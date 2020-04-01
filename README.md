@@ -1,2 +1,2 @@
-# PaddleImgClass
+# PaddleClassification
 Paddle Image Classification Toolkits
