@@ -41,8 +41,8 @@ src="docs/images/models/mobile_arm_top1.png" width="1000">
 模型蒸馏是指使用教师模型(teacher model)去指导学生模型(student model)学习特定任务，保证小模型在参数量不变的情况下，得到比较大的效果提升，甚至获得与大模型相似的精度指标。PaddleCLS提供了一种简单的半监督标签模型蒸馏方案（SSLD，Simple Semi-supervised Label Distillation），使用该方案大幅提升了ResNet50_vd、MobileNetV1和MobileNetV3在ImageNet数据集上分类效果。该蒸馏方案的框架图和蒸馏模型效果如下图所示，详细的蒸馏方法介绍以及使用持续更新中。
 <center class="half">
     <img
-src="docs/images/distillation/ppcls_distillation_v1.png" width="450">  <img
-src="docs/images/distillation/distillation_perform.png" width="300">
+src="docs/images/distillation/ppcls_distillation_v1.png" width="400">  <img
+src="docs/images/distillation/distillation_perform.png" width="250">
 </center>
 
 - 数据增广
