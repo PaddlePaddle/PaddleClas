@@ -101,7 +101,7 @@ PaddleCLS的建设源于百度实际视觉业务应用的淬炼和视觉前沿�
 - 首届多媒体信息识别技术竞赛中印刷文本OCR、人脸识别和地标识别三项任务A级证书
 
 ## 许可证书
-本项目的发布受<a href="PaddleCLS/LICENSE">Apache 2.0 license</a>许可认证。
+本项目的发布受<a href="https://github.com/PaddlePaddle/PaddleCLS/blob/master/LICENSE">Apache 2.0 license</a>许可认证。
 
 ## 版本更新
 
