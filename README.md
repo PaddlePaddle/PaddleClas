@@ -20,14 +20,14 @@ PaddleCLS的目的是为工业界和学术界提供一个图像分类任务相�
 
 基于ImageNet1k分类数据集，PaddleCLS提供ResNet、ResNet_vd、EfficientNet、Res2Net、HRNet、MobileNetV3等17种主流分类网络结构的简单介绍，论文指标复现配置，以及在复现过程中的调参技巧。与此同时，PaddleCLS也提供了118个图像分类预训练模型，并且基于TensorRT评估了所有模型的GPU预测时间，以及在骁龙855（SD855）上评估了移动端模型的CPU预测时间和存储大小。
 
-上图展示了一些适合服务器端应用的模型，使用V100 GPU，FP16和TensorRT预测一个batch的时间，其中batch_size=32，图中ResNet50_vd_ssld，是采用PaddleCLS提供的SSLD蒸馏方法训练的模型。不同模型的Floaps和Params、FP16和FP32的预测时间以及不同batch_size的预测时间正在持续更新中。
+上图展示了一些适合服务器端应用的模型，使用V100 GPU，FP16和TensorRT预测一个batch的时间，其中batch_size=32，图中ResNet50_vd_ssld，是采用PaddleCLS提供的SSLD蒸馏方法训练的模型。不同模型的Flops和Params、FP16和FP32的预测时间以及不同batch_size的预测时间正在持续更新中。
 
 <div align="center">
 <img
 src="docs/images/models/mobile_arm_top1.png" width="1000">
 </div>
 
-上图展示了一些适合移动端应用的模型，在SD855上预测一张图像的CPU时间以及模型的存储大小。图中MV3_large_x1_0_ssld（M是MobileNet的简称），MV3_small_x1_0_ssld和MV1_ssld，是采用PaddleCLS提供的SSLD蒸馏方法训练的模型。MV3_large_x1_0_ssld_int8是进一步进行INT8量化的模型。不同模型的Floaps和Params、以及更多的GPU预测时间正在持续更新中。
+上图展示了一些适合移动端应用的模型，在SD855上预测一张图像的CPU时间以及模型的存储大小。图中MV3_large_x1_0_ssld（M是MobileNet的简称），MV3_small_x1_0_ssld和MV1_ssld，是采用PaddleCLS提供的SSLD蒸馏方法训练的模型。MV3_large_x1_0_ssld_int8是进一步进行INT8量化的模型。不同模型的Flops和Params、以及更多的GPU预测时间正在持续更新中。
 
 - TODO 
 - [ ] EfficientLite 论文指标复现和性能评估
