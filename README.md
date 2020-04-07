@@ -84,7 +84,7 @@ src="docs/images/det/pssdet.png" width="500">
 - [ ] PaddleCLS在人脸检测和识别中的特色应用
 
 ## 实用工具
-为了便于工业应用部署，PaddleCLS也提供了一些实用工具，持续更新中。
+为了便于工业应用部署，PaddleCLS也提供了一些实用工具，还在持续更新中。
 
 - TensorRT预测
 - 移动端预测
