@@ -1,6 +1,6 @@
-### PaddleCLS
+# PaddleCLS
 
-### 简介
+## 简介
 PaddleCLS的目的是为工业界和学术界提供一个图像分类任务相关的百宝箱，特色如下：
 - 模型库：提供17种分类网络结构以及调参技巧，118个分类预训练模型以及性能评估
 
@@ -12,7 +12,7 @@ PaddleCLS的目的是为工业界和学术界提供一个图像分类任务相�
 
 - 赛事支持：助力多个视觉全球挑战赛取得领先成绩，包括2018年Kaggle Open Images V4图像目标检测挑战赛冠军、2019年Kaggle地标检索挑战赛亚军等
     
-### 模型库
+## 模型库
 
 <div align="center">
     <img src="docs/images/models/main_fps_top1.png" width="600">
@@ -34,7 +34,7 @@ src="docs/images/models/mobile_arm_top1.png" width="1000">
   - GhostNet 论文指标复现和性能评估
   - RegNet 论文指标复现和性能评估
 
-### 高阶使用
+## 高阶使用
 除了提供丰富的分类网络结构和预训练模型，PaddleCLS也提供了一系列有助于图像分类任务效果和效率提升的算法或工具。
 - 模型蒸馏
 
@@ -58,7 +58,7 @@ src="docs/images/image_aug/main_image_aug.png" width="500">
   - 更多的优化器支持和效果验证
   - 支持模型可解释性工具
 
-### 应用拓展
+## 应用拓展
 效果更优的图像分类网络结构和预训练模型往往有助于提升其他视觉任务的效果，PaddleCLS提供了一系列在常见视觉任务中的特色方案。
 
 - 图像分类的迁移学习
@@ -78,7 +78,7 @@ src="docs/images/det/pssdet.png" width="500">
   - PaddleCLS在OCR任务中的特色应用
   - PaddleCLS在人脸检测和识别中的特色应用
 
-### 实用工具
+## 实用工具
 为了便于工业应用部署，PaddleCLS也提供了一些实用工具，持续更新中。
 
 - TensorRT预测
@@ -86,7 +86,7 @@ src="docs/images/det/pssdet.png" width="500">
 - INT8量化
 - 多机训练
 
-### 赛事支持
+## 赛事支持
 PaddleCLS的建设源于百度实际视觉业务应用的淬炼和视觉前沿能力的探索，助力多个视觉重点赛事取得领先成绩，并且持续推进更多的前沿视觉问题的解决和落地应用。
 
 - 2018年Kaggle Open Images V4图像目标检测挑战赛冠军
@@ -95,10 +95,10 @@ PaddleCLS的建设源于百度实际视觉业务应用的淬炼和视觉前沿�
 - 2019年Kaggle地标识别挑战赛亚军
 - 首届多媒体信息识别技术竞赛中印刷文本OCR、人脸识别和地标识别三项任务A级证书
 
-### 许可证书
+## 许可证书
 本项目的发布受<a href="/PaddlePaddle/PaddleCLS/LICENSE">Apache 2.0 license</a>许可认证。
 
-### 版本更新
+## 版本更新
 
-### 如何贡献代码
+## 如何贡献代码
 我们非常欢迎你可以为PaddleCLS提供代码，也十分感谢你的反馈。
