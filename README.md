@@ -30,9 +30,9 @@ src="docs/images/models/mobile_arm_top1.png" width="1000">
 上图展示了一些适合移动端应用的模型，在SD855上预测一张图像的CPU时间以及模型的存储大小。图中MV3_large_x1_0_ssld（M是MobileNet的简称），MV3_small_x1_0_ssld和MV1_ssld，是采用PaddleCLS提供的SSLD蒸馏方法训练的模型。MV3_large_x1_0_ssld_int8是进一步进行INT8量化的模型。不同模型的Floaps和Params、以及更多的GPU预测时间持续更新中。
 
 - ToDo  
-- [] EfficientLite 论文指标复现和性能评估
-- [] GhostNet 论文指标复现和性能评估
-- [] RegNet 论文指标复现和性能评估
+- [ ] EfficientLite 论文指标复现和性能评估
+- [ ] GhostNet 论文指标复现和性能评估
+- [ ] RegNet 论文指标复现和性能评估
 
 ## 高阶使用
 除了提供丰富的分类网络结构和预训练模型，PaddleCLS也提供了一系列有助于图像分类任务效果和效率提升的算法或工具。
@@ -60,8 +60,8 @@ src="docs/images/image_aug/main_image_aug.png" width="600">
 </div> 
 
 - ToDo
-- [] 更多的优化器支持和效果验证
-- [] 支持模型可解释性工具
+- [ ] 更多的优化器支持和效果验证
+- [ ] 支持模型可解释性工具
 
 ## 应用拓展
 效果更优的图像分类网络结构和预训练模型往往有助于提升其他视觉任务的效果，PaddleCLS提供了一系列在常见视觉任务中的特色方案。
@@ -80,8 +80,8 @@ src="docs/images/det/pssdet.png" width="500">
 </div>
 
 - ToDo
-- [] PaddleCLS在OCR任务中的特色应用
-- [] PaddleCLS在人脸检测和识别中的特色应用
+- [ ] PaddleCLS在OCR任务中的特色应用
+- [ ] PaddleCLS在人脸检测和识别中的特色应用
 
 ## 实用工具
 为了便于工业应用部署，PaddleCLS也提供了一些实用工具，持续更新中。
