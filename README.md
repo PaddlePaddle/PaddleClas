@@ -42,12 +42,12 @@ src="docs/images/models/mobile_arm_top1.png" width="1000">
 
 <div align="center">
 <img
-src="docs/images/distillation/ppcls_distillation_v1.png" width="400">
+src="docs/images/distillation/ppcls_distillation_v1.png" width="800">
 </div>
 
 <div align="center">
 <img
-src="docs/images/distillation/distillation_perform.png" width="400">
+src="docs/images/distillation/distillation_perform.png" width="800">
 </div>
 
 - 数据增广
