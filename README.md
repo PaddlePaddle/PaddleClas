@@ -42,7 +42,7 @@ src="docs/images/models/mobile_arm_top1.png" width="1000">
 
 <div align="center">
 <img
-src="docs/images/distillation/ppcls_distillation_v1.png" width="500">
+src="docs/images/distillation/ppcls_distillation_v1.png" width="600">
 </div>
 
 <div align="center">
@@ -56,7 +56,7 @@ src="docs/images/distillation/distillation_perform.png" width="500">
 
 <div align="center">
 <img
-src="docs/images/image_aug/main_image_aug.png" width="500">
+src="docs/images/image_aug/main_image_aug.png" width="600">
 </div> 
 
 - ToDo
