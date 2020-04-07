@@ -29,7 +29,7 @@ src="docs/images/models/mobile_arm_top1.png" width="1000">
 
 上图展示了一些适合移动端应用的模型，在SD855上预测一张图像的CPU时间以及模型的存储大小。图中MV3_large_x1_0_ssld（M是MobileNet的简称），MV3_small_x1_0_ssld和MV1_ssld，是采用PaddleCLS提供的SSLD蒸馏方法训练的模型。MV3_large_x1_0_ssld_int8是进一步进行INT8量化的模型。不同模型的Floaps和Params、以及更多的GPU预测时间持续更新中。
 
-- ToDo  
+- TODO 
 - [ ] EfficientLite 论文指标复现和性能评估
 - [ ] GhostNet 论文指标复现和性能评估
 - [ ] RegNet 论文指标复现和性能评估
@@ -59,7 +59,7 @@ src="docs/images/distillation/distillation_perform.png" width="500">
 src="docs/images/image_aug/main_image_aug.png" width="600">
 </div> 
 
-- ToDo
+- TODO
 - [ ] 更多的优化器支持和效果验证
 - [ ] 支持模型可解释性工具
 
@@ -79,7 +79,7 @@ src="docs/images/image_aug/main_image_aug.png" width="600">
 src="docs/images/det/pssdet.png" width="500">
 </div>
 
-- ToDo
+- TODO
 - [ ] PaddleCLS在OCR任务中的特色应用
 - [ ] PaddleCLS在人脸检测和识别中的特色应用
 
@@ -106,4 +106,4 @@ PaddleCLS的建设源于百度实际视觉业务应用的淬炼和视觉前沿�
 ## 版本更新
 
 ## 如何贡献代码
-我们非常欢迎你可以为PaddleCLS提供代码，也十分感谢你的反馈。
+我们非常欢迎你为PaddleCLS提供代码，也十分感谢你的反馈。
