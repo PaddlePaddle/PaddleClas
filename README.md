@@ -2,7 +2,7 @@
 
 ## 简介
 PaddleClas的目的是为工业界和学术界提供一个图像分类任务相关的百宝箱，特色如下：
-- 模型库：17种分类网络结构以及调参技巧，118个分类预训练模型以及性能评估
+- 模型库：17种分类网络结构以及训练技巧，118个分类预训练模型以及性能评估
 
 - 高阶使用：高精度的实用模型蒸馏方案（准确率82.39%的ResNet50_vd和78.9%的MobileNetV3）、8种数据增广方法的复现和验证
 
@@ -18,7 +18,7 @@ PaddleClas的目的是为工业界和学术界提供一个图像分类任务相�
     <img src="docs/images/models/main_fps_top1.png" width="600">
 </div>
 
-基于ImageNet1k分类数据集，PaddleClas提供ResNet、ResNet_vd、EfficientNet、Res2Net、HRNet、MobileNetV3等17种主流分类网络结构的简单介绍，论文指标复现配置，以及在复现过程中的调参技巧。与此同时，PaddleClas也提供了118个图像分类预训练模型，并且基于TensorRT评估了所有模型的GPU预测时间，以及在骁龙855（SD855）上评估了移动端模型的CPU预测时间和存储大小。
+基于ImageNet1k分类数据集，PaddleClas提供ResNet、ResNet_vd、EfficientNet、Res2Net、HRNet、MobileNetV3等17种主流分类网络结构的简单介绍，论文指标复现配置，以及在复现过程中的训练技巧。与此同时，PaddleClas也提供了118个图像分类预训练模型，并且基于TensorRT评估了所有模型的GPU预测时间，以及在骁龙855（SD855）上评估了移动端模型的CPU预测时间和存储大小。
 
 上图展示了一些适合服务器端应用的模型，使用V100 GPU，FP16和TensorRT预测一个batch的时间，其中batch_size=32，图中ResNet50_vd_ssld，是采用PaddleClas提供的SSLD蒸馏方法训练的模型。不同模型的FLOPS和Parameters、FP16和FP32的预测时间以及不同batch_size的预测时间正在持续更新中。
 
