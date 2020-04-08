@@ -82,7 +82,7 @@ src="docs/images/det/pssdet.png" width="500">
 - [ ] PaddleClas在人脸检测和识别中的特色应用
 
 ## 实用工具
-为了便于工业应用部署，PaddleClas也提供了一些实用工具，正在持续更新中。
+PaddlePaddle提供了一系列实用工具，便于工业应用部署PaddleClas，详细使用请参考文档教程。
 
 - TensorRT预测
 - 移动端预测
