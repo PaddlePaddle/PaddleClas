@@ -27,7 +27,7 @@ PaddleClas的目的是为工业界和学术界提供一个图像分类任务相�
 src="docs/images/models/mobile_arm_top1.png" width="600">
 </div>
 
-上图展示了一些适合移动端应用的模型，在SD855上预测一张图像的CPU时间以及模型的存储大小。图中MV3_large_x1_0_ssld（M是MobileNet的简称），MV3_small_x1_0_ssld和MV1_ssld，是采用PaddleClas提供的SSLD蒸馏方法训练的模型。MV3_large_x1_0_ssld_int8是进一步进行INT8量化的模型。不同模型的FLOPS和Parameters、以及更多的GPU预测时间正在持续更新中。
+上图展示了一些适合移动端应用的模型，在SD855上预测一张图像的CPU时间以及模型的存储大小。图中MV3_large_x1_0_ssld（M是MobileNet的简称），MV3_small_x1_0_ssld、MV2_ssld和MV1_ssld，是采用PaddleClas提供的SSLD蒸馏方法训练的模型。MV3_large_x1_0_ssld_int8是进一步进行INT8量化的模型。不同模型的FLOPS和Parameters、以及更多的GPU预测时间正在持续更新中。
 
 - TODO 
 - [ ] EfficientLite、GhostNet、RegNet论文指标复现和性能评估
