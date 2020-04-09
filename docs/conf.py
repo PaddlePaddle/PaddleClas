@@ -14,7 +14,6 @@ import os
 import sys
 import recommonmark
 sys.path.insert(0, os.path.abspath('.'))
-sys.path.insert(0, os.path.abspath('..'))
 
 exclude_patterns = ['tmp', 'build', 'tools', 'README.md']
 
