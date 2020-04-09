@@ -1,0 +1,8 @@
+*.pyc
+*.sw*
+*log*
+/dataset
+checkpoints/
+pretrained/
+*.ipynb*
+build/
