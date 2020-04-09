@@ -357,6 +357,8 @@ def run(dataloader, exe, program, fetchs, epoch=0, mode='train'):
     """
     fetch_list = [f[0] for f in fetchs.values()]
     metric_list = [f[1] for f in fetchs.values()]
+    for m in metric_list:
+        m.reset()
     batch_time = AverageMeter('cost', ':6.3f')
     tic = time.time()
     for idx, batch in enumerate(dataloader()):

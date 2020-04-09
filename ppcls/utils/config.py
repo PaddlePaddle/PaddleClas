@@ -89,8 +89,8 @@ def print_config(config):
         config: configs
     """
 
-    copyright = "PaddleCLS is powered by PaddlePaddle"
-    ad = "https://github.com/PaddlePaddle/PaddleCLS"
+    copyright = "PaddleClas is powered by PaddlePaddle"
+    ad = "https://github.com/PaddlePaddle/PaddleClas"
 
     logger.info("\n" * 2)
     logger.info(copyright)
@@ -193,9 +193,11 @@ def get_config(fname, overrides=[], show=True):
     assert os.path.exists(fname), \
             ('config file({}) is not exist'.format(fname))
     config = parse_config(fname)
-    if show: print_config(config)
+    if show:
+        print_config(config)
     if len(overrides) > 0:
         override_config(config, overrides)
-        print_config(config)
+        if show:
+            print_config(config)
     check_config(config)
     return config

@@ -30,7 +30,7 @@ __all__ = ['init_model', 'save_model']
 
 def _mkdir_if_not_exist(path):
     """
-        mkdir if not exists
+    mkdir if not exists
     """
     if not os.path.exists(os.path.join(path)):
         os.makedirs(os.path.join(path))
@@ -97,25 +97,27 @@ def load_params(exe, prog, path, ignore_params=[]):
     fluid.io.set_program_state(prog, state)
 
 
-def init_model(config, program, exe):
+def init_model(config, program, exe, prefix="ppcls"):
     """
-        load model from checkpoint or pretrained_model
+    load model from checkpoint or pretrained_model
     """
     checkpoints = config.get('checkpoints')
-    if checkpoints and os.path.exists(checkpoints):
-        fluid.load(program, checkpoints, exe)
-        logger.info("Finish initing model from {}".format(checkpoints))
+    if checkpoints:
+        path = os.path.join(checkpoints, prefix)
+        fluid.load(program, path, exe)
+        logger.info("Finish initing model from {}".format(path))
         return
 
     pretrained_model = config.get('pretrained_model')
-    if pretrained_model and os.path.exists(pretrained_model):
-        load_params(exe, program, pretrained_model)
-        logger.info("Finish initing model from {}".format(pretrained_model))
+    if pretrained_model:
+        path = os.path.join(pretrained_model, prefix)
+        load_params(exe, program, path)
+        logger.info("Finish initing model from {}".format(path))
 
 
 def save_model(program, model_path, epoch_id, prefix='ppcls'):
     """
-        save model to the target path
+    save model to the target path
     """
     model_path = os.path.join(model_path, str(epoch_id))
     _mkdir_if_not_exist(model_path)
