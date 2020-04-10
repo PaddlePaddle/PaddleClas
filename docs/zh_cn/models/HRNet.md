@@ -1,7 +1,7 @@
 # HRNet系列
 
 ## 概述
-模型概述正在持续更新中......
+正在持续更新中......
 ![](../../images/models/HRNet.png)
 所有模型在预测时，图像的crop_size设置为224，resize_short_size设置为256。
 
