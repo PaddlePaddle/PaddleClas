@@ -23,7 +23,7 @@ python -m paddle.distributed.launch \
     --selected_gpus="0,1,2,3" \
     --log_dir=log_ResNet50 \
     train.py \
-        -c ../configs/ResNet/ResNet50.yaml \
+        -c ./configs/ResNet/ResNet50.yaml \
 ```
 
 - 输出日志示例如下：
@@ -39,7 +39,7 @@ python -m paddle.distributed.launch \
     --selected_gpus="0,1,2,3" \
     --log_dir=log_ResNet50_vd \
     train.py \
-        -c ../configs/ResNet/ResNet50_vd.yaml \
+        -c ./configs/ResNet/ResNet50_vd.yaml \
     -o use_mix=1 \
 
 ```
@@ -57,7 +57,7 @@ epoch:0    train    step:522    loss:1.6330    lr:0.100000    elapse:0.210
 
 ```bash
 python eval.py \
-    -c ../configs/eval.yaml \
+    -c ./configs/eval.yaml \
     -o architecture="ResNet50_vd" \
     -o pretrained_model=path_to_pretrained_models
 ```

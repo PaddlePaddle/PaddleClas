@@ -2,13 +2,13 @@
 
 ## 概述
 
-基于ImageNet1k分类数据集，PaddleClas支持的25种主流分类网络结构和117个图像分类预训练模型如下表所示，训练技巧、每个系列网络结构的简单介绍和性能评估将在相应章节展现。GPU上的预测时间采用V100和TensorRT，CPU的预测时间是基于骁龙855（SD855）。
+基于ImageNet1k分类数据集，PaddleClas支持的25种主流分类网络结构以及对应的117个图像分类预训练模型如下所示，训练技巧、每个系列网络结构的简单介绍和性能评估将在相应章节展现。GPU评估环境基于V100和TensorRT，CPU的评估环境基于骁龙855（SD855）。
 
 ![](../../images/models/main_fps_top1.png)
 ![](../../images/models/mobile_arm_top1.png)
 
 - ResNet及其Vd系列
-  - ResNet系列([论文地址](http://openaccess.thecvf.com/content_cvpr_2016/html/He_Deep_Residual_Learning_CVPR_2016_paper.html))
+  - ResNet系列`[1]`([论文地址](http://openaccess.thecvf.com/content_cvpr_2016/html/He_Deep_Residual_Learning_CVPR_2016_paper.html))
     - [ResNet18](https://paddle-imagenet-models-name.bj.bcebos.com/ResNet18_pretrained.tar)
     - [ResNet34](https://paddle-imagenet-models-name.bj.bcebos.com/ResNet34_pretrained.tar)
     - [ResNet50](https://paddle-imagenet-models-name.bj.bcebos.com/ResNet50_pretrained.tar)
