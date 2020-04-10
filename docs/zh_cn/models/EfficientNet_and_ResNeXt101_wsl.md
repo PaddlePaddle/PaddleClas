@@ -1,7 +1,7 @@
 # EfficientNet与ResNeXt101_wsl系列
 
 ## 概述
-概述正在持续更新中......
+正在持续更新中......
 ![](../../images/models/EfficientNet.png)
 
 在预测时，图像的crop_size和resize_short_size如下表所示。
