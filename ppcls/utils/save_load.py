@@ -16,9 +16,10 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
+import errno
 import os
-import tempfile
 import shutil
+import tempfile
 
 import paddle
 import paddle.fluid as fluid
@@ -32,8 +33,16 @@ def _mkdir_if_not_exist(path):
     """
     mkdir if not exists
     """
-    if not os.path.exists(os.path.join(path)):
-        os.makedirs(os.path.join(path))
+    if not os.path.exists(path):
+        try:
+            os.makedirs(path)
+        except OSError as e:
+            if e.errno == errno.EEXIST and os.path.isdir(path):
+                logger.warning(
+                    'be happy if some process has already created {}'.format(
+                        path))
+            else:
+                raise OSError('failed to mkdir {}'.format(path))
 
 
 def _load_state(path):
