@@ -10,9 +10,10 @@ PaddleCLS的建设源于百度实际视觉业务应用的淬炼和视觉前沿�
 
 * 2019年Kaggle地标检索挑战赛亚军
     * 技术报告可以参考：[https://arxiv.org/abs/1906.03990](https://arxiv.org/abs/1906.03990)
+    * 详细文档与开源的模型可以参考：[2019地标检索和识别github地址](https://github.com/PaddlePaddle/Research/tree/master/CV/landmark)
 
 * 2019年Kaggle地标识别挑战赛亚军
     * 技术报告可以参考：[https://arxiv.org/abs/1906.03990](https://arxiv.org/abs/1906.03990)
-
+    * 详细文档与开源的模型可以参考：[2019地标检索和识别github地址](https://github.com/PaddlePaddle/Research/tree/master/CV/landmark)
 
 * 首届多媒体信息识别技术竞赛中印刷文本OCR、人脸识别和地标识别三项任务A级证书
