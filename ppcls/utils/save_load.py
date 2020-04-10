@@ -42,7 +42,7 @@ def _mkdir_if_not_exist(path):
                     'be happy if some process has already created {}'.format(
                         path))
             else:
-                raise OSError('failed to mkdir {}'.format(path))
+                raise OSError('Failed to mkdir {}'.format(path))
 
 
 def _load_state(path):
