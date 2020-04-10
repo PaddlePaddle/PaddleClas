@@ -103,6 +103,9 @@ def main():
         assert args.use_gpu == True
         assert args.model_name is not None
         assert args.use_tensorrt == True
+    # HALF precission predict only work when using tensorrt
+    if args.use_fp16==True:
+        assert args.use_tensorrt == True
 
     operators = create_operators()
     predictor = create_predictor(args)

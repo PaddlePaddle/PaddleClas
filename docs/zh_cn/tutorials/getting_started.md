@@ -66,7 +66,7 @@ python eval.py \
 ## 3、模型推理
 
 PaddlePaddle提供三种方式进行预测推理，接下来介绍如何用预测引擎进行推理：
-首先，对预测模型进行导出
+首先，对训练好的模型进行转换
 ```bash
 python tools/export_model.py \
     -model=模型名字 \
@@ -83,4 +83,4 @@ python tools/predict.py \
     --use_gpu=1 \
     --use_tensorrt=True
 ```
-更多推理方式和实验请参考[分类预测框架](../extension/paddle_inference.md)
+更多使用方法和推理方式请参考[分类预测框架](../extension/paddle_inference.md)
