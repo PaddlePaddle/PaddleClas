@@ -46,10 +46,14 @@ def parse_args():
 
 def create_predictor(args):
     config = AnalysisConfig(args.model_file, args.params_file)
+
+
+
     if args.use_gpu:
         config.enable_use_gpu(args.gpu_mem, 0)
     else:
         config.disable_gpu()
+
     config.disable_glog_info()
     config.switch_ir_optim(args.ir_optim) # default true
     if args.use_tensorrt:
@@ -91,6 +95,15 @@ def preprocess(fname, ops):
 
 def main():
     args = parse_args()
+
+    if not args.enable_benchmark:
+        assert args.batch_size == 1
+        assert args.use_fp16 == False
+    else:
+        assert args.use_gpu == True
+        assert args.model_name is not None
+        assert args.use_tensorrt == True
+
     operators = create_operators()
     predictor = create_predictor(args)
 
