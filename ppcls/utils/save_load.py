@@ -31,7 +31,7 @@ __all__ = ['init_model', 'save_model']
 
 def _mkdir_if_not_exist(path):
     """
-    mkdir if not exists
+    mkdir if not exists, ignore the exception when multiprocess mkdir together
     """
     if not os.path.exists(path):
         try:
