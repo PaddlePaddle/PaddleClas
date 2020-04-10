@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 export PYTHONPATH=$(dirname "$PWD"):$PWD:$PYTHONPATH
 
 python -m paddle.distributed.launch \
