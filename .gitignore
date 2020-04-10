@@ -1,8 +1,7 @@
-!ppcls/ 
 *.pyc
 *.sw*
-*log*
-/dataset
+*/workerlog*
+dataset/
 checkpoints/
 output/
 pretrained/
