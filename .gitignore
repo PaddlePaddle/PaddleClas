@@ -3,6 +3,7 @@
 *log*
 /dataset
 checkpoints/
+output/
 pretrained/
 *.ipynb*
 build/
