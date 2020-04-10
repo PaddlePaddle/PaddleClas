@@ -3,18 +3,17 @@
 ## 概述
 MobileNetV1是Google于2017年发布的用于移动设备或嵌入式设备中的网络。该网络将传统的卷积操作替换深度可分离卷积，即Depthwise卷积和Pointwise卷积的组合，相比传统的卷积操作，该组合可以大大节省参数量和计算量。与此同时，MobileNetV1也可以用于目标检测、图像分割等其他视觉任务中。
 
-MobileNetV2是Google继MobileNetV1提出的一种轻量级网络。相比MobileNetV1，MobileNetV2提出了Linear Bottlenecks与Inverted residual block作为网络基本结构，通过大量的堆叠这些基本模块，构成了MobileNetV2的网络结构。最终，在Flops只有MobileNetV1的一半的情况下取得了更高的分类精度。
+MobileNetV2是Google继MobileNetV1提出的一种轻量级网络。相比MobileNetV1，MobileNetV2提出了Linear bottlenecks与Inverted residual block作为网络基本结构，通过大量地堆叠这些基本模块，构成了MobileNetV2的网络结构。最终，在FLOPS只有MobileNetV1的一半的情况下取得了更高的分类精度。
 
-ShuffleNet系列网络是旷视提出的轻量化网络结构，到目前为止，该系列网络一共有两种典型的结构，即ShuffleNetV1与ShuffleNetV2，ShuffleNet中的Channel Shuffle操作可以将组间的信息进行交换，并且可以实现端到端的训练。在ShuffleNetV2的论文中，作者提出了设计轻量级网络的四大准则，并且根据四大准则与ShuffleNetV1的不足，设计了ShuffleNetV2网络。
+ShuffleNet系列网络是旷视提出的轻量化网络结构，到目前为止，该系列网络一共有两种典型的结构，即ShuffleNetV1与ShuffleNetV2。ShuffleNet中的Channel Shuffle操作可以将组间的信息进行交换，并且可以实现端到端的训练。在ShuffleNetV2的论文中，作者提出了设计轻量级网络的四大准则，并且根据四大准则与ShuffleNetV1的不足，设计了ShuffleNetV2网络。
 
-MobileNetV3是Google于2019年提出的一种基于NAS的新的轻量级网络，为了进一步提升效果，该网络的激活函数将relu换作了swish，为了能在移动端更好的加速，作者最终又将网络中的swish和sigmoid激活函数分别替换为h_swish与h_sigmoid激活函数，为了更好地限制Flops，作者引入了一些专门针对小网络的的改进策略，最终，在MobileNetV3的精度几乎没有下降的同时，Flops进一步缩小。
+MobileNetV3是Google于2019年提出的一种基于NAS的新的轻量级网络，为了进一步提升效果，将relu和sigmoid激活函数分别替换为hard_swish与hard_sigmoid激活函数，同时引入了一些专门减小网络计算量的改进策略。
 ![](../../images/models/mobile_arm_top1.png)
 ![](../../images/models/mobile_arm_storage.png)
 ![](../../images/models/mobile_trt.png)
-从图片可以看出，越新的轻量级模型往往有更优的表现，MobileNetV3代表了目前最新的轻量级神经网络结构。在MobileNetV3中，作者为了获得更高的精度，在global-pooling后使用了1x1的卷积，该操作大幅提升了参数量但对计算量影响不大，所以如果从存储角度评价模型的优异程度，MobileNetV3优势不是很大，但由于其更小的计算量，使得其有更快的推理速度。此外，我们模型库中的ssld蒸馏模型表现优异，从各个考量角度下，都刷新了当前轻量级模型的精度，其在视觉其他任务中，也有优异的表现，具体内容详情ssld蒸馏章节。
+目前PaddleClas开源的的移动端系列的预训练模型一共有32个，其指标如图所示。从图片可以看出，越新的轻量级模型往往有更优的表现，MobileNetV3代表了目前最新的轻量级神经网络结构。在MobileNetV3中，作者为了获得更高的精度，在global-avg-pooling后使用了1x1的卷积。该操作大幅提升了参数量但对计算量影响不大，所以如果从存储角度评价模型的优异程度，MobileNetV3优势不是很大，但由于其更小的计算量，使得其有更快的推理速度。此外，我们模型库中的ssld蒸馏模型表现优异，从各个考量角度下，都刷新了当前轻量级模型的精度。由于移动端模型结构复杂，分支较多，对GPU并不友好。
 
 **注意**：所有模型在预测时，图像的crop_size设置为224，resize_short_size设置为256。
-
 
 
 ## 精度、FLOPS和参数量
