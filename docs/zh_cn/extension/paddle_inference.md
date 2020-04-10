@@ -4,7 +4,7 @@
 
 Paddle 的模型保存有多种不同的形式，大体可分为两类：
 1. persistable 模型（fluid.save_persistabels保存的模型）
-    一般用作模型的 checkpoint，可以加载后重新训练。persistable 模型保存的是零散的权重文件，每个文件代表模型中的一个 Variable，这些零散的文件不包含结构信息，需要结合模型的结构一起使用。
+    一般做为模型的 checkpoint，可以加载后重新训练。persistable 模型保存的是零散的权重文件，每个文件代表模型中的一个 Variable，这些零散的文件不包含结构信息，需要结合模型的结构一起使用。
     ```
     resnet50-vd-persistable/
     ├── bn2a_branch1_mean
