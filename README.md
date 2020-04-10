@@ -2,7 +2,7 @@
 
 ## 简介
 PaddleClas的目的是为工业界和学术界提供一个图像分类任务相关的百宝箱，特色如下：
-- 模型库：25种分类网络结构以及训练技巧，117个分类预训练模型以及性能评估
+- 模型库：ResNet_vd、MobileNetV3等25种系列的分类网络结构和训练技巧，以及对应的117个分类预训练模型和性能评估
 
 - 高阶使用：高精度的实用模型蒸馏方案（准确率82.39%的ResNet50_vd和78.9%的MobileNetV3）、8种数据增广方法的复现和验证
 
@@ -11,7 +11,7 @@ PaddleClas的目的是为工业界和学术界提供一个图像分类任务相�
 - 实用工具：便于工业应用部署的实用工具，包括TensorRT预测、移动端预测、INT8量化、多机训练、PaddleHub等
 
 - 赛事支持：助力多个视觉全球挑战赛取得领先成绩，包括2018年Kaggle Open Images V4图像目标检测挑战赛冠军、2019年Kaggle地标检索挑战赛亚军等
-    
+
 ## 模型库
 
 <div align="center">
@@ -29,7 +29,7 @@ src="docs/images/models/mobile_arm_top1.png" width="600">
 
 上图展示了一些适合移动端应用的模型，在SD855上预测一张图像的CPU时间以及模型的存储大小。图中MV3_large_x1_0_ssld（M是MobileNet的简称），MV3_small_x1_0_ssld、MV2_ssld和MV1_ssld，是采用PaddleClas提供的SSLD蒸馏方法训练的模型。MV3_large_x1_0_ssld_int8是进一步进行INT8量化的模型。不同模型的FLOPS和Parameters、以及更多的GPU预测时间正在持续更新中。
 
-- TODO 
+- TODO
 - [ ] EfficientLite、GhostNet、RegNet论文指标复现和性能评估
 
 ## 高阶使用
@@ -55,7 +55,7 @@ src="docs/images/distillation/distillation_perform.png" width="500">
 <div align="center">
 <img
 src="docs/images/image_aug/main_image_aug.png" width="600">
-</div> 
+</div>
 
 - TODO
 - [ ] 更多的优化器支持和效果验证
@@ -105,4 +105,4 @@ PaddleClas的建设源于百度实际视觉业务应用的淬炼和视觉前沿�
 ## 版本更新
 
 ## 如何贡献代码
-我们非常欢迎你为PaddleClas提供代码，也十分感谢你的反馈。
+我们非常欢迎你为PaddleClas贡献代码，也十分感谢你的反馈。
