@@ -1,7 +1,7 @@
 mode: 'train'
 architecture: "MobileNetV1_x0_75"
 pretrained_model: ""
-model_save_dir: "./checkpoints/"
+model_save_dir: "./output/"
 classes_num: 1000
 total_images: 1281167
 save_interval: 1

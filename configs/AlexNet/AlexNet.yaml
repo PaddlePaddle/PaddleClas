@@ -1,7 +1,7 @@
 mode: 'train'
 architecture: "AlexNet"
 pretrained_model: ""
-model_save_dir: "./checkpoints/"
+model_save_dir: "./output/"
 classes_num: 1000
 total_images: 1281167
 save_interval: 1
@@ -48,8 +48,6 @@ TRAIN:
             order: ''
         - ToCHWImage:
 
-
-
 VALID:
     batch_size: 64
     num_workers: 4
@@ -71,5 +69,4 @@ VALID:
             std: [0.229, 0.224, 0.225]
             order: ''
         - ToCHWImage:
-
 
