@@ -8,10 +8,10 @@
 
 | Models                    | crop_size | resize_short_size |
 |:--:|:--:|:--:|
-| ResNeXt101_32x8d_wsl      | 224       | 256               |
-| ResNeXt101_32x16d_wsl     | 224       | 256               |
-| ResNeXt101_32x32d_wsl     | 224       | 256               |
-| ResNeXt101_32x48d_wsl     | 224       | 256               |
+| ResNeXt101_32x8d_wsl      | 224       | 224               |
+| ResNeXt101_32x16d_wsl     | 224       | 224               |
+| ResNeXt101_32x32d_wsl     | 224       | 224               |
+| ResNeXt101_32x48d_wsl     | 224       | 224               |
 | Fix_ResNeXt101_32x48d_wsl | 320       | 320               |
 | EfficientNetB0            | 224       | 256               |
 | EfficientNetB1            | 240       | 272               |
