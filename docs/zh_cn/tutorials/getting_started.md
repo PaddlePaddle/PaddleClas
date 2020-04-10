@@ -22,8 +22,8 @@ PaddleClas 提供模型训练与评估脚本：tools/train.py和tools/eval.py
 python -m paddle.distributed.launch \
     --selected_gpus="0,1,2,3" \
     --log_dir=log_ResNet50 \
-    train.py \
-        -c ./configs/ResNet/ResNet50.yaml \
+    tools/train.py \
+        -c ./configs/ResNet/ResNet50.yaml 
 ```
 
 - 输出日志示例如下：
@@ -38,9 +38,9 @@ epoch:0    train    step:13    loss:7.9561    top1:0.0156    top5:0.1094    lr:0
 python -m paddle.distributed.launch \
     --selected_gpus="0,1,2,3" \
     --log_dir=log_ResNet50_vd \
-    train.py \
+    tools/train.py \
         -c ./configs/ResNet/ResNet50_vd.yaml \
-    -o use_mix=1 \
+        -o use_mix=1 
 
 ```
 
@@ -56,7 +56,7 @@ epoch:0    train    step:522    loss:1.6330    lr:0.100000    elapse:0.210
 ### 2.2 模型评估
 
 ```bash
-python eval.py \
+python tools/eval.py \
     -c ./configs/eval.yaml \
     -o architecture="ResNet50_vd" \
     -o pretrained_model=path_to_pretrained_models
@@ -76,7 +76,7 @@ python tools/export_model.py \
 ```
 之后，通过预测引擎进行推理
 ```bash
-python tools/predict.py \
+python tools/infer/predict.py \
     -m model文件路径 \
     -p params文件路径 \
     -i 图片路径 \
