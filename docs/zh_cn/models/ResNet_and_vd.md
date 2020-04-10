@@ -9,12 +9,10 @@ ResNet系列模型是在2015年提出的，一举在ILSVRC2015比赛中取得冠
 本次发布ResNet系列的模型包括ResNet50，ResNet50_vd，ResNet50_vd_ssld，ResNet200_vd等14个预训练模型。在训练层面上，ResNet的模型采用了训练ImageNet的标准训练流程，而其余改进版模型采用了更多的训练策略，如learning rate的下降方式采用了cosine decay，引入了label smoothing的标签正则方式，在数据预处理加入了mixup的操作，迭代总轮数从120个epoch增加到200个epoch。
 
 其中，ResNet50_vd_v2与ResNet50_vd_ssld采用了知识蒸馏，保证模型结构不变的情况下，进一步提升了模型的精度，具体地，ResNet50_vd_v2的teacher模型是ResNet152_vd（top1准确率80.59%），数据选用的是ImageNet-1k的训练集，ResNet50_vd_ssld的teacher模型是ResNeXt101_32x16d_wsl（top1准确率84.2%），数据选用结合了ImageNet-1k的训练集和ImageNet-22k挖掘的400万数据。知识蒸馏的具体方法正在持续更新中。
-
 ![](../../images/models/ResNet.png)
-
 通过上述曲线可以看出，层数越多，准确率越高，但是相应的参数量、计算量和延时都会增加。ResNet50_vd_ssld通过用更强的teacher和更多的数据，将其在ImageNet-1k上的验证集top-1精度进一步提高，达到了82.39%，刷新了ResNet50系列模型的精度。
 
-- [x] 注意：所有模型在预测时，图像的crop_size设置为224，resize_short_size设置为256。
+**注意**：所有模型在预测时，图像的crop_size设置为224，resize_short_size设置为256。
 
 ## 精度、FLOPS和参数量
 
