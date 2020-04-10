@@ -2,7 +2,7 @@
 ---
 请事先参考[安装指南](install.md)配置运行环境
 
-## 1 设置环境变量
+## 一、设置环境变量
 
 **设置PYTHONPATH环境变量：**
 
@@ -10,7 +10,7 @@
 export PYTHONPATH=path_to_PaddleClas:$PYTHONPATH
 ```
 
-## 2 模型训练与评估
+## 二、模型训练与评估
 
 PaddleClas 提供模型训练与评估脚本：tools/train.py和tools/eval.py
 
@@ -63,7 +63,7 @@ python eval.py \
 ```
 您可以更改configs/eval.yaml中的architecture字段和pretrained_model字段来配置评估模型，或是通过-o参数更新配置。
 
-## 3 模型推理
+## 3、模型推理
 
 PaddlePaddle提供三种方式进行预测推理，接下来介绍如何用预测引擎进行推理：
 首先，对预测模型进行导出

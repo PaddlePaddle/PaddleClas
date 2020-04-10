@@ -1,9 +1,9 @@
 # 分类预测框架
 
-### 一、简介
+## 一、简介
 
 Paddle 的模型保存有多种不同的形式，大体可分为两类：
-1. persistable 模型（fluid.save保存的模型）
+1. persistable 模型（fluid.save_persistabels保存的模型）
     一般用作模型的 checkpoint，可以加载后重新训练。persistable 模型保存的是零散的权重文件，每个文件代表模型中的一个 Variable，这些零散的文件不包含结构信息，需要结合模型的结构一起使用。
     ```
     resnet50-vd-persistable/
@@ -53,7 +53,7 @@ Paddle 的模型保存有多种不同的形式，大体可分为两类：
 不同预测方式，主要有两方面不同：构建引擎和执行预测，在以下的几个部分我们会具体介绍。
 
 
-### 二、模型转换
+## 二、模型转换
 
 在任务的训练阶段，通常我们会保存一些 checkpoint（persistable 模型），这些只是模型权重文件，不能直接被预测引擎直接加载预测，所以我们通常会在训练完之后，找到合适的 checkpoint 并将其转换为 inference 模型。主要分为两个步骤：1. 构建训练引擎，2. 保存 inference 模型，如下所示：
 
@@ -94,7 +94,7 @@ python tools/export_model.py \
     --output_path=model和params保存路径
 ```
 
-### 三、训练引擎 + persistable 模型预测
+## 三、训练引擎 + persistable 模型预测
 
 在模型库的 `tools/infer.py` 中提供了完整的示例，只需执行下述命令即可完成预测：
 
@@ -138,7 +138,7 @@ outputs = exe.run(infer_prog,
 
 上述执行预测时候的参数说明可以参考官网 [fluid.Executor](https://www.paddlepaddle.org.cn/documentation/docs/zh/api_cn/executor_cn/Executor_cn.html)
 
-### 四、训练引擎 + inference 模型预测
+## 四、训练引擎 + inference 模型预测
 
 在模型库的 `tools/py_infer.py` 中提供了完整的示例，只需执行下述命令即可完成预测：
 
@@ -181,7 +181,7 @@ outputs = exe.run(compiled_program,
 
 上述执行预测时候的参数说明可以参考官网 [fluid.Executor](https://www.paddlepaddle.org.cn/documentation/docs/zh/api_cn/executor_cn/Executor_cn.html)
 
-### 五、预测引擎 + inference 模型预测
+## 五、预测引擎 + inference 模型预测
 
 在模型库的 `tools/predict.py` 中提供了完整的示例，只需执行下述命令即可完成预测：
 
