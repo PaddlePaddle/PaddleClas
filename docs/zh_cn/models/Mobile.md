@@ -11,7 +11,7 @@ MobileNetV3是Google于2019年提出的一种基于NAS的新的轻量级网络�
 ![](../../images/models/mobile_arm_top1.png)
 ![](../../images/models/mobile_arm_storage.png)
 ![](../../images/models/mobile_trt.png)
-目前PaddleClas开源的的移动端系列的预训练模型一共有32个，其指标如图所示。从图片可以看出，越新的轻量级模型往往有更优的表现，MobileNetV3代表了目前最新的轻量级神经网络结构。在MobileNetV3中，作者为了获得更高的精度，在global-avg-pooling后使用了1x1的卷积。该操作大幅提升了参数量但对计算量影响不大，所以如果从存储角度评价模型的优异程度，MobileNetV3优势不是很大，但由于其更小的计算量，使得其有更快的推理速度。此外，我们模型库中的ssld蒸馏模型表现优异，从各个考量角度下，都刷新了当前轻量级模型的精度。由于移动端模型结构复杂，分支较多，对GPU并不友好。
+目前PaddleClas开源的的移动端系列的预训练模型一共有32个，其指标如图所示。从图片可以看出，越新的轻量级模型往往有更优的表现，MobileNetV3代表了目前最新的轻量级神经网络结构。在MobileNetV3中，作者为了获得更高的精度，在global-avg-pooling后使用了1x1的卷积。该操作大幅提升了参数量但对计算量影响不大，所以如果从存储角度评价模型的优异程度，MobileNetV3优势不是很大，但由于其更小的计算量，使得其有更快的推理速度。此外，我们模型库中的ssld蒸馏模型表现优异，从各个考量角度下，都刷新了当前轻量级模型的精度。由于MobileNetV3模型结构复杂，分支较多，对GPU并不友好，GPU预测速度不如MobileNetV1。
 
 **注意**：所有模型在预测时，图像的crop_size设置为224，resize_short_size设置为256。
 
