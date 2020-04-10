@@ -4,7 +4,7 @@
 PaddleClas的目的是为工业界和学术界提供一个图像分类任务相关的百宝箱，特色如下：
 - 模型库：ResNet_vd、MobileNetV3等25种系列的分类网络结构和训练技巧，以及对应的117个分类预训练模型和性能评估
 
-- 高阶使用：高精度的实用模型蒸馏方案（准确率82.39%的ResNet50_vd和78.9%的MobileNetV3）、8种数据增广方法的复现和验证
+- 高阶使用：高精度的实用知识蒸馏方案（准确率82.39%的ResNet50_vd和78.9%的MobileNetV3）、8种数据增广方法的复现和验证
 
 - 应用拓展：常见视觉任务的特色方案，包括图像分类领域的迁移学习（百度自研的10万类图像分类预训练模型）和通用目标检测（mAP 47.8%的实用检测方案）等
 
@@ -34,20 +34,20 @@ src="docs/images/models/mobile_arm_top1.png" width="600">
 
 ## 高阶使用
 除了提供丰富的分类网络结构和预训练模型，PaddleClas也支持了一系列有助于图像分类任务效果和效率提升的算法或工具。
-### 模型蒸馏
+### 知识蒸馏
 
-模型蒸馏是指使用教师模型(teacher model)去指导学生模型(student model)学习特定任务，保证小模型在参数量不变的情况下，得到比较大的效果提升，甚至获得与大模型相似的精度指标。
-
-<div align="center">
-<img
-src="docs/images/distillation/ppcls_distillation_v1.png" width="600">
-</div>
-
-PaddleClas提供了一种简单的半监督标签模型蒸馏方案（SSLD，Simple Semi-supervised Label Distillation），使用该方案大幅提升了ResNet50_vd、MobileNetV1和MobileNetV3在ImageNet数据集上分类效果。该蒸馏方案的框架图和蒸馏模型效果如下图所示，详细的蒸馏方法介绍以及使用正在持续更新中。
+知识蒸馏是指使用教师模型(teacher model)去指导学生模型(student model)学习特定任务，保证小模型在参数量不变的情况下，得到比较大的效果提升，甚至获得与大模型相似的精度指标。
 
 <div align="center">
 <img
 src="docs/images/distillation/distillation_perform.png" width="500">
+</div>
+
+PaddleClas提供了一种简单的半监督标签知识蒸馏方案（SSLD，Simple Semi-supervised Label Distillation），使用该方案大幅提升了ResNet50_vd、MobileNetV1、MobileNetV2和MobileNetV3在ImageNet数据集上分类效果，如上图所示。该知识蒸馏方案的框架图如下，详细的知识蒸馏方法介绍以及使用正在持续更新中。
+
+<div align="center">
+<img
+src="docs/images/distillation/ppcls_distillation_v1.png" width="600">
 </div>
 
 ### 数据增广
