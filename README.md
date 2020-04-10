@@ -1,5 +1,7 @@
 # PaddleClas
 
+**文档教程**：https://paddleclas.readthedocs.io （正在持续更新中）
+
 ## 简介
 PaddleClas的目的是为工业界和学术界提供一个图像分类任务相关的百宝箱，特色如下：
 - 模型库：ResNet_vd、MobileNetV3等25种系列的分类网络结构和训练技巧，以及对应的117个分类预训练模型和性能评估
