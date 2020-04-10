@@ -62,3 +62,16 @@ python eval.py \
     -o pretrained_model=path_to_pretrained_models
 ```
 您可以更改configs/eval.yaml中的architecture字段和pretrained_model字段来配置评估模型，或是通过-o参数更新配置。
+
+## 3 模型推理
+
+PaddleClas通过预测引擎进行预测推理
+
+```bash
+python tools/predict.py \
+    -m model文件路径
+    -p params文件路径
+    -i 图片路径
+    --use_tensorrt True
+```
+更多推理方式和实验请参考[分类预测框架](../extension/paddle_inference.md)

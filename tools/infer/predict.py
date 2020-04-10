@@ -12,14 +12,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+
 import utils
 import argparse
 import numpy as np
-
+import logging
+import time
 from paddle.fluid.core import PaddleTensor
 from paddle.fluid.core import AnalysisConfig
 from paddle.fluid.core import create_paddle_predictor
-
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 def parse_args():
     def str2bool(v):
@@ -29,10 +32,14 @@ def parse_args():
     parser.add_argument("-i", "--image_file", type=str)
     parser.add_argument("-m", "--model_file", type=str)
     parser.add_argument("-p", "--params_file", type=str)
-    parser.add_argument("-b", "--max_batch_size", type=int, default=1)
+    parser.add_argument("-b", "--batch_size", type=int, default=1)
+    parser.add_argument("--use_fp16", type=str2bool, default=False)
     parser.add_argument("--use_gpu", type=str2bool, default=True)
     parser.add_argument("--ir_optim", type=str2bool, default=True)
     parser.add_argument("--use_tensorrt", type=str2bool, default=False)
+    parser.add_argument("--gpu_mem", type=int, default=8000)
+    parser.add_argument("--enable_benchmark", type=str2bool, default=False)
+    parser.add_argument("--model_name", type=str)
 
     return parser.parse_args()
 
@@ -40,15 +47,19 @@ def parse_args():
 def create_predictor(args):
     config = AnalysisConfig(args.model_file, args.params_file)
     if args.use_gpu:
-        config.enable_use_gpu(1000, 0)
+        config.enable_use_gpu(args.gpu_mem, 0)
     else:
         config.disable_gpu()
-
-    config.switch_ir_optim(args.ir_optim)  # default true
+    config.disable_glog_info()
+    config.switch_ir_optim(args.ir_optim) # default true
     if args.use_tensorrt:
         config.enable_tensorrt_engine(
-            precision_mode=AnalysisConfig.Precision.Float32,
-            max_batch_size=args.max_batch_size)
+                precision_mode=AnalysisConfig.Precision.Half if args.use_fp16 else AnalysisConfig.Precision.Float32,
+                max_batch_size=args.batch_size)
+
+    config.enable_memory_optim()
+    # use zero copy
+    config.switch_use_feed_fetch_ops(False)
     predictor = create_paddle_predictor(config)
 
     return predictor
@@ -64,7 +75,7 @@ def create_operators():
     resize_op = utils.ResizeImage(resize_short=256)
     crop_op = utils.CropImage(size=(size, size))
     normalize_op = utils.NormalizeImage(
-        scale=img_scale, mean=img_mean, std=img_std)
+            scale=img_scale, mean=img_mean, std=img_std)
     totensor_op = utils.ToTensor()
 
     return [decode_op, resize_op, crop_op, normalize_op, totensor_op]
@@ -78,25 +89,37 @@ def preprocess(fname, ops):
     return data
 
 
-def postprocess(outputs, topk=5):
-    output = outputs[0]
-    prob = output.as_ndarray().flatten()
-    index = prob.argsort(axis=0)[-topk:][::-1].astype('int32')
-    return zip(index, prob[index])
-
-
 def main():
     args = parse_args()
     operators = create_operators()
     predictor = create_predictor(args)
 
-    data = preprocess(args.image_file, operators)
-    inputs = [PaddleTensor(data.copy())]
-    outputs = predictor.run(inputs)
-    probs = postprocess(outputs)
+    inputs = preprocess(args.image_file, operators)
+    inputs = np.expand_dims(inputs, axis=0).repeat(args.batch_size, axis=0).copy()
 
-    for idx, prob in probs:
-        print("class id: {:d}, probability: {:.4f}".format(idx, prob))
+    input_names = predictor.get_input_names()
+    input_tensor = predictor.get_input_tensor(input_names[0])
+    input_tensor.copy_from_cpu(inputs)
+    if not args.enable_benchmark:
+        predictor.zero_copy_run()
+    else:
+        for i in range(0,1010):
+            if i == 10:
+                start = time.time()
+            predictor.zero_copy_run()
+
+        end = time.time()
+        fp_message = "FP16" if args.use_fp16 else "FP32"
+        logger.info("{0}\t{1}\tbatch size: {2}\ttime(ms): {3}".format(args.model_name, fp_message, args.batch_size, end-start))
+
+    output_names = predictor.get_output_names()
+    output_tensor = predictor.get_output_tensor(output_names[0])
+    output = output_tensor.copy_to_cpu()
+    output = output.flatten()
+    cls = np.argmax(output)
+    score = output[cls]
+    logger.info("class: {0}".format(cls))
+    logger.info("score: {0}".format(score))
 
 
 if __name__ == "__main__":
