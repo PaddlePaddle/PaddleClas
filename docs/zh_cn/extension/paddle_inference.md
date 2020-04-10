@@ -90,9 +90,9 @@ fluid.io.save_inference_model(
 
 ```python
 python tools/export_model.py \
-    --model=模型名称 \
-    --pretrained_model=persistable 模型路径 \
-    --output_path=model和params保存路径
+    --m=模型名称 \
+    --p=persistable 模型路径 \
+    --o=model和params保存路径
 ```
 
 ## 三、预测引擎 + inference 模型预测
