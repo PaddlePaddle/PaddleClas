@@ -63,7 +63,7 @@ python eval.py \
 ```
 您可以更改configs/eval.yaml中的architecture字段和pretrained_model字段来配置评估模型，或是通过-o参数更新配置。
 
-## 3、模型推理
+## 三、模型推理
 
 PaddlePaddle提供三种方式进行预测推理，接下来介绍如何用预测引擎进行推理：
 首先，对训练好的模型进行转换
