@@ -81,5 +81,4 @@ class ToTensor(object):
 
     def __call__(self, img):
         img = img.transpose((2, 0, 1))
-        img = np.expand_dims(img, axis=0)
         return img

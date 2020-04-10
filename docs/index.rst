@@ -13,7 +13,5 @@
    zh_cn/model_zoo.md
    zh_cn/change_log.md
    zh_cn/faq.md
-   
-   
 
 :math:`PaddlePaddle2020`

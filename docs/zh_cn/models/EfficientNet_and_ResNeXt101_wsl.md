@@ -1,19 +1,17 @@
 # EfficientNet与ResNeXt101_wsl系列
 
 ## 概述
-
+正在持续更新中......
 ![](../../images/models/EfficientNet.png)
-
-更多的模型简介正在持续更新中。
 
 在预测时，图像的crop_size和resize_short_size如下表所示。
 
 | Models                    | crop_size | resize_short_size |
 |:--:|:--:|:--:|
-| ResNeXt101_32x8d_wsl      | 224       | 256               |
-| ResNeXt101_32x16d_wsl     | 224       | 256               |
-| ResNeXt101_32x32d_wsl     | 224       | 256               |
-| ResNeXt101_32x48d_wsl     | 224       | 256               |
+| ResNeXt101_32x8d_wsl      | 224       | 224               |
+| ResNeXt101_32x16d_wsl     | 224       | 224               |
+| ResNeXt101_32x32d_wsl     | 224       | 224               |
+| ResNeXt101_32x48d_wsl     | 224       | 224               |
 | Fix_ResNeXt101_32x48d_wsl | 320       | 320               |
 | EfficientNetB0            | 224       | 256               |
 | EfficientNetB1            | 240       | 272               |
