@@ -96,7 +96,7 @@ PaddlePaddle提供了一系列实用工具，便于工业应用部署PaddleClas�
 - Paddle Hub
 
 ## 赛事支持
-PaddleClas的建设源于百度实际视觉业务应用的淬炼和视觉前沿能力的探索，助力多个视觉重点赛事取得领先成绩，并且持续推进更多的前沿视觉问题的解决和落地应用。
+PaddleClas的建设源于百度实际视觉业务应用的淬炼和视觉前沿能力的探索，助力多个视觉重点赛事取得领先成绩，并且持续推进更多的前沿视觉问题的解决和落地应用。更多内容请关注文档教程中的[**赛事支持章节**](https://paddleclas.readthedocs.io/zh_CN/latest/zh_cn/competition_support.html)
 
 - 2018年Kaggle Open Images V4图像目标检测挑战赛冠军
 - 2019年Kaggle Open Images V5图像目标检测挑战赛亚军
