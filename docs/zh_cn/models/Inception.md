@@ -1,12 +1,9 @@
 # Inception系列
 
 ## 概述
-
+概述正在持续更新中......
 ![](../../images/models/Inception.png)
-
-所有模型在预测时，图像的crop_size设置为299，resize_short_size设置为320。
-
-更多的模型简介正在持续更新中。
+GoogLeNet在预测时，图像的crop_size设置为224，resize_short_size设置为256，其余模型在预测时，图像的crop_size设置为299，resize_short_size设置为320。
 
 
 ## 精度、FLOPS和参数量
