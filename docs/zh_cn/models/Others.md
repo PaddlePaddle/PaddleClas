@@ -1,10 +1,9 @@
 # 其他模型
 
 ## 概述
+概述正在持续更新中......
 
 DarkNet53在预测时，图像的crop_size设置为256，resize_short_size设置为256；其余模型在预测时，图像的crop_size设置为224，resize_short_size设置为256。
-
-更多的模型简介正在持续更新中。
 
 
 ## 精度、FLOPS和参数量
