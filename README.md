@@ -4,7 +4,7 @@
 
 ## 简介
 PaddleClas的目的是为工业界和学术界提供一个图像分类任务相关的百宝箱，特色如下：
-- 模型库：ResNet_vd、MobileNetV3等25种系列的分类网络结构和训练技巧，以及对应的117个分类预训练模型和性能评估
+- 模型库：ResNet_vd、MobileNetV3等23种系列的分类网络结构和训练技巧，以及对应的117个分类预训练模型和性能评估
 
 - 高阶使用：高精度的实用知识蒸馏方案（准确率82.39%的ResNet50_vd和78.9%的MobileNetV3）、8种数据增广方法的复现和验证
 
@@ -16,7 +16,7 @@ PaddleClas的目的是为工业界和学术界提供一个图像分类任务相�
 
 ## 模型库
 
-基于ImageNet1k分类数据集，PaddleClas提供ResNet、ResNet_vd、EfficientNet、Res2Net、HRNet、MobileNetV3等25种常用分类网络结构的简单介绍、论文指标复现配置，以及在复现过程中的训练技巧。与此同时，PaddleClas也提供了对应的117个图像分类预训练模型，并且基于TensorRT评估了所有模型的GPU预测时间，以及在骁龙855（SD855）上评估了移动端模型的CPU预测时间和存储大小。支持的***预训练模型列表、下载地址以及更多信息***请见文档教程中的[**模型库章节**](https://paddleclas.readthedocs.io/zh_CN/latest/zh_cn/models/models_intro.html)。
+基于ImageNet1k分类数据集，PaddleClas提供ResNet、ResNet_vd、EfficientNet、Res2Net、HRNet、MobileNetV3等23种常用分类网络结构的简单介绍、论文指标复现配置，以及在复现过程中的训练技巧。与此同时，PaddleClas也提供了对应的117个图像分类预训练模型，并且基于TensorRT评估了所有模型的GPU预测时间，以及在骁龙855（SD855）上评估了移动端模型的CPU预测时间和存储大小。支持的***预训练模型列表、下载地址以及更多信息***请见文档教程中的[**模型库章节**](https://paddleclas.readthedocs.io/zh_CN/latest/zh_cn/models/models_intro.html)。
 
 <div align="center">
     <img src="docs/images/models/main_fps_top1.png" width="600">
