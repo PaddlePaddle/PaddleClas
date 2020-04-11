@@ -2,7 +2,7 @@
 
 ## 概述
 
-基于ImageNet1k分类数据集，PaddleClas支持的25种主流分类网络结构以及对应的117个图像分类预训练模型如下所示，训练技巧、每个系列网络结构的简单介绍和性能评估将在相应章节展现。GPU评估环境基于V100和TensorRT，CPU的评估环境基于骁龙855（SD855）。
+基于ImageNet1k分类数据集，PaddleClas支持的23种主流分类网络结构以及对应的117个图像分类预训练模型如下所示，训练技巧、每个系列网络结构的简单介绍和性能评估将在相应章节展现。GPU评估环境基于V100和TensorRT，CPU的评估环境基于骁龙855（SD855）。
 
 ![](../../images/models/main_fps_top1.png)
 ![](../../images/models/mobile_arm_top1.png)
