@@ -15,7 +15,6 @@
 import sys
 import argparse
 
-sys.path.append("../")
 from ppcls import model_zoo
 
 
