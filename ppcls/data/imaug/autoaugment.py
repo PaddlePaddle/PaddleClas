@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-#This code is based on https://github.com/DeepVoltaire/AutoAugment/blob/master/autoaugment.py
+# This code is based on https://github.com/DeepVoltaire/AutoAugment/blob/master/autoaugment.py
 
 from PIL import Image, ImageEnhance, ImageOps
 import numpy as np

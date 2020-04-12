@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# This code is based on https://github.com/kkanshul/Hide-and-Seek
+
 import numpy as np
 import random
 
