@@ -4,6 +4,7 @@ Welcome to PaddleClas！
 .. toctree::
    :maxdepth: 1
    :numbered:
+   :caption: Contents:
    
    tutorials/index
    models/index
