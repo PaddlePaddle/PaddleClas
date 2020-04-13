@@ -12,9 +12,11 @@
 #See the License for the specific language governing permissions and
 #limitations under the License.
 
-import types
 import architectures
+import types
 from difflib import SequenceMatcher
+
+from ppcls.utils.config import get_config
 
 
 def get_architectures():
@@ -28,12 +30,18 @@ def get_architectures():
     return names
 
 
-def similar_architectures(name='', thresh=0.1, topk=10):
+def get_pretrained():
+    """
+    get all of model pretrained
+    """
+    return get_config('./pretrained.list')
+
+
+def similar_architectures(name='', names=[], thresh=0.1, topk=10):
     """
     inferred similar architectures
     """
     scores = []
-    names = get_architectures()
     for idx, n in enumerate(names):
         if n[:2] == '__': continue
         score = SequenceMatcher(None, n.lower(), name.lower()).quick_ratio()

@@ -23,6 +23,8 @@ import tarfile
 import tqdm
 import zipfile
 
+from ppcls.modeling import get_pretrained
+from ppcls.modeling import similar_architectures
 from ppcls.utils.check import check_architecture
 from ppcls.utils import logger
 
@@ -38,6 +40,14 @@ class UrlError(Exception):
     def __init__(self, url='', code=''):
         message = "Downloading from {} failed with code {}!".format(url, code)
         super(UrlError, self).__init__(message)
+
+
+class ModelNameError(Exception):
+    """ ModelNameError
+    """
+
+    def __init__(self, message=''):
+        super(ModelNameError, self).__init__(message)
 
 
 class RetryError(Exception):
@@ -159,19 +169,22 @@ def _decompress(fname):
     os.remove(fname)
 
 
+def _check_pretrained_name(architecture):
+    assert isinstance(architecture, str), \
+            ("the type of architecture({}) should be str". format(architecture))
+    similar_names = similar_architectures(architecture, get_pretrained())
+    model_list = ', '.join(similar_names)
+    err = "{} is not exist! Maybe you want: [{}]" \
+          "".format(architecture, model_list)
+    if architecture not in similar_names:
+        raise ModelNameError(err)
+
+
 def get(architecture, path, decompress=True):
     """
     Get the pretrained model.
-
-    Args:
-        architecture: the name of which architecture to get. 
-            If the name is not exist, will raises UrlError with error code 404.
-        path: which dir to save the pretrained model.
-        decompress: decompress the download or not.
-
-    Raises:
-        RetryError or UrlError if download failed
     """
+    _check_pretrained_name(architecture)
     url = _get_url(architecture)
     fname = _download(url, path)
     if decompress: _decompress(fname)
