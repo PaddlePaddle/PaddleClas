@@ -16,8 +16,6 @@ import architectures
 import types
 from difflib import SequenceMatcher
 
-from ppcls.utils.config import get_config
-
 
 def get_architectures():
     """
@@ -28,13 +26,6 @@ def get_architectures():
         if isinstance(v, (types.FunctionType, types.ClassType)):
             names.append(k)
     return names
-
-
-def get_pretrained():
-    """
-    get all of model pretrained
-    """
-    return get_config('./pretrained.list')
 
 
 def similar_architectures(name='', names=[], thresh=0.1, topk=10):
