@@ -11,12 +11,10 @@
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
 import os
-import sys
+# import sys
 import recommonmark
-sys.path.insert(0, os.path.abspath('.'))
-sys.path.insert(0, os.path.abspath('..'))
 
-exclude_patterns = ['tmp', 'build', 'tools', 'README.md']
+exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 
 # -- Project information -----------------------------------------------------
 
