@@ -21,11 +21,11 @@
 
 ## FP32预测速度
 
-| Models                          | Crop Size | Resize Short Size | Batch Size=1<br>(ms) |
+| Models      | Crop Size | Resize Short Size | Batch Size=1<br>(ms) |
 |-------------|-----------|-------------------|--------------------------|
 | HRNet_W18_C | 224       | 256               | 7.368                    |
-| HRNet_W30_C | 224       | 256               | 9.495                    |
-| HRNet_W32_C | 224       | 256               | 9.292                    |
+| HRNet_W30_C | 224       | 256               | 9.402                    |
+| HRNet_W32_C | 224       | 256               | 9.467                    |
 | HRNet_W40_C | 224       | 256               | 10.739                   |
 | HRNet_W44_C | 224       | 256               | 11.497                   |
 | HRNet_W48_C | 224       | 256               | 12.165                   |

@@ -2,26 +2,14 @@
 
 ## 概述
 正在持续更新中......
-![](../../images/models/EfficientNet.png)
 
-在预测时，图像的crop_size和resize_short_size如下表所示。
+该系列模型的FLOPS、参数量以及fp32预测耗时如下图所示。
 
-| Models                    | crop_size | resize_short_size |
-|:--:|:--:|:--:|
-| ResNeXt101_32x8d_wsl      | 224       | 224               |
-| ResNeXt101_32x16d_wsl     | 224       | 224               |
-| ResNeXt101_32x32d_wsl     | 224       | 224               |
-| ResNeXt101_32x48d_wsl     | 224       | 224               |
-| Fix_ResNeXt101_32x48d_wsl | 320       | 320               |
-| EfficientNetB0            | 224       | 256               |
-| EfficientNetB1            | 240       | 272               |
-| EfficientNetB2            | 260       | 292               |
-| EfficientNetB3            | 300       | 332               |
-| EfficientNetB4            | 380       | 412               |
-| EfficientNetB5            | 456       | 488               |
-| EfficientNetB6            | 528       | 560               |
-| EfficientNetB7            | 600       | 632               |
-| EfficientNetB0_small      | 224       | 256               |
+![](../../images/models/EfficientNet.png.flops.png)
+
+![](../../images/models/EfficientNet.png.params.png)
+
+![](../../images/models/EfficientNet.png.fp32.png)
 
 
 ## 精度、FLOPS和参数量

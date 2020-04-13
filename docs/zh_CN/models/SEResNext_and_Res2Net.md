@@ -6,8 +6,17 @@ ResNeXt是ResNet的典型变种网络之一，ResNeXt发表于2017年的CVPR会�
 SENet是2017年ImageNet分类比赛的冠军方案，其提出了一个全新的SE结构，该结构可以迁移到任何其他网络中，其通过控制scale的大小，把每个通道间重要的特征增强，不重要的特征减弱，从而让提取的特征指向性更强。
 
 Res2Net是2019年提出的一种全新的对ResNet的改进方案，该方案可以和现有其他优秀模块轻松整合，在不增加计算负载量的情况下，在ImageNet、CIFAR-100等数据集上的测试性能超过了ResNet。Res2Net结构简单，性能优越，进一步探索了CNN在更细粒度级别的多尺度表示能力。Res2Net揭示了一个新的提升模型精度的维度，即scale，其是除了深度、宽度和基数的现有维度之外另外一个必不可少的更有效的因素。该网络在其他视觉任务如目标检测、图像分割等也有相当不错的表现。
-![](../../images/models/SeResNeXt.png)
+
+该系列模型的FLOPS、参数量以及fp32预测耗时如下图所示。
+
+![](../../images/models/SeResNeXt.png.flops.png)
+
+![](../../images/models/SeResNeXt.png.params.png)
+
+![](../../images/models/SeResNeXt.png.fp32.png)
+
 目前PaddleClas开源的这三类的预训练模型一共有24个，其指标如图所示，从图中可以看出，在同样Flops和Params下，改进版的模型往往有更高的精度，但是推理速度往往不如ResNet系列。另一方面，Res2Net表现也较为优秀，相比ResNeXt中的group操作、SEResNet中的SE结构操作，Res2Net在相同Flops、Params和推理速度下往往精度更佳。
+
 
 **注意**：所有模型在预测时，图像的crop_size设置为224，resize_short_size设置为256。
 
