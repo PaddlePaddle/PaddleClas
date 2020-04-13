@@ -17,12 +17,13 @@ from __future__ import division
 from __future__ import print_function
 
 import os
-import shutil
 import requests
-import tqdm
+import shutil
 import tarfile
+import tqdm
 import zipfile
 
+from ppcls.modeling import similar_architectures
 from ppcls.utils.check import check_architecture
 from ppcls.utils import logger
 
@@ -44,11 +45,7 @@ class ModelNameError(Exception):
     """ ModelNameError
     """
 
-    def __init__(self, message='', architecture=''):
-        similar_names = similar_architectures(architecture)
-        model_list = ', '.join(similar_names)
-        message += '\n{} is not exist. \nMaybe you want: [{}]'.format(
-            architecture, model_list)
+    def __init__(self, message=''):
         super(ModelNameError, self).__init__(message)
 
 
@@ -171,8 +168,24 @@ def _decompress(fname):
     os.remove(fname)
 
 
+def _check_pretrained_name(architecture):
+    assert isinstance(architecture, str), \
+            ("the type of architecture({}) should be str". format(architecture))
+    with open('./configs/pretrained.list') as flist:
+        pretrained = [line.strip() for line in flist]
+    similar_names = similar_architectures(architecture, pretrained)
+    model_list = ', '.join(similar_names)
+    err = "{} is not exist! Maybe you want: [{}]" \
+          "".format(architecture, model_list)
+    if architecture not in similar_names:
+        raise ModelNameError(err)
+
+
 def get(architecture, path, decompress=True):
-    check_architecture(architecture)
+    """
+    Get the pretrained model.
+    """
+    _check_pretrained_name(architecture)
     url = _get_url(architecture)
     fname = _download(url, path)
     if decompress: _decompress(fname)

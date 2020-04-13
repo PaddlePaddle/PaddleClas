@@ -4,7 +4,6 @@
 .. toctree::
    :maxdepth: 1
    
-   code_overview.md
    paddle_inference.md
    paddle_mobile_inference.md
    paddle_quantization.md

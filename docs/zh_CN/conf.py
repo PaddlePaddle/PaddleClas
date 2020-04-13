@@ -11,12 +11,9 @@
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
 import os
-import sys
 import recommonmark
-sys.path.insert(0, os.path.abspath('.'))
-sys.path.insert(0, os.path.abspath('..'))
 
-exclude_patterns = ['tmp', 'build', 'tools', 'README.md']
+exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 
 # -- Project information -----------------------------------------------------
 
@@ -56,7 +53,7 @@ master_doc = 'index'
 #
 # This is also used if you do content translation via gettext catalogs.
 # Usually you set "language" from the command line for these cases.
-language = 'zh'
+language = 'zh_CN'
 
 # -- Options for HTML output -------------------------------------------------
 
@@ -79,5 +76,4 @@ if not on_rtd:  # only import and set the theme if we're building docs locally
 
 html_static_path = ['_static']
 
-#html_logo = './images/logo.png'
-
+html_logo = '../images/logo.png'

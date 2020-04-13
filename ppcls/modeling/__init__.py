@@ -17,4 +17,4 @@ from . import loss
 
 from .architectures import *
 from .loss import *
-from .utils import similar_architectures
+from .utils import *
