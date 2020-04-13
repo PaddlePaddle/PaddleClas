@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-#This code is based on https://github.com/
+#This code is based on https://github.com/heartInsert/randaugment
 
 from PIL import Image, ImageEnhance, ImageOps
 import numpy as np

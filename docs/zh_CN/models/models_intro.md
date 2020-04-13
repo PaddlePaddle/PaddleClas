@@ -7,6 +7,7 @@
 ![](../../images/models/main_fps_top1.png)
 ![](../../images/models/mobile_arm_top1.png)
 
+## 预训练模型列表及下载地址
 - ResNet及其Vd系列
   - ResNet系列<sup>[[1](#ref1)]</sup>([论文地址](http://openaccess.thecvf.com/content_cvpr_2016/html/He_Deep_Residual_Learning_CVPR_2016_paper.html))
     - [ResNet18](https://paddle-imagenet-models-name.bj.bcebos.com/ResNet18_pretrained.tar)
