@@ -53,44 +53,6 @@ MobileNetV3是Google于2019年提出的一种基于NAS的新的轻量级网络�
 | ShuffleNetV2_swish                   | 0.700   | 0.892   |                   |                   | 0.290        | 2.260             |
 
 
-
-## FP32预测速度
-
-| Models                               | Crop Size | Resize Short Size | Batch Size=1<br>(ms) |
-|--------------------------------------|-----------|-------------------|--------------------------|
-| MobileNetV1_x0_25                    | 224       | 256               | 0.492                    |
-| MobileNetV1_x0_5                     | 224       | 256               | 0.599                    |
-| MobileNetV1_x0_75                    | 224       | 256               | 0.695                    |
-| MobileNetV1                          | 224       | 256               | 0.739                    |
-| MobileNetV1_ssld                     | 224       | 256               | 0.739                    |
-| MobileNetV2_x0_25                    | 224       | 256               | 1.014                    |
-| MobileNetV2_x0_5                     | 224       | 256               | 1.216                    |
-| MobileNetV2_x0_75                    | 224       | 256               | 1.392                    |
-| MobileNetV2                          | 224       | 256               | 1.153                    |
-| MobileNetV2_x1_5                     | 224       | 256               | 1.516                    |
-| MobileNetV2_x2_0                     | 224       | 256               | 1.819                    |
-| MobileNetV2_ssld                     | 224       | 256               | 1.153                    |
-| MobileNetV3_large_<br>x1_25          | 224       | 256               | 3.070                    |
-| MobileNetV3_large_<br>x1_0           | 224       | 256               | 3.173                    |
-| MobileNetV3_large_<br>x0_75          | 224       | 256               | 2.928                    |
-| MobileNetV3_large_<br>x0_5           | 224       | 256               | 2.979                    |
-| MobileNetV3_large_<br>x0_35          | 224       | 256               | 2.987                    |
-| MobileNetV3_small_<br>x1_25          | 224       | 256               | 3.003                    |
-| MobileNetV3_small_<br>x1_0           | 224       | 256               | 3.168                    |
-| MobileNetV3_small_<br>x0_75          | 224       | 256               | 2.974                    |
-| MobileNetV3_small_<br>x0_5           | 224       | 256               | 2.199                    |
-| MobileNetV3_small_<br>x0_35          | 224       | 256               | 2.240                    |
-| MobileNetV3_large_<br>x1_0_ssld      | 224       | 256               | 3.173                    |
-| MobileNetV3_small_<br>x1_0_ssld      | 224       | 256               | 3.168                    |
-| ShuffleNetV2                         | 224       | 256               | 1.861                    |
-| ShuffleNetV2_x0_25                   | 224       | 256               | 1.410                    |
-| ShuffleNetV2_x0_33                   | 224       | 256               | 1.271                    |
-| ShuffleNetV2_x0_5                    | 224       | 256               | 1.389                    |
-| ShuffleNetV2_x1_5                    | 224       | 256               | 1.239                    |
-| ShuffleNetV2_x2_0                    | 224       | 256               | 2.152                    |
-| ShuffleNetV2_swish                   | 224       | 256               | 2.150                    |
-
-
 ## CPU预测速度和存储大小
 
 | Models                               | batch_size=1(ms) | Storage Size(M) |

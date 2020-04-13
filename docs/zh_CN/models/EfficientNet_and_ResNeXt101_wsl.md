@@ -3,7 +3,7 @@
 ## 概述
 正在持续更新中......
 
-该系列模型的FLOPS、参数量以及fp32预测耗时如下图所示。
+该系列模型的FLOPS、参数量以及FP32预测耗时如下图所示。
 
 ![](../../images/models/EfficientNet.png.flops.png)
 

@@ -11,7 +11,7 @@ ResNet系列模型是在2015年提出的，一举在ILSVRC2015比赛中取得冠
 其中，ResNet50_vd_v2与ResNet50_vd_ssld采用了知识蒸馏，保证模型结构不变的情况下，进一步提升了模型的精度，具体地，ResNet50_vd_v2的teacher模型是ResNet152_vd（top1准确率80.59%），数据选用的是ImageNet-1k的训练集，ResNet50_vd_ssld的teacher模型是ResNeXt101_32x16d_wsl（top1准确率84.2%），数据选用结合了ImageNet-1k的训练集和ImageNet-22k挖掘的400万数据。知识蒸馏的具体方法正在持续更新中。
 
 
-该系列模型的FLOPS、参数量以及fp32预测耗时如下图所示。
+该系列模型的FLOPS、参数量以及FP32预测耗时如下图所示。
 
 ![](../../images/models/ResNet.png.flops.png)
 
