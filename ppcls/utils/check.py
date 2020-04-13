@@ -20,6 +20,7 @@ import sys
 
 import paddle.fluid as fluid
 
+from ppcls.modeling import get_architectures
 from ppcls.modeling import similar_architectures
 from ppcls.utils import logger
 
@@ -60,7 +61,7 @@ def check_architecture(architecture):
     """
     assert isinstance(architecture, str), \
             ("the type of architecture({}) should be str". format(architecture))
-    similar_names = similar_architectures(architecture)
+    similar_names = similar_architectures(architecture, get_architectures())
     model_list = ', '.join(similar_names)
     err = "{} is not exist! Maybe you want: [{}]" \
           "".format(architecture, model_list)
