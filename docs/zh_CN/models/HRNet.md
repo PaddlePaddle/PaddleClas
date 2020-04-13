@@ -2,8 +2,14 @@
 
 ## 概述
 正在持续更新中......
-![](../../images/models/HRNet.png)
-所有模型在预测时，图像的crop_size设置为224，resize_short_size设置为256。
+
+该系列模型的FLOPS、参数量以及fp32预测耗时如下图所示。
+
+![](../../images/models/HRNet.png.flops.png)
+
+![](../../images/models/HRNet.png.params.png)
+
+![](../../images/models/HRNet.png.fp32.png)
 
 
 ## 精度、FLOPS和参数量
