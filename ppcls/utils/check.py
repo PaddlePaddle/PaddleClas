@@ -20,6 +20,7 @@ import sys
 
 import paddle.fluid as fluid
 
+from ppcls.modeling import get_architectures
 from ppcls.modeling import similar_architectures
 from ppcls.utils import logger
 

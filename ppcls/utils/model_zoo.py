@@ -25,7 +25,6 @@ import zipfile
 
 from ppcls.modeling import similar_architectures
 from ppcls.utils.check import check_architecture
-from ppcls.utils.config import get_config
 from ppcls.utils import logger
 
 __all__ = ['get']
@@ -172,7 +171,9 @@ def _decompress(fname):
 def _check_pretrained_name(architecture):
     assert isinstance(architecture, str), \
             ("the type of architecture({}) should be str". format(architecture))
-    similar_names = similar_architectures(architecture, get_config('../../../configs/pretrained.list'))
+    with open('./configs/pretrained.list') as flist:
+        pretrained = [line.strip() for line in flist]
+    similar_names = similar_architectures(architecture, pretrained)
     model_list = ', '.join(similar_names)
     err = "{} is not exist! Maybe you want: [{}]" \
           "".format(architecture, model_list)
