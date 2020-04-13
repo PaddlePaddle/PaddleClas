@@ -2,7 +2,26 @@
 
 ## 概述
 
-基于ImageNet1k分类数据集，PaddleClas支持的23种系列分类网络结构以及对应的117个图像分类预训练模型如下所示，训练技巧、每个系列网络结构的简单介绍和性能评估将在相应章节展现。GPU评估环境基于V100和TensorRT，CPU的评估环境基于骁龙855（SD855）。
+基于ImageNet1k分类数据集，PaddleClas支持的23种系列分类网络结构以及对应的117个图像分类预训练模型如下所示，训练技巧、每个系列网络结构的简单介绍和性能评估将在相应章节展现。
+
+## 评估环境
+* CPU的评估环境基于骁龙855（SD855）。
+* GPU评估环境基于V100和TensorRT，评估脚本如下。
+
+```shell
+#!/usr/bin/env bash
+
+export PYTHONPATH=$PWD:$PYTHONPATH
+
+python tools/infer/predict.py \
+    --model_file='pretrained/infer/model' \
+    --params_file='pretrained/infer/params' \
+    --enable_benchmark=True \
+    --model_name=ResNet50_vd \
+    --use_tensorrt=True \
+    --use_fp16=False \
+    --batch_size=1
+```
 
 ![](../../images/models/main_fps_top1.png)
 ![](../../images/models/mobile_arm_top1.png)
@@ -25,6 +44,7 @@
     - [ResNet152_vd](https://paddle-imagenet-models-name.bj.bcebos.com/ResNet152_vd_pretrained.tar)
     - [ResNet200_vd](https://paddle-imagenet-models-name.bj.bcebos.com/ResNet200_vd_pretrained.tar)
     - [ResNet50_vd_ssld](https://paddle-imagenet-models-name.bj.bcebos.com/ResNet50_vd_ssld_pretrained.tar)
+    - [ResNet101_vd_ssld](https://paddle-imagenet-models-name.bj.bcebos.com/ResNet101_vd_ssld_pretrained.tar)
 
 
 - 移动端系列

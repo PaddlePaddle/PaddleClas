@@ -109,11 +109,6 @@ def main():
     operators = create_operators()
     predictor = create_predictor(args)
 
-    inputs = preprocess(args.image_file, operators)
-    inputs = np.expand_dims(
-        inputs, axis=0).repeat(
-            args.batch_size, axis=0).copy()
-
     input_names = predictor.get_input_names()
     input_tensor = predictor.get_input_tensor(input_names[0])
 
