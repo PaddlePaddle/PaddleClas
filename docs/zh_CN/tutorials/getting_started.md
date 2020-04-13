@@ -52,6 +52,19 @@ epoch:0    train    step:522    loss:1.6330    lr:0.100000    elapse:0.210
 
 或是直接修改模型对应的yaml配置文件，具体配置参数参考[配置文档](config.md)。
 
+### 2.3 模型微调
+
+您可以通过如下命令进行模型微调，通过指定--pretrained_model参数加载预训练模型
+
+```bash
+python -m paddle.distributed.launch \
+    --selected_gpus="0,1,2,3" \
+    --log_dir=log_ResNet50_vd \
+    train.py \
+        -c ../configs/ResNet/ResNet50_vd.yaml \
+	-o  pretrained_model= 预训练模型路径\
+
+```
 
 ### 2.2 模型评估
 
