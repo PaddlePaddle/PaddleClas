@@ -10,10 +10,9 @@ ShuffleNet系列网络是旷视提出的轻量化网络结构，到目前为止�
 MobileNetV3是Google于2019年提出的一种基于NAS的新的轻量级网络，为了进一步提升效果，将relu和sigmoid激活函数分别替换为hard_swish与hard_sigmoid激活函数，同时引入了一些专门减小网络计算量的改进策略。
 ![](../../images/models/mobile_arm_top1.png)
 ![](../../images/models/mobile_arm_storage.png)
-![](../../images/models/mobile_trt.png)
+![](../../images/models/mobile_trt.png.flops.png)
+![](../../images/models/mobile_trt.png.params.png)
 目前PaddleClas开源的的移动端系列的预训练模型一共有32个，其指标如图所示。从图片可以看出，越新的轻量级模型往往有更优的表现，MobileNetV3代表了目前最新的轻量级神经网络结构。在MobileNetV3中，作者为了获得更高的精度，在global-avg-pooling后使用了1x1的卷积。该操作大幅提升了参数量但对计算量影响不大，所以如果从存储角度评价模型的优异程度，MobileNetV3优势不是很大，但由于其更小的计算量，使得其有更快的推理速度。此外，我们模型库中的ssld蒸馏模型表现优异，从各个考量角度下，都刷新了当前轻量级模型的精度。由于MobileNetV3模型结构复杂，分支较多，对GPU并不友好，GPU预测速度不如MobileNetV1。
-
-**注意**：所有模型在预测时，图像的crop_size设置为224，resize_short_size设置为256。
 
 
 ## 精度、FLOPS和参数量
@@ -54,78 +53,42 @@ MobileNetV3是Google于2019年提出的一种基于NAS的新的轻量级网络�
 | ShuffleNetV2_swish                   | 0.700   | 0.892   |                   |                   | 0.290        | 2.260             |
 
 
-## FP16预测速度
-
-| Models                               | batch_size=1<br>(ms) | batch_size=4<br>(ms) | batch_size=8<br>(ms) | batch_size=32<br>(ms) |
-|:--:|:--:|:--:|:--:|:--:|
-| MobileNetV1_x0_25                    | 0.236                | 0.258                | 0.281                | 0.556                 |
-| MobileNetV1_x0_5                     | 0.246                | 0.318                | 0.364                | 0.845                 |
-| MobileNetV1_x0_75                    | 0.303                | 0.380                | 0.512                | 1.164                 |
-| MobileNetV1                          | 0.340                | 0.426                | 0.601                | 1.578                 |
-| MobileNetV1_ssld                     | 0.340                | 0.426                | 0.601                | 1.578                 |
-| MobileNetV2_x0_25                    | 0.432                | 0.488                | 0.532                | 0.967                 |
-| MobileNetV2_x0_5                     | 0.475                | 0.564                | 0.654                | 1.296                 |
-| MobileNetV2_x0_75                    | 0.553                | 0.653                | 0.821                | 1.761                 |
-| MobileNetV2                          | 0.610                | 0.738                | 0.931                | 2.115                 |
-| MobileNetV2_x1_5                     | 0.731                | 0.966                | 1.252                | 3.152                 |
-| MobileNetV2_x2_0                     | 0.870                | 1.123                | 1.494                | 3.910                 |
-| MobileNetV2_ssld                     | 0.610                | 0.738                | 0.931                | 2.115                 |
-| MobileNetV3_large_<br>x1_25          | 2.004                | 2.223                | 2.433                | 5.954                 |
-| MobileNetV3_large_<br>x1_0           | 1.943                | 2.203                | 2.113                | 4.823                 |
-| MobileNetV3_large_<br>x0_75          | 2.107                | 2.266                | 2.120                | 3.968                 |
-| MobileNetV3_large_<br>x0_5           | 1.942                | 2.178                | 2.179                | 2.936                 |
-| MobileNetV3_large_<br>x0_35          | 1.994                | 2.407                | 2.285                | 2.420                 |
-| MobileNetV3_small_<br>x1_25          | 1.876                | 2.141                | 2.118                | 3.423                 |
-| MobileNetV3_small_<br>x1_0           | 1.751                | 2.160                | 2.203                | 2.830                 |
-| MobileNetV3_small_<br>x0_75          | 1.856                | 2.235                | 2.166                | 2.464                 |
-| MobileNetV3_small_<br>x0_5           | 1.773                | 2.304                | 2.242                | 2.133                 |
-| MobileNetV3_small_<br>x0_35          | 1.870                | 2.392                | 2.323                | 2.101                 |
-| MobileNetV3_large_<br>x1_0_ssld      | 1.943                | 2.203                | 2.113                | 4.823                 |                      |
-| MobileNetV3_small_<br>x1_0_ssld      | 1.751                | 2.160                | 2.203                | 2.830                 |
-| ShuffleNetV2                         | 1.134                | 1.068                | 1.199                | 2.558                 |
-| ShuffleNetV2_x0_25                   | 0.911                | 0.953                | 0.948                | 1.327                 |
-| ShuffleNetV2_x0_33                   | 0.853                | 1.072                | 0.958                | 1.398                 |
-| ShuffleNetV2_x0_5                    | 0.858                | 1.059                | 1.084                | 1.620                 |
-| ShuffleNetV2_x1_5                    | 1.040                | 1.153                | 1.394                | 3.452                 |
-| ShuffleNetV2_x2_0                    | 1.061                | 1.316                | 1.694                | 4.485                 |
-| ShuffleNetV2_swish                   | 1.688                | 1.958                | 1.707                | 3.711                 |
-
 
 ## FP32预测速度
 
-| Models                               | batch_size=1<br>(ms) | batch_size=4<br>(ms) | batch_size=8<br>(ms) | batch_size=32<br>(ms) |
-|:--:|:--:|:--:|:--:|:--:|
-| MobileNetV1_x0_25                    | 0.233                | 0.372                | 0.424                | 0.930                 |
-| MobileNetV1_x0_5                     | 0.281                | 0.532                | 0.677                | 1.808                 |
-| MobileNetV1_x0_75                    | 0.344                | 0.733                | 0.960                | 2.920                 |
-| MobileNetV1                          | 0.420                | 0.963                | 1.462                | 4.769                 |
-| MobileNetV1_ssld                     | 0.420                | 0.963                | 1.462                | 4.769                 |
-| MobileNetV2_x0_25                    | 0.718                | 0.738                | 0.775                | 1.482                 |
-| MobileNetV2_x0_5                     | 0.818                | 0.975                | 1.107                | 2.481                 |
-| MobileNetV2_x0_75                    | 0.830                | 1.104                | 1.514                | 3.629                 |
-| MobileNetV2                          | 0.889                | 1.346                | 1.875                | 4.711                 |
-| MobileNetV2_x1_5                     | 1.221                | 1.982                | 2.951                | 7.645                 |
-| MobileNetV2_x2_0                     | 1.546                | 2.625                | 3.734                | 10.429                |
-| MobileNetV2_ssld                     | 0.889                | 1.346                | 1.875                | 4.711                 |
-| MobileNetV3_large_<br>x1_25          | 2.113                | 2.377                | 3.114                | 7.332                 |
-| MobileNetV3_large_<br>x1_0           | 1.991                | 2.380                | 2.517                | 5.826                 |
-| MobileNetV3_large_<br>x0_75          | 2.105                | 2.454                | 2.336                | 4.611                 |
-| MobileNetV3_large_<br>x0_5           | 1.978                | 2.603                | 2.291                | 3.306                 |
-| MobileNetV3_large_<br>x0_35          | 2.017                | 2.469                | 2.316                | 2.558                 |
-| MobileNetV3_small_<br>x1_25          | 1.915                | 2.411                | 2.295                | 3.742                 |
-| MobileNetV3_small_<br>x1_0           | 1.915                | 2.889                | 2.862                | 3.022                 |
-| MobileNetV3_small_<br>x0_75          | 1.941                | 2.358                | 2.232                | 2.602                 |
-| MobileNetV3_small_<br>x0_5           | 1.872                | 2.364                | 2.238                | 2.061                 |
-| MobileNetV3_small_<br>x0_35          | 1.889                | 2.407                | 2.328                | 2.127                 |
-| MobileNetV3_large_<br>x1_0_ssld      | 1.991                | 2.380                | 2.517                | 5.826                 |
-| MobileNetV3_small_<br>x1_0_ssld      | 1.915                | 2.889                | 2.862                | 3.022                 |
-| ShuffleNetV2                         | 1.328                | 1.211                | 1.440                | 3.210                 |
-| ShuffleNetV2_x0_25                   | 0.905                | 0.908                | 0.924                | 1.284                 |
-| ShuffleNetV2_x0_33                   | 0.871                | 1.073                | 0.891                | 1.416                 |
-| ShuffleNetV2_x0_5                    | 0.852                | 1.150                | 1.093                | 1.702                 |
-| ShuffleNetV2_x1_5                    | 0.874                | 1.470                | 1.889                | 4.490                 |
-| ShuffleNetV2_x2_0                    | 1.443                | 1.908                | 2.556                | 6.864                 |
-| ShuffleNetV2_swish                   | 1.694                | 1.856                | 2.101                | 3.942                 |
+| Models                               | Crop Size | Resize Short Size | Batch Size=1<br>(ms) |
+|--------------------------------------|-----------|-------------------|--------------------------|
+| MobileNetV1_x0_25                    | 224       | 256               | 0.492                    |
+| MobileNetV1_x0_5                     | 224       | 256               | 0.599                    |
+| MobileNetV1_x0_75                    | 224       | 256               | 0.695                    |
+| MobileNetV1                          | 224       | 256               | 0.739                    |
+| MobileNetV1_ssld                     | 224       | 256               | 0.739                    |
+| MobileNetV2_x0_25                    | 224       | 256               | 1.014                    |
+| MobileNetV2_x0_5                     | 224       | 256               | 1.216                    |
+| MobileNetV2_x0_75                    | 224       | 256               | 1.392                    |
+| MobileNetV2                          | 224       | 256               | 1.153                    |
+| MobileNetV2_x1_5                     | 224       | 256               | 1.516                    |
+| MobileNetV2_x2_0                     | 224       | 256               | 1.819                    |
+| MobileNetV2_ssld                     | 224       | 256               | 1.153                    |
+| MobileNetV3_large_<br>x1_25          | 224       | 256               | 3.070                    |
+| MobileNetV3_large_<br>x1_0           | 224       | 256               | 3.173                    |
+| MobileNetV3_large_<br>x0_75          | 224       | 256               | 2.928                    |
+| MobileNetV3_large_<br>x0_5           | 224       | 256               | 2.979                    |
+| MobileNetV3_large_<br>x0_35          | 224       | 256               | 2.987                    |
+| MobileNetV3_small_<br>x1_25          | 224       | 256               | 3.003                    |
+| MobileNetV3_small_<br>x1_0           | 224       | 256               | 3.168                    |
+| MobileNetV3_small_<br>x0_75          | 224       | 256               | 2.974                    |
+| MobileNetV3_small_<br>x0_5           | 224       | 256               | 2.199                    |
+| MobileNetV3_small_<br>x0_35          | 224       | 256               | 2.240                    |
+| MobileNetV3_large_<br>x1_0_ssld      | 224       | 256               | 3.173                    |
+| MobileNetV3_small_<br>x1_0_ssld      | 224       | 256               | 3.168                    |
+| ShuffleNetV2                         | 224       | 256               | 1.861                    |
+| ShuffleNetV2_x0_25                   | 224       | 256               | 1.410                    |
+| ShuffleNetV2_x0_33                   | 224       | 256               | 1.271                    |
+| ShuffleNetV2_x0_5                    | 224       | 256               | 1.389                    |
+| ShuffleNetV2_x1_5                    | 224       | 256               | 1.239                    |
+| ShuffleNetV2_x2_0                    | 224       | 256               | 2.152                    |
+| ShuffleNetV2_swish                   | 224       | 256               | 2.150                    |
 
 
 ## CPU预测速度和存储大小
