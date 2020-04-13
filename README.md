@@ -19,7 +19,7 @@ PaddleClas的目的是为工业界和学术界提供一个图像分类任务相�
 基于ImageNet1k分类数据集，PaddleClas提供ResNet、ResNet_vd、EfficientNet、Res2Net、HRNet、MobileNetV3等23种系列的分类网络结构的简单介绍、论文指标复现配置，以及在复现过程中的训练技巧。与此同时，PaddleClas也提供了对应的117个图像分类预训练模型，并且基于TensorRT评估了所有模型的GPU预测时间，以及在骁龙855（SD855）上评估了移动端模型的CPU预测时间和存储大小。支持的***预训练模型列表、下载地址以及更多信息***请见文档教程中的[**模型库章节**](https://paddleclas.readthedocs.io/zh_CN/latest/zh_cn/models/models_intro.html)。
 
 <div align="center">
-    <img src="docs/images/models/main_fps_top1.png" width="600">
+    <img src="docs/images/models/main_fps_top1.png" width="700">
 </div>
 
 上图展示了一些适合服务器端应用的模型，使用V100，FP32和TensorRT预测一张图像的时间，图中ResNet50_vd_ssld和ResNet101_vd_ssld，是采用PaddleClas提供的SSLD蒸馏方法训练的模型。图中相同颜色和符号的点代表同一系列不同规模的模型。不同模型的简介、FLOPS、Parameters以及详细GPU预测时间请参考文档教程中的[**模型库章节**](https://paddleclas.readthedocs.io/zh_CN/latest/zh_cn/models/models_intro.html)。
