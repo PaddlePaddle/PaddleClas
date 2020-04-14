@@ -1,10 +1,9 @@
 # EfficientNet与ResNeXt101_wsl系列
 
 ## 概述
-EfficientNet是Google于2019年发布的一个基于NAS的一个轻量级网络，其中EfficientNetB7刷新了当时ImageNet-1k的分类准确率。在该文章中，作者指出，传统的提升神经网络性能的方法主要是从网络的宽度、网络的深度、以及输入图片的分辨率入手，但是作者通过实验发现，平衡这三个维度对精度和效率的提升至关重要，于是，作者通过一系列的实验中总结出了如何同时平衡这三个维度的放缩，与此同时，基于这种放缩方法，作者构建了EfficientNet系列中B1-B7共7个网络，并在同样计算量与参数量的情况下，精度达到了state-of-the-art的效果。
+EfficientNet是Google于2019年发布的一个基于NAS的轻量级网络，其中EfficientNetB7刷新了当时ImageNet-1k的分类准确率。在该文章中，作者指出，传统的提升神经网络性能的方法主要是从网络的宽度、网络的深度、以及输入图片的分辨率入手，但是作者通过实验发现，平衡这三个维度对精度和效率的提升至关重要，于是，作者通过一系列的实验中总结出了如何同时平衡这三个维度的放缩，与此同时，基于这种放缩方法，作者在EfficientNet_B0的基础上，构建了EfficientNet系列中B1-B7共7个网络，并在同样FLOPS与参数量的情况下，精度达到了state-of-the-art的效果。
 
-ResNeXt是facebook于2016年提出的一种对ResNet的改进版网络。在2019年，facebook通过弱监督学习研究了该系列网络在ImageNet上的精度上限，为了区别之前的ResNeXt网络，该系列网络的后缀为wsl，其中wsl是弱监督学习（weakly-supervised-learning）的简称。
-。为了能有更强的特征提取能力，研究者将其网络宽度进一步放大，其中最大的ResNeXt101_32x48d_wsl拥有8亿个参数，将其在9.4亿的弱标签图片下训练并在ImageNet-1k上做finetune，最终在ImageNet-1k的top-1达到了85.4%，这也是迄今为止在ImageNet-1k的数据集上以224x224的分辨率下精度最高的网络。Fix-ResNeXt中，作者使用了更大的图像分辨率，针对训练图片和验证图片数据预处理不一致的情况下做了专门的Fix策略，并使得ResNeXt101_32x48d_wsl拥有了更高的精度，由于其用到了Fix策略，故命名为Fix-ResNeXt101_32x48d_wsl。
+ResNeXt是facebook于2016年提出的一种对ResNet的改进版网络。在2019年，facebook通过弱监督学习研究了该系列网络在ImageNet上的精度上限，为了区别之前的ResNeXt网络，该系列网络的后缀为wsl，其中wsl是弱监督学习（weakly-supervised-learning）的简称。为了能有更强的特征提取能力，研究者将其网络宽度进一步放大，其中最大的ResNeXt101_32x48d_wsl拥有8亿个参数，将其在9.4亿的弱标签图片下训练并在ImageNet-1k上做finetune，最终在ImageNet-1k的top-1达到了85.4%，这也是迄今为止在ImageNet-1k的数据集上以224x224的分辨率下精度最高的网络。Fix-ResNeXt中，作者使用了更大的图像分辨率，针对训练图片和验证图片数据预处理不一致的情况下做了专门的Fix策略，并使得ResNeXt101_32x48d_wsl拥有了更高的精度，由于其用到了Fix策略，故命名为Fix-ResNeXt101_32x48d_wsl。
 
 
 该系列模型的FLOPS、参数量以及FP32预测耗时如下图所示。
@@ -15,7 +14,7 @@ ResNeXt是facebook于2016年提出的一种对ResNet的改进版网络。在2019
 
 ![](../../images/models/EfficientNet.png.fp32.png)
 
-目前paddleclas开源的这两类模型的预训练模型一共有14个。从上图中可以看出EfficientNet系列网络优势非常明显，ResNeXt101_wsl系列模型由于用到了更多的数据，最终的精度也更高。
+目前PaddleClas开源的这两类模型的预训练模型一共有14个。从上图中可以看出EfficientNet系列网络优势非常明显，ResNeXt101_wsl系列模型由于用到了更多的数据，最终的精度也更高。EfficientNet_B0_Small是去掉了SE_block的EfficientNet_B0，其具有更快的推理速度。
 
 ## 精度、FLOPS和参数量
 

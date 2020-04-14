@@ -1,8 +1,8 @@
 # DPN与DenseNet系列
 
 ## 概述
-DenseNet是2017年CVPR best paper提出的一种新的网络结构，该网络设计了一种新的跨层连接的block，即dense-block。相比ResNet中的bottleneck，dense-block设计了一个更激进的密集连接机制，即互相连接所有的层，每个层都会接受其前面所有层作为其额外的输入。DenseNet将所有的dense-block堆叠，组合成了一个密集连接型网络。由于密集连接方式，DenseNet提升了梯度的反向传播，使得网络更容易训练。
-DPN的全称是Dual Path Networks，即双通道网络。该网络是由DenseNet和ResNeXt结合的一个网络，其证明了DenseNet能从靠前的层级中提取到新的特征，而ResNeXt本质上是对之前层级中已提取特征的复用。作者进一步分析发现，ResNeXt对特征有高复用率，但冗余度低，DenseNet能创造新特征，但冗余度高。结合二者结构的优势，作者设计了DPN网络。最终DPN网络在同样Params和Flops下，取得了比ResNeXt与DenseNet更好的结果。
+DenseNet是2017年CVPR best paper提出的一种新的网络结构，该网络设计了一种新的跨层连接的block，即dense-block。相比ResNet中的bottleneck，dense-block设计了一个更激进的密集连接机制，即互相连接所有的层，每个层都会接受其前面所有层作为其额外的输入。DenseNet将所有的dense-block堆叠，组合成了一个密集连接型网络。密集的连接方式使得DenseNe更容易进行梯度的反向传播，使得网络更容易训练。
+DPN的全称是Dual Path Networks，即双通道网络。该网络是由DenseNet和ResNeXt结合的一个网络，其证明了DenseNet能从靠前的层级中提取到新的特征，而ResNeXt本质上是对之前层级中已提取特征的复用。作者进一步分析发现，ResNeXt对特征有高复用率，但冗余度低，DenseNet能创造新特征，但冗余度高。结合二者结构的优势，作者设计了DPN网络。最终DPN网络在同样FLOPS和参数量下，取得了比ResNeXt与DenseNet更好的结果。
 
 该系列模型的FLOPS、参数量以及FP32预测耗时如下图所示。
 
@@ -12,10 +12,9 @@ DPN的全称是Dual Path Networks，即双通道网络。该网络是由DenseNet
 
 ![](../../images/models/DPN.png.fp32.png)
 
-目前paddleclas开源的这两类模型的预训练模型一共有10个，其指标如图所示，可以看到，在Flops和Params下，相比DenseNet，DPN拥有更高的精度。但是由于DPN有更多的分支，所以其推理速度要慢于DenseNet。由于DenseNet264的网络层数最深，所以该网络是DenseNet系列模型中参数量最大的网络，DenseNet161的网络的宽度最大，导致其是该系列中网络中计算量最大、精度最高的网络。从推理速度来看，计算量大且精度高的的DenseNet161比DenseNet264具有更快的速度，所以其比DenseNet264具有更大的优势。
-DPN系列网络的曲线图中规中矩，模型的参数量和计算量越大，模型的精度越高。其中，由于DPN107的网络宽度最大，所以其是该系列网络中参数量与计算量最大的网络。
+目前PaddleClas开源的这两类模型的预训练模型一共有10个，其指标如上图所示，可以看到，在相同的FLOPS和参数量下，相比DenseNet，DPN拥有更高的精度。但是由于DPN有更多的分支，所以其推理速度要慢于DenseNet。由于DenseNet264的网络层数最深，所以该网络是DenseNet系列模型中参数量最大的网络，DenseNet161的网络的宽度最大，导致其是该系列中网络中计算量最大、精度最高的网络。从推理速度来看，计算量大且精度高的的DenseNet161比DenseNet264具有更快的速度，所以其比DenseNet264具有更大的优势。
 
-所有模型在预测时，图像的crop_size设置为224，resize_short_size设置为256。
+对于DPN系列网络，模型的FLOPS和参数量越大，模型的精度越高。其中，由于DPN107的网络宽度最大，所以其是该系列网络中参数量与计算量最大的网络。
 
 ## 精度、FLOPS和参数量
 
