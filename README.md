@@ -16,20 +16,20 @@ PaddleClas的目的是为工业界和学术界提供一个图像分类任务相�
 
 ## 模型库
 
-基于ImageNet1k分类数据集，PaddleClas提供ResNet、ResNet_vd、EfficientNet、Res2Net、HRNet、MobileNetV3等23种系列的分类网络结构的简单介绍、论文指标复现配置，以及在复现过程中的训练技巧。与此同时，PaddleClas也提供了对应的117个图像分类预训练模型，并且基于TensorRT评估了所有模型的GPU预测时间，以及在骁龙855（SD855）上评估了移动端模型的CPU预测时间和存储大小。支持的***预训练模型列表、下载地址以及更多信息***请见文档教程中的[**模型库章节**](https://paddleclas.readthedocs.io/zh_CN/latest/zh_cn/models/models_intro.html)。
+基于ImageNet1k分类数据集，PaddleClas提供ResNet、ResNet_vd、EfficientNet、Res2Net、HRNet、MobileNetV3等23种系列的分类网络结构的简单介绍、论文指标复现配置，以及在复现过程中的训练技巧。与此同时，PaddleClas也提供了对应的117个图像分类预训练模型，并且基于TensorRT评估了所有模型的GPU预测时间，以及在骁龙855（SD855）上评估了移动端模型的CPU预测时间和存储大小。支持的***预训练模型列表、下载地址以及更多信息***请见文档教程中的[**模型库章节**](https://paddleclas.readthedocs.io/zh_CN/latest/models/models_intro.html)。
 
 <div align="center">
     <img src="docs/images/models/main_fps_top1.png" width="700">
 </div>
 
-上图展示了一些适合服务器端应用的模型，使用V100，FP32和TensorRT预测一张图像的时间，图中ResNet50_vd_ssld和ResNet101_vd_ssld，是采用PaddleClas提供的SSLD蒸馏方法训练的模型。图中相同颜色和符号的点代表同一系列不同规模的模型。不同模型的简介、FLOPS、Parameters以及详细GPU预测时间请参考文档教程中的[**模型库章节**](https://paddleclas.readthedocs.io/zh_CN/latest/zh_cn/models/models_intro.html)。
+上图展示了一些适合服务器端应用的模型，使用V100，FP32和TensorRT预测一张图像的时间，图中ResNet50_vd_ssld和ResNet101_vd_ssld，是采用PaddleClas提供的SSLD蒸馏方法训练的模型。图中相同颜色和符号的点代表同一系列不同规模的模型。不同模型的简介、FLOPS、Parameters以及详细GPU预测时间请参考文档教程中的[**模型库章节**](https://paddleclas.readthedocs.io/zh_CN/latest/models/models_intro.html)。
 
 <div align="center">
 <img
 src="docs/images/models/mobile_arm_top1.png" width="700">
 </div>
 
-上图展示了一些适合移动端应用的模型，在SD855上预测一张图像的CPU时间。图中MV3_large_x1_0_ssld（M是MobileNet的简称），MV3_small_x1_0_ssld、MV2_ssld和MV1_ssld，是采用PaddleClas提供的SSLD蒸馏方法训练的模型。MV3_large_x1_0_ssld_int8是进一步进行INT8量化的模型。不同模型的简介、FLOPS、Parameters和模型存储大小请参考文档教程中的[**模型库章节**](https://paddleclas.readthedocs.io/zh_CN/latest/zh_cn/models/models_intro.html)。
+上图展示了一些适合移动端应用的模型，在SD855上预测一张图像的CPU时间。图中MV3_large_x1_0_ssld（M是MobileNet的简称），MV3_small_x1_0_ssld、MV2_ssld和MV1_ssld，是采用PaddleClas提供的SSLD蒸馏方法训练的模型。MV3_large_x1_0_ssld_int8是进一步进行INT8量化的模型。不同模型的简介、FLOPS、Parameters和模型存储大小请参考文档教程中的[**模型库章节**](https://paddleclas.readthedocs.io/zh_CN/latest/models/models_intro.html)。
 
 - TODO
 - [ ] EfficientLite、GhostNet、RegNet论文指标复现和性能评估
@@ -86,7 +86,7 @@ src="docs/images/det/pssdet.png" width="500">
 - [ ] PaddleClas在人脸检测和识别中的特色应用
 
 ## 实用工具
-PaddlePaddle提供了一系列实用工具，便于工业应用部署PaddleClas，具体请参考文档教程中的[**实用工具章节**](https://paddleclas.readthedocs.io/zh_CN/latest/zh_cn/extension/index.html)。
+PaddlePaddle提供了一系列实用工具，便于工业应用部署PaddleClas，具体请参考文档教程中的[**实用工具章节**](https://paddleclas.readthedocs.io/zh_CN/latest/extension/index.html)。
 
 - TensorRT预测
 - Paddle-Lite
@@ -96,7 +96,7 @@ PaddlePaddle提供了一系列实用工具，便于工业应用部署PaddleClas�
 - Paddle Hub
 
 ## 赛事支持
-PaddleClas的建设源于百度实际视觉业务应用的淬炼和视觉前沿能力的探索，助力多个视觉重点赛事取得领先成绩，并且持续推进更多的前沿视觉问题的解决和落地应用。更多内容请关注文档教程中的[**赛事支持章节**](https://paddleclas.readthedocs.io/zh_CN/latest/zh_cn/competition_support.html)
+PaddleClas的建设源于百度实际视觉业务应用的淬炼和视觉前沿能力的探索，助力多个视觉重点赛事取得领先成绩，并且持续推进更多的前沿视觉问题的解决和落地应用。更多内容请关注文档教程中的[**赛事支持章节**](https://paddleclas.readthedocs.io/zh_CN/latest/competition_support.html)
 
 - 2018年Kaggle Open Images V4图像目标检测挑战赛冠军
 - 2019年Kaggle Open Images V5图像目标检测挑战赛亚军
