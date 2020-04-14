@@ -13,16 +13,15 @@
 #limitations under the License.
 
 import cv2
-
 import numpy as np
 import os
 import signal
 
 import paddle
 
-import imaug
-from imaug import transform
-from imaug import MixupOperator
+from . import imaug
+from .imaug import transform
+from .imaug import MixupOperator
 from ppcls.utils import logger
 
 trainers_num = int(os.environ.get('PADDLE_TRAINERS_NUM', 1))
