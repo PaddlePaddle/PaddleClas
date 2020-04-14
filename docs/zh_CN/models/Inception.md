@@ -1,7 +1,11 @@
 # Inception系列
 
 ## 概述
-正在持续更新中......
+GoogleNet是2014年由Google设计的一种新的神经网络结构，其与VGG网络并列成为当年ImageNet挑战赛的双雄。GoogleNet设计了一种新的Inception结构，在网络中堆叠该结构使得网络层数达到了22层，这也是卷积网络首次超过20层的标志。由于在Inception结构中使用了1x1的卷积用于通道数降维，并且使用了Global-pooling代替传统的多fc层加工特征的方式，最终的GoogleNet网络的参数量和计算量远小于VGG网络，成为当时神经网络设计的一道亮丽风景线。
+
+Xception 是 Google 继 Inception 后提出的对 Inception-v3 的另一种改进。在Xception中，作者使用了深度可分离卷积代替了传统的卷积操作，该操作大大节省了网络的参数量和计算量。最终相比InceptionV3，Xception的Flops大幅下降，精度反而有所提升。在DeeplabV3+中，作者将Xception做了进一步的改进，同时增加了Xception的层数，设计出了Xception65和Xception71的网络。
+
+InceptionV4是2016年由Google设计的新的神经网络，作者认为Inception 结构可以用很低的计算成本达到很高的性能。而在传统的网络架构中引入残差结构效果也非常好。所以研究者将 Inception 结构和残差结构结合起来做了广泛的实验。最终，研究者通过实验明确地证实了，结合残差连接可以显著加速 Inception 的训练。也有一些证据表明残差 Inception 网络在相近的成本下略微超过没有残差连接的 Inception 网络。最终作者设计出的InceptionV4网络是包含了多个不同Inception块的模型，其在ImageNet上创造了新的精度。
 
 该系列模型的FLOPS、参数量以及FP32预测耗时如下图所示。
 
@@ -10,6 +14,8 @@
 ![](../../images/models/Inception.png.params.png)
 
 ![](../../images/models/Inception.png.fp32.png)
+
+上图反映了Xception系列和InceptionV4的精度和其他指标的关系，除了参数量外，InceptionV4模型依然比较有竞争力。在v100,FP16的情形下，InceptionV4的推理速度更具有优势。
 
 
 ## 精度、FLOPS和参数量
