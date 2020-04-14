@@ -97,7 +97,7 @@ python tools/export_model.py \
 
 ## 三、预测引擎 + inference 模型预测
 
-在模型库的 `tools/predict.py` 中提供了完整的示例，只需执行下述命令即可完成预测：
+在模型库的 `tools/infer/predict.py` 中提供了完整的示例，只需执行下述命令即可完成预测：
 
 ```
 python ./predict.py \
@@ -163,10 +163,10 @@ predictor.zero_copy_run()
 
 ## 四、训练引擎 + persistable 模型预测
 
-在模型库的 `tools/infer.py` 中提供了完整的示例，只需执行下述命令即可完成预测：
+在模型库的 `tools/infer/infer.py` 中提供了完整的示例，只需执行下述命令即可完成预测：
 
 ```python
-python tools/infer.py \
+python tools/infer/infer.py \
     --i=待预测的图片文件路径 \
     --m=模型名称 \
     --p=persistable 模型路径 \
@@ -214,10 +214,10 @@ outputs = exe.run(infer_prog,
 
 ## 五、训练引擎 + inference 模型预测
 
-在模型库的 `tools/py_infer.py` 中提供了完整的示例，只需执行下述命令即可完成预测：
+在模型库的 `tools/infer/py_infer.py` 中提供了完整的示例，只需执行下述命令即可完成预测：
 
 ```python
-python tools/py_infer.py \
+python tools/infer/py_infer.py \
     --i=图片路径 \
     --d=模型的存储路径 \
     --m=保存的模型文件 \
