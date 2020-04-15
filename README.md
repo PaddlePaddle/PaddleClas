@@ -49,7 +49,7 @@ PaddleClas提供了一种简单的半监督标签知识蒸馏方案（SSLD，Sim
 
 <div align="center">
 <img
-src="docs/images/distillation/ppcls_distillation_v1.png" width="700">
+src="docs/images/distillation/ppcls_distillation.png" width="700">
 </div>
 
 ### 数据增广
