@@ -81,6 +81,7 @@ PaddleClas的安装说明、模型训练、预测、评估以及模型微调（f
 ### 图像分类的迁移学习
 
 在实际应用中，由于训练数据的匮乏，往往将ImageNet1K数据集训练的分类模型作为预训练模型，进行图像分类的迁移学习。为了进一步助力实际问题的解决，PaddleClas提供百度自研的基于10万种类别、4千多万的有标签数据训练的预训练模型，预训练模型下载地址如下，更多的相关内容请参考文档教程中的[**图像分类迁移学习章节**](https://paddleclas.readthedocs.io/zh_CN/latest/application/transfer_learning.html#id1)。
+
 [**10万类预训练模型下载地址**](https://paddle-imagenet-models-name.bj.bcebos.com/ResNet50_vd_10w_pretrained.tar)
 
 ### 通用目标检测
