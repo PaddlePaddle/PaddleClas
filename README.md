@@ -45,7 +45,7 @@ src="docs/images/models/mobile_arm_top1.png" width="700">
 src="docs/images/distillation/distillation_perform.png" width="700">
 </div>
 
-PaddleClas提供了一种简单的半监督标签知识蒸馏方案（SSLD，Simple Semi-supervised Label Distillation），使用该方案大幅提升了使用该方案大幅提升了ResNet101_vd，ResNet50_vd、MobileNetV1、MobileNetV2和MobileNetV3在ImageNet数据集上分类效果，如上图所示。该知识蒸馏方案的框架图如下，详细的知识蒸馏方法介绍以及使用正在持续更新中。
+PaddleClas提供了一种简单的半监督标签知识蒸馏方案（SSLD，Simple Semi-supervised Label Distillation），使用该方案大幅提升了ResNet101_vd，ResNet50_vd、MobileNetV1、MobileNetV2和MobileNetV3在ImageNet数据集上分类效果，如上图所示。该知识蒸馏方案的框架图如下，详细的知识蒸馏方法介绍以及使用正在持续更新中。
 
 <div align="center">
 <img
