@@ -2,8 +2,14 @@
 
 ## 概述
 正在持续更新中......
-![](../../images/models/Inception.png)
-GoogLeNet在预测时，图像的crop_size设置为224，resize_short_size设置为256，其余模型在预测时，图像的crop_size设置为299，resize_short_size设置为320。
+
+该系列模型的FLOPS、参数量以及FP32预测耗时如下图所示。
+
+![](../../images/models/Inception.png.flops.png)
+
+![](../../images/models/Inception.png.params.png)
+
+![](../../images/models/Inception.png.fp32.png)
 
 
 ## 精度、FLOPS和参数量
@@ -19,27 +25,15 @@ GoogLeNet在预测时，图像的crop_size设置为224，resize_short_size设置
 | InceptionV4        | 0.808  | 0.953  | 0.800             | 0.950             | 24.570       | 42.680            |
 
 
-## FP16预测速度
-
-| Models             | batch_size=1<br>(ms) | batch_size=4<br>(ms) | batch_size=8<br>(ms) | batch_size=32<br>(ms) |
-|:--:|:--:|:--:|:--:|:--:|
-| GoogLeNet          | 1.428                | 1.833                | 2.138                | 4.143                 |
-| Xception41         | 1.545                | 2.772                | 4.961                | 18.447                |
-| Xception41<br>_deeplab | 1.630                | 2.647                | 4.462                | 16.354                |
-| Xception65         | 5.398                | 4.215                | 8.611                | 28.702                |
-| Xception65<br>_deeplab | 5.317                | 3.688                | 6.168                | 23.108                |
-| Xception71         | 2.732                | 5.033                | 8.948                | 33.857                |
-| InceptionV4        | 6.172                | 7.558                | 9.527                | 24.021                |
-
 
 ## FP32预测速度
 
-| Models             | batch_size=1<br>(ms) | batch_size=4<br>(ms) | batch_size=8<br>(ms) | batch_size=32<br>(ms) |
-|:--:|:--:|:--:|:--:|:--:|
-| GoogLeNet          | 1.436                | 2.904                | 3.800                | 9.049                 |
-| Xception41         | 3.402                | 7.889                | 14.953               | 56.142                |
-| Xception41<br>_deeplab | 3.778                | 8.396                | 15.449               | 58.735                |
-| Xception65         | 6.802                | 13.935               | 34.301               | 87.256                |
-| Xception65<br>_deeplab | 8.583                | 12.132               | 22.917               | 87.983                |
-| Xception71         | 6.156                | 14.359               | 27.360               | 107.282               |
-| InceptionV4        | 10.384               | 17.438               | 23.312               | 68.777                |
+| Models                 | Crop Size | Resize Short Size | Batch Size=1<br>(ms) |
+|------------------------|-----------|-------------------|--------------------------|
+| GoogLeNet              | 224       | 256               | 1.807                    |
+| Xception41             | 299       | 320               | 3.972                    |
+| Xception41<br>_deeplab | 299       | 320               | 4.408                    |
+| Xception65             | 299       | 320               | 6.174                    |
+| Xception65<br>_deeplab | 299       | 320               | 6.464                    |
+| Xception71             | 299       | 320               | 6.782                    |
+| InceptionV4            | 299       | 320               | 11.141                   |
