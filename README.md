@@ -6,7 +6,7 @@
 PaddleClas的目的是为工业界和学术界提供一个图像分类任务相关的百宝箱，特色如下：
 - 模型库：ResNet_vd、MobileNetV3等23种系列的分类网络结构和训练技巧，以及对应的117个分类预训练模型和性能评估
 
-- 高阶支持：高精度的知识蒸馏方案（准确率82.39%的ResNet50_vd和78.9%的MobileNetV3）、8种数据增广方法的复现和验证
+- 高阶支持：SSLD知识蒸馏方案（准确率82.39%的ResNet50_vd和78.9%的MobileNetV3）、8种数据增广方法的复现和验证
 
 - 应用拓展：常见视觉任务的特色方案，包括图像分类领域的迁移学习（百度自研的10万类图像分类预训练模型）和通用目标检测（mAP 47.8%的实用检测方案）等
 
@@ -45,7 +45,7 @@ src="docs/images/models/mobile_arm_top1.png" width="700">
 src="docs/images/distillation/distillation_perform.png" width="700">
 </div>
 
-PaddleClas提供了一种简单的半监督标签知识蒸馏方案（SSLD，Simple Semi-supervised Label Distillation），使用该方案大幅提升了ResNet101_vd，ResNet50_vd、MobileNetV1、MobileNetV2和MobileNetV3在ImageNet数据集上分类效果，如上图所示。该知识蒸馏方案的框架图如下，详细的知识蒸馏方法介绍以及使用正在持续更新中。
+PaddleClas提供了一种简单的半监督标签知识蒸馏方案（SSLD，Simple Semi-supervised Label Distillation），使用该方案大幅提升了ResNet101_vd，ResNet50_vd、MobileNetV1、MobileNetV2和MobileNetV3在ImageNet数据集上分类效果，如上图所示。该知识蒸馏方案的框架图如下，详细的知识蒸馏方法介绍请参考文档教程中的[**知识蒸馏章节**](https://paddleclas.readthedocs.io/zh_CN/latest/advanced_tutorials/distillation/index.html)。
 
 <div align="center">
 <img
@@ -54,7 +54,14 @@ src="docs/images/distillation/ppcls_distillation.png" width="700">
 
 ### 数据增广
 
-在图像分类任务中，图像数据的增广是一种常用的正则化方法，可以有效提升图像分类的效果，尤其对于数据量不足或者模型网络较大的场景。PaddleClas支持了最新的8种数据增广算法的复现和在统一实验环境下的效果评估，下图展示了不同数据增广方式在ResNet50上的表现。每种数据增广方法的详细介绍、对比的实验环境以及使用正在持续更新中。
+在图像分类任务中，图像数据的增广是一种常用的正则化方法，可以有效提升图像分类的效果，尤其对于数据量不足或者模型网络较大的场景。PaddleClas支持了最新的8种数据增广算法的复现和在统一实验环境下的效果评估，变换效果示例如下。
+
+<div align="center">
+<img
+src="docs/images/image_aug/image_aug_samples.png" width="600">
+</div>
+
+下图展示了不同数据增广方式在ResNet50上的表现。每种数据增广方法的详细介绍、对比的实验环境请参考文档教程中的[**数据增广章节**](https://paddleclas.readthedocs.io/zh_CN/latest/advanced_tutorials/image_augmentation/index.html)。
 
 <div align="center">
 <img
@@ -73,11 +80,11 @@ PaddleClas的安装说明、模型训练、预测、评估以及模型微调（f
 
 ### 图像分类的迁移学习
 
-在实际应用中，由于训练数据的匮乏，往往将ImageNet1K数据集训练的分类模型作为预训练模型，进行图像分类的迁移学习。为了进一步助力实际问题的解决，PaddleClas计划开源百度自研的基于10万种类别、4千多万的有标签数据训练的预训练模型，同时给出多种超参搜索方法。该部分内容正在持续更新中。
+在实际应用中，由于训练数据的匮乏，往往将ImageNet1K数据集训练的分类模型作为预训练模型，进行图像分类的迁移学习。为了进一步助力实际问题的解决，PaddleClas提供百度自研的基于10万种类别、4千多万的有标签数据训练的预训练模型，预训练模型下载地址如下，更多的相关内容请参考文档教程中的[**图像分类迁移学习章节**](https://paddleclas.readthedocs.io/zh_CN/latest/application/transfer_learning.html#id1)。
 
 ### 通用目标检测
 
-近年来，学术界和工业界广泛关注图像中目标检测任务。PaddleClas基于82.39%的ResNet50_vd的预训练模型，结合PaddleDetection中丰富的检测算子，提供了一种面向服务器端应用的目标检测方案，PSS-DET (Practical Server Side Detection)，在COCO目标检测数据集上，当V100单卡预测速度为61FPS时，mAP是41.6%，预测速度为20FPS时，mAP是47.8%。详细的网络配置和训练代码，请参看<a href="https://github.com/PaddlePaddle/PaddleDetection/tree/master/configs/rcnn_server_side_det" rel="nofollow"> PaddleDetection中的相关内容</a>。更多的PaddleClas在目标检测中的特色应用，正在持续更新中。
+近年来，学术界和工业界广泛关注图像中目标检测任务。PaddleClas基于82.39%的ResNet50_vd的预训练模型，结合PaddleDetection中丰富的检测算子，提供了一种面向服务器端应用的目标检测方案，PSS-DET (Practical Server Side Detection)，在COCO目标检测数据集上，当V100单卡预测速度为61FPS时，mAP是41.6%，预测速度为20FPS时，mAP是47.8%。详情请参考[**通用目标检测章节**](https://paddleclas.readthedocs.io/zh_CN/latest/application/object_detection.html)。
 
 <div align="center">
 <img
