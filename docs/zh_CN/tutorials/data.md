@@ -34,6 +34,7 @@ PaddleClas/dataset/imagenet
 |  |_ ILSVRC2012_val_00050000.JPEG
 |_ train_list.txt
 |_ val_list.txt
+```
 
 ```bash
 PaddleClas/dataset/flower
