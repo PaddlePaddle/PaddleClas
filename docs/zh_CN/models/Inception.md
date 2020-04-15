@@ -17,7 +17,7 @@ InceptionV4是2016年由Google设计的新的神经网络，当时残差结构�
 
 ![](../../images/models/Inception.png.fp32.png)
 
-上图反映了Xception系列和InceptionV4的精度和其他指标的关系。其中Xception_deeplab与论文结构保持一致，Xception是PaddleClas的改进模型，在预测速度基本不变的情况下，精度提升约0.6%。
+上图反映了Xception系列和InceptionV4的精度和其他指标的关系。其中Xception_deeplab与论文结构保持一致，Xception是PaddleClas的改进模型，在预测速度基本不变的情况下，精度提升约0.6%。关于该改进模型的详细介绍正在持续更新中，敬请期待。
 
 
 
