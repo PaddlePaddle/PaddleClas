@@ -58,7 +58,7 @@ src="docs/images/distillation/ppcls_distillation.png" width="700">
 
 <div align="center">
 <img
-src="docs/images/image_aug/image_aug_samples.png" width="600">
+src="docs/images/image_aug/image_aug_samples.png" width="800">
 </div>
 
 下图展示了不同数据增广方式在ResNet50上的表现。每种数据增广方法的详细介绍、对比的实验环境请参考文档教程中的[**数据增广章节**](https://paddleclas.readthedocs.io/zh_CN/latest/advanced_tutorials/image_augmentation/index.html)。
