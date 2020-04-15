@@ -26,6 +26,11 @@ python tools/infer/predict.py \
 ![](../../images/models/main_fps_top1.png)
 ![](../../images/models/mobile_arm_top1.png)
 
+
+**此处插播一条硬广~**
+> 如果您觉得此文档对您有帮助，欢迎star、watch、fork，三连我们的项目：[https://github.com/PaddlePaddle/PaddleClas](https://github.com/PaddlePaddle/PaddleClas)
+
+
 ## 预训练模型列表及下载地址
 - ResNet及其Vd系列
   - ResNet系列<sup>[[1](#ref1)]</sup>([论文地址](http://openaccess.thecvf.com/content_cvpr_2016/html/He_Deep_Residual_Learning_CVPR_2016_paper.html))
