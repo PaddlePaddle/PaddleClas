@@ -133,9 +133,9 @@ cd model_final # enter model dir
 for var in ./*_student; do cp "$var" "../student_model/${var%_student}"; done # batch copy and rename
 ```
 
-## 四、蒸馏模型的应用
+# 四、蒸馏模型的应用
 
-### 4.1 使用方法
+## 4.1 使用方法
 
 * 中间层学习率调整。蒸馏得到的模型的中间层特征图更加精细化，因此将蒸馏模型预训练应用到其他任务中时，如果采取和之前相同的学习率，容易破坏中间层特征。而如果降低整体模型训练的学习率，则会带来训练收敛速度慢的问题。因此我们使用了中间层学习率调整的策略。具体地：
     * 针对ResNet50_vd，我们设置一个学习率倍数列表，res block之前的3个conv2d卷积参数具有统一的学习率倍数，4个res block的conv2d分别有一个学习率参数，共需设置5个学习率倍数的超参。在实验中发现。用于迁移学习finetune分类模型时，`[0.1,0.1,0.2,0.2,0.3]`的中间层学习率倍数设置在绝大多数的任务中都性能更好；而在目标检测任务中，`[0.05,0.05,0.05,0.1,0.15]`的中间层学习率倍数设置能够带来更大的精度收益。
@@ -145,7 +145,7 @@ for var in ./*_student; do cp "$var" "../student_model/${var%_student}"; done # 
 * 适当的l2 decay。不同分类模型在训练的时候一般都会根据模型设置不同的l2 decay，大模型为了防止过拟合，往往会设置更大的l2 decay，如ResNet50等模型，一般设置为`1e-4`；而如MobileNet系列模型，在训练时往往都会设置为`1e-5~4e-5`，防止模型过度欠拟合，在蒸馏时亦是如此。在将蒸馏模型应用到目标检测任务中时，我们发现也需要调节backbone甚至特定任务模型模型的l2 decay，和预训练蒸馏时的l2 decay尽可能保持一致。以Faster RCNN MobiletNetV3 FPN为例，我们发现仅修改该参数，在COCO2017数据集上就可以带来最多0.5%左右的精度(mAP)提升（默认Faster RCNN l2 decay为1e-4，我们修改为1e-5~4e-5均有0.3%~0.5%的提升）。
 
 
-#### 4.2 迁移学习finetune
+## 4.2 迁移学习finetune
 * 为验证迁移学习的效果，我们在10个小的数据集上验证其效果。在这里为了保证实验的可对比性，我们均使用ImageNet1k数据集训练的标准预处理过程，对于蒸馏模型我们也添加了蒸馏模型中间层学习率的搜索。
 * 对于ResNet50_vd，baseline为Top1 Acc 79.12%的预训练模型基于grid search搜索得到的最佳精度，对比实验则为基于该精度对预训练和中间层学习率进一步搜索得到的最佳精度。下面给出10个数据集上所有baseline和蒸馏模型的精度对比。
 
@@ -166,7 +166,7 @@ for var in ./*_student; do cp "$var" "../student_model/${var%_student}"; done # 
 * 可以看出在上面10个数据集上，结合适当的中间层学习率倍数设置，蒸馏模型平均能够带来1%以上的精度提升。
 
 
-### 4.3 目标检测
+## 4.3 目标检测
 
 我们基于两阶段目标检测Faster/Cascade RCNN模型验证蒸馏得到的预训练模型的效果。
 
@@ -183,7 +183,17 @@ for var in ./*_student; do cp "$var" "../student_model/${var%_student}"; done # 
 在这里可以看出，对于未蒸馏模型，过度调整中间层学习率反而降低最终检测模型的性能指标。基于该蒸馏模型，我们也提供了领先的服务端实用目标检测方案，详细的配置与训练代码均已开源，可以参考[PaddleDetection](https://github.com/PaddlePaddle/PaddleDetection/tree/master/configs/rcnn_server_side_det)。
 
 
-### 参考文献
+# 五、SSLD实战
+
+* 该部分内容正在持续更新中，敬请期待。
+
+
+
+**此处插播一条硬广~**
+> 如果您觉得此文档对您有帮助，欢迎star、watch、fork，三连我们的项目：[https://github.com/PaddlePaddle/PaddleClas](https://github.com/PaddlePaddle/PaddleClas)
+
+
+# 参考文献
 
 [1] Hinton G, Vinyals O, Dean J. Distilling the knowledge in a neural network[J]. arXiv preprint arXiv:1503.02531, 2015.
 
