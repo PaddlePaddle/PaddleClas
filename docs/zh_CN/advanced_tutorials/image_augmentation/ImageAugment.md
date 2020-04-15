@@ -1,6 +1,8 @@
 # 一、数据增广
 
-在图像分类任务中，图像数据的增广是一种常用的正则化方法，尤其对于数据量不足或者模型参数较多的场景。在本章节中，我们将对除 ImageNet 分类任务标准数据增广外的8种数据增广方式进行简单的介绍和对比，用户也可以将这些增广方法应用到自己的任务中，以获得模型精度的提升。
+在图像分类任务中，图像数据的增广是一种常用的正则化方法，常用于数据量不足或者模型参数较多的场景。在本章节中，我们将对除 ImageNet 分类任务标准数据增广外的8种数据增广方式进行简单的介绍和对比，用户也可以将这些增广方法应用到自己的任务中，以获得模型精度的提升。这8种数据增广方式在ImageNet上的精度指标如下所示。
+
+![](../../../images/image_aug/main_image_aug.png)
 
 
 # 二、常用数据增广方法
@@ -18,9 +20,9 @@
 
 相比于上述标准的图像增广方法，研究者也提出了很多改进的图像增广策略，这些策略均是在标准增广方法的不同阶段插入一定的操作，基于这些策略操作所处的不同阶段，我们将其分为了三类：
 
-1. 对 `RandCrop` 后的 224 的图像进行一些变换：AutoAugment，RandAugment
-2. 对`Transpose` 后的 224 的图像进行一些裁剪:CutOut，RandErasing，HideAndSeek，GridMask
-3. 对 `Batch` 后的数据进行混合：Mixup，Cutmix
+1. 对 `RandCrop` 后的 224 的图像进行一些变换: AutoAugment，RandAugment
+2. 对`Transpose` 后的 224 的图像进行一些裁剪: CutOut，RandErasing，HideAndSeek，GridMask
+3. 对 `Batch` 后的数据进行混合: Mixup，Cutmix
 
 
 具体如下表所示：
@@ -39,9 +41,9 @@
 | **Process**     | (N, 3, 224, 224)<br>float32 | (N, 3, 224, 224)<br>float32 | \-               | \-               | \-          | \-               | \-               | \-            | Y          | Y |
 
 
-PaddleClas中集成了上述所有的数据增广策略，下文将介绍这些策略的原理与使用方法，并以下图为例，对变换后的效果进行可视化。为了说明问题，本章节中将 `RandCrop` 替换为 `Resize`。
+PaddleClas中集成了上述所有的数据增广策略。下文将介绍这些策略的原理与使用方法，并以下图为例，对变换后的效果进行可视化。为了说明问题，本章节中将 `RandCrop` 替换为 `Resize`。
 
-![test_baseline][test_baseline]
+![][test_baseline]
 
 # 三、图像变换类
 
@@ -83,7 +85,7 @@ for f in fnames:
 
 结果如下图所示。
 
-![test_autoaugment][test_autoaugment]
+![][test_autoaugment]
 
 ## 3.2 RandAugment
 
@@ -122,7 +124,7 @@ for f in fnames:
 
 结果如下图所示。
 
-![test_randaugment][test_randaugment]
+![][test_randaugment]
 
 
 # 四、图像裁剪类
@@ -172,7 +174,7 @@ for f in fnames:
 
 结果如下图所示。
 
-![test_cutout][test_cutout]
+![][test_cutout]
 
 ## 4.2 RandomErasing
 
@@ -210,7 +212,7 @@ for f in fnames:
 
 结果如下图所示。
 
-![test_randomerassing][test_randomerassing]
+![][test_randomerassing]
 
 
 ## 4.3 HideAndSeek
@@ -223,7 +225,7 @@ for f in fnames:
 `HideAndSeek`论文将图像分为若干块区域(patch)，对于每块区域，都以一定的概率生成掩码，不同区域的掩码含义如下图所示。
 
 
-![hide_and_seek_mask_expanation][hide_and_seek_mask_expanation]
+![][hide_and_seek_mask_expanation]
 
 
 PaddleClas中`HideAndSeek`的使用方法如下所示。
@@ -253,7 +255,7 @@ for f in fnames:
 
 结果如下图所示。
 
-![test_hideandseek][test_hideandseek]
+![][test_hideandseek]
 
 
 ## 4.4 GridMask
@@ -267,7 +269,7 @@ for f in fnames:
 1. 过度删除区域可能造成目标主体大部分甚至全部被删除，或者导致上下文信息的丢失，导致增广后的数据成为噪声数据；
 2. 保留过多的区域，对目标主体及上下文基本产生不了什么影响，失去增广的意义。
 
-![gridmask-0][gridmask-0]
+![][gridmask-0]
 
 因此如果避免过度删除或过度保留成为需要解决的核心问题。
 
@@ -312,7 +314,7 @@ for f in fnames:
 
 结果如下图所示。
 
-![test_gridmask][test_gridmask]
+![][test_gridmask]
 
 
 # 五、图像混叠
@@ -368,7 +370,7 @@ new_batch = mixup_op(batch)
 
 结果如下图所示。
 
-![test_mixup][test_mixup]
+![][test_mixup]
 
 ## 5.2 Cutmix
 
@@ -409,7 +411,7 @@ new_batch = cutmix_op(batch)
 
 结果如下图所示。
 
-![test_cutmix][test_cutmix]
+![][test_cutmix]
 
 
 
@@ -432,6 +434,16 @@ new_batch = cutmix_op(batch)
 **注意**：
 * 在这里的实验中，为了便于对比，我们将l2 decay固定设置为1e-4，在实际使用中，我们推荐尝试使用更小的l2 decay。结合数据增广，我们发现将l2 decay由1e-4减小为7e-5均能带来至少0.3~0.5%的精度提升。
 * 我们目前尚未对不同策略进行组合并验证效果，这一块后续我们会开展更多的对比实验，敬请期待。
+
+
+# 七、数据增广分类实战
+
+* 该部分内容正在持续更新中，敬请期待。
+
+
+
+**此处插播一条硬广~**
+> 如果您觉得此文档对您有帮助，欢迎star、watch、fork，三连我们的项目：[https://github.com/PaddlePaddle/PaddleClas](https://github.com/PaddlePaddle/PaddleClas)
 
 
 # 参考文献
