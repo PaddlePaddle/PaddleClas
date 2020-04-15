@@ -12,9 +12,10 @@
 #See the License for the specific language governing permissions and
 #limitations under the License.
 
-import architectures
 import types
 from difflib import SequenceMatcher
+
+from . import architectures
 
 
 def get_architectures():
