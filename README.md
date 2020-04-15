@@ -6,7 +6,7 @@
 PaddleClas的目的是为工业界和学术界提供一个图像分类任务相关的百宝箱，特色如下：
 - 模型库：ResNet_vd、MobileNetV3等23种系列的分类网络结构和训练技巧，以及对应的117个分类预训练模型和性能评估
 
-- 高阶使用：高精度的实用知识蒸馏方案（准确率82.39%的ResNet50_vd和78.9%的MobileNetV3）、8种数据增广方法的复现和验证
+- 高阶支持：高精度的知识蒸馏方案（准确率82.39%的ResNet50_vd和78.9%的MobileNetV3）、8种数据增广方法的复现和验证
 
 - 应用拓展：常见视觉任务的特色方案，包括图像分类领域的迁移学习（百度自研的10万类图像分类预训练模型）和通用目标检测（mAP 47.8%的实用检测方案）等
 
@@ -34,7 +34,7 @@ src="docs/images/models/mobile_arm_top1.png" width="700">
 - TODO
 - [ ] EfficientLite、GhostNet、RegNet论文指标复现和性能评估
 
-## 高阶使用
+## 高阶支持
 除了提供丰富的分类网络结构和预训练模型，PaddleClas也支持了一系列有助于图像分类任务效果和效率提升的算法或工具。
 ### 知识蒸馏
 
@@ -45,7 +45,7 @@ src="docs/images/models/mobile_arm_top1.png" width="700">
 src="docs/images/distillation/distillation_perform.png" width="700">
 </div>
 
-PaddleClas提供了一种简单的半监督标签知识蒸馏方案（SSLD，Simple Semi-supervised Label Distillation），使用该方案大幅提升了使用该方案大幅提升了ResNet101_vd，ResNet50_vd、MobileNetV1、MobileNetV2和MobileNetV3在ImageNet数据集上分类效果，如上图所示。该知识蒸馏方案的框架图如下，详细的知识蒸馏方法介绍以及使用正在持续更新中。
+PaddleClas提供了一种简单的半监督标签知识蒸馏方案（SSLD，Simple Semi-supervised Label Distillation），使用该方案大幅提升了ResNet101_vd，ResNet50_vd、MobileNetV1、MobileNetV2和MobileNetV3在ImageNet数据集上分类效果，如上图所示。该知识蒸馏方案的框架图如下，详细的知识蒸馏方法介绍以及使用正在持续更新中。
 
 <div align="center">
 <img
@@ -54,7 +54,7 @@ src="docs/images/distillation/ppcls_distillation_v1.png" width="700">
 
 ### 数据增广
 
-在图像分类任务中，图像数据的增广是一种常用的正则化方法，可以有效提升图像分类的效果，尤其对于数据量不足或者模型网络较大的场景。PaddleClas支持了最新的8种数据增广算法的复现和在统一实验环境下的效果评估，如下图所示。每种数据增广方法的详细介绍、对比的实验环境以及使用正在持续更新中。
+在图像分类任务中，图像数据的增广是一种常用的正则化方法，可以有效提升图像分类的效果，尤其对于数据量不足或者模型网络较大的场景。PaddleClas支持了最新的8种数据增广算法的复现和在统一实验环境下的效果评估，下图展示了不同数据增广方式在ResNet50上的表现。每种数据增广方法的详细介绍、对比的实验环境以及使用正在持续更新中。
 
 <div align="center">
 <img
@@ -64,6 +64,9 @@ src="docs/images/image_aug/main_image_aug.png" width="600">
 - TODO
 - [ ] 更多的优化器支持和效果验证
 - [ ] 支持模型可解释性工具
+
+## 开始使用
+PaddleClas的安装说明、模型训练、预测、评估以及模型微调（fine-tuning）请参考文档教程中的[**初级使用章节**](https://paddleclas.readthedocs.io/zh_CN/latest/tutorials/index.html)，SSLD知识蒸馏和数据增广的高阶使用正在持续更新中。
 
 ## 应用拓展
 效果更优的图像分类网络结构和预训练模型往往有助于提升其他视觉任务的效果，PaddleClas提供了一系列在常见视觉任务中的特色方案。

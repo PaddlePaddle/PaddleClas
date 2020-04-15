@@ -13,16 +13,15 @@
 #limitations under the License.
 
 import cv2
-
 import numpy as np
 import os
 import signal
 
 import paddle
 
-import imaug
-from imaug import transform
-from imaug import MixupOperator
+from . import imaug
+from .imaug import transform
+from .imaug import MixupOperator
 from ppcls.utils import logger
 
 trainers_num = int(os.environ.get('PADDLE_TRAINERS_NUM', 1))
@@ -190,9 +189,9 @@ def partial_reader(params, full_lines, part_id=0, part_num=1):
         for line in full_lines:
             img_path, label = line.split()
             img_path = os.path.join(params['data_dir'], img_path)
-            img = open(img_path).read()
-            img = transform(img, ops)
-            yield (img, int(label))
+            with open(img_path, 'rb') as f:
+                img = f.read()
+            yield (transform(img, ops), int(label))
 
     return reader
 

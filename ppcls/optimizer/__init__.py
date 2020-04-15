@@ -15,5 +15,5 @@
 from . import optimizer
 from . import learning_rate
 
-from optimizer import OptimizerBuilder
-from learning_rate import LearningRateBuilder
+from .optimizer import OptimizerBuilder
+from .learning_rate import LearningRateBuilder
