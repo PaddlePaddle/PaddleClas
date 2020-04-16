@@ -106,7 +106,7 @@ def load_params(exe, prog, path, ignore_params=[]):
     fluid.io.set_program_state(prog, state)
 
 
-def init_model(config, program, exe, prefix="ppcls"):
+def init_model(config, program, exe, prefix=""):
     """
     load model from checkpoint or pretrained_model
     """

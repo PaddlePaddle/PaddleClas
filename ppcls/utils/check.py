@@ -59,15 +59,18 @@ def check_architecture(architecture):
     """
     check architecture and recommend similar architectures
     """
-    assert isinstance(architecture, str), \
-            ("the type of architecture({}) should be str". format(architecture))
-    similar_names = similar_architectures(architecture, get_architectures())
+    assert isinstance(architecture, dict), \
+            ("the type of architecture({}) should be dict". format(architecture))
+    assert "name" in architecture, \
+            ("name must be in the architecture keys, just contains: {}". format(architecture.keys()))
+
+    similar_names = similar_architectures(architecture["name"],
+                                          get_architectures())
     model_list = ', '.join(similar_names)
     err = "{} is not exist! Maybe you want: [{}]" \
-          "".format(architecture, model_list)
-
+          "".format(architecture["name"], model_list)
     try:
-        assert architecture in similar_names
+        assert architecture["name"] in similar_names
     except AssertionError:
         logger.error(err)
         sys.exit(1)
@@ -80,7 +83,7 @@ def check_mix(architecture, use_mix=False):
     err = "Cannot use mix processing in GoogLeNet, " \
           "please set use_mix = False."
     try:
-        if architecture == "GoogLeNet": assert use_mix == False
+        if architecture["name"] == "GoogLeNet": assert use_mix == False
     except AssertionError:
         logger.error(err)
         sys.exit(1)
