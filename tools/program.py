@@ -101,7 +101,7 @@ def create_model(architecture, image, classes_num):
         out(variable): model output variable
     """
     name = architecture["name"]
-    params = architecture["params"] if "params" in architecture else {}
+    params = architecture.get("params", {})
     model = architectures.__dict__[name](**params)
     out = model.net(input=image, class_dim=classes_num)
     return out
