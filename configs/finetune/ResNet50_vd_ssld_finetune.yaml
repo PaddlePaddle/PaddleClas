@@ -50,9 +50,6 @@ TRAIN:
             std: [0.229, 0.224, 0.225]
             order: ''
         - ToCHWImage:
-    mix:                       
-        - MixupOperator:    
-            alpha: 0.2      
 
 VALID:
     batch_size: 32
