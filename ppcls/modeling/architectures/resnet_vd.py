@@ -29,9 +29,20 @@ __all__ = [
 
 
 class ResNet():
-    def __init__(self, layers=50, is_3x3=False):
+    def __init__(self,
+                 layers=50,
+                 is_3x3=False,
+                 postfix_name="",
+                 lr_mult_list=[1.0, 1.0, 1.0, 1.0, 1.0]):
         self.layers = layers
         self.is_3x3 = is_3x3
+        self.postfix_name = "" if postfix_name is None else postfix_name
+        self.lr_mult_list = lr_mult_list
+        assert len(
+            self.lr_mult_list
+        ) == 5, "lr_mult_list length in ResNet must be 5 but got {}!!".format(
+            len(self.lr_mult_list))
+        self.curr_stage = 0
 
     def net(self, input, class_dim=1000):
         is_3x3 = self.is_3x3
@@ -90,6 +101,7 @@ class ResNet():
 
         if layers >= 50:
             for block in range(len(depth)):
+                self.curr_stage += 1
                 for i in range(depth[block]):
                     if layers in [101, 152, 200] and block == 2:
                         if i == 0:
@@ -106,6 +118,7 @@ class ResNet():
                         name=conv_name)
         else:
             for block in range(len(depth)):
+                self.curr_stage += 1
                 for i in range(depth[block]):
                     conv_name = "res" + str(block + 2) + chr(97 + i)
                     conv = self.basic_block(
@@ -123,9 +136,9 @@ class ResNet():
             input=pool,
             size=class_dim,
             param_attr=fluid.param_attr.ParamAttr(
-                name="fc_0.w_0",
+                name="fc_0.w_0" + self.postfix_name,
                 initializer=fluid.initializer.Uniform(-stdv, stdv)),
-            bias_attr=ParamAttr(name="fc_0.b_0"))
+            bias_attr=ParamAttr(name="fc_0.b_0" + self.postfix_name))
 
         return out
 
@@ -137,6 +150,7 @@ class ResNet():
                       groups=1,
                       act=None,
                       name=None):
+        lr_mult = self.lr_mult_list[self.curr_stage]
         conv = fluid.layers.conv2d(
             input=input,
             num_filters=num_filters,
@@ -145,7 +159,7 @@ class ResNet():
             padding=(filter_size - 1) // 2,
             groups=groups,
             act=None,
-            param_attr=ParamAttr(name=name + "_weights"),
+            param_attr=ParamAttr(name=name + "_weights" + self.postfix_name),
             bias_attr=False)
         if name == "conv1":
             bn_name = "bn_" + name
@@ -154,10 +168,10 @@ class ResNet():
         return fluid.layers.batch_norm(
             input=conv,
             act=act,
-            param_attr=ParamAttr(name=bn_name + '_scale'),
-            bias_attr=ParamAttr(bn_name + '_offset'),
-            moving_mean_name=bn_name + '_mean',
-            moving_variance_name=bn_name + '_variance')
+            param_attr=ParamAttr(name=bn_name + '_scale' + self.postfix_name),
+            bias_attr=ParamAttr(bn_name + '_offset' + self.postfix_name),
+            moving_mean_name=bn_name + '_mean' + self.postfix_name,
+            moving_variance_name=bn_name + '_variance' + self.postfix_name)
 
     def conv_bn_layer_new(self,
                           input,
@@ -167,6 +181,7 @@ class ResNet():
                           groups=1,
                           act=None,
                           name=None):
+        lr_mult = self.lr_mult_list[self.curr_stage]
         pool = fluid.layers.pool2d(
             input=input,
             pool_size=2,
@@ -183,7 +198,9 @@ class ResNet():
             padding=(filter_size - 1) // 2,
             groups=groups,
             act=None,
-            param_attr=ParamAttr(name=name + "_weights"),
+            param_attr=ParamAttr(
+                name=name + "_weights" + self.postfix_name,
+                learning_rate=lr_mult),
             bias_attr=False)
         if name == "conv1":
             bn_name = "bn_" + name
@@ -192,10 +209,14 @@ class ResNet():
         return fluid.layers.batch_norm(
             input=conv,
             act=act,
-            param_attr=ParamAttr(name=bn_name + '_scale'),
-            bias_attr=ParamAttr(bn_name + '_offset'),
-            moving_mean_name=bn_name + '_mean',
-            moving_variance_name=bn_name + '_variance')
+            param_attr=ParamAttr(
+                name=bn_name + '_scale' + self.postfix_name,
+                learning_rate=lr_mult),
+            bias_attr=ParamAttr(
+                bn_name + '_offset' + self.postfix_name,
+                learning_rate=lr_mult),
+            moving_mean_name=bn_name + '_mean' + self.postfix_name,
+            moving_variance_name=bn_name + '_variance' + self.postfix_name)
 
     def shortcut(self, input, ch_out, stride, name, if_first=False):
         ch_in = input.shape[1]
@@ -273,8 +294,8 @@ def ResNet34_vd():
     return model
 
 
-def ResNet50_vd():
-    model = ResNet(layers=50, is_3x3=True)
+def ResNet50_vd(**args):
+    model = ResNet(layers=50, is_3x3=True, **args)
     return model
 
 

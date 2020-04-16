@@ -88,19 +88,21 @@ def create_dataloader(feeds):
     return dataloader
 
 
-def create_model(name, image, classes_num):
+def create_model(architecture, image, classes_num):
     """
     Create a model
 
     Args:
-        name(str): model name, such as ResNet50
+        architecture(dict): architecture information, name(such as ResNet50) is needed
         image(variable): model input variable
         classes_num(int): num of classes
 
     Returns:
         out(variable): model output variable
     """
-    model = architectures.__dict__[name]()
+    name = architecture["name"]
+    params = architecture["params"] if "params" in architecture else {}
+    model = architectures.__dict__[name](**params)
     out = model.net(input=image, class_dim=classes_num)
     return out
 
@@ -122,7 +124,7 @@ def create_loss(out,
     Args:
         out(variable): model output variable
         feeds(dict): dict of model input variables
-        architecture(str): model name, such as ResNet50
+        architecture(dict): architecture information, name(such as ResNet50) is needed
         classes_num(int): num of classes
         epsilon(float): parameter for label smoothing, 0.0 <= epsilon <= 1.0
         mix(bool): whether to use mix(include mixup, cutmix, fmix)
@@ -130,7 +132,7 @@ def create_loss(out,
     Returns:
         loss(variable): loss variable
     """
-    if architecture == "GoogLeNet":
+    if architecture["name"] == "GoogLeNet":
         assert len(out) == 3, "GoogLeNet should have 3 outputs"
         loss = GoogLeNetLoss(class_dim=classes_num, epsilon=epsilon)
         target = feeds['label']
@@ -188,7 +190,7 @@ def create_fetchs(out,
     Args:
         out(variable): model output variable
         feeds(dict): dict of model input variables(included label)
-        architecture(str): model name, such as ResNet50
+        architecture(dict): architecture information, name(such as ResNet50) is needed
         topk(int): usually top5
         classes_num(int): num of classes
         epsilon(float): parameter for label smoothing, 0.0 <= epsilon <= 1.0
@@ -293,12 +295,12 @@ def build(config, main_prog, startup_prog, is_train=True):
             use_mix = config.get('use_mix') and is_train
             feeds = create_feeds(config.image_shape, mix=use_mix)
             dataloader = create_dataloader(feeds.values())
-            out = create_model(config.architecture, feeds['image'],
+            out = create_model(config.ARCHITECTURE, feeds['image'],
                                config.classes_num)
             fetchs = create_fetchs(
                 out,
                 feeds,
-                config.architecture,
+                config.ARCHITECTURE,
                 config.topk,
                 config.classes_num,
                 epsilon=config.get('ls_epsilon'),

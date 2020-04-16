@@ -19,7 +19,7 @@ from ppcls.utils import logger
 
 __all__ = ['get_config']
 
-CONFIG_SECS = ['TRAIN', 'VALID', 'OPTIMIZER', 'LEARNING_RATE']
+CONFIG_SECS = ['ARCHITECTURE', 'TRAIN', 'VALID', 'OPTIMIZER', 'LEARNING_RATE']
 
 
 class AttrDict(dict):
@@ -110,7 +110,7 @@ def check_config(config):
     mode = config.get('mode', 'train')
     check.check_gpu()
 
-    architecture = config.get('architecture')
+    architecture = config.get('ARCHITECTURE')
     check.check_architecture(architecture)
 
     use_mix = config.get('use_mix')
