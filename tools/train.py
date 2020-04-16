@@ -96,7 +96,7 @@ def main(args):
 
         if epoch_id % config.save_interval == 0:
             model_path = os.path.join(config.model_save_dir,
-                                      config.architecture)
+                                      config.ARCHITECTURE)
             save_model(train_prog, model_path, epoch_id)
 
 
