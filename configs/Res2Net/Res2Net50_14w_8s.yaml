@@ -1,5 +1,7 @@
 mode: 'train'
-architecture: 'Res2Net50_14w_8s'
+ARCHITECTURE:
+    name: 'Res2Net50_14w_8s'
+
 pretrained_model: ""
 model_save_dir: "./output/"
 classes_num: 1000

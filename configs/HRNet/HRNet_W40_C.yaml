@@ -1,5 +1,7 @@
 mode: 'train'
-architecture: 'HRNet_W40_C'
+ARCHITECTURE:
+    name: 'HRNet_W40_C'
+
 pretrained_model: ""
 model_save_dir: "./output/"
 classes_num: 1000

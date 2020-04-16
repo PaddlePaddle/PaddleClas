@@ -1,5 +1,7 @@
 mode: 'train'
-architecture: 'SE_ResNet34_vd'
+ARCHITECTURE:
+    name: 'SE_ResNet34_vd'
+
 pretrained_model: ""
 model_save_dir: "./output/"
 classes_num: 1000

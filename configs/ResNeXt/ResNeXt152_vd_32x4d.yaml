@@ -1,5 +1,7 @@
 mode: 'train'
-architecture: 'ResNeXt152_vd_32x4d'
+ARCHITECTURE:
+    name: 'ResNeXt152_vd_32x4d'
+
 pretrained_model: ""
 model_save_dir: "./output/"
 classes_num: 1000

@@ -1,5 +1,7 @@
 mode: 'train'
-architecture: "SqueezeNet1_0"
+ARCHITECTURE:
+    name: "SqueezeNet1_0"
+
 pretrained_model: ""
 model_save_dir: "./output/"
 classes_num: 1000

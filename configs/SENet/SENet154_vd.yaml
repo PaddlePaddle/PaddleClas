@@ -1,5 +1,7 @@
 mode: 'train'
-architecture: 'SENet154_vd'
+ARCHITECTURE:
+    name: 'SENet154_vd'
+
 pretrained_model: ""
 model_save_dir: "./output/"
 classes_num: 1000
