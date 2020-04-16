@@ -1,5 +1,7 @@
 mode: 'train'
-architecture: "ShuffleNetV2_x2_0"
+ARCHITECTURE:
+    name: "ShuffleNetV2_x2_0"
+
 pretrained_model: ""
 model_save_dir: "./output/"
 classes_num: 1000

@@ -1,5 +1,7 @@
 mode: 'train'
-architecture: "VGG16"
+ARCHITECTURE:
+    name: "VGG16"
+
 pretrained_model: ""
 model_save_dir: "./output/"
 classes_num: 1000

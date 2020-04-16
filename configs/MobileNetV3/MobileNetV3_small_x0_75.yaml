@@ -1,5 +1,7 @@
 mode: 'train'
-architecture: "MobileNetV3_small_x0_75"
+ARCHITECTURE:
+    name: "MobileNetV3_small_x0_75"
+
 pretrained_model: ""
 model_save_dir: "./output/"
 classes_num: 1000

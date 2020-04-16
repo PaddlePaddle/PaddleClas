@@ -1,5 +1,7 @@
 mode: 'train'
-architecture: "AlexNet"
+ARCHITECTURE:
+    name: "AlexNet"
+
 pretrained_model: ""
 model_save_dir: "./output/"
 classes_num: 1000

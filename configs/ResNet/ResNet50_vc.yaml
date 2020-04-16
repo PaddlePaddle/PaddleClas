@@ -1,5 +1,7 @@
 mode: 'train'
-architecture: 'ResNet50_vc'
+ARCHITECTURE:
+    name: 'ResNet50_vc'
+
 pretrained_model: ""
 model_save_dir: "./output/"
 classes_num: 1000

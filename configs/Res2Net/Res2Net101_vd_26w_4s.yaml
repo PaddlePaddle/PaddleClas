@@ -1,5 +1,7 @@
 mode: 'train'
-architecture: 'Res2Net101_vd_26w_4s'
+ARCHITECTURE:
+    name: 'Res2Net101_vd_26w_4s'
+
 pretrained_model: ""
 model_save_dir: "./output/"
 classes_num: 1000

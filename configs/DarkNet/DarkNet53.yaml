@@ -1,5 +1,7 @@
 mode: 'train'
-architecture: "DarkNet53"
+ARCHITECTURE:
+    name: "DarkNet53"
+
 pretrained_model: ""
 model_save_dir: "./output/"
 classes_num: 1000

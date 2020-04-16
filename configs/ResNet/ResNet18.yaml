@@ -1,5 +1,7 @@
 mode: 'train'
-architecture: 'ResNet18'
+ARCHITECTURE:
+    name: 'ResNet18'
+
 pretrained_model: ""
 model_save_dir: "./output/"
 classes_num: 1000

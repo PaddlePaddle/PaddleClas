@@ -1,5 +1,7 @@
 mode: 'train'
-architecture: "GoogLeNet"
+ARCHITECTURE:
+    name: "GoogLeNet"
+
 pretrained_model: ""
 model_save_dir: "./output/"
 classes_num: 1000

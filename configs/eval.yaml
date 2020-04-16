@@ -1,5 +1,7 @@
 mode: 'valid'
-architecture: ""
+ARCHITECTURE:
+    name: ""
+
 pretrained_model: ""
 classes_num: 1000
 total_images: 1281167
