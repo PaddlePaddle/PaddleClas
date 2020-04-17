@@ -12,6 +12,7 @@
 #See the License for the specific language governing permissions and
 #limitations under the License.
 
+
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
@@ -19,6 +20,7 @@ from __future__ import print_function
 import argparse
 import os
 import sys
+sys.path.append(os.getcwd())
 
 import paddle
 import paddle.fluid as fluid
@@ -41,7 +43,7 @@ def parse_args():
         '-c',
         '--config',
         type=str,
-        default='configs/ResNet/ResNet18_vd.yaml',
+        default='configs/ResNet/ResNet50.yaml',
         help='config file path')
     parser.add_argument(
         '-o',
