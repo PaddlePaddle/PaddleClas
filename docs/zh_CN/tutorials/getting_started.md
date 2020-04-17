@@ -16,15 +16,17 @@ export PYTHONPATH=path_to_PaddleClas:$PYTHONPATH
 PaddleClas 提供模型训练与评估脚本：tools/train.py和tools/eval.py
 
 ### 2.1 模型训练
+以flower102数据为例按如下方式启动模型训练，flower数据集准备请参考[数据集准备](./data.md)
+
 ```bash
 # PaddleClas通过launch方式启动多卡多进程训练
 # 通过设置FLAGS_selected_gpus 指定GPU运行卡号
 
 python -m paddle.distributed.launch \
     --selected_gpus="0,1,2,3" \
-    --log_dir=log_ResNet50 \
+    --log_dir=log_ResNet50_vd \
     tools/train.py \
-        -c ./configs/ResNet/ResNet50.yaml 
+        -c ./configs/flower.yaml 
 ```
 
 - 输出日志示例如下：
@@ -40,7 +42,7 @@ python -m paddle.distributed.launch \
     --selected_gpus="0,1,2,3" \
     --log_dir=log_ResNet50_vd \
     tools/train.py \
-        -c ./configs/ResNet/ResNet50_vd.yaml \
+        -c ./configs/flower.yaml \
         -o use_mix=1 
 
 ```
@@ -54,18 +56,8 @@ epoch:0    train    step:522    loss:1.6330    lr:0.100000    elapse:0.210
 或是直接修改模型对应的yaml配置文件，具体配置参数参考[配置文档](config.md)。
 
 ### 2.3 模型微调
+模型微调请参照[模型微调文档](./finetune.md)
 
-您可以通过如下命令进行模型微调，通过指定--pretrained_model参数加载预训练模型
-
-```bash
-python -m paddle.distributed.launch \
-    --selected_gpus="0,1,2,3" \
-    --log_dir=log_ResNet50_vd \
-    train.py \
-        -c ../configs/ResNet/ResNet50_vd.yaml \
-	-o  pretrained_model= 预训练模型路径\
-
-```
 
 ### 2.2 模型评估
 
