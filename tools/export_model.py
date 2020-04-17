@@ -24,6 +24,7 @@ def parse_args():
     parser.add_argument("-m", "--model", type=str)
     parser.add_argument("-p", "--pretrained_model", type=str)
     parser.add_argument("-o", "--output_path", type=str)
+    parser.add_argument("--class_dim", type=int)
 
     return parser.parse_args()
 
@@ -57,7 +58,7 @@ def main():
     with fluid.program_guard(infer_prog, startup_prog):
         with fluid.unique_name.guard():
             image = create_input()
-            out = create_model(args, model, image)
+            out = create_model(args, model, image, class_dim=args.class_dim)
 
     infer_prog = infer_prog.clone(for_test=True)
     fluid.load(

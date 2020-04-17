@@ -31,6 +31,7 @@ from ppcls.optimizer import OptimizerBuilder
 from ppcls.modeling import architectures
 from ppcls.modeling.loss import CELoss
 from ppcls.modeling.loss import MixCELoss
+from ppcls.modeling.loss import JSDivLoss
 from ppcls.modeling.loss import GoogLeNetLoss
 from ppcls.utils.misc import AverageMeter
 from ppcls.utils import logger
@@ -39,13 +40,13 @@ from paddle.fluid.incubate.fleet.collective import fleet
 from paddle.fluid.incubate.fleet.collective import DistributedStrategy
 
 
-def create_feeds(image_shape, mix=None):
+def create_feeds(image_shape, use_mix=None):
     """
     Create feeds as model input
 
     Args:
         image_shape(list[int]): model input shape, such as [3, 224, 224]
-        mix(bool): whether to use mix(include mixup, cutmix, fmix)
+        use_mix(bool): whether to use mix(include mixup, cutmix, fmix)
 
     Returns:
         feeds(dict): dict of model input variables
@@ -53,7 +54,7 @@ def create_feeds(image_shape, mix=None):
     feeds = OrderedDict()
     feeds['image'] = fluid.data(
         name="feed_image", shape=[None] + image_shape, dtype="float32")
-    if mix:
+    if use_mix:
         feeds['feed_y_a'] = fluid.data(
             name="feed_y_a", shape=[None, 1], dtype="int64")
         feeds['feed_y_b'] = fluid.data(
@@ -112,7 +113,8 @@ def create_loss(out,
                 architecture,
                 classes_num=1000,
                 epsilon=None,
-                mix=False):
+                use_mix=False,
+                use_distillation=False):
     """
     Create a loss for optimization, such as:
         1. CrossEnotry loss
@@ -127,7 +129,7 @@ def create_loss(out,
         architecture(dict): architecture information, name(such as ResNet50) is needed
         classes_num(int): num of classes
         epsilon(float): parameter for label smoothing, 0.0 <= epsilon <= 1.0
-        mix(bool): whether to use mix(include mixup, cutmix, fmix)
+        use_mix(bool): whether to use mix(include mixup, cutmix, fmix)
 
     Returns:
         loss(variable): loss variable
@@ -138,7 +140,14 @@ def create_loss(out,
         target = feeds['label']
         return loss(out[0], out[1], out[2], target)
 
-    if mix:
+    if use_distillation:
+        assert len(
+            out) == 2, "distillation output length must be 2 but got {}".format(
+                len(out))
+        loss = JSDivLoss(class_dim=classes_num, epsilon=epsilon)
+        return loss(out[1], out[0])
+
+    if use_mix:
         loss = MixCELoss(class_dim=classes_num, epsilon=epsilon)
         feed_y_a = feeds['feed_y_a']
         feed_y_b = feeds['feed_y_b']
@@ -150,7 +159,8 @@ def create_loss(out,
         return loss(out, target)
 
 
-def create_metric(out, feeds, topk=5, classes_num=1000):
+def create_metric(out, feeds, topk=5, classes_num=1000,
+                  use_distillation=False):
     """
     Create measures of model accuracy, such as top1 and top5
 
@@ -163,6 +173,9 @@ def create_metric(out, feeds, topk=5, classes_num=1000):
     Returns:
         fetchs(dict): dict of measures
     """
+    # just need student label to get metrics
+    if use_distillation:
+        out = out[1]
     fetchs = OrderedDict()
     label = feeds['label']
     softmax_out = fluid.layers.softmax(out, use_cudnn=False)
@@ -182,10 +195,11 @@ def create_fetchs(out,
                   topk=5,
                   classes_num=1000,
                   epsilon=None,
-                  mix=False):
+                  use_mix=False,
+                  use_distillation=False):
     """
     Create fetchs as model outputs(included loss and measures),
-    will call create_loss and create_metric(if mix).
+    will call create_loss and create_metric(if use_mix).
 
     Args:
         out(variable): model output variable
@@ -194,16 +208,17 @@ def create_fetchs(out,
         topk(int): usually top5
         classes_num(int): num of classes
         epsilon(float): parameter for label smoothing, 0.0 <= epsilon <= 1.0
-        mix(bool): whether to use mix(include mixup, cutmix, fmix)
+        use_mix(bool): whether to use mix(include mixup, cutmix, fmix)
 
     Returns:
         fetchs(dict): dict of model outputs(included loss and measures)
     """
     fetchs = OrderedDict()
-    loss = create_loss(out, feeds, architecture, classes_num, epsilon, mix)
+    loss = create_loss(out, feeds, architecture, classes_num, epsilon, use_mix,
+                       use_distillation)
     fetchs['loss'] = (loss, AverageMeter('loss', ':2.4f', True))
-    if not mix:
-        metric = create_metric(out, feeds, topk, classes_num)
+    if not use_mix:
+        metric = create_metric(out, feeds, topk, classes_num, use_distillation)
         fetchs.update(metric)
 
     return fetchs
@@ -293,7 +308,8 @@ def build(config, main_prog, startup_prog, is_train=True):
     with fluid.program_guard(main_prog, startup_prog):
         with fluid.unique_name.guard():
             use_mix = config.get('use_mix') and is_train
-            feeds = create_feeds(config.image_shape, mix=use_mix)
+            use_distillation = config.get('use_distillation')
+            feeds = create_feeds(config.image_shape, use_mix=use_mix)
             dataloader = create_dataloader(feeds.values())
             out = create_model(config.ARCHITECTURE, feeds['image'],
                                config.classes_num)
@@ -304,7 +320,8 @@ def build(config, main_prog, startup_prog, is_train=True):
                 config.topk,
                 config.classes_num,
                 epsilon=config.get('ls_epsilon'),
-                mix=use_mix)
+                use_mix=use_mix,
+                use_distillation=use_distillation)
             if is_train:
                 optimizer = create_optimizer(config)
                 lr = optimizer._global_learning_rate()
