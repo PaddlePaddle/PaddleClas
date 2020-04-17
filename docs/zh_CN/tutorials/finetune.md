@@ -45,7 +45,7 @@ python -m paddle.distributed.launch \
 ```
 
 
-##剔除FC层
+## 剔除FC层
 
 由于新的数据集类别数（Flower102：102类）和ImgaeNet1k数据（1000类）不一致，一般需要对分类网络的最后FC层进行调整，PaddleClas默认剔除所有形状不一样的层
 
