@@ -1,6 +1,7 @@
 # 开始使用
 ---
 请事先参考[安装指南](install.md)配置运行环境
+有关模型库的基本信息请参考[README](https://github.com/PaddlePaddle/PaddleClas/blob/master/README.md)
 
 ## 一、设置环境变量
 
@@ -15,15 +16,17 @@ export PYTHONPATH=path_to_PaddleClas:$PYTHONPATH
 PaddleClas 提供模型训练与评估脚本：tools/train.py和tools/eval.py
 
 ### 2.1 模型训练
+以flower102数据为例按如下方式启动模型训练，flower数据集准备请参考[数据集准备](./data.md)
+
 ```bash
 # PaddleClas通过launch方式启动多卡多进程训练
 # 通过设置FLAGS_selected_gpus 指定GPU运行卡号
 
 python -m paddle.distributed.launch \
     --selected_gpus="0,1,2,3" \
-    --log_dir=log_ResNet50 \
+    --log_dir=log_ResNet50_vd \
     tools/train.py \
-        -c ./configs/ResNet/ResNet50.yaml 
+        -c ./configs/flower.yaml 
 ```
 
 - 输出日志示例如下：
@@ -39,7 +42,7 @@ python -m paddle.distributed.launch \
     --selected_gpus="0,1,2,3" \
     --log_dir=log_ResNet50_vd \
     tools/train.py \
-        -c ./configs/ResNet/ResNet50_vd.yaml \
+        -c ./configs/flower.yaml \
         -o use_mix=1 
 
 ```
@@ -54,17 +57,39 @@ epoch:0    train    step:522    loss:1.6330    lr:0.100000    elapse:0.210
 
 ### 2.3 模型微调
 
-您可以通过如下命令进行模型微调，通过指定--pretrained_model参数加载预训练模型
+以ResNet50_vd和ResNet50_vd_ssld预训练模型对flower102数据集进行微调
+
+ResNet50_vd： 在ImageNet1k数据集上训练 top1 acc：79.1% 模型详细信息参考[模型库](https://paddleclas.readthedocs.io/zh_CN/latest/models/ResNet_and_vd.html)
+
+ResNet50_vd_ssld： 在ImageNet1k数据集训练的蒸馏模型 top1： 82.4% 模型详细信息参考[模型库](https://paddleclas.readthedocs.io/zh_CN/latest/models/ResNet_and_vd.html)
+
+flower数据集相关信息参考[数据文档](data.md)
+
+指定pretrained_model参数初始化预训练模型
+ResNet50_vd：
 
 ```bash
 python -m paddle.distributed.launch \
-    --selected_gpus="0,1,2,3" \
-    --log_dir=log_ResNet50_vd \
-    train.py \
-        -c ../configs/ResNet/ResNet50_vd.yaml \
-	-o  pretrained_model= 预训练模型路径\
-
+    --selected_gpus="0" \
+    tools/train.py \
+        -c ./configs/finetune/ResNet50_vd_finetune.yaml
+        -o pretrained_model= ResNet50_vd预训练模型
 ```
+
+ResNet50_vd_ssld：
+
+```bash
+python -m paddle.distributed.launch \
+    --selected_gpus="0" \
+    tools/train.py \
+        -c ./configs/finetune/ResNet50_vd_ssld_finetune.yaml
+        -o pretrained_model= ResNet50_vd_ssld预训练模型
+```
+
+
+在使用ResNet50_vd预训练模型对flower102数据进行模型微调后，top1 acc 达到 92.71%
+在使用ResNet50_vd_ssld预训练模型对flower102数据进行模型微调后，top1 acc 达到94.96%
+
 
 ### 2.2 模型评估
 
