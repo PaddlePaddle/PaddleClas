@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from . import environment
 from . import model_zoo
 from . import misc
 from . import logger

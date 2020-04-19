@@ -25,7 +25,6 @@ import paddle.fluid as fluid
 import program
 
 from ppcls.data import Reader
-import ppcls.utils.environment as env
 from ppcls.utils.config import get_config
 from ppcls.utils.save_load import init_model, save_model
 from ppcls.utils import logger
@@ -58,7 +57,8 @@ def main(args):
     fleet.init(role)
 
     config = get_config(args.config, overrides=args.override, show=True)
-    place = env.place()
+    gpu_id = int(os.environ.get('FLAGS_selected_gpus', 0))
+    place = fluid.CUDAPlace(gpu_id)
 
     startup_prog = fluid.Program()
     valid_prog = fluid.Program()
@@ -69,7 +69,7 @@ def main(args):
     exe = fluid.Executor(place)
     exe.run(startup_prog)
 
-    init_model(config, valid_prog, exe)
+    init_model(config, valid_prog, exe, 'ppcls')
 
     valid_reader = Reader(config, 'valid')()
     valid_dataloader.set_sample_list_generator(valid_reader, place)
