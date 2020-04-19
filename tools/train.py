@@ -1,16 +1,16 @@
-#copyright (c) 2020 PaddlePaddle Authors. All Rights Reserve.
+# copyright (c) 2020 PaddlePaddle Authors. All Rights Reserve.
 #
-#Licensed under the Apache License, Version 2.0 (the "License");
-#you may not use this file except in compliance with the License.
-#You may obtain a copy of the License at
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
 #
 #    http://www.apache.org/licenses/LICENSE-2.0
 #
-#Unless required by applicable law or agreed to in writing, software
-#distributed under the License is distributed on an "AS IS" BASIS,
-#WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#See the License for the specific language governing permissions and
-#limitations under the License.
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
 from __future__ import absolute_import
 from __future__ import division
@@ -18,18 +18,14 @@ from __future__ import print_function
 
 import argparse
 import os
-import sys
 
-import paddle
 import paddle.fluid as fluid
 
 import program
 
 from ppcls.data import Reader
-import ppcls.utils.environment as env
 from ppcls.utils.config import get_config
 from ppcls.utils.save_load import init_model, save_model
-from ppcls.utils import logger
 
 from paddle.fluid.incubate.fleet.collective import fleet
 from paddle.fluid.incubate.fleet.base import role_maker
@@ -41,7 +37,7 @@ def parse_args():
         '-c',
         '--config',
         type=str,
-        default='configs/ResNet/ResNet18_vd.yaml',
+        default='configs/ResNet/ResNet50.yaml',
         help='config file path')
     parser.add_argument(
         '-o',
@@ -58,8 +54,12 @@ def main(args):
     fleet.init(role)
 
     config = get_config(args.config, overrides=args.override, show=True)
-    place = env.place()
+    # assign the place
+    gpu_id = int(os.environ.get('FLAGS_selected_gpus', 0))
+    place = fluid.CUDAPlace(gpu_id)
 
+    # startup_prog is used to do some parameter init work,
+    # and train prog is used to hold the network
     startup_prog = fluid.Program()
     train_prog = fluid.Program()
 
@@ -70,11 +70,15 @@ def main(args):
         valid_prog = fluid.Program()
         valid_dataloader, valid_fetchs = program.build(
             config, valid_prog, startup_prog, is_train=False)
+        # clone to prune some content which is irrelevant in valid_prog
         valid_prog = valid_prog.clone(for_test=True)
 
-    exe = fluid.Executor(place)
+    # create the "Executor" with the statement of which place
+    exe = fluid.Executor(place=place)
+    # only run startup_prog once to init
     exe.run(startup_prog)
 
+    # load model from checkpoint or pretrained model
     init_model(config, train_prog, exe)
 
     train_reader = Reader(config, 'train')()
@@ -87,13 +91,15 @@ def main(args):
 
     compiled_train_prog = fleet.main_program
     for epoch_id in range(config.epochs):
+        # 1. train with train dataset
         program.run(train_dataloader, exe, compiled_train_prog, train_fetchs,
                     epoch_id, 'train')
-
+        # 2. validate with validate dataset
         if config.validate and epoch_id % config.valid_interval == 0:
             program.run(valid_dataloader, exe, compiled_valid_prog,
                         valid_fetchs, epoch_id, 'valid')
 
+        # 3. save the persistable model
         if epoch_id % config.save_interval == 0:
             model_path = os.path.join(config.model_save_dir,
                                       config.ARCHITECTURE["name"])

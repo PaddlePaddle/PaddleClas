@@ -1,34 +1,31 @@
-#copyright (c) 2020 PaddlePaddle Authors. All Rights Reserve.
+# copyright (c) 2020 PaddlePaddle Authors. All Rights Reserve.
 #
-#Licensed under the Apache License, Version 2.0 (the "License");
-#you may not use this file except in compliance with the License.
-#You may obtain a copy of the License at
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
 #
 #    http://www.apache.org/licenses/LICENSE-2.0
 #
-#Unless required by applicable law or agreed to in writing, software
-#distributed under the License is distributed on an "AS IS" BASIS,
-#WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#See the License for the specific language governing permissions and
-#limitations under the License.
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-import sys
+import os
 import argparse
 
-import paddle
 import paddle.fluid as fluid
 
 import program
 
 from ppcls.data import Reader
-import ppcls.utils.environment as env
 from ppcls.utils.config import get_config
-from ppcls.utils.save_load import init_model, save_model
-from ppcls.utils import logger
+from ppcls.utils.save_load import init_model
 
 from paddle.fluid.incubate.fleet.collective import fleet
 from paddle.fluid.incubate.fleet.base import role_maker
@@ -40,7 +37,7 @@ def parse_args():
         '-c',
         '--config',
         type=str,
-        default='configs/eval.yaml',
+        default='./configs/eval.yaml',
         help='config file path')
     parser.add_argument(
         '-o',
@@ -58,7 +55,8 @@ def main(args):
     fleet.init(role)
 
     config = get_config(args.config, overrides=args.override, show=True)
-    place = env.place()
+    gpu_id = int(os.environ.get('FLAGS_selected_gpus', 0))
+    place = fluid.CUDAPlace(gpu_id)
 
     startup_prog = fluid.Program()
     valid_prog = fluid.Program()
