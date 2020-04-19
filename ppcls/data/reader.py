@@ -206,6 +206,8 @@ def mp_reader(params):
     check_params(params)
 
     full_lines = get_file_list(params)
+    if params["mode"] == "train":
+        full_lines = shuffle_lines(full_lines, seed=None)
 
     part_num = 1 if 'num_workers' not in params else params['num_workers']
 
@@ -254,11 +256,10 @@ class Reader:
             self.batch_ops = create_operators(self.params['mix'])
 
     def __call__(self):
-        reader = mp_reader(self.params)
-
         batch_size = int(self.params['batch_size']) // trainers_num
 
         def wrapper():
+            reader = mp_reader(self.params)
             batch = []
             for idx, sample in enumerate(reader()):
                 img, label = sample
