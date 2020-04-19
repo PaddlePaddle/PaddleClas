@@ -35,7 +35,7 @@ python -m paddle.distributed.launch \
 epoch:0    train    step:13    loss:7.9561    top1:0.0156    top5:0.1094    lr:0.100000    elapse:0.193
 ```
 
-可以通过添加-o参数来更新配置
+可以通过添加-o参数来更新配置：
 
 ```bash
 python -m paddle.distributed.launch \
@@ -57,13 +57,13 @@ epoch:0    train    step:522    loss:1.6330    lr:0.100000    elapse:0.210
 
 ### 2.3 模型微调
 
-以ResNet50_vd和ResNet50_vd_ssld预训练模型对flower102数据集进行微调
+以ResNet50_vd和ResNet50_vd_ssld预训练模型对flower102数据集进行微调。
 
 ResNet50_vd： 在ImageNet1k数据集上训练 top1 acc：79.1% 模型详细信息参考[模型库](https://paddleclas.readthedocs.io/zh_CN/latest/models/ResNet_and_vd.html)。
 
 ResNet50_vd_ssld： 在ImageNet1k数据集训练的蒸馏模型 top1： 82.4% 模型详细信息参考[模型库](https://paddleclas.readthedocs.io/zh_CN/latest/models/ResNet_and_vd.html)。
 
-flower数据集相关信息参考[数据文档](data.md)
+flower数据集相关信息参考[数据文档](data.md)。
 
 指定pretrained_model参数初始化预训练模型
 ResNet50_vd：
@@ -87,8 +87,8 @@ python -m paddle.distributed.launch \
 ```
 
 
-在使用ResNet50_vd预训练模型对flower102数据进行模型微调后，top1 acc 达到 92.71%
-在使用ResNet50_vd_ssld预训练模型对flower102数据进行模型微调后，top1 acc 达到94.96%
+在使用ResNet50_vd预训练模型对flower102数据进行模型微调后，top1 acc 达到 92.71%。
+在使用ResNet50_vd_ssld预训练模型对flower102数据进行模型微调后，top1 acc 达到94.96%。
 
 
 ### 2.2 模型评估
@@ -104,7 +104,7 @@ python tools/eval.py \
 ## 三、模型推理
 
 PaddlePaddle提供三种方式进行预测推理，接下来介绍如何用预测引擎进行推理：
-首先，对训练好的模型进行转换
+首先，对训练好的模型进行转换：
 ```bash
 python tools/export_model.py \
     -model=模型名字 \
@@ -112,7 +112,7 @@ python tools/export_model.py \
     -output_path=预测模型保存路径
 
 ```
-之后，通过预测引擎进行推理
+之后，通过预测引擎进行推理：
 ```bash
 python tools/infer/predict.py \
     -m model文件路径 \
