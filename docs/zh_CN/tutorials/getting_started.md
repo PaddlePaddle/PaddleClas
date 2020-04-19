@@ -16,7 +16,7 @@ export PYTHONPATH=path_to_PaddleClas:$PYTHONPATH
 PaddleClas 提供模型训练与评估脚本：tools/train.py和tools/eval.py
 
 ### 2.1 模型训练
-以flower102数据为例按如下方式启动模型训练，flower数据集准备请参考[数据集准备](./data.md)
+以flower102数据为例按如下方式启动模型训练，flower数据集准备请参考[数据集准备](./data.md)。
 
 ```bash
 # PaddleClas通过launch方式启动多卡多进程训练
