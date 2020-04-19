@@ -65,7 +65,7 @@ Label_smoothing是深度学习中的一种正则化方法，其全称是 Label S
 | MobileNetV2_x0_25 | [0.2,1]   | 54.39%/77.08%   | 53.18%/76.14%  |
 
 ## 7.使用数据增广方式提升精度
-一般来说，数据集的规模对性能影响至关重要，但是图片的标注往往比较昂贵，所以有标注的图片数量往往比较稀少，在这种情况下，数据的增广尤为重要。在训练ImageNet-1k的标准数据增广中，主要使用了random_crop与random_flip两种数据增广方式，然而，近些年，越来越多的数据增广方式被提出，如cutout、mixup、cutmix、AutoAugment等。实验表明，这些数据的增广方式可以有效提升模型的精度，下表列出了ResNet50在8种不同的数据增广方式的表现，可以看出，相比baseline，所有的数据增广方式均有收益，其中cutmix是目前最有效的数据增广。更多数据增广的介绍请参考[**数据增广章节**](https://paddleclas.readthedocs.io/zh_CN/latest/advanced_tutorials/image_augmentation/ImageAugment.html)
+一般来说，数据集的规模对性能影响至关重要，但是图片的标注往往比较昂贵，所以有标注的图片数量往往比较稀少，在这种情况下，数据的增广尤为重要。在训练ImageNet-1k的标准数据增广中，主要使用了random_crop与random_flip两种数据增广方式，然而，近些年，越来越多的数据增广方式被提出，如cutout、mixup、cutmix、AutoAugment等。实验表明，这些数据的增广方式可以有效提升模型的精度，下表列出了ResNet50在8种不同的数据增广方式的表现，可以看出，相比baseline，所有的数据增广方式均有收益，其中cutmix是目前最有效的数据增广。更多数据增广的介绍请参考[**数据增广章节**](https://paddleclas.readthedocs.io/zh_CN/latest/advanced_tutorials/image_augmentation/ImageAugment.html)。
 
 | 模型       | 数据增广方式         | Test top-1 |
 |:--:|:--:|:--:|
