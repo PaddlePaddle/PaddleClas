@@ -56,7 +56,39 @@ epoch:0    train    step:522    loss:1.6330    lr:0.100000    elapse:0.210
 或是直接修改模型对应的yaml配置文件，具体配置参数参考[配置文档](config.md)。
 
 ### 2.3 模型微调
-模型微调请参照[模型微调文档](./finetune.md)
+
+以ResNet50_vd和ResNet50_vd_ssld预训练模型对flower102数据集进行微调
+
+ResNet50_vd： 在ImageNet1k数据集上训练 top1 acc：79.1% 模型详细信息参考[模型库](https://paddleclas.readthedocs.io/zh_CN/latest/models/ResNet_and_vd.html)
+
+ResNet50_vd_ssld： 在ImageNet1k数据集训练的蒸馏模型 top1： 82.4% 模型详细信息参考[模型库](https://paddleclas.readthedocs.io/zh_CN/latest/models/ResNet_and_vd.html)
+
+flower数据集相关信息参考[数据文档](data.md)
+
+指定pretrained_model参数初始化预训练模型
+ResNet50_vd：
+
+```bash
+python -m paddle.distributed.launch \
+    --selected_gpus="0" \
+    tools/train.py \
+        -c ./configs/finetune/ResNet50_vd_finetune.yaml
+        -o pretrained_model= ResNet50_vd预训练模型
+```
+
+ResNet50_vd_ssld：
+
+```bash
+python -m paddle.distributed.launch \
+    --selected_gpus="0" \
+    tools/train.py \
+        -c ./configs/finetune/ResNet50_vd_ssld_finetune.yaml
+        -o pretrained_model= ResNet50_vd_ssld预训练模型
+```
+
+
+在使用ResNet50_vd预训练模型对flower102数据进行模型微调后，top1 acc 达到 92.71%
+在使用ResNet50_vd_ssld预训练模型对flower102数据进行模型微调后，top1 acc 达到94.96%
 
 
 ### 2.2 模型评估

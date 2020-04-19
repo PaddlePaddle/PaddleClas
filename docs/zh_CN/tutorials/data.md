@@ -4,7 +4,7 @@
 
 ## 1.简介
 本文档介绍ImageNet1k和Flower102数据准备过程。
-PaddleClas提供了丰富的预训练模型，支持的模型列表请参考[模型库](../models/models_intro.md)
+以及PaddleClas提供了丰富的[预训练模型](../models/models_intro.md)
 
 ## 2.数据集准备
 
@@ -14,8 +14,15 @@ PaddleClas提供了丰富的预训练模型，支持的模型列表请参考[模
 [ImageNet1k](http://www.image-net.org/challenges/LSVRC/2012/)|1.2M| 50k | 1000 | 
 
 数据格式
-PaddleClas加载PaddleClas/dataset/中的数据，通过指定data_dir和file_list来进行加载
+按照如下结构组织数据，其中train_list.txt 和val_list.txt的格式形如
 
+```
+#path_to_image Class
+
+ILSVRC2012_val_00000001.JPEG 65
+...
+
+```
 ### ImageNet1k
 从官方下载数据后，按如下组织数据
 
@@ -38,7 +45,7 @@ PaddleClas/dataset/imagenet/
 |_ val_list.txt
 ```
 ### Flower
-从VGG官方网站下载后的数据，解压后包括
+从[VGG官方网站](https://www.robots.ox.ac.uk/~vgg/data/flowers/102/)下载后的数据，解压后包括
 jpg/
 setid.mat
 imagelabels.mat
@@ -63,16 +70,6 @@ PaddleClas/dataset/flower102/
 |_ val_list.txt
 ```
 
-或是通过软链接将数据从实际地址链接到PaddleClas/dataset/下
-
-```bash
-#imagenet
-ln -s actual_path/imagenet path_to_PaddleClas/dataset/imagenet
-
-#flower
-ln -s actual_path/flower path_to_PaddleClas/dataset/flower
-
-```
 
 ## 3.下载预训练模型
 通过tools/download.py下载所需要的预训练模型。
