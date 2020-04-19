@@ -17,7 +17,7 @@
 按照如下结构组织数据，其中train_list.txt 和val_list.txt的格式形如
 
 ```
-#path_to_image Class
+#每一行采用"空格"分隔图像路径与标注
 
 ILSVRC2012_val_00000001.JPEG 65
 ...
