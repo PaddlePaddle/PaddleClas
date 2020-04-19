@@ -59,9 +59,9 @@ epoch:0    train    step:522    loss:1.6330    lr:0.100000    elapse:0.210
 
 以ResNet50_vd和ResNet50_vd_ssld预训练模型对flower102数据集进行微调
 
-ResNet50_vd： 在ImageNet1k数据集上训练 top1 acc：79.1% 模型详细信息参考[模型库](https://paddleclas.readthedocs.io/zh_CN/latest/models/ResNet_and_vd.html)
+ResNet50_vd： 在ImageNet1k数据集上训练 top1 acc：79.1% 模型详细信息参考[模型库](https://paddleclas.readthedocs.io/zh_CN/latest/models/ResNet_and_vd.html)。
 
-ResNet50_vd_ssld： 在ImageNet1k数据集训练的蒸馏模型 top1： 82.4% 模型详细信息参考[模型库](https://paddleclas.readthedocs.io/zh_CN/latest/models/ResNet_and_vd.html)
+ResNet50_vd_ssld： 在ImageNet1k数据集训练的蒸馏模型 top1： 82.4% 模型详细信息参考[模型库](https://paddleclas.readthedocs.io/zh_CN/latest/models/ResNet_and_vd.html)。
 
 flower数据集相关信息参考[数据文档](data.md)
 
@@ -73,7 +73,7 @@ python -m paddle.distributed.launch \
     --selected_gpus="0" \
     tools/train.py \
         -c ./configs/finetune/ResNet50_vd_finetune.yaml
-        -o pretrained_model= ResNet50_vd预训练模型
+        -o pretrained_model=path_to_ResNet50_vd_pretrained_models
 ```
 
 ResNet50_vd_ssld：
@@ -83,7 +83,7 @@ python -m paddle.distributed.launch \
     --selected_gpus="0" \
     tools/train.py \
         -c ./configs/finetune/ResNet50_vd_ssld_finetune.yaml
-        -o pretrained_model= ResNet50_vd_ssld预训练模型
+        -o pretrained_model=path_to_ResNet50_vd_ssld_pretrained_models
 ```
 
 
@@ -121,4 +121,4 @@ python tools/infer/predict.py \
     --use_gpu=1 \
     --use_tensorrt=True
 ```
-更多使用方法和推理方式请参考[分类预测框架](../extension/paddle_inference.md)
+更多使用方法和推理方式请参考[分类预测框架](../extension/paddle_inference.md)。
