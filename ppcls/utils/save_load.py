@@ -106,22 +106,20 @@ def load_params(exe, prog, path, ignore_params=[]):
     fluid.io.set_program_state(prog, state)
 
 
-def init_model(config, program, exe, prefix=""):
+def init_model(config, program, exe):
     """
     load model from checkpoint or pretrained_model
     """
     checkpoints = config.get('checkpoints')
     if checkpoints:
-        path = os.path.join(checkpoints, prefix)
-        fluid.load(program, path, exe)
-        logger.info("Finish initing model from {}".format(path))
+        fluid.load(program, checkpoints, exe)
+        logger.info("Finish initing model from {}".format(checkpoints))
         return
 
     pretrained_model = config.get('pretrained_model')
     if pretrained_model:
-        path = os.path.join(pretrained_model, prefix)
-        load_params(exe, program, path)
-        logger.info("Finish initing model from {}".format(path))
+        load_params(exe, program, pretrained_model)
+        logger.info("Finish initing model from {}".format(pretrained_model))
 
 
 def save_model(program, model_path, epoch_id, prefix='ppcls'):
