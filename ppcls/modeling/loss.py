@@ -15,7 +15,7 @@
 import paddle
 import paddle.fluid as fluid
 
-__all__ = ['CELoss', 'MixCELoss', 'GoogLeNetLoss']
+__all__ = ['CELoss', 'MixCELoss', 'GoogLeNetLoss', 'JSDivLoss']
 
 
 class Loss(object):
@@ -34,8 +34,11 @@ class Loss(object):
             self._label_smoothing = False
 
     def _labelsmoothing(self, target):
-        one_hot_target = fluid.layers.one_hot(
-            input=target, depth=self._class_dim)
+        if target.shape[-1] != self._class_dim:
+            one_hot_target = fluid.layers.one_hot(
+                input=target, depth=self._class_dim)
+        else:
+            one_hot_target = target
         soft_target = fluid.layers.label_smooth(
             label=one_hot_target, epsilon=self._epsilon, dtype="float32")
         return soft_target
@@ -46,6 +49,19 @@ class Loss(object):
         softmax_out = fluid.layers.softmax(input, use_cudnn=False)
         cost = fluid.layers.cross_entropy(
             input=softmax_out, label=target, soft_label=self._label_smoothing)
+        avg_cost = fluid.layers.mean(cost)
+        return avg_cost
+
+    def _kldiv(self, input, target):
+        cost = target * fluid.layers.log(target / input) * self._class_dim
+        cost = fluid.layers.sum(cost)
+        return cost
+
+    def _jsdiv(self, input, target):
+        input = fluid.layers.softmax(input, use_cudnn=False)
+        target = fluid.layers.softmax(target, use_cudnn=False)
+        cost = self._kldiv(input, target) + self._kldiv(target, input)
+        cost = cost / 2
         avg_cost = fluid.layers.mean(cost)
         return avg_cost
 
@@ -97,3 +113,16 @@ class GoogLeNetLoss(Loss):
         cost = cost0 + 0.3 * cost1 + 0.3 * cost2
         avg_cost = fluid.layers.mean(cost)
         return avg_cost
+
+
+class JSDivLoss(Loss):
+    """
+    JSDiv loss
+    """
+
+    def __init__(self, class_dim=1000, epsilon=None):
+        super(JSDivLoss, self).__init__(class_dim, epsilon)
+
+    def __call__(self, input, target):
+        cost = self._jsdiv(input, target)
+        return cost

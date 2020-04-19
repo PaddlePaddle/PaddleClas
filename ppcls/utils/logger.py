@@ -14,6 +14,7 @@
 
 import os
 import logging
+logging.basicConfig()
 import random
 
 DEBUG = logging.DEBUG  #10
