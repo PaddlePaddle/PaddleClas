@@ -1,7 +1,7 @@
 # 开始使用
 ---
 请事先参考[安装指南](install.md)配置运行环境
-有关模型库的基本信息请参考[README](https://github.com/PaddlePaddle/PaddleClas/blob/master/README.md)
+有关模型库的基本信息请参考[README](https://github.com/PaddlePaddle/PaddleClas/blob/master/README.md)。
 
 ## 一、设置环境变量
 
