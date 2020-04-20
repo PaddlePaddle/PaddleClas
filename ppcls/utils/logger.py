@@ -72,10 +72,23 @@ def error(fmt, *args):
 
 
 def advertisement():
+    """
+    Show the advertising message like the following:
+
+    ===========================================================
+    ==        PaddleClas is powered by PaddlePaddle !        ==
+    ===========================================================
+    ==                                                       ==
+    ==   For more info please go to the following website.   ==
+    ==                                                       ==
+    ==       https://github.com/PaddlePaddle/PaddleClas      ==
+    ===========================================================
+
+    """
     copyright = "PaddleClas is powered by PaddlePaddle !"
     info = "For more info please go to the following website."
     website = "https://github.com/PaddlePaddle/PaddleClas"
-    AD_LEN = 55
+    AD_LEN = 6 + len(max([copyright, info, website], key=len))
 
     _logger.info("\n{0}\n{1}\n{2}\n{3}\n{4}\n{5}\n{6}\n{7}\n".format(
         "=" * (AD_LEN + 4),
