@@ -14,12 +14,11 @@
 
 import os
 import yaml
+
 from ppcls.utils import check
 from ppcls.utils import logger
 
 __all__ = ['get_config']
-
-CONFIG_SECS = ['ARCHITECTURE', 'TRAIN', 'VALID', 'OPTIMIZER', 'LEARNING_RATE']
 
 
 class AttrDict(dict):
@@ -63,9 +62,8 @@ def print_dict(d, delimiter=0):
     Recursively visualize a dict and
     indenting acrrording by the relationship of keys.
     """
-    for k, v in d.items():
-        if k in CONFIG_SECS:
-            logger.info("-" * 60)
+    for k, v in sorted(d.items()):
+        if k.istitle(): logger.info("-" * 60)
 
         if isinstance(v, dict):
             logger.info("{}{} : ".format(delimiter * " ", k))
@@ -77,27 +75,23 @@ def print_dict(d, delimiter=0):
         else:
             logger.info("{}{} : {}".format(delimiter * " ", k, v))
 
-        if k in CONFIG_SECS:
-            logger.info("-" * 60)
+        if k.istitle(): logger.info("-" * 60)
 
 
-def print_config(config):
+def print_config(config, show=True):
     """
     visualize configs
 
     Arguments:
         config: configs
     """
+    if not show: return
 
     copyright = "PaddleClas is powered by PaddlePaddle"
     ad = "https://github.com/PaddlePaddle/PaddleClas"
 
-    logger.info("\n" * 2)
-    logger.info(copyright)
-    logger.info(ad)
-
+    logger.info("\n\n{}\n{}".format(copyright, ad))
     print_dict(config)
-
     logger.info("-" * 60)
 
 
@@ -193,11 +187,9 @@ def get_config(fname, overrides=[], show=True):
     assert os.path.exists(fname), \
             ('config file({}) is not exist'.format(fname))
     config = parse_config(fname)
-    if show:
-        print_config(config)
+    print_config(config, show)
     if len(overrides) > 0:
         override_config(config, overrides)
-        if show:
-            print_config(config)
+        print_config(config, show)
     check_config(config)
     return config
