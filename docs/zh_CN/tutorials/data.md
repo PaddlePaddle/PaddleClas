@@ -3,21 +3,21 @@
 ---
 
 ## 1.简介
-本文档介绍ImageNet1k和Flower102数据准备过程。
+本文档介绍ImageNet1k和flowers102数据准备过程。
 以及PaddleClas提供了丰富的[预训练模型](../models/models_intro.md)
 
 ## 2.数据集准备
 
 数据集 | 训练集大小 | 测试集大小 | 类别数 | 备注|
 :------:|:---------------:|:---------------------:|:-----------:|:-----------:
-[Flower102](https://www.robots.ox.ac.uk/~vgg/data/flowers/102/)|1k | 6k | 102 | 
-[ImageNet1k](http://www.image-net.org/challenges/LSVRC/2012/)|1.2M| 50k | 1000 | 
+[flowers102](https://www.robots.ox.ac.uk/~vgg/data/flowers/102/)|1k | 6k | 102 |
+[ImageNet1k](http://www.image-net.org/challenges/LSVRC/2012/)|1.2M| 50k | 1000 |
 
-数据格式
+* 数据格式
 按照如下结构组织数据，其中train_list.txt 和val_list.txt的格式形如
 
-```
-#每一行采用"空格"分隔图像路径与标注
+```shell
+# 每一行采用"空格"分隔图像路径与标注
 
 ILSVRC2012_val_00000001.JPEG 65
 ...
@@ -44,26 +44,26 @@ PaddleClas/dataset/imagenet/
 |_ train_list.txt
 |_ val_list.txt
 ```
-### Flower
+### Flowers102
 从[VGG官方网站](https://www.robots.ox.ac.uk/~vgg/data/flowers/102/)下载后的数据，解压后包括
 jpg/
 setid.mat
 imagelabels.mat
-将以上文件放置在PaddleClas/dataset/flower102/下
+将以上文件放置在PaddleClas/dataset/flowers102/下
 
-通过运行generate_flower_list.py生成train_list.txt和val_list.txt
+通过运行generate_flowers102_list.py生成train_list.txt和val_list.txt
 
 ```bash
-python generate_flower_list.py jpg train > train_list.txt
-python generate_flower_list.py jpg valid > val_list.txt
+python generate_flowers102_list.py jpg train > train_list.txt
+python generate_flowers102_list.py jpg valid > val_list.txt
 
 ```
 按照如下结构组织数据：
 
 ```bash
-PaddleClas/dataset/flower102/
+PaddleClas/dataset/flowers102/
 |_ jpg/
-|  |_ image_03601.jpg 
+|  |_ image_03601.jpg
 |  |_ ...
 |  |_ image_02355.jpg
 |_ train_list.txt
