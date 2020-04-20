@@ -45,7 +45,7 @@ cd ../../
 ### 2.1 设置PYTHONPATH环境变量
 
 ```bash
-export PYTHONPATH=path_to_PaddleClas:$PYTHONPATH
+export PYTHONPATH=./:$PYTHONPATH
 ```
 
 ### 2.2 环境说明
