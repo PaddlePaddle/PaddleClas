@@ -162,6 +162,12 @@ python -m paddle.distributed.launch \  
 
 最终flowers102验证集上的精度为0.9627，使用数据增广可以使得模型精度再次提升1.27\%。
 
+* 如果希望体验`3.6节`的知识蒸馏部分，可以首先保存训练得到的ResNet50_vd预训练模型到合适的位置，作为蒸馏时教师模型的预训练模型。脚本如下所示。
+
+```shell
+cp -r output/ResNet50_vd/19/  ./pretrained/flowers102_R50_vd_final/
+```
+
 ### 3.6 知识蒸馏小试牛刀
 
 * 使用flowers102数据集进行模型蒸馏，为了进一步提提升模型的精度，使用test_list.txt充当无标签数据，在这里有几点需要注意：
@@ -169,13 +175,6 @@ python -m paddle.distributed.launch \  
     * 即使引入了有标签的test_list.txt中的测试集图像，但是代码中没有使用标签信息，因此仍然可以视为无标签的模型蒸馏。
     * 蒸馏过程中，教师模型使用的预训练模型为flowers102数据集上的训练结果，学生模型使用的是ImageNet1k数据集上精度为75.32\%的MobileNetV3_large_x1_0预训练模型。
 
-* 首先需要保存之前训练得到的ResNet50_vd预训练模型到合适的位置，作教师模型的预训练。
-
-脚本如下所示。
-
-```shell
-cp -r output/ResNet50_vd/19/  ./pretrained/flowers102_R50_vd_final/
-```
 
 配置文件中数据数量、模型结构、预训练地址以及训练的数据配置如下：
 
@@ -198,8 +197,11 @@ python -m paddle.distributed.launch \  
     --selected_gpus="0" \  
     tools/train.py \  
         -c ./configs/quick_start/R50_vd_distill_MV3_large_x1_0.yaml
-
 ```
+
+最终flowers102验证集上的精度为0.9647，结合更多的无标签数据，使用教师模型进行知识蒸馏，MobileNetV3的精度涨幅高达6.47\%。
+
+
 ### 3.6 精度一览
 
 * 下表给出了不同训练yaml文件对应的精度。
