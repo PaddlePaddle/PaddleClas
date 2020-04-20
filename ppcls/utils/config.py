@@ -62,9 +62,8 @@ def print_dict(d, delimiter=0):
     Recursively visualize a dict and
     indenting acrrording by the relationship of keys.
     """
+    placeholder = "-" * 60
     for k, v in sorted(d.items()):
-        if k.istitle(): logger.info("-" * 60)
-
         if isinstance(v, dict):
             logger.info("{}{} : ".format(delimiter * " ", k))
             print_dict(v, delimiter + 4)
@@ -75,24 +74,32 @@ def print_dict(d, delimiter=0):
         else:
             logger.info("{}{} : {}".format(delimiter * " ", k, v))
 
-        if k.istitle(): logger.info("-" * 60)
+        if k.isupper():
+            logger.info(placeholder)
 
 
-def print_config(config, show=True):
+def print_config(config):
     """
     visualize configs
 
     Arguments:
         config: configs
     """
-    if not show: return
+    copyright = "PaddleClas is powered by PaddlePaddle !"
+    info = "For more info please go to the following website."
+    website = "https://github.com/PaddlePaddle/PaddleClas"
+    AD_LEN = 55
 
-    copyright = "PaddleClas is powered by PaddlePaddle"
-    ad = "https://github.com/PaddlePaddle/PaddleClas"
-
-    logger.info("\n\n{}\n{}".format(copyright, ad))
+    logger.info("\n{0}\n{1}\n{2}\n{3}\n{4}\n{5}\n{6}\n{7}\n".format(
+        "=" * (AD_LEN + 4),
+        "=={}==".format(copyright.center(AD_LEN)),
+        "=" * (AD_LEN + 4),
+        "=={}==".format(' ' * AD_LEN),
+        "=={}==".format(info.center(AD_LEN)),
+        "=={}==".format(' ' * AD_LEN),
+        "=={}==".format(website.center(AD_LEN)),
+        "=" * (AD_LEN + 4), ))
     print_dict(config)
-    logger.info("-" * 60)
 
 
 def check_config(config):
@@ -151,7 +158,7 @@ def override(dl, ks, v):
             override(dl[ks[0]], ks[1:], v)
 
 
-def override_config(config, options=[]):
+def override_config(config, options=None):
     """
     Recursively override the config
 
@@ -166,30 +173,31 @@ def override_config(config, options=[]):
     Returns:
         config(dict): replaced config
     """
-    for opt in options:
-        assert isinstance(opt, str), \
-                ("option({}) should be a str".format(opt))
-        assert "=" in opt, ("option({}) should contain " \
-                "a = to distinguish between key and value".format(opt))
-        pair = opt.split('=')
-        assert len(pair) == 2, ("there can be only a = in the option")
-        key, value = pair
-        keys = key.split('.')
-        override(config, keys, value)
+    if options is not None:
+        for opt in options:
+            assert isinstance(opt, str), (
+                "option({}) should be a str".format(opt))
+            assert "=" in opt, (
+                "option({}) should contain a ="
+                "to distinguish between key and value".format(opt))
+            pair = opt.split('=')
+            assert len(pair) == 2, ("there can be only a = in the option")
+            key, value = pair
+            keys = key.split('.')
+            override(config, keys, value)
 
     return config
 
 
-def get_config(fname, overrides=[], show=True):
+def get_config(fname, overrides=None, show=True):
     """
     Read config from file
     """
-    assert os.path.exists(fname), \
-            ('config file({}) is not exist'.format(fname))
+    assert os.path.exists(fname), (
+        'config file({}) is not exist'.format(fname))
     config = parse_config(fname)
-    print_config(config, show)
-    if len(overrides) > 0:
-        override_config(config, overrides)
-        print_config(config, show)
+    override_config(config, overrides)
+    if show:
+        print_config(config)
     check_config(config)
     return config
