@@ -389,3 +389,4 @@ def run(dataloader, exe, program, fetchs, epoch=0, mode='train'):
         fetchs_str = ''.join([str(m) for m in metric_list] + [str(batch_time)])
         logger.info("[epoch:%3d][%s][step:%4d]%s" %
                     (epoch, mode, idx, fetchs_str))
+    logger.info("END [epoch:%3d][%s]%s"%(epoch, mode, fetchs_str))

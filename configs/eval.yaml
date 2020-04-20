@@ -1,8 +1,8 @@
 mode: 'valid'
 ARCHITECTURE:
-    name: ""
+    name: "ResNet50_vd"
 
-pretrained_model: ""
+pretrained_model: "./pretrained_model/ResNet50_vd_pretrained"
 classes_num: 1000
 total_images: 1281167
 topk: 5
@@ -11,8 +11,8 @@ image_shape: [3, 224, 224]
 VALID:
     batch_size: 16
     num_workers: 4
-    file_list: "../dataset/ILSVRC2012/val_list.txt"
-    data_dir: "../dataset/ILSVRC2012/"
+    file_list: "./dataset/ILSVRC2012/val_list.txt"
+    data_dir: "./dataset/ILSVRC2012/"
     shuffle_seed: 0
     transforms:
         - DecodeImage:
