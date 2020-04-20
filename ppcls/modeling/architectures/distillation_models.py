@@ -27,12 +27,12 @@ from .mobilenet_v3 import MobileNetV3_large_x1_0
 from .resnext101_wsl import ResNeXt101_32x16d_wsl
 
 __all__ = [
-    'ResNet50_vd_distill_MobileNetV3_x1_0',
+    'ResNet50_vd_distill_MobileNetV3_large_x1_0',
     'ResNeXt101_32x16d_wsl_distill_ResNet50_vd'
 ]
 
 
-class ResNet50_vd_distill_MobileNetV3_x1_0():
+class ResNet50_vd_distill_MobileNetV3_large_x1_0():
     def net(self, input, class_dim=1000):
         # student
         student = MobileNetV3_large_x1_0()
