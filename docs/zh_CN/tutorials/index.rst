@@ -6,6 +6,6 @@
    
    install.md
    quick_start.md
+   data.md
    getting_started.md
    config.md
-   data.md

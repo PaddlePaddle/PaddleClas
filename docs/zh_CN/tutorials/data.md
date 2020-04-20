@@ -4,7 +4,6 @@
 
 ## 1.简介
 本文档介绍ImageNet1k和flowers102数据准备过程。
-以及PaddleClas提供了丰富的[预训练模型](../models/models_intro.md)
 
 ## 2.数据集准备
 
@@ -46,9 +45,13 @@ PaddleClas/dataset/imagenet/
 ```
 ### Flowers102
 从[VGG官方网站](https://www.robots.ox.ac.uk/~vgg/data/flowers/102/)下载后的数据，解压后包括
+
+```shell
 jpg/
 setid.mat
 imagelabels.mat
+```
+
 将以上文件放置在PaddleClas/dataset/flowers102/下
 
 通过运行generate_flowers102_list.py生成train_list.txt和val_list.txt
@@ -69,16 +72,3 @@ PaddleClas/dataset/flowers102/
 |_ train_list.txt
 |_ val_list.txt
 ```
-
-
-## 3.下载预训练模型
-通过tools/download.py下载所需要的预训练模型。
-
-```bash
-python tools/download.py -a ResNet50_vd -p ./pretrained -d True
-```
-
-参数说明：
-+ `architecture`（简写 a）：模型结构
-+ `path`（简写 p）：下载路径
-+ `decompress` （简写 d）：是否解压
