@@ -5,7 +5,7 @@
 ## 简介
 
 <div align="center">
-    <img src="docs/images/main_features.png" width="700">
+    <img src="docs/images/main_features.png" width="750">
 </div>
 
 ## 丰富的模型库
@@ -62,8 +62,6 @@ PaddleClas提供了上述8种数据增广算法的复现和在统一实验环境
 src="docs/images/image_aug/main_image_aug.png" width="600">
 </div>
 
-- TODO
-- [ ] 更多的优化器支持和效果验证
 
 ## 开始使用
 PaddleClas的安装说明、模型训练、预测、评估以及模型微调（finetune）请参考文档教程中的[**初级使用章节**](https://paddleclas.readthedocs.io/zh_CN/latest/tutorials/index.html)，SSLD知识蒸馏和数据增广的高阶使用正在持续更新中。
