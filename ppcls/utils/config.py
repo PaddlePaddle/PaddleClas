@@ -63,7 +63,11 @@ def print_dict(d, delimiter=0):
     Recursively visualize a dict and
     indenting acrrording by the relationship of keys.
     """
+
+    dk = []
+    dv = [] 
     for k, v in d.items():
+      
         if k in CONFIG_SECS:
             logger.info("-" * 60)
 
@@ -75,11 +79,16 @@ def print_dict(d, delimiter=0):
             for value in v:
                 print_dict(value, delimiter + 4)
         else:
-            logger.info("{}{} : {}".format(delimiter * " ", k, v))
-
+            dk.append(k)
+            dv.append(v)
         if k in CONFIG_SECS:
             logger.info("-" * 60)
 
+    for ki,vi in zip(dk,dv):
+
+        logger.info("{}{} : {}".format(delimiter * " ", ki, vi))
+
+        
 
 def print_config(config):
     """

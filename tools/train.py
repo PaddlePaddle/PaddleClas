@@ -87,8 +87,8 @@ def main(args):
     if config.validate:
         valid_reader = Reader(config, 'valid')()
         valid_dataloader.set_sample_list_generator(valid_reader, place)
-        compiled_valid_prog = program.compile(config, valid_prog)
-
+        #compiled_valid_prog = program.compile(config, valid_prog)
+        compiled_valid_prog = valid_prog
     compiled_train_prog = fleet.main_program
     for epoch_id in range(config.epochs):
         # 1. train with train dataset
