@@ -73,18 +73,12 @@ PaddleClas的安装说明、模型训练、预测、评估以及模型微调（f
 
 | 数据集   | 数据统计                | ImageNet预训练模型 | 10万类图像分类预训练模型 |
 |:--:|:--:|:--:|:--:|
-| 花卉    | class_num:102       | 0.7779        | 0.9892        |
-|       | train/val:5789/2396 |               |               |
-| 手绘简笔画 | class_num:18        | 0.8785        | 0.9107        |
-|       | train/val:1007/432  |               |               |
-| 植物叶子  | class_num:6         | 0.8212        | 0.8385        |
-|       | train/val:5256/2278 |               |               |
-| 集装箱车辆 | class_num:115       | 0.623         | 0.9524        |
-|       | train/val:4879/2094 |               |               |
-| 椅子    | class_num:5         | 0.8557        | 0.9077        |
-|       | train/val:169/784   |               |               |
-| 地质    | class_num:4         | 0.5719        | 0.6781        |
-|       | train/val:671/296   |               |               |
+| 花卉    | class_num:102<br/>train/val:5789/2396      | 0.7779        | 0.9892        |
+| 手绘简笔画 | class_num:18<br/>train/val:1007/432        | 0.8785        | 0.9107        |
+| 植物叶子  | class_num:6<br/>train/val:5256/2278        | 0.8212        | 0.8385        |
+| 集装箱车辆 | class_num:115<br/>train/val:4879/2094       | 0.623         | 0.9524        |
+| 椅子    | class_num:5<br/>train/val:169/784         | 0.8557        | 0.9077        |
+| 地质    | class_num:4<br/>train/val:671/296         | 0.5719        | 0.6781        |
 
 10万类图像分类预训练模型下载地址如下，更多的相关内容请参考文档教程中的[**图像分类迁移学习章节**](https://paddleclas.readthedocs.io/zh_CN/latest/application/transfer_learning.html#id1)。
 
