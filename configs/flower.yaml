@@ -1,5 +1,6 @@
 mode: 'train'
-architecture: 'ResNet50_vd'
+ARCHITECTURE: 
+    name: 'ResNet50_vd'
 pretrained_model:
 model_save_dir: "./output/"
 classes_num: 102
@@ -29,8 +30,8 @@ OPTIMIZER:
 TRAIN:
     batch_size: 32
     num_workers: 1
-    file_list: "./dataset/flower102/train_list.txt"
-    data_dir: "./dataset/flower102"
+    file_list: "./dataset/flowers102/train_list.txt"
+    data_dir: "./dataset/flowers102"
     shuffle_seed: 0
     transforms:
         - DecodeImage:
@@ -54,8 +55,8 @@ TRAIN:
 VALID:
     batch_size: 64
     num_workers: 1
-    file_list: "./dataset/flower102/val_list.txt"
-    data_dir: "./dataset/flower102/"
+    file_list: "./dataset/flowers102/val_list.txt"
+    data_dir: "./dataset/flowers102/"
     shuffle_seed: 0
     transforms:
         - DecodeImage:

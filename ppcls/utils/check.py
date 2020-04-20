@@ -67,7 +67,7 @@ def check_architecture(architecture):
     similar_names = similar_architectures(architecture["name"],
                                           get_architectures())
     model_list = ', '.join(similar_names)
-    err = "{} is not exist! Maybe you want: [{}]" \
+    err = "Architecture [{}] is not exist! Maybe you want: [{}]" \
           "".format(architecture["name"], model_list)
     try:
         assert architecture["name"] in similar_names
