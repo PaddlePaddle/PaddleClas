@@ -5,7 +5,7 @@
 ## 简介
 
 <div align="center">
-    <img src="docs/images/main_features.png" width="700">
+    <img src="docs/images/main_features.png" width="800">
 </div>
 
 ## 丰富的模型库
@@ -62,8 +62,6 @@ PaddleClas提供了上述8种数据增广算法的复现和在统一实验环境
 src="docs/images/image_aug/main_image_aug.png" width="600">
 </div>
 
-- TODO
-- [ ] 更多的优化器支持和效果验证
 
 ## 开始使用
 PaddleClas的安装说明、模型训练、预测、评估以及模型微调（finetune）请参考文档教程中的[**初级使用章节**](https://paddleclas.readthedocs.io/zh_CN/latest/tutorials/index.html)，SSLD知识蒸馏和数据增广的高阶使用正在持续更新中。
@@ -72,11 +70,15 @@ PaddleClas的安装说明、模型训练、预测、评估以及模型微调（f
 
 ### 10万类图像分类预训练模型
 在实际应用中，由于训练数据匮乏，往往将ImageNet1K数据集训练的分类模型作为预训练模型，进行图像分类的迁移学习。然而ImageNet1K数据集的类别只有1000种，预训练模型的特征迁移能力有限。因此百度自研了一个有语义体系的、粒度有粗有细的10w级别的Tag体系，通过人工或半监督方式，至今收集到 5500w+图片训练数据；该系统是国内甚至世界范围内最大规模的图片分类体系和训练集合。PaddleClas提供了在该数据集上训练的ResNet50_vd的模型。下表显示了一些实际应用场景中，使用ImageNet预训练模型和上述10万类图像分类预训练模型的效果比对，使用10万类图像分类预训练模型，识别准确率最高可以提升30%。
-
-<div align="center">
-<img
-src="docs/images/10w_cls.png" width="450">
-</div>
+    
+| 数据集   | 数据统计                | ImageNet预训练模型 | 10万类图像分类预训练模型 |
+|:--:|:--:|:--:|:--:|
+| 花卉    | class_num:102<br/>train/val:5789/2396      | 0.7779        | 0.9892        |
+| 手绘简笔画 | class_num:18<br/>train/val:1007/432        | 0.8785        | 0.9107        |
+| 植物叶子  | class_num:6<br/>train/val:5256/2278        | 0.8212        | 0.8385        |
+| 集装箱车辆 | class_num:115<br/>train/val:4879/2094       | 0.623         | 0.9524        |
+| 椅子    | class_num:5<br/>train/val:169/784         | 0.8557        | 0.9077        |
+| 地质    | class_num:4<br/>train/val:671/296         | 0.5719        | 0.6781        |
 
 10万类图像分类预训练模型下载地址如下，更多的相关内容请参考文档教程中的[**图像分类迁移学习章节**](https://paddleclas.readthedocs.io/zh_CN/latest/application/transfer_learning.html#id1)。
 

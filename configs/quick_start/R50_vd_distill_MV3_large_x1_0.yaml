@@ -1,25 +1,26 @@
 mode: 'train'
 ARCHITECTURE:
-    name: 'ResNet50_vd'
-    params:
-        lr_mult_list: [0.1, 0.1, 0.2, 0.2, 0.3]
-pretrained_model: "./pretrained/ResNet50_vd_ssld_pretrained"
+    name: 'ResNet50_vd_distill_MobileNetV3_large_x1_0'
+
+pretrained_model:
+    - "./pretrain/flowers102_R50_vd_final/ppcls"
+    - "./pretrained/MobileNetV3_large_x1_0_pretrained/"
 model_save_dir: "./output/"
 classes_num: 102
-total_images: 1020
+total_images: 7169
 save_interval: 1
 validate: True
 valid_interval: 1
-epochs: 40
+epochs: 20
 topk: 5
 image_shape: [3, 224, 224]
 
-ls_epsilon: 0.1
+use_distillation: True
 
 LEARNING_RATE:
-    function: 'Cosine'          
+    function: 'Cosine'
     params:                   
-        lr: 0.00375
+        lr: 0.0125
 
 OPTIMIZER:
     function: 'Momentum'
@@ -27,12 +28,12 @@ OPTIMIZER:
         momentum: 0.9
     regularizer:
         function: 'L2'
-        factor: 0.000001
+        factor: 0.00007
 
 TRAIN:
     batch_size: 32
     num_workers: 4
-    file_list: "./dataset/flowers102/train_list.txt"
+    file_list: "./dataset/flowers102/train_test_list.txt"
     data_dir: "./dataset/flowers102/"
     shuffle_seed: 0
     transforms:
@@ -52,7 +53,7 @@ TRAIN:
         - ToCHWImage:
 
 VALID:
-    batch_size: 32
+    batch_size: 20
     num_workers: 4
     file_list: "./dataset/flowers102/val_list.txt"
     data_dir: "./dataset/flowers102/"

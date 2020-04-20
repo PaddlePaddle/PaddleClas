@@ -7,3 +7,4 @@
    install.md
    getting_started.md
    config.md
+   data.md
