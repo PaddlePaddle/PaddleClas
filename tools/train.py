@@ -11,24 +11,19 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-
 import argparse
 import os
 
 import paddle.fluid as fluid
-
 import program
+from paddle.fluid.incubate.fleet.base import role_maker
+from paddle.fluid.incubate.fleet.collective import fleet
 
 from ppcls.data import Reader
+from ppcls.utils import logger
 from ppcls.utils.config import get_config
-from ppcls.utils.save_load import init_model, save_model
-
-from paddle.fluid.incubate.fleet.collective import fleet
-from paddle.fluid.incubate.fleet.base import role_maker
+from ppcls.utils.save_load import init_model
+from ppcls.utils.save_load import save_model
 
 
 def parse_args():
@@ -109,3 +104,4 @@ def main(args):
 if __name__ == '__main__':
     args = parse_args()
     main(args)
+    logger.advertisement()
