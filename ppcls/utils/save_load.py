@@ -118,7 +118,10 @@ def init_model(config, program, exe):
 
     pretrained_model = config.get('pretrained_model')
     if pretrained_model:
-        load_params(exe, program, pretrained_model)
+        if not isinstance(pretrained_model, list):
+            pretrained_model = [pretrained_model]
+        for pretrain in pretrained_model:
+            load_params(exe, program, pretrain)
         logger.info("Finish initing model from {}".format(pretrained_model))
 
 
