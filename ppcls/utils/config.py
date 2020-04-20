@@ -46,13 +46,12 @@ def create_attr_dict(yaml_config):
             create_attr_dict(yaml_config[key])
         else:
             yaml_config[key] = value
-    return
 
 
 def parse_config(cfg_file):
     """Load a config file into AttrDict"""
     with open(cfg_file, 'r') as fopen:
-        yaml_config = AttrDict(yaml.load(fopen, Loader=yaml.FullLoader))
+        yaml_config = AttrDict(yaml.load(fopen, Loader=yaml.SafeLoader))
     create_attr_dict(yaml_config)
     return yaml_config
 
