@@ -71,7 +71,7 @@ def error(fmt, *args):
     _logger.error(fmt, *args)
 
 
-def advertisement():
+def advertise():
     """
     Show the advertising message like the following:
 

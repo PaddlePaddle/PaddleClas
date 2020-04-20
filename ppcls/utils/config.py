@@ -84,7 +84,7 @@ def print_config(config):
     Arguments:
         config: configs
     """
-    logger.advertisement()
+    logger.advertise()
     print_dict(config)
 
 
