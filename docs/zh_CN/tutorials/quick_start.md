@@ -82,9 +82,7 @@ python -m paddle.distributed.launch \  
 
 `Top1 Acc`曲线如下所示，最高准确率为0.2735。
 
-<div align="center">
-    <img src="../../images/quick_start/r50_vd_acc.png" width="600">
-</div>
+![](../../images/quick_start/r50_vd_acc.png)
 
 
 ### 3.2 模型微调-基于ResNet50_vd预训练模型(准确率79.12\%)
@@ -102,10 +100,7 @@ python -m paddle.distributed.launch \  
 
 `Top1 Acc`曲线如下所示，最高准确率为0.9402，加载预训练模型之后，flowers102数据集精度大幅提升，绝对精度涨幅超过65\%。
 
-<div align="center">
-    <img src="../../images/quick_start/r50_vd_pretrained_acc.png" width="600">
-</div>
-
+![](../../images/quick_start/r50_vd_pretrained_acc.png)
 
 ### 3.3 SSLD模型微调-基于ResNet50_vd_ssld预训练模型(准确率82.39\%)
 
@@ -220,9 +215,7 @@ python -m paddle.distributed.launch \  
 下图给出了不同配置文件在迭代过程中的`Top1 Acc`的精度曲线变化图。
 
 
-<div align="center">
-    <img src="../../images/quick_start/all_acc.png" width="600">
-</div>
+![](../../images/quick_start/all_acc.png)
 
 
 * 更多训练及评估流程，请参考[开始使用文档](./getting_started.md)
