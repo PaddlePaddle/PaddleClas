@@ -44,12 +44,12 @@ def transform(data, ops=[]):
     return data
 
 
-class ImageNetPolicy(RawImageNetPolicy):
+class AutoAugment(RawImageNetPolicy):
     """ ImageNetPolicy wrapper to auto fit different img types """
 
     def __init__(self, *args, **kwargs):
         if six.PY2:
-            super(ImageNetPolicy, self).__init__(*args, **kwargs)
+            super(AutoAugment, self).__init__(*args, **kwargs)
         else:
             super().__init__(*args, **kwargs)
 
@@ -59,7 +59,7 @@ class ImageNetPolicy(RawImageNetPolicy):
             img = Image.fromarray(img)
 
         if six.PY2:
-            img = super(ImageNetPolicy, self).__call__(img)
+            img = super(AutoAugment, self).__call__(img)
         else:
             img = super().__call__(img)
 

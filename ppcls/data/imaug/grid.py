@@ -25,7 +25,7 @@ NUM_EPOCHS = 240
 
 
 class GridMask(object):
-    def __init__(self, d1, d2, rotate=1, ratio=0.5, mode=0, prob=1.):
+    def __init__(self, d1=96, d2=224, rotate=1, ratio=0.5, mode=0, prob=1.):
         self.d1 = d1
         self.d2 = d2
         self.rotate = rotate
