@@ -185,7 +185,8 @@ for var in ./*_student; do cp "$var" "../student_model/${var%_student}"; done # 
 
 # 五、SSLD实战
 
-本节将介绍训练ImageNet-1k的SSLD蒸馏内容，用户可以通过此处的讲解来实战SSLD蒸馏。如果想快速体验此方法，可以阅读快读开始中的训练Flowers102的SSLD蒸馏章节。
+本节将基于ImageNet-1K的数据集详细介绍SSLD蒸馏实验，如果想快速体验此方法，可以参考[**30min玩转PaddleClas**](../../tutorials
+/quick_start.md)中基于Flowers102的SSLD蒸馏实验。
 
 ## 7.1 参数配置
 
