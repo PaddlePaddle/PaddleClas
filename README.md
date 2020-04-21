@@ -66,7 +66,7 @@ src="docs/images/image_aug/main_image_aug.png" width="600">
 
 ## 30分钟玩转PaddleClas
 
-基于flowers102数据集，30分钟体验PaddleClas不同骨干网络的模型训练、不同预训练模型的效果、SSLD知识蒸馏效果和数据增广效果，详情请参考文档教程中的[**30分钟玩转PaddleClas**](https://paddleclas.readthedocs.io/zh_CN/latest/tutorials/quick_start.html)。
+基于flowers102数据集，30分钟体验PaddleClas不同骨干网络的模型训练、不同预训练模型、SSLD知识蒸馏方案和数据增广的效果。详情请参考文档教程中的[**30分钟玩转PaddleClas**](https://paddleclas.readthedocs.io/zh_CN/latest/tutorials/quick_start.html)。
 
 ## 开始使用
 
