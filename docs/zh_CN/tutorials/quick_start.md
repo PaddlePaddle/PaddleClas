@@ -67,9 +67,6 @@ python tools/download.py -a MobileNetV3_large_x1_0 -p ./pretrained -d True
 
 ## 三、模型训练
 
-* 本章节首先展示基于ResNet50_vd模型结构，在不加载预训练模型、加载精度为79.12\%的预训练模型以及精度为82.39\%的预训练模型的训练效果，同时给出了基于MobileNetV3模型结构的训练效果。此外，为了更方便地体验数据增广以及知识蒸馏的训练过程，本章节也提供了对应的训练命令。
-
-
 ### 3.1 零基础训练：不加载预训练模型的训练
 
 * 基于ResNet50_vd模型，训练脚本如下所示。
@@ -88,7 +85,7 @@ python -m paddle.distributed.launch \  
 ![](../../images/quick_start/r50_vd_acc.png)
 
 
-### 3.2 基于精度为79.12\%的ResNet50_vd预训练模型微调
+### 3.2 模型微调-基于ResNet50_vd预训练模型(准确率79.12\%)
 
 * 基于ImageNet1k分类预训练模型进行微调，训练脚本如下所示。
 
@@ -106,7 +103,7 @@ python -m paddle.distributed.launch \  
 ![](../../images/quick_start/r50_vd_pretrained_acc.png)
 
 
-### 3.3 基于精度82.39\%的ResNet50_vd预训练模型微调
+### 3.3 SSLD模型微调-基于ResNet50_vd_ssld预训练模型(准确率82.39\%)
 
 
 需要注意的是，在使用通过知识蒸馏得到的预训练模型进行微调时，我们推荐使用相对较小的网络中间层学习率。
@@ -221,6 +218,4 @@ python -m paddle.distributed.launch \  
 ![](../../images/quick_start/all_acc.png)
 
 
-### 3.7 总结
-
-* PaddleClas提供了十分丰富的模型库以及详细的高阶使用、预测部署文档，更多的内容可以参考[PaddleClas文档](https://paddleclas.readthedocs.io/zh_CN/latest/index.html)。
+* 更多训练及评估流程，请参考[开始使用文档](./getting_started.md)
