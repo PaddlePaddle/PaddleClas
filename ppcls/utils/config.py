@@ -1,18 +1,18 @@
-#copyright (c) 2020 PaddlePaddle Authors. All Rights Reserve.
+# copyright (c) 2020 PaddlePaddle Authors. All Rights Reserve.
 #
-#Licensed under the Apache License, Version 2.0 (the "License");
-#you may not use this file except in compliance with the License.
-#You may obtain a copy of the License at
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
 #
-#    http://www.apache.org/licenses/LICENSE-2.0
+#     http://www.apache.org/licenses/LICENSE-2.0
 #
-#Unless required by applicable law or agreed to in writing, software
-#distributed under the License is distributed on an "AS IS" BASIS,
-#WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#See the License for the specific language governing permissions and
-#limitations under the License.
-
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 import os
+
 import yaml
 
 from ppcls.utils import check
@@ -84,20 +84,7 @@ def print_config(config):
     Arguments:
         config: configs
     """
-    copyright = "PaddleClas is powered by PaddlePaddle !"
-    info = "For more info please go to the following website."
-    website = "https://github.com/PaddlePaddle/PaddleClas"
-    AD_LEN = 55
-
-    logger.info("\n{0}\n{1}\n{2}\n{3}\n{4}\n{5}\n{6}\n{7}\n".format(
-        "=" * (AD_LEN + 4),
-        "=={}==".format(copyright.center(AD_LEN)),
-        "=" * (AD_LEN + 4),
-        "=={}==".format(' ' * AD_LEN),
-        "=={}==".format(info.center(AD_LEN)),
-        "=={}==".format(' ' * AD_LEN),
-        "=={}==".format(website.center(AD_LEN)),
-        "=" * (AD_LEN + 4), ))
+    logger.advertise()
     print_dict(config)
 
 
