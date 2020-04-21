@@ -438,9 +438,119 @@ new_batch = cutmix_op(batch)
 
 # 七、数据增广分类实战
 
-* 该部分内容正在持续更新中，敬请期待。
+本节将介绍训练ImageNet-1k的数据增广内容，用户可以通过此处的介绍来进行数据增广的实战训练。如果想快速体验各种数据增广，可以阅读快读开始章节中的训练Flowers102的数据增广内容。
 
 
+## 7.1 参数配置
+
+由于不同的数据增广方式含有不同的超参数，为了便于理解和使用，我们在`configs/DataAugment`里分别列举了8种训练ResNet50的数据增广方式的参数配置文件，用户可以在`tools/run.sh`里直接替换配置文件的路径即可使用。此处分别挑选了图像变换、图像裁剪、图像混叠中的一个示例展示，其他参数配置用户可以自查配置文件。
+
+### RandAugment
+
+`RandAugment`的图像增广方式的配置如下，其中用户需要指定其中的参数`num_layers`与`magnitude`，默认的数值分别是`2`和`5`。`RandAugment`是在uint8的数据格式上转换的，所以其处理过程应该放在归一化操作（`NormalizeImage`）之前。
+
+```yaml
+    transforms:                                                                                  
+        - DecodeImage:                                                                           
+            to_rgb: True                                                                         
+            to_np: False                                                                         
+            channel_first: False                                                                 
+        - RandCropImage:                                                                         
+            size: 224                                                                            
+        - RandFlipImage:                                                                         
+            flip_code: 1                                                                         
+        - RandAugment:                                                                           
+            num_layers: 2                                                                        
+            magnitude: 5                                                                         
+        - NormalizeImage:                                                                        
+            scale: 1./255.                                                                       
+            mean: [0.485, 0.456, 0.406]                                                          
+            std: [0.229, 0.224, 0.225]                                                           
+            order: ''                                                                            
+        - ToCHWImage: 
+```
+
+### Cutout
+
+`Cutout`的图像增广方式的配置如下，其中用户需要指定其中的参数`n_holes`与`length`，默认的数值分别是`1`和`112`。类似其他图像裁剪类的数据增广方式，`Cutout`既可以在uint8格式的数据上操作，也可以在归一化（`NormalizeImage`）后的数据上操作，此处给出的是在归一化后的操作。
+
+```yaml
+    transforms:                                                                                  
+        - DecodeImage:                                                                           
+            to_rgb: True                                                                         
+            to_np: False                                                                         
+            channel_first: False                                                                 
+        - RandCropImage:                                                                         
+            size: 224                                                                            
+        - RandFlipImage:                                                                         
+            flip_code: 1                                                                         
+        - NormalizeImage:                                                                        
+            scale: 1./255.                                                                       
+            mean: [0.485, 0.456, 0.406]                                                          
+            std: [0.229, 0.224, 0.225]                                                           
+            order: ''                                                                            
+        - Cutout:                                                                                
+            n_holes: 1                                                                           
+            length: 112                                                                          
+        - ToCHWImage: 
+```
+
+### Mixup
+
+`Mixup`的图像增广方式的配置如下，其中用户需要指定其中的参数`alpha`，默认的数值是`0.2`。类似其他图像混合类的数据增广方式，`Mixup`是在图像做完数据处理后将每个batch内的数据做图像混叠，将混叠后的图像和标签输入网络中训练，所以其是在图像数据处理（图像变换、图像裁剪）后操作。另外，在配置文件中，需要将`use_mix`参数设置为`True`。
+
+```yaml
+    transforms:                                                                                  
+        - DecodeImage:                                                                           
+            to_rgb: True                                                                         
+            to_np: False                                                                         
+            channel_first: False                                                                 
+        - RandCropImage:                                                                         
+            size: 224                                                                            
+        - RandFlipImage:                                                                         
+            flip_code: 1                                                                         
+        - NormalizeImage:                                                                        
+            scale: 1./255.                                                                       
+            mean: [0.485, 0.456, 0.406]                                                          
+            std: [0.229, 0.224, 0.225]                                                           
+            order: ''                                                                            
+        - ToCHWImage:                                                                            
+    mix:                                                                                         
+        - MixupOperator:                                                                         
+            alpha: 0.2  
+```
+
+## 7.2 启动命令
+
+当用户配置完训练环境后，类似于训练其他分类任务，只需要将`tools/run.sh`中的配置文件替换成为相应的数据增广方式的配置文件即可。
+
+其中`run.sh`中的内容如下：
+
+```bash
+export PYTHONPATH=path_to_PaddleClas:$PYTHONPATH
+
+python -m paddle.distributed.launch \                                                            
+    --selected_gpus="0,1,2,3" \                                                                  
+    --log_dir=ResNet50_Cutout \                                                                  
+    tools/train.py \                                                                             
+        -c ./configs/DataAugment/ResNet50_Cutout.yaml 
+```
+
+运行`run.sh`
+
+```bash
+sh tools/run.sh
+```
+
+## 7.3 注意事项
+
+* 在使用图像混叠类的数据处理时，需要将配置文件中的`use_mix`设置为`True`，另外由于图像混叠时需对label进行混叠，无法计算训练数据的准确率，所以在训练过程中没有打印训练准确率。
+
+* 在使用数据增广后，由于训练数据更难，所以训练损失函数可能较大，训练集的准确率相对较低，但其有拥更好的泛化能力，所以验证集的准确率相对较高。
+
+* 在使用数据增广后，模型可能会趋于欠拟合状态，建议可以适当的调小`l2_decay`的值来获得更高的验证集准确率。
+
+* 几乎每一类图像增广均含有超参数，我们只提供了基于ImageNet-1k的超参数，其他数据集需要用户自己调试超参数，具体超参数的含义用户可以阅读相关的论文，调试方法也可以参考训练技巧的章节。
 
 **此处插播一条硬广~**
 > 如果您觉得此文档对您有帮助，欢迎star、watch、fork，三连我们的项目：[https://github.com/PaddlePaddle/PaddleClas](https://github.com/PaddlePaddle/PaddleClas)

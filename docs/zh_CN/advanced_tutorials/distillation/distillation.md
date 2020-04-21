@@ -185,9 +185,73 @@ for var in ./*_student; do cp "$var" "../student_model/${var%_student}"; done # 
 
 # 五、SSLD实战
 
-* 该部分内容正在持续更新中，敬请期待。
+本节将介绍训练ImageNet-1k的SSLD蒸馏内容，用户可以通过此处的讲解来实战SSLD蒸馏。如果想快速体验此方法，可以阅读快读开始中的训练Flowers102的SSLD蒸馏章节。
 
+## 7.1 参数配置
 
+实战部分提供了SSLD蒸馏的示例，在`ppcls/modeling/architectures/distillation_models.py`中提供了`ResNeXt101_32x16d_wsl`蒸馏`ResNet50_vd`与`ResNet50_vd_ssld`蒸馏`MobileNetV3_large_x1_0`的示例，`configs/Distillation`里分别提供了二者的配置文件，用户可以在`tools/run.sh`里直接替换配置文件的路径即可使用。
+
+### ResNeXt101_32x16d_wsl蒸馏ResNet50_vd
+
+`ResNeXt101_32x16d_wsl`蒸馏`ResNet50_vd`的配置如下，其中`pretrained model`指定了`ResNeXt101_32x16d_wsl`（教师模型）的预训练模型的路径，该路径也可以同时指定教师模型与学生模型的预训练模型的路径，用户只需要同时传入二者预训练的路径即可（配置中的注释部分）。
+
+```yaml
+ARCHITECTURE:                                                                                    
+    name: 'ResNeXt101_32x16d_wsl_distill_ResNet50_vd'   
+pretrained_model: "./pretrained/ResNeXt101_32x16d_wsl_pretrained/"  
+# pretrained_model:
+#     - "./pretrained/ResNeXt101_32x16d_wsl_pretrained/"
+#     - "./pretrained/ResNet50_vd_pretrained/"
+use_distillation: True 
+```
+
+### ResNet50_vd_ssld蒸馏MobileNetV3_large_x1_0
+
+类似于`ResNeXt101_32x16d_wsl`蒸馏`ResNet50_vd`，`ResNet50_vd_ssld`蒸馏`MobileNetV3_large_x1_0`的配置如下:
+
+```yaml
+ARCHITECTURE:                                                                                    
+    name: 'ResNet50_vd_distill_MobileNetV3_large_x1_0'  
+pretrained_model: "./pretrained/ResNet50_vd_ssld_pretrained/"  
+# pretrained_model:
+#     - "./pretrained/ResNet50_vd_ssld_pretrained/"
+#     - "./pretrained/ResNet50_vd_pretrained/"
+use_distillation: True 
+```
+
+## 7.2 启动命令
+
+当用户配置完训练环境后，类似于训练其他分类任务，只需要将`tools/run.sh`中的配置文件替换成为相应的蒸馏配置文件即可。
+
+其中`run.sh`中的内容如下：
+
+```bash
+export PYTHONPATH=path_to_PaddleClas:$PYTHONPATH
+
+python -m paddle.distributed.launch \                                                            
+    --selected_gpus="0,1,2,3" \                                                                  
+    --log_dir=R50_vd_distill_MV3_large_x1_0 \                                                                  
+    tools/train.py \                                                                             
+        -c ./configs/Distillation/R50_vd_distill_MV3_large_x1_0.yaml
+```
+
+运行`run.sh`
+
+```bash
+sh tools/run.sh
+```
+
+## 7.3 注意事项
+
+* 用户在使用SSLD蒸馏之前，首先需要在目标数据集上训练一个教师模型，该教师模型用于指导学生模型在该数据集上的训练。
+
+* 在用户使用SSLD蒸馏的时候需要将配置文件中的`use_distillation`设置为`True`，另外由于学生模型学习带有知识信息的soft-label，所以需要关掉label_smoothing选项，即将`ls_epsilon`中的值设置在[0,1]之外。
+
+* 如果学生模型没有加载预训练模型，训练的其他超参数可以参考该学生模型在ImageNet-1k上训练的超参数，如果学生模型加载了预训练模型，学习率可以调整到原来的1/10或者1/100。
+
+* 在SSLD蒸馏的过程中，学生模型只学习soft-label导致训练目标变的更加复杂，建议可以适当的调小`l2_decay`的值来获得更高的验证集准确率。
+
+* 若用户准备添加无标签的训练数据，只需要将新的训练数据放置在原本训练数据的路径下，生成新的数据list即可，另外，新生成的数据list需要将无标签的数据添加伪标签（只是为了统一读数据）。
 
 **此处插播一条硬广~**
 > 如果您觉得此文档对您有帮助，欢迎star、watch、fork，三连我们的项目：[https://github.com/PaddlePaddle/PaddleClas](https://github.com/PaddlePaddle/PaddleClas)

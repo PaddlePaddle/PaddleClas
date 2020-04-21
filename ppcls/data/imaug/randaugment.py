@@ -20,7 +20,7 @@ import random
 
 
 class RandAugment(object):
-    def __init__(self, num_layers, magnitude, fillcolor=(128, 128, 128)):
+    def __init__(self, num_layers=2, magnitude=5, fillcolor=(128, 128, 128)):
         self.num_layers = num_layers
         self.magnitude = magnitude
         self.max_level = 10
