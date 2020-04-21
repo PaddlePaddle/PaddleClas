@@ -187,7 +187,7 @@ for var in ./*_student; do cp "$var" "../student_model/${var%_student}"; done # 
 
 本节将基于ImageNet-1K的数据集详细介绍SSLD蒸馏实验，如果想快速体验此方法，可以参考[**30分钟玩转PaddleClas**](../../tutorials/quick_start.md)中基于Flowers102的SSLD蒸馏实验。
 
-## 7.1 参数配置
+## 5.1 参数配置
 
 实战部分提供了SSLD蒸馏的示例，在`ppcls/modeling/architectures/distillation_models.py`中提供了`ResNeXt101_32x16d_wsl`蒸馏`ResNet50_vd`与`ResNet50_vd_ssld`蒸馏`MobileNetV3_large_x1_0`的示例，`configs/Distillation`里分别提供了二者的配置文件，用户可以在`tools/run.sh`里直接替换配置文件的路径即可使用。
 
@@ -219,7 +219,7 @@ pretrained_model: "./pretrained/ResNet50_vd_ssld_pretrained/"
 use_distillation: True
 ```
 
-## 7.2 启动命令
+## 5.2 启动命令
 
 当用户配置完训练环境后，类似于训练其他分类任务，只需要将`tools/run.sh`中的配置文件替换成为相应的蒸馏配置文件即可。
 
@@ -241,7 +241,7 @@ python -m paddle.distributed.launch \
 sh tools/run.sh
 ```
 
-## 7.3 注意事项
+## 5.3 注意事项
 
 * 用户在使用SSLD蒸馏之前，首先需要在目标数据集上训练一个教师模型，该教师模型用于指导学生模型在该数据集上的训练。
 
