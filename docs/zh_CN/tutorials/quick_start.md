@@ -26,11 +26,11 @@ tar -xf 102flowers.tgz
 ```shell
 python generate_flowers102_list.py jpg train > train_list.txt
 python generate_flowers102_list.py jpg valid > val_list.txt
-python generate_flowers102_list.py jpg test > test_list.txt
-cat train_list.txt test_list.txt > train_test.txt
+python generate_flowers102_list.py jpg test > extra_list.txt
+cat train_list.txt extra_list.txt > train_extra_list.txt
 ```
 
-**注意**：这里将train_list.txt和test_list.txt合并成train_test.txt，是为了之后在进行知识蒸馏时，使用更多的数据提升无标签知识蒸馏任务的效果。
+**注意**：这里将train_list.txt和extra_list.txt合并成train_extra_list.txt，是为了之后在进行知识蒸馏时，使用更多的数据提升无标签知识蒸馏任务的效果。
 
 * 返回`PaddleClas`根目录
 
@@ -186,7 +186,7 @@ pretrained_model:
     - "./pretrained/flowers102_R50_vd_final/ppcls"
     - "./pretrained/MobileNetV3_large_x1_0_pretrained/”
 TRAIN:
-    file_list: "./dataset/flowers102/train_test_list.txt"
+    file_list: "./dataset/flowers102/train_extra_list.txt"
 ```
 
 最终的训练脚本如下所示。
