@@ -1,6 +1,6 @@
 # 30分钟玩转PaddleClas
 
-请事先参考[安装指南](install.md)配置运行环境和克隆PaddleClas代码。
+基于flowers102数据集，30分钟体验PaddleClas不同骨干网络的模型训练、不同预训练模型、SSLD知识蒸馏方案和数据增广的效果。请事先参考[安装指南](install.md)配置运行环境和克隆PaddleClas代码。
 
 
 ## 一、数据和模型准备
