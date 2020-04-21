@@ -185,7 +185,7 @@ for var in ./*_student; do cp "$var" "../student_model/${var%_student}"; done # 
 
 # 五、SSLD实战
 
-本节简要介绍了SSLD的实战内容，用户可以通过此处的配置启动SSLD蒸馏任务。如果用户对SSLD
+本节简要介绍了SSLD的实战内容，用户可以通过此处的配置启动SSLD蒸馏任务。如果还不熟悉此处内容，请阅读快读开始章节。
 
 ## 7.1 参数配置
 
