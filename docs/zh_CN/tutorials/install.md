@@ -2,13 +2,12 @@
 
 ---
 
-## 1.简介
+## 一、简介
 
-本章将介绍如何安装PaddleClas及其依赖项.
-有关模型库的基本信息请参考[README](https://github.com/PaddlePaddle/PaddleClas/blob/master/README.md)
+本章将介绍如何安装PaddleClas及其依赖项。
 
 
-## 2.安装PaddlePaddle
+## 二、安装PaddlePaddle
 
 运行PaddleClas需要PaddlePaddle Fluid v1.7或更高版本。
 
@@ -45,7 +44,7 @@ python -c "import paddle; print(paddle.__version__)"
 - nccl >= 2.1.2
 
 
-## 3.安装PaddleClas
+## 三、安装PaddleClas
 
 **克隆PaddleClas模型库：**
 
@@ -61,14 +60,3 @@ Python依赖库在[requirements.txt](https://github.com/PaddlePaddle/PaddleClas/
 ```
 pip install --upgrade -r requirements.txt
 ```
-
-
-## 4.数据集和预训练模型
-
-PaddleClas加载PaddleClas/dataset/中数据进行训练，请参照[数据文档](./data.md)进行准备。
-PaddleClas提供丰富的预训练模型，请参照[数据文档](./data.md)进行准备。
-
-
-## 5.开始使用
-
-请参照[开始使用](./getting_started.md)文档

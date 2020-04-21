@@ -185,7 +185,7 @@ for var in ./*_student; do cp "$var" "../student_model/${var%_student}"; done # 
 
 # 五、SSLD实战
 
-本节将基于ImageNet-1K的数据集详细介绍SSLD蒸馏实验，如果想快速体验此方法，可以参考[**30min玩转PaddleClas**](../../tutorials/quick_start.md)中基于Flowers102的SSLD蒸馏实验。
+本节将基于ImageNet-1K的数据集详细介绍SSLD蒸馏实验，如果想快速体验此方法，可以参考[**30分钟玩转PaddleClas**](../../tutorials/quick_start.md)中基于Flowers102的SSLD蒸馏实验。
 
 ## 7.1 参数配置
 
@@ -196,13 +196,13 @@ for var in ./*_student; do cp "$var" "../student_model/${var%_student}"; done # 
 `ResNeXt101_32x16d_wsl`蒸馏`ResNet50_vd`的配置如下，其中`pretrained model`指定了`ResNeXt101_32x16d_wsl`（教师模型）的预训练模型的路径，该路径也可以同时指定教师模型与学生模型的预训练模型的路径，用户只需要同时传入二者预训练的路径即可（配置中的注释部分）。
 
 ```yaml
-ARCHITECTURE:                                                                                    
-    name: 'ResNeXt101_32x16d_wsl_distill_ResNet50_vd'   
-pretrained_model: "./pretrained/ResNeXt101_32x16d_wsl_pretrained/"  
+ARCHITECTURE:
+    name: 'ResNeXt101_32x16d_wsl_distill_ResNet50_vd'
+pretrained_model: "./pretrained/ResNeXt101_32x16d_wsl_pretrained/"
 # pretrained_model:
 #     - "./pretrained/ResNeXt101_32x16d_wsl_pretrained/"
 #     - "./pretrained/ResNet50_vd_pretrained/"
-use_distillation: True 
+use_distillation: True
 ```
 
 ### ResNet50_vd_ssld蒸馏MobileNetV3_large_x1_0
@@ -210,13 +210,13 @@ use_distillation: True
 类似于`ResNeXt101_32x16d_wsl`蒸馏`ResNet50_vd`，`ResNet50_vd_ssld`蒸馏`MobileNetV3_large_x1_0`的配置如下:
 
 ```yaml
-ARCHITECTURE:                                                                                    
-    name: 'ResNet50_vd_distill_MobileNetV3_large_x1_0'  
-pretrained_model: "./pretrained/ResNet50_vd_ssld_pretrained/"  
+ARCHITECTURE:
+    name: 'ResNet50_vd_distill_MobileNetV3_large_x1_0'
+pretrained_model: "./pretrained/ResNet50_vd_ssld_pretrained/"
 # pretrained_model:
 #     - "./pretrained/ResNet50_vd_ssld_pretrained/"
 #     - "./pretrained/ResNet50_vd_pretrained/"
-use_distillation: True 
+use_distillation: True
 ```
 
 ## 7.2 启动命令
@@ -228,10 +228,10 @@ use_distillation: True
 ```bash
 export PYTHONPATH=path_to_PaddleClas:$PYTHONPATH
 
-python -m paddle.distributed.launch \                                                            
-    --selected_gpus="0,1,2,3" \                                                                  
-    --log_dir=R50_vd_distill_MV3_large_x1_0 \                                                                  
-    tools/train.py \                                                                             
+python -m paddle.distributed.launch \
+    --selected_gpus="0,1,2,3" \
+    --log_dir=R50_vd_distill_MV3_large_x1_0 \
+    tools/train.py \
         -c ./configs/Distillation/R50_vd_distill_MV3_large_x1_0.yaml
 ```
 
@@ -254,7 +254,7 @@ sh tools/run.sh
 * 若用户准备添加无标签的训练数据，只需要将新的训练数据放置在原本训练数据的路径下，生成新的数据list即可，另外，新生成的数据list需要将无标签的数据添加伪标签（只是为了统一读数据）。
 
 **此处插播一条硬广~**
-> 如果您觉得此文档对您有帮助，欢迎star、watch、fork，三连我们的项目：[https://github.com/PaddlePaddle/PaddleClas](https://github.com/PaddlePaddle/PaddleClas)
+> 如果您觉得此文档对您有帮助，欢迎star我们的项目：[https://github.com/PaddlePaddle/PaddleClas](https://github.com/PaddlePaddle/PaddleClas)
 
 
 # 参考文献

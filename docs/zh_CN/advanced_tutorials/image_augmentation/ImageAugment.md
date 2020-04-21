@@ -438,7 +438,7 @@ new_batch = cutmix_op(batch)
 
 # 七、数据增广分类实战
 
-本节将基于ImageNet-1K的数据集详细介绍数据增广实验，如果想快速体验此方法，可以参考[**30min玩转PaddleClas**](../../tutorials/quick_start.md)中基于Flowers102的数据增广实验。
+本节将基于ImageNet-1K的数据集详细介绍数据增广实验，如果想快速体验此方法，可以参考[**30分钟玩转PaddleClas**](../../tutorials/quick_start.md)中基于Flowers102的数据增广实验。
 
 ## 7.1 参数配置
 
@@ -449,24 +449,24 @@ new_batch = cutmix_op(batch)
 `RandAugment`的图像增广方式的配置如下，其中用户需要指定其中的参数`num_layers`与`magnitude`，默认的数值分别是`2`和`5`。`RandAugment`是在uint8的数据格式上转换的，所以其处理过程应该放在归一化操作（`NormalizeImage`）之前。
 
 ```yaml
-    transforms:                                                                                  
-        - DecodeImage:                                                                           
-            to_rgb: True                                                                         
-            to_np: False                                                                         
-            channel_first: False                                                                 
-        - RandCropImage:                                                                         
-            size: 224                                                                            
-        - RandFlipImage:                                                                         
-            flip_code: 1                                                                         
-        - RandAugment:                                                                           
-            num_layers: 2                                                                        
-            magnitude: 5                                                                         
-        - NormalizeImage:                                                                        
-            scale: 1./255.                                                                       
-            mean: [0.485, 0.456, 0.406]                                                          
-            std: [0.229, 0.224, 0.225]                                                           
-            order: ''                                                                            
-        - ToCHWImage: 
+    transforms:
+        - DecodeImage:
+            to_rgb: True
+            to_np: False
+            channel_first: False
+        - RandCropImage:
+            size: 224
+        - RandFlipImage:
+            flip_code: 1
+        - RandAugment:
+            num_layers: 2
+            magnitude: 5
+        - NormalizeImage:
+            scale: 1./255.
+            mean: [0.485, 0.456, 0.406]
+            std: [0.229, 0.224, 0.225]
+            order: ''
+        - ToCHWImage:
 ```
 
 ### Cutout
@@ -474,24 +474,24 @@ new_batch = cutmix_op(batch)
 `Cutout`的图像增广方式的配置如下，其中用户需要指定其中的参数`n_holes`与`length`，默认的数值分别是`1`和`112`。类似其他图像裁剪类的数据增广方式，`Cutout`既可以在uint8格式的数据上操作，也可以在归一化（`NormalizeImage`）后的数据上操作，此处给出的是在归一化后的操作。
 
 ```yaml
-    transforms:                                                                                  
-        - DecodeImage:                                                                           
-            to_rgb: True                                                                         
-            to_np: False                                                                         
-            channel_first: False                                                                 
-        - RandCropImage:                                                                         
-            size: 224                                                                            
-        - RandFlipImage:                                                                         
-            flip_code: 1                                                                         
-        - NormalizeImage:                                                                        
-            scale: 1./255.                                                                       
-            mean: [0.485, 0.456, 0.406]                                                          
-            std: [0.229, 0.224, 0.225]                                                           
-            order: ''                                                                            
-        - Cutout:                                                                                
-            n_holes: 1                                                                           
-            length: 112                                                                          
-        - ToCHWImage: 
+    transforms:
+        - DecodeImage:
+            to_rgb: True
+            to_np: False
+            channel_first: False
+        - RandCropImage:
+            size: 224
+        - RandFlipImage:
+            flip_code: 1
+        - NormalizeImage:
+            scale: 1./255.
+            mean: [0.485, 0.456, 0.406]
+            std: [0.229, 0.224, 0.225]
+            order: ''
+        - Cutout:
+            n_holes: 1
+            length: 112
+        - ToCHWImage:
 ```
 
 ### Mixup
@@ -499,24 +499,24 @@ new_batch = cutmix_op(batch)
 `Mixup`的图像增广方式的配置如下，其中用户需要指定其中的参数`alpha`，默认的数值是`0.2`。类似其他图像混合类的数据增广方式，`Mixup`是在图像做完数据处理后将每个batch内的数据做图像混叠，将混叠后的图像和标签输入网络中训练，所以其是在图像数据处理（图像变换、图像裁剪）后操作。另外，在配置文件中，需要将`use_mix`参数设置为`True`。
 
 ```yaml
-    transforms:                                                                                  
-        - DecodeImage:                                                                           
-            to_rgb: True                                                                         
-            to_np: False                                                                         
-            channel_first: False                                                                 
-        - RandCropImage:                                                                         
-            size: 224                                                                            
-        - RandFlipImage:                                                                         
-            flip_code: 1                                                                         
-        - NormalizeImage:                                                                        
-            scale: 1./255.                                                                       
-            mean: [0.485, 0.456, 0.406]                                                          
-            std: [0.229, 0.224, 0.225]                                                           
-            order: ''                                                                            
-        - ToCHWImage:                                                                            
-    mix:                                                                                         
-        - MixupOperator:                                                                         
-            alpha: 0.2  
+    transforms:
+        - DecodeImage:
+            to_rgb: True
+            to_np: False
+            channel_first: False
+        - RandCropImage:
+            size: 224
+        - RandFlipImage:
+            flip_code: 1
+        - NormalizeImage:
+            scale: 1./255.
+            mean: [0.485, 0.456, 0.406]
+            std: [0.229, 0.224, 0.225]
+            order: ''
+        - ToCHWImage:
+    mix:
+        - MixupOperator:
+            alpha: 0.2
 ```
 
 ## 7.2 启动命令
@@ -528,11 +528,11 @@ new_batch = cutmix_op(batch)
 ```bash
 export PYTHONPATH=path_to_PaddleClas:$PYTHONPATH
 
-python -m paddle.distributed.launch \                                                            
-    --selected_gpus="0,1,2,3" \                                                                  
-    --log_dir=ResNet50_Cutout \                                                                  
-    tools/train.py \                                                                             
-        -c ./configs/DataAugment/ResNet50_Cutout.yaml 
+python -m paddle.distributed.launch \
+    --selected_gpus="0,1,2,3" \
+    --log_dir=ResNet50_Cutout \
+    tools/train.py \
+        -c ./configs/DataAugment/ResNet50_Cutout.yaml
 ```
 
 运行`run.sh`
@@ -552,7 +552,7 @@ sh tools/run.sh
 * 几乎每一类图像增广均含有超参数，我们只提供了基于ImageNet-1k的超参数，其他数据集需要用户自己调试超参数，具体超参数的含义用户可以阅读相关的论文，调试方法也可以参考训练技巧的章节。
 
 **此处插播一条硬广~**
-> 如果您觉得此文档对您有帮助，欢迎star、watch、fork，三连我们的项目：[https://github.com/PaddlePaddle/PaddleClas](https://github.com/PaddlePaddle/PaddleClas)
+> 如果您觉得此文档对您有帮助，欢迎star我们的项目：[https://github.com/PaddlePaddle/PaddleClas](https://github.com/PaddlePaddle/PaddleClas)
 
 
 # 参考文献
