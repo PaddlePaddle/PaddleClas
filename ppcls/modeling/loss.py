@@ -12,7 +12,6 @@
 #See the License for the specific language governing permissions and
 #limitations under the License.
 
-import paddle
 import paddle.fluid as fluid
 
 __all__ = ['CELoss', 'MixCELoss', 'GoogLeNetLoss', 'JSDivLoss']
@@ -26,7 +25,7 @@ class Loss(object):
     def __init__(self, class_dim=1000, epsilon=None):
         assert class_dim > 1, "class_dim=%d is not larger than 1" % (class_dim)
         self._class_dim = class_dim
-        if epsilon and epsilon >= 0.0 and epsilon <= 1.0:
+        if epsilon is not None and epsilon >= 0.0 and epsilon <= 1.0:
             self._epsilon = epsilon
             self._label_smoothing = True
         else:
