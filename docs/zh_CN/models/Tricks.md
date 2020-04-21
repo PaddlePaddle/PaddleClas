@@ -12,10 +12,7 @@
 ### 学习率下降策略：
 在整个训练过程中，我们不能使用同样的学习率来更新权重，否则无法到达最优点，所以需要在训练过程中调整学习率的大小。在训练初始阶段，由于权重处于随机初始化的状态，损失函数相对容易进行梯度下降，所以可以设置一个较大的学习率。在训练后期，由于权重参数已经接近最优值，较大的学习率无法进一步寻找最优值，所以需要设置一个较小的学习率。在训练整个过程中，很多研究者使用的学习率下降方式是piecewise_decay，即阶梯式下降学习率，如在ResNet50标准的训练中，我们设置的初始学习率是0.1，每30epoch学习率下降到原来的1/10，一共迭代120epoch。除了piecewise_decay，很多研究者也提出了学习率的其他下降方式，如polynomial_decay（多项式下降）、exponential_decay（指数下降）,cosine_decay（余弦下降）等，其中cosine_decay无需调整超参数，鲁棒性也比较高，所以成为现在提高模型精度首选的学习率下降方式。Cosine_decay和piecewise_decay的学习率变化曲线如下图所示，容易观察到，在整个训练过程中，cosine_decay都保持着较大的学习率，所以其收敛较为缓慢，但是最终的收敛效果较peicewise_decay更好一些。
 
-<div align="center">
-<img
-src="../../images/models/lr_decay.jpeg" width="500">
-</div>
+![](../../images/models/lr_decay.jpeg)
 
 另外，从图中我们也可以看到，cosine_decay里学习率小的轮数较少，这样会影响到最终的精度，所以为了使得cosine_decay发挥更好的效果，建议迭代更多的轮数，如200轮。
 
