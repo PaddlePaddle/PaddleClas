@@ -253,7 +253,7 @@ sh tools/run.sh
 
 * 若用户准备添加无标签的训练数据，只需要将新的训练数据放置在原本训练数据的路径下，生成新的数据list即可，另外，新生成的数据list需要将无标签的数据添加伪标签（只是为了统一读数据）。
 
-**此处插播一条硬广~**
+
 > 如果您觉得此文档对您有帮助，欢迎star我们的项目：[https://github.com/PaddlePaddle/PaddleClas](https://github.com/PaddlePaddle/PaddleClas)
 
 
