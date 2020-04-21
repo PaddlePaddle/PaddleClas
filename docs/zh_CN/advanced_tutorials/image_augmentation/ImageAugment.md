@@ -438,8 +438,7 @@ new_batch = cutmix_op(batch)
 
 # 七、数据增广分类实战
 
-本节将介绍训练ImageNet-1k的数据增广内容，用户可以通过此处的介绍来进行数据增广的实战训练。如果想快速体验各种数据增广，可以阅读快读开始章节中的训练Flowers102的数据增广内容。
-
+本节将基于ImageNet-1K的数据集详细介绍数据增广实验，如果想快速体验此方法，可以参考[**30min玩转PaddleClas**](../../tutorials/quick_start.md)中基于Flowers102的数据增广实验。
 
 ## 7.1 参数配置
 
