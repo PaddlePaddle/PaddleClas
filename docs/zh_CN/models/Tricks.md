@@ -90,7 +90,11 @@ Label_smoothing是深度学习中的一种正则化方法，其全称是 Label S
 ## 9.如何通过已有的预训练模型提升自己的数据集的精度
 在现阶段计算机视觉领域中，加载预训练模型来训练自己的任务已成为普遍的做法，相比从随机初始化开始训练，加载预训练模型往往可以提升特定任务的精度。一般来说，业界广泛使用的预训练模型是通过训练128万张图片1000类的ImageNet-1k数据集得到的，该预训练模型的fc层权重是是一个k\*1000的矩阵，其中k是fc层以前的神经元数，在加载预训练权重时，无需加载fc层的权重。在学习率方面，如果您的任务训练的数据集特别小（如小于1千张），我们建议你使用较小的初始学习率，如0.001（batch_size:256,下同），以免较大的学习率破坏预训练权重。如果您的训练数据集规模相对较大（大于10万），我们建议你尝试更大的初始学习率，如0.01或者更大。
 
-## 参考文献
-[1]P. Goyal, P. Dolla ́r, R. B. Girshick, P. Noordhuis, L. Wesolowski, A. Kyrola, A. Tulloch, Y. Jia, and K. He. Accurate, large minibatch SGD: training imagenet in 1 hour. CoRR, abs/1706.02677, 2017. 
 
-[2]C.Szegedy,V.Vanhoucke,S.Ioffe,J.Shlens,andZ.Wojna. Rethinking the inception architecture for computer vision. CoRR, abs/1512.00567, 2015 
+**此处插播一条硬广~**
+> 如果您觉得此文档对您有帮助，欢迎star我们的项目：[https://github.com/PaddlePaddle/PaddleClas](https://github.com/PaddlePaddle/PaddleClas)
+
+## 参考文献
+[1]P. Goyal, P. Dolla ́r, R. B. Girshick, P. Noordhuis, L. Wesolowski, A. Kyrola, A. Tulloch, Y. Jia, and K. He. Accurate, large minibatch SGD: training imagenet in 1 hour. CoRR, abs/1706.02677, 2017.
+
+[2]C.Szegedy,V.Vanhoucke,S.Ioffe,J.Shlens,andZ.Wojna. Rethinking the inception architecture for computer vision. CoRR, abs/1512.00567, 2015
