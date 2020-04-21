@@ -64,6 +64,7 @@ src="docs/images/image_aug/main_image_aug.png" width="600">
 
 
 ## 开始使用
+
 PaddleClas的安装说明、模型训练、预测、评估以及模型微调（finetune）请参考文档教程中的[**初级使用章节**](https://paddleclas.readthedocs.io/zh_CN/latest/tutorials/index.html)，SSLD知识蒸馏和数据增广的高阶使用正在持续更新中。
 
 ## 特色拓展应用
