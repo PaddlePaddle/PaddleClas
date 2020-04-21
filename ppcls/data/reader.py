@@ -139,8 +139,9 @@ def get_file_list(params):
     full_lines = shuffle_lines(full_lines, params["shuffle_seed"])
 
     # use only partial data for each trainer in distributed training
-    img_per_trainer = len(full_lines) // trainers_num
-    full_lines = full_lines[trainer_id::trainers_num][:img_per_trainer]
+    if params['mode'] == 'train':
+        img_per_trainer = len(full_lines) // trainers_num
+        full_lines = full_lines[trainer_id::trainers_num][:img_per_trainer]
 
     return full_lines
 

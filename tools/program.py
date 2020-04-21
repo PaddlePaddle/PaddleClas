@@ -380,6 +380,7 @@ def run(dataloader, exe, program, fetchs, epoch=0, mode='train'):
         m.reset()
     batch_time = AverageMeter('cost', ':6.3f')
     tic = time.time()
+    trainer_id = int(os.getenv("PADDLE_TRAINER_ID", 0))
     for idx, batch in enumerate(dataloader()):
         metrics = exe.run(program=program, feed=batch, fetch_list=fetch_list)
         batch_time.update(time.time() - tic)
@@ -387,6 +388,9 @@ def run(dataloader, exe, program, fetchs, epoch=0, mode='train'):
         for i, m in enumerate(metrics):
             metric_list[i].update(m[0], len(batch[0]))
         fetchs_str = ''.join([str(m) for m in metric_list] + [str(batch_time)])
-        logger.info("[epoch:%3d][%s][step:%4d]%s" %
+        if trainer_id == 0:
+
+            logger.info("[epoch:%3d][%s][step:%4d]%s" %
                     (epoch, mode, idx, fetchs_str))
-    logger.info("END [epoch:%3d][%s]%s"%(epoch, mode, fetchs_str))
+    if trainer_id == 0:
+        logger.info("END [epoch:%3d][%s]%s"%(epoch, mode, fetchs_str))

@@ -11,7 +11,7 @@
    extension/index
    competition_support.md
    model_zoo.md
-   change_log.md
+   update_history.md
    faq.md
 
 :math:`PaddlePaddle2020`
