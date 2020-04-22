@@ -11,63 +11,39 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 import logging
-logging.basicConfig()
+import os
 
-DEBUG = logging.DEBUG  # 10
-INFO = logging.INFO  # 20
-WARN = logging.WARN  # 30
-ERROR = logging.ERROR  # 40
+logging.basicConfig(level=logging.INFO)
+_logger = logging.getLogger(__name__)
 
 
-class Logger(object):
+def anti_fleet(log):
     """
-    Logger
+    Because of the fucking Fleet, logs will print multi-times.
+    So we only display one of them and ignore the others.
     """
 
-    def __init__(self, level=DEBUG):
-        self.init(level)
+    def wrapper(fmt, *args):
+        if int(os.getenv("PADDLE_TRAINER_ID", 0)) == 0:
+            log(fmt, *args)
 
-    def init(self, level=DEBUG):
-        """
-        init
-        """
-        self._logger = logging.getLogger()
-        self._logger.setLevel(level)
-
-    def info(self, fmt, *args):
-        """info"""
-        self._logger.info(fmt, *args)
-
-    def warning(self, fmt, *args):
-        """warning"""
-        self._logger.warning(fmt, *args)
-
-    def error(self, fmt, *args):
-        """error"""
-        self._logger.error(fmt, *args)
+    return wrapper
 
 
-_logger = Logger()
-
-
-def init(level=DEBUG):
-    """init for external"""
-    _logger.init(level)
-
-
+@anti_fleet
 def info(fmt, *args):
-    """info"""
     _logger.info(fmt, *args)
 
 
+@anti_fleet
 def warning(fmt, *args):
-    """warn"""
     _logger.warning(fmt, *args)
 
 
+@anti_fleet
 def error(fmt, *args):
-    """error"""
     _logger.error(fmt, *args)
 
 
@@ -86,16 +62,16 @@ def advertise():
 
     """
     copyright = "PaddleClas is powered by PaddlePaddle !"
-    info = "For more info please go to the following website."
+    ad = "For more info please go to the following website."
     website = "https://github.com/PaddlePaddle/PaddleClas"
-    AD_LEN = 6 + len(max([copyright, info, website], key=len))
+    AD_LEN = 6 + len(max([copyright, ad, website], key=len))
 
-    _logger.info("\n{0}\n{1}\n{2}\n{3}\n{4}\n{5}\n{6}\n{7}\n".format(
+    info("\n{0}\n{1}\n{2}\n{3}\n{4}\n{5}\n{6}\n{7}\n".format(
         "=" * (AD_LEN + 4),
         "=={}==".format(copyright.center(AD_LEN)),
         "=" * (AD_LEN + 4),
         "=={}==".format(' ' * AD_LEN),
-        "=={}==".format(info.center(AD_LEN)),
+        "=={}==".format(ad.center(AD_LEN)),
         "=={}==".format(' ' * AD_LEN),
         "=={}==".format(website.center(AD_LEN)),
         "=" * (AD_LEN + 4), ))

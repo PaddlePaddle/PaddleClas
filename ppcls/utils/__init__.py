@@ -12,9 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from . import model_zoo
-from . import misc
 from . import logger
+from . import misc
+from . import model_zoo
 
 from .save_load import init_model, save_model
 from .config import get_config
