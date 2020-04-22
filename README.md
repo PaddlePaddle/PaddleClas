@@ -84,7 +84,7 @@ PaddleClas的安装说明、模型训练、预测、评估以及模型微调（f
 | 手绘简笔画 | class_num:18<br/>train/val:1007/432        | 0.8785        | 0.9107        |
 | 植物叶子  | class_num:6<br/>train/val:5256/2278        | 0.8212        | 0.8385        |
 | 集装箱车辆 | class_num:115<br/>train/val:4879/2094       | 0.623         | 0.9524        |
-| 椅子    | class_num:5<br/>train/val:169/784         | 0.8557        | 0.9077        |
+| 椅子    | class_num:5<br/>train/val:169/78         | 0.8557        | 0.9077        |
 | 地质    | class_num:4<br/>train/val:671/296         | 0.5719        | 0.6781        |
 
 10万类图像分类预训练模型下载地址如下，更多的相关内容请参考文档教程中的[**图像分类迁移学习章节**](https://paddleclas.readthedocs.io/zh_CN/latest/application/transfer_learning.html#id1)。
