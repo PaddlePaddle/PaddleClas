@@ -18,16 +18,20 @@ import os
 logging.basicConfig(level=logging.INFO)
 _logger = logging.getLogger(__name__)
 
+
 def anti_fleet(log):
     """
     Because of the fucking Fleet, logs will print multi-times.
-    So we only display one of them and ignore the others.    
+    So we only display one of them and ignore the others.
     """
+
     def wrapper(fmt, *args):
         if int(os.getenv("PADDLE_TRAINER_ID", 0)) == 0:
             log(fmt, *args)
+
     return wrapper
- 
+
+
 @anti_fleet
 def info(fmt, *args):
     _logger.info(fmt, *args)
@@ -70,4 +74,4 @@ def advertise():
         "=={}==".format(ad.center(AD_LEN)),
         "=={}==".format(' ' * AD_LEN),
         "=={}==".format(website.center(AD_LEN)),
-        "=" * (AD_LEN + 4) ))
+        "=" * (AD_LEN + 4), ))
