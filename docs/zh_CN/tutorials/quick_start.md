@@ -80,7 +80,7 @@ python -m paddle.distributed.launch \
 
 ```
 
-`Top1 Acc`曲线如下所示，最高准确率为0.2735。
+验证集的`Top1 Acc`曲线如下所示，最高准确率为0.2735。
 
 ![](../../images/quick_start/r50_vd_acc.png)
 
@@ -98,7 +98,7 @@ python -m paddle.distributed.launch \
 
 ```
 
-`Top1 Acc`曲线如下所示，最高准确率为0.9402，加载预训练模型之后，flowers102数据集精度大幅提升，绝对精度涨幅超过65\%。
+验证集的`Top1 Acc`曲线如下所示，最高准确率为0.9402，加载预训练模型之后，flowers102数据集精度大幅提升，绝对精度涨幅超过65\%。
 
 ![](../../images/quick_start/r50_vd_pretrained_acc.png)
 
@@ -216,6 +216,9 @@ python -m paddle.distributed.launch \
 
 
 ![](../../images/quick_start/all_acc.png)
+
+
+* **注意**：flowers102数据集图片数量较少，因此进行训练时，验证集的精度指标可能会有1\%左右的波动。
 
 
 * 更多训练及评估流程，请参考[开始使用文档](./getting_started.md)
