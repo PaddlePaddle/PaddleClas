@@ -9,24 +9,24 @@
 
 ## 二、安装PaddlePaddle
 
-运行PaddleClas需要PaddlePaddle Fluid v1.7或更高版本。
+运行PaddleClas需要PaddlePaddle Fluid v1.7或更高版本。请参照[安装文档](http://www.paddlepaddle.org.cn/install/quick)中的说明进行操作。
 
-pip安装最新GPU版本PaddlePaddle
+如果已经安装好了cuda、cudnn、nccl或者安装好了docker、nvidia-docker运行环境，可以pip安装最新GPU版本PaddlePaddle
 
 ```bash
 pip install paddlepaddle-gpu --upgrade
 ```
 
-或是从源码安装PaddlePaddle，具体参照[安装文档](http://www.paddlepaddle.org.cn/install/quick)中的说明进行操作。
+也可以从源码编译安装PaddlePaddle，请参照[安装文档](http://www.paddlepaddle.org.cn/install/quick)中的说明进行操作。
 
-使用以下命令验证
+使用以下命令可以验证PaddlePaddle是否安装成功。
 
 ```python
 import paddle.fluid as fluid
 fluid.install_check.run_check()
 ```
 
-查看PaddlePaddle版本
+查看PaddlePaddle版本的命令如下：
 
 ```bash
 python -c "import paddle; print(paddle.__version__)"
