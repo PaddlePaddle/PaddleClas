@@ -41,7 +41,7 @@
 | **Process**     | (N, 3, 224, 224)<br>float32 | (N, 3, 224, 224)<br>float32 | \-               | \-               | \-          | \-               | \-               | \-            | Y          | Y |
 
 
-PaddleClas中集成了上述所有的数据增广策略。下文将介绍这些策略的原理与使用方法，并以下图为例，对变换后的效果进行可视化。为了说明问题，本章节中将 `RandCrop` 替换为 `Resize`。
+PaddleClas中集成了上述所有的数据增广策略，每种数据增广策略的参考论文与参考开源代码均在下面的介绍中列出。下文将介绍这些策略的原理与使用方法，并以下图为例，对变换后的效果进行可视化。为了说明问题，本章节中将 `RandCrop` 替换为 `Resize`。
 
 ![][test_baseline]
 
@@ -535,7 +535,7 @@ python -m paddle.distributed.launch \
         -c ./configs/DataAugment/ResNet50_Cutout.yaml
 ```
 
-运行`run.sh`
+运行`run.sh`：
 
 ```bash
 sh tools/run.sh

@@ -235,7 +235,7 @@ python -m paddle.distributed.launch \
         -c ./configs/Distillation/R50_vd_distill_MV3_large_x1_0.yaml
 ```
 
-运行`run.sh`
+运行`run.sh`：
 
 ```bash
 sh tools/run.sh
