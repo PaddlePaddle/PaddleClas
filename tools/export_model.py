@@ -24,7 +24,7 @@ def parse_args():
     parser.add_argument("-m", "--model", type=str)
     parser.add_argument("-p", "--pretrained_model", type=str)
     parser.add_argument("-o", "--output_path", type=str)
-    parser.add_argument("--class_dim", type=int)
+    parser.add_argument("--class_dim", type=int, default=1000)
 
     return parser.parse_args()
 
