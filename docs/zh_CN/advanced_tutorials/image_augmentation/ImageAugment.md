@@ -535,7 +535,7 @@ python -m paddle.distributed.launch \
         -c ./configs/DataAugment/ResNet50_Cutout.yaml
 ```
 
-运行`run.sh`
+运行`run.sh`：
 
 ```bash
 sh tools/run.sh
