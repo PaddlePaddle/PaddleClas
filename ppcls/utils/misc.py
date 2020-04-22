@@ -1,16 +1,16 @@
-#copyright (c) 2020 PaddlePaddle Authors. All Rights Reserve.
+# copyright (c) 2020 PaddlePaddle Authors. All Rights Reserve.
 #
-#Licensed under the Apache License, Version 2.0 (the "License");
-#you may not use this file except in compliance with the License.
-#You may obtain a copy of the License at
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
 #
 #    http://www.apache.org/licenses/LICENSE-2.0
 #
-#Unless required by applicable law or agreed to in writing, software
-#distributed under the License is distributed on an "AS IS" BASIS,
-#WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#See the License for the specific language governing permissions and
-#limitations under the License.
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
 __all__ = ['AverageMeter']
 
@@ -20,10 +20,10 @@ class AverageMeter(object):
     Computes and stores the average and current value
     """
 
-    def __init__(self, name='', fmt=':f', avg=False):
+    def __init__(self, name='', fmt='f', need_avg=False):
         self.name = name
         self.fmt = fmt
-        self.avg_flag = avg
+        self.need_avg = need_avg
         self.reset()
 
     def reset(self):
@@ -40,8 +40,15 @@ class AverageMeter(object):
         self.count += n
         self.avg = self.sum / self.count
 
-    def __str__(self):
-        fmtstr = '[{name}: {val' + self.fmt + '}]'
-        if self.avg_flag:
-            fmtstr += '[{name}(avg): {avg' + self.fmt + '}]'
-        return fmtstr.format(**self.__dict__)
+    @property
+    def total(self):
+        return '[{self.name}_sum: {self.sum:{self.fmt}}]'.format(self=self)
+
+    @property
+    def mean(self):
+        return '[{self.name}_avg: {self.avg:{self.fmt}}]'.format(
+            self=self) if self.need_avg else ''
+
+    @property
+    def value(self):
+        return '[{self.name}: {self.val:{self.fmt}}]'.format(self=self)

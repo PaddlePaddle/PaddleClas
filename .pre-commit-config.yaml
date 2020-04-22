@@ -9,21 +9,6 @@
   hooks:
   - id: autopep8
 
-- repo: https://github.com/pre-commit/pre-commit-hooks
-  rev: v2.5.0
-  hooks:
-    - id: flake8
-      args: ['--ignore=E265']
-    - id: check-yaml
-    - id: check-merge-conflict
-    - id: detect-private-key
-      files: (?!.*paddle)^.*$
-    - id: end-of-file-fixer
-      files: \.(md|yml)$
-    - id: trailing-whitespace
-      files: \.(md|yml)$
-    - id: check-case-conflict
-
 - repo: https://github.com/Lucas-C/pre-commit-hooks
   sha: v1.0.1
   hooks:
@@ -35,3 +20,19 @@
       files: \.(md|yml)$
     - id: remove-tabs
       files: \.(md|yml)$
+
+- repo: https://github.com/pre-commit/pre-commit-hooks
+  rev: v2.5.0
+  hooks:
+    - id: check-yaml
+    - id: check-merge-conflict
+    - id: detect-private-key
+      files: (?!.*paddle)^.*$
+    - id: end-of-file-fixer
+      files: \.(md|yml)$
+    - id: trailing-whitespace
+      files: \.(md|yml)$
+    - id: check-case-conflict
+    - id: flake8
+      args: ['--ignore=E265']
+
