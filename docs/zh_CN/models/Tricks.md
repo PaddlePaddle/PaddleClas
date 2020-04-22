@@ -58,7 +58,7 @@ Label_smoothing是深度学习中的一种正则化方法，其全称是 Label S
 
 综上所述，较大的模型使用label_smoohing可以有效提升模型的精度，较小的模型使用label_smoohing可能会降低模型的精度，所以在决定是否使用label_smoohing前，需要评估模型的大小和任务的难易程度。
 
-## 6.针对更小的模型如何进行图片的crop与拉伸变换
+## 6.针对小模型更改图片的crop面积与拉伸变换
 在ImageNet-1k数据的标准预处理中，random_crop函数中定义了scale和ratio两个值，两个值分别确定了图片crop的大小和图片的拉伸程度，其中scale的默认取值范围是0.08-1(lower_scale-upper_scale),ratio的默认取值范围是3/4-4/3(lower_ratio-upper_ratio)。在非常小的网络训练中，此类数据增强会使得网络欠拟合，导致精度有所下降。为了提升网络的精度，可以使其数据增强变的更弱，即增大图片的crop区域或者减弱图片的拉伸变换程度。我们可以分别通过增大lower_scale的值或缩小lower_ratio与upper_scale的差距来实现更弱的图片变换。下表列出了使用不同lower_scale训练MobileNetV2_x0_25的精度，可以看到，增大图片的crop区域面积后训练精度和验证精度均有提升。
 
 | 模型                | Scale取值范围 | Train_acc1/acc5 | Test_acc1/acc5 |
@@ -81,10 +81,10 @@ Label_smoothing是深度学习中的一种正则化方法，其全称是 Label S
 | ResNet50 | Random-Erasing | 77.91%     |
 | ResNet50 | Hide-and-Seek  | 77.43%     |
 
-## 8. 通过train_acc和test_acc确定调整策略
+## 8. 通过train_acc和test_acc确定调优策略
 在训练网络的过程中，通常会打印每一个epoch的训练集准确率和验证集准确率，二者刻画了该模型在两个数据集上的表现。通常来说，训练集的准确率比验证集准确率微高或者二者相当是比较不错的状态。如果发现训练集的准确率比验证集高很多，说明在这个任务上已经过拟合，需要在训练过程中加入更多的正则，如增大l2_decay的值，加入更多的数据增广策略，加入label_smoothing策略等；如果发现训练集的准确率比验证集低一些，说明在这个任务上可能欠拟合，需要在训练过程中减弱正则效果，如减小l2_decay的值，减少数据增广方式，增大图片crop区域面积，减弱图片拉伸变换，去除label_smoothing等。
 
-## 9.如何通过已有的预训练模型提升自己的数据集的精度
+## 9.通过已有的预训练模型提升自己的数据集的精度
 在现阶段计算机视觉领域中，加载预训练模型来训练自己的任务已成为普遍的做法，相比从随机初始化开始训练，加载预训练模型往往可以提升特定任务的精度。一般来说，业界广泛使用的预训练模型是通过训练128万张图片1000类的ImageNet-1k数据集得到的，该预训练模型的fc层权重是是一个k\*1000的矩阵，其中k是fc层以前的神经元数，在加载预训练权重时，无需加载fc层的权重。在学习率方面，如果您的任务训练的数据集特别小（如小于1千张），我们建议你使用较小的初始学习率，如0.001（batch_size:256,下同），以免较大的学习率破坏预训练权重。如果您的训练数据集规模相对较大（大于10万），我们建议你尝试更大的初始学习率，如0.01或者更大。
 
 
@@ -93,4 +93,4 @@ Label_smoothing是深度学习中的一种正则化方法，其全称是 Label S
 ## 参考文献
 [1]P. Goyal, P. Dolla ́r, R. B. Girshick, P. Noordhuis, L. Wesolowski, A. Kyrola, A. Tulloch, Y. Jia, and K. He. Accurate, large minibatch SGD: training imagenet in 1 hour. CoRR, abs/1706.02677, 2017.
 
-[2]C.Szegedy,V.Vanhoucke,S.Ioffe,J.Shlens,andZ.Wojna. Rethinking the inception architecture for computer vision. CoRR, abs/1512.00567, 2015
+[2]C.Szegedy,V.Vanhoucke,S.Ioffe,J.Shlens,andZ.Wojna. Rethinking the inception architecture for computer vision. CoRR, abs/1512.00567, 2015.
