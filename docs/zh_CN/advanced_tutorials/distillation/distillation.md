@@ -8,7 +8,7 @@
 深度神经网络一般有较多的参数冗余，目前有几种主要的方法对模型进行压缩，减小其参数量。如裁剪、量化、知识蒸馏等，其中知识蒸馏是指使用教师模型(teacher model)去指导学生模型(student model)学习特定任务，保证小模型在参数量不变的情况下，得到比较大的性能提升，甚至获得与大模型相似的精度指标[1]。PaddleClas融合已有的蒸馏方法[2,3]，提供了一种简单的半监督标签知识蒸馏方案（SSLD，Simple Semi-supervised Label Distillation），基于ImageNet1k分类数据集，在ResNet_vd以及MobileNet系列上的精度均有超过3%的绝对精度提升，具体指标如下图所示。
 
 
-![ssld_performance][ssld_performance]
+![](../../../images/distillation/distillation_perform.png)
 
 
 # 二、SSLD 蒸馏策略
@@ -17,7 +17,9 @@
 
 SSLD的流程图如下图所示。
 
-![epic_distillation_framework][distillation_framework]
+
+![](../../../images/distillation/ppcls_distillation.png)
+
 
 首先，我们从ImageNet22k中挖掘出了近400万张图片，同时与ImageNet-1k训练集整合在一起，得到了一个新的包含500万张图片的数据集。然后，我们将学生模型与教师模型组合成一个新的网络，该网络分别输出学生模型和教师模型的预测分布，与此同时，固定教师模型整个网络的梯度，而学生模型可以做正常的反向传播。最后，我们将两个模型的logits经过softmax激活函数转换为soft label，并将二者的soft label做JS散度作为损失函数，用于蒸馏模型训练。下面以MobileNetV3（该模型直接训练，精度为75.3%）的知识蒸馏为例，介绍该方案的核心关键点（baseline为79.12%的ResNet50_vd模型蒸馏MobileNetV3，训练集为ImageNet1k训练集，loss为cross entropy loss，迭代轮数为120epoch，精度指标为75.6%）。
 
@@ -39,7 +41,7 @@ SSLD的流程图如下图所示。
 * SSLD蒸馏方案的一大特色就是无需使用图像的真值标签，因此可以任意扩展数据集的大小，考虑到计算资源的限制，我们在这里仅基于ImageNet22k数据集对蒸馏任务的训练集进行扩充。在SSLD蒸馏任务中，我们使用了`Top-k per class`的数据采样方案[3]。具体步骤如下。
     * 训练集去重。我们首先基于SIFT特征相似度匹配的方式对ImageNet22k数据集与ImageNet1k验证集进行去重，防止添加的ImageNet22k训练集中包含ImageNet1k验证集图像，最终去除了4511张相似图片。部分过滤的相似图片如下所示。
 
-    ![22k-1k val相似图片][22k_1k_similar_w_sift]
+    ![](../../../images/distillation/22k_1k_val_compare_w_sift.png)
 
     * 大数据集soft label获取，对于去重后的ImageNet22k数据集，我们使用`ResNeXt101_32x16d_wsl`模型进行预测，得到每张图片的soft label。
     * Top-k数据选择，ImageNet1k数据共有1000类，对于每一类，找出属于该类并且得分最高的k张图片，最终得到一个数据量不超过`1000*k`的数据集（某些类上得到的图片数量可能少于k张）。
@@ -264,9 +266,3 @@ sh tools/run.sh
 [2] Bagherinezhad H, Horton M, Rastegari M, et al. Label refinery: Improving imagenet classification through label progression[J]. arXiv preprint arXiv:1805.02641, 2018.
 
 [3] Yalniz I Z, Jégou H, Chen K, et al. Billion-scale semi-supervised learning for image classification[J]. arXiv preprint arXiv:1905.00546, 2019.
-
-
-
-[ssld_performance]: ../../../images/distillation/distillation_perform.png
-[22k_1k_similar_w_sift]: ../../../images/distillation/22k_1k_val_compare_w_sift.png
-[distillation_framework]: ../../../images/distillation/ppcls_distillation.png
