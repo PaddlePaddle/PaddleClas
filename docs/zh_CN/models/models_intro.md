@@ -197,6 +197,7 @@ python tools/infer/predict.py \
   - ACNet系列<sup>[[22](#ref22)]</sup>([论文地址](https://arxiv.org/abs/1908.03930))
     - [ResNet50_ACNet_deploy](https://paddle-imagenet-models-name.bj.bcebos.com/ResNet50_ACNet_deploy_pretrained.tar)
 
+**注意**：以上模型中EfficientNetB1-B7的预训练模型转自[pytorch版EfficientNet](https://github.com/lukemelas/EfficientNet-PyTorch)，ResNeXt101_wsl系列模型转自[官方repo](https://github.com/facebookresearch/WSL-Images)，剩余预训练模型均基于飞浆训练得到的，并在configs里给出了相应的训练超参数。
 
 ## 参考文献
 
