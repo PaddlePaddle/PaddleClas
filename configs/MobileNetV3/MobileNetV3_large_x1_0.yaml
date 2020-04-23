@@ -43,7 +43,7 @@ TRAIN:
             size: 224
         - RandFlipImage:
             flip_code: 1
-        - ImageNetPolicy:
+        - AutoAugment:
         - NormalizeImage:
             scale: 1./255.
             mean: [0.485, 0.456, 0.406]
