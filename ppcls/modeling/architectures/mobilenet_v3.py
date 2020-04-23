@@ -1,23 +1,22 @@
-#copyright (c) 2020 PaddlePaddle Authors. All Rights Reserve.
+# copyright (c) 2020 PaddlePaddle Authors. All Rights Reserve.
 #
-#Licensed under the Apache License, Version 2.0 (the "License");
-#you may not use this file except in compliance with the License.
-#You may obtain a copy of the License at
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
 #
 #    http://www.apache.org/licenses/LICENSE-2.0
 #
-#Unless required by applicable law or agreed to in writing, software
-#distributed under the License is distributed on an "AS IS" BASIS,
-#WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#See the License for the specific language governing permissions and
-#limitations under the License.
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
 import paddle.fluid as fluid
-from paddle.fluid.initializer import MSRA
 from paddle.fluid.param_attr import ParamAttr
 
 __all__ = [
@@ -30,9 +29,19 @@ __all__ = [
 
 
 class MobileNetV3():
-    def __init__(self, scale=1.0, model_name='small'):
+    def __init__(self,
+                 scale=1.0,
+                 model_name='small',
+                 lr_mult_list=[1.0, 1.0, 1.0, 1.0, 1.0]):
         self.scale = scale
         self.inplanes = 16
+
+        self.lr_mult_list = lr_mult_list
+        assert len(self.lr_mult_list) == 5, \
+            "lr_mult_list length in MobileNetV3 must be 5 but got {}!!".format(
+            len(self.lr_mult_list))
+        self.curr_stage = 0
+
         if model_name == "large":
             self.cfg = [
                 # k, exp, c,  se,     nl,  s,
@@ -54,6 +63,7 @@ class MobileNetV3():
             ]
             self.cls_ch_squeeze = 960
             self.cls_ch_expand = 1280
+            self.lr_interval = 3
         elif model_name == "small":
             self.cfg = [
                 # k, exp, c,  se,     nl,  s,
@@ -71,9 +81,10 @@ class MobileNetV3():
             ]
             self.cls_ch_squeeze = 576
             self.cls_ch_expand = 1280
+            self.lr_interval = 2
         else:
-            raise NotImplementedError("mode[" + model_name +
-                                      "_model] is not implemented!")
+            raise NotImplementedError(
+                "mode[{}_model] is not implemented!".format(model_name))
 
     def net(self, input, class_dim=1000):
         scale = self.scale
@@ -81,7 +92,7 @@ class MobileNetV3():
         cfg = self.cfg
         cls_ch_squeeze = self.cls_ch_squeeze
         cls_ch_expand = self.cls_ch_expand
-        #conv1
+        # conv1
         conv = self.conv_bn_layer(
             input,
             filter_size=3,
@@ -107,6 +118,7 @@ class MobileNetV3():
                 name='conv' + str(i + 2))
             inplanes = self.make_divisible(scale * layer_cfg[2])
             i += 1
+            self.curr_stage = i
 
         conv = self.conv_bn_layer(
             input=conv,
@@ -149,6 +161,10 @@ class MobileNetV3():
                       name=None,
                       use_cudnn=True,
                       res_last_bn_init=False):
+        lr_idx = self.curr_stage // self.lr_interval
+        lr_idx = min(lr_idx, len(self.lr_mult_list) - 1)
+        lr_mult = self.lr_mult_list[lr_idx]
+
         conv = fluid.layers.conv2d(
             input=input,
             num_filters=num_filters,
@@ -158,7 +174,8 @@ class MobileNetV3():
             groups=num_groups,
             act=None,
             use_cudnn=use_cudnn,
-            param_attr=ParamAttr(name=name + '_weights'),
+            param_attr=ParamAttr(
+                name=name + '_weights', learning_rate=lr_mult),
             bias_attr=False)
         bn_name = name + '_bn'
         bn = fluid.layers.batch_norm(
@@ -189,6 +206,10 @@ class MobileNetV3():
         return new_v
 
     def se_block(self, input, num_out_filter, ratio=4, name=None):
+        lr_idx = self.curr_stage // self.lr_interval
+        lr_idx = min(lr_idx, len(self.lr_mult_list) - 1)
+        lr_mult = self.lr_mult_list[lr_idx]
+
         num_mid_filter = num_out_filter // ratio
         pool = fluid.layers.pool2d(
             input=input, pool_type='avg', global_pooling=True, use_cudnn=False)
@@ -197,15 +218,19 @@ class MobileNetV3():
             filter_size=1,
             num_filters=num_mid_filter,
             act='relu',
-            param_attr=ParamAttr(name=name + '_1_weights'),
-            bias_attr=ParamAttr(name=name + '_1_offset'))
+            param_attr=ParamAttr(
+                name=name + '_1_weights', learning_rate=lr_mult),
+            bias_attr=ParamAttr(
+                name=name + '_1_offset', learning_rate=lr_mult))
         conv2 = fluid.layers.conv2d(
             input=conv1,
             filter_size=1,
             num_filters=num_out_filter,
             act='hard_sigmoid',
-            param_attr=ParamAttr(name=name + '_2_weights'),
-            bias_attr=ParamAttr(name=name + '_2_offset'))
+            param_attr=ParamAttr(
+                name=name + '_2_weights', learning_rate=lr_mult),
+            bias_attr=ParamAttr(
+                name=name + '_2_offset', learning_rate=lr_mult))
         scale = fluid.layers.elementwise_mul(x=input, y=conv2, axis=0)
         return scale
 
@@ -275,8 +300,8 @@ def MobileNetV3_small_x0_75():
     return model
 
 
-def MobileNetV3_small_x1_0():
-    model = MobileNetV3(model_name='small', scale=1.0)
+def MobileNetV3_small_x1_0(**args):
+    model = MobileNetV3(model_name='small', scale=1.0, **args)
     return model
 
 
@@ -300,8 +325,8 @@ def MobileNetV3_large_x0_75():
     return model
 
 
-def MobileNetV3_large_x1_0():
-    model = MobileNetV3(model_name='large', scale=1.0)
+def MobileNetV3_large_x1_0(**args):
+    model = MobileNetV3(model_name='large', scale=1.0, **args)
     return model
 
 
