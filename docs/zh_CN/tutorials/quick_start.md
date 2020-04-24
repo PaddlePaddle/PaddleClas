@@ -166,9 +166,9 @@ cp -r output/ResNet50_vd/19/  ./pretrained/flowers102_R50_vd_final/
 
 ### 3.6 知识蒸馏小试牛刀
 
-* 使用flowers102数据集进行模型蒸馏，为了进一步提提升模型的精度，使用test_list.txt充当无标签数据，在这里有几点需要注意：
-    * `test_list.txt`与`val_list.txt`的样本没有重复。
-    * 即使引入了有标签的test_list.txt中的测试集图像，但是代码中没有使用标签信息，因此仍然可以视为无标签的模型蒸馏。
+* 使用flowers102数据集进行模型蒸馏，为了进一步提提升模型的精度，使用extra_list.txt充当无标签数据，在这里有几点需要注意：
+    * `extra_list.txt`与`val_list.txt`的样本没有重复，因此可以用于扩充知识蒸馏任务的训练数据。
+    * 即使引入了有标签的extra_list.txt中的图像，但是代码中没有使用标签信息，因此仍然可以视为无标签的模型蒸馏。
     * 蒸馏过程中，教师模型使用的预训练模型为flowers102数据集上的训练结果，学生模型使用的是ImageNet1k数据集上精度为75.32\%的MobileNetV3_large_x1_0预训练模型。
 
 
