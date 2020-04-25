@@ -16,6 +16,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
+import os
 import sys
 
 import paddle.fluid as fluid
@@ -36,7 +37,7 @@ def check_version():
 
     try:
         fluid.require_version('1.7.0')
-    except Exception as e:
+    except Exception:
         logger.error(err)
         sys.exit(1)
 
@@ -60,9 +61,10 @@ def check_architecture(architecture):
     check architecture and recommend similar architectures
     """
     assert isinstance(architecture, dict), \
-            ("the type of architecture({}) should be dict". format(architecture))
+        ("the type of architecture({}) should be dict". format(architecture))
     assert "name" in architecture, \
-            ("name must be in the architecture keys, just contains: {}". format(architecture.keys()))
+        ("name must be in the architecture keys, just contains: {}". format(
+            architecture.keys()))
 
     similar_names = similar_architectures(architecture["name"],
                                           get_architectures())
@@ -83,7 +85,8 @@ def check_mix(architecture, use_mix=False):
     err = "Cannot use mix processing in GoogLeNet, " \
           "please set use_mix = False."
     try:
-        if architecture["name"] == "GoogLeNet": assert use_mix == False
+        if architecture["name"] == "GoogLeNet":
+            assert use_mix is not True
     except AssertionError:
         logger.error(err)
         sys.exit(1)
@@ -94,7 +97,7 @@ def check_classes_num(classes_num):
     check classes_num
     """
     err = "classes_num({}) should be a positive integer" \
-           "and larger than 1".format(classes_num)
+        "and larger than 1".format(classes_num)
     try:
         assert isinstance(classes_num, int)
         assert classes_num > 1
@@ -122,12 +125,12 @@ def check_function_params(config, key):
     """
     k_config = config.get(key)
     assert k_config is not None, \
-            ('{} is required in config'.format(key))
+        ('{} is required in config'.format(key))
 
     assert k_config.get('function'), \
-            ('function is required {} config'.format(key))
+        ('function is required {} config'.format(key))
     params = k_config.get('params')
     assert params is not None, \
-            ('params is required in {} config'.format(key))
+        ('params is required in {} config'.format(key))
     assert isinstance(params, dict), \
-            ('the params in {} config should be a dict'.format(key))
+        ('the params in {} config should be a dict'.format(key))

@@ -100,7 +100,7 @@ def check_config(config):
     architecture = config.get('ARCHITECTURE')
     check.check_architecture(architecture)
 
-    use_mix = config.get('use_mix')
+    use_mix = config.get('use_mix', False)
     check.check_mix(architecture, use_mix)
 
     classes_num = config.get('classes_num')
