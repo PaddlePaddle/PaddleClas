@@ -7,7 +7,7 @@
 ## 简介
 
 <div align="center">
-    <img src="docs/images/main_features.png" width="700">
+    <img src="docs/images/main_features.png" width="800">
 </div>
 
 ## 丰富的模型库
