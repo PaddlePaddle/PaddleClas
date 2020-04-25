@@ -12,12 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import utils
 import argparse
+import utils
 import numpy as np
 import logging
 import time
-from paddle.fluid.core import PaddleTensor
+
 from paddle.fluid.core import AnalysisConfig
 from paddle.fluid.core import create_paddle_predictor
 logging.basicConfig(level=logging.INFO)
@@ -85,7 +85,7 @@ def create_operators():
 
 
 def preprocess(fname, ops):
-    data = open(fname).read()
+    data = open(fname, 'rb').read()
     for op in ops:
         data = op(data)
 
@@ -97,14 +97,14 @@ def main():
 
     if not args.enable_benchmark:
         assert args.batch_size == 1
-        assert args.use_fp16 == False
+        assert args.use_fp16 is False
     else:
-        assert args.use_gpu == True
+        assert args.use_gpu is True
         assert args.model_name is not None
-        assert args.use_tensorrt == True
+        assert args.use_tensorrt is True
     # HALF precission predict only work when using tensorrt
-    if args.use_fp16 == True:
-        assert args.use_tensorrt == True
+    if args.use_fp16 is True:
+        assert args.use_tensorrt is True
 
     operators = create_operators()
     predictor = create_predictor(args)
