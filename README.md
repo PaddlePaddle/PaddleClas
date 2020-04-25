@@ -7,7 +7,7 @@
 ## 简介
 
 <div align="center">
-    <img src="docs/images/main_features.png" width="600">
+    <img src="docs/images/main_features.png" width="700">
 </div>
 
 ## 丰富的模型库
@@ -114,14 +114,14 @@ PaddlePaddle提供了一系列实用工具，便于工业应用部署PaddleClas�
 - 多机训练
 - Paddle Hub
 
-## 护航视觉挑战赛
+## 赛事支持
 PaddleClas的建设源于百度实际视觉业务应用的淬炼和视觉前沿能力的探索，助力多个视觉重点赛事取得领先成绩，并且持续推进更多的前沿视觉问题的解决和落地应用。更多内容请关注文档教程中的[**赛事支持章节**](https://paddleclas.readthedocs.io/zh_CN/latest/competition_support.html)
 
 - 2018年Kaggle Open Images V4图像目标检测挑战赛冠军
+- 首届多媒体信息识别技术竞赛中印刷文本OCR、人脸识别和地标识别三项任务A级证书
 - 2019年Kaggle Open Images V5图像目标检测挑战赛亚军
 - 2019年Kaggle地标检索挑战赛亚军
 - 2019年Kaggle地标识别挑战赛亚军
-- 首届多媒体信息识别技术竞赛中印刷文本OCR、人脸识别和地标识别三项任务A级证书
 
 ## 许可证书
 本项目的发布受<a href="https://github.com/PaddlePaddle/PaddleCLS/blob/master/LICENSE">Apache 2.0 license</a>许可认证。
