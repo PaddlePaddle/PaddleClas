@@ -1,16 +1,16 @@
-#copyright (c) 2020 PaddlePaddle Authors. All Rights Reserve.
+# copyright (c) 2020 PaddlePaddle Authors. All Rights Reserve.
 #
-#Licensed under the Apache License, Version 2.0 (the "License");
-#you may not use this file except in compliance with the License.
-#You may obtain a copy of the License at
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
 #
 #    http://www.apache.org/licenses/LICENSE-2.0
 #
-#Unless required by applicable law or agreed to in writing, software
-#distributed under the License is distributed on an "AS IS" BASIS,
-#WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#See the License for the specific language governing permissions and
-#limitations under the License.
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
 from __future__ import absolute_import
 from __future__ import division
@@ -18,7 +18,6 @@ from __future__ import print_function
 
 import math
 
-import paddle
 import paddle.fluid as fluid
 from paddle.fluid.param_attr import ParamAttr
 
@@ -39,7 +38,8 @@ class Res2Net_vd():
         layers = self.layers
         supported_layers = [50, 101, 152, 200]
         assert layers in supported_layers, \
-            "supported layers are {} but input layer is {}".format(supported_layers, layers)
+            "supported layers are {} but input layer is {}".format(
+                supported_layers, layers)
         basic_width = self.width * self.scales
         num_filters1 = [basic_width * t for t in [1, 2, 4, 8]]
         num_filters2 = [256 * t for t in [1, 2, 4, 8]]
@@ -81,7 +81,7 @@ class Res2Net_vd():
             pool_type='max')
         for block in range(len(depth)):
             for i in range(depth[block]):
-                if layers in [101, 152] and block == 2:
+                if layers in [101, 152, 200] and block == 2:
                     if i == 0:
                         conv_name = "res" + str(block + 2) + "a"
                     else:
