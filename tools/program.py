@@ -375,7 +375,7 @@ def run(dataloader, exe, program, fetchs, epoch=0, mode='train'):
     metric_list = [f[1] for f in fetchs.values()]
     for m in metric_list:
         m.reset()
-    batch_time = AverageMeter('cost', '.3f')
+    batch_time = AverageMeter('elapse', '.3f')
     tic = time.time()
     for idx, batch in enumerate(dataloader()):
         metrics = exe.run(program=program, feed=batch, fetch_list=fetch_list)
@@ -383,9 +383,17 @@ def run(dataloader, exe, program, fetchs, epoch=0, mode='train'):
         tic = time.time()
         for i, m in enumerate(metrics):
             metric_list[i].update(m[0], len(batch[0]))
-        fetchs_str = ''.join([m.value
-                              for m in metric_list] + [batch_time.value])
-        logger.info("[epoch:{:3d}][{:s}][step:{:4d}]{:s}".format(
+        fetchs_str = ''.join([str(m.value)+' '
+                              for m in metric_list]+ [batch_time.value])
+        if epoch != -1:
+            logger.info("epoch:{:<3d} {:s} step:{:<4d} {:s}s".format(
             epoch, mode, idx, fetchs_str))
-    end_str = ''.join([m.mean for m in metric_list] + [batch_time.total])
-    logger.info("END [epoch:{:3d}][{:s}]{:s}".format(epoch, mode, end_str))
+        else:
+            logger.info("{:s} step:{:<4d} {:s}s".format(
+            mode, idx, fetchs_str))
+
+    end_str = ''.join([str(m.mean)+' ' for m in metric_list] + [batch_time.total])
+    if epoch!= -1:
+        logger.info("END epoch:{:<3d} {:s} {:s}s".format(epoch, mode, end_str))
+    else:
+        logger.info("END {:s} {:s}s".format(mode, end_str))

@@ -145,10 +145,6 @@ def main():
             output = output.flatten()
             if i >= 10:
                 test_time += time.time() - start_time
-            cls = np.argmax(output)
-            score = output[cls]
-            logger.info("class: {0}".format(cls))
-            logger.info("score: {0}".format(score))
 
         fp_message = "FP16" if args.use_fp16 else "FP32"
         logger.info("{0}\t{1}\tbatch size: {2}\ttime(ms): {3}".format(

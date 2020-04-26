@@ -73,7 +73,7 @@ def main(args):
     valid_dataloader.set_sample_list_generator(valid_reader, place)
 
     compiled_valid_prog = program.compile(config, valid_prog)
-    program.run(valid_dataloader, exe, compiled_valid_prog, valid_fetchs, 0,
+    program.run(valid_dataloader, exe, compiled_valid_prog, valid_fetchs, -1,
                 'valid')
 
 

@@ -1,3 +1,4 @@
+ujson
 opencv-python
 pillow
 tqdm
