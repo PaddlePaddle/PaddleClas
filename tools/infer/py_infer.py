@@ -87,6 +87,7 @@ def main():
     exe, program, feed_names, fetch_lists = create_predictor(args)
 
     data = preprocess(args.image_file, operators)
+    data = np.expand_dims(data, axis=0)
     outputs = exe.run(program,
                       feed={feed_names[0]: data},
                       fetch_list=fetch_lists,
