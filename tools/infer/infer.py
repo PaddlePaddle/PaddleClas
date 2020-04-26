@@ -85,7 +85,7 @@ def create_operators():
 
 
 def preprocess(fname, ops):
-    data = open(fname).read()
+    data = open(fname, 'rb').read()
     for op in ops:
         data = op(data)
 
