@@ -71,9 +71,8 @@ def main(args):
 
     valid_reader = Reader(config, 'valid')()
     valid_dataloader.set_sample_list_generator(valid_reader, place)
-    
-    #compiled_valid_prog = program.compile(config, valid_prog)
-    compiled_valid_prog = valid_prog
+
+    compiled_valid_prog = program.compile(config, valid_prog)
     program.run(valid_dataloader, exe, compiled_valid_prog, valid_fetchs, 0,
                 'valid')
 
