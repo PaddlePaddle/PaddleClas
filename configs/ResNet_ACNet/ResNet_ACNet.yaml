@@ -1,6 +1,6 @@
 mode: 'train'
 ARCHITECTURE:
-    name: "ResNet_ACNet"
+    name: "ResNet50_ACNet"
 
 pretrained_model: ""
 model_save_dir: "./output/"
