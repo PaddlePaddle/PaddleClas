@@ -42,18 +42,18 @@ class AverageMeter(object):
 
     @property
     def total(self):
-        return '[{self.name}_sum: {self.sum:{self.fmt}}]'.format(self=self)
+        return '{self.name}_sum: {self.sum:{self.fmt}}'.format(self=self)
 
     @property
     def total_minute(self):
-        return '[{self.name}_sum: {s:{self.fmt}} min]'.format(
+        return '{self.name}_sum: {s:{self.fmt}} min'.format(
             s=self.sum / 60, self=self)
 
     @property
     def mean(self):
-        return '[{self.name}_avg: {self.avg:{self.fmt}}]'.format(
+        return '{self.name}_avg: {self.avg:{self.fmt}}'.format(
             self=self) if self.need_avg else ''
 
     @property
     def value(self):
-        return '[{self.name}: {self.val:{self.fmt}}]'.format(self=self)
+        return '{self.name}: {self.val:{self.fmt}}'.format(self=self)
