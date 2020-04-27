@@ -398,7 +398,6 @@ def run(dataloader, exe, program, fetchs, epoch=0, mode='train'):
     else:
         logger.info("END epoch:{:<3d} {:s} {:s}s".format(epoch, mode, end_str))
 
-    # save the best model
+    # return top1_acc in order to save the best model
     if mode == 'valid':
-        top1_acc = fetchs["top1"][1].avg
-        return top1_acc
+        return fetchs["top1"][1].avg
