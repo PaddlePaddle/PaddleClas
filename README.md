@@ -31,6 +31,7 @@ src="docs/images/models/mobile_arm_top1.png" width="700">
 
 - TODO
 - [ ] EfficientLite、GhostNet、RegNet论文指标复现和性能评估
+- [ ] The speed test on P4/T4
 
 ## 高阶优化支持
 除了提供丰富的分类网络结构和预训练模型，PaddleClas也支持了一系列有助于图像分类任务效果和效率提升的算法或工具。
