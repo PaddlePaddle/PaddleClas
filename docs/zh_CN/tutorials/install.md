@@ -38,7 +38,7 @@ python -c "import paddle; print(paddle.__version__)"
 
 **运行环境需求:**
 
-- Python2（官方已不提供更新维护）或Python3 (windows系统仅支持Python3)
+- Python2（官方已不提供更新维护）或Python3 (当前只支持Linux系统)
 - CUDA >= 9.0
 - cuDNN >= 5.0
 - nccl >= 2.1.2
