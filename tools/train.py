@@ -26,6 +26,7 @@ from paddle.fluid.incubate.fleet.collective import fleet
 from ppcls.data import Reader
 from ppcls.utils.config import get_config
 from ppcls.utils.save_load import init_model, save_model
+from ppcls.utils import logger
 import program
 
 
@@ -61,6 +62,10 @@ def main(args):
     startup_prog = fluid.Program()
     train_prog = fluid.Program()
 
+    # best_top1_acc_list[0]: top1 acc
+    # best_top1_acc_list[1]: epoch id
+    best_top1_acc_list = [0.0, 0]
+
     train_dataloader, train_fetchs = program.build(
         config, train_prog, startup_prog, is_train=True)
 
@@ -94,8 +99,16 @@ def main(args):
                     epoch_id, 'train')
         # 2. validate with validate dataset
         if config.validate and epoch_id % config.valid_interval == 0:
-            program.run(valid_dataloader, exe, compiled_valid_prog,
-                        valid_fetchs, epoch_id, 'valid')
+            top1_acc = program.run(valid_dataloader, exe, compiled_valid_prog,
+                                   valid_fetchs, epoch_id, 'valid')
+            if top1_acc > best_top1_acc_list[0]:
+                best_top1_acc_list[0] = top1_acc
+                best_top1_acc_list[1] = epoch_id
+                logger.info("Best top1 acc: {}, in epoch: {}".format(
+                    best_top1_acc_list[0], best_top1_acc_list[1]))
+                model_path = os.path.join(config.model_save_dir,
+                                          config.ARCHITECTURE["name"])
+                save_model(train_prog, model_path, "best_model")
 
         # 3. save the persistable model
         if epoch_id % config.save_interval == 0:
