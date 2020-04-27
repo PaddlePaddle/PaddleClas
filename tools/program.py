@@ -385,7 +385,7 @@ def run(dataloader, exe, program, fetchs, epoch=0, mode='train'):
             metric_list[i].update(m[0], len(batch[0]))
         fetchs_str = ''.join([str(m.value) + ' '
                               for m in metric_list] + [batch_time.value])
-        if mode == 'valid':
+        if mode == 'eval':
             logger.info("{:s} step:{:<4d} {:s}s".format(mode, idx, fetchs_str))
         else:
             logger.info("epoch:{:<3d} {:s} step:{:<4d} {:s}s".format(
@@ -393,7 +393,7 @@ def run(dataloader, exe, program, fetchs, epoch=0, mode='train'):
 
     end_str = ''.join([str(m.mean) + ' '
                        for m in metric_list] + [batch_time.total])
-    if mode == 'valid':
+    if mode == 'eval':
         logger.info("END {:s} {:s}s".format(mode, end_str))
     else:
         logger.info("END epoch:{:<3d} {:s} {:s}s".format(epoch, mode, end_str))
