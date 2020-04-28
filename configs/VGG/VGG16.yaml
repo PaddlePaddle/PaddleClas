@@ -48,8 +48,6 @@ TRAIN:
             order: ''
         - ToCHWImage:
 
-
-
 VALID:
     batch_size: 64
     num_workers: 4
@@ -71,5 +69,4 @@ VALID:
             std: [0.229, 0.224, 0.225]
             order: ''
         - ToCHWImage:
-
 
