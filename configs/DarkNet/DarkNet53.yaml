@@ -62,7 +62,7 @@ VALID:
         - ResizeImage:
             resize_short: 256
         - CropImage:
-            size: 224
+            size: 256
         - NormalizeImage:
             scale: 1.0/255.0
             mean: [0.485, 0.456, 0.406]
