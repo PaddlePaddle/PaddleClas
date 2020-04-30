@@ -17,7 +17,7 @@
 基于ImageNet1k分类数据集，PaddleClas提供ResNet、ResNet_vd、Res2Net、HRNet、MobileNetV3等23种系列的分类网络结构的简单介绍、论文指标复现配置，以及在复现过程中的训练技巧。与此同时，也提供了对应的117个图像分类预训练模型，并且基于TensorRT评估了服务器端模型的GPU预测时间，以及在骁龙855（SD855）上评估了移动端模型的CPU预测时间和存储大小。支持的***预训练模型列表、下载地址以及更多信息***请见文档教程中的[**模型库章节**](https://paddleclas.readthedocs.io/zh_CN/latest/models/models_intro.html)。
 
 <div align="center">
-    <img src="docs/images/models/main_fps_top1.png" width="700">
+    <img src="docs/images/models/main_fps_top1_s.jpg" width="700">
 </div>
 
 上图对比了一些最新的面向服务器端应用场景的模型，在使用V100，FP32和TensorRT预测一张图像的时间和其准确率，图中准确率82.4%的ResNet50_vd_ssld和83.7%的ResNet101_vd_ssld，是采用PaddleClas提供的SSLD知识蒸馏方案训练的模型。图中相同颜色和符号的点代表同一系列不同规模的模型。不同模型的简介、FLOPS、Parameters以及详细的GPU预测时间请参考文档教程中的[**模型库章节**](https://paddleclas.readthedocs.io/zh_CN/latest/models/models_intro.html)。
@@ -41,14 +41,14 @@ src="docs/images/models/mobile_arm_top1_s.jpg" width="700">
 
 <div align="center">
 <img
-src="docs/images/distillation/distillation_perform.png" width="700">
+src="docs/images/distillation/distillation_perform_s.jpg" width="700">
 </div>
 
 以在ImageNet1K蒸馏模型为例，SSLD知识蒸馏方案框架图如下，该方案的核心关键点包括教师模型的选择、loss计算方式、迭代轮数、无标签数据的使用、以及ImageNet1k蒸馏finetune，每部分的详细介绍以及实验介绍请参考文档教程中的[**知识蒸馏章节**](https://paddleclas.readthedocs.io/zh_CN/latest/advanced_tutorials/distillation/index.html)。
 
 <div align="center">
 <img
-src="docs/images/distillation/ppcls_distillation.png" width="700">
+src="docs/images/distillation/ppcls_distillation_s.jpg" width="700">
 </div>
 
 ### 数据增广
@@ -57,14 +57,14 @@ src="docs/images/distillation/ppcls_distillation.png" width="700">
 
 <div align="center">
 <img
-src="docs/images/image_aug/image_aug_samples.png" width="800">
+src="docs/images/image_aug/image_aug_samples_s.jpg" width="800">
 </div>
 
 PaddleClas提供了上述8种数据增广算法的复现和在统一实验环境下的效果评估。下图展示了不同数据增广方式在ResNet50上的表现, 与标准变换相比，采用数据增广，识别准确率最高可以提升1%。每种数据增广方法的详细介绍、对比的实验环境请参考文档教程中的[**数据增广章节**](https://paddleclas.readthedocs.io/zh_CN/latest/advanced_tutorials/image_augmentation/index.html)。
 
 <div align="center">
 <img
-src="docs/images/image_aug/main_image_aug.png" width="600">
+src="docs/images/image_aug/main_image_aug_s.jpg" width="600">
 </div>
 
 ## 30分钟玩转PaddleClas
