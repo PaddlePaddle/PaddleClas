@@ -8,3 +8,4 @@ output/
 pretrained/
 *.ipynb*
 _build/
+nohup.out
