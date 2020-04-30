@@ -9,7 +9,7 @@
 飞桨图像分类套件PaddleClas是飞桨为工业界和学术界所准备的一个图像分类任务的工具集，助力使用者训练出更好的视觉模型和应用落地。
 
 <div align="center">
-    <img src="docs/images/main_features_s.png" width="600">
+    <img src="docs/images/main_features_s.png" width="700">
 </div>
 
 ## 丰富的模型库
