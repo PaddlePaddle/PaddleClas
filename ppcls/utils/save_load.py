@@ -46,7 +46,7 @@ def _mkdir_if_not_exist(path):
 
 
 def _load_state(path):
-    print("path: ", path)
+    logger.info("path: {}".format(path))
     if os.path.exists(path + '.pdopt'):
         # XXX another hack to ignore the optimizer state
         tmp = tempfile.mkdtemp()
@@ -55,12 +55,12 @@ def _load_state(path):
         state = fluid.io.load_program_state(dst)
         shutil.rmtree(tmp)
     else:
-        print("path: ", path)
+        logger.info("path: {}".format(path))
         state = fluid.io.load_program_state(path)
     return state
 
 
-def load_params(exe, prog, path, ignore_params=[]):
+def load_params(exe, prog, path, ignore_params=None):
     """
     Load model from the given path.
     Args:
@@ -103,6 +103,7 @@ def load_params(exe, prog, path, ignore_params=[]):
             if k in state:
                 logger.warning('variable {} not used'.format(k))
                 del state[k]
+
     fluid.io.set_program_state(prog, state)
 
 
