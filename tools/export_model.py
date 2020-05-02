@@ -13,7 +13,6 @@
 # limitations under the License.
 
 import argparse
-import numpy as np
 
 from ppcls.modeling import architectures
 import paddle.fluid as fluid
@@ -25,13 +24,14 @@ def parse_args():
     parser.add_argument("-p", "--pretrained_model", type=str)
     parser.add_argument("-o", "--output_path", type=str)
     parser.add_argument("--class_dim", type=int, default=1000)
+    parser.add_argument("--img_size", type=int, default=224)
 
     return parser.parse_args()
 
 
-def create_input():
+def create_input(img_size=224):
     image = fluid.data(
-        name='image', shape=[None, 3, 224, 224], dtype='float32')
+        name='image', shape=[None, 3, img_size, img_size], dtype='float32')
     return image
 
 
@@ -57,7 +57,7 @@ def main():
 
     with fluid.program_guard(infer_prog, startup_prog):
         with fluid.unique_name.guard():
-            image = create_input()
+            image = create_input(args.img_size)
             out = create_model(args, model, image, class_dim=args.class_dim)
 
     infer_prog = infer_prog.clone(for_test=True)
