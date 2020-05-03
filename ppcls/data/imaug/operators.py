@@ -22,7 +22,6 @@ from __future__ import unicode_literals
 import six
 import math
 import random
-import functools
 import cv2
 import numpy as np
 
@@ -38,8 +37,8 @@ class DecodeImage(object):
 
     def __init__(self, to_rgb=True, to_np=False, channel_first=False):
         self.to_rgb = to_rgb
-        self.to_np = to_np  #to numpy
-        self.channel_first = channel_first  #only enabled when to_np is True
+        self.to_np = to_np  # to numpy
+        self.channel_first = channel_first  # only enabled when to_np is True
 
     def __call__(self, img):
         if six.PY2:
@@ -64,7 +63,8 @@ class DecodeImage(object):
 class ResizeImage(object):
     """ resize image """
 
-    def __init__(self, size=None, resize_short=None):
+    def __init__(self, size=None, resize_short=None, interpolation=-1):
+        self.interpolation = interpolation if interpolation >= 0 else None
         if resize_short is not None and resize_short > 0:
             self.resize_short = resize_short
             self.w = None
@@ -86,8 +86,10 @@ class ResizeImage(object):
         else:
             w = self.w
             h = self.h
-
-        return cv2.resize(img, (w, h))
+        if self.interpolation is None:
+            return cv2.resize(img, (w, h))
+        else:
+            return cv2.resize(img, (w, h), interpolation=self.interpolation)
 
 
 class CropImage(object):
@@ -138,8 +140,7 @@ class RandCropImage(object):
         scale_max = min(scale[1], bound)
         scale_min = min(scale[0], bound)
 
-        target_area = img_w * img_h * random.uniform(\
-            scale_min, scale_max)
+        target_area = img_w * img_h * random.uniform(scale_min, scale_max)
         target_size = math.sqrt(target_area)
         w = int(target_size * w)
         h = int(target_size * h)
@@ -176,7 +177,8 @@ class NormalizeImage(object):
     """
 
     def __init__(self, scale=None, mean=None, std=None, order='chw'):
-        if isinstance(scale, str): scale = eval(scale)
+        if isinstance(scale, str):
+            scale = eval(scale)
         self.scale = np.float32(scale if scale is not None else 1.0 / 255.0)
         mean = mean if mean is not None else [0.485, 0.456, 0.406]
         std = std if std is not None else [0.229, 0.224, 0.225]
