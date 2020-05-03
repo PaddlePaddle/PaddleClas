@@ -22,7 +22,7 @@
 
 >>
 * Q: 在评测`EfficientNetB0_small`模型时，为什么最终的精度始终比官网的低0.3%左右？
-* A: `EfficientNet`系列的网络在进行resize的时候，是使用`cubic插值方式`(resize参数的interpolation值设置为2)，而默认情况下位None，因此在训练和评估的时候需要显式地指定resiz的interpolation值。具体地，可以参考以下配置中预处理过程中ResizeImage的参数。
+* A: `EfficientNet`系列的网络在进行resize的时候，是使用`cubic插值方式`(resize参数的interpolation值设置为2)，而其他模型默认情况下为None，因此在训练和评估的时候需要显式地指定resiz的interpolation值。具体地，可以参考以下配置中预处理过程中ResizeImage的参数。
 ```
 VALID:
     batch_size: 16
