@@ -22,7 +22,6 @@ import re
 import shutil
 import tempfile
 
-import paddle
 import paddle.fluid as fluid
 
 from ppcls.utils import logger
