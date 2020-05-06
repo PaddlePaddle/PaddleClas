@@ -114,5 +114,5 @@ VGG11
 VGG13
 VGG16
 VGG19
-DarkNet53
+DarkNet53_ImageNet1k
 ResNet50_ACNet_deploy
