@@ -14,9 +14,24 @@
 
 import logging
 import os
+import datetime
 
-logging.basicConfig(level=logging.INFO, format='%(message)s')
+from imp import reload
+reload(logging)
+
+logging.basicConfig(level=logging.INFO, 
+                    format="%(asctime)s %(levelname)s: %(message)s",
+                    datefmt = "%Y-%m-%d %H:%M:%S")
+
+
+def time_zone(sec, fmt):
+    real_time = datetime.datetime.now() + datetime.timedelta(hours=8)
+    return real_time.timetuple()
+
+
+logging.Formatter.converter = time_zone
 _logger = logging.getLogger(__name__)
+
 
 Color= {
         'RED' : '\033[31m' ,
@@ -28,12 +43,14 @@ Color= {
         'FAIL' : '\033[91m' ,
         'ENDC' : '\033[0m' }
 
+
 def coloring(message, color="OKGREEN"):
     assert color in Color.keys()
     if os.environ.get('PADDLECLAS_COLORING', False):
         return Color[color]+str(message)+Color["ENDC"]
     else:
         return message
+
 
 def anti_fleet(log):
     """
