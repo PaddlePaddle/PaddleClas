@@ -25,6 +25,7 @@ import random
 import cv2
 import numpy as np
 
+from autoargument import ImageNetPolicy
 
 class OperatorParamError(ValueError):
     """ OperatorParamError
@@ -170,6 +171,18 @@ class RandFlipImage(object):
             return cv2.flip(img, self.flip_code)
         else:
             return img
+
+class AA(object):
+     
+    def __init__(self):
+        self.policy = ImageNetPolicy()
+
+    def __call__(self,img):
+        from PIL import Image
+        img = np.ascontiguousarray(img)
+        img = Image.fromarray(img)
+        img = self.policy(img)
+        img = np.asarray(img)
 
 
 class NormalizeImage(object):
