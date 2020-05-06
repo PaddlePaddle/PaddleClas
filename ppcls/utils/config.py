@@ -64,14 +64,14 @@ def print_dict(d, delimiter=0):
     placeholder = "-" * 60
     for k, v in sorted(d.items()):
         if isinstance(v, dict):
-            logger.info("{}{} : ".format(delimiter * " ", k))
+            logger.info("{}{} : ".format(delimiter * " ", logger.coloring(k, "HEADER")))
             print_dict(v, delimiter + 4)
         elif isinstance(v, list) and len(v) >= 1 and isinstance(v[0], dict):
-            logger.info("{}{} : ".format(delimiter * " ", k))
+            logger.info("{}{} : ".format(delimiter * " ", logger.coloring(str(k),"HEADER")))
             for value in v:
                 print_dict(value, delimiter + 4)
         else:
-            logger.info("{}{} : {}".format(delimiter * " ", k, v))
+            logger.info("{}{} : {}".format(delimiter * " ", logger.coloring(k,"HEADER"), logger.coloring(v,"OKGREEN")))
 
         if k.isupper():
             logger.info(placeholder)

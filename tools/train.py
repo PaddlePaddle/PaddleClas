@@ -62,7 +62,7 @@ def main(args):
     startup_prog = fluid.Program()
     train_prog = fluid.Program()
 
-    best_top1_acc_list = (0.0, -1)  # (top1_acc, epoch_id)
+    best_top1_acc = 0.0  # best top1 acc record
 
     train_dataloader, train_fetchs = program.build(
         config, train_prog, startup_prog, is_train=True)
@@ -101,13 +101,15 @@ def main(args):
                 top1_acc = program.run(valid_dataloader, exe,
                                        compiled_valid_prog, valid_fetchs,
                                        epoch_id, 'valid')
-                if top1_acc > best_top1_acc_list[0]:
-                    best_top1_acc_list = (top1_acc, epoch_id)
-                    logger.info("Best top1 acc: {}, in epoch: {}".format(
-                        *best_top1_acc_list))
-                    model_path = os.path.join(config.model_save_dir,
+                if top1_acc > best_top1_acc:
+                    best_top1_acc = top1_acc
+                    message = "The best top1 acc {:.5f}, in epoch: {:d}".format(best_top1_acc, epoch_id)
+                    logger.info("{:s}".format(logger.coloring(message, "RED")))
+                    if epoch_id % config.save_interval==0:
+
+                        model_path = os.path.join(config.model_save_dir,
                                               config.ARCHITECTURE["name"])
-                    save_model(train_prog, model_path, "best_model")
+                        save_model(train_prog, model_path, "best_model_in_epoch_"+str(epoch_id))
 
             # 3. save the persistable model
             if epoch_id % config.save_interval == 0:
