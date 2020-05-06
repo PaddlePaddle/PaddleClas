@@ -86,7 +86,7 @@ def create_dataloader(feeds):
     return dataloader
 
 
-def create_model(architecture, image, classes_num):
+def create_model(architecture, image, classes_num, is_train):
     """
     Create a model
 
@@ -101,6 +101,8 @@ def create_model(architecture, image, classes_num):
     """
     name = architecture["name"]
     params = architecture.get("params", {})
+    params['is_test'] = not is_train
+    print(params)
     model = architectures.__dict__[name](**params)
     out = model.net(input=image, class_dim=classes_num)
     return out
@@ -323,7 +325,7 @@ def build(config, main_prog, startup_prog, is_train=True):
             feeds = create_feeds(config.image_shape, use_mix=use_mix)
             dataloader = create_dataloader(feeds.values())
             out = create_model(config.ARCHITECTURE, feeds['image'],
-                               config.classes_num)
+                               config.classes_num, is_train)
             fetchs = create_fetchs(
                 out,
                 feeds,
@@ -339,6 +341,12 @@ def build(config, main_prog, startup_prog, is_train=True):
                 fetchs['lr'] = (lr, AverageMeter('lr', 'f', need_avg=False))
                 optimizer = dist_optimizer(config, optimizer)
                 optimizer.minimize(fetchs['loss'][0])
+                if config.get('use_ema'):
+
+                    global_steps = fluid.layers.learning_rate_scheduler._decay_step_counter()
+                    ema = ExponentialMovingAverage(config.get('ema_decay'), thres_steps=global_steps)
+                    ema.update()
+                    fetchs['ema'] = ema
 
     return dataloader, fetchs
 
