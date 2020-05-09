@@ -59,9 +59,9 @@ MobileNetV3是Google于2019年提出的一种基于NAS的新的轻量级网络�
 | ShuffleNetV2_swish                   | 0.700   | 0.892   |                   |                   | 0.290        | 2.260             |
 
 
-## CPU预测速度和存储大小
+## 基于SD855的预测速度和存储大小
 
-| Models                               | batch_size=1(ms) | Storage Size(M) |
+| Models                               | Batch Size=1(ms) | Storage Size(M) |
 |:--:|:--:|:--:|
 | MobileNetV1_x0_25                    | 3.220            | 1.900           |
 | MobileNetV1_x0_5                     | 9.580            | 5.200           |
@@ -97,10 +97,9 @@ MobileNetV3是Google于2019年提出的一种基于NAS的新的轻量级网络�
 | ShuffleNetV2_swish                   | 16.023           | 9.100           |
 
 
-## T4 GPU预测速度
+## 基于T4 GPU的预测速度
 
-
-| Models                      | batch_size=1,fp16(ms) | batch_size=4,fp16(ms) | batch_size=8,fp16(ms) | batch_size=1,fp32(ms) | batch_size=4,fp32(ms) | batch_size=8,fp32(ms) |
+| Models            | FP16<br>Batch Size=1<br>(ms) | FP16<br>Batch Size=4<br>(ms) | FP16<br>Batch Size=8<br>(ms) | FP32<br>Batch Size=1<br>(ms) | FP32<br>Batch Size=4<br>(ms) | FP32<br>Batch Size=8<br>(ms) |
 |-----------------------------|-----------------------|-----------------------|-----------------------|-----------------------|-----------------------|-----------------------|
 | MobileNetV1_x0_25           | 0.68422               | 1.13021               | 1.72095               | 0.67274               | 1.226                 | 1.84096               |
 | MobileNetV1_x0_5            | 0.69326               | 1.09027               | 1.84746               | 0.69947               | 1.43045               | 2.39353               |

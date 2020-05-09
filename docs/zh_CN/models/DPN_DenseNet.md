@@ -53,7 +53,7 @@ DPN的全称是Dual Path Networks，即双通道网络。该网络是由DenseNet
 
 ## 基于T4 GPU的预测速度
 
-| Models      | Crop Size | Resize Short Size | FP16<br>batch_size=1<br>(ms) | FP16<br>batch_size=4<br>(ms) | FP16<br>batch_size=8<br>(ms) | FP32<br>batch_size=1<br>(ms) | FP32<br>batch_size=4<br>(ms) | FP32<br>batch_size=8<br>(ms) |
+| Models      | Crop Size | Resize Short Size | FP16<br>Batch Size=1<br>(ms) | FP16<br>Batch Size=4<br>(ms) | FP16<br>Batch Size=8<br>(ms) | FP32<br>Batch Size=1<br>(ms) | FP32<br>Batch Size=4<br>(ms) | FP32<br>Batch Size=8<br>(ms) |
 |-------------|-----------|-------------------|------------------------------|------------------------------|------------------------------|------------------------------|------------------------------|------------------------------|
 | DenseNet121 | 224       | 256               | 4.16436                      | 7.2126                       | 10.50221                     | 4.40447                      | 9.32623                      | 15.25175                     |
 | DenseNet161 | 224       | 256               | 9.27249                      | 14.25326                     | 20.19849                     | 10.39152                     | 22.15555                     | 35.78443                     |

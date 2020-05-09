@@ -37,7 +37,7 @@ InceptionV4是2016年由Google设计的新的神经网络，当时残差结构�
 
 ## 基于V100 GPU的预测速度
 
-| Models                 | Crop Size | Resize Short Size | Batch Size=1<br>(ms) |
+| Models                 | Crop Size | Resize Short Size | FP32<br>Batch Size=1<br>(ms) |
 |------------------------|-----------|-------------------|--------------------------|
 | GoogLeNet              | 224       | 256               | 1.807                    |
 | Xception41             | 299       | 320               | 3.972                    |
@@ -51,7 +51,7 @@ InceptionV4是2016年由Google设计的新的神经网络，当时残差结构�
 
 ## 基于T4 GPU的预测速度
 
-| Models             | Crop Size | Resize Short Size | FP16<br>batch_size=1<br>(ms) | FP16<br>batch_size=4<br>(ms) | FP16<br>batch_size=8<br>(ms) | FP32<br>batch_size=1<br>(ms) | FP32<br>batch_size=4<br>(ms) | FP32<br>batch_size=8<br>(ms) |
+| Models             | Crop Size | Resize Short Size | FP16<br>Batch Size=1<br>(ms) | FP16<br>Batch Size=4<br>(ms) | FP16<br>Batch Size=8<br>(ms) | FP32<br>Batch Size=1<br>(ms) | FP32<br>Batch Size=4<br>(ms) | FP32<br>Batch Size=8<br>(ms) |
 |--------------------|-----------|-------------------|------------------------------|------------------------------|------------------------------|------------------------------|------------------------------|------------------------------|
 | GoogLeNet          | 299       | 320               | 1.75451                      | 3.39931                      | 4.71909                      | 1.88038                      | 4.48882                      | 6.94035                      |
 | Xception41         | 299       | 320               | 2.91192                      | 7.86878                      | 15.53685                     | 4.96939                      | 17.01361                     | 32.67831                     |

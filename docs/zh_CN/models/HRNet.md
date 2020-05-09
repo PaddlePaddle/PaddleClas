@@ -44,7 +44,7 @@ HRNet是2019年由微软亚洲研究院提出的一种全新的神经网络，�
 
 ## 基于T4 GPU的预测速度
 
-| Models      | Crop Size | Resize Short Size | FP16<br>batch_size=1<br>(ms) | FP16<br>batch_size=4<br>(ms) | FP16<br>batch_size=8<br>(ms) | FP32<br>batch_size=1<br>(ms) | FP32<br>batch_size=4<br>(ms) | FP32<br>batch_size=8<br>(ms) |
+| Models      | Crop Size | Resize Short Size | FP16<br>Batch Size=1<br>(ms) | FP16<br>Batch Size=4<br>(ms) | FP16<br>Batch Size=8<br>(ms) | FP32<br>Batch Size=1<br>(ms) | FP32<br>Batch Size=4<br>(ms) | FP32<br>Batch Size=8<br>(ms) |
 |-------------|-----------|-------------------|------------------------------|------------------------------|------------------------------|------------------------------|------------------------------|------------------------------|
 | HRNet_W18_C | 224       | 256               | 6.79093                      | 11.50986                     | 17.67244                     | 7.40636                      | 13.29752                     | 23.33445                     |
 | HRNet_W30_C | 224       | 256               | 8.98077                      | 14.08082                     | 21.23527                     | 9.57594                      | 17.35485                     | 32.6933                      |

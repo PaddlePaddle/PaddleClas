@@ -21,7 +21,7 @@ ResNet系列模型是在2015年提出的，一举在ILSVRC2015比赛中取得冠
 
 通过上述曲线可以看出，层数越多，准确率越高，但是相应的参数量、计算量和延时都会增加。ResNet50_vd_ssld通过用更强的teacher和更多的数据，将其在ImageNet-1k上的验证集top-1精度进一步提高，达到了82.39%，刷新了ResNet50系列模型的精度。
 
-c
+
 ## 精度、FLOPS和参数量
 
 | Models           | Top1 | Top5 | Reference<br>top1 | Reference<br>top5 | FLOPS<br>(G) | Parameters<br>(M) |
@@ -68,7 +68,7 @@ c
 
 ## 基于T4 GPU的预测速度
 
-| Models            | Crop Size | Resize Short Size | FP16<br>batch_size=1<br>(ms) | FP16<br>batch_size=4<br>(ms) | FP16<br>batch_size=8<br>(ms) | FP32<br>batch_size=1<br>(ms) | FP32<br>batch_size=4<br>(ms) | FP32<br>batch_size=8<br>(ms) |
+| Models            | Crop Size | Resize Short Size | FP16<br>Batch Size=1<br>(ms) | FP16<br>Batch Size=4<br>(ms) | FP16<br>Batch Size=8<br>(ms) | FP32<br>Batch Size=1<br>(ms) | FP32<br>Batch Size=4<br>(ms) | FP32<br>Batch Size=8<br>(ms) |
 |-------------------|-----------|-------------------|------------------------------|------------------------------|------------------------------|------------------------------|------------------------------|------------------------------|
 | ResNet18          | 224       | 256               | 1.3568                       | 2.5225                       | 3.61904                      | 1.45606                      | 3.56305                      | 6.28798                      |
 | ResNet18_vd       | 224       | 256               | 1.39593                      | 2.69063                      | 3.88267                      | 1.54557                      | 3.85363                      | 6.88121                      |

@@ -84,7 +84,7 @@ Res2Net是2019年提出的一种全新的对ResNet的改进方案，该方案可
 
 ## 基于T4 GPU的预测速度
 
-| Models                | Crop Size | Resize Short Size | FP16<br>batch_size=1<br>(ms) | FP16<br>batch_size=4<br>(ms) | FP16<br>batch_size=8<br>(ms) | FP32<br>batch_size=1<br>(ms) | FP32<br>batch_size=4<br>(ms) | FP32<br>batch_size=8<br>(ms) |
+| Models                | Crop Size | Resize Short Size | FP16<br>Batch Size=1<br>(ms) | FP16<br>Batch Size=4<br>(ms) | FP16<br>Batch Size=8<br>(ms) | FP32<br>Batch Size=1<br>(ms) | FP32<br>Batch Size=4<br>(ms) | FP32<br>Batch Size=8<br>(ms) |
 |-----------------------|-----------|-------------------|------------------------------|------------------------------|------------------------------|------------------------------|------------------------------|------------------------------|
 | Res2Net50_26w_4s      | 224       | 256               | 3.56067                      | 6.61827                      | 11.41566                     | 4.47188                      | 9.65722                      | 17.54535                     |
 | Res2Net50_vd_26w_4s   | 224       | 256               | 3.69221                      | 6.94419                      | 11.92441                     | 4.52712                      | 9.93247                      | 18.16928                     |
