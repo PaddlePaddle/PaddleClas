@@ -18,6 +18,8 @@ ResNet系列模型是在2015年提出的，一举在ILSVRC2015比赛中取得冠
 
 ![](../../images/models/T4_benchmark/t4.fp32.bs4.ResNet.png)
 
+![](../../images/models/T4_benchmark/t4.fp16.bs4.ResNet.png)
+
 
 通过上述曲线可以看出，层数越多，准确率越高，但是相应的参数量、计算量和延时都会增加。ResNet50_vd_ssld通过用更强的teacher和更多的数据，将其在ImageNet-1k上的验证集top-1精度进一步提高，达到了82.39%，刷新了ResNet50系列模型的精度。
 

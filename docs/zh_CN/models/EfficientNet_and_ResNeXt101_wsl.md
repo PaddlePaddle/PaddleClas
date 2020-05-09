@@ -6,14 +6,15 @@ EfficientNet是Google于2019年发布的一个基于NAS的轻量级网络，其�
 ResNeXt是facebook于2016年提出的一种对ResNet的改进版网络。在2019年，facebook通过弱监督学习研究了该系列网络在ImageNet上的精度上限，为了区别之前的ResNeXt网络，该系列网络的后缀为wsl，其中wsl是弱监督学习（weakly-supervised-learning）的简称。为了能有更强的特征提取能力，研究者将其网络宽度进一步放大，其中最大的ResNeXt101_32x48d_wsl拥有8亿个参数，将其在9.4亿的弱标签图片下训练并在ImageNet-1k上做finetune，最终在ImageNet-1k的top-1达到了85.4%，这也是迄今为止在ImageNet-1k的数据集上以224x224的分辨率下精度最高的网络。Fix-ResNeXt中，作者使用了更大的图像分辨率，针对训练图片和验证图片数据预处理不一致的情况下做了专门的Fix策略，并使得ResNeXt101_32x48d_wsl拥有了更高的精度，由于其用到了Fix策略，故命名为Fix-ResNeXt101_32x48d_wsl。
 
 
-该系列模型的FLOPS、参数量以及T4 GPU
-上的预测耗时如下图所示。
+该系列模型的FLOPS、参数量以及T4 GPU上的预测耗时如下图所示。
 
 ![](../../images/models/T4_benchmark/t4.fp32.bs4.EfficientNet.flops.png)
 
 ![](../../images/models/T4_benchmark/t4.fp32.bs4.EfficientNet.params.png)
 
 ![](../../images/models/T4_benchmark/t4.fp32.bs1.EfficientNet.png)
+
+![](../../images/models/T4_benchmark/t4.fp16.bs1.EfficientNet.png)
 
 目前PaddleClas开源的这两类模型的预训练模型一共有14个。从上图中可以看出EfficientNet系列网络优势非常明显，ResNeXt101_wsl系列模型由于用到了更多的数据，最终的精度也更高。EfficientNet_B0_Small是去掉了SE_block的EfficientNet_B0，其具有更快的推理速度。
 

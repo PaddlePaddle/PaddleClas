@@ -12,6 +12,8 @@ DPN的全称是Dual Path Networks，即双通道网络。该网络是由DenseNet
 
 ![](../../images/models/T4_benchmark/t4.fp32.bs4.DPN.png)
 
+![](../../images/models/T4_benchmark/t4.fp16.bs4.DPN.png)
+
 目前PaddleClas开源的这两类模型的预训练模型一共有10个，其指标如上图所示，可以看到，在相同的FLOPS和参数量下，相比DenseNet，DPN拥有更高的精度。但是由于DPN有更多的分支，所以其推理速度要慢于DenseNet。由于DenseNet264的网络层数最深，所以该网络是DenseNet系列模型中参数量最大的网络，DenseNet161的网络的宽度最大，导致其是该系列中网络中计算量最大、精度最高的网络。从推理速度来看，计算量大且精度高的的DenseNet161比DenseNet264具有更快的速度，所以其比DenseNet264具有更大的优势。
 
 对于DPN系列网络，模型的FLOPS和参数量越大，模型的精度越高。其中，由于DPN107的网络宽度最大，所以其是该系列网络中参数量与计算量最大的网络。
