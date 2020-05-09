@@ -9,13 +9,13 @@ Xception 是 Google 继 Inception 后提出的对 InceptionV3 的另一种改进
 InceptionV4是2016年由Google设计的新的神经网络，当时残差结构风靡一时，但是作者认为仅使用Inception 结构也可以达到很高的性能。InceptionV4使用了更多的Inception module，在ImageNet上的精度再创新高。
 
 
-该系列模型的FLOPS、参数量以及FP32预测耗时如下图所示。
+该系列模型的FLOPS、参数量以及T4 GPU上的预测耗时如下图所示。
 
-![](../../images/models/Inception.png.flops.png)
+![](../../images/models/T4_benchmark/t4.fp32.bs4.Inception.flops.png)
 
-![](../../images/models/Inception.png.params.png)
+![](../../images/models/T4_benchmark/t4.fp32.bs4.Inception.params.png)
 
-![](../../images/models/Inception.png.fp32.png)
+![](../../images/models/T4_benchmark/t4.fp32.bs4.Inception.png)
 
 上图反映了Xception系列和InceptionV4的精度和其他指标的关系。其中Xception_deeplab与论文结构保持一致，Xception是PaddleClas的改进模型，在预测速度基本不变的情况下，精度提升约0.6%。关于该改进模型的详细介绍正在持续更新中，敬请期待。
 
@@ -35,14 +35,28 @@ InceptionV4是2016年由Google设计的新的神经网络，当时残差结构�
 
 
 
-## FP32预测速度
+## 基于V100 GPU的预测速度
 
 | Models                 | Crop Size | Resize Short Size | Batch Size=1<br>(ms) |
 |------------------------|-----------|-------------------|--------------------------|
 | GoogLeNet              | 224       | 256               | 1.807                    |
 | Xception41             | 299       | 320               | 3.972                    |
-| Xception41<br>_deeplab | 299       | 320               | 4.408                    |
+| Xception41_<br>deeplab | 299       | 320               | 4.408                    |
 | Xception65             | 299       | 320               | 6.174                    |
-| Xception65<br>_deeplab | 299       | 320               | 6.464                    |
+| Xception65_<br>deeplab | 299       | 320               | 6.464                    |
 | Xception71             | 299       | 320               | 6.782                    |
 | InceptionV4            | 299       | 320               | 11.141                   |
+
+
+
+## 基于T4 GPU的预测速度
+
+| Models             | Crop Size | Resize Short Size | FP16<br>batch_size=1<br>(ms) | FP16<br>batch_size=4<br>(ms) | FP16<br>batch_size=8<br>(ms) | FP32<br>batch_size=1<br>(ms) | FP32<br>batch_size=4<br>(ms) | FP32<br>batch_size=8<br>(ms) |
+|--------------------|-----------|-------------------|------------------------------|------------------------------|------------------------------|------------------------------|------------------------------|------------------------------|
+| GoogLeNet          | 299       | 320               | 1.75451                      | 3.39931                      | 4.71909                      | 1.88038                      | 4.48882                      | 6.94035                      |
+| Xception41         | 299       | 320               | 2.91192                      | 7.86878                      | 15.53685                     | 4.96939                      | 17.01361                     | 32.67831                     |
+| Xception41_<br>deeplab | 299       | 320               | 2.85934                      | 7.2075                       | 14.01406                     | 5.33541                      | 17.55938                     | 33.76232                     |
+| Xception65         | 299       | 320               | 4.30126                      | 11.58371                     | 23.22213                     | 7.26158                      | 25.88778                     | 53.45426                     |
+| Xception65_<br>deeplab | 299       | 320               | 4.06803                      | 9.72694                      | 19.477                       | 7.60208                      | 26.03699                     | 54.74724                     |
+| Xception71         | 299       | 320               | 4.80889                      | 13.5624                      | 27.18822                     | 8.72457                      | 31.55549                     | 69.31018                     |
+| InceptionV4        | 299       | 320               | 9.50821                      | 13.72104                     | 20.27447                     | 12.99342                     | 25.23416                     | 43.56121                     |
