@@ -188,7 +188,11 @@ def partial_reader(params, full_lines, part_id=0, part_num=1):
     def reader():
         ops = create_operators(params['transforms'])
         for line in full_lines:
-            img_path, label = line.split()
+            try:
+                delimiter = params['delimiter']
+            except KeyError:
+                delimiter = " "
+            img_path, label = line.split(delimiter)
             img_path = os.path.join(params['data_dir'], img_path)
             with open(img_path, 'rb') as f:
                 img = f.read()
