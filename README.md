@@ -20,7 +20,7 @@
     <img src="./docs/images/models/T4_benchmark/t4.fp32.bs4.main_fps_top1.png" width="700">
 </div>
 
-上图对比了一些最新的面向服务器端应用场景的模型，在使用V100，FP32和TensorRT预测一张图像的时间和其准确率，图中准确率82.4%的ResNet50_vd_ssld和83.7%的ResNet101_vd_ssld，是采用PaddleClas提供的SSLD知识蒸馏方案训练的模型。图中相同颜色和符号的点代表同一系列不同规模的模型。不同模型的简介、FLOPS、Parameters以及详细的GPU预测时间请参考文档教程中的[**模型库章节**](https://paddleclas.readthedocs.io/zh_CN/latest/models/models_intro.html)。
+上图对比了一些最新的面向服务器端应用场景的模型，在使用T4，FP32和TensorRT，batch size为4时的预测时间及其准确率，图中准确率82.4%的ResNet50_vd_ssld和83.7%的ResNet101_vd_ssld，是采用PaddleClas提供的SSLD知识蒸馏方案训练的模型。图中相同颜色和符号的点代表同一系列不同规模的模型。不同模型的简介、FLOPS、Parameters以及详细的GPU预测时间请参考文档教程中的[**模型库章节**](https://paddleclas.readthedocs.io/zh_CN/latest/models/models_intro.html)。
 
 <div align="center">
 <img
