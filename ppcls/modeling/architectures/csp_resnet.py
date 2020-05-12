@@ -22,10 +22,10 @@ import paddle
 import paddle.fluid as fluid
 from paddle.fluid.param_attr import ParamAttr
 
-__all__ = ["CSPNetNet50", ]
+__all__ = ["CSPResNet50", ]
 
 
-class CSPNetNet():
+class CSPResNet():
     def __init__(self, layers=50):
         self.layers = layers
 
@@ -39,7 +39,7 @@ class CSPNetNet():
         if layers == 18:
             depth = [2, 2, 2, 2]
         elif layers == 34 or layers == 50:
-            depth = [3, 3, 5, 3]
+            depth = [3, 3, 5, 2]
         elif layers == 101:
             depth = [3, 4, 23, 3]
         elif layers == 152:
@@ -51,14 +51,14 @@ class CSPNetNet():
             num_filters=64,
             filter_size=7,
             stride=2,
-            act='relu',
+            act='leaky',
             name="conv1",
             data_format=data_format)
         conv = fluid.layers.pool2d(
             input=conv,
-            pool_size=3,
+            pool_size=2,
             pool_stride=2,
-            pool_padding=1,
+            pool_padding=0,
             pool_type='max',
             data_format=data_format)
 
@@ -68,7 +68,7 @@ class CSPNetNet():
                 if block != 0:
                     conv = self.conv_bn_layer(
                         input=conv,
-                        num_filters=num_filters[block] * 2,
+                        num_filters=num_filters[block],
                         filter_size=3,
                         stride=2,
                         act="leaky_relu",
@@ -76,15 +76,19 @@ class CSPNetNet():
                         data_format=data_format)
 
                 # layer warp
-                #                 left = conv
-                #                 right = conv
-                left, right = fluid.layers.split(
-                    conv,
-                    num_or_sections=[conv.shape[1] // 2, conv.shape[1] // 2],
-                    dim=1)
+                #                 left, right = fluid.layers.split(
+                #                     conv,
+                #                     num_or_sections=[conv.shape[1]//2, conv.shape[1]//2],
+                #                     dim=1)
+                left = conv
+                right = conv
+                if block == 0:
+                    ch = num_filters[block]
+                else:
+                    ch = num_filters[block] * 2
                 right = self.conv_bn_layer(
                     input=right,
-                    num_filters=num_filters[block] * 4,
+                    num_filters=ch,
                     filter_size=1,
                     act="leaky_relu",
                     name=conv_name + "_right_first_route",
@@ -159,7 +163,7 @@ class CSPNetNet():
             stride=stride,
             padding=(filter_size - 1) // 2,
             groups=groups,
-            act=act,
+            act=None,
             param_attr=ParamAttr(name=name + "_weights"),
             bias_attr=False,
             name=name + '.conv2d.output.1',
@@ -178,6 +182,10 @@ class CSPNetNet():
             moving_mean_name=bn_name + '_mean',
             moving_variance_name=bn_name + '_variance',
             data_layout=data_format)
+        if act == "relu":
+            bn = fluid.layers.relu(bn)
+        elif act == "leaky_relu":
+            bn = fluid.layers.leaky_relu(bn)
         return bn
 
     def shortcut(self, input, ch_out, stride, is_first, name, data_format):
@@ -228,6 +236,6 @@ class CSPNetNet():
         return ret
 
 
-def CSPNetNet50():
-    model = CSPNetNet(layers=50)
+def CSPResNet50():
+    model = CSPResNet(layers=50)
     return model
