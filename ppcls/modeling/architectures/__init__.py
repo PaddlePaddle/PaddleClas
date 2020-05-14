@@ -46,4 +46,4 @@ from .resnet_acnet import ResNet18_ACNet, ResNet34_ACNet, ResNet50_ACNet, ResNet
 # distillation model
 from .distillation_models import ResNet50_vd_distill_MobileNetV3_large_x1_0, ResNeXt101_32x16d_wsl_distill_ResNet50_vd
 
-from .csp_resnet import *
+from .csp_resnet import CSPResNet50, CSPResNet101
