@@ -34,7 +34,7 @@ class Loss(object):
 
     def _labelsmoothing(self, target):
         if target.shape[-1] != self._class_dim:
-            one_hot_target = fluid.layers.one_hot(
+            one_hot_target = fluid.one_hot(
                 input=target, depth=self._class_dim)
         else:
             one_hot_target = target
