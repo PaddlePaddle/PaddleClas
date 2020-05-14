@@ -18,11 +18,10 @@ from __future__ import print_function
 
 import math
 
-import paddle
 import paddle.fluid as fluid
 from paddle.fluid.param_attr import ParamAttr
 
-__all__ = ["CSPResNet50", ]
+__all__ = ["CSPResNet50", "CSPResNet101"]
 
 
 class CSPResNet():
@@ -31,19 +30,16 @@ class CSPResNet():
 
     def net(self, input, class_dim=1000, data_format="NCHW"):
         layers = self.layers
-        supported_layers = [18, 34, 50, 101, 152]
+        supported_layers = [50, 101]
         assert layers in supported_layers, \
             "supported layers are {} but input layer is {}".format(
                 supported_layers, layers)
 
-        if layers == 18:
-            depth = [2, 2, 2, 2]
-        elif layers == 34 or layers == 50:
+        if layers == 50:
             depth = [3, 3, 5, 2]
         elif layers == 101:
-            depth = [3, 4, 23, 3]
-        elif layers == 152:
-            depth = [3, 8, 36, 3]
+            depth = [3, 3, 22, 2]
+
         num_filters = [64, 128, 256, 512]
 
         conv = self.conv_bn_layer(
@@ -62,75 +58,68 @@ class CSPResNet():
             pool_type='max',
             data_format=data_format)
 
-        if layers >= 50:
-            for block in range(len(depth)):
-                conv_name = "res" + str(block + 2) + chr(97)
-                if block != 0:
-                    conv = self.conv_bn_layer(
-                        input=conv,
-                        num_filters=num_filters[block],
-                        filter_size=3,
-                        stride=2,
-                        act="leaky_relu",
-                        name=conv_name + "_downsample",
-                        data_format=data_format)
-
-                # layer warp
-                #                 left, right = fluid.layers.split(
-                #                     conv,
-                #                     num_or_sections=[conv.shape[1]//2, conv.shape[1]//2],
-                #                     dim=1)
-                left = conv
-                right = conv
-                if block == 0:
-                    ch = num_filters[block]
-                else:
-                    ch = num_filters[block] * 2
-                right = self.conv_bn_layer(
-                    input=right,
-                    num_filters=ch,
-                    filter_size=1,
-                    act="leaky_relu",
-                    name=conv_name + "_right_first_route",
-                    data_format=data_format)
-
-                for i in range(depth[block]):
-                    conv_name = "res" + str(block + 2) + chr(97 + i)
-
-                    right = self.bottleneck_block(
-                        input=right,
-                        num_filters=num_filters[block],
-                        stride=1,
-                        name=conv_name,
-                        data_format=data_format)
-
-                # route
-                left = self.conv_bn_layer(
-                    input=left,
-                    num_filters=num_filters[block] * 2,
-                    filter_size=1,
-                    act="leaky_relu",
-                    name=conv_name + "_left_route",
-                    data_format=data_format)
-                right = self.conv_bn_layer(
-                    input=right,
-                    num_filters=num_filters[block] * 2,
-                    filter_size=1,
-                    act="leaky_relu",
-                    name=conv_name + "_right_route",
-                    data_format=data_format)
-                conv = fluid.layers.concat([left, right], axis=1)
-
+        for block in range(len(depth)):
+            conv_name = "res" + str(block + 2) + chr(97)
+            if block != 0:
                 conv = self.conv_bn_layer(
                     input=conv,
-                    num_filters=num_filters[block] * 2,
-                    filter_size=1,
-                    stride=1,
+                    num_filters=num_filters[block],
+                    filter_size=3,
+                    stride=2,
                     act="leaky_relu",
-                    name=conv_name + "_merged_transition",
+                    name=conv_name + "_downsample",
                     data_format=data_format)
-        else:
-            assert False, "not implemented now!!!"
+
+            # split
+            left = conv
+            right = conv
+            if block == 0:
+                ch = num_filters[block]
+            else:
+                ch = num_filters[block] * 2
+            right = self.conv_bn_layer(
+                input=right,
+                num_filters=ch,
+                filter_size=1,
+                act="leaky_relu",
+                name=conv_name + "_right_first_route",
+                data_format=data_format)
+
+            for i in range(depth[block]):
+                conv_name = "res" + str(block + 2) + chr(97 + i)
+
+                right = self.bottleneck_block(
+                    input=right,
+                    num_filters=num_filters[block],
+                    stride=1,
+                    name=conv_name,
+                    data_format=data_format)
+
+            # route
+            left = self.conv_bn_layer(
+                input=left,
+                num_filters=num_filters[block] * 2,
+                filter_size=1,
+                act="leaky_relu",
+                name=conv_name + "_left_route",
+                data_format=data_format)
+            right = self.conv_bn_layer(
+                input=right,
+                num_filters=num_filters[block] * 2,
+                filter_size=1,
+                act="leaky_relu",
+                name=conv_name + "_right_route",
+                data_format=data_format)
+            conv = fluid.layers.concat([left, right], axis=1)
+
+            conv = self.conv_bn_layer(
+                input=conv,
+                num_filters=num_filters[block] * 2,
+                filter_size=1,
+                stride=1,
+                act="leaky_relu",
+                name=conv_name + "_merged_transition",
+                data_format=data_format)
 
         pool = fluid.layers.pool2d(
             input=conv,
@@ -193,7 +182,7 @@ class CSPResNet():
             ch_in = input.shape[1]
         else:
             ch_in = input.shape[-1]
-        if ch_in != ch_out or stride != 1 or is_first == True:
+        if ch_in != ch_out or stride != 1 or is_first is True:
             return self.conv_bn_layer(
                 input, ch_out, 1, stride, name=name, data_format=data_format)
         else:
@@ -238,4 +227,9 @@ class CSPResNet():
 
 def CSPResNet50():
     model = CSPResNet(layers=50)
+    return model
+
+
+def CSPResNet101():
+    model = CSPResNet(layers=101)
     return model
