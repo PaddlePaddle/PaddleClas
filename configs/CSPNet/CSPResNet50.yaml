@@ -1,6 +1,6 @@
 mode: 'train'
 ARCHITECTURE:
-    name: 'CSPResNet50'
+    name: 'CSPResNet50_leaky'
 
 pretrained_model: ""
 model_save_dir: "./output/"

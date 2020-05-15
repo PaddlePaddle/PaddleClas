@@ -21,12 +21,16 @@ import math
 import paddle.fluid as fluid
 from paddle.fluid.param_attr import ParamAttr
 
-__all__ = ["CSPResNet50", "CSPResNet101"]
+__all__ = [
+    "CSPResNet50_leaky", "CSPResNet50_mish", "CSPResNet101_leaky",
+    "CSPResNet101_mish"
+]
 
 
 class CSPResNet():
-    def __init__(self, layers=50):
+    def __init__(self, layers=50, act="leaky_relu"):
         self.layers = layers
+        self.act = act
 
     def net(self, input, class_dim=1000, data_format="NCHW"):
         layers = self.layers
@@ -47,7 +51,7 @@ class CSPResNet():
             num_filters=64,
             filter_size=7,
             stride=2,
-            act='leaky',
+            act=self.act,
             name="conv1",
             data_format=data_format)
         conv = fluid.layers.pool2d(
@@ -66,7 +70,7 @@ class CSPResNet():
                     num_filters=num_filters[block],
                     filter_size=3,
                     stride=2,
-                    act="leaky_relu",
+                    act=self.act,
                     name=conv_name + "_downsample",
                     data_format=data_format)
 
@@ -81,7 +85,7 @@ class CSPResNet():
                 input=right,
                 num_filters=ch,
                 filter_size=1,
-                act="leaky_relu",
+                act=self.act,
                 name=conv_name + "_right_first_route",
                 data_format=data_format)
 
@@ -100,14 +104,14 @@ class CSPResNet():
                 input=left,
                 num_filters=num_filters[block] * 2,
                 filter_size=1,
-                act="leaky_relu",
+                act=self.act,
                 name=conv_name + "_left_route",
                 data_format=data_format)
             right = self.conv_bn_layer(
                 input=right,
                 num_filters=num_filters[block] * 2,
                 filter_size=1,
-                act="leaky_relu",
+                act=self.act,
                 name=conv_name + "_right_route",
                 data_format=data_format)
             conv = fluid.layers.concat([left, right], axis=1)
@@ -117,7 +121,7 @@ class CSPResNet():
                 num_filters=num_filters[block] * 2,
                 filter_size=1,
                 stride=1,
-                act="leaky_relu",
+                act=self.act,
                 name=conv_name + "_merged_transition",
                 data_format=data_format)
 
@@ -175,7 +179,16 @@ class CSPResNet():
             bn = fluid.layers.relu(bn)
         elif act == "leaky_relu":
             bn = fluid.layers.leaky_relu(bn)
+        elif act == "mish":
+            bn = self._mish(bn)
         return bn
+
+    def _mish(self, input):
+        return input * fluid.layers.tanh(self._softplus(input))
+
+    def _softplus(self, input):
+        expf = fluid.layers.exp(fluid.layers.clip(input, -200, 50))
+        return fluid.layers.log(1 + expf)
 
     def shortcut(self, input, ch_out, stride, is_first, name, data_format):
         if data_format == 'NCHW':
@@ -225,11 +238,21 @@ class CSPResNet():
         return ret
 
 
-def CSPResNet50():
-    model = CSPResNet(layers=50)
+def CSPResNet50_leaky():
+    model = CSPResNet(layers=50, act="leaky_relu")
     return model
 
 
-def CSPResNet101():
-    model = CSPResNet(layers=101)
+def CSPResNet50_mish():
+    model = CSPResNet(layers=50, act="mish")
+    return model
+
+
+def CSPResNet101_leaky():
+    model = CSPResNet(layers=101, act="leaky_relu")
+    return model
+
+
+def CSPResNet101_mish():
+    model = CSPResNet(layers=101, act="mish")
     return model
