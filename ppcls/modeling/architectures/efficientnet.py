@@ -1,16 +1,16 @@
-#copyright (c) 2020 PaddlePaddle Authors. All Rights Reserve.
+# copyright (c) 2020 PaddlePaddle Authors. All Rights Reserve.
 #
-#Licensed under the Apache License, Version 2.0 (the "License");
-#you may not use this file except in compliance with the License.
-#You may obtain a copy of the License at
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
 #
 #    http://www.apache.org/licenses/LICENSE-2.0
 #
-#Unless required by applicable law or agreed to in writing, software
-#distributed under the License is distributed on an "AS IS" BASIS,
-#WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#See the License for the specific language governing permissions and
-#limitations under the License.
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
 from __future__ import absolute_import
 from __future__ import division
@@ -201,7 +201,8 @@ class EfficientNet():
 
     def _expand_conv_norm(self, inputs, block_args, is_test, name=None):
         # Expansion phase
-        oup = block_args.input_filters * block_args.expand_ratio  # number of output channels
+        oup = block_args.input_filters * \
+            block_args.expand_ratio  # number of output channels
 
         if block_args.expand_ratio != 1:
             conv = self.conv_bn_layer(
@@ -223,7 +224,8 @@ class EfficientNet():
         s = block_args.stride
         if isinstance(s, list) or isinstance(s, tuple):
             s = s[0]
-        oup = block_args.input_filters * block_args.expand_ratio  # number of output channels
+        oup = block_args.input_filters * \
+            block_args.expand_ratio  # number of output channels
 
         conv = self.conv_bn_layer(
             inputs,
@@ -326,7 +328,8 @@ class EfficientNet():
                       drop_connect_rate=None,
                       name=None):
         # Expansion and Depthwise Convolution
-        oup = block_args.input_filters * block_args.expand_ratio  # number of output channels
+        oup = block_args.input_filters * \
+            block_args.expand_ratio  # number of output channels
         has_se = self.use_se and (block_args.se_ratio is not None) and (
             0 < block_args.se_ratio <= 1)
         id_skip = block_args.id_skip  # skip connection and drop connect
