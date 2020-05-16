@@ -46,7 +46,6 @@ def _mkdir_if_not_exist(path):
 
 
 def _load_state(path):
-    logger.info("path: {}".format(path))
     if os.path.exists(path + '.pdopt'):
         # XXX another hack to ignore the optimizer state
         tmp = tempfile.mkdtemp()
@@ -55,7 +54,6 @@ def _load_state(path):
         state = fluid.io.load_program_state(dst)
         shutil.rmtree(tmp)
     else:
-        logger.info("path: {}".format(path))
         state = fluid.io.load_program_state(path)
     return state
 
@@ -69,7 +67,8 @@ def load_params(exe, prog, path, ignore_params=None):
         path (string): URL string or loca model path.
         ignore_params (list): ignore variable to load when finetuning.
             It can be specified by finetune_exclude_pretrained_params
-            and the usage can refer to docs/advanced_tutorials/TRANSFER_LEARNING.md
+            and the usage can refer to the document
+            docs/advanced_tutorials/TRANSFER_LEARNING.md
     """
     if not (os.path.isdir(path) or os.path.exists(path + '.pdparams')):
         raise ValueError("Model pretrain path {} does not "
