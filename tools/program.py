@@ -297,6 +297,19 @@ def dist_optimizer(config, optimizer):
     return optimizer
 
 
+def mixed_precision_optimizer(config, optimizer):
+    use_fp16 = config.get('use_fp16', False)
+    amp_scale_loss = config.get('amp_scale_loss', 1.0)
+    use_dynamic_loss_scaling = config.get('use_dynamic_loss_scaling', False)
+    if use_fp16:
+        optimizer = fluid.contrib.mixed_precision.decorate(
+            optimizer,
+            init_loss_scaling=amp_scale_loss,
+            use_dynamic_loss_scaling=use_dynamic_loss_scaling)
+
+    return optimizer
+
+
 def build(config, main_prog, startup_prog, is_train=True):
     """
     Build a program using a model and an optimizer
@@ -337,6 +350,8 @@ def build(config, main_prog, startup_prog, is_train=True):
                 optimizer = create_optimizer(config)
                 lr = optimizer._global_learning_rate()
                 fetchs['lr'] = (lr, AverageMeter('lr', 'f', need_avg=False))
+
+                optimizer = mixed_precision_optimizer(config, optimizer)
                 optimizer = dist_optimizer(config, optimizer)
                 optimizer.minimize(fetchs['loss'][0])
 
@@ -396,7 +411,7 @@ def run(dataloader, exe, program, fetchs, epoch=0, mode='train'):
         for i, m in enumerate(metrics):
             metric_list[i].update(m[0], len(batch[0]))
         fetchs_str = ''.join([str(m.value) + ' '
-                              for m in metric_list] + [batch_time.value])+'s'
+                              for m in metric_list] + [batch_time.value]) + 's'
         if mode == 'eval':
             logger.info("{:s} step:{:<4d} {:s}s".format(mode, idx, fetchs_str))
         else:
@@ -404,16 +419,22 @@ def run(dataloader, exe, program, fetchs, epoch=0, mode='train'):
             step_str = "{:s} step:{:<4d}".format(mode, idx)
 
             logger.info("{:s} {:s} {:s}".format(
-                logger.coloring(epoch_str, "HEADER") if idx==0 else epoch_str, logger.coloring(step_str,"PURPLE"), logger.coloring(fetchs_str,'OKGREEN')))
+                logger.coloring(epoch_str, "HEADER")
+                if idx == 0 else epoch_str,
+                logger.coloring(step_str, "PURPLE"),
+                logger.coloring(fetchs_str, 'OKGREEN')))
 
     end_str = ''.join([str(m.mean) + ' '
-                       for m in metric_list] + [batch_time.total])+'s'
+                       for m in metric_list] + [batch_time.total]) + 's'
     if mode == 'eval':
         logger.info("END {:s} {:s}s".format(mode, end_str))
     else:
         end_epoch_str = "END epoch:{:<3d}".format(epoch)
 
-        logger.info("{:s} {:s} {:s}".format(logger.coloring(end_epoch_str,"RED"), logger.coloring(mode,"PURPLE"), logger.coloring(end_str,"OKGREEN")))
+        logger.info("{:s} {:s} {:s}".format(
+            logger.coloring(end_epoch_str, "RED"),
+            logger.coloring(mode, "PURPLE"),
+            logger.coloring(end_str, "OKGREEN")))
 
     # return top1_acc in order to save the best model
     if mode == 'valid':
