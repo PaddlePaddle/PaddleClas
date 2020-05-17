@@ -74,7 +74,7 @@ def load_params(exe, prog, path, ignore_params=None):
         raise ValueError("Model pretrain path {} does not "
                          "exists.".format(path))
 
-    logger.info('Loading parameters from {}...'.format(path))
+    logger.info(logger.coloring('Loading parameters from {}...'.format(path), 'HEADER'))
 
     ignore_set = set()
     state = _load_state(path)
@@ -100,7 +100,7 @@ def load_params(exe, prog, path, ignore_params=None):
     if len(ignore_set) > 0:
         for k in ignore_set:
             if k in state:
-                logger.warning('variable {} not used'.format(k))
+                logger.warning('variable {} is already excluded automatically'.format(k))
                 del state[k]
 
     fluid.io.set_program_state(prog, state)
@@ -113,7 +113,7 @@ def init_model(config, program, exe):
     checkpoints = config.get('checkpoints')
     if checkpoints:
         fluid.load(program, checkpoints, exe)
-        logger.info("Finish initing model from {}".format(checkpoints))
+        logger.info(logger.coloring("Finish initing model from {}".format(checkpoints),"HEADER"))
         return
 
     pretrained_model = config.get('pretrained_model')
@@ -122,7 +122,7 @@ def init_model(config, program, exe):
             pretrained_model = [pretrained_model]
         for pretrain in pretrained_model:
             load_params(exe, program, pretrain)
-        logger.info("Finish initing model from {}".format(pretrained_model))
+        logger.info(logger.coloring("Finish initing model from {}".format(pretrained_model),"HEADER"))
 
 
 def save_model(program, model_path, epoch_id, prefix='ppcls'):
@@ -133,4 +133,4 @@ def save_model(program, model_path, epoch_id, prefix='ppcls'):
     _mkdir_if_not_exist(model_path)
     model_prefix = os.path.join(model_path, prefix)
     fluid.save(program, model_prefix)
-    logger.info("Already save model in {}".format(model_path))
+    logger.info(logger.coloring("Already save model in {}".format(model_path),"HEADER"))

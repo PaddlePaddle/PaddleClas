@@ -23,7 +23,8 @@ python tools/infer/predict.py \
     --batch_size=1
 ```
 
-![](../../images/models/main_fps_top1.png)
+![](../../images/models/T4_benchmark/t4.fp32.bs4.main_fps_top1.png)
+
 ![](../../images/models/mobile_arm_top1.png)
 
 
@@ -193,7 +194,7 @@ python tools/infer/predict.py \
     - [VGG16](https://paddle-imagenet-models-name.bj.bcebos.com/VGG16_pretrained.tar)
     - [VGG19](https://paddle-imagenet-models-name.bj.bcebos.com/VGG19_pretrained.tar)
   - DarkNet系列<sup>[[21](#ref21)]</sup>([论文地址](https://arxiv.org/abs/1506.02640))
-    - [DarkNet53](https://paddle-imagenet-models-name.bj.bcebos.com/DarkNet53_pretrained.tar)
+    - [DarkNet53](https://paddle-imagenet-models-name.bj.bcebos.com/DarkNet53_ImageNet1k_pretrained.tar)
   - ACNet系列<sup>[[22](#ref22)]</sup>([论文地址](https://arxiv.org/abs/1908.03930))
     - [ResNet50_ACNet_deploy](https://paddle-imagenet-models-name.bj.bcebos.com/ResNet50_ACNet_deploy_pretrained.tar)
 

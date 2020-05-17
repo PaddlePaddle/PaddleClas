@@ -14,15 +14,48 @@
 
 import logging
 import os
+import datetime
 
-logging.basicConfig(level=logging.INFO)
+from imp import reload
+reload(logging)
+
+logging.basicConfig(level=logging.INFO, 
+                    format="%(asctime)s %(levelname)s: %(message)s",
+                    datefmt = "%Y-%m-%d %H:%M:%S")
+
+
+def time_zone(sec, fmt):
+    real_time = datetime.datetime.now() + datetime.timedelta(hours=8)
+    return real_time.timetuple()
+
+
+logging.Formatter.converter = time_zone
 _logger = logging.getLogger(__name__)
+
+
+Color= {
+        'RED' : '\033[31m' ,
+        'HEADER' : '\033[35m' , # deep purple
+        'PURPLE' : '\033[95m' ,# purple
+        'OKBLUE' : '\033[94m' ,
+        'OKGREEN' : '\033[92m' ,
+        'WARNING' : '\033[93m' ,
+        'FAIL' : '\033[91m' ,
+        'ENDC' : '\033[0m' }
+
+
+def coloring(message, color="OKGREEN"):
+    assert color in Color.keys()
+    if os.environ.get('PADDLECLAS_COLORING', False):
+        return Color[color]+str(message)+Color["ENDC"]
+    else:
+        return message
 
 
 def anti_fleet(log):
     """
-    Because of the fucking Fleet, logs will print multi-times.
-    So we only display one of them and ignore the others.
+    logs will print multi-times when calling Fleet API.
+    Only display single log and ignore the others.
     """
 
     def wrapper(fmt, *args):
@@ -39,12 +72,12 @@ def info(fmt, *args):
 
 @anti_fleet
 def warning(fmt, *args):
-    _logger.warning(fmt, *args)
+    _logger.warning(coloring(fmt, "RED"), *args)
 
 
 @anti_fleet
 def error(fmt, *args):
-    _logger.error(fmt, *args)
+    _logger.error(coloring(fmt, "FAIL"), *args)
 
 
 def advertise():
@@ -66,7 +99,7 @@ def advertise():
     website = "https://github.com/PaddlePaddle/PaddleClas"
     AD_LEN = 6 + len(max([copyright, ad, website], key=len))
 
-    info("\n{0}\n{1}\n{2}\n{3}\n{4}\n{5}\n{6}\n{7}\n".format(
+    info(coloring("\n{0}\n{1}\n{2}\n{3}\n{4}\n{5}\n{6}\n{7}\n".format(
         "=" * (AD_LEN + 4),
         "=={}==".format(copyright.center(AD_LEN)),
         "=" * (AD_LEN + 4),
@@ -74,4 +107,4 @@ def advertise():
         "=={}==".format(ad.center(AD_LEN)),
         "=={}==".format(' ' * AD_LEN),
         "=={}==".format(website.center(AD_LEN)),
-        "=" * (AD_LEN + 4), ))
+        "=" * (AD_LEN + 4), ),"RED"))

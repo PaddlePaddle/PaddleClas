@@ -288,7 +288,7 @@ class EfficientNet():
             name=conv_name,
             use_bias=use_bias)
 
-        if use_bn == False:
+        if use_bn is False:
             return conv
         else:
             bn_name = name + bn_name
@@ -350,8 +350,11 @@ class EfficientNet():
         conv = self._project_conv_norm(conv, block_args, is_test, name)
 
         # Skip connection and drop connect
-        input_filters, output_filters = block_args.input_filters, block_args.output_filters
-        if id_skip and block_args.stride == 1 and input_filters == output_filters:
+        input_filters = block_args.input_filters
+        output_filters = block_args.output_filters
+        if id_skip and \
+                block_args.stride == 1 and \
+                input_filters == output_filters:
             if drop_connect_rate:
                 conv = self._drop_connect(conv, drop_connect_rate,
                                           self.is_test)
@@ -416,7 +419,8 @@ class EfficientNet():
                 num_repeat=round_repeats(block_args.num_repeat,
                                          self._global_params))
 
-            # The first block needs to take care of stride and filter size increase.
+            # The first block needs to take care of stride,
+            # and filter size increase.
             drop_connect_rate = self._global_params.drop_connect_rate
             if drop_connect_rate:
                 drop_connect_rate *= float(idx) / block_size
@@ -444,7 +448,9 @@ class EfficientNet():
 
 
 class BlockDecoder(object):
-    """ Block Decoder for readability, straight from the official TensorFlow repository """
+    """
+    Block Decoder, straight from the official TensorFlow repository.
+    """
 
     @staticmethod
     def _decode_block_string(block_string):
@@ -460,9 +466,10 @@ class BlockDecoder(object):
                 options[key] = value
 
         # Check stride
-        assert (
-            ('s' in options and len(options['s']) == 1) or
-            (len(options['s']) == 2 and options['s'][0] == options['s'][1]))
+        cond_1 = ('s' in options and len(options['s']) == 1)
+        cond_2 = ((len(options['s']) == 2)
+                  and (options['s'][0] == options['s'][1]))
+        assert (cond_1 or cond_2)
 
         return BlockArgs(
             kernel_size=int(options['k']),
@@ -491,10 +498,11 @@ class BlockDecoder(object):
     @staticmethod
     def decode(string_list):
         """
-        Decodes a list of string notations to specify blocks inside the network.
+        Decode a list of string notations to specify blocks in the network.
 
-        :param string_list: a list of strings, each string is a notation of block
-        :return: a list of BlockArgs namedtuples of block args
+        string_list: list of strings, each string is a notation of block
+        return
+            list of BlockArgs namedtuples of block args
         """
         assert isinstance(string_list, list)
         blocks_args = []
@@ -520,6 +528,19 @@ def EfficientNetB0(is_test=False,
                    padding_type='SAME',
                    override_params=None,
                    use_se=True):
+    model = EfficientNet(
+        name='b0',
+        is_test=is_test,
+        padding_type=padding_type,
+        override_params=override_params,
+        use_se=use_se)
+    return model
+
+
+def EfficientNetB0_small(is_test=False,
+                         padding_type='DYNAMIC',
+                         override_params=None,
+                         use_se=False):
     model = EfficientNet(
         name='b0',
         is_test=is_test,
