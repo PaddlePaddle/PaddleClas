@@ -1,16 +1,16 @@
 # Copyright (c) 2020 PaddlePaddle Authors. All Rights Reserve.
 #
-#Licensed under the Apache License, Version 2.0 (the "License");
-#you may not use this file except in compliance with the License.
-#You may obtain a copy of the License at
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
 #
 #    http://www.apache.org/licenses/LICENSE-2.0
 #
-#Unless required by applicable law or agreed to in writing, software
-#distributed under the License is distributed on an "AS IS" BASIS,
-#WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#See the License for the specific language governing permissions and
-#limitations under the License.
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
 from __future__ import absolute_import
 from __future__ import division
@@ -18,10 +18,10 @@ from __future__ import print_function
 
 import errno
 import os
+import re
 import shutil
 import tempfile
 
-import paddle
 import paddle.fluid as fluid
 
 from ppcls.utils import logger
@@ -58,7 +58,7 @@ def _load_state(path):
     return state
 
 
-def load_params(exe, prog, path, ignore_params=[]):
+def load_params(exe, prog, path, ignore_params=None):
     """
     Load model from the given path.
     Args:
@@ -67,7 +67,8 @@ def load_params(exe, prog, path, ignore_params=[]):
         path (string): URL string or loca model path.
         ignore_params (list): ignore variable to load when finetuning.
             It can be specified by finetune_exclude_pretrained_params
-            and the usage can refer to docs/advanced_tutorials/TRANSFER_LEARNING.md
+            and the usage can refer to the document
+            docs/advanced_tutorials/TRANSFER_LEARNING.md
     """
     if not (os.path.isdir(path) or os.path.exists(path + '.pdparams')):
         raise ValueError("Model pretrain path {} does not "
@@ -101,6 +102,7 @@ def load_params(exe, prog, path, ignore_params=[]):
             if k in state:
                 logger.warning('variable {} is already excluded automatically'.format(k))
                 del state[k]
+
     fluid.io.set_program_state(prog, state)
 
 

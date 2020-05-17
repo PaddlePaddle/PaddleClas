@@ -192,9 +192,9 @@ class EfficientNet():
         if is_test:
             return inputs
         keep_prob = 1.0 - prob
-        random_tensor = keep_prob + \
-            fluid.layers.uniform_random_batch_size_like(
-                inputs, [-1, 1, 1, 1], min=0., max=1.)
+        inputs_shape = fluid.layers.shape(inputs)
+        random_tensor = keep_prob + fluid.layers.uniform_random(
+            shape=[inputs_shape[0], 1, 1, 1], min=0., max=1.)
         binary_tensor = fluid.layers.floor(random_tensor)
         output = inputs / keep_prob * binary_tensor
         return output
