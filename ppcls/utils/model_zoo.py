@@ -24,7 +24,6 @@ import tqdm
 import zipfile
 
 from ppcls.modeling import similar_architectures
-from ppcls.utils.check import check_architecture
 from ppcls.utils import logger
 
 __all__ = ['get']
@@ -168,17 +167,30 @@ def _decompress(fname):
     os.remove(fname)
 
 
+def _get_pretrained():
+    with open('./ppcls/utils/pretrained.list') as flist:
+        pretrained = [line.strip() for line in flist]
+    return pretrained
+
+
 def _check_pretrained_name(architecture):
     assert isinstance(architecture, str), \
-            ("the type of architecture({}) should be str". format(architecture))
-    with open('./configs/pretrained.list') as flist:
-        pretrained = [line.strip() for line in flist]
+        ("the type of architecture({}) should be str". format(architecture))
+    pretrained = _get_pretrained()
     similar_names = similar_architectures(architecture, pretrained)
     model_list = ', '.join(similar_names)
     err = "{} is not exist! Maybe you want: [{}]" \
           "".format(architecture, model_list)
     if architecture not in similar_names:
         raise ModelNameError(err)
+
+
+def list_models():
+    pretrained = _get_pretrained()
+    msg = "All avialable pretrained models are as follows: {}".format(
+        pretrained)
+    logger.info(msg)
+    return
 
 
 def get(architecture, path, decompress=True):
@@ -188,5 +200,6 @@ def get(architecture, path, decompress=True):
     _check_pretrained_name(architecture)
     url = _get_url(architecture)
     fname = _download(url, path)
-    if decompress: _decompress(fname)
+    if decompress:
+        _decompress(fname)
     logger.info("download {} finished ".format(fname))
