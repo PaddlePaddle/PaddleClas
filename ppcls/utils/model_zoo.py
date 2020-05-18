@@ -58,9 +58,9 @@ class RetryError(Exception):
         super(RetryError, self).__init__(message)
 
 
-def _get_url(architecture):
+def _get_url(architecture, postfix="tar"):
     prefix = "https://paddle-imagenet-models-name.bj.bcebos.com/"
-    fname = architecture + "_pretrained.tar"
+    fname = architecture + "_pretrained." + postfix
     return prefix + fname
 
 
@@ -193,13 +193,13 @@ def list_models():
     return
 
 
-def get(architecture, path, decompress=True):
+def get(architecture, path, decompress=True, postfix="tar"):
     """
     Get the pretrained model.
     """
     _check_pretrained_name(architecture)
-    url = _get_url(architecture)
+    url = _get_url(architecture, postfix=postfix)
     fname = _download(url, path)
-    if decompress:
+    if postfix == "tar" and decompress:
         _decompress(fname)
     logger.info("download {} finished ".format(fname))
