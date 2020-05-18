@@ -13,10 +13,11 @@
 # limitations under the License.
 
 import numpy as np
+import imghdr
 import os
 import signal
-import imghdr
-import paddle
+
+from paddle.fluid.io import multiprocess_reader
 
 from . import imaug
 from .imaug import transform
@@ -215,7 +216,7 @@ def mp_reader(params):
     for part_id in range(part_num):
         readers.append(partial_reader(params, full_lines, part_id, part_num))
 
-    return paddle.reader.multiprocess_reader(readers, use_pipe=False)
+    return multiprocess_reader(readers, use_pipe=False)
 
 
 def term_mp(sig_num, frame):
