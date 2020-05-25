@@ -39,6 +39,8 @@ class Loss(object):
             one_hot_target = target
         soft_target = fluid.layers.label_smooth(
             label=one_hot_target, epsilon=self._epsilon, dtype="float32")
+        soft_target = fluid.layers.reshape(
+            soft_target, shape=[-1, self._class_dim])
         return soft_target
 
     def _crossentropy(self, input, target):
