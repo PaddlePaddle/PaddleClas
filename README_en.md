@@ -42,7 +42,7 @@ In addition to providing rich classification network structures and pretrained m
 
 ### knowledge distillation (SSLD)
 
-Knowledge distillation refers to using the teacher model to guide the student model to learn specific tasks, ensuring that the small model has a relatively large effect improvement with the computation cost unchanged, and even obtains similar accuracy with the large model. PaddleClas provides a Simple Semi-supervised Label Distillation method (SSLD). With this method, different models on ImageNet1k-val dataset has 3% absolute improvement(Top1 accuracy) on ImageNet1k-val dataset. The following figure shows the models' performance after SSLD.
+Knowledge distillation refers to using the teacher model to guide the student model to learn specific tasks, ensuring that the small model has a relatively large effect improvement with the computation cost unchanged, and even obtains similar accuracy with the large model. PaddleClas provides a Simple Semi-supervised Label Distillation method (SSLD). With this method, different models on ImageNet1k-val dataset have 3% absolute improvement(Top1 accuracy) on ImageNet1k-val dataset. The following figure shows the models' performance after SSLD.
 
 <div align="center">
 <img
