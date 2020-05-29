@@ -42,7 +42,7 @@ def parse_args():
     parser.add_argument(
         '--vdl_dir',
         type=str,
-        default="scaler",
+        default=None,
         help='VisualDL logging directory for image.')
     parser.add_argument(
         '-o',
