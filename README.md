@@ -30,7 +30,7 @@ src="./docs/images/models/mobile_arm_top1.png" width="700">
 上图对比了一些最新的面向移动端应用场景的模型，在骁龙855（SD855）上预测一张图像的时间和其准确率，包括MobileNetV1系列、MobileNetV2系列、MobileNetV3系列和ShuffleNetV2系列。图中准确率79%的MV3_large_x1_0_ssld（M是MobileNet的简称），71.3%的MV3_small_x1_0_ssld、76.74%的MV2_ssld和77.89%的MV1_ssld，是采用PaddleClas提供的SSLD蒸馏方法训练的模型。MV3_large_x1_0_ssld_int8是进一步进行INT8量化的模型。不同模型的简介、FLOPS、Parameters和模型存储大小请参考文档教程中的[**模型库章节**](https://paddleclas.readthedocs.io/zh_CN/latest/models/models_intro.html)。
 
 - TODO
-- [ ] EfficientLite、GhostNet、RegNet论文指标复现和性能评估
+- [ ] EfficientLite、GhostNet、RegNet、ResNeSt的论文指标复现和性能评估
 
 ## 高阶优化支持
 除了提供丰富的分类网络结构和预训练模型，PaddleClas也支持了一系列有助于图像分类任务效果和效率提升的算法或工具。
