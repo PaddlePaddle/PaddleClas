@@ -39,6 +39,11 @@ def parse_args():
         default='configs/ResNet/ResNet50.yaml',
         help='config file path')
     parser.add_argument(
+        '--vdl_dir',
+        type=str,
+        default="scaler",
+        help='VisualDL logging directory for image.')
+    parser.add_argument(
         '-o',
         '--override',
         action='append',
@@ -94,7 +99,7 @@ def main(args):
     for epoch_id in range(config.epochs):
         # 1. train with train dataset
         program.run(train_dataloader, exe, compiled_train_prog, train_fetchs,
-                    epoch_id, 'train')
+                    epoch_id, 'train', args.vdl_dir)
         if int(os.getenv("PADDLE_TRAINER_ID", 0)) == 0:
             # 2. validate with validate dataset
             if config.validate and epoch_id % config.valid_interval == 0:
@@ -103,13 +108,15 @@ def main(args):
                                        epoch_id, 'valid')
                 if top1_acc > best_top1_acc:
                     best_top1_acc = top1_acc
-                    message = "The best top1 acc {:.5f}, in epoch: {:d}".format(best_top1_acc, epoch_id)
+                    message = "The best top1 acc {:.5f}, in epoch: {:d}".format(
+                        best_top1_acc, epoch_id)
                     logger.info("{:s}".format(logger.coloring(message, "RED")))
-                    if epoch_id % config.save_interval==0:
+                    if epoch_id % config.save_interval == 0:
 
                         model_path = os.path.join(config.model_save_dir,
-                                              config.ARCHITECTURE["name"])
-                        save_model(train_prog, model_path, "best_model_in_epoch_"+str(epoch_id))
+                                                  config.ARCHITECTURE["name"])
+                        save_model(train_prog, model_path,
+                                   "best_model_in_epoch_" + str(epoch_id))
 
             # 3. save the persistable model
             if epoch_id % config.save_interval == 0:
