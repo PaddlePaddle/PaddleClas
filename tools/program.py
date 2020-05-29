@@ -387,7 +387,7 @@ def compile(config, program, loss_name=None):
 total_step = 0
 
 
-def run(dataloader, exe, program, fetchs, epoch=0, mode='train', vdl_dir=None):
+def run(dataloader, exe, program, fetchs, epoch=0, mode='train', vdl_writer=None):
     """
     Feed data to the model and fetch the measures and loss
 
@@ -415,9 +415,9 @@ def run(dataloader, exe, program, fetchs, epoch=0, mode='train', vdl_dir=None):
             metric_list[i].update(m[0], len(batch[0]))
         fetchs_str = ''.join([str(m.value) + ' '
                               for m in metric_list] + [batch_time.value]) + 's'
-        if vdl_dir:
+        if vdl_writer:
             global total_step
-            logger.scaler('loss', metrics[0][0], total_step, vdl_dir)
+            logger.scaler('loss', metrics[0][0], total_step, vdl_writer)
             total_step += 1
         if mode == 'eval':
             logger.info("{:s} step:{:<4d} {:s}s".format(mode, idx, fetchs_str))

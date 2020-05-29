@@ -81,10 +81,8 @@ def error(fmt, *args):
     _logger.error(coloring(fmt, "FAIL"), *args)
 
 
-def scaler(name, value, step, path):
-    from visualdl import LogWriter
-    vdl_writer = LogWriter(path)
-    vdl_writer.add_scalar(name, value, step)
+def scaler(name, value, step, writer):
+    writer.add_scalar(name, value, step)
 
 
 def advertise():

@@ -19,6 +19,7 @@ from __future__ import print_function
 import argparse
 import os
 
+from visualdl import LogWriter
 import paddle.fluid as fluid
 from paddle.fluid.incubate.fleet.base import role_maker
 from paddle.fluid.incubate.fleet.collective import fleet
@@ -96,10 +97,12 @@ def main(args):
         compiled_valid_prog = program.compile(config, valid_prog)
 
     compiled_train_prog = fleet.main_program
+    vdl_writer = LogWriter(args.vdl_dir) if args.vdl_dir else None
+
     for epoch_id in range(config.epochs):
         # 1. train with train dataset
         program.run(train_dataloader, exe, compiled_train_prog, train_fetchs,
-                    epoch_id, 'train', args.vdl_dir)
+                    epoch_id, 'train', vdl_writer)
         if int(os.getenv("PADDLE_TRAINER_ID", 0)) == 0:
             # 2. validate with validate dataset
             if config.validate and epoch_id % config.valid_interval == 0:
