@@ -172,7 +172,7 @@ class RandFlipImage(object):
         else:
             return img
 
-class AA(object):
+class AutoArgument(object):
      
     def __init__(self):
         self.policy = ImageNetPolicy()

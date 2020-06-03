@@ -36,6 +36,8 @@ from ppcls.utils import logger
 from paddle.fluid.incubate.fleet.collective import fleet
 from paddle.fluid.incubate.fleet.collective import DistributedStrategy
 
+import ema
+
 
 def create_feeds(image_shape, use_mix=None):
     """
@@ -102,7 +104,6 @@ def create_model(architecture, image, classes_num, is_train):
     name = architecture["name"]
     params = architecture.get("params", {})
     params['is_test'] = not is_train
-    print(params)
     model = architectures.__dict__[name](**params)
     out = model.net(input=image, class_dim=classes_num)
     return out

@@ -23,6 +23,12 @@ import shutil
 import sys
 
 def main():
+"""
+Usage: when training with flag use_ema, and evaluating EMA model, should clean the saved model at first.
+       To generate clean model:
+    
+       python ema_clean.py ema_model_dir cleaned_model_dir
+"""
     cleaned_model_dir = sys.argv[1]
     ema_model_dir = sys.argv[2]
     if not os.path.exists(cleaned_model_dir):

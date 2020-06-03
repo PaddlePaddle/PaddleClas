@@ -46,9 +46,10 @@ TRAIN:
             channel_first: False
         - RandCropImage:
             size: 224
+            interpolation: 2
         - RandFlipImage:
             flip_code: 1
-        - AA:
+        - AutoArgument:
         - NormalizeImage:
             scale: 1./255.
             mean: [0.485, 0.456, 0.406]
