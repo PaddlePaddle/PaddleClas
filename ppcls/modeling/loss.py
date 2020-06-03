@@ -1,16 +1,16 @@
-#copyright (c) 2020 PaddlePaddle Authors. All Rights Reserve.
+# copyright (c) 2020 PaddlePaddle Authors. All Rights Reserve.
 #
-#Licensed under the Apache License, Version 2.0 (the "License");
-#you may not use this file except in compliance with the License.
-#You may obtain a copy of the License at
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
 #
 #    http://www.apache.org/licenses/LICENSE-2.0
 #
-#Unless required by applicable law or agreed to in writing, software
-#distributed under the License is distributed on an "AS IS" BASIS,
-#WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#See the License for the specific language governing permissions and
-#limitations under the License.
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
 import paddle.fluid as fluid
 
@@ -34,12 +34,13 @@ class Loss(object):
 
     def _labelsmoothing(self, target):
         if target.shape[-1] != self._class_dim:
-            one_hot_target = fluid.layers.one_hot(
-                input=target, depth=self._class_dim)
+            one_hot_target = fluid.one_hot(input=target, depth=self._class_dim)
         else:
             one_hot_target = target
         soft_target = fluid.layers.label_smooth(
             label=one_hot_target, epsilon=self._epsilon, dtype="float32")
+        soft_target = fluid.layers.reshape(
+            soft_target, shape=[-1, self._class_dim])
         return soft_target
 
     def _crossentropy(self, input, target):

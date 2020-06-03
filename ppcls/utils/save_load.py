@@ -1,16 +1,16 @@
 # Copyright (c) 2020 PaddlePaddle Authors. All Rights Reserve.
 #
-#Licensed under the Apache License, Version 2.0 (the "License");
-#you may not use this file except in compliance with the License.
-#You may obtain a copy of the License at
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
 #
 #    http://www.apache.org/licenses/LICENSE-2.0
 #
-#Unless required by applicable law or agreed to in writing, software
-#distributed under the License is distributed on an "AS IS" BASIS,
-#WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#See the License for the specific language governing permissions and
-#limitations under the License.
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
 from __future__ import absolute_import
 from __future__ import division
@@ -18,10 +18,10 @@ from __future__ import print_function
 
 import errno
 import os
+import re
 import shutil
 import tempfile
 
-import paddle
 import paddle.fluid as fluid
 
 from ppcls.utils import logger
@@ -46,7 +46,6 @@ def _mkdir_if_not_exist(path):
 
 
 def _load_state(path):
-    print("path: ", path)
     if os.path.exists(path + '.pdopt'):
         # XXX another hack to ignore the optimizer state
         tmp = tempfile.mkdtemp()
@@ -55,12 +54,11 @@ def _load_state(path):
         state = fluid.io.load_program_state(dst)
         shutil.rmtree(tmp)
     else:
-        print("path: ", path)
         state = fluid.io.load_program_state(path)
     return state
 
 
-def load_params(exe, prog, path, ignore_params=[]):
+def load_params(exe, prog, path, ignore_params=None):
     """
     Load model from the given path.
     Args:
@@ -69,13 +67,14 @@ def load_params(exe, prog, path, ignore_params=[]):
         path (string): URL string or loca model path.
         ignore_params (list): ignore variable to load when finetuning.
             It can be specified by finetune_exclude_pretrained_params
-            and the usage can refer to docs/advanced_tutorials/TRANSFER_LEARNING.md
+            and the usage can refer to the document
+            docs/advanced_tutorials/TRANSFER_LEARNING.md
     """
     if not (os.path.isdir(path) or os.path.exists(path + '.pdparams')):
         raise ValueError("Model pretrain path {} does not "
                          "exists.".format(path))
 
-    logger.info('Loading parameters from {}...'.format(path))
+    logger.info(logger.coloring('Loading parameters from {}...'.format(path), 'HEADER'))
 
     ignore_set = set()
     state = _load_state(path)
@@ -101,8 +100,9 @@ def load_params(exe, prog, path, ignore_params=[]):
     if len(ignore_set) > 0:
         for k in ignore_set:
             if k in state:
-                logger.warning('variable {} not used'.format(k))
+                logger.warning('variable {} is already excluded automatically'.format(k))
                 del state[k]
+
     fluid.io.set_program_state(prog, state)
 
 
@@ -113,7 +113,7 @@ def init_model(config, program, exe):
     checkpoints = config.get('checkpoints')
     if checkpoints:
         fluid.load(program, checkpoints, exe)
-        logger.info("Finish initing model from {}".format(checkpoints))
+        logger.info(logger.coloring("Finish initing model from {}".format(checkpoints),"HEADER"))
         return
 
     pretrained_model = config.get('pretrained_model')
@@ -122,7 +122,7 @@ def init_model(config, program, exe):
             pretrained_model = [pretrained_model]
         for pretrain in pretrained_model:
             load_params(exe, program, pretrain)
-        logger.info("Finish initing model from {}".format(pretrained_model))
+        logger.info(logger.coloring("Finish initing model from {}".format(pretrained_model),"HEADER"))
 
 
 def save_model(program, model_path, epoch_id, prefix='ppcls'):
@@ -133,4 +133,4 @@ def save_model(program, model_path, epoch_id, prefix='ppcls'):
     _mkdir_if_not_exist(model_path)
     model_prefix = os.path.join(model_path, prefix)
     fluid.save(program, model_prefix)
-    logger.info("Already save model in {}".format(model_path))
+    logger.info(logger.coloring("Already save model in {}".format(model_path),"HEADER"))

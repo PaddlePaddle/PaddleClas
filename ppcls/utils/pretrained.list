@@ -116,3 +116,4 @@ VGG16
 VGG19
 DarkNet53_ImageNet1k
 ResNet50_ACNet_deploy
+CSPResNet50_leaky

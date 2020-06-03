@@ -23,7 +23,10 @@ python tools/infer/predict.py \
     --batch_size=1
 ```
 
-![](../../images/models/main_fps_top1.png)
+![](../../images/models/T4_benchmark/t4.fp32.bs4.main_fps_top1.png)
+
+![](../../images/models/V100_benchmark/v100.fp32.bs1.main_fps_top1_s.jpg)
+
 ![](../../images/models/mobile_arm_top1.png)
 
 

@@ -24,6 +24,7 @@ def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('-a', '--architecture', type=str, default='ResNet50')
     parser.add_argument('-p', '--path', type=str, default='./pretrained/')
+    parser.add_argument('--postfix', type=str, default="tar")
     parser.add_argument('-d', '--decompress', type=str2bool, default=True)
     parser.add_argument('-l', '--list', type=str2bool, default=False)
 
@@ -36,7 +37,8 @@ def main():
     if args.list:
         model_zoo.list_models()
     else:
-        model_zoo.get(args.architecture, args.path, args.decompress)
+        model_zoo.get(args.architecture, args.path, args.decompress,
+                      args.postfix)
 
 
 if __name__ == '__main__':
