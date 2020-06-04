@@ -1,16 +1,16 @@
-#copyright (c) 2020 PaddlePaddle Authors. All Rights Reserve.
+# copyright (c) 2020 PaddlePaddle Authors. All Rights Reserve.
 #
-#Licensed under the Apache License, Version 2.0 (the "License");
-#you may not use this file except in compliance with the License.
-#You may obtain a copy of the License at
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
 #
 #    http://www.apache.org/licenses/LICENSE-2.0
 #
-#Unless required by applicable law or agreed to in writing, software
-#distributed under the License is distributed on an "AS IS" BASIS,
-#WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#See the License for the specific language governing permissions and
-#limitations under the License.
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
 from __future__ import absolute_import
 from __future__ import division
@@ -130,7 +130,7 @@ class CosineWarmup(object):
         with fluid.layers.control_flow.Switch() as switch:
             with switch.case(epoch < self.warmup_epoch):
                 decayed_lr = self.lr * \
-                        (global_step / (self.step_each_epoch * self.warmup_epoch))
+                    (global_step / (self.step_each_epoch * self.warmup_epoch))
                 fluid.layers.tensor.assign(
                     input=decayed_lr, output=learning_rate)
             with switch.default():
@@ -139,6 +139,65 @@ class CosineWarmup(object):
                     self.epochs - self.warmup_epoch) * self.step_each_epoch
                 decayed_lr = self.lr * \
                     (ops.cos(current_step * math.pi / total_step) + 1) / 2
+                fluid.layers.tensor.assign(
+                    input=decayed_lr, output=learning_rate)
+
+        return learning_rate
+
+
+class ExponentialWarmup(object):
+    """
+    Exponential learning rate decay with warmup
+    [0, warmup_epoch): linear warmup
+    [warmup_epoch, epochs): Exponential decay
+
+    Args:
+        lr(float): initial learning rate
+        step_each_epoch(int): steps each epoch
+        decay_epochs(float): decay epochs
+        decay_rate(float): decay rate
+        warmup_epoch(int): epoch num of warmup
+    """
+
+    def __init__(self,
+                 lr,
+                 step_each_epoch,
+                 decay_epochs=2.4,
+                 decay_rate=0.97,
+                 warmup_epoch=5,
+                 **kwargs):
+        super(ExponentialWarmup, self).__init__()
+        self.lr = lr
+        self.step_each_epoch = step_each_epoch
+        self.decay_epochs = decay_epochs * self.step_each_epoch
+        self.decay_rate = decay_rate
+        self.warmup_epoch = fluid.layers.fill_constant(
+            shape=[1],
+            value=float(warmup_epoch),
+            dtype='float32',
+            force_cpu=True)
+
+    def __call__(self):
+        global_step = _decay_step_counter()
+        learning_rate = fluid.layers.tensor.create_global_var(
+            shape=[1],
+            value=0.0,
+            dtype='float32',
+            persistable=True,
+            name="learning_rate")
+
+        epoch = ops.floor(global_step / self.step_each_epoch)
+        with fluid.layers.control_flow.Switch() as switch:
+            with switch.case(epoch < self.warmup_epoch):
+                decayed_lr = self.lr * \
+                    (global_step / (self.step_each_epoch * self.warmup_epoch))
+                fluid.layers.tensor.assign(
+                    input=decayed_lr, output=learning_rate)
+            with switch.default():
+                rest_step = global_step - self.warmup_epoch * self.step_each_epoch
+                div_res = ops.floor(rest_step / self.decay_epochs)
+
+                decayed_lr = self.lr * (self.decay_rate**div_res)
                 fluid.layers.tensor.assign(
                     input=decayed_lr, output=learning_rate)
 

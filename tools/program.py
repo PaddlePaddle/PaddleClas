@@ -36,6 +36,8 @@ from ppcls.utils import logger
 from paddle.fluid.incubate.fleet.collective import fleet
 from paddle.fluid.incubate.fleet.collective import DistributedStrategy
 
+from ema import ExponentialMovingAverage
+
 
 def create_feeds(image_shape, use_mix=None):
     """
@@ -86,7 +88,7 @@ def create_dataloader(feeds):
     return dataloader
 
 
-def create_model(architecture, image, classes_num):
+def create_model(architecture, image, classes_num, is_train):
     """
     Create a model
 
@@ -101,6 +103,7 @@ def create_model(architecture, image, classes_num):
     """
     name = architecture["name"]
     params = architecture.get("params", {})
+    params['is_test'] = not is_train
     model = architectures.__dict__[name](**params)
     out = model.net(input=image, class_dim=classes_num)
     return out
@@ -336,7 +339,7 @@ def build(config, main_prog, startup_prog, is_train=True):
             feeds = create_feeds(config.image_shape, use_mix=use_mix)
             dataloader = create_dataloader(feeds.values())
             out = create_model(config.ARCHITECTURE, feeds['image'],
-                               config.classes_num)
+                               config.classes_num, is_train)
             fetchs = create_fetchs(
                 out,
                 feeds,
@@ -354,6 +357,14 @@ def build(config, main_prog, startup_prog, is_train=True):
                 optimizer = mixed_precision_optimizer(config, optimizer)
                 optimizer = dist_optimizer(config, optimizer)
                 optimizer.minimize(fetchs['loss'][0])
+                if config.get('use_ema'):
+
+                    global_steps = fluid.layers.learning_rate_scheduler._decay_step_counter(
+                    )
+                    ema = ExponentialMovingAverage(
+                        config.get('ema_decay'), thres_steps=global_steps)
+                    ema.update()
+                    return dataloader, fetchs, ema
 
     return dataloader, fetchs
 
@@ -387,7 +398,13 @@ def compile(config, program, loss_name=None):
 total_step = 0
 
 
-def run(dataloader, exe, program, fetchs, epoch=0, mode='train', vdl_writer=None):
+def run(dataloader,
+        exe,
+        program,
+        fetchs,
+        epoch=0,
+        mode='train',
+        vdl_writer=None):
     """
     Feed data to the model and fetch the measures and loss
 
@@ -401,6 +418,7 @@ def run(dataloader, exe, program, fetchs, epoch=0, mode='train', vdl_writer=None
 
     Returns:
     """
+    print(fetchs)
     fetch_list = [f[0] for f in fetchs.values()]
     metric_list = [f[1] for f in fetchs.values()]
     for m in metric_list:
