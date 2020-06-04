@@ -38,7 +38,7 @@ python -c "import paddle; print(paddle.__version__)"
 
 **运行环境需求:**
 
-- Python2（官方已不提供更新维护）或Python3 (当前只支持Linux系统)
+- Python3 (当前只支持Linux系统)
 - CUDA >= 9.0
 - cuDNN >= 5.0
 - nccl >= 2.1.2
@@ -59,4 +59,11 @@ Python依赖库在[requirements.txt](https://github.com/PaddlePaddle/PaddleClas/
 
 ```
 pip install --upgrade -r requirements.txt
+```
+
+visualdl可能出现安装失败，请尝试
+
+```
+pip3 install --upgrade visualdl==2.0.0b3 -i https://mirror.baidu.com/pypi/simple
+
 ```
