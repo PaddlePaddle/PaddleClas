@@ -383,7 +383,9 @@ class EfficientNet():
             use_bias=True,
             padding_type=self.padding_type,
             name=name + '_se_expand')
-        se_out = inputs * fluid.layers.sigmoid(x_squeezed)
+        #se_out = inputs * fluid.layers.sigmoid(x_squeezed)
+        se_out = fluid.layers.elementwise_mul(
+            inputs, fluid.layers.sigmoid(x_squeezed), axis=-1)
         return se_out
 
     def extract_features(self, inputs, is_test):
@@ -467,8 +469,8 @@ class BlockDecoder(object):
 
         # Check stride
         cond_1 = ('s' in options and len(options['s']) == 1)
-        cond_2 = ((len(options['s']) == 2)
-                  and (options['s'][0] == options['s'][1]))
+        cond_2 = ((len(options['s']) == 2) and
+                  (options['s'][0] == options['s'][1]))
         assert (cond_1 or cond_2)
 
         return BlockArgs(

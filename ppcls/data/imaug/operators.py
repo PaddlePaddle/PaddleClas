@@ -25,7 +25,8 @@ import random
 import cv2
 import numpy as np
 
-from autoargument import ImageNetPolicy
+from .autoaugment import ImageNetPolicy
+
 
 class OperatorParamError(ValueError):
     """ OperatorParamError
@@ -172,12 +173,12 @@ class RandFlipImage(object):
         else:
             return img
 
-class AutoArgument(object):
-     
+
+class AutoAugment(object):
     def __init__(self):
         self.policy = ImageNetPolicy()
 
-    def __call__(self,img):
+    def __call__(self, img):
         from PIL import Image
         img = np.ascontiguousarray(img)
         img = Image.fromarray(img)
