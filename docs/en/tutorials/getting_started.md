@@ -1,26 +1,24 @@
-# 开始使用
+# Getting Started
 ---
-请事先参考[安装指南](install.md)配置运行环境，并根据[数据说明](./data.md)文档准备ImageNet1k数据，本章节下面所有的实验均以ImageNet1k数据集为例。
+Please refer to [Installation](install.md) to setup environment at first, and prepare ImageNet1K data by following the instruction mentioned in the [data](data.md)
 
-## 一、设置环境变量
+## Setup
 
-**设置PYTHONPATH环境变量：**
+**Setup PYTHONPATH：**
 
 ```bash
 export PYTHONPATH=path_to_PaddleClas:$PYTHONPATH
 ```
 
-## 二、模型训练与评估
+## Training and validating
 
-PaddleClas 提供模型训练与评估脚本：`tools/train.py`和`tools/eval.py`
+PaddleClas support `tools/train.py` and `tools/eval.py` to start training and validating.
 
-### 2.1 模型训练
-
-按照如下方式启动模型训练。
+### Training
 
 ```bash
-# PaddleClas通过launch方式启动多卡多进程训练
-# 通过设置FLAGS_selected_gpus 指定GPU运行卡号
+# PaddleClas use paddle.distributed.launch to start multi-cards and multiprocess training.
+# Set FLAGS_selected_gpus to indicate GPU cards
 
 python -m paddle.distributed.launch \
     --selected_gpus="0,1,2,3" \
@@ -28,13 +26,13 @@ python -m paddle.distributed.launch \
         -c ./configs/ResNet/ResNet50_vd.yaml
 ```
 
-- 输出日志示例如下：
+- log:
 
 ```
 epoch:0    train    step:13    loss:7.9561    top1:0.0156    top5:0.1094    lr:0.100000    elapse:0.193
 ```
 
-可以通过添加-o参数来更新配置：
+add -o params to update configuration
 
 ```bash
 python -m paddle.distributed.launch \
@@ -42,19 +40,19 @@ python -m paddle.distributed.launch \
     tools/train.py \
         -c ./configs/ResNet/ResNet50_vd.yaml \
         -o use_mix=1 \
-	--vdl_dir=./scalar/
+    --vdl_dir=./scalar/
 
 ```
 
-- 输出日志示例如下：
+- log:
 
 ```
 epoch:0    train    step:522    loss:1.6330    lr:0.100000    elapse:0.210
 ```
 
-也可以直接修改模型对应的配置文件更新配置。具体配置参数参考[配置文档](config.md)。
+or modify configuration directly to config fileds, please refer to [config](config.md) for more details.
 
-训练期间可以通过VisualDL实时观察loss变化，启动命令如下：
+use visuldl to visulize training loss in the real time
 
 ```bash
 visualdl --logdir ./scalar --host <host_IP> --port <port_num>
@@ -62,41 +60,44 @@ visualdl --logdir ./scalar --host <host_IP> --port <port_num>
 ```
 
 
-### 2.2 模型微调
+### finetune
 
-* [30分钟玩转PaddleClas](./quick_start.md)中包含大量模型微调的示例，可以参考该章节在特定的数据集上进行模型微调。
+* please refer to [Trial](./quick_start.md) for more details.
 
-### 2.3 模型评估
+### validating
 
 ```bash
 python tools/eval.py \
     -c ./configs/eval.yaml \
     -o ARCHITECTURE.name="ResNet50_vd" \
     -o pretrained_model=path_to_pretrained_models
-```
-可以更改configs/eval.yaml中的`ARCHITECTURE.name`字段和pretrained_model字段来配置评估模型，也可以通过-o参数更新配置。
 
-**注意：** 加载预训练模型时，需要指定预训练模型的前缀，例如预训练模型参数所在的文件夹为`output/ResNet50_vd/19`，预训练模型参数的名称为`output/ResNet50_vd/19/ppcls.pdparams`，则`pretrained_model`参数需要指定为`output/ResNet50_vd/19/ppcls`，PaddleClas会自动补齐`.pdparams`的后缀。
+modify `configs/eval.yaml filed: `ARCHITECTURE.name` and filed: `pretrained_model` to config valid model or add -o params to update config directly.
 
-## 三、模型推理
 
-PaddlePaddle提供三种方式进行预测推理，接下来介绍如何用预测引擎进行推理：
-首先，对训练好的模型进行转换：
+**NOTE: ** when loading the pretrained model, should ignore the suffix ```.pdparams```
+
+## Predict
+
+PaddlePaddle supprot three predict interfaces
+Use predicator interface to predict
+First, export inference model
 
 ```bash
 python tools/export_model.py \
-    --model=模型名字 \
-    --pretrained_model=预训练模型路径 \
-    --output_path=预测模型保存路径
+    --model=model_name \
+    --pretrained_model=pretrained_model_dir \
+    --output_path=save_inference_dir
 
 ```
-之后，通过预测引擎进行推理：
+Second, start predicator enginee：
+
 ```bash
 python tools/infer/predict.py \
-    -m model文件路径 \
-    -p params文件路径 \
-    -i 图片路径 \
+    -m model_path \
+    -p params_path \
+    -i image path \
     --use_gpu=1 \
     --use_tensorrt=True
 ```
-更多使用方法和推理方式请参考[分类预测框架](../extension/paddle_inference.md)。
+please refer to [inference](../extension/paddle_inference.md) for more details.
