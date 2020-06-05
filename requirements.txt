@@ -3,3 +3,4 @@ opencv-python
 pillow
 tqdm
 PyYAML
+visualdl >= 2.0.0b
