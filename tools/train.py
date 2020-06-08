@@ -20,8 +20,6 @@ import argparse
 import os
 
 import paddle.fluid as fluid
-from paddle.fluid.incubate.fleet.base import role_maker
-from paddle.fluid.incubate.fleet.collective import fleet
 
 from ppcls.data import Reader
 from ppcls.utils.config import get_config
@@ -49,73 +47,63 @@ def parse_args():
 
 
 def main(args):
-    role = role_maker.PaddleCloudRoleMaker(is_collective=True)
-    fleet.init(role)
-
     config = get_config(args.config, overrides=args.override, show=True)
     # assign the place
-    gpu_id = int(os.environ.get('FLAGS_selected_gpus', 0))
+    gpu_id = fluid.dygraph.parallel.Env().dev_id
     place = fluid.CUDAPlace(gpu_id)
 
-    # startup_prog is used to do some parameter init work,
-    # and train prog is used to hold the network
-    startup_prog = fluid.Program()
-    train_prog = fluid.Program()
+    with fluid.dygraph.guard(place):
+        strategy = fluid.dygraph.parallel.prepare_context()
+        net = program.create_model(config.ARCHITECTURE, config.classes_num)
+        net = fluid.dygraph.parallel.DataParallel(net, strategy)
 
-    best_top1_acc = 0.0  # best top1 acc record
+        optimizer = program.create_optimizer(
+            config, parameter_list=net.parameters())
 
-    train_dataloader, train_fetchs = program.build(
-        config, train_prog, startup_prog, is_train=True)
+        # load model from checkpoint or pretrained model
+        init_model(config, net, optimizer)
 
-    if config.validate:
-        valid_prog = fluid.Program()
-        valid_dataloader, valid_fetchs = program.build(
-            config, valid_prog, startup_prog, is_train=False)
-        # clone to prune some content which is irrelevant in valid_prog
-        valid_prog = valid_prog.clone(for_test=True)
+        train_dataloader = program.create_dataloader()
+        train_reader = Reader(config, 'train')()
+        train_dataloader.set_sample_list_generator(train_reader, place)
 
-    # create the "Executor" with the statement of which place
-    exe = fluid.Executor(place=place)
-    # only run startup_prog once to init
-    exe.run(startup_prog)
+        if config.validate:
+            valid_dataloader = program.create_dataloader()
+            valid_reader = Reader(config, 'valid')()
+            valid_dataloader.set_sample_list_generator(valid_reader, place)
 
-    # load model from checkpoint or pretrained model
-    init_model(config, train_prog, exe)
+        best_top1_acc = 0.0  # best top1 acc record
+        for epoch_id in range(config.epochs):
+            net.train()
+            # 1. train with train dataset
+            program.run(train_dataloader, config, net, optimizer, epoch_id,
+                        'train')
 
-    train_reader = Reader(config, 'train')()
-    train_dataloader.set_sample_list_generator(train_reader, place)
+            if fluid.dygraph.parallel.Env().local_rank == 0:
+                # 2. validate with validate dataset
+                if config.validate and epoch_id % config.valid_interval == 0:
+                    net.eval()
+                    top1_acc = program.run(valid_dataloader, config, net, None,
+                                           epoch_id, 'valid')
+                    if top1_acc > best_top1_acc:
+                        best_top1_acc = top1_acc
+                        message = "The best top1 acc {:.5f}, in epoch: {:d}".format(
+                            best_top1_acc, epoch_id)
+                        logger.info("{:s}".format(
+                            logger.coloring(message, "RED")))
+                        if epoch_id % config.save_interval == 0:
 
-    if config.validate:
-        valid_reader = Reader(config, 'valid')()
-        valid_dataloader.set_sample_list_generator(valid_reader, place)
-        compiled_valid_prog = program.compile(config, valid_prog)
+                            model_path = os.path.join(
+                                config.model_save_dir,
+                                config.ARCHITECTURE["name"])
+                            save_model(net, optimizer, model_path,
+                                       "best_model_in_epoch_" + str(epoch_id))
 
-    compiled_train_prog = fleet.main_program
-    for epoch_id in range(config.epochs):
-        # 1. train with train dataset
-        program.run(train_dataloader, exe, compiled_train_prog, train_fetchs,
-                    epoch_id, 'train')
-        if int(os.getenv("PADDLE_TRAINER_ID", 0)) == 0:
-            # 2. validate with validate dataset
-            if config.validate and epoch_id % config.valid_interval == 0:
-                top1_acc = program.run(valid_dataloader, exe,
-                                       compiled_valid_prog, valid_fetchs,
-                                       epoch_id, 'valid')
-                if top1_acc > best_top1_acc:
-                    best_top1_acc = top1_acc
-                    message = "The best top1 acc {:.5f}, in epoch: {:d}".format(best_top1_acc, epoch_id)
-                    logger.info("{:s}".format(logger.coloring(message, "RED")))
-                    if epoch_id % config.save_interval==0:
-
-                        model_path = os.path.join(config.model_save_dir,
+                # 3. save the persistable model
+                if epoch_id % config.save_interval == 0:
+                    model_path = os.path.join(config.model_save_dir,
                                               config.ARCHITECTURE["name"])
-                        save_model(train_prog, model_path, "best_model_in_epoch_"+str(epoch_id))
-
-            # 3. save the persistable model
-            if epoch_id % config.save_interval == 0:
-                model_path = os.path.join(config.model_save_dir,
-                                          config.ARCHITECTURE["name"])
-                save_model(train_prog, model_path, epoch_id)
+                    save_model(net, optimizer, model_path, epoch_id)
 
 
 if __name__ == '__main__':
