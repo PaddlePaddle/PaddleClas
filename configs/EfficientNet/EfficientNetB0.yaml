@@ -1,8 +1,12 @@
 mode: 'train'
 ARCHITECTURE:
     name: "EfficientNetB0"
-    drop_connect_rate: 0.1
-    padding_type : "SAME"
+    params:
+        is_test: False
+        padding_type : "SAME"
+        override_params:
+            drop_connect_rate: 0.1
+
 pretrained_model: ""
 model_save_dir: "./output/"
 classes_num: 1000

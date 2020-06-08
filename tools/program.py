@@ -103,7 +103,8 @@ def create_model(architecture, image, classes_num, is_train):
     """
     name = architecture["name"]
     params = architecture.get("params", {})
-    params['is_test'] = not is_train
+    if "is_test" in params:
+        params['is_test'] = not is_train
     model = architectures.__dict__[name](**params)
     out = model.net(input=image, class_dim=classes_num)
     return out
@@ -418,7 +419,6 @@ def run(dataloader,
 
     Returns:
     """
-    print(fetchs)
     fetch_list = [f[0] for f in fetchs.values()]
     metric_list = [f[1] for f in fetchs.values()]
     for m in metric_list:
