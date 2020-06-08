@@ -112,7 +112,7 @@ def main(args):
             if config.validate and epoch_id % config.valid_interval == 0:
                 if config.get('use_ema'):
                     logger.info(logger.coloring("EMA validate start..."))
-                    with train_fetchs('ema').apply(exe):
+                    with ema.apply(exe):
                         top1_acc = program.run(valid_dataloader, exe,
                                                compiled_valid_prog,
                                                valid_fetchs, epoch_id, 'valid')
