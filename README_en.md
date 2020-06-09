@@ -1,5 +1,3 @@
-[简体中文](README.md) | English
-
 # PaddleClas
 
 **Quick start PaddleClas in 30 minutes**: [./docs/en/tutorials/quick_start.md](./docs/en/tutorials/quick_start.md)
