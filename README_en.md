@@ -4,7 +4,9 @@
 
 > **English version of PaddleClas. Updating...**
 
-**Quick start PaddleClas in 30 minutes**: [./docs/en/tutorials/quick_start.md](./docs/en/tutorials/quick_start.md)
+**Book**: https://paddleclas.readthedocs.io
+
+**Quick start PaddleClas in 30 minutes**: https://paddleclas.readthedocs.io/zh_CN/latest/tutorials/quick_start.html
 
 ## Introduction
 
