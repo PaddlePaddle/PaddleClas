@@ -1,3 +1,5 @@
+[简体中文](README.md) | English
+
 # PaddleClas
 
 **Book**: https://paddleclas.readthedocs.io
