@@ -1,6 +1,6 @@
-English version of PaddleClas. Updating...
-
 # PaddleClas
+
+> **English version of PaddleClas. Updating...**
 
 **Quick start PaddleClas in 30 minutes**: [./docs/en/tutorials/quick_start.md](./docs/en/tutorials/quick_start.md)
 
