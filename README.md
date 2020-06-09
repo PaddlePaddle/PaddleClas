@@ -1,3 +1,5 @@
+简体中文 | [English](README_en.md)
+
 # PaddleClas
 
 **文档教程**: https://paddleclas.readthedocs.io
