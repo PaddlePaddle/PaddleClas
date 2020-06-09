@@ -2,9 +2,7 @@
 
 # PaddleClas
 
-**Book**: https://paddleclas.readthedocs.io
-
-**Quick start PaddleClas in 30 minutes**: https://paddleclas.readthedocs.io/zh_CN/latest/tutorials/quick_start.html
+**Quick start PaddleClas in 30 minutes**: [./docs/en/tutorials/quick_start.md](./docs/en/tutorials/quick_start.md)
 
 ## Introduction
 
