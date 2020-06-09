@@ -33,41 +33,12 @@ from ppcls.modeling.loss import GoogLeNetLoss
 from ppcls.utils.misc import AverageMeter
 from ppcls.utils import logger
 
+from paddle.fluid.dygraph.base import to_variable
 from paddle.fluid.incubate.fleet.collective import fleet
 from paddle.fluid.incubate.fleet.collective import DistributedStrategy
 
-from ema import ExponentialMovingAverage
 
-
-def create_feeds(image_shape, use_mix=None):
-    """
-    Create feeds as model input
-
-    Args:
-        image_shape(list[int]): model input shape, such as [3, 224, 224]
-        use_mix(bool): whether to use mix(include mixup, cutmix, fmix)
-
-    Returns:
-        feeds(dict): dict of model input variables
-    """
-    feeds = OrderedDict()
-    feeds['image'] = fluid.data(
-        name="feed_image", shape=[None] + image_shape, dtype="float32")
-    if use_mix:
-        feeds['feed_y_a'] = fluid.data(
-            name="feed_y_a", shape=[None, 1], dtype="int64")
-        feeds['feed_y_b'] = fluid.data(
-            name="feed_y_b", shape=[None, 1], dtype="int64")
-        feeds['feed_lam'] = fluid.data(
-            name="feed_lam", shape=[None, 1], dtype="float32")
-    else:
-        feeds['label'] = fluid.data(
-            name="feed_label", shape=[None, 1], dtype="int64")
-
-    return feeds
-
-
-def create_dataloader(feeds):
+def create_dataloader():
     """
     Create a dataloader with model input variables
 
@@ -80,7 +51,6 @@ def create_dataloader(feeds):
     trainer_num = int(os.environ.get('PADDLE_TRAINERS_NUM', 1))
     capacity = 64 if trainer_num <= 1 else 8
     dataloader = fluid.io.DataLoader.from_generator(
-        feed_list=feeds,
         capacity=capacity,
         use_double_buffer=True,
         iterable=True)
@@ -88,7 +58,7 @@ def create_dataloader(feeds):
     return dataloader
 
 
-def create_model(architecture, image, classes_num, is_train):
+def create_model(architecture, classes_num):
     """
     Create a model
 
@@ -103,15 +73,11 @@ def create_model(architecture, image, classes_num, is_train):
     """
     name = architecture["name"]
     params = architecture.get("params", {})
-    if "is_test" in params:
-        params['is_test'] = not is_train
-    model = architectures.__dict__[name](**params)
-    out = model.net(input=image, class_dim=classes_num)
-    return out
+    return architectures.__dict__[name](class_dim=classes_num, **params)
 
 
 def create_loss(out,
-                feeds,
+                label,
                 architecture,
                 classes_num=1000,
                 epsilon=None,
@@ -140,8 +106,7 @@ def create_loss(out,
     if architecture["name"] == "GoogLeNet":
         assert len(out) == 3, "GoogLeNet should have 3 outputs"
         loss = GoogLeNetLoss(class_dim=classes_num, epsilon=epsilon)
-        target = feeds['label']
-        return loss(out[0], out[1], out[2], target)
+        return loss(out[0], out[1], out[2], label)
 
     if use_distillation:
         assert len(out) == 2, ("distillation output length must be 2, "
@@ -151,18 +116,18 @@ def create_loss(out,
 
     if use_mix:
         loss = MixCELoss(class_dim=classes_num, epsilon=epsilon)
-        feed_y_a = feeds['feed_y_a']
-        feed_y_b = feeds['feed_y_b']
-        feed_lam = feeds['feed_lam']
-        return loss(out, feed_y_a, feed_y_b, feed_lam)
+        raise NotImplementedError
+        #feed_y_a = feeds['feed_y_a']
+        #feed_y_b = feeds['feed_y_b']
+        #feed_lam = feeds['feed_lam']
+        #return loss(out, feed_y_a, feed_y_b, feed_lam)
     else:
         loss = CELoss(class_dim=classes_num, epsilon=epsilon)
-        target = feeds['label']
-        return loss(out, target)
+        return loss(out, label)
 
 
 def create_metric(out,
-                  feeds,
+                  label,
                   architecture,
                   topk=5,
                   classes_num=1000,
@@ -190,19 +155,19 @@ def create_metric(out,
 
     fetchs = OrderedDict()
     # set top1 to fetchs
-    top1 = fluid.layers.accuracy(softmax_out, label=feeds['label'], k=1)
-    fetchs['top1'] = (top1, AverageMeter('top1', '.4f', need_avg=True))
+    top1 = fluid.layers.accuracy(softmax_out, label=label, k=1)
+    fetchs['top1'] = top1
     # set topk to fetchs
     k = min(topk, classes_num)
-    topk = fluid.layers.accuracy(softmax_out, label=feeds['label'], k=k)
+    topk = fluid.layers.accuracy(softmax_out, label=label, k=k)
     topk_name = 'top{}'.format(k)
-    fetchs[topk_name] = (topk, AverageMeter(topk_name, '.4f', need_avg=True))
+    fetchs[topk_name] = topk
 
     return fetchs
 
 
 def create_fetchs(out,
-                  feeds,
+                  label,
                   architecture,
                   topk=5,
                   classes_num=1000,
@@ -228,18 +193,17 @@ def create_fetchs(out,
         fetchs(dict): dict of model outputs(included loss and measures)
     """
     fetchs = OrderedDict()
-    loss = create_loss(out, feeds, architecture, classes_num, epsilon, use_mix,
+    fetchs['loss'] = create_loss(out, label, architecture, classes_num, epsilon, use_mix,
                        use_distillation)
-    fetchs['loss'] = (loss, AverageMeter('loss', '7.4f', need_avg=True))
     if not use_mix:
-        metric = create_metric(out, feeds, architecture, topk, classes_num,
+        metric = create_metric(out, label, architecture, topk, classes_num,
                                use_distillation)
         fetchs.update(metric)
 
     return fetchs
 
 
-def create_optimizer(config):
+def create_optimizer(config, parameter_list=None):
     """
     Create an optimizer using config, usually including
     learning rate and regularization.
@@ -274,7 +238,7 @@ def create_optimizer(config):
     # create optimizer instance
     opt_config = config['OPTIMIZER']
     opt = OptimizerBuilder(**opt_config)
-    return opt(lr)
+    return opt(lr, parameter_list)
 
 
 def dist_optimizer(config, optimizer):
@@ -314,7 +278,7 @@ def mixed_precision_optimizer(config, optimizer):
     return optimizer
 
 
-def build(config, main_prog, startup_prog, is_train=True):
+def compute(config, out, label, mode='train'):
     """
     Build a program using a model and an optimizer
         1. create feeds
@@ -333,79 +297,20 @@ def build(config, main_prog, startup_prog, is_train=True):
         dataloader(): a bridge between the model and the data
         fetchs(dict): dict of model outputs(included loss and measures)
     """
-    with fluid.program_guard(main_prog, startup_prog):
-        with fluid.unique_name.guard():
-            use_mix = config.get('use_mix') and is_train
-            use_distillation = config.get('use_distillation')
-            feeds = create_feeds(config.image_shape, use_mix=use_mix)
-            dataloader = create_dataloader(feeds.values())
-            out = create_model(config.ARCHITECTURE, feeds['image'],
-                               config.classes_num, is_train)
-            fetchs = create_fetchs(
-                out,
-                feeds,
-                config.ARCHITECTURE,
-                config.topk,
-                config.classes_num,
-                epsilon=config.get('ls_epsilon'),
-                use_mix=use_mix,
-                use_distillation=use_distillation)
-            if is_train:
-                optimizer = create_optimizer(config)
-                lr = optimizer._global_learning_rate()
-                fetchs['lr'] = (lr, AverageMeter('lr', 'f', need_avg=False))
+    fetchs = create_fetchs(
+        out,
+        label,
+        config.ARCHITECTURE,
+        config.topk,
+        config.classes_num,
+        epsilon=config.get('ls_epsilon'),
+        use_mix=config.get('use_mix') and mode == 'train',
+        use_distillation=config.get('use_distillation'))
 
-                optimizer = mixed_precision_optimizer(config, optimizer)
-                optimizer = dist_optimizer(config, optimizer)
-                optimizer.minimize(fetchs['loss'][0])
-                if config.get('use_ema'):
-
-                    global_steps = fluid.layers.learning_rate_scheduler._decay_step_counter(
-                    )
-                    ema = ExponentialMovingAverage(
-                        config.get('ema_decay'), thres_steps=global_steps)
-                    ema.update()
-                    return dataloader, fetchs, ema
-
-    return dataloader, fetchs
+    return fetchs
 
 
-def compile(config, program, loss_name=None):
-    """
-    Compile the program
-
-    Args:
-        config(dict): config
-        program(): the program which is wrapped by
-        loss_name(str): loss name
-
-    Returns:
-        compiled_program(): a compiled program
-    """
-    build_strategy = fluid.compiler.BuildStrategy()
-    exec_strategy = fluid.ExecutionStrategy()
-
-    exec_strategy.num_threads = 1
-    exec_strategy.num_iteration_per_drop_scope = 10
-
-    compiled_program = fluid.CompiledProgram(program).with_data_parallel(
-        loss_name=loss_name,
-        build_strategy=build_strategy,
-        exec_strategy=exec_strategy)
-
-    return compiled_program
-
-
-total_step = 0
-
-
-def run(dataloader,
-        exe,
-        program,
-        fetchs,
-        epoch=0,
-        mode='train',
-        vdl_writer=None):
+def run(dataloader, config, net, optimizer=None, epoch=0, mode='train'):
     """
     Feed data to the model and fetch the measures and loss
 
@@ -419,48 +324,58 @@ def run(dataloader,
 
     Returns:
     """
-    fetch_list = [f[0] for f in fetchs.values()]
-    metric_list = [f[1] for f in fetchs.values()]
-    for m in metric_list:
-        m.reset()
-    batch_time = AverageMeter('elapse', '.3f')
+    topk_name = 'top{}'.format(config.topk)
+    metric_list = OrderedDict([
+        ("loss", AverageMeter('loss', '7.4f')),
+        ("top1", AverageMeter('top1', '.4f')),
+        (topk_name, AverageMeter(topk_name, '.4f')),
+        ("lr", AverageMeter('lr', 'f', need_avg=False)),
+        ("batch_time", AverageMeter('elapse', '.3f')),
+    ])
+
     tic = time.time()
-    for idx, batch in enumerate(dataloader()):
-        metrics = exe.run(program=program, feed=batch, fetch_list=fetch_list)
-        batch_time.update(time.time() - tic)
+    for idx, (img, label) in enumerate(dataloader()):
+        label = to_variable(label.numpy().astype('int64').reshape(-1, 1))
+        fetchs = compute(config, net(img), label, mode)
+        if mode == 'train':
+            avg_loss = net.scale_loss(fetchs['loss'])
+            avg_loss.backward()
+            net.apply_collective_grads()
+
+            optimizer.minimize(avg_loss)
+            net.clear_gradients()
+            metric_list['lr'].update(
+                    optimizer._global_learning_rate().numpy()[0], len(img))
+
+        for name, fetch in fetchs.items():
+            metric_list[name].update(fetch.numpy()[0], len(img))
+        metric_list['batch_time'].update(time.time() - tic)
         tic = time.time()
-        for i, m in enumerate(metrics):
-            metric_list[i].update(m[0], len(batch[0]))
-        fetchs_str = ''.join([str(m.value) + ' '
-                              for m in metric_list] + [batch_time.value]) + 's'
-        if vdl_writer:
-            global total_step
-            logger.scaler('loss', metrics[0][0], total_step, vdl_writer)
-            total_step += 1
+
+        fetchs_str = ' '.join([str(m.value) for m in metric_list.values()])
         if mode == 'eval':
             logger.info("{:s} step:{:<4d} {:s}s".format(mode, idx, fetchs_str))
         else:
             epoch_str = "epoch:{:<3d}".format(epoch)
             step_str = "{:s} step:{:<4d}".format(mode, idx)
 
-            logger.info("{:s} {:s} {:s}".format(
+            logger.info("{:s} {:s} {:s}s".format(
                 logger.coloring(epoch_str, "HEADER")
                 if idx == 0 else epoch_str,
                 logger.coloring(step_str, "PURPLE"),
                 logger.coloring(fetchs_str, 'OKGREEN')))
 
-    end_str = ''.join([str(m.mean) + ' '
-                       for m in metric_list] + [batch_time.total]) + 's'
+    end_str = ' '.join([str(m.mean) for m in metric_list.values()] + [metric_list['batch_time'].total])
     if mode == 'eval':
         logger.info("END {:s} {:s}s".format(mode, end_str))
     else:
         end_epoch_str = "END epoch:{:<3d}".format(epoch)
 
-        logger.info("{:s} {:s} {:s}".format(
+        logger.info("{:s} {:s} {:s}s".format(
             logger.coloring(end_epoch_str, "RED"),
             logger.coloring(mode, "PURPLE"),
             logger.coloring(end_str, "OKGREEN")))
 
     # return top1_acc in order to save the best model
     if mode == 'valid':
-        return fetchs["top1"][1].avg
+        return metric_list['top1'].avg
