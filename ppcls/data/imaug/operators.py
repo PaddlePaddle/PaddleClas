@@ -25,6 +25,8 @@ import random
 import cv2
 import numpy as np
 
+from .autoaugment import ImageNetPolicy
+
 
 class OperatorParamError(ValueError):
     """ OperatorParamError
@@ -115,7 +117,9 @@ class CropImage(object):
 class RandCropImage(object):
     """ random crop image """
 
-    def __init__(self, size, scale=None, ratio=None):
+    def __init__(self, size, scale=None, ratio=None, interpolation=-1):
+
+        self.interpolation = interpolation if interpolation >= 0 else None
         if type(size) is int:
             self.size = (size, size)  # (h, w)
         else:
@@ -149,7 +153,10 @@ class RandCropImage(object):
         j = random.randint(0, img_h - h)
 
         img = img[j:j + h, i:i + w, :]
-        return cv2.resize(img, size)
+        if self.interpolation is None:
+            return cv2.resize(img, size)
+        else:
+            return cv2.resize(img, size, interpolation=self.interpolation)
 
 
 class RandFlipImage(object):
@@ -170,6 +177,18 @@ class RandFlipImage(object):
             return cv2.flip(img, self.flip_code)
         else:
             return img
+
+
+class AutoAugment(object):
+    def __init__(self):
+        self.policy = ImageNetPolicy()
+
+    def __call__(self, img):
+        from PIL import Image
+        img = np.ascontiguousarray(img)
+        img = Image.fromarray(img)
+        img = self.policy(img)
+        img = np.asarray(img)
 
 
 class NormalizeImage(object):
