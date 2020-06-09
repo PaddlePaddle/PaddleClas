@@ -41,7 +41,8 @@ python -m paddle.distributed.launch \
     --selected_gpus="0,1,2,3" \
     tools/train.py \
         -c ./configs/ResNet/ResNet50_vd.yaml \
-        -o use_mix=1
+        -o use_mix=1 \
+	--vdl_dir=./scalar/
 
 ```
 
@@ -52,6 +53,13 @@ epoch:0    train    step:522    loss:1.6330    lr:0.100000    elapse:0.210
 ```
 
 也可以直接修改模型对应的配置文件更新配置。具体配置参数参考[配置文档](config.md)。
+
+训练期间可以通过VisualDL实时观察loss变化，启动命令如下：
+
+```bash
+visualdl --logdir ./scalar --host <host_IP> --port <port_num>
+
+```
 
 
 ### 2.2 模型微调
