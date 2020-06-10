@@ -15,15 +15,17 @@
 import numpy as np
 import imghdr
 import os
+import sys
 import signal
 
+from paddle import fluid
 from paddle.fluid.io import multiprocess_reader
 
 from . import imaug
 from .imaug import transform
 from ppcls.utils import logger
 
-trainers_num = int(os.environ.get('PADDLE_TRAINERS_NUM', 1))
+trainers_num = int(os.environ.get('PADDLE_TRAINERS_NUM', 0))
 trainer_id = int(os.environ.get("PADDLE_TRAINER_ID", 0))
 
 
@@ -139,8 +141,9 @@ def get_file_list(params):
 
     # use only partial data for each trainer in distributed training
     if params['mode'] == 'train':
-        img_per_trainer = len(full_lines) // trainers_num
-        full_lines = full_lines[trainer_id::trainers_num][:img_per_trainer]
+        real_trainer_num = max(trainers_num, 1)
+        img_per_trainer = len(full_lines) // real_trainer_num
+        full_lines = full_lines[trainer_id::real_trainer_num][:img_per_trainer]
 
     return full_lines
 
@@ -165,7 +168,7 @@ def create_operators(params):
     return ops
 
 
-def partial_reader(params, full_lines, part_id=0, part_num=1):
+def partial_reader(params, full_lines, part_id=0, part_num=1, batch_size=1):
     """
     create a reader with partial data
 
@@ -174,13 +177,13 @@ def partial_reader(params, full_lines, part_id=0, part_num=1):
         full_lines: label list
         part_id(int): part index of the current partial data
         part_num(int): part num of the dataset
+        batch_size(int): batch size for one trainer
     """
     assert part_id < part_num, ("part_num: {} should be larger "
                                 "than part_id: {}".format(part_num, part_id))
 
     full_lines = full_lines[part_id::part_num]
 
-    batch_size = int(params['batch_size']) // trainers_num
     if params['mode'] != "test" and len(full_lines) < batch_size:
         raise SampleNumException('', len(full_lines), batch_size)
 
@@ -197,7 +200,7 @@ def partial_reader(params, full_lines, part_id=0, part_num=1):
     return reader
 
 
-def mp_reader(params):
+def mp_reader(params, batch_size):
     """
     multiprocess reader
 
@@ -210,11 +213,16 @@ def mp_reader(params):
     if params["mode"] == "train":
         full_lines = shuffle_lines(full_lines, seed=None)
 
+    # NOTE: multiprocess reader is not supported on windows
+    if sys.platform == "win32":
+        return partial_reader(params, full_lines, 0, 1, batch_size)
+
     part_num = 1 if 'num_workers' not in params else params['num_workers']
 
     readers = []
     for part_id in range(part_num):
-        readers.append(partial_reader(params, full_lines, part_id, part_num))
+        readers.append(
+            partial_reader(params, full_lines, part_id, part_num, batch_size))
 
     return multiprocess_reader(readers, use_pipe=False)
 
@@ -248,6 +256,7 @@ class Reader:
         except KeyError:
             raise ModeException(mode=mode)
 
+        self.use_gpu = config.get("use_gpu", True)
         use_mix = config.get('use_mix')
         self.params['mode'] = mode
         if seed is not None:
@@ -257,10 +266,17 @@ class Reader:
             self.batch_ops = create_operators(self.params['mix'])
 
     def __call__(self):
-        batch_size = int(self.params['batch_size']) // trainers_num
+        device_num = trainers_num
+        # non-distributed launch
+        if trainers_num <= 0:
+            if self.use_gpu:
+                device_num = fluid.core.get_cuda_device_count()
+            else:
+                device_num = int(os.environ.get('CPU_NUM', 1))
+        batch_size = int(self.params['batch_size']) // device_num
 
         def wrapper():
-            reader = mp_reader(self.params)
+            reader = mp_reader(self.params, batch_size)
             batch = []
             for idx, sample in enumerate(reader()):
                 img, label = sample
