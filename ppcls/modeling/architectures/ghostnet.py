@@ -109,10 +109,6 @@ class GhostNet():
                 initializer=fluid.initializer.Uniform(-stdv, stdv),
                 name=name + '_exc_weights'),
             bias_attr=ParamAttr(name=name + '_exc_offset'))
-	#ones = fluid.layers.fill_constant(excitation.shape, "float32", 1)
-	#zeros = fluid.layers.fill_constant(excitation.shape, "float32", 0)
-	#excitation = fluid.layers.elementwise_max(excitation, zeros)
-	# excitation = fluid.layers.elementwise_min(excitation, ones)
         excitation = fluid.layers.clip(x=excitation,
                                        min=0,
                                        max=1,
@@ -167,10 +163,7 @@ class GhostNet():
                                             name=name+"_cheap_operation",
                                             data_format=data_format)
         out = fluid.layers.concat([primary_conv, cheap_operation], axis=1, name=name+"_concat")
-        # return out[:, :self.oup, :, :]
-        print(self.oup)
-        print(out.shape)
-        return fluid.layers.slice(out, axes=[1], starts=[0], ends=[self.oup])
+        return out
     
     def GhostBottleneck(self,
                         inp,
@@ -251,8 +244,6 @@ class GhostNet():
         for k, exp_size, c, use_se, s in self.cfgs:
             output_channel = int(self._make_divisible(c*self.width_mult, 4))
             hidden_channel = int(self._make_divisible(exp_size*self.width_mult, 4))
-            #print(output_channel)
-            #print(hidden_channel)
             x = self.GhostBottleneck(inp=x,
                                     hidden_dim=hidden_channel,
                                     oup=output_channel,
