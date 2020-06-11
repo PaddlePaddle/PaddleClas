@@ -1,6 +1,6 @@
 # Transfer learning in image classification
 
-Transfer learning is an important part machine learning, which is widely used in various fields such as text and images. Here we mainly introduce transfer learning in the field of image classification, which is often called domain transfer, such as migration of the ImageNet classification model to the specified image classification task, such as flower classification.
+Transfer learning is an important part of machine learning, which is widely used in various fields such as text and images. Here we mainly introduce transfer learning in the field of image classification, which is often called domain transfer, such as migration of the ImageNet classification model to the specified image classification task, such as flower classification.
 
 ## 1. Hyperparameter search
 
@@ -37,7 +37,7 @@ label smoothing: [False, True]
 mixup: [False, True]
 ```
 
-It takes 196 times for grid search, and takes 10 times less for Bayesian search. The baseline is trainin using ImageNet1k pretrained model based on ResNet50_vd and fixed scheme. The follow shows the experiments.
+It takes 196 times for grid search, and takes 10 times less for Bayesian search. The baseline is trained by using ImageNet1k pretrained model based on ResNet50_vd and fixed scheme. The follow shows the experiments.
 
 
 | Dataset             | Fix scheme | Grid search | Grid search time | Bayesian search | Bayesian search time|
@@ -53,7 +53,7 @@ It takes 196 times for grid search, and takes 10 times less for Bayesian search.
 
 
 - The above experiments verify that Bayesian search only reduces the accuracy by 0% to 0.4% under the condition of reducing the number of searches by about 10 times compared to grid search.
-- Thes earch space can be expaned easily using Bayesian search.
+- The search space can be expaned easily using Bayesian search.
 
 ## 二、 Large-scale image classification
 
@@ -79,7 +79,7 @@ lr=0.001，l2 decay=1e-4，label smoothing=False，mixup=False
 | Chair         | class:5<br />train:169<br />valid:78      | 0.8557/0.9688                                            | 0.9077/0.9792                                             |
 | Geology         | class:4<br />train:671<br />valid:296     | 0.5719/0.8094                                            | 0.6781/0.8219                                             |
 
-- The above experiments verified that for fixed parameters, compared with the pretrained model on ImageNet, using the large-scale classification model as a pretrained model can help us improve the the model performance on a new dataset in most cases. Parameter search can be further helpful to the model performance.
+- The above experiments verified that for fixed parameters, compared with the pretrained model on ImageNet, using the large-scale classification model as a pretrained model can help us improve the model performance on a new dataset in most cases. Parameter search can be further helpful to the model performance.
 
 ## Reference
 

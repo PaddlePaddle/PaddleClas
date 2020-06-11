@@ -22,8 +22,8 @@
 | +`libra sampling` | 640x640 | 640x640 | 41.6% | 60.345 |
 
 
-Based on the ablation experiments, Cascade RCNN and larger inference scale(1000x1500) are used for better performance. The final COCO mAP is 47.8% when the
-And the following figure shows `mAP-Speed` curves for some common detectors.
+Based on the ablation experiments, Cascade RCNN and larger inference scale(1000x1500) are used for better performance. The final COCO mAP is 47.8%
+and the following figure shows `mAP-Speed` curves for some common detectors.
 
 
 ![pssdet](../../images/det/pssdet.png)
