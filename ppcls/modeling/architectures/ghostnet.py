@@ -230,7 +230,6 @@ class GhostNet():
     def net(self, input, class_dim=1000):
         # build first layer:
         output_channel = int(self._make_divisible(16 * self.width_mult, 4))
-        # print(output_channel)
         x = self.conv_bn_layer(
             input=input,
             num_filters=output_channel,
