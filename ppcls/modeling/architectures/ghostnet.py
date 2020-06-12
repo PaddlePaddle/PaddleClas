@@ -7,11 +7,11 @@ import math
 import paddle.fluid as fluid
 from paddle.fluid.param_attr import ParamAttr
 
-__all__ = ["GhostNet", "GhostNet_0_5", "GhostNet_1_0", "GhostNet_1_3"]
+__all__ = ["GhostNet", "GhostNet_x0_5", "GhostNet_x1_0", "GhostNet_x1_3"]
 
 
 class GhostNet():
-    def __init__(self, width_mult):
+    def __init__(self, scale):
         cfgs = [
             # k, t, c, SE, s
             [3, 16, 16, 0, 1],
@@ -32,7 +32,69 @@ class GhostNet():
             [5, 960, 160, 1, 1]
         ]
         self.cfgs = cfgs
-        self.width_mult = width_mult
+        self.scale = scale
+
+    def net(self, input, class_dim=1000):
+        # build first layer:
+        output_channel = int(self._make_divisible(16 * self.scale, 4))
+        x = self.conv_bn_layer(
+            input=input,
+            num_filters=output_channel,
+            filter_size=3,
+            stride=2,
+            groups=1,
+            act="relu",
+            name="conv1")
+        # build inverted residual blocks
+        idx = 0
+        for k, exp_size, c, use_se, s in self.cfgs:
+            output_channel = int(self._make_divisible(c * self.scale, 4))
+            hidden_channel = int(
+                self._make_divisible(exp_size * self.scale, 4))
+            x = self.ghost_bottleneck(
+                inp=x,
+                hidden_dim=hidden_channel,
+                oup=output_channel,
+                kernel_size=k,
+                stride=s,
+                use_se=use_se,
+                name="ghost_bottle_" + str(idx))
+            idx += 1
+        # build last several layers
+        output_channel = int(
+            self._make_divisible(exp_size * self.scale, 4))
+        x = self.conv_bn_layer(
+            input=x,
+            num_filters=output_channel,
+            filter_size=1,
+            stride=1,
+            groups=1,
+            act="relu",
+            name="conv2")
+        x = fluid.layers.pool2d(
+            input=x, pool_type='avg', global_pooling=True)
+        output_channel = 1280
+
+        stdv = 1.0 / math.sqrt(x.shape[1] * 1.0)
+        out = self.conv_bn_layer(
+            input=x,
+            num_filters=output_channel,
+            filter_size=1,
+            stride=1,
+            groups=1,
+            act="relu",
+            name="fc_0")
+        out = fluid.layers.dropout(x=out, dropout_prob=0.2)
+        stdv = 1.0 / math.sqrt(out.shape[1] * 1.0)
+        out = fluid.layers.fc(
+            input=out,
+            size=class_dim,
+            param_attr=ParamAttr(
+                name="fc_1_weight",
+                initializer=fluid.initializer.Uniform(-stdv, stdv)),
+            bias_attr=ParamAttr(name="fc_1_offset"))
+
+        return out
 
     def _make_divisible(self, v, divisor, min_value=None):
         """
@@ -56,8 +118,7 @@ class GhostNet():
                       stride=1,
                       groups=1,
                       act=None,
-                      name=None,
-                      data_format="NCHW"):
+                      name=None):
         x = fluid.layers.conv2d(
             input=input,
             num_filters=num_filters,
@@ -68,14 +129,11 @@ class GhostNet():
             act=None,
             param_attr=ParamAttr(
                 initializer=fluid.initializer.MSRA(), name=name + "_weights"),
-            bias_attr=False,
-            name=name + "_conv_op",
-            data_format=data_format)
+            bias_attr=False)
 
         x = fluid.layers.batch_norm(
             input=x,
             act=act,
-            name=name + "_bn",
             param_attr=ParamAttr(
                 name=name + "_bn_scale",
                 regularizer=fluid.regularizer.L2DecayRegularizer(
@@ -85,11 +143,10 @@ class GhostNet():
                 regularizer=fluid.regularizer.L2DecayRegularizer(
                     regularization_coeff=0.0)),
             moving_mean_name=name + "_bn_mean",
-            moving_variance_name=name + "_bn_variance",
-            data_layout=data_format)
+            moving_variance_name=name + "_bn_variance")
         return x
 
-    def SElayer(self, input, num_channels, reduction_ratio=4, name=None):
+    def se_layer(self, input, num_channels, reduction_ratio=4, name=None):
         pool = fluid.layers.pool2d(
             input=input, pool_size=0, pool_type='avg', global_pooling=True)
         stdv = 1.0 / math.sqrt(pool.shape[1] * 1.0)
@@ -111,9 +168,9 @@ class GhostNet():
                 name=name + '_exc_weights'),
             bias_attr=ParamAttr(name=name + '_exc_offset'))
         excitation = fluid.layers.clip(
-            x=excitation, min=0, max=1, name=name + '_clip')
-        scale = fluid.layers.elementwise_mul(x=input, y=excitation, axis=0)
-        return scale
+            x=excitation, min=0, max=1)
+        se_scale = fluid.layers.elementwise_mul(x=input, y=excitation, axis=0)
+        return se_scale
 
     def depthwise_conv(self,
                        inp,
@@ -121,19 +178,17 @@ class GhostNet():
                        kernel_size,
                        stride=1,
                        relu=False,
-                       name=None,
-                       data_format="NCHW"):
+                       name=None):
         return self.conv_bn_layer(
             input=inp,
             num_filters=oup,
             filter_size=kernel_size,
             stride=stride,
-            groups=inp.shape[1] if data_format == "NCHW" else inp.shape[-1],
+            groups=inp.shape[1],
             act="relu" if relu else None,
-            name=name + "_dw",
-            data_format=data_format)
+            name=name + "_dw")
 
-    def GhostModule(self,
+    def ghost_module(self,
                     inp,
                     oup,
                     kernel_size=1,
@@ -141,8 +196,7 @@ class GhostNet():
                     dw_size=3,
                     stride=1,
                     relu=True,
-                    name=None,
-                    data_format="NCHW"):
+                    name=None):
         self.oup = oup
         init_channels = int(math.ceil(oup / ratio))
         new_channels = int(init_channels * (ratio - 1))
@@ -153,8 +207,7 @@ class GhostNet():
             stride=stride,
             groups=1,
             act="relu" if relu else None,
-            name=name + "_primary_conv",
-            data_format="NCHW")
+            name=name + "_primary_conv")
         cheap_operation = self.conv_bn_layer(
             input=primary_conv,
             num_filters=new_channels,
@@ -162,30 +215,27 @@ class GhostNet():
             stride=1,
             groups=init_channels,
             act="relu" if relu else None,
-            name=name + "_cheap_operation",
-            data_format=data_format)
+            name=name + "_cheap_operation")
         out = fluid.layers.concat(
-            [primary_conv, cheap_operation], axis=1, name=name + "_concat")
+            [primary_conv, cheap_operation], axis=1)
         return out
 
-    def GhostBottleneck(self,
+    def ghost_bottleneck(self,
                         inp,
                         hidden_dim,
                         oup,
                         kernel_size,
                         stride,
                         use_se,
-                        name=None,
-                        data_format="NCHW"):
+                        name=None):
         inp_channels = inp.shape[1]
-        x = self.GhostModule(
+        x = self.ghost_module(
             inp=inp,
             oup=hidden_dim,
             kernel_size=1,
             stride=1,
             relu=True,
-            name=name + "GhostBottle_1",
-            data_format="NCHW")
+            name=name + "ghost_module_1")
         if stride == 2:
             x = self.depthwise_conv(
                 inp=x,
@@ -193,17 +243,16 @@ class GhostNet():
                 kernel_size=kernel_size,
                 stride=stride,
                 relu=False,
-                name=name + "_dw2",
-                data_format="NCHW")
+                name=name + "_dw2")
         if use_se:
-            x = self.SElayer(
-                input=x, num_channels=hidden_dim, name=name + "SElayer")
-        x = self.GhostModule(
+            x = self.se_layer(
+                input=x, num_channels=hidden_dim, name=name + "se_layer")
+        x = self.ghost_module(
             inp=x,
             oup=oup,
             kernel_size=1,
             relu=False,
-            name=name + "GhostModule_2")
+            name=name + "ghost_module_2")
         if stride == 1 and inp_channels == oup:
             shortcut = inp
         else:
@@ -213,8 +262,7 @@ class GhostNet():
                 kernel_size=kernel_size,
                 stride=stride,
                 relu=False,
-                name=name + "shortcut_depthwise_conv",
-                data_format="NCHW")
+                name=name + "shortcut_depthwise_conv")
             shortcut = self.conv_bn_layer(
                 input=shortcut,
                 num_filters=oup,
@@ -222,104 +270,22 @@ class GhostNet():
                 stride=1,
                 groups=1,
                 act=None,
-                name=name + "shortcut_conv_bn",
-                data_format="NCHW")
+                name=name + "shortcut_conv_bn")
         return fluid.layers.elementwise_add(
-            x=x, y=shortcut, axis=-1, act=None, name=name + "elementwise_add")
-
-    def net(self, input, class_dim=1000):
-        # build first layer:
-        output_channel = int(self._make_divisible(16 * self.width_mult, 4))
-        x = self.conv_bn_layer(
-            input=input,
-            num_filters=output_channel,
-            filter_size=3,
-            stride=2,
-            groups=1,
-            act="relu",
-            name="firstlayer",
-            data_format="NCHW")
-        # build inverted residual blocks
-        idx = 0
-        for k, exp_size, c, use_se, s in self.cfgs:
-            output_channel = int(self._make_divisible(c * self.width_mult, 4))
-            hidden_channel = int(
-                self._make_divisible(exp_size * self.width_mult, 4))
-            x = self.GhostBottleneck(
-                inp=x,
-                hidden_dim=hidden_channel,
-                oup=output_channel,
-                kernel_size=k,
-                stride=s,
-                use_se=use_se,
-                name="GhostBottle_" + str(idx),
-                data_format="NCHW")
-            idx += 1
-        # build last several layers
-        output_channel = int(
-            self._make_divisible(exp_size * self.width_mult, 4))
-        x = self.conv_bn_layer(
-            input=x,
-            num_filters=output_channel,
-            filter_size=1,
-            stride=1,
-            groups=1,
-            act="relu",
-            name="lastlayer",
-            data_format="NCHW")
-        x = fluid.layers.pool2d(
-            input=x, pool_type='avg', global_pooling=True, data_format="NCHW")
-        output_channel = 1280
-
-        stdv = 1.0 / math.sqrt(x.shape[1] * 1.0)
-        out = fluid.layers.conv2d(
-            input=x,
-            num_filters=output_channel,
-            filter_size=1,
-            groups=1,
-            param_attr=ParamAttr(
-                name="fc_0_w",
-                initializer=fluid.initializer.Uniform(-stdv, stdv)),
-            bias_attr=False,
-            name="fc_0")
-        out = fluid.layers.batch_norm(
-            input=out,
-            act="relu",
-            name="fc_0_bn",
-            param_attr=ParamAttr(
-                name="fc_0_bn_scale",
-                regularizer=fluid.regularizer.L2DecayRegularizer(
-                    regularization_coeff=0.0)),
-            bias_attr=ParamAttr(
-                name="fc_0_bn_offset",
-                regularizer=fluid.regularizer.L2DecayRegularizer(
-                    regularization_coeff=0.0)),
-            moving_mean_name="fc_0_bn_mean",
-            moving_variance_name="fc_0_bn_variance",
-            data_layout="NCHW")
-        out = fluid.layers.dropout(x=out, dropout_prob=0.2)
-        stdv = 1.0 / math.sqrt(out.shape[1] * 1.0)
-        out = fluid.layers.fc(
-            input=out,
-            size=class_dim,
-            param_attr=ParamAttr(
-                name="fc_1_w",
-                initializer=fluid.initializer.Uniform(-stdv, stdv)),
-            bias_attr=ParamAttr(name="fc_1_bias"))
-
-        return out
+            x=x, y=shortcut, axis=-1, act=None)
 
 
-def GhostNet_0_5():
-    model = GhostNet(width_mult=0.5)
+def GhostNet_x0_5():
+    model = GhostNet(scale=0.5)
     return model
 
 
-def GhostNet_1_0():
-    model = GhostNet(width_mult=1.0)
+def GhostNet_x1_0():
+    model = GhostNet(scale=1.0)
     return model
 
 
-def GhostNet_1_3():
-    model = GhostNet(width_mult=1.3)
+def GhostNet_x1_3():
+    model = GhostNet(scale=1.3)
     return model
+
