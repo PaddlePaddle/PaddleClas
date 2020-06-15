@@ -17,9 +17,7 @@ import argparse
 import numpy as np
 
 import paddle.fluid as fluid
-
 from ppcls.modeling import architectures
-
 
 def parse_args():
     def str2bool(v):
@@ -32,41 +30,6 @@ def parse_args():
     parser.add_argument("--use_gpu", type=str2bool, default=True)
 
     return parser.parse_args()
-
-
-def create_predictor(args):
-    def create_input():
-        image = fluid.data(
-            name='image', shape=[None, 3, 224, 224], dtype='float32')
-        return image
-
-    def create_model(args, model, input, class_dim=1000):
-        if args.model == "GoogLeNet":
-            out, _, _ = model.net(input=input, class_dim=class_dim)
-        else:
-            out = model.net(input=input, class_dim=class_dim)
-            out = fluid.layers.softmax(out)
-        return out
-
-    model = architectures.__dict__[args.model]()
-
-    place = fluid.CUDAPlace(0) if args.use_gpu else fluid.CPUPlace()
-    exe = fluid.Executor(place)
-
-    startup_prog = fluid.Program()
-    infer_prog = fluid.Program()
-
-    with fluid.program_guard(infer_prog, startup_prog):
-        with fluid.unique_name.guard():
-            image = create_input()
-            out = create_model(args, model, image)
-
-    infer_prog = infer_prog.clone(for_test=True)
-    fluid.load(
-        program=infer_prog, model_path=args.pretrained_model, executor=exe)
-
-    return exe, infer_prog, [image.name], [out.name]
-
 
 def create_operators():
     size = 224
@@ -102,19 +65,33 @@ def postprocess(outputs, topk=5):
 def main():
     args = parse_args()
     operators = create_operators()
-    exe, program, feed_names, fetch_names = create_predictor(args)
-
-    data = preprocess(args.image_file, operators)
-    data = np.expand_dims(data, axis=0)
-    outputs = exe.run(program,
-                      feed={feed_names[0]: data},
-                      fetch_list=fetch_names,
-                      return_numpy=False)
+    # assign the place
+    gpu_id = fluid.dygraph.parallel.Env().dev_id
+    place = fluid.CUDAPlace(gpu_id)
+    
+    pre_weights_dict = fluid.load_program_state(args.pretrained_model)
+    with fluid.dygraph.guard(place):
+        net = architectures.__dict__[args.model]()
+        data = preprocess(args.image_file, operators)
+        data = np.expand_dims(data, axis=0)
+        data = fluid.dygraph.to_variable(data)
+        dy_weights_dict = net.state_dict()
+        pre_weights_dict_new = {}
+        for key in dy_weights_dict:
+            weights_name = dy_weights_dict[key].name
+            pre_weights_dict_new[key] = pre_weights_dict[weights_name]
+        net.set_dict(pre_weights_dict_new)
+        net.eval()
+        outputs = net(data)
+        outputs = fluid.layers.softmax(outputs)
+        outputs = outputs.numpy()
+        
     probs = postprocess(outputs)
-
+    rank = 1
     for idx, prob in probs:
-        print("class id: {:d}, probability: {:.4f}".format(idx, prob))
-
+        print("top{:d}, class id: {:d}, probability: {:.4f}".format(
+            rank, idx, prob))
+        rank += 1
 
 if __name__ == "__main__":
     main()
