@@ -12,8 +12,6 @@ Welcome to PaddleClas！
    application/index
    extension/index
    competition_support.md
-   model_zoo.md
-   change_log.md
-   faq.md
+   update_history_en.md
+   faq_en.md
 
-:math:`PaddlePaddle2020`
