@@ -338,7 +338,8 @@ def build(config, main_prog, startup_prog, is_train=True):
             use_mix = config.get('use_mix') and is_train
             use_distillation = config.get('use_distillation')
             feeds = create_feeds(config.image_shape, use_mix=use_mix)
-            dataloader = create_dataloader(feeds.values())
+            dataloader = create_dataloader(feeds.values()) if not config.get(
+                'use_dali') else None
             out = create_model(config.ARCHITECTURE, feeds['image'],
                                config.classes_num, is_train)
             fetchs = create_fetchs(
@@ -405,6 +406,7 @@ def run(dataloader,
         fetchs,
         epoch=0,
         mode='train',
+        config=None,
         vdl_writer=None):
     """
     Feed data to the model and fetch the measures and loss
@@ -425,7 +427,13 @@ def run(dataloader,
         m.reset()
     batch_time = AverageMeter('elapse', '.3f')
     tic = time.time()
-    for idx, batch in enumerate(dataloader()):
+    dataloader = dataloader if config.get('use_dali') else dataloader()()
+
+    for idx, batch in enumerate(dataloader):
+        if config.get('use_dali'):
+            import dali
+            batch = dali.post_mix_numpy(config, batch)
+
         metrics = exe.run(program=program, feed=batch, fetch_list=fetch_list)
         batch_time.update(time.time() - tic)
         tic = time.time()
@@ -448,6 +456,8 @@ def run(dataloader,
                 if idx == 0 else epoch_str,
                 logger.coloring(step_str, "PURPLE"),
                 logger.coloring(fetchs_str, 'OKGREEN')))
+    if config.get('use_dali'):
+        dataloader.reset()
 
     end_str = ''.join([str(m.mean) + ' '
                        for m in metric_list] + [batch_time.total]) + 's'
