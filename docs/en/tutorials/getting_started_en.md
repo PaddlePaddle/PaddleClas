@@ -64,7 +64,7 @@ visualdl --logdir ./scalar --host <host_IP> --port <port_num>
 
 * please refer to [Trial](./quick_start.md) for more details.
 
-### validating
+### validation
 
 ```bash
 python tools/eval.py \

@@ -1,14 +1,14 @@
 # Paddle-Lite
 
-## I. Introduction
+## Introduction
 
 [Paddle-Lite](https://github.com/PaddlePaddle/Paddle-Lite) is a set of lightweight inference engine which is fully functional, easy to use and then performs well. Lightweighting is reflected in the use of fewer bits to represent the weight and activation of the neural network, which can greatly reduce the size of the model, solve the problem of limited storage space of the mobile device, and the inference speed is better than other frameworks on the whole.
 
 In [PaddleClas](https://github.com/PaddlePaddle/PaddleClas), we uses Paddle-Lite to [evaluate the performance on the mobile device](../models/Mobile.md), in this section we uses the `MobileNetV1` model trained on the `ImageNet1k` dataset as an example to introduce how to use `Paddle-Lite` to evaluate the model speed on the mobile terminal (evaluated on SD855)
 
-## II. Evaluation Steps
+## Evaluation Steps
 
-### I. Export the Inference Model
+### Export the Inference Model
 
 * First you should transform the saved model during training to the special model which can be used to inference, the special model can be exported by `tools/export_model.py`, the specific way of transform is as follows.
 
@@ -19,7 +19,7 @@ python tools/export_model.py -m MobileNetV1 -p pretrained/MobileNetV1_pretrained
 Finally the `model` and `parmas` can be saved in `inference/MobileNetV1`.
 
 
-### II. Download Benchmark Binary File
+### Download Benchmark Binary File
 
 * Use the adb (Android Debug Bridge) tool to connect the Android phone and the PC, then develop and debug. After installing adb and ensuring that the PC and the phone are successfully connected, use the following command to view the ARM version of the phone and select the pre-compiled library based on ARM version.
 
@@ -39,7 +39,7 @@ If the ARM version is v7, the v7 benchmark_bin file should be downloaded, the co
 wget -c https://paddle-inference-dist.bj.bcebos.com/PaddleLite/benchmark_0/benchmark_bin_v7
 ```
 
-### III. the Inference Speeds
+### Inference benchmark
 
 After the PC and mobile phone are successfully connected, use the following command to start the model evaluation.
 
@@ -63,7 +63,7 @@ MobileNetV1                           min = 10.03200    max = 9.94300     averag
 
 Here is the model inference speed under different number of threads, the unit is FPS, taking model on one threads as an example, the average speed of MobileNetV1 on SD855 is `30.79750FPS`.
 
-### IV. Model Optimization and Speed Evaluation
+### Model Optimization and Speed Evaluation
 
 * In II.III section, we mention that the model will be optimized before evaluation, here you can  first optimize the model, and then directly load the optimized model for speed evaluation
 

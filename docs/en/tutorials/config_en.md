@@ -4,9 +4,7 @@
 
 ## Introduction
 
-This document introduces the configuration(filed in config/*.yaml) of PaddleClas.
-
-## Filed in config/*.yaml
+This document introduces the configuration(filed in `config/*.yaml`) of PaddleClas.
 
 ### Basic
 
