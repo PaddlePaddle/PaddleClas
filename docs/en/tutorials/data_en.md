@@ -2,10 +2,10 @@
 
 ---
 
-## 1. Introducation
+## Introducation
 This document introduces the preparation of ImageNet1k and flowers102
 
-## 2. Dataset
+## Dataset
 
 Dataset | train dataset size | valid dataset size | category |
 :------:|:---------------:|:---------------------:|:--------:|

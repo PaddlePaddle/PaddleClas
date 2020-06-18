@@ -1,6 +1,6 @@
-# Classification Framework
+# Prediction Framework
 
-## I. Introduction
+## Introduction
 
 Models for Paddle are stored in many different forms, which can be roughly divided into two categories：
 1. persistable model（the models saved by fluid.save_persistables）
@@ -54,7 +54,7 @@ Regardless of the inference method, it basically includes the following main ste
 There are two main differences in different inference methods: building the engine and executing the forecast. The following sections will be introduced in detail
 
 
-## II. Model Transformation
+## Model Transformation
 
 During training, we usually save some checkpoints (persistable models). These are just model weight files and cannot be directly loaded by the prediction engine to predict, so we usually find suitable checkpoints after the training and convert them to inference model. There are two main steps: 1. Build a training engine, 2. Save the inference model, as shown below.
 
@@ -95,7 +95,7 @@ python tools/export_model.py \
     --o=the saved path of model and params
 ```
 
-## III. prediction engine + inference model
+## Prediction engine + inference model
 
 The complete example is provided in the `tools/infer/predict.py`，just execute the following command to complete the prediction:
 
@@ -161,7 +161,7 @@ More parameters information can be refered in [Paddle Python prediction API](htt
 
 By default, Paddle's wheel package does not include the TensorRT prediction engine. If you need to use TensorRT for prediction optimization, you need to compile the corresponding wheel package yourself. For the compilation method, please refer to Paddle's compilation guide. [Paddle compilation](https://www.paddlepaddle.org.cn/documentation/docs/zh/install/compile/fromsource.html)。
 
-## IV、Training engine + persistable model prediction
+## Training engine + persistable model prediction
 
 A complete example is provided in the `tools/infer/infer.py`, just execute the following command to complete the prediction：
 
@@ -212,7 +212,7 @@ outputs = exe.run(infer_prog,
 
 For the above parameter descriptions, please refer to the official website [fluid.Executor](https://www.paddlepaddle.org.cn/documentation/docs/zh/api_cn/executor_cn/Executor_cn.html)
 
-## V、training engine + inference model prediction
+## Training engine + inference model prediction
 
 A complete example is provided in `tools/infer/py_infer.py`, just execute the following command to complete the prediction：
 
