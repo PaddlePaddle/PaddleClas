@@ -22,10 +22,10 @@ Based on ImageNet1k dataset, PaddleClas provides 23 series of image classificati
 
 
 <div align="center">
-    <img src="./docs/images/models/V100_benchmark/v100.fp32.bs1.main_fps_top1_s.jpg" width="700">
+    <img src="./docs/images/models/T4_benchmark/t4.fp32.bs4.main_fps_top1.png" width="700">
 </div>
 
-The above figure shows some of the latest server-side pretrained models. It can be seen from the figure that when using V100 GPU with FP32 and TensorRT, the `Top1` accuracy of the ResNet50_vd_ssld pretrained model on ImageNet1k-val dataset is **82.4%** and that of ResNet101_vd_ssld pretrained model is 83.7%. These pretained models are obtained from  SSLD knowledge distillation solution provided by PaddleClas. The marks of the same color and symbol in the figure represent models of different model sizes in the same series. For the introduction of different models, FLOPS, Params and detailed GPU inference time (including the inference speed of T4 GPU with different batch size), please refer to the documentation tutorial for more details: [https://paddleclas-en.readthedocs.io/en/latest/models/models_intro_en.html](https://paddleclas-en.readthedocs.io/en/latest/models/models_intro_en.html)
+The above figure shows some of the latest server-side pretrained models. It can be seen from the figure that when using V100 GPU with FP32 and TensorRT, the `Top1` accuracy of the ResNet50_vd_ssld pretrained model on ImageNet1k-val dataset is **83.0%** and that of ResNet101_vd_ssld pretrained model is 83.7%. These pretained models are obtained from  SSLD knowledge distillation solution provided by PaddleClas. The marks of the same color and symbol in the figure represent models of different model sizes in the same series. For the introduction of different models, FLOPS, Params and detailed GPU inference time (including the inference speed of T4 GPU with different batch size), please refer to the documentation tutorial for more details: [https://paddleclas-en.readthedocs.io/en/latest/models/models_intro_en.html](https://paddleclas-en.readthedocs.io/en/latest/models/models_intro_en.html)
 
 
 <div align="center">
