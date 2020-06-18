@@ -4,9 +4,9 @@
 
 > **English version of PaddleClas. Updating...**
 
-**Book**: https://paddleclas.readthedocs.io
+**Book**: https://paddleclas-en.readthedocs.io/en/latest/
 
-**Quick start PaddleClas in 30 minutes**: https://paddleclas.readthedocs.io/zh_CN/latest/tutorials/quick_start.html
+**Quick start PaddleClas in 30 minutes**: https://paddleclas-en.readthedocs.io/en/latest/tutorials/quick_start_en.html
 
 ## Introduction
 
@@ -18,14 +18,14 @@ PaddleClas is a toolset for image classification tasks prepared for the industry
 
 ## Rich model zoo
 
-Based on ImageNet1k dataset, PaddleClas provides 23 series of image classification networks such as ResNet, ResNet_vd, Res2Net, HRNet, and MobileNetV3 with brief introductions, reproduction configurations and training tricks. At the same time, the corresponding 117 image classification pretrained models are also available. The GPU inference time of the server-side models are evaluated based on TensorRT. The CPU inference time and storage size of the mobile-side models are evaluated on the Snapdragon 855 (SD855). For more detailed information on the supported pretrained models and their download links, please refer to [**models introduction tutorial**](https://paddleclas.readthedocs.io/zh_CN/latest/models/models_intro.html).
+Based on ImageNet1k dataset, PaddleClas provides 23 series of image classification networks such as ResNet, ResNet_vd, Res2Net, HRNet, and MobileNetV3 with brief introductions, reproduction configurations and training tricks. At the same time, the corresponding 117 image classification pretrained models are also available. The GPU inference time of the server-side models are evaluated based on TensorRT. The CPU inference time and storage size of the mobile-side models are evaluated on the Snapdragon 855 (SD855). For more detailed information on the supported pretrained models and their download links, please refer to [**models introduction tutorial**](https://paddleclas-en.readthedocs.io/en/latest/models/models_intro_en.html).
 
 
 <div align="center">
     <img src="./docs/images/models/V100_benchmark/v100.fp32.bs1.main_fps_top1_s.jpg" width="700">
 </div>
 
-The above figure shows some of the latest server-side pretrained models. It can be seen from the figure that when using V100 GPU with FP32 and TensorRT, the `Top1` accuracy of the ResNet50_vd_ssld pretrained model on ImageNet1k-val dataset is **82.4%** and that of ResNet101_vd_ssld pretrained model is 83.7%. These pretained models are obtained from  SSLD knowledge distillation solution provided by PaddleClas. The marks of the same color and symbol in the figure represent models of different model sizes in the same series. For the introduction of different models, FLOPS, Params and detailed GPU inference time (including the inference speed of T4 GPU with different batch size), please refer to the documentation tutorial for more details: [https://paddleclas.readthedocs.io/zh_CN/latest/models/models_intro.html](https://paddleclas.readthedocs.io/zh_CN/latest/models/models_intro.html)
+The above figure shows some of the latest server-side pretrained models. It can be seen from the figure that when using V100 GPU with FP32 and TensorRT, the `Top1` accuracy of the ResNet50_vd_ssld pretrained model on ImageNet1k-val dataset is **82.4%** and that of ResNet101_vd_ssld pretrained model is 83.7%. These pretained models are obtained from  SSLD knowledge distillation solution provided by PaddleClas. The marks of the same color and symbol in the figure represent models of different model sizes in the same series. For the introduction of different models, FLOPS, Params and detailed GPU inference time (including the inference speed of T4 GPU with different batch size), please refer to the documentation tutorial for more details: [https://paddleclas-en.readthedocs.io/en/latest/models/models_intro_en.html](https://paddleclas-en.readthedocs.io/en/latest/models/models_intro_en.html)
 
 
 <div align="center">
@@ -34,7 +34,7 @@ src="./docs/images/models/mobile_arm_top1.png" width="700">
 </div>
 
 
-The above figure shows the performance of some commonly used mobile-side models, including MobileNetV1, MobileNetV2, MobileNetV3 and ShuffleNetV2 series. The inference time is tested on Snapdragon 855 (SD855) with the batch size set as 1. The `Top1` accuracy of the MV3_large_x1_0_ssld, MV3_small_x1_0_ssld, MV1_ssld and MV2_ssld pretrained model on ImageNet1k-val dataset are 79%, 71.3%, 76.74%, 77.89%, respectively (M is short for MobileNet). MV3_large_x1_0_ssld_int8 is a quantizatied pretrained model for MV3_large_x1_0. More details about the mobile-side models can be seen in [**models introduction tutorial**](https://paddleclas.readthedocs.io/zh_CN/latest/models/models_intro.html)
+The above figure shows the performance of some commonly used mobile-side models, including MobileNetV1, MobileNetV2, MobileNetV3 and ShuffleNetV2 series. The inference time is tested on Snapdragon 855 (SD855) with the batch size set as 1. The `Top1` accuracy of the MV3_large_x1_0_ssld, MV3_small_x1_0_ssld, MV1_ssld and MV2_ssld pretrained model on ImageNet1k-val dataset are 79%, 71.3%, 76.74%, 77.89%, respectively (M is short for MobileNet). MV3_large_x1_0_ssld_int8 is a quantizatied pretrained model for MV3_large_x1_0. More details about the mobile-side models can be seen in [**models introduction tutorial**](https://paddleclas-en.readthedocs.io/en/latest/models/models_intro_en.html)
 
 - TODO
 - [ ] Reproduction and performance evaluation of EfficientLite, GhostNet, RegNet and ResNeSt.
@@ -54,7 +54,7 @@ Knowledge distillation refers to using the teacher model to guide the student mo
 src="./docs/images/distillation/distillation_perform_s.jpg" width="700">
 </div>
 
-Taking the ImageNet1k dataset as an example, the following figure shows the SSLD knowledge distillation method framework. The key points of the method include the choice of teacher model, loss calculation method, iteration number, use of unlabeled data, and ImageNet1k dataset finetune. For detailed introduction and experiments, please refer to [**knowledge distillation tutorial**](https://paddleclas.readthedocs.io/zh_CN/latest/advanced_tutorials/distillation/index.html)
+Taking the ImageNet1k dataset as an example, the following figure shows the SSLD knowledge distillation method framework. The key points of the method include the choice of teacher model, loss calculation method, iteration number, use of unlabeled data, and ImageNet1k dataset finetune. For detailed introduction and experiments, please refer to [**knowledge distillation tutorial**](https://paddleclas-en.readthedocs.io/en/latest/advanced_tutorials/distillation/distillation_en.html)
 
 <div align="center">
 <img
@@ -72,7 +72,7 @@ src="./docs/images/image_aug/image_aug_samples_s_en.jpg" width="800">
 </div>
 
 
-PaddleClas provides the reproduction of the above 8 data augmentation algorithms and the evaluation of the effect in a unified environment. The following figure shows the performance of different data augmentation methods based on ResNet50. Compared with the standard transformation, using data augmentation, the recognition accuracy  can be increased by up to 1%. For more detailed introduction of data augmentation methods, please refer to the [**data augmentation tutorial**](https://paddleclas.readthedocs.io/zh_CN/latest/advanced_tutorials/image_augmentation/index.html).
+PaddleClas provides the reproduction of the above 8 data augmentation algorithms and the evaluation of the effect in a unified environment. The following figure shows the performance of different data augmentation methods based on ResNet50. Compared with the standard transformation, using data augmentation, the recognition accuracy  can be increased by up to 1%. For more detailed introduction of data augmentation methods, please refer to the [**data augmentation tutorial**](https://paddleclas-en.readthedocs.io/en/latest/advanced_tutorials/image_augmentation/ImageAugment_en.html).
 
 
 <div align="center">
@@ -83,12 +83,12 @@ src="./docs/images/image_aug/main_image_aug_s.jpg" width="600">
 
 ## Quick start
 
-Based on flowers102 dataset, one can easily experience different networks, pretrained models and SSLD knowledge distillation method in PaddleClas. More details can be seen in [**Quick start PaddleClas in 30 minutes**](https://paddleclas.readthedocs.io/zh_CN/latest/tutorials/quick_start.html).
+Based on flowers102 dataset, one can easily experience different networks, pretrained models and SSLD knowledge distillation method in PaddleClas. More details can be seen in [**Quick start PaddleClas in 30 minutes**](https://paddleclas-en.readthedocs.io/en/latest/tutorials/quick_start_en.html).
 
 
 ## Getting started
 
-For installation, model training, inference, evaluation and finetune in PaddleClas, you can refer to [**gettting started tutorial**](https://paddleclas.readthedocs.io/zh_CN/latest/tutorials/index.html).
+For installation, model training, inference, evaluation and finetune in PaddleClas, you can refer to [**gettting started tutorial**](https://paddleclas-en.readthedocs.io/en/latest/tutorials/index.html).
 
 
 ## Featured extension and application
@@ -107,12 +107,12 @@ The models trained on ImageNet1K dataset are often used as pretrained models for
 | Geology    | class_num:4<br/>train/val:671/296         | 0.5719        | 0.6781        |
 
 
-The 100,000 categories' pretrained model can be downloaded here: [download link](https://paddle-imagenet-models-name.bj.bcebos.com/ResNet50_vd_10w_pretrained.tar). More details can be seen in [**Transfer learning tutorial**](https://paddleclas.readthedocs.io/zh_CN/latest/application/transfer_learning.html).
+The 100,000 categories' pretrained model can be downloaded here: [download link](https://paddle-imagenet-models-name.bj.bcebos.com/ResNet50_vd_10w_pretrained.tar). More details can be seen in [**Transfer learning tutorial**](https://paddleclas-en.readthedocs.io/en/latest/application/transfer_learning_en.html).
 
 
 ### Object detection
 
-In recent years, object detection tasks attract a lot of attention in academia and industry. The ImageNet classification model is often used for pretrained model in object detection, which can directly affect the effect of object detection. Based on 82.39% ResNet50_vd pretrained model, PaddleDetection provides a Practical Server-side Detection solution, PSS-DET. The solution contains many strategies that can effectively improve the performance while taking limited extra computation cost, such as model pruning, better pretrained model, deformable convolution, cascade rcnn, autoaugment, libra sampling and multi-scale training. Compared with the 79.12% ImageNet1k pretrained model, the 82.39% model can help improve the COCO mAP by 1.5% without any computation cost. Using PSS-DET, the inference speed on single V100 GPU can reach 20FPS when COCO mAP is 47.8%, and reach 61FPS when COCO mAP is 41.6%. For more details, please refer to [**Object Detection tutorial**](https://paddleclas.readthedocs.io/zh_CN/latest/application/object_detection.html).
+In recent years, object detection tasks attract a lot of attention in academia and industry. The ImageNet classification model is often used for pretrained model in object detection, which can directly affect the effect of object detection. Based on 82.39% ResNet50_vd pretrained model, PaddleDetection provides a Practical Server-side Detection solution, PSS-DET. The solution contains many strategies that can effectively improve the performance while taking limited extra computation cost, such as model pruning, better pretrained model, deformable convolution, cascade rcnn, autoaugment, libra sampling and multi-scale training. Compared with the 79.12% ImageNet1k pretrained model, the 82.39% model can help improve the COCO mAP by 1.5% without any computation cost. Using PSS-DET, the inference speed on single V100 GPU can reach 20FPS when COCO mAP is 47.8%, and reach 61FPS when COCO mAP is 41.6%. For more details, please refer to [**Object Detection tutorial**](https://paddleclas-en.readthedocs.io/en/latest/application/object_detection_en.html).
 
 
 - TODO

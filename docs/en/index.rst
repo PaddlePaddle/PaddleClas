@@ -11,7 +11,7 @@ Welcome to PaddleClas！
    advanced_tutorials/index
    application/index
    extension/index
-   competition_support.md
+   competition_support_en.md
    update_history_en.md
    faq_en.md
 
