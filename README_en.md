@@ -2,8 +2,6 @@
 
 # PaddleClas
 
-> **English version of PaddleClas. Updating...**
-
 **Book**: https://paddleclas-en.readthedocs.io/en/latest/
 
 **Quick start PaddleClas in 30 minutes**: https://paddleclas-en.readthedocs.io/en/latest/tutorials/quick_start_en.html
