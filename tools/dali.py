@@ -279,47 +279,52 @@ def _to_Tensor(lod_tensor, dtype):
     return data_tensor
 
 
-def post_mix(settings, batch):
-    batch_size = settings.TRAIN.batch_size // paddle.fluid.core.get_cuda_device_count(
-    )
+def normalize(feeds, config):
+    image, label = feeds['image'], feeds['label']
+    print(np.array(image).shape)
+    img_mean = np.array([0.485, 0.456, 0.406]).reshape((3, 1, 1))
+    img_std = np.array([0.229, 0.224, 0.225]).reshape((3, 1, 1))
+    image = fluid.layers.cast(image, 'float32')
+    #image = fluid.layers.transpose(image, perm=[0,3,1,2])
 
-    batch_imgs = _to_Tensor(batch[0]['feed_image'], 'float32')
-    batch_label = _to_Tensor(batch[0]['feed_label'], 'int64')
+    #image = fluid.layers.cast(image,'float32')
+    costant = fluid.layers.fill_constant(
+        shape=[1], value=255.0, dtype='float32')
+    image = fluid.layers.elementwise_div(image, costant)
+
+    mean = fluid.layers.create_tensor(dtype="float32")
+    fluid.layers.assign(input=img_mean.astype("float32"), output=mean)
+    std = fluid.layers.create_tensor(dtype="float32")
+    fluid.layers.assign(input=img_std.astype("float32"), output=std)
+
+    image = fluid.layers.elementwise_sub(image, mean)
+    image = fluid.layers.elementwise_div(image, std)
+
+    image.stop_gradient = True
+    print(image)
+    feeds['image'] = image
+
+    return feeds
+
+
+def mix(feeds, config, is_train=True):
+    batch_size = config.TRAIN.batch_size // paddle.fluid.core.get_cuda_device_count(
+    )
+    #batch_imgs = _to_Tensor(feeds['feed_image'], 'float32')
+    #batch_label = _to_Tensor(feeds['feed_label'], 'int64')
+    images = feeds['image']
+    label = feeds['label']
     alpha = 0.2
     idx = _to_Tensor(np.random.permutation(batch_size), 'int32')
     lam = np.random.beta(alpha, alpha)
 
-    batch_imgs = lam * batch_imgs + (1 - lam) * paddle.fluid.layers.gather(
-        batch_imgs, idx)
+    images = lam * images + (1 - lam) * paddle.fluid.layers.gather(images, idx)
 
-    # print(type(batch_label))
-    feed = [{
-        'feed_image': batch_imgs,
-        'feed_y_a': batch_label,
-        'feed_y_b': paddle.fluid.layers.gather(batch_label, idx),
+    feed = {
+        'image': images,
+        'feed_y_a': label,
+        'feed_y_b': paddle.fluid.layers.gather(label, idx),
         'feed_lam': _to_Tensor([lam] * batch_size, 'float32')
-    }]
+    }
 
-    return feed
-
-
-def post_mix_numpy(settings, batch):
-    batch_size = settings.TRAIN.batch_size // paddle.fluid.core.get_cuda_device_count(
-    )
-
-    batch_imgs = np.array(batch[0]['feed_image'])
-    batch_label = np.array(batch[0]['feed_label'])
-    alpha = 0.2
-    idx = np.random.permutation(batch_size)
-    lam = np.random.beta(alpha, alpha)
-
-    batch_imgs = lam * batch_imgs + (1 - lam) * batch_imgs[idx]
-
-    feed = [{
-        'feed_image': batch_imgs,
-        'feed_y_a': batch_label,
-        'feed_y_b': batch_label[idx],
-        'feed_lam': np.array([lam] * batch_size).astype('float32')
-    }]
-
-    return feed
+    return feed if is_train else feeds

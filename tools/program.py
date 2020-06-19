@@ -39,7 +39,7 @@ from paddle.fluid.incubate.fleet.collective import DistributedStrategy
 from ema import ExponentialMovingAverage
 
 
-def create_feeds(image_shape, use_mix=None):
+def create_feeds(image_shape, use_mix=None, use_dali=None):
     """
     Create feeds as model input
 
@@ -53,7 +53,8 @@ def create_feeds(image_shape, use_mix=None):
     feeds = OrderedDict()
     feeds['image'] = fluid.data(
         name="feed_image", shape=[None] + image_shape, dtype="float32")
-    if use_mix:
+
+    if use_mix and not use_dali:
         feeds['feed_y_a'] = fluid.data(
             name="feed_y_a", shape=[None, 1], dtype="int64")
         feeds['feed_y_b'] = fluid.data(
@@ -61,6 +62,7 @@ def create_feeds(image_shape, use_mix=None):
         feeds['feed_lam'] = fluid.data(
             name="feed_lam", shape=[None, 1], dtype="float32")
     else:
+
         feeds['label'] = fluid.data(
             name="feed_label", shape=[None, 1], dtype="int64")
 
@@ -149,6 +151,7 @@ def create_loss(out,
         loss = JSDivLoss(class_dim=classes_num, epsilon=epsilon)
         return loss(out[1], out[0])
 
+    print("++++++", use_mix)
     if use_mix:
         loss = MixCELoss(class_dim=classes_num, epsilon=epsilon)
         feed_y_a = feeds['feed_y_a']
@@ -336,8 +339,15 @@ def build(config, main_prog, startup_prog, is_train=True):
     with fluid.program_guard(main_prog, startup_prog):
         with fluid.unique_name.guard():
             use_mix = config.get('use_mix') and is_train
+            use_dali = config.get('use_dali')
             use_distillation = config.get('use_distillation')
-            feeds = create_feeds(config.image_shape, use_mix=use_mix)
+            feeds = create_feeds(config.image_shape, use_mix=use_mix, use_dali)
+
+            if use_dali and use_mix:
+                import dali
+                #feeds = dali.normalize(feeds,config)
+                feeds = dali.mix(feeds, config, is_train)
+
             dataloader = create_dataloader(feeds.values()) if not config.get(
                 'use_dali') else None
             out = create_model(config.ARCHITECTURE, feeds['image'],
@@ -428,13 +438,19 @@ def run(dataloader,
     batch_time = AverageMeter('elapse', '.3f')
     tic = time.time()
     dataloader = dataloader if config.get('use_dali') else dataloader()()
-
+    #sta = 0
     for idx, batch in enumerate(dataloader):
-        if config.get('use_dali'):
-            import dali
-            batch = dali.post_mix_numpy(config, batch)
 
+        #start_time = time.time()
         metrics = exe.run(program=program, feed=batch, fetch_list=fetch_list)
+        #end_time = time.time()
+        #statistics = end_time - start_time
+        # if idx >= 10:
+        #    sta = sta+statistics
+        # if idx == 110 and int(os.getenv("PADDLE_TRAINER_ID", 0)) == 0:
+        #    print("10-100batch speed 000", sta/100, 's/batch', 'bs', config.TRAIN.batch_size)
+        # if idx == 110 and int(os.getenv("PADDLE_TRAINER_ID", 0)) == 1:
+        #    print("10-100batch speed 111", sta/100, 's/batch', 'bs', config.TRAIN.batch_size)
         batch_time.update(time.time() - tic)
         tic = time.time()
         for i, m in enumerate(metrics):
