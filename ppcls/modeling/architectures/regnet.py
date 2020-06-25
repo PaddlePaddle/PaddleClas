@@ -16,11 +16,12 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
+import math
+import numpy as np
+
 import paddle
 import paddle.fluid as fluid
 from paddle.fluid.param_attr import ParamAttr
-import math
-import numpy as np
 
 __all__ = [
     "RegNetX_200MF", "RegNetX_4GF", "RegNetX_32GF", "RegNetY_200MF",
