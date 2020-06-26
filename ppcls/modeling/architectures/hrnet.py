@@ -1,18 +1,11 @@
 import numpy as np
-import argparse
-import ast
 import paddle
 import paddle.fluid as fluid
 from paddle.fluid.param_attr import ParamAttr
 from paddle.fluid.layer_helper import LayerHelper
 from paddle.fluid.dygraph.nn import Conv2D, Pool2D, BatchNorm, Linear
-from paddle.fluid.dygraph.base import to_variable
-
-from paddle.fluid import framework
 
 import math
-import sys
-import time
 
 __all__ = [
     "HRNet_W18_C",
