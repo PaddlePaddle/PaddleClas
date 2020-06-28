@@ -1,133 +1,161 @@
-#copyright (c) 2020 PaddlePaddle Authors. All Rights Reserve.
-#
-#Licensed under the Apache License, Version 2.0 (the "License");
-#you may not use this file except in compliance with the License.
-#You may obtain a copy of the License at
-#
-#    http://www.apache.org/licenses/LICENSE-2.0
-#
-#Unless required by applicable law or agreed to in writing, software
-#distributed under the License is distributed on an "AS IS" BASIS,
-#WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#See the License for the specific language governing permissions and
-#limitations under the License.
-
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-
-import math
+import numpy as np
+import argparse
 import paddle
 import paddle.fluid as fluid
 from paddle.fluid.param_attr import ParamAttr
+from paddle.fluid.layer_helper import LayerHelper
+from paddle.fluid.dygraph.nn import Conv2D, Pool2D, BatchNorm, Linear, Dropout
+from paddle.fluid.dygraph.base import to_variable
 
-__all__ = ["SqueezeNet", "SqueezeNet1_0", "SqueezeNet1_1"]
+from paddle.fluid import framework
 
+import math
+import sys
+import time
 
-class SqueezeNet():
-    def __init__(self, version='1.0'):
+__all__ = ["SqueezeNet1_0", "SqueezeNet1_1"]
+
+class Make_Fire_Conv(fluid.dygraph.Layer):
+    def __init__(self, 
+                input_channels,
+                output_channels,
+                filter_size,
+                padding=0,
+                name=None):
+        super(Make_Fire_Conv, self).__init__()
+        self._conv = Conv2D(input_channels,
+                            output_channels,
+                            filter_size, 
+                            padding=padding, 
+                            act="relu",
+                            param_attr=ParamAttr(name=name + "_weights"),
+                            bias_attr=ParamAttr(name=name + "_offset"))
+
+    def forward(self, inputs):
+        return self._conv(inputs)
+
+class Make_Fire(fluid.dygraph.Layer):
+    def __init__(self,
+                input_channels,
+                squeeze_channels,
+                expand1x1_channels,
+                expand3x3_channels,
+                name=None):
+        super(Make_Fire, self).__init__()
+        self._conv = Make_Fire_Conv(input_channels,
+                                    squeeze_channels,
+                                    1,
+                                    name=name + "_squeeze1x1")
+        self._conv_path1 = Make_Fire_Conv(squeeze_channels,
+                                        expand1x1_channels,
+                                        1,
+                                        name=name + "_expand1x1")
+        self._conv_path2 = Make_Fire_Conv(squeeze_channels,
+                                        expand3x3_channels,
+                                        3,
+                                        padding=1,
+                                        name=name + "_expand3x3")
+
+    def forward(self, inputs):
+        x = self._conv(inputs)
+        x1 = self._conv_path1(x)
+        x2 = self._conv_path2(x)
+        return fluid.layers.concat([x1, x2], axis=1)
+
+class SqueezeNet(fluid.dygraph.Layer):
+    def __init__(self, version, class_dim=1000):
+        super(SqueezeNet, self).__init__()
         self.version = version
 
-    def net(self, input, class_dim=1000):
-        version = self.version
-        assert version in ['1.0', '1.1'], \
-            "supported version are {} but input version is {}".format(['1.0', '1.1'], version)
-        if version == '1.0':
-            conv = fluid.layers.conv2d(
-                input,
-                num_filters=96,
-                filter_size=7,
-                stride=2,
-                act='relu',
-                param_attr=fluid.param_attr.ParamAttr(name="conv1_weights"),
-                bias_attr=ParamAttr(name='conv1_offset'))
-            conv = fluid.layers.pool2d(
-                conv, pool_size=3, pool_stride=2, pool_type='max')
-            conv = self.make_fire(conv, 16, 64, 64, name='fire2')
-            conv = self.make_fire(conv, 16, 64, 64, name='fire3')
-            conv = self.make_fire(conv, 32, 128, 128, name='fire4')
-            conv = fluid.layers.pool2d(
-                conv, pool_size=3, pool_stride=2, pool_type='max')
-            conv = self.make_fire(conv, 32, 128, 128, name='fire5')
-            conv = self.make_fire(conv, 48, 192, 192, name='fire6')
-            conv = self.make_fire(conv, 48, 192, 192, name='fire7')
-            conv = self.make_fire(conv, 64, 256, 256, name='fire8')
-            conv = fluid.layers.pool2d(
-                conv, pool_size=3, pool_stride=2, pool_type='max')
-            conv = self.make_fire(conv, 64, 256, 256, name='fire9')
+        if self.version == "1.0":
+            self._conv = Conv2D(3,
+                                96,
+                                7,
+                                stride=2,
+                                act="relu",
+                                param_attr=ParamAttr(name="conv1_weights"),
+                                bias_attr=ParamAttr(name="conv1_offset"))
+            self._pool = Pool2D(pool_size=3,
+                                pool_stride=2,
+                                pool_type="max")
+            self._conv1 = Make_Fire(96, 16, 64, 64, name="fire2")
+            self._conv2 = Make_Fire(128, 16, 64, 64, name="fire3")
+            self._conv3 = Make_Fire(128, 32, 128, 128, name="fire4")
+
+            self._conv4 = Make_Fire(256, 32, 128, 128, name="fire5")
+            self._conv5 = Make_Fire(256, 48, 192, 192, name="fire6")
+            self._conv6 = Make_Fire(384, 48, 192, 192, name="fire7")
+            self._conv7 = Make_Fire(384, 64, 256, 256, name="fire8")
+
+            self._conv8 = Make_Fire(512, 64, 256, 256, name="fire9")
         else:
-            conv = fluid.layers.conv2d(
-                input,
-                num_filters=64,
-                filter_size=3,
-                stride=2,
-                padding=1,
-                act='relu',
-                param_attr=fluid.param_attr.ParamAttr(name="conv1_weights"),
-                bias_attr=ParamAttr(name='conv1_offset'))
-            conv = fluid.layers.pool2d(
-                conv, pool_size=3, pool_stride=2, pool_type='max')
-            conv = self.make_fire(conv, 16, 64, 64, name='fire2')
-            conv = self.make_fire(conv, 16, 64, 64, name='fire3')
-            conv = fluid.layers.pool2d(
-                conv, pool_size=3, pool_stride=2, pool_type='max')
-            conv = self.make_fire(conv, 32, 128, 128, name='fire4')
-            conv = self.make_fire(conv, 32, 128, 128, name='fire5')
-            conv = fluid.layers.pool2d(
-                conv, pool_size=3, pool_stride=2, pool_type='max')
-            conv = self.make_fire(conv, 48, 192, 192, name='fire6')
-            conv = self.make_fire(conv, 48, 192, 192, name='fire7')
-            conv = self.make_fire(conv, 64, 256, 256, name='fire8')
-            conv = self.make_fire(conv, 64, 256, 256, name='fire9')
-        conv = fluid.layers.dropout(conv, dropout_prob=0.5)
-        conv = fluid.layers.conv2d(
-            conv,
-            num_filters=class_dim,
-            filter_size=1,
-            act='relu',
-            param_attr=fluid.param_attr.ParamAttr(name="conv10_weights"),
-            bias_attr=ParamAttr(name='conv10_offset'))
-        conv = fluid.layers.pool2d(conv, pool_type='avg', global_pooling=True)
-        out = fluid.layers.flatten(conv)
-        return out
+            self._conv = Conv2D(3,
+                                64,
+                                3,
+                                stride=2,
+                                padding=1,
+                                act="relu",
+                                param_attr=ParamAttr(name="conv1_weights"),
+                                bias_attr=ParamAttr(name="conv1_offset"))
+            self._pool = Pool2D(pool_size=3,
+                                pool_stride=2,
+                                pool_type="max")
+            self._conv1 = Make_Fire(64, 16, 64, 64, name="fire2")
+            self._conv2 = Make_Fire(128, 16, 64, 64, name="fire3")
 
-    def make_fire_conv(self,
-                       input,
-                       num_filters,
-                       filter_size,
-                       padding=0,
-                       name=None):
-        conv = fluid.layers.conv2d(
-            input,
-            num_filters=num_filters,
-            filter_size=filter_size,
-            padding=padding,
-            act='relu',
-            param_attr=fluid.param_attr.ParamAttr(name=name + "_weights"),
-            bias_attr=ParamAttr(name=name + '_offset'))
-        return conv
+            self._conv3 = Make_Fire(128, 32, 128, 128, name="fire4")
+            self._conv4 = Make_Fire(256, 32, 128, 128, name="fire5")
 
-    def make_fire(self,
-                  input,
-                  squeeze_channels,
-                  expand1x1_channels,
-                  expand3x3_channels,
-                  name=None):
-        conv = self.make_fire_conv(
-            input, squeeze_channels, 1, name=name + '_squeeze1x1')
-        conv_path1 = self.make_fire_conv(
-            conv, expand1x1_channels, 1, name=name + '_expand1x1')
-        conv_path2 = self.make_fire_conv(
-            conv, expand3x3_channels, 3, 1, name=name + '_expand3x3')
-        out = fluid.layers.concat([conv_path1, conv_path2], axis=1)
-        return out
+            self._conv5 = Make_Fire(256, 48, 192, 192, name="fire6")
+            self._conv6 = Make_Fire(384, 48, 192, 192, name="fire7")
+            self._conv7 = Make_Fire(384, 64, 256, 256, name="fire8")
+            self._conv8 = Make_Fire(512, 64, 256, 256, name="fire9")
 
+        self._drop = Dropout(p=0.5)
+        self._conv9 = Conv2D(512, 
+                            class_dim, 
+                            1, 
+                            act="relu",
+                            param_attr=ParamAttr(name="conv10_weights"),
+                            bias_attr=ParamAttr(name="conv10_offset"))
+        self._avg_pool = Pool2D(pool_type="avg",
+                                global_pooling=True)
+
+    def forward(self, inputs):
+        x = self._conv(inputs)
+        x = self._pool(x)
+        if self.version=="1.0":
+            x = self._conv1(x)
+            x = self._conv2(x)
+            x = self._conv3(x)
+            x = self._pool(x)
+            x = self._conv4(x)
+            x = self._conv5(x)
+            x = self._conv6(x)
+            x = self._conv7(x)
+            x = self._pool(x)
+            x = self._conv8(x)
+        else:
+            x = self._conv1(x)
+            x = self._conv2(x)
+            x = self._pool(x)
+            x = self._conv3(x)
+            x = self._conv4(x)
+            x = self._pool(x)
+            x = self._conv5(x)
+            x = self._conv6(x)
+            x = self._conv7(x)
+            x = self._conv8(x)
+        x = self._drop(x)
+        x = self._conv9(x)
+        x = self._avg_pool(x)
+        x = fluid.layers.squeeze(x, axes=[2,3])
+        return x
 
 def SqueezeNet1_0():
-    model = SqueezeNet(version='1.0')
-    return model
-
+    model = SqueezeNet(version="1.0")
+    return model 
 
 def SqueezeNet1_1():
-    model = SqueezeNet(version='1.1')
-    return model
+    model = SqueezeNet(version="1.1")
+    return model 

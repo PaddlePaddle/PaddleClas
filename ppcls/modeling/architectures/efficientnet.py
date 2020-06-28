@@ -1,34 +1,26 @@
-# copyright (c) 2020 PaddlePaddle Authors. All Rights Reserve.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#    http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# coding:utf-8
+import numpy as np
+import argparse
+import paddle
+import paddle.fluid as fluid
+from paddle.fluid.param_attr import ParamAttr
+from paddle.fluid.layer_helper import LayerHelper
+from paddle.fluid.dygraph.nn import Conv2D, Pool2D, BatchNorm, Linear, Dropout
+from paddle.fluid.dygraph.base import to_variable
 
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
+from paddle.fluid import framework
 
+import math
+import sys
+import time
 import collections
 import re
-import math
 import copy
 
-import paddle.fluid as fluid
-
-from .layers import conv2d, init_batch_norm_layer, init_fc_layer
-
 __all__ = [
-    'EfficientNet', 'EfficientNetB0', 'EfficientNetB1', 'EfficientNetB2',
-    'EfficientNetB3', 'EfficientNetB4', 'EfficientNetB5', 'EfficientNetB6',
-    'EfficientNetB7'
+    'EfficientNet', 'EfficientNetB0_small', 'EfficientNetB0', 'EfficientNetB1',
+    'EfficientNetB2', 'EfficientNetB3', 'EfficientNetB4', 'EfficientNetB5',
+    'EfficientNetB6', 'EfficientNetB7'
 ]
 
 GlobalParams = collections.namedtuple('GlobalParams', [
@@ -136,319 +128,6 @@ def round_repeats(repeats, global_params):
     return int(math.ceil(multiplier * repeats))
 
 
-class EfficientNet():
-    def __init__(self,
-                 name='b0',
-                 padding_type='SAME',
-                 override_params=None,
-                 is_test=False,
-                 use_se=True):
-        valid_names = ['b' + str(i) for i in range(8)]
-        assert name in valid_names, 'efficient name should be in b0~b7'
-        model_name = 'efficientnet-' + name
-        self._blocks_args, self._global_params = get_model_params(
-            model_name, override_params)
-        self._bn_mom = self._global_params.batch_norm_momentum
-        self._bn_eps = self._global_params.batch_norm_epsilon
-        self.is_test = is_test
-        self.padding_type = padding_type
-        self.use_se = use_se
-
-    def net(self, input, class_dim=1000, is_test=False):
-
-        conv = self.extract_features(input, is_test=is_test)
-
-        out_channels = round_filters(1280, self._global_params)
-        conv = self.conv_bn_layer(
-            conv,
-            num_filters=out_channels,
-            filter_size=1,
-            bn_act='swish',
-            bn_mom=self._bn_mom,
-            bn_eps=self._bn_eps,
-            padding_type=self.padding_type,
-            name='',
-            conv_name='_conv_head',
-            bn_name='_bn1')
-
-        pool = fluid.layers.pool2d(
-            input=conv, pool_type='avg', global_pooling=True, use_cudnn=False)
-
-        if self._global_params.dropout_rate:
-            pool = fluid.layers.dropout(
-                pool,
-                self._global_params.dropout_rate,
-                dropout_implementation='upscale_in_train')
-
-        param_attr, bias_attr = init_fc_layer(class_dim, '_fc')
-        out = fluid.layers.fc(pool,
-                              class_dim,
-                              name='_fc',
-                              param_attr=param_attr,
-                              bias_attr=bias_attr)
-        return out
-
-    def _drop_connect(self, inputs, prob, is_test):
-        if is_test:
-            return inputs
-        keep_prob = 1.0 - prob
-        inputs_shape = fluid.layers.shape(inputs)
-        random_tensor = keep_prob + fluid.layers.uniform_random(
-            shape=[inputs_shape[0], 1, 1, 1], min=0., max=1.)
-        binary_tensor = fluid.layers.floor(random_tensor)
-        output = inputs / keep_prob * binary_tensor
-        return output
-
-    def _expand_conv_norm(self, inputs, block_args, is_test, name=None):
-        # Expansion phase
-        oup = block_args.input_filters * \
-            block_args.expand_ratio  # number of output channels
-
-        if block_args.expand_ratio != 1:
-            conv = self.conv_bn_layer(
-                inputs,
-                num_filters=oup,
-                filter_size=1,
-                bn_act=None,
-                bn_mom=self._bn_mom,
-                bn_eps=self._bn_eps,
-                padding_type=self.padding_type,
-                name=name,
-                conv_name=name + '_expand_conv',
-                bn_name='_bn0')
-
-        return conv
-
-    def _depthwise_conv_norm(self, inputs, block_args, is_test, name=None):
-        k = block_args.kernel_size
-        s = block_args.stride
-        if isinstance(s, list) or isinstance(s, tuple):
-            s = s[0]
-        oup = block_args.input_filters * \
-            block_args.expand_ratio  # number of output channels
-
-        conv = self.conv_bn_layer(
-            inputs,
-            num_filters=oup,
-            filter_size=k,
-            stride=s,
-            num_groups=oup,
-            bn_act=None,
-            padding_type=self.padding_type,
-            bn_mom=self._bn_mom,
-            bn_eps=self._bn_eps,
-            name=name,
-            use_cudnn=False,
-            conv_name=name + '_depthwise_conv',
-            bn_name='_bn1')
-
-        return conv
-
-    def _project_conv_norm(self, inputs, block_args, is_test, name=None):
-        final_oup = block_args.output_filters
-        conv = self.conv_bn_layer(
-            inputs,
-            num_filters=final_oup,
-            filter_size=1,
-            bn_act=None,
-            padding_type=self.padding_type,
-            bn_mom=self._bn_mom,
-            bn_eps=self._bn_eps,
-            name=name,
-            conv_name=name + '_project_conv',
-            bn_name='_bn2')
-        return conv
-
-    def conv_bn_layer(self,
-                      input,
-                      filter_size,
-                      num_filters,
-                      stride=1,
-                      num_groups=1,
-                      padding_type="SAME",
-                      conv_act=None,
-                      bn_act='swish',
-                      use_cudnn=True,
-                      use_bn=True,
-                      bn_mom=0.9,
-                      bn_eps=1e-05,
-                      use_bias=False,
-                      name=None,
-                      conv_name=None,
-                      bn_name=None):
-        conv = conv2d(
-            input=input,
-            num_filters=num_filters,
-            filter_size=filter_size,
-            stride=stride,
-            groups=num_groups,
-            act=conv_act,
-            padding_type=padding_type,
-            use_cudnn=use_cudnn,
-            name=conv_name,
-            use_bias=use_bias)
-
-        if use_bn is False:
-            return conv
-        else:
-            bn_name = name + bn_name
-            param_attr, bias_attr = init_batch_norm_layer(bn_name)
-            return fluid.layers.batch_norm(
-                input=conv,
-                act=bn_act,
-                momentum=bn_mom,
-                epsilon=bn_eps,
-                name=bn_name,
-                moving_mean_name=bn_name + '_mean',
-                moving_variance_name=bn_name + '_variance',
-                param_attr=param_attr,
-                bias_attr=bias_attr)
-
-    def _conv_stem_norm(self, inputs, is_test):
-        out_channels = round_filters(32, self._global_params)
-        bn = self.conv_bn_layer(
-            inputs,
-            num_filters=out_channels,
-            filter_size=3,
-            stride=2,
-            bn_act=None,
-            bn_mom=self._bn_mom,
-            padding_type=self.padding_type,
-            bn_eps=self._bn_eps,
-            name='',
-            conv_name='_conv_stem',
-            bn_name='_bn0')
-
-        return bn
-
-    def mb_conv_block(self,
-                      inputs,
-                      block_args,
-                      is_test=False,
-                      drop_connect_rate=None,
-                      name=None):
-        # Expansion and Depthwise Convolution
-        oup = block_args.input_filters * \
-            block_args.expand_ratio  # number of output channels
-        has_se = self.use_se and (block_args.se_ratio is not None) and (
-            0 < block_args.se_ratio <= 1)
-        id_skip = block_args.id_skip  # skip connection and drop connect
-        conv = inputs
-        if block_args.expand_ratio != 1:
-            conv = fluid.layers.swish(
-                self._expand_conv_norm(conv, block_args, is_test, name))
-
-        conv = fluid.layers.swish(
-            self._depthwise_conv_norm(conv, block_args, is_test, name))
-
-        # Squeeze and Excitation
-        if has_se:
-            num_squeezed_channels = max(
-                1, int(block_args.input_filters * block_args.se_ratio))
-            conv = self.se_block(conv, num_squeezed_channels, oup, name)
-
-        conv = self._project_conv_norm(conv, block_args, is_test, name)
-
-        # Skip connection and drop connect
-        input_filters = block_args.input_filters
-        output_filters = block_args.output_filters
-        if id_skip and \
-                block_args.stride == 1 and \
-                input_filters == output_filters:
-            if drop_connect_rate:
-                conv = self._drop_connect(conv, drop_connect_rate,
-                                          self.is_test)
-            conv = fluid.layers.elementwise_add(conv, inputs)
-
-        return conv
-
-    def se_block(self, inputs, num_squeezed_channels, oup, name):
-        x_squeezed = fluid.layers.pool2d(
-            input=inputs,
-            pool_type='avg',
-            global_pooling=True,
-            use_cudnn=False)
-        x_squeezed = conv2d(
-            x_squeezed,
-            num_filters=num_squeezed_channels,
-            filter_size=1,
-            use_bias=True,
-            padding_type=self.padding_type,
-            act='swish',
-            name=name + '_se_reduce')
-        x_squeezed = conv2d(
-            x_squeezed,
-            num_filters=oup,
-            filter_size=1,
-            use_bias=True,
-            padding_type=self.padding_type,
-            name=name + '_se_expand')
-        #se_out = inputs * fluid.layers.sigmoid(x_squeezed)
-        se_out = fluid.layers.elementwise_mul(
-            inputs, fluid.layers.sigmoid(x_squeezed), axis=-1)
-        return se_out
-
-    def extract_features(self, inputs, is_test):
-        """ Returns output of the final convolution layer """
-
-        conv = fluid.layers.swish(
-            self._conv_stem_norm(
-                inputs, is_test=is_test))
-
-        block_args_copy = copy.deepcopy(self._blocks_args)
-        idx = 0
-        block_size = 0
-        for block_arg in block_args_copy:
-            block_arg = block_arg._replace(
-                input_filters=round_filters(block_arg.input_filters,
-                                            self._global_params),
-                output_filters=round_filters(block_arg.output_filters,
-                                             self._global_params),
-                num_repeat=round_repeats(block_arg.num_repeat,
-                                         self._global_params))
-            block_size += 1
-            for _ in range(block_arg.num_repeat - 1):
-                block_size += 1
-
-        for block_args in self._blocks_args:
-
-            # Update block input and output filters based on depth multiplier.
-            block_args = block_args._replace(
-                input_filters=round_filters(block_args.input_filters,
-                                            self._global_params),
-                output_filters=round_filters(block_args.output_filters,
-                                             self._global_params),
-                num_repeat=round_repeats(block_args.num_repeat,
-                                         self._global_params))
-
-            # The first block needs to take care of stride,
-            # and filter size increase.
-            drop_connect_rate = self._global_params.drop_connect_rate
-            if drop_connect_rate:
-                drop_connect_rate *= float(idx) / block_size
-            conv = self.mb_conv_block(conv, block_args, is_test,
-                                      drop_connect_rate,
-                                      '_blocks.' + str(idx) + '.')
-
-            idx += 1
-            if block_args.num_repeat > 1:
-                block_args = block_args._replace(
-                    input_filters=block_args.output_filters, stride=1)
-            for _ in range(block_args.num_repeat - 1):
-                drop_connect_rate = self._global_params.drop_connect_rate
-                if drop_connect_rate:
-                    drop_connect_rate *= float(idx) / block_size
-                conv = self.mb_conv_block(conv, block_args, is_test,
-                                          drop_connect_rate,
-                                          '_blocks.' + str(idx) + '.')
-                idx += 1
-
-        return conv
-
-    def shortcut(self, input, data_residual):
-        return fluid.layers.elementwise_add(input, data_residual)
-
-
 class BlockDecoder(object):
     """
     Block Decoder, straight from the official TensorFlow repository.
@@ -526,26 +205,614 @@ class BlockDecoder(object):
         return block_strings
 
 
-def EfficientNetB0(is_test=False,
-                   padding_type='SAME',
-                   override_params=None,
-                   use_se=True):
+def initial_type(name, use_bias=False):
+    param_attr = ParamAttr(name=name + "_weights")
+    if use_bias:
+        bias_attr = ParamAttr(name=name + "_offset")
+    else:
+        bias_attr = False
+    return param_attr, bias_attr
+
+
+def init_batch_norm_layer(name="batch_norm"):
+    param_attr = ParamAttr(name=name + "_scale")
+    bias_attr = ParamAttr(name=name + "_offset")
+    return param_attr, bias_attr
+
+
+def init_fc_layer(name="fc"):
+    param_attr = ParamAttr(name=name + "_weights")
+    bias_attr = ParamAttr(name=name + "_offset")
+    return param_attr, bias_attr
+
+
+def cal_padding(img_size, stride, filter_size, dilation=1):
+    """Calculate padding size."""
+    if img_size % stride == 0:
+        out_size = max(filter_size - stride, 0)
+    else:
+        out_size = max(filter_size - (img_size % stride), 0)
+    return out_size // 2, out_size - out_size // 2
+
+
+inp_shape = {
+    "b0_small": [224, 112, 112, 56, 28, 14, 14, 7],
+    "b0": [224, 112, 112, 56, 28, 14, 14, 7],
+    "b1": [240, 120, 120, 60, 30, 15, 15, 8],
+    "b2": [260, 130, 130, 65, 33, 17, 17, 9],
+    "b3": [300, 150, 150, 75, 38, 19, 19, 10],
+    "b4": [380, 190, 190, 95, 48, 24, 24, 12],
+    "b5": [456, 228, 228, 114, 57, 29, 29, 15],
+    "b6": [528, 264, 264, 132, 66, 33, 33, 17],
+    "b7": [600, 300, 300, 150, 75, 38, 38, 19]
+}
+
+
+def _drop_connect(inputs, prob, is_test):
+    if is_test:
+        return inputs
+    keep_prob = 1.0 - prob
+    inputs_shape = fluid.layers.shape(inputs)
+    random_tensor = keep_prob + fluid.layers.uniform_random(
+        shape=[inputs_shape[0], 1, 1, 1], min=0., max=1.)
+    binary_tensor = fluid.layers.floor(random_tensor)
+    output = inputs / keep_prob * binary_tensor
+    return output
+
+
+class conv2d(fluid.dygraph.Layer):
+    def __init__(self,
+                 input_channels,
+                 output_channels,
+                 filter_size,
+                 stride=1,
+                 padding=0,
+                 groups=None,
+                 name="conv2d",
+                 act=None,
+                 use_bias=False,
+                 padding_type=None,
+                 model_name=None,
+                 cur_stage=None):
+        super(conv2d, self).__init__()
+
+        param_attr, bias_attr = initial_type(name=name, use_bias=use_bias)
+
+        def get_padding(filter_size, stride=1, dilation=1):
+            padding = ((stride - 1) + dilation * (filter_size - 1)) // 2
+            return padding
+
+        inps = 1 if model_name == None and cur_stage == None else inp_shape[
+            model_name][cur_stage]
+        self.need_crop = False
+        if padding_type == "SAME":
+            top_padding, bottom_padding = cal_padding(inps, stride,
+                                                      filter_size)
+            left_padding, right_padding = cal_padding(inps, stride,
+                                                      filter_size)
+            height_padding = bottom_padding
+            width_padding = right_padding
+            if top_padding != bottom_padding or left_padding != right_padding:
+                height_padding = top_padding + stride
+                width_padding = left_padding + stride
+                self.need_crop = True
+            padding = [height_padding, width_padding]
+        elif padding_type == "VALID":
+            height_padding = 0
+            width_padding = 0
+            padding = [height_padding, width_padding]
+        elif padding_type == "DYNAMIC":
+            padding = get_padding(filter_size, stride)
+        else:
+            padding = padding_type
+
+        self._conv = Conv2D(
+            input_channels,
+            output_channels,
+            filter_size,
+            groups=groups,
+            stride=stride,
+            act=act,
+            padding=padding,
+            param_attr=param_attr,
+            bias_attr=bias_attr)
+        # debug:
+        self.stride = stride
+        self.filter_size = filter_size
+        self.inps = inps
+
+    def forward(self, inputs):
+        x = self._conv(inputs)
+        if self.need_crop:
+            x = x[:, :, 1:, 1:]
+        return x
+
+
+class ConvBNLayer(fluid.dygraph.Layer):
+    def __init__(self,
+                 input_channels,
+                 filter_size,
+                 output_channels,
+                 stride=1,
+                 num_groups=1,
+                 padding_type="SAME",
+                 conv_act=None,
+                 bn_act="swish",
+                 use_bn=True,
+                 use_bias=False,
+                 name=None,
+                 conv_name=None,
+                 bn_name=None,
+                 model_name=None,
+                 cur_stage=None):
+        super(ConvBNLayer, self).__init__()
+
+        self._conv = conv2d(
+            input_channels=input_channels,
+            output_channels=output_channels,
+            filter_size=filter_size,
+            stride=stride,
+            groups=num_groups,
+            act=conv_act,
+            padding_type=padding_type,
+            name=conv_name,
+            use_bias=use_bias,
+            model_name=model_name,
+            cur_stage=cur_stage)
+        self.use_bn = use_bn
+        if use_bn is True:
+            bn_name = name + bn_name
+            param_attr, bias_attr = init_batch_norm_layer(bn_name)
+
+            self._bn = BatchNorm(
+                num_channels=output_channels,
+                act=bn_act,
+                momentum=0.99,
+                epsilon=0.001,
+                moving_mean_name=bn_name + "_mean",
+                moving_variance_name=bn_name + "_variance",
+                param_attr=param_attr,
+                bias_attr=bias_attr)
+
+    def forward(self, inputs):
+        if self.use_bn:
+            x = self._conv(inputs)
+            x = self._bn(x)
+            return x
+        else:
+            return self._conv(inputs)
+
+
+class Expand_Conv_Norm(fluid.dygraph.Layer):
+    def __init__(self,
+                 input_channels,
+                 block_args,
+                 padding_type,
+                 name=None,
+                 model_name=None,
+                 cur_stage=None):
+        super(Expand_Conv_Norm, self).__init__()
+
+        self.oup = block_args.input_filters * block_args.expand_ratio
+        self.expand_ratio = block_args.expand_ratio
+
+        if self.expand_ratio != 1:
+            self._conv = ConvBNLayer(
+                input_channels,
+                1,
+                self.oup,
+                bn_act=None,
+                padding_type=padding_type,
+                name=name,
+                conv_name=name + "_expand_conv",
+                bn_name="_bn0",
+                model_name=model_name,
+                cur_stage=cur_stage)
+
+    def forward(self, inputs):
+        if self.expand_ratio != 1:
+            return self._conv(inputs)
+        else:
+            return inputs
+
+
+class Depthwise_Conv_Norm(fluid.dygraph.Layer):
+    def __init__(self,
+                 input_channels,
+                 block_args,
+                 padding_type,
+                 name=None,
+                 model_name=None,
+                 cur_stage=None):
+        super(Depthwise_Conv_Norm, self).__init__()
+
+        self.k = block_args.kernel_size
+        self.s = block_args.stride
+        if isinstance(self.s, list) or isinstance(self.s, tuple):
+            self.s = self.s[0]
+        oup = block_args.input_filters * block_args.expand_ratio
+
+        self._conv = ConvBNLayer(
+            input_channels,
+            self.k,
+            oup,
+            self.s,
+            num_groups=input_channels,
+            bn_act=None,
+            padding_type=padding_type,
+            name=name,
+            conv_name=name + "_depthwise_conv",
+            bn_name="_bn1",
+            model_name=model_name,
+            cur_stage=cur_stage)
+
+    def forward(self, inputs):
+        return self._conv(inputs)
+
+
+class Project_Conv_Norm(fluid.dygraph.Layer):
+    def __init__(self,
+                 input_channels,
+                 block_args,
+                 padding_type,
+                 name=None,
+                 model_name=None,
+                 cur_stage=None):
+        super(Project_Conv_Norm, self).__init__()
+
+        final_oup = block_args.output_filters
+
+        self._conv = ConvBNLayer(
+            input_channels,
+            1,
+            final_oup,
+            bn_act=None,
+            padding_type=padding_type,
+            name=name,
+            conv_name=name + "_project_conv",
+            bn_name="_bn2",
+            model_name=model_name,
+            cur_stage=cur_stage)
+
+    def forward(self, inputs):
+        return self._conv(inputs)
+
+
+class Se_Block(fluid.dygraph.Layer):
+    def __init__(self,
+                 input_channels,
+                 num_squeezed_channels,
+                 oup,
+                 padding_type,
+                 name=None,
+                 model_name=None,
+                 cur_stage=None):
+        super(Se_Block, self).__init__()
+
+        self._pool = Pool2D(
+            pool_type="avg", global_pooling=True, use_cudnn=False)
+        self._conv1 = conv2d(
+            input_channels,
+            num_squeezed_channels,
+            1,
+            use_bias=True,
+            padding_type=padding_type,
+            act="swish",
+            name=name + "_se_reduce")
+
+        self._conv2 = conv2d(
+            num_squeezed_channels,
+            oup,
+            1,
+            use_bias=True,
+            padding_type=padding_type,
+            name=name + "_se_expand")
+
+    def forward(self, inputs):
+        x = self._pool(inputs)
+        x = self._conv1(x)
+        x = self._conv2(x)
+        layer_helper = LayerHelper(self.full_name(), act='sigmoid')
+        x = layer_helper.append_activation(x)
+        return fluid.layers.elementwise_mul(inputs, x)
+
+
+class Mb_Conv_Block(fluid.dygraph.Layer):
+    def __init__(self,
+                 input_channels,
+                 block_args,
+                 padding_type,
+                 use_se,
+                 name=None,
+                 drop_connect_rate=None,
+                 is_test=False,
+                 model_name=None,
+                 cur_stage=None):
+        super(Mb_Conv_Block, self).__init__()
+
+        oup = block_args.input_filters * block_args.expand_ratio
+        self.block_args = block_args
+        self.has_se = use_se and (block_args.se_ratio is not None) and (
+            0 < block_args.se_ratio <= 1)
+        self.id_skip = block_args.id_skip
+        self.expand_ratio = block_args.expand_ratio
+        self.drop_connect_rate = drop_connect_rate
+        self.is_test = is_test
+
+        if self.expand_ratio != 1:
+            self._ecn = Expand_Conv_Norm(
+                input_channels,
+                block_args,
+                padding_type=padding_type,
+                name=name,
+                model_name=model_name,
+                cur_stage=cur_stage)
+
+        self._dcn = Depthwise_Conv_Norm(
+            input_channels * block_args.expand_ratio,
+            block_args,
+            padding_type=padding_type,
+            name=name,
+            model_name=model_name,
+            cur_stage=cur_stage)
+
+        if self.has_se:
+            num_squeezed_channels = max(
+                1, int(block_args.input_filters * block_args.se_ratio))
+            self._se = Se_Block(
+                input_channels * block_args.expand_ratio,
+                num_squeezed_channels,
+                oup,
+                padding_type=padding_type,
+                name=name,
+                model_name=model_name,
+                cur_stage=cur_stage)
+
+        self._pcn = Project_Conv_Norm(
+            input_channels * block_args.expand_ratio,
+            block_args,
+            padding_type=padding_type,
+            name=name,
+            model_name=model_name,
+            cur_stage=cur_stage)
+
+    def forward(self, inputs):
+        x = inputs
+        layer_helper = LayerHelper(self.full_name(), act='swish')
+        if self.expand_ratio != 1:
+            x = self._ecn(x)
+            x = layer_helper.append_activation(x)
+        x = self._dcn(x)
+        x = layer_helper.append_activation(x)
+        if self.has_se:
+            x = self._se(x)
+        x = self._pcn(x)
+        if self.id_skip and self.block_args.stride == 1 and self.block_args.input_filters == self.block_args.output_filters:
+            if self.drop_connect_rate:
+                x = _drop_connect(x, self.drop_connect_rate, self.is_test)
+            x = fluid.layers.elementwise_add(x, inputs)
+        return x
+
+
+class Conv_Stem_Norm(fluid.dygraph.Layer):
+    def __init__(self,
+                 input_channels,
+                 padding_type,
+                 _global_params,
+                 name=None,
+                 model_name=None,
+                 cur_stage=None):
+        super(Conv_Stem_Norm, self).__init__()
+
+        output_channels = round_filters(32, _global_params)
+        self._conv = ConvBNLayer(
+            input_channels,
+            filter_size=3,
+            output_channels=output_channels,
+            stride=2,
+            bn_act=None,
+            padding_type=padding_type,
+            name="",
+            conv_name="_conv_stem",
+            bn_name="_bn0",
+            model_name=model_name,
+            cur_stage=cur_stage)
+
+    def forward(self, inputs):
+        return self._conv(inputs)
+
+
+class Extract_Features(fluid.dygraph.Layer):
+    def __init__(self,
+                 input_channels,
+                 _block_args,
+                 _global_params,
+                 padding_type,
+                 use_se,
+                 is_test,
+                 model_name=None):
+        super(Extract_Features, self).__init__()
+
+        self._global_params = _global_params
+
+        self._conv_stem = Conv_Stem_Norm(
+            input_channels,
+            padding_type=padding_type,
+            _global_params=_global_params,
+            model_name=model_name,
+            cur_stage=0)
+
+        self.block_args_copy = copy.deepcopy(_block_args)
+        idx = 0
+        block_size = 0
+        for block_arg in self.block_args_copy:
+            block_arg = block_arg._replace(
+                input_filters=round_filters(block_arg.input_filters,
+                                            _global_params),
+                output_filters=round_filters(block_arg.output_filters,
+                                             _global_params),
+                num_repeat=round_repeats(block_arg.num_repeat, _global_params))
+            block_size += 1
+            for _ in range(block_arg.num_repeat - 1):
+                block_size += 1
+
+        self.conv_seq = []
+        cur_stage = 1
+        for block_args in _block_args:
+            block_args = block_args._replace(
+                input_filters=round_filters(block_args.input_filters,
+                                            _global_params),
+                output_filters=round_filters(block_args.output_filters,
+                                             _global_params),
+                num_repeat=round_repeats(block_args.num_repeat,
+                                         _global_params))
+
+            drop_connect_rate = self._global_params.drop_connect_rate if not is_test else 0
+            if drop_connect_rate:
+                drop_connect_rate *= float(idx) / block_size
+
+            _mc_block = self.add_sublayer(
+                "_blocks." + str(idx) + ".",
+                Mb_Conv_Block(
+                    block_args.input_filters,
+                    block_args=block_args,
+                    padding_type=padding_type,
+                    use_se=use_se,
+                    name="_blocks." + str(idx) + ".",
+                    drop_connect_rate=drop_connect_rate,
+                    model_name=model_name,
+                    cur_stage=cur_stage))
+            self.conv_seq.append(_mc_block)
+            idx += 1
+            if block_args.num_repeat > 1:
+                block_args = block_args._replace(
+                    input_filters=block_args.output_filters, stride=1)
+            for _ in range(block_args.num_repeat - 1):
+                drop_connect_rate = self._global_params.drop_connect_rate if not is_test else 0
+                if drop_connect_rate:
+                    drop_connect_rate *= float(idx) / block_size
+                _mc_block = self.add_sublayer(
+                    "block." + str(idx) + ".",
+                    Mb_Conv_Block(
+                        block_args.input_filters,
+                        block_args,
+                        padding_type=padding_type,
+                        use_se=use_se,
+                        name="_blocks." + str(idx) + ".",
+                        drop_connect_rate=drop_connect_rate,
+                        model_name=model_name,
+                        cur_stage=cur_stage))
+                self.conv_seq.append(_mc_block)
+                idx += 1
+            cur_stage += 1
+
+    def forward(self, inputs):
+        x = self._conv_stem(inputs)
+        layer_helper = LayerHelper(self.full_name(), act='swish')
+        x = layer_helper.append_activation(x)
+        for _mc_block in self.conv_seq:
+            x = _mc_block(x)
+        return x
+
+
+class EfficientNet(fluid.dygraph.Layer):
+    def __init__(self,
+                 name="b0",
+                 is_test=True,
+                 padding_type="SAME",
+                 override_params=None,
+                 use_se=True,
+                 class_dim=1000):
+        super(EfficientNet, self).__init__()
+
+        model_name = 'efficientnet-' + name
+        self.name = name
+        self._block_args, self._global_params = get_model_params(
+            model_name, override_params)
+        self.padding_type = padding_type
+        self.use_se = use_se
+        self.is_test = is_test
+
+        self._ef = Extract_Features(
+            3,
+            self._block_args,
+            self._global_params,
+            self.padding_type,
+            self.use_se,
+            self.is_test,
+            model_name=self.name)
+
+        output_channels = round_filters(1280, self._global_params)
+        if name == "b0_small" or name == "b0" or name == "b1":
+            oup = 320
+        elif name == "b2":
+            oup = 352
+        elif name == "b3":
+            oup = 384
+        elif name == "b4":
+            oup = 448
+        elif name == "b5":
+            oup = 512
+        elif name == "b6":
+            oup = 576
+        elif name == "b7":
+            oup = 640
+        self._conv = ConvBNLayer(
+            oup,
+            1,
+            output_channels,
+            bn_act="swish",
+            padding_type=self.padding_type,
+            name="",
+            conv_name="_conv_head",
+            bn_name="_bn1",
+            model_name=self.name,
+            cur_stage=7)
+        self._pool = Pool2D(pool_type="avg", global_pooling=True)
+
+        if self._global_params.dropout_rate:
+            self._drop = Dropout(
+                p=self._global_params.dropout_rate,
+                dropout_implementation="upscale_in_train")
+
+        param_attr, bias_attr = init_fc_layer("_fc")
+        self._fc = Linear(
+            output_channels,
+            class_dim,
+            param_attr=param_attr,
+            bias_attr=bias_attr)
+
+    def forward(self, inputs):
+        x = self._ef(inputs)
+        x = self._conv(x)
+        x = self._pool(x)
+        if self._global_params.dropout_rate:
+            x = self._drop(x)
+        x = fluid.layers.squeeze(x, axes=[2, 3])
+        x = self._fc(x)
+        return x
+
+
+def EfficientNetB0_small(is_test=True,
+                         padding_type='DYNAMIC',
+                         override_params=None,
+                         use_se=False):
     model = EfficientNet(
         name='b0',
-        is_test=is_test,
+        is_test=True,
         padding_type=padding_type,
         override_params=override_params,
         use_se=use_se)
     return model
 
 
-def EfficientNetB0_small(is_test=False,
-                         padding_type='DYNAMIC',
-                         override_params=None,
-                         use_se=False):
+def EfficientNetB0(is_test=False,
+                   padding_type='SAME',
+                   override_params=None,
+                   use_se=True):
     model = EfficientNet(
         name='b0',
-        is_test=is_test,
+        is_test=True,
         padding_type=padding_type,
         override_params=override_params,
         use_se=use_se)
@@ -558,7 +825,7 @@ def EfficientNetB1(is_test=False,
                    use_se=True):
     model = EfficientNet(
         name='b1',
-        is_test=is_test,
+        is_test=True,
         padding_type=padding_type,
         override_params=override_params,
         use_se=use_se)
@@ -571,7 +838,7 @@ def EfficientNetB2(is_test=False,
                    use_se=True):
     model = EfficientNet(
         name='b2',
-        is_test=is_test,
+        is_test=True,
         padding_type=padding_type,
         override_params=override_params,
         use_se=use_se)
@@ -584,7 +851,7 @@ def EfficientNetB3(is_test=False,
                    use_se=True):
     model = EfficientNet(
         name='b3',
-        is_test=is_test,
+        is_test=True,
         padding_type=padding_type,
         override_params=override_params,
         use_se=use_se)
@@ -597,7 +864,7 @@ def EfficientNetB4(is_test=False,
                    use_se=True):
     model = EfficientNet(
         name='b4',
-        is_test=is_test,
+        is_test=True,
         padding_type=padding_type,
         override_params=override_params,
         use_se=use_se)
@@ -610,7 +877,7 @@ def EfficientNetB5(is_test=False,
                    use_se=True):
     model = EfficientNet(
         name='b5',
-        is_test=is_test,
+        is_test=True,
         padding_type=padding_type,
         override_params=override_params,
         use_se=use_se)
@@ -623,7 +890,7 @@ def EfficientNetB6(is_test=False,
                    use_se=True):
     model = EfficientNet(
         name='b6',
-        is_test=is_test,
+        is_test=True,
         padding_type=padding_type,
         override_params=override_params,
         use_se=use_se)
@@ -636,7 +903,7 @@ def EfficientNetB7(is_test=False,
                    use_se=True):
     model = EfficientNet(
         name='b7',
-        is_test=is_test,
+        is_test=True,
         padding_type=padding_type,
         override_params=override_params,
         use_se=use_se)

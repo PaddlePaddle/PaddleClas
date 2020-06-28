@@ -1,172 +1,360 @@
-#copyright (c) 2020 PaddlePaddle Authors. All Rights Reserve.
-#
-#Licensed under the Apache License, Version 2.0 (the "License");
-#you may not use this file except in compliance with the License.
-#You may obtain a copy of the License at
-#
-#    http://www.apache.org/licenses/LICENSE-2.0
-#
-#Unless required by applicable law or agreed to in writing, software
-#distributed under the License is distributed on an "AS IS" BASIS,
-#WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#See the License for the specific language governing permissions and
-#limitations under the License.
-
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-
-import math
-
+import numpy as np
+import argparse
 import paddle
 import paddle.fluid as fluid
+from paddle.fluid.param_attr import ParamAttr
+from paddle.fluid.layer_helper import LayerHelper
+from paddle.fluid.dygraph.nn import Conv2D, Pool2D, BatchNorm, Linear
+from paddle.fluid.dygraph.base import to_variable
 
-__all__ = ['AlexNet']
+from paddle.fluid import framework
+
+import math
+import sys
+import time
+
+__all__ = ['Xception41', 'Xception65', 'Xception71']
 
 
-class AlexNet():
-    def __init__(self):
-        pass
+class ConvBNLayer(fluid.dygraph.Layer):
+    def __init__(self,
+                 num_channels,
+                 num_filters,
+                 filter_size,
+                 stride=1,
+                 groups=1,
+                 act=None,
+                 name=None):
+        super(ConvBNLayer, self).__init__()
 
-    def net(self, input, class_dim=1000):
-        stdv = 1.0 / math.sqrt(input.shape[1] * 11 * 11)
-        layer_name = [
-            "conv1", "conv2", "conv3", "conv4", "conv5", "fc6", "fc7", "fc8"
-        ]
-        conv1 = fluid.layers.conv2d(
-            input=input,
-            num_filters=64,
-            filter_size=11,
-            stride=4,
-            padding=2,
-            groups=1,
-            act='relu',
-            bias_attr=fluid.param_attr.ParamAttr(
-                initializer=fluid.initializer.Uniform(-stdv, stdv),
-                name=layer_name[0] + "_offset"),
-            param_attr=fluid.param_attr.ParamAttr(
-                initializer=fluid.initializer.Uniform(-stdv, stdv),
-                name=layer_name[0] + "_weights"))
-        pool1 = fluid.layers.pool2d(
-            input=conv1,
-            pool_size=3,
-            pool_stride=2,
-            pool_padding=0,
-            pool_type='max')
+        self._conv = Conv2D(
+            num_channels=num_channels,
+            num_filters=num_filters,
+            filter_size=filter_size,
+            stride=stride,
+            padding=(filter_size - 1) // 2,
+            groups=groups,
+            act=None,
+            param_attr=ParamAttr(name=name + "_weights"),
+            bias_attr=False)
+        bn_name = "bn_" + name
+        self._batch_norm = BatchNorm(
+            num_filters,
+            act=act,
+            param_attr=ParamAttr(name=bn_name + "_scale"),
+            bias_attr=ParamAttr(name=bn_name + "_offset"),
+            moving_mean_name=bn_name + '_mean',
+            moving_variance_name=bn_name + '_variance')
 
-        stdv = 1.0 / math.sqrt(pool1.shape[1] * 5 * 5)
-        conv2 = fluid.layers.conv2d(
-            input=pool1,
-            num_filters=192,
-            filter_size=5,
+    def forward(self, inputs):
+        y = self._conv(inputs)
+        y = self._batch_norm(y)
+        return y
+
+
+class Separable_Conv(fluid.dygraph.Layer):
+    def __init__(self, input_channels, output_channels, stride=1, name=None):
+        super(Separable_Conv, self).__init__()
+
+        self._pointwise_conv = ConvBNLayer(
+            input_channels, output_channels, 1, name=name + "_sep")
+        self._depthwise_conv = ConvBNLayer(
+            output_channels,
+            output_channels,
+            3,
+            stride=stride,
+            groups=output_channels,
+            name=name + "_dw")
+
+    def forward(self, inputs):
+        x = self._pointwise_conv(inputs)
+        x = self._depthwise_conv(x)
+        return x
+
+
+class Entry_Flow_Bottleneck_Block(fluid.dygraph.Layer):
+    def __init__(self,
+                 input_channels,
+                 output_channels,
+                 stride=2,
+                 name=None,
+                 relu_first=False):
+        super(Entry_Flow_Bottleneck_Block, self).__init__()
+        self.relu_first = relu_first
+
+        self._short = Conv2D(
+            num_channels=input_channels,
+            num_filters=output_channels,
+            filter_size=1,
+            stride=stride,
+            padding=0,
+            act=None,
+            param_attr=ParamAttr(name + "_branch1_weights"),
+            bias_attr=False)
+        self._conv1 = Separable_Conv(
+            input_channels,
+            output_channels,
             stride=1,
-            padding=2,
-            groups=1,
-            act='relu',
-            bias_attr=fluid.param_attr.ParamAttr(
-                initializer=fluid.initializer.Uniform(-stdv, stdv),
-                name=layer_name[1] + "_offset"),
-            param_attr=fluid.param_attr.ParamAttr(
-                initializer=fluid.initializer.Uniform(-stdv, stdv),
-                name=layer_name[1] + "_weights"))
-        pool2 = fluid.layers.pool2d(
-            input=conv2,
-            pool_size=3,
-            pool_stride=2,
-            pool_padding=0,
-            pool_type='max')
-
-        stdv = 1.0 / math.sqrt(pool2.shape[1] * 3 * 3)
-        conv3 = fluid.layers.conv2d(
-            input=pool2,
-            num_filters=384,
-            filter_size=3,
+            name=name + "_branch2a_weights")
+        self._conv2 = Separable_Conv(
+            output_channels,
+            output_channels,
             stride=1,
-            padding=1,
-            groups=1,
-            act='relu',
-            bias_attr=fluid.param_attr.ParamAttr(
-                initializer=fluid.initializer.Uniform(-stdv, stdv),
-                name=layer_name[2] + "_offset"),
-            param_attr=fluid.param_attr.ParamAttr(
-                initializer=fluid.initializer.Uniform(-stdv, stdv),
-                name=layer_name[2] + "_weights"))
+            name=name + "_branch2b_weights")
+        self._pool = Pool2D(
+            pool_size=3, pool_stride=stride, pool_padding=1, pool_type="max")
 
-        stdv = 1.0 / math.sqrt(conv3.shape[1] * 3 * 3)
-        conv4 = fluid.layers.conv2d(
-            input=conv3,
-            num_filters=256,
-            filter_size=3,
+    def forward(self, inputs):
+        conv0 = inputs
+        short = self._short(inputs)
+        layer_helper = LayerHelper(self.full_name(), act="relu")
+        if self.relu_first:
+            conv0 = layer_helper.append_activation(conv0)
+        conv1 = self._conv1(conv0)
+        conv2 = layer_helper.append_activation(conv1)
+        conv2 = self._conv2(conv2)
+        pool = self._pool(conv2)
+        return fluid.layers.elementwise_add(x=short, y=pool)
+
+
+class Entry_Flow(fluid.dygraph.Layer):
+    def __init__(self, block_num=3):
+        super(Entry_Flow, self).__init__()
+
+        name = "entry_flow"
+        self.block_num = block_num
+        self._conv1 = ConvBNLayer(
+            3, 32, 3, stride=2, act="relu", name=name + "_conv1")
+        self._conv2 = ConvBNLayer(32, 64, 3, act="relu", name=name + "_conv2")
+        if block_num == 3:
+            self._conv_0 = Entry_Flow_Bottleneck_Block(
+                64, 128, stride=2, name=name + "_0", relu_first=False)
+            self._conv_1 = Entry_Flow_Bottleneck_Block(
+                128, 256, stride=2, name=name + "_1", relu_first=True)
+            self._conv_2 = Entry_Flow_Bottleneck_Block(
+                256, 728, stride=2, name=name + "_2", relu_first=True)
+        elif block_num == 5:
+            self._conv_0 = Entry_Flow_Bottleneck_Block(
+                64, 128, stride=2, name=name + "_0", relu_first=False)
+            self._conv_1 = Entry_Flow_Bottleneck_Block(
+                128, 256, stride=1, name=name + "_1", relu_first=True)
+            self._conv_2 = Entry_Flow_Bottleneck_Block(
+                256, 256, stride=2, name=name + "_2", relu_first=True)
+            self._conv_3 = Entry_Flow_Bottleneck_Block(
+                256, 728, stride=1, name=name + "_3", relu_first=True)
+            self._conv_4 = Entry_Flow_Bottleneck_Block(
+                728, 728, stride=2, name=name + "_4", relu_first=True)
+        else:
+            sys.exit(-1)
+
+    def forward(self, inputs):
+        x = self._conv1(inputs)
+        x = self._conv2(x)
+
+        if self.block_num == 3:
+            x = self._conv_0(x)
+            x = self._conv_1(x)
+            x = self._conv_2(x)
+        elif self.block_num == 5:
+            x = self._conv_0(x)
+            x = self._conv_1(x)
+            x = self._conv_2(x)
+            x = self._conv_3(x)
+            x = self._conv_4(x)
+        return x
+
+
+class Middle_Flow_Bottleneck_Block(fluid.dygraph.Layer):
+    def __init__(self, input_channels, output_channels, name):
+        super(Middle_Flow_Bottleneck_Block, self).__init__()
+
+        self._conv_0 = Separable_Conv(
+            input_channels,
+            output_channels,
             stride=1,
-            padding=1,
-            groups=1,
-            act='relu',
-            bias_attr=fluid.param_attr.ParamAttr(
-                initializer=fluid.initializer.Uniform(-stdv, stdv),
-                name=layer_name[3] + "_offset"),
-            param_attr=fluid.param_attr.ParamAttr(
-                initializer=fluid.initializer.Uniform(-stdv, stdv),
-                name=layer_name[3] + "_weights"))
-
-        stdv = 1.0 / math.sqrt(conv4.shape[1] * 3 * 3)
-        conv5 = fluid.layers.conv2d(
-            input=conv4,
-            num_filters=256,
-            filter_size=3,
+            name=name + "_branch2a_weights")
+        self._conv_1 = Separable_Conv(
+            output_channels,
+            output_channels,
             stride=1,
-            padding=1,
-            groups=1,
-            act='relu',
-            bias_attr=fluid.param_attr.ParamAttr(
-                initializer=fluid.initializer.Uniform(-stdv, stdv),
-                name=layer_name[4] + "_offset"),
-            param_attr=fluid.param_attr.ParamAttr(
-                initializer=fluid.initializer.Uniform(-stdv, stdv),
-                name=layer_name[4] + "_weights"))
-        pool5 = fluid.layers.pool2d(
-            input=conv5,
-            pool_size=3,
-            pool_stride=2,
-            pool_padding=0,
-            pool_type='max')
+            name=name + "_branch2b_weights")
+        self._conv_2 = Separable_Conv(
+            output_channels,
+            output_channels,
+            stride=1,
+            name=name + "_branch2c_weights")
 
-        drop6 = fluid.layers.dropout(x=pool5, dropout_prob=0.5)
-        stdv = 1.0 / math.sqrt(drop6.shape[1] * drop6.shape[2] *
-                               drop6.shape[3] * 1.0)
+    def forward(self, inputs):
+        layer_helper = LayerHelper(self.full_name(), act="relu")
+        conv0 = layer_helper.append_activation(inputs)
+        conv0 = self._conv_0(conv0)
+        conv1 = layer_helper.append_activation(conv0)
+        conv1 = self._conv_1(conv1)
+        conv2 = layer_helper.append_activation(conv1)
+        conv2 = self._conv_2(conv2)
+        return fluid.layers.elementwise_add(x=inputs, y=conv2)
 
-        fc6 = fluid.layers.fc(
-            input=drop6,
-            size=4096,
-            act='relu',
-            bias_attr=fluid.param_attr.ParamAttr(
-                initializer=fluid.initializer.Uniform(-stdv, stdv),
-                name=layer_name[5] + "_offset"),
-            param_attr=fluid.param_attr.ParamAttr(
-                initializer=fluid.initializer.Uniform(-stdv, stdv),
-                name=layer_name[5] + "_weights"))
 
-        drop7 = fluid.layers.dropout(x=fc6, dropout_prob=0.5)
-        stdv = 1.0 / math.sqrt(drop7.shape[1] * 1.0)
+class Middle_Flow(fluid.dygraph.Layer):
+    def __init__(self, block_num=8):
+        super(Middle_Flow, self).__init__()
 
-        fc7 = fluid.layers.fc(
-            input=drop7,
-            size=4096,
-            act='relu',
-            bias_attr=fluid.param_attr.ParamAttr(
-                initializer=fluid.initializer.Uniform(-stdv, stdv),
-                name=layer_name[6] + "_offset"),
-            param_attr=fluid.param_attr.ParamAttr(
-                initializer=fluid.initializer.Uniform(-stdv, stdv),
-                name=layer_name[6] + "_weights"))
+        self.block_num = block_num
+        self._conv_0 = Middle_Flow_Bottleneck_Block(
+            728, 728, name="middle_flow_0")
+        self._conv_1 = Middle_Flow_Bottleneck_Block(
+            728, 728, name="middle_flow_1")
+        self._conv_2 = Middle_Flow_Bottleneck_Block(
+            728, 728, name="middle_flow_2")
+        self._conv_3 = Middle_Flow_Bottleneck_Block(
+            728, 728, name="middle_flow_3")
+        self._conv_4 = Middle_Flow_Bottleneck_Block(
+            728, 728, name="middle_flow_4")
+        self._conv_5 = Middle_Flow_Bottleneck_Block(
+            728, 728, name="middle_flow_5")
+        self._conv_6 = Middle_Flow_Bottleneck_Block(
+            728, 728, name="middle_flow_6")
+        self._conv_7 = Middle_Flow_Bottleneck_Block(
+            728, 728, name="middle_flow_7")
+        if block_num == 16:
+            self._conv_8 = Middle_Flow_Bottleneck_Block(
+                728, 728, name="middle_flow_8")
+            self._conv_9 = Middle_Flow_Bottleneck_Block(
+                728, 728, name="middle_flow_9")
+            self._conv_10 = Middle_Flow_Bottleneck_Block(
+                728, 728, name="middle_flow_10")
+            self._conv_11 = Middle_Flow_Bottleneck_Block(
+                728, 728, name="middle_flow_11")
+            self._conv_12 = Middle_Flow_Bottleneck_Block(
+                728, 728, name="middle_flow_12")
+            self._conv_13 = Middle_Flow_Bottleneck_Block(
+                728, 728, name="middle_flow_13")
+            self._conv_14 = Middle_Flow_Bottleneck_Block(
+                728, 728, name="middle_flow_14")
+            self._conv_15 = Middle_Flow_Bottleneck_Block(
+                728, 728, name="middle_flow_15")
 
-        stdv = 1.0 / math.sqrt(fc7.shape[1] * 1.0)
-        out = fluid.layers.fc(
-            input=fc7,
-            size=class_dim,
-            bias_attr=fluid.param_attr.ParamAttr(
-                initializer=fluid.initializer.Uniform(-stdv, stdv),
-                name=layer_name[7] + "_offset"),
-            param_attr=fluid.param_attr.ParamAttr(
-                initializer=fluid.initializer.Uniform(-stdv, stdv),
-                name=layer_name[7] + "_weights"))
+    def forward(self, inputs):
+        x = self._conv_0(inputs)
+        x = self._conv_1(x)
+        x = self._conv_2(x)
+        x = self._conv_3(x)
+        x = self._conv_4(x)
+        x = self._conv_5(x)
+        x = self._conv_6(x)
+        x = self._conv_7(x)
+        if self.block_num == 16:
+            x = self._conv_8(x)
+            x = self._conv_9(x)
+            x = self._conv_10(x)
+            x = self._conv_11(x)
+            x = self._conv_12(x)
+            x = self._conv_13(x)
+            x = self._conv_14(x)
+            x = self._conv_15(x)
+        return x
+
+
+class Exit_Flow_Bottleneck_Block(fluid.dygraph.Layer):
+    def __init__(self, input_channels, output_channels1, output_channels2,
+                 name):
+        super(Exit_Flow_Bottleneck_Block, self).__init__()
+
+        self._short = Conv2D(
+            num_channels=input_channels,
+            num_filters=output_channels2,
+            filter_size=1,
+            stride=2,
+            padding=0,
+            act=None,
+            param_attr=ParamAttr(name + "_branch1_weights"),
+            bias_attr=False)
+        self._conv_1 = Separable_Conv(
+            input_channels,
+            output_channels1,
+            stride=1,
+            name=name + "_branch2a_weights")
+        self._conv_2 = Separable_Conv(
+            output_channels1,
+            output_channels2,
+            stride=1,
+            name=name + "_branch2b_weights")
+        self._pool = Pool2D(
+            pool_size=3, pool_stride=2, pool_padding=1, pool_type="max")
+
+    def forward(self, inputs):
+        short = self._short(inputs)
+        layer_helper = LayerHelper(self.full_name(), act="relu")
+        conv0 = layer_helper.append_activation(inputs)
+        conv1 = self._conv_1(conv0)
+        conv2 = layer_helper.append_activation(conv1)
+        conv2 = self._conv_2(conv2)
+        pool = self._pool(conv2)
+        return fluid.layers.elementwise_add(x=short, y=pool)
+
+
+class Exit_Flow(fluid.dygraph.Layer):
+    def __init__(self, class_dim):
+        super(Exit_Flow, self).__init__()
+
+        name = "exit_flow"
+
+        self._conv_0 = Exit_Flow_Bottleneck_Block(
+            728, 728, 1024, name=name + "_1")
+        self._conv_1 = Separable_Conv(1024, 1536, stride=1, name=name + "_2")
+        self._conv_2 = Separable_Conv(1536, 2048, stride=1, name=name + "_3")
+        self._pool = Pool2D(pool_type="avg", global_pooling=True)
+        stdv = 1.0 / math.sqrt(2048 * 1.0)
+        self._out = Linear(
+            2048,
+            class_dim,
+            param_attr=ParamAttr(
+                name="fc_weights",
+                initializer=fluid.initializer.Uniform(-stdv, stdv)),
+            bias_attr=ParamAttr(name="fc_offset"))
+
+    def forward(self, inputs):
+        layer_helper = LayerHelper(self.full_name(), act="relu")
+        conv0 = self._conv_0(inputs)
+        conv1 = self._conv_1(conv0)
+        conv1 = layer_helper.append_activation(conv1)
+        conv2 = self._conv_2(conv1)
+        conv2 = layer_helper.append_activation(conv2)
+        pool = self._pool(conv2)
+        pool = fluid.layers.reshape(pool, [0, -1])
+        out = self._out(pool)
         return out
+
+
+class Xception(fluid.dygraph.Layer):
+    def __init__(self,
+                 entry_flow_block_num=3,
+                 middle_flow_block_num=8,
+                 class_dim=1000):
+        super(Xception, self).__init__()
+        self.entry_flow_block_num = entry_flow_block_num
+        self.middle_flow_block_num = middle_flow_block_num
+        self._entry_flow = Entry_Flow(entry_flow_block_num)
+        self._middle_flow = Middle_Flow(middle_flow_block_num)
+        self._exit_flow = Exit_Flow(class_dim)
+
+    def forward(self, inputs):
+        x = self._entry_flow(inputs)
+        x = self._middle_flow(x)
+        x = self._exit_flow(x)
+        return x
+
+
+def Xception41():
+    model = Xception(entry_flow_block_num=3, middle_flow_block_num=8)
+    return model
+
+
+def Xception65():
+    model = Xception(entry_flow_block_num=3, middle_flow_block_num=16)
+    return model
+
+
+def Xception71():
+    model = Xception(entry_flow_block_num=5, middle_flow_block_num=16)
+    return model
