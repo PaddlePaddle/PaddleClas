@@ -263,17 +263,3 @@ def GhostNet_x1_0():
 def GhostNet_x1_3():
     model = GhostNet(scale=1.3)
     return model
-
-if __name__ == "__main__":
-    image = fluid.data(name='image', shape=[16, 3, 224, 224], dtype='float32')
-    
-    model = GhostNet_x1_0()
-    out = model.net(input=image, class_dim=1000)
-    test_program = fluid.default_main_program().clone(for_test=True)
-
-    place = fluid.CPUPlace()
-    exe = fluid.Executor(place)
-    exe.run(fluid.default_startup_program())
-
-    #lltotal_flops_params, is_quantize = summary(test_program)
-    fluid.save(test_program, "ghostnet1_3")
