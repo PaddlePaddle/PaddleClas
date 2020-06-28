@@ -119,19 +119,19 @@ class GhostNet():
                                 param_attr=ParamAttr(
                                     initializer=fluid.initializer.MSRA(), name=name + "_weights"),
                                 bias_attr=False)
-        bn_name = name+"_bn"
+        bn_name = name + "_bn"
         x = fluid.layers.batch_norm(input=x,
                                     act=act,
                                     param_attr=ParamAttr(
-                                        name=bn_name+"_scale",
+                                        name=bn_name + "_scale",
                                         regularizer=fluid.regularizer.L2DecayRegularizer(
                                         regularization_coeff=0.0)),
                                     bias_attr=ParamAttr(
-                                        name=bn_name+"_offset",
+                                        name=bn_name + "_offset",
                                         regularizer=fluid.regularizer.L2DecayRegularizer(
                                         regularization_coeff=0.0)),
-                                    moving_mean_name=bn_name+"_mean",
-                                    moving_variance_name=name+"_variance")
+                                    moving_mean_name=bn_name + "_mean",
+                                    moving_variance_name=name + "_variance")
         return x
 
     def se_block(self, input, num_channels, reduction_ratio=4, name=None):
@@ -147,12 +147,13 @@ class GhostNet():
         stdv = 1.0 / math.sqrt(squeeze.shape[1] * 1.0)
         excitation = fluid.layers.fc(input=squeeze,
                                     size=num_channels,
-                                    act=None,
+                                    act="hard_sigmoid",
                                     param_attr=fluid.param_attr.ParamAttr(
                                         initializer=fluid.initializer.Uniform(-stdv, stdv),
                                         name=name + '_2_weights'),
                                     bias_attr=ParamAttr(name=name + '_2_offset'))
-        excitation = fluid.layers.clip(x=excitation, min=0, max=1)
+        #excitation = fluid.layers.clip(x=excitation, min=0, max=1)
+        print("using hardsigmoid")
         se_scale = fluid.layers.elementwise_mul(x=input, y=excitation, axis=0)
         return se_scale
 
@@ -223,7 +224,7 @@ class GhostNet():
                                     relu=False,
                                     name=name + "_depthwise")
         if use_se:
-            x = self.se_block(input=x, num_channels=hidden_dim, name=name+"_se")
+            x = self.se_block(input=x, num_channels=hidden_dim, name=name + "_se")
         x = self.ghost_module(input=x,
                             output=output,
                             kernel_size=1,
@@ -264,3 +265,16 @@ def GhostNet_x1_3():
     model = GhostNet(scale=1.3)
     return model
 
+if __name__ == "__main__":
+    image = fluid.data(name='image', shape=[16, 3, 224, 224], dtype='float32')
+    
+    model = GhostNet_x1_0()
+    out = model.net(input=image, class_dim=1000)
+    test_program = fluid.default_main_program().clone(for_test=True)
+
+    place = fluid.CPUPlace()
+    exe = fluid.Executor(place)
+    exe.run(fluid.default_startup_program())
+
+    #lltotal_flops_params, is_quantize = summary(test_program)
+    fluid.save(test_program, "ghostnet1_3")
