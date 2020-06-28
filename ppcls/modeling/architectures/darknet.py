@@ -1,4 +1,3 @@
-# coding=UTF-8
 import numpy as np
 import argparse
 import paddle
@@ -11,8 +10,6 @@ from paddle.fluid.dygraph.base import to_variable
 from paddle.fluid import framework
 
 import math
-import sys
-import time
 
 __all__ = ["DarkNet53"]
 

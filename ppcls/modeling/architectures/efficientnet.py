@@ -11,8 +11,6 @@ from paddle.fluid.dygraph.base import to_variable
 from paddle.fluid import framework
 
 import math
-import sys
-import time
 import collections
 import re
 import copy
@@ -260,7 +258,7 @@ def _drop_connect(inputs, prob, is_test):
     return output
 
 
-class conv2d(fluid.dygraph.Layer):
+class Conv2ds(fluid.dygraph.Layer):
     def __init__(self,
                  input_channels,
                  output_channels,
@@ -274,7 +272,7 @@ class conv2d(fluid.dygraph.Layer):
                  padding_type=None,
                  model_name=None,
                  cur_stage=None):
-        super(conv2d, self).__init__()
+        super(Conv2ds, self).__init__()
 
         param_attr, bias_attr = initial_type(name=name, use_bias=use_bias)
 
@@ -316,10 +314,6 @@ class conv2d(fluid.dygraph.Layer):
             padding=padding,
             param_attr=param_attr,
             bias_attr=bias_attr)
-        # debug:
-        self.stride = stride
-        self.filter_size = filter_size
-        self.inps = inps
 
     def forward(self, inputs):
         x = self._conv(inputs)
@@ -347,7 +341,7 @@ class ConvBNLayer(fluid.dygraph.Layer):
                  cur_stage=None):
         super(ConvBNLayer, self).__init__()
 
-        self._conv = conv2d(
+        self._conv = Conv2ds(
             input_channels=input_channels,
             output_channels=output_channels,
             filter_size=filter_size,
@@ -383,7 +377,7 @@ class ConvBNLayer(fluid.dygraph.Layer):
             return self._conv(inputs)
 
 
-class Expand_Conv_Norm(fluid.dygraph.Layer):
+class ExpandConvNorm(fluid.dygraph.Layer):
     def __init__(self,
                  input_channels,
                  block_args,
@@ -391,7 +385,7 @@ class Expand_Conv_Norm(fluid.dygraph.Layer):
                  name=None,
                  model_name=None,
                  cur_stage=None):
-        super(Expand_Conv_Norm, self).__init__()
+        super(ExpandConvNorm, self).__init__()
 
         self.oup = block_args.input_filters * block_args.expand_ratio
         self.expand_ratio = block_args.expand_ratio
@@ -478,7 +472,7 @@ class Project_Conv_Norm(fluid.dygraph.Layer):
         return self._conv(inputs)
 
 
-class Se_Block(fluid.dygraph.Layer):
+class SEBlock(fluid.dygraph.Layer):
     def __init__(self,
                  input_channels,
                  num_squeezed_channels,
@@ -487,11 +481,11 @@ class Se_Block(fluid.dygraph.Layer):
                  name=None,
                  model_name=None,
                  cur_stage=None):
-        super(Se_Block, self).__init__()
+        super(SEBlock, self).__init__()
 
         self._pool = Pool2D(
             pool_type="avg", global_pooling=True, use_cudnn=False)
-        self._conv1 = conv2d(
+        self._conv1 = Conv2ds(
             input_channels,
             num_squeezed_channels,
             1,
@@ -500,7 +494,7 @@ class Se_Block(fluid.dygraph.Layer):
             act="swish",
             name=name + "_se_reduce")
 
-        self._conv2 = conv2d(
+        self._conv2 = Conv2ds(
             num_squeezed_channels,
             oup,
             1,
@@ -517,7 +511,7 @@ class Se_Block(fluid.dygraph.Layer):
         return fluid.layers.elementwise_mul(inputs, x)
 
 
-class Mb_Conv_Block(fluid.dygraph.Layer):
+class MbConvBlock(fluid.dygraph.Layer):
     def __init__(self,
                  input_channels,
                  block_args,
@@ -528,7 +522,7 @@ class Mb_Conv_Block(fluid.dygraph.Layer):
                  is_test=False,
                  model_name=None,
                  cur_stage=None):
-        super(Mb_Conv_Block, self).__init__()
+        super(MbConvBlock, self).__init__()
 
         oup = block_args.input_filters * block_args.expand_ratio
         self.block_args = block_args
@@ -540,7 +534,7 @@ class Mb_Conv_Block(fluid.dygraph.Layer):
         self.is_test = is_test
 
         if self.expand_ratio != 1:
-            self._ecn = Expand_Conv_Norm(
+            self._ecn = ExpandConvNorm(
                 input_channels,
                 block_args,
                 padding_type=padding_type,
@@ -559,7 +553,7 @@ class Mb_Conv_Block(fluid.dygraph.Layer):
         if self.has_se:
             num_squeezed_channels = max(
                 1, int(block_args.input_filters * block_args.se_ratio))
-            self._se = Se_Block(
+            self._se = SEBlock(
                 input_channels * block_args.expand_ratio,
                 num_squeezed_channels,
                 oup,
@@ -587,14 +581,16 @@ class Mb_Conv_Block(fluid.dygraph.Layer):
         if self.has_se:
             x = self._se(x)
         x = self._pcn(x)
-        if self.id_skip and self.block_args.stride == 1 and self.block_args.input_filters == self.block_args.output_filters:
+        if self.id_skip and \
+            self.block_args.stride == 1 and \
+            self.block_args.input_filters == self.block_args.output_filters:
             if self.drop_connect_rate:
                 x = _drop_connect(x, self.drop_connect_rate, self.is_test)
             x = fluid.layers.elementwise_add(x, inputs)
         return x
 
 
-class Conv_Stem_Norm(fluid.dygraph.Layer):
+class ConvStemNorm(fluid.dygraph.Layer):
     def __init__(self,
                  input_channels,
                  padding_type,
@@ -602,7 +598,7 @@ class Conv_Stem_Norm(fluid.dygraph.Layer):
                  name=None,
                  model_name=None,
                  cur_stage=None):
-        super(Conv_Stem_Norm, self).__init__()
+        super(ConvStemNorm, self).__init__()
 
         output_channels = round_filters(32, _global_params)
         self._conv = ConvBNLayer(
@@ -622,7 +618,7 @@ class Conv_Stem_Norm(fluid.dygraph.Layer):
         return self._conv(inputs)
 
 
-class Extract_Features(fluid.dygraph.Layer):
+class ExtractFeatures(fluid.dygraph.Layer):
     def __init__(self,
                  input_channels,
                  _block_args,
@@ -631,11 +627,11 @@ class Extract_Features(fluid.dygraph.Layer):
                  use_se,
                  is_test,
                  model_name=None):
-        super(Extract_Features, self).__init__()
+        super(ExtractFeatures, self).__init__()
 
         self._global_params = _global_params
 
-        self._conv_stem = Conv_Stem_Norm(
+        self._conv_stem = ConvStemNorm(
             input_channels,
             padding_type=padding_type,
             _global_params=_global_params,
@@ -673,7 +669,7 @@ class Extract_Features(fluid.dygraph.Layer):
 
             _mc_block = self.add_sublayer(
                 "_blocks." + str(idx) + ".",
-                Mb_Conv_Block(
+                MbConvBlock(
                     block_args.input_filters,
                     block_args=block_args,
                     padding_type=padding_type,
@@ -693,7 +689,7 @@ class Extract_Features(fluid.dygraph.Layer):
                     drop_connect_rate *= float(idx) / block_size
                 _mc_block = self.add_sublayer(
                     "block." + str(idx) + ".",
-                    Mb_Conv_Block(
+                    MbConvBlock(
                         block_args.input_filters,
                         block_args,
                         padding_type=padding_type,
@@ -733,7 +729,7 @@ class EfficientNet(fluid.dygraph.Layer):
         self.use_se = use_se
         self.is_test = is_test
 
-        self._ef = Extract_Features(
+        self._ef = ExtractFeatures(
             3,
             self._block_args,
             self._global_params,
@@ -799,7 +795,7 @@ def EfficientNetB0_small(is_test=True,
                          use_se=False):
     model = EfficientNet(
         name='b0',
-        is_test=True,
+        is_test=is_test,
         padding_type=padding_type,
         override_params=override_params,
         use_se=use_se)
@@ -812,7 +808,7 @@ def EfficientNetB0(is_test=False,
                    use_se=True):
     model = EfficientNet(
         name='b0',
-        is_test=True,
+        is_test=is_test,
         padding_type=padding_type,
         override_params=override_params,
         use_se=use_se)
@@ -825,7 +821,7 @@ def EfficientNetB1(is_test=False,
                    use_se=True):
     model = EfficientNet(
         name='b1',
-        is_test=True,
+        is_test=is_test,
         padding_type=padding_type,
         override_params=override_params,
         use_se=use_se)
@@ -838,7 +834,7 @@ def EfficientNetB2(is_test=False,
                    use_se=True):
     model = EfficientNet(
         name='b2',
-        is_test=True,
+        is_test=is_test,
         padding_type=padding_type,
         override_params=override_params,
         use_se=use_se)
@@ -851,7 +847,7 @@ def EfficientNetB3(is_test=False,
                    use_se=True):
     model = EfficientNet(
         name='b3',
-        is_test=True,
+        is_test=is_test,
         padding_type=padding_type,
         override_params=override_params,
         use_se=use_se)
@@ -864,7 +860,7 @@ def EfficientNetB4(is_test=False,
                    use_se=True):
     model = EfficientNet(
         name='b4',
-        is_test=True,
+        is_test=is_test,
         padding_type=padding_type,
         override_params=override_params,
         use_se=use_se)
@@ -877,7 +873,7 @@ def EfficientNetB5(is_test=False,
                    use_se=True):
     model = EfficientNet(
         name='b5',
-        is_test=True,
+        is_test=is_test,
         padding_type=padding_type,
         override_params=override_params,
         use_se=use_se)
@@ -890,7 +886,7 @@ def EfficientNetB6(is_test=False,
                    use_se=True):
     model = EfficientNet(
         name='b6',
-        is_test=True,
+        is_test=is_test,
         padding_type=padding_type,
         override_params=override_params,
         use_se=use_se)
@@ -903,8 +899,10 @@ def EfficientNetB7(is_test=False,
                    use_se=True):
     model = EfficientNet(
         name='b7',
-        is_test=True,
+        is_test=is_test,
         padding_type=padding_type,
         override_params=override_params,
         use_se=use_se)
     return model
+
+    

@@ -8,10 +8,7 @@ from paddle.fluid.dygraph.nn import Conv2D, Pool2D, BatchNorm, Linear, Dropout
 from paddle.fluid.dygraph.base import to_variable
 
 from paddle.fluid import framework
-
 import math
-import sys
-import time
 
 __all__ = ["InceptionV4"]
 
@@ -380,9 +377,9 @@ class InceptionC(fluid.dygraph.Layer):
         return concat
 
 
-class InceptionV4_DY(fluid.dygraph.Layer):
+class InceptionV4DY(fluid.dygraph.Layer):
     def __init__(self, class_dim=1000):
-        super(InceptionV4_DY, self).__init__()
+        super(InceptionV4DY, self).__init__()
         self._inception_stem = Inception_Stem()
 
         self._inceptionA_1 = InceptionA(name="1")
@@ -445,5 +442,5 @@ class InceptionV4_DY(fluid.dygraph.Layer):
 
 
 def InceptionV4():
-    model = InceptionV4_DY()
+    model = InceptionV4DY()
     return model

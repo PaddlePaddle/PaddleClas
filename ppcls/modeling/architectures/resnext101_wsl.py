@@ -96,9 +96,9 @@ class Bottleneck_Block(fluid.dygraph.Layer):
         y = self._short(inputs)
         return fluid.layers.elementwise_add(x, y, act="relu")
 
-class ResNeXt101_wsl(fluid.dygraph.Layer):
+class ResNeXt101WSL(fluid.dygraph.Layer):
     def __init__(self, layers=101, cardinality=32, width=48, class_dim=1000):
-        super(ResNeXt101_wsl, self).__init__()
+        super(ResNeXt101WSL, self).__init__()
 
         self.class_dim = class_dim
 
@@ -240,17 +240,17 @@ class ResNeXt101_wsl(fluid.dygraph.Layer):
         return x
 
 def ResNeXt101_32x8d_wsl():
-    model = ResNeXt101_wsl(cardinality=32, width=8)
+    model = ResNeXt101WSL(cardinality=32, width=8)
     return model 
 
 def ResNeXt101_32x16d_wsl():
-    model = ResNeXt101_wsl(cardinality=32, width=16)
+    model = ResNeXt101WSL(cardinality=32, width=16)
     return model 
 
 def ResNeXt101_32x32d_wsl():
-    model = ResNeXt101_wsl(cardinality=32, width=32)
+    model = ResNeXt101WSL(cardinality=32, width=32)
     return model 
 
 def ResNeXt101_32x48d_wsl():
-    model = ResNeXt101_wsl(cardinality=32, width=48)
+    model = ResNeXt101WSL(cardinality=32, width=48)
     return model 

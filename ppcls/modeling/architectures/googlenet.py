@@ -1,5 +1,3 @@
-import numpy as np
-import argparse
 import paddle
 import paddle.fluid as fluid
 from paddle.fluid.param_attr import ParamAttr
