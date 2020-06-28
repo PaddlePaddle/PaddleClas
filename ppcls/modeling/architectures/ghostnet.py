@@ -147,13 +147,12 @@ class GhostNet():
         stdv = 1.0 / math.sqrt(squeeze.shape[1] * 1.0)
         excitation = fluid.layers.fc(input=squeeze,
                                     size=num_channels,
-                                    act="hard_sigmoid",
+                                    act=None,
                                     param_attr=fluid.param_attr.ParamAttr(
                                         initializer=fluid.initializer.Uniform(-stdv, stdv),
                                         name=name + '_2_weights'),
                                     bias_attr=ParamAttr(name=name + '_2_offset'))
         #excitation = fluid.layers.clip(x=excitation, min=0, max=1)
-        print("using hardsigmoid")
         se_scale = fluid.layers.elementwise_mul(x=input, y=excitation, axis=0)
         return se_scale
 
