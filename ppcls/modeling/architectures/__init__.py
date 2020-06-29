@@ -13,3 +13,6 @@
 # limitations under the License.
 
 from .resnet_name import *
+from .dpn import DPN68
+from .densenet import DenseNet121
+from .hrnet import HRNet_W18_C
