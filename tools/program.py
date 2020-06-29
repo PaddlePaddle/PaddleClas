@@ -338,20 +338,29 @@ def run(dataloader, config, net, optimizer=None, epoch=0, mode='train'):
 
     Returns:
     """
-    topk_name = 'top{}'.format(config.topk)
-    metric_list = OrderedDict([
-        ("loss", AverageMeter('loss', '7.4f')),
-        ("top1", AverageMeter('top1', '.4f')),
-        (topk_name, AverageMeter(topk_name, '.4f')),
-        ("lr", AverageMeter(
-            'lr', 'f', need_avg=False)),
-        ("batch_time", AverageMeter('elapse', '.3f')),
-    ])
+    use_mix = config.get("use_mix", False) and mode == "train"
+    if use_mix:
+        metric_list = OrderedDict([
+            ("loss", AverageMeter('loss', '7.4f')),
+            ("lr", AverageMeter(
+                'lr', 'f', need_avg=False)),
+            ("batch_time", AverageMeter('elapse', '.3f')),
+        ])
+    else:
+        topk_name = 'top{}'.format(config.topk)
+        metric_list = OrderedDict([
+            ("loss", AverageMeter('loss', '7.4f')),
+            ("top1", AverageMeter('top1', '.4f')),
+            (topk_name, AverageMeter(topk_name, '.4f')),
+            ("lr", AverageMeter(
+                'lr', 'f', need_avg=False)),
+            ("batch_time", AverageMeter('elapse', '.3f')),
+        ])
 
     tic = time.time()
     for idx, batch in enumerate(dataloader()):
         bs = len(batch[0])
-        feeds = create_feeds(batch, config.get("use_mix", False))
+        feeds = create_feeds(batch, use_mix)
         fetchs = compute(feeds, net, config, mode)
         if mode == 'train':
             avg_loss = net.scale_loss(fetchs['loss'])

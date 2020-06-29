@@ -1,3 +1,21 @@
+# copyright (c) 2020 PaddlePaddle Authors. All Rights Reserve.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#    http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
+
 import numpy as np
 import paddle
 import paddle.fluid as fluid
@@ -647,81 +665,81 @@ class HRNet(fluid.dygraph.Layer):
         return y
 
 
-def HRNet_W18_C():
-    model = HRNet(width=18)
+def HRNet_W18_C(**args):
+    model = HRNet(width=18, **args)
     return model
 
 
-def HRNet_W30_C():
-    model = HRNet(width=30)
+def HRNet_W30_C(**args):
+    model = HRNet(width=30, **args)
     return model
 
 
-def HRNet_W32_C():
-    model = HRNet(width=32)
+def HRNet_W32_C(**args):
+    model = HRNet(width=32, **args)
     return model
 
 
-def HRNet_W40_C():
-    model = HRNet(width=40)
+def HRNet_W40_C(**args):
+    model = HRNet(width=40, **args)
     return model
 
 
-def HRNet_W44_C():
-    model = HRNet(width=44)
+def HRNet_W44_C(**args):
+    model = HRNet(width=44, **args)
     return model
 
 
-def HRNet_W48_C():
-    model = HRNet(width=48)
+def HRNet_W48_C(**args):
+    model = HRNet(width=48, **args)
     return model
 
 
-def HRNet_W60_C():
-    model = HRNet(width=60)
+def HRNet_W60_C(**args):
+    model = HRNet(width=60, **args)
     return model
 
 
-def HRNet_W64_C():
-    model = HRNet(width=64)
+def HRNet_W64_C(**args):
+    model = HRNet(width=64, **args)
     return model
 
 
-def SE_HRNet_W18_C():
-    model = HRNet(width=18, has_se=True)
+def SE_HRNet_W18_C(**args):
+    model = HRNet(width=18, has_se=True, **args)
     return model
 
 
-def SE_HRNet_W30_C():
-    model = HRNet(width=30, has_se=True)
+def SE_HRNet_W30_C(**args):
+    model = HRNet(width=30, has_se=True, **args)
     return model
 
 
-def SE_HRNet_W32_C():
-    model = HRNet(width=32, has_se=True)
+def SE_HRNet_W32_C(**args):
+    model = HRNet(width=32, has_se=True, **args)
     return model
 
 
-def SE_HRNet_W40_C():
-    model = HRNet(width=40, has_se=True)
+def SE_HRNet_W40_C(**args):
+    model = HRNet(width=40, has_se=True, **args)
     return model
 
 
-def SE_HRNet_W44_C():
-    model = HRNet(width=44, has_se=True)
+def SE_HRNet_W44_C(**args):
+    model = HRNet(width=44, has_se=True, **args)
     return model
 
 
-def SE_HRNet_W48_C():
-    model = HRNet(width=48, has_se=True)
+def SE_HRNet_W48_C(**args):
+    model = HRNet(width=48, has_se=True, **args)
     return model
 
 
-def SE_HRNet_W60_C():
-    model = HRNet(width=60, has_se=True)
+def SE_HRNet_W60_C(**args):
+    model = HRNet(width=60, has_se=True, **args)
     return model
 
 
-def SE_HRNet_W64_C():
-    model = HRNet(width=64, has_se=True)
+def SE_HRNet_W64_C(**args):
+    model = HRNet(width=64, has_se=True, **args)
     return model
