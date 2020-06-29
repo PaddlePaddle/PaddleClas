@@ -133,7 +133,7 @@ def main(args):
 
                 top1_acc = program.run(valid_dataloader, exe,
                                        compiled_valid_prog, valid_fetchs,
-                                       epoch_id, 'valid')
+                                       epoch_id, 'valid', config)
                 if top1_acc > best_top1_acc:
                     best_top1_acc = top1_acc
                     message = "The best top1 acc {:.5f}, in epoch: {:d}".format(
