@@ -13,3 +13,4 @@
 # limitations under the License.
 
 from .resnet_name import *
+from .dpn import DPN68

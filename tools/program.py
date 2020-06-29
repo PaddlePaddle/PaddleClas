@@ -51,9 +51,7 @@ def create_dataloader():
     trainer_num = int(os.environ.get('PADDLE_TRAINERS_NUM', 1))
     capacity = 64 if trainer_num <= 1 else 8
     dataloader = fluid.io.DataLoader.from_generator(
-        capacity=capacity,
-        use_double_buffer=True,
-        iterable=True)
+        capacity=capacity, use_double_buffer=True, iterable=True)
 
     return dataloader
 
@@ -76,8 +74,8 @@ def create_model(architecture, classes_num):
     return architectures.__dict__[name](class_dim=classes_num, **params)
 
 
-def create_loss(out,
-                label,
+def create_loss(feeds,
+                out,
                 architecture,
                 classes_num=1000,
                 epsilon=None,
@@ -106,7 +104,7 @@ def create_loss(out,
     if architecture["name"] == "GoogLeNet":
         assert len(out) == 3, "GoogLeNet should have 3 outputs"
         loss = GoogLeNetLoss(class_dim=classes_num, epsilon=epsilon)
-        return loss(out[0], out[1], out[2], label)
+        return loss(out[0], out[1], out[2], feeds["label"])
 
     if use_distillation:
         assert len(out) == 2, ("distillation output length must be 2, "
@@ -116,14 +114,13 @@ def create_loss(out,
 
     if use_mix:
         loss = MixCELoss(class_dim=classes_num, epsilon=epsilon)
-        raise NotImplementedError
-        #feed_y_a = feeds['feed_y_a']
-        #feed_y_b = feeds['feed_y_b']
-        #feed_lam = feeds['feed_lam']
-        #return loss(out, feed_y_a, feed_y_b, feed_lam)
+        feed_y_a = feeds['y_a']
+        feed_y_b = feeds['y_b']
+        feed_lam = feeds['lam']
+        return loss(out, feed_y_a, feed_y_b, feed_lam)
     else:
         loss = CELoss(class_dim=classes_num, epsilon=epsilon)
-        return loss(out, label)
+        return loss(out, feeds["label"])
 
 
 def create_metric(out,
@@ -166,8 +163,9 @@ def create_metric(out,
     return fetchs
 
 
-def create_fetchs(out,
-                  label,
+def create_fetchs(feeds,
+                  out,
+                  config,
                   architecture,
                   topk=5,
                   classes_num=1000,
@@ -193,11 +191,11 @@ def create_fetchs(out,
         fetchs(dict): dict of model outputs(included loss and measures)
     """
     fetchs = OrderedDict()
-    fetchs['loss'] = create_loss(out, label, architecture, classes_num, epsilon, use_mix,
-                       use_distillation)
+    fetchs['loss'] = create_loss(feeds, out, architecture, classes_num,
+                                 epsilon, use_mix, use_distillation)
     if not use_mix:
-        metric = create_metric(out, label, architecture, topk, classes_num,
-                               use_distillation)
+        metric = create_metric(out, feeds["label"], architecture, topk,
+                               classes_num, use_distillation)
         fetchs.update(metric)
 
     return fetchs
@@ -278,7 +276,7 @@ def mixed_precision_optimizer(config, optimizer):
     return optimizer
 
 
-def compute(config, out, label, mode='train'):
+def compute(feeds, net, config, mode='train'):
     """
     Build a program using a model and an optimizer
         1. create feeds
@@ -297,9 +295,11 @@ def compute(config, out, label, mode='train'):
         dataloader(): a bridge between the model and the data
         fetchs(dict): dict of model outputs(included loss and measures)
     """
+    out = net(feeds["image"])
     fetchs = create_fetchs(
+        feeds,
         out,
-        label,
+        config,
         config.ARCHITECTURE,
         config.topk,
         config.classes_num,
@@ -308,6 +308,20 @@ def compute(config, out, label, mode='train'):
         use_distillation=config.get('use_distillation'))
 
     return fetchs
+
+
+def create_feeds(batch, use_mix):
+    if use_mix:
+        image = batch[0]
+        y_a = to_variable(batch[1].numpy().astype("int64").reshape(-1, 1))
+        y_b = to_variable(batch[2].numpy().astype("int64").reshape(-1, 1))
+        lam = to_variable(batch[3].numpy().astype("float32").reshape(-1, 1))
+        feeds = {"image": image, "y_a": y_a, "y_b": y_b, "lam": lam}
+    else:
+        image = batch[0]
+        label = to_variable(batch[1].numpy().astype('int64').reshape(-1, 1))
+        feeds = {"image": image, "label": label}
+    return feeds
 
 
 def run(dataloader, config, net, optimizer=None, epoch=0, mode='train'):
@@ -329,14 +343,16 @@ def run(dataloader, config, net, optimizer=None, epoch=0, mode='train'):
         ("loss", AverageMeter('loss', '7.4f')),
         ("top1", AverageMeter('top1', '.4f')),
         (topk_name, AverageMeter(topk_name, '.4f')),
-        ("lr", AverageMeter('lr', 'f', need_avg=False)),
+        ("lr", AverageMeter(
+            'lr', 'f', need_avg=False)),
         ("batch_time", AverageMeter('elapse', '.3f')),
     ])
 
     tic = time.time()
-    for idx, (img, label) in enumerate(dataloader()):
-        label = to_variable(label.numpy().astype('int64').reshape(-1, 1))
-        fetchs = compute(config, net(img), label, mode)
+    for idx, batch in enumerate(dataloader()):
+        bs = len(batch[0])
+        feeds = create_feeds(batch, config.get("use_mix", False))
+        fetchs = compute(feeds, net, config, mode)
         if mode == 'train':
             avg_loss = net.scale_loss(fetchs['loss'])
             avg_loss.backward()
@@ -345,10 +361,10 @@ def run(dataloader, config, net, optimizer=None, epoch=0, mode='train'):
             optimizer.minimize(avg_loss)
             net.clear_gradients()
             metric_list['lr'].update(
-                    optimizer._global_learning_rate().numpy()[0], len(img))
+                optimizer._global_learning_rate().numpy()[0], bs)
 
         for name, fetch in fetchs.items():
-            metric_list[name].update(fetch.numpy()[0], len(img))
+            metric_list[name].update(fetch.numpy()[0], bs)
         metric_list['batch_time'].update(time.time() - tic)
         tic = time.time()
 
@@ -365,7 +381,8 @@ def run(dataloader, config, net, optimizer=None, epoch=0, mode='train'):
                 logger.coloring(step_str, "PURPLE"),
                 logger.coloring(fetchs_str, 'OKGREEN')))
 
-    end_str = ' '.join([str(m.mean) for m in metric_list.values()] + [metric_list['batch_time'].total])
+    end_str = ' '.join([str(m.mean) for m in metric_list.values()] +
+                       [metric_list['batch_time'].total])
     if mode == 'eval':
         logger.info("END {:s} {:s}s".format(mode, end_str))
     else:
