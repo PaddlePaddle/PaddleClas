@@ -1,172 +1,103 @@
-#copyright (c) 2020 PaddlePaddle Authors. All Rights Reserve.
-#
-#Licensed under the Apache License, Version 2.0 (the "License");
-#you may not use this file except in compliance with the License.
-#You may obtain a copy of the License at
-#
-#    http://www.apache.org/licenses/LICENSE-2.0
-#
-#Unless required by applicable law or agreed to in writing, software
-#distributed under the License is distributed on an "AS IS" BASIS,
-#WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#See the License for the specific language governing permissions and
-#limitations under the License.
-
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-
-import math
-
 import paddle
 import paddle.fluid as fluid
+from paddle.fluid.param_attr import ParamAttr
+from paddle.fluid.dygraph.nn import Conv2D, Pool2D, BatchNorm, Linear, Dropout
+import math
 
-__all__ = ['AlexNet']
+__all__ = ["AlexNet"]
+
+class ConvPoolLayer(fluid.dygraph.Layer):
+    def __init__(self, 
+                inputc_channels,
+                output_channels,
+                filter_size,
+                stride,
+                padding,
+                stdv,
+                groups=1,
+                act=None,
+                name=None):
+        super(ConvPoolLayer, self).__init__()
+
+        self._conv = Conv2D(num_channels=inputc_channels,
+                            num_filters=output_channels,
+                            filter_size=filter_size,
+                            stride=stride,
+                            padding=padding,
+                            groups=groups,
+                            param_attr=ParamAttr(name=name + "_weights",
+                                initializer=fluid.initializer.Uniform(-stdv, stdv)),
+                            bias_attr=ParamAttr(name=name + "_offset",
+                                initializer=fluid.initializer.Uniform(-stdv, stdv)),
+                            act=act)
+        self._pool = Pool2D(pool_size=3,
+                            pool_stride=2,
+                            pool_padding=0,
+                            pool_type="max")
+
+    def forward(self, inputs):
+        x = self._conv(inputs)
+        x = self._pool(x)
+        return x
 
 
-class AlexNet():
-    def __init__(self):
-        pass
+class AlexNetDY(fluid.dygraph.Layer):
+    def __init__(self, class_dim=1000):
+        super(AlexNetDY, self).__init__()
 
-    def net(self, input, class_dim=1000):
-        stdv = 1.0 / math.sqrt(input.shape[1] * 11 * 11)
-        layer_name = [
-            "conv1", "conv2", "conv3", "conv4", "conv5", "fc6", "fc7", "fc8"
-        ]
-        conv1 = fluid.layers.conv2d(
-            input=input,
-            num_filters=64,
-            filter_size=11,
-            stride=4,
-            padding=2,
-            groups=1,
-            act='relu',
-            bias_attr=fluid.param_attr.ParamAttr(
-                initializer=fluid.initializer.Uniform(-stdv, stdv),
-                name=layer_name[0] + "_offset"),
-            param_attr=fluid.param_attr.ParamAttr(
-                initializer=fluid.initializer.Uniform(-stdv, stdv),
-                name=layer_name[0] + "_weights"))
-        pool1 = fluid.layers.pool2d(
-            input=conv1,
-            pool_size=3,
-            pool_stride=2,
-            pool_padding=0,
-            pool_type='max')
+        stdv = 1.0/math.sqrt(3*11*11)
+        self._conv1 = ConvPoolLayer(
+            3, 64, 11, 4, 2, stdv, act="relu", name="conv1") 
+        stdv = 1.0/math.sqrt(64*5*5)
+        self._conv2 = ConvPoolLayer(
+            64, 192, 5, 1, 2, stdv, act="relu", name="conv2")
+        stdv = 1.0/math.sqrt(192*3*3)
+        self._conv3 = Conv2D(192, 384, 3, stride=1, padding=1, 
+            param_attr=ParamAttr(name="conv3_weights", initializer=fluid.initializer.Uniform(-stdv, stdv)),
+            bias_attr=ParamAttr(name="conv3_offset", initializer=fluid.initializer.Uniform(-stdv, stdv)), 
+            act="relu")
+        stdv = 1.0/math.sqrt(384*3*3)
+        self._conv4 = Conv2D(384, 256, 3, stride=1, padding=1,
+            param_attr=ParamAttr(name="conv4_weights", initializer=fluid.initializer.Uniform(-stdv, stdv)),
+            bias_attr=ParamAttr(name="conv4_offset", initializer=fluid.initializer.Uniform(-stdv, stdv)), 
+            act="relu")
+        stdv = 1.0/math.sqrt(256*3*3)
+        self._conv5 = ConvPoolLayer(
+            256, 256, 3, 1, 1, stdv, act="relu", name="conv5")
+        stdv = 1.0/math.sqrt(256*6*6)
 
-        stdv = 1.0 / math.sqrt(pool1.shape[1] * 5 * 5)
-        conv2 = fluid.layers.conv2d(
-            input=pool1,
-            num_filters=192,
-            filter_size=5,
-            stride=1,
-            padding=2,
-            groups=1,
-            act='relu',
-            bias_attr=fluid.param_attr.ParamAttr(
-                initializer=fluid.initializer.Uniform(-stdv, stdv),
-                name=layer_name[1] + "_offset"),
-            param_attr=fluid.param_attr.ParamAttr(
-                initializer=fluid.initializer.Uniform(-stdv, stdv),
-                name=layer_name[1] + "_weights"))
-        pool2 = fluid.layers.pool2d(
-            input=conv2,
-            pool_size=3,
-            pool_stride=2,
-            pool_padding=0,
-            pool_type='max')
+        self._drop1 = Dropout(p=0.5)
+        self._fc6 = Linear(input_dim=256*6*6, 
+                        output_dim=4096, 
+                        param_attr=ParamAttr(name="fc6_weights", initializer=fluid.initializer.Uniform(-stdv, stdv)),
+                        bias_attr=ParamAttr(name="fc6_offset", initializer=fluid.initializer.Uniform(-stdv, stdv)),
+                        act="relu")
+        
+        self._drop2 = Dropout(p=0.5)
+        self._fc7 = Linear(input_dim=4096,
+                        output_dim=4096,
+                        param_attr=ParamAttr(name="fc7_weights", initializer=fluid.initializer.Uniform(-stdv, stdv)),
+                        bias_attr=ParamAttr(name="fc7_offset", initializer=fluid.initializer.Uniform(-stdv, stdv)),
+                        act="relu")
+        self._fc8 = Linear(input_dim=4096,
+                        output_dim=class_dim,
+                        param_attr=ParamAttr(name="fc8_weights", initializer=fluid.initializer.Uniform(-stdv, stdv)),
+                        bias_attr=ParamAttr(name="fc8_offset", initializer=fluid.initializer.Uniform(-stdv, stdv)))
 
-        stdv = 1.0 / math.sqrt(pool2.shape[1] * 3 * 3)
-        conv3 = fluid.layers.conv2d(
-            input=pool2,
-            num_filters=384,
-            filter_size=3,
-            stride=1,
-            padding=1,
-            groups=1,
-            act='relu',
-            bias_attr=fluid.param_attr.ParamAttr(
-                initializer=fluid.initializer.Uniform(-stdv, stdv),
-                name=layer_name[2] + "_offset"),
-            param_attr=fluid.param_attr.ParamAttr(
-                initializer=fluid.initializer.Uniform(-stdv, stdv),
-                name=layer_name[2] + "_weights"))
+    def forward(self, inputs):
+        x = self._conv1(inputs)
+        x = self._conv2(x)
+        x = self._conv3(x)
+        x = self._conv4(x)
+        x = self._conv5(x)
+        x = fluid.layers.flatten(x, axis=0)
+        x = self._drop1(x)
+        x = self._fc6(x)
+        x = self._drop2(x)
+        x = self._fc7(x)
+        x = self._fc8(x)
+        return x
 
-        stdv = 1.0 / math.sqrt(conv3.shape[1] * 3 * 3)
-        conv4 = fluid.layers.conv2d(
-            input=conv3,
-            num_filters=256,
-            filter_size=3,
-            stride=1,
-            padding=1,
-            groups=1,
-            act='relu',
-            bias_attr=fluid.param_attr.ParamAttr(
-                initializer=fluid.initializer.Uniform(-stdv, stdv),
-                name=layer_name[3] + "_offset"),
-            param_attr=fluid.param_attr.ParamAttr(
-                initializer=fluid.initializer.Uniform(-stdv, stdv),
-                name=layer_name[3] + "_weights"))
-
-        stdv = 1.0 / math.sqrt(conv4.shape[1] * 3 * 3)
-        conv5 = fluid.layers.conv2d(
-            input=conv4,
-            num_filters=256,
-            filter_size=3,
-            stride=1,
-            padding=1,
-            groups=1,
-            act='relu',
-            bias_attr=fluid.param_attr.ParamAttr(
-                initializer=fluid.initializer.Uniform(-stdv, stdv),
-                name=layer_name[4] + "_offset"),
-            param_attr=fluid.param_attr.ParamAttr(
-                initializer=fluid.initializer.Uniform(-stdv, stdv),
-                name=layer_name[4] + "_weights"))
-        pool5 = fluid.layers.pool2d(
-            input=conv5,
-            pool_size=3,
-            pool_stride=2,
-            pool_padding=0,
-            pool_type='max')
-
-        drop6 = fluid.layers.dropout(x=pool5, dropout_prob=0.5)
-        stdv = 1.0 / math.sqrt(drop6.shape[1] * drop6.shape[2] *
-                               drop6.shape[3] * 1.0)
-
-        fc6 = fluid.layers.fc(
-            input=drop6,
-            size=4096,
-            act='relu',
-            bias_attr=fluid.param_attr.ParamAttr(
-                initializer=fluid.initializer.Uniform(-stdv, stdv),
-                name=layer_name[5] + "_offset"),
-            param_attr=fluid.param_attr.ParamAttr(
-                initializer=fluid.initializer.Uniform(-stdv, stdv),
-                name=layer_name[5] + "_weights"))
-
-        drop7 = fluid.layers.dropout(x=fc6, dropout_prob=0.5)
-        stdv = 1.0 / math.sqrt(drop7.shape[1] * 1.0)
-
-        fc7 = fluid.layers.fc(
-            input=drop7,
-            size=4096,
-            act='relu',
-            bias_attr=fluid.param_attr.ParamAttr(
-                initializer=fluid.initializer.Uniform(-stdv, stdv),
-                name=layer_name[6] + "_offset"),
-            param_attr=fluid.param_attr.ParamAttr(
-                initializer=fluid.initializer.Uniform(-stdv, stdv),
-                name=layer_name[6] + "_weights"))
-
-        stdv = 1.0 / math.sqrt(fc7.shape[1] * 1.0)
-        out = fluid.layers.fc(
-            input=fc7,
-            size=class_dim,
-            bias_attr=fluid.param_attr.ParamAttr(
-                initializer=fluid.initializer.Uniform(-stdv, stdv),
-                name=layer_name[7] + "_offset"),
-            param_attr=fluid.param_attr.ParamAttr(
-                initializer=fluid.initializer.Uniform(-stdv, stdv),
-                name=layer_name[7] + "_weights"))
-        return out
+def AlexNet(**args):
+    model = AlexNetDY(**args)
+    return model

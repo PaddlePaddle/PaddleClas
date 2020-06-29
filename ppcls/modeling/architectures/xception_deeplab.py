@@ -1,33 +1,10 @@
-#copyright (c) 2020 PaddlePaddle Authors. All Rights Reserve.
-#
-#Licensed under the Apache License, Version 2.0 (the "License");
-#you may not use this file except in compliance with the License.
-#You may obtain a copy of the License at
-#
-#    http://www.apache.org/licenses/LICENSE-2.0
-#
-#Unless required by applicable law or agreed to in writing, software
-#distributed under the License is distributed on an "AS IS" BASIS,
-#WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#See the License for the specific language governing permissions and
-#limitations under the License.
-
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-
-import contextlib
 import paddle
-import math
-
 import paddle.fluid as fluid
+from paddle.fluid.param_attr import ParamAttr
+from paddle.fluid.layer_helper import LayerHelper
+from paddle.fluid.dygraph.nn import Conv2D, Pool2D, BatchNorm, Linear, Dropout
 
-from .model_libs import scope, name_scope
-from .model_libs import bn, bn_relu, relu
-from .model_libs import conv
-from .model_libs import seperate_conv
-
-__all__ = ['Xception41_deeplab', 'Xception65_deeplab', 'Xception71_deeplab']
+__all__ = ["Xception41_deeplab", "Xception65_deeplab", "Xception71_deeplab"]
 
 
 def check_data(data, number):
@@ -54,267 +31,355 @@ def check_points(count, points):
             return (True if count == points else False)
 
 
-class Xception():
-    def __init__(self, backbone="xception_65"):
-        self.bottleneck_params = self.gen_bottleneck_params(backbone)
+def gen_bottleneck_params(backbone='xception_65'):
+    if backbone == 'xception_65':
+        bottleneck_params = {
+            "entry_flow": (3, [2, 2, 2], [128, 256, 728]),
+            "middle_flow": (16, 1, 728),
+            "exit_flow": (2, [2, 1], [[728, 1024, 1024], [1536, 1536, 2048]])
+        }
+    elif backbone == 'xception_41':
+        bottleneck_params = {
+            "entry_flow": (3, [2, 2, 2], [128, 256, 728]),
+            "middle_flow": (8, 1, 728),
+            "exit_flow": (2, [2, 1], [[728, 1024, 1024], [1536, 1536, 2048]])
+        }
+    elif backbone == 'xception_71':
+        bottleneck_params = {
+            "entry_flow": (5, [2, 1, 2, 1, 2], [128, 256, 256, 728, 728]),
+            "middle_flow": (16, 1, 728),
+            "exit_flow": (2, [2, 1], [[728, 1024, 1024], [1536, 1536, 2048]])
+        }
+    else:
+        raise Exception(
+            "xception backbont only support xception_41/xception_65/xception_71"
+        )
+    return bottleneck_params
+
+
+class ConvBNLayer(fluid.dygraph.Layer):
+    def __init__(self,
+                 input_channels,
+                 output_channels,
+                 filter_size,
+                 stride=1,
+                 padding=0,
+                 act=None,
+                 name=None):
+        super(ConvBNLayer, self).__init__()
+
+        self._conv = Conv2D(
+            num_channels=input_channels,
+            num_filters=output_channels,
+            filter_size=filter_size,
+            stride=stride,
+            padding=padding,
+            param_attr=ParamAttr(name=name + "/weights"),
+            bias_attr=False)
+        self._bn = BatchNorm(
+            num_channels=output_channels,
+            act=act,
+            epsilon=1e-3,
+            momentum=0.99,
+            param_attr=ParamAttr(name=name + "/BatchNorm/gamma"),
+            bias_attr=ParamAttr(name=name + "/BatchNorm/beta"),
+            moving_mean_name=name + "/BatchNorm/moving_mean",
+            moving_variance_name=name + "/BatchNorm/moving_variance")
+
+    def forward(self, inputs):
+        return self._bn(self._conv(inputs))
+
+
+class Seperate_Conv(fluid.dygraph.Layer):
+    def __init__(self,
+                 input_channels,
+                 output_channels,
+                 stride,
+                 filter,
+                 dilation=1,
+                 act=None,
+                 name=None):
+        super(Seperate_Conv, self).__init__()
+
+        self._conv1 = Conv2D(
+            num_channels=input_channels,
+            num_filters=input_channels,
+            filter_size=filter,
+            stride=stride,
+            groups=input_channels,
+            padding=(filter) // 2 * dilation,
+            dilation=dilation,
+            param_attr=ParamAttr(name=name + "/depthwise/weights"),
+            bias_attr=False)
+        self._bn1 = BatchNorm(
+            input_channels,
+            act=act,
+            epsilon=1e-3,
+            momentum=0.99,
+            param_attr=ParamAttr(name=name + "/depthwise/BatchNorm/gamma"),
+            bias_attr=ParamAttr(name=name + "/depthwise/BatchNorm/beta"),
+            moving_mean_name=name + "/depthwise/BatchNorm/moving_mean",
+            moving_variance_name=name + "/depthwise/BatchNorm/moving_variance")
+        self._conv2 = Conv2D(
+            input_channels,
+            output_channels,
+            1,
+            stride=1,
+            groups=1,
+            padding=0,
+            param_attr=ParamAttr(name=name + "/pointwise/weights"),
+            bias_attr=False)
+        self._bn2 = BatchNorm(
+            output_channels,
+            act=act,
+            epsilon=1e-3,
+            momentum=0.99,
+            param_attr=ParamAttr(name=name + "/pointwise/BatchNorm/gamma"),
+            bias_attr=ParamAttr(name=name + "/pointwise/BatchNorm/beta"),
+            moving_mean_name=name + "/pointwise/BatchNorm/moving_mean",
+            moving_variance_name=name + "/pointwise/BatchNorm/moving_variance")
+
+    def forward(self, inputs):
+        x = self._conv1(inputs)
+        x = self._bn1(x)
+        x = self._conv2(x)
+        x = self._bn2(x)
+        return x
+
+
+class Xception_Block(fluid.dygraph.Layer):
+    def __init__(self,
+                 input_channels,
+                 output_channels,
+                 strides=1,
+                 filter_size=3,
+                 dilation=1,
+                 skip_conv=True,
+                 has_skip=True,
+                 activation_fn_in_separable_conv=False,
+                 name=None):
+        super(Xception_Block, self).__init__()
+
+        repeat_number = 3
+        output_channels = check_data(output_channels, repeat_number)
+        filter_size = check_data(filter_size, repeat_number)
+        strides = check_data(strides, repeat_number)
+
+        self.has_skip = has_skip
+        self.skip_conv = skip_conv
+        self.activation_fn_in_separable_conv = activation_fn_in_separable_conv
+        if not activation_fn_in_separable_conv:
+            self._conv1 = Seperate_Conv(
+                input_channels,
+                output_channels[0],
+                stride=strides[0],
+                filter=filter_size[0],
+                dilation=dilation,
+                name=name + "/separable_conv1")
+            self._conv2 = Seperate_Conv(
+                output_channels[0],
+                output_channels[1],
+                stride=strides[1],
+                filter=filter_size[1],
+                dilation=dilation,
+                name=name + "/separable_conv2")
+            self._conv3 = Seperate_Conv(
+                output_channels[1],
+                output_channels[2],
+                stride=strides[2],
+                filter=filter_size[2],
+                dilation=dilation,
+                name=name + "/separable_conv3")
+        else:
+            self._conv1 = Seperate_Conv(
+                input_channels,
+                output_channels[0],
+                stride=strides[0],
+                filter=filter_size[0],
+                act="relu",
+                dilation=dilation,
+                name=name + "/separable_conv1")
+            self._conv2 = Seperate_Conv(
+                output_channels[0],
+                output_channels[1],
+                stride=strides[1],
+                filter=filter_size[1],
+                act="relu",
+                dilation=dilation,
+                name=name + "/separable_conv2")
+            self._conv3 = Seperate_Conv(
+                output_channels[1],
+                output_channels[2],
+                stride=strides[2],
+                filter=filter_size[2],
+                act="relu",
+                dilation=dilation,
+                name=name + "/separable_conv3")
+
+        if has_skip and skip_conv:
+            self._short = ConvBNLayer(
+                input_channels,
+                output_channels[-1],
+                1,
+                stride=strides[-1],
+                padding=0,
+                name=name + "/shortcut")
+
+    def forward(self, inputs):
+        layer_helper = LayerHelper(self.full_name(), act='relu')
+        if not self.activation_fn_in_separable_conv:
+            x = layer_helper.append_activation(inputs)
+            x = self._conv1(x)
+            x = layer_helper.append_activation(x)
+            x = self._conv2(x)
+            x = layer_helper.append_activation(x)
+            x = self._conv3(x)
+        else:
+            x = self._conv1(inputs)
+            x = self._conv2(x)
+            x = self._conv3(x)
+        if self.has_skip is False:
+            return x
+        if self.skip_conv:
+            skip = self._short(inputs)
+        else:
+            skip = inputs
+        return fluid.layers.elementwise_add(x, skip)
+
+
+class XceptionDeeplab(fluid.dygraph.Layer):
+    def __init__(self, backbone, class_dim=1000):
+        super(XceptionDeeplab, self).__init__()
+
+        bottleneck_params = gen_bottleneck_params(backbone)
         self.backbone = backbone
 
-    def gen_bottleneck_params(self, backbone='xception_65'):
-        if backbone == 'xception_65':
-            bottleneck_params = {
-                "entry_flow": (3, [2, 2, 2], [128, 256, 728]),
-                "middle_flow": (16, 1, 728),
-                "exit_flow":
-                (2, [2, 1], [[728, 1024, 1024], [1536, 1536, 2048]])
-            }
-        elif backbone == 'xception_41':
-            bottleneck_params = {
-                "entry_flow": (3, [2, 2, 2], [128, 256, 728]),
-                "middle_flow": (8, 1, 728),
-                "exit_flow":
-                (2, [2, 1], [[728, 1024, 1024], [1536, 1536, 2048]])
-            }
-        elif backbone == 'xception_71':
-            bottleneck_params = {
-                "entry_flow": (5, [2, 1, 2, 1, 2], [128, 256, 256, 728, 728]),
-                "middle_flow": (16, 1, 728),
-                "exit_flow":
-                (2, [2, 1], [[728, 1024, 1024], [1536, 1536, 2048]])
-            }
-        else:
-            raise Exception(
-                "xception backbont only support xception_41/xception_65/xception_71"
-            )
-        return bottleneck_params
+        self._conv1 = ConvBNLayer(
+            3,
+            32,
+            3,
+            stride=2,
+            padding=1,
+            act="relu",
+            name=self.backbone + "/entry_flow/conv1")
+        self._conv2 = ConvBNLayer(
+            32,
+            64,
+            3,
+            stride=1,
+            padding=1,
+            act="relu",
+            name=self.backbone + "/entry_flow/conv2")
 
-    def net(self,
-            input,
-            output_stride=32,
-            class_dim=1000,
-            end_points=None,
-            decode_points=None):
+        self.block_num = bottleneck_params["entry_flow"][0]
+        self.strides = bottleneck_params["entry_flow"][1]
+        self.chns = bottleneck_params["entry_flow"][2]
+        self.strides = check_data(self.strides, self.block_num)
+        self.chns = check_data(self.chns, self.block_num)
+
+        self.entry_flow = []
+        self.middle_flow = []
+
         self.stride = 2
-        self.block_point = 0
-        self.output_stride = output_stride
-        self.decode_points = decode_points
-        self.short_cuts = dict()
-        with scope(self.backbone):
-            # Entry flow
-            data = self.entry_flow(input)
-            if check_points(self.block_point, end_points):
-                return data, self.short_cuts
-
-            # Middle flow
-            data = self.middle_flow(data)
-            if check_points(self.block_point, end_points):
-                return data, self.short_cuts
-
-            # Exit flow
-            data = self.exit_flow(data)
-            if check_points(self.block_point, end_points):
-                return data, self.short_cuts
-
-            data = fluid.layers.reduce_mean(data, [2, 3], keep_dim=True)
-            data = fluid.layers.dropout(data, 0.5)
-            stdv = 1.0 / math.sqrt(data.shape[1] * 1.0)
-            with scope("logit"):
-                out = fluid.layers.fc(
-                    input=data,
-                    size=class_dim,
-                    param_attr=fluid.param_attr.ParamAttr(
-                        name='fc_weights',
-                        initializer=fluid.initializer.Uniform(-stdv, stdv)),
-                    bias_attr=fluid.param_attr.ParamAttr(name='fc_bias'))
-
-            return out
-
-    def entry_flow(self, data):
-        param_attr = fluid.ParamAttr(
-            name=name_scope + 'weights',
-            regularizer=None,
-            initializer=fluid.initializer.TruncatedNormal(
-                loc=0.0, scale=0.09))
-        with scope("entry_flow"):
-            with scope("conv1"):
-                data = bn_relu(
-                    conv(
-                        data,
-                        32,
-                        3,
-                        stride=2,
-                        padding=1,
-                        param_attr=param_attr))
-            with scope("conv2"):
-                data = bn_relu(
-                    conv(
-                        data,
-                        64,
-                        3,
-                        stride=1,
-                        padding=1,
-                        param_attr=param_attr))
-
-        # get entry flow params
-        block_num = self.bottleneck_params["entry_flow"][0]
-        strides = self.bottleneck_params["entry_flow"][1]
-        chns = self.bottleneck_params["entry_flow"][2]
-        strides = check_data(strides, block_num)
-        chns = check_data(chns, block_num)
-
-        # params to control your flow
+        self.output_stride = 32
         s = self.stride
-        block_point = self.block_point
-        output_stride = self.output_stride
-        with scope("entry_flow"):
-            for i in range(block_num):
-                block_point = block_point + 1
-                with scope("block" + str(i + 1)):
-                    stride = strides[i] if check_stride(s * strides[i],
-                                                        output_stride) else 1
-                    data, short_cuts = self.xception_block(data, chns[i],
-                                                           [1, 1, stride])
-                    s = s * stride
-                    if check_points(block_point, self.decode_points):
-                        self.short_cuts[block_point] = short_cuts[1]
+
+        for i in range(self.block_num):
+            stride = self.strides[i] if check_stride(s * self.strides[i],
+                                                     self.output_stride) else 1
+            xception_block = self.add_sublayer(
+                self.backbone + "/entry_flow/block" + str(i + 1),
+                Xception_Block(
+                    input_channels=64 if i == 0 else self.chns[i - 1],
+                    output_channels=self.chns[i],
+                    strides=[1, 1, self.stride],
+                    name=self.backbone + "/entry_flow/block" + str(i + 1)))
+            self.entry_flow.append(xception_block)
+            s = s * stride
+        self.stride = s
+
+        self.block_num = bottleneck_params["middle_flow"][0]
+        self.strides = bottleneck_params["middle_flow"][1]
+        self.chns = bottleneck_params["middle_flow"][2]
+        self.strides = check_data(self.strides, self.block_num)
+        self.chns = check_data(self.chns, self.block_num)
+        s = self.stride
+
+        for i in range(self.block_num):
+            stride = self.strides[i] if check_stride(s * self.strides[i],
+                                                     self.output_stride) else 1
+            xception_block = self.add_sublayer(
+                self.backbone + "/middle_flow/block" + str(i + 1),
+                Xception_Block(
+                    input_channels=728,
+                    output_channels=728,
+                    strides=[1, 1, self.strides[i]],
+                    skip_conv=False,
+                    name=self.backbone + "/middle_flow/block" + str(i + 1)))
+            self.middle_flow.append(xception_block)
+            s = s * stride
+        self.stride = s
+
+        self.block_num = bottleneck_params["exit_flow"][0]
+        self.strides = bottleneck_params["exit_flow"][1]
+        self.chns = bottleneck_params["exit_flow"][2]
+        self.strides = check_data(self.strides, self.block_num)
+        self.chns = check_data(self.chns, self.block_num)
+        s = self.stride
+        stride = self.strides[0] if check_stride(s * self.strides[0],
+                                                 self.output_stride) else 1
+        self._exit_flow_1 = Xception_Block(
+            728,
+            self.chns[0], [1, 1, stride],
+            name=self.backbone + "/exit_flow/block1")
+        s = s * stride
+        stride = self.strides[1] if check_stride(s * self.strides[1],
+                                                 self.output_stride) else 1
+        self._exit_flow_2 = Xception_Block(
+            self.chns[0][-1],
+            self.chns[1], [1, 1, stride],
+            dilation=2,
+            has_skip=False,
+            activation_fn_in_separable_conv=True,
+            name=self.backbone + "/exit_flow/block2")
+        s = s * stride
 
         self.stride = s
-        self.block_point = block_point
-        return data
 
-    def middle_flow(self, data):
-        block_num = self.bottleneck_params["middle_flow"][0]
-        strides = self.bottleneck_params["middle_flow"][1]
-        chns = self.bottleneck_params["middle_flow"][2]
-        strides = check_data(strides, block_num)
-        chns = check_data(chns, block_num)
+        self._drop = Dropout(p=0.5)
+        self._pool = Pool2D(pool_type="avg", global_pooling=True)
+        self._fc = Linear(
+            self.chns[1][-1],
+            class_dim,
+            param_attr=ParamAttr(name="fc_weights"),
+            bias_attr=ParamAttr(name="fc_bias"))
 
-        # params to control your flow
-        s = self.stride
-        block_point = self.block_point
-        output_stride = self.output_stride
-        with scope("middle_flow"):
-            for i in range(block_num):
-                block_point = block_point + 1
-                with scope("block" + str(i + 1)):
-                    stride = strides[i] if check_stride(s * strides[i],
-                                                        output_stride) else 1
-                    data, short_cuts = self.xception_block(
-                        data, chns[i], [1, 1, strides[i]], skip_conv=False)
-                    s = s * stride
-                    if check_points(block_point, self.decode_points):
-                        self.short_cuts[block_point] = short_cuts[1]
-
-        self.stride = s
-        self.block_point = block_point
-        return data
-
-    def exit_flow(self, data):
-        block_num = self.bottleneck_params["exit_flow"][0]
-        strides = self.bottleneck_params["exit_flow"][1]
-        chns = self.bottleneck_params["exit_flow"][2]
-        strides = check_data(strides, block_num)
-        chns = check_data(chns, block_num)
-
-        assert (block_num == 2)
-        # params to control your flow
-        s = self.stride
-        block_point = self.block_point
-        output_stride = self.output_stride
-        with scope("exit_flow"):
-            with scope('block1'):
-                block_point += 1
-                stride = strides[0] if check_stride(s * strides[0],
-                                                    output_stride) else 1
-                data, short_cuts = self.xception_block(data, chns[0],
-                                                       [1, 1, stride])
-                s = s * stride
-                if check_points(block_point, self.decode_points):
-                    self.short_cuts[block_point] = short_cuts[1]
-            with scope('block2'):
-                block_point += 1
-                stride = strides[1] if check_stride(s * strides[1],
-                                                    output_stride) else 1
-                data, short_cuts = self.xception_block(
-                    data,
-                    chns[1], [1, 1, stride],
-                    dilation=2,
-                    has_skip=False,
-                    activation_fn_in_separable_conv=True)
-                s = s * stride
-                if check_points(block_point, self.decode_points):
-                    self.short_cuts[block_point] = short_cuts[1]
-
-        self.stride = s
-        self.block_point = block_point
-        return data
-
-    def xception_block(self,
-                       input,
-                       channels,
-                       strides=1,
-                       filters=3,
-                       dilation=1,
-                       skip_conv=True,
-                       has_skip=True,
-                       activation_fn_in_separable_conv=False):
-        repeat_number = 3
-        channels = check_data(channels, repeat_number)
-        filters = check_data(filters, repeat_number)
-        strides = check_data(strides, repeat_number)
-        data = input
-        results = []
-        for i in range(repeat_number):
-            with scope('separable_conv' + str(i + 1)):
-                if not activation_fn_in_separable_conv:
-                    data = relu(data)
-                    data = seperate_conv(
-                        data,
-                        channels[i],
-                        strides[i],
-                        filters[i],
-                        dilation=dilation)
-                else:
-                    data = seperate_conv(
-                        data,
-                        channels[i],
-                        strides[i],
-                        filters[i],
-                        dilation=dilation,
-                        act=relu)
-                results.append(data)
-        if not has_skip:
-            return data, results
-        if skip_conv:
-            param_attr = fluid.ParamAttr(
-                name=name_scope + 'weights',
-                regularizer=None,
-                initializer=fluid.initializer.TruncatedNormal(
-                    loc=0.0, scale=0.09))
-            with scope('shortcut'):
-                skip = bn(
-                    conv(
-                        input,
-                        channels[-1],
-                        1,
-                        strides[-1],
-                        groups=1,
-                        padding=0,
-                        param_attr=param_attr))
-        else:
-            skip = input
-        return data + skip, results
+    def forward(self, inputs):
+        x = self._conv1(inputs)
+        x = self._conv2(x)
+        for ef in self.entry_flow:
+            x = ef(x)
+        for mf in self.middle_flow:
+            x = mf(x)
+        x = self._exit_flow_1(x)
+        x = self._exit_flow_2(x)
+        x = self._drop(x)
+        x = self._pool(x)
+        x = fluid.layers.squeeze(x, axes=[2, 3])
+        x = self._fc(x)
+        return x
 
 
-def Xception41_deeplab():
-    model = Xception("xception_41")
+def Xception41_deeplab(**args):
+    model = XceptionDeeplab('xception_41', **args)
     return model
 
 
-def Xception65_deeplab():
-    model = Xception("xception_65")
+def Xception65_deeplab(**args):
+    model = XceptionDeeplab("xception_65", **args)
     return model
 
 
-def Xception71_deeplab():
-    model = Xception("xception_71")
+def Xception71_deeplab(**args):
+    model = XceptionDeeplab("xception_71", **args)
     return model
