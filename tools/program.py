@@ -151,7 +151,6 @@ def create_loss(out,
         loss = JSDivLoss(class_dim=classes_num, epsilon=epsilon)
         return loss(out[1], out[0])
 
-    print("++++++", use_mix)
     if use_mix:
         loss = MixCELoss(class_dim=classes_num, epsilon=epsilon)
         feed_y_a = feeds['feed_y_a']
@@ -341,7 +340,7 @@ def build(config, main_prog, startup_prog, is_train=True):
             use_mix = config.get('use_mix') and is_train
             use_dali = config.get('use_dali')
             use_distillation = config.get('use_distillation')
-            feeds = create_feeds(config.image_shape, use_mix=use_mix, use_dali)
+            feeds = create_feeds(config.image_shape, use_mix, use_dali)
 
             if use_dali and use_mix:
                 import dali
