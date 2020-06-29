@@ -1,17 +1,7 @@
-import numpy as np
-import argparse
 import paddle
 import paddle.fluid as fluid
 from paddle.fluid.param_attr import ParamAttr
-from paddle.fluid.layer_helper import LayerHelper
 from paddle.fluid.dygraph.nn import Conv2D, Pool2D, BatchNorm, Linear, Dropout
-from paddle.fluid.dygraph.base import to_variable
-
-from paddle.fluid import framework
-
-import math
-import sys
-import time
 
 __all__ = ["SqueezeNet1_0", "SqueezeNet1_1"]
 
@@ -152,10 +142,10 @@ class SqueezeNet(fluid.dygraph.Layer):
         x = fluid.layers.squeeze(x, axes=[2,3])
         return x
 
-def SqueezeNet1_0():
-    model = SqueezeNet(version="1.0")
+def SqueezeNet1_0(**args):
+    model = SqueezeNet(version="1.0", **args)
     return model 
 
-def SqueezeNet1_1():
-    model = SqueezeNet(version="1.1")
+def SqueezeNet1_1(**args):
+    model = SqueezeNet(version="1.1", **args)
     return model 

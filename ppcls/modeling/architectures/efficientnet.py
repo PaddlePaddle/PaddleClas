@@ -1,15 +1,8 @@
-# coding:utf-8
-import numpy as np
-import argparse
 import paddle
 import paddle.fluid as fluid
 from paddle.fluid.param_attr import ParamAttr
 from paddle.fluid.layer_helper import LayerHelper
 from paddle.fluid.dygraph.nn import Conv2D, Pool2D, BatchNorm, Linear, Dropout
-from paddle.fluid.dygraph.base import to_variable
-
-from paddle.fluid import framework
-
 import math
 import collections
 import re
@@ -410,7 +403,7 @@ class ExpandConvNorm(fluid.dygraph.Layer):
             return inputs
 
 
-class Depthwise_Conv_Norm(fluid.dygraph.Layer):
+class DepthwiseConvNorm(fluid.dygraph.Layer):
     def __init__(self,
                  input_channels,
                  block_args,
@@ -418,7 +411,7 @@ class Depthwise_Conv_Norm(fluid.dygraph.Layer):
                  name=None,
                  model_name=None,
                  cur_stage=None):
-        super(Depthwise_Conv_Norm, self).__init__()
+        super(DepthwiseConvNorm, self).__init__()
 
         self.k = block_args.kernel_size
         self.s = block_args.stride
@@ -444,7 +437,7 @@ class Depthwise_Conv_Norm(fluid.dygraph.Layer):
         return self._conv(inputs)
 
 
-class Project_Conv_Norm(fluid.dygraph.Layer):
+class ProjectConvNorm(fluid.dygraph.Layer):
     def __init__(self,
                  input_channels,
                  block_args,
@@ -452,7 +445,7 @@ class Project_Conv_Norm(fluid.dygraph.Layer):
                  name=None,
                  model_name=None,
                  cur_stage=None):
-        super(Project_Conv_Norm, self).__init__()
+        super(ProjectConvNorm, self).__init__()
 
         final_oup = block_args.output_filters
 
@@ -542,7 +535,7 @@ class MbConvBlock(fluid.dygraph.Layer):
                 model_name=model_name,
                 cur_stage=cur_stage)
 
-        self._dcn = Depthwise_Conv_Norm(
+        self._dcn = DepthwiseConvNorm(
             input_channels * block_args.expand_ratio,
             block_args,
             padding_type=padding_type,
@@ -562,7 +555,7 @@ class MbConvBlock(fluid.dygraph.Layer):
                 model_name=model_name,
                 cur_stage=cur_stage)
 
-        self._pcn = Project_Conv_Norm(
+        self._pcn = ProjectConvNorm(
             input_channels * block_args.expand_ratio,
             block_args,
             padding_type=padding_type,
@@ -792,117 +785,133 @@ class EfficientNet(fluid.dygraph.Layer):
 def EfficientNetB0_small(is_test=True,
                          padding_type='DYNAMIC',
                          override_params=None,
-                         use_se=False):
+                         use_se=False,
+                         **args):
     model = EfficientNet(
         name='b0',
         is_test=is_test,
         padding_type=padding_type,
         override_params=override_params,
-        use_se=use_se)
+        use_se=use_se,
+        **args)
     return model
 
 
 def EfficientNetB0(is_test=False,
                    padding_type='SAME',
                    override_params=None,
-                   use_se=True):
+                   use_se=True,
+                   **args):
     model = EfficientNet(
         name='b0',
         is_test=is_test,
         padding_type=padding_type,
         override_params=override_params,
-        use_se=use_se)
+        use_se=use_se,
+        **args)
     return model
 
 
 def EfficientNetB1(is_test=False,
                    padding_type='SAME',
                    override_params=None,
-                   use_se=True):
+                   use_se=True,
+                   **args):
     model = EfficientNet(
         name='b1',
         is_test=is_test,
         padding_type=padding_type,
         override_params=override_params,
-        use_se=use_se)
+        use_se=use_se,
+        **args)
     return model
 
 
 def EfficientNetB2(is_test=False,
                    padding_type='SAME',
                    override_params=None,
-                   use_se=True):
+                   use_se=True,
+                   **args):
     model = EfficientNet(
         name='b2',
         is_test=is_test,
         padding_type=padding_type,
         override_params=override_params,
-        use_se=use_se)
+        use_se=use_se,
+        **args)
     return model
 
 
 def EfficientNetB3(is_test=False,
                    padding_type='SAME',
                    override_params=None,
-                   use_se=True):
+                   use_se=True,
+                   **args):
     model = EfficientNet(
         name='b3',
         is_test=is_test,
         padding_type=padding_type,
         override_params=override_params,
-        use_se=use_se)
+        use_se=use_se,
+        **args)
     return model
 
 
 def EfficientNetB4(is_test=False,
                    padding_type='SAME',
                    override_params=None,
-                   use_se=True):
+                   use_se=True,
+                   **args):
     model = EfficientNet(
         name='b4',
         is_test=is_test,
         padding_type=padding_type,
         override_params=override_params,
-        use_se=use_se)
+        use_se=use_se,
+        **args)
     return model
 
 
 def EfficientNetB5(is_test=False,
                    padding_type='SAME',
                    override_params=None,
-                   use_se=True):
+                   use_se=True,
+                   **args):
     model = EfficientNet(
         name='b5',
         is_test=is_test,
         padding_type=padding_type,
         override_params=override_params,
-        use_se=use_se)
+        use_se=use_se,
+        **args)
     return model
 
 
 def EfficientNetB6(is_test=False,
                    padding_type='SAME',
                    override_params=None,
-                   use_se=True):
+                   use_se=True,
+                   **args):
     model = EfficientNet(
         name='b6',
         is_test=is_test,
         padding_type=padding_type,
         override_params=override_params,
-        use_se=use_se)
+        use_se=use_se,
+        **args)
     return model
 
 
 def EfficientNetB7(is_test=False,
                    padding_type='SAME',
                    override_params=None,
-                   use_se=True):
+                   use_se=True,
+                   **args):
     model = EfficientNet(
         name='b7',
         is_test=is_test,
         padding_type=padding_type,
         override_params=override_params,
-        use_se=use_se)
+        use_se=use_se,
+        **args)
     return model
-
-    

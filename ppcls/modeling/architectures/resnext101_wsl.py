@@ -1,17 +1,7 @@
-import numpy as np
-import argparse
 import paddle
 import paddle.fluid as fluid
 from paddle.fluid.param_attr import ParamAttr
-from paddle.fluid.layer_helper import LayerHelper
 from paddle.fluid.dygraph.nn import Conv2D, Pool2D, BatchNorm, Linear
-from paddle.fluid.dygraph.base import to_variable
-
-from paddle.fluid import framework
-
-import math
-import sys
-import time
 
 __all__ = ["ResNeXt101_32x8d_wsl",
             "ResNeXt101_wsl_32x16d_wsl",
@@ -60,9 +50,9 @@ class ConvBNLayer(fluid.dygraph.Layer):
         x = self._bn(x)
         return x
 
-class Short_Cut(fluid.dygraph.Layer):
+class ShortCut(fluid.dygraph.Layer):
     def __init__(self, input_channels, output_channels, stride, name=None):
-        super(Short_Cut, self).__init__()
+        super(ShortCut, self).__init__()
 
         self.input_channels = input_channels
         self.output_channels = output_channels
@@ -76,9 +66,9 @@ class Short_Cut(fluid.dygraph.Layer):
             return self._conv(inputs)
         return inputs 
 
-class Bottleneck_Block(fluid.dygraph.Layer):
+class BottleneckBlock(fluid.dygraph.Layer):
     def __init__(self, input_channels, output_channels, stride, cardinality, width, name):
-        super(Bottleneck_Block, self).__init__()
+        super(BottleneckBlock, self).__init__()
 
         self._conv0 = ConvBNLayer(
             input_channels, output_channels, filter_size=1, act="relu", name=name + ".conv1")
@@ -86,7 +76,7 @@ class Bottleneck_Block(fluid.dygraph.Layer):
             output_channels, output_channels, filter_size=3, act="relu", stride=stride, groups=cardinality, name=name + ".conv2")
         self._conv2 = ConvBNLayer(
             output_channels, output_channels//(width//8), filter_size=1, act=None, name=name + ".conv3")
-        self._short = Short_Cut(
+        self._short = ShortCut(
             input_channels, output_channels//(width//8), stride=stride, name=name + ".downsample")
 
     def forward(self, inputs):
@@ -117,74 +107,74 @@ class ResNeXt101WSL(fluid.dygraph.Layer):
                             pool_padding=1,
                             pool_type="max")
 
-        self._conv1_0 = Bottleneck_Block(
+        self._conv1_0 = BottleneckBlock(
             64, num_filters[0], stride=1, cardinality=self.cardinality, width=self.width, name="layer1.0")
-        self._conv1_1 = Bottleneck_Block(
+        self._conv1_1 = BottleneckBlock(
             num_filters[0]//(width//8), num_filters[0], stride=1, cardinality=self.cardinality, width=self.width, name="layer1.1")
-        self._conv1_2 = Bottleneck_Block(
+        self._conv1_2 = BottleneckBlock(
             num_filters[0]//(width//8), num_filters[0], stride=1, cardinality=self.cardinality, width=self.width, name="layer1.2")
 
-        self._conv2_0 = Bottleneck_Block(
+        self._conv2_0 = BottleneckBlock(
             num_filters[0]//(width//8), num_filters[1], stride=2, cardinality=self.cardinality, width=self.width, name="layer2.0")
-        self._conv2_1 = Bottleneck_Block(
+        self._conv2_1 = BottleneckBlock(
             num_filters[1]//(width//8), num_filters[1], stride=1, cardinality=self.cardinality, width=self.width, name="layer2.1")
-        self._conv2_2 = Bottleneck_Block(
+        self._conv2_2 = BottleneckBlock(
             num_filters[1]//(width//8), num_filters[1], stride=1, cardinality=self.cardinality, width=self.width, name="layer2.2")
-        self._conv2_3 = Bottleneck_Block(
+        self._conv2_3 = BottleneckBlock(
             num_filters[1]//(width//8), num_filters[1], stride=1, cardinality=self.cardinality, width=self.width, name="layer2.3")
 
-        self._conv3_0 = Bottleneck_Block(
+        self._conv3_0 = BottleneckBlock(
             num_filters[1]//(width//8), num_filters[2], stride=2, cardinality=self.cardinality, width=self.width, name="layer3.0")
-        self._conv3_1 = Bottleneck_Block(
+        self._conv3_1 = BottleneckBlock(
             num_filters[2]//(width//8), num_filters[2], stride=1, cardinality=self.cardinality, width=self.width, name="layer3.1")
-        self._conv3_2 = Bottleneck_Block(
+        self._conv3_2 = BottleneckBlock(
             num_filters[2]//(width//8), num_filters[2], stride=1, cardinality=self.cardinality, width=self.width, name="layer3.2")
-        self._conv3_3 = Bottleneck_Block(
+        self._conv3_3 = BottleneckBlock(
             num_filters[2]//(width//8), num_filters[2], stride=1, cardinality=self.cardinality, width=self.width, name="layer3.3")
-        self._conv3_4 = Bottleneck_Block(
+        self._conv3_4 = BottleneckBlock(
             num_filters[2]//(width//8), num_filters[2], stride=1, cardinality=self.cardinality, width=self.width, name="layer3.4")
-        self._conv3_5 = Bottleneck_Block(
+        self._conv3_5 = BottleneckBlock(
             num_filters[2]//(width//8), num_filters[2], stride=1, cardinality=self.cardinality, width=self.width, name="layer3.5")
-        self._conv3_6 = Bottleneck_Block(
+        self._conv3_6 = BottleneckBlock(
             num_filters[2]//(width//8), num_filters[2], stride=1, cardinality=self.cardinality, width=self.width, name="layer3.6")
-        self._conv3_7 = Bottleneck_Block(
+        self._conv3_7 = BottleneckBlock(
             num_filters[2]//(width//8), num_filters[2], stride=1, cardinality=self.cardinality, width=self.width, name="layer3.7")
-        self._conv3_8 = Bottleneck_Block(
+        self._conv3_8 = BottleneckBlock(
             num_filters[2]//(width//8), num_filters[2], stride=1, cardinality=self.cardinality, width=self.width, name="layer3.8")
-        self._conv3_9 = Bottleneck_Block(
+        self._conv3_9 = BottleneckBlock(
             num_filters[2]//(width//8), num_filters[2], stride=1, cardinality=self.cardinality, width=self.width, name="layer3.9")
-        self._conv3_10 = Bottleneck_Block(
+        self._conv3_10 = BottleneckBlock(
             num_filters[2]//(width//8), num_filters[2], stride=1, cardinality=self.cardinality, width=self.width, name="layer3.10")
-        self._conv3_11 = Bottleneck_Block(
+        self._conv3_11 = BottleneckBlock(
             num_filters[2]//(width//8), num_filters[2], stride=1, cardinality=self.cardinality, width=self.width, name="layer3.11")
-        self._conv3_12 = Bottleneck_Block(
+        self._conv3_12 = BottleneckBlock(
             num_filters[2]//(width//8), num_filters[2], stride=1, cardinality=self.cardinality, width=self.width, name="layer3.12")
-        self._conv3_13 = Bottleneck_Block(
+        self._conv3_13 = BottleneckBlock(
             num_filters[2]//(width//8), num_filters[2], stride=1, cardinality=self.cardinality, width=self.width, name="layer3.13")
-        self._conv3_14 = Bottleneck_Block(
+        self._conv3_14 = BottleneckBlock(
             num_filters[2]//(width//8), num_filters[2], stride=1, cardinality=self.cardinality, width=self.width, name="layer3.14")
-        self._conv3_15 = Bottleneck_Block(
+        self._conv3_15 = BottleneckBlock(
             num_filters[2]//(width//8), num_filters[2], stride=1, cardinality=self.cardinality, width=self.width, name="layer3.15")
-        self._conv3_16 = Bottleneck_Block(
+        self._conv3_16 = BottleneckBlock(
             num_filters[2]//(width//8), num_filters[2], stride=1, cardinality=self.cardinality, width=self.width, name="layer3.16")
-        self._conv3_17 = Bottleneck_Block(
+        self._conv3_17 = BottleneckBlock(
             num_filters[2]//(width//8), num_filters[2], stride=1, cardinality=self.cardinality, width=self.width, name="layer3.17")
-        self._conv3_18 = Bottleneck_Block(
+        self._conv3_18 = BottleneckBlock(
             num_filters[2]//(width//8), num_filters[2], stride=1, cardinality=self.cardinality, width=self.width, name="layer3.18")
-        self._conv3_19 = Bottleneck_Block(
+        self._conv3_19 = BottleneckBlock(
             num_filters[2]//(width//8), num_filters[2], stride=1, cardinality=self.cardinality, width=self.width, name="layer3.19")
-        self._conv3_20 = Bottleneck_Block(
+        self._conv3_20 = BottleneckBlock(
             num_filters[2]//(width//8), num_filters[2], stride=1, cardinality=self.cardinality, width=self.width, name="layer3.20")
-        self._conv3_21 = Bottleneck_Block(
+        self._conv3_21 = BottleneckBlock(
             num_filters[2]//(width//8), num_filters[2], stride=1, cardinality=self.cardinality, width=self.width, name="layer3.21")
-        self._conv3_22 = Bottleneck_Block(
+        self._conv3_22 = BottleneckBlock(
             num_filters[2]//(width//8), num_filters[2], stride=1, cardinality=self.cardinality, width=self.width, name="layer3.22")
 
-        self._conv4_0 = Bottleneck_Block(
+        self._conv4_0 = BottleneckBlock(
             num_filters[2]//(width//8), num_filters[3], stride=2, cardinality=self.cardinality, width=self.width, name="layer4.0")
-        self._conv4_1 = Bottleneck_Block(
+        self._conv4_1 = BottleneckBlock(
             num_filters[3]//(width//8), num_filters[3], stride=1, cardinality=self.cardinality, width=self.width, name="layer4.1")
-        self._conv4_2 = Bottleneck_Block(
+        self._conv4_2 = BottleneckBlock(
             num_filters[3]//(width//8), num_filters[3], stride=1, cardinality=self.cardinality, width=self.width, name="layer4.2")
 
         self._avg_pool = Pool2D(pool_type="avg", global_pooling=True)
@@ -239,18 +229,18 @@ class ResNeXt101WSL(fluid.dygraph.Layer):
         x = self._out(x)
         return x
 
-def ResNeXt101_32x8d_wsl():
-    model = ResNeXt101WSL(cardinality=32, width=8)
+def ResNeXt101_32x8d_wsl(**args):
+    model = ResNeXt101WSL(cardinality=32, width=8, **args)
     return model 
 
-def ResNeXt101_32x16d_wsl():
-    model = ResNeXt101WSL(cardinality=32, width=16)
+def ResNeXt101_32x16d_wsl(**args):
+    model = ResNeXt101WSL(cardinality=32, width=16, **args)
     return model 
 
-def ResNeXt101_32x32d_wsl():
-    model = ResNeXt101WSL(cardinality=32, width=32)
+def ResNeXt101_32x32d_wsl(**args):
+    model = ResNeXt101WSL(cardinality=32, width=32, **args)
     return model 
 
-def ResNeXt101_32x48d_wsl():
-    model = ResNeXt101WSL(cardinality=32, width=48)
+def ResNeXt101_32x48d_wsl(**args):
+    model = ResNeXt101WSL(cardinality=32, width=48, **args)
     return model 

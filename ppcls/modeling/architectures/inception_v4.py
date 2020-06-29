@@ -1,17 +1,10 @@
-import numpy as np
-import argparse
 import paddle
 import paddle.fluid as fluid
 from paddle.fluid.param_attr import ParamAttr
-from paddle.fluid.layer_helper import LayerHelper
 from paddle.fluid.dygraph.nn import Conv2D, Pool2D, BatchNorm, Linear, Dropout
-from paddle.fluid.dygraph.base import to_variable
-
-from paddle.fluid import framework
 import math
 
 __all__ = ["InceptionV4"]
-
 
 class ConvBNLayer(fluid.dygraph.Layer):
     def __init__(self,
@@ -50,9 +43,9 @@ class ConvBNLayer(fluid.dygraph.Layer):
         return y
 
 
-class Inception_Stem(fluid.dygraph.Layer):
+class InceptionStem(fluid.dygraph.Layer):
     def __init__(self):
-        super(Inception_Stem, self).__init__()
+        super(InceptionStem, self).__init__()
         self._conv_1 = ConvBNLayer(
             3, 32, 3, stride=2, act="relu", name="conv1_3x3_s2")
         self._conv_2 = ConvBNLayer(32, 32, 3, act="relu", name="conv2_3x3_s1")
@@ -380,7 +373,7 @@ class InceptionC(fluid.dygraph.Layer):
 class InceptionV4DY(fluid.dygraph.Layer):
     def __init__(self, class_dim=1000):
         super(InceptionV4DY, self).__init__()
-        self._inception_stem = Inception_Stem()
+        self._inception_stem = InceptionStem()
 
         self._inceptionA_1 = InceptionA(name="1")
         self._inceptionA_2 = InceptionA(name="2")
@@ -441,6 +434,6 @@ class InceptionV4DY(fluid.dygraph.Layer):
         return x
 
 
-def InceptionV4():
-    model = InceptionV4DY()
+def InceptionV4(**args):
+    model = InceptionV4DY(**args)
     return model

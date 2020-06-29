@@ -1,17 +1,8 @@
-import numpy as np
-import argparse
 import paddle
 import paddle.fluid as fluid
 from paddle.fluid.param_attr import ParamAttr
 from paddle.fluid.layer_helper import LayerHelper
 from paddle.fluid.dygraph.nn import Conv2D, Pool2D, BatchNorm, Linear, Dropout
-from paddle.fluid.dygraph.base import to_variable
-
-from paddle.fluid import framework
-
-import math
-import sys
-import time
 
 __all__ = ["Xception41_deeplab", "Xception65_deeplab", "Xception71_deeplab"]
 
@@ -256,9 +247,9 @@ class Xception_Block(fluid.dygraph.Layer):
         return fluid.layers.elementwise_add(x, skip)
 
 
-class Xception_deeplab(fluid.dygraph.Layer):
+class XceptionDeeplab(fluid.dygraph.Layer):
     def __init__(self, backbone, class_dim=1000):
-        super(Xception_deeplab, self).__init__()
+        super(XceptionDeeplab, self).__init__()
 
         bottleneck_params = gen_bottleneck_params(backbone)
         self.backbone = backbone
@@ -379,16 +370,16 @@ class Xception_deeplab(fluid.dygraph.Layer):
         return x
 
 
-def Xception41_deeplab():
-    model = Xception_deeplab('xception_41')
+def Xception41_deeplab(**args):
+    model = XceptionDeeplab('xception_41', **args)
     return model
 
 
-def Xception65_deeplab():
-    model = Xception_deeplab("xception_65")
+def Xception65_deeplab(**args):
+    model = XceptionDeeplab("xception_65", **args)
     return model
 
 
-def Xception71_deeplab():
-    model = Xception_deeplab("xception_71")
+def Xception71_deeplab(**args):
+    model = XceptionDeeplab("xception_71", **args)
     return model

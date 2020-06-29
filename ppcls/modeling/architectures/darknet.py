@@ -1,14 +1,7 @@
-import numpy as np
-import argparse
 import paddle
 import paddle.fluid as fluid
 from paddle.fluid.param_attr import ParamAttr
-from paddle.fluid.layer_helper import LayerHelper
 from paddle.fluid.dygraph.nn import Conv2D, Pool2D, BatchNorm, Linear
-from paddle.fluid.dygraph.base import to_variable
-
-from paddle.fluid import framework
-
 import math
 
 __all__ = ["DarkNet53"]
@@ -49,9 +42,9 @@ class ConvBNLayer(fluid.dygraph.Layer):
         return x
 
 
-class Basic_Block(fluid.dygraph.Layer):
+class BasicBlock(fluid.dygraph.Layer):
     def __init__(self, input_channels, output_channels, name=None):
-        super(Basic_Block, self).__init__()
+        super(BasicBlock, self).__init__()
 
         self._conv1 = ConvBNLayer(
             input_channels, output_channels, 1, 1, 0, name=name + ".0")
@@ -66,48 +59,48 @@ class Basic_Block(fluid.dygraph.Layer):
 
 class DarkNet(fluid.dygraph.Layer):
     def __init__(self, class_dim=1000):
-        super(DarkNet53, self).__init__()
+        super(DarkNet, self).__init__()
 
         self.stages = [1, 2, 8, 8, 4]
         self._conv1 = ConvBNLayer(3, 32, 3, 1, 1, name="yolo_input")
         self._conv2 = ConvBNLayer(
             32, 64, 3, 2, 1, name="yolo_input.downsample")
 
-        self._basic_block_01 = Basic_Block(64, 32, name="stage.0.0")
+        self._basic_block_01 = BasicBlock(64, 32, name="stage.0.0")
         self._downsample_0 = ConvBNLayer(
             64, 128, 3, 2, 1, name="stage.0.downsample")
 
-        self._basic_block_11 = Basic_Block(128, 64, name="stage.1.0")
-        self._basic_block_12 = Basic_Block(128, 64, name="stage.1.1")
+        self._basic_block_11 = BasicBlock(128, 64, name="stage.1.0")
+        self._basic_block_12 = BasicBlock(128, 64, name="stage.1.1")
         self._downsample_1 = ConvBNLayer(
             128, 256, 3, 2, 1, name="stage.1.downsample")
 
-        self._basic_block_21 = Basic_Block(256, 128, name="stage.2.0")
-        self._basic_block_22 = Basic_Block(256, 128, name="stage.2.1")
-        self._basic_block_23 = Basic_Block(256, 128, name="stage.2.2")
-        self._basic_block_24 = Basic_Block(256, 128, name="stage.2.3")
-        self._basic_block_25 = Basic_Block(256, 128, name="stage.2.4")
-        self._basic_block_26 = Basic_Block(256, 128, name="stage.2.5")
-        self._basic_block_27 = Basic_Block(256, 128, name="stage.2.6")
-        self._basic_block_28 = Basic_Block(256, 128, name="stage.2.7")
+        self._basic_block_21 = BasicBlock(256, 128, name="stage.2.0")
+        self._basic_block_22 = BasicBlock(256, 128, name="stage.2.1")
+        self._basic_block_23 = BasicBlock(256, 128, name="stage.2.2")
+        self._basic_block_24 = BasicBlock(256, 128, name="stage.2.3")
+        self._basic_block_25 = BasicBlock(256, 128, name="stage.2.4")
+        self._basic_block_26 = BasicBlock(256, 128, name="stage.2.5")
+        self._basic_block_27 = BasicBlock(256, 128, name="stage.2.6")
+        self._basic_block_28 = BasicBlock(256, 128, name="stage.2.7")
         self._downsample_2 = ConvBNLayer(
             256, 512, 3, 2, 1, name="stage.2.downsample")
 
-        self._basic_block_31 = Basic_Block(512, 256, name="stage.3.0")
-        self._basic_block_32 = Basic_Block(512, 256, name="stage.3.1")
-        self._basic_block_33 = Basic_Block(512, 256, name="stage.3.2")
-        self._basic_block_34 = Basic_Block(512, 256, name="stage.3.3")
-        self._basic_block_35 = Basic_Block(512, 256, name="stage.3.4")
-        self._basic_block_36 = Basic_Block(512, 256, name="stage.3.5")
-        self._basic_block_37 = Basic_Block(512, 256, name="stage.3.6")
-        self._basic_block_38 = Basic_Block(512, 256, name="stage.3.7")
+        self._basic_block_31 = BasicBlock(512, 256, name="stage.3.0")
+        self._basic_block_32 = BasicBlock(512, 256, name="stage.3.1")
+        self._basic_block_33 = BasicBlock(512, 256, name="stage.3.2")
+        self._basic_block_34 = BasicBlock(512, 256, name="stage.3.3")
+        self._basic_block_35 = BasicBlock(512, 256, name="stage.3.4")
+        self._basic_block_36 = BasicBlock(512, 256, name="stage.3.5")
+        self._basic_block_37 = BasicBlock(512, 256, name="stage.3.6")
+        self._basic_block_38 = BasicBlock(512, 256, name="stage.3.7")
         self._downsample_3 = ConvBNLayer(
             512, 1024, 3, 2, 1, name="stage.3.downsample")
 
-        self._basic_block_41 = Basic_Block(1024, 512, name="stage.4.0")
-        self._basic_block_42 = Basic_Block(1024, 512, name="stage.4.1")
-        self._basic_block_43 = Basic_Block(1024, 512, name="stage.4.2")
-        self._basic_block_44 = Basic_Block(1024, 512, name="stage.4.3")
+        self._basic_block_41 = BasicBlock(1024, 512, name="stage.4.0")
+        self._basic_block_42 = BasicBlock(1024, 512, name="stage.4.1")
+        self._basic_block_43 = BasicBlock(1024, 512, name="stage.4.2")
+        self._basic_block_44 = BasicBlock(1024, 512, name="stage.4.3")
 
         self._pool = Pool2D(pool_type="avg", global_pooling=True)
 

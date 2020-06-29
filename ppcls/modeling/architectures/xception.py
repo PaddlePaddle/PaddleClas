@@ -1,17 +1,9 @@
-import numpy as np
-import argparse
 import paddle
 import paddle.fluid as fluid
 from paddle.fluid.param_attr import ParamAttr
 from paddle.fluid.layer_helper import LayerHelper
 from paddle.fluid.dygraph.nn import Conv2D, Pool2D, BatchNorm, Linear
-from paddle.fluid.dygraph.base import to_variable
-
-from paddle.fluid import framework
-
 import math
-import sys
-import time
 
 __all__ = ['Xception41', 'Xception65', 'Xception71']
 
@@ -52,9 +44,9 @@ class ConvBNLayer(fluid.dygraph.Layer):
         return y
 
 
-class Separable_Conv(fluid.dygraph.Layer):
+class SeparableConv(fluid.dygraph.Layer):
     def __init__(self, input_channels, output_channels, stride=1, name=None):
-        super(Separable_Conv, self).__init__()
+        super(SeparableConv, self).__init__()
 
         self._pointwise_conv = ConvBNLayer(
             input_channels, output_channels, 1, name=name + "_sep")
@@ -72,14 +64,14 @@ class Separable_Conv(fluid.dygraph.Layer):
         return x
 
 
-class Entry_Flow_Bottleneck_Block(fluid.dygraph.Layer):
+class EntryFlowBottleneckBlock(fluid.dygraph.Layer):
     def __init__(self,
                  input_channels,
                  output_channels,
                  stride=2,
                  name=None,
                  relu_first=False):
-        super(Entry_Flow_Bottleneck_Block, self).__init__()
+        super(EntryFlowBottleneckBlock, self).__init__()
         self.relu_first = relu_first
 
         self._short = Conv2D(
@@ -91,12 +83,12 @@ class Entry_Flow_Bottleneck_Block(fluid.dygraph.Layer):
             act=None,
             param_attr=ParamAttr(name + "_branch1_weights"),
             bias_attr=False)
-        self._conv1 = Separable_Conv(
+        self._conv1 = SeparableConv(
             input_channels,
             output_channels,
             stride=1,
             name=name + "_branch2a_weights")
-        self._conv2 = Separable_Conv(
+        self._conv2 = SeparableConv(
             output_channels,
             output_channels,
             stride=1,
@@ -117,9 +109,9 @@ class Entry_Flow_Bottleneck_Block(fluid.dygraph.Layer):
         return fluid.layers.elementwise_add(x=short, y=pool)
 
 
-class Entry_Flow(fluid.dygraph.Layer):
+class EntryFlow(fluid.dygraph.Layer):
     def __init__(self, block_num=3):
-        super(Entry_Flow, self).__init__()
+        super(EntryFlow, self).__init__()
 
         name = "entry_flow"
         self.block_num = block_num
@@ -127,22 +119,22 @@ class Entry_Flow(fluid.dygraph.Layer):
             3, 32, 3, stride=2, act="relu", name=name + "_conv1")
         self._conv2 = ConvBNLayer(32, 64, 3, act="relu", name=name + "_conv2")
         if block_num == 3:
-            self._conv_0 = Entry_Flow_Bottleneck_Block(
+            self._conv_0 = EntryFlowBottleneckBlock(
                 64, 128, stride=2, name=name + "_0", relu_first=False)
-            self._conv_1 = Entry_Flow_Bottleneck_Block(
+            self._conv_1 = EntryFlowBottleneckBlock(
                 128, 256, stride=2, name=name + "_1", relu_first=True)
-            self._conv_2 = Entry_Flow_Bottleneck_Block(
+            self._conv_2 = EntryFlowBottleneckBlock(
                 256, 728, stride=2, name=name + "_2", relu_first=True)
         elif block_num == 5:
-            self._conv_0 = Entry_Flow_Bottleneck_Block(
+            self._conv_0 = EntryFlowBottleneckBlock(
                 64, 128, stride=2, name=name + "_0", relu_first=False)
-            self._conv_1 = Entry_Flow_Bottleneck_Block(
+            self._conv_1 = EntryFlowBottleneckBlock(
                 128, 256, stride=1, name=name + "_1", relu_first=True)
-            self._conv_2 = Entry_Flow_Bottleneck_Block(
+            self._conv_2 = EntryFlowBottleneckBlock(
                 256, 256, stride=2, name=name + "_2", relu_first=True)
-            self._conv_3 = Entry_Flow_Bottleneck_Block(
+            self._conv_3 = EntryFlowBottleneckBlock(
                 256, 728, stride=1, name=name + "_3", relu_first=True)
-            self._conv_4 = Entry_Flow_Bottleneck_Block(
+            self._conv_4 = EntryFlowBottleneckBlock(
                 728, 728, stride=2, name=name + "_4", relu_first=True)
         else:
             sys.exit(-1)
@@ -164,21 +156,21 @@ class Entry_Flow(fluid.dygraph.Layer):
         return x
 
 
-class Middle_Flow_Bottleneck_Block(fluid.dygraph.Layer):
+class MiddleFlowBottleneckBlock(fluid.dygraph.Layer):
     def __init__(self, input_channels, output_channels, name):
-        super(Middle_Flow_Bottleneck_Block, self).__init__()
+        super(MiddleFlowBottleneckBlock, self).__init__()
 
-        self._conv_0 = Separable_Conv(
+        self._conv_0 = SeparableConv(
             input_channels,
             output_channels,
             stride=1,
             name=name + "_branch2a_weights")
-        self._conv_1 = Separable_Conv(
+        self._conv_1 = SeparableConv(
             output_channels,
             output_channels,
             stride=1,
             name=name + "_branch2b_weights")
-        self._conv_2 = Separable_Conv(
+        self._conv_2 = SeparableConv(
             output_channels,
             output_channels,
             stride=1,
@@ -195,43 +187,43 @@ class Middle_Flow_Bottleneck_Block(fluid.dygraph.Layer):
         return fluid.layers.elementwise_add(x=inputs, y=conv2)
 
 
-class Middle_Flow(fluid.dygraph.Layer):
+class MiddleFlow(fluid.dygraph.Layer):
     def __init__(self, block_num=8):
-        super(Middle_Flow, self).__init__()
+        super(MiddleFlow, self).__init__()
 
         self.block_num = block_num
-        self._conv_0 = Middle_Flow_Bottleneck_Block(
+        self._conv_0 = MiddleFlowBottleneckBlock(
             728, 728, name="middle_flow_0")
-        self._conv_1 = Middle_Flow_Bottleneck_Block(
+        self._conv_1 = MiddleFlowBottleneckBlock(
             728, 728, name="middle_flow_1")
-        self._conv_2 = Middle_Flow_Bottleneck_Block(
+        self._conv_2 = MiddleFlowBottleneckBlock(
             728, 728, name="middle_flow_2")
-        self._conv_3 = Middle_Flow_Bottleneck_Block(
+        self._conv_3 = MiddleFlowBottleneckBlock(
             728, 728, name="middle_flow_3")
-        self._conv_4 = Middle_Flow_Bottleneck_Block(
+        self._conv_4 = MiddleFlowBottleneckBlock(
             728, 728, name="middle_flow_4")
-        self._conv_5 = Middle_Flow_Bottleneck_Block(
+        self._conv_5 = MiddleFlowBottleneckBlock(
             728, 728, name="middle_flow_5")
-        self._conv_6 = Middle_Flow_Bottleneck_Block(
+        self._conv_6 = MiddleFlowBottleneckBlock(
             728, 728, name="middle_flow_6")
-        self._conv_7 = Middle_Flow_Bottleneck_Block(
+        self._conv_7 = MiddleFlowBottleneckBlock(
             728, 728, name="middle_flow_7")
         if block_num == 16:
-            self._conv_8 = Middle_Flow_Bottleneck_Block(
+            self._conv_8 = MiddleFlowBottleneckBlock(
                 728, 728, name="middle_flow_8")
-            self._conv_9 = Middle_Flow_Bottleneck_Block(
+            self._conv_9 = MiddleFlowBottleneckBlock(
                 728, 728, name="middle_flow_9")
-            self._conv_10 = Middle_Flow_Bottleneck_Block(
+            self._conv_10 = MiddleFlowBottleneckBlock(
                 728, 728, name="middle_flow_10")
-            self._conv_11 = Middle_Flow_Bottleneck_Block(
+            self._conv_11 = MiddleFlowBottleneckBlock(
                 728, 728, name="middle_flow_11")
-            self._conv_12 = Middle_Flow_Bottleneck_Block(
+            self._conv_12 = MiddleFlowBottleneckBlock(
                 728, 728, name="middle_flow_12")
-            self._conv_13 = Middle_Flow_Bottleneck_Block(
+            self._conv_13 = MiddleFlowBottleneckBlock(
                 728, 728, name="middle_flow_13")
-            self._conv_14 = Middle_Flow_Bottleneck_Block(
+            self._conv_14 = MiddleFlowBottleneckBlock(
                 728, 728, name="middle_flow_14")
-            self._conv_15 = Middle_Flow_Bottleneck_Block(
+            self._conv_15 = MiddleFlowBottleneckBlock(
                 728, 728, name="middle_flow_15")
 
     def forward(self, inputs):
@@ -255,10 +247,10 @@ class Middle_Flow(fluid.dygraph.Layer):
         return x
 
 
-class Exit_Flow_Bottleneck_Block(fluid.dygraph.Layer):
+class ExitFlowBottleneckBlock(fluid.dygraph.Layer):
     def __init__(self, input_channels, output_channels1, output_channels2,
                  name):
-        super(Exit_Flow_Bottleneck_Block, self).__init__()
+        super(ExitFlowBottleneckBlock, self).__init__()
 
         self._short = Conv2D(
             num_channels=input_channels,
@@ -269,12 +261,12 @@ class Exit_Flow_Bottleneck_Block(fluid.dygraph.Layer):
             act=None,
             param_attr=ParamAttr(name + "_branch1_weights"),
             bias_attr=False)
-        self._conv_1 = Separable_Conv(
+        self._conv_1 = SeparableConv(
             input_channels,
             output_channels1,
             stride=1,
             name=name + "_branch2a_weights")
-        self._conv_2 = Separable_Conv(
+        self._conv_2 = SeparableConv(
             output_channels1,
             output_channels2,
             stride=1,
@@ -293,16 +285,16 @@ class Exit_Flow_Bottleneck_Block(fluid.dygraph.Layer):
         return fluid.layers.elementwise_add(x=short, y=pool)
 
 
-class Exit_Flow(fluid.dygraph.Layer):
+class ExitFlow(fluid.dygraph.Layer):
     def __init__(self, class_dim):
-        super(Exit_Flow, self).__init__()
+        super(ExitFlow, self).__init__()
 
         name = "exit_flow"
 
-        self._conv_0 = Exit_Flow_Bottleneck_Block(
+        self._conv_0 = ExitFlowBottleneckBlock(
             728, 728, 1024, name=name + "_1")
-        self._conv_1 = Separable_Conv(1024, 1536, stride=1, name=name + "_2")
-        self._conv_2 = Separable_Conv(1536, 2048, stride=1, name=name + "_3")
+        self._conv_1 = SeparableConv(1024, 1536, stride=1, name=name + "_2")
+        self._conv_2 = SeparableConv(1536, 2048, stride=1, name=name + "_3")
         self._pool = Pool2D(pool_type="avg", global_pooling=True)
         stdv = 1.0 / math.sqrt(2048 * 1.0)
         self._out = Linear(
@@ -334,9 +326,9 @@ class Xception(fluid.dygraph.Layer):
         super(Xception, self).__init__()
         self.entry_flow_block_num = entry_flow_block_num
         self.middle_flow_block_num = middle_flow_block_num
-        self._entry_flow = Entry_Flow(entry_flow_block_num)
-        self._middle_flow = Middle_Flow(middle_flow_block_num)
-        self._exit_flow = Exit_Flow(class_dim)
+        self._entry_flow = EntryFlow(entry_flow_block_num)
+        self._middle_flow = MiddleFlow(middle_flow_block_num)
+        self._exit_flow = ExitFlow(class_dim)
 
     def forward(self, inputs):
         x = self._entry_flow(inputs)
@@ -345,16 +337,16 @@ class Xception(fluid.dygraph.Layer):
         return x
 
 
-def Xception41():
-    model = Xception(entry_flow_block_num=3, middle_flow_block_num=8)
+def Xception41(**args):
+    model = Xception(entry_flow_block_num=3, middle_flow_block_num=8, **args)
     return model
 
 
-def Xception65():
-    model = Xception(entry_flow_block_num=3, middle_flow_block_num=16)
+def Xception65(**args):
+    model = Xception(entry_flow_block_num=3, middle_flow_block_num=16, **args)
     return model
 
 
-def Xception71():
-    model = Xception(entry_flow_block_num=5, middle_flow_block_num=16)
+def Xception71(**args):
+    model = Xception(entry_flow_block_num=5, middle_flow_block_num=16, **args)
     return model

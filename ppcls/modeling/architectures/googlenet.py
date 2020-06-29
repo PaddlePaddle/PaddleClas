@@ -3,16 +3,9 @@ import paddle.fluid as fluid
 from paddle.fluid.param_attr import ParamAttr
 from paddle.fluid.layer_helper import LayerHelper
 from paddle.fluid.dygraph.nn import Conv2D, Pool2D, BatchNorm, Linear
-from paddle.fluid.dygraph.base import to_variable
-
-from paddle.fluid import framework
-
 import math
-import sys
-import time
 
 __all__ = ['GoogLeNet_DY']
-
 
 def xavier(channels, filter_size, name):
     stdv = (3.0 / (filter_size**2 * channels))**0.5
@@ -101,9 +94,9 @@ class Inception(fluid.dygraph.Layer):
         return layer_helper.append_activation(cat)
 
 
-class GoogleNet_DY(fluid.dygraph.Layer):
+class GoogleNetDY(fluid.dygraph.Layer):
     def __init__(self, class_dim=1000):
-        super(GoogleNet_DY, self).__init__()
+        super(GoogleNetDY, self).__init__()
         self._conv = ConvLayer(3, 64, 7, 2, name="conv1")
         self._pool = Pool2D(pool_size=3, pool_type="max", pool_stride=2)
         self._conv_1 = ConvLayer(64, 64, 1, name="conv2_1x1")
@@ -210,6 +203,6 @@ class GoogleNet_DY(fluid.dygraph.Layer):
         return [out, out1, out2]
 
 
-def GoogLeNet():
-    model = GoogleNet_DY()
+def GoogLeNet(**args):
+    model = GoogleNetDY(**args)
     return model
