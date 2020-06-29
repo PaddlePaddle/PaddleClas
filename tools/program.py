@@ -437,19 +437,9 @@ def run(dataloader,
     batch_time = AverageMeter('elapse', '.3f')
     tic = time.time()
     dataloader = dataloader if config.get('use_dali') else dataloader()()
-    #sta = 0
     for idx, batch in enumerate(dataloader):
 
-        #start_time = time.time()
         metrics = exe.run(program=program, feed=batch, fetch_list=fetch_list)
-        #end_time = time.time()
-        #statistics = end_time - start_time
-        # if idx >= 10:
-        #    sta = sta+statistics
-        # if idx == 110 and int(os.getenv("PADDLE_TRAINER_ID", 0)) == 0:
-        #    print("10-100batch speed 000", sta/100, 's/batch', 'bs', config.TRAIN.batch_size)
-        # if idx == 110 and int(os.getenv("PADDLE_TRAINER_ID", 0)) == 1:
-        #    print("10-100batch speed 111", sta/100, 's/batch', 'bs', config.TRAIN.batch_size)
         batch_time.update(time.time() - tic)
         tic = time.time()
         for i, m in enumerate(metrics):
