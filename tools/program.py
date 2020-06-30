@@ -410,6 +410,7 @@ def run(dataloader,
         fetchs,
         epoch=0,
         mode='train',
+        config=None,
         vdl_writer=None):
     """
     Feed data to the model and fetch the measures and loss
@@ -443,16 +444,28 @@ def run(dataloader,
             logger.scaler('loss', metrics[0][0], total_step, vdl_writer)
             total_step += 1
         if mode == 'eval':
-            logger.info("{:s} step:{:<4d} {:s}s".format(mode, idx, fetchs_str))
+            if idx % config.get('print_interval', 1) == 0:
+                logger.info("{:s} step:{:<4d} {:s}s".format(mode, idx,
+                                                            fetchs_str))
         else:
             epoch_str = "epoch:{:<3d}".format(epoch)
             step_str = "{:s} step:{:<4d}".format(mode, idx)
 
-            logger.info("{:s} {:s} {:s}".format(
-                logger.coloring(epoch_str, "HEADER")
-                if idx == 0 else epoch_str,
-                logger.coloring(step_str, "PURPLE"),
-                logger.coloring(fetchs_str, 'OKGREEN')))
+            # Keep the first 10 batches statistics, They are important for develop
+            if epoch == 0 and idx < 10:
+                logger.info("{:s} {:s} {:s}".format(
+                    logger.coloring(epoch_str, "HEADER")
+                    if idx == 0 else epoch_str,
+                    logger.coloring(step_str, "PURPLE"),
+                    logger.coloring(fetchs_str, 'OKGREEN')))
+
+            else:
+                if idx % config.get('print_interval', 1) == 0:
+                    logger.info("{:s} {:s} {:s}".format(
+                        logger.coloring(epoch_str, "HEADER")
+                        if idx == 0 else epoch_str,
+                        logger.coloring(step_str, "PURPLE"),
+                        logger.coloring(fetchs_str, 'OKGREEN')))
 
     end_str = ''.join([str(m.mean) + ' '
                        for m in metric_list] + [batch_time.total]) + 's'
