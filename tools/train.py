@@ -39,6 +39,11 @@ def parse_args():
         default='configs/ResNet/ResNet50.yaml',
         help='config file path')
     parser.add_argument(
+        '--vdl_dir',
+        type=str,
+        default=None,
+        help='VisualDL logging directory for image.')
+    parser.add_argument(
         '-o',
         '--override',
         action='append',
@@ -64,8 +69,12 @@ def main(args):
 
     best_top1_acc = 0.0  # best top1 acc record
 
-    train_dataloader, train_fetchs = program.build(
-        config, train_prog, startup_prog, is_train=True)
+    if not config.get('use_ema'):
+        train_dataloader, train_fetchs = program.build(
+            config, train_prog, startup_prog, is_train=True)
+    else:
+        train_dataloader, train_fetchs, ema = program.build(
+            config, train_prog, startup_prog, is_train=True)
 
     if config.validate:
         valid_prog = fluid.Program()
@@ -75,11 +84,11 @@ def main(args):
         valid_prog = valid_prog.clone(for_test=True)
 
     # create the "Executor" with the statement of which place
-    exe = fluid.Executor(place=place)
-    # only run startup_prog once to init
+    exe = fluid.Executor(place)
+    # Parameter initialization
     exe.run(startup_prog)
 
-    # load model from checkpoint or pretrained model
+    # load model from 1. checkpoint to resume training, 2. pretrained model to finetune
     init_model(config, train_prog, exe)
 
     train_reader = Reader(config, 'train')()
@@ -91,25 +100,41 @@ def main(args):
         compiled_valid_prog = program.compile(config, valid_prog)
 
     compiled_train_prog = fleet.main_program
+
+    if args.vdl_dir:
+        from visualdl import LogWriter
+        vdl_writer = LogWriter(args.vdl_dir)
+    else:
+        vdl_writer = None
+
     for epoch_id in range(config.epochs):
         # 1. train with train dataset
         program.run(train_dataloader, exe, compiled_train_prog, train_fetchs,
-                    epoch_id, 'train')
+                    epoch_id, 'train', vdl_writer)
         if int(os.getenv("PADDLE_TRAINER_ID", 0)) == 0:
             # 2. validate with validate dataset
             if config.validate and epoch_id % config.valid_interval == 0:
+                if config.get('use_ema'):
+                    logger.info(logger.coloring("EMA validate start..."))
+                    with ema.apply(exe):
+                        top1_acc = program.run(valid_dataloader, exe,
+                                               compiled_valid_prog,
+                                               valid_fetchs, epoch_id, 'valid')
+                    logger.info(logger.coloring("EMA validate over!"))
+
                 top1_acc = program.run(valid_dataloader, exe,
                                        compiled_valid_prog, valid_fetchs,
                                        epoch_id, 'valid')
                 if top1_acc > best_top1_acc:
                     best_top1_acc = top1_acc
-                    message = "The best top1 acc {:.5f}, in epoch: {:d}".format(best_top1_acc, epoch_id)
+                    message = "The best top1 acc {:.5f}, in epoch: {:d}".format(
+                        best_top1_acc, epoch_id)
                     logger.info("{:s}".format(logger.coloring(message, "RED")))
-                    if epoch_id % config.save_interval==0:
+                    if epoch_id % config.save_interval == 0:
 
                         model_path = os.path.join(config.model_save_dir,
-                                              config.ARCHITECTURE["name"])
-                        save_model(train_prog, model_path, "best_model_in_epoch_"+str(epoch_id))
+                                                  config.ARCHITECTURE["name"])
+                        save_model(train_prog, model_path, "best_model")
 
             # 3. save the persistable model
             if epoch_id % config.save_interval == 0:

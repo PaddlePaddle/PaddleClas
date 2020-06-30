@@ -33,6 +33,3 @@
     - id: trailing-whitespace
       files: \.(md|yml)$
     - id: check-case-conflict
-    - id: flake8
-      args: ['--ignore=E265']
-

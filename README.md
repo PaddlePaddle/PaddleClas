@@ -1,3 +1,5 @@
+简体中文 | [English](README_en.md)
+
 # PaddleClas
 
 **文档教程**: https://paddleclas.readthedocs.io
@@ -20,7 +22,7 @@
     <img src="./docs/images/models/V100_benchmark/v100.fp32.bs1.main_fps_top1_s.jpg" width="700">
 </div>
 
-上图对比了一些最新的面向服务器端应用场景的模型，在使用V100，FP32和TensorRT，batch size为1时的预测时间及其准确率，图中准确率82.4%的ResNet50_vd_ssld和83.7%的ResNet101_vd_ssld，是采用PaddleClas提供的SSLD知识蒸馏方案训练的模型。图中相同颜色和符号的点代表同一系列不同规模的模型。不同模型的简介、FLOPS、Parameters以及详细的GPU预测时间(包括不同batchsize的T4卡预测速度)请参考文档教程中的[**模型库章节**](https://paddleclas.readthedocs.io/zh_CN/latest/models/models_intro.html)。
+上图对比了一些最新的面向服务器端应用场景的模型，在使用V100，FP32和TensorRT，batch size为1时的预测时间及其准确率，图中准确率83.0%的ResNet50_vd_ssld_v2和83.7%的ResNet101_vd_ssld，是采用PaddleClas提供的SSLD知识蒸馏方案训练的模型，其中v2表示在训练时添加了AutoAugment数据增广策略。图中相同颜色和符号的点代表同一系列不同规模的模型。不同模型的简介、FLOPS、Parameters以及详细的GPU预测时间(包括不同batchsize的T4卡预测速度)请参考文档教程中的[**模型库章节**](https://paddleclas.readthedocs.io/zh_CN/latest/models/models_intro.html)。
 
 <div align="center">
 <img
@@ -30,7 +32,7 @@ src="./docs/images/models/mobile_arm_top1.png" width="700">
 上图对比了一些最新的面向移动端应用场景的模型，在骁龙855（SD855）上预测一张图像的时间和其准确率，包括MobileNetV1系列、MobileNetV2系列、MobileNetV3系列和ShuffleNetV2系列。图中准确率79%的MV3_large_x1_0_ssld（M是MobileNet的简称），71.3%的MV3_small_x1_0_ssld、76.74%的MV2_ssld和77.89%的MV1_ssld，是采用PaddleClas提供的SSLD蒸馏方法训练的模型。MV3_large_x1_0_ssld_int8是进一步进行INT8量化的模型。不同模型的简介、FLOPS、Parameters和模型存储大小请参考文档教程中的[**模型库章节**](https://paddleclas.readthedocs.io/zh_CN/latest/models/models_intro.html)。
 
 - TODO
-- [ ] EfficientLite、GhostNet、RegNet论文指标复现和性能评估
+- [ ] EfficientLite、GhostNet、RegNet、ResNeSt的论文指标复现和性能评估
 
 ## 高阶优化支持
 除了提供丰富的分类网络结构和预训练模型，PaddleClas也支持了一系列有助于图像分类任务效果和效率提升的算法或工具。
@@ -97,10 +99,6 @@ PaddleClas的安装说明、模型训练、预测、评估以及模型微调（f
 
 近年来，学术界和工业界广泛关注图像中目标检测任务，而图像分类的网络结构以及预训练模型效果直接影响目标检测的效果。PaddleDetection使用PaddleClas的82.39%的ResNet50_vd的预训练模型，结合自身丰富的检测算子，提供了一种面向服务器端应用的目标检测方案，PSS-DET (Practical Server Side Detection)。该方案融合了多种只增加少许计算量，但是可以有效提升两阶段Faster RCNN目标检测效果的策略，包括检测模型剪裁、使用分类效果更优的预训练模型、DCNv2、Cascade RCNN、AutoAugment、Libra sampling以及多尺度训练。其中基于82.39%的R50_vd_ssld预训练模型，与79.12%的R50_vd的预训练模型相比，检测效果可以提升1.5%。在COCO目标检测数据集上测试PSS-DET，当V100单卡预测速度为61FPS时，mAP是41.6%，预测速度为20FPS时，mAP是47.8%。详情请参考[**通用目标检测章节**](https://paddleclas.readthedocs.io/zh_CN/latest/application/object_detection.html)。
 
-<div align="center">
-<img
-src="./docs/images/det/pssdet.png" width="500">
-</div>
 
 - TODO
 - [ ] PaddleClas在OCR任务中的应用

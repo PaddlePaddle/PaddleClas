@@ -18,6 +18,7 @@ from __future__ import print_function
 
 import os
 import time
+import numpy as np
 
 from collections import OrderedDict
 
@@ -35,6 +36,8 @@ from ppcls.utils import logger
 
 from paddle.fluid.incubate.fleet.collective import fleet
 from paddle.fluid.incubate.fleet.collective import DistributedStrategy
+
+from ema import ExponentialMovingAverage
 
 
 def create_feeds(image_shape, use_mix=None):
@@ -86,7 +89,7 @@ def create_dataloader(feeds):
     return dataloader
 
 
-def create_model(architecture, image, classes_num):
+def create_model(architecture, image, classes_num, is_train):
     """
     Create a model
 
@@ -101,6 +104,8 @@ def create_model(architecture, image, classes_num):
     """
     name = architecture["name"]
     params = architecture.get("params", {})
+    if "is_test" in params:
+        params['is_test'] = not is_train
     model = architectures.__dict__[name](**params)
     out = model.net(input=image, class_dim=classes_num)
     return out
@@ -310,7 +315,7 @@ def mixed_precision_optimizer(config, optimizer):
     return optimizer
 
 
-def build(config, main_prog, startup_prog, is_train=True):
+def build(config, main_prog, startup_prog, is_train=True, is_distributed=True):
     """
     Build a program using a model and an optimizer
         1. create feeds
@@ -324,6 +329,7 @@ def build(config, main_prog, startup_prog, is_train=True):
         main_prog(): main program
         startup_prog(): startup program
         is_train(bool): train or valid
+        is_distributed(bool): whether to use distributed training method
 
     Returns:
         dataloader(): a bridge between the model and the data
@@ -336,7 +342,7 @@ def build(config, main_prog, startup_prog, is_train=True):
             feeds = create_feeds(config.image_shape, use_mix=use_mix)
             dataloader = create_dataloader(feeds.values())
             out = create_model(config.ARCHITECTURE, feeds['image'],
-                               config.classes_num)
+                               config.classes_num, is_train)
             fetchs = create_fetchs(
                 out,
                 feeds,
@@ -352,13 +358,22 @@ def build(config, main_prog, startup_prog, is_train=True):
                 fetchs['lr'] = (lr, AverageMeter('lr', 'f', need_avg=False))
 
                 optimizer = mixed_precision_optimizer(config, optimizer)
-                optimizer = dist_optimizer(config, optimizer)
+                if is_distributed:
+                    optimizer = dist_optimizer(config, optimizer)
                 optimizer.minimize(fetchs['loss'][0])
+                if config.get('use_ema'):
+
+                    global_steps = fluid.layers.learning_rate_scheduler._decay_step_counter(
+                    )
+                    ema = ExponentialMovingAverage(
+                        config.get('ema_decay'), thres_steps=global_steps)
+                    ema.update()
+                    return dataloader, fetchs, ema
 
     return dataloader, fetchs
 
 
-def compile(config, program, loss_name=None):
+def compile(config, program, loss_name=None, share_prog=None):
     """
     Compile the program
 
@@ -366,6 +381,7 @@ def compile(config, program, loss_name=None):
         config(dict): config
         program(): the program which is wrapped by
         loss_name(str): loss name
+        share_prog(): the shared program, used for evaluation during training
 
     Returns:
         compiled_program(): a compiled program
@@ -377,6 +393,7 @@ def compile(config, program, loss_name=None):
     exec_strategy.num_iteration_per_drop_scope = 10
 
     compiled_program = fluid.CompiledProgram(program).with_data_parallel(
+        share_vars_from=share_prog,
         loss_name=loss_name,
         build_strategy=build_strategy,
         exec_strategy=exec_strategy)
@@ -384,7 +401,16 @@ def compile(config, program, loss_name=None):
     return compiled_program
 
 
-def run(dataloader, exe, program, fetchs, epoch=0, mode='train'):
+total_step = 0
+
+
+def run(dataloader,
+        exe,
+        program,
+        fetchs,
+        epoch=0,
+        mode='train',
+        vdl_writer=None):
     """
     Feed data to the model and fetch the measures and loss
 
@@ -409,9 +435,13 @@ def run(dataloader, exe, program, fetchs, epoch=0, mode='train'):
         batch_time.update(time.time() - tic)
         tic = time.time()
         for i, m in enumerate(metrics):
-            metric_list[i].update(m[0], len(batch[0]))
+            metric_list[i].update(np.mean(m), len(batch[0]))
         fetchs_str = ''.join([str(m.value) + ' '
                               for m in metric_list] + [batch_time.value]) + 's'
+        if vdl_writer:
+            global total_step
+            logger.scaler('loss', metrics[0][0], total_step, vdl_writer)
+            total_step += 1
         if mode == 'eval':
             logger.info("{:s} step:{:<4d} {:s}s".format(mode, idx, fetchs_str))
         else:

@@ -64,14 +64,18 @@ def print_dict(d, delimiter=0):
     placeholder = "-" * 60
     for k, v in sorted(d.items()):
         if isinstance(v, dict):
-            logger.info("{}{} : ".format(delimiter * " ", logger.coloring(k, "HEADER")))
+            logger.info("{}{} : ".format(delimiter * " ",
+                                         logger.coloring(k, "HEADER")))
             print_dict(v, delimiter + 4)
         elif isinstance(v, list) and len(v) >= 1 and isinstance(v[0], dict):
-            logger.info("{}{} : ".format(delimiter * " ", logger.coloring(str(k),"HEADER")))
+            logger.info("{}{} : ".format(delimiter * " ",
+                                         logger.coloring(str(k), "HEADER")))
             for value in v:
                 print_dict(value, delimiter + 4)
         else:
-            logger.info("{}{} : {}".format(delimiter * " ", logger.coloring(k,"HEADER"), logger.coloring(v,"OKGREEN")))
+            logger.info("{}{} : {}".format(delimiter * " ",
+                                           logger.coloring(k, "HEADER"),
+                                           logger.coloring(v, "OKGREEN")))
 
         if k.isupper():
             logger.info(placeholder)
@@ -95,7 +99,9 @@ def check_config(config):
     check.check_version()
 
     mode = config.get('mode', 'train')
-    check.check_gpu()
+    use_gpu = config.get("use_gpu", True)
+    if use_gpu:
+        check.check_gpu()
 
     architecture = config.get('ARCHITECTURE')
     check.check_architecture(architecture)
