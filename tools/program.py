@@ -444,9 +444,9 @@ def run(dataloader,
             logger.scaler('loss', metrics[0][0], total_step, vdl_writer)
             total_step += 1
         if mode == 'eval':
-            if idx % config.get('print_interval', 1) == 0:
-                logger.info("{:s} step:{:<4d} {:s}s".format(mode, idx,
-                                                            fetchs_str))
+            if idx % config.get('print_interval', 10) == 0:
+                logger.info("{:s} step:{:<4d} {:s}".format(mode, idx,
+                                                           fetchs_str))
         else:
             epoch_str = "epoch:{:<3d}".format(epoch)
             step_str = "{:s} step:{:<4d}".format(mode, idx)
