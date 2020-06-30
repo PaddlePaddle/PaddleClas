@@ -460,7 +460,7 @@ def run(dataloader,
                     logger.coloring(fetchs_str, 'OKGREEN')))
 
             else:
-                if idx % config.get('print_interval', 1) == 0:
+                if idx % config.get('print_interval', 10) == 0:
                     logger.info("{:s} {:s} {:s}".format(
                         logger.coloring(epoch_str, "HEADER")
                         if idx == 0 else epoch_str,
