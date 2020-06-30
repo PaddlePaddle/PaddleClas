@@ -1,4 +1,4 @@
-# 1. Image Augmentation
+# Image Augmentation
 
 
 Image augmentation is a commonly used regularization method in image classification task, which is often used in scenarios with insufficient data or large model. In this chapter, we mainly introduce 8 image augmentation methods besides standard augmentation methods. Users can apply these methods in their own tasks for better model performance. Under the same conditions, These augmentation methods' performance on ImageNet1k dataset is shown as follows.
@@ -6,7 +6,7 @@ Image augmentation is a commonly used regularization method in image classificat
 ![](../../../images/image_aug/main_image_aug.png)
 
 
-# 2. Common image augmentation methods
+# Common image augmentation methods
 
 If without special explanation, all the examples and experiments in this chapter are based on ImageNet1k dataset with the network input image size set as 224.
 
@@ -49,11 +49,11 @@ PaddleClas integrates all the above data augmentation strategies. More details i
 
 ![](../../../images/image_aug/test_baseline.jpeg)
 
-# 3. Image Transformation
+# Image Transformation
 
 Transformation means performing some transformations on the image after `RandCrop`. It mainly contains AutoAugment and RandAugment.
 
-## 3.1 AutoAugment
+## AutoAugment
 
 Address：[https://arxiv.org/abs/1805.09501v1](https://arxiv.org/abs/1805.09501v1)
 
@@ -89,7 +89,7 @@ The images after `AutoAugment` are as follows.
 
 ![][test_autoaugment]
 
-## 3.2 RandAugment
+## RandAugment
 
 Address: [https://arxiv.org/pdf/1909.13719.pdf](https://arxiv.org/pdf/1909.13719.pdf)
 
@@ -128,7 +128,7 @@ The images after `RandAugment` are as follows.
 ![][test_randaugment]
 
 
-# 4. Image Cropping
+# Image Cropping
 
 Cropping means performing some transformations on the image after `Transpose`, setting pixels of the cropped area as certain constant. It mainly contains CutOut, RandErasing, HideAndSeek and GridMask.
 
@@ -137,7 +137,7 @@ Image cropping methods can be operated before or after normalization. The differ
 The above-mentioned cropping transformation ideas are the similar, all to solve the problem of poor generalization ability of the trained model on occlusion images, the difference lies in that their cropping details.
 
 
-## 4.1 Cutout
+## Cutout
 
 Address: [https://arxiv.org/abs/1708.04552](https://arxiv.org/abs/1708.04552)
 
@@ -173,7 +173,7 @@ The images after `Cutout` are as follows.
 
 ![][test_cutout]
 
-## 4.2 RandomErasing
+## RandomErasing
 
 Address: [https://arxiv.org/pdf/1708.04896.pdf](https://arxiv.org/pdf/1708.04896.pdf)
 
@@ -211,7 +211,7 @@ The images after `RandomErasing` are as follows.
 ![][test_randomerassing]
 
 
-## 4.3 HideAndSeek
+## HideAndSeek
 
 Address: [https://arxiv.org/pdf/1811.02545.pdf](https://arxiv.org/pdf/1811.02545.pdf)
 
@@ -252,7 +252,7 @@ The images after `HideAndSeek` are as follows.
 ![][test_hideandseek]
 
 
-## 4.4 GridMask
+## GridMask
 Address：[https://arxiv.org/abs/2001.04086](https://arxiv.org/abs/2001.04086)
 
 Github repo：[https://github.com/akuxcw/GridMask](https://github.com/akuxcw/GridMask)
@@ -307,13 +307,13 @@ The images after `GridMask` are as follows.
 ![][test_gridmask]
 
 
-# 5. Image aliasing
+# Image aliasing
 
 Aliasing means performing some transformations on the image after `Batch`, which contains Mixup and Cutmix.
 
 Data augmentation methods introduced before are based on single image while aliasing is carried on a certain batch to generate a new batch.
 
-## 5.1 Mixup
+## Mixup
 
 Address: [https://arxiv.org/pdf/1710.09412.pdf](https://arxiv.org/pdf/1710.09412.pdf)
 
@@ -358,7 +358,7 @@ The images after `Mixup` are as follows.
 
 ![][test_mixup]
 
-## 5.2 Cutmix
+## Cutmix
 
 Address: [https://arxiv.org/pdf/1905.04899v2.pdf](https://arxiv.org/pdf/1905.04899v2.pdf)
 
@@ -402,7 +402,7 @@ The images after `Cutmix` are as follows.
 ![][test_cutmix]
 
 
-# 6. Experiments
+# Experiments
 
 Based on PaddleClas, Metrics of different augmentation methods on ImageNet1k dataset are as follows.
 
@@ -426,15 +426,15 @@ Based on PaddleClas, Metrics of different augmentation methods on ImageNet1k dat
 
 
 
-## 7. Data augmentation practice
+## Data augmentation practice
 
 Experiments about data augmentation will be introduced in detail in this section. If you want to quickly experience these methods, please refer to [**Quick start PaddleClas in 30 miniutes**](../../tutorials/quick_start_en.md).
 
-## 7.1 Configurations
+## Configurations
 
 Since hyperparameters differ from different augmentation methods. For better understanding, we list 8 augmentation configuration files in `configs/DataAugment` based on ResNet50. Users can train the model with `tools/run.sh`. The following are 3 of them.
 
-### 7.1.1 RandAugment
+### RandAugment
 
 Configuration of `RandAugment` is shown as follows. `Num_layers`(default as 2) and `magnitude`(default as 5) are two hyperparameters.
 
@@ -460,7 +460,7 @@ Configuration of `RandAugment` is shown as follows. `Num_layers`(default as 2) a
         - ToCHWImage:
 ```
 
-### 7.1.2 Cutout
+### Cutout
 
 Configuration of `Cutout` is shown as follows. `n_holes`(default as 1) and `n_holes`(default as 112) are two hyperparameters.
 
@@ -485,7 +485,7 @@ Configuration of `Cutout` is shown as follows. `n_holes`(default as 1) and `n_ho
         - ToCHWImage:
 ```
 
-### 7.1.3 Mixup
+### Mixup
 
 
 Configuration of `Mixup` is shown as follows. `alpha`(default as 0.2) is hyperparameter which users need to care about. What's more, `use_mix` need to be set as `True` in the root of the configuration.
@@ -511,7 +511,7 @@ Configuration of `Mixup` is shown as follows. `alpha`(default as 0.2) is hyperpa
             alpha: 0.2
 ```
 
-## 7.2 启动命令
+## 启动命令
 
 Users can use the following command to start the training process, which can also be referred to `tools/run.sh`.
 
@@ -524,7 +524,7 @@ python -m paddle.distributed.launch \
         -c ./configs/DataAugment/ResNet50_Cutout.yaml
 ```
 
-## 7.3 Note
+## Note
 
 * When using augmentation methods based on image aliasing, users need to set `use_mix` in the configuration file as `True`. In addition, because the label needs to be aliased when the image is aliased, the accuracy of the training data cannot be calculated. The training accuracy rate was not printed during the training process.
 

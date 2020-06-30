@@ -143,8 +143,7 @@ def main(args):
 
                         model_path = os.path.join(config.model_save_dir,
                                                   config.ARCHITECTURE["name"])
-                        save_model(train_prog, model_path,
-                                   "best_model_in_epoch_" + str(epoch_id))
+                        save_model(train_prog, model_path, "best_model")
 
             # 3. save the persistable model
             if epoch_id % config.save_interval == 0:

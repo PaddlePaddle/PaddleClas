@@ -4,9 +4,9 @@ extension
 .. toctree::
    :maxdepth: 1
    
-   paddle_inference.md
-   paddle_mobile_inference.md
-   paddle_quantization.md
-   multi_machine_training.md
-   paddle_hub.md
-   paddle_serving.md
+   paddle_inference_en.md
+   paddle_mobile_inference_en.md
+   paddle_quantization_en.md
+   multi_machine_training_en.md
+   paddle_hub_en.md
+   paddle_serving_en.md
