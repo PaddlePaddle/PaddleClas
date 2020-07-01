@@ -144,9 +144,14 @@ def override(dl, ks, v):
             override(dl[k], ks[1:], v)
     else:
         if len(ks) == 1:
-            assert ks[0] in dl, ('{} is not exist in {}'.format(ks[0], dl))
+            #assert ks[0] in dl, ('{} is not exist in {}'.format(ks[0], dl))
+            if not ks[0] in dl:
+                logger.warning('A new filed ({}) detected!'.format(ks[0], dl))
             dl[ks[0]] = str2num(v)
         else:
+            assert ks[0] in dl, (
+                '({}) doesn\'t exist in {}, a new dict field is invalid'.
+                format(ks[0], dl))
             override(dl[ks[0]], ks[1:], v)
 
 
