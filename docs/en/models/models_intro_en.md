@@ -93,6 +93,10 @@ python tools/infer/predict.py \
     - [ShuffleNetV2_x1_5](https://paddle-imagenet-models-name.bj.bcebos.com/ShuffleNetV2_x1_5_pretrained.tar)
     - [ShuffleNetV2_x2_0](https://paddle-imagenet-models-name.bj.bcebos.com/ShuffleNetV2_x2_0_pretrained.tar)
     - [ShuffleNetV2_swish](https://paddle-imagenet-models-name.bj.bcebos.com/ShuffleNetV2_swish_pretrained.tar)
+  - GhostNet series<sup>[[23](#ref23)]</sup>([paper link](https://arxiv.org/pdf/1911.11907.pdf))
+    - [GhostNet_x0_5](https://paddle-imagenet-models-name.bj.bcebos.com/GhostNet_x0_5_pretrained.pdparams)
+    - [GhostNet_x1_0](https://paddle-imagenet-models-name.bj.bcebos.com/GhostNet_x1_0_pretrained.pdparams)
+    - [GhostNet_x1_3](https://paddle-imagenet-models-name.bj.bcebos.com/GhostNet_x1_3_pretrained.pdparams)
 
 
 - SEResNeXt and Res2Net series
@@ -254,3 +258,5 @@ python tools/infer/predict.py \
 <a name="ref21">[21]</a> Redmon J, Divvala S, Girshick R, et al. You only look once: Unified, real-time object detection[C]//Proceedings of the IEEE conference on computer vision and pattern recognition. 2016: 779-788.
 
 <a name="ref22">[22]</a> Ding X, Guo Y, Ding G, et al. Acnet: Strengthening the kernel skeletons for powerful cnn via asymmetric convolution blocks[C]//Proceedings of the IEEE International Conference on Computer Vision. 2019: 1911-1920.
+
+<a name="ref23">[23]</a> Han K, Wang Y, Tian Q, et al. GhostNet: More features from cheap operations[C]//Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition. 2020: 1580-1589.
