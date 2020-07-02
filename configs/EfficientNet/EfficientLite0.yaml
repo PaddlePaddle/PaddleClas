@@ -78,9 +78,9 @@ VALID:
             channel_first: False
         - ResizeImage:
             interpolation: 2
-            resize_short: 412
+            resize_short: 256
         - CropImage:
-            size: 256
+            size: 224
         - NormalizeImage:
             scale: 1./255.
             mean: [0.485, 0.456, 0.406]
