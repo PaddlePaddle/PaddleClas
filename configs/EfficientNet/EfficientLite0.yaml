@@ -52,7 +52,7 @@ TRAIN:
             channel_first: False
         - RandCropImage:
             size: 224
-            interpolation: 2
+            interpolation: 1
         - RandFlipImage:
             flip_code: 1
         - AutoAugment:
@@ -77,7 +77,7 @@ VALID:
             to_np: False
             channel_first: False
         - ResizeImage:
-            interpolation: 2
+            interpolation: 1
             resize_short: 256
         - CropImage:
             size: 224
