@@ -100,7 +100,7 @@ python tools/export_model.py \
 The complete example is provided in the `tools/infer/predict.py`，just execute the following command to complete the prediction:
 
 ```
-python ./predict.py \
+python ./tools/infer/predict.py \
     -i=./test.jpeg \
     -m=./resnet50-vd/model \
     -p=./resnet50-vd/params \
