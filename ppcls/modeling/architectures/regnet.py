@@ -206,7 +206,6 @@ class RegNet():
             bias_attr=bias_attr,
             moving_mean_name=bn_name + '_mean',
             moving_variance_name=bn_name + '_variance', )
-        # todo: to check the bn layer's eps and momentum, and relu_inplace
 
     def shortcut(self, input, ch_out, stride, name):
         ch_in = input.shape[1]
