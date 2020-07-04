@@ -23,6 +23,8 @@ tar -xf ResNet50_pretrained.tar
 
 找到我们所需要的特征图位置，设置self.fm将其fetch出来，本文以resnet50中的stem层之后的特征图为例。
 
+在fm_vis.py中修改模型的名字。
+
 在ResNet50的__init__函数中定义self.fm
 ```python
 self.fm = None
@@ -60,6 +62,9 @@ python tools/feature_maps_visualization/fm_vis.py -i the image you want to test 
 
 ## 四、结果
 输入图片：  
+
 ![](../../tools/feature_maps_visualization/test.jpg)  
+
 输出特征图：  
-![](../../tools/feature_maps_visualization/fm.jpg)  
+
+![](../../tools/feature_maps_visualization/fm.jpg)

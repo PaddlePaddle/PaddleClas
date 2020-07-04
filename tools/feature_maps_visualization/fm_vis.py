@@ -19,7 +19,6 @@ import numpy as np
 import cv2 
 import utils
 import argparse
-import matplotlib.pyplot as plt 
 
 def parse_args():
     def str2bool(v):
