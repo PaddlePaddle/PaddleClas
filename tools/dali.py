@@ -313,6 +313,7 @@ def normalize(feeds, config):
 
 
 def mix(feeds, config, is_train=True):
+    env = os.environ
     gpu_num = paddle.fluid.core.get_cuda_device_count() if (
         'PADDLE_TRAINERS_NUM') and (
             'PADDLE_TRAINER_ID'
