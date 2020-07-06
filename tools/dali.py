@@ -313,8 +313,14 @@ def normalize(feeds, config):
 
 
 def mix(feeds, config, is_train=True):
-    batch_size = config.TRAIN.batch_size // paddle.fluid.core.get_cuda_device_count(
-    )
+    gpu_num = paddle.fluid.core.get_cuda_device_count() if (
+        'PADDLE_TRAINERS_NUM') and (
+            'PADDLE_TRAINER_ID'
+    ) not in env else int(env.get('PADDLE_TRAINERS_NUM', 0))
+
+
+    batch_size = config.TRAIN.batch_size // gpu_num
+
     #batch_imgs = _to_Tensor(feeds['feed_image'], 'float32')
     #batch_label = _to_Tensor(feeds['feed_label'], 'int64')
     images = feeds['image']
