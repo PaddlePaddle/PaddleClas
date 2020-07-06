@@ -119,3 +119,6 @@ VGG19
 DarkNet53_ImageNet1k
 ResNet50_ACNet_deploy
 CSPResNet50_leaky
+GhostNet_x0_5
+GhostNet_x1_0
+GhostNet_x1_3

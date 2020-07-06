@@ -151,10 +151,15 @@ def build(settings, mode='train'):
 
     file_root = settings.TRAIN.data_dir
     bs = settings.TRAIN.batch_size if mode == 'train' else settings.VALID.batch_size
-    print(bs, paddle.fluid.core.get_cuda_device_count())
-    assert bs % paddle.fluid.core.get_cuda_device_count() == 0, \
+
+    gpu_num = paddle.fluid.core.get_cuda_device_count() if (
+        'PADDLE_TRAINERS_NUM') and (
+            'PADDLE_TRAINER_ID'
+    ) not in env else int(env.get('PADDLE_TRAINERS_NUM', 0))
+
+    assert bs % gpu_num == 0, \
         "batch size must be multiple of number of devices"
-    batch_size = bs // paddle.fluid.core.get_cuda_device_count()
+    batch_size = bs // gpu_num
 
     image_mean = [0.485, 0.456, 0.406]
     image_std = [0.229, 0.224, 0.225]

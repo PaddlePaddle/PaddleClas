@@ -100,10 +100,6 @@ PaddleClas的安装说明、模型训练、预测、评估以及模型微调（f
 近年来，学术界和工业界广泛关注图像中目标检测任务，而图像分类的网络结构以及预训练模型效果直接影响目标检测的效果。PaddleDetection使用PaddleClas的82.39%的ResNet50_vd的预训练模型，结合自身丰富的检测算子，提供了一种面向服务器端应用的目标检测方案，PSS-DET (Practical Server Side Detection)。该方案融合了多种只增加少许计算量，但是可以有效提升两阶段Faster RCNN目标检测效果的策略，包括检测模型剪裁、使用分类效果更优的预训练模型、DCNv2、Cascade RCNN、AutoAugment、Libra sampling以及多尺度训练。其中基于82.39%的R50_vd_ssld预训练模型，与79.12%的R50_vd的预训练模型相比，检测效果可以提升1.5%。在COCO目标检测数据集上测试PSS-DET，当V100单卡预测速度为61FPS时，mAP是41.6%，预测速度为20FPS时，mAP是47.8%。详情请参考[**通用目标检测章节**](https://paddleclas.readthedocs.io/zh_CN/latest/application/object_detection.html)。
 
 
-- TODO
-- [ ] PaddleClas在OCR任务中的应用
-- [ ] PaddleClas在人脸检测和识别中的应用
-
 ## 工业级应用部署工具
 PaddlePaddle提供了一系列实用工具，便于工业应用部署PaddleClas，具体请参考文档教程中的[**实用工具章节**](https://paddleclas.readthedocs.io/zh_CN/latest/extension/index.html)。
 

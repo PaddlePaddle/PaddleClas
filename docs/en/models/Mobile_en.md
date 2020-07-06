@@ -10,6 +10,7 @@ The ShuffleNet series network is the lightweight network structure proposed by M
 
 MobileNetV3 is a new and lightweight network based on NAS proposed by Google in 2019. In order to further improve the effect, the activation functions of relu and sigmoid were replaced with hard_swish and hard_sigmoid activation functions, and some improved strategies were introduced to reduce the amount of network computing.
 
+GhosttNet is a brand-new lightweight network structure proposed by Huawei in 2020. By introducing the ghost module, the problem of redundant calculation of features in traditional deep networks is greatly alleviated, which greatly reduces the amount of network parameters and calculations.
 
 ![](../../images/models/mobile_arm_top1.png)
 
@@ -57,6 +58,9 @@ Currently there are 32 pretrained models of the mobile series open source by Pad
 | ShuffleNetV2_x1_5                    | 0.716   | 0.902   | 0.726             |                   | 0.580        | 3.470             |
 | ShuffleNetV2_x2_0                    | 0.732   | 0.912   | 0.749             |                   | 1.120        | 7.320             |
 | ShuffleNetV2_swish                   | 0.700   | 0.892   |                   |                   | 0.290        | 2.260             |
+| GhostNet_x0_5                        | 0.668   | 0.869   | 0.662             | 0.866             | 0.041        | 2.600             |
+| GhostNet_x1_0                        | 0.740   | 0.916   | 0.739             | 0.914             | 0.147        | 5.200             |
+| GhostNet_x1_3                        | 0.757   | 0.925   | 0.757             | 0.927             | 0.220        | 7.300             |
 
 
 ## Inference speed and storage size based on SD855
