@@ -99,6 +99,9 @@ Currently there are 32 pretrained models of the mobile series open source by Pad
 | ShuffleNetV2_x1_5                    | 19.352           | 14.000          |
 | ShuffleNetV2_x2_0                    | 34.770           | 28.000          |
 | ShuffleNetV2_swish                   | 16.023           | 9.100           |
+| GhostNet_x0_5                   | 5.714           | 10.000           |
+| GhostNet_x1_0                   | 13.558           | 20.000           |
+| GhostNet_x1_3                   | 19.982           | 29.000           |
 
 
 ## Inference speed based on T4 GPU
