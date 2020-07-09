@@ -192,7 +192,9 @@ def partial_reader(params, full_lines, part_id=0, part_num=1, batch_size=1):
         delimiter = params.get('delimiter', ' ')
         for line in full_lines:
             img_path, label = line.split(delimiter)
+
             img_path = os.path.join(params['data_dir'], img_path)
+
             with open(img_path, 'rb') as f:
                 img = f.read()
             yield (transform(img, ops), int(label))
@@ -259,6 +261,8 @@ class Reader:
         self.use_gpu = config.get("use_gpu", True)
         use_mix = config.get('use_mix')
         self.params['mode'] = mode
+        if int(os.environ.get('PADDLECLAS_DEBUG')):
+            self.params['debug'] = config['DEBUG']
         if seed is not None:
             self.params['shuffle_seed'] = seed
         self.batch_ops = []
@@ -278,6 +282,9 @@ class Reader:
         def wrapper():
             reader = mp_reader(self.params, batch_size)
             batch = []
+            if int(os.environ.get('PADDLECLAS_DEBUG')):
+                fake_image_path = self.params.debug.fake_input
+                reader = partial_reader(self.params, [fake_image_path+' 1'] * self.params.debug.repeat_times)
             for idx, sample in enumerate(reader()):
                 img, label = sample
                 batch.append((img, label))
@@ -287,7 +294,6 @@ class Reader:
                     batch = []
 
         return wrapper
-
 
 signal.signal(signal.SIGINT, term_mp)
 signal.signal(signal.SIGTERM, term_mp)

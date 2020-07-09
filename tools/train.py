@@ -49,6 +49,12 @@ def parse_args():
         action='append',
         default=[],
         help='config options to be overridden')
+    parser.add_argument(
+        '-d',
+        '--debug',
+        default=False,
+        help='debug'
+        )
     args = parser.parse_args()
     return args
 

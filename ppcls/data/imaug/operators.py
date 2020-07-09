@@ -24,6 +24,7 @@ import math
 import random
 import cv2
 import numpy as np
+import os
 
 from .autoaugment import ImageNetPolicy
 
@@ -151,12 +152,16 @@ class RandCropImage(object):
 
         i = random.randint(0, img_w - w)
         j = random.randint(0, img_h - h)
+        
+        
+        img_adj = img[j:j + h, i:i + w, :]
 
-        img = img[j:j + h, i:i + w, :]
+        if int(os.environ.get('PADDLECLAS_DEBUG')):
+            img_adj = img
         if self.interpolation is None:
-            return cv2.resize(img, size)
+            return cv2.resize(img_adj, size)
         else:
-            return cv2.resize(img, size, interpolation=self.interpolation)
+            return cv2.resize(img_adj, size, interpolation=self.interpolation)
 
 
 class RandFlipImage(object):
@@ -173,6 +178,8 @@ class RandFlipImage(object):
         self.flip_code = flip_code
 
     def __call__(self, img):
+        if int(os.environ.get('PADDLECLAS_DEBUG')):
+            return img
         if random.randint(0, 1) == 1:
             return cv2.flip(img, self.flip_code)
         else:

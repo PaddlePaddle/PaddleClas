@@ -369,6 +369,14 @@ def build(config, main_prog, startup_prog, is_train=True, is_distributed=True):
                         config.get('ema_decay'), thres_steps=global_steps)
                     ema.update()
                     return dataloader, fetchs, ema
+            if int(os.environ.get('PADDLECLAS_DEBUG')):
+                v = []
+                for var in main_prog.list_vars():
+                    #print(var.name)
+                    if 'velocity' not in var.name  and 'conv6_weights' in var.name:
+                        v.append(var.name)
+                fetchs['debug'] = v
+
 
     return dataloader, fetchs
 
@@ -425,16 +433,32 @@ def run(dataloader,
 
     Returns:
     """
-    fetch_list = [f[0] for f in fetchs.values()]
-    metric_list = [f[1] for f in fetchs.values()]
+    fetch_list = []
+    metric_list = []
+    debug_ops = 0
+    for k,v in fetchs.items():
+        if k != 'debug':
+            metric_list.append(v[1])
+            fetch_list.append(v[0])
+        else:
+            debug_ops = debug_ops + len(v)
+            fetch_list = fetch_list+v
+
+
     for m in metric_list:
         m.reset()
     batch_time = AverageMeter('elapse', '.3f')
     tic = time.time()
     for idx, batch in enumerate(dataloader()):
+        
         metrics = exe.run(program=program, feed=batch, fetch_list=fetch_list)
+        
         batch_time.update(time.time() - tic)
         tic = time.time()
+        logger.info("DEBUG {:s} ".format(metrics))
+        metrics = metrics[:-debug_ops]
+
+
         for i, m in enumerate(metrics):
             metric_list[i].update(np.mean(m), len(batch[0]))
         fetchs_str = ''.join([str(m.value) + ' '
@@ -466,6 +490,8 @@ def run(dataloader,
                         if idx == 0 else epoch_str,
                         logger.coloring(step_str, "PURPLE"),
                         logger.coloring(fetchs_str, 'OKGREEN')))
+
+        #sys.stdout.flush()
 
     end_str = ''.join([str(m.mean) + ' '
                        for m in metric_list] + [batch_time.total]) + 's'
