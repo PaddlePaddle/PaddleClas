@@ -297,6 +297,8 @@ def dist_optimizer(config, optimizer):
     dist_strategy.nccl_comm_num = 1
     dist_strategy.fuse_all_reduce_ops = True
     dist_strategy.exec_strategy = exec_strategy
+    dist_strategy.mode = "collective"
+    dist_strategy.collective_mode = "grad_allreduce"
     optimizer = fleet.distributed_optimizer(optimizer, strategy=dist_strategy)
 
     return optimizer
