@@ -31,7 +31,7 @@ First, we select nearly 4 million images from ImageNet22k dataset, and integrate
 
 * There is not need for laleled data in SSLD, which leads to convenient training data expansion. label is not utilized when computing the loss function, therefore the unlabeled data can also be used to train the network. The label-free distillation strategy of this distillation solution has also greatly improved the upper performance limit of student models (`77.1%-> 78.5%`).
 
-* ImageNet1k finetune. ImageNet1k training set is used for finetuning, which brings a 0.4% accuracy improvement (`75.8%-> 78.9%`).
+* ImageNet1k finetune. ImageNet1k training set is used for finetuning, which brings a 0.4% accuracy improvement (`78.5%-> 78.9%`).
 
 
 ## Data selection
