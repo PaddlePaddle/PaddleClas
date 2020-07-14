@@ -1,5 +1,9 @@
 # 更新日志
 
+* 2020.07.14
+    * 添加Res2Net200_vd_26w_4s_ssld模型，在ImageNet上Top-1 Acc可达85.13%。
+    * 添加Fix_ResNet50_vd_ssld_v2模型，，在ImageNet上Top-1 Acc可达84.0%。
+
 * 2020.06.17
     * 添加英文文档。
 
