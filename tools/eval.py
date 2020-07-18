@@ -71,8 +71,6 @@ def main(args):
 
         net.eval()
         top1_acc = program.run(valid_dataloader, config, net, None, 0, 'valid')
-        message = "top1 acc {:.5f}".format(top1_acc)
-        logger.info(message)
 
 
 if __name__ == '__main__':
