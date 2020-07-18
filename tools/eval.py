@@ -26,6 +26,7 @@ import program
 from ppcls.data import Reader
 from ppcls.utils.config import get_config
 from ppcls.utils.save_load import init_model
+from ppcls.utils import logger
 
 from paddle.fluid.incubate.fleet.collective import fleet
 from paddle.fluid.incubate.fleet.base import role_maker
@@ -57,20 +58,21 @@ def main(args):
     place = fluid.CUDAPlace(gpu_id)
 
     with fluid.dygraph.guard(place):
-	pre_weights_dict = fluid.dygraph.load_dygraph(config.pretrained_model+"/ppcls")[0]
-	strategy = fluid.dygraph.parallel.prepare_context()
+        pre_weights_dict = fluid.dygraph.load_dygraph(config.pretrained_model +
+                                                      "/ppcls")[0]
+        strategy = fluid.dygraph.parallel.prepare_context()
         net = program.create_model(config.ARCHITECTURE, config.classes_num)
-        net = fluid.dygraph.parallel.DataParallel(net, strategy) 
+        net = fluid.dygraph.parallel.DataParallel(net, strategy)
         net.set_dict(pre_weights_dict)
-        
+
         valid_dataloader = program.create_dataloader()
         valid_reader = Reader(config, 'valid')()
         valid_dataloader.set_sample_list_generator(valid_reader, place)
-        
+
         net.eval()
         top1_acc = program.run(valid_dataloader, config, net, None, 0, 'valid')
         message = "top1 acc {:.5f}".format(top1_acc)
-        print(message)
+        logger.info(message)
 
 
 if __name__ == '__main__':
