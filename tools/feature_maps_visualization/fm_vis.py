@@ -12,27 +12,29 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from resnet import ResNet50 
+from resnet import ResNet50
 import paddle.fluid as fluid
 
-import numpy as np 
-import cv2 
+import numpy as np
+import cv2
 import utils
 import argparse
+
 
 def parse_args():
     def str2bool(v):
         return v.lower() in ("true", "t", "1")
+
     parser = argparse.ArgumentParser()
     parser.add_argument("-i", "--image_file", type=str)
     parser.add_argument("-c", "--channel_num", type=int)
     parser.add_argument("-p", "--pretrained_model", type=str)
     parser.add_argument("--show", type=str2bool, default=False)
-    parser.add_argument("--save", type=str2bool, default=True)
-    parser.add_argument("--save_path", type=str)
+    parser.add_argument("--save_path", type=str, default=None)
     parser.add_argument("--use_gpu", type=str2bool, default=True)
-    
+
     return parser.parse_args()
+
 
 def create_operators():
     size = 224
@@ -57,6 +59,7 @@ def preprocess(fname, ops):
 
     return data
 
+
 def main():
     args = parse_args()
     operators = create_operators()
@@ -66,9 +69,7 @@ def main():
         place = fluid.CUDAPlace(gpu_id)
     else:
         place = fluid.CPUPlace()
-    fm = None
-    
-    print(args.pretrained_model)
+
     pre_weights_dict = fluid.load_program_state(args.pretrained_model)
     with fluid.dygraph.guard(place):
         net = ResNet50()
@@ -83,16 +84,16 @@ def main():
         net.set_dict(pre_weights_dict_new)
         net.eval()
         _, fm = net(data)
-        assert args.channel_num >= 0 and args.channel_num <= fm.shape[1], "the channel is out of the range"
-        fm = (np.squeeze(fm[0][args.channel_num].numpy())*255).astype(np.uint8)
-        print(fm)
+        assert args.channel_num >= 0 and args.channel_num <= fm.shape[1], "the channel is out of the range, should be in {} but got {}".format([0, fm.shape[1]], args.channel_num)
+        fm = (np.squeeze(fm[0][args.channel_num].numpy()) *
+              255).astype(np.uint8)
     if fm is not None:
-        if args.save:
-            print(args.save_path)
+        if args.save_path is not None:
             cv2.imwrite(args.save_path, fm)
         if args.show:
             cv2.show(fm)
             cv2.waitKey(0)
-        
+
+
 if __name__ == "__main__":
     main()
