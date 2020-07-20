@@ -28,7 +28,6 @@ def parse_args():
     parser.add_argument("-c", "--channel_num", type=int)
     parser.add_argument("-p", "--pretrained_model", type=str)
     parser.add_argument("--show", type=str2bool, default=False)
-    parser.add_argument("--save", type=str2bool, default=True)
     parser.add_argument("--save_path", type=str)
     parser.add_argument("--use_gpu", type=str2bool, default=True)
     
@@ -66,9 +65,7 @@ def main():
         place = fluid.CUDAPlace(gpu_id)
     else:
         place = fluid.CPUPlace()
-    fm = None
-    
-    print(args.pretrained_model)
+
     pre_weights_dict = fluid.load_program_state(args.pretrained_model)
     with fluid.dygraph.guard(place):
         net = ResNet50()
@@ -83,12 +80,10 @@ def main():
         net.set_dict(pre_weights_dict_new)
         net.eval()
         _, fm = net(data)
-        assert args.channel_num >= 0 and args.channel_num <= fm.shape[1], "the channel is out of the range"
+        assert args.channel_num >= 0 and args.channel_num <= fm.shape[1], "the channel is out of the range, should be in {} but got {}".format([0, fm.shape[1]], args.channel_num)
         fm = (np.squeeze(fm[0][args.channel_num].numpy())*255).astype(np.uint8)
-        print(fm)
     if fm is not None:
         if args.save:
-            print(args.save_path)
             cv2.imwrite(args.save_path, fm)
         if args.show:
             cv2.show(fm)

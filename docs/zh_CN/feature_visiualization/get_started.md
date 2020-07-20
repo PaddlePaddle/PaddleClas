@@ -6,7 +6,7 @@
 
 ## 二、准备工作
 
-首先我们需要选定研究的模型，本文设定ResNet50作为研究模型，将resnet.py从[模型库](../../ppcls/modeling/architecture/)拷贝到当前目录下，并下载预训练模型[预训练模型](../../docs/zh_CN/models/models_intro), 复制resnet50的模型链接，使用下列命令下载并解压预训练模型。
+首先需要选定研究的模型，本文设定ResNet50作为研究模型，将resnet.py从[模型库](../../../ppcls/modeling/architecture/)拷贝到当前目录下，并下载预训练模型[预训练模型](../../zh_CN/models/models_intro), 复制resnet50的模型链接，使用下列命令下载并解压预训练模型。
 
 ```bash
 wget The Link for Pretrained Model
@@ -53,18 +53,17 @@ python tools/feature_maps_visualization/fm_vis.py -i the image you want to test 
 ```
 参数说明：
 + `-i`：待预测的图片文件路径，如 `./test.jpeg`
-+ `-c`：特征图维度，如 `./resnet50-vd/model`
++ `-c`：特征图维度，如 `./resnet50_vd/model`
 + `-p`：权重文件路径，如 `./ResNet50_pretrained/`
 + `--show`：是否展示图片，默认值 False
-+ `--save`：是否保存图片，默认值：True
 + `--save_path`：保存路径，如：`./tools/`
 + `--use_gpu`：是否使用 GPU 预测，默认值：True
 
 ## 四、结果
 输入图片：  
 
-![](../../tools/feature_maps_visualization/test.jpg)  
+![](../../../tools/feature_maps_visualization/test.jpg)  
 
 输出特征图：  
 
-![](../../tools/feature_maps_visualization/fm.jpg)
+![](../../../tools/feature_maps_visualization/fm.jpg)
