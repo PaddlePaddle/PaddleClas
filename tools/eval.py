@@ -58,8 +58,7 @@ def main(args):
     place = fluid.CUDAPlace(gpu_id)
 
     with fluid.dygraph.guard(place):
-        pre_weights_dict = fluid.dygraph.load_dygraph(config.pretrained_model +
-                                                      "/ppcls")[0]
+        pre_weights_dict = fluid.dygraph.load_dygraph(config.pretrained_model)[0]
         strategy = fluid.dygraph.parallel.prepare_context()
         net = program.create_model(config.ARCHITECTURE, config.classes_num)
         net = fluid.dygraph.parallel.DataParallel(net, strategy)
