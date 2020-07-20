@@ -77,14 +77,14 @@ class BottleneckBlock(fluid.dygraph.Layer):
             filter_size=1,
             act=None)
 
-        if not shortcut:
+        self.shortcut = shortcut
+
+        if not self.shortcut:
             self.short = ConvBNLayer(
                 num_channels=num_channels,
                 num_filters=num_filters * 4,
                 filter_size=1,
                 stride=stride)
-
-        self.shortcut = shortcut
 
         self._num_channels_out = num_filters * 4
 
@@ -108,18 +108,16 @@ class ResNet(fluid.dygraph.Layer):
     def __init__(self, layers=50, class_dim=1000):
         super(ResNet, self).__init__()
 
-        self.layers = layers
-        supported_layers = [50, 101, 152]
-        assert layers in supported_layers, \
-            "supported layers are {} but input layer is {}".format(
-                supported_layers, layers)
-
-        if layers == 50:
+        if layers == 18:
+            depth = [2, 2, 2, 2]
+        elif layers == 18 or layers == 50:
             depth = [3, 4, 6, 3]
         elif layers == 101:
             depth = [3, 4, 23, 3]
         elif layers == 152:
             depth = [3, 8, 36, 3]
+        else:
+            raise ValueError('Input layer is not supported')
         num_channels = [64, 256, 512, 1024]
         num_filters = [64, 128, 256, 512]
 
@@ -191,6 +189,6 @@ def ResNet101(**kwargs):
     return model
 
 
-def ResNet152(class_dim=1000):
-    model = ResNet(layers=152, class_dim=class_dim)
+def ResNet152(**kwargs):
+    model = ResNet(layers=152, **kwargs)
     return model
