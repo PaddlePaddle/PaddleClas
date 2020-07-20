@@ -28,19 +28,20 @@ def parse_args():
     parser.add_argument("-c", "--channel_num", type=int)
     parser.add_argument("-p", "--pretrained_model", type=str)
     parser.add_argument("--show", type=str2bool, default=False)
+    parser.add_argument("--interpolation", type=int, default=1)
     parser.add_argument("--save_path", type=str)
     parser.add_argument("--use_gpu", type=str2bool, default=True)
     
     return parser.parse_args()
 
-def create_operators():
+def create_operators(interpolation=1):
     size = 224
     img_mean = [0.485, 0.456, 0.406]
     img_std = [0.229, 0.224, 0.225]
     img_scale = 1.0 / 255.0
 
     decode_op = utils.DecodeImage()
-    resize_op = utils.ResizeImage(resize_short=256)
+    resize_op = utils.ResizeImage(resize_short=256, interpolation=interpolation)
     crop_op = utils.CropImage(size=(size, size))
     normalize_op = utils.NormalizeImage(
         scale=img_scale, mean=img_mean, std=img_std)
@@ -58,7 +59,7 @@ def preprocess(fname, ops):
 
 def main():
     args = parse_args()
-    operators = create_operators()
+    operators = create_operators(args.interpolation)
     # assign the place
     if args.use_gpu:
         gpu_id = fluid.dygraph.parallel.Env().dev_id
@@ -66,7 +67,7 @@ def main():
     else:
         place = fluid.CPUPlace()
 
-    pre_weights_dict = fluid.load_program_state(args.pretrained_model)
+    #pre_weights_dict = fluid.load_program_state(args.pretrained_model)
     with fluid.dygraph.guard(place):
         net = ResNet50()
         data = preprocess(args.image_file, operators)

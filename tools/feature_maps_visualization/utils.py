@@ -32,15 +32,16 @@ class DecodeImage(object):
 
 
 class ResizeImage(object):
-    def __init__(self, resize_short=None):
+    def __init__(self, resize_short=None, interpolation=1):
         self.resize_short = resize_short
+        self.interpolation = interpolation
 
     def __call__(self, img):
         img_h, img_w = img.shape[:2]
         percent = float(self.resize_short) / min(img_w, img_h)
         w = int(round(img_w * percent))
         h = int(round(img_h * percent))
-        return cv2.resize(img, (w, h))
+        return cv2.resize(img, (w, h), interpolation=self.interpolation)
 
 
 class CropImage(object):

@@ -47,7 +47,7 @@ def forward(self, inputs):
 python tools/feature_maps_visualization/fm_vis.py -i the image you want to test \
                                                 -c channel_num -p pretrained model \
                                                 --show whether to show \
-                                                --save whether to save \
+                                                --interpolation interpolation method\
                                                 --save_path where to save \
                                                 --use_gpu whether to use gpu
 ```
@@ -56,6 +56,7 @@ python tools/feature_maps_visualization/fm_vis.py -i the image you want to test 
 + `-c`：特征图维度，如 `./resnet50_vd/model`
 + `-p`：权重文件路径，如 `./ResNet50_pretrained/`
 + `--show`：是否展示图片，默认值 False
++ `--interpolation`: 图像插值方式， 默认值 1
 + `--save_path`：保存路径，如：`./tools/`
 + `--use_gpu`：是否使用 GPU 预测，默认值：True
 
