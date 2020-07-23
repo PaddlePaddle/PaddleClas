@@ -47,6 +47,7 @@ from .hrnet import HRNet_W18_C, HRNet_W30_C, HRNet_W32_C, HRNet_W40_C, HRNet_W44
 from .darts_gs import DARTS_GS_6M, DARTS_GS_4M
 from .resnet_acnet import ResNet18_ACNet, ResNet34_ACNet, ResNet50_ACNet, ResNet101_ACNet, ResNet152_ACNet
 from .ghostnet import GhostNet_x0_5, GhostNet_x1_0, GhostNet_x1_3
+from .resnest import ResNeSt50, ResNeSt101, ResNeSt200, ResNeSt269, ResNeSt50_fast_1s1x64d, ResNeSt50_fast_2s1x64d, ResNeSt50_fast_4s1x64d, ResNeSt50_fast_1s2x40d, ResNeSt50_fast_2s2x40d, ResNeSt50_fast_2s2x40d, ResNeSt50_fast_4s2x40d, ResNeSt50_fast_1s4x24d
 
 # distillation model
 from .distillation_models import ResNet50_vd_distill_MobileNetV3_large_x1_0, ResNeXt101_32x16d_wsl_distill_ResNet50_vd
