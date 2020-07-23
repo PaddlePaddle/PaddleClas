@@ -17,11 +17,12 @@ from __future__ import division
 from __future__ import print_function
 
 import math
-import numpy as np
 
 import paddle
 import paddle.fluid as fluid
 from paddle.fluid.param_attr import ParamAttr
+import math
+import numpy as np
 
 __all__ = [
     "RegNetX_200MF", "RegNetX_4GF", "RegNetX_32GF", "RegNetY_200MF",
@@ -113,13 +114,22 @@ class RegNet():
         # Generate RegNet ws per block
         b_ws, num_s, max_s, ws_cont = self.generate_regnet(
             self.w_a, self.w_0, self.w_m, self.d, self.q)
+        #print('generate_regnet func done!')
+        #print('b_ws={}, num_stages={}, max_stage={}, ws_cont={}'.format(b_ws, num_s, max_s, ws_cont))
         # Convert to per stage format
         ws, ds = self.get_stages_from_blocks(b_ws, b_ws)
+        #print('get_stages_from_blocks func done!')
+        #print('ws={}, ds={}'.format(ws, ds))
         # Generate group widths and bot muls
         gws = [self.group_w for _ in range(num_s)]
         bms = [self.bot_mul for _ in range(num_s)]
+        # print('gws={}'.format(gws))
+        # print('bms={}'.format(bms))
         # Adjust the compatibility of ws and gws
+        #print('adjust_ws_gs_comp func done!')
         ws, gws = self.adjust_ws_gs_comp(ws, bms, gws)
+        print('ws={}'.format(ws))
+        print('gws={}'.format(gws))
         # Use the same stride for each stage
         ss = [self.stride for _ in range(num_s)]
         # Use SE for RegNetY
@@ -175,11 +185,6 @@ class RegNet():
                       act=None,
                       name=None,
                       final_bn=False):
-        param_attr, bias_attr = self.init_weights(
-            op_type='conv',
-            filter_size=filter_size,
-            num_channels=num_filters,
-            name=name)
         conv = fluid.layers.conv2d(
             input=input,
             num_filters=num_filters,
@@ -188,24 +193,16 @@ class RegNet():
             padding=padding,
             groups=groups,
             act=None,
-            param_attr=param_attr,
-            bias_attr=bias_attr,
             name=name + '.conv2d.output.1')
         bn_name = name + '_bn'
-        if final_bn:
-            param_attr, bias_attr = self.init_weights(
-                op_type='final_bn', name=bn_name)
-        else:
-            param_attr, bias_attr = self.init_weights(
-                op_type='bn', name=bn_name)
+
         return fluid.layers.batch_norm(
             input=conv,
             act=act,
             name=bn_name + '.output.1',
-            param_attr=param_attr,
-            bias_attr=bias_attr,
             moving_mean_name=bn_name + '_mean',
             moving_variance_name=bn_name + '_variance', )
+        # todo: to check the bn layer's eps and momentum, and relu_inplace
 
     def shortcut(self, input, ch_out, stride, name):
         ch_in = input.shape[1]
