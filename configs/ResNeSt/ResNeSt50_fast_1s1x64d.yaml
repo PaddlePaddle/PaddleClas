@@ -1,0 +1,78 @@
+mode: 'train'
+ARCHITECTURE:
+    name: 'ResNeSt50_fast_1s1x64d'
+
+pretrained_model: ""
+model_save_dir: "./output/"
+classes_num: 1000
+total_images: 1281167
+save_interval: 1
+validate: True
+valid_interval: 1
+epochs: 300
+topk: 5
+image_shape: [3, 224, 224]
+
+use_mix: True
+ls_epsilon: 0.1
+
+LEARNING_RATE:
+    function: 'CosineWarmup'          
+    params:                   
+        lr: 0.1               
+
+OPTIMIZER:
+    function: 'Momentum'
+    params:
+        momentum: 0.9
+    regularizer:
+        function: 'L2'
+        factor: 0.000070
+
+TRAIN:
+    batch_size: 256
+    num_workers: 4
+    file_list: "./dataset/ILSVRC2012/train_list.txt"
+    data_dir: "./dataset/ILSVRC2012/"
+    shuffle_seed: 0
+    transforms:
+        - DecodeImage:
+            to_rgb: True
+            to_np: False
+            channel_first: False
+        - RandCropImage:
+            size: 224
+        - RandFlipImage:
+            flip_code: 1
+        - AutoAugment:
+        - NormalizeImage:
+            scale: 1./255.
+            mean: [0.485, 0.456, 0.406]
+            std: [0.229, 0.224, 0.225]
+            order: ''
+        - ToCHWImage:
+    mix:                       
+        - CutmixOperator:    
+            alpha: 0.2      
+
+VALID:
+    batch_size: 64
+    num_workers: 4
+    file_list: "./dataset/ILSVRC2012/val_list.txt"
+    data_dir: "./dataset/ILSVRC2012/"
+    shuffle_seed: 0
+    transforms:
+        - DecodeImage:
+            to_rgb: True
+            to_np: False
+            channel_first: False
+        - ResizeImage:
+            resize_short: 256
+        - CropImage:
+            size: 224
+        - NormalizeImage:
+            scale: 1.0/255.0
+            mean: [0.485, 0.456, 0.406]
+            std: [0.229, 0.224, 0.225]
+            order: ''
+        - ToCHWImage:

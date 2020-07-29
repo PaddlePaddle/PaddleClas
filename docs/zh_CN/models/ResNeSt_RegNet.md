@@ -9,6 +9,5 @@ ResNeSt系列模型是在2020年提出的，在原有的resnet网络结构上做
 
 | Models           | Top1 | Top5 | Reference<br>top1 | Reference<br>top5 | FLOPS<br>(G) | Parameters<br>(M) |
 |:--:|:--:|:--:|:--:|:--:|:--:|:--:|
-| ResNeSt50        | 0.8102 | 0.9542|  0.8113 |            -|5.39     | 27.5   |
-
-
+| ResNeSt50_fast_1s1x64d        | 0.8035 | 0.9528|  0.8035 |            -| 8.68     | 26.3   |
+| ResNeSt50        | 0.8102 | 0.9542|  0.8113 |            -| 10.78     | 27.5   |
