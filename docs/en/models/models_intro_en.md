@@ -193,9 +193,9 @@ python tools/infer/predict.py \
 
 
 - ResNeSt and RegNet series
-  - ResNeSt系列<sup>[[24](#ref24)]</sup>([paper link](https://arxiv.org/abs/2004.08955))
-    - [ResNeSt50_fast_1s1x64d)(https://paddle-imagenet-models-name.bj.bcebos.com/ResNeSt50_fast_1s1x64d_pretrained.tar)
-    - [ResNeSt50)(https://paddle-imagenet-models-name.bj.bcebos.com/ResNeSt50_pretrained.tar)
+  - ResNeSt series<sup>[[24](#ref24)]</sup>([paper link](https://arxiv.org/abs/2004.08955))
+    - [ResNeSt50_fast_1s1x64d](https://paddle-imagenet-models-name.bj.bcebos.com/ResNeSt50_fast_1s1x64d_pretrained.pdparams)
+    - [ResNeSt50](https://paddle-imagenet-models-name.bj.bcebos.com/ResNeSt50_pretrained.pdparams)
 
 
 - Other models
