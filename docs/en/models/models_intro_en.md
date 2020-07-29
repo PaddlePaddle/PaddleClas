@@ -191,6 +191,13 @@ python tools/infer/predict.py \
     - [Fix_ResNeXt101_32x48d_wsl](https://paddle-imagenet-models-name.bj.bcebos.com/Fix_ResNeXt101_32x48d_wsl_pretrained.tar)
 
 
+
+- ResNeSt and RegNet series
+  - ResNeSt series<sup>[[24](#ref24)]</sup>([paper link](https://arxiv.org/abs/2004.08955))
+    - [ResNeSt50_fast_1s1x64d](https://paddle-imagenet-models-name.bj.bcebos.com/ResNeSt50_fast_1s1x64d_pretrained.pdparams)
+    - [ResNeSt50](https://paddle-imagenet-models-name.bj.bcebos.com/ResNeSt50_pretrained.pdparams)
+
+
 - Other models
   - AlexNet series<sup>[[18](#ref18)]</sup>([paper link](https://papers.nips.cc/paper/4824-imagenet-classification-with-deep-convolutional-neural-networks.pdf))
     - [AlexNet](https://paddle-imagenet-models-name.bj.bcebos.com/AlexNet_pretrained.tar)
@@ -261,3 +268,5 @@ python tools/infer/predict.py \
 <a name="ref22">[22]</a> Ding X, Guo Y, Ding G, et al. Acnet: Strengthening the kernel skeletons for powerful cnn via asymmetric convolution blocks[C]//Proceedings of the IEEE International Conference on Computer Vision. 2019: 1911-1920.
 
 <a name="ref23">[23]</a> Han K, Wang Y, Tian Q, et al. GhostNet: More features from cheap operations[C]//Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition. 2020: 1580-1589.
+
+<a name="ref24">[24]</a> Zhang H, Wu C, Zhang Z, et al. Resnest: Split-attention networks[J]. arXiv preprint arXiv:2004.08955, 2020.

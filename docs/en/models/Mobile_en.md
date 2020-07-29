@@ -58,9 +58,9 @@ Currently there are 32 pretrained models of the mobile series open source by Pad
 | ShuffleNetV2_x1_5                    | 0.716   | 0.902   | 0.726             |                   | 0.580        | 3.470             |
 | ShuffleNetV2_x2_0                    | 0.732   | 0.912   | 0.749             |                   | 1.120        | 7.320             |
 | ShuffleNetV2_swish                   | 0.700   | 0.892   |                   |                   | 0.290        | 2.260             |
-| GhostNet_x0_5                        | 0.668   | 0.869   | 0.662             | 0.866             | 0.041        | 2.600             |
-| GhostNet_x1_0                        | 0.740   | 0.916   | 0.739             | 0.914             | 0.147        | 5.200             |
-| GhostNet_x1_3                        | 0.757   | 0.925   | 0.757             | 0.927             | 0.220        | 7.300             |
+| GhostNet_x0_5                        | 0.668   | 0.869   | 0.662             | 0.866             | 0.082        | 2.600             |
+| GhostNet_x1_0                        | 0.740   | 0.916   | 0.739             | 0.914             | 0.294        | 5.200             |
+| GhostNet_x1_3                        | 0.757   | 0.925   | 0.757             | 0.927             | 0.440        | 7.300             |
 
 
 ## Inference speed and storage size based on SD855
