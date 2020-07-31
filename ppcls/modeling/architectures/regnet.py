@@ -114,22 +114,13 @@ class RegNet():
         # Generate RegNet ws per block
         b_ws, num_s, max_s, ws_cont = self.generate_regnet(
             self.w_a, self.w_0, self.w_m, self.d, self.q)
-        #print('generate_regnet func done!')
-        #print('b_ws={}, num_stages={}, max_stage={}, ws_cont={}'.format(b_ws, num_s, max_s, ws_cont))
         # Convert to per stage format
         ws, ds = self.get_stages_from_blocks(b_ws, b_ws)
-        #print('get_stages_from_blocks func done!')
-        #print('ws={}, ds={}'.format(ws, ds))
         # Generate group widths and bot muls
         gws = [self.group_w for _ in range(num_s)]
         bms = [self.bot_mul for _ in range(num_s)]
-        # print('gws={}'.format(gws))
-        # print('bms={}'.format(bms))
         # Adjust the compatibility of ws and gws
-        #print('adjust_ws_gs_comp func done!')
         ws, gws = self.adjust_ws_gs_comp(ws, bms, gws)
-        print('ws={}'.format(ws))
-        print('gws={}'.format(gws))
         # Use the same stride for each stage
         ss = [self.stride for _ in range(num_s)]
         # Use SE for RegNetY
