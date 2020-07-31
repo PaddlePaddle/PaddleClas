@@ -16,320 +16,342 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
+import numpy as np
+import paddle
 import paddle.fluid as fluid
 from paddle.fluid.param_attr import ParamAttr
+from paddle.fluid.layer_helper import LayerHelper
+from paddle.fluid.dygraph.nn import Conv2D, Pool2D, BatchNorm, Linear, Dropout
+
+import math
 
 __all__ = [
-    'MobileNetV3', 'MobileNetV3_small_x0_35', 'MobileNetV3_small_x0_5',
-    'MobileNetV3_small_x0_75', 'MobileNetV3_small_x1_0',
-    'MobileNetV3_small_x1_25', 'MobileNetV3_large_x0_35',
-    'MobileNetV3_large_x0_5', 'MobileNetV3_large_x0_75',
-    'MobileNetV3_large_x1_0', 'MobileNetV3_large_x1_25'
+    "MobileNetV3_small_x0_35", "MobileNetV3_small_x0_5",
+    "MobileNetV3_small_x0_75", "MobileNetV3_small_x1_0",
+    "MobileNetV3_small_x1_25", "MobileNetV3_large_x0_35",
+    "MobileNetV3_large_x0_5", "MobileNetV3_large_x0_75",
+    "MobileNetV3_large_x1_0", "MobileNetV3_large_x1_25"
 ]
 
 
-class MobileNetV3():
-    def __init__(self,
-                 scale=1.0,
-                 model_name='small',
-                 lr_mult_list=[1.0, 1.0, 1.0, 1.0, 1.0]):
-        self.scale = scale
-        self.inplanes = 16
+def make_divisible(v, divisor=8, min_value=None):
+    if min_value is None:
+        min_value = divisor
+    new_v = max(min_value, int(v + divisor / 2) // divisor * divisor)
+    if new_v < 0.9 * v:
+        new_v += divisor
+    return new_v
 
-        self.lr_mult_list = lr_mult_list
-        assert len(self.lr_mult_list) == 5, \
-            "lr_mult_list length in MobileNetV3 must be 5 but got {}!!".format(
-            len(self.lr_mult_list))
-        self.curr_stage = 0
 
+class MobileNetV3(fluid.dygraph.Layer):
+    def __init__(self, scale=1.0, model_name="small", class_dim=1000):
+        super(MobileNetV3, self).__init__()
+
+        inplanes = 16
         if model_name == "large":
             self.cfg = [
                 # k, exp, c,  se,     nl,  s,
-                [3, 16, 16, False, 'relu', 1],
-                [3, 64, 24, False, 'relu', 2],
-                [3, 72, 24, False, 'relu', 1],
-                [5, 72, 40, True, 'relu', 2],
-                [5, 120, 40, True, 'relu', 1],
-                [5, 120, 40, True, 'relu', 1],
-                [3, 240, 80, False, 'hard_swish', 2],
-                [3, 200, 80, False, 'hard_swish', 1],
-                [3, 184, 80, False, 'hard_swish', 1],
-                [3, 184, 80, False, 'hard_swish', 1],
-                [3, 480, 112, True, 'hard_swish', 1],
-                [3, 672, 112, True, 'hard_swish', 1],
-                [5, 672, 160, True, 'hard_swish', 2],
-                [5, 960, 160, True, 'hard_swish', 1],
-                [5, 960, 160, True, 'hard_swish', 1],
+                [3, 16, 16, False, "relu", 1],
+                [3, 64, 24, False, "relu", 2],
+                [3, 72, 24, False, "relu", 1],
+                [5, 72, 40, True, "relu", 2],
+                [5, 120, 40, True, "relu", 1],
+                [5, 120, 40, True, "relu", 1],
+                [3, 240, 80, False, "hard_swish", 2],
+                [3, 200, 80, False, "hard_swish", 1],
+                [3, 184, 80, False, "hard_swish", 1],
+                [3, 184, 80, False, "hard_swish", 1],
+                [3, 480, 112, True, "hard_swish", 1],
+                [3, 672, 112, True, "hard_swish", 1],
+                [5, 672, 160, True, "hard_swish", 2],
+                [5, 960, 160, True, "hard_swish", 1],
+                [5, 960, 160, True, "hard_swish", 1],
             ]
             self.cls_ch_squeeze = 960
             self.cls_ch_expand = 1280
-            self.lr_interval = 3
         elif model_name == "small":
             self.cfg = [
                 # k, exp, c,  se,     nl,  s,
-                [3, 16, 16, True, 'relu', 2],
-                [3, 72, 24, False, 'relu', 2],
-                [3, 88, 24, False, 'relu', 1],
-                [5, 96, 40, True, 'hard_swish', 2],
-                [5, 240, 40, True, 'hard_swish', 1],
-                [5, 240, 40, True, 'hard_swish', 1],
-                [5, 120, 48, True, 'hard_swish', 1],
-                [5, 144, 48, True, 'hard_swish', 1],
-                [5, 288, 96, True, 'hard_swish', 2],
-                [5, 576, 96, True, 'hard_swish', 1],
-                [5, 576, 96, True, 'hard_swish', 1],
+                [3, 16, 16, True, "relu", 2],
+                [3, 72, 24, False, "relu", 2],
+                [3, 88, 24, False, "relu", 1],
+                [5, 96, 40, True, "hard_swish", 2],
+                [5, 240, 40, True, "hard_swish", 1],
+                [5, 240, 40, True, "hard_swish", 1],
+                [5, 120, 48, True, "hard_swish", 1],
+                [5, 144, 48, True, "hard_swish", 1],
+                [5, 288, 96, True, "hard_swish", 2],
+                [5, 576, 96, True, "hard_swish", 1],
+                [5, 576, 96, True, "hard_swish", 1],
             ]
             self.cls_ch_squeeze = 576
             self.cls_ch_expand = 1280
-            self.lr_interval = 2
         else:
             raise NotImplementedError(
                 "mode[{}_model] is not implemented!".format(model_name))
 
-    def net(self, input, class_dim=1000):
-        scale = self.scale
-        inplanes = self.inplanes
-        cfg = self.cfg
-        cls_ch_squeeze = self.cls_ch_squeeze
-        cls_ch_expand = self.cls_ch_expand
-        # conv1
-        conv = self.conv_bn_layer(
-            input,
+        self.conv1 = ConvBNLayer(
+            in_c=3,
+            out_c=make_divisible(inplanes * scale),
             filter_size=3,
-            num_filters=self.make_divisible(inplanes * scale),
             stride=2,
             padding=1,
             num_groups=1,
             if_act=True,
-            act='hard_swish',
-            name='conv1')
-        i = 0
-        inplanes = self.make_divisible(inplanes * scale)
-        for layer_cfg in cfg:
-            conv = self.residual_unit(
-                input=conv,
-                num_in_filter=inplanes,
-                num_mid_filter=self.make_divisible(scale * layer_cfg[1]),
-                num_out_filter=self.make_divisible(scale * layer_cfg[2]),
-                act=layer_cfg[4],
-                stride=layer_cfg[5],
-                filter_size=layer_cfg[0],
-                use_se=layer_cfg[3],
-                name='conv' + str(i + 2))
-            inplanes = self.make_divisible(scale * layer_cfg[2])
-            i += 1
-            self.curr_stage = i
+            act="hard_swish",
+            name="conv1")
 
-        conv = self.conv_bn_layer(
-            input=conv,
+        self.block_list = []
+        i = 0
+        inplanes = make_divisible(inplanes * scale)
+        for (k, exp, c, se, nl, s) in self.cfg:
+            self.block_list.append(
+                ResidualUnit(
+                    in_c=inplanes,
+                    mid_c=make_divisible(scale * exp),
+                    out_c=make_divisible(scale * c),
+                    filter_size=k,
+                    stride=s,
+                    use_se=se,
+                    act=nl,
+                    name="conv" + str(i + 2)))
+            self.add_sublayer(
+                sublayer=self.block_list[-1], name="conv" + str(i + 2))
+            inplanes = make_divisible(scale * c)
+            i += 1
+
+        self.last_second_conv = ConvBNLayer(
+            in_c=inplanes,
+            out_c=make_divisible(scale * self.cls_ch_squeeze),
             filter_size=1,
-            num_filters=self.make_divisible(scale * cls_ch_squeeze),
             stride=1,
             padding=0,
             num_groups=1,
             if_act=True,
-            act='hard_swish',
-            name='conv_last')
-        conv = fluid.layers.pool2d(
-            input=conv, pool_type='avg', global_pooling=True, use_cudnn=False)
-        conv = fluid.layers.conv2d(
-            input=conv,
-            num_filters=cls_ch_expand,
+            act="hard_swish",
+            name="conv_last")
+
+        self.pool = Pool2D(
+            pool_type="avg", global_pooling=True, use_cudnn=False)
+
+        self.last_conv = Conv2D(
+            num_channels=make_divisible(scale * self.cls_ch_squeeze),
+            num_filters=self.cls_ch_expand,
             filter_size=1,
             stride=1,
             padding=0,
             act=None,
-            param_attr=ParamAttr(name='last_1x1_conv_weights'),
+            param_attr=ParamAttr(name="last_1x1_conv_weights"),
             bias_attr=False)
-        conv = fluid.layers.hard_swish(conv)
-        drop = fluid.layers.dropout(x=conv, dropout_prob=0.2)
-        out = fluid.layers.fc(input=drop,
-                              size=class_dim,
-                              param_attr=ParamAttr(name='fc_weights'),
-                              bias_attr=ParamAttr(name='fc_offset'))
-        return out
 
-    def conv_bn_layer(self,
-                      input,
-                      filter_size,
-                      num_filters,
-                      stride,
-                      padding,
-                      num_groups=1,
-                      if_act=True,
-                      act=None,
-                      name=None,
-                      use_cudnn=True,
-                      res_last_bn_init=False):
-        lr_idx = self.curr_stage // self.lr_interval
-        lr_idx = min(lr_idx, len(self.lr_mult_list) - 1)
-        lr_mult = self.lr_mult_list[lr_idx]
+        self.out = Linear(
+            input_dim=self.cls_ch_expand,
+            output_dim=class_dim,
+            param_attr=ParamAttr("fc_weights"),
+            bias_attr=ParamAttr(name="fc_offset"))
 
-        conv = fluid.layers.conv2d(
-            input=input,
-            num_filters=num_filters,
+    def forward(self, inputs, label=None, dropout_prob=0.2):
+        x = self.conv1(inputs)
+        for block in self.block_list:
+            x = block(x)
+        x = self.last_second_conv(x)
+        x = self.pool(x)
+        x = self.last_conv(x)
+        x = fluid.layers.hard_swish(x)
+        x = fluid.layers.dropout(x=x, dropout_prob=dropout_prob)
+        x = fluid.layers.reshape(x, shape=[x.shape[0], x.shape[1]])
+        x = self.out(x)
+
+        return x
+
+
+class ConvBNLayer(fluid.dygraph.Layer):
+    def __init__(self,
+                 in_c,
+                 out_c,
+                 filter_size,
+                 stride,
+                 padding,
+                 num_groups=1,
+                 if_act=True,
+                 act=None,
+                 use_cudnn=True,
+                 name=""):
+        super(ConvBNLayer, self).__init__()
+        self.if_act = if_act
+        self.act = act
+        self.conv = fluid.dygraph.Conv2D(
+            num_channels=in_c,
+            num_filters=out_c,
             filter_size=filter_size,
             stride=stride,
             padding=padding,
             groups=num_groups,
-            act=None,
+            param_attr=ParamAttr(name=name + "_weights"),
+            bias_attr=False,
             use_cudnn=use_cudnn,
+            act=None)
+        self.bn = fluid.dygraph.BatchNorm(
+            num_channels=out_c,
+            act=None,
             param_attr=ParamAttr(
-                name=name + '_weights', learning_rate=lr_mult),
-            bias_attr=False)
-        bn_name = name + '_bn'
-        bn = fluid.layers.batch_norm(
-            input=conv,
-            param_attr=ParamAttr(
-                name=bn_name + "_scale",
+                name=name + "_bn_scale",
                 regularizer=fluid.regularizer.L2DecayRegularizer(
                     regularization_coeff=0.0)),
             bias_attr=ParamAttr(
-                name=bn_name + "_offset",
+                name=name + "_bn_offset",
                 regularizer=fluid.regularizer.L2DecayRegularizer(
                     regularization_coeff=0.0)),
-            moving_mean_name=bn_name + '_mean',
-            moving_variance_name=bn_name + '_variance')
-        if if_act:
-            if act == 'relu':
-                bn = fluid.layers.relu(bn)
-            elif act == 'hard_swish':
-                bn = fluid.layers.hard_swish(bn)
-        return bn
+            moving_mean_name=name + "_bn_mean",
+            moving_variance_name=name + "_bn_variance")
 
-    def make_divisible(self, v, divisor=8, min_value=None):
-        if min_value is None:
-            min_value = divisor
-        new_v = max(min_value, int(v + divisor / 2) // divisor * divisor)
-        if new_v < 0.9 * v:
-            new_v += divisor
-        return new_v
+    def forward(self, x):
+        x = self.conv(x)
+        x = self.bn(x)
+        if self.if_act:
+            if self.act == "relu":
+                x = fluid.layers.relu(x)
+            elif self.act == "hard_swish":
+                x = fluid.layers.hard_swish(x)
+            else:
+                print("The activation function is selected incorrectly.")
+                exit()
+        return x
 
-    def se_block(self, input, num_out_filter, ratio=4, name=None):
-        lr_idx = self.curr_stage // self.lr_interval
-        lr_idx = min(lr_idx, len(self.lr_mult_list) - 1)
-        lr_mult = self.lr_mult_list[lr_idx]
 
-        num_mid_filter = num_out_filter // ratio
-        pool = fluid.layers.pool2d(
-            input=input, pool_type='avg', global_pooling=True, use_cudnn=False)
-        conv1 = fluid.layers.conv2d(
-            input=pool,
+class ResidualUnit(fluid.dygraph.Layer):
+    def __init__(self,
+                 in_c,
+                 mid_c,
+                 out_c,
+                 filter_size,
+                 stride,
+                 use_se,
+                 act=None,
+                 name=''):
+        super(ResidualUnit, self).__init__()
+        self.if_shortcut = stride == 1 and in_c == out_c
+        self.if_se = use_se
+
+        self.expand_conv = ConvBNLayer(
+            in_c=in_c,
+            out_c=mid_c,
             filter_size=1,
-            num_filters=num_mid_filter,
-            act='relu',
-            param_attr=ParamAttr(
-                name=name + '_1_weights', learning_rate=lr_mult),
-            bias_attr=ParamAttr(
-                name=name + '_1_offset', learning_rate=lr_mult))
-        conv2 = fluid.layers.conv2d(
-            input=conv1,
-            filter_size=1,
-            num_filters=num_out_filter,
-            act='hard_sigmoid',
-            param_attr=ParamAttr(
-                name=name + '_2_weights', learning_rate=lr_mult),
-            bias_attr=ParamAttr(
-                name=name + '_2_offset', learning_rate=lr_mult))
-        scale = fluid.layers.elementwise_mul(x=input, y=conv2, axis=0)
-        return scale
-
-    def residual_unit(self,
-                      input,
-                      num_in_filter,
-                      num_mid_filter,
-                      num_out_filter,
-                      stride,
-                      filter_size,
-                      act=None,
-                      use_se=False,
-                      name=None):
-
-        conv0 = self.conv_bn_layer(
-            input=input,
-            filter_size=1,
-            num_filters=num_mid_filter,
             stride=1,
             padding=0,
             if_act=True,
             act=act,
-            name=name + '_expand')
-
-        conv1 = self.conv_bn_layer(
-            input=conv0,
+            name=name + "_expand")
+        self.bottleneck_conv = ConvBNLayer(
+            in_c=mid_c,
+            out_c=mid_c,
             filter_size=filter_size,
-            num_filters=num_mid_filter,
             stride=stride,
             padding=int((filter_size - 1) // 2),
+            num_groups=mid_c,
             if_act=True,
             act=act,
-            num_groups=num_mid_filter,
-            use_cudnn=False,
-            name=name + '_depthwise')
-        if use_se:
-            conv1 = self.se_block(
-                input=conv1, num_out_filter=num_mid_filter, name=name + '_se')
-
-        conv2 = self.conv_bn_layer(
-            input=conv1,
+            name=name + "_depthwise")
+        if self.if_se:
+            self.mid_se = SEModule(mid_c, name=name + "_se")
+        self.linear_conv = ConvBNLayer(
+            in_c=mid_c,
+            out_c=out_c,
             filter_size=1,
-            num_filters=num_out_filter,
             stride=1,
             padding=0,
             if_act=False,
-            name=name + '_linear',
-            res_last_bn_init=True)
-        if num_in_filter != num_out_filter or stride != 1:
-            return conv2
-        else:
-            return fluid.layers.elementwise_add(x=input, y=conv2, act=None)
+            act=None,
+            name=name + "_linear")
+
+    def forward(self, inputs):
+        x = self.expand_conv(inputs)
+        x = self.bottleneck_conv(x)
+        if self.if_se:
+            x = self.mid_se(x)
+        x = self.linear_conv(x)
+        if self.if_shortcut:
+            x = fluid.layers.elementwise_add(inputs, x)
+        return x
 
 
-def MobileNetV3_small_x0_35():
-    model = MobileNetV3(model_name='small', scale=0.35)
+class SEModule(fluid.dygraph.Layer):
+    def __init__(self, channel, reduction=4, name=""):
+        super(SEModule, self).__init__()
+        self.avg_pool = fluid.dygraph.Pool2D(
+            pool_type="avg", global_pooling=True, use_cudnn=False)
+        self.conv1 = fluid.dygraph.Conv2D(
+            num_channels=channel,
+            num_filters=channel // reduction,
+            filter_size=1,
+            stride=1,
+            padding=0,
+            act="relu",
+            param_attr=ParamAttr(name=name + "_1_weights"),
+            bias_attr=ParamAttr(name=name + "_1_offset"))
+        self.conv2 = fluid.dygraph.Conv2D(
+            num_channels=channel // reduction,
+            num_filters=channel,
+            filter_size=1,
+            stride=1,
+            padding=0,
+            act=None,
+            param_attr=ParamAttr(name + "_2_weights"),
+            bias_attr=ParamAttr(name=name + "_2_offset"))
+
+    def forward(self, inputs):
+        outputs = self.avg_pool(inputs)
+        outputs = self.conv1(outputs)
+        outputs = self.conv2(outputs)
+        outputs = fluid.layers.hard_sigmoid(outputs)
+        return fluid.layers.elementwise_mul(x=inputs, y=outputs, axis=0)
+
+
+def MobileNetV3_small_x0_35(**args):
+    model = MobileNetV3(model_name="small", scale=0.35, **args)
     return model
 
 
-def MobileNetV3_small_x0_5():
-    model = MobileNetV3(model_name='small', scale=0.5)
+def MobileNetV3_small_x0_5(**args):
+    model = MobileNetV3(model_name="small", scale=0.5, **args)
     return model
 
 
-def MobileNetV3_small_x0_75():
-    model = MobileNetV3(model_name='small', scale=0.75)
+def MobileNetV3_small_x0_75(**args):
+    model = MobileNetV3(model_name="small", scale=0.75, **args)
     return model
 
 
 def MobileNetV3_small_x1_0(**args):
-    model = MobileNetV3(model_name='small', scale=1.0, **args)
+    model = MobileNetV3(model_name="small", scale=1.0, **args)
     return model
 
 
-def MobileNetV3_small_x1_25():
-    model = MobileNetV3(model_name='small', scale=1.25)
+def MobileNetV3_small_x1_25(**args):
+    model = MobileNetV3(model_name="small", scale=1.25, **args)
     return model
 
 
-def MobileNetV3_large_x0_35():
-    model = MobileNetV3(model_name='large', scale=0.35)
+def MobileNetV3_large_x0_35(**args):
+    model = MobileNetV3(model_name="large", scale=0.35, **args)
     return model
 
 
-def MobileNetV3_large_x0_5():
-    model = MobileNetV3(model_name='large', scale=0.5)
+def MobileNetV3_large_x0_5(**args):
+    model = MobileNetV3(model_name="large", scale=0.5, **args)
     return model
 
 
-def MobileNetV3_large_x0_75():
-    model = MobileNetV3(model_name='large', scale=0.75)
+def MobileNetV3_large_x0_75(**args):
+    model = MobileNetV3(model_name="large", scale=0.75, **args)
     return model
 
 
 def MobileNetV3_large_x1_0(**args):
-    model = MobileNetV3(model_name='large', scale=1.0, **args)
+    model = MobileNetV3(model_name="large", scale=1.0, **args)
     return model
 
 
-def MobileNetV3_large_x1_25():
-    model = MobileNetV3(model_name='large', scale=1.25)
+def MobileNetV3_large_x1_25(**args):
+    model = MobileNetV3(model_name="large", scale=1.25, **args)
     return model
