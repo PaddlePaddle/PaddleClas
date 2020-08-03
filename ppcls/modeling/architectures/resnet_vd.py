@@ -45,7 +45,7 @@ class ConvBNLayer(fluid.dygraph.Layer):
 
         self.is_vd_mode = is_vd_mode
         self._pool2d_avg = Pool2D(
-            pool_size=2, pool_stride=2, pool_padding=0, pool_type='avg')
+            pool_size=2, pool_stride=2, pool_padding=0, pool_type='avg', ceil_mode=True)
         self._conv = Conv2D(
             num_channels=num_channels,
             num_filters=num_filters,
