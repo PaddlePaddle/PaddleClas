@@ -175,11 +175,6 @@ class RegNet():
                       act=None,
                       name=None,
                       final_bn=False):
-        param_attr, bias_attr = self.init_weights(
-            op_type='conv',
-            filter_size=filter_size,
-            num_channels=num_filters,
-            name=name)
         conv = fluid.layers.conv2d(
             input=input,
             num_filters=num_filters,
@@ -188,22 +183,13 @@ class RegNet():
             padding=padding,
             groups=groups,
             act=None,
-            param_attr=param_attr,
-            bias_attr=bias_attr,
             name=name + '.conv2d.output.1')
         bn_name = name + '_bn'
-        if final_bn:
-            param_attr, bias_attr = self.init_weights(
-                op_type='final_bn', name=bn_name)
-        else:
-            param_attr, bias_attr = self.init_weights(
-                op_type='bn', name=bn_name)
+
         return fluid.layers.batch_norm(
             input=conv,
             act=act,
             name=bn_name + '.output.1',
-            param_attr=param_attr,
-            bias_attr=bias_attr,
             moving_mean_name=bn_name + '_mean',
             moving_variance_name=bn_name + '_variance', )
 
