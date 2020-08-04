@@ -45,7 +45,11 @@ class ConvBNLayer(fluid.dygraph.Layer):
 
         self.is_vd_mode = is_vd_mode
         self._pool2d_avg = Pool2D(
-            pool_size=2, pool_stride=2, pool_padding=0, pool_type='avg', ceil_mode=True)
+            pool_size=2,
+            pool_stride=2,
+            pool_padding=0,
+            pool_type='avg',
+            ceil_mode=True)
         self._conv = Conv2D(
             num_channels=num_channels,
             num_filters=num_filters,
@@ -139,7 +143,7 @@ class BottleneckBlock(fluid.dygraph.Layer):
         return layer_helper.append_activation(y)
 
 
-class BisicBlock(fluid.dygraph.Layer):
+class BasicBlock(fluid.dygraph.Layer):
     def __init__(self,
                  num_channels,
                  num_filters,
@@ -148,7 +152,7 @@ class BisicBlock(fluid.dygraph.Layer):
                  if_first=False,
                  reduction_ratio=16,
                  name=None):
-        super(BisicBlock, self).__init__()
+        super(BasicBlock, self).__init__()
         self.stride = stride
         self.conv0 = ConvBNLayer(
             num_channels=num_channels,
@@ -313,9 +317,9 @@ class SE_ResNet_vd(fluid.dygraph.Layer):
                 shortcut = False
                 for i in range(depth[block]):
                     conv_name = "res" + str(block + 2) + chr(97 + i)
-                    bisic_block = self.add_sublayer(
+                    basic_block = self.add_sublayer(
                         'bb_%d_%d' % (block, i),
-                        BisicBlock(
+                        BasicBlock(
                             num_channels=num_channels[block]
                             if i == 0 else num_filters[block],
                             num_filters=num_filters[block],
@@ -323,7 +327,7 @@ class SE_ResNet_vd(fluid.dygraph.Layer):
                             shortcut=shortcut,
                             if_first=block == i == 0,
                             name=conv_name))
-                    self.block_list.append(bisic_block)
+                    self.block_list.append(basic_block)
                     shortcut = True
 
         self.pool2d_avg = Pool2D(

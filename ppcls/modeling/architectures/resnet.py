@@ -124,14 +124,14 @@ class BottleneckBlock(fluid.dygraph.Layer):
         return layer_helper.append_activation(y)
 
 
-class BisicBlock(fluid.dygraph.Layer):
+class BasicBlock(fluid.dygraph.Layer):
     def __init__(self,
                  num_channels,
                  num_filters,
                  stride,
                  shortcut=True,
                  name=None):
-        super(BisicBlock, self).__init__()
+        super(BasicBlock, self).__init__()
         self.stride = stride
         self.conv0 = ConvBNLayer(
             num_channels=num_channels,
@@ -231,16 +231,16 @@ class ResNet(fluid.dygraph.Layer):
                 shortcut = False
                 for i in range(depth[block]):
                     conv_name = "res" + str(block + 2) + chr(97 + i)
-                    bisic_block = self.add_sublayer(
+                    basic_block = self.add_sublayer(
                         conv_name,
-                        BisicBlock(
+                        BasicBlock(
                             num_channels=num_channels[block]
                             if i == 0 else num_filters[block],
                             num_filters=num_filters[block],
                             stride=2 if i == 0 and block != 0 else 1,
                             shortcut=shortcut,
                             name=conv_name))
-                    self.block_list.append(bisic_block)
+                    self.block_list.append(basic_block)
                     shortcut = True
 
         self.pool2d_avg = Pool2D(
