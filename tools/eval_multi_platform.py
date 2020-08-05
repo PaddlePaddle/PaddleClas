@@ -68,7 +68,7 @@ def main(args):
 
     compiled_valid_prog = program.compile(config, valid_prog)
     program.run(valid_dataloader, exe, compiled_valid_prog, valid_fetchs, -1,
-                'eval')
+                'eval', config)
 
 
 if __name__ == '__main__':
