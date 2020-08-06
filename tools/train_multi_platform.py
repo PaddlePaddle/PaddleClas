@@ -18,6 +18,7 @@ from __future__ import print_function
 
 import argparse
 import os
+from sys import version_info
 
 import paddle.fluid as fluid
 
@@ -110,11 +111,15 @@ def main(args):
         compiled_valid_prog = program.compile(
             config, valid_prog, share_prog=compiled_train_prog)
 
+    vdl_writer = None
     if args.vdl_dir:
-        from visualdl import LogWriter
-        vdl_writer = LogWriter(args.vdl_dir)
-    else:
-        vdl_writer = None
+        if version_info.major == 2:
+            logger.info(
+                "visualdl is just supported for python3, so it is disabled in python2..."
+            )
+        else:
+            from visualdl import LogWriter
+            vdl_writer = LogWriter(args.vdl_dir)
 
     for epoch_id in range(config.epochs):
         # 1. train with train dataset

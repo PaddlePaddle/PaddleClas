@@ -46,3 +46,8 @@ VALID:
 >>
 * Q: What should I do if I want to transform the weights' format from `pdparams` to an earlier version(before Paddle1.7.0), which consists of the scattered files?
 * A: You can use `fluid.load` to load the `pdparams` weights and use `fluid.io.save_vars` to save the weights as scattered files.
+
+
+>>
+* Q: The error occured when using visualdl under python2, shows that: `TypeError: __init__() missing 1 required positional argument: 'sync_cycle'`.
+* A: `Visualdl` is only supported on python3 as now, whose version needs also be higher than `2.0`. If your visualdl version is lower than 2.0, you can also install visualdl 2.0 by `pip3 install visualdl==2.0.0b8 -i https://mirror.baidu.com/pypi/simple`.
