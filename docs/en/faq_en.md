@@ -45,7 +45,15 @@ VALID:
 
 >>
 * Q: What should I do if I want to transform the weights' format from `pdparams` to an earlier version(before Paddle1.7.0), which consists of the scattered files?
-* A: You can use `fluid.load` to load the `pdparams` weights and use `fluid.io.save_vars` to save the weights as scattered files.
+* A: You can use `fluid.load` to load the `pdparams` weights and use `fluid.io.save_vars` to save the weights as scattered files. The demo is as follows. Finally all the scattered files will be saved in the path `path_to_save_var`.
+```
+fluid.load(
+        program=infer_prog, model_path=args.pretrained_model, executor=exe)
+state = fluid.io.load_program_state(args.pretrained_model)
+def exists(var):
+    return var.name in state
+fluid.io.save_vars(exe, "./path_to_save_var", infer_prog, predicate=exists)
+```
 
 
 >>
