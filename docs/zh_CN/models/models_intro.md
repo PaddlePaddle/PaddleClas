@@ -192,8 +192,10 @@ python tools/infer/predict.py \
 
 - ResNeSt与RegNet系列
   - ResNeSt系列<sup>[[24](#ref24)]</sup>([论文地址](https://arxiv.org/abs/2004.08955))
-    - [ResNeSt50_fast_1s1x64d)(https://paddle-imagenet-models-name.bj.bcebos.com/ResNeSt50_fast_1s1x64d_pretrained.pdparams)
-    - [ResNeSt50)(https://paddle-imagenet-models-name.bj.bcebos.com/ResNeSt50_pretrained.pdparams)
+    - [ResNeSt50_fast_1s1x64d](https://paddle-imagenet-models-name.bj.bcebos.com/ResNeSt50_fast_1s1x64d_pretrained.pdparams)
+    - [ResNeSt50](https://paddle-imagenet-models-name.bj.bcebos.com/ResNeSt50_pretrained.pdparams)
+  - RegNet系列<sup>[[25](#ref25)]</sup>([paper link](https://arxiv.org/abs/2003.13678))
+    - [RegNetX_4GF](https://paddle-imagenet-models-name.bj.bcebos.com/RegNetX_4GF_pretrained.pdparams)
 
 
 - 其他模型
@@ -268,3 +270,5 @@ python tools/infer/predict.py \
 <a name="ref23">[23]</a> Han K, Wang Y, Tian Q, et al. GhostNet: More features from cheap operations[C]//Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition. 2020: 1580-1589.
 
 <a name="ref24">[24]</a> Zhang H, Wu C, Zhang Z, et al. Resnest: Split-attention networks[J]. arXiv preprint arXiv:2004.08955, 2020.
+
+<a name="ref25">[25]</a> Radosavovic I, Kosaraju R P, Girshick R, et al. Designing network design spaces[C]//Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition. 2020: 10428-10436.

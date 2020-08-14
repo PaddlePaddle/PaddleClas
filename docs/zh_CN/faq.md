@@ -45,7 +45,15 @@ VALID:
 
 >>
 * Q: 如果想将保存的`pdparams`模型参数文件转换为早期版本(Paddle1.7.0之前)的零碎文件(每个文件均为一个单独的模型参数)，该怎么实现呢？
-* A: 可以首先导入`pdparams`模型，之后使用`fluid.io.save_vars`函数将模型保存为零散的碎文件。
+* A: 可以首先导入`pdparams`模型，之后使用`fluid.io.save_vars`函数将模型保存为零散的碎文件。示例代码如下，最终所有零散文件会被保存在`path_to_save_var`目录下。
+```
+fluid.load(
+        program=infer_prog, model_path=args.pretrained_model, executor=exe)
+state = fluid.io.load_program_state(args.pretrained_model)
+def exists(var):
+    return var.name in state
+fluid.io.save_vars(exe, "./path_to_save_var", infer_prog, predicate=exists)
+```
 
 
 >>
