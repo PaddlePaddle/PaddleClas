@@ -9,7 +9,7 @@ ShuffleNet系列网络是旷视提出的轻量化网络结构，到目前为止�
 
 MobileNetV3是Google于2019年提出的一种基于NAS的新的轻量级网络，为了进一步提升效果，将relu和sigmoid激活函数分别替换为hard_swish与hard_sigmoid激活函数，同时引入了一些专门减小网络计算量的改进策略。
 
-GhosttNet是华为于2020年提出的一种全新的轻量化网络结构，通过引入ghost module，大大减缓了传统深度网络中特征的冗余计算问题，使得网络的参数量和计算量大大降低。
+GhostNet是华为于2020年提出的一种全新的轻量化网络结构，通过引入ghost module，大大减缓了传统深度网络中特征的冗余计算问题，使得网络的参数量和计算量大大降低。
 
 ![](../../images/models/mobile_arm_top1.png)
 
