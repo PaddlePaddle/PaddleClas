@@ -45,12 +45,13 @@ def _mkdir_if_not_exist(path):
                 raise OSError('Failed to mkdir {}'.format(path))
 
 
-def _load_state(path):
-    if os.path.exists(path + '.pdopt'):
+def _load_state(path, prefix='ppcls'):
+    model_path = os.path.join(path, prefix) 
+    if os.path.exists(model_path + '.pdopt'):
         # XXX another hack to ignore the optimizer state
         tmp = tempfile.mkdtemp()
-        dst = os.path.join(tmp, os.path.basename(os.path.normpath(path)))
-        shutil.copy(path + '.pdparams', dst + '.pdparams')
+        dst = os.path.join(tmp, os.path.basename(os.path.normpath(model_path)))
+        shutil.copy(model_path + '.pdparams', dst + '.pdparams')
         state = fluid.io.load_program_state(dst)
         shutil.rmtree(tmp)
     else:
@@ -58,7 +59,7 @@ def _load_state(path):
     return state
 
 
-def load_params(exe, prog, path, ignore_params=None):
+def load_params(exe, prog, path, prefix='ppcls', ignore_params=None):
     """
     Load model from the given path.
     Args:
@@ -70,7 +71,8 @@ def load_params(exe, prog, path, ignore_params=None):
             and the usage can refer to the document
             docs/advanced_tutorials/TRANSFER_LEARNING.md
     """
-    if not (os.path.isdir(path) or os.path.exists(path + '.pdparams')):
+    params_path = os.path.join(path, prefix + '.pdparams')
+    if not (os.path.isdir(path) or os.path.exists(params_path)):
         raise ValueError("Model pretrain path {} does not "
                          "exists.".format(path))
 
@@ -106,16 +108,17 @@ def load_params(exe, prog, path, ignore_params=None):
     fluid.io.set_program_state(prog, state)
 
 
-def init_model(config, program, exe):
+def init_model(config, program, exe, prefix='ppcls'):
     """
     load model from checkpoint or pretrained_model
     """
     checkpoints = config.get('checkpoints')
     if checkpoints:
-        fluid.load(program, checkpoints, exe)
+        model_path = os.path.join(checkpoints, prefix)
+        fluid.load(program, model_path, exe)
         logger.info(logger.coloring("Finish initing model from {}".format(checkpoints),"HEADER"))
         return
-
+    
     pretrained_model = config.get('pretrained_model')
     if pretrained_model:
         if not isinstance(pretrained_model, list):
