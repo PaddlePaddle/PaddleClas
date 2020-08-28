@@ -1,24 +1,21 @@
 mode: 'train'
 ARCHITECTURE:
-    name: 'ResNet50_vd'
-    params:
-        lr_mult_list: [0.1, 0.1, 0.2, 0.2, 0.3]
-pretrained_model: "./pretrained/ResNet50_vd_ssld_pretrained"
-load_static_weights: True
+    name: 'CSPResNet50'
+pretrained_model: ""
 model_save_dir: "./output/"
-classes_num: 102
+classes_num: 1000
 total_images: 1020
 save_interval: 1
-validate: True
+validate: False
 valid_interval: 1
-epochs: 20
+epochs: 1
 topk: 5
 image_shape: [3, 224, 224]
 
 LEARNING_RATE:
     function: 'Cosine'          
     params:                   
-        lr: 0.00375
+        lr: 0.0125
 
 OPTIMIZER:
     function: 'Momentum'
@@ -26,7 +23,7 @@ OPTIMIZER:
         momentum: 0.9
     regularizer:
         function: 'L2'
-        factor: 0.000001
+        factor: 0.00001
 
 TRAIN:
     batch_size: 32
@@ -48,8 +45,6 @@ TRAIN:
             mean: [0.485, 0.456, 0.406]
             std: [0.229, 0.224, 0.225]
             order: ''
-        - RandomErasing:
-            EPSILON: 0.5
         - ToCHWImage:
 
 VALID:

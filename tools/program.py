@@ -71,6 +71,8 @@ def create_model(architecture, classes_num):
     """
     name = architecture["name"]
     params = architecture.get("params", {})
+    print(name)
+    print(params)
     return architectures.__dict__[name](class_dim=classes_num, **params)
 
 

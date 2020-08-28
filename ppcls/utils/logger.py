@@ -16,9 +16,6 @@ import logging
 import os
 import datetime
 
-from imp import reload
-reload(logging)
-
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s %(levelname)s: %(message)s",

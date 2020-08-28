@@ -1,9 +1,9 @@
 mode: 'train'
 ARCHITECTURE:
-    name: 'ResNet50_vd'
+    name: 'MobileNetV3_large_x1_0'
     params:
-        lr_mult_list: [0.1, 0.1, 0.2, 0.2, 0.3]
-pretrained_model: "./pretrained/ResNet50_vd_ssld_pretrained"
+        lr_mult_list: [0.25, 0.25, 0.5, 0.5, 0.75]
+pretrained_model: "./pretrained/MobileNetV3_large_x1_0_ssld_pretrained"
 load_static_weights: True
 model_save_dir: "./output/"
 classes_num: 102
@@ -48,8 +48,6 @@ TRAIN:
             mean: [0.485, 0.456, 0.406]
             std: [0.229, 0.224, 0.225]
             order: ''
-        - RandomErasing:
-            EPSILON: 0.5
         - ToCHWImage:
 
 VALID:

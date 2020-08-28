@@ -102,7 +102,7 @@ def main(args):
                                 config.model_save_dir,
                                 config.ARCHITECTURE["name"])
                             save_model(net, optimizer, model_path,
-                                       "best_model_in_epoch_" + str(epoch_id))
+                                       "best_model")
 
                 # 3. save the persistable model
                 if epoch_id % config.save_interval == 0:
