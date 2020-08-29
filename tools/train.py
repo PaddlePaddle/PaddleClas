@@ -57,12 +57,13 @@ def main(args):
 
     with fluid.dygraph.guard(place):
         net = program.create_model(config.ARCHITECTURE, config.classes_num)
-        if config["use_data_parallel"]:
-            strategy = fluid.dygraph.parallel.prepare_context()
-            net = fluid.dygraph.parallel.DataParallel(net, strategy)
 
         optimizer = program.create_optimizer(
             config, parameter_list=net.parameters())
+
+        if config["use_data_parallel"]:
+            strategy = fluid.dygraph.parallel.prepare_context()
+            net = fluid.dygraph.parallel.DataParallel(net, strategy)
 
         # load model from checkpoint or pretrained model
         init_model(config, net, optimizer)

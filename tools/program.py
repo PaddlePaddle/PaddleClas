@@ -21,6 +21,7 @@ import time
 
 from collections import OrderedDict
 
+import paddle
 import paddle.fluid as fluid
 
 from ppcls.optimizer import LearningRateBuilder
@@ -280,7 +281,7 @@ def mixed_precision_optimizer(config, optimizer):
 
 
 def create_feeds(batch, use_mix):
-    image = to_variable(batch[0].numpy().astype("float32"))
+    image = batch[0]
     if use_mix:
         y_a = to_variable(batch[1].numpy().astype("int64").reshape(-1, 1))
         y_b = to_variable(batch[2].numpy().astype("int64").reshape(-1, 1))
