@@ -18,6 +18,8 @@ import numpy as np
 
 import paddle.fluid as fluid
 from ppcls.modeling import architectures
+from ppcls.utils.save_load import load_dygraph_pretrain
+
 
 def parse_args():
     def str2bool(v):
@@ -28,8 +30,10 @@ def parse_args():
     parser.add_argument("-m", "--model", type=str)
     parser.add_argument("-p", "--pretrained_model", type=str)
     parser.add_argument("--use_gpu", type=str2bool, default=True)
+    parser.add_argument("--load_static_weights", type=str2bool, default=True)
 
     return parser.parse_args()
+
 
 def create_operators():
     size = 224
@@ -66,32 +70,32 @@ def main():
     args = parse_args()
     operators = create_operators()
     # assign the place
-    gpu_id = fluid.dygraph.parallel.Env().dev_id
-    place = fluid.CUDAPlace(gpu_id)
-    
-    pre_weights_dict = fluid.load_program_state(args.pretrained_model)
+    if args.use_gpu:
+        gpu_id = fluid.dygraph.parallel.Env().dev_id
+        place = fluid.CUDAPlace(gpu_id)
+    else:
+        place = fluid.CPUPlace()
+
     with fluid.dygraph.guard(place):
         net = architectures.__dict__[args.model]()
         data = preprocess(args.image_file, operators)
         data = np.expand_dims(data, axis=0)
         data = fluid.dygraph.to_variable(data)
-        dy_weights_dict = net.state_dict()
-        pre_weights_dict_new = {}
-        for key in dy_weights_dict:
-            weights_name = dy_weights_dict[key].name
-            pre_weights_dict_new[key] = pre_weights_dict[weights_name]
-        net.set_dict(pre_weights_dict_new)
+        load_dygraph_pretrain(net, args.pretrained_model,
+                              args.load_static_weights)
         net.eval()
         outputs = net(data)
         outputs = fluid.layers.softmax(outputs)
         outputs = outputs.numpy()
-        
+
     probs = postprocess(outputs)
     rank = 1
     for idx, prob in probs:
-        print("top{:d}, class id: {:d}, probability: {:.4f}".format(
-            rank, idx, prob))
+        print("top{:d}, class id: {:d}, probability: {:.4f}".format(rank, idx,
+                                                                    prob))
         rank += 1
+    return
+
 
 if __name__ == "__main__":
     main()

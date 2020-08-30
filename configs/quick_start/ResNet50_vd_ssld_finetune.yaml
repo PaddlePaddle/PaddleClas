@@ -4,6 +4,7 @@ ARCHITECTURE:
     params:
         lr_mult_list: [0.1, 0.1, 0.2, 0.2, 0.3]
 pretrained_model: "./pretrained/ResNet50_vd_ssld_pretrained"
+load_static_weights: True
 model_save_dir: "./output/"
 classes_num: 102
 total_images: 1020
