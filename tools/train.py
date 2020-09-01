@@ -52,10 +52,14 @@ def main(args):
     gpu_id = fluid.dygraph.parallel.Env().dev_id
     place = fluid.CUDAPlace(gpu_id)
 
+    use_data_parallel = int(os.getenv("PADDLE_TRAINERS_NUM", 1)) != 1
+    config["use_data_parallel"] = use_data_parallel
+
     with fluid.dygraph.guard(place):
-        strategy = fluid.dygraph.parallel.prepare_context()
         net = program.create_model(config.ARCHITECTURE, config.classes_num)
-        net = fluid.dygraph.parallel.DataParallel(net, strategy)
+        if config["use_data_parallel"]:
+            strategy = fluid.dygraph.parallel.prepare_context()
+            net = fluid.dygraph.parallel.DataParallel(net, strategy)
 
         optimizer = program.create_optimizer(
             config, parameter_list=net.parameters())
@@ -79,7 +83,8 @@ def main(args):
             program.run(train_dataloader, config, net, optimizer, epoch_id,
                         'train')
 
-            if fluid.dygraph.parallel.Env().local_rank == 0:
+            if not config["use_data_parallel"] or fluid.dygraph.parallel.Env(
+            ).local_rank == 0:
                 # 2. validate with validate dataset
                 if config.validate and epoch_id % config.valid_interval == 0:
                     net.eval()

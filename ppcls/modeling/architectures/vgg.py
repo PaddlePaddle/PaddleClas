@@ -106,7 +106,7 @@ class VGGNet(fluid.dygraph.Layer):
         x = self._conv_block_4(x)
         x = self._conv_block_5(x)
 
-        x = fluid.layers.flatten(x, axis=0)
+        x = fluid.layers.reshape(x, [0,-1])
         x = self._fc1(x)
         x = self._drop(x)
         x = self._fc2(x)

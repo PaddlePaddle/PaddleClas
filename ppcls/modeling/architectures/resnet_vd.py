@@ -1,55 +1,199 @@
-#copyright (c) 2020 PaddlePaddle Authors. All Rights Reserve.
+# copyright (c) 2020 PaddlePaddle Authors. All Rights Reserve.
 #
-#Licensed under the Apache License, Version 2.0 (the "License");
-#you may not use this file except in compliance with the License.
-#You may obtain a copy of the License at
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
 #
 #    http://www.apache.org/licenses/LICENSE-2.0
 #
-#Unless required by applicable law or agreed to in writing, software
-#distributed under the License is distributed on an "AS IS" BASIS,
-#WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#See the License for the specific language governing permissions and
-#limitations under the License.
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-import math
-
+import numpy as np
 import paddle
 import paddle.fluid as fluid
 from paddle.fluid.param_attr import ParamAttr
+from paddle.fluid.layer_helper import LayerHelper
+from paddle.fluid.dygraph.nn import Conv2D, Pool2D, BatchNorm, Linear, Dropout
+
+import math
 
 __all__ = [
-    "ResNet", "ResNet18_vd", "ResNet34_vd", "ResNet50_vd", "ResNet101_vd",
-    "ResNet152_vd", "ResNet200_vd"
+    "ResNet18_vd", "ResNet34_vd", "ResNet50_vd", "ResNet101_vd", "ResNet152_vd"
 ]
 
 
-class ResNet():
-    def __init__(self,
-                 layers=50,
-                 is_3x3=False,
-                 postfix_name="",
-                 lr_mult_list=[1.0, 1.0, 1.0, 1.0, 1.0]):
-        self.layers = layers
-        self.is_3x3 = is_3x3
-        self.postfix_name = "" if postfix_name is None else postfix_name
-        self.lr_mult_list = lr_mult_list
-        assert len(
-            self.lr_mult_list
-        ) == 5, "lr_mult_list length in ResNet must be 5 but got {}!!".format(
-            len(self.lr_mult_list))
-        self.curr_stage = 0
+class ConvBNLayer(fluid.dygraph.Layer):
+    def __init__(
+            self,
+            num_channels,
+            num_filters,
+            filter_size,
+            stride=1,
+            groups=1,
+            is_vd_mode=False,
+            act=None,
+            name=None, ):
+        super(ConvBNLayer, self).__init__()
 
-    def net(self, input, class_dim=1000):
-        is_3x3 = self.is_3x3
-        layers = self.layers
+        self.is_vd_mode = is_vd_mode
+        self._pool2d_avg = Pool2D(
+            pool_size=2,
+            pool_stride=2,
+            pool_padding=0,
+            pool_type='avg',
+            ceil_mode=True)
+        self._conv = Conv2D(
+            num_channels=num_channels,
+            num_filters=num_filters,
+            filter_size=filter_size,
+            stride=stride,
+            padding=(filter_size - 1) // 2,
+            groups=groups,
+            act=None,
+            param_attr=ParamAttr(name=name + "_weights"),
+            bias_attr=False)
+        if name == "conv1":
+            bn_name = "bn_" + name
+        else:
+            bn_name = "bn" + name[3:]
+        self._batch_norm = BatchNorm(
+            num_filters,
+            act=act,
+            param_attr=ParamAttr(name=bn_name + '_scale'),
+            bias_attr=ParamAttr(bn_name + '_offset'),
+            moving_mean_name=bn_name + '_mean',
+            moving_variance_name=bn_name + '_variance')
+
+    def forward(self, inputs):
+        if self.is_vd_mode:
+            inputs = self._pool2d_avg(inputs)
+        y = self._conv(inputs)
+        y = self._batch_norm(y)
+        return y
+
+
+class BottleneckBlock(fluid.dygraph.Layer):
+    def __init__(self,
+                 num_channels,
+                 num_filters,
+                 stride,
+                 shortcut=True,
+                 if_first=False,
+                 name=None):
+        super(BottleneckBlock, self).__init__()
+
+        self.conv0 = ConvBNLayer(
+            num_channels=num_channels,
+            num_filters=num_filters,
+            filter_size=1,
+            act='relu',
+            name=name + "_branch2a")
+        self.conv1 = ConvBNLayer(
+            num_channels=num_filters,
+            num_filters=num_filters,
+            filter_size=3,
+            stride=stride,
+            act='relu',
+            name=name + "_branch2b")
+        self.conv2 = ConvBNLayer(
+            num_channels=num_filters,
+            num_filters=num_filters * 4,
+            filter_size=1,
+            act=None,
+            name=name + "_branch2c")
+
+        if not shortcut:
+            self.short = ConvBNLayer(
+                num_channels=num_channels,
+                num_filters=num_filters * 4,
+                filter_size=1,
+                stride=1,
+                is_vd_mode=False if if_first else True,
+                name=name + "_branch1")
+
+        self.shortcut = shortcut
+
+    def forward(self, inputs):
+        y = self.conv0(inputs)
+        conv1 = self.conv1(y)
+        conv2 = self.conv2(conv1)
+
+        if self.shortcut:
+            short = inputs
+        else:
+            short = self.short(inputs)
+        y = fluid.layers.elementwise_add(x=short, y=conv2)
+
+        layer_helper = LayerHelper(self.full_name(), act='relu')
+        return layer_helper.append_activation(y)
+
+
+class BasicBlock(fluid.dygraph.Layer):
+    def __init__(self,
+                 num_channels,
+                 num_filters,
+                 stride,
+                 shortcut=True,
+                 if_first=False,
+                 name=None):
+        super(BasicBlock, self).__init__()
+        self.stride = stride
+        self.conv0 = ConvBNLayer(
+            num_channels=num_channels,
+            num_filters=num_filters,
+            filter_size=3,
+            stride=stride,
+            act='relu',
+            name=name + "_branch2a")
+        self.conv1 = ConvBNLayer(
+            num_channels=num_filters,
+            num_filters=num_filters,
+            filter_size=3,
+            act=None,
+            name=name + "_branch2b")
+
+        if not shortcut:
+            self.short = ConvBNLayer(
+                num_channels=num_channels,
+                num_filters=num_filters,
+                filter_size=1,
+                stride=1,
+                is_vd_mode=False if if_first else True,
+                name=name + "_branch1")
+
+        self.shortcut = shortcut
+
+    def forward(self, inputs):
+        y = self.conv0(inputs)
+        conv1 = self.conv1(y)
+
+        if self.shortcut:
+            short = inputs
+        else:
+            short = self.short(inputs)
+        y = fluid.layers.elementwise_add(x=short, y=conv1)
+
+        layer_helper = LayerHelper(self.full_name(), act='relu')
+        return layer_helper.append_activation(y)
+
+
+class ResNet_vd(fluid.dygraph.Layer):
+    def __init__(self, layers=50, class_dim=1000):
+        super(ResNet_vd, self).__init__()
+
+        self.layers = layers
         supported_layers = [18, 34, 50, 101, 152, 200]
         assert layers in supported_layers, \
-            "supported layers are {} but input layer is {}".format(supported_layers, layers)
+            "supported layers are {} but input layer is {}".format(
+                supported_layers, layers)
 
         if layers == 18:
             depth = [2, 2, 2, 2]
@@ -61,254 +205,129 @@ class ResNet():
             depth = [3, 8, 36, 3]
         elif layers == 200:
             depth = [3, 12, 48, 3]
+        num_channels = [64, 256, 512,
+                        1024] if layers >= 50 else [64, 64, 128, 256]
         num_filters = [64, 128, 256, 512]
-        if is_3x3 == False:
-            conv = self.conv_bn_layer(
-                input=input,
-                num_filters=64,
-                filter_size=7,
-                stride=2,
-                act='relu')
-        else:
-            conv = self.conv_bn_layer(
-                input=input,
-                num_filters=32,
-                filter_size=3,
-                stride=2,
-                act='relu',
-                name='conv1_1')
-            conv = self.conv_bn_layer(
-                input=conv,
-                num_filters=32,
-                filter_size=3,
-                stride=1,
-                act='relu',
-                name='conv1_2')
-            conv = self.conv_bn_layer(
-                input=conv,
-                num_filters=64,
-                filter_size=3,
-                stride=1,
-                act='relu',
-                name='conv1_3')
 
-        conv = fluid.layers.pool2d(
-            input=conv,
-            pool_size=3,
-            pool_stride=2,
-            pool_padding=1,
-            pool_type='max')
+        self.conv1_1 = ConvBNLayer(
+            num_channels=3,
+            num_filters=32,
+            filter_size=3,
+            stride=2,
+            act='relu',
+            name="conv1_1")
+        self.conv1_2 = ConvBNLayer(
+            num_channels=32,
+            num_filters=32,
+            filter_size=3,
+            stride=1,
+            act='relu',
+            name="conv1_2")
+        self.conv1_3 = ConvBNLayer(
+            num_channels=32,
+            num_filters=64,
+            filter_size=3,
+            stride=1,
+            act='relu',
+            name="conv1_3")
+        self.pool2d_max = Pool2D(
+            pool_size=3, pool_stride=2, pool_padding=1, pool_type='max')
 
+        self.block_list = []
         if layers >= 50:
             for block in range(len(depth)):
-                self.curr_stage += 1
+                shortcut = False
                 for i in range(depth[block]):
-                    if layers in [101, 152, 200] and block == 2:
+                    if layers in [101, 152] and block == 2:
                         if i == 0:
                             conv_name = "res" + str(block + 2) + "a"
                         else:
                             conv_name = "res" + str(block + 2) + "b" + str(i)
                     else:
                         conv_name = "res" + str(block + 2) + chr(97 + i)
-                    conv = self.bottleneck_block(
-                        input=conv,
-                        num_filters=num_filters[block],
-                        stride=2 if i == 0 and block != 0 else 1,
-                        if_first=block == i == 0,
-                        name=conv_name)
+                    bottleneck_block = self.add_sublayer(
+                        'bb_%d_%d' % (block, i),
+                        BottleneckBlock(
+                            num_channels=num_channels[block]
+                            if i == 0 else num_filters[block] * 4,
+                            num_filters=num_filters[block],
+                            stride=2 if i == 0 and block != 0 else 1,
+                            shortcut=shortcut,
+                            if_first=block == i == 0,
+                            name=conv_name))
+                    self.block_list.append(bottleneck_block)
+                    shortcut = True
         else:
             for block in range(len(depth)):
-                self.curr_stage += 1
+                shortcut = False
                 for i in range(depth[block]):
                     conv_name = "res" + str(block + 2) + chr(97 + i)
-                    conv = self.basic_block(
-                        input=conv,
-                        num_filters=num_filters[block],
-                        stride=2 if i == 0 and block != 0 else 1,
-                        if_first=block == i == 0,
-                        name=conv_name)
+                    basic_block = self.add_sublayer(
+                        'bb_%d_%d' % (block, i),
+                        BasicBlock(
+                            num_channels=num_channels[block]
+                            if i == 0 else num_filters[block],
+                            num_filters=num_filters[block],
+                            stride=2 if i == 0 and block != 0 else 1,
+                            shortcut=shortcut,
+                            if_first=block == i == 0,
+                            name=conv_name))
+                    self.block_list.append(basic_block)
+                    shortcut = True
 
-        pool = fluid.layers.pool2d(
-            input=conv, pool_type='avg', global_pooling=True)
-        stdv = 1.0 / math.sqrt(pool.shape[1] * 1.0)
+        self.pool2d_avg = Pool2D(
+            pool_size=7, pool_type='avg', global_pooling=True)
 
-        out = fluid.layers.fc(
-            input=pool,
-            size=class_dim,
-            param_attr=fluid.param_attr.ParamAttr(
-                name="fc_0.w_0" + self.postfix_name,
-                initializer=fluid.initializer.Uniform(-stdv, stdv)),
-            bias_attr=ParamAttr(name="fc_0.b_0" + self.postfix_name))
+        self.pool2d_avg_channels = num_channels[-1] * 2
 
-        return out
+        stdv = 1.0 / math.sqrt(self.pool2d_avg_channels * 1.0)
 
-    def conv_bn_layer(self,
-                      input,
-                      num_filters,
-                      filter_size,
-                      stride=1,
-                      groups=1,
-                      act=None,
-                      name=None):
-        lr_mult = self.lr_mult_list[self.curr_stage]
-        conv = fluid.layers.conv2d(
-            input=input,
-            num_filters=num_filters,
-            filter_size=filter_size,
-            stride=stride,
-            padding=(filter_size - 1) // 2,
-            groups=groups,
-            act=None,
-            param_attr=ParamAttr(name=name + "_weights" + self.postfix_name),
-            bias_attr=False)
-        if name == "conv1":
-            bn_name = "bn_" + name
-        else:
-            bn_name = "bn" + name[3:]
-        return fluid.layers.batch_norm(
-            input=conv,
-            act=act,
-            param_attr=ParamAttr(name=bn_name + '_scale' + self.postfix_name),
-            bias_attr=ParamAttr(bn_name + '_offset' + self.postfix_name),
-            moving_mean_name=bn_name + '_mean' + self.postfix_name,
-            moving_variance_name=bn_name + '_variance' + self.postfix_name)
-
-    def conv_bn_layer_new(self,
-                          input,
-                          num_filters,
-                          filter_size,
-                          stride=1,
-                          groups=1,
-                          act=None,
-                          name=None):
-        lr_mult = self.lr_mult_list[self.curr_stage]
-        pool = fluid.layers.pool2d(
-            input=input,
-            pool_size=2,
-            pool_stride=2,
-            pool_padding=0,
-            pool_type='avg',
-            ceil_mode=True)
-
-        conv = fluid.layers.conv2d(
-            input=pool,
-            num_filters=num_filters,
-            filter_size=filter_size,
-            stride=1,
-            padding=(filter_size - 1) // 2,
-            groups=groups,
-            act=None,
+        self.out = Linear(
+            self.pool2d_avg_channels,
+            class_dim,
             param_attr=ParamAttr(
-                name=name + "_weights" + self.postfix_name,
-                learning_rate=lr_mult),
-            bias_attr=False)
-        if name == "conv1":
-            bn_name = "bn_" + name
-        else:
-            bn_name = "bn" + name[3:]
-        return fluid.layers.batch_norm(
-            input=conv,
-            act=act,
-            param_attr=ParamAttr(
-                name=bn_name + '_scale' + self.postfix_name,
-                learning_rate=lr_mult),
-            bias_attr=ParamAttr(
-                bn_name + '_offset' + self.postfix_name,
-                learning_rate=lr_mult),
-            moving_mean_name=bn_name + '_mean' + self.postfix_name,
-            moving_variance_name=bn_name + '_variance' + self.postfix_name)
+                initializer=fluid.initializer.Uniform(-stdv, stdv),
+                name="fc_0.w_0"),
+            bias_attr=ParamAttr(name="fc_0.b_0"))
 
-    def shortcut(self, input, ch_out, stride, name, if_first=False):
-        ch_in = input.shape[1]
-        if ch_in != ch_out or stride != 1:
-            if if_first:
-                return self.conv_bn_layer(input, ch_out, 1, stride, name=name)
-            else:
-                return self.conv_bn_layer_new(
-                    input, ch_out, 1, stride, name=name)
-        elif if_first:
-            return self.conv_bn_layer(input, ch_out, 1, stride, name=name)
-        else:
-            return input
-
-    def bottleneck_block(self, input, num_filters, stride, name, if_first):
-        conv0 = self.conv_bn_layer(
-            input=input,
-            num_filters=num_filters,
-            filter_size=1,
-            act='relu',
-            name=name + "_branch2a")
-        conv1 = self.conv_bn_layer(
-            input=conv0,
-            num_filters=num_filters,
-            filter_size=3,
-            stride=stride,
-            act='relu',
-            name=name + "_branch2b")
-        conv2 = self.conv_bn_layer(
-            input=conv1,
-            num_filters=num_filters * 4,
-            filter_size=1,
-            act=None,
-            name=name + "_branch2c")
-
-        short = self.shortcut(
-            input,
-            num_filters * 4,
-            stride,
-            if_first=if_first,
-            name=name + "_branch1")
-
-        return fluid.layers.elementwise_add(x=short, y=conv2, act='relu')
-
-    def basic_block(self, input, num_filters, stride, name, if_first):
-        conv0 = self.conv_bn_layer(
-            input=input,
-            num_filters=num_filters,
-            filter_size=3,
-            act='relu',
-            stride=stride,
-            name=name + "_branch2a")
-        conv1 = self.conv_bn_layer(
-            input=conv0,
-            num_filters=num_filters,
-            filter_size=3,
-            act=None,
-            name=name + "_branch2b")
-        short = self.shortcut(
-            input,
-            num_filters,
-            stride,
-            if_first=if_first,
-            name=name + "_branch1")
-        return fluid.layers.elementwise_add(x=short, y=conv1, act='relu')
+    def forward(self, inputs):
+        y = self.conv1_1(inputs)
+        y = self.conv1_2(y)
+        y = self.conv1_3(y)
+        y = self.pool2d_max(y)
+        for block in self.block_list:
+            y = block(y)
+        y = self.pool2d_avg(y)
+        y = fluid.layers.reshape(y, shape=[-1, self.pool2d_avg_channels])
+        y = self.out(y)
+        return y
 
 
-def ResNet18_vd():
-    model = ResNet(layers=18, is_3x3=True)
+def ResNet18_vd(**args):
+    model = ResNet_vd(layers=18, **args)
     return model
 
 
-def ResNet34_vd():
-    model = ResNet(layers=34, is_3x3=True)
+def ResNet34_vd(**args):
+    model = ResNet_vd(layers=34, **args)
     return model
 
 
 def ResNet50_vd(**args):
-    model = ResNet(layers=50, is_3x3=True, **args)
+    model = ResNet_vd(layers=50, **args)
     return model
 
 
-def ResNet101_vd():
-    model = ResNet(layers=101, is_3x3=True)
+def ResNet101_vd(**args):
+    model = ResNet_vd(layers=101, **args)
     return model
 
 
-def ResNet152_vd():
-    model = ResNet(layers=152, is_3x3=True)
+def ResNet152_vd(**args):
+    model = ResNet_vd(layers=152, **args)
     return model
 
 
-def ResNet200_vd():
-    model = ResNet(layers=200, is_3x3=True)
+def ResNet200_vd(**args):
+    model = ResNet_vd(layers=200, **args)
     return model
