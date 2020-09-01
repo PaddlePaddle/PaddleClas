@@ -314,6 +314,7 @@ def run(dataloader, config, net, optimizer=None, epoch=0, mode='train'):
             ("lr", AverageMeter(
                 'lr', 'f', need_avg=False)),
             ("batch_time", AverageMeter('elapse', '.3f')),
+            ('reader_time', AverageMeter('reader', '.3f')),
         ])
     else:
         topk_name = 'top{}'.format(config.topk)
@@ -324,10 +325,12 @@ def run(dataloader, config, net, optimizer=None, epoch=0, mode='train'):
             ("lr", AverageMeter(
                 'lr', 'f', need_avg=False)),
             ("batch_time", AverageMeter('elapse', '.3f')),
+            ('reader_time', AverageMeter('reader', '.3f')),
         ])
 
     tic = time.time()
     for idx, batch in enumerate(dataloader()):
+        metric_list['reader_time'].update(time.time() - tic)
         batch_size = len(batch[0])
         feeds = create_feeds(batch, use_mix)
         fetchs = create_fetchs(feeds, net, config, mode)
