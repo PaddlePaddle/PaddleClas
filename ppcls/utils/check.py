@@ -31,12 +31,12 @@ def check_version():
     Log error and exit when the installed version of paddlepaddle is
     not satisfied.
     """
-    err = "PaddlePaddle version 1.7 or higher is required, " \
+    err = "PaddlePaddle version 2.0.0 or higher is required, " \
           "or a suitable develop version is satisfied as well. \n" \
           "Please make sure the version is good with your code." \
 
     try:
-        fluid.require_version('1.7.0')
+        fluid.require_version('2.0.0')
     except Exception:
         logger.error(err)
         sys.exit(1)
