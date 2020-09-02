@@ -1,18 +1,17 @@
 import paddle
 import paddle.fluid as fluid
 from paddle.fluid.param_attr import ParamAttr
-from paddle.fluid.layer_helper import LayerHelper
 from paddle.fluid.dygraph.nn import Conv2D, Pool2D, BatchNorm, Linear
 import math
 
-__all__ = ['GoogLeNet_DY']
+__all__ = ['GoogLeNet']
+
 
 def xavier(channels, filter_size, name):
     stdv = (3.0 / (filter_size**2 * channels))**0.5
     param_attr = ParamAttr(
         initializer=fluid.initializer.Uniform(-stdv, stdv),
         name=name + "_weights")
-
     return param_attr
 
 
@@ -90,8 +89,8 @@ class Inception(fluid.dygraph.Layer):
         convprj = self._convprj(pool)
 
         cat = fluid.layers.concat([conv1, conv3, conv5, convprj], axis=1)
-        layer_helper = LayerHelper(self.full_name(), act="relu")
-        return layer_helper.append_activation(cat)
+        cat = fluid.layers.relu(cat)
+        return cat
 
 
 class GoogleNetDY(fluid.dygraph.Layer):

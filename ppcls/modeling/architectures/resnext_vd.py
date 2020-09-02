@@ -20,7 +20,6 @@ import numpy as np
 import paddle
 import paddle.fluid as fluid
 from paddle.fluid.param_attr import ParamAttr
-from paddle.fluid.layer_helper import LayerHelper
 from paddle.fluid.dygraph.nn import Conv2D, Pool2D, BatchNorm, Linear, Dropout
 
 import math
@@ -46,7 +45,11 @@ class ConvBNLayer(fluid.dygraph.Layer):
 
         self.is_vd_mode = is_vd_mode
         self._pool2d_avg = Pool2D(
-            pool_size=2, pool_stride=2, pool_padding=0, pool_type='avg', ceil_mode=True)
+            pool_size=2,
+            pool_stride=2,
+            pool_padding=0,
+            pool_type='avg',
+            ceil_mode=True)
         self._conv = Conv2D(
             num_channels=num_channels,
             num_filters=num_filters,
@@ -131,10 +134,8 @@ class BottleneckBlock(fluid.dygraph.Layer):
         else:
             short = self.short(inputs)
 
-        y = fluid.layers.elementwise_add(x=short, y=conv2)
-
-        layer_helper = LayerHelper(self.full_name(), act='relu')
-        return layer_helper.append_activation(y)
+        y = fluid.layers.elementwise_add(x=short, y=conv2, act='relu')
+        return y
 
 
 class ResNeXt(fluid.dygraph.Layer):

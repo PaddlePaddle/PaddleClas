@@ -1,7 +1,6 @@
 import paddle
 import paddle.fluid as fluid
 from paddle.fluid.param_attr import ParamAttr
-from paddle.fluid.layer_helper import LayerHelper
 from paddle.fluid.dygraph.nn import Conv2D, Pool2D, BatchNorm, Linear, Dropout
 import math
 import collections
@@ -491,6 +490,7 @@ class SEBlock(fluid.dygraph.Layer):
             num_squeezed_channels,
             oup,
             1,
+            act="sigmoid",
             use_bias=True,
             padding_type=padding_type,
             name=name + "_se_expand")
@@ -499,8 +499,6 @@ class SEBlock(fluid.dygraph.Layer):
         x = self._pool(inputs)
         x = self._conv1(x)
         x = self._conv2(x)
-        layer_helper = LayerHelper(self.full_name(), act='sigmoid')
-        x = layer_helper.append_activation(x)
         return fluid.layers.elementwise_mul(inputs, x)
 
 
@@ -565,18 +563,17 @@ class MbConvBlock(fluid.dygraph.Layer):
 
     def forward(self, inputs):
         x = inputs
-        layer_helper = LayerHelper(self.full_name(), act='swish')
         if self.expand_ratio != 1:
             x = self._ecn(x)
-            x = layer_helper.append_activation(x)
+            x = fluid.layers.swish(x)
         x = self._dcn(x)
-        x = layer_helper.append_activation(x)
+        x = fluid.layers.swish(x)
         if self.has_se:
             x = self._se(x)
         x = self._pcn(x)
         if self.id_skip and \
-            self.block_args.stride == 1 and \
-            self.block_args.input_filters == self.block_args.output_filters:
+                self.block_args.stride == 1 and \
+                self.block_args.input_filters == self.block_args.output_filters:
             if self.drop_connect_rate:
                 x = _drop_connect(x, self.drop_connect_rate, self.is_test)
             x = fluid.layers.elementwise_add(x, inputs)
@@ -697,8 +694,7 @@ class ExtractFeatures(fluid.dygraph.Layer):
 
     def forward(self, inputs):
         x = self._conv_stem(inputs)
-        layer_helper = LayerHelper(self.full_name(), act='swish')
-        x = layer_helper.append_activation(x)
+        x = fluid.layers.swish(x)
         for _mc_block in self.conv_seq:
             x = _mc_block(x)
         return x

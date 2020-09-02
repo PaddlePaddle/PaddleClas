@@ -19,7 +19,6 @@ import numpy as np
 import paddle
 import paddle.fluid as fluid
 from paddle.fluid.param_attr import ParamAttr
-from paddle.fluid.layer_helper import LayerHelper
 from paddle.fluid.dygraph.nn import Conv2D, Pool2D, BatchNorm, Linear, Dropout
 
 import math
@@ -137,10 +136,8 @@ class BottleneckBlock(fluid.dygraph.Layer):
             short = inputs
         else:
             short = self.short(inputs)
-        y = fluid.layers.elementwise_add(x=short, y=scale)
-
-        layer_helper = LayerHelper(self.full_name(), act='relu')
-        return layer_helper.append_activation(y)
+        y = fluid.layers.elementwise_add(x=short, y=scale, act='relu')
+        return y
 
 
 class BasicBlock(fluid.dygraph.Layer):
@@ -194,10 +191,8 @@ class BasicBlock(fluid.dygraph.Layer):
             short = inputs
         else:
             short = self.short(inputs)
-        y = fluid.layers.elementwise_add(x=short, y=scale)
-
-        layer_helper = LayerHelper(self.full_name(), act='relu')
-        return layer_helper.append_activation(y)
+        y = fluid.layers.elementwise_add(x=short, y=scale, act='relu')
+        return y
 
 
 class SELayer(fluid.dygraph.Layer):
