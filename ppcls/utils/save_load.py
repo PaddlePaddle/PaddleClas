@@ -48,7 +48,7 @@ def _mkdir_if_not_exist(path):
 def load_dygraph_pretrain(
         model,
         path=None,
-        load_static_weights=False, ):
+        load_static_weights=False):
     if not (os.path.isdir(path) or os.path.exists(path + '.pdparams')):
         raise ValueError("Model pretrain path {} does not "
                          "exists.".format(path))
@@ -72,6 +72,26 @@ def load_dygraph_pretrain(
     return
 
 
+def load_distillation_model(model, pretrained_model, load_static_weights):
+    logger.info("In distillation mode, teacher model will be "
+                   "loaded firstly before student model.")
+    assert len(pretrained_model) == 2, "pretrained_model length should be 2 but got {}".format(len(pretrained_model))
+    assert len(load_static_weights) == 2, "load_static_weights length should be 2 but got {}".format(len(load_static_weights))
+    load_dygraph_pretrain(
+        model.teacher,
+        path=pretrained_model[0],
+        load_static_weights=load_static_weights[0])
+    logger.info(
+        logger.coloring("Finish initing teacher model from {}".format(
+            pretrained_model), "HEADER"))
+    load_dygraph_pretrain(
+        model.student,
+        path=pretrained_model[1],
+        load_static_weights=load_static_weights[1])
+    logger.info(
+        logger.coloring("Finish initing student model from {}".format(
+            pretrained_model), "HEADER"))
+
 def init_model(config, net, optimizer=None):
     """
     load model from checkpoint or pretrained_model
@@ -94,18 +114,13 @@ def init_model(config, net, optimizer=None):
     load_static_weights = config.get('load_static_weights', False)
     use_distillation = config.get('use_distillation', False)
     if pretrained_model:
-        if not isinstance(pretrained_model, list):
-            pretrained_model = [pretrained_model]
-        if not isinstance(load_static_weights, list):
-            load_static_weights = [load_static_weights] * len(pretrained_model)
-        for idx, pretrained in enumerate(pretrained_model):
-            load_static = load_static_weights[idx]
-            model = net
-            if use_distillation and not load_static:
-                model = net.teacher
+        if isinstance(pretrained_model, list): # load distillation pretrained model
+            if not isinstance(load_static_weights, list):
+                load_static_weights = [load_static_weights] * len(pretrained_model)
+            load_distillation_model(net, pretrained_model, load_static_weights)
+        else: # common load
             load_dygraph_pretrain(
-                model, path=pretrained, load_static_weights=load_static)
-
+                net, path=pretrained_model, load_static_weights=load_static_weights)
             logger.info(
                 logger.coloring("Finish initing model from {}".format(
                     pretrained_model), "HEADER"))
