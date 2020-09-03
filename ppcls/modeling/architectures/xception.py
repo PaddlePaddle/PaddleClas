@@ -1,7 +1,6 @@
 import paddle
 import paddle.fluid as fluid
 from paddle.fluid.param_attr import ParamAttr
-from paddle.fluid.layer_helper import LayerHelper
 from paddle.fluid.dygraph.nn import Conv2D, Pool2D, BatchNorm, Linear
 import math
 
@@ -99,11 +98,10 @@ class EntryFlowBottleneckBlock(fluid.dygraph.Layer):
     def forward(self, inputs):
         conv0 = inputs
         short = self._short(inputs)
-        layer_helper = LayerHelper(self.full_name(), act="relu")
         if self.relu_first:
-            conv0 = layer_helper.append_activation(conv0)
+            conv0 = fluid.layers.relu(conv0)
         conv1 = self._conv1(conv0)
-        conv2 = layer_helper.append_activation(conv1)
+        conv2 = fluid.layers.relu(conv1)
         conv2 = self._conv2(conv2)
         pool = self._pool(conv2)
         return fluid.layers.elementwise_add(x=short, y=pool)
@@ -177,12 +175,11 @@ class MiddleFlowBottleneckBlock(fluid.dygraph.Layer):
             name=name + "_branch2c_weights")
 
     def forward(self, inputs):
-        layer_helper = LayerHelper(self.full_name(), act="relu")
-        conv0 = layer_helper.append_activation(inputs)
+        conv0 = fluid.layers.relu(inputs)
         conv0 = self._conv_0(conv0)
-        conv1 = layer_helper.append_activation(conv0)
+        conv1 = fluid.layers.relu(conv0)
         conv1 = self._conv_1(conv1)
-        conv2 = layer_helper.append_activation(conv1)
+        conv2 = fluid.layers.relu(conv1)
         conv2 = self._conv_2(conv2)
         return fluid.layers.elementwise_add(x=inputs, y=conv2)
 
@@ -276,10 +273,9 @@ class ExitFlowBottleneckBlock(fluid.dygraph.Layer):
 
     def forward(self, inputs):
         short = self._short(inputs)
-        layer_helper = LayerHelper(self.full_name(), act="relu")
-        conv0 = layer_helper.append_activation(inputs)
+        conv0 = fluid.layers.relu(inputs)
         conv1 = self._conv_1(conv0)
-        conv2 = layer_helper.append_activation(conv1)
+        conv2 = fluid.layers.relu(conv1)
         conv2 = self._conv_2(conv2)
         pool = self._pool(conv2)
         return fluid.layers.elementwise_add(x=short, y=pool)
@@ -306,12 +302,11 @@ class ExitFlow(fluid.dygraph.Layer):
             bias_attr=ParamAttr(name="fc_offset"))
 
     def forward(self, inputs):
-        layer_helper = LayerHelper(self.full_name(), act="relu")
         conv0 = self._conv_0(inputs)
         conv1 = self._conv_1(conv0)
-        conv1 = layer_helper.append_activation(conv1)
+        conv1 = fluid.layers.relu(conv1)
         conv2 = self._conv_2(conv1)
-        conv2 = layer_helper.append_activation(conv2)
+        conv2 = fluid.layers.relu(conv2)
         pool = self._pool(conv2)
         pool = fluid.layers.reshape(pool, [0, -1])
         out = self._out(pool)

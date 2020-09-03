@@ -1,7 +1,6 @@
 import paddle
 import paddle.fluid as fluid
 from paddle.fluid.param_attr import ParamAttr
-from paddle.fluid.layer_helper import LayerHelper
 from paddle.fluid.dygraph.nn import Conv2D, Pool2D, BatchNorm, Linear, Dropout
 
 __all__ = ["Xception41_deeplab", "Xception65_deeplab", "Xception71_deeplab"]
@@ -226,13 +225,12 @@ class Xception_Block(fluid.dygraph.Layer):
                 name=name + "/shortcut")
 
     def forward(self, inputs):
-        layer_helper = LayerHelper(self.full_name(), act='relu')
         if not self.activation_fn_in_separable_conv:
-            x = layer_helper.append_activation(inputs)
+            x = fluid.layers.relu(inputs)
             x = self._conv1(x)
-            x = layer_helper.append_activation(x)
+            x = fluid.layers.relu(x)
             x = self._conv2(x)
-            x = layer_helper.append_activation(x)
+            x = fluid.layers.relu(x)
             x = self._conv3(x)
         else:
             x = self._conv1(inputs)
