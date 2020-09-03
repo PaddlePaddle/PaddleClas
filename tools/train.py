@@ -49,8 +49,7 @@ def parse_args():
 def main(args):
     config = get_config(args.config, overrides=args.override, show=True)
     # assign the place
-    gpu_id = fluid.dygraph.parallel.Env().dev_id
-    place = fluid.CUDAPlace(gpu_id)
+    place = fluid.CUDAPlace(fluid.dygraph.ParallelEnv().dev_id)
 
     use_data_parallel = int(os.getenv("PADDLE_TRAINERS_NUM", 1)) != 1
     config["use_data_parallel"] = use_data_parallel
