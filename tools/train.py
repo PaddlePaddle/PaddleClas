@@ -13,19 +13,21 @@
 # limitations under the License.
 
 from __future__ import absolute_import
+import program
+from ppcls.utils import logger
+from ppcls.utils.save_load import init_model, save_model
+from ppcls.utils.config import get_config
+from ppcls.data import Reader
+import paddle.fluid as fluid
 from __future__ import division
 from __future__ import print_function
 
 import argparse
 import os
-
-import paddle.fluid as fluid
-
-from ppcls.data import Reader
-from ppcls.utils.config import get_config
-from ppcls.utils.save_load import init_model, save_model
-from ppcls.utils import logger
-import program
+import sys
+__dir__ = os.path.dirname(os.path.abspath(__file__))
+sys.path.append(__dir__)
+sys.path.append(os.path.abspath(os.path.join(__dir__, '..')))
 
 
 def parse_args():
@@ -49,8 +51,12 @@ def parse_args():
 def main(args):
     config = get_config(args.config, overrides=args.override, show=True)
     # assign the place
-    gpu_id = fluid.dygraph.parallel.Env().dev_id
-    place = fluid.CUDAPlace(gpu_id)
+    use_gpu = config.get("use_gpu", True)
+    if use_gpu:
+        gpu_id = fluid.dygraph.ParallelEnv().dev_id
+        place = fluid.CUDAPlace(gpu_id)
+    else:
+        place = fluid.CPUPlace()
 
     use_data_parallel = int(os.getenv("PADDLE_TRAINERS_NUM", 1)) != 1
     config["use_data_parallel"] = use_data_parallel
