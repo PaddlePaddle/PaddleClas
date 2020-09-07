@@ -13,19 +13,22 @@
 # limitations under the License.
 
 from __future__ import absolute_import
+import program
+from ppcls.utils import logger
+from ppcls.utils.save_load import init_model
+from ppcls.utils.config import get_config
+from ppcls.data import Reader
+import paddle.fluid as fluid
+import paddle
+import argparse
 from __future__ import division
 from __future__ import print_function
 
 import os
-import argparse
-
-from ppcls.data import Reader
-from ppcls.utils.config import get_config
-from ppcls.utils.save_load import init_model
-from ppcls.utils import logger
-
-from paddle.fluid.incubate.fleet.collective import fleet
-from paddle.fluid.incubate.fleet.base import role_maker
+import sys
+__dir__ = os.path.dirname(os.path.abspath(__file__))
+sys.path.append(__dir__)
+sys.path.append(os.path.abspath(os.path.join(__dir__, '..')))
 
 
 def parse_args():
@@ -47,20 +50,25 @@ def parse_args():
 
 
 def main(args):
-    # assign the place
-    gpu_id = fluid.dygraph.parallel.Env().dev_id
-    place = fluid.CUDAPlace(gpu_id)
+    config = get_config(args.config, overrides=args.override, show=True)
+    # assign place
+    use_gpu = config.get("use_gpu", True)
+    if use_gpu:
+        gpu_id = fluid.dygraph.ParallelEnv().dev_id
+        place = fluid.CUDAPlace(gpu_id)
+    else:
+        place = fluid.CPUPlace()
     with fluid.dygraph.guard(place):
-        pre_weights_dict = fluid.dygraph.load_dygraph(config.pretrained_model)[0]
         strategy = fluid.dygraph.parallel.prepare_context()
         net = program.create_model(config.ARCHITECTURE, config.classes_num)
         net = fluid.dygraph.parallel.DataParallel(net, strategy)
-        net.set_dict(pre_weights_dict)
+        init_model(config, net, optimizer=None)
         valid_dataloader = program.create_dataloader()
         valid_reader = Reader(config, 'valid')()
         valid_dataloader.set_sample_list_generator(valid_reader, place)
         net.eval()
         top1_acc = program.run(valid_dataloader, config, net, None, 0, 'valid')
+
 
 if __name__ == '__main__':
     args = parse_args()
