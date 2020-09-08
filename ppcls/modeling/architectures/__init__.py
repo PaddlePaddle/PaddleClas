@@ -25,6 +25,7 @@ from .dpn import DPN68
 from .densenet import DenseNet121
 from .hrnet import HRNet_W18_C
 from .efficientnet import EfficientNetB0
+from .resnest import ResNeSt50_fast_1s1x64d, ResNeSt50
 from .googlenet import GoogLeNet
 from .mobilenet_v1 import MobileNetV1_x0_25, MobileNetV1_x0_5, MobileNetV1_x0_75, MobileNetV1
 from .mobilenet_v2 import MobileNetV2_x0_25, MobileNetV2_x0_5, MobileNetV2_x0_75, MobileNetV2, MobileNetV2_x1_5, MobileNetV2_x2_0
