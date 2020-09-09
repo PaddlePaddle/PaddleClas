@@ -49,13 +49,13 @@ TRAIN:
             mean: [0.485, 0.456, 0.406]
             std: [0.229, 0.224, 0.225]
             order: ''
+        - ToCHWImage:
         - RandomErasing:
               EPSILON: 0.5
               sl: 0.02
               sh: 0.4
-              r1: 0.3                                     
+              r1: 0.3
               mean: [0., 0., 0.]
-        - ToCHWImage:
 
 VALID:
     batch_size: 64
