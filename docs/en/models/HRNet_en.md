@@ -22,6 +22,7 @@ At present, there are 7 pretrained models of such models open-sourced by PaddleC
 | Models      | Top1   | Top5   | Reference<br>top1 | Reference<br>top5 | FLOPS<br>(G) | Parameters<br>(M) |
 |:--:|:--:|:--:|:--:|:--:|:--:|:--:|
 | HRNet_W18_C | 0.769  | 0.934  | 0.768             | 0.934             | 4.140        | 21.290            |
+| HRNet_W18_C_ssld | 0.816  | 0.958  | 0.768             | 0.934             | 4.140        | 21.290            |
 | HRNet_W30_C | 0.780  | 0.940  | 0.782             | 0.942             | 16.230       | 37.710            |
 | HRNet_W32_C | 0.783  | 0.942  | 0.785             | 0.942             | 17.860       | 41.230            |
 | HRNet_W40_C | 0.788  | 0.945  | 0.789             | 0.945             | 25.410       | 57.550            |
@@ -35,6 +36,7 @@ At present, there are 7 pretrained models of such models open-sourced by PaddleC
 | Models      | Crop Size | Resize Short Size | FP32<br>Batch Size=1<br>(ms) |
 |-------------|-----------|-------------------|--------------------------|
 | HRNet_W18_C | 224       | 256               | 7.368                    |
+| HRNet_W18_C_ssld | 224       | 256               | 7.368                    |
 | HRNet_W30_C | 224       | 256               | 9.402                    |
 | HRNet_W32_C | 224       | 256               | 9.467                    |
 | HRNet_W40_C | 224       | 256               | 10.739                   |
@@ -50,6 +52,7 @@ At present, there are 7 pretrained models of such models open-sourced by PaddleC
 | Models      | Crop Size | Resize Short Size | FP16<br>Batch Size=1<br>(ms) | FP16<br>Batch Size=4<br>(ms) | FP16<br>Batch Size=8<br>(ms) | FP32<br>Batch Size=1<br>(ms) | FP32<br>Batch Size=4<br>(ms) | FP32<br>Batch Size=8<br>(ms) |
 |-------------|-----------|-------------------|------------------------------|------------------------------|------------------------------|------------------------------|------------------------------|------------------------------|
 | HRNet_W18_C | 224       | 256               | 6.79093                      | 11.50986                     | 17.67244                     | 7.40636                      | 13.29752                     | 23.33445                     |
+| HRNet_W18_C_ssld | 224       | 256               | 6.79093                      | 11.50986                     | 17.67244                     | 7.40636                      | 13.29752                     | 23.33445                     |
 | HRNet_W30_C | 224       | 256               | 8.98077                      | 14.08082                     | 21.23527                     | 9.57594                      | 17.35485                     | 32.6933                      |
 | HRNet_W32_C | 224       | 256               | 8.82415                      | 14.21462                     | 21.19804                     | 9.49807                      | 17.72921                     | 32.96305                     |
 | HRNet_W40_C | 224       | 256               | 11.4229                      | 19.1595                      | 30.47984                     | 12.12202                     | 25.68184                     | 48.90623                     |
