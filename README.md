@@ -178,7 +178,8 @@ HRNet系列模型的精度、速度指标如下表所示，更多关于该系列
 
 | 模型          | Top-1 Acc | Top-5 Acc | time(ms)<br>bs=1 | time(ms)<br>bs=4 | Flops(G) | Params(M) | 下载地址                                                                                 |
 |-------------|-----------|-----------|------------------|------------------|----------|-----------|--------------------------------------------------------------------------------------|
-| HRNet_W18_C | 0.7580    | 0.9258    | 7.40636          | 13.29752         | 4.14     | 21.29     | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/HRNet_W18_C_pretrained.tar) |
+| HRNet_W18_C | 0.7692    | 0.9339    | 7.40636          | 13.29752         | 4.14     | 21.29     | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/HRNet_W18_C_pretrained.tar) |
+| HRNet_W18_C_ssld | 0.81162    | 0.95804    | 7.40636          | 13.29752         | 4.14     | 21.29     | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/HRNet_W18_C_ssld_pretrained.tar) |
 | HRNet_W30_C | 0.7804    | 0.9402    | 9.57594          | 17.35485         | 16.23    | 37.71     | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/HRNet_W30_C_pretrained.tar) |
 | HRNet_W32_C | 0.7828    | 0.9424    | 9.49807          | 17.72921         | 17.86    | 41.23     | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/HRNet_W32_C_pretrained.tar) |
 | HRNet_W40_C | 0.7877    | 0.9447    | 12.12202         | 25.68184         | 25.41    | 57.55     | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/HRNet_W40_C_pretrained.tar) |
@@ -266,6 +267,7 @@ ResNeSt与RegNet系列模型的精度、速度指标如下表所示，更多关�
 | MobileNetV3_small_x0_75          | 0.6602    | 0.8633    | 5.28435                | 0.088    | 2.37      | 9.6     | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/MobileNetV3_small_x0_75_pretrained.tar)          |
 | MobileNetV3_small_x0_5           | 0.5921    | 0.8152    | 3.35165                | 0.043    | 1.9       | 7.8     | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/MobileNetV3_small_x0_5_pretrained.tar)           |
 | MobileNetV3_small_x0_35          | 0.5303    | 0.7637    | 2.6352                 | 0.026    | 1.66      | 6.9     | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/MobileNetV3_small_x0_35_pretrained.tar)          |
+| MobileNetV3_small_x0_35_ssld          | 0.5555    | 0.7771    | 2.6352                 | 0.026    | 1.66      | 6.9     | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/MobileNetV3_small_x0_35_ssld_pretrained.tar)          |
 | MobileNetV3_large_x1_0_ssld      | 0.7896    | 0.9448    | 19.30835               | 0.45     | 5.47      | 21      | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/MobileNetV3_large_x1_0_ssld_pretrained.tar)      |
 | MobileNetV3_large_x1_0_ssld_int8 | 0.7605    |     -      | 14.395                 |    -     |      -     | 10      | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/MobileNetV3_large_x1_0_ssld_int8_pretrained.tar) |
 | MobileNetV3_small_x1_0_ssld      | 0.7129    | 0.9010    | 6.5463                 | 0.123    | 2.94      | 12      | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/MobileNetV3_small_x1_0_ssld_pretrained.tar)      |
