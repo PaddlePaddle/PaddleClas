@@ -6,7 +6,6 @@
 
 飞桨图像分类套件PaddleClas是飞桨为工业界和学术界所准备的一个图像分类任务的工具集，助力使用者训练出更好的视觉模型和应用落地。
 
-
 **近期更新**
 - 2020.07.14 添加Res2Net200_vd_26w_4s_ssld模型，在ImageNet上Top-1 Acc可达85.13%；添加Fix_ResNet50_vd_ssld_v2模型，，在ImageNet上Top-1 Acc可达84.0%。
 - 2020.06.17 添加英文文档。
@@ -17,19 +16,17 @@
 
 ## 特性
 
-- 丰富的模型库
-    - 基于ImageNet1k分类数据集，PaddleClas提供了包括ResNet、ResNet_vd、Res2Net、HRNet、MobileNetV3、GhostNet等24种系列的分类网络结构以及移动端模型。支持的***预训练模型列表、下载地址以及更多信息***请见文档教程中的[**模型库章节**](./docs/zh_CN/models/models_intro.md)。
+- 丰富的模型库：基于ImageNet1k分类数据集，PaddleClas提供了24个系列的分类网络结构，同时支持模型的训练、评估与预测。支持的预训练模型列表、下载地址以及更多信息请见文档教程中的模型库章节。
 
-- SSLD知识蒸馏
-    - 基于PaddleClas自研的SSLD知识蒸馏方案，模型效果普遍提升3%以上。关于SSLD知识蒸馏的详细介绍以及实验请参考文档教程中的[**知识蒸馏章节**](./docs/zh_CN/advanced_tutorials/distillation/distillation.md)。
+- SSLD知识蒸馏：基于PaddleClas自研的SSLD知识蒸馏方案，模型效果普遍提升3%以上。关于SSLD知识蒸馏的详细介绍以及实验请参考文档教程中的知识蒸馏章节。
 
-- 数据增广
-    - PaddleClas提供了AutoAugment、Cutout、Cutmix等8种数据增广算法的复现和在统一实验环境下的效果评估。每种数据增广方法的详细介绍、对比的实验环境请参考文档教程中的[**数据增广章节**](./docs/zh_CN/advanced_tutorials/image_augmentation/ImageAugment.md)。
+- 数据增广：PaddleClas提供了AutoAugment、Cutout、Cutmix等8种数据增广算法的复现和在统一实验环境下的效果评估。每种数据增广方法的详细介绍、对比的实验环境请参考文档教程中的数据增广章节。
 
-- 10万类图像分类预训练模型
-    - 百度自研了一个有语义体系的、粒度有粗有细的10w级别的Tag体系，并开源了在该数据集上训练的ResNet50_vd模型，在一些实际场景中，使用10万类图像分类预训练模型的识别准确率最懂可以提升30%。更多关于该10W类图像分类预训练模型的介绍和效果请参考文档中的[**图像分类迁移学习章节**](./docs/zh_CN/application/transfer_learning.md)
+- 10万类图像分类预训练模型：百度自研并开源了基于10万类数据集训练的ResNet50_vd模型，在一些实际场景中，使用10万类图像分类预训练模型的识别准确率最多可以提升30%。更多关于该10W类图像分类预训练模型的介绍和效果请参考文档中的图像分类迁移学习章节。
 
-- 多种训练、预测推理、部署方案，包括多机训练、混合精度训练、TensorRT预测、Paddle-Lite预测、模型服务化部署、模型量化、Paddle Hub等。
+- 多种训练方案，包括多机训练、混合精度训练等。
+
+- 多种预测推理、部署方案，包括TensorRT预测、Paddle-Lite预测、模型服务化部署、模型量化、Paddle Hub等。
 
 - 可运行于Linux、Windows、MacOS等多种系统。
 
@@ -68,11 +65,9 @@
 - FAQ
     - 图像分类通用问题(coming soon)
     - [PaddleClas实战FAQ](./docs/zh_CN/faq.md)
-- [赛事支持](#赛事支持)
+- [赛事支持](./docs/zh_CN/competition_support.md)
 - [许可证书](#许可证书)
 - [贡献代码](#贡献代码)
-
-
 
 
 ## 模型库
@@ -83,7 +78,12 @@
 * CPU的评估环境基于骁龙855（SD855）。
 * GPU评估环境基于T4机器，在FP32+TensorRT配置下运行500次测得（去除前10次的warmup时间）。
 
+常见服务器端模型的精度指标与其预测耗时的变化曲线如下图所示。
+
 ![](./docs/images/models/T4_benchmark/t4.fp32.bs4.main_fps_top1.png)
+
+
+常见移动端模型的精度指标与其预测耗时、模型存储大小的变化曲线如下图所示。
 
 ![](./docs/images/models/mobile_arm_storage.png)
 
@@ -284,23 +284,6 @@ ResNeSt与RegNet系列模型的精度、速度指标如下表所示，更多关�
 
 
 
-
-
-
-
-
-
-
-<a name="赛事支持"></a>
-## 赛事支持
-PaddleClas的建设源于百度实际视觉业务应用的淬炼和视觉前沿能力的探索，助力多个视觉重点赛事取得领先成绩，并且持续推进更多的前沿视觉问题的解决和落地应用。更多内容请关注文档教程中的[**赛事支持章节**](./docs/zh_CN/competition_support.md)
-
-- 2018年Kaggle Open Images V4图像目标检测挑战赛冠军
-- 首届多媒体信息识别技术竞赛中印刷文本OCR、人脸识别和地标识别三项任务A级证书
-- 2019年Kaggle Open Images V5图像目标检测挑战赛亚军
-- 2019年Kaggle地标检索挑战赛亚军
-- 2019年Kaggle地标识别挑战赛亚军
-- 2020年Kaggle地标检索挑战赛亚军
 
 <a name="许可证书"></a>
 ## 许可证书
