@@ -1,5 +1,9 @@
 # Release Notes
 
+* 2020.09.07
+    * Add `HRNet_W18_C_ssld` pretrained model, whose Top-1 Acc on ImageNet1k dataset reaches 81.16%.
+    * Add `MobileNetV3_small_x0_35_ssld` pretrained model, whose Top-1 Acc on ImageNet1k dataset reaches 55.55%.
+
 * 2020.07.14
     * Add `Res2Net200_vd_26w_4s_ssld` pretrained model, whose Top-1 Acc on ImageNet1k dataset reaches 85.13%.
     * Add `Fix_ResNet50_vd_ssld_v2` pretrained model, whose Top-1 Acc on ImageNet1k dataset reaches 84.00%.

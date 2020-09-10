@@ -16,9 +16,6 @@ import logging
 import os
 import datetime
 
-from imp import reload
-reload(logging)
-
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s %(levelname)s: %(message)s",
@@ -26,7 +23,7 @@ logging.basicConfig(
 
 
 def time_zone(sec, fmt):
-    real_time = datetime.datetime.now() + datetime.timedelta(hours=8)
+    real_time = datetime.datetime.now()
     return real_time.timetuple()
 
 

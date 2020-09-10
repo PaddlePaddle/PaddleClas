@@ -1,5 +1,8 @@
 # 更新日志
 
+* 2020.09.07
+    * 添加HRNet_W18_C_ssld模型，在ImageNet上Top-1 Acc可达0.81162；添加MobileNetV3_small_x0_35_ssld模型，在ImageNet上Top-1 Acc可达0.5555。
+
 * 2020.07.14
     * 添加Res2Net200_vd_26w_4s_ssld模型，在ImageNet上Top-1 Acc可达85.13%。
     * 添加Fix_ResNet50_vd_ssld_v2模型，，在ImageNet上Top-1 Acc可达84.0%。

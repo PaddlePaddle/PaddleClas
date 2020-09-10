@@ -11,3 +11,12 @@ RegNet was proposed in 2020 by Facebook to deepen the concept of design space. B
 | ResNeSt50_fast_1s1x64d        | 0.8035 | 0.9528|  0.8035 |            -| 8.68     | 26.3   |
 | ResNeSt50        | 0.8102 | 0.9542|  0.8113 |            -| 10.78     | 27.5   |
 | RegNetX_4GF        | 0.7850 | 0.9416|  0.7860 |            -| 8.0     | 22.1   |
+
+
+## Inference speed based on T4 GPU
+
+| Models             | Crop Size | Resize Short Size | FP16<br>Batch Size=1<br>(ms) | FP16<br>Batch Size=4<br>(ms) | FP16<br>Batch Size=8<br>(ms) | FP32<br>Batch Size=1<br>(ms) | FP32<br>Batch Size=4<br>(ms) | FP32<br>Batch Size=8<br>(ms) |
+|--------------------|-----------|-------------------|------------------------------|------------------------------|------------------------------|------------------------------|------------------------------|------------------------------|
+| ResNeSt50_fast_1s1x64d          | 224       | 256   | -           | -            | -          | -      |   -    |    -     |
+| ResNeSt50         | 224       | 256               | -           | -            | -          | -      |   -    |    -     |
+| RegNetX_4GF | 224       | 256       | 6.69042    | 8.01664            | 11.60608       | 6.46478     |   11.19862    |    16.89089    |
