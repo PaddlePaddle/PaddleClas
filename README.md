@@ -12,7 +12,7 @@
 - 2020.06.17 添加英文文档。
 - 2020.06.12 添加对windows和CPU环境的训练与评估支持。
 - 2020.05.17 添加混合精度训练，基于ResNet50模型，精度几乎无损的情况下，训练时间可以减少约40%。
-- [more](./docs/zh_CN/faq.md)
+- [more](./docs/zh_CN/update_history.md)
 
 
 ## 特性
