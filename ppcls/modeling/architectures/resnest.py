@@ -104,11 +104,7 @@ class ResNeSt():
             is_first=False,
             name="layer1")
         x = self.resnest_layer(
-            x=x, 
-            planes=128, 
-            blocks=self.layers[1], 
-            stride=2, 
-            name="layer2")
+            x=x, planes=128, blocks=self.layers[1], stride=2, name="layer2")
         if self.dilated or self.dilation == 4:
             x = self.resnest_layer(
                 x=x,
@@ -152,10 +148,8 @@ class ResNeSt():
                 blocks=self.layers[3],
                 stride=2,
                 name="layer4")
-        x = fluid.layers.pool2d(
-            input=x, pool_type="avg", global_pooling=True)
-        x = fluid.layers.dropout(
-            x=x, dropout_prob=self.final_drop)
+        x = fluid.layers.pool2d(input=x, pool_type="avg", global_pooling=True)
+        x = fluid.layers.dropout(x=x, dropout_prob=self.final_drop)
         stdv = 1.0 / math.sqrt(x.shape[1] * 1.0)
         x = fluid.layers.fc(
             input=x,
@@ -266,8 +260,7 @@ class ResNeSt():
             param_attr=ParamAttr(
                 name=name + "_splat_weights", initializer=MSRA()),
             bias_attr=False)
-        atten = self.rsoftmax(
-            x=atten, radix=radix, cardinality=groups)
+        atten = self.rsoftmax(x=atten, radix=radix, cardinality=groups)
         atten = fluid.layers.reshape(x=atten, shape=[-1, atten.shape[1], 1, 1])
 
         if radix > 1:
@@ -275,10 +268,10 @@ class ResNeSt():
                 input=atten, num_or_sections=radix, dim=1)
             out = fluid.layers.sum([
                 fluid.layers.elementwise_mul(
-                    x=att, y=split) for (att, split) in zip(attens, splited)
+                    x=split, y=att) for (att, split) in zip(attens, splited)
             ])
         else:
-            out = fluid.layers.elementwise_mul(atten, x)
+            out = fluid.layers.elementwise_mul(x, atten)
         return out
 
     def bottleneck(self,
