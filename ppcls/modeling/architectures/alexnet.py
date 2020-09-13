@@ -2,7 +2,8 @@ import paddle
 from paddle import ParamAttr
 import paddle.nn as nn
 import paddle.nn.functional as F
-from paddle.nn import Conv2d, Pool2D, BatchNorm, Linear, Dropout, ReLU
+from paddle.nn import Conv2d, BatchNorm, Linear, Dropout, ReLU
+from paddle.nn import AdaptiveAvgPool2d, MaxPool2d, AvgPool2d
 from paddle.nn.initializer import Uniform
 import math
 
@@ -35,8 +36,7 @@ class ConvPoolLayer(nn.Layer):
                 name=name + "_weights", initializer=Uniform(-stdv, stdv)),
             bias_attr=ParamAttr(
                 name=name + "_offset", initializer=Uniform(-stdv, stdv)))
-        self._pool = Pool2D(
-            pool_size=3, pool_stride=2, pool_padding=0, pool_type="max")
+        self._pool = MaxPool2d(kernel_size=3, stride=2, padding=0)
 
     def forward(self, inputs):
         x = self._conv(inputs)

@@ -21,7 +21,8 @@ import sys
 import paddle
 from paddle import ParamAttr
 import paddle.nn as nn
-from paddle.nn import Conv2d, Pool2D, BatchNorm, Linear
+from paddle.nn import Conv2d, BatchNorm, Linear
+from paddle.nn import AdaptiveAvgPool2d, MaxPool2d, AvgPool2d
 from paddle.nn.initializer import Uniform
 
 import math
@@ -235,8 +236,7 @@ class DPN(nn.Layer):
             act='relu',
             name="conv1")
 
-        self.pool2d_max = Pool2D(
-            pool_size=3, pool_stride=2, pool_padding=1, pool_type='max')
+        self.pool2d_max = MaxPool2d(kernel_size=3, stride=2, padding=1)
 
         num_channel_dpn = init_num_filter
 
@@ -301,7 +301,7 @@ class DPN(nn.Layer):
             moving_mean_name='final_concat_bn_mean',
             moving_variance_name='final_concat_bn_variance')
 
-        self.pool2d_avg = Pool2D(pool_type='avg', global_pooling=True)
+        self.pool2d_avg = AdaptiveAvgPool2d(1)
 
         stdv = 0.01
 

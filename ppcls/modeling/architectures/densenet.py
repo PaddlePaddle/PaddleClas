@@ -20,7 +20,8 @@ import numpy as np
 import paddle
 from paddle import ParamAttr
 import paddle.nn as nn
-from paddle.nn import Conv2d, Pool2D, BatchNorm, Linear, Dropout
+from paddle.nn import Conv2d, BatchNorm, Linear, Dropout
+from paddle.nn import AdaptiveAvgPool2d, MaxPool2d, AvgPool2d
 from paddle.nn.initializer import Uniform
 
 import math
@@ -144,7 +145,7 @@ class TransitionLayer(nn.Layer):
             stride=1,
             name=name)
 
-        self.pool2d_avg = Pool2D(pool_size=2, pool_stride=2, pool_type='avg')
+        self.pool2d_avg = AvgPool2d(kernel_size=2, stride=2, padding=0)
 
     def forward(self, input):
         y = self.conv_ac_func(input)
@@ -213,8 +214,7 @@ class DenseNet(nn.Layer):
             act='relu',
             name="conv1")
 
-        self.pool2d_max = Pool2D(
-            pool_size=3, pool_stride=2, pool_padding=1, pool_type='max')
+        self.pool2d_max = MaxPool2d(kernel_size=3, stride=2, padding=1)
 
         self.block_config = block_config
 
@@ -256,7 +256,7 @@ class DenseNet(nn.Layer):
             moving_mean_name='conv5_blk_bn_mean',
             moving_variance_name='conv5_blk_bn_variance')
 
-        self.pool2d_avg = Pool2D(pool_type='avg', global_pooling=True)
+        self.pool2d_avg = AdaptiveAvgPool2d(1)
 
         stdv = 1.0 / math.sqrt(num_features * 1.0)
 

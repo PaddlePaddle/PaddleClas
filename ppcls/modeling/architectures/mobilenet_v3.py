@@ -21,7 +21,8 @@ import paddle
 from paddle import ParamAttr
 import paddle.nn as nn
 import paddle.nn.functional as F
-from paddle.nn import Conv2d, Pool2D, BatchNorm, Linear, Dropout
+from paddle.nn import Conv2d, BatchNorm, Linear, Dropout
+from paddle.nn import AdaptiveAvgPool2d, MaxPool2d, AvgPool2d
 # TODO: need to be removed later!
 from paddle.fluid.regularizer import L2Decay
 
@@ -133,8 +134,7 @@ class MobileNetV3(nn.Layer):
             act="hard_swish",
             name="conv_last")
 
-        self.pool = Pool2D(
-            pool_type="avg", global_pooling=True, use_cudnn=False)
+        self.pool = AdaptiveAvgPool2d(1)
 
         self.last_conv = Conv2d(
             in_channels=make_divisible(scale * self.cls_ch_squeeze),
@@ -275,7 +275,7 @@ class ResidualUnit(nn.Layer):
 class SEModule(nn.Layer):
     def __init__(self, channel, reduction=4, name=""):
         super(SEModule, self).__init__()
-        self.avg_pool = Pool2D(pool_type="avg", global_pooling=True)
+        self.avg_pool = AdaptiveAvgPool2d(1)
         self.conv1 = Conv2d(
             in_channels=channel,
             out_channels=channel // reduction,

@@ -21,7 +21,8 @@ import paddle
 from paddle import ParamAttr
 import paddle.nn as nn
 import paddle.nn.functional as F
-from paddle.nn import Conv2d, Pool2D, BatchNorm, Linear
+from paddle.nn import Conv2d, BatchNorm, Linear
+from paddle.nn import AdaptiveAvgPool2d, MaxPool2d, AvgPool2d
 from paddle.nn.initializer import Uniform
 
 import math
@@ -310,7 +311,7 @@ class SELayer(nn.Layer):
     def __init__(self, num_channels, num_filters, reduction_ratio, name=None):
         super(SELayer, self).__init__()
 
-        self.pool2d_gap = Pool2D(pool_type='avg', global_pooling=True)
+        self.pool2d_gap = AdaptiveAvgPool2d(1)
 
         self._num_channels = num_channels
 
@@ -622,7 +623,7 @@ class HRNet(nn.Layer):
             stride=1,
             name="cls_head_last_conv")
 
-        self.pool2d_avg = Pool2D(pool_type='avg', global_pooling=True)
+        self.pool2d_avg = AdaptiveAvgPool2d(1)
 
         stdv = 1.0 / math.sqrt(2048 * 1.0)
 

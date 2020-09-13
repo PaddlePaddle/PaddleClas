@@ -16,7 +16,8 @@ import paddle
 from paddle import ParamAttr
 import paddle.nn as nn
 import paddle.nn.functional as F
-from paddle.nn import Conv2d, Pool2D, BatchNorm, Linear, Dropout
+from paddle.nn import Conv2d, BatchNorm, Linear, Dropout
+from paddle.nn import AdaptiveAvgPool2d, MaxPool2d, AvgPool2d
 from paddle.nn.initializer import Uniform
 import math
 
@@ -67,7 +68,7 @@ class InceptionStem(nn.Layer):
         self._conv_2 = ConvBNLayer(32, 32, 3, act="relu", name="conv2_3x3_s1")
         self._conv_3 = ConvBNLayer(
             32, 64, 3, padding=1, act="relu", name="conv3_3x3_s1")
-        self._pool = Pool2D(pool_size=3, pool_type="max", pool_stride=2)
+        self._pool = MaxPool2d(kernel_size=3, stride=2, padding=0)
         self._conv2 = ConvBNLayer(
             64, 96, 3, stride=2, act="relu", name="inception_stem1_3x3_s2")
         self._conv1_1 = ConvBNLayer(
@@ -122,7 +123,7 @@ class InceptionStem(nn.Layer):
 class InceptionA(nn.Layer):
     def __init__(self, name):
         super(InceptionA, self).__init__()
-        self._pool = Pool2D(pool_size=3, pool_type="avg", pool_padding=1)
+        self._pool = AvgPool2d(kernel_size=3, stride=1, padding=1)
         self._conv1 = ConvBNLayer(
             384, 96, 1, act="relu", name="inception_a" + name + "_1x1")
         self._conv2 = ConvBNLayer(
@@ -177,7 +178,7 @@ class InceptionA(nn.Layer):
 class ReductionA(nn.Layer):
     def __init__(self):
         super(ReductionA, self).__init__()
-        self._pool = Pool2D(pool_size=3, pool_type="max", pool_stride=2)
+        self._pool = MaxPool2d(kernel_size=3, stride=2, padding=0)
         self._conv2 = ConvBNLayer(
             384, 384, 3, stride=2, act="relu", name="reduction_a_3x3")
         self._conv3_1 = ConvBNLayer(
@@ -200,7 +201,7 @@ class ReductionA(nn.Layer):
 class InceptionB(nn.Layer):
     def __init__(self, name=None):
         super(InceptionB, self).__init__()
-        self._pool = Pool2D(pool_size=3, pool_type="avg", pool_padding=1)
+        self._pool = AvgPool2d(kernel_size=3, stride=1, padding=1)
         self._conv1 = ConvBNLayer(
             1024, 128, 1, act="relu", name="inception_b" + name + "_1x1")
         self._conv2 = ConvBNLayer(
@@ -277,7 +278,7 @@ class InceptionB(nn.Layer):
 class ReductionB(nn.Layer):
     def __init__(self):
         super(ReductionB, self).__init__()
-        self._pool = Pool2D(pool_size=3, pool_type="max", pool_stride=2)
+        self._pool = MaxPool2d(kernel_size=3, stride=2, padding=0)
         self._conv2_1 = ConvBNLayer(
             1024, 192, 1, act="relu", name="reduction_b_3x3_reduce")
         self._conv2_2 = ConvBNLayer(
@@ -318,7 +319,7 @@ class ReductionB(nn.Layer):
 class InceptionC(nn.Layer):
     def __init__(self, name=None):
         super(InceptionC, self).__init__()
-        self._pool = Pool2D(pool_size=3, pool_type="avg", pool_padding=1)
+        self._pool = AvgPool2d(kernel_size=3, stride=1, padding=1)
         self._conv1 = ConvBNLayer(
             1536, 256, 1, act="relu", name="inception_c" + name + "_1x1")
         self._conv2 = ConvBNLayer(
@@ -410,7 +411,7 @@ class InceptionV4DY(nn.Layer):
         self._inceptionC_2 = InceptionC(name="2")
         self._inceptionC_3 = InceptionC(name="3")
 
-        self.avg_pool = Pool2D(pool_type='avg', global_pooling=True)
+        self.avg_pool = AdaptiveAvgPool2d(1)
         self._drop = Dropout(p=0.2)
         stdv = 1.0 / math.sqrt(1536 * 1.0)
         self.out = Linear(

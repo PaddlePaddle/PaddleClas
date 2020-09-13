@@ -2,7 +2,8 @@ import paddle
 from paddle import ParamAttr
 import paddle.nn as nn
 import paddle.nn.functional as F
-from paddle.nn import Conv2d, Pool2D, BatchNorm, Linear, Dropout
+from paddle.nn import Conv2d, BatchNorm, Linear, Dropout
+from paddle.nn import AdaptiveAvgPool2d, MaxPool2d, AvgPool2d
 
 __all__ = ["Xception41_deeplab", "Xception65_deeplab", "Xception71_deeplab"]
 
@@ -346,7 +347,7 @@ class XceptionDeeplab(nn.Layer):
         self.stride = s
 
         self._drop = Dropout(p=0.5)
-        self._pool = Pool2D(pool_type="avg", global_pooling=True)
+        self._pool = AdaptiveAvgPool2d(1)
         self._fc = Linear(
             self.chns[1][-1],
             class_dim,

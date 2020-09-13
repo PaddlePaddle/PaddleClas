@@ -21,7 +21,8 @@ import paddle
 from paddle import ParamAttr
 import paddle.nn as nn
 import paddle.nn.functional as F
-from paddle.nn import Conv2d, Pool2D, BatchNorm, Linear, Dropout
+from paddle.nn import Conv2d, BatchNorm, Linear, Dropout
+from paddle.nn import AdaptiveAvgPool2d, MaxPool2d, AvgPool2d
 
 import math
 
@@ -198,7 +199,7 @@ class MobileNet(nn.Layer):
             padding=0,
             name="conv9")
 
-        self.pool2d_avg = Pool2D(pool_type="avg", global_pooling=True)
+        self.pool2d_avg = AdaptiveAvgPool2d(1)
 
         self.out = Linear(
             self.out_c,

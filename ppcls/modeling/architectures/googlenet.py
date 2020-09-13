@@ -2,7 +2,8 @@ import paddle
 from paddle import ParamAttr
 import paddle.nn as nn
 import paddle.nn.functional as F
-from paddle.nn import Conv2d, Pool2D, BatchNorm, Linear, Dropout
+from paddle.nn import Conv2d, BatchNorm, Linear, Dropout
+from paddle.nn import AdaptiveAvgPool2d, MaxPool2d, AvgPool2d
 from paddle.nn.initializer import Uniform
 
 import math
@@ -72,8 +73,8 @@ class Inception(nn.Layer):
             name="inception_" + name + "_5x5_reduce")
         self._conv5 = ConvLayer(
             filter5R, filter5, 5, name="inception_" + name + "_5x5")
-        self._pool = Pool2D(
-            pool_size=3, pool_type="max", pool_stride=1, pool_padding=1)
+        self._pool = MaxPool2d(kernel_size=3, stride=1, padding=1)
+
         self._convprj = ConvLayer(
             input_channels, proj, 1, name="inception_" + name + "_3x3_proj")
 
@@ -98,7 +99,7 @@ class GoogleNetDY(nn.Layer):
     def __init__(self, class_dim=1000):
         super(GoogleNetDY, self).__init__()
         self._conv = ConvLayer(3, 64, 7, 2, name="conv1")
-        self._pool = Pool2D(pool_size=3, pool_type="max", pool_stride=2)
+        self._pool = MaxPool2d(kernel_size=3, stride=2)
         self._conv_1 = ConvLayer(64, 64, 1, name="conv2_1x1")
         self._conv_2 = ConvLayer(64, 192, 3, name="conv2_3x3")
 
@@ -123,7 +124,7 @@ class GoogleNetDY(nn.Layer):
         self._ince5b = Inception(
             832, 832, 384, 192, 384, 48, 128, 128, name="ince5b")
 
-        self._pool_5 = Pool2D(pool_size=7, pool_type='avg', pool_stride=7)
+        self._pool_5 = AvgPool2d(kernel_size=7, stride=7)
 
         self._drop = Dropout(p=0.4)
         self._fc_out = Linear(
@@ -131,7 +132,7 @@ class GoogleNetDY(nn.Layer):
             class_dim,
             weight_attr=xavier(1024, 1, "out"),
             bias_attr=ParamAttr(name="out_offset"))
-        self._pool_o1 = Pool2D(pool_size=5, pool_stride=3, pool_type="avg")
+        self._pool_o1 = AvgPool2d(kernel_size=5, stride=3)
         self._conv_o1 = ConvLayer(512, 128, 1, name="conv_o1")
         self._fc_o1 = Linear(
             1152,
@@ -144,7 +145,7 @@ class GoogleNetDY(nn.Layer):
             class_dim,
             weight_attr=xavier(1024, 1, "out1"),
             bias_attr=ParamAttr(name="out1_offset"))
-        self._pool_o2 = Pool2D(pool_size=5, pool_stride=3, pool_type='avg')
+        self._pool_o2 = AvgPool2d(kernel_size=5, stride=3)
         self._conv_o2 = ConvLayer(528, 128, 1, name="conv_o2")
         self._fc_o2 = Linear(
             1152,
