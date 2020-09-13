@@ -12,8 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from ppcls.utils.save_load import load_dygraph_pretrain
-from ppcls.modeling import architectures
 import paddle.fluid as fluid
 import numpy as np
 import argparse
@@ -23,6 +21,9 @@ import sys
 __dir__ = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(__dir__)
 sys.path.append(os.path.abspath(os.path.join(__dir__, '../..')))
+
+from ppcls.modeling import architectures
+from ppcls.utils.save_load import load_dygraph_pretrain
 
 
 def parse_args():
@@ -108,7 +109,10 @@ def main():
             data = fluid.dygraph.to_variable(data)
             net.eval()
             outputs = net(data)
-            outputs = fluid.layers.softmax(outputs)
+            if args.model == "GoogLeNet":
+                outputs = outputs[0]
+            else:
+                outputs = fluid.layers.softmax(outputs)
             outputs = outputs.numpy()
 
             probs = postprocess(outputs)

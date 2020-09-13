@@ -1,7 +1,10 @@
 import paddle
-import paddle.fluid as fluid
-from paddle.fluid.param_attr import ParamAttr
-from paddle.fluid.dygraph.nn import Conv2D, Pool2D, BatchNorm, Linear
+from paddle import ParamAttr
+import paddle.nn as nn
+import paddle.nn.functional as F
+from paddle.nn import Conv2d, Pool2D, BatchNorm, Linear, Dropout
+from paddle.nn.initializer import Uniform
+
 import math
 
 __all__ = ['GoogLeNet']
@@ -10,12 +13,11 @@ __all__ = ['GoogLeNet']
 def xavier(channels, filter_size, name):
     stdv = (3.0 / (filter_size**2 * channels))**0.5
     param_attr = ParamAttr(
-        initializer=fluid.initializer.Uniform(-stdv, stdv),
-        name=name + "_weights")
+        initializer=Uniform(-stdv, stdv), name=name + "_weights")
     return param_attr
 
 
-class ConvLayer(fluid.dygraph.Layer):
+class ConvLayer(nn.Layer):
     def __init__(self,
                  num_channels,
                  num_filters,
@@ -26,15 +28,14 @@ class ConvLayer(fluid.dygraph.Layer):
                  name=None):
         super(ConvLayer, self).__init__()
 
-        self._conv = Conv2D(
-            num_channels=num_channels,
-            num_filters=num_filters,
-            filter_size=filter_size,
+        self._conv = Conv2d(
+            in_channels=num_channels,
+            out_channels=num_filters,
+            kernel_size=filter_size,
             stride=stride,
             padding=(filter_size - 1) // 2,
             groups=groups,
-            act=None,
-            param_attr=ParamAttr(name=name + "_weights"),
+            weight_attr=ParamAttr(name=name + "_weights"),
             bias_attr=False)
 
     def forward(self, inputs):
@@ -42,7 +43,7 @@ class ConvLayer(fluid.dygraph.Layer):
         return y
 
 
-class Inception(fluid.dygraph.Layer):
+class Inception(nn.Layer):
     def __init__(self,
                  input_channels,
                  output_channels,
@@ -88,12 +89,12 @@ class Inception(fluid.dygraph.Layer):
         pool = self._pool(inputs)
         convprj = self._convprj(pool)
 
-        cat = fluid.layers.concat([conv1, conv3, conv5, convprj], axis=1)
-        cat = fluid.layers.relu(cat)
+        cat = paddle.concat([conv1, conv3, conv5, convprj], axis=1)
+        cat = F.relu(cat)
         return cat
 
 
-class GoogleNetDY(fluid.dygraph.Layer):
+class GoogleNetDY(nn.Layer):
     def __init__(self, class_dim=1000):
         super(GoogleNetDY, self).__init__()
         self._conv = ConvLayer(3, 64, 7, 2, name="conv1")
@@ -124,40 +125,37 @@ class GoogleNetDY(fluid.dygraph.Layer):
 
         self._pool_5 = Pool2D(pool_size=7, pool_type='avg', pool_stride=7)
 
-        self._drop = fluid.dygraph.Dropout(p=0.4)
+        self._drop = Dropout(p=0.4)
         self._fc_out = Linear(
             1024,
             class_dim,
-            param_attr=xavier(1024, 1, "out"),
-            bias_attr=ParamAttr(name="out_offset"),
-            act="softmax")
+            weight_attr=xavier(1024, 1, "out"),
+            bias_attr=ParamAttr(name="out_offset"))
         self._pool_o1 = Pool2D(pool_size=5, pool_stride=3, pool_type="avg")
         self._conv_o1 = ConvLayer(512, 128, 1, name="conv_o1")
         self._fc_o1 = Linear(
             1152,
             1024,
-            param_attr=xavier(2048, 1, "fc_o1"),
-            bias_attr=ParamAttr(name="fc_o1_offset"),
-            act="relu")
-        self._drop_o1 = fluid.dygraph.Dropout(p=0.7)
+            weight_attr=xavier(2048, 1, "fc_o1"),
+            bias_attr=ParamAttr(name="fc_o1_offset"))
+        self._drop_o1 = Dropout(p=0.7)
         self._out1 = Linear(
             1024,
             class_dim,
-            param_attr=xavier(1024, 1, "out1"),
-            bias_attr=ParamAttr(name="out1_offset"),
-            act="softmax")
+            weight_attr=xavier(1024, 1, "out1"),
+            bias_attr=ParamAttr(name="out1_offset"))
         self._pool_o2 = Pool2D(pool_size=5, pool_stride=3, pool_type='avg')
         self._conv_o2 = ConvLayer(528, 128, 1, name="conv_o2")
         self._fc_o2 = Linear(
             1152,
             1024,
-            param_attr=xavier(2048, 1, "fc_o2"),
+            weight_attr=xavier(2048, 1, "fc_o2"),
             bias_attr=ParamAttr(name="fc_o2_offset"))
-        self._drop_o2 = fluid.dygraph.Dropout(p=0.7)
+        self._drop_o2 = Dropout(p=0.7)
         self._out2 = Linear(
             1024,
             class_dim,
-            param_attr=xavier(1024, 1, "out2"),
+            weight_attr=xavier(1024, 1, "out2"),
             bias_attr=ParamAttr(name="out2_offset"))
 
     def forward(self, inputs):
@@ -183,19 +181,22 @@ class GoogleNetDY(fluid.dygraph.Layer):
 
         x = self._pool_5(ince5b)
         x = self._drop(x)
-        x = fluid.layers.squeeze(x, axes=[2, 3])
+        x = paddle.squeeze(x, axis=[2, 3])
         out = self._fc_out(x)
+        out = F.softmax(out)
 
         x = self._pool_o1(ince4a)
         x = self._conv_o1(x)
-        x = fluid.layers.flatten(x)
+        x = paddle.flatten(x, start_axis=1, stop_axis=-1)
         x = self._fc_o1(x)
+        x = F.relu(x)
         x = self._drop_o1(x)
         out1 = self._out1(x)
+        out1 = F.softmax(out1)
 
         x = self._pool_o2(ince4d)
         x = self._conv_o2(x)
-        x = fluid.layers.flatten(x)
+        x = paddle.flatten(x, start_axis=1, stop_axis=-1)
         x = self._fc_o2(x)
         x = self._drop_o2(x)
         out2 = self._out2(x)
