@@ -19,8 +19,7 @@ from __future__ import print_function
 import math
 
 import paddle
-import paddle.fluid as fluid
-from paddle.fluid.param_attr import ParamAttr
+import paddle.nn as nn
 
 from .resnet_vd import ResNet50_vd
 from .mobilenet_v3 import MobileNetV3_large_x1_0
@@ -32,7 +31,7 @@ __all__ = [
 ]
 
 
-class ResNet50_vd_distill_MobileNetV3_large_x1_0(fluid.dygraph.Layer):
+class ResNet50_vd_distill_MobileNetV3_large_x1_0(nn.Layer):
     def __init__(self, class_dim=1000, **args):
         super(ResNet50_vd_distill_MobileNetV3_large_x1_0, self).__init__()
 
@@ -49,7 +48,7 @@ class ResNet50_vd_distill_MobileNetV3_large_x1_0(fluid.dygraph.Layer):
         return teacher_label, student_label
 
 
-class ResNeXt101_32x16d_wsl_distill_ResNet50_vd(fluid.dygraph.Layer):
+class ResNeXt101_32x16d_wsl_distill_ResNet50_vd(nn.Layer):
     def __init__(self, class_dim=1000, **args):
         super(ResNet50_vd_distill_MobileNetV3_large_x1_0, self).__init__()
 
