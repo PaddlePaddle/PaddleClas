@@ -13,13 +13,6 @@
 # limitations under the License.
 
 from __future__ import absolute_import
-from paddle.distributed import ParallelEnv
-import paddle
-from ppcls.data import Reader
-from ppcls.utils.config import get_config
-from ppcls.utils.save_load import init_model, save_model
-from ppcls.utils import logger
-import program
 from __future__ import division
 from __future__ import print_function
 
@@ -30,6 +23,14 @@ __dir__ = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(__dir__)
 sys.path.append(os.path.abspath(os.path.join(__dir__, '..')))
 
+import program
+from ppcls.utils import logger
+from ppcls.utils.save_load import init_model, save_model
+from ppcls.utils.config import get_config
+from ppcls.data import Reader
+
+import paddle
+from paddle.distributed import ParallelEnv
 
 def parse_args():
     parser = argparse.ArgumentParser("PaddleClas train script")
