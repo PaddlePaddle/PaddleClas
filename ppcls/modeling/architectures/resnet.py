@@ -19,7 +19,6 @@ from __future__ import print_function
 import numpy as np
 import paddle
 from paddle import ParamAttr
-# from paddle.fluid.param_attr import ParamAttr
 import paddle.nn as nn
 from paddle.nn import Conv2d, Pool2D, BatchNorm, Linear, Dropout
 
