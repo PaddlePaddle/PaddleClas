@@ -202,8 +202,7 @@ class Res2Net_vd(nn.Layer):
             stride=1,
             act='relu',
             name="conv1_3")
-        self.pool2d_max = MaxPool2d(
-            kernel_size=3, stride=2, padding=1, ceil_mode=True)
+        self.pool2d_max = MaxPool2d(kernel_size=3, stride=2, padding=1)
 
         self.block_list = []
         for block in range(len(depth)):
