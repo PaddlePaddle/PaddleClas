@@ -33,6 +33,7 @@ from .mobilenet_v3 import MobileNetV3_small_x0_35, MobileNetV3_small_x0_5, Mobil
 from .shufflenet_v2 import ShuffleNetV2_x0_25, ShuffleNetV2_x0_33, ShuffleNetV2_x0_5, ShuffleNetV2, ShuffleNetV2_x1_5, ShuffleNetV2_x2_0, ShuffleNetV2_swish
 from .alexnet import AlexNet
 from .inception_v4 import InceptionV4
+from .xception import Xception41, Xception65, Xception71
 from .xception_deeplab import Xception41_deeplab, Xception65_deeplab, Xception71_deeplab
 from .resnext101_wsl import ResNeXt101_32x8d_wsl, ResNeXt101_32x16d_wsl, ResNeXt101_32x32d_wsl, ResNeXt101_32x48d_wsl
 from .shufflenet_v2 import ShuffleNetV2_x0_25, ShuffleNetV2_x0_33, ShuffleNetV2_x0_5, ShuffleNetV2, ShuffleNetV2_x1_5, ShuffleNetV2_x2_0, ShuffleNetV2_swish
