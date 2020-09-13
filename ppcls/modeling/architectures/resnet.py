@@ -20,7 +20,8 @@ import numpy as np
 import paddle
 from paddle import ParamAttr
 import paddle.nn as nn
-from paddle.nn import Conv2d, Pool2D, BatchNorm, Linear, Dropout
+from paddle.nn import Conv2d, BatchNorm, Linear, Dropout
+from paddle.nn import AdaptiveAvgPool2d, MaxPool2d, AvgPool2d
 from paddle.nn.initializer import Uniform
 
 import math
@@ -195,8 +196,7 @@ class ResNet(nn.Layer):
             stride=2,
             act="relu",
             name="conv1")
-        self.pool2d_max = Pool2D(
-            pool_size=3, pool_stride=2, pool_padding=1, pool_type="max")
+        self.pool2d_max = MaxPool2d(kernel_size=3, stride=2, padding=1)
 
         self.block_list = []
         if layers >= 50:
@@ -238,8 +238,7 @@ class ResNet(nn.Layer):
                     self.block_list.append(basic_block)
                     shortcut = True
 
-        self.pool2d_avg = Pool2D(
-            pool_size=7, pool_type='avg', global_pooling=True)
+        self.pool2d_avg = AdaptiveAvgPool2d(1)
 
         self.pool2d_avg_channels = num_channels[-1] * 2
 
