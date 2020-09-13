@@ -11,7 +11,7 @@ __all__ = ["AlexNet"]
 
 class ConvPoolLayer(nn.Layer):
     def __init__(self,
-                 inputc_channels,
+                 input_channels,
                  output_channels,
                  filter_size,
                  stride,
@@ -25,7 +25,7 @@ class ConvPoolLayer(nn.Layer):
         self.relu = ReLU() if act == "relu" else None
 
         self._conv = Conv2d(
-            in_channels=inputc_channels,
+            in_channels=input_channels,
             out_channels=output_channels,
             kernel_size=filter_size,
             stride=stride,

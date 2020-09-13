@@ -18,10 +18,11 @@ from __future__ import print_function
 
 import numpy as np
 import paddle
-import paddle.fluid as fluid
-from paddle.fluid.param_attr import ParamAttr
-from paddle.fluid.dygraph.nn import Conv2D, Pool2D, BatchNorm, Linear, Dropout
-from paddle.fluid.initializer import MSRA
+from paddle import ParamAttr
+import paddle.nn as nn
+import paddle.nn.functional as F
+from paddle.nn import Conv2d, Pool2D, BatchNorm, Linear, Dropout
+from paddle.nn.initializer import MSRA
 import math
 
 __all__ = [
@@ -29,7 +30,7 @@ __all__ = [
 ]
 
 
-class ConvBNLayer(fluid.dygraph.Layer):
+class ConvBNLayer(nn.Layer):
     def __init__(self,
                  num_channels,
                  filter_size,
@@ -39,20 +40,17 @@ class ConvBNLayer(fluid.dygraph.Layer):
                  channels=None,
                  num_groups=1,
                  act='relu',
-                 use_cudnn=True,
                  name=None):
         super(ConvBNLayer, self).__init__()
 
-        self._conv = Conv2D(
-            num_channels=num_channels,
-            num_filters=num_filters,
-            filter_size=filter_size,
+        self._conv = Conv2d(
+            in_channels=num_channels,
+            out_channels=num_filters,
+            kernel_size=filter_size,
             stride=stride,
             padding=padding,
             groups=num_groups,
-            act=None,
-            use_cudnn=use_cudnn,
-            param_attr=ParamAttr(
+            weight_attr=ParamAttr(
                 initializer=MSRA(), name=name + "_weights"),
             bias_attr=False)
 
@@ -70,7 +68,7 @@ class ConvBNLayer(fluid.dygraph.Layer):
         return y
 
 
-class DepthwiseSeparable(fluid.dygraph.Layer):
+class DepthwiseSeparable(nn.Layer):
     def __init__(self,
                  num_channels,
                  num_filters1,
@@ -88,7 +86,6 @@ class DepthwiseSeparable(fluid.dygraph.Layer):
             stride=stride,
             padding=1,
             num_groups=int(num_groups * scale),
-            use_cudnn=False,
             name=name + "_dw")
 
         self._pointwise_conv = ConvBNLayer(
@@ -105,7 +102,7 @@ class DepthwiseSeparable(fluid.dygraph.Layer):
         return y
 
 
-class MobileNet(fluid.dygraph.Layer):
+class MobileNet(nn.Layer):
     def __init__(self, scale=1.0, class_dim=1000):
         super(MobileNet, self).__init__()
         self.scale = scale
@@ -234,7 +231,7 @@ class MobileNet(fluid.dygraph.Layer):
         self.out = Linear(
             int(1024 * scale),
             class_dim,
-            param_attr=ParamAttr(
+            weight_attr=ParamAttr(
                 initializer=MSRA(), name="fc7_weights"),
             bias_attr=ParamAttr(name="fc7_offset"))
 
@@ -243,7 +240,7 @@ class MobileNet(fluid.dygraph.Layer):
         for block in self.block_list:
             y = block(y)
         y = self.pool2d_avg(y)
-        y = fluid.layers.reshape(y, shape=[-1, int(1024 * self.scale)])
+        y = paddle.reshape(y, shape=[-1, int(1024 * self.scale)])
         y = self.out(y)
         return y
 
