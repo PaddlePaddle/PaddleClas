@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import paddle.fluid as fluid
 import numpy as np
 import argparse
 import utils
@@ -22,9 +21,12 @@ __dir__ = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(__dir__)
 sys.path.append(os.path.abspath(os.path.join(__dir__, '../..')))
 
-from ppcls.modeling import architectures
 from ppcls.utils.save_load import load_dygraph_pretrain
+from ppcls.modeling import architectures
 
+import paddle
+from paddle.distributed import ParallelEnv
+import paddle.nn.functional as F
 
 def parse_args():
     def str2bool(v):
@@ -93,35 +95,35 @@ def main():
     operators = create_operators()
     # assign the place
     if args.use_gpu:
-        gpu_id = fluid.dygraph.parallel.Env().dev_id
-        place = fluid.CUDAPlace(gpu_id)
+        gpu_id = ParallelEnv().dev_id
+        place = paddle.CUDAPlace(gpu_id)
     else:
-        place = fluid.CPUPlace()
+        place = paddle.CPUPlace()
 
-    with fluid.dygraph.guard(place):
-        net = architectures.__dict__[args.model]()
-        load_dygraph_pretrain(net, args.pretrained_model,
-                              args.load_static_weights)
-        image_list = get_image_list(args.image_file)
-        for idx, filename in enumerate(image_list):
-            data = preprocess(filename, operators)
-            data = np.expand_dims(data, axis=0)
-            data = fluid.dygraph.to_variable(data)
-            net.eval()
-            outputs = net(data)
-            if args.model == "GoogLeNet":
-                outputs = outputs[0]
-            else:
-                outputs = fluid.layers.softmax(outputs)
-            outputs = outputs.numpy()
+    paddle.disable_static(place)
 
-            probs = postprocess(outputs)
-            rank = 1
-            print("Current image file: {}".format(filename))
-            for idx, prob in probs:
-                print("\ttop{:d}, class id: {:d}, probability: {:.4f}".format(
-                    rank, idx, prob))
-                rank += 1
+    net = architectures.__dict__[args.model]()
+    load_dygraph_pretrain(net, args.pretrained_model, args.load_static_weights)
+    image_list = get_image_list(args.image_file)
+    for idx, filename in enumerate(image_list):
+        data = preprocess(filename, operators)
+        data = np.expand_dims(data, axis=0)
+        data = paddle.to_tensor(data)
+        net.eval()
+        outputs = net(data)
+        if args.model == "GoogLeNet":
+            outputs = outputs[0]
+        else:
+            outputs = F.softmax(outputs)
+        outputs = outputs.numpy()
+
+        probs = postprocess(outputs)
+        rank = 1
+        print("Current image file: {}".format(filename))
+        for idx, prob in probs:
+            print("\ttop{:d}, class id: {:d}, probability: {:.4f}".format(
+                rank, idx, prob))
+            rank += 1
     return
 
 
