@@ -1,7 +1,8 @@
 import paddle
-import paddle.fluid as fluid
-from paddle.fluid.param_attr import ParamAttr
-from paddle.fluid.dygraph.nn import Conv2D, Pool2D, BatchNorm, Linear, Dropout
+from paddle import ParamAttr
+import paddle.nn as nn
+import paddle.nn.functional as F
+from paddle.nn import Conv2d, Pool2D, BatchNorm, Linear, Dropout
 
 __all__ = ["Xception41_deeplab", "Xception65_deeplab", "Xception71_deeplab"]
 
@@ -56,7 +57,7 @@ def gen_bottleneck_params(backbone='xception_65'):
     return bottleneck_params
 
 
-class ConvBNLayer(fluid.dygraph.Layer):
+class ConvBNLayer(nn.Layer):
     def __init__(self,
                  input_channels,
                  output_channels,
@@ -67,13 +68,13 @@ class ConvBNLayer(fluid.dygraph.Layer):
                  name=None):
         super(ConvBNLayer, self).__init__()
 
-        self._conv = Conv2D(
-            num_channels=input_channels,
-            num_filters=output_channels,
-            filter_size=filter_size,
+        self._conv = Conv2d(
+            in_channels=input_channels,
+            out_channels=output_channels,
+            kernel_size=filter_size,
             stride=stride,
             padding=padding,
-            param_attr=ParamAttr(name=name + "/weights"),
+            weight_attr=ParamAttr(name=name + "/weights"),
             bias_attr=False)
         self._bn = BatchNorm(
             num_channels=output_channels,
@@ -89,7 +90,7 @@ class ConvBNLayer(fluid.dygraph.Layer):
         return self._bn(self._conv(inputs))
 
 
-class Seperate_Conv(fluid.dygraph.Layer):
+class Seperate_Conv(nn.Layer):
     def __init__(self,
                  input_channels,
                  output_channels,
@@ -100,15 +101,15 @@ class Seperate_Conv(fluid.dygraph.Layer):
                  name=None):
         super(Seperate_Conv, self).__init__()
 
-        self._conv1 = Conv2D(
-            num_channels=input_channels,
-            num_filters=input_channels,
-            filter_size=filter,
+        self._conv1 = Conv2d(
+            in_channels=input_channels,
+            out_channels=input_channels,
+            kernel_size=filter,
             stride=stride,
             groups=input_channels,
             padding=(filter) // 2 * dilation,
             dilation=dilation,
-            param_attr=ParamAttr(name=name + "/depthwise/weights"),
+            weight_attr=ParamAttr(name=name + "/depthwise/weights"),
             bias_attr=False)
         self._bn1 = BatchNorm(
             input_channels,
@@ -119,14 +120,14 @@ class Seperate_Conv(fluid.dygraph.Layer):
             bias_attr=ParamAttr(name=name + "/depthwise/BatchNorm/beta"),
             moving_mean_name=name + "/depthwise/BatchNorm/moving_mean",
             moving_variance_name=name + "/depthwise/BatchNorm/moving_variance")
-        self._conv2 = Conv2D(
+        self._conv2 = Conv2d(
             input_channels,
             output_channels,
             1,
             stride=1,
             groups=1,
             padding=0,
-            param_attr=ParamAttr(name=name + "/pointwise/weights"),
+            weight_attr=ParamAttr(name=name + "/pointwise/weights"),
             bias_attr=False)
         self._bn2 = BatchNorm(
             output_channels,
@@ -146,7 +147,7 @@ class Seperate_Conv(fluid.dygraph.Layer):
         return x
 
 
-class Xception_Block(fluid.dygraph.Layer):
+class Xception_Block(nn.Layer):
     def __init__(self,
                  input_channels,
                  output_channels,
@@ -226,11 +227,11 @@ class Xception_Block(fluid.dygraph.Layer):
 
     def forward(self, inputs):
         if not self.activation_fn_in_separable_conv:
-            x = fluid.layers.relu(inputs)
+            x = F.relu(inputs)
             x = self._conv1(x)
-            x = fluid.layers.relu(x)
+            x = F.relu(x)
             x = self._conv2(x)
-            x = fluid.layers.relu(x)
+            x = F.relu(x)
             x = self._conv3(x)
         else:
             x = self._conv1(inputs)
@@ -242,10 +243,10 @@ class Xception_Block(fluid.dygraph.Layer):
             skip = self._short(inputs)
         else:
             skip = inputs
-        return fluid.layers.elementwise_add(x, skip)
+        return paddle.elementwise_add(x, skip)
 
 
-class XceptionDeeplab(fluid.dygraph.Layer):
+class XceptionDeeplab(nn.Layer):
     def __init__(self, backbone, class_dim=1000):
         super(XceptionDeeplab, self).__init__()
 
@@ -349,7 +350,7 @@ class XceptionDeeplab(fluid.dygraph.Layer):
         self._fc = Linear(
             self.chns[1][-1],
             class_dim,
-            param_attr=ParamAttr(name="fc_weights"),
+            weight_attr=ParamAttr(name="fc_weights"),
             bias_attr=ParamAttr(name="fc_bias"))
 
     def forward(self, inputs):
@@ -363,7 +364,7 @@ class XceptionDeeplab(fluid.dygraph.Layer):
         x = self._exit_flow_2(x)
         x = self._drop(x)
         x = self._pool(x)
-        x = fluid.layers.squeeze(x, axes=[2, 3])
+        x = paddle.squeeze(x, axis=[2, 3])
         x = self._fc(x)
         return x
 

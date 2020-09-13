@@ -33,5 +33,6 @@ from .mobilenet_v3 import MobileNetV3_small_x0_35, MobileNetV3_small_x0_5, Mobil
 from .shufflenet_v2 import ShuffleNetV2_x0_25, ShuffleNetV2_x0_33, ShuffleNetV2_x0_5, ShuffleNetV2, ShuffleNetV2_x1_5, ShuffleNetV2_x2_0, ShuffleNetV2_swish
 from .alexnet import AlexNet
 from .inception_v4 import InceptionV4
+from .xception_deeplab import Xception41_deeplab, Xception65_deeplab, Xception71_deeplab
 
 from .distillation_models import ResNet50_vd_distill_MobileNetV3_large_x1_0
