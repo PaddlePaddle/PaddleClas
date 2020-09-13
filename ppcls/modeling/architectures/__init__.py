@@ -35,5 +35,8 @@ from .alexnet import AlexNet
 from .inception_v4 import InceptionV4
 from .xception_deeplab import Xception41_deeplab, Xception65_deeplab, Xception71_deeplab
 from .resnext101_wsl import ResNeXt101_32x8d_wsl, ResNeXt101_32x16d_wsl, ResNeXt101_32x32d_wsl, ResNeXt101_32x48d_wsl
+from .shufflenet_v2 import ShuffleNetV2_x0_25, ShuffleNetV2_x0_33, ShuffleNetV2_x0_5, ShuffleNetV2, ShuffleNetV2_x1_5, ShuffleNetV2_x2_0, ShuffleNetV2_swish
+from .squeezenet import SqueezeNet1_0, SqueezeNet1_1
+from .vgg import VGG11, VGG13, VGG16, VGG19
 
 from .distillation_models import ResNet50_vd_distill_MobileNetV3_large_x1_0
