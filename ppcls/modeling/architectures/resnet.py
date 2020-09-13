@@ -18,16 +18,16 @@ from __future__ import print_function
 
 import numpy as np
 import paddle
-import paddle.fluid as fluid
-from paddle.fluid.param_attr import ParamAttr
-from paddle.fluid.dygraph.nn import Conv2D, Pool2D, BatchNorm, Linear, Dropout
+from paddle import ParamAttr
+import paddle.nn as nn
+from paddle.nn import Conv2d, Pool2D, BatchNorm, Linear, Dropout
 
 import math
 
 __all__ = ["ResNet18", "ResNet34", "ResNet50", "ResNet101", "ResNet152"]
 
 
-class ConvBNLayer(fluid.dygraph.Layer):
+class ConvBNLayer(nn.Layer):
     def __init__(self,
                  num_channels,
                  num_filters,
@@ -38,7 +38,7 @@ class ConvBNLayer(fluid.dygraph.Layer):
                  name=None):
         super(ConvBNLayer, self).__init__()
 
-        self._conv = Conv2D(
+        self._conv = Conv2d(
             num_channels=num_channels,
             num_filters=num_filters,
             filter_size=filter_size,
@@ -66,7 +66,7 @@ class ConvBNLayer(fluid.dygraph.Layer):
         return y
 
 
-class BottleneckBlock(fluid.dygraph.Layer):
+class BottleneckBlock(nn.Layer):
     def __init__(self,
                  num_channels,
                  num_filters,
@@ -117,11 +117,11 @@ class BottleneckBlock(fluid.dygraph.Layer):
         else:
             short = self.short(inputs)
 
-        y = fluid.layers.elementwise_add(x=short, y=conv2, act="relu")
+        y = paddle.elementwise_add(x=short, y=conv2, act="relu")
         return y
 
 
-class BasicBlock(fluid.dygraph.Layer):
+class BasicBlock(nn.Layer):
     def __init__(self,
                  num_channels,
                  num_filters,
@@ -162,11 +162,11 @@ class BasicBlock(fluid.dygraph.Layer):
             short = inputs
         else:
             short = self.short(inputs)
-        y = fluid.layers.elementwise_add(x=short, y=conv1, act="relu")
+        y = paddle.elementwise_add(x=short, y=conv1, act="relu")
         return y
 
 
-class ResNet(fluid.dygraph.Layer):
+class ResNet(nn.Layer):
     def __init__(self, layers=50, class_dim=1000):
         super(ResNet, self).__init__()
 
@@ -249,7 +249,7 @@ class ResNet(fluid.dygraph.Layer):
             self.pool2d_avg_channels,
             class_dim,
             param_attr=ParamAttr(
-                initializer=fluid.initializer.Uniform(-stdv, stdv),
+                initializer=paddle.distribution.Uniform(-stdv, stdv),
                 name="fc_0.w_0"),
             bias_attr=ParamAttr(name="fc_0.b_0"))
 
@@ -259,7 +259,7 @@ class ResNet(fluid.dygraph.Layer):
         for block in self.block_list:
             y = block(y)
         y = self.pool2d_avg(y)
-        y = fluid.layers.reshape(y, shape=[-1, self.pool2d_avg_channels])
+        y = paddle.reshape(y, shape=[-1, self.pool2d_avg_channels])
         y = self.out(y)
         return y
 
