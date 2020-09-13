@@ -20,11 +20,12 @@ import numpy as np
 import paddle
 import math
 import paddle.nn as nn
-import paddle.fluid as fluid
-from paddle.fluid.param_attr import ParamAttr
-from paddle.fluid.regularizer import L2DecayRegularizer
-from paddle.fluid.initializer import MSRA, ConstantInitializer
-from paddle.fluid.dygraph.nn import Conv2D, Pool2D, BatchNorm, Linear, Dropout
+from paddle import ParamAttr
+from paddle.nn.initializer import MSRA
+from paddle.nn import Conv2d, BatchNorm, Linear, Dropout
+from paddle.nn import AdaptiveAvgPool2d, MaxPool2d, AvgPool2d
+# TODO: need to be removed later!
+from paddle.fluid.regularizer import L2Decay
 
 __all__ = ["ResNeSt50_fast_1s1x64d", "ResNeSt50"]
 
@@ -43,26 +44,25 @@ class ConvBNLayer(nn.Layer):
 
         bn_decay = 0.0
 
-        self._conv = Conv2D(
-            num_channels=num_channels,
-            num_filters=num_filters,
-            filter_size=filter_size,
+        self._conv = Conv2d(
+            in_channels=num_channels,
+            out_channels=num_filters,
+            kernel_size=filter_size,
             stride=stride,
             padding=(filter_size - 1) // 2,
             dilation=dilation,
             groups=groups,
-            act=None,
-            param_attr=ParamAttr(name=name + "_weight"),
+            weight_attr=ParamAttr(name=name + "_weight"),
             bias_attr=False)
         self._batch_norm = BatchNorm(
             num_filters,
             act=act,
             param_attr=ParamAttr(
                 name=name + "_scale",
-                regularizer=L2DecayRegularizer(regularization_coeff=bn_decay)),
+                regularizer=L2Decay(regularization_coeff=bn_decay)),
             bias_attr=ParamAttr(
                 name + "_offset",
-                regularizer=L2DecayRegularizer(regularization_coeff=bn_decay)),
+                regularizer=L2Decay(regularization_coeff=bn_decay)),
             moving_mean_name=name + "_mean",
             moving_variance_name=name + "_variance")
 
@@ -124,7 +124,7 @@ class SplatConv(nn.Layer):
             act="relu",
             name=name + "_splat1")
 
-        self.avg_pool2d = Pool2D(pool_type='avg', global_pooling=True)
+        self.avg_pool2d = AdaptiveAvgPool2d(1)
 
         inter_channels = int(max(in_channels * radix // reduction_factor, 32))
 
@@ -139,15 +139,14 @@ class SplatConv(nn.Layer):
             name=name + "_splat2")
 
         # to calc atten
-        self.conv3 = Conv2D(
-            num_channels=inter_channels,
-            num_filters=channels * radix,
-            filter_size=1,
+        self.conv3 = Conv2d(
+            in_channels=inter_channels,
+            out_channels=channels * radix,
+            kernel_size=1,
             stride=1,
             padding=0,
             groups=groups,
-            act=None,
-            param_attr=ParamAttr(
+            weight_attr=ParamAttr(
                 name=name + "_splat_weights", initializer=MSRA()),
             bias_attr=False)
 
@@ -221,11 +220,8 @@ class BottleneckBlock(nn.Layer):
             name=name + "_conv1")
 
         if avd and avd_first and (stride > 1 or is_first):
-            self.avg_pool2d_1 = Pool2D(
-                pool_size=3,
-                pool_stride=stride,
-                pool_padding=1,
-                pool_type="avg")
+            self.avg_pool2d_1 = AvgPool2d(
+                kernel_size=3, stride=stride, padding=1)
 
         if radix >= 1:
             self.conv2 = SplatConv(
@@ -252,11 +248,8 @@ class BottleneckBlock(nn.Layer):
                 name=name + "_conv2")
 
         if avd and avd_first == False and (stride > 1 or is_first):
-            self.avg_pool2d_2 = Pool2D(
-                pool_size=3,
-                pool_stride=stride,
-                pool_padding=1,
-                pool_type="avg")
+            self.avg_pool2d_2 = AvgPool2d(
+                kernel_size=3, stride=stride, padding=1)
 
         self.conv3 = ConvBNLayer(
             num_channels=group_width,
@@ -270,39 +263,31 @@ class BottleneckBlock(nn.Layer):
         if stride != 1 or self.inplanes != self.planes * 4:
             if avg_down:
                 if dilation == 1:
-                    self.avg_pool2d_3 = Pool2D(
-                        pool_size=stride,
-                        pool_stride=stride,
-                        pool_type="avg",
-                        ceil_mode=True)
+                    self.avg_pool2d_3 = AvgPool2d(
+                        kernel_size=stride, stride=stride, padding=0)
                 else:
-                    self.avg_pool2d_3 = Pool2D(
-                        pool_size=1,
-                        pool_stride=1,
-                        pool_type="avg",
-                        ceil_mode=True)
+                    self.avg_pool2d_3 = AvgPool2d(
+                        kernel_size=1, stride=1, padding=0, ceil_mode=True)
 
-                self.conv4 = Conv2D(
-                    num_channels=self.inplanes,
-                    num_filters=planes * 4,
-                    filter_size=1,
+                self.conv4 = Conv2d(
+                    in_channels=self.inplanes,
+                    out_channels=planes * 4,
+                    kernel_size=1,
                     stride=1,
                     padding=0,
                     groups=1,
-                    act=None,
-                    param_attr=ParamAttr(
+                    weight_attr=ParamAttr(
                         name=name + "_weights", initializer=MSRA()),
                     bias_attr=False)
             else:
-                self.conv4 = Conv2D(
-                    num_channels=self.inplanes,
-                    num_filters=planes * 4,
-                    filter_size=1,
+                self.conv4 = Conv2d(
+                    in_channels=self.inplanes,
+                    out_channels=planes * 4,
+                    kernel_size=1,
                     stride=stride,
                     padding=0,
                     groups=1,
-                    act=None,
-                    param_attr=ParamAttr(
+                    weight_attr=ParamAttr(
                         name=name + "_shortcut_weights", initializer=MSRA()),
                     bias_attr=False)
 
@@ -312,12 +297,10 @@ class BottleneckBlock(nn.Layer):
                 act=None,
                 param_attr=ParamAttr(
                     name=name + "_shortcut_scale",
-                    regularizer=L2DecayRegularizer(
-                        regularization_coeff=bn_decay)),
+                    regularizer=L2Decay(regularization_coeff=bn_decay)),
                 bias_attr=ParamAttr(
                     name + "_shortcut_offset",
-                    regularizer=L2DecayRegularizer(
-                        regularization_coeff=bn_decay)),
+                    regularizer=L2Decay(regularization_coeff=bn_decay)),
                 moving_mean_name=name + "_shortcut_mean",
                 moving_variance_name=name + "_shortcut_variance")
 
@@ -515,8 +498,7 @@ class ResNeSt(nn.Layer):
                 act="relu",
                 name="conv1")
 
-        self.max_pool2d = Pool2D(
-            pool_size=3, pool_stride=2, pool_padding=1, pool_type="max")
+        self.max_pool2d = MaxPool2d(kernel_size=3, stride=2, padding=1)
 
         self.layer1 = ResNeStLayer(
             inplanes=self.stem_width * 2
@@ -645,7 +627,7 @@ class ResNeSt(nn.Layer):
                 stride=2,
                 name="layer4")
 
-        self.pool2d_avg = Pool2D(pool_type='avg', global_pooling=True)
+        self.pool2d_avg = AdaptiveAvgPool2d(1)
 
         self.out_channels = 2048
 
@@ -654,7 +636,7 @@ class ResNeSt(nn.Layer):
         self.out = Linear(
             self.out_channels,
             class_dim,
-            param_attr=ParamAttr(
+            weight_attr=ParamAttr(
                 initializer=nn.initializer.Uniform(-stdv, stdv),
                 name="fc_weights"),
             bias_attr=ParamAttr(name="fc_offset"))
