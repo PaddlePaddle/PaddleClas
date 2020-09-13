@@ -21,6 +21,7 @@ import paddle
 from paddle import ParamAttr
 import paddle.nn as nn
 from paddle.nn import Conv2d, Pool2D, BatchNorm, Linear, Dropout
+from paddle.nn.initializer import Uniform
 
 import math
 
@@ -248,8 +249,7 @@ class ResNet(nn.Layer):
             self.pool2d_avg_channels,
             class_dim,
             weight_attr=ParamAttr(
-                initializer=paddle.nn.initializer.Uniform(-stdv, stdv),
-                name="fc_0.w_0"),
+                initializer=Uniform(-stdv, stdv), name="fc_0.w_0"),
             bias_attr=ParamAttr(name="fc_0.b_0"))
 
     def forward(self, inputs):
