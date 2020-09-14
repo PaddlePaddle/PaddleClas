@@ -23,7 +23,7 @@ from .se_resnet_vd import SE_ResNet18_vd, SE_ResNet34_vd, SE_ResNet50_vd, SE_Res
 from .se_resnext_vd import SE_ResNeXt50_vd_32x4d, SE_ResNeXt50_vd_32x4d, SENet154_vd
 from .dpn import DPN68
 from .densenet import DenseNet121
-from .hrnet import HRNet_W18_C
+from .hrnet import HRNet_W18_C, HRNet_W30_C, HRNet_W32_C, HRNet_W40_C, HRNet_W44_C, HRNet_W48_C, HRNet_W60_C, HRNet_W64_C, SE_HRNet_W18_C, SE_HRNet_W30_C, SE_HRNet_W32_C, SE_HRNet_W40_C, SE_HRNet_W44_C, SE_HRNet_W48_C, SE_HRNet_W60_C, SE_HRNet_W64_C
 from .efficientnet import EfficientNetB0
 from .resnest import ResNeSt50_fast_1s1x64d, ResNeSt50
 from .googlenet import GoogLeNet
@@ -39,5 +39,6 @@ from .resnext101_wsl import ResNeXt101_32x8d_wsl, ResNeXt101_32x16d_wsl, ResNeXt
 from .shufflenet_v2 import ShuffleNetV2_x0_25, ShuffleNetV2_x0_33, ShuffleNetV2_x0_5, ShuffleNetV2, ShuffleNetV2_x1_5, ShuffleNetV2_x2_0, ShuffleNetV2_swish
 from .squeezenet import SqueezeNet1_0, SqueezeNet1_1
 from .vgg import VGG11, VGG13, VGG16, VGG19
+from .darknet import DarkNet53
 
 from .distillation_models import ResNet50_vd_distill_MobileNetV3_large_x1_0
