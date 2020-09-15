@@ -17,7 +17,7 @@ import imghdr
 import os
 import signal
 
-from paddle.fluid.io import multiprocess_reader
+from paddle.reader import multiprocess_reader
 
 from . import imaug
 from .imaug import transform
