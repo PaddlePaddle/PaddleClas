@@ -18,7 +18,7 @@ from __future__ import print_function
 
 import sys
 
-import paddle.fluid as fluid
+import paddle
 
 __all__ = ['OptimizerBuilder']
 
@@ -33,11 +33,10 @@ class L1Decay(object):
 
     def __init__(self, factor=0.0):
         super(L1Decay, self).__init__()
-        self.regularization_coeff = factor
+        self.factor = factor
 
     def __call__(self):
-        reg = fluid.regularizer.L1Decay(
-            regularization_coeff=self.regularization_coeff)
+        reg = paddle.regularizer.L1Decay(self.factor)
         return reg
 
 
@@ -51,11 +50,10 @@ class L2Decay(object):
 
     def __init__(self, factor=0.0):
         super(L2Decay, self).__init__()
-        self.regularization_coeff = factor
+        self.factor = factor
 
     def __call__(self):
-        reg = fluid.regularizer.L2Decay(
-            regularization_coeff=self.regularization_coeff)
+        reg = paddle.regularizer.L2Decay(self.factor)
         return reg
 
 
@@ -83,11 +81,11 @@ class Momentum(object):
         self.regularization = regularization
 
     def __call__(self):
-        opt = fluid.optimizer.Momentum(
+        opt = paddle.optimizer.Momentum(
             learning_rate=self.learning_rate,
             momentum=self.momentum,
-            parameter_list=self.parameter_list,
-            regularization=self.regularization)
+            parameters=self.parameter_list,
+            weight_decay=self.regularization)
         return opt
 
 
@@ -121,13 +119,13 @@ class RMSProp(object):
         self.regularization = regularization
 
     def __call__(self):
-        opt = fluid.optimizer.RMSProp(
+        opt = paddle.optimizer.RMSProp(
             learning_rate=self.learning_rate,
             momentum=self.momentum,
             rho=self.rho,
             epsilon=self.epsilon,
-            parameter_list=self.parameter_list,
-            regularization=self.regularization)
+            parameters=self.parameter_list,
+            weight_decay=self.regularization)
         return opt
 
 

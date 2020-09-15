@@ -19,7 +19,9 @@ from __future__ import print_function
 import os
 import sys
 
-import paddle.fluid as fluid
+import paddle
+# TODO: need to be fixed in the future.
+from paddle.fluid import is_compiled_with_cuda
 
 from ppcls.modeling import get_architectures
 from ppcls.modeling import similar_architectures
@@ -33,10 +35,9 @@ def check_version():
     """
     err = "PaddlePaddle version 1.8.0 or higher is required, " \
           "or a suitable develop version is satisfied as well. \n" \
-          "Please make sure the version is good with your code." \
-
+          "Please make sure the version is good with your code."
     try:
-        fluid.require_version('1.8.0')
+        paddle.utils.require_version('0.0.0')
     except Exception:
         logger.error(err)
         sys.exit(1)
@@ -50,7 +51,7 @@ def check_gpu():
           "install paddlepaddle-gpu to run model on GPU."
 
     try:
-        assert fluid.is_compiled_with_cuda()
+        assert is_compiled_with_cuda()
     except AssertionError:
         logger.error(err)
         sys.exit(1)

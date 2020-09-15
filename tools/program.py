@@ -69,8 +69,6 @@ def create_model(architecture, classes_num):
     """
     name = architecture["name"]
     params = architecture.get("params", {})
-    print(name)
-    print(params)
     return architectures.__dict__[name](class_dim=classes_num, **params)
 
 
@@ -237,7 +235,7 @@ def create_optimizer(config, parameter_list=None):
     # create optimizer instance
     opt_config = config['OPTIMIZER']
     opt = OptimizerBuilder(**opt_config)
-    return opt(lr, parameter_list)
+    return opt(lr, parameter_list), lr
 
 
 def create_feeds(batch, use_mix):
@@ -253,7 +251,13 @@ def create_feeds(batch, use_mix):
     return feeds
 
 
-def run(dataloader, config, net, optimizer=None, epoch=0, mode='train'):
+def run(dataloader,
+        config,
+        net,
+        optimizer=None,
+        lr_scheduler=None,
+        epoch=0,
+        mode='train'):
     """
     Feed data to the model and fetch the measures and loss
 
@@ -301,6 +305,17 @@ def run(dataloader, config, net, optimizer=None, epoch=0, mode='train'):
             net.clear_gradients()
             metric_list['lr'].update(
                 optimizer._global_learning_rate().numpy()[0], batch_size)
+
+            if lr_scheduler is not None:
+                if lr_scheduler.update_specified:
+                    curr_global_counter = lr_scheduler.step_each_epoch * epoch + idx
+                    update = max(
+                        0, curr_global_counter - lr_scheduler.update_start_step
+                    ) % lr_scheduler.update_step_interval == 0
+                    if update:
+                        lr_scheduler.step()
+                else:
+                    lr_scheduler.step()
 
         for name, fetch in fetchs.items():
             metric_list[name].update(fetch.numpy()[0], batch_size)

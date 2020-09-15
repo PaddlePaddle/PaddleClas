@@ -23,14 +23,15 @@ __dir__ = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(__dir__)
 sys.path.append(os.path.abspath(os.path.join(__dir__, '..')))
 
-import program
-from ppcls.utils import logger
-from ppcls.utils.save_load import init_model, save_model
-from ppcls.utils.config import get_config
-from ppcls.data import Reader
 
 import paddle
 from paddle.distributed import ParallelEnv
+
+from ppcls.data import Reader
+from ppcls.utils.config import get_config
+from ppcls.utils.save_load import init_model, save_model
+from ppcls.utils import logger
+import program
 
 def parse_args():
     parser = argparse.ArgumentParser("PaddleClas train script")
@@ -67,7 +68,7 @@ def main(args):
 
     net = program.create_model(config.ARCHITECTURE, config.classes_num)
 
-    optimizer = program.create_optimizer(
+    optimizer, lr_scheduler = program.create_optimizer(
         config, parameter_list=net.parameters())
 
     if config["use_data_parallel"]:
@@ -90,8 +91,8 @@ def main(args):
     for epoch_id in range(config.epochs):
         net.train()
         # 1. train with train dataset
-        program.run(train_dataloader, config, net, optimizer, epoch_id,
-                    'train')
+        program.run(train_dataloader, config, net, optimizer, lr_scheduler,
+                    epoch_id, 'train')
 
         if not config["use_data_parallel"] or ParallelEnv().local_rank == 0:
             # 2. validate with validate dataset
