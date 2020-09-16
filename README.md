@@ -18,7 +18,7 @@
 
 ## 特性
 
-- 丰富的模型库：基于ImageNet1k分类数据集，PaddleClas提供了24个系列的分类网络结构和训练配置，121个预训练模型和性能评估。
+- 丰富的模型库：基于ImageNet1k分类数据集，PaddleClas提供了24个系列的分类网络结构和训练配置，122个预训练模型和性能评估。
 
 - SSLD知识蒸馏：基于该方案蒸馏模型的识别准确率普遍提升3%以上。
 
@@ -42,8 +42,9 @@
     - [ResNet及其Vd系列](#ResNet及其Vd系列)
     - [移动端系列](#移动端系列)
     - [SEResNeXt与Res2Net系列](#SEResNeXt与Res2Net系列)
-    - [Inception系列](#Inception系列)
     - [DPN与DenseNet系列](#DPN与DenseNet系列)
+    - [HRNet](HRNet系列)
+    - [Inception系列](#Inception系列)
     - [EfficientNet与ResNeXt101_wsl系列](#EfficientNet与ResNeXt101_wsl系列)
     - [ResNeSt与RegNet系列](#ResNeSt与RegNet系列)
 - 模型训练/评估
@@ -260,7 +261,7 @@ Inception系列模型的精度、速度指标如下表所示，更多关于该�
 <a name="EfficientNet与ResNeXt101_wsl系列"></a>
 ### EfficientNet与ResNeXt101_wsl系列
 
-EfficientNet与ResNeXt101_wsl系列模型的精度、速度指标如下表所示，更多关于该系列的模型介绍可以参考：[EfficientNet与ResNeXt101_wsl系列模型文档](./docs/zh_CN/models/Inception.md)。
+EfficientNet与ResNeXt101_wsl系列模型的精度、速度指标如下表所示，更多关于该系列的模型介绍可以参考：[EfficientNet与ResNeXt101_wsl系列模型文档](./docs/zh_CN/models/EfficientNet_and_ResNeXt101_wsl.md)。
 
 
 | 模型                        | Top-1 Acc | Top-5 Acc | time(ms)<br>bs=1 | time(ms)<br>bs=4 | Flops(G) | Params(M) | 下载地址                                                                                               |
