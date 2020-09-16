@@ -1,12 +1,30 @@
+# copyright (c) 2020 PaddlePaddle Authors. All Rights Reserve.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#    http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 import paddle
-import paddle.fluid as fluid
-from paddle.fluid.param_attr import ParamAttr
-from paddle.fluid.dygraph.nn import Conv2D, Pool2D, BatchNorm, Linear, Dropout
+from paddle import ParamAttr
+import paddle.nn as nn
+import paddle.nn.functional as F
+from paddle.nn import Conv2d, BatchNorm, Linear, Dropout
+from paddle.nn import AdaptiveAvgPool2d, MaxPool2d, AvgPool2d
+from paddle.nn.initializer import Uniform
 import math
 
 __all__ = ["InceptionV4"]
 
-class ConvBNLayer(fluid.dygraph.Layer):
+
+class ConvBNLayer(nn.Layer):
     def __init__(self,
                  num_channels,
                  num_filters,
@@ -18,15 +36,14 @@ class ConvBNLayer(fluid.dygraph.Layer):
                  name=None):
         super(ConvBNLayer, self).__init__()
 
-        self._conv = Conv2D(
-            num_channels=num_channels,
-            num_filters=num_filters,
-            filter_size=filter_size,
+        self._conv = Conv2d(
+            in_channels=num_channels,
+            out_channels=num_filters,
+            kernel_size=filter_size,
             stride=stride,
             padding=padding,
             groups=groups,
-            act=None,
-            param_attr=ParamAttr(name=name + "_weights"),
+            weight_attr=ParamAttr(name=name + "_weights"),
             bias_attr=False)
         bn_name = name + "_bn"
         self._batch_norm = BatchNorm(
@@ -43,7 +60,7 @@ class ConvBNLayer(fluid.dygraph.Layer):
         return y
 
 
-class InceptionStem(fluid.dygraph.Layer):
+class InceptionStem(nn.Layer):
     def __init__(self):
         super(InceptionStem, self).__init__()
         self._conv_1 = ConvBNLayer(
@@ -51,7 +68,7 @@ class InceptionStem(fluid.dygraph.Layer):
         self._conv_2 = ConvBNLayer(32, 32, 3, act="relu", name="conv2_3x3_s1")
         self._conv_3 = ConvBNLayer(
             32, 64, 3, padding=1, act="relu", name="conv3_3x3_s1")
-        self._pool = Pool2D(pool_size=3, pool_type="max", pool_stride=2)
+        self._pool = MaxPool2d(kernel_size=3, stride=2, padding=0)
         self._conv2 = ConvBNLayer(
             64, 96, 3, stride=2, act="relu", name="inception_stem1_3x3_s2")
         self._conv1_1 = ConvBNLayer(
@@ -84,7 +101,7 @@ class InceptionStem(fluid.dygraph.Layer):
 
         pool1 = self._pool(conv)
         conv2 = self._conv2(conv)
-        concat = fluid.layers.concat([pool1, conv2], axis=1)
+        concat = paddle.concat([pool1, conv2], axis=1)
 
         conv1 = self._conv1_1(concat)
         conv1 = self._conv1_2(conv1)
@@ -94,19 +111,19 @@ class InceptionStem(fluid.dygraph.Layer):
         conv2 = self._conv2_3(conv2)
         conv2 = self._conv2_4(conv2)
 
-        concat = fluid.layers.concat([conv1, conv2], axis=1)
+        concat = paddle.concat([conv1, conv2], axis=1)
 
         conv1 = self._conv3(concat)
         pool1 = self._pool(concat)
 
-        concat = fluid.layers.concat([conv1, pool1], axis=1)
+        concat = paddle.concat([conv1, pool1], axis=1)
         return concat
 
 
-class InceptionA(fluid.dygraph.Layer):
+class InceptionA(nn.Layer):
     def __init__(self, name):
         super(InceptionA, self).__init__()
-        self._pool = Pool2D(pool_size=3, pool_type="avg", pool_padding=1)
+        self._pool = AvgPool2d(kernel_size=3, stride=1, padding=1)
         self._conv1 = ConvBNLayer(
             384, 96, 1, act="relu", name="inception_a" + name + "_1x1")
         self._conv2 = ConvBNLayer(
@@ -154,14 +171,14 @@ class InceptionA(fluid.dygraph.Layer):
         conv4 = self._conv4_2(conv4)
         conv4 = self._conv4_3(conv4)
 
-        concat = fluid.layers.concat([conv1, conv2, conv3, conv4], axis=1)
+        concat = paddle.concat([conv1, conv2, conv3, conv4], axis=1)
         return concat
 
 
-class ReductionA(fluid.dygraph.Layer):
+class ReductionA(nn.Layer):
     def __init__(self):
         super(ReductionA, self).__init__()
-        self._pool = Pool2D(pool_size=3, pool_type="max", pool_stride=2)
+        self._pool = MaxPool2d(kernel_size=3, stride=2, padding=0)
         self._conv2 = ConvBNLayer(
             384, 384, 3, stride=2, act="relu", name="reduction_a_3x3")
         self._conv3_1 = ConvBNLayer(
@@ -177,14 +194,14 @@ class ReductionA(fluid.dygraph.Layer):
         conv3 = self._conv3_1(inputs)
         conv3 = self._conv3_2(conv3)
         conv3 = self._conv3_3(conv3)
-        concat = fluid.layers.concat([pool1, conv2, conv3], axis=1)
+        concat = paddle.concat([pool1, conv2, conv3], axis=1)
         return concat
 
 
-class InceptionB(fluid.dygraph.Layer):
+class InceptionB(nn.Layer):
     def __init__(self, name=None):
         super(InceptionB, self).__init__()
-        self._pool = Pool2D(pool_size=3, pool_type="avg", pool_padding=1)
+        self._pool = AvgPool2d(kernel_size=3, stride=1, padding=1)
         self._conv1 = ConvBNLayer(
             1024, 128, 1, act="relu", name="inception_b" + name + "_1x1")
         self._conv2 = ConvBNLayer(
@@ -254,14 +271,14 @@ class InceptionB(fluid.dygraph.Layer):
         conv4 = self._conv4_4(conv4)
         conv4 = self._conv4_5(conv4)
 
-        concat = fluid.layers.concat([conv1, conv2, conv3, conv4], axis=1)
+        concat = paddle.concat([conv1, conv2, conv3, conv4], axis=1)
         return concat
 
 
-class ReductionB(fluid.dygraph.Layer):
+class ReductionB(nn.Layer):
     def __init__(self):
         super(ReductionB, self).__init__()
-        self._pool = Pool2D(pool_size=3, pool_type="max", pool_stride=2)
+        self._pool = MaxPool2d(kernel_size=3, stride=2, padding=0)
         self._conv2_1 = ConvBNLayer(
             1024, 192, 1, act="relu", name="reduction_b_3x3_reduce")
         self._conv2_2 = ConvBNLayer(
@@ -294,15 +311,15 @@ class ReductionB(fluid.dygraph.Layer):
         conv3 = self._conv3_3(conv3)
         conv3 = self._conv3_4(conv3)
 
-        concat = fluid.layers.concat([pool1, conv2, conv3], axis=1)
+        concat = paddle.concat([pool1, conv2, conv3], axis=1)
 
         return concat
 
 
-class InceptionC(fluid.dygraph.Layer):
+class InceptionC(nn.Layer):
     def __init__(self, name=None):
         super(InceptionC, self).__init__()
-        self._pool = Pool2D(pool_size=3, pool_type="avg", pool_padding=1)
+        self._pool = AvgPool2d(kernel_size=3, stride=1, padding=1)
         self._conv1 = ConvBNLayer(
             1536, 256, 1, act="relu", name="inception_c" + name + "_1x1")
         self._conv2 = ConvBNLayer(
@@ -364,13 +381,13 @@ class InceptionC(fluid.dygraph.Layer):
         conv4_1 = self._conv4_1(conv4)
         conv4_2 = self._conv4_2(conv4)
 
-        concat = fluid.layers.concat(
+        concat = paddle.concat(
             [conv1, conv2, conv3_1, conv3_2, conv4_1, conv4_2], axis=1)
 
         return concat
 
 
-class InceptionV4DY(fluid.dygraph.Layer):
+class InceptionV4DY(nn.Layer):
     def __init__(self, class_dim=1000):
         super(InceptionV4DY, self).__init__()
         self._inception_stem = InceptionStem()
@@ -394,15 +411,14 @@ class InceptionV4DY(fluid.dygraph.Layer):
         self._inceptionC_2 = InceptionC(name="2")
         self._inceptionC_3 = InceptionC(name="3")
 
-        self.avg_pool = Pool2D(pool_type='avg', global_pooling=True)
-        self._drop = Dropout(p=0.2)
+        self.avg_pool = AdaptiveAvgPool2d(1)
+        self._drop = Dropout(p=0.2, mode="downscale_in_infer")
         stdv = 1.0 / math.sqrt(1536 * 1.0)
         self.out = Linear(
             1536,
             class_dim,
-            param_attr=ParamAttr(
-                initializer=fluid.initializer.Uniform(-stdv, stdv),
-                name="final_fc_weights"),
+            weight_attr=ParamAttr(
+                initializer=Uniform(-stdv, stdv), name="final_fc_weights"),
             bias_attr=ParamAttr(name="final_fc_offset"))
 
     def forward(self, inputs):
@@ -428,7 +444,7 @@ class InceptionV4DY(fluid.dygraph.Layer):
         x = self._inceptionC_3(x)
 
         x = self.avg_pool(x)
-        x = fluid.layers.squeeze(x, axes=[2, 3])
+        x = paddle.squeeze(x, axis=[2, 3])
         x = self._drop(x)
         x = self.out(x)
         return x

@@ -18,15 +18,17 @@ from __future__ import print_function
 
 import numpy as np
 import paddle
-import paddle.fluid as fluid
-from paddle.fluid.param_attr import ParamAttr
-from paddle.fluid.dygraph.nn import Conv2D, Pool2D, BatchNorm, Linear, Dropout
-from paddle.fluid.initializer import MSRA
+from paddle import ParamAttr
+import paddle.nn as nn
+import paddle.nn.functional as F
+from paddle.nn import Conv2d, BatchNorm, Linear, Dropout
+from paddle.nn import AdaptiveAvgPool2d, MaxPool2d, AvgPool2d
+from paddle.nn.initializer import MSRA
 import math
 
 __all__ = [
     "ShuffleNetV2_x0_25", "ShuffleNetV2_x0_33", "ShuffleNetV2_x0_5",
-    "ShuffleNetV2_x1_0", "ShuffleNetV2_x1_5", "ShuffleNetV2_x2_0",
+    "ShuffleNetV2", "ShuffleNetV2_x1_5", "ShuffleNetV2_x2_0",
     "ShuffleNetV2_swish"
 ]
 
@@ -37,17 +39,16 @@ def channel_shuffle(x, groups):
     channels_per_group = num_channels // groups
 
     # reshape
-    x = fluid.layers.reshape(
+    x = paddle.reshape(
         x=x, shape=[batchsize, groups, channels_per_group, height, width])
 
-    x = fluid.layers.transpose(x=x, perm=[0, 2, 1, 3, 4])
+    x = paddle.transpose(x=x, perm=[0, 2, 1, 3, 4])
     # flatten
-    x = fluid.layers.reshape(
-        x=x, shape=[batchsize, num_channels, height, width])
+    x = paddle.reshape(x=x, shape=[batchsize, num_channels, height, width])
     return x
 
 
-class ConvBNLayer(fluid.dygraph.Layer):
+class ConvBNLayer(nn.Layer):
     def __init__(self,
                  num_channels,
                  filter_size,
@@ -58,24 +59,21 @@ class ConvBNLayer(fluid.dygraph.Layer):
                  num_groups=1,
                  if_act=True,
                  act='relu',
-                 name=None,
-                 use_cudnn=True):
+                 name=None):
         super(ConvBNLayer, self).__init__()
         self._if_act = if_act
         assert act in ['relu', 'swish'], \
             "supported act are {} but your act is {}".format(
                 ['relu', 'swish'], act)
         self._act = act
-        self._conv = Conv2D(
-            num_channels=num_channels,
-            num_filters=num_filters,
-            filter_size=filter_size,
+        self._conv = Conv2d(
+            in_channels=num_channels,
+            out_channels=num_filters,
+            kernel_size=filter_size,
             stride=stride,
             padding=padding,
             groups=num_groups,
-            act=None,
-            use_cudnn=use_cudnn,
-            param_attr=ParamAttr(
+            weight_attr=ParamAttr(
                 initializer=MSRA(), name=name + "_weights"),
             bias_attr=False)
 
@@ -90,12 +88,11 @@ class ConvBNLayer(fluid.dygraph.Layer):
         y = self._conv(inputs)
         y = self._batch_norm(y)
         if self._if_act:
-            y = fluid.layers.relu(
-                y) if self._act == 'relu' else fluid.layers.swish(y)
+            y = F.relu(y) if self._act == 'relu' else F.swish(y)
         return y
 
 
-class InvertedResidualUnit(fluid.dygraph.Layer):
+class InvertedResidualUnit(nn.Layer):
     def __init__(self,
                  num_channels,
                  num_filters,
@@ -130,7 +127,6 @@ class InvertedResidualUnit(fluid.dygraph.Layer):
                 num_groups=oup_inc,
                 if_act=False,
                 act=act,
-                use_cudnn=False,
                 name='stage_' + name + '_conv2')
             self._conv_linear = ConvBNLayer(
                 num_channels=oup_inc,
@@ -153,7 +149,6 @@ class InvertedResidualUnit(fluid.dygraph.Layer):
                 num_groups=inp,
                 if_act=False,
                 act=act,
-                use_cudnn=False,
                 name='stage_' + name + '_conv4')
             self._conv_linear_1 = ConvBNLayer(
                 num_channels=inp,
@@ -185,7 +180,6 @@ class InvertedResidualUnit(fluid.dygraph.Layer):
                 num_groups=oup_inc,
                 if_act=False,
                 act=act,
-                use_cudnn=False,
                 name='stage_' + name + '_conv2')
             self._conv_linear_2 = ConvBNLayer(
                 num_channels=oup_inc,
@@ -200,14 +194,14 @@ class InvertedResidualUnit(fluid.dygraph.Layer):
 
     def forward(self, inputs):
         if self.benchmodel == 1:
-            x1, x2 = fluid.layers.split(
+            x1, x2 = paddle.split(
                 inputs,
                 num_or_sections=[inputs.shape[1] // 2, inputs.shape[1] // 2],
-                dim=1)
+                axis=1)
             x2 = self._conv_pw(x2)
             x2 = self._conv_dw(x2)
             x2 = self._conv_linear(x2)
-            out = fluid.layers.concat([x1, x2], axis=1)
+            out = paddle.concat([x1, x2], axis=1)
         else:
             x1 = self._conv_dw_1(inputs)
             x1 = self._conv_linear_1(x1)
@@ -215,12 +209,12 @@ class InvertedResidualUnit(fluid.dygraph.Layer):
             x2 = self._conv_pw_2(inputs)
             x2 = self._conv_dw_2(x2)
             x2 = self._conv_linear_2(x2)
-            out = fluid.layers.concat([x1, x2], axis=1)
+            out = paddle.concat([x1, x2], axis=1)
 
         return channel_shuffle(out, 2)
 
 
-class ShuffleNet(fluid.dygraph.Layer):
+class ShuffleNet(nn.Layer):
     def __init__(self, class_dim=1000, scale=1.0, act='relu'):
         super(ShuffleNet, self).__init__()
         self.scale = scale
@@ -252,8 +246,7 @@ class ShuffleNet(fluid.dygraph.Layer):
             if_act=True,
             act=act,
             name='stage1_conv')
-        self._max_pool = Pool2D(
-            pool_type='max', pool_size=3, pool_stride=2, pool_padding=1)
+        self._max_pool = MaxPool2d(kernel_size=3, stride=2, padding=1)
 
         # 2. bottleneck sequences
         self._block_list = []
@@ -298,13 +291,13 @@ class ShuffleNet(fluid.dygraph.Layer):
             name='conv5')
 
         # 4. pool
-        self._pool2d_avg = Pool2D(pool_type='avg', global_pooling=True)
+        self._pool2d_avg = AdaptiveAvgPool2d(1)
         self._out_c = stage_out_channels[-1]
         # 5. fc
         self._fc = Linear(
             stage_out_channels[-1],
             class_dim,
-            param_attr=ParamAttr(name='fc6_weights'),
+            weight_attr=ParamAttr(name='fc6_weights'),
             bias_attr=ParamAttr(name='fc6_offset'))
 
     def forward(self, inputs):
@@ -314,7 +307,7 @@ class ShuffleNet(fluid.dygraph.Layer):
             y = inv(y)
         y = self._last_conv(y)
         y = self._pool2d_avg(y)
-        y = fluid.layers.reshape(y, shape=[-1, self._out_c])
+        y = paddle.reshape(y, shape=[-1, self._out_c])
         y = self._fc(y)
         return y
 

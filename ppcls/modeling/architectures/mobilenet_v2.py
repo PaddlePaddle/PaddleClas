@@ -18,9 +18,11 @@ from __future__ import print_function
 
 import numpy as np
 import paddle
-import paddle.fluid as fluid
-from paddle.fluid.param_attr import ParamAttr
-from paddle.fluid.dygraph.nn import Conv2D, Pool2D, BatchNorm, Linear, Dropout
+from paddle import ParamAttr
+import paddle.nn as nn
+import paddle.nn.functional as F
+from paddle.nn import Conv2d, BatchNorm, Linear, Dropout
+from paddle.nn import AdaptiveAvgPool2d, MaxPool2d, AvgPool2d
 
 import math
 
@@ -30,7 +32,7 @@ __all__ = [
 ]
 
 
-class ConvBNLayer(fluid.dygraph.Layer):
+class ConvBNLayer(nn.Layer):
     def __init__(self,
                  num_channels,
                  filter_size,
@@ -43,16 +45,14 @@ class ConvBNLayer(fluid.dygraph.Layer):
                  use_cudnn=True):
         super(ConvBNLayer, self).__init__()
 
-        self._conv = Conv2D(
-            num_channels=num_channels,
-            num_filters=num_filters,
-            filter_size=filter_size,
+        self._conv = Conv2d(
+            in_channels=num_channels,
+            out_channels=num_filters,
+            kernel_size=filter_size,
             stride=stride,
             padding=padding,
             groups=num_groups,
-            act=None,
-            use_cudnn=use_cudnn,
-            param_attr=ParamAttr(name=name + "_weights"),
+            weight_attr=ParamAttr(name=name + "_weights"),
             bias_attr=False)
 
         self._batch_norm = BatchNorm(
@@ -66,11 +66,11 @@ class ConvBNLayer(fluid.dygraph.Layer):
         y = self._conv(inputs)
         y = self._batch_norm(y)
         if if_act:
-            y = fluid.layers.relu6(y)
+            y = F.relu6(y)
         return y
 
 
-class InvertedResidualUnit(fluid.dygraph.Layer):
+class InvertedResidualUnit(nn.Layer):
     def __init__(self, num_channels, num_in_filter, num_filters, stride,
                  filter_size, padding, expansion_factor, name):
         super(InvertedResidualUnit, self).__init__()
@@ -108,11 +108,11 @@ class InvertedResidualUnit(fluid.dygraph.Layer):
         y = self._bottleneck_conv(y, if_act=True)
         y = self._linear_conv(y, if_act=False)
         if ifshortcut:
-            y = fluid.layers.elementwise_add(inputs, y)
+            y = paddle.elementwise_add(inputs, y)
         return y
 
 
-class InvresiBlocks(fluid.dygraph.Layer):
+class InvresiBlocks(nn.Layer):
     def __init__(self, in_c, t, c, n, s, name):
         super(InvresiBlocks, self).__init__()
 
@@ -148,7 +148,7 @@ class InvresiBlocks(fluid.dygraph.Layer):
         return y
 
 
-class MobileNet(fluid.dygraph.Layer):
+class MobileNet(nn.Layer):
     def __init__(self, class_dim=1000, scale=1.0):
         super(MobileNet, self).__init__()
         self.scale = scale
@@ -199,12 +199,12 @@ class MobileNet(fluid.dygraph.Layer):
             padding=0,
             name="conv9")
 
-        self.pool2d_avg = Pool2D(pool_type="avg", global_pooling=True)
+        self.pool2d_avg = AdaptiveAvgPool2d(1)
 
         self.out = Linear(
             self.out_c,
             class_dim,
-            param_attr=ParamAttr(name="fc10_weights"),
+            weight_attr=ParamAttr(name="fc10_weights"),
             bias_attr=ParamAttr(name="fc10_offset"))
 
     def forward(self, inputs):
@@ -213,7 +213,7 @@ class MobileNet(fluid.dygraph.Layer):
             y = block(y)
         y = self.conv9(y, if_act=True)
         y = self.pool2d_avg(y)
-        y = fluid.layers.reshape(y, shape=[-1, self.out_c])
+        y = paddle.reshape(y, shape=[-1, self.out_c])
         y = self.out(y)
         return y
 

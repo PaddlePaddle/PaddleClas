@@ -18,9 +18,12 @@ from __future__ import print_function
 
 import numpy as np
 import paddle
-import paddle.fluid as fluid
-from paddle.fluid.param_attr import ParamAttr
-from paddle.fluid.dygraph.nn import Conv2D, Pool2D, BatchNorm, Linear
+from paddle import ParamAttr
+import paddle.nn as nn
+import paddle.nn.functional as F
+from paddle.nn import Conv2d, BatchNorm, Linear
+from paddle.nn import AdaptiveAvgPool2d, MaxPool2d, AvgPool2d
+from paddle.nn.initializer import Uniform
 
 import math
 
@@ -44,7 +47,7 @@ __all__ = [
 ]
 
 
-class ConvBNLayer(fluid.dygraph.Layer):
+class ConvBNLayer(nn.Layer):
     def __init__(self,
                  num_channels,
                  num_filters,
@@ -55,15 +58,14 @@ class ConvBNLayer(fluid.dygraph.Layer):
                  name=None):
         super(ConvBNLayer, self).__init__()
 
-        self._conv = Conv2D(
-            num_channels=num_channels,
-            num_filters=num_filters,
-            filter_size=filter_size,
+        self._conv = Conv2d(
+            in_channels=num_channels,
+            out_channels=num_filters,
+            kernel_size=filter_size,
             stride=stride,
             padding=(filter_size - 1) // 2,
             groups=groups,
-            act=None,
-            param_attr=ParamAttr(name=name + "_weights"),
+            weight_attr=ParamAttr(name=name + "_weights"),
             bias_attr=False)
         bn_name = name + '_bn'
         self._batch_norm = BatchNorm(
@@ -80,7 +82,7 @@ class ConvBNLayer(fluid.dygraph.Layer):
         return y
 
 
-class Layer1(fluid.dygraph.Layer):
+class Layer1(nn.Layer):
     def __init__(self, num_channels, has_se=False, name=None):
         super(Layer1, self).__init__()
 
@@ -105,7 +107,7 @@ class Layer1(fluid.dygraph.Layer):
         return conv
 
 
-class TransitionLayer(fluid.dygraph.Layer):
+class TransitionLayer(nn.Layer):
     def __init__(self, in_channels, out_channels, name=None):
         super(TransitionLayer, self).__init__()
 
@@ -148,7 +150,7 @@ class TransitionLayer(fluid.dygraph.Layer):
         return outs
 
 
-class Branches(fluid.dygraph.Layer):
+class Branches(nn.Layer):
     def __init__(self,
                  block_num,
                  in_channels,
@@ -183,7 +185,7 @@ class Branches(fluid.dygraph.Layer):
         return outs
 
 
-class BottleneckBlock(fluid.dygraph.Layer):
+class BottleneckBlock(nn.Layer):
     def __init__(self,
                  num_channels,
                  num_filters,
@@ -243,11 +245,11 @@ class BottleneckBlock(fluid.dygraph.Layer):
         if self.has_se:
             conv3 = self.se(conv3)
 
-        y = fluid.layers.elementwise_add(x=conv3, y=residual, act="relu")
+        y = paddle.elementwise_add(x=conv3, y=residual, act="relu")
         return y
 
 
-class BasicBlock(fluid.dygraph.Layer):
+class BasicBlock(nn.Layer):
     def __init__(self,
                  num_channels,
                  num_filters,
@@ -301,15 +303,15 @@ class BasicBlock(fluid.dygraph.Layer):
         if self.has_se:
             conv2 = self.se(conv2)
 
-        y = fluid.layers.elementwise_add(x=conv2, y=residual, act="relu")
+        y = paddle.elementwise_add(x=conv2, y=residual, act="relu")
         return y
 
 
-class SELayer(fluid.dygraph.Layer):
+class SELayer(nn.Layer):
     def __init__(self, num_channels, num_filters, reduction_ratio, name=None):
         super(SELayer, self).__init__()
 
-        self.pool2d_gap = Pool2D(pool_type='avg', global_pooling=True)
+        self.pool2d_gap = AdaptiveAvgPool2d(1)
 
         self._num_channels = num_channels
 
@@ -320,8 +322,7 @@ class SELayer(fluid.dygraph.Layer):
             med_ch,
             act="relu",
             param_attr=ParamAttr(
-                initializer=fluid.initializer.Uniform(-stdv, stdv),
-                name=name + "_sqz_weights"),
+                initializer=Uniform(-stdv, stdv), name=name + "_sqz_weights"),
             bias_attr=ParamAttr(name=name + '_sqz_offset'))
 
         stdv = 1.0 / math.sqrt(med_ch * 1.0)
@@ -330,22 +331,21 @@ class SELayer(fluid.dygraph.Layer):
             num_filters,
             act="sigmoid",
             param_attr=ParamAttr(
-                initializer=fluid.initializer.Uniform(-stdv, stdv),
-                name=name + "_exc_weights"),
+                initializer=Uniform(-stdv, stdv), name=name + "_exc_weights"),
             bias_attr=ParamAttr(name=name + '_exc_offset'))
 
     def forward(self, input):
         pool = self.pool2d_gap(input)
-        pool = fluid.layers.reshape(pool, shape=[-1, self._num_channels])
+        pool = paddle.reshape(pool, shape=[-1, self._num_channels])
         squeeze = self.squeeze(pool)
         excitation = self.excitation(squeeze)
-        excitation = fluid.layers.reshape(
+        excitation = paddle.reshape(
             excitation, shape=[-1, self._num_channels, 1, 1])
         out = input * excitation
         return out
 
 
-class Stage(fluid.dygraph.Layer):
+class Stage(nn.Layer):
     def __init__(self,
                  num_channels,
                  num_modules,
@@ -386,7 +386,7 @@ class Stage(fluid.dygraph.Layer):
         return out
 
 
-class HighResolutionModule(fluid.dygraph.Layer):
+class HighResolutionModule(nn.Layer):
     def __init__(self,
                  num_channels,
                  num_filters,
@@ -414,7 +414,7 @@ class HighResolutionModule(fluid.dygraph.Layer):
         return out
 
 
-class FuseLayers(fluid.dygraph.Layer):
+class FuseLayers(nn.Layer):
     def __init__(self,
                  in_channels,
                  out_channels,
@@ -482,8 +482,8 @@ class FuseLayers(fluid.dygraph.Layer):
                     y = self.residual_func_list[residual_func_idx](input[j])
                     residual_func_idx += 1
 
-                    y = fluid.layers.resize_nearest(input=y, scale=2**(j - i))
-                    residual = fluid.layers.elementwise_add(
+                    y = F.resize_nearest(input=y, scale=2**(j - i))
+                    residual = paddle.elementwise_add(
                         x=residual, y=y, act=None)
                 elif j < i:
                     y = input[j]
@@ -491,16 +491,16 @@ class FuseLayers(fluid.dygraph.Layer):
                         y = self.residual_func_list[residual_func_idx](y)
                         residual_func_idx += 1
 
-                    residual = fluid.layers.elementwise_add(
+                    residual = paddle.elementwise_add(
                         x=residual, y=y, act=None)
 
-            residual = fluid.layers.relu(residual)
+            residual = F.relu(residual)
             outs.append(residual)
 
         return outs
 
 
-class LastClsOut(fluid.dygraph.Layer):
+class LastClsOut(nn.Layer):
     def __init__(self,
                  num_channel_list,
                  has_se,
@@ -528,7 +528,7 @@ class LastClsOut(fluid.dygraph.Layer):
         return outs
 
 
-class HRNet(fluid.dygraph.Layer):
+class HRNet(nn.Layer):
     def __init__(self, width=18, has_se=False, class_dim=1000):
         super(HRNet, self).__init__()
 
@@ -623,16 +623,15 @@ class HRNet(fluid.dygraph.Layer):
             stride=1,
             name="cls_head_last_conv")
 
-        self.pool2d_avg = Pool2D(pool_type='avg', global_pooling=True)
+        self.pool2d_avg = AdaptiveAvgPool2d(1)
 
         stdv = 1.0 / math.sqrt(2048 * 1.0)
 
         self.out = Linear(
             2048,
             class_dim,
-            param_attr=ParamAttr(
-                initializer=fluid.initializer.Uniform(-stdv, stdv),
-                name="fc_weights"),
+            weight_attr=ParamAttr(
+                initializer=Uniform(-stdv, stdv), name="fc_weights"),
             bias_attr=ParamAttr(name="fc_offset"))
 
     def forward(self, input):
@@ -658,7 +657,7 @@ class HRNet(fluid.dygraph.Layer):
 
         y = self.conv_last(y)
         y = self.pool2d_avg(y)
-        y = fluid.layers.reshape(y, shape=[0, -1])
+        y = paddle.reshape(y, shape=[0, -1])
         y = self.out(y)
         return y
 

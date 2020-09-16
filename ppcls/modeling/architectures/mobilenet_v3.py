@@ -18,9 +18,12 @@ from __future__ import print_function
 
 import numpy as np
 import paddle
-import paddle.fluid as fluid
-from paddle.fluid.param_attr import ParamAttr
-from paddle.fluid.dygraph.nn import Conv2D, Pool2D, BatchNorm, Linear, Dropout
+from paddle import ParamAttr
+import paddle.nn as nn
+import paddle.nn.functional as F
+from paddle.nn import Conv2d, BatchNorm, Linear, Dropout
+from paddle.nn import AdaptiveAvgPool2d, MaxPool2d, AvgPool2d
+from paddle.regularizer import L2Decay
 
 import math
 
@@ -42,8 +45,12 @@ def make_divisible(v, divisor=8, min_value=None):
     return new_v
 
 
-class MobileNetV3(fluid.dygraph.Layer):
-    def __init__(self, scale=1.0, model_name="small", class_dim=1000):
+class MobileNetV3(nn.Layer):
+    def __init__(self,
+                 scale=1.0,
+                 model_name="small",
+                 dropout_prob=0.2,
+                 class_dim=1000):
         super(MobileNetV3, self).__init__()
 
         inplanes = 16
@@ -130,41 +137,42 @@ class MobileNetV3(fluid.dygraph.Layer):
             act="hard_swish",
             name="conv_last")
 
-        self.pool = Pool2D(
-            pool_type="avg", global_pooling=True, use_cudnn=False)
+        self.pool = AdaptiveAvgPool2d(1)
 
-        self.last_conv = Conv2D(
-            num_channels=make_divisible(scale * self.cls_ch_squeeze),
-            num_filters=self.cls_ch_expand,
-            filter_size=1,
+        self.last_conv = Conv2d(
+            in_channels=make_divisible(scale * self.cls_ch_squeeze),
+            out_channels=self.cls_ch_expand,
+            kernel_size=1,
             stride=1,
             padding=0,
-            act=None,
-            param_attr=ParamAttr(name="last_1x1_conv_weights"),
+            weight_attr=ParamAttr(name="last_1x1_conv_weights"),
             bias_attr=False)
 
+        self.dropout = Dropout(p=dropout_prob, mode="downscale_in_infer")
+
         self.out = Linear(
-            input_dim=self.cls_ch_expand,
-            output_dim=class_dim,
-            param_attr=ParamAttr("fc_weights"),
+            self.cls_ch_expand,
+            class_dim,
+            weight_attr=ParamAttr("fc_weights"),
             bias_attr=ParamAttr(name="fc_offset"))
 
-    def forward(self, inputs, label=None, dropout_prob=0.2):
+    def forward(self, inputs, label=None):
         x = self.conv1(inputs)
         for block in self.block_list:
             x = block(x)
+
         x = self.last_second_conv(x)
         x = self.pool(x)
-        x = self.last_conv(x)
-        x = fluid.layers.hard_swish(x)
-        x = fluid.layers.dropout(x=x, dropout_prob=dropout_prob)
-        x = fluid.layers.reshape(x, shape=[x.shape[0], x.shape[1]])
-        x = self.out(x)
 
+        x = self.last_conv(x)
+        x = F.hard_swish(x)
+        x = self.dropout(x)
+        x = paddle.reshape(x, shape=[x.shape[0], x.shape[1]])
+        x = self.out(x)
         return x
 
 
-class ConvBNLayer(fluid.dygraph.Layer):
+class ConvBNLayer(nn.Layer):
     def __init__(self,
                  in_c,
                  out_c,
@@ -179,28 +187,22 @@ class ConvBNLayer(fluid.dygraph.Layer):
         super(ConvBNLayer, self).__init__()
         self.if_act = if_act
         self.act = act
-        self.conv = fluid.dygraph.Conv2D(
-            num_channels=in_c,
-            num_filters=out_c,
-            filter_size=filter_size,
+        self.conv = Conv2d(
+            in_channels=in_c,
+            out_channels=out_c,
+            kernel_size=filter_size,
             stride=stride,
             padding=padding,
             groups=num_groups,
-            param_attr=ParamAttr(name=name + "_weights"),
-            bias_attr=False,
-            use_cudnn=use_cudnn,
-            act=None)
-        self.bn = fluid.dygraph.BatchNorm(
+            weight_attr=ParamAttr(name=name + "_weights"),
+            bias_attr=False)
+        self.bn = BatchNorm(
             num_channels=out_c,
             act=None,
             param_attr=ParamAttr(
-                name=name + "_bn_scale",
-                regularizer=fluid.regularizer.L2DecayRegularizer(
-                    regularization_coeff=0.0)),
+                name=name + "_bn_scale", regularizer=L2Decay(0.0)),
             bias_attr=ParamAttr(
-                name=name + "_bn_offset",
-                regularizer=fluid.regularizer.L2DecayRegularizer(
-                    regularization_coeff=0.0)),
+                name=name + "_bn_offset", regularizer=L2Decay(0.0)),
             moving_mean_name=name + "_bn_mean",
             moving_variance_name=name + "_bn_variance")
 
@@ -209,16 +211,16 @@ class ConvBNLayer(fluid.dygraph.Layer):
         x = self.bn(x)
         if self.if_act:
             if self.act == "relu":
-                x = fluid.layers.relu(x)
+                x = F.relu(x)
             elif self.act == "hard_swish":
-                x = fluid.layers.hard_swish(x)
+                x = F.hard_swish(x)
             else:
                 print("The activation function is selected incorrectly.")
                 exit()
         return x
 
 
-class ResidualUnit(fluid.dygraph.Layer):
+class ResidualUnit(nn.Layer):
     def __init__(self,
                  in_c,
                  mid_c,
@@ -270,40 +272,38 @@ class ResidualUnit(fluid.dygraph.Layer):
             x = self.mid_se(x)
         x = self.linear_conv(x)
         if self.if_shortcut:
-            x = fluid.layers.elementwise_add(inputs, x)
+            x = paddle.elementwise_add(inputs, x)
         return x
 
 
-class SEModule(fluid.dygraph.Layer):
+class SEModule(nn.Layer):
     def __init__(self, channel, reduction=4, name=""):
         super(SEModule, self).__init__()
-        self.avg_pool = fluid.dygraph.Pool2D(
-            pool_type="avg", global_pooling=True, use_cudnn=False)
-        self.conv1 = fluid.dygraph.Conv2D(
-            num_channels=channel,
-            num_filters=channel // reduction,
-            filter_size=1,
+        self.avg_pool = AdaptiveAvgPool2d(1)
+        self.conv1 = Conv2d(
+            in_channels=channel,
+            out_channels=channel // reduction,
+            kernel_size=1,
             stride=1,
             padding=0,
-            act="relu",
-            param_attr=ParamAttr(name=name + "_1_weights"),
+            weight_attr=ParamAttr(name=name + "_1_weights"),
             bias_attr=ParamAttr(name=name + "_1_offset"))
-        self.conv2 = fluid.dygraph.Conv2D(
-            num_channels=channel // reduction,
-            num_filters=channel,
-            filter_size=1,
+        self.conv2 = Conv2d(
+            in_channels=channel // reduction,
+            out_channels=channel,
+            kernel_size=1,
             stride=1,
             padding=0,
-            act=None,
-            param_attr=ParamAttr(name + "_2_weights"),
+            weight_attr=ParamAttr(name + "_2_weights"),
             bias_attr=ParamAttr(name=name + "_2_offset"))
 
     def forward(self, inputs):
         outputs = self.avg_pool(inputs)
         outputs = self.conv1(outputs)
+        outputs = F.relu(outputs)
         outputs = self.conv2(outputs)
-        outputs = fluid.layers.hard_sigmoid(outputs)
-        return fluid.layers.elementwise_mul(x=inputs, y=outputs, axis=0)
+        outputs = F.hard_sigmoid(outputs)
+        return paddle.multiply(x=inputs, y=outputs, axis=0)
 
 
 def MobileNetV3_small_x0_35(**args):

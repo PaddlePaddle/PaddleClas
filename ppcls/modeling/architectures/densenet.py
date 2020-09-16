@@ -18,9 +18,11 @@ from __future__ import print_function
 
 import numpy as np
 import paddle
-import paddle.fluid as fluid
-from paddle.fluid.param_attr import ParamAttr
-from paddle.fluid.dygraph.nn import Conv2D, Pool2D, BatchNorm, Linear, Dropout
+from paddle import ParamAttr
+import paddle.nn as nn
+from paddle.nn import Conv2d, BatchNorm, Linear, Dropout
+from paddle.nn import AdaptiveAvgPool2d, MaxPool2d, AvgPool2d
+from paddle.nn.initializer import Uniform
 
 import math
 
@@ -29,7 +31,7 @@ __all__ = [
 ]
 
 
-class BNACConvLayer(fluid.dygraph.Layer):
+class BNACConvLayer(nn.Layer):
     def __init__(self,
                  num_channels,
                  num_filters,
@@ -49,15 +51,14 @@ class BNACConvLayer(fluid.dygraph.Layer):
             moving_mean_name=name + '_bn_mean',
             moving_variance_name=name + '_bn_variance')
 
-        self._conv = Conv2D(
-            num_channels=num_channels,
-            num_filters=num_filters,
-            filter_size=filter_size,
+        self._conv = Conv2d(
+            in_channels=num_channels,
+            out_channels=num_filters,
+            kernel_size=filter_size,
             stride=stride,
             padding=pad,
             groups=groups,
-            act=None,
-            param_attr=ParamAttr(name=name + "_weights"),
+            weight_attr=ParamAttr(name=name + "_weights"),
             bias_attr=False)
 
     def forward(self, input):
@@ -66,7 +67,7 @@ class BNACConvLayer(fluid.dygraph.Layer):
         return y
 
 
-class DenseLayer(fluid.dygraph.Layer):
+class DenseLayer(nn.Layer):
     def __init__(self, num_channels, growth_rate, bn_size, dropout, name=None):
         super(DenseLayer, self).__init__()
         self.dropout = dropout
@@ -88,18 +89,18 @@ class DenseLayer(fluid.dygraph.Layer):
             name=name + "_x2")
 
         if dropout:
-            self.dropout_func = Dropout(p=dropout)
+            self.dropout_func = Dropout(p=dropout, mode="downscale_in_infer")
 
     def forward(self, input):
         conv = self.bn_ac_func1(input)
         conv = self.bn_ac_func2(conv)
         if self.dropout:
             conv = self.dropout_func(conv)
-        conv = fluid.layers.concat([input, conv], axis=1)
+        conv = paddle.concat([input, conv], axis=1)
         return conv
 
 
-class DenseBlock(fluid.dygraph.Layer):
+class DenseBlock(nn.Layer):
     def __init__(self,
                  num_channels,
                  num_layers,
@@ -132,7 +133,7 @@ class DenseBlock(fluid.dygraph.Layer):
         return conv
 
 
-class TransitionLayer(fluid.dygraph.Layer):
+class TransitionLayer(nn.Layer):
     def __init__(self, num_channels, num_output_features, name=None):
         super(TransitionLayer, self).__init__()
 
@@ -144,7 +145,7 @@ class TransitionLayer(fluid.dygraph.Layer):
             stride=1,
             name=name)
 
-        self.pool2d_avg = Pool2D(pool_size=2, pool_stride=2, pool_type='avg')
+        self.pool2d_avg = AvgPool2d(kernel_size=2, stride=2, padding=0)
 
     def forward(self, input):
         y = self.conv_ac_func(input)
@@ -152,7 +153,7 @@ class TransitionLayer(fluid.dygraph.Layer):
         return y
 
 
-class ConvBNLayer(fluid.dygraph.Layer):
+class ConvBNLayer(nn.Layer):
     def __init__(self,
                  num_channels,
                  num_filters,
@@ -164,15 +165,14 @@ class ConvBNLayer(fluid.dygraph.Layer):
                  name=None):
         super(ConvBNLayer, self).__init__()
 
-        self._conv = Conv2D(
-            num_channels=num_channels,
-            num_filters=num_filters,
-            filter_size=filter_size,
+        self._conv = Conv2d(
+            in_channels=num_channels,
+            out_channels=num_filters,
+            kernel_size=filter_size,
             stride=stride,
             padding=pad,
             groups=groups,
-            act=None,
-            param_attr=ParamAttr(name=name + "_weights"),
+            weight_attr=ParamAttr(name=name + "_weights"),
             bias_attr=False)
         self._batch_norm = BatchNorm(
             num_filters,
@@ -188,7 +188,7 @@ class ConvBNLayer(fluid.dygraph.Layer):
         return y
 
 
-class DenseNet(fluid.dygraph.Layer):
+class DenseNet(nn.Layer):
     def __init__(self, layers=60, bn_size=4, dropout=0, class_dim=1000):
         super(DenseNet, self).__init__()
 
@@ -214,8 +214,7 @@ class DenseNet(fluid.dygraph.Layer):
             act='relu',
             name="conv1")
 
-        self.pool2d_max = Pool2D(
-            pool_size=3, pool_stride=2, pool_padding=1, pool_type='max')
+        self.pool2d_max = MaxPool2d(kernel_size=3, stride=2, padding=1)
 
         self.block_config = block_config
 
@@ -257,16 +256,15 @@ class DenseNet(fluid.dygraph.Layer):
             moving_mean_name='conv5_blk_bn_mean',
             moving_variance_name='conv5_blk_bn_variance')
 
-        self.pool2d_avg = Pool2D(pool_type='avg', global_pooling=True)
+        self.pool2d_avg = AdaptiveAvgPool2d(1)
 
         stdv = 1.0 / math.sqrt(num_features * 1.0)
 
         self.out = Linear(
             num_features,
             class_dim,
-            param_attr=ParamAttr(
-                initializer=fluid.initializer.Uniform(-stdv, stdv),
-                name="fc_weights"),
+            weight_attr=ParamAttr(
+                initializer=Uniform(-stdv, stdv), name="fc_weights"),
             bias_attr=ParamAttr(name="fc_offset"))
 
     def forward(self, input):
@@ -280,7 +278,7 @@ class DenseNet(fluid.dygraph.Layer):
 
         conv = self.batch_norm(conv)
         y = self.pool2d_avg(conv)
-        y = fluid.layers.reshape(y, shape=[0, -1])
+        y = paddle.reshape(y, shape=[0, -1])
         y = self.out(y)
         return y
 

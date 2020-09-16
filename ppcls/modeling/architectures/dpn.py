@@ -19,9 +19,11 @@ from __future__ import print_function
 import numpy as np
 import sys
 import paddle
-import paddle.fluid as fluid
-from paddle.fluid.param_attr import ParamAttr
-from paddle.fluid.dygraph.nn import Conv2D, Pool2D, BatchNorm, Linear
+from paddle import ParamAttr
+import paddle.nn as nn
+from paddle.nn import Conv2d, BatchNorm, Linear
+from paddle.nn import AdaptiveAvgPool2d, MaxPool2d, AvgPool2d
+from paddle.nn.initializer import Uniform
 
 import math
 
@@ -35,7 +37,7 @@ __all__ = [
 ]
 
 
-class ConvBNLayer(fluid.dygraph.Layer):
+class ConvBNLayer(nn.Layer):
     def __init__(self,
                  num_channels,
                  num_filters,
@@ -47,15 +49,14 @@ class ConvBNLayer(fluid.dygraph.Layer):
                  name=None):
         super(ConvBNLayer, self).__init__()
 
-        self._conv = Conv2D(
-            num_channels=num_channels,
-            num_filters=num_filters,
-            filter_size=filter_size,
+        self._conv = Conv2d(
+            in_channels=num_channels,
+            out_channels=num_filters,
+            kernel_size=filter_size,
             stride=stride,
             padding=pad,
             groups=groups,
-            act=None,
-            param_attr=ParamAttr(name=name + "_weights"),
+            weight_attr=ParamAttr(name=name + "_weights"),
             bias_attr=False)
         self._batch_norm = BatchNorm(
             num_filters,
@@ -71,7 +72,7 @@ class ConvBNLayer(fluid.dygraph.Layer):
         return y
 
 
-class BNACConvLayer(fluid.dygraph.Layer):
+class BNACConvLayer(nn.Layer):
     def __init__(self,
                  num_channels,
                  num_filters,
@@ -83,7 +84,6 @@ class BNACConvLayer(fluid.dygraph.Layer):
                  name=None):
         super(BNACConvLayer, self).__init__()
         self.num_channels = num_channels
-        self.name = name
 
         self._batch_norm = BatchNorm(
             num_channels,
@@ -93,15 +93,14 @@ class BNACConvLayer(fluid.dygraph.Layer):
             moving_mean_name=name + '_bn_mean',
             moving_variance_name=name + '_bn_variance')
 
-        self._conv = Conv2D(
-            num_channels=num_channels,
-            num_filters=num_filters,
-            filter_size=filter_size,
+        self._conv = Conv2d(
+            in_channels=num_channels,
+            out_channels=num_filters,
+            kernel_size=filter_size,
             stride=stride,
             padding=pad,
             groups=groups,
-            act=None,
-            param_attr=ParamAttr(name=name + "_weights"),
+            weight_attr=ParamAttr(name=name + "_weights"),
             bias_attr=False)
 
     def forward(self, input):
@@ -110,7 +109,7 @@ class BNACConvLayer(fluid.dygraph.Layer):
         return y
 
 
-class DualPathFactory(fluid.dygraph.Layer):
+class DualPathFactory(nn.Layer):
     def __init__(self,
                  num_channels,
                  num_1x1_a,
@@ -183,14 +182,14 @@ class DualPathFactory(fluid.dygraph.Layer):
     def forward(self, input):
         # PROJ
         if isinstance(input, list):
-            data_in = fluid.layers.concat([input[0], input[1]], axis=1)
+            data_in = paddle.concat([input[0], input[1]], axis=1)
         else:
             data_in = input
 
         if self.has_proj:
             c1x1_w = self.c1x1_w_func(data_in)
-            data_o1, data_o2 = fluid.layers.split(
-                c1x1_w, num_or_sections=[self.num_1x1_c, 2 * self.inc], dim=1)
+            data_o1, data_o2 = paddle.split(
+                c1x1_w, num_or_sections=[self.num_1x1_c, 2 * self.inc], axis=1)
         else:
             data_o1 = input[0]
             data_o2 = input[1]
@@ -199,17 +198,17 @@ class DualPathFactory(fluid.dygraph.Layer):
         c3x3_b = self.c3x3_b_func(c1x1_a)
         c1x1_c = self.c1x1_c_func(c3x3_b)
 
-        c1x1_c1, c1x1_c2 = fluid.layers.split(
-            c1x1_c, num_or_sections=[self.num_1x1_c, self.inc], dim=1)
+        c1x1_c1, c1x1_c2 = paddle.split(
+            c1x1_c, num_or_sections=[self.num_1x1_c, self.inc], axis=1)
 
         # OUTPUTS
-        summ = fluid.layers.elementwise_add(x=data_o1, y=c1x1_c1)
-        dense = fluid.layers.concat([data_o2, c1x1_c2], axis=1)
+        summ = paddle.elementwise_add(x=data_o1, y=c1x1_c1)
+        dense = paddle.concat([data_o2, c1x1_c2], axis=1)
         # tensor, channels
         return [summ, dense]
 
 
-class DPN(fluid.dygraph.Layer):
+class DPN(nn.Layer):
     def __init__(self, layers=60, class_dim=1000):
         super(DPN, self).__init__()
 
@@ -237,8 +236,7 @@ class DPN(fluid.dygraph.Layer):
             act='relu',
             name="conv1")
 
-        self.pool2d_max = Pool2D(
-            pool_size=3, pool_stride=2, pool_padding=1, pool_type='max')
+        self.pool2d_max = MaxPool2d(kernel_size=3, stride=2, padding=1)
 
         num_channel_dpn = init_num_filter
 
@@ -303,16 +301,15 @@ class DPN(fluid.dygraph.Layer):
             moving_mean_name='final_concat_bn_mean',
             moving_variance_name='final_concat_bn_variance')
 
-        self.pool2d_avg = Pool2D(pool_type='avg', global_pooling=True)
+        self.pool2d_avg = AdaptiveAvgPool2d(1)
 
         stdv = 0.01
 
         self.out = Linear(
             out_channel,
             class_dim,
-            param_attr=ParamAttr(
-                initializer=fluid.initializer.Uniform(-stdv, stdv),
-                name="fc_weights"),
+            weight_attr=ParamAttr(
+                initializer=Uniform(-stdv, stdv), name="fc_weights"),
             bias_attr=ParamAttr(name="fc_offset"))
 
     def forward(self, input):
@@ -327,11 +324,11 @@ class DPN(fluid.dygraph.Layer):
                 convX_x_x = self.dpn_func_list[dpn_idx](convX_x_x)
                 dpn_idx += 1
 
-        conv5_x_x = fluid.layers.concat(convX_x_x, axis=1)
+        conv5_x_x = paddle.concat(convX_x_x, axis=1)
         conv5_x_x = self.conv5_x_x_bn(conv5_x_x)
 
         y = self.pool2d_avg(conv5_x_x)
-        y = fluid.layers.reshape(y, shape=[0, -1])
+        y = paddle.reshape(y, shape=[0, -1])
         y = self.out(y)
         return y
 
