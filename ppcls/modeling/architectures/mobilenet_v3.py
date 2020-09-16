@@ -46,7 +46,11 @@ def make_divisible(v, divisor=8, min_value=None):
 
 
 class MobileNetV3(nn.Layer):
-    def __init__(self, scale=1.0, model_name="small", class_dim=1000):
+    def __init__(self,
+                 scale=1.0,
+                 model_name="small",
+                 dropout_prob=0.2,
+                 class_dim=1000):
         super(MobileNetV3, self).__init__()
 
         inplanes = 16
@@ -144,24 +148,27 @@ class MobileNetV3(nn.Layer):
             weight_attr=ParamAttr(name="last_1x1_conv_weights"),
             bias_attr=False)
 
+        self.dropout = Dropout(p=dropout_prob, mode="downscale_in_infer")
+
         self.out = Linear(
             self.cls_ch_expand,
             class_dim,
             weight_attr=ParamAttr("fc_weights"),
             bias_attr=ParamAttr(name="fc_offset"))
 
-    def forward(self, inputs, label=None, dropout_prob=0.2):
+    def forward(self, inputs, label=None):
         x = self.conv1(inputs)
         for block in self.block_list:
             x = block(x)
+
         x = self.last_second_conv(x)
         x = self.pool(x)
+
         x = self.last_conv(x)
         x = F.hard_swish(x)
-        x = F.dropout(x=x, p=dropout_prob)
+        x = self.dropout(x)
         x = paddle.reshape(x, shape=[x.shape[0], x.shape[1]])
         x = self.out(x)
-
         return x
 
 

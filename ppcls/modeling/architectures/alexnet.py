@@ -83,7 +83,7 @@ class AlexNetDY(nn.Layer):
             256, 256, 3, 1, 1, stdv, act="relu", name="conv5")
         stdv = 1.0 / math.sqrt(256 * 6 * 6)
 
-        self._drop1 = Dropout(p=0.5)
+        self._drop1 = Dropout(p=0.5, mode="downscale_in_infer")
         self._fc6 = Linear(
             in_features=256 * 6 * 6,
             out_features=4096,
@@ -92,7 +92,7 @@ class AlexNetDY(nn.Layer):
             bias_attr=ParamAttr(
                 name="fc6_offset", initializer=Uniform(-stdv, stdv)))
 
-        self._drop2 = Dropout(p=0.5)
+        self._drop2 = Dropout(p=0.5, mode="downscale_in_infer")
         self._fc7 = Linear(
             in_features=4096,
             out_features=4096,

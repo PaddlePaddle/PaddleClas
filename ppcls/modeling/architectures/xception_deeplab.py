@@ -346,7 +346,7 @@ class XceptionDeeplab(nn.Layer):
 
         self.stride = s
 
-        self._drop = Dropout(p=0.5)
+        self._drop = Dropout(p=0.5, mode="downscale_in_infer")
         self._pool = AdaptiveAvgPool2d(1)
         self._fc = Linear(
             self.chns[1][-1],

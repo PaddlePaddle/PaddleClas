@@ -12,19 +12,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from paddle.distributed import ParallelEnv
 import paddle
-from ppcls.utils import logger
-from ppcls.utils.save_load import init_model
-from ppcls.utils.config import get_config
-from ppcls.data import Reader
-import program
+from paddle.distributed import ParallelEnv
+
 import argparse
 import os
 import sys
 __dir__ = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(__dir__)
 sys.path.append(os.path.abspath(os.path.join(__dir__, '..')))
+
+from ppcls.utils import logger
+from ppcls.utils.save_load import init_model
+from ppcls.utils.config import get_config
+from ppcls.data import Reader
+import program
 
 
 def parse_args():

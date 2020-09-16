@@ -412,7 +412,7 @@ class InceptionV4DY(nn.Layer):
         self._inceptionC_3 = InceptionC(name="3")
 
         self.avg_pool = AdaptiveAvgPool2d(1)
-        self._drop = Dropout(p=0.2)
+        self._drop = Dropout(p=0.2, mode="downscale_in_infer")
         stdv = 1.0 / math.sqrt(1536 * 1.0)
         self.out = Linear(
             1536,

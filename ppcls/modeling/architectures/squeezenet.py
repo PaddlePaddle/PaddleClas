@@ -101,7 +101,7 @@ class SqueezeNet(nn.Layer):
             self._conv7 = MakeFire(384, 64, 256, 256, name="fire8")
             self._conv8 = MakeFire(512, 64, 256, 256, name="fire9")
 
-        self._drop = Dropout(p=0.5)
+        self._drop = Dropout(p=0.5, mode="downscale_in_infer")
         self._conv9 = Conv2d(
             512,
             class_dim,

@@ -126,7 +126,7 @@ class GoogleNetDY(nn.Layer):
 
         self._pool_5 = AvgPool2d(kernel_size=7, stride=7)
 
-        self._drop = Dropout(p=0.4)
+        self._drop = Dropout(p=0.4, mode="downscale_in_infer")
         self._fc_out = Linear(
             1024,
             class_dim,
@@ -139,7 +139,7 @@ class GoogleNetDY(nn.Layer):
             1024,
             weight_attr=xavier(2048, 1, "fc_o1"),
             bias_attr=ParamAttr(name="fc_o1_offset"))
-        self._drop_o1 = Dropout(p=0.7)
+        self._drop_o1 = Dropout(p=0.7, mode="downscale_in_infer")
         self._out1 = Linear(
             1024,
             class_dim,
@@ -152,7 +152,7 @@ class GoogleNetDY(nn.Layer):
             1024,
             weight_attr=xavier(2048, 1, "fc_o2"),
             bias_attr=ParamAttr(name="fc_o2_offset"))
-        self._drop_o2 = Dropout(p=0.7)
+        self._drop_o2 = Dropout(p=0.7, mode="downscale_in_infer")
         self._out2 = Linear(
             1024,
             class_dim,

@@ -89,7 +89,7 @@ class VGGNet(nn.Layer):
         self._conv_block_4 = ConvBlock(256, 512, self.groups[3], name="conv4_")
         self._conv_block_5 = ConvBlock(512, 512, self.groups[4], name="conv5_")
 
-        self._drop = Dropout(p=0.5)
+        self._drop = Dropout(p=0.5, mode="downscale_in_infer")
         self._fc1 = Linear(
             7 * 7 * 512,
             4096,

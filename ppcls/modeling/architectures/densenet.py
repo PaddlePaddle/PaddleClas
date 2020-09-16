@@ -89,7 +89,7 @@ class DenseLayer(nn.Layer):
             name=name + "_x2")
 
         if dropout:
-            self.dropout_func = Dropout(p=dropout)
+            self.dropout_func = Dropout(p=dropout, mode="downscale_in_infer")
 
     def forward(self, input):
         conv = self.bn_ac_func1(input)
