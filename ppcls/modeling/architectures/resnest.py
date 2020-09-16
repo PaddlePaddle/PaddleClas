@@ -24,8 +24,7 @@ from paddle import ParamAttr
 from paddle.nn.initializer import MSRA
 from paddle.nn import Conv2d, BatchNorm, Linear, Dropout
 from paddle.nn import AdaptiveAvgPool2d, MaxPool2d, AvgPool2d
-# TODO: need to be removed later!
-from paddle.fluid.regularizer import L2Decay
+from paddle.regularizer import L2Decay
 
 __all__ = ["ResNeSt50_fast_1s1x64d", "ResNeSt50"]
 
@@ -58,11 +57,9 @@ class ConvBNLayer(nn.Layer):
             num_filters,
             act=act,
             param_attr=ParamAttr(
-                name=name + "_scale",
-                regularizer=L2Decay(regularization_coeff=bn_decay)),
+                name=name + "_scale", regularizer=L2Decay(bn_decay)),
             bias_attr=ParamAttr(
-                name + "_offset",
-                regularizer=L2Decay(regularization_coeff=bn_decay)),
+                name + "_offset", regularizer=L2Decay(bn_decay)),
             moving_mean_name=name + "_mean",
             moving_variance_name=name + "_variance")
 
