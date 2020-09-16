@@ -47,8 +47,7 @@ class Loss(object):
         if self._label_smoothing:
             target = self._labelsmoothing(target)
             input = -F.log_softmax(input, axis=-1)
-            log_probs = -F.log_softmax(input, axis=-1)
-            cost = paddle.reduce_sum(target * log_probs, dim=-1)
+            cost = paddle.reduce_sum(target * input, dim=-1)
         else:
             #             softmax_out = F.softmax(input)
             cost = F.cross_entropy(input=input, label=target)
