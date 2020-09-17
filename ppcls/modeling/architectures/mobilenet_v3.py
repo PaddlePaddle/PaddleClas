@@ -23,7 +23,7 @@ import paddle.nn as nn
 import paddle.nn.functional as F
 from paddle.nn import Conv2d, BatchNorm, Linear, Dropout
 from paddle.nn import AdaptiveAvgPool2d, MaxPool2d, AvgPool2d
-from paddle.regularizer import L2Decay
+from paddle.fluid.regularizer import L2Decay
 
 import math
 

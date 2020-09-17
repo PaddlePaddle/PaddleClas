@@ -19,6 +19,7 @@ from __future__ import print_function
 import sys
 
 import paddle
+import paddle.fluid.regularizer as regularizer
 
 __all__ = ['OptimizerBuilder']
 
@@ -36,7 +37,7 @@ class L1Decay(object):
         self.factor = factor
 
     def __call__(self):
-        reg = paddle.regularizer.L1Decay(self.factor)
+        reg = regularizer.L1Decay(self.factor)
         return reg
 
 
@@ -53,7 +54,7 @@ class L2Decay(object):
         self.factor = factor
 
     def __call__(self):
-        reg = paddle.regularizer.L2Decay(self.factor)
+        reg = regularizer.L2Decay(self.factor)
         return reg
 
 

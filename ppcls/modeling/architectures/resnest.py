@@ -24,7 +24,7 @@ from paddle import ParamAttr
 from paddle.nn.initializer import MSRA
 from paddle.nn import Conv2d, BatchNorm, Linear, Dropout
 from paddle.nn import AdaptiveAvgPool2d, MaxPool2d, AvgPool2d
-from paddle.regularizer import L2Decay
+from paddle.fluid.regularizer import L2Decay
 
 __all__ = ["ResNeSt50_fast_1s1x64d", "ResNeSt50"]
 
