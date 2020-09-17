@@ -37,7 +37,8 @@ def check_version():
           "or a suitable develop version is satisfied as well. \n" \
           "Please make sure the version is good with your code."
     try:
-        paddle.utils.require_version('0.0.0')
+        pass
+        # paddle.utils.require_version('0.0.0')
     except Exception:
         logger.error(err)
         sys.exit(1)
