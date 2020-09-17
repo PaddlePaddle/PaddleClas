@@ -7,6 +7,7 @@
 飞桨图像分类套件PaddleClas是飞桨为工业界和学术界所准备的一个图像分类任务的工具集，助力使用者训练出更好的视觉模型和应用落地。
 
 **近期更新**
+- 2020.09.17 添加HRNet_W48_C_ssld模型，在ImageNet上Top-1 Acc可达0.836；添加ResNet34_vd_ssld模型，在ImageNet上Top-1 Acc可达0.797。
 - 2020.09.07 添加HRNet_W18_C_ssld模型，在ImageNet上Top-1 Acc可达0.81162；添加MobileNetV3_small_x0_35_ssld模型，在ImageNet上Top-1 Acc可达0.5555。
 - 2020.07.14 添加Res2Net200_vd_26w_4s_ssld模型，在ImageNet上Top-1 Acc可达85.13%；添加Fix_ResNet50_vd_ssld_v2模型，在ImageNet上Top-1 Acc可达84.0%。
 - 2020.06.17 添加英文文档。
@@ -17,7 +18,7 @@
 
 ## 特性
 
-- 丰富的模型库：基于ImageNet1k分类数据集，PaddleClas提供了24个系列的分类网络结构和训练配置，121个预训练模型和性能评估。
+- 丰富的模型库：基于ImageNet1k分类数据集，PaddleClas提供了24个系列的分类网络结构和训练配置，122个预训练模型和性能评估。
 
 - SSLD知识蒸馏：基于该方案蒸馏模型的识别准确率普遍提升3%以上。
 
@@ -41,8 +42,9 @@
     - [ResNet及其Vd系列](#ResNet及其Vd系列)
     - [移动端系列](#移动端系列)
     - [SEResNeXt与Res2Net系列](#SEResNeXt与Res2Net系列)
-    - [Inception系列](#Inception系列)
     - [DPN与DenseNet系列](#DPN与DenseNet系列)
+    - [HRNet](HRNet系列)
+    - [Inception系列](#Inception系列)
     - [EfficientNet与ResNeXt101_wsl系列](#EfficientNet与ResNeXt101_wsl系列)
     - [ResNeSt与RegNet系列](#ResNeSt与RegNet系列)
 - 模型训练/评估
@@ -103,6 +105,7 @@ ResNet及其Vd系列模型的精度、速度指标如下表所示，更多关于
 | ResNet18_vd         | 0.7226    | 0.9080    | 1.54557               | 3.85363              | 4.14     | 11.71     | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/ResNet18_vd_pretrained.tar)         |
 | ResNet34            | 0.7457    | 0.9214    | 2.34957               | 5.89821              | 7.36     | 21.8      | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/ResNet34_pretrained.tar)            |
 | ResNet34_vd         | 0.7598    | 0.9298    | 2.43427               | 6.22257              | 7.39     | 21.82     | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/ResNet34_vd_pretrained.tar)         |
+| ResNet34_vd_ssld         | 0.7972    | 0.9490    | 2.43427               | 6.22257              | 7.39     | 21.82     | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/ResNet34_vd_ssld_pretrained.tar)         |
 | ResNet50            | 0.7650    | 0.9300    | 3.47712               | 7.84421              | 8.19     | 25.56     | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/ResNet50_pretrained.tar)            |
 | ResNet50_vc         | 0.7835    | 0.9403    | 3.52346               | 8.10725              | 8.67     | 25.58     | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/ResNet50_vc_pretrained.tar)         |
 | ResNet50_vd         | 0.7912    | 0.9444    | 3.53131               | 8.09057              | 8.67     | 25.58     | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/ResNet50_vd_pretrained.tar)         |
@@ -235,6 +238,7 @@ HRNet系列模型的精度、速度指标如下表所示，更多关于该系列
 | HRNet_W40_C | 0.7877    | 0.9447    | 12.12202         | 25.68184         | 25.41    | 57.55     | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/HRNet_W40_C_pretrained.tar) |
 | HRNet_W44_C | 0.7900    | 0.9451    | 13.19858         | 32.25202         | 29.79    | 67.06     | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/HRNet_W44_C_pretrained.tar) |
 | HRNet_W48_C | 0.7895    | 0.9442    | 13.70761         | 34.43572         | 34.58    | 77.47     | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/HRNet_W48_C_pretrained.tar) |
+| HRNet_W48_C_ssld | 0.8363    | 0.9682    | 13.70761         | 34.43572         | 34.58    | 77.47     | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/HRNet_W48_C_pretrained.tar) |
 | HRNet_W64_C | 0.7930    | 0.9461    | 17.57527         | 47.9533          | 57.83    | 128.06    | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/HRNet_W64_C_pretrained.tar) |
 
 
@@ -257,7 +261,7 @@ Inception系列模型的精度、速度指标如下表所示，更多关于该�
 <a name="EfficientNet与ResNeXt101_wsl系列"></a>
 ### EfficientNet与ResNeXt101_wsl系列
 
-EfficientNet与ResNeXt101_wsl系列模型的精度、速度指标如下表所示，更多关于该系列的模型介绍可以参考：[EfficientNet与ResNeXt101_wsl系列模型文档](./docs/zh_CN/models/Inception.md)。
+EfficientNet与ResNeXt101_wsl系列模型的精度、速度指标如下表所示，更多关于该系列的模型介绍可以参考：[EfficientNet与ResNeXt101_wsl系列模型文档](./docs/zh_CN/models/EfficientNet_and_ResNeXt101_wsl.md)。
 
 
 | 模型                        | Top-1 Acc | Top-5 Acc | time(ms)<br>bs=1 | time(ms)<br>bs=4 | Flops(G) | Params(M) | 下载地址                                                                                               |
