@@ -8,7 +8,7 @@ PaddleClas is a toolset for image classification tasks prepared for the industry
 
 
 **Recent update**
-- 2020.07.17 Add `HRNet_W48_C_ssld` pretrained model, whose Top-1 Acc on ImageNet1k dataset reaches 83.62%. Add `ResNet34_vd_ssld` pretrained model, whose Top-1 Acc on ImageNet1k dataset reaches 79.72%.
+- 2020.09.17 Add `HRNet_W48_C_ssld` pretrained model, whose Top-1 Acc on ImageNet1k dataset reaches 83.62%. Add `ResNet34_vd_ssld` pretrained model, whose Top-1 Acc on ImageNet1k dataset reaches 79.72%.
 - 2020.09.07 Add `HRNet_W18_C_ssld` pretrained model, whose Top-1 Acc on ImageNet1k dataset reaches 81.16%.
 - 2020.07.14 Add `Res2Net200_vd_26w_4s_ssld` pretrained model, whose Top-1 Acc on ImageNet1k dataset reaches 85.13%. Add `Fix_ResNet50_vd_ssld_v2` pretrained model, whose Top-1 Acc on ImageNet1k dataset reaches 84.00%.
 - 2020.06.17 Add English documents.
@@ -17,24 +17,21 @@ PaddleClas is a toolset for image classification tasks prepared for the industry
 - [more](./docs/zh_CN/update_history.md)
 
 
-## Rich model zoo
-
-
 ## Features
 
 - Rich model zoo. Based on the ImageNet1k classification dataset, PaddleClas provides 24 series of classification network structures and training configurations, 122 models' pretrained weights and their evaluation metrics.
 
-- SSLD Knowledge Distillation. Based on this SSLD distillation strategy, the accuracy of the distillation model is generally increased by more than 3%.
+- SSLD Knowledge Distillation. Based on this SSLD distillation strategy, the accuracy of the distilled model is generally increased by more than 3%.
 
 - Data augmentation: PaddleClas provides detailed introduction of 8 data augmentation algorithms such as AutoAugment, Cutout, Cutmix, code reproduction and effect evaluation in a unified experimental environment.
 
-- Pretrained model with 100,000 categories: Baidu self-developed and open sourced the `ResNet50_vd` model trained on a 100,000-category dataset. In some practical scenarios, the  accuracy based on the pretrained weights can be increased by up to 30%.
+- Pretrained model with 100,000 categories: Based on `ResNet50_vd` model, Baidu open sourced the `ResNet50_vd` pretrained model trained on a 100,000-category dataset. In some practical scenarios, the  accuracy based on the pretrained weights can be increased by up to 30%.
 
 - A variety of training modes, including multi-machine training, mixed precision training, etc.
 
 - A variety of inference and deployment solutions, including TensorRT inference, Paddle-Lite inference, model service deployment, model quantification, Paddle Hub, etc.
 
-- Support Linux, Windows, MacOS and other systems.
+- Support Linux, Windows, macOS and other systems.
 
 
 ## Tutorials
@@ -67,7 +64,7 @@ PaddleClas is a toolset for image classification tasks prepared for the industry
     - [Data augmentation](./docs/en/advanced_tutorials/image_augmentation/ImageAugment_en.md)
 - Applications
     - [Transfer learning](./docs/en/application/transfer_learning_en.md)
-    - [pretrained model with 100,000 categories](./docs/en/application/transfer_learning_en.md)
+    - [Pretrained model with 100,000 categories](./docs/en/application/transfer_learning_en.md)
     - [Generic object detection](./docs/en/application/object_detection_en.md)
 - FAQ
     - General image classification problems (coming soon)
