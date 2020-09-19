@@ -2,14 +2,13 @@
 ---
 请事先参考[安装指南](install.md)配置运行环境，并根据[数据说明](./data.md)文档准备ImageNet1k数据，本章节下面所有的实验均以ImageNet1k数据集为例。
 
-## 一、Windows或者CPU上训练
+## 1. Windows或者CPU上训练与评估
 
 如果在windows系统或者CPU上进行训练与评估，推荐使用`tools/train_multi_platform.py`与`tools/eval_multi_platform.py`脚本。
 
-
 ### 1.1 模型训练
 
-配置好数据路径之后，可以使用下面的方式启动训练。
+准备好配置文件之后，可以使用下面的方式启动训练。
 
 ```
 python tools/train_multi_platform.py \
@@ -40,7 +39,6 @@ python tools/train_multi_platform.py \
 
 ```bash
 visualdl --logdir ./scalar --host <host_IP> --port <port_num>
-
 ```
 
 ### 1.2 模型微调
@@ -57,7 +55,7 @@ python tools/train_multi_platform.py \
 
 ### 1.3 模型恢复训练
 
-* 如果训练任务，因为其他原因被终止，也可以加载预训练模型继续训练。
+* 如果训练任务因为其他原因被终止，也可以加载断点权重继续训练。
 
 ```
 python tools/train_multi_platform.py \
@@ -65,10 +63,12 @@ python tools/train_multi_platform.py \
     -o checkpoints="./output/ResNet/0/ppcls"
 ```
 
-其中配置文件不需要做任何修改，只需要在训练时添加`checkpoints`参数即可，表示加载的预训练模型路径，使用该参数会同时加载保存的模型参数权重和学习率、优化器等信息。
+其中配置文件不需要做任何修改，只需要在训练时添加`checkpoints`参数即可，表示加载的断点权重路径，使用该参数会同时加载保存的断点权重和学习率、优化器等信息。
 
 
 ### 1.4 模型评估
+
+* 可以通过以下命令完成模型评估。
 
 ```bash
 python tools/eval_multi_platform.py \
@@ -77,12 +77,12 @@ python tools/eval_multi_platform.py \
     -o pretrained_model=path_to_pretrained_models
 ```
 
-可以更改configs/eval.yaml中的`ARCHITECTURE.name`字段和pretrained_model字段来配置评估模型，也可以通过-o参数更新配置。
+可以更改`configs/eval.yaml`中的`ARCHITECTURE.name`字段和`pretrained_model`字段来配置评估模型，也可以通过-o参数更新配置。
 
 **注意：** 加载预训练模型时，需要指定预训练模型的前缀，例如预训练模型参数所在的文件夹为`output/ResNet50_vd/19`，预训练模型参数的名称为`output/ResNet50_vd/19/ppcls.pdparams`，则`pretrained_model`参数需要指定为`output/ResNet50_vd/19/ppcls`，PaddleClas会自动补齐`.pdparams`的后缀。
 
 
-## 二、基于Linux+GPU的模型训练与评估
+## 2. 基于Linux+GPU的模型训练与评估
 
 如果机器环境为Linux+GPU，那么推荐使用PaddleClas 提供的模型训练与评估脚本：`tools/train.py`和`tools/eval.py`，可以更快地完成训练与评估任务。
 
@@ -108,10 +108,10 @@ python -m paddle.distributed.launch \
     tools/train.py \
         -c ./configs/ResNet/ResNet50_vd.yaml \
         -o use_mix=1 \
-    --vdl_dir=./scalar/
+        --vdl_dir=./scalar/
 ```
 
-输出日志信息同上。
+输出日志信息的格式同上。
 
 ### 2.2 模型微调
 
@@ -132,7 +132,7 @@ python -m paddle.distributed.launch \
 
 ### 2.3 模型恢复训练
 
-* 如果训练任务，因为其他原因被终止，也可以加载预训练模型继续训练。
+* 如果训练任务，因为其他原因被终止，也可以加载断点权重继续训练。
 
 ```
 python -m paddle.distributed.launch \
@@ -142,7 +142,7 @@ python -m paddle.distributed.launch \
         -o checkpoints="./output/ResNet/0/ppcls"
 ```
 
-其中配置文件不需要做任何修改，只需要在训练时添加`checkpoints`参数即可，表示加载的预训练模型路径，使用该参数会同时加载保存的模型参数权重和学习率、优化器等信息。
+其中配置文件不需要做任何修改，只需要在训练时添加`checkpoints`参数即可，表示加载的断点权重路径，使用该参数会同时加载保存的模型参数权重和学习率、优化器等信息。
 
 
 ### 2.4 模型评估
@@ -159,8 +159,6 @@ python -m paddle.distributed.launch \
 ```
 
 可以更改configs/eval.yaml中的`ARCHITECTURE.name`字段和pretrained_model字段来配置评估模型，也可以通过-o参数更新配置。
-
-**注意：** 加载预训练模型时，需要指定预训练模型的前缀，例如预训练模型参数所在的文件夹为`output/ResNet50_vd/19`，预训练模型参数的名称为`output/ResNet50_vd/19/ppcls.pdparams`，则`pretrained_model`参数需要指定为`output/ResNet50_vd/19/ppcls`，PaddleClas会自动补齐`.pdparams`的后缀。
 
 
 ## 三、模型推理
