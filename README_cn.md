@@ -7,12 +7,12 @@
 飞桨图像分类套件PaddleClas是飞桨为工业界和学术界所准备的一个图像分类任务的工具集，助力使用者训练出更好的视觉模型和应用落地。
 
 **近期更新**
-- 2020.09.17 添加HRNet_W48_C_ssld模型，在ImageNet上Top-1 Acc可达0.836；添加ResNet34_vd_ssld模型，在ImageNet上Top-1 Acc可达0.797。
-- 2020.09.07 添加HRNet_W18_C_ssld模型，在ImageNet上Top-1 Acc可达0.81162；添加MobileNetV3_small_x0_35_ssld模型，在ImageNet上Top-1 Acc可达0.5555。
-- 2020.07.14 添加Res2Net200_vd_26w_4s_ssld模型，在ImageNet上Top-1 Acc可达85.13%；添加Fix_ResNet50_vd_ssld_v2模型，在ImageNet上Top-1 Acc可达84.0%。
+- 2020.09.17 添加 `HRNet_W48_C_ssld `模型，在ImageNet-1k上Top-1 Acc可达83.62%；添加 `ResNet34_vd_ssld `模型，在ImageNet-1k上Top-1 Acc可达79.72%。
+- 2020.09.07 添加 `HRNet_W18_C_ssld `模型，在ImageNet-1k上Top-1 Acc可达81.16%；添加 `MobileNetV3_small_x0_35_ssld `模型，在ImageNet-1k上Top-1 Acc可达55.55%。
+- 2020.07.14 添加 `Res2Net200_vd_26w_4s_ssld `模型，在ImageNet-1k上Top-1 Acc可达85.13%；添加 `Fix_ResNet50_vd_ssld_v2 `模型，在ImageNet-1k上Top-1 Acc可达84.0%。
 - 2020.06.17 添加英文文档。
 - 2020.06.12 添加对windows和CPU环境的训练与评估支持。
-- 2020.05.17 添加混合精度训练，基于ResNet50模型，精度几乎无损的情况下，训练时间可以减少约40%。
+- 2020.05.17 添加混合精度训练，基于 `ResNet50 `模型，精度几乎无损的情况下，训练时间可以减少约40%。
 - [more](./docs/zh_CN/update_history.md)
 
 
@@ -24,7 +24,7 @@
 
 - 数据增广：支持AutoAugment、Cutout、Cutmix等8种数据增广算法详细介绍、代码复现和在统一实验环境下的效果评估。
 
-- 10万类图像分类预训练模型：百度自研并开源了基于10万类数据集训练的ResNet50_vd模型，在一些实际场景中，使用该预训练模型的识别准确率最多可以提升30%。
+- 10万类图像分类预训练模型：百度自研并开源了基于10万类数据集训练的 `ResNet50_vd `模型，在一些实际场景中，使用该预训练模型的识别准确率最多可以提升30%。
 
 - 多种训练方案，包括多机训练、混合精度训练等。
 
