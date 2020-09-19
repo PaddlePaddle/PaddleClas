@@ -8,9 +8,9 @@ PaddleClas is a toolset for image classification tasks prepared for the industry
 
 
 **Recent update**
-- 2020.09.17 Add `HRNet_W48_C_ssld` pretrained model, whose Top-1 Acc on ImageNet1k dataset reaches 83.62%. Add `ResNet34_vd_ssld` pretrained model, whose Top-1 Acc on ImageNet1k dataset reaches 79.72%.
-- 2020.09.07 Add `HRNet_W18_C_ssld` pretrained model, whose Top-1 Acc on ImageNet1k dataset reaches 81.16%.
-- 2020.07.14 Add `Res2Net200_vd_26w_4s_ssld` pretrained model, whose Top-1 Acc on ImageNet1k dataset reaches 85.13%. Add `Fix_ResNet50_vd_ssld_v2` pretrained model, whose Top-1 Acc on ImageNet1k dataset reaches 84.00%.
+- 2020.09.17 Add `HRNet_W48_C_ssld` pretrained model, whose Top-1 Acc on ImageNet-1k dataset reaches 83.62%. Add `ResNet34_vd_ssld` pretrained model, whose Top-1 Acc on ImageNet-1k dataset reaches 79.72%.
+- 2020.09.07 Add `HRNet_W18_C_ssld` pretrained model, whose Top-1 Acc on ImageNet-1k dataset reaches 81.16%.
+- 2020.07.14 Add `Res2Net200_vd_26w_4s_ssld` pretrained model, whose Top-1 Acc on ImageNet-1k dataset reaches 85.13%. Add `Fix_ResNet50_vd_ssld_v2` pretrained model, whose Top-1 Acc on ImageNet-1k dataset reaches 84.00%.
 - 2020.06.17 Add English documents.
 - 2020.06.12 Add support for training and evaluation on Windows or CPU.
 - 2020.05.17 Add support for mixed precision training.
@@ -19,9 +19,9 @@ PaddleClas is a toolset for image classification tasks prepared for the industry
 
 ## Features
 
-- Rich model zoo. Based on the ImageNet1k classification dataset, PaddleClas provides 24 series of classification network structures and training configurations, 122 models' pretrained weights and their evaluation metrics.
+- Rich model zoo. Based on the ImageNet-1k classification dataset, PaddleClas provides 24 series of classification network structures and training configurations, 122 models' pretrained weights and their evaluation metrics.
 
-- SSLD Knowledge Distillation. Based on this SSLD distillation strategy, the accuracy of the distilled model is generally increased by more than 3%.
+- SSLD Knowledge Distillation. Based on this SSLD distillation strategy, the top-1 acc of the distilled model is generally increased by more than 3%.
 
 - Data augmentation: PaddleClas provides detailed introduction of 8 data augmentation algorithms such as AutoAugment, Cutout, Cutmix, code reproduction and effect evaluation in a unified experimental environment.
 
@@ -77,7 +77,7 @@ PaddleClas is a toolset for image classification tasks prepared for the industry
 <a name="Model_zoo_overview"></a>
 ### Model zoo overview
 
-Based on the ImageNet1k classification dataset, the 24 classification network structures supported by PaddleClas and the corresponding 122 image classification pretrained models are shown below. Training trick, a brief introduction to each series of network structures, and performance evaluation will be shown in the corresponding chapters. The  evaluation environment is as follows.
+Based on the ImageNet-1k classification dataset, the 24 classification network structures supported by PaddleClas and the corresponding 122 image classification pretrained models are shown below. Training trick, a brief introduction to each series of network structures, and performance evaluation will be shown in the corresponding chapters. The  evaluation environment is as follows.
 
 * CPU evaluation environment is based on Snapdragon 855 (SD855).
 * The GPU evaluation speed is measured by running 500 times under the FP32+TensorRT configuration (excluding the warmup time of the first 10 times).
@@ -127,7 +127,7 @@ Accuracy and inference time metrics of ResNet and Vd series models are shown as 
 
 Accuracy and inference time metrics of Mobile series models are shown as follows. More detailed information can be refered to [Mobile series tutorial](./docs/en/models/Mobile_en.md).
 
-| Model                              | Top-1 Acc | Top-5 Acc | SD855 time(ms)<br>bs=1 | Flops(G) | Params(M) | 模型大小(M) | Download Address                                                                                                      |
+| Model                              | Top-1 Acc | Top-5 Acc | SD855 time(ms)<br>bs=1 | Flops(G) | Params(M) | Model storage size(M) | Download Address                                                                                                      |
 |----------------------------------|-----------|-----------|------------------------|----------|-----------|---------|-----------------------------------------------------------------------------------------------------------|
 | MobileNetV1_<br>x0_25                | 0.5143    | 0.7546    | 3.21985                | 0.07     | 0.46      | 1.9     | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/MobileNetV1_x0_25_pretrained.tar)                |
 | MobileNetV1_<br>x0_5                 | 0.6352    | 0.8473    | 9.579599               | 0.28     | 1.31      | 5.2     | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/MobileNetV1_x0_5_pretrained.tar)                 |
