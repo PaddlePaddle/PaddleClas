@@ -67,3 +67,5 @@ visualdl可能出现安装失败，请尝试
 pip3 install --upgrade visualdl==2.0.0b3 -i https://mirror.baidu.com/pypi/simple
 
 ```
+
+此外，visualdl目前只支持在python3下运行，因此如果希望使用visualdl，需要使用python3。

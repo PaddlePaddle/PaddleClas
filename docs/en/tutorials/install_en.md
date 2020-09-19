@@ -51,3 +51,12 @@ git clone https://github.com/PaddlePaddle/PaddleClas.git
 ```
 pip install --upgrade -r requirements.txt
 ```
+
+If the install process of visualdl failed, you can try the following commands.
+
+```
+pip3 install --upgrade visualdl==2.0.0b3 -i https://mirror.baidu.com/pypi/simple
+
+```
+
+What's more, visualdl is just supported in python3, so python3 is needed if you want to use visualdl.
