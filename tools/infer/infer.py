@@ -13,13 +13,17 @@
 # limitations under the License.
 
 import os
-import utils
+import sys
+__dir__ = os.path.dirname(os.path.abspath(__file__))
+sys.path.append(__dir__)
+sys.path.append(os.path.abspath(os.path.join(__dir__, '../../')))
+
 import argparse
 import numpy as np
-
 import paddle.fluid as fluid
 
 from ppcls.modeling import architectures
+import utils
 
 
 def parse_args():
