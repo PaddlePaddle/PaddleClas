@@ -275,20 +275,22 @@ def run(dataloader,
     use_mix = config.get("use_mix", False) and mode == "train"
 
     metric_list = [
-        ("loss", AverageMeter('loss', '7.4f')),
+        ("loss", AverageMeter('loss', '7.5f')),
         ("lr", AverageMeter(
             'lr', 'f', need_avg=False)),
-        ("batch_time", AverageMeter('elapse', '.3f')),
+        ("batch_time", AverageMeter('elapse', '.7f')),
+        ("reader_time", AverageMeter('reader ', '.7f')),
     ]
     if not use_mix:
         topk_name = 'top{}'.format(config.topk)
-        metric_list.insert(1, (topk_name, AverageMeter(topk_name, '.4f')))
-        metric_list.insert(1, ("top1", AverageMeter("top1", '.4f')))
+        metric_list.insert(1, (topk_name, AverageMeter(topk_name, '.5f')))
+        metric_list.insert(1, ("top1", AverageMeter("top1", '.5f')))
 
     metric_list = OrderedDict(metric_list)
 
     tic = time.time()
     for idx, batch in enumerate(dataloader()):
+        metric_list['reader_time'].update(time.time() - tic)
         batch_size = len(batch[0])
         feeds = create_feeds(batch, use_mix)
         fetchs = create_fetchs(feeds, net, config, mode)
