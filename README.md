@@ -36,9 +36,9 @@ PaddleClas is a toolset for image classification tasks prepared for the industry
 
 ## Tutorials
 
-- [Installation](./docs/en/tutorials/install.md)
-- [Quick start PaddleClas in 30 minutes](./docs/en/tutorials/quick_start.md)
-- [Model introduction and model zoo](./docs/en/models/models_intro.md)
+- [Installation](./docs/en/tutorials/install_en.md)
+- [Quick start PaddleClas in 30 minutes](./docs/en/tutorials/quick_start_en.md)
+- [Model introduction and model zoo](./docs/en/models/models_intro_en.md)
     - [Model zoo overview](#Model_zoo_overview)
     - [ResNet and Vd series](#ResNet_and_Vd_series)
     - [Mobile series](#Mobile_series)
