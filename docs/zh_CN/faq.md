@@ -248,3 +248,58 @@ fluid.io.save_vars(exe, "./path_to_save_var", infer_prog, predicate=exists)
 >>
 * Q: python2下，使用visualdl的时候，报出以下错误，`TypeError: __init__() missing 1 required positional argument: 'sync_cycle'`，这是为什么呢？
 * A: 目前visualdl仅支持在python3下运行，visualdl需要是2.0以上的版本，如果visualdl版本不对的话，可以通过以下方式进行安装：`pip3 install visualdl==2.0.0b8  -i https://mirror.baidu.com/pypi/simple`
+
+
+>>
+* Q: 自己在测ResNet50_vd预测单张图片速度的时候发现比官网提供的速度benchmark慢了很多，而且CPU速度比GPU速度快很多，这个是为什么呢？
+* A: 模型预测需要初始化，初始化的过程比较耗时，因此在统计预测速度的时候，需要批量跑一批图片，去除前若干张图片的预测耗时，再统计下平均的时间。GPU比CPU速度测试单张图片速度慢是因为GPU的初始化并CPU要慢很多。
+
+
+>>
+* Q: 在动态图中加载静态图预训练模型的时候，需要注意哪些问题？
+* A: 在使用infer.py预测单张图片或者文件夹中的图片时，需要注意指定[infer.py](https://github.com/PaddlePaddle/PaddleClas/blob/53c5850df7c49a1bfcd8d989e6ccbea61f406a1d/tools/infer/infer.py#L40)中的`load_static_weights`为True，在finetune或者评估的时候需要添加`-o load_static_weights=True`的参数。
+
+>>
+* Q: 灰度图可以用于模型训练吗？
+* A: 灰度图也可以用于模型训练，不过需要修改模型的输入shape为`[1, 224, 224]`，此外数据增广部分也需要注意适配一下。不过为了更好地使用PaddleClas代码的话，即使是灰度图，也建议调整为3通道的图片进行训练（RGB通道的像素值相等）。
+
+
+>>
+* Q: 怎么在windows上或者cpu上面模型训练呢？
+* A: 可以参考[PaddleClas开始使用教程](https://github.com/PaddlePaddle/PaddleClas/blob/master/docs/zh_CN/tutorials/getting_started.md)，详细介绍了在Linux、Windows、CPU等环境中进行模型训练、评估与预测的教程。
+
+>>
+* Q: 怎样在模型训练的时候使用label smoothing呢？
+* A: 可以在配置文件中添加`use_mix=True`，同时设置label smoothing epsilon的值，`ls_epsilon=0.1`，表示设置该值为0.1。
+
+>>
+* Q: PaddleClas提供的10W类图像分类预训练模型能否用于模型推断呢？
+* A: 该10W类图像分类预训练模型没有提供fc全连接层的参数，无法用于模型推断，目前可以用于模型微调。
+
+>>
+* Q: 在使用`tools/infere/predict.py`进行模型预测的时候，报了这个问题:`Error: Pass tensorrt_subgraph_pass has not been registered`，这是为什么呢？
+* A: 如果希望使用TensorRT进行模型预测推理的话，需要编译带TensorRT的PaddlePaddle，编译的时候参考以下的编译方式，其中`TENSORRT_ROOT`表示TensorRT的路径。
+```
+cmake  .. \
+        -DWITH_CONTRIB=OFF \
+        -DWITH_MKL=ON \
+        -DWITH_MKLDNN=ON  \
+        -DWITH_TESTING=OFF \
+        -DCMAKE_BUILD_TYPE=Release \
+        -DWITH_INFERENCE_API_TEST=OFF \
+        -DON_INFER=ON \
+        -DWITH_PYTHON=ON \
+        -DPY_VERSION=2.7 \
+        -DTENSORRT_ROOT=/usr/local/TensorRT6-cuda10.0-cudnn7/
+make -j16
+make inference_lib_dist
+```
+
+>>
+* Q: 怎样在训练的时候使用自动混合精度(Automatic Mixed Precision, AMP)训练呢？
+* A: 可以参考[ResNet50_fp16.yml](https://github.com/PaddlePaddle/PaddleClas/blob/master/configs/ResNet/ResNet50_fp16.yml)这个配置文件；具体地，如果希望自己的配置文件在模型训练的时候也支持自动混合精度，可以在配置文件中添加下面的配置信息。
+```
+use_fp16: True
+amp_scale_loss: 128.0
+use_dynamic_loss_scaling: True
+```
