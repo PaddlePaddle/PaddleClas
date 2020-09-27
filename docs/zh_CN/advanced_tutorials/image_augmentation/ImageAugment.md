@@ -23,7 +23,6 @@
 2. 对`Transpose` 后的 224 的图像进行一些裁剪: CutOut，RandErasing，HideAndSeek，GridMask
 3. 对 `Batch` 后的数据进行混合: Mixup，Cutmix
 
-
 增广后的可视化效果如下所示。
 
 ![](../../../images/image_aug/image_aug_samples_s.jpg)
