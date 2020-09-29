@@ -27,6 +27,10 @@ Compared with the above standard image augmentation methods, the researchers hav
 3. Aliasing. Perform some transformations on the image after `Batch`, such as Mixup and Cutmix.
 
 
+Visualization results of some images after augmentation are shown as follows.
+
+![](../../../images/image_aug/image_aug_samples_s_en.jpg)
+
 
 The following table shows more detailed information of the transformations.
 
