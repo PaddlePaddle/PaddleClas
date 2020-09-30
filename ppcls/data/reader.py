@@ -233,7 +233,6 @@ class Reader:
                 batch_size=batch_size,
                 shuffle=self.shuffle,
                 drop_last=True)
-
             loader = DataLoader(
                 dataset,
                 batch_sampler=batch_sampler,
