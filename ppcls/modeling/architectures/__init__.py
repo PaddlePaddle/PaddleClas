@@ -27,6 +27,7 @@ from .hrnet import HRNet_W18_C
 from .efficientnet import EfficientNetB0
 from .resnest import ResNeSt50_fast_1s1x64d, ResNeSt50
 from .googlenet import GoogLeNet
+from .ghostnet import GhostNet_x0_5, GhostNet_x1_0, GhostNet_x1_3
 from .mobilenet_v1 import MobileNetV1_x0_25, MobileNetV1_x0_5, MobileNetV1_x0_75, MobileNetV1
 from .mobilenet_v2 import MobileNetV2_x0_25, MobileNetV2_x0_5, MobileNetV2_x0_75, MobileNetV2, MobileNetV2_x1_5, MobileNetV2_x2_0
 from .mobilenet_v3 import MobileNetV3_small_x0_35, MobileNetV3_small_x0_5, MobileNetV3_small_x0_75, MobileNetV3_small_x1_0, MobileNetV3_small_x1_25, MobileNetV3_large_x0_35, MobileNetV3_large_x0_5, MobileNetV3_large_x0_75, MobileNetV3_large_x1_0, MobileNetV3_large_x1_25
