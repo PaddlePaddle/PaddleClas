@@ -355,16 +355,16 @@ class GhostNet(nn.Layer):
         return new_v
 
 
-def GhostNet_x0_5():
+def GhostNet_x0_5(**args):
     model = GhostNet(scale=0.5)
     return model
 
 
-def GhostNet_x1_0():
+def GhostNet_x1_0(**args):
     model = GhostNet(scale=1.0)
     return model
 
 
-def GhostNet_x1_3():
+def GhostNet_x1_3(**args):
     model = GhostNet(scale=1.3)
     return model
