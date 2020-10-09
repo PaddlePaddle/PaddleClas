@@ -63,10 +63,9 @@ def main(args):
     net = program.create_model(config.ARCHITECTURE, config.classes_num)
     net = paddle.DataParallel(net, strategy)
     init_model(config, net, optimizer=None)
-    valid_dataloader = program.create_dataloader()
-    valid_reader = Reader(config, 'valid')()
-    valid_dataloader.set_sample_list_generator(valid_reader, place)
+    valid_dataloader = Reader(config, 'valid', places=place)()
     net.eval()
+
     top1_acc = program.run(valid_dataloader, config, net, None, None, 0,
                            'valid')
 
