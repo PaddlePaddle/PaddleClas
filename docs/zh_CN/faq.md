@@ -78,6 +78,7 @@
 >>
 * Q: weight_decay是什么？怎么选择合适的weight_decay呢？
 * A: 过拟合是机器学习中常见的一个名词，简单理解即为模型在训练数据上表现很好，但在测试数据上表现较差，在卷积神经网络中，同样存在过拟合的问题，为了避免过拟合，很多正则方式被提出，其中，weight_decay是其中一个广泛使用的避免过拟合的方式。在使用SGD优化器时，weight_decay等价于在最终的损失函数后添加L2正则化，L2正则化使得网络的权重倾向于选择更小的值，最终整个网络中的参数值更趋向于0，模型的泛化性能相应提高。在各大深度学习框架的实现中，该值表达的含义是L2正则前的系数，在paddle框架中，该值的名称是l2_decay，所以以下都称其为l2_decay。该系数越大，表示加入的正则越强，模型越趋于欠拟合状态。在训练ImageNet的任务中，大多数的网络将该参数值设置为1e-4，在一些小的网络如MobileNet系列网络中，为了避免网络欠拟合，该值设置为1e-5~4e-5之间。当然，该值的设置也和具体的数据集有关系，当任务的数据集较大时，网络本身趋向于欠拟合状态，可以将该值适当减小，当任务的数据集较小时，网络本身趋向于过拟合状态，可以将该值适当增大。下表展示了MobileNetV1_x0_25在ImageNet-1k上使用不同l2_decay的精度情况。由于MobileNetV1_x0_25是一个比较小的网络，所以l2_decay过大会使网络趋向于欠拟合状态，所以在该网络中，相对1e-4，3e-5是更好的选择。
+
 | 模型                | L2_decay | Train acc1/acc5 | Test acc1/acc5 |
 |:--:|:--:|:--:|:--:|
 | MobileNetV1_x0_25 | 1e-4     | 43.79%/67.61%   | 50.41%/74.70%  |
@@ -88,6 +89,7 @@
 * Q: 标签平滑(label_smoothing)指的是什么？有什么效果呢？一般适用于什么样的场景中？
 * A: Label_smoothing是深度学习中的一种正则化方法，其全称是 Label Smoothing Regularization(LSR)，即标签平滑正则化。在传统的分类任务计算损失函数时，是将真实的one hot标签与神经网络的输出做相应的交叉熵计算，而label_smoothing是将真实的one hot标签做一个标签平滑的处理，使得网络学习的标签不再是一个hard label，而是一个有概率值的soft label，其中在类别对应的位置的概率最大，其他位置概率是一个非常小的数。具体的计算方式参见论文[2]。在label_smoothing里，有一个epsilon的参数值，该值描述了将标签软化的程度，该值越大，经过label smoothing后的标签向量的标签概率值越小，标签越平滑，反之，标签越趋向于hard label，在训练ImageNet-1k的实验里通常将该值设置为0.1。
 在训练ImageNet-1k的实验中，我们发现，ResNet50大小级别及其以上的模型在使用label_smooting后，精度有稳定的提升。下表展示了ResNet50_vd在使用label_smoothing前后的精度指标。同时，由于label_smoohing相当于一种正则方式，在相对较小的模型上，精度提升不明显甚至会有所下降，下表展示了ResNet18在ImageNet-1k上使用label_smoothing前后的精度指标。可以明显看到，在使用label_smoothing后，精度有所下降。
+
 | 模型   | Use_label_smoothing | Test acc1 |
 |:--:|:--:|:--:|
 | ResNet50_vd | 0    | 77.9%  |
@@ -114,6 +116,7 @@
 >>
 * Q: 随机裁剪是怎么影响小模型训练的性能的？
 * A: 在ImageNet-1k数据的标准预处理中，随机裁剪函数中定义了scale和ratio两个值，两个值分别确定了图片crop的大小和图片的拉伸程度，其中scale的默认取值范围是0.08-1(lower_scale-upper_scale),ratio的默认取值范围是3/4-4/3(lower_ratio-upper_ratio)。在非常小的网络训练中，此类数据增强会使得网络欠拟合，导致精度有所下降。为了提升网络的精度，可以使其数据增强变的更弱，即增大图片的crop区域或者减弱图片的拉伸变换程度。我们可以分别通过增大lower_scale的值或缩小lower_ratio与upper_scale的差距来实现更弱的图片变换。下表列出了使用不同lower_scale训练MobileNetV2_x0_25的精度，可以看到，增大图片的crop区域面积后训练精度和验证精度均有提升。
+
 | 模型                | Scale取值范围 | Train_acc1/acc5 | Test_acc1/acc5 |
 |:--:|:--:|:--:|:--:|
 | MobileNetV2_x0_25 | [0.08,1]  | 50.36%/72.98%   | 52.35%/75.65%  |
