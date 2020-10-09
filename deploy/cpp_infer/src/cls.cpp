@@ -93,7 +93,7 @@ void Classifier::Run(cv::Mat &img) {
   int maxPosition =
       max_element(out_data.begin(), out_data.end()) - out_data.begin();
   std::cout << "result: " << std::endl;
-  std::cout << "\tclass: " << maxPosition << std::endl;
+  std::cout << "\tclass id: " << maxPosition << std::endl;
   std::cout << std::fixed << std::setprecision(10)
             << "\tscore: " << double(out_data[maxPosition]) << std::endl;
 }
