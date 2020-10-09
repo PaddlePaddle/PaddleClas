@@ -211,4 +211,4 @@ sh tools/run.sh
     <img src="./docs/imgs/cpp_infer_result.png" width="600">
 </div>
 
-其中`class id`表示置信度最高的类别对应的id，score表示图片属于该类别的
+其中`class id`表示置信度最高的类别对应的id，score表示图片属于该类别的概率。
