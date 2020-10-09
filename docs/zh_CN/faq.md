@@ -171,7 +171,6 @@
 >>
 * Q: 多卡评估时，为什么每张卡输出的精度指标不相同？
 * A: 目前PaddleClas基于fleet api使用多卡，在多卡评估时，每张卡都是单独读取各自part的数据，不同卡中计算的图片是不同的，因此最终指标也会有微量差异，如果希望得到准确的评估指标，可以使用单卡评估。
-@@ -58,4 +247,59 @@ fluid.io.save_vars(exe, "./path_to_save_var", infer_prog, predicate=exists)
 
 >>
 * Q: 在配置文件的`TRAIN`字段中配置了`mix`的参数，为什么`mixup`的数据增广预处理没有生效呢？
