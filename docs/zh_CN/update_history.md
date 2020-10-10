@@ -1,5 +1,10 @@
 # 更新日志
 
+
+- 2020.10.10
+    * 添加cpp inference demo。
+    * 添加FAQ30问。
+
 - 2020.09.17
     * 添加HRNet_W48_C_ssld模型，在ImageNet上Top-1 Acc可达0.836；添加ResNet34_vd_ssld模型，在ImageNet上Top-1 Acc可达0.797。
 
