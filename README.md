@@ -67,7 +67,7 @@ PaddleClas is a toolset for image classification tasks prepared for the industry
     - [Pretrained model with 100,000 categories](./docs/en/application/transfer_learning_en.md)
     - [Generic object detection](./docs/en/application/object_detection_en.md)
 - FAQ
-    - General image classification problems (coming soon)
+    - [General image classification problems](./docs/en/faq_en.md)
     - [PaddleClas FAQ](./docs/en/faq_en.md)
 - [Competition support](./docs/en/competition_support_en.md)
 - [License](#License)
