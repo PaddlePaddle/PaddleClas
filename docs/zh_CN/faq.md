@@ -224,7 +224,6 @@ fluid.io.save_vars(exe, "./path_to_save_var", infer_prog, predicate=exists)
 
 >>
 * Q: python2下，使用visualdl的时候，报出以下错误，`TypeError: __init__() missing 1 required positional argument: 'sync_cycle'`，这是为什么呢？
-* A: 目前visualdl仅支持在python3下运行，visualdl需要是2.0以上的版本，如果visualdl版本不对的话，可以通过以下方式进行安装：`pip3 install visualdl==2.0.0b8  -i https://mirror.baidu.com/pypi/simple`cd
 * A: 目前visualdl仅支持在python3下运行，visualdl需要是2.0以上的版本，如果visualdl版本不对的话，可以通过以下方式进行安装：`pip3 install visualdl==2.0.0b8  -i https://mirror.baidu.com/pypi/simple`
 
 >>
