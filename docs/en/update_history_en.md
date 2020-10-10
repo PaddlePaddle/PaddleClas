@@ -1,5 +1,9 @@
 # Release Notes
 
+- 2020.10.10
+    * Add cpp inference demo.
+    * Improve FAQ tutorials.
+
 * 2020.09.17
     * Add `HRNet_W48_C_ssld` pretrained model, whose Top-1 Acc on ImageNet1k dataset reaches 83.62%.
     * Add `ResNet34_vd_ssld` pretrained model, whose Top-1 Acc on ImageNet1k dataset reaches 79.72%.

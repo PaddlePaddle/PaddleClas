@@ -8,13 +8,13 @@ PaddleClas is a toolset for image classification tasks prepared for the industry
 
 
 **Recent update**
+- 2020.10.10 Add cpp inference demo and improve FAQ tutorial.
 - 2020.09.17 Add `HRNet_W48_C_ssld` pretrained model, whose Top-1 Acc on ImageNet-1k dataset reaches 83.62%. Add `ResNet34_vd_ssld` pretrained model, whose Top-1 Acc on ImageNet-1k dataset reaches 79.72%.
 - 2020.09.07 Add `HRNet_W18_C_ssld` pretrained model, whose Top-1 Acc on ImageNet-1k dataset reaches 81.16%.
 - 2020.07.14 Add `Res2Net200_vd_26w_4s_ssld` pretrained model, whose Top-1 Acc on ImageNet-1k dataset reaches 85.13%. Add `Fix_ResNet50_vd_ssld_v2` pretrained model, whose Top-1 Acc on ImageNet-1k dataset reaches 84.00%.
 - 2020.06.17 Add English documents.
 - 2020.06.12 Add support for training and evaluation on Windows or CPU.
-- 2020.05.17 Add support for mixed precision training.
-- [more](./docs/zh_CN/update_history.md)
+- [more](./docs/en/update_history_en.md)
 
 
 ## Features
