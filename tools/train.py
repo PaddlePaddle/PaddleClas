@@ -105,7 +105,7 @@ def main(args):
                                                   config.ARCHITECTURE["name"])
                         save_model(net, optimizer, model_path, "best_model")
                 message = "The best top1 acc {:.5f}, in epoch: {:d}".format(
-                    best_top1_acc, epoch_id)
+                    best_top1_acc, best_top1_epoch)
                 logger.info("{:s}".format(logger.coloring(message, "RED")))
 
             # 3. save the persistable model
