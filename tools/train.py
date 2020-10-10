@@ -23,7 +23,6 @@ __dir__ = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(__dir__)
 sys.path.append(os.path.abspath(os.path.join(__dir__, '..')))
 
-
 import paddle
 from paddle.distributed import ParallelEnv
 
@@ -32,6 +31,7 @@ from ppcls.utils.config import get_config
 from ppcls.utils.save_load import init_model, save_model
 from ppcls.utils import logger
 import program
+
 
 def parse_args():
     parser = argparse.ArgumentParser("PaddleClas train script")
@@ -78,16 +78,13 @@ def main(args):
     # load model from checkpoint or pretrained model
     init_model(config, net, optimizer)
 
-    train_dataloader = program.create_dataloader()
-    train_reader = Reader(config, 'train')()
-    train_dataloader.set_sample_list_generator(train_reader, place)
+    train_dataloader = Reader(config, 'train', places=place)()
 
-    if config.validate:
-        valid_dataloader = program.create_dataloader()
-        valid_reader = Reader(config, 'valid')()
-        valid_dataloader.set_sample_list_generator(valid_reader, place)
+    if config.validate and ParallelEnv().local_rank == 0:
+        valid_dataloader = Reader(config, 'valid', places=place)()
 
     best_top1_acc = 0.0  # best top1 acc record
+    best_top1_epoch = 0
     for epoch_id in range(config.epochs):
         net.train()
         # 1. train with train dataset
@@ -98,18 +95,18 @@ def main(args):
             # 2. validate with validate dataset
             if config.validate and epoch_id % config.valid_interval == 0:
                 net.eval()
-                top1_acc = program.run(valid_dataloader, config, net, None, None,
-                                       epoch_id, 'valid')
+                top1_acc = program.run(valid_dataloader, config, net, None,
+                                       None, epoch_id, 'valid')
                 if top1_acc > best_top1_acc:
                     best_top1_acc = top1_acc
-                    message = "The best top1 acc {:.5f}, in epoch: {:d}".format(
-                        best_top1_acc, epoch_id)
-                    logger.info("{:s}".format(logger.coloring(message, "RED")))
+                    best_top1_epoch = epoch_id
                     if epoch_id % config.save_interval == 0:
-
                         model_path = os.path.join(config.model_save_dir,
                                                   config.ARCHITECTURE["name"])
                         save_model(net, optimizer, model_path, "best_model")
+                message = "The best top1 acc {:.5f}, in epoch: {:d}".format(
+                    best_top1_acc, best_top1_epoch)
+                logger.info("{:s}".format(logger.coloring(message, "RED")))
 
             # 3. save the persistable model
             if epoch_id % config.save_interval == 0:

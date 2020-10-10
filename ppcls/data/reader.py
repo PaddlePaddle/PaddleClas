@@ -17,7 +17,7 @@ import imghdr
 import os
 import signal
 
-from paddle.reader import multiprocess_reader
+from paddle.io import Dataset, DataLoader, DistributedBatchSampler
 
 from . import imaug
 from .imaug import transform
@@ -109,7 +109,6 @@ def create_file_list(params):
 def shuffle_lines(full_lines, seed=None):
     """
     random shuffle lines
-
     Args:
         full_lines(list):
         seed(int): random seed
@@ -135,12 +134,8 @@ def get_file_list(params):
     with open(params['file_list']) as flist:
         full_lines = [line.strip() for line in flist]
 
-    full_lines = shuffle_lines(full_lines, params["shuffle_seed"])
-
-    # use only partial data for each trainer in distributed training
-    if params['mode'] == 'train':
-        img_per_trainer = len(full_lines) // trainers_num
-        full_lines = full_lines[trainer_id::trainers_num][:img_per_trainer]
+    if params["mode"] == "train":
+        full_lines = shuffle_lines(full_lines, seed=params['shuffle_seed'])
 
     return full_lines
 
@@ -165,60 +160,6 @@ def create_operators(params):
     return ops
 
 
-def partial_reader(params, full_lines, part_id=0, part_num=1):
-    """
-    create a reader with partial data
-
-    Args:
-        params(dict):
-        full_lines: label list
-        part_id(int): part index of the current partial data
-        part_num(int): part num of the dataset
-    """
-    assert part_id < part_num, ("part_num: {} should be larger "
-                                "than part_id: {}".format(part_num, part_id))
-
-    full_lines = full_lines[part_id::part_num]
-
-    batch_size = int(params['batch_size']) // trainers_num
-    if params['mode'] != "test" and len(full_lines) < batch_size:
-        raise SampleNumException('', len(full_lines), batch_size)
-
-    def reader():
-        ops = create_operators(params['transforms'])
-        delimiter = params.get('delimiter', ' ')
-        for line in full_lines:
-            img_path, label = line.split(delimiter)
-            img_path = os.path.join(params['data_dir'], img_path)
-            with open(img_path, 'rb') as f:
-                img = f.read()
-            yield (transform(img, ops), int(label))
-
-    return reader
-
-
-def mp_reader(params):
-    """
-    multiprocess reader
-
-    Args:
-        params(dict):
-    """
-    check_params(params)
-
-    full_lines = get_file_list(params)
-    if params["mode"] == "train":
-        full_lines = shuffle_lines(full_lines, seed=None)
-
-    part_num = 1 if 'num_workers' not in params else params['num_workers']
-
-    readers = []
-    for part_id in range(part_num):
-        readers.append(partial_reader(params, full_lines, part_id, part_num))
-
-    return multiprocess_reader(readers, use_pipe=False)
-
-
 def term_mp(sig_num, frame):
     """ kill all child processes
     """
@@ -227,6 +168,29 @@ def term_mp(sig_num, frame):
     logger.info("main proc {} exit, kill process group "
                 "{}".format(pid, pgid))
     os.killpg(pgid, signal.SIGKILL)
+    return
+
+
+class CommonDataset(Dataset):
+    def __init__(self, params):
+        self.params = params
+        self.mode = params.get("mode", "train")
+        self.full_lines = get_file_list(params)
+        self.delimiter = params.get('delimiter', ' ')
+        self.ops = create_operators(params['transforms'])
+        self.num_samples = len(self.full_lines)
+        return
+
+    def __getitem__(self, idx):
+        line = self.full_lines[idx]
+        img_path, label = line.split(self.delimiter)
+        img_path = os.path.join(self.params['data_dir'], img_path)
+        with open(img_path, 'rb') as f:
+            img = f.read()
+        return (transform(img, self.ops), int(label))
+
+    def __len__(self):
+        return self.num_samples
 
 
 class Reader:
@@ -242,7 +206,7 @@ class Reader:
         the specific reader
     """
 
-    def __init__(self, config, mode='train', seed=None):
+    def __init__(self, config, mode='train', places=None):
         try:
             self.params = config[mode.upper()]
         except KeyError:
@@ -250,27 +214,58 @@ class Reader:
 
         use_mix = config.get('use_mix')
         self.params['mode'] = mode
-        if seed is not None:
-            self.params['shuffle_seed'] = seed
+        self.shuffle = mode == "train"
+
+        self.collate_fn = None
         self.batch_ops = []
         if use_mix and mode == "train":
             self.batch_ops = create_operators(self.params['mix'])
+            self.collate_fn = self.mix_collate_fn
+
+        self.places = places
+
+    def mix_collate_fn(self, batch):
+        batch = transform(batch, self.batch_ops)
+        # batch each field
+        slots = []
+        for items in batch:
+            for i, item in enumerate(items):
+                if len(slots) < len(items):
+                    slots.append([item])
+                else:
+                    slots[i].append(item)
+
+        return [np.stack(slot, axis=0) for slot in slots]
 
     def __call__(self):
         batch_size = int(self.params['batch_size']) // trainers_num
 
-        def wrapper():
-            reader = mp_reader(self.params)
-            batch = []
-            for idx, sample in enumerate(reader()):
-                img, label = sample
-                batch.append((img, label))
-                if (idx + 1) % batch_size == 0:
-                    batch = transform(batch, self.batch_ops)
-                    yield batch
-                    batch = []
+        dataset = CommonDataset(self.params)
 
-        return wrapper
+        if self.params['mode'] == "train":
+            batch_sampler = DistributedBatchSampler(
+                dataset,
+                batch_size=batch_size,
+                shuffle=self.shuffle,
+                drop_last=True)
+            loader = DataLoader(
+                dataset,
+                batch_sampler=batch_sampler,
+                collate_fn=self.collate_fn,
+                places=self.places,
+                return_list=True,
+                num_workers=self.params["num_workers"])
+        else:
+            loader = DataLoader(
+                dataset,
+                places=self.places,
+                batch_size=batch_size,
+                drop_last=False,
+                return_list=True,
+                shuffle=False,
+                num_workers=self.params["num_workers"])
+
+        return loader
 
 
 signal.signal(signal.SIGINT, term_mp)

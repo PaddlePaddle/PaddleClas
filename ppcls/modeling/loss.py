@@ -49,7 +49,6 @@ class Loss(object):
             input = -F.log_softmax(input, axis=-1)
             cost = paddle.reduce_sum(target * input, dim=-1)
         else:
-            #             softmax_out = F.softmax(input)
             cost = F.cross_entropy(input=input, label=target)
         avg_cost = paddle.mean(cost)
         return avg_cost
