@@ -51,8 +51,7 @@ public:
 
 class ResizeImg {
 public:
-  virtual void Run(const cv::Mat &img, cv::Mat &resize_img, int max_size_len,
-                   float &ratio_h, float &ratio_w);
+  virtual void Run(const cv::Mat &img, cv::Mat &resize_img, int max_size_len);
 };
 
 } // namespace PaddleClas
