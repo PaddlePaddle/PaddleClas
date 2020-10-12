@@ -30,7 +30,7 @@ export root_path=$PWD
 export install_path=${root_path}/opencv3
 ```
 
-然后在opencv源码路径下，按照下面的方式进行编译。
+* 然后在opencv源码路径下，按照下面的方式进行编译。
 
 ```shell
 rm -rf build
@@ -59,7 +59,7 @@ make -j
 make install
 ```
 
-`make install`完成之后，会在该文件夹下生成opencv头文件和库文件，用于后面的PaddleClas代码编译。
+* `make install`完成之后，会在该文件夹下生成opencv头文件和库文件，用于后面的PaddleClas代码编译。
 
 以opencv3.4.7版本为例，最终在安装路径下的文件结构如下所示。**注意**：不同的opencv版本，下述的文件结构可能不同。
 
@@ -204,11 +204,11 @@ make -j
 sh tools/run.sh
 ```
 
-
-最终屏幕上会输出检测结果如下。
+* 最终屏幕上会输出结果，如下图所示。
 
 <div align="center">
     <img src="./docs/imgs/cpp_infer_result.png" width="600">
 </div>
+
 
 其中`class id`表示置信度最高的类别对应的id，score表示图片属于该类别的概率。
