@@ -47,15 +47,12 @@ void Classifier::LoadModel(const std::string &model_dir) {
 }
 
 void Classifier::Run(cv::Mat &img) {
-  float ratio_h{};
-  float ratio_w{};
-
   cv::Mat srcimg;
   cv::Mat resize_img;
   img.copyTo(srcimg);
 
-  this->resize_op_.Run(img, resize_img, this->resize_short_size_, ratio_h,
-                       ratio_w);
+  this->resize_op_.Run(img, resize_img, this->resize_short_size_);
+
   this->crop_op_.Run(resize_img, this->crop_size_);
 
   this->normalize_op_.Run(&resize_img, this->mean_, this->scale_,

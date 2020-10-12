@@ -25,6 +25,7 @@
 
 #include <cstring>
 #include <fstream>
+#include <math.h>
 #include <numeric>
 
 #include <include/preprocess_op.h>
@@ -68,25 +69,22 @@ void CenterCropImg::Run(cv::Mat &img, const int crop_size) {
   img = img(rect);
 }
 
-void ResizeImg::Run(const cv::Mat &img, cv::Mat &resize_img, int max_size_len,
-                    float &ratio_h, float &ratio_w) {
+void ResizeImg::Run(const cv::Mat &img, cv::Mat &resize_img,
+                    int resize_short_size) {
   int w = img.cols;
   int h = img.rows;
 
   float ratio = 1.f;
   if (h < w) {
-    ratio = float(max_size_len) / float(h);
+    ratio = float(resize_short_size) / float(h);
   } else {
-    ratio = float(max_size_len) / float(w);
+    ratio = float(resize_short_size) / float(w);
   }
 
-  int resize_h = int(float(h) * ratio);
-  int resize_w = int(float(w) * ratio);
+  int resize_h = round(float(h) * ratio);
+  int resize_w = round(float(w) * ratio);
 
   cv::resize(img, resize_img, cv::Size(resize_w, resize_h));
-
-  ratio_h = float(resize_h) / float(h);
-  ratio_w = float(resize_w) / float(w);
 }
 
 } // namespace PaddleClas
