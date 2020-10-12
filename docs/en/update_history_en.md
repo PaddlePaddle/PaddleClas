@@ -1,5 +1,8 @@
 # Release Notes
 
+- 2020.10.12
+    * Add Paddle-Lite demo.
+
 - 2020.10.10
     * Add cpp inference demo.
     * Improve FAQ tutorials.

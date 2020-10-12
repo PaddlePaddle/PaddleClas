@@ -8,6 +8,7 @@ PaddleClas is a toolset for image classification tasks prepared for the industry
 
 
 **Recent update**
+- 2020.10.12 Add Paddle-Lite demo。
 - 2020.10.10 Add cpp inference demo and improve FAQ tutorial.
 - 2020.09.17 Add `HRNet_W48_C_ssld` pretrained model, whose Top-1 Acc on ImageNet-1k dataset reaches 83.62%. Add `ResNet34_vd_ssld` pretrained model, whose Top-1 Acc on ImageNet-1k dataset reaches 79.72%.
 - 2020.09.07 Add `HRNet_W18_C_ssld` pretrained model, whose Top-1 Acc on ImageNet-1k dataset reaches 81.16%.
@@ -25,7 +26,7 @@ PaddleClas is a toolset for image classification tasks prepared for the industry
 
 - Data augmentation: PaddleClas provides detailed introduction of 8 data augmentation algorithms such as AutoAugment, Cutout, Cutmix, code reproduction and effect evaluation in a unified experimental environment.
 
-- Pretrained model with 100,000 categories: Based on `ResNet50_vd` model, Baidu open sourced the `ResNet50_vd` pretrained model trained on a 100,000-category dataset. In some practical scenarios, the  accuracy based on the pretrained weights can be increased by up to 30%.
+- Pretrained model with 100,000 categories: Based on `ResNet50_vd` model, Baidu open sourced the `ResNet50_vd` pretrained model trained on a 100,000-category dataset. In some practical scenarios, the accuracy based on the pretrained weights can be increased by up to 30%.
 
 - A variety of training modes, including multi-machine training, mixed precision training, etc.
 
@@ -55,9 +56,9 @@ PaddleClas is a toolset for image classification tasks prepared for the industry
 - Model prediction/inference
     - [Prediction based on training engine](./docs/en/extension/paddle_inference_en.md)
     - [Python inference](./docs/en/extension/paddle_inference_en.md)
-    - C++ inference (coming soon)
+    - [C++ inference](./deploy/cpp_infer/readme_en.md)
     - [Serving deployment](./docs/en/extension/paddle_serving_en.md)
-    - Mobile (coming soon)
+    - [Mobile](./deploy/lite/readme.md)
     - [Model Quantization and Compression](docs/en/extension/paddle_quantization_en.md)
 - Advanced tutorials
     - [Knowledge distillation](./docs/en/advanced_tutorials/distillation/distillation_en.md)
