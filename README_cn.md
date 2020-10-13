@@ -7,6 +7,7 @@
 飞桨图像分类套件PaddleClas是飞桨为工业界和学术界所准备的一个图像分类任务的工具集，助力使用者训练出更好的视觉模型和应用落地。
 
 **近期更新**
+- 2020.10.12 添加Paddle-Lite demo。
 - 2020.10.10 添加cpp inference demo，完善`FAQ 30问`教程。
 - 2020.09.17 添加 `HRNet_W48_C_ssld `模型，在ImageNet-1k上Top-1 Acc可达83.62%；添加 `ResNet34_vd_ssld `模型，在ImageNet-1k上Top-1 Acc可达79.72%。
 - 2020.09.07 添加 `HRNet_W18_C_ssld `模型，在ImageNet-1k上Top-1 Acc可达81.16%；添加 `MobileNetV3_small_x0_35_ssld `模型，在ImageNet-1k上Top-1 Acc可达55.55%。
@@ -54,9 +55,9 @@
 - 模型预测
     - [基于训练引擎预测推理](./docs/zh_CN/extension/paddle_inference.md)
     - [基于Python预测引擎预测推理](./docs/zh_CN/extension/paddle_inference.md)
-    - 基于C++预测引擎预测推理(coming soon)
+    - [基于C++预测引擎预测推理](./deploy/cpp_infer/readme.md)
     - [服务化部署](./docs/zh_CN/extension/paddle_serving.md)
-    - 端侧部署(coming soon)
+    - [端侧部署](./deploy/lite/readme.md)
     - [模型量化压缩](docs/zh_CN/extension/paddle_quantization.md)
 - 高阶使用
     - [知识蒸馏](./docs/zh_CN/advanced_tutorials/distillation/distillation.md)

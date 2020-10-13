@@ -1,5 +1,7 @@
 # 更新日志
 
+- 2020.10.12
+    * 添加Paddle-Lite demo。
 
 - 2020.10.10
     * 添加cpp inference demo。
