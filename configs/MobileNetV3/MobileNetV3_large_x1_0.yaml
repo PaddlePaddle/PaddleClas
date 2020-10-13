@@ -54,7 +54,7 @@ TRAIN:
 
 
 VALID:
-    batch_size: 32
+    batch_size: 1024
     num_workers: 4
     file_list: "./dataset/ILSVRC2012/val_list.txt"
     data_dir: "./dataset/ILSVRC2012/"

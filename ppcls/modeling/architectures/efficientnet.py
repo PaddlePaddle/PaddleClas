@@ -1,7 +1,9 @@
 import paddle
-import paddle.fluid as fluid
-from paddle.fluid.param_attr import ParamAttr
-from paddle.fluid.dygraph.nn import Conv2D, Pool2D, BatchNorm, Linear, Dropout
+from paddle import ParamAttr
+import paddle.nn as nn
+import paddle.nn.functional as F
+from paddle.nn import Conv2d, BatchNorm, Linear, Dropout
+from paddle.nn import AdaptiveAvgPool2d, MaxPool2d, AvgPool2d
 import math
 import collections
 import re
@@ -242,15 +244,14 @@ def _drop_connect(inputs, prob, is_test):
     if is_test:
         return inputs
     keep_prob = 1.0 - prob
-    inputs_shape = fluid.layers.shape(inputs)
-    random_tensor = keep_prob + fluid.layers.uniform_random(
-        shape=[inputs_shape[0], 1, 1, 1], min=0., max=1.)
-    binary_tensor = fluid.layers.floor(random_tensor)
+    inputs_shape = paddle.shape(inputs)
+    random_tensor = keep_prob + paddle.rand(shape=[inputs_shape[0], 1, 1, 1])
+    binary_tensor = paddle.floor(random_tensor)
     output = inputs / keep_prob * binary_tensor
     return output
 
 
-class Conv2ds(fluid.dygraph.Layer):
+class Conv2ds(nn.Layer):
     def __init__(self,
                  input_channels,
                  output_channels,
@@ -265,6 +266,8 @@ class Conv2ds(fluid.dygraph.Layer):
                  model_name=None,
                  cur_stage=None):
         super(Conv2ds, self).__init__()
+        assert act in [None, "swish", "sigmoid"]
+        self.act = act
 
         param_attr, bias_attr = initial_type(name=name, use_bias=use_bias)
 
@@ -296,25 +299,31 @@ class Conv2ds(fluid.dygraph.Layer):
         else:
             padding = padding_type
 
-        self._conv = Conv2D(
+        groups = 1 if groups is None else groups
+        self._conv = Conv2d(
             input_channels,
             output_channels,
             filter_size,
             groups=groups,
             stride=stride,
-            act=act,
+            #             act=act,
             padding=padding,
-            param_attr=param_attr,
+            weight_attr=param_attr,
             bias_attr=bias_attr)
 
     def forward(self, inputs):
         x = self._conv(inputs)
+        if self.act == "swish":
+            x = F.swish(x)
+        elif self.act == "sigmoid":
+            x = F.sigmoid(x)
+
         if self.need_crop:
             x = x[:, :, 1:, 1:]
         return x
 
 
-class ConvBNLayer(fluid.dygraph.Layer):
+class ConvBNLayer(nn.Layer):
     def __init__(self,
                  input_channels,
                  filter_size,
@@ -369,7 +378,7 @@ class ConvBNLayer(fluid.dygraph.Layer):
             return self._conv(inputs)
 
 
-class ExpandConvNorm(fluid.dygraph.Layer):
+class ExpandConvNorm(nn.Layer):
     def __init__(self,
                  input_channels,
                  block_args,
@@ -402,7 +411,7 @@ class ExpandConvNorm(fluid.dygraph.Layer):
             return inputs
 
 
-class DepthwiseConvNorm(fluid.dygraph.Layer):
+class DepthwiseConvNorm(nn.Layer):
     def __init__(self,
                  input_channels,
                  block_args,
@@ -436,7 +445,7 @@ class DepthwiseConvNorm(fluid.dygraph.Layer):
         return self._conv(inputs)
 
 
-class ProjectConvNorm(fluid.dygraph.Layer):
+class ProjectConvNorm(nn.Layer):
     def __init__(self,
                  input_channels,
                  block_args,
@@ -464,7 +473,7 @@ class ProjectConvNorm(fluid.dygraph.Layer):
         return self._conv(inputs)
 
 
-class SEBlock(fluid.dygraph.Layer):
+class SEBlock(nn.Layer):
     def __init__(self,
                  input_channels,
                  num_squeezed_channels,
@@ -475,8 +484,7 @@ class SEBlock(fluid.dygraph.Layer):
                  cur_stage=None):
         super(SEBlock, self).__init__()
 
-        self._pool = Pool2D(
-            pool_type="avg", global_pooling=True, use_cudnn=False)
+        self._pool = AdaptiveAvgPool2d(1)
         self._conv1 = Conv2ds(
             input_channels,
             num_squeezed_channels,
@@ -499,10 +507,10 @@ class SEBlock(fluid.dygraph.Layer):
         x = self._pool(inputs)
         x = self._conv1(x)
         x = self._conv2(x)
-        return fluid.layers.elementwise_mul(inputs, x)
+        return paddle.multiply(inputs, x)
 
 
-class MbConvBlock(fluid.dygraph.Layer):
+class MbConvBlock(nn.Layer):
     def __init__(self,
                  input_channels,
                  block_args,
@@ -565,9 +573,9 @@ class MbConvBlock(fluid.dygraph.Layer):
         x = inputs
         if self.expand_ratio != 1:
             x = self._ecn(x)
-            x = fluid.layers.swish(x)
+            x = F.swish(x)
         x = self._dcn(x)
-        x = fluid.layers.swish(x)
+        x = F.swish(x)
         if self.has_se:
             x = self._se(x)
         x = self._pcn(x)
@@ -576,11 +584,11 @@ class MbConvBlock(fluid.dygraph.Layer):
                 self.block_args.input_filters == self.block_args.output_filters:
             if self.drop_connect_rate:
                 x = _drop_connect(x, self.drop_connect_rate, self.is_test)
-            x = fluid.layers.elementwise_add(x, inputs)
+            x = paddle.elementwise_add(x, inputs)
         return x
 
 
-class ConvStemNorm(fluid.dygraph.Layer):
+class ConvStemNorm(nn.Layer):
     def __init__(self,
                  input_channels,
                  padding_type,
@@ -608,7 +616,7 @@ class ConvStemNorm(fluid.dygraph.Layer):
         return self._conv(inputs)
 
 
-class ExtractFeatures(fluid.dygraph.Layer):
+class ExtractFeatures(nn.Layer):
     def __init__(self,
                  input_channels,
                  _block_args,
@@ -694,13 +702,13 @@ class ExtractFeatures(fluid.dygraph.Layer):
 
     def forward(self, inputs):
         x = self._conv_stem(inputs)
-        x = fluid.layers.swish(x)
+        x = F.swish(x)
         for _mc_block in self.conv_seq:
             x = _mc_block(x)
         return x
 
 
-class EfficientNet(fluid.dygraph.Layer):
+class EfficientNet(nn.Layer):
     def __init__(self,
                  name="b0",
                  is_test=True,
@@ -753,18 +761,17 @@ class EfficientNet(fluid.dygraph.Layer):
             bn_name="_bn1",
             model_name=self.name,
             cur_stage=7)
-        self._pool = Pool2D(pool_type="avg", global_pooling=True)
+        self._pool = AdaptiveAvgPool2d(1)
 
         if self._global_params.dropout_rate:
             self._drop = Dropout(
-                p=self._global_params.dropout_rate,
-                dropout_implementation="upscale_in_train")
+                p=self._global_params.dropout_rate, mode="upscale_in_train")
 
         param_attr, bias_attr = init_fc_layer("_fc")
         self._fc = Linear(
             output_channels,
             class_dim,
-            param_attr=param_attr,
+            weight_attr=param_attr,
             bias_attr=bias_attr)
 
     def forward(self, inputs):
@@ -773,7 +780,7 @@ class EfficientNet(fluid.dygraph.Layer):
         x = self._pool(x)
         if self._global_params.dropout_rate:
             x = self._drop(x)
-        x = fluid.layers.squeeze(x, axes=[2, 3])
+        x = paddle.squeeze(x, axis=[2, 3])
         x = self._fc(x)
         return x
 

@@ -18,11 +18,12 @@ from __future__ import print_function
 
 import os
 import time
-
 from collections import OrderedDict
 
 import paddle
-import paddle.fluid as fluid
+from paddle import to_tensor
+import paddle.nn as nn
+import paddle.nn.functional as F
 
 from ppcls.optimizer import LearningRateBuilder
 from ppcls.optimizer import OptimizerBuilder
@@ -34,8 +35,6 @@ from ppcls.modeling.loss import GoogLeNetLoss
 from ppcls.utils.misc import AverageMeter
 from ppcls.utils import logger
 
-from paddle.fluid.dygraph.base import to_variable
-
 
 def create_dataloader():
     """
@@ -45,11 +44,11 @@ def create_dataloader():
         feeds(dict): dict of model input variables
 
     Returns:
-        dataloader(fluid dataloader):
+        dataloader(paddle dataloader):
     """
     trainer_num = int(os.environ.get('PADDLE_TRAINERS_NUM', 1))
     capacity = 64 if trainer_num == 1 else 8
-    dataloader = fluid.io.DataLoader.from_generator(
+    dataloader = paddle.io.DataLoader.from_generator(
         capacity=capacity, use_double_buffer=True, iterable=True)
 
     return dataloader
@@ -70,8 +69,6 @@ def create_model(architecture, classes_num):
     """
     name = architecture["name"]
     params = architecture.get("params", {})
-    print(name)
-    print(params)
     return architectures.__dict__[name](class_dim=classes_num, **params)
 
 
@@ -149,15 +146,15 @@ def create_metric(out,
         # just need student label to get metrics
         if use_distillation:
             out = out[1]
-        softmax_out = fluid.layers.softmax(out, use_cudnn=False)
+        softmax_out = F.softmax(out)
 
     fetchs = OrderedDict()
     # set top1 to fetchs
-    top1 = fluid.layers.accuracy(softmax_out, label=label, k=1)
+    top1 = paddle.metric.accuracy(softmax_out, label=label, k=1)
     fetchs['top1'] = top1
     # set topk to fetchs
     k = min(topk, classes_num)
-    topk = fluid.layers.accuracy(softmax_out, label=label, k=k)
+    topk = paddle.metric.accuracy(softmax_out, label=label, k=k)
     topk_name = 'top{}'.format(k)
     fetchs[topk_name] = topk
 
@@ -238,28 +235,34 @@ def create_optimizer(config, parameter_list=None):
     # create optimizer instance
     opt_config = config['OPTIMIZER']
     opt = OptimizerBuilder(**opt_config)
-    return opt(lr, parameter_list)
+    return opt(lr, parameter_list), lr
 
 
 def create_feeds(batch, use_mix):
     image = batch[0]
     if use_mix:
-        y_a = to_variable(batch[1].numpy().astype("int64").reshape(-1, 1))
-        y_b = to_variable(batch[2].numpy().astype("int64").reshape(-1, 1))
-        lam = to_variable(batch[3].numpy().astype("float32").reshape(-1, 1))
+        y_a = to_tensor(batch[1].numpy().astype("int64").reshape(-1, 1))
+        y_b = to_tensor(batch[2].numpy().astype("int64").reshape(-1, 1))
+        lam = to_tensor(batch[3].numpy().astype("float32").reshape(-1, 1))
         feeds = {"image": image, "y_a": y_a, "y_b": y_b, "lam": lam}
     else:
-        label = to_variable(batch[1].numpy().astype('int64').reshape(-1, 1))
+        label = to_tensor(batch[1].numpy().astype('int64').reshape(-1, 1))
         feeds = {"image": image, "label": label}
     return feeds
 
 
-def run(dataloader, config, net, optimizer=None, epoch=0, mode='train'):
+def run(dataloader,
+        config,
+        net,
+        optimizer=None,
+        lr_scheduler=None,
+        epoch=0,
+        mode='train'):
     """
     Feed data to the model and fetch the measures and loss
 
     Args:
-        dataloader(fluid dataloader):
+        dataloader(paddle dataloader):
         exe():
         program():
         fetchs(dict): dict of measures and the loss
@@ -272,20 +275,22 @@ def run(dataloader, config, net, optimizer=None, epoch=0, mode='train'):
     use_mix = config.get("use_mix", False) and mode == "train"
 
     metric_list = [
-        ("loss", AverageMeter('loss', '7.4f')),
+        ("loss", AverageMeter('loss', '7.5f')),
         ("lr", AverageMeter(
             'lr', 'f', need_avg=False)),
-        ("batch_time", AverageMeter('elapse', '.3f')),
+        ("batch_time", AverageMeter('elapse', '.7f')),
+        ("reader_time", AverageMeter('reader ', '.7f')),
     ]
     if not use_mix:
         topk_name = 'top{}'.format(config.topk)
-        metric_list.insert(1, (topk_name, AverageMeter(topk_name, '.4f')))
-        metric_list.insert(1, ("top1", AverageMeter("top1", '.4f')))
+        metric_list.insert(1, (topk_name, AverageMeter(topk_name, '.5f')))
+        metric_list.insert(1, ("top1", AverageMeter("top1", '.5f')))
 
     metric_list = OrderedDict(metric_list)
 
     tic = time.time()
     for idx, batch in enumerate(dataloader()):
+        metric_list['reader_time'].update(time.time() - tic)
         batch_size = len(batch[0])
         feeds = create_feeds(batch, use_mix)
         fetchs = create_fetchs(feeds, net, config, mode)
@@ -302,6 +307,17 @@ def run(dataloader, config, net, optimizer=None, epoch=0, mode='train'):
             net.clear_gradients()
             metric_list['lr'].update(
                 optimizer._global_learning_rate().numpy()[0], batch_size)
+
+            if lr_scheduler is not None:
+                if lr_scheduler.update_specified:
+                    curr_global_counter = lr_scheduler.step_each_epoch * epoch + idx
+                    update = max(
+                        0, curr_global_counter - lr_scheduler.update_start_step
+                    ) % lr_scheduler.update_step_interval == 0
+                    if update:
+                        lr_scheduler.step()
+                else:
+                    lr_scheduler.step()
 
         for name, fetch in fetchs.items():
             metric_list[name].update(fetch.numpy()[0], batch_size)

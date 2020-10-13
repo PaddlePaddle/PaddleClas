@@ -19,36 +19,15 @@ from __future__ import print_function
 import sys
 import math
 
-import paddle.fluid as fluid
-import paddle.fluid.layers.ops as ops
-from paddle.fluid.layers.learning_rate_scheduler import _decay_step_counter
+from paddle.optimizer.lr_scheduler import LinearLrWarmup
+from paddle.optimizer.lr_scheduler import PiecewiseLR
+from paddle.optimizer.lr_scheduler import CosineAnnealingLR
+from paddle.optimizer.lr_scheduler import ExponentialLR
 
 __all__ = ['LearningRateBuilder']
 
 
-class Linear(object):
-    """
-    Linear learning rate decay
-
-    Args:
-        lr(float): initial learning rate
-        steps(int): total decay steps
-        end_lr(float): end learning rate, default: 0.0.
-    """
-
-    def __init__(self, lr, steps, end_lr=0.0, **kwargs):
-        super(Linear, self).__init__()
-        self.lr = lr
-        self.steps = steps
-        self.end_lr = end_lr
-
-    def __call__(self):
-        learning_rate = fluid.layers.polynomial_decay(
-            self.lr, self.steps, self.end_lr, power=1)
-        return learning_rate
-
-
-class Cosine(object):
+class Cosine(CosineAnnealingLR):
     """
     Cosine learning rate decay
     lr = 0.05 * (math.cos(epoch * (math.pi / epochs)) + 1)
@@ -60,20 +39,14 @@ class Cosine(object):
     """
 
     def __init__(self, lr, step_each_epoch, epochs, **kwargs):
-        super(Cosine, self).__init__()
-        self.lr = lr
-        self.step_each_epoch = step_each_epoch
-        self.epochs = epochs
+        super(Cosine, self).__init__(
+            learning_rate=lr,
+            T_max=step_each_epoch * epochs, )
 
-    def __call__(self):
-        learning_rate = fluid.layers.cosine_decay(
-            learning_rate=self.lr,
-            step_each_epoch=self.step_each_epoch,
-            epochs=self.epochs)
-        return learning_rate
+        self.update_specified = False
 
 
-class Piecewise(object):
+class Piecewise(PiecewiseLR):
     """
     Piecewise learning rate decay
 
@@ -85,16 +58,15 @@ class Piecewise(object):
     """
 
     def __init__(self, lr, step_each_epoch, decay_epochs, gamma=0.1, **kwargs):
-        super(Piecewise, self).__init__()
-        self.bd = [step_each_epoch * e for e in decay_epochs]
-        self.lr = [lr * (gamma**i) for i in range(len(self.bd) + 1)]
+        boundaries = [step_each_epoch * e for e in decay_epochs]
+        lr_values = [lr * (gamma**i) for i in range(len(boundaries) + 1)]
+        super(Piecewise, self).__init__(
+            boundaries=boundaries, values=lr_values)
 
-    def __call__(self):
-        learning_rate = fluid.layers.piecewise_decay(self.bd, self.lr)
-        return learning_rate
+        self.update_specified = False
 
 
-class CosineWarmup(object):
+class CosineWarmup(LinearLrWarmup):
     """
     Cosine learning rate decay with warmup
     [0, warmup_epoch): linear warmup
@@ -108,28 +80,23 @@ class CosineWarmup(object):
     """
 
     def __init__(self, lr, step_each_epoch, epochs, warmup_epoch=5, **kwargs):
-        super(CosineWarmup, self).__init__()
-        self.lr = lr
-        self.step_each_epoch = step_each_epoch
-        self.epochs = epochs
-        self.warmup_epoch = warmup_epoch
+        assert epochs > warmup_epoch, "total epoch({}) should be larger than warmup_epoch({}) in CosineWarmup.".format(
+            epochs, warmup_epoch)
+        warmup_step = warmup_epoch * step_each_epoch
+        start_lr = 0.0
+        end_lr = lr
+        lr_sch = Cosine(lr, step_each_epoch, epochs - warmup_epoch)
 
-    def __call__(self):
-        learning_rate = fluid.layers.cosine_decay(
-            learning_rate=self.lr,
-            step_each_epoch=self.step_each_epoch,
-            epochs=self.epochs)
+        super(CosineWarmup, self).__init__(
+            learning_rate=lr_sch,
+            warmup_steps=warmup_step,
+            start_lr=start_lr,
+            end_lr=end_lr)
 
-        learning_rate = fluid.layers.linear_lr_warmup(
-            learning_rate,
-            warmup_steps=self.warmup_epoch * self.step_each_epoch,
-            start_lr=0.0,
-            end_lr=self.lr)
-
-        return learning_rate
+        self.update_specified = False
 
 
-class ExponentialWarmup(object):
+class ExponentialWarmup(LinearLrWarmup):
     """
     Exponential learning rate decay with warmup
     [0, warmup_epoch): linear warmup
@@ -150,27 +117,22 @@ class ExponentialWarmup(object):
                  decay_rate=0.97,
                  warmup_epoch=5,
                  **kwargs):
-        super(ExponentialWarmup, self).__init__()
-        self.lr = lr
+        warmup_step = warmup_epoch * step_each_epoch
+        start_lr = 0.0
+        end_lr = lr
+        lr_sch = ExponentialLR(lr, decay_rate)
+
+        super(ExponentialWarmup, self).__init__(
+            learning_rate=lr_sch,
+            warmup_steps=warmup_step,
+            start_lr=start_lr,
+            end_lr=end_lr)
+
+        # NOTE: hac method to update exponential lr scheduler
+        self.update_specified = True
+        self.update_start_step = warmup_step
+        self.update_step_interval = int(decay_epochs * step_each_epoch)
         self.step_each_epoch = step_each_epoch
-        self.decay_epochs = decay_epochs
-        self.decay_rate = decay_rate
-        self.warmup_epoch = warmup_epoch
-
-    def __call__(self):
-        learning_rate = fluid.layers.exponential_decay(
-            learning_rate=self.lr,
-            decay_steps=self.decay_epochs * self.step_each_epoch,
-            decay_rate=self.decay_rate,
-            staircase=False)
-
-        learning_rate = fluid.layers.linear_lr_warmup(
-            learning_rate,
-            warmup_steps=self.warmup_epoch * self.step_each_epoch,
-            start_lr=0.0,
-            end_lr=self.lr)
-
-        return learning_rate
 
 
 class LearningRateBuilder():
@@ -193,5 +155,5 @@ class LearningRateBuilder():
 
     def __call__(self):
         mod = sys.modules[__name__]
-        lr = getattr(mod, self.function)(**self.params)()
+        lr = getattr(mod, self.function)(**self.params)
         return lr

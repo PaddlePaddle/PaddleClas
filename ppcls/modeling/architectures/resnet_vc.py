@@ -18,9 +18,11 @@ from __future__ import print_function
 
 import numpy as np
 import paddle
-import paddle.fluid as fluid
-from paddle.fluid.param_attr import ParamAttr
-from paddle.fluid.dygraph.nn import Conv2D, Pool2D, BatchNorm, Linear, Dropout
+from paddle import ParamAttr
+import paddle.nn as nn
+from paddle.nn import Conv2d, BatchNorm, Linear, Dropout
+from paddle.nn import AdaptiveAvgPool2d, MaxPool2d, AvgPool2d
+from paddle.nn.initializer import Uniform
 
 import math
 
@@ -29,7 +31,7 @@ __all__ = [
 ]
 
 
-class ConvBNLayer(fluid.dygraph.Layer):
+class ConvBNLayer(nn.Layer):
     def __init__(self,
                  num_channels,
                  num_filters,
@@ -40,15 +42,14 @@ class ConvBNLayer(fluid.dygraph.Layer):
                  name=None):
         super(ConvBNLayer, self).__init__()
 
-        self._conv = Conv2D(
-            num_channels=num_channels,
-            num_filters=num_filters,
-            filter_size=filter_size,
+        self._conv = Conv2d(
+            in_channels=num_channels,
+            out_channels=num_filters,
+            kernel_size=filter_size,
             stride=stride,
             padding=(filter_size - 1) // 2,
             groups=groups,
-            act=None,
-            param_attr=ParamAttr(name=name + "_weights"),
+            weight_attr=ParamAttr(name=name + "_weights"),
             bias_attr=False)
         if name == "conv1":
             bn_name = "bn_" + name
@@ -68,7 +69,7 @@ class ConvBNLayer(fluid.dygraph.Layer):
         return y
 
 
-class BottleneckBlock(fluid.dygraph.Layer):
+class BottleneckBlock(nn.Layer):
     def __init__(self,
                  num_channels,
                  num_filters,
@@ -119,11 +120,11 @@ class BottleneckBlock(fluid.dygraph.Layer):
         else:
             short = self.short(inputs)
 
-        y = fluid.layers.elementwise_add(x=short, y=conv2, act='relu')
+        y = paddle.elementwise_add(x=short, y=conv2, act='relu')
         return y
 
 
-class BasicBlock(fluid.dygraph.Layer):
+class BasicBlock(nn.Layer):
     def __init__(self,
                  num_channels,
                  num_filters,
@@ -164,11 +165,11 @@ class BasicBlock(fluid.dygraph.Layer):
             short = inputs
         else:
             short = self.short(inputs)
-        y = fluid.layers.elementwise_add(x=short, y=conv1, act='relu')
+        y = paddle.elementwise_add(x=short, y=conv1, act='relu')
         return y
 
 
-class ResNet_vc(fluid.dygraph.Layer):
+class ResNet_vc(nn.Layer):
     def __init__(self, layers=50, class_dim=1000):
         super(ResNet_vc, self).__init__()
 
@@ -212,8 +213,7 @@ class ResNet_vc(fluid.dygraph.Layer):
             act='relu',
             name="conv1_3")
 
-        self.pool2d_max = Pool2D(
-            pool_size=3, pool_stride=2, pool_padding=1, pool_type='max')
+        self.pool2d_max = MaxPool2d(kernel_size=3, stride=2, padding=1)
 
         self.block_list = []
         if layers >= 50:
@@ -255,8 +255,7 @@ class ResNet_vc(fluid.dygraph.Layer):
                     self.block_list.append(basic_block)
                     shortcut = True
 
-        self.pool2d_avg = Pool2D(
-            pool_size=7, pool_type='avg', global_pooling=True)
+        self.pool2d_avg = AdaptiveAvgPool2d(1)
 
         self.pool2d_avg_channels = num_channels[-1] * 2
 
@@ -265,9 +264,8 @@ class ResNet_vc(fluid.dygraph.Layer):
         self.out = Linear(
             self.pool2d_avg_channels,
             class_dim,
-            param_attr=ParamAttr(
-                initializer=fluid.initializer.Uniform(-stdv, stdv),
-                name="fc_0.w_0"),
+            weight_attr=ParamAttr(
+                initializer=Uniform(-stdv, stdv), name="fc_0.w_0"),
             bias_attr=ParamAttr(name="fc_0.b_0"))
 
     def forward(self, inputs):
@@ -278,7 +276,7 @@ class ResNet_vc(fluid.dygraph.Layer):
         for block in self.block_list:
             y = block(y)
         y = self.pool2d_avg(y)
-        y = fluid.layers.reshape(y, shape=[-1, self.pool2d_avg_channels])
+        y = paddle.reshape(y, shape=[-1, self.pool2d_avg_channels])
         y = self.out(y)
         return y
 

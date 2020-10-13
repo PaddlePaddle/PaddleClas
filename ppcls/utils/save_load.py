@@ -22,7 +22,8 @@ import re
 import shutil
 import tempfile
 
-import paddle.fluid as fluid
+import paddle
+from paddle.io import load_program_state
 
 from ppcls.utils import logger
 
@@ -50,7 +51,7 @@ def load_dygraph_pretrain(model, path=None, load_static_weights=False):
         raise ValueError("Model pretrain path {} does not "
                          "exists.".format(path))
     if load_static_weights:
-        pre_state_dict = fluid.load_program_state(path)
+        pre_state_dict = load_program_state(path)
         param_state_dict = {}
         model_dict = model.state_dict()
         for key in model_dict.keys():
@@ -64,7 +65,7 @@ def load_dygraph_pretrain(model, path=None, load_static_weights=False):
         model.set_dict(param_state_dict)
         return
 
-    param_state_dict, optim_state_dict = fluid.load_dygraph(path)
+    param_state_dict, optim_state_dict = paddle.load(path)
     model.set_dict(param_state_dict)
     return
 
@@ -105,7 +106,7 @@ def init_model(config, net, optimizer=None):
             "Given dir {}.pdparams not exist.".format(checkpoints)
         assert os.path.exists(checkpoints + ".pdopt"), \
             "Given dir {}.pdopt not exist.".format(checkpoints)
-        para_dict, opti_dict = fluid.dygraph.load_dygraph(checkpoints)
+        para_dict, opti_dict = paddle(checkpoints)
         net.set_dict(para_dict)
         optimizer.set_dict(opti_dict)
         logger.info(
@@ -141,8 +142,8 @@ def save_model(net, optimizer, model_path, epoch_id, prefix='ppcls'):
     _mkdir_if_not_exist(model_path)
     model_prefix = os.path.join(model_path, prefix)
 
-    fluid.dygraph.save_dygraph(net.state_dict(), model_prefix)
-    fluid.dygraph.save_dygraph(optimizer.state_dict(), model_prefix)
+    paddle.save(net.state_dict(), model_prefix)
+    paddle.save(optimizer.state_dict(), model_prefix)
     logger.info(
         logger.coloring("Already save model in {}".format(model_path),
                         "HEADER"))

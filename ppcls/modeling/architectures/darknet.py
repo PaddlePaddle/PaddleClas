@@ -1,13 +1,16 @@
 import paddle
-import paddle.fluid as fluid
-from paddle.fluid.param_attr import ParamAttr
-from paddle.fluid.dygraph.nn import Conv2D, Pool2D, BatchNorm, Linear
+from paddle import ParamAttr
+import paddle.nn as nn
+import paddle.nn.functional as F
+from paddle.nn import Conv2d, BatchNorm, Linear, Dropout
+from paddle.nn import AdaptiveAvgPool2d, MaxPool2d, AvgPool2d
+from paddle.nn.initializer import Uniform
 import math
 
 __all__ = ["DarkNet53"]
 
 
-class ConvBNLayer(fluid.dygraph.Layer):
+class ConvBNLayer(nn.Layer):
     def __init__(self,
                  input_channels,
                  output_channels,
@@ -17,14 +20,13 @@ class ConvBNLayer(fluid.dygraph.Layer):
                  name=None):
         super(ConvBNLayer, self).__init__()
 
-        self._conv = Conv2D(
-            num_channels=input_channels,
-            num_filters=output_channels,
-            filter_size=filter_size,
+        self._conv = Conv2d(
+            in_channels=input_channels,
+            out_channels=output_channels,
+            kernel_size=filter_size,
             stride=stride,
             padding=padding,
-            act=None,
-            param_attr=ParamAttr(name=name + ".conv.weights"),
+            weight_attr=ParamAttr(name=name + ".conv.weights"),
             bias_attr=False)
 
         bn_name = name + ".bn"
@@ -42,7 +44,7 @@ class ConvBNLayer(fluid.dygraph.Layer):
         return x
 
 
-class BasicBlock(fluid.dygraph.Layer):
+class BasicBlock(nn.Layer):
     def __init__(self, input_channels, output_channels, name=None):
         super(BasicBlock, self).__init__()
 
@@ -54,10 +56,10 @@ class BasicBlock(fluid.dygraph.Layer):
     def forward(self, inputs):
         x = self._conv1(inputs)
         x = self._conv2(x)
-        return fluid.layers.elementwise_add(x=inputs, y=x)
+        return paddle.elementwise_add(x=inputs, y=x)
 
 
-class DarkNet(fluid.dygraph.Layer):
+class DarkNet(nn.Layer):
     def __init__(self, class_dim=1000):
         super(DarkNet, self).__init__()
 
@@ -102,15 +104,14 @@ class DarkNet(fluid.dygraph.Layer):
         self._basic_block_43 = BasicBlock(1024, 512, name="stage.4.2")
         self._basic_block_44 = BasicBlock(1024, 512, name="stage.4.3")
 
-        self._pool = Pool2D(pool_type="avg", global_pooling=True)
+        self._pool = AdaptiveAvgPool2d(1)
 
         stdv = 1.0 / math.sqrt(1024.0)
         self._out = Linear(
-            input_dim=1024,
-            output_dim=class_dim,
-            param_attr=ParamAttr(
-                name="fc_weights",
-                initializer=fluid.initializer.Uniform(-stdv, stdv)),
+            1024,
+            class_dim,
+            weight_attr=ParamAttr(
+                name="fc_weights", initializer=Uniform(-stdv, stdv)),
             bias_attr=ParamAttr(name="fc_offset"))
 
     def forward(self, inputs):
@@ -150,7 +151,7 @@ class DarkNet(fluid.dygraph.Layer):
         x = self._basic_block_44(x)
 
         x = self._pool(x)
-        x = fluid.layers.squeeze(x, axes=[2, 3])
+        x = paddle.squeeze(x, axis=[2, 3])
         x = self._out(x)
         return x
 

@@ -12,7 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import paddle.fluid as fluid
+import paddle
+import paddle.nn.functional as F
 
 __all__ = ['CELoss', 'MixCELoss', 'GoogLeNetLoss', 'JSDivLoss']
 
@@ -34,35 +35,35 @@ class Loss(object):
 
     def _labelsmoothing(self, target):
         if target.shape[-1] != self._class_dim:
-            one_hot_target = fluid.one_hot(input=target, depth=self._class_dim)
+            one_hot_target = F.one_hot(target, self._class_dim)
         else:
             one_hot_target = target
-        soft_target = fluid.layers.label_smooth(
-            label=one_hot_target, epsilon=self._epsilon, dtype="float32")
-        soft_target = fluid.layers.reshape(
-            soft_target, shape=[-1, self._class_dim])
+        soft_target = F.label_smooth(
+            one_hot_target, epsilon=self._epsilon, dtype="float32")
+        soft_target = paddle.reshape(soft_target, shape=[-1, self._class_dim])
         return soft_target
 
     def _crossentropy(self, input, target):
         if self._label_smoothing:
             target = self._labelsmoothing(target)
-        softmax_out = fluid.layers.softmax(input, use_cudnn=False)
-        cost = fluid.layers.cross_entropy(
-            input=softmax_out, label=target, soft_label=self._label_smoothing)
-        avg_cost = fluid.layers.mean(cost)
+            input = -F.log_softmax(input, axis=-1)
+            cost = paddle.reduce_sum(target * input, dim=-1)
+        else:
+            cost = F.cross_entropy(input=input, label=target)
+        avg_cost = paddle.mean(cost)
         return avg_cost
 
     def _kldiv(self, input, target):
-        cost = target * fluid.layers.log(target / input) * self._class_dim
-        cost = fluid.layers.sum(cost)
+        cost = target * F.log(target / input) * self._class_dim
+        cost = paddle.sum(cost)
         return cost
 
     def _jsdiv(self, input, target):
-        input = fluid.layers.softmax(input, use_cudnn=False)
-        target = fluid.layers.softmax(target, use_cudnn=False)
+        input = F.softmax(input)
+        target = F.softmax(target)
         cost = self._kldiv(input, target) + self._kldiv(target, input)
         cost = cost / 2
-        avg_cost = fluid.layers.mean(cost)
+        avg_cost = paddle.mean(cost)
         return avg_cost
 
     def __call__(self, input, target):
@@ -94,7 +95,7 @@ class MixCELoss(Loss):
         cost0 = self._crossentropy(input, target0)
         cost1 = self._crossentropy(input, target1)
         cost = lam * cost0 + (1.0 - lam) * cost1
-        avg_cost = fluid.layers.mean(cost)
+        avg_cost = paddle.mean(cost)
         return avg_cost
 
 
@@ -111,7 +112,7 @@ class GoogLeNetLoss(Loss):
         cost1 = self._crossentropy(input1, target)
         cost2 = self._crossentropy(input2, target)
         cost = cost0 + 0.3 * cost1 + 0.3 * cost2
-        avg_cost = fluid.layers.mean(cost)
+        avg_cost = paddle.mean(cost)
         return avg_cost
 
 

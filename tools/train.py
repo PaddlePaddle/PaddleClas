@@ -13,12 +13,6 @@
 # limitations under the License.
 
 from __future__ import absolute_import
-import program
-from ppcls.utils import logger
-from ppcls.utils.save_load import init_model, save_model
-from ppcls.utils.config import get_config
-from ppcls.data import Reader
-import paddle.fluid as fluid
 from __future__ import division
 from __future__ import print_function
 
@@ -28,6 +22,15 @@ import sys
 __dir__ = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(__dir__)
 sys.path.append(os.path.abspath(os.path.join(__dir__, '..')))
+
+import paddle
+from paddle.distributed import ParallelEnv
+
+from ppcls.data import Reader
+from ppcls.utils.config import get_config
+from ppcls.utils.save_load import init_model, save_model
+from ppcls.utils import logger
+import program
 
 
 def parse_args():
@@ -53,69 +56,63 @@ def main(args):
     # assign the place
     use_gpu = config.get("use_gpu", True)
     if use_gpu:
-        gpu_id = fluid.dygraph.ParallelEnv().dev_id
-        place = fluid.CUDAPlace(gpu_id)
+        gpu_id = ParallelEnv().dev_id
+        place = paddle.CUDAPlace(gpu_id)
     else:
-        place = fluid.CPUPlace()
+        place = paddle.CPUPlace()
 
     use_data_parallel = int(os.getenv("PADDLE_TRAINERS_NUM", 1)) != 1
     config["use_data_parallel"] = use_data_parallel
 
-    with fluid.dygraph.guard(place):
-        net = program.create_model(config.ARCHITECTURE, config.classes_num)
+    paddle.disable_static(place)
 
-        optimizer = program.create_optimizer(
-            config, parameter_list=net.parameters())
+    net = program.create_model(config.ARCHITECTURE, config.classes_num)
 
-        if config["use_data_parallel"]:
-            strategy = fluid.dygraph.parallel.prepare_context()
-            net = fluid.dygraph.parallel.DataParallel(net, strategy)
+    optimizer, lr_scheduler = program.create_optimizer(
+        config, parameter_list=net.parameters())
 
-        # load model from checkpoint or pretrained model
-        init_model(config, net, optimizer)
+    if config["use_data_parallel"]:
+        strategy = paddle.distributed.init_parallel_env()
+        net = paddle.DataParallel(net, strategy)
 
-        train_dataloader = program.create_dataloader()
-        train_reader = Reader(config, 'train')()
-        train_dataloader.set_sample_list_generator(train_reader, place)
+    # load model from checkpoint or pretrained model
+    init_model(config, net, optimizer)
 
-        if config.validate:
-            valid_dataloader = program.create_dataloader()
-            valid_reader = Reader(config, 'valid')()
-            valid_dataloader.set_sample_list_generator(valid_reader, place)
+    train_dataloader = Reader(config, 'train', places=place)()
 
-        best_top1_acc = 0.0  # best top1 acc record
-        for epoch_id in range(config.epochs):
-            net.train()
-            # 1. train with train dataset
-            program.run(train_dataloader, config, net, optimizer, epoch_id,
-                        'train')
+    if config.validate and ParallelEnv().local_rank == 0:
+        valid_dataloader = Reader(config, 'valid', places=place)()
 
-            if not config["use_data_parallel"] or fluid.dygraph.parallel.Env(
-            ).local_rank == 0:
-                # 2. validate with validate dataset
-                if config.validate and epoch_id % config.valid_interval == 0:
-                    net.eval()
-                    top1_acc = program.run(valid_dataloader, config, net, None,
-                                           epoch_id, 'valid')
-                    if top1_acc > best_top1_acc:
-                        best_top1_acc = top1_acc
-                        message = "The best top1 acc {:.5f}, in epoch: {:d}".format(
-                            best_top1_acc, epoch_id)
-                        logger.info("{:s}".format(
-                            logger.coloring(message, "RED")))
-                        if epoch_id % config.save_interval == 0:
+    best_top1_acc = 0.0  # best top1 acc record
+    best_top1_epoch = 0
+    for epoch_id in range(config.epochs):
+        net.train()
+        # 1. train with train dataset
+        program.run(train_dataloader, config, net, optimizer, lr_scheduler,
+                    epoch_id, 'train')
 
-                            model_path = os.path.join(
-                                config.model_save_dir,
-                                config.ARCHITECTURE["name"])
-                            save_model(net, optimizer, model_path,
-                                       "best_model")
+        if not config["use_data_parallel"] or ParallelEnv().local_rank == 0:
+            # 2. validate with validate dataset
+            if config.validate and epoch_id % config.valid_interval == 0:
+                net.eval()
+                top1_acc = program.run(valid_dataloader, config, net, None,
+                                       None, epoch_id, 'valid')
+                if top1_acc > best_top1_acc:
+                    best_top1_acc = top1_acc
+                    best_top1_epoch = epoch_id
+                    if epoch_id % config.save_interval == 0:
+                        model_path = os.path.join(config.model_save_dir,
+                                                  config.ARCHITECTURE["name"])
+                        save_model(net, optimizer, model_path, "best_model")
+                message = "The best top1 acc {:.5f}, in epoch: {:d}".format(
+                    best_top1_acc, best_top1_epoch)
+                logger.info("{:s}".format(logger.coloring(message, "RED")))
 
-                # 3. save the persistable model
-                if epoch_id % config.save_interval == 0:
-                    model_path = os.path.join(config.model_save_dir,
-                                              config.ARCHITECTURE["name"])
-                    save_model(net, optimizer, model_path, epoch_id)
+            # 3. save the persistable model
+            if epoch_id % config.save_interval == 0:
+                model_path = os.path.join(config.model_save_dir,
+                                          config.ARCHITECTURE["name"])
+                save_model(net, optimizer, model_path, epoch_id)
 
 
 if __name__ == '__main__':
