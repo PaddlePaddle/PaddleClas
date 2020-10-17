@@ -158,13 +158,21 @@ def _decompress(fname):
     else:
         raise TypeError("Unsupport compress file type {}".format(fname))
 
-    for f in os.listdir(fpath_tmp):
-        src_dir = os.path.join(fpath_tmp, f)
-        dst_dir = os.path.join(fpath, f)
-        _move_and_merge_tree(src_dir, dst_dir)
+    fs = os.listdir(fpath_tmp)
+    assert len(
+        fs
+    ) == 1, "There should just be 1 pretrained path in an archive file but got {}.".format(
+        len(fs))
+
+    f = fs[0]
+    src_dir = os.path.join(fpath_tmp, f)
+    dst_dir = os.path.join(fpath, f)
+    _move_and_merge_tree(src_dir, dst_dir)
 
     shutil.rmtree(fpath_tmp)
     os.remove(fname)
+
+    return f
 
 
 def _get_pretrained():
