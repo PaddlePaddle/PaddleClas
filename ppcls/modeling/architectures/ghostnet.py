@@ -261,7 +261,7 @@ class GhostNet(nn.Layer):
         for k, exp_size, c, use_se, s in self.cfgs:
             in_channels = output_channels
             output_channels = int(self._make_divisible(c * self.scale, 4))
-            hidden_dim = int(self._make_divisible(exp_size, self.scale, 4))
+            hidden_dim = int(self._make_divisible(exp_size * self.scale, 4))
             ghost_bottleneck = self.add_sublayer(
                 name="_ghostbottleneck_" + str(idx),
                 sublayer=GhostBottleneck(
