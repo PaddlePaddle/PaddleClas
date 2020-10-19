@@ -2,7 +2,6 @@ mode: 'train'
 ARCHITECTURE:
     name: "EfficientNetB0"
     params:
-        is_test: False
         padding_type : "SAME"
         override_params:
             drop_connect_rate: 0.1
