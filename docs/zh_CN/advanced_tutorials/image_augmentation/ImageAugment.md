@@ -4,7 +4,6 @@
 
 ![](../../../images/image_aug/main_image_aug.png)
 
-
 # 二、常用数据增广方法
 
 如果没有特殊说明，本章节中所有示例为 ImageNet 分类，并且假设最终输入网络的数据维度为：`[batch-size, 3, 224, 224]`
@@ -24,6 +23,9 @@
 2. 对`Transpose` 后的 224 的图像进行一些裁剪: CutOut，RandErasing，HideAndSeek，GridMask
 3. 对 `Batch` 后的数据进行混合: Mixup，Cutmix
 
+增广后的可视化效果如下所示。
+
+![](../../../images/image_aug/image_aug_samples_s.jpg)
 
 具体如下表所示：
 
