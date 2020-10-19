@@ -100,7 +100,7 @@ python tools/export_model.py \
 在模型库的 `tools/infer/predict.py` 中提供了完整的示例，只需执行下述命令即可完成预测：
 
 ```
-python ./predict.py \
+python ./tools/infer/predict.py \
     -i=./test.jpeg \
     -m=./resnet50-vd/model \
     -p=./resnet50-vd/params \
@@ -122,7 +122,7 @@ python ./predict.py \
 
 注意：
 当启用benchmark时，默认开启tersorrt进行预测
- 
+
 
 构建预测引擎：
 
@@ -259,4 +259,3 @@ outputs = exe.run(compiled_program,
 ```
 
 上述执行预测时候的参数说明可以参考官网 [fluid.Executor](https://www.paddlepaddle.org.cn/documentation/docs/zh/api_cn/executor_cn/Executor_cn.html)
-

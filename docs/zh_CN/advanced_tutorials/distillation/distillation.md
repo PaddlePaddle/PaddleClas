@@ -8,7 +8,7 @@
 深度神经网络一般有较多的参数冗余，目前有几种主要的方法对模型进行压缩，减小其参数量。如裁剪、量化、知识蒸馏等，其中知识蒸馏是指使用教师模型(teacher model)去指导学生模型(student model)学习特定任务，保证小模型在参数量不变的情况下，得到比较大的性能提升，甚至获得与大模型相似的精度指标[1]。PaddleClas融合已有的蒸馏方法[2,3]，提供了一种简单的半监督标签知识蒸馏方案（SSLD，Simple Semi-supervised Label Distillation），基于ImageNet1k分类数据集，在ResNet_vd以及MobileNet系列上的精度均有超过3%的绝对精度提升，具体指标如下图所示。
 
 
-![](../../../images/distillation/distillation_perform.png)
+![](../../../images/distillation/distillation_perform_s.jpg)
 
 
 # 二、SSLD 蒸馏策略
@@ -17,9 +17,7 @@
 
 SSLD的流程图如下图所示。
 
-
 ![](../../../images/distillation/ppcls_distillation.png)
-
 
 首先，我们从ImageNet22k中挖掘出了近400万张图片，同时与ImageNet-1k训练集整合在一起，得到了一个新的包含500万张图片的数据集。然后，我们将学生模型与教师模型组合成一个新的网络，该网络分别输出学生模型和教师模型的预测分布，与此同时，固定教师模型整个网络的梯度，而学生模型可以做正常的反向传播。最后，我们将两个模型的logits经过softmax激活函数转换为soft label，并将二者的soft label做JS散度作为损失函数，用于蒸馏模型训练。下面以MobileNetV3（该模型直接训练，精度为75.3%）的知识蒸馏为例，介绍该方案的核心关键点（baseline为79.12%的ResNet50_vd模型蒸馏MobileNetV3，训练集为ImageNet1k训练集，loss为cross entropy loss，迭代轮数为120epoch，精度指标为75.6%）。
 
@@ -31,7 +29,7 @@ SSLD的流程图如下图所示。
 
 * 无需数据集的真值标签，很容易扩展训练集。SSLD的loss在计算过程中，仅涉及到教师和学生模型对于相同图片的处理结果（经过softmax激活函数处理之后的soft label），因此即使图片数据不包含真值标签，也可以用来进行训练并提升模型性能。该蒸馏方案的无标签蒸馏策略也大大提升了学生模型的性能上限（`77.1%->78.5%`）。
 
-* ImageNet1k蒸馏finetune。我们仅使用ImageNet1k数据，使用蒸馏方法对上述模型进行finetune，最终仍然可以获得0.4%的性能提升(`75.8%->78.9%`)。
+* ImageNet1k蒸馏finetune。我们仅使用ImageNet1k数据，使用蒸馏方法对上述模型进行finetune，最终仍然可以获得0.4%的性能提升(`78.5%->78.9%`)。
 
 
 
@@ -87,6 +85,7 @@ SSLD的流程图如下图所示。
 | MobileNetV3_small_x1_0 | 360 | 1e-5 |  5760/24 | 3.65625 | cosine_decay_warmup | 70.11% |
 | ResNet50_vd | 360 | 7e-5 | 1024/32 | 0.4 | cosine_decay_warmup | 82.07% |
 | ResNet101_vd | 360 | 7e-5 | 1024/32 | 0.4 | cosine_decay_warmup | 83.41% |
+| Res2Net200_vd_26w_4s | 360 | 4e-5 | 1024/32 | 0.4 | cosine_decay_warmup | 84.82% |
 
 ## 3.3 ImageNet1k训练集finetune
 
@@ -101,6 +100,15 @@ SSLD的流程图如下图所示。
 | MobileNetV3_small_x1_0 | 30 | 1e-5 |  6400/32 | 0.025 | cosine_decay_warmup | 71.28% |
 | ResNet50_vd | 60 | 7e-5 | 1024/32 | 0.004 | cosine_decay_warmup | 82.39% |
 | ResNet101_vd | 30 | 7e-5 | 1024/32 | 0.004 | cosine_decay_warmup | 83.73% |
+| Res2Net200_vd_26w_4s | 360 | 4e-5 | 1024/32 | 0.004 | cosine_decay_warmup | 85.13% |
+
+
+## 3.4 数据增广以及基于Fix策略的微调
+
+* 基于前文所述的实验结论，我们在训练的过程中加入自动增广(AutoAugment)[4]，同时进一步减小了l2_decay(4e-5->2e-5)，最终ResNet50_vd经过SSLD蒸馏策略，在ImageNet1k上的精度可以达到82.99%，相比之前不加数据增广的蒸馏策略再次增加了0.6%。
+
+
+* 对于图像分类任务，在测试的时候，测试尺度为训练尺度的1.15倍左右时，往往在不需要重新训练模型的情况下，模型的精度指标就可以进一步提升[5]，对于82.99%的ResNet50_vd在320x320的尺度下测试，精度可达83.7%，我们进一步使用Fix策略，即在320x320的尺度下进行训练，使用与预测时相同的数据预处理方法，同时固定除FC层以外的所有参数，最终在320x320的预测尺度下，精度可以达到**84.0%**。
 
 
 ## 3.4 实验过程中的一些问题
@@ -182,7 +190,7 @@ for var in ./*_student; do cp "$var" "../student_model/${var%_student}"; done # 
 | Faster RCNN R50_vd FPN | 640/640 | 79.12% | [0.05,0.05,0.1,0.1,0.15] | 34.3% |
 | Faster RCNN R50_vd FPN | 640/640 | 82.18% | [0.05,0.05,0.1,0.1,0.15] | 36.3% |
 
-在这里可以看出，对于未蒸馏模型，过度调整中间层学习率反而降低最终检测模型的性能指标。基于该蒸馏模型，我们也提供了领先的服务端实用目标检测方案，详细的配置与训练代码均已开源，可以参考[PaddleDetection](https://github.com/PaddlePaddle/PaddleDetection/tree/master/configs/rcnn_server_side_det)。
+在这里可以看出，对于未蒸馏模型，过度调整中间层学习率反而降低最终检测模型的性能指标。基于该蒸馏模型，我们也提供了领先的服务端实用目标检测方案，详细的配置与训练代码均已开源，可以参考[PaddleDetection](https://github.com/PaddlePaddle/PaddleDetection/tree/master/configs/rcnn_enhance)。
 
 
 # 五、SSLD实战
@@ -266,3 +274,7 @@ sh tools/run.sh
 [2] Bagherinezhad H, Horton M, Rastegari M, et al. Label refinery: Improving imagenet classification through label progression[J]. arXiv preprint arXiv:1805.02641, 2018.
 
 [3] Yalniz I Z, Jégou H, Chen K, et al. Billion-scale semi-supervised learning for image classification[J]. arXiv preprint arXiv:1905.00546, 2019.
+
+[4] Cubuk E D, Zoph B, Mane D, et al. Autoaugment: Learning augmentation strategies from data[C]//Proceedings of the IEEE conference on computer vision and pattern recognition. 2019: 113-123.
+
+[5] Touvron H, Vedaldi A, Douze M, et al. Fixing the train-test resolution discrepancy[C]//Advances in Neural Information Processing Systems. 2019: 8250-8260.

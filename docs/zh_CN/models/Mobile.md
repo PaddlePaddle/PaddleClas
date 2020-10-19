@@ -9,6 +9,8 @@ ShuffleNet系列网络是旷视提出的轻量化网络结构，到目前为止�
 
 MobileNetV3是Google于2019年提出的一种基于NAS的新的轻量级网络，为了进一步提升效果，将relu和sigmoid激活函数分别替换为hard_swish与hard_sigmoid激活函数，同时引入了一些专门减小网络计算量的改进策略。
 
+GhostNet是华为于2020年提出的一种全新的轻量化网络结构，通过引入ghost module，大大减缓了传统深度网络中特征的冗余计算问题，使得网络的参数量和计算量大大降低。
+
 ![](../../images/models/mobile_arm_top1.png)
 
 ![](../../images/models/mobile_arm_storage.png)
@@ -18,7 +20,7 @@ MobileNetV3是Google于2019年提出的一种基于NAS的新的轻量级网络�
 ![](../../images/models/T4_benchmark/t4.fp32.bs4.mobile_trt.params.png)
 
 
-目前PaddleClas开源的的移动端系列的预训练模型一共有32个，其指标如图所示。从图片可以看出，越新的轻量级模型往往有更优的表现，MobileNetV3代表了目前最新的轻量级神经网络结构。在MobileNetV3中，作者为了获得更高的精度，在global-avg-pooling后使用了1x1的卷积。该操作大幅提升了参数量但对计算量影响不大，所以如果从存储角度评价模型的优异程度，MobileNetV3优势不是很大，但由于其更小的计算量，使得其有更快的推理速度。此外，我们模型库中的ssld蒸馏模型表现优异，从各个考量角度下，都刷新了当前轻量级模型的精度。由于MobileNetV3模型结构复杂，分支较多，对GPU并不友好，GPU预测速度不如MobileNetV1。
+目前PaddleClas开源的的移动端系列的预训练模型一共有35个，其指标如图所示。从图片可以看出，越新的轻量级模型往往有更优的表现，MobileNetV3代表了目前主流的轻量级神经网络结构。在MobileNetV3中，作者为了获得更高的精度，在global-avg-pooling后使用了1x1的卷积。该操作大幅提升了参数量但对计算量影响不大，所以如果从存储角度评价模型的优异程度，MobileNetV3优势不是很大，但由于其更小的计算量，使得其有更快的推理速度。此外，我们模型库中的ssld蒸馏模型表现优异，从各个考量角度下，都刷新了当前轻量级模型的精度。由于MobileNetV3模型结构复杂，分支较多，对GPU并不友好，GPU预测速度不如MobileNetV1。GhostNet于2020年提出，通过引入ghost的网络设计理念，大大降低了计算量和参数量，同时在精度上也超过前期最高的MobileNetV3网络结构。
 
 
 ## 精度、FLOPS和参数量
@@ -47,6 +49,7 @@ MobileNetV3是Google于2019年提出的一种基于NAS的新的轻量级网络�
 | MobileNetV3_small_<br>x0_75          | 0.660   | 0.863   | 0.654             |                   | 0.088        | 2.370             |
 | MobileNetV3_small_<br>x0_5           | 0.592   | 0.815   | 0.580             |                   | 0.043        | 1.900             |
 | MobileNetV3_small_<br>x0_35          | 0.530   | 0.764   | 0.498             |                   | 0.026        | 1.660             |
+| MobileNetV3_small_<br>x0_35_ssld          | 0.556   | 0.777   | 0.498             |                   | 0.026        | 1.660             |
 | MobileNetV3_large_<br>x1_0_ssld      | 0.790   | 0.945   |                   |                   | 0.450        | 5.470             |
 | MobileNetV3_large_<br>x1_0_ssld_int8 | 0.761   |         |                   |                   |              |                   |
 | MobileNetV3_small_<br>x1_0_ssld      | 0.713   | 0.901   |                   |                   | 0.123        | 2.940             |
@@ -57,6 +60,9 @@ MobileNetV3是Google于2019年提出的一种基于NAS的新的轻量级网络�
 | ShuffleNetV2_x1_5                    | 0.716   | 0.902   | 0.726             |                   | 0.580        | 3.470             |
 | ShuffleNetV2_x2_0                    | 0.732   | 0.912   | 0.749             |                   | 1.120        | 7.320             |
 | ShuffleNetV2_swish                   | 0.700   | 0.892   |                   |                   | 0.290        | 2.260             |
+| GhostNet_x0_5                        | 0.668   | 0.869   | 0.662             | 0.866             | 0.082        | 2.600             |
+| GhostNet_x1_0                        | 0.740   | 0.916   | 0.739             | 0.914             | 0.294        | 5.200             |
+| GhostNet_x1_3                        | 0.757   | 0.925   | 0.757             | 0.927             | 0.440        | 7.300             |
 
 
 ## 基于SD855的预测速度和存储大小
@@ -85,6 +91,7 @@ MobileNetV3是Google于2019年提出的一种基于NAS的新的轻量级网络�
 | MobileNetV3_small_x0_75          | 5.284            | 9.600           |
 | MobileNetV3_small_x0_5           | 3.352            | 7.800           |
 | MobileNetV3_small_x0_35          | 2.635            | 6.900           |
+| MobileNetV3_small_x0_35_ssld          | 2.635            | 6.900           |
 | MobileNetV3_large_x1_0_ssld      | 19.308           | 21.000          |
 | MobileNetV3_large_x1_0_ssld_int8 | 14.395           | 10.000          |
 | MobileNetV3_small_x1_0_ssld      | 6.546            | 12.000          |
@@ -95,6 +102,9 @@ MobileNetV3是Google于2019年提出的一种基于NAS的新的轻量级网络�
 | ShuffleNetV2_x1_5                    | 19.352           | 14.000          |
 | ShuffleNetV2_x2_0                    | 34.770           | 28.000          |
 | ShuffleNetV2_swish                   | 16.023           | 9.100           |
+| GhostNet_x0_5                   | 5.714           | 10.000           |
+| GhostNet_x1_0                   | 13.558           | 20.000           |
+| GhostNet_x1_3                   | 19.982           | 29.000           |
 
 
 ## 基于T4 GPU的预测速度
@@ -123,6 +133,7 @@ MobileNetV3是Google于2019年提出的一种基于NAS的新的轻量级网络�
 | MobileNetV3_small_x0_75     | 1.80617               | 2.64646               | 3.24513               | 1.93697               | 2.64285               | 3.32797               |
 | MobileNetV3_small_x0_5      | 1.95001               | 2.74014               | 3.39485               | 1.88406               | 2.99601               | 3.3908                |
 | MobileNetV3_small_x0_35     | 2.10683               | 2.94267               | 3.44254               | 1.94427               | 2.94116               | 3.41082               |
+| MobileNetV3_small_x0_35_ssld     | 2.10683               | 2.94267               | 3.44254               | 1.94427               | 2.94116               | 3.41082               |
 | MobileNetV3_large_x1_0_ssld | 2.20149               | 3.08423               | 4.07779               | 2.04296               | 2.9322                | 4.53184               |
 | MobileNetV3_small_x1_0_ssld | 1.73933               | 2.59478               | 3.40276               | 1.74527               | 2.63565               | 3.28124               |
 | ShuffleNetV2                | 1.95064               | 2.15928               | 2.97169               | 1.89436               | 2.26339               | 3.17615               |
