@@ -6,6 +6,8 @@ dataset/
 checkpoints/
 output/
 pretrained/
+.ipynb_checkpoints/
 *.ipynb*
 _build/
+build/
 nohup.out
