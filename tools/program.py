@@ -61,7 +61,6 @@ def create_model(architecture, classes_num):
     Args:
         architecture(dict): architecture information,
             name(such as ResNet50) is needed
-        image(variable): model input variable
         classes_num(int): num of classes
 
     Returns:

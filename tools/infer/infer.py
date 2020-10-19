@@ -28,6 +28,7 @@ import paddle
 from paddle.distributed import ParallelEnv
 import paddle.nn.functional as F
 
+
 def parse_args():
     def str2bool(v):
         return v.lower() in ("true", "t", "1")
@@ -101,8 +102,11 @@ def main():
         place = paddle.CPUPlace()
 
     paddle.disable_static(place)
+    if "EfficientNet" in args.model:
+        net = architectures.__dict__[args.model](is_test=True)
+    else:
+        net = architectures.__dict__[args.model]()
 
-    net = architectures.__dict__[args.model]()
     load_dygraph_pretrain(net, args.pretrained_model, args.load_static_weights)
     image_list = get_image_list(args.image_file)
     for idx, filename in enumerate(image_list):
