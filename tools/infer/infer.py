@@ -53,7 +53,10 @@ def create_predictor(args):
             out = fluid.layers.softmax(out)
         return out
 
-    model = architectures.__dict__[args.model]()
+    if "EfficientNet" in args.model:
+        model = architectures.__dict__[args.model](is_test=True)
+    else:
+        model = architectures.__dict__[args.model]()
 
     place = fluid.CUDAPlace(0) if args.use_gpu else fluid.CPUPlace()
     exe = fluid.Executor(place)
