@@ -307,7 +307,7 @@ class ShuffleNet(Layer):
 
 
 def ShuffleNetV2_x0_25(**args):
-    model = ShuffleNetV2(scale=0.25, **args)
+    model = ShuffleNet(scale=0.25, **args)
     return model
 
 
