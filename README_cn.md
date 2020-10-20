@@ -7,13 +7,12 @@
 飞桨图像分类套件PaddleClas是飞桨为工业界和学术界所准备的一个图像分类任务的工具集，助力使用者训练出更好的视觉模型和应用落地。
 
 **近期更新**
+- 2020.10.20 添加 `Res2Net50_vd_26w_4s_ssld `模型，在ImageNet-1k上Top-1 Acc可达83.1%；添加 `Res2Net101_vd_26w_4s_ssld `模型，在ImageNet-1k上Top-1 Acc可达83.9%。
 - 2020.10.12 添加Paddle-Lite demo。
 - 2020.10.10 添加cpp inference demo，完善`FAQ 30问`教程。
 - 2020.09.17 添加 `HRNet_W48_C_ssld `模型，在ImageNet-1k上Top-1 Acc可达83.62%；添加 `ResNet34_vd_ssld `模型，在ImageNet-1k上Top-1 Acc可达79.72%。
 - 2020.09.07 添加 `HRNet_W18_C_ssld `模型，在ImageNet-1k上Top-1 Acc可达81.16%；添加 `MobileNetV3_small_x0_35_ssld `模型，在ImageNet-1k上Top-1 Acc可达55.55%。
 - 2020.07.14 添加 `Res2Net200_vd_26w_4s_ssld `模型，在ImageNet-1k上Top-1 Acc可达85.13%；添加 `Fix_ResNet50_vd_ssld_v2 `模型，在ImageNet-1k上Top-1 Acc可达84.0%。
-- 2020.06.17 添加英文文档。
-- 2020.06.12 添加对windows和CPU环境的训练与评估支持。
 - [more](./docs/zh_CN/update_history.md)
 
 
