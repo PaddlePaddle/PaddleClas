@@ -337,5 +337,5 @@ def ShuffleNetV2_x2_0(**args):
 
 
 def ShuffleNetV2_swish(**args):
-    model = ShuffleNet(scale=1.0, act=swish, **args)
+    model = ShuffleNet(scale=1.0, act="swish", **args)
     return model
