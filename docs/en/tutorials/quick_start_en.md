@@ -40,32 +40,27 @@ cd ../../
 
 ## Environment
 
-### Set PYTHONPATH
-
-```bash
-export PYTHONPATH=./:$PYTHONPATH
-```
-
 ### Download pretrained model
 
+You can use the following commands to downdload the pretrained models.
 
 ```bash
-python tools/download.py -a ResNet50_vd -p ./pretrained -d True
-python tools/download.py -a ResNet50_vd_ssld -p ./pretrained -d True
-python tools/download.py -a MobileNetV3_large_x1_0 -p ./pretrained -d True
+mkdir pretrained
+cd pretrained
+wget https://paddle-imagenet-models-name.bj.bcebos.com/ResNet50_vd_pretrained.tar
+wget https://paddle-imagenet-models-name.bj.bcebos.com/ResNet50_vd_ssld_pretrained.tar
+wget https://paddle-imagenet-models-name.bj.bcebos.com/MobileNetV3_large_x1_0_pretrained.tar
+tar -xf ResNet50_vd_pretrained.tar
+tar -xf ResNet50_vd_ssld_pretrained.tar
+tar -xf MobileNetV3_large_x1_0_pretrained.tar
+cd ../
 ```
 
-Paramters：
-+ `architecture`(shortname: a): model name.
-+ `path`(shortname: p) download path.
-+ `decompress`(shortname: d) whether to decompress.
-
-
-
-* All experiments are running on the NVIDIA® Tesla® V100 sigle card.
-
+**Note**: If you want to download the pretrained models on Windows environment, you can copy the links to the web page and download, you can use the the thirdparty tools such as `7Zip` to uncompress the tar files.
 
 ## Training
+
+* All experiments are running on the NVIDIA® Tesla® V100 sigle card.
 
 ### Train from scratch
 

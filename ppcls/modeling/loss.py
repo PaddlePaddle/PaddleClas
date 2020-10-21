@@ -53,9 +53,10 @@ class Loss(object):
         avg_cost = paddle.mean(cost)
         return avg_cost
 
-    def _kldiv(self, input, target):
-        cost = target * F.log(target / input) * self._class_dim
-        cost = paddle.sum(cost)
+    def _kldiv(self, input, target, name=None):
+        eps = 1.0e-10
+        cost = target * paddle.log(
+            (target + eps) / (input + eps)) * self._class_dim
         return cost
 
     def _jsdiv(self, input, target):
