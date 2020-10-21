@@ -57,7 +57,6 @@ class ConvBNLayer(nn.Layer):
             stride=stride,
             padding=(filter_size - 1) // 2,
             groups=groups,
-            act=None,
             weight_attr=ParamAttr(name=name + "_weights"),
             bias_attr=False)
         if name == "conv1":
@@ -111,8 +110,7 @@ class BottleneckBlock(nn.Layer):
                     act='relu',
                     name=name + '_branch2b_' + str(s + 1)))
             self.conv1_list.append(conv1)
-        self.pool2d_avg = AvgPool2d(
-            kernel_size=3, stride=stride, padding=1, ceil_mode=True)
+        self.pool2d_avg = AvgPool2d(kernel_size=3, stride=stride, padding=1)
 
         self.conv2 = ConvBNLayer(
             num_channels=num_filters,

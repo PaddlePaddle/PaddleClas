@@ -1,5 +1,8 @@
 # 更新日志
 
+- 2020.10.20
+    * 添加Res2Net50_vd_26w_4s_ssld模型，在ImageNet上Top-1 Acc可达0.831；添加Res2Net101_vd_26w_4s_ssld模型，在ImageNet上Top-1 Acc可达0.839。
+
 - 2020.10.12
     * 添加Paddle-Lite demo。
 
