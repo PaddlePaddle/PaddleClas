@@ -56,7 +56,8 @@ tar -xf MobileNetV3_large_x1_0_pretrained.tar
 cd ../
 ```
 
-**Note**: If you want to download the pretrained models on Windows environment, you can copy the links to the web page and download, you can use the the thirdparty tools such as `7Zip` to uncompress the tar files.
+**Note**: If you want to download the pretrained models on Windows environment, you can copy the links to the browser and download, then use the the thirdparty tools such as `7Zip` to uncompress the tar files.
+
 
 ## Training
 
