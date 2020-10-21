@@ -40,25 +40,23 @@ cd ../../
 
 ## 二、环境准备
 
-### 2.1 设置PYTHONPATH环境变量
+### 2.1 下载预训练模型
+
+通过下面的命令下载所需要的预训练模型。
 
 ```bash
-export PYTHONPATH=./:$PYTHONPATH
+mkdir pretrained
+cd pretrained
+wget https://paddle-imagenet-models-name.bj.bcebos.com/ResNet50_vd_pretrained.tar
+wget https://paddle-imagenet-models-name.bj.bcebos.com/ResNet50_vd_ssld_pretrained.tar
+wget https://paddle-imagenet-models-name.bj.bcebos.com/MobileNetV3_large_x1_0_pretrained.tar
+tar -xf ResNet50_vd_pretrained.tar
+tar -xf ResNet50_vd_ssld_pretrained.tar
+tar -xf MobileNetV3_large_x1_0_pretrained.tar
+cd ../
 ```
 
-### 下载预训练模型
-通过tools/download.py下载所需要的预训练模型。
-
-```bash
-python tools/download.py -a ResNet50_vd -p ./pretrained -d True
-python tools/download.py -a ResNet50_vd_ssld -p ./pretrained -d True
-python tools/download.py -a MobileNetV3_large_x1_0 -p ./pretrained -d True
-```
-
-参数说明：
-+ `architecture`（简写 a）：模型结构
-+ `path`（简写 p）：下载路径
-+ `decompress` （简写 d）：是否解压
+**注意**：如果是在windows中下载预训练模型的话，需要将地址拷贝到浏览器中并下载，然后使用`7Zip`等工具进行解压。
 
 ### 2.2 环境说明
 
@@ -161,7 +159,7 @@ python -m paddle.distributed.launch \
 * 如果希望体验`3.6节`的知识蒸馏部分，可以首先保存训练得到的ResNet50_vd预训练模型到合适的位置，作为蒸馏时教师模型的预训练模型。脚本如下所示。
 
 ```shell
-cp -r output/ResNet50_vd/19/  ./pretrained/flowers102_R50_vd_final/
+cp -r output/ResNet50_vd/best_model/  ./pretrained/flowers102_R50_vd_final/
 ```
 
 ### 3.6 知识蒸馏小试牛刀

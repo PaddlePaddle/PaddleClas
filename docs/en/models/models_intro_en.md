@@ -128,8 +128,10 @@ python tools/infer/predict.py \
   - Res2Net series<sup>[[9](#ref9)]</sup>([paper link](https://arxiv.org/abs/1904.01169))
     - [Res2Net50_26w_4s](https://paddle-imagenet-models-name.bj.bcebos.com/Res2Net50_26w_4s_pretrained.tar)
     - [Res2Net50_vd_26w_4s](https://paddle-imagenet-models-name.bj.bcebos.com/Res2Net50_vd_26w_4s_pretrained.tar)
+    - [Res2Net50_vd_26w_4s_ssld](https://paddle-imagenet-models-name.bj.bcebos.com/Res2Net50_vd_26w_4s_ssld_pretrained.tar)
     - [Res2Net50_14w_8s](https://paddle-imagenet-models-name.bj.bcebos.com/Res2Net50_14w_8s_pretrained.tar)
     - [Res2Net101_vd_26w_4s](https://paddle-imagenet-models-name.bj.bcebos.com/Res2Net101_vd_26w_4s_pretrained.tar)
+    - [Res2Net101_vd_26w_4s_ssld](https://paddle-imagenet-models-name.bj.bcebos.com/Res2Net101_vd_26w_4s_ssld_pretrained.tar)
     - [Res2Net200_vd_26w_4s](https://paddle-imagenet-models-name.bj.bcebos.com/Res2Net200_vd_26w_4s_pretrained.tar)
     - [Res2Net200_vd_26w_4s_ssld](https://paddle-imagenet-models-name.bj.bcebos.com/Res2Net200_vd_26w_4s_ssld_pretrained.tar)
 
