@@ -145,7 +145,7 @@ Finally you can see the following files in the folder of `fluid_inference/`.
 
 ### 2.1 Export the inference model
 
-* You can refer to [Model inference]((../../tools/export_model.py))，export the inference model. After the model is exported, assuming it is placed in the `inference` directory, the directory structure is as follows.
+* You can refer to [Model inference](../../tools/export_model.py)，export the inference model. After the model is exported, assuming it is placed in the `inference` directory, the directory structure is as follows.
 
 ```
 inference/
@@ -153,7 +153,7 @@ inference/
 |--params
 ```
 
-**NOTICE**: Among them, `model` file stores the model structure information and the `params` file stores the model parameter information.Therefore, you could rename the files name exported by [Model inference]((../../tools/export_model.py)).
+**NOTICE**: Among them, `model` file stores the model structure information and the `params` file stores the model parameter information.Therefore, you could rename the files name exported by [Model inference](../../tools/export_model.py).
 
 ### 2.2 Compile PaddleClas C++ inference demo
 

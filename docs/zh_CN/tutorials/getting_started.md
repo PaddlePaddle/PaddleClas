@@ -1,185 +1,243 @@
 # 开始使用
 ---
-请事先参考[安装指南](install.md)配置运行环境，并根据[数据说明](./data.md)文档准备ImageNet1k数据，本章节下面所有的实验均以ImageNet1k数据集为例。
+请参考[安装指南](./install.md)配置运行环境，并根据[快速开始](./quick_start)文档准备flower102数据集，本章节下面所有的实验均以flower102数据集为例。
 
-## 1. Windows或者CPU上训练与评估
+PaddleClas目前支持的训练/评估环境如下：
+```shell
+└── CPU/单卡GPU
+    ├── Linux
+    └── Windows
 
-如果在windows系统或者CPU上进行训练与评估，推荐使用`tools/train_multi_platform.py`与`tools/eval_multi_platform.py`脚本。
+└── 多卡GPU
+    └── Linux
+```
 
+## 1. 基于CPU/单卡GPU上的训练与评估
+
+在基于CPU/单卡GPU上训练与评估，推荐使用`tools/train.py`与`tools/eval.py`脚本。关于Linux平台多卡GPU环境下的训练与评估，请参考[2. 基于Linux+GPU的模型训练与评估](#2)。
+
+<a name="1.1"></a>
 ### 1.1 模型训练
 
 准备好配置文件之后，可以使用下面的方式启动训练。
 
 ```
-python tools/train_multi_platform.py \
-    -c configs/ResNet/ResNet50.yaml \
-    -o model_save_dir=./output/ \
+python tools/train.py \
+    -c configs/quick_start/MobileNetV3_large_x1_0_finetune.yaml \
+    -o pretrained_model="" \
     -o use_gpu=True
 ```
 
-其中，`-c`用于指定配置文件的路径，`-o`用于指定需要修改或者添加的参数，`-o model_save_dir=./output/`表示将配置文件中的`model_save_dir`修改为`./output/`。`-o use_gpu=True`表示使用GPU进行训练。如果希望使用CPU进行训练，则需要将`use_gpu`设置为`False`。
+其中，`-c`用于指定配置文件的路径，`-o`用于指定需要修改或者添加的参数，其中`-o pretrained_model=""`表示不使用预训练模型，`-o use_gpu=True`表示使用GPU进行训练。如果希望使用CPU进行训练，则需要将`use_gpu`设置为`False`。
 
-也可以直接修改模型对应的配置文件更新配置。具体配置参数参考[配置文档](config.md)。
+更详细的训练配置，也可以直接修改模型对应的配置文件。具体配置参数参考[配置文档](config.md)。
 
-* 输出日志示例如下：
+运行上述命令，可以看到输出日志，示例如下：
 
-    * 如果在训练使用了mixup或者cutmix的数据增广方式，那么日志中只会打印出loss(损失)、lr(学习率)以及该minibatch的训练时间。
+* 如果在训练中使用了mixup或者cutmix的数据增广方式，那么日志中只会打印出loss(损失)、lr(学习率)以及该minibatch的训练时间。
 
     ```
     train step:890  loss:  6.8473 lr: 0.100000 elapse: 0.157s
     ```
 
-    * 如果训练过程中没有使用mixup或者cutmix的数据增广，那么除了loss(损失)、lr(学习率)以及该minibatch的训练时间之外，日志中也会打印出top-1与top-k(默认为5)的信息。
+* 如果训练过程中没有使用mixup或者cutmix的数据增广，那么除了loss(损失)、lr(学习率)以及该minibatch的训练时间之外，日志中也会打印出top-1与top-k(默认为5)的信息。
 
     ```
     epoch:0    train    step:13    loss:7.9561    top1:0.0156    top5:0.1094    lr:0.100000    elapse:0.193s
     ```
 
-训练期间可以通过VisualDL实时观察loss变化，启动命令如下：
-
-```bash
-visualdl --logdir ./scalar --host <host_IP> --port <port_num>
-```
+训练期间也可以通过VisualDL实时观察loss变化，详见[VisualDL](https://github.com/PaddlePaddle/VisualDL)。
 
 ### 1.2 模型微调
 
-* 根据自己的数据集配置好配置文件之后，可以通过加载预训练模型进行微调，如下所示。
+根据自己的数据集路径设置好配置文件后，可以通过加载预训练模型的方式进行微调，如下所示。
 
 ```
-python tools/train_multi_platform.py \
-    -c configs/ResNet/ResNet50.yaml \
-    -o pretrained_model="./pretrained/ResNet50_pretrained"
+python tools/train.py \
+    -c configs/quick_start/MobileNetV3_large_x1_0_finetune.yaml \
+    -o pretrained_model="./pretrained/MobileNetV3_large_x1_0_pretrained" \
+    -o use_gpu=True
 ```
 
-其中`pretrained_model`用于设置加载预训练权重的地址，使用时需要换成自己的预训练模型权重路径，也可以直接在配置文件中修改该路径。
+其中`-o pretrained_model`用于设置加载预训练模型权重文件的地址，使用时需要换成自己的预训练模型权重文件的路径，也可以直接在配置文件中修改该路径。
 
+我们也提供了大量基于`ImageNet-1k`数据集的预训练模型，模型列表及下载地址详见[模型库概览](../models/models_intro.md)。
+
+<a name="1.3"></a>
 ### 1.3 模型恢复训练
 
-* 如果训练任务因为其他原因被终止，也可以加载断点权重继续训练。
+如果训练任务因为其他原因被终止，也可以加载断点权重文件，继续训练：
 
 ```
-python tools/train_multi_platform.py \
-    -c configs/ResNet/ResNet50.yaml \
-    -o checkpoints="./output/ResNet/0/ppcls"
+python tools/train.py \
+    -c configs/quick_start/MobileNetV3_large_x1_0_finetune.yaml \
+    -o checkpoints="./output/MobileNetV3_large_x1_0_gpupaddle/0/ppcls" \
+    -o last_epoch=5 \
+    -o use_gpu=True
 ```
 
-其中配置文件不需要做任何修改，只需要在训练时添加`checkpoints`参数即可，表示加载的断点权重路径，使用该参数会同时加载保存的断点权重和学习率、优化器等信息。
+其中配置文件不需要做任何修改，只需要在继续训练时设置`checkpoints`参数即可，表示加载的断点权重文件路径，使用该参数会同时加载保存的断点权重和学习率、优化器等信息。
 
+**注意**：
+* 参数`-o last_epoch=5`表示将上一次训练轮次数记为`5`，即本次训练轮次数从`6`开始计算。
 
+* `-o checkpoints`参数无需包含断点权重文件的后缀名，上述训练命令会在训练过程中生成如下所示的断点权重文件，若想从断点`0`继续训练，则`checkpoints`参数只需设置为`"./output/MobileNetV3_large_x1_0_gpupaddle/0/ppcls"`，PaddleClas会自动补充后缀名。
+    ```shell
+    output/
+    └── MobileNetV3_large_x1_0
+        ├── 0
+        │   ├── ppcls.pdopt
+        │   └── ppcls.pdparams
+        ├── 1
+        │   ├── ppcls.pdopt
+        │   └── ppcls.pdparams
+        .
+        .
+        .
+    ```
+
+<a name="1.4"></a>
 ### 1.4 模型评估
 
-* 可以通过以下命令完成模型评估。
+可以通过以下命令进行模型评估。
 
 ```bash
-python tools/eval_multi_platform.py \
+python tools/eval.py \
     -c ./configs/eval.yaml \
-    -o ARCHITECTURE.name="ResNet50_vd" \
+    -o ARCHITECTURE.name="MobileNetV3_large_x1_0" \
     -o pretrained_model=path_to_pretrained_models
 ```
 
-可以更改`configs/eval.yaml`中的`ARCHITECTURE.name`字段和`pretrained_model`字段来配置评估模型，也可以通过-o参数更新配置。
+可以通过更改`configs/eval.yaml`中的`ARCHITECTURE.name`参数和`pretrained_model`参数来配置评估模型，也可以通过`-o`参数更新配置，如上所示。
 
-**注意：** 加载预训练模型时，需要指定预训练模型的前缀，例如预训练模型参数所在的文件夹为`output/ResNet50_vd/19`，预训练模型参数的名称为`output/ResNet50_vd/19/ppcls.pdparams`，则`pretrained_model`参数需要指定为`output/ResNet50_vd/19/ppcls`，PaddleClas会自动补齐`.pdparams`的后缀。
+**注意：** 加载预训练模型时，需要指定预训练模型文件的路径，但无需包含文件后缀名，PaddleClas会自动补齐`.pdparams`的后缀，如[1.3 模型恢复训练](#1.3)。
 
-
+<a name="2"></a>
 ## 2. 基于Linux+GPU的模型训练与评估
 
-如果机器环境为Linux+GPU，那么推荐使用PaddleClas 提供的模型训练与评估脚本：`tools/train.py`和`tools/eval.py`，可以更快地完成训练与评估任务。
+如果机器环境为Linux+GPU，那么推荐使用`paddle.distributed.launch`启动模型训练脚本（`tools/train.py`）、评估脚本（`tools/eval.py`），可以更方便地启动多卡训练与评估。
 
 ### 2.1 模型训练
 
-按照如下方式启动模型训练。
+参考如下方式启动模型训练，`paddle.distributed.launch`通过设置`selected_gpus`指定GPU运行卡号：
 
 ```bash
 # PaddleClas通过launch方式启动多卡多进程训练
-# 通过设置FLAGS_selected_gpus 指定GPU运行卡号
+
+export CUDA_VISIBLE_DEVICES=0,1,2,3
 
 python -m paddle.distributed.launch \
     --selected_gpus="0,1,2,3" \
     tools/train.py \
-        -c ./configs/ResNet/ResNet50_vd.yaml
+        -c ./configs/quick_start/MobileNetV3_large_x1_0_finetune.yaml
 ```
 
-可以通过添加-o参数来更新配置：
+其中，`-c`用于指定配置文件的路径，可通过配置文件修改相关训练配置信息，也可以通过添加`-o`参数来更新配置：
 
 ```bash
 python -m paddle.distributed.launch \
     --selected_gpus="0,1,2,3" \
     tools/train.py \
-        -c ./configs/ResNet/ResNet50_vd.yaml \
-        -o use_mix=1 \
-        --vdl_dir=./scalar/
+        -c ./configs/quick_start/MobileNetV3_large_x1_0_finetune.yaml \
+        -o pretrained_model="" \
+        -o use_gpu=True
 ```
+`-o`用于指定需要修改或者添加的参数，其中`-o pretrained_model=""`表示不使用预训练模型，`-o use_gpu=True`表示使用GPU进行训练。
 
-输出日志信息的格式同上。
+输出日志信息的格式同上，详见[1.1 模型训练](#1.1)。
 
 ### 2.2 模型微调
 
-* 根据自己的数据集配置好配置文件之后，可以通过加载预训练模型进行微调，如下所示。
+根据自己的数据集配置好配置文件之后，可以加载预训练模型进行微调，如下所示。
 
 ```
+export CUDA_VISIBLE_DEVICES=0,1,2,3
+
 python -m paddle.distributed.launch \
     --selected_gpus="0,1,2,3" \
     tools/train.py \
-        -c configs/ResNet/ResNet50.yaml \
-        -o pretrained_model="./pretrained/ResNet50_pretrained"
+        -c ./configs/quick_start/MobileNetV3_large_x1_0_finetune.yaml \
+        -o pretrained_model="./pretrained_model/ \ MobileNetV3_large_x1_0_pretrained"
 ```
 
-其中`pretrained_model`用于设置加载预训练权重的地址，使用时需要换成自己的预训练模型权重路径，也可以直接在配置文件中修改该路径。
+其中`pretrained_model`用于设置加载预训练权重文件的路径，使用时需要换成自己的预训练模型权重文件路径，也可以直接在配置文件中修改该路径。
 
-* [30分钟玩转PaddleClas教程](./quick_start.md)中包含大量模型微调的示例，可以参考该章节在特定的数据集上进行模型微调。
+[30分钟玩转PaddleClas教程](./quick_start.md)中包含大量模型微调的示例，可以参考该章节在特定的数据集上进行模型微调。
 
 
 ### 2.3 模型恢复训练
 
-* 如果训练任务，因为其他原因被终止，也可以加载断点权重继续训练。
+如果训练任务因为其他原因被终止，也可以加载断点权重文件继续训练。
 
 ```
+export CUDA_VISIBLE_DEVICES=0,1,2,3
+
 python -m paddle.distributed.launch \
     --selected_gpus="0,1,2,3" \
     tools/train.py \
-        -c configs/ResNet/ResNet50.yaml \
+        -c ./configs/quick_start/MobileNetV3_large_x1_0_finetune.yaml \
         -o checkpoints="./output/ResNet/0/ppcls"
+        -o last_epoch=5 \
+        -o use_gpu=True
 ```
 
-其中配置文件不需要做任何修改，只需要在训练时添加`checkpoints`参数即可，表示加载的断点权重路径，使用该参数会同时加载保存的模型参数权重和学习率、优化器等信息。
+其中配置文件不需要做任何修改，只需要在训练时设置`checkpoints`参数与`last_epoch`参数即可，该参数表示加载的断点权重文件路径，使用该参数会同时加载保存的模型参数权重和学习率、优化器等信息，详见[1.3 模型恢复训练](#1.3)。
 
 
 ### 2.4 模型评估
 
-* 可以通过以下命令完成模型评估。
+可以通过以下命令进行模型评估。
 
 ```bash
 python -m paddle.distributed.launch \
     --selected_gpus="0" \
     tools/eval.py \
         -c ./configs/eval.yaml \
-        -o ARCHITECTURE.name="ResNet50_vd" \
+        -o ARCHITECTURE.name="MobileNetV3_large_x1_0" \
         -o pretrained_model=path_to_pretrained_models
 ```
 
-可以更改configs/eval.yaml中的`ARCHITECTURE.name`字段和pretrained_model字段来配置评估模型，也可以通过-o参数更新配置。
+参数说明详见[1.4 模型评估](#1.4)。
 
 
-## 三、模型推理
+## 3. 模型推理
 
 PaddlePaddle提供三种方式进行预测推理，接下来介绍如何用预测引擎进行推理：
 首先，对训练好的模型进行转换：
 
 ```bash
 python tools/export_model.py \
-    --model=模型名字 \
-    --pretrained_model=预训练模型路径 \
-    --output_path=预测模型保存路径
-
+    --model=MobileNetV3_large_x1_0 \
+    --pretrained_model=./output/MobileNetV3_large_x1_0/best_model/ppcls \
+    --output_path=./exported_model
 ```
-之后，通过预测引擎进行推理：
+
+其中，参数`--model`用于指定模型名称，`--pretrained_model`用于指定模型文件路径，该路径仍无需包含模型文件后缀名（如[1.3 模型恢复训练](#1.3)），`--output_path`用于指定转换后模型的存储路径。
+
+**注意**：文件`export_model.py:53`中，`shape`参数为模型输入图像的`shape`，默认为`224*224`，请根据实际情况修改，如下所示：
+```python
+50 # Please modify the 'shape' according to actual needs
+51 @to_static(input_spec=[
+52     paddle.static.InputSpec(
+53         shape=[None, 3, 224, 224], dtype='float32')
+54 ])
+```
+
+上述命令将生成模型结构文件（`__model__`）和模型权重文件（`__variables__`），然后可以使用预测引擎进行推理：
+
 ```bash
 python tools/infer/predict.py \
-    -m model文件路径 \
-    -p params文件路径 \
     -i 图片路径 \
-    --use_gpu=1 \
+    -m __model__文件路径 \
+    -p __variables__文件路径 \
+    --use_gpu=True \
     --use_tensorrt=False
 ```
+其中：
++ `image_file`(简写 i)：待预测的图片文件路径，如 `./test.jpeg`
++ `model_file`(简写 m)：模型文件路径，如 `./MobileNetV3_large_x1_0/__model__`
++ `params_file`(简写 p)：权重文件路径，如 `./MobileNetV3_large_x1_0/__variables__`
++ `use_tensorrt`：是否使用 TesorRT 预测引擎，默认值：`True`
++ `use_gpu`：是否使用 GPU 预测，默认值：`True`
+
 更多使用方法和推理方式请参考[分类预测框架](../extension/paddle_inference.md)。
