@@ -1,130 +1,310 @@
+[简体中文](README_cn.md) | English
+
 # PaddleClas
 
-**文档教程**: https://paddleclas.readthedocs.io
+## Introduction
 
-**30分钟玩转PaddleClas**: https://paddleclas.readthedocs.io/zh_CN/latest/tutorials/quick_start.html
+PaddleClas is a toolset for image classification tasks prepared for the industry and academia. It helps users train better computer vision models and apply them in real scenarios.
 
-## 简介
-
-飞桨图像分类套件PaddleClas是飞桨为工业界和学术界所准备的一个图像分类任务的工具集，助力使用者训练出更好的视觉模型和应用落地。
-
-<div align="center">
-    <img src="./docs/images/main_features_s.png" width="700">
-</div>
-
-## 丰富的模型库
-
-基于ImageNet1k分类数据集，PaddleClas提供ResNet、ResNet_vd、Res2Net、HRNet、MobileNetV3等23种系列的分类网络结构的简单介绍、论文指标复现配置，以及在复现过程中的训练技巧。与此同时，也提供了对应的117个图像分类预训练模型，并且基于TensorRT评估了服务器端模型的GPU预测时间，以及在骁龙855（SD855）上评估了移动端模型的CPU预测时间和存储大小。支持的***预训练模型列表、下载地址以及更多信息***请见文档教程中的[**模型库章节**](https://paddleclas.readthedocs.io/zh_CN/latest/models/models_intro.html)。
-
-<div align="center">
-    <img src="./docs/images/models/V100_benchmark/v100.fp32.bs1.main_fps_top1_s.jpg" width="700">
-</div>
-
-上图对比了一些最新的面向服务器端应用场景的模型，在使用V100，FP32和TensorRT，batch size为1时的预测时间及其准确率，图中准确率82.4%的ResNet50_vd_ssld和83.7%的ResNet101_vd_ssld，是采用PaddleClas提供的SSLD知识蒸馏方案训练的模型。图中相同颜色和符号的点代表同一系列不同规模的模型。不同模型的简介、FLOPS、Parameters以及详细的GPU预测时间(包括不同batchsize的T4卡预测速度)请参考文档教程中的[**模型库章节**](https://paddleclas.readthedocs.io/zh_CN/latest/models/models_intro.html)。
-
-<div align="center">
-<img
-src="./docs/images/models/mobile_arm_top1.png" width="700">
-</div>
-
-上图对比了一些最新的面向移动端应用场景的模型，在骁龙855（SD855）上预测一张图像的时间和其准确率，包括MobileNetV1系列、MobileNetV2系列、MobileNetV3系列和ShuffleNetV2系列。图中准确率79%的MV3_large_x1_0_ssld（M是MobileNet的简称），71.3%的MV3_small_x1_0_ssld、76.74%的MV2_ssld和77.89%的MV1_ssld，是采用PaddleClas提供的SSLD蒸馏方法训练的模型。MV3_large_x1_0_ssld_int8是进一步进行INT8量化的模型。不同模型的简介、FLOPS、Parameters和模型存储大小请参考文档教程中的[**模型库章节**](https://paddleclas.readthedocs.io/zh_CN/latest/models/models_intro.html)。
-
-- TODO
-- [ ] EfficientLite、GhostNet、RegNet论文指标复现和性能评估
-
-## 高阶优化支持
-除了提供丰富的分类网络结构和预训练模型，PaddleClas也支持了一系列有助于图像分类任务效果和效率提升的算法或工具。
-### SSLD知识蒸馏
-
-知识蒸馏是指使用教师模型(teacher model)去指导学生模型(student model)学习特定任务，保证小模型在参数量不变的情况下，得到比较大的效果提升，甚至获得与大模型相似的精度指标。PaddleClas提供了一种简单的半监督标签知识蒸馏方案（SSLD，Simple Semi-supervised Label Distillation），使用该方案，模型效果普遍提升3%以上，一些蒸馏模型提升效果如下图所示：
-
-<div align="center">
-<img
-src="./docs/images/distillation/distillation_perform_s.jpg" width="700">
-</div>
-
-以在ImageNet1K蒸馏模型为例，SSLD知识蒸馏方案框架图如下，该方案的核心关键点包括教师模型的选择、loss计算方式、迭代轮数、无标签数据的使用、以及ImageNet1k蒸馏finetune，每部分的详细介绍以及实验介绍请参考文档教程中的[**知识蒸馏章节**](https://paddleclas.readthedocs.io/zh_CN/latest/advanced_tutorials/distillation/index.html)。
-
-<div align="center">
-<img
-src="./docs/images/distillation/ppcls_distillation_s.jpg" width="700">
-</div>
-
-### 数据增广
-
-在图像分类任务中，图像数据的增广是一种常用的正则化方法，可以有效提升图像分类的效果，尤其对于数据量不足或者模型网络较大的场景。常用的数据增广可以分为3类，图像变换类、图像裁剪类和图像混叠类，如下图所示。图像变换类是指对全图进行一些变换，例如AutoAugment，RandAugment。图像裁剪类是指对图像以一定的方式遮挡部分区域的变换，例如CutOut，RandErasing，HideAndSeek，GridMask。图像混叠类是指多张图进行混叠一张新图的变换，例如Mixup，Cutmix。
-
-<div align="center">
-<img
-src="./docs/images/image_aug/image_aug_samples_s.jpg" width="800">
-</div>
-
-PaddleClas提供了上述8种数据增广算法的复现和在统一实验环境下的效果评估。下图展示了不同数据增广方式在ResNet50上的表现, 与标准变换相比，采用数据增广，识别准确率最高可以提升1%。每种数据增广方法的详细介绍、对比的实验环境请参考文档教程中的[**数据增广章节**](https://paddleclas.readthedocs.io/zh_CN/latest/advanced_tutorials/image_augmentation/index.html)。
-
-<div align="center">
-<img
-src="./docs/images/image_aug/main_image_aug_s.jpg" width="600">
-</div>
-
-## 30分钟玩转PaddleClas
-
-基于flowers102数据集，30分钟体验PaddleClas不同骨干网络的模型训练、不同预训练模型、SSLD知识蒸馏方案和数据增广的效果。详情请参考文档教程中的[**30分钟玩转PaddleClas**](https://paddleclas.readthedocs.io/zh_CN/latest/tutorials/quick_start.html)。
-
-## 开始使用
-
-PaddleClas的安装说明、模型训练、预测、评估以及模型微调（finetune）请参考文档教程中的[**初级使用章节**](https://paddleclas.readthedocs.io/zh_CN/latest/tutorials/index.html)。
+**Recent update**
+- 2020.09.17 Add `Res2Net50_vd_26w_4s_ssld` pretrained model, whose Top-1 Acc on ImageNet-1k dataset reaches 83.1%. Add `Res2Net101_vd_26w_4s_ssld` pretrained model, whose Top-1 Acc on ImageNet-1k dataset reaches 83.9%.
+- 2020.10.12 Add Paddle-Lite demo。
+- 2020.10.10 Add cpp inference demo and improve FAQ tutorial.
+- 2020.09.17 Add `HRNet_W48_C_ssld` pretrained model, whose Top-1 Acc on ImageNet-1k dataset reaches 83.62%. Add `ResNet34_vd_ssld` pretrained model, whose Top-1 Acc on ImageNet-1k dataset reaches 79.72%.
+- 2020.09.07 Add `HRNet_W18_C_ssld` pretrained model, whose Top-1 Acc on ImageNet-1k dataset reaches 81.16%.
+- 2020.07.14 Add `Res2Net200_vd_26w_4s_ssld` pretrained model, whose Top-1 Acc on ImageNet-1k dataset reaches 85.13%. Add `Fix_ResNet50_vd_ssld_v2` pretrained model, whose Top-1 Acc on ImageNet-1k dataset reaches 84.00%.
+- [more](./docs/en/update_history_en.md)
 
 
-## 特色拓展应用
+## Features
 
-### 10万类图像分类预训练模型
-在实际应用中，由于训练数据匮乏，往往将ImageNet1K数据集训练的分类模型作为预训练模型，进行图像分类的迁移学习。然而ImageNet1K数据集的类别只有1000种，预训练模型的特征迁移能力有限。因此百度自研了一个有语义体系的、粒度有粗有细的10w级别的Tag体系，通过人工或半监督方式，至今收集到 5500w+图片训练数据；该系统是国内甚至世界范围内最大规模的图片分类体系和训练集合。PaddleClas提供了在该数据集上训练的ResNet50_vd的模型。下表显示了一些实际应用场景中，使用ImageNet预训练模型和上述10万类图像分类预训练模型的效果比对，使用10万类图像分类预训练模型，识别准确率最高可以提升30%。
+- Rich model zoo. Based on the ImageNet-1k classification dataset, PaddleClas provides 24 series of classification network structures and training configurations, 122 models' pretrained weights and their evaluation metrics.
 
-| 数据集   | 数据统计                | ImageNet预训练模型 | 10万类图像分类预训练模型 |
-|:--:|:--:|:--:|:--:|
-| 花卉    | class_num:102<br/>train/val:5789/2396      | 0.7779        | 0.9892        |
-| 手绘简笔画 | class_num:18<br/>train/val:1007/432        | 0.8785        | 0.9107        |
-| 植物叶子  | class_num:6<br/>train/val:5256/2278        | 0.8212        | 0.8385        |
-| 集装箱车辆 | class_num:115<br/>train/val:4879/2094       | 0.623         | 0.9524        |
-| 椅子    | class_num:5<br/>train/val:169/78         | 0.8557        | 0.9077        |
-| 地质    | class_num:4<br/>train/val:671/296         | 0.5719        | 0.6781        |
+- SSLD Knowledge Distillation. Based on this SSLD distillation strategy, the top-1 acc of the distilled model is generally increased by more than 3%.
 
-10万类图像分类预训练模型下载地址如下，更多的相关内容请参考文档教程中的[**图像分类迁移学习章节**](https://paddleclas.readthedocs.io/zh_CN/latest/application/transfer_learning.html#id1)。
+- Data augmentation: PaddleClas provides detailed introduction of 8 data augmentation algorithms such as AutoAugment, Cutout, Cutmix, code reproduction and effect evaluation in a unified experimental environment.
 
-- **10万类预训练模型:**[**下载地址**](https://paddle-imagenet-models-name.bj.bcebos.com/ResNet50_vd_10w_pretrained.tar)
+- Pretrained model with 100,000 categories: Based on `ResNet50_vd` model, Baidu open sourced the `ResNet50_vd` pretrained model trained on a 100,000-category dataset. In some practical scenarios, the accuracy based on the pretrained weights can be increased by up to 30%.
 
-### 通用目标检测
+- A variety of training modes, including multi-machine training, mixed precision training, etc.
 
-近年来，学术界和工业界广泛关注图像中目标检测任务，而图像分类的网络结构以及预训练模型效果直接影响目标检测的效果。PaddleDetection使用PaddleClas的82.39%的ResNet50_vd的预训练模型，结合自身丰富的检测算子，提供了一种面向服务器端应用的目标检测方案，PSS-DET (Practical Server Side Detection)。该方案融合了多种只增加少许计算量，但是可以有效提升两阶段Faster RCNN目标检测效果的策略，包括检测模型剪裁、使用分类效果更优的预训练模型、DCNv2、Cascade RCNN、AutoAugment、Libra sampling以及多尺度训练。其中基于82.39%的R50_vd_ssld预训练模型，与79.12%的R50_vd的预训练模型相比，检测效果可以提升1.5%。在COCO目标检测数据集上测试PSS-DET，当V100单卡预测速度为61FPS时，mAP是41.6%，预测速度为20FPS时，mAP是47.8%。详情请参考[**通用目标检测章节**](https://paddleclas.readthedocs.io/zh_CN/latest/application/object_detection.html)。
+- A variety of inference and deployment solutions, including TensorRT inference, Paddle-Lite inference, model service deployment, model quantification, Paddle Hub, etc.
+
+- Support Linux, Windows, macOS and other systems.
 
 
-- TODO
-- [ ] PaddleClas在OCR任务中的应用
-- [ ] PaddleClas在人脸检测和识别中的应用
+## Tutorials
 
-## 工业级应用部署工具
-PaddlePaddle提供了一系列实用工具，便于工业应用部署PaddleClas，具体请参考文档教程中的[**实用工具章节**](https://paddleclas.readthedocs.io/zh_CN/latest/extension/index.html)。
+- [Installation](./docs/en/tutorials/install_en.md)
+- [Quick start PaddleClas in 30 minutes](./docs/en/tutorials/quick_start_en.md)
+- [Model introduction and model zoo](./docs/en/models/models_intro_en.md)
+    - [Model zoo overview](#Model_zoo_overview)
+    - [ResNet and Vd series](#ResNet_and_Vd_series)
+    - [Mobile series](#Mobile_series)
+    - [SEResNeXt and Res2Net series](#SEResNeXt_and_Res2Net_series)
+    - [DPN and DenseNet series](#DPN_and_DenseNet_series)
+    - [HRNet series](#HRNet_series)
+    - [Inception series](#Inception_series)
+    - [EfficientNet and ResNeXt101_wsl series](#EfficientNet_and_ResNeXt101_wsl_series)
+    - [ResNeSt and RegNet series](#ResNeSt_and_RegNet_series)
+- Model training/evaluation
+    - [Data preparation](./docs/en/tutorials/data_en.md)
+    - [Model training and finetuning](./docs/en/tutorials/getting_started_en.md)
+    - [Model evaluation](./docs/en/tutorials/getting_started_en.md)
+- Model prediction/inference
+    - [Prediction based on training engine](./docs/en/extension/paddle_inference_en.md)
+    - [Python inference](./docs/en/extension/paddle_inference_en.md)
+    - [C++ inference](./deploy/cpp_infer/readme_en.md)
+    - [Serving deployment](./docs/en/extension/paddle_serving_en.md)
+    - [Mobile](./deploy/lite/readme_en.md)
+    - [Model Quantization and Compression](docs/en/extension/paddle_quantization_en.md)
+- Advanced tutorials
+    - [Knowledge distillation](./docs/en/advanced_tutorials/distillation/distillation_en.md)
+    - [Data augmentation](./docs/en/advanced_tutorials/image_augmentation/ImageAugment_en.md)
+- Applications
+    - [Transfer learning](./docs/en/application/transfer_learning_en.md)
+    - [Pretrained model with 100,000 categories](./docs/en/application/transfer_learning_en.md)
+    - [Generic object detection](./docs/en/application/object_detection_en.md)
+- FAQ
+    - [General image classification problems](./docs/en/faq_en.md)
+    - [PaddleClas FAQ](./docs/en/faq_en.md)
+- [Competition support](./docs/en/competition_support_en.md)
+- [License](#License)
+- [Contribution](#Contribution)
 
-- TensorRT预测
-- Paddle-Lite
-- 模型服务化部署
-- 模型量化
-- 多机训练
-- Paddle Hub
 
-## 赛事支持
-PaddleClas的建设源于百度实际视觉业务应用的淬炼和视觉前沿能力的探索，助力多个视觉重点赛事取得领先成绩，并且持续推进更多的前沿视觉问题的解决和落地应用。更多内容请关注文档教程中的[**赛事支持章节**](https://paddleclas.readthedocs.io/zh_CN/latest/competition_support.html)
+<a name="Model_zoo_overview"></a>
+### Model zoo overview
 
-- 2018年Kaggle Open Images V4图像目标检测挑战赛冠军
-- 首届多媒体信息识别技术竞赛中印刷文本OCR、人脸识别和地标识别三项任务A级证书
-- 2019年Kaggle Open Images V5图像目标检测挑战赛亚军
-- 2019年Kaggle地标检索挑战赛亚军
-- 2019年Kaggle地标识别挑战赛亚军
+Based on the ImageNet-1k classification dataset, the 24 classification network structures supported by PaddleClas and the corresponding 122 image classification pretrained models are shown below. Training trick, a brief introduction to each series of network structures, and performance evaluation will be shown in the corresponding chapters. The  evaluation environment is as follows.
 
-## 许可证书
-本项目的发布受<a href="https://github.com/PaddlePaddle/PaddleCLS/blob/master/LICENSE">Apache 2.0 license</a>许可认证。
+* CPU evaluation environment is based on Snapdragon 855 (SD855).
+* The GPU evaluation speed is measured by running 500 times under the FP32+TensorRT configuration (excluding the warmup time of the first 10 times).
 
-## 版本更新
 
-## 如何贡献代码
-我们非常欢迎你为PaddleClas贡献代码，也十分感谢你的反馈。
+Curves of accuracy to the inference time of common server-side models are shown as follows.
+
+![](./docs/images/models/T4_benchmark/t4.fp32.bs4.main_fps_top1.png)
+
+
+Curves of accuracy to the inference time and storage size of common mobile-side models are shown as follows.
+
+![](./docs/images/models/mobile_arm_storage.png)
+
+![](./docs/images/models/mobile_arm_top1.png)
+
+
+
+<a name="ResNet_and_Vd_series"></a>
+### ResNet and Vd series
+
+Accuracy and inference time metrics of ResNet and Vd series models are shown as follows. More detailed information can be refered to [ResNet and Vd series tutorial](./docs/en/models/ResNet_and_vd_en.md).
+
+| Model                 | Top-1 Acc | Top-5 Acc | time(ms)<br>bs=1 | time(ms)<br>bs=4 | Flops(G) | Params(M) | Download Address                                                                                         |
+|---------------------|-----------|-----------|-----------------------|----------------------|----------|-----------|----------------------------------------------------------------------------------------------|
+| ResNet18            | 0.7098    | 0.8992    | 1.45606               | 3.56305              | 3.66     | 11.69     | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/ResNet18_pretrained.tar)            |
+| ResNet18_vd         | 0.7226    | 0.9080    | 1.54557               | 3.85363              | 4.14     | 11.71     | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/ResNet18_vd_pretrained.tar)         |
+| ResNet34            | 0.7457    | 0.9214    | 2.34957               | 5.89821              | 7.36     | 21.8      | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/ResNet34_pretrained.tar)            |
+| ResNet34_vd         | 0.7598    | 0.9298    | 2.43427               | 6.22257              | 7.39     | 21.82     | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/ResNet34_vd_pretrained.tar)         |
+| ResNet34_vd_ssld         | 0.7972    | 0.9490    | 2.43427               | 6.22257              | 7.39     | 21.82     | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/ResNet34_vd_ssld_pretrained.tar)         |
+| ResNet50            | 0.7650    | 0.9300    | 3.47712               | 7.84421              | 8.19     | 25.56     | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/ResNet50_pretrained.tar)            |
+| ResNet50_vc         | 0.7835    | 0.9403    | 3.52346               | 8.10725              | 8.67     | 25.58     | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/ResNet50_vc_pretrained.tar)         |
+| ResNet50_vd         | 0.7912    | 0.9444    | 3.53131               | 8.09057              | 8.67     | 25.58     | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/ResNet50_vd_pretrained.tar)         |
+| ResNet50_vd_v2      | 0.7984    | 0.9493    | 3.53131               | 8.09057              | 8.67     | 25.58     | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/ResNet50_vd_v2_pretrained.tar)      |
+| ResNet101           | 0.7756    | 0.9364    | 6.07125               | 13.40573             | 15.52    | 44.55     | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/ResNet101_pretrained.tar)           |
+| ResNet101_vd        | 0.8017    | 0.9497    | 6.11704               | 13.76222             | 16.1     | 44.57     | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/ResNet101_vd_pretrained.tar)        |
+| ResNet152           | 0.7826    | 0.9396    | 8.50198               | 19.17073             | 23.05    | 60.19     | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/ResNet152_pretrained.tar)           |
+| ResNet152_vd        | 0.8059    | 0.9530    | 8.54376               | 19.52157             | 23.53    | 60.21     | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/ResNet152_vd_pretrained.tar)        |
+| ResNet200_vd        | 0.8093    | 0.9533    | 10.80619              | 25.01731             | 30.53    | 74.74     | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/ResNet200_vd_pretrained.tar)        |
+| ResNet50_vd_<br>ssld    | 0.8239    | 0.9610    | 3.53131               | 8.09057              | 8.67     | 25.58     | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/ResNet50_vd_ssld_pretrained.tar)    |
+| ResNet50_vd_<br>ssld_v2 | 0.8300    | 0.9640    | 3.53131               | 8.09057              | 8.67     | 25.58     | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/ResNet50_vd_ssld_v2_pretrained.tar) |
+| ResNet101_vd_<br>ssld   | 0.8373    | 0.9669    | 6.11704               | 13.76222             | 16.1     | 44.57     | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/ResNet101_vd_ssld_pretrained.tar)   |
+
+
+<a name="Mobile_series"></a>
+### Mobile series
+
+Accuracy and inference time metrics of Mobile series models are shown as follows. More detailed information can be refered to [Mobile series tutorial](./docs/en/models/Mobile_en.md).
+
+| Model                              | Top-1 Acc | Top-5 Acc | SD855 time(ms)<br>bs=1 | Flops(G) | Params(M) | Model storage size(M) | Download Address                                                                                                      |
+|----------------------------------|-----------|-----------|------------------------|----------|-----------|---------|-----------------------------------------------------------------------------------------------------------|
+| MobileNetV1_<br>x0_25                | 0.5143    | 0.7546    | 3.21985                | 0.07     | 0.46      | 1.9     | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/MobileNetV1_x0_25_pretrained.tar)                |
+| MobileNetV1_<br>x0_5                 | 0.6352    | 0.8473    | 9.579599               | 0.28     | 1.31      | 5.2     | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/MobileNetV1_x0_5_pretrained.tar)                 |
+| MobileNetV1_<br>x0_75                | 0.6881    | 0.8823    | 19.436399              | 0.63     | 2.55      | 10      | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/MobileNetV1_x0_75_pretrained.tar)                |
+| MobileNetV1                      | 0.7099    | 0.8968    | 32.523048              | 1.11     | 4.19      | 16      | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/MobileNetV1_pretrained.tar)                      |
+| MobileNetV1_<br>ssld                 | 0.7789    | 0.9394    | 32.523048              | 1.11     | 4.19      | 16      | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/MobileNetV1_ssld_pretrained.tar)                 |
+| MobileNetV2_<br>x0_25                | 0.5321    | 0.7652    | 3.79925                | 0.05     | 1.5       | 6.1     | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/MobileNetV2_x0_25_pretrained.tar)                |
+| MobileNetV2_<br>x0_5                 | 0.6503    | 0.8572    | 8.7021                 | 0.17     | 1.93      | 7.8     | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/MobileNetV2_x0_5_pretrained.tar)                 |
+| MobileNetV2_<br>x0_75                | 0.6983    | 0.8901    | 15.531351              | 0.35     | 2.58      | 10      | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/MobileNetV2_x0_75_pretrained.tar)                |
+| MobileNetV2                      | 0.7215    | 0.9065    | 23.317699              | 0.6      | 3.44      | 14      | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/MobileNetV2_pretrained.tar)                      |
+| MobileNetV2_<br>x1_5                 | 0.7412    | 0.9167    | 45.623848              | 1.32     | 6.76      | 26      | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/MobileNetV2_x1_5_pretrained.tar)                 |
+| MobileNetV2_<br>x2_0                 | 0.7523    | 0.9258    | 74.291649              | 2.32     | 11.13     | 43      | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/MobileNetV2_x2_0_pretrained.tar)                 |
+| MobileNetV2_<br>ssld                 | 0.7674    | 0.9339    | 23.317699              | 0.6      | 3.44      | 14      | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/MobileNetV2_ssld_pretrained.tar)                 |
+| MobileNetV3_<br>large_x1_25          | 0.7641    | 0.9295    | 28.217701              | 0.714    | 7.44      | 29      | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/MobileNetV3_large_x1_25_pretrained.tar)          |
+| MobileNetV3_<br>large_x1_0           | 0.7532    | 0.9231    | 19.30835               | 0.45     | 5.47      | 21      | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/MobileNetV3_large_x1_0_pretrained.tar)           |
+| MobileNetV3_<br>large_x0_75          | 0.7314    | 0.9108    | 13.5646                | 0.296    | 3.91      | 16      | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/MobileNetV3_large_x0_75_pretrained.tar)          |
+| MobileNetV3_<br>large_x0_5           | 0.6924    | 0.8852    | 7.49315                | 0.138    | 2.67      | 11      | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/MobileNetV3_large_x0_5_pretrained.tar)           |
+| MobileNetV3_<br>large_x0_35          | 0.6432    | 0.8546    | 5.13695                | 0.077    | 2.1       | 8.6     | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/MobileNetV3_large_x0_35_pretrained.tar)          |
+| MobileNetV3_<br>small_x1_25          | 0.7067    | 0.8951    | 9.2745                 | 0.195    | 3.62      | 14      | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/MobileNetV3_small_x1_25_pretrained.tar)          |
+| MobileNetV3_<br>small_x1_0           | 0.6824    | 0.8806    | 6.5463                 | 0.123    | 2.94      | 12      | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/MobileNetV3_small_x1_0_pretrained.tar)           |
+| MobileNetV3_<br>small_x0_75          | 0.6602    | 0.8633    | 5.28435                | 0.088    | 2.37      | 9.6     | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/MobileNetV3_small_x0_75_pretrained.tar)          |
+| MobileNetV3_<br>small_x0_5           | 0.5921    | 0.8152    | 3.35165                | 0.043    | 1.9       | 7.8     | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/MobileNetV3_small_x0_5_pretrained.tar)           |
+| MobileNetV3_<br>small_x0_35          | 0.5303    | 0.7637    | 2.6352                 | 0.026    | 1.66      | 6.9     | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/MobileNetV3_small_x0_35_pretrained.tar)          |
+| MobileNetV3_<br>small_x0_35_ssld          | 0.5555    | 0.7771    | 2.6352                 | 0.026    | 1.66      | 6.9     | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/MobileNetV3_small_x0_35_ssld_pretrained.tar)          |
+| MobileNetV3_<br>large_x1_0_ssld      | 0.7896    | 0.9448    | 19.30835               | 0.45     | 5.47      | 21      | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/MobileNetV3_large_x1_0_ssld_pretrained.tar)      |
+| MobileNetV3_large_<br>x1_0_ssld_int8 | 0.7605    |     -      | 14.395                 |    -     |      -     | 10      | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/MobileNetV3_large_x1_0_ssld_int8_pretrained.tar) |
+| MobileNetV3_small_<br>x1_0_ssld      | 0.7129    | 0.9010    | 6.5463                 | 0.123    | 2.94      | 12      | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/MobileNetV3_small_x1_0_ssld_pretrained.tar)      |
+| ShuffleNetV2                     | 0.6880    | 0.8845    | 10.941                 | 0.28     | 2.26      | 9       | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/ShuffleNetV2_pretrained.tar)                     |
+| ShuffleNetV2_<br>x0_25               | 0.4990    | 0.7379    | 2.329                  | 0.03     | 0.6       | 2.7     | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/ShuffleNetV2_x0_25_pretrained.tar)               |
+| ShuffleNetV2_<br>x0_33               | 0.5373    | 0.7705    | 2.64335                | 0.04     | 0.64      | 2.8     | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/ShuffleNetV2_x0_33_pretrained.tar)               |
+| ShuffleNetV2_<br>x0_5                | 0.6032    | 0.8226    | 4.2613                 | 0.08     | 1.36      | 5.6     | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/ShuffleNetV2_x0_5_pretrained.tar)                |
+| ShuffleNetV2_<br>x1_5                | 0.7163    | 0.9015    | 19.3522                | 0.58     | 3.47      | 14      | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/ShuffleNetV2_x1_5_pretrained.tar)                |
+| ShuffleNetV2_<br>x2_0                | 0.7315    | 0.9120    | 34.770149              | 1.12     | 7.32      | 28      | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/ShuffleNetV2_x2_0_pretrained.tar)                |
+| ShuffleNetV2_<br>swish               | 0.7003    | 0.8917    | 16.023151              | 0.29     | 2.26      | 9.1     | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/ShuffleNetV2_swish_pretrained.tar)               |
+| DARTS_GS_4M                      | 0.7523    | 0.9215    | 47.204948              | 1.04     | 4.77      | 21      | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/DARTS_GS_4M_pretrained.tar)                      |
+| DARTS_GS_6M                      | 0.7603    | 0.9279    | 53.720802              | 1.22     | 5.69      | 24      | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/DARTS_GS_6M_pretrained.tar)                      |
+| GhostNet_<br>x0_5                    | 0.6688    | 0.8695    | 5.7143                 | 0.082    | 2.6       | 10      | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/GhostNet_x0_5_pretrained.pdparams)               |
+| GhostNet_<br>x1_0                    | 0.7402    | 0.9165    | 13.5587                | 0.294    | 5.2       | 20      | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/GhostNet_x1_0_pretrained.pdparams)               |
+| GhostNet_<br>x1_3                    | 0.7579    | 0.9254    | 19.9825                | 0.44     | 7.3       | 29      | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/GhostNet_x1_3_pretrained.pdparams)               |
+
+
+<a name="SEResNeXt_and_Res2Net_series"></a>
+### SEResNeXt and Res2Net series
+
+Accuracy and inference time metrics of SEResNeXt and Res2Net series models are shown as follows. More detailed information can be refered to [SEResNext and_Res2Net series tutorial](./docs/en/models/SEResNext_and_Res2Net_en.md).
+
+
+| Model                 | Top-1 Acc | Top-5 Acc | time(ms)<br>bs=1 | time(ms)<br>bs=4 | Flops(G) | Params(M) | Download Address                                                                                         |
+|---------------------------|-----------|-----------|-----------------------|----------------------|----------|-----------|----------------------------------------------------------------------------------------------------|
+| Res2Net50_<br>26w_4s          | 0.7933    | 0.9457    | 4.47188               | 9.65722              | 8.52     | 25.7      | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/Res2Net50_26w_4s_pretrained.tar)          |
+| Res2Net50_vd_<br>26w_4s       | 0.7975    | 0.9491    | 4.52712               | 9.93247              | 8.37     | 25.06     | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/Res2Net50_vd_26w_4s_pretrained.tar)       |
+| Res2Net50_<br>14w_8s          | 0.7946    | 0.9470    | 5.4026                | 10.60273             | 9.01     | 25.72     | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/Res2Net50_14w_8s_pretrained.tar)          |
+| Res2Net101_vd_<br>26w_4s      | 0.8064    | 0.9522    | 8.08729               | 17.31208             | 16.67    | 45.22     | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/Res2Net101_vd_26w_4s_pretrained.tar)      |
+| Res2Net200_vd_<br>26w_4s      | 0.8121    | 0.9571    | 14.67806              | 32.35032             | 31.49    | 76.21     | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/Res2Net200_vd_26w_4s_pretrained.tar)      |
+| Res2Net200_vd_<br>26w_4s_ssld | 0.8513    | 0.9742    | 14.67806              | 32.35032             | 31.49    | 76.21     | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/Res2Net200_vd_26w_4s_ssld_pretrained.tar) |
+| ResNeXt50_<br>32x4d           | 0.7775    | 0.9382    | 7.56327               | 10.6134              | 8.02     | 23.64     | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/ResNeXt50_32x4d_pretrained.tar)           |
+| ResNeXt50_vd_<br>32x4d        | 0.7956    | 0.9462    | 7.62044               | 11.03385             | 8.5      | 23.66     | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/ResNeXt50_vd_32x4d_pretrained.tar)        |
+| ResNeXt50_<br>64x4d           | 0.7843    | 0.9413    | 13.80962              | 18.4712              | 15.06    | 42.36     | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/ResNeXt50_64x4d_pretrained.tar)           |
+| ResNeXt50_vd_<br>64x4d        | 0.8012    | 0.9486    | 13.94449              | 18.88759             | 15.54    | 42.38     | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/ResNeXt50_vd_64x4d_pretrained.tar)        |
+| ResNeXt101_<br>32x4d          | 0.7865    | 0.9419    | 16.21503              | 19.96568             | 15.01    | 41.54     | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/ResNeXt101_32x4d_pretrained.tar)          |
+| ResNeXt101_vd_<br>32x4d       | 0.8033    | 0.9512    | 16.28103              | 20.25611             | 15.49    | 41.56     | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/ResNeXt101_vd_32x4d_pretrained.tar)       |
+| ResNeXt101_<br>64x4d          | 0.7835    | 0.9452    | 30.4788               | 36.29801             | 29.05    | 78.12     | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/ResNeXt101_64x4d_pretrained.tar)          |
+| ResNeXt101_vd_<br>64x4d       | 0.8078    | 0.9520    | 30.40456              | 36.77324             | 29.53    | 78.14     | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/ResNeXt101_vd_64x4d_pretrained.tar)       |
+| ResNeXt152_<br>32x4d          | 0.7898    | 0.9433    | 24.86299              | 29.36764             | 22.01    | 56.28     | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/ResNeXt152_32x4d_pretrained.tar)          |
+| ResNeXt152_vd_<br>32x4d       | 0.8072    | 0.9520    | 25.03258              | 30.08987             | 22.49    | 56.3      | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/ResNeXt152_vd_32x4d_pretrained.tar)       |
+| ResNeXt152_<br>64x4d          | 0.7951    | 0.9471    | 46.7564               | 56.34108             | 43.03    | 107.57    | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/ResNeXt152_64x4d_pretrained.tar)          |
+| ResNeXt152_vd_<br>64x4d       | 0.8108    | 0.9534    | 47.18638              | 57.16257             | 43.52    | 107.59    | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/ResNeXt152_vd_64x4d_pretrained.tar)       |
+| SE_ResNet18_vd            | 0.7333    | 0.9138    | 1.7691                | 4.19877              | 4.14     | 11.8      | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/SE_ResNet18_vd_pretrained.tar)            |
+| SE_ResNet34_vd            | 0.7651    | 0.9320    | 2.88559               | 7.03291              | 7.84     | 21.98     | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/SE_ResNet34_vd_pretrained.tar)            |
+| SE_ResNet50_vd            | 0.7952    | 0.9475    | 4.28393               | 10.38846             | 8.67     | 28.09     | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/SE_ResNet50_vd_pretrained.tar)            |
+| SE_ResNeXt50_<br>32x4d        | 0.7844    | 0.9396    | 8.74121               | 13.563               | 8.02     | 26.16     | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/SE_ResNeXt50_32x4d_pretrained.tar)        |
+| SE_ResNeXt50_vd_<br>32x4d     | 0.8024    | 0.9489    | 9.17134               | 14.76192             | 10.76    | 26.28     | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/SE_ResNeXt50_vd_32x4d_pretrained.tar)     |
+| SE_ResNeXt101_<br>32x4d       | 0.7912    | 0.9420    | 18.82604              | 25.31814             | 15.02    | 46.28     | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/SE_ResNeXt101_32x4d_pretrained.tar)       |
+| SENet154_vd               | 0.8140    | 0.9548    | 53.79794              | 66.31684             | 45.83    | 114.29    | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/SENet154_vd_pretrained.tar)               |
+
+
+<a name="DPN_and_DenseNet_series"></a>
+### DPN and DenseNet series
+
+Accuracy and inference time metrics of DPN and DenseNet series models are shown as follows. More detailed information can be refered to [DPN and DenseNet series tutorial](./docs/en/models/DPN_DenseNet_en.md).
+
+
+| Model                 | Top-1 Acc | Top-5 Acc | time(ms)<br>bs=1 | time(ms)<br>bs=4 | Flops(G) | Params(M) | Download Address                                                                                         |
+|-------------|-----------|-----------|-----------------------|----------------------|----------|-----------|--------------------------------------------------------------------------------------|
+| DenseNet121 | 0.7566    | 0.9258    | 4.40447               | 9.32623              | 5.69     | 7.98      | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/DenseNet121_pretrained.tar) |
+| DenseNet161 | 0.7857    | 0.9414    | 10.39152              | 22.15555             | 15.49    | 28.68     | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/DenseNet161_pretrained.tar) |
+| DenseNet169 | 0.7681    | 0.9331    | 6.43598               | 12.98832             | 6.74     | 14.15     | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/DenseNet169_pretrained.tar) |
+| DenseNet201 | 0.7763    | 0.9366    | 8.20652               | 17.45838             | 8.61     | 20.01     | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/DenseNet201_pretrained.tar) |
+| DenseNet264 | 0.7796    | 0.9385    | 12.14722              | 26.27707             | 11.54    | 33.37     | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/DenseNet264_pretrained.tar) |
+| DPN68       | 0.7678    | 0.9343    | 11.64915              | 12.82807             | 4.03     | 10.78     | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/DPN68_pretrained.tar)       |
+| DPN92       | 0.7985    | 0.9480    | 18.15746              | 23.87545             | 12.54    | 36.29     | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/DPN92_pretrained.tar)       |
+| DPN98       | 0.8059    | 0.9510    | 21.18196              | 33.23925             | 22.22    | 58.46     | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/DPN98_pretrained.tar)       |
+| DPN107      | 0.8089    | 0.9532    | 27.62046              | 52.65353             | 35.06    | 82.97     | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/DPN107_pretrained.tar)      |
+| DPN131      | 0.8070    | 0.9514    | 28.33119              | 46.19439             | 30.51    | 75.36     | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/DPN131_pretrained.tar)      |
+
+<a name="HRNet_series"></a>
+### HRNet series
+
+Accuracy and inference time metrics of HRNet series models are shown as follows. More detailed information can be refered to [Mobile series tutorial](./docs/en/models/HRNet_en.md).
+
+
+| Model         | Top-1 Acc | Top-5 Acc | time(ms)<br>bs=1 | time(ms)<br>bs=4 | Flops(G) | Params(M) | Download Address                                                                                 |
+|-------------|-----------|-----------|------------------|------------------|----------|-----------|--------------------------------------------------------------------------------------|
+| HRNet_W18_C | 0.7692    | 0.9339    | 7.40636          | 13.29752         | 4.14     | 21.29     | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/HRNet_W18_C_pretrained.tar) |
+| HRNet_W18_C_ssld | 0.81162    | 0.95804    | 7.40636          | 13.29752         | 4.14     | 21.29     | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/HRNet_W18_C_ssld_pretrained.tar) |
+| HRNet_W30_C | 0.7804    | 0.9402    | 9.57594          | 17.35485         | 16.23    | 37.71     | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/HRNet_W30_C_pretrained.tar) |
+| HRNet_W32_C | 0.7828    | 0.9424    | 9.49807          | 17.72921         | 17.86    | 41.23     | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/HRNet_W32_C_pretrained.tar) |
+| HRNet_W40_C | 0.7877    | 0.9447    | 12.12202         | 25.68184         | 25.41    | 57.55     | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/HRNet_W40_C_pretrained.tar) |
+| HRNet_W44_C | 0.7900    | 0.9451    | 13.19858         | 32.25202         | 29.79    | 67.06     | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/HRNet_W44_C_pretrained.tar) |
+| HRNet_W48_C | 0.7895    | 0.9442    | 13.70761         | 34.43572         | 34.58    | 77.47     | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/HRNet_W48_C_pretrained.tar) |
+| HRNet_W48_C_ssld | 0.8363    | 0.9682    | 13.70761         | 34.43572         | 34.58    | 77.47     | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/HRNet_W48_C_pretrained.tar) |
+| HRNet_W64_C | 0.7930    | 0.9461    | 17.57527         | 47.9533          | 57.83    | 128.06    | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/HRNet_W64_C_pretrained.tar) |
+
+
+<a name="Inception_series"></a>
+### Inception series
+
+Accuracy and inference time metrics of Inception series models are shown as follows. More detailed information can be refered to [Inception series tutorial](./docs/en/models/Inception_en.md).
+
+
+| Model                 | Top-1 Acc | Top-5 Acc | time(ms)<br>bs=1 | time(ms)<br>bs=4 | Flops(G) | Params(M) | Download Address                                                                                         |
+|--------------------|-----------|-----------|-----------------------|----------------------|----------|-----------|---------------------------------------------------------------------------------------------|
+| GoogLeNet          | 0.7070    | 0.8966    | 1.88038               | 4.48882              | 2.88     | 8.46      | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/GoogLeNet_pretrained.tar)          |
+| Xception41         | 0.7930    | 0.9453    | 4.96939               | 17.01361             | 16.74    | 22.69     | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/Xception41_pretrained.tar)         |
+| Xception41_deeplab | 0.7955    | 0.9438    | 5.33541               | 17.55938             | 18.16    | 26.73     | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/Xception41_deeplab_pretrained.tar) |
+| Xception65         | 0.8100    | 0.9549    | 7.26158               | 25.88778             | 25.95    | 35.48     | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/Xception65_pretrained.tar)         |
+| Xception65_deeplab | 0.8032    | 0.9449    | 7.60208               | 26.03699             | 27.37    | 39.52     | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/Xception65_deeplab_pretrained.tar) |
+| Xception71         | 0.8111    | 0.9545    | 8.72457               | 31.55549             | 31.77    | 37.28     | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/Xception71_pretrained.tar)         |
+| InceptionV4        | 0.8077    | 0.9526    | 12.99342              | 25.23416             | 24.57    | 42.68     | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/InceptionV4_pretrained.tar)        |
+
+
+<a name="EfficientNet_and_ResNeXt101_wsl_series"></a>
+### EfficientNet and ResNeXt101_wsl series
+
+Accuracy and inference time metrics of EfficientNet and ResNeXt101_wsl series models are shown as follows. More detailed information can be refered to [EfficientNet and ResNeXt101_wsl series tutorial](./docs/en/models/EfficientNet_and_ResNeXt101_wsl_en.md).
+
+
+| Model                       | Top-1 Acc | Top-5 Acc | time(ms)<br>bs=1 | time(ms)<br>bs=4 | Flops(G) | Params(M) | Download Address                                                                                               |
+|---------------------------|-----------|-----------|------------------|------------------|----------|-----------|----------------------------------------------------------------------------------------------------|
+| ResNeXt101_<br>32x8d_wsl      | 0.8255    | 0.9674    | 18.52528         | 34.25319         | 29.14    | 78.44     | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/ResNeXt101_32x8d_wsl_pretrained.tar)      |
+| ResNeXt101_<br>32x16d_wsl     | 0.8424    | 0.9726    | 25.60395         | 71.88384         | 57.55    | 152.66    | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/ResNeXt101_32x16d_wsl_pretrained.tar)     |
+| ResNeXt101_<br>32x32d_wsl     | 0.8497    | 0.9759    | 54.87396         | 160.04337        | 115.17   | 303.11    | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/ResNeXt101_32x32d_wsl_pretrained.tar)     |
+| ResNeXt101_<br>32x48d_wsl     | 0.8537    | 0.9769    | 99.01698256      | 315.91261        | 173.58   | 456.2     | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/ResNeXt101_32x48d_wsl_pretrained.tar)     |
+| Fix_ResNeXt101_<br>32x48d_wsl | 0.8626    | 0.9797    | 160.0838242      | 595.99296        | 354.23   | 456.2     | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/Fix_ResNeXt101_32x48d_wsl_pretrained.tar) |
+| EfficientNetB0            | 0.7738    | 0.9331    | 3.442            | 6.11476          | 0.72     | 5.1       | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/EfficientNetB0_pretrained.tar)            |
+| EfficientNetB1            | 0.7915    | 0.9441    | 5.3322           | 9.41795          | 1.27     | 7.52      | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/EfficientNetB1_pretrained.tar)            |
+| EfficientNetB2            | 0.7985    | 0.9474    | 6.29351          | 10.95702         | 1.85     | 8.81      | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/EfficientNetB2_pretrained.tar)            |
+| EfficientNetB3            | 0.8115    | 0.9541    | 7.67749          | 16.53288         | 3.43     | 11.84     | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/EfficientNetB3_pretrained.tar)            |
+| EfficientNetB4            | 0.8285    | 0.9623    | 12.15894         | 30.94567         | 8.29     | 18.76     | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/EfficientNetB4_pretrained.tar)            |
+| EfficientNetB5            | 0.8362    | 0.9672    | 20.48571         | 61.60252         | 19.51    | 29.61     | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/EfficientNetB5_pretrained.tar)            |
+| EfficientNetB6            | 0.8400    | 0.9688    | 32.62402         | -                | 36.27    | 42        | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/EfficientNetB6_pretrained.tar)            |
+| EfficientNetB7            | 0.8430    | 0.9689    | 53.93823         | -                | 72.35    | 64.92     | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/EfficientNetB7_pretrained.tar)            |
+| EfficientNetB0_<br>small      | 0.7580    | 0.9258    | 2.3076           | 4.71886          | 0.72     | 4.65      | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/EfficientNetB0_small_pretrained.tar)      |
+
+
+<a name="ResNeSt_and_RegNet_series"></a>
+### ResNeSt and RegNet series
+
+Accuracy and inference time metrics of ResNeSt and RegNet series models are shown as follows. More detailed information can be refered to [ResNeSt and RegNet series tutorial](./docs/en/models/ResNeSt_RegNet_en.md).
+
+
+| Model                    | Top-1 Acc | Top-5 Acc | time(ms)<br>bs=1 | time(ms)<br>bs=4 | Flops(G) | Params(M) | Download Address                                                                                                 |
+|------------------------|-----------|-----------|------------------|------------------|----------|-----------|------------------------------------------------------------------------------------------------------|
+| ResNeSt50_<br>fast_1s1x64d | 0.8035    | 0.9528    | 3.45405                | 8.72680                | 8.68     | 26.3      | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/ResNeSt50_fast_1s1x64d_pretrained.pdparams) |
+| ResNeSt50              | 0.8102    | 0.9542    | 6.69042    | 8.01664                | 10.78    | 27.5      | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/ResNeSt50_pretrained.pdparams)              |
+| RegNetX_4GF            | 0.785     | 0.9416    |    6.46478              |      11.19862           | 8        | 22.1      | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/RegNetX_4GF_pretrained.pdparams)            |
+
+
+<a name="License"></a>
+## License
+
+PaddleClas is released under the <a href="https://github.com/PaddlePaddle/PaddleClas/blob/master/LICENSE">Apache 2.0 license</a>
+
+
+<a name="Contribution"></a>
+## Contribution
+
+Contributions are highly welcomed and we would really appreciate your feedback!!
+
+- Thank [nblib](https://github.com/nblib) to fix bug of RandErasing.
+- Thank [chenpy228](https://github.com/chenpy228) to fix some typos PaddleClas.

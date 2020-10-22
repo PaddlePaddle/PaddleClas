@@ -47,7 +47,7 @@ def parse_args():
     return args
 
 
-def main(args):
+def main(args, return_dict={}):
     config = get_config(args.config, overrides=args.override, show=True)
     # assign place
     use_gpu = config.get("use_gpu", True)
@@ -68,6 +68,8 @@ def main(args):
 
     top1_acc = program.run(valid_dataloader, config, net, None, None, 0,
                            'valid')
+    return_dict["top1_acc"] = top1_acc
+    return top1_acc
 
 
 if __name__ == '__main__':

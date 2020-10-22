@@ -2,7 +2,6 @@ mode: 'train'
 ARCHITECTURE:
     name: "EfficientNetB0"
     params:
-        is_test: False
         padding_type : "SAME"
         override_params:
             drop_connect_rate: 0.1
@@ -46,7 +45,7 @@ TRAIN:
     transforms:
         - DecodeImage:
             to_rgb: True
-            to_np: Fals
+            to_np: False
             channel_first: False
         - RandCropImage:
             size: 224
