@@ -175,9 +175,9 @@ python tools/infer/infer.py \
 
 参数说明：
 + `image_file`(简写 i)：待预测的图片文件路径，如 `./test.jpeg`
-+ `model_file`(简写 m)：模型文件路径，如 `./resnet50-vd/model`
-+ `params_file`(简写 p)：权重文件路径，如 `./resnet50-vd/params`
-+ `use_gpu` : 是否开启GPU训练，默认值：True
++ `model`(简写 m)：模型名称，如 `ResNet50_vd`
++ `pretrained_model`(简写 p)：权重文件路径，如 `./pretrained/ResNet50_vd_pretrained/`
++ `use_gpu` : 是否开启GPU训练，默认值：`True`
 
 
 训练引擎构建：
