@@ -6,6 +6,9 @@
 
 飞桨图像分类套件PaddleClas是飞桨为工业界和学术界所准备的一个图像分类任务的工具集，助力使用者训练出更好的视觉模型和应用落地。
 
+
+**注意**: 百度提出了一个新的图像分类网络结构 **`HS-ResNet`** ，基于ImageNet-1k数据集，`HS-ResNet`在与`ResNet`的params相近的情况下，Top-1 Acc达到了81.3%，相应的Arxiv文章链接可以参考这里：[HS-ResNet: Hierarchical-Split Block on Convolutional Neural Network](https://arxiv.org/pdf/2010.07621.pdf)，模型结构和预训练模型参数即将开源，敬请期待！
+
 **近期更新**
 - 2020.10.12 添加Paddle-Lite demo。
 - 2020.10.10 添加cpp inference demo，完善`FAQ 30问`教程。
