@@ -106,9 +106,9 @@ def init_model(config, net, optimizer=None):
             "Given dir {}.pdparams not exist.".format(checkpoints)
         assert os.path.exists(checkpoints + ".pdopt"), \
             "Given dir {}.pdopt not exist.".format(checkpoints)
-        para_dict, opti_dict = paddle(checkpoints)
+        para_dict, opti_dict = paddle.load(checkpoints)
         net.set_dict(para_dict)
-        optimizer.set_dict(opti_dict)
+        optimizer.set_state_dict(opti_dict)
         logger.info(
             logger.coloring("Finish initing model from {}".format(checkpoints),
                             "HEADER"))
