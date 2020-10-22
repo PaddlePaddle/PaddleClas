@@ -28,6 +28,7 @@ import paddle
 from paddle.distributed import ParallelEnv
 import paddle.nn.functional as F
 
+
 def parse_args():
     def str2bool(v):
         return v.lower() in ("true", "t", "1")
@@ -37,7 +38,7 @@ def parse_args():
     parser.add_argument("-m", "--model", type=str)
     parser.add_argument("-p", "--pretrained_model", type=str)
     parser.add_argument("--use_gpu", type=str2bool, default=True)
-    parser.add_argument("--load_static_weights", type=str2bool, default=True)
+    parser.add_argument("--load_static_weights", type=str2bool, default=False)
 
     return parser.parse_args()
 

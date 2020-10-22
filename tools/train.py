@@ -83,7 +83,7 @@ def main(args):
     if config.validate and ParallelEnv().local_rank == 0:
         valid_dataloader = Reader(config, 'valid', places=place)()
 
-    last_epoch_id = config.get("last_epoch", 0)
+    last_epoch_id = config.get("last_epoch", -1)
     best_top1_acc = 0.0  # best top1 acc record
     best_top1_epoch = last_epoch_id
     for epoch_id in range(last_epoch_id + 1, config.epochs):

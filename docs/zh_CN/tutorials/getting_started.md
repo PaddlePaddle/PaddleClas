@@ -79,7 +79,7 @@ python tools/train.py \
 其中配置文件不需要做任何修改，只需要在继续训练时设置`checkpoints`参数即可，表示加载的断点权重文件路径，使用该参数会同时加载保存的断点权重和学习率、优化器等信息。
 
 **注意**：
-* 参数`-o last_epoch=5`表示将上一次训练轮次数记为`5`，即本次训练轮次数从`6`开始计算。
+* 参数`-o last_epoch=5`表示将上一次训练轮次数记为`5`，即本次训练轮次数从`6`开始计算，该值默认为-1，表示本次训练轮次数从`0`开始计算。
 
 * `-o checkpoints`参数无需包含断点权重文件的后缀名，上述训练命令会在训练过程中生成如下所示的断点权重文件，若想从断点`0`继续训练，则`checkpoints`参数只需设置为`"./output/MobileNetV3_large_x1_0_gpupaddle/0/ppcls"`，PaddleClas会自动补充后缀名。
     ```shell
@@ -200,9 +200,30 @@ python -m paddle.distributed.launch \
 参数说明详见[1.4 模型评估](#1.4)。
 
 
-## 3. 模型推理
+## 3. 使用预训练模型进行模型预测
 
-PaddlePaddle提供三种方式进行预测推理，接下来介绍如何用预测引擎进行推理：
+模型训练完成之后，可以加载训练得到的预训练模型，进行模型预测。在模型库的 `tools/infer/infer.py` 中提供了完整的示例，只需执行下述命令即可完成模型预测：
+
+```python
+python tools/infer/infer.py \
+    --i=待预测的图片文件路径 \
+    --m=模型名称 \
+    --p=persistable 模型路径 \
+    --use_gpu=True \
+    --load_static_weights=False
+```
+
+参数说明：
++ `image_file`(简写 i)：待预测的图片文件路径或者批量预测时的图片文件夹，如 `./test.jpeg`
++ `model`(简写 m)：模型名称，如 `ResNet50_vd`
++ `pretrained_model`(简写 p)：权重文件路径，如 `./pretrained/ResNet50_vd_pretrained/`
++ `use_gpu` : 是否开启GPU训练，默认值：`True`
++ `load_static_weights` : 是否加载静态图训练得到的预训练模型，默认值：`False`
+
+
+## 4. 使用inference模型模型推理
+
+通过导出inference模型，PaddlePaddle支持使用预测引擎进行预测推理。接下来介绍如何用预测引擎进行推理：
 首先，对训练好的模型进行转换：
 
 ```bash
@@ -214,7 +235,7 @@ python tools/export_model.py \
 
 其中，参数`--model`用于指定模型名称，`--pretrained_model`用于指定模型文件路径，该路径仍无需包含模型文件后缀名（如[1.3 模型恢复训练](#1.3)），`--output_path`用于指定转换后模型的存储路径。
 
-**注意**：文件`export_model.py:53`中，`shape`参数为模型输入图像的`shape`，默认为`224*224`，请根据实际情况修改，如下所示：
+**注意**：文件`export_model.py:line53`中，`shape`参数为模型输入图像的`shape`，默认为`224*224`，请根据实际情况修改，如下所示：
 ```python
 50 # Please modify the 'shape' according to actual needs
 51 @to_static(input_spec=[
@@ -238,6 +259,6 @@ python tools/infer/predict.py \
 + `model_file`(简写 m)：模型文件路径，如 `./MobileNetV3_large_x1_0/__model__`
 + `params_file`(简写 p)：权重文件路径，如 `./MobileNetV3_large_x1_0/__variables__`
 + `use_tensorrt`：是否使用 TesorRT 预测引擎，默认值：`True`
-+ `use_gpu`：是否使用 GPU 预测，默认值：`True`
++ `use_gpu`：是否使用 GPU 预测，默认值：`True`。
 
-更多使用方法和推理方式请参考[分类预测框架](../extension/paddle_inference.md)。
+* 如果你希望评测模型速度，建议使用该脚本(`tools/infer/predict.py`)，同时开启TensorRT加速预测。
