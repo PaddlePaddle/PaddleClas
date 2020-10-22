@@ -53,7 +53,7 @@ class ConvBNLayer(nn.Layer):
             param_attr=ParamAttr(name=bn_name + "_scale", regularizer=L2DecayRegularizer(regularization_coeff=0.0)),
             bias_attr=ParamAttr(name=bn_name + "_offset", regularizer=L2DecayRegularizer(regularization_coeff=0.0)),
             moving_mean_name=bn_name + "_mean",
-            moving_variance_name=bn_name + "_variance"
+            moving_variance_name=name + "_variance"  # wrong due to an old typo, will be fixed later.
         )
 
     def forward(self, inputs):
@@ -173,7 +173,7 @@ class GhostBottleneck(nn.Layer):
                 stride=stride,
                 groups=hidden_dim,
                 act=None,
-                name=name+"_depthwise"  # In the old version, name was name + "_depthwise_depthwise"
+                name=name+"_depthwise_depthwise"  # looks strange due to an old typo, will be fixed later.
             )
         if use_se:
             self.se_block = SEBlock(
@@ -195,7 +195,7 @@ class GhostBottleneck(nn.Layer):
                 stride=stride,
                 groups=in_channels,
                 act=None,
-                name=name + "_shortcut_depthwise"  # In the old version, name was name + "_shortcut_depthwise_depthwise"
+                name=name + "_shortcut_depthwise_depthwise"  # looks strange due to an old typo, will be fixed later.
             )
             self.shortcut_conv = ConvBNLayer(
                 in_channels=in_channels,
