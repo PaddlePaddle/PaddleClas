@@ -170,7 +170,8 @@ python tools/infer/infer.py \
     --i=待预测的图片文件路径 \
     --m=模型名称 \
     --p=persistable 模型路径 \
-    --use_gpu=True
+    --use_gpu=True \
+    --load_static_weights=False
 ```
 
 参数说明：
@@ -178,6 +179,7 @@ python tools/infer/infer.py \
 + `model`(简写 m)：模型名称，如 `ResNet50_vd`
 + `pretrained_model`(简写 p)：权重文件路径，如 `./pretrained/ResNet50_vd_pretrained/`
 + `use_gpu` : 是否开启GPU训练，默认值：`True`
++ `load_static_weights` : 是否加载静态图训练得到的预训练模型，默认值：`False`
 
 
 训练引擎构建：
