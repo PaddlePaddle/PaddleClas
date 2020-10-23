@@ -50,6 +50,7 @@
     - [Inception系列](#Inception系列)
     - [EfficientNet与ResNeXt101_wsl系列](#EfficientNet与ResNeXt101_wsl系列)
     - [ResNeSt与RegNet系列](#ResNeSt与RegNet系列)
+    - HS-ResNet: arxiv文章链接: [https://arxiv.org/pdf/2010.07621.pdf](https://arxiv.org/pdf/2010.07621.pdf)。 代码和预训练模型即将开源，敬请期待。
 - 模型训练/评估
     - [数据准备](./docs/zh_CN/tutorials/data.md)
     - [模型训练与微调](./docs/zh_CN/tutorials/getting_started.md)
