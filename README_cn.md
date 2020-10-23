@@ -88,7 +88,7 @@
 
 常见服务器端模型的精度指标与其预测耗时的变化曲线如下图所示。
 
-![](./docs/images/models/T4_benchmark/t4.fp32.bs4.main_fps_top1.png)
+![](./docs/images/models/T4_benchmark/t4.fp32.bs1.main_fps_top1.png)
 
 
 常见移动端模型的精度指标与其预测耗时、模型存储大小的变化曲线如下图所示。

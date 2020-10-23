@@ -88,7 +88,7 @@ Based on the ImageNet-1k classification dataset, the 24 classification network s
 
 Curves of accuracy to the inference time of common server-side models are shown as follows.
 
-![](./docs/images/models/T4_benchmark/t4.fp32.bs4.main_fps_top1.png)
+![](./docs/images/models/T4_benchmark/t4.fp32.bs1.main_fps_top1.png)
 
 
 Curves of accuracy to the inference time and storage size of common mobile-side models are shown as follows.
