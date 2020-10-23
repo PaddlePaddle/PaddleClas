@@ -219,6 +219,8 @@ python tools/infer/infer.py \
 + `pretrained_model`(简写 p)：权重文件路径，如 `./pretrained/ResNet50_vd_pretrained/`
 + `use_gpu` : 是否开启GPU训练，默认值：`True`
 + `load_static_weights` : 是否加载静态图训练得到的预训练模型，默认值：`False`
++ `pre_label_image` : 是否对图像数据进行预标注，默认值：`False`
++ `pre_label_out_idr` : 预标注图像数据的输出文件夹，当`pre_label_image=True`时，会在该文件夹下面生成很多个子文件夹，每个文件夹名称为类别id，其中存储模型预测属于该类别的所有图像。
 
 
 ## 4. 使用inference模型模型推理
