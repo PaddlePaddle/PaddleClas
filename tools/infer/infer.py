@@ -15,6 +15,7 @@
 import numpy as np
 import argparse
 import utils
+import shutil
 import os
 import sys
 __dir__ = os.path.dirname(os.path.abspath(__file__))
@@ -38,7 +39,19 @@ def parse_args():
     parser.add_argument("-m", "--model", type=str)
     parser.add_argument("-p", "--pretrained_model", type=str)
     parser.add_argument("--use_gpu", type=str2bool, default=True)
-    parser.add_argument("--load_static_weights", type=str2bool, default=False)
+    parser.add_argument(
+        "--load_static_weights",
+        type=str2bool,
+        default=False,
+        help='Whether to load the pretrained weights saved in static mode')
+
+    # parameters for pre-label the images
+    parser.add_argument(
+        "--pre_label_image",
+        type=str2bool,
+        default=False,
+        help="Whether to pre-label the images using the loaded weights")
+    parser.add_argument("--pre_label_out_idr", type=str, default=None)
 
     return parser.parse_args()
 
@@ -63,7 +76,6 @@ def preprocess(fname, ops):
     data = open(fname, 'rb').read()
     for op in ops:
         data = op(data)
-
     return data
 
 
@@ -89,6 +101,13 @@ def get_image_list(img_file):
     if len(imgs_lists) == 0:
         raise Exception("not found any img file in {}".format(img_file))
     return imgs_lists
+
+
+def save_prelabel_results(class_id, input_filepath, output_idr):
+    output_dir = os.path.join(output_idr, str(class_id))
+    if not os.path.isdir(output_dir):
+        os.makedirs(output_dir)
+    shutil.copy(input_filepath, output_dir)
 
 
 def main():
@@ -117,14 +136,22 @@ def main():
         else:
             outputs = F.softmax(outputs)
         outputs = outputs.numpy()
-
         probs = postprocess(outputs)
+
+        top1_class_id = 0
         rank = 1
         print("Current image file: {}".format(filename))
         for idx, prob in probs:
             print("\ttop{:d}, class id: {:d}, probability: {:.4f}".format(
                 rank, idx, prob))
+            if rank == 1:
+                top1_class_id = idx
             rank += 1
+
+        if args.pre_label_image:
+            save_prelabel_results(top1_class_id, filename,
+                                  args.pre_label_out_idr)
+
     return
 
 
