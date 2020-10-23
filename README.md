@@ -53,8 +53,8 @@ PaddleClas is a toolset for image classification tasks prepared for the industry
     - [Model training and finetuning](./docs/en/tutorials/getting_started_en.md)
     - [Model evaluation](./docs/en/tutorials/getting_started_en.md)
 - Model prediction/inference
-    - [Prediction based on training engine](./docs/en/extension/paddle_inference_en.md)
-    - [Python inference](./docs/en/extension/paddle_inference_en.md)
+    - [Prediction based on training engine](./docs/en/tutorials/getting_started_en.md)
+    - [Python inference](./docs/en/tutorials/getting_started_en.md)
     - [C++ inference](./deploy/cpp_infer/readme_en.md)
     - [Serving deployment](./docs/en/extension/paddle_serving_en.md)
     - [Mobile](./deploy/lite/readme_en.md)

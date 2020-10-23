@@ -165,6 +165,7 @@ python -m paddle.distributed.launch \
 [30分钟玩转PaddleClas教程](./quick_start.md)中包含大量模型微调的示例，可以参考该章节在特定的数据集上进行模型微调。
 
 
+<a name="model_resume"></a>
 ### 2.3 模型恢复训练
 
 如果训练任务因为其他原因被终止，也可以加载断点权重文件继续训练。
@@ -200,6 +201,7 @@ python -m paddle.distributed.launch \
 参数说明详见[1.4 模型评估](#1.4)。
 
 
+<a name="model_infer"></a>
 ## 3. 使用预训练模型进行模型预测
 
 模型训练完成之后，可以加载训练得到的预训练模型，进行模型预测。在模型库的 `tools/infer/infer.py` 中提供了完整的示例，只需执行下述命令即可完成模型预测：
@@ -219,8 +221,11 @@ python tools/infer/infer.py \
 + `pretrained_model`(简写 p)：权重文件路径，如 `./pretrained/ResNet50_vd_pretrained/`
 + `use_gpu` : 是否开启GPU训练，默认值：`True`
 + `load_static_weights` : 是否加载静态图训练得到的预训练模型，默认值：`False`
++ `pre_label_image` : 是否对图像数据进行预标注，默认值：`False`
++ `pre_label_out_idr` : 预标注图像数据的输出文件夹，当`pre_label_image=True`时，会在该文件夹下面生成很多个子文件夹，每个文件夹名称为类别id，其中存储模型预测属于该类别的所有图像。
 
 
+<a name="model_inference"></a>
 ## 4. 使用inference模型模型推理
 
 通过导出inference模型，PaddlePaddle支持使用预测引擎进行预测推理。接下来介绍如何用预测引擎进行推理：

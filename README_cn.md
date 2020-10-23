@@ -56,8 +56,8 @@
     - [模型训练与微调](./docs/zh_CN/tutorials/getting_started.md)
     - [模型评估](./docs/zh_CN/tutorials/getting_started.md)
 - 模型预测
-    - [基于训练引擎预测推理](./docs/zh_CN/extension/paddle_inference.md)
-    - [基于Python预测引擎预测推理](./docs/zh_CN/extension/paddle_inference.md)
+    - [基于训练引擎预测推理](./docs/zh_CN/tutorials/getting_started.md)
+    - [基于Python预测引擎预测推理](./docs/zh_CN/tutorials/getting_started.md)
     - [基于C++预测引擎预测推理](./deploy/cpp_infer/readme.md)
     - [服务化部署](./docs/zh_CN/extension/paddle_serving.md)
     - [端侧部署](./deploy/lite/readme.md)
