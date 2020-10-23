@@ -6,9 +6,6 @@
 
 PaddleClas is a toolset for image classification tasks prepared for the industry and academia. It helps users train better computer vision models and apply them in real scenarios.
 
-
-**Note**: Baidu proposed a new image classification network structure **`HS-ResNet`**, which reaches 81.3% on ImageNet-1k dataset, while its `params` is almost same as `ResNet50`.The arxiv link is here: [HS-ResNet: Hierarchical-Split Block on Convolutional Neural Network](https://arxiv.org/pdf/2010.07621.pdf). The model structure and the pretrained weights are coming soon!
-
 **Recent update**
 - 2020.09.17 Add `Res2Net50_vd_26w_4s_ssld` pretrained model, whose Top-1 Acc on ImageNet-1k dataset reaches 83.1%. Add `Res2Net101_vd_26w_4s_ssld` pretrained model, whose Top-1 Acc on ImageNet-1k dataset reaches 83.9%.
 - 2020.10.12 Add Paddle-Lite demo。
@@ -50,6 +47,7 @@ PaddleClas is a toolset for image classification tasks prepared for the industry
     - [Inception series](#Inception_series)
     - [EfficientNet and ResNeXt101_wsl series](#EfficientNet_and_ResNeXt101_wsl_series)
     - [ResNeSt and RegNet series](#ResNeSt_and_RegNet_series)
+    - HS-ResNet: arxiv link: [https://arxiv.org/pdf/2010.07621.pdf](https://arxiv.org/pdf/2010.07621.pdf). Code and models are coming soon!
 - Model training/evaluation
     - [Data preparation](./docs/en/tutorials/data_en.md)
     - [Model training and finetuning](./docs/en/tutorials/getting_started_en.md)
