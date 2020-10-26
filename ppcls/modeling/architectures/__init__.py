@@ -42,5 +42,6 @@ from .shufflenet_v2 import ShuffleNetV2_x0_25, ShuffleNetV2_x0_33, ShuffleNetV2_
 from .squeezenet import SqueezeNet1_0, SqueezeNet1_1
 from .vgg import VGG11, VGG13, VGG16, VGG19
 from .darknet import DarkNet53
+from .regnet import RegNetX_200MF, RegNetX_4GF, RegNetX_32GF, RegNetY_200MF, RegNetY_4GF, RegNetY_32GF
 
 from .distillation_models import ResNet50_vd_distill_MobileNetV3_large_x1_0
