@@ -70,7 +70,7 @@ python tools/train.py \
 The configuration file does not need to be modified. You only need to add the `checkpoints` parameter during training, which represents the path of the checkpoints. The parameter weights, learning rate, optimizer and other information will be loaded using this parameter.
 
 **Note**:
-* The parameter `-o last_epoch=5` means to record the number of the last training epoch as `5`, that is, the number of this training epoch starts from `6`.
+* The parameter `-o last_epoch=5` means to record the number of the last training epoch as `5`, that is, the number of this training epoch starts from `6`, , and the parameter defaults to `-1`, which means the number of this training epoch starts from `0`.
 
 * The `-o checkpoints` parameter does not need to include the suffix of the checkpoints. The above training command will generate the checkpoints as shown below during the training process. If you want to continue training from the epoch `0`, Just set the `checkpoints` to `./output/MobileNetV3_large_x1_0_gpupaddle/0/ppcls`, PaddleClas will automatically fill in the `pdopt` and `pdparams` suffixes.
 
@@ -154,6 +154,7 @@ Among them, `pretrained_model` is used to set the address to load the pretrained
 
 There contains a lot of examples of model finetuning in [Quick Start](./quick_start_en.md). You can refer to this tutorial to finetune the model on a specific dataset.
 
+<a name="model_resume"></a>
 ### 2.3 Resume Training
 
 If the training process is terminated for some reasons, you can also load the checkpoints to continue training.
@@ -185,10 +186,34 @@ python tools/eval.py \
 
 You can modify the `ARCHITECTURE.name` field and `pretrained_model` field in `configs/eval.yaml` to configure the evaluation model, and you also can update the configuration through the `-o` parameter.
 
+<a name="model_infer"></a>
+## 3. Use the pre-trained model to predict
+After the training is completed, you can predict by using the pre-trained model obtained by the training, as follows:
 
-## 3. Model inference
+```python
+python tools/infer/infer.py \
+    --i image path \
+    --m model name \
+    --p path to persistence model \
+    --use_gpu True \
+    --load_static_weights False
+```
 
-PaddlePaddle provides three ways to perform model inference. Next, how to use the inference engine to perform model inference will be introduced.
+Among them:
++ `image_file`(i): The path of the image file to be predicted, such as `./test.jpeg`;
++ `model`(m): Model name, such as `MobileNetV3_large_x1_0`;
++ `pretrained_model`(p): Weight file path, such as `./pretrained/MobileNetV3_large_x1_0_pretrained/`;
++ `use_gpu`: Whether to use the GPU, default by `True`;
++ `load_static_weights`: Whether to load the pre-trained model obtained from static image training, default by `False`;
++ `pre_label_image`: Whether to pre-label the image data, default value: `False`;
++ `pre_label_out_idr`: The output path of pre-labeled image data. When `pre_label_image=True`, a lot of subfolders will be generated under the path, each subfolder represent a category, which stores all the images predicted by the model to belong to the category.
+
+About more detailed infomation, you can refer to [infer.py](../../../tools/infer/infer.py).
+
+<a name="model_inference"></a>
+## 4. Use the inference model to predict
+
+PaddlePaddle supports inference using prediction engines, which will be introduced next.
 
 Firstly, you should export inference model using `tools/export_model.py`.
 
@@ -201,7 +226,17 @@ python tools/export_model.py \
 ```
 Among them, the `--model` parameter is used to specify the model name, `--pretrained_model` parameter is used to specify the model file path, the path does not need to include the model file suffix name, and `--output_path` is used to specify the storage path of the converted model .
 
-The above command will generate the model structure file (`__model__`) and the model weight file (`__variables__`), and then the prediction engine can be used for inference:
+**Note**: In the file `export_model.py:line53`, the `shape` parameter is the shape of the model input image, the default is `224*224`. Please modify it according to the actual situation, as shown below:
+
+```python
+50 # Please modify the 'shape' according to actual needs
+51 @to_static(input_spec=[
+52     paddle.static.InputSpec(
+53         shape=[None, 3, 224, 224], dtype='float32')
+54 ])
+```
+
+The above command will generate the model structure file (`__model__`) and the model weight file (`__variables__`), and then the inference engine can be used for inference:
 
 ```bash
 python tools/infer/predict.py \
@@ -218,4 +253,4 @@ Among them:
 + `use_tensorrt`: Whether to use the TesorRT, default by `True`;
 + `use_gpu`: Whether to use the GPU, default by `True`.
 
-Please refer to [inference](../extension/paddle_inference_en.md) for more details.
+If you want to evaluate the speed of the model, it is recommended to use [predict.py](../../../tools/infer/predict.py), and enable TensorRT to accelerate.
