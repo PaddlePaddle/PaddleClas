@@ -2,8 +2,8 @@ import paddle
 from paddle import ParamAttr
 import paddle.nn as nn
 import paddle.nn.functional as F
-from paddle.nn import Conv2d, BatchNorm, Linear, Dropout
-from paddle.nn import AdaptiveAvgPool2d, MaxPool2d, AvgPool2d
+from paddle.nn import Conv2D, BatchNorm, Linear, Dropout
+from paddle.nn import AdaptiveAvgPool2D, MaxPool2D, AvgPool2D
 from paddle.nn.initializer import Uniform
 import math
 
@@ -21,7 +21,7 @@ class ConvBNLayer(nn.Layer):
                  name=None):
         super(ConvBNLayer, self).__init__()
 
-        self._conv = Conv2d(
+        self._conv = Conv2D(
             in_channels=num_channels,
             out_channels=num_filters,
             kernel_size=filter_size,
@@ -75,7 +75,7 @@ class EntryFlowBottleneckBlock(nn.Layer):
         super(EntryFlowBottleneckBlock, self).__init__()
         self.relu_first = relu_first
 
-        self._short = Conv2d(
+        self._short = Conv2D(
             in_channels=input_channels,
             out_channels=output_channels,
             kernel_size=1,
@@ -93,7 +93,7 @@ class EntryFlowBottleneckBlock(nn.Layer):
             output_channels,
             stride=1,
             name=name + "_branch2b_weights")
-        self._pool = MaxPool2d(kernel_size=3, stride=stride, padding=1)
+        self._pool = MaxPool2D(kernel_size=3, stride=stride, padding=1)
 
     def forward(self, inputs):
         conv0 = inputs
@@ -104,7 +104,7 @@ class EntryFlowBottleneckBlock(nn.Layer):
         conv2 = F.relu(conv1)
         conv2 = self._conv2(conv2)
         pool = self._pool(conv2)
-        return paddle.elementwise_add(x=short, y=pool)
+        return paddle.add(x=short, y=pool)
 
 
 class EntryFlow(nn.Layer):
@@ -181,7 +181,7 @@ class MiddleFlowBottleneckBlock(nn.Layer):
         conv1 = self._conv_1(conv1)
         conv2 = F.relu(conv1)
         conv2 = self._conv_2(conv2)
-        return paddle.elementwise_add(x=inputs, y=conv2)
+        return paddle.add(x=inputs, y=conv2)
 
 
 class MiddleFlow(nn.Layer):
@@ -249,7 +249,7 @@ class ExitFlowBottleneckBlock(nn.Layer):
                  name):
         super(ExitFlowBottleneckBlock, self).__init__()
 
-        self._short = Conv2d(
+        self._short = Conv2D(
             in_channels=input_channels,
             out_channels=output_channels2,
             kernel_size=1,
@@ -267,7 +267,7 @@ class ExitFlowBottleneckBlock(nn.Layer):
             output_channels2,
             stride=1,
             name=name + "_branch2b_weights")
-        self._pool = MaxPool2d(kernel_size=3, stride=2, padding=1)
+        self._pool = MaxPool2D(kernel_size=3, stride=2, padding=1)
 
     def forward(self, inputs):
         short = self._short(inputs)
@@ -276,7 +276,7 @@ class ExitFlowBottleneckBlock(nn.Layer):
         conv2 = F.relu(conv1)
         conv2 = self._conv_2(conv2)
         pool = self._pool(conv2)
-        return paddle.elementwise_add(x=short, y=pool)
+        return paddle.add(x=short, y=pool)
 
 
 class ExitFlow(nn.Layer):
@@ -289,7 +289,7 @@ class ExitFlow(nn.Layer):
             728, 728, 1024, name=name + "_1")
         self._conv_1 = SeparableConv(1024, 1536, stride=1, name=name + "_2")
         self._conv_2 = SeparableConv(1536, 2048, stride=1, name=name + "_3")
-        self._pool = AdaptiveAvgPool2d(1)
+        self._pool = AdaptiveAvgPool2D(1)
         stdv = 1.0 / math.sqrt(2048 * 1.0)
         self._out = Linear(
             2048,

@@ -17,9 +17,9 @@ import paddle
 from paddle import ParamAttr
 import paddle.nn as nn
 import paddle.nn.functional as F
-from paddle.nn import Conv2d, BatchNorm, AdaptiveAvgPool2d, Linear
-from paddle.fluid.regularizer import L2DecayRegularizer
-from paddle.nn.initializer import Uniform
+from paddle.nn import Conv2D, BatchNorm, AdaptiveAvgPool2D, Linear
+from paddle.regularizer import L2Decay
+from paddle.nn.initializer import Uniform, KaimingNormal
 
 
 class ConvBNLayer(nn.Layer):
@@ -32,7 +32,7 @@ class ConvBNLayer(nn.Layer):
                  act="relu",
                  name=None):
         super(ConvBNLayer, self).__init__()
-        self._conv = Conv2d(
+        self._conv = Conv2D(
             in_channels=in_channels,
             out_channels=out_channels,
             kernel_size=kernel_size,
@@ -40,7 +40,7 @@ class ConvBNLayer(nn.Layer):
             padding=(kernel_size - 1) // 2,
             groups=groups,
             weight_attr=ParamAttr(
-                initializer=nn.initializer.MSRA(), name=name + "_weights"),
+                initializer=KaimingNormal(), name=name + "_weights"),
             bias_attr=False)
         bn_name = name + "_bn"
 
@@ -50,10 +50,10 @@ class ConvBNLayer(nn.Layer):
             act=act,
             param_attr=ParamAttr(
                 name=bn_name + "_scale",
-                regularizer=L2DecayRegularizer(regularization_coeff=0.0)),
+                regularizer=L2Decay(regularization_coeff=0.0)),
             bias_attr=ParamAttr(
                 name=bn_name + "_offset",
-                regularizer=L2DecayRegularizer(regularization_coeff=0.0)),
+                regularizer=L2Decay(regularization_coeff=0.0)),
             moving_mean_name=bn_name + "_mean",
             moving_variance_name=name +
             "_variance"  # wrong due to an old typo, will be fixed later.
@@ -68,7 +68,7 @@ class ConvBNLayer(nn.Layer):
 class SEBlock(nn.Layer):
     def __init__(self, num_channels, reduction_ratio=4, name=None):
         super(SEBlock, self).__init__()
-        self.pool2d_gap = AdaptiveAvgPool2d(1)
+        self.pool2d_gap = AdaptiveAvgPool2D(1)
         self._num_channels = num_channels
         stdv = 1.0 / math.sqrt(num_channels * 1.0)
         med_ch = num_channels // reduction_ratio
@@ -92,7 +92,7 @@ class SEBlock(nn.Layer):
         squeeze = self.squeeze(pool)
         squeeze = F.relu(squeeze)
         excitation = self.excitation(squeeze)
-        excitation = paddle.fluid.layers.clip(x=excitation, min=0, max=1)
+        excitation = paddle.clip(x=excitation, min=0, max=1)
         excitation = paddle.reshape(
             excitation, shape=[-1, self._num_channels, 1, 1])
         out = inputs * excitation
@@ -208,7 +208,7 @@ class GhostBottleneck(nn.Layer):
         else:
             shortcut = self.shortcut_depthwise(inputs)
             shortcut = self.shortcut_conv(shortcut)
-        return paddle.elementwise_add(x=x, y=shortcut, axis=-1)
+        return paddle.add(x=x, y=shortcut)
 
 
 class GhostNet(nn.Layer):
@@ -273,7 +273,7 @@ class GhostNet(nn.Layer):
             groups=1,
             act="relu",
             name="conv_last")
-        self.pool2d_gap = AdaptiveAvgPool2d(1)
+        self.pool2d_gap = AdaptiveAvgPool2D(1)
         in_channels = output_channels
         self._fc0_output_channels = 1280
         self.fc_0 = ConvBNLayer(

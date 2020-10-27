@@ -21,9 +21,9 @@ import paddle
 from paddle import ParamAttr
 import paddle.nn as nn
 import paddle.nn.functional as F
-from paddle.nn import Conv2d, BatchNorm, Linear, Dropout
-from paddle.nn import AdaptiveAvgPool2d, MaxPool2d, AvgPool2d
-from paddle.fluid.regularizer import L2Decay
+from paddle.nn import Conv2D, BatchNorm, Linear, Dropout
+from paddle.nn import AdaptiveAvgPool2D, MaxPool2D, AvgPool2D
+from paddle.regularizer import L2Decay
 
 import math
 
@@ -137,9 +137,9 @@ class MobileNetV3(nn.Layer):
             act="hard_swish",
             name="conv_last")
 
-        self.pool = AdaptiveAvgPool2d(1)
+        self.pool = AdaptiveAvgPool2D(1)
 
-        self.last_conv = Conv2d(
+        self.last_conv = Conv2D(
             in_channels=make_divisible(scale * self.cls_ch_squeeze),
             out_channels=self.cls_ch_expand,
             kernel_size=1,
@@ -187,7 +187,7 @@ class ConvBNLayer(nn.Layer):
         super(ConvBNLayer, self).__init__()
         self.if_act = if_act
         self.act = act
-        self.conv = Conv2d(
+        self.conv = Conv2D(
             in_channels=in_c,
             out_channels=out_c,
             kernel_size=filter_size,
@@ -272,15 +272,15 @@ class ResidualUnit(nn.Layer):
             x = self.mid_se(x)
         x = self.linear_conv(x)
         if self.if_shortcut:
-            x = paddle.elementwise_add(inputs, x)
+            x = paddle.add(inputs, x)
         return x
 
 
 class SEModule(nn.Layer):
     def __init__(self, channel, reduction=4, name=""):
         super(SEModule, self).__init__()
-        self.avg_pool = AdaptiveAvgPool2d(1)
-        self.conv1 = Conv2d(
+        self.avg_pool = AdaptiveAvgPool2D(1)
+        self.conv1 = Conv2D(
             in_channels=channel,
             out_channels=channel // reduction,
             kernel_size=1,
@@ -288,7 +288,7 @@ class SEModule(nn.Layer):
             padding=0,
             weight_attr=ParamAttr(name=name + "_1_weights"),
             bias_attr=ParamAttr(name=name + "_1_offset"))
-        self.conv2 = Conv2d(
+        self.conv2 = Conv2D(
             in_channels=channel // reduction,
             out_channels=channel,
             kernel_size=1,

@@ -20,8 +20,7 @@ import os
 import sys
 
 import paddle
-# TODO: need to be fixed in the future.
-from paddle.fluid import is_compiled_with_cuda
+from paddle import is_compiled_with_cuda
 
 from ppcls.modeling import get_architectures
 from ppcls.modeling import similar_architectures

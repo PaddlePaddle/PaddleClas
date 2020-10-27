@@ -2,8 +2,8 @@ import paddle
 from paddle import ParamAttr
 import paddle.nn as nn
 import paddle.nn.functional as F
-from paddle.nn import Conv2d, BatchNorm, Linear, Dropout
-from paddle.nn import AdaptiveAvgPool2d, MaxPool2d, AvgPool2d
+from paddle.nn import Conv2D, BatchNorm, Linear, Dropout
+from paddle.nn import AdaptiveAvgPool2D, MaxPool2D, AvgPool2D
 from paddle.nn.initializer import Uniform
 import math
 
@@ -20,7 +20,7 @@ class ConvBNLayer(nn.Layer):
                  name=None):
         super(ConvBNLayer, self).__init__()
 
-        self._conv = Conv2d(
+        self._conv = Conv2D(
             in_channels=input_channels,
             out_channels=output_channels,
             kernel_size=filter_size,
@@ -56,7 +56,7 @@ class BasicBlock(nn.Layer):
     def forward(self, inputs):
         x = self._conv1(inputs)
         x = self._conv2(x)
-        return paddle.elementwise_add(x=inputs, y=x)
+        return paddle.add(x=inputs, y=x)
 
 
 class DarkNet(nn.Layer):
@@ -104,7 +104,7 @@ class DarkNet(nn.Layer):
         self._basic_block_43 = BasicBlock(1024, 512, name="stage.4.2")
         self._basic_block_44 = BasicBlock(1024, 512, name="stage.4.3")
 
-        self._pool = AdaptiveAvgPool2d(1)
+        self._pool = AdaptiveAvgPool2D(1)
 
         stdv = 1.0 / math.sqrt(1024.0)
         self._out = Linear(

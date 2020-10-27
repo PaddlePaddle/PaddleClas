@@ -21,10 +21,10 @@ import paddle
 import math
 import paddle.nn as nn
 from paddle import ParamAttr
-from paddle.nn.initializer import MSRA
-from paddle.nn import Conv2d, BatchNorm, Linear, Dropout
-from paddle.nn import AdaptiveAvgPool2d, MaxPool2d, AvgPool2d
-from paddle.fluid.regularizer import L2Decay
+from paddle.nn.initializer import KaimingNormal
+from paddle.nn import Conv2D, BatchNorm, Linear, Dropout
+from paddle.nn import AdaptiveAvgPool2D, MaxPool2D, AvgPool2D
+from paddle.regularizer import L2Decay
 
 __all__ = ["ResNeSt50_fast_1s1x64d", "ResNeSt50"]
 
@@ -43,7 +43,7 @@ class ConvBNLayer(nn.Layer):
 
         bn_decay = 0.0
 
-        self._conv = Conv2d(
+        self._conv = Conv2D(
             in_channels=num_channels,
             out_channels=num_filters,
             kernel_size=filter_size,
@@ -121,7 +121,7 @@ class SplatConv(nn.Layer):
             act="relu",
             name=name + "_splat1")
 
-        self.avg_pool2d = AdaptiveAvgPool2d(1)
+        self.avg_pool2d = AdaptiveAvgPool2D(1)
 
         inter_channels = int(max(in_channels * radix // reduction_factor, 32))
 
@@ -136,7 +136,7 @@ class SplatConv(nn.Layer):
             name=name + "_splat2")
 
         # to calc atten
-        self.conv3 = Conv2d(
+        self.conv3 = Conv2D(
             in_channels=inter_channels,
             out_channels=channels * radix,
             kernel_size=1,
@@ -144,7 +144,7 @@ class SplatConv(nn.Layer):
             padding=0,
             groups=groups,
             weight_attr=ParamAttr(
-                name=name + "_splat_weights", initializer=MSRA()),
+                name=name + "_splat_weights", initializer=KaimingNormal()),
             bias_attr=False)
 
         self.rsoftmax = rSoftmax(radix=radix, cardinality=groups)
@@ -217,7 +217,7 @@ class BottleneckBlock(nn.Layer):
             name=name + "_conv1")
 
         if avd and avd_first and (stride > 1 or is_first):
-            self.avg_pool2d_1 = AvgPool2d(
+            self.avg_pool2d_1 = AvgPool2D(
                 kernel_size=3, stride=stride, padding=1)
 
         if radix >= 1:
@@ -245,7 +245,7 @@ class BottleneckBlock(nn.Layer):
                 name=name + "_conv2")
 
         if avd and avd_first == False and (stride > 1 or is_first):
-            self.avg_pool2d_2 = AvgPool2d(
+            self.avg_pool2d_2 = AvgPool2D(
                 kernel_size=3, stride=stride, padding=1)
 
         self.conv3 = ConvBNLayer(
@@ -260,13 +260,13 @@ class BottleneckBlock(nn.Layer):
         if stride != 1 or self.inplanes != self.planes * 4:
             if avg_down:
                 if dilation == 1:
-                    self.avg_pool2d_3 = AvgPool2d(
+                    self.avg_pool2d_3 = AvgPool2D(
                         kernel_size=stride, stride=stride, padding=0)
                 else:
-                    self.avg_pool2d_3 = AvgPool2d(
+                    self.avg_pool2d_3 = AvgPool2D(
                         kernel_size=1, stride=1, padding=0, ceil_mode=True)
 
-                self.conv4 = Conv2d(
+                self.conv4 = Conv2D(
                     in_channels=self.inplanes,
                     out_channels=planes * 4,
                     kernel_size=1,
@@ -274,10 +274,10 @@ class BottleneckBlock(nn.Layer):
                     padding=0,
                     groups=1,
                     weight_attr=ParamAttr(
-                        name=name + "_weights", initializer=MSRA()),
+                        name=name + "_weights", initializer=KaimingNormal()),
                     bias_attr=False)
             else:
-                self.conv4 = Conv2d(
+                self.conv4 = Conv2D(
                     in_channels=self.inplanes,
                     out_channels=planes * 4,
                     kernel_size=1,
@@ -285,7 +285,8 @@ class BottleneckBlock(nn.Layer):
                     padding=0,
                     groups=1,
                     weight_attr=ParamAttr(
-                        name=name + "_shortcut_weights", initializer=MSRA()),
+                        name=name + "_shortcut_weights",
+                        initializer=KaimingNormal()),
                     bias_attr=False)
 
             bn_decay = 0.0
@@ -324,7 +325,8 @@ class BottleneckBlock(nn.Layer):
 
             short = self._batch_norm(short)
 
-        y = paddle.elementwise_add(x=short, y=x, act="relu")
+        y = paddle.add(x=short, y=x)
+        y = F.relu(y)
         return y
 
 
@@ -495,7 +497,7 @@ class ResNeSt(nn.Layer):
                 act="relu",
                 name="conv1")
 
-        self.max_pool2d = MaxPool2d(kernel_size=3, stride=2, padding=1)
+        self.max_pool2d = MaxPool2D(kernel_size=3, stride=2, padding=1)
 
         self.layer1 = ResNeStLayer(
             inplanes=self.stem_width * 2
@@ -624,7 +626,7 @@ class ResNeSt(nn.Layer):
                 stride=2,
                 name="layer4")
 
-        self.pool2d_avg = AdaptiveAvgPool2d(1)
+        self.pool2d_avg = AdaptiveAvgPool2D(1)
 
         self.out_channels = 2048
 

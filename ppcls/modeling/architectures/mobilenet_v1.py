@@ -21,9 +21,9 @@ import paddle
 from paddle import ParamAttr
 import paddle.nn as nn
 import paddle.nn.functional as F
-from paddle.nn import Conv2d, BatchNorm, Linear, Dropout
-from paddle.nn import AdaptiveAvgPool2d, MaxPool2d, AvgPool2d
-from paddle.nn.initializer import MSRA
+from paddle.nn import Conv2D, BatchNorm, Linear, Dropout
+from paddle.nn import AdaptiveAvgPool2D, MaxPool2D, AvgPool2D
+from paddle.nn.initializer import KaimingNormal
 import math
 
 __all__ = [
@@ -44,7 +44,7 @@ class ConvBNLayer(nn.Layer):
                  name=None):
         super(ConvBNLayer, self).__init__()
 
-        self._conv = Conv2d(
+        self._conv = Conv2D(
             in_channels=num_channels,
             out_channels=num_filters,
             kernel_size=filter_size,
@@ -52,7 +52,7 @@ class ConvBNLayer(nn.Layer):
             padding=padding,
             groups=num_groups,
             weight_attr=ParamAttr(
-                initializer=MSRA(), name=name + "_weights"),
+                initializer=KaimingNormal(), name=name + "_weights"),
             bias_attr=False)
 
         self._batch_norm = BatchNorm(
@@ -227,13 +227,13 @@ class MobileNet(nn.Layer):
                 name="conv6"))
         self.block_list.append(conv6)
 
-        self.pool2d_avg = AdaptiveAvgPool2d(1)
+        self.pool2d_avg = AdaptiveAvgPool2D(1)
 
         self.out = Linear(
             int(1024 * scale),
             class_dim,
             weight_attr=ParamAttr(
-                initializer=MSRA(), name="fc7_weights"),
+                initializer=KaimingNormal(), name="fc7_weights"),
             bias_attr=ParamAttr(name="fc7_offset"))
 
     def forward(self, inputs):

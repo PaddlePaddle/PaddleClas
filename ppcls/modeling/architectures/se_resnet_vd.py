@@ -20,8 +20,8 @@ import paddle
 from paddle import ParamAttr
 import paddle.nn as nn
 import paddle.nn.functional as F
-from paddle.nn import Conv2d, BatchNorm, Linear, Dropout
-from paddle.nn import AdaptiveAvgPool2d, MaxPool2d, AvgPool2d
+from paddle.nn import Conv2D, BatchNorm, Linear, Dropout
+from paddle.nn import AdaptiveAvgPool2D, MaxPool2D, AvgPool2D
 from paddle.nn.initializer import Uniform
 
 import math
@@ -46,10 +46,10 @@ class ConvBNLayer(nn.Layer):
         super(ConvBNLayer, self).__init__()
 
         self.is_vd_mode = is_vd_mode
-        self._pool2d_avg = AvgPool2d(
+        self._pool2d_avg = AvgPool2D(
             kernel_size=2, stride=2, padding=0, ceil_mode=True)
 
-        self._conv = Conv2d(
+        self._conv = Conv2D(
             in_channels=num_channels,
             out_channels=num_filters,
             kernel_size=filter_size,
@@ -135,7 +135,8 @@ class BottleneckBlock(nn.Layer):
             short = inputs
         else:
             short = self.short(inputs)
-        y = paddle.elementwise_add(x=short, y=scale, act='relu')
+        y = paddle.add(x=short, y=scale)
+        y = F.relu(y)
         return y
 
 
@@ -190,7 +191,8 @@ class BasicBlock(nn.Layer):
             short = inputs
         else:
             short = self.short(inputs)
-        y = paddle.elementwise_add(x=short, y=scale, act='relu')
+        y = paddle.add(x=short, y=scale)
+        y = F.relu(y)
         return y
 
 
@@ -198,7 +200,7 @@ class SELayer(nn.Layer):
     def __init__(self, num_channels, num_filters, reduction_ratio, name=None):
         super(SELayer, self).__init__()
 
-        self.pool2d_gap = AdaptiveAvgPool2d(1)
+        self.pool2d_gap = AdaptiveAvgPool2D(1)
 
         self._num_channels = num_channels
 
@@ -277,7 +279,7 @@ class SE_ResNet_vd(nn.Layer):
             stride=1,
             act='relu',
             name="conv1_3")
-        self.pool2d_max = MaxPool2d(kernel_size=3, stride=2, padding=1)
+        self.pool2d_max = MaxPool2D(kernel_size=3, stride=2, padding=1)
 
         self.block_list = []
         if layers >= 50:
@@ -321,7 +323,7 @@ class SE_ResNet_vd(nn.Layer):
                     self.block_list.append(basic_block)
                     shortcut = True
 
-        self.pool2d_avg = AdaptiveAvgPool2d(1)
+        self.pool2d_avg = AdaptiveAvgPool2D(1)
 
         self.pool2d_avg_channels = num_channels[-1] * 2
 

@@ -2,8 +2,8 @@ import paddle
 from paddle import ParamAttr
 import paddle.nn as nn
 import paddle.nn.functional as F
-from paddle.nn import Conv2d, BatchNorm, Linear, Dropout
-from paddle.nn import AdaptiveAvgPool2d, MaxPool2d, AvgPool2d
+from paddle.nn import Conv2D, BatchNorm, Linear, Dropout
+from paddle.nn import AdaptiveAvgPool2D, MaxPool2D, AvgPool2D
 
 __all__ = ["VGG11", "VGG13", "VGG16", "VGG19"]
 
@@ -13,7 +13,7 @@ class ConvBlock(nn.Layer):
         super(ConvBlock, self).__init__()
 
         self.groups = groups
-        self._conv_1 = Conv2d(
+        self._conv_1 = Conv2D(
             in_channels=input_channels,
             out_channels=output_channels,
             kernel_size=3,
@@ -22,7 +22,7 @@ class ConvBlock(nn.Layer):
             weight_attr=ParamAttr(name=name + "1_weights"),
             bias_attr=False)
         if groups == 2 or groups == 3 or groups == 4:
-            self._conv_2 = Conv2d(
+            self._conv_2 = Conv2D(
                 in_channels=output_channels,
                 out_channels=output_channels,
                 kernel_size=3,
@@ -31,7 +31,7 @@ class ConvBlock(nn.Layer):
                 weight_attr=ParamAttr(name=name + "2_weights"),
                 bias_attr=False)
         if groups == 3 or groups == 4:
-            self._conv_3 = Conv2d(
+            self._conv_3 = Conv2D(
                 in_channels=output_channels,
                 out_channels=output_channels,
                 kernel_size=3,
@@ -40,7 +40,7 @@ class ConvBlock(nn.Layer):
                 weight_attr=ParamAttr(name=name + "3_weights"),
                 bias_attr=False)
         if groups == 4:
-            self._conv_4 = Conv2d(
+            self._conv_4 = Conv2D(
                 in_channels=output_channels,
                 out_channels=output_channels,
                 kernel_size=3,
@@ -49,7 +49,7 @@ class ConvBlock(nn.Layer):
                 weight_attr=ParamAttr(name=name + "4_weights"),
                 bias_attr=False)
 
-        self._pool = MaxPool2d(kernel_size=2, stride=2, padding=0)
+        self._pool = MaxPool2D(kernel_size=2, stride=2, padding=0)
 
     def forward(self, inputs):
         x = self._conv_1(inputs)

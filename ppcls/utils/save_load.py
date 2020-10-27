@@ -23,7 +23,7 @@ import shutil
 import tempfile
 
 import paddle
-from paddle.io import load_program_state
+from paddle.static import load_program_state
 
 from ppcls.utils import logger
 

@@ -21,8 +21,8 @@ import paddle
 from paddle import ParamAttr
 import paddle.nn as nn
 import paddle.nn.functional as F
-from paddle.nn import Conv2d, BatchNorm, Linear, Dropout
-from paddle.nn import AdaptiveAvgPool2d, MaxPool2d, AvgPool2d
+from paddle.nn import Conv2D, BatchNorm, Linear, Dropout
+from paddle.nn import AdaptiveAvgPool2D, MaxPool2D, AvgPool2D
 from paddle.nn.initializer import Uniform
 
 import math
@@ -48,9 +48,9 @@ class ConvBNLayer(nn.Layer):
         super(ConvBNLayer, self).__init__()
 
         self.is_vd_mode = is_vd_mode
-        self._pool2d_avg = AvgPool2d(
+        self._pool2d_avg = AvgPool2D(
             kernel_size=2, stride=2, padding=0, ceil_mode=True)
-        self._conv = Conv2d(
+        self._conv = Conv2D(
             in_channels=num_channels,
             out_channels=num_filters,
             kernel_size=filter_size,
@@ -110,7 +110,7 @@ class BottleneckBlock(nn.Layer):
                     act='relu',
                     name=name + '_branch2b_' + str(s + 1)))
             self.conv1_list.append(conv1)
-        self.pool2d_avg = AvgPool2d(kernel_size=3, stride=stride, padding=1)
+        self.pool2d_avg = AvgPool2D(kernel_size=3, stride=stride, padding=1)
 
         self.conv2 = ConvBNLayer(
             num_channels=num_filters,
@@ -150,7 +150,8 @@ class BottleneckBlock(nn.Layer):
             short = inputs
         else:
             short = self.short(inputs)
-        y = paddle.elementwise_add(x=short, y=conv2, act='relu')
+        y = paddle.add(x=short, y=conv2)
+        y = F.relu(y)
         return y
 
 
@@ -200,7 +201,7 @@ class Res2Net_vd(nn.Layer):
             stride=1,
             act='relu',
             name="conv1_3")
-        self.pool2d_max = MaxPool2d(kernel_size=3, stride=2, padding=1)
+        self.pool2d_max = MaxPool2D(kernel_size=3, stride=2, padding=1)
 
         self.block_list = []
         for block in range(len(depth)):
@@ -228,7 +229,7 @@ class Res2Net_vd(nn.Layer):
                 self.block_list.append(bottleneck_block)
                 shortcut = True
 
-        self.pool2d_avg = AdaptiveAvgPool2d(1)
+        self.pool2d_avg = AdaptiveAvgPool2D(1)
 
         self.pool2d_avg_channels = num_channels[-1] * 2
 

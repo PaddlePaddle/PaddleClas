@@ -20,8 +20,9 @@ import numpy as np
 import paddle
 from paddle import ParamAttr
 import paddle.nn as nn
-from paddle.nn import Conv2d, BatchNorm, Linear, Dropout
-from paddle.nn import AdaptiveAvgPool2d, MaxPool2d, AvgPool2d
+import paddle.nn.functional as F
+from paddle.nn import Conv2D, BatchNorm, Linear, Dropout
+from paddle.nn import AdaptiveAvgPool2D, MaxPool2D, AvgPool2D
 from paddle.nn.initializer import Uniform
 
 import math
@@ -30,22 +31,21 @@ __all__ = ["SE_ResNeXt50_vd_32x4d", "SE_ResNeXt50_vd_32x4d", "SENet154_vd"]
 
 
 class ConvBNLayer(nn.Layer):
-    def __init__(
-            self,
-            num_channels,
-            num_filters,
-            filter_size,
-            stride=1,
-            groups=1,
-            is_vd_mode=False,
-            act=None,
-            name=None):
+    def __init__(self,
+                 num_channels,
+                 num_filters,
+                 filter_size,
+                 stride=1,
+                 groups=1,
+                 is_vd_mode=False,
+                 act=None,
+                 name=None):
         super(ConvBNLayer, self).__init__()
 
         self.is_vd_mode = is_vd_mode
-        self._pool2d_avg = AvgPool2d(
+        self._pool2d_avg = AvgPool2D(
             kernel_size=2, stride=2, padding=0, ceil_mode=True)
-        self._conv = Conv2d(
+        self._conv = Conv2D(
             in_channels=num_channels,
             out_channels=num_filters,
             kernel_size=filter_size,
@@ -131,7 +131,8 @@ class BottleneckBlock(nn.Layer):
             short = inputs
         else:
             short = self.short(inputs)
-        y = paddle.elementwise_add(x=short, y=scale, act='relu')
+        y = paddle.add(x=short, y=scale)
+        y = F.relu(y)
         return y
 
 
@@ -139,7 +140,7 @@ class SELayer(nn.Layer):
     def __init__(self, num_channels, num_filters, reduction_ratio, name=None):
         super(SELayer, self).__init__()
 
-        self.pool2d_gap = AdaptiveAvgPool2d(1)
+        self.pool2d_gap = AdaptiveAvgPool2D(1)
 
         self._num_channels = num_channels
 
@@ -149,8 +150,7 @@ class SELayer(nn.Layer):
             num_channels,
             med_ch,
             weight_attr=ParamAttr(
-               initializer=Uniform(-stdv, stdv),
-               name=name + "_sqz_weights"),
+                initializer=Uniform(-stdv, stdv), name=name + "_sqz_weights"),
             bias_attr=ParamAttr(name=name + '_sqz_offset'))
         self.relu = nn.ReLU()
         stdv = 1.0 / math.sqrt(med_ch * 1.0)
@@ -158,11 +158,10 @@ class SELayer(nn.Layer):
             med_ch,
             num_filters,
             weight_attr=ParamAttr(
-                initializer=Uniform(-stdv, stdv),
-                name=name + "_exc_weights"),
+                initializer=Uniform(-stdv, stdv), name=name + "_exc_weights"),
             bias_attr=ParamAttr(name=name + '_exc_offset'))
         self.sigmoid = nn.Sigmoid()
-        
+
     def forward(self, input):
         pool = self.pool2d_gap(input)
         pool = paddle.reshape(pool, shape=[-1, self._num_channels])
@@ -223,7 +222,7 @@ class ResNeXt(nn.Layer):
             act='relu',
             name="conv1_3")
 
-        self.pool2d_max = MaxPool2d(kernel_size=3, stride=2, padding=1)
+        self.pool2d_max = MaxPool2D(kernel_size=3, stride=2, padding=1)
 
         self.block_list = []
         n = 1 if layers == 50 or layers == 101 else 3
@@ -246,7 +245,7 @@ class ResNeXt(nn.Layer):
                 self.block_list.append(bottleneck_block)
                 shortcut = True
 
-        self.pool2d_avg = AdaptiveAvgPool2d(1)
+        self.pool2d_avg = AdaptiveAvgPool2D(1)
 
         self.pool2d_avg_channels = num_channels[-1] * 2
 
@@ -256,8 +255,7 @@ class ResNeXt(nn.Layer):
             self.pool2d_avg_channels,
             class_dim,
             weight_attr=ParamAttr(
-                initializer=Uniform(-stdv, stdv),
-                name="fc6_weights"),
+                initializer=Uniform(-stdv, stdv), name="fc6_weights"),
             bias_attr=ParamAttr(name="fc6_offset"))
 
     def forward(self, inputs):
