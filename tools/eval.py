@@ -56,9 +56,9 @@ def main(args, return_dict={}):
 
     paddle.disable_static(place)
 
-    # strategy = paddle.distributed.init_parallel_env()
+    strategy = paddle.distributed.init_parallel_env()
     net = program.create_model(config.ARCHITECTURE, config.classes_num)
-    # net = paddle.DataParallel(net, strategy)
+    net = paddle.DataParallel(net, strategy)
     init_model(config, net, optimizer=None)
     valid_dataloader = Reader(config, 'valid', places=place)()
     net.eval()
