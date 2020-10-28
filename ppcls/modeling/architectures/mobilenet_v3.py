@@ -21,6 +21,7 @@ import paddle
 from paddle import ParamAttr
 import paddle.nn as nn
 import paddle.nn.functional as F
+from paddle.nn.functional.activation import hard_sigmoid, hard_swish
 from paddle.nn import Conv2D, BatchNorm, Linear, Dropout
 from paddle.nn import AdaptiveAvgPool2D, MaxPool2D, AvgPool2D
 from paddle.regularizer import L2Decay
@@ -111,7 +112,8 @@ class MobileNetV3(nn.Layer):
         i = 0
         inplanes = make_divisible(inplanes * scale)
         for (k, exp, c, se, nl, s) in self.cfg:
-            self.block_list.append(
+            block = self.add_sublayer(
+                "conv" + str(i + 2),
                 ResidualUnit(
                     in_c=inplanes,
                     mid_c=make_divisible(scale * exp),
@@ -121,8 +123,7 @@ class MobileNetV3(nn.Layer):
                     use_se=se,
                     act=nl,
                     name="conv" + str(i + 2)))
-            self.add_sublayer(
-                sublayer=self.block_list[-1], name="conv" + str(i + 2))
+            self.block_list.append(block)
             inplanes = make_divisible(scale * c)
             i += 1
 
@@ -158,6 +159,7 @@ class MobileNetV3(nn.Layer):
 
     def forward(self, inputs, label=None):
         x = self.conv1(inputs)
+
         for block in self.block_list:
             x = block(x)
 
@@ -165,10 +167,11 @@ class MobileNetV3(nn.Layer):
         x = self.pool(x)
 
         x = self.last_conv(x)
-        x = F.hardswish(x)
+        x = hard_swish(x)
         x = self.dropout(x)
         x = paddle.reshape(x, shape=[x.shape[0], x.shape[1]])
         x = self.out(x)
+
         return x
 
 
@@ -213,7 +216,7 @@ class ConvBNLayer(nn.Layer):
             if self.act == "relu":
                 x = F.relu(x)
             elif self.act == "hard_swish":
-                x = F.hardswish(x)
+                x = hard_swish(x)
             else:
                 print("The activation function is selected incorrectly.")
                 exit()
@@ -302,7 +305,7 @@ class SEModule(nn.Layer):
         outputs = self.conv1(outputs)
         outputs = F.relu(outputs)
         outputs = self.conv2(outputs)
-        outputs = F.hardsigmoid(outputs)
+        outputs = hard_sigmoid(outputs)
         return paddle.multiply(x=inputs, y=outputs, axis=0)
 
 
