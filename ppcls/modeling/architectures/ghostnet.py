@@ -49,11 +49,9 @@ class ConvBNLayer(nn.Layer):
             num_channels=out_channels,
             act=act,
             param_attr=ParamAttr(
-                name=bn_name + "_scale",
-                regularizer=L2Decay(regularization_coeff=0.0)),
+                name=bn_name + "_scale", regularizer=L2Decay(0.0)),
             bias_attr=ParamAttr(
-                name=bn_name + "_offset",
-                regularizer=L2Decay(regularization_coeff=0.0)),
+                name=bn_name + "_offset", regularizer=L2Decay(0.0)),
             moving_mean_name=bn_name + "_mean",
             moving_variance_name=name +
             "_variance"  # wrong due to an old typo, will be fixed later.

@@ -20,6 +20,7 @@ import numpy as np
 import paddle
 from paddle import ParamAttr
 import paddle.nn as nn
+import paddle.nn.functional as F
 from paddle.nn import Conv2D, BatchNorm, Linear, Dropout
 from paddle.nn import AdaptiveAvgPool2D, MaxPool2D, AvgPool2D
 from paddle.nn.initializer import Uniform

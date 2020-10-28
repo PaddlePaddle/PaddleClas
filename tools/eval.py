@@ -49,6 +49,7 @@ def parse_args():
 
 def main(args, return_dict={}):
     config = get_config(args.config, overrides=args.override, show=True)
+    config.mode = "valid"
     # assign place
     use_gpu = config.get("use_gpu", True)
     place = 'gpu:{}'.format(ParallelEnv().dev_id) if use_gpu else 'cpu'

@@ -165,7 +165,7 @@ class MobileNetV3(nn.Layer):
         x = self.pool(x)
 
         x = self.last_conv(x)
-        x = F.hard_swish(x)
+        x = F.hardswish(x)
         x = self.dropout(x)
         x = paddle.reshape(x, shape=[x.shape[0], x.shape[1]])
         x = self.out(x)
@@ -213,7 +213,7 @@ class ConvBNLayer(nn.Layer):
             if self.act == "relu":
                 x = F.relu(x)
             elif self.act == "hard_swish":
-                x = F.hard_swish(x)
+                x = F.hardswish(x)
             else:
                 print("The activation function is selected incorrectly.")
                 exit()
@@ -302,7 +302,7 @@ class SEModule(nn.Layer):
         outputs = self.conv1(outputs)
         outputs = F.relu(outputs)
         outputs = self.conv2(outputs)
-        outputs = F.hard_sigmoid(outputs)
+        outputs = F.hardsigmoid(outputs)
         return paddle.multiply(x=inputs, y=outputs, axis=0)
 
 

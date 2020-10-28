@@ -20,6 +20,7 @@ import numpy as np
 import paddle
 import math
 import paddle.nn as nn
+import paddle.nn.functional as F
 from paddle import ParamAttr
 from paddle.nn.initializer import KaimingNormal
 from paddle.nn import Conv2D, BatchNorm, Linear, Dropout
@@ -154,7 +155,7 @@ class SplatConv(nn.Layer):
 
         if self.radix > 1:
             splited = paddle.split(x, num_or_sections=self.radix, axis=1)
-            gap = paddle.sums(splited)
+            gap = paddle.add_n(splited)
         else:
             gap = x
 
@@ -167,7 +168,7 @@ class SplatConv(nn.Layer):
 
         if self.radix > 1:
             attens = paddle.split(atten, num_or_sections=self.radix, axis=1)
-            y = paddle.sums(
+            y = paddle.add_n(
                 [att * split for (att, split) in zip(attens, splited)])
         else:
             y = atten * x
@@ -295,10 +296,9 @@ class BottleneckBlock(nn.Layer):
                 act=None,
                 param_attr=ParamAttr(
                     name=name + "_shortcut_scale",
-                    regularizer=L2Decay(regularization_coeff=bn_decay)),
+                    regularizer=L2Decay(bn_decay)),
                 bias_attr=ParamAttr(
-                    name + "_shortcut_offset",
-                    regularizer=L2Decay(regularization_coeff=bn_decay)),
+                    name + "_shortcut_offset", regularizer=L2Decay(bn_decay)),
                 moving_mean_name=name + "_shortcut_mean",
                 moving_variance_name=name + "_shortcut_variance")
 

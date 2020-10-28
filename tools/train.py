@@ -61,8 +61,6 @@ def main(args):
     use_data_parallel = int(os.getenv("PADDLE_TRAINERS_NUM", 1)) != 1
     config["use_data_parallel"] = use_data_parallel
 
-    paddle.disable_static(place)
-
     net = program.create_model(config.ARCHITECTURE, config.classes_num)
 
     optimizer, lr_scheduler = program.create_optimizer(

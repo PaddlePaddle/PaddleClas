@@ -484,7 +484,7 @@ class FuseLayers(nn.Layer):
                     y = self.residual_func_list[residual_func_idx](input[j])
                     residual_func_idx += 1
 
-                    y = F.resize_nearest(input=y, scale=2**(j - i))
+                    y = F.upsample(y, scale_factor=2**(j - i), mode="nearest")
                     residual = paddle.add(x=residual, y=y)
                 elif j < i:
                     y = input[j]
