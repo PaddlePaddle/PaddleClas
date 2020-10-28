@@ -55,11 +55,8 @@ def main(args):
     config = get_config(args.config, overrides=args.override, show=True)
     # assign the place
     use_gpu = config.get("use_gpu", True)
-    if use_gpu:
-        gpu_id = ParallelEnv().dev_id
-        place = paddle.CUDAPlace(gpu_id)
-    else:
-        place = paddle.CPUPlace()
+    place = 'gpu:{}'.format(ParallelEnv().dev_id) if use_gpu else 'cpu'
+    place = paddle.set_device(place)
 
     use_data_parallel = int(os.getenv("PADDLE_TRAINERS_NUM", 1)) != 1
     config["use_data_parallel"] = use_data_parallel

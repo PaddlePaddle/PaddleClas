@@ -114,11 +114,8 @@ def main():
     args = parse_args()
     operators = create_operators()
     # assign the place
-    if args.use_gpu:
-        gpu_id = ParallelEnv().dev_id
-        place = paddle.CUDAPlace(gpu_id)
-    else:
-        place = paddle.CPUPlace()
+    place = 'gpu:{}'.format(ParallelEnv().dev_id) if args.use_gpu else 'cpu'
+    place = paddle.set_device(place)
 
     paddle.disable_static(place)
 

@@ -80,8 +80,8 @@ def main(args):
             args.config = model_info["config_path"]
             args.override = [
                 "pretrained_model={}".format(pretrained_path),
-                "VALID.batch_size=128",
-                "VALID.num_workers=16",
+                "VALID.batch_size=32",
+                "VALID.num_workers=4",
                 "load_static_weights=True",
                 "print_interval=100",
             ]
