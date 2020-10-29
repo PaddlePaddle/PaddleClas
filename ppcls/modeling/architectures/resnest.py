@@ -169,9 +169,9 @@ class SplatConv(nn.Layer):
         if self.radix > 1:
             attens = paddle.split(atten, num_or_sections=self.radix, axis=1)
             y = paddle.add_n(
-                [att * split for (att, split) in zip(attens, splited)])
+                [split * att for (att, split) in zip(attens, splited)])
         else:
-            y = atten * x
+            y = x * atten
 
         return y
 
