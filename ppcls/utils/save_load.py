@@ -65,7 +65,7 @@ def load_dygraph_pretrain(model, path=None, load_static_weights=False):
         model.set_dict(param_state_dict)
         return
 
-    param_state_dict, optim_state_dict = paddle.load(path)
+    param_state_dict = paddle.load(path + ".pdparams")
     model.set_dict(param_state_dict)
     return
 
@@ -106,7 +106,8 @@ def init_model(config, net, optimizer=None):
             "Given dir {}.pdparams not exist.".format(checkpoints)
         assert os.path.exists(checkpoints + ".pdopt"), \
             "Given dir {}.pdopt not exist.".format(checkpoints)
-        para_dict, opti_dict = paddle.load(checkpoints)
+        para_dict = paddle.load(checkpoints + ".pdparams")
+        opti_dict = paddle.load(checkpoints + ".pdopt")
         net.set_dict(para_dict)
         optimizer.set_state_dict(opti_dict)
         logger.info(
@@ -142,8 +143,8 @@ def save_model(net, optimizer, model_path, epoch_id, prefix='ppcls'):
     _mkdir_if_not_exist(model_path)
     model_prefix = os.path.join(model_path, prefix)
 
-    paddle.save(net.state_dict(), model_prefix)
-    paddle.save(optimizer.state_dict(), model_prefix)
+    paddle.save(net.state_dict(), model_prefix + ".pdparams")
+    paddle.save(optimizer.state_dict(), model_prefix + ".pdopt")
     logger.info(
         logger.coloring("Already save model in {}".format(model_path),
                         "HEADER"))
