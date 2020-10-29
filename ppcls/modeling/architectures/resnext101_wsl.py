@@ -2,8 +2,8 @@ import paddle
 from paddle import ParamAttr
 import paddle.nn as nn
 import paddle.nn.functional as F
-from paddle.nn import Conv2d, BatchNorm, Linear, Dropout
-from paddle.nn import AdaptiveAvgPool2d, MaxPool2d, AvgPool2d
+from paddle.nn import Conv2D, BatchNorm, Linear, Dropout
+from paddle.nn import AdaptiveAvgPool2D, MaxPool2D, AvgPool2D
 from paddle.nn.initializer import Uniform
 
 __all__ = [
@@ -26,7 +26,7 @@ class ConvBNLayer(nn.Layer):
             conv_name = name + ".0"
         else:
             conv_name = name
-        self._conv = Conv2d(
+        self._conv = Conv2D(
             in_channels=input_channels,
             out_channels=output_channels,
             kernel_size=filter_size,
@@ -114,7 +114,9 @@ class BottleneckBlock(nn.Layer):
         x = self._conv1(x)
         x = self._conv2(x)
         y = self._short(inputs)
-        return paddle.elementwise_add(x, y, act="relu")
+        y = paddle.add(x, y)
+        y = F.relu(y)
+        return y
 
 
 class ResNeXt101WSL(nn.Layer):
@@ -134,7 +136,7 @@ class ResNeXt101WSL(nn.Layer):
                        for i in [1, 2, 4, 8]]  # [256, 512, 1024, 2048]
         self._conv_stem = ConvBNLayer(
             3, 64, 7, stride=2, act="relu", name="conv1")
-        self._pool = MaxPool2d(kernel_size=3, stride=2, padding=1)
+        self._pool = MaxPool2D(kernel_size=3, stride=2, padding=1)
 
         self._conv1_0 = BottleneckBlock(
             64,
@@ -371,7 +373,7 @@ class ResNeXt101WSL(nn.Layer):
             width=self.width,
             name="layer4.2")
 
-        self._avg_pool = AdaptiveAvgPool2d(1)
+        self._avg_pool = AdaptiveAvgPool2D(1)
         self._out = Linear(
             num_filters[3] // (width // 8),
             class_dim,

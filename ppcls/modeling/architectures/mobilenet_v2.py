@@ -21,8 +21,8 @@ import paddle
 from paddle import ParamAttr
 import paddle.nn as nn
 import paddle.nn.functional as F
-from paddle.nn import Conv2d, BatchNorm, Linear, Dropout
-from paddle.nn import AdaptiveAvgPool2d, MaxPool2d, AvgPool2d
+from paddle.nn import Conv2D, BatchNorm, Linear, Dropout
+from paddle.nn import AdaptiveAvgPool2D, MaxPool2D, AvgPool2D
 
 import math
 
@@ -45,7 +45,7 @@ class ConvBNLayer(nn.Layer):
                  use_cudnn=True):
         super(ConvBNLayer, self).__init__()
 
-        self._conv = Conv2d(
+        self._conv = Conv2D(
             in_channels=num_channels,
             out_channels=num_filters,
             kernel_size=filter_size,
@@ -108,7 +108,7 @@ class InvertedResidualUnit(nn.Layer):
         y = self._bottleneck_conv(y, if_act=True)
         y = self._linear_conv(y, if_act=False)
         if ifshortcut:
-            y = paddle.elementwise_add(inputs, y)
+            y = paddle.add(inputs, y)
         return y
 
 
@@ -199,7 +199,7 @@ class MobileNet(nn.Layer):
             padding=0,
             name="conv9")
 
-        self.pool2d_avg = AdaptiveAvgPool2d(1)
+        self.pool2d_avg = AdaptiveAvgPool2D(1)
 
         self.out = Linear(
             self.out_c,

@@ -2,8 +2,8 @@ import paddle
 from paddle import ParamAttr
 import paddle.nn as nn
 import paddle.nn.functional as F
-from paddle.nn import Conv2d, BatchNorm, Linear, Dropout, ReLU
-from paddle.nn import AdaptiveAvgPool2d, MaxPool2d, AvgPool2d
+from paddle.nn import Conv2D, BatchNorm, Linear, Dropout, ReLU
+from paddle.nn import AdaptiveAvgPool2D, MaxPool2D, AvgPool2D
 from paddle.nn.initializer import Uniform
 import math
 
@@ -25,7 +25,7 @@ class ConvPoolLayer(nn.Layer):
 
         self.relu = ReLU() if act == "relu" else None
 
-        self._conv = Conv2d(
+        self._conv = Conv2D(
             in_channels=input_channels,
             out_channels=output_channels,
             kernel_size=filter_size,
@@ -36,7 +36,7 @@ class ConvPoolLayer(nn.Layer):
                 name=name + "_weights", initializer=Uniform(-stdv, stdv)),
             bias_attr=ParamAttr(
                 name=name + "_offset", initializer=Uniform(-stdv, stdv)))
-        self._pool = MaxPool2d(kernel_size=3, stride=2, padding=0)
+        self._pool = MaxPool2D(kernel_size=3, stride=2, padding=0)
 
     def forward(self, inputs):
         x = self._conv(inputs)
@@ -57,7 +57,7 @@ class AlexNetDY(nn.Layer):
         self._conv2 = ConvPoolLayer(
             64, 192, 5, 1, 2, stdv, act="relu", name="conv2")
         stdv = 1.0 / math.sqrt(192 * 3 * 3)
-        self._conv3 = Conv2d(
+        self._conv3 = Conv2D(
             192,
             384,
             3,
@@ -68,7 +68,7 @@ class AlexNetDY(nn.Layer):
             bias_attr=ParamAttr(
                 name="conv3_offset", initializer=Uniform(-stdv, stdv)))
         stdv = 1.0 / math.sqrt(384 * 3 * 3)
-        self._conv4 = Conv2d(
+        self._conv4 = Conv2D(
             384,
             256,
             3,

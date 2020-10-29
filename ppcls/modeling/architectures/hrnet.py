@@ -21,8 +21,8 @@ import paddle
 from paddle import ParamAttr
 import paddle.nn as nn
 import paddle.nn.functional as F
-from paddle.nn import Conv2d, BatchNorm, Linear
-from paddle.nn import AdaptiveAvgPool2d, MaxPool2d, AvgPool2d
+from paddle.nn import Conv2D, BatchNorm, Linear
+from paddle.nn import AdaptiveAvgPool2D, MaxPool2D, AvgPool2D
 from paddle.nn.initializer import Uniform
 
 import math
@@ -58,7 +58,7 @@ class ConvBNLayer(nn.Layer):
                  name=None):
         super(ConvBNLayer, self).__init__()
 
-        self._conv = Conv2d(
+        self._conv = Conv2D(
             in_channels=num_channels,
             out_channels=num_filters,
             kernel_size=filter_size,
@@ -245,7 +245,8 @@ class BottleneckBlock(nn.Layer):
         if self.has_se:
             conv3 = self.se(conv3)
 
-        y = paddle.elementwise_add(x=conv3, y=residual, act="relu")
+        y = paddle.add(x=conv3, y=residual)
+        y = F.relu(y)
         return y
 
 
@@ -303,7 +304,8 @@ class BasicBlock(nn.Layer):
         if self.has_se:
             conv2 = self.se(conv2)
 
-        y = paddle.elementwise_add(x=conv2, y=residual, act="relu")
+        y = paddle.add(x=conv2, y=residual)
+        y = F.relu(y)
         return y
 
 
@@ -311,7 +313,7 @@ class SELayer(nn.Layer):
     def __init__(self, num_channels, num_filters, reduction_ratio, name=None):
         super(SELayer, self).__init__()
 
-        self.pool2d_gap = AdaptiveAvgPool2d(1)
+        self.pool2d_gap = AdaptiveAvgPool2D(1)
 
         self._num_channels = num_channels
 
@@ -482,17 +484,15 @@ class FuseLayers(nn.Layer):
                     y = self.residual_func_list[residual_func_idx](input[j])
                     residual_func_idx += 1
 
-                    y = F.resize_nearest(input=y, scale=2**(j - i))
-                    residual = paddle.elementwise_add(
-                        x=residual, y=y, act=None)
+                    y = F.upsample(y, scale_factor=2**(j - i), mode="nearest")
+                    residual = paddle.add(x=residual, y=y)
                 elif j < i:
                     y = input[j]
                     for k in range(i - j):
                         y = self.residual_func_list[residual_func_idx](y)
                         residual_func_idx += 1
 
-                    residual = paddle.elementwise_add(
-                        x=residual, y=y, act=None)
+                    residual = paddle.add(x=residual, y=y)
 
             residual = F.relu(residual)
             outs.append(residual)
@@ -623,7 +623,7 @@ class HRNet(nn.Layer):
             stride=1,
             name="cls_head_last_conv")
 
-        self.pool2d_avg = AdaptiveAvgPool2d(1)
+        self.pool2d_avg = AdaptiveAvgPool2D(1)
 
         stdv = 1.0 / math.sqrt(2048 * 1.0)
 

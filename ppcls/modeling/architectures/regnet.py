@@ -20,8 +20,9 @@ import numpy as np
 import paddle
 from paddle import ParamAttr
 import paddle.nn as nn
-from paddle.nn import Conv2d, BatchNorm, Linear, Dropout
-from paddle.nn import AdaptiveAvgPool2d, MaxPool2d, AvgPool2d
+import paddle.nn.functional as F
+from paddle.nn import Conv2D, BatchNorm, Linear, Dropout
+from paddle.nn import AdaptiveAvgPool2D, MaxPool2D, AvgPool2D
 from paddle.nn.initializer import Uniform
 import math
 
@@ -29,6 +30,7 @@ __all__ = [
     "RegNetX_200MF", "RegNetX_4GF", "RegNetX_32GF", "RegNetY_200MF",
     "RegNetY_4GF", "RegNetY_32GF"
 ]
+
 
 def quantize_float(f, q):
     """Converts a float to closest non-zero int divisible by q."""
@@ -39,9 +41,7 @@ def adjust_ws_gs_comp(ws, bms, gs):
     """Adjusts the compatibility of widths and groups."""
     ws_bot = [int(w * b) for w, b in zip(ws, bms)]
     gs = [min(g, w_bot) for g, w_bot in zip(gs, ws_bot)]
-    ws_bot = [
-        quantize_float(w_bot, g) for w_bot, g in zip(ws_bot, gs)
-    ]
+    ws_bot = [quantize_float(w_bot, g) for w_bot, g in zip(ws_bot, gs)]
     ws = [int(w_bot / b) for w_bot, b in zip(ws_bot, bms)]
     return ws, gs
 
@@ -81,7 +81,7 @@ class ConvBNLayer(nn.Layer):
                  name=None):
         super(ConvBNLayer, self).__init__()
 
-        self._conv = Conv2d(
+        self._conv = Conv2D(
             in_channels=num_channels,
             out_channels=num_filters,
             kernel_size=filter_size,
@@ -98,21 +98,22 @@ class ConvBNLayer(nn.Layer):
             bias_attr=ParamAttr(bn_name + ".output.1.b_0"),
             moving_mean_name=bn_name + "_mean",
             moving_variance_name=bn_name + "_variance")
+
     def forward(self, inputs):
         y = self._conv(inputs)
         y = self._batch_norm(y)
         return y
-    
-    
+
+
 class BottleneckBlock(nn.Layer):
     def __init__(self,
                  num_channels,
                  num_filters,
                  stride,
-                 bm, 
-                 gw, 
+                 bm,
+                 gw,
                  se_on,
-                 se_r, 
+                 se_r,
                  shortcut=True,
                  name=None):
         super(BottleneckBlock, self).__init__()
@@ -121,7 +122,7 @@ class BottleneckBlock(nn.Layer):
         w_b = int(round(num_filters * bm))
         # Compute the number of groups
         num_gs = w_b // gw
-        self.se_on = se_on 
+        self.se_on = se_on
         self.conv0 = ConvBNLayer(
             num_channels=num_channels,
             num_filters=w_b,
@@ -174,15 +175,16 @@ class BottleneckBlock(nn.Layer):
         else:
             short = self.short(inputs)
 
-        y = paddle.elementwise_add(x=short, y=conv2, act="relu")
+        y = paddle.add(x=short, y=conv2)
+        y = F.relu(y)
         return y
 
-    
+
 class SELayer(nn.Layer):
     def __init__(self, num_channels, num_filters, reduction_ratio, name=None):
         super(SELayer, self).__init__()
 
-        self.pool2d_gap = AdaptiveAvgPool2d(1)
+        self.pool2d_gap = AdaptiveAvgPool2D(1)
 
         self._num_channels = num_channels
 
@@ -214,15 +216,23 @@ class SELayer(nn.Layer):
             excitation, shape=[-1, self._num_channels, 1, 1])
         out = input * excitation
         return out
-    
+
 
 class RegNet(nn.Layer):
-    def __init__(self, w_a, w_0, w_m, d, group_w, bot_mul, q=8, se_on=False, class_dim=1000):
+    def __init__(self,
+                 w_a,
+                 w_0,
+                 w_m,
+                 d,
+                 group_w,
+                 bot_mul,
+                 q=8,
+                 se_on=False,
+                 class_dim=1000):
         super(RegNet, self).__init__()
-        
+
         # Generate RegNet ws per block
-        b_ws, num_s, max_s, ws_cont = generate_regnet(
-            w_a, w_0, w_m, d, q)
+        b_ws, num_s, max_s, ws_cont = generate_regnet(w_a, w_0, w_m, d, q)
         # Convert to per stage format
         ws, ds = get_stages_from_blocks(b_ws, b_ws)
         # Generate group widths and bot muls
@@ -258,7 +268,8 @@ class RegNet(nn.Layer):
                 num_channels = stem_w if block == i == 0 else in_channels
                 # Stride apply to the first block of the stage
                 b_stride = stride if i == 0 else 1
-                conv_name = "s" + str(block + 1) + "_b" + str(i + 1)  # chr(97 + i)
+                conv_name = "s" + str(block + 1) + "_b" + str(i +
+                                                              1)  # chr(97 + i)
                 bottleneck_block = self.add_sublayer(
                     conv_name,
                     BottleneckBlock(
@@ -275,7 +286,7 @@ class RegNet(nn.Layer):
                 self.block_list.append(bottleneck_block)
                 shortcut = True
 
-        self.pool2d_avg = AdaptiveAvgPool2d(1)
+        self.pool2d_avg = AdaptiveAvgPool2D(1)
 
         self.pool2d_avg_channels = w_out
 
@@ -297,7 +308,7 @@ class RegNet(nn.Layer):
         y = self.out(y)
         return y
 
-    
+
 def RegNetX_200MF(**args):
     model = RegNet(
         w_a=36.44, w_0=24, w_m=2.49, d=13, group_w=8, bot_mul=1.0, q=8, **args)
@@ -306,13 +317,27 @@ def RegNetX_200MF(**args):
 
 def RegNetX_4GF(**args):
     model = RegNet(
-        w_a=38.65, w_0=96, w_m=2.43, d=23, group_w=40, bot_mul=1.0, q=8, **args)
+        w_a=38.65,
+        w_0=96,
+        w_m=2.43,
+        d=23,
+        group_w=40,
+        bot_mul=1.0,
+        q=8,
+        **args)
     return model
 
 
 def RegNetX_32GF(**args):
     model = RegNet(
-        w_a=69.86, w_0=320, w_m=2.0, d=23, group_w=168, bot_mul=1.0, q=8, **args)
+        w_a=69.86,
+        w_0=320,
+        w_m=2.0,
+        d=23,
+        group_w=168,
+        bot_mul=1.0,
+        q=8,
+        **args)
     return model
 
 
@@ -356,4 +381,3 @@ def RegNetY_32GF(**args):
         se_on=True,
         **args)
     return model
-

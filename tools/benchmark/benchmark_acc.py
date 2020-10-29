@@ -20,7 +20,9 @@ sys.path.append(__dir__)
 sys.path.append(os.path.abspath(os.path.join(__dir__, '..')))
 sys.path.append(os.path.abspath(os.path.join(__dir__, '../..')))
 
-from multiprocessing import Process, Manager
+import paddle
+
+from multiprocessing import Manager
 import tools.eval as eval
 from ppcls.utils.model_zoo import _download, _decompress
 from ppcls.utils import logger
@@ -80,18 +82,25 @@ def main(args):
             args.config = model_info["config_path"]
             args.override = [
                 "pretrained_model={}".format(pretrained_path),
-                "VALID.batch_size=128",
+                "VALID.batch_size=256",
                 "VALID.num_workers=16",
                 "load_static_weights=True",
                 "print_interval=100",
             ]
+
             manager = Manager()
             return_dict = manager.dict()
-            p = Process(target=eval.main, args=(args, return_dict))
-            p.start()
-            p.join()
+
+            # A hack method to avoid name conflict.
+            # Multi-process maybe a better method here.
+            # More details can be seen in branch 2.0-beta.
+            # TODO: fluid needs to be removed in the future.
+            with paddle.utils.unique_name.guard():
+                eval.main(args, return_dict)
+
             top1_acc = return_dict.get("top1_acc", 0.0)
-        except:
+        except Exception as e:
+            logger.error(e)
             top1_acc = 0.0
         diff = abs(top1_acc - model_info["top1_acc"])
         if diff > 0.001:

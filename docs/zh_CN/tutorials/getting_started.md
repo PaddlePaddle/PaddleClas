@@ -235,12 +235,14 @@ python tools/infer/infer.py \
 python tools/export_model.py \
     --model=MobileNetV3_large_x1_0 \
     --pretrained_model=./output/MobileNetV3_large_x1_0/best_model/ppcls \
-    --output_path=./exported_model
+    --output_path=./inference/cls_infer
 ```
 
 其中，参数`--model`用于指定模型名称，`--pretrained_model`用于指定模型文件路径，该路径仍无需包含模型文件后缀名（如[1.3 模型恢复训练](#1.3)），`--output_path`用于指定转换后模型的存储路径。
 
-**注意**：文件`export_model.py:line53`中，`shape`参数为模型输入图像的`shape`，默认为`224*224`，请根据实际情况修改，如下所示：
+**注意**：
+1. `--output_path`中必须指定文件名的前缀，若`--output_path=./inference/cls_infer`，则会在`inference`文件夹下生成`cls_infer.pdiparams`、`cls_infer.pdmodel`和`cls_infer.pdiparams.info`文件。
+2. 文件`export_model.py:line53`中，`shape`参数为模型输入图像的`shape`，默认为`224*224`，请根据实际情况修改，如下所示：
 ```python
 50 # Please modify the 'shape' according to actual needs
 51 @to_static(input_spec=[
@@ -248,8 +250,9 @@ python tools/export_model.py \
 53         shape=[None, 3, 224, 224], dtype='float32')
 54 ])
 ```
+2.
 
-上述命令将生成模型结构文件（`__model__`）和模型权重文件（`__variables__`），然后可以使用预测引擎进行推理：
+上述命令将生成模型结构文件（`cls_infer.pdmodel`）和模型权重文件（`cls_infer.pdiparams`），然后可以使用预测引擎进行推理：
 
 ```bash
 python tools/infer/predict.py \
@@ -261,8 +264,8 @@ python tools/infer/predict.py \
 ```
 其中：
 + `image_file`(简写 i)：待预测的图片文件路径，如 `./test.jpeg`
-+ `model_file`(简写 m)：模型文件路径，如 `./MobileNetV3_large_x1_0/__model__`
-+ `params_file`(简写 p)：权重文件路径，如 `./MobileNetV3_large_x1_0/__variables__`
++ `model_file`(简写 m)：模型文件路径，如 `./MobileNetV3_large_x1_0/cls_infer.pdmodel`
++ `params_file`(简写 p)：权重文件路径，如 `./MobileNetV3_large_x1_0/cls_infer.pdiparams`
 + `use_tensorrt`：是否使用 TesorRT 预测引擎，默认值：`True`
 + `use_gpu`：是否使用 GPU 预测，默认值：`True`。
 

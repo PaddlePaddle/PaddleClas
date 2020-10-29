@@ -2,8 +2,8 @@ import paddle
 from paddle import ParamAttr
 import paddle.nn as nn
 import paddle.nn.functional as F
-from paddle.nn import Conv2d, BatchNorm, Linear, Dropout
-from paddle.nn import AdaptiveAvgPool2d, MaxPool2d, AvgPool2d
+from paddle.nn import Conv2D, BatchNorm, Linear, Dropout
+from paddle.nn import AdaptiveAvgPool2D, MaxPool2D, AvgPool2D
 import math
 import collections
 import re
@@ -300,7 +300,7 @@ class Conv2ds(nn.Layer):
             padding = padding_type
 
         groups = 1 if groups is None else groups
-        self._conv = Conv2d(
+        self._conv = Conv2D(
             input_channels,
             output_channels,
             filter_size,
@@ -484,7 +484,7 @@ class SEBlock(nn.Layer):
                  cur_stage=None):
         super(SEBlock, self).__init__()
 
-        self._pool = AdaptiveAvgPool2d(1)
+        self._pool = AdaptiveAvgPool2D(1)
         self._conv1 = Conv2ds(
             input_channels,
             num_squeezed_channels,
@@ -582,7 +582,7 @@ class MbConvBlock(nn.Layer):
                 self.block_args.input_filters == self.block_args.output_filters:
             if self.drop_connect_rate:
                 x = _drop_connect(x, self.drop_connect_rate, not self.training)
-            x = paddle.elementwise_add(x, inputs)
+            x = paddle.add(x, inputs)
         return x
 
 
@@ -755,7 +755,7 @@ class EfficientNet(nn.Layer):
             bn_name="_bn1",
             model_name=self.name,
             cur_stage=7)
-        self._pool = AdaptiveAvgPool2d(1)
+        self._pool = AdaptiveAvgPool2D(1)
 
         if self._global_params.dropout_rate:
             self._drop = Dropout(

@@ -19,7 +19,7 @@ from __future__ import print_function
 import sys
 
 import paddle
-import paddle.fluid.regularizer as regularizer
+import paddle.regularizer as regularizer
 
 __all__ = ['OptimizerBuilder']
 

@@ -141,12 +141,12 @@ def create_metric(out,
     """
     if architecture["name"] == "GoogLeNet":
         assert len(out) == 3, "GoogLeNet should have 3 outputs"
-        softmax_out = out[0]
+        out = out[0]
     else:
         # just need student label to get metrics
         if use_distillation:
             out = out[1]
-        softmax_out = F.softmax(out)
+    softmax_out = F.softmax(out)
 
     fetchs = OrderedDict()
     # set top1 to fetchs

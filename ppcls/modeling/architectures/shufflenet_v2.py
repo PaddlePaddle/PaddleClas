@@ -17,8 +17,8 @@ from __future__ import division
 from __future__ import print_function
 
 from paddle import ParamAttr, reshape, transpose, concat, split
-from paddle.nn import Layer, Conv2d, MaxPool2d, AdaptiveAvgPool2d, BatchNorm, Linear
-from paddle.nn.initializer import MSRA
+from paddle.nn import Layer, Conv2D, MaxPool2D, AdaptiveAvgPool2D, BatchNorm, Linear
+from paddle.nn.initializer import KaimingNormal
 from paddle.nn.functional import swish
 
 __all__ = [
@@ -56,7 +56,7 @@ class ConvBNLayer(Layer):
             act=None,
             name=None, ):
         super(ConvBNLayer, self).__init__()
-        self._conv = Conv2d(
+        self._conv = Conv2D(
             in_channels=in_channels,
             out_channels=out_channels,
             kernel_size=kernel_size,
@@ -64,7 +64,7 @@ class ConvBNLayer(Layer):
             padding=padding,
             groups=groups,
             weight_attr=ParamAttr(
-                initializer=MSRA(), name=name + "_weights"),
+                initializer=KaimingNormal(), name=name + "_weights"),
             bias_attr=False)
 
         self._batch_norm = BatchNorm(
@@ -228,7 +228,7 @@ class ShuffleNet(Layer):
             padding=1,
             act=act,
             name='stage1_conv')
-        self._max_pool = MaxPool2d(kernel_size=3, stride=2, padding=1)
+        self._max_pool = MaxPool2D(kernel_size=3, stride=2, padding=1)
 
         # 2. bottleneck sequences
         self._block_list = []
@@ -263,7 +263,7 @@ class ShuffleNet(Layer):
             act=act,
             name='conv5')
         # 4. pool
-        self._pool2d_avg = AdaptiveAvgPool2d(1)
+        self._pool2d_avg = AdaptiveAvgPool2D(1)
         self._out_c = stage_out_channels[-1]
         # 5. fc
         self._fc = Linear(
