@@ -33,7 +33,8 @@ def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument("-m", "--model", type=str)
     parser.add_argument("-p", "--pretrained_model", type=str)
-    parser.add_argument("-o", "--output_path", type=str)
+    parser.add_argument(
+        "-o", "--output_path", type=str, default="./inference/cls_infer")
     parser.add_argument("--class_dim", type=int, default=1000)
     parser.add_argument("--load_static_weights", type=str2bool, default=True)
     # parser.add_argument("--img_size", type=int, default=224)
@@ -61,7 +62,6 @@ class Net(paddle.nn.Layer):
 def main():
     args = parse_args()
 
-    paddle.disable_static()
     net = architectures.__dict__[args.model]
 
     model = Net(net, to_static, args.class_dim)

@@ -38,6 +38,7 @@ def parse_args():
     parser.add_argument("-i", "--image_file", type=str)
     parser.add_argument("-m", "--model", type=str)
     parser.add_argument("-p", "--pretrained_model", type=str)
+    parser.add_argument("--class_num", type=int, default=1000)
     parser.add_argument("--use_gpu", type=str2bool, default=True)
     parser.add_argument(
         "--load_static_weights",
@@ -117,7 +118,7 @@ def main():
     place = 'gpu:{}'.format(ParallelEnv().dev_id) if args.use_gpu else 'cpu'
     place = paddle.set_device(place)
 
-    net = architectures.__dict__[args.model]()
+    net = architectures.__dict__[args.model](class_dim=args.class_num)
     load_dygraph_pretrain(net, args.pretrained_model, args.load_static_weights)
     image_list = get_image_list(args.image_file)
     for idx, filename in enumerate(image_list):
