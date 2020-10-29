@@ -22,8 +22,7 @@ sys.path.append(os.path.abspath(os.path.join(__dir__, '../..')))
 
 import paddle
 
-from multiprocessing import Process, Manager
-import threading
+from multiprocessing import Manager
 import tools.eval as eval
 from ppcls.utils.model_zoo import _download, _decompress
 from ppcls.utils import logger
