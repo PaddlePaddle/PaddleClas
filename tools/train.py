@@ -25,6 +25,7 @@ sys.path.append(os.path.abspath(os.path.join(__dir__, '../')))
 
 from sys import version_info
 
+import paddle
 import paddle.fluid as fluid
 from paddle.fluid.incubate.fleet.base import role_maker
 from paddle.fluid.incubate.fleet.collective import fleet
@@ -154,5 +155,6 @@ def main(args):
 
 
 if __name__ == '__main__':
+    paddle.enable_static()
     args = parse_args()
     main(args)

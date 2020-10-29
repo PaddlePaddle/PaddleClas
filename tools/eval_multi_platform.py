@@ -23,7 +23,7 @@ sys.path.append(__dir__)
 sys.path.append(os.path.abspath(os.path.join(__dir__, '../')))
 
 import argparse
-
+import paddle
 import paddle.fluid as fluid
 
 import program
@@ -77,5 +77,6 @@ def main(args):
 
 
 if __name__ == '__main__':
+    paddle.enable_static()
     args = parse_args()
     main(args)

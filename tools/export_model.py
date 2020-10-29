@@ -21,6 +21,7 @@ sys.path.append(os.path.abspath(os.path.join(__dir__, '../')))
 import argparse
 
 from ppcls.modeling import architectures
+import paddle
 import paddle.fluid as fluid
 
 
@@ -81,4 +82,5 @@ def main():
 
 
 if __name__ == "__main__":
+    paddle.enable_static()
     main()
