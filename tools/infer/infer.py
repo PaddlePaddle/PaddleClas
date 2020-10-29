@@ -128,8 +128,7 @@ def main():
         outputs = net(data)
         if args.model == "GoogLeNet":
             outputs = outputs[0]
-        else:
-            outputs = F.softmax(outputs)
+        outputs = F.softmax(outputs)
         outputs = outputs.numpy()
         probs = postprocess(outputs)
 

@@ -184,7 +184,6 @@ class GoogleNetDY(nn.Layer):
         x = self._drop(x)
         x = paddle.squeeze(x, axis=[2, 3])
         out = self._fc_out(x)
-        out = F.softmax(out)
 
         x = self._pool_o1(ince4a)
         x = self._conv_o1(x)
@@ -193,7 +192,6 @@ class GoogleNetDY(nn.Layer):
         x = F.relu(x)
         x = self._drop_o1(x)
         out1 = self._out1(x)
-        out1 = F.softmax(out1)
 
         x = self._pool_o2(ince4d)
         x = self._conv_o2(x)
