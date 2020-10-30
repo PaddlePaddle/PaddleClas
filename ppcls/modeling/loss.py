@@ -38,8 +38,7 @@ class Loss(object):
             one_hot_target = F.one_hot(target, self._class_dim)
         else:
             one_hot_target = target
-        soft_target = F.label_smooth(
-            one_hot_target, epsilon=self._epsilon, dtype="float32")
+        soft_target = F.label_smooth(one_hot_target, epsilon=self._epsilon)
         soft_target = paddle.reshape(soft_target, shape=[-1, self._class_dim])
         return soft_target
 
@@ -47,15 +46,16 @@ class Loss(object):
         if self._label_smoothing:
             target = self._labelsmoothing(target)
             input = -F.log_softmax(input, axis=-1)
-            cost = paddle.reduce_sum(target * input, dim=-1)
+            cost = paddle.sum(target * input, axis=-1)
         else:
             cost = F.cross_entropy(input=input, label=target)
         avg_cost = paddle.mean(cost)
         return avg_cost
 
-    def _kldiv(self, input, target):
-        cost = target * F.log(target / input) * self._class_dim
-        cost = paddle.sum(cost)
+    def _kldiv(self, input, target, name=None):
+        eps = 1.0e-10
+        cost = target * paddle.log(
+            (target + eps) / (input + eps)) * self._class_dim
         return cost
 
     def _jsdiv(self, input, target):

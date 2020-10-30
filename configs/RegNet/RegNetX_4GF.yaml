@@ -1,6 +1,6 @@
 mode: 'train'
 ARCHITECTURE:
-    name: "ShuffleNetV2_x0_5"
+    name: 'RegNetX_4GF'
 
 pretrained_model: ""
 model_save_dir: "./output/"
@@ -9,14 +9,17 @@ total_images: 1281167
 save_interval: 1
 validate: True
 valid_interval: 1
-epochs: 240
+epochs: 100
 topk: 5
 image_shape: [3, 224, 224]
+
+use_mix: False
+ls_epsilon: -1
 
 LEARNING_RATE:
     function: 'CosineWarmup'
     params:
-        lr: 0.5
+        lr: 0.4
         warmup_epoch: 5
 
 OPTIMIZER:
@@ -25,10 +28,10 @@ OPTIMIZER:
         momentum: 0.9
     regularizer:
         function: 'L2'
-        factor: 0.00003
+        factor: 0.000050
 
 TRAIN:
-    batch_size: 1024
+    batch_size: 512
     num_workers: 4
     file_list: "./dataset/ILSVRC2012/train_list.txt"
     data_dir: "./dataset/ILSVRC2012/"
@@ -40,8 +43,6 @@ TRAIN:
             channel_first: False
         - RandCropImage:
             size: 224
-            scale: [0.64, 1.0]
-            ratio: [0.8, 1.2]
         - RandFlipImage:
             flip_code: 1
         - NormalizeImage:
@@ -51,10 +52,8 @@ TRAIN:
             order: ''
         - ToCHWImage:
 
-
-
 VALID:
-    batch_size: 64
+    batch_size: 256
     num_workers: 4
     file_list: "./dataset/ILSVRC2012/val_list.txt"
     data_dir: "./dataset/ILSVRC2012/"
@@ -74,5 +73,3 @@ VALID:
             std: [0.229, 0.224, 0.225]
             order: ''
         - ToCHWImage:
-
-

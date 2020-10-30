@@ -33,6 +33,15 @@ PaddleClas is a toolset for image classification tasks prepared for the industry
 - Support Linux, Windows, macOS and other systems.
 
 
+## Community
+
+* Scan the QR code below with your Wechat, you can access to official technical exchange group. Look forward to your participation.
+
+<div align="center">
+<img src="./docs/images/joinus.png"  width = "200" height = "200" />
+</div>
+
+
 ## Tutorials
 
 - [Installation](./docs/en/tutorials/install_en.md)
@@ -47,13 +56,14 @@ PaddleClas is a toolset for image classification tasks prepared for the industry
     - [Inception series](#Inception_series)
     - [EfficientNet and ResNeXt101_wsl series](#EfficientNet_and_ResNeXt101_wsl_series)
     - [ResNeSt and RegNet series](#ResNeSt_and_RegNet_series)
+    - HS-ResNet: arxiv link: [https://arxiv.org/pdf/2010.07621.pdf](https://arxiv.org/pdf/2010.07621.pdf). Code and models are coming soon!
 - Model training/evaluation
     - [Data preparation](./docs/en/tutorials/data_en.md)
     - [Model training and finetuning](./docs/en/tutorials/getting_started_en.md)
     - [Model evaluation](./docs/en/tutorials/getting_started_en.md)
 - Model prediction/inference
-    - [Prediction based on training engine](./docs/en/extension/paddle_inference_en.md)
-    - [Python inference](./docs/en/extension/paddle_inference_en.md)
+    - [Prediction based on training engine](./docs/en/tutorials/getting_started_en.md)
+    - [Python inference](./docs/en/tutorials/getting_started_en.md)
     - [C++ inference](./deploy/cpp_infer/readme_en.md)
     - [Serving deployment](./docs/en/extension/paddle_serving_en.md)
     - [Mobile](./deploy/lite/readme_en.md)
@@ -84,7 +94,7 @@ Based on the ImageNet-1k classification dataset, the 24 classification network s
 
 Curves of accuracy to the inference time of common server-side models are shown as follows.
 
-![](./docs/images/models/T4_benchmark/t4.fp32.bs4.main_fps_top1.png)
+![](./docs/images/models/T4_benchmark/t4.fp32.bs1.main_fps_top1.png)
 
 
 Curves of accuracy to the inference time and storage size of common mobile-side models are shown as follows.
@@ -291,7 +301,7 @@ Accuracy and inference time metrics of ResNeSt and RegNet series models are show
 | Model                    | Top-1 Acc | Top-5 Acc | time(ms)<br>bs=1 | time(ms)<br>bs=4 | Flops(G) | Params(M) | Download Address                                                                                                 |
 |------------------------|-----------|-----------|------------------|------------------|----------|-----------|------------------------------------------------------------------------------------------------------|
 | ResNeSt50_<br>fast_1s1x64d | 0.8035    | 0.9528    | 3.45405                | 8.72680                | 8.68     | 26.3      | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/ResNeSt50_fast_1s1x64d_pretrained.pdparams) |
-| ResNeSt50              | 0.8102    | 0.9542    | 6.69042    | 8.01664                | 10.78    | 27.5      | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/ResNeSt50_pretrained.pdparams)              |
+| ResNeSt50              | 0.8083    | 0.9542    | 6.69042    | 8.01664                | 10.78    | 27.5      | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/ResNeSt50_pretrained.pdparams)              |
 | RegNetX_4GF            | 0.785     | 0.9416    |    6.46478              |      11.19862           | 8        | 22.1      | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/RegNetX_4GF_pretrained.pdparams)            |
 
 

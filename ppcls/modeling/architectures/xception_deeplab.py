@@ -2,8 +2,8 @@ import paddle
 from paddle import ParamAttr
 import paddle.nn as nn
 import paddle.nn.functional as F
-from paddle.nn import Conv2d, BatchNorm, Linear, Dropout
-from paddle.nn import AdaptiveAvgPool2d, MaxPool2d, AvgPool2d
+from paddle.nn import Conv2D, BatchNorm, Linear, Dropout
+from paddle.nn import AdaptiveAvgPool2D, MaxPool2D, AvgPool2D
 
 __all__ = ["Xception41_deeplab", "Xception65_deeplab", "Xception71_deeplab"]
 
@@ -69,7 +69,7 @@ class ConvBNLayer(nn.Layer):
                  name=None):
         super(ConvBNLayer, self).__init__()
 
-        self._conv = Conv2d(
+        self._conv = Conv2D(
             in_channels=input_channels,
             out_channels=output_channels,
             kernel_size=filter_size,
@@ -102,7 +102,7 @@ class Seperate_Conv(nn.Layer):
                  name=None):
         super(Seperate_Conv, self).__init__()
 
-        self._conv1 = Conv2d(
+        self._conv1 = Conv2D(
             in_channels=input_channels,
             out_channels=input_channels,
             kernel_size=filter,
@@ -121,7 +121,7 @@ class Seperate_Conv(nn.Layer):
             bias_attr=ParamAttr(name=name + "/depthwise/BatchNorm/beta"),
             moving_mean_name=name + "/depthwise/BatchNorm/moving_mean",
             moving_variance_name=name + "/depthwise/BatchNorm/moving_variance")
-        self._conv2 = Conv2d(
+        self._conv2 = Conv2D(
             input_channels,
             output_channels,
             1,
@@ -244,7 +244,7 @@ class Xception_Block(nn.Layer):
             skip = self._short(inputs)
         else:
             skip = inputs
-        return paddle.elementwise_add(x, skip)
+        return paddle.add(x, skip)
 
 
 class XceptionDeeplab(nn.Layer):
@@ -347,7 +347,7 @@ class XceptionDeeplab(nn.Layer):
         self.stride = s
 
         self._drop = Dropout(p=0.5, mode="downscale_in_infer")
-        self._pool = AdaptiveAvgPool2d(1)
+        self._pool = AdaptiveAvgPool2D(1)
         self._fc = Linear(
             self.chns[1][-1],
             class_dim,

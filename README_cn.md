@@ -6,6 +6,9 @@
 
 飞桨图像分类套件PaddleClas是飞桨为工业界和学术界所准备的一个图像分类任务的工具集，助力使用者训练出更好的视觉模型和应用落地。
 
+
+**注意**: 百度提出了一个新的图像分类网络结构 **`HS-ResNet`** ，基于ImageNet-1k数据集，`HS-ResNet`在与`ResNet`的params相近的情况下，Top-1 Acc达到了81.3%，相应的Arxiv文章链接可以参考这里：[HS-ResNet: Hierarchical-Split Block on Convolutional Neural Network](https://arxiv.org/pdf/2010.07621.pdf)，模型结构和预训练模型参数即将开源，敬请期待！
+
 **近期更新**
 - 2020.10.20 添加 `Res2Net50_vd_26w_4s_ssld `模型，在ImageNet-1k上Top-1 Acc可达83.1%；添加 `Res2Net101_vd_26w_4s_ssld `模型，在ImageNet-1k上Top-1 Acc可达83.9%。
 - 2020.10.12 添加Paddle-Lite demo。
@@ -33,6 +36,15 @@
 - 可运行于Linux、Windows、MacOS等多种系统。
 
 
+## 欢迎加入技术交流群
+
+* 微信扫描二维码加入官方交流群，获得更高效的问题答疑，与各行各业开发者充分交流，期待您的加入。
+
+<div align="center">
+<img src="./docs/images/joinus.png"  width = "200" height = "200" />
+</div>
+
+
 ## 文档教程
 
 - [快速安装](./docs/zh_CN/tutorials/install.md)
@@ -47,13 +59,14 @@
     - [Inception系列](#Inception系列)
     - [EfficientNet与ResNeXt101_wsl系列](#EfficientNet与ResNeXt101_wsl系列)
     - [ResNeSt与RegNet系列](#ResNeSt与RegNet系列)
+    - HS-ResNet: arxiv文章链接: [https://arxiv.org/pdf/2010.07621.pdf](https://arxiv.org/pdf/2010.07621.pdf)。 代码和预训练模型即将开源，敬请期待。
 - 模型训练/评估
     - [数据准备](./docs/zh_CN/tutorials/data.md)
     - [模型训练与微调](./docs/zh_CN/tutorials/getting_started.md)
     - [模型评估](./docs/zh_CN/tutorials/getting_started.md)
 - 模型预测
-    - [基于训练引擎预测推理](./docs/zh_CN/extension/paddle_inference.md)
-    - [基于Python预测引擎预测推理](./docs/zh_CN/extension/paddle_inference.md)
+    - [基于训练引擎预测推理](./docs/zh_CN/tutorials/getting_started.md)
+    - [基于Python预测引擎预测推理](./docs/zh_CN/tutorials/getting_started.md)
     - [基于C++预测引擎预测推理](./deploy/cpp_infer/readme.md)
     - [服务化部署](./docs/zh_CN/extension/paddle_serving.md)
     - [端侧部署](./deploy/lite/readme.md)
@@ -84,7 +97,7 @@
 
 常见服务器端模型的精度指标与其预测耗时的变化曲线如下图所示。
 
-![](./docs/images/models/T4_benchmark/t4.fp32.bs4.main_fps_top1.png)
+![](./docs/images/models/T4_benchmark/t4.fp32.bs1.main_fps_top1.png)
 
 
 常见移动端模型的精度指标与其预测耗时、模型存储大小的变化曲线如下图所示。
@@ -291,7 +304,7 @@ ResNeSt与RegNet系列模型的精度、速度指标如下表所示，更多关�
 | 模型                     | Top-1 Acc | Top-5 Acc | time(ms)<br>bs=1 | time(ms)<br>bs=4 | Flops(G) | Params(M) | 下载地址                                                                                                 |
 |------------------------|-----------|-----------|------------------|------------------|----------|-----------|------------------------------------------------------------------------------------------------------|
 | ResNeSt50_<br>fast_1s1x64d | 0.8035    | 0.9528    | 3.45405                | 8.72680                | 8.68     | 26.3      | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/ResNeSt50_fast_1s1x64d_pretrained.pdparams) |
-| ResNeSt50              | 0.8102    | 0.9542    | 6.69042    | 8.01664                | 10.78    | 27.5      | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/ResNeSt50_pretrained.pdparams)              |
+| ResNeSt50              | 0.8083    | 0.9542    | 6.69042    | 8.01664                | 10.78    | 27.5      | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/ResNeSt50_pretrained.pdparams)              |
 | RegNetX_4GF            | 0.785     | 0.9416    |    6.46478              |      11.19862           | 8        | 22.1      | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/RegNetX_4GF_pretrained.pdparams)            |
 
 

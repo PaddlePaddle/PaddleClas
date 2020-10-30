@@ -19,15 +19,15 @@ from __future__ import print_function
 import sys
 import math
 
-from paddle.optimizer.lr_scheduler import LinearLrWarmup
-from paddle.optimizer.lr_scheduler import PiecewiseLR
-from paddle.optimizer.lr_scheduler import CosineAnnealingLR
-from paddle.optimizer.lr_scheduler import ExponentialLR
+from paddle.optimizer.lr import LinearWarmup
+from paddle.optimizer.lr import PiecewiseDecay
+from paddle.optimizer.lr import CosineAnnealingDecay
+from paddle.optimizer.lr import ExponentialDecay
 
 __all__ = ['LearningRateBuilder']
 
 
-class Cosine(CosineAnnealingLR):
+class Cosine(CosineAnnealingDecay):
     """
     Cosine learning rate decay
     lr = 0.05 * (math.cos(epoch * (math.pi / epochs)) + 1)
@@ -46,7 +46,7 @@ class Cosine(CosineAnnealingLR):
         self.update_specified = False
 
 
-class Piecewise(PiecewiseLR):
+class Piecewise(PiecewiseDecay):
     """
     Piecewise learning rate decay
 
@@ -66,7 +66,7 @@ class Piecewise(PiecewiseLR):
         self.update_specified = False
 
 
-class CosineWarmup(LinearLrWarmup):
+class CosineWarmup(LinearWarmup):
     """
     Cosine learning rate decay with warmup
     [0, warmup_epoch): linear warmup
@@ -96,7 +96,7 @@ class CosineWarmup(LinearLrWarmup):
         self.update_specified = False
 
 
-class ExponentialWarmup(LinearLrWarmup):
+class ExponentialWarmup(LinearWarmup):
     """
     Exponential learning rate decay with warmup
     [0, warmup_epoch): linear warmup
@@ -120,7 +120,7 @@ class ExponentialWarmup(LinearLrWarmup):
         warmup_step = warmup_epoch * step_each_epoch
         start_lr = 0.0
         end_lr = lr
-        lr_sch = ExponentialLR(lr, decay_rate)
+        lr_sch = ExponentialDecay(lr, decay_rate)
 
         super(ExponentialWarmup, self).__init__(
             learning_rate=lr_sch,

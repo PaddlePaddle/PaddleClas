@@ -20,8 +20,9 @@ import numpy as np
 import paddle
 from paddle import ParamAttr
 import paddle.nn as nn
-from paddle.nn import Conv2d, BatchNorm, Linear, Dropout
-from paddle.nn import AdaptiveAvgPool2d, MaxPool2d, AvgPool2d
+import paddle.nn.functional as F
+from paddle.nn import Conv2D, BatchNorm, Linear, Dropout
+from paddle.nn import AdaptiveAvgPool2D, MaxPool2D, AvgPool2D
 from paddle.nn.initializer import Uniform
 
 import math
@@ -32,29 +33,29 @@ __all__ = [
 
 
 class ConvBNLayer(nn.Layer):
-    def __init__(
-            self,
-            num_channels,
-            num_filters,
-            filter_size,
-            stride=1,
-            groups=1,
-            is_vd_mode=False,
-            act=None,
-            name=None, ):
+    def __init__(self,
+                 num_channels,
+                 num_filters,
+                 filter_size,
+                 stride=1,
+                 groups=1,
+                 is_vd_mode=False,
+                 act=None,
+                 lr_mult=1.0,
+                 name=None):
         super(ConvBNLayer, self).__init__()
-
         self.is_vd_mode = is_vd_mode
-        self._pool2d_avg = AvgPool2d(
+        self._pool2d_avg = AvgPool2D(
             kernel_size=2, stride=2, padding=0, ceil_mode=True)
-        self._conv = Conv2d(
+        self._conv = Conv2D(
             in_channels=num_channels,
             out_channels=num_filters,
             kernel_size=filter_size,
             stride=stride,
             padding=(filter_size - 1) // 2,
             groups=groups,
-            weight_attr=ParamAttr(name=name + "_weights"),
+            weight_attr=ParamAttr(
+                name=name + "_weights", learning_rate=lr_mult),
             bias_attr=False)
         if name == "conv1":
             bn_name = "bn_" + name
@@ -83,6 +84,7 @@ class BottleneckBlock(nn.Layer):
                  stride,
                  shortcut=True,
                  if_first=False,
+                 lr_mult=1.0,
                  name=None):
         super(BottleneckBlock, self).__init__()
 
@@ -91,6 +93,7 @@ class BottleneckBlock(nn.Layer):
             num_filters=num_filters,
             filter_size=1,
             act='relu',
+            lr_mult=lr_mult,
             name=name + "_branch2a")
         self.conv1 = ConvBNLayer(
             num_channels=num_filters,
@@ -98,12 +101,14 @@ class BottleneckBlock(nn.Layer):
             filter_size=3,
             stride=stride,
             act='relu',
+            lr_mult=lr_mult,
             name=name + "_branch2b")
         self.conv2 = ConvBNLayer(
             num_channels=num_filters,
             num_filters=num_filters * 4,
             filter_size=1,
             act=None,
+            lr_mult=lr_mult,
             name=name + "_branch2c")
 
         if not shortcut:
@@ -126,7 +131,8 @@ class BottleneckBlock(nn.Layer):
             short = inputs
         else:
             short = self.short(inputs)
-        y = paddle.elementwise_add(x=short, y=conv2, act='relu')
+        y = paddle.add(x=short, y=conv2)
+        y = F.relu(y)
         return y
 
 
@@ -137,6 +143,7 @@ class BasicBlock(nn.Layer):
                  stride,
                  shortcut=True,
                  if_first=False,
+                 lr_mult=1.0,
                  name=None):
         super(BasicBlock, self).__init__()
         self.stride = stride
@@ -173,12 +180,16 @@ class BasicBlock(nn.Layer):
             short = inputs
         else:
             short = self.short(inputs)
-        y = paddle.elementwise_add(x=short, y=conv1, act='relu')
+        y = paddle.add(x=short, y=conv1)
+        y = F.relu(y)
         return y
 
 
 class ResNet_vd(nn.Layer):
-    def __init__(self, layers=50, class_dim=1000):
+    def __init__(self,
+                 layers=50,
+                 class_dim=1000,
+                 lr_mult_list=[1.0, 1.0, 1.0, 1.0, 1.0]):
         super(ResNet_vd, self).__init__()
 
         self.layers = layers
@@ -186,6 +197,16 @@ class ResNet_vd(nn.Layer):
         assert layers in supported_layers, \
             "supported layers are {} but input layer is {}".format(
                 supported_layers, layers)
+
+        self.lr_mult_list = lr_mult_list
+        assert isinstance(self.lr_mult_list, (
+            list, tuple
+        )), "lr_mult_list should be in (list, tuple) but got {}".format(
+            type(self.lr_mult_list))
+        assert len(
+            self.lr_mult_list
+        ) == 5, "lr_mult_list length should should be 5 but got {}".format(
+            len(self.lr_mult_list))
 
         if layers == 18:
             depth = [2, 2, 2, 2]
@@ -207,6 +228,7 @@ class ResNet_vd(nn.Layer):
             filter_size=3,
             stride=2,
             act='relu',
+            lr_mult=self.lr_mult_list[0],
             name="conv1_1")
         self.conv1_2 = ConvBNLayer(
             num_channels=32,
@@ -214,6 +236,7 @@ class ResNet_vd(nn.Layer):
             filter_size=3,
             stride=1,
             act='relu',
+            lr_mult=self.lr_mult_list[0],
             name="conv1_2")
         self.conv1_3 = ConvBNLayer(
             num_channels=32,
@@ -221,8 +244,9 @@ class ResNet_vd(nn.Layer):
             filter_size=3,
             stride=1,
             act='relu',
+            lr_mult=self.lr_mult_list[0],
             name="conv1_3")
-        self.pool2d_max = MaxPool2d(kernel_size=3, stride=2, padding=1)
+        self.pool2d_max = MaxPool2D(kernel_size=3, stride=2, padding=1)
 
         self.block_list = []
         if layers >= 50:
@@ -245,6 +269,7 @@ class ResNet_vd(nn.Layer):
                             stride=2 if i == 0 and block != 0 else 1,
                             shortcut=shortcut,
                             if_first=block == i == 0,
+                            lr_mult=self.lr_mult_list[block + 1],
                             name=conv_name))
                     self.block_list.append(bottleneck_block)
                     shortcut = True
@@ -262,11 +287,12 @@ class ResNet_vd(nn.Layer):
                             stride=2 if i == 0 and block != 0 else 1,
                             shortcut=shortcut,
                             if_first=block == i == 0,
-                            name=conv_name))
+                            name=conv_name,
+                            lr_mult=self.lr_mult_list[block + 1]))
                     self.block_list.append(basic_block)
                     shortcut = True
 
-        self.pool2d_avg = AdaptiveAvgPool2d(1)
+        self.pool2d_avg = AdaptiveAvgPool2D(1)
 
         self.pool2d_avg_channels = num_channels[-1] * 2
 

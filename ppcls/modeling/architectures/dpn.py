@@ -21,8 +21,8 @@ import sys
 import paddle
 from paddle import ParamAttr
 import paddle.nn as nn
-from paddle.nn import Conv2d, BatchNorm, Linear
-from paddle.nn import AdaptiveAvgPool2d, MaxPool2d, AvgPool2d
+from paddle.nn import Conv2D, BatchNorm, Linear
+from paddle.nn import AdaptiveAvgPool2D, MaxPool2D, AvgPool2D
 from paddle.nn.initializer import Uniform
 
 import math
@@ -49,7 +49,7 @@ class ConvBNLayer(nn.Layer):
                  name=None):
         super(ConvBNLayer, self).__init__()
 
-        self._conv = Conv2d(
+        self._conv = Conv2D(
             in_channels=num_channels,
             out_channels=num_filters,
             kernel_size=filter_size,
@@ -93,7 +93,7 @@ class BNACConvLayer(nn.Layer):
             moving_mean_name=name + '_bn_mean',
             moving_variance_name=name + '_bn_variance')
 
-        self._conv = Conv2d(
+        self._conv = Conv2D(
             in_channels=num_channels,
             out_channels=num_filters,
             kernel_size=filter_size,
@@ -202,7 +202,7 @@ class DualPathFactory(nn.Layer):
             c1x1_c, num_or_sections=[self.num_1x1_c, self.inc], axis=1)
 
         # OUTPUTS
-        summ = paddle.elementwise_add(x=data_o1, y=c1x1_c1)
+        summ = paddle.add(x=data_o1, y=c1x1_c1)
         dense = paddle.concat([data_o2, c1x1_c2], axis=1)
         # tensor, channels
         return [summ, dense]
@@ -236,7 +236,7 @@ class DPN(nn.Layer):
             act='relu',
             name="conv1")
 
-        self.pool2d_max = MaxPool2d(kernel_size=3, stride=2, padding=1)
+        self.pool2d_max = MaxPool2D(kernel_size=3, stride=2, padding=1)
 
         num_channel_dpn = init_num_filter
 
@@ -301,7 +301,7 @@ class DPN(nn.Layer):
             moving_mean_name='final_concat_bn_mean',
             moving_variance_name='final_concat_bn_variance')
 
-        self.pool2d_avg = AdaptiveAvgPool2d(1)
+        self.pool2d_avg = AdaptiveAvgPool2D(1)
 
         stdv = 0.01
 

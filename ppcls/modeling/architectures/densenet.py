@@ -20,8 +20,8 @@ import numpy as np
 import paddle
 from paddle import ParamAttr
 import paddle.nn as nn
-from paddle.nn import Conv2d, BatchNorm, Linear, Dropout
-from paddle.nn import AdaptiveAvgPool2d, MaxPool2d, AvgPool2d
+from paddle.nn import Conv2D, BatchNorm, Linear, Dropout
+from paddle.nn import AdaptiveAvgPool2D, MaxPool2D, AvgPool2D
 from paddle.nn.initializer import Uniform
 
 import math
@@ -51,7 +51,7 @@ class BNACConvLayer(nn.Layer):
             moving_mean_name=name + '_bn_mean',
             moving_variance_name=name + '_bn_variance')
 
-        self._conv = Conv2d(
+        self._conv = Conv2D(
             in_channels=num_channels,
             out_channels=num_filters,
             kernel_size=filter_size,
@@ -145,7 +145,7 @@ class TransitionLayer(nn.Layer):
             stride=1,
             name=name)
 
-        self.pool2d_avg = AvgPool2d(kernel_size=2, stride=2, padding=0)
+        self.pool2d_avg = AvgPool2D(kernel_size=2, stride=2, padding=0)
 
     def forward(self, input):
         y = self.conv_ac_func(input)
@@ -165,7 +165,7 @@ class ConvBNLayer(nn.Layer):
                  name=None):
         super(ConvBNLayer, self).__init__()
 
-        self._conv = Conv2d(
+        self._conv = Conv2D(
             in_channels=num_channels,
             out_channels=num_filters,
             kernel_size=filter_size,
@@ -214,7 +214,7 @@ class DenseNet(nn.Layer):
             act='relu',
             name="conv1")
 
-        self.pool2d_max = MaxPool2d(kernel_size=3, stride=2, padding=1)
+        self.pool2d_max = MaxPool2D(kernel_size=3, stride=2, padding=1)
 
         self.block_config = block_config
 
@@ -256,7 +256,7 @@ class DenseNet(nn.Layer):
             moving_mean_name='conv5_blk_bn_mean',
             moving_variance_name='conv5_blk_bn_variance')
 
-        self.pool2d_avg = AdaptiveAvgPool2d(1)
+        self.pool2d_avg = AdaptiveAvgPool2D(1)
 
         stdv = 1.0 / math.sqrt(num_features * 1.0)
 

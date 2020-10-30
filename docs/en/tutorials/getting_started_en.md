@@ -221,12 +221,20 @@ Firstly, you should export inference model using `tools/export_model.py`.
 python tools/export_model.py \
     --model=MobileNetV3_large_x1_0 \
     --pretrained_model=./output/MobileNetV3_large_x1_0/best_model/ppcls \
-    --output_path=./exported_model
+    --output_path=./inference/cls_infer
 
+```python
+50 # Please modify the 'shape' according to actual needs
+51 @to_static(input_spec=[
+52     paddle.static.InputSpec(
+53         shape=[None, 3, 224, 224], dtype='float32')
+54 ])
 ```
-Among them, the `--model` parameter is used to specify the model name, `--pretrained_model` parameter is used to specify the model file path, the path does not need to include the model file suffix name, and `--output_path` is used to specify the storage path of the converted model .
+Among them, the `--model` parameter is used to specify the model name, `--pretrained_model` parameter is used to specify the model file path, the path does not need to include the model file suffix name, and `--output_path` is used to specify the storage path of the converted model.
 
-**Note**: In the file `export_model.py:line53`, the `shape` parameter is the shape of the model input image, the default is `224*224`. Please modify it according to the actual situation, as shown below:
+**Note**:
+1. File prefix must be assigned in `--output_path`. If `--output_path=./inference/cls_infer`, then three files will be generated in the folder `inference`, they are `cls_infer.pdiparams`, `cls_infer.pdmodel` and `cls_infer.pdiparams.info`.
+2. In the file `export_model.py:line53`, the `shape` parameter is the shape of the model input image, the default is `224*224`. Please modify it according to the actual situation, as shown below:
 
 ```python
 50 # Please modify the 'shape' according to actual needs
@@ -236,7 +244,7 @@ Among them, the `--model` parameter is used to specify the model name, `--pretra
 54 ])
 ```
 
-The above command will generate the model structure file (`__model__`) and the model weight file (`__variables__`), and then the inference engine can be used for inference:
+The above command will generate the model structure file (`cls_infer.pdmodel`) and the model weight file (`cls_infer.pdiparams`), and then the inference engine can be used for inference:
 
 ```bash
 python tools/infer/predict.py \
@@ -248,8 +256,8 @@ python tools/infer/predict.py \
 ```
 Among them:
 + `image_file`(i): The path of the image file to be predicted, such as `./test.jpeg`;
-+ `model_file`(m): Model file path, such as `./MobileNetV3_large_x1_0/__model__`;
-+ `params_file`(p): Weight file path, such as `./MobileNetV3_large_x1_0/__variables__`;
++ `model_file`(m): Model file path, such as `./MobileNetV3_large_x1_0/cls_infer.pdmodel`;
++ `params_file`(p): Weight file path, such as `./MobileNetV3_large_x1_0/cls_infer.pdiparams`;
 + `use_tensorrt`: Whether to use the TesorRT, default by `True`;
 + `use_gpu`: Whether to use the GPU, default by `True`.
 

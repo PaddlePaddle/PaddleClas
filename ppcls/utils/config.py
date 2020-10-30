@@ -98,8 +98,9 @@ def check_config(config):
     """
     check.check_version()
 
-    mode = config.get('mode', 'train')
-    check.check_gpu()
+    use_gpu = config.get('use_gpu', True)
+    if use_gpu:
+        check.check_gpu()
 
     architecture = config.get('ARCHITECTURE')
     check.check_architecture(architecture)
@@ -110,6 +111,7 @@ def check_config(config):
     classes_num = config.get('classes_num')
     check.check_classes_num(classes_num)
 
+    mode = config.get('mode', 'train')
     if mode.lower() == 'train':
         check.check_function_params(config, 'LEARNING_RATE')
         check.check_function_params(config, 'OPTIMIZER')

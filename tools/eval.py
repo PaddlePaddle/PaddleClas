@@ -49,13 +49,11 @@ def parse_args():
 
 def main(args, return_dict={}):
     config = get_config(args.config, overrides=args.override, show=True)
+    config.mode = "valid"
     # assign place
     use_gpu = config.get("use_gpu", True)
-    if use_gpu:
-        gpu_id = ParallelEnv().dev_id
-        place = paddle.CUDAPlace(gpu_id)
-    else:
-        place = paddle.CPUPlace()
+    place = 'gpu:{}'.format(ParallelEnv().dev_id) if use_gpu else 'cpu'
+    place = paddle.set_device(place)
 
     paddle.disable_static(place)
 
