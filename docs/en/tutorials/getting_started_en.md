@@ -95,15 +95,20 @@ The model evaluation process can be started as follows.
 
 ```bash
 python tools/eval.py \
-    -c ./configs/eval.yaml \
-    -o ARCHITECTURE.name="MobileNetV3_large_x1_0" \
-    -o pretrained_model=path_to_pretrained_models
+    -c ./configs/quick_start/MobileNetV3_large_x1_0_finetune.yaml \
+    -o pretrained_model="./output/MobileNetV3_large_x1_0/best_model/ppcls"\
+    -o load_static_weights=False
 ```
 
-You can modify the `ARCHITECTURE.name` field and `pretrained_model` field in `configs/eval.yaml` to configure the evaluation model, and you also can update the configuration through the `-o` parameter.
+The above command will use `./configs/quick_start/MobileNetV3_large_x1_0_finetune.yaml` as the configuration file to evaluate the model `./output/MobileNetV3_large_x1_0/best_model/ppcls`. You can also set the evaluation by changing the parameters in the configuration file, or you can update the configuration with the `-o` parameter, as shown above.
+
+Some of the configurable evaluation parameters are described as follows:
+* `ARCHITECTURE.name`: Model name
+* `pretrained_model`: The path of the model file to be evaluated
+* `load_static_weights`: Whether the model to be evaluated is a static graph model
 
 
-**Note:** When loading the pre-trained model, you need to specify the prefix of the pretrained model, such as  [1.3 Resume Training](#13-resume-training).
+**Note:** If the model is a dygraph type, you only need to specify the prefix of the model file when loading the model, instead of specifying the suffix, such as [1.3 Resume Training](#13-resume-training).
 
 <a name="2"></a>
 ### 2. Training and evaluation on Linux+GPU
@@ -120,7 +125,7 @@ export CUDA_VISIBLE_DEVICES=0,1,2,3
 python -m paddle.distributed.launch \
     --selected_gpus="0,1,2,3" \
     tools/train.py \
-        -c ./configs/quick_start/MobileNetV3_large_x1_0_finetune.yaml \
+        -c ./configs/quick_start/MobileNetV3_large_x1_0_finetune.yaml
 ```
 
 The configuration can be updated by adding the `-o` parameter.
@@ -146,8 +151,8 @@ export CUDA_VISIBLE_DEVICES=0,1,2,3
 python -m paddle.distributed.launch \
     --selected_gpus="0,1,2,3" \
     tools/train.py \
-        -c configs/ResNet/ResNet50.yaml \
-        -o pretrained_model="./pretrained/ResNet50_pretrained"
+        -c ./configs/quick_start/MobileNetV3_large_x1_0_finetune.yaml \
+        -o pretrained_model="./pretrained/MobileNetV3_large_x1_0_pretrained"
 ```
 
 Among them, `pretrained_model` is used to set the address to load the pretrained weights. When using it, you need to replace it with your own pretrained weights' path, or you can modify the path directly in the configuration file.
@@ -166,7 +171,7 @@ python -m paddle.distributed.launch \
     --selected_gpus="0,1,2,3" \
     tools/train.py \
         -c ./configs/quick_start/MobileNetV3_large_x1_0_finetune.yaml \
-        -o checkpoints="./output/ResNet/0/ppcls"
+        -o checkpoints="./output/MobileNetV3_large_x1_0/5/ppcls" \
         -o last_epoch=5 \
         -o use_gpu=True
 ```
@@ -179,12 +184,12 @@ The model evaluation process can be started as follows.
 
 ```bash
 python tools/eval.py \
-    -c ./configs/eval.yaml \
-    -o ARCHITECTURE.name="MobileNetV3_large_x1_0" \
-    -o pretrained_model=path_to_pretrained_models
+    -c ./configs/quick_start/MobileNetV3_large_x1_0_finetune.yaml \
+    -o pretrained_model="./output/MobileNetV3_large_x1_0/best_model/ppcls"\
+    -o load_static_weights=False
 ```
 
-You can modify the `ARCHITECTURE.name` field and `pretrained_model` field in `configs/eval.yaml` to configure the evaluation model, and you also can update the configuration through the `-o` parameter.
+About parameter description, see [1.4 Model evaluation](#14-model-evaluation) for details.
 
 <a name="model_infer"></a>
 ## 3. Use the pre-trained model to predict
@@ -192,9 +197,9 @@ After the training is completed, you can predict by using the pre-trained model 
 
 ```python
 python tools/infer/infer.py \
-    --i image path \
-    --m model name \
-    --p path to persistence model \
+    -i image path \
+    -m MobileNetV3_large_x1_0 \
+    --pretrained_model "./output/MobileNetV3_large_x1_0/best_model/ppcls" \
     --use_gpu True \
     --load_static_weights False
 ```
@@ -202,7 +207,7 @@ python tools/infer/infer.py \
 Among them:
 + `image_file`(i): The path of the image file to be predicted, such as `./test.jpeg`;
 + `model`(m): Model name, such as `MobileNetV3_large_x1_0`;
-+ `pretrained_model`(p): Weight file path, such as `./pretrained/MobileNetV3_large_x1_0_pretrained/`;
++ `pretrained_model`: Weight file path, such as `./pretrained/MobileNetV3_large_x1_0_pretrained/`;
 + `use_gpu`: Whether to use the GPU, default by `True`;
 + `load_static_weights`: Whether to load the pre-trained model obtained from static image training, default by `False`;
 + `pre_label_image`: Whether to pre-label the image data, default value: `False`;
@@ -219,17 +224,11 @@ Firstly, you should export inference model using `tools/export_model.py`.
 
 ```bash
 python tools/export_model.py \
-    --model=MobileNetV3_large_x1_0 \
-    --pretrained_model=./output/MobileNetV3_large_x1_0/best_model/ppcls \
-    --output_path=./inference/cls_infer
-
-```python
-50 # Please modify the 'shape' according to actual needs
-51 @to_static(input_spec=[
-52     paddle.static.InputSpec(
-53         shape=[None, 3, 224, 224], dtype='float32')
-54 ])
+    --model MobileNetV3_large_x1_0 \
+    --pretrained_model ./output/MobileNetV3_large_x1_0/best_model/ppcls \
+    --output_path ./inference/cls_infer
 ```
+
 Among them, the `--model` parameter is used to specify the model name, `--pretrained_model` parameter is used to specify the model file path, the path does not need to include the model file suffix name, and `--output_path` is used to specify the storage path of the converted model.
 
 **Note**:
@@ -248,14 +247,14 @@ The above command will generate the model structure file (`cls_infer.pdmodel`) a
 
 ```bash
 python tools/infer/predict.py \
-    -i image path \
-    -m path of __model__ \
-    -p path of __variables__ \
-    --use_gpu=1 \
-    --use_tensorrt=True
+    --image_file image path \
+    -m "./inference/cls_infer.pdmodel" \
+    -p "./inference/cls_infer.pdiparams" \
+    --use_gpu=True \
+    --use_tensorrt=False
 ```
 Among them:
-+ `image_file`(i): The path of the image file to be predicted, such as `./test.jpeg`;
++ `image_file`: The path of the image file to be predicted, such as `./test.jpeg`;
 + `model_file`(m): Model file path, such as `./MobileNetV3_large_x1_0/cls_infer.pdmodel`;
 + `params_file`(p): Weight file path, such as `./MobileNetV3_large_x1_0/cls_infer.pdiparams`;
 + `use_tensorrt`: Whether to use the TesorRT, default by `True`;

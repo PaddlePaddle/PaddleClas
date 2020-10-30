@@ -103,14 +103,19 @@ python tools/train.py \
 
 ```bash
 python tools/eval.py \
-    -c ./configs/eval.yaml \
-    -o ARCHITECTURE.name="MobileNetV3_large_x1_0" \
-    -o pretrained_model=path_to_pretrained_models
+    -c ./configs/quick_start/MobileNetV3_large_x1_0_finetune.yaml \
+    -o pretrained_model="./output/MobileNetV3_large_x1_0/best_model/ppcls"\
+    -o load_static_weights=False
 ```
 
-可以通过更改`configs/eval.yaml`中的`ARCHITECTURE.name`参数和`pretrained_model`参数来配置评估模型，也可以通过`-o`参数更新配置，如上所示。
+上述命令将使用`./configs/quick_start/MobileNetV3_large_x1_0_finetune.yaml`作为配置文件，对上述训练得到的模型`./output/MobileNetV3_large_x1_0/best_model/ppcls`进行评估。你也可以通过更改配置文件中的参数来设置评估，也可以通过`-o`参数更新配置，如上所示。
 
-**注意：** 加载预训练模型时，需要指定预训练模型文件的路径，但无需包含文件后缀名，PaddleClas会自动补齐`.pdparams`的后缀，如[1.3 模型恢复训练](#1.3)。
+可配置的部分评估参数说明如下：
+* `ARCHITECTURE.name`：模型名称
+* `pretrained_model`：待评估的模型文件路径
+* `load_static_weights`：待评估模型是否为静态图模型
+
+**注意：** 如果模型为动态图模型，则在加载待评估模型时，需要指定模型文件的路径，但无需包含文件后缀名，PaddleClas会自动补齐`.pdparams`的后缀，如[1.3 模型恢复训练](#1.3)。
 
 <a name="2"></a>
 ## 2. 基于Linux+GPU的模型训练与评估
@@ -157,7 +162,7 @@ python -m paddle.distributed.launch \
     --selected_gpus="0,1,2,3" \
     tools/train.py \
         -c ./configs/quick_start/MobileNetV3_large_x1_0_finetune.yaml \
-        -o pretrained_model="./pretrained_model/ \ MobileNetV3_large_x1_0_pretrained"
+        -o pretrained_model="./pretrained/MobileNetV3_large_x1_0_pretrained"
 ```
 
 其中`pretrained_model`用于设置加载预训练权重文件的路径，使用时需要换成自己的预训练模型权重文件路径，也可以直接在配置文件中修改该路径。
@@ -177,7 +182,7 @@ python -m paddle.distributed.launch \
     --selected_gpus="0,1,2,3" \
     tools/train.py \
         -c ./configs/quick_start/MobileNetV3_large_x1_0_finetune.yaml \
-        -o checkpoints="./output/ResNet/0/ppcls"
+        -o checkpoints="./output/MobileNetV3_large_x1_0/5/ppcls" \
         -o last_epoch=5 \
         -o use_gpu=True
 ```
@@ -190,12 +195,10 @@ python -m paddle.distributed.launch \
 可以通过以下命令进行模型评估。
 
 ```bash
-python -m paddle.distributed.launch \
-    --selected_gpus="0" \
-    tools/eval.py \
-        -c ./configs/eval.yaml \
-        -o ARCHITECTURE.name="MobileNetV3_large_x1_0" \
-        -o pretrained_model=path_to_pretrained_models
+python tools/eval.py \
+    -c ./configs/quick_start/MobileNetV3_large_x1_0_finetune.yaml \
+    -o pretrained_model="./output/MobileNetV3_large_x1_0/best_model/ppcls"\
+    -o load_static_weights=False
 ```
 
 参数说明详见[1.4 模型评估](#1.4)。
@@ -208,19 +211,19 @@ python -m paddle.distributed.launch \
 
 ```python
 python tools/infer/infer.py \
-    --i=待预测的图片文件路径 \
-    --m=模型名称 \
-    --p=persistable 模型路径 \
-    --use_gpu=True \
-    --load_static_weights=False
+    -i 待预测的图片文件路径 \
+    -m MobileNetV3_large_x1_0 \
+    --pretrained_model "./output/MobileNetV3_large_x1_0/best_model/ppcls" \
+    --use_gpu True \
+    --load_static_weights False
 ```
 
 参数说明：
 + `image_file`(简写 i)：待预测的图片文件路径或者批量预测时的图片文件夹，如 `./test.jpeg`
-+ `model`(简写 m)：模型名称，如 `ResNet50_vd`
-+ `pretrained_model`(简写 p)：权重文件路径，如 `./pretrained/ResNet50_vd_pretrained/`
++ `model`(简写 m)：模型名称，如 `MobileNetV3_large_x1_0`
++ `pretrained_model`：模型权重文件路径，如 `./output/MobileNetV3_large_x1_0/best_model/ppcls`
 + `use_gpu` : 是否开启GPU训练，默认值：`True`
-+ `load_static_weights` : 是否加载静态图训练得到的预训练模型，默认值：`False`
++ `load_static_weights` : 模型权重文件是否为静态图训练得到的，默认值：`False`
 + `pre_label_image` : 是否对图像数据进行预标注，默认值：`False`
 + `pre_label_out_idr` : 预标注图像数据的输出文件夹，当`pre_label_image=True`时，会在该文件夹下面生成很多个子文件夹，每个文件夹名称为类别id，其中存储模型预测属于该类别的所有图像。
 
@@ -233,9 +236,9 @@ python tools/infer/infer.py \
 
 ```bash
 python tools/export_model.py \
-    --model=MobileNetV3_large_x1_0 \
-    --pretrained_model=./output/MobileNetV3_large_x1_0/best_model/ppcls \
-    --output_path=./inference/cls_infer
+    --model MobileNetV3_large_x1_0 \
+    --pretrained_model ./output/MobileNetV3_large_x1_0/best_model/ppcls \
+    --output_path ./inference/cls_infer
 ```
 
 其中，参数`--model`用于指定模型名称，`--pretrained_model`用于指定模型文件路径，该路径仍无需包含模型文件后缀名（如[1.3 模型恢复训练](#1.3)），`--output_path`用于指定转换后模型的存储路径。
@@ -250,22 +253,21 @@ python tools/export_model.py \
 53         shape=[None, 3, 224, 224], dtype='float32')
 54 ])
 ```
-2.
 
 上述命令将生成模型结构文件（`cls_infer.pdmodel`）和模型权重文件（`cls_infer.pdiparams`），然后可以使用预测引擎进行推理：
 
 ```bash
 python tools/infer/predict.py \
-    -i 图片路径 \
-    -m __model__文件路径 \
-    -p __variables__文件路径 \
+    --image_file 图片路径 \
+    -m "./inference/cls_infer.pdmodel" \
+    -p "./inference/cls_infer.pdiparams" \
     --use_gpu=True \
     --use_tensorrt=False
 ```
 其中：
-+ `image_file`(简写 i)：待预测的图片文件路径，如 `./test.jpeg`
-+ `model_file`(简写 m)：模型文件路径，如 `./MobileNetV3_large_x1_0/cls_infer.pdmodel`
-+ `params_file`(简写 p)：权重文件路径，如 `./MobileNetV3_large_x1_0/cls_infer.pdiparams`
++ `image_file`：待预测的图片文件路径，如 `./test.jpeg`
++ `model_file`(简写 m)：模型结构文件路径，如 `./inference/cls_infer.pdmodel`
++ `params_file`(简写 p)：模型权重文件路径，如 `./inference/cls_infer.pdiparams`
 + `use_tensorrt`：是否使用 TesorRT 预测引擎，默认值：`True`
 + `use_gpu`：是否使用 GPU 预测，默认值：`True`。
 
