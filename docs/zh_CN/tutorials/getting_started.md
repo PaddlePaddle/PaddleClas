@@ -1,6 +1,6 @@
 # 开始使用
 ---
-请参考[安装指南](./install.md)配置运行环境，并根据[快速开始](./quick_start)文档准备flower102数据集，本章节下面所有的实验均以flower102数据集为例。
+请参考[安装指南](./install.md)配置运行环境，并根据[快速开始](./quick_start.md)文档准备flower102数据集，本章节下面所有的实验均以flower102数据集为例。
 
 PaddleClas目前支持的训练/评估环境如下：
 ```shell
@@ -71,7 +71,7 @@ python tools/train.py \
 ```
 python tools/train.py \
     -c configs/quick_start/MobileNetV3_large_x1_0_finetune.yaml \
-    -o checkpoints="./output/MobileNetV3_large_x1_0_gpupaddle/0/ppcls" \
+    -o checkpoints="./output/MobileNetV3_large_x1_0/5/ppcls" \
     -o last_epoch=5 \
     -o use_gpu=True
 ```
@@ -81,7 +81,7 @@ python tools/train.py \
 **注意**：
 * 参数`-o last_epoch=5`表示将上一次训练轮次数记为`5`，即本次训练轮次数从`6`开始计算，该值默认为-1，表示本次训练轮次数从`0`开始计算。
 
-* `-o checkpoints`参数无需包含断点权重文件的后缀名，上述训练命令会在训练过程中生成如下所示的断点权重文件，若想从断点`0`继续训练，则`checkpoints`参数只需设置为`"./output/MobileNetV3_large_x1_0_gpupaddle/0/ppcls"`，PaddleClas会自动补充后缀名。
+* `-o checkpoints`参数无需包含断点权重文件的后缀名，上述训练命令会在训练过程中生成如下所示的断点权重文件，若想从断点`5`继续训练，则`checkpoints`参数只需设置为`"./output/MobileNetV3_large_x1_0_gpupaddle/5/ppcls"`，PaddleClas会自动补充后缀名。
     ```shell
     output/
     └── MobileNetV3_large_x1_0
