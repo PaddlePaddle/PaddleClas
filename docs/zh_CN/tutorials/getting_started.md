@@ -71,7 +71,7 @@ python tools/train.py \
 ```
 python tools/train.py \
     -c configs/quick_start/MobileNetV3_large_x1_0_finetune.yaml \
-    -o checkpoints="./output/MobileNetV3_large_x1_0_gpupaddle/0/ppcls" \
+    -o checkpoints="./output/MobileNetV3_large_x1_0/0/ppcls" \
     -o last_epoch=5 \
     -o use_gpu=True
 ```
