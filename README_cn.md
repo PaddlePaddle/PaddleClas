@@ -36,6 +36,13 @@
 - 可运行于Linux、Windows、MacOS等多种系统。
 
 
+## 欢迎加入PaddleClas技术交流群
+
+* 微信扫描二维码加入官方交流群，获得更高效的问题答疑，与各行各业开发者充分交流，期待您的加入。
+
+![](docs/images/joinus.png)
+
+
 ## 文档教程
 
 - [快速安装](./docs/zh_CN/tutorials/install.md)
