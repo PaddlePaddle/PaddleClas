@@ -34,6 +34,13 @@ PaddleClas is a toolset for image classification tasks prepared for the industry
 - Support Linux, Windows, macOS and other systems.
 
 
+## Community
+
+* Scan the QR code below with your Wechat, you can access to official technical exchange group. Look forward to your participation.
+
+![](docs/images/joinus.png)
+
+
 ## Tutorials
 
 - [Installation](./docs/en/tutorials/install_en.md)
