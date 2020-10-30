@@ -62,7 +62,7 @@ If the training process is terminated for some reasons, you can also load the ch
 ```
 python tools/train.py \
     -c configs/quick_start/MobileNetV3_large_x1_0_finetune.yaml \
-    -o checkpoints="./output/MobileNetV3_large_x1_0/0/ppcls" \
+    -o checkpoints="./output/MobileNetV3_large_x1_0/5/ppcls" \
     -o last_epoch=5 \
     -o use_gpu=True
 ```
@@ -72,7 +72,7 @@ The configuration file does not need to be modified. You only need to add the `c
 **Note**:
 * The parameter `-o last_epoch=5` means to record the number of the last training epoch as `5`, that is, the number of this training epoch starts from `6`, , and the parameter defaults to `-1`, which means the number of this training epoch starts from `0`.
 
-* The `-o checkpoints` parameter does not need to include the suffix of the checkpoints. The above training command will generate the checkpoints as shown below during the training process. If you want to continue training from the epoch `0`, Just set the `checkpoints` to `./output/MobileNetV3_large_x1_0_gpupaddle/0/ppcls`, PaddleClas will automatically fill in the `pdopt` and `pdparams` suffixes.
+* The `-o checkpoints` parameter does not need to include the suffix of the checkpoints. The above training command will generate the checkpoints as shown below during the training process. If you want to continue training from the epoch `5`, Just set the `checkpoints` to `./output/MobileNetV3_large_x1_0_gpupaddle/5/ppcls`, PaddleClas will automatically fill in the `pdopt` and `pdparams` suffixes.
 
     ```shell
     output/
