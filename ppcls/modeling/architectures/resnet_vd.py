@@ -285,7 +285,7 @@ class ResNet_vd(nn.Layer):
                             shortcut=shortcut,
                             if_first=block == i == 0,
                             name=conv_name,
-                            lr_mult=lr_mult))
+                            lr_mult=self.lr_mult_list[block + 1]))
                     self.block_list.append(basic_block)
                     shortcut = True
 
