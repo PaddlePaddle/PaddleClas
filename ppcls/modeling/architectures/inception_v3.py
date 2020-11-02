@@ -196,7 +196,6 @@ class InceptionB(nn.Layer):
     def forward(self, x):
         branch3x3 = self.branch3x3(x)
 
-        print (branch3x3[0][0][:10])
         branch3x3dbl = self.branch3x3dbl_1(x)
         branch3x3dbl = self.branch3x3dbl_2(branch3x3dbl)
         branch3x3dbl = self.branch3x3dbl_3(branch3x3dbl)
