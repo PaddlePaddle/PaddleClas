@@ -295,16 +295,11 @@ def run(dataloader,
         feeds = create_feeds(batch, use_mix)
         fetchs = create_fetchs(feeds, net, config, mode)
         if mode == 'train':
-            if config["use_data_parallel"]:
-                avg_loss = net.scale_loss(fetchs['loss'])
-                avg_loss.backward()
-                net.apply_collective_grads()
-            else:
-                avg_loss = fetchs['loss']
-                avg_loss.backward()
+            avg_loss = fetchs['loss']
+            avg_loss.backward()
 
-            optimizer.minimize(avg_loss)
-            net.clear_gradients()
+            optimizer.step()
+            optimizer.clear_grad()
             metric_list['lr'].update(
                 optimizer._global_learning_rate().numpy()[0], batch_size)
 
