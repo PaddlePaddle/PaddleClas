@@ -52,6 +52,8 @@ def parse_args():
 
 
 def main(args):
+    paddle.seed(123)
+
     config = get_config(args.config, overrides=args.override, show=True)
     # assign the place
     use_gpu = config.get("use_gpu", True)
