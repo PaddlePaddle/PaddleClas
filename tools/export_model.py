@@ -36,7 +36,7 @@ def parse_args():
     parser.add_argument(
         "-o", "--output_path", type=str, default="./inference/cls_infer")
     parser.add_argument("--class_dim", type=int, default=1000)
-    parser.add_argument("--load_static_weights", type=str2bool, default=True)
+    parser.add_argument("--load_static_weights", type=str2bool, default=False)
     # parser.add_argument("--img_size", type=int, default=224)
 
     return parser.parse_args()
