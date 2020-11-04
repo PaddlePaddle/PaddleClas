@@ -63,13 +63,15 @@ def main(args):
     use_data_parallel = int(os.getenv("PADDLE_TRAINERS_NUM", 1)) != 1
     config["use_data_parallel"] = use_data_parallel
 
+    if config["use_data_parallel"]:
+        strategy = paddle.distributed.init_parallel_env()
+
     net = program.create_model(config.ARCHITECTURE, config.classes_num)
 
     optimizer, lr_scheduler = program.create_optimizer(
         config, parameter_list=net.parameters())
 
     if config["use_data_parallel"]:
-        strategy = paddle.distributed.init_parallel_env()
         net = paddle.DataParallel(net, strategy)
 
     # load model from checkpoint or pretrained model
