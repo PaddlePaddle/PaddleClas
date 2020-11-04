@@ -18,6 +18,7 @@
 #include <chrono>
 #include <iomanip>
 #include <iostream>
+#include <opencv2/core/utils/filesystem.hpp>
 #include <ostream>
 #include <vector>
 
@@ -43,26 +44,48 @@ int main(int argc, char **argv) {
 
   config.PrintConfigInfo();
 
-  std::string img_path(argv[2]);
+  std::string path(argv[2]);
 
-  cv::Mat srcimg = cv::imread(img_path, cv::IMREAD_COLOR);
-  cv::cvtColor(srcimg, srcimg, cv::COLOR_BGR2RGB);
+  std::vector<std::string> img_files_list;
+  if (cv::utils::fs::isDirectory(path)) {
+    std::vector<cv::String> filenames;
+    cv::glob(path, filenames);
+    for (auto f : filenames) {
+      img_files_list.push_back(f);
+    }
+  } else {
+    img_files_list.push_back(path);
+  }
+
+  std::cout << "img_file_list length: " << img_files_list.size() << std::endl;
 
   Classifier classifier(config.cls_model_dir, config.use_gpu, config.gpu_id,
                         config.gpu_mem, config.cpu_math_library_num_threads,
                         config.use_mkldnn, config.use_zero_copy_run,
                         config.resize_short_size, config.crop_size);
 
-  auto start = std::chrono::system_clock::now();
-  classifier.Run(srcimg);
-  auto end = std::chrono::system_clock::now();
-  auto duration =
-      std::chrono::duration_cast<std::chrono::microseconds>(end - start);
-  std::cout << "Cost "
-            << double(duration.count()) *
-                   std::chrono::microseconds::period::num /
-                   std::chrono::microseconds::period::den
-            << " s" << std::endl;
+  double elapsed_time = 0.0;
+  int warmup_iter = img_files_list.size() > 5 ? 5 : 0;
+  for (int idx = 0; idx < img_files_list.size(); ++idx) {
+    std::string img_path = img_files_list[idx];
+    cv::Mat srcimg = cv::imread(img_path, cv::IMREAD_COLOR);
+    cv::cvtColor(srcimg, srcimg, cv::COLOR_BGR2RGB);
+
+    auto start = std::chrono::system_clock::now();
+    classifier.Run(srcimg);
+    auto end = std::chrono::system_clock::now();
+    auto duration =
+        std::chrono::duration_cast<std::chrono::microseconds>(end - start);
+    double curr_time = double(duration.count()) *
+                       std::chrono::microseconds::period::num /
+                       std::chrono::microseconds::period::den;
+    if (idx >= warmup_iter) {
+      elapsed_time += curr_time;
+    }
+    std::cout << "Current time cost: " << curr_time << " s, "
+              << "average time cost in all: "
+              << elapsed_time / (idx + 1 - warmup_iter) << " s." << std::endl;
+  }
 
   return 0;
 }
