@@ -16,7 +16,6 @@ PaddleClas is a toolset for image classification tasks prepared for the industry
 - 2020.06.12 Add support for training and evaluation on Windows or CPU.
 - [more](./docs/en/update_history_en.md)
 
-
 ## Features
 
 - Rich model zoo. Based on the ImageNet-1k classification dataset, PaddleClas provides 24 series of classification network structures and training configurations, 122 models' pretrained weights and their evaluation metrics.
