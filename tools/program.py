@@ -275,16 +275,23 @@ def run(dataloader,
     use_mix = config.get("use_mix", False) and mode == "train"
 
     metric_list = [
-        ("loss", AverageMeter('loss', '7.5f')),
+        ("loss", AverageMeter(
+            'loss', '7.5f', postfix=",")),
         ("lr", AverageMeter(
-            'lr', 'f', need_avg=False)),
-        ("batch_time", AverageMeter('elapse', '.7f')),
-        ("reader_time", AverageMeter('reader ', '.7f')),
+            'lr', 'f', postfix=",", need_avg=False)),
+        ("batch_time", AverageMeter(
+            'batch_cost', '.5f', postfix=" s,")),
+        ("reader_time", AverageMeter(
+            'reader_cost', '.5f', postfix=" s,")),
     ]
     if not use_mix:
         topk_name = 'top{}'.format(config.topk)
-        metric_list.insert(1, (topk_name, AverageMeter(topk_name, '.5f')))
-        metric_list.insert(1, ("top1", AverageMeter("top1", '.5f')))
+        metric_list.insert(
+            1, (topk_name, AverageMeter(
+                topk_name, '.5f', postfix=",")))
+        metric_list.insert(
+            1, ("top1", AverageMeter(
+                "top1", '.5f', postfix=",")))
 
     metric_list = OrderedDict(metric_list)
 
@@ -316,35 +323,47 @@ def run(dataloader,
 
         for name, fetch in fetchs.items():
             metric_list[name].update(fetch.numpy()[0], batch_size)
-        metric_list['batch_time'].update(time.time() - tic)
+        metric_list["batch_time"].update(time.time() - tic)
         tic = time.time()
 
         fetchs_str = ' '.join([str(m.value) for m in metric_list.values()])
 
         if idx % print_interval == 0:
+            total_batch_size = batch_size * config.get(
+                "trainer_num", 1) if mode == "train" else batch_size
+            ips_info = "ips: {:.5f} images/sec.".format(
+                total_batch_size / metric_list["batch_time"].val)
             if mode == 'eval':
-                logger.info("{:s} step:{:<4d} {:s}s".format(mode, idx,
-                                                            fetchs_str))
+                logger.info("{:s} step:{:<4d}, {:s} {:s}".format(
+                    mode, idx, fetchs_str, ips_info))
             else:
                 epoch_str = "epoch:{:<3d}".format(epoch)
                 step_str = "{:s} step:{:<4d}".format(mode, idx)
-                logger.info("{:s} {:s} {:s}s".format(
+                logger.info("{:s}, {:s}, {:s} {:s}".format(
                     logger.coloring(epoch_str, "HEADER")
                     if idx == 0 else epoch_str,
                     logger.coloring(step_str, "PURPLE"),
-                    logger.coloring(fetchs_str, 'OKGREEN')))
+                    logger.coloring(fetchs_str, 'OKGREEN'),
+                    logger.coloring(ips_info, 'OKGREEN')))
 
     end_str = ' '.join([str(m.mean) for m in metric_list.values()] +
                        [metric_list['batch_time'].total])
+    total_batch_size = batch_size * config.get(
+        "trainer_num", 1) if mode == "train" else batch_size
+    ips_info = "ips: {:.5f} images/sec.".format(
+        total_batch_size * metric_list["batch_time"].count /
+        metric_list["batch_time"].sum)
+
     if mode == 'eval':
-        logger.info("END {:s} {:s}s".format(mode, end_str))
+        logger.info("END {:s} {:s} {:s}".format(mode, end_str, ips_info))
     else:
         end_epoch_str = "END epoch:{:<3d}".format(epoch)
 
-        logger.info("{:s} {:s} {:s}s".format(
+        logger.info("{:s} {:s} {:s} {:s}".format(
             logger.coloring(end_epoch_str, "RED"),
             logger.coloring(mode, "PURPLE"),
-            logger.coloring(end_str, "OKGREEN")))
+            logger.coloring(end_str, "OKGREEN"),
+            logger.coloring(ips_info, "OKGREEN"), ))
 
     # return top1_acc in order to save the best model
     if mode == 'valid':
