@@ -329,10 +329,8 @@ def run(dataloader,
         fetchs_str = ' '.join([str(m.value) for m in metric_list.values()])
 
         if idx % print_interval == 0:
-            total_batch_size = batch_size * config.get(
-                "trainer_num", 1) if mode == "train" else batch_size
             ips_info = "ips: {:.5f} images/sec.".format(
-                total_batch_size / metric_list["batch_time"].val)
+                batch_size / metric_list["batch_time"].val)
             if mode == 'eval':
                 logger.info("{:s} step:{:<4d}, {:s} {:s}".format(
                     mode, idx, fetchs_str, ips_info))
@@ -348,10 +346,8 @@ def run(dataloader,
 
     end_str = ' '.join([str(m.mean) for m in metric_list.values()] +
                        [metric_list['batch_time'].total])
-    total_batch_size = batch_size * config.get(
-        "trainer_num", 1) if mode == "train" else batch_size
     ips_info = "ips: {:.5f} images/sec.".format(
-        total_batch_size * metric_list["batch_time"].count /
+        batch_size * metric_list["batch_time"].count /
         metric_list["batch_time"].sum)
 
     if mode == 'eval':
