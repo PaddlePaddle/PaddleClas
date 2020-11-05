@@ -4,7 +4,10 @@
 
 ## 简介
 
-本文档介绍了PaddleClas配置文件(configs/*.yaml)中各参数的含义，以便您更快的自定义或修改超参数配置。
+本文档介绍了PaddleClas配置文件(`configs/*.yaml`)中各参数的含义，以便您更快地自定义或修改超参数配置。
+
+* 注意：部分参数并未在配置文件中体现，在训练或者评估时，可以直接使用`-o`进行参数的扩充或者更新，比如说`-o checkpoints=./ckp_path/ppcls`，表示在配置文件中添加（如果之前不存在）或者更新（如果之前已经包含该字段）`checkpoints`字段，其值设为`./ckp_path/ppcls`。
+
 
 ## 配置详解
 
@@ -13,8 +16,10 @@
 | 参数名字 | 具体含义 | 默认值 | 可选值 |
 |:---:|:---:|:---:|:---:|
 | mode | 运行模式 | "train" | ["train"," valid"] |
-| architecture | 模型结构名字 | "ResNet50_vd" | PaddleClas提供的模型结构 |
+| checkpoints | 断点模型路径，用于恢复训练 | "" | Str |
+| last_epoch | 上一次训练结束时已经训练的epoch数量，与checkpoints一起使用 | -1 | int |
 | pretrained_model | 预训练模型路径 | "" | Str |
+| load_static_weights | 加载的模型是否为静态图的预训练模型 | False | bool |
 | model_save_dir | 保存模型路径 | "" | Str |
 | classes_num | 分类数 | 1000 | int |
 | total_images | 总图片数 | 1281167 | int |
@@ -26,10 +31,18 @@
 | image_shape | 图片大小 | [3，224，224] | list, shape: (3,) |
 | use_mix | 是否启用mixup | False | ['True', 'False'] |
 | ls_epsilon | label_smoothing epsilon值| 0 | float |
+| use_distillation | 是否进行模型蒸馏 | False | bool |
 
-### 学习率与优化器
 
-学习率
+## 结构(ARCHITECTURE)
+
+| 参数名字 | 具体含义 | 默认值 | 可选值 |
+|:---:|:---:|:---:|:---:|
+| name | 模型结构名字 | "ResNet50_vd" | PaddleClas提供的模型结构 |
+| params | 模型传参 | {} | 模型结构所需的额外字典，如EfficientNet等配置文件中需要传入`padding_type`等参数，可以通过这种方式传入 |
+
+
+### 学习率(LEARNING_RATE)
 
 | 参数名字 | 具体含义 | 默认值 | 可选值 |
 |:---:|:---:|:---:|:---:|
@@ -41,7 +54,7 @@
 | parmas.steps | lineardecay衰减steps数 | 100 | int |
 | params.end_lr | lineardecayend_lr值 | 0 | float |
 
-优化器
+### 优化器(OPTIMIZER)
 
 | 参数名字 | 具体含义 | 默认值 | 可选值 |
 |:---:|:---:|:---:|:---:|
