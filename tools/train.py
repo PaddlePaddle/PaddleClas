@@ -60,7 +60,8 @@ def main(args):
     place = 'gpu:{}'.format(ParallelEnv().dev_id) if use_gpu else 'cpu'
     place = paddle.set_device(place)
 
-    use_data_parallel = int(os.getenv("PADDLE_TRAINERS_NUM", 1)) != 1
+    trainer_num = int(os.getenv("PADDLE_TRAINERS_NUM", 1))
+    use_data_parallel = trainer_num != 1
     config["use_data_parallel"] = use_data_parallel
 
     if config["use_data_parallel"]:
