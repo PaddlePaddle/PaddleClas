@@ -51,7 +51,7 @@ This document introduces the configuration(filed in `config/*.yaml`) of PaddleCl
 | parmas.steps | decay steps in lineardecay | 100 | int |
 | params.end_lr | end lr in lineardecay | 0 | float |
 
-### optimizer
+### OPTIMIZER
 
 | name | detail | default value | optional value |
 |:---:|:---:|:---:|:---:|
