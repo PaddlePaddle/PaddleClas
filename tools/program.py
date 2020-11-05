@@ -36,24 +36,6 @@ from ppcls.utils.misc import AverageMeter
 from ppcls.utils import logger
 
 
-def create_dataloader():
-    """
-    Create a dataloader with model input variables
-
-    Args:
-        feeds(dict): dict of model input variables
-
-    Returns:
-        dataloader(paddle dataloader):
-    """
-    trainer_num = int(os.environ.get('PADDLE_TRAINERS_NUM', 1))
-    capacity = 64 if trainer_num == 1 else 8
-    dataloader = paddle.io.DataLoader.from_generator(
-        capacity=capacity, use_double_buffer=True, iterable=True)
-
-    return dataloader
-
-
 def create_model(architecture, classes_num):
     """
     Create a model

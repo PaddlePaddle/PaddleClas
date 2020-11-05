@@ -63,7 +63,6 @@ def main(args):
     trainer_num = int(os.getenv("PADDLE_TRAINERS_NUM", 1))
     use_data_parallel = trainer_num != 1
     config["use_data_parallel"] = use_data_parallel
-    config["trainer_num"] = trainer_num
 
     if config["use_data_parallel"]:
         strategy = paddle.distributed.init_parallel_env()
