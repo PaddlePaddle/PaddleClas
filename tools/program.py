@@ -36,24 +36,6 @@ from ppcls.utils.misc import AverageMeter
 from ppcls.utils import logger
 
 
-def create_dataloader():
-    """
-    Create a dataloader with model input variables
-
-    Args:
-        feeds(dict): dict of model input variables
-
-    Returns:
-        dataloader(paddle dataloader):
-    """
-    trainer_num = int(os.environ.get('PADDLE_TRAINERS_NUM', 1))
-    capacity = 64 if trainer_num == 1 else 8
-    dataloader = paddle.io.DataLoader.from_generator(
-        capacity=capacity, use_double_buffer=True, iterable=True)
-
-    return dataloader
-
-
 def create_model(architecture, classes_num):
     """
     Create a model
@@ -275,16 +257,23 @@ def run(dataloader,
     use_mix = config.get("use_mix", False) and mode == "train"
 
     metric_list = [
-        ("loss", AverageMeter('loss', '7.5f')),
+        ("loss", AverageMeter(
+            'loss', '7.5f', postfix=",")),
         ("lr", AverageMeter(
-            'lr', 'f', need_avg=False)),
-        ("batch_time", AverageMeter('elapse', '.7f')),
-        ("reader_time", AverageMeter('reader ', '.7f')),
+            'lr', 'f', postfix=",", need_avg=False)),
+        ("batch_time", AverageMeter(
+            'batch_cost', '.5f', postfix=" s,")),
+        ("reader_time", AverageMeter(
+            'reader_cost', '.5f', postfix=" s,")),
     ]
     if not use_mix:
         topk_name = 'top{}'.format(config.topk)
-        metric_list.insert(1, (topk_name, AverageMeter(topk_name, '.5f')))
-        metric_list.insert(1, ("top1", AverageMeter("top1", '.5f')))
+        metric_list.insert(
+            1, (topk_name, AverageMeter(
+                topk_name, '.5f', postfix=",")))
+        metric_list.insert(
+            1, ("top1", AverageMeter(
+                "top1", '.5f', postfix=",")))
 
     metric_list = OrderedDict(metric_list)
 
@@ -295,16 +284,11 @@ def run(dataloader,
         feeds = create_feeds(batch, use_mix)
         fetchs = create_fetchs(feeds, net, config, mode)
         if mode == 'train':
-            if config["use_data_parallel"]:
-                avg_loss = net.scale_loss(fetchs['loss'])
-                avg_loss.backward()
-                net.apply_collective_grads()
-            else:
-                avg_loss = fetchs['loss']
-                avg_loss.backward()
+            avg_loss = fetchs['loss']
+            avg_loss.backward()
 
-            optimizer.minimize(avg_loss)
-            net.clear_gradients()
+            optimizer.step()
+            optimizer.clear_grad()
             metric_list['lr'].update(
                 optimizer._global_learning_rate().numpy()[0], batch_size)
 
@@ -321,35 +305,43 @@ def run(dataloader,
 
         for name, fetch in fetchs.items():
             metric_list[name].update(fetch.numpy()[0], batch_size)
-        metric_list['batch_time'].update(time.time() - tic)
+        metric_list["batch_time"].update(time.time() - tic)
         tic = time.time()
 
         fetchs_str = ' '.join([str(m.value) for m in metric_list.values()])
 
         if idx % print_interval == 0:
+            ips_info = "ips: {:.5f} images/sec.".format(
+                batch_size / metric_list["batch_time"].val)
             if mode == 'eval':
-                logger.info("{:s} step:{:<4d} {:s}s".format(mode, idx,
-                                                            fetchs_str))
+                logger.info("{:s} step:{:<4d}, {:s} {:s}".format(
+                    mode, idx, fetchs_str, ips_info))
             else:
                 epoch_str = "epoch:{:<3d}".format(epoch)
                 step_str = "{:s} step:{:<4d}".format(mode, idx)
-                logger.info("{:s} {:s} {:s}s".format(
+                logger.info("{:s}, {:s}, {:s} {:s}".format(
                     logger.coloring(epoch_str, "HEADER")
                     if idx == 0 else epoch_str,
                     logger.coloring(step_str, "PURPLE"),
-                    logger.coloring(fetchs_str, 'OKGREEN')))
+                    logger.coloring(fetchs_str, 'OKGREEN'),
+                    logger.coloring(ips_info, 'OKGREEN')))
 
     end_str = ' '.join([str(m.mean) for m in metric_list.values()] +
                        [metric_list['batch_time'].total])
+    ips_info = "ips: {:.5f} images/sec.".format(
+        batch_size * metric_list["batch_time"].count /
+        metric_list["batch_time"].sum)
+
     if mode == 'eval':
-        logger.info("END {:s} {:s}s".format(mode, end_str))
+        logger.info("END {:s} {:s} {:s}".format(mode, end_str, ips_info))
     else:
         end_epoch_str = "END epoch:{:<3d}".format(epoch)
 
-        logger.info("{:s} {:s} {:s}s".format(
+        logger.info("{:s} {:s} {:s} {:s}".format(
             logger.coloring(end_epoch_str, "RED"),
             logger.coloring(mode, "PURPLE"),
-            logger.coloring(end_str, "OKGREEN")))
+            logger.coloring(end_str, "OKGREEN"),
+            logger.coloring(ips_info, "OKGREEN"), ))
 
     # return top1_acc in order to save the best model
     if mode == 'valid':

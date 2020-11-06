@@ -7,9 +7,8 @@
 飞桨图像分类套件PaddleClas是飞桨为工业界和学术界所准备的一个图像分类任务的工具集，助力使用者训练出更好的视觉模型和应用落地。
 
 
-**注意**: 百度提出了一个新的图像分类网络结构 **`HS-ResNet`** ，基于ImageNet-1k数据集，`HS-ResNet`在与`ResNet`的params相近的情况下，Top-1 Acc达到了81.3%，相应的Arxiv文章链接可以参考这里：[HS-ResNet: Hierarchical-Split Block on Convolutional Neural Network](https://arxiv.org/pdf/2010.07621.pdf)，模型结构和预训练模型参数即将开源，敬请期待！
-
 **近期更新**
+- 2020.11.04 添加图像分类[常见问题2020第一季第一期](./docs/zh_CN/faq_series/faq_2020_s1.md) 7个新问题，并且计划以后每周一会更新，欢迎大家持续关注。
 - 2020.10.20 添加 `Res2Net50_vd_26w_4s_ssld `模型，在ImageNet-1k上Top-1 Acc可达83.1%；添加 `Res2Net101_vd_26w_4s_ssld `模型，在ImageNet-1k上Top-1 Acc可达83.9%。
 - 2020.10.12 添加Paddle-Lite demo。
 - 2020.10.10 添加cpp inference demo，完善`FAQ 30问`教程。
@@ -64,6 +63,7 @@
     - [数据准备](./docs/zh_CN/tutorials/data.md)
     - [模型训练与微调](./docs/zh_CN/tutorials/getting_started.md)
     - [模型评估](./docs/zh_CN/tutorials/getting_started.md)
+    - [配置文件详解](./docs/zh_CN/tutorials/config.md)
 - 模型预测
     - [基于训练引擎预测推理](./docs/zh_CN/tutorials/getting_started.md)
     - [基于Python预测引擎预测推理](./docs/zh_CN/tutorials/getting_started.md)
@@ -79,8 +79,9 @@
     - [10万类图像分类预训练模型](./docs/zh_CN/application/transfer_learning.md)
     - [通用目标检测](./docs/zh_CN/application/object_detection.md)
 - FAQ
-    - [图像分类通用问题](./docs/zh_CN/faq.md)
-    - [PaddleClas实战FAQ](./docs/zh_CN/faq.md)
+    - [图像分类2020第一季精选问题(近期更新2020.11.04)](./docs/zh_CN/faq_series/faq_2020_s1.md)
+    - [图像分类通用30个问题](./docs/zh_CN/faq.md)
+    - [PaddleClas实战15个问题](./docs/zh_CN/faq.md)
 - [赛事支持](./docs/zh_CN/competition_support.md)
 - [许可证书](#许可证书)
 - [贡献代码](#贡献代码)
