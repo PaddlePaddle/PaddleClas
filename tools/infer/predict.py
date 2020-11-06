@@ -17,8 +17,8 @@ import utils
 import numpy as np
 import time
 
-from paddle.fluid.core import AnalysisConfig
-from paddle.fluid.core import create_paddle_predictor
+from paddle.inference import Config
+from paddle.inference import create_predictor
 
 
 def parse_args():
@@ -42,7 +42,9 @@ def parse_args():
 
 
 def create_predictor(args):
-    config = AnalysisConfig(args.model_file, args.params_file)
+    print(args)
+    exit()
+    config = Cconfig(args.model_file, args.params_file)
 
     if args.use_gpu:
         config.enable_use_gpu(args.gpu_mem, 0)
@@ -53,14 +55,14 @@ def create_predictor(args):
     config.switch_ir_optim(args.ir_optim)  # default true
     if args.use_tensorrt:
         config.enable_tensorrt_engine(
-            precision_mode=AnalysisConfig.Precision.Half
-            if args.use_fp16 else AnalysisConfig.Precision.Float32,
+            precision_mode=Config.PrecisionType.Half
+            if args.use_fp16 else Config.PrecisionType.Float32,
             max_batch_size=args.batch_size)
 
     config.enable_memory_optim()
     # use zero copy
     config.switch_use_feed_fetch_ops(False)
-    predictor = create_paddle_predictor(config)
+    predictor = create_predictor(config)
 
     return predictor
 
