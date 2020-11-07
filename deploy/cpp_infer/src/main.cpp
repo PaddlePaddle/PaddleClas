@@ -61,8 +61,8 @@ int main(int argc, char **argv) {
 
   Classifier classifier(config.cls_model_dir, config.use_gpu, config.gpu_id,
                         config.gpu_mem, config.cpu_math_library_num_threads,
-                        config.use_mkldnn,
-                        config.resize_short_size, config.crop_size);
+                        config.use_mkldnn, config.resize_short_size,
+                        config.crop_size);
 
   double elapsed_time = 0.0;
   int warmup_iter = img_files_list.size() > 5 ? 5 : 0;
@@ -83,14 +83,13 @@ int main(int argc, char **argv) {
       elapsed_time += curr_time;
     }
     if (idx >= warmup_iter) {
-      std::cout << "Current image path: " << img_path << std::endl; 
+      std::cout << "Current image path: " << img_path << std::endl;
       std::cout << "Current time cost: " << curr_time << " s, "
                 << "average time cost in all: "
                 << elapsed_time / (idx + 1 - warmup_iter) << " s." << std::endl;
     } else {
       std::cout << "Current time cost: " << curr_time << " s." << std::endl;
     }
-    
   }
 
   return 0;

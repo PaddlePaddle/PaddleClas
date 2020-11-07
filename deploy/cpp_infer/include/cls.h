@@ -39,8 +39,8 @@ public:
   explicit Classifier(const std::string &model_dir, const bool &use_gpu,
                       const int &gpu_id, const int &gpu_mem,
                       const int &cpu_math_library_num_threads,
-                      const bool &use_mkldnn,
-                      const int &resize_short_size, const int &crop_size) {
+                      const bool &use_mkldnn, const int &resize_short_size,
+                      const int &crop_size) {
     this->use_gpu_ = use_gpu;
     this->gpu_id_ = gpu_id;
     this->gpu_mem_ = gpu_mem;

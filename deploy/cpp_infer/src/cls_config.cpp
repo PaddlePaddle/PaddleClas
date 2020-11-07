@@ -17,7 +17,7 @@
 namespace PaddleClas {
 
 std::vector<std::string> ClsConfig::split(const std::string &str,
-                                       const std::string &delim) {
+                                          const std::string &delim) {
   std::vector<std::string> res;
   if ("" == str)
     return res;
