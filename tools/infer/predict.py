@@ -41,10 +41,10 @@ def parse_args():
     return parser.parse_args()
 
 
-def create_predictor(args):
+def create_paddle_predictor(args):
     print(args)
-    exit()
-    config = Cconfig(args.model_file, args.params_file)
+    config = Config(args.model_file, args.params_file)
+    #     config = Config("./r50_rerod/r50_dyg.pdmodel", "./r50_rerod/r50_dyg.pdiparams")
 
     if args.use_gpu:
         config.enable_use_gpu(args.gpu_mem, 0)
@@ -105,13 +105,13 @@ def main():
         assert args.use_tensorrt is True
 
     operators = create_operators()
-    predictor = create_predictor(args)
+    predictor = create_paddle_predictor(args)
 
     input_names = predictor.get_input_names()
-    input_tensor = predictor.get_input_tensor(input_names[0])
+    input_tensor = predictor.get_input_handle(input_names[0])
 
     output_names = predictor.get_output_names()
-    output_tensor = predictor.get_output_tensor(output_names[0])
+    output_tensor = predictor.get_output_handle(output_names[0])
 
     test_num = 500
     test_time = 0.0
@@ -122,7 +122,7 @@ def main():
                 args.batch_size, axis=0).copy()
         input_tensor.copy_from_cpu(inputs)
 
-        predictor.zero_copy_run()
+        predictor.run()
 
         output = output_tensor.copy_to_cpu()
         output = output.flatten()
@@ -138,7 +138,7 @@ def main():
             start_time = time.time()
             input_tensor.copy_from_cpu(inputs)
 
-            predictor.zero_copy_run()
+            predictor.run()
 
             output = output_tensor.copy_to_cpu()
             output = output.flatten()
