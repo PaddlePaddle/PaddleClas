@@ -81,8 +81,6 @@ int main(int argc, char **argv) {
                        std::chrono::microseconds::period::den;
     if (idx >= warmup_iter) {
       elapsed_time += curr_time;
-    }
-    if (idx >= warmup_iter) {
       std::cout << "Current image path: " << img_path << std::endl;
       std::cout << "Current time cost: " << curr_time << " s, "
                 << "average time cost in all: "
