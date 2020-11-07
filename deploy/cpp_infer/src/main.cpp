@@ -27,7 +27,7 @@
 #include <numeric>
 
 #include <include/cls.h>
-#include <include/config.h>
+#include <include/cls_config.h>
 
 using namespace std;
 using namespace cv;
@@ -40,7 +40,7 @@ int main(int argc, char **argv) {
     exit(1);
   }
 
-  Config config(argv[1]);
+  ClsConfig config(argv[1]);
 
   config.PrintConfigInfo();
 
@@ -61,8 +61,8 @@ int main(int argc, char **argv) {
 
   Classifier classifier(config.cls_model_dir, config.use_gpu, config.gpu_id,
                         config.gpu_mem, config.cpu_math_library_num_threads,
-                        config.use_mkldnn, config.use_zero_copy_run,
-                        config.resize_short_size, config.crop_size);
+                        config.use_mkldnn, config.resize_short_size,
+                        config.crop_size);
 
   double elapsed_time = 0.0;
   int warmup_iter = img_files_list.size() > 5 ? 5 : 0;
@@ -81,10 +81,13 @@ int main(int argc, char **argv) {
                        std::chrono::microseconds::period::den;
     if (idx >= warmup_iter) {
       elapsed_time += curr_time;
+      std::cout << "Current image path: " << img_path << std::endl;
+      std::cout << "Current time cost: " << curr_time << " s, "
+                << "average time cost in all: "
+                << elapsed_time / (idx + 1 - warmup_iter) << " s." << std::endl;
+    } else {
+      std::cout << "Current time cost: " << curr_time << " s." << std::endl;
     }
-    std::cout << "Current time cost: " << curr_time << " s, "
-              << "average time cost in all: "
-              << elapsed_time / (idx + 1 - warmup_iter) << " s." << std::endl;
   }
 
   return 0;
