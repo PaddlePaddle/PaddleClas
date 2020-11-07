@@ -42,9 +42,7 @@ def parse_args():
 
 
 def create_paddle_predictor(args):
-    print(args)
     config = Config(args.model_file, args.params_file)
-    #     config = Config("./r50_rerod/r50_dyg.pdmodel", "./r50_rerod/r50_dyg.pdiparams")
 
     if args.use_gpu:
         config.enable_use_gpu(args.gpu_mem, 0)
