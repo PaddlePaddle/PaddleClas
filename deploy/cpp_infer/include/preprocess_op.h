@@ -28,7 +28,6 @@
 #include <numeric>
 
 using namespace std;
-using namespace paddle;
 
 namespace PaddleClas {
 
