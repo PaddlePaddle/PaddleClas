@@ -141,5 +141,5 @@ class Base64ToCV2(object):
         import base64
         data = base64.b64decode(b64str.encode('utf8'))
         data = np.fromstring(data, np.uint8)
-        data = cv2.imdecode(data, cv2.IMREAD_COLOR)
+        data = cv2.imdecode(data, cv2.IMREAD_COLOR)[:, :, ::-1]
         return data
