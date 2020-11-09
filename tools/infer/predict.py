@@ -17,12 +17,12 @@ import numpy as np
 import cv2
 import time
 
-from paddle.fluid.core import AnalysisConfig
-from paddle.fluid.core import create_paddle_predictor
+from paddle.inference import Config
+from paddle.inference import create_predictor
 
 
-def create_predictor(args):
-    config = AnalysisConfig(args.model_file, args.params_file)
+def create_paddle_predictor(args):
+    config = Config(args.model_file, args.params_file)
 
     if args.use_gpu:
         config.enable_use_gpu(args.gpu_mem, 0)
@@ -33,14 +33,14 @@ def create_predictor(args):
     config.switch_ir_optim(args.ir_optim)  # default true
     if args.use_tensorrt:
         config.enable_tensorrt_engine(
-            precision_mode=AnalysisConfig.Precision.Half
-            if args.use_fp16 else AnalysisConfig.Precision.Float32,
+            precision_mode=Config.PrecisionType.Half
+            if args.use_fp16 else Config.PrecisionType.Float32,
             max_batch_size=args.batch_size)
 
     config.enable_memory_optim()
     # use zero copy
     config.switch_use_feed_fetch_ops(False)
-    predictor = create_paddle_predictor(config)
+    predictor = create_predictor(config)
 
     return predictor
 
@@ -58,13 +58,13 @@ def main():
     if args.use_fp16 is True:
         assert args.use_tensorrt is True
 
-    predictor = create_predictor(args)
+    predictor = create_paddle_predictor(args)
 
     input_names = predictor.get_input_names()
-    input_tensor = predictor.get_input_tensor(input_names[0])
+    input_tensor = predictor.get_input_handle(input_names[0])
 
     output_names = predictor.get_output_names()
-    output_tensor = predictor.get_output_tensor(output_names[0])
+    output_tensor = predictor.get_output_handle(output_names[0])
 
     test_num = 500
     test_time = 0.0
@@ -76,7 +76,7 @@ def main():
                 args.batch_size, axis=0).copy()
         input_tensor.copy_from_cpu(inputs)
 
-        predictor.zero_copy_run()
+        predictor.run()
 
         output = output_tensor.copy_to_cpu()
         output = output.flatten()
@@ -92,7 +92,7 @@ def main():
             start_time = time.time()
             input_tensor.copy_from_cpu(inputs)
 
-            predictor.zero_copy_run()
+            predictor.run()
 
             output = output_tensor.copy_to_cpu()
             output = output.flatten()

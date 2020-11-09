@@ -12,12 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <include/config.h>
+#include <include/cls_config.h>
 
 namespace PaddleClas {
 
-std::vector<std::string> Config::split(const std::string &str,
-                                       const std::string &delim) {
+std::vector<std::string> ClsConfig::split(const std::string &str,
+                                          const std::string &delim) {
   std::vector<std::string> res;
   if ("" == str)
     return res;
@@ -38,7 +38,7 @@ std::vector<std::string> Config::split(const std::string &str,
 }
 
 std::map<std::string, std::string>
-Config::LoadConfig(const std::string &config_path) {
+ClsConfig::LoadConfig(const std::string &config_path) {
   auto config = Utility::ReadDict(config_path);
 
   std::map<std::string, std::string> dict;
@@ -53,7 +53,7 @@ Config::LoadConfig(const std::string &config_path) {
   return dict;
 }
 
-void Config::PrintConfigInfo() {
+void ClsConfig::PrintConfigInfo() {
   std::cout << "=======Paddle Class inference config======" << std::endl;
   for (auto iter = config_map_.begin(); iter != config_map_.end(); iter++) {
     std::cout << iter->first << " : " << iter->second << std::endl;

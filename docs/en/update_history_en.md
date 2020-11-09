@@ -1,5 +1,8 @@
 # Release Notes
 
+- 2020.11.09
+    * Add `InceptionV3` architecture and pretrained model, whose Top-1 Acc on ImageNet1k dataset reaches 79.1%.
+    
 * 2020.10.20
     * Add `Res2Net50_vd_26w_4s_ssld` pretrained model, whose Top-1 Acc on ImageNet1k dataset reaches 83.1%.
     * Add `Res2Net101_vd_26w_4s_ssld` pretrained model, whose Top-1 Acc on ImageNet1k dataset reaches 83.9%.

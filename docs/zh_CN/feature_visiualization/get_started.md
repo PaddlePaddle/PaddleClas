@@ -55,16 +55,30 @@ python tools/feature_maps_visualization/fm_vis.py -i the image you want to test 
 + `-i`：待预测的图片文件路径，如 `./test.jpeg`
 + `-c`：特征图维度，如 `./resnet50_vd/model`
 + `-p`：权重文件路径，如 `./ResNet50_pretrained/`
-+ `--show`：是否展示图片，默认值 False
 + `--interpolation`: 图像插值方式， 默认值 1
 + `--save_path`：保存路径，如：`./tools/`
 + `--use_gpu`：是否使用 GPU 预测，默认值：True
 
 ## 四、结果
-输入图片：  
 
-![](../../../tools/feature_maps_visualization/test.jpg)  
+* 输入图片：  
 
-输出特征图：  
+![](../../../docs/images/feature_maps/feature_visualization_input.jpg)
 
-![](../../../tools/feature_maps_visualization/fm.jpg)
+* 运行下面的特征图可视化脚本
+
+```
+python tools/feature_maps_visualization/fm_vis.py \
+    -i ./docs/images/feature_maps/feature_visualization_input.jpg \
+    -c 5 \
+    -p pretrained/ResNet50_pretrained/  \
+    --show=True \
+    --interpolation=1 \
+    --save_path="./output.png" \
+    --use_gpu=False \
+    --load_static_weights=True
+```
+
+* 输出特征图保存为`output.png`，如下所示。
+
+![](../../../docs/images/feature_maps/feature_visualization_output.jpg)
