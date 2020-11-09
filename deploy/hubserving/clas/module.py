@@ -120,6 +120,6 @@ class ClasSystem(hub.Module):
 
 if __name__ == '__main__':
     clas = ClasSystem()
-    image_path = ['./doc/imgs/dog.jpeg', ]
+    image_path = ['./deploy/hubserving/ILSVRC2012_val_00006666.JPEG', ]
     res = clas.predict(top_k=5, paths=image_path)
     print(res)
