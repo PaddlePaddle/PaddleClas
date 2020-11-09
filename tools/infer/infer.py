@@ -64,15 +64,10 @@ def save_prelabel_results(class_id, input_filepath, output_idr):
 def main():
     args = utils.parse_args()
     # assign the place
-    if args.use_gpu:
-        gpu_id = ParallelEnv().dev_id
-        place = paddle.CUDAPlace(gpu_id)
-    else:
-        place = paddle.CPUPlace()
+    place = 'gpu:{}'.format(ParallelEnv().dev_id) if args.use_gpu else 'cpu'
+    place = paddle.set_device(place)
 
-    paddle.disable_static(place)
-
-    net = architectures.__dict__[args.model]()
+    net = architectures.__dict__[args.model](class_dim=args.class_num)
     load_dygraph_pretrain(net, args.pretrained_model, args.load_static_weights)
     image_list = get_image_list(args.image_file)
     for idx, filename in enumerate(image_list):
@@ -84,8 +79,7 @@ def main():
         outputs = net(data)
         if args.model == "GoogLeNet":
             outputs = outputs[0]
-        else:
-            outputs = F.softmax(outputs)
+        outputs = F.softmax(outputs)
         outputs = outputs.numpy()
         probs = postprocess(outputs)
 
