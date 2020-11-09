@@ -31,6 +31,7 @@ The figure above reflects the relationship between the accuracy of Xception seri
 | Xception65         | 0.810  | 0.955  |                   |                   | 25.950       | 35.480            |
 | Xception65<br>_deeplab | 0.803  | 0.945  |                   |                   | 27.370       | 39.520            |
 | Xception71         | 0.811  | 0.955  |                   |                   | 31.770       | 37.280            |
+| InceptionV3        | 0.791  | 0.946  | 0.788             | 0.944             | 11.460       | 23.830            |
 | InceptionV4        | 0.808  | 0.953  | 0.800             | 0.950             | 24.570       | 42.680            |
 
 
@@ -59,4 +60,5 @@ The figure above reflects the relationship between the accuracy of Xception seri
 | Xception65         | 299       | 320               | 4.30126                      | 11.58371                     | 23.22213                     | 7.26158                      | 25.88778                     | 53.45426                     |
 | Xception65_<br>deeplab | 299       | 320               | 4.06803                      | 9.72694                      | 19.477                       | 7.60208                      | 26.03699                     | 54.74724                     |
 | Xception71         | 299       | 320               | 4.80889                      | 13.5624                      | 27.18822                     | 8.72457                      | 31.55549                     | 69.31018                     |
+| InceptionV3        | 299       | 320               | 3.67502                      | 6.36071                     | 9.82645                     | 6.64054                     | 13.53630                     | 22.17355                     |
 | InceptionV4        | 299       | 320               | 9.50821                      | 13.72104                     | 20.27447                     | 12.99342                     | 25.23416                     | 43.56121                     |
