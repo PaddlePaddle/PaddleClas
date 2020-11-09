@@ -70,6 +70,8 @@ def main():
     test_time = 0.0
     if not args.enable_benchmark:
         img = cv2.imread(args.image_file)[:, :, ::-1]
+        assert img is not None, "Error in loading image: {}".format(
+            args.image_file)
         inputs = utils.preprocess(img, args)
         inputs = np.expand_dims(
             inputs, axis=0).repeat(
