@@ -139,7 +139,7 @@ python tools/infer/predict.py \
     - [GoogLeNet](https://paddle-imagenet-models-name.bj.bcebos.com/GoogLeNet_pretrained.tar)
   - InceptionV3 series<sup>[[26](#ref26)]</sup>([paper link](https://arxiv.org/abs/1512.00567))
     - [InceptionV3](https://paddle-imagenet-models-name.bj.bcebos.com/InceptionV3_pretrained.tar)
-  - Inception series<sup>[[11](#ref11)]</sup>([paper link](https://arxiv.org/abs/1602.07261))
+  - InceptionV4 series<sup>[[11](#ref11)]</sup>([paper link](https://arxiv.org/abs/1602.07261))
     - [InceptionV4](https://paddle-imagenet-models-name.bj.bcebos.com/InceptionV4_pretrained.tar)
   - Xception series<sup>[[12](#ref12)]</sup>([paper link](http://openaccess.thecvf.com/content_cvpr_2017/html/Chollet_Xception_Deep_Learning_CVPR_2017_paper.html))
     - [Xception41](https://paddle-imagenet-models-name.bj.bcebos.com/Xception41_pretrained.tar)
