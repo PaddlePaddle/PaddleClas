@@ -139,7 +139,9 @@ python tools/infer/predict.py \
 - Inception series
   - GoogLeNet series<sup>[[10](#ref10)]</sup>([paper link](https://arxiv.org/pdf/1409.4842.pdf))
     - [GoogLeNet](https://paddle-imagenet-models-name.bj.bcebos.com/GoogLeNet_pretrained.tar)
-  - Inception series<sup>[[11](#ref11)]</sup>([paper link](https://arxiv.org/abs/1602.07261))
+  - InceptionV3 series<sup>[[26](#ref26)]</sup>([paper link](https://arxiv.org/abs/1512.00567))
+    - [InceptionV3](https://paddle-imagenet-models-name.bj.bcebos.com/InceptionV3_pretrained.tar)
+  - InceptionV4 series<sup>[[11](#ref11)]</sup>([paper link](https://arxiv.org/abs/1602.07261))
     - [InceptionV4](https://paddle-imagenet-models-name.bj.bcebos.com/InceptionV4_pretrained.tar)
   - Xception series<sup>[[12](#ref12)]</sup>([paper link](http://openaccess.thecvf.com/content_cvpr_2017/html/Chollet_Xception_Deep_Learning_CVPR_2017_paper.html))
     - [Xception41](https://paddle-imagenet-models-name.bj.bcebos.com/Xception41_pretrained.tar)
@@ -280,3 +282,5 @@ python tools/infer/predict.py \
 <a name="ref24">[24]</a> Zhang H, Wu C, Zhang Z, et al. Resnest: Split-attention networks[J]. arXiv preprint arXiv:2004.08955, 2020.
 
 <a name="ref25">[25]</a> Radosavovic I, Kosaraju R P, Girshick R, et al. Designing network design spaces[C]//Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition. 2020: 10428-10436.
+
+<a name="ref26">[26]</a> C.Szegedy, V.Vanhoucke, S.Ioffe, J.Shlens, and Z.Wojna. Rethinking the inception architecture for computer vision. arXiv preprint arXiv:1512.00567, 2015.
