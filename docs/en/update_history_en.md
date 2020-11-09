@@ -1,5 +1,8 @@
 # Release Notes
 
+- 2020.11.09
+    * Add `InceptionV3` architecture and pretrained model, whose Top-1 Acc on ImageNet1k dataset reaches 79.1%.
+    
 - 2020.10.12
     * Add Paddle-Lite demo.
 
