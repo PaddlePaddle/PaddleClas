@@ -212,7 +212,7 @@ python tools/eval.py \
 ```python
 python tools/infer/infer.py \
     -i 待预测的图片文件路径 \
-    -m MobileNetV3_large_x1_0 \
+    --model MobileNetV3_large_x1_0 \
     --pretrained_model "./output/MobileNetV3_large_x1_0/best_model/ppcls" \
     --use_gpu True \
     --load_static_weights False
@@ -259,8 +259,8 @@ python tools/export_model.py \
 ```bash
 python tools/infer/predict.py \
     --image_file 图片路径 \
-    -m "./inference/cls_infer.pdmodel" \
-    -p "./inference/cls_infer.pdiparams" \
+    --model_file "./inference/cls_infer.pdmodel" \
+    --params_file "./inference/cls_infer.pdiparams" \
     --use_gpu=True \
     --use_tensorrt=False
 ```

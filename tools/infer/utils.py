@@ -12,23 +12,72 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import argparse
 import cv2
 import numpy as np
 
 
-class DecodeImage(object):
-    def __init__(self, to_rgb=True):
-        self.to_rgb = to_rgb
+def parse_args():
+    def str2bool(v):
+        return v.lower() in ("true", "t", "1")
 
-    def __call__(self, img):
-        data = np.frombuffer(img, dtype='uint8')
-        img = cv2.imdecode(data, 1)
-        if self.to_rgb:
-            assert img.shape[2] == 3, 'invalid shape of image[%s]' % (
-                img.shape)
-            img = img[:, :, ::-1]
+    # general params
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-i", "--image_file", type=str)
+    parser.add_argument("--use_gpu", type=str2bool, default=True)
 
-        return img
+    # params for preprocess
+    parser.add_argument("--resize_short", type=int, default=256)
+    parser.add_argument("--resize", type=int, default=224)
+    parser.add_argument("--normalize", type=str2bool, default=True)
+
+    # params for predict and predict_system
+    parser.add_argument("--model_file", type=str)
+    parser.add_argument("--params_file", type=str)
+    parser.add_argument("-b", "--batch_size", type=int, default=1)
+    parser.add_argument("--use_fp16", type=str2bool, default=False)
+    parser.add_argument("--ir_optim", type=str2bool, default=True)
+    parser.add_argument("--use_tensorrt", type=str2bool, default=False)
+    parser.add_argument("--gpu_mem", type=int, default=8000)
+    parser.add_argument("--enable_benchmark", type=str2bool, default=False)
+    parser.add_argument("--model_name", type=str)
+
+    # params for infer
+    parser.add_argument("--model", type=str)
+    parser.add_argument("--pretrained_model", type=str)
+    parser.add_argument("--class_num", type=int, default=1000)
+    parser.add_argument(
+        "--load_static_weights",
+        type=str2bool,
+        default=False,
+        help='Whether to load the pretrained weights saved in static mode')
+
+    # parameters for pre-label the images
+    parser.add_argument(
+        "--pre_label_image",
+        type=str2bool,
+        default=False,
+        help="Whether to pre-label the images using the loaded weights")
+    parser.add_argument("--pre_label_out_idr", type=str, default=None)
+
+    return parser.parse_args()
+
+
+def preprocess(img, args):
+    resize_op = ResizeImage(resize_short=args.resize_short)
+    img = resize_op(img)
+    crop_op = CropImage(size=(args.resize, args.resize))
+    img = crop_op(img)
+    if args.normalize:
+        img_mean = [0.485, 0.456, 0.406]
+        img_std = [0.229, 0.224, 0.225]
+        img_scale = 1.0 / 255.0
+        normalize_op = NormalizeImage(
+            scale=img_scale, mean=img_mean, std=img_std)
+        img = normalize_op(img)
+    tensor_op = ToTensor()
+    img = tensor_op(img)
+    return img
 
 
 class ResizeImage(object):
@@ -82,3 +131,15 @@ class ToTensor(object):
     def __call__(self, img):
         img = img.transpose((2, 0, 1))
         return img
+
+
+class Base64ToCV2(object):
+    def __init__(self):
+        pass
+
+    def __call__(self, b64str):
+        import base64
+        data = base64.b64decode(b64str.encode('utf8'))
+        data = np.fromstring(data, np.uint8)
+        data = cv2.imdecode(data, cv2.IMREAD_COLOR)
+        return data

@@ -198,7 +198,7 @@ After the training is completed, you can predict by using the pre-trained model 
 ```python
 python tools/infer/infer.py \
     -i image path \
-    -m MobileNetV3_large_x1_0 \
+    --model MobileNetV3_large_x1_0 \
     --pretrained_model "./output/MobileNetV3_large_x1_0/best_model/ppcls" \
     --use_gpu True \
     --load_static_weights False
@@ -248,8 +248,8 @@ The above command will generate the model structure file (`cls_infer.pdmodel`) a
 ```bash
 python tools/infer/predict.py \
     --image_file image path \
-    -m "./inference/cls_infer.pdmodel" \
-    -p "./inference/cls_infer.pdiparams" \
+    -model_file "./inference/cls_infer.pdmodel" \
+    -params_file "./inference/cls_infer.pdiparams" \
     --use_gpu=True \
     --use_tensorrt=False
 ```
