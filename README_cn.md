@@ -7,6 +7,7 @@
 飞桨图像分类套件PaddleClas是飞桨为工业界和学术界所准备的一个图像分类任务的工具集，助力使用者训练出更好的视觉模型和应用落地。
 
 **近期更新**
+- 2020.11.09 添加`InceptionV3 `结构和模型，在ImageNet-1k上Top-1 Acc可达79.14%。
 - 2020.11.04 添加图像分类[常见问题2020第一季第一期](./docs/zh_CN/faq_series/faq_2020_s1.md) 7个新问题，并且计划以后每周一会更新，欢迎大家持续关注。
 - 2020.10.12 添加Paddle-Lite demo。
 - 2020.10.10 添加cpp inference demo，完善`FAQ 30问`教程。
@@ -268,6 +269,7 @@ Inception系列模型的精度、速度指标如下表所示，更多关于该�
 | Xception65         | 0.8100    | 0.9549    | 7.26158               | 25.88778             | 25.95    | 35.48     | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/Xception65_pretrained.tar)         |
 | Xception65_deeplab | 0.8032    | 0.9449    | 7.60208               | 26.03699             | 27.37    | 39.52     | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/Xception65_deeplab_pretrained.tar) |
 | Xception71         | 0.8111    | 0.9545    | 8.72457               | 31.55549             | 31.77    | 37.28     | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/Xception71_pretrained.tar)         |
+| InceptionV3        | 0.7914    | 0.9459    | 6.64054              | 13.53630              | 11.46    | 23.83     | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/InceptionV3_pretrained.tar)        |
 | InceptionV4        | 0.8077    | 0.9526    | 12.99342              | 25.23416             | 24.57    | 42.68     | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/InceptionV4_pretrained.tar)        |
 
 
