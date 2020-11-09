@@ -137,7 +137,9 @@ python tools/infer/predict.py \
 - Inception系列
   - GoogLeNet系列<sup>[[10](#ref10)]</sup>([论文地址](https://arxiv.org/pdf/1409.4842.pdf))
     - [GoogLeNet](https://paddle-imagenet-models-name.bj.bcebos.com/GoogLeNet_pretrained.tar)
-  - Inception系列<sup>[[11](#ref11)]</sup>([论文地址](https://arxiv.org/abs/1602.07261))
+  - InceptionV3系列<sup>[[11](#ref11)]</sup>([论文地址](https://arxiv.org/abs/1512.00567))
+    - [InceptionV3](https://paddle-imagenet-models-name.bj.bcebos.com/InceptionV3_pretrained.tar)
+  - InceptionV4系列<sup>[[11](#ref11)]</sup>([论文地址](https://arxiv.org/abs/1602.07261))
     - [InceptionV4](https://paddle-imagenet-models-name.bj.bcebos.com/InceptionV4_pretrained.tar)
   - Xception系列<sup>[[12](#ref12)]</sup>([论文地址](http://openaccess.thecvf.com/content_cvpr_2017/html/Chollet_Xception_Deep_Learning_CVPR_2017_paper.html))
     - [Xception41](https://paddle-imagenet-models-name.bj.bcebos.com/Xception41_pretrained.tar)
