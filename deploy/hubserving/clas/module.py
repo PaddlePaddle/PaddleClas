@@ -24,8 +24,8 @@ import cv2
 import numpy as np
 import paddlehub as hub
 
+import tools.infer.predict as paddle_predict
 from tools.infer.utils import Base64ToCV2
-from tools.infer.predict_system import System
 from deploy.hubserving.clas.params import read_params
 
 
@@ -44,6 +44,9 @@ class ClasSystem(hub.Module):
         cfg = read_params()
         if use_gpu is not None:
             cfg.use_gpu = use_gpu
+        cfg.hubserving = True
+        cfg.enable_benchmark = False
+        self.args = cfg
         if cfg.use_gpu:
             try:
                 _places = os.environ["CUDA_VISIBLE_DEVICES"]
@@ -56,8 +59,6 @@ class ClasSystem(hub.Module):
                 )
         else:
             print("Use CPU")
-
-        self.Sys = System(cfg)
 
     def read_images(self, paths=[]):
         images = []
@@ -99,11 +100,14 @@ class ClasSystem(hub.Module):
                 all_results.append([])
                 continue
             starttime = time.time()
-            cla, scores = self.Sys(img, top_k)
+
+            self.args.image_file = img
+            self.args.top_k = top_k
+            classes, scores = paddle_predict.main(self.args)
 
             elapse = time.time() - starttime
             logger.info("Predict time: {}".format(elapse))
-            all_results.append([cla.item(), scores.tolist()])
+            all_results.append([classes.tolist(), scores.tolist()])
 
         return all_results
 
@@ -121,5 +125,5 @@ class ClasSystem(hub.Module):
 if __name__ == '__main__':
     clas = ClasSystem()
     image_path = ['./deploy/hubserving/ILSVRC2012_val_00006666.JPEG', ]
-    res = clas.predict(top_k=5, paths=image_path)
+    res = clas.predict(paths=image_path, top_k=5)
     print(res)

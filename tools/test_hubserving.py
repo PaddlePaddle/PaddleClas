@@ -63,23 +63,25 @@ def main(url, image_path, top_k=1):
             continue
         data = {'images': [cv2_to_base64(img)], 'top_k': top_k}
 
-        # 发送HTTP请求
         starttime = time.time()
         r = requests.post(url=url, headers=headers, data=json.dumps(data))
+        assert r.status_code == 200, "Request error, status_code: {}".format(
+            r.status_code)
         elapse = time.time() - starttime
         total_time += elapse
 
         res = r.json()["results"][0]
-        clas = res[0]
+        classes = res[0]
         scores = res[1]
         all_acc += scores[0]
         cnt += 1
 
-        scores_str = ", ".join(
-            list(map(str, map(lambda x: round(x, 5), scores))))
+        scores = map(lambda x: round(x, 5), scores)
+        results = dict(zip(classes, scores))
+
         file_str = image_file.split('/')[-1]
-        message = "No.{}, File:{}, Class:{}, The top-{} score(s):{}, Time cost:{:.3f}".format(
-            cnt, file_str, clas, top_k, scores_str, elapse)
+        message = "No.{}, File:{}, The top-{} result(s):{}, Time cost:{:.3f}".format(
+            cnt, file_str, top_k, results, elapse)
         logger.info(message)
 
     logger.info("The average time cost: {}".format(float(total_time) / cnt))

@@ -114,7 +114,7 @@ hub serving start -c deploy/hubserving/clas/config.json
 - **top_k**：[**可选**] 返回前 `top_k` 个 `score` ，默认为 `1`。
 
 访问示例：  
-```python tools/test_hubserving.py http://127.0.0.1:8868/predict/clas_system ./doc/imgs/ 5```
+```python tools/test_hubserving.py http://127.0.0.1:8866/predict/clas_system ./deploy/hubserving/ILSVRC2012_val_00006666.JPEG 5```
 
 ## 返回结果格式说明
 返回结果为列表（list），包含 `clas`，以及所有得分组成的 `scores` （list类型）， `scores` 包含前 `top_k` 个 `score` 。
