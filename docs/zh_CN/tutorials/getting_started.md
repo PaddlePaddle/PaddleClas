@@ -212,7 +212,7 @@ python tools/eval.py \
 ```python
 python tools/infer/infer.py \
     -i 待预测的图片文件路径 \
-    -m MobileNetV3_large_x1_0 \
+    --model MobileNetV3_large_x1_0 \
     --pretrained_model "./output/MobileNetV3_large_x1_0/best_model/ppcls" \
     --use_gpu True \
     --load_static_weights False
@@ -220,7 +220,7 @@ python tools/infer/infer.py \
 
 参数说明：
 + `image_file`(简写 i)：待预测的图片文件路径或者批量预测时的图片文件夹，如 `./test.jpeg`
-+ `model`(简写 m)：模型名称，如 `MobileNetV3_large_x1_0`
++ `model`：模型名称，如 `MobileNetV3_large_x1_0`
 + `pretrained_model`：模型权重文件路径，如 `./output/MobileNetV3_large_x1_0/best_model/ppcls`
 + `use_gpu` : 是否开启GPU训练，默认值：`True`
 + `load_static_weights` : 模型权重文件是否为静态图训练得到的，默认值：`False`
@@ -259,15 +259,15 @@ python tools/export_model.py \
 ```bash
 python tools/infer/predict.py \
     --image_file 图片路径 \
-    -m "./inference/cls_infer.pdmodel" \
-    -p "./inference/cls_infer.pdiparams" \
+    --model_file "./inference/cls_infer.pdmodel" \
+    --params_file "./inference/cls_infer.pdiparams" \
     --use_gpu=True \
     --use_tensorrt=False
 ```
 其中：
 + `image_file`：待预测的图片文件路径，如 `./test.jpeg`
-+ `model_file`(简写 m)：模型结构文件路径，如 `./inference/cls_infer.pdmodel`
-+ `params_file`(简写 p)：模型权重文件路径，如 `./inference/cls_infer.pdiparams`
++ `model_file`：模型结构文件路径，如 `./inference/cls_infer.pdmodel`
++ `params_file`：模型权重文件路径，如 `./inference/cls_infer.pdiparams`
 + `use_tensorrt`：是否使用 TesorRT 预测引擎，默认值：`True`
 + `use_gpu`：是否使用 GPU 预测，默认值：`True`。
 

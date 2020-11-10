@@ -12,33 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import argparse
-import utils
+import sys
+sys.path.insert(0, ".")
+import tools.infer.utils as utils
 import numpy as np
+import cv2
 import time
 
 from paddle.inference import Config
 from paddle.inference import create_predictor
-
-
-def parse_args():
-    def str2bool(v):
-        return v.lower() in ("true", "t", "1")
-
-    parser = argparse.ArgumentParser()
-    parser.add_argument("-i", "--image_file", type=str)
-    parser.add_argument("-m", "--model_file", type=str)
-    parser.add_argument("-p", "--params_file", type=str)
-    parser.add_argument("-b", "--batch_size", type=int, default=1)
-    parser.add_argument("--use_fp16", type=str2bool, default=False)
-    parser.add_argument("--use_gpu", type=str2bool, default=True)
-    parser.add_argument("--ir_optim", type=str2bool, default=True)
-    parser.add_argument("--use_tensorrt", type=str2bool, default=False)
-    parser.add_argument("--gpu_mem", type=int, default=8000)
-    parser.add_argument("--enable_benchmark", type=str2bool, default=False)
-    parser.add_argument("--model_name", type=str)
-
-    return parser.parse_args()
 
 
 def create_paddle_predictor(args):
@@ -65,33 +47,7 @@ def create_paddle_predictor(args):
     return predictor
 
 
-def create_operators():
-    size = 224
-    img_mean = [0.485, 0.456, 0.406]
-    img_std = [0.229, 0.224, 0.225]
-    img_scale = 1.0 / 255.0
-
-    decode_op = utils.DecodeImage()
-    resize_op = utils.ResizeImage(resize_short=256)
-    crop_op = utils.CropImage(size=(size, size))
-    normalize_op = utils.NormalizeImage(
-        scale=img_scale, mean=img_mean, std=img_std)
-    totensor_op = utils.ToTensor()
-
-    return [decode_op, resize_op, crop_op, normalize_op, totensor_op]
-
-
-def preprocess(fname, ops):
-    data = open(fname, 'rb').read()
-    for op in ops:
-        data = op(data)
-
-    return data
-
-
-def main():
-    args = parse_args()
-
+def main(args):
     if not args.enable_benchmark:
         assert args.batch_size == 1
         assert args.use_fp16 is False
@@ -102,7 +58,6 @@ def main():
     if args.use_fp16 is True:
         assert args.use_tensorrt is True
 
-    operators = create_operators()
     predictor = create_paddle_predictor(args)
 
     input_names = predictor.get_input_names()
@@ -114,7 +69,15 @@ def main():
     test_num = 500
     test_time = 0.0
     if not args.enable_benchmark:
-        inputs = preprocess(args.image_file, operators)
+        # for PaddleHubServing
+        if args.hubserving:
+            img = args.image_file
+        # for predict only
+        else:
+            img = cv2.imread(args.image_file)[:, :, ::-1]
+        assert img is not None, "Error in loading image: {}".format(
+            args.image_file)
+        inputs = utils.preprocess(img, args)
         inputs = np.expand_dims(
             inputs, axis=0).repeat(
                 args.batch_size, axis=0).copy()
@@ -123,12 +86,7 @@ def main():
         predictor.run()
 
         output = output_tensor.copy_to_cpu()
-        output = output.flatten()
-        cls = np.argmax(output)
-        score = output[cls]
-        print("Current image file: {}".format(args.image_file))
-        print("\ttop-1 class: {0}".format(cls))
-        print("\ttop-1 score: {0}".format(score))
+        return utils.postprocess(output, args)
     else:
         for i in range(0, test_num + 10):
             inputs = np.random.rand(args.batch_size, 3, 224,
@@ -152,4 +110,8 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    args = utils.parse_args()
+    classes, scores = main(args)
+    print("Current image file: {}".format(args.image_file))
+    print("\ttop-1 class: {0}".format(classes[0]))
+    print("\ttop-1 score: {0}".format(scores[0]))

@@ -13,7 +13,7 @@
 # limitations under the License.
 
 import numpy as np
-import argparse
+import cv2
 import utils
 import shutil
 import os
@@ -28,56 +28,6 @@ from ppcls.modeling import architectures
 import paddle
 from paddle.distributed import ParallelEnv
 import paddle.nn.functional as F
-
-
-def parse_args():
-    def str2bool(v):
-        return v.lower() in ("true", "t", "1")
-
-    parser = argparse.ArgumentParser()
-    parser.add_argument("-i", "--image_file", type=str)
-    parser.add_argument("-m", "--model", type=str)
-    parser.add_argument("-p", "--pretrained_model", type=str)
-    parser.add_argument("--class_num", type=int, default=1000)
-    parser.add_argument("--use_gpu", type=str2bool, default=True)
-    parser.add_argument(
-        "--load_static_weights",
-        type=str2bool,
-        default=False,
-        help='Whether to load the pretrained weights saved in static mode')
-
-    # parameters for pre-label the images
-    parser.add_argument(
-        "--pre_label_image",
-        type=str2bool,
-        default=False,
-        help="Whether to pre-label the images using the loaded weights")
-    parser.add_argument("--pre_label_out_idr", type=str, default=None)
-
-    return parser.parse_args()
-
-
-def create_operators():
-    size = 224
-    img_mean = [0.485, 0.456, 0.406]
-    img_std = [0.229, 0.224, 0.225]
-    img_scale = 1.0 / 255.0
-
-    decode_op = utils.DecodeImage()
-    resize_op = utils.ResizeImage(resize_short=256)
-    crop_op = utils.CropImage(size=(size, size))
-    normalize_op = utils.NormalizeImage(
-        scale=img_scale, mean=img_mean, std=img_std)
-    totensor_op = utils.ToTensor()
-
-    return [decode_op, resize_op, crop_op, normalize_op, totensor_op]
-
-
-def preprocess(fname, ops):
-    data = open(fname, 'rb').read()
-    for op in ops:
-        data = op(data)
-    return data
 
 
 def postprocess(outputs, topk=5):
@@ -112,8 +62,7 @@ def save_prelabel_results(class_id, input_filepath, output_idr):
 
 
 def main():
-    args = parse_args()
-    operators = create_operators()
+    args = utils.parse_args()
     # assign the place
     place = 'gpu:{}'.format(ParallelEnv().dev_id) if args.use_gpu else 'cpu'
     place = paddle.set_device(place)
@@ -122,7 +71,8 @@ def main():
     load_dygraph_pretrain(net, args.pretrained_model, args.load_static_weights)
     image_list = get_image_list(args.image_file)
     for idx, filename in enumerate(image_list):
-        data = preprocess(filename, operators)
+        img = cv2.imread(filename)[:, :, ::-1]
+        data = utils.preprocess(img, args)
         data = np.expand_dims(data, axis=0)
         data = paddle.to_tensor(data)
         net.eval()

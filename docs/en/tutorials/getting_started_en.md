@@ -198,7 +198,7 @@ After the training is completed, you can predict by using the pre-trained model 
 ```python
 python tools/infer/infer.py \
     -i image path \
-    -m MobileNetV3_large_x1_0 \
+    --model MobileNetV3_large_x1_0 \
     --pretrained_model "./output/MobileNetV3_large_x1_0/best_model/ppcls" \
     --use_gpu True \
     --load_static_weights False
@@ -206,7 +206,7 @@ python tools/infer/infer.py \
 
 Among them:
 + `image_file`(i): The path of the image file to be predicted, such as `./test.jpeg`;
-+ `model`(m): Model name, such as `MobileNetV3_large_x1_0`;
++ `model`: Model name, such as `MobileNetV3_large_x1_0`;
 + `pretrained_model`: Weight file path, such as `./pretrained/MobileNetV3_large_x1_0_pretrained/`;
 + `use_gpu`: Whether to use the GPU, default by `True`;
 + `load_static_weights`: Whether to load the pre-trained model obtained from static image training, default by `False`;
@@ -248,15 +248,15 @@ The above command will generate the model structure file (`cls_infer.pdmodel`) a
 ```bash
 python tools/infer/predict.py \
     --image_file image path \
-    -m "./inference/cls_infer.pdmodel" \
-    -p "./inference/cls_infer.pdiparams" \
+    --model_file "./inference/cls_infer.pdmodel" \
+    --params_file "./inference/cls_infer.pdiparams" \
     --use_gpu=True \
     --use_tensorrt=False
 ```
 Among them:
 + `image_file`: The path of the image file to be predicted, such as `./test.jpeg`;
-+ `model_file`(m): Model file path, such as `./MobileNetV3_large_x1_0/cls_infer.pdmodel`;
-+ `params_file`(p): Weight file path, such as `./MobileNetV3_large_x1_0/cls_infer.pdiparams`;
++ `model_file`: Model file path, such as `./MobileNetV3_large_x1_0/cls_infer.pdmodel`;
++ `params_file`: Weight file path, such as `./MobileNetV3_large_x1_0/cls_infer.pdiparams`;
 + `use_tensorrt`: Whether to use the TesorRT, default by `True`;
 + `use_gpu`: Whether to use the GPU, default by `True`.
 
