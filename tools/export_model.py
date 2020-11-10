@@ -65,11 +65,12 @@ def main():
     net = architectures.__dict__[args.model]
 
     model = Net(net, to_static, args.class_dim)
-
     load_dygraph_pretrain(
         model.pre_net,
         path=args.pretrained_model,
         load_static_weights=args.load_static_weights)
+
+    model.eval()
     paddle.jit.save(model, args.output_path)
 
 
