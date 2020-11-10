@@ -243,11 +243,12 @@ inp_shape = {
 def _drop_connect(inputs, prob, is_test):
     if is_test:
         return inputs
+
     keep_prob = 1.0 - prob
     inputs_shape = paddle.shape(inputs)
     random_tensor = keep_prob + paddle.rand(shape=[inputs_shape[0], 1, 1, 1])
     binary_tensor = paddle.floor(random_tensor)
-    output = inputs / keep_prob * binary_tensor
+    output = paddle.multiply(inputs, binary_tensor) / keep_prob
     return output
 
 
@@ -507,7 +508,8 @@ class SEBlock(nn.Layer):
         x = self._pool(inputs)
         x = self._conv1(x)
         x = self._conv2(x)
-        return paddle.multiply(inputs, x)
+        out = paddle.multiply(inputs, x)
+        return out
 
 
 class MbConvBlock(nn.Layer):
@@ -572,11 +574,13 @@ class MbConvBlock(nn.Layer):
         if self.expand_ratio != 1:
             x = self._ecn(x)
             x = F.swish(x)
+
         x = self._dcn(x)
         x = F.swish(x)
         if self.has_se:
             x = self._se(x)
         x = self._pcn(x)
+
         if self.id_skip and \
                 self.block_args.stride == 1 and \
                 self.block_args.input_filters == self.block_args.output_filters:
