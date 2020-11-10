@@ -17,7 +17,6 @@
 #include "opencv2/core.hpp"
 #include "opencv2/imgcodecs.hpp"
 #include "opencv2/imgproc.hpp"
-#include "paddle_api.h"
 #include "paddle_inference_api.h"
 #include <chrono>
 #include <iomanip>
@@ -31,6 +30,8 @@
 
 #include <include/preprocess_op.h>
 
+using namespace paddle_infer;
+
 namespace PaddleClas {
 
 class Classifier {
@@ -38,14 +39,13 @@ public:
   explicit Classifier(const std::string &model_dir, const bool &use_gpu,
                       const int &gpu_id, const int &gpu_mem,
                       const int &cpu_math_library_num_threads,
-                      const bool &use_mkldnn, const bool &use_zero_copy_run,
-                      const int &resize_short_size, const int &crop_size) {
+                      const bool &use_mkldnn, const int &resize_short_size,
+                      const int &crop_size) {
     this->use_gpu_ = use_gpu;
     this->gpu_id_ = gpu_id;
     this->gpu_mem_ = gpu_mem;
     this->cpu_math_library_num_threads_ = cpu_math_library_num_threads;
     this->use_mkldnn_ = use_mkldnn;
-    this->use_zero_copy_run_ = use_zero_copy_run;
 
     this->resize_short_size_ = resize_short_size;
     this->crop_size_ = crop_size;
@@ -60,14 +60,13 @@ public:
   void Run(cv::Mat &img);
 
 private:
-  std::shared_ptr<PaddlePredictor> predictor_;
+  std::shared_ptr<Predictor> predictor_;
 
   bool use_gpu_ = false;
   int gpu_id_ = 0;
   int gpu_mem_ = 4000;
   int cpu_math_library_num_threads_ = 4;
   bool use_mkldnn_ = false;
-  bool use_zero_copy_run_ = false;
 
   std::vector<float> mean_ = {0.485f, 0.456f, 0.406f};
   std::vector<float> scale_ = {1 / 0.229f, 1 / 0.224f, 1 / 0.225f};
