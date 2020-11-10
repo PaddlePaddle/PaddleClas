@@ -12,7 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import utils
+import sys
+sys.path.insert(0, ".")
+import tools.infer.utils as utils
 import numpy as np
 import cv2
 import time
@@ -45,9 +47,7 @@ def create_paddle_predictor(args):
     return predictor
 
 
-def main():
-    args = utils.parse_args()
-
+def main(args):
     if not args.enable_benchmark:
         assert args.batch_size == 1
         assert args.use_fp16 is False
@@ -69,7 +69,12 @@ def main():
     test_num = 500
     test_time = 0.0
     if not args.enable_benchmark:
-        img = cv2.imread(args.image_file)[:, :, ::-1]
+        # for PaddleHubServing
+        if args.hubserving:
+            img = args.image_file
+        # for predict only
+        else:
+            img = cv2.imread(args.image_file)[:, :, ::-1]
         assert img is not None, "Error in loading image: {}".format(
             args.image_file)
         inputs = utils.preprocess(img, args)
@@ -81,12 +86,7 @@ def main():
         predictor.run()
 
         output = output_tensor.copy_to_cpu()
-        output = output.flatten()
-        cls = np.argmax(output)
-        score = output[cls]
-        print("Current image file: {}".format(args.image_file))
-        print("\ttop-1 class: {0}".format(cls))
-        print("\ttop-1 score: {0}".format(score))
+        return utils.postprocess(output, args)
     else:
         for i in range(0, test_num + 10):
             inputs = np.random.rand(args.batch_size, 3, 224,
@@ -110,4 +110,8 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    args = utils.parse_args()
+    classes, scores = main(args)
+    print("Current image file: {}".format(args.image_file))
+    print("\ttop-1 class: {0}".format(classes[0]))
+    print("\ttop-1 score: {0}".format(scores[0]))

@@ -31,7 +31,7 @@ def parse_args():
     parser.add_argument("--resize", type=int, default=224)
     parser.add_argument("--normalize", type=str2bool, default=True)
 
-    # params for predict and predict_system
+    # params for predict
     parser.add_argument("--model_file", type=str)
     parser.add_argument("--params_file", type=str)
     parser.add_argument("-b", "--batch_size", type=int, default=1)
@@ -41,6 +41,8 @@ def parse_args():
     parser.add_argument("--gpu_mem", type=int, default=8000)
     parser.add_argument("--enable_benchmark", type=str2bool, default=False)
     parser.add_argument("--model_name", type=str)
+    parser.add_argument("--top_k", type=int, default=1)
+    parser.add_argument("--hubserving", type=str2bool, default=False)
 
     # params for infer
     parser.add_argument("--model", type=str)
@@ -78,6 +80,14 @@ def preprocess(img, args):
     tensor_op = ToTensor()
     img = tensor_op(img)
     return img
+
+
+def postprocess(output, args):
+    output = output.flatten()
+    classes = np.argpartition(output, -args.top_k)[-args.top_k:]
+    classes = classes[np.argsort(-output[classes])]
+    scores = output[classes]
+    return classes, scores
 
 
 class ResizeImage(object):
