@@ -80,15 +80,19 @@ def load_distillation_model(model, pretrained_model, load_static_weights):
         load_static_weights
     ) == 2, "load_static_weights length should be 2 but got {}".format(
         len(load_static_weights))
+    teacher = model.teacher if hasattr(model,
+                                       "teacher") else model._layers.teacher
+    student = model.student if hasattr(model,
+                                       "student") else model._layers.student
     load_dygraph_pretrain(
-        model.teacher,
+        teacher,
         path=pretrained_model[0],
         load_static_weights=load_static_weights[0])
     logger.info(
         logger.coloring("Finish initing teacher model from {}".format(
             pretrained_model), "HEADER"))
     load_dygraph_pretrain(
-        model.student,
+        student,
         path=pretrained_model[1],
         load_static_weights=load_static_weights[1])
     logger.info(
