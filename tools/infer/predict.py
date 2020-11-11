@@ -53,7 +53,7 @@ def main(args):
         assert args.use_fp16 is False
     else:
         assert args.use_gpu is True
-        assert args.model_name is not None
+        assert args.model is not None
     # HALF precission predict only work when using tensorrt
     if args.use_fp16 is True:
         assert args.use_tensorrt is True
@@ -105,8 +105,8 @@ def main(args):
         fp_message = "FP16" if args.use_fp16 else "FP32"
         trt_msg = "using tensorrt" if args.use_tensorrt else "not using tensorrt"
         print("{0}\t{1}\t{2}\tbatch size: {3}\ttime(ms): {4}".format(
-            args.model_name, trt_msg, fp_message, args.batch_size, 1000 *
-            test_time / test_num))
+            args.model, trt_msg, fp_message, args.batch_size, 1000 * test_time
+            / test_num))
 
 
 if __name__ == "__main__":
