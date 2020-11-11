@@ -35,7 +35,7 @@ PaddleClas is a toolset for image classification tasks prepared for the industry
 
 ## Community
 
-* Scan the QR code below with your Wechat, you can access to official technical exchange group. Look forward to your participation.
+* Scan the QR code below with your Wechat and send the message `分类` out, then you will be invited into the official technical exchange group. Look forward to your participation.
 
 <div align="center">
 <img src="./docs/images/joinus.png"  width = "200" height = "200" />
