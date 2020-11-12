@@ -19,6 +19,7 @@ from __future__ import print_function
 import os
 import sys
 
+import paddle
 import paddle.fluid as fluid
 
 from ppcls.modeling import get_architectures
@@ -134,3 +135,10 @@ def check_function_params(config, key):
         ('params is required in {} config'.format(key))
     assert isinstance(params, dict), \
         ('the params in {} config should be a dict'.format(key))
+
+
+def enable_static_mode():
+    try:
+        paddle.enable_static()
+    except:
+        pass

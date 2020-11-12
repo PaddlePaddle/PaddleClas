@@ -31,6 +31,7 @@ import paddle.fluid as fluid
 from ppcls.data import Reader
 from ppcls.utils.config import get_config
 from ppcls.utils.save_load import init_model, save_model
+from ppcls.utils.check import enable_static_mode
 from ppcls.utils import logger
 import program
 
@@ -164,6 +165,6 @@ def main(args):
 
 
 if __name__ == '__main__':
-    paddle.enable_static()
+    enable_static_mode()
     args = parse_args()
     main(args)

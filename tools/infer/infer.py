@@ -24,6 +24,7 @@ import paddle
 import paddle.fluid as fluid
 
 from ppcls.modeling import architectures
+from ppcls.utils.check import enable_static_mode
 import utils
 
 
@@ -145,5 +146,5 @@ def main():
 
 
 if __name__ == "__main__":
-    paddle.enable_static()
+    enable_static_mode()
     main()
