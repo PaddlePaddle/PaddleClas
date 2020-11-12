@@ -44,7 +44,7 @@
 <img src="./docs/images/joinus.png"  width = "200" />
 </div>
 
-* 也可以扫描下面的QQ群二维码， 加入PaddleClas QQ交流群。获得更高效的问题答疑，与各行各业开发者充分交流，期待您的加入。
+* 您也可以扫描下面的QQ群二维码， 加入PaddleClas QQ交流群。获得更高效的问题答疑，与各行各业开发者充分交流，期待您的加入。
 
 <div align="center">
 <img src="./docs/images/qq_group.png"  width = "200" />
