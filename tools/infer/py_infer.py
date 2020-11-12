@@ -11,6 +11,11 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import os
+import sys
+__dir__ = os.path.dirname(os.path.abspath(__file__))
+sys.path.append(__dir__)
+sys.path.append(os.path.abspath(os.path.join(__dir__, '../')))
 
 import utils
 import argparse
@@ -18,6 +23,8 @@ import numpy as np
 
 import paddle
 import paddle.fluid as fluid
+
+from ppcls.utils.check import enable_static_mode
 
 
 def parse_args():
@@ -100,5 +107,5 @@ def main():
 
 
 if __name__ == "__main__":
-    paddle.enable_static()
+    enable_static_mode()
     main()
