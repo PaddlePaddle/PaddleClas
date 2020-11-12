@@ -41,7 +41,7 @@ PaddleClas is a toolset for image classification tasks prepared for the industry
 <img src="./docs/images/joinus.png"  width = "200" height = "200" />
 </div>
 
-* you can also scan the QQ group QR code to enter the PaddleClas QQ group. Look forward to your participation.
+* You can also scan the QQ group QR code to enter the PaddleClas QQ group. Look forward to your participation.
 
 <div align="center">
 <img src="./docs/images/qq_group.png"  width = "200" />
