@@ -38,11 +38,18 @@
 
 ## 欢迎加入技术交流群
 
-* 微信扫描二维码加入添加飞桨小姐姐的微信，添加成功后私信小姐姐暗号【分类】，即可收到系统进群邀请，获得更高效的问题答疑，与各行各业开发者充分交流，期待您的加入。
+* 微信扫描下面左方二维码添加飞桨小姐姐的微信，添加成功后私信小姐姐暗号【分类】，即可收到系统进群邀请。
 
 <div align="center">
-<img src="./docs/images/joinus.png"  width = "200" height = "200" />
+<img src="./docs/images/joinus.png"  width = "200" />
 </div>
+
+* 也可以扫描下面的QQ群二维码， 加入PaddleClas QQ交流群。获得更高效的问题答疑，与各行各业开发者充分交流，期待您的加入。
+
+<div align="center">
+<img src="./docs/images/qq_group.png"  width = "200" />
+</div>
+
 
 
 ## 文档教程
