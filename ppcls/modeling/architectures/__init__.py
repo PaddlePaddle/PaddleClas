@@ -26,7 +26,7 @@ from .dpn import DPN68, DPN92, DPN98, DPN107, DPN131
 from .densenet import DenseNet121, DenseNet161, DenseNet169, DenseNet201, DenseNet264
 from .hrnet import HRNet_W18_C, HRNet_W30_C, HRNet_W32_C, HRNet_W40_C, HRNet_W44_C, HRNet_W48_C, HRNet_W60_C, HRNet_W64_C, SE_HRNet_W18_C, SE_HRNet_W30_C, SE_HRNet_W32_C, SE_HRNet_W40_C, SE_HRNet_W44_C, SE_HRNet_W48_C, SE_HRNet_W60_C, SE_HRNet_W64_C
 from .efficientnet import EfficientNetB0, EfficientNetB1, EfficientNetB2, EfficientNetB3, EfficientNetB4, EfficientNetB5, EfficientNetB6, EfficientNetB7
-from .resnest import ResNeSt50_fast_1s1x64d, ResNeSt50
+from .resnest import ResNeSt50_fast_1s1x64d, ResNeSt50, ResNeSt101
 from .googlenet import GoogLeNet
 from .ghostnet import GhostNet_x0_5, GhostNet_x1_0, GhostNet_x1_3
 from .mobilenet_v1 import MobileNetV1_x0_25, MobileNetV1_x0_5, MobileNetV1_x0_75, MobileNetV1

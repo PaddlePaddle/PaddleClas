@@ -27,7 +27,7 @@ from paddle.nn import Conv2D, BatchNorm, Linear, Dropout
 from paddle.nn import AdaptiveAvgPool2D, MaxPool2D, AvgPool2D
 from paddle.regularizer import L2Decay
 
-__all__ = ["ResNeSt50_fast_1s1x64d", "ResNeSt50"]
+__all__ = ["ResNeSt50_fast_1s1x64d", "ResNeSt50", "ResNeSt101"]
 
 
 class ConvBNLayer(nn.Layer):
@@ -679,6 +679,22 @@ def ResNeSt50(**args):
         bottleneck_width=64,
         deep_stem=True,
         stem_width=32,
+        avg_down=True,
+        avd=True,
+        avd_first=False,
+        final_drop=0.0,
+        **args)
+    return model
+
+
+def ResNeSt101(**args):
+    model = ResNeSt(
+        layers=[3, 4, 23, 3],
+        radix=2,
+        groups=1,
+        bottleneck_width=64,
+        deep_stem=True,
+        stem_width=64,
         avg_down=True,
         avd=True,
         avd_first=False,
