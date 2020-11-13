@@ -36,6 +36,7 @@ from ppcls.utils import logger
 
 from paddle.fluid.incubate.fleet.collective import fleet
 from paddle.fluid.incubate.fleet.collective import DistributedStrategy
+import paddle.fluid as fluid
 
 from ema import ExponentialMovingAverage
 
@@ -89,7 +90,7 @@ def create_dataloader(feeds):
     return dataloader
 
 
-def create_model(architecture, image, classes_num, is_train):
+def create_model(architecture, image, classes_num, is_train, data_format='NCHW'):
     """
     Create a model
 
@@ -107,7 +108,13 @@ def create_model(architecture, image, classes_num, is_train):
     if "is_test" in params:
         params['is_test'] = not is_train
     model = architectures.__dict__[name](**params)
-    out = model.net(input=image, class_dim=classes_num)
+    if name == "InceptionV3":
+        image = fluid.layers.transpose(image, [0, 2, 3, 1]) if data_format == 'NHWC' else image
+        image.stop_gradient = image.stop_gradient
+
+        out = model.net(input=image, class_dim=classes_num, data_format=data_format)
+    else:
+        out = model.net(input=image, class_dim=classes_num)
     return out
 
 
@@ -341,8 +348,10 @@ def build(config, main_prog, startup_prog, is_train=True, is_distributed=True):
             use_distillation = config.get('use_distillation')
             feeds = create_feeds(config.image_shape, use_mix=use_mix)
             dataloader = create_dataloader(feeds.values())
+            
+            data_format = config.get('use_distillation', 'NCHW')
             out = create_model(config.ARCHITECTURE, feeds['image'],
-                               config.classes_num, is_train)
+                               config.classes_num, is_train, data_format)
             fetchs = create_fetchs(
                 out,
                 feeds,
@@ -361,6 +370,7 @@ def build(config, main_prog, startup_prog, is_train=True, is_distributed=True):
                 if is_distributed:
                     optimizer = dist_optimizer(config, optimizer)
                 optimizer.minimize(fetchs['loss'][0])
+                print(main_prog)
                 if config.get('use_ema'):
 
                     global_steps = fluid.layers.learning_rate_scheduler._decay_step_counter(
@@ -391,6 +401,32 @@ def compile(config, program, loss_name=None, share_prog=None):
 
     exec_strategy.num_threads = 1
     exec_strategy.num_iteration_per_drop_scope = 10
+
+    use_fp16 = config.get('fuse_bn_act_ops', False)
+
+    if use_fp16:
+        try:
+            fluid.require_version(min_version='1.7.0')
+            build_strategy.fuse_bn_act_ops = config.fuse_bn_act_ops
+        except Exception as e:
+            logger.info(
+                "PaddlePaddle version 1.7.0 or higher is "
+                "required when you want to fuse batch_norm and activation_op.")
+        build_strategy.fuse_elewise_add_act_ops = config.fuse_elewise_add_act_ops
+        
+        try:
+            build_strategy.fuse_bn_add_act_ops = config.fuse_bn_add_act_ops
+            print(build_strategy.fuse_bn_add_act_ops)
+        except Exception as e:
+            logger.info(
+                "PaddlePaddle 2.0-rc or higher is "
+                "required when you want to enable fuse_bn_add_act_ops strategy.")
+        try:
+            build_strategy.enable_addto = config.enable_addto
+        except Exception as e:
+            logger.info(
+                "PaddlePaddle 2.0-rc or higher is "
+                "required when you want to enable addto strategy.")
 
     compiled_program = fluid.CompiledProgram(program).with_data_parallel(
         share_vars_from=share_prog,
@@ -434,6 +470,7 @@ def run(dataloader,
     for idx, batch in enumerate(dataloader()):
         metrics = exe.run(program=program, feed=batch, fetch_list=fetch_list)
         batch_time.update(time.time() - tic)
+        print( time.time() - tic )
         tic = time.time()
         for i, m in enumerate(metrics):
             metric_list[i].update(np.mean(m), len(batch[0]))

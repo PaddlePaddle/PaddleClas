@@ -16,6 +16,16 @@ image_shape: [3, 299, 299]
 use_mix: True
 ls_epsilon: 0.1
 
+use_fp16: True
+amp_scale_loss: 128
+use_dynamic_loss_scaling: True
+data_format: 'NHWC'
+fuse_elewise_add_act_ops: True
+fuse_bn_act_ops: True
+fuse_bn_add_act_ops: True
+use_dali: True
+enable_addto: True
+
 LEARNING_RATE:
     function: 'Cosine'          
     params:                  
@@ -31,7 +41,7 @@ OPTIMIZER:
 
 TRAIN:
     batch_size: 256
-    num_workers: 4
+    num_workers: 8
     file_list: "./dataset/ILSVRC2012/train_list.txt"
     data_dir: "./dataset/ILSVRC2012/"
     shuffle_seed: 0
