@@ -105,9 +105,11 @@ def create_model(architecture, image, classes_num, is_train, data_format='NCHW')
     """
     name = architecture["name"]
     params = architecture.get("params", {})
+
     if "is_test" in params:
         params['is_test'] = not is_train
     model = architectures.__dict__[name](**params)
+    print(data_format)
     if name == "InceptionV3":
         image = fluid.layers.transpose(image, [0, 2, 3, 1]) if data_format == 'NHWC' else image
         image.stop_gradient = image.stop_gradient
@@ -349,7 +351,7 @@ def build(config, main_prog, startup_prog, is_train=True, is_distributed=True):
             feeds = create_feeds(config.image_shape, use_mix=use_mix)
             dataloader = create_dataloader(feeds.values())
             
-            data_format = config.get('use_distillation', 'NCHW')
+            data_format = config.get('data_format', 'NCHW')
             out = create_model(config.ARCHITECTURE, feeds['image'],
                                config.classes_num, is_train, data_format)
             fetchs = create_fetchs(
@@ -470,7 +472,6 @@ def run(dataloader,
     for idx, batch in enumerate(dataloader()):
         metrics = exe.run(program=program, feed=batch, fetch_list=fetch_list)
         batch_time.update(time.time() - tic)
-        print( time.time() - tic )
         tic = time.time()
         for i, m in enumerate(metrics):
             metric_list[i].update(np.mean(m), len(batch[0]))
