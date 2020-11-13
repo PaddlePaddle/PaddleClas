@@ -70,8 +70,9 @@ def main(args):
     if use_fp16:
         AMP_RELATED_FLAGS_SETTING = {
             'FLAGS_cudnn_exhaustive_search': 1,
-            'FLAGS_conv_workspace_size_limit': 1000,
+            'FLAGS_conv_workspace_size_limit': 4000,
             'FLAGS_cudnn_batchnorm_spatial_persistent': 1,
+            'FLAGS_max_inplace_grad_add': 8,
         }
         os.environ['FLAGS_cudnn_batchnorm_spatial_persistent'] = '1'
         paddle.fluid.set_flags(AMP_RELATED_FLAGS_SETTING)

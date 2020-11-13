@@ -404,7 +404,7 @@ def compile(config, program, loss_name=None, share_prog=None):
     exec_strategy.num_threads = 1
     exec_strategy.num_iteration_per_drop_scope = 10
 
-    use_fp16 = config.get('fuse_bn_act_ops', False)
+    use_fp16 = config.get('use_fp16', False)
 
     if use_fp16:
         try:
@@ -504,6 +504,7 @@ def run(dataloader,
                         if idx == 0 else epoch_str,
                         logger.coloring(step_str, "PURPLE"),
                         logger.coloring(fetchs_str, 'OKGREEN')))
+        #exit(0)
 
     end_str = ''.join([str(m.mean) + ' '
                        for m in metric_list] + [batch_time.total]) + 's'
