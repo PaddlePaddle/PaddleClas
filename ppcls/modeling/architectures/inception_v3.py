@@ -24,23 +24,25 @@ from paddle.fluid.param_attr import ParamAttr
 __all__ = ["InceptionV3"]
 
 class InceptionV3():
-    def __init__(self):
+    def __init__(self, data_format="NCHW"):
         self.inception_a_list = [32, 64, 64]
         self.inception_c_list = [128, 160, 160, 192]
+        self.data_format = data_format
+        self.concat_axis = 3 if self.data_format=="NHWC" else 1
 
-    def net(self, input, class_dim=1000, data_format="NCHW"):
-        axis = 3 if data_format=="NHWC" else 1
-        x = self.inception_stem(input, data_format=data_format)
+    def net(self, input, class_dim=1000):
+        
+        x = self.inception_stem(input)
         for i, pool_features in enumerate(self.inception_a_list):
-            x = self.inceptionA(x, pool_features, name=str(i+1), data_format=data_format, axis=axis)
-        x = self.inceptionB(x, name="1", data_format=data_format, axis=axis)
+            x = self.inceptionA(x, pool_features, name=str(i+1))
+        x = self.inceptionB(x, name="1")
         for i, channels_7x7 in enumerate(self.inception_c_list):
-             x = self.inceptionC(x, channels_7x7, name=str(i+1), data_format=data_format, axis=axis)
-        x = self.inceptionD(x, name="1", data_format=data_format, axis=axis)
-        x = self.inceptionE(x, name="1", data_format=data_format, axis=axis)
-        x = self.inceptionE(x, name="2", data_format=data_format, axis=axis)
+             x = self.inceptionC(x, channels_7x7, name=str(i+1))
+        x = self.inceptionD(x, name="1")
+        x = self.inceptionE(x, name="1")
+        x = self.inceptionE(x, name="2")
 
-        pool = fluid.layers.pool2d(input=x, pool_type="avg", global_pooling=True, data_format=data_format)
+        pool = fluid.layers.pool2d(input=x, pool_type="avg", global_pooling=True, data_format=self.data_format)
 
         drop = fluid.layers.dropout(x=pool, dropout_prob=0.2)
 
@@ -60,8 +62,7 @@ class InceptionV3():
                       padding=0,
                       groups=1,
                       act="relu",
-                      name=None,
-                      data_format="NCHW"):
+                      name=None):
         conv = fluid.layers.conv2d(
             input=data,
             num_filters=num_filters,
@@ -73,325 +74,297 @@ class InceptionV3():
             param_attr=ParamAttr(name=name+"_weights"),
             bias_attr=False,
             name=name, 
-            data_format=data_format)
+            data_format=self.data_format)
         return fluid.layers.batch_norm(input=conv, 
                                        act=act,
                                        param_attr = ParamAttr(name=name+"_bn_scale"),
                                        bias_attr=ParamAttr(name=name+"_bn_offset"),
                                        moving_mean_name=name+"_bn_mean",
                                        moving_variance_name=name+"_bn_variance", 
-                                       data_layout=data_format)
+                                       data_layout=self.data_format)
     
-    def inception_stem(self, x, data_format="NCHW"):
+    def inception_stem(self, x):
         x = self.conv_bn_layer(x, 
                                num_filters=32, 
                                filter_size=3, 
                                stride=2,
                                act="relu",
-                               name="conv_1a_3x3", data_format=data_format)
+                               name="conv_1a_3x3")
         x = self.conv_bn_layer(x, 
                                num_filters=32, 
                                filter_size=3, 
                                stride=1,
                                act="relu",
-                               name="conv_2a_3x3", data_format=data_format)        
+                               name="conv_2a_3x3")        
         x = self.conv_bn_layer(x, 
                                num_filters=64, 
                                filter_size=3, 
                                padding=1,
                                act="relu",
-                               name="conv_2b_3x3", data_format=data_format)         
+                               name="conv_2b_3x3")         
 
-        x = fluid.layers.pool2d(input=x, pool_size=3, pool_stride=2, pool_type="max", data_format=data_format)
+        x = fluid.layers.pool2d(input=x, pool_size=3, pool_stride=2, pool_type="max", data_format=self.data_format)
         
         x = self.conv_bn_layer(x, 
                                num_filters=80, 
                                filter_size=1, 
                                act="relu",
-                               name="conv_3b_1x1", data_format=data_format)  
+                               name="conv_3b_1x1")  
         x = self.conv_bn_layer(x, 
                                num_filters=192, 
                                filter_size=3, 
                                act="relu",
-                               name="conv_4a_3x3", data_format=data_format)  
+                               name="conv_4a_3x3")  
 
-        x = fluid.layers.pool2d(input=x, pool_size=3, pool_stride=2, pool_type="max", data_format=data_format)
+        x = fluid.layers.pool2d(input=x, pool_size=3, pool_stride=2, pool_type="max", data_format=self.data_format)
 
         return x
 
-    def inceptionA(self, x, pool_features, name=None, data_format="NCHW", axis=1):
+    def inceptionA(self, x, pool_features, name=None):
         branch1x1 = self.conv_bn_layer(x, 
                                        num_filters=64, 
                                        filter_size=1, 
                                        act="relu",
-                                       name="inception_a_branch1x1_"+name, data_format=data_format)
+                                       name="inception_a_branch1x1_"+name)
         branch5x5 = self.conv_bn_layer(x, 
                                        num_filters=48, 
                                        filter_size=1, 
                                        act="relu",
-                                       name="inception_a_branch5x5_1_"+name, data_format=data_format)
+                                       name="inception_a_branch5x5_1_"+name)
         branch5x5 = self.conv_bn_layer(branch5x5, 
                                        num_filters=64, 
                                        filter_size=5, 
                                        padding=2, 
                                        act="relu",
-                                       name="inception_a_branch5x5_2_"+name, data_format=data_format)
+                                       name="inception_a_branch5x5_2_"+name)
 
         branch3x3dbl = self.conv_bn_layer(x, 
                                        num_filters=64, 
                                        filter_size=1, 
                                        act="relu",
-                                       name="inception_a_branch3x3dbl_1_"+name, data_format=data_format)
+                                       name="inception_a_branch3x3dbl_1_"+name)
         branch3x3dbl = self.conv_bn_layer(branch3x3dbl, 
                                        num_filters=96, 
                                        filter_size=3, 
                                        padding=1,
                                        act="relu",
-                                       name="inception_a_branch3x3dbl_2_"+name, data_format=data_format)
+                                       name="inception_a_branch3x3dbl_2_"+name)
         branch3x3dbl = self.conv_bn_layer(branch3x3dbl, 
                                num_filters=96, 
                                filter_size=3, 
                                padding=1,
                                act="relu",
-                               name="inception_a_branch3x3dbl_3_"+name, data_format=data_format)
-        branch_pool = fluid.layers.pool2d(x, pool_size=3, pool_padding=1, pool_type="avg", data_format=data_format)
+                               name="inception_a_branch3x3dbl_3_"+name)
+        branch_pool = fluid.layers.pool2d(x, pool_size=3, pool_padding=1, pool_type="avg", data_format=self.data_format)
         branch_pool = self.conv_bn_layer(branch_pool, 
                                num_filters=pool_features, 
                                filter_size=1, 
                                act="relu",
-                               name="inception_a_branch_pool_"+name, data_format=data_format)
+                               name="inception_a_branch_pool_"+name)
 
-        concat = fluid.layers.concat([branch1x1, branch5x5, branch3x3dbl, branch_pool], axis=axis)
+        concat = fluid.layers.concat([branch1x1, branch5x5, branch3x3dbl, branch_pool], axis=self.concat_axis)
         
         return concat
 
     
     
-    def inceptionB(self, x, name=None, data_format="NCHW", axis=1):
+    def inceptionB(self, x, name=None):
         branch3x3 = self.conv_bn_layer(x, 
                                        num_filters=384, 
                                        filter_size=3, 
                                        stride=2,
                                        act="relu",
-                                       name="inception_b_branch3x3_"+name,
-                                       data_format=data_format)
+                                       name="inception_b_branch3x3_"+name)
         branch3x3dbl = self.conv_bn_layer(x, 
                                        num_filters=64, 
                                        filter_size=1, 
                                        act="relu",
-                                       name="inception_b_branch3x3dbl_1_"+name,
-                                       data_format=data_format)
+                                       name="inception_b_branch3x3dbl_1_"+name)
         branch3x3dbl = self.conv_bn_layer(branch3x3dbl, 
                                        num_filters=96, 
                                        filter_size=3, 
                                        padding=1,
                                        act="relu",
-                                       name="inception_b_branch3x3dbl_2_"+name,
-                                       data_format=data_format)
+                                       name="inception_b_branch3x3dbl_2_"+name)
         branch3x3dbl = self.conv_bn_layer(branch3x3dbl, 
                                        num_filters=96, 
                                        filter_size=3,
                                        stride=2,
                                        act="relu",
-                                       name="inception_b_branch3x3dbl_3_"+name,
-                                       data_format=data_format)
-        branch_pool = fluid.layers.pool2d(x, pool_size=3, pool_stride=2, pool_type="max", data_format=data_format)
+                                       name="inception_b_branch3x3dbl_3_"+name)
+        branch_pool = fluid.layers.pool2d(x, pool_size=3, pool_stride=2, pool_type="max", data_format=self.data_format)
         
-        concat = fluid.layers.concat([branch3x3, branch3x3dbl, branch_pool], axis=axis)
+        concat = fluid.layers.concat([branch3x3, branch3x3dbl, branch_pool], axis=self.concat_axis)
         
         return concat
     
     
-    def inceptionC(self, x, channels_7x7, name=None, data_format="NCHW", axis=1):
+    def inceptionC(self, x, channels_7x7, name=None):
         branch1x1 = self.conv_bn_layer(x, 
                                        num_filters=192, 
                                        filter_size=1, 
                                        act="relu",
-                                       name="inception_c_branch1x1_"+name,
-                                       data_format=data_format)
+                                       name="inception_c_branch1x1_"+name)
         branch7x7 = self.conv_bn_layer(x, 
                                        num_filters=channels_7x7, 
                                        filter_size=1, 
                                        stride=1,
                                        act="relu",
-                                       name="inception_c_branch7x7_1_"+name,
-                                       data_format=data_format)
+                                       name="inception_c_branch7x7_1_"+name)
         branch7x7 = self.conv_bn_layer(branch7x7, 
                                        num_filters=channels_7x7, 
                                        filter_size=(1, 7), 
                                        stride=1,
                                        padding=(0, 3),
                                        act="relu",
-                                       name="inception_c_branch7x7_2_"+name,
-                                       data_format=data_format)
+                                       name="inception_c_branch7x7_2_"+name)
         branch7x7 = self.conv_bn_layer(branch7x7, 
                                        num_filters=192, 
                                        filter_size=(7, 1), 
                                        stride=1,
                                        padding=(3, 0),
                                        act="relu",
-                                       name="inception_c_branch7x7_3_"+name,
-                                       data_format=data_format)
+                                       name="inception_c_branch7x7_3_"+name)
         
         branch7x7dbl = self.conv_bn_layer(x, 
                                        num_filters=channels_7x7, 
                                        filter_size=1, 
                                        act="relu",
                                        name="inception_c_branch7x7dbl_1_"+name,
-                                       data_format=data_format)
+                                       data_format=self.data_format)
         branch7x7dbl = self.conv_bn_layer(branch7x7dbl, 
                                        num_filters=channels_7x7, 
                                        filter_size=(7, 1), 
                                        padding = (3, 0),
                                        act="relu",
-                                       name="inception_c_branch7x7dbl_2_"+name,
-                                       data_format=data_format)
+                                       name="inception_c_branch7x7dbl_2_"+name)
         branch7x7dbl = self.conv_bn_layer(branch7x7dbl, 
                                        num_filters=channels_7x7, 
                                        filter_size=(1, 7), 
                                        padding = (0, 3),
                                        act="relu",
-                                       name="inception_c_branch7x7dbl_3_"+name,
-                                       data_format=data_format)
+                                       name="inception_c_branch7x7dbl_3_"+name)
         branch7x7dbl = self.conv_bn_layer(branch7x7dbl, 
                                        num_filters=channels_7x7, 
                                        filter_size=(7, 1), 
                                        padding = (3, 0),
                                        act="relu",
-                                       name="inception_c_branch7x7dbl_4_"+name,
-                                       data_format=data_format)
+                                       name="inception_c_branch7x7dbl_4_"+name)
         branch7x7dbl = self.conv_bn_layer(branch7x7dbl, 
                                        num_filters=192, 
                                        filter_size=(1, 7), 
                                        padding = (0, 3),
                                        act="relu",
-                                       name="inception_c_branch7x7dbl_5_"+name,
-                                       data_format=data_format)
+                                       name="inception_c_branch7x7dbl_5_"+name)
        
-        branch_pool = fluid.layers.pool2d(x, pool_size=3, pool_stride=1, pool_padding=1, pool_type="avg", data_format=data_format)
+        branch_pool = fluid.layers.pool2d(x, pool_size=3, pool_stride=1, pool_padding=1, pool_type="avg", data_format=self.data_format)
         branch_pool = self.conv_bn_layer(branch_pool, 
                                        num_filters=192, 
                                        filter_size=1, 
                                        act="relu",
-                                       name="inception_c_branch_pool_"+name,
-                                       data_format=data_format)    
-        concat = fluid.layers.concat([branch1x1, branch7x7, branch7x7dbl, branch_pool], axis=axis)
+                                       name="inception_c_branch_pool_"+name)    
+        concat = fluid.layers.concat([branch1x1, branch7x7, branch7x7dbl, branch_pool], axis=self.concat_axis)
         
         return concat
 
     
-    def inceptionD(self, x, name=None, data_format="NCHW", axis=1):
+    def inceptionD(self, x, name=None):
         branch3x3 = self.conv_bn_layer(x, 
                                        num_filters=192, 
                                        filter_size=1, 
                                        act="relu",
-                                       name="inception_d_branch3x3_1_"+name,
-                                       data_format=data_format)
+                                       name="inception_d_branch3x3_1_"+name)
         branch3x3 = self.conv_bn_layer(branch3x3, 
                                        num_filters=320, 
                                        filter_size=3, 
                                        stride=2,
                                        act="relu",
-                                       name="inception_d_branch3x3_2_"+name,
-                                       data_format=data_format)
+                                       name="inception_d_branch3x3_2_"+name)
         branch7x7x3 = self.conv_bn_layer(x, 
                                        num_filters=192, 
                                        filter_size=1, 
                                        act="relu",
-                                       name="inception_d_branch7x7x3_1_"+name,
-                                       data_format=data_format)
+                                       name="inception_d_branch7x7x3_1_"+name)
         branch7x7x3 = self.conv_bn_layer(branch7x7x3, 
                                        num_filters=192, 
                                        filter_size=(1, 7), 
                                        padding=(0, 3),
                                        act="relu",
-                                       name="inception_d_branch7x7x3_2_"+name,
-                                       data_format=data_format)
+                                       name="inception_d_branch7x7x3_2_"+name)
         branch7x7x3 = self.conv_bn_layer(branch7x7x3, 
                                        num_filters=192, 
                                        filter_size=(7, 1), 
                                        padding=(3, 0),
                                        act="relu",
-                                       name="inception_d_branch7x7x3_3_"+name,
-                                       data_format=data_format)
+                                       name="inception_d_branch7x7x3_3_"+name)
         branch7x7x3 = self.conv_bn_layer(branch7x7x3, 
                                        num_filters=192, 
                                        filter_size=3, 
                                        stride=2,
                                        act="relu",
-                                       name="inception_d_branch7x7x3_4_"+name,
-                                       data_format=data_format)
-        branch_pool = fluid.layers.pool2d(x, pool_size=3, pool_stride=2, pool_type="max", data_format=data_format)
+                                       name="inception_d_branch7x7x3_4_"+name)
+        branch_pool = fluid.layers.pool2d(x, pool_size=3, pool_stride=2, pool_type="max", data_format=self.data_format)
         
-        concat = fluid.layers.concat([branch3x3, branch7x7x3, branch_pool], axis=axis)
+        concat = fluid.layers.concat([branch3x3, branch7x7x3, branch_pool], axis=self.concat_axis)
         
         return concat
     
     
-    def inceptionE(self, x, name=None, data_format="NCHW", axis=1):
+    def inceptionE(self, x, name=None):
         branch1x1 = self.conv_bn_layer(x, 
                                        num_filters=320, 
                                        filter_size=1, 
                                        act="relu",
-                                       name="inception_e_branch1x1_"+name,
-                                       data_format=data_format)
+                                       name="inception_e_branch1x1_"+name)
         branch3x3 = self.conv_bn_layer(x, 
                                        num_filters=384, 
                                        filter_size=1, 
                                        act="relu",
-                                       name="inception_e_branch3x3_1_"+name,
-                                       data_format=data_format)
+                                       name="inception_e_branch3x3_1_"+name)
         branch3x3_2a = self.conv_bn_layer(branch3x3, 
                                        num_filters=384, 
                                        filter_size=(1, 3), 
                                        padding=(0, 1),
                                        act="relu",
-                                       name="inception_e_branch3x3_2a_"+name,
-                                       data_format=data_format)
+                                       name="inception_e_branch3x3_2a_"+name)
         branch3x3_2b = self.conv_bn_layer(branch3x3, 
                                        num_filters=384, 
                                        filter_size=(3, 1), 
                                        padding=(1, 0),
                                        act="relu",
-                                       name="inception_e_branch3x3_2b_"+name,
-                                       data_format=data_format)
+                                       name="inception_e_branch3x3_2b_"+name)
         
-        branch3x3 = fluid.layers.concat([branch3x3_2a, branch3x3_2b], axis=axis)
+        branch3x3 = fluid.layers.concat([branch3x3_2a, branch3x3_2b], axis==self.concat_axis)
         branch3x3dbl = self.conv_bn_layer(x, 
                                        num_filters=448, 
                                        filter_size=1, 
                                        act="relu",
-                                       name="inception_e_branch3x3dbl_1_"+name,
-                                       data_format=data_format)
+                                       name="inception_e_branch3x3dbl_1_"+name)
         branch3x3dbl = self.conv_bn_layer(branch3x3dbl, 
                                        num_filters=384, 
                                        filter_size=3, 
                                        padding=1,
                                        act="relu",
-                                       name="inception_e_branch3x3dbl_2_"+name,
-                                       data_format=data_format)
+                                       name="inception_e_branch3x3dbl_2_"+name)
         branch3x3dbl_3a = self.conv_bn_layer(branch3x3dbl, 
                                        num_filters=384, 
                                        filter_size=(1, 3), 
                                        padding=(0, 1),
                                        act="relu",
-                                       name="inception_e_branch3x3dbl_3a_"+name,
-                                       data_format=data_format)
+                                       name="inception_e_branch3x3dbl_3a_"+name)
         branch3x3dbl_3b = self.conv_bn_layer(branch3x3dbl, 
                                        num_filters=384, 
                                        filter_size=(3, 1), 
                                        padding=(1, 0),
                                        act="relu",
-                                       name="inception_e_branch3x3dbl_3b_"+name,
-                                       data_format=data_format)
-        branch3x3dbl = fluid.layers.concat([branch3x3dbl_3a, branch3x3dbl_3b], axis=axis)
-        branch_pool = fluid.layers.pool2d(x, pool_size=3, pool_stride=1, pool_padding=1, pool_type="avg", data_format=data_format)
+                                       name="inception_e_branch3x3dbl_3b_"+name)
+        branch3x3dbl = fluid.layers.concat([branch3x3dbl_3a, branch3x3dbl_3b], axis=self.concat_axis)
+        branch_pool = fluid.layers.pool2d(x, pool_size=3, pool_stride=1, pool_padding=1, pool_type="avg", data_format=self.data_format)
         branch_pool = self.conv_bn_layer(branch_pool, 
                                        num_filters=192, 
                                        filter_size=1, 
                                        act="relu",
-                                       name="inception_e_branch_pool_"+name,
-                                       data_format=data_format)
-        concat = fluid.layers.concat([branch1x1, branch3x3, branch3x3dbl, branch_pool], axis=axis)
+                                       name="inception_e_branch_pool_"+name)
+        concat = fluid.layers.concat([branch1x1, branch3x3, branch3x3dbl, branch_pool], axis=self.concat_axis)
         
         return concat

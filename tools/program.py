@@ -109,12 +109,12 @@ def create_model(architecture, image, classes_num, is_train, data_format='NCHW')
     if "is_test" in params:
         params['is_test'] = not is_train
     model = architectures.__dict__[name](**params)
-    print(data_format)
-    if name == "InceptionV3":
+
+    data_format = params.get('data_format', None)
+    if data_format:
         image = fluid.layers.transpose(image, [0, 2, 3, 1]) if data_format == 'NHWC' else image
         image.stop_gradient = image.stop_gradient
-
-        out = model.net(input=image, class_dim=classes_num, data_format=data_format)
+        out = model.net(input=image, class_dim=classes_num)
     else:
         out = model.net(input=image, class_dim=classes_num)
     return out
