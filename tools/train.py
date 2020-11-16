@@ -52,7 +52,7 @@ def parse_args():
 
 
 def main(args):
-    paddle.seed(123)
+    paddle.seed(12345)
 
     config = get_config(args.config, overrides=args.override, show=True)
     # assign the place
@@ -68,7 +68,6 @@ def main(args):
         strategy = paddle.distributed.init_parallel_env()
 
     net = program.create_model(config.ARCHITECTURE, config.classes_num)
-
     optimizer, lr_scheduler = program.create_optimizer(
         config, parameter_list=net.parameters())
 

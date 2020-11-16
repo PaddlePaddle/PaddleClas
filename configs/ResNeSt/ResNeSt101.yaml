@@ -1,6 +1,6 @@
 mode: 'train'
 ARCHITECTURE:
-    name: "ResNet50_ACNet"
+    name: 'ResNeSt101'
 
 pretrained_model: ""
 model_save_dir: "./output/"
@@ -9,16 +9,17 @@ total_images: 1281167
 save_interval: 1
 validate: True
 valid_interval: 1
-epochs: 120
+epochs: 300
 topk: 5
 image_shape: [3, 224, 224]
 
+use_mix: True
+ls_epsilon: 0.1
+
 LEARNING_RATE:
-   function: 'Piecewise'
-   params:
-       lr: 0.1
-       decay_epochs: [30, 60, 90]
-       gamma: 0.1
+    function: 'CosineWarmup'          
+    params:                   
+        lr: 0.1               
 
 OPTIMIZER:
     function: 'Momentum'
@@ -26,7 +27,7 @@ OPTIMIZER:
         momentum: 0.9
     regularizer:
         function: 'L2'
-        factor: 0.0001
+        factor: 0.000070
 
 TRAIN:
     batch_size: 256
@@ -43,14 +44,16 @@ TRAIN:
             size: 224
         - RandFlipImage:
             flip_code: 1
+        - AutoAugment:
         - NormalizeImage:
             scale: 1./255.
             mean: [0.485, 0.456, 0.406]
             std: [0.229, 0.224, 0.225]
             order: ''
         - ToCHWImage:
-
-
+    mix:                       
+        - CutmixOperator:    
+            alpha: 0.2      
 
 VALID:
     batch_size: 64
@@ -64,14 +67,12 @@ VALID:
             to_np: False
             channel_first: False
         - ResizeImage:
-            resize_short: 256
+            resize_short: 288
         - CropImage:
-            size: 224
+            size: 256
         - NormalizeImage:
             scale: 1.0/255.0
             mean: [0.485, 0.456, 0.406]
             std: [0.229, 0.224, 0.225]
             order: ''
         - ToCHWImage:
-
-

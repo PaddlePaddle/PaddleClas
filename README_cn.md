@@ -8,8 +8,9 @@
 
 
 **近期更新**
+- 2020.11.11 添加图像分类[常见问题2020第一季第二期](./docs/zh_CN/faq_series/faq_2020_s1.md) 5个新问题，并且计划以后每周会更新，欢迎大家持续关注。
 - 2020.11.09 添加`InceptionV3 `结构和模型，在ImageNet-1k上Top-1 Acc可达79.14%。
-- 2020.11.04 添加图像分类[常见问题2020第一季第一期](./docs/zh_CN/faq_series/faq_2020_s1.md) 7个新问题，并且计划以后每周一会更新，欢迎大家持续关注。
+- 2020.11.04 添加图像分类[常见问题2020第一季第一期](./docs/zh_CN/faq_series/faq_2020_s1.md) 7个新问题，并且计划以后每周会更新，欢迎大家持续关注。
 - 2020.10.20 添加 `Res2Net50_vd_26w_4s_ssld `模型，在ImageNet-1k上Top-1 Acc可达83.1%；添加 `Res2Net101_vd_26w_4s_ssld `模型，在ImageNet-1k上Top-1 Acc可达83.9%。
 - 2020.10.12 添加Paddle-Lite demo。
 - 2020.10.10 添加cpp inference demo，完善`FAQ 30问`教程。
@@ -38,10 +39,16 @@
 
 ## 欢迎加入技术交流群
 
-* 微信扫描二维码加入官方交流群，获得更高效的问题答疑，与各行各业开发者充分交流，期待您的加入。
+* 微信扫描下面左方二维码添加飞桨小姐姐的微信，添加成功后私信小姐姐暗号【分类】，即可收到微信群进群邀请。
 
 <div align="center">
-<img src="./docs/images/joinus.png"  width = "200" height = "200" />
+<img src="./docs/images/joinus.png"  width = "200" />
+</div>
+
+* 您也可以扫描下面的QQ群二维码， 加入PaddleClas QQ交流群。获得更高效的问题答疑，与各行各业开发者充分交流，期待您的加入。
+
+<div align="center">
+<img src="./docs/images/qq_group.png"  width = "200" />
 </div>
 
 

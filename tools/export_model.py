@@ -43,10 +43,11 @@ def parse_args():
 
 
 class Net(paddle.nn.Layer):
-    def __init__(self, net, to_static, class_dim):
+    def __init__(self, net, to_static, class_dim, model):
         super(Net, self).__init__()
         self.pre_net = net(class_dim=class_dim)
         self.to_static = to_static
+        self.model = model
 
     # Please modify the 'shape' according to actual needs
     @to_static(input_spec=[
@@ -55,6 +56,8 @@ class Net(paddle.nn.Layer):
     ])
     def forward(self, inputs):
         x = self.pre_net(inputs)
+        if self.model == "GoogLeNet":
+            x = x[0]
         x = F.softmax(x)
         return x
 
@@ -64,12 +67,13 @@ def main():
 
     net = architectures.__dict__[args.model]
 
-    model = Net(net, to_static, args.class_dim)
-
+    model = Net(net, to_static, args.class_dim, args.model)
     load_dygraph_pretrain(
         model.pre_net,
         path=args.pretrained_model,
         load_static_weights=args.load_static_weights)
+
+    model.eval()
     paddle.jit.save(model, args.output_path)
 
 

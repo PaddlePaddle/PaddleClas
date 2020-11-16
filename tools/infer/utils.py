@@ -40,7 +40,6 @@ def parse_args():
     parser.add_argument("--use_tensorrt", type=str2bool, default=False)
     parser.add_argument("--gpu_mem", type=int, default=8000)
     parser.add_argument("--enable_benchmark", type=str2bool, default=False)
-    parser.add_argument("--model_name", type=str)
     parser.add_argument("--top_k", type=int, default=1)
     parser.add_argument("--hubserving", type=str2bool, default=False)
 
