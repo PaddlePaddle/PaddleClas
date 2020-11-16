@@ -230,8 +230,7 @@ class InceptionV3():
                                        num_filters=channels_7x7, 
                                        filter_size=1, 
                                        act="relu",
-                                       name="inception_c_branch7x7dbl_1_"+name,
-                                       data_format=self.data_format)
+                                       name="inception_c_branch7x7dbl_1_"+name)
         branch7x7dbl = self.conv_bn_layer(branch7x7dbl, 
                                        num_filters=channels_7x7, 
                                        filter_size=(7, 1), 
@@ -334,7 +333,7 @@ class InceptionV3():
                                        act="relu",
                                        name="inception_e_branch3x3_2b_"+name)
         
-        branch3x3 = fluid.layers.concat([branch3x3_2a, branch3x3_2b], axis==self.concat_axis)
+        branch3x3 = fluid.layers.concat([branch3x3_2a, branch3x3_2b], axis=self.concat_axis)
         branch3x3dbl = self.conv_bn_layer(x, 
                                        num_filters=448, 
                                        filter_size=1, 

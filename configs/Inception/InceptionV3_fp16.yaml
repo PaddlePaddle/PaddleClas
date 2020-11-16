@@ -1,7 +1,8 @@
 mode: 'train'
 ARCHITECTURE:
     name: 'InceptionV3'
-    data_format: 'NHWC'
+    params:
+        data_format: 'NHWC'
 
 pretrained_model: ""
 model_save_dir: "./output/"
@@ -14,10 +15,12 @@ epochs: 200
 topk: 5
 image_shape: [3, 299, 299]
 
+# mxied precision training
+
 use_mix: True
 ls_epsilon: 0.1
 
-use_fp16: True
+use_fp16: True # cannot open with dali
 amp_scale_loss: 128
 use_dynamic_loss_scaling: True
 fuse_elewise_add_act_ops: True

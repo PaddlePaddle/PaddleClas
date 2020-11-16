@@ -368,7 +368,7 @@ def build(config, main_prog, startup_prog, is_train=True, is_distributed=True):
                 if is_distributed:
                     optimizer = dist_optimizer(config, optimizer)
                 optimizer.minimize(fetchs['loss'][0])
-                print(main_prog)
+
                 if config.get('use_ema'):
 
                     global_steps = fluid.layers.learning_rate_scheduler._decay_step_counter(
