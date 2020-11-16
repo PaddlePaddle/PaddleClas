@@ -37,13 +37,15 @@ from deploy.hubserving.clas.params import read_params
     author_email="paddle-dev@baidu.com",
     type="cv/class")
 class ClasSystem(hub.Module):
-    def _initialize(self, use_gpu=None):
+    def _initialize(self, use_gpu=None, enable_mkldnn=None):
         """
         initialize with the necessary elements
         """
         cfg = read_params()
         if use_gpu is not None:
             cfg.use_gpu = use_gpu
+        if enable_mkldnn is not None:
+            cfg.enable_mkldnn = enable_mkldnn
         cfg.hubserving = True
         cfg.enable_benchmark = False
         self.args = cfg
@@ -59,6 +61,7 @@ class ClasSystem(hub.Module):
                 )
         else:
             print("Use CPU")
+            print("Enable MKL-DNN") if enable_mkldnn else None
 
     def read_images(self, paths=[]):
         images = []
