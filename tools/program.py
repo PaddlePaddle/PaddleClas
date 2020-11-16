@@ -412,7 +412,7 @@ def compile(config, program, loss_name=None, share_prog=None):
 
     if use_fp16:
         try:
-            build_strategy.fuse_bn_act_ops = config.fuse_bn_act_ops
+            build_strategy.fuse_bn_act_ops = fuse_bn_act_ops
         except Exception as e:
             logger.info(
                 "PaddlePaddle version 1.7.0 or higher is "
@@ -425,7 +425,7 @@ def compile(config, program, loss_name=None, share_prog=None):
                 "required when you want to fuse elewise_add_act and activation_op.")
         
         try:
-            build_strategy.fuse_bn_add_act_ops = config.fuse_bn_add_act_ops
+            build_strategy.fuse_bn_add_act_ops = fuse_bn_add_act_ops
         except Exception as e:
             logger.info(
                 "PaddlePaddle 2.0-rc or higher is "
