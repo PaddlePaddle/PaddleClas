@@ -405,26 +405,34 @@ def compile(config, program, loss_name=None, share_prog=None):
     exec_strategy.num_iteration_per_drop_scope = 10
 
     use_fp16 = config.get('use_fp16', False)
+    fuse_bn_act_ops = config.get('fuse_bn_act_ops', True)
+    fuse_elewise_add_act_ops = config.get('fuse_elewise_add_act_ops', True)
+    fuse_bn_add_act_ops = config.get('fuse_bn_add_act_ops', True)
+    enable_addto = config.get('enable_addto', True)
 
     if use_fp16:
         try:
-            fluid.require_version(min_version='1.7.0')
             build_strategy.fuse_bn_act_ops = config.fuse_bn_act_ops
         except Exception as e:
             logger.info(
                 "PaddlePaddle version 1.7.0 or higher is "
                 "required when you want to fuse batch_norm and activation_op.")
-        build_strategy.fuse_elewise_add_act_ops = config.fuse_elewise_add_act_ops
+        try:
+            build_strategy.fuse_elewise_add_act_ops = fuse_elewise_add_act_ops
+        except Exception as e:
+            logger.info(
+                "PaddlePaddle version 1.7.0 or higher is "
+                "required when you want to fuse elewise_add_act and activation_op.")
         
         try:
             build_strategy.fuse_bn_add_act_ops = config.fuse_bn_add_act_ops
-            print(build_strategy.fuse_bn_add_act_ops)
         except Exception as e:
             logger.info(
                 "PaddlePaddle 2.0-rc or higher is "
                 "required when you want to enable fuse_bn_add_act_ops strategy.")
         try:
-            build_strategy.enable_addto = config.enable_addto
+            
+            build_strategy.enable_addto = enable_addto
         except Exception as e:
             logger.info(
                 "PaddlePaddle 2.0-rc or higher is "
@@ -504,7 +512,7 @@ def run(dataloader,
                         if idx == 0 else epoch_str,
                         logger.coloring(step_str, "PURPLE"),
                         logger.coloring(fetchs_str, 'OKGREEN')))
-        #exit(0)
+        
 
     end_str = ''.join([str(m.mean) + ' '
                        for m in metric_list] + [batch_time.total]) + 's'
