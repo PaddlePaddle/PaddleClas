@@ -27,9 +27,14 @@ def create_paddle_predictor(args):
     config = Config(args.model_file, args.params_file)
 
     if args.use_gpu:
+        assert args.enable_mkldnn is False, "Error: Cannot use GPU and MKL-DNN at the same time"
         config.enable_use_gpu(args.gpu_mem, 0)
     else:
         config.disable_gpu()
+        if args.enable_mkldnn:
+            # cache 10 different shapes for mkldnn to avoid memory leak
+            config.set_mkldnn_cache_capacity(10)
+            config.enable_mkldnn()
 
     config.disable_glog_info()
     config.switch_ir_optim(args.ir_optim)  # default true
