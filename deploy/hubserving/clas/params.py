@@ -28,6 +28,7 @@ def read_params():
     cfg.params_file = "./inference/cls_infer.pdiparams"
     cfg.batch_size = 1
     cfg.use_gpu = False
+    cfg.enable_mkldnn = False
     cfg.ir_optim = True
     cfg.gpu_mem = 8000
     cfg.use_fp16 = False
