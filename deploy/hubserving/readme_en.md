@@ -99,7 +99,7 @@ Wherein, the format of `config.json` is as follows:
 - When using the configuration file to start the service, other parameters will be ignored.
 - If you use GPU prediction (that is, `use_gpu` is set to `true`), you need to set the environment variable CUDA_VISIBLE_DEVICES before starting the service, such as: ```export CUDA_VISIBLE_DEVICES=0```, otherwise you do not need to set it.
 - **`use_gpu` and `use_multiprocess` cannot be `true` at the same time.**  
-- **`use_gpu` and `enable_mkldnn` cannot be `true` at the same time.**  
+- **When both `use_gpu` and `enable_mkldnn` are set to `true` at the same time, GPU is used to run and `enable_mkldnn` will be ignored.**
 
 For example, use GPU card No. 3 to start the 2-stage series service:
 ```shell

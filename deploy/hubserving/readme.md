@@ -98,7 +98,7 @@ $ hub serving start --modules Module1==Version1 \
 - 使用配置文件启动服务时，其他参数会被忽略。
 - 如果使用GPU预测(即，`use_gpu`置为`true`)，则需要在启动服务之前，设置CUDA_VISIBLE_DEVICES环境变量，如：```export CUDA_VISIBLE_DEVICES=0```，否则不用设置。
 - **`use_gpu`不可与`use_multiprocess`同时为`true`**。
-- **`use_gpu`不可与`enable_mkldnn`同时为`true`**。
+- **`use_gpu`与`enable_mkldnn`同时为`true`时，将忽略`enable_mkldnn`，而使用GPU**。
 
 如，使用GPU 3号卡启动串联服务：  
 ```shell

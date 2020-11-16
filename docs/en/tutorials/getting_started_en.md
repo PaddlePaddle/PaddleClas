@@ -259,7 +259,7 @@ Among them:
 + `params_file`: Weight file path, such as `./MobileNetV3_large_x1_0/cls_infer.pdiparams`;
 + `use_tensorrt`: Whether to use the TesorRT, default by `True`;
 + `use_gpu`: Whether to use the GPU, default by `True`
-+ `enable_mkldnn`: Wheter to use `MKL-DNN`, default by `False`. Cannot use `MKL-DNN` and `GPU` at the same time.
++ `enable_mkldnn`: Wheter to use `MKL-DNN`, default by `False`. When both `use_gpu` and `enable_mkldnn` are set to `True`, GPU is used to run and `enable_mkldnn` will be ignored.
 
 
 If you want to evaluate the speed of the model, it is recommended to use [predict.py](../../../tools/infer/predict.py), and enable TensorRT to accelerate.
