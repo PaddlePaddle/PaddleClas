@@ -62,10 +62,6 @@ def parse_args():
 
 
 def main(args):
-    #     role = fleet.PaddleCloudRoleMaker()
-    #     print(role)
-    #     fleet.init(role)
-
     role = role_maker.PaddleCloudRoleMaker(is_collective=True)
     fleet.init(role)
 

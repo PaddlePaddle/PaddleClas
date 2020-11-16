@@ -24,7 +24,6 @@ from collections import OrderedDict
 
 import paddle
 import paddle.nn.functional as F
-import paddle.fluid as fluid
 
 from tools.static.learning_rate import LearningRateBuilder
 from tools.static.optimizer import OptimizerBuilder
@@ -342,8 +341,8 @@ def build(config, main_prog, startup_prog, is_train=True, is_distributed=True):
         dataloader(): a bridge between the model and the data
         fetchs(dict): dict of model outputs(included loss and measures)
     """
-    with fluid.program_guard(main_prog, startup_prog):
-        with fluid.unique_name.guard():
+    with paddle.static.program_guard(main_prog, startup_prog):
+        with paddle.utils.unique_name.guard():
             use_mix = config.get('use_mix') and is_train
             use_distillation = config.get('use_distillation')
             feeds = create_feeds(config.image_shape, use_mix=use_mix)
@@ -384,17 +383,18 @@ def compile(config, program, loss_name=None, share_prog=None):
     Returns:
         compiled_program(): a compiled program
     """
-    build_strategy = fluid.compiler.BuildStrategy()
-    exec_strategy = fluid.ExecutionStrategy()
+    build_strategy = paddle.static.BuildStrategy()
+    exec_strategy = paddle.static.ExecutionStrategy()
 
     exec_strategy.num_threads = 1
     exec_strategy.num_iteration_per_drop_scope = 10
 
-    compiled_program = fluid.CompiledProgram(program).with_data_parallel(
-        share_vars_from=share_prog,
-        loss_name=loss_name,
-        build_strategy=build_strategy,
-        exec_strategy=exec_strategy)
+    compiled_program = paddle.static.CompiledProgram(
+        program).with_data_parallel(
+            share_vars_from=share_prog,
+            loss_name=loss_name,
+            build_strategy=build_strategy,
+            exec_strategy=exec_strategy)
 
     return compiled_program
 
@@ -414,7 +414,7 @@ def run(dataloader,
     Feed data to the model and fetch the measures and loss
 
     Args:
-        dataloader(fluid dataloader):
+        dataloader(paddle io dataloader):
         exe():
         program():
         fetchs(dict): dict of measures and the loss
