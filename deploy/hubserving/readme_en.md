@@ -78,7 +78,8 @@ Wherein, the format of `config.json` is as follows:
         "clas_system": {
             "init_args": {
                 "version": "1.0.0",
-                "use_gpu": true
+                "use_gpu": true,
+                "enable_mkldnn": false
             },
             "predict_args": {
             }
@@ -89,13 +90,16 @@ Wherein, the format of `config.json` is as follows:
     "workers": 2
 }
 ```
-- The configurable parameters in `init_args` are consistent with the `_initialize` function interface in `module.py`. Among them, **when `use_gpu` is `true`, it means that the GPU is used to start the service**.
+- The configurable parameters in `init_args` are consistent with the `_initialize` function interface in `module.py`. Among them,
+  - when `use_gpu` is `true`, it means that the GPU is used to start the service.
+  - when `enable_mkldnn` is `true`, it means that use MKL-DNN to accelerate.
 - The configurable parameters in `predict_args` are consistent with the `predict` function interface in `module.py`.
 
 **Note:**  
 - When using the configuration file to start the service, other parameters will be ignored.
 - If you use GPU prediction (that is, `use_gpu` is set to `true`), you need to set the environment variable CUDA_VISIBLE_DEVICES before starting the service, such as: ```export CUDA_VISIBLE_DEVICES=0```, otherwise you do not need to set it.
 - **`use_gpu` and `use_multiprocess` cannot be `true` at the same time.**  
+- **`use_gpu` and `enable_mkldnn` cannot be `true` at the same time.**  
 
 For example, use GPU card No. 3 to start the 2-stage series service:
 ```shell
