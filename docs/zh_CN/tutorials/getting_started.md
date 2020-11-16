@@ -269,6 +269,7 @@ python tools/infer/predict.py \
 + `model_file`：模型结构文件路径，如 `./inference/cls_infer.pdmodel`
 + `params_file`：模型权重文件路径，如 `./inference/cls_infer.pdiparams`
 + `use_tensorrt`：是否使用 TesorRT 预测引擎，默认值：`True`
-+ `use_gpu`：是否使用 GPU 预测，默认值：`True`。
++ `use_gpu`：是否使用 GPU 预测，默认值：`True`
++ `enable_mkldnn`：是否启用`MKL-DNN`加速，默认为`False`。注意`enable_mkldnn`与`use_gpu`不可以同时为`True`。
 
 * 如果你希望评测模型速度，建议使用该脚本(`tools/infer/predict.py`)，同时开启TensorRT加速预测。
