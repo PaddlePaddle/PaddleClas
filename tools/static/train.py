@@ -76,12 +76,12 @@ def main(args):
 
     best_top1_acc = 0.0  # best top1 acc record
 
-    train_fetchs = program.build(
+    train_fetchs, lr_scheduler = program.build(
         config, train_prog, startup_prog, is_train=True)
 
     if config.validate:
         valid_prog = paddle.static.Program()
-        valid_fetchs = program.build(
+        valid_fetchs, _ = program.build(
             config, valid_prog, startup_prog, is_train=False)
         # clone to prune some content which is irrelevant in valid_prog
         valid_prog = valid_prog.clone(for_test=True)
@@ -111,7 +111,7 @@ def main(args):
     for epoch_id in range(config.epochs):
         # 1. train with train dataset
         program.run(train_dataloader, exe, train_prog, train_fetchs, epoch_id,
-                    'train', config, vdl_writer)
+                    'train', config, vdl_writer, lr_scheduler)
         if int(os.getenv("PADDLE_TRAINER_ID", 0)) == 0:
             # 2. validate with validate dataset
             if config.validate and epoch_id % config.valid_interval == 0:

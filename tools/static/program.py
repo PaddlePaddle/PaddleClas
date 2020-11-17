@@ -25,8 +25,8 @@ from collections import OrderedDict
 import paddle
 import paddle.nn.functional as F
 
-from tools.static.learning_rate import LearningRateBuilder
-from tools.static.optimizer import OptimizerBuilder
+from ppcls.optimizer.learning_rate import LearningRateBuilder
+from ppcls.optimizer.optimizer import OptimizerBuilder
 from ppcls.modeling import architectures
 from ppcls.modeling.loss import CELoss
 from ppcls.modeling.loss import MixCELoss
@@ -281,7 +281,7 @@ def create_optimizer(config):
     # create optimizer instance
     opt_config = config['OPTIMIZER']
     opt = OptimizerBuilder(**opt_config)
-    return opt(lr)
+    return opt(lr), lr
 
 
 def dist_optimizer(config, optimizer):
@@ -357,17 +357,18 @@ def build(config, main_prog, startup_prog, is_train=True, is_distributed=True):
                 epsilon=config.get('ls_epsilon'),
                 use_mix=use_mix,
                 use_distillation=use_distillation)
+            lr_scheduler = None
             if is_train:
-                optimizer = create_optimizer(config)
-                lr = optimizer._global_learning_rate()
-                fetchs['lr'] = (lr, AverageMeter('lr', 'f', need_avg=False))
-
+                optimizer, lr_scheduler = create_optimizer(config)
                 optimizer = mixed_precision_optimizer(config, optimizer)
                 if is_distributed:
                     optimizer = dist_optimizer(config, optimizer)
 
                 optimizer.minimize(fetchs['loss'][0])
-    return fetchs
+
+#                 lr = old_optimizer._global_learning_rate()
+#                 fetchs['lr'] = (lr, AverageMeter('lr', 'f', need_avg=False))
+    return fetchs, lr_scheduler
 
 
 def compile(config, program, loss_name=None, share_prog=None):
@@ -409,7 +410,8 @@ def run(dataloader,
         epoch=0,
         mode='train',
         config=None,
-        vdl_writer=None):
+        vdl_writer=None,
+        lr_scheduler=None):
     """
     Feed data to the model and fetch the measures and loss
 
@@ -425,6 +427,8 @@ def run(dataloader,
     """
     fetch_list = [f[0] for f in fetchs.values()]
     metric_list = [f[1] for f in fetchs.values()]
+    if mode == "train":
+        metric_list.append(AverageMeter('lr', 'f', need_avg=False))
     for m in metric_list:
         m.reset()
     batch_time = AverageMeter('elapse', '.3f')
@@ -437,13 +441,26 @@ def run(dataloader,
                   "feed_label": batch[1]},
             fetch_list=fetch_list)
 
-        #         metrics = exe.run(program=program, feed=batch, fetch_list=fetch_list)
         batch_time.update(time.time() - tic)
         tic = time.time()
         for i, m in enumerate(metrics):
             metric_list[i].update(np.mean(m), batch_size)
+        if mode == "train":
+            metric_list[-1].update(lr_scheduler.get_lr())
         fetchs_str = ''.join([str(m.value) + ' '
                               for m in metric_list] + [batch_time.value]) + 's'
+
+        if lr_scheduler is not None:
+            if lr_scheduler.update_specified:
+                curr_global_counter = lr_scheduler.step_each_epoch * epoch + idx
+                update = max(
+                    0, curr_global_counter - lr_scheduler.
+                    update_start_step) % lr_scheduler.update_step_interval == 0
+                if update:
+                    lr_scheduler.step()
+            else:
+                lr_scheduler.step()
+
         if vdl_writer:
             global total_step
             logger.scaler('loss', metrics[0][0], total_step, vdl_writer)
@@ -456,21 +473,12 @@ def run(dataloader,
             epoch_str = "epoch:{:<3d}".format(epoch)
             step_str = "{:s} step:{:<4d}".format(mode, idx)
 
-            # Keep the first 10 batches statistics, They are important for develop
-            if epoch == 0 and idx < 10:
+            if idx % config.get('print_interval', 10) == 0:
                 logger.info("{:s} {:s} {:s}".format(
                     logger.coloring(epoch_str, "HEADER")
                     if idx == 0 else epoch_str,
                     logger.coloring(step_str, "PURPLE"),
                     logger.coloring(fetchs_str, 'OKGREEN')))
-
-            else:
-                if idx % config.get('print_interval', 10) == 0:
-                    logger.info("{:s} {:s} {:s}".format(
-                        logger.coloring(epoch_str, "HEADER")
-                        if idx == 0 else epoch_str,
-                        logger.coloring(step_str, "PURPLE"),
-                        logger.coloring(fetchs_str, 'OKGREEN')))
 
     end_str = ''.join([str(m.mean) + ' '
                        for m in metric_list] + [batch_time.total]) + 's'

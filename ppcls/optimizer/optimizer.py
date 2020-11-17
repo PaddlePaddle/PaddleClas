@@ -154,7 +154,7 @@ class OptimizerBuilder(object):
             reg = getattr(mod, reg_func)(**regularizer)()
             self.params['regularization'] = reg
 
-    def __call__(self, learning_rate, parameter_list):
+    def __call__(self, learning_rate, parameter_list=None):
         mod = sys.modules[__name__]
         opt = getattr(mod, self.function)
         return opt(learning_rate=learning_rate,
