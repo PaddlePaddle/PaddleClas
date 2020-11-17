@@ -143,7 +143,13 @@ def create_loss(out,
     Returns:
         loss(variable): loss variable
     """
-    target = paddle.reshape(feeds['label'], [-1, 1])
+    if use_mix:
+        feed_y_a = paddle.reshape(feeds['feed_y_a'], [-1, 1])
+        feed_y_b = paddle.reshape(feeds['feed_y_b'], [-1, 1])
+        feed_lam = paddle.reshape(feeds['feed_lam'], [-1, 1])
+    else:
+        target = paddle.reshape(feeds['label'], [-1, 1])
+    
     if architecture["name"] == "GoogLeNet":
         assert len(out) == 3, "GoogLeNet should have 3 outputs"
         loss = GoogLeNetLoss(class_dim=classes_num, epsilon=epsilon)
@@ -157,10 +163,6 @@ def create_loss(out,
 
     if use_mix:
         loss = MixCELoss(class_dim=classes_num, epsilon=epsilon)
-        feed_y_a = feeds['feed_y_a']
-        feed_y_b = feeds['feed_y_b']
-        feed_lam = feeds['feed_lam']
-        assert False, "not supported now in mix as true..."
         return loss(out, feed_y_a, feed_y_b, feed_lam)
     else:
         loss = CELoss(class_dim=classes_num, epsilon=epsilon)
@@ -197,7 +199,6 @@ def create_metric(out,
 
     fetchs = OrderedDict()
     # set top1 to fetchs
-    label = paddle.reshape(feeds['label'], [-1, 1])
     top1 = paddle.metric.accuracy(softmax_out, label=label, k=1)
     fetchs['top1'] = (top1, AverageMeter('top1', '.4f', need_avg=True))
     # set topk to fetchs
@@ -365,10 +366,7 @@ def build(config, main_prog, startup_prog, is_train=True, is_distributed=True):
                     optimizer = dist_optimizer(config, optimizer)
 
                 optimizer.minimize(fetchs['loss'][0])
-
-#                 lr = old_optimizer._global_learning_rate()
-#                 fetchs['lr'] = (lr, AverageMeter('lr', 'f', need_avg=False))
-    return fetchs, lr_scheduler
+    return fetchs, lr_scheduler, feeds
 
 
 def compile(config, program, loss_name=None, share_prog=None):
@@ -402,16 +400,17 @@ def compile(config, program, loss_name=None, share_prog=None):
 
 total_step = 0
 
-
 def run(dataloader,
         exe,
         program,
+        feeds,
         fetchs,
         epoch=0,
         mode='train',
         config=None,
         vdl_writer=None,
-        lr_scheduler=None):
+        lr_scheduler=None
+        ):
     """
     Feed data to the model and fetch the measures and loss
 
@@ -435,10 +434,10 @@ def run(dataloader,
     tic = time.time()
     for idx, batch in enumerate(dataloader()):
         batch_size = batch[0].shape()[0]
+        feed_dict = {key.name:batch[idx] for idx, key in enumerate(feeds.values())}
         metrics = exe.run(
             program=program,
-            feed={"feed_image": batch[0],
-                  "feed_label": batch[1]},
+            feed=feed_dict,
             fetch_list=fetch_list)
 
         batch_time.update(time.time() - tic)

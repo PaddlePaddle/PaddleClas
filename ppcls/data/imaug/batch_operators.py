@@ -53,8 +53,9 @@ class MixupOperator(BatchOperator):
         imgs, labels, bs = self._unpack(batch)
         idx = np.random.permutation(bs)
         lam = np.random.beta(self._alpha, self._alpha)
+        lams = np.array([lam] * bs, dtype=np.float32)
         imgs = lam * imgs + (1 - lam) * imgs[idx]
-        return list(zip(imgs, labels, labels[idx], [lam] * bs))
+        return list(zip(imgs, labels, labels[idx], lams))
 
 
 class CutmixOperator(BatchOperator):
@@ -93,7 +94,8 @@ class CutmixOperator(BatchOperator):
         imgs[:, :, bbx1:bbx2, bby1:bby2] = imgs[idx, :, bbx1:bbx2, bby1:bby2]
         lam = 1 - (float(bbx2 - bbx1) * (bby2 - bby1) /
                    (imgs.shape[-2] * imgs.shape[-1]))
-        return list(zip(imgs, labels, labels[idx], [lam] * bs))
+        lams = np.array([lam] * bs, dtype=np.float32)
+        return list(zip(imgs, labels, labels[idx], lams))
 
 
 class FmixOperator(BatchOperator):
