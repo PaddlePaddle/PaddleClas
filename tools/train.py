@@ -66,6 +66,16 @@ def main(args):
     fleet.init(role)
 
     config = get_config(args.config, overrides=args.override, show=True)
+    use_fp16 = config.get('use_fp16', False)
+    if use_fp16:
+        AMP_RELATED_FLAGS_SETTING = {
+            'FLAGS_cudnn_exhaustive_search': 1,
+            'FLAGS_conv_workspace_size_limit': 4000,
+            'FLAGS_cudnn_batchnorm_spatial_persistent': 1,
+            'FLAGS_max_inplace_grad_add': 8,
+        }
+        os.environ['FLAGS_cudnn_batchnorm_spatial_persistent'] = '1'
+        paddle.fluid.set_flags(AMP_RELATED_FLAGS_SETTING)
     # assign the place
     gpu_id = int(os.environ.get('FLAGS_selected_gpus', 0))
     place = fluid.CUDAPlace(gpu_id)

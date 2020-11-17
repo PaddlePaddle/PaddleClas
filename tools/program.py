@@ -36,6 +36,7 @@ from ppcls.utils import logger
 
 from paddle.fluid.incubate.fleet.collective import fleet
 from paddle.fluid.incubate.fleet.collective import DistributedStrategy
+import paddle.fluid as fluid
 
 from ema import ExponentialMovingAverage
 
@@ -104,9 +105,14 @@ def create_model(architecture, image, classes_num, is_train):
     """
     name = architecture["name"]
     params = architecture.get("params", {})
+
     if "is_test" in params:
         params['is_test'] = not is_train
     model = architectures.__dict__[name](**params)
+
+    if "data_format" in  params  and params["data_format"] == "NHWC":
+        image = fluid.layers.transpose(image, [0, 2, 3, 1])
+        image.stop_gradient = True
     out = model.net(input=image, class_dim=classes_num)
     return out
 
@@ -341,6 +347,7 @@ def build(config, main_prog, startup_prog, is_train=True, is_distributed=True):
             use_distillation = config.get('use_distillation')
             feeds = create_feeds(config.image_shape, use_mix=use_mix)
             dataloader = create_dataloader(feeds.values())
+            
             out = create_model(config.ARCHITECTURE, feeds['image'],
                                config.classes_num, is_train)
             fetchs = create_fetchs(
@@ -361,6 +368,7 @@ def build(config, main_prog, startup_prog, is_train=True, is_distributed=True):
                 if is_distributed:
                     optimizer = dist_optimizer(config, optimizer)
                 optimizer.minimize(fetchs['loss'][0])
+
                 if config.get('use_ema'):
 
                     global_steps = fluid.layers.learning_rate_scheduler._decay_step_counter(
@@ -391,6 +399,40 @@ def compile(config, program, loss_name=None, share_prog=None):
 
     exec_strategy.num_threads = 1
     exec_strategy.num_iteration_per_drop_scope = 10
+
+    use_fp16 = config.get('use_fp16', False)
+    fuse_bn_act_ops = config.get('fuse_bn_act_ops', True)
+    fuse_elewise_add_act_ops = config.get('fuse_elewise_add_act_ops', True)
+    fuse_bn_add_act_ops = config.get('fuse_bn_add_act_ops', True)
+    enable_addto = config.get('enable_addto', True)
+
+    if use_fp16:
+        try:
+            build_strategy.fuse_bn_act_ops = fuse_bn_act_ops
+        except Exception as e:
+            logger.info(
+                "PaddlePaddle version 1.7.0 or higher is "
+                "required when you want to fuse batch_norm and activation_op.")
+        try:
+            build_strategy.fuse_elewise_add_act_ops = fuse_elewise_add_act_ops
+        except Exception as e:
+            logger.info(
+                "PaddlePaddle version 1.7.0 or higher is "
+                "required when you want to fuse elewise_add_act and activation_op.")
+        
+        try:
+            build_strategy.fuse_bn_add_act_ops = fuse_bn_add_act_ops
+        except Exception as e:
+            logger.info(
+                "PaddlePaddle 2.0-rc or higher is "
+                "required when you want to enable fuse_bn_add_act_ops strategy.")
+        try:
+            
+            build_strategy.enable_addto = enable_addto
+        except Exception as e:
+            logger.info(
+                "PaddlePaddle 2.0-rc or higher is "
+                "required when you want to enable addto strategy.")
 
     compiled_program = fluid.CompiledProgram(program).with_data_parallel(
         share_vars_from=share_prog,
@@ -466,6 +508,7 @@ def run(dataloader,
                         if idx == 0 else epoch_str,
                         logger.coloring(step_str, "PURPLE"),
                         logger.coloring(fetchs_str, 'OKGREEN')))
+        
 
     end_str = ''.join([str(m.mean) + ' '
                        for m in metric_list] + [batch_time.total]) + 's'
