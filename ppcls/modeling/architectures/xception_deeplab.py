@@ -238,13 +238,14 @@ class Xception_Block(nn.Layer):
             x = self._conv1(inputs)
             x = self._conv2(x)
             x = self._conv3(x)
-        if self.has_skip is False:
-            return x
-        if self.skip_conv:
-            skip = self._short(inputs)
+        if self.has_skip:
+            if self.skip_conv:
+                skip = self._short(inputs)
+            else:
+                skip = inputs
+            return paddle.add(x, skip)
         else:
-            skip = inputs
-        return paddle.add(x, skip)
+            return x
 
 
 class XceptionDeeplab(nn.Layer):
