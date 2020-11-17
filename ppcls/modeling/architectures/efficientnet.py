@@ -242,13 +242,14 @@ inp_shape = {
 
 def _drop_connect(inputs, prob, is_test):
     if is_test:
-        return inputs
-
-    keep_prob = 1.0 - prob
-    inputs_shape = paddle.shape(inputs)
-    random_tensor = keep_prob + paddle.rand(shape=[inputs_shape[0], 1, 1, 1])
-    binary_tensor = paddle.floor(random_tensor)
-    output = paddle.multiply(inputs, binary_tensor) / keep_prob
+        output = inputs
+    else:
+        keep_prob = 1.0 - prob
+        inputs_shape = paddle.shape(inputs)
+        random_tensor = keep_prob + paddle.rand(
+            shape=[inputs_shape[0], 1, 1, 1])
+        binary_tensor = paddle.floor(random_tensor)
+        output = paddle.multiply(inputs, binary_tensor) / keep_prob
     return output
 
 
