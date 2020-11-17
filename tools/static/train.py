@@ -27,9 +27,7 @@ from sys import version_info
 
 import paddle
 from paddle.distributed import ParallelEnv
-# from paddle.distributed import fleet
-from paddle.fluid.incubate.fleet.base import role_maker
-from paddle.fluid.incubate.fleet.collective import fleet
+from paddle.distributed import fleet
 
 from ppcls.data import Reader
 from ppcls.utils.config import get_config
@@ -62,8 +60,7 @@ def parse_args():
 
 
 def main(args):
-    role = role_maker.PaddleCloudRoleMaker(is_collective=True)
-    fleet.init(role)
+    fleet.init(is_collective=True)
 
     config = get_config(args.config, overrides=args.override, show=True)
     # assign the place
@@ -101,8 +98,6 @@ def main(args):
         valid_dataloader = Reader(config, 'valid', places=place)()
         compiled_valid_prog = program.compile(config, valid_prog)
 
-    compiled_train_prog = fleet.main_program
-
     vdl_writer = None
     if args.vdl_dir:
         if version_info.major == 2:
@@ -115,8 +110,8 @@ def main(args):
 
     for epoch_id in range(config.epochs):
         # 1. train with train dataset
-        program.run(train_dataloader, exe, compiled_train_prog, train_fetchs,
-                    epoch_id, 'train', config, vdl_writer)
+        program.run(train_dataloader, exe, train_prog, train_fetchs, epoch_id,
+                    'train', config, vdl_writer)
         if int(os.getenv("PADDLE_TRAINER_ID", 0)) == 0:
             # 2. validate with validate dataset
             if config.validate and epoch_id % config.valid_interval == 0:

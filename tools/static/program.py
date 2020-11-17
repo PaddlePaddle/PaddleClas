@@ -35,8 +35,8 @@ from ppcls.modeling.loss import GoogLeNetLoss
 from ppcls.utils.misc import AverageMeter
 from ppcls.utils import logger
 
-from paddle.fluid.incubate.fleet.collective import fleet
-from paddle.fluid.incubate.fleet.collective import DistributedStrategy
+from paddle.distributed import fleet
+from paddle.distributed.fleet import DistributedStrategy
 
 
 def _mkdir_if_not_exist(path):
@@ -302,7 +302,7 @@ def dist_optimizer(config, optimizer):
     dist_strategy = DistributedStrategy()
     dist_strategy.nccl_comm_num = 1
     dist_strategy.fuse_all_reduce_ops = True
-    dist_strategy.exec_strategy = exec_strategy
+    dist_strategy.execution_strategy = exec_strategy
     optimizer = fleet.distributed_optimizer(optimizer, strategy=dist_strategy)
 
     return optimizer
