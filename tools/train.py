@@ -119,7 +119,7 @@ def main(args):
     else:
         import dali
         train_dataloader = dali.train(config)
-        if config.validate:
+        if config.validate and int(os.getenv("PADDLE_TRAINER_ID", 0)):
             if int(os.getenv("PADDLE_TRAINER_ID", 0)) == 0:
                 valid_dataloader = dali.val(config)
             compiled_valid_prog = program.compile(config, valid_prog)
