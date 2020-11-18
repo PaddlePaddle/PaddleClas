@@ -323,6 +323,7 @@ def mix(feeds, config, is_train=True):
 
     images = feeds['image']
     label = feeds['label']
+    # TODO: hard code here, should be fixed!
     alpha = 0.2
     idx = _to_Tensor(np.random.permutation(batch_size), 'int32')
     lam = np.random.beta(alpha, alpha)

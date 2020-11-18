@@ -351,7 +351,6 @@ def build(config, main_prog, startup_prog, is_train=True, is_distributed=True):
 
             if use_dali and use_mix:
                 import dali
-                #feeds = dali.normalize(feeds,config)
                 feeds = dali.mix(feeds, config, is_train)
 
             dataloader = create_dataloader(feeds.values()) if not config.get(
