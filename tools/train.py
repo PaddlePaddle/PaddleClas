@@ -108,7 +108,7 @@ def main(args):
 
     # load model from 1. checkpoint to resume training, 2. pretrained model to finetune
     init_model(config, train_prog, exe)
-    if not config.get('use_dali'):
+    if not config.get('use_dali', False):
 
         train_reader = Reader(config, 'train')()
         train_dataloader.set_sample_list_generator(train_reader, place)
