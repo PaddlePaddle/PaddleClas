@@ -146,7 +146,7 @@ inference/
 |--model
 |--params
 ```
-**注意**：上述文件中，`model`文件存储了模型结构信息，`params`文件存储了模型参数信息。因此，在使用模型导出时，需将导出的`__model__`文件重命名为`model`，`__variables__`文件重命名为`params`。
+**注意**：上述文件中，`model`文件存储了模型结构信息，`params`文件存储了模型参数信息。因此，在使用模型导出时，需将导出的`cls_infer.pdmodel`文件重命名为`model`，`cls_infer.pdiparams`文件重命名为`params`。
 
 
 ### 2.2 编译PaddleClas C++预测demo
