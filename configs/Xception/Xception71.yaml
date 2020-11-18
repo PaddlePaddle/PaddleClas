@@ -1,6 +1,6 @@
 mode: 'train'
 ARCHITECTURE:
-    name: 'Xception65'
+    name: 'Xception71'
 
 pretrained_model: ""
 model_save_dir: "./output/"
