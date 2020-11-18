@@ -24,7 +24,6 @@ sys.path.append(__dir__)
 sys.path.append(os.path.abspath(os.path.join(__dir__, '..')))
 
 import paddle
-from paddle.distributed import ParallelEnv
 
 from ppcls.data import Reader
 from ppcls.utils.config import get_config
@@ -57,29 +56,28 @@ def main(args):
     config = get_config(args.config, overrides=args.override, show=True)
     # assign the place
     use_gpu = config.get("use_gpu", True)
-    place = 'gpu:{}'.format(ParallelEnv().dev_id) if use_gpu else 'cpu'
-    place = paddle.set_device(place)
+    place = paddle.set_device('gpu' if use_gpu else 'cpu')
 
-    trainer_num = int(os.getenv("PADDLE_TRAINERS_NUM", 1))
+    trainer_num = paddle.distributed.get_world_size()
     use_data_parallel = trainer_num != 1
     config["use_data_parallel"] = use_data_parallel
 
     if config["use_data_parallel"]:
-        strategy = paddle.distributed.init_parallel_env()
+        paddle.distributed.init_parallel_env()
 
     net = program.create_model(config.ARCHITECTURE, config.classes_num)
     optimizer, lr_scheduler = program.create_optimizer(
         config, parameter_list=net.parameters())
 
     if config["use_data_parallel"]:
-        net = paddle.DataParallel(net, strategy)
+        net = paddle.DataParallel(net)
 
     # load model from checkpoint or pretrained model
     init_model(config, net, optimizer)
 
     train_dataloader = Reader(config, 'train', places=place)()
 
-    if config.validate and ParallelEnv().local_rank == 0:
+    if config.validate and paddle.distributed.get_rank() == 0:
         valid_dataloader = Reader(config, 'valid', places=place)()
 
     last_epoch_id = config.get("last_epoch", -1)
@@ -91,7 +89,7 @@ def main(args):
         program.run(train_dataloader, config, net, optimizer, lr_scheduler,
                     epoch_id, 'train')
 
-        if not config["use_data_parallel"] or ParallelEnv().local_rank == 0:
+        if paddle.distributed.get_rank() == 0:
             # 2. validate with validate dataset
             if config.validate and epoch_id % config.valid_interval == 0:
                 net.eval()

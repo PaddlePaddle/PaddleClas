@@ -13,7 +13,6 @@
 # limitations under the License.
 
 import paddle
-from paddle.distributed import ParallelEnv
 
 import argparse
 import os
@@ -52,16 +51,18 @@ def main(args, return_dict={}):
     config.mode = "valid"
     # assign place
     use_gpu = config.get("use_gpu", True)
-    place = 'gpu:{}'.format(ParallelEnv().dev_id) if use_gpu else 'cpu'
-    place = paddle.set_device(place)
+    place = paddle.set_device('gpu' if use_gpu else 'cpu')
 
-    use_data_parallel = int(os.getenv("PADDLE_TRAINERS_NUM", 1)) != 1
+    trainer_num = paddle.distributed.get_world_size()
+    use_data_parallel = trainer_num != 1
     config["use_data_parallel"] = use_data_parallel
+
+    if config["use_data_parallel"]:
+        paddle.distributed.init_parallel_env()
 
     net = program.create_model(config.ARCHITECTURE, config.classes_num)
     if config["use_data_parallel"]:
-        strategy = paddle.distributed.init_parallel_env()
-        net = paddle.DataParallel(net, strategy)
+        net = paddle.DataParallel(net)
 
     init_model(config, net, optimizer=None)
     valid_dataloader = Reader(config, 'valid', places=place)()

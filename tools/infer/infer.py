@@ -26,7 +26,6 @@ from ppcls.utils.save_load import load_dygraph_pretrain
 from ppcls.modeling import architectures
 
 import paddle
-from paddle.distributed import ParallelEnv
 import paddle.nn.functional as F
 
 
@@ -64,8 +63,7 @@ def save_prelabel_results(class_id, input_filepath, output_idr):
 def main():
     args = utils.parse_args()
     # assign the place
-    place = 'gpu:{}'.format(ParallelEnv().dev_id) if args.use_gpu else 'cpu'
-    place = paddle.set_device(place)
+    place = paddle.set_device('gpu' if args.use_gpu else 'cpu')
 
     net = architectures.__dict__[args.model](class_dim=args.class_num)
     load_dygraph_pretrain(net, args.pretrained_model, args.load_static_weights)

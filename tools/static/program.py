@@ -149,7 +149,7 @@ def create_loss(out,
         feed_lam = paddle.reshape(feeds['feed_lam'], [-1, 1])
     else:
         target = paddle.reshape(feeds['label'], [-1, 1])
-    
+
     if architecture["name"] == "GoogLeNet":
         assert len(out) == 3, "GoogLeNet should have 3 outputs"
         loss = GoogLeNetLoss(class_dim=classes_num, epsilon=epsilon)
@@ -400,6 +400,7 @@ def compile(config, program, loss_name=None, share_prog=None):
 
 total_step = 0
 
+
 def run(dataloader,
         exe,
         program,
@@ -409,8 +410,7 @@ def run(dataloader,
         mode='train',
         config=None,
         vdl_writer=None,
-        lr_scheduler=None
-        ):
+        lr_scheduler=None):
     """
     Feed data to the model and fetch the measures and loss
 
@@ -434,11 +434,13 @@ def run(dataloader,
     tic = time.time()
     for idx, batch in enumerate(dataloader()):
         batch_size = batch[0].shape()[0]
-        feed_dict = {key.name:batch[idx] for idx, key in enumerate(feeds.values())}
-        metrics = exe.run(
-            program=program,
-            feed=feed_dict,
-            fetch_list=fetch_list)
+        feed_dict = {
+            key.name: batch[idx]
+            for idx, key in enumerate(feeds.values())
+        }
+        metrics = exe.run(program=program,
+                          feed=feed_dict,
+                          fetch_list=fetch_list)
 
         batch_time.update(time.time() - tic)
         tic = time.time()
