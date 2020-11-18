@@ -64,7 +64,6 @@ def create_feeds(image_shape, use_mix=None, use_dali=None):
         feeds['feed_lam'] = fluid.data(
             name="feed_lam", shape=[None, 1], dtype="float32")
     else:
-
         feeds['label'] = fluid.data(
             name="feed_label", shape=[None, 1], dtype="int64")
 
@@ -112,7 +111,7 @@ def create_model(architecture, image, classes_num, is_train):
         params['is_test'] = not is_train
     model = architectures.__dict__[name](**params)
 
-    if "data_format" in  params  and params["data_format"] == "NHWC":
+    if "data_format" in params and params["data_format"] == "NHWC":
         image = fluid.layers.transpose(image, [0, 2, 3, 1])
         image.stop_gradient = True
     out = model.net(input=image, class_dim=classes_num)
@@ -427,21 +426,22 @@ def compile(config, program, loss_name=None, share_prog=None):
         except Exception as e:
             logger.info(
                 "PaddlePaddle version 1.7.0 or higher is "
-                "required when you want to fuse elewise_add_act and activation_op.")
-        
+                "required when you want to fuse elewise_add_act and activation_op."
+            )
+
         try:
             build_strategy.fuse_bn_add_act_ops = fuse_bn_add_act_ops
         except Exception as e:
             logger.info(
                 "PaddlePaddle 2.0-rc or higher is "
-                "required when you want to enable fuse_bn_add_act_ops strategy.")
+                "required when you want to enable fuse_bn_add_act_ops strategy."
+            )
         try:
-            
+
             build_strategy.enable_addto = enable_addto
         except Exception as e:
-            logger.info(
-                "PaddlePaddle 2.0-rc or higher is "
-                "required when you want to enable addto strategy.")
+            logger.info("PaddlePaddle 2.0-rc or higher is "
+                        "required when you want to enable addto strategy.")
 
     compiled_program = fluid.CompiledProgram(program).with_data_parallel(
         share_vars_from=share_prog,
@@ -519,7 +519,6 @@ def run(dataloader,
                         if idx == 0 else epoch_str,
                         logger.coloring(step_str, "PURPLE"),
                         logger.coloring(fetchs_str, 'OKGREEN')))
-        
 
     if config.get('use_dali'):
         dataloader.reset()
