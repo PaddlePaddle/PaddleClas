@@ -41,7 +41,7 @@ import paddle.fluid as fluid
 from ema import ExponentialMovingAverage
 
 
-def create_feeds(image_shape, use_mix=None):
+def create_feeds(image_shape, use_mix=None, use_dali=None):
     """
     Create feeds as model input
 
@@ -55,7 +55,8 @@ def create_feeds(image_shape, use_mix=None):
     feeds = OrderedDict()
     feeds['image'] = fluid.data(
         name="feed_image", shape=[None] + image_shape, dtype="float32")
-    if use_mix:
+
+    if use_mix and not use_dali:
         feeds['feed_y_a'] = fluid.data(
             name="feed_y_a", shape=[None, 1], dtype="int64")
         feeds['feed_y_b'] = fluid.data(
@@ -63,6 +64,7 @@ def create_feeds(image_shape, use_mix=None):
         feeds['feed_lam'] = fluid.data(
             name="feed_lam", shape=[None, 1], dtype="float32")
     else:
+
         feeds['label'] = fluid.data(
             name="feed_label", shape=[None, 1], dtype="int64")
 
@@ -344,10 +346,17 @@ def build(config, main_prog, startup_prog, is_train=True, is_distributed=True):
     with fluid.program_guard(main_prog, startup_prog):
         with fluid.unique_name.guard():
             use_mix = config.get('use_mix') and is_train
+            use_dali = config.get('use_dali')
             use_distillation = config.get('use_distillation')
-            feeds = create_feeds(config.image_shape, use_mix=use_mix)
-            dataloader = create_dataloader(feeds.values())
-            
+            feeds = create_feeds(config.image_shape, use_mix, use_dali)
+
+            if use_dali and use_mix:
+                import dali
+                #feeds = dali.normalize(feeds,config)
+                feeds = dali.mix(feeds, config, is_train)
+
+            dataloader = create_dataloader(feeds.values()) if not config.get(
+                'use_dali') else None
             out = create_model(config.ARCHITECTURE, feeds['image'],
                                config.classes_num, is_train)
             fetchs = create_fetchs(
@@ -473,7 +482,9 @@ def run(dataloader,
         m.reset()
     batch_time = AverageMeter('elapse', '.3f')
     tic = time.time()
-    for idx, batch in enumerate(dataloader()):
+    dataloader = dataloader if config.get('use_dali') else dataloader()()
+    for idx, batch in enumerate(dataloader):
+
         metrics = exe.run(program=program, feed=batch, fetch_list=fetch_list)
         batch_time.update(time.time() - tic)
         tic = time.time()
@@ -509,6 +520,9 @@ def run(dataloader,
                         logger.coloring(step_str, "PURPLE"),
                         logger.coloring(fetchs_str, 'OKGREEN')))
         
+
+    if config.get('use_dali'):
+        dataloader.reset()
 
     end_str = ''.join([str(m.mean) + ' '
                        for m in metric_list] + [batch_time.total]) + 's'
