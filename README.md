@@ -61,6 +61,7 @@ PaddleClas is a toolset for image classification tasks prepared for the industry
     - [Inception series](#Inception_series)
     - [EfficientNet and ResNeXt101_wsl series](#EfficientNet_and_ResNeXt101_wsl_series)
     - [ResNeSt and RegNet series](#ResNeSt_and_RegNet_series)
+    - [Others](#Others)
     - HS-ResNet: arxiv link: [https://arxiv.org/pdf/2010.07621.pdf](https://arxiv.org/pdf/2010.07621.pdf). Code and models are coming soon!
 - Model training/evaluation
     - [Data preparation](./docs/en/tutorials/data_en.md)
@@ -309,6 +310,26 @@ Accuracy and inference time metrics of ResNeSt and RegNet series models are show
 | ResNeSt50_<br>fast_1s1x64d | 0.8035    | 0.9528    | 3.45405                | 8.72680                | 8.68     | 26.3      | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/ResNeSt50_fast_1s1x64d_pretrained.pdparams) |
 | ResNeSt50              | 0.8102    | 0.9542    | 6.69042    | 8.01664                | 10.78    | 27.5      | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/ResNeSt50_pretrained.pdparams)              |
 | RegNetX_4GF            | 0.785     | 0.9416    |    6.46478              |      11.19862           | 8        | 22.1      | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/RegNetX_4GF_pretrained.pdparams)            |
+
+
+<a name="Others"></a>
+### Others
+
+Accuracy and inference time metrics of AlexNet, SqueezeNet series, VGG series, DarkNet53, ResNet50_ACNet and ResNet50_ACNet_deploy models are shown as follows. More detailed information can be refered to [Others](./docs/en/models/Others_en.md).
+
+
+| Model                    | Top-1 Acc | Top-5 Acc | time(ms)<br>bs=1 | time(ms)<br>bs=4 | Flops(G) | Params(M) | Download Address                                                                                                 |
+|------------------------|-----------|-----------|------------------|------------------|----------|-----------|------------------------------------------------------------------------------------------------------|
+| AlexNet                   | 0.567  | 0.792  | 1.44993           | 2.46696           | 1.370        | 61.090            | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/AlexNet_pretrained.tar) |
+| SqueezeNet1_0             | 0.596  | 0.817  | 0.96736           | 2.53221           | 1.550        | 1.240             | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/SqueezeNet1_0_pretrained.tar) |
+| SqueezeNet1_1             | 0.601  | 0.819  | 0.76032           | 1.877             | 0.690        | 1.230             | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/SqueezeNet1_1_pretrained.tar) |
+| VGG11                     | 0.693  | 0.891  | 3.90412           | 9.51147           | 15.090       | 132.850           | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/VGG11_pretrained.tar) |
+| VGG13                     | 0.700  | 0.894  | 4.64684           | 12.61558          | 22.480       | 133.030           | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/VGG13_pretrained.tar) |
+| VGG16                     | 0.720  | 0.907  | 5.61769           | 16.40064          | 30.810       | 138.340           | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/VGG16_pretrained.tar) |
+| VGG19                     | 0.726  | 0.909  | 6.65221           | 20.4334           | 39.130       | 143.650           | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/VGG19_pretrained.tar) |
+| DarkNet53                 | 0.780  | 0.941  | 4.10829           | 12.1714           | 18.580       | 41.600            | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/DarkNet53_ImageNet1k_pretrained.tar) |
+| ResNet50_ACNet            | 0.767  | 0.932  | 5.33395           | 10.96843          | 10.730       | 33.110            | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/ResNet50_ACNet_pretrained.tar) |
+| ResNet50_ACNet<br>_deploy | 0.767  | 0.932  | 3.49161           | 7.78374           | 8.190        | 25.550            | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/ResNet50_ACNet_deploy_pretrained.tar) |
 
 
 <a name="License"></a>
