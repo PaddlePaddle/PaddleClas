@@ -26,7 +26,6 @@ sys.path.append(os.path.abspath(os.path.join(__dir__, '../../')))
 from sys import version_info
 
 import paddle
-from paddle.distributed import ParallelEnv
 from paddle.distributed import fleet
 
 from ppcls.data import Reader
@@ -66,8 +65,7 @@ def main(args):
     # assign the place
     use_gpu = config.get("use_gpu", True)
     assert use_gpu is True, "gpu must be true in static mode!"
-    place = 'gpu:{}'.format(ParallelEnv().dev_id)
-    place = paddle.set_device(place)
+    place = paddle.set_device("gpu")
 
     # startup_prog is used to do some parameter init work,
     # and train prog is used to hold the network
@@ -94,7 +92,7 @@ def main(args):
     # load model from 1. checkpoint to resume training, 2. pretrained model to finetune
     train_dataloader = Reader(config, 'train', places=place)()
 
-    if config.validate and ParallelEnv().local_rank == 0:
+    if config.validate and paddle.distributed.get_rank() == 0:
         valid_dataloader = Reader(config, 'valid', places=place)()
         compiled_valid_prog = program.compile(config, valid_prog)
 
@@ -110,14 +108,15 @@ def main(args):
 
     for epoch_id in range(config.epochs):
         # 1. train with train dataset
-        program.run(train_dataloader, exe, train_prog, train_feeds, train_fetchs, epoch_id,
-                    'train', config, vdl_writer, lr_scheduler)
-        if int(os.getenv("PADDLE_TRAINER_ID", 0)) == 0:
+        program.run(train_dataloader, exe, train_prog, train_feeds,
+                    train_fetchs, epoch_id, 'train', config, vdl_writer,
+                    lr_scheduler)
+        if paddle.distributed.get_rank() == 0:
             # 2. validate with validate dataset
             if config.validate and epoch_id % config.valid_interval == 0:
                 top1_acc = program.run(valid_dataloader, exe,
-                                       compiled_valid_prog, valid_feeds, valid_fetchs,
-                                       epoch_id, 'valid', config)
+                                       compiled_valid_prog, valid_feeds,
+                                       valid_fetchs, epoch_id, 'valid', config)
                 if top1_acc > best_top1_acc:
                     best_top1_acc = top1_acc
                     message = "The best top1 acc {:.5f}, in epoch: {:d}".format(

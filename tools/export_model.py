@@ -37,23 +37,17 @@ def parse_args():
         "-o", "--output_path", type=str, default="./inference/cls_infer")
     parser.add_argument("--class_dim", type=int, default=1000)
     parser.add_argument("--load_static_weights", type=str2bool, default=False)
-    # parser.add_argument("--img_size", type=int, default=224)
+    parser.add_argument("--img_size", type=int, default=224)
 
     return parser.parse_args()
 
 
 class Net(paddle.nn.Layer):
-    def __init__(self, net, to_static, class_dim, model):
+    def __init__(self, net, class_dim, model):
         super(Net, self).__init__()
         self.pre_net = net(class_dim=class_dim)
-        self.to_static = to_static
         self.model = model
 
-    # Please modify the 'shape' according to actual needs
-    @to_static(input_spec=[
-        paddle.static.InputSpec(
-            shape=[None, 3, 224, 224], dtype='float32')
-    ])
     def forward(self, inputs):
         x = self.pre_net(inputs)
         if self.model == "GoogLeNet":
@@ -66,14 +60,19 @@ def main():
     args = parse_args()
 
     net = architectures.__dict__[args.model]
-
-    model = Net(net, to_static, args.class_dim, args.model)
+    model = Net(net, args.class_dim, args.model)
     load_dygraph_pretrain(
         model.pre_net,
         path=args.pretrained_model,
         load_static_weights=args.load_static_weights)
-
     model.eval()
+
+    model = to_static(
+        model,
+        input_spec=[
+            paddle.static.InputSpec(
+                shape=[None, 3, args.img_size, args.img_size], dtype='float32')
+        ])
     paddle.jit.save(model, args.output_path)
 
 
