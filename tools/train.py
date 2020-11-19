@@ -108,14 +108,21 @@ def main(args):
 
     # load model from 1. checkpoint to resume training, 2. pretrained model to finetune
     init_model(config, train_prog, exe)
+    if not config.get('use_dali', False):
+        train_reader = Reader(config, 'train')()
+        train_dataloader.set_sample_list_generator(train_reader, place)
+        if config.validate:
+            valid_reader = Reader(config, 'valid')()
+            valid_dataloader.set_sample_list_generator(valid_reader, place)
+            compiled_valid_prog = program.compile(config, valid_prog)
 
-    train_reader = Reader(config, 'train')()
-    train_dataloader.set_sample_list_generator(train_reader, place)
-
-    if config.validate:
-        valid_reader = Reader(config, 'valid')()
-        valid_dataloader.set_sample_list_generator(valid_reader, place)
-        compiled_valid_prog = program.compile(config, valid_prog)
+    else:
+        import dali
+        train_dataloader = dali.train(config)
+        if config.validate and int(os.getenv("PADDLE_TRAINER_ID", 0)):
+            if int(os.getenv("PADDLE_TRAINER_ID", 0)) == 0:
+                valid_dataloader = dali.val(config)
+            compiled_valid_prog = program.compile(config, valid_prog)
 
     compiled_train_prog = fleet.main_program
 

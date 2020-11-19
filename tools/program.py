@@ -41,7 +41,7 @@ import paddle.fluid as fluid
 from ema import ExponentialMovingAverage
 
 
-def create_feeds(image_shape, use_mix=None):
+def create_feeds(image_shape, use_mix=None, use_dali=None):
     """
     Create feeds as model input
 
@@ -55,7 +55,8 @@ def create_feeds(image_shape, use_mix=None):
     feeds = OrderedDict()
     feeds['image'] = fluid.data(
         name="feed_image", shape=[None] + image_shape, dtype="float32")
-    if use_mix:
+
+    if use_mix and not use_dali:
         feeds['feed_y_a'] = fluid.data(
             name="feed_y_a", shape=[None, 1], dtype="int64")
         feeds['feed_y_b'] = fluid.data(
@@ -110,7 +111,7 @@ def create_model(architecture, image, classes_num, is_train):
         params['is_test'] = not is_train
     model = architectures.__dict__[name](**params)
 
-    if "data_format" in  params  and params["data_format"] == "NHWC":
+    if "data_format" in params and params["data_format"] == "NHWC":
         image = fluid.layers.transpose(image, [0, 2, 3, 1])
         image.stop_gradient = True
     out = model.net(input=image, class_dim=classes_num)
@@ -344,10 +345,16 @@ def build(config, main_prog, startup_prog, is_train=True, is_distributed=True):
     with fluid.program_guard(main_prog, startup_prog):
         with fluid.unique_name.guard():
             use_mix = config.get('use_mix') and is_train
+            use_dali = config.get('use_dali')
             use_distillation = config.get('use_distillation')
-            feeds = create_feeds(config.image_shape, use_mix=use_mix)
-            dataloader = create_dataloader(feeds.values())
-            
+            feeds = create_feeds(config.image_shape, use_mix, use_dali)
+
+            if use_dali and use_mix:
+                import dali
+                feeds = dali.mix(feeds, config, is_train)
+
+            dataloader = create_dataloader(feeds.values()) if not config.get(
+                'use_dali') else None
             out = create_model(config.ARCHITECTURE, feeds['image'],
                                config.classes_num, is_train)
             fetchs = create_fetchs(
@@ -418,21 +425,22 @@ def compile(config, program, loss_name=None, share_prog=None):
         except Exception as e:
             logger.info(
                 "PaddlePaddle version 1.7.0 or higher is "
-                "required when you want to fuse elewise_add_act and activation_op.")
-        
+                "required when you want to fuse elewise_add_act and activation_op."
+            )
+
         try:
             build_strategy.fuse_bn_add_act_ops = fuse_bn_add_act_ops
         except Exception as e:
             logger.info(
                 "PaddlePaddle 2.0-rc or higher is "
-                "required when you want to enable fuse_bn_add_act_ops strategy.")
+                "required when you want to enable fuse_bn_add_act_ops strategy."
+            )
         try:
-            
+
             build_strategy.enable_addto = enable_addto
         except Exception as e:
-            logger.info(
-                "PaddlePaddle 2.0-rc or higher is "
-                "required when you want to enable addto strategy.")
+            logger.info("PaddlePaddle 2.0-rc or higher is "
+                        "required when you want to enable addto strategy.")
 
     compiled_program = fluid.CompiledProgram(program).with_data_parallel(
         share_vars_from=share_prog,
@@ -473,7 +481,9 @@ def run(dataloader,
         m.reset()
     batch_time = AverageMeter('elapse', '.3f')
     tic = time.time()
-    for idx, batch in enumerate(dataloader()):
+    dataloader = dataloader if config.get('use_dali') else dataloader()()
+    for idx, batch in enumerate(dataloader):
+
         metrics = exe.run(program=program, feed=batch, fetch_list=fetch_list)
         batch_time.update(time.time() - tic)
         tic = time.time()
@@ -508,7 +518,9 @@ def run(dataloader,
                         if idx == 0 else epoch_str,
                         logger.coloring(step_str, "PURPLE"),
                         logger.coloring(fetchs_str, 'OKGREEN')))
-        
+
+    if config.get('use_dali'):
+        dataloader.reset()
 
     end_str = ''.join([str(m.mean) + ' '
                        for m in metric_list] + [batch_time.total]) + 's'
