@@ -1,5 +1,5 @@
-OPENCV_DIR=/PaddleClas/PaddleOCR/opencv-3.4.7/opencv3/
-LIB_DIR=/PaddleClas/PaddleOCR/fluid_inference/
+OPENCV_DIR=/PaddleClas/opencv-3.4.7/opencv3/
+LIB_DIR=/PaddleClas/fluid_inference/
 CUDA_LIB_DIR=/usr/local/cuda/lib64
 CUDNN_LIB_DIR=/usr/lib/x86_64-linux-gnu/
 

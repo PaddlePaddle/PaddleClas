@@ -36,7 +36,8 @@ namespace PaddleClas {
 
 class Classifier {
 public:
-  explicit Classifier(const std::string &model_dir, const bool &use_gpu,
+  explicit Classifier(const std::string &model_path,
+                      const std::string &params_path, const bool &use_gpu,
                       const int &gpu_id, const int &gpu_mem,
                       const int &cpu_math_library_num_threads,
                       const bool &use_mkldnn, const int &resize_short_size,
@@ -50,11 +51,11 @@ public:
     this->resize_short_size_ = resize_short_size;
     this->crop_size_ = crop_size;
 
-    LoadModel(model_dir);
+    LoadModel(model_path, params_path);
   }
 
   // Load Paddle inference model
-  void LoadModel(const std::string &model_dir);
+  void LoadModel(const std::string &model_path, const std::string &params_path);
 
   // Run predictor
   void Run(cv::Mat &img);

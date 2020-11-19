@@ -120,13 +120,13 @@ build/fluid_inference_install_dir/
 
 #### 1.2.2 直接下载安装
 
-* [Paddle预测库官网](https://www.paddlepaddle.org.cn/documentation/docs/zh/advanced_guide/inference_deployment/inference/build_and_install_lib_cn.html)上提供了不同cuda版本的Linux预测库，可以在官网查看并选择合适的预测库版本。
+* [Paddle预测库官网](https://www.paddlepaddle.org.cn/documentation/docs/zh/advanced_guide/inference_deployment/inference/build_and_install_lib_cn.html)上提供了不同cuda版本的Linux预测库，可以在官网查看并选择合适的预测库版本，注意必须选择`develop`版本。
 
-  以`ubuntu14.04_cuda9.0_cudnn7_avx_mkl`的`1.8.4`版本为例，使用下述命令下载并解压：
+  以`ubuntu14.04_cuda9.0_cudnn7_avx_mkl`的`develop`版本为例，使用下述命令下载并解压：
 
 
 ```shell
-wget https://paddle-inference-lib.bj.bcebos.com/1.8.4-gpu-cuda9-cudnn7-avx-mkl/fluid_inference.tgz
+wget https://paddle-inference-lib.bj.bcebos.com/latest-gpu-cuda9-cudnn7-avx-mkl/fluid_inference.tgz
 
 tar -xvf fluid_inference.tgz
 ```
@@ -143,11 +143,10 @@ tar -xvf fluid_inference.tgz
 
 ```
 inference/
-|--model
-|--params
+|--cls_infer.pdmodel
+|--cls_infer.pdiparams
 ```
-**注意**：上述文件中，`model`文件存储了模型结构信息，`params`文件存储了模型参数信息。因此，在使用模型导出时，需将导出的`cls_infer.pdmodel`文件重命名为`model`，`cls_infer.pdiparams`文件重命名为`params`。
-
+**注意**：上述文件中，`cls_infer.pdmodel`文件存储了模型结构信息，`cls_infer.pdiparams`文件存储了模型参数信息。注意两个文件的路径需要与配置文件`tools/config.txt`中的`cls_model_path`和`cls_params_path`参数对应一致。
 
 ### 2.2 编译PaddleClas C++预测demo
 

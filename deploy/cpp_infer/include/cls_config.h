@@ -41,7 +41,9 @@ public:
 
     this->use_mkldnn = bool(stoi(config_map_["use_mkldnn"]));
 
-    this->cls_model_dir.assign(config_map_["cls_model_dir"]);
+    this->cls_model_path.assign(config_map_["cls_model_path"]);
+
+    this->cls_params_path.assign(config_map_["cls_params_path"]);
 
     this->resize_short_size = stoi(config_map_["resize_short_size"]);
 
@@ -58,7 +60,9 @@ public:
 
   bool use_mkldnn = false;
 
-  std::string cls_model_dir;
+  std::string cls_model_path;
+
+  std::string cls_params_path;
 
   int resize_short_size = 256;
   int crop_size = 224;
