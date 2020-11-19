@@ -131,6 +131,7 @@ Among them, `paddle` is the Paddle library required for C++ prediction later, an
 * Different cuda versions of the Linux inference library (based on GCC 4.8.2) are provided on the
 [Paddle Inference Library official website](https://www.paddlepaddle.org.cn/documentation/docs/en/advanced_guide/inference_deployment/inference/build_and_install_lib_en.html). You can view and select the appropriate version of the inference library on the official website.
 
+* Please select the `develop` version.
 
 * After downloading, use the following method to uncompress.
 
@@ -149,11 +150,11 @@ Finally you can see the following files in the folder of `fluid_inference/`.
 
 ```
 inference/
-|--model
-|--params
+|--cls_infer.pdmodel
+|--cls_infer.pdiparams
 ```
 
-**NOTICE**: Among them, `model` file stores the model structure information and the `params` file stores the model parameter information.Therefore, you could rename the files name exported by [Model inference](../../tools/export_model.py).
+**NOTICE**: Among them, `cls_infer.pdmodel` file stores the model structure information and the `cls_infer.pdiparams` file stores the model parameter information.The paths of the two files need to correspond to the parameters of `cls_model_path` and `cls_params_path` in the configuration file `tools/config.txt`.
 
 ### 2.2 Compile PaddleClas C++ inference demo
 
