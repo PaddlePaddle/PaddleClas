@@ -242,29 +242,19 @@ class Reader:
 
         dataset = CommonDataset(self.params)
 
-        if self.params['mode'] == "train":
-            batch_sampler = DistributedBatchSampler(
-                dataset,
-                batch_size=batch_size,
-                shuffle=self.shuffle,
-                drop_last=True)
-            loader = DataLoader(
-                dataset,
-                batch_sampler=batch_sampler,
-                collate_fn=self.collate_fn,
-                places=self.places,
-                return_list=True,
-                num_workers=self.params["num_workers"])
-        else:
-            loader = DataLoader(
-                dataset,
-                places=self.places,
-                batch_size=batch_size,
-                drop_last=False,
-                return_list=True,
-                shuffle=False,
-                num_workers=self.params["num_workers"])
-
+        is_train = self.params['mode'] == "train"
+        batch_sampler = DistributedBatchSampler(
+            dataset,
+            batch_size=batch_size,
+            shuffle=self.shuffle and is_train,
+            drop_last=is_train)
+        loader = DataLoader(
+            dataset,
+            batch_sampler=batch_sampler,
+            collate_fn=self.collate_fn if is_train else None,
+            places=self.places,
+            return_list=True,
+            num_workers=self.params["num_workers"])
         return loader
 
 
