@@ -7,9 +7,8 @@
 飞桨图像分类套件PaddleClas是飞桨为工业界和学术界所准备的一个图像分类任务的工具集，助力使用者训练出更好的视觉模型和应用落地。
 
 **近期更新**
-- 2020.11.11 添加图像分类[常见问题2020第一季第二期](./docs/zh_CN/faq_series/faq_2020_s1.md) 5个新问题，并且计划以后每周会更新，欢迎大家持续关注。
+- 2020.11.18 添加图像分类[常见问题2020第一季第三期](./docs/zh_CN/faq_series/faq_2020_s1.md) 5个新问题，并且计划以后每周会更新，欢迎大家持续关注。
 - 2020.11.09 添加`InceptionV3 `结构和模型，在ImageNet-1k上Top-1 Acc可达79.14%。
-- 2020.11.04 添加图像分类[常见问题2020第一季第一期](./docs/zh_CN/faq_series/faq_2020_s1.md) 7个新问题，并且计划以后每周会更新，欢迎大家持续关注。
 - 2020.10.12 添加Paddle-Lite demo。
 - 2020.10.10 添加cpp inference demo，完善`FAQ 30问`教程。
 - 2020.09.17 添加 `HRNet_W48_C_ssld `模型，在ImageNet-1k上Top-1 Acc可达83.62%；添加 `ResNet34_vd_ssld `模型，在ImageNet-1k上Top-1 Acc可达79.72%。
@@ -88,7 +87,7 @@
     - [10万类图像分类预训练模型](./docs/zh_CN/application/transfer_learning.md)
     - [通用目标检测](./docs/zh_CN/application/object_detection.md)
 - FAQ
-    - [图像分类2020第一季精选问题(近期更新2020.11.04)](./docs/zh_CN/faq_series/faq_2020_s1.md)
+    - [图像分类2020第一季精选问题(近期更新2020.11.18)](./docs/zh_CN/faq_series/faq_2020_s1.md)
     - [图像分类通用30个问题](./docs/zh_CN/faq.md)
     - [PaddleClas实战15个问题](./docs/zh_CN/faq.md)
 - [赛事支持](./docs/zh_CN/competition_support.md)
