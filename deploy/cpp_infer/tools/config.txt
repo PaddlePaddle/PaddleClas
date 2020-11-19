@@ -6,6 +6,7 @@ cpu_math_library_num_threads  10
 use_mkldnn 1
 
 # cls config
-cls_model_dir  ./inference/
+cls_model_path  /PaddleClas/inference/cls_infer.pdmodel
+cls_params_path /PaddleClas/inference/cls_infer.pdiparams
 resize_short_size 256
 crop_size 224

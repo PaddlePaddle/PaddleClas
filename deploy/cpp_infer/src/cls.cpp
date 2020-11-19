@@ -16,9 +16,10 @@
 
 namespace PaddleClas {
 
-void Classifier::LoadModel(const std::string &model_dir) {
+void Classifier::LoadModel(const std::string &model_path,
+                           const std::string &params_path) {
   paddle_infer::Config config;
-  config.SetModel(model_dir + "/model", model_dir + "/params");
+  config.SetModel(model_path, params_path);
 
   if (this->use_gpu_) {
     config.EnableUseGpu(this->gpu_mem_, this->gpu_id_);

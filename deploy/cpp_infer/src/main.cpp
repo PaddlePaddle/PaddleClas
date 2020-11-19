@@ -59,10 +59,10 @@ int main(int argc, char **argv) {
 
   std::cout << "img_file_list length: " << img_files_list.size() << std::endl;
 
-  Classifier classifier(config.cls_model_dir, config.use_gpu, config.gpu_id,
-                        config.gpu_mem, config.cpu_math_library_num_threads,
-                        config.use_mkldnn, config.resize_short_size,
-                        config.crop_size);
+  Classifier classifier(config.cls_model_path, config.cls_params_path,
+                        config.use_gpu, config.gpu_id, config.gpu_mem,
+                        config.cpu_math_library_num_threads, config.use_mkldnn,
+                        config.resize_short_size, config.crop_size);
 
   double elapsed_time = 0.0;
   int warmup_iter = img_files_list.size() > 5 ? 5 : 0;
