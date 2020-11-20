@@ -18,16 +18,20 @@ Please follow the steps mentioned below to organize data, include train_list.txt
 
 ```shell
 # delimiter: "space"
-
-ILSVRC2012_val_00000001.JPEG 65
+# the following the content of train_list.txt
+train/n01440764/n01440764_10026.JPEG 0
 ...
 
+# the following the content of val_list.txt
+val/ILSVRC2012_val_00000001.JPEG 65
+...
 ```
+
 ### ImageNet1k
 After downloading data, please organize the data dir as below
 
 ```bash
-PaddleClas/dataset/imagenet/
+PaddleClas/dataset/ILSVRC2012/
 |_ train/
 |  |_ n01440764
 |  |  |_ n01440764_10026.JPEG
@@ -44,6 +48,7 @@ PaddleClas/dataset/imagenet/
 |_ train_list.txt
 |_ val_list.txt
 ```
+
 ### Flowers102 Dataset
 
 Download [Data](https://www.robots.ox.ac.uk/~vgg/data/flowers/102/) then decompress:
