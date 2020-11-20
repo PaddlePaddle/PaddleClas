@@ -95,7 +95,7 @@ def main(args):
                 net.eval()
                 top1_acc = program.run(valid_dataloader, config, net, None,
                                        None, epoch_id, 'valid')
-                if top1_acc > best_top1_acc:
+                if top1_acc > best_top1_acc or epoch_id == last_epoch_id + 1:
                     best_top1_acc = top1_acc
                     best_top1_epoch = epoch_id
                     if epoch_id % config.save_interval == 0:
