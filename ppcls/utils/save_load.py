@@ -143,6 +143,8 @@ def save_model(net, optimizer, model_path, epoch_id, prefix='ppcls'):
     """
     save model to the target path
     """
+    if paddle.distributed.get_rank() != 0:
+        return
     model_path = os.path.join(model_path, str(epoch_id))
     _mkdir_if_not_exist(model_path)
     model_prefix = os.path.join(model_path, prefix)
