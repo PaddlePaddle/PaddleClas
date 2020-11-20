@@ -13,20 +13,25 @@
 [ImageNet1k](http://www.image-net.org/challenges/LSVRC/2012/)|1.2M| 50k | 1000 |
 
 * 数据格式
-按照如下结构组织数据，其中train_list.txt 和val_list.txt的格式形如
+按照如下结构组织数据，其中`train_list.txt`和`val_list.txt`的格式形如：
 
 ```shell
 # 每一行采用"空格"分隔图像路径与标注
 
-ILSVRC2012_val_00000001.JPEG 65
+# 下面是train_list.txt中的格式样例
+train/n01440764/n01440764_10026.JPEG 0
 ...
 
+# 下面是val_list.txt中的格式样例
+val/ILSVRC2012_val_00000001.JPEG 65
+...
 ```
+
 ### ImageNet1k
 从官方下载数据后，按如下组织数据
 
 ```bash
-PaddleClas/dataset/imagenet/
+PaddleClas/dataset/ILSVRC2012/
 |_ train/
 |  |_ n01440764
 |  |  |_ n01440764_10026.JPEG
@@ -43,6 +48,7 @@ PaddleClas/dataset/imagenet/
 |_ train_list.txt
 |_ val_list.txt
 ```
+
 ### Flowers102
 从[VGG官方网站](https://www.robots.ox.ac.uk/~vgg/data/flowers/102/)下载后的数据，解压后包括
 
