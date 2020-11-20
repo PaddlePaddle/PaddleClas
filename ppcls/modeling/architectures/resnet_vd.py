@@ -253,7 +253,7 @@ class ResNet_vd(nn.Layer):
             for block in range(len(depth)):
                 shortcut = False
                 for i in range(depth[block]):
-                    if layers in [101, 152] and block == 2:
+                    if layers in [101, 152, 200] and block == 2:
                         if i == 0:
                             conv_name = "res" + str(block + 2) + "a"
                         else:
