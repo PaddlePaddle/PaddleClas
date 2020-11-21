@@ -209,7 +209,7 @@ class DualPathFactory(nn.Layer):
 
 
 class DPN(nn.Layer):
-    def __init__(self, layers=60, class_dim=1000):
+    def __init__(self, layers=68, class_dim=1000):
         super(DPN, self).__init__()
 
         self._class_dim = class_dim
@@ -230,7 +230,7 @@ class DPN(nn.Layer):
         self.conv1_x_1_func = ConvBNLayer(
             num_channels=3,
             num_filters=init_num_filter,
-            filter_size=3,
+            filter_size=init_filter_size,
             stride=2,
             pad=1,
             act='relu',
