@@ -57,7 +57,7 @@ def load_dygraph_pretrain(model, path=None, load_static_weights=False):
         for key in model_dict.keys():
             weight_name = model_dict[key].name
             if weight_name in pre_state_dict.keys():
-                print('Load weight: {}, shape: {}'.format(
+                logger.info('Load weight: {}, shape: {}'.format(
                     weight_name, pre_state_dict[weight_name].shape))
                 param_state_dict[key] = pre_state_dict[weight_name]
             else:
