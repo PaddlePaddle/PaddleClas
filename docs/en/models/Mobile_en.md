@@ -62,6 +62,7 @@ Currently there are 32 pretrained models of the mobile series open source by Pad
 | GhostNet_x0_5                        | 0.668   | 0.869   | 0.662             | 0.866             | 0.082        | 2.600             |
 | GhostNet_x1_0                        | 0.740   | 0.916   | 0.739             | 0.914             | 0.294        | 5.200             |
 | GhostNet_x1_3                        | 0.757   | 0.925   | 0.757             | 0.927             | 0.440        | 7.300             |
+| GhostNet_x1_3_ssld                        | 0.794   | 0.945   | 0.757             | 0.927             | 0.440        | 7.300             |
 
 
 ## Inference speed and storage size based on SD855
@@ -104,6 +105,8 @@ Currently there are 32 pretrained models of the mobile series open source by Pad
 | GhostNet_x0_5                   | 5.714           | 10.000           |
 | GhostNet_x1_0                   | 13.558           | 20.000           |
 | GhostNet_x1_3                   | 19.982           | 29.000           |
+| GhostNet_x1_3_ssld                   | 19.982           | 29.000           |
+
 
 
 ## Inference speed based on T4 GPU
