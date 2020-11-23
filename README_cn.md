@@ -7,6 +7,7 @@
 飞桨图像分类套件PaddleClas是飞桨为工业界和学术界所准备的一个图像分类任务的工具集，助力使用者训练出更好的视觉模型和应用落地。
 
 **近期更新**
+- 2020.11.23 添加`GhostNet_x1_3_ssld `模型，在ImageNet-1k上Top-1 Acc可达79.38%。
 - 2020.11.18 添加图像分类[常见问题2020第一季第三期](./docs/zh_CN/faq_series/faq_2020_s1.md) 5个新问题，并且计划以后每周会更新，欢迎大家持续关注。
 - 2020.11.09 添加`InceptionV3 `结构和模型，在ImageNet-1k上Top-1 Acc可达79.14%。
 - 2020.10.12 添加Paddle-Lite demo。
@@ -187,7 +188,7 @@ ResNet及其Vd系列模型的精度、速度指标如下表所示，更多关于
 | GhostNet_<br>x0_5                    | 0.6688    | 0.8695    | 5.7143                 | 0.082    | 2.6       | 10      | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/GhostNet_x0_5_pretrained.pdparams)               |
 | GhostNet_<br>x1_0                    | 0.7402    | 0.9165    | 13.5587                | 0.294    | 5.2       | 20      | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/GhostNet_x1_0_pretrained.pdparams)               |
 | GhostNet_<br>x1_3                    | 0.7579    | 0.9254    | 19.9825                | 0.44     | 7.3       | 29      | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/GhostNet_x1_3_pretrained.pdparams)               |
-
+| GhostNet_<br>x1_3_ssld                    | 0.7938    | 0.9449    | 19.9825                | 0.44     | 7.3       | 29      | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/GhostNet_x1_3_ssld_pretrained.tar)               |
 
 <a name="SEResNeXt与Res2Net系列"></a>
 ### SEResNeXt与Res2Net系列
