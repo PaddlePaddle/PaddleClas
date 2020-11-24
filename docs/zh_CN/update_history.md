@@ -1,5 +1,8 @@
 # 更新日志
 
+- 2020.11.23
+    * 添加GhostNet_x1_3_ssld模型，在ImageNet上Top-1 Acc可达0.7938。
+
 - 2020.11.09
     * 添加InceptionV3结构和模型，在ImageNet上Top-1 Acc可达0.791。
     
