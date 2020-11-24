@@ -46,7 +46,6 @@ class DPN(object):
         init_padding = args['init_padding']
 
         ## define Dual Path Network
-
         # conv1
         conv1_x_1 = fluid.layers.conv2d(
             input=input,
