@@ -494,8 +494,8 @@ def run(dataloader,
             metric_list[i].update(np.mean(m), batch_size)
         fetchs_str = ''.join([str(m.value) + ' '
                               for m in metric_list] + [batch_time.value]) + 's'
-        ips_info = ", ips: {:.5f} images/sec.".format(batch_size /
-                                                      batch_time.val)
+        ips_info = " ips: {:.5f} images/sec.".format(batch_size /
+                                                     batch_time.val)
         fetchs_str += ips_info
         if vdl_writer:
             global total_step
@@ -523,10 +523,9 @@ def run(dataloader,
                                                 batch_time.sum)
 
     if mode == 'eval':
-        logger.info("END {:s} {:s}s, {}".format(mode, end_str, ips_info))
+        logger.info("END {:s} {:s}s {:s}".format(mode, end_str, ips_info))
     else:
         end_epoch_str = "END epoch:{:<3d}".format(epoch)
-
         logger.info("{:s} {:s} {:s} {:s}".format(end_epoch_str, mode, end_str,
                                                  ips_info))
 
