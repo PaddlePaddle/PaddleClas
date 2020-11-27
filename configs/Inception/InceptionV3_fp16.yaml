@@ -20,7 +20,7 @@ image_shape: [3, 299, 299]
 use_mix: True
 ls_epsilon: 0.1
 
-use_fp16: True # cannot open with dali
+use_fp16: True
 amp_scale_loss: 128
 use_dynamic_loss_scaling: True
 fuse_elewise_add_act_ops: True
