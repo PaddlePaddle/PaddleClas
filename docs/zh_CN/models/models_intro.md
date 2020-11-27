@@ -98,7 +98,7 @@ python tools/infer/predict.py \
     - [GhostNet_x0_5](https://paddle-imagenet-models-name.bj.bcebos.com/GhostNet_x0_5_pretrained.pdparams)
     - [GhostNet_x1_0](https://paddle-imagenet-models-name.bj.bcebos.com/GhostNet_x1_0_pretrained.pdparams)
     - [GhostNet_x1_3](https://paddle-imagenet-models-name.bj.bcebos.com/GhostNet_x1_3_pretrained.pdparams)
-
+    - [GhostNet_x1_3_ssld](https://paddle-imagenet-models-name.bj.bcebos.com/GhostNet_x1_3_ssld_pretrained.tar)
 
 - SEResNeXt与Res2Net系列
   - ResNeXt系列<sup>[[7](#ref7)]</sup>([论文地址](https://arxiv.org/abs/1611.05431))
