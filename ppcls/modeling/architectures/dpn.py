@@ -46,7 +46,6 @@ class DPN(object):
         init_padding = args['init_padding']
 
         ## define Dual Path Network
-
         # conv1
         conv1_x_1 = fluid.layers.conv2d(
             input=input,
@@ -63,7 +62,6 @@ class DPN(object):
         conv1_x_1 = fluid.layers.batch_norm(
             input=conv1_x_1,
             act='relu',
-            is_test=False,
             name="conv1_bn",
             param_attr=ParamAttr(name='conv1_bn_scale'),
             bias_attr=ParamAttr('conv1_bn_offset'),
@@ -107,7 +105,6 @@ class DPN(object):
         conv5_x_x = fluid.layers.batch_norm(
             input=conv5_x_x,
             act='relu',
-            is_test=False,
             name="final_concat_bn",
             param_attr=ParamAttr(name='final_concat_bn_scale'),
             bias_attr=ParamAttr('final_concat_bn_offset'),
@@ -293,7 +290,6 @@ class DPN(object):
         bn_ac = fluid.layers.batch_norm(
             input=data,
             act='relu',
-            is_test=False,
             name=name + '.output.1',
             param_attr=ParamAttr(name=name + '_bn_scale'),
             bias_attr=ParamAttr(name + '_bn_offset'),
