@@ -53,7 +53,7 @@ At present, there are a total of 24 pretrained models of the three categories op
 | SE_ResNet50_vd        | 0.795  | 0.948  |                   |                   | 8.670        | 28.090            |
 | SE_ResNeXt50_32x4d    | 0.784  | 0.940  | 0.789             | 0.945             | 8.020        | 26.160            |
 | SE_ResNeXt50_vd_32x4d | 0.802  | 0.949  |                   |                   | 10.760       | 26.280            |
-| SE_ResNeXt101_32x4d   | 0.791  | 0.942  | 0.793             | 0.950             | 15.020       | 46.280            |
+| SE_ResNeXt101_32x4d   | 0.7939  | 0.9443  | 0.793             | 0.950             | 15.020       | 46.280            |
 | SENet154_vd           | 0.814  | 0.955  |                   |                   | 45.830       | 114.290           |
 
 
