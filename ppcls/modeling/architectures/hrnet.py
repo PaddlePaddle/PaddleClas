@@ -657,7 +657,7 @@ class HRNet(nn.Layer):
 
         y = self.conv_last(y)
         y = self.pool2d_avg(y)
-        y = paddle.reshape(y, shape=[0, -1])
+        y = paddle.reshape(y, shape=[-1, y.shape[1]])
         y = self.out(y)
         return y
 
