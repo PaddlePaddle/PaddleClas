@@ -306,7 +306,7 @@ class SEModule(nn.Layer):
         outputs = F.relu(outputs)
         outputs = self.conv2(outputs)
         outputs = hard_sigmoid(outputs)
-        return paddle.multiply(x=inputs, y=outputs, axis=0)
+        return paddle.multiply(x=inputs, y=outputs)
 
 
 def MobileNetV3_small_x0_35(**args):

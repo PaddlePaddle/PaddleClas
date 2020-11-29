@@ -305,7 +305,7 @@ class ExitFlow(nn.Layer):
         conv2 = self._conv_2(conv1)
         conv2 = F.relu(conv2)
         pool = self._pool(conv2)
-        pool = paddle.reshape(pool, [0, -1])
+        pool = paddle.reshape(pool, [-1, pool.shape[1]])
         out = self._out(pool)
         return out
 
