@@ -44,7 +44,6 @@ class ConvBNLayer(nn.Layer):
             bias_attr=False)
         bn_name = name + "_bn"
 
-        # In the old version, moving_variance_name was name + "_variance"
         self._batch_norm = BatchNorm(
             num_channels=out_channels,
             act=act,
@@ -53,9 +52,7 @@ class ConvBNLayer(nn.Layer):
             bias_attr=ParamAttr(
                 name=bn_name + "_offset", regularizer=L2Decay(0.0)),
             moving_mean_name=bn_name + "_mean",
-            moving_variance_name=name +
-            "_variance"  # wrong due to an old typo, will be fixed later.
-        )
+            moving_variance_name=bn_name + "_variance")
 
     def forward(self, inputs):
         y = self._conv(inputs)
