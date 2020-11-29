@@ -232,7 +232,7 @@ class DPN(nn.Layer):
             num_filters=init_num_filter,
             filter_size=init_filter_size,
             stride=2,
-            pad=1,
+            pad=init_padding,
             act='relu',
             name="conv1")
 
