@@ -90,7 +90,7 @@ python tools/infer/predict.py \
     - [ShuffleNetV2_x0_25](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ShuffleNetV2_x0_25_pretrained.pdparams)
     - [ShuffleNetV2_x0_33](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ShuffleNetV2_x0_33_pretrained.pdparams)
     - [ShuffleNetV2_x0_5](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ShuffleNetV2_x0_5_pretrained.pdparams)
-    - [ShuffleNetV2](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ShuffleNetV2_pretrained.pdparams)
+    - [ShuffleNetV2](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ShuffleNetV2_x1_0_pretrained.pdparams)
     - [ShuffleNetV2_x1_5](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ShuffleNetV2_x1_5_pretrained.pdparams)
     - [ShuffleNetV2_x2_0](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ShuffleNetV2_x2_0_pretrained.pdparams)
     - [ShuffleNetV2_swish](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ShuffleNetV2_swish_pretrained.pdparams)
