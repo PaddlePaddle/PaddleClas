@@ -26,6 +26,7 @@ sys.path.append(os.path.abspath(os.path.join(__dir__, '../../')))
 from sys import version_info
 
 import paddle
+import paddle.fluid as fluid
 from paddle.distributed import fleet
 
 from ppcls.data import Reader
@@ -66,6 +67,16 @@ def main(args):
     use_gpu = config.get("use_gpu", True)
     assert use_gpu is True, "gpu must be true in static mode!"
     place = paddle.set_device("gpu")
+    
+    # amp related config
+    use_fp16 = config.get('use_fp16', False)
+    if use_fp16:
+        AMP_RELATED_FLAGS_SETTING = {
+            'FLAGS_cudnn_exhaustive_search': 1,
+            'FLAGS_conv_workspace_size_limit': 4000,
+            'FLAGS_cudnn_batchnorm_spatial_persistent': 1,
+            'FLAGS_max_inplace_grad_add': 8,
+        }
 
     # startup_prog is used to do some parameter init work,
     # and train prog is used to hold the network

@@ -24,6 +24,7 @@ from collections import OrderedDict
 
 import paddle
 import paddle.nn.functional as F
+from paddle import fluid
 
 from ppcls.optimizer.learning_rate import LearningRateBuilder
 from ppcls.optimizer.optimizer import OptimizerBuilder
@@ -109,9 +110,14 @@ def create_model(architecture, image, classes_num, is_train):
     """
     name = architecture["name"]
     params = architecture.get("params", {})
+
     if "is_test" in params:
         params['is_test'] = not is_train
     model = architectures.__dict__[name](class_dim=classes_num, **params)
+    
+    if "data_format" in params and params["data_format"] == "NHWC":
+        image = fluid.layers.transpose(image, [0, 2, 3, 1])
+        image.stop_gradient = True
     out = model(image)
     return out
 
@@ -311,18 +317,18 @@ def dist_optimizer(config, optimizer):
 
 def mixed_precision_optimizer(config, optimizer):
     use_fp16 = config.get('use_fp16', False)
-    amp_scale_loss = config.get('amp_scale_loss', 1.0)
+    scale_loss = config.get('scale_loss', 1.0)
     use_dynamic_loss_scaling = config.get('use_dynamic_loss_scaling', False)
     if use_fp16:
         optimizer = fluid.contrib.mixed_precision.decorate(
             optimizer,
-            init_loss_scaling=amp_scale_loss,
+            init_loss_scaling=scale_loss,
             use_dynamic_loss_scaling=use_dynamic_loss_scaling)
 
     return optimizer
 
 
-def build(config, main_prog, startup_prog, is_train=True, is_distributed=True):
+def build(config, main_prog, startup_prog, is_train=True, is_distributed=False):
     """
     Build a program using a model and an optimizer
         1. create feeds
@@ -364,7 +370,6 @@ def build(config, main_prog, startup_prog, is_train=True, is_distributed=True):
                 optimizer = mixed_precision_optimizer(config, optimizer)
                 if is_distributed:
                     optimizer = dist_optimizer(config, optimizer)
-
                 optimizer.minimize(fetchs['loss'][0])
     return fetchs, lr_scheduler, feeds
 
@@ -444,12 +449,13 @@ def run(dataloader,
 
         batch_time.update(time.time() - tic)
         tic = time.time()
+        ips = batch_size / batch_time.val
         for i, m in enumerate(metrics):
             metric_list[i].update(np.mean(m), batch_size)
         if mode == "train":
             metric_list[-1].update(lr_scheduler.get_lr())
         fetchs_str = ''.join([str(m.value) + ' '
-                              for m in metric_list] + [batch_time.value]) + 's'
+                              for m in metric_list] + [batch_time.value]) + 's' + ' ips: ' + str(ips) 
 
         if lr_scheduler is not None:
             if lr_scheduler.update_specified:
