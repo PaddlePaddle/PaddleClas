@@ -8,7 +8,7 @@ CUR_NODE_IPS="10.10.10.1"
 python -m paddle.distributed.launch \
     --cluster_node_ips=$ALL_NODE_IPS \
     --node_ip=$CUR_NODE_IPS \
-    --selected_gpus="0,1,2,3" \
+    --gpus="0,1,2,3" \
     tools/train.py \
         -c ./configs/ResNet/ResNet50.yaml \
         -o print_interval=10
