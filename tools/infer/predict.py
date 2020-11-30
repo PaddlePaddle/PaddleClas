@@ -39,8 +39,8 @@ def create_paddle_predictor(args):
     config.switch_ir_optim(args.ir_optim)  # default true
     if args.use_tensorrt:
         config.enable_tensorrt_engine(
-            precision_mode=Config.PrecisionType.Half
-            if args.use_fp16 else Config.PrecisionType.Float32,
+            precision_mode=Config.Precision.Half
+            if args.use_fp16 else Config.Precision.Float32,
             max_batch_size=args.batch_size)
 
     config.enable_memory_optim()
