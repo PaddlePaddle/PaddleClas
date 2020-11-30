@@ -23,7 +23,7 @@ from paddle.nn.functional import swish
 
 __all__ = [
     "ShuffleNetV2_x0_25", "ShuffleNetV2_x0_33", "ShuffleNetV2_x0_5",
-    "ShuffleNetV2", "ShuffleNetV2_x1_5", "ShuffleNetV2_x2_0",
+    "ShuffleNetV2_x1_0", "ShuffleNetV2_x1_5", "ShuffleNetV2_x2_0",
     "ShuffleNetV2_swish"
 ]
 
@@ -299,7 +299,7 @@ def ShuffleNetV2_x0_5(**args):
     return model
 
 
-def ShuffleNetV2(**args):
+def ShuffleNetV2_x1_0(**args):
     model = ShuffleNet(scale=1.0, **args)
     return model
 

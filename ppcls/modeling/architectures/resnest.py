@@ -120,7 +120,7 @@ class SplatConv(nn.Layer):
             stride=stride,
             groups=groups * radix,
             act="relu",
-            name=name + "_splat1")
+            name=name + "_1_weights")
 
         self.avg_pool2d = AdaptiveAvgPool2D(1)
 
@@ -134,7 +134,7 @@ class SplatConv(nn.Layer):
             stride=1,
             groups=groups,
             act="relu",
-            name=name + "_splat2")
+            name=name + "_2_weights")
 
         # to calc atten
         self.conv3 = Conv2D(
@@ -145,7 +145,7 @@ class SplatConv(nn.Layer):
             padding=0,
             groups=groups,
             weight_attr=ParamAttr(
-                name=name + "_splat_weights", initializer=KaimingNormal()),
+                name=name + "_weights", initializer=KaimingNormal()),
             bias_attr=False)
 
         self.rsoftmax = rSoftmax(radix=radix, cardinality=groups)
@@ -233,7 +233,7 @@ class BottleneckBlock(nn.Layer):
                 bias=False,
                 radix=radix,
                 rectify_avg=rectify_avg,
-                name=name + "_splatconv")
+                name=name + "_splat")
         else:
             self.conv2 = ConvBNLayer(
                 num_channels=group_width,
@@ -403,10 +403,10 @@ class ResNeStLayer(nn.Layer):
         self.inplanes = planes * 4
         self.bottleneck_block_list = [bottleneck_func]
         for i in range(1, blocks):
-            name = name + "_bottleneck_" + str(i)
+            curr_name = name + "_bottleneck_" + str(i)
 
             bottleneck_func = self.add_sublayer(
-                name,
+                curr_name,
                 BottleneckBlock(
                     inplanes=self.inplanes,
                     planes=planes,
@@ -419,7 +419,7 @@ class ResNeStLayer(nn.Layer):
                     dilation=dilation,
                     rectify_avg=rectify_avg,
                     last_gamma=last_gamma,
-                    name=name))
+                    name=curr_name))
             self.bottleneck_block_list.append(bottleneck_func)
 
     def forward(self, x):
