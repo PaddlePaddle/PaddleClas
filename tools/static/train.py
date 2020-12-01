@@ -59,7 +59,9 @@ def parse_args():
 
 
 def main(args):
-    fleet.init(is_collective=True)
+    is_distributed = False
+    if is_distributed:
+        fleet.init(is_collective=True)
 
     config = get_config(args.config, overrides=args.override, show=True)
     # assign the place
@@ -75,12 +77,20 @@ def main(args):
     best_top1_acc = 0.0  # best top1 acc record
 
     train_fetchs, lr_scheduler, train_feeds = program.build(
-        config, train_prog, startup_prog, is_train=True)
+        config,
+        train_prog,
+        startup_prog,
+        is_train=True,
+        is_distributed=is_distributed)
 
     if config.validate:
         valid_prog = paddle.static.Program()
         valid_fetchs, _, valid_feeds = program.build(
-            config, valid_prog, startup_prog, is_train=False)
+            config,
+            valid_prog,
+            startup_prog,
+            is_train=False,
+            is_distributed=is_distributed)
         # clone to prune some content which is irrelevant in valid_prog
         valid_prog = valid_prog.clone(for_test=True)
 
@@ -88,6 +98,12 @@ def main(args):
     exe = paddle.static.Executor(place)
     # Parameter initialization
     exe.run(startup_prog)
+
+    if not is_distributed:
+        compiled_train_prog = program.compile(
+            config, train_prog, loss_name=train_fetchs["loss"][0].name)
+    else:
+        compiled_train_prog = train_prog
 
     # load model from 1. checkpoint to resume training, 2. pretrained model to finetune
     train_dataloader = Reader(config, 'train', places=place)()
@@ -108,7 +124,7 @@ def main(args):
 
     for epoch_id in range(config.epochs):
         # 1. train with train dataset
-        program.run(train_dataloader, exe, train_prog, train_feeds,
+        program.run(train_dataloader, exe, compiled_train_prog, train_feeds,
                     train_fetchs, epoch_id, 'train', config, vdl_writer,
                     lr_scheduler)
         if paddle.distributed.get_rank() == 0:
