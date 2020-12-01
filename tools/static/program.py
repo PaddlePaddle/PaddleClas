@@ -388,6 +388,8 @@ def compile(config, program, loss_name=None, share_prog=None):
         compiled_program(): a compiled program
     """
     build_strategy = paddle.static.BuildStrategy()
+    build_strategy.fuse_bn_act_ops = config.get('fuse_bn_act_ops', False)
+    build_strategy.fuse_elewise_add_act_ops = config.get('fuse_elewise_add_act_ops', False)
     exec_strategy = paddle.static.ExecutionStrategy()
 
     exec_strategy.num_threads = 1

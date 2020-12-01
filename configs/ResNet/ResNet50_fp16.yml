@@ -16,7 +16,9 @@ topk: 5
 image_shape: [3, 224, 224]
 
 # mixed precision training
-use_fp16: False
+fuse_bn_act_ops : True
+fuse_elewise_add_act_ops : True
+use_fp16: True
 scale_loss: 128.0
 use_dynamic_loss_scaling: True
 
@@ -41,8 +43,8 @@ OPTIMIZER:
 TRAIN:
     batch_size: 256
     num_workers: 4
-    file_list: "/ssd3/datasets/ILSVRC2012/train_list.txt"
-    data_dir: "/ssd3/datasets/ILSVRC2012/"
+    file_list: "./dataset/ILSVRC2012/val_list.txt"
+    data_dir: "./dataset/ILSVRC2012/"
     shuffle_seed: 0
     transforms:
         - DecodeImage:
@@ -63,8 +65,8 @@ TRAIN:
 VALID:
     batch_size: 64
     num_workers: 4
-    file_list: "/ssd3/datasets/ILSVRC2012/train_list.txt"
-    data_dir: "/ssd3/datasets/ILSVRC2012/"
+    file_list: "./dataset/ILSVRC2012/val_list.txt"
+    data_dir: "./dataset/ILSVRC2012/"
     shuffle_seed: 0
     transforms:
         - DecodeImage:
