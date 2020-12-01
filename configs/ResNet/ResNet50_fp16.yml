@@ -2,7 +2,7 @@ mode: 'train'
 ARCHITECTURE:
     name: 'ResNet50'
     params:
-        data_format: "NCHW"
+        data_format: "NHWC"
 
 pretrained_model: ""
 model_save_dir: "./output/"
@@ -16,8 +16,6 @@ topk: 5
 image_shape: [3, 224, 224]
 
 # mixed precision training
-fuse_bn_act_ops : True
-fuse_elewise_add_act_ops : True
 use_fp16: True
 scale_loss: 128.0
 use_dynamic_loss_scaling: True
@@ -43,7 +41,7 @@ OPTIMIZER:
 TRAIN:
     batch_size: 256
     num_workers: 4
-    file_list: "./dataset/ILSVRC2012/val_list.txt"
+    file_list: "./dataset/ILSVRC2012/train_list.txt"
     data_dir: "./dataset/ILSVRC2012/"
     shuffle_seed: 0
     transforms:

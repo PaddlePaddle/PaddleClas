@@ -110,7 +110,6 @@ def create_model(architecture, image, classes_num, is_train):
     """
     name = architecture["name"]
     params = architecture.get("params", {})
-
     if "is_test" in params:
         params['is_test'] = not is_train
     model = architectures.__dict__[name](class_dim=classes_num, **params)
@@ -328,7 +327,7 @@ def mixed_precision_optimizer(config, optimizer):
     return optimizer
 
 
-def build(config, main_prog, startup_prog, is_train=True, is_distributed=False):
+def build(config, main_prog, startup_prog, is_train=True, is_distributed=True):
     """
     Build a program using a model and an optimizer
         1. create feeds
@@ -388,12 +387,43 @@ def compile(config, program, loss_name=None, share_prog=None):
         compiled_program(): a compiled program
     """
     build_strategy = paddle.static.BuildStrategy()
-    build_strategy.fuse_bn_act_ops = config.get('fuse_bn_act_ops', False)
-    build_strategy.fuse_elewise_add_act_ops = config.get('fuse_elewise_add_act_ops', False)
     exec_strategy = paddle.static.ExecutionStrategy()
 
     exec_strategy.num_threads = 1
     exec_strategy.num_iteration_per_drop_scope = 10
+
+    use_fp16 = config.get('use_fp16', False)
+    fuse_bn_act_ops = config.get('fuse_bn_act_ops', use_fp16)
+    fuse_elewise_add_act_ops = config.get('fuse_elewise_add_act_ops', use_fp16)
+    fuse_bn_add_act_ops = config.get('fuse_bn_add_act_ops', use_fp16)
+    enable_addto = config.get('enable_addto', use_fp16)
+
+    try:
+        build_strategy.fuse_bn_act_ops = fuse_bn_act_ops
+    except Exception as e:
+        logger.info(
+            "PaddlePaddle version 1.7.0 or higher is "
+            "required when you want to fuse batch_norm and activation_op.")
+
+    try:
+        build_strategy.fuse_elewise_add_act_ops = fuse_elewise_add_act_ops
+    except Exception as e:
+        logger.info(
+            "PaddlePaddle version 1.7.0 or higher is "
+            "required when you want to fuse elewise_add_act and activation_op.")
+
+    try:
+        build_strategy.fuse_bn_add_act_ops = fuse_bn_add_act_ops
+    except Exception as e:
+        logger.info(
+            "PaddlePaddle 2.0-rc or higher is "
+            "required when you want to enable fuse_bn_add_act_ops strategy.")
+
+    try:
+        build_strategy.enable_addto = enable_addto
+    except Exception as e:
+        logger.info("PaddlePaddle 2.0-rc or higher is "
+                    "required when you want to enable addto strategy.")
 
     compiled_program = paddle.static.CompiledProgram(
         program).with_data_parallel(
@@ -437,12 +467,13 @@ def run(dataloader,
         metric_list.append(AverageMeter('lr', 'f', need_avg=False))
     for m in metric_list:
         m.reset()
-    batch_time = AverageMeter('elapse', '.3f')
+    batch_time = AverageMeter('elapse', '.5f')
     tic = time.time()
     for idx, batch in enumerate(dataloader()):
-        # ignore the warmup iters
-        if idx == 5:
-            batch_time.reset()
+        if idx == 10:
+            for m in metric_list:
+                m.reset()
+            batch_time.reset()	    
         batch_size = batch[0].shape()[0]
         feed_dict = {
             key.name: batch[idx]
@@ -453,16 +484,15 @@ def run(dataloader,
                           fetch_list=fetch_list)
         batch_time.update(time.time() - tic)
         tic = time.time()
-        ips = batch_size / batch_time.val
         for i, m in enumerate(metrics):
             metric_list[i].update(np.mean(m), batch_size)
 
         if mode == "train":
             metric_list[-1].update(lr_scheduler.get_lr())
         fetchs_str = ''.join([str(m.value) + ' '
-                              for m in metric_list] + [batch_time.value]) + 's'
+                              for m in metric_list] + [batch_time.mean]) + 's' 
         ips_info = " ips: {:.5f} images/sec.".format(batch_size /
-                                                     batch_time.val)
+	                                                 batch_time.avg)
         fetchs_str += ips_info
 
         if lr_scheduler is not None:

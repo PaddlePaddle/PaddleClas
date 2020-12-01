@@ -63,7 +63,6 @@ def main(args):
     is_distributed = False
     if is_distributed:
         fleet.init(is_collective=True)
-
     config = get_config(args.config, overrides=args.override, show=True)
     # assign the place
     use_gpu = config.get("use_gpu", True)
@@ -79,6 +78,8 @@ def main(args):
             'FLAGS_cudnn_batchnorm_spatial_persistent': 1,
             'FLAGS_max_inplace_grad_add': 8,
         }
+        os.environ['FLAGS_cudnn_batchnorm_spatial_persistent'] = '1'
+        paddle.fluid.set_flags(AMP_RELATED_FLAGS_SETTING)
 
     # startup_prog is used to do some parameter init work,
     # and train prog is used to hold the network
