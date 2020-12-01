@@ -1,5 +1,8 @@
 # Release Notes
 
+- 2020.11.23
+    * Add `GhostNet_x1_3_ssld` pretrained model, whose Top-1 Acc on ImageNet1k dataset reaches 79.38%.
+    
 - 2020.11.09
     * Add `InceptionV3` architecture and pretrained model, whose Top-1 Acc on ImageNet1k dataset reaches 79.1%.
     

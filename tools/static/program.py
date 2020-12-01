@@ -440,6 +440,9 @@ def run(dataloader,
     batch_time = AverageMeter('elapse', '.3f')
     tic = time.time()
     for idx, batch in enumerate(dataloader()):
+        # ignore the warmup iters
+        if idx == 5:
+            batch_time.reset()
         batch_size = batch[0].shape()[0]
         feed_dict = {
             key.name: batch[idx]
@@ -448,16 +451,19 @@ def run(dataloader,
         metrics = exe.run(program=program,
                           feed=feed_dict,
                           fetch_list=fetch_list)
-
         batch_time.update(time.time() - tic)
         tic = time.time()
         ips = batch_size / batch_time.val
         for i, m in enumerate(metrics):
             metric_list[i].update(np.mean(m), batch_size)
+
         if mode == "train":
             metric_list[-1].update(lr_scheduler.get_lr())
         fetchs_str = ''.join([str(m.value) + ' '
-                              for m in metric_list] + [batch_time.value]) + 's' + ' ips: ' + str(ips) 
+                              for m in metric_list] + [batch_time.value]) + 's'
+        ips_info = " ips: {:.5f} images/sec.".format(batch_size /
+                                                     batch_time.val)
+        fetchs_str += ips_info
 
         if lr_scheduler is not None:
             if lr_scheduler.update_specified:
@@ -491,15 +497,14 @@ def run(dataloader,
 
     end_str = ''.join([str(m.mean) + ' '
                        for m in metric_list] + [batch_time.total]) + 's'
+    ips_info = "ips: {:.5f} images/sec.".format(batch_size * batch_time.count /
+                                                batch_time.sum)
     if mode == 'eval':
-        logger.info("END {:s} {:s}s".format(mode, end_str))
+        logger.info("END {:s} {:s}s {:s}".format(mode, end_str, ips_info))
     else:
         end_epoch_str = "END epoch:{:<3d}".format(epoch)
-
-        logger.info("{:s} {:s} {:s}".format(
-            logger.coloring(end_epoch_str, "RED"),
-            logger.coloring(mode, "PURPLE"),
-            logger.coloring(end_str, "OKGREEN")))
+        logger.info("{:s} {:s} {:s} {:s}".format(end_epoch_str, mode, end_str,
+                                                 ips_info))
 
     # return top1_acc in order to save the best model
     if mode == 'valid':
