@@ -63,9 +63,12 @@ def main(args):
 
     config = get_config(args.config, overrides=args.override, show=True)
     # assign the place
-    use_gpu = config.get("use_gpu", True)
-    assert use_gpu is True, "gpu must be true in static mode!"
-    place = paddle.set_device("gpu")
+    use_gpu = config.get("use_gpu", False)
+    use_xpu = config.get("use_xpu", False)
+    assert (use_gpu or use_xpu) is True, "gpu or xpu must be true in static mode!"
+    assert (use_gpu and use_xpu) is not True, "gpu and xpu can not be true in the same time in static mode!"
+
+    place = paddle.set_device('gpu' if use_gpu else 'xpu')
 
     # startup_prog is used to do some parameter init work,
     # and train prog is used to hold the network
@@ -75,12 +78,12 @@ def main(args):
     best_top1_acc = 0.0  # best top1 acc record
 
     train_fetchs, lr_scheduler, train_feeds = program.build(
-        config, train_prog, startup_prog, is_train=True)
+        config, train_prog, startup_prog, is_train=True, is_distributed=(not use_xpu))
 
     if config.validate:
         valid_prog = paddle.static.Program()
         valid_fetchs, _, valid_feeds = program.build(
-            config, valid_prog, startup_prog, is_train=False)
+            config, valid_prog, startup_prog, is_train=False, is_distributed=(not use_xpu))
         # clone to prune some content which is irrelevant in valid_prog
         valid_prog = valid_prog.clone(for_test=True)
 
@@ -94,7 +97,10 @@ def main(args):
 
     if config.validate and paddle.distributed.get_rank() == 0:
         valid_dataloader = Reader(config, 'valid', places=place)()
-        compiled_valid_prog = program.compile(config, valid_prog)
+        if use_xpu:
+            compiled_valid_prog = valid_prog
+        else:
+            compiled_valid_prog = program.compile(config, valid_prog)
 
     vdl_writer = None
     if args.vdl_dir:
