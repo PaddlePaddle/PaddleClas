@@ -63,10 +63,13 @@ def main(args):
 
     config = get_config(args.config, overrides=args.override, show=True)
     # assign the place
-    use_gpu = config.get("use_gpu", False)
+    use_gpu = config.get("use_gpu", True)
     use_xpu = config.get("use_xpu", False)
-    assert (use_gpu or use_xpu) is True, "gpu or xpu must be true in static mode!"
-    assert (use_gpu and use_xpu) is not True, "gpu and xpu can not be true in the same time in static mode!"
+    assert (use_gpu or use_xpu
+            ) is True, "gpu or xpu must be true in static mode!"
+    assert (
+        use_gpu and use_xpu
+    ) is not True, "gpu and xpu can not be true in the same time in static mode!"
 
     place = paddle.set_device('gpu' if use_gpu else 'xpu')
 
@@ -78,12 +81,20 @@ def main(args):
     best_top1_acc = 0.0  # best top1 acc record
 
     train_fetchs, lr_scheduler, train_feeds = program.build(
-        config, train_prog, startup_prog, is_train=True, is_distributed=config.get("is_distributed", True))
+        config,
+        train_prog,
+        startup_prog,
+        is_train=True,
+        is_distributed=config.get("is_distributed", True))
 
     if config.validate:
         valid_prog = paddle.static.Program()
         valid_fetchs, _, valid_feeds = program.build(
-            config, valid_prog, startup_prog, is_train=False, is_distributed=config.get("is_distributed", True))
+            config,
+            valid_prog,
+            startup_prog,
+            is_train=False,
+            is_distributed=config.get("is_distributed", True))
         # clone to prune some content which is irrelevant in valid_prog
         valid_prog = valid_prog.clone(for_test=True)
 
@@ -92,14 +103,20 @@ def main(args):
     # Parameter initialization
     exe.run(startup_prog)
 
-    # load model from 1. checkpoint to resume training, 2. pretrained model to finetune
-    train_dataloader = Reader(config, 'train', places=place)()
-
-    if config.validate and paddle.distributed.get_rank() == 0:
-        valid_dataloader = Reader(config, 'valid', places=place)()
-        if use_xpu:
-            compiled_valid_prog = valid_prog
-        else:
+    if not config.get('use_dali', False):
+        train_dataloader = Reader(config, 'train', places=place)()
+        if config.validate and paddle.distributed.get_rank() == 0:
+            valid_dataloader = Reader(config, 'valid', places=place)()
+            if use_xpu:
+                compiled_valid_prog = valid_prog
+            else:
+                compiled_valid_prog = program.compile(config, valid_prog)
+    else:
+        assert use_gpu is True, "DALI only support gpu, please set use_gpu to True!"
+        import dali
+        train_dataloader = dali.train(config)
+        if config.validate and paddle.distributed.get_rank() == 0:
+            valid_dataloader = dali.val(config)
             compiled_valid_prog = program.compile(config, valid_prog)
 
     vdl_writer = None
