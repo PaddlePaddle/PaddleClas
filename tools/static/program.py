@@ -66,7 +66,7 @@ def save_model(program, model_path, epoch_id, prefix='ppcls'):
     logger.info("Already save model in {}".format(model_path))
 
 
-def create_feeds(image_shape, use_mix=None):
+def create_feeds(image_shape, use_mix=None, use_dali=None):
     """
     Create feeds as model input
 
@@ -80,7 +80,7 @@ def create_feeds(image_shape, use_mix=None):
     feeds = OrderedDict()
     feeds['image'] = paddle.static.data(
         name="feed_image", shape=[None] + image_shape, dtype="float32")
-    if use_mix:
+    if use_mix and not use_dali:
         feeds['feed_y_a'] = paddle.static.data(
             name="feed_y_a", shape=[None, 1], dtype="int64")
         feeds['feed_y_b'] = paddle.static.data(
@@ -345,8 +345,13 @@ def build(config, main_prog, startup_prog, is_train=True, is_distributed=True):
     with paddle.static.program_guard(main_prog, startup_prog):
         with paddle.utils.unique_name.guard():
             use_mix = config.get('use_mix') and is_train
+            use_dali = config.get('use_dali', False)
             use_distillation = config.get('use_distillation')
-            feeds = create_feeds(config.image_shape, use_mix=use_mix)
+            feeds = create_feeds(
+                config.image_shape, use_mix=use_mix, use_dali=use_dali)
+            if use_dali and use_mix:
+                import dali
+                feeds = dali.mix(feeds, config, is_train)
             out = create_model(config.ARCHITECTURE, feeds['image'],
                                config.classes_num, is_train)
             fetchs = create_fetchs(
@@ -431,8 +436,10 @@ def run(dataloader,
     for m in metric_list:
         m.reset()
     batch_time = AverageMeter('elapse', '.3f')
+    use_dali = config.get('use_dali', False)
+    dataloader = dataloader if use_dali else dataloader()
     tic = time.time()
-    for idx, batch in enumerate(dataloader()):
+    for idx, batch in enumerate(dataloader):
         # ignore the warmup iters
         if idx == 5:
             batch_time.reset()
@@ -497,6 +504,8 @@ def run(dataloader,
         end_epoch_str = "END epoch:{:<3d}".format(epoch)
         logger.info("{:s} {:s} {:s} {:s}".format(end_epoch_str, mode, end_str,
                                                  ips_info))
+    if use_dali:
+        dataloader.reset()
 
     # return top1_acc in order to save the best model
     if mode == 'valid':
