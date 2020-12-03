@@ -60,10 +60,9 @@ def parse_args():
 
 
 def main(args):
-    is_distributed = False
-    if is_distributed:
-        fleet.init(is_collective=True)
     config = get_config(args.config, overrides=args.override, show=True)
+    if config.get("is_distributed", True):
+        fleet.init(is_collective=True)
     # assign the place
     use_gpu = config.get("use_gpu", True)
     assert use_gpu is True, "gpu must be true in static mode!"
@@ -119,11 +118,12 @@ def main(args):
     # Parameter initialization
     exe.run(startup_prog)
 
-    if not is_distributed:
+    if not config.get("is_distributed", True):
         compiled_train_prog = program.compile(
             config, train_prog, loss_name=train_fetchs["loss"][0].name)
     else:
         compiled_train_prog = train_prog
+    #print("This is use_dali: ", config.get('use_dali', False))
     if not config.get('use_dali', False):
         train_dataloader = Reader(config, 'train', places=place)()
         if config.validate and paddle.distributed.get_rank() == 0:

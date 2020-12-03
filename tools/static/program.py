@@ -474,12 +474,17 @@ def run(dataloader,
         m.reset()
     batch_time = AverageMeter('elapse', '.3f')
     use_dali = config.get('use_dali', False)
+    if use_dali:
+         print("use_dali:", use_dali)
+    print("use_dali:", use_dali)
     dataloader = dataloader if use_dali else dataloader()
     tic = time.time()
     for idx, batch in enumerate(dataloader):
         # ignore the warmup iters
         if idx == 5:
             batch_time.reset()
+        print("Batch 0:", batch[0])
+        #batch_size = len(batch[0])
         batch_size = batch[0].shape()[0]
         feed_dict = {
             key.name: batch[idx]
