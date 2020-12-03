@@ -40,33 +40,6 @@ from paddle.distributed import fleet
 from paddle.distributed.fleet import DistributedStrategy
 
 
-def _mkdir_if_not_exist(path):
-    """
-    mkdir if not exists, ignore the exception when multiprocess mkdir together
-    """
-    if not os.path.exists(path):
-        try:
-            os.makedirs(path)
-        except OSError as e:
-            if e.errno == errno.EEXIST and os.path.isdir(path):
-                logger.warning(
-                    'be happy if some process has already created {}'.format(
-                        path))
-            else:
-                raise OSError('Failed to mkdir {}'.format(path))
-
-
-def save_model(program, model_path, epoch_id, prefix='ppcls'):
-    """
-    save model to the target path
-    """
-    model_path = os.path.join(model_path, str(epoch_id))
-    _mkdir_if_not_exist(model_path)
-    model_prefix = os.path.join(model_path, prefix)
-    paddle.static.save(program, model_prefix)
-    logger.info("Already save model in {}".format(model_path))
-
-
 def create_feeds(image_shape, use_mix=None, use_dali=None):
     """
     Create feeds as model input
@@ -483,13 +456,15 @@ def run(dataloader,
         # ignore the warmup iters
         if idx == 5:
             batch_time.reset()
-        print("Batch 0:", batch[0])
-        #batch_size = len(batch[0])
-        batch_size = batch[0].shape()[0]
-        feed_dict = {
-            key.name: batch[idx]
-            for idx, key in enumerate(feeds.values())
-        }
+        if use_dali:
+            batch_size = batch[0]["feed_image"].shape()[0]
+            feed_dict = batch[0]
+        else:
+            batch_size = batch[0].shape()[0]
+            feed_dict = {
+                key.name: batch[idx]
+                for idx, key in enumerate(feeds.values())
+            }
         metrics = exe.run(program=program,
                           feed=feed_dict,
                           fetch_list=fetch_list)
@@ -521,7 +496,7 @@ def run(dataloader,
             global total_step
             logger.scaler('loss', metrics[0][0], total_step, vdl_writer)
             total_step += 1
-        if mode == 'eval':
+        if mode == 'valid':
             if idx % config.get('print_interval', 10) == 0:
                 logger.info("{:s} step:{:<4d} {:s}".format(mode, idx,
                                                            fetchs_str))
@@ -540,7 +515,7 @@ def run(dataloader,
                        for m in metric_list] + [batch_time.total]) + 's'
     ips_info = "ips: {:.5f} images/sec.".format(batch_size * batch_time.count /
                                                 batch_time.sum)
-    if mode == 'eval':
+    if mode == 'valid':
         logger.info("END {:s} {:s}s {:s}".format(mode, end_str, ips_info))
     else:
         end_epoch_str = "END epoch:{:<3d}".format(epoch)

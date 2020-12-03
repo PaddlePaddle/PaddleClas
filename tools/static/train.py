@@ -33,7 +33,7 @@ from ppcls.data import Reader
 from ppcls.utils.config import get_config
 from ppcls.utils import logger
 from tools.static import program
-from program import save_model
+from save_load import init_model, save_model
 
 
 def parse_args():
@@ -117,13 +117,15 @@ def main(args):
     exe = paddle.static.Executor(place)
     # Parameter initialization
     exe.run(startup_prog)
+    # load pretrained models or checkpoints
+    init_model(config, train_prog, exe)
 
     if not config.get("is_distributed", True):
         compiled_train_prog = program.compile(
             config, train_prog, loss_name=train_fetchs["loss"][0].name)
     else:
         compiled_train_prog = train_prog
-    #print("This is use_dali: ", config.get('use_dali', False))
+
     if not config.get('use_dali', False):
         train_dataloader = Reader(config, 'train', places=place)()
         if config.validate and paddle.distributed.get_rank() == 0:
