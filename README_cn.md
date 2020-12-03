@@ -8,6 +8,7 @@
 
 
 **近期更新**
+- 2020.12.03 添加`SE_HRNet_W64_C_ssld`模型，在ImageNet-1k上Top-1 Acc可达84.75%。
 - 2020.11.23 添加`GhostNet_x1_3_ssld `模型，在ImageNet-1k上Top-1 Acc可达79.38%。
 - 2020.11.18 添加图像分类[常见问题2020第一季第三期](./docs/zh_CN/faq_series/faq_2020_s1.md) 5个新问题，并且计划以后每周会更新，欢迎大家持续关注。
 - 2020.11.09 添加`InceptionV3 `结构和模型，在ImageNet-1k上Top-1 Acc可达79.14%。
@@ -260,6 +261,7 @@ HRNet系列模型的精度、速度指标如下表所示，更多关于该系列
 | HRNet_W48_C | 0.7895    | 0.9442    | 13.70761         | 34.43572         | 34.58    | 77.47     | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/HRNet_W48_C_pretrained.pdparams) |
 | HRNet_W48_C_ssld | 0.8363    | 0.9682    | 13.70761         | 34.43572         | 34.58    | 77.47     | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/HRNet_W48_C_pretrained.pdparams) |
 | HRNet_W64_C | 0.7930    | 0.9461    | 17.57527         | 47.9533          | 57.83    | 128.06    | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/HRNet_W64_C_pretrained.pdparams) |
+| SE_HRNet_W64_C_ssld | 0.8475    |  0.9726    |          |           | 57.83    | 128.97    | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/SE_HRNet_W64_C_ssld_pretrained.pdparams) |
 
 
 <a name="Inception系列"></a>
