@@ -322,8 +322,7 @@ class SELayer(nn.Layer):
         self.squeeze = Linear(
             num_channels,
             med_ch,
-            act="relu",
-            param_attr=ParamAttr(
+            weight_attr=ParamAttr(
                 initializer=Uniform(-stdv, stdv), name=name + "_sqz_weights"),
             bias_attr=ParamAttr(name=name + '_sqz_offset'))
 
@@ -331,8 +330,7 @@ class SELayer(nn.Layer):
         self.excitation = Linear(
             med_ch,
             num_filters,
-            act="sigmoid",
-            param_attr=ParamAttr(
+            weight_attr=ParamAttr(
                 initializer=Uniform(-stdv, stdv), name=name + "_exc_weights"),
             bias_attr=ParamAttr(name=name + '_exc_offset'))
 
@@ -340,7 +338,9 @@ class SELayer(nn.Layer):
         pool = self.pool2d_gap(input)
         pool = paddle.reshape(pool, shape=[-1, self._num_channels])
         squeeze = self.squeeze(pool)
+        squeeze = F.relu(squeeze)
         excitation = self.excitation(squeeze)
+        excitation = F.sigmoid(excitation)
         excitation = paddle.reshape(
             excitation, shape=[-1, self._num_channels, 1, 1])
         out = input * excitation
