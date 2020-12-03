@@ -416,11 +416,15 @@ def run(dataloader,
         # ignore the warmup iters
         if idx == 5:
             batch_time.reset()
-        batch_size = batch[0].shape()[0]
-        feed_dict = {
-            key.name: batch[idx]
-            for idx, key in enumerate(feeds.values())
-        }
+        if use_dali:
+            batch_size = batch[0]["feed_image"].shape()[0]
+            feed_dict = batch[0]
+        else:
+            batch_size = batch[0].shape()[0]
+            feed_dict = {
+                key.name: batch[idx]
+                for idx, key in enumerate(feeds.values())
+            }
         metrics = exe.run(program=program,
                           feed=feed_dict,
                           fetch_list=fetch_list)
@@ -452,7 +456,7 @@ def run(dataloader,
             global total_step
             logger.scaler('loss', metrics[0][0], total_step, vdl_writer)
             total_step += 1
-        if mode == 'eval':
+        if mode == 'valid':
             if idx % config.get('print_interval', 10) == 0:
                 logger.info("{:s} step:{:<4d} {:s}".format(mode, idx,
                                                            fetchs_str))
@@ -471,7 +475,7 @@ def run(dataloader,
                        for m in metric_list] + [batch_time.total]) + 's'
     ips_info = "ips: {:.5f} images/sec.".format(batch_size * batch_time.count /
                                                 batch_time.sum)
-    if mode == 'eval':
+    if mode == 'valid':
         logger.info("END {:s} {:s}s {:s}".format(mode, end_str, ips_info))
     else:
         end_epoch_str = "END epoch:{:<3d}".format(epoch)
