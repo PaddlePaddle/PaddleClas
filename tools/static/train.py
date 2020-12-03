@@ -80,6 +80,14 @@ def main(args):
         }
         os.environ['FLAGS_cudnn_batchnorm_spatial_persistent'] = '1'
         paddle.fluid.set_flags(AMP_RELATED_FLAGS_SETTING)
+    use_xpu = config.get("use_xpu", False)
+    assert (use_gpu or use_xpu
+            ) is True, "gpu or xpu must be true in static mode!"
+    assert (
+        use_gpu and use_xpu
+    ) is not True, "gpu and xpu can not be true in the same time in static mode!"
+
+    place = paddle.set_device('gpu' if use_gpu else 'xpu')
 
     # startup_prog is used to do some parameter init work,
     # and train prog is used to hold the network
@@ -93,7 +101,7 @@ def main(args):
         train_prog,
         startup_prog,
         is_train=True,
-        is_distributed=is_distributed)
+        is_distributed=config.get("is_distributed", True))
 
     if config.validate:
         valid_prog = paddle.static.Program()
@@ -102,7 +110,7 @@ def main(args):
             valid_prog,
             startup_prog,
             is_train=False,
-            is_distributed=is_distributed)
+            is_distributed=config.get("is_distributed", True))
         # clone to prune some content which is irrelevant in valid_prog
         valid_prog = valid_prog.clone(for_test=True)
 
@@ -116,12 +124,21 @@ def main(args):
             config, train_prog, loss_name=train_fetchs["loss"][0].name)
     else:
         compiled_train_prog = train_prog
-    # load model from 1. checkpoint to resume training, 2. pretrained model to finetune
-    train_dataloader = Reader(config, 'train', places=place)()
-
-    if config.validate and paddle.distributed.get_rank() == 0:
-        valid_dataloader = Reader(config, 'valid', places=place)()
-        compiled_valid_prog = program.compile(config, valid_prog)
+    if not config.get('use_dali', False):
+        train_dataloader = Reader(config, 'train', places=place)()
+        if config.validate and paddle.distributed.get_rank() == 0:
+            valid_dataloader = Reader(config, 'valid', places=place)()
+            if use_xpu:
+                compiled_valid_prog = valid_prog
+            else:
+                compiled_valid_prog = program.compile(config, valid_prog)
+    else:
+        assert use_gpu is True, "DALI only support gpu, please set use_gpu to True!"
+        import dali
+        train_dataloader = dali.train(config)
+        if config.validate and paddle.distributed.get_rank() == 0:
+            valid_dataloader = dali.val(config)
+            compiled_valid_prog = program.compile(config, valid_prog)
 
     vdl_writer = None
     if args.vdl_dir:

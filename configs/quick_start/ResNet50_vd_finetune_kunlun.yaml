@@ -1,13 +1,11 @@
 mode: 'train'
 ARCHITECTURE:
-    name: 'ResNet50'
-    params:
-        data_format: "NCHW"
-
-pretrained_model: ""
+    name: 'ResNet50_vd'
+pretrained_model: "./pretrained/ResNet50_vd_pretrained"
+load_static_weights: true
 model_save_dir: "./output/"
-classes_num: 1000
-total_images: 1281167
+classes_num: 102
+total_images: 1020
 save_interval: 1
 validate: True
 valid_interval: 1
@@ -15,20 +13,10 @@ epochs: 120
 topk: 5
 image_shape: [3, 224, 224]
 
-# mixed precision training
-use_fp16: True
-scale_loss: 128.0
-use_dynamic_loss_scaling: True
-
-use_mix: False
-ls_epsilon: -1
-
 LEARNING_RATE:
-    function: 'Piecewise'
-    params:
-        lr: 0.1
-        decay_epochs: [30, 60, 90]
-        gamma: 0.1
+    function: 'Cosine'          
+    params:                   
+        lr: 0.00375
 
 OPTIMIZER:
     function: 'Momentum'
@@ -36,13 +24,13 @@ OPTIMIZER:
         momentum: 0.9
     regularizer:
         function: 'L2'
-        factor: 0.000100
+        factor: 0.000001
 
 TRAIN:
-    batch_size: 256
-    num_workers: 4
-    file_list: "./dataset/ILSVRC2012/train_list.txt"
-    data_dir: "./dataset/ILSVRC2012/"
+    batch_size: 20
+    num_workers: 1
+    file_list: "./dataset/flowers102/train_list.txt"
+    data_dir: "./dataset/flowers102/"
     shuffle_seed: 0
     transforms:
         - DecodeImage:
@@ -61,10 +49,10 @@ TRAIN:
         - ToCHWImage:
 
 VALID:
-    batch_size: 64
-    num_workers: 4
-    file_list: "./dataset/ILSVRC2012/val_list.txt"
-    data_dir: "./dataset/ILSVRC2012/"
+    batch_size: 20
+    num_workers: 1
+    file_list: "./dataset/flowers102/val_list.txt"
+    data_dir: "./dataset/flowers102/"
     shuffle_seed: 0
     transforms:
         - DecodeImage:
