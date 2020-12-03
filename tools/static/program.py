@@ -39,33 +39,6 @@ from paddle.distributed import fleet
 from paddle.distributed.fleet import DistributedStrategy
 
 
-def _mkdir_if_not_exist(path):
-    """
-    mkdir if not exists, ignore the exception when multiprocess mkdir together
-    """
-    if not os.path.exists(path):
-        try:
-            os.makedirs(path)
-        except OSError as e:
-            if e.errno == errno.EEXIST and os.path.isdir(path):
-                logger.warning(
-                    'be happy if some process has already created {}'.format(
-                        path))
-            else:
-                raise OSError('Failed to mkdir {}'.format(path))
-
-
-def save_model(program, model_path, epoch_id, prefix='ppcls'):
-    """
-    save model to the target path
-    """
-    model_path = os.path.join(model_path, str(epoch_id))
-    _mkdir_if_not_exist(model_path)
-    model_prefix = os.path.join(model_path, prefix)
-    paddle.static.save(program, model_prefix)
-    logger.info("Already save model in {}".format(model_path))
-
-
 def create_feeds(image_shape, use_mix=None, use_dali=None):
     """
     Create feeds as model input

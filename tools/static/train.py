@@ -32,7 +32,7 @@ from ppcls.data import Reader
 from ppcls.utils.config import get_config
 from ppcls.utils import logger
 from tools.static import program
-from program import save_model
+from save_load import init_model, save_model
 
 
 def parse_args():
@@ -102,6 +102,9 @@ def main(args):
     exe = paddle.static.Executor(place)
     # Parameter initialization
     exe.run(startup_prog)
+
+    # load pretrained models or checkpoints
+    init_model(config, train_prog, exe)
 
     if not config.get('use_dali', False):
         train_dataloader = Reader(config, 'train', places=place)()
