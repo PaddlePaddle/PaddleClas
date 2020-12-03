@@ -30,6 +30,7 @@ At present, there are 7 pretrained models of such models open-sourced by PaddleC
 | HRNet_W48_C | 0.790  | 0.944  | 0.793             | 0.945             | 34.580       | 77.470            |
 | HRNet_W48_C_ssld | 0.836  | 0.968  | 0.793             | 0.945             | 34.580       | 77.470            |
 | HRNet_W64_C | 0.793  | 0.946  | 0.795             | 0.946             | 57.830       | 128.060           |
+| SE_HRNet_W64_C_ssld | 0.847  | 0.973  |                |                   | 57.830       | 128.970           |
 
 
 ## Inference speed based on V100 GPU
@@ -62,3 +63,4 @@ At present, there are 7 pretrained models of such models open-sourced by PaddleC
 | HRNet_W48_C | 224       | 256               | 12.65015                     | 23.12886                     | 33.37859                     | 13.70761                     | 34.43572                     | 63.01219                     |
 | HRNet_W48_C_ssld | 224       | 256               | 12.65015                     | 23.12886                     | 33.37859                     | 13.70761                     | 34.43572                     | 63.01219                     |
 | HRNet_W64_C | 224       | 256               | 15.10428                     | 27.68901                     | 40.4198                      | 17.57527                     | 47.9533                      | 97.11228                     |
+| SE_HRNet_W64_C_ssld | 224       | 256               |                      |                      |                       |                      |                       |                     |
