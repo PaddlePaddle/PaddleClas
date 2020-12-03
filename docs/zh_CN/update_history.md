@@ -1,5 +1,8 @@
 # 更新日志
 
+- 2020.12.03
+    * 添加SE_HRNet_W64_C_ssld模型，在ImageNet上Top-1 Acc可达0.8475。
+    
 - 2020.11.23
     * 添加GhostNet_x1_3_ssld模型，在ImageNet上Top-1 Acc可达0.7938。
 
