@@ -223,13 +223,12 @@ class SELayer(nn.Layer):
 
     def forward(self, input):
         pool = self.pool2d_gap(input)
-        pool = paddle.reshape(pool, shape=[-1, self._num_channels])
+        pool = paddle.squeeze(pool, axis=[2, 3])
         squeeze = self.squeeze(pool)
         squeeze = F.relu(squeeze)
         excitation = self.excitation(squeeze)
         excitation = F.sigmoid(excitation)
-        excitation = paddle.reshape(
-            excitation, shape=[-1, self._num_channels, 1, 1])
+        excitation = paddle.unsqueeze(excitation, axis=[2, 3])
         out = input * excitation
         return out
 
