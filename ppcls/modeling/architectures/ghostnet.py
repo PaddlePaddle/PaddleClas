@@ -83,13 +83,12 @@ class SEBlock(nn.Layer):
 
     def forward(self, inputs):
         pool = self.pool2d_gap(inputs)
-        pool = paddle.reshape(pool, shape=[-1, self._num_channels])
+        pool = paddle.squeeze(pool, axis=[2, 3])
         squeeze = self.squeeze(pool)
         squeeze = F.relu(squeeze)
         excitation = self.excitation(squeeze)
         excitation = paddle.clip(x=excitation, min=0, max=1)
-        excitation = paddle.reshape(
-            excitation, shape=[-1, self._num_channels, 1, 1])
+        excitation = paddle.unsqueeze(excitation, axis=[2, 3])
         out = inputs * excitation
         return out
 
