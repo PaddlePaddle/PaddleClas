@@ -1,6 +1,6 @@
 # Release Notes
 
-- 2020.12.03
+- 2020.12.06
     * Add `SE_HRNet_W64_C_ssld` pretrained model, whose Top-1 Acc on ImageNet1k dataset reaches 84.75%.
 
 - 2020.11.23
