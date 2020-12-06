@@ -55,7 +55,10 @@ def create_model(args, model, input, class_dim=1000):
 def main():
     args = parse_args()
 
-    model = architectures.__dict__[args.model]()
+    if "EfficientNet" in args.model:
+        model = architectures.__dict__[args.model](is_test=True)
+    else:
+        model = architectures.__dict__[args.model]()
 
     place = fluid.CPUPlace()
     exe = fluid.Executor(place)
