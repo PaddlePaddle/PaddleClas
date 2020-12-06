@@ -90,7 +90,11 @@ def main(args):
         predictor.run()
 
         output = output_tensor.copy_to_cpu()
-        return utils.postprocess(output, args)
+        classes, scores = utils.postprocess(output, args)
+        print("Current image file: {}".format(args.image_file))
+        print("\ttop-1 class: {0}".format(classes[0]))
+        print("\ttop-1 score: {0}".format(scores[0]))
+
     else:
         for i in range(0, test_num + 10):
             inputs = np.random.rand(args.batch_size, 3, 224,
@@ -115,7 +119,4 @@ def main(args):
 
 if __name__ == "__main__":
     args = utils.parse_args()
-    classes, scores = main(args)
-    print("Current image file: {}".format(args.image_file))
-    print("\ttop-1 class: {0}".format(classes[0]))
-    print("\ttop-1 score: {0}".format(scores[0]))
+    main(args)

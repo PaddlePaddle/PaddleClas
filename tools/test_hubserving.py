@@ -85,7 +85,7 @@ def main(url, image_path, top_k=1):
         logger.info(message)
 
     logger.info("The average time cost: {}".format(float(total_time) / cnt))
-    logger.info("The average top-1 accuracy: {}".format(float(all_acc) / cnt))
+    logger.info("The average top-1 score: {}".format(float(all_acc) / cnt))
 
 
 if __name__ == '__main__':
