@@ -25,6 +25,7 @@ from collections import OrderedDict
 import paddle
 import paddle.nn.functional as F
 from paddle import fluid
+from paddle.fluid.contrib.mixed_precision.fp16_utils import cast_model_to_fp16
 
 from ppcls.optimizer.learning_rate import LearningRateBuilder
 from ppcls.optimizer.optimizer import OptimizerBuilder
@@ -40,7 +41,7 @@ from paddle.distributed import fleet
 from paddle.distributed.fleet import DistributedStrategy
 
 
-def create_feeds(image_shape, use_mix=None, use_dali=None):
+def create_feeds(image_shape, use_mix=None, use_dali=None, dtype="float32"):
     """
     Create feeds as model input
 
@@ -53,14 +54,14 @@ def create_feeds(image_shape, use_mix=None, use_dali=None):
     """
     feeds = OrderedDict()
     feeds['image'] = paddle.static.data(
-        name="feed_image", shape=[None] + image_shape, dtype="float32")
+        name="feed_image", shape=[None] + image_shape, dtype=dtype)
     if use_mix and not use_dali:
         feeds['feed_y_a'] = paddle.static.data(
             name="feed_y_a", shape=[None, 1], dtype="int64")
         feeds['feed_y_b'] = paddle.static.data(
             name="feed_y_b", shape=[None, 1], dtype="int64")
         feeds['feed_lam'] = paddle.static.data(
-            name="feed_lam", shape=[None, 1], dtype="float32")
+            name="feed_lam", shape=[None, 1], dtype=dtype)
     else:
         feeds['label'] = paddle.static.data(
             name="feed_label", shape=[None, 1], dtype="int64")
@@ -68,7 +69,7 @@ def create_feeds(image_shape, use_mix=None, use_dali=None):
     return feeds
 
 
-def create_model(architecture, image, classes_num, is_train):
+def create_model(architecture, image, classes_num, config, is_train):
     """
     Create a model
 
@@ -77,20 +78,27 @@ def create_model(architecture, image, classes_num, is_train):
             name(such as ResNet50) is needed
         image(variable): model input variable
         classes_num(int): num of classes
+        config(dict): model config
 
     Returns:
         out(variable): model output variable
     """
+    use_pure_fp16 = config.get("use_pure_fp16", False)
     name = architecture["name"]
     params = architecture.get("params", {})
     if "is_test" in params:
         params['is_test'] = not is_train
     model = architectures.__dict__[name](class_dim=classes_num, **params)
     
+    if use_pure_fp16 and not config.get("use_dali", False):
+        image = fluid.layers.cast(image, 'float16')
     if "data_format" in params and params["data_format"] == "NHWC":
         image = fluid.layers.transpose(image, [0, 2, 3, 1])
         image.stop_gradient = True
     out = model(image)
+    if config.get("use_pure_fp16", False):
+        cast_model_to_fp16(fluid.default_main_program())
+        out = fluid.layers.cast(x=out, dtype="float32")
     return out
 
 
@@ -152,6 +160,7 @@ def create_metric(out,
                   architecture,
                   topk=5,
                   classes_num=1000,
+                  config=None,
                   use_distillation=False):
     """
     Create measures of model accuracy, such as top1 and top5
@@ -161,6 +170,7 @@ def create_metric(out,
         feeds(dict): dict of model input variables(included label)
         topk(int): usually top5
         classes_num(int): num of classes
+        config(dict) : model config
 
     Returns:
         fetchs(dict): dict of measures
@@ -194,6 +204,7 @@ def create_fetchs(out,
                   classes_num=1000,
                   epsilon=None,
                   use_mix=False,
+                  config=None,
                   use_distillation=False):
     """
     Create fetchs as model outputs(included loss and measures),
@@ -209,6 +220,7 @@ def create_fetchs(out,
         classes_num(int): num of classes
         epsilon(float): parameter for label smoothing, 0.0 <= epsilon <= 1.0
         use_mix(bool): whether to use mix(include mixup, cutmix, fmix)
+        config(dict): model config
 
     Returns:
         fetchs(dict): dict of model outputs(included loss and measures)
@@ -219,7 +231,7 @@ def create_fetchs(out,
     fetchs['loss'] = (loss, AverageMeter('loss', '7.4f', need_avg=True))
     if not use_mix:
         metric = create_metric(out, feeds, architecture, topk, classes_num,
-                               use_distillation)
+                               config, use_distillation)
         fetchs.update(metric)
 
     return fetchs
@@ -259,7 +271,7 @@ def create_optimizer(config):
 
     # create optimizer instance
     opt_config = config['OPTIMIZER']
-    opt = OptimizerBuilder(**opt_config)
+    opt = OptimizerBuilder(config, **opt_config)
     return opt(lr), lr
 
 
@@ -288,10 +300,10 @@ def dist_optimizer(config, optimizer):
 
 
 def mixed_precision_optimizer(config, optimizer):
-    use_fp16 = config.get('use_fp16', False)
+    use_amp = config.get('use_amp', False)
     scale_loss = config.get('scale_loss', 1.0)
     use_dynamic_loss_scaling = config.get('use_dynamic_loss_scaling', False)
-    if use_fp16:
+    if use_amp:
         optimizer = fluid.contrib.mixed_precision.decorate(
             optimizer,
             init_loss_scaling=scale_loss,
@@ -325,13 +337,18 @@ def build(config, main_prog, startup_prog, is_train=True, is_distributed=True):
             use_mix = config.get('use_mix') and is_train
             use_dali = config.get('use_dali', False)
             use_distillation = config.get('use_distillation')
+
+            image_dtype = "float32"
+            if config["ARCHITECTURE"]["name"] == "ResNet50" and config.get("use_pure_fp16", False) \
+                and config.get("use_dali", False):
+                image_dtype = "float16"
             feeds = create_feeds(
-                config.image_shape, use_mix=use_mix, use_dali=use_dali)
+                config.image_shape, use_mix=use_mix, use_dali=use_dali, dtype = image_dtype)
             if use_dali and use_mix:
                 import dali
                 feeds = dali.mix(feeds, config, is_train)
             out = create_model(config.ARCHITECTURE, feeds['image'],
-                               config.classes_num, is_train)
+                               config.classes_num, config, is_train)
             fetchs = create_fetchs(
                 out,
                 feeds,
@@ -340,6 +357,7 @@ def build(config, main_prog, startup_prog, is_train=True, is_distributed=True):
                 config.classes_num,
                 epsilon=config.get('ls_epsilon'),
                 use_mix=use_mix,
+                config=config,
                 use_distillation=use_distillation)
             lr_scheduler = None
             if is_train:
@@ -368,13 +386,13 @@ def compile(config, program, loss_name=None, share_prog=None):
     exec_strategy = paddle.static.ExecutionStrategy()
 
     exec_strategy.num_threads = 1
-    exec_strategy.num_iteration_per_drop_scope = 10
+    exec_strategy.num_iteration_per_drop_scope = 10000
 
-    use_fp16 = config.get('use_fp16', False)
-    fuse_bn_act_ops = config.get('fuse_bn_act_ops', use_fp16)
-    fuse_elewise_add_act_ops = config.get('fuse_elewise_add_act_ops', use_fp16)
-    fuse_bn_add_act_ops = config.get('fuse_bn_add_act_ops', use_fp16)
-    enable_addto = config.get('enable_addto', use_fp16)
+    use_amp = config.get('use_amp', False)
+    fuse_bn_act_ops = config.get('fuse_bn_act_ops', use_amp)
+    fuse_elewise_add_act_ops = config.get('fuse_elewise_add_act_ops', use_amp)
+    fuse_bn_add_act_ops = config.get('fuse_bn_add_act_ops', use_amp)
+    enable_addto = config.get('enable_addto', use_amp)
 
     try:
         build_strategy.fuse_bn_act_ops = fuse_bn_act_ops
@@ -447,9 +465,6 @@ def run(dataloader,
         m.reset()
     batch_time = AverageMeter('elapse', '.3f')
     use_dali = config.get('use_dali', False)
-    if use_dali:
-         print("use_dali:", use_dali)
-    print("use_dali:", use_dali)
     dataloader = dataloader if use_dali else dataloader()
     tic = time.time()
     for idx, batch in enumerate(dataloader):

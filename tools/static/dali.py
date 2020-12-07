@@ -44,7 +44,9 @@ class HybridTrainPipe(Pipeline):
                  num_shards=1,
                  random_shuffle=True,
                  num_threads=4,
-                 seed=42):
+                 seed=42,
+                 pad_output=False,
+                 output_dtype=types.FLOAT):
         super(HybridTrainPipe, self).__init__(
             batch_size, num_threads, device_id, seed=seed)
         self.input = ops.FileReader(
@@ -69,12 +71,13 @@ class HybridTrainPipe(Pipeline):
             device='gpu', resize_x=crop, resize_y=crop, interp_type=interp)
         self.cmnp = ops.CropMirrorNormalize(
             device="gpu",
-            output_dtype=types.FLOAT,
+            output_dtype=output_dtype,
             output_layout=types.NCHW,
             crop=(crop, crop),
             image_type=types.RGB,
             mean=mean,
-            std=std)
+            std=std,
+            pad_output=pad_output)
         self.coin = ops.CoinFlip(probability=0.5)
         self.to_int64 = ops.Cast(dtype=types.INT64, device="gpu")
 
@@ -105,7 +108,9 @@ class HybridValPipe(Pipeline):
                  num_shards=1,
                  random_shuffle=False,
                  num_threads=4,
-                 seed=42):
+                 seed=42,
+                 pad_output=False,
+                 output_dtype=types.FLOAT):
         super(HybridValPipe, self).__init__(
             batch_size, num_threads, device_id, seed=seed)
         self.input = ops.FileReader(
@@ -119,12 +124,13 @@ class HybridValPipe(Pipeline):
             device="gpu", resize_shorter=resize_shorter, interp_type=interp)
         self.cmnp = ops.CropMirrorNormalize(
             device="gpu",
-            output_dtype=types.FLOAT,
+            output_dtype=output_dtype,
             output_layout=types.NCHW,
             crop=(crop, crop),
             image_type=types.RGB,
             mean=mean,
-            std=std)
+            std=std,
+            pad_output=pad_output)
         self.to_int64 = ops.Cast(dtype=types.INT64, device="gpu")
 
     def define_graph(self):
@@ -170,8 +176,13 @@ def build(config, mode='train'):
         2: types.INTERP_CUBIC,  # cv2.INTER_CUBIC
         4: types.INTERP_LANCZOS3,  # XXX use LANCZOS3 for cv2.INTER_LANCZOS4
     }
+    output_dtype = types.FLOAT16 if config.get("use_pure_fp16", False) else types.FLOAT
     assert interp in interp_map, "interpolation method not supported by DALI"
     interp = interp_map[interp]
+    pad_output = False
+    image_shape = config.ARCHITECTURE.get("params", {}).get('image_shape', None)
+    if image_shape and image_shape[0] == 4:
+        pad_output = True
 
     transforms = {
         k: v
@@ -214,7 +225,9 @@ def build(config, mode='train'):
                 device_id,
                 shard_id,
                 num_shards,
-                seed=42 + shard_id)
+                seed=42 + shard_id,
+                pad_output=pad_output,
+                output_dtype=output_dtype)
             pipe.build()
             pipelines = [pipe]
             sample_per_shard = len(pipe) // num_shards
@@ -241,7 +254,9 @@ def build(config, mode='train'):
                     device_id,
                     idx,
                     num_shards,
-                    seed=42 + idx)
+                    seed=42 + idx,
+                pad_output=pad_output,
+                output_dtype=output_dtype)
                 pipe.build()
                 pipelines.append(pipe)
             sample_per_shard = len(pipelines[0])
@@ -264,7 +279,9 @@ def build(config, mode='train'):
             interp,
             mean,
             std,
-            device_id=device_id)
+            device_id=device_id,
+            pad_output=pad_output,
+            output_dtype=output_dtype)
         pipe.build()
         return DALIGenericIterator(
             pipe, ['feed_image', 'feed_label'],

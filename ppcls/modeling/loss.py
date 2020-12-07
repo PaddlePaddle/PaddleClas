@@ -48,8 +48,8 @@ class Loss(object):
             input = -F.log_softmax(input, axis=-1)
             cost = paddle.sum(target * input, axis=-1)
         else:
-            cost = F.cross_entropy(input=input, label=target)
-        avg_cost = paddle.mean(cost)
+            cost = F.cross_entropy(input=input, label=target)      
+        avg_cost = paddle.fluid.layers.reduce_sum(cost)
         return avg_cost
 
     def _kldiv(self, input, target, name=None):
@@ -94,8 +94,8 @@ class MixCELoss(Loss):
     def __call__(self, input, target0, target1, lam):
         cost0 = self._crossentropy(input, target0)
         cost1 = self._crossentropy(input, target1)
-        cost = lam * cost0 + (1.0 - lam) * cost1
-        avg_cost = paddle.mean(cost)
+        cost = lam * cost0 + (1.0 - lam) * cost1      
+        avg_cost = paddle.fluid.layers.reduce_sum(cost)
         return avg_cost
 
 

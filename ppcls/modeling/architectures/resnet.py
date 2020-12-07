@@ -183,11 +183,13 @@ class BasicBlock(nn.Layer):
 
 
 class ResNet(nn.Layer):
-    def __init__(self, layers=50, class_dim=1000, data_format="NCHW"):
+    def __init__(self, layers=50, class_dim=1000, data_format="NCHW", image_shape=[3, 224, 224]):
         super(ResNet, self).__init__()
 
         self.layers = layers
         self.data_format = data_format
+        self.image_shape = image_shape
+
         supported_layers = [18, 34, 50, 101, 152]
         assert layers in supported_layers, \
             "supported layers are {} but input layer is {}".format(
@@ -206,14 +208,18 @@ class ResNet(nn.Layer):
         num_filters = [64, 128, 256, 512]
 
         self.conv = ConvBNLayer(
-            num_channels=3,
+            num_channels=self.image_shape[0],
             num_filters=64,
             filter_size=7,
             stride=2,
             act="relu",
             name="conv1",
             data_format=self.data_format)
-        self.pool2d_max = MaxPool2D(kernel_size=3, stride=2, padding=1, data_format=self.data_format)
+        self.pool2d_max = MaxPool2D(
+            kernel_size=3,
+            stride=2, 
+            padding=1,
+            data_format=self.data_format)
 
         self.block_list = []
         if layers >= 50:

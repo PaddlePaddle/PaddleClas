@@ -27,6 +27,7 @@ from sys import version_info
 
 import paddle
 import paddle.fluid as fluid
+from paddle.fluid.contrib.mixed_precision.fp16_utils import cast_parameters_to_fp16
 from paddle.distributed import fleet
 
 from ppcls.data import Reader
@@ -69,8 +70,9 @@ def main(args):
     place = paddle.set_device("gpu")
     
     # amp related config
-    use_fp16 = config.get('use_fp16', False)
-    if use_fp16:
+    use_amp = config.get('use_amp', False)
+    use_pure_fp16 = config.get('use_pure_fp16', False)
+    if use_amp or use_pure_fp16:
         AMP_RELATED_FLAGS_SETTING = {
             'FLAGS_cudnn_exhaustive_search': 1,
             'FLAGS_conv_workspace_size_limit': 4000,
@@ -117,6 +119,8 @@ def main(args):
     exe = paddle.static.Executor(place)
     # Parameter initialization
     exe.run(startup_prog)
+    if config.get("use_pure_fp16", False):	
+        cast_parameters_to_fp16(place, train_prog, fluid.global_scope())
     # load pretrained models or checkpoints
     init_model(config, train_prog, exe)
 

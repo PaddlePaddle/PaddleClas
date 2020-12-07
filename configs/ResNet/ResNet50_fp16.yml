@@ -3,6 +3,7 @@ ARCHITECTURE:
     name: 'ResNet50'
     params:
         data_format: "NCHW"
+        image_shape: [3, 224, 224]
 
 pretrained_model: ""
 model_save_dir: "./output/"
@@ -17,7 +18,9 @@ image_shape: [3, 224, 224]
 is_distributed: True
 
 # mixed precision training
-use_fp16: True
+use_amp: True
+use_pure_fp16: False
+multi_precision: True
 scale_loss: 128.0
 use_dynamic_loss_scaling: True
 
