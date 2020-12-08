@@ -386,13 +386,13 @@ def compile(config, program, loss_name=None, share_prog=None):
     exec_strategy = paddle.static.ExecutionStrategy()
 
     exec_strategy.num_threads = 1
-    exec_strategy.num_iteration_per_drop_scope = 10000
+    exec_strategy.num_iteration_per_drop_scope = 10000 if config.get('use_pure_fp16', False) else 10
 
-    use_amp = config.get('use_amp', False)
-    fuse_bn_act_ops = config.get('fuse_bn_act_ops', use_amp)
-    fuse_elewise_add_act_ops = config.get('fuse_elewise_add_act_ops', use_amp)
-    fuse_bn_add_act_ops = config.get('fuse_bn_add_act_ops', use_amp)
-    enable_addto = config.get('enable_addto', use_amp)
+    fuse_op = config.get('use_amp', False) or config.get('use_pure_fp16', False)
+    fuse_bn_act_ops = config.get('fuse_bn_act_ops', fuse_op)
+    fuse_elewise_add_act_ops = config.get('fuse_elewise_add_act_ops', fuse_op)
+    fuse_bn_add_act_ops = config.get('fuse_bn_add_act_ops', fuse_op)
+    enable_addto = config.get('enable_addto', fuse_op)
 
     try:
         build_strategy.fuse_bn_act_ops = fuse_bn_act_ops
