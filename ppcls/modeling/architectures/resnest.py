@@ -90,7 +90,7 @@ class rSoftmax(nn.Layer):
                 ])
             x = paddle.transpose(x=x, perm=[0, 2, 1, 3])
             x = nn.functional.softmax(x, axis=1)
-            x = paddle.reshape(x=x, shape=[batch, r * h * w])
+            x = paddle.reshape(x=x, shape=[batch, r * h * w, 1, 1])
         else:
             x = nn.functional.sigmoid(x)
         return x
@@ -165,7 +165,6 @@ class SplatConv(nn.Layer):
 
         atten = self.conv3(gap)
         atten = self.rsoftmax(atten)
-        atten = paddle.unsqueeze(x=atten, axis=[2, 3])
 
         if self.radix > 1:
             attens = paddle.split(atten, num_or_sections=self.radix, axis=1)
