@@ -144,7 +144,7 @@ hub uninstall clas_system
 ```
 - 4. Install modified service module
 ```shell
-hub install deploy/hubserving/clas_system/
+hub install deploy/hubserving/clas/
 ```
 - 5. Restart service
 ```shell

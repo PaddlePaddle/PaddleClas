@@ -25,7 +25,7 @@ import numpy as np
 import paddlehub as hub
 
 import tools.infer.predict as paddle_predict
-from tools.infer.utils import Base64ToCV2
+from tools.infer.utils import Base64ToCV2, create_paddle_predictor
 from deploy.hubserving.clas.params import read_params
 
 
@@ -96,6 +96,7 @@ class ClasSystem(hub.Module):
 
         assert predicted_data != [], "There is not any image to be predicted. Please check the input data."
 
+        predictor = create_paddle_predictor(self.args)
         all_results = []
         for img in predicted_data:
             if img is None:
@@ -106,7 +107,7 @@ class ClasSystem(hub.Module):
 
             self.args.image_file = img
             self.args.top_k = top_k
-            classes, scores = paddle_predict.main(self.args)
+            classes, scores = paddle_predict.predict(self.args, predictor)
 
             elapse = time.time() - starttime
             logger.info("Predict time: {}".format(elapse))
