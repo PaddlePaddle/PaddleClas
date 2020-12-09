@@ -114,7 +114,8 @@ def create_loss(out,
                 classes_num=1000,
                 epsilon=None,
                 use_mix=False,
-                use_distillation=False):
+                use_distillation=False,
+                use_pure_fp16=False):
     """
     Create a loss for optimization, such as:
         1. CrossEnotry loss
@@ -131,6 +132,7 @@ def create_loss(out,
         classes_num(int): num of classes
         epsilon(float): parameter for label smoothing, 0.0 <= epsilon <= 1.0
         use_mix(bool): whether to use mix(include mixup, cutmix, fmix)
+        use_pure_fp16(bool): whether to use pure fp16 data as training parameter
 
     Returns:
         loss(variable): loss variable
@@ -155,10 +157,10 @@ def create_loss(out,
 
     if use_mix:
         loss = MixCELoss(class_dim=classes_num, epsilon=epsilon)
-        return loss(out, feed_y_a, feed_y_b, feed_lam)
+        return loss(out, feed_y_a, feed_y_b, feed_lam, use_pure_fp16)
     else:
         loss = CELoss(class_dim=classes_num, epsilon=epsilon)
-        return loss(out, target)
+        return loss(out, target, use_pure_fp16)
 
 
 def create_metric(out,
@@ -232,8 +234,9 @@ def create_fetchs(out,
         fetchs(dict): dict of model outputs(included loss and measures)
     """
     fetchs = OrderedDict()
+    use_pure_fp16 = config.get("use_pure_fp16", False)
     loss = create_loss(out, feeds, architecture, classes_num, epsilon, use_mix,
-                       use_distillation)
+                       use_distillation, use_pure_fp16)
     fetchs['loss'] = (loss, AverageMeter('loss', '7.4f', need_avg=True))
     if not use_mix:
         metric = create_metric(out, feeds, architecture, topk, classes_num,
