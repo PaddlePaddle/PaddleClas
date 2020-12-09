@@ -15,6 +15,8 @@
 import argparse
 import cv2
 import numpy as np
+from paddle.inference import Config
+from paddle.inference import create_predictor
 
 
 def parse_args():
@@ -63,6 +65,34 @@ def parse_args():
     parser.add_argument("--pre_label_out_idr", type=str, default=None)
 
     return parser.parse_args()
+
+
+def create_paddle_predictor(args):
+    config = Config(args.model_file, args.params_file)
+
+    if args.use_gpu:
+        config.enable_use_gpu(args.gpu_mem, 0)
+    else:
+        config.disable_gpu()
+        if args.enable_mkldnn:
+            # cache 10 different shapes for mkldnn to avoid memory leak
+            config.set_mkldnn_cache_capacity(10)
+            config.enable_mkldnn()
+
+    config.disable_glog_info()
+    config.switch_ir_optim(args.ir_optim)  # default true
+    if args.use_tensorrt:
+        config.enable_tensorrt_engine(
+            precision_mode=Config.Precision.Half
+            if args.use_fp16 else Config.Precision.Float32,
+            max_batch_size=args.batch_size)
+
+    config.enable_memory_optim()
+    # use zero copy
+    config.switch_use_feed_fetch_ops(False)
+    predictor = create_predictor(config)
+
+    return predictor
 
 
 def preprocess(img, args):

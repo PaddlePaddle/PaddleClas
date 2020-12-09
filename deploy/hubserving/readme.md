@@ -138,7 +138,7 @@ hub serving start -c deploy/hubserving/clas/config.json
 ```hub uninstall clas_system```  
 
 - 4、 安装修改后的新服务包  
-```hub install deploy/hubserving/clas_system/```  
+```hub install deploy/hubserving/clas/```  
 
 - 5、重新启动服务  
 ```hub serving start -m clas_system```  

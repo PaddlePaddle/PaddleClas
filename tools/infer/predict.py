@@ -19,51 +19,8 @@ import numpy as np
 import cv2
 import time
 
-from paddle.inference import Config
-from paddle.inference import create_predictor
 
-
-def create_paddle_predictor(args):
-    config = Config(args.model_file, args.params_file)
-
-    if args.use_gpu:
-        config.enable_use_gpu(args.gpu_mem, 0)
-    else:
-        config.disable_gpu()
-        if args.enable_mkldnn:
-            # cache 10 different shapes for mkldnn to avoid memory leak
-            config.set_mkldnn_cache_capacity(10)
-            config.enable_mkldnn()
-
-    config.disable_glog_info()
-    config.switch_ir_optim(args.ir_optim)  # default true
-    if args.use_tensorrt:
-        config.enable_tensorrt_engine(
-            precision_mode=Config.Precision.Half
-            if args.use_fp16 else Config.Precision.Float32,
-            max_batch_size=args.batch_size)
-
-    config.enable_memory_optim()
-    # use zero copy
-    config.switch_use_feed_fetch_ops(False)
-    predictor = create_predictor(config)
-
-    return predictor
-
-
-def main(args):
-    if not args.enable_benchmark:
-        assert args.batch_size == 1
-        assert args.use_fp16 is False
-    else:
-        assert args.use_gpu is True
-        assert args.model is not None
-    # HALF precission predict only work when using tensorrt
-    if args.use_fp16 is True:
-        assert args.use_tensorrt is True
-
-    predictor = create_paddle_predictor(args)
-
+def predict(args, predictor):
     input_names = predictor.get_input_names()
     input_tensor = predictor.get_input_handle(input_names[0])
 
@@ -91,10 +48,11 @@ def main(args):
 
         output = output_tensor.copy_to_cpu()
         classes, scores = utils.postprocess(output, args)
+        if args.hubserving:
+            return classes, scores
         print("Current image file: {}".format(args.image_file))
         print("\ttop-1 class: {0}".format(classes[0]))
         print("\ttop-1 score: {0}".format(scores[0]))
-
     else:
         for i in range(0, test_num + 10):
             inputs = np.random.rand(args.batch_size, 3, 224,
@@ -115,6 +73,19 @@ def main(args):
         print("{0}\t{1}\t{2}\tbatch size: {3}\ttime(ms): {4}".format(
             args.model, trt_msg, fp_message, args.batch_size, 1000 * test_time
             / test_num))
+
+
+def main(args):
+    if not args.enable_benchmark:
+        assert args.batch_size == 1
+    else:
+        assert args.model is not None
+    # HALF precission predict only work when using tensorrt
+    if args.use_fp16 is True:
+        assert args.use_tensorrt is True
+
+    predictor = utils.create_paddle_predictor(args)
+    predict(args, predictor)
 
 
 if __name__ == "__main__":
