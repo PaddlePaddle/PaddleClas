@@ -86,13 +86,19 @@ def create_model(architecture, image, classes_num, config, is_train):
     use_pure_fp16 = config.get("use_pure_fp16", False)
     name = architecture["name"]
     params = architecture.get("params", {})
+    data_format = config.get("data_format", "NCHW")
+    input_image_channel = config.get('image_shape', [3, 224, 224])[0]
     if "is_test" in params:
         params['is_test'] = not is_train
-    model = architectures.__dict__[name](class_dim=classes_num, **params)
+    model = architectures.__dict__[name](
+                class_dim=classes_num,
+                input_image_channel=input_image_channel,
+                data_format=data_format,
+                **params)
     
     if use_pure_fp16 and not config.get("use_dali", False):
         image = fluid.layers.cast(image, 'float16')
-    if "data_format" in params and params["data_format"] == "NHWC":
+    if data_format == "NHWC":
         image = fluid.layers.transpose(image, [0, 2, 3, 1])
         image.stop_gradient = True
     out = model(image)

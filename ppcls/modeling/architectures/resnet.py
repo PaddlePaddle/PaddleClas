@@ -183,12 +183,12 @@ class BasicBlock(nn.Layer):
 
 
 class ResNet(nn.Layer):
-    def __init__(self, layers=50, class_dim=1000, data_format="NCHW", image_shape=[3, 224, 224]):
+    def __init__(self, layers=50, class_dim=1000, input_image_channel=3, data_format="NCHW"):
         super(ResNet, self).__init__()
 
         self.layers = layers
         self.data_format = data_format
-        self.image_shape = image_shape
+        self.input_image_channel = input_image_channel
 
         supported_layers = [18, 34, 50, 101, 152]
         assert layers in supported_layers, \
@@ -208,7 +208,7 @@ class ResNet(nn.Layer):
         num_filters = [64, 128, 256, 512]
 
         self.conv = ConvBNLayer(
-            num_channels=self.image_shape[0],
+            num_channels=self.input_image_channel,
             num_filters=64,
             filter_size=7,
             stride=2,

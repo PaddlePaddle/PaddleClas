@@ -180,7 +180,7 @@ def build(config, mode='train'):
     assert interp in interp_map, "interpolation method not supported by DALI"
     interp = interp_map[interp]
     pad_output = False
-    image_shape = config.ARCHITECTURE.get("params", {}).get('image_shape', None)
+    image_shape = config.get("image_shape", None)
     if image_shape and image_shape[0] == 4:
         pad_output = True
 
