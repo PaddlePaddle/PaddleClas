@@ -97,14 +97,14 @@ def create_model(architecture, image, classes_num, config, is_train):
                 **params)
     
     if use_pure_fp16 and not config.get("use_dali", False):
-        image = fluid.layers.cast(image, 'float16')
+        image = image.astype('float16')
     if data_format == "NHWC":
-        image = fluid.layers.transpose(image, [0, 2, 3, 1])
+        image = paddle.tensor.transpose(image, [0, 2, 3, 1])
         image.stop_gradient = True
     out = model(image)
     if config.get("use_pure_fp16", False):
-        cast_model_to_fp16(fluid.default_main_program())
-        out = fluid.layers.cast(x=out, dtype="float32")
+        cast_model_to_fp16(paddle.static.default_main_program())
+        out = out.astype('float32')
     return out
 
 
