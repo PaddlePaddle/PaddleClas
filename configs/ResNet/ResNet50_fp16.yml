@@ -17,7 +17,7 @@ is_distributed: True
 # mixed precision training
 use_amp: True
 use_pure_fp16: False
-multi_precision: True
+multi_precision: False
 scale_loss: 128.0
 use_dynamic_loss_scaling: True
 data_format: "NCHW"

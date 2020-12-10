@@ -19,6 +19,7 @@ from __future__ import print_function
 import sys
 
 import paddle
+import paddle.fluid as fluid
 import paddle.regularizer as regularizer
 
 __all__ = ['OptimizerBuilder']
@@ -74,19 +75,24 @@ class Momentum(object):
                  momentum,
                  parameter_list=None,
                  regularization=None,
+                 config=None,
                  **args):
         super(Momentum, self).__init__()
         self.learning_rate = learning_rate
         self.momentum = momentum
         self.parameter_list = parameter_list
         self.regularization = regularization
+        self.multi_precision = config.get('multi_precision', False)
+        self.rescale_grad = (1.0 / (config['TRAIN']['batch_size'] / len(fluid.cuda_places()))
+            if config.get('use_pure_fp16', False) else 1.0)
 
     def __call__(self):
-        opt = paddle.optimizer.Momentum(
+        opt = fluid.contrib.optimizer.Momentum(
             learning_rate=self.learning_rate,
             momentum=self.momentum,
-            parameters=self.parameter_list,
-            weight_decay=self.regularization)
+            regularization=self.regularization,
+            multi_precision=self.multi_precision,
+            rescale_grad=self.rescale_grad)
         return opt
 
 
@@ -141,11 +147,13 @@ class OptimizerBuilder(object):
     """
 
     def __init__(self,
+                 config=None,
                  function='Momentum',
                  params={'momentum': 0.9},
                  regularizer=None):
         self.function = function
         self.params = params
+        self.config = config
         # create regularizer
         if regularizer is not None:
             mod = sys.modules[__name__]
@@ -159,4 +167,5 @@ class OptimizerBuilder(object):
         opt = getattr(mod, self.function)
         return opt(learning_rate=learning_rate,
                    parameter_list=parameter_list,
+                   config=self.config,
                    **self.params)()

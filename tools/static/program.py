@@ -21,6 +21,7 @@ import time
 import numpy as np
 
 from collections import OrderedDict
+from optimizer import OptimizerBuilder
 
 import paddle
 import paddle.nn.functional as F
@@ -28,7 +29,6 @@ from paddle import fluid
 from paddle.fluid.contrib.mixed_precision.fp16_utils import cast_model_to_fp16
 
 from ppcls.optimizer.learning_rate import LearningRateBuilder
-from ppcls.optimizer.optimizer import OptimizerBuilder
 from ppcls.modeling import architectures
 from ppcls.modeling.loss import CELoss
 from ppcls.modeling.loss import MixCELoss
