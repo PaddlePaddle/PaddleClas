@@ -298,6 +298,11 @@ def run(dataloader,
 
     tic = time.time()
     for idx, batch in enumerate(dataloader()):
+        # avoid statistics from warmup time
+        if idx == 10:
+            metric_list["batch_time"].reset()
+            metric_list["reader_time"].reset()
+
         metric_list['reader_time'].update(time.time() - tic)
         batch_size = len(batch[0])
         feeds = create_feeds(batch, use_mix)
@@ -327,11 +332,15 @@ def run(dataloader,
         metric_list["batch_time"].update(time.time() - tic)
         tic = time.time()
 
-        fetchs_str = ' '.join([str(m.value) for m in metric_list.values()])
+        fetchs_str = ' '.join([
+            str(metric_list[key].mean)
+            if "time" in key else str(metric_list[key].value)
+            for key in metric_list
+        ])
 
         if idx % print_interval == 0:
             ips_info = "ips: {:.5f} images/sec.".format(
-                batch_size / metric_list["batch_time"].val)
+                batch_size / metric_list["batch_time"].avg)
             if mode == 'eval':
                 logger.info("{:s} step:{:<4d}, {:s} {:s}".format(
                     mode, idx, fetchs_str, ips_info))

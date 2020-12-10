@@ -1,6 +1,6 @@
-python -m paddle.distributed.launch \
-    --selected_gpus="0" \
+python3.7 -m paddle.distributed.launch \
+    --gpus="0,1,2,3" \
     tools/eval.py \
-        -c ./configs/eval.yaml \
-        -o load_static_weights=True \
-        -o use_gpu=False
+        -c ./configs/ResNet/ResNet50.yaml \
+        -o pretrained_model="./ResNet50_pretrained" \
+        -o use_gpu=True

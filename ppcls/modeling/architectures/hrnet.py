@@ -179,7 +179,8 @@ class Branches(nn.Layer):
         outs = []
         for idx, input in enumerate(inputs):
             conv = input
-            for basic_block_func in self.basic_block_list[idx]:
+            basic_block_list = self.basic_block_list[idx]
+            for basic_block_func in basic_block_list:
                 conv = basic_block_func(conv)
             outs.append(conv)
         return outs
