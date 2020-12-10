@@ -92,8 +92,9 @@ def main(args):
         # 2. validate with validate dataset
         if config.validate and epoch_id % config.valid_interval == 0:
             net.eval()
-            top1_acc = program.run(valid_dataloader, config, net, None, None,
-                                   epoch_id, 'valid')
+            with paddle.no_grad():
+                top1_acc = program.run(valid_dataloader, config, net, None,
+                                       None, epoch_id, 'valid')
             if top1_acc > best_top1_acc:
                 best_top1_acc = top1_acc
                 best_top1_epoch = epoch_id

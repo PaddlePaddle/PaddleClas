@@ -165,7 +165,7 @@ class SplatConv(nn.Layer):
 
         atten = self.conv3(gap)
         atten = self.rsoftmax(atten)
-        atten = paddle.unsqueeze(x=atten, axis=[2, 3])
+        atten = paddle.reshape(x=atten, shape=[-1, atten.shape[1], 1, 1])
 
         if self.radix > 1:
             attens = paddle.split(atten, num_or_sections=self.radix, axis=1)

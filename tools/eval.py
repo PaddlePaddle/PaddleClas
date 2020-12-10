@@ -67,9 +67,9 @@ def main(args, return_dict={}):
     init_model(config, net, optimizer=None)
     valid_dataloader = Reader(config, 'valid', places=place)()
     net.eval()
-
-    top1_acc = program.run(valid_dataloader, config, net, None, None, 0,
-                           'valid')
+    with paddle.no_grad():
+        top1_acc = program.run(valid_dataloader, config, net, None, None, 0,
+                               'valid')
     return_dict["top1_acc"] = top1_acc
     return top1_acc
 
