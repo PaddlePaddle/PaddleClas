@@ -88,7 +88,7 @@
     - [10万类图像分类预训练模型](./docs/zh_CN/application/transfer_learning.md)
     - [通用目标检测](./docs/zh_CN/application/object_detection.md)
 - FAQ
-    - [图像分类2020第一季精选问题(近期更新2020.11.18)](./docs/zh_CN/faq_series/faq_2020_s1.md)
+    - [图像分类2020第一季精选问题(近期更新2020.12.09)](./docs/zh_CN/faq_series/faq_2020_s1.md)
     - [图像分类通用30个问题](./docs/zh_CN/faq.md)
     - [PaddleClas实战15个问题](./docs/zh_CN/faq.md)
 - [赛事支持](./docs/zh_CN/competition_support.md)

@@ -90,7 +90,7 @@ class rSoftmax(nn.Layer):
                 ])
             x = paddle.transpose(x=x, perm=[0, 2, 1, 3])
             x = nn.functional.softmax(x, axis=1)
-            x = paddle.reshape(x=x, shape=[batch, r * h * w])
+            x = paddle.reshape(x=x, shape=[batch, r * h * w, 1, 1])
         else:
             x = nn.functional.sigmoid(x)
         return x
