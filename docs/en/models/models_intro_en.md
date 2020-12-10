@@ -163,6 +163,7 @@ python tools/infer/predict.py \
     - [HRNet_W48_C](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/HRNet_W48_C_pretrained.pdparams)
     - [HRNet_W48_C_ssld](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/HRNet_W48_C_ssld_pretrained.pdparams)
     - [HRNet_W64_C](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/HRNet_W64_C_pretrained.pdparams)
+    - [SE_HRNet_W64_C_ssld](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/SE_HRNet_W64_C_ssld_pretrained.pdparams)
 
 
 - DPN and DenseNet series

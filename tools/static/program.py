@@ -493,16 +493,16 @@ def run(dataloader,
                           feed=feed_dict,
                           fetch_list=fetch_list)
         batch_time.update(time.time() - tic)
-        tic = time.time()
         for i, m in enumerate(metrics):
             metric_list[i].update(np.mean(m), batch_size)
 
         if mode == "train":
             metric_list[-1].update(lr_scheduler.get_lr())
+
         fetchs_str = ''.join([str(m.value) + ' '
-                              for m in metric_list] + [batch_time.mean]) + 's' 
+                              for m in metric_list] + [batch_time.mean]) + 's'
         ips_info = " ips: {:.5f} images/sec.".format(batch_size /
-	                                                 batch_time.avg)
+                                                     batch_time.avg)
         fetchs_str += ips_info
 
         if lr_scheduler is not None:
@@ -534,6 +534,8 @@ def run(dataloader,
                     if idx == 0 else epoch_str,
                     logger.coloring(step_str, "PURPLE"),
                     logger.coloring(fetchs_str, 'OKGREEN')))
+
+        tic = time.time()
 
     end_str = ''.join([str(m.mean) + ' '
                        for m in metric_list] + [batch_time.total]) + 's'

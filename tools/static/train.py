@@ -65,7 +65,7 @@ def main(args):
     if config.get("is_distributed", True):
         fleet.init(is_collective=True)
     # assign the place
-    use_gpu = config.get("use_gpu", True)
+    use_gpu = config.get("use_gpu", False)
     assert use_gpu is True, "gpu must be true in static mode!"
     place = paddle.set_device("gpu")
     
@@ -82,13 +82,16 @@ def main(args):
         os.environ['FLAGS_cudnn_batchnorm_spatial_persistent'] = '1'
         paddle.fluid.set_flags(AMP_RELATED_FLAGS_SETTING)
     use_xpu = config.get("use_xpu", False)
-    assert (use_gpu or use_xpu
-            ) is True, "gpu or xpu must be true in static mode!"
     assert (
         use_gpu and use_xpu
     ) is not True, "gpu and xpu can not be true in the same time in static mode!"
 
-    place = paddle.set_device('gpu' if use_gpu else 'xpu')
+    if use_gpu:
+        place = paddle.set_device('gpu')
+    elif use_xpu:
+        place = paddle.set_device('xpu')
+    else:
+        place = paddle.set_device('cpu')
 
     # startup_prog is used to do some parameter init work,
     # and train prog is used to hold the network

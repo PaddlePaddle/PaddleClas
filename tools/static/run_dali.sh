@@ -8,4 +8,4 @@ python3.7 -m paddle.distributed.launch \
     tools/static/train.py \
         -c ./configs/ResNet/ResNet50.yaml \
         -o print_interval=10 \
-        -o use_dali=true
+        -o use_dali=True
