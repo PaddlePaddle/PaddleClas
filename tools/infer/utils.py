@@ -44,6 +44,7 @@ def parse_args():
     parser.add_argument("--enable_benchmark", type=str2bool, default=False)
     parser.add_argument("--top_k", type=int, default=1)
     parser.add_argument("--enable_mkldnn", type=str2bool, default=False)
+    parser.add_argument("--cpu_num_threads", type=int, default=10)
     parser.add_argument("--hubserving", type=str2bool, default=False)
 
     # params for infer
@@ -78,6 +79,7 @@ def create_paddle_predictor(args):
             # cache 10 different shapes for mkldnn to avoid memory leak
             config.set_mkldnn_cache_capacity(10)
             config.enable_mkldnn()
+    config.set_cpu_math_library_num_threads(args.cpu_num_threads)
 
     config.disable_glog_info()
     config.switch_ir_optim(args.ir_optim)  # default true
