@@ -82,7 +82,7 @@ opencv3/
 
 #### 1.2.1 Compile from the source code
 * If you want to get the latest Paddle Inference Library features, you can download the latest code from Paddle GitHub repository and compile the inference library from the source code.
-* You can refer to [Paddle Inference Library] (https://www.paddlepaddle.org.cn/documentation/docs/en/advanced_guide/inference_deployment/inference/build_and_install_lib_en.html) to get the Paddle source code from github, and then compile To generate the latest inference library. The method of using git to access the code is as follows.
+* You can refer to [Paddle Inference Library](https://www.paddlepaddle.org.cn/documentation/docs/en/develop/guides/05_inference_deployment/inference/build_and_install_lib_en.html#build-from-source-code) to get the Paddle source code from github, and then compile To generate the latest inference library. The method of using git to access the code is as follows.
 
 
 ```shell
@@ -109,13 +109,13 @@ make -j
 make inference_lib_dist
 ```
 
-For more compilation parameter options, please refer to the official website of the Paddle C++ inference library:[https://www.paddlepaddle.org.cn/documentation/docs/en/advanced_guide/inference_deployment/inference/build_and_install_lib_en.html](https://www.paddlepaddle.org.cn/documentation/docs/en/advanced_guide/inference_deployment/inference/build_and_install_lib_en.html).
+For more compilation parameter options, please refer to the official website of the Paddle C++ inference library:[https://www.paddlepaddle.org.cn/documentation/docs/en/develop/guides/05_inference_deployment/inference/build_and_install_lib_en.html#build-from-source-code](https://www.paddlepaddle.org.cn/documentation/docs/en/develop/guides/05_inference_deployment/inference/build_and_install_lib_en.html#build-from-source-code).
 
 
-* After the compilation process, you can see the following files in the folder of `build/fluid_inference_install_dir/`.
+* After the compilation process, you can see the following files in the folder of `build/paddle_inference_install_dir/`.
 
 ```
-build/fluid_inference_install_dir/
+build/paddle_inference_install_dir/
 |-- CMakeCache.txt
 |-- paddle
 |-- third_party
@@ -129,17 +129,17 @@ Among them, `paddle` is the Paddle library required for C++ prediction later, an
 #### 1.2.2 Direct download and installation
 
 * Different cuda versions of the Linux inference library (based on GCC 4.8.2) are provided on the
-[Paddle Inference Library official website](https://www.paddlepaddle.org.cn/documentation/docs/en/advanced_guide/inference_deployment/inference/build_and_install_lib_en.html). You can view and select the appropriate version of the inference library on the official website.
+[Paddle Inference Library official website](https://www.paddlepaddle.org.cn/documentation/docs/en/develop/guides/05_inference_deployment/inference/build_and_install_lib_en.html). You can view and select the appropriate version of the inference library on the official website.
 
 * Please select the `develop` version.
 
 * After downloading, use the following method to uncompress.
 
 ```
-tar -xf fluid_inference.tgz
+tar -xf paddle_inference.tgz
 ```
 
-Finally you can see the following files in the folder of `fluid_inference/`.
+Finally you can see the following files in the folder of `paddle_inference/`.
 
 
 ## 2. Compile and run the demo
@@ -195,17 +195,17 @@ In the above parameters of command:
 
 * `OPENCV_DIR` is the opencv installation path;
 
-* `LIB_DIR` is the download (`fluid_inference` folder) or the generated Paddle Inference Library path (`build/fluid_inference_install_dir` folder);
+* `LIB_DIR` is the download (`paddle_inference` folder) or the generated Paddle Inference Library path (`build/paddle_inference_install_dir` folder);
 
 * `CUDA_LIB_DIR` is the cuda library file path, in docker; it is `/usr/local/cuda/lib64`;
 
 * `CUDNN_LIB_DIR` is the cudnn library file path, in docker it is `/usr/lib/x86_64-linux-gnu/`.
 
-After the compilation is completed, an executable file named `ocr_system` will be generated in the `build` folder.
+After the compilation is completed, an executable file named `clas_system` will be generated in the `build` folder.
 
 
 ### Run the demo
-* Execute the following command to complete the classification of an image.
+* First, please modify the `tools/config.txt` and `tools/run.sh`. Then execute the following command to complete the classification of an image.
 
 ```shell
 sh tools/run.sh
