@@ -26,6 +26,8 @@ sys.path.append(os.path.abspath(os.path.join(__dir__, '../../')))
 from sys import version_info
 
 import paddle
+import paddle.fluid as fluid
+from paddle.fluid.contrib.mixed_precision.fp16_utils import cast_parameters_to_fp16
 from paddle.distributed import fleet
 
 from ppcls.data import Reader
@@ -59,11 +61,26 @@ def parse_args():
 
 
 def main(args):
-    fleet.init(is_collective=True)
-
     config = get_config(args.config, overrides=args.override, show=True)
+    if config.get("is_distributed", True):
+        fleet.init(is_collective=True)
     # assign the place
     use_gpu = config.get("use_gpu", False)
+    assert use_gpu is True, "gpu must be true in static mode!"
+    place = paddle.set_device("gpu")
+    
+    # amp related config
+    use_amp = config.get('use_amp', False)
+    use_pure_fp16 = config.get('use_pure_fp16', False)
+    if use_amp or use_pure_fp16:
+        AMP_RELATED_FLAGS_SETTING = {
+            'FLAGS_cudnn_exhaustive_search': 1,
+            'FLAGS_conv_workspace_size_limit': 4000,
+            'FLAGS_cudnn_batchnorm_spatial_persistent': 1,
+            'FLAGS_max_inplace_grad_add': 8,
+        }
+        os.environ['FLAGS_cudnn_batchnorm_spatial_persistent'] = '1'
+        paddle.fluid.set_flags(AMP_RELATED_FLAGS_SETTING)
     use_xpu = config.get("use_xpu", False)
     assert (
         use_gpu and use_xpu
@@ -105,9 +122,16 @@ def main(args):
     exe = paddle.static.Executor(place)
     # Parameter initialization
     exe.run(startup_prog)
-
+    if config.get("use_pure_fp16", False):	
+        cast_parameters_to_fp16(place, train_prog, fluid.global_scope())
     # load pretrained models or checkpoints
     init_model(config, train_prog, exe)
+
+    if not config.get("is_distributed", True):
+        compiled_train_prog = program.compile(
+            config, train_prog, loss_name=train_fetchs["loss"][0].name)
+    else:
+        compiled_train_prog = train_prog
 
     if not config.get('use_dali', False):
         train_dataloader = Reader(config, 'train', places=place)()
@@ -137,7 +161,7 @@ def main(args):
 
     for epoch_id in range(config.epochs):
         # 1. train with train dataset
-        program.run(train_dataloader, exe, train_prog, train_feeds,
+        program.run(train_dataloader, exe, compiled_train_prog, train_feeds,
                     train_fetchs, epoch_id, 'train', config, vdl_writer,
                     lr_scheduler)
         if paddle.distributed.get_rank() == 0:
