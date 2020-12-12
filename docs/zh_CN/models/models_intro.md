@@ -218,9 +218,7 @@ python tools/infer/predict.py \
     - [VGG16](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/VGG16_pretrained.pdparams)
     - [VGG19](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/VGG19_pretrained.pdparams)
   - DarkNet系列<sup>[[21](#ref21)]</sup>([论文地址](https://arxiv.org/abs/1506.02640))
-    - [DarkNet53](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DarkNet53_ImageNet1k_pretrained.pdparams)
-  - ACNet系列<sup>[[22](#ref22)]</sup>([论文地址](https://arxiv.org/abs/1908.03930))
-    - [ResNet50_ACNet_deploy](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ResNet50_ACNet_deploy_pretrained.pdparams)
+    - [DarkNet53](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DarkNet53_pretrained.pdparams)
 
 **注意**：以上模型中EfficientNetB1-B7的预训练模型转自[pytorch版EfficientNet](https://github.com/lukemelas/EfficientNet-PyTorch)，ResNeXt101_wsl系列预训练模型转自[官方repo](https://github.com/facebookresearch/WSL-Images)，剩余预训练模型均基于飞浆训练得到的，并在configs里给出了相应的训练超参数。
 
