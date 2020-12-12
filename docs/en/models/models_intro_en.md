@@ -222,9 +222,7 @@ python tools/infer/predict.py \
     - [VGG16](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/VGG16_pretrained.pdparams)
     - [VGG19](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/VGG19_pretrained.pdparams)
   - DarkNet series<sup>[[21](#ref21)]</sup>([paper link](https://arxiv.org/abs/1506.02640))
-    - [DarkNet53](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DarkNet53_ImageNet1k_pretrained.pdparams)
-  - ACNet series<sup>[[22](#ref22)]</sup>([paper link](https://arxiv.org/abs/1908.03930))
-    - [ResNet50_ACNet_deploy](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ResNet50_ACNet_deploy_pretrained.pdparams)
+    - [DarkNet53](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DarkNet53_pretrained.pdparams)
 
 **Note**: The pretrained models of EfficientNetB1-B7 in the above models are transferred from [pytorch version of EfficientNet](https://github.com/lukemelas/EfficientNet-PyTorch), and the ResNeXt101_wsl series of pretrained models are transferred from [Official repo](https://github.com/facebookresearch/WSL-Images), the remaining pretrained models are obtained by training with the PaddlePaddle framework, and the corresponding training hyperparameters are given in configs.
 
