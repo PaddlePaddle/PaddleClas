@@ -124,7 +124,7 @@ python tools/eval.py \
 
 ### 2.1 模型训练
 
-参考如下方式启动模型训练，`paddle.distributed.launch`通过设置`selected_gpus`指定GPU运行卡号：
+参考如下方式启动模型训练，`paddle.distributed.launch`通过设置`gpus`指定GPU运行卡号：
 
 ```bash
 # PaddleClas通过launch方式启动多卡多进程训练
@@ -132,7 +132,7 @@ python tools/eval.py \
 export CUDA_VISIBLE_DEVICES=0,1,2,3
 
 python -m paddle.distributed.launch \
-    --selected_gpus="0,1,2,3" \
+    --gpus="0,1,2,3" \
     tools/train.py \
         -c ./configs/quick_start/MobileNetV3_large_x1_0_finetune.yaml
 ```
@@ -141,7 +141,7 @@ python -m paddle.distributed.launch \
 
 ```bash
 python -m paddle.distributed.launch \
-    --selected_gpus="0,1,2,3" \
+    --gpus="0,1,2,3" \
     tools/train.py \
         -c ./configs/quick_start/MobileNetV3_large_x1_0_finetune.yaml \
         -o pretrained_model="" \
@@ -159,7 +159,7 @@ python -m paddle.distributed.launch \
 export CUDA_VISIBLE_DEVICES=0,1,2,3
 
 python -m paddle.distributed.launch \
-    --selected_gpus="0,1,2,3" \
+    --gpus="0,1,2,3" \
     tools/train.py \
         -c ./configs/quick_start/MobileNetV3_large_x1_0_finetune.yaml \
         -o pretrained_model="./pretrained/MobileNetV3_large_x1_0_pretrained"
@@ -179,7 +179,7 @@ python -m paddle.distributed.launch \
 export CUDA_VISIBLE_DEVICES=0,1,2,3
 
 python -m paddle.distributed.launch \
-    --selected_gpus="0,1,2,3" \
+    --gpus="0,1,2,3" \
     tools/train.py \
         -c ./configs/quick_start/MobileNetV3_large_x1_0_finetune.yaml \
         -o checkpoints="./output/MobileNetV3_large_x1_0/5/ppcls" \
