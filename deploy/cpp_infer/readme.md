@@ -77,7 +77,7 @@ opencv3/
 
 #### 1.2.1 预测库源码编译
 * 如果希望获取最新预测库特性，可以从Paddle github上克隆最新代码，源码编译预测库。
-* 可以参考[Paddle预测库官网](https://www.paddlepaddle.org.cn/documentation/docs/zh/advanced_guide/inference_deployment/inference/build_and_install_lib_cn.html)的说明，从github上获取Paddle代码，然后进行编译，生成最新的预测库。使用git获取代码方法如下。
+* 可以参考[Paddle预测库官网](https://www.paddlepaddle.org.cn/documentation/docs/zh/develop/guides/05_inference_deployment/inference/build_and_install_lib_cn.html#id16)的说明，从github上获取Paddle代码，然后进行编译，生成最新的预测库。使用git获取代码方法如下。
 
 ```shell
 git clone https://github.com/PaddlePaddle/Paddle.git
@@ -103,13 +103,13 @@ make -j
 make inference_lib_dist
 ```
 
-更多编译参数选项可以参考Paddle C++预测库官网：[https://www.paddlepaddle.org.cn/documentation/docs/zh/advanced_guide/inference_deployment/inference/build_and_install_lib_cn.html](https://www.paddlepaddle.org.cn/documentation/docs/zh/advanced_guide/inference_deployment/inference/build_and_install_lib_cn.html)。
+更多编译参数选项可以参考Paddle C++预测库官网：[https://www.paddlepaddle.org.cn/documentation/docs/zh/develop/guides/05_inference_deployment/inference/build_and_install_lib_cn.html#id16](https://www.paddlepaddle.org.cn/documentation/docs/zh/develop/guides/05_inference_deployment/inference/build_and_install_lib_cn.html#id16)。
 
 
-* 编译完成之后，可以在`build/fluid_inference_install_dir/`文件下看到生成了以下文件及文件夹。
+* 编译完成之后，可以在`build/paddle_inference_install_dir/`文件下看到生成了以下文件及文件夹。
 
 ```
-build/fluid_inference_install_dir/
+build/paddle_inference_install_dir/
 |-- CMakeCache.txt
 |-- paddle
 |-- third_party
@@ -120,19 +120,19 @@ build/fluid_inference_install_dir/
 
 #### 1.2.2 直接下载安装
 
-* [Paddle预测库官网](https://www.paddlepaddle.org.cn/documentation/docs/zh/advanced_guide/inference_deployment/inference/build_and_install_lib_cn.html)上提供了不同cuda版本的Linux预测库，可以在官网查看并选择合适的预测库版本，注意必须选择`develop`版本。
+* [Paddle预测库官网](https://www.paddlepaddle.org.cn/documentation/docs/zh/develop/guides/05_inference_deployment/inference/build_and_install_lib_cn.html#id1)上提供了不同cuda版本的Linux预测库，可以在官网查看并选择合适的预测库版本，注意必须选择`develop`版本。
 
   以`ubuntu14.04_cuda9.0_cudnn7_avx_mkl`的`develop`版本为例，使用下述命令下载并解压：
 
 
 ```shell
-wget https://paddle-inference-lib.bj.bcebos.com/latest-gpu-cuda9-cudnn7-avx-mkl/fluid_inference.tgz
+wget https://paddle-inference-lib.bj.bcebos.com/latest-gpu-cuda9-cudnn7-avx-mkl/paddle_inference.tgz
 
-tar -xvf fluid_inference.tgz
+tar -xvf paddle_inference.tgz
 ```
 
 
-最终会在当前的文件夹中生成`fluid_inference/`的子文件夹。
+最终会在当前的文件夹中生成`paddle_inference/`的子文件夹。
 
 
 ## 2 开始运行
@@ -187,7 +187,7 @@ make -j
 
 * `OPENCV_DIR`为opencv编译安装的地址（本例中为`opencv-3.4.7/opencv3`文件夹的路径）；
 
-* `LIB_DIR`为下载的Paddle预测库（`fluid_inference`文件夹），或编译生成的Paddle预测库（`build/fluid_inference_install_dir`文件夹）的路径；
+* `LIB_DIR`为下载的Paddle预测库（`paddle_inference`文件夹），或编译生成的Paddle预测库（`build/paddle_inference_install_dir`文件夹）的路径；
 
 * `CUDA_LIB_DIR`为cuda库文件地址，在docker中为`/usr/local/cuda/lib64`；
 
@@ -197,7 +197,22 @@ make -j
 
 
 ### 运行demo
-* 执行以下命令，完成对一幅图像的分类。
+* 首先修改`tools/config.txt`中对应字段：
+  * use_gpu：是否使用GPU；
+  * gpu_id：使用的GPU卡号；
+  * gpu_mem：显存；
+  * cpu_math_library_num_threads：底层科学计算库所用线程的数量；
+  * use_mkldnn：是否使用MKLDNN加速；
+  * cls_model_path：预测模型结构文件路径；
+  * cls_params_path：预测模型参数文件路径；
+  * resize_short_size：预处理时图像缩放大小；
+  * crop_size：预处理时图像裁剪后的大小。
+
+* 然后修改`tools/run.sh`：
+  * `./build/clas_system ./tools/config.txt ./docs/imgs/ILSVRC2012_val_00000666.JPEG`
+  * 上述命令中分别为：编译得到的可执行文件`clas_system`；运行时的配置文件`config.txt`；待预测的图像。
+
+* 最后执行以下命令，完成对一幅图像的分类。
 
 ```shell
 sh tools/run.sh
