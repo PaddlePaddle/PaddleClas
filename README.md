@@ -21,7 +21,7 @@ PaddleClas is a toolset for image classification tasks prepared for the industry
 
 ## Features
 
-- Rich model zoo. Based on the ImageNet-1k classification dataset, PaddleClas provides 24 series of classification network structures and training configurations, 122 models' pretrained weights and their evaluation metrics.
+- Rich model zoo. Based on the ImageNet-1k classification dataset, PaddleClas provides 29 series of classification network structures and training configurations, 134 models' pretrained weights and their evaluation metrics.
 
 - SSLD Knowledge Distillation. Based on this SSLD distillation strategy, the top-1 acc of the distilled model is generally increased by more than 3%.
 
