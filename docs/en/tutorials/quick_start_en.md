@@ -47,16 +47,14 @@ You can use the following commands to downdload the pretrained models.
 ```bash
 mkdir pretrained
 cd pretrained
-wget https://paddle-imagenet-models-name.bj.bcebos.com/ResNet50_vd_pretrained.tar
-wget https://paddle-imagenet-models-name.bj.bcebos.com/ResNet50_vd_ssld_pretrained.tar
-wget https://paddle-imagenet-models-name.bj.bcebos.com/MobileNetV3_large_x1_0_pretrained.tar
-tar -xf ResNet50_vd_pretrained.tar
-tar -xf ResNet50_vd_ssld_pretrained.tar
-tar -xf MobileNetV3_large_x1_0_pretrained.tar
+wget https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ResNet50_vd_pretrained.pdparams
+wget https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ResNet50_vd_ssld_pretrained.pdparams
+wget https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/MobileNetV3_large_x1_0_pretrained.pdparams
+
 cd ../
 ```
 
-**Note**: If you want to download the pretrained models on Windows environment, you can copy the links to the browser and download, then use the the thirdparty tools such as `7Zip` to uncompress the tar files.
+**Note**: If you want to download the pretrained models on Windows environment, you can copy the links to the browser and download.
 
 
 ## Training
@@ -165,7 +163,7 @@ cp -r output/ResNet50_vd/19/  ./pretrained/flowers102_R50_vd_final/
 
 ### Distillation
 
-* Use extra_list.txt as unlabeled data, Note:
+* Use `extra_list.txt` as unlabeled data, Note:
     * Samples in the `extra_list.txt` and `val_list.txt` don't have intersection
     * Because of in the source code, label information is unused, This is still unlabeled distillation
     * Teacher model use the pretrained_model trained on the flowers102 dataset, and student model use the MobileNetV3_large_x1_0 pretrained model(Acc 75.32\%) trained on the ImageNet1K dataset
