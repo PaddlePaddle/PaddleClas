@@ -8,23 +8,31 @@ PaddleClas在Windows 平台下基于`Visual Studio 2019 Community` 进行了测�
 * CUDA 9.0 / CUDA 10.0，cudnn 7.6+ （仅在使用GPU版本的预测库时需要）
 * CMake 3.0+
 
-请确保系统已经安装好上述基本软件，以下测试基于`Visual Studio 2019 Community`版本。
+请确保系统已经正确安装并配置好上述基本软件，其中：
+  * 在安装`Visual Studio 2019`时，`工作负载`需要勾选`使用C++的桌面开发`；
+  * CUDA需要正确安装并设置系统环境变量；
+  * CMake需要正确安装并将路径添加到系统环境变量中。
+
+以下测试基于`Visual Studio 2019 Community`版本。
 
 **下面所有示例以工作目录为 `D:\projects`演示**。
 
-### Step1: 下载PaddlePaddle C++ 预测库 fluid_inference
+### Step1: 下载PaddlePaddle C++ 预测库 paddle_inference_install_dir
 
 PaddlePaddle C++ 预测库针对不同的`CPU`和`CUDA`版本提供了不同的预编译版本，请根据实际情况下载:  [C++预测库下载列表](https://www.paddlepaddle.org.cn/documentation/docs/zh/develop/advanced_guide/inference_deployment/inference/windows_cpp_inference.html)。
 
-解压后`D:\projects\fluid_inference`目录包含内容为：
+解压后`D:\projects\paddle_inference_install_dir`目录包含内容为：
+
 ```
-fluid_inference
+paddle_inference_install_dir
 ├── paddle # paddle核心库和头文件
 |
 ├── third_party # 第三方依赖库和头文件
 |
 └── version.txt # 版本和编译信息
 ```
+
+然后需要将`Paddle预测库`的路径`D:\projects\paddle_inference_install_dir\paddle\lib`添加到系统环境变量`Path`中。
 
 ### Step2: 安装配置OpenCV
 
@@ -62,7 +70,7 @@ fluid_inference
 | CMAKE_BUILD_TYPE              | RelWithDebInfo     | [√]         |
 | CUDA_LIB                      | CUDA的库路径       | [√]         |
 | CUDNN_LIB                     | CUDNN的库路径      | [√]         |
-| OPENCV_DIR                    | OpenCV的安装路径   | [√]         |
+| OpenCV_DIR                    | OpenCV的安装路径   | [√]         |
 | PADDLE_LIB                    | Paddle预测库的路径 | [√]         |
 | WITH_GPU                      | [√]                | [√]         |
 | WITH_MKL                      | [√]                | [√]         |
@@ -73,7 +81,10 @@ fluid_inference
 1. `CMAKE_BACKWARDS_COMPATIBILITY` 的值请根据自己 `cmake` 版本设置，`cmake` 版本可以通过命令：`cmake --version` 查询；
 2. `CUDA_LIB` 、 `CUDNN_LIB` 的值仅需在使用**GPU版本**预测库时指定，其中CUDA库版本尽量对齐，**使用9.0、10.0版本，不使用9.2、10.1等版本CUDA库**；
 3. 在设置 `CUDA_LIB`、`CUDNN_LIB`、`OPENCV_DIR`、`PADDLE_LIB` 时，点击 `浏览`，分别设置相应的路径；
-4. 在使用`CPU`版预测库时，请把 `WITH_GPU` 的勾去掉。
+   * `CUDA_LIB`和`CUDNN_LIB`：该路径取决于CUDA与CUDNN的安装位置。
+   * `OpenCV_DIR`：该路径下需要有`.cmake`文件，一般为`opencv/build/`；
+   * `PADDLE_LIB`：该路径下需要有`CMakeCache.txt`文件，一般为`paddle_inference_install_dir/`。
+4. 在使用 `CPU` 版预测库时，请不要勾选 `WITH_GPU` - `保存到 JSON`。
 
 ![step4](./imgs/vs2019_step5.png)
 
@@ -94,11 +105,12 @@ cd D:\projects\PaddleClas\deploy\cpp_infer\out\build\x64-Release
 可执行文件`clas_system.exe`即为编译产出的的预测程序，其使用方法如下：
 
 ```shell
-#预测图片 `.\docs\ILSVRC2012_val_00008306.JPEG`  
 .\clas_system.exe D:\projects\PaddleClas\deploy\cpp_infer\tools\config.txt .\docs\ILSVRC2012_val_00008306.JPEG
 ```
 
-上述命令中，第一个参数为配置文件路径，第二个参数为需要预测的图片路径。
+上述命令中，第一个参数（`D:\projects\PaddleClas\deploy\cpp_infer\tools\config.txt`）为配置文件路径，第二个参数（`.\docs\ILSVRC2012_val_00008306.JPEG`）为需要预测的图片路径。
+
+注意，需要在配置文件中正确设置预测参数，包括所用模型文件的路径（`cls_model_path`和`cls_params_path`）。
 
 
 ### 注意
