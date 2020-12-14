@@ -2,7 +2,7 @@
 
 ## Overview
 
-Based on the ImageNet1k classification dataset, the 23 classification network structures supported by PaddleClas and the corresponding 117 image classification pretrained models are shown below. Training trick, a brief introduction to each series of network structures, and performance evaluation will be shown in the corresponding chapters.
+Based on the ImageNet1k classification dataset, the 29 classification network structures supported by PaddleClas and the corresponding 134 image classification pretrained models are shown below. Training trick, a brief introduction to each series of network structures, and performance evaluation will be shown in the corresponding chapters.
 
 ## Evaluation environment
 * CPU evaluation environment is based on Snapdragon 855 (SD855).
