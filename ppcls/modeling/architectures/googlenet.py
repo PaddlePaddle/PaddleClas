@@ -95,9 +95,9 @@ class Inception(nn.Layer):
         return cat
 
 
-class GoogleNetDY(nn.Layer):
+class GoogLeNetDY(nn.Layer):
     def __init__(self, class_dim=1000):
-        super(GoogleNetDY, self).__init__()
+        super(GoogLeNetDY, self).__init__()
         self._conv = ConvLayer(3, 64, 7, 2, name="conv1")
         self._pool = MaxPool2D(kernel_size=3, stride=2)
         self._conv_1 = ConvLayer(64, 64, 1, name="conv2_1x1")
@@ -203,5 +203,5 @@ class GoogleNetDY(nn.Layer):
 
 
 def GoogLeNet(**args):
-    model = GoogleNetDY(**args)
+    model = GoogLeNetDY(**args)
     return model
