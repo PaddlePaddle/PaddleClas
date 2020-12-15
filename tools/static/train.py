@@ -65,10 +65,7 @@ def main(args):
     if config.get("is_distributed", True):
         fleet.init(is_collective=True)
     # assign the place
-    use_gpu = config.get("use_gpu", False)
-    assert use_gpu is True, "gpu must be true in static mode!"
-    place = paddle.set_device("gpu")
-    
+    use_gpu = config.get("use_gpu", True)
     # amp related config
     use_amp = config.get('use_amp', False)
     use_pure_fp16 = config.get('use_pure_fp16', False)
@@ -122,7 +119,7 @@ def main(args):
     exe = paddle.static.Executor(place)
     # Parameter initialization
     exe.run(startup_prog)
-    if config.get("use_pure_fp16", False):	
+    if config.get("use_pure_fp16", False):
         cast_parameters_to_fp16(place, train_prog, fluid.global_scope())
     # load pretrained models or checkpoints
     init_model(config, train_prog, exe)
