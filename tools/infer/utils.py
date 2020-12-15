@@ -41,6 +41,7 @@ def parse_args():
     parser.add_argument("--ir_optim", type=str2bool, default=True)
     parser.add_argument("--use_tensorrt", type=str2bool, default=False)
     parser.add_argument("--gpu_mem", type=int, default=8000)
+    parser.add_argument("--enable_profile", type=str2bool, default=False)
     parser.add_argument("--enable_benchmark", type=str2bool, default=False)
     parser.add_argument("--top_k", type=int, default=1)
     parser.add_argument("--enable_mkldnn", type=str2bool, default=False)
@@ -81,6 +82,8 @@ def create_paddle_predictor(args):
             config.enable_mkldnn()
     config.set_cpu_math_library_num_threads(args.cpu_num_threads)
 
+    if args.enable_profile:
+        config.enable_profile()
     config.disable_glog_info()
     config.switch_ir_optim(args.ir_optim)  # default true
     if args.use_tensorrt:
