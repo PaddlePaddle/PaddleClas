@@ -113,7 +113,8 @@ class VGGNet(nn.Layer):
         x = self._conv_block_4(x)
         x = self._conv_block_5(x)
 
-        x = paddle.reshape(x, [-1, x.shape[1]*x.shape[2]*x.shape[3]])
+        _, c, h, w = list(x.shape)
+        x = paddle.reshape(x, [-1, c * h * w])
         x = self._fc1(x)
         x = F.relu(x)
         x = self._drop(x)
