@@ -53,7 +53,7 @@ void Classifier::LoadModel(const std::string &model_path,
   this->predictor_ = CreatePredictor(config);
 }
 
-void Classifier::Run(cv::Mat &img) {
+double Classifier::Run(cv::Mat &img) {
   cv::Mat srcimg;
   cv::Mat resize_img;
   img.copyTo(srcimg);
@@ -70,6 +70,7 @@ void Classifier::Run(cv::Mat &img) {
   auto input_names = this->predictor_->GetInputNames();
   auto input_t = this->predictor_->GetInputHandle(input_names[0]);
   input_t->Reshape({1, 3, resize_img.rows, resize_img.cols});
+  auto start = std::chrono::system_clock::now();
   input_t->CopyFromCpu(input.data());
   this->predictor_->Run();
 

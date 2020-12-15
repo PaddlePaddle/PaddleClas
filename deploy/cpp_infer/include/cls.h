@@ -61,7 +61,7 @@ public:
   void LoadModel(const std::string &model_path, const std::string &params_path);
 
   // Run predictor
-  void Run(cv::Mat &img);
+  double Run(cv::Mat &img);
 
 private:
   std::shared_ptr<Predictor> predictor_;
