@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <chrono>
 #include <include/cls.h>
 
 namespace PaddleClas {
@@ -52,7 +53,7 @@ void Classifier::LoadModel(const std::string &model_path,
   this->predictor_ = CreatePredictor(config);
 }
 
-void Classifier::Run(cv::Mat &img) {
+double Classifier::Run(cv::Mat &img) {
   cv::Mat srcimg;
   cv::Mat resize_img;
   img.copyTo(srcimg);
@@ -69,6 +70,7 @@ void Classifier::Run(cv::Mat &img) {
   auto input_names = this->predictor_->GetInputNames();
   auto input_t = this->predictor_->GetInputHandle(input_names[0]);
   input_t->Reshape({1, 3, resize_img.rows, resize_img.cols});
+  auto start = std::chrono::system_clock::now();
   input_t->CopyFromCpu(input.data());
   this->predictor_->Run();
 
@@ -81,6 +83,12 @@ void Classifier::Run(cv::Mat &img) {
 
   out_data.resize(out_num);
   output_t->CopyToCpu(out_data.data());
+  auto end = std::chrono::system_clock::now();
+  auto duration =
+      std::chrono::duration_cast<std::chrono::microseconds>(end - start);
+  double cost_time = double(duration.count()) *
+                     std::chrono::microseconds::period::num /
+                     std::chrono::microseconds::period::den;
 
   int maxPosition =
       max_element(out_data.begin(), out_data.end()) - out_data.begin();
@@ -88,6 +96,8 @@ void Classifier::Run(cv::Mat &img) {
   std::cout << "\tclass id: " << maxPosition << std::endl;
   std::cout << std::fixed << std::setprecision(10)
             << "\tscore: " << double(out_data[maxPosition]) << std::endl;
+
+  return cost_time;
 }
 
 } // namespace PaddleClas
