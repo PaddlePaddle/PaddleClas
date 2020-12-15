@@ -479,7 +479,7 @@ def run(dataloader,
     metric_list = [f[1] for f in fetchs.values()]
     for m in metric_list:
         m.reset()
-    batch_time = AverageMeter('elapse', '.5f')
+    batch_time = AverageMeter('elapse', '.5f', need_avg=True)
     tic = time.time()
     dataloader = dataloader if config.get('use_dali') else dataloader()()
     for idx, batch in enumerate(dataloader):
@@ -493,9 +493,9 @@ def run(dataloader,
         for i, m in enumerate(metrics):
             metric_list[i].update(np.mean(m), batch_size)
         fetchs_str = ''.join([str(m.value) + ' '
-                              for m in metric_list] + [batch_time.value]) + 's'
+                              for m in metric_list] + [batch_time.mean]) + 's'
         ips_info = " ips: {:.5f} images/sec.".format(batch_size /
-                                                     batch_time.val)
+                                                     batch_time.avg)
         fetchs_str += ips_info
         if vdl_writer:
             global total_step
