@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <include/cls.h>
 #include <chrono>
+#include <include/cls.h>
 
 namespace PaddleClas {
 
@@ -84,8 +84,11 @@ double Classifier::Run(cv::Mat &img) {
   out_data.resize(out_num);
   output_t->CopyToCpu(out_data.data());
   auto end = std::chrono::system_clock::now();
-  auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
-  double cost_time = double(duration.count()) * std::chrono::microseconds::period::num / std::chrono::microseconds::period::den;
+  auto duration =
+      std::chrono::duration_cast<std::chrono::microseconds>(end - start);
+  double cost_time = double(duration.count()) *
+                     std::chrono::microseconds::period::num /
+                     std::chrono::microseconds::period::den;
 
   int maxPosition =
       max_element(out_data.begin(), out_data.end()) - out_data.begin();
@@ -93,7 +96,7 @@ double Classifier::Run(cv::Mat &img) {
   std::cout << "\tclass id: " << maxPosition << std::endl;
   std::cout << std::fixed << std::setprecision(10)
             << "\tscore: " << double(out_data[maxPosition]) << std::endl;
-  
+
   return cost_time;
 }
 
