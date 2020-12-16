@@ -27,7 +27,6 @@ from sys import version_info
 
 import paddle
 import paddle.fluid as fluid
-from paddle.fluid.contrib.mixed_precision.fp16_utils import cast_parameters_to_fp16
 from paddle.distributed import fleet
 
 from ppcls.data import Reader
@@ -68,8 +67,7 @@ def main(args):
     use_gpu = config.get("use_gpu", True)
     # amp related config
     use_amp = config.get('use_amp', False)
-    use_pure_fp16 = config.get('use_pure_fp16', False)
-    if use_amp or use_pure_fp16:
+    if use_amp:
         AMP_RELATED_FLAGS_SETTING = {
             'FLAGS_cudnn_exhaustive_search': 1,
             'FLAGS_conv_workspace_size_limit': 4000,
@@ -119,8 +117,6 @@ def main(args):
     exe = paddle.static.Executor(place)
     # Parameter initialization
     exe.run(startup_prog)
-    if config.get("use_pure_fp16", False):
-        cast_parameters_to_fp16(place, train_prog, fluid.global_scope())
     # load pretrained models or checkpoints
     init_model(config, train_prog, exe)
 
@@ -141,11 +137,11 @@ def main(args):
     else:
         assert use_gpu is True, "DALI only support gpu, please set use_gpu to True!"
         import dali
-        train_dataloader = dali.train(config)
+        os.environ["FLAGS_fraction_of_gpu_memory_to_use"] = "0.8"
+        train_dataloader = dali.train(config)     
         if config.validate and paddle.distributed.get_rank() == 0:
             valid_dataloader = dali.val(config)
             compiled_valid_prog = program.compile(config, valid_prog)
-
     vdl_writer = None
     if args.vdl_dir:
         if version_info.major == 2:
