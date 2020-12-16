@@ -62,6 +62,7 @@ int main(int argc, char **argv) {
   Classifier classifier(config.cls_model_path, config.cls_params_path,
                         config.use_gpu, config.gpu_id, config.gpu_mem,
                         config.cpu_math_library_num_threads, config.use_mkldnn,
+                        config.use_tensorrt, config.use_fp16,
                         config.resize_short_size, config.crop_size);
 
   double elapsed_time = 0.0;
@@ -71,22 +72,15 @@ int main(int argc, char **argv) {
     cv::Mat srcimg = cv::imread(img_path, cv::IMREAD_COLOR);
     cv::cvtColor(srcimg, srcimg, cv::COLOR_BGR2RGB);
 
-    auto start = std::chrono::system_clock::now();
-    classifier.Run(srcimg);
-    auto end = std::chrono::system_clock::now();
-    auto duration =
-        std::chrono::duration_cast<std::chrono::microseconds>(end - start);
-    double curr_time = double(duration.count()) *
-                       std::chrono::microseconds::period::num /
-                       std::chrono::microseconds::period::den;
+    double run_time = classifier.Run(srcimg);
     if (idx >= warmup_iter) {
-      elapsed_time += curr_time;
+      elapsed_time += run_time;
       std::cout << "Current image path: " << img_path << std::endl;
-      std::cout << "Current time cost: " << curr_time << " s, "
+      std::cout << "Current time cost: " << run_time << " s, "
                 << "average time cost in all: "
                 << elapsed_time / (idx + 1 - warmup_iter) << " s." << std::endl;
     } else {
-      std::cout << "Current time cost: " << curr_time << " s." << std::endl;
+      std::cout << "Current time cost: " << run_time << " s." << std::endl;
     }
   }
 

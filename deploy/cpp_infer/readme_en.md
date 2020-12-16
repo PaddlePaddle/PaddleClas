@@ -183,7 +183,7 @@ cmake .. \
     -DDEMO_NAME=ocr_system \
     -DWITH_GPU=OFF \
     -DWITH_STATIC_LIB=OFF \
-    -DUSE_TENSORRT=OFF \
+    -DWITH_TENSORRT=OFF \
     -DOPENCV_DIR=${OPENCV_DIR} \
     -DCUDNN_LIB=${CUDNN_LIB_DIR} \
     -DCUDA_LIB=${CUDA_LIB_DIR} \

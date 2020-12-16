@@ -85,16 +85,21 @@ def create_model(architecture, image, classes_num, config, is_train):
     """
     name = architecture["name"]
     params = architecture.get("params", {})
-    data_format = config.get("data_format", "NCHW")
+
+    data_format = "NCHW"
+    if "data_format" in config:
+        params["data_format"] = config["data_format"]
+        data_format = config["data_format"]
     input_image_channel = config.get('image_shape', [3, 224, 224])[0]
+    if input_image_channel != 3:
+        logger.warning(
+            "Input image channel is changed to {}, maybe for better speed-up".
+            format(input_image_channel))
+        params["input_image_channel"] = input_image_channel
     if "is_test" in params:
         params['is_test'] = not is_train
-    model = architectures.__dict__[name](
-                class_dim=classes_num,
-                input_image_channel=input_image_channel,
-                data_format=data_format,
-                **params)
-    
+    model = architectures.__dict__[name](class_dim=classes_num, **params)
+
     if data_format == "NHWC":
         image = paddle.tensor.transpose(image, [0, 2, 3, 1])
         image.stop_gradient = True
@@ -343,7 +348,10 @@ def build(config, main_prog, startup_prog, is_train=True, is_distributed=True):
                 and config.get("use_dali", False):
                 image_dtype = "float16"
             feeds = create_feeds(
-                config.image_shape, use_mix=use_mix, use_dali=use_dali, dtype = image_dtype)
+                config.image_shape,
+                use_mix=use_mix,
+                use_dali=use_dali,
+                dtype=image_dtype)
             if use_dali and use_mix:
                 import dali
                 feeds = dali.mix(feeds, config, is_train)

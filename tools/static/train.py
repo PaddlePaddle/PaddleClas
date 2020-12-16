@@ -64,10 +64,7 @@ def main(args):
     if config.get("is_distributed", True):
         fleet.init(is_collective=True)
     # assign the place
-    use_gpu = config.get("use_gpu", False)
-    assert use_gpu is True, "gpu must be true in static mode!"
-    place = paddle.set_device("gpu")
-    
+    use_gpu = config.get("use_gpu", True)
     # amp related config
     use_amp = config.get('use_amp', False)
     if use_amp:
