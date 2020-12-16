@@ -142,7 +142,6 @@ def main(args):
         if config.validate and paddle.distributed.get_rank() == 0:
             valid_dataloader = dali.val(config)
             compiled_valid_prog = program.compile(config, valid_prog)
-            
     vdl_writer = None
     if args.vdl_dir:
         if version_info.major == 2:
