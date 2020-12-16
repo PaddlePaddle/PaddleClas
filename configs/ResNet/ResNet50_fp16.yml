@@ -11,17 +11,16 @@ validate: True
 valid_interval: 1
 epochs: 120
 topk: 5
-image_shape: [3, 224, 224]
-is_distributed: True
+is_distributed: False
+use_gpu: True
 
-# mixed precision training
+# mixed precision training related config
 use_amp: True
-use_pure_fp16: False
-multi_precision: False
 scale_loss: 128.0
 use_dynamic_loss_scaling: True
-data_format: "NCHW"
-image_shape: [3, 224, 224]
+data_format: "NHWC"
+image_shape: [4, 224, 224]
+use_dali : True
 
 use_mix: False
 ls_epsilon: -1
@@ -42,7 +41,7 @@ OPTIMIZER:
         factor: 0.000100
 
 TRAIN:
-    batch_size: 256
+    batch_size: 128
     num_workers: 4
     file_list: "./dataset/ILSVRC2012/train_list.txt"
     data_dir: "./dataset/ILSVRC2012/"

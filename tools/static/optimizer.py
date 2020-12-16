@@ -82,17 +82,12 @@ class Momentum(object):
         self.momentum = momentum
         self.parameter_list = parameter_list
         self.regularization = regularization
-        self.multi_precision = config.get('multi_precision', False)
-        self.rescale_grad = (1.0 / (config['TRAIN']['batch_size'] / len(fluid.cuda_places()))
-            if config.get('use_pure_fp16', False) else 1.0)
 
     def __call__(self):
         opt = fluid.contrib.optimizer.Momentum(
             learning_rate=self.learning_rate,
             momentum=self.momentum,
-            regularization=self.regularization,
-            multi_precision=self.multi_precision,
-            rescale_grad=self.rescale_grad)
+            regularization=self.regularization)
         return opt
 
 
