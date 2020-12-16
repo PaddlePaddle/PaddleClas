@@ -164,6 +164,7 @@ OPENCV_DIR=your_opencv_dir
 LIB_DIR=your_paddle_inference_dir
 CUDA_LIB_DIR=your_cuda_lib_dir
 CUDNN_LIB_DIR=your_cudnn_lib_dir
+TENSORRT_DIR=your_tensorrt_lib_dir
 
 BUILD_DIR=build
 rm -rf ${BUILD_DIR}
@@ -176,6 +177,7 @@ cmake .. \
     -DWITH_GPU=OFF \
     -DWITH_STATIC_LIB=OFF \
     -DWITH_TENSORRT=OFF \
+    -DTENSORRT_DIR=${TENSORRT_DIR} \
     -DOPENCV_DIR=${OPENCV_DIR} \
     -DCUDNN_LIB=${CUDNN_LIB_DIR} \
     -DCUDA_LIB=${CUDA_LIB_DIR} \
@@ -193,6 +195,8 @@ make -j
 
 * `CUDNN_LIB_DIR`为cudnn库文件地址，在docker中为`/usr/lib/x86_64-linux-gnu/`。
 
+* `TENSORRT_DIR`是tensorrt库文件地址，在dokcer中为`/usr/local/TensorRT6-cuda10.0-cudnn7/`，TensorRT需要结合GPU使用。
+
 在执行上述命令，编译完成之后，会在当前路径下生成`build`文件夹，其中生成一个名为`clas_system`的可执行文件。
 
 
@@ -203,6 +207,8 @@ make -j
   * gpu_mem：显存；
   * cpu_math_library_num_threads：底层科学计算库所用线程的数量；
   * use_mkldnn：是否使用MKLDNN加速；
+  * use_tensorrt: 是否使用tensorRT进行加速；
+  * use_fp16：是否使用半精度浮点数进行计算，该选项仅在use_tensorrt为true时有效；
   * cls_model_path：预测模型结构文件路径；
   * cls_params_path：预测模型参数文件路径；
   * resize_short_size：预处理时图像缩放大小；
