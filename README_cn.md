@@ -8,6 +8,7 @@
 
 
 **近期更新**
+- 2020.12.16 添加对cpp预测的tensorRT支持，预测加速更明显。
 - 2020.12.06 添加`SE_HRNet_W64_C_ssld`模型，在ImageNet-1k上Top-1 Acc可达84.75%。
 - 2020.11.23 添加`GhostNet_x1_3_ssld `模型，在ImageNet-1k上Top-1 Acc可达79.38%。
 - 2020.11.18 添加图像分类[常见问题2020第一季第三期](./docs/zh_CN/faq_series/faq_2020_s1.md) 5个新问题，并且计划以后每周会更新，欢迎大家持续关注。
@@ -17,7 +18,6 @@
 - 2020.10.10 添加cpp inference demo，完善`FAQ 30问`教程。
 - 2020.09.17 添加 `HRNet_W48_C_ssld `模型，在ImageNet-1k上Top-1 Acc可达83.62%；添加 `ResNet34_vd_ssld `模型，在ImageNet-1k上Top-1 Acc可达79.72%。
 - 2020.09.07 添加 `HRNet_W18_C_ssld `模型，在ImageNet-1k上Top-1 Acc可达81.16%；添加 `MobileNetV3_small_x0_35_ssld `模型，在ImageNet-1k上Top-1 Acc可达55.55%。
-- 2020.07.14 添加 `Res2Net200_vd_26w_4s_ssld `模型，在ImageNet-1k上Top-1 Acc可达85.13%；添加 `Fix_ResNet50_vd_ssld_v2 `模型，在ImageNet-1k上Top-1 Acc可达84.0%。
 - [more](./docs/zh_CN/update_history.md)
 
 
@@ -78,7 +78,7 @@
     - [基于训练引擎预测推理](./docs/zh_CN/tutorials/getting_started.md)
     - [基于Python预测引擎预测推理](./docs/zh_CN/tutorials/getting_started.md)
     - [基于C++预测引擎预测推理](./deploy/cpp_infer/readme.md)
-    - [服务化部署](./docs/zh_CN/extension/paddle_serving.md)
+    - [服务化部署](./deploy/hubserving/readme.md)
     - [端侧部署](./deploy/lite/readme.md)
     - [模型量化压缩](docs/zh_CN/extension/paddle_quantization.md)
 - 高阶使用

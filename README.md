@@ -7,6 +7,7 @@
 PaddleClas is a toolset for image classification tasks prepared for the industry and academia. It helps users train better computer vision models and apply them in real scenarios.
 
 **Recent update**
+- 2020.12.16 Add support for TensorRT when using cpp inference to obain more obvious acceleration.
 - 2020.12.06 Add `SE_HRNet_W64_C_ssld` pretrained model, whose Top-1 Acc on ImageNet-1k dataset reaches 84.75%.
 - 2020.11.23 Add `GhostNet_x1_3_ssld` pretrained model, whose Top-1 Acc on ImageNet-1k dataset reaches 79.38%.
 - 2020.11.09 Add `InceptionV3` architecture and pretrained model, whose Top-1 Acc on ImageNet1k dataset reaches 79.1%.
@@ -15,7 +16,6 @@ PaddleClas is a toolset for image classification tasks prepared for the industry
 - 2020.10.10 Add cpp inference demo and improve FAQ tutorial.
 - 2020.09.17 Add `HRNet_W48_C_ssld` pretrained model, whose Top-1 Acc on ImageNet-1k dataset reaches 83.62%. Add `ResNet34_vd_ssld` pretrained model, whose Top-1 Acc on ImageNet-1k dataset reaches 79.72%.
 - 2020.09.07 Add `HRNet_W18_C_ssld` pretrained model, whose Top-1 Acc on ImageNet-1k dataset reaches 81.16%.
-- 2020.07.14 Add `Res2Net200_vd_26w_4s_ssld` pretrained model, whose Top-1 Acc on ImageNet-1k dataset reaches 85.13%. Add `Fix_ResNet50_vd_ssld_v2` pretrained model, whose Top-1 Acc on ImageNet-1k dataset reaches 84.00%.
 - [more](./docs/en/update_history_en.md)
 
 
@@ -76,7 +76,7 @@ PaddleClas is a toolset for image classification tasks prepared for the industry
     - [Prediction based on training engine](./docs/en/tutorials/getting_started_en.md)
     - [Python inference](./docs/en/tutorials/getting_started_en.md)
     - [C++ inference](./deploy/cpp_infer/readme_en.md)
-    - [Serving deployment](./docs/en/extension/paddle_serving_en.md)
+    - [Serving deployment](./deploy/hubserving/readme_en.md)
     - [Mobile](./deploy/lite/readme_en.md)
     - [Model Quantization and Compression](docs/en/extension/paddle_quantization_en.md)
 - Advanced tutorials

@@ -1,14 +1,17 @@
 # Release Notes
 
+- 2020.12.16
+    * Add support for TensorRT when using cpp inference to obain more obvious acceleration.
+
 - 2020.12.06
     * Add `SE_HRNet_W64_C_ssld` pretrained model, whose Top-1 Acc on ImageNet1k dataset reaches 84.75%.
 
 - 2020.11.23
     * Add `GhostNet_x1_3_ssld` pretrained model, whose Top-1 Acc on ImageNet1k dataset reaches 79.38%.
-    
+
 - 2020.11.09
     * Add `InceptionV3` architecture and pretrained model, whose Top-1 Acc on ImageNet1k dataset reaches 79.1%.
-    
+
 * 2020.10.20
     * Add `Res2Net50_vd_26w_4s_ssld` pretrained model, whose Top-1 Acc on ImageNet1k dataset reaches 83.1%.
     * Add `Res2Net101_vd_26w_4s_ssld` pretrained model, whose Top-1 Acc on ImageNet1k dataset reaches 83.9%.

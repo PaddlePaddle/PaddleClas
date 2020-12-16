@@ -172,6 +172,7 @@ OPENCV_DIR=your_opencv_dir
 LIB_DIR=your_paddle_inference_dir
 CUDA_LIB_DIR=your_cuda_lib_dir
 CUDNN_LIB_DIR=your_cudnn_lib_dir
+TENSORRT_DIR=your_tensorrt_lib_dir
 
 BUILD_DIR=build
 rm -rf ${BUILD_DIR}
@@ -180,10 +181,11 @@ cd ${BUILD_DIR}
 cmake .. \
     -DPADDLE_LIB=${LIB_DIR} \
     -DWITH_MKL=ON \
-    -DDEMO_NAME=ocr_system \
+    -DDEMO_NAME=clas_system \
     -DWITH_GPU=OFF \
     -DWITH_STATIC_LIB=OFF \
     -DWITH_TENSORRT=OFF \
+    -DTENSORRT_DIR=${TENSORRT_DIR} \
     -DOPENCV_DIR=${OPENCV_DIR} \
     -DCUDNN_LIB=${CUDNN_LIB_DIR} \
     -DCUDA_LIB=${CUDA_LIB_DIR} \
@@ -201,11 +203,29 @@ In the above parameters of command:
 
 * `CUDNN_LIB_DIR` is the cudnn library file path, in docker it is `/usr/lib/x86_64-linux-gnu/`.
 
+* `TENSORRT_DIR` is the tensorrt library file path，in dokcer it is `/usr/local/TensorRT6-cuda10.0-cudnn7/`，TensorRT is just enabled for GPU.
+
 After the compilation is completed, an executable file named `clas_system` will be generated in the `build` folder.
 
 
 ### Run the demo
-* First, please modify the `tools/config.txt` and `tools/run.sh`. Then execute the following command to complete the classification of an image.
+* First, please modify the `tools/config.txt` and `tools/run.sh`.
+
+* Some key words in `tools/config.txt` is as follows.
+  * use_gpu: Whether to use GPU.
+  * gpu_id: GPU id.
+  * gpu_mem：GPU memory.
+  * cpu_math_library_num_threads：Number of thread for math library acceleration.
+  * use_mkldnn：Whether to use mkldnn.
+  * use_tensorrt: Whether to use tensorRT.
+  * use_fp16：Whether to use Float16 (half precision), it is just enabled when use_tensorrt is set as 1.
+  * cls_model_path: Model path of inference model.
+  * cls_params_path: Params path of inference model.
+  * resize_short_size：Short side length of the image after resize.
+  * crop_size：Image size after center crop.
+
+
+* Then execute the following command to complete the classification of an image.
 
 ```shell
 sh tools/run.sh
