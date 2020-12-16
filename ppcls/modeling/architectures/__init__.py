@@ -13,6 +13,7 @@
 # limitations under the License.
 
 from .resnet import ResNet18, ResNet34, ResNet50, ResNet101, ResNet152
+from .resnet_amp import ResNet50_amp
 from .resnet_vc import ResNet18_vc, ResNet34_vc, ResNet50_vc, ResNet101_vc, ResNet152_vc
 from .resnet_vd import ResNet18_vd, ResNet34_vd, ResNet50_vd, ResNet101_vd, ResNet152_vd, ResNet200_vd
 from .resnext import ResNeXt50_32x4d, ResNeXt50_64x4d, ResNeXt101_32x4d, ResNeXt101_64x4d, ResNeXt152_32x4d, ResNeXt152_64x4d

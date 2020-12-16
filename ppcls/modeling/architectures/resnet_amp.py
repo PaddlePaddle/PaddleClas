@@ -21,13 +21,14 @@ import paddle
 from paddle import ParamAttr
 import paddle.nn as nn
 import paddle.nn.functional as F
-from paddle.nn import Conv2D, BatchNorm, Linear, Dropout
+from paddle.nn import Conv2D, Linear, Dropout
 from paddle.nn import AdaptiveAvgPool2D, MaxPool2D, AvgPool2D
 from paddle.nn.initializer import Uniform
+from .nn import BatchNorm
 
 import math
 
-__all__ = ["ResNet18", "ResNet34", "ResNet50", "ResNet101", "ResNet152"]
+__all__ = ["ResNet50_amp"]
 
 
 class ConvBNLayer(nn.Layer):
@@ -286,27 +287,6 @@ class ResNet(nn.Layer):
         y = self.out(y)
         return y
 
-
-def ResNet18(**args):
-    model = ResNet(layers=18, **args)
-    return model
-
-
-def ResNet34(**args):
-    model = ResNet(layers=34, **args)
-    return model
-
-
-def ResNet50(**args):
+def ResNet50_amp(**args):
     model = ResNet(layers=50, **args)
-    return model
-
-
-def ResNet101(**args):
-    model = ResNet(layers=101, **args)
-    return model
-
-
-def ResNet152(**args):
-    model = ResNet(layers=152, **args)
     return model
