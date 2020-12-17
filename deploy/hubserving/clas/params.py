@@ -33,6 +33,8 @@ def read_params():
     cfg.gpu_mem = 8000
     cfg.use_fp16 = False
     cfg.use_tensorrt = False
+    cfg.cpu_num_threads = 10
+    cfg.enable_profile = False
 
     # params for preprocess
     cfg.resize_short = 256
