@@ -19,7 +19,7 @@ PaddleClas在Windows 平台下基于`Visual Studio 2019 Community` 进行了测�
 
 ### Step1: 下载PaddlePaddle C++ 预测库 paddle_inference_install_dir
 
-PaddlePaddle C++ 预测库针对不同的`CPU`和`CUDA`版本提供了不同的预编译版本，请根据实际情况下载:  [C++预测库下载列表](https://www.paddlepaddle.org.cn/documentation/docs/zh/develop/advanced_guide/inference_deployment/inference/windows_cpp_inference.html)。
+PaddlePaddle C++ 预测库针对不同的`CPU`和`CUDA`版本提供了不同的预编译版本，请根据实际情况下载:  [C++预测库下载列表](https://www.paddlepaddle.org.cn/documentation/docs/zh/develop/guides/05_inference_deployment/inference/windows_cpp_inference.html)。
 
 解压后`D:\projects\paddle_inference_install_dir`目录包含内容为：
 
@@ -116,3 +116,4 @@ cd D:\projects\PaddleClas\deploy\cpp_infer\out\build\x64-Release
 ### 注意
 * 在Windows下的终端中执行文件exe时，可能会发生乱码的现象，此时需要在终端中输入`CHCP 65001`，将终端的编码方式由GBK编码(默认)改为UTF-8编码，更加具体的解释可以参考这篇博客：[https://blog.csdn.net/qq_35038153/article/details/78430359](https://blog.csdn.net/qq_35038153/article/details/78430359)。
 * 如果需要使用CPU预测，PaddlePaddle在Windows上仅支持avx的CPU预测，目前不支持noavx的CPU预测。
+* 在使用生成的`clas_system.exe`进行预测时，如提示`由于找不到paddle_fluid.dll，无法继续执行代码。重新安装程序可能会解决此问题`，请检查是否将Paddle预测库路径添加到系统环境变量，详见[Step1: 下载PaddlePaddle C++ 预测库 paddle_inference_install_dir](#step1-下载paddlepaddle-c-预测库-paddle_inference_install_dir)
