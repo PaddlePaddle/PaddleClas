@@ -57,19 +57,27 @@ def main(url, image_path, top_k=1):
     all_acc = 0.0
 
     for image_file in image_file_list:
+        file_str = image_file.split('/')[-1]
         img = open(image_file, 'rb').read()
         if img is None:
-            logger.info("error in loading image:{}".format(image_file))
+            logger.error("Loading image:{} failed".format(image_file))
             continue
         data = {'images': [cv2_to_base64(img)], 'top_k': top_k}
 
         starttime = time.time()
-        r = requests.post(url=url, headers=headers, data=json.dumps(data))
-        assert r.status_code == 200, "Request error, status_code: {}".format(
-            r.status_code)
+        try:
+            r = requests.post(url=url, headers=headers, data=json.dumps(data))
+            r.raise_for_status()
+        except Exception as e:
+            logger.error("File:{}, {}".format(file_str, e))
+            continue
         elapse = time.time() - starttime
         total_time += elapse
-
+        if r.json()['status'] != '0':
+            logger.error(
+                "File:{}, The parameters returned by the server are: {}".
+                format(file_str, r.json()['msg']))
+            continue
         res = r.json()["results"][0]
         classes = res[0]
         scores = res[1]
@@ -79,7 +87,6 @@ def main(url, image_path, top_k=1):
         scores = map(lambda x: round(x, 5), scores)
         results = dict(zip(classes, scores))
 
-        file_str = image_file.split('/')[-1]
         message = "No.{}, File:{}, The top-{} result(s):{}, Time cost:{:.3f}".format(
             cnt, file_str, top_k, results, elapse)
         logger.info(message)
