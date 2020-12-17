@@ -12,13 +12,13 @@ PaddleClas在Windows 平台下基于`Visual Studio 2019 Community` 进行了测�
 
 **下面所有示例以工作目录为 `D:\projects`演示**。
 
-### Step1: 下载PaddlePaddle C++ 预测库 fluid_inference
+### Step1: 下载PaddlePaddle C++ 预测库 paddle_inference_install_dir
 
-PaddlePaddle C++ 预测库针对不同的`CPU`和`CUDA`版本提供了不同的预编译版本，请根据实际情况下载:  [C++预测库下载列表](https://www.paddlepaddle.org.cn/documentation/docs/zh/develop/advanced_guide/inference_deployment/inference/windows_cpp_inference.html)。
+PaddlePaddle C++ 预测库针对不同的`CPU`和`CUDA`版本提供了不同的预编译版本，请根据实际情况下载:  [C++预测库下载列表](https://www.paddlepaddle.org.cn/documentation/docs/zh/2.0-rc1/guides/05_inference_deployment/inference/windows_cpp_inference.html)。
 
-解压后`D:\projects\fluid_inference`目录包含内容为：
+解压后`D:\projects\paddle_inference_install_dir`目录包含内容为：
 ```
-fluid_inference
+paddle_inference_install_dir
 ├── paddle # paddle核心库和头文件
 |
 ├── third_party # 第三方依赖库和头文件
@@ -62,7 +62,7 @@ fluid_inference
 | CMAKE_BUILD_TYPE              | RelWithDebInfo     | [√]         |
 | CUDA_LIB                      | CUDA的库路径       | [√]         |
 | CUDNN_LIB                     | CUDNN的库路径      | [√]         |
-| OPENCV_DIR                    | OpenCV的安装路径   | [√]         |
+| OpenCV_DIR                    | OpenCV的安装路径   | [√]         |
 | PADDLE_LIB                    | Paddle预测库的路径 | [√]         |
 | WITH_GPU                      | [√]                | [√]         |
 | WITH_MKL                      | [√]                | [√]         |
