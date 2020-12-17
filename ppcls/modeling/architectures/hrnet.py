@@ -246,7 +246,7 @@ class BottleneckBlock(nn.Layer):
         if self.has_se:
             conv3 = self.se(conv3)
 
-        y = paddle.add(x=conv3, y=residual)
+        y = paddle.add(x=residual, y=conv3)
         y = F.relu(y)
         return y
 
@@ -305,7 +305,7 @@ class BasicBlock(nn.Layer):
         if self.has_se:
             conv2 = self.se(conv2)
 
-        y = paddle.add(x=conv2, y=residual)
+        y = paddle.add(x=residual, y=conv2)
         y = F.relu(y)
         return y
 
