@@ -29,8 +29,8 @@ def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('-a', '--architecture', type=str, default='ResNet50')
     parser.add_argument('-p', '--path', type=str, default='./pretrained/')
-    parser.add_argument('--postfix', type=str, default="tar")
-    parser.add_argument('-d', '--decompress', type=str2bool, default=True)
+    parser.add_argument('--postfix', type=str, default="pdparams")
+    parser.add_argument('-d', '--decompress', type=str2bool, default=False)
     parser.add_argument('-l', '--list', type=str2bool, default=False)
 
     args = parser.parse_args()
