@@ -131,7 +131,7 @@ class BottleneckBlock(nn.Layer):
             if s == 0 or self.stride == 2:
                 ys.append(conv1(xs[s]))
             else:
-                ys.append(conv1(xs[s] + ys[-1]))
+                ys.append(conv1(paddle.add(xs[s], ys[-1])))
         if self.stride == 1:
             ys.append(xs[-1])
         else:

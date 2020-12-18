@@ -653,7 +653,7 @@ class HRNet(nn.Layer):
 
         y = last_cls[0]
         for idx in range(3):
-            y = last_cls[idx + 1] + self.cls_head_conv_list[idx](y)
+            y = paddle.add(last_cls[idx + 1], self.cls_head_conv_list[idx](y))
 
         y = self.conv_last(y)
         y = self.pool2d_avg(y)
