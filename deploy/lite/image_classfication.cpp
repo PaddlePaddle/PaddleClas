@@ -149,7 +149,7 @@ cv::Mat CenterCropImg(const cv::Mat &img, const int &crop_size) {
 std::vector<RESULT>
 RunClasModel(std::shared_ptr<PaddlePredictor> predictor, const cv::Mat &img,
              const std::map<std::string, std::string> &config,
-             const std::vector<std::string> &word_labels) {
+             const std::vector<std::string> &word_labels, double &cost_time) {
   // Read img
   int resize_short_size = stoi(config.at("resize_short_size"));
   int crop_size = stoi(config.at("crop_size"));
@@ -173,6 +173,7 @@ RunClasModel(std::shared_ptr<PaddlePredictor> predictor, const cv::Mat &img,
   const float *dimg = reinterpret_cast<const float *>(img_fp.data);
   NeonMeanScale(dimg, data0, img_fp.rows * img_fp.cols, mean, scale);
 
+  auto start = std::chrono::system_clock::now();
   // Run predictor
   predictor->Run();
 
@@ -180,6 +181,12 @@ RunClasModel(std::shared_ptr<PaddlePredictor> predictor, const cv::Mat &img,
   std::unique_ptr<const Tensor> output_tensor(
       std::move(predictor->GetOutput(0)));
   auto *output_data = output_tensor->data<float>();
+  auto end = std::chrono::system_clock::now();
+  auto duration =
+      std::chrono::duration_cast<std::chrono::microseconds>(end - start);
+  cost_time = double(duration.count()) *
+              std::chrono::microseconds::period::num /
+              std::chrono::microseconds::period::den;
 
   int output_size = 1;
   for (auto dim : output_tensor->shape()) {
@@ -294,6 +301,12 @@ int main(int argc, char **argv) {
   auto config = LoadConfigTxt(config_path);
   PrintConfig(config);
 
+  double elapsed_time = 0.0;
+  int warmup_iter = 10;
+
+  bool enable_benchmark = bool(stoi(config.at("enable_benchmark")));
+  int total_cnt = enable_benchmark ? 1000 : 1;
+
   std::string clas_model_file = config.at("clas_model_file");
   std::string label_path = config.at("label_path");
 
@@ -301,32 +314,31 @@ int main(int argc, char **argv) {
   std::vector<std::string> word_labels = LoadLabels(label_path);
 
   auto clas_predictor = LoadModel(clas_model_file);
+  for (int j = 0; j < total_cnt; ++j) {
+    cv::Mat srcimg = cv::imread(img_path, cv::IMREAD_COLOR);
+    cv::cvtColor(srcimg, srcimg, cv::COLOR_BGR2RGB);
 
-  auto start = std::chrono::system_clock::now();
+    double run_time = 0;
+    std::vector<RESULT> results =
+        RunClasModel(clas_predictor, srcimg, config, word_labels, run_time);
 
-  cv::Mat srcimg = cv::imread(img_path, cv::IMREAD_COLOR);
-  cv::cvtColor(srcimg, srcimg, cv::COLOR_BGR2RGB);
-
-  std::vector<RESULT> results =
-      RunClasModel(clas_predictor, srcimg, config, word_labels);
-
-  std::cout << "===clas result for image: " << img_path << "===" << std::endl;
-  for (int i = 0; i < results.size(); i++) {
-    std::cout << "\t"
-              << "Top-" << i + 1 << ", class_id: " << results[i].class_id
-              << ", class_name: " << results[i].class_name
-              << ", score: " << results[i].score << std::endl;
+    std::cout << "===clas result for image: " << img_path << "===" << std::endl;
+    for (int i = 0; i < results.size(); i++) {
+      std::cout << "\t"
+                << "Top-" << i + 1 << ", class_id: " << results[i].class_id
+                << ", class_name: " << results[i].class_name
+                << ", score: " << results[i].score << std::endl;
+    }
+    if (j >= warmup_iter) {
+      elapsed_time += run_time;
+      std::cout << "Current image path: " << img_path << std::endl;
+      std::cout << "Current time cost: " << run_time << " s, "
+                << "average time cost in all: "
+                << elapsed_time / (j + 1 - warmup_iter) << " s." << std::endl;
+    } else {
+      std::cout << "Current time cost: " << run_time << " s." << std::endl;
+    }
   }
-
-  auto end = std::chrono::system_clock::now();
-  auto duration =
-      std::chrono::duration_cast<std::chrono::microseconds>(end - start);
-
-  std::cout << "Cost "
-            << double(duration.count()) *
-                   std::chrono::microseconds::period::num /
-                   std::chrono::microseconds::period::den
-            << " s" << std::endl;
 
   return 0;
 }
