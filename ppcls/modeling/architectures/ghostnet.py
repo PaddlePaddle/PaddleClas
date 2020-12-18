@@ -89,7 +89,7 @@ class SEBlock(nn.Layer):
         excitation = self.excitation(squeeze)
         excitation = paddle.clip(x=excitation, min=0, max=1)
         excitation = paddle.unsqueeze(excitation, axis=[2, 3])
-        out = inputs * excitation
+        out = paddle.multiply(inputs, excitation)
         return out
 
 

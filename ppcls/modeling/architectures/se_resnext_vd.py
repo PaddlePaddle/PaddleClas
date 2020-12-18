@@ -170,7 +170,7 @@ class SELayer(nn.Layer):
         excitation = self.excitation(squeeze)
         excitation = self.sigmoid(excitation)
         excitation = paddle.unsqueeze(excitation, axis=[2, 3])
-        out = input * excitation
+        out = paddle.multiply(input, excitation)
         return out
 
 
