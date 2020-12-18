@@ -1,5 +1,6 @@
 clas_model_file ./MobileNetV3_large_x1_0.nb
-label_path ./imagenet1k_label_list.txt
+label_path ./readable_label.txt
 resize_short_size 256
 crop_size 224
 visualize 0
+enable_benchmark 1
