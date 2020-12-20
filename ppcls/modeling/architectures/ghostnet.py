@@ -21,6 +21,8 @@ from paddle.nn import Conv2D, BatchNorm, AdaptiveAvgPool2D, Linear
 from paddle.regularizer import L2Decay
 from paddle.nn.initializer import Uniform, KaimingNormal
 
+__all__ = ["GhostNet_x0_5", "GhostNet_x1_0", "GhostNet_x1_3"]
+
 
 class ConvBNLayer(nn.Layer):
     def __init__(self,
