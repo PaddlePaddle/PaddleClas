@@ -12,7 +12,7 @@ valid_interval: 1
 epochs: 120
 topk: 5
 image_shape: [3, 224, 224]
-is_distributed: True
+is_distributed: False
 
 # mixed precision training
 use_amp: True

@@ -36,7 +36,6 @@ from ppcls.utils import logger
 from tools.static import program
 from save_load import init_model, save_model
 
-
 def parse_args():
     parser = argparse.ArgumentParser("PaddleClas train script")
     parser.add_argument(

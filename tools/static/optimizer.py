@@ -87,10 +87,10 @@ class Momentum(object):
             if config.get('use_pure_fp16', False) else 1.0)
 
     def __call__(self):
-        opt = fluid.contrib.optimizer.Momentum(
+        opt = paddle.optimizer.Momentum(
             learning_rate=self.learning_rate,
             momentum=self.momentum,
-            regularization=self.regularization,
+            weight_decay=self.regularization,
             multi_precision=self.multi_precision,
             rescale_grad=self.rescale_grad)
         return opt
