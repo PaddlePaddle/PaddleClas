@@ -252,10 +252,16 @@ class SELayer(nn.Layer):
 
 
 class SE_ResNet_vd(nn.Layer):
-    def __init__(self, layers=50, class_dim=1000, data_format="NCHW"):
+    def __init__(self,
+                 layers=50,
+                 class_dim=1000,
+                 input_image_channel=3,
+                 data_format="NCHW"):
         super(SE_ResNet_vd, self).__init__()
 
         self.layers = layers
+        self.data_format = data_format
+        self.input_image_channel = input_image_channel
         supported_layers = [18, 34, 50, 101, 152, 200]
         assert layers in supported_layers, \
             "supported layers are {} but input layer is {}".format(
@@ -276,13 +282,13 @@ class SE_ResNet_vd(nn.Layer):
         num_filters = [64, 128, 256, 512]
 
         self.conv1_1 = ConvBNLayer(
-            num_channels=3,
+            num_channels=self.input_image_channel,
             num_filters=32,
             filter_size=3,
             stride=2,
             act='relu',
             name="conv1_1",
-            data_format=data_format)
+            data_format=self.data_format)
         self.conv1_2 = ConvBNLayer(
             num_channels=32,
             num_filters=32,
@@ -290,7 +296,7 @@ class SE_ResNet_vd(nn.Layer):
             stride=1,
             act='relu',
             name="conv1_2",
-            data_format=data_format)
+            data_format=self.data_format)
         self.conv1_3 = ConvBNLayer(
             num_channels=32,
             num_filters=64,
@@ -298,8 +304,9 @@ class SE_ResNet_vd(nn.Layer):
             stride=1,
             act='relu',
             name="conv1_3",
-            data_format=data_format)
-        self.pool2d_max = MaxPool2D(kernel_size=3, stride=2, padding=1)
+            data_format=self.data_format)
+        self.pool2d_max = MaxPool2D(
+            kernel_size=3, stride=2, padding=1, data_format=self.data_format)
 
         self.block_list = []
         if layers >= 50:
@@ -323,7 +330,7 @@ class SE_ResNet_vd(nn.Layer):
                             shortcut=shortcut,
                             if_first=block == i == 0,
                             name=conv_name,
-                            data_format=data_format))
+                            data_format=self.data_format))
                     self.block_list.append(bottleneck_block)
                     shortcut = True
         else:
