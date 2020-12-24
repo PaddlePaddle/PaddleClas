@@ -73,7 +73,7 @@ def main(url, image_path, top_k=1):
             continue
         elapse = time.time() - starttime
         total_time += elapse
-        if r.json()['status'] != '0':
+        if r.json()['status'] != '000':
             logger.error(
                 "File:{}, The parameters returned by the server are: {}".
                 format(file_str, r.json()['msg']))

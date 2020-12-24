@@ -14,8 +14,8 @@ deploy/hubserving/clas/
 ## Quick start service
 ### 1. Prepare the environment
 ```shell
-# Install paddlehub  
-pip3 install paddlehub --upgrade -i https://pypi.tuna.tsinghua.edu.cn/simple
+# Install version 2.0 of PaddleHub  
+pip3 install paddlehub==2.0.0b1 --upgrade -i https://pypi.tuna.tsinghua.edu.cn/simple
 ```
 
 ### 2. Download inference model
