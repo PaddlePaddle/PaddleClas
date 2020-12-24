@@ -62,6 +62,7 @@ class ClasSystem(hub.Module):
         else:
             print("Use CPU")
             print("Enable MKL-DNN") if enable_mkldnn else None
+        self.predictor = create_paddle_predictor(self.args)
 
     def read_images(self, paths=[]):
         images = []
@@ -96,7 +97,6 @@ class ClasSystem(hub.Module):
 
         assert predicted_data != [], "There is not any image to be predicted. Please check the input data."
 
-        predictor = create_paddle_predictor(self.args)
         all_results = []
         for img in predicted_data:
             if img is None:
@@ -107,7 +107,7 @@ class ClasSystem(hub.Module):
 
             self.args.image_file = img
             self.args.top_k = top_k
-            classes, scores = paddle_predict.predict(self.args, predictor)
+            classes, scores = paddle_predict.predict(self.args, self.predictor)
 
             elapse = time.time() - starttime
             logger.info("Predict time: {}".format(elapse))

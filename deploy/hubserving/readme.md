@@ -14,8 +14,8 @@ deploy/hubserving/clas/
 ## 快速启动服务
 ### 1. 准备环境
 ```shell
-# 安装paddlehub  
-pip3 install paddlehub --upgrade -i https://pypi.tuna.tsinghua.edu.cn/simple
+# 安装paddlehub,请安装2.0版本
+pip3 install paddlehub==2.0.0b1 --upgrade -i https://pypi.tuna.tsinghua.edu.cn/simple
 ```
 
 ### 2. 下载推理模型
