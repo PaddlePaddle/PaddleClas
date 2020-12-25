@@ -74,7 +74,7 @@ Paramters：
 ```shell
 export CUDA_VISIBLE_DEVICES=0
 python -m paddle.distributed.launch \
-    --selected_gpus="0" \
+    --gpus="0" \
     tools/train.py \
         -c ./configs/quick_start/ResNet50_vd.yaml
 
@@ -92,7 +92,7 @@ The validation `Top1 Acc` curve is showmn below.
 ```shell
 export CUDA_VISIBLE_DEVICES=0
 python -m paddle.distributed.launch \
-    --selected_gpus="0" \
+    --gpus="0" \
     tools/train.py \
         -c ./configs/quick_start/ResNet50_vd_finetune.yaml
 
@@ -122,7 +122,7 @@ Tringing script
 ```shell
 export CUDA_VISIBLE_DEVICES=0
 python -m paddle.distributed.launch \
-    --selected_gpus="0" \
+    --gpus="0" \
     tools/train.py \
         -c ./configs/quick_start/ResNet50_vd_ssld_finetune.yaml
 ```
@@ -137,7 +137,7 @@ Training script
 ```shell
 export CUDA_VISIBLE_DEVICES=0
 python -m paddle.distributed.launch \
-    --selected_gpus="0" \
+    --gpus="0" \
     tools/train.py \
         -c ./configs/quick_start/MobileNetV3_large_x1_0_finetune.yaml
 ```
@@ -154,7 +154,7 @@ Training script
 ```shell
 export CUDA_VISIBLE_DEVICES=0
 python -m paddle.distributed.launch \
-    --selected_gpus="0" \
+    --gpus="0" \
     tools/train.py \
         -c ./configs/quick_start/ResNet50_vd_ssld_random_erasing_finetune.yaml
 ```
@@ -191,7 +191,7 @@ Final training script
 ```shell
 export CUDA_VISIBLE_DEVICES=0
 python -m paddle.distributed.launch \
-    --selected_gpus="0" \
+    --gpus="0" \
     tools/train.py \
         -c ./configs/quick_start/R50_vd_distill_MV3_large_x1_0.yaml
 ```

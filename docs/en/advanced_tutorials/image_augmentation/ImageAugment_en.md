@@ -523,7 +523,7 @@ Users can use the following command to start the training process, which can als
 export PYTHONPATH=path_to_PaddleClas:$PYTHONPATH
 
 python -m paddle.distributed.launch \
-    --selected_gpus="0,1,2,3" \
+    --gpus="0,1,2,3" \
     tools/train.py \
         -c ./configs/DataAugment/ResNet50_Cutout.yaml
 ```

@@ -239,7 +239,7 @@ use_distillation: True
 export PYTHONPATH=path_to_PaddleClas:$PYTHONPATH
 
 python -m paddle.distributed.launch \
-    --selected_gpus="0,1,2,3" \
+    --gpus="0,1,2,3" \
     --log_dir=R50_vd_distill_MV3_large_x1_0 \
     tools/train.py \
         -c ./configs/Distillation/R50_vd_distill_MV3_large_x1_0.yaml

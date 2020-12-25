@@ -95,7 +95,7 @@ After preparing the configuration file, The training process can be started in t
 # PaddleClas starts multi-card and multi-process training through launch
 # Specify the GPU running card number by setting FLAGS_selected_gpus
 python -m paddle.distributed.launch \
-    --selected_gpus="0,1,2,3" \
+    --gpus="0,1,2,3" \
     tools/train.py \
         -c ./configs/ResNet/ResNet50_vd.yaml
 ```
@@ -104,7 +104,7 @@ The configuration can be updated by adding the `-o` parameter.
 
 ```bash
 python -m paddle.distributed.launch \
-    --selected_gpus="0,1,2,3" \
+    --gpus="0,1,2,3" \
     tools/train.py \
         -c ./configs/ResNet/ResNet50_vd.yaml \
         -o use_mix=1 \
@@ -121,7 +121,7 @@ The format of output log information is the same as above.
 
 ```
 python -m paddle.distributed.launch \
-    --selected_gpus="0,1,2,3" \
+    --gpus="0,1,2,3" \
     tools/train.py \
         -c configs/ResNet/ResNet50.yaml \
         -o pretrained_model="./pretrained/ResNet50_pretrained"
@@ -137,7 +137,7 @@ Among them, `pretrained_model` is used to set the address to load the pretrained
 
 ```
 python -m paddle.distributed.launch \
-    --selected_gpus="0,1,2,3" \
+    --gpus="0,1,2,3" \
     tools/train.py \
         -c configs/ResNet/ResNet50.yaml \
         -o checkpoints="./output/ResNet/0/ppcls"
