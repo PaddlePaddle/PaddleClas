@@ -64,15 +64,12 @@ def main(url, image_path, top_k=1):
             continue
         data = {'images': [cv2_to_base64(img)], 'top_k': top_k}
 
-        starttime = time.time()
         try:
             r = requests.post(url=url, headers=headers, data=json.dumps(data))
             r.raise_for_status()
         except Exception as e:
             logger.error("File:{}, {}".format(file_str, e))
             continue
-        elapse = time.time() - starttime
-        total_time += elapse
         if r.json()['status'] != '000':
             logger.error(
                 "File:{}, The parameters returned by the server are: {}".
@@ -81,7 +78,9 @@ def main(url, image_path, top_k=1):
         res = r.json()["results"][0]
         classes = res[0]
         scores = res[1]
+        elapse = res[2]
         all_acc += scores[0]
+        total_time += elapse
         cnt += 1
 
         scores = map(lambda x: round(x, 5), scores)
