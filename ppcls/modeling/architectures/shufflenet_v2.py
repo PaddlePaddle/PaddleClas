@@ -279,7 +279,7 @@ class ShuffleNet(Layer):
             y = inv(y)
         y = self._last_conv(y)
         y = self._pool2d_avg(y)
-        y = reshape(y, shape=[-1, self._out_c])
+        y = paddle.flatten(y, start_axis=1, stop_axis=-1)
         y = self._fc(y)
         return y
 
