@@ -33,16 +33,16 @@ __all__ = [
 
 
 class ConvBNLayer(nn.Layer):
-    def __init__(
-            self,
-            num_channels,
-            num_filters,
-            filter_size,
-            stride=1,
-            groups=1,
-            is_vd_mode=False,
-            act=None,
-            name=None, ):
+    def __init__(self,
+                 num_channels,
+                 num_filters,
+                 filter_size,
+                 stride=1,
+                 groups=1,
+                 is_vd_mode=False,
+                 act=None,
+                 name=None,
+                 data_format="NCHW"):
         super(ConvBNLayer, self).__init__()
 
         self.is_vd_mode = is_vd_mode
@@ -57,7 +57,8 @@ class ConvBNLayer(nn.Layer):
             padding=(filter_size - 1) // 2,
             groups=groups,
             weight_attr=ParamAttr(name=name + "_weights"),
-            bias_attr=False)
+            bias_attr=False,
+            data_format=data_format)
         if name == "conv1":
             bn_name = "bn_" + name
         else:
@@ -68,7 +69,8 @@ class ConvBNLayer(nn.Layer):
             param_attr=ParamAttr(name=bn_name + '_scale'),
             bias_attr=ParamAttr(bn_name + '_offset'),
             moving_mean_name=bn_name + '_mean',
-            moving_variance_name=bn_name + '_variance')
+            moving_variance_name=bn_name + '_variance',
+            data_format=data_format)
 
     def forward(self, inputs):
         if self.is_vd_mode:
@@ -86,7 +88,8 @@ class BottleneckBlock(nn.Layer):
                  shortcut=True,
                  if_first=False,
                  reduction_ratio=16,
-                 name=None):
+                 name=None,
+                 data_format="NCHW"):
         super(BottleneckBlock, self).__init__()
 
         self.conv0 = ConvBNLayer(
@@ -94,25 +97,29 @@ class BottleneckBlock(nn.Layer):
             num_filters=num_filters,
             filter_size=1,
             act='relu',
-            name=name + "_branch2a")
+            name=name + "_branch2a",
+            data_format=data_format)
         self.conv1 = ConvBNLayer(
             num_channels=num_filters,
             num_filters=num_filters,
             filter_size=3,
             stride=stride,
             act='relu',
-            name=name + "_branch2b")
+            name=name + "_branch2b",
+            data_format=data_format)
         self.conv2 = ConvBNLayer(
             num_channels=num_filters,
             num_filters=num_filters * 4,
             filter_size=1,
             act=None,
-            name=name + "_branch2c")
+            name=name + "_branch2c",
+            data_format=data_format)
         self.scale = SELayer(
             num_channels=num_filters * 4,
             num_filters=num_filters * 4,
             reduction_ratio=reduction_ratio,
-            name='fc_' + name)
+            name='fc_' + name,
+            data_format=data_format)
 
         if not shortcut:
             self.short = ConvBNLayer(
@@ -121,7 +128,8 @@ class BottleneckBlock(nn.Layer):
                 filter_size=1,
                 stride=1,
                 is_vd_mode=False if if_first else True,
-                name=name + "_branch1")
+                name=name + "_branch1",
+                data_format=data_format)
 
         self.shortcut = shortcut
 
@@ -148,7 +156,8 @@ class BasicBlock(nn.Layer):
                  shortcut=True,
                  if_first=False,
                  reduction_ratio=16,
-                 name=None):
+                 name=None,
+                 data_format="NCHW"):
         super(BasicBlock, self).__init__()
         self.stride = stride
         self.conv0 = ConvBNLayer(
@@ -157,19 +166,22 @@ class BasicBlock(nn.Layer):
             filter_size=3,
             stride=stride,
             act='relu',
-            name=name + "_branch2a")
+            name=name + "_branch2a",
+            data_format=data_format)
         self.conv1 = ConvBNLayer(
             num_channels=num_filters,
             num_filters=num_filters,
             filter_size=3,
             act=None,
-            name=name + "_branch2b")
+            name=name + "_branch2b",
+            data_format=data_format)
 
         self.scale = SELayer(
             num_channels=num_filters,
             num_filters=num_filters,
             reduction_ratio=reduction_ratio,
-            name='fc_' + name)
+            name='fc_' + name,
+            data_format=data_format)
 
         if not shortcut:
             self.short = ConvBNLayer(
@@ -178,7 +190,8 @@ class BasicBlock(nn.Layer):
                 filter_size=1,
                 stride=1,
                 is_vd_mode=False if if_first else True,
-                name=name + "_branch1")
+                name=name + "_branch1",
+                data_format=data_format)
 
         self.shortcut = shortcut
 
@@ -197,7 +210,12 @@ class BasicBlock(nn.Layer):
 
 
 class SELayer(nn.Layer):
-    def __init__(self, num_channels, num_filters, reduction_ratio, name=None):
+    def __init__(self,
+                 num_channels,
+                 num_filters,
+                 reduction_ratio,
+                 name=None,
+                 data_format="NCHW"):
         super(SELayer, self).__init__()
 
         self.pool2d_gap = AdaptiveAvgPool2D(1)
@@ -234,10 +252,16 @@ class SELayer(nn.Layer):
 
 
 class SE_ResNet_vd(nn.Layer):
-    def __init__(self, layers=50, class_dim=1000):
+    def __init__(self,
+                 layers=50,
+                 class_dim=1000,
+                 input_image_channel=3,
+                 data_format="NCHW"):
         super(SE_ResNet_vd, self).__init__()
 
         self.layers = layers
+        self.data_format = data_format
+        self.input_image_channel = input_image_channel
         supported_layers = [18, 34, 50, 101, 152, 200]
         assert layers in supported_layers, \
             "supported layers are {} but input layer is {}".format(
@@ -258,27 +282,31 @@ class SE_ResNet_vd(nn.Layer):
         num_filters = [64, 128, 256, 512]
 
         self.conv1_1 = ConvBNLayer(
-            num_channels=3,
+            num_channels=self.input_image_channel,
             num_filters=32,
             filter_size=3,
             stride=2,
             act='relu',
-            name="conv1_1")
+            name="conv1_1",
+            data_format=self.data_format)
         self.conv1_2 = ConvBNLayer(
             num_channels=32,
             num_filters=32,
             filter_size=3,
             stride=1,
             act='relu',
-            name="conv1_2")
+            name="conv1_2",
+            data_format=self.data_format)
         self.conv1_3 = ConvBNLayer(
             num_channels=32,
             num_filters=64,
             filter_size=3,
             stride=1,
             act='relu',
-            name="conv1_3")
-        self.pool2d_max = MaxPool2D(kernel_size=3, stride=2, padding=1)
+            name="conv1_3",
+            data_format=self.data_format)
+        self.pool2d_max = MaxPool2D(
+            kernel_size=3, stride=2, padding=1, data_format=self.data_format)
 
         self.block_list = []
         if layers >= 50:
@@ -301,7 +329,8 @@ class SE_ResNet_vd(nn.Layer):
                             stride=2 if i == 0 and block != 0 else 1,
                             shortcut=shortcut,
                             if_first=block == i == 0,
-                            name=conv_name))
+                            name=conv_name,
+                            data_format=self.data_format))
                     self.block_list.append(bottleneck_block)
                     shortcut = True
         else:
