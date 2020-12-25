@@ -95,7 +95,7 @@ python tools/eval_multi_platform.py \
 # 通过设置FLAGS_selected_gpus 指定GPU运行卡号
 
 python -m paddle.distributed.launch \
-    --selected_gpus="0,1,2,3" \
+    --gpus="0,1,2,3" \
     tools/train.py \
         -c ./configs/ResNet/ResNet50_vd.yaml
 ```
@@ -104,7 +104,7 @@ python -m paddle.distributed.launch \
 
 ```bash
 python -m paddle.distributed.launch \
-    --selected_gpus="0,1,2,3" \
+    --gpus="0,1,2,3" \
     tools/train.py \
         -c ./configs/ResNet/ResNet50_vd.yaml \
         -o use_mix=1 \
@@ -119,7 +119,7 @@ python -m paddle.distributed.launch \
 
 ```
 python -m paddle.distributed.launch \
-    --selected_gpus="0,1,2,3" \
+    --gpus="0,1,2,3" \
     tools/train.py \
         -c configs/ResNet/ResNet50.yaml \
         -o pretrained_model="./pretrained/ResNet50_pretrained"
@@ -136,7 +136,7 @@ python -m paddle.distributed.launch \
 
 ```
 python -m paddle.distributed.launch \
-    --selected_gpus="0,1,2,3" \
+    --gpus="0,1,2,3" \
     tools/train.py \
         -c configs/ResNet/ResNet50.yaml \
         -o checkpoints="./output/ResNet/0/ppcls"
@@ -151,7 +151,7 @@ python -m paddle.distributed.launch \
 
 ```bash
 python -m paddle.distributed.launch \
-    --selected_gpus="0" \
+    --gpus="0" \
     tools/eval.py \
         -c ./configs/eval.yaml \
         -o ARCHITECTURE.name="ResNet50_vd" \

@@ -74,7 +74,7 @@ python tools/download.py -a MobileNetV3_large_x1_0 -p ./pretrained -d True
 ```shell
 export CUDA_VISIBLE_DEVICES=0
 python -m paddle.distributed.launch \
-    --selected_gpus="0" \
+    --gpus="0" \
     tools/train.py \
         -c ./configs/quick_start/ResNet50_vd.yaml
 
@@ -92,7 +92,7 @@ python -m paddle.distributed.launch \
 ```shell
 export CUDA_VISIBLE_DEVICES=0
 python -m paddle.distributed.launch \
-    --selected_gpus="0" \
+    --gpus="0" \
     tools/train.py \
         -c ./configs/quick_start/ResNet50_vd_finetune.yaml
 
@@ -120,7 +120,7 @@ pretrained_model: "./pretrained/ResNet50_vd_ssld_pretrained"
 ```shell
 export CUDA_VISIBLE_DEVICES=0
 python -m paddle.distributed.launch \
-    --selected_gpus="0" \
+    --gpus="0" \
     tools/train.py \
         -c ./configs/quick_start/ResNet50_vd_ssld_finetune.yaml
 ```
@@ -135,7 +135,7 @@ python -m paddle.distributed.launch \
 ```shell
 export CUDA_VISIBLE_DEVICES=0
 python -m paddle.distributed.launch \
-    --selected_gpus="0" \
+    --gpus="0" \
     tools/train.py \
         -c ./configs/quick_start/MobileNetV3_large_x1_0_finetune.yaml
 ```
@@ -151,7 +151,7 @@ python -m paddle.distributed.launch \
 ```shell
 export CUDA_VISIBLE_DEVICES=0
 python -m paddle.distributed.launch \
-    --selected_gpus="0" \
+    --gpus="0" \
     tools/train.py \
         -c ./configs/quick_start/ResNet50_vd_ssld_random_erasing_finetune.yaml
 ```
@@ -190,7 +190,7 @@ TRAIN:
 ```shell
 export CUDA_VISIBLE_DEVICES=0
 python -m paddle.distributed.launch \
-    --selected_gpus="0" \
+    --gpus="0" \
     tools/train.py \
         -c ./configs/quick_start/R50_vd_distill_MV3_large_x1_0.yaml
 ```
