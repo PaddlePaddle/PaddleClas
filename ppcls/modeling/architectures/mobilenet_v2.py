@@ -213,7 +213,7 @@ class MobileNet(nn.Layer):
             y = block(y)
         y = self.conv9(y, if_act=True)
         y = self.pool2d_avg(y)
-        y = paddle.reshape(y, shape=[-1, self.out_c])
+        y = paddle.flatten(y, start_axis=1, stop_axis=-1)
         y = self.out(y)
         return y
 

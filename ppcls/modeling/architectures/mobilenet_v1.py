@@ -241,7 +241,7 @@ class MobileNet(nn.Layer):
         for block in self.block_list:
             y = block(y)
         y = self.pool2d_avg(y)
-        y = paddle.reshape(y, shape=[-1, int(1024 * self.scale)])
+        y = paddle.flatten(y, start_axis=1, stop_axis=-1)
         y = self.out(y)
         return y
 

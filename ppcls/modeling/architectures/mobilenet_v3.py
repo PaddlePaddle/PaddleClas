@@ -169,7 +169,7 @@ class MobileNetV3(nn.Layer):
         x = self.last_conv(x)
         x = hard_swish(x)
         x = self.dropout(x)
-        x = paddle.reshape(x, shape=[x.shape[0], x.shape[1]])
+        x = paddle.flatten(x, start_axis=1, stop_axis=-1)
         x = self.out(x)
 
         return x

@@ -328,7 +328,7 @@ class DPN(nn.Layer):
         conv5_x_x = self.conv5_x_x_bn(conv5_x_x)
 
         y = self.pool2d_avg(conv5_x_x)
-        y = paddle.reshape(y, shape=[0, -1])
+        y = paddle.flatten(y, start_axis=1, stop_axis=-1)
         y = self.out(y)
         return y
 
