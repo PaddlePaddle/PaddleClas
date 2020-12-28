@@ -76,9 +76,7 @@ def main(url, image_path, top_k=1):
                 format(file_str, r.json()['msg']))
             continue
         res = r.json()["results"][0]
-        classes = res[0]
-        scores = res[1]
-        elapse = res[2]
+        classes, scores, elapse = res
         all_acc += scores[0]
         total_time += elapse
         cnt += 1
