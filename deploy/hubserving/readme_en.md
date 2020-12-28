@@ -124,29 +124,40 @@ Two parameters need to be passed to the script:
 python tools/test_hubserving.py http://127.0.0.1:8866/predict/clas_system ./deploy/hubserving/ILSVRC2012_val_00006666.JPEG 5
 ```
 
-## Returned result format
-The returned result is a list, including classification results(`clas`), and the `top_k`'s scores(`socres`). And `scores` is a list, consist of `score`.
+### Returned result format
+The returned result is a list, including the `top_k`'s classification results, corresponding scores and the time cost of prediction, details as follows.
+
+```
+list: The returned results
+└─ list: The result of first picture
+   └─ list: The top-k classification results, sorted in descending order of score
+   └─ list: The scores corresponding to the top-k classification results, sorted in descending order of score
+   └─ float: The time cost of predicting the picture, unit second
+```
 
 **Note：** If you need to add, delete or modify the returned fields, you can modify the file `module.py` of the corresponding module. For the complete process, refer to the user-defined modification service module in the next section.
 
 ## User defined service module modification
 If you need to modify the service logic, the following steps are generally required:
 
-- 1. Stop service
+1. Stop service
 ```shell
 hub serving stop --port/-p XXXX
 ```
-- 2. Modify the code in the corresponding files, like `module.py` and `params.py`, according to the actual needs.  
-For example, if you need to replace the model used by the deployed service, you need to modify model path parameters `cfg.model_file` and `cfg.params_file` in `params.py`. Of course, other related parameters may need to be modified at the same time. Please modify and debug according to the actual situation. It is suggested to run `module.py` directly for debugging after modification before starting the service test.  
-- 3. Uninstall old service module
+2. Modify the code in the corresponding files, like `module.py` and `params.py`, according to the actual needs.  
+For example, if you need to replace the model used by the deployed service, you need to modify model path parameters `cfg.model_file` and `cfg.params_file` in `params.py`. Of course, other related parameters may need to be modified at the same time. Please modify and debug according to the actual situation.
+
+    After modifying and installing (`hub install deploy/hubserving/clas/`) and before deploying, you can use `python deploy/hubserving/clas/test.py` to test the installed service module.
+
+1. Uninstall old service module
 ```shell
 hub uninstall clas_system
 ```
-- 4. Install modified service module
+4. Install modified service module
 ```shell
 hub install deploy/hubserving/clas/
 ```
-- 5. Restart service
+5. Restart service
 ```shell
 hub serving start -m clas_system
 ```

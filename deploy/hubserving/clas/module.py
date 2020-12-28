@@ -18,7 +18,7 @@ sys.path.insert(0, ".")
 
 import time
 
-from paddlehub.common.logger import logger
+from paddlehub.utils.log import logger
 from paddlehub.module.module import moduleinfo, serving
 import cv2
 import numpy as np
@@ -103,16 +103,16 @@ class ClasSystem(hub.Module):
                 logger.info("error in loading image")
                 all_results.append([])
                 continue
-            starttime = time.time()
 
             self.args.image_file = img
             self.args.top_k = top_k
+
+            starttime = time.time()
             classes, scores = paddle_predict.predict(self.args, self.predictor)
-
             elapse = time.time() - starttime
-            logger.info("Predict time: {}".format(elapse))
-            all_results.append([classes.tolist(), scores.tolist()])
 
+            logger.info("Predict time: {}".format(elapse))
+            all_results.append([classes.tolist(), scores.tolist(), elapse])
         return all_results
 
     @serving
@@ -124,10 +124,3 @@ class ClasSystem(hub.Module):
         images_decode = [to_cv2(image) for image in images]
         results = self.predict(images_decode, **kwargs)
         return results
-
-
-if __name__ == '__main__':
-    clas = ClasSystem()
-    image_path = ['./deploy/hubserving/ILSVRC2012_val_00006666.JPEG', ]
-    res = clas.predict(paths=image_path, top_k=5)
-    print(res)
