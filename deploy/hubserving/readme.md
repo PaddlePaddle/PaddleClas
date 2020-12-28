@@ -139,7 +139,9 @@ list: 返回结果
 ```hub serving stop --port/-p XXXX```  
 
 - 2、 到相应的`module.py`和`params.py`等文件中根据实际需求修改代码。  
-例如，例如需要替换部署服务所用模型，则需要到`params.py`中修改模型路径参数`cfg.model_file`和`cfg.params_file`。
+  例如，例如需要替换部署服务所用模型，则需要到`params.py`中修改模型路径参数`cfg.model_file`和`cfg.params_file`。
+
+  修改并安装（`hub install deploy/hubserving/clas/`）完成后，在进行部署前，可通过`python deploy/hubserving/clas/test.py`测试已安装服务模块。
 
 - 3、 卸载旧服务包  
 ```hub uninstall clas_system```  

@@ -140,21 +140,24 @@ list: The returned results
 ## User defined service module modification
 If you need to modify the service logic, the following steps are generally required:
 
-- 1. Stop service
+1. Stop service
 ```shell
 hub serving stop --port/-p XXXX
 ```
-- 2. Modify the code in the corresponding files, like `module.py` and `params.py`, according to the actual needs.  
+2. Modify the code in the corresponding files, like `module.py` and `params.py`, according to the actual needs.  
 For example, if you need to replace the model used by the deployed service, you need to modify model path parameters `cfg.model_file` and `cfg.params_file` in `params.py`. Of course, other related parameters may need to be modified at the same time. Please modify and debug according to the actual situation.
-- 3. Uninstall old service module
+
+    After modifying and installing (`hub install deploy/hubserving/clas/`) and before deploying, you can use `python deploy/hubserving/clas/test.py` to test the installed service module.
+
+1. Uninstall old service module
 ```shell
 hub uninstall clas_system
 ```
-- 4. Install modified service module
+4. Install modified service module
 ```shell
 hub install deploy/hubserving/clas/
 ```
-- 5. Restart service
+5. Restart service
 ```shell
 hub serving start -m clas_system
 ```
