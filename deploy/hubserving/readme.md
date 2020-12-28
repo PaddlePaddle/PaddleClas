@@ -120,8 +120,15 @@ hub serving start -c deploy/hubserving/clas/config.json
 访问示例：  
 ```python tools/test_hubserving.py http://127.0.0.1:8866/predict/clas_system ./deploy/hubserving/ILSVRC2012_val_00006666.JPEG 5```
 
-## 返回结果格式说明
-返回结果为列表（list），包含 `clas`，以及所有得分组成的 `scores` （list类型）， `scores` 包含前 `top_k` 个 `score` 。
+### 返回结果格式说明
+返回结果为列表（list），包含top-k个分类结果，以及对应的得分，还有此图片预测耗时，具体如下：
+```
+list: 返回结果
+└─ list: 第一张图片结果
+   └─ list: 前k个分类结果，依score递减排序
+   └─ list: 前k个分类结果对应的score，依score递减排序
+   └─ float: 该图分类耗时，单位秒
+```
 
 **说明：** 如果需要增加、删除、修改返回字段，可在相应模块的`module.py`文件中进行修改，完整流程参考下一节自定义修改服务模块。
 
@@ -132,7 +139,7 @@ hub serving start -c deploy/hubserving/clas/config.json
 ```hub serving stop --port/-p XXXX```  
 
 - 2、 到相应的`module.py`和`params.py`等文件中根据实际需求修改代码。  
-例如，例如需要替换部署服务所用模型，则需要到`params.py`中修改模型路径参数`cfg.model_file`和`cfg.params_file`。 **强烈建议修改后先直接运行`module.py`调试，能正确运行预测后再启动服务测试。**
+例如，例如需要替换部署服务所用模型，则需要到`params.py`中修改模型路径参数`cfg.model_file`和`cfg.params_file`。
 
 - 3、 卸载旧服务包  
 ```hub uninstall clas_system```  
