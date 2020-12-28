@@ -124,11 +124,3 @@ class ClasSystem(hub.Module):
         images_decode = [to_cv2(image) for image in images]
         results = self.predict(images_decode, **kwargs)
         return results
-
-
-if __name__ == '__main__':
-    clas = ClasSystem()
-    clas._initialize()
-    image_path = ['./deploy/hubserving/ILSVRC2012_val_00006666.JPEG', ]
-    res = clas.predict(paths=image_path, top_k=5)
-    print(res)
