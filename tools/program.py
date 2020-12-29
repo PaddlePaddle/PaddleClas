@@ -28,10 +28,7 @@ import paddle.nn.functional as F
 from ppcls.optimizer import LearningRateBuilder
 from ppcls.optimizer import OptimizerBuilder
 from ppcls.modeling import architectures
-from ppcls.modeling.loss import CELoss
-from ppcls.modeling.loss import MixCELoss
-from ppcls.modeling.loss import JSDivLoss
-from ppcls.modeling.loss import GoogLeNetLoss
+from ppcls.modeling.loss import LossBuilder
 from ppcls.utils.misc import AverageMeter
 from ppcls.utils import logger
 
@@ -54,53 +51,16 @@ def create_model(architecture, classes_num):
     return architectures.__dict__[name](class_dim=classes_num, **params)
 
 
-def create_loss(feeds,
-                out,
-                architecture,
-                classes_num=1000,
-                epsilon=None,
-                use_mix=False,
-                use_distillation=False):
-    """
-    Create a loss for optimization, such as:
-        1. CrossEnotry loss
-        2. CrossEnotry loss with label smoothing
-        3. CrossEnotry loss with mix(mixup, cutmix, fmix)
-        4. CrossEnotry loss with label smoothing and (mixup, cutmix, fmix)
-        5. GoogLeNet loss
+def create_loss(config):
+    classes_num = config["classes_num"]
+    params = config["LOSS"]["params"]
+    if not isinstance(params, (dict, )):
+        params = {}
+    params["classes_num"] = config["classes_num"]
 
-    Args:
-        out(variable): model output variable
-        feeds(dict): dict of model input variables
-        architecture(dict): architecture information,
-            name(such as ResNet50) is needed
-        classes_num(int): num of classes
-        epsilon(float): parameter for label smoothing, 0.0 <= epsilon <= 1.0
-        use_mix(bool): whether to use mix(include mixup, cutmix, fmix)
-
-    Returns:
-        loss(variable): loss variable
-    """
-    if architecture["name"] == "GoogLeNet":
-        assert len(out) == 3, "GoogLeNet should have 3 outputs"
-        loss = GoogLeNetLoss(class_dim=classes_num, epsilon=epsilon)
-        return loss(out[0], out[1], out[2], feeds["label"])
-
-    if use_distillation:
-        assert len(out) == 2, ("distillation output length must be 2, "
-                               "but got {}".format(len(out)))
-        loss = JSDivLoss(class_dim=classes_num, epsilon=epsilon)
-        return loss(out[1], out[0])
-
-    if use_mix:
-        loss = MixCELoss(class_dim=classes_num, epsilon=epsilon)
-        feed_y_a = feeds['y_a']
-        feed_y_b = feeds['y_b']
-        feed_lam = feeds['lam']
-        return loss(out, feed_y_a, feed_y_b, feed_lam)
-    else:
-        loss = CELoss(class_dim=classes_num, epsilon=epsilon)
-        return loss(out, feeds["label"])
+    loss_func = LossBuilder(
+        function=config["LOSS"]["function"], params=params)()
+    return loss_func
 
 
 def create_metric(out,
@@ -156,10 +116,10 @@ def create_metric(out,
     return fetchs
 
 
-def create_fetchs(feeds, net, config, mode="train"):
+def create_fetchs(feeds, net, config, loss_func, mode="train"):
     """
     Create fetchs as model outputs(included loss and measures),
-    will call create_loss and create_metric(if use_mix).
+    will call create_metric(if use_mix).
 
     Args:
         out(variable): model output variable
@@ -178,15 +138,23 @@ def create_fetchs(feeds, net, config, mode="train"):
     architecture = config.ARCHITECTURE
     topk = config.topk
     classes_num = config.classes_num
-    epsilon = config.get('ls_epsilon')
     use_mix = config.get('use_mix') and mode == 'train'
     use_distillation = config.get('use_distillation')
 
     out = net(feeds["image"])
 
     fetchs = OrderedDict()
-    fetchs['loss'] = create_loss(feeds, out, architecture, classes_num,
-                                 epsilon, use_mix, use_distillation)
+
+    if use_distillation:
+        assert len(out) == 2, ("distillation output length must be 2, "
+                               "but got {}".format(len(out)))
+        x = out[1]
+        target = out[0]
+    else:
+        x = out
+        target = feeds
+    fetchs['loss'] = loss_func(x, target)
+
     if not use_mix:
         metric = create_metric(
             out,
@@ -296,6 +264,8 @@ def run(dataloader,
 
     metric_list = OrderedDict(metric_list)
 
+    loss_func = create_loss(config)
+
     tic = time.time()
     for idx, batch in enumerate(dataloader()):
         # avoid statistics from warmup time
@@ -306,7 +276,7 @@ def run(dataloader,
         metric_list['reader_time'].update(time.time() - tic)
         batch_size = len(batch[0])
         feeds = create_feeds(batch, use_mix)
-        fetchs = create_fetchs(feeds, net, config, mode)
+        fetchs = create_fetchs(feeds, net, config, loss_func, mode)
         if mode == 'train':
             avg_loss = fetchs['loss']
             avg_loss.backward()

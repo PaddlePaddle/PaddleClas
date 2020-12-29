@@ -14,7 +14,6 @@ topk: 5
 image_shape: [3, 224, 224]
 
 use_mix: False
-ls_epsilon: 0.1
 
 LEARNING_RATE:
     function: 'CosineWarmup'          
@@ -28,6 +27,11 @@ OPTIMIZER:
     regularizer:
         function: 'L2'
         factor: 0.0000400
+
+LOSS:
+    function: "CELoss"
+    params: 
+        epsilon: 0.1
 
 TRAIN:
     batch_size: 1024

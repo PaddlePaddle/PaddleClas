@@ -19,7 +19,6 @@ image_shape: [3, 224, 224]
 use_ema: True
 ema_decay: 0.9999
 use_aa: True
-ls_epsilon: 0.1
 
 LEARNING_RATE:
     function: 'ExponentialWarmup'
@@ -35,6 +34,11 @@ OPTIMIZER:
     regularizer:
         function: 'L2'
         factor: 0.00001
+
+LOSS:
+    function: "CELoss"
+    params: 
+        epsilon: 0.1
 
 TRAIN:
     batch_size: 512

@@ -13,6 +13,10 @@ epochs: 120
 topk: 5
 image_shape: [3, 224, 224]
 
+LOSS:
+    function: "CELoss"
+    params:
+
 VALID:
     batch_size: 64
     num_workers: 4

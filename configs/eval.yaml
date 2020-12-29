@@ -8,6 +8,10 @@ total_images: 1281167
 topk: 5
 image_shape: [3, 224, 224]
 
+LOSS:
+    function: "CELoss"
+    params:
+
 VALID:
     batch_size: 16
     num_workers: 4

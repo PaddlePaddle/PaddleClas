@@ -7,7 +7,6 @@ model_save_dir: "./output/"
 classes_num: 1000
 total_images: 1281167
 save_interval: 1
-ls_epsilon: 0.1
 validate: True
 valid_interval: 1
 epochs: 360
@@ -27,6 +26,11 @@ OPTIMIZER:
     regularizer:
         function: 'L2'
         factor: 0.00002
+
+LOSS:
+    function: "CELoss"
+    params: 
+        epsilon: 0.1
 
 TRAIN:
     batch_size: 2048

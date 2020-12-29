@@ -27,6 +27,11 @@ OPTIMIZER:
         function: 'L2'
         factor: 0.000001
 
+LOSS:
+    function: "CELoss"
+    params: 
+
+
 TRAIN:
     batch_size: 32
     num_workers: 4

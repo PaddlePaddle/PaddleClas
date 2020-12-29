@@ -30,6 +30,11 @@ OPTIMIZER:
         function: 'L2'
         factor: 0.00007
 
+LOSS:
+    function: "JSDivLoss"
+    params: 
+
+
 TRAIN:
     batch_size: 32
     num_workers: 4
