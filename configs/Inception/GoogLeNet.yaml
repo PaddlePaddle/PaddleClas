@@ -27,7 +27,7 @@ OPTIMIZER:
         factor: 0.0001
 
 LOSS:
-    function: "CELoss"
+    function: "GoogLeNetLoss"
     params: 
 
 
