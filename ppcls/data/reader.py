@@ -99,7 +99,7 @@ def create_file_list(params):
     data_dir = params.get('data_dir', '')
     params['file_list'] = ".tmp.txt"
     imgtype_list = {'jpg', 'bmp', 'png', 'jpeg', 'rgb', 'tif', 'tiff'}
-    with open(params['file_list'], "w") as fout:
+    with open(params['file_list'], "w", encoding='utf-8') as fout:
         tmp_file_list = os.listdir(data_dir)
         for file_name in tmp_file_list:
             file_path = os.path.join(data_dir, file_name)
@@ -134,7 +134,7 @@ def get_file_list(params):
     if params['mode'] == 'test':
         create_file_list(params)
 
-    with open(params['file_list']) as flist:
+    with open(params['file_list'], encoding='utf-8') as flist:
         full_lines = [line.strip() for line in flist]
 
     full_lines = shuffle_lines(full_lines, params["shuffle_seed"])
