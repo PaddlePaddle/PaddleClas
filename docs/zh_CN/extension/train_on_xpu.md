@@ -18,3 +18,8 @@
 * 命令：
 
 ```python3.7 tools/static/train.py -c configs/quick_start/MobileNetV3_large_x1_0_finetune.yaml -o use_gpu=False -o use_xpu=True -o is_distributed=False```
+
+### HRNet
+* 命令：
+
+```python3.7 tools/static/train.py -c configs/quick_start/HRNet_W18_C_finetune.yaml -o is_distributed=False -o use_cpu=False  -o use_xpu=True -o use_gpu=False```
