@@ -22,7 +22,7 @@ from paddlehub.utils.log import logger
 from paddlehub.module.module import moduleinfo, serving
 import cv2
 import numpy as np
-import paddlehub as hub
+import paddle.nn as nn
 
 import tools.infer.predict as paddle_predict
 from tools.infer.utils import Base64ToCV2, create_paddle_predictor
@@ -36,8 +36,8 @@ from deploy.hubserving.clas.params import read_params
     author="paddle-dev",
     author_email="paddle-dev@baidu.com",
     type="cv/class")
-class ClasSystem(hub.Module):
-    def _initialize(self, use_gpu=None, enable_mkldnn=None):
+class ClasSystem(nn.Layer):
+    def __init__(self, use_gpu=None, enable_mkldnn=None):
         """
         initialize with the necessary elements
         """
