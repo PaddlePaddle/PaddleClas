@@ -503,8 +503,10 @@ def run(dataloader,
     ]
     topk_name = 'top{}'.format(config.topk)
     metric_list.insert(0, ("loss", fetchs["loss"][1]))
-    metric_list.insert(0, (topk_name, fetchs[topk_name][1]))
-    metric_list.insert(0, ("top1", fetchs["top1"][1]))
+    use_mix = config.get("use_mix", False) and mode == "train"
+    if not use_mix:
+        metric_list.insert(0, (topk_name, fetchs[topk_name][1]))
+        metric_list.insert(0, ("top1", fetchs["top1"][1]))
 
     metric_list = OrderedDict(metric_list)
 
