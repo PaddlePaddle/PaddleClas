@@ -541,7 +541,11 @@ def run(dataloader,
         if mode == "train":
             metric_list['lr'].update(lr_scheduler.get_lr())
 
-        fetchs_str = ' '.join([str(m.value) for m in metric_list.values()])
+        fetchs_str = ' '.join([
+            str(metric_list[key].mean)
+            if "time" in key else str(metric_list[key].value)
+            for key in metric_list
+        ])
         ips_info = " ips: {:.5f} images/sec.".format(
             batch_size / metric_list["batch_time"].avg)
         fetchs_str += ips_info
