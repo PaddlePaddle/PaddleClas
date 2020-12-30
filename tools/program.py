@@ -288,10 +288,10 @@ def run(dataloader,
     if not use_mix:
         topk_name = 'top{}'.format(config.topk)
         metric_list.insert(
-            1, (topk_name, AverageMeter(
+            0, (topk_name, AverageMeter(
                 topk_name, '.5f', postfix=",")))
         metric_list.insert(
-            1, ("top1", AverageMeter(
+            0, ("top1", AverageMeter(
                 "top1", '.5f', postfix=",")))
 
     metric_list = OrderedDict(metric_list)

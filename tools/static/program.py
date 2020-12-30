@@ -501,9 +501,10 @@ def run(dataloader,
         ("reader_time", AverageMeter(
             'reader_cost', '.5f', postfix=" s,")),
     ]
-
-    for name, f in reversed(fetchs.items()):
-        metric_list.insert(0, (name, f[1]))
+    topk_name = 'top{}'.format(config.topk)
+    metric_list.insert(0, ("loss", fetchs["loss"][1]))
+    metric_list.insert(0, (topk_name, fetchs[topk_name][1]))
+    metric_list.insert(0, ("top1", fetchs["top1"][1]))
 
     metric_list = OrderedDict(metric_list)
 
