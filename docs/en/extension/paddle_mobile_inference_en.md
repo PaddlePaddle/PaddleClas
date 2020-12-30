@@ -44,7 +44,7 @@ wget -c https://paddle-inference-dist.bj.bcebos.com/PaddleLite/benchmark_0/bench
 After the PC and mobile phone are successfully connected, use the following command to start the model evaluation.
 
 ```
-sh tools/lite/benchmark.sh ./benchmark_bin_v8 ./inference result_armv8.txt true
+sh deploy/lite/benchmark/benchmark.sh ./benchmark_bin_v8 ./inference result_armv8.txt true
 ```
 
 Where `./benchmark_bin_v8` is the path of the benchmark binary file, `./inference` is the path of all the models that need to be evaluated, `result_armv8.txt` is the result file, and the final parameter `true` means that the model will be optimized before evaluation. Eventually, the evaluation result file of `result_armv8.txt` will be saved in the current folder. The specific performances are as follows.

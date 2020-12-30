@@ -14,19 +14,21 @@
 
 import numpy as np
 import cv2
-import utils
 import shutil
 import os
 import sys
+
+import paddle
+import paddle.nn.functional as F
+
 __dir__ = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(__dir__)
 sys.path.append(os.path.abspath(os.path.join(__dir__, '../..')))
 
 from ppcls.utils.save_load import load_dygraph_pretrain
 from ppcls.modeling import architectures
-
-import paddle
-import paddle.nn.functional as F
+import utils
+from utils import get_image_list
 
 
 def postprocess(outputs, topk=5):
@@ -34,23 +36,6 @@ def postprocess(outputs, topk=5):
     prob = np.array(output).flatten()
     index = prob.argsort(axis=0)[-topk:][::-1].astype('int32')
     return zip(index, prob[index])
-
-
-def get_image_list(img_file):
-    imgs_lists = []
-    if img_file is None or not os.path.exists(img_file):
-        raise Exception("not found any img file in {}".format(img_file))
-
-    img_end = ['jpg', 'png', 'jpeg', 'JPEG', 'JPG', 'bmp']
-    if os.path.isfile(img_file) and img_file.split('.')[-1] in img_end:
-        imgs_lists.append(img_file)
-    elif os.path.isdir(img_file):
-        for single_file in os.listdir(img_file):
-            if single_file.split('.')[-1] in img_end:
-                imgs_lists.append(os.path.join(img_file, single_file))
-    if len(imgs_lists) == 0:
-        raise Exception("not found any img file in {}".format(img_file))
-    return imgs_lists
 
 
 def save_prelabel_results(class_id, input_filepath, output_idr):

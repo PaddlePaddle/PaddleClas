@@ -12,12 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import sys
-sys.path.insert(0, ".")
-import tools.infer.utils as utils
 import numpy as np
 import cv2
 import time
+
+import sys
+sys.path.insert(0, ".")
+import tools.infer.utils as utils
+from tools.infer.utils import get_image_list
 
 
 def predict(args, predictor):
@@ -32,27 +34,33 @@ def predict(args, predictor):
     if not args.enable_benchmark:
         # for PaddleHubServing
         if args.hubserving:
-            img = args.image_file
+            img_list = [args.image_file]
         # for predict only
         else:
-            img = cv2.imread(args.image_file)[:, :, ::-1]
-        assert img is not None, "Error in loading image: {}".format(
-            args.image_file)
-        inputs = utils.preprocess(img, args)
-        inputs = np.expand_dims(
-            inputs, axis=0).repeat(
-                args.batch_size, axis=0).copy()
-        input_tensor.copy_from_cpu(inputs)
+            img_list = get_image_list(args.image_file)
 
-        predictor.run()
+        for idx, img_name in enumerate(img_list):
+            if not args.hubserving:
+                img = cv2.imread(img_name)[:, :, ::-1]
+                assert img is not None, "Error in loading image: {}".format(
+                    img_name)
+            else:
+                img = img_name
+            inputs = utils.preprocess(img, args)
+            inputs = np.expand_dims(
+                inputs, axis=0).repeat(
+                    args.batch_size, axis=0).copy()
+            input_tensor.copy_from_cpu(inputs)
 
-        output = output_tensor.copy_to_cpu()
-        classes, scores = utils.postprocess(output, args)
-        if args.hubserving:
-            return classes, scores
-        print("Current image file: {}".format(args.image_file))
-        print("\ttop-1 class: {0}".format(classes[0]))
-        print("\ttop-1 score: {0}".format(scores[0]))
+            predictor.run()
+
+            output = output_tensor.copy_to_cpu()
+            classes, scores = utils.postprocess(output, args)
+            if args.hubserving:
+                return classes, scores
+            print("Current image file: {}".format(img_name))
+            print("\ttop-1 class: {0}".format(classes[0]))
+            print("\ttop-1 score: {0}".format(scores[0]))
     else:
         for i in range(0, test_num + 10):
             inputs = np.random.rand(args.batch_size, 3, 224,

@@ -226,13 +226,13 @@ Firstly, you should export inference model using `tools/export_model.py`.
 python tools/export_model.py \
     --model MobileNetV3_large_x1_0 \
     --pretrained_model ./output/MobileNetV3_large_x1_0/best_model/ppcls \
-    --output_path ./inference/cls_infer
+    --output_path ./inference
 ```
 
 Among them, the `--model` parameter is used to specify the model name, `--pretrained_model` parameter is used to specify the model file path, the path does not need to include the model file suffix name, and `--output_path` is used to specify the storage path of the converted model.
 
 **Note**:
-1. File prefix must be assigned in `--output_path`. If `--output_path=./inference/cls_infer`, then three files will be generated in the folder `inference`, they are `cls_infer.pdiparams`, `cls_infer.pdmodel` and `cls_infer.pdiparams.info`.
+1. If `--output_path=./inference`, then three files will be generated in the folder `inference`, they are `inference.pdiparams`, `inference.pdmodel` and `inference.pdiparams.info`.
 2. In the file `export_model.py:line53`, the `shape` parameter is the shape of the model input image, the default is `224*224`. Please modify it according to the actual situation, as shown below:
 
 ```python
@@ -243,20 +243,20 @@ Among them, the `--model` parameter is used to specify the model name, `--pretra
 54 ])
 ```
 
-The above command will generate the model structure file (`cls_infer.pdmodel`) and the model weight file (`cls_infer.pdiparams`), and then the inference engine can be used for inference:
+The above command will generate the model structure file (`inference.pdmodel`) and the model weight file (`inference.pdiparams`), and then the inference engine can be used for inference:
 
 ```bash
 python tools/infer/predict.py \
     --image_file image path \
-    --model_file "./inference/cls_infer.pdmodel" \
-    --params_file "./inference/cls_infer.pdiparams" \
+    --model_file "./inference/inference.pdmodel" \
+    --params_file "./inference/inference.pdiparams" \
     --use_gpu=True \
     --use_tensorrt=False
 ```
 Among them:
 + `image_file`: The path of the image file to be predicted, such as `./test.jpeg`;
-+ `model_file`: Model file path, such as `./MobileNetV3_large_x1_0/cls_infer.pdmodel`;
-+ `params_file`: Weight file path, such as `./MobileNetV3_large_x1_0/cls_infer.pdiparams`;
++ `model_file`: Model file path, such as `./MobileNetV3_large_x1_0/inference.pdmodel`;
++ `params_file`: Weight file path, such as `./MobileNetV3_large_x1_0/inference.pdiparams`;
 + `use_tensorrt`: Whether to use the TesorRT, default by `True`;
 + `use_gpu`: Whether to use the GPU, default by `True`
 + `enable_mkldnn`: Wheter to use `MKL-DNN`, default by `False`. When both `use_gpu` and `enable_mkldnn` are set to `True`, GPU is used to run and `enable_mkldnn` will be ignored.
