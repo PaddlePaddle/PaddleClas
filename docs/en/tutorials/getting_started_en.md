@@ -226,13 +226,13 @@ Firstly, you should export inference model using `tools/export_model.py`.
 python tools/export_model.py \
     --model MobileNetV3_large_x1_0 \
     --pretrained_model ./output/MobileNetV3_large_x1_0/best_model/ppcls \
-    --output_path ./inference/inference
+    --output_path ./inference
 ```
 
 Among them, the `--model` parameter is used to specify the model name, `--pretrained_model` parameter is used to specify the model file path, the path does not need to include the model file suffix name, and `--output_path` is used to specify the storage path of the converted model.
 
 **Note**:
-1. File prefix must be assigned in `--output_path`. If `--output_path=./inference/inference`, then three files will be generated in the folder `inference`, they are `inference.pdiparams`, `inference.pdmodel` and `inference.pdiparams.info`.
+1. If `--output_path=./inference`, then three files will be generated in the folder `inference`, they are `inference.pdiparams`, `inference.pdmodel` and `inference.pdiparams.info`.
 2. In the file `export_model.py:line53`, the `shape` parameter is the shape of the model input image, the default is `224*224`. Please modify it according to the actual situation, as shown below:
 
 ```python

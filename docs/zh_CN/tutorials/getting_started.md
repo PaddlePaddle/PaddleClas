@@ -238,13 +238,13 @@ python tools/infer/infer.py \
 python tools/export_model.py \
     --model MobileNetV3_large_x1_0 \
     --pretrained_model ./output/MobileNetV3_large_x1_0/best_model/ppcls \
-    --output_path ./inference/inference
+    --output_path ./inference
 ```
 
 其中，参数`--model`用于指定模型名称，`--pretrained_model`用于指定模型文件路径，该路径仍无需包含模型文件后缀名（如[1.3 模型恢复训练](#1.3)），`--output_path`用于指定转换后模型的存储路径。
 
 **注意**：
-1. `--output_path`中必须指定文件名的前缀，若`--output_path=./inference/inference`，则会在`inference`文件夹下生成`inference.pdiparams`、`inference.pdmodel`和`inference.pdiparams.info`文件。
+1. `--output_path`表示输出的inference模型文件夹路径，若`--output_path=./inference`，则会在`inference`文件夹下生成`inference.pdiparams`、`inference.pdmodel`和`inference.pdiparams.info`文件。
 2. 文件`export_model.py:line53`中，`shape`参数为模型输入图像的`shape`，默认为`224*224`，请根据实际情况修改，如下所示：
 ```python
 50 # Please modify the 'shape' according to actual needs
