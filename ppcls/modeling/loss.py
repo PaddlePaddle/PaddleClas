@@ -65,7 +65,7 @@ class CELoss(nn.Layer):
         avg_cost = self.reduce_loss(cost)
         return avg_cost
 
-    def forward(self, x, feeds):
+    def forward(self, x, feeds, mode="train"):
         target = feeds["label"]
         return self.calc_loss(x, target)
 
@@ -80,13 +80,18 @@ class MixCELoss(CELoss):
         super(MixCELoss, self).__init__(
             classes_num=classes_num, epsilon=epsilon, mode=mode, **args)
 
-    def forward(self, x, feeds):
-        target0 = feeds['y_a']
-        target1 = feeds['y_b']
-        lam = feeds['lam']
-        cost0 = self.calc_loss(x, target0)
-        cost1 = self.calc_loss(x, target1)
-        cost = lam * cost0 + (1.0 - lam) * cost1
+    def forward(self, x, feeds, mode="train"):
+        if mode == "train":
+            target0 = feeds['y_a']
+            target1 = feeds['y_b']
+            lam = feeds['lam']
+            cost0 = self.calc_loss(x, target0)
+            cost1 = self.calc_loss(x, target1)
+            cost = lam * cost0 + (1.0 - lam) * cost1
+        else:
+            target = feeds["label"]
+            cost = self.calc_loss(x, target)
+
         avg_cost = self.reduce_loss(cost)
         return avg_cost
 
@@ -106,7 +111,7 @@ class JSDivLoss(nn.Layer):
             (target + eps) / (x + eps)) * self._classes_num
         return cost
 
-    def forward(self, x, target):
+    def forward(self, x, target, mode="train"):
         x = F.softmax(x)
         target = F.softmax(target)
         cost = self._kldiv(x, target) + self._kldiv(target, x)
@@ -125,7 +130,7 @@ class GoogLeNetLoss(CELoss):
         super(GoogLeNetLoss, self).__init__(
             classes_num=classes_num, epsilon=epsilon, mode=mode, **args)
 
-    def forward(self, x, feeds):
+    def forward(self, x, feeds, mode="train"):
         assert len(
             x
         ) == 3, "input for {} must be 3 but got {}, please check your input".format(
@@ -157,26 +162,3 @@ class LossBuilder(object):
         mod = sys.modules[__name__]
         func = getattr(mod, self.function)
         return func(**self.params)
-
-
-def test_ce_loss():
-    x = paddle.randn((16, 1000))
-    label = paddle.ones((16, 1), dtype="int64")
-    for eps in [0.0, 0.1, 1.0]:
-        celoss_func = CrossEntropyLoss(
-            classes_num=1000, epsilon=eps, mode="mean")
-        loss = celoss_func(x, label)
-        print(loss)
-
-
-def test_jsdiv_loss():
-    x = paddle.randn((16, 1000))
-    y = paddle.randn((16, 1000))
-    loss_func = JSDivLoss(classes_num=1000)
-    loss = loss_func(x, y)
-    print(loss)
-
-
-if __name__ == "__main__":
-    test_ce_loss()
-    test_jsdiv_loss()

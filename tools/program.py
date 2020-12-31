@@ -153,7 +153,7 @@ def create_fetchs(feeds, net, config, loss_func, mode="train"):
     else:
         x = out
         target = feeds
-    fetchs['loss'] = loss_func(x, target)
+    fetchs['loss'] = loss_func(x, target, mode=mode)
 
     if not use_mix:
         metric = create_metric(
