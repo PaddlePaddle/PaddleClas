@@ -45,7 +45,7 @@ wget -c https://paddle-inference-dist.bj.bcebos.com/PaddleLite/benchmark_0/bench
 PC端和手机连接成功后，使用下面的命令开始模型评估。
 
 ```
-sh tools/lite/benchmark.sh ./benchmark_bin_v8 ./inference result_armv8.txt true
+sh deploy/lite/benchmark/benchmark.sh ./benchmark_bin_v8 ./inference result_armv8.txt true
 ```
 
 其中`./benchmark_bin_v8`为benchmark二进制文件路径，`./inference`为所有需要评测的模型的路径，`result_armv8.txt`为保存的结果文件，最后的参数`true`表示在评估之后会首先进行模型优化。最终在当前文件夹下会输出`result_armv8.txt`的评估结果文件，具体信息如下。

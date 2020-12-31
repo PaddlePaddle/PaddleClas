@@ -149,7 +149,7 @@ For example, if you need to replace the model used by the deployed service, you 
 
     After modifying and installing (`hub install deploy/hubserving/clas/`) and before deploying, you can use `python deploy/hubserving/clas/test.py` to test the installed service module.
 
-1. Uninstall old service module
+3. Uninstall old service module
 ```shell
 hub uninstall clas_system
 ```

@@ -33,8 +33,7 @@ def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument("-m", "--model", type=str)
     parser.add_argument("-p", "--pretrained_model", type=str)
-    parser.add_argument(
-        "-o", "--output_path", type=str, default="./inference/cls_infer")
+    parser.add_argument("-o", "--output_path", type=str, default="./inference")
     parser.add_argument("--class_dim", type=int, default=1000)
     parser.add_argument("--load_static_weights", type=str2bool, default=False)
     parser.add_argument("--img_size", type=int, default=224)
@@ -73,7 +72,7 @@ def main():
             paddle.static.InputSpec(
                 shape=[None, 3, args.img_size, args.img_size], dtype='float32')
         ])
-    paddle.jit.save(model, args.output_path)
+    paddle.jit.save(model, os.path.join(args.output_path, "inference"))
 
 
 if __name__ == "__main__":
