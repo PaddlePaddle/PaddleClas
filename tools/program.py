@@ -40,11 +40,10 @@ def create_model(architecture, classes_num):
     Args:
         architecture(dict): architecture information,
             name(such as ResNet50) is needed
-        image(variable): model input variable
         classes_num(int): num of classes
 
     Returns:
-        out(variable): model output variable
+        out(nn.Layer): model output tensor
     """
     name = architecture["name"]
     params = architecture.get("params", {})
@@ -52,6 +51,15 @@ def create_model(architecture, classes_num):
 
 
 def create_loss(config):
+    """
+    Build loss function
+
+    Args:
+        config(dict): config
+    
+    Returns:
+        loss_func(nn.Layer): loss function
+    """
     classes_num = config["classes_num"]
     params = config["LOSS"]["params"]
     if not isinstance(params, (dict, )):
@@ -74,8 +82,8 @@ def create_metric(out,
     Create measures of model accuracy, such as top1 and top5
 
     Args:
-        out(variable): model output variable
-        feeds(dict): dict of model input variables(included label)
+        out(tensor): model output tensor
+        feeds(dict): dict of model input tensors(included label)
         topk(int): usually top5
         classes_num(int): num of classes
         use_distillation(bool): whether to use distillation training
@@ -122,16 +130,12 @@ def create_fetchs(feeds, net, config, loss_func, mode="train"):
     will call create_metric(if use_mix).
 
     Args:
-        out(variable): model output variable
-        feeds(dict): dict of model input variables.
+        feeds(dict): dict of model input tensors.
             If use mix_up, it will not include label.
-        architecture(dict): architecture information,
-            name(such as ResNet50) is needed
-        topk(int): usually top5
-        classes_num(int): num of classes
-        epsilon(float): parameter for label smoothing, 0.0 <= epsilon <= 1.0
-        use_mix(bool): whether to use mix(include mixup, cutmix, fmix)
-
+        net(dict): network
+        config(dict): root config for training/eval process
+        loss_func(func): loss function of the network
+        mode(string): run mode, train/valid
     Returns:
         fetchs(dict): dict of model outputs(included loss and measures)
     """
@@ -189,6 +193,8 @@ def create_optimizer(config, parameter_list=None):
                 }
         }
 
+        parameter_list(list): parameter list
+
     Returns:
         an optimizer instance
     """
@@ -208,6 +214,17 @@ def create_optimizer(config, parameter_list=None):
 
 
 def create_feeds(batch, use_mix):
+    """
+    Create input batch
+
+    Args:
+        batch(list):  batch data, including image and label
+        use_mix(bool): whether to use mix for training
+    Returns:
+        feeds(dict): dict of model inputs
+            1. for use_mix=False, dict keys are image, label
+            2. for use_mix=True,  dict keys are image, y_a, y_b, lam
+    """
     image = batch[0]
     if use_mix:
         y_a = to_tensor(batch[1].numpy().astype("int64").reshape(-1, 1))
@@ -232,13 +249,18 @@ def run(dataloader,
 
     Args:
         dataloader(paddle dataloader):
-        exe():
-        program():
+        config(dict): config
+        net(nn.Layer): network
+        optimizer(): optimizer instance
+        lr_scheduler(): learning rate schedulers instance
+        epoch(int): epoch num
+        mode(string): run mode, train/valid
         fetchs(dict): dict of measures and the loss
         epoch(int): epoch of training or validation
         model(str): log only
 
     Returns:
+        None
     """
     print_interval = config.get("print_interval", 10)
     use_mix = config.get("use_mix", False) and mode == "train"
@@ -256,10 +278,10 @@ def run(dataloader,
     if not use_mix:
         topk_name = 'top{}'.format(config.topk)
         metric_list.insert(
-            0, (topk_name, AverageMeter(
+            1, (topk_name, AverageMeter(
                 topk_name, '.5f', postfix=",")))
         metric_list.insert(
-            0, ("top1", AverageMeter(
+            1, ("top1", AverageMeter(
                 "top1", '.5f', postfix=",")))
 
     metric_list = OrderedDict(metric_list)
@@ -318,29 +340,22 @@ def run(dataloader,
                 epoch_str = "epoch:{:<3d}".format(epoch)
                 step_str = "{:s} step:{:<4d}".format(mode, idx)
                 logger.info("{:s}, {:s}, {:s} {:s}".format(
-                    logger.coloring(epoch_str, "HEADER")
-                    if idx == 0 else epoch_str,
-                    logger.coloring(step_str, "PURPLE"),
-                    logger.coloring(fetchs_str, 'OKGREEN'),
-                    logger.coloring(ips_info, 'OKGREEN')))
+                    epoch_str, step_str, fetchs_str, ips_info))
 
-    end_str = ' '.join([str(m.mean) for m in metric_list.values()] +
+    end_str = " ".join([str(m.mean) for m in metric_list.values()] +
                        [metric_list['batch_time'].total])
     ips_info = "ips: {:.5f} images/sec.".format(
         batch_size * metric_list["batch_time"].count /
         metric_list["batch_time"].sum)
 
-    if mode == 'eval':
+    if mode == "valid":
         logger.info("END {:s} {:s} {:s}".format(mode, end_str, ips_info))
     else:
         end_epoch_str = "END epoch:{:<3d}".format(epoch)
 
-        logger.info("{:s} {:s} {:s} {:s}".format(
-            logger.coloring(end_epoch_str, "RED"),
-            logger.coloring(mode, "PURPLE"),
-            logger.coloring(end_str, "OKGREEN"),
-            logger.coloring(ips_info, "OKGREEN"), ))
+        logger.info("{:s} {:s} {:s} {:s}".format(end_epoch_str, mode, end_str,
+                                                 ips_info))
 
     # return top1_acc in order to save the best model
-    if mode == 'valid':
+    if mode == "valid":
         return metric_list['top1'].avg
