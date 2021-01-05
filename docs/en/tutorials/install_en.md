@@ -10,13 +10,24 @@ This document introduces how to install PaddleClas and its requirements.
 
 Python 3.x, CUDA 10.0, CUDNN7.6.4 nccl2.1.2 and later version are required at first, For now, PaddleClas only support training on the GPU device. Please follow the instructions in the [Installation](http://www.paddlepaddle.org.cn/install/quick) if the PaddlePaddle on the device is lower than 2.0.0rc1.
 
-Install PaddlePaddle
+
+### Install PaddlePaddle using pip
+
+If you want to use PaddlePaddle on GPU, you can use the following command to install PaddlePaddle.
 
 ```bash
 pip install paddlepaddle-gpu==2.0.0rc1 --upgrade
 ```
 
-or compile from source code, please refer to [Installation](http://www.paddlepaddle.org.cn/install/quick).
+If you want to use PaddlePaddle on CPU, you can use the following command to install PaddlePaddle.
+
+```bash
+pip install paddlepaddle==2.0.0rc1 --upgrade
+```
+
+### Install PaddlePaddle from source code
+
+You can also compile PaddlePaddle from source code, please refer to [Installation](http://www.paddlepaddle.org.cn/install/quick).
 
 Verify Installation
 
