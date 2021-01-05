@@ -59,7 +59,7 @@ cd ../
 
 ## Training
 
-* All experiments are running on the NVIDIA® Tesla® V100 sigle card.
+* All experiments are running on the NVIDIA® Tesla® V100 single card.
 
 ### Train from scratch
 
