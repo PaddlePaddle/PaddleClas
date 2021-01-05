@@ -32,7 +32,7 @@ setup(
     package_dir={'paddleclas': ''},
     include_package_data=True,
     entry_points={"console_scripts": ["paddleclas= paddleclas.paddleclas:main"]},
-    version='2.0.0rc1',
+    version='0.0.0',
     install_requires=requirements,
     license='Apache License 2.0',
     description='Awesome Image Classification toolkits based on PaddlePaddle ',

@@ -14,4 +14,3 @@
 
 __all__ = ['PaddleClas']
 from .paddleclas import PaddleClas
-#from .tools.infer.utility import draw_ocr
