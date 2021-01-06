@@ -247,11 +247,6 @@ def Res2Net50_14w_8s(**args):
     return model
 
 
-def Res2Net50_48w_2s(**args):
-    model = Res2Net(layers=50, scales=2, width=48, **args)
-    return model
-
-
 def Res2Net50_26w_6s(**args):
     model = Res2Net(layers=50, scales=6, width=26, **args)
     return model
