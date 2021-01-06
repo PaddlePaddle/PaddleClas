@@ -242,7 +242,7 @@ class BottleneckBlock(nn.Layer):
                 num_filters=group_width,
                 filter_size=3,
                 stride=1,
-                dilation=dialtion,
+                dilation=dilation,
                 groups=cardinality,
                 act="relu",
                 name=name + "_conv2")
