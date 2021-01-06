@@ -24,11 +24,12 @@ result=clas.predict(image_file)
 print(result)
 ```
 **下图是使用的demo图片**
+
 ![](../images/whl/demo.jpg)
 
 ```
     >>> result
-    [{'filename': '/Users/mac/Downloads/PaddleClas/docs/images/whl/demo.jpg', 'class_ids': array([8]), 'scores': array([0.9796774], dtype=float32), 'label_names': ['hen']}]
+    [{'filename': '/Users/mac/Downloads/PaddleClas/docs/images/whl/demo.jpg', 'class_ids': [8], 'scores': [0.9796774], 'label_names': ['hen']}]
 ```
 
 ### 2. 参数解释
