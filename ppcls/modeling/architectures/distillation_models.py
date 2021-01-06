@@ -50,7 +50,7 @@ class ResNet50_vd_distill_MobileNetV3_large_x1_0(nn.Layer):
 
 class ResNeXt101_32x16d_wsl_distill_ResNet50_vd(nn.Layer):
     def __init__(self, class_dim=1000, **args):
-        super(ResNet50_vd_distill_MobileNetV3_large_x1_0, self).__init__()
+        super(ResNeXt101_32x16d_wsl_distill_ResNet50_vd, self).__init__()
 
         self.teacher = ResNeXt101_32x16d_wsl(class_dim=class_dim, **args)
 
