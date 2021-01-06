@@ -284,7 +284,7 @@ class PaddleClas(object):
             download_with_progressbar(img, image_path)
             print("Current using image from Internet:{}, renamed as: {}".
                   format(img, image_path))
-            img = os.path.join(BASE_IMAGES_DIR, 'tmp.jpg')
+            img = image_path
         image_list = utils.get_image_list(img)
         total_result = []
         for filename in image_list:
