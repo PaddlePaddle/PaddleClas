@@ -39,6 +39,7 @@ from tqdm import tqdm
 import tools.infer.utils as utils
 import shutil
 __all__ = ['PaddleClas']
+BASE_DIR = os.path.expanduser("~/.paddleclas/inference_model/")
 
 model_names = {'Xception71', 'SE_ResNeXt101_32x4d', 'ShuffleNetV2_x0_5', 'ResNet34', 'ShuffleNetV2_x2_0', 'ResNeXt101_32x4d', 'HRNet_W48_C_ssld', 'ResNeSt50_fast_1s1x64d',
                'MobileNetV2_x2_0', 'MobileNetV3_large_x1_0', 'Fix_ResNeXt101_32x48d_wsl', 'MobileNetV2_ssld', 'ResNeXt101_vd_64x4d', 'ResNet34_vd_ssld', 'MobileNetV3_small_x1_0',
@@ -188,20 +189,20 @@ class PaddleClas(object):
                 raise Exception('Please input model name that you want to use!')
             if process_params.model_name in model_names :
                 url = 'https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/{}_infer.tar'.format(process_params.model_name)
-                if os.path.dirname(process_params.model_file) == '':
-                    download_path = os.getcwd()
-                else:
-                    download_path = os.path.dirname(process_params.model_file)
-                if not os.path.exists(os.path.join(download_path, process_params.model_name)):
-                    os.makedirs(os.path.join(download_path,process_params.model_name))
-                download_path = os.path.join(download_path,process_params.model_name)
+                # if os.path.dirname(process_params.model_file) == '':
+                #     download_path = os.getcwd()
+                # else:
+                #     download_path = os.path.dirname(process_params.model_file)
+                if not os.path.exists(os.path.join(BASE_DIR, process_params.model_name)):
+                    os.makedirs(os.path.join(BASE_DIR,process_params.model_name))
+                download_path = os.path.join( BASE_DIR,process_params.model_name)
                 maybe_download(
                     model_storage_directory=download_path,
                     url=url
                 )
                 process_params.model_file = os.path.join(download_path,'inference.pdmodel')
                 process_params.params_file = os.path.join(download_path,'inference.pdiparams')
-                process_params.label_name_path = "ppcls/utils/imagenet1k_label_list.txt"
+                process_params.label_name_path = os.path.join(__dir__, 'ppcls/utils/imagenet1k_label_list.txt')
             else:
                 raise Exception('If you want to use your own model, Please input model_file as model path!')
         else:

@@ -11,12 +11,12 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 from setuptools import setup
 from io import open
 
 with open('requirements.txt', encoding="utf-8-sig") as f:
     requirements = f.readlines()
+
 
 
 def readme():
@@ -30,9 +30,7 @@ setup(
     packages=['paddleclas'],
     package_dir={'paddleclas': ''},
     include_package_data=True,
-    entry_points={
-        "console_scripts": ["paddleclas= paddleclas.paddleclas:main"]
-    },
+    entry_points={"console_scripts": ["paddleclas= paddleclas.paddleclas:main"]},
     version='0.0.0',
     install_requires=requirements,
     license='Apache License 2.0',
@@ -42,11 +40,10 @@ setup(
     url='https://github.com/PaddlePaddle/PaddleClas',
     download_url='https://github.com/PaddlePaddle/PaddleClas.git',
     keywords=[
-        'A treasure chest for image classification powered by PaddlePaddle.'
+    'A treasure chest for image classification powered by PaddlePaddle.'
     ],
     classifiers=[
-        'Intended Audience :: Developers',
-        'Operating System :: OS Independent',
+        'Intended Audience :: Developers', 'Operating System :: OS Independent',
         'Natural Language :: Chinese (Simplified)',
         'Programming Language :: Python :: 3',
         'Programming Language :: Python :: 3.2',

@@ -25,14 +25,34 @@ print(result)
 ```
 下图是使用的demo图片
 ![](../images/whl/demo.jpg)
-结果展示
+结果展示**
 ```
 	>>> result
 	[{'filename': '/Users/mac/Downloads/PaddleClas/docs/images/whl/demo.jpg', 'class_ids': array([8]), 'scores': array([0.9796774], dtype=float32), 'label_names': ['hen']}]
 ```
 
+### 2. 参数解释
+* model_name(str): 模型名称，没有指定自定义的model_file和params_file时，可以指定该参数，使用PaddleClas提供的基于ImageNet1k的inference model，默认值为ResNet50。
+* image_file(str): 图像地址，支持指定单一图像的路径或图像的网址进行预测，支持指定包含图像的文件夹路径。
+* use_gpu(bool): 是否使用GPU，如果使用，指定为True。
+* use_tensorrt(bool): 是否开启TensorRT预测，可提升GPU预测性能，需要使用带TensorRT的预测库。当使用TensorRT推理加速，指定为True。默认为False。
+* resize_short(int): 将图像的高宽二者中小的值，调整到指定的resize_short值，大的值按比例放大。默认为256。
+* resize(int): 将图像裁剪到指定的resize值大小，默认224。
+* normalize(bool): 是否对图像数据归一化，默认True。
+* batch_size(int): 预测时每个batch的样本数，默认为1。
+* model_file(str): 模型.pdmodel的路径，若不指定该参数，需要指定model_name，获得下载的模型。
+* params_file(str): 模型参数.pdiparams的路径，若不与model_file指定，则需要指定model_name,以获得下载的模型。
+* ir_optim(bool): 是否开启IR优化，默认为True。
+* gpu_mem(int): 使用的GPU显存大小，默认为8000。
+* enable_profile(bool): 是否开启profile功能，默认False。
+* top_k(int): 指定的topk，预测的前k个类别和对应的分类概率，默认为1。
+* enable_mkldnn(bool): 是否开启MKLDNN，默认False。
+* cpu_num_threads(int): 指定cpu线程数，默认设置为10。
+* label_name_path(str): 指定一个表示所有的label name的文件路径。当用户使用自己训练的模型，可指定这一参数，打印结果时可以显示图像对应的类名称。若用户使用Paddle提供的inference model，则可不指定该参数，默认使用imagenet1k的label_name。
+* pre_label_image(bool): 是否需要进行预标注。
+* pre_label_out_idr(str): 进行预标注后，输出结果的文件路径。 
 
-### 2. 代码使用方法
+### 3. 代码使用方法
 * 用户使用自己指定的模型,需要指定模型路径参数model_file和参数params_file
 ```python
 from paddleclas import PaddleClas
