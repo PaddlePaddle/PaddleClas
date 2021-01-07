@@ -19,7 +19,9 @@ pip3 install dist/paddleclas-x.x.x-py3-none-any.whl # x.x.x是paddleclas的版�
 
 **下图是使用的demo图片**
 
-![](../images/whl/demo.jpg)
+<div align="center">
+<img src="../images/whl/demo.jpg"  width = "400" />
+</div>
 
 ```python
 from paddleclas import PaddleClas
