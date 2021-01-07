@@ -167,7 +167,7 @@ def parse_args(mMain=True, add_help=True):
         parser.add_argument("--model_name", type=str)
         parser.add_argument("-i", "--image_file", type=str)
         parser.add_argument("--use_gpu", type=str2bool, default=False)
-        parser.add_argument("--use_tensorrt", type=str2bool, default=True)
+
         # params for preprocess
         parser.add_argument("--resize_short", type=int, default=256)
         parser.add_argument("--resize", type=int, default=224)
@@ -175,17 +175,23 @@ def parse_args(mMain=True, add_help=True):
         parser.add_argument("-b", "--batch_size", type=int, default=1)
 
         # params for predict
-        parser.add_argument("--model_file", type=str)  ## inference.pdmodel
-        parser.add_argument("--params_file", type=str)  ## inference.pdiparams
+        parser.add_argument(
+            "--model_file", type=str, default='')  ## inference.pdmodel
+        parser.add_argument(
+            "--params_file", type=str, default='')  ## inference.pdiparams
         parser.add_argument("--ir_optim", type=str2bool, default=True)
+        parser.add_argument("--use_fp16", type=str2bool, default=False)
+        parser.add_argument("--use_tensorrt", type=str2bool, default=False)
         parser.add_argument("--gpu_mem", type=int, default=8000)
         parser.add_argument("--enable_profile", type=str2bool, default=False)
         parser.add_argument("--top_k", type=int, default=1)
         parser.add_argument("--enable_mkldnn", type=str2bool, default=False)
+        parser.add_argument("--enable_benchmark", type=str2bool, default=False)
         parser.add_argument("--cpu_num_threads", type=int, default=10)
+        parser.add_argument("--hubserving", type=str2bool, default=False)
 
         # parameters for pre-label the images
-        parser.add_argument("--label_name_path", type=str, default=None)
+        parser.add_argument("--label_name_path", type=str, default='')
         parser.add_argument(
             "--pre_label_image",
             type=str2bool,
@@ -199,6 +205,7 @@ def parse_args(mMain=True, add_help=True):
             model_name='',
             image_file='',
             use_gpu=False,
+            use_fp16=False,
             use_tensorrt=False,
             resize_short=256,
             resize=224,
@@ -211,8 +218,10 @@ def parse_args(mMain=True, add_help=True):
             enable_profile=False,
             top_k=1,
             enable_mkldnn=False,
+            enable_benchmark=False,
             cpu_num_threads=10,
-            label_name_path=None,
+            hubserving=False,
+            label_name_path='',
             pre_label_image=False,
             pre_label_out_idr=None)
 
@@ -226,7 +235,7 @@ class PaddleClas(object):
         process_params = parse_args(mMain=False, add_help=False)
         process_params.__dict__.update(**kwargs)
 
-        if os.path.exists(process_params.model_file) is False:
+        if not os.path.exists(process_params.model_file):
             if process_params.model_name is None:
                 raise Exception(
                     'Please input model name that you want to use!')
