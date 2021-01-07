@@ -80,7 +80,7 @@ class VGGNet(nn.Layer):
         }
         assert self.layers in self.vgg_configure.keys(), \
             "supported layers are {} but input layer is {}".format(
-                vgg_configure.keys(), layers)
+                self.vgg_configure.keys(), layers)
         self.groups = self.vgg_configure[self.layers]
 
         self._conv_block_1 = ConvBlock(3, 64, self.groups[0], name="conv1_")
