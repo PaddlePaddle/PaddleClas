@@ -6,7 +6,7 @@
 
 install by pypi
 ```bash
-pip install paddleclas==2.0.0rc1
+pip install paddleclas==2.0.0rc2
 ```
 
 build own whl package and install
@@ -21,7 +21,9 @@ pip3 install dist/paddleclas-x.x.x-py3-none-any.whl
 
 **Here is demo.jpg**
 
-![](../images/whl/demo.jpg)
+<div align="center">
+<img src="../images/whl/demo.jpg"  width = "400" />
+</div>
 
 ```python
 from paddleclas import PaddleClas
