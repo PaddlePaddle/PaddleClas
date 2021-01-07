@@ -108,7 +108,7 @@ python -m paddle.distributed.launch \
 ARCHITECTURE:
     name: 'ResNet50_vd'
     params:
-        lr_mult_list: [0.1, 0.1, 0.2, 0.2, 0.3]
+        lr_mult_list: [0.5, 0.5, 0.6, 0.6, 0.8]
 pretrained_model: "./pretrained/ResNet50_vd_ssld_pretrained"
 ```
 
