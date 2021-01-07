@@ -6,6 +6,7 @@ from paddle.nn import Conv2D, BatchNorm, Linear, Dropout
 from paddle.nn import AdaptiveAvgPool2D, MaxPool2D, AvgPool2D
 from paddle.nn.initializer import Uniform
 import math
+import sys
 
 __all__ = ['Xception41', 'Xception65', 'Xception71']
 
