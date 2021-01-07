@@ -68,15 +68,18 @@ paddleclas --model_name='ResNet50' --image_file='docs/images/whl/demo.jpg'
 
 ### 3. 代码使用方法
 
-**提供两种使用方式：1、python交互式编程。2、命令行式编程**
+**提供两种使用方式：1、python交互式编程。2、bash命令行式编程**
 
 * 查看帮助信息
+
+###### bash
 ```bash
 paddleclas -h
 ```
 
 * 用户使用自己指定的模型,需要指定模型路径参数`model_file`和参数`params_file`
 
+###### python
 ```python
 from paddleclas import PaddleClas
 clas = PaddleClas(model_file='user-specified model path',
@@ -86,6 +89,7 @@ result=clas.predict(image_file)
 print(result)
 ```
 
+###### bash
 ```bash
 paddleclas --model_file='user-specified model path' --params_file='parmas path' --image_file='image path'
 ```
@@ -93,6 +97,7 @@ paddleclas --model_file='user-specified model path' --params_file='parmas path' 
 * 用户使用PaddlePaddle训练好的inference model来预测，用户需要使用，初始化打印的模型的其中一个，并指定给`model_name`。
 用户可以不指定`model_file`,模型会自动下载到当前目录,并保存在以`model_name`命名的文件夹中，避免下载不同模型的覆盖问题。
 
+###### python
 ```python
 from paddleclas import PaddleClas
 clas = PaddleClas(model_name='ResNet50',use_gpu=False, use_tensorrt=False)
@@ -101,12 +106,14 @@ result=clas.predict(image_file)
 print(result)
 ```
 
+###### bash
 ```bash
 paddleclas --model_name='ResNet50' --image_file='image path'
 ```
 
 * 用户可以将`image_file`指定为包含图片的文件夹路径，可以指定`top_k`参数
 
+###### python
 ```python
 from paddleclas import PaddleClas
 clas = PaddleClas(model_name='ResNet50',use_gpu=False, use_tensorrt=False,top_k=5)
@@ -115,12 +122,14 @@ result=clas.predict(image_file)
 print(result)
 ```
 
+###### bash
 ```bash
 paddleclas --model_name='ResNet50' --image_file='image path' --top_k=5
 ```
 
 * 用户可以指定`--pre_label_image=True`, `--pre_label_out_idr= './output_pre_label/'`，将图片复制到，以其top1对应的类别命名的文件夹中。
 
+###### python
 ```python
 from paddleclas import PaddleClas
 clas = PaddleClas(model_name='ResNet50',use_gpu=False, use_tensorrt=False,top_k=5, pre_label_image=True,pre_label_out_idr='./output_pre_label/')
@@ -129,6 +138,7 @@ result=clas.predict(image_file)
 print(result)
 ```
 
+###### bash
 ```bash
 paddleclas --model_name='ResNet50' --image_file='image path' --top_k=5 --pre_label_image=True --pre_label_out_idr='./output_pre_label/'
 ```
@@ -145,6 +155,8 @@ paddleclas --model_name='ResNet50' --image_file='image path' --top_k=5 --pre_lab
 * 用户如果使用Paddle提供的inference model，则不需要提供`label_name_path`，会默认使用`ppcls/utils/imagenet1k_label_list.txt`。
 如果用户希望使用自己的模型，则可以提供`label_name_path`，将label_name与结果一并输出。如果不提供将不会输出label_name信息。
 
+
+###### python
 ```python
 from paddleclas import PaddleClas
 clas = PaddleClas(model_file= './inference.pdmodel',params_file = './inference.pdiparams',label_name_path='./ppcls/utils/imagenet1k_label_list.txt',use_gpu=False)
@@ -153,10 +165,12 @@ result=clas.predict(image_file)
 print(result)
 ```
 
+###### bash
 ```bash
 paddleclas --model_file= './inference.pdmodel' --params_file = './inference.pdiparams' --image_file='image path' --label_name_path='./ppcls/utils/imagenet1k_label_list.txt'
 ```
 
+###### python
 ```python
 from paddleclas import PaddleClas
 clas = PaddleClas(model_name='ResNet50',use_gpu=False)
@@ -165,6 +179,7 @@ result=clas.predict(image_file)
 print(result)
 ```
 
+###### bash
 ```bash
 paddleclas --model_name='ResNet50' --image_file='image path'
 ```
