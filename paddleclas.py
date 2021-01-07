@@ -280,28 +280,43 @@ class PaddleClas(object):
         Returns:
             dict：{image_name: "", class_id: [], scores: [], label_names: []}，if label name path == None，label_names will be empty.
         """
+        assert isinstance(img, (str, np.ndarray))
+
         input_names = self.predictor.get_input_names()
         input_tensor = self.predictor.get_input_handle(input_names[0])
 
         output_names = self.predictor.get_output_names()
         output_tensor = self.predictor.get_output_handle(output_names[0])
-        # download internet image
-        if img.startswith('http'):
-            if not os.path.exists(BASE_IMAGES_DIR):
-                os.makedirs(BASE_IMAGES_DIR)
-            image_path = os.path.join(BASE_IMAGES_DIR, 'tmp.jpg')
-            download_with_progressbar(img, image_path)
-            print("Current using image from Internet:{}, renamed as: {}".
-                  format(img, image_path))
-            img = image_path
-        image_list = utils.get_image_list(img)
+        if isinstance(img, str):
+            # download internet image
+            if img.startswith('http'):
+                if not os.path.exists(BASE_IMAGES_DIR):
+                    os.makedirs(BASE_IMAGES_DIR)
+                image_path = os.path.join(BASE_IMAGES_DIR, 'tmp.jpg')
+                download_with_progressbar(img, image_path)
+                print("Current using image from Internet:{}, renamed as: {}".
+                      format(img, image_path))
+                img = image_path
+            image_list = utils.get_image_list(img)
+        else:
+            if isinstance(img, np.ndarray):
+                image_list = [img]
+            else:
+                print('Please input legal image!')
+
         total_result = []
         for filename in image_list:
-            image = cv2.imread(filename)[:, :, ::-1]
-            assert image is not None, "Error in loading image: {}".format(
-                filename)
-            inputs = utils.preprocess(image, self.args)
-            inputs = np.expand_dims(inputs, axis=0).repeat(1, axis=0).copy()
+            if isinstance(filename, str):
+                image = cv2.imread(filename)[:, :, ::-1]
+                assert image is not None, "Error in loading image: {}".format(
+                    filename)
+                inputs = utils.preprocess(image, self.args)
+                inputs = np.expand_dims(
+                    inputs, axis=0).repeat(
+                        1, axis=0).copy()
+            else:
+                inputs = filename
+
             input_tensor.copy_from_cpu(inputs)
 
             self.predictor.run()
@@ -312,7 +327,7 @@ class PaddleClas(object):
             if len(self.label_name_dict) != 0:
                 label_names = [self.label_name_dict[c] for c in classes]
             result = {
-                "filename": filename,
+                "filename": filename if isinstance(filename, str) else 'image',
                 "class_ids": classes.tolist(),
                 "scores": scores.tolist(),
                 "label_names": label_names,

@@ -47,7 +47,7 @@ paddleclas --model_name='ResNet50' --image_file='docs/images/whl/demo.jpg'
 
 ### 2. 参数解释
 * model_name(str): 模型名称，没有指定自定义的model_file和params_file时，可以指定该参数，使用PaddleClas提供的基于ImageNet1k的inference model，默认值为ResNet50。
-* image_file(str): 图像地址，支持指定单一图像的路径或图像的网址进行预测，支持指定包含图像的文件夹路径。
+* image_file(str): 图像地址，支持指定单一图像的路径或图像的网址进行预测，支持指定包含图像的文件夹路径，支持经过预处理的np.ndarray形式输入。
 * use_gpu(bool): 是否使用GPU，如果使用，指定为True。默认为False。
 * use_tensorrt(bool): 是否开启TensorRT预测，可提升GPU预测性能，需要使用带TensorRT的预测库。当使用TensorRT推理加速，指定为True。默认为False。
 * resize_short(int): 将图像的高宽二者中小的值，调整到指定的resize_short值，大的值按比例放大。默认为256。
@@ -110,6 +110,22 @@ print(result)
 ```bash
 paddleclas --model_name='ResNet50' --image_file='image path'
 ```
+
+* 用户可以使用经过预处理的np.ndarray格式`--image_file=np.ndarray`。
+
+###### python
+```python
+from paddleclas import PaddleClas
+clas = PaddleClas(model_name='ResNet50',use_gpu=False, use_tensorrt=False)
+image_file =np.ndarray # image_file 可指定为前缀是https的网络图片，也可指定为本地图片
+result=clas.predict(image_file)
+```
+
+###### bash
+```bash
+paddleclas --model_name='ResNet50' --image_file=np.ndarray
+```
+
 
 * 用户可以将`image_file`指定为包含图片的文件夹路径，可以指定`top_k`参数
 

@@ -49,7 +49,7 @@ paddleclas --model_name='ResNet50' --image_file='docs/images/whl/demo.jpg'
 
 ### 2. Definition of Parameters
 * model_name(str): model's name. If not assigning `model_file`and`params_file`, you can assign this param. If using inference model based on ImageNet1k provided by Paddle, set as default='ResNet50'.
-* image_file(str): image's path. Support assigning single local image, internet image and folder containing series of images.
+* image_file(str): image's path. Support assigning single local image, internet image and folder containing series of images. Also Support numpy.ndarray.
 * use_gpu(bool): Whether to use GPU or not, defalut=False。
 * use_tensorrt(bool): whether to open tensorrt or not. Using it can greatly promote predict preformance, default=False.
 * resize_short(int): resize the minima between height and width into resize_short(int), default=256
@@ -109,6 +109,22 @@ print(result)
 ```bash
 paddleclas --model_name='ResNet50' --image_file='image path'
 ```
+
+* You can assign input as format`np.ndarray` which has been preprocessed `--image_file=np.ndarray`.
+
+###### python
+```python
+from paddleclas import PaddleClas
+clas = PaddleClas(model_name='ResNet50',use_gpu=False, use_tensorrt=False)
+image_file =np.ndarray # image_file 可指定为前缀是https的网络图片，也可指定为本地图片
+result=clas.predict(image_file)
+```
+
+###### bash
+```bash
+paddleclas --model_name='ResNet50' --image_file=np.ndarray
+```
+
 
 * You can assign `image_file` as a folder path containing series of images, also can assign `top_k`.
 
