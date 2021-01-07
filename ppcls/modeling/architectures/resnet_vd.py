@@ -64,8 +64,10 @@ class ConvBNLayer(nn.Layer):
         self._batch_norm = BatchNorm(
             num_filters,
             act=act,
-            param_attr=ParamAttr(name=bn_name + '_scale'),
-            bias_attr=ParamAttr(bn_name + '_offset'),
+            param_attr=ParamAttr(
+                name=bn_name + '_scale', learning_rate=lr_mult),
+            bias_attr=ParamAttr(
+                bn_name + '_offset', learning_rate=lr_mult),
             moving_mean_name=bn_name + '_mean',
             moving_variance_name=bn_name + '_variance')
 
@@ -118,6 +120,7 @@ class BottleneckBlock(nn.Layer):
                 filter_size=1,
                 stride=1,
                 is_vd_mode=False if if_first else True,
+                lr_mult=lr_mult,
                 name=name + "_branch1")
 
         self.shortcut = shortcut
@@ -153,12 +156,14 @@ class BasicBlock(nn.Layer):
             filter_size=3,
             stride=stride,
             act='relu',
+            lr_mult=lr_mult,
             name=name + "_branch2a")
         self.conv1 = ConvBNLayer(
             num_channels=num_filters,
             num_filters=num_filters,
             filter_size=3,
             act=None,
+            lr_mult=lr_mult,
             name=name + "_branch2b")
 
         if not shortcut:
@@ -168,6 +173,7 @@ class BasicBlock(nn.Layer):
                 filter_size=1,
                 stride=1,
                 is_vd_mode=False if if_first else True,
+                lr_mult=lr_mult,
                 name=name + "_branch1")
 
         self.shortcut = shortcut
