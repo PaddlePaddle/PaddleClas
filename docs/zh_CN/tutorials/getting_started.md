@@ -229,7 +229,7 @@ python tools/infer/infer.py \
 
 
 <a name="model_inference"></a>
-## 4. 使用inference模型模型推理
+## 4. 使用inference模型进行模型推理
 
 通过导出inference模型，PaddlePaddle支持使用预测引擎进行预测推理。接下来介绍如何用预测引擎进行推理：
 首先，对训练好的模型进行转换：
