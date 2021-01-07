@@ -144,7 +144,7 @@ class BottleneckBlock(nn.Layer):
             self.se_block = SELayer(
                 num_channels=w_b,
                 num_filters=w_b,
-                reduction_channels=w_se,
+                reduction_ratio=w_se,
                 name=name + "_branch2se")
         self.conv2 = ConvBNLayer(
             num_channels=w_b,
