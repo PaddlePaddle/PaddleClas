@@ -1,5 +1,8 @@
 # Release Notes
 
+- 2021.01.08
+    * Add support for whl package and its usage, Model inference can be done by simply install paddleclas using pip.
+
 - 2020.12.16
     * Add support for TensorRT when using cpp inference to obain more obvious acceleration.
 
