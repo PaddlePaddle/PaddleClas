@@ -68,10 +68,11 @@ class ConvBlock(nn.Layer):
 
 
 class VGGNet(nn.Layer):
-    def __init__(self, layers=11, class_dim=1000):
+    def __init__(self, layers=11, stop_grad_layers=0, class_dim=1000):
         super(VGGNet, self).__init__()
 
         self.layers = layers
+        self.stop_grad_layers = stop_grad_layers
         self.vgg_configure = {
             11: [1, 1, 2, 2, 2],
             13: [2, 2, 2, 2, 2],
@@ -88,6 +89,22 @@ class VGGNet(nn.Layer):
         self._conv_block_3 = ConvBlock(128, 256, self.groups[2], name="conv3_")
         self._conv_block_4 = ConvBlock(256, 512, self.groups[3], name="conv4_")
         self._conv_block_5 = ConvBlock(512, 512, self.groups[4], name="conv5_")
+
+        if self.stop_grad_layers >= 1:
+            for param in self._conv_block_1.parameters():
+                param.trainable = False
+        if self.stop_grad_layers >= 2:
+            for param in self._conv_block_2.parameters():
+                param.trainable = False
+        if self.stop_grad_layers >= 3:
+            for param in self._conv_block_3.parameters():
+                param.trainable = False
+        if self.stop_grad_layers >= 4:
+            for param in self._conv_block_4.parameters():
+                param.trainable = False
+        if self.stop_grad_layers >= 5:
+            for param in self._conv_block_5.parameters():
+                param.trainable = False
 
         self._drop = Dropout(p=0.5, mode="downscale_in_infer")
         self._fc1 = Linear(
