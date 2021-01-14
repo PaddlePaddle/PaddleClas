@@ -90,21 +90,13 @@ class VGGNet(nn.Layer):
         self._conv_block_4 = ConvBlock(256, 512, self.groups[3], name="conv4_")
         self._conv_block_5 = ConvBlock(512, 512, self.groups[4], name="conv5_")
 
-        if self.stop_grad_layers >= 1:
-            for param in self._conv_block_1.parameters():
-                param.trainable = False
-        if self.stop_grad_layers >= 2:
-            for param in self._conv_block_2.parameters():
-                param.trainable = False
-        if self.stop_grad_layers >= 3:
-            for param in self._conv_block_3.parameters():
-                param.trainable = False
-        if self.stop_grad_layers >= 4:
-            for param in self._conv_block_4.parameters():
-                param.trainable = False
-        if self.stop_grad_layers >= 5:
-            for param in self._conv_block_5.parameters():
-                param.trainable = False
+        for idx, block in enumerate([
+                self._conv_block_1, self._conv_block_2, self._conv_block_3,
+                self._conv_block_4, self._conv_block_5
+        ]):
+            if self.stop_grad_layers >= idx + 1:
+                for param in block.parameters():
+                    param.trainable = False
 
         self._drop = Dropout(p=0.5, mode="downscale_in_infer")
         self._fc1 = Linear(
