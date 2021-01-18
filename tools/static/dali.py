@@ -176,7 +176,11 @@ def build(config, mode='train'):
         2: types.INTERP_CUBIC,  # cv2.INTER_CUBIC
         4: types.INTERP_LANCZOS3,  # XXX use LANCZOS3 for cv2.INTER_LANCZOS4
     }
-    output_dtype = types.FLOAT16 if config.get("use_pure_fp16", False) else types.FLOAT
+   
+    if config.get("use_pure_fp16", False) and config.get("use_amp", False):
+        output_dtype = types.FLOAT16 
+    else:
+        output_dtype = types.FLOAT
     assert interp in interp_map, "interpolation method not supported by DALI"
     interp = interp_map[interp]
     pad_output = False

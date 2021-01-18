@@ -25,8 +25,6 @@ from optimizer import OptimizerBuilder
 
 import paddle
 import paddle.nn.functional as F
-from paddle import fluid
-from paddle.fluid.contrib.mixed_precision.fp16_utils import cast_model_to_fp16
 
 from ppcls.optimizer.learning_rate import LearningRateBuilder
 from ppcls.modeling import architectures
@@ -100,15 +98,9 @@ def create_model(architecture, image, classes_num, config, is_train):
     if "is_test" in params:
         params['is_test'] = not is_train
     model = architectures.__dict__[name](class_dim=classes_num, **params)
-
-    if use_pure_fp16 and not config.get("use_dali", False):
-        image = image.astype('float16')
-    if data_format == "NHWC":
-        image = paddle.tensor.transpose(image, [0, 2, 3, 1])
-        image.stop_gradient = True
+    
     out = model(image)
     if config.get("use_pure_fp16", False):
-        cast_model_to_fp16(paddle.static.default_main_program())
         out = out.astype('float32')
     return out
 
@@ -119,8 +111,7 @@ def create_loss(out,
                 classes_num=1000,
                 epsilon=None,
                 use_mix=False,
-                use_distillation=False,
-                use_pure_fp16=False):
+                use_distillation=False):
     """
     Create a loss for optimization, such as:
         1. CrossEnotry loss
@@ -137,7 +128,6 @@ def create_loss(out,
         classes_num(int): num of classes
         epsilon(float): parameter for label smoothing, 0.0 <= epsilon <= 1.0
         use_mix(bool): whether to use mix(include mixup, cutmix, fmix)
-        use_pure_fp16(bool): whether to use pure fp16 data as training parameter
 
     Returns:
         loss(variable): loss variable
@@ -162,10 +152,10 @@ def create_loss(out,
 
     if use_mix:
         loss = MixCELoss(class_dim=classes_num, epsilon=epsilon)
-        return loss(out, feed_y_a, feed_y_b, feed_lam, use_pure_fp16)
+        return loss(out, feed_y_a, feed_y_b, feed_lam)
     else:
         loss = CELoss(class_dim=classes_num, epsilon=epsilon)
-        return loss(out, target, use_pure_fp16)
+        return loss(out, target)
 
 
 def create_metric(out,
@@ -239,9 +229,8 @@ def create_fetchs(out,
         fetchs(dict): dict of model outputs(included loss and measures)
     """
     fetchs = OrderedDict()
-    use_pure_fp16 = config.get("use_pure_fp16", False)
     loss = create_loss(out, feeds, architecture, classes_num, epsilon, use_mix,
-                       use_distillation, use_pure_fp16)
+                       use_distillation)
     fetchs['loss'] = (loss, AverageMeter('loss', '7.4f', need_avg=True))
     if not use_mix:
         metric = create_metric(out, feeds, architecture, topk, classes_num,
@@ -372,11 +361,14 @@ def mixed_precision_optimizer(config, optimizer):
     use_amp = config.get('use_amp', False)
     scale_loss = config.get('scale_loss', 1.0)
     use_dynamic_loss_scaling = config.get('use_dynamic_loss_scaling', False)
+    use_pure_fp16 = config.get('use_pure_fp16', False)
     if use_amp:
-        optimizer = fluid.contrib.mixed_precision.decorate(
+        optimizer = paddle.static.amp.decorate(
             optimizer,
             init_loss_scaling=scale_loss,
-            use_dynamic_loss_scaling=use_dynamic_loss_scaling)
+            use_dynamic_loss_scaling=use_dynamic_loss_scaling,
+            use_pure_fp16=use_pure_fp16,
+            use_fp16_guard=True)
 
     return optimizer
 
@@ -432,13 +424,14 @@ def build(config, main_prog, startup_prog, is_train=True, is_distributed=True):
                 config=config,
                 use_distillation=use_distillation)
             lr_scheduler = None
+            optimizer = None
             if is_train:
                 optimizer, lr_scheduler = create_optimizer(config)
                 optimizer = mixed_precision_optimizer(config, optimizer)
                 if is_distributed:
                     optimizer = dist_optimizer(config, optimizer)
                 optimizer.minimize(fetchs['loss'][0])
-    return fetchs, lr_scheduler, feeds
+    return fetchs, lr_scheduler, feeds, optimizer
 
 
 def compile(config, program, loss_name=None, share_prog=None):
