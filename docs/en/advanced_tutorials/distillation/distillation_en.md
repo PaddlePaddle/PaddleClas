@@ -25,7 +25,7 @@ First, we select nearly 4 million images from ImageNet22k dataset, and integrate
 
 * Choice of the teacher model, During knowledge distillation, it may not be an optimal solution if the structure of the teacher model and the student model are too different. Under the same structure, the teacher model with higher accuracy leads to better performance for the student model during distillation. Compared with the 79.12% ResNet50_vd teacher model, using the 82.4% teacher model can bring a 0.4% accuracy improvement on Top-1 accuracy (`75.6%-> 76.0%`).
 
-* Improvement of loss function. The most commonly used loss function for classification is cross entropy loss. We fint that when using soft label for training, KL divergence loss is almost useless to improve model performance compared to cross entropy loss, but The accuracy has a 0.2% improvement using JS divergence loss (`76.0%-> 76.2%`). Loss function in SSLD is JS divergence loss.
+* Improvement of loss function. The most commonly used loss function for classification is cross entropy loss. We find that when using soft label for training, KL divergence loss is almost useless to improve model performance compared to cross entropy loss, but The accuracy has a 0.2% improvement using JS divergence loss (`76.0%-> 76.2%`). Loss function in SSLD is JS divergence loss.
 
 * More iteration number. It is only 120 for the baseline experiment. We can achieve a 0.9% improvement by setting it as 360 (`76.2%-> 77.1%`).
 
