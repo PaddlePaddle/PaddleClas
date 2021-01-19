@@ -32,34 +32,34 @@ __all__ = [
 
 
 class ResNet50_vd_distill_MobileNetV3_large_x1_0(nn.Layer):
-    def __init__(self, class_dim=1000, **args):
+    def __init__(self, class_dim=1000, freeze_teacher=True, **args):
         super(ResNet50_vd_distill_MobileNetV3_large_x1_0, self).__init__()
 
         self.teacher = ResNet50_vd(class_dim=class_dim, **args)
-
         self.student = MobileNetV3_large_x1_0(class_dim=class_dim, **args)
 
-    def forward(self, input):
-        teacher_label = self.teacher(input)
-        teacher_label.stop_gradient = True
+        if freeze_teacher:
+            for param in self.teacher.parameters():
+                param.trainable = False
 
-        student_label = self.student(input)
-
+    def forward(self, x):
+        teacher_label = self.teacher(x)
+        student_label = self.student(x)
         return teacher_label, student_label
 
 
 class ResNeXt101_32x16d_wsl_distill_ResNet50_vd(nn.Layer):
-    def __init__(self, class_dim=1000, **args):
+    def __init__(self, class_dim=1000, freeze_teacher=True, **args):
         super(ResNeXt101_32x16d_wsl_distill_ResNet50_vd, self).__init__()
 
         self.teacher = ResNeXt101_32x16d_wsl(class_dim=class_dim, **args)
-
         self.student = ResNet50_vd(class_dim=class_dim, **args)
 
-    def forward(self, input):
-        teacher_label = self.teacher(input)
-        teacher_label.stop_gradient = True
+        if freeze_teacher:
+            for param in self.teacher.parameters():
+                param.trainable = False
 
-        student_label = self.student(input)
-
+    def forward(self, x):
+        teacher_label = self.teacher(x)
+        student_label = self.student(x)
         return teacher_label, student_label
