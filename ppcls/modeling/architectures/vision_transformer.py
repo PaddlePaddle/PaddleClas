@@ -30,16 +30,12 @@ def to_2tuple(x):
 
 def drop_path(x, drop_prob=0., training=False):
     """Drop paths (Stochastic Depth) per sample (when applied in main path of residual blocks).
-    This is the same as the DropConnect impl I created for EfficientNet, etc networks, however,
     the original name is misleading as 'Drop Connect' is a different form of dropout in a separate paper...
-    See discussion: https://github.com/tensorflow/tpu/issues/494#issuecomment-532968956 ... I've opted for
-    changing the layer and argument names to 'drop path' rather than mix DropConnect as a layer name and use
-    'survival rate' as the argument.
+    See discussion: https://github.com/tensorflow/tpu/issues/494#issuecomment-532968956 ...
     """
     if drop_prob == 0. or not training:
         return x
     keep_prob = 1 - drop_prob
-    # work with diff dim tensors, not just 2D ConvNets
     shape = (x.shape[0],) + (1,) * (x.ndim - 1)
     random_tensor = keep_prob + paddle.rand(shape, dtype=x.dtype)
     random_tensor.floor_()  # binarize
@@ -91,7 +87,6 @@ class Attention(nn.Layer):
         super().__init__()
         self.num_heads = num_heads
         head_dim = dim // num_heads
-        # NOTE scale factor was wrong in my original version, can set manually to be compat with prev weights
         self.scale = qk_scale or head_dim ** -0.5
 
         self.qkv = nn.Linear(dim, dim * 3, bias_attr=qkv_bias)
@@ -155,7 +150,6 @@ class PatchEmbed(nn.Layer):
 
     def forward(self, x):
         B, C, H, W = x.shape
-        # FIXME look at relaxing size constraints
         assert H == self.img_size[0] and W == self.img_size[1], \
             f"Input image size ({H}*{W}) doesn't match model ({self.img_size[0]}*{self.img_size[1]})."
 
@@ -172,7 +166,7 @@ class VisionTransformer(nn.Layer):
                  drop_path_rate=0., norm_layer='nn.LayerNorm', epsilon=1e-5, **args):
         super().__init__()
         self.class_dim = class_dim
-        # num_features for consistency with other models
+
         self.num_features = self.embed_dim = embed_dim
 
         self.patch_embed = PatchEmbed(
@@ -187,7 +181,6 @@ class VisionTransformer(nn.Layer):
         self.add_parameter("cls_token", self.cls_token)
         self.pos_drop = nn.Dropout(p=drop_rate)
 
-        # stochastic depth decay rule
         dpr = [x for x in paddle.linspace(0, drop_path_rate, depth)]
 
         self.blocks = nn.LayerList([
