@@ -21,7 +21,7 @@ import time
 import numpy as np
 
 from collections import OrderedDict
-from optimizer import OptimizerBuilder
+from .optimizer import OptimizerBuilder
 
 import paddle
 import paddle.nn.functional as F
@@ -81,11 +81,9 @@ def create_model(architecture, image, classes_num, config, is_train):
     Returns:
         out(variable): model output variable
     """
-    use_pure_fp16 = config.get("use_pure_fp16", False)
     name = architecture["name"]
     params = architecture.get("params", {})
 
-    data_format = "NCHW"
     if "data_format" in config:
         params["data_format"] = config["data_format"]
         data_format = config["data_format"]
@@ -100,8 +98,6 @@ def create_model(architecture, image, classes_num, config, is_train):
     model = architectures.__dict__[name](class_dim=classes_num, **params)
     
     out = model(image)
-    if config.get("use_pure_fp16", False):
-        out = out.astype('float32')
     return out
 
 
@@ -274,7 +270,7 @@ def create_optimizer(config):
 
     # create optimizer instance
     opt_config = config['OPTIMIZER']
-    opt = OptimizerBuilder(config, **opt_config)
+    opt = OptimizerBuilder(**opt_config)
     return opt(lr), lr
 
 
@@ -293,11 +289,11 @@ def create_strategy(config):
     exec_strategy = paddle.static.ExecutionStrategy()
 
     exec_strategy.num_threads = 1
-    exec_strategy.num_iteration_per_drop_scope = 10000 if config.get(
-        'use_pure_fp16', False) else 10
+    exec_strategy.num_iteration_per_drop_scope = (10000 if 'AMP' in config and
+                    config.AMP.get("use_pure_fp16", False) else 10)
 
-    fuse_op = config.get('use_amp', False) or config.get('use_pure_fp16',
-                                                         False)
+    fuse_op = True if 'AMP' in config else False
+
     fuse_bn_act_ops = config.get('fuse_bn_act_ops', fuse_op)
     fuse_elewise_add_act_ops = config.get('fuse_elewise_add_act_ops', fuse_op)
     fuse_bn_add_act_ops = config.get('fuse_bn_add_act_ops', fuse_op)
@@ -358,11 +354,11 @@ def dist_optimizer(config, optimizer):
 
 
 def mixed_precision_optimizer(config, optimizer):
-    use_amp = config.get('use_amp', False)
-    scale_loss = config.get('scale_loss', 1.0)
-    use_dynamic_loss_scaling = config.get('use_dynamic_loss_scaling', False)
-    use_pure_fp16 = config.get('use_pure_fp16', False)
-    if use_amp:
+    if 'AMP' in config:
+        amp_cfg = config.AMP if config.AMP else dict()
+        scale_loss = amp_cfg.get('scale_loss', 1.0)
+        use_dynamic_loss_scaling = amp_cfg.get('use_dynamic_loss_scaling', False)
+        use_pure_fp16 = amp_cfg.get('use_pure_fp16', False)
         optimizer = paddle.static.amp.decorate(
             optimizer,
             init_loss_scaling=scale_loss,
@@ -399,15 +395,11 @@ def build(config, main_prog, startup_prog, is_train=True, is_distributed=True):
             use_dali = config.get('use_dali', False)
             use_distillation = config.get('use_distillation')
 
-            image_dtype = "float32"
-            if config["ARCHITECTURE"]["name"] == "ResNet50" and config.get("use_pure_fp16", False) \
-                and config.get("use_dali", False):
-                image_dtype = "float16"
             feeds = create_feeds(
                 config.image_shape,
                 use_mix=use_mix,
                 use_dali=use_dali,
-                dtype=image_dtype)
+                dtype="float32")
             if use_dali and use_mix:
                 import dali
                 feeds = dali.mix(feeds, config, is_train)

@@ -65,9 +65,7 @@ def main(args):
     # assign the place
     use_gpu = config.get("use_gpu", True)
     # amp related config
-    use_amp = config.get('use_amp', False)
-    use_pure_fp16 = config.get('use_pure_fp16', False)
-    if use_amp or use_pure_fp16:
+    if 'AMP' in config:
         AMP_RELATED_FLAGS_SETTING = {
             'FLAGS_cudnn_exhaustive_search': 1,
             'FLAGS_conv_workspace_size_limit': 4000,
@@ -120,7 +118,7 @@ def main(args):
     # load pretrained models or checkpoints
     init_model(config, train_prog, exe)
 
-    if config.get("use_pure_fp16", False):
+    if 'AMP' in config and config.AMP.get("use_pure_fp16", False):
         optimizer.amp_init(place,
                 scope=paddle.static.global_scope(),
                 test_program=valid_prog if config.validate else None)
