@@ -2,7 +2,7 @@ mode: 'train'
 ARCHITECTURE:
     name: 'ResNeXt101_32x16d_wsl_distill_ResNet50_vd'
 
-pretrained_model: "./pretrained/ResNeXt101_32x16d_wsl_pretrained/"
+pretrained_model: "./pretrained/ResNeXt101_32x16d_wsl_pretrained"
 model_save_dir: "./output/"
 classes_num: 1000
 total_images: 1281167
