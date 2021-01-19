@@ -5,8 +5,6 @@ The official jax code is released and available at https://github.com/google-res
 """
 import paddle
 import paddle.nn as nn
-
-from functools import partial
 from paddle.nn.initializer import TruncatedNormal, Constant
 
 
@@ -241,14 +239,14 @@ def ViT_base_patch16_224(**kwargs):
 
 def ViT_base_patch16_384(**kwargs):
     model = VisionTransformer(
-        img_size=384, patch_size=16, embed_dim=768, depth=12, num_heads=12, mlp_ratio=4, 
+        img_size=384, patch_size=16, embed_dim=768, depth=12, num_heads=12, mlp_ratio=4,
         qkv_bias=True, epsilon=1e-6, **kwargs)
     return model
 
 
 def ViT_base_patch32_384(**kwargs):
     model = VisionTransformer(
-        img_size=384, patch_size=32, embed_dim=768, depth=12, num_heads=12, mlp_ratio=4, 
+        img_size=384, patch_size=32, embed_dim=768, depth=12, num_heads=12, mlp_ratio=4,
         qkv_bias=True, epsilon=1e-6, **kwargs)
     return model
 
@@ -262,14 +260,14 @@ def ViT_large_patch16_224(**kwargs):
 
 def ViT_large_patch16_384(**kwargs):
     model = VisionTransformer(
-        img_size=384, patch_size=16, embed_dim=1024, depth=24, num_heads=16, mlp_ratio=4, 
+        img_size=384, patch_size=16, embed_dim=1024, depth=24, num_heads=16, mlp_ratio=4,
         qkv_bias=True, epsilon=1e-6, **kwargs)
     return model
 
 
 def ViT_large_patch32_384(**kwargs):
     model = VisionTransformer(
-        img_size=384, patch_size=32, embed_dim=1024, depth=24, num_heads=16, mlp_ratio=4, 
+        img_size=384, patch_size=32, embed_dim=1024, depth=24, num_heads=16, mlp_ratio=4,
         qkv_bias=True, epsilon=1e-6, **kwargs)
     return model
 
