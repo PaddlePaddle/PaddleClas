@@ -12,7 +12,7 @@ from paddle.nn.initializer import TruncatedNormal, Constant
 
 __all__ = [
     "VisionTransformer",
-    "ViT_small_patch16_224", 
+    "ViT_small_patch16_224",
     "ViT_base_patch16_224", "ViT_base_patch16_384", "ViT_base_patch32_384",
     "ViT_large_patch16_224", "ViT_large_patch16_384", "ViT_large_patch32_384",
     "ViT_huge_patch16_224", "ViT_huge_patch32_384"
@@ -103,7 +103,6 @@ class Attention(nn.Layer):
         B, N, C = x.shape
         qkv = self.qkv(x).reshape((B, N, 3, self.num_heads, C //
                                    self.num_heads)).transpose((2, 0, 3, 1, 4))
-        # make torchscript happy (cannot use tensor as tuple)
         q, k, v = qkv[0], qkv[1], qkv[2]
 
         attn = (q.matmul(k.transpose((0, 1, 3, 2)))) * self.scale
@@ -119,14 +118,14 @@ class Attention(nn.Layer):
 class Block(nn.Layer):
 
     def __init__(self, dim, num_heads, mlp_ratio=4., qkv_bias=False, qk_scale=None, drop=0., attn_drop=0.,
-                 drop_path=0., act_layer=nn.GELU, norm_layer=nn.LayerNorm):
+                 drop_path=0., act_layer=nn.GELU, norm_layer='nn.LayerNorm', epsilon=1e-5):
         super().__init__()
-        self.norm1 = norm_layer(dim)
+        self.norm1 = eval(norm_layer)(dim, epsilon=epsilon)
         self.attn = Attention(
             dim, num_heads=num_heads, qkv_bias=qkv_bias, qk_scale=qk_scale, attn_drop=attn_drop, proj_drop=drop)
         # NOTE: drop path for stochastic depth, we shall see if this is better than dropout here
         self.drop_path = DropPath(drop_path) if drop_path > 0. else Identity()
-        self.norm2 = norm_layer(dim)
+        self.norm2 = eval(norm_layer)(dim, epsilon=epsilon)
         mlp_hidden_dim = int(dim * mlp_ratio)
         self.mlp = Mlp(in_features=dim, hidden_features=mlp_hidden_dim,
                        act_layer=act_layer, drop=drop)
@@ -170,7 +169,7 @@ class VisionTransformer(nn.Layer):
 
     def __init__(self, img_size=224, patch_size=16, in_chans=3, class_dim=1000, embed_dim=768, depth=12,
                  num_heads=12, mlp_ratio=4, qkv_bias=False, qk_scale=None, drop_rate=0., attn_drop_rate=0.,
-                 drop_path_rate=0., norm_layer=nn.LayerNorm):
+                 drop_path_rate=0., norm_layer='nn.LayerNorm', epsilon=1e-5, **args):
         super().__init__()
         self.class_dim = class_dim
         # num_features for consistency with other models
@@ -194,13 +193,10 @@ class VisionTransformer(nn.Layer):
         self.blocks = nn.LayerList([
             Block(
                 dim=embed_dim, num_heads=num_heads, mlp_ratio=mlp_ratio, qkv_bias=qkv_bias, qk_scale=qk_scale,
-                drop=drop_rate, attn_drop=attn_drop_rate, drop_path=dpr[i], norm_layer=norm_layer)
+                drop=drop_rate, attn_drop=attn_drop_rate, drop_path=dpr[i], norm_layer=norm_layer, epsilon=epsilon)
             for i in range(depth)])
-        self.norm = norm_layer(embed_dim)
 
-        # NOTE as per official impl, we could have a pre-logits representation dense layer + tanh here
-        #self.repr = nn.Linear(embed_dim, representation_size)
-        #self.repr_act = nn.Tanh()
+        self.norm = eval(norm_layer)(embed_dim, epsilon=epsilon)
 
         # Classifier head
         self.head = nn.Linear(
@@ -222,7 +218,6 @@ class VisionTransformer(nn.Layer):
     def forward_features(self, x):
         B = x.shape[0]
         x = self.patch_embed(x)
-        # stole cls_tokens impl from Phil Wang, thanks
         cls_tokens = self.cls_token.expand((B, -1, -1))
         x = paddle.concat((cls_tokens, x), axis=1)
         x = x + self.pos_embed
@@ -247,42 +242,42 @@ def ViT_small_patch16_224(**kwargs):
 def ViT_base_patch16_224(**kwargs):
     model = VisionTransformer(
         patch_size=16, embed_dim=768, depth=12, num_heads=12, mlp_ratio=4, qkv_bias=True,
-        norm_layer=partial(nn.LayerNorm, epsilon=1e-6), **kwargs)
+        norm_layer='nn.LayerNorm', epsilon=1e-6, **kwargs)
     return model
 
 
 def ViT_base_patch16_384(**kwargs):
     model = VisionTransformer(
         img_size=384, patch_size=16, embed_dim=768, depth=12, num_heads=12, mlp_ratio=4, qkv_bias=True,
-        norm_layer=partial(nn.LayerNorm, epsilon=1e-6), **kwargs)
+        norm_layer='nn.LayerNorm', epsilon=1e-6, **kwargs)
     return model
 
 
 def ViT_base_patch32_384(**kwargs):
     model = VisionTransformer(
         img_size=384, patch_size=32, embed_dim=768, depth=12, num_heads=12, mlp_ratio=4, qkv_bias=True,
-        norm_layer=partial(nn.LayerNorm, epsilon=1e-6), **kwargs)
+        norm_layer='nn.LayerNorm', epsilon=1e-6, **kwargs)
     return model
 
 
 def ViT_large_patch16_224(**kwargs):
     model = VisionTransformer(
         patch_size=16, embed_dim=1024, depth=24, num_heads=16, mlp_ratio=4, qkv_bias=True,
-        norm_layer=partial(nn.LayerNorm, epsilon=1e-6), **kwargs)
+        norm_layer='nn.LayerNorm', epsilon=1e-6, **kwargs)
     return model
 
 
 def ViT_large_patch16_384(**kwargs):
     model = VisionTransformer(
         img_size=384, patch_size=16, embed_dim=1024, depth=24, num_heads=16, mlp_ratio=4,  qkv_bias=True,
-        norm_layer=partial(nn.LayerNorm, epsilon=1e-6), **kwargs)
+        norm_layer='nn.LayerNorm', epsilon=1e-6, **kwargs)
     return model
 
 
 def ViT_large_patch32_384(**kwargs):
     model = VisionTransformer(
         img_size=384, patch_size=32, embed_dim=1024, depth=24, num_heads=16, mlp_ratio=4,  qkv_bias=True,
-        norm_layer=partial(nn.LayerNorm, epsilon=1e-6), **kwargs)
+        norm_layer='nn.LayerNorm', epsilon=1e-6, **kwargs)
     return model
 
 
