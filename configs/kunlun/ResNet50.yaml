@@ -19,7 +19,7 @@ ls_epsilon: -1
 LEARNING_RATE:
     function: 'Piecewise'          
     params:                   
-        lr: 0.1               
+        lr: 0.0078125
         decay_epochs: [30, 60, 90] 
         gamma: 0.1 
 
