@@ -8,7 +8,7 @@ total_images: 1020
 save_interval: 1
 validate: True
 valid_interval: 1
-epochs: 20
+epochs: 10
 topk: 5
 image_shape: [3, 224, 224]
 
@@ -26,7 +26,7 @@ OPTIMIZER:
         factor: 0.000001
 
 TRAIN:
-    batch_size: 32
+    batch_size: 20
     num_workers: 4
     file_list: "./dataset/flowers102/train_list.txt"
     data_dir: "./dataset/flowers102/"
