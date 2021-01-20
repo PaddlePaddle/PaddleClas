@@ -226,7 +226,7 @@ class VisionTransformer(nn.Layer):
 
 def ViT_small_patch16_224(**kwargs):
     model = VisionTransformer(
-        patch_size=16, embed_dim=768, depth=8, num_heads=8, mlp_ratio=3, **kwargs)
+        patch_size=16, embed_dim=768, depth=8, num_heads=8, mlp_ratio=3, qk_scale=768**-0.5, **kwargs)
     return model
 
 
