@@ -63,7 +63,7 @@ VALID:
             to_np: False
             channel_first: False
         - ResizeImage:
-            resize_short: 416
+            size: 384
         - CropImage:
             size: 384
         - NormalizeImage:
