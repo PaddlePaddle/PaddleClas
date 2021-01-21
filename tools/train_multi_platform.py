@@ -63,7 +63,17 @@ def main(args):
     config = get_config(args.config, overrides=args.override, show=True)
     # assign the place
     use_gpu = config.get("use_gpu", True)
-    places = fluid.cuda_places() if use_gpu else fluid.cpu_places()
+    use_xpu = config.get("use_xpu", False)
+    assert (
+        use_gpu and use_xpu
+    ) is not True, "gpu and xpu can not be true in the same time in static mode!"
+
+    if use_gpu:
+        places = fluid.cuda_places()
+    elif use_xpu:
+        places = fluid.xpu_places()
+    else:
+        places = fluid.cpu_places()
 
     # startup_prog is used to do some parameter init work,
     # and train prog is used to hold the network
