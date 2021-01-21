@@ -53,11 +53,12 @@ class DistilledVisionTransformer(VisionTransformer):
         x = self.head(x)
         x_dist = self.head_dist(x_dist)
 
-        if self.training:
-            return x, x_dist
-        else:
-            return (x + x_dist) / 2
+        # if self.training:
+        #     return x, x_dist
+        # else:
+        #     return (x + x_dist) / 2
 
+        return (x + x_dist) / 2
 
 def DeiT_tiny_patch16_224(**kwargs):
     model = VisionTransformer(
