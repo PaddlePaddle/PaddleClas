@@ -42,17 +42,14 @@ class Loss(object):
         soft_target = paddle.reshape(soft_target, shape=[-1, self._class_dim])
         return soft_target
 
-    def _crossentropy(self, input, target, use_pure_fp16=False):
+    def _crossentropy(self, input, target):
         if self._label_smoothing:
             target = self._labelsmoothing(target)
             input = -F.log_softmax(input, axis=-1)
             cost = paddle.sum(target * input, axis=-1)
         else:
             cost = F.cross_entropy(input=input, label=target) 
-        if use_pure_fp16:
-            avg_cost = paddle.sum(cost)
-        else:
-            avg_cost = paddle.mean(cost)
+        avg_cost = paddle.mean(cost)
         return avg_cost
 
     def _kldiv(self, input, target, name=None):
@@ -81,8 +78,8 @@ class CELoss(Loss):
     def __init__(self, class_dim=1000, epsilon=None):
         super(CELoss, self).__init__(class_dim, epsilon)
 
-    def __call__(self, input, target, use_pure_fp16=False):
-        cost = self._crossentropy(input, target, use_pure_fp16)
+    def __call__(self, input, target):
+        cost = self._crossentropy(input, target)
         return cost
 
 
@@ -94,14 +91,11 @@ class MixCELoss(Loss):
     def __init__(self, class_dim=1000, epsilon=None):
         super(MixCELoss, self).__init__(class_dim, epsilon)
 
-    def __call__(self, input, target0, target1, lam, use_pure_fp16=False):
-        cost0 = self._crossentropy(input, target0, use_pure_fp16)
-        cost1 = self._crossentropy(input, target1, use_pure_fp16)
+    def __call__(self, input, target0, target1, lam):
+        cost0 = self._crossentropy(input, target0)
+        cost1 = self._crossentropy(input, target1)
         cost = lam * cost0 + (1.0 - lam) * cost1  
-        if use_pure_fp16:
-            avg_cost = paddle.sum(cost)
-        else:
-            avg_cost = paddle.mean(cost)
+        avg_cost = paddle.mean(cost)
         return avg_cost
 
 
