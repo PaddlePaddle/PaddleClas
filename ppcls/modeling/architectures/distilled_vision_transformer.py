@@ -1,4 +1,4 @@
-# Copyright (c) 2015-present, Facebook, Inc.
+# Copyright (c) 2015-2021, Facebook, Inc.
 # All rights reserved.
 import paddle
 import paddle.nn as nn
@@ -14,8 +14,12 @@ __all__ = [
 
 
 class DistilledVisionTransformer(VisionTransformer):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    def __init__(self, img_size=224, patch_size=16, class_dim=1000, embed_dim=768, depth=12,
+                 num_heads=12, mlp_ratio=4, qkv_bias=False, norm_layer='nn.LayerNorm', epsilon=1e-5,
+                 **kwargs):
+        super().__init__(img_size=img_size, patch_size=patch_size, class_dim=class_dim, embed_dim=embed_dim, depth=depth,
+                         num_heads=num_heads, mlp_ratio=mlp_ratio, qkv_bias=qkv_bias, norm_layer=norm_layer, epsilon=epsilon,
+                         **kwargs)
         self.pos_embed = self.create_parameter(
             shape=(1, self.patch_embed.num_patches + 2, self.embed_dim), default_initializer=zeros_)
         self.add_parameter("pos_embed", self.pos_embed)
@@ -52,13 +56,8 @@ class DistilledVisionTransformer(VisionTransformer):
         x, x_dist = self.forward_features(x)
         x = self.head(x)
         x_dist = self.head_dist(x_dist)
-
-        # if self.training:
-        #     return x, x_dist
-        # else:
-        #     return (x + x_dist) / 2
-
         return (x + x_dist) / 2
+
 
 def DeiT_tiny_patch16_224(**kwargs):
     model = VisionTransformer(
