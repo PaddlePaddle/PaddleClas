@@ -134,6 +134,9 @@ def init_model(config, net, optimizer=None):
 
 
 def _save_student_model(net, model_prefix):
+    """
+    save student model if the net is the network contains student
+    """
     student_model_prefix = model_prefix + "_student.pdparams"
     if hasattr(net, "_layers"):
         net = net._layers
@@ -141,7 +144,6 @@ def _save_student_model(net, model_prefix):
         paddle.save(net.student.state_dict(), student_model_prefix)
         logger.info("Already save student model in {}".format(
             student_model_prefix))
-        return
 
 
 def save_model(net, optimizer, model_path, epoch_id, prefix='ppcls'):
