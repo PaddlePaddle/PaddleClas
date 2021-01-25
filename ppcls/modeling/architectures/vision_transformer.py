@@ -42,13 +42,12 @@ def drop_path(x, drop_prob=0., training=False):
     """
     if drop_prob == 0. or not training:
         return x
-    keep_prob = 1 - drop_prob
+    keep_prob = paddle.to_tensor(1 - drop_prob)
     shape = (x.shape[0],) + (1,) * (x.ndim - 1)
     random_tensor = keep_prob + paddle.rand(shape, dtype=x.dtype)
-    random_tensor.floor_()  # binarize
-    output = x.div(keep_prob) * random_tensor
+    random_tensor = paddle.floor(random_tensor) # binarize
+    output = x.divide(keep_prob) * random_tensor
     return output
-
 
 class DropPath(nn.Layer):
     """Drop paths (Stochastic Depth) per sample  (when applied in main path of residual blocks).
