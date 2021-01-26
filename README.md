@@ -383,3 +383,4 @@ Contributions are highly welcomed and we would really appreciate your feedback!!
 
 - Thank [nblib](https://github.com/nblib) to fix bug of RandErasing.
 - Thank [chenpy228](https://github.com/chenpy228) to fix some typos PaddleClas.
+- Thank [jm12138](https://github.com/jm12138) to add ViT and DeiT models into PaddleClas.
