@@ -382,3 +382,6 @@ ResNeSt与RegNet系列模型的精度、速度指标如下表所示，更多关�
 
 - 非常感谢[nblib](https://github.com/nblib)修正了PaddleClas中RandErasing的数据增广配置文件。
 - 非常感谢[chenpy228](https://github.com/chenpy228)修正了PaddleClas文档中的部分错别字。
+- 非常感谢[jm12138](https://github.com/jm12138)为PaddleClas添加ViT和DeiT模型。
+
+我们非常欢迎你为PaddleClas贡献代码，也十分感谢你的反馈。
