@@ -13,16 +13,14 @@ DeiT（Data-efficient Image Transformers）系列模型是由FaceBook在2020年�
 
 | Models           | Top1 | Top5 | Reference<br>top1 | Reference<br>top5 | FLOPS<br>(G) |
 |:--:|:--:|:--:|:--:|:--:|:--:|
-| ViT_small_patch16_224 | 0.77268 | 0.93190 | 0.77854 | 0.93424 |      |
-| ViT_base_patch16_224 | 0.81760 | 0.96134 | 0.81784 | 0.96126 |      |
-| ViT_base_patch16_384 | 0.83928 | 0.97100 | 0.84202 | 0.97218 |      |
-| ViT_base_patch32_384 | 0.81242 | 0.95980 | 0.81656 | 0.96130 |  |
-| ViT_large_patch16_224 | 0.83248 | 0.96580 | 0.83060 | 0.96444 |  |
-| ViT_large_patch16_384 | 0.85066 | 0.97408 | 0.85166 | 0.97362 |  |
-| ViT_large_patch32_384 | 0.81054 | 0.95958 | 0.815 | - |  |
-| ViT_huge_patch16_224 |  |  |  |  |  |
-| ViT_huge_patch32_384 |  | |  | |  |
-| | | | | | |
+| ViT_small_patch16_224 | 0.7727 | 0.9319 | 0.7785 | 0.9342 |      |
+| ViT_base_patch16_224 | 0.8176 | 0.9613 | 0.8178 | 0.9613 |      |
+| ViT_base_patch16_384 | 0.8393 | 0.9710 | 0.8420 | 0.9722 |      |
+| ViT_base_patch32_384 | 0.8124 | 0.9598 | 0.8166 | 0.9613 |  |
+| ViT_large_patch16_224 | 0.8325 | 0.9658 | 0.8306 | 0.9644 |  |
+| ViT_large_patch16_384 | 0.8507 | 0.9741 | 0.8517 | 0.9736 |  |
+| ViT_large_patch32_384 | 0.8105 | 0.9596 | 0.815 | - |  |
+|                       |        |        |                   |                   |              |
 
 
 | Models           | Top1 | Top5 | Reference<br>top1 | Reference<br>top5 | FLOPS<br>(G) |

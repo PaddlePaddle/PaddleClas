@@ -67,7 +67,7 @@
     - [Inception系列](#Inception系列)
     - [EfficientNet与ResNeXt101_wsl系列](#EfficientNet与ResNeXt101_wsl系列)
     - [ResNeSt与RegNet系列](#ResNeSt与RegNet系列)
-    - [Transformer系列](#Transformer)
+    - [Transformer系列](#Transformer系列)
     - [其他模型](#其他模型)
     - HS-ResNet: arxiv文章链接: [https://arxiv.org/pdf/2010.07621.pdf](https://arxiv.org/pdf/2010.07621.pdf)。 代码和预训练模型即将开源，敬请期待。
 - 模型训练/评估
@@ -358,21 +358,19 @@ ResNeSt与RegNet系列模型的精度、速度指标如下表所示，更多关�
 <a name="Transformer系列"></a>
 ### Transformer系列
 
-ViT（Vision Transformer）与DeiT（Data-efficient Image Transformers）系列模型的精度、速度指标如下表所示. 更多关于该系列模型的介绍可以参考： [Transformer系列模型文档](./docs/zh_CN/models/Transformer.md).
+ViT（Vision Transformer）与DeiT（Data-efficient Image Transformers）系列模型的精度、速度指标如下表所示. 更多关于该系列模型的介绍可以参考： [Transformer系列模型文档](./docs/zh_CN/models/Transformer.md)。
 
 
 | 模型                  | Top-1 Acc | Top-5 Acc | time(ms)<br>bs=1 | time(ms)<br>bs=4 | Flops(G) | Params(M) | 下载地址 |
 |------------------------|-----------|-----------|------------------|------------------|----------|------------------------|------------------------|
-| ViT_small_<br/>patch16_224 | 0.77268   | 0.93190   | -                | -                |      |  | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ViT_small_patch16_224_pretrained.pdparams) |
-| ViT_base_<br/>patch16_224 | 0.81760   | 0.96134   | -    | -                |     | 86 | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ViT_base_patch16_224_pretrained.pdparams) |
-| ViT_base_<br/>patch16_384 | 0.83928   | 0.97100   |    -              |      -           |         |  | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ViT_base_patch16_384_pretrained.pdparams) |
-| ViT_base_<br/>patch32_384 | 0.81242   | 0.95980   | - | - |  |  | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ViT_base_patch32_384_pretrained.pdparams) |
-| ViT_large_<br/>patch16_224 | 0.83248   | 0.96580   | - | - |  | 307 | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ViT_large_patch16_224_pretrained.pdparams) |
-| ViT_large_<br/>patch16_384 | 0.85066   | 0.97408   | - | - |  |  | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ViT_large_patch16_384_pretrained.pdparams) |
-| ViT_large_<br/>patch32_384 | 0.81054   | 0.95958   | - | - |  |  | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ViT_large_patch32_384_pretrained.pdparams) |
-| ViT_huge_<br/>patch16_224 | - | - | - | - |  | 632 | - |
-| ViT_huge_<br/>patch32_384 | - | - | - | - |  |  | - |
-| | | | | | | | |
+| ViT_small_<br/>patch16_224 | 0.7727  | 0.9319   | -                | -                |      |  | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ViT_small_patch16_224_pretrained.pdparams) |
+| ViT_base_<br/>patch16_224 | 0.8176   | 0.9613   | -    | -                |     | 86 | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ViT_base_patch16_224_pretrained.pdparams) |
+| ViT_base_<br/>patch16_384 | 0.8393  | 0.9710   |    -              |      -           |         |  | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ViT_base_patch16_384_pretrained.pdparams) |
+| ViT_base_<br/>patch32_384 | 0.8124   | 0.9598   | - | - |  |  | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ViT_base_patch32_384_pretrained.pdparams) |
+| ViT_large_<br/>patch16_224 | 0.8325  | 0.9658   | - | - |  | 307 | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ViT_large_patch16_224_pretrained.pdparams) |
+| ViT_large_<br/>patch16_384 | 0.8507  | 0.9741  | - | - |  |  | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ViT_large_patch16_384_pretrained.pdparams) |
+| ViT_large_<br/>patch32_384 | 0.8105   | 0.9596  | - | - |  |  | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ViT_large_patch32_384_pretrained.pdparams) |
+|                            |           |           |                  |                  |          |           |                                                              |
 
 
 | 模型                  | Top-1 Acc | Top-5 Acc | time(ms)<br>bs=1 | time(ms)<br>bs=4 | Flops(G) | Params(M) | 下载地址 |

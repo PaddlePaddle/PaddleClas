@@ -7,7 +7,7 @@
 PaddleClas is a toolset for image classification tasks prepared for the industry and academia. It helps users train better computer vision models and apply them in real scenarios.
 
 **Recent update**
-- 2021.01.27 Add `ViT` and `DeiT` pretrained model, `ViT`'s Top-1 Acc on ImageNet-1k dataset reaches 81.05%, and `DeiT` reachees 85.5%.
+- 2021.01.27 Add `ViT` and `DeiT` pretrained model, `ViT`'s Top-1 Acc on ImageNet-1k dataset reaches 81.05%, and `DeiT` reaches 85.5%.
 - 2021.01.08 Add support for whl package and its usage, Model inference can be done by simply install paddleclas using pip.
 - 2020.12.16 Add support for TensorRT when using cpp inference to obain more obvious acceleration.
 - 2020.12.06 Add `SE_HRNet_W64_C_ssld` pretrained model, whose Top-1 Acc on ImageNet-1k dataset reaches 84.75%.
@@ -67,7 +67,7 @@ PaddleClas is a toolset for image classification tasks prepared for the industry
     - [Inception series](#Inception_series)
     - [EfficientNet and ResNeXt101_wsl series](#EfficientNet_and_ResNeXt101_wsl_series)
     - [ResNeSt and RegNet series](#ResNeSt_and_RegNet_series)
-    - [Transformer](#Transformer)
+    - [Transformer series](#Transformer)
     - [Others](#Others)
     - HS-ResNet: arxiv link: [https://arxiv.org/pdf/2010.07621.pdf](https://arxiv.org/pdf/2010.07621.pdf). Code and models are coming soon!
 - Model training/evaluation
@@ -354,23 +354,21 @@ Accuracy and inference time metrics of ResNeSt and RegNet series models are show
 
 
 <a name="Transformer"></a>
-### Transformer
+### Transformer series
 
 Accuracy and inference time metrics of ViT and DeiT series models are shown as follows. More detailed information can be refered to [Transformer series tutorial](./docs/en/models/Transformer.md).
 
 
 | Model                    | Top-1 Acc | Top-5 Acc | time(ms)<br>bs=1 | time(ms)<br>bs=4 | Flops(G) | Params(M) | Download Address |
 |------------------------|-----------|-----------|------------------|------------------|----------|------------------------|------------------------|
-| ViT_small_<br/>patch16_224 | 0.77268   | 0.93190   | -                | -                |      |  | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ViT_small_patch16_224_pretrained.pdparams) |
-| ViT_base_<br/>patch16_224 | 0.81760   | 0.96134   | -    | -                |     | 86 | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ViT_base_patch16_224_pretrained.pdparams) |
-| ViT_base_<br/>patch16_384 | 0.83928   | 0.97100   |    -              |      -           |         |  | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ViT_base_patch16_384_pretrained.pdparams) |
-| ViT_base_<br/>patch32_384 | 0.81242   | 0.95980   | - | - |  |  | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ViT_base_patch32_384_pretrained.pdparams) |
-| ViT_large_<br/>patch16_224 | 0.83248   | 0.96580   | - | - |  | 307 | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ViT_large_patch16_224_pretrained.pdparams) |
-| ViT_large_<br/>patch16_384 | 0.85066   | 0.97408   | - | - |  |  | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ViT_large_patch16_384_pretrained.pdparams) |
-| ViT_large_<br/>patch32_384 | 0.81054   | 0.95958   | - | - |  |  | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ViT_large_patch32_384_pretrained.pdparams) |
-| ViT_huge_<br/>patch16_224 | - | - | - | - |  | 632 | - |
-| ViT_huge_<br/>patch32_384 | - | - | - | - |  |  | - |
-| | | | | | | | |
+| ViT_small_<br/>patch16_224 | 0.7727  | 0.9319   | -                | -                |      |  | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ViT_small_patch16_224_pretrained.pdparams) |
+| ViT_base_<br/>patch16_224 | 0.8176   | 0.9613   | -    | -                |     | 86 | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ViT_base_patch16_224_pretrained.pdparams) |
+| ViT_base_<br/>patch16_384 | 0.8393  | 0.9710   |    -              |      -           |         |  | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ViT_base_patch16_384_pretrained.pdparams) |
+| ViT_base_<br/>patch32_384 | 0.8124   | 0.9598   | - | - |  |  | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ViT_base_patch32_384_pretrained.pdparams) |
+| ViT_large_<br/>patch16_224 | 0.8325  | 0.9658   | - | - |  | 307 | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ViT_large_patch16_224_pretrained.pdparams) |
+| ViT_large_<br/>patch16_384 | 0.8507  | 0.9741  | - | - |  |  | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ViT_large_patch16_384_pretrained.pdparams) |
+| ViT_large_<br/>patch32_384 | 0.8105   | 0.9596  | - | - |  |  | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ViT_large_patch32_384_pretrained.pdparams) |
+|                            |           |           |                  |                  |          |           |                                                              |
 
 
 | Model                    | Top-1 Acc | Top-5 Acc | time(ms)<br>bs=1 | time(ms)<br>bs=4 | Flops(G) | Params(M) | Download Address |
