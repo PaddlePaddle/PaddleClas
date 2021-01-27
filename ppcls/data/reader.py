@@ -25,7 +25,7 @@ from . import imaug
 from .imaug import transform
 from ppcls.utils import logger
 
-trainers_num = int(os.environ.get('PADDLE_TRAINERS_NUM', 0))
+trainers_num = int(os.environ.get('PADDLE_TRAINERS_NUM', 1))
 trainer_id = int(os.environ.get("PADDLE_TRAINER_ID", 0))
 
 
@@ -257,6 +257,9 @@ class Reader:
             raise ModeException(mode=mode)
 
         self.use_gpu = config.get("use_gpu", True)
+        self.use_xpu = config.get("use_xpu", False)
+        self.is_distributed = config.get("is_distributed", True)
+
         use_mix = config.get('use_mix')
         self.params['mode'] = mode
         if seed is not None:
@@ -265,14 +268,20 @@ class Reader:
         if use_mix and mode == "train":
             self.batch_ops = create_operators(self.params['mix'])
 
+    def get_device_num(self):
+        if self.is_distributed:
+            device_num = trainers_num
+        elif self.use_gpu:
+            device_num = fluid.core.get_cuda_device_count()
+        elif self.use_xpu:
+            xpus = os.environ.get("FLAGS_selected_xpus", '1')
+            device_num = len(xpus.split(','))
+        else:
+            device_num = int(os.environ.get('CPU_NUM', 1))
+        return device_num
+
     def __call__(self):
-        device_num = trainers_num
-        # non-distributed launch
-        if trainers_num <= 0:
-            if self.use_gpu:
-                device_num = fluid.core.get_cuda_device_count()
-            else:
-                device_num = int(os.environ.get('CPU_NUM', 1))
+        device_num = self.get_device_num()
         batch_size = int(self.params['batch_size']) // device_num
 
         def wrapper():
