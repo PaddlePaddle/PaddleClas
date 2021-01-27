@@ -282,6 +282,7 @@ def create_optimizer(config):
     # create optimizer instance
     opt_config = config['OPTIMIZER']
     opt = OptimizerBuilder(**opt_config)
+
     return opt(lr)
 
 
