@@ -1,5 +1,10 @@
 # Release Notes
 
+
+
+- 2021.01.27
+   * Add ViT and DeiT pretrained models, ViT's Top-1 Acc on ImageNet reaches 81.05%, and DeiT reaches 85.5%.
+
 - 2021.01.08
     * Add support for whl package and its usage, Model inference can be done by simply install paddleclas using pip.
 
