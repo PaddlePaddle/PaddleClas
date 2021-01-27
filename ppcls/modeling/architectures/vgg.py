@@ -23,8 +23,9 @@ __all__ = ["VGGNet", "VGG11", "VGG13", "VGG16", "VGG19"]
 
 
 class VGGNet():
-    def __init__(self, layers=16):
+    def __init__(self, layers=16, stop_grad_layers=0, **args):
         self.layers = layers
+        self.stop_grad_layers = stop_grad_layers
 
     def net(self, input, class_dim=1000):
         layers = self.layers
@@ -43,6 +44,10 @@ class VGGNet():
         conv3 = self.conv_block(conv2, 256, nums[2], name="conv3_")
         conv4 = self.conv_block(conv3, 512, nums[3], name="conv4_")
         conv5 = self.conv_block(conv4, 512, nums[4], name="conv5_")
+
+        for idx, conv in enumerate([conv1, conv2, conv3, conv4, conv5]):
+            if self.stop_grad_layers >= idx + 1:
+                conv.stop_gradient = True
 
         fc_dim = 4096
         fc_name = ["fc6", "fc7", "fc8"]
@@ -88,21 +93,21 @@ class VGGNet():
             input=conv, pool_size=2, pool_type='max', pool_stride=2)
 
 
-def VGG11():
-    model = VGGNet(layers=11)
+def VGG11(stop_grad_layers=0, **args):
+    model = VGGNet(layers=11, stop_grad_layers=stop_grad_layers, **args)
     return model
 
 
-def VGG13():
-    model = VGGNet(layers=13)
+def VGG13(stop_grad_layers=0, **args):
+    model = VGGNet(layers=13, stop_grad_layers=stop_grad_layers, **args)
     return model
 
 
-def VGG16():
-    model = VGGNet(layers=16)
+def VGG16(stop_grad_layers=0, **args):
+    model = VGGNet(layers=16, stop_grad_layers=stop_grad_layers, **args)
     return model
 
 
-def VGG19():
-    model = VGGNet(layers=19)
+def VGG19(stop_grad_layers=0, **args):
+    model = VGGNet(layers=19, stop_grad_layers=stop_grad_layers, **args)
     return model
