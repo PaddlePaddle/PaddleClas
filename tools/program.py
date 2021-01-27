@@ -305,7 +305,6 @@ def dist_optimizer(config, optimizer):
     dist_strategy.fuse_all_reduce_ops = True
     dist_strategy.exec_strategy = exec_strategy
     optimizer = fleet.distributed_optimizer(optimizer, strategy=dist_strategy)
-
     return optimizer
 
 
