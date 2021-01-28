@@ -64,6 +64,7 @@ def main(args):
     # assign the place
     use_gpu = config.get("use_gpu", True)
     use_xpu = config.get("use_xpu", False)
+    is_distributed = config.get("is_distributed", False)
     assert (
         use_gpu and use_xpu
     ) is not True, "gpu and xpu can not be true in the same time in static mode!"
@@ -88,14 +89,14 @@ def main(args):
             train_prog,
             startup_prog,
             is_train=True,
-            is_distributed=False)
+            is_distributed=is_distributed)
     else:
         train_dataloader, train_fetchs, ema = program.build(
             config,
             train_prog,
             startup_prog,
             is_train=True,
-            is_distributed=False)
+            is_distributed=is_distributed)
 
     if config.validate:
         valid_prog = fluid.Program()
@@ -119,14 +120,20 @@ def main(args):
     train_reader = Reader(config, 'train')()
     train_dataloader.set_sample_list_generator(train_reader, places)
 
-    compiled_train_prog = program.compile(config, train_prog,
-                                          train_fetchs['loss'][0].name)
+    if not is_distributed and not use_xpu:
+        compiled_train_prog = program.compile(config, train_prog,
+                                              train_fetchs['loss'][0].name)
+    else:
+        compiled_train_prog = train_prog
 
     if config.validate:
         valid_reader = Reader(config, 'valid')()
         valid_dataloader.set_sample_list_generator(valid_reader, places)
-        compiled_valid_prog = program.compile(
-            config, valid_prog, share_prog=compiled_train_prog)
+        if use_xpu:
+            compiled_valid_prog = valid_prog
+        else:
+            compiled_valid_prog = program.compile(
+                config, valid_prog, share_prog=compiled_train_prog)
 
     vdl_writer = None
     if args.vdl_dir:
