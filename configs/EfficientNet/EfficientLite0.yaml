@@ -8,6 +8,8 @@ ARCHITECTURE:
             drop_connect_rate: 0.1
             fix_head_stem: True
             relu_fn: True
+            local_pooling: True
+        use_se: False
 
 pretrained_model: ""
 model_save_dir: "./output/"
