@@ -7,7 +7,7 @@
 PaddleClas is a toolset for image classification tasks prepared for the industry and academia. It helps users train better computer vision models and apply them in real scenarios.
 
 **Recent update**
-- 2021.01.27 Add `ViT` and `DeiT` pretrained model, `ViT`'s Top-1 Acc on ImageNet-1k dataset reaches 81.05%, and `DeiT` reaches 85.5%.
+- 2021.01.27 Add `ViT` and `DeiT` pretrained model, `ViT`'s Top-1 Acc on ImageNet-1k dataset reaches 81.05%, and `DeiT` reaches 85.1%.
 - 2021.01.08 Add support for whl package and its usage, Model inference can be done by simply install paddleclas using pip.
 - 2020.12.16 Add support for TensorRT when using cpp inference to obain more obvious acceleration.
 - 2020.12.06 Add `SE_HRNet_W64_C_ssld` pretrained model, whose Top-1 Acc on ImageNet-1k dataset reaches 84.75%.
