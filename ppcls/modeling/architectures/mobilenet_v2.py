@@ -149,7 +149,7 @@ class InvresiBlocks(nn.Layer):
 
 
 class MobileNet(nn.Layer):
-    def __init__(self, class_dim=1000, scale=1.0):
+    def __init__(self, class_dim=1000, scale=1.0, prefix_name="", **args):
         super(MobileNet, self).__init__()
         self.scale = scale
         self.class_dim = class_dim
@@ -170,7 +170,7 @@ class MobileNet(nn.Layer):
             filter_size=3,
             stride=2,
             padding=1,
-            name="conv1_1")
+            name=prefix_name + "conv1_1")
 
         self.block_list = []
         i = 1
@@ -179,14 +179,14 @@ class MobileNet(nn.Layer):
             t, c, n, s = layer_setting
             i += 1
             block = self.add_sublayer(
-                "conv" + str(i),
+                prefix_name + "conv" + str(i),
                 sublayer=InvresiBlocks(
                     in_c=in_c,
                     t=t,
                     c=int(c * scale),
                     n=n,
                     s=s,
-                    name="conv" + str(i)))
+                    name=prefix_name + "conv" + str(i)))
             self.block_list.append(block)
             in_c = int(c * scale)
 
@@ -197,15 +197,15 @@ class MobileNet(nn.Layer):
             filter_size=1,
             stride=1,
             padding=0,
-            name="conv9")
+            name=prefix_name + "conv9")
 
         self.pool2d_avg = AdaptiveAvgPool2D(1)
 
         self.out = Linear(
             self.out_c,
             class_dim,
-            weight_attr=ParamAttr(name="fc10_weights"),
-            bias_attr=ParamAttr(name="fc10_offset"))
+            weight_attr=ParamAttr(name=prefix_name + "fc10_weights"),
+            bias_attr=ParamAttr(name=prefix_name + "fc10_offset"))
 
     def forward(self, inputs):
         y = self.conv1(inputs, if_act=True)
