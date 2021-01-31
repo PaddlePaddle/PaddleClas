@@ -12,9 +12,9 @@ __all__ = [
 ]
 
 
-class Conv_BN(nn.Layer):
+class ConvBN(nn.Layer):
     def __init__(self, in_channels, out_channels, kernel_size, stride, padding, groups=1):
-        super(Conv_BN, self).__init__()
+        super(ConvBN, self).__init__()
         self.conv = nn.Conv2D(in_channels=in_channels, out_channels=out_channels,
                               kernel_size=kernel_size, stride=stride, padding=padding, groups=groups, bias_attr=False)
         self.bn = nn.BatchNorm2D(num_features=out_channels)
@@ -48,9 +48,9 @@ class RepVGGBlock(nn.Layer):
 
         self.rbr_identity = nn.BatchNorm2D(
             num_features=in_channels) if out_channels == in_channels and stride == 1 else None
-        self.rbr_dense = Conv_BN(in_channels=in_channels, out_channels=out_channels,
+        self.rbr_dense = ConvBN(in_channels=in_channels, out_channels=out_channels,
                                  kernel_size=kernel_size, stride=stride, padding=padding, groups=groups)
-        self.rbr_1x1 = Conv_BN(in_channels=in_channels, out_channels=out_channels,
+        self.rbr_1x1 = ConvBN(in_channels=in_channels, out_channels=out_channels,
                                kernel_size=1, stride=stride, padding=padding_11, groups=groups)
 
     def forward(self, inputs):
@@ -89,7 +89,7 @@ class RepVGGBlock(nn.Layer):
     def _fuse_bn_tensor(self, branch):
         if branch is None:
             return 0, 0
-        if isinstance(branch, Conv_BN):
+        if isinstance(branch, ConvBN):
             kernel = branch.conv.weight
             running_mean = branch.bn._mean
             running_var = branch.bn._variance
