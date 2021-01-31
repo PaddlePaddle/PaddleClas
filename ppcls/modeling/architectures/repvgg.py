@@ -49,9 +49,9 @@ class RepVGGBlock(nn.Layer):
         self.rbr_identity = nn.BatchNorm2D(
             num_features=in_channels) if out_channels == in_channels and stride == 1 else None
         self.rbr_dense = ConvBN(in_channels=in_channels, out_channels=out_channels,
-                                 kernel_size=kernel_size, stride=stride, padding=padding, groups=groups)
+                                kernel_size=kernel_size, stride=stride, padding=padding, groups=groups)
         self.rbr_1x1 = ConvBN(in_channels=in_channels, out_channels=out_channels,
-                               kernel_size=1, stride=stride, padding=padding_11, groups=groups)
+                              kernel_size=1, stride=stride, padding=padding_11, groups=groups)
 
     def forward(self, inputs):
         if not self.training:
