@@ -12,12 +12,17 @@ __all__ = [
 ]
 
 
-def conv_bn(in_channels, out_channels, kernel_size, stride, padding, groups=1):
-    result = nn.Sequential()
-    result.add_sublayer('conv', nn.Conv2D(in_channels=in_channels, out_channels=out_channels,
-                                          kernel_size=kernel_size, stride=stride, padding=padding, groups=groups, bias_attr=False))
-    result.add_sublayer('bn', nn.BatchNorm2D(num_features=out_channels))
-    return result
+class Conv_BN(nn.Layer):
+    def __init__(self, in_channels, out_channels, kernel_size, stride, padding, groups=1):
+        super(Conv_BN, self).__init__()
+        self.conv = nn.Conv2D(in_channels=in_channels, out_channels=out_channels,
+                              kernel_size=kernel_size, stride=stride, padding=padding, groups=groups, bias_attr=False)
+        self.bn = nn.BatchNorm2D(num_features=out_channels)
+
+    def forward(self, x):
+        y = self.conv(x)
+        y = self.bn(y)
+        return y
 
 
 class RepVGGBlock(nn.Layer):
@@ -43,9 +48,9 @@ class RepVGGBlock(nn.Layer):
 
         self.rbr_identity = nn.BatchNorm2D(
             num_features=in_channels) if out_channels == in_channels and stride == 1 else None
-        self.rbr_dense = conv_bn(in_channels=in_channels, out_channels=out_channels,
+        self.rbr_dense = Conv_BN(in_channels=in_channels, out_channels=out_channels,
                                  kernel_size=kernel_size, stride=stride, padding=padding, groups=groups)
-        self.rbr_1x1 = conv_bn(in_channels=in_channels, out_channels=out_channels,
+        self.rbr_1x1 = Conv_BN(in_channels=in_channels, out_channels=out_channels,
                                kernel_size=1, stride=stride, padding=padding_11, groups=groups)
 
     def forward(self, inputs):
@@ -84,7 +89,7 @@ class RepVGGBlock(nn.Layer):
     def _fuse_bn_tensor(self, branch):
         if branch is None:
             return 0, 0
-        if isinstance(branch, nn.Sequential):
+        if isinstance(branch, Conv_BN):
             kernel = branch.conv.weight
             running_mean = branch.bn._mean
             running_var = branch.bn._variance
