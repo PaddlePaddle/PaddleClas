@@ -98,13 +98,12 @@ def main(args):
             if top1_acc > best_top1_acc:
                 best_top1_acc = top1_acc
                 best_top1_epoch = epoch_id
-                if epoch_id % config.save_interval == 0:
-                    model_path = os.path.join(config.model_save_dir,
-                                              config.ARCHITECTURE["name"])
-                    save_model(net, optimizer, model_path, "best_model")
+                model_path = os.path.join(config.model_save_dir,
+                                          config.ARCHITECTURE["name"])
+                save_model(net, optimizer, model_path, "best_model")
             message = "The best top1 acc {:.5f}, in epoch: {:d}".format(
                 best_top1_acc, best_top1_epoch)
-            logger.info("{:s}".format(logger.coloring(message, "RED")))
+            logger.info(message)
 
         # 3. save the persistable model
         if epoch_id % config.save_interval == 0:
