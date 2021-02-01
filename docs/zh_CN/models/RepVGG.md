@@ -2,7 +2,7 @@
 
 ## 概述
 
-RepVGG（Making VGG-style ConvNets Great Again）系列模型是有清华大学(丁贵广团队)、旷视科技(孙剑等人)、港科大和阿伯里斯特威斯大学在2021年提出的一个简单但强大的卷积神经网络架构，该架构具有类似于VGG的推理时间主体，该主体仅由3x3卷积和ReLU的堆栈组成，而训练时间模型具有多分支拓扑。训练时间和推理时间架构的这种解耦是通过结构重新参数化(re-parameterization)技术实现的，因此该模型称为RepVGG。[论文地址](https://arxiv.org/abs/2101.03697)。
+RepVGG（Making VGG-style ConvNets Great Again）系列模型是由清华大学(丁贵广团队)、旷视科技(孙剑等人)、港科大和阿伯里斯特威斯大学在2021年提出的一个简单但强大的卷积神经网络架构，该架构具有类似于VGG的推理时间主体，该主体仅由3x3卷积和ReLU的堆栈组成，而训练时间模型具有多分支拓扑。训练时间和推理时间架构的这种解耦是通过结构重新参数化(re-parameterization)技术实现的，因此该模型称为RepVGG。[论文地址](https://arxiv.org/abs/2101.03697)。
 
 
 ## 精度、FLOPS和参数量
