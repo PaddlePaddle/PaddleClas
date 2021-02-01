@@ -8,7 +8,7 @@
 
 
 **近期更新**
-- 2021.01.27 添加`ViT`与`DeiT`模型，在ImageNet-1k上，`ViT`模型Top-1 Acc可达81.05%，`DeiT`模型可达85.5%。
+- 2021.01.27 添加`ViT`与`DeiT`模型，在ImageNet-1k上，`ViT`模型Top-1 Acc可达85.13%，`DeiT`模型可达85.1%。
 - 2021.01.08 添加whl包及其使用说明，直接安装paddleclas whl包，即可快速完成模型预测。
 - 2020.12.16 添加对cpp预测的tensorRT支持，预测加速更明显。
 - 2020.12.06 添加`SE_HRNet_W64_C_ssld`模型，在ImageNet-1k上Top-1 Acc可达84.75%。
@@ -363,26 +363,26 @@ ViT（Vision Transformer）与DeiT（Data-efficient Image Transformers）系列�
 
 | 模型                  | Top-1 Acc | Top-5 Acc | time(ms)<br>bs=1 | time(ms)<br>bs=4 | Flops(G) | Params(M) | 下载地址 |
 |------------------------|-----------|-----------|------------------|------------------|----------|------------------------|------------------------|
-| ViT_small_<br/>patch16_224 | 0.7727  | 0.9319   | -                | -                |      |  | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ViT_small_patch16_224_pretrained.pdparams) |
-| ViT_base_<br/>patch16_224 | 0.8176   | 0.9613   | -    | -                |     | 86 | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ViT_base_patch16_224_pretrained.pdparams) |
-| ViT_base_<br/>patch16_384 | 0.8393  | 0.9710   |    -              |      -           |         |  | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ViT_base_patch16_384_pretrained.pdparams) |
-| ViT_base_<br/>patch32_384 | 0.8124   | 0.9598   | - | - |  |  | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ViT_base_patch32_384_pretrained.pdparams) |
-| ViT_large_<br/>patch16_224 | 0.8325  | 0.9658   | - | - |  | 307 | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ViT_large_patch16_224_pretrained.pdparams) |
-| ViT_large_<br/>patch16_384 | 0.8507  | 0.9741  | - | - |  |  | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ViT_large_patch16_384_pretrained.pdparams) |
-| ViT_large_<br/>patch32_384 | 0.8105   | 0.9596  | - | - |  |  | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ViT_large_patch32_384_pretrained.pdparams) |
+| ViT_small_<br/>patch16_224 | 0.7769  | 0.9342   | -                | -                |      |  | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ViT_small_patch16_224_pretrained.pdparams) |
+| ViT_base_<br/>patch16_224 | 0.8195   | 0.9617   | -    | -                |     | 86 | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ViT_base_patch16_224_pretrained.pdparams) |
+| ViT_base_<br/>patch16_384 | 0.8414  | 0.9717   |    -              |      -           |         |  | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ViT_base_patch16_384_pretrained.pdparams) |
+| ViT_base_<br/>patch32_384 | 0.8176   | 0.9613   | - | - |  |  | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ViT_base_patch32_384_pretrained.pdparams) |
+| ViT_large_<br/>patch16_224 | 0.8323  | 0.9650   | - | - |  | 307 | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ViT_large_patch16_224_pretrained.pdparams) |
+| ViT_large_<br/>patch16_384 | 0.8513  | 0.9736  | - | - |  |  | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ViT_large_patch16_384_pretrained.pdparams) |
+| ViT_large_<br/>patch32_384 | 0.8153   | 0.9608  | - | - |  |  | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ViT_large_patch32_384_pretrained.pdparams) |
 |                            |           |           |                  |                  |          |           |                                                              |
 
 
 | 模型                  | Top-1 Acc | Top-5 Acc | time(ms)<br>bs=1 | time(ms)<br>bs=4 | Flops(G) | Params(M) | 下载地址 |
 |------------------------|-----------|-----------|------------------|------------------|----------|------------------------|------------------------|
-| DeiT_tiny_<br>patch16_224 | 0.709 | 0.906 | -                | -                |      | 5 | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DeiT_tiny_patch16_224_pretrained.pdparams) |
-| DeiT_small_<br>patch16_224 | 0.794 | 0.948 | -    | -                |     | 22 | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DeiT_small_patch16_224_pretrained.pdparams) |
-| DeiT_base_<br>patch16_224 | 0.816 | 0.955 |    -              |      -           |         | 86 | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DeiT_base_patch16_224_pretrained.pdparams) |
-| DeiT_base_<br>patch16_384 | 0.831 | 0.962 | - | - |  | 87 | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DeiT_base_patch16_384_pretrained.pdparams) |
-| DeiT_tiny_<br>distilled_patch16_224 | 0.736 | 0.915 | - | - |  | 6 | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DeiT_tiny_distilled_patch16_224_pretrained.pdparams) |
-| DeiT_small_<br>distilled_patch16_224 | 0.810 | 0.953 | - | - |  | 22 | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DeiT_small_distilled_patch16_224_pretrained.pdparams) |
-| DeiT_base_<br>distilled_patch16_224 | 0.830 | 0.963 | - | - |  | 87 | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DeiT_base_distilled_patch16_224_pretrained.pdparams) |
-| DeiT_base_<br>distilled_patch16_384 | 0.855 | 0.974 | - | - |  | 88 | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DeiT_base_distilled_patch16_384_pretrained.pdparams) |
+| DeiT_tiny_<br>patch16_224 | 0.718 | 0.910 | -                | -                |      | 5 | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DeiT_tiny_patch16_224_pretrained.pdparams) |
+| DeiT_small_<br>patch16_224 | 0.796 | 0.949 | -    | -                |     | 22 | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DeiT_small_patch16_224_pretrained.pdparams) |
+| DeiT_base_<br>patch16_224 | 0.817 | 0.957 |    -              |      -           |         | 86 | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DeiT_base_patch16_224_pretrained.pdparams) |
+| DeiT_base_<br>patch16_384 | 0.830 | 0.962 | - | - |  | 87 | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DeiT_base_patch16_384_pretrained.pdparams) |
+| DeiT_tiny_<br>distilled_patch16_224 | 0.741 | 0.918 | - | - |  | 6 | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DeiT_tiny_distilled_patch16_224_pretrained.pdparams) |
+| DeiT_small_<br>distilled_patch16_224 | 0.809 | 0.953 | - | - |  | 22 | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DeiT_small_distilled_patch16_224_pretrained.pdparams) |
+| DeiT_base_<br>distilled_patch16_224 | 0.831 | 0.964 | - | - |  | 87 | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DeiT_base_distilled_patch16_224_pretrained.pdparams) |
+| DeiT_base_<br>distilled_patch16_384 | 0.851 | 0.973 | - | - |  | 88 | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DeiT_base_distilled_patch16_384_pretrained.pdparams) |
 |  |  |  |  |  |  |  |  |
 
 

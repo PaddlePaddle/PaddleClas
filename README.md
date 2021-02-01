@@ -7,7 +7,7 @@
 PaddleClas is a toolset for image classification tasks prepared for the industry and academia. It helps users train better computer vision models and apply them in real scenarios.
 
 **Recent update**
-- 2021.01.27 Add `ViT` and `DeiT` pretrained model, `ViT`'s Top-1 Acc on ImageNet-1k dataset reaches 81.05%, and `DeiT` reaches 85.5%.
+- 2021.01.27 Add `ViT` and `DeiT` pretrained model, `ViT`'s Top-1 Acc on ImageNet-1k dataset reaches 85.13%, and `DeiT` reaches 85.1%.
 - 2021.01.08 Add support for whl package and its usage, Model inference can be done by simply install paddleclas using pip.
 - 2020.12.16 Add support for TensorRT when using cpp inference to obain more obvious acceleration.
 - 2020.12.06 Add `SE_HRNet_W64_C_ssld` pretrained model, whose Top-1 Acc on ImageNet-1k dataset reaches 84.75%.
@@ -361,26 +361,26 @@ Accuracy and inference time metrics of ViT and DeiT series models are shown as f
 
 | Model                    | Top-1 Acc | Top-5 Acc | time(ms)<br>bs=1 | time(ms)<br>bs=4 | Flops(G) | Params(M) | Download Address |
 |------------------------|-----------|-----------|------------------|------------------|----------|------------------------|------------------------|
-| ViT_small_<br/>patch16_224 | 0.7727  | 0.9319   | -                | -                |      |  | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ViT_small_patch16_224_pretrained.pdparams) |
-| ViT_base_<br/>patch16_224 | 0.8176   | 0.9613   | -    | -                |     | 86 | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ViT_base_patch16_224_pretrained.pdparams) |
-| ViT_base_<br/>patch16_384 | 0.8393  | 0.9710   |    -              |      -           |         |  | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ViT_base_patch16_384_pretrained.pdparams) |
-| ViT_base_<br/>patch32_384 | 0.8124   | 0.9598   | - | - |  |  | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ViT_base_patch32_384_pretrained.pdparams) |
-| ViT_large_<br/>patch16_224 | 0.8325  | 0.9658   | - | - |  | 307 | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ViT_large_patch16_224_pretrained.pdparams) |
-| ViT_large_<br/>patch16_384 | 0.8507  | 0.9741  | - | - |  |  | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ViT_large_patch16_384_pretrained.pdparams) |
-| ViT_large_<br/>patch32_384 | 0.8105   | 0.9596  | - | - |  |  | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ViT_large_patch32_384_pretrained.pdparams) |
+| ViT_small_<br/>patch16_224 | 0.7769  | 0.9342   | -                | -                |      |  | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ViT_small_patch16_224_pretrained.pdparams) |
+| ViT_base_<br/>patch16_224 | 0.8195   | 0.9617   | -    | -                |     | 86 | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ViT_base_patch16_224_pretrained.pdparams) |
+| ViT_base_<br/>patch16_384 | 0.8414  | 0.9717   |    -              |      -           |         |  | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ViT_base_patch16_384_pretrained.pdparams) |
+| ViT_base_<br/>patch32_384 | 0.8176   | 0.9613   | - | - |  |  | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ViT_base_patch32_384_pretrained.pdparams) |
+| ViT_large_<br/>patch16_224 | 0.8323  | 0.9650   | - | - |  | 307 | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ViT_large_patch16_224_pretrained.pdparams) |
+| ViT_large_<br/>patch16_384 | 0.8513  | 0.9736  | - | - |  |  | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ViT_large_patch16_384_pretrained.pdparams) |
+| ViT_large_<br/>patch32_384 | 0.8153   | 0.9608  | - | - |  |  | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ViT_large_patch32_384_pretrained.pdparams) |
 |                            |           |           |                  |                  |          |           |                                                              |
 
 
 | Model                    | Top-1 Acc | Top-5 Acc | time(ms)<br>bs=1 | time(ms)<br>bs=4 | Flops(G) | Params(M) | Download Address |
 |------------------------|-----------|-----------|------------------|------------------|----------|------------------------|------------------------|
-| DeiT_tiny_<br>patch16_224 | 0.709 | 0.906 | -                | -                |      | 5 | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DeiT_tiny_patch16_224_pretrained.pdparams) |
-| DeiT_small_<br>patch16_224 | 0.794 | 0.948 | -    | -                |     | 22 | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DeiT_small_patch16_224_pretrained.pdparams) |
-| DeiT_base_<br>patch16_224 | 0.816 | 0.955 |    -              |      -           |         | 86 | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DeiT_base_patch16_224_pretrained.pdparams) |
-| DeiT_base_<br>patch16_384 | 0.831 | 0.962 | - | - |  | 87 | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DeiT_base_patch16_384_pretrained.pdparams) |
-| DeiT_tiny_<br>distilled_patch16_224 | 0.736 | 0.915 | - | - |  | 6 | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DeiT_tiny_distilled_patch16_224_pretrained.pdparams) |
-| DeiT_small_<br>distilled_patch16_224 | 0.810 | 0.953 | - | - |  | 22 | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DeiT_small_distilled_patch16_224_pretrained.pdparams) |
-| DeiT_base_<br>distilled_patch16_224 | 0.830 | 0.963 | - | - |  | 87 | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DeiT_base_distilled_patch16_224_pretrained.pdparams) |
-| DeiT_base_<br>distilled_patch16_384 | 0.855 | 0.974 | - | - |  | 88 | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DeiT_base_distilled_patch16_384_pretrained.pdparams) |
+| DeiT_tiny_<br>patch16_224 | 0.718 | 0.910 | -                | -                |      | 5 | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DeiT_tiny_patch16_224_pretrained.pdparams) |
+| DeiT_small_<br>patch16_224 | 0.796 | 0.949 | -    | -                |     | 22 | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DeiT_small_patch16_224_pretrained.pdparams) |
+| DeiT_base_<br>patch16_224 | 0.817 | 0.957 |    -              |      -           |         | 86 | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DeiT_base_patch16_224_pretrained.pdparams) |
+| DeiT_base_<br>patch16_384 | 0.830 | 0.962 | - | - |  | 87 | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DeiT_base_patch16_384_pretrained.pdparams) |
+| DeiT_tiny_<br>distilled_patch16_224 | 0.741 | 0.918 | - | - |  | 6 | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DeiT_tiny_distilled_patch16_224_pretrained.pdparams) |
+| DeiT_small_<br>distilled_patch16_224 | 0.809 | 0.953 | - | - |  | 22 | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DeiT_small_distilled_patch16_224_pretrained.pdparams) |
+| DeiT_base_<br>distilled_patch16_224 | 0.831 | 0.964 | - | - |  | 87 | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DeiT_base_distilled_patch16_224_pretrained.pdparams) |
+| DeiT_base_<br>distilled_patch16_384 | 0.851 | 0.973 | - | - |  | 88 | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DeiT_base_distilled_patch16_384_pretrained.pdparams) |
 |  |  |  |  |  |  |  |  |
 
 

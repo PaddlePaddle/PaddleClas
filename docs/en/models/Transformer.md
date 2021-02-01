@@ -11,27 +11,25 @@ DeiT(Data-efficient Image Transformers) series models were proposed by Facebook 
 
 | Models           | Top1 | Top5 | Reference<br>top1 | Reference<br>top5 | FLOPS<br>(G) |
 |:--:|:--:|:--:|:--:|:--:|:--:|
-| ViT_small_patch16_224 | 0.7727 | 0.9319 | 0.7785 | 0.9342 |      |
-| ViT_base_patch16_224 | 0.8176 | 0.9613 | 0.8178 | 0.9613 |      |
-| ViT_base_patch16_384 | 0.8393 | 0.9710 | 0.8420 | 0.9722 |      |
-| ViT_base_patch32_384 | 0.8124 | 0.9598 | 0.8166 | 0.9613 |  |
-| ViT_large_patch16_224 | 0.8325 | 0.9658 | 0.8306 | 0.9644 |  |
-| ViT_large_patch16_384 | 0.8507 | 0.9741 | 0.8517 | 0.9736 |  |
-| ViT_large_patch32_384 | 0.8105 | 0.9596 | 0.815 | - |  |
-|                       |        |        |                   |                   |              |
+| ViT_small_patch16_224 | 0.7769 | 0.9342 | 0.7785 | 0.9342 |      |
+| ViT_base_patch16_224  | 0.8195 | 0.9617 | 0.8178 | 0.9613 |      |
+| ViT_base_patch16_384  | 0.8414 | 0.9717 | 0.8420 | 0.9722 |      |
+| ViT_base_patch32_384  | 0.8176 | 0.9613 | 0.8166 | 0.9613 |      |
+| ViT_large_patch16_224 | 0.8323 | 0.9650 | 0.8306 | 0.9644 |      |
+| ViT_large_patch16_384 | 0.8513 | 0.9736 | 0.8517 | 0.9736 |      |
+| ViT_large_patch32_384 | 0.8153 | 0.9608 | 0.815  | -      |      |
 
 
 | Models           | Top1 | Top5 | Reference<br>top1 | Reference<br>top5 | FLOPS<br>(G) |
 |:--:|:--:|:--:|:--:|:--:|:--:|
-| DeiT_tiny_patch16_224        | 0.709 | 0.906 | 0.722 | 0.911 |      |
-| DeiT_small_patch16_224        | 0.794 | 0.948 | 0.799 | 0.950 |      |
-| DeiT_base_patch16_224        | 0.816 | 0.955 | 0.818 | 0.956 |      |
-| DeiT_base_patch16_384 | 0.831 | 0.962 | 0.829 | 0.972 |  |
-| DeiT_tiny_distilled_patch16_224 | 0.736 | 0.915 | 0.745 | 0.919 |  |
-| DeiT_small_distilled_patch16_224 | 0.810 | 0.953 | 0.812 | 0.954 |  |
-| DeiT_base_distilled_patch16_224 | 0.830 | 0.963 | 0.834 | 0.965 |  |
-| DeiT_base_distilled_patch16_384 | 0.855 | 0.974 | 0.852 | 0.972 |  |
-|  |  | |  | |  |
+| DeiT_tiny_patch16_224            | 0.718 | 0.910 | 0.722 | 0.911 |      |
+| DeiT_small_patch16_224           | 0.796 | 0.949 | 0.799 | 0.950 |      |
+| DeiT_base_patch16_224            | 0.817 | 0.957 | 0.818 | 0.956 |      |
+| DeiT_base_patch16_384            | 0.830 | 0.962 | 0.829 | 0.972 |      |
+| DeiT_tiny_distilled_patch16_224  | 0.741 | 0.918 | 0.745 | 0.919 |      |
+| DeiT_small_distilled_patch16_224 | 0.809 | 0.953 | 0.812 | 0.954 |      |
+| DeiT_base_distilled_patch16_224  | 0.831 | 0.964 | 0.834 | 0.965 |      |
+| DeiT_base_distilled_patch16_384  | 0.851 | 0.973 | 0.852 | 0.972 |      |
 
 
 Params, FLOPs, Inference speed and other information are coming soon.
