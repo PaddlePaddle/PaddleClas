@@ -17,12 +17,7 @@ RepVGG（Making VGG-style ConvNets Great Again）系列模型是由清华大学(
 | RepVGG_B2 | 0.7813 | 0.9410 | 0.7878 |     |
 | RepVGG_B1g2 | 0.7732 | 0.9359 | 0.7778 |    |
 | RepVGG_B1g4 | 0.7675 | 0.9335 | 0.7758 |    |
-| RepVGG_B2g4 | 0.7782 | 0.9380 | 0.7850 |    |
-
-| Models | Top1 | Top5 | Reference<br>top1 | FLOPS<br>(G) |
-|:--:|:--:|:--:|:--:|:--:|
-| RepVGG_B3_200epochs | 0.7987 | 0.9502 | 0.8052 |      |
-| RepVGG_B2g4_200epochs | 0.7881 | 0.9448 | 0.7938 |     |
-| RepVGG_B3g4_200epochs | 0.7965 | 0.9485 | 0.8021 |     |
+| RepVGG_B2g4 | 0.7881 | 0.9448 | 0.7938 |    |
+| RepVGG_B3g4 | 0.7965 | 0.9485 | 0.8021 |    |
 
 关于Params、FLOPs、Inference speed等信息，敬请期待。

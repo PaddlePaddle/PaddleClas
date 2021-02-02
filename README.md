@@ -7,7 +7,8 @@
 PaddleClas is a toolset for image classification tasks prepared for the industry and academia. It helps users train better computer vision models and apply them in real scenarios.
 
 **Recent update**
-- 2021.01.27 Add `ViT` and `DeiT` pretrained model, `ViT`'s Top-1 Acc on ImageNet-1k dataset reaches 85.13%, and `DeiT` reaches 85.1%.
+- 2021.02.01 Add `RepVGG` pretrained models, whose Top-1 Acc on ImageNet-1k dataset reaches 79.65%.
+- 2021.01.27 Add `ViT` and `DeiT` pretrained models, `ViT`'s Top-1 Acc on ImageNet-1k dataset reaches 85.13%, and `DeiT` reaches 85.1%.
 - 2021.01.08 Add support for whl package and its usage, Model inference can be done by simply install paddleclas using pip.
 - 2020.12.16 Add support for TensorRT when using cpp inference to obain more obvious acceleration.
 - 2020.12.06 Add `SE_HRNet_W64_C_ssld` pretrained model, whose Top-1 Acc on ImageNet-1k dataset reaches 84.75%.
@@ -68,6 +69,7 @@ PaddleClas is a toolset for image classification tasks prepared for the industry
     - [EfficientNet and ResNeXt101_wsl series](#EfficientNet_and_ResNeXt101_wsl_series)
     - [ResNeSt and RegNet series](#ResNeSt_and_RegNet_series)
     - [Transformer series](#Transformer)
+    - [RepVGG series](#RepVGG)
     - [Others](#Others)
     - HS-ResNet: arxiv link: [https://arxiv.org/pdf/2010.07621.pdf](https://arxiv.org/pdf/2010.07621.pdf). Code and models are coming soon!
 - Model training/evaluation
@@ -356,7 +358,7 @@ Accuracy and inference time metrics of ResNeSt and RegNet series models are show
 <a name="Transformer"></a>
 ### Transformer series
 
-Accuracy and inference time metrics of ViT and DeiT series models are shown as follows. More detailed information can be refered to [Transformer series tutorial](./docs/en/models/Transformer.md).
+Accuracy and inference time metrics of ViT and DeiT series models are shown as follows. More detailed information can be refered to [Transformer series tutorial](./docs/en/models/Transformer_en.md).
 
 
 | Model                    | Top-1 Acc | Top-5 Acc | time(ms)<br>bs=1 | time(ms)<br>bs=4 | Flops(G) | Params(M) | Download Address |
@@ -383,6 +385,26 @@ Accuracy and inference time metrics of ViT and DeiT series models are shown as f
 | DeiT_base_<br>distilled_patch16_384 | 0.851 | 0.973 | - | - |  | 88 | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DeiT_base_distilled_patch16_384_pretrained.pdparams) |
 |  |  |  |  |  |  |  |  |
 
+
+<a name="RepVGG_series"></a>
+
+### RepVGG
+
+Accuracy and inference time metrics of RepVGG series models are shown as follows. More detailed information can be refered to [RepVGG series tutorial](./docs/en/models/RepVGG_en.md).
+
+
+| Model                     | Top-1 Acc | Top-5 Acc | time(ms)<br>bs=1 | time(ms)<br>bs=4 | Flops(G) | Params(M) | Download Address |
+|------------------------|-----------|-----------|------------------|------------------|----------|-----------|------------------------------------------------------------------------------------------------------|
+| RepVGG_A0   | 0.7131    | 0.9016    |  |  |  |  | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/RepVGG_A0_pretrained.pdparams) |
+| RepVGG_A1   | 0.7380    | 0.9146    |  |  |  |  | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/RepVGG_A1_pretrained.pdparams) |
+| RepVGG_A2   | 0.7571    | 0.9264    |  |  |  |  | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/RepVGG_A2_pretrained.pdparams) |
+| RepVGG_B0   | 0.7450    | 0.9213    |  |  |  |  | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/RepVGG_B0_pretrained.pdparams) |
+| RepVGG_B1   | 0.7773    | 0.9385    |  |  |  |  | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/RepVGG_B1_pretrained.pdparams) |
+| RepVGG_B2   | 0.7813    | 0.9410    |  |  |  |  | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/RepVGG_B2_pretrained.pdparams) |
+| RepVGG_B1g2 | 0.7732    | 0.9359    |  |  |  |  | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/RepVGG_B1g2_pretrained.pdparams) |
+| RepVGG_B1g4 | 0.7675    | 0.9335    |  |  |  |  | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/RepVGG_B1g4_pretrained.pdparams) |
+| RepVGG_B2g4 | 0.7881    | 0.9448    |  |  |  |  | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/RepVGG_B2g4_pretrained.pdparams) |
+| RepVGG_B3g4 | 0.7965    | 0.9485    |  |  |  |  | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/RepVGG_B3g4_pretrained.pdparams) |
 
 <a name="Others"></a>
 
@@ -416,4 +438,4 @@ Contributions are highly welcomed and we would really appreciate your feedback!!
 
 - Thank [nblib](https://github.com/nblib) to fix bug of RandErasing.
 - Thank [chenpy228](https://github.com/chenpy228) to fix some typos PaddleClas.
-- Thank [jm12138](https://github.com/jm12138) to add ViT and DeiT models into PaddleClas.
+- Thank [jm12138](https://github.com/jm12138) to add ViT, DeiT models and RepVGG models into PaddleClas.
