@@ -9,20 +9,20 @@
 
 ## 二、安装PaddlePaddle
 
-运行PaddleClas需要`PaddlePaddle 2.0rc1`或更高版本。请参照[安装文档](http://www.paddlepaddle.org.cn/install/quick)中的说明进行操作。
+运行PaddleClas需要`PaddlePaddle 2.0`或更高版本。请参照[安装文档](http://www.paddlepaddle.org.cn/install/quick)中的说明进行操作。
 
 ### 通过pip安装PaddlePaddle
 
 如果已经安装好了cuda、cudnn、nccl或者安装好了docker、nvidia-docker运行环境，可以pip安装最新GPU版本PaddlePaddle
 
 ```bash
-pip install paddlepaddle-gpu==2.0.0rc1 --upgrade
+pip install paddlepaddle-gpu==2.0.0 --upgrade
 ```
 
 如果希望在CPU环境中使用PaddlePaddle，可以运行下面的命令安装PaddlePaddle。
 
 ```bash
-pip install paddlepaddle==2.0.0rc1 --upgrade
+pip install paddlepaddle==2.0.0 --upgrade
 ```
 
 ### 源码编译PaddlePaddle
@@ -44,7 +44,7 @@ python -c "import paddle; print(paddle.__version__)"
 ```
 
 注意：
-- 从源码编译的PaddlePaddle版本号为0.0.0，请确保使用了PaddlePaddle 2.0rc1及之后的源码编译。
+- 从源码编译的PaddlePaddle版本号为0.0.0，请确保使用了PaddlePaddle 2.0及之后的源码编译。
 - PaddleClas基于PaddlePaddle高性能的分布式训练能力，若您从源码编译，请确保打开编译选项，**WITH_DISTRIBUTE=ON**。具体编译选项参考[编译选项表](https://www.paddlepaddle.org.cn/documentation/docs/zh/develop/install/Tables.html#id3)。
 - 在docker中运行时，为保证docker容器有足够的共享内存用于Paddle的数据读取加速，在创建docker容器时，请设置参数`--shm_size=8g`，条件允许的话可以设置为更大的值。
 
