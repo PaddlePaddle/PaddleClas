@@ -8,6 +8,7 @@
 
 
 **近期更新**
+- 2021.02.01 添加`RepVGG`系列模型，在ImageNet-1k上Top-1 Acc可达79.65%。
 - 2021.01.27 添加`ViT`与`DeiT`模型，在ImageNet-1k上，`ViT`模型Top-1 Acc可达85.13%，`DeiT`模型可达85.1%。
 - 2021.01.08 添加whl包及其使用说明，直接安装paddleclas whl包，即可快速完成模型预测。
 - 2020.12.16 添加对cpp预测的tensorRT支持，预测加速更明显。
@@ -68,6 +69,7 @@
     - [EfficientNet与ResNeXt101_wsl系列](#EfficientNet与ResNeXt101_wsl系列)
     - [ResNeSt与RegNet系列](#ResNeSt与RegNet系列)
     - [Transformer系列](#Transformer系列)
+    - [RepVGG系列](#RepVGG系列)
     - [其他模型](#其他模型)
     - HS-ResNet: arxiv文章链接: [https://arxiv.org/pdf/2010.07621.pdf](https://arxiv.org/pdf/2010.07621.pdf)。 代码和预训练模型即将开源，敬请期待。
 - 模型训练/评估
@@ -386,6 +388,26 @@ ViT（Vision Transformer）与DeiT（Data-efficient Image Transformers）系列�
 |  |  |  |  |  |  |  |  |
 
 
+<a name="RepVGG系列"></a>
+
+### RepVGG系列
+
+关于RepVGG系列模型的精度、速度指标如下表所示，更多介绍可以参考：[RepVGG系列模型文档](./docs/zh_CN/models/RepVGG.md)。
+
+
+| 模型                     | Top-1 Acc | Top-5 Acc | time(ms)<br>bs=1 | time(ms)<br>bs=4 | Flops(G) | Params(M) | 下载地址 |
+|------------------------|-----------|-----------|------------------|------------------|----------|-----------|------------------------------------------------------------------------------------------------------|
+| RepVGG_A0   | 0.7131    | 0.9016    |  |  |  |  | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/RepVGG_A0_pretrained.pdparams) |
+| RepVGG_A1   | 0.7380    | 0.9146    |  |  |  |  | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/RepVGG_A1_pretrained.pdparams) |
+| RepVGG_A2   | 0.7571    | 0.9264    |  |  |  |  | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/RepVGG_A2_pretrained.pdparams) |
+| RepVGG_B0   | 0.7450    | 0.9213    |  |  |  |  | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/RepVGG_B0_pretrained.pdparams) |
+| RepVGG_B1   | 0.7773    | 0.9385    |  |  |  |  | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/RepVGG_B1_pretrained.pdparams) |
+| RepVGG_B2   | 0.7813    | 0.9410    |  |  |  |  | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/RepVGG_B2_pretrained.pdparams) |
+| RepVGG_B1g2 | 0.7732    | 0.9359    |  |  |  |  | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/RepVGG_B1g2_pretrained.pdparams) |
+| RepVGG_B1g4 | 0.7675    | 0.9335    |  |  |  |  | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/RepVGG_B1g4_pretrained.pdparams) |
+| RepVGG_B2g4 | 0.7881    | 0.9448    |  |  |  |  | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/RepVGG_B2g4_pretrained.pdparams) |
+| RepVGG_B3g4 | 0.7965    | 0.9485    |  |  |  |  | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/RepVGG_B3g4_pretrained.pdparams) |
+
 <a name="其他模型"></a>
 
 ### 其他模型
@@ -416,6 +438,6 @@ ViT（Vision Transformer）与DeiT（Data-efficient Image Transformers）系列�
 
 - 非常感谢[nblib](https://github.com/nblib)修正了PaddleClas中RandErasing的数据增广配置文件。
 - 非常感谢[chenpy228](https://github.com/chenpy228)修正了PaddleClas文档中的部分错别字。
-- 非常感谢[jm12138](https://github.com/jm12138)为PaddleClas添加ViT和DeiT模型。
+- 非常感谢[jm12138](https://github.com/jm12138)为PaddleClas添加ViT，DeiT系列模型和RepVGG系列模型。
 
 我们非常欢迎你为PaddleClas贡献代码，也十分感谢你的反馈。
