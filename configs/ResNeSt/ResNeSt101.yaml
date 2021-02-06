@@ -11,7 +11,7 @@ validate: True
 valid_interval: 1
 epochs: 300
 topk: 5
-image_shape: [3, 224, 224]
+image_shape: [3, 256, 256]
 
 use_mix: True
 ls_epsilon: 0.1
@@ -41,7 +41,7 @@ TRAIN:
             to_np: False
             channel_first: False
         - RandCropImage:
-            size: 224
+            size: 256
         - RandFlipImage:
             flip_code: 1
         - AutoAugment:
