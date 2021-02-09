@@ -22,7 +22,7 @@ PaddleClas is a toolset for image classification tasks prepared for the industry
 
 ## Features
 
-- Rich model zoo. Based on the ImageNet-1k classification dataset, PaddleClas provides 29 series of classification network structures and training configurations, 134 models' pretrained weights and their evaluation metrics.
+- Rich model zoo. Based on the ImageNet-1k classification dataset, PaddleClas provides 29 series of classification network structures and training configurations, 133 models' pretrained weights and their evaluation metrics.
 
 - SSLD Knowledge Distillation. Based on this SSLD distillation strategy, the top-1 acc of the distilled model is generally increased by more than 3%.
 
@@ -100,7 +100,7 @@ PaddleClas is a toolset for image classification tasks prepared for the industry
 <a name="Model_zoo_overview"></a>
 ### Model zoo overview
 
-Based on the ImageNet-1k classification dataset, the 24 classification network structures supported by PaddleClas and the corresponding 122 image classification pretrained models are shown below. Training trick, a brief introduction to each series of network structures, and performance evaluation will be shown in the corresponding chapters. The  evaluation environment is as follows.
+Based on the ImageNet-1k classification dataset, the 29 classification network structures supported by PaddleClas and the corresponding 133 image classification pretrained models are shown below. Training trick, a brief introduction to each series of network structures, and performance evaluation will be shown in the corresponding chapters. The  evaluation environment is as follows.
 
 * CPU evaluation environment is based on Snapdragon 855 (SD855).
 * The GPU evaluation speed is measured by running 500 times under the FP32+TensorRT configuration (excluding the warmup time of the first 10 times).
