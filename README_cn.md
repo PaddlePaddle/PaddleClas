@@ -8,7 +8,7 @@
 
 
 **近期更新**
-- 2021.02.08 正式发布PaddleClas v2.0(branch release/2.0)并设置为推荐用户使用的默认分支. 发布的详细内容，请参考: https://github.com/PaddlePaddle/PaddleClas/releases/tag/v2.0.0
+- 2021.02.08 正式发布PaddleClas v2.0(branch release/2.0)并设置为推荐用户使用的默认分支。发布的详细内容，请参考: https://github.com/PaddlePaddle/PaddleClas/releases/tag/v2.0.0
 - 2021.01.08 添加whl包及其使用说明，直接安装paddleclas whl包，即可快速完成模型预测。
 - 2020.12.16 添加对cpp预测的tensorRT支持，预测加速更明显。
 - 2020.12.06 添加`SE_HRNet_W64_C_ssld`模型，在ImageNet-1k上Top-1 Acc可达84.75%。
