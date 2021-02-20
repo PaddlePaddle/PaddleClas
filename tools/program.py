@@ -18,6 +18,7 @@ from __future__ import print_function
 
 import os
 import time
+import datetime
 from collections import OrderedDict
 
 import paddle
@@ -339,20 +340,22 @@ def run(dataloader,
         ])
 
         if idx % print_interval == 0:
-            ips_info = "ips: {:.5f} images/sec.".format(
+            ips_info = "ips: {:.5f} images/sec".format(
                 batch_size / metric_list["batch_time"].avg)
+
             if mode == 'eval':
                 logger.info("{:s} step:{:<4d}, {:s} {:s}".format(
                     mode, idx, fetchs_str, ips_info))
             else:
                 epoch_str = "epoch:{:<3d}".format(epoch)
                 step_str = "{:s} step:{:<4d}".format(mode, idx)
-                logger.info("{:s}, {:s}, {:s} {:s}".format(
-                    logger.coloring(epoch_str, "HEADER")
-                    if idx == 0 else epoch_str,
-                    logger.coloring(step_str, "PURPLE"),
-                    logger.coloring(fetchs_str, 'OKGREEN'),
-                    logger.coloring(ips_info, 'OKGREEN')))
+                eta_sec = ((config["epochs"] - epoch) * len(dataloader) - idx
+                           ) * metric_list["batch_time"].avg
+                eta_str = "eta: {:s}".format(
+                    str(datetime.timedelta(seconds=int(eta_sec))))
+                logger.info("{:s}, {:s}, {:s} {:s}, {:s}".format(
+                    epoch_str if idx == 0 else epoch_str, step_str, fetchs_str,
+                    ips_info, eta_str))
 
     end_str = ' '.join([str(m.mean) for m in metric_list.values()] +
                        [metric_list['batch_time'].total])
@@ -365,11 +368,8 @@ def run(dataloader,
     else:
         end_epoch_str = "END epoch:{:<3d}".format(epoch)
 
-        logger.info("{:s} {:s} {:s} {:s}".format(
-            logger.coloring(end_epoch_str, "RED"),
-            logger.coloring(mode, "PURPLE"),
-            logger.coloring(end_str, "OKGREEN"),
-            logger.coloring(ips_info, "OKGREEN"), ))
+        logger.info("{:s} {:s} {:s} {:s}".format(end_epoch_str, mode, end_str,
+                                                 ips_info))
 
     # return top1_acc in order to save the best model
     if mode == 'valid':
