@@ -343,10 +343,7 @@ def run(dataloader,
             ips_info = "ips: {:.5f} images/sec".format(
                 batch_size / metric_list["batch_time"].avg)
 
-            if mode == 'eval':
-                logger.info("{:s} step:{:<4d}, {:s} {:s}".format(
-                    mode, idx, fetchs_str, ips_info))
-            else:
+            if mode == "train":
                 epoch_str = "epoch:{:<3d}".format(epoch)
                 step_str = "{:s} step:{:<4d}".format(mode, idx)
                 eta_sec = ((config["epochs"] - epoch) * len(dataloader) - idx
@@ -354,8 +351,10 @@ def run(dataloader,
                 eta_str = "eta: {:s}".format(
                     str(datetime.timedelta(seconds=int(eta_sec))))
                 logger.info("{:s}, {:s}, {:s} {:s}, {:s}".format(
-                    epoch_str if idx == 0 else epoch_str, step_str, fetchs_str,
-                    ips_info, eta_str))
+                    epoch_str, step_str, fetchs_str, ips_info, eta_str))
+            else:
+                logger.info("{:s} step:{:<4d}, {:s} {:s}".format(
+                    mode, idx, fetchs_str, ips_info))
 
     end_str = ' '.join([str(m.mean) for m in metric_list.values()] +
                        [metric_list['batch_time'].total])
