@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import random
 import numpy as np
 import imghdr
 import os
@@ -182,11 +183,15 @@ class CommonDataset(Dataset):
         return
 
     def __getitem__(self, idx):
-        line = self.full_lines[idx]
-        img_path, label = line.split(self.delimiter)
-        img_path = os.path.join(self.params['data_dir'], img_path)
-        with open(img_path, 'rb') as f:
-            img = f.read()
+        try:
+            line = self.full_lines[idx]
+            img_path, label = line.split(self.delimiter)
+            img_path = os.path.join(self.params['data_dir'], img_path)
+            with open(img_path, 'rb') as f:
+                img = f.read()
+        except Exception as e:
+            logger.error('data read faild: "{}"'.format(line))
+            return self.__getitem__(random.randint(0, len(self)))
         return (transform(img, self.ops), int(label))
 
     def __len__(self):
