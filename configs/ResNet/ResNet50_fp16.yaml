@@ -11,7 +11,7 @@ validate: True
 valid_interval: 1
 epochs: 120
 topk: 5
-is_distributed: False
+is_distributed: True
 
 use_dali: True
 use_gpu: True
