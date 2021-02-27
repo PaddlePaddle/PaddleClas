@@ -74,7 +74,7 @@ def main(args):
 
     # prepare to quant
     quant_config = get_default_quant_config()
-    # quant_config["activation_preprocess_type"] = "PACT"
+    quant_config["activation_preprocess_type"] = "PACT"
     quanter = QAT(config=quant_config)
     quanter.quantize(net)
 
