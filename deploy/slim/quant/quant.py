@@ -71,8 +71,6 @@ def main(args):
         paddle.distributed.init_parallel_env()
 
     net = program.create_model(config.ARCHITECTURE, config.classes_num)
-    # load model from checkpoint or pretrained model
-    init_model(config, net, None)
 
     # prepare to quant
     quant_config = get_default_quant_config()
@@ -83,9 +81,7 @@ def main(args):
     optimizer, lr_scheduler = program.create_optimizer(
         config, parameter_list=net.parameters())
 
-    # load ckp
-    if not config.get('checkpoints', None):
-        init_model(config, net, optimizer)
+    init_model(config, net, optimizer)
 
     if config["use_data_parallel"]:
         net = paddle.DataParallel(net)
