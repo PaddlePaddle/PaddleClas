@@ -72,7 +72,7 @@ def main(args):
     if use_amp or use_pure_fp16:
         AMP_RELATED_FLAGS_SETTING = {
             'FLAGS_cudnn_exhaustive_search': 1,
-            'FLAGS_conv_workspace_size_limit': 4000,
+            'FLAGS_conv_workspace_size_limit': 1500,
             'FLAGS_cudnn_batchnorm_spatial_persistent': 1,
             'FLAGS_max_inplace_grad_add': 8,
         }
