@@ -105,7 +105,7 @@ def init_model(config, net, optimizer=None):
     load model from checkpoint or pretrained_model
     """
     checkpoints = config.get('checkpoints')
-    if checkpoints:
+    if checkpoints and optimizer is not None:
         assert os.path.exists(checkpoints + ".pdparams"), \
             "Given dir {}.pdparams not exist.".format(checkpoints)
         assert os.path.exists(checkpoints + ".pdopt"), \
@@ -114,7 +114,7 @@ def init_model(config, net, optimizer=None):
         opti_dict = paddle.load(checkpoints + ".pdopt")
         net.set_dict(para_dict)
         optimizer.set_state_dict(opti_dict)
-        logger.info("Finish initing model from {}".format(checkpoints))
+        logger.info("Finish load checkpoints from {}".format(checkpoints))
         return
 
     pretrained_model = config.get('pretrained_model')
@@ -129,7 +129,7 @@ def init_model(config, net, optimizer=None):
                 path=pretrained_model,
                 load_static_weights=load_static_weights)
             logger.info(
-                logger.coloring("Finish initing model from {}".format(
+                logger.coloring("Finish load pretrained model from {}".format(
                     pretrained_model), "HEADER"))
 
 
