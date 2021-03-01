@@ -47,7 +47,7 @@ def parse_args():
 
 
 class Net(paddle.nn.Layer):
-    def __init__(self, net, class_dim, model):
+    def __init__(self, net, class_dim, model=None):
         super(Net, self).__init__()
         self.pre_net = net(class_dim=class_dim)
         self.model = model
@@ -66,18 +66,18 @@ def main():
     net = architectures.__dict__[args.model]
     model = Net(net, args.class_dim, args.model)
 
-    load_dygraph_pretrain(
-        model.pre_net,
-        path=args.pretrained_model,
-        load_static_weights=args.load_static_weights)
-    model.eval()
-
     # get QAT model
     quant_config = get_default_quant_config()
     # TODO(littletomatodonkey): add PACT for export model
     # quant_config["activation_preprocess_type"] = "PACT"
     quanter = QAT(config=quant_config)
     quanter.quantize(model)
+
+    load_dygraph_pretrain(
+        model.pre_net,
+        path=args.pretrained_model,
+        load_static_weights=args.load_static_weights)
+    model.eval()
 
     save_path = os.path.join(args.output_path, "inference")
     quanter.save_quantized_model(
