@@ -74,19 +74,22 @@ class Momentum(object):
                  momentum,
                  parameter_list=None,
                  regularization=None,
+                 multi_precision=False,
                  **args):
         super(Momentum, self).__init__()
         self.learning_rate = learning_rate
         self.momentum = momentum
         self.parameter_list = parameter_list
         self.regularization = regularization
+        self.multi_precision = multi_precision
 
     def __call__(self):
         opt = paddle.optimizer.Momentum(
             learning_rate=self.learning_rate,
             momentum=self.momentum,
             parameters=self.parameter_list,
-            weight_decay=self.regularization)
+            weight_decay=self.regularization,
+            multi_precision=self.multi_precision)
         return opt
 
 

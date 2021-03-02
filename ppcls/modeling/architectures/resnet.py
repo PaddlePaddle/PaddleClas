@@ -277,14 +277,18 @@ class ResNet(nn.Layer):
             bias_attr=ParamAttr(name="fc_0.b_0"))
 
     def forward(self, inputs):
-        y = self.conv(inputs)
-        y = self.pool2d_max(y)
-        for block in self.block_list:
-            y = block(y)
-        y = self.pool2d_avg(y)
-        y = paddle.reshape(y, shape=[-1, self.pool2d_avg_channels])
-        y = self.out(y)
-        return y
+        with paddle.static.amp.fp16_guard():
+            if self.data_format == "NHWC":
+                inputs = paddle.tensor.transpose(inputs, [0, 2, 3, 1])
+                inputs.stop_gradient = True
+            y = self.conv(inputs)
+            y = self.pool2d_max(y)
+            for block in self.block_list:
+                y = block(y)
+            y = self.pool2d_avg(y)
+            y = paddle.reshape(y, shape=[-1, self.pool2d_avg_channels])
+            y = self.out(y)
+            return y
 
 
 def ResNet18(**args):

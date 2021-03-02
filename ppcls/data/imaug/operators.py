@@ -195,14 +195,18 @@ class NormalizeImage(object):
     """ normalize image such as substract mean, divide std
     """
 
-    def __init__(self, scale=None, mean=None, std=None, order='chw'):
+    def __init__(self, scale=None, mean=None, std=None, order='chw', output_fp16=False, channel_num=3):
         if isinstance(scale, str):
             scale = eval(scale)
+        assert channel_num in [3, 4], "channel number of input image should be set to 3 or 4."
+        self.channel_num = channel_num
+        self.output_dtype = 'float16' if output_fp16 else 'float32'
         self.scale = np.float32(scale if scale is not None else 1.0 / 255.0)
+        self.order = order
         mean = mean if mean is not None else [0.485, 0.456, 0.406]
         std = std if std is not None else [0.229, 0.224, 0.225]
 
-        shape = (3, 1, 1) if order == 'chw' else (1, 1, 3)
+        shape = (3, 1, 1) if self.order == 'chw' else (1, 1, 3)
         self.mean = np.array(mean).reshape(shape).astype('float32')
         self.std = np.array(std).reshape(shape).astype('float32')
 
@@ -213,7 +217,16 @@ class NormalizeImage(object):
 
         assert isinstance(img,
                           np.ndarray), "invalid input 'img' in NormalizeImage"
-        return (img.astype('float32') * self.scale - self.mean) / self.std
+        
+        img = (img.astype('float32') * self.scale - self.mean) / self.std
+
+        if self.channel_num == 4:
+            img_h = img.shape[1] if self.order == 'chw' else img.shape[0]
+            img_w = img.shape[2] if self.order == 'chw' else img.shape[1]
+            pad_zeros = np.zeros((1, img_h, img_w)) if self.order == 'chw' else np.zeros((img_h, img_w, 1))
+            img = (np.concatenate((img, pad_zeros), axis=0) if self.order == 'chw'
+                   else np.concatenate((img, pad_zeros), axis=2))
+        return img.astype(self.output_dtype)
 
 
 class ToCHWImage(object):
