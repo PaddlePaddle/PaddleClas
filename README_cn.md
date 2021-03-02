@@ -8,16 +8,11 @@
 
 
 **近期更新**
+- 2021.03.02 添加分类模型量化方法与使用教程。
 - 2021.02.01 添加`RepVGG`系列模型，在ImageNet-1k上Top-1 Acc可达79.65%。
 - 2021.01.27 添加`ViT`与`DeiT`模型，在ImageNet-1k上，`ViT`模型Top-1 Acc可达85.13%，`DeiT`模型可达85.1%。
 - 2021.01.08 添加whl包及其使用说明，直接安装paddleclas whl包，即可快速完成模型预测。
 - 2020.12.16 添加对cpp预测的tensorRT支持，预测加速更明显。
-- 2020.12.06 添加`SE_HRNet_W64_C_ssld`模型，在ImageNet-1k上Top-1 Acc可达84.75%。
-- 2020.11.23 添加`GhostNet_x1_3_ssld `模型，在ImageNet-1k上Top-1 Acc可达79.38%。
-- 2020.11.09 添加`InceptionV3 `结构和模型，在ImageNet-1k上Top-1 Acc可达79.14%。
-- 2020.10.20 添加 `Res2Net50_vd_26w_4s_ssld `模型，在ImageNet-1k上Top-1 Acc可达83.1%；添加 `Res2Net101_vd_26w_4s_ssld `模型，在ImageNet-1k上Top-1 Acc可达83.9%。
-- 2020.10.12 添加Paddle-Lite demo。
-- 2020.10.10 添加cpp inference demo，完善`FAQ 30问`教程。
 - [more](./docs/zh_CN/update_history.md)
 
 
@@ -84,7 +79,7 @@
     - [服务化部署](./deploy/hubserving/readme.md)
     - [端侧部署](./deploy/lite/readme.md)
     - [whl包预测](./docs/zh_CN/whl.md)
-    - [模型量化压缩](docs/zh_CN/extension/paddle_quantization.md)
+    - [模型量化压缩](deploy/slim/quant/README.md)
 - 高阶使用
     - [知识蒸馏](./docs/zh_CN/advanced_tutorials/distillation/distillation.md)
     - [数据增广](./docs/zh_CN/advanced_tutorials/image_augmentation/ImageAugment.md)
