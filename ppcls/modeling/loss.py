@@ -15,7 +15,7 @@
 import paddle
 import paddle.nn.functional as F
 
-__all__ = ['CELoss', 'MixCELoss', 'GoogLeNetLoss', 'JSDivLoss']
+__all__ = ['MultiLabelLoss', 'CELoss', 'MixCELoss', 'GoogLeNetLoss', 'JSDivLoss']
 
 
 class Loss(object):
@@ -41,6 +41,19 @@ class Loss(object):
         soft_target = F.label_smooth(one_hot_target, epsilon=self._epsilon)
         soft_target = paddle.reshape(soft_target, shape=[-1, self._class_dim])
         return soft_target
+
+    def _binary_crossentropy(self, input, target, use_pure_fp16=False):
+        if self._label_smoothing:
+            target = self._labelsmoothing(target)
+            cost = F.binary_cross_entropy_with_logits(logit=input, label=target)
+        else:
+            cost = F.binary_cross_entropy_with_logits(logit=input, label=target)
+        if use_pure_fp16:
+            avg_cost = paddle.sum(cost)
+        else:
+            avg_cost = paddle.mean(cost)
+
+        return avg_cost
 
     def _crossentropy(self, input, target, use_pure_fp16=False):
         if self._label_smoothing:
@@ -71,6 +84,20 @@ class Loss(object):
 
     def __call__(self, input, target):
         pass
+
+
+class MultiLabelLoss(Loss):
+    """
+    Multilabel loss based binary cross entropy
+    """
+    
+    def __init__(self, class_dim=1000, epsilon=None):
+        super(MultiLabelLoss, self).__init__(class_dim, epsilon)
+
+    def __call__(self, input, target, use_pure_fp16=False):
+        cost = self._binary_crossentropy(input, target, use_pure_fp16)
+
+        return cost
 
 
 class CELoss(Loss):
