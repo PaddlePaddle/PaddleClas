@@ -4,6 +4,8 @@
 
 ## Introduction
 
+* this is a test
+
 PaddleClas is a toolset for image classification tasks prepared for the industry and academia. It helps users train better computer vision models and apply them in real scenarios.
 
 **Recent update**
