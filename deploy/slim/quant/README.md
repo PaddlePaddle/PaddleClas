@@ -79,7 +79,6 @@ python3.7 -m paddle.distributed.launch \
         -o LEARNING_RATE.params.lr=0.13 \
         -o epochs=100
 ```
-如果要训练识别模型的量化，修改配置文件和加载的模型参数即可。
 
 ### 4. 导出模型
 
