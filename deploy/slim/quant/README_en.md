@@ -106,7 +106,7 @@ The derived model can be converted through the `opt tool` of PaddleLite.
 
 For quantitative model deployment, please refer to [Mobile terminal model deployment](../../lite/readme_en.md)
 
-## Notices:
+## Notes:
 
 * In quantitative training, it is suggested to load the pre-trained model obtained from conventional training to accelerate the convergence of quantitative training.
-* In quantitative training, it is suggested that the initial learning rate should be changed to `1 / 20 ~ 1 / 10` of the conventional training, and the training epoch number should be changed to `1 / 5 ~ 1 / 2` of the conventional training. In terms of learning rate strategy, other configuration information is not recommended to be changed.
+* In quantitative training, it is suggested that the initial learning rate should be changed to `1 / 20 ~ 1 / 10` of the conventional training, and the training epoch number should be changed to `1 / 5 ~ 1 / 2` of the conventional training. In terms of learning rate strategy, it's better to train with warmup, other configuration information is not recommended to be changed.
