@@ -46,10 +46,10 @@ class RandomErasing(object):
                 x1 = random.randint(0, img.shape[1] - h)
                 y1 = random.randint(0, img.shape[2] - w)
                 if img.shape[0] == 3:
-                    img[0, x1:x1 + h, y1:y1 + w] = self.mean[0]
-                    img[1, x1:x1 + h, y1:y1 + w] = self.mean[1]
-                    img[2, x1:x1 + h, y1:y1 + w] = self.mean[2]
+                    img[x1:x1 + h, y1:y1 + w, 0] = self.mean[0]
+                    img[x1:x1 + h, y1:y1 + w, 1] = self.mean[1]
+                    img[x1:x1 + h, y1:y1 + w, 2] = self.mean[2]
                 else:
-                    img[0, x1:x1 + h, y1:y1 + w] = self.mean[1]
+                    img[x1:x1 + h, y1:y1 + w, 0] = self.mean[1]
                 return img
         return img
