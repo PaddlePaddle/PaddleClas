@@ -205,6 +205,7 @@ class MultiLabelDataset(Dataset):
         self.delimiter = params.get("delimiter", "\t")
         self.ops = create_operators(params["transforms"])
         self.num_samples = len(self.full_lines)
+        return
 
     def __getitem__(self, idx):
         line = self.full_lines[idx]
