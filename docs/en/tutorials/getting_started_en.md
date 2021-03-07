@@ -226,10 +226,13 @@ Firstly, you should export inference model using `tools/export_model.py`.
 python tools/export_model.py \
     --model MobileNetV3_large_x1_0 \
     --pretrained_model ./output/MobileNetV3_large_x1_0/best_model/ppcls \
-    --output_path ./inference
+    --output_path ./inference \
+    --class_dim 1000
 ```
 
-Among them, the `--model` parameter is used to specify the model name, `--pretrained_model` parameter is used to specify the model file path, the path does not need to include the model file suffix name, and `--output_path` is used to specify the storage path of the converted model.
+Among them, the `--model` parameter is used to specify the model name, `--pretrained_model` parameter is used to specify the model file path, the path does not need to include the model file suffix name, and `--output_path` is used to specify the storage path of the converted model, class_dim means number of class for the model, default as 1000.
+
+注意：
 
 **Note**:
 1. If `--output_path=./inference`, then three files will be generated in the folder `inference`, they are `inference.pdiparams`, `inference.pdmodel` and `inference.pdiparams.info`.
