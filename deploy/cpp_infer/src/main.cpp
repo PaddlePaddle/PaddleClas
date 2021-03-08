@@ -70,6 +70,12 @@ int main(int argc, char **argv) {
   for (int idx = 0; idx < img_files_list.size(); ++idx) {
     std::string img_path = img_files_list[idx];
     cv::Mat srcimg = cv::imread(img_path, cv::IMREAD_COLOR);
+    if (!srcimg.data) {
+      std::cerr << "[ERROR] image read failed! image path: " << img_path
+                << "\n";
+      exit(-1);
+    }
+
     cv::cvtColor(srcimg, srcimg, cv::COLOR_BGR2RGB);
 
     double run_time = classifier.Run(srcimg);
