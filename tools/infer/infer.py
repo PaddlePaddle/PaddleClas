@@ -31,11 +31,15 @@ import utils
 from utils import get_image_list
 
 
-def postprocess(outputs, topk=5):
-    output = outputs[0]
-    prob = np.array(output).flatten()
-    index = prob.argsort(axis=0)[-topk:][::-1].astype('int32')
-    return zip(index, prob[index])
+def postprocess(batch_outputs, topk=5):
+    batch_results = []
+    for probs in batch_outputs:
+        results = []
+        index = probs.argsort(axis=0)[-topk:][::-1].astype('int32')
+        for i in index:
+            results.append({"cls": i, "prob": probs[i]})
+        batch_results.append(results)
+    return batch_results
 
 
 def save_prelabel_results(class_id, input_filepath, output_idr):
@@ -53,32 +57,34 @@ def main():
     net = architectures.__dict__[args.model](class_dim=args.class_num)
     load_dygraph_pretrain(net, args.pretrained_model, args.load_static_weights)
     image_list = get_image_list(args.image_file)
-    for idx, filename in enumerate(image_list):
-        img = cv2.imread(filename)[:, :, ::-1]
+    batch_list = []
+    filepath_list = []
+    for idx, filepath in enumerate(image_list):
+        img = cv2.imread(filepath)[:, :, ::-1]
         data = utils.preprocess(img, args)
-        data = np.expand_dims(data, axis=0)
-        data = paddle.to_tensor(data)
-        net.eval()
-        outputs = net(data)
-        if args.model == "GoogLeNet":
-            outputs = outputs[0]
-        outputs = F.softmax(outputs)
-        outputs = outputs.numpy()
-        probs = postprocess(outputs)
+        batch_list.append(data)
+        filepath_list.append(filepath)
 
-        top1_class_id = 0
-        rank = 1
-        print("Current image file: {}".format(filename))
-        for idx, prob in probs:
-            print("\ttop{:d}, class id: {:d}, probability: {:.4f}".format(
-                rank, idx, prob))
-            if rank == 1:
-                top1_class_id = idx
-            rank += 1
+        if (idx + 1) % args.batch_size == 0 or (idx + 1) == len(image_list):
+            batch_tensor = paddle.to_tensor(batch_list)
+            net.eval()
+            batch_outputs = net(batch_tensor)
+            if args.model == "GoogLeNet":
+                batch_outputs = batch_outputs[0]
+            batch_outputs = F.softmax(batch_outputs)
+            batch_outputs = batch_outputs.numpy()
+            batch_result = postprocess(batch_outputs, args.top_k)
 
-        if args.pre_label_image:
-            save_prelabel_results(top1_class_id, filename,
-                                  args.pre_label_out_idr)
+            for number, result_list in enumerate(batch_result):
+                filename = filepath_list[number].split("/")[-1]
+                print("File:{}, The top-{} result(s):{}".format(
+                    filename, args.top_k, result_list))
+                if args.pre_label_image:
+                    save_prelabel_results(result_list[0]["cls"],
+                                          filepath_list[number],
+                                          args.pre_label_out_idr)
+            batch_list = []
+            filepath_list = []
 
     return
 
