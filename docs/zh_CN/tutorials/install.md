@@ -16,13 +16,13 @@
 如果已经安装好了cuda、cudnn、nccl或者安装好了docker、nvidia-docker运行环境，可以pip安装最新GPU版本PaddlePaddle
 
 ```bash
-pip install paddlepaddle-gpu==2.0.0 --upgrade
+pip3 install paddlepaddle-gpu==2.0.0 --upgrade -i https://mirror.baidu.com/pypi/simple
 ```
 
 如果希望在CPU环境中使用PaddlePaddle，可以运行下面的命令安装PaddlePaddle。
 
 ```bash
-pip install paddlepaddle==2.0.0 --upgrade
+pip3 install paddlepaddle==2.0.0 --upgrade -i https://mirror.baidu.com/pypi/simple
 ```
 
 ### 源码编译PaddlePaddle
@@ -40,7 +40,7 @@ paddle.utils.run_check()
 查看PaddlePaddle版本的命令如下：
 
 ```bash
-python -c "import paddle; print(paddle.__version__)"
+python3 -c "import paddle; print(paddle.__version__)"
 ```
 
 注意：
@@ -60,24 +60,30 @@ python -c "import paddle; print(paddle.__version__)"
 
 **克隆PaddleClas模型库：**
 
+```bash
+git clone https://github.com/PaddlePaddle/PaddleClas.git -b release/2.0
 ```
-cd path_to_clone_PaddleClas
-git clone https://github.com/PaddlePaddle/PaddleClas.git
+
+如果从github上网速太慢，可以从gitee下载，下载命令如下：
+
+```bash
+git clone https://gitee.com/paddlepaddle/PaddleClas.git -b release/2.0
 ```
+
+
 
 **安装Python依赖库：**
 
-Python依赖库在[requirements.txt](https://github.com/PaddlePaddle/PaddleClas/blob/master/requirements.txt)中给出，可通过如下命令安装：
+Python依赖库在[requirements.txt](https://github.com/PaddlePaddle/PaddleClas/blob/release/2.0/requirements.txt)中给出，可通过如下命令安装：
 
-```
-pip install --upgrade -r requirements.txt
+```bash
+pip3 install --upgrade -r requirements.txt -i https://mirror.baidu.com/pypi/simple
 ```
 
 visualdl可能出现安装失败，请尝试
 
-```
-pip3 install --upgrade visualdl==2.0.0b3 -i https://mirror.baidu.com/pypi/simple
-
+```bash
+pip3 install --upgrade visualdl==2.1.1 -i https://mirror.baidu.com/pypi/simple
 ```
 
 此外，visualdl目前只支持在python3下运行，因此如果希望使用visualdl，需要使用python3。
