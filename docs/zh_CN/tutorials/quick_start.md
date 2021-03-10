@@ -181,8 +181,7 @@ TRAIN:
 
 ```shell
 export CUDA_VISIBLE_DEVICES=0
-python3 tools/train.py \
-        -c ./configs/quick_start/R50_vd_distill_MV3_large_x1_0.yaml
+python3 tools/train.py -c ./configs/quick_start/R50_vd_distill_MV3_large_x1_0.yaml
 ```
 
 最终flowers102验证集上的精度为0.9647，结合更多的无标签数据，使用教师模型进行知识蒸馏，MobileNetV3的精度涨幅高达6.47\%。
