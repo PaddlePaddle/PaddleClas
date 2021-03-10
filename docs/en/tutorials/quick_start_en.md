@@ -1,6 +1,6 @@
 # Trial in 30mins
 
-Based on the flowers102 dataset, it takes only 30 mins to experience PaddleClas, include training varieties of backbone and pretrained model, SSLD distillation, and multiple data augmentation, Please refer to [Installation](install.md) to install at first.
+Based on the flowers102 dataset, it takes only 30 mins to experience PaddleClas, include training varieties of backbone and pretrained model, SSLD distillation, and multiple data augmentation, Please refer to [Installation](install_en.md) to install at first.
 
 
 ## Preparation
@@ -11,28 +11,17 @@ Based on the flowers102 dataset, it takes only 30 mins to experience PaddleClas,
 cd path_to_PaddleClas
 ```
 
-* enter `dataset/flowers102`, download and decompress flowers102 dataset.
+* Enter `dataset/flowers102`, download and decompress flowers102 dataset.
 
 ```shell
 cd dataset/flowers102
-wget https://www.robots.ox.ac.uk/~vgg/data/flowers/102/102flowers.tgz
-wget https://www.robots.ox.ac.uk/~vgg/data/flowers/102/imagelabels.mat
-wget https://www.robots.ox.ac.uk/~vgg/data/flowers/102/setid.mat
-tar -xf 102flowers.tgz
+# If you want to download from the brower, you can copy the link, visit it
+# in the browser, download and then commpress.
+wget https://paddle-imagenet-models-name.bj.bcebos.com/data/flowers102.zip
+unzip flowers102.zip
 ```
 
-* create train/val/test label files
-
-```shell
-python generate_flowers102_list.py jpg train > train_list.txt
-python generate_flowers102_list.py jpg valid > val_list.txt
-python generate_flowers102_list.py jpg test > extra_list.txt
-cat train_list.txt extra_list.txt > train_extra_list.txt
-```
-
-**Note:** In order to offer more data to SSLD training task, train_list.txt and extra_list.txt will merge into train_extra_list.txft
-
-* return `PaddleClas` dir
+* Return `PaddleClas` dir
 
 ```
 cd ../../
@@ -67,11 +56,7 @@ cd ../
 
 ```shell
 export CUDA_VISIBLE_DEVICES=0
-python -m paddle.distributed.launch \
-    --gpus="0" \
-    tools/train.py \
-        -c ./configs/quick_start/ResNet50_vd.yaml
-
+python3 tools/train.py -c ./configs/quick_start/ResNet50_vd.yaml
 ```
 
 The validation `Top1 Acc` curve is shown below.
@@ -85,11 +70,7 @@ The validation `Top1 Acc` curve is shown below.
 
 ```shell
 export CUDA_VISIBLE_DEVICES=0
-python -m paddle.distributed.launch \
-    --gpus="0" \
-    tools/train.py \
-        -c ./configs/quick_start/ResNet50_vd_finetune.yaml
-
+python3 tools/train.py -c ./configs/quick_start/ResNet50_vd_finetune.yaml
 ```
 
 The validation `Top1 Acc` curve is shown below
@@ -97,6 +78,31 @@ The validation `Top1 Acc` curve is shown below
 ![](../../images/quick_start/r50_vd_pretrained_acc.png)
 
 Compare with training from scratch, it improve by 65\% to 94.02\%
+
+
+You can use the trained model to infer the result of image `docs/images/quick_start/flowers102/image_06739.jpg`. The command is as follows.
+
+
+```shell
+python3 tools/infer/infer.py \
+    -i docs/images/quick_start/flowers102/image_06739.jpg \
+    --model=ResNet50_vd \
+    --pretrained_model="output/ResNet50_vd/best_model/ppcls" \
+    --class_num=102
+```
+
+The output is as follows. Top-5 class ids and their scores are printed.
+
+```
+Current image file: docs/images/quick_start/flowers102/image_06739.jpg
+    top1, class id: 0, probability: 0.5129
+    top2, class id: 50, probability: 0.0671
+    top3, class id: 18, probability: 0.0377
+    top4, class id: 82, probability: 0.0238
+    top5, class id: 54, probability: 0.0231
+```
+
+* Note: Results are different for different models, so you might get different results for the command.
 
 
 ### SSLD finetune - ResNet50_vd_ssld pretrained model (Acc 82.39\%)
@@ -115,10 +121,7 @@ Tringing script
 
 ```shell
 export CUDA_VISIBLE_DEVICES=0
-python -m paddle.distributed.launch \
-    --gpus="0" \
-    tools/train.py \
-        -c ./configs/quick_start/ResNet50_vd_ssld_finetune.yaml
+python3 tools/train.py -c ./configs/quick_start/ResNet50_vd_ssld_finetune.yaml
 ```
 
 Compare with finetune on the 79.12% pretrained model, it improve by 0.9% to 95%.
@@ -130,10 +133,7 @@ Training script
 
 ```shell
 export CUDA_VISIBLE_DEVICES=0
-python -m paddle.distributed.launch \
-    --gpus="0" \
-    tools/train.py \
-        -c ./configs/quick_start/MobileNetV3_large_x1_0_finetune.yaml
+python3 tools/train.py -c ./configs/quick_start/MobileNetV3_large_x1_0_finetune.yaml
 ```
 
 Compare with ResNet50_vd pretrained model, it decrease by 5% to 90%. Different architecture generates different performance, actually it is a task-oriented decision to apply the best performance model, should consider the inference time, storage, heterogeneous device, etc.
@@ -147,10 +147,7 @@ Training script
 
 ```shell
 export CUDA_VISIBLE_DEVICES=0
-python -m paddle.distributed.launch \
-    --gpus="0" \
-    tools/train.py \
-        -c ./configs/quick_start/ResNet50_vd_ssld_random_erasing_finetune.yaml
+python3 tools/train.py -c ./configs/quick_start/ResNet50_vd_ssld_random_erasing_finetune.yaml
 ```
 
 It improves by 1.27\% to 96.27\%
@@ -184,10 +181,7 @@ Final training script
 
 ```shell
 export CUDA_VISIBLE_DEVICES=0
-python -m paddle.distributed.launch \
-    --gpus="0" \
-    tools/train.py \
-        -c ./configs/quick_start/R50_vd_distill_MV3_large_x1_0.yaml
+python3 tools/train.py -c ./configs/quick_start/R50_vd_distill_MV3_large_x1_0.yaml
 ```
 
 It significantly imporve by 6.47% to 96.47% with more unlabeled data and teacher model.
@@ -214,4 +208,4 @@ The whole accuracy curves are shown below
 
 * **NOTE**: As flowers102 is a small dataset, validatation accuracy maybe float 1%.
 
-* Please refer to [Getting_started](./getting_started) for more details
+* Please refer to [Getting_started](./getting_started_en.md) for more details

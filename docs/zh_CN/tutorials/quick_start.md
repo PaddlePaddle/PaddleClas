@@ -11,26 +11,15 @@
 cd path_to_PaddleClas
 ```
 
-* 进入`dataset/flowers102`目录，下载并解压flowers102数据集.
+* 进入`dataset/flowers102`目录，下载并解压flowers102数据集。
+
 
 ```shell
 cd dataset/flowers102
-wget https://www.robots.ox.ac.uk/~vgg/data/flowers/102/102flowers.tgz
-wget https://www.robots.ox.ac.uk/~vgg/data/flowers/102/imagelabels.mat
-wget https://www.robots.ox.ac.uk/~vgg/data/flowers/102/setid.mat
-tar -xf 102flowers.tgz
+# 如果希望从浏览器中直接下载，可以复制该链接并访问，然后下载解压即可
+wget https://paddle-imagenet-models-name.bj.bcebos.com/data/flowers102.zip
+unzip flowers102.zip
 ```
-
-* 制作train/val/test标签文件
-
-```shell
-python generate_flowers102_list.py jpg train > train_list.txt
-python generate_flowers102_list.py jpg valid > val_list.txt
-python generate_flowers102_list.py jpg test > extra_list.txt
-cat train_list.txt extra_list.txt > train_extra_list.txt
-```
-
-**注意**：这里将train_list.txt和extra_list.txt合并成train_extra_list.txt，是为了之后在进行知识蒸馏时，使用更多的数据提升无标签知识蒸馏任务的效果。
 
 * 返回`PaddleClas`根目录
 
@@ -50,7 +39,6 @@ cd pretrained
 wget https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ResNet50_vd_pretrained.pdparams
 wget https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ResNet50_vd_ssld_pretrained.pdparams
 wget https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/MobileNetV3_large_x1_0_pretrained.pdparams
-
 cd ../
 ```
 
@@ -69,11 +57,7 @@ cd ../
 
 ```shell
 export CUDA_VISIBLE_DEVICES=0
-python -m paddle.distributed.launch \
-    --gpus="0" \
-    tools/train.py \
-        -c ./configs/quick_start/ResNet50_vd.yaml
-
+python3 tools/train.py -c ./configs/quick_start/ResNet50_vd.yaml
 ```
 
 验证集的`Top1 Acc`曲线如下所示，最高准确率为0.2735。
@@ -87,19 +71,39 @@ python -m paddle.distributed.launch \
 
 ```shell
 export CUDA_VISIBLE_DEVICES=0
-python -m paddle.distributed.launch \
-    --gpus="0" \
-    tools/train.py \
-        -c ./configs/quick_start/ResNet50_vd_finetune.yaml
-
+python3 tools/train.py -c ./configs/quick_start/ResNet50_vd_finetune.yaml
 ```
 
 验证集的`Top1 Acc`曲线如下所示，最高准确率为0.9402，加载预训练模型之后，flowers102数据集精度大幅提升，绝对精度涨幅超过65\%。
 
 ![](../../images/quick_start/r50_vd_pretrained_acc.png)
 
-### 3.3 SSLD模型微调-基于ResNet50_vd_ssld预训练模型(准确率82.39\%)
+使用训练完的预训练模型对图片`docs/images/quick_start/flowers102/image_06739.jpg`进行预测，预测命令为
 
+
+```shell
+python3 tools/infer/infer.py \
+    -i docs/images/quick_start/flowers102/image_06739.jpg \
+    --model=ResNet50_vd \
+    --pretrained_model="output/ResNet50_vd/best_model/ppcls" \
+    --class_num=102
+```
+
+最终可以得到如下结果，打印出了Top-5对应的class id以及score。
+
+```
+Current image file: docs/images/quick_start/flowers102/image_06739.jpg
+	top1, class id: 0, probability: 0.5129
+	top2, class id: 50, probability: 0.0671
+	top3, class id: 18, probability: 0.0377
+	top4, class id: 82, probability: 0.0238
+	top5, class id: 54, probability: 0.0231
+```
+
+* 注意：这里每个模型的训练结果都不相同，因此结果可能稍有不同。
+
+
+### 3.3 SSLD模型微调-基于ResNet50_vd_ssld预训练模型(准确率82.39\%)
 
 需要注意的是，在使用通过知识蒸馏得到的预训练模型进行微调时，我们推荐使用相对较小的网络中间层学习率。
 
@@ -113,12 +117,10 @@ pretrained_model: "./pretrained/ResNet50_vd_ssld_pretrained"
 ```
 
 训练脚本如下。
+
 ```shell
 export CUDA_VISIBLE_DEVICES=0
-python -m paddle.distributed.launch \
-    --gpus="0" \
-    tools/train.py \
-        -c ./configs/quick_start/ResNet50_vd_ssld_finetune.yaml
+python3 tools/train.py -c ./configs/quick_start/ResNet50_vd_ssld_finetune.yaml
 ```
 
 最终flowers102验证集上精度指标为0.95，相对于79.12\%预训练模型的微调结构，新数据集指标可以再次提升0.9\%。
@@ -130,10 +132,7 @@ python -m paddle.distributed.launch \
 
 ```shell
 export CUDA_VISIBLE_DEVICES=0
-python -m paddle.distributed.launch \
-    --gpus="0" \
-    tools/train.py \
-        -c ./configs/quick_start/MobileNetV3_large_x1_0_finetune.yaml
+python3 tools/train.py -c ./configs/quick_start/MobileNetV3_large_x1_0_finetune.yaml
 ```
 
 最终flowers102验证集上的精度为0.90，比加载了预训练模型的ResNet50_vd的精度差了5\%。不同模型结构的网络在相同数据集上的性能表现不同，需要根据预测耗时以及存储的需求选择合适的模型。
@@ -146,10 +145,7 @@ python -m paddle.distributed.launch \
 
 ```shell
 export CUDA_VISIBLE_DEVICES=0
-python -m paddle.distributed.launch \
-    --gpus="0" \
-    tools/train.py \
-        -c ./configs/quick_start/ResNet50_vd_ssld_random_erasing_finetune.yaml
+python3 tools/train.py -c ./configs/quick_start/ResNet50_vd_ssld_random_erasing_finetune.yaml
 ```
 
 最终flowers102验证集上的精度为0.9627，使用数据增广可以使得模型精度再次提升1.27\%。
@@ -185,9 +181,7 @@ TRAIN:
 
 ```shell
 export CUDA_VISIBLE_DEVICES=0
-python -m paddle.distributed.launch \
-    --gpus="0" \
-    tools/train.py \
+python3 tools/train.py \
         -c ./configs/quick_start/R50_vd_distill_MV3_large_x1_0.yaml
 ```
 
