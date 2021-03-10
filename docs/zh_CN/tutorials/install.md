@@ -74,7 +74,7 @@ git clone https://gitee.com/paddlepaddle/PaddleClas.git -b release/2.0
 
 **安装Python依赖库：**
 
-Python依赖库在[requirements.txt](https://github.com/PaddlePaddle/PaddleClas/blob/release/2.0/requirements.txt)中给出，可通过如下命令安装：
+Python依赖库在`requirements.txt`中给出，可通过如下命令安装：
 
 ```bash
 pip3 install --upgrade -r requirements.txt -i https://mirror.baidu.com/pypi/simple
