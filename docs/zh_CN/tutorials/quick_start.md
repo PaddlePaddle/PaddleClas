@@ -54,7 +54,7 @@ cd ../
 export CUDA_VISIBLE_DEVICES=0
 ```
 
-* 如果使用windows，可以使用下面的命令进行设置。
+如果使用windows，可以使用下面的命令进行设置。
 
 ```shell
 set CUDA_VISIBLE_DEVICES=0
