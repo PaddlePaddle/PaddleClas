@@ -4,6 +4,7 @@ ARCHITECTURE:
 
 checkpoints: ""
 pretrained_model: ""
+use_gpu: True
 model_save_dir: "./output/"
 classes_num: 102
 total_images: 1020
