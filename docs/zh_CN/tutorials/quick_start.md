@@ -46,8 +46,7 @@ cd ../
 
 ### 2.2 环境说明
 
-* 下面所有的训练过程均在`单卡V100`机器上运行。
-* 首先需要设置可用的显卡设备id
+* 下面所有的训练过程均在`单卡V100`机器上运行。首先需要设置可用的显卡设备id。
 
 如果使用mac或者linux，可以使用下面的命令进行设置。
 
@@ -61,6 +60,7 @@ export CUDA_VISIBLE_DEVICES=0
 set CUDA_VISIBLE_DEVICES=0
 ```
 
+* 如果希望在cpu上训练，可以将配置文件中的`use_gpu: True`修改为`use_gpu: False`，或者在训练脚本后面添加`-o use_gpu=False`，表示传入参数，覆盖默认的`use_gpu`值。
 
 ## 三、模型训练
 
@@ -71,6 +71,15 @@ set CUDA_VISIBLE_DEVICES=0
 ```shell
 python3 tools/train.py -c ./configs/quick_start/ResNet50_vd.yaml
 ```
+
+如果希望在cpu上训练，训练脚本如下所示。
+
+```shell
+python3 tools/train.py -c ./configs/quick_start/ResNet50_vd.yaml -o use_gpu=False
+```
+
+下面的训练任务中，如果希望使用cpu训练，也可以在训练脚本中添加`-o use_gpu=False`。
+
 
 验证集的`Top1 Acc`曲线如下所示，最高准确率为0.2735。
 

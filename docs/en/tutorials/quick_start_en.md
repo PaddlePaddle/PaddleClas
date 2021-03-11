@@ -63,6 +63,9 @@ export CUDA_VISIBLE_DEVICES=0
 set CUDA_VISIBLE_DEVICES=0
 ```
 
+* If you want to train on cpu device, you can modify the field `use_gpu: True` in the config file to `use_gpu: False`, or you can append `-o use_gpu=False` in the training command, which means override the value of `use_gpu` as False.
+
+
 ### Train from scratch
 
 * Train ResNet50_vd
@@ -70,6 +73,14 @@ set CUDA_VISIBLE_DEVICES=0
 ```shell
 python3 tools/train.py -c ./configs/quick_start/ResNet50_vd.yaml
 ```
+
+If you want to train on cpu device, the command is as follows.
+
+```shell
+python3 tools/train.py -c ./configs/quick_start/ResNet50_vd.yaml -o use_gpu=False
+```
+
+Similarly, for the following commands, if you want to train on cpu device, you can append `-o use_gpu=False` in the command.
 
 The validation `Top1 Acc` curve is shown below.
 
