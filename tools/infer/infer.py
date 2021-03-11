@@ -28,18 +28,7 @@ sys.path.append(os.path.abspath(os.path.join(__dir__, '../..')))
 from ppcls.utils.save_load import load_dygraph_pretrain
 from ppcls.modeling import architectures
 import utils
-from utils import get_image_list
-
-
-def postprocess(batch_outputs, topk=5):
-    batch_results = []
-    for probs in batch_outputs:
-        results = []
-        index = probs.argsort(axis=0)[-topk:][::-1].astype('int32')
-        for i in index:
-            results.append({"cls": i, "prob": probs[i]})
-        batch_results.append(results)
-    return batch_results
+from utils import get_image_list, postprocess
 
 
 def save_prelabel_results(class_id, input_filepath, output_idr):
