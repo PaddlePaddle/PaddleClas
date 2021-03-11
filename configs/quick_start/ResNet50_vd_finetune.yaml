@@ -3,6 +3,7 @@ ARCHITECTURE:
     name: 'ResNet50_vd'
 pretrained_model: "./pretrained/ResNet50_vd_pretrained"
 model_save_dir: "./output/"
+use_gpu: True
 classes_num: 102
 total_images: 1020
 save_interval: 1
