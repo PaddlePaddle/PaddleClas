@@ -47,6 +47,19 @@ cd ../
 ### 2.2 环境说明
 
 * 下面所有的训练过程均在`单卡V100`机器上运行。
+* 首先需要设置可用的显卡设备id
+
+如果使用mac或者linux，可以使用下面的命令进行设置。
+
+```shell
+export CUDA_VISIBLE_DEVICES=0
+```
+
+* 如果使用windows，可以使用下面的命令进行设置。
+
+```shell
+set CUDA_VISIBLE_DEVICES=0
+```
 
 
 ## 三、模型训练
@@ -56,7 +69,6 @@ cd ../
 * 基于ResNet50_vd模型，训练脚本如下所示。
 
 ```shell
-export CUDA_VISIBLE_DEVICES=0
 python3 tools/train.py -c ./configs/quick_start/ResNet50_vd.yaml
 ```
 
@@ -70,7 +82,6 @@ python3 tools/train.py -c ./configs/quick_start/ResNet50_vd.yaml
 * 基于ImageNet1k分类预训练模型进行微调，训练脚本如下所示。
 
 ```shell
-export CUDA_VISIBLE_DEVICES=0
 python3 tools/train.py -c ./configs/quick_start/ResNet50_vd_finetune.yaml
 ```
 
@@ -79,7 +90,6 @@ python3 tools/train.py -c ./configs/quick_start/ResNet50_vd_finetune.yaml
 ![](../../images/quick_start/r50_vd_pretrained_acc.png)
 
 使用训练完的预训练模型对图片`docs/images/quick_start/flowers102/image_06739.jpg`进行预测，预测命令为
-
 
 ```shell
 python3 tools/infer/infer.py \
@@ -119,11 +129,10 @@ pretrained_model: "./pretrained/ResNet50_vd_ssld_pretrained"
 训练脚本如下。
 
 ```shell
-export CUDA_VISIBLE_DEVICES=0
 python3 tools/train.py -c ./configs/quick_start/ResNet50_vd_ssld_finetune.yaml
 ```
 
-最终flowers102验证集上精度指标为0.95，相对于79.12\%预训练模型的微调结构，新数据集指标可以再次提升0.9\%。
+最终flowers102验证集上精度指标为0.95，相对于79.12\%预训练模型的微调结构，新数据集指标可以再次提升0.98\%。
 
 
 ### 3.4 尝试更多的模型结构-MobileNetV3
@@ -131,7 +140,6 @@ python3 tools/train.py -c ./configs/quick_start/ResNet50_vd_ssld_finetune.yam
 训练脚本如下所示。
 
 ```shell
-export CUDA_VISIBLE_DEVICES=0
 python3 tools/train.py -c ./configs/quick_start/MobileNetV3_large_x1_0_finetune.yaml
 ```
 
@@ -144,7 +152,6 @@ python3 tools/train.py -c ./configs/quick_start/MobileNetV3_large_x1_0_finetu
 
 
 ```shell
-export CUDA_VISIBLE_DEVICES=0
 python3 tools/train.py -c ./configs/quick_start/ResNet50_vd_ssld_random_erasing_finetune.yaml
 ```
 
@@ -180,7 +187,6 @@ TRAIN:
 最终的训练脚本如下所示。
 
 ```shell
-export CUDA_VISIBLE_DEVICES=0
 python3 tools/train.py -c ./configs/quick_start/R50_vd_distill_MV3_large_x1_0.yaml
 ```
 

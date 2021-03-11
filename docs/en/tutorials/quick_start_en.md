@@ -5,7 +5,7 @@ Based on the flowers102 dataset, it takes only 30 mins to experience PaddleClas,
 
 ## Preparation
 
-* enter insatallation dir
+* Enter insatallation dir.
 
 ```
 cd path_to_PaddleClas
@@ -16,7 +16,7 @@ cd path_to_PaddleClas
 ```shell
 cd dataset/flowers102
 # If you want to download from the brower, you can copy the link, visit it
-# in the browser, download and then commpress.
+# in the browser, download and then decommpress.
 wget https://paddle-imagenet-models-name.bj.bcebos.com/data/flowers102.zip
 unzip flowers102.zip
 ```
@@ -49,13 +49,25 @@ cd ../
 ## Training
 
 * All experiments are running on the NVIDIA® Tesla® V100 single card.
+* First of all, use the following command to set visible device.
+
+If you use mac or linux, you can use the following command:
+
+```shell
+export CUDA_VISIBLE_DEVICES=0
+```
+
+* If you use windows, you can use the following command.
+
+```shell
+set CUDA_VISIBLE_DEVICES=0
+```
 
 ### Train from scratch
 
 * Train ResNet50_vd
 
 ```shell
-export CUDA_VISIBLE_DEVICES=0
 python3 tools/train.py -c ./configs/quick_start/ResNet50_vd.yaml
 ```
 
@@ -66,10 +78,9 @@ The validation `Top1 Acc` curve is shown below.
 
 ### Finetune - ResNet50_vd pretrained model (Acc 79.12\%)
 
-* finetune ResNet50_vd_ model pretrained on the 1000-class Imagenet dataset
+* Finetune ResNet50_vd model pretrained on the 1000-class Imagenet dataset
 
 ```shell
-export CUDA_VISIBLE_DEVICES=0
 python3 tools/train.py -c ./configs/quick_start/ResNet50_vd_finetune.yaml
 ```
 
@@ -120,11 +131,10 @@ pretrained_model: "./pretrained/ResNet50_vd_ssld_pretrained"
 Tringing script
 
 ```shell
-export CUDA_VISIBLE_DEVICES=0
 python3 tools/train.py -c ./configs/quick_start/ResNet50_vd_ssld_finetune.yaml
 ```
 
-Compare with finetune on the 79.12% pretrained model, it improve by 0.9% to 95%.
+Compare with finetune on the 79.12% pretrained model, it improve by 0.98\% to 95\%.
 
 
 ### More architecture - MobileNetV3
@@ -132,7 +142,6 @@ Compare with finetune on the 79.12% pretrained model, it improve by 0.9% to 95%.
 Training script
 
 ```shell
-export CUDA_VISIBLE_DEVICES=0
 python3 tools/train.py -c ./configs/quick_start/MobileNetV3_large_x1_0_finetune.yaml
 ```
 
@@ -146,7 +155,6 @@ Data augmentation works when training data is small.
 Training script
 
 ```shell
-export CUDA_VISIBLE_DEVICES=0
 python3 tools/train.py -c ./configs/quick_start/ResNet50_vd_ssld_random_erasing_finetune.yaml
 ```
 
@@ -180,7 +188,6 @@ TRAIN:
 Final training script
 
 ```shell
-export CUDA_VISIBLE_DEVICES=0
 python3 tools/train.py -c ./configs/quick_start/R50_vd_distill_MV3_large_x1_0.yaml
 ```
 
