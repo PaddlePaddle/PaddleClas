@@ -22,56 +22,63 @@ import tools.infer.utils as utils
 from tools.infer.utils import get_image_list
 
 
-def predict(args, predictor):
-    input_names = predictor.get_input_names()
-    input_tensor = predictor.get_input_handle(input_names[0])
+class Predictor(object):
+    def __init__(self, args):
+        if args.enable_benchmark:
+            assert args.model is not None
+        # HALF precission predict only work when using tensorrt
+        if args.use_fp16 is True:
+            assert args.use_tensorrt is True
+        self.args = args
 
-    output_names = predictor.get_output_names()
-    output_tensor = predictor.get_output_handle(output_names[0])
+        self.paddle_predictor = utils.create_paddle_predictor(args)
+        input_names = self.paddle_predictor.get_input_names()
+        self.input_tensor = self.paddle_predictor.get_input_handle(input_names[
+            0])
 
-    test_num = 500
-    test_time = 0.0
-    if not args.enable_benchmark:
-        # for PaddleHubServing
-        if args.hubserving:
-            img_list = [args.image_file]
-        # for predict only
-        else:
-            img_list = get_image_list(args.image_file)
+        output_names = self.paddle_predictor.get_output_names()
+        self.output_tensor = self.paddle_predictor.get_output_handle(
+            output_names[0])
 
-        for idx, img_name in enumerate(img_list):
-            if not args.hubserving:
-                img = cv2.imread(img_name)[:, :, ::-1]
-                assert img is not None, "Error in loading image: {}".format(
-                    img_name)
-            else:
-                img = img_name
-            inputs = utils.preprocess(img, args)
-            inputs = np.expand_dims(
-                inputs, axis=0).repeat(
-                    args.batch_size, axis=0).copy()
-            input_tensor.copy_from_cpu(inputs)
+    def predict(self, batch_input):
+        self.input_tensor.copy_from_cpu(batch_input)
+        self.paddle_predictor.run()
+        batch_output = self.output_tensor.copy_to_cpu()
+        return batch_output
 
-            predictor.run()
+    def local_predict(self):
+        image_list = get_image_list(self.args.image_file)
+        batch_input_list = []
+        filepath_list = []
+        for idx, img_path in enumerate(image_list):
+            img = cv2.imread(img_path)[:, :, ::-1]
+            assert img is not None, "Error in loading image: {}".format(
+                img_path)
+            img = utils.preprocess(img, args)
+            batch_input_list.append(img)
+            filepath_list.append(img_path)
 
-            output = output_tensor.copy_to_cpu()
-            classes, scores = utils.postprocess(output, args)
-            if args.hubserving:
-                return classes, scores
-            print("Current image file: {}".format(img_name))
-            print("\ttop-1 class: {0}".format(classes[0]))
-            print("\ttop-1 score: {0}".format(scores[0]))
-    else:
+            if (idx + 1) % args.batch_size == 0 or (idx + 1
+                                                    ) == len(filepath_list):
+                batch_outputs = self.predict(np.array(batch_input_list))
+                batch_result_list = utils.postprocess(batch_outputs,
+                                                      self.args.top_k)
+
+                for number, result_list in enumerate(batch_result_list):
+                    filename = filepath_list[number].split("/")[-1]
+                    print("File:{}, The top-{} result(s):{}".format(
+                        filename, self.args.top_k, result_list))
+                batch_input_list = []
+                filepath_list = []
+
+    def benchmark_predict(self):
+        test_num = 500
+        test_time = 0.0
         for i in range(0, test_num + 10):
             inputs = np.random.rand(args.batch_size, 3, 224,
                                     224).astype(np.float32)
             start_time = time.time()
-            input_tensor.copy_from_cpu(inputs)
-
-            predictor.run()
-
-            output = output_tensor.copy_to_cpu()
-            output = output.flatten()
+            batch_output = self.predict(inputs).flatten()
             if i >= 10:
                 test_time += time.time() - start_time
             time.sleep(0.01)  # sleep for T4 GPU
@@ -83,19 +90,10 @@ def predict(args, predictor):
             / test_num))
 
 
-def main(args):
-    if not args.enable_benchmark:
-        assert args.batch_size == 1
-    else:
-        assert args.model is not None
-    # HALF precission predict only work when using tensorrt
-    if args.use_fp16 is True:
-        assert args.use_tensorrt is True
-
-    predictor = utils.create_paddle_predictor(args)
-    predict(args, predictor)
-
-
 if __name__ == "__main__":
     args = utils.parse_args()
-    main(args)
+    predictor = Predictor(args)
+    if not args.enable_benchmark:
+        predictor.local_predict()
+    else:
+        predictor.benchmark_predict()

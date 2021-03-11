@@ -119,12 +119,15 @@ def preprocess(img, args):
     return img
 
 
-def postprocess(output, args):
-    output = output.flatten()
-    classes = np.argpartition(output, -args.top_k)[-args.top_k:]
-    classes = classes[np.argsort(-output[classes])]
-    scores = output[classes]
-    return classes, scores
+def postprocess(batch_outputs, topk=5):
+    batch_results = []
+    for probs in batch_outputs:
+        results = []
+        index = probs.argsort(axis=0)[-topk:][::-1].astype('int32')
+        for i in index:
+            results.append({"cls": i, "prob": probs[i]})
+        batch_results.append(results)
+    return batch_results
 
 
 def get_image_list(img_file):
