@@ -62,9 +62,9 @@ def main():
                 batch_outputs = batch_outputs[0]
             batch_outputs = F.softmax(batch_outputs)
             batch_outputs = batch_outputs.numpy()
-            batch_result = postprocess(batch_outputs, args.top_k)
+            batch_result_list = postprocess(batch_outputs, args.top_k)
 
-            for number, result_list in enumerate(batch_result):
+            for number, result_list in enumerate(batch_result_list):
                 filename = filepath_list[number].split("/")[-1]
                 result_str = ", ".join([
                     "{}: {:.2f}".format(r["cls"], r["score"])
