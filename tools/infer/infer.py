@@ -67,8 +67,8 @@ def main():
             for number, result_list in enumerate(batch_result):
                 filename = filepath_list[number].split("/")[-1]
                 result_str = ", ".join([
-                    "{}: {:.2f}".format(d["cls"], d["score"])
-                    for d in result_list
+                    "{}: {:.2f}".format(r["cls"], r["score"])
+                    for r in result_list
                 ])
                 print("File:{}, The top-{} result(s):{}".format(
                     filename, args.top_k, result_str))

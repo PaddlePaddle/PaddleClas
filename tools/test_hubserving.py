@@ -18,7 +18,7 @@ __dir__ = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(__dir__)
 sys.path.append(os.path.abspath(os.path.join(__dir__, '..')))
 
-from tools.infer.utils import parse_args, get_image_list, preprocess, np_to_base64
+from tools.infer.utils import parse_args, get_image_list, preprocess, np_to_b64
 from ppcls.utils import logger
 import numpy as np
 import cv2
@@ -26,7 +26,6 @@ import time
 import requests
 import json
 import base64
-import imghdr
 
 
 def main(args):
@@ -53,11 +52,13 @@ def main(args):
         if (idx + 1) % args.batch_size == 0 or (idx + 1
                                                 ) == len(image_path_list):
             batch_input = np.array(batch_input_list)
-            b64str, revert_shape = np_to_base64(batch_input)
+            b64str, revert_shape = np_to_b64(batch_input)
             data = {
                 "images": b64str,
-                "revert_shape": revert_shape,
-                "revert_dtype": str(batch_input.dtype),
+                "revert_params": {
+                    "shape": revert_shape,
+                    "dtype": str(batch_input.dtype)
+                },
                 "top_k": args.top_k
             }
             try:
@@ -84,8 +85,8 @@ def main(args):
                 for number, result_list in enumerate(batch_result_list):
                     all_score += result_list[0]["score"]
                     result_str = ", ".join([
-                        "{}: {:.2f}".format(d["cls"], d["score"])
-                        for d in result_list
+                        "{}: {:.2f}".format(r["cls"], r["score"])
+                        for r in result_list
                     ])
                     logger.info("File:{}, The top-{} result(s): {}".format(
                         file_name_list[number], args.top_k, result_str))
@@ -95,10 +96,11 @@ def main(args):
                 file_name_list = []
 
     total_time = time.time() - start_time
-    logger.info("The average time of prediction cost: {}".format(predict_time /
-                                                                 cnt))
-    logger.info("The average time cost: {}".format(total_time / cnt))
-    logger.info("The average top-1 score: {}".format(all_score / cnt))
+    logger.info("The average time of prediction cost: {:.3f} s/image".format(
+        predict_time / cnt))
+    logger.info("The average time cost: {:.3f} s/image".format(total_time /
+                                                               cnt))
+    logger.info("The average top-1 score: {:.3f}".format(all_score / cnt))
 
 
 if __name__ == '__main__':

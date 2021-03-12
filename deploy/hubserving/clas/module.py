@@ -25,7 +25,7 @@ import numpy as np
 import paddle.nn as nn
 
 from tools.infer.predict import Predictor
-from tools.infer.utils import Base64ToNp, postprocess
+from tools.infer.utils import b64_to_np, postprocess
 from deploy.hubserving.clas.params import read_params
 
 
@@ -63,20 +63,6 @@ class ClasSystem(nn.Layer):
             print("Use CPU")
             print("Enable MKL-DNN") if enable_mkldnn else None
         self.predictor = Predictor(self.args)
-        self.to_np = Base64ToNp()
-
-    def read_images(self, paths=[]):
-        images = []
-        for img_path in paths:
-            assert os.path.isfile(
-                img_path), "The {} isn't a valid file.".format(img_path)
-            img = cv2.imread(img_path)
-            if img is None:
-                logger.info("error in loading image:{}".format(img_path))
-                continue
-            img = img[:, :, ::-1]
-            images.append(img)
-        return np.array(images)
 
     def predict(self, batch_input_data, top_k=1):
         assert isinstance(
@@ -94,6 +80,6 @@ class ClasSystem(nn.Layer):
         """
         Run as a service.
         """
-        input_data = self.to_np(images, revert_params)
+        input_data = b64_to_np(images, revert_params)
         results = self.predict(batch_input_data=input_data, **kwargs)
         return results
