@@ -204,32 +204,15 @@ class ToTensor(object):
         return img
 
 
-class Base64ToCV2(object):
-    def __init__(self):
-        pass
-
-    def __call__(self, b64str):
-        import base64
-        data = base64.b64decode(b64str.encode('utf8'))
-        data = np.fromstring(data, np.uint8)
-        data = cv2.imdecode(data, cv2.IMREAD_COLOR)[:, :, ::-1]
-        return data
+def b64_to_np(b64str, revert_params):
+    shape = revert_params["shape"]
+    dtype = revert_params["dtype"]
+    dtype = getattr(np, dtype) if isinstance(str, type(dtype)) else dtype
+    data = base64.b64decode(b64str.encode('utf8'))
+    data = np.fromstring(data, dtype).reshape(shape)
+    return data
 
 
-class Base64ToNp(object):
-    def __init__(self):
-        pass
-
-    def __call__(self, b64str, revert_params):
-        shape = revert_params["shape"]
-        dtype = revert_params["dtype"]
-        dtype = getattr(np, dtype) if isinstance(str, dtype) else dtype
-        data = base64.b64decode(b64str.encode('utf8'))
-        data = np.fromstring(data, dtype).reshape(shape)
-        return data
-
-
-def np_to_base64(images):
+def np_to_b64(images):
     img_str = base64.b64encode(images).decode('utf8')
-    # img_byte = base64.decodebytes(img_str)
     return img_str, images.shape

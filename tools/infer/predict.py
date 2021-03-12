@@ -23,8 +23,6 @@ from tools.infer.utils import parse_args, get_image_list, create_paddle_predicto
 
 class Predictor(object):
     def __init__(self, args):
-        if args.enable_benchmark:
-            assert args.model is not None
         # HALF precission predict only work when using tensorrt
         if args.use_fp16 is True:
             assert args.use_tensorrt is True
@@ -65,8 +63,8 @@ class Predictor(object):
                 for number, result_list in enumerate(batch_result_list):
                     filename = filepath_list[number].split("/")[-1]
                     result_str = ", ".join([
-                        "{}: {:.2f}".format(d["cls"], d["score"])
-                        for d in result_list
+                        "{}: {:.2f}".format(r["cls"], r["score"])
+                        for r in result_list
                     ])
                     print("File:{}, The top-{} result(s):{}".format(
                         filename, self.args.top_k, result_str))
@@ -98,4 +96,5 @@ if __name__ == "__main__":
     if not args.enable_benchmark:
         predictor.normal_predict()
     else:
+        assert args.model is not None
         predictor.benchmark_predict()
