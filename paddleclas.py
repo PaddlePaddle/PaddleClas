@@ -30,13 +30,15 @@ import os
 import sys
 __dir__ = os.path.dirname(__file__)
 sys.path.append(os.path.join(__dir__, ''))
+import argparse
 
 import cv2
 import numpy as np
 import tarfile
 import requests
 from tqdm import tqdm
-import tools.infer.utils as utils
+from tools.infer.utils import get_image_list, preprocess, postprocess
+from tools.infer.predict import Predictor
 import shutil
 __all__ = ['PaddleClas']
 BASE_DIR = os.path.expanduser("~/.paddleclas/")
@@ -155,8 +157,6 @@ def load_label_name_dict(path):
 
 
 def parse_args(mMain=True, add_help=True):
-    import argparse
-
     def str2bool(v):
         return v.lower() in ("true", "t", "1")
 
@@ -270,7 +270,7 @@ class PaddleClas(object):
             process_params.label_name_path)
 
         self.args = process_params
-        self.predictor = utils.create_paddle_predictor(process_params)
+        self.predictor = Predictor(process_params)
 
     def predict(self, img):
         """
@@ -282,11 +282,6 @@ class PaddleClas(object):
         """
         assert isinstance(img, (str, np.ndarray))
 
-        input_names = self.predictor.get_input_names()
-        input_tensor = self.predictor.get_input_handle(input_names[0])
-
-        output_names = self.predictor.get_output_names()
-        output_tensor = self.predictor.get_output_handle(output_names[0])
         if isinstance(img, str):
             # download internet image
             if img.startswith('http'):
@@ -297,7 +292,7 @@ class PaddleClas(object):
                 print("Current using image from Internet:{}, renamed as: {}".
                       format(img, image_path))
                 img = image_path
-            image_list = utils.get_image_list(img)
+            image_list = get_image_list(img)
         else:
             if isinstance(img, np.ndarray):
                 image_list = [img]
@@ -310,26 +305,30 @@ class PaddleClas(object):
                 image = cv2.imread(filename)[:, :, ::-1]
                 assert image is not None, "Error in loading image: {}".format(
                     filename)
-                inputs = utils.preprocess(image, self.args)
+                inputs = preprocess(image, self.args)
                 inputs = np.expand_dims(
                     inputs, axis=0).repeat(
                         1, axis=0).copy()
             else:
                 inputs = filename
 
-            input_tensor.copy_from_cpu(inputs)
+            batch_outputs = self.predictor.predict(inputs)
 
-            self.predictor.run()
+            batch_result_list = postprocess(batch_outputs, self.args.top_k)
+            # TODO(gaotingquan): support batch size > 1
+            classes = []
+            scores = []
+            for top_i in batch_result_list[0]:
+                classes.append(top_i["cls"])
+                scores.append(top_i["score"])
 
-            outputs = output_tensor.copy_to_cpu()
-            classes, scores = utils.postprocess(outputs, self.args)
             label_names = []
             if len(self.label_name_dict) != 0:
                 label_names = [self.label_name_dict[c] for c in classes]
             result = {
                 "filename": filename if isinstance(filename, str) else 'image',
-                "class_ids": classes.tolist(),
-                "scores": scores.tolist(),
+                "class_ids": classes,
+                "scores": scores,
                 "label_names": label_names,
             }
             total_result.append(result)
