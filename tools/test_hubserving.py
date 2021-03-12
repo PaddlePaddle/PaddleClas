@@ -18,7 +18,9 @@ __dir__ = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(__dir__)
 sys.path.append(os.path.abspath(os.path.join(__dir__, '..')))
 
+from tools.infer.utils import parse_args, get_image_list, preprocess, np_to_base64
 from ppcls.utils import logger
+import numpy as np
 import cv2
 import time
 import requests
@@ -27,76 +29,78 @@ import base64
 import imghdr
 
 
-def get_image_file_list(img_file):
-    imgs_lists = []
-    if img_file is None or not os.path.exists(img_file):
-        raise Exception("not found any img file in {}".format(img_file))
-
-    img_end = {'jpg', 'bmp', 'png', 'jpeg', 'rgb', 'tif', 'tiff', 'gif', 'GIF'}
-    if os.path.isfile(img_file) and imghdr.what(img_file) in img_end:
-        imgs_lists.append(img_file)
-    elif os.path.isdir(img_file):
-        for single_file in os.listdir(img_file):
-            file_path = os.path.join(img_file, single_file)
-            if imghdr.what(file_path) in img_end:
-                imgs_lists.append(file_path)
-    if len(imgs_lists) == 0:
-        raise Exception("not found any img file in {}".format(img_file))
-    return imgs_lists
-
-
-def cv2_to_base64(image):
-    return base64.b64encode(image).decode('utf8')
-
-
-def main(url, image_path, top_k=1):
-    image_file_list = get_image_file_list(image_path)
+def main(args):
+    image_path_list = get_image_list(args.image_file)
     headers = {"Content-type": "application/json"}
+
     cnt = 0
-    total_time = 0
-    all_acc = 0.0
+    predict_time = 0
+    all_score = 0.0
+    start_time = time.time()
 
-    for image_file in image_file_list:
-        file_str = image_file.split('/')[-1]
-        img = open(image_file, 'rb').read()
+    batch_input_list = []
+    file_name_list = []
+    for idx, img_path in enumerate(image_path_list):
+        file_name = img_path.split('/')[-1]
+        img = cv2.imread(img_path)[:, :, ::-1]
         if img is None:
-            logger.error("Loading image:{} failed".format(image_file))
+            logger.error("Loading image:{} failed".format(img_path))
             continue
-        data = {'images': [cv2_to_base64(img)], 'top_k': top_k}
+        img = preprocess(img, args)
 
-        try:
-            r = requests.post(url=url, headers=headers, data=json.dumps(data))
-            r.raise_for_status()
-        except Exception as e:
-            logger.error("File:{}, {}".format(file_str, e))
-            continue
-        if r.json()['status'] != '000':
-            logger.error(
-                "File:{}, The parameters returned by the server are: {}".
-                format(file_str, r.json()['msg']))
-            continue
-        res = r.json()["results"][0]
-        classes, scores, elapse = res
-        all_acc += scores[0]
-        total_time += elapse
-        cnt += 1
+        batch_input_list.append(img)
+        file_name_list.append(file_name)
+        if (idx + 1) % args.batch_size == 0 or (idx + 1
+                                                ) == len(image_path_list):
+            batch_input = np.array(batch_input_list)
+            b64str, revert_shape = np_to_base64(batch_input)
+            data = {
+                "images": b64str,
+                "revert_shape": revert_shape,
+                "revert_dtype": str(batch_input.dtype),
+                "top_k": args.top_k
+            }
+            try:
+                r = requests.post(
+                    url=args.server_url,
+                    headers=headers,
+                    data=json.dumps(data))
+                r.raise_for_status
+                if r.json()["status"] != "000":
+                    msg = r.json()["msg"]
+                    raise Exception(msg)
+            except Exception as e:
+                logger.error("{}, in file(s): {} etc.".format(
+                    e, file_name_list[0]))
+                continue
+            else:
+                results = r.json()["results"]
+                batch_result_list = results["prediction"]
+                elapse = results["elapse"]
 
-        scores = map(lambda x: round(x, 5), scores)
-        results = dict(zip(classes, scores))
+                cnt += len(batch_result_list)
+                predict_time += elapse
 
-        message = "No.{}, File:{}, The top-{} result(s):{}, Time cost:{:.3f}".format(
-            cnt, file_str, top_k, results, elapse)
-        logger.info(message)
+                for number, result_list in enumerate(batch_result_list):
+                    all_score += result_list[0]["score"]
+                    result_str = ", ".join([
+                        "{}: {:.2f}".format(d["cls"], d["score"])
+                        for d in result_list
+                    ])
+                    logger.info("File:{}, The top-{} result(s): {}".format(
+                        file_name_list[number], args.top_k, result_str))
 
-    logger.info("The average time cost: {}".format(float(total_time) / cnt))
-    logger.info("The average top-1 score: {}".format(float(all_acc) / cnt))
+            finally:
+                batch_input_list = []
+                file_name_list = []
+
+    total_time = time.time() - start_time
+    logger.info("The average time of prediction cost: {}".format(predict_time /
+                                                                 cnt))
+    logger.info("The average time cost: {}".format(total_time / cnt))
+    logger.info("The average top-1 score: {}".format(all_score / cnt))
 
 
 if __name__ == '__main__':
-    if len(sys.argv) != 3 and len(sys.argv) != 4:
-        logger.info("Usage: %s server_url image_path" % sys.argv[0])
-    else:
-        server_url = sys.argv[1]
-        image_path = sys.argv[2]
-        top_k = int(sys.argv[3]) if len(sys.argv) == 4 else 1
-        main(server_url, image_path, top_k)
+    args = parse_args()
+    main(args)

@@ -18,8 +18,7 @@ import time
 
 import sys
 sys.path.insert(0, ".")
-import tools.infer.utils as utils
-from tools.infer.utils import get_image_list
+from tools.infer.utils import parse_args, get_image_list, create_paddle_predictor, preprocess, postprocess
 
 
 class Predictor(object):
@@ -31,7 +30,7 @@ class Predictor(object):
             assert args.use_tensorrt is True
         self.args = args
 
-        self.paddle_predictor = utils.create_paddle_predictor(args)
+        self.paddle_predictor = create_paddle_predictor(args)
         input_names = self.paddle_predictor.get_input_names()
         self.input_tensor = self.paddle_predictor.get_input_handle(input_names[
             0])
@@ -46,7 +45,7 @@ class Predictor(object):
         batch_output = self.output_tensor.copy_to_cpu()
         return batch_output
 
-    def local_predict(self):
+    def normal_predict(self):
         image_list = get_image_list(self.args.image_file)
         batch_input_list = []
         filepath_list = []
@@ -54,20 +53,23 @@ class Predictor(object):
             img = cv2.imread(img_path)[:, :, ::-1]
             assert img is not None, "Error in loading image: {}".format(
                 img_path)
-            img = utils.preprocess(img, args)
+            img = preprocess(img, args)
             batch_input_list.append(img)
             filepath_list.append(img_path)
 
             if (idx + 1) % args.batch_size == 0 or (idx + 1
-                                                    ) == len(filepath_list):
+                                                    ) == len(image_list):
                 batch_outputs = self.predict(np.array(batch_input_list))
-                batch_result_list = utils.postprocess(batch_outputs,
-                                                      self.args.top_k)
+                batch_result_list = postprocess(batch_outputs, self.args.top_k)
 
                 for number, result_list in enumerate(batch_result_list):
                     filename = filepath_list[number].split("/")[-1]
+                    result_str = ", ".join([
+                        "{}: {:.2f}".format(d["cls"], d["score"])
+                        for d in result_list
+                    ])
                     print("File:{}, The top-{} result(s):{}".format(
-                        filename, self.args.top_k, result_list))
+                        filename, self.args.top_k, result_str))
                 batch_input_list = []
                 filepath_list = []
 
@@ -91,9 +93,9 @@ class Predictor(object):
 
 
 if __name__ == "__main__":
-    args = utils.parse_args()
+    args = parse_args()
     predictor = Predictor(args)
     if not args.enable_benchmark:
-        predictor.local_predict()
+        predictor.normal_predict()
     else:
         predictor.benchmark_predict()
