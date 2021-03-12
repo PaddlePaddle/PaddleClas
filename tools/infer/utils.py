@@ -14,6 +14,7 @@
 
 import os
 import argparse
+import base64
 import cv2
 import numpy as np
 
@@ -67,6 +68,9 @@ def parse_args():
         default=False,
         help="Whether to pre-label the images using the loaded weights")
     parser.add_argument("--pre_label_out_idr", type=str, default=None)
+
+    # parameters for test hubserving
+    parser.add_argument("--server_url", type=str)
 
     return parser.parse_args()
 
@@ -123,9 +127,9 @@ def postprocess(batch_outputs, topk=5):
     batch_results = []
     for probs in batch_outputs:
         results = []
-        index = probs.argsort(axis=0)[-topk:][::-1].astype('int32')
+        index = probs.argsort(axis=0)[-topk:][::-1].astype("int32")
         for i in index:
-            results.append({"cls": i, "prob": probs[i]})
+            results.append({"cls": i.item(), "score": probs[i].item()})
         batch_results.append(results)
     return batch_results
 
@@ -210,3 +214,22 @@ class Base64ToCV2(object):
         data = np.fromstring(data, np.uint8)
         data = cv2.imdecode(data, cv2.IMREAD_COLOR)[:, :, ::-1]
         return data
+
+
+class Base64ToNp(object):
+    def __init__(self):
+        pass
+
+    def __call__(self, b64str, revert_params):
+        shape = revert_params["shape"]
+        dtype = revert_params["dtype"]
+        dtype = getattr(np, dtype) if isinstance(str, dtype) else dtype
+        data = base64.b64decode(b64str.encode('utf8'))
+        data = np.fromstring(data, dtype).reshape(shape)
+        return data
+
+
+def np_to_base64(images):
+    img_str = base64.b64encode(images).decode('utf8')
+    # img_byte = base64.decodebytes(img_str)
+    return img_str, images.shape

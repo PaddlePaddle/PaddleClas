@@ -66,16 +66,18 @@ def main():
 
             for number, result_list in enumerate(batch_result):
                 filename = filepath_list[number].split("/")[-1]
+                result_str = ", ".join([
+                    "{}: {:.2f}".format(d["cls"], d["score"])
+                    for d in result_list
+                ])
                 print("File:{}, The top-{} result(s):{}".format(
-                    filename, args.top_k, result_list))
+                    filename, args.top_k, result_str))
                 if args.pre_label_image:
                     save_prelabel_results(result_list[0]["cls"],
                                           filepath_list[number],
                                           args.pre_label_out_idr)
             batch_list = []
             filepath_list = []
-
-    return
 
 
 if __name__ == "__main__":
