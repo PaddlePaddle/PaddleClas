@@ -46,6 +46,11 @@ def parse_args():
         action='append',
         default=[],
         help='config options to be overridden')
+    parser.add_argument(
+        "--fp16",
+        action='store_true',
+        default=False,
+        help="Enable mixed precision training.")
     args = parser.parse_args()
     return args
 
@@ -54,6 +59,8 @@ def main(args):
     paddle.seed(12345)
 
     config = get_config(args.config, overrides=args.override, show=True)
+    config['fp16'] = args.fp16
+    
     # assign the place
     use_gpu = config.get("use_gpu", True)
     place = paddle.set_device('gpu' if use_gpu else 'cpu')
