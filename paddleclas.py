@@ -37,7 +37,7 @@ import numpy as np
 import tarfile
 import requests
 from tqdm import tqdm
-from tools.infer.utils import get_image_list, preprocess, postprocess
+from tools.infer.utils import get_image_list, preprocess, postprocess, save_prelabel_results
 from tools.infer.predict import Predictor
 import shutil
 __all__ = ['PaddleClas']
@@ -130,13 +130,6 @@ def maybe_download(model_storage_directory, url):
                         'wb') as f:
                     f.write(file.read())
         os.remove(tmp_path)
-
-
-def save_prelabel_results(class_id, input_filepath, output_idr):
-    output_dir = os.path.join(output_idr, str(class_id))
-    if not os.path.isdir(output_dir):
-        os.makedirs(output_dir)
-    shutil.copy(input_filepath, output_dir)
 
 
 def load_label_name_dict(path):
