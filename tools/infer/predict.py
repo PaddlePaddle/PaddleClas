@@ -18,6 +18,7 @@ import time
 
 import sys
 sys.path.insert(0, ".")
+from ppcls.utils import logger
 from tools.infer.utils import parse_args, get_image_list, create_paddle_predictor, preprocess, postprocess
 
 
@@ -46,30 +47,37 @@ class Predictor(object):
     def normal_predict(self):
         image_list = get_image_list(self.args.image_file)
         batch_input_list = []
-        filepath_list = []
+        img_name_list = []
+        cnt = 0
         for idx, img_path in enumerate(image_list):
-            img = cv2.imread(img_path)[:, :, ::-1]
-            assert img is not None, "Error in loading image: {}".format(
-                img_path)
-            img = preprocess(img, args)
-            batch_input_list.append(img)
-            filepath_list.append(img_path)
+            img = cv2.imread(img_path)
+            if img is None:
+                logger.warning(
+                    "Image file failed to read and has been skipped. The path: {}".
+                    format(img_path))
+                continue
+            else:
+                img = img[:, :, ::-1]
+                img = preprocess(img, args)
+                batch_input_list.append(img)
+                img_name = img_path.split("/")[-1]
+                img_name_list.append(img_name)
+                cnt += 1
 
-            if (idx + 1) % args.batch_size == 0 or (idx + 1
-                                                    ) == len(image_list):
+            if cnt % args.batch_size == 0 or (idx + 1) == len(image_list):
                 batch_outputs = self.predict(np.array(batch_input_list))
                 batch_result_list = postprocess(batch_outputs, self.args.top_k)
 
                 for number, result_list in enumerate(batch_result_list):
-                    filename = filepath_list[number].split("/")[-1]
+                    filename = img_name_list[number]
                     result_str = ", ".join([
-                        "{}: {:.2f}".format(r["cls"], r["score"])
+                        "{}: {:.2f}".format(r["cls_id"], r["score"])
                         for r in result_list
                     ])
                     print("File:{}, The top-{} result(s):{}".format(
                         filename, self.args.top_k, result_str))
                 batch_input_list = []
-                filepath_list = []
+                img_name_list = []
 
     def benchmark_predict(self):
         test_num = 500

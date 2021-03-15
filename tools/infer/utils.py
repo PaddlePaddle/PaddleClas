@@ -129,7 +129,7 @@ def postprocess(batch_outputs, topk=5):
         results = []
         index = probs.argsort(axis=0)[-topk:][::-1].astype("int32")
         for i in index:
-            results.append({"cls": i.item(), "score": probs[i].item()})
+            results.append({"cls_id": i.item(), "score": probs[i].item()})
         batch_results.append(results)
     return batch_results
 
