@@ -15,6 +15,7 @@
 import os
 import argparse
 import base64
+import shutil
 import cv2
 import numpy as np
 
@@ -149,6 +150,13 @@ def get_image_list(img_file):
     if len(imgs_lists) == 0:
         raise Exception("not found any img file in {}".format(img_file))
     return imgs_lists
+
+
+def save_prelabel_results(class_id, input_file_path, output_dir):
+    output_dir = os.path.join(output_dir, str(class_id))
+    if not os.path.isdir(output_dir):
+        os.makedirs(output_dir)
+    shutil.copy(input_file_path, output_dir)
 
 
 class ResizeImage(object):

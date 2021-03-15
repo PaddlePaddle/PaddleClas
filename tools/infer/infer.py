@@ -14,7 +14,6 @@
 
 import numpy as np
 import cv2
-import shutil
 import os
 import sys
 
@@ -28,14 +27,7 @@ sys.path.append(os.path.abspath(os.path.join(__dir__, '../..')))
 from ppcls.utils.save_load import load_dygraph_pretrain
 from ppcls.utils import logger
 from ppcls.modeling import architectures
-from utils import parse_args, get_image_list, preprocess, postprocess
-
-
-def save_prelabel_results(class_id, input_file_path, output_dir):
-    output_dir = os.path.join(output_dir, str(class_id))
-    if not os.path.isdir(output_dir):
-        os.makedirs(output_dir)
-    shutil.copy(input_file_path, output_dir)
+from utils import parse_args, get_image_list, preprocess, postprocess, save_prelabel_results
 
 
 def main():

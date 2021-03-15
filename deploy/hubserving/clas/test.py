@@ -16,22 +16,13 @@ import os
 import sys
 __dir__ = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.path.abspath(os.path.join(__dir__, '../../../')))
-
+import argparse
 import numpy as np
 import cv2
 import paddlehub as hub
 from tools.infer.utils import preprocess
 
-
-class Args(object):
-    def __init__(self):
-        pass
-
-
-args = Args()
-args.resize_short = 256
-args.resize = 224
-args.normalize = True
+args = argparse.Namespace(resize_short=256, resize=224, normalize=True)
 
 img_path_list = ["./deploy/hubserving/ILSVRC2012_val_00006666.JPEG", ]
 
