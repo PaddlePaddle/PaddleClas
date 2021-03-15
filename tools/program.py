@@ -297,10 +297,12 @@ def run(dataloader,
                 "top1", '.5f', postfix=",")))
 
     metric_list = OrderedDict(metric_list)
-
-    if config.fp16:
-    scalar = amp.GradScaler(
-        enable=config.use_gpu, init_loss_scaling=1024)
+    
+    use_amp = config.get("use_amp", True)
+    use_gpu = config.get("use_gpu", True)
+    if use_amp:
+        scalar = amp.GradScaler(
+            enable=use_gpu, init_loss_scaling=1024)
     
     tic = time.time()
     for idx, batch in enumerate(dataloader()):
@@ -314,8 +316,8 @@ def run(dataloader,
         feeds = create_feeds(batch, use_mix)
         fetchs = create_fetchs(feeds, net, config, mode)
         if mode == 'train':
-            if config.fp16:
-                with amp.auto_cast(enable=config.use_gpu):
+            if use_amp:
+                with amp.auto_cast(enable=use_gpu):
                     avg_loss = fetchs['loss']
 
                 scaled_loss = scalar.scale(avg_loss)
