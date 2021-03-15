@@ -59,10 +59,11 @@ def main(args):
     paddle.seed(12345)
 
     config = get_config(args.config, overrides=args.override, show=True)
-    config['fp16'] = args.fp16
+    config["fp16"] = args.fp16
     
     # assign the place
     use_gpu = config.get("use_gpu", True)
+    config["use_gpu"] = use_gpu
     place = paddle.set_device('gpu' if use_gpu else 'cpu')
 
     trainer_num = paddle.distributed.get_world_size()
