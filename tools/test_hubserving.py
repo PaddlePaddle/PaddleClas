@@ -38,19 +38,23 @@ def main(args):
     start_time = time.time()
 
     batch_input_list = []
-    file_name_list = []
+    img_name_list = []
+    cnt = 0
     for idx, img_path in enumerate(image_path_list):
-        file_name = img_path.split('/')[-1]
-        img = cv2.imread(img_path)[:, :, ::-1]
+        img = cv2.imread(img_path)
         if img is None:
-            logger.error("Loading image:{} failed".format(img_path))
+            logger.warning(
+                "Image file failed to read and has been skipped. The path: {}".
+                format(img_path))
             continue
-        img = preprocess(img, args)
-
-        batch_input_list.append(img)
-        file_name_list.append(file_name)
-        if (idx + 1) % args.batch_size == 0 or (idx + 1
-                                                ) == len(image_path_list):
+        else:
+            img = img[:, :, ::-1]
+            data = preprocess(img, args)
+            batch_input_list.append(data)
+            img_name = img_path.split('/')[-1]
+            img_name_list.append(img_name)
+            cnt += 1
+        if cnt % args.batch_size == 0 or (idx + 1) == len(image_path_list):
             batch_input = np.array(batch_input_list)
             b64str, revert_shape = np_to_b64(batch_input)
             data = {
@@ -71,8 +75,8 @@ def main(args):
                     msg = r.json()["msg"]
                     raise Exception(msg)
             except Exception as e:
-                logger.error("{}, in file(s): {} etc.".format(
-                    e, file_name_list[0]))
+                logger.error("{}, in file(s): {} etc.".format(e, img_name_list[
+                    0]))
                 continue
             else:
                 results = r.json()["results"]
@@ -85,15 +89,15 @@ def main(args):
                 for number, result_list in enumerate(batch_result_list):
                     all_score += result_list[0]["score"]
                     result_str = ", ".join([
-                        "{}: {:.2f}".format(r["cls"], r["score"])
+                        "{}: {:.2f}".format(r["cls_id"], r["score"])
                         for r in result_list
                     ])
                     logger.info("File:{}, The top-{} result(s): {}".format(
-                        file_name_list[number], args.top_k, result_str))
+                        img_name_list[number], args.top_k, result_str))
 
             finally:
                 batch_input_list = []
-                file_name_list = []
+                img_name_list = []
 
     total_time = time.time() - start_time
     logger.info("The average time of prediction cost: {:.3f} s/image".format(
