@@ -22,6 +22,7 @@ import datetime
 from collections import OrderedDict
 
 import paddle
+from paddle import amp
 from paddle import to_tensor
 import paddle.nn as nn
 import paddle.nn.functional as F
@@ -297,6 +298,10 @@ def run(dataloader,
 
     metric_list = OrderedDict(metric_list)
 
+    if config.fp16:
+    scalar = amp.GradScaler(
+        enable=config.use_gpu, init_loss_scaling=1024)
+    
     tic = time.time()
     for idx, batch in enumerate(dataloader()):
         # avoid statistics from warmup time
@@ -309,10 +314,19 @@ def run(dataloader,
         feeds = create_feeds(batch, use_mix)
         fetchs = create_fetchs(feeds, net, config, mode)
         if mode == 'train':
-            avg_loss = fetchs['loss']
-            avg_loss.backward()
+            if config.fp16:
+                with amp.auto_cast(enable=config.use_gpu):
+                    avg_loss = fetchs['loss']
 
-            optimizer.step()
+                scaled_loss = scalar.scale(avg_loss)
+                scaled_loss.backward()
+                # in dygraph mode, optimizer.minimize is equal to optimizer.step
+                scalar.minimize(optimizer, scaled_loss)
+            else:
+                avg_loss = fetchs['loss']
+                avg_loss.backward()
+                optimizer.step()
+                
             optimizer.clear_grad()
             metric_list['lr'].update(
                 optimizer._global_learning_rate().numpy()[0], batch_size)
