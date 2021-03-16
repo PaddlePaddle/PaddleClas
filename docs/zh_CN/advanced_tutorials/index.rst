@@ -6,4 +6,5 @@
 
    image_augmentation/index
    distillation/index
+   multilabel/index
 
