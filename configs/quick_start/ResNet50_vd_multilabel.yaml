@@ -2,15 +2,14 @@ mode: 'train'
 ARCHITECTURE:
     name: 'ResNet50_vd'
 
-pretrained_model: "./pretrained/ResNet50_vd_10w_pretrained"
-load_static_weights: True
+pretrained_model: "./pretrained/ResNet50_vd_pretrained"
 model_save_dir: "./output/"
-classes_num: 5
-total_images: 2000
+classes_num: 33
+total_images: 17463
 save_interval: 1
 validate: True
 valid_interval: 1
-epochs: 100
+epochs: 10
 topk: 1
 image_shape: [3, 224, 224]
 
@@ -20,9 +19,9 @@ use_mix: False
 ls_epsilon: 0.1
 
 LEARNING_RATE:
-    function: 'CosineWarmup'          
+    function: 'Cosine'          
     params:                   
-        lr: 0.07               
+        lr: 0.07           
 
 OPTIMIZER:
     function: 'Momentum'
@@ -33,10 +32,10 @@ OPTIMIZER:
         factor: 0.000070
 
 TRAIN:
-    batch_size: 64
+    batch_size: 256
     num_workers: 4
-    file_list: "/path/to/multi_train_list_example.txt"
-    data_dir: "/path/to/image/directory"
+    file_list: "./dataset/NUS-SCENE-dataset/multilabel_train_list.txt"
+    data_dir: "./dataset/NUS-SCENE-dataset/images"
     shuffle_seed: 0
     transforms:
         - DecodeImage:
@@ -60,8 +59,8 @@ TRAIN:
 VALID:
     batch_size: 64
     num_workers: 4
-    file_list: "/path/to/val_list.txt"
-    data_dir: "/path/to/image/directory"
+    file_list: "./dataset/NUS-SCENE-dataset/multilabel_test_list.txt"
+    data_dir: "./dataset/NUS-SCENE-dataset/images"
     shuffle_seed: 0
     transforms:
         - DecodeImage:
