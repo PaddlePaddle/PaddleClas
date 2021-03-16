@@ -35,9 +35,9 @@ from ppcls.modeling.loss import JSDivLoss
 from ppcls.modeling.loss import GoogLeNetLoss
 from ppcls.utils.misc import AverageMeter
 from ppcls.utils import logger
-
-from sklearn.metrics import multilabel_confusion_matrix
-import numpy as np
+from ppcls.utils import multi_hot_encode
+from ppcls.utils import hamming_distance
+from ppcls.utils import accuracy_score
 
 
 def create_model(architecture, classes_num):
@@ -142,6 +142,7 @@ def create_metric(out,
             out = out[1]
     
     fetchs = OrderedDict()
+    metric_names = set()
     if not multilabel:
         softmax_out = F.softmax(out)
         
@@ -151,29 +152,33 @@ def create_metric(out,
         k = min(topk, classes_num)
         topk = paddle.metric.accuracy(softmax_out, label=label, k=k)
 
-        # multi cards' eval
-        if mode != "train" and paddle.distributed.get_world_size() > 1:
-            top1 = paddle.distributed.all_reduce(
-                top1, op=paddle.distributed.ReduceOp.
-                SUM) / paddle.distributed.get_world.size()
-            topk = paddle.distributed.all_reduce(
-                topk, op=paddle.distributed.ReduceOp.
-                SUM) / paddle.distributed.get_world_size()
+        metric_names.add("top1")
+        metric_names.add("top{}".format(k))
 
         fetchs['top1'] = top1
         topk_name = "top{}".format(k)
         fetchs[topk_name] = topk
     else:
         out = F.sigmoid(out)
-        accuracys = multilabel_metrics(out, label)
-        
-        # multi cards' eval
-        if mode != "train" and paddle.distributed.get_world_size() > 1:
-            accuracys = paddle.distributed.all_reduce(
-                accuracys, op=paddle.distributed.ReduceOp.
-                SUM) / paddle.distributed.get_world_size()
+        preds = multi_hot_encode(out.numpy())
+        targets = label.numpy()
+        ham_dist = to_tensor(hamming_distance(preds, targets))
+        accuracy = to_tensor(accuracy_score(preds, targets, base="label"))
 
-        fetchs["multilabel_accuracys"] = to_tensor(accuracys)
+        ham_dist_name = "hamming_distance"
+        accuracy_name = "multilabel_accuracy"
+        metric_names.add(ham_dist_name)
+        metric_names.add(accuracy_name)
+        
+        fetchs[accuracy_name] = accuracy
+        fetchs[ham_dist_name] = ham_dist
+
+    # multi cards' eval
+    if mode != "train" and paddle.distributed.get_world_size() > 1:
+        for metric_name in metric_names:
+            fetchs[metric_name] = paddle.distributed.all_reduce(
+                fetchs[metric_name], op=paddle.distributed.ReduceOp.
+                SUM) / paddle.distributed.get_world_size()
 
     return fetchs
 
@@ -279,28 +284,6 @@ def create_feeds(batch, use_mix, num_classes, multilabel=False):
     return feeds
 
 
-def multilabel_metrics(output, target):
-    pred = output.numpy()
-    preds = []
-    for items in pred:
-        p = np.zeros(len(items))
-        for i, item in enumerate(items):
-            if item >= 0.5:
-                p[i] = 1
-        preds.append(p)
-    preds = np.array(preds)
-    gt = target.numpy()
-    cm = multilabel_confusion_matrix(gt, preds)
-    tns = cm[:, 0, 0]
-    fns = cm[:, 1, 0]
-    tps = cm[:, 1, 1]
-    fps = cm[:, 0, 1]
-
-    accuracys = (sum(tps) + sum(tns)) / (sum(tps) + sum(tns) + sum(fns) + sum(fps))
-    
-    return accuracys
-
-
 def run(dataloader,
         config,
         net,
@@ -346,8 +329,10 @@ def run(dataloader,
                 0, ("top1", AverageMeter(
                     "top1", '.5f', postfix=",")))
         else:
-            metric_list.insert(0, ("multilabel_accuracys", AverageMeter(
-                                   "multilabel_accuracys", '.5f', postfix=",")))
+            metric_list.insert(0, ("multilabel_accuracy", AverageMeter(
+                                   "multilabel_accuracy", '.5f', postfix=",")))
+            metric_list.insert(0, ("hamming_distance", AverageMeter(
+                                   "hamming_distance", '.5f', postfix=",")))
 
     metric_list = OrderedDict(metric_list)
 
@@ -429,6 +414,6 @@ def run(dataloader,
     # return top1_acc in order to save the best model
     if mode == 'valid':
         if multilabel:
-            return metric_list['multilabel_accuracys']
+            return metric_list['multilabel_accuracy'].avg
         else:
             return metric_list['top1'].avg
