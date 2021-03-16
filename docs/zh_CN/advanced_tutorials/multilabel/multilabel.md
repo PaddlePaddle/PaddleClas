@@ -78,6 +78,6 @@ python tools/infer/infer.py \
 得到类似下面的输出：
 ```    
     class id: 3, probability: 0.6025
-	class id: 23, probability: 0.5491
-	class id: 32, probability: 0.7006
+    class id: 23, probability: 0.5491
+    class id: 32, probability: 0.7006
 ```
