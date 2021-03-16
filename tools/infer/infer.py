@@ -31,10 +31,13 @@ import utils
 from utils import get_image_list
 
 
-def postprocess(outputs, topk=5):
+def postprocess(outputs, topk=5, multilabel=False):
     output = outputs[0]
     prob = np.array(output).flatten()
-    index = prob.argsort(axis=0)[-topk:][::-1].astype('int32')
+    if multilabel:
+        index = np.where(prob >= 0.5)[0].astype('int32')
+    else:
+        index = prob.argsort(axis=0)[-topk:][::-1].astype('int32')
     return zip(index, prob[index])
 
 
@@ -49,6 +52,7 @@ def main():
     args = utils.parse_args()
     # assign the place
     place = paddle.set_device('gpu' if args.use_gpu else 'cpu')
+    multilabel = True if args.multilabel else False
 
     net = architectures.__dict__[args.model](class_dim=args.class_num)
     load_dygraph_pretrain(net, args.pretrained_model, args.load_static_weights)
@@ -62,23 +66,29 @@ def main():
         outputs = net(data)
         if args.model == "GoogLeNet":
             outputs = outputs[0]
-        outputs = F.softmax(outputs)
+        if multilabel:
+            outputs = F.sigmoid(outputs)
+        else:
+            outputs = F.softmax(outputs)
         outputs = outputs.numpy()
-        probs = postprocess(outputs)
+        probs = postprocess(outputs, multilabel=multilabel)
 
         top1_class_id = 0
         rank = 1
         print("Current image file: {}".format(filename))
         for idx, prob in probs:
-            print("\ttop{:d}, class id: {:d}, probability: {:.4f}".format(
-                rank, idx, prob))
-            if rank == 1:
-                top1_class_id = idx
-            rank += 1
+            if multilabel:
+                print("\tclass id: {:d}, probability: {:.4f}".format(idx, prob))
+            else:
+                print("\ttop{:d}, class id: {:d}, probability: {:.4f}".format(
+                      rank, idx, prob))
+                if rank == 1:
+                    top1_class_id = idx
+                rank += 1
 
-        if args.pre_label_image:
-            save_prelabel_results(top1_class_id, filename,
-                                  args.pre_label_out_idr)
+                if args.pre_label_image:
+                    save_prelabel_results(top1_class_id, filename,
+                                          args.pre_label_out_idr)
 
     return
 

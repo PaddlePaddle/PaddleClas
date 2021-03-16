@@ -29,6 +29,7 @@ def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument("-i", "--image_file", type=str)
     parser.add_argument("--use_gpu", type=str2bool, default=True)
+    parser.add_argument("--multilabel", type=str2bool, default=False)
 
     # params for preprocess
     parser.add_argument("--resize_short", type=int, default=256)
