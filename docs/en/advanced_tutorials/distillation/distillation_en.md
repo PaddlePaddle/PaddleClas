@@ -1,6 +1,7 @@
 
+# Knowledge Distillation
 
-# Introduction of model compression methods
+## Introduction of model compression methods
 
 In recent years, deep neural networks have been proven to be an extremely effective method to solve problems in the fields of computer vision and natural language processing. The deep learning methods performs better than traditional methods with suitable network structure and training process.
 
@@ -13,9 +14,9 @@ Parameter redundancy exists in deep neural networks. There are several methods t
 ![](../../../images/distillation/distillation_perform_s.jpg)
 
 
-# SSLD
+## SSLD
 
-## Introduction
+### Introduction
 
 The following figure shows the framework of SSLD.
 
@@ -34,22 +35,22 @@ First, we select nearly 4 million images from ImageNet22k dataset, and integrate
 * ImageNet1k finetune. ImageNet1k training set is used for finetuning, which brings a 0.4% accuracy improvement (`78.5%-> 78.9%`).
 
 
-## Data selection
+### Data selection
 
 * An important feature of the SSLD distillation scheme is no need for labeled images, so the dataset size can be arbitrarily expanded. Considering the limitation of computing resources, we here only expand the training set of the distillation task based on the ImageNet22k dataset. For SSLD, we used the `Top-k per class` data sampling scheme [3]. Specific steps are as follows.
-     * Deduplication of training set. We first deduplicate the ImageNet22k dataset and the ImageNet1k validation set based on the SIFT feature similarity matching method to prevent the added ImageNet22k training set from containing the ImageNet1k validation set images. Finally we removed 4511 similar images. Similar pictures with partial filtering are shown below.
+     * Deduplication of training set. We first deduplicate the ImageNet22k dataset and the ImageNet1k validation set based on the SIFT feature similarity matching method to prevent the added ImageNet22k training set from containing the ImageNet1k validation set images. Finally we removed 4511 similar images. Similar pictures with partial filtering are shown below.
 
     ![](../../../images/distillation/22k_1k_val_compare_w_sift.png)
 
     * Obtain the soft label of the ImageNet22k dataset. For the ImageNet22k dataset after deduplication, we use the `ResNeXt101_32x16d_wsl` model to make predictions to obtain the soft label of each image.
-     * Top-k data selection. There contains 1000 categories in ImageNet1k dataset. For each category, we find out images in the category with Top-k highest score, and finally generate a dataset whose image number does not exceed `1000 * k` (For some categories, there may contain less than k images).
-     * The selected images are merged with the ImageNet1k training set to form the new dataset used for the final distillation model training, which contains 5 million images in all.
+     * Top-k data selection. There contains 1000 categories in ImageNet1k dataset. For each category, we find out images in the category with Top-k highest score, and finally generate a dataset whose image number does not exceed `1000 * k` (For some categories, there may contain less than k images).
+     * The selected images are merged with the ImageNet1k training set to form the new dataset used for the final distillation model training, which contains 5 million images in all.
 
-# Experiments
+## Experiments
 
 The distillation solution that PaddleClas provides is combining common training with finetuning. Given a suitable teacher model, the large dataset(5 million) is used for common training and the ImageNet1k dataset is used for finetuning.
 
-## Choice of teacher model
+### Choice of teacher model
 
 In order to verify the influence of the model size difference between the teacher model and the student model on the distillation results as well as the teacher model accuracy, we conducted several experiments. The training strategy is unified as follows: `cosine_decay_warmup, lr = 1.3, epoch = 120, bs = 2048`, and the student models are all trained from scratch.
 
@@ -70,7 +71,7 @@ It can be shown from the table that:
 Therefore, during distillation, for the ResNet series student model, we use `ResNeXt101_32x16d_wsl` as the teacher model; for the MobileNet series student model, we use` ResNet50_vd_SSLD` as the teacher model.
 
 
-## Distillation using large-scale dataset
+### Distillation using large-scale dataset
 
 Training process is carried out on the large-scale dataset with 5 million images. Specifically, the following table shows more details of different models.
 
@@ -84,7 +85,7 @@ Training process is carried out on the large-scale dataset with 5 million images
 | ResNet101_vd | 360 | 7e-5 | 1024/32 | 0.4 | cosine_decay_warmup | 83.41% |
 | Res2Net200_vd_26w_4s | 360 | 4e-5 | 1024/32 | 0.4 | cosine_decay_warmup | 84.82% |
 
-## finetuning using ImageNet1k
+### finetuning using ImageNet1k
 
 Finetuning is carried out on ImageNet1k dataset to restore distribution between training set and test set. the following table shows more details of finetuning.
 
@@ -99,24 +100,24 @@ Finetuning is carried out on ImageNet1k dataset to restore distribution between 
 | ResNet101_vd | 30 | 7e-5 | 1024/32 | 0.004 | cosine_decay_warmup | 83.73% |
 | Res2Net200_vd_26w_4s | 360 | 4e-5 | 1024/32 | 0.004 | cosine_decay_warmup | 85.13% |
 
-## Data agmentation and Fix strategy
+### Data agmentation and Fix strategy
 
 * Based on experiments mentioned above, we add AutoAugment [4] during training process, and reduced l2_decay from 4e-5 t 2e-5. Finally, the Top-1 accuracy on ImageNet1k dataset can reach 82.99%, with 0.6% improvement compared to the standard SSLD distillation strategy.
 
 * For image classsification tasks, The model accuracy can be further improved when the test scale is 1.15 times that of training[5]. For the 82.99% ResNet50_vd pretrained model, it comes to 83.7% using 320x320 for the evaluation. We use Fix strategy to finetune the model with the training scale set as 320x320. During the process, the pre-preocessing pipeline is same for both training and test. All the weights except the fully connected layer are freezed. Finally the top-1 accuracy comes to **84.0%**.
 
 
-# Application of the distillation model
+## Application of the distillation model
 
-## Instructions
+### Instructions
 
 * Adjust the learning rate of the middle layer. The middle layer feature map of the model obtained by distillation is more refined. Therefore, when the distillation model is used as the pretrained model in other tasks, if the same learning rate as before is adopted, it is easy to destroy the features. If the learning rate of the overall model training is reduced, it will bring about the problem of slow convergence. Therefore, we use the strategy of adjusting the learning rate of the middle layer. specifically:
-    * For ResNet50_vd, we set up a learning rate list. The three conv2d convolution parameters before the resiual block have a uniform learning rate multiple, and the four resiual block conv2d have theirs own learning rate parameters, respectively. 5 values need to be set in the list. By the experiment, we find that when used for transfer learning finetune classification model, the learning rate list with `[0.1,0.1,0.2,0.2,0.3]` performs better in most tasks; while in the object detection tasks, `[0.05, 0.05, 0.05, 0.1, 0.15]` can bring greater accuracy gains.
-    * For MoblileNetV3_large_1x0, because it contains 15 blocks, we set each 3 blocks to share a learning rate, so 5 learning rate values are required. We find that in classification and detection tasks, the learning rate list with `[0.25, 0.25, 0.5, 0.5, 0.75]` performs better in most tasks.
+    * For ResNet50_vd, we set up a learning rate list. The three conv2d convolution parameters before the resiual block have a uniform learning rate multiple, and the four resiual block conv2d have theirs own learning rate parameters, respectively. 5 values need to be set in the list. By the experiment, we find that when used for transfer learning finetune classification model, the learning rate list with `[0.1,0.1,0.2,0.2,0.3]` performs better in most tasks; while in the object detection tasks, `[0.05, 0.05, 0.05, 0.1, 0.15]` can bring greater accuracy gains.
+    * For MoblileNetV3_large_1x0, because it contains 15 blocks, we set each 3 blocks to share a learning rate, so 5 learning rate values are required. We find that in classification and detection tasks, the learning rate list with `[0.25, 0.25, 0.5, 0.5, 0.75]` performs better in most tasks.
 * Appropriate l2 decay. Different l2 decay values are set for different models during training. In order to prevent overfitting, l2 decay is ofen set as large for large models. L2 decay is set as `1e-4` for ResNet50, and `1e-5 ~ 4e-5` for MobileNet series models. L2 decay needs also to be adjusted when applied in other tasks. Taking Faster_RCNN_MobiletNetV3_FPN as an example, we found that only modifying l2 decay can bring up to 0.5% accuracy (mAP) improvement on the COCO2017 dataset.
 
 
-## Transfer learning
+### Transfer learning
 
 * To verify the effect of the SSLD pretrained model in transfer learning, we carried out experiments on 10 small datasets. Here, in order to ensure the comparability of the experiment, we use the standard preprocessing process trained by the ImageNet1k dataset. For the distillation model, we also add a simple search method for the learning rate of the middle layers of the distillation pretrained model.
 * For ResNet50_vd, the baseline pretrained model Top-1 Acc is 79.12%, the other parameters are got by grid search. For distillation pretrained model, we add learning rate of the middle layers into the search space. The following table shows the results.
@@ -136,7 +137,7 @@ Finetuning is carried out on ImageNet1k dataset to restore distribution between 
 
 * It can be seen that on the above 10 datasets, combined with the appropriate middle layer learning rate, the distillation pretrained model can bring an average accuracy improvement of more than 1%.
 
-## Object detection
+### Object detection
 
 
 Based on the two-stage Faster/Cascade RCNN model, we verify the effect of the pretrained model obtained by distillation.
@@ -156,17 +157,17 @@ Training scale and test scale are set as 640x640, and some of the ablationstudie
 It can be seen here that for the baseline pretrained model, excessive adjustment of the middle-layer learning rate actually reduces the performance of the detection model. Based on this distillation model, we also provide a practical server-side detection solution. The detailed configuration and training code are open source, more details can be refer to [PaddleDetection] (https://github.com/PaddlePaddle/PaddleDetection/tree/master/configs/rcnn_enhance).
 
 
-# Practice
+## Practice
 
 This section will introduce the SSLD distillation experiments in detail based on the ImageNet-1K dataset. If you want to experience this method quickly, you can refer to [** Quick start PaddleClas in 30 minutes**] (../../tutorials/quick_start.md), whose dataset is set as Flowers102.
 
 
 
-## Configuration
+### Configuration
 
 
 
-### Distill ResNet50_vd using ResNeXt101_32x16d_wsl
+#### Distill ResNet50_vd using ResNeXt101_32x16d_wsl
 
 Configuration of distilling `ResNet50_vd` using `ResNeXt101_32x16d_wsl` is as follows.
 
@@ -180,7 +181,7 @@ pretrained_model: "./pretrained/ResNeXt101_32x16d_wsl_pretrained/"
 use_distillation: True
 ```
 
-### Distill MobileNetV3_large_x1_0 using ResNet50_vd_ssld
+#### Distill MobileNetV3_large_x1_0 using ResNet50_vd_ssld
 
 The detailed configuration is as follows.
 
@@ -194,7 +195,7 @@ pretrained_model: "./pretrained/ResNet50_vd_ssld_pretrained/"
 use_distillation: True
 ```
 
-## Begin to train the network
+### Begin to train the network
 
 If everything is ready, users can begin to train the network using the following command.
 
@@ -208,7 +209,7 @@ python -m paddle.distributed.launch \
         -c ./configs/Distillation/R50_vd_distill_MV3_large_x1_0.yaml
 ```
 
-## Note
+### Note
 
 * Before using SSLD, users need to train a teacher model on the target dataset firstly. The teacher model is used to guide the training of the student model.
 
@@ -225,7 +226,7 @@ python -m paddle.distributed.launch \
 > If this document is helpful to you, welcome to star our project: [https://github.com/PaddlePaddle/PaddleClas](https://github.com/PaddlePaddle/PaddleClas)
 
 
-# Reference
+## Reference
 
 [1] Hinton G, Vinyals O, Dean J. Distilling the knowledge in a neural network[J]. arXiv preprint arXiv:1503.02531, 2015.
 

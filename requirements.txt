@@ -1,5 +1,5 @@
 ujson
-opencv-python
+opencv-python==4.1.1.26
 pillow
 tqdm
 PyYAML
