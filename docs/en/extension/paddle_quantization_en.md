@@ -9,4 +9,4 @@ By using this toolkit, [PaddleClas](https://github.com/PaddlePaddle/PaddleClas) 
 After quantized, the prediction speed is accelerated from 19.308ms to 14.395ms on SD855.
 The storage size is reduced from 21M to 10M.
 The top1 recognition accuracy rate is 75.9%.
-For specific training methods, please refer to [PaddleSlim quant aware](../../../deploy/slim/quant/README.md)。
+For specific training methods, please refer to [PaddleSlim quant aware](../../../deploy/slim/quant/README_en.md)。
