@@ -48,10 +48,8 @@ class Loss(object):
             cost = F.binary_cross_entropy_with_logits(logit=input, label=target)
         else:
             cost = F.binary_cross_entropy_with_logits(logit=input, label=target)
-        if use_pure_fp16:
-            avg_cost = paddle.sum(cost)
-        else:
-            avg_cost = paddle.mean(cost)
+        
+        avg_cost = paddle.mean(cost)
 
         return avg_cost
 

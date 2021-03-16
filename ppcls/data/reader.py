@@ -13,6 +13,7 @@
 # limitations under the License.
 
 import numpy as np
+import random
 import imghdr
 import os
 import signal
@@ -208,16 +209,20 @@ class MultiLabelDataset(Dataset):
         return
 
     def __getitem__(self, idx):
-        line = self.full_lines[idx]
-        img_path, label_str = line.split(self.delimiter)
-        img_path = os.path.join(self.params["data_dir"], img_path)
-        with open(img_path, "rb") as f:
-            img = f.read()
+        try:
+            line = self.full_lines[idx]
+            img_path, label_str = line.split(self.delimiter)
+            img_path = os.path.join(self.params["data_dir"], img_path)
+            with open(img_path, "rb") as f:
+                img = f.read()
 
-        labels = label_str.split(',')
-        labels = [int(i) for i in labels]
+            labels = label_str.split(',')
+            labels = [int(i) for i in labels]
 
-        return (transform(img, self.ops), np.array(labels).astype("float32"))
+            return (transform(img, self.ops), np.array(labels).astype("float32"))
+        except Exception as e:
+            logger.error("data read failed: {}, exception info: {}".format(line, e))
+            return self.__getitem__(random.randint(0, len(self)))
 
     def __len__(self):
         return self.num_samples
