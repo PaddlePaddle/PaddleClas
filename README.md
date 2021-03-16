@@ -85,6 +85,7 @@ PaddleClas is a toolset for image classification tasks prepared for the industry
 - Advanced tutorials
     - [Knowledge distillation](./docs/en/advanced_tutorials/distillation/distillation_en.md)
     - [Data augmentation](./docs/en/advanced_tutorials/image_augmentation/ImageAugment_en.md)
+    - [Multilabel classification](./docs/en/advanced_tutorials/multilabel/multilabel_en.md)
 - Applications
     - [Transfer learning](./docs/en/application/transfer_learning_en.md)
     - [Pretrained model with 100,000 categories](./docs/en/application/transfer_learning_en.md)
