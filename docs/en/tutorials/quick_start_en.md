@@ -171,13 +171,14 @@ python3 tools/train.py -c ./configs/quick_start/ResNet50_vd_ssld_random_erasin
 
 It improves by 1.27\% to 96.27\%
 
-* Save ResNet50_vd pretrained model to experience next chapter.
+
+### Distillation
+
+* The ResNet50_vd model pretrained on previous chapter will be used as the teacher model to train student model. Save the model to specified directory, command as follows:
 
 ```shell
 cp -r output/ResNet50_vd/19/  ./pretrained/flowers102_R50_vd_final/
 ```
-
-### Distillation
 
 * Use `extra_list.txt` as unlabeled data, Note:
     * Samples in the `extra_list.txt` and `val_list.txt` don't have intersection
