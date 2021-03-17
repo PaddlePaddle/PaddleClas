@@ -116,12 +116,7 @@ python3 tools/infer/infer.py \
 The output is as follows. Top-5 class ids and their scores are printed.
 
 ```
-Current image file: docs/images/quick_start/flowers102/image_06739.jpg
-    top1, class id: 0, probability: 0.5129
-    top2, class id: 50, probability: 0.0671
-    top3, class id: 18, probability: 0.0377
-    top4, class id: 82, probability: 0.0238
-    top5, class id: 54, probability: 0.0231
+File:image_06739.jpg, The top-5 result(s):0: 0.79, 96: 0.02, 18: 0.01, 50: 0.01, 51: 0.01
 ```
 
 * Note: Results are different for different models, so you might get different results for the command.
