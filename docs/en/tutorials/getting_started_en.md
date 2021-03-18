@@ -234,15 +234,7 @@ Among them, the `--model` parameter is used to specify the model name, `--pretra
 
 **Note**:
 1. If `--output_path=./inference`, then three files will be generated in the folder `inference`, they are `inference.pdiparams`, `inference.pdmodel` and `inference.pdiparams.info`.
-2. In the file `export_model.py:line53`, the `shape` parameter is the shape of the model input image, the default is `224*224`. Please modify it according to the actual situation, as shown below:
-
-```python
-50 # Please modify the 'shape' according to actual needs
-51 @to_static(input_spec=[
-52     paddle.static.InputSpec(
-53         shape=[None, 3, 224, 224], dtype='float32')
-54 ])
-```
+2. You can specify the `shape` of the model input image by setting the parameter `--img_size`, the default is `224`, which means the shape of input image is `224*224`.
 
 The above command will generate the model structure file (`inference.pdmodel`) and the model weight file (`inference.pdiparams`), and then the inference engine can be used for inference:
 
