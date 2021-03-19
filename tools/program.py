@@ -258,7 +258,9 @@ def run(dataloader,
         optimizer=None,
         lr_scheduler=None,
         epoch=0,
-        mode='train'):
+        mode='train',
+        vdl_writer=None
+    ):
     """
     Feed data to the model and fetch the measures and loss
 
@@ -371,6 +373,11 @@ def run(dataloader,
             logger.coloring(end_str, "OKGREEN"),
             logger.coloring(ips_info, "OKGREEN"), ))
 
+    if vdl_writer:
+        vdl_writer.add_scalar("loss", metric_list['loss'].avg, epoch)
+        vdl_writer.add_scalar("acc", metric_list['top1'].avg, epoch)
+        if mode == 'train':
+            vdl_writer.add_scalar("lr", metric_list['lr'].avg, epoch)
     # return top1_acc in order to save the best model
     if mode == 'valid':
         return metric_list['top1'].avg
