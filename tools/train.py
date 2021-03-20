@@ -46,6 +46,8 @@ def parse_args():
         action='append',
         default=[],
         help='config options to be overridden')
+    parser.add_argument(
+        '--vdl_dir', type=str, default=None, help="Visual DL log saved path")
     args = parser.parse_args()
     return args
 
@@ -83,33 +85,44 @@ def main(args):
     last_epoch_id = config.get("last_epoch", -1)
     best_top1_acc = 0.0  # best top1 acc record
     best_top1_epoch = last_epoch_id
-    for epoch_id in range(last_epoch_id + 1, config.epochs):
-        net.train()
-        # 1. train with train dataset
-        program.run(train_dataloader, config, net, optimizer, lr_scheduler,
-                    epoch_id, 'train')
 
-        # 2. validate with validate dataset
-        if config.validate and epoch_id % config.valid_interval == 0:
-            net.eval()
-            with paddle.no_grad():
-                top1_acc = program.run(valid_dataloader, config, net, None,
-                                       None, epoch_id, 'valid')
-            if top1_acc > best_top1_acc:
-                best_top1_acc = top1_acc
-                best_top1_epoch = epoch_id
+    vdl_writer = None
+    if args.vdl_dir:
+        from visualdl import LogWriter
+        vdl_writer = LogWriter(args.vdl_dir)
+    # Ensure that the vdl log file can be closed normally
+    try:
+        for epoch_id in range(last_epoch_id + 1, config.epochs):
+            net.train()
+            # 1. train with train dataset
+            program.run(train_dataloader, config, net, optimizer, lr_scheduler,
+                        epoch_id, 'train', vdl_writer)
+
+            # 2. validate with validate dataset
+            if config.validate and epoch_id % config.valid_interval == 0:
+                net.eval()
+                with paddle.no_grad():
+                    top1_acc = program.run(valid_dataloader, config, net, None,
+                                           None, epoch_id, 'valid', vdl_writer)
+                if top1_acc > best_top1_acc:
+                    best_top1_acc = top1_acc
+                    best_top1_epoch = epoch_id
+                    model_path = os.path.join(config.model_save_dir,
+                                              config.ARCHITECTURE["name"])
+                    save_model(net, optimizer, model_path, "best_model")
+                message = "The best top1 acc {:.5f}, in epoch: {:d}".format(
+                    best_top1_acc, best_top1_epoch)
+                logger.info(message)
+
+            # 3. save the persistable model
+            if epoch_id % config.save_interval == 0:
                 model_path = os.path.join(config.model_save_dir,
                                           config.ARCHITECTURE["name"])
-                save_model(net, optimizer, model_path, "best_model")
-            message = "The best top1 acc {:.5f}, in epoch: {:d}".format(
-                best_top1_acc, best_top1_epoch)
-            logger.info(message)
-
-        # 3. save the persistable model
-        if epoch_id % config.save_interval == 0:
-            model_path = os.path.join(config.model_save_dir,
-                                      config.ARCHITECTURE["name"])
-            save_model(net, optimizer, model_path, epoch_id)
+                save_model(net, optimizer, model_path, epoch_id)
+    except Exception as e:
+        logger.error(e)
+    finally:
+        vdl_writer.close() if vdl_writer else None
 
 
 if __name__ == '__main__':
