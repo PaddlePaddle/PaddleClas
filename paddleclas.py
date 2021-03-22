@@ -292,6 +292,7 @@ class PaddleClas(object):
         """
         if isinstance(input_data, np.ndarray):
             if not self.args.is_preprocessed:
+                input_data = input_data[:, :, ::-1]
                 input_data = preprocess(input_data, self.args)
             input_data = np.expand_dims(input_data, axis=0)
             batch_outputs = self.predictor.predict(input_data)
@@ -336,11 +337,29 @@ class PaddleClas(object):
                     for number, output in enumerate(batch_outputs):
                         result = self.postprocess(output)
                         result["filename"] = img_path_list[number]
+
+                        result_str = ""
+                        result_str += "filename: " + result["filename"] + "; "
+                        result_str += "class id: " + ", ".join([
+                            "{}".format(class_id)
+                            for class_id in result["class_ids"]
+                        ]) + "; "
+                        result_str += "scores: " + ", ".join([
+                            "{:.4f}".format(score)
+                            for score in result["scores"]
+                        ]) + "; "
+                        result_str += "label: " + ", ".join([
+                            "{}".format(label)
+                            for label in result["label_names"]
+                        ])
+                        print(result_str)
+
                         total_result.append(result)
                         if self.args.pre_label_image:
                             save_prelabel_results(result["class_ids"][0],
                                                   img_path_list[number],
                                                   self.args.pre_label_out_idr)
+
                     batch_input_list = []
                     img_path_list = []
             return total_result
@@ -358,16 +377,6 @@ def main():
     print('{}{}{}'.format('*' * 10, args.image_file, '*' * 10))
     total_result = clas_engine.predict(args.image_file)
 
-    for result in total_result:
-        result_str = ""
-        result_str += "filename: " + result["filename"] + "; "
-        result_str += "class id: " + ", ".join(
-            ["{}".format(class_id) for class_id in result["class_ids"]]) + "; "
-        result_str += "scores: " + ", ".join(
-            ["{:.4f}".format(score) for score in result["scores"]]) + "; "
-        result_str += "label: " + ", ".join(
-            ["{}".format(label) for label in result["label_names"]])
-        print(result_str)
     print("Predict complete!")
 
 
