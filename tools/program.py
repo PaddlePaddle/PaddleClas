@@ -253,13 +253,17 @@ def create_feeds(batch, use_mix):
     return feeds
 
 
+total_step = 0
+
+
 def run(dataloader,
         config,
         net,
         optimizer=None,
         lr_scheduler=None,
         epoch=0,
-        mode='train'):
+        mode='train',
+        vdl_writer=None):
     """
     Feed data to the model and fetch the measures and loss
 
@@ -314,8 +318,8 @@ def run(dataloader,
 
             optimizer.step()
             optimizer.clear_grad()
-            metric_list['lr'].update(
-                optimizer._global_learning_rate().numpy()[0], batch_size)
+            lr_value = optimizer._global_learning_rate().numpy()[0]
+            metric_list['lr'].update(lr_value, batch_size)
 
             if lr_scheduler is not None:
                 if lr_scheduler.update_specified:
@@ -332,6 +336,18 @@ def run(dataloader,
             metric_list[name].update(fetch.numpy()[0], batch_size)
         metric_list["batch_time"].update(time.time() - tic)
         tic = time.time()
+
+        if vdl_writer and mode == "train":
+            global total_step
+            logger.scaler(
+                name="lr", value=lr_value, step=total_step, writer=vdl_writer)
+            for name, fetch in fetchs.items():
+                logger.scaler(
+                    name="train_{}".format(name),
+                    value=fetch.numpy()[0],
+                    step=total_step,
+                    writer=vdl_writer)
+            total_step += 1
 
         fetchs_str = ' '.join([
             str(metric_list[key].mean)
@@ -366,7 +382,6 @@ def run(dataloader,
         logger.info("END {:s} {:s} {:s}".format(mode, end_str, ips_info))
     else:
         end_epoch_str = "END epoch:{:<3d}".format(epoch)
-
         logger.info("{:s} {:s} {:s} {:s}".format(end_epoch_str, mode, end_str,
                                                  ips_info))
 
