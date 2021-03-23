@@ -46,8 +46,6 @@ def parse_args():
         action='append',
         default=[],
         help='config options to be overridden')
-    parser.add_argument(
-        '--vdl_dir', type=str, default=None, help="Visual DL log saved path")
     args = parser.parse_args()
     return args
 
@@ -86,10 +84,11 @@ def main(args):
     best_top1_acc = 0.0  # best top1 acc record
     best_top1_epoch = last_epoch_id
 
+    vdl_writer_path = config.get("vdl_dir", None)
     vdl_writer = None
-    if args.vdl_dir:
+    if vdl_writer_path:
         from visualdl import LogWriter
-        vdl_writer = LogWriter(args.vdl_dir)
+        vdl_writer = LogWriter(vdl_writer_path)
     # Ensure that the vdl log file can be closed normally
     try:
         for epoch_id in range(last_epoch_id + 1, config.epochs):
