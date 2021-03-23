@@ -38,7 +38,7 @@ Of course, you can also directly modify the configuration file to update the con
     epoch:0    train    step:13    loss:7.9561    top1:0.0156    top5:0.1094    lr:0.100000    elapse:0.193s
     ```
 
-During training, you can view loss changes in real time through `VisualDL`,  see [VisualDL](https://github.com/PaddlePaddle/VisualDL) for details.
+During training, you can view loss changes in real time through `VisualDL`,  see [VisualDL](../extension/VisualDL.md) for details.
 
 ### 1.2 Model finetuning
 
