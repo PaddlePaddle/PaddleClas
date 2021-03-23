@@ -245,14 +245,7 @@ python tools/export_model.py \
 
 **注意**：
 1. `--output_path`表示输出的inference模型文件夹路径，若`--output_path=./inference`，则会在`inference`文件夹下生成`inference.pdiparams`、`inference.pdmodel`和`inference.pdiparams.info`文件。
-2. 文件`export_model.py:line53`中，`shape`参数为模型输入图像的`shape`，默认为`224*224`，请根据实际情况修改，如下所示：
-```python
-50 # Please modify the 'shape' according to actual needs
-51 @to_static(input_spec=[
-52     paddle.static.InputSpec(
-53         shape=[None, 3, 224, 224], dtype='float32')
-54 ])
-```
+2. 可以通过设置参数`--img_size`指定模型输入图像的`shape`，默认为`224`，表示图像尺寸为`224*224`，请根据实际情况修改。
 
 上述命令将生成模型结构文件（`inference.pdmodel`）和模型权重文件（`inference.pdiparams`），然后可以使用预测引擎进行推理：
 
