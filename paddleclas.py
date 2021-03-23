@@ -359,7 +359,6 @@ class PaddleClas(object):
                             save_prelabel_results(result["class_ids"][0],
                                                   img_path_list[number],
                                                   self.args.pre_label_out_idr)
-
                     batch_input_list = []
                     img_path_list = []
             return total_result
