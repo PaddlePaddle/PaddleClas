@@ -46,7 +46,7 @@ python tools/train.py \
     epoch:0    train    step:13    loss:7.9561    top1:0.0156    top5:0.1094    lr:0.100000    elapse:0.193s
     ```
 
-训练期间也可以通过VisualDL实时观察loss变化，详见[VisualDL](https://github.com/PaddlePaddle/VisualDL)。
+训练期间也可以通过VisualDL实时观察loss变化，详见[VisualDL](./extension/VisualDL.md)。
 
 ### 1.2 模型微调
 
