@@ -25,7 +25,7 @@ pip3 install dist/paddleclas-x.x.x-py3-none-any.whl # x.x.x是paddleclas的版�
 
 ```python
 from paddleclas import PaddleClas
-clas = PaddleClas(model_name='ResNet50', use_gpu=True, top_k=5)
+clas = PaddleClas(model_name='ResNet50', top_k=5)
 image_file='docs/images/whl/demo.jpg'
 result=clas.predict(image_file)
 print(result)
@@ -39,7 +39,7 @@ print(result)
 
 * 使用命令行式交互方法。直接获得结果。
 ```bash
-paddleclas --model_name=ResNet50 --use_gpu=True --top_k 5 -i docs/images/whl/demo.jpg
+paddleclas --model_name=ResNet50 --top_k=5 --image_file='docs/images/whl/demo.jpg'
 ```
 
 ```
@@ -52,10 +52,10 @@ paddleclas --model_name=ResNet50 --use_gpu=True --top_k 5 -i docs/images/whl/dem
 ### 2. 参数解释
 以下参数可在命令行交互使用时通过参数指定，或在Python代码中实例化PaddleClas对象时作为构造函数的参数使用。
 * model_name(str): 模型名称，没有指定自定义的model_file和params_file时，可以指定该参数，使用PaddleClas提供的基于ImageNet1k的inference model，默认值为ResNet50。
-* image_file(str or NumPy.ndarray): 图像地址，支持指定单一图像的路径或图像的网址进行预测，支持指定包含图像的文件夹路径，支持NumPy.ndarray格式的三通道图像数据，且通道顺序为[B, G, R]。
+* image_file(str or numpy.ndarray): 图像地址，支持指定单一图像的路径或图像的网址进行预测，支持指定包含图像的文件夹路径，支持numpy.ndarray格式的三通道图像数据，且通道顺序为[B, G, R]。
 * use_gpu(bool): 是否使用GPU，如果使用，指定为True。默认为False。
 * use_tensorrt(bool): 是否开启TensorRT预测，可提升GPU预测性能，需要使用带TensorRT的预测库。当使用TensorRT推理加速，指定为True。默认为False。
-* is_preprocessed(bool): 当image_file为NumPy.ndarray格式的图像数据时，图像数据是否已经过预处理。如果该参数为True，则不再对image_file数据进行预处理，否则将转换通道顺序后，按照resize_short，resize，normalize参数对图像进行预处理。默认值为False。
+* is_preprocessed(bool): 当image_file为numpy.ndarray格式的图像数据时，图像数据是否已经过预处理。如果该参数为True，则不再对image_file数据进行预处理，否则将转换通道顺序后，按照resize_short，resize，normalize参数对图像进行预处理。默认值为False。
 * resize_short(int): 将图像的高宽二者中小的值，调整到指定的resize_short值，大的值按比例放大。默认为256。
 * resize(int): 将图像裁剪到指定的resize值大小，默认224。
 * normalize(bool): 是否对图像数据归一化，默认True。
@@ -88,16 +88,16 @@ paddleclas -h
 ###### python
 ```python
 from paddleclas import PaddleClas
-clas = PaddleClas(model_file='user-specified model path',
-    params_file='parmas path', use_gpu=True)
-image_file = '' # image_file 可指定为前缀是https的网络图片，也可指定为本地图片
+clas = PaddleClas(model_file='the path of model file',
+    params_file='the path of params file')
+image_file = 'docs/images/whl/demo.jpg' # image_file 可指定为前缀是https的网络图片，也可指定为本地图片
 result=clas.predict(image_file)
 print(result)
 ```
 
 ###### bash
 ```bash
-paddleclas --model_file='user-specified model path' --params_file='parmas path' --image_file='image path' --use_gpu=True
+paddleclas --model_file='user-specified model path' --params_file='parmas path' --image_file='docs/images/whl/demo.jpg'
 ```
 
 * 用户使用PaddlePaddle训练好的inference model来预测，并通过参数`model_name`指定。
@@ -106,24 +106,24 @@ paddleclas --model_file='user-specified model path' --params_file='parmas path' 
 ###### python
 ```python
 from paddleclas import PaddleClas
-clas = PaddleClas(model_name='ResNet50', use_gpu=True)
-image_file = '' # image_file 可指定为前缀是https的网络图片，也可指定为本地图片
+clas = PaddleClas(model_name='ResNet50')
+image_file = 'docs/images/whl/demo.jpg' # image_file 可指定为前缀是https的网络图片，也可指定为本地图片
 result=clas.predict(image_file)
 print(result)
 ```
 
 ###### bash
 ```bash
-paddleclas --model_name='ResNet50' --image_file='image path' --use_gpu=True
+paddleclas --model_name='ResNet50' --image_file='docs/images/whl/demo.jpg'
 ```
 
-* 用户可以使用NumPy.ndarray格式的图像数据，并通过参数`image_file`指定。注意该图像数据必须为三通道图像数据。如需对图像进行预处理，则图像通道顺序必须为[B, G, R]。
+* 用户可以使用numpy.ndarray格式的图像数据，并通过参数`image_file`指定。注意该图像数据必须为三通道图像数据。如需对图像进行预处理，则图像通道顺序必须为[B, G, R]。
 
 ###### python
 ```python
 import cv2
 from paddleclas import PaddleClas
-clas = PaddleClas(model_name='ResNet50', use_gpu=True)
+clas = PaddleClas(model_name='ResNet50')
 image_file = cv2.imread("docs/images/whl/demo.jpg")
 result=clas.predict(image_file)
 ```
@@ -133,15 +133,15 @@ result=clas.predict(image_file)
 ###### python
 ```python
 from paddleclas import PaddleClas
-clas = PaddleClas(model_name='ResNet50', use_gpu=True)
-image_file = '' # it can be image_file folder path which contains all of images you want to predict.
+clas = PaddleClas(model_name='ResNet50')
+image_file = 'docs/images/whl/' # it can be image_file folder path which contains all of images you want to predict.
 result=clas.predict(image_file)
 print(result)
 ```
 
 ###### bash
 ```bash
-paddleclas --model_name='ResNet50' --image_file='the directory containing image files' --use_gpu=True
+paddleclas --model_name='ResNet50' --image_file='docs/images/whl/'
 ```
 
 * 用户可以指定`pre_label_image=True`, `pre_label_out_idr='./output_pre_label/'`，将图片按其top1预测结果保存到`pre_label_out_dir`目录下对应类别的文件夹中。
@@ -149,15 +149,15 @@ paddleclas --model_name='ResNet50' --image_file='the directory containing image 
 ###### python
 ```python
 from paddleclas import PaddleClas
-clas = PaddleClas(model_name='ResNet50',use_gpu=True, pre_label_image=True,pre_label_out_idr='./output_pre_label/')
-image_file = '' # it can be image_file folder path which contains all of images you want to predict.
+clas = PaddleClas(model_name='ResNet50', pre_label_image=True,pre_label_out_idr='./output_pre_label/')
+image_file = 'docs/images/whl/' # it can be image_file folder path which contains all of images you want to predict.
 result=clas.predict(image_file)
 print(result)
 ```
 
 ###### bash
 ```bash
-paddleclas --model_name='ResNet50' --image_file='image path' --use_gpu=True --pre_label_image=True --pre_label_out_idr='./output_pre_label/'
+paddleclas --model_name='ResNet50' --image_file='docs/images/whl/' --pre_label_image=True --pre_label_out_idr='./output_pre_label/'
 ```
 
 * 用户可以通过参数`label_name_path`指定模型的`label_dict_file`文件路径，文件内容格式应为(class_id<space>class_name<\n>)，例如：
@@ -176,27 +176,27 @@ paddleclas --model_name='ResNet50' --image_file='image path' --use_gpu=True --pr
 ###### python
 ```python
 from paddleclas import PaddleClas
-clas = PaddleClas(model_file='./inference.pdmodel', params_file ='./inference.pdiparams', label_name_path='./ppcls/utils/imagenet1k_label_list.txt', use_gpu=True)
-image_file = '' # it can be image_file folder path which contains all of images you want to predict.
+clas = PaddleClas(model_file='the path of model file', params_file ='the path of params file', label_name_path='./ppcls/utils/imagenet1k_label_list.txt')
+image_file = 'docs/images/whl/demo.jpg' # it can be image_file folder path which contains all of images you want to predict.
 result=clas.predict(image_file)
 print(result)
 ```
 
 ###### bash
 ```bash
-paddleclas --model_file='./inference.pdmodel' --params_file ='./inference.pdiparams' --image_file='image path' --label_name_path='./ppcls/utils/imagenet1k_label_list.txt'
+paddleclas --model_file='the path of model file' --params_file='the path of params file' --image_file='docs/images/whl/demo.jpg' --label_name_path='./ppcls/utils/imagenet1k_label_list.txt'
 ```
 
 ###### python
 ```python
 from paddleclas import PaddleClas
-clas = PaddleClas(model_name='ResNet50',use_gpu=False)
-image_file = '' # it can be image_file folder path which contains all of images you want to predict.
+clas = PaddleClas(model_name='ResNet50')
+image_file = 'docs/images/whl/' # it can be image_file folder path which contains all of images you want to predict.
 result=clas.predict(image_file)
 print(result)
 ```
 
 ###### bash
 ```bash
-paddleclas --model_name='ResNet50' --image_file='image path'
+paddleclas --model_name='ResNet50' --image_file='docs/images/whl/'
 ```

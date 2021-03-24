@@ -1,5 +1,6 @@
 include LICENSE.txt
 include README.md
+include docs/en/whl_en.md
 
 recursive-include tools/infer utils.py predict.py
 recursive-include ppcls/utils logger.py
