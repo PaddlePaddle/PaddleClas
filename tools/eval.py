@@ -13,6 +13,7 @@
 # limitations under the License.
 
 import paddle
+import paddle.nn.functional as F
 
 import argparse
 import os
@@ -87,6 +88,7 @@ def main(args, return_dict={}):
             for idx, batch in enumerate(valid_dataloader()):
                 feeds = program.create_feeds(batch, False, config.classes_num, multilabel)
                 out = net(feeds["image"])
+                out = F.sigmoid(out)
 
                 use_distillation = config.get("use_distillation", False)
                 if use_distillation:
