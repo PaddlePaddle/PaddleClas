@@ -1,4 +1,5 @@
 
+dependencies = ['paddle', 'numpy']
 
 
 from ppcls.modeling.architectures.resnet import ResNet18 as _ResNet18
