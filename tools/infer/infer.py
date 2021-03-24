@@ -65,18 +65,18 @@ def main():
             batch_outputs = batch_outputs.numpy()
             batch_result_list = postprocess(batch_outputs, args.top_k)
 
-            for number, result_list in enumerate(batch_result_list):
+            for number, result_dict in enumerate(batch_result_list):
                 filename = img_path_list[number].split("/")[-1]
-                result_str = ", ".join([
-                    "{}: {:.2f}".format(r["cls_id"], r["score"])
-                    for r in result_list
-                ])
-                print("File:{}, The top-{} result(s):{}".format(
-                    filename, args.top_k, result_str))
+                clas_ids = result_dict["clas_ids"]
+                scores_str = "[{}]".format(", ".join("{:.2f}".format(
+                    r) for r in result_dict["scores"]))
+                print("File:{}, Top-{} result: class id(s): {}, score(s): {}".
+                      format(filename, args.top_k, clas_ids, scores_str))
+
                 if args.pre_label_image:
-                    save_prelabel_results(result_list[0]["cls_id"],
-                                          img_path_list[number],
+                    save_prelabel_results(clas_ids[0], img_path_list[number],
                                           args.pre_label_out_idr)
+
             batch_input_list = []
             img_path_list = []
 

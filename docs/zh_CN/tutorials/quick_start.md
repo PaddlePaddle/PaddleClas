@@ -112,7 +112,8 @@ python3 tools/infer/infer.py \
 最终可以得到如下结果，打印出了Top-5对应的class id以及score。
 
 ```
-File:image_06739.jpg, The top-5 result(s):0: 0.79, 96: 0.02, 18: 0.01, 50: 0.01, 51: 0.01```
+File:image_06739.jpg, Top-5 result: class id(s): [0, 96, 18, 50, 51], score(s): [0.79, 0.02, 0.01, 0.01, 0.01]
+```
 
 * 注意：这里每个模型的训练结果都不相同，因此结果可能稍有不同。
 

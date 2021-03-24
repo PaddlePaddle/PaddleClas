@@ -68,14 +68,15 @@ class Predictor(object):
                 batch_outputs = self.predict(np.array(batch_input_list))
                 batch_result_list = postprocess(batch_outputs, self.args.top_k)
 
-                for number, result_list in enumerate(batch_result_list):
+                for number, result_dict in enumerate(batch_result_list):
                     filename = img_name_list[number]
-                    result_str = ", ".join([
-                        "{}: {:.2f}".format(r["cls_id"], r["score"])
-                        for r in result_list
-                    ])
-                    print("File:{}, The top-{} result(s):{}".format(
-                        filename, self.args.top_k, result_str))
+                    clas_ids = result_dict["clas_ids"]
+                    scores_str = "[{}]".format(", ".join("{:.2f}".format(
+                        r) for r in result_dict["scores"]))
+                    print(
+                        "File:{}, Top-{} result: class id(s): {}, score(s): {}".
+                        format(filename, self.args.top_k, clas_ids,
+                               scores_str))
                 batch_input_list = []
                 img_name_list = []
 

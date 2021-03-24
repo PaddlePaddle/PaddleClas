@@ -116,7 +116,7 @@ python3 tools/infer/infer.py \
 The output is as follows. Top-5 class ids and their scores are printed.
 
 ```
-File:image_06739.jpg, The top-5 result(s):0: 0.79, 96: 0.02, 18: 0.01, 50: 0.01, 51: 0.01
+File:image_06739.jpg, Top-5 result: class id(s): [0, 96, 18, 50, 51], score(s): [0.79, 0.02, 0.01, 0.01, 0.01]
 ```
 
 * Note: Results are different for different models, so you might get different results for the command.

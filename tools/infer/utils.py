@@ -129,9 +129,12 @@ def postprocess(batch_outputs, topk=5):
     for probs in batch_outputs:
         results = []
         index = probs.argsort(axis=0)[-topk:][::-1].astype("int32")
+        clas_id_list = []
+        score_list = []
         for i in index:
-            results.append({"cls_id": i.item(), "score": probs[i].item()})
-        batch_results.append(results)
+            clas_id_list.append(i.item())
+            score_list.append(probs[i].item())
+        batch_results.append({"clas_ids": clas_id_list, "scores": score_list})
     return batch_results
 
 
