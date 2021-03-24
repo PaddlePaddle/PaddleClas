@@ -1,0 +1,91 @@
+mode: 'train'
+ARCHITECTURE:
+    name: 'ResNeXt101_32x4d'
+
+pretrained_model: ""
+model_save_dir: "./output/"
+classes_num: 1000
+total_images: 1281167
+save_interval: 1
+validate: True
+valid_interval: 1
+epochs: 120
+topk: 5
+image_shape: [4, 224, 224]
+
+use_dali: True
+use_gpu: True
+data_format: "NCHW"
+image_channel: &image_channel 4
+image_shape: [*image_channel, 224, 224]
+
+use_mix: False
+ls_epsilon: -1
+
+# mixed precision training
+AMP:
+    scale_loss: 128.0
+    use_dynamic_loss_scaling: True
+    use_pure_fp16: &use_pure_fp16 True
+
+LEARNING_RATE:
+    function: 'Piecewise'          
+    params:                   
+        lr: 0.1               
+        decay_epochs: [30, 60, 90] 
+        gamma: 0.1 
+
+OPTIMIZER:
+    function: 'Momentum'
+    params:
+        momentum: 0.9
+        multi_precision: *use_pure_fp16
+    regularizer:
+        function: 'L2'
+        factor: 0.000100
+
+TRAIN:
+    batch_size: 256
+    num_workers: 4
+    file_list: "./dataset/ILSVRC2012/train_list.txt"
+    data_dir: "./dataset/ILSVRC2012/"
+    shuffle_seed: 0
+    transforms:
+        - DecodeImage:
+            to_rgb: True
+            to_np: False
+            channel_first: False
+        - RandCropImage:
+            size: 224
+        - RandFlipImage:
+            flip_code: 1
+        - NormalizeImage:
+            scale: 1./255.
+            mean: [0.485, 0.456, 0.406]
+            std: [0.229, 0.224, 0.225]
+            order: ''
+            output_fp16: *use_pure_fp16
+            channel_num: *image_channel
+        - ToCHWImage:
+
+VALID:
+    batch_size: 64
+    num_workers: 4
+    file_list: "./dataset/ILSVRC2012/val_list.txt"
+    data_dir: "./dataset/ILSVRC2012/"
+    shuffle_seed: 0
+    transforms:
+        - DecodeImage:
+            to_rgb: True
+            to_np: False
+            channel_first: False
+        - ResizeImage:
+            resize_short: 256
+        - CropImage:
+            size: 224
+        - NormalizeImage:
+            scale: 1.0/255.0
+            mean: [0.485, 0.456, 0.406]
+            std: [0.229, 0.224, 0.225]
+            order: ''
+        - ToCHWImage:
