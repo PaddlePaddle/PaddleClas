@@ -296,9 +296,9 @@ class PaddleClas(object):
                 input_data = preprocess(input_data, self.args)
             input_data = np.expand_dims(input_data, axis=0)
             batch_outputs = self.predictor.predict(input_data)
-            result = self.postprocess(batch_outputs[0])
-            result["filename"] = "image"
-            return [result]
+            result = {"filename": "image"}
+            result.update(self.postprocess(batch_outputs[0]))
+            return result
         elif isinstance(input_data, str):
             input_path = input_data
             # download internet image
@@ -335,23 +335,11 @@ class PaddleClas(object):
                     batch_outputs = self.predictor.predict(
                         np.array(batch_input_list))
                     for number, output in enumerate(batch_outputs):
-                        result = self.postprocess(output)
-                        result["filename"] = img_path_list[number]
+                        result = {"filename": img_path_list[number]}
+                        result.update(self.postprocess(output))
 
-                        result_str = ""
-                        result_str += "filename: " + result["filename"] + "; "
-                        result_str += "class id: " + ", ".join([
-                            "{}".format(class_id)
-                            for class_id in result["class_ids"]
-                        ]) + "; "
-                        result_str += "scores: " + ", ".join([
-                            "{:.4f}".format(score)
-                            for score in result["scores"]
-                        ]) + "; "
-                        result_str += "label: " + ", ".join([
-                            "{}".format(label)
-                            for label in result["label_names"]
-                        ])
+                        result_str = "top-{} result: {}".format(
+                            self.args.top_k, result)
                         print(result_str)
 
                         total_result.append(result)
