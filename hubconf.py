@@ -226,4 +226,75 @@ def SqueezeNet1_1(**kwargs):
     return model
 
 
-    
+
+
+def DenseNet121(**kwargs):
+    '''DenseNet121
+    '''
+    pretrained = kwargs.pop('pretrained', False)
+
+    model = _densenet.DenseNet121(**kwargs)
+    if pretrained:
+        assert 'DenseNet121' in _checkpoints, 'Not provide `DenseNet121` pretrained model.'
+        path = paddle.utils.download.get_weights_path_from_url(_checkpoints['DenseNet121'])
+        model.set_state_dict(paddle.load(path))
+
+    return model
+
+
+def DenseNet161(**kwargs):
+    '''DenseNet161
+    '''
+    pretrained = kwargs.pop('pretrained', False)
+
+    model = _densenet.DenseNet161(**kwargs)
+    if pretrained:
+        assert 'DenseNet161' in _checkpoints, 'Not provide `DenseNet161` pretrained model.'
+        path = paddle.utils.download.get_weights_path_from_url(_checkpoints['DenseNet161'])
+        model.set_state_dict(paddle.load(path))
+
+    return model
+
+
+def DenseNet169(**kwargs):
+    '''DenseNet169
+    '''
+    pretrained = kwargs.pop('pretrained', False)
+
+    model = _densenet.DenseNet169(**kwargs)
+    if pretrained:
+        assert 'DenseNet169' in _checkpoints, 'Not provide `DenseNet169` pretrained model.'
+        path = paddle.utils.download.get_weights_path_from_url(_checkpoints['DenseNet169'])
+        model.set_state_dict(paddle.load(path))
+
+    return model
+
+
+def DenseNet201(**kwargs):
+    '''DenseNet201
+    '''
+    pretrained = kwargs.pop('pretrained', False)
+
+    model = _densenet.DenseNet201(**kwargs)
+    if pretrained:
+        assert 'DenseNet201' in _checkpoints, 'Not provide `DenseNet201` pretrained model.'
+        path = paddle.utils.download.get_weights_path_from_url(_checkpoints['DenseNet201'])
+        model.set_state_dict(paddle.load(path))
+
+    return model
+
+
+def DenseNet264(**kwargs):
+    '''DenseNet264
+    '''
+    pretrained = kwargs.pop('pretrained', False)
+
+    model = _densenet.DenseNet264(**kwargs)
+    if pretrained:
+        assert 'DenseNet264' in _checkpoints, 'Not provide `DenseNet264` pretrained model.'
+        path = paddle.utils.download.get_weights_path_from_url(_checkpoints['DenseNet264'])
+        model.set_state_dict(paddle.load(path))
+
+    return model
+
+
