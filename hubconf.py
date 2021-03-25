@@ -6,18 +6,27 @@ import paddle
 from ppcls.modeling.architectures import alexnet as _alexnet
 from ppcls.modeling.architectures import vgg as _vgg 
 from ppcls.modeling.architectures import resnet as _resnet 
+from ppcls.modeling.architectures import squeezenet as _squeezenet
+from ppcls.modeling.architectures import densenet as _densenet
+from ppcls.modeling.architectures import inception_v3 as _inception_v3
+from ppcls.modeling.architectures import inception_v4 as _inception_v4
+
 # _checkpoints = {
 #     'ResNet18': 'https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ResNet18_pretrained.pdparams',
 #     'ResNet34': 'https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ResNet34_pretrained.pdparams',
 # }
 
+
 def _load_pretrained_urls():
     '''Load pretrained model parameters url from README.md
     '''
     import re
+    import os
     from collections import OrderedDict
 
-    with open('./README.md', 'r') as f:
+    readme_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'README.md')
+
+    with open(readme_path, 'r') as f:
         lines = f.readlines()
         lines = [lin for lin in lines if lin.strip().startswith('|') and 'Download link' in lin]
     
