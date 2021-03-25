@@ -19,7 +19,7 @@ def ResNet18(**kwargs):
 def ResNet34(**kwargs):
     '''ResNet34
     '''
-    model = _ResNet18(**kwargs)
+    model = _ResNet34(**kwargs)
     return model
 
 
@@ -27,5 +27,5 @@ def ResNet34(**kwargs):
 def ResNet50(**kwargs):
     '''ResNet50
     '''
-    model = _ResNet18(**kwargs)
+    model = _ResNet50(**kwargs)
     return model
