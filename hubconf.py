@@ -484,8 +484,6 @@ def MobileNetV2_x2_0(**kwargs):
     return model
 
 
-
-
 def MobileNetV3_large_x0_35(**kwargs):
     '''MobileNetV3_large_x0_35
     '''
@@ -512,7 +510,6 @@ def MobileNetV3_large_x0_5(**kwargs):
         model.set_state_dict(paddle.load(path))
 
     return model
-
 
 
 def MobileNetV3_large_x0_75(**kwargs):
@@ -543,7 +540,6 @@ def MobileNetV3_large_x1_0(**kwargs):
     return model
 
 
-
 def MobileNetV3_large_x1_25(**kwargs):
     '''MobileNetV3_large_x1_25
     '''
@@ -556,7 +552,6 @@ def MobileNetV3_large_x1_25(**kwargs):
         model.set_state_dict(paddle.load(path))
 
     return model
-
 
 
 def MobileNetV3_small_x0_35(**kwargs):
@@ -573,7 +568,6 @@ def MobileNetV3_small_x0_35(**kwargs):
     return model
 
 
-
 def MobileNetV3_small_x0_5(**kwargs):
     '''MobileNetV3_small_x0_5
     '''
@@ -586,7 +580,6 @@ def MobileNetV3_small_x0_5(**kwargs):
         model.set_state_dict(paddle.load(path))
 
     return model
-
 
 
 def MobileNetV3_small_x0_75(**kwargs):
@@ -603,7 +596,6 @@ def MobileNetV3_small_x0_75(**kwargs):
     return model
 
 
-
 def MobileNetV3_small_x1_0(**kwargs):
     '''MobileNetV3_small_x1_0
     '''
@@ -616,7 +608,6 @@ def MobileNetV3_small_x1_0(**kwargs):
         model.set_state_dict(paddle.load(path))
 
     return model
-
 
 
 def MobileNetV3_small_x1_25(**kwargs):
@@ -633,3 +624,86 @@ def MobileNetV3_small_x1_25(**kwargs):
     return model
 
 
+
+def ResNeXt101_32x4d(**kwargs):
+    '''ResNeXt101_32x4d
+    '''
+    pretrained = kwargs.pop('pretrained', False)
+
+    model = _resnext.ResNeXt101_32x4d(**kwargs)
+    if pretrained:
+        assert 'ResNeXt101_32x4d' in _checkpoints, 'Not provide `ResNeXt101_32x4d` pretrained model.'
+        path = paddle.utils.download.get_weights_path_from_url(_checkpoints['ResNeXt101_32x4d'])
+        model.set_state_dict(paddle.load(path))
+
+    return model
+
+
+def ResNeXt101_64x4d(**kwargs):
+    '''ResNeXt101_64x4d
+    '''
+    pretrained = kwargs.pop('pretrained', False)
+
+    model = _resnext.ResNeXt101_64x4d(**kwargs)
+    if pretrained:
+        assert 'ResNeXt101_64x4d' in _checkpoints, 'Not provide `ResNeXt101_64x4d` pretrained model.'
+        path = paddle.utils.download.get_weights_path_from_url(_checkpoints['ResNeXt101_64x4d'])
+        model.set_state_dict(paddle.load(path))
+
+    return model
+
+
+def ResNeXt152_32x4d(**kwargs):
+    '''ResNeXt152_32x4d
+    '''
+    pretrained = kwargs.pop('pretrained', False)
+
+    model = _resnext.ResNeXt152_32x4d(**kwargs)
+    if pretrained:
+        assert 'ResNeXt152_32x4d' in _checkpoints, 'Not provide `ResNeXt152_32x4d` pretrained model.'
+        path = paddle.utils.download.get_weights_path_from_url(_checkpoints['ResNeXt152_32x4d'])
+        model.set_state_dict(paddle.load(path))
+
+    return model
+
+
+def ResNeXt152_64x4d(**kwargs):
+    '''ResNeXt152_64x4d
+    '''
+    pretrained = kwargs.pop('pretrained', False)
+
+    model = _resnext.ResNeXt152_64x4d(**kwargs)
+    if pretrained:
+        assert 'ResNeXt152_64x4d' in _checkpoints, 'Not provide `ResNeXt152_64x4d` pretrained model.'
+        path = paddle.utils.download.get_weights_path_from_url(_checkpoints['ResNeXt152_64x4d'])
+        model.set_state_dict(paddle.load(path))
+
+    return model
+
+
+def ResNeXt50_32x4d(**kwargs):
+    '''ResNeXt50_32x4d
+    '''
+    pretrained = kwargs.pop('pretrained', False)
+
+    model = _resnext.ResNeXt50_32x4d(**kwargs)
+    if pretrained:
+        assert 'ResNeXt50_32x4d' in _checkpoints, 'Not provide `ResNeXt50_32x4d` pretrained model.'
+        path = paddle.utils.download.get_weights_path_from_url(_checkpoints['ResNeXt50_32x4d'])
+        model.set_state_dict(paddle.load(path))
+
+    return model
+
+
+def ResNeXt50_64x4d(**kwargs):
+    '''ResNeXt50_64x4d
+    '''
+    pretrained = kwargs.pop('pretrained', False)
+
+    model = _resnext.ResNeXt50_64x4d(**kwargs)
+    if pretrained:
+        assert 'ResNeXt50_64x4d' in _checkpoints, 'Not provide `ResNeXt50_64x4d` pretrained model.'
+        path = paddle.utils.download.get_weights_path_from_url(_checkpoints['ResNeXt50_64x4d'])
+        model.set_state_dict(paddle.load(path))
+
+    return model
