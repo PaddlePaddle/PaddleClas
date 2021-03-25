@@ -325,3 +325,311 @@ def InceptionV4(**kwargs):
         model.set_state_dict(paddle.load(path))
 
     return model
+
+
+
+def GoogLeNet(**kwargs):
+    '''GoogLeNet
+    '''
+    pretrained = kwargs.pop('pretrained', False)
+
+    model = _googlenet.GoogLeNet(**kwargs)
+    if pretrained:
+        assert 'GoogLeNet' in _checkpoints, 'Not provide `GoogLeNet` pretrained model.'
+        path = paddle.utils.download.get_weights_path_from_url(_checkpoints['GoogLeNet'])
+        model.set_state_dict(paddle.load(path))
+
+    return model
+
+
+
+def ShuffleNet(**kwargs):
+    '''ShuffleNet
+    '''
+    pretrained = kwargs.pop('pretrained', False)
+
+    model = _shufflenet_v2.ShuffleNet(**kwargs)
+    if pretrained:
+        assert 'ShuffleNet' in _checkpoints, 'Not provide `ShuffleNet` pretrained model.'
+        path = paddle.utils.download.get_weights_path_from_url(_checkpoints['ShuffleNet'])
+        model.set_state_dict(paddle.load(path))
+
+    return model
+
+
+
+def MobileNetV1(**kwargs):
+    '''MobileNetV1
+    '''
+    pretrained = kwargs.pop('pretrained', False)
+
+    model = _mobilenet_v1.MobileNetV1(**kwargs)
+    if pretrained:
+        assert 'MobileNetV1' in _checkpoints, 'Not provide `MobileNetV1` pretrained model.'
+        path = paddle.utils.download.get_weights_path_from_url(_checkpoints['MobileNetV1'])
+        model.set_state_dict(paddle.load(path))
+
+    return model
+
+
+def MobileNetV1_x0_25(**kwargs):
+    '''MobileNetV1_x0_25
+    '''
+    pretrained = kwargs.pop('pretrained', False)
+
+    model = _mobilenet_v1.MobileNetV1_x0_25(**kwargs)
+    if pretrained:
+        assert 'MobileNetV1_x0_25' in _checkpoints, 'Not provide `MobileNetV1_x0_25` pretrained model.'
+        path = paddle.utils.download.get_weights_path_from_url(_checkpoints['MobileNetV1_x0_25'])
+        model.set_state_dict(paddle.load(path))
+
+    return model
+
+
+def MobileNetV1_x0_5(**kwargs):
+    '''MobileNetV1_x0_5
+    '''
+    pretrained = kwargs.pop('pretrained', False)
+
+    model = _mobilenet_v1.MobileNetV1_x0_5(**kwargs)
+    if pretrained:
+        assert 'MobileNetV1_x0_5' in _checkpoints, 'Not provide `MobileNetV1_x0_5` pretrained model.'
+        path = paddle.utils.download.get_weights_path_from_url(_checkpoints['MobileNetV1_x0_5'])
+        model.set_state_dict(paddle.load(path))
+
+    return model
+
+
+def MobileNetV1_x0_75(**kwargs):
+    '''MobileNetV1_x0_75
+    '''
+    pretrained = kwargs.pop('pretrained', False)
+
+    model = _mobilenet_v1.MobileNetV1_x0_75(**kwargs)
+    if pretrained:
+        assert 'MobileNetV1_x0_75' in _checkpoints, 'Not provide `MobileNetV1_x0_75` pretrained model.'
+        path = paddle.utils.download.get_weights_path_from_url(_checkpoints['MobileNetV1_x0_75'])
+        model.set_state_dict(paddle.load(path))
+
+    return model
+
+
+def MobileNetV2_x0_25(**kwargs):
+    '''MobileNetV2_x0_25
+    '''
+    pretrained = kwargs.pop('pretrained', False)
+
+    model = _mobilenet_v2.MobileNetV2_x0_25(**kwargs)
+    if pretrained:
+        assert 'MobileNetV2_x0_25' in _checkpoints, 'Not provide `MobileNetV2_x0_25` pretrained model.'
+        path = paddle.utils.download.get_weights_path_from_url(_checkpoints['MobileNetV2_x0_25'])
+        model.set_state_dict(paddle.load(path))
+
+    return model
+
+
+def MobileNetV2_x0_5(**kwargs):
+    '''MobileNetV2_x0_5
+    '''
+    pretrained = kwargs.pop('pretrained', False)
+
+    model = _mobilenet_v2.MobileNetV2_x0_5(**kwargs)
+    if pretrained:
+        assert 'MobileNetV2_x0_5' in _checkpoints, 'Not provide `MobileNetV2_x0_5` pretrained model.'
+        path = paddle.utils.download.get_weights_path_from_url(_checkpoints['MobileNetV2_x0_5'])
+        model.set_state_dict(paddle.load(path))
+
+    return model
+
+
+def MobileNetV2_x0_75(**kwargs):
+    '''MobileNetV2_x0_75
+    '''
+    pretrained = kwargs.pop('pretrained', False)
+
+    model = _mobilenet_v2.MobileNetV2_x0_75(**kwargs)
+    if pretrained:
+        assert 'MobileNetV2_x0_75' in _checkpoints, 'Not provide `MobileNetV2_x0_75` pretrained model.'
+        path = paddle.utils.download.get_weights_path_from_url(_checkpoints['MobileNetV2_x0_75'])
+        model.set_state_dict(paddle.load(path))
+
+    return model
+
+
+def MobileNetV2_x1_5(**kwargs):
+    '''MobileNetV2_x1_5
+    '''
+    pretrained = kwargs.pop('pretrained', False)
+
+    model = _mobilenet_v2.MobileNetV2_x1_5(**kwargs)
+    if pretrained:
+        assert 'MobileNetV2_x1_5' in _checkpoints, 'Not provide `MobileNetV2_x1_5` pretrained model.'
+        path = paddle.utils.download.get_weights_path_from_url(_checkpoints['MobileNetV2_x1_5'])
+        model.set_state_dict(paddle.load(path))
+
+    return model
+
+
+def MobileNetV2_x2_0(**kwargs):
+    '''MobileNetV2_x2_0
+    '''
+    pretrained = kwargs.pop('pretrained', False)
+
+    model = _mobilenet_v2.MobileNetV2_x2_0(**kwargs)
+    if pretrained:
+        assert 'MobileNetV2_x2_0' in _checkpoints, 'Not provide `MobileNetV2_x2_0` pretrained model.'
+        path = paddle.utils.download.get_weights_path_from_url(_checkpoints['MobileNetV2_x2_0'])
+        model.set_state_dict(paddle.load(path))
+
+    return model
+
+
+
+
+def MobileNetV3_large_x0_35(**kwargs):
+    '''MobileNetV3_large_x0_35
+    '''
+    pretrained = kwargs.pop('pretrained', False)
+
+    model = _mobilenet_v3.MobileNetV3_large_x0_35(**kwargs)
+    if pretrained:
+        assert 'MobileNetV3_large_x0_35' in _checkpoints, 'Not provide `MobileNetV3_large_x0_35` pretrained model.'
+        path = paddle.utils.download.get_weights_path_from_url(_checkpoints['MobileNetV3_large_x0_35'])
+        model.set_state_dict(paddle.load(path))
+
+    return model
+
+
+def MobileNetV3_large_x0_5(**kwargs):
+    '''MobileNetV3_large_x0_5
+    '''
+    pretrained = kwargs.pop('pretrained', False)
+
+    model = _mobilenet_v3.MobileNetV3_large_x0_5(**kwargs)
+    if pretrained:
+        assert 'MobileNetV3_large_x0_5' in _checkpoints, 'Not provide `MobileNetV3_large_x0_5` pretrained model.'
+        path = paddle.utils.download.get_weights_path_from_url(_checkpoints['MobileNetV3_large_x0_5'])
+        model.set_state_dict(paddle.load(path))
+
+    return model
+
+
+
+def MobileNetV3_large_x0_75(**kwargs):
+    '''MobileNetV3_large_x0_75
+    '''
+    pretrained = kwargs.pop('pretrained', False)
+
+    model = _mobilenet_v3.MobileNetV3_large_x0_75(**kwargs)
+    if pretrained:
+        assert 'MobileNetV3_large_x0_75' in _checkpoints, 'Not provide `MobileNetV3_large_x0_75` pretrained model.'
+        path = paddle.utils.download.get_weights_path_from_url(_checkpoints['MobileNetV3_large_x0_75'])
+        model.set_state_dict(paddle.load(path))
+
+    return model
+
+
+def MobileNetV3_large_x1_0(**kwargs):
+    '''MobileNetV3_large_x1_0
+    '''
+    pretrained = kwargs.pop('pretrained', False)
+
+    model = _mobilenet_v3.MobileNetV3_large_x1_0(**kwargs)
+    if pretrained:
+        assert 'MobileNetV3_large_x1_0' in _checkpoints, 'Not provide `MobileNetV3_large_x1_0` pretrained model.'
+        path = paddle.utils.download.get_weights_path_from_url(_checkpoints['MobileNetV3_large_x1_0'])
+        model.set_state_dict(paddle.load(path))
+
+    return model
+
+
+
+def MobileNetV3_large_x1_25(**kwargs):
+    '''MobileNetV3_large_x1_25
+    '''
+    pretrained = kwargs.pop('pretrained', False)
+
+    model = _mobilenet_v3.MobileNetV3_large_x1_25(**kwargs)
+    if pretrained:
+        assert 'MobileNetV3_large_x1_25' in _checkpoints, 'Not provide `MobileNetV3_large_x1_25` pretrained model.'
+        path = paddle.utils.download.get_weights_path_from_url(_checkpoints['MobileNetV3_large_x1_25'])
+        model.set_state_dict(paddle.load(path))
+
+    return model
+
+
+
+def MobileNetV3_small_x0_35(**kwargs):
+    '''MobileNetV3_small_x0_35
+    '''
+    pretrained = kwargs.pop('pretrained', False)
+
+    model = _mobilenet_v3.MobileNetV3_small_x0_35(**kwargs)
+    if pretrained:
+        assert 'MobileNetV3_small_x0_35' in _checkpoints, 'Not provide `MobileNetV3_small_x0_35` pretrained model.'
+        path = paddle.utils.download.get_weights_path_from_url(_checkpoints['MobileNetV3_small_x0_35'])
+        model.set_state_dict(paddle.load(path))
+
+    return model
+
+
+
+def MobileNetV3_small_x0_5(**kwargs):
+    '''MobileNetV3_small_x0_5
+    '''
+    pretrained = kwargs.pop('pretrained', False)
+
+    model = _mobilenet_v3.MobileNetV3_small_x0_5(**kwargs)
+    if pretrained:
+        assert 'MobileNetV3_small_x0_5' in _checkpoints, 'Not provide `MobileNetV3_small_x0_5` pretrained model.'
+        path = paddle.utils.download.get_weights_path_from_url(_checkpoints['MobileNetV3_small_x0_5'])
+        model.set_state_dict(paddle.load(path))
+
+    return model
+
+
+
+def MobileNetV3_small_x0_75(**kwargs):
+    '''MobileNetV3_small_x0_75
+    '''
+    pretrained = kwargs.pop('pretrained', False)
+
+    model = _mobilenet_v3.MobileNetV3_small_x0_75(**kwargs)
+    if pretrained:
+        assert 'MobileNetV3_small_x0_75' in _checkpoints, 'Not provide `MobileNetV3_small_x0_75` pretrained model.'
+        path = paddle.utils.download.get_weights_path_from_url(_checkpoints['MobileNetV3_small_x0_75'])
+        model.set_state_dict(paddle.load(path))
+
+    return model
+
+
+
+def MobileNetV3_small_x1_0(**kwargs):
+    '''MobileNetV3_small_x1_0
+    '''
+    pretrained = kwargs.pop('pretrained', False)
+
+    model = _mobilenet_v3.MobileNetV3_small_x1_0(**kwargs)
+    if pretrained:
+        assert 'MobileNetV3_small_x1_0' in _checkpoints, 'Not provide `MobileNetV3_small_x1_0` pretrained model.'
+        path = paddle.utils.download.get_weights_path_from_url(_checkpoints['MobileNetV3_small_x1_0'])
+        model.set_state_dict(paddle.load(path))
+
+    return model
+
+
+
+def MobileNetV3_small_x1_25(**kwargs):
+    '''MobileNetV3_small_x1_25
+    '''
+    pretrained = kwargs.pop('pretrained', False)
+
+    model = _mobilenet_v3.MobileNetV3_small_x1_25(**kwargs)
+    if pretrained:
+        assert 'MobileNetV3_small_x1_25' in _checkpoints, 'Not provide `MobileNetV3_small_x1_25` pretrained model.'
+        path = paddle.utils.download.get_weights_path_from_url(_checkpoints['MobileNetV3_small_x1_25'])
+        model.set_state_dict(paddle.load(path))
+
+    return model
+
+
