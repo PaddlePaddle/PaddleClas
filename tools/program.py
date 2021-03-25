@@ -314,10 +314,10 @@ def run(dataloader,
         metric_list['reader_time'].update(time.time() - tic)
         batch_size = len(batch[0])
         feeds = create_feeds(batch, use_mix)
-        fetchs = create_fetchs(feeds, net, config, mode)
         if mode == 'train':
             if use_amp:
                 with amp.auto_cast(enable=use_gpu):
+                    fetchs = create_fetchs(feeds, net, config, mode)
                     avg_loss = fetchs['loss']
 
                 scaled_loss = scalar.scale(avg_loss)
@@ -325,6 +325,7 @@ def run(dataloader,
                 # in dygraph mode, optimizer.minimize is equal to optimizer.step
                 scalar.minimize(optimizer, scaled_loss)
             else:
+                fetchs = create_fetchs(feeds, net, config, mode)
                 avg_loss = fetchs['loss']
                 avg_loss.backward()
                 optimizer.step()
