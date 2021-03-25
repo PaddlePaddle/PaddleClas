@@ -298,3 +298,30 @@ def DenseNet264(**kwargs):
     return model
 
 
+
+def InceptionV3(**kwargs):
+    '''InceptionV3
+    '''
+    pretrained = kwargs.pop('pretrained', False)
+
+    model = _inception_v3.InceptionV3(**kwargs)
+    if pretrained:
+        assert 'InceptionV3' in _checkpoints, 'Not provide `InceptionV3` pretrained model.'
+        path = paddle.utils.download.get_weights_path_from_url(_checkpoints['InceptionV3'])
+        model.set_state_dict(paddle.load(path))
+
+    return model
+
+
+def InceptionV4(**kwargs):
+    '''InceptionV4
+    '''
+    pretrained = kwargs.pop('pretrained', False)
+
+    model = _inception_v4.InceptionV4(**kwargs)
+    if pretrained:
+        assert 'InceptionV4' in _checkpoints, 'Not provide `InceptionV4` pretrained model.'
+        path = paddle.utils.download.get_weights_path_from_url(_checkpoints['InceptionV4'])
+        model.set_state_dict(paddle.load(path))
+
+    return model
