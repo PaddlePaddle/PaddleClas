@@ -101,7 +101,9 @@ def download_with_progressbar(url, save_path):
             file.write(data)
     progress_bar.close()
     if total_size_in_bytes == 0 or progress_bar.n != total_size_in_bytes:
-        raise Exception("Something went wrong while downloading models")
+        raise Exception(
+            "Something went wrong while downloading model/image from {}".
+            format(url))
 
 
 def maybe_download(model_storage_directory, url):
@@ -181,9 +183,7 @@ def parse_args(mMain=True, add_help=True):
         parser.add_argument("--enable_profile", type=str2bool, default=False)
         parser.add_argument("--top_k", type=int, default=1)
         parser.add_argument("--enable_mkldnn", type=str2bool, default=False)
-        parser.add_argument("--enable_benchmark", type=str2bool, default=False)
         parser.add_argument("--cpu_num_threads", type=int, default=10)
-        parser.add_argument("--hubserving", type=str2bool, default=False)
 
         # parameters for pre-label the images
         parser.add_argument("--label_name_path", type=str, default='')
@@ -214,9 +214,7 @@ def parse_args(mMain=True, add_help=True):
             enable_profile=False,
             top_k=1,
             enable_mkldnn=False,
-            enable_benchmark=False,
             cpu_num_threads=10,
-            hubserving=False,
             label_name_path='',
             pre_label_image=False,
             pre_label_out_idr=None)
