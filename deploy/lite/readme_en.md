@@ -31,7 +31,7 @@ For the detailed compilation directions of different development environments, p
 
 **NOTE**:
 
-1. If you download the inference library from [Paddle-Lite official document](https://paddle-lite.readthedocs.io/zh/latest/user_guides/release_lib.html#android-toolchain-gcc), please choose `with_extra=ON` , `with_cv=ON` .
+1. If you download the inference library from [Paddle-Lite official document](https://paddle-lite.readthedocs.io/zh/latest/quick_start/release_lib.html#android-toolchain-gcc), please choose `with_extra=ON` , `with_cv=ON` .
 
 2. It is recommended to build inference library using [Paddle-Lite](https://github.com/PaddlePaddle/Paddle-Lite) develop branch if you want to deploy the [quantitative](https://github.com/PaddlePaddle/PaddleOCR/blob/develop/deploy/slim/quantization/README_en.md) model to mobile phones. Please refer to the [link](https://paddle-lite.readthedocs.io/zh/latest/user_guides/Compile/Android.html#id2) for more detailed information about compiling.
 

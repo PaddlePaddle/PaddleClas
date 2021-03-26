@@ -14,7 +14,6 @@
 
 import numpy as np
 import cv2
-import shutil
 import os
 import sys
 
@@ -26,61 +25,60 @@ sys.path.append(__dir__)
 sys.path.append(os.path.abspath(os.path.join(__dir__, '../..')))
 
 from ppcls.utils.save_load import load_dygraph_pretrain
+from ppcls.utils import logger
 from ppcls.modeling import architectures
-import utils
-from utils import get_image_list
-
-
-def postprocess(outputs, topk=5):
-    output = outputs[0]
-    prob = np.array(output).flatten()
-    index = prob.argsort(axis=0)[-topk:][::-1].astype('int32')
-    return zip(index, prob[index])
-
-
-def save_prelabel_results(class_id, input_filepath, output_idr):
-    output_dir = os.path.join(output_idr, str(class_id))
-    if not os.path.isdir(output_dir):
-        os.makedirs(output_dir)
-    shutil.copy(input_filepath, output_dir)
+from utils import parse_args, get_image_list, preprocess, postprocess, save_prelabel_results
 
 
 def main():
-    args = utils.parse_args()
+    args = parse_args()
     # assign the place
     place = paddle.set_device('gpu' if args.use_gpu else 'cpu')
 
     net = architectures.__dict__[args.model](class_dim=args.class_num)
     load_dygraph_pretrain(net, args.pretrained_model, args.load_static_weights)
     image_list = get_image_list(args.image_file)
-    for idx, filename in enumerate(image_list):
-        img = cv2.imread(filename)[:, :, ::-1]
-        data = utils.preprocess(img, args)
-        data = np.expand_dims(data, axis=0)
-        data = paddle.to_tensor(data)
-        net.eval()
-        outputs = net(data)
-        if args.model == "GoogLeNet":
-            outputs = outputs[0]
-        outputs = F.softmax(outputs)
-        outputs = outputs.numpy()
-        probs = postprocess(outputs)
+    batch_input_list = []
+    img_path_list = []
+    cnt = 0
+    for idx, img_path in enumerate(image_list):
+        img = cv2.imread(img_path)
+        if img is None:
+            logger.warning(
+                "Image file failed to read and has been skipped. The path: {}".
+                format(img_path))
+            continue
+        else:
+            img = img[:, :, ::-1]
+            data = preprocess(img, args)
+            batch_input_list.append(data)
+            img_path_list.append(img_path)
+            cnt += 1
 
-        top1_class_id = 0
-        rank = 1
-        print("Current image file: {}".format(filename))
-        for idx, prob in probs:
-            print("\ttop{:d}, class id: {:d}, probability: {:.4f}".format(
-                rank, idx, prob))
-            if rank == 1:
-                top1_class_id = idx
-            rank += 1
+        if cnt % args.batch_size == 0 or (idx + 1) == len(image_list):
+            batch_tensor = paddle.to_tensor(batch_input_list)
+            net.eval()
+            batch_outputs = net(batch_tensor)
+            if args.model == "GoogLeNet":
+                batch_outputs = batch_outputs[0]
+            batch_outputs = F.softmax(batch_outputs)
+            batch_outputs = batch_outputs.numpy()
+            batch_result_list = postprocess(batch_outputs, args.top_k)
 
-        if args.pre_label_image:
-            save_prelabel_results(top1_class_id, filename,
-                                  args.pre_label_out_idr)
+            for number, result_dict in enumerate(batch_result_list):
+                filename = img_path_list[number].split("/")[-1]
+                clas_ids = result_dict["clas_ids"]
+                scores_str = "[{}]".format(", ".join("{:.2f}".format(
+                    r) for r in result_dict["scores"]))
+                print("File:{}, Top-{} result: class id(s): {}, score(s): {}".
+                      format(filename, args.top_k, clas_ids, scores_str))
 
-    return
+                if args.pre_label_image:
+                    save_prelabel_results(clas_ids[0], img_path_list[number],
+                                          args.pre_label_out_idr)
+
+            batch_input_list = []
+            img_path_list = []
 
 
 if __name__ == "__main__":
