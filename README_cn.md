@@ -8,15 +8,11 @@
 
 
 **近期更新**
-- 2021.02.08 正式发布PaddleClas v2.0(branch release/2.0)并设置为推荐用户使用的默认分支。发布的详细内容，请参考: https://github.com/PaddlePaddle/PaddleClas/releases/tag/v2.0.0
+- 2021.03.02 添加分类模型量化方法与使用教程。
+- 2021.02.01 添加`RepVGG`系列模型，在ImageNet-1k上Top-1 Acc可达79.65%。
+- 2021.01.27 添加`ViT`与`DeiT`模型，在ImageNet-1k上，`ViT`模型Top-1 Acc可达85.13%，`DeiT`模型可达85.1%。
 - 2021.01.08 添加whl包及其使用说明，直接安装paddleclas whl包，即可快速完成模型预测。
 - 2020.12.16 添加对cpp预测的tensorRT支持，预测加速更明显。
-- 2020.12.06 添加`SE_HRNet_W64_C_ssld`模型，在ImageNet-1k上Top-1 Acc可达84.75%。
-- 2020.11.23 添加`GhostNet_x1_3_ssld `模型，在ImageNet-1k上Top-1 Acc可达79.38%。
-- 2020.11.09 添加`InceptionV3 `结构和模型，在ImageNet-1k上Top-1 Acc可达79.14%。
-- 2020.10.20 添加 `Res2Net50_vd_26w_4s_ssld `模型，在ImageNet-1k上Top-1 Acc可达83.1%；添加 `Res2Net101_vd_26w_4s_ssld `模型，在ImageNet-1k上Top-1 Acc可达83.9%。
-- 2020.10.12 添加Paddle-Lite demo。
-- 2020.10.10 添加cpp inference demo，完善`FAQ 30问`教程。
 - [more](./docs/zh_CN/update_history.md)
 
 
@@ -67,6 +63,8 @@
     - [Inception系列](#Inception系列)
     - [EfficientNet与ResNeXt101_wsl系列](#EfficientNet与ResNeXt101_wsl系列)
     - [ResNeSt与RegNet系列](#ResNeSt与RegNet系列)
+    - [Transformer系列](#Transformer系列)
+    - [RepVGG系列](#RepVGG系列)
     - [其他模型](#其他模型)
     - HS-ResNet: arxiv文章链接: [https://arxiv.org/pdf/2010.07621.pdf](https://arxiv.org/pdf/2010.07621.pdf)。 代码和预训练模型即将开源，敬请期待。
 - 模型训练/评估
@@ -81,7 +79,7 @@
     - [服务化部署](./deploy/hubserving/readme.md)
     - [端侧部署](./deploy/lite/readme.md)
     - [whl包预测](./docs/zh_CN/whl.md)
-    - [模型量化压缩](docs/zh_CN/extension/paddle_quantization.md)
+    - [模型量化压缩](deploy/slim/quant/README.md)
 - 高阶使用
     - [知识蒸馏](./docs/zh_CN/advanced_tutorials/distillation/distillation.md)
     - [数据增广](./docs/zh_CN/advanced_tutorials/image_augmentation/ImageAugment.md)
@@ -91,7 +89,7 @@
     - [10万类图像分类预训练模型](./docs/zh_CN/application/transfer_learning.md)
     - [通用目标检测](./docs/zh_CN/application/object_detection.md)
 - FAQ
-    - [图像分类2021第一季精选问题(近期更新2021.01.21)](./docs/zh_CN/faq_series/faq_2021_s1.md)
+    - [图像分类2021第一季精选问题(近期更新2021.02.03)](./docs/zh_CN/faq_series/faq_2021_s1.md)
     - [图像分类通用30个问题](./docs/zh_CN/faq.md)
     - [PaddleClas实战15个问题](./docs/zh_CN/faq.md)
 - [赛事支持](./docs/zh_CN/competition_support.md)
@@ -298,7 +296,7 @@ HRNet系列模型的精度、速度指标如下表所示，更多关于该系列
 | HRNet_W48_C | 0.7895    | 0.9442    | 13.70761         | 34.43572         | 34.58    | 77.47     | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/HRNet_W48_C_pretrained.pdparams) |
 | HRNet_W48_C_ssld | 0.8363    | 0.9682    | 13.70761         | 34.43572         | 34.58    | 77.47     | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/HRNet_W48_C_ssld_pretrained.pdparams) |
 | HRNet_W64_C | 0.7930    | 0.9461    | 17.57527         | 47.9533          | 57.83    | 128.06    | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/HRNet_W64_C_pretrained.pdparams) |
-| SE_HRNet_W64_C_ssld | 0.8475    |  0.9726    |    31.69770      |     94.99546      | 57.83    | 128.97    | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/SE_HRNet_W64_C_ssld_pretrained.pdparams) |
+| SE_HRNet_W64_C_ssld | 0.8475    |  0.9726    |    31.69770      |     94.99546      | 57.83    | 128.97    | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/SE_HRNet_W64_C_ssld_pretrained.pdparams) |
 
 
 <a name="Inception系列"></a>
@@ -354,6 +352,58 @@ ResNeSt与RegNet系列模型的精度、速度指标如下表所示，更多关�
 | ResNeSt50              | 0.8083    | 0.9542    | 6.69042    | 8.01664                | 10.78    | 27.5      | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ResNeSt50_pretrained.pdparams)              |
 | RegNetX_4GF            | 0.785     | 0.9416    |    6.46478              |      11.19862           | 8        | 22.1      | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/RegNetX_4GF_pretrained.pdparams)            |
 
+
+<a name="Transformer系列"></a>
+### Transformer系列
+
+ViT（Vision Transformer）与DeiT（Data-efficient Image Transformers）系列模型的精度、速度指标如下表所示. 更多关于该系列模型的介绍可以参考： [Transformer系列模型文档](./docs/zh_CN/models/Transformer.md)。
+
+
+| 模型                  | Top-1 Acc | Top-5 Acc | time(ms)<br>bs=1 | time(ms)<br>bs=4 | Flops(G) | Params(M) | 下载地址 |
+|------------------------|-----------|-----------|------------------|------------------|----------|------------------------|------------------------|
+| ViT_small_<br/>patch16_224 | 0.7769  | 0.9342   | -                | -                |      |  | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ViT_small_patch16_224_pretrained.pdparams) |
+| ViT_base_<br/>patch16_224 | 0.8195   | 0.9617   | -    | -                |     | 86 | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ViT_base_patch16_224_pretrained.pdparams) |
+| ViT_base_<br/>patch16_384 | 0.8414  | 0.9717   |    -              |      -           |         |  | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ViT_base_patch16_384_pretrained.pdparams) |
+| ViT_base_<br/>patch32_384 | 0.8176   | 0.9613   | - | - |  |  | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ViT_base_patch32_384_pretrained.pdparams) |
+| ViT_large_<br/>patch16_224 | 0.8323  | 0.9650   | - | - |  | 307 | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ViT_large_patch16_224_pretrained.pdparams) |
+| ViT_large_<br/>patch16_384 | 0.8513  | 0.9736  | - | - |  |  | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ViT_large_patch16_384_pretrained.pdparams) |
+| ViT_large_<br/>patch32_384 | 0.8153   | 0.9608  | - | - |  |  | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ViT_large_patch32_384_pretrained.pdparams) |
+|                            |           |           |                  |                  |          |           |                                                              |
+
+
+| 模型                  | Top-1 Acc | Top-5 Acc | time(ms)<br>bs=1 | time(ms)<br>bs=4 | Flops(G) | Params(M) | 下载地址 |
+|------------------------|-----------|-----------|------------------|------------------|----------|------------------------|------------------------|
+| DeiT_tiny_<br>patch16_224 | 0.718 | 0.910 | -                | -                |      | 5 | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DeiT_tiny_patch16_224_pretrained.pdparams) |
+| DeiT_small_<br>patch16_224 | 0.796 | 0.949 | -    | -                |     | 22 | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DeiT_small_patch16_224_pretrained.pdparams) |
+| DeiT_base_<br>patch16_224 | 0.817 | 0.957 |    -              |      -           |         | 86 | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DeiT_base_patch16_224_pretrained.pdparams) |
+| DeiT_base_<br>patch16_384 | 0.830 | 0.962 | - | - |  | 87 | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DeiT_base_patch16_384_pretrained.pdparams) |
+| DeiT_tiny_<br>distilled_patch16_224 | 0.741 | 0.918 | - | - |  | 6 | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DeiT_tiny_distilled_patch16_224_pretrained.pdparams) |
+| DeiT_small_<br>distilled_patch16_224 | 0.809 | 0.953 | - | - |  | 22 | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DeiT_small_distilled_patch16_224_pretrained.pdparams) |
+| DeiT_base_<br>distilled_patch16_224 | 0.831 | 0.964 | - | - |  | 87 | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DeiT_base_distilled_patch16_224_pretrained.pdparams) |
+| DeiT_base_<br>distilled_patch16_384 | 0.851 | 0.973 | - | - |  | 88 | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DeiT_base_distilled_patch16_384_pretrained.pdparams) |
+|  |  |  |  |  |  |  |  |
+
+
+<a name="RepVGG系列"></a>
+
+### RepVGG系列
+
+关于RepVGG系列模型的精度、速度指标如下表所示，更多介绍可以参考：[RepVGG系列模型文档](./docs/zh_CN/models/RepVGG.md)。
+
+
+| 模型                     | Top-1 Acc | Top-5 Acc | time(ms)<br>bs=1 | time(ms)<br>bs=4 | Flops(G) | Params(M) | 下载地址 |
+|------------------------|-----------|-----------|------------------|------------------|----------|-----------|------------------------------------------------------------------------------------------------------|
+| RepVGG_A0   | 0.7131    | 0.9016    |  |  |  |  | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/RepVGG_A0_pretrained.pdparams) |
+| RepVGG_A1   | 0.7380    | 0.9146    |  |  |  |  | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/RepVGG_A1_pretrained.pdparams) |
+| RepVGG_A2   | 0.7571    | 0.9264    |  |  |  |  | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/RepVGG_A2_pretrained.pdparams) |
+| RepVGG_B0   | 0.7450    | 0.9213    |  |  |  |  | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/RepVGG_B0_pretrained.pdparams) |
+| RepVGG_B1   | 0.7773    | 0.9385    |  |  |  |  | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/RepVGG_B1_pretrained.pdparams) |
+| RepVGG_B2   | 0.7813    | 0.9410    |  |  |  |  | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/RepVGG_B2_pretrained.pdparams) |
+| RepVGG_B1g2 | 0.7732    | 0.9359    |  |  |  |  | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/RepVGG_B1g2_pretrained.pdparams) |
+| RepVGG_B1g4 | 0.7675    | 0.9335    |  |  |  |  | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/RepVGG_B1g4_pretrained.pdparams) |
+| RepVGG_B2g4 | 0.7881    | 0.9448    |  |  |  |  | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/RepVGG_B2g4_pretrained.pdparams) |
+| RepVGG_B3g4 | 0.7965    | 0.9485    |  |  |  |  | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/RepVGG_B3g4_pretrained.pdparams) |
+
 <a name="其他模型"></a>
 
 ### 其他模型
@@ -384,3 +434,6 @@ ResNeSt与RegNet系列模型的精度、速度指标如下表所示，更多关�
 
 - 非常感谢[nblib](https://github.com/nblib)修正了PaddleClas中RandErasing的数据增广配置文件。
 - 非常感谢[chenpy228](https://github.com/chenpy228)修正了PaddleClas文档中的部分错别字。
+- 非常感谢[jm12138](https://github.com/jm12138)为PaddleClas添加ViT，DeiT系列模型和RepVGG系列模型。
+
+我们非常欢迎你为PaddleClas贡献代码，也十分感谢你的反馈。

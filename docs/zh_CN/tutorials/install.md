@@ -16,13 +16,14 @@
 如果已经安装好了cuda、cudnn、nccl或者安装好了docker、nvidia-docker运行环境，可以pip安装最新GPU版本PaddlePaddle
 
 ```bash
-pip3 install paddlepaddle-gpu==2.0.0 --upgrade -i https://mirror.baidu.com/pypi/simple
+pip3 install paddlepaddle-gpu --upgrade -i https://mirror.baidu.com/pypi/simple
 ```
 
 如果希望在CPU环境中使用PaddlePaddle，可以运行下面的命令安装PaddlePaddle。
 
 ```bash
-pip3 install paddlepaddle==2.0.0 --upgrade -i https://mirror.baidu.com/pypi/simple
+pip3 install paddlepaddle --upgrade -i https://mirror.baidu.com/pypi/simple
+>>>>>>> upstream/develop
 ```
 
 ### 源码编译PaddlePaddle
@@ -61,13 +62,13 @@ python3 -c "import paddle; print(paddle.__version__)"
 **克隆PaddleClas模型库：**
 
 ```bash
-git clone https://github.com/PaddlePaddle/PaddleClas.git -b release/2.0
+git clone https://github.com/PaddlePaddle/PaddleClas.git -b develop
 ```
 
 如果从github上网速太慢，可以从gitee下载，下载命令如下：
 
 ```bash
-git clone https://gitee.com/paddlepaddle/PaddleClas.git -b release/2.0
+git clone https://gitee.com/paddlepaddle/PaddleClas.git -b develop
 ```
 
 
@@ -83,7 +84,7 @@ pip3 install --upgrade -r requirements.txt -i https://mirror.baidu.com/pypi/simp
 visualdl可能出现安装失败，请尝试
 
 ```bash
-pip3 install --upgrade visualdl==2.1.1 -i https://mirror.baidu.com/pypi/simple
+pip3 install --upgrade visualdl -i https://mirror.baidu.com/pypi/simple
 ```
 
 此外，visualdl目前只支持在python3下运行，因此如果希望使用visualdl，需要使用python3。

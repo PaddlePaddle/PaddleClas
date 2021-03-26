@@ -16,13 +16,13 @@ Python 3.x, CUDA 10.0, CUDNN7.6.4 nccl2.1.2 and later version are required at fi
 If you want to use PaddlePaddle on GPU, you can use the following command to install PaddlePaddle.
 
 ```bash
-pip3 install paddlepaddle-gpu==2.0.0 --upgrade -i https://mirror.baidu.com/pypi/simple
+pip3 install paddlepaddle-gpu --upgrade -i https://mirror.baidu.com/pypi/simple
 ```
 
 If you want to use PaddlePaddle on CPU, you can use the following command to install PaddlePaddle.
 
 ```bash
-pip3 install paddlepaddle==2.0.0 --upgrade -i https://mirror.baidu.com/pypi/simple
+pip3 install paddlepaddle --upgrade -i https://mirror.baidu.com/pypi/simple
 ```
 
 ### Install PaddlePaddle from source code
@@ -53,13 +53,13 @@ Note:
 **Clone PaddleClas: **
 
 ```
-git clone https://github.com/PaddlePaddle/PaddleClas.git -b release/2.0
+git clone https://github.com/PaddlePaddle/PaddleClas.git -b develop
 ```
 
 If it is too slow for you to download from github, you can download PaddleClas from gitee. The command is as follows.
 
 ```bash
-git clone https://gitee.com/paddlepaddle/PaddleClas.git -b release/2.0
+git clone https://gitee.com/paddlepaddle/PaddleClas.git -b develop
 ```
 
 **Install requirements**
@@ -71,8 +71,7 @@ pip3 install --upgrade -r requirements.txt -i https://mirror.baidu.com/pypi/simp
 If the install process of visualdl failed, you can try the following commands.
 
 ```
-pip3 install --upgrade visualdl==2.1.1 -i https://mirror.baidu.com/pypi/simple
-
+pip3 install --upgrade visualdl -i https://mirror.baidu.com/pypi/simple
 ```
 
 What's more, visualdl is just supported in python3, so python3 is needed if you want to use visualdl.

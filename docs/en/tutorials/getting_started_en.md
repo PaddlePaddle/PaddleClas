@@ -38,7 +38,7 @@ Of course, you can also directly modify the configuration file to update the con
     epoch:0    train    step:13    loss:7.9561    top1:0.0156    top5:0.1094    lr:0.100000    elapse:0.193s
     ```
 
-During training, you can view loss changes in real time through `VisualDL`,  see [VisualDL](https://github.com/PaddlePaddle/VisualDL) for details.
+During training, you can view loss changes in real time through `VisualDL`,  see [VisualDL](../extension/VisualDL.md) for details.
 
 ### 1.2 Model finetuning
 
@@ -226,22 +226,15 @@ Firstly, you should export inference model using `tools/export_model.py`.
 python tools/export_model.py \
     --model MobileNetV3_large_x1_0 \
     --pretrained_model ./output/MobileNetV3_large_x1_0/best_model/ppcls \
-    --output_path ./inference
+    --output_path ./inference \
+    --class_dim 1000
 ```
 
-Among them, the `--model` parameter is used to specify the model name, `--pretrained_model` parameter is used to specify the model file path, the path does not need to include the model file suffix name, and `--output_path` is used to specify the storage path of the converted model.
+Among them, the `--model` parameter is used to specify the model name, `--pretrained_model` parameter is used to specify the model file path, the path does not need to include the model file suffix name, and `--output_path` is used to specify the storage path of the converted model, class_dim means number of class for the model, default as 1000.
 
 **Note**:
 1. If `--output_path=./inference`, then three files will be generated in the folder `inference`, they are `inference.pdiparams`, `inference.pdmodel` and `inference.pdiparams.info`.
-2. In the file `export_model.py:line53`, the `shape` parameter is the shape of the model input image, the default is `224*224`. Please modify it according to the actual situation, as shown below:
-
-```python
-50 # Please modify the 'shape' according to actual needs
-51 @to_static(input_spec=[
-52     paddle.static.InputSpec(
-53         shape=[None, 3, 224, 224], dtype='float32')
-54 ])
-```
+2. You can specify the `shape` of the model input image by setting the parameter `--img_size`, the default is `224`, which means the shape of input image is `224*224`.
 
 The above command will generate the model structure file (`inference.pdmodel`) and the model weight file (`inference.pdiparams`), and then the inference engine can be used for inference:
 

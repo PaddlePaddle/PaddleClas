@@ -383,7 +383,7 @@ new_batch = mixup_op(batch)
 与  `Mixup` 直接对两幅图进行相加不一样，`Cutmix` 是从一幅图中随机裁剪出一个 `ROI`，然后覆盖当前图像中对应的区域，代码实现如下所示：
 
 ```python
-rom ppcls.data.imaug import DecodeImage
+from ppcls.data.imaug import DecodeImage
 from ppcls.data.imaug import ResizeImage
 from ppcls.data.imaug import ToCHWImage
 from ppcls.data.imaug import transform

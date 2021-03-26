@@ -46,7 +46,7 @@ python tools/train.py \
     epoch:0    train    step:13    loss:7.9561    top1:0.0156    top5:0.1094    lr:0.100000    elapse:0.193s
     ```
 
-训练期间也可以通过VisualDL实时观察loss变化，详见[VisualDL](https://github.com/PaddlePaddle/VisualDL)。
+训练期间也可以通过VisualDL实时观察loss变化，详见[VisualDL](../extension/VisualDL.md)。
 
 ### 1.2 模型微调
 
@@ -238,21 +238,15 @@ python tools/infer/infer.py \
 python tools/export_model.py \
     --model MobileNetV3_large_x1_0 \
     --pretrained_model ./output/MobileNetV3_large_x1_0/best_model/ppcls \
-    --output_path ./inference
+    --output_path ./inference \
+    --class_dim 1000
 ```
 
-其中，参数`--model`用于指定模型名称，`--pretrained_model`用于指定模型文件路径，该路径仍无需包含模型文件后缀名（如[1.3 模型恢复训练](#1.3)），`--output_path`用于指定转换后模型的存储路径。
+其中，参数`--model`用于指定模型名称，`--pretrained_model`用于指定模型文件路径，该路径仍无需包含模型文件后缀名（如[1.3 模型恢复训练](#1.3)），`--output_path`用于指定转换后模型的存储路径，`class_dim`表示模型所包含的类别数，默认为1000。
 
 **注意**：
 1. `--output_path`表示输出的inference模型文件夹路径，若`--output_path=./inference`，则会在`inference`文件夹下生成`inference.pdiparams`、`inference.pdmodel`和`inference.pdiparams.info`文件。
-2. 文件`export_model.py:line53`中，`shape`参数为模型输入图像的`shape`，默认为`224*224`，请根据实际情况修改，如下所示：
-```python
-50 # Please modify the 'shape' according to actual needs
-51 @to_static(input_spec=[
-52     paddle.static.InputSpec(
-53         shape=[None, 3, 224, 224], dtype='float32')
-54 ])
-```
+2. 可以通过设置参数`--img_size`指定模型输入图像的`shape`，默认为`224`，表示图像尺寸为`224*224`，请根据实际情况修改。
 
 上述命令将生成模型结构文件（`inference.pdmodel`）和模型权重文件（`inference.pdiparams`），然后可以使用预测引擎进行推理：
 

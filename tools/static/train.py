@@ -26,8 +26,6 @@ sys.path.append(os.path.abspath(os.path.join(__dir__, '../../')))
 from sys import version_info
 
 import paddle
-import paddle.fluid as fluid
-from paddle.fluid.contrib.mixed_precision.fp16_utils import cast_parameters_to_fp16
 from paddle.distributed import fleet
 
 from ppcls.data import Reader
@@ -67,12 +65,10 @@ def main(args):
     # assign the place
     use_gpu = config.get("use_gpu", True)
     # amp related config
-    use_amp = config.get('use_amp', False)
-    use_pure_fp16 = config.get('use_pure_fp16', False)
-    if use_amp or use_pure_fp16:
+    if 'AMP' in config:
         AMP_RELATED_FLAGS_SETTING = {
             'FLAGS_cudnn_exhaustive_search': 1,
-            'FLAGS_conv_workspace_size_limit': 4000,
+            'FLAGS_conv_workspace_size_limit': 1500,
             'FLAGS_cudnn_batchnorm_spatial_persistent': 1,
             'FLAGS_max_inplace_grad_add': 8,
         }
@@ -97,7 +93,7 @@ def main(args):
 
     best_top1_acc = 0.0  # best top1 acc record
 
-    train_fetchs, lr_scheduler, train_feeds = program.build(
+    train_fetchs, lr_scheduler, train_feeds, optimizer = program.build(
         config,
         train_prog,
         startup_prog,
@@ -106,7 +102,7 @@ def main(args):
 
     if config.validate:
         valid_prog = paddle.static.Program()
-        valid_fetchs, _, valid_feeds = program.build(
+        valid_fetchs, _, valid_feeds, _ = program.build(
             config,
             valid_prog,
             startup_prog,
@@ -119,10 +115,13 @@ def main(args):
     exe = paddle.static.Executor(place)
     # Parameter initialization
     exe.run(startup_prog)
-    if config.get("use_pure_fp16", False):
-        cast_parameters_to_fp16(place, train_prog, fluid.global_scope())
     # load pretrained models or checkpoints
     init_model(config, train_prog, exe)
+
+    if 'AMP' in config and config.AMP.get("use_pure_fp16", False):
+        optimizer.amp_init(place,
+                scope=paddle.static.global_scope(),
+                test_program=valid_prog if config.validate else None)
 
     if not config.get("is_distributed", True) and not use_xpu:
         compiled_train_prog = program.compile(
