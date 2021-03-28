@@ -22,6 +22,7 @@ import datetime
 from collections import OrderedDict
 
 import paddle
+from paddle import amp
 from paddle import to_tensor
 import paddle.nn as nn
 import paddle.nn.functional as F
@@ -300,7 +301,13 @@ def run(dataloader,
                 "top1", '.5f', postfix=",")))
 
     metric_list = OrderedDict(metric_list)
-
+    
+    use_amp = config.get("use_amp", True)
+    use_gpu = config.get("use_gpu", True)
+    if use_amp:
+        scalar = amp.GradScaler(
+            enable=use_gpu, init_loss_scaling=1024)
+    
     tic = time.time()
     for idx, batch in enumerate(dataloader()):
         # avoid statistics from warmup time
@@ -311,12 +318,22 @@ def run(dataloader,
         metric_list['reader_time'].update(time.time() - tic)
         batch_size = len(batch[0])
         feeds = create_feeds(batch, use_mix)
-        fetchs = create_fetchs(feeds, net, config, mode)
         if mode == 'train':
-            avg_loss = fetchs['loss']
-            avg_loss.backward()
+            if use_amp:
+                with amp.auto_cast(enable=use_gpu):
+                    fetchs = create_fetchs(feeds, net, config, mode)
+                    avg_loss = fetchs['loss']
 
-            optimizer.step()
+                scaled_loss = scalar.scale(avg_loss)
+                scaled_loss.backward()
+                # in dygraph mode, optimizer.minimize is equal to optimizer.step
+                scalar.minimize(optimizer, scaled_loss)
+            else:
+                fetchs = create_fetchs(feeds, net, config, mode)
+                avg_loss = fetchs['loss']
+                avg_loss.backward()
+                optimizer.step()
+                
             optimizer.clear_grad()
             lr_value = optimizer._global_learning_rate().numpy()[0]
             metric_list['lr'].update(lr_value, batch_size)
