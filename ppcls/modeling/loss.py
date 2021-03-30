@@ -89,8 +89,8 @@ class MultiLabelLoss(Loss):
     def __init__(self, class_dim=1000, epsilon=None):
         super(MultiLabelLoss, self).__init__(class_dim, epsilon)
 
-    def __call__(self, input, target, use_pure_fp16=False):
-        cost = self._binary_crossentropy(input, target, use_pure_fp16)
+    def __call__(self, input, target):
+        cost = self._binary_crossentropy(input, target)
 
         return cost
 

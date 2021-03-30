@@ -34,8 +34,8 @@ OPTIMIZER:
 TRAIN:
     batch_size: 256
     num_workers: 4
-    file_list: "./dataset/NUS-SCENE-dataset/multilabel_train_list.txt"
-    data_dir: "./dataset/NUS-SCENE-dataset/images"
+    file_list: "./dataset/NUS-WIDE-SCENE/NUS-SCENE-dataset/multilabel_train_list.txt"
+    data_dir: "./dataset/NUS-WIDE-SCENE/NUS-SCENE-dataset/images"
     shuffle_seed: 0
     transforms:
         - DecodeImage:
@@ -59,8 +59,8 @@ TRAIN:
 VALID:
     batch_size: 64
     num_workers: 4
-    file_list: "./dataset/NUS-SCENE-dataset/multilabel_test_list.txt"
-    data_dir: "./dataset/NUS-SCENE-dataset/images"
+    file_list: "./dataset/NUS-WIDE-SCENE/NUS-SCENE-dataset/multilabel_test_list.txt"
+    data_dir: "./dataset/NUS-WIDE-SCENE/NUS-SCENE-dataset/images"
     shuffle_seed: 0
     transforms:
         - DecodeImage:

@@ -72,10 +72,15 @@ def main():
             for number, result_dict in enumerate(batch_result_list):
                 filename = img_path_list[number].split("/")[-1]
                 clas_ids = result_dict["clas_ids"]
-                scores_str = "[{}]".format(", ".join("{:.2f}".format(
-                    r) for r in result_dict["scores"]))
-                print("File:{}, Top-{} result: class id(s): {}, score(s): {}".
-                      format(filename, args.top_k, clas_ids, scores_str))
+                if multilabel:
+                    print("File:{}, multilabel result: ".format(filename))
+                    for id, score in zip(clas_ids, result_dict["scores"]):
+                        print("\tclass id: {}, probability: {:.2f}".format(id, score))
+                else:
+                    scores_str = "[{}]".format(", ".join("{:.2f}".format(
+                        r) for r in result_dict["scores"]))
+                    print("File:{}, Top-{} result: class id(s): {}, score(s): {}".
+                        format(filename, args.top_k, clas_ids, scores_str))
 
                 if args.pre_label_image:
                     save_prelabel_results(clas_ids[0], img_path_list[number],
