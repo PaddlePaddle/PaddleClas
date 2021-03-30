@@ -34,6 +34,7 @@ def main():
     args = parse_args()
     # assign the place
     place = paddle.set_device('gpu' if args.use_gpu else 'cpu')
+    multilabel = True if args.multilabel else False
 
     net = architectures.__dict__[args.model](class_dim=args.class_num)
     load_dygraph_pretrain(net, args.pretrained_model, args.load_static_weights)
@@ -61,9 +62,12 @@ def main():
             batch_outputs = net(batch_tensor)
             if args.model == "GoogLeNet":
                 batch_outputs = batch_outputs[0]
-            batch_outputs = F.softmax(batch_outputs)
+            if multilabel:
+                batch_outputs = F.sigmoid(batch_outputs)
+            else:
+                batch_outputs = F.softmax(batch_outputs)
             batch_outputs = batch_outputs.numpy()
-            batch_result_list = postprocess(batch_outputs, args.top_k)
+            batch_result_list = postprocess(batch_outputs, args.top_k, multilabel=multilabel)
 
             for number, result_dict in enumerate(batch_result_list):
                 filename = img_path_list[number].split("/")[-1]
