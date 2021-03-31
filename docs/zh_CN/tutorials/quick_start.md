@@ -105,18 +105,14 @@ python3 tools/infer/infer.py \
     -i docs/images/quick_start/flowers102/image_06739.jpg \
     --model=ResNet50_vd \
     --pretrained_model="output/ResNet50_vd/best_model/ppcls" \
-    --class_num=102
+    --class_num=102 \
+    --top_k=5
 ```
 
 最终可以得到如下结果，打印出了Top-5对应的class id以及score。
 
 ```
-Current image file: docs/images/quick_start/flowers102/image_06739.jpg
-	top1, class id: 0, probability: 0.5129
-	top2, class id: 50, probability: 0.0671
-	top3, class id: 18, probability: 0.0377
-	top4, class id: 82, probability: 0.0238
-	top5, class id: 54, probability: 0.0231
+File:image_06739.jpg, Top-5 result: class id(s): [0, 96, 18, 50, 51], score(s): [0.79, 0.02, 0.01, 0.01, 0.01]
 ```
 
 * 注意：这里每个模型的训练结果都不相同，因此结果可能稍有不同。

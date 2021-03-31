@@ -12,11 +12,24 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import os
+import sys
+__dir__ = os.path.dirname(os.path.abspath(__file__))
+sys.path.append(os.path.abspath(os.path.join(__dir__, '../../../')))
+import argparse
+import numpy as np
+import cv2
 import paddlehub as hub
+from tools.infer.utils import preprocess
 
-image_path = ["./deploy/hubserving/ILSVRC2012_val_00006666.JPEG", ]
-top_k = 5
+args = argparse.Namespace(resize_short=256, resize=224, normalize=True)
+
+img_path_list = ["./deploy/hubserving/ILSVRC2012_val_00006666.JPEG", ]
+
 module = hub.Module(name="clas_system")
-res = module.predict(paths=image_path, top_k=top_k)
-for i, image in enumerate(image_path):
-    print("The returned result of {}: {}".format(image, res[i]))
+for i, img_path in enumerate(img_path_list):
+    img = cv2.imread(img_path)[:, :, ::-1]
+    img = preprocess(img, args)
+    batch_input_data = np.expand_dims(img, axis=0)
+    res = module.predict(batch_input_data)
+    print("The returned result of {}: {}".format(img_path, res))
