@@ -86,7 +86,13 @@ model_names = {
     'InceptionV3', 'ShuffleNetV2_swish', 'GoogLeNet', 'ResNet50_vd_ssld_v2',
     'SE_ResNet50_vd', 'MobileNetV2', 'ResNeXt101_vd_32x4d',
     'MobileNetV3_large_x0_75', 'MobileNetV3_small_x0_5', 'DenseNet169',
-    'EfficientNetB5'
+    'EfficientNetB5', 'DeiT_base_distilled_patch16_224',
+    'DeiT_base_distilled_patch16_384', 'DeiT_base_patch16_224',
+    'DeiT_base_patch16_384_infer', 'DeiT_small_distilled_patch16_224',
+    'DeiT_small_patch16_224_infer', 'DeiT_tiny_distilled_patch16_224',
+    'DeiT_tiny_patch16_224', 'ViT_base_patch16_224', 'ViT_base_patch16_384',
+    'ViT_base_patch32_384', 'ViT_large_patch16_224', 'ViT_large_patch16_384',
+    'ViT_large_patch32_384', 'ViT_small_patch16_224'
 }
 
 
@@ -253,8 +259,8 @@ class PaddleClas(object):
                     __dir__, 'ppcls/utils/imagenet1k_label_list.txt')
             else:
                 raise Exception(
-                    'If you want to use your own model, Please input model_file as model path!'
-                )
+                    'The model inputed is {}, not provided by PaddleClas. If you want to use your own model, please input model_file as model path!'.
+                    format(process_params.model_name))
         else:
             print('Using user-specified model and params!')
 
