@@ -6,4 +6,4 @@ advanced_tutorials
 
    image_augmentation/index
    distillation/index
-
+   multilabel/index

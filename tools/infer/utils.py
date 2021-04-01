@@ -31,6 +31,7 @@ def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument("-i", "--image_file", type=str)
     parser.add_argument("--use_gpu", type=str2bool, default=True)
+    parser.add_argument("--multilabel", type=str2bool, default=False)
 
     # params for preprocess
     parser.add_argument("--resize_short", type=int, default=256)
@@ -124,11 +125,14 @@ def preprocess(img, args):
     return img
 
 
-def postprocess(batch_outputs, topk=5):
+def postprocess(batch_outputs, topk=5, multilabel=False):
     batch_results = []
     for probs in batch_outputs:
         results = []
-        index = probs.argsort(axis=0)[-topk:][::-1].astype("int32")
+        if multilabel:
+            index = np.where(probs >= 0.5)[0].astype('int32')
+        else:
+            index = probs.argsort(axis=0)[-topk:][::-1].astype("int32")
         clas_id_list = []
         score_list = []
         for i in index:
