@@ -253,11 +253,9 @@ class VisionTransformer(nn.Layer):
         self.head = nn.Linear(embed_dim,
                               class_dim) if class_dim > 0 else Identity()
 
-        # TODO(littletomatodonkey): same init in static mode
-        if paddle.in_dynamic_mode():
-            trunc_normal_(self.pos_embed)
-            trunc_normal_(self.cls_token)
-            self.apply(self._init_weights)
+        trunc_normal_(self.pos_embed)
+        trunc_normal_(self.cls_token)
+        self.apply(self._init_weights)
 
     def _init_weights(self, m):
         if isinstance(m, nn.Linear):
