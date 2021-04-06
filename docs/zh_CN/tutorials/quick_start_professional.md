@@ -223,7 +223,7 @@ python3 -m paddle.distributed.launch \
 ```bash
 python3 tools/eval.py \
     -c ./configs/quick_start/ResNet50_vd_CIFAR100.yaml \
-    -o pretrained_model="./output/ResNet50_vd/best_model/ppcls"\
+    -o pretrained_model="./output/ResNet50_vd/best_model/ppcls"
 ```
 
 #### 6.1.2 单标签分类模型预测
@@ -235,8 +235,7 @@ python3 tools/infer/infer.py \
     -i 待预测的图片文件路径 \
     --model ResNet50_vd \
     --pretrained_model "./output/ResNet50_vd/best_model/ppcls" \
-    --use_gpu True \
-    --load_static_weights False
+    --use_gpu True
 ```
 
 
@@ -249,7 +248,9 @@ python3 tools/infer/infer.py \
 python3 tools/export_model.py \
     --model ResNet50_vd \
     --pretrained_model ./output/ResNet50_vd/best_model/ppcls \
-    --output_path ./inference
+    --output_path ./inference \
+    --class_dim 100 \
+    --img_size 32
 ```
 
 其中，参数`--model`用于指定模型名称，`--pretrained_model`用于指定模型文件路径，`--output_path`用于指定转换后模型的存储路径。
@@ -263,7 +264,7 @@ python3 tools/export_model.py \
 
 ```bash
 python3 tools/infer/predict.py \
-    --image_file 图片路径 \
+    --image_file "./dataset/CIFAR100/test/0/0001.png" \
     --model_file "./inference/inference.pdmodel" \
     --params_file "./inference/inference.pdiparams" \
     --use_gpu=True \
@@ -279,8 +280,7 @@ python3 tools/infer/predict.py \
 ```bash
 python3 tools/eval.py \
     -c ./configs/quick_start/ResNet50_vd_multilabel.yaml \
-    -o pretrained_model="./output/ResNet50_vd/best_model/ppcls" \
-    -o load_static_weights=False
+    -o pretrained_model="./output/ResNet50_vd/best_model/ppcls" 
 ```
 
 评估指标采用mAP，验证集的mAP应该在0.57左右。
@@ -289,11 +289,10 @@ python3 tools/eval.py \
 
 ```bash
 python3 tools/infer/infer.py \
-    -i 待预测的图片文件路径 \
+    -i "./dataset/NUS-WIDE-SCENE/NUS-SCENE-dataset/images/0199_434752251.jpg" \
     --model ResNet50_vd \
     --pretrained_model "./output/ResNet50_vd/best_model/ppcls" \
     --use_gpu True \
-    --load_static_weights False \
     --multilabel True \
     --class_num 33
 ```
