@@ -232,7 +232,7 @@ python3 tools/eval.py \
 
 ```python
 python3 tools/infer/infer.py \
-    -i 待预测的图片文件路径 \
+    -i "./dataset/CIFAR100/test/0/0001.png" \
     --model ResNet50_vd \
     --pretrained_model "./output/ResNet50_vd/best_model/ppcls" \
     --use_gpu True
