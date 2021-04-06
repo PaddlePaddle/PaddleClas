@@ -197,6 +197,40 @@ class CommonDataset(Dataset):
 
     def __len__(self):
         return self.num_samples
+    
+
+class MultiLabelDataset(Dataset):
+    """
+    Define dataset class for multilabel image classification
+    """
+
+    def __init__(self, params):
+        self.params = params
+        self.mode = params.get("mode", "train")
+        self.full_lines = get_file_list(params)
+        self.delimiter = params.get("delimiter", "\t")
+        self.ops = create_operators(params["transforms"])
+        self.num_samples = len(self.full_lines)
+        return
+
+    def __getitem__(self, idx):
+        try:
+            line = self.full_lines[idx]
+            img_path, label_str = line.split(self.delimiter)
+            img_path = os.path.join(self.params["data_dir"], img_path)
+            with open(img_path, "rb") as f:
+                img = f.read()
+
+            labels = label_str.split(',')
+            labels = [int(i) for i in labels]
+
+            return (transform(img, self.ops), np.array(labels).astype("float32"))
+        except Exception as e:
+            logger.error("data read failed: {}, exception info: {}".format(line, e))
+            return self.__getitem__(random.randint(0, len(self)))
+
+    def __len__(self):
+        return self.num_samples
 
 
 class Reader:
@@ -229,6 +263,7 @@ class Reader:
             self.collate_fn = self.mix_collate_fn
 
         self.places = places
+        self.multilabel = config.get("multilabel", False)
 
     def mix_collate_fn(self, batch):
         batch = transform(batch, self.batch_ops)
@@ -246,7 +281,10 @@ class Reader:
     def __call__(self):
         batch_size = int(self.params['batch_size']) // trainers_num
 
-        dataset = CommonDataset(self.params)
+        if self.multilabel:
+            dataset = MultiLabelDataset(self.params)
+        else:
+            dataset = CommonDataset(self.params)
 
         is_train = self.params['mode'] == "train"
         batch_sampler = DistributedBatchSampler(

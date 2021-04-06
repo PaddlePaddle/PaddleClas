@@ -104,6 +104,7 @@ def check_config(config):
 
     architecture = config.get('ARCHITECTURE')
     check.check_architecture(architecture)
+    check.check_model_with_running_mode(architecture)
 
     use_mix = config.get('use_mix', False)
     check.check_mix(architecture, use_mix)

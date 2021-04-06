@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import os
 import numpy as np
 import cv2
 import time
@@ -101,6 +102,13 @@ class Predictor(object):
 
 if __name__ == "__main__":
     args = parse_args()
+    assert os.path.exists(
+        args.model_file), "The path of 'model_file' does not exist: {}".format(
+            args.model_file)
+    assert os.path.exists(
+        args.params_file
+    ), "The path of 'params_file' does not exist: {}".format(args.params_file)
+
     predictor = Predictor(args)
     if not args.enable_benchmark:
         predictor.normal_predict()
