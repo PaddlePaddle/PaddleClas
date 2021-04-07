@@ -18,13 +18,13 @@
 * PaddleClas主要代码和目录结构如下
 
 <div align="center">
-<img src="../../images/quick_start/community/code_framework.png"  width = "600" />
+<img src="../../images/quick_start/community/code_framework.png"  width = "800" />
 </div>
 
 * configs 文件夹下存放训练脚本和验证脚本的yaml配置文件，文件按模型类别存放。
 * dataset 文件夹下存放数据集和预处理训练数据的脚本。脚本负责将数据集处理为适合Dataloader处理的格式。
 * docs 文件夹下存放中英文文档。
-* deploy 文件夹存放的是编译、部署工具，支持 Cpp inference、Hub Serveing、Paddle Lite、Slim量化等多种部署方式。
+* deploy 文件夹存放的是部署工具，支持 Cpp inference、Hub Serveing、Paddle Lite、Slim量化等多种部署方式。
 * ppcls 文件夹下存放PaddleClas框架主体。模型结构脚本、数据增强脚本、优化脚本等DL程序的标准流程代码都在这里。
 * tools 文件夹下存放用于模型下载、训练、预测的脚本。
 * requirements.txt 文件用于安装 PaddleClas 的依赖项。使用pip进行升级安装使用。
@@ -248,9 +248,24 @@ def save_model(net, optimizer, model_path, epoch_id, prefix='ppcls'):
 
 ## 2. 如何贡献代码
 
+### 2.1 PaddleClas分支说明
+
+PaddleClas未来将维护2种分支，分别为：
+
+* release/x.x系列分支：为稳定的发行版本分支，会适时打tag发布版本，适配Paddle的release版本。当前最新的分支为release/2.0分支，是当前默认分支，适配Paddle v2.0.0。随着版本迭代，release/x.x系列分支会越来越多，默认维护最新版本的release分支，前1个版本分支会修复bug，其他的分支不再维护。
+* develop分支：为开发分支，适配Paddle的develop版本，主要用于开发新功能。如果有同学需要进行二次开发，请选择develop分支。为了保证develop分支能在需要的时候拉出release/x.x分支，develop分支的代码只能使用Paddle最新release分支中有效的api。也就是说，如果Paddle develop分支中开发了新的api，但尚未出现在release分支代码中，那么请不要在PaddleClas中使用。除此之外，对于不涉及api的性能优化、参数调整、策略更新等，都可以正常进行开发。
+
+PaddleClas的历史分支，未来将不再维护。考虑到一些同学可能仍在使用，这些分支还会继续保留：
+
+* release/static分支：这个分支曾用于静态图的开发与测试，目前兼容>=1.7版本的Paddle。如果有特殊需求，要适配旧版本的Paddle，那还可以使用这个分支，但除了修复bug外不再更新代码。
+* dygraph-dev分支：这个分支将不再维护，也不再接受新的代码，请使用的同学尽快迁移到develop分支。
+
+
 PaddleClas欢迎大家向repo中积极贡献代码，下面给出一些贡献代码的基本流程。
 
-### 2.1 fork和clone代码
+### 2.2 PaddleClas代码提交流程与规范
+
+#### 2.2.1 fork和clone代码
 
 * 跳转到[PaddleClas GitHub首页](https://github.com/PaddlePaddle/PaddleClas)，然后单击 Fork 按钮，生成自己目录下的仓库，比如 `https://github.com/USERNAME/PaddleClas`。
 
@@ -276,7 +291,7 @@ clone的地址可以从下面获取
 <img src="../../images/quick_start/community/002_clone.png"  width = "600" />
 </div>
 
-### 2.2 和远程仓库建立连接
+#### 2.2.2 和远程仓库建立连接
 
 首先通过`git remote -v`查看当前远程仓库的信息。
 
@@ -302,7 +317,7 @@ upstream    https://github.com/PaddlePaddle/PaddleClas.git (push)
 
 这主要是为了后续在提交pull request(PR)时，始终保持本地仓库最新。
 
-### 2.3 创建本地分支
+#### 2.2.3 创建本地分支
 
 可以基于当前分支创建新的本地分支，命令如下。
 
@@ -327,7 +342,7 @@ Branch new_branch set up to track remote branch develop from upstream.
 Switched to a new branch 'new_branch'
 ```
 
-### 2.4 使用pre-commit勾子
+#### 2.2.4 使用pre-commit勾子
 
 Paddle 开发人员使用 pre-commit 工具来管理 Git 预提交钩子。 它可以帮助我们格式化源代码（C++，Python），在提交（commit）前自动检查一些基本事宜（如每个文件只有一个 EOL，Git 中不要添加大文件等）。
 
@@ -343,7 +358,7 @@ pre-commit install
 2. 通过pip install pre-commit和conda install -c conda-forge pre-commit安装的yapf稍有不同的，PaddleClas 开发人员使用的是`pip install pre-commit`。
 
 
-### 2.5 修改与提交代码
+#### 2.2.5 修改与提交代码
 
 可以通过`git status`查看改动的文件。
 对PaddleClas的`README.md`做了一些修改，希望提交上去。则可以通过以下步骤
@@ -366,7 +381,7 @@ pre-commit
 git commit -m "your commit info"
 ```
 
-### 2.6 保持本地仓库最新
+#### 2.2.6 保持本地仓库最新
 
 获取 upstream 的最新代码并更新当前分支。这里的upstream来自于2.2节的`和远程仓库建立连接`部分。
 
@@ -376,13 +391,13 @@ git fetch upstream
 git pull upstream develop
 ```
 
-### 2.7 push到远程仓库
+#### 2.2.7 push到远程仓库
 
 ```shell
 git push origin new_branch
 ```
 
-### 2.7 提交Pull Request
+#### 2.2.7 提交Pull Request
 
 点击new pull request，选择本地分支和目标分支，如下图所示。在PR的描述说明中，填写该PR所完成的功能。接下来等待review，如果有需要修改的地方，参照上述步骤更新 origin 中的对应分支即可。
 
@@ -392,7 +407,7 @@ git push origin new_branch
 
 
 
-### 2.8 签署CLA协议和通过单元测试
+#### 2.2.8 签署CLA协议和通过单元测试
 
 * 签署CLA
 在首次向PaddlePaddle提交Pull Request时，您需要您签署一次CLA(Contributor License Agreement)协议，以保证您的代码可以被合入，具体签署方式如下：
@@ -401,7 +416,7 @@ git push origin new_branch
 2. 点击CLA网站中的“Sign in with GitHub to agree”,点击完成后将会跳转回您的Pull Request页面
 
 
-### 2.9 删除分支
+#### 2.2.9 删除分支
 
 * 删除远程分支
 
@@ -424,7 +439,7 @@ git checkout develop
 git branch -D new_branch
 ```
 
-### 2.10 提交代码的一些约定
+#### 2.2.10 提交代码的一些约定
 
 为了使评审人在评审代码时更好地专注于代码本身，请您每次提交代码时，遵守以下约定：
 
@@ -457,10 +472,10 @@ git branch -D new_branch
 请采用`start a review`进行回复，而非直接回复的方式。原因是每个回复都会发送一封邮件，会造成邮件灾难。
 
 
-### 总结
+## 3. 总结
 
 * 开源社区依赖于众多开发者与用户的贡献和反馈，在这里感谢与期待大家向PaddleClas提出宝贵的意见与pull request，希望我们可以一起打造一个领先实用全面的图像分类代码仓库！
 
-### 参考文献
+## 4. 参考文献
 1. [PaddlePaddle本地开发指南](https://www.paddlepaddle.org.cn/documentation/docs/zh/develop/guides/08_contribution/index_cn.html)
 2. [向开源框架提交pr的过程](https://blog.csdn.net/vim_wj/article/details/78300239)
