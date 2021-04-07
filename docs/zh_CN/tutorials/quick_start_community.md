@@ -235,15 +235,15 @@ def save_model(net, optimizer, model_path, epoch_id, prefix='ppcls'):
 ```
 
 在保存的时候有两点需要注意：
-1. 只在0号节点上保存模型。否则多卡训练的时候，如果所有节点都保存模型，则多个节点写文件时可能会发生写文件冲突，导致最终保存的模型无法不被正确加载。
+1. 只在0号节点上保存模型。否则多卡训练的时候，如果所有节点都保存模型到相同的路径，则多个节点写文件时可能会发生写文件冲突，导致最终保存的模型无法被正确加载。
 2. 优化器参数也需要存储，方便后续的加载断点进行训练。
 
 1.2.3 预测部署代码和方式。
 
-* 如果希望在服务端使用cpp进行部署，可以参考[cpp inference预测教程](../../../deploy/cpp_infer/readme.md)
-* 如果希望将分类模型部署为服务，可以参考[hub serving预测部署教程](../../../deploy/hubserving/readme.md)
-* 如果希望将对分类模型进行量化，可以参考[Paddle Slim量化教程](../../../deploy/slim/quant/README.md)
-* 如果希望在移动端使用分类模型进行预测，可以参考[PaddleLite预测部署教程](../../../deploy/lite/readme.md)
+* 如果希望在服务端使用cpp进行部署，可以参考[cpp inference预测教程](../../../deploy/cpp_infer/readme.md)。
+* 如果希望将分类模型部署为服务，可以参考[hub serving预测部署教程](../../../deploy/hubserving/readme.md)。
+* 如果希望将对分类模型进行量化，可以参考[Paddle Slim量化教程](../../../deploy/slim/quant/README.md)。
+* 如果希望在移动端使用分类模型进行预测，可以参考[PaddleLite预测部署教程](../../../deploy/lite/readme.md)。
 
 
 ## 2. 如何贡献代码
@@ -290,6 +290,8 @@ origin    https://github.com/USERNAME/PaddleClas.git (push)
 ```shell
 git remote add upstream https://github.com/PaddlePaddle/PaddleClas.git
 ```
+
+使用`git remote -v`查看当前远程仓库的信息，输出如下，发现包括了origin和upstream 2个远程仓库。
 
 ```
 origin    https://github.com/USERNAME/PaddleClas.git (fetch)
@@ -438,7 +440,7 @@ git branch -D new_branch
 
 请注意每个commit的名称：应能反映当前commit的内容，不能太随意。
 
-3）如果解决了某个Issue的问题，请在该PUll Request的第一个评论框中加上：fix #issue_number，这样当该PUll Request被合并后，会自动关闭对应的Issue。关键词包括：close, closes, closed, fix, fixes, fixed, resolve, resolves, resolved，请选择合适的词汇。详细可参考Closing issues via commit messages。
+3）如果解决了某个Issue的问题，请在该PUll Request的第一个评论框中加上：fix #issue_number，这样当该PUll Request被合并后，会自动关闭对应的Issue。关键词包括：close, closes, closed, fix, fixes, fixed, resolve, resolves, resolved，请选择合适的词汇。详细可参考[Closing issues via commit messages](https://help.github.com/articles/closing-issues-via-commit-messages)。
 
 此外，在回复评审人意见时，请您遵守以下约定：
 
