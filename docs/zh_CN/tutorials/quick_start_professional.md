@@ -69,7 +69,7 @@ export CUDA_VISIBLE_DEVICES=0,1,2,3
 python3 -m paddle.distributed.launch \
     --gpus="0,1,2,3" \
     tools/train.py \
-        -c ./configs/quick_start/ResNet50_vd_CIFAR100.yaml
+        -c ./configs/quick_start/professional/ResNet50_vd_CIFAR100.yaml
 ```
 
 
@@ -85,7 +85,7 @@ export CUDA_VISIBLE_DEVICES=0,1,2,3
 python3 -m paddle.distributed.launch \
     --gpus="0,1,2,3" \
     tools/train.py \
-        -c ./configs/quick_start/ResNet50_vd_CIFAR100_finetune.yaml
+        -c ./configs/quick_start/professional/ResNet50_vd_CIFAR100_finetune.yaml
 ```
 
 验证集最高准确率为0.718左右，加载预训练模型之后，CIFAR100数据集精度大幅提升，绝对精度涨幅30\%。
@@ -97,7 +97,7 @@ export CUDA_VISIBLE_DEVICES=0,1,2,3
 python3 -m paddle.distributed.launch \
     --gpus="0,1,2,3" \
     tools/train.py \
-        -c ./configs/quick_start/ResNet50_vd_ssld_CIFAR100_finetune.yaml
+        -c ./configs/quick_start/professional/ResNet50_vd_ssld_CIFAR100_finetune.yaml
 ```
 
 最终CIFAR100验证集上精度指标为0.73，相对于79.12\%预训练模型的微调结构，新数据集指标可以再次提升1.2\%。
@@ -109,7 +109,7 @@ export CUDA_VISIBLE_DEVICES=0,1,2,3
 python3 -m paddle.distributed.launch \
     --gpus="0,1,2,3" \
     tools/train.py \
-        -c ./configs/quick_start/MobileNetV3_large_x1_0_CIFAR100_finetune.yaml
+        -c ./configs/quick_start/professional/MobileNetV3_large_x1_0_CIFAR100_finetune.yaml
 ```
 
 验证集最高准确率为0.601左右, 较ResNet50_vd低近12%。
@@ -145,7 +145,7 @@ export CUDA_VISIBLE_DEVICES=0,1,2,3
 python3 -m paddle.distributed.launch \
     --gpus="0,1,2,3" \
     tools/train.py \
-        -c ./configs/quick_start/ResNet50_vd_mixup_CIFAR100_finetune.yaml
+        -c ./configs/quick_start/professional/ResNet50_vd_mixup_CIFAR100_finetune.yaml
 ```
 
 最终CIFAR100验证集上的精度为0.73，使用数据增广可以使得模型精度再次提升约1.2\%。
@@ -186,7 +186,7 @@ export CUDA_VISIBLE_DEVICES=0,1,2,3
 python3 -m paddle.distributed.launch \
     --gpus="0,1,2,3" \
     tools/train.py \
-        -c ./configs/quick_start/R50_vd_distill_MV3_large_x1_0_CIFAR100.yaml
+        -c ./configs/quick_start/professional/R50_vd_distill_MV3_large_x1_0_CIFAR100.yaml
 ```
 
 最终CIFAR100验证集上的精度为64.4\%，使用教师模型进行知识蒸馏，MobileNetV3的精度涨幅4.3\%。
@@ -222,7 +222,7 @@ python3 -m paddle.distributed.launch \
 
 ```bash
 python3 tools/eval.py \
-    -c ./configs/quick_start/ResNet50_vd_CIFAR100.yaml \
+    -c ./configs/quick_start/professional/ResNet50_vd_CIFAR100.yaml \
     -o pretrained_model="./output/ResNet50_vd/best_model/ppcls"
 ```
 
