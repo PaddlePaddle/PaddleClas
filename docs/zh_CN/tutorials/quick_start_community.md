@@ -1,4 +1,4 @@
-# 30分钟玩转PaddleClas（社区版）
+# PaddleClas代码解析与社区贡献指南
 
 ## 1. 整体代码结构解析
 
@@ -34,7 +34,7 @@
 深度学习模型训练流程框图如下。
 
 <div align="center">
-<img src="../../images/quick_start/community/train_framework.png"  width = "600" />
+<img src="../../images/quick_start/community/train_framework.png"  width = "800" />
 </div>
 
 具体地，深度学习模型训练过程中，主要包含以下几个核心模块。
