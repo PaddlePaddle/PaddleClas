@@ -16,13 +16,13 @@ cd path_to_PaddleClas
 
 #### 1.1.1 准备CIFAR100
 
-* 创建并进入`dataset/CIFAR100`目录，下载并解压NUS-WIDE-SCENE数据集。
+* 进入`dataset/`目录，下载并解压CIFAR100数据集。
 
 ```shell
-mkdir dataset/CIFAR100
-cd dataset/CIFAR100
+cd dataset
 wget https://paddle-imagenet-models-name.bj.bcebos.com/data/CIFAR100.tar
 tar -xf CIFAR100.tar
+cd ../
 ```
 
 #### 1.1.2 准备NUS-WIDE-SCENE
@@ -69,7 +69,8 @@ export CUDA_VISIBLE_DEVICES=0,1,2,3
 python3 -m paddle.distributed.launch \
     --gpus="0,1,2,3" \
     tools/train.py \
-        -c ./configs/quick_start/professional/ResNet50_vd_CIFAR100.yaml
+        -c ./configs/quick_start/professional/ResNet50_vd_CIFAR100.yaml \
+        -o model_save_dir="output_CIFAR"
 ```
 
 
@@ -85,7 +86,8 @@ export CUDA_VISIBLE_DEVICES=0,1,2,3
 python3 -m paddle.distributed.launch \
     --gpus="0,1,2,3" \
     tools/train.py \
-        -c ./configs/quick_start/professional/ResNet50_vd_CIFAR100_finetune.yaml
+        -c ./configs/quick_start/professional/ResNet50_vd_CIFAR100_finetune.yaml \
+        -o model_save_dir="output_CIFAR"
 ```
 
 验证集最高准确率为0.718左右，加载预训练模型之后，CIFAR100数据集精度大幅提升，绝对精度涨幅30\%。
@@ -97,7 +99,8 @@ export CUDA_VISIBLE_DEVICES=0,1,2,3
 python3 -m paddle.distributed.launch \
     --gpus="0,1,2,3" \
     tools/train.py \
-        -c ./configs/quick_start/professional/ResNet50_vd_ssld_CIFAR100_finetune.yaml
+        -c ./configs/quick_start/professional/ResNet50_vd_ssld_CIFAR100_finetune.yaml \
+        -o model_save_dir="output_CIFAR"
 ```
 
 最终CIFAR100验证集上精度指标为0.73，相对于79.12\%预训练模型的微调结构，新数据集指标可以再次提升1.2\%。
@@ -109,7 +112,8 @@ export CUDA_VISIBLE_DEVICES=0,1,2,3
 python3 -m paddle.distributed.launch \
     --gpus="0,1,2,3" \
     tools/train.py \
-        -c ./configs/quick_start/professional/MobileNetV3_large_x1_0_CIFAR100_finetune.yaml
+        -c ./configs/quick_start/professional/MobileNetV3_large_x1_0_CIFAR100_finetune.yaml \
+        -o model_save_dir="output_CIFAR"
 ```
 
 验证集最高准确率为0.601左右, 较ResNet50_vd低近12%。
@@ -117,17 +121,18 @@ python3 -m paddle.distributed.launch \
 
 ### 2.2 多标签训练
 
-* 基于ImageNet1k分类预训练模型进行微调NUS-WIDE-SCENE数据集，训练脚本如下所示。
+* 基于ImageNet1k分类预训练模型进行微调NUS-WIDE-SCENE数据集，该是数据集NUS-WIDE的一个子集，类别数目为33类，图片总数是17463张，训练脚本如下所示。
 
 ```shell
 export CUDA_VISIBLE_DEVICES=0,1,2,3
 python3 -m paddle.distributed.launch \
     --gpus="0,1,2,3" \
     tools/train.py \
-        -c ./configs/quick_start/ResNet50_vd_multilabel.yaml
+        -c ./configs/quick_start/ResNet50_vd_multilabel.yaml \
+        -o model_save_dir="output_NUS-WIDE-SCENE"
 ```
 
-训练10epoch之后，验证集最好的准确率应该在0.72左右。
+训练10epoch之后，验证集最好的准确率应该在0.95左右。
 
 * 零基础训练(不加载预训练模型)只需要将配置文件中的`pretrained_model`置为`""`即可。
 
@@ -145,7 +150,9 @@ export CUDA_VISIBLE_DEVICES=0,1,2,3
 python3 -m paddle.distributed.launch \
     --gpus="0,1,2,3" \
     tools/train.py \
-        -c ./configs/quick_start/professional/ResNet50_vd_mixup_CIFAR100_finetune.yaml
+        -c ./configs/quick_start/professional/ResNet50_vd_mixup_CIFAR100_finetune.yaml \
+        -o model_save_dir="output_CIFAR"
+        
 ```
 
 最终CIFAR100验证集上的精度为0.73，使用数据增广可以使得模型精度再次提升约1.2\%。
@@ -165,7 +172,7 @@ python3 -m paddle.distributed.launch \
 PaddleClas包含了自研的SSLD知识蒸馏方案，具体的内容可以参考[知识蒸馏章节](../advanced_tutorials/distillation/distillation.md)本小节将尝试使用知识蒸馏技术对MobileNetV3_large_x1_0模型进行训练，使用`2.1.2小节`训练得到的ResNet50_vd模型作为蒸馏所用的教师模型，首先将`2.1.2小节`训练得到的ResNet50_vd模型保存到指定目录，脚本如下。
 
 ```shell
-cp -r output/ResNet50_vd/best_model/  ./pretrained/CIFAR100_R50_vd_final/
+cp -r output_CIFAR/ResNet50_vd/best_model/  ./pretrained/CIFAR100_R50_vd_final/
 ```
 
 配置文件中数据数量、模型结构、预训练地址以及训练的数据配置如下：
@@ -186,7 +193,9 @@ export CUDA_VISIBLE_DEVICES=0,1,2,3
 python3 -m paddle.distributed.launch \
     --gpus="0,1,2,3" \
     tools/train.py \
-        -c ./configs/quick_start/professional/R50_vd_distill_MV3_large_x1_0_CIFAR100.yaml
+        -c ./configs/quick_start/professional/R50_vd_distill_MV3_large_x1_0_CIFAR100.yaml \
+        -o model_save_dir="output_CIFAR"
+        
 ```
 
 最终CIFAR100验证集上的精度为64.4\%，使用教师模型进行知识蒸馏，MobileNetV3的精度涨幅4.3\%。
@@ -198,35 +207,21 @@ python3 -m paddle.distributed.launch \
     * 该蒸馏过程无须使用真实标签，所以可以使用更多的无标签数据，在使用过程中，可以将无标签数据生成假的train_list.txt，然后与真实的train_list.txt进行合并, 用户可以根据自己的数据自行体验。
 
 
-## 五、多标签分类
+## 五、模型评估与推理
 
-本小结提供了多标签分类的样例，数据集NUS-WIDE-SCENE是数据集NUS-WIDE的一个子集，类别数目为33类，图片总数是17463张。训练脚本如下。
+### 5.1 单标签分类模型评估与推理
 
-```shell
-export CUDA_VISIBLE_DEVICES=0,1,2,3
-python3 -m paddle.distributed.launch \
-    --gpus="0,1,2,3" \
-    tools/train.py \
-        -c ./configs/quick_start/ResNet50_vd_multilabel.yaml
-```
-
-训练10epoch之后，验证集最好的正确率应该在0.72左右。
-
-## 六、模型评估与推理
-
-### 6.1 单标签分类模型评估与推理
-
-#### 6.1.1 单标签分类模型评估。
+#### 5.1.1 单标签分类模型评估。
 
 训练好模型之后，可以通过以下命令实现对模型精度的评估。
 
 ```bash
 python3 tools/eval.py \
     -c ./configs/quick_start/professional/ResNet50_vd_CIFAR100.yaml \
-    -o pretrained_model="./output/ResNet50_vd/best_model/ppcls"
+    -o pretrained_model="./output_CIFAR/ResNet50_vd/best_model/ppcls" 
 ```
 
-#### 6.1.2 单标签分类模型预测
+#### 5.1.2 单标签分类模型预测
 
 模型训练完成之后，可以加载训练得到的预训练模型，进行模型预测。在模型库的 `tools/infer/infer.py` 中提供了完整的示例，只需执行下述命令即可完成模型预测：
 
@@ -234,12 +229,12 @@ python3 tools/eval.py \
 python3 tools/infer/infer.py \
     -i "./dataset/CIFAR100/test/0/0001.png" \
     --model ResNet50_vd \
-    --pretrained_model "./output/ResNet50_vd/best_model/ppcls" \
+    --pretrained_model "./output_CIFAR/ResNet50_vd/best_model/ppcls" \
     --use_gpu True
 ```
 
 
-#### 6.1.3 单标签分类使用inference模型进行模型推理
+#### 5.1.3 单标签分类使用inference模型进行模型推理
 
 通过导出inference模型，PaddlePaddle支持使用预测引擎进行预测推理。接下来介绍如何用预测引擎进行推理：
 首先，对训练好的模型进行转换：
@@ -247,7 +242,7 @@ python3 tools/infer/infer.py \
 ```bash
 python3 tools/export_model.py \
     --model ResNet50_vd \
-    --pretrained_model ./output/ResNet50_vd/best_model/ppcls \
+    --pretrained_model ./output_CIFAR/ResNet50_vd/best_model/ppcls \
     --output_path ./inference \
     --class_dim 100 \
     --img_size 32
@@ -271,27 +266,27 @@ python3 tools/infer/predict.py \
     --use_tensorrt=False
 ```
 
-### 6.2 多标签分类模型评估与预测
+### 5.2 多标签分类模型评估与预测
 
-#### 6.2.1 多标签分类模型评估
+#### 5.2.1 多标签分类模型评估
 
 训练好模型之后，可以通过以下命令实现对模型精度的评估。
 
 ```bash
 python3 tools/eval.py \
     -c ./configs/quick_start/ResNet50_vd_multilabel.yaml \
-    -o pretrained_model="./output/ResNet50_vd/best_model/ppcls" 
+    -o pretrained_model="./output_NUS-WIDE-SCENE/ResNet50_vd/best_model/ppcls" 
 ```
 
 评估指标采用mAP，验证集的mAP应该在0.57左右。
 
-#### 6.2.2 多标签分类模型预测
+#### 5.2.2 多标签分类模型预测
 
 ```bash
 python3 tools/infer/infer.py \
     -i "./dataset/NUS-WIDE-SCENE/NUS-SCENE-dataset/images/0199_434752251.jpg" \
     --model ResNet50_vd \
-    --pretrained_model "./output/ResNet50_vd/best_model/ppcls" \
+    --pretrained_model "./output_NUS-WIDE-SCENE/ResNet50_vd/best_model/ppcls" \
     --use_gpu True \
     --multilabel True \
     --class_num 33
