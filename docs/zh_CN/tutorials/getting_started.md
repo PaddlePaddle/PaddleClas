@@ -224,6 +224,8 @@ python tools/infer/infer.py \
 + `pretrained_model`：模型权重文件路径，如 `./output/MobileNetV3_large_x1_0/best_model/ppcls`
 + `use_gpu` : 是否开启GPU训练，默认值：`True`
 + `load_static_weights` : 模型权重文件是否为静态图训练得到的，默认值：`False`
++ `resize_short`: 对输入图像进行等比例缩放，表示最短边的尺寸，默认值：`256`
++ `resize`: 对`resize_short`操作后的进行居中裁剪，表示裁剪的尺寸，默认值：`224`
 + `pre_label_image` : 是否对图像数据进行预标注，默认值：`False`
 + `pre_label_out_idr` : 预标注图像数据的输出文件夹，当`pre_label_image=True`时，会在该文件夹下面生成很多个子文件夹，每个文件夹名称为类别id，其中存储模型预测属于该类别的所有图像。
 
@@ -265,5 +267,7 @@ python tools/infer/predict.py \
 + `use_tensorrt`：是否使用 TesorRT 预测引擎，默认值：`True`
 + `use_gpu`：是否使用 GPU 预测，默认值：`True`
 + `enable_mkldnn`：是否启用`MKL-DNN`加速，默认为`False`。注意`enable_mkldnn`与`use_gpu`同时为`True`时，将忽略`enable_mkldnn`，而使用GPU运行。
++ `resize_short`: 对输入图像进行等比例缩放，表示最短边的尺寸，默认值：`256`
++ `resize`: 对`resize_short`操作后的进行居中裁剪，表示裁剪的尺寸，默认值：`224`
 
 * 如果你希望评测模型速度，建议使用该脚本(`tools/infer/predict.py`)，同时开启TensorRT加速预测。
