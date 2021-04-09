@@ -72,6 +72,8 @@ paddleclas --model_name=ResNet50 --top_k=5 --image_file='docs/images/whl/demo.jp
 * pre_label_image(bool): 是否需要进行预标注。
 * pre_label_out_idr(str): 进行预标注后，输出结果的文件路径，默认为None。
 
+**注意**: 如果使用`Transformer`系列模型，如`DeiT_***_384`, `ViT_***_384`等，请注意模型的输入数据尺寸，需要设置参数`resize_short=384`, `reize=384`。
+
 ### 3. 代码使用方法
 
 **提供两种使用方式：1、python交互式编程。2、bash命令行式编程**
