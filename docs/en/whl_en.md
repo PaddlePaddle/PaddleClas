@@ -73,6 +73,8 @@ paddleclas --model_name=ResNet50 --top_k=5 --image_file='docs/images/whl/demo.jp
 * pre_label_image(bool): whether prelabel or not, default=False.
 * pre_label_out_idr(str): If prelabeling, the path of output.
 
+**Note**: If you want to use `Transformer series models`, such as `DeiT_***_384`, `ViT_***_384`, etc., please pay attention to the input size of model, and need to set `resize_short=384`, `reize=384`.
+
 ### 3. Different Usages of Codes
 
 **We provide two ways to use: 1. Python interative programming 2. Bash command line programming**

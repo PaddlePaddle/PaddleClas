@@ -210,8 +210,12 @@ Among them:
 + `pretrained_model`: Weight file path, such as `./pretrained/MobileNetV3_large_x1_0_pretrained/`;
 + `use_gpu`: Whether to use the GPU, default by `True`;
 + `load_static_weights`: Whether to load the pre-trained model obtained from static image training, default by `False`;
++ `resize_short`: The length of the shortest side of the image that be scaled proportionally, default by `256`;
++ `resize`: The side length of the image that be center cropped from resize_shorted image, default by `224`;
 + `pre_label_image`: Whether to pre-label the image data, default value: `False`;
 + `pre_label_out_idr`: The output path of pre-labeled image data. When `pre_label_image=True`, a lot of subfolders will be generated under the path, each subfolder represent a category, which stores all the images predicted by the model to belong to the category.
+
+**Note**: If you want to use `Transformer series models`, such as `DeiT_***_384`, `ViT_***_384`, etc., please pay attention to the input size of model, and need to set `resize_short=384`, `reize=384`.
 
 About more detailed infomation, you can refer to [infer.py](../../../tools/infer/infer.py).
 
@@ -253,6 +257,9 @@ Among them:
 + `use_tensorrt`: Whether to use the TesorRT, default by `True`;
 + `use_gpu`: Whether to use the GPU, default by `True`
 + `enable_mkldnn`: Wheter to use `MKL-DNN`, default by `False`. When both `use_gpu` and `enable_mkldnn` are set to `True`, GPU is used to run and `enable_mkldnn` will be ignored.
++ `resize_short`: The length of the shortest side of the image that be scaled proportionally, default by `256`;
++ `resize`: The side length of the image that be center cropped from resize_shorted image, default by `224`;
 
+**Note**: If you want to use `Transformer series models`, such as `DeiT_***_384`, `ViT_***_384`, etc., please pay attention to the input size of model, and need to set `resize_short=384`, `reize=384`.
 
 If you want to evaluate the speed of the model, it is recommended to use [predict.py](../../../tools/infer/predict.py), and enable TensorRT to accelerate.
