@@ -16,6 +16,7 @@ import numpy as np
 import imghdr
 import os
 import signal
+import random
 
 from paddle.io import Dataset, DataLoader, DistributedBatchSampler
 
@@ -182,12 +183,17 @@ class CommonDataset(Dataset):
         return
 
     def __getitem__(self, idx):
-        line = self.full_lines[idx]
-        img_path, label = line.split(self.delimiter)
-        img_path = os.path.join(self.params['data_dir'], img_path)
-        with open(img_path, 'rb') as f:
-            img = f.read()
-        return (transform(img, self.ops), int(label))
+        try:
+            line = self.full_lines[idx]
+            img_path, label = line.split(self.delimiter)
+            img_path = os.path.join(self.params['data_dir'], img_path)
+            with open(img_path, 'rb') as f:
+                img = f.read()
+            return (transform(img, self.ops), int(label))
+        except Exception as e:
+            logger.error("data read faild: {}, exception info: {}".format(line,
+                                                                          e))
+            return self.__getitem__(random.randint(0, len(self)))
 
     def __len__(self):
         return self.num_samples
