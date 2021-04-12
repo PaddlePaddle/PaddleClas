@@ -9,20 +9,27 @@ THIRD_PARTY_DIR=${LITE_ROOT}/third_party
 
 OPENCV_VERSION=opencv4.1.0
 
-OPENCV_LIBS = ${THIRD_PARTY_DIR}/${OPENCV_VERSION}/arm64-v8a/libs/libopencv_imgcodecs.a \
-              ${THIRD_PARTY_DIR}/${OPENCV_VERSION}/arm64-v8a/libs/libopencv_imgproc.a \
-              ${THIRD_PARTY_DIR}/${OPENCV_VERSION}/arm64-v8a/libs/libopencv_core.a \
-              ${THIRD_PARTY_DIR}/${OPENCV_VERSION}/arm64-v8a/3rdparty/libs/libtegra_hal.a \
-              ${THIRD_PARTY_DIR}/${OPENCV_VERSION}/arm64-v8a/3rdparty/libs/liblibjpeg-turbo.a \
-              ${THIRD_PARTY_DIR}/${OPENCV_VERSION}/arm64-v8a/3rdparty/libs/liblibwebp.a \
-              ${THIRD_PARTY_DIR}/${OPENCV_VERSION}/arm64-v8a/3rdparty/libs/liblibpng.a \
-              ${THIRD_PARTY_DIR}/${OPENCV_VERSION}/arm64-v8a/3rdparty/libs/liblibjasper.a \
-              ${THIRD_PARTY_DIR}/${OPENCV_VERSION}/arm64-v8a/3rdparty/libs/liblibtiff.a \
-              ${THIRD_PARTY_DIR}/${OPENCV_VERSION}/arm64-v8a/3rdparty/libs/libIlmImf.a \
-              ${THIRD_PARTY_DIR}/${OPENCV_VERSION}/arm64-v8a/3rdparty/libs/libtbb.a \
-              ${THIRD_PARTY_DIR}/${OPENCV_VERSION}/arm64-v8a/3rdparty/libs/libcpufeatures.a
+ifeq (${ARM_ABI}, arm8)
+    ARM_PATH=arm64-v8a
+endif
+ifeq (${ARM_ABI}, arm7)
+    ARM_PATH=armeabi-v7a
+endif
 
-OPENCV_INCLUDE = -I../../../third_party/${OPENCV_VERSION}/arm64-v8a/include
+OPENCV_LIBS = ${THIRD_PARTY_DIR}/${OPENCV_VERSION}/${ARM_PATH}/libs/libopencv_imgcodecs.a \
+              ${THIRD_PARTY_DIR}/${OPENCV_VERSION}/${ARM_PATH}/libs/libopencv_imgproc.a \
+              ${THIRD_PARTY_DIR}/${OPENCV_VERSION}/${ARM_PATH}/libs/libopencv_core.a \
+              ${THIRD_PARTY_DIR}/${OPENCV_VERSION}/${ARM_PATH}/3rdparty/libs/libtegra_hal.a \
+              ${THIRD_PARTY_DIR}/${OPENCV_VERSION}/${ARM_PATH}/3rdparty/libs/liblibjpeg-turbo.a \
+              ${THIRD_PARTY_DIR}/${OPENCV_VERSION}/${ARM_PATH}/3rdparty/libs/liblibwebp.a \
+              ${THIRD_PARTY_DIR}/${OPENCV_VERSION}/${ARM_PATH}/3rdparty/libs/liblibpng.a \
+              ${THIRD_PARTY_DIR}/${OPENCV_VERSION}/${ARM_PATH}/3rdparty/libs/liblibjasper.a \
+              ${THIRD_PARTY_DIR}/${OPENCV_VERSION}/${ARM_PATH}/3rdparty/libs/liblibtiff.a \
+              ${THIRD_PARTY_DIR}/${OPENCV_VERSION}/${ARM_PATH}/3rdparty/libs/libIlmImf.a \
+              ${THIRD_PARTY_DIR}/${OPENCV_VERSION}/${ARM_PATH}/3rdparty/libs/libtbb.a \
+              ${THIRD_PARTY_DIR}/${OPENCV_VERSION}/${ARM_PATH}/3rdparty/libs/libcpufeatures.a
+
+OPENCV_INCLUDE = -I../../../third_party/${OPENCV_VERSION}/${ARM_PATH}/include
 
 CXX_INCLUDES = $(INCLUDES) ${OPENCV_INCLUDE} -I$(LITE_ROOT)/cxx/include
 

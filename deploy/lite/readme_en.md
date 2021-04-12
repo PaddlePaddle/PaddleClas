@@ -26,8 +26,8 @@ For the detailed compilation directions of different development environments, p
 
 |Platform|Inference Library Download Link|
 |-|-|
-|Android|[arm7](https://paddlelite-data.bj.bcebos.com/Release/2.6.1/Android/inference_lite_lib.android.armv7.gcc.c++_static.with_extra.CV_ON.tar.gz) / [arm8](https://paddlelite-data.bj.bcebos.com/Release/2.6.1/Android/inference_lite_lib.android.armv8.gcc.c++_static.with_extra.CV_ON.tar.gz)|
-|iOS|[arm7](https://paddlelite-data.bj.bcebos.com/Release/2.6.1/iOS/inference_lite_lib.ios.armv7.with_extra.CV_ON.tar.gz) / [arm8](https://paddlelite-data.bj.bcebos.com/Release/2.6.1/iOS/inference_lite_lib.ios64.armv8.with_extra.CV_ON.tar.gz)|
+|Android|[arm7](https://paddlelite-data.bj.bcebos.com/Release/2.8-rc/Android/gcc/inference_lite_lib.android.armv7.gcc.c++_static.with_extra.with_cv.tar.gz) / [arm8](https://paddlelite-data.bj.bcebos.com/Release/2.8-rc/Android/gcc/inference_lite_lib.android.armv8.gcc.c++_static.with_extra.with_cv.tar.gz)|
+|iOS|[arm7](https://paddlelite-data.bj.bcebos.com/Release/2.8-rc/iOS/inference_lite_lib.ios.armv7.with_cv.with_extra.tiny_publish.tar.gz) / [arm8](https://paddlelite-data.bj.bcebos.com/Release/2.8-rc/iOS/inference_lite_lib.ios.armv8.with_cv.with_extra.tiny_publish.tar.gz)|
 
 **NOTE**:
 
@@ -78,8 +78,9 @@ Paddle-Lite provides a variety of strategies to automatically optimize the origi
 * Use pip to install Paddle-Lite. The following command uses `pip3.7` .
 
 ```shell
-pip install paddlelite
+pip install paddlelite==2.8
 ```
+**Note**：The version of `paddlelite`'s wheel must match that of inference lib.
 
 * Use `paddle_lite_opt` to optimize inference model, the parameters of `paddle_lite_opt` are as follows:
 
@@ -121,17 +122,14 @@ Taking the `MobileNetV3_large_x1_0` model of PaddleClas as an example, we will i
 ```shell
 # enter PaddleClas root directory
 cd PaddleClas_root_path
-export PYTHONPATH=$PWD
 
-# download and uncompress the pre-trained model
-wget https://paddle-imagenet-models-name.bj.bcebos.com/MobileNetV3_large_x1_0_pretrained.tar
-tar -xf MobileNetV3_large_x1_0_pretrained.tar
+# download and uncompress the inference model
+wget https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/MobileNetV3_large_x1_0_infer.tar
+tar -xf MobileNetV3_large_x1_0_infer.tar
 
-# export the pre-trained model as an inference model
-python tools/export_model.py -m MobileNetV3_large_x1_0 -p ./MobileNetV3_large_x1_0_pretrained/ -o ./MobileNetV3_large_x1_0_inference/
 
 # convert inference model to Paddle-Lite optimized model
-paddle_lite_opt --model_file=./MobileNetV3_large_x1_0_inference/model --param_file=./MobileNetV3_large_x1_0_inference/params --optimize_out=./MobileNetV3_large_x1_0
+paddle_lite_opt --model_file=./MobileNetV3_large_x1_0_infer/inference.pdmodel --param_file=./MobileNetV3_large_x1_0_infer/inference.pdiparams --optimize_out=./MobileNetV3_large_x1_0
 ```
 
 When the above code command is completed, there will be ``MobileNetV3_large_x1_0.nb` in the current directory, which is the converted model file.
