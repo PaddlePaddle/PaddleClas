@@ -52,28 +52,28 @@ train/n01440764/n01440764_10027.JPEG 0
 
 ```yaml
 TRAIN:
-    batch_size: 256
-    num_workers: 4
-    file_list: "./dataset/ILSVRC2012/train_list.txt"
-    data_dir: "./dataset/ILSVRC2012/"
-    shuffle_seed: 0
+    batch_size: 256 # 所有训练设备上的总batch size
+    num_workers: 4 # 训练时每块设备上的进程数
+    file_list: "./dataset/ILSVRC2012/train_list.txt" # 训练标签文件
+    data_dir: "./dataset/ILSVRC2012/" # 训练图片文件夹
+    shuffle_seed: 0 # 随机打散的种子数
     transforms:
-        - DecodeImage:
+        - DecodeImage: # 对图像文件进行解码，转成numpy矩阵
             to_rgb: True
             to_np: False
             channel_first: False
-        - RandCropImage:
+        - RandCropImage: # 对图像做随机裁剪
             size: 224
-        - RandFlipImage:
+        - RandFlipImage: # 对图像做随机翻转
             flip_code: 1
-        - NormalizeImage:
+        - NormalizeImage: # 对图像做归一化
             scale: 1./255.
             mean: [0.485, 0.456, 0.406]
             std: [0.229, 0.224, 0.225]
             order: ''
-        - ToCHWImage:
+        - ToCHWImage: # 将图像从HWC格式转成CHW格式
     mix:
-        - MixupOperator:
+        - MixupOperator: # mixup数据增广，在全局配置use_mix=True时生效
             alpha: 0.2
 ```
 
@@ -90,7 +90,7 @@ PaddleClas中也包含了`AutoAugment`, `RandAugment`等数据增广方法，也
 ```yaml
 ARCHITECTURE:
     name: "EfficientNetB0"
-    params:
+    params: # 模型需要传入的额外参数，如果没有可不填
         padding_type : "SAME"
         override_params:
             drop_connect_rate: 0.1
@@ -165,7 +165,7 @@ def create_loss(feeds,
 
 ```yaml
 OPTIMIZER:
-    function: 'Momentum'
+    function: 'Momentum' # Momentum优化器
     params:
         momentum: 0.9
     regularizer:
@@ -177,11 +177,11 @@ OPTIMIZER:
 
 ```yaml
 LEARNING_RATE:
-    function: 'Piecewise'
+    function: 'Piecewise' # Piecewise学习率衰减策略
     params:
-        lr: 0.1
-        decay_epochs: [30, 60, 90]
-        gamma: 0.1
+        lr: 0.1 # 初始学习率
+        decay_epochs: [30, 60, 90] # 学习率下降时对应的epoch数量
+        gamma: 0.1 # 学习率衰减倍数
 ```
 
 在`tools/program.py`中使用`create_optimizer`创建优化器和学习率对象。
@@ -441,9 +441,9 @@ git branch -D new_branch
 
 #### 2.2.10 提交代码的一些约定
 
-为了使评审人在评审代码时更好地专注于代码本身，请您每次提交代码时，遵守以下约定：
+为了使官方维护人员在评审代码时更好地专注于代码本身，请您每次提交代码时，遵守以下约定：
 
-1）请保证Travis-CI 中单元测试能顺利通过。如果没过，说明提交的代码存在问题，评审人一般不做评审。
+1）请保证Travis-CI 中单元测试能顺利通过。如果没过，说明提交的代码存在问题，官方维护人员一般不做评审。
 
 2）提交PUll Request前：
 
@@ -459,17 +459,15 @@ git branch -D new_branch
 
 此外，在回复评审人意见时，请您遵守以下约定：
 
-1）评审人的每个意见都必须回复（这是开源社区的基本礼貌，别人帮了忙，应该说谢谢）：
+1）官方维护人员的每一个review意见都希望得到回复，这样会更好地提升开源社区的贡献。
 
-对评审意见同意且按其修改完的，给个简单的Done即可；
+- 对评审意见同意且按其修改完的，给个简单的Done即可；
+- 对评审意见不同意的，请给出您自己的反驳理由。
 
-对评审意见不同意的，请给出您自己的反驳理由。
+2）如果评审意见比较多,
 
-2）如果评审意见比较多：
-
-请给出总体的修改情况。
-
-请采用`start a review`进行回复，而非直接回复的方式。原因是每个回复都会发送一封邮件，会造成邮件灾难。
+- 请给出总体的修改情况。
+- 请采用`start a review`进行回复，而非直接回复的方式。原因是每个回复都会发送一封邮件，会造成邮件灾难。
 
 
 ## 3. 总结
