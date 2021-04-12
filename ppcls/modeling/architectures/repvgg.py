@@ -215,6 +215,7 @@ class RepVGG(nn.Layer):
     def eval(self):
         self.training = False
         for layer in self.sublayers():
+            layer.training = False
             layer.eval()
 
     def forward(self, x):

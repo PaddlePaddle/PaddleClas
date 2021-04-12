@@ -65,28 +65,24 @@ def main(args, return_dict={}):
     use_data_parallel = trainer_num != 1
     config["use_data_parallel"] = use_data_parallel
 
-    if config["use_data_parallel"]:
-        paddle.distributed.init_parallel_env()
-
     net = program.create_model(config.ARCHITECTURE, config.classes_num)
-    if config["use_data_parallel"]:
-        net = paddle.DataParallel(net)
 
     init_model(config, net, optimizer=None)
     valid_dataloader = Reader(config, 'valid', places=place)()
     net.eval()
     with paddle.no_grad():
         if not multilabel:
-            top1_acc = program.run(valid_dataloader, config, net, None, None, 0,
-                                   'valid')
+            top1_acc = program.run(valid_dataloader, config, net, None, None,
+                                   0, 'valid')
             return_dict["top1_acc"] = top1_acc
 
             return top1_acc
         else:
             all_outs = []
             targets = []
-            for idx, batch in enumerate(valid_dataloader()):
-                feeds = program.create_feeds(batch, False, config.classes_num, multilabel)
+            for _, batch in enumerate(valid_dataloader()):
+                feeds = program.create_feeds(batch, False, config.classes_num,
+                                             multilabel)
                 out = net(feeds["image"])
                 out = F.sigmoid(out)
 
