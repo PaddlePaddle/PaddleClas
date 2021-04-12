@@ -69,6 +69,7 @@ def main(args):
     optimizer, lr_scheduler = program.create_optimizer(
         config, parameter_list=net.parameters())
 
+    dp_net = net
     if config["use_data_parallel"]:
         find_unused_parameters = config.get("find_unused_parameters", False)
         dp_net = paddle.DataParallel(

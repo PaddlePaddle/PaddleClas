@@ -65,6 +65,9 @@ def main(args, return_dict={}):
     use_data_parallel = trainer_num != 1
     config["use_data_parallel"] = use_data_parallel
 
+    if config["use_data_parallel"]:
+        paddle.distributed.init_parallel_env()
+
     net = program.create_model(config.ARCHITECTURE, config.classes_num)
 
     init_model(config, net, optimizer=None)
