@@ -22,7 +22,7 @@
 </div>
 
 * configs 文件夹下存放训练脚本和验证脚本的yaml配置文件，文件按模型类别存放。
-* dataset 文件夹下存放数据集和预处理训练数据的脚本。脚本负责将数据集处理为适合Dataloader处理的格式。
+* dataset 文件夹下存放数据集和用于处理数据集的脚本。脚本负责将数据集处理为适合Dataloader处理的格式。
 * docs 文件夹下存放中英文文档。
 * deploy 文件夹存放的是部署工具，支持 Cpp inference、Hub Serveing、Paddle Lite、Slim量化等多种部署方式。
 * ppcls 文件夹下存放PaddleClas框架主体。模型结构脚本、数据增强脚本、优化脚本等DL程序的标准流程代码都在这里。
@@ -60,7 +60,6 @@ TRAIN:
     transforms:
         - DecodeImage: # 对图像文件进行解码，转成numpy矩阵
             to_rgb: True
-            to_np: False
             channel_first: False
         - RandCropImage: # 对图像做随机裁剪
             size: 224
