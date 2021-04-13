@@ -145,7 +145,6 @@ def create_metric(out,
 
     fetch_list = []
     metric_names = []
-    # tensor_list
     if not multilabel:
         softmax_out = F.softmax(out)
 
