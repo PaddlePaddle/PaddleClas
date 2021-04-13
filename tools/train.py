@@ -46,6 +46,11 @@ def parse_args():
         action='append',
         default=[],
         help='config options to be overridden')
+    parser.add_argument(
+        '--vdl_dir',
+        type=str,
+        default=None,
+        help='VisualDL logging directory for image.')
     args = parser.parse_args()
     return args
 
@@ -80,6 +85,12 @@ def main(args):
     if config.validate:
         valid_dataloader = Reader(config, 'valid', places=place)()
 
+    vdl_writer = None
+    if args.vdl_dir:
+        from visualdl import LogWriter
+        vdl_writer = LogWriter(os.path.join(args.vdl_dir, 'train'))
+        vdl_writer_val = LogWriter(os.path.join(args.vdl_dir, 'val'))
+
     last_epoch_id = config.get("last_epoch", -1)
     best_top1_acc = 0.0  # best top1 acc record
     best_top1_epoch = last_epoch_id
@@ -87,14 +98,14 @@ def main(args):
         net.train()
         # 1. train with train dataset
         program.run(train_dataloader, config, net, optimizer, lr_scheduler,
-                    epoch_id, 'train')
+                    epoch_id, 'train', vdl_writer=vdl_writer)
 
         # 2. validate with validate dataset
         if config.validate and epoch_id % config.valid_interval == 0:
             net.eval()
             with paddle.no_grad():
                 top1_acc = program.run(valid_dataloader, config, net, None,
-                                       None, epoch_id, 'valid')
+                                       None, epoch_id, 'valid', vdl_writer=vdl_writer_val)
             if top1_acc > best_top1_acc:
                 best_top1_acc = top1_acc
                 best_top1_epoch = epoch_id
