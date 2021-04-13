@@ -1,6 +1,6 @@
 # 快速上手文档（新手用户）
 
-此教程主要针对初级用户，即深度学习相关理论知识处于入门阶段，具有一定的python基础，能够阅读简单的代码度度用户。此内容主要包括利用PaddleClas进行网络训练及模型预测，具体内容如下：
+此教程主要针对初级用户，即深度学习相关理论知识处于入门阶段，具有一定的python基础，能够阅读简单代码的用户。此内容主要包括利用PaddleClas进行网络训练及模型预测，具体内容如下：
 
 - [基础知识](#一、基础知识)
 - [环境安装与配置](#一、环境安装与配置)
@@ -180,7 +180,7 @@ python tools/infer/infer.py --model ShuffleNetV2_x0_25 -i $image_path_dir --pret
 
 其中主要参数如下：
 
-- `-model`：训练时使用擦网络模型，如 ShuffleNetV2_x0_25、ResNet50_vd，具体可查看训练时`yaml`文件中**ARCHITECTURE**下 **name**参数的值
+- `--model`：训练时使用擦网络模型，如 ShuffleNetV2_x0_25、ResNet50_vd，具体可查看训练时`yaml`文件中**ARCHITECTURE**下 **name**参数的值
 - `-i`：图像文件存放的目录
 - `--pretrained_model`： 存放的模型权重位置。上述[CPU训练过程](#使用CPU进行模型训练)中，最优模型存放位置如下：`$path_to_PaddleClas/output/ResNet18_vd/best_model/ppcls.pdparams`，此时此参数应如下填写：`$path_to_PaddleClas/output/ResNet18_vd/best_model/ppcls`，去掉`.pdparams`
 - `--use_gpu`：是否使用GPU
