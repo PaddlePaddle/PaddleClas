@@ -40,7 +40,6 @@ TRAIN:
     transforms:
         - DecodeImage:
             to_rgb: True
-            to_np: False
             channel_first: False
         - RandCropImage:
             size: 224
@@ -62,7 +61,6 @@ VALID:
     transforms:
         - DecodeImage:
             to_rgb: True
-            to_np: False
             channel_first: False
         - ResizeImage:
             resize_short: 256
