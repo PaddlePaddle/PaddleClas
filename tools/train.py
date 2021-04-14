@@ -69,9 +69,10 @@ def main(args):
     optimizer, lr_scheduler = program.create_optimizer(
         config, parameter_list=net.parameters())
 
+    dp_net = net
     if config["use_data_parallel"]:
         find_unused_parameters = config.get("find_unused_parameters", False)
-        net = paddle.DataParallel(
+        dp_net = paddle.DataParallel(
             net, find_unused_parameters=find_unused_parameters)
 
     # load model from checkpoint or pretrained model
@@ -96,8 +97,8 @@ def main(args):
         for epoch_id in range(last_epoch_id + 1, config.epochs):
             net.train()
             # 1. train with train dataset
-            program.run(train_dataloader, config, net, optimizer, lr_scheduler,
-                        epoch_id, 'train', vdl_writer)
+            program.run(train_dataloader, config, dp_net, optimizer,
+                        lr_scheduler, epoch_id, 'train', vdl_writer)
 
             # 2. validate with validate dataset
             if config.validate and epoch_id % config.valid_interval == 0:
