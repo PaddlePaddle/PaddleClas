@@ -116,12 +116,7 @@ python3 tools/infer/infer.py \
 The output is as follows. Top-5 class ids and their scores are printed.
 
 ```
-Current image file: docs/images/quick_start/flowers102/image_06739.jpg
-    top1, class id: 0, probability: 0.5129
-    top2, class id: 50, probability: 0.0671
-    top3, class id: 18, probability: 0.0377
-    top4, class id: 82, probability: 0.0238
-    top5, class id: 54, probability: 0.0231
+File:image_06739.jpg, Top-5 result: class id(s): [0, 96, 18, 50, 51], score(s): [0.79, 0.02, 0.01, 0.01, 0.01]
 ```
 
 * Note: Results are different for different models, so you might get different results for the command.
@@ -171,13 +166,14 @@ python3 tools/train.py -c ./configs/quick_start/ResNet50_vd_ssld_random_erasin
 
 It improves by 1.27\% to 96.27\%
 
-* Save ResNet50_vd pretrained model to experience next chapter.
+
+### Distillation
+
+* The ResNet50_vd model pretrained on previous chapter will be used as the teacher model to train student model. Save the model to specified directory, command as follows:
 
 ```shell
 cp -r output/ResNet50_vd/19/  ./pretrained/flowers102_R50_vd_final/
 ```
-
-### Distillation
 
 * Use `extra_list.txt` as unlabeled data, Note:
     * Samples in the `extra_list.txt` and `val_list.txt` don't have intersection

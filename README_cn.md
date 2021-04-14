@@ -83,6 +83,7 @@
 - 高阶使用
     - [知识蒸馏](./docs/zh_CN/advanced_tutorials/distillation/distillation.md)
     - [数据增广](./docs/zh_CN/advanced_tutorials/image_augmentation/ImageAugment.md)
+    - [多标签分类](./docs/zh_CN/advanced_tutorials/multilabel/multilabel.md)
 - 特色拓展应用
     - [迁移学习](./docs/zh_CN/application/transfer_learning.md)
     - [10万类图像分类预训练模型](./docs/zh_CN/application/transfer_learning.md)

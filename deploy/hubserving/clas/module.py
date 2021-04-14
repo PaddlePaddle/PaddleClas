@@ -24,8 +24,8 @@ import cv2
 import numpy as np
 import paddle.nn as nn
 
-import tools.infer.predict as paddle_predict
-from tools.infer.utils import Base64ToCV2, create_paddle_predictor
+from tools.infer.predict import Predictor
+from tools.infer.utils import b64_to_np, postprocess
 from deploy.hubserving.clas.params import read_params
 
 
@@ -62,65 +62,24 @@ class ClasSystem(nn.Layer):
         else:
             print("Use CPU")
             print("Enable MKL-DNN") if enable_mkldnn else None
-        self.predictor = create_paddle_predictor(self.args)
+        self.predictor = Predictor(self.args)
 
-    def read_images(self, paths=[]):
-        images = []
-        for img_path in paths:
-            assert os.path.isfile(
-                img_path), "The {} isn't a valid file.".format(img_path)
-            img = cv2.imread(img_path)
-            if img is None:
-                logger.info("error in loading image:{}".format(img_path))
-                continue
-            img = img[:, :, ::-1]
-            images.append(img)
-        return images
+    def predict(self, batch_input_data, top_k=1):
+        assert isinstance(
+            batch_input_data,
+            np.ndarray), "The input data is inconsistent with expectations."
 
-    def predict(self, images=[], paths=[], top_k=1):
-        """
-        
-        Args:
-            images (list(numpy.ndarray)): images data, shape of each is [H, W, C]. If images not paths
-            paths (list[str]): The paths of images. If paths not images
-        Returns:
-            res (list): The result of chinese texts and save path of images.
-        """
-
-        if images != [] and isinstance(images, list) and paths == []:
-            predicted_data = images
-        elif images == [] and isinstance(paths, list) and paths != []:
-            predicted_data = self.read_images(paths)
-        else:
-            raise TypeError(
-                "The input data is inconsistent with expectations.")
-
-        assert predicted_data != [], "There is not any image to be predicted. Please check the input data."
-
-        all_results = []
-        for img in predicted_data:
-            if img is None:
-                logger.info("error in loading image")
-                all_results.append([])
-                continue
-
-            self.args.image_file = img
-            self.args.top_k = top_k
-
-            starttime = time.time()
-            classes, scores = paddle_predict.predict(self.args, self.predictor)
-            elapse = time.time() - starttime
-
-            logger.info("Predict time: {}".format(elapse))
-            all_results.append([classes.tolist(), scores.tolist(), elapse])
-        return all_results
+        starttime = time.time()
+        batch_outputs = self.predictor.predict(batch_input_data)
+        elapse = time.time() - starttime
+        batch_result_list = postprocess(batch_outputs, top_k)
+        return {"prediction": batch_result_list, "elapse": elapse}
 
     @serving
-    def serving_method(self, images, **kwargs):
+    def serving_method(self, images, revert_params, **kwargs):
         """
         Run as a service.
         """
-        to_cv2 = Base64ToCV2()
-        images_decode = [to_cv2(image) for image in images]
-        results = self.predict(images_decode, **kwargs)
+        input_data = b64_to_np(images, revert_params)
+        results = self.predict(batch_input_data=input_data, **kwargs)
         return results

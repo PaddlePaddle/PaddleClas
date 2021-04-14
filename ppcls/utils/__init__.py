@@ -15,7 +15,13 @@
 from . import logger
 from . import misc
 from . import model_zoo
+from . import metrics
 
 from .save_load import init_model, save_model
 from .config import get_config
 from .misc import AverageMeter
+from .metrics import multi_hot_encode
+from .metrics import hamming_distance
+from .metrics import accuracy_score
+from .metrics import precision_recall_fscore
+from .metrics import mean_average_precision

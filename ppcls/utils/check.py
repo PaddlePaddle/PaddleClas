@@ -24,6 +24,7 @@ from paddle import is_compiled_with_cuda
 
 from ppcls.modeling import get_architectures
 from ppcls.modeling import similar_architectures
+from ppcls.modeling import get_blacklist_model_in_static_mode
 from ppcls.utils import logger
 
 
@@ -77,6 +78,19 @@ def check_architecture(architecture):
     except AssertionError:
         logger.error(err)
         sys.exit(1)
+
+
+def check_model_with_running_mode(architecture):
+    """
+    check whether the model is consistent with the operating mode 
+    """
+    # some model are not supported in the static mode
+    blacklist = get_blacklist_model_in_static_mode()
+    if not paddle.in_dynamic_mode() and architecture["name"] in blacklist:
+        logger.error("Model: {} is not supported in the staic mode.".format(
+            architecture["name"]))
+        sys.exit(1)
+    return
 
 
 def check_mix(architecture, use_mix=False):

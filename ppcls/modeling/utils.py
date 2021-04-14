@@ -30,6 +30,13 @@ def get_architectures():
     return names
 
 
+def get_blacklist_model_in_static_mode():
+    from ppcls.modeling.architectures import distilled_vision_transformer
+    from ppcls.modeling.architectures import vision_transformer
+    blacklist = distilled_vision_transformer.__all__ + vision_transformer.__all__
+    return blacklist
+
+
 def similar_architectures(name='', names=[], thresh=0.1, topk=10):
     """
     inferred similar architectures

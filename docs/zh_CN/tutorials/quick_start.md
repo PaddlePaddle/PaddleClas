@@ -105,18 +105,14 @@ python3 tools/infer/infer.py \
     -i docs/images/quick_start/flowers102/image_06739.jpg \
     --model=ResNet50_vd \
     --pretrained_model="output/ResNet50_vd/best_model/ppcls" \
-    --class_num=102
+    --class_num=102 \
+    --top_k=5
 ```
 
 最终可以得到如下结果，打印出了Top-5对应的class id以及score。
 
 ```
-Current image file: docs/images/quick_start/flowers102/image_06739.jpg
-	top1, class id: 0, probability: 0.5129
-	top2, class id: 50, probability: 0.0671
-	top3, class id: 18, probability: 0.0377
-	top4, class id: 82, probability: 0.0238
-	top5, class id: 54, probability: 0.0231
+File:image_06739.jpg, Top-5 result: class id(s): [0, 96, 18, 50, 51], score(s): [0.79, 0.02, 0.01, 0.01, 0.01]
 ```
 
 * 注意：这里每个模型的训练结果都不相同，因此结果可能稍有不同。
@@ -166,14 +162,13 @@ python3 tools/train.py -c ./configs/quick_start/ResNet50_vd_ssld_random_erasi
 
 最终flowers102验证集上的精度为0.9627，使用数据增广可以使得模型精度再次提升1.27\%。
 
-* 如果希望体验`3.6节`的知识蒸馏部分，可以首先保存训练得到的ResNet50_vd预训练模型到合适的位置，作为蒸馏时教师模型的预训练模型。脚本如下所示。
+
+### 3.6 知识蒸馏小试牛刀
+* 本小节将尝试使用知识蒸馏技术对MobileNetV3_large_x1_0模型进行训练，使用`3.5小节`训练得到的ResNet50_vd模型作为蒸馏所用的教师模型，首先将`3.5小节`训练得到的ResNet50_vd模型保存到指定目录，脚本如下。
 
 ```shell
 cp -r output/ResNet50_vd/best_model/  ./pretrained/flowers102_R50_vd_final/
 ```
-
-### 3.6 知识蒸馏小试牛刀
-
 * 使用flowers102数据集进行模型蒸馏，为了进一步提提升模型的精度，使用`extra_list.txt`充当无标签数据，在这里有几点需要注意：
     * `extra_list.txt`与`val_list.txt`的样本没有重复，因此可以用于扩充知识蒸馏任务的训练数据。
     * 即使引入了有标签的extra_list.txt中的图像，但是代码中没有使用标签信息，因此仍然可以视为无标签的模型蒸馏。

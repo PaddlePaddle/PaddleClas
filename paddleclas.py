@@ -30,14 +30,17 @@ import os
 import sys
 __dir__ = os.path.dirname(__file__)
 sys.path.append(os.path.join(__dir__, ''))
+import argparse
+import shutil
 
 import cv2
 import numpy as np
 import tarfile
 import requests
 from tqdm import tqdm
-import tools.infer.utils as utils
-import shutil
+from tools.infer.utils import get_image_list, preprocess, save_prelabel_results
+from tools.infer.predict import Predictor
+
 __all__ = ['PaddleClas']
 BASE_DIR = os.path.expanduser("~/.paddleclas/")
 BASE_INFERENCE_MODEL_DIR = os.path.join(BASE_DIR, 'inference_model')
@@ -83,7 +86,13 @@ model_names = {
     'InceptionV3', 'ShuffleNetV2_swish', 'GoogLeNet', 'ResNet50_vd_ssld_v2',
     'SE_ResNet50_vd', 'MobileNetV2', 'ResNeXt101_vd_32x4d',
     'MobileNetV3_large_x0_75', 'MobileNetV3_small_x0_5', 'DenseNet169',
-    'EfficientNetB5'
+    'EfficientNetB5', 'DeiT_base_distilled_patch16_224',
+    'DeiT_base_distilled_patch16_384', 'DeiT_base_patch16_224',
+    'DeiT_base_patch16_384_infer', 'DeiT_small_distilled_patch16_224',
+    'DeiT_small_patch16_224_infer', 'DeiT_tiny_distilled_patch16_224',
+    'DeiT_tiny_patch16_224', 'ViT_base_patch16_224', 'ViT_base_patch16_384',
+    'ViT_base_patch32_384', 'ViT_large_patch16_224', 'ViT_large_patch16_384',
+    'ViT_large_patch32_384', 'ViT_small_patch16_224'
 }
 
 
@@ -98,7 +107,9 @@ def download_with_progressbar(url, save_path):
             file.write(data)
     progress_bar.close()
     if total_size_in_bytes == 0 or progress_bar.n != total_size_in_bytes:
-        raise Exception("Something went wrong while downloading models")
+        raise Exception(
+            "Something went wrong while downloading model/image from {}".
+            format(url))
 
 
 def maybe_download(model_storage_directory, url):
@@ -130,20 +141,14 @@ def maybe_download(model_storage_directory, url):
         os.remove(tmp_path)
 
 
-def save_prelabel_results(class_id, input_filepath, output_idr):
-    output_dir = os.path.join(output_idr, str(class_id))
-    if not os.path.isdir(output_dir):
-        os.makedirs(output_dir)
-    shutil.copy(input_filepath, output_dir)
-
-
 def load_label_name_dict(path):
-    result = {}
     if not os.path.exists(path):
         print(
-            'Warning: If want to use your own label_dict, please input legal path!\nOtherwise label_names will be empty!'
+            "Warning: If want to use your own label_dict, please input legal path!\nOtherwise label_names will be empty!"
         )
+        return None
     else:
+        result = {}
         for line in open(path, 'r'):
             partition = line.split('\n')[0].partition(' ')
             try:
@@ -155,8 +160,6 @@ def load_label_name_dict(path):
 
 
 def parse_args(mMain=True, add_help=True):
-    import argparse
-
     def str2bool(v):
         return v.lower() in ("true", "t", "1")
 
@@ -186,9 +189,7 @@ def parse_args(mMain=True, add_help=True):
         parser.add_argument("--enable_profile", type=str2bool, default=False)
         parser.add_argument("--top_k", type=int, default=1)
         parser.add_argument("--enable_mkldnn", type=str2bool, default=False)
-        parser.add_argument("--enable_benchmark", type=str2bool, default=False)
         parser.add_argument("--cpu_num_threads", type=int, default=10)
-        parser.add_argument("--hubserving", type=str2bool, default=False)
 
         # parameters for pre-label the images
         parser.add_argument("--label_name_path", type=str, default='')
@@ -207,6 +208,7 @@ def parse_args(mMain=True, add_help=True):
             use_gpu=False,
             use_fp16=False,
             use_tensorrt=False,
+            is_preprocessed=False,
             resize_short=256,
             resize=224,
             normalize=True,
@@ -218,9 +220,7 @@ def parse_args(mMain=True, add_help=True):
             enable_profile=False,
             top_k=1,
             enable_mkldnn=False,
-            enable_benchmark=False,
             cpu_num_threads=10,
-            hubserving=False,
             label_name_path='',
             pre_label_image=False,
             pre_label_out_idr=None)
@@ -231,7 +231,6 @@ class PaddleClas(object):
           format(model_names), '\n')
 
     def __init__(self, **kwargs):
-
         process_params = parse_args(mMain=False, add_help=False)
         process_params.__dict__.update(**kwargs)
 
@@ -260,8 +259,8 @@ class PaddleClas(object):
                     __dir__, 'ppcls/utils/imagenet1k_label_list.txt')
             else:
                 raise Exception(
-                    'If you want to use your own model, Please input model_file as model path!'
-                )
+                    'The model inputed is {}, not provided by PaddleClas. If you want to use your own model, please input model_file as model path!'.
+                    format(process_params.model_name))
         else:
             print('Using user-specified model and params!')
 
@@ -270,76 +269,96 @@ class PaddleClas(object):
             process_params.label_name_path)
 
         self.args = process_params
-        self.predictor = utils.create_paddle_predictor(process_params)
+        self.predictor = Predictor(process_params)
 
-    def predict(self, img):
+    def postprocess(self, output):
+        output = output.flatten()
+        classes = np.argpartition(output, -self.args.top_k)[-self.args.top_k:]
+        class_ids = classes[np.argsort(-output[classes])]
+        scores = output[class_ids]
+        label_names = [self.label_name_dict[c]
+                       for c in class_ids] if self.label_name_dict else []
+        return {
+            "class_ids": class_ids,
+            "scores": scores,
+            "label_names": label_names
+        }
+
+    def predict(self, input_data):
         """
         predict label of img with paddleclas
         Args:
-            img: input image for clas, support single image , internet url, folder path containing series of images
+            input_data(string, NumPy.ndarray): image to be classified, support:
+                string: local path of image file, internet URL, directory containing series of images;
+                NumPy.ndarray: preprocessed image data that has 3 channels and accords with [C, H, W], or raw image data that has 3 channels and accords with [H, W, C]
         Returns:
-            dict：{image_name: "", class_id: [], scores: [], label_names: []}，if label name path == None，label_names will be empty.
+            dict: {image_name: "", class_id: [], scores: [], label_names: []}，if label name path == None，label_names will be empty.
         """
-        assert isinstance(img, (str, np.ndarray))
-
-        input_names = self.predictor.get_input_names()
-        input_tensor = self.predictor.get_input_handle(input_names[0])
-
-        output_names = self.predictor.get_output_names()
-        output_tensor = self.predictor.get_output_handle(output_names[0])
-        if isinstance(img, str):
+        if isinstance(input_data, np.ndarray):
+            if not self.args.is_preprocessed:
+                input_data = input_data[:, :, ::-1]
+                input_data = preprocess(input_data, self.args)
+            input_data = np.expand_dims(input_data, axis=0)
+            batch_outputs = self.predictor.predict(input_data)
+            result = {"filename": "image"}
+            result.update(self.postprocess(batch_outputs[0]))
+            return result
+        elif isinstance(input_data, str):
+            input_path = input_data
             # download internet image
-            if img.startswith('http'):
+            if input_path.startswith('http'):
                 if not os.path.exists(BASE_IMAGES_DIR):
                     os.makedirs(BASE_IMAGES_DIR)
-                image_path = os.path.join(BASE_IMAGES_DIR, 'tmp.jpg')
-                download_with_progressbar(img, image_path)
+                file_path = os.path.join(BASE_IMAGES_DIR, 'tmp.jpg')
+                download_with_progressbar(input_path, file_path)
                 print("Current using image from Internet:{}, renamed as: {}".
-                      format(img, image_path))
-                img = image_path
-            image_list = utils.get_image_list(img)
+                      format(input_path, file_path))
+                input_path = file_path
+            image_list = get_image_list(input_path)
+
+            total_result = []
+            batch_input_list = []
+            img_path_list = []
+            cnt = 0
+            for idx, img_path in enumerate(image_list):
+                img = cv2.imread(img_path)
+                if img is None:
+                    print(
+                        "Warning: Image file failed to read and has been skipped. The path: {}".
+                        format(img_path))
+                    continue
+                else:
+                    img = img[:, :, ::-1]
+                    data = preprocess(img, self.args)
+                    batch_input_list.append(data)
+                    img_path_list.append(img_path)
+                    cnt += 1
+
+                if cnt % self.args.batch_size == 0 or (idx + 1
+                                                       ) == len(image_list):
+                    batch_outputs = self.predictor.predict(
+                        np.array(batch_input_list))
+                    for number, output in enumerate(batch_outputs):
+                        result = {"filename": img_path_list[number]}
+                        result.update(self.postprocess(output))
+
+                        result_str = "top-{} result: {}".format(
+                            self.args.top_k, result)
+                        print(result_str)
+
+                        total_result.append(result)
+                        if self.args.pre_label_image:
+                            save_prelabel_results(result["class_ids"][0],
+                                                  img_path_list[number],
+                                                  self.args.pre_label_out_idr)
+                    batch_input_list = []
+                    img_path_list = []
+            return total_result
         else:
-            if isinstance(img, np.ndarray):
-                image_list = [img]
-            else:
-                print('Please input legal image!')
-
-        total_result = []
-        for filename in image_list:
-            if isinstance(filename, str):
-                image = cv2.imread(filename)[:, :, ::-1]
-                assert image is not None, "Error in loading image: {}".format(
-                    filename)
-                inputs = utils.preprocess(image, self.args)
-                inputs = np.expand_dims(
-                    inputs, axis=0).repeat(
-                        1, axis=0).copy()
-            else:
-                inputs = filename
-
-            input_tensor.copy_from_cpu(inputs)
-
-            self.predictor.run()
-
-            outputs = output_tensor.copy_to_cpu()
-            classes, scores = utils.postprocess(outputs, self.args)
-            label_names = []
-            if len(self.label_name_dict) != 0:
-                label_names = [self.label_name_dict[c] for c in classes]
-            result = {
-                "filename": filename if isinstance(filename, str) else 'image',
-                "class_ids": classes.tolist(),
-                "scores": scores.tolist(),
-                "label_names": label_names,
-            }
-            total_result.append(result)
-            if self.args.pre_label_image:
-                save_prelabel_results(classes[0], filename,
-                                      self.args.pre_label_out_idr)
-                print("\tSaving prelabel results in {}".format(
-                    os.path.join(self.args.pre_label_out_idr, str(classes[
-                        0]))))
-        return total_result
+            print(
+                "Error: Please input legal image! The type of image supported by PaddleClas are: NumPy.ndarray and string of local path or Ineternet URL"
+            )
+            return []
 
 
 def main():
@@ -347,9 +366,9 @@ def main():
     args = parse_args(mMain=True)
     clas_engine = PaddleClas(**(args.__dict__))
     print('{}{}{}'.format('*' * 10, args.image_file, '*' * 10))
-    result = clas_engine.predict(args.image_file)
-    if result is not None:
-        print(result)
+    total_result = clas_engine.predict(args.image_file)
+
+    print("Predict complete!")
 
 
 if __name__ == '__main__':

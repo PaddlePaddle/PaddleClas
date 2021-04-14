@@ -14,6 +14,8 @@
 
 import os
 import argparse
+import base64
+import shutil
 import cv2
 import numpy as np
 
@@ -29,6 +31,7 @@ def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument("-i", "--image_file", type=str)
     parser.add_argument("--use_gpu", type=str2bool, default=True)
+    parser.add_argument("--multilabel", type=str2bool, default=False)
 
     # params for preprocess
     parser.add_argument("--resize_short", type=int, default=256)
@@ -67,6 +70,9 @@ def parse_args():
         default=False,
         help="Whether to pre-label the images using the loaded weights")
     parser.add_argument("--pre_label_out_idr", type=str, default=None)
+
+    # parameters for test hubserving
+    parser.add_argument("--server_url", type=str)
 
     return parser.parse_args()
 
@@ -119,12 +125,21 @@ def preprocess(img, args):
     return img
 
 
-def postprocess(output, args):
-    output = output.flatten()
-    classes = np.argpartition(output, -args.top_k)[-args.top_k:]
-    classes = classes[np.argsort(-output[classes])]
-    scores = output[classes]
-    return classes, scores
+def postprocess(batch_outputs, topk=5, multilabel=False):
+    batch_results = []
+    for probs in batch_outputs:
+        results = []
+        if multilabel:
+            index = np.where(probs >= 0.5)[0].astype('int32')
+        else:
+            index = probs.argsort(axis=0)[-topk:][::-1].astype("int32")
+        clas_id_list = []
+        score_list = []
+        for i in index:
+            clas_id_list.append(i.item())
+            score_list.append(probs[i].item())
+        batch_results.append({"clas_ids": clas_id_list, "scores": score_list})
+    return batch_results
 
 
 def get_image_list(img_file):
@@ -142,6 +157,13 @@ def get_image_list(img_file):
     if len(imgs_lists) == 0:
         raise Exception("not found any img file in {}".format(img_file))
     return imgs_lists
+
+
+def save_prelabel_results(class_id, input_file_path, output_dir):
+    output_dir = os.path.join(output_dir, str(class_id))
+    if not os.path.isdir(output_dir):
+        os.makedirs(output_dir)
+    shutil.copy(input_file_path, output_dir)
 
 
 class ResizeImage(object):
@@ -197,13 +219,15 @@ class ToTensor(object):
         return img
 
 
-class Base64ToCV2(object):
-    def __init__(self):
-        pass
+def b64_to_np(b64str, revert_params):
+    shape = revert_params["shape"]
+    dtype = revert_params["dtype"]
+    dtype = getattr(np, dtype) if isinstance(str, type(dtype)) else dtype
+    data = base64.b64decode(b64str.encode('utf8'))
+    data = np.fromstring(data, dtype).reshape(shape)
+    return data
 
-    def __call__(self, b64str):
-        import base64
-        data = base64.b64decode(b64str.encode('utf8'))
-        data = np.fromstring(data, np.uint8)
-        data = cv2.imdecode(data, cv2.IMREAD_COLOR)[:, :, ::-1]
-        return data
+
+def np_to_b64(images):
+    img_str = base64.b64encode(images).decode('utf8')
+    return img_str, images.shape

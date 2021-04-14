@@ -25,11 +25,13 @@ Paddle Lite是飞桨轻量化推理引擎，为手机、IOT端提供高效推理
 1. [建议]直接下载，预测库下载链接如下：
       |平台|预测库下载链接|
       |-|-|
-      |Android|[arm7](https://paddlelite-data.bj.bcebos.com/Release/2.6.1/Android/inference_lite_lib.android.armv7.gcc.c++_static.with_extra.CV_ON.tar.gz) / [arm8](https://paddlelite-data.bj.bcebos.com/Release/2.6.1/Android/inference_lite_lib.android.armv8.gcc.c++_static.with_extra.CV_ON.tar.gz)|
-      |iOS|[arm7](https://paddlelite-data.bj.bcebos.com/Release/2.6.1/iOS/inference_lite_lib.ios.armv7.with_extra.CV_ON.tar.gz) / [arm8](https://paddlelite-data.bj.bcebos.com/Release/2.6.1/iOS/inference_lite_lib.ios64.armv8.with_extra.CV_ON.tar.gz)|
+      |Android|[arm7](https://paddlelite-data.bj.bcebos.com/Release/2.8-rc/Android/gcc/inference_lite_lib.android.armv7.gcc.c++_static.with_extra.with_cv.tar.gz) / [arm8](https://paddlelite-data.bj.bcebos.com/Release/2.8-rc/Android/gcc/inference_lite_lib.android.armv8.gcc.c++_static.with_extra.with_cv.tar.gz)|
+      |iOS|[arm7](https://paddlelite-data.bj.bcebos.com/Release/2.8-rc/iOS/inference_lite_lib.ios.armv7.with_cv.with_extra.tiny_publish.tar.gz) / [arm8](https://paddlelite-data.bj.bcebos.com/Release/2.8-rc/iOS/inference_lite_lib.ios.armv8.with_cv.with_extra.tiny_publish.tar.gz)|
 
-      注：1. 如果是从 Paddle-Lite [官方文档](https://paddle-lite.readthedocs.io/zh/latest/user_guides/release_lib.html#android-toolchain-gcc)下载的预测库，
-      注意选择`with_extra=ON，with_cv=ON`的下载链接。2. 如果使用量化的模型部署在端侧，建议使用Paddle-Lite develop分支编译预测库。
+      **注**：
+      1. 如果是从 Paddle-Lite [官方文档](https://paddle-lite.readthedocs.io/zh/latest/quick_start/release_lib.html#android-toolchain-gcc)下载的预测库，
+      注意选择`with_extra=ON，with_cv=ON`的下载链接。
+      2. 如果使用量化的模型部署在端侧，建议使用Paddle-Lite develop分支编译预测库。
 
 2. 编译Paddle-Lite得到预测库，Paddle-Lite的编译方式如下：
 ```shell
@@ -81,9 +83,10 @@ Paddle-Lite 提供了多种策略来自动优化原始的模型，其中包括�
 #### 2.1.1 [建议]pip安装paddlelite并进行转换
 
 Python下安装 `paddlelite`，目前最高支持`Python3.7`。
+**注意**：`paddlelite`whl包版本必须和预测库版本对应。
 
 ```shell
-pip install paddlelite
+pip install paddlelite==2.8
 ```
 
 之后使用`paddle_lite_opt`工具可以进行inference模型的转换。`paddle_lite_opt`的部分参数如下
@@ -130,17 +133,13 @@ cd build.opt/lite/api/
 ```shell
 # 进入PaddleClas根目录
 cd PaddleClas_root_path
-export PYTHONPATH=$PWD
 
-# 下载并解压预训练模型
-wget https://paddle-imagenet-models-name.bj.bcebos.com/MobileNetV3_large_x1_0_pretrained.tar
-tar -xf MobileNetV3_large_x1_0_pretrained.tar
-
-# 将预训练模型导出为inference模型
-python tools/export_model.py -m MobileNetV3_large_x1_0 -p ./MobileNetV3_large_x1_0_pretrained/ -o ./MobileNetV3_large_x1_0_inference/
+# 下载并解压inference模型
+wget https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/MobileNetV3_large_x1_0_infer.tar
+tar -xf MobileNetV3_large_x1_0_infer.tar
 
 # 将inference模型转化为Paddle-Lite优化模型
-paddle_lite_opt --model_file=./MobileNetV3_large_x1_0_inference/model --param_file=./MobileNetV3_large_x1_0_inference/params --optimize_out=./MobileNetV3_large_x1_0
+paddle_lite_opt --model_file=./MobileNetV3_large_x1_0_infer/inference.pdmodel --param_file=./MobileNetV3_large_x1_0_infer/inference.pdiparams --optimize_out=./MobileNetV3_large_x1_0
 ```
 
 最终在当前文件夹下生成`MobileNetV3_large_x1_0.nb`的文件。

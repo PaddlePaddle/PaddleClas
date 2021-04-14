@@ -29,12 +29,16 @@ import paddle.nn.functional as F
 from ppcls.optimizer import LearningRateBuilder
 from ppcls.optimizer import OptimizerBuilder
 from ppcls.modeling import architectures
+from ppcls.modeling.loss import MultiLabelLoss
 from ppcls.modeling.loss import CELoss
 from ppcls.modeling.loss import MixCELoss
 from ppcls.modeling.loss import JSDivLoss
 from ppcls.modeling.loss import GoogLeNetLoss
 from ppcls.utils.misc import AverageMeter
 from ppcls.utils import logger
+from ppcls.utils import multi_hot_encode
+from ppcls.utils import hamming_distance
+from ppcls.utils import accuracy_score
 
 
 def create_model(architecture, classes_num):
@@ -61,7 +65,8 @@ def create_loss(feeds,
                 classes_num=1000,
                 epsilon=None,
                 use_mix=False,
-                use_distillation=False):
+                use_distillation=False,
+                multilabel=False):
     """
     Create a loss for optimization, such as:
         1. CrossEnotry loss
@@ -100,7 +105,10 @@ def create_loss(feeds,
         feed_lam = feeds['lam']
         return loss(out, feed_y_a, feed_y_b, feed_lam)
     else:
-        loss = CELoss(class_dim=classes_num, epsilon=epsilon)
+        if not multilabel:
+            loss = CELoss(class_dim=classes_num, epsilon=epsilon)
+        else:
+            loss = MultiLabelLoss(class_dim=classes_num, epsilon=epsilon)
         return loss(out, feeds["label"])
 
 
@@ -110,6 +118,7 @@ def create_metric(out,
                   topk=5,
                   classes_num=1000,
                   use_distillation=False,
+                  multilabel=False,
                   mode="train"):
     """
     Create measures of model accuracy, such as top1 and top5
@@ -134,26 +143,47 @@ def create_metric(out,
             out = out[1]
     softmax_out = F.softmax(out)
 
-    fetchs = OrderedDict()
-    # set top1 to fetchs
-    top1 = paddle.metric.accuracy(softmax_out, label=label, k=1)
-    # set topk to fetchs
-    k = min(topk, classes_num)
-    topk = paddle.metric.accuracy(softmax_out, label=label, k=k)
+    fetch_list = []
+    metric_names = []
+    if not multilabel:
+        softmax_out = F.softmax(out)
+
+        # set top1 to fetchs
+        top1 = paddle.metric.accuracy(softmax_out, label=label, k=1)
+        # set topk to fetchs
+        k = min(topk, classes_num)
+        topk = paddle.metric.accuracy(softmax_out, label=label, k=k)
+
+        metric_names.append("top1")
+        metric_names.append("top{}".format(k))
+
+        fetch_list.append(top1)
+        fetch_list.append(topk)
+    else:
+        out = F.sigmoid(out)
+        preds = multi_hot_encode(out.numpy())
+        targets = label.numpy()
+        ham_dist = to_tensor(hamming_distance(preds, targets))
+        accuracy = to_tensor(accuracy_score(preds, targets, base="label"))
+
+        ham_dist_name = "hamming_distance"
+        accuracy_name = "multilabel_accuracy"
+        metric_names.append(ham_dist_name)
+        metric_names.append(accuracy_name)
+
+        fetch_list.append(accuracy)
+        fetch_list.append(ham_dist)
 
     # multi cards' eval
     if mode != "train" and paddle.distributed.get_world_size() > 1:
-        top1 = paddle.distributed.all_reduce(
-            top1, op=paddle.distributed.ReduceOp.
-            SUM) / paddle.distributed.get_world_size()
-        topk = paddle.distributed.all_reduce(
-            topk, op=paddle.distributed.ReduceOp.
-            SUM) / paddle.distributed.get_world_size()
+        for idx, fetch in enumerate(fetch_list):
+            fetch_list[idx] = paddle.distributed.all_reduce(
+                fetch, op=paddle.distributed.ReduceOp.
+                SUM) / paddle.distributed.get_world_size()
 
-    fetchs['top1'] = top1
-    topk_name = 'top{}'.format(k)
-    fetchs[topk_name] = topk
-
+    fetchs = OrderedDict()
+    for idx, name in enumerate(metric_names):
+        fetchs[name] = fetch_list[idx]
     return fetchs
 
 
@@ -182,12 +212,14 @@ def create_fetchs(feeds, net, config, mode="train"):
     epsilon = config.get('ls_epsilon')
     use_mix = config.get('use_mix') and mode == 'train'
     use_distillation = config.get('use_distillation')
+    multilabel = config.get('multilabel', False)
 
     out = net(feeds["image"])
 
     fetchs = OrderedDict()
     fetchs['loss'] = create_loss(feeds, out, architecture, classes_num,
-                                 epsilon, use_mix, use_distillation)
+                                 epsilon, use_mix, use_distillation,
+                                 multilabel)
     if not use_mix:
         metric = create_metric(
             out,
@@ -196,6 +228,7 @@ def create_fetchs(feeds, net, config, mode="train"):
             topk,
             classes_num,
             use_distillation,
+            multilabel=multilabel,
             mode=mode)
         fetchs.update(metric)
 
@@ -240,7 +273,7 @@ def create_optimizer(config, parameter_list=None):
     return opt(lr, parameter_list), lr
 
 
-def create_feeds(batch, use_mix):
+def create_feeds(batch, use_mix, num_classes, multilabel=False):
     image = batch[0]
     if use_mix:
         y_a = to_tensor(batch[1].numpy().astype("int64").reshape(-1, 1))
@@ -248,9 +281,16 @@ def create_feeds(batch, use_mix):
         lam = to_tensor(batch[3].numpy().astype("float32").reshape(-1, 1))
         feeds = {"image": image, "y_a": y_a, "y_b": y_b, "lam": lam}
     else:
-        label = to_tensor(batch[1].numpy().astype('int64').reshape(-1, 1))
+        if not multilabel:
+            label = to_tensor(batch[1].numpy().astype("int64").reshape(-1, 1))
+        else:
+            label = to_tensor(batch[1].numpy().astype('float32').reshape(
+                -1, num_classes))
         feeds = {"image": image, "label": label}
     return feeds
+
+
+total_step = 0
 
 
 def run(dataloader,
@@ -259,7 +299,8 @@ def run(dataloader,
         optimizer=None,
         lr_scheduler=None,
         epoch=0,
-        mode='train'):
+        mode='train',
+        vdl_writer=None):
     """
     Feed data to the model and fetch the measures and loss
 
@@ -275,6 +316,8 @@ def run(dataloader,
     """
     print_interval = config.get("print_interval", 10)
     use_mix = config.get("use_mix", False) and mode == "train"
+    multilabel = config.get("multilabel", False)
+    classes_num = config.get("classes_num")
 
     metric_list = [
         ("loss", AverageMeter(
@@ -287,13 +330,21 @@ def run(dataloader,
             'reader_cost', '.5f', postfix=" s,")),
     ]
     if not use_mix:
-        topk_name = 'top{}'.format(config.topk)
-        metric_list.insert(
-            0, (topk_name, AverageMeter(
-                topk_name, '.5f', postfix=",")))
-        metric_list.insert(
-            0, ("top1", AverageMeter(
-                "top1", '.5f', postfix=",")))
+        if not multilabel:
+            topk_name = 'top{}'.format(config.topk)
+            metric_list.insert(
+                0, (topk_name, AverageMeter(
+                    topk_name, '.5f', postfix=",")))
+            metric_list.insert(
+                0, ("top1", AverageMeter(
+                    "top1", '.5f', postfix=",")))
+        else:
+            metric_list.insert(
+                0, ("multilabel_accuracy", AverageMeter(
+                    "multilabel_accuracy", '.5f', postfix=",")))
+            metric_list.insert(
+                0, ("hamming_distance", AverageMeter(
+                    "hamming_distance", '.5f', postfix=",")))
 
     metric_list = OrderedDict(metric_list)
 
@@ -306,7 +357,7 @@ def run(dataloader,
 
         metric_list['reader_time'].update(time.time() - tic)
         batch_size = len(batch[0])
-        feeds = create_feeds(batch, use_mix)
+        feeds = create_feeds(batch, use_mix, classes_num, multilabel)
         fetchs = create_fetchs(feeds, net, config, mode)
         if mode == 'train':
             avg_loss = fetchs['loss']
@@ -314,8 +365,8 @@ def run(dataloader,
 
             optimizer.step()
             optimizer.clear_grad()
-            metric_list['lr'].update(
-                optimizer._global_learning_rate().numpy()[0], batch_size)
+            lr_value = optimizer._global_learning_rate().numpy()[0]
+            metric_list['lr'].update(lr_value, batch_size)
 
             if lr_scheduler is not None:
                 if lr_scheduler.update_specified:
@@ -332,6 +383,18 @@ def run(dataloader,
             metric_list[name].update(fetch.numpy()[0], batch_size)
         metric_list["batch_time"].update(time.time() - tic)
         tic = time.time()
+
+        if vdl_writer and mode == "train":
+            global total_step
+            logger.scaler(
+                name="lr", value=lr_value, step=total_step, writer=vdl_writer)
+            for name, fetch in fetchs.items():
+                logger.scaler(
+                    name="train_{}".format(name),
+                    value=fetch.numpy()[0],
+                    step=total_step,
+                    writer=vdl_writer)
+            total_step += 1
 
         fetchs_str = ' '.join([
             str(metric_list[key].mean)
@@ -366,10 +429,12 @@ def run(dataloader,
         logger.info("END {:s} {:s} {:s}".format(mode, end_str, ips_info))
     else:
         end_epoch_str = "END epoch:{:<3d}".format(epoch)
-
         logger.info("{:s} {:s} {:s} {:s}".format(end_epoch_str, mode, end_str,
                                                  ips_info))
 
     # return top1_acc in order to save the best model
     if mode == 'valid':
-        return metric_list['top1'].avg
+        if multilabel:
+            return metric_list['multilabel_accuracy'].avg
+        else:
+            return metric_list['top1'].avg
