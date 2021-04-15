@@ -34,16 +34,23 @@ python tools/train.py \
 
 运行上述命令，可以看到输出日志，示例如下：
 
-* 如果在训练中使用了mixup或者cutmix的数据增广方式，那么日志中只会打印出loss(损失)、lr(学习率)以及该minibatch的训练时间。
+* 如果在训练中使用了mixup或者cutmix的数据增广方式，那么日志中将不会打印top-1与top-k（默认为5）信息：
+    ```
+    ...
+    epoch:0  , train step:20   , loss: 4.53660, lr: 0.003750, batch_cost: 1.23101 s, reader_cost: 0.74311 s, ips: 25.99489 images/sec, eta: 0:12:43
+    ...
+    END epoch:1   valid top1: 0.01569, top5: 0.06863, loss: 4.61747,  batch_cost: 0.26155 s, reader_cost: 0.16952 s, batch_cost_sum: 10.72348 s, ips: 76.46772 images/sec.
+    ...
+    ```
+
+* 如果训练过程中没有使用mixup或者cutmix的数据增广，那么除了上述信息外，日志中也会打印出top-1与top-k(默认为5)的信息：
 
     ```
-    train step:890  loss:  6.8473 lr: 0.100000 elapse: 0.157s
-    ```
-
-* 如果训练过程中没有使用mixup或者cutmix的数据增广，那么除了loss(损失)、lr(学习率)以及该minibatch的训练时间之外，日志中也会打印出top-1与top-k(默认为5)的信息。
-
-    ```
-    epoch:0    train    step:13    loss:7.9561    top1:0.0156    top5:0.1094    lr:0.100000    elapse:0.193s
+    ...
+    epoch:0  , train step:30  , top1: 0.06250, top5: 0.09375, loss: 4.62766, lr: 0.003728, batch_cost: 0.64089 s, reader_cost: 0.18857 s, ips: 49.93080 images/sec, eta: 0:06:18
+    ...
+    END epoch:0   train top1: 0.01310, top5: 0.04738, loss: 4.65124,  batch_cost: 0.64089 s, reader_cost: 0.18857 s, batch_cost_sum: 13.45863 s, ips: 49.93080 images/sec.
+    ...
     ```
 
 训练期间也可以通过VisualDL实时观察loss变化，详见[VisualDL](../extension/VisualDL.md)。
