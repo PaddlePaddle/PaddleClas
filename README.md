@@ -7,7 +7,7 @@
 PaddleClas is a toolset for image classification tasks prepared for the industry and academia. It helps users train better computer vision models and apply them in real scenarios.
 
 **Recent update**
-- 2021.04.15 Add `MixNet` and `ReXNet` pretrained models, `MixNet`'s Top-1 Acc on ImageNet-1k reaches 78.6% and `ReXNet` reaches 82.09%.
+- 2021.04.15 Add `MixNet` and `ReXNet` pretrained models, `MixNet_L`'s Top-1 Acc on ImageNet-1k reaches 78.6% and `ReXNet_3_0` reaches 82.09%.
 - 2021.03.02 Add support for model quantization.
 - 2021.02.01 Add `RepVGG` pretrained models, whose Top-1 Acc on ImageNet-1k dataset reaches 79.65%.
 - 2021.01.27 Add `ViT` and `DeiT` pretrained models, `ViT`'s Top-1 Acc on ImageNet-1k dataset reaches 85.13%, and `DeiT` reaches 85.1%.

@@ -3,7 +3,7 @@
 
 
 - 2021.04.15
-   - 添加`MixNet`和`ReXNet`系列模型，在ImageNet-1k上`MixNet` 模型Top1 Acc可达78.6%，`ReXNet`模型可达82.09%
+   - 添加`MixNet_L`和`ReXNet_3_0`系列模型，在ImageNet-1k上`MixNet` 模型Top1 Acc可达78.6%，`ReXNet`模型可达82.09%
 - 2021.01.27
    * 添加ViT与DeiT模型，在ImageNet上，ViT模型Top-1 Acc可达81.05%，DeiT模型可达85.5%。
 - 2021.01.08

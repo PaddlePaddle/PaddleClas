@@ -438,8 +438,7 @@ class MixUnit(nn.Layer):
     in_channels : int
         Number of input channels.
     out_channels : int
-        Number of output channels.
-    exp_channels : int
+        Number of output channels.  exp_channels : int
         Number of middle (expanded) channels.
     stride : int or tuple/list of 2 int
         Strides of the second convolution layer.
@@ -692,12 +691,7 @@ class MixNet(nn.Layer):
         return x
 
 
-def get_mixnet(version,
-               width_scale,
-               model_name=None,
-               pretrained=False,
-               root=os.path.join("~", ".paddle", "models"),
-               **kwargs):
+def get_mixnet(version, width_scale, model_name=None, **kwargs):
     """
     Create MixNet model with specific parameters.
 
@@ -708,11 +702,7 @@ def get_mixnet(version,
     width_scale : float
         Scale factor for width of layers.
     model_name : str or None, default None
-        Model name for loading pretrained model.
-    pretrained : bool, default False
-        Whether to load the pretrained weights for model.
-    root : str, default '~/.torch/models'
-        Location for keeping the model parameters.
+        Model name.
     """
 
     if version == "s":
@@ -769,13 +759,6 @@ def MixNet_S(**kwargs):
     """
     MixNet-S model from 'MixConv: Mixed Depthwise Convolutional Kernels,'
     https://arxiv.org/abs/1907.09595.
-
-    Parameters:
-    ----------
-    pretrained : bool, default False
-        Whether to load the pretrained weights for model.
-    root : str, default '~/.torch/models'
-        Location for keeping the model parameters.
     """
     return get_mixnet(
         version="s", width_scale=1.0, model_name="MixNet_S", **kwargs)
@@ -785,13 +768,6 @@ def MixNet_M(**kwargs):
     """
     MixNet-M model from 'MixConv: Mixed Depthwise Convolutional Kernels,'
     https://arxiv.org/abs/1907.09595.
-
-    Parameters:
-    ----------
-    pretrained : bool, default False
-        Whether to load the pretrained weights for model.
-    root : str, default '~/.torch/models'
-        Location for keeping the model parameters.
     """
     return get_mixnet(
         version="m", width_scale=1.0, model_name="MixNet_M", **kwargs)
@@ -801,13 +777,6 @@ def MixNet_L(**kwargs):
     """
     MixNet-L model from 'MixConv: Mixed Depthwise Convolutional Kernels,'
     https://arxiv.org/abs/1907.09595.
-
-    Parameters:
-    ----------
-    pretrained : bool, default False
-        Whether to load the pretrained weights for model.
-    root : str, default '~/.torch/models'
-        Location for keeping the model parameters.
     """
     return get_mixnet(
         version="m", width_scale=1.3, model_name="MixNet_L", **kwargs)

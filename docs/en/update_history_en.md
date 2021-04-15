@@ -3,7 +3,7 @@
 
 
 - 2021.04.15
-   - Add `MixNet` and `ReXNet` pretrained models, `MixNet`'s Top-1 Acc on ImageNet-1k reaches 78.6% and `ReXNet` reaches 82.09%.
+   - Add `MixNet` and `ReXNet` pretrained models, `MixNet_L`'s Top-1 Acc on ImageNet-1k reaches 78.6% and `ReXNet_3_0` reaches 82.09%.
 - 2021.01.27
    * Add ViT and DeiT pretrained models, ViT's Top-1 Acc on ImageNet reaches 81.05%, and DeiT reaches 85.5%.
 - 2021.01.08
