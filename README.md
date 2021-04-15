@@ -7,7 +7,8 @@
 PaddleClas is a toolset for image classification tasks prepared for the industry and academia. It helps users train better computer vision models and apply them in real scenarios.
 
 **Recent update**
-- 2021.03.02 Add support for model quantization。
+- 2021.04.15 Add `MixNet` and `ReXNet` pretrained models, `MixNet`'s Top-1 Acc on ImageNet-1k reaches 78.6% and `ReXNet` reaches 82.09%.
+- 2021.03.02 Add support for model quantization.
 - 2021.02.01 Add `RepVGG` pretrained models, whose Top-1 Acc on ImageNet-1k dataset reaches 79.65%.
 - 2021.01.27 Add `ViT` and `DeiT` pretrained models, `ViT`'s Top-1 Acc on ImageNet-1k dataset reaches 85.13%, and `DeiT` reaches 85.1%.
 - 2021.01.08 Add support for whl package and its usage, Model inference can be done by simply install paddleclas using pip.
@@ -64,6 +65,8 @@ PaddleClas is a toolset for image classification tasks prepared for the industry
     - [ResNeSt and RegNet series](#ResNeSt_and_RegNet_series)
     - [Transformer series](#Transformer)
     - [RepVGG series](#RepVGG)
+    - [MixNet series](#MixNet)
+    - [ReXNet series](#ReXNet)
     - [Others](#Others)
     - HS-ResNet: arxiv link: [https://arxiv.org/pdf/2010.07621.pdf](https://arxiv.org/pdf/2010.07621.pdf). Code and models are coming soon!
 - Model training/evaluation
@@ -400,6 +403,32 @@ Accuracy and inference time metrics of RepVGG series models are shown as follows
 | RepVGG_B1g4 | 0.7675    | 0.9335    |  |  |  |  | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/RepVGG_B1g4_pretrained.pdparams) |
 | RepVGG_B2g4 | 0.7881    | 0.9448    |  |  |  |  | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/RepVGG_B2g4_pretrained.pdparams) |
 | RepVGG_B3g4 | 0.7965    | 0.9485    |  |  |  |  | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/RepVGG_B3g4_pretrained.pdparams) |
+
+<a name="MixNet"></a>
+
+### MixNet
+
+Accuracy and inference time metrics of MixNet series models are shown as follows. More detailed information can be refered to [MixNet series tutorial](./docs/en/models/MixNet_en.md).
+
+| Model    | Top-1 Acc | Top-5 Acc | time(ms)<br>bs=1 | time(ms)<br>bs=4 | Flops(M) | Params(M) | Download Address                                             |
+| -------- | --------- | --------- | ---------------- | ---------------- | -------- | --------- | ------------------------------------------------------------ |
+| MixNet_S | 0.7628    | 0.9299    |                  |                  | 252.977  | 4.167     | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/MixNet_S_pretrained.pdparams) |
+| MixNet_M | 0.7767    | 0.9364    |                  |                  | 357.119  | 5.065     | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/MixNet_M_pretrained.pdparams) |
+| MixNet_L | 0.7860    | 0.9437    |                  |                  | 579.017  | 7.384     | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/MixNet_L_pretrained.pdparams) |
+
+<a name="ReXNet"></a>
+
+### ReXNet
+
+Accuracy and inference time metrics of ReXNet series models are shown as follows. More detailed information can be refered to [ReXNet series tutorial](./docs/en/models/ReXNet_en.md).
+
+| Model      | Top-1 Acc | Top-5 Acc | time(ms)<br>bs=1 | time(ms)<br>bs=4 | Flops(G) | Params(M) | Download Address                                             |
+| ---------- | --------- | --------- | ---------------- | ---------------- | -------- | --------- | ------------------------------------------------------------ |
+| ReXNet_1_0 | 0.7746    | 0.9370    |                  |                  | 0.415    | 4.838     | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ReXNet_1_0_pretrained.pdparams) |
+| ReXNet_1_3 | 0.7913    | 0.9464    |                  |                  | 0.683    | 7.611     | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ReXNet_1_3_pretrained.pdparams) |
+| ReXNet_1_5 | 0.8006    | 0.9512    |                  |                  | 0.900    | 9.791     | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ReXNet_1_5_pretrained.pdparams) |
+| ReXNet_2_0 | 0.8122    | 0.9536    |                  |                  | 1.561    | 16.449    | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ReXNet_2_0_pretrained.pdparams) |
+| ReXNet_3_0 | 0.8209    | 0.9612    |                  |                  | 3.445    | 34.833    | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ReXNet_3_0_pretrained.pdparams) |
 
 <a name="Others"></a>
 
