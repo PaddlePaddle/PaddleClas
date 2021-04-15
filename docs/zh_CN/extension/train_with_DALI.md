@@ -6,7 +6,7 @@
 由于深度学习程序在训练阶段依赖大量数据，这些数据需要经过加载、预处理等操作后，才能送入训练程序，而这些操作通常在CPU完成，因此限制了训练速度进一步提高，特别是在batch_size较大时，数据读取可能成为训练速度的瓶颈。DALI可以基于GPU的高并行特性实现数据加载及预处理操作，可以进一步提高训练速度。
 
 ## 安装DALI
-目前DALI仅支持Linux x64平台，且CUDA版本大于等于10.0。
+目前DALI仅支持Linux x64平台，且CUDA版本大于等于10.2。
 
 * 对于CUDA 10:
 
@@ -25,7 +25,7 @@ PaddleClas支持在静态图训练方式中使用DALI加速，由于DALI仅支�
 # 设置用于训练的GPU卡号
 export CUDA_VISIBLE_DEVICES="0"
 
-# 设置用于神经网络训练的显存大小，可根据具体情况设置，一般可设置为0.8或0.7
+# 设置用于神经网络训练的显存大小，可根据具体情况设置，一般可设置为0.8或0.7，剩余显存则预留DALI使用
 export FLAGS_fraction_of_gpu_memory_to_use=0.80
 
 python tools/static/train.py -c configs/ResNet/ResNet50.yaml -o use_dali=True
@@ -37,7 +37,7 @@ python tools/static/train.py -c configs/ResNet/ResNet50.yaml -o use_dali=True
 # 设置用于训练的GPU卡号
 export CUDA_VISIBLE_DEVICES="0,1,2,3,4,5,6,7"
 
-# 设置用于神经网络训练的显存，可根据具体情况设置，一般可设置为0.8或0.7
+# 设置用于神经网络训练的显存大小，可根据具体情况设置，一般可设置为0.8或0.7，剩余显存则预留DALI使用
 export FLAGS_fraction_of_gpu_memory_to_use=0.80
 
 python -m paddle.distributed.launch \
@@ -54,5 +54,3 @@ python -m paddle.distributed.launch \
 ```shell
 python tools/static/train.py -c configs/ResNet/ResNet50.yaml -o use_dali=True -o AMP.use_pure_fp16=True
 ```
-
-使用FP16半精度训练将导致训练精度下降或收敛变慢的问题。

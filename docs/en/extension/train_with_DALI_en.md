@@ -6,7 +6,7 @@
 Since  the Deep learning relies on a large amount of data in the training stage, these data need to be loaded and preprocessed. These operations are usually executed on the CPU, which limits the further improvement of the training speed, especially when the batch_size is large, which become the bottleneck of speed. DALI can use GPU to accelerate these operations, thereby further improve the training speed.
 
 ## Installing DALI
-DALI only support Linux x64 and version of CUDA is 10.0 or later.
+DALI only support Linux x64 and version of CUDA is 10.2 or later.
 
 * For CUDA 10:
 
@@ -25,7 +25,7 @@ Paddleclas supports training with DALI in static graph. Since DALI only supports
 # set the GPUs that can be seen
 export CUDA_VISIBLE_DEVICES="0"
 
-# set the GPU memory used for neural network training, generally 0.8 or 0.7
+# set the GPU memory used for neural network training, generally 0.8 or 0.7, and the remaining GPU memory is reserved for DALI
 export FLAGS_fraction_of_gpu_memory_to_use=0.80
 
 python tools/static/train.py -c configs/ResNet/ResNet50.yaml -o use_dali=True
@@ -37,7 +37,7 @@ And you can train with muti-GPUs:
 # set the GPUs that can be seen
 export CUDA_VISIBLE_DEVICES="0,1,2,3,4,5,6,7"
 
-# set the GPU memory used for neural network training, generally 0.8 or 0.7
+# set the GPU memory used for neural network training, generally 0.8 or 0.7, and the remaining GPU memory is reserved for DALI
 export FLAGS_fraction_of_gpu_memory_to_use=0.80
 
 python -m paddle.distributed.launch \
@@ -54,5 +54,3 @@ On the basis of the above, using FP16 half-precision can further improve the tra
 ```shell
 python tools/static/train.py -c configs/ResNet/ResNet50.yaml -o use_dali=True -o AMP.use_pure_fp16=True
 ```
-
-Using fp16 half-precision will lead to the problem of training precision decline or convergence slow.
