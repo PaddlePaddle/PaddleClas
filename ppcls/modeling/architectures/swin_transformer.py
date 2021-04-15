@@ -124,7 +124,7 @@ class WindowAttention(nn.Layer):
         coords_w = paddle.arange(self.window_size[1])
         coords = paddle.stack(paddle.meshgrid(
             [coords_h, coords_w]))  # 2, Wh, Ww
-        coords_flatten = paddle.flatten(coords, 1).clone()  # 2, Wh*Ww
+        coords_flatten = paddle.flatten(coords, 1)  # 2, Wh*Ww
 
         coords_flatten_1 = coords_flatten.unsqueeze(axis=2)
         coords_flatten_2 = coords_flatten.unsqueeze(axis=1)
@@ -701,7 +701,7 @@ class SwinTransformer(nn.Layer):
 
         x = self.norm(x)  # B L C
         x = self.avgpool(x.transpose([0, 2, 1]))  # B C 1
-        x = paddle.flatten(x, 1).clone()
+        x = paddle.flatten(x, 1)
         return x
 
     def forward(self, x):
