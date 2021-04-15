@@ -68,7 +68,7 @@ unzip flowers102.zip
 ```shell
 # linux or mac
 cd ../../
-# windoes直接打开PaddleCls根目录即可
+# windoes直接打开PaddleClas根目录即可
 ```
 
 ## 四、模型训练
@@ -120,15 +120,25 @@ python tools/train.py -c ./configs/quick_start/new_user/ShuffleNetV2_x0_25.yaml 
 
 由于GPU训练速度更快，可以使用更复杂模型，因此以ResNet50_vd为例。与ShuffleNetV2_x0_25相比，此模型计算量较大， 训练好的模型精度也会更高。
 
+首先要设置环境变量，使用0号GPU进行训练
+
+- linux 或者 mac
+
+  ```shell
+  export CUDA_VISIBLE_DEVICES=0
+  ```
+
+- windows
+
+  ```shell
+  set CUDA_VISIBLE_DEVICES=0
+  ```
+
 ##### 不使用预训练模型
 
 ```shell
-#for linux or mac，GPU训练暂不支持windows
-export CUDA_VISIBLE_DEVICES=0
 python tools/train.py -c ./configs/quick_start/ResNet50_vd.yaml
 ```
-
-- `export CUDA_VISIBLE_DEVICES=0` 指定此训练程序可见的GPU为0号卡
 
 训练完成后，验证集的`Top1 Acc`曲线如下所示，最高准确率为0.2735。训练精度曲线下图所示
 
@@ -139,7 +149,6 @@ python tools/train.py -c ./configs/quick_start/ResNet50_vd.yaml
 基于ImageNet1k分类预训练模型进行微调，训练脚本如下所示
 
 ```shell
-export CUDA_VISIBLE_DEVICES=0
 python tools/train.py -c ./configs/quick_start/ResNet50_vd_finetune.yaml
 ```
 
