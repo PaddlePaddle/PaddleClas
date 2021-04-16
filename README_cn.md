@@ -87,7 +87,7 @@
     - [数据增广](./docs/zh_CN/advanced_tutorials/image_augmentation/ImageAugment.md)
 - 特色拓展应用
     - [迁移学习](./docs/zh_CN/application/transfer_learning.md)
-    - [10万类图像分类预训练模型](./docs/zh_CN/application/transfer_learning.md)
+    - [10万类图像分类预训练模型](./docs/zh_CN/models/models_intro.md)
     - [通用目标检测](./docs/zh_CN/application/object_detection.md)
 - FAQ
     - [图像分类2021第一季精选问题(近期更新2021.01.21)](./docs/zh_CN/faq_series/faq_2021_s1.md)
