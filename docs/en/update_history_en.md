@@ -2,21 +2,18 @@
 
 
 
+- 2021.04.15
+   - Add `MixNet` and `ReXNet` pretrained models, `MixNet_L`'s Top-1 Acc on ImageNet-1k reaches 78.6% and `ReXNet_3_0` reaches 82.09%.
 - 2021.01.27
    * Add ViT and DeiT pretrained models, ViT's Top-1 Acc on ImageNet reaches 81.05%, and DeiT reaches 85.5%.
-
 - 2021.01.08
     * Add support for whl package and its usage, Model inference can be done by simply install paddleclas using pip.
-
 - 2020.12.16
     * Add support for TensorRT when using cpp inference to obain more obvious acceleration.
-
 - 2020.12.06
     * Add `SE_HRNet_W64_C_ssld` pretrained model, whose Top-1 Acc on ImageNet1k dataset reaches 84.75%.
-
 - 2020.11.23
     * Add `GhostNet_x1_3_ssld` pretrained model, whose Top-1 Acc on ImageNet1k dataset reaches 79.38%.
-
 - 2020.11.09
     * Add `InceptionV3` architecture and pretrained model, whose Top-1 Acc on ImageNet1k dataset reaches 79.1%.
 

@@ -26,19 +26,27 @@ Among them, `-c` is used to specify the path of the configuration file, `-o` is 
 Of course, you can also directly modify the configuration file to update the configuration. For specific configuration parameters, please refer to [Configuration Document](config_en.md).
 
 * The output log examples are as follows:
-    * If mixup or cutmix is used in training, only loss, lr (learning rate) and training time of the minibatch will be printed in the log.
+    * If mixup or cutmix is used in training, top-1 and top-k (default by 5) will not be printed in the log:
 
     ```
-    train step:890  loss:  6.8473 lr: 0.100000 elapse: 0.157s
+    ...
+    epoch:0  , train step:20   , loss: 4.53660, lr: 0.003750, batch_cost: 1.23101 s, reader_cost: 0.74311 s, ips: 25.99489 images/sec, eta: 0:12:43
+    ...
+    END epoch:1   valid top1: 0.01569, top5: 0.06863, loss: 4.61747,  batch_cost: 0.26155 s, reader_cost: 0.16952 s, batch_cost_sum: 10.72348 s, ips: 76.46772 images/sec.
+    ...
     ```
 
-    * If mixup or cutmix is not used during training, in addition to loss, lr (learning rate) and the training time of the minibatch, top-1 and top-k( The default is 5) will also be printed in the log.
+    * If mixup or cutmix is not used during training, in addition to the above information, top-1 and top-k (The default is 5) will also be printed in the log:
 
     ```
-    epoch:0    train    step:13    loss:7.9561    top1:0.0156    top5:0.1094    lr:0.100000    elapse:0.193s
+    ...
+    epoch:0  , train step:30  , top1: 0.06250, top5: 0.09375, loss: 4.62766, lr: 0.003728, batch_cost: 0.64089 s, reader_cost: 0.18857 s, ips: 49.93080 images/sec, eta: 0:06:18
+    ...
+    END epoch:0   train top1: 0.01310, top5: 0.04738, loss: 4.65124,  batch_cost: 0.64089 s, reader_cost: 0.18857 s, batch_cost_sum: 13.45863 s, ips: 49.93080 images/sec.
+    ...
     ```
 
-During training, you can view loss changes in real time through `VisualDL`,  see [VisualDL](../extension/VisualDL.md) for details.
+During training, you can view loss changes in real time through `VisualDL`,  see [VisualDL](../extension/VisualDL_en.md) for details.
 
 ### 1.2 Model finetuning
 
