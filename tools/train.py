@@ -56,7 +56,16 @@ def main(args):
     config = get_config(args.config, overrides=args.override, show=True)
     # assign the place
     use_gpu = config.get("use_gpu", True)
-    place = paddle.set_device('gpu' if use_gpu else 'cpu')
+    use_xpu = config.get("use_xpu", False)
+    assert (
+        use_gpu and use_xpu
+    ) is not True, "gpu and xpu can not be true in the same time in static mode!"
+    if use_gpu:
+        place = paddle.set_device('gpu')
+    elif use_xpu:
+        place = paddle.set_device('xpu')
+    else:
+        place = paddle.set_device('cpu')
 
     trainer_num = paddle.distributed.get_world_size()
     use_data_parallel = trainer_num != 1
@@ -70,10 +79,10 @@ def main(args):
         config, parameter_list=net.parameters())
 
     dp_net = net
-    if config["use_data_parallel"]:
-        find_unused_parameters = config.get("find_unused_parameters", False)
-        dp_net = paddle.DataParallel(
-            net, find_unused_parameters=find_unused_parameters)
+    # if config["use_data_parallel"]:
+    #     find_unused_parameters = config.get("find_unused_parameters", False)
+    #     dp_net = paddle.DataParallel(
+    #         net, find_unused_parameters=find_unused_parameters)
 
     # load model from checkpoint or pretrained model
     init_model(config, net, optimizer)
