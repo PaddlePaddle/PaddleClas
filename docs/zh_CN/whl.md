@@ -49,6 +49,9 @@ paddleclas --model_name=ResNet50 --top_k=5 --image_file='docs/images/whl/demo.jp
     Predict complete!
 ```
 
+**注意**: 如果使用`Transformer`系列模型，如`DeiT_***_384`, `ViT_***_384`等，请注意模型的输入数据尺寸，需要设置参数`resize_short=384`, `reize=384`。
+
+
 ### 2. 参数解释
 以下参数可在命令行交互使用时通过参数指定，或在Python代码中实例化PaddleClas对象时作为构造函数的参数使用。
 * model_name(str): 模型名称，没有指定自定义的model_file和params_file时，可以指定该参数，使用PaddleClas提供的基于ImageNet1k的inference model，默认值为ResNet50。
