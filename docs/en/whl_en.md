@@ -73,7 +73,11 @@ paddleclas --model_name=ResNet50 --top_k=5 --image_file='docs/images/whl/demo.jp
 * pre_label_image(bool): whether prelabel or not, default=False.
 * pre_label_out_idr(str): If prelabeling, the path of output.
 
-**Note**: If you want to use `Transformer series models`, such as `DeiT_***_384`, `ViT_***_384`, etc., please pay attention to the input size of model, and need to set `resize_short=384`, `reize=384`.
+**Note**: If you want to use `Transformer series models`, such as `DeiT_***_384`, `ViT_***_384`, etc., please pay attention to the input size of model, and need to set `resize_short=384`, `reize=384` when building a `PaddleClas` object. The following is a demo.
+
+```python
+clas = PaddleClas(model_name='ViT_base_patch16_384', top_k=5, resize_short=384, resize=384)
+```
 
 ### 3. Different Usages of Codes
 
