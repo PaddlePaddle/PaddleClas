@@ -6,7 +6,7 @@
 
 install by pypi
 ```bash
-pip install paddleclas==2.0.0rc3
+pip install paddleclas==2.0.1
 ```
 
 build own whl package and install
