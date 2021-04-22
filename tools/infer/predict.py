@@ -20,7 +20,8 @@ import time
 import sys
 sys.path.insert(0, ".")
 from ppcls.utils import logger
-from tools.infer.utils import parse_args, get_image_list, create_paddle_predictor, preprocess, postprocess
+from tools.infer.utils import parse_args, create_paddle_predictor, preprocess, postprocess
+from tools.infer.utils import get_image_list, get_image_list_from_label_file, calc_topk_acc
 
 
 class Predictor(object):
@@ -46,7 +47,19 @@ class Predictor(object):
         return batch_output
 
     def normal_predict(self):
-        image_list = get_image_list(self.args.image_file)
+        if self.args.enable_calc_topk:
+            assert self.args.gt_label_path is not None and os.path.exists(self.args.gt_label_path), \
+                "gt_label_path shoule not be None and must exist, please check its path."
+            image_list, gt_labels = get_image_list_from_label_file(
+                self.args.image_file, self.args.gt_label_path)
+            predicts_map = {
+                "prediction": [],
+                "gt_label": [],
+            }
+        else:
+            image_list = get_image_list(self.args.image_file)
+            gt_labels = None
+
         batch_input_list = []
         img_name_list = []
         cnt = 0
@@ -64,6 +77,8 @@ class Predictor(object):
                 img_name = img_path.split("/")[-1]
                 img_name_list.append(img_name)
                 cnt += 1
+                if self.args.enable_calc_topk:
+                    predicts_map["gt_label"].append(gt_labels[idx])
 
             if cnt % args.batch_size == 0 or (idx + 1) == len(image_list):
                 batch_outputs = self.predict(np.array(batch_input_list))
@@ -74,12 +89,20 @@ class Predictor(object):
                     clas_ids = result_dict["clas_ids"]
                     scores_str = "[{}]".format(", ".join("{:.2f}".format(
                         r) for r in result_dict["scores"]))
-                    print(
+                    logger.info(
                         "File:{}, Top-{} result: class id(s): {}, score(s): {}".
                         format(filename, self.args.top_k, clas_ids,
                                scores_str))
+
+                    if self.args.enable_calc_topk:
+                        predicts_map["prediction"].append(clas_ids)
+
                 batch_input_list = []
                 img_name_list = []
+        if self.args.enable_calc_topk:
+            topk_acc = calc_topk_acc(predicts_map)
+            for idx, acc in enumerate(topk_acc):
+                logger.info("Top-{} acc: {:.5f}".format(idx + 1, acc))
 
     def benchmark_predict(self):
         test_num = 500

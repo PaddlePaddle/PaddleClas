@@ -267,6 +267,8 @@ Among them:
 + `enable_mkldnn`: Wheter to use `MKL-DNN`, default by `False`. When both `use_gpu` and `enable_mkldnn` are set to `True`, GPU is used to run and `enable_mkldnn` will be ignored.
 + `resize_short`: The length of the shortest side of the image that be scaled proportionally, default by `256`;
 + `resize`: The side length of the image that be center cropped from resize_shorted image, default by `224`;
++ `enable_calc_topk`: Whether to calculate top-k accuracy of the predction, default by `False`. Top-k accuracy will be printed out when set as `True`.
++ `gt_label_path`: Image name and label file, used when `enable_calc_topk` is `True` to get image list and labels.
 
 **Note**: If you want to use `Transformer series models`, such as `DeiT_***_384`, `ViT_***_384`, etc., please pay attention to the input size of model, and need to set `resize_short=384`, `reize=384`.
 
