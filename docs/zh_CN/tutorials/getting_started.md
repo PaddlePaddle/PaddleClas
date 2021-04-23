@@ -1,6 +1,6 @@
 # 开始使用
 ---
-请参考[安装指南](./install.md)配置运行环境，并根据[快速开始](./quick_start.md)文档准备flower102数据集，本章节下面所有的实验均以flower102数据集为例。
+请参考[安装指南](./install.md)配置运行环境，并根据[快速开始](./quick_start_new_user.md)文档准备flower102数据集，本章节下面所有的实验均以flower102数据集为例。
 
 PaddleClas目前支持的训练/评估环境如下：
 ```shell
@@ -174,7 +174,7 @@ python -m paddle.distributed.launch \
 
 其中`pretrained_model`用于设置加载预训练权重文件的路径，使用时需要换成自己的预训练模型权重文件路径，也可以直接在配置文件中修改该路径。
 
-[30分钟玩转PaddleClas教程](./quick_start.md)中包含大量模型微调的示例，可以参考该章节在特定的数据集上进行模型微调。
+30分钟玩转PaddleClas[尝鲜版](./quick_start_new_user.md)与[进阶版](./quick_start_professional.md)中包含大量模型微调的示例，可以参考该章节在特定的数据集上进行模型微调。
 
 
 <a name="model_resume"></a>

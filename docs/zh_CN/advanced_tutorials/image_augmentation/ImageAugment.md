@@ -440,7 +440,7 @@ new_batch = cutmix_op(batch)
 
 # 七、数据增广分类实战
 
-本节将基于ImageNet-1K的数据集详细介绍数据增广实验，如果想快速体验此方法，可以参考[**30分钟玩转PaddleClas**](../../tutorials/quick_start.md)中基于Flowers102的数据增广实验。
+本节将基于ImageNet-1K的数据集详细介绍数据增广实验，如果想快速体验此方法，可以参考[**30分钟玩转PaddleClas（进阶版）**](../../tutorials/quick_start_professional.md)中基于CIFAR100的数据增广实验。
 
 ## 7.1 参数配置
 

@@ -52,7 +52,8 @@
 ## 文档教程
 
 - [快速安装](./docs/zh_CN/tutorials/install.md)
-- [30分钟玩转PaddleClas](./docs/zh_CN/tutorials/quick_start.md)
+- [30分钟玩转PaddleClas（尝鲜版）](./docs/zh_CN/tutorials/quick_start_new_user.md)
+- [30分钟玩转PaddleClas（进阶版）](./docs/zh_CN/tutorials/quick_start_professional.md)
 - [模型库介绍和预训练模型](./docs/zh_CN/models/models_intro.md)
     - [模型库概览图](#模型库概览图)
     - [SSLD知识蒸馏系列](#SSLD知识蒸馏系列)
@@ -87,6 +88,7 @@
     - [知识蒸馏](./docs/zh_CN/advanced_tutorials/distillation/distillation.md)
     - [数据增广](./docs/zh_CN/advanced_tutorials/image_augmentation/ImageAugment.md)
     - [多标签分类](./docs/zh_CN/advanced_tutorials/multilabel/multilabel.md)
+    - [代码解析与社区贡献指南](./docs/zh_CN/tutorials/quick_start_community.md)
 - 特色拓展应用
     - [迁移学习](./docs/zh_CN/application/transfer_learning.md)
     - [10万类图像分类预训练模型](./docs/zh_CN/application/transfer_learning.md)
@@ -463,5 +465,6 @@ ViT（Vision Transformer）与DeiT（Data-efficient Image Transformers）系列�
 - 非常感谢[nblib](https://github.com/nblib)修正了PaddleClas中RandErasing的数据增广配置文件。
 - 非常感谢[chenpy228](https://github.com/chenpy228)修正了PaddleClas文档中的部分错别字。
 - 非常感谢[jm12138](https://github.com/jm12138)为PaddleClas添加ViT，DeiT系列模型和RepVGG系列模型。
+- 非常感谢[FutureSI](https://aistudio.baidu.com/aistudio/personalcenter/thirdview/76563)对PaddleClas代码的解析与总结。
 
 我们非常欢迎你为PaddleClas贡献代码，也十分感谢你的反馈。
