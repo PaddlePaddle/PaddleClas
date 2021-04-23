@@ -236,7 +236,7 @@ python tools/infer/infer.py \
 + `pre_label_image` : 是否对图像数据进行预标注，默认值：`False`
 + `pre_label_out_idr` : 预标注图像数据的输出文件夹，当`pre_label_image=True`时，会在该文件夹下面生成很多个子文件夹，每个文件夹名称为类别id，其中存储模型预测属于该类别的所有图像。
 
-**注意**: 如果使用`Transformer`系列模型，如`DeiT_***_384`, `ViT_***_384`等，请注意模型的输入数据尺寸，需要设置参数`resize_short=384`, `reize=384`。
+**注意**: 如果使用`Transformer`系列模型，如`DeiT_***_384`, `ViT_***_384`等，请注意模型的输入数据尺寸，需要设置参数`resize_short=384`, `resize=384`。
 
 
 <a name="model_inference"></a>
@@ -279,6 +279,6 @@ python tools/infer/predict.py \
 + `resize_short`: 对输入图像进行等比例缩放，表示最短边的尺寸，默认值：`256`
 + `resize`: 对`resize_short`操作后的进行居中裁剪，表示裁剪的尺寸，默认值：`224`
 
-**注意**: 如果使用`Transformer`系列模型，如`DeiT_***_384`, `ViT_***_384`等，请注意模型的输入数据尺寸，需要设置参数`resize_short=384`, `reize=384`。
+**注意**: 如果使用`Transformer`系列模型，如`DeiT_***_384`, `ViT_***_384`等，请注意模型的输入数据尺寸，需要设置参数`resize_short=384`, `resize=384`。
 
 * 如果你希望评测模型速度，建议使用该脚本(`tools/infer/predict.py`)，同时开启TensorRT加速预测。
