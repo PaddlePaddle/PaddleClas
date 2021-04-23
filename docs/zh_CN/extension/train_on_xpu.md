@@ -5,7 +5,7 @@
 * 本文档介绍了目前昆仑支持的模型以及如何在昆仑设备上训练这些模型。支持昆仑的PaddlePaddle安装参考install_kunlun(https://github.com/PaddlePaddle/FluidDoc/blob/develop/doc/paddle/install/install_Kunlun_zh.md)
 
 ## 昆仑训练
-* 数据来源和预训练模型参考[quick_start](../tutorials/quick_start.md)。昆仑训练效果与CPU/GPU对齐。
+* 数据来源和预训练模型参考[quick_start](../tutorials/quick_start_new_user.md)。昆仑训练效果与CPU/GPU对齐。
 
 ### ResNet50
 * 命令：

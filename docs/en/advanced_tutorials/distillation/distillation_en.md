@@ -159,7 +159,7 @@ It can be seen here that for the baseline pretrained model, excessive adjustment
 
 ## Practice
 
-This section will introduce the SSLD distillation experiments in detail based on the ImageNet-1K dataset. If you want to experience this method quickly, you can refer to [** Quick start PaddleClas in 30 minutes**] (../../tutorials/quick_start.md), whose dataset is set as Flowers102.
+This section will introduce the SSLD distillation experiments in detail based on the ImageNet-1K dataset. If you want to experience this method quickly, you can refer to [** Quick start PaddleClas in 30 minutes**] (../../tutorials/quick_start_en.md), whose dataset is set as Flowers102.
 
 
 

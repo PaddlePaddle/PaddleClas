@@ -1,4 +1,4 @@
-# 30分钟玩转PaddleClas（专业版）
+# 30分钟玩转PaddleClas（尝鲜版）
 
 此处提供了专业用户在linux操作系统上使用PaddleClas的快速上手教程，主要内容包括基于CIFAR-100数据集和NUS-WIDE-SCENE数据集，快速体验不同模型的单标签训练及多标签训练、加载不同预训练模型、SSLD知识蒸馏方案和数据增广的效果。请事先参考[安装指南](install.md)配置运行环境和克隆PaddleClas代码。
 
@@ -152,7 +152,7 @@ python3 -m paddle.distributed.launch \
     tools/train.py \
         -c ./configs/quick_start/professional/ResNet50_vd_mixup_CIFAR100_finetune.yaml \
         -o model_save_dir="output_CIFAR"
-        
+
 ```
 
 最终CIFAR100验证集上的精度为0.73，使用数据增广可以使得模型精度再次提升约1.2\%。
@@ -162,7 +162,7 @@ python3 -m paddle.distributed.launch \
 * **注意**
 
     * 其他数据增广的配置文件可以参考`configs/DataAugment`中的配置文件。
-    
+
     * 训练CIFAR100的迭代轮数较少，因此进行训练时，验证集的精度指标可能会有1\%左右的波动。
 
 
@@ -195,7 +195,7 @@ python3 -m paddle.distributed.launch \
     tools/train.py \
         -c ./configs/quick_start/professional/R50_vd_distill_MV3_large_x1_0_CIFAR100.yaml \
         -o model_save_dir="output_CIFAR"
-        
+
 ```
 
 最终CIFAR100验证集上的精度为64.4\%，使用教师模型进行知识蒸馏，MobileNetV3的精度涨幅4.3\%。
@@ -203,7 +203,7 @@ python3 -m paddle.distributed.launch \
 * **注意**
 
     * 蒸馏过程中，教师模型使用的预训练模型为CIFAR100数据集上的训练结果，学生模型使用的是ImageNet1k数据集上精度为75.32\%的MobileNetV3_large_x1_0预训练模型。
-    
+
     * 该蒸馏过程无须使用真实标签，所以可以使用更多的无标签数据，在使用过程中，可以将无标签数据生成假的train_list.txt，然后与真实的train_list.txt进行合并, 用户可以根据自己的数据自行体验。
 
 
@@ -218,7 +218,7 @@ python3 -m paddle.distributed.launch \
 ```bash
 python3 tools/eval.py \
     -c ./configs/quick_start/professional/ResNet50_vd_CIFAR100.yaml \
-    -o pretrained_model="./output_CIFAR/ResNet50_vd/best_model/ppcls" 
+    -o pretrained_model="./output_CIFAR/ResNet50_vd/best_model/ppcls"
 ```
 
 #### 5.1.2 单标签分类模型预测
@@ -275,7 +275,7 @@ python3 tools/infer/predict.py \
 ```bash
 python3 tools/eval.py \
     -c ./configs/quick_start/ResNet50_vd_multilabel.yaml \
-    -o pretrained_model="./output_NUS-WIDE-SCENE/ResNet50_vd/best_model/ppcls" 
+    -o pretrained_model="./output_NUS-WIDE-SCENE/ResNet50_vd/best_model/ppcls"
 ```
 
 评估指标采用mAP，验证集的mAP应该在0.57左右。
