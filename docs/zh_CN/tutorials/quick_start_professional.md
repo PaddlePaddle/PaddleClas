@@ -1,4 +1,4 @@
-# 30分钟玩转PaddleClas（尝鲜版）
+# 30分钟玩转PaddleClas（进阶版）
 
 此处提供了专业用户在linux操作系统上使用PaddleClas的快速上手教程，主要内容包括基于CIFAR-100数据集和NUS-WIDE-SCENE数据集，快速体验不同模型的单标签训练及多标签训练、加载不同预训练模型、SSLD知识蒸馏方案和数据增广的效果。请事先参考[安装指南](install.md)配置运行环境和克隆PaddleClas代码。
 
