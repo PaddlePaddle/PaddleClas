@@ -1,4 +1,4 @@
-# Copyright (c) 2020 PaddlePaddle Authors. All Rights Reserved.
+# Copyright (c) 2021 PaddlePaddle Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -129,8 +129,6 @@ def VGG19(pretrained=False, **kwargs):
     return model
 
 
-
-
 def ResNet18(pretrained=False, **kwargs):
     """
     ResNet18
@@ -226,7 +224,6 @@ def ResNet152(pretrained=False, **kwargs):
     return model
 
 
-
 def SqueezeNet1_0(pretrained=False, **kwargs):
     """
     SqueezeNet1_0
@@ -259,8 +256,6 @@ def SqueezeNet1_1(pretrained=False, **kwargs):
         model = _load_pretrained_parameters(model, 'SqueezeNet1_1')
 
     return model
-
-
 
 
 def DenseNet121(pretrained=False, **kwargs):
@@ -358,7 +353,6 @@ def DenseNet264(pretrained=False, **kwargs):
     return model
 
 
-
 def InceptionV3(pretrained=False, **kwargs):
     """
     InceptionV3
@@ -393,7 +387,6 @@ def InceptionV4(pretrained=False, **kwargs):
     return model
 
 
-
 def GoogLeNet(pretrained=False, **kwargs):
     """
     GoogLeNet
@@ -411,7 +404,6 @@ def GoogLeNet(pretrained=False, **kwargs):
     return model
 
 
-
 def ShuffleNet(pretrained=False, **kwargs):
     """
     ShuffleNet
@@ -427,7 +419,6 @@ def ShuffleNet(pretrained=False, **kwargs):
         model = _load_pretrained_parameters(model, 'ShuffleNet')
 
     return model
-
 
 
 def MobileNetV1(pretrained=False, **kwargs):
