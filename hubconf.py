@@ -403,17 +403,17 @@ def GoogLeNet(pretrained=False, **kwargs):
     return model
 
 
-def ShuffleNet(pretrained=False, **kwargs):
+def ShuffleNetV2_x0_25(pretrained=False, **kwargs):
     """
-    ShuffleNet
+    ShuffleNetV2_x0_25
     Args:
         pretrained: bool=False. If `True` load pretrained parameters, `False` otherwise.
         kwargs: 
             class_dim: int=1000. Output dim of last fc layer.
     Returns:
-        model: nn.Layer. Specific `ShuffleNet` model depends on args.
+        model: nn.Layer. Specific `ShuffleNetV2_x0_25` model depends on args.
     """
-    model = _shufflenet_v2.ShuffleNet(**kwargs)
+    model = _shufflenet_v2.ShuffleNetV2_x0_25(**kwargs)
     if pretrained:
         model = _load_pretrained_parameters(model, 'ShuffleNet')
 
