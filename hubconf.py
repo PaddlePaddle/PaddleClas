@@ -32,12 +32,6 @@ from ppcls.modeling.architectures import mobilenet_v3 as _mobilenet_v3
 from ppcls.modeling.architectures import resnext as _resnext
 
 
-# _checkpoints = {
-#     'ResNet18': 'https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ResNet18_pretrained.pdparams',
-#     'ResNet34': 'https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ResNet34_pretrained.pdparams',
-# }
-
-
 def _load_pretrained_urls():
     '''Load pretrained model parameters url from README.md
     '''
@@ -77,8 +71,6 @@ def _load_pretrained_parameters(model, name):
 def AlexNet(pretrained=False, **kwargs):
     '''AlexNet
     '''
-    # pretrained = kwargs.pop('pretrained', False)
-
     model = _alexnet.AlexNet(**kwargs)
     if pretrained:
         model = _load_pretrained_parameters(model, 'AlexNet')
@@ -90,8 +82,6 @@ def AlexNet(pretrained=False, **kwargs):
 def VGG11(pretrained=False, **kwargs):
     '''VGG11
     '''
-    # pretrained = kwargs.pop('pretrained', False)
-
     model = _vgg.VGG11(**kwargs)
     if pretrained:
         model = _load_pretrained_parameters(model, 'VGG11')
@@ -102,8 +92,6 @@ def VGG11(pretrained=False, **kwargs):
 def VGG13(pretrained=False, **kwargs):
     '''VGG13
     '''
-    # pretrained = kwargs.pop('pretrained', False)
-
     model = _vgg.VGG13(**kwargs)
     if pretrained:
         model = _load_pretrained_parameters(model, 'VGG13')
@@ -114,8 +102,6 @@ def VGG13(pretrained=False, **kwargs):
 def VGG16(pretrained=False, **kwargs):
     '''VGG16
     '''
-    # pretrained = kwargs.pop('pretrained', False)
-
     model = _vgg.VGG16(**kwargs)
     if pretrained:
         model = _load_pretrained_parameters(model, 'VGG16')
@@ -126,8 +112,6 @@ def VGG16(pretrained=False, **kwargs):
 def VGG19(pretrained=False, **kwargs):
     '''VGG19
     '''
-    # pretrained = kwargs.pop('pretrained', False)
-
     model = _vgg.VGG19(**kwargs)
     if pretrained:
         model = _load_pretrained_parameters(model, 'VGG19')
@@ -140,8 +124,6 @@ def VGG19(pretrained=False, **kwargs):
 def ResNet18(pretrained=False, **kwargs):
     '''ResNet18
     '''
-    # pretrained = kwargs.pop('pretrained', False)
-
     model = _resnet.ResNet18(**kwargs)
     if pretrained:
         model = _load_pretrained_parameters(model, 'ResNet18')
@@ -152,8 +134,6 @@ def ResNet18(pretrained=False, **kwargs):
 def ResNet34(pretrained=False, **kwargs):
     '''ResNet34
     '''
-    # pretrained = kwargs.pop('pretrained', False)
-
     model = _resnet.ResNet34(**kwargs)
     if pretrained:
         model = _load_pretrained_parameters(model, 'ResNet34')
@@ -164,8 +144,6 @@ def ResNet34(pretrained=False, **kwargs):
 def ResNet50(pretrained=False, **kwargs):
     '''ResNet50
     '''
-    # pretrained = kwargs.pop('pretrained', False)
-
     model = _resnet.ResNet50(**kwargs)
     if pretrained:
         model = _load_pretrained_parameters(model, 'ResNet50')
@@ -176,8 +154,6 @@ def ResNet50(pretrained=False, **kwargs):
 def ResNet101(pretrained=False, **kwargs):
     '''ResNet101
     '''
-    # pretrained = kwargs.pop('pretrained', False)
-
     model = _resnet.ResNet101(**kwargs)
     if pretrained:
         model = _load_pretrained_parameters(model, 'ResNet101')
@@ -188,8 +164,6 @@ def ResNet101(pretrained=False, **kwargs):
 def ResNet152(pretrained=False, **kwargs):
     '''ResNet152
     '''
-    # pretrained = kwargs.pop('pretrained', False)
-
     model = _resnet.ResNet152(**kwargs)
     if pretrained:
         model = _load_pretrained_parameters(model, 'ResNet152')
@@ -201,8 +175,6 @@ def ResNet152(pretrained=False, **kwargs):
 def SqueezeNet1_0(pretrained=False, **kwargs):
     '''SqueezeNet1_0
     '''
-    # pretrained = kwargs.pop('pretrained', False)
-
     model = _squeezenet.SqueezeNet1_0(**kwargs)
     if pretrained:
         model = _load_pretrained_parameters(model, 'SqueezeNet1_0')
@@ -213,8 +185,6 @@ def SqueezeNet1_0(pretrained=False, **kwargs):
 def SqueezeNet1_1(pretrained=False, **kwargs):
     '''SqueezeNet1_1
     '''
-    # pretrained = kwargs.pop('pretrained', False)
-
     model = _squeezenet.SqueezeNet1_1(**kwargs)
     if pretrained:
         model = _load_pretrained_parameters(model, 'SqueezeNet1_1')
@@ -227,8 +197,6 @@ def SqueezeNet1_1(pretrained=False, **kwargs):
 def DenseNet121(pretrained=False, **kwargs):
     '''DenseNet121
     '''
-    # pretrained = kwargs.pop('pretrained', False)
-
     model = _densenet.DenseNet121(**kwargs)
     if pretrained:
         model = _load_pretrained_parameters(model, 'DenseNet121')
@@ -239,8 +207,6 @@ def DenseNet121(pretrained=False, **kwargs):
 def DenseNet161(pretrained=False, **kwargs):
     '''DenseNet161
     '''
-    # pretrained = kwargs.pop('pretrained', False)
-
     model = _densenet.DenseNet161(**kwargs)
     if pretrained:
         model = _load_pretrained_parameters(model, 'DenseNet161')
@@ -251,8 +217,6 @@ def DenseNet161(pretrained=False, **kwargs):
 def DenseNet169(pretrained=False, **kwargs):
     '''DenseNet169
     '''
-    # pretrained = kwargs.pop('pretrained', False)
-
     model = _densenet.DenseNet169(**kwargs)
     if pretrained:
         model = _load_pretrained_parameters(model, 'DenseNet169')
@@ -263,8 +227,6 @@ def DenseNet169(pretrained=False, **kwargs):
 def DenseNet201(pretrained=False, **kwargs):
     '''DenseNet201
     '''
-    # pretrained = kwargs.pop('pretrained', False)
-
     model = _densenet.DenseNet201(**kwargs)
     if pretrained:
         model = _load_pretrained_parameters(model, 'DenseNet201')
@@ -275,8 +237,6 @@ def DenseNet201(pretrained=False, **kwargs):
 def DenseNet264(pretrained=False, **kwargs):
     '''DenseNet264
     '''
-    # pretrained = kwargs.pop('pretrained', False)
-
     model = _densenet.DenseNet264(**kwargs)
     if pretrained:
         model = _load_pretrained_parameters(model, 'DenseNet264')
@@ -288,8 +248,6 @@ def DenseNet264(pretrained=False, **kwargs):
 def InceptionV3(pretrained=False, **kwargs):
     '''InceptionV3
     '''
-    # pretrained = kwargs.pop('pretrained', False)
-
     model = _inception_v3.InceptionV3(**kwargs)
     if pretrained:
         model = _load_pretrained_parameters(model, 'InceptionV3')
@@ -300,8 +258,6 @@ def InceptionV3(pretrained=False, **kwargs):
 def InceptionV4(pretrained=False, **kwargs):
     '''InceptionV4
     '''
-    # pretrained = kwargs.pop('pretrained', False)
-
     model = _inception_v4.InceptionV4(**kwargs)
     if pretrained:
         model = _load_pretrained_parameters(model, 'InceptionV4')
@@ -313,8 +269,6 @@ def InceptionV4(pretrained=False, **kwargs):
 def GoogLeNet(pretrained=False, **kwargs):
     '''GoogLeNet
     '''
-    # pretrained = kwargs.pop('pretrained', False)
-
     model = _googlenet.GoogLeNet(**kwargs)
     if pretrained:
         model = _load_pretrained_parameters(model, 'GoogLeNet')
@@ -326,8 +280,6 @@ def GoogLeNet(pretrained=False, **kwargs):
 def ShuffleNet(pretrained=False, **kwargs):
     '''ShuffleNet
     '''
-    # pretrained = kwargs.pop('pretrained', False)
-
     model = _shufflenet_v2.ShuffleNet(**kwargs)
     if pretrained:
         model = _load_pretrained_parameters(model, 'ShuffleNet')
@@ -339,8 +291,6 @@ def ShuffleNet(pretrained=False, **kwargs):
 def MobileNetV1(pretrained=False, **kwargs):
     '''MobileNetV1
     '''
-    # pretrained = kwargs.pop('pretrained', False)
-
     model = _mobilenet_v1.MobileNetV1(**kwargs)
     if pretrained:
         model = _load_pretrained_parameters(model, 'MobileNetV1')
@@ -351,8 +301,6 @@ def MobileNetV1(pretrained=False, **kwargs):
 def MobileNetV1_x0_25(pretrained=False, **kwargs):
     '''MobileNetV1_x0_25
     '''
-    # pretrained = kwargs.pop('pretrained', False)
-
     model = _mobilenet_v1.MobileNetV1_x0_25(**kwargs)
     if pretrained:
         model = _load_pretrained_parameters(model, 'MobileNetV1_x0_25')
@@ -363,8 +311,6 @@ def MobileNetV1_x0_25(pretrained=False, **kwargs):
 def MobileNetV1_x0_5(pretrained=False, **kwargs):
     '''MobileNetV1_x0_5
     '''
-    # pretrained = kwargs.pop('pretrained', False)
-
     model = _mobilenet_v1.MobileNetV1_x0_5(**kwargs)
     if pretrained:
         model = _load_pretrained_parameters(model, 'MobileNetV1_x0_5')
@@ -375,8 +321,6 @@ def MobileNetV1_x0_5(pretrained=False, **kwargs):
 def MobileNetV1_x0_75(pretrained=False, **kwargs):
     '''MobileNetV1_x0_75
     '''
-    # pretrained = kwargs.pop('pretrained', False)
-
     model = _mobilenet_v1.MobileNetV1_x0_75(**kwargs)
     if pretrained:
         model = _load_pretrained_parameters(model, 'MobileNetV1_x0_75')
@@ -387,8 +331,6 @@ def MobileNetV1_x0_75(pretrained=False, **kwargs):
 def MobileNetV2_x0_25(pretrained=False, **kwargs):
     '''MobileNetV2_x0_25
     '''
-    # pretrained = kwargs.pop('pretrained', False)
-
     model = _mobilenet_v2.MobileNetV2_x0_25(**kwargs)
     if pretrained:
         model = _load_pretrained_parameters(model, 'MobileNetV2_x0_25')
@@ -399,8 +341,6 @@ def MobileNetV2_x0_25(pretrained=False, **kwargs):
 def MobileNetV2_x0_5(pretrained=False, **kwargs):
     '''MobileNetV2_x0_5
     '''
-    # pretrained = kwargs.pop('pretrained', False)
-
     model = _mobilenet_v2.MobileNetV2_x0_5(**kwargs)
     if pretrained:
         model = _load_pretrained_parameters(model, 'MobileNetV2_x0_5')
@@ -411,8 +351,6 @@ def MobileNetV2_x0_5(pretrained=False, **kwargs):
 def MobileNetV2_x0_75(pretrained=False, **kwargs):
     '''MobileNetV2_x0_75
     '''
-    # pretrained = kwargs.pop('pretrained', False)
-
     model = _mobilenet_v2.MobileNetV2_x0_75(**kwargs)
     if pretrained:
         model = _load_pretrained_parameters(model, 'MobileNetV2_x0_75')
@@ -423,8 +361,6 @@ def MobileNetV2_x0_75(pretrained=False, **kwargs):
 def MobileNetV2_x1_5(pretrained=False, **kwargs):
     '''MobileNetV2_x1_5
     '''
-    # pretrained = kwargs.pop('pretrained', False)
-
     model = _mobilenet_v2.MobileNetV2_x1_5(**kwargs)
     if pretrained:
         model = _load_pretrained_parameters(model, 'MobileNetV2_x1_5')
@@ -435,8 +371,6 @@ def MobileNetV2_x1_5(pretrained=False, **kwargs):
 def MobileNetV2_x2_0(pretrained=False, **kwargs):
     '''MobileNetV2_x2_0
     '''
-    # pretrained = kwargs.pop('pretrained', False)
-
     model = _mobilenet_v2.MobileNetV2_x2_0(**kwargs)
     if pretrained:
         model = _load_pretrained_parameters(model, 'MobileNetV2_x2_0')
@@ -447,8 +381,6 @@ def MobileNetV2_x2_0(pretrained=False, **kwargs):
 def MobileNetV3_large_x0_35(pretrained=False, **kwargs):
     '''MobileNetV3_large_x0_35
     '''
-    # pretrained = kwargs.pop('pretrained', False)
-
     model = _mobilenet_v3.MobileNetV3_large_x0_35(**kwargs)
     if pretrained:
         model = _load_pretrained_parameters(model, 'MobileNetV3_large_x0_35')
@@ -459,8 +391,6 @@ def MobileNetV3_large_x0_35(pretrained=False, **kwargs):
 def MobileNetV3_large_x0_5(pretrained=False, **kwargs):
     '''MobileNetV3_large_x0_5
     '''
-    # pretrained = kwargs.pop('pretrained', False)
-
     model = _mobilenet_v3.MobileNetV3_large_x0_5(**kwargs)
     if pretrained:
         model = _load_pretrained_parameters(model, 'MobileNetV3_large_x0_5')
@@ -471,8 +401,6 @@ def MobileNetV3_large_x0_5(pretrained=False, **kwargs):
 def MobileNetV3_large_x0_75(pretrained=False, **kwargs):
     '''MobileNetV3_large_x0_75
     '''
-    # pretrained = kwargs.pop('pretrained', False)
-
     model = _mobilenet_v3.MobileNetV3_large_x0_75(**kwargs)
     if pretrained:
         model = _load_pretrained_parameters(model, 'MobileNetV3_large_x0_75')
@@ -483,8 +411,6 @@ def MobileNetV3_large_x0_75(pretrained=False, **kwargs):
 def MobileNetV3_large_x1_0(pretrained=False, **kwargs):
     '''MobileNetV3_large_x1_0
     '''
-    # pretrained = kwargs.pop('pretrained', False)
-
     model = _mobilenet_v3.MobileNetV3_large_x1_0(**kwargs)
     if pretrained:
         model = _load_pretrained_parameters(model, 'MobileNetV3_large_x1_0')
@@ -495,8 +421,6 @@ def MobileNetV3_large_x1_0(pretrained=False, **kwargs):
 def MobileNetV3_large_x1_25(pretrained=False, **kwargs):
     '''MobileNetV3_large_x1_25
     '''
-    # pretrained = kwargs.pop('pretrained', False)
-
     model = _mobilenet_v3.MobileNetV3_large_x1_25(**kwargs)
     if pretrained:
         model = _load_pretrained_parameters(model, 'MobileNetV3_large_x1_25')
@@ -507,8 +431,6 @@ def MobileNetV3_large_x1_25(pretrained=False, **kwargs):
 def MobileNetV3_small_x0_35(pretrained=False, **kwargs):
     '''MobileNetV3_small_x0_35
     '''
-    # pretrained = kwargs.pop('pretrained', False)
-
     model = _mobilenet_v3.MobileNetV3_small_x0_35(**kwargs)
     if pretrained:
         model = _load_pretrained_parameters(model, 'MobileNetV3_small_x0_35')
@@ -519,8 +441,6 @@ def MobileNetV3_small_x0_35(pretrained=False, **kwargs):
 def MobileNetV3_small_x0_5(pretrained=False, **kwargs):
     '''MobileNetV3_small_x0_5
     '''
-    # pretrained = kwargs.pop('pretrained', False)
-
     model = _mobilenet_v3.MobileNetV3_small_x0_5(**kwargs)
     if pretrained:
         model = _load_pretrained_parameters(model, 'MobileNetV3_small_x0_5')
@@ -531,8 +451,6 @@ def MobileNetV3_small_x0_5(pretrained=False, **kwargs):
 def MobileNetV3_small_x0_75(pretrained=False, **kwargs):
     '''MobileNetV3_small_x0_75
     '''
-    # pretrained = kwargs.pop('pretrained', False)
-
     model = _mobilenet_v3.MobileNetV3_small_x0_75(**kwargs)
     if pretrained:
         model = _load_pretrained_parameters(model, 'MobileNetV3_small_x0_75')
@@ -543,8 +461,6 @@ def MobileNetV3_small_x0_75(pretrained=False, **kwargs):
 def MobileNetV3_small_x1_0(pretrained=False, **kwargs):
     '''MobileNetV3_small_x1_0
     '''
-    # pretrained = kwargs.pop('pretrained', False)
-
     model = _mobilenet_v3.MobileNetV3_small_x1_0(**kwargs)
     if pretrained:
         model = _load_pretrained_parameters(model, 'MobileNetV3_small_x1_0')
@@ -555,8 +471,6 @@ def MobileNetV3_small_x1_0(pretrained=False, **kwargs):
 def MobileNetV3_small_x1_25(pretrained=False, **kwargs):
     '''MobileNetV3_small_x1_25
     '''
-    # pretrained = kwargs.pop('pretrained', False)
-
     model = _mobilenet_v3.MobileNetV3_small_x1_25(**kwargs)
     if pretrained:
         model = _load_pretrained_parameters(model, 'MobileNetV3_small_x1_25')
@@ -568,8 +482,6 @@ def MobileNetV3_small_x1_25(pretrained=False, **kwargs):
 def ResNeXt101_32x4d(pretrained=False, **kwargs):
     '''ResNeXt101_32x4d
     '''
-    # pretrained = kwargs.pop('pretrained', False)
-
     model = _resnext.ResNeXt101_32x4d(**kwargs)
     if pretrained:
         model = _load_pretrained_parameters(model, 'ResNeXt101_32x4d')
@@ -580,8 +492,6 @@ def ResNeXt101_32x4d(pretrained=False, **kwargs):
 def ResNeXt101_64x4d(pretrained=False, **kwargs):
     '''ResNeXt101_64x4d
     '''
-    # pretrained = kwargs.pop('pretrained', False)
-
     model = _resnext.ResNeXt101_64x4d(**kwargs)
     if pretrained:
         model = _load_pretrained_parameters(model, 'ResNeXt101_64x4d')
@@ -592,8 +502,6 @@ def ResNeXt101_64x4d(pretrained=False, **kwargs):
 def ResNeXt152_32x4d(pretrained=False, **kwargs):
     '''ResNeXt152_32x4d
     '''
-    # pretrained = kwargs.pop('pretrained', False)
-
     model = _resnext.ResNeXt152_32x4d(**kwargs)
     if pretrained:
         model = _load_pretrained_parameters(model, 'ResNeXt152_32x4d')
@@ -604,8 +512,6 @@ def ResNeXt152_32x4d(pretrained=False, **kwargs):
 def ResNeXt152_64x4d(pretrained=False, **kwargs):
     '''ResNeXt152_64x4d
     '''
-    # pretrained = kwargs.pop('pretrained', False)
-
     model = _resnext.ResNeXt152_64x4d(**kwargs)
     if pretrained:
         model = _load_pretrained_parameters(model, 'ResNeXt152_64x4d')
@@ -616,8 +522,6 @@ def ResNeXt152_64x4d(pretrained=False, **kwargs):
 def ResNeXt50_32x4d(pretrained=False, **kwargs):
     '''ResNeXt50_32x4d
     '''
-    # pretrained = kwargs.pop('pretrained', False)
-
     model = _resnext.ResNeXt50_32x4d(**kwargs)
     if pretrained:
         model = _load_pretrained_parameters(model, 'ResNeXt50_32x4d')
@@ -628,8 +532,6 @@ def ResNeXt50_32x4d(pretrained=False, **kwargs):
 def ResNeXt50_64x4d(pretrained=False, **kwargs):
     '''ResNeXt50_64x4d
     '''
-    # pretrained = kwargs.pop('pretrained', False)
-
     model = _resnext.ResNeXt50_64x4d(**kwargs)
     if pretrained:
         model = _load_pretrained_parameters(model, 'ResNeXt50_64x4d')
