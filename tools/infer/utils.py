@@ -74,6 +74,12 @@ def parse_args():
     # parameters for test hubserving
     parser.add_argument("--server_url", type=str)
 
+    # enable_calc_metric, when set as true, topk acc will be calculated
+    parser.add_argument("--enable_calc_topk", type=str2bool, default=False)
+    # groudtruth label path
+    # data format for each line: $image_name $class_id
+    parser.add_argument("--gt_label_path", type=str, default=None)
+
     return parser.parse_args()
 
 
@@ -128,7 +134,6 @@ def preprocess(img, args):
 def postprocess(batch_outputs, topk=5, multilabel=False):
     batch_results = []
     for probs in batch_outputs:
-        results = []
         if multilabel:
             index = np.where(probs >= 0.5)[0].astype('int32')
         else:
@@ -157,6 +162,42 @@ def get_image_list(img_file):
     if len(imgs_lists) == 0:
         raise Exception("not found any img file in {}".format(img_file))
     return imgs_lists
+
+
+def get_image_list_from_label_file(image_path, label_file_path):
+    imgs_lists = []
+    gt_labels = []
+    with open(label_file_path, "r") as fin:
+        lines = fin.readlines()
+        for line in lines:
+            image_name, label = line.strip("\n").split()
+            label = int(label)
+            imgs_lists.append(os.path.join(image_path, image_name))
+            gt_labels.append(int(label))
+    return imgs_lists, gt_labels
+
+
+def calc_topk_acc(info_map):
+    '''
+    calc_topk_acc
+    input:
+        info_map(dict): keys are prediction and gt_label
+    output:
+        topk_acc(list): top-k accuracy list
+    '''
+    gt_label = np.array(info_map["gt_label"])
+    prediction = np.array(info_map["prediction"])
+
+    gt_label = np.reshape(gt_label, (-1, 1)).repeat(
+        prediction.shape[1], axis=1)
+    correct = np.equal(prediction, gt_label)
+    topk_acc = []
+    for idx in range(prediction.shape[1]):
+        if idx > 0:
+            correct[:, idx] = np.logical_or(correct[:, idx],
+                                            correct[:, idx - 1])
+        topk_acc.append(1.0 * np.sum(correct[:, idx]) / correct.shape[0])
+    return topk_acc
 
 
 def save_prelabel_results(class_id, input_file_path, output_dir):

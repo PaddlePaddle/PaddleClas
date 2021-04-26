@@ -278,6 +278,9 @@ python tools/infer/predict.py \
 + `enable_mkldnn`：是否启用`MKL-DNN`加速，默认为`False`。注意`enable_mkldnn`与`use_gpu`同时为`True`时，将忽略`enable_mkldnn`，而使用GPU运行。
 + `resize_short`: 对输入图像进行等比例缩放，表示最短边的尺寸，默认值：`256`
 + `resize`: 对`resize_short`操作后的进行居中裁剪，表示裁剪的尺寸，默认值：`224`
++ `enable_calc_topk`: 是否计算预测结果的Topk精度指标，默认为`False`，
++ `gt_label_path`: 图像文件名以及真值标签文件，当`enable_calc_topk`为True时生效，用于读取待预测的图像列表及其标签。
+
 
 **注意**: 如果使用`Transformer`系列模型，如`DeiT_***_384`, `ViT_***_384`等，请注意模型的输入数据尺寸，需要设置参数`resize_short=384`, `resize=384`。
 
