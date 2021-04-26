@@ -15,20 +15,7 @@
 dependencies = ['paddle', 'numpy']
 
 import paddle
-
-from ppcls.modeling.architectures import alexnet as _alexnet
-from ppcls.modeling.architectures import vgg as _vgg
-from ppcls.modeling.architectures import resnet as _resnet
-from ppcls.modeling.architectures import squeezenet as _squeezenet
-from ppcls.modeling.architectures import densenet as _densenet
-from ppcls.modeling.architectures import inception_v3 as _inception_v3
-from ppcls.modeling.architectures import inception_v4 as _inception_v4
-from ppcls.modeling.architectures import googlenet as _googlenet
-from ppcls.modeling.architectures import shufflenet_v2 as _shufflenet_v2
-from ppcls.modeling.architectures import mobilenet_v1 as _mobilenet_v1
-from ppcls.modeling.architectures import mobilenet_v2 as _mobilenet_v2
-from ppcls.modeling.architectures import mobilenet_v3 as _mobilenet_v3
-from ppcls.modeling.architectures import resnext as _resnext
+from ppcls.modeling import architectures
 
 
 def _load_pretrained_parameters(model, name):
@@ -39,7 +26,7 @@ def _load_pretrained_parameters(model, name):
     return model
 
 
-def AlexNet(pretrained=False, **kwargs):
+def alexnet(pretrained=False, **kwargs):
     """
     AlexNet
     Args:
@@ -49,14 +36,14 @@ def AlexNet(pretrained=False, **kwargs):
     Returns:
         model: nn.Layer. Specific `AlexNet` model depends on args.
     """
-    model = _alexnet.AlexNet(**kwargs)
+    model = architectures.AlexNet(**kwargs)
     if pretrained:
         model = _load_pretrained_parameters(model, 'AlexNet')
 
     return model
 
 
-def VGG11(pretrained=False, **kwargs):
+def vgg11(pretrained=False, **kwargs):
     """
     VGG11
     Args:
@@ -67,14 +54,14 @@ def VGG11(pretrained=False, **kwargs):
     Returns:
         model: nn.Layer. Specific `VGG11` model depends on args.
     """
-    model = _vgg.VGG11(**kwargs)
+    model = architectures.VGG11(**kwargs)
     if pretrained:
         model = _load_pretrained_parameters(model, 'VGG11')
 
     return model
 
 
-def VGG13(pretrained=False, **kwargs):
+def vgg13(pretrained=False, **kwargs):
     """
     VGG13
     Args:
@@ -85,14 +72,14 @@ def VGG13(pretrained=False, **kwargs):
     Returns:
         model: nn.Layer. Specific `VGG13` model depends on args.
     """
-    model = _vgg.VGG13(**kwargs)
+    model = architectures.VGG13(**kwargs)
     if pretrained:
         model = _load_pretrained_parameters(model, 'VGG13')
 
     return model
 
 
-def VGG16(pretrained=False, **kwargs):
+def vgg16(pretrained=False, **kwargs):
     """
     VGG16
     Args:
@@ -103,14 +90,14 @@ def VGG16(pretrained=False, **kwargs):
     Returns:
         model: nn.Layer. Specific `VGG16` model depends on args.
     """
-    model = _vgg.VGG16(**kwargs)
+    model = architectures.VGG16(**kwargs)
     if pretrained:
         model = _load_pretrained_parameters(model, 'VGG16')
 
     return model
 
 
-def VGG19(pretrained=False, **kwargs):
+def vgg19(pretrained=False, **kwargs):
     """
     VGG19
     Args:
@@ -121,14 +108,14 @@ def VGG19(pretrained=False, **kwargs):
     Returns:
         model: nn.Layer. Specific `VGG19` model depends on args.
     """
-    model = _vgg.VGG19(**kwargs)
+    model = architectures.VGG19(**kwargs)
     if pretrained:
         model = _load_pretrained_parameters(model, 'VGG19')
 
     return model
 
 
-def ResNet18(pretrained=False, **kwargs):
+def resnet18(pretrained=False, **kwargs):
     """
     ResNet18
     Args:
@@ -140,14 +127,14 @@ def ResNet18(pretrained=False, **kwargs):
     Returns:
         model: nn.Layer. Specific `ResNet18` model depends on args.
     """
-    model = _resnet.ResNet18(**kwargs)
+    model = architectures.ResNet18(**kwargs)
     if pretrained:
         model = _load_pretrained_parameters(model, 'ResNet18')
 
     return model
 
 
-def ResNet34(pretrained=False, **kwargs):
+def resnet34(pretrained=False, **kwargs):
     """
     ResNet34
     Args:
@@ -159,14 +146,14 @@ def ResNet34(pretrained=False, **kwargs):
     Returns:
         model: nn.Layer. Specific `ResNet34` model depends on args.
     """
-    model = _resnet.ResNet34(**kwargs)
+    model = architectures.ResNet34(**kwargs)
     if pretrained:
         model = _load_pretrained_parameters(model, 'ResNet34')
 
     return model
 
 
-def ResNet50(pretrained=False, **kwargs):
+def resnet50(pretrained=False, **kwargs):
     """
     ResNet50
     Args:
@@ -178,14 +165,14 @@ def ResNet50(pretrained=False, **kwargs):
     Returns:
         model: nn.Layer. Specific `ResNet50` model depends on args.
     """
-    model = _resnet.ResNet50(**kwargs)
+    model = architectures.ResNet50(**kwargs)
     if pretrained:
         model = _load_pretrained_parameters(model, 'ResNet50')
 
     return model
 
 
-def ResNet101(pretrained=False, **kwargs):
+def resnet101(pretrained=False, **kwargs):
     """
     ResNet101
     Args:
@@ -197,14 +184,14 @@ def ResNet101(pretrained=False, **kwargs):
     Returns:
         model: nn.Layer. Specific `ResNet101` model depends on args.
     """
-    model = _resnet.ResNet101(**kwargs)
+    model = architectures.ResNet101(**kwargs)
     if pretrained:
         model = _load_pretrained_parameters(model, 'ResNet101')
 
     return model
 
 
-def ResNet152(pretrained=False, **kwargs):
+def resnet152(pretrained=False, **kwargs):
     """
     ResNet152
     Args:
@@ -216,14 +203,14 @@ def ResNet152(pretrained=False, **kwargs):
     Returns:
         model: nn.Layer. Specific `ResNet152` model depends on args.
     """
-    model = _resnet.ResNet152(**kwargs)
+    model = architectures.ResNet152(**kwargs)
     if pretrained:
         model = _load_pretrained_parameters(model, 'ResNet152')
 
     return model
 
 
-def SqueezeNet1_0(pretrained=False, **kwargs):
+def squeezenet1_0(pretrained=False, **kwargs):
     """
     SqueezeNet1_0
     Args:
@@ -233,14 +220,14 @@ def SqueezeNet1_0(pretrained=False, **kwargs):
     Returns:
         model: nn.Layer. Specific `SqueezeNet1_0` model depends on args.
     """
-    model = _squeezenet.SqueezeNet1_0(**kwargs)
+    model = architectures.SqueezeNet1_0(**kwargs)
     if pretrained:
         model = _load_pretrained_parameters(model, 'SqueezeNet1_0')
 
     return model
 
 
-def SqueezeNet1_1(pretrained=False, **kwargs):
+def squeezenet1_1(pretrained=False, **kwargs):
     """
     SqueezeNet1_1
     Args:
@@ -250,14 +237,14 @@ def SqueezeNet1_1(pretrained=False, **kwargs):
     Returns:
         model: nn.Layer. Specific `SqueezeNet1_1` model depends on args.
     """
-    model = _squeezenet.SqueezeNet1_1(**kwargs)
+    model = architectures.SqueezeNet1_1(**kwargs)
     if pretrained:
         model = _load_pretrained_parameters(model, 'SqueezeNet1_1')
 
     return model
 
 
-def DenseNet121(pretrained=False, **kwargs):
+def densenet121(pretrained=False, **kwargs):
     """
     DenseNet121
     Args:
@@ -269,14 +256,14 @@ def DenseNet121(pretrained=False, **kwargs):
     Returns:
         model: nn.Layer. Specific `DenseNet121` model depends on args.
     """
-    model = _densenet.DenseNet121(**kwargs)
+    model = architectures.DenseNet121(**kwargs)
     if pretrained:
         model = _load_pretrained_parameters(model, 'DenseNet121')
 
     return model
 
 
-def DenseNet161(pretrained=False, **kwargs):
+def densenet161(pretrained=False, **kwargs):
     """
     DenseNet161
     Args:
@@ -288,14 +275,14 @@ def DenseNet161(pretrained=False, **kwargs):
     Returns:
         model: nn.Layer. Specific `DenseNet161` model depends on args.
     """
-    model = _densenet.DenseNet161(**kwargs)
+    model = architectures.DenseNet161(**kwargs)
     if pretrained:
         model = _load_pretrained_parameters(model, 'DenseNet161')
 
     return model
 
 
-def DenseNet169(pretrained=False, **kwargs):
+def densenet169(pretrained=False, **kwargs):
     """
     DenseNet169
     Args:
@@ -307,14 +294,14 @@ def DenseNet169(pretrained=False, **kwargs):
     Returns:
         model: nn.Layer. Specific `DenseNet169` model depends on args.
     """
-    model = _densenet.DenseNet169(**kwargs)
+    model = architectures.DenseNet169(**kwargs)
     if pretrained:
         model = _load_pretrained_parameters(model, 'DenseNet169')
 
     return model
 
 
-def DenseNet201(pretrained=False, **kwargs):
+def densenet201(pretrained=False, **kwargs):
     """
     DenseNet201
     Args:
@@ -326,14 +313,14 @@ def DenseNet201(pretrained=False, **kwargs):
     Returns:
         model: nn.Layer. Specific `DenseNet201` model depends on args.
     """
-    model = _densenet.DenseNet201(**kwargs)
+    model = architectures.DenseNet201(**kwargs)
     if pretrained:
         model = _load_pretrained_parameters(model, 'DenseNet201')
 
     return model
 
 
-def DenseNet264(pretrained=False, **kwargs):
+def densenet264(pretrained=False, **kwargs):
     """
     DenseNet264
     Args:
@@ -345,14 +332,14 @@ def DenseNet264(pretrained=False, **kwargs):
     Returns:
         model: nn.Layer. Specific `DenseNet264` model depends on args.
     """
-    model = _densenet.DenseNet264(**kwargs)
+    model = architectures.DenseNet264(**kwargs)
     if pretrained:
         model = _load_pretrained_parameters(model, 'DenseNet264')
 
     return model
 
 
-def InceptionV3(pretrained=False, **kwargs):
+def inceptionv3(pretrained=False, **kwargs):
     """
     InceptionV3
     Args:
@@ -362,14 +349,14 @@ def InceptionV3(pretrained=False, **kwargs):
     Returns:
         model: nn.Layer. Specific `InceptionV3` model depends on args.
     """
-    model = _inception_v3.InceptionV3(**kwargs)
+    model = architectures.InceptionV3(**kwargs)
     if pretrained:
         model = _load_pretrained_parameters(model, 'InceptionV3')
 
     return model
 
 
-def InceptionV4(pretrained=False, **kwargs):
+def inceptionv4(pretrained=False, **kwargs):
     """
     InceptionV4
     Args:
@@ -379,14 +366,14 @@ def InceptionV4(pretrained=False, **kwargs):
     Returns:
         model: nn.Layer. Specific `InceptionV4` model depends on args.
     """
-    model = _inception_v4.InceptionV4(**kwargs)
+    model = architectures.InceptionV4(**kwargs)
     if pretrained:
         model = _load_pretrained_parameters(model, 'InceptionV4')
 
     return model
 
 
-def GoogLeNet(pretrained=False, **kwargs):
+def googlenet(pretrained=False, **kwargs):
     """
     GoogLeNet
     Args:
@@ -396,14 +383,14 @@ def GoogLeNet(pretrained=False, **kwargs):
     Returns:
         model: nn.Layer. Specific `GoogLeNet` model depends on args.
     """
-    model = _googlenet.GoogLeNet(**kwargs)
+    model = architectures.GoogLeNet(**kwargs)
     if pretrained:
         model = _load_pretrained_parameters(model, 'GoogLeNet')
 
     return model
 
 
-def ShuffleNetV2_x0_25(pretrained=False, **kwargs):
+def shufflenetv2_x0_25(pretrained=False, **kwargs):
     """
     ShuffleNetV2_x0_25
     Args:
@@ -413,14 +400,14 @@ def ShuffleNetV2_x0_25(pretrained=False, **kwargs):
     Returns:
         model: nn.Layer. Specific `ShuffleNetV2_x0_25` model depends on args.
     """
-    model = _shufflenet_v2.ShuffleNetV2_x0_25(**kwargs)
+    model = architectures.ShuffleNetV2_x0_25(**kwargs)
     if pretrained:
         model = _load_pretrained_parameters(model, 'ShuffleNetV2_x0_25')
 
     return model
 
 
-def MobileNetV1(pretrained=False, **kwargs):
+def mobilenetv1(pretrained=False, **kwargs):
     """
     MobileNetV1
     Args:
@@ -430,14 +417,14 @@ def MobileNetV1(pretrained=False, **kwargs):
     Returns:
         model: nn.Layer. Specific `MobileNetV1` model depends on args.
     """
-    model = _mobilenet_v1.MobileNetV1(**kwargs)
+    model = architectures.MobileNetV1(**kwargs)
     if pretrained:
         model = _load_pretrained_parameters(model, 'MobileNetV1')
 
     return model
 
 
-def MobileNetV1_x0_25(pretrained=False, **kwargs):
+def mobilenetv1_x0_25(pretrained=False, **kwargs):
     """
     MobileNetV1_x0_25
     Args:
@@ -447,14 +434,14 @@ def MobileNetV1_x0_25(pretrained=False, **kwargs):
     Returns:
         model: nn.Layer. Specific `MobileNetV1_x0_25` model depends on args.
     """
-    model = _mobilenet_v1.MobileNetV1_x0_25(**kwargs)
+    model = architectures.MobileNetV1_x0_25(**kwargs)
     if pretrained:
         model = _load_pretrained_parameters(model, 'MobileNetV1_x0_25')
 
     return model
 
 
-def MobileNetV1_x0_5(pretrained=False, **kwargs):
+def mobilenetv1_x0_5(pretrained=False, **kwargs):
     """
     MobileNetV1_x0_5
     Args:
@@ -464,14 +451,14 @@ def MobileNetV1_x0_5(pretrained=False, **kwargs):
     Returns:
         model: nn.Layer. Specific `MobileNetV1_x0_5` model depends on args.
     """
-    model = _mobilenet_v1.MobileNetV1_x0_5(**kwargs)
+    model = architectures.MobileNetV1_x0_5(**kwargs)
     if pretrained:
         model = _load_pretrained_parameters(model, 'MobileNetV1_x0_5')
 
     return model
 
 
-def MobileNetV1_x0_75(pretrained=False, **kwargs):
+def mobilenetv1_x0_75(pretrained=False, **kwargs):
     """
     MobileNetV1_x0_75
     Args:
@@ -481,14 +468,14 @@ def MobileNetV1_x0_75(pretrained=False, **kwargs):
     Returns:
         model: nn.Layer. Specific `MobileNetV1_x0_75` model depends on args.
     """
-    model = _mobilenet_v1.MobileNetV1_x0_75(**kwargs)
+    model = architectures.MobileNetV1_x0_75(**kwargs)
     if pretrained:
         model = _load_pretrained_parameters(model, 'MobileNetV1_x0_75')
 
     return model
 
 
-def MobileNetV2_x0_25(pretrained=False, **kwargs):
+def mobilenetv2_x0_25(pretrained=False, **kwargs):
     """
     MobileNetV2_x0_25
     Args:
@@ -498,14 +485,14 @@ def MobileNetV2_x0_25(pretrained=False, **kwargs):
     Returns:
         model: nn.Layer. Specific `MobileNetV2_x0_25` model depends on args.
     """
-    model = _mobilenet_v2.MobileNetV2_x0_25(**kwargs)
+    model = architectures.MobileNetV2_x0_25(**kwargs)
     if pretrained:
         model = _load_pretrained_parameters(model, 'MobileNetV2_x0_25')
 
     return model
 
 
-def MobileNetV2_x0_5(pretrained=False, **kwargs):
+def mobilenetv2_x0_5(pretrained=False, **kwargs):
     """
     MobileNetV2_x0_5
     Args:
@@ -515,14 +502,14 @@ def MobileNetV2_x0_5(pretrained=False, **kwargs):
     Returns:
         model: nn.Layer. Specific `MobileNetV2_x0_5` model depends on args.
     """
-    model = _mobilenet_v2.MobileNetV2_x0_5(**kwargs)
+    model = architectures.MobileNetV2_x0_5(**kwargs)
     if pretrained:
         model = _load_pretrained_parameters(model, 'MobileNetV2_x0_5')
 
     return model
 
 
-def MobileNetV2_x0_75(pretrained=False, **kwargs):
+def mobilenetv2_x0_75(pretrained=False, **kwargs):
     """
     MobileNetV2_x0_75
     Args:
@@ -532,14 +519,14 @@ def MobileNetV2_x0_75(pretrained=False, **kwargs):
     Returns:
         model: nn.Layer. Specific `MobileNetV2_x0_75` model depends on args.
     """
-    model = _mobilenet_v2.MobileNetV2_x0_75(**kwargs)
+    model = architectures.MobileNetV2_x0_75(**kwargs)
     if pretrained:
         model = _load_pretrained_parameters(model, 'MobileNetV2_x0_75')
 
     return model
 
 
-def MobileNetV2_x1_5(pretrained=False, **kwargs):
+def mobilenetv2_x1_5(pretrained=False, **kwargs):
     """
     MobileNetV2_x1_5
     Args:
@@ -549,14 +536,14 @@ def MobileNetV2_x1_5(pretrained=False, **kwargs):
     Returns:
         model: nn.Layer. Specific `MobileNetV2_x1_5` model depends on args.
     """
-    model = _mobilenet_v2.MobileNetV2_x1_5(**kwargs)
+    model = architectures.MobileNetV2_x1_5(**kwargs)
     if pretrained:
         model = _load_pretrained_parameters(model, 'MobileNetV2_x1_5')
 
     return model
 
 
-def MobileNetV2_x2_0(pretrained=False, **kwargs):
+def mobilenetv2_x2_0(pretrained=False, **kwargs):
     """
     MobileNetV2_x2_0
     Args:
@@ -566,14 +553,14 @@ def MobileNetV2_x2_0(pretrained=False, **kwargs):
     Returns:
         model: nn.Layer. Specific `MobileNetV2_x2_0` model depends on args.
     """
-    model = _mobilenet_v2.MobileNetV2_x2_0(**kwargs)
+    model = architectures.MobileNetV2_x2_0(**kwargs)
     if pretrained:
         model = _load_pretrained_parameters(model, 'MobileNetV2_x2_0')
 
     return model
 
 
-def MobileNetV3_large_x0_35(pretrained=False, **kwargs):
+def mobilenetv3_large_x0_35(pretrained=False, **kwargs):
     """
     MobileNetV3_large_x0_35
     Args:
@@ -583,14 +570,14 @@ def MobileNetV3_large_x0_35(pretrained=False, **kwargs):
     Returns:
         model: nn.Layer. Specific `MobileNetV3_large_x0_35` model depends on args.
     """
-    model = _mobilenet_v3.MobileNetV3_large_x0_35(**kwargs)
+    model = architectures.MobileNetV3_large_x0_35(**kwargs)
     if pretrained:
         model = _load_pretrained_parameters(model, 'MobileNetV3_large_x0_35')
 
     return model
 
 
-def MobileNetV3_large_x0_5(pretrained=False, **kwargs):
+def mobilenetv3_large_x0_5(pretrained=False, **kwargs):
     """
     MobileNetV3_large_x0_5
     Args:
@@ -600,14 +587,14 @@ def MobileNetV3_large_x0_5(pretrained=False, **kwargs):
     Returns:
         model: nn.Layer. Specific `MobileNetV3_large_x0_5` model depends on args.
     """
-    model = _mobilenet_v3.MobileNetV3_large_x0_5(**kwargs)
+    model = architectures.MobileNetV3_large_x0_5(**kwargs)
     if pretrained:
         model = _load_pretrained_parameters(model, 'MobileNetV3_large_x0_5')
 
     return model
 
 
-def MobileNetV3_large_x0_75(pretrained=False, **kwargs):
+def mobilenetv3_large_x0_75(pretrained=False, **kwargs):
     """
     MobileNetV3_large_x0_75
     Args:
@@ -617,14 +604,14 @@ def MobileNetV3_large_x0_75(pretrained=False, **kwargs):
     Returns:
         model: nn.Layer. Specific `MobileNetV3_large_x0_75` model depends on args.
     """
-    model = _mobilenet_v3.MobileNetV3_large_x0_75(**kwargs)
+    model = architectures.MobileNetV3_large_x0_75(**kwargs)
     if pretrained:
         model = _load_pretrained_parameters(model, 'MobileNetV3_large_x0_75')
 
     return model
 
 
-def MobileNetV3_large_x1_0(pretrained=False, **kwargs):
+def mobilenetv3_large_x1_0(pretrained=False, **kwargs):
     """
     MobileNetV3_large_x1_0
     Args:
@@ -634,14 +621,14 @@ def MobileNetV3_large_x1_0(pretrained=False, **kwargs):
     Returns:
         model: nn.Layer. Specific `MobileNetV3_large_x1_0` model depends on args.
     """
-    model = _mobilenet_v3.MobileNetV3_large_x1_0(**kwargs)
+    model = architectures.MobileNetV3_large_x1_0(**kwargs)
     if pretrained:
         model = _load_pretrained_parameters(model, 'MobileNetV3_large_x1_0')
 
     return model
 
 
-def MobileNetV3_large_x1_25(pretrained=False, **kwargs):
+def mobilenetv3_large_x1_25(pretrained=False, **kwargs):
     """
     MobileNetV3_large_x1_25
     Args:
@@ -651,14 +638,14 @@ def MobileNetV3_large_x1_25(pretrained=False, **kwargs):
     Returns:
         model: nn.Layer. Specific `MobileNetV3_large_x1_25` model depends on args.
     """
-    model = _mobilenet_v3.MobileNetV3_large_x1_25(**kwargs)
+    model = architectures.MobileNetV3_large_x1_25(**kwargs)
     if pretrained:
         model = _load_pretrained_parameters(model, 'MobileNetV3_large_x1_25')
 
     return model
 
 
-def MobileNetV3_small_x0_35(pretrained=False, **kwargs):
+def mobilenetv3_small_x0_35(pretrained=False, **kwargs):
     """
     MobileNetV3_small_x0_35
     Args:
@@ -668,14 +655,14 @@ def MobileNetV3_small_x0_35(pretrained=False, **kwargs):
     Returns:
         model: nn.Layer. Specific `MobileNetV3_small_x0_35` model depends on args.
     """
-    model = _mobilenet_v3.MobileNetV3_small_x0_35(**kwargs)
+    model = architectures.MobileNetV3_small_x0_35(**kwargs)
     if pretrained:
         model = _load_pretrained_parameters(model, 'MobileNetV3_small_x0_35')
 
     return model
 
 
-def MobileNetV3_small_x0_5(pretrained=False, **kwargs):
+def mobilenetv3_small_x0_5(pretrained=False, **kwargs):
     """
     MobileNetV3_small_x0_5
     Args:
@@ -685,14 +672,14 @@ def MobileNetV3_small_x0_5(pretrained=False, **kwargs):
     Returns:
         model: nn.Layer. Specific `MobileNetV3_small_x0_5` model depends on args.
     """
-    model = _mobilenet_v3.MobileNetV3_small_x0_5(**kwargs)
+    model = architectures.MobileNetV3_small_x0_5(**kwargs)
     if pretrained:
         model = _load_pretrained_parameters(model, 'MobileNetV3_small_x0_5')
 
     return model
 
 
-def MobileNetV3_small_x0_75(pretrained=False, **kwargs):
+def mobilenetv3_small_x0_75(pretrained=False, **kwargs):
     """
     MobileNetV3_small_x0_75
     Args:
@@ -702,14 +689,14 @@ def MobileNetV3_small_x0_75(pretrained=False, **kwargs):
     Returns:
         model: nn.Layer. Specific `MobileNetV3_small_x0_75` model depends on args.
     """
-    model = _mobilenet_v3.MobileNetV3_small_x0_75(**kwargs)
+    model = architectures.MobileNetV3_small_x0_75(**kwargs)
     if pretrained:
         model = _load_pretrained_parameters(model, 'MobileNetV3_small_x0_75')
 
     return model
 
 
-def MobileNetV3_small_x1_0(pretrained=False, **kwargs):
+def mobilenetv3_small_x1_0(pretrained=False, **kwargs):
     """
     MobileNetV3_small_x1_0
     Args:
@@ -719,14 +706,14 @@ def MobileNetV3_small_x1_0(pretrained=False, **kwargs):
     Returns:
         model: nn.Layer. Specific `MobileNetV3_small_x1_0` model depends on args.
     """
-    model = _mobilenet_v3.MobileNetV3_small_x1_0(**kwargs)
+    model = architectures.MobileNetV3_small_x1_0(**kwargs)
     if pretrained:
         model = _load_pretrained_parameters(model, 'MobileNetV3_small_x1_0')
 
     return model
 
 
-def MobileNetV3_small_x1_25(pretrained=False, **kwargs):
+def mobilenetv3_small_x1_25(pretrained=False, **kwargs):
     """
     MobileNetV3_small_x1_25
     Args:
@@ -736,14 +723,14 @@ def MobileNetV3_small_x1_25(pretrained=False, **kwargs):
     Returns:
         model: nn.Layer. Specific `MobileNetV3_small_x1_25` model depends on args.
     """
-    model = _mobilenet_v3.MobileNetV3_small_x1_25(**kwargs)
+    model = architectures.MobileNetV3_small_x1_25(**kwargs)
     if pretrained:
         model = _load_pretrained_parameters(model, 'MobileNetV3_small_x1_25')
 
     return model
 
 
-def ResNeXt101_32x4d(pretrained=False, **kwargs):
+def resnext101_32x4d(pretrained=False, **kwargs):
     """
     ResNeXt101_32x4d
     Args:
@@ -753,14 +740,14 @@ def ResNeXt101_32x4d(pretrained=False, **kwargs):
     Returns:
         model: nn.Layer. Specific `ResNeXt101_32x4d` model depends on args.
     """
-    model = _resnext.ResNeXt101_32x4d(**kwargs)
+    model = architectures.ResNeXt101_32x4d(**kwargs)
     if pretrained:
         model = _load_pretrained_parameters(model, 'ResNeXt101_32x4d')
 
     return model
 
 
-def ResNeXt101_64x4d(pretrained=False, **kwargs):
+def resnext101_64x4d(pretrained=False, **kwargs):
     """
     ResNeXt101_64x4d
     Args:
@@ -770,14 +757,14 @@ def ResNeXt101_64x4d(pretrained=False, **kwargs):
     Returns:
         model: nn.Layer. Specific `ResNeXt101_64x4d` model depends on args.
     """
-    model = _resnext.ResNeXt101_64x4d(**kwargs)
+    model = architectures.ResNeXt101_64x4d(**kwargs)
     if pretrained:
         model = _load_pretrained_parameters(model, 'ResNeXt101_64x4d')
 
     return model
 
 
-def ResNeXt152_32x4d(pretrained=False, **kwargs):
+def resnext152_32x4d(pretrained=False, **kwargs):
     """
     ResNeXt152_32x4d
     Args:
@@ -787,14 +774,14 @@ def ResNeXt152_32x4d(pretrained=False, **kwargs):
     Returns:
         model: nn.Layer. Specific `ResNeXt152_32x4d` model depends on args.
     """
-    model = _resnext.ResNeXt152_32x4d(**kwargs)
+    model = architectures.ResNeXt152_32x4d(**kwargs)
     if pretrained:
         model = _load_pretrained_parameters(model, 'ResNeXt152_32x4d')
 
     return model
 
 
-def ResNeXt152_64x4d(pretrained=False, **kwargs):
+def resnext152_64x4d(pretrained=False, **kwargs):
     """
     ResNeXt152_64x4d
     Args:
@@ -804,14 +791,14 @@ def ResNeXt152_64x4d(pretrained=False, **kwargs):
     Returns:
         model: nn.Layer. Specific `ResNeXt152_64x4d` model depends on args.
     """
-    model = _resnext.ResNeXt152_64x4d(**kwargs)
+    model = architectures.ResNeXt152_64x4d(**kwargs)
     if pretrained:
         model = _load_pretrained_parameters(model, 'ResNeXt152_64x4d')
 
     return model
 
 
-def ResNeXt50_32x4d(pretrained=False, **kwargs):
+def resnext50_32x4d(pretrained=False, **kwargs):
     """
     ResNeXt50_32x4d
     Args:
@@ -821,14 +808,14 @@ def ResNeXt50_32x4d(pretrained=False, **kwargs):
     Returns:
         model: nn.Layer. Specific `ResNeXt50_32x4d` model depends on args.
     """
-    model = _resnext.ResNeXt50_32x4d(**kwargs)
+    model = architectures.ResNeXt50_32x4d(**kwargs)
     if pretrained:
         model = _load_pretrained_parameters(model, 'ResNeXt50_32x4d')
 
     return model
 
 
-def ResNeXt50_64x4d(pretrained=False, **kwargs):
+def resnext50_64x4d(pretrained=False, **kwargs):
     """
     ResNeXt50_64x4d
     Args:
@@ -838,7 +825,7 @@ def ResNeXt50_64x4d(pretrained=False, **kwargs):
     Returns:
         model: nn.Layer. Specific `ResNeXt50_64x4d` model depends on args.
     """
-    model = _resnext.ResNeXt50_64x4d(**kwargs)
+    model = architectures.ResNeXt50_64x4d(**kwargs)
     if pretrained:
         model = _load_pretrained_parameters(model, 'ResNeXt50_64x4d')
 
