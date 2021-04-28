@@ -79,10 +79,10 @@ def main(args):
         config, parameter_list=net.parameters())
 
     dp_net = net
-    # if config["use_data_parallel"]:
-    #     find_unused_parameters = config.get("find_unused_parameters", False)
-    #     dp_net = paddle.DataParallel(
-    #         net, find_unused_parameters=find_unused_parameters)
+    if config["use_data_parallel"]:
+        find_unused_parameters = config.get("find_unused_parameters", False)
+        dp_net = paddle.DataParallel(
+            net, find_unused_parameters=find_unused_parameters)
 
     # load model from checkpoint or pretrained model
     init_model(config, net, optimizer)
