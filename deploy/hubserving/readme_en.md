@@ -121,7 +121,7 @@ Two parameters need to be passed to the script:
 
 **Eg.**
 ```shell
-python tools/test_hubserving.py http://127.0.0.1:8866/predict/clas_system ./deploy/hubserving/ILSVRC2012_val_00006666.JPEG 5
+python tools/test_hubserving.py --server_url http://127.0.0.1:8866/predict/clas_system --image_file ./deploy/hubserving/ILSVRC2012_val_00006666.JPEG 5
 ```
 
 ### Returned result format
