@@ -87,11 +87,12 @@ def main(args):
                 predict_time += elapse
 
                 for number, result_list in enumerate(batch_result_list):
-                    all_score += result_list[0]["score"]
-                    result_str = ", ".join([
-                        "{}: {:.2f}".format(r["cls_id"], r["score"])
-                        for r in result_list
-                    ])
+                    all_score += result_list["scores"][0]
+                    result_str = ""
+                    for i in range(len(result_list["clas_ids"])):
+                        result_str += "{}: {:.2f}\t".format(
+                            result_list["clas_ids"][i],
+                            result_list["scores"][i])
                     logger.info("File:{}, The top-{} result(s): {}".format(
                         img_name_list[number], args.top_k, result_str))
 
