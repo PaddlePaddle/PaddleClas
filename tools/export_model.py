@@ -47,6 +47,12 @@ class Net(paddle.nn.Layer):
         self.pre_net = net(class_dim=class_dim)
         self.model = model
 
+    def eval(self):
+        self.training = False
+        for layer in self.sublayers():
+            layer.training = False
+            layer.eval()
+
     def forward(self, inputs):
         x = self.pre_net(inputs)
         if self.model == "GoogLeNet":
