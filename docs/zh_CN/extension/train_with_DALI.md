@@ -58,5 +58,5 @@ export FLAGS_fraction_of_gpu_memory_to_use=0.8
 python -m paddle.distributed.launch \
     --gpus="0,1,2,3,4,5,6,7" \
     tools/static/train.py \
-    -c configs/ResNet/ResNet50_fp16.yaml
+        -c configs/ResNet/ResNet50_fp16.yaml
 ```
