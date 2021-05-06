@@ -49,8 +49,14 @@ python -m paddle.distributed.launch \
 
 ## Train with FP16
 
-On the basis of the above, using FP16 half-precision can further improve the training speed, just add fields in the start training command `AMP.use_pure_fp16=True`:
+On the basis of the above, using FP16 half-precision can further improve the training speed, you can refer the following command.
 
 ```shell
-python tools/static/train.py -c configs/ResNet/ResNet50.yaml -o use_dali=True -o AMP.use_pure_fp16=True
+export CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7
+export FLAGS_fraction_of_gpu_memory_to_use=0.8
+
+python -m paddle.distributed.launch \
+    --gpus="0,1,2,3,4,5,6,7" \
+    tools/static/train.py \
+        -c configs/ResNet/ResNet50_fp16.yaml
 ```
