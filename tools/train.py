@@ -88,9 +88,18 @@ def main(args):
     init_model(config, net, optimizer)
 
     train_dataloader = Reader(config, 'train', places=place)()
+    if len(train_dataloader) <= 0:
+        logger.error(
+            "train dataloader is empty, please check your data config again!")
+        sys.exit(-1)
 
     if config.validate:
         valid_dataloader = Reader(config, 'valid', places=place)()
+        if len(valid_dataloader) <= 0:
+            logger.error(
+                "valid dataloader is empty, please check your data config again!"
+            )
+            sys.exit(-1)
 
     last_epoch_id = config.get("last_epoch", -1)
     best_top1_acc = 0.0  # best top1 acc record

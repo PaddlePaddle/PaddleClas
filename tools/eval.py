@@ -72,6 +72,10 @@ def main(args, return_dict={}):
 
     init_model(config, net, optimizer=None)
     valid_dataloader = Reader(config, 'valid', places=place)()
+    if len(valid_dataloader) <= 0:
+        logger.error(
+            "valid dataloader is empty, please check your data config again!")
+        sys.exit(-1)
     net.eval()
     with paddle.no_grad():
         if not multilabel:

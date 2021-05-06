@@ -197,7 +197,7 @@ class CommonDataset(Dataset):
 
     def __len__(self):
         return self.num_samples
-    
+
 
 class MultiLabelDataset(Dataset):
     """
@@ -224,9 +224,11 @@ class MultiLabelDataset(Dataset):
             labels = label_str.split(',')
             labels = [int(i) for i in labels]
 
-            return (transform(img, self.ops), np.array(labels).astype("float32"))
+            return (transform(img, self.ops),
+                    np.array(labels).astype("float32"))
         except Exception as e:
-            logger.error("data read failed: {}, exception info: {}".format(line, e))
+            logger.error("data read failed: {}, exception info: {}".format(
+                line, e))
             return self.__getitem__(random.randint(0, len(self)))
 
     def __len__(self):
@@ -291,7 +293,7 @@ class Reader:
             dataset,
             batch_size=batch_size,
             shuffle=self.shuffle and is_train,
-            drop_last=is_train)
+            drop_last=False)
         loader = DataLoader(
             dataset,
             batch_sampler=batch_sampler,
