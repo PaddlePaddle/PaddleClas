@@ -167,7 +167,7 @@ python tools/train.py -c ./configs/quick_start/ResNet50_vd_finetune.yaml
 
 ```shell
 cd $path_to_PaddleClas
-python tools/infer/infer.py --model ShuffleNetV2_x0_25 -i dataset/flowers102/jpg/image_00001.jpg --pretrained_model output/ShuffleNetV2_x0_25/best_model/ppcls  --use_gpu False
+python tools/infer/infer.py --model ShuffleNetV2_x0_25 -i dataset/flowers102/jpg/image_00001.jpg --pretrained_model output/ShuffleNetV2_x0_25/best_model/ppcls --class_num 102 --use_gpu False
 ```
 
 其中主要参数如下：
@@ -175,31 +175,27 @@ python tools/infer/infer.py --model ShuffleNetV2_x0_25 -i dataset/flowers102/jpg
 - `--model`：训练时使用擦网络模型，如 ShuffleNetV2_x0_25、ResNet50_vd，具体可查看训练时`yaml`文件中**ARCHITECTURE**下 **name**参数的值
 - `-i`：图像文件路径或者图像所在目录
 - `--pretrained_model`： 存放的模型权重位置。上述CPU训练过程中，最优模型存放位置如下：`output/ShuffleNetV2_x0_25/best_model/ppcls.pdparams`，此时此参数应如下填写：`output/ShuffleNetV2_x0_25/best_model/ppcls`，去掉`.pdparams`
+- `--class_num`：为图像类别数，`flowers102`数据集为102类。若用其他数据集，改成相应类别数即可
 - `--use_gpu`：是否使用GPU
 
 `-i`输入为单张图像路径，运行成功后，示例结果如下：
 
-`File:image_00001.jpg, Top-1 result: class id(s): [728], score(s): [0.03]`
+`File:image_00001.jpg, Top-1 result: class id(s): [72], score(s): [0.03]`
 
-`-i`输出为图像目录，运行成功后，示例结果如下：
+`-i`输入为图像集所在目录，运行成功后，示例结果如下：
 
 ```txt
-Current image file: dataset/flowers102/jpg/image_03946.jpg
-        top1, class id: 124, probability: 0.2043
-        top2, class id: 281, probability: 0.1033
-        top3, class id: 458, probability: 0.0505
-        top4, class id: 688, probability: 0.0379
-        top5, class id: 789, probability: 0.0357
-Current image file: dataset/flowers102/jpg/image_02480.jpg
-        top1, class id: 264, probability: 0.0055
-        top2, class id: 570, probability: 0.0041
-        top3, class id: 795, probability: 0.0037
-        top4, class id: 789, probability: 0.0037
-        top5, class id: 268, probability: 0.0033
-Current image file: dataset/flowers102/jpg/image_00297.jpg
-        top1, class id: 264, probability: 0.0035
-        top2, class id: 500, probability: 0.0029
-        top3, class id: 65, probability: 0.0027
-        top4, class id: 2, probability: 0.0024
-        top5, class id: 613, probability: 0.0023
+File:image_02993.jpg, Top-1 result: class id(s): [77], score(s): [0.02]
+File:image_00448.jpg, Top-1 result: class id(s): [77], score(s): [0.02]
+File:image_08001.jpg, Top-1 result: class id(s): [77], score(s): [0.01]
+File:image_00804.jpg, Top-1 result: class id(s): [100], score(s): [0.02]
+File:image_01842.jpg, Top-1 result: class id(s): [100], score(s): [0.02]
+File:image_02790.jpg, Top-1 result: class id(s): [70], score(s): [0.05]
+File:image_03412.jpg, Top-1 result: class id(s): [100], score(s): [0.02]
+File:image_05196.jpg, Top-1 result: class id(s): [77], score(s): [0.02]
+File:image_06860.jpg, Top-1 result: class id(s): [70], score(s): [0.03]
+File:image_05312.jpg, Top-1 result: class id(s): [77], score(s): [0.02]
+File:image_05930.jpg, Top-1 result: class id(s): [100], score(s): [0.02]
+File:image_05711.jpg, Top-1 result: class id(s): [77], score(s): [0.01]
+File:image_01180.jpg, Top-1 result: class id(s): [70], score(s): [0.03]
 ```
