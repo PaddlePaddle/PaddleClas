@@ -49,7 +49,7 @@ python -m paddle.distributed.launch \
 
 ## Train with FP16
 
-On the basis of the above, using FP16 half-precision can further improve the training speed, you can refer the following command.
+On the basis of the above, using FP16 half-precision can further improve the training speed, you can refer to the following command.
 
 ```shell
 export CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7
