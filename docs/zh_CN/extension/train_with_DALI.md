@@ -49,8 +49,14 @@ python -m paddle.distributed.launch \
 
 ## 使用FP16训练
 
-在上述基础上，使用FP16半精度训练，可以进一步提高速度，只需在启动训练命令中添加字段`AMP.use_pure_fp16=True`：
+在上述基础上，使用FP16半精度训练，可以进一步提高速度，可以参考下面的配置与运行命令。
 
 ```shell
-python tools/static/train.py -c configs/ResNet/ResNet50.yaml -o use_dali=True -o AMP.use_pure_fp16=True
+export CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7
+export FLAGS_fraction_of_gpu_memory_to_use=0.8
+
+python -m paddle.distributed.launch \
+    --gpus="0,1,2,3,4,5,6,7" \
+    tools/static/train.py \
+    -c configs/ResNet/ResNet50_fp16.yaml
 ```
