@@ -119,7 +119,8 @@ def create_metric(out,
                   classes_num=1000,
                   use_distillation=False,
                   multilabel=False,
-                  mode="train"):
+                  mode="train",
+                  use_xpu=False):
     """
     Create measures of model accuracy, such as top1 and top5
 
@@ -175,11 +176,12 @@ def create_metric(out,
         fetch_list.append(ham_dist)
 
     # multi cards' eval
-    if mode != "train" and paddle.distributed.get_world_size() > 1:
-        for idx, fetch in enumerate(fetch_list):
-            fetch_list[idx] = paddle.distributed.all_reduce(
-                fetch, op=paddle.distributed.ReduceOp.
-                SUM) / paddle.distributed.get_world_size()
+    if not use_xpu:
+        if mode != "train" and paddle.distributed.get_world_size() > 1:
+            for idx, fetch in enumerate(fetch_list):
+                fetch_list[idx] = paddle.distributed.all_reduce(
+                    fetch, op=paddle.distributed.ReduceOp.
+                    SUM) / paddle.distributed.get_world_size()
 
     fetchs = OrderedDict()
     for idx, name in enumerate(metric_names):
@@ -213,6 +215,7 @@ def create_fetchs(feeds, net, config, mode="train"):
     use_mix = config.get('use_mix') and mode == 'train'
     use_distillation = config.get('use_distillation')
     multilabel = config.get('multilabel', False)
+    use_xpu = config.get("use_xpu", False)
 
     out = net(feeds["image"])
 
@@ -229,7 +232,8 @@ def create_fetchs(feeds, net, config, mode="train"):
             classes_num,
             use_distillation,
             multilabel=multilabel,
-            mode=mode)
+            mode=mode,
+            use_xpu=use_xpu)
         fetchs.update(metric)
 
     return fetchs

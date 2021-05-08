@@ -265,6 +265,7 @@ class Reader:
             self.collate_fn = self.mix_collate_fn
 
         self.places = places
+        self.use_xpu = config.get("use_xpu", False)
         self.multilabel = config.get("multilabel", False)
 
     def mix_collate_fn(self, batch):
@@ -287,20 +288,29 @@ class Reader:
             dataset = MultiLabelDataset(self.params)
         else:
             dataset = CommonDataset(self.params)
-
-        is_train = self.params['mode'] == "train"
-        batch_sampler = DistributedBatchSampler(
-            dataset,
-            batch_size=batch_size,
-            shuffle=self.shuffle and is_train,
-            drop_last=False)
-        loader = DataLoader(
-            dataset,
-            batch_sampler=batch_sampler,
-            collate_fn=self.collate_fn if is_train else None,
-            places=self.places,
-            return_list=True,
-            num_workers=self.params["num_workers"])
+        if (self.params['mode'] != "train") and self.use_xpu:
+            loader = DataLoader(
+                dataset,
+                places=self.places,
+                batch_size=batch_size,
+                drop_last=False,
+                return_list=True,
+                shuffle=False,
+                num_workers=self.params["num_workers"])
+        else:
+            is_train = self.params['mode'] == "train"
+            batch_sampler = DistributedBatchSampler(
+                dataset,
+                batch_size=batch_size,
+                shuffle=self.shuffle and is_train,
+                drop_last=is_train)
+            loader = DataLoader(
+                dataset,
+                batch_sampler=batch_sampler,
+                collate_fn=self.collate_fn if is_train else None,
+                places=self.places,
+                return_list=True,
+                num_workers=self.params["num_workers"])
         return loader
 
 
