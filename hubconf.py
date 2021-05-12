@@ -20,6 +20,15 @@ import sys
 
 
 class _SysPathG(object):
+    """
+    _SysPathG used to add/clean path for sys.path. Making sure minimal pkgs dependents by skiping parent dirs.
+
+    __enter__
+        add path into sys.path
+    __exit__
+        clean user's sys.path to avoid unexpect behaviors
+    """
+
     def __init__(self, path):
         self.path = path
 
@@ -28,7 +37,8 @@ class _SysPathG(object):
 
     def __exit__(self, type, value, traceback):
         _p = sys.path.pop(0)
-        assert _p == self.path, 'make sure pop {} correctly.'.format(self.path)
+        assert _p == self.path, 'Make sure sys.path cleaning {} correctly.'.format(
+            self.path)
 
 
 with _SysPathG(
