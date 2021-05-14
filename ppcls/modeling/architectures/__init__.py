@@ -50,3 +50,4 @@ from .repvgg import RepVGG_A0, RepVGG_A1, RepVGG_A2, RepVGG_B0, RepVGG_B1, RepVG
 from .swin_transformer import SwinTransformer_tiny_patch4_window7_224, SwinTransformer_small_patch4_window7_224, SwinTransformer_base_patch4_window7_224, SwinTransformer_base_patch4_window12_384
 from .mixnet import MixNet_S, MixNet_M, MixNet_L
 from .rexnet import ReXNet_1_0, ReXNet_1_3, ReXNet_1_5, ReXNet_2_0, ReXNet_3_0
+from .hardnet import HarDNet39_ds, HarDNet68, HarDNet68_ds, HarDNet85
