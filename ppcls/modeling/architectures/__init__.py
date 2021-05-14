@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from re import I
 from .resnet import ResNet18, ResNet34, ResNet50, ResNet101, ResNet152
 from .resnet_vc import ResNet18_vc, ResNet34_vc, ResNet50_vc, ResNet101_vc, ResNet152_vc
 from .resnet_vd import ResNet18_vd, ResNet34_vd, ResNet50_vd, ResNet101_vd, ResNet152_vd, ResNet200_vd
@@ -50,3 +51,4 @@ from .repvgg import RepVGG_A0, RepVGG_A1, RepVGG_A2, RepVGG_B0, RepVGG_B1, RepVG
 from .swin_transformer import SwinTransformer_tiny_patch4_window7_224, SwinTransformer_small_patch4_window7_224, SwinTransformer_base_patch4_window7_224, SwinTransformer_base_patch4_window12_384
 from .mixnet import MixNet_S, MixNet_M, MixNet_L
 from .rexnet import ReXNet_1_0, ReXNet_1_3, ReXNet_1_5, ReXNet_2_0, ReXNet_3_0
+from .rednet import RedNet26, RedNet38, RedNet50, RedNet101, RedNet152
