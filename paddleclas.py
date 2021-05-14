@@ -92,7 +92,15 @@ model_names = {
     'DeiT_small_patch16_224', 'DeiT_tiny_distilled_patch16_224',
     'DeiT_tiny_patch16_224', 'ViT_base_patch16_224', 'ViT_base_patch16_384',
     'ViT_base_patch32_384', 'ViT_large_patch16_224', 'ViT_large_patch16_384',
-    'ViT_large_patch32_384', 'ViT_small_patch16_224'
+    'ViT_large_patch32_384', 'ViT_small_patch16_224',
+    'SwinTransformer_large_patch4_window7_224_22kto1k',
+    'SwinTransformer_large_patch4_window12_384_22kto1k',
+    'SwinTransformer_base_patch4_window7_224_22kto1k',
+    'SwinTransformer_base_patch4_window12_384_22kto1k',
+    'SwinTransformer_base_patch4_window12_384',
+    'SwinTransformer_base_patch4_window7_224',
+    'SwinTransformer_small_patch4_window7_224',
+    'SwinTransformer_tiny_patch4_window7_224'
 }
 
 
