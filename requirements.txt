@@ -1,3 +1,4 @@
+prettytable
 ujson
 opencv-python==4.1.2.30
 pillow
