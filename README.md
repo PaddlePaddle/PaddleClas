@@ -7,6 +7,8 @@
 PaddleClas is a toolset for image classification tasks prepared for the industry and academia. It helps users train better computer vision models and apply them in real scenarios.
 
 **Recent update**
+
+- 2021.05.14 Add `SwinTransformer` series pretrained models, whose Top-1 Acc on ImageNet-1k dataset reaches 87.19%.
 - 2021.04.15 Add `MixNet` and `ReXNet` pretrained models, `MixNet_L`'s Top-1 Acc on ImageNet-1k reaches 78.6% and `ReXNet_3_0` reaches 82.09%.
 - 2021.03.02 Add support for model quantization.
 - 2021.02.01 Add `RepVGG` pretrained models, whose Top-1 Acc on ImageNet-1k dataset reaches 79.65%.
@@ -63,10 +65,11 @@ PaddleClas is a toolset for image classification tasks prepared for the industry
     - [Inception series](#Inception_series)
     - [EfficientNet and ResNeXt101_wsl series](#EfficientNet_and_ResNeXt101_wsl_series)
     - [ResNeSt and RegNet series](#ResNeSt_and_RegNet_series)
-    - [Transformer series](#Transformer)
+    - [ViT and DeiT series](#ViT_and_DeiT)
     - [RepVGG series](#RepVGG)
     - [MixNet series](#MixNet)
     - [ReXNet series](#ReXNet)
+    - [SwinTransformer series](#SwinTransformer)
     - [Others](#Others)
     - HS-ResNet: arxiv link: [https://arxiv.org/pdf/2010.07621.pdf](https://arxiv.org/pdf/2010.07621.pdf). Code and models are coming soon!
 - Model training/evaluation
@@ -353,10 +356,10 @@ Accuracy and inference time metrics of ResNeSt and RegNet series models are show
 | RegNetX_4GF            | 0.785     | 0.9416    |    6.46478              |      11.19862           | 8        | 22.1      | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/RegNetX_4GF_pretrained.pdparams)            |
 
 
-<a name="Transformer"></a>
-### Transformer series
+<a name="ViT_and_DeiT"></a>
+### ViT and DeiT series
 
-Accuracy and inference time metrics of ViT and DeiT series models are shown as follows. More detailed information can be refered to [Transformer series tutorial](./docs/en/models/Transformer_en.md).
+Accuracy and inference time metrics of ViT and DeiT series models are shown as follows. More detailed information can be refered to [ViT and DeiT series tutorial](./docs/en/models/ViT_and_DeiT_en.md).
 
 
 | Model                    | Top-1 Acc | Top-5 Acc | time(ms)<br>bs=1 | time(ms)<br>bs=4 | Flops(G) | Params(M) | Download Address |
@@ -429,6 +432,25 @@ Accuracy and inference time metrics of ReXNet series models are shown as follows
 | ReXNet_1_5 | 0.8006    | 0.9512    |                  |                  | 0.900    | 9.791     | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ReXNet_1_5_pretrained.pdparams) |
 | ReXNet_2_0 | 0.8122    | 0.9536    |                  |                  | 1.561    | 16.449    | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ReXNet_2_0_pretrained.pdparams) |
 | ReXNet_3_0 | 0.8209    | 0.9612    |                  |                  | 3.445    | 34.833    | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ReXNet_3_0_pretrained.pdparams) |
+
+<a name="SwinTransformer"></a>
+
+### SwinTransformer
+
+Accuracy and inference time metrics of SwinTransformer series models are shown as follows. More detailed information can be refered to [SwinTransformer series tutorial](./docs/en/models/SwinTransformer_en.md).
+
+| Model      | Top-1 Acc | Top-5 Acc | time(ms)<br>bs=1 | time(ms)<br>bs=4 | Flops(G) | Params(M) | Download Address                                             |
+| ---------- | --------- | --------- | ---------------- | ---------------- | -------- | --------- | ------------------------------------------------------------ |
+| SwinTransformer_tiny_patch4_window7_224    | 0.8069 | 0.9534 |                  |                  | 4.5  | 28   | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/SwinTransformer_tiny_patch4_window7_224_pretrained.pdparams) |
+| SwinTransformer_small_patch4_window7_224   | 0.8275 | 0.9613 |                  |                  | 8.7  | 50   | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/SwinTransformer_small_patch4_window7_224_pretrained.pdparams) |
+| SwinTransformer_base_patch4_window7_224    | 0.8300 | 0.9626 |                  |                  | 15.4 | 88   | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/SwinTransformer_base_patch4_window7_224_pretrained.pdparams) |
+| SwinTransformer_base_patch4_window12_384   | 0.8439 | 0.9693 |                  |                  | 47.1 | 88   | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/SwinTransformer_base_patch4_window12_384_pretrained.pdparams) |
+| SwinTransformer_base_patch4_window7_224<sup>*</sup>     | 0.8487 | 0.9746 |                  |                  | 15.4 | 88   | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/SwinTransformer_base_patch4_window7_224_22kto1k_pretrained.pdparams) |
+| SwinTransformer_base_patch4_window12_384<sup>*</sup>    | 0.8642 | 0.9807 |                  |                  | 47.1 | 88   | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/SwinTransformer_base_patch4_window12_384_22kto1k_pretrained.pdparams) |
+| SwinTransformer_large_patch4_window7_224<sup>*</sup>    | 0.8596 | 0.9783 |                  |                  | 34.5 | 197  | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/SwinTransformer_large_patch4_window7_224_22kto1k_pretrained.pdparams) |
+| SwinTransformer_large_patch4_window12_384<sup>*</sup>   | 0.8719 | 0.9823 |                  |                  | 103.9 | 197 | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/SwinTransformer_large_patch4_window12_384_22kto1k_pretrained.pdparams) |
+
+*: Based on imagenet22k dataset pre-training, and then in imagenet1k dataset transfer learning.
 
 <a name="Others"></a>
 
