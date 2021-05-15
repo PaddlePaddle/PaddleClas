@@ -155,7 +155,7 @@ class ModelNameError(Exception):
     """
 
     def __init__(self, message=''):
-        super(ModelNameError, self).__init__(message)
+        super().__init__(message)
 
 
 def print_info():
