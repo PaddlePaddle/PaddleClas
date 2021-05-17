@@ -154,7 +154,7 @@ class DlaTree(nn.Layer):
 
 
 class DLA(nn.Layer):
-    def __init__(self, levels, channels, output_stride=32, in_chans=3, cardinality=1,
+    def __init__(self, levels, channels, in_chans=3, cardinality=1,
                  base_width=64, block=DlaBottleneck, residual_root=False,
                  drop_rate=0.0, class_dim=1000, with_pool=True):
         super(DLA, self).__init__()
@@ -164,19 +164,21 @@ class DLA(nn.Layer):
         self.cardinality = cardinality
         self.base_width = base_width
         self.drop_rate = drop_rate
-        assert output_stride == 32  # FIXME support dilation
 
         self.base_layer = nn.Sequential(
             nn.Conv2D(in_chans, channels[0], kernel_size=7,
                       stride=1, padding=3, bias_attr=False),
             nn.BatchNorm2D(channels[0]),
             nn.ReLU())
+
         self.level0 = self._make_conv_level(
             channels[0], channels[0], levels[0])
         self.level1 = self._make_conv_level(
             channels[0], channels[1], levels[1], stride=2)
+
         cargs = dict(cardinality=cardinality,
                      base_width=base_width, root_residual=residual_root)
+
         self.level2 = DlaTree(
             levels[2], block, channels[1], channels[2], 2, level_root=False, **cargs)
         self.level3 = DlaTree(
@@ -185,6 +187,7 @@ class DLA(nn.Layer):
             levels[4], block, channels[3], channels[4], 2, level_root=True, **cargs)
         self.level5 = DlaTree(
             levels[5], block, channels[4], channels[5], 2, level_root=True, **cargs)
+
         self.feature_info = [
             # rare to have a meaningful stride 1 level
             dict(num_chs=channels[0], reduction=1, module='level0'),
