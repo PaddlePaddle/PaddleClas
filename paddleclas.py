@@ -32,7 +32,10 @@ __dir__ = os.path.dirname(__file__)
 sys.path.append(os.path.join(__dir__, ''))
 import argparse
 import shutil
+import textwrap
+from difflib import SequenceMatcher
 
+from prettytable import PrettyTable
 import cv2
 import numpy as np
 import tarfile
@@ -45,55 +48,146 @@ __all__ = ['PaddleClas']
 BASE_DIR = os.path.expanduser("~/.paddleclas/")
 BASE_INFERENCE_MODEL_DIR = os.path.join(BASE_DIR, 'inference_model')
 BASE_IMAGES_DIR = os.path.join(BASE_DIR, 'images')
-
-model_names = {
-    'Xception71', 'SE_ResNeXt101_32x4d', 'ShuffleNetV2_x0_5', 'ResNet34',
-    'ShuffleNetV2_x2_0', 'ResNeXt101_32x4d', 'HRNet_W48_C_ssld',
-    'ResNeSt50_fast_1s1x64d', 'MobileNetV2_x2_0', 'MobileNetV3_large_x1_0',
-    'Fix_ResNeXt101_32x48d_wsl', 'MobileNetV2_ssld', 'ResNeXt101_vd_64x4d',
-    'ResNet34_vd_ssld', 'MobileNetV3_small_x1_0', 'VGG11',
-    'ResNeXt50_vd_32x4d', 'MobileNetV3_large_x1_25',
-    'MobileNetV3_large_x1_0_ssld', 'MobileNetV2_x0_75',
-    'MobileNetV3_small_x0_35', 'MobileNetV1_x0_75', 'MobileNetV1_ssld',
-    'ResNeXt50_32x4d', 'GhostNet_x1_3_ssld', 'Res2Net101_vd_26w_4s',
-    'ResNet152', 'Xception65', 'EfficientNetB0', 'ResNet152_vd', 'HRNet_W18_C',
-    'Res2Net50_14w_8s', 'ShuffleNetV2_x0_25', 'HRNet_W64_C',
-    'Res2Net50_vd_26w_4s_ssld', 'HRNet_W18_C_ssld', 'ResNet18_vd',
-    'ResNeXt101_32x16d_wsl', 'SE_ResNeXt50_32x4d', 'SqueezeNet1_1',
-    'SENet154_vd', 'SqueezeNet1_0', 'GhostNet_x1_0', 'ResNet50_vc', 'DPN98',
-    'HRNet_W48_C', 'DenseNet264', 'SE_ResNet34_vd', 'HRNet_W44_C',
-    'MobileNetV3_small_x1_25', 'MobileNetV1_x0_5', 'ResNet200_vd', 'VGG13',
-    'EfficientNetB3', 'EfficientNetB2', 'ShuffleNetV2_x0_33',
-    'MobileNetV3_small_x0_75', 'ResNeXt152_vd_32x4d', 'ResNeXt101_32x32d_wsl',
-    'ResNet18', 'MobileNetV3_large_x0_35', 'Res2Net50_26w_4s',
-    'MobileNetV2_x0_5', 'EfficientNetB0_small', 'ResNet101_vd_ssld',
-    'EfficientNetB6', 'EfficientNetB1', 'EfficientNetB7', 'ResNeSt50',
-    'ShuffleNetV2_x1_0', 'MobileNetV3_small_x1_0_ssld', 'InceptionV4',
-    'GhostNet_x0_5', 'SE_HRNet_W64_C_ssld', 'ResNet50_ACNet_deploy',
-    'Xception41', 'ResNet50', 'Res2Net200_vd_26w_4s_ssld',
-    'Xception41_deeplab', 'SE_ResNet18_vd', 'SE_ResNeXt50_vd_32x4d',
-    'HRNet_W30_C', 'HRNet_W40_C', 'VGG19', 'Res2Net200_vd_26w_4s',
-    'ResNeXt101_32x8d_wsl', 'ResNet50_vd', 'ResNeXt152_64x4d', 'DarkNet53',
-    'ResNet50_vd_ssld', 'ResNeXt101_64x4d', 'MobileNetV1_x0_25',
-    'Xception65_deeplab', 'AlexNet', 'ResNet101', 'DenseNet121',
-    'ResNet50_vd_v2', 'Res2Net50_vd_26w_4s', 'ResNeXt101_32x48d_wsl',
-    'MobileNetV3_large_x0_5', 'MobileNetV2_x0_25', 'DPN92', 'ResNet101_vd',
-    'MobileNetV2_x1_5', 'DPN131', 'ResNeXt50_vd_64x4d', 'ShuffleNetV2_x1_5',
-    'ResNet34_vd', 'MobileNetV1', 'ResNeXt152_vd_64x4d', 'DPN107', 'VGG16',
-    'ResNeXt50_64x4d', 'RegNetX_4GF', 'DenseNet161', 'GhostNet_x1_3',
-    'HRNet_W32_C', 'Fix_ResNet50_vd_ssld_v2', 'Res2Net101_vd_26w_4s_ssld',
-    'DenseNet201', 'DPN68', 'EfficientNetB4', 'ResNeXt152_32x4d',
-    'InceptionV3', 'ShuffleNetV2_swish', 'GoogLeNet', 'ResNet50_vd_ssld_v2',
-    'SE_ResNet50_vd', 'MobileNetV2', 'ResNeXt101_vd_32x4d',
-    'MobileNetV3_large_x0_75', 'MobileNetV3_small_x0_5', 'DenseNet169',
-    'EfficientNetB5', 'DeiT_base_distilled_patch16_224',
-    'DeiT_base_distilled_patch16_384', 'DeiT_base_patch16_224',
-    'DeiT_base_patch16_384', 'DeiT_small_distilled_patch16_224',
-    'DeiT_small_patch16_224', 'DeiT_tiny_distilled_patch16_224',
-    'DeiT_tiny_patch16_224', 'ViT_base_patch16_224', 'ViT_base_patch16_384',
-    'ViT_base_patch32_384', 'ViT_large_patch16_224', 'ViT_large_patch16_384',
-    'ViT_large_patch32_384', 'ViT_small_patch16_224'
+model_series = {
+    "AlexNet": ["AlexNet"],
+    "DarkNet": ["DarkNet53"],
+    "DeiT": [
+        'DeiT_base_distilled_patch16_224', 'DeiT_base_distilled_patch16_384',
+        'DeiT_base_patch16_224', 'DeiT_base_patch16_384',
+        'DeiT_small_distilled_patch16_224', 'DeiT_small_patch16_224',
+        'DeiT_tiny_distilled_patch16_224', 'DeiT_tiny_patch16_224'
+    ],
+    "DenseNet": [
+        "DenseNet121", "DenseNet161", "DenseNet169", "DenseNet201",
+        "DenseNet264"
+    ],
+    "DPN": ["DPN68", "DPN92", "DPN98", "DPN107", "DPN131"],
+    "EfficientNet": [
+        "EfficientNetB0", "EfficientNetB0_small", "EfficientNetB1",
+        "EfficientNetB2", "EfficientNetB3", "EfficientNetB4", "EfficientNetB5",
+        "EfficientNetB6", "EfficientNetB7"
+    ],
+    "GhostNet":
+    ["GhostNet_x0_5", "GhostNet_x1_0", "GhostNet_x1_3", "GhostNet_x1_3_ssld"],
+    "HRNet": [
+        "HRNet_W18_C", "HRNet_W30_C", "HRNet_W32_C", "HRNet_W40_C",
+        "HRNet_W44_C", "HRNet_W48_C", "HRNet_W64_C", "HRNet_W18_C_ssld",
+        "HRNet_W48_C_ssld"
+    ],
+    "Inception": ["GoogLeNet", "InceptionV3", "InceptionV4"],
+    "MobileNetV1": [
+        "MobileNetV1_x0_25", "MobileNetV1_x0_5", "MobileNetV1_x0_75",
+        "MobileNetV1", "MobileNetV1_ssld"
+    ],
+    "MobileNetV2": [
+        "MobileNetV2_x0_25", "MobileNetV2_x0_5", "MobileNetV2_x0_75",
+        "MobileNetV2", "MobileNetV2_x1_5", "MobileNetV2_x2_0",
+        "MobileNetV2_ssld"
+    ],
+    "MobileNetV3": [
+        "MobileNetV3_small_x0_35", "MobileNetV3_small_x0_5",
+        "MobileNetV3_small_x0_75", "MobileNetV3_small_x1_0",
+        "MobileNetV3_small_x1_25", "MobileNetV3_large_x0_35",
+        "MobileNetV3_large_x0_5", "MobileNetV3_large_x0_75",
+        "MobileNetV3_large_x1_0", "MobileNetV3_large_x1_25",
+        "MobileNetV3_small_x1_0_ssld", "MobileNetV3_large_x1_0_ssld"
+    ],
+    "RegNet": ["RegNetX_4GF"],
+    "Res2Net": [
+        "Res2Net50_14w_8s", "Res2Net50_26w_4s", "Res2Net50_vd_26w_4s",
+        "Res2Net200_vd_26w_4s", "Res2Net101_vd_26w_4s",
+        "Res2Net50_vd_26w_4s_ssld", "Res2Net101_vd_26w_4s_ssld",
+        "Res2Net200_vd_26w_4s_ssld"
+    ],
+    "ResNeSt": ["ResNeSt50", "ResNeSt50_fast_1s1x64d"],
+    "ResNet": [
+        "ResNet18", "ResNet18_vd", "ResNet34", "ResNet34_vd", "ResNet50",
+        "ResNet50_vc", "ResNet50_vd", "ResNet50_vd_v2", "ResNet101",
+        "ResNet101_vd", "ResNet152", "ResNet152_vd", "ResNet200_vd",
+        "ResNet34_vd_ssld", "ResNet50_vd_ssld", "ResNet50_vd_ssld_v2",
+        "ResNet101_vd_ssld", "Fix_ResNet50_vd_ssld_v2", "ResNet50_ACNet_deploy"
+    ],
+    "ResNeXt": [
+        "ResNeXt50_32x4d", "ResNeXt50_vd_32x4d", "ResNeXt50_64x4d",
+        "ResNeXt50_vd_64x4d", "ResNeXt101_32x4d", "ResNeXt101_vd_32x4d",
+        "ResNeXt101_32x8d_wsl", "ResNeXt101_32x16d_wsl",
+        "ResNeXt101_32x32d_wsl", "ResNeXt101_32x48d_wsl",
+        "Fix_ResNeXt101_32x48d_wsl", "ResNeXt101_64x4d", "ResNeXt101_vd_64x4d",
+        "ResNeXt152_32x4d", "ResNeXt152_vd_32x4d", "ResNeXt152_64x4d",
+        "ResNeXt152_vd_64x4d"
+    ],
+    "SENet": [
+        "SENet154_vd", "SE_HRNet_W64_C_ssld", "SE_ResNet18_vd",
+        "SE_ResNet34_vd", "SE_ResNet50_vd", "SE_ResNeXt50_32x4d",
+        "SE_ResNeXt50_vd_32x4d", "SE_ResNeXt101_32x4d"
+    ],
+    "ShuffleNetV2": [
+        "ShuffleNetV2_swish", "ShuffleNetV2_x0_25", "ShuffleNetV2_x0_33",
+        "ShuffleNetV2_x0_5", "ShuffleNetV2_x1_0", "ShuffleNetV2_x1_5",
+        "ShuffleNetV2_x2_0"
+    ],
+    "SqueezeNet": ["SqueezeNet1_0", "SqueezeNet1_1"],
+    "SwinTransformer": [
+        "SwinTransformer_large_patch4_window7_224_22kto1k",
+        "SwinTransformer_large_patch4_window12_384_22kto1k",
+        "SwinTransformer_base_patch4_window7_224_22kto1k",
+        "SwinTransformer_base_patch4_window12_384_22kto1k",
+        "SwinTransformer_base_patch4_window12_384",
+        "SwinTransformer_base_patch4_window7_224",
+        "SwinTransformer_small_patch4_window7_224",
+        "SwinTransformer_tiny_patch4_window7_224"
+    ],
+    "VGG": ["VGG11", "VGG13", "VGG16", "VGG19"],
+    "VisionTransformer": [
+        "ViT_base_patch16_224", "ViT_base_patch16_384", "ViT_base_patch32_384",
+        "ViT_large_patch16_224", "ViT_large_patch16_384",
+        "ViT_large_patch32_384", "ViT_small_patch16_224"
+    ],
+    "Xception": [
+        "Xception41", "Xception41_deeplab", "Xception65", "Xception65_deeplab",
+        "Xception71"
+    ]
 }
+
+
+class ModelNameError(Exception):
+    """ ModelNameError
+    """
+
+    def __init__(self, message=''):
+        super().__init__(message)
+
+
+def print_info():
+    table = PrettyTable(['Series', 'Name'])
+    for series in model_series:
+        names = textwrap.fill("  ".join(model_series[series]), width=100)
+        table.add_row([series, names])
+    print('Inference models that Paddle provides are listed as follows:')
+    print(table)
+
+
+def get_model_names():
+    model_names = []
+    for series in model_series:
+        model_names += model_series[series]
+    return model_names
+
+
+def similar_architectures(name='', names=[], thresh=0.1, topk=10):
+    """
+    inferred similar architectures
+    """
+    scores = []
+    for idx, n in enumerate(names):
+        if n.startswith('__'):
+            continue
+        score = SequenceMatcher(None, n.lower(), name.lower()).quick_ratio()
+        if score > thresh:
+            scores.append((idx, score))
+    scores.sort(key=lambda x: x[1], reverse=True)
+    similar_names = [names[s[0]] for s in scores[:min(topk, len(scores))]]
+    return similar_names
 
 
 def download_with_progressbar(url, save_path):
@@ -227,17 +321,26 @@ def parse_args(mMain=True, add_help=True):
 
 
 class PaddleClas(object):
-    print('Inference models that Paddle provides are listed as follows:\n\n{}'.
-          format(model_names), '\n')
+    print_info()
 
     def __init__(self, **kwargs):
+        model_names = get_model_names()
         process_params = parse_args(mMain=False, add_help=False)
         process_params.__dict__.update(**kwargs)
 
         if not os.path.exists(process_params.model_file):
             if process_params.model_name is None:
-                raise Exception(
+                raise ModelNameError(
                     'Please input model name that you want to use!')
+
+            similar_names = similar_architectures(process_params.model_name,
+                                                  model_names)
+            model_list = ', '.join(similar_names)
+            if process_params.model_name not in similar_names:
+                err = "{} is not exist! Maybe you want: [{}]" \
+                "".format(process_params.model_name, model_list)
+                raise ModelNameError(err)
+
             if process_params.model_name in model_names:
                 url = 'https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/{}_infer.tar'.format(
                     process_params.model_name)

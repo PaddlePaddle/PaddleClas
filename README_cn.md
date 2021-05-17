@@ -8,7 +8,8 @@
 
 **近期更新**
 
-- 2021.04.15 添加`MixNet`和`ReXNet`系列模型，在ImageNet-1k上`MixNet_L` 模型Top1 Acc可达78.6%，`ReXNet_3_0`模型可达82.09%
+- 2021.05.14 添加`SwinTransformer` 系列模型，在ImageNet-1k上，Top1 Acc可达87.19%
+- 2021.04.15 添加`MixNet`和`ReXNet`系列模型，在ImageNet-1k上`MixNet_L`模型Top1 Acc可达78.6%，`ReXNet_3_0`模型可达82.09%
 - 2021.03.02 添加分类模型量化方法与使用教程。
 - 2021.02.01 添加`RepVGG`系列模型，在ImageNet-1k上Top-1 Acc可达79.65%。
 - 2021.01.27 添加`ViT`与`DeiT`模型，在ImageNet-1k上，`ViT`模型Top-1 Acc可达85.13%，`DeiT`模型可达85.1%。
@@ -65,10 +66,11 @@
     - [Inception系列](#Inception系列)
     - [EfficientNet与ResNeXt101_wsl系列](#EfficientNet与ResNeXt101_wsl系列)
     - [ResNeSt与RegNet系列](#ResNeSt与RegNet系列)
-    - [Transformer系列](#Transformer系列)
+    - [ViT与DeiT系列](#ViT_and_DeiT系列)
     - [RepVGG系列](#RepVGG系列)
     - [MixNet系列](#MixNet系列)
     - [ReXNet系列](#ReXNet系列)
+    - [SwinTransformer系列](#SwinTransformer系列)
     - [其他模型](#其他模型)
     - HS-ResNet: arxiv文章链接: [https://arxiv.org/pdf/2010.07621.pdf](https://arxiv.org/pdf/2010.07621.pdf)。 代码和预训练模型即将开源，敬请期待。
 - 模型训练/评估
@@ -358,10 +360,10 @@ ResNeSt与RegNet系列模型的精度、速度指标如下表所示，更多关�
 | RegNetX_4GF            | 0.785     | 0.9416    |    6.46478              |      11.19862           | 8        | 22.1      | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/RegNetX_4GF_pretrained.pdparams)            |
 
 
-<a name="Transformer系列"></a>
-### Transformer系列
+<a name="ViT_and_DeiT系列"></a>
+### ViT_and_DeiT系列
 
-ViT（Vision Transformer）与DeiT（Data-efficient Image Transformers）系列模型的精度、速度指标如下表所示. 更多关于该系列模型的介绍可以参考： [Transformer系列模型文档](./docs/zh_CN/models/Transformer.md)。
+ViT（Vision Transformer）与DeiT（Data-efficient Image Transformers）系列模型的精度、速度指标如下表所示. 更多关于该系列模型的介绍可以参考： [ViT_and_DeiT系列模型文档](./docs/zh_CN/models/ViT_and_DeiT.md)。
 
 
 | 模型                  | Top-1 Acc | Top-5 Acc | time(ms)<br>bs=1 | time(ms)<br>bs=4 | Flops(G) | Params(M) | 下载地址 |
@@ -433,6 +435,25 @@ ViT（Vision Transformer）与DeiT（Data-efficient Image Transformers）系列�
 | ReXNet_1_5 | 0.8006    | 0.9512    |                  |                  | 0.900    | 9.791     | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ReXNet_1_5_pretrained.pdparams) |
 | ReXNet_2_0 | 0.8122    | 0.9536    |                  |                  | 1.561    | 16.449    | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ReXNet_2_0_pretrained.pdparams) |
 | ReXNet_3_0 | 0.8209    | 0.9612    |                  |                  | 3.445    | 34.833    | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ReXNet_3_0_pretrained.pdparams) |
+
+<a name="SwinTransformer系列"></a>
+
+### SwinTransformer系列
+
+关于SwinTransformer系列模型的精度、速度指标如下表所示，更多介绍可以参考：[SwinTransformer系列模型文档](./docs/zh_CN/models/SwinTransformer.md)。
+
+| 模型       | Top-1 Acc | Top-5 Acc | time(ms)<br>bs=1 | time(ms)<br>bs=4 | Flops(G) | Params(M) | 下载地址                                                     |
+| ---------- | --------- | --------- | ---------------- | ---------------- | -------- | --------- | ------------------------------------------------------------ |
+| SwinTransformer_tiny_patch4_window7_224    | 0.8069 | 0.9534 |                  |                  | 4.5  | 28   | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/SwinTransformer_tiny_patch4_window7_224_pretrained.pdparams) |
+| SwinTransformer_small_patch4_window7_224   | 0.8275 | 0.9613 |                  |                  | 8.7  | 50   | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/SwinTransformer_small_patch4_window7_224_pretrained.pdparams) |
+| SwinTransformer_base_patch4_window7_224    | 0.8300 | 0.9626 |                  |                  | 15.4 | 88   | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/SwinTransformer_base_patch4_window7_224_pretrained.pdparams) |
+| SwinTransformer_base_patch4_window12_384   | 0.8439 | 0.9693 |                  |                  | 47.1 | 88   | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/SwinTransformer_base_patch4_window12_384_pretrained.pdparams) |
+| SwinTransformer_base_patch4_window7_224<sup>[1]</sup>     | 0.8487 | 0.9746 |                  |                  | 15.4 | 88   | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/SwinTransformer_base_patch4_window7_224_22kto1k_pretrained.pdparams) |
+| SwinTransformer_base_patch4_window12_384<sup>[1]</sup>    | 0.8642 | 0.9807 |                  |                  | 47.1 | 88   | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/SwinTransformer_base_patch4_window12_384_22kto1k_pretrained.pdparams) |
+| SwinTransformer_large_patch4_window7_224<sup>[1]</sup>    | 0.8596 | 0.9783 |                  |                  | 34.5 | 197  | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/SwinTransformer_large_patch4_window7_224_22kto1k_pretrained.pdparams) |
+| SwinTransformer_large_patch4_window12_384<sup>[1]</sup>   | 0.8719 | 0.9823 |                  |                  | 103.9 | 197 | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/SwinTransformer_large_patch4_window12_384_22kto1k_pretrained.pdparams) |
+
+[1]：基于ImageNet22k数据集预训练，然后在ImageNet1k数据集迁移学习得到。
 
 <a name="其他模型"></a>
 

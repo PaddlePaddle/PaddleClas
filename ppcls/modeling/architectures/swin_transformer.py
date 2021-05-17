@@ -759,3 +759,24 @@ def SwinTransformer_base_patch4_window12_384(**args):
         drop_path_rate=0.5,  # NOTE: do not appear in offical code
         **args)
     return model
+
+
+def SwinTransformer_large_patch4_window7_224(**args):
+    model = SwinTransformer(
+        embed_dim=192,
+        depths=[2, 2, 18, 2],
+        num_heads=[6, 12, 24, 48],
+        window_size=7,
+        **args)
+    return model
+
+
+def SwinTransformer_large_patch4_window12_384(**args):
+    model = SwinTransformer(
+        img_size=384,
+        embed_dim=192,
+        depths=[2, 2, 18, 2],
+        num_heads=[6, 12, 24, 48],
+        window_size=12,
+        **args)
+    return model
