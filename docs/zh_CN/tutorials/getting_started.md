@@ -222,7 +222,7 @@ python tools/infer/infer.py \
     --model MobileNetV3_large_x1_0 \
     --pretrained_model "./output/MobileNetV3_large_x1_0/best_model/ppcls" \
     --use_gpu True \
-    --load_static_weights False
+    --class_num 1000
 ```
 
 参数说明：
@@ -230,7 +230,7 @@ python tools/infer/infer.py \
 + `model`：模型名称，如 `MobileNetV3_large_x1_0`
 + `pretrained_model`：模型权重文件路径，如 `./output/MobileNetV3_large_x1_0/best_model/ppcls`
 + `use_gpu` : 是否开启GPU训练，默认值：`True`
-+ `load_static_weights` : 模型权重文件是否为静态图训练得到的，默认值：`False`
++ `class_num` : 类别数，默认为1000，需要根据自己的数据进行修改。
 + `resize_short`: 对输入图像进行等比例缩放，表示最短边的尺寸，默认值：`256`
 + `resize`: 对`resize_short`操作后的进行居中裁剪，表示裁剪的尺寸，默认值：`224`
 + `pre_label_image` : 是否对图像数据进行预标注，默认值：`False`
