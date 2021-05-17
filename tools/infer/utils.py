@@ -111,7 +111,7 @@ def create_paddle_predictor(args):
     config.switch_use_feed_fetch_ops(False)
     predictor = create_predictor(config)
 
-    return predictor
+    return predictor, config
 
 
 def preprocess(img, args):

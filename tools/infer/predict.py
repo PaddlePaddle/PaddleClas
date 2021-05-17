@@ -19,6 +19,7 @@ import time
 
 import sys
 sys.path.insert(0, ".")
+import tools.infer.benchmark_utils as benchmark_utils
 from ppcls.utils import logger
 from tools.infer.utils import parse_args, create_paddle_predictor, preprocess, postprocess
 from tools.infer.utils import get_image_list, get_image_list_from_label_file, calc_topk_acc
@@ -31,7 +32,7 @@ class Predictor(object):
             assert args.use_tensorrt is True
         self.args = args
 
-        self.paddle_predictor = create_paddle_predictor(args)
+        self.paddle_predictor, self.config = create_paddle_predictor(args)
         input_names = self.paddle_predictor.get_input_names()
         self.input_tensor = self.paddle_predictor.get_input_handle(input_names[
             0])
@@ -116,11 +117,20 @@ class Predictor(object):
                 test_time += time.time() - start_time
             time.sleep(0.01)  # sleep for T4 GPU
 
-        fp_message = "FP16" if args.use_fp16 else "FP32"
-        trt_msg = "using tensorrt" if args.use_tensorrt else "not using tensorrt"
-        print("{0}\t{1}\t{2}\tbatch size: {3}\ttime(ms): {4}".format(
-            args.model, trt_msg, fp_message, args.batch_size, 1000 * test_time
-            / test_num))
+        model_info = {
+            'model_name': args.model,
+            'precision': "fp16" if args.use_fp16 else "fp32"
+        }
+        data_info = {
+            'batch_size': args.batch_size,
+            'shape': "1,3,224,224",
+            'data_num': test_num
+        }
+        perf_info = {'inference_time_s': test_time}
+        resource_info = {}
+        clas_log = benchmark_utils.PaddleInferBenchmark(
+            self.config, model_info, data_info, perf_info, resource_info)
+        clas_log('Clas')
 
 
 if __name__ == "__main__":
