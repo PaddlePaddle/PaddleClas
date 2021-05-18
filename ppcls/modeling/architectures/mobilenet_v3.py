@@ -157,7 +157,7 @@ class MobileNetV3(nn.Layer):
             weight_attr=ParamAttr("fc_weights"),
             bias_attr=ParamAttr(name="fc_offset"))
 
-    def forward(self, inputs, label=None):
+    def forward(self, inputs):
         x = self.conv1(inputs)
 
         for block in self.block_list:
