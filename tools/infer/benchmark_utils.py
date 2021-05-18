@@ -57,7 +57,7 @@ class PaddleInferBenchmark(object):
                  'gpu_util': 60}
         """
         # PaddleInferBenchmark Log Version
-        self.log_version = "1.0.2"
+        self.log_version = "1.0.3"
 
         # Paddle Version
         self.paddle_version = paddle.__version__
@@ -130,6 +130,10 @@ class PaddleInferBenchmark(object):
         """
         benchmark logger
         """
+        # remove other logging handler
+        for handler in logging.root.handlers[:]:
+            logging.root.removeHandler(handler)
+
         # Init logger
         FORMAT = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
         log_output = f"{LOG_PATH_ROOT}/{self.model_name}.log"
