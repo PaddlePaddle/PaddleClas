@@ -41,6 +41,13 @@ def parse_args():
         default='configs/ResNet/ResNet50.yaml',
         help='config file path')
     parser.add_argument(
+        '-p',
+        '--profiler_options',
+        type=str,
+        default=None,
+        help='The option of profiler, which should be in format \"key1=value1;key2=value2;key3=value3\".'
+    )
+    parser.add_argument(
         '-o',
         '--override',
         action='append',
@@ -116,7 +123,8 @@ def main(args):
             net.train()
             # 1. train with train dataset
             program.run(train_dataloader, config, dp_net, optimizer,
-                        lr_scheduler, epoch_id, 'train', vdl_writer)
+                        lr_scheduler, epoch_id, 'train', vdl_writer,
+                        args.profiler_options)
 
             # 2. validate with validate dataset
             if config.validate and epoch_id % config.valid_interval == 0:

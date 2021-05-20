@@ -53,7 +53,8 @@ def parse_args():
         '--profiler_options',
         type=str,
         default=None,
-        help='The option of profiler, which should be convertted to a dict.')
+        help='The option of profiler, which should be in format \"key1=value1;key2=value2;key3=value3\".'
+    )
     parser.add_argument(
         '-o',
         '--override',
