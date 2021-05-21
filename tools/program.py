@@ -41,7 +41,7 @@ from ppcls.utils import hamming_distance
 from ppcls.utils import accuracy_score
 
 
-def create_model(architecture, classes_num):
+def create_model(architecture, classes_num, config):
     """
     Create a model
 
@@ -56,6 +56,15 @@ def create_model(architecture, classes_num):
     """
     name = architecture["name"]
     params = architecture.get("params", {})
+    if "data_format" in config:
+        params["data_format"] = config["data_format"]
+        data_format = config["data_format"]
+    input_image_channel = config.get('image_shape', [3, 224, 224])[0]
+    if input_image_channel != 3:
+        logger.warning(
+            "Input image channel is changed to {}, maybe for better speed-up".
+            format(input_image_channel))
+        params["input_image_channel"] = input_image_channel
     return architectures.__dict__[name](class_dim=classes_num, **params)
 
 
@@ -217,7 +226,11 @@ def create_fetchs(feeds, net, config, mode="train"):
     multilabel = config.get('multilabel', False)
     use_xpu = config.get("use_xpu", False)
 
-    out = net(feeds["image"])
+    if 'AMP' in config:
+        with paddle.amp.auto_cast():
+            out = net(feeds["image"])
+    else:
+        out = net(feeds["image"])
 
     fetchs = OrderedDict()
     fetchs['loss'] = create_loss(feeds, out, architecture, classes_num,
@@ -277,20 +290,26 @@ def create_optimizer(config, parameter_list=None):
     return opt(lr, parameter_list), lr
 
 
-def create_feeds(batch, use_mix, num_classes, multilabel=False):
-    image = batch[0]
-    if use_mix:
-        y_a = to_tensor(batch[1].numpy().astype("int64").reshape(-1, 1))
-        y_b = to_tensor(batch[2].numpy().astype("int64").reshape(-1, 1))
-        lam = to_tensor(batch[3].numpy().astype("float32").reshape(-1, 1))
-        feeds = {"image": image, "y_a": y_a, "y_b": y_b, "lam": lam}
-    else:
-        if not multilabel:
-            label = to_tensor(batch[1].numpy().astype("int64").reshape(-1, 1))
+def create_feeds(batch, use_mix, num_classes, config, multilabel=False):
+    if not config.get('use_dali', False):
+        image = batch[0]
+        if use_mix:
+            y_a = to_tensor(batch[1].numpy().astype("int64").reshape(-1, 1))
+            y_b = to_tensor(batch[2].numpy().astype("int64").reshape(-1, 1))
+            lam = to_tensor(batch[3].numpy().astype("float32").reshape(-1, 1))
+            feeds = {"image": image, "y_a": y_a, "y_b": y_b, "lam": lam}
         else:
-            label = to_tensor(batch[1].numpy().astype('float32').reshape(
-                -1, num_classes))
+            if not multilabel:
+                label = to_tensor(batch[1].numpy().astype("int64").reshape(-1, 1))
+            else:
+                label = to_tensor(batch[1].numpy().astype('float32').reshape(
+                    -1, num_classes))
+            feeds = {"image": image, "label": label}
+    else:
+        image = to_tensor(batch[0]['feed_image'])
+        label = to_tensor(batch[0]['feed_label'])
         feeds = {"image": image, "label": label}
+
     return feeds
 
 
@@ -353,22 +372,38 @@ def run(dataloader,
     metric_list = OrderedDict(metric_list)
 
     tic = time.time()
-    for idx, batch in enumerate(dataloader()):
+
+    if 'AMP' in config:
+        amp_cfg = config.AMP if config.AMP else dict()
+        scale_loss = amp_cfg.get('scale_loss', 1.0)
+        use_dynamic_loss_scaling = amp_cfg.get('use_dynamic_loss_scaling',
+                                               False)
+        scaler = paddle.amp.GradScaler(init_loss_scaling=scale_loss, use_dynamic_loss_scaling=use_dynamic_loss_scaling)  
+
+    use_dali = config.get('use_dali', False)
+    dataloader = dataloader if use_dali else dataloader()
+
+    for idx, batch in enumerate(dataloader):
         # avoid statistics from warmup time
         if idx == 10:
             metric_list["batch_time"].reset()
             metric_list["reader_time"].reset()
 
         metric_list['reader_time'].update(time.time() - tic)
-        batch_size = len(batch[0])
-        feeds = create_feeds(batch, use_mix, classes_num, multilabel)
+        feeds = create_feeds(batch, use_mix, classes_num, config, multilabel)
+        batch_size = feeds['image'].shape[0]
         fetchs = create_fetchs(feeds, net, config, mode)
         if mode == 'train':
             avg_loss = fetchs['loss']
-            avg_loss.backward()
-
-            optimizer.step()
+            if 'AMP' in config and scaler:
+                scaled = scaler.scale(avg_loss)  # scale the loss
+                scaled.backward()            # do backward
+                scaler.minimize(optimizer, scaled)  # update parameters
+            else:
+                avg_loss.backward()
+                optimizer.step()
             optimizer.clear_grad()
+
             lr_value = optimizer._global_learning_rate().numpy()[0]
             metric_list['lr'].update(lr_value, batch_size)
 

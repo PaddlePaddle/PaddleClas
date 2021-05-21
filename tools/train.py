@@ -54,6 +54,18 @@ def main(args):
     paddle.seed(12345)
 
     config = get_config(args.config, overrides=args.override, show=True)
+
+    # amp related config
+    if 'AMP' in config:
+        AMP_RELATED_FLAGS_SETTING = {
+            'FLAGS_cudnn_exhaustive_search': 1,
+            'FLAGS_conv_workspace_size_limit': 1500,
+            'FLAGS_cudnn_batchnorm_spatial_persistent': 1,
+            'FLAGS_max_inplace_grad_add': 8,
+        }
+        os.environ['FLAGS_cudnn_batchnorm_spatial_persistent'] = '1'
+        paddle.fluid.set_flags(AMP_RELATED_FLAGS_SETTING)
+
     # assign the place
     use_gpu = config.get("use_gpu", True)
     use_xpu = config.get("use_xpu", False)
@@ -74,7 +86,7 @@ def main(args):
     if config["use_data_parallel"]:
         paddle.distributed.init_parallel_env()
 
-    net = program.create_model(config.ARCHITECTURE, config.classes_num)
+    net = program.create_model(config.ARCHITECTURE, config.classes_num, config)
     optimizer, lr_scheduler = program.create_optimizer(
         config, parameter_list=net.parameters())
 
@@ -87,19 +99,26 @@ def main(args):
     # load model from checkpoint or pretrained model
     init_model(config, net, optimizer)
 
-    train_dataloader = Reader(config, 'train', places=place)()
-    if len(train_dataloader) <= 0:
-        logger.error(
-            "train dataloader is empty, please check your data config again!")
-        sys.exit(-1)
-
-    if config.validate:
-        valid_dataloader = Reader(config, 'valid', places=place)()
-        if len(valid_dataloader) <= 0:
+    if not config.get('use_dali', False):
+        train_dataloader = Reader(config, 'train', places=place)()
+        if len(train_dataloader) <= 0:
             logger.error(
-                "valid dataloader is empty, please check your data config again!"
-            )
+                "train dataloader is empty, please check your data config again!")
             sys.exit(-1)
+
+        if config.validate:
+            valid_dataloader = Reader(config, 'valid', places=place)()
+            if len(valid_dataloader) <= 0:
+                logger.error(
+                    "valid dataloader is empty, please check your data config again!"
+                )
+                sys.exit(-1)
+    else:
+        assert use_gpu is True, "DALI only support gpu, please set use_gpu to True!"
+        from tools.static import dali
+        train_dataloader = dali.train(config)
+        if config.validate and paddle.distributed.get_rank() == 0:
+            valid_dataloader = dali.val(config)
 
     last_epoch_id = config.get("last_epoch", -1)
     best_top1_acc = 0.0  # best top1 acc record
