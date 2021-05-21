@@ -36,6 +36,7 @@ from ppcls.modeling.loss import JSDivLoss
 from ppcls.modeling.loss import GoogLeNetLoss
 from ppcls.utils.misc import AverageMeter
 from ppcls.utils import logger
+from ppcls.utils import profiler
 from ppcls.utils import multi_hot_encode
 from ppcls.utils import hamming_distance
 from ppcls.utils import accuracy_score
@@ -304,7 +305,8 @@ def run(dataloader,
         lr_scheduler=None,
         epoch=0,
         mode='train',
-        vdl_writer=None):
+        vdl_writer=None,
+        profiler_options=None):
     """
     Feed data to the model and fetch the measures and loss
 
@@ -358,6 +360,8 @@ def run(dataloader,
         if idx == 10:
             metric_list["batch_time"].reset()
             metric_list["reader_time"].reset()
+
+        profiler.add_profiler_step(profiler_options)
 
         metric_list['reader_time'].update(time.time() - tic)
         batch_size = len(batch[0])

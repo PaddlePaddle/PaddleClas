@@ -33,7 +33,7 @@ from ppcls.modeling.loss import MixCELoss
 from ppcls.modeling.loss import JSDivLoss
 from ppcls.modeling.loss import GoogLeNetLoss
 from ppcls.utils.misc import AverageMeter
-from ppcls.utils import logger
+from ppcls.utils import logger, profiler
 
 from paddle.distributed import fleet
 from paddle.distributed.fleet import DistributedStrategy
@@ -465,7 +465,8 @@ def run(dataloader,
         mode='train',
         config=None,
         vdl_writer=None,
-        lr_scheduler=None):
+        lr_scheduler=None,
+        profiler_options=None):
     """
     Feed data to the model and fetch the measures and loss
 
@@ -524,6 +525,8 @@ def run(dataloader,
             metric_list["reader_time"].reset()
 
         metric_list['reader_time'].update(time.time() - tic)
+
+        profiler.add_profiler_step(profiler_options)
 
         if use_dali:
             batch_size = batch[0]["feed_image"].shape()[0]
