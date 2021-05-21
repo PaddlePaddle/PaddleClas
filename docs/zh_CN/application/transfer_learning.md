@@ -57,7 +57,7 @@ Mixup: [False, True]
 
 ## 二、 大规模分类模型
 
-在实际应用中，由于训练数据的匮乏，往往将ImageNet1k数据集训练的分类模型作为预训练模型，进行图像分类的迁移学习。为了进一步助力解决实际问题，基于ResNet50_vd, 百度开源了自研的大规模分类预训练模型，其中训练数据为10万个类别，4300万张图片。10万类预训练模型的下载地址：[**下载地址**](https://paddle-imagenet-models-name.bj.bcebos.com/ResNet50_vd_10w_pretrained.tar)
+在实际应用中，由于训练数据的匮乏，往往将ImageNet1k数据集训练的分类模型作为预训练模型，进行图像分类的迁移学习。为了进一步助力解决实际问题，基于ResNet50_vd, 百度开源了自研的大规模分类预训练模型，其中训练数据为10万个类别，4300万张图片。10万类预训练模型的下载地址：[**下载地址**](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ResNet50_vd_10w_pretrained.pdparams)
 
 我们在6个自有采集的数据集上进行迁移学习实验，采用一组固定参数以及网格搜索方式，其中训练轮数设置为20epochs，选用ResNet50_vd模型，ImageNet预训练精度为79.12%。实验数据集参数以及模型精度的对比结果如下：
 
