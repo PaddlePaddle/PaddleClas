@@ -16,7 +16,7 @@ import six
 import types
 from difflib import SequenceMatcher
 
-from . import architectures
+from . import backbone
 
 
 def get_architectures():
@@ -24,15 +24,15 @@ def get_architectures():
     get all of model architectures
     """
     names = []
-    for k, v in architectures.__dict__.items():
+    for k, v in backbone.__dict__.items():
         if isinstance(v, (types.FunctionType, six.class_types)):
             names.append(k)
     return names
 
 
 def get_blacklist_model_in_static_mode():
-    from ppcls.modeling.architectures import distilled_vision_transformer
-    from ppcls.modeling.architectures import vision_transformer
+    from ppcls.arch.backbone import distilled_vision_transformer
+    from ppcls.arch.backbone import vision_transformer
     blacklist = distilled_vision_transformer.__all__ + vision_transformer.__all__
     return blacklist
 

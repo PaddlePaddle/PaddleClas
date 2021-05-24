@@ -2,7 +2,6 @@ __pycache__/
 *.pyc
 *.sw*
 */workerlog*
-dataset/
 checkpoints/
 output/
 pretrained/

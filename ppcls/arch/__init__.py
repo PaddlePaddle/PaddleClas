@@ -12,9 +12,8 @@
 #See the License for the specific language governing permissions and
 #limitations under the License.
 
-from . import architectures
-from . import loss
+from . import backbone
 
-from .architectures import *
+from .backbone import *
 from .loss import *
 from .utils import *
