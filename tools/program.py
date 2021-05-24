@@ -16,24 +16,22 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-import os
 import time
 import datetime
 from collections import OrderedDict
 
 import paddle
 from paddle import to_tensor
-import paddle.nn as nn
 import paddle.nn.functional as F
 
 from ppcls.optimizer import LearningRateBuilder
 from ppcls.optimizer import OptimizerBuilder
-from ppcls.modeling import architectures
-from ppcls.modeling.loss import MultiLabelLoss
-from ppcls.modeling.loss import CELoss
-from ppcls.modeling.loss import MixCELoss
-from ppcls.modeling.loss import JSDivLoss
-from ppcls.modeling.loss import GoogLeNetLoss
+from ppcls.arch import backbone
+from ppcls.arch.loss import MultiLabelLoss
+from ppcls.arch.loss import CELoss
+from ppcls.arch.loss import MixCELoss
+from ppcls.arch.loss import JSDivLoss
+from ppcls.arch.loss import GoogLeNetLoss
 from ppcls.utils.misc import AverageMeter
 from ppcls.utils import logger
 from ppcls.utils import profiler
@@ -57,7 +55,7 @@ def create_model(architecture, classes_num):
     """
     name = architecture["name"]
     params = architecture.get("params", {})
-    return architectures.__dict__[name](class_dim=classes_num, **params)
+    return backbone.__dict__[name](class_dim=classes_num, **params)
 
 
 def create_loss(feeds,

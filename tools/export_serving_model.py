@@ -14,7 +14,7 @@
 
 import argparse
 import os
-from ppcls.modeling import architectures
+from ppcls.arch import backbone
 
 import paddle.fluid as fluid
 import paddle_serving_client.io as serving_io
@@ -49,7 +49,7 @@ def create_model(args, model, input, class_dim=1000):
 def main():
     args = parse_args()
 
-    model = architectures.__dict__[args.model]()
+    model = backbone.__dict__[args.model]()
 
     place = fluid.CPUPlace()
     exe = fluid.Executor(place)

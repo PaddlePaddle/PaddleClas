@@ -16,7 +16,6 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-import os
 import time
 import numpy as np
 
@@ -27,11 +26,11 @@ import paddle
 import paddle.nn.functional as F
 
 from ppcls.optimizer.learning_rate import LearningRateBuilder
-from ppcls.modeling import architectures
-from ppcls.modeling.loss import CELoss
-from ppcls.modeling.loss import MixCELoss
-from ppcls.modeling.loss import JSDivLoss
-from ppcls.modeling.loss import GoogLeNetLoss
+from ppcls.arch import backbone
+from ppcls.arch.loss import CELoss
+from ppcls.arch.loss import MixCELoss
+from ppcls.arch.loss import JSDivLoss
+from ppcls.arch.loss import GoogLeNetLoss
 from ppcls.utils.misc import AverageMeter
 from ppcls.utils import logger, profiler
 
@@ -95,7 +94,7 @@ def create_model(architecture, image, classes_num, config, is_train):
         params["input_image_channel"] = input_image_channel
     if "is_test" in params:
         params['is_test'] = not is_train
-    model = architectures.__dict__[name](class_dim=classes_num, **params)
+    model = backbone.__dict__[name](class_dim=classes_num, **params)
 
     out = model(image)
     return out

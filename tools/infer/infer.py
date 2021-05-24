@@ -26,7 +26,7 @@ sys.path.append(os.path.abspath(os.path.join(__dir__, '../..')))
 
 from ppcls.utils.save_load import load_dygraph_pretrain
 from ppcls.utils import logger
-from ppcls.modeling import architectures
+from ppcls.arch import backbone
 from utils import parse_args, get_image_list, preprocess, postprocess, save_prelabel_results
 
 
@@ -36,7 +36,7 @@ def main():
     place = paddle.set_device('gpu' if args.use_gpu else 'cpu')
     multilabel = True if args.multilabel else False
 
-    net = architectures.__dict__[args.model](class_dim=args.class_num)
+    net = backbone.__dict__[args.model](class_dim=args.class_num)
     load_dygraph_pretrain(net, args.pretrained_model, args.load_static_weights)
     image_list = get_image_list(args.image_file)
     batch_input_list = []
