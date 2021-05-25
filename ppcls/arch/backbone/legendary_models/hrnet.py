@@ -582,15 +582,17 @@ class HRNet(TheseusLayer):
 
         la1 = self.la1(conv2)
 
-        tr1 = self.tr1_1([la1])
-        tr1 = self.tr1_2(tr1)
-        st2 = self.st2(tr1)
+        tr1_1 = self.tr1_1([la1])
+        tr1_2 = self.tr1_2([la1])
+        st2 = self.st2([tr1_1, tr1_2])
 
-        tr2 = self.tr2(st2)
-        st3 = self.st3(tr2)
+        tr2 = self.tr2(st2[-1])
+        st2.append(tr2)
+        st3 = self.st3(st2)
 
-        tr3 = self.tr3(st3)
-        st4 = self.st4(tr3)
+        tr3 = self.tr3(st3[-1])
+        st3.append(tr3)
+        st4 = self.st4(st3)
 
         last_cls = self.last_cls(st4)
 
