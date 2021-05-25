@@ -75,25 +75,6 @@ class ConvBNLayer(TheseusLayer):
         return y
 
 
-class Layer1(TheseusLayer):
-    def __init__(self, num_channels, has_se=False, name=None):
-        super(Layer1, self).__init__()
-
-        self.bottleneck_blocks = nn.Sequential(*[BottleneckBlock(
-                num_channels=num_channels if i == 0 else 256,
-                num_filters=64,
-                has_se=has_se,
-                stride=1,
-                downsample=True if i == 0 else False,
-                name=name + '_' + str(i + 1))
-            for i in range(4)
-        ])
-
-    def forward(self, x, res_dict=None):
-        y = self.bottleneck_blocks(x)
-        return y
-
-
 class Branches(TheseusLayer):
     def __init__(self,
                  block_num,
@@ -494,7 +475,15 @@ class HRNet(TheseusLayer):
             stride=2,
             act='relu')
 
-        self.la1 = Layer1(num_channels=64, has_se=has_se, name="layer2")
+        self.la1 = self.bottleneck_blocks = nn.Sequential(*[BottleneckBlock(
+                num_channels=64 if i == 0 else 256,
+                num_filters=64,
+                has_se=has_se,
+                stride=1,
+                downsample=True if i == 0 else False,
+                name="layer2_{}".format(i+1))
+            for i in range(4)
+        ])
 
         self.tr1_1 = ConvBNLayer(
             num_channels=256,
