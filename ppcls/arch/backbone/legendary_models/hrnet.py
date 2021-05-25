@@ -151,15 +151,13 @@ class BasicBlock(nn.Layer):
             num_filters=num_filters,
             filter_size=3,
             stride=1,
-            act="relu",
-            name=name + "_conv1")
+            act="relu")
         self.conv2 = ConvBNLayer(
             num_channels=num_filters,
             num_filters=num_filters,
             filter_size=3,
             stride=1,
-            act=None,
-            name=name + "_conv2")
+            act=None)
 
         if self.has_se:
             self.se = SELayer(
