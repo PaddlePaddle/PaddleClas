@@ -582,7 +582,8 @@ class HRNet(TheseusLayer):
 
         la1 = self.la1(conv2)
 
-        tr1 = self.tr1([la1])
+        tr1 = self.tr1_1([la1])
+        tr1 = self.tr1_2(tr1)
         st2 = self.st2(tr1)
 
         tr2 = self.tr2(st2)
