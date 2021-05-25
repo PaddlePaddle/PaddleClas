@@ -22,7 +22,6 @@ import paddle
 from paddle import ParamAttr
 import paddle.nn as nn
 import paddle.nn.functional as F
-from paddle.nn import Conv2D, BatchNorm, Linear
 from paddle.nn import AdaptiveAvgPool2D, MaxPool2D, AvgPool2D
 from paddle.nn.initializer import Uniform
 
@@ -59,7 +58,7 @@ class ConvBNLayer(TheseusLayer):
                  name=None):
         super(ConvBNLayer, self).__init__()
 
-        self._conv = Conv2D(
+        self._conv = nn.Conv2D(
             in_channels=num_channels,
             out_channels=num_filters,
             kernel_size=filter_size,
@@ -69,7 +68,7 @@ class ConvBNLayer(TheseusLayer):
             weight_attr=ParamAttr(name=name + "_weights"),
             bias_attr=False)
         bn_name = name + '_bn'
-        self._batch_norm = BatchNorm(
+        self._batch_norm = nn.BatchNorm(
             num_filters,
             act=act,
             param_attr=ParamAttr(name=bn_name + '_scale'),
@@ -321,7 +320,7 @@ class SELayer(TheseusLayer):
 
         med_ch = int(num_channels / reduction_ratio)
         stdv = 1.0 / math.sqrt(num_channels * 1.0)
-        self.squeeze = Linear(
+        self.squeeze = nn.Linear(
             num_channels,
             med_ch,
             weight_attr=ParamAttr(
@@ -329,7 +328,7 @@ class SELayer(TheseusLayer):
             bias_attr=ParamAttr(name=name + '_sqz_offset'))
 
         stdv = 1.0 / math.sqrt(med_ch * 1.0)
-        self.excitation = Linear(
+        self.excitation = nn.Linear(
             med_ch,
             num_filters,
             weight_attr=ParamAttr(
@@ -628,7 +627,7 @@ class HRNet(TheseusLayer):
 
         stdv = 1.0 / math.sqrt(2048 * 1.0)
 
-        self.out = Linear(
+        self.out = nn.Linear(
             2048,
             class_dim,
             weight_attr=ParamAttr(
