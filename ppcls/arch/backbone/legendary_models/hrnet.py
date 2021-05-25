@@ -54,8 +54,7 @@ class ConvBNLayer(TheseusLayer):
                  filter_size,
                  stride=1,
                  groups=1,
-                 act="relu",
-                 name=None):
+                 act="relu"):
         super(ConvBNLayer, self).__init__()
 
         self._conv = nn.Conv2D(
@@ -66,7 +65,6 @@ class ConvBNLayer(TheseusLayer):
             padding=(filter_size - 1) // 2,
             groups=groups,
             bias_attr=False)
-        bn_name = name + '_bn'
         self._batch_norm = nn.BatchNorm(
             num_filters,
             act=act)
@@ -81,19 +79,16 @@ class Layer1(TheseusLayer):
     def __init__(self, num_channels, has_se=False, name=None):
         super(Layer1, self).__init__()
 
-        self.bottleneck_block_list = []
-
-        for i in range(4):
-            bottleneck_block = self.add_sublayer(
-                "bb_{}_{}".format(name, i + 1),
-                BottleneckBlock(
-                    num_channels=num_channels if i == 0 else 256,
-                    num_filters=64,
-                    has_se=has_se,
-                    stride=1,
-                    downsample=True if i == 0 else False,
-                    name=name + '_' + str(i + 1)))
-            self.bottleneck_block_list.append(bottleneck_block)
+        self.bottleneck_block_list = nn.Sequential(*[
+            BottleneckBlock(
+                num_channels=num_channels if i == 0 else 256,
+                num_filters=64,
+                has_se=has_se,
+                stride=1,
+                downsample=True if i == 0 else False,
+                name=name + '_' + str(i + 1))
+            for i in range(4)
+        ])
 
     def forward(self, x, res_dict=None):
         y = x
