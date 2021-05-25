@@ -79,8 +79,7 @@ class Layer1(TheseusLayer):
     def __init__(self, num_channels, has_se=False, name=None):
         super(Layer1, self).__init__()
 
-        self.bottleneck_block_list = nn.Sequential(*{
-            "bb_{}_{}".format(name, i + 1): BottleneckBlock(
+        self.bottleneck_blocks = nn.Sequential(*[BottleneckBlock(
                 num_channels=num_channels if i == 0 else 256,
                 num_filters=64,
                 has_se=has_se,
@@ -88,12 +87,10 @@ class Layer1(TheseusLayer):
                 downsample=True if i == 0 else False,
                 name=name + '_' + str(i + 1))
             for i in range(4)
-        })
+        ])
 
     def forward(self, x, res_dict=None):
-        y = x
-        for block_func in self.bottleneck_block_list:
-            y = block_func(y)
+        y = self.bottleneck_blocks(x)
         return y
 
 
