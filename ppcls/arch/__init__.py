@@ -15,5 +15,5 @@
 from . import backbone
 
 from .backbone import *
-from .loss import *
+from ppcls.arch.loss_metrics.loss import *
 from .utils import *
