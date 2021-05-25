@@ -106,7 +106,7 @@ class Predictor(object):
                 logger.info("Top-{} acc: {:.5f}".format(idx + 1, acc))
 
     def benchmark_predict(self):
-        test_num = 500
+        test_num = 1000
         test_time = 0.0
         for i in range(0, test_num + 10):
             inputs = np.random.rand(args.batch_size, 3, 224,
@@ -126,7 +126,7 @@ class Predictor(object):
             'shape': "1,3,224,224",
             'data_num': test_num
         }
-        perf_info = {'inference_time_s': test_time}
+        perf_info = {'inference_time_s': test_time / test_num}
         resource_info = {}
         clas_log = benchmark_utils.PaddleInferBenchmark(
             self.config, model_info, data_info, perf_info, resource_info)
