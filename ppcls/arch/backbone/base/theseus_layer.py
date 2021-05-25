@@ -15,7 +15,7 @@ class TheseusLayer(nn.Layer):
     def __init__(self, *args, return_patterns=None, **kwargs):
         super(TheseusLayer, self).__init__()
         self.res_dict = None
-        self.register_forward_post_hook(self._disconnect_res_dict_hook)
+        # self.register_forward_post_hook(self._disconnect_res_dict_hook)
         if return_patterns is not None:
             self._update_res(return_patterns)
 
