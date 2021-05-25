@@ -503,7 +503,9 @@ class HRNet(TheseusLayer):
         self.tr1_2 = ConvBNLayer(
             num_channels=256,
             num_filters=width * 2,
-            filter_size=3)
+            filter_size=3,
+            stride=2
+        )
 
         self.st2 = Stage(
             num_channels=channels_2,
@@ -515,7 +517,9 @@ class HRNet(TheseusLayer):
         self.tr2 = ConvBNLayer(
             num_channels=width * 2,
             num_filters=width * 4,
-            filter_size=3)
+            filter_size=3,
+            stride=2
+        )
         self.st3 = Stage(
             num_channels=channels_3,
             num_modules=num_modules_3,
@@ -526,7 +530,9 @@ class HRNet(TheseusLayer):
         self.tr3 = ConvBNLayer(
             num_channels=width * 4,
             num_filters=width * 8,
-            filter_size=3)
+            filter_size=3,
+            stride=2
+        )
 
         self.st4 = Stage(
             num_channels=channels_4,
