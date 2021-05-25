@@ -502,7 +502,7 @@ class HRNet(TheseusLayer):
             has_se=has_se,
             name="tr1_1")
         self.tr1_2 = BasicBlock(
-            num_channels=width,
+            num_channels=256,
             num_filters=width * 2,
             has_se=has_se,
             name="tr1_2")
