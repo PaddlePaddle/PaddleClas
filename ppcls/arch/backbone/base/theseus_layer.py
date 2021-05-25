@@ -11,7 +11,7 @@ class Identity(nn.Layer):
         return inputs
 
 
-class TheseusLayer(nn.Layer, ABC):
+class TheseusLayer(nn.Layer):
     def __init__(self, *args, return_patterns=None, **kwargs):
         super(TheseusLayer, self).__init__()
         self.res_dict = None
