@@ -45,11 +45,11 @@ class TheseusLayer(nn.Layer):
                 if return_layers is not None and re.match(return_pattern, layer_name):
                     self._sub_layers[layer_i].register_forward_post_hook(self._save_sub_res_hook)
 
-    def _save_sub_res_hook(self, layer, input, output):
-        self.res_dict[layer.full_name()] = output
-
-    def _disconnect_res_dict_hook(self, input, output):
-        self.res_dict = None
+    # def _save_sub_res_hook(self, layer, input, output):
+    #     self.res_dict[layer.full_name()] = output
+    #
+    # def _disconnect_res_dict_hook(self, input, output):
+    #     self.res_dict = None
 
     def replace_sub(self, layer_name_pattern, replace_function, recursive=True):
         for layer_i in self._sub_layers:
