@@ -475,13 +475,12 @@ class HRNet(TheseusLayer):
             stride=2,
             act='relu')
 
-        self.la1 = self.bottleneck_blocks = nn.Sequential(*[BottleneckBlock(
+        self.layer1 = self.bottleneck_blocks = nn.Sequential(*[BottleneckBlock(
                 num_channels=64 if i == 0 else 256,
                 num_filters=64,
                 has_se=has_se,
                 stride=1,
-                downsample=True if i == 0 else False,
-                name="layer2_{}".format(i+1))
+                downsample=True if i == 0 else False)
             for i in range(4)
         ])
 
@@ -571,7 +570,7 @@ class HRNet(TheseusLayer):
         conv1 = self.conv_layer1_1(input)
         conv2 = self.conv_layer1_2(conv1)
 
-        la1 = self.la1(conv2)
+        la1 = self.layer1(conv2)
 
         tr1_1 = self.tr1_1(la1)
         tr1_2 = self.tr1_2(la1)
