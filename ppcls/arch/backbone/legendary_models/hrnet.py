@@ -77,8 +77,8 @@ class ConvBNLayer(TheseusLayer):
             moving_mean_name=bn_name + '_mean',
             moving_variance_name=bn_name + '_variance')
 
-    def forward(self, input):
-        y = self._conv(input)
+    def forward(self, x, res_dict=None):
+        y = self._conv(x)
         y = self._batch_norm(y)
         return y
 
@@ -101,11 +101,11 @@ class Layer1(TheseusLayer):
                     name=name + '_' + str(i + 1)))
             self.bottleneck_block_list.append(bottleneck_block)
 
-    def forward(self, input):
-        conv = input
+    def forward(self, x, res_dict=None):
+        y = x
         for block_func in self.bottleneck_block_list:
-            conv = block_func(conv)
-        return conv
+            y = block_func(y)
+        return y
 
 
 class TransitionLayer(TheseusLayer):
@@ -138,16 +138,16 @@ class TransitionLayer(TheseusLayer):
                         name=name + '_layer_' + str(i + 1)))
             self.conv_bn_func_list.append(residual)
 
-    def forward(self, input):
+    def forward(self, x, res_dict=None):
         outs = []
         for idx, conv_bn_func in enumerate(self.conv_bn_func_list):
             if conv_bn_func is None:
-                outs.append(input[idx])
+                outs.append(x[idx])
             else:
-                if idx < len(input):
-                    outs.append(conv_bn_func(input[idx]))
+                if idx < len(x):
+                    outs.append(conv_bn_func(x[idx]))
                 else:
-                    outs.append(conv_bn_func(input[-1]))
+                    outs.append(conv_bn_func(x[-1]))
         return outs
 
 
@@ -176,10 +176,10 @@ class Branches(TheseusLayer):
                         str(j + 1)))
                 self.basic_block_list[i].append(basic_block_func)
 
-    def forward(self, inputs):
+    def forward(self, x, res_dict=None):
         outs = []
-        for idx, input in enumerate(inputs):
-            conv = input
+        for idx, xi in enumerate(x):
+            conv = xi
             basic_block_list = self.basic_block_list[idx]
             for basic_block_func in basic_block_list:
                 conv = basic_block_func(conv)
@@ -235,14 +235,14 @@ class BottleneckBlock(TheseusLayer):
                 reduction_ratio=16,
                 name='fc' + name)
 
-    def forward(self, input):
-        residual = input
-        conv1 = self.conv1(input)
+    def forward(self, x, res_dict=None):
+        residual = x
+        conv1 = self.conv1(x)
         conv2 = self.conv2(conv1)
         conv3 = self.conv3(conv2)
 
         if self.downsample:
-            residual = self.conv_down(input)
+            residual = self.conv_down(x)
 
         if self.has_se:
             conv3 = self.se(conv3)
@@ -295,7 +295,7 @@ class BasicBlock(TheseusLayer):
                 reduction_ratio=16,
                 name='fc' + name)
 
-    def forward(self, input):
+    def forward(self, input, res_dict=None):
         residual = input
         conv1 = self.conv1(input)
         conv2 = self.conv2(conv1)
@@ -336,7 +336,7 @@ class SELayer(TheseusLayer):
                 initializer=Uniform(-stdv, stdv), name=name + "_exc_weights"),
             bias_attr=ParamAttr(name=name + '_exc_offset'))
 
-    def forward(self, input):
+    def forward(self, input, res_dict=None):
         pool = self.pool2d_gap(input)
         pool = paddle.squeeze(pool, axis=[2, 3])
         squeeze = self.squeeze(pool)
@@ -382,7 +382,7 @@ class Stage(TheseusLayer):
 
             self.stage_func_list.append(stage_func)
 
-    def forward(self, input):
+    def forward(self, input, res_dict=None):
         out = input
         for idx in range(self._num_modules):
             out = self.stage_func_list[idx](out)
@@ -411,7 +411,7 @@ class HighResolutionModule(TheseusLayer):
             multi_scale_output=multi_scale_output,
             name=name)
 
-    def forward(self, input):
+    def forward(self, input, res_dict=None):
         out = self.branches_func(input)
         out = self.fuse_func(out)
         return out
@@ -475,7 +475,7 @@ class FuseLayers(TheseusLayer):
                             pre_num_filters = out_channels[j]
                         self.residual_func_list.append(residual_func)
 
-    def forward(self, input):
+    def forward(self, input, res_dict=None):
         outs = []
         residual_func_idx = 0
         for i in range(self._actual_ch):
@@ -521,7 +521,7 @@ class LastClsOut(TheseusLayer):
                     name=name + 'conv_' + str(idx + 1)))
             self.func_list.append(func)
 
-    def forward(self, inputs):
+    def forward(self, inputs, res_dict=None):
         outs = []
         for idx, input in enumerate(inputs):
             out = self.func_list[idx](input)
@@ -635,7 +635,7 @@ class HRNet(TheseusLayer):
                 initializer=Uniform(-stdv, stdv), name="fc_weights"),
             bias_attr=ParamAttr(name="fc_offset"))
 
-    def forward(self, input):
+    def forward(self, input, res_dict=None):
         conv1 = self.conv_layer1_1(input)
         conv2 = self.conv_layer1_2(conv1)
 
