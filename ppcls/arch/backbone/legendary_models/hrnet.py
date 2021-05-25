@@ -114,8 +114,7 @@ class TransitionLayer(TheseusLayer):
                         ConvBNLayer(
                             num_channels=in_channels[i],
                             num_filters=out_channels[i],
-                            filter_size=3,
-                            name=name + '_layer_' + str(i + 1)))
+                            filter_size=3))
             else:
                 residual = self.add_sublayer(
                     "transition_{}_layer_{}".format(name, i + 1),
@@ -123,8 +122,7 @@ class TransitionLayer(TheseusLayer):
                         num_channels=in_channels[-1],
                         num_filters=out_channels[i],
                         filter_size=3,
-                        stride=2,
-                        name=name + '_layer_' + str(i + 1)))
+                        stride=2))
             self.conv_bn_func_list.append(residual)
 
     def forward(self, x, res_dict=None):
@@ -193,29 +191,25 @@ class BottleneckBlock(TheseusLayer):
             num_channels=num_channels,
             num_filters=num_filters,
             filter_size=1,
-            act="relu",
-            name=name + "_conv1", )
+            act="relu")
         self.conv2 = ConvBNLayer(
             num_channels=num_filters,
             num_filters=num_filters,
             filter_size=3,
             stride=stride,
-            act="relu",
-            name=name + "_conv2")
+            act="relu")
         self.conv3 = ConvBNLayer(
             num_channels=num_filters,
             num_filters=num_filters * 4,
             filter_size=1,
-            act=None,
-            name=name + "_conv3")
+            act=None)
 
         if self.downsample:
             self.conv_down = ConvBNLayer(
                 num_channels=num_channels,
                 num_filters=num_filters * 4,
                 filter_size=1,
-                act=None,
-                name=name + "_downsample")
+                act=None)
 
         if self.has_se:
             self.se = SELayer(
@@ -259,23 +253,20 @@ class BasicBlock(TheseusLayer):
             num_filters=num_filters,
             filter_size=3,
             stride=stride,
-            act="relu",
-            name=name + "_conv1")
+            act="relu")
         self.conv2 = ConvBNLayer(
             num_channels=num_filters,
             num_filters=num_filters,
             filter_size=3,
             stride=1,
-            act=None,
-            name=name + "_conv2")
+            act=None)
 
         if self.downsample:
             self.conv_down = ConvBNLayer(
                 num_channels=num_channels,
                 num_filters=num_filters * 4,
                 filter_size=1,
-                act="relu",
-                name=name + "_downsample")
+                act="relu")
 
         if self.has_se:
             self.se = SELayer(
@@ -429,9 +420,7 @@ class FuseLayers(TheseusLayer):
                             num_filters=out_channels[i],
                             filter_size=1,
                             stride=1,
-                            act=None,
-                            name=name + '_layer_' + str(i + 1) + '_' +
-                            str(j + 1)))
+                            act=None))
                     self.residual_func_list.append(residual_func)
                 elif j < i:
                     pre_num_filters = in_channels[j]
@@ -445,9 +434,7 @@ class FuseLayers(TheseusLayer):
                                     num_filters=out_channels[i],
                                     filter_size=3,
                                     stride=2,
-                                    act=None,
-                                    name=name + '_layer_' + str(i + 1) + '_' +
-                                    str(j + 1) + '_' + str(k + 1)))
+                                    act=None))
                             pre_num_filters = out_channels[i]
                         else:
                             residual_func = self.add_sublayer(
@@ -458,9 +445,7 @@ class FuseLayers(TheseusLayer):
                                     num_filters=out_channels[j],
                                     filter_size=3,
                                     stride=2,
-                                    act="relu",
-                                    name=name + '_layer_' + str(i + 1) + '_' +
-                                    str(j + 1) + '_' + str(k + 1)))
+                                    act="relu"))
                             pre_num_filters = out_channels[j]
                         self.residual_func_list.append(residual_func)
 
@@ -544,16 +529,14 @@ class HRNet(TheseusLayer):
             num_filters=64,
             filter_size=3,
             stride=2,
-            act='relu',
-            name="layer1_1")
+            act='relu')
 
         self.conv_layer1_2 = ConvBNLayer(
             num_channels=64,
             num_filters=64,
             filter_size=3,
             stride=2,
-            act='relu',
-            name="layer1_2")
+            act='relu')
 
         self.la1 = Layer1(num_channels=64, has_se=has_se, name="layer2")
 
@@ -603,15 +586,13 @@ class HRNet(TheseusLayer):
                         num_channels=num_filters_list[idx] * 4,
                         num_filters=last_num_filters[idx],
                         filter_size=3,
-                        stride=2,
-                        name="cls_head_add" + str(idx + 1))))
+                        stride=2)))
 
         self.conv_last = ConvBNLayer(
             num_channels=1024,
             num_filters=2048,
             filter_size=1,
-            stride=1,
-            name="cls_head_last_conv")
+            stride=1)
 
         self.pool2d_avg = AdaptiveAvgPool2D(1)
 
