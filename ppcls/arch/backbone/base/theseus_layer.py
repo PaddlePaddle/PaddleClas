@@ -12,25 +12,35 @@ class Identity(nn.Layer):
 
 
 class TheseusLayer(nn.Layer, ABC):
-    def __init__(self, *args, return_patterns=None, stop_layer=None, **kwargs):
+    def __init__(self, *args, return_patterns=None, **kwargs):
         super(TheseusLayer, self).__init__()
         self.res_dict = None
         self.register_forward_post_hook(self._disconnect_res_dict_hook)
-        if return_patterns is not None or stop_layer is not None:
-            self._update_sub(return_patterns, stop_layer)
+        if return_patterns is not None:
+            self._update_res(return_patterns)
 
     def forward(self, *input, res_dict=None, **kwargs):
         if res_dict is not None:
             self.res_dict = res_dict
 
-    def _update_sub(self, return_layers, stop_layer):
+    # stop doesn't work when stop layer has a parallel branch.
+    def stop_after(self, stop_layer_name: str):
         after_stop = False
         for layer_i in self._sub_layers:
-            layer_name = self._sub_layers[layer_i].full_name()
-            if stop_layer is not None and layer_name == stop_layer:
-                after_stop = True
             if after_stop:
                 self._sub_layers[layer_i] = Identity()
+                continue
+            layer_name = self._sub_layers[layer_i].full_name()
+            if layer_name == stop_layer_name:
+                after_stop = True
+                continue
+            if isinstance(self._sub_layers[layer_i], TheseusLayer):
+                after_stop = self._sub_layers[layer_i].stop_after(stop_layer_name)
+        return after_stop
+
+    def _update_res(self, return_layers):
+        for layer_i in self._sub_layers:
+            layer_name = self._sub_layers[layer_i].full_name()
             for return_pattern in return_layers:
                 if return_layers is not None and re.match(return_pattern, layer_name):
                     self._sub_layers[layer_i].register_forward_post_hook(self._save_sub_res_hook)
