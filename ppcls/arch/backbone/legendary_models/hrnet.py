@@ -214,8 +214,7 @@ class Stage(TheseusLayer):
     def __init__(self,
                  num_modules,
                  num_filters,
-                 has_se=False,
-                 name=None):
+                 has_se=False):
         super(Stage, self).__init__()
 
         self._num_modules = num_modules
@@ -225,8 +224,7 @@ class Stage(TheseusLayer):
             self.stage_func_list.append(
                 HighResolutionModule(
                     num_filters=num_filters,
-                    has_se=has_se,
-                    name=name + '_' + str(i + 1)))
+                    has_se=has_se))
 
     def forward(self, input, res_dict=None):
         out = input
@@ -238,8 +236,7 @@ class Stage(TheseusLayer):
 class HighResolutionModule(TheseusLayer):
     def __init__(self,
                  num_filters,
-                 has_se=False,
-                 name=None):
+                 has_se=False):
         super(HighResolutionModule, self).__init__()
 
         self.basic_block_list = nn.LayerList()
@@ -254,8 +251,7 @@ class HighResolutionModule(TheseusLayer):
 
         self.fuse_func = FuseLayers(
             in_channels=num_filters,
-            out_channels=num_filters,
-            name=name)
+            out_channels=num_filters)
 
     def forward(self, input, res_dict=None):
         outs = []
@@ -272,8 +268,7 @@ class HighResolutionModule(TheseusLayer):
 class FuseLayers(TheseusLayer):
     def __init__(self,
                  in_channels,
-                 out_channels,
-                 name=None):
+                 out_channels):
         super(FuseLayers, self).__init__()
 
         self._actual_ch = len(in_channels)
@@ -342,8 +337,7 @@ class LastClsOut(TheseusLayer):
     def __init__(self,
                  num_channel_list,
                  has_se,
-                 num_filters_list=[32, 64, 128, 256],
-                 name=None):
+                 num_filters_list=[32, 64, 128, 256]):
         super(LastClsOut, self).__init__()
 
         self.func_list = nn.LayerList()
@@ -369,19 +363,11 @@ class HRNet(TheseusLayer):
 
         self.width = width
         self.has_se = has_se
-        self.channels = {
-            18: [[18, 36], [18, 36, 72], [18, 36, 72, 144]],
-            30: [[30, 60], [30, 60, 120], [30, 60, 120, 240]],
-            32: [[32, 64], [32, 64, 128], [32, 64, 128, 256]],
-            40: [[40, 80], [40, 80, 160], [40, 80, 160, 320]],
-            44: [[44, 88], [44, 88, 176], [44, 88, 176, 352]],
-            48: [[48, 96], [48, 96, 192], [48, 96, 192, 384]],
-            60: [[60, 120], [60, 120, 240], [60, 120, 240, 480]],
-            64: [[64, 128], [64, 128, 256], [64, 128, 256, 512]]
-        }
         self._class_dim = class_dim
 
-        channels_2, channels_3, channels_4 = self.channels[width]
+        channels_2 = [self.width, self.width * 2]
+        channels_3 = [self.width, self.width * 2, self.width * 4]
+        channels_4 = [self.width, self.width * 2, self.width * 4, self.width * 8]
 
         self.conv_layer1_1 = ConvBNLayer(
             num_channels=3,
@@ -421,8 +407,7 @@ class HRNet(TheseusLayer):
         self.st2 = Stage(
             num_modules=1,
             num_filters=channels_2,
-            has_se=self.has_se,
-            name="st2")
+            has_se=self.has_se)
 
         self.tr2 = ConvBNLayer(
             num_channels=width * 2,
@@ -433,8 +418,7 @@ class HRNet(TheseusLayer):
         self.st3 = Stage(
             num_modules=4,
             num_filters=channels_3,
-            has_se=self.has_se,
-            name="st3")
+            has_se=self.has_se)
 
         self.tr3 = ConvBNLayer(
             num_channels=width * 4,
@@ -446,16 +430,14 @@ class HRNet(TheseusLayer):
         self.st4 = Stage(
             num_modules=3,
             num_filters=channels_4,
-            has_se=self.has_se,
-            name="st4")
+            has_se=self.has_se)
 
         # classification
         num_filters_list = [32, 64, 128, 256]
         self.last_cls = LastClsOut(
             num_channel_list=channels_4,
             has_se=self.has_se,
-            num_filters_list=num_filters_list,
-            name="cls_head", )
+            num_filters_list=num_filters_list)
 
         last_num_filters = [256, 512, 1024]
         self.cls_head_conv_list = nn.LayerList()
