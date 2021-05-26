@@ -370,16 +370,14 @@ class LastClsOut(TheseusLayer):
                  name=None):
         super(LastClsOut, self).__init__()
 
-        self.func_list = []
+        self.func_list = nn.LayerList()
         for idx in range(len(num_channel_list)):
-            func = self.add_sublayer(
-                "conv_{}_conv_{}".format(name, idx + 1),
+            self.func_list.append(
                 BottleneckBlock(
                     num_channels=num_channel_list[idx],
                     num_filters=num_filters_list[idx],
                     has_se=has_se,
                     downsample=True))
-            self.func_list.append(func)
 
     def forward(self, inputs, res_dict=None):
         outs = []
