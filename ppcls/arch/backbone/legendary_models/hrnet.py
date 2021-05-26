@@ -215,7 +215,6 @@ class Stage(TheseusLayer):
                  num_modules,
                  num_filters,
                  has_se=False,
-                 multi_scale_output=True,
                  name=None):
         super(Stage, self).__init__()
 
@@ -223,19 +222,11 @@ class Stage(TheseusLayer):
 
         self.stage_func_list = nn.LayerList()
         for i in range(num_modules):
-            if i == num_modules - 1 and not multi_scale_output:
-                self.stage_func_list.append(
-                    HighResolutionModule(
-                        num_filters=num_filters,
-                        has_se=has_se,
-                        multi_scale_output=False,
-                        name=name + '_' + str(i + 1)))
-            else:
-                self.stage_func_list.append(
-                    HighResolutionModule(
-                        num_filters=num_filters,
-                        has_se=has_se,
-                        name=name + '_' + str(i + 1)))
+            self.stage_func_list.append(
+                HighResolutionModule(
+                    num_filters=num_filters,
+                    has_se=has_se,
+                    name=name + '_' + str(i + 1)))
 
     def forward(self, input, res_dict=None):
         out = input
@@ -248,28 +239,22 @@ class HighResolutionModule(TheseusLayer):
     def __init__(self,
                  num_filters,
                  has_se=False,
-                 multi_scale_output=True,
                  name=None):
         super(HighResolutionModule, self).__init__()
 
-        self.basic_block_list = []
+        self.basic_block_list = nn.LayerList()
 
         for i in range(len(num_filters)):
-            self.basic_block_list.append([])
-            for j in range(4):
-                in_ch = num_filters[i]
-                basic_block_func = self.add_sublayer(
-                    "bb_{}_branch_layer_{}_{}".format(name, i + 1, j + 1),
+            self.basic_block_list.append(
+                nn.Sequential(*[
                     BasicBlock(
-                        num_channels=in_ch,
+                        num_channels=num_filters[i],
                         num_filters=num_filters[i],
-                        has_se=has_se))
-                self.basic_block_list[i].append(basic_block_func)
+                        has_se=has_se) for j in range(4)]))
 
         self.fuse_func = FuseLayers(
             in_channels=num_filters,
             out_channels=num_filters,
-            multi_scale_output=multi_scale_output,
             name=name)
 
     def forward(self, input, res_dict=None):
@@ -288,34 +273,28 @@ class FuseLayers(TheseusLayer):
     def __init__(self,
                  in_channels,
                  out_channels,
-                 multi_scale_output=True,
                  name=None):
         super(FuseLayers, self).__init__()
 
-        self._actual_ch = len(in_channels) if multi_scale_output else 1
+        self._actual_ch = len(in_channels)
         self._in_channels = in_channels
 
-        self.residual_func_list = []
-        for i in range(self._actual_ch):
+        self.residual_func_list = nn.LayerList()
+        for i in range(len(in_channels)):
             for j in range(len(in_channels)):
-                residual_func = None
                 if j > i:
-                    residual_func = self.add_sublayer(
-                        "residual_{}_layer_{}_{}".format(name, i + 1, j + 1),
+                    self.residual_func_list.append(
                         ConvBNLayer(
                             num_channels=in_channels[j],
                             num_filters=out_channels[i],
                             filter_size=1,
                             stride=1,
                             act=None))
-                    self.residual_func_list.append(residual_func)
                 elif j < i:
                     pre_num_filters = in_channels[j]
                     for k in range(i - j):
                         if k == i - j - 1:
-                            residual_func = self.add_sublayer(
-                                "residual_{}_layer_{}_{}_{}".format(
-                                    name, i + 1, j + 1, k + 1),
+                            self.residual_func_list.append(
                                 ConvBNLayer(
                                     num_channels=pre_num_filters,
                                     num_filters=out_channels[i],
@@ -324,9 +303,7 @@ class FuseLayers(TheseusLayer):
                                     act=None))
                             pre_num_filters = out_channels[i]
                         else:
-                            residual_func = self.add_sublayer(
-                                "residual_{}_layer_{}_{}_{}".format(
-                                    name, i + 1, j + 1, k + 1),
+                            self.residual_func_list.append(
                                 ConvBNLayer(
                                     num_channels=pre_num_filters,
                                     num_filters=out_channels[j],
@@ -334,12 +311,11 @@ class FuseLayers(TheseusLayer):
                                     stride=2,
                                     act="relu"))
                             pre_num_filters = out_channels[j]
-                        self.residual_func_list.append(residual_func)
 
     def forward(self, input, res_dict=None):
         outs = []
         residual_func_idx = 0
-        for i in range(self._actual_ch):
+        for i in range(len(self._in_channels)):
             residual = input[i]
             for j in range(len(self._in_channels)):
                 if j > i:
@@ -421,7 +397,8 @@ class HRNet(TheseusLayer):
             stride=2,
             act='relu')
 
-        self.layer1 = self.bottleneck_blocks = nn.Sequential(*[BottleneckBlock(
+        self.layer1 = self.bottleneck_blocks = nn.Sequential(*[
+            BottleneckBlock(
                 num_channels=64 if i == 0 else 256,
                 num_filters=64,
                 has_se=has_se,
