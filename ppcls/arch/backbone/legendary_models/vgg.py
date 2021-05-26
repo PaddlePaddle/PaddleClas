@@ -23,6 +23,8 @@ from paddle.nn import AdaptiveAvgPool2D, MaxPool2D, AvgPool2D
 
 from ppcls.arch.backbone.base.theseus_layer import TheseusLayer
 
+from ppcls.utils.save_load import load_dygraph_pretrain
+
 __all__ = ["VGG11", "VGG13", "VGG16", "VGG19"]
 
 # VGG config
@@ -149,7 +151,12 @@ class ConvBlock(TheseusLayer):
 
 
 class VGGNet(TheseusLayer):
-    def __init__(self, config, stop_grad_layers=0, class_num=1000):
+    def __init__(self,
+                 config,
+                 stop_grad_layers=0,
+                 class_num=1000,
+                 pretrained=False,
+                 **args):
         super().__init__()
 
         self.stop_grad_layers = stop_grad_layers
@@ -175,6 +182,9 @@ class VGGNet(TheseusLayer):
         self._fc1 = Linear(7 * 7 * 512, 4096)
         self._fc2 = Linear(4096, 4096)
         self._out = Linear(4096, class_num)
+
+        if pretrained is not None:
+            load_dygraph_pretrain(self, pretrained)
 
     def forward(self, inputs):
         x = self._conv_block_1(inputs)
