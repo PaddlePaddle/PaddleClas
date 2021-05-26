@@ -130,19 +130,20 @@ class ConvBlock(TheseusLayer):
                 bias_attr=False)
 
         self._pool = MaxPool2D(kernel_size=2, stride=2, padding=0)
+        self._relu = nn.ReLU()
 
     def forward(self, inputs):
         x = self._conv_1(inputs)
-        x = F.relu(x)
+        x = self._relu(x)
         if self.groups == 2 or self.groups == 3 or self.groups == 4:
             x = self._conv_2(x)
-            x = F.relu(x)
+            x = self._relu(x)
         if self.groups == 3 or self.groups == 4:
             x = self._conv_3(x)
-            x = F.relu(x)
+            x = self._relu(x)
         if self.groups == 4:
             x = self._conv_4(x)
-            x = F.relu(x)
+            x = self._relu(x)
         x = self._pool(x)
         return x
 
@@ -160,6 +161,7 @@ class VGGNet(TheseusLayer):
         self._conv_block_5 = ConvBlock(512, 512, config[4])
 
         self._relu = nn.ReLU()
+        self._flatten = nn.Flatten(start_axis=1, stop_axis=-1)
 
         for idx, block in enumerate([
                 self._conv_block_1, self._conv_block_2, self._conv_block_3,
@@ -180,7 +182,7 @@ class VGGNet(TheseusLayer):
         x = self._conv_block_3(x)
         x = self._conv_block_4(x)
         x = self._conv_block_5(x)
-        x = x.flatten(start_axis=1, stop_axis=-1)
+        x = self._flatten(x)
         x = self._fc1(x)
         x = self._relu(x)
         x = self._drop(x)
