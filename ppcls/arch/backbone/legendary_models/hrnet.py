@@ -397,7 +397,7 @@ class HRNet(TheseusLayer):
             stride=2,
             act='relu')
 
-        self.layer1 = self.bottleneck_blocks = nn.Sequential(*[
+        self.layer1 = nn.Sequential(*[
             BottleneckBlock(
                 num_channels=64 if i == 0 else 256,
                 num_filters=64,
