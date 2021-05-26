@@ -81,8 +81,7 @@ class BottleneckBlock(TheseusLayer):
                  num_filters,
                  has_se,
                  stride=1,
-                 downsample=False,
-                 name=None):
+                 downsample=False):
         super(BottleneckBlock, self).__init__()
 
         self.has_se = has_se
@@ -116,8 +115,7 @@ class BottleneckBlock(TheseusLayer):
             self.se = SELayer(
                 num_channels=num_filters * 4,
                 num_filters=num_filters * 4,
-                reduction_ratio=16,
-                name='fc' + name)
+                reduction_ratio=16)
 
     def forward(self, x, res_dict=None):
         residual = x
@@ -140,8 +138,7 @@ class BasicBlock(nn.Layer):
     def __init__(self,
                  num_channels,
                  num_filters,
-                 has_se=False,
-                 name=None):
+                 has_se=False):
         super(BasicBlock, self).__init__()
 
         self.has_se = has_se
@@ -163,8 +160,7 @@ class BasicBlock(nn.Layer):
             self.se = SELayer(
                 num_channels=num_filters,
                 num_filters=num_filters,
-                reduction_ratio=16,
-                name='fc' + name)
+                reduction_ratio=16)
 
     def forward(self, input):
         residual = input
@@ -180,7 +176,7 @@ class BasicBlock(nn.Layer):
 
 
 class SELayer(TheseusLayer):
-    def __init__(self, num_channels, num_filters, reduction_ratio, name=None):
+    def __init__(self, num_channels, num_filters, reduction_ratio):
         super(SELayer, self).__init__()
 
         self.pool2d_gap = AdaptiveAvgPool2D(1)
@@ -193,16 +189,14 @@ class SELayer(TheseusLayer):
             num_channels,
             med_ch,
             weight_attr=ParamAttr(
-                initializer=Uniform(-stdv, stdv), name=name + "_sqz_weights"),
-            bias_attr=ParamAttr(name=name + '_sqz_offset'))
+                initializer=Uniform(-stdv, stdv)))
 
         stdv = 1.0 / math.sqrt(med_ch * 1.0)
         self.excitation = nn.Linear(
             med_ch,
             num_filters,
             weight_attr=ParamAttr(
-                initializer=Uniform(-stdv, stdv), name=name + "_exc_weights"),
-            bias_attr=ParamAttr(name=name + '_exc_offset'))
+                initializer=Uniform(-stdv, stdv)))
 
     def forward(self, input, res_dict=None):
         pool = self.pool2d_gap(input)
@@ -273,9 +267,7 @@ class HighResolutionModule(TheseusLayer):
                     BasicBlock(
                         num_channels=in_ch,
                         num_filters=num_filters[i],
-                        has_se=has_se,
-                        name=name + '_branch_layer_' + str(i + 1) + '_' +
-                             str(j + 1)))
+                        has_se=has_se))
                 self.basic_block_list[i].append(basic_block_func)
 
         self.fuse_func = FuseLayers(
@@ -390,8 +382,7 @@ class LastClsOut(TheseusLayer):
                     num_channels=num_channel_list[idx],
                     num_filters=num_filters_list[idx],
                     has_se=has_se,
-                    downsample=True,
-                    name=name + 'conv_' + str(idx + 1)))
+                    downsample=True))
             self.func_list.append(func)
 
     def forward(self, inputs, res_dict=None):
@@ -496,16 +487,14 @@ class HRNet(TheseusLayer):
             name="cls_head", )
 
         last_num_filters = [256, 512, 1024]
-        self.cls_head_conv_list = []
+        self.cls_head_conv_list = nn.LayerList()
         for idx in range(3):
             self.cls_head_conv_list.append(
-                self.add_sublayer(
-                    "cls_head_add{}".format(idx + 1),
                     ConvBNLayer(
                         num_channels=num_filters_list[idx] * 4,
                         num_filters=last_num_filters[idx],
                         filter_size=3,
-                        stride=2)))
+                        stride=2))
 
         self.conv_last = ConvBNLayer(
             num_channels=1024,
@@ -521,8 +510,7 @@ class HRNet(TheseusLayer):
             2048,
             class_dim,
             weight_attr=ParamAttr(
-                initializer=Uniform(-stdv, stdv), name="fc_weights"),
-            bias_attr=ParamAttr(name="fc_offset"))
+                initializer=Uniform(-stdv, stdv)))
 
     def forward(self, input, res_dict=None):
         conv1 = self.conv_layer1_1(input)
