@@ -14,6 +14,9 @@
 
 import sys
 import copy
+
+import paddle.nn as nn
+
 from . import backbone
 
 from .backbone import *
@@ -21,32 +24,32 @@ from ppcls.arch.loss_metrics.loss import *
 from .utils import *
 
 
-def build_arch(config):
+def build_model(config):
     config = copy.deepcopy(config)
-    arch_type = config.pop("type")
-    module = sys.modules[__name__]
-    arch = getattr(module)(config)
+    model_type = config.pop("name")
+    mod = sys.modules[__name__]
+    arch = getattr(mod, model_type)(**config)
     return arch
 
 
-class BaseModel(nn.Layer):
-    def __init__(self, config):
+class RecModel(nn.Layer):
+    def __init__(self, **config):
         super().__init__()
         backbone_config = config["Backbone"]
-        backbone_type = backbone_config.pop("type")
-        self.backbone = getattr(backbone)(**backbone_config)
+        backbone_name = backbone_config.pop("name")
+        self.backbone = getattr(backbone_name)(**backbone_config)
 
         if "Neck" in config:
             neck_config = config["Neck"]
-            neck_type = neck_config.pop("type")
-            self.neck = getattr(backbone)(**neck_config)
+            neck_name = neck_config.pop("name")
+            self.neck = getattr(neck_name)(**neck_config)
         else:
             self.neck = None
 
         if "Head" in config:
             head_config = config["Head"]
-            head_type = head_config.pop("type")
-            self.head = getattr(head)(**head_config)
+            head_name = head_config.pop("name")
+            self.head = getattr(head_name)(**head_config)
         else:
             self.head = None
 

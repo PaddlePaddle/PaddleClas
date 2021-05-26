@@ -250,13 +250,14 @@ class Reader:
 
     def __init__(self, config, mode='train', places=None):
         try:
-            self.params = config[mode.upper()]
+            self.params = config[mode.capitalize()]
         except KeyError:
             raise ModeException(mode=mode)
 
         use_mix = config.get('use_mix')
         self.params['mode'] = mode
-        self.shuffle = mode == "train"
+        self.shuffle = mode.capitalize() == "Train"
+        self.is_train = mode.capitalize() == "Train"
 
         self.collate_fn = None
         self.batch_ops = []
@@ -298,7 +299,7 @@ class Reader:
                 shuffle=False,
                 num_workers=self.params["num_workers"])
         else:
-            is_train = self.params['mode'] == "train"
+            is_train = self.is_train
             batch_sampler = DistributedBatchSampler(
                 dataset,
                 batch_size=batch_size,
