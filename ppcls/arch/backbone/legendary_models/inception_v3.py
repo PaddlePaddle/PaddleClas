@@ -52,8 +52,7 @@ class ConvBNLayer(TheseusLayer):
                  stride=1,
                  padding=0,
                  groups=1,
-                 act="relu",
-                 name=None):
+                 act="relu"):
         super(ConvBNLayer, self).__init__()
 
         self.conv = Conv2D(
@@ -63,15 +62,10 @@ class ConvBNLayer(TheseusLayer):
             stride=stride,
             padding=padding,
             groups=groups,
-            weight_attr=ParamAttr(name=name+"_weights"),
             bias_attr=False)
         self.batch_norm = BatchNorm(
             num_filters,
-            act=act,
-            param_attr=ParamAttr(name=name+"_bn_scale"),
-            bias_attr=ParamAttr(name=name+"_bn_offset"),
-            moving_mean_name=name+"_bn_mean",
-            moving_variance_name=name+"_bn_variance")
+            act=act)
 
     def forward(self, inputs):
         y = self.conv(inputs)
@@ -85,32 +79,27 @@ class InceptionStem(TheseusLayer):
                                        num_filters=32,
                                        filter_size=3,
                                        stride=2,
-                                       act="relu",
-                                       name="conv_1a_3x3")
+                                       act="relu")
         self.conv_2a_3x3 = ConvBNLayer(num_channels=32,
                                        num_filters=32,
                                        filter_size=3,
                                        stride=1,
-                                       act="relu",
-                                       name="conv_2a_3x3")
+                                       act="relu")
         self.conv_2b_3x3 = ConvBNLayer(num_channels=32,
                                        num_filters=64,
                                        filter_size=3,
                                        padding=1,
-                                       act="relu",
-                                       name="conv_2b_3x3")
+                                       act="relu")
 
         self.maxpool = MaxPool2D(kernel_size=3, stride=2, padding=0)
         self.conv_3b_1x1 = ConvBNLayer(num_channels=64,
                                        num_filters=80,
                                        filter_size=1,
-                                       act="relu",
-                                       name="conv_3b_1x1")        
+                                       act="relu")        
         self.conv_4a_3x3 = ConvBNLayer(num_channels=80,
                                        num_filters=192,
                                        filter_size=3,
-                                       act="relu",
-                                       name="conv_4a_3x3")
+                                       act="relu")
     def forward(self, x):
         y = self.conv_1a_3x3(x)
         y = self.conv_2a_3x3(y)
@@ -123,48 +112,41 @@ class InceptionStem(TheseusLayer):
 
                          
 class InceptionA(TheseusLayer):
-    def __init__(self, num_channels, pool_features, name=None):
+    def __init__(self, num_channels, pool_features):
         super(InceptionA, self).__init__()
         self.branch1x1 = ConvBNLayer(num_channels=num_channels,
                                      num_filters=64,
                                      filter_size=1,
-                                     act="relu",
-                                     name="inception_a_branch1x1_"+name) 
+                                     act="relu") 
         self.branch5x5_1 = ConvBNLayer(num_channels=num_channels,
                                        num_filters=48, 
                                        filter_size=1, 
-                                       act="relu",
-                                       name="inception_a_branch5x5_1_"+name)
+                                       act="relu")
         self.branch5x5_2 = ConvBNLayer(num_channels=48, 
                                        num_filters=64, 
                                        filter_size=5, 
                                        padding=2, 
-                                       act="relu",
-                                       name="inception_a_branch5x5_2_"+name)
+                                       act="relu")
 
         self.branch3x3dbl_1 = ConvBNLayer(num_channels=num_channels,
                                        num_filters=64, 
                                        filter_size=1, 
-                                       act="relu",
-                                       name="inception_a_branch3x3dbl_1_"+name)
+                                       act="relu")
         self.branch3x3dbl_2 = ConvBNLayer(num_channels=64,
                                        num_filters=96, 
                                        filter_size=3, 
                                        padding=1,
-                                       act="relu",
-                                       name="inception_a_branch3x3dbl_2_"+name)
+                                       act="relu")
         self.branch3x3dbl_3 = ConvBNLayer(num_channels=96,
                                num_filters=96, 
                                filter_size=3, 
                                padding=1,
-                               act="relu",
-                               name="inception_a_branch3x3dbl_3_"+name)
+                               act="relu")
         self.branch_pool = AvgPool2D(kernel_size=3, stride=1, padding=1, exclusive=False)
         self.branch_pool_conv = ConvBNLayer(num_channels=num_channels,
                                num_filters=pool_features, 
                                filter_size=1, 
-                               act="relu",
-                               name="inception_a_branch_pool_"+name)
+                               act="relu")
 
     def forward(self, x):
         branch1x1 = self.branch1x1(x)
@@ -183,31 +165,27 @@ class InceptionA(TheseusLayer):
 
     
 class InceptionB(TheseusLayer):
-    def __init__(self, num_channels, name=None):
+    def __init__(self, num_channels):
         super(InceptionB, self).__init__()
         self.branch3x3 = ConvBNLayer(num_channels=num_channels,
                                      num_filters=384,
                                      filter_size=3,
                                      stride=2,
-                                     act="relu",
-                                     name="inception_b_branch3x3_"+name) 
+                                     act="relu") 
         self.branch3x3dbl_1 = ConvBNLayer(num_channels=num_channels, 
                                        num_filters=64, 
                                        filter_size=1, 
-                                       act="relu",
-                                       name="inception_b_branch3x3dbl_1_"+name)
+                                       act="relu")
         self.branch3x3dbl_2 = ConvBNLayer(num_channels=64, 
                                        num_filters=96, 
                                        filter_size=3, 
                                        padding=1,
-                                       act="relu",
-                                       name="inception_b_branch3x3dbl_2_"+name)
+                                       act="relu")
         self.branch3x3dbl_3 = ConvBNLayer(num_channels=96, 
                                        num_filters=96, 
                                        filter_size=3,
                                        stride=2,
-                                       act="relu",
-                                       name="inception_b_branch3x3dbl_3_"+name)
+                                       act="relu")
         self.branch_pool = MaxPool2D(kernel_size=3, stride=2)
         
     def forward(self, x):
@@ -224,70 +202,60 @@ class InceptionB(TheseusLayer):
         return outputs
 
 class InceptionC(TheseusLayer):
-    def __init__(self, num_channels, channels_7x7, name=None):
+    def __init__(self, num_channels, channels_7x7):
         super(InceptionC, self).__init__()
         self.branch1x1 = ConvBNLayer(num_channels=num_channels, 
                                        num_filters=192, 
                                        filter_size=1, 
-                                       act="relu",
-                                       name="inception_c_branch1x1_"+name)
+                                       act="relu")
         self.branch7x7_1 = ConvBNLayer(num_channels=num_channels, 
                                        num_filters=channels_7x7, 
                                        filter_size=1, 
                                        stride=1,
-                                       act="relu",
-                                       name="inception_c_branch7x7_1_"+name)
+                                       act="relu")
         self.branch7x7_2 = ConvBNLayer(num_channels=channels_7x7,
                                        num_filters=channels_7x7, 
                                        filter_size=(1, 7), 
                                        stride=1,
                                        padding=(0, 3),
-                                       act="relu",
-                                       name="inception_c_branch7x7_2_"+name)
+                                       act="relu")
         self.branch7x7_3 = ConvBNLayer(num_channels=channels_7x7,
                                        num_filters=192, 
                                        filter_size=(7, 1), 
                                        stride=1,
                                        padding=(3, 0),
-                                       act="relu",
-                                       name="inception_c_branch7x7_3_"+name)
+                                       act="relu")
         
         self.branch7x7dbl_1 = ConvBNLayer(num_channels=num_channels, 
                                        num_filters=channels_7x7, 
                                        filter_size=1, 
-                                       act="relu",
-                                       name="inception_c_branch7x7dbl_1_"+name)
+                                       act="relu")
         self.branch7x7dbl_2 = ConvBNLayer(num_channels=channels_7x7,  
                                        num_filters=channels_7x7, 
                                        filter_size=(7, 1), 
                                        padding = (3, 0),
-                                       act="relu",
-                                       name="inception_c_branch7x7dbl_2_"+name)
+                                       act="relu")
         self.branch7x7dbl_3 = ConvBNLayer(num_channels=channels_7x7, 
                                        num_filters=channels_7x7, 
                                        filter_size=(1, 7), 
                                        padding = (0, 3),
-                                       act="relu",
-                                       name="inception_c_branch7x7dbl_3_"+name)
+                                       act="relu")
         self.branch7x7dbl_4 = ConvBNLayer(num_channels=channels_7x7,  
                                        num_filters=channels_7x7, 
                                        filter_size=(7, 1), 
                                        padding = (3, 0),
-                                       act="relu",
-                                       name="inception_c_branch7x7dbl_4_"+name)
+                                       act="relu")
         self.branch7x7dbl_5 = ConvBNLayer(num_channels=channels_7x7, 
                                        num_filters=192, 
                                        filter_size=(1, 7), 
                                        padding = (0, 3),
-                                       act="relu",
-                                       name="inception_c_branch7x7dbl_5_"+name)
+                                       act="relu")
        
         self.branch_pool = AvgPool2D(kernel_size=3, stride=1, padding=1, exclusive=False)
         self.branch_pool_conv = ConvBNLayer(num_channels=num_channels,
                                        num_filters=192, 
                                        filter_size=1, 
-                                       act="relu",
-                                       name="inception_c_branch_pool_"+name)
+                                       act="relu")
         
     def forward(self, x):
         branch1x1 = self.branch1x1(x)
@@ -310,42 +278,36 @@ class InceptionC(TheseusLayer):
         return outputs
     
 class InceptionD(TheseusLayer):
-    def __init__(self, num_channels, name=None):
+    def __init__(self, num_channels):
         super(InceptionD, self).__init__()
         self.branch3x3_1 = ConvBNLayer(num_channels=num_channels, 
                                        num_filters=192, 
                                        filter_size=1, 
-                                       act="relu",
-                                       name="inception_d_branch3x3_1_"+name)
+                                       act="relu")
         self.branch3x3_2 = ConvBNLayer(num_channels=192, 
                                        num_filters=320, 
                                        filter_size=3, 
                                        stride=2,
-                                       act="relu",
-                                       name="inception_d_branch3x3_2_"+name)
+                                       act="relu")
         self.branch7x7x3_1 = ConvBNLayer(num_channels=num_channels, 
                                        num_filters=192, 
                                        filter_size=1, 
-                                       act="relu",
-                                       name="inception_d_branch7x7x3_1_"+name)
+                                       act="relu")
         self.branch7x7x3_2 = ConvBNLayer(num_channels=192,
                                        num_filters=192, 
                                        filter_size=(1, 7), 
                                        padding=(0, 3),
-                                       act="relu",
-                                       name="inception_d_branch7x7x3_2_"+name)
+                                       act="relu")
         self.branch7x7x3_3 = ConvBNLayer(num_channels=192, 
                                        num_filters=192, 
                                        filter_size=(7, 1), 
                                        padding=(3, 0),
-                                       act="relu",
-                                       name="inception_d_branch7x7x3_3_"+name)
+                                       act="relu")
         self.branch7x7x3_4 = ConvBNLayer(num_channels=192,  
                                        num_filters=192, 
                                        filter_size=3, 
                                        stride=2,
-                                       act="relu",
-                                       name="inception_d_branch7x7x3_4_"+name)
+                                       act="relu")
         self.branch_pool = MaxPool2D(kernel_size=3, stride=2)
 
     def forward(self, x):
@@ -363,60 +325,51 @@ class InceptionD(TheseusLayer):
         return outputs
     
 class InceptionE(TheseusLayer):
-    def __init__(self, num_channels, name=None):
+    def __init__(self, num_channels):
         super(InceptionE, self).__init__()
         self.branch1x1 = ConvBNLayer(num_channels=num_channels,
                                        num_filters=320, 
                                        filter_size=1, 
-                                       act="relu",
-                                       name="inception_e_branch1x1_"+name)
+                                       act="relu")
         self.branch3x3_1 = ConvBNLayer(num_channels=num_channels,
                                        num_filters=384, 
                                        filter_size=1, 
-                                       act="relu",
-                                       name="inception_e_branch3x3_1_"+name)
+                                       act="relu")
         self.branch3x3_2a = ConvBNLayer(num_channels=384, 
                                        num_filters=384, 
                                        filter_size=(1, 3), 
                                        padding=(0, 1),
-                                       act="relu",
-                                       name="inception_e_branch3x3_2a_"+name)
+                                       act="relu")
         self.branch3x3_2b = ConvBNLayer(num_channels=384, 
                                        num_filters=384, 
                                        filter_size=(3, 1), 
                                        padding=(1, 0),
-                                       act="relu",
-                                       name="inception_e_branch3x3_2b_"+name)
+                                       act="relu")
         
         self.branch3x3dbl_1 = ConvBNLayer(num_channels=num_channels, 
                                        num_filters=448, 
                                        filter_size=1, 
-                                       act="relu",
-                                       name="inception_e_branch3x3dbl_1_"+name)
+                                       act="relu")
         self.branch3x3dbl_2 = ConvBNLayer(num_channels=448, 
                                        num_filters=384, 
                                        filter_size=3, 
                                        padding=1,
-                                       act="relu",
-                                       name="inception_e_branch3x3dbl_2_"+name)
+                                       act="relu")
         self.branch3x3dbl_3a = ConvBNLayer(num_channels=384,
                                        num_filters=384, 
                                        filter_size=(1, 3), 
                                        padding=(0, 1),
-                                       act="relu",
-                                       name="inception_e_branch3x3dbl_3a_"+name)
+                                       act="relu")
         self.branch3x3dbl_3b = ConvBNLayer(num_channels=384,
                                        num_filters=384, 
                                        filter_size=(3, 1), 
                                        padding=(1, 0),
-                                       act="relu",
-                                       name="inception_e_branch3x3dbl_3b_"+name)
+                                       act="relu")
         self.branch_pool = AvgPool2D(kernel_size=3, stride=1, padding=1, exclusive=False)
         self.branch_pool_conv = ConvBNLayer(num_channels=num_channels, 
                                        num_filters=192, 
                                        filter_size=1, 
-                                       act="relu",
-                                       name="inception_e_branch_pool_"+name)
+                                       act="relu")
     def forward(self, x):
         branch1x1 = self.branch1x1(x)
 
@@ -454,29 +407,27 @@ class Inception_V3(TheseusLayer):
         
         self.inception_stem = InceptionStem()
 
-        self.inception_block_list = []
+        self.inception_block_list = nn.LayerList()
         for i in range(len(self.inception_a_list[0])):
             inception_a = InceptionA(self.inception_a_list[0][i], 
-                                     self.inception_a_list[1][i], 
-                                     name=str(i+1))
+                                     self.inception_a_list[1][i])
             self.inception_block_list.append(inception_a)
 
         for i in range(len(self.inception_b_list)):
-            inception_b = InceptionB(self.inception_b_list[i], name=str(i+1))
+            inception_b = InceptionB(self.inception_b_list[i])
             self.inception_block_list.append(inception_b)
 
         for i in range(len(self.inception_c_list[0])):
             inception_c = InceptionC(self.inception_c_list[0][i], 
-                                     self.inception_c_list[1][i], 
-                                     name=str(i+1))
+                                     self.inception_c_list[1][i])
             self.inception_block_list.append(inception_c)
 
         for i in range(len(self.inception_d_list)):
-            inception_d = InceptionD(self.inception_d_list[i], name=str(i+1))
+            inception_d = InceptionD(self.inception_d_list[i])
             self.inception_block_list.append(inception_d)
 
         for i in range(len(self.inception_e_list)):
-            inception_e = InceptionE(self.inception_e_list[i], name=str(i+1))
+            inception_e = InceptionE(self.inception_e_list[i])
             self.inception_block_list.append(inception_e)
  
         self.gap = AdaptiveAvgPool2D(1)
@@ -486,8 +437,8 @@ class Inception_V3(TheseusLayer):
             2048,
             class_num,
             weight_attr=ParamAttr(
-                initializer=Uniform(-stdv, stdv), name="fc_weights"),
-            bias_attr=ParamAttr(name="fc_offset"))
+                initializer=Uniform(-stdv, stdv)),
+            bias_attr=ParamAttr())
 
     def forward(self, x):
         y = self.inception_stem(x)
