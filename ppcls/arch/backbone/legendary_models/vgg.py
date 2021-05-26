@@ -21,6 +21,8 @@ import paddle.nn.functional as F
 from paddle.nn import Conv2D, BatchNorm, Linear, Dropout
 from paddle.nn import AdaptiveAvgPool2D, MaxPool2D, AvgPool2D
 
+from ppcls.arch.backbone.base.theseus_layer import TheseusLayer
+
 __all__ = ["VGG11", "VGG13", "VGG16", "VGG19"]
 
 # VGG config
@@ -90,7 +92,7 @@ def VGG19(**args):
     return model
 
 
-class ConvBlock(nn.Layer):
+class ConvBlock(TheseusLayer):
     def __init__(self, input_channels, output_channels, groups):
         super(ConvBlock, self).__init__()
 
@@ -145,7 +147,7 @@ class ConvBlock(nn.Layer):
         return x
 
 
-class VGGNet(nn.Layer):
+class VGGNet(TheseusLayer):
     def __init__(self, config, stop_grad_layers=0, class_num=1000):
         super().__init__()
 
