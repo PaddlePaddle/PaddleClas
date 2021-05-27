@@ -183,7 +183,7 @@ class Trainer(object):
                         self.model,
                         optimizer,
                         self.output_dir,
-                        epoch_id=epoch_id,
+                        model_name=self.config["Arch"]["name"],
                         prefix="best_model")
 
             # save model
@@ -192,7 +192,7 @@ class Trainer(object):
                     self.model,
                     optimizer,
                     self.output_dir,
-                    epoch_id=epoch_id,
+                    model_name=self.config["Arch"]["name"],
                     prefix="ppcls_epoch_{}".format(epoch_id))
 
     def build_avg_metrics(self, info_dict):
