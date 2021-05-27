@@ -358,12 +358,19 @@ class LastClsOut(TheseusLayer):
 
 
 class HRNet(TheseusLayer):
-    def __init__(self, width=18, has_se=False, class_dim=1000):
+    '''
+    HRNet
+    Args:
+        width: int=18. Base channel number of HRNet.
+        has_se: bool=False. If 'True', add se module to HRNet.
+        class_num: int=1000. Output num of last fc layer.
+    '''
+    def __init__(self, width=18, has_se=False, class_num=1000):
         super(HRNet, self).__init__()
 
         self.width = width
         self.has_se = has_se
-        self._class_dim = class_dim
+        self._class_num = class_num
 
         channels_2 = [self.width, self.width * 2]
         channels_3 = [self.width, self.width * 2, self.width * 4]
@@ -461,7 +468,7 @@ class HRNet(TheseusLayer):
 
         self.out = nn.Linear(
             2048,
-            class_dim,
+            class_num,
             weight_attr=ParamAttr(
                 initializer=Uniform(-stdv, stdv)))
 
