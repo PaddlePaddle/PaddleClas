@@ -12,4 +12,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from .reader import Reader
+import copy
+import paddle
+import os
+from paddle.io import DistributedBatchSampler, BatchSampler, DataLoader
+
+from ppcls.utils import logger
+
+
+# TODO: fix the format
+def build_dataloader(config, mode, device, seed=None):
+    from . import reader
+    from .reader import Reader
+    dataloader = Reader(config, mode=mode, places=device)()
+    return dataloader
