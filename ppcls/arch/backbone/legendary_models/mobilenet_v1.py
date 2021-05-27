@@ -18,7 +18,7 @@ import numpy as np
 import paddle
 from paddle import ParamAttr
 import paddle.nn as nn
-from paddle.nn import Conv2D, BatchNorm, Linear, Dropout, ReLU
+from paddle.nn import Conv2D, BatchNorm, Linear, Dropout, ReLU, Flatten
 from paddle.nn import AdaptiveAvgPool2D, MaxPool2D, AvgPool2D
 from paddle.nn.initializer import KaimingNormal
 import math
@@ -131,17 +131,20 @@ class MobileNet(TheseusLayer):
                             scale=scale) for params in self.cfg])
 
         self.pool2d_avg = AdaptiveAvgPool2D(1)
+        self.flatten    = Flatten(start_axis=1, stop_axis=-1)
 
         self.out = Linear(
             int(1024 * scale),
             class_dim,
             weight_attr=ParamAttr(initializer=KaimingNormal()))
+        
+        
 
     def forward(self, x):
         x = self.conv1(x)
         x = self.blocks(x)
         x = self.pool2d_avg(x)
-        x = paddle.flatten(x, start_axis=1, stop_axis=-1)
+        x = self.flatten(x)
         x = self.out(x)
         return x
 
