@@ -26,22 +26,21 @@ from paddle.nn.initializer import Uniform
 import math
 
 from ppcls.arch.backbone.base.theseus_layer import TheseusLayer
+from ppcls.utils.save_load import load_dygraph_pretrain
 
 __all__ = ["InceptionV3"]
 
 
+# InceptionV3 config
+# key: inception blocks 
+# value: conv num in different blocks
 NET_CONFIG = {
-    'inception_a':[[192, 256, 288], [32, 64, 64]],
+    'inception_a':[[192, 256, 288], [32, 64, 64]], 
     'inception_b':[288],   
     'inception_c':[[768, 768, 768, 768], [128, 160, 160, 192]],
     'inception_d':[768],   
     'inception_e':[1280,2048]
 }
-
-
-def InceptionV3(**kwargs):
-    model = Inception_V3(NET_CONFIG, **kwargs)
-    return model
 
 
 class ConvBNLayer(TheseusLayer):
@@ -158,7 +157,6 @@ class InceptionA(TheseusLayer):
         branch3x3dbl = self.branch3x3dbl_3(branch3x3dbl)
 
         branch_pool = self.branch_pool(x)
-
         branch_pool = self.branch_pool_conv(branch_pool)
         outputs = paddle.concat([branch1x1, branch5x5, branch3x3dbl, branch_pool], axis=1)
         return outputs
@@ -208,6 +206,8 @@ class InceptionC(TheseusLayer):
                                        num_filters=192, 
                                        filter_size=1, 
                                        act="relu")
+
+
         self.branch7x7_1 = ConvBNLayer(num_channels=num_channels, 
                                        num_filters=channels_7x7, 
                                        filter_size=1, 
@@ -396,7 +396,12 @@ class InceptionE(TheseusLayer):
 
 
 class Inception_V3(TheseusLayer):
-    def __init__(self, config, class_num=1000, **kwargs):
+
+    def __init__(self, 
+                 config, 
+                 class_num=1000, 
+                 pretrained=False,
+                 **kwargs):
         super(Inception_V3, self).__init__()
 
         self.inception_a_list = config['inception_a']
@@ -440,6 +445,9 @@ class Inception_V3(TheseusLayer):
                 initializer=Uniform(-stdv, stdv)),
             bias_attr=ParamAttr())
 
+        if pretrained is not None:
+            load_dygraph_pretrain(self, pretrained)
+
     def forward(self, x):
         y = self.inception_stem(x)
         for inception_block in self.inception_block_list:
@@ -450,4 +458,19 @@ class Inception_V3(TheseusLayer):
         y = self.out(y)
         return y
 
+
+
+
+def InceptionV3(**kwargs):
+    """
+    InceptionV3
+    Args:
+        kwargs: 
+            class_num: int=1000. Output dim of last fc layer.
+            pretrained: 
+    Returns:
+        model: nn.Layer. Specific `InceptionV3` model 
+    """
+    model = Inception_V3(NET_CONFIG, **kwargs)
+    return model
 
