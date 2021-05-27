@@ -256,8 +256,8 @@ class Reader:
 
         use_mix = config.get('use_mix')
         self.params['mode'] = mode
-        self.shuffle = mode.capitalize() == "Train"
-        self.is_train = mode.capitalize() == "Train"
+        self.shuffle = mode == "train"
+        self.is_train = mode == "train"
 
         self.collate_fn = None
         self.batch_ops = []

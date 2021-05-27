@@ -24,5 +24,5 @@ from ppcls.utils import logger
 def build_dataloader(config, mode, device, seed=None):
     from . import reader
     from .reader import Reader
-    dataloader = Reader(config, mode=mode.capitalize(), places=device)()
+    dataloader = Reader(config, mode=mode, places=device)()
     return dataloader
