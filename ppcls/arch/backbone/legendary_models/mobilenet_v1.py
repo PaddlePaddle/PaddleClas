@@ -18,7 +18,7 @@ import numpy as np
 import paddle
 from paddle import ParamAttr
 import paddle.nn as nn
-from paddle.nn import Conv2D, BatchNorm, Linear, Dropout
+from paddle.nn import Conv2D, BatchNorm, Linear, Dropout, ReLU
 from paddle.nn import AdaptiveAvgPool2D, MaxPool2D, AvgPool2D
 from paddle.nn.initializer import KaimingNormal
 import math
@@ -29,8 +29,7 @@ from ppcls.arch.backbone.base.theseus_layer import TheseusLayer
 __all__ = [
     "MobileNetV1_x0_25", "MobileNetV1_x0_5", "MobileNetV1_x0_75", "MobileNetV1"
 ]
-
-
+    
 class ConvBNLayer(TheseusLayer):
     def __init__(self,
                  num_channels,
@@ -38,9 +37,7 @@ class ConvBNLayer(TheseusLayer):
                  num_filters,
                  stride,
                  padding,
-                 channels=None,
-                 num_groups=1,
-                 act='relu'):
+                 num_groups=1):
         super(ConvBNLayer, self).__init__()
 
         self._conv = Conv2D(
@@ -55,12 +52,14 @@ class ConvBNLayer(TheseusLayer):
             bias_attr=False)
 
         self._batch_norm = BatchNorm(
-            num_filters,
-            act=act)
+            num_filters)
+        
+        self._activation = ReLU()
 
     def forward(self, x):
         x = self._conv(x)
         x = self._batch_norm(x)
+        x = self._activation(x)
         return x
 
 
@@ -104,110 +103,32 @@ class MobileNet(TheseusLayer):
         self.conv1 = ConvBNLayer(
             num_channels=3,
             filter_size=3,
-            channels=3,
             num_filters=int(32 * scale),
             stride=2,
             padding=1)
-
-        conv2_1 = self.add_sublayer(
-            "conv2_1",
-            sublayer=DepthwiseSeparable(
-                num_channels=int(32 * scale),
-                num_filters1=32,
-                num_filters2=64,
-                num_groups=32,
-                stride=1,
-                scale=scale))
-        self.block_list.append(conv2_1)
-
-        conv2_2 = self.add_sublayer(
-            "conv2_2",
-            sublayer=DepthwiseSeparable(
-                num_channels=int(64 * scale),
-                num_filters1=64,
-                num_filters2=128,
-                num_groups=64,
-                stride=2,
-                scale=scale))
-        self.block_list.append(conv2_2)
-
-        conv3_1 = self.add_sublayer(
-            "conv3_1",
-            sublayer=DepthwiseSeparable(
-                num_channels=int(128 * scale),
-                num_filters1=128,
-                num_filters2=128,
-                num_groups=128,
-                stride=1,
-                scale=scale))
-        self.block_list.append(conv3_1)
-
-        conv3_2 = self.add_sublayer(
-            "conv3_2",
-            sublayer=DepthwiseSeparable(
-                num_channels=int(128 * scale),
-                num_filters1=128,
-                num_filters2=256,
-                num_groups=128,
-                stride=2,
-                scale=scale))
-        self.block_list.append(conv3_2)
-
-        conv4_1 = self.add_sublayer(
-            "conv4_1",
-            sublayer=DepthwiseSeparable(
-                num_channels=int(256 * scale),
-                num_filters1=256,
-                num_filters2=256,
-                num_groups=256,
-                stride=1,
-                scale=scale))
-        self.block_list.append(conv4_1)
-
-        conv4_2 = self.add_sublayer(
-            "conv4_2",
-            sublayer=DepthwiseSeparable(
-                num_channels=int(256 * scale),
-                num_filters1=256,
-                num_filters2=512,
-                num_groups=256,
-                stride=2,
-                scale=scale))
-        self.block_list.append(conv4_2)
-
-        for i in range(5):
-            conv5 = self.add_sublayer(
-                "conv5_" + str(i + 1),
-                sublayer=DepthwiseSeparable(
-                    num_channels=int(512 * scale),
-                    num_filters1=512,
-                    num_filters2=512,
-                    num_groups=512,
-                    stride=1,
-                    scale=scale))
-            self.block_list.append(conv5)
-
-        conv5_6 = self.add_sublayer(
-            "conv5_6",
-            sublayer=DepthwiseSeparable(
-                num_channels=int(512 * scale),
-                num_filters1=512,
-                num_filters2=1024,
-                num_groups=512,
-                stride=2,
-                scale=scale))
-        self.block_list.append(conv5_6)
-
-        conv6 = self.add_sublayer(
-            "conv6",
-            sublayer=DepthwiseSeparable(
-                num_channels=int(1024 * scale),
-                num_filters1=1024,
-                num_filters2=1024,
-                num_groups=1024,
-                stride=1,
-                scale=scale))
-        self.block_list.append(conv6)
+        
+        self.cfg =   [[int(32 * scale),   32,   64,   32,   1],
+                      [int(64 * scale),   64,   128,  64,   2],
+                      [int(128 * scale),  128,  128,  128,  1],
+                      [int(128 * scale),  128,  256,  128,  2],
+                      [int(256 * scale),  256,  256,  256,  1],
+                      [int(256 * scale),  256,  512,  256,  2],
+                      [int(512 * scale),  512,  512,  512,  1],
+                      [int(512 * scale),  512,  512,  512,  1],
+                      [int(512 * scale),  512,  512,  512,  1],
+                      [int(512 * scale),  512,  512,  512,  1],
+                      [int(512 * scale),  512,  512,  512,  1],
+                      [int(512 * scale),  512,  1024, 512,  2],
+                      [int(1024 * scale), 1024, 1024, 1024, 1]]
+        
+        self.blocks = nn.Sequential(*[
+                    DepthwiseSeparable(
+                            num_channels=params[0],
+                            num_filters1=params[1],
+                            num_filters2=params[2],
+                            num_groups=params[3],
+                            stride=params[4],
+                            scale=scale) for params in self.cfg])
 
         self.pool2d_avg = AdaptiveAvgPool2D(1)
 
@@ -218,8 +139,7 @@ class MobileNet(TheseusLayer):
 
     def forward(self, x):
         x = self.conv1(x)
-        for block in self.block_list:
-            x = block(x)
+        x = self.blocks(x)
         x = self.pool2d_avg(x)
         x = paddle.flatten(x, start_axis=1, stop_axis=-1)
         x = self.out(x)
@@ -244,3 +164,5 @@ def MobileNetV1_x0_75(**args):
 def MobileNetV1(**args):
     model = MobileNet(scale=1.0, **args)
     return model
+
+
