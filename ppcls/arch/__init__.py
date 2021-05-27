@@ -12,8 +12,8 @@
 #See the License for the specific language governing permissions and
 #limitations under the License.
 
-import sys
 import copy
+import importlib
 
 import paddle.nn as nn
 
@@ -27,7 +27,7 @@ from .utils import *
 def build_model(config):
     config = copy.deepcopy(config)
     model_type = config.pop("name")
-    mod = sys.modules[__name__]
+    mod = importlib.import_module(__name__)
     arch = getattr(mod, model_type)(**config)
     return arch
 
@@ -38,6 +38,9 @@ class RecModel(nn.Layer):
         backbone_config = config["Backbone"]
         backbone_name = backbone_config.pop("name")
         self.backbone = getattr(backbone_name)(**backbone_config)
+        if "backbone_stop_layer" in config:
+            backbone_stop_layer = config["backbone_stop_layer"]
+            self.backbone.stop_layer(backbone_stop_layer)
 
         if "Neck" in config:
             neck_config = config["Neck"]
