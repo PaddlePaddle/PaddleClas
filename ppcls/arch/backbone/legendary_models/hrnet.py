@@ -358,13 +358,13 @@ class LastClsOut(TheseusLayer):
 
 
 class HRNet(TheseusLayer):
-    '''
+    """
     HRNet
     Args:
         width: int=18. Base channel number of HRNet.
         has_se: bool=False. If 'True', add se module to HRNet.
         class_num: int=1000. Output num of last fc layer.
-    '''
+    """
     def __init__(self, width=18, has_se=False, class_num=1000):
         super(HRNet, self).__init__()
 
