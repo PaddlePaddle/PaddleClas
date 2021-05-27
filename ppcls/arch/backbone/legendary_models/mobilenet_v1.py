@@ -12,9 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
+from __future__ import absolute_import, division, print_function
 
 import numpy as np
 import paddle
@@ -65,10 +63,10 @@ class ConvBNLayer(TheseusLayer):
             moving_mean_name=name + "_bn_mean",
             moving_variance_name=name + "_bn_variance")
 
-    def forward(self, inputs):
-        y = self._conv(inputs)
-        y = self._batch_norm(y)
-        return y
+    def forward(self, x):
+        x = self._conv(x)
+        x = self._batch_norm(x)
+        return x
 
 
 class DepthwiseSeparable(TheseusLayer):
@@ -99,10 +97,10 @@ class DepthwiseSeparable(TheseusLayer):
             padding=0,
             name=name + "_sep")
 
-    def forward(self, inputs):
-        y = self._depthwise_conv(inputs)
-        y = self._pointwise_conv(y)
-        return y
+    def forward(self, x):
+        x = self._depthwise_conv(x)
+        x = self._pointwise_conv(x)
+        return x
 
 
 class MobileNet(TheseusLayer):
@@ -238,14 +236,14 @@ class MobileNet(TheseusLayer):
                 initializer=KaimingNormal(), name="fc7_weights"),
             bias_attr=ParamAttr(name="fc7_offset"))
 
-    def forward(self, inputs):
-        y = self.conv1(inputs)
+    def forward(self, x):
+        x = self.conv1(x)
         for block in self.block_list:
-            y = block(y)
-        y = self.pool2d_avg(y)
-        y = paddle.flatten(y, start_axis=1, stop_axis=-1)
-        y = self.out(y)
-        return y
+            x = block(x)
+        x = self.pool2d_avg(x)
+        x = paddle.flatten(x, start_axis=1, stop_axis=-1)
+        x = self.out(x)
+        return x
 
 
 def MobileNetV1_x0_25(**args):
