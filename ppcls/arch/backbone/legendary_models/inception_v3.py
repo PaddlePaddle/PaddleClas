@@ -467,7 +467,7 @@ def InceptionV3(**kwargs):
     Args:
         kwargs: 
             class_num: int=1000. Output dim of last fc layer.
-            pretrained: 
+            pretrained: str, pretrained model file
     Returns:
         model: nn.Layer. Specific `InceptionV3` model 
     """
