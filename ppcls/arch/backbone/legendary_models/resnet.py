@@ -365,7 +365,7 @@ def ResNet34(**args):
             lr_mult_list: list=[1.0, 1.0, 1.0, 1.0, 1.0]. Control the learning rate of different stages.
             pretrained: bool or str, default: bool=False. Whether to load the pretrained model.
     Returns:
-        model: nn.Layer. Specific `ResNet18` model depends on args.
+        model: nn.Layer. Specific `ResNet34` model depends on args.
     """
     model = ResNet(config=NET_CONFIG["34"], version="vb", **args)
     if isinstance(model.pretrained, bool):
@@ -388,7 +388,7 @@ def ResNet34_vd(**args):
             lr_mult_list: list=[1.0, 1.0, 1.0, 1.0, 1.0]. Control the learning rate of different stages.
             pretrained: bool or str, default: bool=False. Whether to load the pretrained model.
     Returns:
-        model: nn.Layer. Specific `ResNet18_vd` model depends on args.
+        model: nn.Layer. Specific `ResNet34_vd` model depends on args.
     """
     model = ResNet(config=NET_CONFIG["34"], version="vd", **args)
     if isinstance(model.pretrained, bool):
