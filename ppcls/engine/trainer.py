@@ -267,12 +267,3 @@ class Trainer(object):
             return -1
         # return 1st metric in the dict
         return output_info[metric_key].avg
-
-
-def main():
-    trainer = Trainer()
-    trainer.train()
-
-
-if __name__ == "__main__":
-    main()
