@@ -294,7 +294,7 @@ class ResNet(TheseusLayer):
         self.avg_pool_channels = self.num_channels[-1] * 2
 
         stdv = 1.0 / math.sqrt(self.avg_pool_channels * 1.0)
-        self.out = Linear(
+        self.fc = Linear(
             self.avg_pool_channels,
             self.class_num,
             weight_attr=ParamAttr(
@@ -306,7 +306,7 @@ class ResNet(TheseusLayer):
         x = self.blocks(x)
         x = self.avg_pool(x)
         x = paddle.reshape(x, shape=[-1, self.avg_pool_channels])
-        x = self.out(x)
+        x = self.fc(x)
         return x
 
 
