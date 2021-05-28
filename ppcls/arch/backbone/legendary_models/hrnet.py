@@ -17,7 +17,6 @@ from __future__ import division
 from __future__ import print_function
 
 import math
-import numpy as np
 import paddle
 from paddle import ParamAttr
 import paddle.nn as nn
@@ -25,7 +24,7 @@ import paddle.nn.functional as F
 from paddle.nn import AdaptiveAvgPool2D, MaxPool2D, AvgPool2D
 from paddle.nn.initializer import Uniform
 
-from ppcls.arch.backbone.base.theseus_layer import TheseusLayer
+from ppcls.arch.backbone.base.theseus_layer import TheseusLayer, Identity
 
 __all__ = [
     "HRNet_W18_C",
@@ -57,7 +56,7 @@ class ConvBNLayer(TheseusLayer):
                  act="relu"):
         super(ConvBNLayer, self).__init__()
 
-        self._conv = nn.Conv2D(
+        self.conv = nn.Conv2D(
             in_channels=num_channels,
             out_channels=num_filters,
             kernel_size=filter_size,
@@ -65,14 +64,28 @@ class ConvBNLayer(TheseusLayer):
             padding=(filter_size - 1) // 2,
             groups=groups,
             bias_attr=False)
-        self._batch_norm = nn.BatchNorm(
+        self.bn = nn.BatchNorm(
             num_filters,
-            act=act)
+            act=None)
+        self.act = create_act(act)
 
-    def forward(self, x, res_dict=None):
-        y = self._conv(x)
-        y = self._batch_norm(y)
-        return y
+    def forward(self, x):
+        x = self.conv(x)
+        x = self.bn(x)
+        x = self.act(x)
+        return x
+
+
+def create_act(act):
+    if act == 'hardswish':
+        return nn.Hardswish()
+    elif act == 'relu':
+        return nn.ReLU()
+    elif act is None:
+        return Identity()
+    else:
+        raise RuntimeError(
+            'The activation function is not supported: {}'.format(act))
 
 
 class BottleneckBlock(TheseusLayer):
@@ -116,22 +129,20 @@ class BottleneckBlock(TheseusLayer):
                 num_channels=num_filters * 4,
                 num_filters=num_filters * 4,
                 reduction_ratio=16)
+        self.relu = nn.ReLU()
 
     def forward(self, x, res_dict=None):
         residual = x
-        conv1 = self.conv1(x)
-        conv2 = self.conv2(conv1)
-        conv3 = self.conv3(conv2)
-
+        x = self.conv1(x)
+        x = self.conv2(x)
+        x = self.conv3(x)
         if self.downsample:
-            residual = self.conv_down(x)
-
+            residual = self.conv_down(residual)
         if self.has_se:
-            conv3 = self.se(conv3)
-
-        y = paddle.add(x=residual, y=conv3)
-        y = F.relu(y)
-        return y
+            x = self.se(x)
+        x = paddle.add(x=residual, y=x)
+        x = self.relu(x)
+        return x
 
 
 class BasicBlock(nn.Layer):
@@ -161,18 +172,19 @@ class BasicBlock(nn.Layer):
                 num_channels=num_filters,
                 num_filters=num_filters,
                 reduction_ratio=16)
+        self.relu = nn.ReLU()
 
-    def forward(self, input):
-        residual = input
-        conv1 = self.conv1(input)
-        conv2 = self.conv2(conv1)
+    def forward(self, x):
+        residual = x
+        x = self.conv1(x)
+        x = self.conv2(x)
 
         if self.has_se:
-            conv2 = self.se(conv2)
+            x = self.se(x)
 
-        y = paddle.add(x=residual, y=conv2)
-        y = F.relu(y)
-        return y
+        x = paddle.add(x=residual, y=x)
+        x = self.relu(x)
+        return x
 
 
 class SELayer(TheseusLayer):
@@ -185,29 +197,31 @@ class SELayer(TheseusLayer):
 
         med_ch = int(num_channels / reduction_ratio)
         stdv = 1.0 / math.sqrt(num_channels * 1.0)
-        self.squeeze = nn.Linear(
+        self.fc_squeeze = nn.Linear(
             num_channels,
             med_ch,
             weight_attr=ParamAttr(
                 initializer=Uniform(-stdv, stdv)))
-
+        self.relu = nn.ReLU()
         stdv = 1.0 / math.sqrt(med_ch * 1.0)
-        self.excitation = nn.Linear(
+        self.fc_excitation = nn.Linear(
             med_ch,
             num_filters,
             weight_attr=ParamAttr(
                 initializer=Uniform(-stdv, stdv)))
+        self.sigmoid = nn.Sigmoid()
 
-    def forward(self, input, res_dict=None):
-        pool = self.pool2d_gap(input)
-        pool = paddle.squeeze(pool, axis=[2, 3])
-        squeeze = self.squeeze(pool)
-        squeeze = F.relu(squeeze)
-        excitation = self.excitation(squeeze)
-        excitation = F.sigmoid(excitation)
-        excitation = paddle.unsqueeze(excitation, axis=[2, 3])
-        out = input * excitation
-        return out
+    def forward(self, x, res_dict=None):
+        residual = x
+        x = self.pool2d_gap(x)
+        x = paddle.squeeze(x, axis=[2, 3])
+        x = self.fc_squeeze(x)
+        x = self.relu(x)
+        x = self.fc_excitation(x)
+        x = self.sigmoid(x)
+        x = paddle.unsqueeze(x, axis=[2, 3])
+        x = residual * x
+        return x
 
 
 class Stage(TheseusLayer):
@@ -226,11 +240,11 @@ class Stage(TheseusLayer):
                     num_filters=num_filters,
                     has_se=has_se))
 
-    def forward(self, input, res_dict=None):
-        out = input
+    def forward(self, x, res_dict=None):
+        x = x
         for idx in range(self._num_modules):
-            out = self.stage_func_list[idx](out)
-        return out
+            x = self.stage_func_list[idx](x)
+        return x
 
 
 class HighResolutionModule(TheseusLayer):
@@ -253,15 +267,14 @@ class HighResolutionModule(TheseusLayer):
             in_channels=num_filters,
             out_channels=num_filters)
 
-    def forward(self, input, res_dict=None):
-        outs = []
-        for idx, input in enumerate(input):
-            conv = input
+    def forward(self, x, res_dict=None):
+        out = []
+        for idx, xi in enumerate(x):
             basic_block_list = self.basic_block_list[idx]
             for basic_block_func in basic_block_list:
-                conv = basic_block_func(conv)
-            outs.append(conv)
-        out = self.fuse_func(outs)
+                xi = basic_block_func(xi)
+            out.append(xi)
+        out = self.fuse_func(out)
         return out
 
 
@@ -275,6 +288,7 @@ class FuseLayers(TheseusLayer):
         self._in_channels = in_channels
 
         self.residual_func_list = nn.LayerList()
+        self.relu = nn.ReLU()
         for i in range(len(in_channels)):
             for j in range(len(in_channels)):
                 if j > i:
@@ -307,30 +321,30 @@ class FuseLayers(TheseusLayer):
                                     act="relu"))
                             pre_num_filters = out_channels[j]
 
-    def forward(self, input, res_dict=None):
-        outs = []
+    def forward(self, x, res_dict=None):
+        out = []
         residual_func_idx = 0
         for i in range(len(self._in_channels)):
-            residual = input[i]
+            residual = x[i]
             for j in range(len(self._in_channels)):
                 if j > i:
-                    y = self.residual_func_list[residual_func_idx](input[j])
+                    xj = self.residual_func_list[residual_func_idx](x[j])
                     residual_func_idx += 1
 
-                    y = F.upsample(y, scale_factor=2**(j - i), mode="nearest")
-                    residual = paddle.add(x=residual, y=y)
+                    xj = F.upsample(xj, scale_factor=2**(j - i), mode="nearest")
+                    residual = paddle.add(x=residual, y=xj)
                 elif j < i:
-                    y = input[j]
+                    xj = x[j]
                     for k in range(i - j):
-                        y = self.residual_func_list[residual_func_idx](y)
+                        xj = self.residual_func_list[residual_func_idx](xj)
                         residual_func_idx += 1
 
-                    residual = paddle.add(x=residual, y=y)
+                    residual = paddle.add(x=residual, y=xj)
 
-            residual = F.relu(residual)
-            outs.append(residual)
+            residual = self.relu(residual)
+            out.append(residual)
 
-        return outs
+        return out
 
 
 class LastClsOut(TheseusLayer):
@@ -349,12 +363,12 @@ class LastClsOut(TheseusLayer):
                     has_se=has_se,
                     downsample=True))
 
-    def forward(self, inputs, res_dict=None):
-        outs = []
-        for idx, input in enumerate(inputs):
-            out = self.func_list[idx](input)
-            outs.append(out)
-        return outs
+    def forward(self, x, res_dict=None):
+        out = []
+        for idx, xi in enumerate(x):
+            xi = self.func_list[idx](xi)
+            out.append(xi)
+        return out
 
 
 class HRNet(TheseusLayer):
@@ -400,11 +414,11 @@ class HRNet(TheseusLayer):
             for i in range(4)
         ])
 
-        self.tr1_1 = ConvBNLayer(
+        self.conv_tr1_1 = ConvBNLayer(
             num_channels=256,
             num_filters=width,
             filter_size=3)
-        self.tr1_2 = ConvBNLayer(
+        self.conv_tr1_2 = ConvBNLayer(
             num_channels=256,
             num_filters=width * 2,
             filter_size=3,
@@ -416,7 +430,7 @@ class HRNet(TheseusLayer):
             num_filters=channels_2,
             has_se=self.has_se)
 
-        self.tr2 = ConvBNLayer(
+        self.conv_tr2 = ConvBNLayer(
             num_channels=width * 2,
             num_filters=width * 4,
             filter_size=3,
@@ -427,7 +441,7 @@ class HRNet(TheseusLayer):
             num_filters=channels_3,
             has_se=self.has_se)
 
-        self.tr3 = ConvBNLayer(
+        self.conv_tr3 = ConvBNLayer(
             num_channels=width * 4,
             num_filters=width * 8,
             filter_size=3,
@@ -462,44 +476,44 @@ class HRNet(TheseusLayer):
             filter_size=1,
             stride=1)
 
-        self.pool2d_avg = AdaptiveAvgPool2D(1)
+        self.avg_pool = AdaptiveAvgPool2D(1)
 
         stdv = 1.0 / math.sqrt(2048 * 1.0)
 
-        self.out = nn.Linear(
+        self.fc = nn.Linear(
             2048,
             class_num,
             weight_attr=ParamAttr(
                 initializer=Uniform(-stdv, stdv)))
 
-    def forward(self, input, res_dict=None):
-        conv1 = self.conv_layer1_1(input)
-        conv2 = self.conv_layer1_2(conv1)
+    def forward(self, x, res_dict=None):
+        x = self.conv_layer1_1(x)
+        x = self.conv_layer1_2(x)
 
-        la1 = self.layer1(conv2)
+        x = self.layer1(x)
 
-        tr1_1 = self.tr1_1(la1)
-        tr1_2 = self.tr1_2(la1)
-        st2 = self.st2([tr1_1, tr1_2])
+        tr1_1 = self.conv_tr1_1(x)
+        tr1_2 = self.conv_tr1_2(x)
+        x = self.st2([tr1_1, tr1_2])
 
-        tr2 = self.tr2(st2[-1])
-        st2.append(tr2)
-        st3 = self.st3(st2)
+        tr2 = self.conv_tr2(x[-1])
+        x.append(tr2)
+        x = self.st3(x)
 
-        tr3 = self.tr3(st3[-1])
-        st3.append(tr3)
-        st4 = self.st4(st3)
+        tr3 = self.conv_tr3(x[-1])
+        x.append(tr3)
+        x = self.st4(x)
 
-        last_cls = self.last_cls(st4)
+        x = self.last_cls(x)
 
-        y = last_cls[0]
+        y = x[0]
         for idx in range(3):
-            y = paddle.add(last_cls[idx + 1], self.cls_head_conv_list[idx](y))
+            y = paddle.add(x[idx + 1], self.cls_head_conv_list[idx](y))
 
         y = self.conv_last(y)
-        y = self.pool2d_avg(y)
+        y = self.avg_pool(y)
         y = paddle.reshape(y, shape=[-1, y.shape[1]])
-        y = self.out(y)
+        y = self.fc(y)
         return y
 
 
