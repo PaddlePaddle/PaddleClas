@@ -24,10 +24,18 @@ from paddle.nn.initializer import KaimingNormal
 import math
 
 from ppcls.arch.backbone.base.theseus_layer import TheseusLayer
+from ppcls.utils.save_load import load_dygraph_pretrain_from, load_dygraph_pretrain_from_url
 
-__all__ = [
-    "MobileNetV1_x0_25", "MobileNetV1_x0_5", "MobileNetV1_x0_75", "MobileNetV1"
-]
+
+MODEL_URLS = {
+    "MobileNetV1_x0_25": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/MobileNetV1_x0_25_pretrained.pdparams",
+    "MobileNetV1_x0_5": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/MobileNetV1_x0_5_vd_pretrained.pdparams",
+    "MobileNetV1_x0_75": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/MobileNetV1_x0_75_pretrained.pdparams",
+    "MobileNetV1": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/MobileNetV1_pretrained.pdparams",
+}
+
+__all__ = MODEL_URLS.keys()
+    
     
 class ConvBNLayer(TheseusLayer):
     def __init__(self,
@@ -94,12 +102,13 @@ class DepthwiseSeparable(TheseusLayer):
 
 
 class MobileNet(TheseusLayer):
-    def __init__(self, scale=1.0, class_num=1000):
+    def __init__(self, scale=1.0, class_num=1000, pretrained=False):
         super(MobileNet, self).__init__()
         self.scale = scale
+        self.pretrained = pretrained
         self.block_list = []
 
-        self.conv1 = ConvBNLayer(
+        self.conv = ConvBNLayer(
             num_channels=3,
             filter_size=3,
             num_filters=int(32 * scale),
@@ -129,7 +138,7 @@ class MobileNet(TheseusLayer):
                             stride=params[4],
                             scale=scale) for params in self.cfg])
 
-        self.pool2d_avg = AdaptiveAvgPool2D(1)
+        self.avg_pool = AdaptiveAvgPool2D(1)
         self.flatten    = Flatten(start_axis=1, stop_axis=-1)
 
         self.out = Linear(
@@ -138,9 +147,9 @@ class MobileNet(TheseusLayer):
             weight_attr=ParamAttr(initializer=KaimingNormal()))
         
     def forward(self, x):
-        x = self.conv1(x)
+        x = self.conv(x)
         x = self.blocks(x)
-        x = self.pool2d_avg(x)
+        x = self.avg_pool(x)
         x = self.flatten(x)
         x = self.out(x)
         return x
@@ -157,6 +166,14 @@ def MobileNetV1_x0_25(**args):
             model: nn.Layer. Specific `MobileNetV1_x0_25` model depends on args.
     """
     model = MobileNet(scale=0.25, **args)
+    if isinstance(model.pretrained, bool):
+        if model.pretrained is True:
+            load_dygraph_pretrain_from_url(model, MODEL_URLS["MobileNetV1_x0_25"])
+    elif isinstance(model.pretrained, str):
+        load_dygraph_pretrain(model, model.pretrained)
+    else:
+        raise RuntimeError(
+            "pretrained type is not available. Please use `string` or `boolean` type")
     return model
 
 
@@ -171,6 +188,14 @@ def MobileNetV1_x0_5(**args):
             model: nn.Layer. Specific `MobileNetV1_x0_5` model depends on args.
     """
     model = MobileNet(scale=0.5, **args)
+    if isinstance(model.pretrained, bool):
+        if model.pretrained is True:
+            load_dygraph_pretrain_from_url(model, MODEL_URLS["MobileNetV1_x0_5"])
+    elif isinstance(model.pretrained, str):
+        load_dygraph_pretrain(model, model.pretrained)
+    else:
+        raise RuntimeError(
+            "pretrained type is not available. Please use `string` or `boolean` type")
     return model
 
 
@@ -185,6 +210,14 @@ def MobileNetV1_x0_75(**args):
             model: nn.Layer. Specific `MobileNetV1_x0_75` model depends on args.
     """
     model = MobileNet(scale=0.75, **args)
+    if isinstance(model.pretrained, bool):
+        if model.pretrained is True:
+            load_dygraph_pretrain_from_url(model, MODEL_URLS["MobileNetV1_x0_75"])
+    elif isinstance(model.pretrained, str):
+        load_dygraph_pretrain(model, model.pretrained)
+    else:
+        raise RuntimeError(
+            "pretrained type is not available. Please use `string` or `boolean` type")
     return model
 
 
@@ -199,6 +232,14 @@ def MobileNetV1(**args):
             model: nn.Layer. Specific `MobileNetV1` model depends on args.
     """
     model = MobileNet(scale=1.0, **args)
+    if isinstance(model.pretrained, bool):
+        if model.pretrained is True:
+            load_dygraph_pretrain_from_url(model, MODEL_URLS["MobileNetV1"])
+    elif isinstance(model.pretrained, str):
+        load_dygraph_pretrain(model, model.pretrained)
+    else:
+        raise RuntimeError(
+            "pretrained type is not available. Please use `string` or `boolean` type")
     return model
 
 
