@@ -25,7 +25,6 @@ import math
 
 from ppcls.arch.backbone.base.theseus_layer import TheseusLayer
 
-
 __all__ = [
     "MobileNetV1_x0_25", "MobileNetV1_x0_5", "MobileNetV1_x0_75", "MobileNetV1"
 ]
@@ -138,8 +137,6 @@ class MobileNet(TheseusLayer):
             class_num,
             weight_attr=ParamAttr(initializer=KaimingNormal()))
         
-        
-
     def forward(self, x):
         x = self.conv1(x)
         x = self.blocks(x)
