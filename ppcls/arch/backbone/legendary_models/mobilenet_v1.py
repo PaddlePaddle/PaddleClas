@@ -21,7 +21,6 @@ import paddle.nn as nn
 from paddle.nn import Conv2D, BatchNorm, Linear, Dropout, ReLU, Flatten
 from paddle.nn import AdaptiveAvgPool2D
 from paddle.nn.initializer import KaimingNormal
-import math
 
 from ppcls.arch.backbone.base.theseus_layer import TheseusLayer
 from ppcls.utils.save_load import load_dygraph_pretrain_from, load_dygraph_pretrain_from_url
@@ -106,7 +105,6 @@ class MobileNet(TheseusLayer):
         super(MobileNet, self).__init__()
         self.scale = scale
         self.pretrained = pretrained
-        self.block_list = []
 
         self.conv = ConvBNLayer(
             num_channels=3,
@@ -116,19 +114,19 @@ class MobileNet(TheseusLayer):
             padding=1)
         
         #num_channels, num_filters1, num_filters2, num_groups, stride
-        self.cfg =   [[int(32 * scale),   32,   64,   32,   1],
-                      [int(64 * scale),   64,   128,  64,   2],
-                      [int(128 * scale),  128,  128,  128,  1],
-                      [int(128 * scale),  128,  256,  128,  2],
-                      [int(256 * scale),  256,  256,  256,  1],
-                      [int(256 * scale),  256,  512,  256,  2],
-                      [int(512 * scale),  512,  512,  512,  1],
-                      [int(512 * scale),  512,  512,  512,  1],
-                      [int(512 * scale),  512,  512,  512,  1],
-                      [int(512 * scale),  512,  512,  512,  1],
-                      [int(512 * scale),  512,  512,  512,  1],
-                      [int(512 * scale),  512,  1024, 512,  2],
-                      [int(1024 * scale), 1024, 1024, 1024, 1]]
+        self.cfg = [[int(32 * scale),   32,   64,   32,   1],
+                    [int(64 * scale),   64,   128,  64,   2],
+                    [int(128 * scale),  128,  128,  128,  1],
+                    [int(128 * scale),  128,  256,  128,  2],
+                    [int(256 * scale),  256,  256,  256,  1],
+                    [int(256 * scale),  256,  512,  256,  2],
+                    [int(512 * scale),  512,  512,  512,  1],
+                    [int(512 * scale),  512,  512,  512,  1],
+                    [int(512 * scale),  512,  512,  512,  1],
+                    [int(512 * scale),  512,  512,  512,  1],
+                    [int(512 * scale),  512,  512,  512,  1],
+                    [int(512 * scale),  512,  1024, 512,  2],
+                    [int(1024 * scale), 1024, 1024, 1024, 1]]
         
         self.blocks = nn.Sequential(*[
                     DepthwiseSeparable(
