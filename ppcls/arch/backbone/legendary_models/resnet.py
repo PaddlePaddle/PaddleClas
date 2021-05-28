@@ -23,7 +23,7 @@ from paddle.nn import AdaptiveAvgPool2D, MaxPool2D, AvgPool2D
 from paddle.nn.initializer import Uniform
 import math
 
-from theseus_layer import TheseusLayer
+from ppcls.arch.backbone.base.theseus_layer import TheseusLayer
 from ppcls.utils.save_load import load_dygraph_pretrain_from, load_dygraph_pretrain_from_url
 
 
