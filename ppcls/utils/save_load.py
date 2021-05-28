@@ -24,6 +24,7 @@ import tempfile
 
 import paddle
 from paddle.static import load_program_state
+from paddle.utils.download import get_weights_path_from_url
 
 from ppcls.utils import logger
 
@@ -67,6 +68,14 @@ def load_dygraph_pretrain(model, path=None, load_static_weights=False):
 
     param_state_dict = paddle.load(path + ".pdparams")
     model.set_dict(param_state_dict)
+    return
+
+
+def load_dygraph_pretrain_from_url(model, pretrained_url, use_ssld, load_static_weights=False):
+    if use_ssld:
+        pretrained_url = pretrained_url.replace("_pretrained", "_ssld_pretrained")
+    local_weight_path = get_weights_path_from_url(pretrained_url).replace(".pdparams", "")
+    load_dygraph_pretrain(model, path=local_weight_path, load_static_weights=load_static_weights)
     return
 
 
