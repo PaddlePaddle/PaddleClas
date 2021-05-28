@@ -53,12 +53,10 @@ class ConvBNLayer(TheseusLayer):
             stride=stride,
             padding=padding,
             groups=num_groups,
-            weight_attr=ParamAttr(
-                initializer=KaimingNormal()),
+            weight_attr=ParamAttr(initializer=KaimingNormal()),
             bias_attr=False)
 
-        self.bn = BatchNorm(
-            num_filters)
+        self.bn = BatchNorm(num_filters)
         
         self.relu = ReLU()
 
