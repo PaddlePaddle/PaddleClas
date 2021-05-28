@@ -18,32 +18,33 @@ from __future__ import print_function
 
 import math
 import paddle
+from paddle import nn
 from paddle import ParamAttr
-import paddle.nn as nn
-import paddle.nn.functional as F
-from paddle.nn import AdaptiveAvgPool2D, MaxPool2D, AvgPool2D
+from paddle.nn.functional import upsample
 from paddle.nn.initializer import Uniform
 
 from ppcls.arch.backbone.base.theseus_layer import TheseusLayer, Identity
 
-__all__ = [
-    "HRNet_W18_C",
-    "HRNet_W30_C",
-    "HRNet_W32_C",
-    "HRNet_W40_C",
-    "HRNet_W44_C",
-    "HRNet_W48_C",
-    "HRNet_W60_C",
-    "HRNet_W64_C",
-    "SE_HRNet_W18_C",
-    "SE_HRNet_W30_C",
-    "SE_HRNet_W32_C",
-    "SE_HRNet_W40_C",
-    "SE_HRNet_W44_C",
-    "SE_HRNet_W48_C",
-    "SE_HRNet_W60_C",
-    "SE_HRNet_W64_C",
-]
+MODEL_URLS = {
+    "HRNet_W18_C": "",
+    "HRNet_W30_C": "",
+    "HRNet_W32_C": "",
+    "HRNet_W40_C": "",
+    "HRNet_W44_C": "",
+    "HRNet_W48_C": "",
+    "HRNet_W60_C": "",
+    "HRNet_W64_C": "",
+    "SE_HRNet_W18_C": "",
+    "SE_HRNet_W30_C": "",
+    "SE_HRNet_W32_C": "",
+    "SE_HRNet_W40_C": "",
+    "SE_HRNet_W44_C": "",
+    "SE_HRNet_W48_C": "",
+    "SE_HRNet_W60_C": "",
+    "SE_HRNet_W64_C": "",
+}
+
+__all__ = list(MODEL_URLS.keys())
 
 
 class ConvBNLayer(TheseusLayer):
@@ -191,7 +192,7 @@ class SELayer(TheseusLayer):
     def __init__(self, num_channels, num_filters, reduction_ratio):
         super(SELayer, self).__init__()
 
-        self.pool2d_gap = AdaptiveAvgPool2D(1)
+        self.pool2d_gap = nn.AdaptiveAvgPool2D(1)
 
         self._num_channels = num_channels
 
@@ -207,8 +208,7 @@ class SELayer(TheseusLayer):
         self.fc_excitation = nn.Linear(
             med_ch,
             num_filters,
-            weight_attr=ParamAttr(
-                initializer=Uniform(-stdv, stdv)))
+            weight_attr=ParamAttr(initializer=Uniform(-stdv, stdv)))
         self.sigmoid = nn.Sigmoid()
 
     def forward(self, x, res_dict=None):
@@ -331,7 +331,7 @@ class FuseLayers(TheseusLayer):
                     xj = self.residual_func_list[residual_func_idx](x[j])
                     residual_func_idx += 1
 
-                    xj = F.upsample(xj, scale_factor=2**(j - i), mode="nearest")
+                    xj = upsample(xj, scale_factor=2**(j - i), mode="nearest")
                     residual = paddle.add(x=residual, y=xj)
                 elif j < i:
                     xj = x[j]
@@ -476,15 +476,14 @@ class HRNet(TheseusLayer):
             filter_size=1,
             stride=1)
 
-        self.avg_pool = AdaptiveAvgPool2D(1)
+        self.avg_pool = nn.AdaptiveAvgPool2D(1)
 
         stdv = 1.0 / math.sqrt(2048 * 1.0)
 
         self.fc = nn.Linear(
             2048,
             class_num,
-            weight_attr=ParamAttr(
-                initializer=Uniform(-stdv, stdv)))
+            weight_attr=ParamAttr(initializer=Uniform(-stdv, stdv)))
 
     def forward(self, x, res_dict=None):
         x = self.conv_layer1_1(x)
