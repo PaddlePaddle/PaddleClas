@@ -19,7 +19,7 @@ PaddleClas在Windows 平台下基于`Visual Studio 2019 Community` 进行了测�
 
 ### Step1: 下载PaddlePaddle C++ 预测库 paddle_inference_install_dir
 
-PaddlePaddle C++ 预测库针对不同的`CPU`和`CUDA`版本提供了不同的预编译版本，请根据实际情况下载:  [C++预测库下载列表](https://www.paddlepaddle.org.cn/documentation/docs/zh/develop/guides/05_inference_deployment/inference/windows_cpp_inference.html)。
+PaddlePaddle C++ 预测库针对不同的`CPU`和`CUDA`版本提供了不同的预编译版本，请根据实际情况下载:  [C++预测库下载列表](https://paddleinference.paddlepaddle.org.cn/v2.1/user_guides/download_lib.html#windows)。
 
 解压后`D:\projects\paddle_inference_install_dir`目录包含内容为：
 
