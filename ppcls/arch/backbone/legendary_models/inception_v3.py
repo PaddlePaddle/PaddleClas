@@ -449,10 +449,10 @@ class Inception_V3(TheseusLayer):
             inception_e = InceptionE(self.inception_e_list[i])
             self.inception_block_list.append(inception_e)
  
-        self.gap = AdaptiveAvgPool2D(1)
-        self.drop = Dropout(p=0.2, mode="downscale_in_infer")
+        self.avg_pool = AdaptiveAvgPool2D(1)
+        self.dropout = Dropout(p=0.2, mode="downscale_in_infer")
         stdv = 1.0 / math.sqrt(2048 * 1.0)
-        self.out = Linear(
+        self.fc = Linear(
             2048,
             class_num,
             weight_attr=ParamAttr(
@@ -463,10 +463,10 @@ class Inception_V3(TheseusLayer):
         x = self.inception_stem(x)
         for inception_block in self.inception_block_list:
            x = inception_block(x)
-        x = self.gap(x)
+        x = self.avg_pool(x)
         x = paddle.reshape(x, shape=[-1, 2048])
-        x = self.drop(x)
-        x = self.out(x)
+        x = self.dropout(x)
+        x = self.fc(x)
         return x
 
 
