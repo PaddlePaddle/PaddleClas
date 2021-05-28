@@ -60,7 +60,6 @@ def build_optimizer(config, epochs, step_each_epoch, parameters):
     optim = getattr(optimizer, optim_name)(learning_rate=lr,
                                            weight_decay=reg,
                                            grad_clip=grad_clip,
-                                           parameter_list=parameters,
-                                           **config)()
+                                           **config)(parameters=parameters)
     logger.info("build optimizer ({}) success..".format(optim))
     return optim, lr

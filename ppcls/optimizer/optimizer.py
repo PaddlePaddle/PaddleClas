@@ -16,52 +16,12 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-import sys
-
-import paddle
-import paddle.regularizer as regularizer
-
-__all__ = ['OptimizerBuilder']
-
-
-class L1Decay(object):
-    """
-    L1 Weight Decay Regularization, which encourages the weights to be sparse.
-
-    Args:
-        factor(float): regularization coeff. Default:0.0.
-    """
-
-    def __init__(self, factor=0.0):
-        super(L1Decay, self).__init__()
-        self.factor = factor
-
-    def __call__(self):
-        reg = regularizer.L1Decay(self.factor)
-        return reg
-
-
-class L2Decay(object):
-    """
-    L2 Weight Decay Regularization, which encourages the weights to be sparse.
-
-    Args:
-        factor(float): regularization coeff. Default:0.0.
-    """
-
-    def __init__(self, factor=0.0):
-        super(L2Decay, self).__init__()
-        self.factor = factor
-
-    def __call__(self):
-        reg = regularizer.L2Decay(self.factor)
-        return reg
+from paddle import optimizer as optim
 
 
 class Momentum(object):
     """
     Simple Momentum optimizer with velocity state.
-
     Args:
         learning_rate (float|Variable) - The learning rate used to update parameters.
             Can be a float value or a Variable with one float value as data element.
@@ -72,31 +32,63 @@ class Momentum(object):
     def __init__(self,
                  learning_rate,
                  momentum,
-                 parameter_list=None,
-                 regularization=None,
-                 multi_precision=False,
-                 **args):
+                 weight_decay=None,
+                 grad_clip=None):
         super(Momentum, self).__init__()
         self.learning_rate = learning_rate
         self.momentum = momentum
-        self.parameter_list = parameter_list
-        self.regularization = regularization
-        self.multi_precision = multi_precision
+        self.weight_decay = weight_decay
+        self.grad_clip = grad_clip
 
-    def __call__(self):
-        opt = paddle.optimizer.Momentum(
+    def __call__(self, parameters):
+        opt = optim.Momentum(
             learning_rate=self.learning_rate,
             momentum=self.momentum,
-            parameters=self.parameter_list,
-            weight_decay=self.regularization,
-            multi_precision=self.multi_precision)
+            weight_decay=self.weight_decay,
+            grad_clip=self.grad_clip,
+            parameters=parameters)
+        return opt
+
+
+class Adam(object):
+    def __init__(self,
+                 learning_rate=0.001,
+                 beta1=0.9,
+                 beta2=0.999,
+                 epsilon=1e-08,
+                 parameter_list=None,
+                 weight_decay=None,
+                 grad_clip=None,
+                 name=None,
+                 lazy_mode=False):
+        self.learning_rate = learning_rate
+        self.beta1 = beta1
+        self.beta2 = beta2
+        self.epsilon = epsilon
+        self.parameter_list = parameter_list
+        self.learning_rate = learning_rate
+        self.weight_decay = weight_decay
+        self.grad_clip = grad_clip
+        self.name = name
+        self.lazy_mode = lazy_mode
+
+    def __call__(self, parameters):
+        opt = optim.Adam(
+            learning_rate=self.learning_rate,
+            beta1=self.beta1,
+            beta2=self.beta2,
+            epsilon=self.epsilon,
+            weight_decay=self.weight_decay,
+            grad_clip=self.grad_clip,
+            name=self.name,
+            lazy_mode=self.lazy_mode,
+            parameters=parameters)
         return opt
 
 
 class RMSProp(object):
     """
     Root Mean Squared Propagation (RMSProp) is an unpublished, adaptive learning rate method.
-
     Args:
         learning_rate (float|Variable) - The learning rate used to update parameters.
             Can be a float value or a Variable with one float value as data element.
@@ -108,58 +100,26 @@ class RMSProp(object):
 
     def __init__(self,
                  learning_rate,
-                 momentum,
+                 momentum=0.0,
                  rho=0.95,
                  epsilon=1e-6,
-                 parameter_list=None,
-                 regularization=None,
-                 **args):
+                 weight_decay=None,
+                 grad_clip=None):
         super(RMSProp, self).__init__()
         self.learning_rate = learning_rate
         self.momentum = momentum
         self.rho = rho
         self.epsilon = epsilon
-        self.parameter_list = parameter_list
-        self.regularization = regularization
+        self.weight_decay = weight_decay
+        self.grad_clip = grad_clip
 
-    def __call__(self):
-        opt = paddle.optimizer.RMSProp(
+    def __call__(self, parameters):
+        opt = optim.RMSProp(
             learning_rate=self.learning_rate,
             momentum=self.momentum,
             rho=self.rho,
             epsilon=self.epsilon,
-            parameters=self.parameter_list,
-            weight_decay=self.regularization)
+            weight_decay=self.weight_decay,
+            grad_clip=self.grad_clip,
+            parameters=parameters)
         return opt
-
-
-class OptimizerBuilder(object):
-    """
-    Build optimizer
-
-    Args:
-        function(str): optimizer name of learning rate
-        params(dict): parameters used for init the class
-        regularizer (dict): parameters used for create regularization
-    """
-
-    def __init__(self,
-                 function='Momentum',
-                 params={'momentum': 0.9},
-                 regularizer=None):
-        self.function = function
-        self.params = params
-        # create regularizer
-        if regularizer is not None:
-            mod = sys.modules[__name__]
-            reg_func = regularizer['function'] + 'Decay'
-            del regularizer['function']
-            reg = getattr(mod, reg_func)(**regularizer)()
-            self.params['regularization'] = reg
-
-    def __call__(self, learning_rate, parameter_list=None):
-        mod = sys.modules[__name__]
-        opt = getattr(mod, self.function)
-        return opt(learning_rate=learning_rate,
-                   parameter_list=parameter_list,
-                   **self.params)()
