@@ -20,17 +20,35 @@ from paddle import ParamAttr
 from paddle.nn import AdaptiveAvgPool2D, BatchNorm, Conv2D, Dropout, Linear
 from paddle.regularizer import L2Decay
 from ppcls.arch.backbone.base.theseus_layer import TheseusLayer
+from ppcls.utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
 
-__all__ = [
-    "MobileNetV3_small_x0_35", "MobileNetV3_small_x0_5",
-    "MobileNetV3_small_x0_75", "MobileNetV3_small_x1_0",
-    "MobileNetV3_small_x1_25", "MobileNetV3_large_x0_35",
-    "MobileNetV3_large_x0_5", "MobileNetV3_large_x0_75",
-    "MobileNetV3_large_x1_0", "MobileNetV3_large_x1_25"
-]
+MODEL_URLS = {
+    "MobileNetV3_small_x0_35":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/MobileNetV3_small_x0_35_pretrained.pdparams",
+    "MobileNetV3_small_x0_5":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/MobileNetV3_small_x0_5_pretrained.pdparams",
+    "MobileNetV3_small_x0_75":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/MobileNetV3_small_x0_75_pretrained.pdparams",
+    "MobileNetV3_small_x1_0":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/MobileNetV3_small_x1_0_pretrained.pdparams",
+    "MobileNetV3_small_x1_25":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/MobileNetV3_small_x1_25_pretrained.pdparams",
+    "MobileNetV3_large_x0_35":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/MobileNetV3_large_x0_35_pretrained.pdparams",
+    "MobileNetV3_large_x0_5":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/MobileNetV3_large_x0_5_pretrained.pdparams",
+    "MobileNetV3_large_x0_75":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/MobileNetV3_large_x0_75_pretrained.pdparams",
+    "MobileNetV3_large_x1_0":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/MobileNetV3_large_x1_0_pretrained.pdparams",
+    "MobileNetV3_large_x1_25":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/MobileNetV3_large_x1_25_pretrained.pdparams",
+}
 
-# 'large', 'small' is just for MobinetV3_large, MobileNetV3_small respectively.
-# The type of 'large' or 'small' config is a list. Each element(list) represents a depthwise block, which is composed of k, exp, se, act, s.
+__all__ = MODEL_URLS.keys()
+
+# "large", "small" is just for MobinetV3_large, MobileNetV3_small respectively.
+# The type of "large" or "small" config is a list. Each element(list) represents a depthwise block, which is composed of k, exp, se, act, s.
 # k: kernel_size
 # exp: middle channel number in depthwise block
 # c: output channel number in depthwise block
@@ -38,7 +56,7 @@ __all__ = [
 # act: which activation to use
 # s: stride in depthwise block
 NET_CONFIG = {
-    'large': [
+    "large": [
         # k, exp, c,  se,     act,  s,
         [3, 16, 16, False, "relu", 1],
         [3, 64, 24, False, "relu", 2],
@@ -56,7 +74,7 @@ NET_CONFIG = {
         [5, 960, 160, True, "hardswish", 1],
         [5, 960, 160, True, "hardswish", 1],
     ],
-    'small': [
+    "small": [
         # k, exp, c,  se,     act,  s,
         [3, 16, 16, True, "relu", 2],
         [3, 72, 24, False, "relu", 2],
@@ -73,15 +91,15 @@ NET_CONFIG = {
 }
 # first conv output channel number in MobileNetV3
 STEM_CONV_NUMBER = 16
-# last second conv output channel for 'small'
+# last second conv output channel for "small"
 LAST_SECOND_CONV_SMALL = 576
-# last second conv output channel for 'large'
+# last second conv output channel for "large"
 LAST_SECOND_CONV_LARGE = 960
-# last conv output channel number for 'large' and 'small'
+# last conv output channel number for "large" and "small"
 LAST_CONV = 1280
 
 
-def make_divisible(v, divisor=8, min_value=None):
+def _make_divisible(v, divisor=8, min_value=None):
     if min_value is None:
         min_value = divisor
     new_v = max(min_value, int(v + divisor / 2) // divisor * divisor)
@@ -90,16 +108,16 @@ def make_divisible(v, divisor=8, min_value=None):
     return new_v
 
 
-def create_act(act):
-    if act == 'hardswish':
+def _create_act(act):
+    if act == "hardswish":
         return nn.Hardswish()
-    elif act == 'relu':
+    elif act == "relu":
         return nn.ReLU()
     elif act is None:
         return None
     else:
         raise RuntimeError(
-            'The activation function is selected incorrectly: {}'.format(act))
+            "The activation function is not supported: {}".format(act))
 
 
 class MobileNetV3(TheseusLayer):
@@ -113,6 +131,7 @@ class MobileNetV3(TheseusLayer):
         class_squeeze: int=960. The output channel number of second to last convolution layer. 
         class_expand: int=1280. The output channel number of last convolution layer. 
         dropout_prob: float=0.2.  Probability of setting units to zero.
+        pretrained: bool=False. If `True` load pretrained parameters, `False` otherwise.
     Returns:
         model: nn.Layer. Specific MobileNetV3 model depends on args.
     """
@@ -124,7 +143,8 @@ class MobileNetV3(TheseusLayer):
                  inplanes=STEM_CONV_NUMBER,
                  class_squeeze=LAST_SECOND_CONV_LARGE,
                  class_expand=LAST_CONV,
-                 dropout_prob=0.2):
+                 dropout_prob=0.2,
+                 pretrained=False):
         super(MobileNetV3, self).__init__()
 
         self.cfg = config
@@ -133,10 +153,11 @@ class MobileNetV3(TheseusLayer):
         self.class_squeeze = class_squeeze
         self.class_expand = class_expand
         self.class_num = class_num
+        self.pretrained = pretrained
 
-        self.conv1 = ConvBNLayer(
+        self.conv = ConvBNLayer(
             in_c=3,
-            out_c=make_divisible(self.inplanes * self.scale),
+            out_c=_make_divisible(self.inplanes * self.scale),
             filter_size=3,
             stride=2,
             padding=1,
@@ -146,10 +167,10 @@ class MobileNetV3(TheseusLayer):
 
         self.blocks = nn.Sequential(*[
             ResidualUnit(
-                in_c=make_divisible(self.inplanes * self.scale if i == 0 else
-                                    self.cfg[i - 1][2] * self.scale),
-                mid_c=make_divisible(self.scale * exp),
-                out_c=make_divisible(self.scale * c),
+                in_c=_make_divisible(self.inplanes * self.scale if i == 0 else
+                                     self.cfg[i - 1][2] * self.scale),
+                mid_c=_make_divisible(self.scale * exp),
+                out_c=_make_divisible(self.scale * c),
                 filter_size=k,
                 stride=s,
                 use_se=se,
@@ -157,8 +178,8 @@ class MobileNetV3(TheseusLayer):
         ])
 
         self.last_second_conv = ConvBNLayer(
-            in_c=make_divisible(self.cfg[-1][2] * self.scale),
-            out_c=make_divisible(self.scale * self.class_squeeze),
+            in_c=_make_divisible(self.cfg[-1][2] * self.scale),
+            out_c=_make_divisible(self.scale * self.class_squeeze),
             filter_size=1,
             stride=1,
             padding=0,
@@ -166,10 +187,10 @@ class MobileNetV3(TheseusLayer):
             if_act=True,
             act="hardswish")
 
-        self.pool = AdaptiveAvgPool2D(1)
+        self.avg_pool = AdaptiveAvgPool2D(1)
 
         self.last_conv = Conv2D(
-            in_channels=make_divisible(self.scale * self.class_squeeze),
+            in_channels=_make_divisible(self.scale * self.class_squeeze),
             out_channels=self.class_expand,
             kernel_size=1,
             stride=1,
@@ -180,21 +201,18 @@ class MobileNetV3(TheseusLayer):
         self.dropout = Dropout(p=dropout_prob, mode="downscale_in_infer")
         self.flatten = nn.Flatten(start_axis=1, stop_axis=-1)
 
-        self.out = Linear(self.class_expand, class_num)
+        self.fc = Linear(self.class_expand, class_num)
 
     def forward(self, x):
-        x = self.conv1(x)
-
+        x = self.conv(x)
         x = self.blocks(x)
-
         x = self.last_second_conv(x)
-        x = self.pool(x)
-
+        x = self.avg_pool(x)
         x = self.last_conv(x)
         x = self.hardswish(x)
         x = self.dropout(x)
         x = self.flatten(x)
-        x = self.out(x)
+        x = self.fc(x)
 
         return x
 
@@ -225,7 +243,7 @@ class ConvBNLayer(TheseusLayer):
             param_attr=ParamAttr(regularizer=L2Decay(0.0)),
             bias_attr=ParamAttr(regularizer=L2Decay(0.0)))
         self.if_act = if_act
-        self.act = create_act(act)
+        self.act = _create_act(act)
 
     def forward(self, x):
         x = self.conv(x)
@@ -288,7 +306,7 @@ class ResidualUnit(TheseusLayer):
         return x
 
 
-# nn.Hardsigmoid can't transfer 'slope' and 'offset' in nn.functional.hardsigmoid
+# nn.Hardsigmoid can't transfer "slope" and "offset" in nn.functional.hardsigmoid
 class Hardsigmoid(TheseusLayer):
     def __init__(self, slope=0.2, offset=0.5):
         super(Hardsigmoid, self).__init__()
@@ -330,90 +348,270 @@ class SEModule(TheseusLayer):
 
 
 def MobileNetV3_small_x0_35(**args):
+    """
+    MobileNetV3_small_x0_35
+    Args:
+        pretrained: bool=False. If `True` load pretrained parameters, `False` otherwise.
+        class_num: int=1000. Output dim of last fc layer.
+    Returns:
+        model: nn.Layer. Specific `MobileNetV3_small_x0_35` model depends on args.
+    """
     model = MobileNetV3(
-        config=NET_CONFIG['small'],
+        config=NET_CONFIG["small"],
         scale=0.35,
         class_squeeze=LAST_SECOND_CONV_SMALL,
         **args)
+    if isinstance(model.pretrained, bool):
+        if model.pretrained is True:
+            load_dygraph_pretrain_from_url(
+                model, MODEL_URLS["MobileNetV3_small_x0_35"])
+    elif isinstance(model.pretrained, str):
+        load_dygraph_pretrain(model, model.pretrained)
+    else:
+        raise RuntimeError(
+            "pretrained type is not available. Please use `string` or `boolean` type"
+        )
     return model
 
 
 def MobileNetV3_small_x0_5(**args):
+    """
+    MobileNetV3_small_x0_5
+    Args:
+        pretrained: bool=False. If `True` load pretrained parameters, `False` otherwise.
+        class_num: int=1000. Output dim of last fc layer.
+    Returns:
+        model: nn.Layer. Specific `MobileNetV3_small_x0_5` model depends on args.
+    """
     model = MobileNetV3(
-        config=NET_CONFIG['small'],
+        config=NET_CONFIG["small"],
         scale=0.5,
         class_squeeze=LAST_SECOND_CONV_SMALL,
         **args)
+    if isinstance(model.pretrained, bool):
+        if model.pretrained is True:
+            load_dygraph_pretrain_from_url(
+                model, MODEL_URLS["MobileNetV3_small_x0_5"])
+    elif isinstance(model.pretrained, str):
+        load_dygraph_pretrain(model, model.pretrained)
+    else:
+        raise RuntimeError(
+            "pretrained type is not available. Please use `string` or `boolean` type"
+        )
     return model
 
 
 def MobileNetV3_small_x0_75(**args):
+    """
+    MobileNetV3_small_x0_75
+    Args:
+        pretrained: bool=False. If `True` load pretrained parameters, `False` otherwise.
+        class_num: int=1000. Output dim of last fc layer.
+    Returns:
+        model: nn.Layer. Specific `MobileNetV3_small_x0_75` model depends on args.
+    """
     model = MobileNetV3(
-        config=NET_CONFIG['small'],
+        config=NET_CONFIG["small"],
         scale=0.75,
         class_squeeze=LAST_SECOND_CONV_SMALL,
         **args)
+    if isinstance(model.pretrained, bool):
+        if model.pretrained is True:
+            load_dygraph_pretrain_from_url(
+                model, MODEL_URLS["MobileNetV3_small_x0_75"])
+    elif isinstance(model.pretrained, str):
+        load_dygraph_pretrain(model, model.pretrained)
+    else:
+        raise RuntimeError(
+            "pretrained type is not available. Please use `string` or `boolean` type"
+        )
     return model
 
 
 def MobileNetV3_small_x1_0(**args):
+    """
+    MobileNetV3_small_x1_0
+    Args:
+        pretrained: bool=False. If `True` load pretrained parameters, `False` otherwise.
+        class_num: int=1000. Output dim of last fc layer.
+    Returns:
+        model: nn.Layer. Specific `MobileNetV3_small_x1_0` model depends on args.
+    """
     model = MobileNetV3(
-        config=NET_CONFIG['small'],
+        config=NET_CONFIG["small"],
         scale=1.0,
         class_squeeze=LAST_SECOND_CONV_SMALL,
         **args)
+    if isinstance(model.pretrained, bool):
+        if model.pretrained is True:
+            load_dygraph_pretrain_from_url(
+                model, MODEL_URLS["MobileNetV3_small_x1_0"])
+    elif isinstance(model.pretrained, str):
+        load_dygraph_pretrain(model, model.pretrained)
+    else:
+        raise RuntimeError(
+            "pretrained type is not available. Please use `string` or `boolean` type"
+        )
     return model
 
 
 def MobileNetV3_small_x1_25(**args):
+    """
+    MobileNetV3_small_x1_25
+    Args:
+        pretrained: bool=False. If `True` load pretrained parameters, `False` otherwise.
+        class_num: int=1000. Output dim of last fc layer.
+    Returns:
+        model: nn.Layer. Specific `MobileNetV3_small_x1_25` model depends on args.
+    """
     model = MobileNetV3(
-        config=NET_CONFIG['small'],
+        config=NET_CONFIG["small"],
         scale=1.25,
         class_squeeze=LAST_SECOND_CONV_SMALL,
         **args)
+    if isinstance(model.pretrained, bool):
+        if model.pretrained is True:
+            load_dygraph_pretrain_from_url(
+                model, MODEL_URLS["MobileNetV3_small_x1_25"])
+    elif isinstance(model.pretrained, str):
+        load_dygraph_pretrain(model, model.pretrained)
+    else:
+        raise RuntimeError(
+            "pretrained type is not available. Please use `string` or `boolean` type"
+        )
     return model
 
 
 def MobileNetV3_large_x0_35(**args):
+    """
+    MobileNetV3_large_x0_35
+    Args:
+        pretrained: bool=False. If `True` load pretrained parameters, `False` otherwise.
+        class_num: int=1000. Output dim of last fc layer.
+    Returns:
+        model: nn.Layer. Specific `MobileNetV3_large_x0_35` model depends on args.
+    """
     model = MobileNetV3(
-        config=NET_CONFIG['large'],
+        config=NET_CONFIG["large"],
         scale=0.35,
         class_squeeze=LAST_SECOND_CONV_LARGE,
         **args)
+    if isinstance(model.pretrained, bool):
+        if model.pretrained is True:
+            load_dygraph_pretrain_from_url(
+                model, MODEL_URLS["MobileNetV3_large_x0_35"])
+    elif isinstance(model.pretrained, str):
+        load_dygraph_pretrain(model, model.pretrained)
+    else:
+        raise RuntimeError(
+            "pretrained type is not available. Please use `string` or `boolean` type"
+        )
     return model
 
 
 def MobileNetV3_large_x0_5(**args):
+    """
+    MobileNetV3_large_x0_5
+    Args:
+        pretrained: bool=False. If `True` load pretrained parameters, `False` otherwise.
+        class_num: int=1000. Output dim of last fc layer.
+    Returns:
+        model: nn.Layer. Specific `MobileNetV3_large_x0_5` model depends on args.
+    """
     model = MobileNetV3(
-        config=NET_CONFIG['large'],
+        config=NET_CONFIG["large"],
         scale=0.5,
         class_squeeze=LAST_SECOND_CONV_LARGE,
         **args)
+    if isinstance(model.pretrained, bool):
+        if model.pretrained is True:
+            load_dygraph_pretrain_from_url(
+                model, MODEL_URLS["MobileNetV3_large_x0_5"])
+    elif isinstance(model.pretrained, str):
+        load_dygraph_pretrain(model, model.pretrained)
+    else:
+        raise RuntimeError(
+            "pretrained type is not available. Please use `string` or `boolean` type"
+        )
     return model
 
 
 def MobileNetV3_large_x0_75(**args):
+    """
+    MobileNetV3_large_x0_75
+    Args:
+        pretrained: bool=False. If `True` load pretrained parameters, `False` otherwise.
+        class_num: int=1000. Output dim of last fc layer.
+    Returns:
+        model: nn.Layer. Specific `MobileNetV3_large_x0_75` model depends on args.
+    """
     model = MobileNetV3(
-        config=NET_CONFIG['large'],
+        config=NET_CONFIG["large"],
         scale=0.75,
         class_squeeze=LAST_SECOND_CONV_LARGE,
         **args)
+    if isinstance(model.pretrained, bool):
+        if model.pretrained is True:
+            load_dygraph_pretrain_from_url(
+                model, MODEL_URLS["MobileNetV3_large_x0_75"])
+    elif isinstance(model.pretrained, str):
+        load_dygraph_pretrain(model, model.pretrained)
+    else:
+        raise RuntimeError(
+            "pretrained type is not available. Please use `string` or `boolean` type"
+        )
     return model
 
 
 def MobileNetV3_large_x1_0(**args):
+    """
+    MobileNetV3_large_x1_0
+    Args:
+        pretrained: bool=False. If `True` load pretrained parameters, `False` otherwise.
+        class_num: int=1000. Output dim of last fc layer.
+    Returns:
+        model: nn.Layer. Specific `MobileNetV3_large_x1_0` model depends on args.
+    """
     model = MobileNetV3(
-        config=NET_CONFIG['large'],
+        config=NET_CONFIG["large"],
         scale=1.0,
         class_squeeze=LAST_SECOND_CONV_LARGE,
         **args)
+    if isinstance(model.pretrained, bool):
+        if model.pretrained is True:
+            load_dygraph_pretrain_from_url(
+                model, MODEL_URLS["MobileNetV3_large_x1_0"])
+    elif isinstance(model.pretrained, str):
+        load_dygraph_pretrain(model, model.pretrained)
+    else:
+        raise RuntimeError(
+            "pretrained type is not available. Please use `string` or `boolean` type"
+        )
     return model
 
 
 def MobileNetV3_large_x1_25(**args):
+    """
+    MobileNetV3_large_x1_25
+    Args:
+        pretrained: bool=False. If `True` load pretrained parameters, `False` otherwise.
+        class_num: int=1000. Output dim of last fc layer.
+    Returns:
+        model: nn.Layer. Specific `MobileNetV3_large_x1_25` model depends on args.
+    """
     model = MobileNetV3(
-        config=NET_CONFIG['large'],
+        config=NET_CONFIG["large"],
         scale=1.25,
         class_squeeze=LAST_SECOND_CONV_LARGE,
         **args)
+    if isinstance(model.pretrained, bool):
+        if model.pretrained is True:
+            load_dygraph_pretrain_from_url(
+                model, MODEL_URLS["MobileNetV3_large_x1_25"])
+    elif isinstance(model.pretrained, str):
+        load_dygraph_pretrain(model, model.pretrained)
+    else:
+        raise RuntimeError(
+            "pretrained type is not available. Please use `string` or `boolean` type"
+        )
     return model
