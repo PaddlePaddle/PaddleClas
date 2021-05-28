@@ -19,7 +19,7 @@ import paddle
 from paddle import ParamAttr
 import paddle.nn as nn
 from paddle.nn import Conv2D, BatchNorm, Linear, Dropout, ReLU, Flatten
-from paddle.nn import AdaptiveAvgPool2D, MaxPool2D, AvgPool2D
+from paddle.nn import AdaptiveAvgPool2D
 from paddle.nn.initializer import KaimingNormal
 import math
 
@@ -47,7 +47,7 @@ class ConvBNLayer(TheseusLayer):
                  num_groups=1):
         super(ConvBNLayer, self).__init__()
 
-        self._conv = Conv2D(
+        self.conv = Conv2D(
             in_channels=num_channels,
             out_channels=num_filters,
             kernel_size=filter_size,
@@ -58,15 +58,15 @@ class ConvBNLayer(TheseusLayer):
                 initializer=KaimingNormal()),
             bias_attr=False)
 
-        self._bn = BatchNorm(
+        self.bn = BatchNorm(
             num_filters)
         
-        self._relu = ReLU()
+        self.relu = ReLU()
 
     def forward(self, x):
-        x = self._conv(x)
-        x = self._bn(x)
-        x = self._relu(x)
+        x = self.conv(x)
+        x = self.bn(x)
+        x = self.relu(x)
         return x
 
 
@@ -80,7 +80,7 @@ class DepthwiseSeparable(TheseusLayer):
                  scale):
         super(DepthwiseSeparable, self).__init__()
 
-        self._depthwise_conv = ConvBNLayer(
+        self.depthwise_conv = ConvBNLayer(
             num_channels=num_channels,
             num_filters=int(num_filters1 * scale),
             filter_size=3,
@@ -88,7 +88,7 @@ class DepthwiseSeparable(TheseusLayer):
             padding=1,
             num_groups=int(num_groups * scale))
 
-        self._pointwise_conv = ConvBNLayer(
+        self.pointwise_conv = ConvBNLayer(
             num_channels=int(num_filters1 * scale),
             filter_size=1,
             num_filters=int(num_filters2 * scale),
@@ -96,8 +96,8 @@ class DepthwiseSeparable(TheseusLayer):
             padding=0)
 
     def forward(self, x):
-        x = self._depthwise_conv(x)
-        x = self._pointwise_conv(x)
+        x = self.depthwise_conv(x)
+        x = self.pointwise_conv(x)
         return x
 
 
@@ -139,7 +139,7 @@ class MobileNet(TheseusLayer):
                             scale=scale) for params in self.cfg])
 
         self.avg_pool = AdaptiveAvgPool2D(1)
-        self.flatten    = Flatten(start_axis=1, stop_axis=-1)
+        self.flatten = Flatten(start_axis=1, stop_axis=-1)
 
         self.fc = Linear(
             int(1024 * scale),
