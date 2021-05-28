@@ -1,6 +1,6 @@
 # global configs
 Global:
-  pretrained_model: ""
+  pretrained_model: null
   output_dir: "./output/"
   device: "gpu"
   class_num: 1000

@@ -25,9 +25,7 @@ import paddle
 import paddle.nn as nn
 import paddle.distributed as dist
 
-from ppcls.utils import config
 from ppcls.utils.check import check_gpu
-
 from ppcls.utils.misc import AverageMeter
 from ppcls.utils import logger
 from ppcls.data import build_dataloader
@@ -35,16 +33,15 @@ from ppcls.arch import build_model
 from ppcls.arch.loss_metrics import build_loss
 from ppcls.arch.loss_metrics import build_metrics
 from ppcls.optimizer import build_optimizer
+from ppcls.utils.save_load import load_dygraph_pretrain
 
 from ppcls.utils import save_load
 
 
 class Trainer(object):
-    def __init__(self, mode="train"):
-        args = config.parse_args()
-        self.config = config.get_config(
-            args.config, overrides=args.override, show=True)
+    def __init__(self, config, mode="train"):
         self.mode = mode
+        self.config = config
         self.output_dir = self.config['Global']['output_dir']
         # set device
         assert self.config["Global"]["device"] in ["cpu", "gpu", "xpu"]
@@ -55,6 +52,10 @@ class Trainer(object):
         if self.config["Global"]["distributed"]:
             dist.init_parallel_env()
         self.model = build_model(self.config["Arch"])
+
+        if self.config["Global"]["pretrained_model"] is not None:
+            load_dygraph_pretrain(self.model,
+                                  self.config["Global"]["pretrained_model"])
 
         if self.config["Global"]["distributed"]:
             self.model = paddle.DataParallel(self.model)
