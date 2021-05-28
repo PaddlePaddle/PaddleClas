@@ -115,6 +115,7 @@ class MobileNet(TheseusLayer):
             stride=2,
             padding=1)
         
+        #num_channels, num_filters1, num_filters2, num_groups, stride
         self.cfg =   [[int(32 * scale),   32,   64,   32,   1],
                       [int(64 * scale),   64,   128,  64,   2],
                       [int(128 * scale),  128,  128,  128,  1],
