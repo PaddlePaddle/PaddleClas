@@ -141,7 +141,7 @@ class MobileNet(TheseusLayer):
         self.avg_pool = AdaptiveAvgPool2D(1)
         self.flatten    = Flatten(start_axis=1, stop_axis=-1)
 
-        self.out = Linear(
+        self.fc = Linear(
             int(1024 * scale),
             class_num,
             weight_attr=ParamAttr(initializer=KaimingNormal()))
@@ -151,7 +151,7 @@ class MobileNet(TheseusLayer):
         x = self.blocks(x)
         x = self.avg_pool(x)
         x = self.flatten(x)
-        x = self.out(x)
+        x = self.fc(x)
         return x
 
 
