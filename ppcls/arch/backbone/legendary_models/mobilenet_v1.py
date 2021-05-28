@@ -18,7 +18,7 @@ import numpy as np
 import paddle
 from paddle import ParamAttr
 import paddle.nn as nn
-from paddle.nn import Conv2D, BatchNorm, Linear, Dropout, ReLU, Flatten
+from paddle.nn import Conv2D, BatchNorm, Linear, ReLU, Flatten
 from paddle.nn import AdaptiveAvgPool2D
 from paddle.nn.initializer import KaimingNormal
 
