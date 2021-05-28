@@ -82,7 +82,7 @@ opencv3/
 
 #### 1.2.1 Compile from the source code
 * If you want to get the latest Paddle Inference Library features, you can download the latest code from Paddle GitHub repository and compile the inference library from the source code.
-* You can refer to [Paddle Inference Library](https://www.paddlepaddle.org.cn/documentation/docs/en/develop/guides/05_inference_deployment/inference/build_and_install_lib_en.html#build-from-source-code) to get the Paddle source code from github, and then compile To generate the latest inference library. The method of using git to access the code is as follows.
+* You can refer to [Paddle Inference Library](https://paddleinference.paddlepaddle.org.cn/v2.1/user_guides/source_compile.html) to get the Paddle source code from github, and then compile To generate the latest inference library. The method of using git to access the code is as follows.
 
 
 ```shell
@@ -109,7 +109,7 @@ make -j
 make inference_lib_dist
 ```
 
-For more compilation parameter options, please refer to the official website of the Paddle C++ inference library:[https://www.paddlepaddle.org.cn/documentation/docs/en/develop/guides/05_inference_deployment/inference/build_and_install_lib_en.html#build-from-source-code](https://www.paddlepaddle.org.cn/documentation/docs/en/develop/guides/05_inference_deployment/inference/build_and_install_lib_en.html#build-from-source-code).
+For more compilation parameter options, please refer to the official website of the Paddle C++ inference library:[https://paddleinference.paddlepaddle.org.cn/v2.1/user_guides/download_lib.html](https://paddleinference.paddlepaddle.org.cn/v2.1/user_guides/download_lib.html).
 
 
 * After the compilation process, you can see the following files in the folder of `build/paddle_inference_install_dir/`.
