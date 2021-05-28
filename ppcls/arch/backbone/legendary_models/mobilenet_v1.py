@@ -58,15 +58,15 @@ class ConvBNLayer(TheseusLayer):
                 initializer=KaimingNormal()),
             bias_attr=False)
 
-        self._batch_norm = BatchNorm(
+        self._bn = BatchNorm(
             num_filters)
         
-        self._activation = ReLU()
+        self._relu = ReLU()
 
     def forward(self, x):
         x = self._conv(x)
-        x = self._batch_norm(x)
-        x = self._activation(x)
+        x = self._bn(x)
+        x = self._relu(x)
         return x
 
 
