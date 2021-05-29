@@ -1,5 +1,6 @@
 # global configs
 Global:
+  checkpoints: null
   pretrained_model: null
   output_dir: "./output/"
   device: "gpu"
@@ -7,7 +8,7 @@ Global:
   save_interval: 1
   eval_during_train: True
   eval_interval: 1
-  epochs: 90
+  epochs: 120
   print_batch_step: 10
   use_visualdl: False
   image_shape: [3, 224, 224]

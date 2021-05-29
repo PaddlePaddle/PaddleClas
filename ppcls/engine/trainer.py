@@ -34,7 +34,7 @@ from ppcls.arch.loss_metrics import build_loss
 from ppcls.arch.loss_metrics import build_metrics
 from ppcls.optimizer import build_optimizer
 from ppcls.utils.save_load import load_dygraph_pretrain
-
+from ppcls.utils.save_load import init_model
 from ppcls.utils import save_load
 
 
@@ -123,7 +123,15 @@ class Trainer(object):
         # global iter counter
         global_step = 0
 
-        for epoch_id in range(1, self.config["Global"]["epochs"] + 1):
+        if self.config["Global"]["checkpoints"] is not None:
+            metric_info = init_model(self.config["Global"], self.model,
+                                     optimizer)
+            if metric_info is not None:
+                best_metric.update(metric_info)
+
+        for epoch_id in range(best_metric["epoch"] + 1,
+                              self.config["Global"]["epochs"] + 1):
+            acc = 0.0
             self.model.train()
             for iter_id, batch in enumerate(train_dataloader()):
                 batch_size = batch[0].shape[0]
@@ -177,12 +185,13 @@ class Trainer(object):
                     "eval_during_train"] and epoch_id % self.config["Global"][
                         "eval_during_train"] == 0:
                 acc = self.eval(epoch_id)
-                if acc >= best_metric["metric"]:
+                if acc > best_metric["metric"]:
                     best_metric["metric"] = acc
                     best_metric["epoch"] = epoch_id
                     save_load.save_model(
                         self.model,
                         optimizer,
+                        best_metric,
                         self.output_dir,
                         model_name=self.config["Arch"]["name"],
                         prefix="best_model")
@@ -191,7 +200,8 @@ class Trainer(object):
             if epoch_id % save_interval == 0:
                 save_load.save_model(
                     self.model,
-                    optimizer,
+                    optimizer, {"metric": acc,
+                                "epoch": epoch_id},
                     self.output_dir,
                     model_name=self.config["Arch"]["name"],
                     prefix="ppcls_epoch_{}".format(epoch_id))
