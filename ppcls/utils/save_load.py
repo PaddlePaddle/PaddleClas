@@ -71,11 +71,17 @@ def load_dygraph_pretrain(model, path=None, load_static_weights=False):
     return
 
 
-def load_dygraph_pretrain_from_url(model, pretrained_url, use_ssld, load_static_weights=False):
+def load_dygraph_pretrain_from_url(model,
+                                   pretrained_url,
+                                   use_ssld,
+                                   load_static_weights=False):
     if use_ssld:
-        pretrained_url = pretrained_url.replace("_pretrained", "_ssld_pretrained")
-    local_weight_path = get_weights_path_from_url(pretrained_url).replace(".pdparams", "")
-    load_dygraph_pretrain(model, path=local_weight_path, load_static_weights=load_static_weights)
+        pretrained_url = pretrained_url.replace("_pretrained",
+                                                "_ssld_pretrained")
+    local_weight_path = get_weights_path_from_url(pretrained_url).replace(
+        ".pdparams", "")
+    load_dygraph_pretrain(
+        model, path=local_weight_path, load_static_weights=load_static_weights)
     return
 
 
@@ -121,10 +127,11 @@ def init_model(config, net, optimizer=None):
             "Given dir {}.pdopt not exist.".format(checkpoints)
         para_dict = paddle.load(checkpoints + ".pdparams")
         opti_dict = paddle.load(checkpoints + ".pdopt")
+        metric_dict = paddle.load(checkpoints + ".pdstates")
         net.set_dict(para_dict)
         optimizer.set_state_dict(opti_dict)
         logger.info("Finish load checkpoints from {}".format(checkpoints))
-        return
+        return metric_dict
 
     pretrained_model = config.get('pretrained_model')
     load_static_weights = config.get('load_static_weights', False)
@@ -155,7 +162,12 @@ def _save_student_model(net, model_prefix):
             student_model_prefix))
 
 
-def save_model(net, optimizer, model_path, model_name="", prefix='ppcls'):
+def save_model(net,
+               optimizer,
+               metric_info,
+               model_path,
+               model_name="",
+               prefix='ppcls'):
     """
     save model to the target path
     """
@@ -169,4 +181,5 @@ def save_model(net, optimizer, model_path, model_name="", prefix='ppcls'):
 
     paddle.save(net.state_dict(), model_prefix + ".pdparams")
     paddle.save(optimizer.state_dict(), model_prefix + ".pdopt")
+    paddle.save(metric_info, model_prefix + ".pdstates")
     logger.info("Already save model in {}".format(model_path))

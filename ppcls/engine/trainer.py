@@ -25,9 +25,7 @@ import paddle
 import paddle.nn as nn
 import paddle.distributed as dist
 
-from ppcls.utils import config
 from ppcls.utils.check import check_gpu
-
 from ppcls.utils.misc import AverageMeter
 from ppcls.utils import logger
 from ppcls.data import build_dataloader
@@ -35,16 +33,15 @@ from ppcls.arch import build_model
 from ppcls.arch.loss_metrics import build_loss
 from ppcls.arch.loss_metrics import build_metrics
 from ppcls.optimizer import build_optimizer
-
+from ppcls.utils.save_load import load_dygraph_pretrain
+from ppcls.utils.save_load import init_model
 from ppcls.utils import save_load
 
 
 class Trainer(object):
-    def __init__(self, mode="train"):
-        args = config.parse_args()
-        self.config = config.get_config(
-            args.config, overrides=args.override, show=True)
+    def __init__(self, config, mode="train"):
         self.mode = mode
+        self.config = config
         self.output_dir = self.config['Global']['output_dir']
         # set device
         assert self.config["Global"]["device"] in ["cpu", "gpu", "xpu"]
@@ -55,6 +52,10 @@ class Trainer(object):
         if self.config["Global"]["distributed"]:
             dist.init_parallel_env()
         self.model = build_model(self.config["Arch"])
+
+        if self.config["Global"]["pretrained_model"] is not None:
+            load_dygraph_pretrain(self.model,
+                                  self.config["Global"]["pretrained_model"])
 
         if self.config["Global"]["distributed"]:
             self.model = paddle.DataParallel(self.model)
@@ -122,7 +123,15 @@ class Trainer(object):
         # global iter counter
         global_step = 0
 
-        for epoch_id in range(1, self.config["Global"]["epochs"] + 1):
+        if self.config["Global"]["checkpoints"] is not None:
+            metric_info = init_model(self.config["Global"], self.model,
+                                     optimizer)
+            if metric_info is not None:
+                best_metric.update(metric_info)
+
+        for epoch_id in range(best_metric["epoch"] + 1,
+                              self.config["Global"]["epochs"] + 1):
+            acc = 0.0
             self.model.train()
             for iter_id, batch in enumerate(train_dataloader()):
                 batch_size = batch[0].shape[0]
@@ -176,12 +185,13 @@ class Trainer(object):
                     "eval_during_train"] and epoch_id % self.config["Global"][
                         "eval_during_train"] == 0:
                 acc = self.eval(epoch_id)
-                if acc >= best_metric["metric"]:
+                if acc > best_metric["metric"]:
                     best_metric["metric"] = acc
                     best_metric["epoch"] = epoch_id
                     save_load.save_model(
                         self.model,
                         optimizer,
+                        best_metric,
                         self.output_dir,
                         model_name=self.config["Arch"]["name"],
                         prefix="best_model")
@@ -190,7 +200,8 @@ class Trainer(object):
             if epoch_id % save_interval == 0:
                 save_load.save_model(
                     self.model,
-                    optimizer,
+                    optimizer, {"metric": acc,
+                                "epoch": epoch_id},
                     self.output_dir,
                     model_name=self.config["Arch"]["name"],
                     prefix="ppcls_epoch_{}".format(epoch_id))
@@ -266,12 +277,3 @@ class Trainer(object):
             return -1
         # return 1st metric in the dict
         return output_info[metric_key].avg
-
-
-def main():
-    trainer = Trainer()
-    trainer.train()
-
-
-if __name__ == "__main__":
-    main()
