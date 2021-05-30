@@ -131,7 +131,6 @@ class MobileNetV3(TheseusLayer):
         class_squeeze: int=960. The output channel number of second to last convolution layer. 
         class_expand: int=1280. The output channel number of last convolution layer. 
         dropout_prob: float=0.2.  Probability of setting units to zero.
-        pretrained: bool=False. If `True` load pretrained parameters, `False` otherwise.
     Returns:
         model: nn.Layer. Specific MobileNetV3 model depends on args.
     """
@@ -143,8 +142,7 @@ class MobileNetV3(TheseusLayer):
                  inplanes=STEM_CONV_NUMBER,
                  class_squeeze=LAST_SECOND_CONV_LARGE,
                  class_expand=LAST_CONV,
-                 dropout_prob=0.2,
-                 pretrained=False):
+                 dropout_prob=0.2):
         super(MobileNetV3, self).__init__()
 
         self.cfg = config
@@ -153,7 +151,6 @@ class MobileNetV3(TheseusLayer):
         self.class_squeeze = class_squeeze
         self.class_expand = class_expand
         self.class_num = class_num
-        self.pretrained = pretrained
 
         self.conv = ConvBNLayer(
             in_c=3,
@@ -347,12 +344,26 @@ class SEModule(TheseusLayer):
         return paddle.multiply(x=identity, y=x)
 
 
-def MobileNetV3_small_x0_35(**args):
+def _load_pretrained(pretrained, model, model_url, use_ssld):
+    if pretrained is False:
+        pass
+    elif pretrained is True:
+        load_dygraph_pretrain_from_url(model, model_url, use_ssld=use_ssld)
+    elif isinstance(pretrained, str):
+        load_dygraph_pretrain(model, pretrained)
+    else:
+        raise RuntimeError(
+            "pretrained type is not available. Please use `string` or `boolean` type."
+        )
+
+
+def MobileNetV3_small_x0_35(pretrained=False, use_ssld=False, **kwargs):
     """
     MobileNetV3_small_x0_35
     Args:
-        pretrained: bool=False. If `True` load pretrained parameters, `False` otherwise.
-        class_num: int=1000. Output dim of last fc layer.
+        pretrained: bool=False or str. If `True` load pretrained parameters, `False` otherwise.
+                    If str, means the path of the pretrained model.
+        use_ssld: bool=False. Whether using distillation pretrained model when pretrained=True.
     Returns:
         model: nn.Layer. Specific `MobileNetV3_small_x0_35` model depends on args.
     """
@@ -360,26 +371,19 @@ def MobileNetV3_small_x0_35(**args):
         config=NET_CONFIG["small"],
         scale=0.35,
         class_squeeze=LAST_SECOND_CONV_SMALL,
-        **args)
-    if isinstance(model.pretrained, bool):
-        if model.pretrained is True:
-            load_dygraph_pretrain_from_url(
-                model, MODEL_URLS["MobileNetV3_small_x0_35"])
-    elif isinstance(model.pretrained, str):
-        load_dygraph_pretrain(model, model.pretrained)
-    else:
-        raise RuntimeError(
-            "pretrained type is not available. Please use `string` or `boolean` type"
-        )
+        **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS['MobileNetV3_small_x0_35'],
+                     use_ssld)
     return model
 
 
-def MobileNetV3_small_x0_5(**args):
+def MobileNetV3_small_x0_5(pretrained=False, use_ssld=False, **kwargs):
     """
     MobileNetV3_small_x0_5
     Args:
-        pretrained: bool=False. If `True` load pretrained parameters, `False` otherwise.
-        class_num: int=1000. Output dim of last fc layer.
+        pretrained: bool=False or str. If `True` load pretrained parameters, `False` otherwise.
+                    If str, means the path of the pretrained model.
+        use_ssld: bool=False. Whether using distillation pretrained model when pretrained=True.
     Returns:
         model: nn.Layer. Specific `MobileNetV3_small_x0_5` model depends on args.
     """
@@ -387,26 +391,19 @@ def MobileNetV3_small_x0_5(**args):
         config=NET_CONFIG["small"],
         scale=0.5,
         class_squeeze=LAST_SECOND_CONV_SMALL,
-        **args)
-    if isinstance(model.pretrained, bool):
-        if model.pretrained is True:
-            load_dygraph_pretrain_from_url(
-                model, MODEL_URLS["MobileNetV3_small_x0_5"])
-    elif isinstance(model.pretrained, str):
-        load_dygraph_pretrain(model, model.pretrained)
-    else:
-        raise RuntimeError(
-            "pretrained type is not available. Please use `string` or `boolean` type"
-        )
+        **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["MobileNetV3_small_x0_5"],
+                     use_ssld)
     return model
 
 
-def MobileNetV3_small_x0_75(**args):
+def MobileNetV3_small_x0_75(pretrained=False, use_ssld=False, **kwargs):
     """
     MobileNetV3_small_x0_75
     Args:
-        pretrained: bool=False. If `True` load pretrained parameters, `False` otherwise.
-        class_num: int=1000. Output dim of last fc layer.
+        pretrained: bool=false or str. if `true` load pretrained parameters, `false` otherwise.
+                    if str, means the path of the pretrained model.
+        use_ssld: bool=False. Whether using distillation pretrained model when pretrained=True.
     Returns:
         model: nn.Layer. Specific `MobileNetV3_small_x0_75` model depends on args.
     """
@@ -414,26 +411,19 @@ def MobileNetV3_small_x0_75(**args):
         config=NET_CONFIG["small"],
         scale=0.75,
         class_squeeze=LAST_SECOND_CONV_SMALL,
-        **args)
-    if isinstance(model.pretrained, bool):
-        if model.pretrained is True:
-            load_dygraph_pretrain_from_url(
-                model, MODEL_URLS["MobileNetV3_small_x0_75"])
-    elif isinstance(model.pretrained, str):
-        load_dygraph_pretrain(model, model.pretrained)
-    else:
-        raise RuntimeError(
-            "pretrained type is not available. Please use `string` or `boolean` type"
-        )
+        **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["MobileNetV3_small_x0_75"],
+                     use_ssld)
     return model
 
 
-def MobileNetV3_small_x1_0(**args):
+def MobileNetV3_small_x1_0(pretrained=False, use_ssld=False, **kwargs):
     """
     MobileNetV3_small_x1_0
     Args:
-        pretrained: bool=False. If `True` load pretrained parameters, `False` otherwise.
-        class_num: int=1000. Output dim of last fc layer.
+        pretrained: bool=False or str. If `True` load pretrained parameters, `False` otherwise.
+                    If str, means the path of the pretrained model.
+        use_ssld: bool=False. Whether using distillation pretrained model when pretrained=True.
     Returns:
         model: nn.Layer. Specific `MobileNetV3_small_x1_0` model depends on args.
     """
@@ -441,26 +431,19 @@ def MobileNetV3_small_x1_0(**args):
         config=NET_CONFIG["small"],
         scale=1.0,
         class_squeeze=LAST_SECOND_CONV_SMALL,
-        **args)
-    if isinstance(model.pretrained, bool):
-        if model.pretrained is True:
-            load_dygraph_pretrain_from_url(
-                model, MODEL_URLS["MobileNetV3_small_x1_0"])
-    elif isinstance(model.pretrained, str):
-        load_dygraph_pretrain(model, model.pretrained)
-    else:
-        raise RuntimeError(
-            "pretrained type is not available. Please use `string` or `boolean` type"
-        )
+        **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["MobileNetV3_small_x1_0"],
+                     use_ssld)
     return model
 
 
-def MobileNetV3_small_x1_25(**args):
+def MobileNetV3_small_x1_25(pretrained=False, use_ssld=False, **kwargs):
     """
     MobileNetV3_small_x1_25
     Args:
-        pretrained: bool=False. If `True` load pretrained parameters, `False` otherwise.
-        class_num: int=1000. Output dim of last fc layer.
+        pretrained: bool=False or str. If `True` load pretrained parameters, `False` otherwise.
+                    If str, means the path of the pretrained model.
+        use_ssld: bool=False. Whether using distillation pretrained model when pretrained=True.
     Returns:
         model: nn.Layer. Specific `MobileNetV3_small_x1_25` model depends on args.
     """
@@ -468,26 +451,19 @@ def MobileNetV3_small_x1_25(**args):
         config=NET_CONFIG["small"],
         scale=1.25,
         class_squeeze=LAST_SECOND_CONV_SMALL,
-        **args)
-    if isinstance(model.pretrained, bool):
-        if model.pretrained is True:
-            load_dygraph_pretrain_from_url(
-                model, MODEL_URLS["MobileNetV3_small_x1_25"])
-    elif isinstance(model.pretrained, str):
-        load_dygraph_pretrain(model, model.pretrained)
-    else:
-        raise RuntimeError(
-            "pretrained type is not available. Please use `string` or `boolean` type"
-        )
+        **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["MobileNetV3_small_x1_25"],
+                     use_ssld)
     return model
 
 
-def MobileNetV3_large_x0_35(**args):
+def MobileNetV3_large_x0_35(pretrained=False, use_ssld=False, **kwargs):
     """
     MobileNetV3_large_x0_35
     Args:
-        pretrained: bool=False. If `True` load pretrained parameters, `False` otherwise.
-        class_num: int=1000. Output dim of last fc layer.
+        pretrained: bool=False or str. If `True` load pretrained parameters, `False` otherwise.
+                    If str, means the path of the pretrained model.
+        use_ssld: bool=False. Whether using distillation pretrained model when pretrained=True.
     Returns:
         model: nn.Layer. Specific `MobileNetV3_large_x0_35` model depends on args.
     """
@@ -495,26 +471,19 @@ def MobileNetV3_large_x0_35(**args):
         config=NET_CONFIG["large"],
         scale=0.35,
         class_squeeze=LAST_SECOND_CONV_LARGE,
-        **args)
-    if isinstance(model.pretrained, bool):
-        if model.pretrained is True:
-            load_dygraph_pretrain_from_url(
-                model, MODEL_URLS["MobileNetV3_large_x0_35"])
-    elif isinstance(model.pretrained, str):
-        load_dygraph_pretrain(model, model.pretrained)
-    else:
-        raise RuntimeError(
-            "pretrained type is not available. Please use `string` or `boolean` type"
-        )
+        **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["MobileNetV3_large_x0_35"],
+                     use_ssld)
     return model
 
 
-def MobileNetV3_large_x0_5(**args):
+def MobileNetV3_large_x0_5(pretrained=False, use_ssld=False, **kwargs):
     """
     MobileNetV3_large_x0_5
     Args:
-        pretrained: bool=False. If `True` load pretrained parameters, `False` otherwise.
-        class_num: int=1000. Output dim of last fc layer.
+        pretrained: bool=False or str. If `True` load pretrained parameters, `False` otherwise.
+                    If str, means the path of the pretrained model.
+        use_ssld: bool=False. Whether using distillation pretrained model when pretrained=True.
     Returns:
         model: nn.Layer. Specific `MobileNetV3_large_x0_5` model depends on args.
     """
@@ -522,26 +491,19 @@ def MobileNetV3_large_x0_5(**args):
         config=NET_CONFIG["large"],
         scale=0.5,
         class_squeeze=LAST_SECOND_CONV_LARGE,
-        **args)
-    if isinstance(model.pretrained, bool):
-        if model.pretrained is True:
-            load_dygraph_pretrain_from_url(
-                model, MODEL_URLS["MobileNetV3_large_x0_5"])
-    elif isinstance(model.pretrained, str):
-        load_dygraph_pretrain(model, model.pretrained)
-    else:
-        raise RuntimeError(
-            "pretrained type is not available. Please use `string` or `boolean` type"
-        )
+        **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["MobileNetV3_large_x0_5"],
+                     use_ssld)
     return model
 
 
-def MobileNetV3_large_x0_75(**args):
+def MobileNetV3_large_x0_75(pretrained=False, use_ssld=False, **kwargs):
     """
     MobileNetV3_large_x0_75
     Args:
-        pretrained: bool=False. If `True` load pretrained parameters, `False` otherwise.
-        class_num: int=1000. Output dim of last fc layer.
+        pretrained: bool=False or str. If `True` load pretrained parameters, `False` otherwise.
+                    If str, means the path of the pretrained model.
+        use_ssld: bool=False. Whether using distillation pretrained model when pretrained=True.
     Returns:
         model: nn.Layer. Specific `MobileNetV3_large_x0_75` model depends on args.
     """
@@ -549,26 +511,19 @@ def MobileNetV3_large_x0_75(**args):
         config=NET_CONFIG["large"],
         scale=0.75,
         class_squeeze=LAST_SECOND_CONV_LARGE,
-        **args)
-    if isinstance(model.pretrained, bool):
-        if model.pretrained is True:
-            load_dygraph_pretrain_from_url(
-                model, MODEL_URLS["MobileNetV3_large_x0_75"])
-    elif isinstance(model.pretrained, str):
-        load_dygraph_pretrain(model, model.pretrained)
-    else:
-        raise RuntimeError(
-            "pretrained type is not available. Please use `string` or `boolean` type"
-        )
+        **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["MobileNetV3_large_x0_75"],
+                     use_ssld)
     return model
 
 
-def MobileNetV3_large_x1_0(**args):
+def MobileNetV3_large_x1_0(pretrained=False, use_ssld=False, **kwargs):
     """
     MobileNetV3_large_x1_0
     Args:
-        pretrained: bool=False. If `True` load pretrained parameters, `False` otherwise.
-        class_num: int=1000. Output dim of last fc layer.
+        pretrained: bool=False or str. If `True` load pretrained parameters, `False` otherwise.
+                    If str, means the path of the pretrained model.
+        use_ssld: bool=False. Whether using distillation pretrained model when pretrained=True.
     Returns:
         model: nn.Layer. Specific `MobileNetV3_large_x1_0` model depends on args.
     """
@@ -576,26 +531,19 @@ def MobileNetV3_large_x1_0(**args):
         config=NET_CONFIG["large"],
         scale=1.0,
         class_squeeze=LAST_SECOND_CONV_LARGE,
-        **args)
-    if isinstance(model.pretrained, bool):
-        if model.pretrained is True:
-            load_dygraph_pretrain_from_url(
-                model, MODEL_URLS["MobileNetV3_large_x1_0"])
-    elif isinstance(model.pretrained, str):
-        load_dygraph_pretrain(model, model.pretrained)
-    else:
-        raise RuntimeError(
-            "pretrained type is not available. Please use `string` or `boolean` type"
-        )
+        **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["MobileNetV3_large_x1_0"],
+                     use_ssld)
     return model
 
 
-def MobileNetV3_large_x1_25(**args):
+def MobileNetV3_large_x1_25(pretrained=False, use_ssld=False, **kwargs):
     """
     MobileNetV3_large_x1_25
     Args:
-        pretrained: bool=False. If `True` load pretrained parameters, `False` otherwise.
-        class_num: int=1000. Output dim of last fc layer.
+        pretrained: bool=False or str. If `True` load pretrained parameters, `False` otherwise.
+                    If str, means the path of the pretrained model.
+        use_ssld: bool=False. Whether using distillation pretrained model when pretrained=True.
     Returns:
         model: nn.Layer. Specific `MobileNetV3_large_x1_25` model depends on args.
     """
@@ -603,15 +551,7 @@ def MobileNetV3_large_x1_25(**args):
         config=NET_CONFIG["large"],
         scale=1.25,
         class_squeeze=LAST_SECOND_CONV_LARGE,
-        **args)
-    if isinstance(model.pretrained, bool):
-        if model.pretrained is True:
-            load_dygraph_pretrain_from_url(
-                model, MODEL_URLS["MobileNetV3_large_x1_25"])
-    elif isinstance(model.pretrained, str):
-        load_dygraph_pretrain(model, model.pretrained)
-    else:
-        raise RuntimeError(
-            "pretrained type is not available. Please use `string` or `boolean` type"
-        )
+        **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["MobileNetV3_large_x1_25"],
+                     use_ssld)
     return model
