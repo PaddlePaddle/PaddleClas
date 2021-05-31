@@ -112,3 +112,4 @@ class KLDivLoss(paddle.nn.Layer):
             p = paddle.nn.functional.softmax(p)
             q = paddle.nn.functional.softmax(q)
         return -(p * paddle.log(q + 1e-8)).sum(1).mean()
+    
