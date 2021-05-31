@@ -43,7 +43,7 @@ class CosMargin(paddle.nn.Layer):
         cos   = paddle.matmul(input, weight)
         cos_m = cos - self.margin
         
-        one_hot = paddle.nn.functional.one_hot(label, self.out_dim)
+        one_hot = paddle.nn.functional.one_hot(label, self.class_num)
         one_hot = paddle.squeeze(one_hot, axis=[1])
         output  = paddle.multiply(one_hot, cos_m) + paddle.multiply((1.0 - one_hot), cos)
         output = output * self.scale
