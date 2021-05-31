@@ -32,7 +32,6 @@ from ppcls.utils import logger
 
 from .common_dataset import CommonDataset
 
-
 class MultiLabelDataset(CommonDataset):
 
     def _load_anno(self):
@@ -66,10 +65,3 @@ class MultiLabelDataset(CommonDataset):
                          format(self.images[idx], ex))
             rnd_idx = np.random.randint(self.__len__())
             return self.__getitem__(rnd_idx)
-
-
-
-
-
-
-
