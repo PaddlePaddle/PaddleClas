@@ -30,9 +30,10 @@ from ppcls.data import preprocess
 from ppcls.data.preprocess import transform
 from ppcls.utils import logger
 
+from .common_dataset import CommonDataset
 
 
-class MultiLabelDataset(Dataset):
+class MultiLabelDataset(CommonDataset):
 
     def _load_anno(self):
         assert os.path.exists(self._cls_path)
