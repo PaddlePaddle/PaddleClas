@@ -44,3 +44,4 @@ class CenterLoss(nn.Layer):
         loss = paddle.sum(paddle.clip(dist, min=1e-12, max=1e+12)) / batch_size
 
         return {'CenterLoss': loss}
+    
