@@ -14,16 +14,24 @@
 
 from __future__ import absolute_import, division, print_function
 
-import paddle
-from paddle import ParamAttr
 import paddle.nn as nn
-import paddle.nn.functional as F
 from paddle.nn import Conv2D, BatchNorm, Linear, Dropout
-from paddle.nn import AdaptiveAvgPool2D, MaxPool2D, AvgPool2D
+from paddle.nn import MaxPool2D
 
 from ppcls.arch.backbone.base.theseus_layer import TheseusLayer
+from ppcls.utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
 
-__all__ = ["VGG11", "VGG13", "VGG16", "VGG19"]
+MODEL_URLS = {
+    "VGG11":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/VGG11_pretrained.pdparams",
+    "VGG13":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/VGG13_pretrained.pdparams",
+    "VGG16":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/VGG16_pretrained.pdparams",
+    "VGG19":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/VGG19_pretrained.pdparams",
+}
+__all__ = MODEL_URLS.keys()
 
 # VGG config
 # key: VGG network depth
@@ -36,68 +44,12 @@ NET_CONFIG = {
 }
 
 
-def VGG11(**args):
-    """
-    VGG11
-    Args:
-        kwargs: 
-            class_num: int=1000. Output dim of last fc layer.
-            stop_grad_layers: int=0. The parameters in blocks which index larger than `stop_grad_layers`, will be set `param.trainable=False`
-    Returns:
-        model: nn.Layer. Specific `VGG11` model depends on args.
-    """
-    model = VGGNet(config=NET_CONFIG[11], **args)
-    return model
-
-
-def VGG13(**args):
-    """
-    VGG13
-    Args:
-        kwargs: 
-            class_num: int=1000. Output dim of last fc layer.
-            stop_grad_layers: int=0. The parameters in blocks which index larger than `stop_grad_layers`, will be set `param.trainable=False`
-    Returns:
-        model: nn.Layer. Specific `VGG11` model depends on args.
-    """
-    model = VGGNet(config=NET_CONFIG[13], **args)
-    return model
-
-
-def VGG16(**args):
-    """
-    VGG16
-    Args:
-        kwargs: 
-            class_num: int=1000. Output dim of last fc layer.
-            stop_grad_layers: int=0. The parameters in blocks which index larger than `stop_grad_layers`, will be set `param.trainable=False`
-    Returns:
-        model: nn.Layer. Specific `VGG11` model depends on args.
-    """
-    model = VGGNet(config=NET_CONFIG[16], **args)
-    return model
-
-
-def VGG19(**args):
-    """
-    VGG19
-    Args:
-        kwargs: 
-            class_num: int=1000. Output dim of last fc layer.
-            stop_grad_layers: int=0. The parameters in blocks which index larger than `stop_grad_layers`, will be set `param.trainable=False`
-    Returns:
-        model: nn.Layer. Specific `VGG11` model depends on args.
-    """
-    model = VGGNet(config=NET_CONFIG[19], **args)
-    return model
-
-
 class ConvBlock(TheseusLayer):
     def __init__(self, input_channels, output_channels, groups):
-        super(ConvBlock, self).__init__()
+        super().__init__()
 
         self.groups = groups
-        self._conv_1 = Conv2D(
+        self.conv1 = Conv2D(
             in_channels=input_channels,
             out_channels=output_channels,
             kernel_size=3,
@@ -105,7 +57,7 @@ class ConvBlock(TheseusLayer):
             padding=1,
             bias_attr=False)
         if groups == 2 or groups == 3 or groups == 4:
-            self._conv_2 = Conv2D(
+            self.conv2 = Conv2D(
                 in_channels=output_channels,
                 out_channels=output_channels,
                 kernel_size=3,
@@ -113,7 +65,7 @@ class ConvBlock(TheseusLayer):
                 padding=1,
                 bias_attr=False)
         if groups == 3 or groups == 4:
-            self._conv_3 = Conv2D(
+            self.conv3 = Conv2D(
                 in_channels=output_channels,
                 out_channels=output_channels,
                 kernel_size=3,
@@ -121,7 +73,7 @@ class ConvBlock(TheseusLayer):
                 padding=1,
                 bias_attr=False)
         if groups == 4:
-            self._conv_4 = Conv2D(
+            self.conv4 = Conv2D(
                 in_channels=output_channels,
                 out_channels=output_channels,
                 kernel_size=3,
@@ -129,65 +81,148 @@ class ConvBlock(TheseusLayer):
                 padding=1,
                 bias_attr=False)
 
-        self._pool = MaxPool2D(kernel_size=2, stride=2, padding=0)
-        self._relu = nn.ReLU()
+        self.max_pool = MaxPool2D(kernel_size=2, stride=2, padding=0)
+        self.relu = nn.ReLU()
 
     def forward(self, inputs):
-        x = self._conv_1(inputs)
-        x = self._relu(x)
+        x = self.conv1(inputs)
+        x = self.relu(x)
         if self.groups == 2 or self.groups == 3 or self.groups == 4:
-            x = self._conv_2(x)
-            x = self._relu(x)
+            x = self.conv2(x)
+            x = self.relu(x)
         if self.groups == 3 or self.groups == 4:
-            x = self._conv_3(x)
-            x = self._relu(x)
+            x = self.conv3(x)
+            x = self.relu(x)
         if self.groups == 4:
-            x = self._conv_4(x)
-            x = self._relu(x)
-        x = self._pool(x)
+            x = self.conv4(x)
+            x = self.relu(x)
+        x = self.max_pool(x)
         return x
 
 
 class VGGNet(TheseusLayer):
+    """
+    VGGNet
+    Args:
+        config: list. VGGNet config.
+        stop_grad_layers: int=0. The parameters in blocks which index larger than `stop_grad_layers`, will be set `param.trainable=False`
+        class_num: int=1000. The number of classes.
+    Returns:
+        model: nn.Layer. Specific VGG model depends on args.
+    """
+
     def __init__(self, config, stop_grad_layers=0, class_num=1000):
         super().__init__()
 
         self.stop_grad_layers = stop_grad_layers
 
-        self._conv_block_1 = ConvBlock(3, 64, config[0])
-        self._conv_block_2 = ConvBlock(64, 128, config[1])
-        self._conv_block_3 = ConvBlock(128, 256, config[2])
-        self._conv_block_4 = ConvBlock(256, 512, config[3])
-        self._conv_block_5 = ConvBlock(512, 512, config[4])
+        self.conv_block_1 = ConvBlock(3, 64, config[0])
+        self.conv_block_2 = ConvBlock(64, 128, config[1])
+        self.conv_block_3 = ConvBlock(128, 256, config[2])
+        self.conv_block_4 = ConvBlock(256, 512, config[3])
+        self.conv_block_5 = ConvBlock(512, 512, config[4])
 
-        self._relu = nn.ReLU()
-        self._flatten = nn.Flatten(start_axis=1, stop_axis=-1)
+        self.relu = nn.ReLU()
+        self.flatten = nn.Flatten(start_axis=1, stop_axis=-1)
 
         for idx, block in enumerate([
-                self._conv_block_1, self._conv_block_2, self._conv_block_3,
-                self._conv_block_4, self._conv_block_5
+                self.conv_block_1, self.conv_block_2, self.conv_block_3,
+                self.conv_block_4, self.conv_block_5
         ]):
             if self.stop_grad_layers >= idx + 1:
                 for param in block.parameters():
                     param.trainable = False
 
-        self._drop = Dropout(p=0.5, mode="downscale_in_infer")
-        self._fc1 = Linear(7 * 7 * 512, 4096)
-        self._fc2 = Linear(4096, 4096)
-        self._out = Linear(4096, class_num)
+        self.drop = Dropout(p=0.5, mode="downscale_in_infer")
+        self.fc1 = Linear(7 * 7 * 512, 4096)
+        self.fc2 = Linear(4096, 4096)
+        self.fc3 = Linear(4096, class_num)
 
     def forward(self, inputs):
-        x = self._conv_block_1(inputs)
-        x = self._conv_block_2(x)
-        x = self._conv_block_3(x)
-        x = self._conv_block_4(x)
-        x = self._conv_block_5(x)
-        x = self._flatten(x)
-        x = self._fc1(x)
-        x = self._relu(x)
-        x = self._drop(x)
-        x = self._fc2(x)
-        x = self._relu(x)
-        x = self._drop(x)
-        x = self._out(x)
+        x = self.conv_block_1(inputs)
+        x = self.conv_block_2(x)
+        x = self.conv_block_3(x)
+        x = self.conv_block_4(x)
+        x = self.conv_block_5(x)
+        x = self.flatten(x)
+        x = self.fc1(x)
+        x = self.relu(x)
+        x = self.drop(x)
+        x = self.fc2(x)
+        x = self.relu(x)
+        x = self.drop(x)
+        x = self.fc3(x)
         return x
+
+
+def _load_pretrained(pretrained, model, model_url, use_ssld):
+    if pretrained is False:
+        pass
+    elif pretrained is True:
+        load_dygraph_pretrain_from_url(model, model_url, use_ssld=use_ssld)
+    elif isinstance(pretrained, str):
+        load_dygraph_pretrain(model, pretrained)
+    else:
+        raise RuntimeError(
+            "pretrained type is not available. Please use `string` or `boolean` type."
+        )
+
+
+def VGG11(pretrained=False, use_ssld=False, **kwargs):
+    """
+    VGG11
+    Args:
+        pretrained: bool=False or str. If `True` load pretrained parameters, `False` otherwise.
+                    If str, means the path of the pretrained model.
+        use_ssld: bool=False. Whether using distillation pretrained model when pretrained=True.
+    Returns:
+        model: nn.Layer. Specific `VGG11` model depends on args.
+    """
+    model = VGGNet(config=NET_CONFIG[11], **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["VGG11"], use_ssld)
+    return model
+
+
+def VGG13(pretrained=False, use_ssld=False, **kwargs):
+    """
+    VGG13
+    Args:
+        pretrained: bool=False or str. If `True` load pretrained parameters, `False` otherwise.
+                    If str, means the path of the pretrained model.
+        use_ssld: bool=False. Whether using distillation pretrained model when pretrained=True.
+    Returns:
+        model: nn.Layer. Specific `VGG13` model depends on args.
+    """
+    model = VGGNet(config=NET_CONFIG[13], **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["VGG13"], use_ssld)
+    return model
+
+
+def VGG16(pretrained=False, use_ssld=False, **kwargs):
+    """
+    VGG16
+    Args:
+        pretrained: bool=False or str. If `True` load pretrained parameters, `False` otherwise.
+                    If str, means the path of the pretrained model.
+        use_ssld: bool=False. Whether using distillation pretrained model when pretrained=True.
+    Returns:
+        model: nn.Layer. Specific `VGG16` model depends on args.
+    """
+    model = VGGNet(config=NET_CONFIG[16], **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["VGG16"], use_ssld)
+    return model
+
+
+def VGG19(pretrained=False, use_ssld=False, **kwargs):
+    """
+    VGG19
+    Args:
+        pretrained: bool=False or str. If `True` load pretrained parameters, `False` otherwise.
+                    If str, means the path of the pretrained model.
+        use_ssld: bool=False. Whether using distillation pretrained model when pretrained=True.
+    Returns:
+        model: nn.Layer. Specific `VGG19` model depends on args.
+    """
+    model = VGGNet(config=NET_CONFIG[19], **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["VGG19"], use_ssld)
+    return model

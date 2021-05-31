@@ -17,34 +17,45 @@ from __future__ import division
 from __future__ import print_function
 
 import math
-import numpy as np
 import paddle
+from paddle import nn
 from paddle import ParamAttr
-import paddle.nn as nn
-import paddle.nn.functional as F
-from paddle.nn import AdaptiveAvgPool2D, MaxPool2D, AvgPool2D
+from paddle.nn.functional import upsample
 from paddle.nn.initializer import Uniform
 
-from ppcls.arch.backbone.base.theseus_layer import TheseusLayer
+from ppcls.arch.backbone.base.theseus_layer import TheseusLayer, Identity
+from ppcls.utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
 
-__all__ = [
-    "HRNet_W18_C",
-    "HRNet_W30_C",
-    "HRNet_W32_C",
-    "HRNet_W40_C",
-    "HRNet_W44_C",
-    "HRNet_W48_C",
-    "HRNet_W60_C",
-    "HRNet_W64_C",
-    "SE_HRNet_W18_C",
-    "SE_HRNet_W30_C",
-    "SE_HRNet_W32_C",
-    "SE_HRNet_W40_C",
-    "SE_HRNet_W44_C",
-    "SE_HRNet_W48_C",
-    "SE_HRNet_W60_C",
-    "SE_HRNet_W64_C",
-]
+MODEL_URLS = {
+    "HRNet_W18_C":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/HRNet_W18_C_pretrained.pdparams",
+    "HRNet_W30_C":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/HRNet_W30_C_pretrained.pdparams",
+    "HRNet_W32_C":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/HRNet_W32_C_pretrained.pdparams",
+    "HRNet_W40_C":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/HRNet_W40_C_pretrained.pdparams",
+    "HRNet_W44_C":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/HRNet_W44_C_pretrained.pdparams",
+    "HRNet_W48_C":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/HRNet_W48_C_pretrained.pdparams",
+    "HRNet_W64_C":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/HRNet_W64_C_pretrained.pdparams"
+}
+
+__all__ = list(MODEL_URLS.keys())
+
+
+def _create_act(act):
+    if act == "hardswish":
+        return nn.Hardswish()
+    elif act == "relu":
+        return nn.ReLU()
+    elif act is None:
+        return Identity()
+    else:
+        raise RuntimeError(
+            "The activation function is not supported: {}".format(act))
 
 
 class ConvBNLayer(TheseusLayer):
@@ -54,136 +65,25 @@ class ConvBNLayer(TheseusLayer):
                  filter_size,
                  stride=1,
                  groups=1,
-                 act="relu",
-                 name=None):
-        super(ConvBNLayer, self).__init__()
+                 act="relu"):
+        super().__init__()
 
-        self._conv = nn.Conv2D(
+        self.conv = nn.Conv2D(
             in_channels=num_channels,
             out_channels=num_filters,
             kernel_size=filter_size,
             stride=stride,
             padding=(filter_size - 1) // 2,
             groups=groups,
-            weight_attr=ParamAttr(name=name + "_weights"),
             bias_attr=False)
-        bn_name = name + '_bn'
-        self._batch_norm = nn.BatchNorm(
-            num_filters,
-            act=act,
-            param_attr=ParamAttr(name=bn_name + '_scale'),
-            bias_attr=ParamAttr(bn_name + '_offset'),
-            moving_mean_name=bn_name + '_mean',
-            moving_variance_name=bn_name + '_variance')
+        self.bn = nn.BatchNorm(num_filters, act=None)
+        self.act = _create_act(act)
 
-    def forward(self, x, res_dict=None):
-        y = self._conv(x)
-        y = self._batch_norm(y)
-        return y
-
-
-class Layer1(TheseusLayer):
-    def __init__(self, num_channels, has_se=False, name=None):
-        super(Layer1, self).__init__()
-
-        self.bottleneck_block_list = []
-
-        for i in range(4):
-            bottleneck_block = self.add_sublayer(
-                "bb_{}_{}".format(name, i + 1),
-                BottleneckBlock(
-                    num_channels=num_channels if i == 0 else 256,
-                    num_filters=64,
-                    has_se=has_se,
-                    stride=1,
-                    downsample=True if i == 0 else False,
-                    name=name + '_' + str(i + 1)))
-            self.bottleneck_block_list.append(bottleneck_block)
-
-    def forward(self, x, res_dict=None):
-        y = x
-        for block_func in self.bottleneck_block_list:
-            y = block_func(y)
-        return y
-
-
-class TransitionLayer(TheseusLayer):
-    def __init__(self, in_channels, out_channels, name=None):
-        super(TransitionLayer, self).__init__()
-
-        num_in = len(in_channels)
-        num_out = len(out_channels)
-        out = []
-        self.conv_bn_func_list = []
-        for i in range(num_out):
-            residual = None
-            if i < num_in:
-                if in_channels[i] != out_channels[i]:
-                    residual = self.add_sublayer(
-                        "transition_{}_layer_{}".format(name, i + 1),
-                        ConvBNLayer(
-                            num_channels=in_channels[i],
-                            num_filters=out_channels[i],
-                            filter_size=3,
-                            name=name + '_layer_' + str(i + 1)))
-            else:
-                residual = self.add_sublayer(
-                    "transition_{}_layer_{}".format(name, i + 1),
-                    ConvBNLayer(
-                        num_channels=in_channels[-1],
-                        num_filters=out_channels[i],
-                        filter_size=3,
-                        stride=2,
-                        name=name + '_layer_' + str(i + 1)))
-            self.conv_bn_func_list.append(residual)
-
-    def forward(self, x, res_dict=None):
-        outs = []
-        for idx, conv_bn_func in enumerate(self.conv_bn_func_list):
-            if conv_bn_func is None:
-                outs.append(x[idx])
-            else:
-                if idx < len(x):
-                    outs.append(conv_bn_func(x[idx]))
-                else:
-                    outs.append(conv_bn_func(x[-1]))
-        return outs
-
-
-class Branches(TheseusLayer):
-    def __init__(self,
-                 block_num,
-                 in_channels,
-                 out_channels,
-                 has_se=False,
-                 name=None):
-        super(Branches, self).__init__()
-
-        self.basic_block_list = []
-
-        for i in range(len(out_channels)):
-            self.basic_block_list.append([])
-            for j in range(block_num):
-                in_ch = in_channels[i] if j == 0 else out_channels[i]
-                basic_block_func = self.add_sublayer(
-                    "bb_{}_branch_layer_{}_{}".format(name, i + 1, j + 1),
-                    BasicBlock(
-                        num_channels=in_ch,
-                        num_filters=out_channels[i],
-                        has_se=has_se,
-                        name=name + '_branch_layer_' + str(i + 1) + '_' +
-                        str(j + 1)))
-                self.basic_block_list[i].append(basic_block_func)
-
-    def forward(self, x, res_dict=None):
-        outs = []
-        for idx, xi in enumerate(x):
-            conv = xi
-            basic_block_list = self.basic_block_list[idx]
-            for basic_block_func in basic_block_list:
-                conv = basic_block_func(conv)
-            outs.append(conv)
-        return outs
+    def forward(self, x):
+        x = self.conv(x)
+        x = self.bn(x)
+        x = self.act(x)
+        return x
 
 
 class BottleneckBlock(TheseusLayer):
@@ -192,9 +92,8 @@ class BottleneckBlock(TheseusLayer):
                  num_filters,
                  has_se,
                  stride=1,
-                 downsample=False,
-                 name=None):
-        super(BottleneckBlock, self).__init__()
+                 downsample=False):
+        super().__init__()
 
         self.has_se = has_se
         self.downsample = downsample
@@ -203,540 +102,640 @@ class BottleneckBlock(TheseusLayer):
             num_channels=num_channels,
             num_filters=num_filters,
             filter_size=1,
-            act="relu",
-            name=name + "_conv1", )
+            act="relu")
         self.conv2 = ConvBNLayer(
             num_channels=num_filters,
             num_filters=num_filters,
             filter_size=3,
             stride=stride,
-            act="relu",
-            name=name + "_conv2")
+            act="relu")
         self.conv3 = ConvBNLayer(
             num_channels=num_filters,
             num_filters=num_filters * 4,
             filter_size=1,
-            act=None,
-            name=name + "_conv3")
+            act=None)
 
         if self.downsample:
             self.conv_down = ConvBNLayer(
                 num_channels=num_channels,
                 num_filters=num_filters * 4,
                 filter_size=1,
-                act=None,
-                name=name + "_downsample")
+                act=None)
 
         if self.has_se:
             self.se = SELayer(
                 num_channels=num_filters * 4,
                 num_filters=num_filters * 4,
-                reduction_ratio=16,
-                name='fc' + name)
+                reduction_ratio=16)
+        self.relu = nn.ReLU()
 
     def forward(self, x, res_dict=None):
         residual = x
-        conv1 = self.conv1(x)
-        conv2 = self.conv2(conv1)
-        conv3 = self.conv3(conv2)
-
+        x = self.conv1(x)
+        x = self.conv2(x)
+        x = self.conv3(x)
         if self.downsample:
-            residual = self.conv_down(x)
-
+            residual = self.conv_down(residual)
         if self.has_se:
-            conv3 = self.se(conv3)
+            x = self.se(x)
+        x = paddle.add(x=residual, y=x)
+        x = self.relu(x)
+        return x
 
-        y = paddle.add(x=residual, y=conv3)
-        y = F.relu(y)
-        return y
 
-
-class BasicBlock(TheseusLayer):
-    def __init__(self,
-                 num_channels,
-                 num_filters,
-                 stride=1,
-                 has_se=False,
-                 downsample=False,
-                 name=None):
-        super(BasicBlock, self).__init__()
+class BasicBlock(nn.Layer):
+    def __init__(self, num_channels, num_filters, has_se=False):
+        super().__init__()
 
         self.has_se = has_se
-        self.downsample = downsample
 
         self.conv1 = ConvBNLayer(
             num_channels=num_channels,
             num_filters=num_filters,
             filter_size=3,
-            stride=stride,
-            act="relu",
-            name=name + "_conv1")
+            stride=1,
+            act="relu")
         self.conv2 = ConvBNLayer(
             num_channels=num_filters,
             num_filters=num_filters,
             filter_size=3,
             stride=1,
-            act=None,
-            name=name + "_conv2")
-
-        if self.downsample:
-            self.conv_down = ConvBNLayer(
-                num_channels=num_channels,
-                num_filters=num_filters * 4,
-                filter_size=1,
-                act="relu",
-                name=name + "_downsample")
+            act=None)
 
         if self.has_se:
             self.se = SELayer(
                 num_channels=num_filters,
                 num_filters=num_filters,
-                reduction_ratio=16,
-                name='fc' + name)
+                reduction_ratio=16)
+        self.relu = nn.ReLU()
 
-    def forward(self, input, res_dict=None):
-        residual = input
-        conv1 = self.conv1(input)
-        conv2 = self.conv2(conv1)
-
-        if self.downsample:
-            residual = self.conv_down(input)
+    def forward(self, x):
+        residual = x
+        x = self.conv1(x)
+        x = self.conv2(x)
 
         if self.has_se:
-            conv2 = self.se(conv2)
+            x = self.se(x)
 
-        y = paddle.add(x=residual, y=conv2)
-        y = F.relu(y)
-        return y
+        x = paddle.add(x=residual, y=x)
+        x = self.relu(x)
+        return x
 
 
 class SELayer(TheseusLayer):
-    def __init__(self, num_channels, num_filters, reduction_ratio, name=None):
-        super(SELayer, self).__init__()
+    def __init__(self, num_channels, num_filters, reduction_ratio):
+        super().__init__()
 
-        self.pool2d_gap = AdaptiveAvgPool2D(1)
+        self.avg_pool = nn.AdaptiveAvgPool2D(1)
 
         self._num_channels = num_channels
 
         med_ch = int(num_channels / reduction_ratio)
         stdv = 1.0 / math.sqrt(num_channels * 1.0)
-        self.squeeze = nn.Linear(
+        self.fc_squeeze = nn.Linear(
             num_channels,
             med_ch,
-            weight_attr=ParamAttr(
-                initializer=Uniform(-stdv, stdv), name=name + "_sqz_weights"),
-            bias_attr=ParamAttr(name=name + '_sqz_offset'))
-
+            weight_attr=ParamAttr(initializer=Uniform(-stdv, stdv)))
+        self.relu = nn.ReLU()
         stdv = 1.0 / math.sqrt(med_ch * 1.0)
-        self.excitation = nn.Linear(
+        self.fc_excitation = nn.Linear(
             med_ch,
             num_filters,
-            weight_attr=ParamAttr(
-                initializer=Uniform(-stdv, stdv), name=name + "_exc_weights"),
-            bias_attr=ParamAttr(name=name + '_exc_offset'))
+            weight_attr=ParamAttr(initializer=Uniform(-stdv, stdv)))
+        self.sigmoid = nn.Sigmoid()
 
-    def forward(self, input, res_dict=None):
-        pool = self.pool2d_gap(input)
-        pool = paddle.squeeze(pool, axis=[2, 3])
-        squeeze = self.squeeze(pool)
-        squeeze = F.relu(squeeze)
-        excitation = self.excitation(squeeze)
-        excitation = F.sigmoid(excitation)
-        excitation = paddle.unsqueeze(excitation, axis=[2, 3])
-        out = input * excitation
-        return out
+    def forward(self, x, res_dict=None):
+        residual = x
+        x = self.avg_pool(x)
+        x = paddle.squeeze(x, axis=[2, 3])
+        x = self.fc_squeeze(x)
+        x = self.relu(x)
+        x = self.fc_excitation(x)
+        x = self.sigmoid(x)
+        x = paddle.unsqueeze(x, axis=[2, 3])
+        x = residual * x
+        return x
 
 
 class Stage(TheseusLayer):
-    def __init__(self,
-                 num_channels,
-                 num_modules,
-                 num_filters,
-                 has_se=False,
-                 multi_scale_output=True,
-                 name=None):
-        super(Stage, self).__init__()
+    def __init__(self, num_modules, num_filters, has_se=False):
+        super().__init__()
 
         self._num_modules = num_modules
 
-        self.stage_func_list = []
+        self.stage_func_list = nn.LayerList()
         for i in range(num_modules):
-            if i == num_modules - 1 and not multi_scale_output:
-                stage_func = self.add_sublayer(
-                    "stage_{}_{}".format(name, i + 1),
-                    HighResolutionModule(
-                        num_channels=num_channels,
-                        num_filters=num_filters,
-                        has_se=has_se,
-                        multi_scale_output=False,
-                        name=name + '_' + str(i + 1)))
-            else:
-                stage_func = self.add_sublayer(
-                    "stage_{}_{}".format(name, i + 1),
-                    HighResolutionModule(
-                        num_channels=num_channels,
-                        num_filters=num_filters,
-                        has_se=has_se,
-                        name=name + '_' + str(i + 1)))
+            self.stage_func_list.append(
+                HighResolutionModule(
+                    num_filters=num_filters, has_se=has_se))
 
-            self.stage_func_list.append(stage_func)
-
-    def forward(self, input, res_dict=None):
-        out = input
+    def forward(self, x, res_dict=None):
+        x = x
         for idx in range(self._num_modules):
-            out = self.stage_func_list[idx](out)
-        return out
+            x = self.stage_func_list[idx](x)
+        return x
 
 
 class HighResolutionModule(TheseusLayer):
-    def __init__(self,
-                 num_channels,
-                 num_filters,
-                 has_se=False,
-                 multi_scale_output=True,
-                 name=None):
-        super(HighResolutionModule, self).__init__()
+    def __init__(self, num_filters, has_se=False):
+        super().__init__()
 
-        self.branches_func = Branches(
-            block_num=4,
-            in_channels=num_channels,
-            out_channels=num_filters,
-            has_se=has_se,
-            name=name)
+        self.basic_block_list = nn.LayerList()
+
+        for i in range(len(num_filters)):
+            self.basic_block_list.append(
+                nn.Sequential(*[
+                    BasicBlock(
+                        num_channels=num_filters[i],
+                        num_filters=num_filters[i],
+                        has_se=has_se) for j in range(4)
+                ]))
 
         self.fuse_func = FuseLayers(
-            in_channels=num_filters,
-            out_channels=num_filters,
-            multi_scale_output=multi_scale_output,
-            name=name)
+            in_channels=num_filters, out_channels=num_filters)
 
-    def forward(self, input, res_dict=None):
-        out = self.branches_func(input)
+    def forward(self, x, res_dict=None):
+        out = []
+        for idx, xi in enumerate(x):
+            basic_block_list = self.basic_block_list[idx]
+            for basic_block_func in basic_block_list:
+                xi = basic_block_func(xi)
+            out.append(xi)
         out = self.fuse_func(out)
         return out
 
 
 class FuseLayers(TheseusLayer):
-    def __init__(self,
-                 in_channels,
-                 out_channels,
-                 multi_scale_output=True,
-                 name=None):
-        super(FuseLayers, self).__init__()
+    def __init__(self, in_channels, out_channels):
+        super().__init__()
 
-        self._actual_ch = len(in_channels) if multi_scale_output else 1
+        self._actual_ch = len(in_channels)
         self._in_channels = in_channels
 
-        self.residual_func_list = []
-        for i in range(self._actual_ch):
+        self.residual_func_list = nn.LayerList()
+        self.relu = nn.ReLU()
+        for i in range(len(in_channels)):
             for j in range(len(in_channels)):
-                residual_func = None
                 if j > i:
-                    residual_func = self.add_sublayer(
-                        "residual_{}_layer_{}_{}".format(name, i + 1, j + 1),
+                    self.residual_func_list.append(
                         ConvBNLayer(
                             num_channels=in_channels[j],
                             num_filters=out_channels[i],
                             filter_size=1,
                             stride=1,
-                            act=None,
-                            name=name + '_layer_' + str(i + 1) + '_' +
-                            str(j + 1)))
-                    self.residual_func_list.append(residual_func)
+                            act=None))
                 elif j < i:
                     pre_num_filters = in_channels[j]
                     for k in range(i - j):
                         if k == i - j - 1:
-                            residual_func = self.add_sublayer(
-                                "residual_{}_layer_{}_{}_{}".format(
-                                    name, i + 1, j + 1, k + 1),
+                            self.residual_func_list.append(
                                 ConvBNLayer(
                                     num_channels=pre_num_filters,
                                     num_filters=out_channels[i],
                                     filter_size=3,
                                     stride=2,
-                                    act=None,
-                                    name=name + '_layer_' + str(i + 1) + '_' +
-                                    str(j + 1) + '_' + str(k + 1)))
+                                    act=None))
                             pre_num_filters = out_channels[i]
                         else:
-                            residual_func = self.add_sublayer(
-                                "residual_{}_layer_{}_{}_{}".format(
-                                    name, i + 1, j + 1, k + 1),
+                            self.residual_func_list.append(
                                 ConvBNLayer(
                                     num_channels=pre_num_filters,
                                     num_filters=out_channels[j],
                                     filter_size=3,
                                     stride=2,
-                                    act="relu",
-                                    name=name + '_layer_' + str(i + 1) + '_' +
-                                    str(j + 1) + '_' + str(k + 1)))
+                                    act="relu"))
                             pre_num_filters = out_channels[j]
-                        self.residual_func_list.append(residual_func)
 
-    def forward(self, input, res_dict=None):
-        outs = []
+    def forward(self, x, res_dict=None):
+        out = []
         residual_func_idx = 0
-        for i in range(self._actual_ch):
-            residual = input[i]
+        for i in range(len(self._in_channels)):
+            residual = x[i]
             for j in range(len(self._in_channels)):
                 if j > i:
-                    y = self.residual_func_list[residual_func_idx](input[j])
+                    xj = self.residual_func_list[residual_func_idx](x[j])
                     residual_func_idx += 1
 
-                    y = F.upsample(y, scale_factor=2**(j - i), mode="nearest")
-                    residual = paddle.add(x=residual, y=y)
+                    xj = upsample(xj, scale_factor=2**(j - i), mode="nearest")
+                    residual = paddle.add(x=residual, y=xj)
                 elif j < i:
-                    y = input[j]
+                    xj = x[j]
                     for k in range(i - j):
-                        y = self.residual_func_list[residual_func_idx](y)
+                        xj = self.residual_func_list[residual_func_idx](xj)
                         residual_func_idx += 1
 
-                    residual = paddle.add(x=residual, y=y)
+                    residual = paddle.add(x=residual, y=xj)
 
-            residual = F.relu(residual)
-            outs.append(residual)
+            residual = self.relu(residual)
+            out.append(residual)
 
-        return outs
+        return out
 
 
 class LastClsOut(TheseusLayer):
     def __init__(self,
                  num_channel_list,
                  has_se,
-                 num_filters_list=[32, 64, 128, 256],
-                 name=None):
-        super(LastClsOut, self).__init__()
+                 num_filters_list=[32, 64, 128, 256]):
+        super().__init__()
 
-        self.func_list = []
+        self.func_list = nn.LayerList()
         for idx in range(len(num_channel_list)):
-            func = self.add_sublayer(
-                "conv_{}_conv_{}".format(name, idx + 1),
+            self.func_list.append(
                 BottleneckBlock(
                     num_channels=num_channel_list[idx],
                     num_filters=num_filters_list[idx],
                     has_se=has_se,
-                    downsample=True,
-                    name=name + 'conv_' + str(idx + 1)))
-            self.func_list.append(func)
+                    downsample=True))
 
-    def forward(self, inputs, res_dict=None):
-        outs = []
-        for idx, input in enumerate(inputs):
-            out = self.func_list[idx](input)
-            outs.append(out)
-        return outs
+    def forward(self, x, res_dict=None):
+        out = []
+        for idx, xi in enumerate(x):
+            xi = self.func_list[idx](xi)
+            out.append(xi)
+        return out
 
 
 class HRNet(TheseusLayer):
-    def __init__(self, width=18, has_se=False, class_dim=1000):
-        super(HRNet, self).__init__()
+    """
+    HRNet
+    Args:
+        width: int=18. Base channel number of HRNet.
+        has_se: bool=False. If 'True', add se module to HRNet.
+        class_num: int=1000. Output num of last fc layer.
+    Returns:
+        model: nn.Layer. Specific HRNet model depends on args.
+    """
+
+    def __init__(self, width=18, has_se=False, class_num=1000):
+        super().__init__()
 
         self.width = width
         self.has_se = has_se
-        self.channels = {
-            18: [[18, 36], [18, 36, 72], [18, 36, 72, 144]],
-            30: [[30, 60], [30, 60, 120], [30, 60, 120, 240]],
-            32: [[32, 64], [32, 64, 128], [32, 64, 128, 256]],
-            40: [[40, 80], [40, 80, 160], [40, 80, 160, 320]],
-            44: [[44, 88], [44, 88, 176], [44, 88, 176, 352]],
-            48: [[48, 96], [48, 96, 192], [48, 96, 192, 384]],
-            60: [[60, 120], [60, 120, 240], [60, 120, 240, 480]],
-            64: [[64, 128], [64, 128, 256], [64, 128, 256, 512]]
-        }
-        self._class_dim = class_dim
+        self._class_num = class_num
 
-        channels_2, channels_3, channels_4 = self.channels[width]
-        num_modules_2, num_modules_3, num_modules_4 = 1, 4, 3
+        channels_2 = [self.width, self.width * 2]
+        channels_3 = [self.width, self.width * 2, self.width * 4]
+        channels_4 = [
+            self.width, self.width * 2, self.width * 4, self.width * 8
+        ]
 
         self.conv_layer1_1 = ConvBNLayer(
             num_channels=3,
             num_filters=64,
             filter_size=3,
             stride=2,
-            act='relu',
-            name="layer1_1")
+            act="relu")
 
         self.conv_layer1_2 = ConvBNLayer(
             num_channels=64,
             num_filters=64,
             filter_size=3,
             stride=2,
-            act='relu',
-            name="layer1_2")
+            act="relu")
 
-        self.la1 = Layer1(num_channels=64, has_se=has_se, name="layer2")
+        self.layer1 = nn.Sequential(*[
+            BottleneckBlock(
+                num_channels=64 if i == 0 else 256,
+                num_filters=64,
+                has_se=has_se,
+                stride=1,
+                downsample=True if i == 0 else False) for i in range(4)
+        ])
 
-        self.tr1 = TransitionLayer(
-            in_channels=[256], out_channels=channels_2, name="tr1")
+        self.conv_tr1_1 = ConvBNLayer(
+            num_channels=256, num_filters=width, filter_size=3)
+        self.conv_tr1_2 = ConvBNLayer(
+            num_channels=256, num_filters=width * 2, filter_size=3, stride=2)
 
         self.st2 = Stage(
-            num_channels=channels_2,
-            num_modules=num_modules_2,
-            num_filters=channels_2,
-            has_se=self.has_se,
-            name="st2")
+            num_modules=1, num_filters=channels_2, has_se=self.has_se)
 
-        self.tr2 = TransitionLayer(
-            in_channels=channels_2, out_channels=channels_3, name="tr2")
+        self.conv_tr2 = ConvBNLayer(
+            num_channels=width * 2,
+            num_filters=width * 4,
+            filter_size=3,
+            stride=2)
         self.st3 = Stage(
-            num_channels=channels_3,
-            num_modules=num_modules_3,
-            num_filters=channels_3,
-            has_se=self.has_se,
-            name="st3")
+            num_modules=4, num_filters=channels_3, has_se=self.has_se)
 
-        self.tr3 = TransitionLayer(
-            in_channels=channels_3, out_channels=channels_4, name="tr3")
+        self.conv_tr3 = ConvBNLayer(
+            num_channels=width * 4,
+            num_filters=width * 8,
+            filter_size=3,
+            stride=2)
+
         self.st4 = Stage(
-            num_channels=channels_4,
-            num_modules=num_modules_4,
-            num_filters=channels_4,
-            has_se=self.has_se,
-            name="st4")
+            num_modules=3, num_filters=channels_4, has_se=self.has_se)
 
         # classification
         num_filters_list = [32, 64, 128, 256]
         self.last_cls = LastClsOut(
             num_channel_list=channels_4,
             has_se=self.has_se,
-            num_filters_list=num_filters_list,
-            name="cls_head", )
+            num_filters_list=num_filters_list)
 
         last_num_filters = [256, 512, 1024]
-        self.cls_head_conv_list = []
+        self.cls_head_conv_list = nn.LayerList()
         for idx in range(3):
             self.cls_head_conv_list.append(
-                self.add_sublayer(
-                    "cls_head_add{}".format(idx + 1),
-                    ConvBNLayer(
-                        num_channels=num_filters_list[idx] * 4,
-                        num_filters=last_num_filters[idx],
-                        filter_size=3,
-                        stride=2,
-                        name="cls_head_add" + str(idx + 1))))
+                ConvBNLayer(
+                    num_channels=num_filters_list[idx] * 4,
+                    num_filters=last_num_filters[idx],
+                    filter_size=3,
+                    stride=2))
 
         self.conv_last = ConvBNLayer(
-            num_channels=1024,
-            num_filters=2048,
-            filter_size=1,
-            stride=1,
-            name="cls_head_last_conv")
+            num_channels=1024, num_filters=2048, filter_size=1, stride=1)
 
-        self.pool2d_avg = AdaptiveAvgPool2D(1)
+        self.avg_pool = nn.AdaptiveAvgPool2D(1)
 
         stdv = 1.0 / math.sqrt(2048 * 1.0)
 
-        self.out = nn.Linear(
+        self.fc = nn.Linear(
             2048,
-            class_dim,
-            weight_attr=ParamAttr(
-                initializer=Uniform(-stdv, stdv), name="fc_weights"),
-            bias_attr=ParamAttr(name="fc_offset"))
+            class_num,
+            weight_attr=ParamAttr(initializer=Uniform(-stdv, stdv)))
 
-    def forward(self, input, res_dict=None):
-        conv1 = self.conv_layer1_1(input)
-        conv2 = self.conv_layer1_2(conv1)
+    def forward(self, x, res_dict=None):
+        x = self.conv_layer1_1(x)
+        x = self.conv_layer1_2(x)
 
-        la1 = self.la1(conv2)
+        x = self.layer1(x)
 
-        tr1 = self.tr1([la1])
-        st2 = self.st2(tr1)
+        tr1_1 = self.conv_tr1_1(x)
+        tr1_2 = self.conv_tr1_2(x)
+        x = self.st2([tr1_1, tr1_2])
 
-        tr2 = self.tr2(st2)
-        st3 = self.st3(tr2)
+        tr2 = self.conv_tr2(x[-1])
+        x.append(tr2)
+        x = self.st3(x)
 
-        tr3 = self.tr3(st3)
-        st4 = self.st4(tr3)
+        tr3 = self.conv_tr3(x[-1])
+        x.append(tr3)
+        x = self.st4(x)
 
-        last_cls = self.last_cls(st4)
+        x = self.last_cls(x)
 
-        y = last_cls[0]
+        y = x[0]
         for idx in range(3):
-            y = paddle.add(last_cls[idx + 1], self.cls_head_conv_list[idx](y))
+            y = paddle.add(x[idx + 1], self.cls_head_conv_list[idx](y))
 
         y = self.conv_last(y)
-        y = self.pool2d_avg(y)
+        y = self.avg_pool(y)
         y = paddle.reshape(y, shape=[-1, y.shape[1]])
-        y = self.out(y)
+        y = self.fc(y)
         return y
 
 
-def HRNet_W18_C(**args):
-    model = HRNet(width=18, **args)
+def _load_pretrained(pretrained, model, model_url, use_ssld):
+    if pretrained is False:
+        pass
+    elif pretrained is True:
+        load_dygraph_pretrain_from_url(model, model_url, use_ssld=use_ssld)
+    elif isinstance(pretrained, str):
+        load_dygraph_pretrain(model, pretrained)
+    else:
+        raise RuntimeError(
+            "pretrained type is not available. Please use `string` or `boolean` type."
+        )
+
+
+def HRNet_W18_C(pretrained=False, use_ssld=False, **kwargs):
+    """
+    HRNet_W18_C
+    Args:
+        pretrained: bool=False or str. If `True` load pretrained parameters, `False` otherwise.
+                    If str, means the path of the pretrained model.
+        use_ssld: bool=False. Whether using distillation pretrained model when pretrained=True.
+    Returns:
+        model: nn.Layer. Specific `HRNet_W18_C` model depends on args.
+    """
+    model = HRNet(width=18, **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["HRNet_W18_C"], use_ssld)
     return model
 
 
-def HRNet_W30_C(**args):
-    model = HRNet(width=30, **args)
+def HRNet_W30_C(pretrained=False, use_ssld=False, **kwargs):
+    """
+    HRNet_W30_C
+    Args:
+        pretrained: bool=False or str. If `True` load pretrained parameters, `False` otherwise.
+                    If str, means the path of the pretrained model.
+        use_ssld: bool=False. Whether using distillation pretrained model when pretrained=True.
+    Returns:
+        model: nn.Layer. Specific `HRNet_W30_C` model depends on args.
+    """
+    model = HRNet(width=30, **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["HRNet_W30_C"], use_ssld)
     return model
 
 
-def HRNet_W32_C(**args):
-    model = HRNet(width=32, **args)
+def HRNet_W32_C(pretrained=False, use_ssld=False, **kwargs):
+    """
+    HRNet_W32_C
+    Args:
+        pretrained: bool=False or str. If `True` load pretrained parameters, `False` otherwise.
+                    If str, means the path of the pretrained model.
+        use_ssld: bool=False. Whether using distillation pretrained model when pretrained=True.
+    Returns:
+        model: nn.Layer. Specific `HRNet_W32_C` model depends on args.
+    """
+    model = HRNet(width=32, **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["HRNet_W32_C"], use_ssld)
     return model
 
 
-def HRNet_W40_C(**args):
-    model = HRNet(width=40, **args)
+def HRNet_W40_C(pretrained=False, use_ssld=False, **kwargs):
+    """
+    HRNet_W40_C
+    Args:
+        pretrained: bool=False or str. If `True` load pretrained parameters, `False` otherwise.
+                    If str, means the path of the pretrained model.
+        use_ssld: bool=False. Whether using distillation pretrained model when pretrained=True.
+    Returns:
+        model: nn.Layer. Specific `HRNet_W40_C` model depends on args.
+    """
+    model = HRNet(width=40, **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["HRNet_W40_C"], use_ssld)
     return model
 
 
-def HRNet_W44_C(**args):
-    model = HRNet(width=44, **args)
+def HRNet_W44_C(pretrained=False, use_ssld=False, **kwargs):
+    """
+    HRNet_W44_C
+    Args:
+        pretrained: bool=False or str. If `True` load pretrained parameters, `False` otherwise.
+                    If str, means the path of the pretrained model.
+        use_ssld: bool=False. Whether using distillation pretrained model when pretrained=True.
+    Returns:
+        model: nn.Layer. Specific `HRNet_W44_C` model depends on args.
+    """
+    model = HRNet(width=44, **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["HRNet_W44_C"], use_ssld)
     return model
 
 
-def HRNet_W48_C(**args):
-    model = HRNet(width=48, **args)
+def HRNet_W48_C(pretrained=False, use_ssld=False, **kwargs):
+    """
+    HRNet_W48_C
+    Args:
+        pretrained: bool=False or str. If `True` load pretrained parameters, `False` otherwise.
+                    If str, means the path of the pretrained model.
+        use_ssld: bool=False. Whether using distillation pretrained model when pretrained=True.
+    Returns:
+        model: nn.Layer. Specific `HRNet_W48_C` model depends on args.
+    """
+    model = HRNet(width=48, **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["HRNet_W48_C"], use_ssld)
     return model
 
 
-def HRNet_W60_C(**args):
-    model = HRNet(width=60, **args)
+def HRNet_W60_C(pretrained=False, use_ssld=False, **kwargs):
+    """
+    HRNet_W60_C
+    Args:
+        pretrained: bool=False or str. If `True` load pretrained parameters, `False` otherwise.
+                    If str, means the path of the pretrained model.
+        use_ssld: bool=False. Whether using distillation pretrained model when pretrained=True.
+    Returns:
+        model: nn.Layer. Specific `HRNet_W60_C` model depends on args.
+    """
+    model = HRNet(width=60, **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["HRNet_W60_C"], use_ssld)
     return model
 
 
-def HRNet_W64_C(**args):
-    model = HRNet(width=64, **args)
+def HRNet_W64_C(pretrained=False, use_ssld=False, **kwargs):
+    """
+    HRNet_W64_C
+    Args:
+        pretrained: bool=False or str. If `True` load pretrained parameters, `False` otherwise.
+                    If str, means the path of the pretrained model.
+        use_ssld: bool=False. Whether using distillation pretrained model when pretrained=True.
+    Returns:
+        model: nn.Layer. Specific `HRNet_W64_C` model depends on args.
+    """
+    model = HRNet(width=64, **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["HRNet_W64_C"], use_ssld)
     return model
 
 
-def SE_HRNet_W18_C(**args):
-    model = HRNet(width=18, has_se=True, **args)
+def SE_HRNet_W18_C(pretrained=False, use_ssld=False, **kwargs):
+    """
+    SE_HRNet_W18_C
+    Args:
+        pretrained: bool=False or str. If `True` load pretrained parameters, `False` otherwise.
+                    If str, means the path of the pretrained model.
+        use_ssld: bool=False. Whether using distillation pretrained model when pretrained=True.
+    Returns:
+        model: nn.Layer. Specific `SE_HRNet_W18_C` model depends on args.
+    """
+    model = HRNet(width=18, has_se=True, **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["SE_HRNet_W18_C"], use_ssld)
     return model
 
 
-def SE_HRNet_W30_C(**args):
-    model = HRNet(width=30, has_se=True, **args)
+def SE_HRNet_W30_C(pretrained=False, use_ssld=False, **kwargs):
+    """
+    SE_HRNet_W30_C
+    Args:
+        pretrained: bool=False or str. If `True` load pretrained parameters, `False` otherwise.
+                    If str, means the path of the pretrained model.
+        use_ssld: bool=False. Whether using distillation pretrained model when pretrained=True.
+    Returns:
+        model: nn.Layer. Specific `SE_HRNet_W30_C` model depends on args.
+    """
+    model = HRNet(width=30, has_se=True, **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["SE_HRNet_W30_C"], use_ssld)
     return model
 
 
-def SE_HRNet_W32_C(**args):
-    model = HRNet(width=32, has_se=True, **args)
+def SE_HRNet_W32_C(pretrained=False, use_ssld=False, **kwargs):
+    """
+    SE_HRNet_W32_C
+    Args:
+        pretrained: bool=False or str. If `True` load pretrained parameters, `False` otherwise.
+                    If str, means the path of the pretrained model.
+        use_ssld: bool=False. Whether using distillation pretrained model when pretrained=True.
+    Returns:
+        model: nn.Layer. Specific `SE_HRNet_W32_C` model depends on args.
+    """
+    model = HRNet(width=32, has_se=True, **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["SE_HRNet_W32_C"], use_ssld)
     return model
 
 
-def SE_HRNet_W40_C(**args):
-    model = HRNet(width=40, has_se=True, **args)
+def SE_HRNet_W40_C(pretrained=False, use_ssld=False, **kwargs):
+    """
+    SE_HRNet_W40_C
+    Args:
+        pretrained: bool=False or str. If `True` load pretrained parameters, `False` otherwise.
+                    If str, means the path of the pretrained model.
+        use_ssld: bool=False. Whether using distillation pretrained model when pretrained=True.
+    Returns:
+        model: nn.Layer. Specific `SE_HRNet_W40_C` model depends on args.
+    """
+    model = HRNet(width=40, has_se=True, **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["SE_HRNet_W40_C"], use_ssld)
     return model
 
 
-def SE_HRNet_W44_C(**args):
-    model = HRNet(width=44, has_se=True, **args)
+def SE_HRNet_W44_C(pretrained=False, use_ssld=False, **kwargs):
+    """
+    SE_HRNet_W44_C
+    Args:
+        pretrained: bool=False or str. If `True` load pretrained parameters, `False` otherwise.
+                    If str, means the path of the pretrained model.
+        use_ssld: bool=False. Whether using distillation pretrained model when pretrained=True.
+    Returns:
+        model: nn.Layer. Specific `SE_HRNet_W44_C` model depends on args.
+    """
+    model = HRNet(width=44, has_se=True, **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["SE_HRNet_W44_C"], use_ssld)
     return model
 
 
-def SE_HRNet_W48_C(**args):
-    model = HRNet(width=48, has_se=True, **args)
+def SE_HRNet_W48_C(pretrained=False, use_ssld=False, **kwargs):
+    """
+    SE_HRNet_W48_C
+    Args:
+        pretrained: bool=False or str. If `True` load pretrained parameters, `False` otherwise.
+                    If str, means the path of the pretrained model.
+        use_ssld: bool=False. Whether using distillation pretrained model when pretrained=True.
+    Returns:
+        model: nn.Layer. Specific `SE_HRNet_W48_C` model depends on args.
+    """
+    model = HRNet(width=48, has_se=True, **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["SE_HRNet_W48_C"], use_ssld)
     return model
 
 
-def SE_HRNet_W60_C(**args):
-    model = HRNet(width=60, has_se=True, **args)
+def SE_HRNet_W60_C(pretrained=False, use_ssld=False, **kwargs):
+    """
+    SE_HRNet_W60_C
+    Args:
+        pretrained: bool=False or str. If `True` load pretrained parameters, `False` otherwise.
+                    If str, means the path of the pretrained model.
+        use_ssld: bool=False. Whether using distillation pretrained model when pretrained=True.
+    Returns:
+        model: nn.Layer. Specific `SE_HRNet_W60_C` model depends on args.
+    """
+    model = HRNet(width=60, has_se=True, **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["SE_HRNet_W60_C"], use_ssld)
     return model
 
 
-def SE_HRNet_W64_C(**args):
-    model = HRNet(width=64, has_se=True, **args)
+def SE_HRNet_W64_C(pretrained=False, use_ssld=False, **kwargs):
+    """
+    SE_HRNet_W64_C
+    Args:
+        pretrained: bool=False or str. If `True` load pretrained parameters, `False` otherwise.
+                    If str, means the path of the pretrained model.
+        use_ssld: bool=False. Whether using distillation pretrained model when pretrained=True.
+    Returns:
+        model: nn.Layer. Specific `SE_HRNet_W64_C` model depends on args.
+    """
+    model = HRNet(width=64, has_se=True, **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["SE_HRNet_W64_C"], use_ssld)
     return model

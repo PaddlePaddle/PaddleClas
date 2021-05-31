@@ -24,6 +24,7 @@ import tempfile
 
 import paddle
 from paddle.static import load_program_state
+from paddle.utils.download import get_weights_path_from_url
 
 from ppcls.utils import logger
 
@@ -70,6 +71,20 @@ def load_dygraph_pretrain(model, path=None, load_static_weights=False):
     return
 
 
+def load_dygraph_pretrain_from_url(model,
+                                   pretrained_url,
+                                   use_ssld,
+                                   load_static_weights=False):
+    if use_ssld:
+        pretrained_url = pretrained_url.replace("_pretrained",
+                                                "_ssld_pretrained")
+    local_weight_path = get_weights_path_from_url(pretrained_url).replace(
+        ".pdparams", "")
+    load_dygraph_pretrain(
+        model, path=local_weight_path, load_static_weights=load_static_weights)
+    return
+
+
 def load_distillation_model(model, pretrained_model, load_static_weights):
     logger.info("In distillation mode, teacher model will be "
                 "loaded firstly before student model.")
@@ -112,10 +127,11 @@ def init_model(config, net, optimizer=None):
             "Given dir {}.pdopt not exist.".format(checkpoints)
         para_dict = paddle.load(checkpoints + ".pdparams")
         opti_dict = paddle.load(checkpoints + ".pdopt")
+        metric_dict = paddle.load(checkpoints + ".pdstates")
         net.set_dict(para_dict)
         optimizer.set_state_dict(opti_dict)
         logger.info("Finish load checkpoints from {}".format(checkpoints))
-        return
+        return metric_dict
 
     pretrained_model = config.get('pretrained_model')
     load_static_weights = config.get('load_static_weights', False)
@@ -146,13 +162,18 @@ def _save_student_model(net, model_prefix):
             student_model_prefix))
 
 
-def save_model(net, optimizer, model_path, epoch_id, prefix='ppcls'):
+def save_model(net,
+               optimizer,
+               metric_info,
+               model_path,
+               model_name="",
+               prefix='ppcls'):
     """
     save model to the target path
     """
     if paddle.distributed.get_rank() != 0:
         return
-    model_path = os.path.join(model_path, str(epoch_id))
+    model_path = os.path.join(model_path, model_name)
     _mkdir_if_not_exist(model_path)
     model_prefix = os.path.join(model_path, prefix)
 
@@ -160,4 +181,5 @@ def save_model(net, optimizer, model_path, epoch_id, prefix='ppcls'):
 
     paddle.save(net.state_dict(), model_prefix + ".pdparams")
     paddle.save(optimizer.state_dict(), model_prefix + ".pdopt")
+    paddle.save(metric_info, model_prefix + ".pdstates")
     logger.info("Already save model in {}".format(model_path))

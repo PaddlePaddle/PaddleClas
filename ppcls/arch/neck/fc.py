@@ -15,16 +15,19 @@
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
-import os
-import sys
-__dir__ = os.path.dirname(os.path.abspath(__file__))
-sys.path.append(os.path.abspath(os.path.join(__dir__, '../')))
 
-from ppcls.utils import config
-from ppcls.engine.trainer import Trainer
+import paddle
+import paddle.nn as nn
 
-if __name__ == "__main__":
-    args = config.parse_args()
-    config = config.get_config(args.config, overrides=args.override, show=True)
-    trainer = Trainer(config, mode="eval")
-    trainer.eval()
+class FC(nn.Layer):
+    def __init__(self, input_dim, 
+                       embedding_size):
+        super(FC, self).__init__()
+        self.input_dim  = input_dim
+        self.embedding_size = embedding_size
+        weight_attr =  paddle.ParamAttr(initializer = paddle.nn.initializer.XavierNormal())
+        self.fc  =  paddle.nn.Linear(self.input_dim, self.embedding_size, weight_attr=weight_attr)    
+
+    def forward(self, x):
+        x = self.fc(x)
+        return x

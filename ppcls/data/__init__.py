@@ -115,5 +115,4 @@ def build_dataloader(config, mode, device, seed=None):
     dataloader = Reader(config, mode=mode, places=device)()
     return dataloader
 
-    return data_loader
 '''

@@ -12,19 +12,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-import os
-import sys
-__dir__ = os.path.dirname(os.path.abspath(__file__))
-sys.path.append(os.path.abspath(os.path.join(__dir__, '../')))
+from .arcmargin import ArcMargin
+from .cosmargin import CosMargin
+from .circlemargin import CircleMargin
+from .fc import FC
 
-from ppcls.utils import config
-from ppcls.engine.trainer import Trainer
+__all__ = ['build_head']
 
-if __name__ == "__main__":
-    args = config.parse_args()
-    config = config.get_config(args.config, overrides=args.override, show=True)
-    trainer = Trainer(config, mode="eval")
-    trainer.eval()
+def build_head(config):
+    support_dict = ['ArcMargin', 'CosMargin', 'CircleMargin', 'FC']
+    module_name = config.pop('name')
+    assert module_name in support_dict, Exception('head only support {}'.format(
+        support_dict))
+    module_class = eval(module_name)(**config)
+    return module_class
