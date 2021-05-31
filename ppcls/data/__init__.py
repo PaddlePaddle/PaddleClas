@@ -24,30 +24,12 @@ from . import samplers
 # dataset
 from .datasets.imagenet_dataset import ImageNetDataset
 from .dataset.multilabel_dataset import MultiLabelDataset
+from .datasets.common_dataset import create_operators
+
 # sampler
 from .samplers import DistributedRandomIdentitySampler
 
 from .preprocess import transform
-
-
-def create_operators(params):
-    """
-    create operators based on the config
-    Args:
-        params(list): a dict list, used to create some operators
-    """
-    assert isinstance(params, list), ('operator config should be a list')
-    ops = []
-    for operator in params:
-        print(operator)
-        assert isinstance(operator,
-                          dict) and len(operator) == 1, "yaml format error"
-        op_name = list(operator)[0]
-        param = {} if operator[op_name] is None else operator[op_name]
-        op = getattr(preprocess, op_name)(**param)
-        ops.append(op)
-
-    return ops
 
 def build_dataloader(config, mode, device, seed=None):
     assert mode in ['Train', 'Eval', 'Test'], "Mode should be Train, Eval or Test."
