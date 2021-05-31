@@ -311,7 +311,7 @@ class ResNet(TheseusLayer):
         self.blocks = nn.Sequential(*block_list)
 
         self.avg_pool = AdaptiveAvgPool2D(1)
-        self.avg_pool_channels = self.num_channels[-1] * 2
+        self.flatten = nn.Flatten()
 
         stdv = 1.0 / math.sqrt(self.avg_pool_channels * 1.0)
         self.fc = Linear(
@@ -324,7 +324,7 @@ class ResNet(TheseusLayer):
         x = self.max_pool(x)
         x = self.blocks(x)
         x = self.avg_pool(x)
-        x = paddle.reshape(x, shape=[-1, self.avg_pool_channels])
+        x = self.flatten(x)
         x = self.fc(x)
         return x
 
