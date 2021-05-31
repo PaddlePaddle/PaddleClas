@@ -14,8 +14,6 @@
 
 from __future__ import absolute_import, division, print_function
 
-import numpy as np
-import paddle
 from paddle import ParamAttr
 import paddle.nn as nn
 from paddle.nn import Conv2D, BatchNorm, Linear, ReLU, Flatten
@@ -23,19 +21,22 @@ from paddle.nn import AdaptiveAvgPool2D
 from paddle.nn.initializer import KaimingNormal
 
 from ppcls.arch.backbone.base.theseus_layer import TheseusLayer
-from ppcls.utils.save_load import load_dygraph_pretrain_from, load_dygraph_pretrain_from_url
-
+from ppcls.utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
 
 MODEL_URLS = {
-    "MobileNetV1_x0_25": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/MobileNetV1_x0_25_pretrained.pdparams",
-    "MobileNetV1_x0_5": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/MobileNetV1_x0_5_pretrained.pdparams",
-    "MobileNetV1_x0_75": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/MobileNetV1_x0_75_pretrained.pdparams",
-    "MobileNetV1": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/MobileNetV1_pretrained.pdparams",
+    "MobileNetV1_x0_25":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/MobileNetV1_x0_25_pretrained.pdparams",
+    "MobileNetV1_x0_5":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/MobileNetV1_x0_5_pretrained.pdparams",
+    "MobileNetV1_x0_75":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/MobileNetV1_x0_75_pretrained.pdparams",
+    "MobileNetV1":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/MobileNetV1_pretrained.pdparams"
 }
 
 __all__ = MODEL_URLS.keys()
-    
-    
+
+
 class ConvBNLayer(TheseusLayer):
     def __init__(self,
                  num_channels,
@@ -44,7 +45,7 @@ class ConvBNLayer(TheseusLayer):
                  stride,
                  padding,
                  num_groups=1):
-        super(ConvBNLayer, self).__init__()
+        super().__init__()
 
         self.conv = Conv2D(
             in_channels=num_channels,
@@ -55,9 +56,7 @@ class ConvBNLayer(TheseusLayer):
             groups=num_groups,
             weight_attr=ParamAttr(initializer=KaimingNormal()),
             bias_attr=False)
-
         self.bn = BatchNorm(num_filters)
-        
         self.relu = ReLU()
 
     def forward(self, x):
@@ -68,14 +67,9 @@ class ConvBNLayer(TheseusLayer):
 
 
 class DepthwiseSeparable(TheseusLayer):
-    def __init__(self,
-                 num_channels,
-                 num_filters1,
-                 num_filters2,
-                 num_groups,
-                 stride,
-                 scale):
-        super(DepthwiseSeparable, self).__init__()
+    def __init__(self, num_channels, num_filters1, num_filters2, num_groups,
+                 stride, scale):
+        super().__init__()
 
         self.depthwise_conv = ConvBNLayer(
             num_channels=num_channels,
@@ -99,10 +93,18 @@ class DepthwiseSeparable(TheseusLayer):
 
 
 class MobileNet(TheseusLayer):
-    def __init__(self, scale=1.0, class_num=1000, pretrained=False):
-        super(MobileNet, self).__init__()
+    """
+    MobileNet
+    Args:
+        scale: float=1.0. The coefficient that controls the size of network parameters. 
+        class_num: int=1000. The number of classes.
+    Returns:
+        model: nn.Layer. Specific MobileNet model depends on args.
+    """
+
+    def __init__(self, scale=1.0, class_num=1000):
+        super().__init__()
         self.scale = scale
-        self.pretrained = pretrained
 
         self.conv = ConvBNLayer(
             num_channels=3,
@@ -110,30 +112,31 @@ class MobileNet(TheseusLayer):
             num_filters=int(32 * scale),
             stride=2,
             padding=1)
-        
+
         #num_channels, num_filters1, num_filters2, num_groups, stride
-        self.cfg = [[int(32 * scale),   32,   64,   32,   1],
-                    [int(64 * scale),   64,   128,  64,   2],
-                    [int(128 * scale),  128,  128,  128,  1],
-                    [int(128 * scale),  128,  256,  128,  2],
-                    [int(256 * scale),  256,  256,  256,  1],
-                    [int(256 * scale),  256,  512,  256,  2],
-                    [int(512 * scale),  512,  512,  512,  1],
-                    [int(512 * scale),  512,  512,  512,  1],
-                    [int(512 * scale),  512,  512,  512,  1],
-                    [int(512 * scale),  512,  512,  512,  1],
-                    [int(512 * scale),  512,  512,  512,  1],
-                    [int(512 * scale),  512,  1024, 512,  2],
+        self.cfg = [[int(32 * scale), 32, 64, 32, 1],
+                    [int(64 * scale), 64, 128, 64, 2],
+                    [int(128 * scale), 128, 128, 128, 1],
+                    [int(128 * scale), 128, 256, 128, 2],
+                    [int(256 * scale), 256, 256, 256, 1],
+                    [int(256 * scale), 256, 512, 256, 2],
+                    [int(512 * scale), 512, 512, 512, 1],
+                    [int(512 * scale), 512, 512, 512, 1],
+                    [int(512 * scale), 512, 512, 512, 1],
+                    [int(512 * scale), 512, 512, 512, 1],
+                    [int(512 * scale), 512, 512, 512, 1],
+                    [int(512 * scale), 512, 1024, 512, 2],
                     [int(1024 * scale), 1024, 1024, 1024, 1]]
-        
+
         self.blocks = nn.Sequential(*[
-                    DepthwiseSeparable(
-                            num_channels=params[0],
-                            num_filters1=params[1],
-                            num_filters2=params[2],
-                            num_groups=params[3],
-                            stride=params[4],
-                            scale=scale) for params in self.cfg])
+            DepthwiseSeparable(
+                num_channels=params[0],
+                num_filters1=params[1],
+                num_filters2=params[2],
+                num_groups=params[3],
+                stride=params[4],
+                scale=scale) for params in self.cfg
+        ])
 
         self.avg_pool = AdaptiveAvgPool2D(1)
         self.flatten = Flatten(start_axis=1, stop_axis=-1)
@@ -142,7 +145,7 @@ class MobileNet(TheseusLayer):
             int(1024 * scale),
             class_num,
             weight_attr=ParamAttr(initializer=KaimingNormal()))
-        
+
     def forward(self, x):
         x = self.conv(x)
         x = self.blocks(x)
@@ -152,91 +155,77 @@ class MobileNet(TheseusLayer):
         return x
 
 
-def MobileNetV1_x0_25(**args):
-    """
-        MobileNetV1_x0_25
-        Args:
-            pretrained: bool=False. If `True` load pretrained parameters, `False` otherwise.
-            kwargs: 
-                class_num: int=1000. Output dim of last fc layer.
-        Returns:
-            model: nn.Layer. Specific `MobileNetV1_x0_25` model depends on args.
-    """
-    model = MobileNet(scale=0.25, **args)
-    if isinstance(model.pretrained, bool):
-        if model.pretrained is True:
-            load_dygraph_pretrain_from_url(model, MODEL_URLS["MobileNetV1_x0_25"])
-    elif isinstance(model.pretrained, str):
-        load_dygraph_pretrain(model, model.pretrained)
+def _load_pretrained(pretrained, model, model_url, use_ssld):
+    if pretrained is False:
+        pass
+    elif pretrained is True:
+        load_dygraph_pretrain_from_url(model, model_url, use_ssld=use_ssld)
+    elif isinstance(pretrained, str):
+        load_dygraph_pretrain(model, pretrained)
     else:
         raise RuntimeError(
-            "pretrained type is not available. Please use `string` or `boolean` type")
+            "pretrained type is not available. Please use `string` or `boolean` type."
+        )
+
+
+def MobileNetV1_x0_25(pretrained=False, use_ssld=False, **kwargs):
+    """
+    MobileNetV1_x0_25
+    Args:
+        pretrained: bool=False or str. If `True` load pretrained parameters, `False` otherwise.
+                    If str, means the path of the pretrained model.
+        use_ssld: bool=False. Whether using distillation pretrained model when pretrained=True.
+    Returns:
+        model: nn.Layer. Specific `MobileNetV1_x0_25` model depends on args.
+    """
+    model = MobileNet(scale=0.25, **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["MobileNetV1_x0_25"],
+                     use_ssld)
     return model
 
 
-def MobileNetV1_x0_5(**args):
+def MobileNetV1_x0_5(pretrained=False, use_ssld=False, **kwargs):
     """
-        MobileNetV1_x0_5
-        Args:
-            pretrained: bool=False. If `True` load pretrained parameters, `False` otherwise.
-            kwargs: 
-                class_num: int=1000. Output dim of last fc layer.
-        Returns:
-            model: nn.Layer. Specific `MobileNetV1_x0_5` model depends on args.
+    MobileNetV1_x0_5
+    Args:
+        pretrained: bool=False or str. If `True` load pretrained parameters, `False` otherwise.
+                    If str, means the path of the pretrained model.
+        use_ssld: bool=False. Whether using distillation pretrained model when pretrained=True.
+    Returns:
+        model: nn.Layer. Specific `MobileNetV1_x0_5` model depends on args.
     """
-    model = MobileNet(scale=0.5, **args)
-    if isinstance(model.pretrained, bool):
-        if model.pretrained is True:
-            load_dygraph_pretrain_from_url(model, MODEL_URLS["MobileNetV1_x0_5"])
-    elif isinstance(model.pretrained, str):
-        load_dygraph_pretrain(model, model.pretrained)
-    else:
-        raise RuntimeError(
-            "pretrained type is not available. Please use `string` or `boolean` type")
+    model = MobileNet(scale=0.5, **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["MobileNetV1_x0_5"],
+                     use_ssld)
     return model
 
 
-def MobileNetV1_x0_75(**args):
+def MobileNetV1_x0_75(pretrained=False, use_ssld=False, **kwargs):
     """
-        MobileNetV1_x0_75
-        Args:
-            pretrained: bool=False. If `True` load pretrained parameters, `False` otherwise.
-            kwargs: 
-                class_num: int=1000. Output dim of last fc layer.
-        Returns:
-            model: nn.Layer. Specific `MobileNetV1_x0_75` model depends on args.
+    MobileNetV1_x0_75
+    Args:
+        pretrained: bool=False or str. If `True` load pretrained parameters, `False` otherwise.
+                    If str, means the path of the pretrained model.
+        use_ssld: bool=False. Whether using distillation pretrained model when pretrained=True.
+    Returns:
+        model: nn.Layer. Specific `MobileNetV1_x0_75` model depends on args.
     """
-    model = MobileNet(scale=0.75, **args)
-    if isinstance(model.pretrained, bool):
-        if model.pretrained is True:
-            load_dygraph_pretrain_from_url(model, MODEL_URLS["MobileNetV1_x0_75"])
-    elif isinstance(model.pretrained, str):
-        load_dygraph_pretrain(model, model.pretrained)
-    else:
-        raise RuntimeError(
-            "pretrained type is not available. Please use `string` or `boolean` type")
+    model = MobileNet(scale=0.75, **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["MobileNetV1_x0_75"],
+                     use_ssld)
     return model
 
 
-def MobileNetV1(**args):
+def MobileNetV1(pretrained=False, use_ssld=False, **kwargs):
     """
-        MobileNetV1
-        Args:
-            pretrained: bool=False. If `True` load pretrained parameters, `False` otherwise.
-            kwargs: 
-                class_num: int=1000. Output dim of last fc layer.
-        Returns:
-            model: nn.Layer. Specific `MobileNetV1` model depends on args.
+    MobileNetV1
+    Args:
+        pretrained: bool=False or str. If `True` load pretrained parameters, `False` otherwise.
+                    If str, means the path of the pretrained model.
+        use_ssld: bool=False. Whether using distillation pretrained model when pretrained=True.
+    Returns:
+        model: nn.Layer. Specific `MobileNetV1` model depends on args.
     """
-    model = MobileNet(scale=1.0, **args)
-    if isinstance(model.pretrained, bool):
-        if model.pretrained is True:
-            load_dygraph_pretrain_from_url(model, MODEL_URLS["MobileNetV1"])
-    elif isinstance(model.pretrained, str):
-        load_dygraph_pretrain(model, model.pretrained)
-    else:
-        raise RuntimeError(
-            "pretrained type is not available. Please use `string` or `boolean` type")
+    model = MobileNet(scale=1.0, **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["MobileNetV1"], use_ssld)
     return model
-
-
