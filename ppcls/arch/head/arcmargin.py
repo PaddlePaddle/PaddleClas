@@ -36,7 +36,7 @@ class ArcMargin(nn.Layer):
         input_norm = paddle.sqrt(paddle.sum(paddle.square(input), axis=1, keepdim=True))
         input = paddle.divide(input, input_norm)
 
-        weight = self.fc0.weight
+        weight = self.fc.weight
         weight_norm = paddle.sqrt(paddle.sum(paddle.square(weight), axis=0, keepdim=True))
         weight = paddle.divide(weight, weight_norm)
         
