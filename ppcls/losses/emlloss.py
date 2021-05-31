@@ -86,15 +86,4 @@ class EmlLoss(paddle.nn.Layer):
         loss = self.surrogate_function_stable(self.beta, theta, bias, self.thresh)
         loss = paddle.mean(loss)
         return {"emlloss": loss}
-
-if __name__=="__main__":
     
-    metric = EmlLoss()
-
-    np.random.seed(1)
-    features = np.random.randn(40, 32)
-    features = paddle.to_tensor(features, dtype="float32")
-    print(features)    
-    
-    loss = metric(features)
-    print(loss)
