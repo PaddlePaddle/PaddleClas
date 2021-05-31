@@ -123,6 +123,8 @@ def build_dataloader(config, mode, device, seed=None):
 
     logger.info("build data_loader({}) success...".format(data_loader))
     
+    return dataloader
+    
 '''
 # TODO: fix the format
 def build_dataloader(config, mode, device, seed=None):
