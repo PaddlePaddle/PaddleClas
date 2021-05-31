@@ -94,6 +94,13 @@ def main(args):
     # load model from checkpoint or pretrained model
     init_model(config, net, optimizer)
 
+    # add for benchmark platform to test training speed of @to_static
+    to_static = config.get("to_static", False) and config.get(
+        "support_to_static", False)
+    if to_static:
+        dp_net = paddle.jit.to_static(dp_net)
+        logger.info("Successfully to apply @to_static for training.")
+
     train_dataloader = Reader(config, 'train', places=place)()
     if len(train_dataloader) <= 0:
         logger.error(

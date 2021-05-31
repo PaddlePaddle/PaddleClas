@@ -2,6 +2,7 @@ mode: 'train'
 ARCHITECTURE:
     name: "MobileNetV2"
 
+support_to_static: True
 pretrained_model: ""
 model_save_dir: "./output/"
 classes_num: 1000
@@ -70,5 +71,3 @@ VALID:
             std: [0.229, 0.224, 0.225]
             order: ''
         - ToCHWImage:
-
-

@@ -2,6 +2,7 @@ mode: 'train'
 ARCHITECTURE:
     name: 'ResNet152'
 
+support_to_static: True
 pretrained_model: ""
 model_save_dir: "./output/"
 classes_num: 1000
