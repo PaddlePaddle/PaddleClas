@@ -312,7 +312,7 @@ class ResNet(TheseusLayer):
 
         self.avg_pool = AdaptiveAvgPool2D(1)
         self.flatten = nn.Flatten()
-
+        self.avg_pool_channels = self.num_channels[-1] * 2
         stdv = 1.0 / math.sqrt(self.avg_pool_channels * 1.0)
         self.fc = Linear(
             self.avg_pool_channels,
