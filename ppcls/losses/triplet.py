@@ -141,3 +141,4 @@ class TripletLoss(nn.Layer):
         y = paddle.ones_like(dist_an)
         loss = self.ranking_loss(dist_an, dist_ap, y)
         return {"TripletLoss": loss}
+    
