@@ -69,19 +69,4 @@ class MSMLoss(paddle.nn.Layer):
     def _nomalize(self, input):
         input_norm = paddle.sqrt(paddle.sum(paddle.square(input), axis=1, keepdim=True))
         return paddle.divide(input, input_norm)
-
-if __name__ == "__main__":
-    
-    import numpy as np
-    metric = MSMLoss(48)
-
-    #prepare data
-    np.random.seed(1)
-    features = np.random.randn(48, 32)
-    #print(features)
-
-    #do inference
-    features  = paddle.to_tensor(features)
-    loss = metric(features)
-    print(loss)
     
