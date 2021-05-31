@@ -37,7 +37,7 @@ def forward(self, inputs):
     y = self.pool2d_max(y)
     for bottleneck_block in self.bottleneck_block_list:
         y = bottleneck_block(y)
-    y = self.pool2d_avg(y)
+    y = self.avg_pool(y)
     y = fluid.layers.reshape(y, shape=[-1, self.pool2d_avg_output])
     y = self.out(y)
     return y, self.fm
