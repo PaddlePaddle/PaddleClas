@@ -24,27 +24,38 @@ from paddle.nn.functional import upsample
 from paddle.nn.initializer import Uniform
 
 from ppcls.arch.backbone.base.theseus_layer import TheseusLayer, Identity
+from ppcls.utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
 
 MODEL_URLS = {
-    "HRNet_W18_C": "",
-    "HRNet_W30_C": "",
-    "HRNet_W32_C": "",
-    "HRNet_W40_C": "",
-    "HRNet_W44_C": "",
-    "HRNet_W48_C": "",
-    "HRNet_W60_C": "",
-    "HRNet_W64_C": "",
-    "SE_HRNet_W18_C": "",
-    "SE_HRNet_W30_C": "",
-    "SE_HRNet_W32_C": "",
-    "SE_HRNet_W40_C": "",
-    "SE_HRNet_W44_C": "",
-    "SE_HRNet_W48_C": "",
-    "SE_HRNet_W60_C": "",
-    "SE_HRNet_W64_C": "",
+    "HRNet_W18_C":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/HRNet_W18_C_pretrained.pdparams",
+    "HRNet_W30_C":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/HRNet_W30_C_pretrained.pdparams",
+    "HRNet_W32_C":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/HRNet_W32_C_pretrained.pdparams",
+    "HRNet_W40_C":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/HRNet_W40_C_pretrained.pdparams",
+    "HRNet_W44_C":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/HRNet_W44_C_pretrained.pdparams",
+    "HRNet_W48_C":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/HRNet_W48_C_pretrained.pdparams",
+    "HRNet_W64_C":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/HRNet_W64_C_pretrained.pdparams"
 }
 
 __all__ = list(MODEL_URLS.keys())
+
+
+def _create_act(act):
+    if act == "hardswish":
+        return nn.Hardswish()
+    elif act == "relu":
+        return nn.ReLU()
+    elif act is None:
+        return Identity()
+    else:
+        raise RuntimeError(
+            "The activation function is not supported: {}".format(act))
 
 
 class ConvBNLayer(TheseusLayer):
@@ -55,7 +66,7 @@ class ConvBNLayer(TheseusLayer):
                  stride=1,
                  groups=1,
                  act="relu"):
-        super(ConvBNLayer, self).__init__()
+        super().__init__()
 
         self.conv = nn.Conv2D(
             in_channels=num_channels,
@@ -65,28 +76,14 @@ class ConvBNLayer(TheseusLayer):
             padding=(filter_size - 1) // 2,
             groups=groups,
             bias_attr=False)
-        self.bn = nn.BatchNorm(
-            num_filters,
-            act=None)
-        self.act = create_act(act)
+        self.bn = nn.BatchNorm(num_filters, act=None)
+        self.act = _create_act(act)
 
     def forward(self, x):
         x = self.conv(x)
         x = self.bn(x)
         x = self.act(x)
         return x
-
-
-def create_act(act):
-    if act == 'hardswish':
-        return nn.Hardswish()
-    elif act == 'relu':
-        return nn.ReLU()
-    elif act is None:
-        return Identity()
-    else:
-        raise RuntimeError(
-            'The activation function is not supported: {}'.format(act))
 
 
 class BottleneckBlock(TheseusLayer):
@@ -96,7 +93,7 @@ class BottleneckBlock(TheseusLayer):
                  has_se,
                  stride=1,
                  downsample=False):
-        super(BottleneckBlock, self).__init__()
+        super().__init__()
 
         self.has_se = has_se
         self.downsample = downsample
@@ -147,11 +144,8 @@ class BottleneckBlock(TheseusLayer):
 
 
 class BasicBlock(nn.Layer):
-    def __init__(self,
-                 num_channels,
-                 num_filters,
-                 has_se=False):
-        super(BasicBlock, self).__init__()
+    def __init__(self, num_channels, num_filters, has_se=False):
+        super().__init__()
 
         self.has_se = has_se
 
@@ -190,9 +184,9 @@ class BasicBlock(nn.Layer):
 
 class SELayer(TheseusLayer):
     def __init__(self, num_channels, num_filters, reduction_ratio):
-        super(SELayer, self).__init__()
+        super().__init__()
 
-        self.pool2d_gap = nn.AdaptiveAvgPool2D(1)
+        self.avg_pool = nn.AdaptiveAvgPool2D(1)
 
         self._num_channels = num_channels
 
@@ -201,8 +195,7 @@ class SELayer(TheseusLayer):
         self.fc_squeeze = nn.Linear(
             num_channels,
             med_ch,
-            weight_attr=ParamAttr(
-                initializer=Uniform(-stdv, stdv)))
+            weight_attr=ParamAttr(initializer=Uniform(-stdv, stdv)))
         self.relu = nn.ReLU()
         stdv = 1.0 / math.sqrt(med_ch * 1.0)
         self.fc_excitation = nn.Linear(
@@ -213,7 +206,7 @@ class SELayer(TheseusLayer):
 
     def forward(self, x, res_dict=None):
         residual = x
-        x = self.pool2d_gap(x)
+        x = self.avg_pool(x)
         x = paddle.squeeze(x, axis=[2, 3])
         x = self.fc_squeeze(x)
         x = self.relu(x)
@@ -225,11 +218,8 @@ class SELayer(TheseusLayer):
 
 
 class Stage(TheseusLayer):
-    def __init__(self,
-                 num_modules,
-                 num_filters,
-                 has_se=False):
-        super(Stage, self).__init__()
+    def __init__(self, num_modules, num_filters, has_se=False):
+        super().__init__()
 
         self._num_modules = num_modules
 
@@ -237,8 +227,7 @@ class Stage(TheseusLayer):
         for i in range(num_modules):
             self.stage_func_list.append(
                 HighResolutionModule(
-                    num_filters=num_filters,
-                    has_se=has_se))
+                    num_filters=num_filters, has_se=has_se))
 
     def forward(self, x, res_dict=None):
         x = x
@@ -248,10 +237,8 @@ class Stage(TheseusLayer):
 
 
 class HighResolutionModule(TheseusLayer):
-    def __init__(self,
-                 num_filters,
-                 has_se=False):
-        super(HighResolutionModule, self).__init__()
+    def __init__(self, num_filters, has_se=False):
+        super().__init__()
 
         self.basic_block_list = nn.LayerList()
 
@@ -261,11 +248,11 @@ class HighResolutionModule(TheseusLayer):
                     BasicBlock(
                         num_channels=num_filters[i],
                         num_filters=num_filters[i],
-                        has_se=has_se) for j in range(4)]))
+                        has_se=has_se) for j in range(4)
+                ]))
 
         self.fuse_func = FuseLayers(
-            in_channels=num_filters,
-            out_channels=num_filters)
+            in_channels=num_filters, out_channels=num_filters)
 
     def forward(self, x, res_dict=None):
         out = []
@@ -279,10 +266,8 @@ class HighResolutionModule(TheseusLayer):
 
 
 class FuseLayers(TheseusLayer):
-    def __init__(self,
-                 in_channels,
-                 out_channels):
-        super(FuseLayers, self).__init__()
+    def __init__(self, in_channels, out_channels):
+        super().__init__()
 
         self._actual_ch = len(in_channels)
         self._in_channels = in_channels
@@ -352,7 +337,7 @@ class LastClsOut(TheseusLayer):
                  num_channel_list,
                  has_se,
                  num_filters_list=[32, 64, 128, 256]):
-        super(LastClsOut, self).__init__()
+        super().__init__()
 
         self.func_list = nn.LayerList()
         for idx in range(len(num_channel_list)):
@@ -378,9 +363,12 @@ class HRNet(TheseusLayer):
         width: int=18. Base channel number of HRNet.
         has_se: bool=False. If 'True', add se module to HRNet.
         class_num: int=1000. Output num of last fc layer.
+    Returns:
+        model: nn.Layer. Specific HRNet model depends on args.
     """
+
     def __init__(self, width=18, has_se=False, class_num=1000):
-        super(HRNet, self).__init__()
+        super().__init__()
 
         self.width = width
         self.has_se = has_se
@@ -388,21 +376,23 @@ class HRNet(TheseusLayer):
 
         channels_2 = [self.width, self.width * 2]
         channels_3 = [self.width, self.width * 2, self.width * 4]
-        channels_4 = [self.width, self.width * 2, self.width * 4, self.width * 8]
+        channels_4 = [
+            self.width, self.width * 2, self.width * 4, self.width * 8
+        ]
 
         self.conv_layer1_1 = ConvBNLayer(
             num_channels=3,
             num_filters=64,
             filter_size=3,
             stride=2,
-            act='relu')
+            act="relu")
 
         self.conv_layer1_2 = ConvBNLayer(
             num_channels=64,
             num_filters=64,
             filter_size=3,
             stride=2,
-            act='relu')
+            act="relu")
 
         self.layer1 = nn.Sequential(*[
             BottleneckBlock(
@@ -410,48 +400,33 @@ class HRNet(TheseusLayer):
                 num_filters=64,
                 has_se=has_se,
                 stride=1,
-                downsample=True if i == 0 else False)
-            for i in range(4)
+                downsample=True if i == 0 else False) for i in range(4)
         ])
 
         self.conv_tr1_1 = ConvBNLayer(
-            num_channels=256,
-            num_filters=width,
-            filter_size=3)
+            num_channels=256, num_filters=width, filter_size=3)
         self.conv_tr1_2 = ConvBNLayer(
-            num_channels=256,
-            num_filters=width * 2,
-            filter_size=3,
-            stride=2
-        )
+            num_channels=256, num_filters=width * 2, filter_size=3, stride=2)
 
         self.st2 = Stage(
-            num_modules=1,
-            num_filters=channels_2,
-            has_se=self.has_se)
+            num_modules=1, num_filters=channels_2, has_se=self.has_se)
 
         self.conv_tr2 = ConvBNLayer(
             num_channels=width * 2,
             num_filters=width * 4,
             filter_size=3,
-            stride=2
-        )
+            stride=2)
         self.st3 = Stage(
-            num_modules=4,
-            num_filters=channels_3,
-            has_se=self.has_se)
+            num_modules=4, num_filters=channels_3, has_se=self.has_se)
 
         self.conv_tr3 = ConvBNLayer(
             num_channels=width * 4,
             num_filters=width * 8,
             filter_size=3,
-            stride=2
-        )
+            stride=2)
 
         self.st4 = Stage(
-            num_modules=3,
-            num_filters=channels_4,
-            has_se=self.has_se)
+            num_modules=3, num_filters=channels_4, has_se=self.has_se)
 
         # classification
         num_filters_list = [32, 64, 128, 256]
@@ -464,17 +439,14 @@ class HRNet(TheseusLayer):
         self.cls_head_conv_list = nn.LayerList()
         for idx in range(3):
             self.cls_head_conv_list.append(
-                    ConvBNLayer(
-                        num_channels=num_filters_list[idx] * 4,
-                        num_filters=last_num_filters[idx],
-                        filter_size=3,
-                        stride=2))
+                ConvBNLayer(
+                    num_channels=num_filters_list[idx] * 4,
+                    num_filters=last_num_filters[idx],
+                    filter_size=3,
+                    stride=2))
 
         self.conv_last = ConvBNLayer(
-            num_channels=1024,
-            num_filters=2048,
-            filter_size=1,
-            stride=1)
+            num_channels=1024, num_filters=2048, filter_size=1, stride=1)
 
         self.avg_pool = nn.AdaptiveAvgPool2D(1)
 
@@ -516,81 +488,254 @@ class HRNet(TheseusLayer):
         return y
 
 
-def HRNet_W18_C(**args):
-    model = HRNet(width=18, **args)
+def _load_pretrained(pretrained, model, model_url, use_ssld):
+    if pretrained is False:
+        pass
+    elif pretrained is True:
+        load_dygraph_pretrain_from_url(model, model_url, use_ssld=use_ssld)
+    elif isinstance(pretrained, str):
+        load_dygraph_pretrain(model, pretrained)
+    else:
+        raise RuntimeError(
+            "pretrained type is not available. Please use `string` or `boolean` type."
+        )
+
+
+def HRNet_W18_C(pretrained=False, use_ssld=False, **kwargs):
+    """
+    HRNet_W18_C
+    Args:
+        pretrained: bool=False or str. If `True` load pretrained parameters, `False` otherwise.
+                    If str, means the path of the pretrained model.
+        use_ssld: bool=False. Whether using distillation pretrained model when pretrained=True.
+    Returns:
+        model: nn.Layer. Specific `HRNet_W18_C` model depends on args.
+    """
+    model = HRNet(width=18, **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["HRNet_W18_C"], use_ssld)
     return model
 
 
-def HRNet_W30_C(**args):
-    model = HRNet(width=30, **args)
+def HRNet_W30_C(pretrained=False, use_ssld=False, **kwargs):
+    """
+    HRNet_W30_C
+    Args:
+        pretrained: bool=False or str. If `True` load pretrained parameters, `False` otherwise.
+                    If str, means the path of the pretrained model.
+        use_ssld: bool=False. Whether using distillation pretrained model when pretrained=True.
+    Returns:
+        model: nn.Layer. Specific `HRNet_W30_C` model depends on args.
+    """
+    model = HRNet(width=30, **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["HRNet_W30_C"], use_ssld)
     return model
 
 
-def HRNet_W32_C(**args):
-    model = HRNet(width=32, **args)
+def HRNet_W32_C(pretrained=False, use_ssld=False, **kwargs):
+    """
+    HRNet_W32_C
+    Args:
+        pretrained: bool=False or str. If `True` load pretrained parameters, `False` otherwise.
+                    If str, means the path of the pretrained model.
+        use_ssld: bool=False. Whether using distillation pretrained model when pretrained=True.
+    Returns:
+        model: nn.Layer. Specific `HRNet_W32_C` model depends on args.
+    """
+    model = HRNet(width=32, **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["HRNet_W32_C"], use_ssld)
     return model
 
 
-def HRNet_W40_C(**args):
-    model = HRNet(width=40, **args)
+def HRNet_W40_C(pretrained=False, use_ssld=False, **kwargs):
+    """
+    HRNet_W40_C
+    Args:
+        pretrained: bool=False or str. If `True` load pretrained parameters, `False` otherwise.
+                    If str, means the path of the pretrained model.
+        use_ssld: bool=False. Whether using distillation pretrained model when pretrained=True.
+    Returns:
+        model: nn.Layer. Specific `HRNet_W40_C` model depends on args.
+    """
+    model = HRNet(width=40, **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["HRNet_W40_C"], use_ssld)
     return model
 
 
-def HRNet_W44_C(**args):
-    model = HRNet(width=44, **args)
+def HRNet_W44_C(pretrained=False, use_ssld=False, **kwargs):
+    """
+    HRNet_W44_C
+    Args:
+        pretrained: bool=False or str. If `True` load pretrained parameters, `False` otherwise.
+                    If str, means the path of the pretrained model.
+        use_ssld: bool=False. Whether using distillation pretrained model when pretrained=True.
+    Returns:
+        model: nn.Layer. Specific `HRNet_W44_C` model depends on args.
+    """
+    model = HRNet(width=44, **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["HRNet_W44_C"], use_ssld)
     return model
 
 
-def HRNet_W48_C(**args):
-    model = HRNet(width=48, **args)
+def HRNet_W48_C(pretrained=False, use_ssld=False, **kwargs):
+    """
+    HRNet_W48_C
+    Args:
+        pretrained: bool=False or str. If `True` load pretrained parameters, `False` otherwise.
+                    If str, means the path of the pretrained model.
+        use_ssld: bool=False. Whether using distillation pretrained model when pretrained=True.
+    Returns:
+        model: nn.Layer. Specific `HRNet_W48_C` model depends on args.
+    """
+    model = HRNet(width=48, **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["HRNet_W48_C"], use_ssld)
     return model
 
 
-def HRNet_W60_C(**args):
-    model = HRNet(width=60, **args)
+def HRNet_W60_C(pretrained=False, use_ssld=False, **kwargs):
+    """
+    HRNet_W60_C
+    Args:
+        pretrained: bool=False or str. If `True` load pretrained parameters, `False` otherwise.
+                    If str, means the path of the pretrained model.
+        use_ssld: bool=False. Whether using distillation pretrained model when pretrained=True.
+    Returns:
+        model: nn.Layer. Specific `HRNet_W60_C` model depends on args.
+    """
+    model = HRNet(width=60, **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["HRNet_W60_C"], use_ssld)
     return model
 
 
-def HRNet_W64_C(**args):
-    model = HRNet(width=64, **args)
+def HRNet_W64_C(pretrained=False, use_ssld=False, **kwargs):
+    """
+    HRNet_W64_C
+    Args:
+        pretrained: bool=False or str. If `True` load pretrained parameters, `False` otherwise.
+                    If str, means the path of the pretrained model.
+        use_ssld: bool=False. Whether using distillation pretrained model when pretrained=True.
+    Returns:
+        model: nn.Layer. Specific `HRNet_W64_C` model depends on args.
+    """
+    model = HRNet(width=64, **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["HRNet_W64_C"], use_ssld)
     return model
 
 
-def SE_HRNet_W18_C(**args):
-    model = HRNet(width=18, has_se=True, **args)
+def SE_HRNet_W18_C(pretrained=False, use_ssld=False, **kwargs):
+    """
+    SE_HRNet_W18_C
+    Args:
+        pretrained: bool=False or str. If `True` load pretrained parameters, `False` otherwise.
+                    If str, means the path of the pretrained model.
+        use_ssld: bool=False. Whether using distillation pretrained model when pretrained=True.
+    Returns:
+        model: nn.Layer. Specific `SE_HRNet_W18_C` model depends on args.
+    """
+    model = HRNet(width=18, has_se=True, **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["SE_HRNet_W18_C"], use_ssld)
     return model
 
 
-def SE_HRNet_W30_C(**args):
-    model = HRNet(width=30, has_se=True, **args)
+def SE_HRNet_W30_C(pretrained=False, use_ssld=False, **kwargs):
+    """
+    SE_HRNet_W30_C
+    Args:
+        pretrained: bool=False or str. If `True` load pretrained parameters, `False` otherwise.
+                    If str, means the path of the pretrained model.
+        use_ssld: bool=False. Whether using distillation pretrained model when pretrained=True.
+    Returns:
+        model: nn.Layer. Specific `SE_HRNet_W30_C` model depends on args.
+    """
+    model = HRNet(width=30, has_se=True, **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["SE_HRNet_W30_C"], use_ssld)
     return model
 
 
-def SE_HRNet_W32_C(**args):
-    model = HRNet(width=32, has_se=True, **args)
+def SE_HRNet_W32_C(pretrained=False, use_ssld=False, **kwargs):
+    """
+    SE_HRNet_W32_C
+    Args:
+        pretrained: bool=False or str. If `True` load pretrained parameters, `False` otherwise.
+                    If str, means the path of the pretrained model.
+        use_ssld: bool=False. Whether using distillation pretrained model when pretrained=True.
+    Returns:
+        model: nn.Layer. Specific `SE_HRNet_W32_C` model depends on args.
+    """
+    model = HRNet(width=32, has_se=True, **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["SE_HRNet_W32_C"], use_ssld)
     return model
 
 
-def SE_HRNet_W40_C(**args):
-    model = HRNet(width=40, has_se=True, **args)
+def SE_HRNet_W40_C(pretrained=False, use_ssld=False, **kwargs):
+    """
+    SE_HRNet_W40_C
+    Args:
+        pretrained: bool=False or str. If `True` load pretrained parameters, `False` otherwise.
+                    If str, means the path of the pretrained model.
+        use_ssld: bool=False. Whether using distillation pretrained model when pretrained=True.
+    Returns:
+        model: nn.Layer. Specific `SE_HRNet_W40_C` model depends on args.
+    """
+    model = HRNet(width=40, has_se=True, **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["SE_HRNet_W40_C"], use_ssld)
     return model
 
 
-def SE_HRNet_W44_C(**args):
-    model = HRNet(width=44, has_se=True, **args)
+def SE_HRNet_W44_C(pretrained=False, use_ssld=False, **kwargs):
+    """
+    SE_HRNet_W44_C
+    Args:
+        pretrained: bool=False or str. If `True` load pretrained parameters, `False` otherwise.
+                    If str, means the path of the pretrained model.
+        use_ssld: bool=False. Whether using distillation pretrained model when pretrained=True.
+    Returns:
+        model: nn.Layer. Specific `SE_HRNet_W44_C` model depends on args.
+    """
+    model = HRNet(width=44, has_se=True, **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["SE_HRNet_W44_C"], use_ssld)
     return model
 
 
-def SE_HRNet_W48_C(**args):
-    model = HRNet(width=48, has_se=True, **args)
+def SE_HRNet_W48_C(pretrained=False, use_ssld=False, **kwargs):
+    """
+    SE_HRNet_W48_C
+    Args:
+        pretrained: bool=False or str. If `True` load pretrained parameters, `False` otherwise.
+                    If str, means the path of the pretrained model.
+        use_ssld: bool=False. Whether using distillation pretrained model when pretrained=True.
+    Returns:
+        model: nn.Layer. Specific `SE_HRNet_W48_C` model depends on args.
+    """
+    model = HRNet(width=48, has_se=True, **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["SE_HRNet_W48_C"], use_ssld)
     return model
 
 
-def SE_HRNet_W60_C(**args):
-    model = HRNet(width=60, has_se=True, **args)
+def SE_HRNet_W60_C(pretrained=False, use_ssld=False, **kwargs):
+    """
+    SE_HRNet_W60_C
+    Args:
+        pretrained: bool=False or str. If `True` load pretrained parameters, `False` otherwise.
+                    If str, means the path of the pretrained model.
+        use_ssld: bool=False. Whether using distillation pretrained model when pretrained=True.
+    Returns:
+        model: nn.Layer. Specific `SE_HRNet_W60_C` model depends on args.
+    """
+    model = HRNet(width=60, has_se=True, **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["SE_HRNet_W60_C"], use_ssld)
     return model
 
 
-def SE_HRNet_W64_C(**args):
-    model = HRNet(width=64, has_se=True, **args)
+def SE_HRNet_W64_C(pretrained=False, use_ssld=False, **kwargs):
+    """
+    SE_HRNet_W64_C
+    Args:
+        pretrained: bool=False or str. If `True` load pretrained parameters, `False` otherwise.
+                    If str, means the path of the pretrained model.
+        use_ssld: bool=False. Whether using distillation pretrained model when pretrained=True.
+    Returns:
+        model: nn.Layer. Specific `SE_HRNet_W64_C` model depends on args.
+    """
+    model = HRNet(width=64, has_se=True, **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["SE_HRNet_W64_C"], use_ssld)
     return model
