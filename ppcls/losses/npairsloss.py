@@ -35,19 +35,3 @@ class NpairsLoss(paddle.nn.Layer):
         l2loss = 0.5 * reg_lambda * reg
         return {"npairsloss": xentloss + l2loss}
     
-if __name__ == "__main__":
-    
-    import numpy as np
-    metric = NpairsLoss()
-
-    #prepare data
-    np.random.seed(1)
-    features = np.random.randn(160, 32)
-    #print(features)
-
-    #do inference
-    features  = paddle.to_tensor(features)
-    loss = metric(features)
-    print(loss)
-    
-
