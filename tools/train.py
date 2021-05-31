@@ -95,9 +95,7 @@ def main(args):
     init_model(config, net, optimizer)
 
     # add for benchmark platform to test training speed of @to_static
-    to_static = config.get("to_static", False) and config.get(
-        "support_to_static", False)
-    if to_static:
+    if config.get("to_static", False) and config.get("support_to_static", False):
         dp_net = paddle.jit.to_static(dp_net)
         logger.info("Successfully to apply @to_static for training.")
 
