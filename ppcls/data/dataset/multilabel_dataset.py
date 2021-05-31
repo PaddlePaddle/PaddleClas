@@ -59,11 +59,8 @@ class MultiLabelDataset(CommonDataset):
             if self._transform_ops:
                 img = transform(img, self._transform_ops)
             img = img.transpose((2, 0, 1))
-
             label = np.array(self.labels[idx]).astype("float32")
-
             return (img, label)
-
         except Exception as ex:
             logger.error("Exception occured when parse line: {} with msg: {}".
                          format(self.images[idx], ex))
