@@ -23,5 +23,5 @@ def build_postprocess(config):
     config = copy.deepcopy(config)
     model_name = config.pop("name")
     mod = importlib.import_module(__name__)
-    arch = getattr(mod, model_name)(**config)
-    return arch
+    postprocess_func = getattr(mod, model_name)(**config)
+    return postprocess_func
