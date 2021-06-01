@@ -1,1 +1,1 @@
-from interface import Graph_Index
+from .interface import Graph_Index
