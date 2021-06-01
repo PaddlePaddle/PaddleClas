@@ -48,7 +48,6 @@ class TripletLossV2(nn.Layer):
 
         # `dist_ap` means distance(anchor, positive)
         ## both `dist_ap` and `relative_p_inds` with shape [N, 1]
-        #print(is_pos.shape, dist.shape, type(is_pos), type(dist), paddle.reshape(paddle.masked_select(dist, is_pos),(bs, -1)))
         '''
         dist_ap, relative_p_inds = paddle.max(
             paddle.reshape(dist[is_pos], (bs, -1)), axis=1, keepdim=True)
@@ -98,7 +97,6 @@ class TripletLoss(nn.Layer):
         """
         inputs = input["features"]
 
-        #print(inputs.shape, targets.shape)
         bs = inputs.shape[0]
         # Compute pairwise distance, replace by the official when merged
         dist = paddle.pow(inputs, 2).sum(axis=1, keepdim=True).expand([bs, bs])

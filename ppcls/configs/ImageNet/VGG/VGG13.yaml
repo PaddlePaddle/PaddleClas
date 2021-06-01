@@ -8,7 +8,7 @@ Global:
   save_interval: 1
   eval_during_train: True
   eval_interval: 1
-  epochs: 120
+  epochs: 90
   print_batch_step: 10
   use_visualdl: False
   # used for static mode and model export
@@ -17,7 +17,7 @@ Global:
 
 # model architecture
 Arch:
-  name: "ResNet50"
+  name: "VGG13"
  
 # loss function config for traing/eval process
 Loss:
@@ -33,13 +33,11 @@ Optimizer:
   name: Momentum
   momentum: 0.9
   lr:
-    name: Piecewise
-    learning_rate: 0.1
-    decay_epochs: [30, 60, 90]
-    values: [0.1, 0.01, 0.001, 0.0001]
+    name: Cosine
+    learning_rate: 0.01
   regularizer:
     name: 'L2'
-    coeff: 0.0001
+    coeff: 0.0003
 
 
 # data loader for train and eval
