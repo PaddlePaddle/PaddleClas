@@ -16,35 +16,41 @@ import paddle
 import math
 import paddle.nn as nn
 
+
 class CosMargin(paddle.nn.Layer):
-    def __init__(self, embedding_size,
-                       class_num,
-                       margin=0.35,
-                       scale=64.0):
+    def __init__(self, embedding_size, class_num, margin=0.35, scale=64.0):
         super(CosMargin, self).__init__()
         self.scale = scale
         self.margin = margin
         self.embedding_size = embedding_size
         self.class_num = class_num
-        
-        weight_attr =  paddle.ParamAttr(initializer = paddle.nn.initializer.XavierNormal())
-        self.fc = nn.Linear(self.embedding_size, self.class_num, weight_attr=weight_attr, bias_attr=False)
-        
+
+        weight_attr = paddle.ParamAttr(
+            initializer=paddle.nn.initializer.XavierNormal())
+        self.fc = nn.Linear(
+            self.embedding_size,
+            self.class_num,
+            weight_attr=weight_attr,
+            bias_attr=False)
+
     def forward(self, input, label):
         label.stop_gradient = True
 
-        input_norm = paddle.sqrt(paddle.sum(paddle.square(input), axis=1, keepdim=True))
-        input = paddle.divide(input, x_norm) 
+        input_norm = paddle.sqrt(
+            paddle.sum(paddle.square(input), axis=1, keepdim=True))
+        input = paddle.divide(input, x_norm)
 
         weight = self.fc.weight
-        weight_norm = paddle.sqrt(paddle.sum(paddle.square(weight), axis=0, keepdim=True))
+        weight_norm = paddle.sqrt(
+            paddle.sum(paddle.square(weight), axis=0, keepdim=True))
         weight = paddle.divide(weight, weight_norm)
 
-        cos   = paddle.matmul(input, weight)
+        cos = paddle.matmul(input, weight)
         cos_m = cos - self.margin
-        
+
         one_hot = paddle.nn.functional.one_hot(label, self.class_num)
         one_hot = paddle.squeeze(one_hot, axis=[1])
-        output  = paddle.multiply(one_hot, cos_m) + paddle.multiply((1.0 - one_hot), cos)
+        output = paddle.multiply(one_hot, cos_m) + paddle.multiply(
+            (1.0 - one_hot), cos)
         output = output * self.scale
         return output

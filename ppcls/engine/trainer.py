@@ -30,8 +30,8 @@ from ppcls.utils.misc import AverageMeter
 from ppcls.utils import logger
 from ppcls.data import build_dataloader
 from ppcls.arch import build_model
-from ppcls.arch.loss_metrics import build_loss
-from ppcls.arch.loss_metrics import build_metrics
+from ppcls.loss import build_loss
+from ppcls.metrics import build_metrics
 from ppcls.optimizer import build_optimizer
 from ppcls.utils.save_load import load_dygraph_pretrain
 from ppcls.utils.save_load import init_model

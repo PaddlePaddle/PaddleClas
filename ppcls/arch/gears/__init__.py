@@ -11,18 +11,19 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import importlib
 
 from .arcmargin import ArcMargin
 from .cosmargin import CosMargin
 from .circlemargin import CircleMargin
 from .fc import FC
 
-__all__ = ['build_head']
 
-def build_head(config):
+def build_gear(config):
     support_dict = ['ArcMargin', 'CosMargin', 'CircleMargin', 'FC']
-    module_name = config.pop('name')
-    assert module_name in support_dict, Exception('head only support {}'.format(
+    gear_name = config.pop('name')
+    assert gear_name in support_dict, Exception('head only support {}'.format(
         support_dict))
-    module_class = eval(module_name)(**config)
-    return module_class
+    module = importlib.import_module(__name__)
+    gear = getattr(module, gear_name)(**config)
+    return gear

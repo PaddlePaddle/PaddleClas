@@ -16,35 +16,44 @@ import paddle
 import paddle.nn as nn
 import math
 
+
 class ArcMargin(nn.Layer):
-    def __init__(self, embedding_size, 
-                       class_num,  
-                       margin=0.5, 
-                       scale=80.0, 
-                       easy_margin=False):
+    def __init__(self,
+                 embedding_size,
+                 class_num,
+                 margin=0.5,
+                 scale=80.0,
+                 easy_margin=False):
         super(ArcMargin, self).__init__()
-        self.embedding_size   = embedding_size
-        self.class_num   = class_num
-        self.margin      = margin
-        self.scale       = scale
+        self.embedding_size = embedding_size
+        self.class_num = class_num
+        self.margin = margin
+        self.scale = scale
         self.easy_margin = easy_margin
 
-        weight_attr =  paddle.ParamAttr(initializer = paddle.nn.initializer.XavierNormal())
-        self.fc = nn.Linear(self.embedding_size, self.class_num, weight_attr=weight_attr, bias_attr=False) 
+        weight_attr = paddle.ParamAttr(
+            initializer=paddle.nn.initializer.XavierNormal())
+        self.fc = nn.Linear(
+            self.embedding_size,
+            self.class_num,
+            weight_attr=weight_attr,
+            bias_attr=False)
 
     def forward(self, input, label):
-        input_norm = paddle.sqrt(paddle.sum(paddle.square(input), axis=1, keepdim=True))
+        input_norm = paddle.sqrt(
+            paddle.sum(paddle.square(input), axis=1, keepdim=True))
         input = paddle.divide(input, input_norm)
 
         weight = self.fc.weight
-        weight_norm = paddle.sqrt(paddle.sum(paddle.square(weight), axis=0, keepdim=True))
+        weight_norm = paddle.sqrt(
+            paddle.sum(paddle.square(weight), axis=0, keepdim=True))
         weight = paddle.divide(weight, weight_norm)
-        
-        cos   = paddle.matmul(input, weight)
-        sin   = paddle.sqrt(1.0 - paddle.square(cos) + 1e-6)
+
+        cos = paddle.matmul(input, weight)
+        sin = paddle.sqrt(1.0 - paddle.square(cos) + 1e-6)
         cos_m = math.cos(self.margin)
         sin_m = math.sin(self.margin)
-        phi   = cos * cos_m - sin * sin_m
+        phi = cos * cos_m - sin * sin_m
 
         th = math.cos(self.margin) * (-1)
         mm = math.sin(self.margin) * self.margin
@@ -55,11 +64,12 @@ class ArcMargin(nn.Layer):
 
         one_hot = paddle.nn.functional.one_hot(label, self.class_num)
         one_hot = paddle.squeeze(one_hot, axis=[1])
-        output  = paddle.multiply(one_hot, phi) + paddle.multiply((1.0 - one_hot), cos)
-        output  = output * self.scale
+        output = paddle.multiply(one_hot, phi) + paddle.multiply(
+            (1.0 - one_hot), cos)
+        output = output * self.scale
         return output
 
     def _paddle_where_more_than(self, target, limit, x, y):
-        mask   = paddle.cast( x = (target > limit), dtype='float32')
+        mask = paddle.cast(x=(target > limit), dtype='float32')
         output = paddle.multiply(mask, x) + paddle.multiply((1.0 - mask), y)
         return output
