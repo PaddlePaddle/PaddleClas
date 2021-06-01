@@ -4,7 +4,7 @@
 
 ## 简介
 
-一些垂域识别任务（如车辆、商品等）需要识别的类别数较大，往往采用基于检索的方式，通过查询向量与底库向量进行快速的最近邻搜索，获得匹配的预测类别。向量检索模块提供基础的近似最近邻搜索算法，基于百度自研的Möbius算法，一种基于图的近似最近邻搜索算法，用于最大内积搜索 (MIPS)。 该模块提供python接口，支持numpy和 tensor类型向量,支持L2和Inner Product距离计算
+一些垂域识别任务（如车辆、商品等）需要识别的类别数较大，往往采用基于检索的方式，通过查询向量与底库向量进行快速的最近邻搜索，获得匹配的预测类别。向量检索模块提供基础的近似最近邻搜索算法，基于百度自研的Möbius算法，一种基于图的近似最近邻搜索算法，用于最大内积搜索 (MIPS)。 该模块提供python接口，支持numpy和 tensor类型向量,支持L2和Inner Product距离计算。
 
 Mobius 算法细节详见论文 （[Möbius Transformation for Fast Inner Product Search on Graph](http://research.baidu.com/Public/uploads/5e189d36b5cf6.PDF)）
 
