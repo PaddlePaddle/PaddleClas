@@ -14,9 +14,9 @@
 import copy
 import importlib
 
-from . import topk_process
+from . import topk
 
-from .topk_process import Topk
+from .topk import Topk
 
 
 def build_postprocess(config):
