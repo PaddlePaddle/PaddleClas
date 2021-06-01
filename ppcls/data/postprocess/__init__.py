@@ -16,7 +16,7 @@ import importlib
 
 from . import topk_process
 
-from .topk_process import TopkProcess
+from .topk_process import Topk
 
 
 def build_postprocess(config):

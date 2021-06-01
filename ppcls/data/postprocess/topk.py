@@ -18,7 +18,7 @@ import paddle
 import paddle.nn.functional as F
 
 
-class TopkProcess(object):
+class Topk(object):
     def __init__(self, topk=1, class_id_map_file=None):
         assert isinstance(topk, (int, ))
         self.class_id_map = self.parse_class_id_map(class_id_map_file)
