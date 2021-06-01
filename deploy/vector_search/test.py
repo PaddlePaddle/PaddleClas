@@ -1,5 +1,5 @@
 import numpy as np
-from interface import *
+from interface import Graph_Index
 
 # 随机产生样本
 index_vectors = np.random.rand(100000,128).astype(np.float32) 
