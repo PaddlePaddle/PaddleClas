@@ -246,7 +246,7 @@ Among them, the `--model` parameter is used to specify the model name, `--pretra
 
 **Note**:
 1. If `--output_path=./inference`, then three files will be generated in the folder `inference`, they are `inference.pdiparams`, `inference.pdmodel` and `inference.pdiparams.info`.
-2. You can specify the `shape` of the model input image by setting the parameter `--img_size`, the default is `224`, which means the shape of input image is `224*224`.
+2. You can specify the `shape` of the model input image by setting the parameter `--img_size`, the default is `224`, which means the shape of input image is `224*224`. If you want to use `Transformer series models`, such as `DeiT_***_384`, `ViT_***_384`, etc., please pay attention to the input size of model, and need to set `resize_short=384`, `resize=384`.
 
 The above command will generate the model structure file (`inference.pdmodel`) and the model weight file (`inference.pdiparams`), and then the inference engine can be used for inference:
 
