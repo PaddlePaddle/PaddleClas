@@ -281,5 +281,6 @@ python tools/infer/predict.py \
 + `enable_calc_topk`: 是否计算预测结果的Topk精度指标，默认为`False`，
 + `gt_label_path`: 图像文件名以及真值标签文件，当`enable_calc_topk`为True时生效，用于读取待预测的图像列表及其标签。
 
+**注意**: 如果使用`Transformer`系列模型，如`DeiT_***_384`, `ViT_***_384`等，请注意模型的输入数据尺寸，需要设置参数`resize_short=384`, `resize=384`。
 
 * 如果你希望评测模型速度，建议使用该脚本(`tools/infer/predict.py`)，同时开启TensorRT加速预测。
