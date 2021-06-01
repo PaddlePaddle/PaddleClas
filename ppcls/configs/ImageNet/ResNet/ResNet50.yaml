@@ -16,7 +16,21 @@ Global:
 
 # model architecture
 Arch:
+  #for classification
   name: "ResNet50"
+  
+  #for retrieval
+  # name: "RecModel"
+  # Backbone:
+  #   name: "ResNet50"
+  # Stoplayer: 
+  #   name: "flatten_0"
+  #   output_dim: 2048
+  #   embedding_size: 512
+  # Head:
+  #   name: "ArcMargin"
+  #   margin: 0.5
+  #   scale:  80
 
 # loss function config for traing/eval process
 Loss:
