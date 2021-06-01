@@ -32,7 +32,7 @@ Mobius 算法细节详见论文 （[Möbius Transformation for Fast Inner Produc
     
     # 初始化索引结构
     indexer = Graph_Index(dist_type="IP") #支持"IP"和"L2"
-    indexer.build(gallery_vectors=index_vectors, gallery_doc=index_docs, pq_size=100, index_path='test')
+    indexer.build(gallery_vectors=index_vectors, gallery_docs=index_docs, pq_size=100, index_path='test')
     
     # 查询
     scores, docs = indexer.search(query=query_vector, return_k=10, search_budget=100)
