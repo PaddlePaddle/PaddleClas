@@ -40,7 +40,6 @@ def transform(data, ops=[]):
     """ transform """
     for op in ops:
         data = op(data)
-        #print(data.shape, op)
     return data
 
 

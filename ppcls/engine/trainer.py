@@ -37,6 +37,10 @@ from ppcls.utils.save_load import load_dygraph_pretrain
 from ppcls.utils.save_load import init_model
 from ppcls.utils import save_load
 
+from ppcls.data.utils.get_image_list import get_image_list
+from ppcls.data.postprocess import build_postprocess
+from ppcls.data.reader import create_operators
+
 
 class Trainer(object):
     def __init__(self, config, mode="train"):
@@ -100,7 +104,7 @@ class Trainer(object):
 
         metric_func = self._build_metric_info(self.config["Metric"])
 
-        train_dataloader = build_dataloader(self.config["DataLoader"], "train",
+        train_dataloader = build_dataloader(self.config["DataLoader"], "Train",
                                             self.device)
 
         step_each_epoch = len(train_dataloader)
@@ -213,7 +217,7 @@ class Trainer(object):
     def eval(self, epoch_id=0):
         output_info = dict()
 
-        eval_dataloader = build_dataloader(self.config["DataLoader"], "eval",
+        eval_dataloader = build_dataloader(self.config["DataLoader"], "Eval",
                                            self.device)
 
         self.model.eval()
@@ -277,3 +281,36 @@ class Trainer(object):
             return -1
         # return 1st metric in the dict
         return output_info[metric_key].avg
+
+    @paddle.no_grad()
+    def infer(self, ):
+        total_trainer = paddle.distributed.get_world_size()
+        local_rank = paddle.distributed.get_rank()
+        image_list = get_image_list(self.config["Infer"]["infer_imgs"])
+        # data split
+        image_list = image_list[local_rank::total_trainer]
+
+        preprocess_func = create_operators(self.config["Infer"]["transforms"])
+        postprocess_func = build_postprocess(self.config["Infer"][
+            "PostProcess"])
+
+        batch_size = self.config["Infer"]["batch_size"]
+
+        self.model.eval()
+
+        batch_data = []
+        image_file_list = []
+        for idx, image_file in enumerate(image_list):
+            with open(image_file, 'rb') as f:
+                x = f.read()
+            for process in preprocess_func:
+                x = process(x)
+            batch_data.append(x)
+            image_file_list.append(image_file)
+            if len(batch_data) >= batch_size or idx == len(image_list) - 1:
+                batch_tensor = paddle.to_tensor(batch_data)
+                out = self.model(batch_tensor)
+                result = postprocess_func(out, image_file_list)
+                print(result)
+                batch_data.clear()
+                image_file_list.clear()
