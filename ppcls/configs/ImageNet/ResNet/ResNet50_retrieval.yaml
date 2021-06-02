@@ -33,6 +33,11 @@ Loss:
   Train:
     - CELoss:
         weight: 1.0
+    - TriHardLoss:
+        batch_size: 120
+        samples_each_class: 2  
+        margin: 0.1
+        weight: 0.1 
   Eval:
     - CELoss:
         weight: 1.0
