@@ -41,20 +41,20 @@ class CELoss(nn.Layer):
         soft_target = paddle.reshape(soft_target, shape=[-1, class_num])
         return soft_target
 
-    def forward(self, logits, label, mode="train"):
+    def forward(self, x, label, mode="train"):
         loss_dict = {}
         if self.epsilon is not None:
-            class_num = logits.shape[-1]
+            class_num = x.shape[-1]
             label = self._labelsmoothing(label, class_num)
             x = -F.log_softmax(x, axis=-1)
             loss = paddle.sum(x * label, axis=-1)
         else:
-            if label.shape[-1] == logits.shape[-1]:
+            if label.shape[-1] == x.shape[-1]:
                 label = F.softmax(label, axis=-1)
                 soft_label = True
             else:
                 soft_label = False
-            loss = F.cross_entropy(logits, label=label, soft_label=soft_label)
+            loss = F.cross_entropy(x, label=label, soft_label=soft_label)
         loss_dict[self.name] = paddle.mean(loss)
         return loss_dict
 
