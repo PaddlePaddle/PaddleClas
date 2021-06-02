@@ -1,6 +1,6 @@
 # global configs
 Global:
-  checkpoints: "output/ResNet50/ppcls_epoch_15"
+  checkpoints: null
   pretrained_model: null
   output_dir: "./output/"
   device: "gpu"
