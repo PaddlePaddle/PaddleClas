@@ -41,8 +41,7 @@ Loss:
   Eval:
     - CELoss:
         weight: 1.0
-
-
+        
 Optimizer:
   name: Momentum
   momentum: 0.9
