@@ -69,6 +69,9 @@ class Topk(nn.Layer):
         self.topk = topk
 
     def forward(self, x, label):
+        if isinstance(x, dict)
+            x = x["logits"]
+            
         metric_dict = dict()
         for k in self.topk:
             metric_dict["top{}".format(k)] = paddle.metric.accuracy(
