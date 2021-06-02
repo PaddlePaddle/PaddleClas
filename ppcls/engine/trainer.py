@@ -30,7 +30,7 @@ from ppcls.utils.misc import AverageMeter
 from ppcls.utils import logger
 from ppcls.data import build_dataloader
 from ppcls.arch import build_model
-from ppcls.arch.loss_metrics import build_loss
+from ppcls.losses import build_loss
 from ppcls.arch.loss_metrics import build_metrics
 from ppcls.optimizer import build_optimizer
 from ppcls.utils.save_load import load_dygraph_pretrain
@@ -55,6 +55,9 @@ class Trainer(object):
             "distributed"] = paddle.distributed.get_world_size() != 1
         if self.config["Global"]["distributed"]:
             dist.init_parallel_env()
+
+        if "Head" in self.config["Arch"]:
+            self.config["Arch"]["Head"]["class_num"] = self.config["Global"]["class_num"]
         self.model = build_model(self.config["Arch"])
 
         if self.config["Global"]["pretrained_model"] is not None:
@@ -143,7 +146,7 @@ class Trainer(object):
                                             .reshape([-1, 1]))
                 global_step += 1
                 # image input
-                out = self.model(batch[0])
+                out = self.model(batch[0], batch[1])
                 # calc loss
                 loss_dict = loss_func(out, batch[-1])
                 for key in loss_dict:
@@ -233,7 +236,7 @@ class Trainer(object):
             batch[0] = paddle.to_tensor(batch[0]).astype("float32")
             batch[1] = paddle.to_tensor(batch[1]).reshape([-1, 1])
             # image input
-            out = self.model(batch[0])
+            out = self.model(batch[0], batch[1])["logits"]
             # calc build
             if loss_func is not None:
                 loss_dict = loss_func(out, batch[-1])
