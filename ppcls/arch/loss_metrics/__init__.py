@@ -46,8 +46,8 @@ class CELoss(nn.Layer):
         if self.epsilon is not None:
             class_num = logits.shape[-1]
             label = self._labelsmoothing(label, class_num)
-            x = -F.log_softmax(x, axis=-1)
-            loss = paddle.sum(x * label, axis=-1)
+            x = -F.log_softmax(logits, axis=-1)
+            loss = paddle.sum(logits * label, axis=-1)
         else:
             if label.shape[-1] == logits.shape[-1]:
                 label = F.softmax(label, axis=-1)

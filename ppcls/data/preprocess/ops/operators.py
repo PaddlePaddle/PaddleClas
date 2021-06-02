@@ -29,10 +29,12 @@ from PIL import Image
 from .autoaugment import ImageNetPolicy
 from .functional import augmentations
 
+
 class OperatorParamError(ValueError):
     """ OperatorParamError
     """
     pass
+
 
 class DecodeImage(object):
     """ decode image """
@@ -235,7 +237,12 @@ class AugMix(object):
     """ Perform AugMix augmentation and compute mixture.
     """
 
-    def __init__(self, prob=0.5, aug_prob_coeff=0.1, mixture_width=3, mixture_depth=1, aug_severity=1):
+    def __init__(self,
+                 prob=0.5,
+                 aug_prob_coeff=0.1,
+                 mixture_width=3,
+                 mixture_depth=1,
+                 aug_severity=1):
         """
         Args:
             prob: Probability of taking augmix
@@ -264,14 +271,16 @@ class AugMix(object):
 
         ws = np.float32(
             np.random.dirichlet([self.aug_prob_coeff] * self.mixture_width))
-        m = np.float32(np.random.beta(self.aug_prob_coeff, self.aug_prob_coeff))
+        m = np.float32(
+            np.random.beta(self.aug_prob_coeff, self.aug_prob_coeff))
 
         # image = Image.fromarray(image)
         mix = np.zeros([image.shape[1], image.shape[0], 3])
         for i in range(self.mixture_width):
             image_aug = image.copy()
             image_aug = Image.fromarray(image_aug)
-            depth = self.mixture_depth if self.mixture_depth > 0 else np.random.randint(1, 4)
+            depth = self.mixture_depth if self.mixture_depth > 0 else np.random.randint(
+                1, 4)
             for _ in range(depth):
                 op = np.random.choice(self.augmentations)
                 image_aug = op(image_aug, self.aug_severity)

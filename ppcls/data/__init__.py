@@ -25,14 +25,17 @@ from . import samplers
 from .dataset.imagenet_dataset import ImageNetDataset
 from .dataset.multilabel_dataset import MultiLabelDataset
 from .dataset.common_dataset import create_operators
+from .dataset.vehicle_dataset import CompCars, VeriWild
 
 # sampler
 from .samplers import DistributedRandomIdentitySampler
 
 from .preprocess import transform
 
+
 def build_dataloader(config, mode, device, seed=None):
-    assert mode in ['Train', 'Eval', 'Test'], "Mode should be Train, Eval or Test."
+    assert mode in ['Train', 'Eval', 'Test'
+                    ], "Mode should be Train, Eval or Test."
     # build dataset
     config_dataset = config[mode]['dataset']
     config_dataset = copy.deepcopy(config_dataset)
@@ -76,7 +79,7 @@ def build_dataloader(config, mode, device, seed=None):
         batch_ops = create_operators(batch_transform)
         batch_collate_fn = mix_collate_fn
     else:
-        batch_collate_fn = None 
+        batch_collate_fn = None
 
     # build dataloader
     config_loader = config[mode]['loader']
@@ -105,9 +108,10 @@ def build_dataloader(config, mode, device, seed=None):
             collate_fn=batch_collate_fn)
 
     logger.info("build data_loader({}) success...".format(data_loader))
-    
+
     return data_loader
-    
+
+
 '''
 # TODO: fix the format
 def build_dataloader(config, mode, device, seed=None):
