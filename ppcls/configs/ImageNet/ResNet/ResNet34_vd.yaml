@@ -17,7 +17,7 @@ Global:
 
 # model architecture
 Arch:
-  name: "ResNet101_vd"
+  name: "ResNet34_vd"
  
 # loss function config for traing/eval process
 Loss:
@@ -75,6 +75,8 @@ DataLoader:
         cls_label_path: "./dataset/ILSVRC2012/val_list.txt"
         transform_ops:
           - ResizeImage:
+              resize_short: 256
+          - CropImage:
               size: 224
           - NormalizeImage:
               scale: 0.00392157

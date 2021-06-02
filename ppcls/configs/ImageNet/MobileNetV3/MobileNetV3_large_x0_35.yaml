@@ -24,6 +24,7 @@ Loss:
   Train:
     - CELoss:
         weight: 1.0
+        epsilon: 0.1
   Eval:
     - CELoss:
         weight: 1.0
@@ -75,6 +76,8 @@ DataLoader:
         cls_label_path: "./dataset/ILSVRC2012/val_list.txt"
         transform_ops:
           - ResizeImage:
+              resize_short: 256
+          - CropImage:
               size: 224
           - NormalizeImage:
               scale: 0.00392157
