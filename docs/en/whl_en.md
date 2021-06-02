@@ -75,9 +75,15 @@ paddleclas --model_name=ResNet50 --top_k=5 --image_file='docs/images/whl/demo.jp
 
 **Note**: If you want to use `Transformer series models`, such as `DeiT_***_384`, `ViT_***_384`, etc., please pay attention to the input size of model, and need to set `resize_short=384`, `resize=384` when building a `PaddleClas` object. The following is a demo.
 
-```python
-clas = PaddleClas(model_name='ViT_base_patch16_384', top_k=5, resize_short=384, resize=384)
-```
+* Bash:
+    ```bash
+    paddleclas --model_name=ViT_base_patch16_384 --image_file='docs/images/whl/demo.jpg' --resize_short=384 --resize=384
+    ```
+
+* Python:
+    ```python
+    clas = PaddleClas(model_name='ViT_base_patch16_384', top_k=5, resize_short=384, resize=384)
+    ```
 
 ### 3. Different Usages of Codes
 
