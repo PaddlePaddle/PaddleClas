@@ -78,7 +78,9 @@ class Topk(nn.Layer):
 
 # TODO: fix the format
 def build_loss(config):
-    loss_func = CELoss()
+    config = list(copy.deepcopy(config[0]).values())[0]
+    weight = config.pop("weight")
+    loss_func = CELoss(**config)
     return loss_func
 
 
