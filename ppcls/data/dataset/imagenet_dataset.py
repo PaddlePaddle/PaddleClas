@@ -30,13 +30,18 @@ from .common_dataset import CommonDataset
 
 class ImageNetDataset(CommonDataset):
 
-    def _load_anno(self):
+    def _load_anno(self, seed=None):
         assert os.path.exists(self._cls_path)
         assert os.path.exists(self._img_root)
         self.images = []
         self.labels = []
+
         with open(self._cls_path) as fd:
             lines = fd.readlines()
+            if seed is not None:
+                np.random.RandomState(seed).shuffle(lines)
+            else:
+                np.random.shuffle(lines)
             for l in lines:
                 l = l.strip().split(" ")
                 self.images.append(os.path.join(self._img_root, l[0]))

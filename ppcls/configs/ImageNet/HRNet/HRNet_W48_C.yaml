@@ -76,8 +76,6 @@ DataLoader:
         image_root: "./dataset/ILSVRC2012/"
         cls_label_path: "./dataset/ILSVRC2012/val_list.txt"
         transform_ops:
-          - ResizeImage:
-              size: 224
           - NormalizeImage:
               scale: 0.00392157
               mean: [0.485, 0.456, 0.406]

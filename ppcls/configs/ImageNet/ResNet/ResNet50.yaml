@@ -1,6 +1,6 @@
 # global configs
 Global:
-  checkpoints: null
+  checkpoints: "output/ResNet50/ppcls_epoch_15"
   pretrained_model: null
   output_dir: "./output/"
   device: "gpu"
@@ -77,6 +77,8 @@ DataLoader:
         cls_label_path: "./dataset/ILSVRC2012/val_list.txt"
         transform_ops:
           - ResizeImage:
+              resize_short: 256
+          - CropImage:
               size: 224
           - NormalizeImage:
               scale: 0.00392157
