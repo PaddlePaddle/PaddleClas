@@ -18,6 +18,7 @@ Arch:
   name: "RecModel"
   Backbone:
     name: "ResNet50"
+    pretrained: True
   Stoplayer: 
     name: "flatten_0"
     output_dim: 2048
