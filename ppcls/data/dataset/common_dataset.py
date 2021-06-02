@@ -40,7 +40,6 @@ def create_operators(params):
     assert isinstance(params, list), ('operator config should be a list')
     ops = []
     for operator in params:
-        print(operator)
         assert isinstance(operator,
                           dict) and len(operator) == 1, "yaml format error"
         op_name = list(operator)[0]

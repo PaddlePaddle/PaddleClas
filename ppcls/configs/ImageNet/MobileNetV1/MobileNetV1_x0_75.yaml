@@ -17,7 +17,7 @@ Global:
 
 # model architecture
 Arch:
-  name: "ResNet50"
+  name: "MobileNetV1_x0_75"
  
 # loss function config for traing/eval process
 Loss:
@@ -39,7 +39,7 @@ Optimizer:
     values: [0.1, 0.01, 0.001, 0.0001]
   regularizer:
     name: 'L2'
-    coeff: 0.0001
+    coeff: 0.00003
 
 
 # data loader for train and eval
@@ -116,9 +116,9 @@ Infer:
 
 Metric:
     Train:
-    - TopkAcc:
+    - Topk:
         k: [1, 5]
     Eval:
-    - TopkAcc:
+    - Topk:
         k: [1, 5]
 

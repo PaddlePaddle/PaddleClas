@@ -104,7 +104,7 @@ class Trainer(object):
 
         metric_func = self._build_metric_info(self.config["Metric"])
 
-        train_dataloader = build_dataloader(self.config["DataLoader"], "train",
+        train_dataloader = build_dataloader(self.config["DataLoader"], "Train",
                                             self.device)
 
         step_each_epoch = len(train_dataloader)
@@ -217,7 +217,7 @@ class Trainer(object):
     def eval(self, epoch_id=0):
         output_info = dict()
 
-        eval_dataloader = build_dataloader(self.config["DataLoader"], "eval",
+        eval_dataloader = build_dataloader(self.config["DataLoader"], "Eval",
                                            self.device)
 
         self.model.eval()

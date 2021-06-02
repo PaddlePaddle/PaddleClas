@@ -18,13 +18,13 @@ from paddle.io import DistributedBatchSampler, BatchSampler, DataLoader
 
 from ppcls.utils import logger
 
-from . import datasets
+from . import dataset
 from . import imaug
 from . import samplers
 # dataset
-from .datasets.imagenet_dataset import ImageNetDataset
+from .dataset.imagenet_dataset import ImageNetDataset
 from .dataset.multilabel_dataset import MultiLabelDataset
-from .datasets.common_dataset import create_operators
+from .dataset.common_dataset import create_operators
 
 # sampler
 from .samplers import DistributedRandomIdentitySampler
@@ -35,6 +35,7 @@ def build_dataloader(config, mode, device, seed=None):
     assert mode in ['Train', 'Eval', 'Test'], "Mode should be Train, Eval or Test."
     # build dataset
     config_dataset = config[mode]['dataset']
+    config_dataset = copy.deepcopy(config_dataset)
     dataset_name = config_dataset.pop('name')
     if 'batch_transform_ops' in config_dataset:
         batch_transform = config_dataset.pop('batch_transform_ops')
@@ -105,7 +106,7 @@ def build_dataloader(config, mode, device, seed=None):
 
     logger.info("build data_loader({}) success...".format(data_loader))
     
-    return dataloader
+    return data_loader
     
 '''
 # TODO: fix the format

@@ -17,7 +17,7 @@ Global:
 
 # model architecture
 Arch:
-  name: "ResNet50"
+  name: "ResNet152"
  
 # loss function config for traing/eval process
 Loss:
@@ -116,9 +116,9 @@ Infer:
 
 Metric:
     Train:
-    - TopkAcc:
+    - Topk:
         k: [1, 5]
     Eval:
-    - TopkAcc:
+    - Topk:
         k: [1, 5]
 
