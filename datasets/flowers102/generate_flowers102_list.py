@@ -34,5 +34,6 @@ d['valid'] = np.array(setid['valid'][0])
 d['test'] = np.array(setid['tstid'][0])
 
 for id in d[sys.argv[2]]:
-   message = str(data_path) + "/image_" + str(id).zfill(5) + ".jpg " + str(labels[id - 1] - 1)
-   print(message)
+    message = str(data_path) + "/image_" + str(id).zfill(5) + ".jpg " + str(
+        labels[id - 1] - 1)
+    print(message)
