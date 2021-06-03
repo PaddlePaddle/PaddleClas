@@ -10,6 +10,7 @@ from .emlloss import EmlLoss
 from .npairsloss  import NpairsLoss
 from .trihardloss import TriHardLoss
 from .centerloss  import CenterLoss
+from .pairwisecosface import PairwiseCosface
 
 class CombinedLoss(nn.Layer):
     def __init__(self, config_list):
