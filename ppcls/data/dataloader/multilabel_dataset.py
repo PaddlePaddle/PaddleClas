@@ -14,38 +14,45 @@
 
 from __future__ import print_function
 
-import io
-import tarfile
 import numpy as np
-from PIL import Image  #all use default backend
-
-import paddle
-from paddle.io import Dataset
-import pickle
 import os
 import cv2
-import random
+
+from ppcls.data.preprocess import transform
+from ppcls.utils import logger
 
 from .common_dataset import CommonDataset
 
-class ImageNetDataset(CommonDataset):
 
-    def _load_anno(self, seed=None):
+class MultiLabelDataset(CommonDataset):
+    def _load_anno(self):
         assert os.path.exists(self._cls_path)
         assert os.path.exists(self._img_root)
         self.images = []
         self.labels = []
-
         with open(self._cls_path) as fd:
             lines = fd.readlines()
-            if seed is not None:
-                np.random.RandomState(seed).shuffle(lines)
-            else:
-                np.random.shuffle(lines)
             for l in lines:
                 l = l.strip().split(" ")
                 self.images.append(os.path.join(self._img_root, l[0]))
-                self.labels.append(int(l[1]))
+
+                labels = l[1].split(',')
+                labels = [int(i) for i in labels]
+
+                self.labels.append(labels)
                 assert os.path.exists(self.images[-1])
 
-
+    def __getitem__(self, idx):
+        try:
+            img = cv2.imread(self.images[idx])
+            img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+            if self._transform_ops:
+                img = transform(img, self._transform_ops)
+            img = img.transpose((2, 0, 1))
+            label = np.array(self.labels[idx]).astype("float32")
+            return (img, label)
+        except Exception as ex:
+            logger.error("Exception occured when parse line: {} with msg: {}".
+                         format(self.images[idx], ex))
+            rnd_idx = np.random.randint(self.__len__())
+            return self.__getitem__(rnd_idx)

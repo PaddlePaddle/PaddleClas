@@ -18,26 +18,27 @@ from __future__ import print_function
 
 import numpy as np
 
+
 def rerange_index(batch_size, samples_each_class):
-    tmp = np.arange(0, batch_size * batch_size) 
-    tmp = tmp.reshape(-1, batch_size) 
+    tmp = np.arange(0, batch_size * batch_size)
+    tmp = tmp.reshape(-1, batch_size)
     rerange_index = []
 
     for i in range(batch_size):
         step = i // samples_each_class
         start = step * samples_each_class
-        end   = (step + 1) * samples_each_class
+        end = (step + 1) * samples_each_class
 
-        pos_idx = []   
-        neg_idx = []   
+        pos_idx = []
+        neg_idx = []
         for j, k in enumerate(tmp[i]):
             if j >= start and j < end:
                 if j == i:
                     pos_idx.insert(0, k)
                 else:
-                    pos_idx.append(k)  
+                    pos_idx.append(k)
             else:
-                neg_idx.append(k)  
+                neg_idx.append(k)
         rerange_index += (pos_idx + neg_idx)
 
     rerange_index = np.array(rerange_index).astype(np.int32)

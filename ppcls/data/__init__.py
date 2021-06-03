@@ -11,26 +11,25 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 import copy
 import paddle
 import numpy as np
 from paddle.io import DistributedBatchSampler, BatchSampler, DataLoader
-
 from ppcls.utils import logger
 
-from . import dataset
-from . import imaug
-from . import samplers
+from ppcls.data import dataloader
+from ppcls.data import imaug
 # dataset
-from .dataset.imagenet_dataset import ImageNetDataset
-from .dataset.multilabel_dataset import MultiLabelDataset
-from .dataset.common_dataset import create_operators
-from .dataset.vehicle_dataset import CompCars, VeriWild
+from ppcls.data.dataloader.imagenet_dataset import ImageNetDataset
+from ppcls.data.dataloader.multilabel_dataset import MultiLabelDataset
+from ppcls.data.dataloader.common_dataset import create_operators
+from ppcls.data.dataloader.vehicle_dataset import CompCars, VeriWild
 
 # sampler
-from .samplers import DistributedRandomIdentitySampler
+from ppcls.data.dataloader import DistributedRandomIdentitySampler
 
-from .preprocess import transform
+from ppcls.data.preprocess import transform
 
 
 def build_dataloader(config, mode, device, seed=None):

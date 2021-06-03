@@ -18,10 +18,10 @@ import importlib
 import paddle.nn as nn
 
 from . import backbone
-from . import head
+from . import gears
 
 from .backbone import *
-from .head import *
+from .gears import *
 from .utils import *
 
 __all__ = ["build_model", "RecModel"]

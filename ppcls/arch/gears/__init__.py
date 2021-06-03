@@ -19,10 +19,11 @@ from .fc import FC
 
 __all__ = ['build_head']
 
+
 def build_head(config):
     support_dict = ['ArcMargin', 'CosMargin', 'CircleMargin', 'FC']
     module_name = config.pop('name')
-    assert module_name in support_dict, Exception('head only support {}'.format(
-        support_dict))
+    assert module_name in support_dict, Exception(
+        'head only support {}'.format(support_dict))
     module_class = eval(module_name)(**config)
     return module_class
