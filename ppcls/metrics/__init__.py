@@ -1,5 +1,6 @@
 import paddle
 import paddle.nn as nn
+import copy
 
 class Topk(nn.Layer):
     def __init__(self, topk=[1, 5]):
@@ -20,5 +21,7 @@ class Topk(nn.Layer):
         return metric_dict
 
 def build_metric(config):
+    config = copy.deepcopy(config)
     metrics_func = Topk()
+    logger.info("build metric {} success.".format(metrics_func))
     return metrics_func
