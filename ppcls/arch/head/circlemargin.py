@@ -22,7 +22,7 @@ class CircleMargin(nn.Layer):
                        class_num, 
                        margin, 
                        scale):
-        super(CircleSoftmax, self).__init__()
+        super(CircleMargin, self).__init__()
         self.scale  = scale
         self.margin = margin
         self.embedding_size = embedding_size
