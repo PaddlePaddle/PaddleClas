@@ -24,6 +24,7 @@ from . import samplers
 # dataset
 from .dataset.imagenet_dataset import ImageNetDataset
 from .dataset.multilabel_dataset import MultiLabelDataset
+from .dataset.logo_dataset import LogoDataset
 from .dataset.common_dataset import create_operators
 
 # sampler
