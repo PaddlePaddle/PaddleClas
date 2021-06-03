@@ -25,7 +25,13 @@ pip3 install paddlehub==2.0.0b1 --upgrade -i https://pypi.tuna.tsinghua.edu.cn/s
 分类推理模型权重文件：./inference/cls_infer.pdiparams
 ```  
 
-**模型路径可在`params.py`中查看和修改。** 我们也提供了大量基于ImageNet-1k数据集的预训练模型，模型列表及下载地址详见[模型库概览](../../docs/zh_CN/models/models_intro.md)，也可以替换成自己训练转换好的模型。
+**注意**：
+* 模型路径可在`./PaddleClas/deploy/hubserving/clas/params.py`中查看和修改。
+  ```python
+  cfg.model_file = "./inference/cls_infer.pdmodel"
+  cfg.params_file = "./inference/cls_infer.pdiparams"
+  ```
+* 我们也提供了大量基于ImageNet-1k数据集的预训练模型，模型列表及下载地址详见[模型库概览](../../docs/zh_CN/models/models_intro.md)，也可以使用自己训练转换好的模型。
 
 ### 3. 安装服务模块
 针对Linux环境和Windows环境，安装命令如下。
@@ -111,14 +117,21 @@ hub serving start -c deploy/hubserving/clas/config.json
 
 ```python tools/test_hubserving.py server_url image_path```  
 
-需要给脚本传递2个参数：  
+需要给脚本传递2个必须参数：
 - **server_url**：服务地址，格式为  
 `http://[ip_address]:[port]/predict/[module_name]`  
-- **image_path**：测试图像路径，可以是单张图片路径，也可以是图像集合目录路径
+- **image_path**：测试图像路径，可以是单张图片路径，也可以是图像集合目录路径。
 - **top_k**：[**可选**] 返回前 `top_k` 个 `score` ，默认为 `1`。
+- **batch_size**：[**可选**] 以`batch_size`大小为单位进行预测，默认为`1`。
+- **resize_short**：[**可选**] 将图像等比例缩放到最短边为`resize_short`，默认为`256`。
+- **resize**：[**可选**] 将图像resize到`resize * resize`尺寸，默认为`224`。
+- **normalize**：[**可选**] 是否对图像进行normalize处理，默认为`True`。
+
+**注意**：如果使用`Transformer`系列模型，如`DeiT_***_384`, `ViT_***_384`等，请注意模型的输入数据尺寸。需要指定`--resize_short=384 --resize=384`。
+
 
 访问示例：  
-```python tools/test_hubserving.py --server_url http://127.0.0.1:8866/predict/clas_system --image_file ./deploy/hubserving/ILSVRC2012_val_00006666.JPEG 5```
+```python tools/test_hubserving.py --server_url http://127.0.0.1:8866/predict/clas_system --image_file ./deploy/hubserving/ILSVRC2012_val_00006666.JPEG --top_k 5```
 
 ### 返回结果格式说明
 返回结果为列表（list），包含top-k个分类结果，以及对应的得分，还有此图片预测耗时，具体如下：

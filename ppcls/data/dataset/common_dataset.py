@@ -14,17 +14,10 @@
 
 from __future__ import print_function
 
-import io
-import tarfile
 import numpy as np
-from PIL import Image  #all use default backend
 
-import paddle
 from paddle.io import Dataset
-import pickle
-import os
 import cv2
-import random
 
 from ppcls.data import preprocess
 from ppcls.data.preprocess import transform
@@ -40,7 +33,6 @@ def create_operators(params):
     assert isinstance(params, list), ('operator config should be a list')
     ops = []
     for operator in params:
-        print(operator)
         assert isinstance(operator,
                           dict) and len(operator) == 1, "yaml format error"
         op_name = list(operator)[0]
@@ -66,7 +58,7 @@ class CommonDataset(Dataset):
         self.labels = []
         self._load_anno()
 
-    def _load_anno(self): 
+    def _load_anno(self):
         pass
 
     def __getitem__(self, idx):
@@ -90,4 +82,3 @@ class CommonDataset(Dataset):
     @property
     def class_num(self):
         return len(set(self.labels))
-

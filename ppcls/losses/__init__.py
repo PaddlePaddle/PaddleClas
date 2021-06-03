@@ -1,16 +1,20 @@
 import copy
+
 import paddle
 import paddle.nn as nn
+from ppcls.utils import logger
 
 from .celoss import CELoss
-
-from .triplet import TripletLoss, TripletLossV2
-from .msmloss import MSMLoss
+from .centerloss import CenterLoss
 from .emlloss import EmlLoss
-from .npairsloss  import NpairsLoss
+from .msmloss import MSMLoss
+from .npairsloss import NpairsLoss
 from .trihardloss import TriHardLoss
 from .centerloss  import CenterLoss
 from .pairwisecosface import PairwiseCosface
+from .triplet import TripletLoss, TripletLossV2
+
+
 
 class CombinedLoss(nn.Layer):
     def __init__(self, config_list):
@@ -40,7 +44,8 @@ class CombinedLoss(nn.Layer):
         loss_dict["loss"] = paddle.add_n(list(loss_dict.values()))
         return loss_dict
 
+
 def build_loss(config):
-    module_class = CombinedLoss(config)
+    module_class = CombinedLoss(copy.deepcopy(config))
     logger.info("build loss {} success.".format(module_class))
     return module_class

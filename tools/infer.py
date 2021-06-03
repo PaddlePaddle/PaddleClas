@@ -12,12 +12,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-__all__ = ['build_neck"]
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
+import os
+import sys
+__dir__ = os.path.dirname(os.path.abspath(__file__))
+sys.path.append(os.path.abspath(os.path.join(__dir__, '../')))
 
-def build_neck(config):
-    support_dict = ['FPN', 'FC']
-    module_name = config.pop('name')
-    assert module_name in support_dict, Exception('head only support {}'.format(
-        support_dict))
-    module_class = eval(module_name)(**config)
-    return module_class
+from ppcls.utils import config
+from ppcls.engine.trainer import Trainer
+
+if __name__ == "__main__":
+    args = config.parse_args()
+    config = config.get_config(args.config, overrides=args.override, show=True)
+    trainer = Trainer(config, mode="infer")
+
+    trainer.infer()

@@ -72,11 +72,17 @@ paddleclas --model_name=ResNet50 --top_k=5 --image_file='docs/images/whl/demo.jp
 * pre_label_image(bool): 是否需要进行预标注。
 * pre_label_out_idr(str): 进行预标注后，输出结果的文件路径，默认为None。
 
-**注意**: 如果使用`Transformer`系列模型，如`DeiT_***_384`, `ViT_***_384`等，请注意模型的输入数据尺寸，需要设置参数`resize_short=384`, `resize=384`，如下所示。
+**注意**: 如果使用`Transformer`系列模型，如`DeiT_***_384`, `ViT_***_384`等，请注意模型的输入数据尺寸，需要设置参数`resize_short=384`, `resize=384`，如下所示：
 
-```
-clas = PaddleClas(model_name='ViT_base_patch16_384', top_k=5, resize_short=384, resize=384)
-```
+* 在命令行中使用：
+    ```bash
+    paddleclas --model_name=ViT_base_patch16_384 --image_file='docs/images/whl/demo.jpg' --resize_short=384 --resize=384
+    ```
+
+* 在python代码中：
+    ```python
+    clas = PaddleClas(model_name='ViT_base_patch16_384', top_k=5, resize_short=384, resize=384)
+    ```
 
 ### 3. 代码使用方法
 

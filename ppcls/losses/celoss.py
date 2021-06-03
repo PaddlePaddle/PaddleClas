@@ -22,6 +22,7 @@ class Loss(object):
     """
     Loss
     """
+
     def __init__(self, class_dim=1000, epsilon=None):
         assert class_dim > 1, "class_dim=%d is not larger than 1" % (class_dim)
         self._class_dim = class_dim
@@ -35,22 +36,26 @@ class Loss(object):
     #do label_smoothing
     def _labelsmoothing(self, target):
         if target.shape[-1] != self._class_dim:
-            one_hot_target = F.one_hot(target, self._class_dim)  #do ont hot(23,34,46)-> 3 * _class_dim
+            one_hot_target = F.one_hot(
+                target,
+                self._class_dim)  #do ont hot(23,34,46)-> 3 * _class_dim
         else:
             one_hot_target = target
 
         #do label_smooth
-        soft_target = F.label_smooth(one_hot_target, epsilon=self._epsilon)   #(1 - epsilon) * input + eposilon / K.
+        soft_target = F.label_smooth(
+            one_hot_target,
+            epsilon=self._epsilon)  #(1 - epsilon) * input + eposilon / K.
         soft_target = paddle.reshape(soft_target, shape=[-1, self._class_dim])
         return soft_target
 
     def _crossentropy(self, input, target, use_pure_fp16=False):
         if self._label_smoothing:
             target = self._labelsmoothing(target)
-            input = -F.log_softmax(input, axis=-1)      #softmax and do log
+            input = -F.log_softmax(input, axis=-1)  #softmax and do log
             cost = paddle.sum(target * input, axis=-1)  #sum  
         else:
-            cost = F.cross_entropy(input=input, label=target) 
+            cost = F.cross_entropy(input=input, label=target)
 
         if use_pure_fp16:
             avg_cost = paddle.sum(cost)
@@ -64,9 +69,10 @@ class Loss(object):
             (target + eps) / (input + eps)) * self._class_dim
         return cost
 
-    def _jsdiv(self, input, target):  #so the input and target is the fc output; no softmax
+    def _jsdiv(self, input,
+               target):  #so the input and target is the fc output; no softmax
         input = F.softmax(input)
-        target = F.softmax(target) 
+        target = F.softmax(target)
 
         #two distribution
         cost = self._kldiv(input, target) + self._kldiv(target, input)
@@ -87,14 +93,19 @@ class CELoss(Loss):
         super(CELoss, self).__init__(class_dim, epsilon)
 
     def __call__(self, input, target, use_pure_fp16=False):
-        logits = input["logits"]
+        if type(input) is dict:
+            logits = input["logits"]
+        else:
+            logits = input
         cost = self._crossentropy(logits, target, use_pure_fp16)
         return {"CELoss": cost}
+
 
 class JSDivLoss(Loss):
     """
     JSDiv loss
     """
+
     def __init__(self, class_dim=1000, epsilon=None):
         super(JSDivLoss, self).__init__(class_dim, epsilon)
 
@@ -112,4 +123,3 @@ class KLDivLoss(paddle.nn.Layer):
             p = paddle.nn.functional.softmax(p)
             q = paddle.nn.functional.softmax(q)
         return -(p * paddle.log(q + 1e-8)).sum(1).mean()
-    

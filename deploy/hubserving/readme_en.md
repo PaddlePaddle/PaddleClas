@@ -113,15 +113,22 @@ After the service starts, you can use the following command to send a prediction
 python tools/test_hubserving.py server_url image_path
 ```  
 
-Two parameters need to be passed to the script:
-- **server_url**：service address，format of which is
+Two required parameters need to be passed to the script:
+- **server_url**: service address，format of which is
 `http://[ip_address]:[port]/predict/[module_name]`  
-- **image_path**：Test image path, can be a single image path or an image directory path
-- **top_k**：[**Optional**] Return the top `top_k` 's scores ,default by `1`.
+- **image_path**: Test image path, can be a single image path or an image directory path
+- **top_k**: [**Optional**] Return the top `top_k` 's scores ,default by `1`.
+- **batch_size**: [**Optional**] batch_size. Default by `1`.
+- **resize_short**: [**Optional**] Resize the input image according to short size. Default by `256`.
+- **resize**: [**Optional**] Resize the input image. Default by `224`.
+- **normalize**: [**Optional**] Whether normalize the input image. Default by `True`.
+
+**Notice**:
+If you want to use `Transformer series models`, such as `DeiT_***_384`, `ViT_***_384`, etc., please pay attention to the input size of model, and need to set `--resize_short=384`, `--resize=384`.
 
 **Eg.**
 ```shell
-python tools/test_hubserving.py --server_url http://127.0.0.1:8866/predict/clas_system --image_file ./deploy/hubserving/ILSVRC2012_val_00006666.JPEG 5
+python tools/test_hubserving.py --server_url http://127.0.0.1:8866/predict/clas_system --image_file ./deploy/hubserving/ILSVRC2012_val_00006666.JPEG --top_k 5
 ```
 
 ### Returned result format
