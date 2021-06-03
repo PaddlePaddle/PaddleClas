@@ -1,4 +1,4 @@
-# Copyright (c) 2020 PaddlePaddle Authors. All Rights Reserved.
+# Copyright (c) 2021 PaddlePaddle Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -109,8 +109,10 @@ class Trainer(object):
     def train(self):
         # build train loss and metric info
         loss_func = self._build_loss_info(self.config["Loss"])
-
-        metric_func = self._build_metric_info(self.config["Metric"])
+        if "Metric" in self.config:
+            metric_func = self._build_metric_info(self.config["Metric"])
+        else:
+            metric_func = None
 
         train_dataloader = build_dataloader(self.config["DataLoader"], "Train",
                                             self.device)
@@ -156,7 +158,7 @@ class Trainer(object):
                 else:
                     out = self.model(batch[0], batch[1])
                 # calc loss
-                loss_dict = loss_func(out, batch[-1])
+                loss_dict = loss_func(out, batch[1])
                 for key in loss_dict:
                     if not key in output_info:
                         output_info[key] = AverageMeter(key, '7.5f')

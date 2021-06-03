@@ -27,14 +27,13 @@ from ppcls.data.dataloader.common_dataset import create_operators
 from ppcls.data.dataloader.vehicle_dataset import CompCars, VeriWild
 
 # sampler
-from ppcls.data.dataloader import DistributedRandomIdentitySampler
-
+from ppcls.data.dataloader.DistributedRandomIdentitySampler import DistributedRandomIdentitySampler
 from ppcls.data.preprocess import transform
 
 
 def build_dataloader(config, mode, device, seed=None):
-    assert mode in ['Train', 'Eval', 'Test'
-                    ], "Mode should be Train, Eval or Test."
+    assert mode in ['Train', 'Eval', 'Test', 'Gallery', 'Query'
+                    ], "Mode should be Train, Eval, Test, Gallery or Query"
     # build dataset
     config_dataset = config[mode]['dataset']
     config_dataset = copy.deepcopy(config_dataset)
