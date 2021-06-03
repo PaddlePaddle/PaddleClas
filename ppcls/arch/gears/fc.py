@@ -19,14 +19,16 @@ from __future__ import print_function
 import paddle
 import paddle.nn as nn
 
+
 class FC(nn.Layer):
-    def __init__(self, embedding_size, 
-                       class_num):
+    def __init__(self, embedding_size, class_num):
         super(FC, self).__init__()
-        self.embedding_size  = embedding_size
+        self.embedding_size = embedding_size
         self.class_num = class_num
-        weight_attr =  paddle.ParamAttr(initializer = paddle.nn.initializer.XavierNormal())
-        self.fc  =  paddle.nn.Linear(self.embedding_size, self.class_num, weight_attr=weight_attr)    
+        weight_attr = paddle.ParamAttr(
+            initializer=paddle.nn.initializer.XavierNormal())
+        self.fc = paddle.nn.Linear(
+            self.embedding_size, self.class_num, weight_attr=weight_attr)
 
     def forward(self, input, label):
         out = self.fc(input)

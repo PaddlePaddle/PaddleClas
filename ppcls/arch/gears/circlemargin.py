@@ -16,30 +16,32 @@ import math
 import paddle
 import paddle.nn as nn
 import paddle.nn.functional as F
- 
+
+
 class CircleMargin(nn.Layer):
-    def __init__(self, embedding_size, 
-                       class_num, 
-                       margin, 
-                       scale):
+    def __init__(self, embedding_size, class_num, margin, scale):
         super(CircleSoftmax, self).__init__()
-        self.scale  = scale
+        self.scale = scale
         self.margin = margin
         self.embedding_size = embedding_size
         self.class_num = class_num
 
-        weight_attr = paddle.ParamAttr(initializer = paddle.nn.initializer.XavierNormal())
-        self.fc0 = paddle.nn.Linear(self.embedding_size, self.class_num, weight_attr=weight_attr)
- 
+        weight_attr = paddle.ParamAttr(
+            initializer=paddle.nn.initializer.XavierNormal())
+        self.fc0 = paddle.nn.Linear(
+            self.embedding_size, self.class_num, weight_attr=weight_attr)
+
     def forward(self, input, label):
-        feat_norm = paddle.sqrt(paddle.sum(paddle.square(input), axis=1, keepdim=True))
+        feat_norm = paddle.sqrt(
+            paddle.sum(paddle.square(input), axis=1, keepdim=True))
         input = paddle.divide(input, feat_norm)
 
         weight = self.fc0.weight
-        weight_norm = paddle.sqrt(paddle.sum(paddle.square(weight), axis=0, keepdim=True))
+        weight_norm = paddle.sqrt(
+            paddle.sum(paddle.square(weight), axis=0, keepdim=True))
         weight = paddle.divide(weight, weight_norm)
- 
-        logits   = paddle.matmul(input, weight)
+
+        logits = paddle.matmul(input, weight)
 
         alpha_p = paddle.clip(-logits.detach() + 1 + self.margin, min=0.)
         alpha_n = paddle.clip(logits.detach() + self.margin, min=0.)
@@ -51,5 +53,5 @@ class CircleMargin(nn.Layer):
         logits_n = alpha_n * (logits - delta_n)
         pre_logits = logits_p * m_hot + logits_n * (1 - m_hot)
         pre_logits = self.scale * pre_logits
- 
+
         return pre_logits
