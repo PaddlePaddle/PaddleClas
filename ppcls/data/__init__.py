@@ -27,8 +27,7 @@ from ppcls.data.dataloader.common_dataset import create_operators
 from ppcls.data.dataloader.vehicle_dataset import CompCars, VeriWild
 
 # sampler
-from ppcls.data.dataloader import DistributedRandomIdentitySampler
-
+from ppcls.data.dataloader.DistributedRandomIdentitySampler import DistributedRandomIdentitySampler
 from ppcls.data.preprocess import transform
 
 

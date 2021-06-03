@@ -17,6 +17,7 @@ Global:
   image_shape: [3, 224, 224]
   save_inference_dir: "./inference"
   num_split: 1
+  feature_normalize: True
 
 
 # model architecture

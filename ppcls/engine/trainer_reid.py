@@ -169,9 +169,11 @@ class TrainerReID(Trainer):
             batch_feas = out["features"]
 
             # do norm
-            feas_norm = paddle.sqrt(
-                paddle.sum(paddle.square(batch_feas), axis=1, keepdim=True))
-            batch_feas = paddle.divide(batch_feas, feas_norm)
+            if self.config["Global"].get("feature_normalize", True):
+                feas_norm = paddle.sqrt(
+                    paddle.sum(paddle.square(batch_feas), axis=1,
+                               keepdim=True))
+                batch_feas = paddle.divide(batch_feas, feas_norm)
 
             batch_feas = batch_feas
             batch_image_labels = batch[1]
