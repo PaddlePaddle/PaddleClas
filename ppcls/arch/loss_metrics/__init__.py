@@ -12,8 +12,8 @@
 #See the License for the specific language governing permissions and
 #limitations under the License.
 
-import sys
 import copy
+import sys
 
 import paddle
 import paddle.nn as nn
@@ -46,8 +46,8 @@ class CELoss(nn.Layer):
         if self.epsilon is not None:
             class_num = logits.shape[-1]
             label = self._labelsmoothing(label, class_num)
-            x = -F.log_softmax(x, axis=-1)
-            loss = paddle.sum(x * label, axis=-1)
+            x = -F.log_softmax(logits, axis=-1)
+            loss = paddle.sum(logits * label, axis=-1)
         else:
             if label.shape[-1] == logits.shape[-1]:
                 label = F.softmax(label, axis=-1)
@@ -69,6 +69,9 @@ class Topk(nn.Layer):
         self.topk = topk
 
     def forward(self, x, label):
+        if isinstance(x, dict):
+            x = x["logits"]
+
         metric_dict = dict()
         for k in self.topk:
             metric_dict["top{}".format(k)] = paddle.metric.accuracy(
