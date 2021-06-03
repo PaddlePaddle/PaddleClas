@@ -3,13 +3,14 @@ import paddle
 import paddle.nn as nn
 
 from .celoss import CELoss
-
 from .triplet import TripletLoss, TripletLossV2
 from .msmloss import MSMLoss
 from .emlloss import EmlLoss
 from .npairsloss  import NpairsLoss
 from .trihardloss import TriHardLoss
 from .centerloss  import CenterLoss
+
+from ppcls.utils import logger
 
 class CombinedLoss(nn.Layer):
     def __init__(self, config_list):
@@ -40,5 +41,7 @@ class CombinedLoss(nn.Layer):
         return loss_dict
 
 def build_loss(config):
+    config = copy.deepcopy(config)
     module_class = CombinedLoss(config)
+    logger.info("build loss {} success.".format(module_class))
     return module_class
