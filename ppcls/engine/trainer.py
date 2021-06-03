@@ -244,7 +244,10 @@ class Trainer(object):
             batch[0] = paddle.to_tensor(batch[0]).astype("float32")
             batch[1] = paddle.to_tensor(batch[1]).reshape([-1, 1])
             # image input
-            out = self.model(batch[0])
+            if self.is_rec:
+                out = self.model(batch[0], batch[1])
+            else:
+                out = self.model(batch[0])
             # calc build
             if loss_func is not None:
                 loss_dict = loss_func(out, batch[-1])

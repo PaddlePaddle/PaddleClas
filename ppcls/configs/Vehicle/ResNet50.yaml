@@ -39,6 +39,9 @@ Loss:
     - TripletLossV2:
         weight: 1.0
         margin: 0.5
+  Eval:
+    - CELoss:
+        weight: 1.0
 
 Optimizer:
   name: Momentum

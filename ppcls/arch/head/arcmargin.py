@@ -50,6 +50,8 @@ class ArcMargin(nn.Layer):
         weight = paddle.divide(weight, weight_norm)
 
         cos = paddle.matmul(input, weight)
+        if not self.training:
+            return cos
         sin = paddle.sqrt(1.0 - paddle.square(cos) + 1e-6)
         cos_m = math.cos(self.margin)
         sin_m = math.sin(self.margin)
