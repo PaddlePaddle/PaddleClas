@@ -14,26 +14,17 @@
 
 from __future__ import print_function
 
-import io
-import tarfile
 import numpy as np
-from PIL import Image  #all use default backend
-
-import paddle
-from paddle.io import Dataset
-import pickle
 import os
 import cv2
-import random
 
-from ppcls.data import preprocess
 from ppcls.data.preprocess import transform
 from ppcls.utils import logger
 
 from .common_dataset import CommonDataset
 
-class MultiLabelDataset(CommonDataset):
 
+class MultiLabelDataset(CommonDataset):
     def _load_anno(self):
         assert os.path.exists(self._cls_path)
         assert os.path.exists(self._img_root)

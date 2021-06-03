@@ -14,22 +14,13 @@
 
 from __future__ import print_function
 
-import io
-import tarfile
 import numpy as np
-from PIL import Image  #all use default backend
-
-import paddle
-from paddle.io import Dataset
-import pickle
 import os
-import cv2
-import random
 
 from .common_dataset import CommonDataset
 
-class ImageNetDataset(CommonDataset):
 
+class ImageNetDataset(CommonDataset):
     def _load_anno(self, seed=None):
         assert os.path.exists(self._cls_path)
         assert os.path.exists(self._img_root)
@@ -47,5 +38,3 @@ class ImageNetDataset(CommonDataset):
                 self.images.append(os.path.join(self._img_root, l[0]))
                 self.labels.append(int(l[1]))
                 assert os.path.exists(self.images[-1])
-
-
