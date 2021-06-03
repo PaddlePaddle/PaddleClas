@@ -31,7 +31,11 @@ def build_lr_scheduler(lr_config, epochs, step_each_epoch):
     lr_config.update({'epochs': epochs, 'step_each_epoch': step_each_epoch})
     if 'name' in lr_config:
         lr_name = lr_config.pop('name')
-        lr = getattr(learning_rate, lr_name)(**lr_config)()
+        lr = getattr(learning_rate, lr_name)(**lr_config)
+        if isinstance(lr, paddle.optimizer.lr.LRScheduler):
+            return lr
+        else:
+            return lr()
     else:
         lr = lr_config['learning_rate']
     return lr

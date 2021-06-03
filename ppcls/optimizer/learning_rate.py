@@ -11,11 +11,11 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-from __future__ import unicode_literals
+from __future__ import (absolute_import, division, print_function,
+                        unicode_literals)
+
 from paddle.optimizer import lr
+from paddle.optimizer.lr import LRScheduler
 
 
 class Linear(object):
@@ -181,3 +181,104 @@ class Piecewise(object):
                 end_lr=self.values[0],
                 last_epoch=self.last_epoch)
         return learning_rate
+
+
+class MultiStepDecay(LRScheduler):
+    """
+    Update the learning rate by ``gamma`` once ``epoch`` reaches one of the milestones.
+    The algorithm can be described as the code below. 
+    .. code-block:: text
+        learning_rate = 0.5
+        milestones = [30, 50]
+        gamma = 0.1
+        if epoch < 30:
+            learning_rate = 0.5
+        elif epoch < 50:
+            learning_rate = 0.05
+        else:
+            learning_rate = 0.005
+    Args:
+        learning_rate (float): The initial learning rate. It is a python float number.
+        milestones (tuple|list): List or tuple of each boundaries. Must be increasing.
+        gamma (float, optional): The Ratio that the learning rate will be reduced. ``new_lr = origin_lr * gamma`` . 
+            It should be less than 1.0. Default: 0.1.
+        last_epoch (int, optional):  The index of last epoch. Can be set to restart training. Default: -1, means initial learning rate.
+        verbose (bool, optional): If ``True``, prints a message to stdout for each update. Default: ``False`` .
+        
+    Returns:
+        ``MultiStepDecay`` instance to schedule learning rate.
+    Examples:
+        
+        .. code-block:: python
+            import paddle
+            import numpy as np
+            # train on default dynamic graph mode
+            linear = paddle.nn.Linear(10, 10)
+            scheduler = paddle.optimizer.lr.MultiStepDecay(learning_rate=0.5, milestones=[2, 4, 6], gamma=0.8, verbose=True)
+            sgd = paddle.optimizer.SGD(learning_rate=scheduler, parameters=linear.parameters())
+            for epoch in range(20):
+                for batch_id in range(5):
+                    x = paddle.uniform([10, 10])
+                    out = linear(x)
+                    loss = paddle.mean(out)
+                    loss.backward()
+                    sgd.step()
+                    sgd.clear_gradients()
+                    scheduler.step()    # If you update learning rate each step
+              # scheduler.step()        # If you update learning rate each epoch
+            # train on static graph mode
+            paddle.enable_static()
+            main_prog = paddle.static.Program()
+            start_prog = paddle.static.Program()
+            with paddle.static.program_guard(main_prog, start_prog):
+                x = paddle.static.data(name='x', shape=[None, 4, 5])
+                y = paddle.static.data(name='y', shape=[None, 4, 5])
+                z = paddle.static.nn.fc(x, 100)
+                loss = paddle.mean(z)
+                scheduler = paddle.optimizer.lr.MultiStepDecay(learning_rate=0.5, milestones=[2, 4, 6], gamma=0.8, verbose=True)
+                sgd = paddle.optimizer.SGD(learning_rate=scheduler)
+                sgd.minimize(loss)
+            exe = paddle.static.Executor()
+            exe.run(start_prog)
+            for epoch in range(20):
+                for batch_id in range(5):
+                    out = exe.run(
+                        main_prog,
+                        feed={
+                            'x': np.random.randn(3, 4, 5).astype('float32'),
+                            'y': np.random.randn(3, 4, 5).astype('float32')
+                        },
+                        fetch_list=loss.name)
+                    scheduler.step()    # If you update learning rate each step
+              # scheduler.step()        # If you update learning rate each epoch
+    """
+
+    def __init__(self,
+                 learning_rate,
+                 milestones,
+                 epochs,
+                 step_each_epoch,
+                 gamma=0.1,
+                 last_epoch=-1,
+                 verbose=False):
+        if not isinstance(milestones, (tuple, list)):
+            raise TypeError(
+                "The type of 'milestones' in 'MultiStepDecay' must be 'tuple, list', but received %s."
+                % type(milestones))
+        if not all([
+                milestones[i] < milestones[i + 1]
+                for i in range(len(milestones) - 1)
+        ]):
+            raise ValueError('The elements of milestones must be incremented')
+        if gamma >= 1.0:
+            raise ValueError('gamma should be < 1.0.')
+        self.milestones = [x * step_each_epoch for x in milestones]
+        self.gamma = gamma
+        super(MultiStepDecay, self).__init__(learning_rate, last_epoch,
+                                             verbose)
+
+    def get_lr(self):
+        for i in range(len(self.milestones)):
+            if self.last_epoch < self.milestones[i]:
+                return self.base_lr * (self.gamma**i)
+        return self.base_lr * (self.gamma**len(self.milestones))

@@ -50,8 +50,7 @@ class RecModel(nn.Layer):
         self.backbone.stop_after(stop_layer_config["name"])
 
         if stop_layer_config.get("embedding_size", 0) > 0:
-            #  self.neck = nn.Linear(stop_layer_config["output_dim"], stop_layer_config["embedding_size"])
-            self.neck = nn.Conv2D(stop_layer_config["output_dim"],
+            self.neck = nn.Linear(stop_layer_config["output_dim"],
                                   stop_layer_config["embedding_size"])
             embedding_size = stop_layer_config["embedding_size"]
         else:

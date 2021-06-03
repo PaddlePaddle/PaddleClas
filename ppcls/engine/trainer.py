@@ -55,6 +55,14 @@ class Trainer(object):
             "distributed"] = paddle.distributed.get_world_size() != 1
         if self.config["Global"]["distributed"]:
             dist.init_parallel_env()
+
+        if "Head" in self.config["Arch"]:
+            self.config["Arch"]["Head"]["class_num"] = self.config["Global"][
+                "class_num"]
+            self.is_rec = True
+        else:
+            self.is_rec = False
+
         self.model = build_model(self.config["Arch"])
 
         if self.config["Global"]["pretrained_model"] is not None:
@@ -143,7 +151,10 @@ class Trainer(object):
                                             .reshape([-1, 1]))
                 global_step += 1
                 # image input
-                out = self.model(batch[0])
+                if not self.is_rec:
+                    out = self.model(batch[0])
+                else:
+                    out = self.model(batch[0], batch[1])
                 # calc loss
                 loss_dict = loss_func(out, batch[-1])
                 for key in loss_dict:

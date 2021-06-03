@@ -16,17 +16,20 @@ Global:
   save_inference_dir: "./inference"
 
 # model architecture
-RecModel:
-  Backbone: "ResNet50"
-  Stoplayer: "adaptive_avg_pool2d_0" 
-  embedding_size: 512
-
-Head:
-  name: "ArcMargin"  
-  embedding_size: 512
-  class_num: 431
-  margin: 0.15
-  scale: 32
+Arch:
+  name: "RecModel"
+  Backbone: 
+    name: "ResNet50"
+  Stoplayer: 
+    name: "flatten_0" 
+    output_dim: 2048
+    embedding_size: 512
+  Head:
+    name: "ArcMargin"  
+    embedding_size: 512
+    class_num: 431
+    margin: 0.15
+    scale: 32
  
 # loss function config for traing/eval process
 Loss:
@@ -43,7 +46,7 @@ Optimizer:
   lr:
     name: MultiStepDecay
     learning_rate: 0.01
-    decay_epochs: [30, 60, 70, 80, 90, 100, 120, 140]
+    milestones: [30, 60, 70, 80, 90, 100, 120, 140]
     gamma: 0.5
     verbose: False
     last_epoch: -1
@@ -82,7 +85,7 @@ DataLoader:
 
     sampler:
         name: DistributedRandomIdentitySampler
-        batch_size: 128
+        batch_size: 64
         num_instances: 2
         drop_last: False
         shuffle: True
