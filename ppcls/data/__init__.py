@@ -18,14 +18,14 @@ from paddle.io import DistributedBatchSampler, BatchSampler, DataLoader
 
 from ppcls.utils import logger
 
-from . import dataset
+from . import dataloader
 from . import imaug
 from . import samplers
 # dataset
-from .dataset.imagenet_dataset import ImageNetDataset
-from .dataset.multilabel_dataset import MultiLabelDataset
-from .dataset.common_dataset import create_operators
-from .dataset.vehicle_dataset import CompCars, VeriWild
+from .dataloader.imagenet_dataset import ImageNetDataset
+from .dataloader.multilabel_dataset import MultiLabelDataset
+from .dataloader.common_dataset import create_operators
+from .dataloader.vehicle_dataset import CompCars, VeriWild
 
 # sampler
 from .samplers import DistributedRandomIdentitySampler
