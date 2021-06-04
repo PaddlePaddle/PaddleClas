@@ -96,20 +96,17 @@ class TrainerReID(Trainer):
         for q_idx in range(num_q):
             # get query pid and camid
             q_pid = q_pids[q_idx]
-            q_camid = q_camids[q_idx]
-
-            # remove gallery samples that have the same pid and camid with query
             order = indices[q_idx]
             if query_camera_id is not None and gallery_camera_id is not None:
+                # remove gallery samples that have the same pid and camid with query
+                q_camid = q_camids[q_idx]
                 remove = (g_pids[order] == q_pid) & (
                     g_camids[order] == q_camid)
+                keep = np.invert(remove)
+                raw_cmc = matches[q_idx][keep]  # binary vector, positions with value 1 are correct matches
             else:
-                remove = g_pids[order] == q_pid
-            keep = np.invert(remove)
-
-            # compute cmc curve
-            raw_cmc = matches[q_idx][
-                keep]  # binary vector, positions with value 1 are correct matches
+                raw_cmc = matches[q_idx]  # binary vector, positions with value 1 are correct matches
+                
             if not np.any(raw_cmc):
                 # this condition is true when query identity does not appear in gallery
                 continue
