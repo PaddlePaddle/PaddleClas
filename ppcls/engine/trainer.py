@@ -31,7 +31,7 @@ from ppcls.utils import logger
 from ppcls.data import build_dataloader
 from ppcls.arch import build_model
 from ppcls.loss import build_loss
-from ppcls.arch.loss_metrics import build_metrics
+from ppcls.metric import build_metrics
 from ppcls.optimizer import build_optimizer
 from ppcls.utils.save_load import load_dygraph_pretrain
 from ppcls.utils.save_load import init_model
@@ -379,6 +379,11 @@ class Trainer(object):
                                                 query_img_id, gallery_img_id)
         else:
             metric_dict = {metric_key: 0.}
+        metric_msg = ", ".join([
+            "{}: {:.5f}".format(key, metric_dict[key].avg)
+            for key in metric_dict
+        ])
+        logger.info("[Eval][Epoch {}][Avg]{}".format(epoch_id, metric_msg))
 
         return metric_dict[metric_key]
 
