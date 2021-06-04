@@ -335,12 +335,9 @@ class Trainer(object):
             name='gallery')
         query_feas, query_img_id, query_camera_id = self._cal_feature(
             name='query')
-        gallery_img_id = paddle.to_tensor([gallery_img_id]).t()
+        gallery_img_id = gallery_img_id.t()
         if gallery_camera_id is not None:
-            gallery_camera_id = paddle.to_tensor([gallery_camera_id]).t()
-        query_img_id = paddle.to_tensor(query_img_id)
-        if query_camera_id is not None:
-            query_camera_id = paddle.to_tensor(query_camera_id)
+            gallery_camera_id = gallery_camera_id.t()
         # step2. do evaluation
         sim_block_size = self.config["Global"].get("sim_block_size", 1)
         sections = [sim_block_size] * (len(query_feas) // sim_block_size)
