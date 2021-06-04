@@ -28,12 +28,13 @@ from preprocess import create_operators
 from postprocess import build_postprocess
 
 
-class ClsPredictor(Predictor):
+class RecPredictor(Predictor):
     def __init__(self, config):
-        super().__init__(config["Global"])
-        self.preprocess_ops = create_operators(config["PreProcess"][
+        super().__init__(config["Global"],
+                         config["Global"]["rec_inference_model_dir"])
+        self.preprocess_ops = create_operators(config["RecPreProcess"][
             "transform_ops"])
-        self.postprocess = build_postprocess(config["PostProcess"])
+        self.postprocess = build_postprocess(config["RecPostProcess"])
 
     def predict(self, images):
         input_names = self.paddle_predictor.get_input_names()
@@ -57,15 +58,17 @@ class ClsPredictor(Predictor):
 
 
 def main(config):
-    cls_predictor = ClsPredictor(config)
+    rec_predictor = RecPredictor(config)
     image_list = get_image_list(config["Global"]["infer_imgs"])
 
     assert config["Global"]["batch_size"] == 1
     for idx, image_file in enumerate(image_list):
+        batch_input = []
         img = cv2.imread(image_file)[:, :, ::-1]
-        output = cls_predictor.predict(img)
-        output = cls_predictor.postprocess(output)
-        print(output)
+        output = rec_predictor.predict(img)
+        if rec_predictor.postprocess is not None:
+            output = rec_predictor.postprocess(output)
+        print(output.shape)
     return
 
 

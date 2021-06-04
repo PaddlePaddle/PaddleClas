@@ -21,6 +21,8 @@ import paddle.nn.functional as F
 
 
 def build_postprocess(config):
+    if config is None:
+        return None
     config = copy.deepcopy(config)
     model_name = config.pop("name")
     mod = importlib.import_module(__name__)

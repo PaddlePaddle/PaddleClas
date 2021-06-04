@@ -23,32 +23,22 @@ from paddle.inference import create_predictor
 
 
 class Predictor(object):
-    def __init__(self, args):
+    def __init__(self, args, inference_model_dir=None):
         # HALF precission predict only work when using tensorrt
         if args.use_fp16 is True:
             assert args.use_tensorrt is True
         self.args = args
+        self.paddle_predictor = self.create_paddle_predictor(
+            args, inference_model_dir)
 
-        self.paddle_predictor = self.create_paddle_predictor(args)
-        input_names = self.paddle_predictor.get_input_names()
-        self.input_tensor = self.paddle_predictor.get_input_handle(input_names[
-            0])
+    def predict(self, image):
+        raise NotImplementedError
 
-        output_names = self.paddle_predictor.get_output_names()
-        self.output_tensor = self.paddle_predictor.get_output_handle(
-            output_names[0])
-
-    def predict(self, batch_input):
-        self.input_tensor.copy_from_cpu(batch_input)
-        self.paddle_predictor.run()
-        batch_output = self.output_tensor.copy_to_cpu()
-        return batch_output
-
-    def create_paddle_predictor(self, args):
-        params_file = os.path.join(args.inference_model_dir,
-                                   "inference.pdiparams")
-        model_file = os.path.join(args.inference_model_dir,
-                                  "inference.pdmodel")
+    def create_paddle_predictor(self, args, inference_model_dir=None):
+        if inference_model_dir is None:
+            inference_model_dir = args.inference_model_dir
+        params_file = os.path.join(inference_model_dir, "inference.pdiparams")
+        model_file = os.path.join(inference_model_dir, "inference.pdmodel")
         config = Config(model_file, params_file)
 
         if args.use_gpu:
