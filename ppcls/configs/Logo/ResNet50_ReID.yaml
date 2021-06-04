@@ -1,4 +1,6 @@
 # global configs
+Trainer:
+  name: TrainerReID
 Global:
   checkpoints: null
   pretrained_model: null
@@ -8,13 +10,17 @@ Global:
   save_interval: 1
   eval_during_train: True
   eval_interval: 1
-  epochs: 120
+  epochs: 160
   print_batch_step: 10
   use_visualdl: False
+  # used for static mode and model export
+  image_shape: [3, 224, 224]
+  save_inference_dir: "./inference"
   num_split: 15
-  
-# model architecture
+  feature_normalize: True
 
+
+# model architecture
 Arch:
   name: "RecModel"
   Backbone: 
@@ -54,7 +60,6 @@ Optimizer:
     name: 'L2'
     coeff: 0.0001
 
-
 # data loader for train and eval
 DataLoader:
   Train:
@@ -86,7 +91,8 @@ DataLoader:
         num_workers: 6
         use_shared_memory: False
 
-  Eval:
+
+  Query:
     # TOTO: modify to the latest trainer
     dataset: 
         name: LogoDataset
@@ -109,7 +115,7 @@ DataLoader:
         num_workers: 6
         use_shared_memory: False
 
-  Test:
+  Gallery:
     # TOTO: modify to the latest trainer
     dataset: 
         name: LogoDataset
@@ -131,12 +137,4 @@ DataLoader:
     loader:
         num_workers: 6
         use_shared_memory: False
-
-Metric:
-    Train:
-    - Topk:
-        k: [1, 5]
-    Eval:
-    - Topk:
-        k: [1, 5]
 
