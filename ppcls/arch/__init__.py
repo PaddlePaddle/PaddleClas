@@ -1,4 +1,4 @@
-#copyright (c) 2020 PaddlePaddle Authors. All Rights Reserve.
+#copyright (c) 2021 PaddlePaddle Authors. All Rights Reserve.
 #
 #Licensed under the Apache License, Version 2.0 (the "License");
 #you may not use this file except in compliance with the License.
@@ -17,9 +17,7 @@ import importlib
 
 import paddle.nn as nn
 
-from . import backbone
-from . import gears
-
+from . import backbone, gears
 from .backbone import *
 from .gears import build_gear
 from .utils import *
@@ -40,10 +38,10 @@ class RecModel(nn.Layer):
         super().__init__()
         backbone_config = config["Backbone"]
         backbone_name = backbone_config.pop("name")
-        self.backbone = getattr(backbone_name)(**backbone_config)
+        self.backbone = eval(backbone_name)(**backbone_config)
         if "BackboneStopLayer" in config:
-            backbone_stop_layer = config["BackboneStopLayer"]
-            self.backbone.stop_layer(backbone_stop_layer)
+            backbone_stop_layer = config["BackboneStopLayer"]["name"]
+            self.backbone.stop_after(backbone_stop_layer)
 
         if "Neck" in config:
             self.neck = build_gear(config["Neck"])
@@ -55,10 +53,11 @@ class RecModel(nn.Layer):
         else:
             self.head = None
 
-    def forward(self, x):
-        y = self.backbone(x)
+    def forward(self, x, label):
+        x = self.backbone(x)
         if self.neck is not None:
-            y = self.neck(y)
+            x = self.neck(x)
+        y = x
         if self.head is not None:
-            y = self.head(y)
-        return y
+            y = self.head(x, label)
+        return {"features": x, "logits": y}

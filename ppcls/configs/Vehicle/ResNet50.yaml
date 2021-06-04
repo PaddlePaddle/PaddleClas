@@ -21,8 +21,8 @@ Arch:
   Backbone: 
     name: "ResNet50_last_stage_stride1"
     pretrained: True
-  BackboneStoplayer:
-    name: "adaptive_avg_pool2d_1"
+  BackboneStopLayer:
+    name: "adaptive_avg_pool2d_0"
   Neck:
     name: "VehicleNeck"
     in_channels: 2048
@@ -91,7 +91,7 @@ DataLoader:
 
     sampler:
         name: DistributedRandomIdentitySampler
-        batch_size: 64
+        batch_size: 128
         num_instances: 2
         drop_last: False
         shuffle: True
@@ -117,7 +117,7 @@ DataLoader:
               order: ''
     sampler:
         name: DistributedBatchSampler
-        batch_size: 64
+        batch_size: 128
         drop_last: False
         shuffle: False
     loader:

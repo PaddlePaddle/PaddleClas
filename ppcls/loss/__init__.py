@@ -11,6 +11,7 @@ from .msmloss import MSMLoss
 from .npairsloss import NpairsLoss
 from .trihardloss import TriHardLoss
 from .triplet import TripletLoss, TripletLossV2
+from .supconloss import SupConLoss
 
 
 class CombinedLoss(nn.Layer):

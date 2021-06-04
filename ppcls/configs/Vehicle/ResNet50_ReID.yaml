@@ -25,8 +25,8 @@ Arch:
   Backbone: 
     name: "ResNet50_last_stage_stride1"
     pretrained: True
-  BackboneStoplayer:
-    name: "adaptive_avg_pool2d_1"
+  BackboneStopLayer:
+    name: "adaptive_avg_pool2d_0"
   Neck:
     name: "VehicleNeck"
     in_channels: 2048
@@ -43,9 +43,9 @@ Loss:
   Train:
     - CELoss:
         weight: 1.0
-    - TripletLossV2:
+    - SupConLoss:
         weight: 1.0
-        margin: 0.5
+        views: 2
   Eval:
     - CELoss:
         weight: 1.0
@@ -70,7 +70,7 @@ DataLoader:
     dataset:
         name: "VeriWild"
         image_root: "/work/dataset/VeRI-Wild/images/"
-        cls_label_path: "/work/dataset/VeRI-Wild/train_test_split/debug_train.txt"
+        cls_label_path: "/work/dataset/VeRI-Wild/train_test_split/train_list_start0.txt"
         transform_ops:
           - ResizeImage:
               size: 224
@@ -105,7 +105,7 @@ DataLoader:
     dataset: 
         name: "VeriWild"
         image_root: "/work/dataset/VeRI-Wild/images"
-        cls_label_path: "/work/dataset/VeRI-Wild/train_test_split/debug_test_query.txt"
+        cls_label_path: "/work/dataset/VeRI-Wild/train_test_split/test_3000_id_query.txt"
         transform_ops:
           - ResizeImage:
               size: 224
@@ -128,7 +128,7 @@ DataLoader:
     dataset: 
         name: "VeriWild"
         image_root: "/work/dataset/VeRI-Wild/images"
-        cls_label_path: "/work/dataset/VeRI-Wild/train_test_split/debug_test.txt"
+        cls_label_path: "/work/dataset/VeRI-Wild/train_test_split/test_3000_id.txt"
         transform_ops:
           - ResizeImage:
               size: 224

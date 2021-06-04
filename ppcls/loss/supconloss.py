@@ -32,6 +32,7 @@ class SupConLoss(nn.Layer):
         Returns:
             A loss scalar.
         """
+        features = features["features"]
         if self.num_ids is None:
             self.num_ids = int(features.shape[0] / self.views)
 
@@ -104,4 +105,4 @@ class SupConLoss(nn.Layer):
         loss = -(self.temperature / self.base_temperature) * mean_log_prob_pos
         loss = paddle.mean(loss.reshape([anchor_count, batch_size]))
 
-        return loss
+        return {"SupConLoss": loss}
