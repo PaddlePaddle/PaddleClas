@@ -47,6 +47,8 @@ class ClasModel(nn.Layer):
 
     def forward(self, x):
         x = self.base_model(x)
+        if isinstance(x, dict):
+            x = x["logits"]
         x = self.softmax(x)
         return x
 
@@ -58,6 +60,8 @@ if __name__ == "__main__":
     assert config["Global"]["device"] in ["cpu", "gpu", "xpu"]
     device = paddle.set_device(config["Global"]["device"])
 
+    if "Head" in config["Arch"]:
+        config["Arch"]["Head"]["class_num"] = config["Global"]["class_num"]
     model = ClasModel(config["Arch"])
 
     if config["Global"]["pretrained_model"] is not None:
