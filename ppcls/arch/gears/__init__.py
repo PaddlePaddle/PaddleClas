@@ -16,12 +16,15 @@ from .arcmargin import ArcMargin
 from .cosmargin import CosMargin
 from .circlemargin import CircleMargin
 from .fc import FC
+from .vehicle_neck import VehicleNeck
 
-__all__ = ['build_head']
+__all__ = ['build_gear']
 
 
-def build_head(config):
-    support_dict = ['ArcMargin', 'CosMargin', 'CircleMargin', 'FC']
+def build_gear(config):
+    support_dict = [
+        'ArcMargin', 'CosMargin', 'CircleMargin', 'FC', 'VehicleNeck'
+    ]
     module_name = config.pop('name')
     assert module_name in support_dict, Exception(
         'head only support {}'.format(support_dict))
