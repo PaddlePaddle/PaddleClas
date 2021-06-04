@@ -12,6 +12,8 @@ from .npairsloss import NpairsLoss
 from .trihardloss import TriHardLoss
 from .triplet import TripletLoss, TripletLossV2
 from .supconloss import SupConLoss
+from .pairwisecosface import PairwiseCosface
+
 
 
 class CombinedLoss(nn.Layer):
