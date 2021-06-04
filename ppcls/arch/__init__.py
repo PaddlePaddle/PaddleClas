@@ -38,7 +38,8 @@ def build_model(config):
 class RecModel(nn.Layer):
     def __init__(self, **config):
         super().__init__()
-
+        self.mode = config.get("mode", "train")
+        
         backbone_config = config["Backbone"]
         backbone_name = backbone_config.pop("name")
         self.backbone = eval(backbone_name)(**backbone_config)
@@ -57,15 +58,20 @@ class RecModel(nn.Layer):
             self.neck = None
             embedding_size = stop_layer_config["output_dim"]
 
-        assert "Head" in config, "Head should be specified in retrieval task \
-                please specify a Head config"
+        if self.mode == "train":
+            assert "Head" in config, "Head should be specified in retrieval task \
+                    please specify a Head config"
 
-        config["Head"]["embedding_size"] = embedding_size
-        self.head = build_head(config["Head"])
+            config["Head"]["embedding_size"] = embedding_size
+            self.head = build_head(config["Head"])
 
     def forward(self, x, label):
         x = self.backbone(x)
         if self.neck is not None:
             x = self.neck(x)
+        
+        if self.mode == "infer":
+            return x
+        
         y = self.head(x, label)
         return {"features": x, "logits": y}
