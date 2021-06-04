@@ -36,6 +36,7 @@ Arch:
     name: "CircleMargin"
     margin: 0.35
     scale:  64
+    embedding_size: 512
  
 # loss function config for traing/eval process
 Loss:
