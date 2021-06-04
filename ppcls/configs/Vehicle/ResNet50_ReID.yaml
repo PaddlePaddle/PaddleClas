@@ -19,16 +19,18 @@ Global:
   num_split: 1
   feature_normalize: True
 
-
 # model architecture
 Arch:
   name: "RecModel"
   Backbone: 
-    name: "ResNet50"
-  Stoplayer: 
-    name: "flatten_0" 
-    output_dim: 2048
-    embedding_size: 512
+    name: "ResNet50_last_stage_stride1"
+    pretrained: True
+  BackboneStoplayer:
+    name: "adaptive_avg_pool2d_1"
+  Neck:
+    name: "VehicleNeck"
+    in_channels: 2048
+    out_channels: 512
   Head:
     name: "ArcMargin"  
     embedding_size: 512
