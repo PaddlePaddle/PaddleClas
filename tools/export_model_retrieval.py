@@ -38,7 +38,7 @@ if __name__ == "__main__":
     device = paddle.set_device(config["Global"]["device"])
 
     # set arch mode to eval
-    config["Arch"]["mode"] = "eval"
+    config["Arch"]["mode"] = "infer"
     assert "Head" in config["Arch"]
     config["Arch"]["Head"]["class_num"] = config["Global"]["class_num"]
     eval_model = build_model(config["Arch"])
