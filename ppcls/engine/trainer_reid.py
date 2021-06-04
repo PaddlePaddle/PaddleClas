@@ -53,7 +53,7 @@ class TrainerReID(Trainer):
             num_split = self.config["Global"]["num_split"]
         else:
             num_split = 1
-        fea_blocks = paddle.split(query_feas, num_or_sections=1)
+        fea_blocks = paddle.split(query_feas, num_or_sections=num_split)
 
         total_similarities_matrix = None
 
