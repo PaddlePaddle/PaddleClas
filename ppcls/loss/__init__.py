@@ -10,7 +10,7 @@ from .emlloss import EmlLoss
 from .msmloss import MSMLoss
 from .npairsloss import NpairsLoss
 from .trihardloss import TriHardLoss
-from .triplet import TripletLoss, TripletLossV2
+from .triplet import TripletLoss
 from .pairwisecosface import PairwiseCosface
 
 
