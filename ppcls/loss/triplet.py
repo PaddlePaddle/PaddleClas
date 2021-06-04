@@ -6,14 +6,14 @@ import paddle
 import paddle.nn as nn
 
 
-class TripletLossV2(nn.Layer):
+class TripletLoss(nn.Layer):
     """Triplet loss with hard positive/negative mining.
     Args:
         margin (float): margin for triplet.
     """
 
     def __init__(self, margin=0.5, normalize_feature=True):
-        super(TripletLossV2, self).__init__()
+        super(TripletLoss, self).__init__()
         self.margin = margin
         self.ranking_loss = paddle.nn.loss.MarginRankingLoss(margin=margin)
         self.normalize_feature = normalize_feature
@@ -69,67 +69,6 @@ class TripletLossV2(nn.Layer):
         # shape [N]
         dist_ap = paddle.squeeze(dist_ap, axis=1)
         dist_an = paddle.squeeze(dist_an, axis=1)
-
-        # Compute ranking hinge loss
-        y = paddle.ones_like(dist_an)
-        loss = self.ranking_loss(dist_an, dist_ap, y)
-        return {"TripletLossV2": loss}
-
-
-class TripletLoss(nn.Layer):
-    """Triplet loss with hard positive/negative mining.
-    Reference:
-    Hermans et al. In Defense of the Triplet Loss for Person Re-Identification. arXiv:1703.07737.
-    Code imported from https://github.com/Cysu/open-reid/blob/master/reid/loss/triplet.py.
-    Args:
-        margin (float): margin for triplet.
-    """
-
-    def __init__(self, margin=1.0):
-        super(TripletLoss, self).__init__()
-        self.margin = margin
-        self.ranking_loss = paddle.nn.loss.MarginRankingLoss(margin=margin)
-
-    def forward(self, input, target):
-        """
-        Args:
-            inputs: feature matrix with shape (batch_size, feat_dim)
-            target: ground truth labels with shape (num_classes)
-        """
-        inputs = input["features"]
-
-        bs = inputs.shape[0]
-        # Compute pairwise distance, replace by the official when merged
-        dist = paddle.pow(inputs, 2).sum(axis=1, keepdim=True).expand([bs, bs])
-        dist = dist + dist.t()
-        dist = paddle.addmm(
-            input=dist, x=inputs, y=inputs.t(), alpha=-2.0, beta=1.0)
-        dist = paddle.clip(dist, min=1e-12).sqrt()
-
-        mask = paddle.equal(
-            target.expand([bs, bs]), target.expand([bs, bs]).t())
-        mask_numpy_idx = mask.numpy()
-        dist_ap, dist_an = [], []
-        for i in range(bs):
-            # dist_ap_i = paddle.to_tensor(dist[i].numpy()[mask_numpy_idx[i]].max(),dtype='float64').unsqueeze(0)
-            # dist_ap_i.stop_gradient = False
-            # dist_ap.append(dist_ap_i)
-            dist_ap.append(
-                max([
-                    dist[i][j] if mask_numpy_idx[i][j] == True else float(
-                        "-inf") for j in range(bs)
-                ]).unsqueeze(0))
-            # dist_an_i = paddle.to_tensor(dist[i].numpy()[mask_numpy_idx[i] == False].min(), dtype='float64').unsqueeze(0)
-            # dist_an_i.stop_gradient = False
-            # dist_an.append(dist_an_i)
-            dist_an.append(
-                min([
-                    dist[i][k] if mask_numpy_idx[i][k] == False else float(
-                        "inf") for k in range(bs)
-                ]).unsqueeze(0))
-
-        dist_ap = paddle.concat(dist_ap, axis=0)
-        dist_an = paddle.concat(dist_an, axis=0)
 
         # Compute ranking hinge loss
         y = paddle.ones_like(dist_an)
