@@ -16,7 +16,7 @@ from paddle import nn
 import copy
 from collections import OrderedDict
 
-from .metrics import Topk, mAP, mINP, Recallk
+from .metrics import TopkAcc, mAP, mINP, Recallk
 
 
 class CombinedMetrics(nn.Layer):

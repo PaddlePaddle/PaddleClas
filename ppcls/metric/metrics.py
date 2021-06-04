@@ -18,7 +18,7 @@ import paddle.nn as nn
 
 
 # TODO: fix the format
-class Topk(nn.Layer):
+class TopkAcc(nn.Layer):
     def __init__(self, topk=(1, 5)):
         super().__init__()
         assert isinstance(topk, (int, list, tuple))
