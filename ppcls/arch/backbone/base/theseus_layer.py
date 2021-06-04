@@ -35,15 +35,18 @@ class TheseusLayer(nn.Layer):
                 after_stop = True
                 continue
             if isinstance(self._sub_layers[layer_i], TheseusLayer):
-                after_stop = self._sub_layers[layer_i].stop_after(stop_layer_name)
+                after_stop = self._sub_layers[layer_i].stop_after(
+                    stop_layer_name)
         return after_stop
 
     def _update_res(self, return_layers):
         for layer_i in self._sub_layers:
             layer_name = self._sub_layers[layer_i].full_name()
             for return_pattern in return_layers:
-                if return_layers is not None and re.match(return_pattern, layer_name):
-                    self._sub_layers[layer_i].register_forward_post_hook(self._save_sub_res_hook)
+                if return_layers is not None and re.match(return_pattern,
+                                                          layer_name):
+                    self._sub_layers[layer_i].register_forward_post_hook(
+                        self._save_sub_res_hook)
 
     # def _save_sub_res_hook(self, layer, input, output):
     #     self.res_dict[layer.full_name()] = output
@@ -51,13 +54,24 @@ class TheseusLayer(nn.Layer):
     # def _disconnect_res_dict_hook(self, input, output):
     #     self.res_dict = None
 
-    def replace_sub(self, layer_name_pattern, replace_function, recursive=True):
-        for layer_i in self._sub_layers:
-            layer_name = self._sub_layers[layer_i].full_name()
+    def replace_sub(self, layer_name_pattern, replace_function,
+                    recursive=True):
+        for k in self._sub_layers.keys():
+            layer_name = self._sub_layers[k].full_name()
             if re.match(layer_name_pattern, layer_name):
-                self._sub_layers[layer_i] = replace_function(self._sub_layers[layer_i])
-            if recursive and isinstance(self._sub_layers[layer_i], TheseusLayer):
-                self._sub_layers[layer_i].replace_sub(layer_name_pattern, replace_function, recursive)
+                self._sub_layers[k] = replace_function(self._sub_layers[k])
+            if recursive:
+                if isinstance(self._sub_layers[k], TheseusLayer):
+                    self._sub_layers[k].replace_sub(
+                        layer_name_pattern, replace_function, recursive)
+                elif isinstance(self._sub_layers[k],
+                                nn.Sequential) or isinstance(
+                                    self._sub_layers[k], nn.LayerList):
+                    for kk in self._sub_layers[k]._sub_layers.keys():
+                        self._sub_layers[k]._sub_layers[kk].replace_sub(
+                            layer_name_pattern, replace_function, recursive)
+                else:
+                    pass
 
     '''
     example of replace function:
