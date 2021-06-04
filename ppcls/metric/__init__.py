@@ -33,10 +33,10 @@ class CombinedMetrics(nn.Layer):
             metric_params = config[metric_name]
             self.metric_func_list.append(eval(metric_name)(**metric_params))
 
-    def __call__(self, **kwargs):
+    def __call__(self, *args, **kwargs):
         metric_dict = OrderedDict()
         for idx, metric_func in enumerate(self.metric_func_list):
-            metric_dict.update(metric_func(**kwargs))
+            metric_dict.update(metric_func(*args, **kwargs))
 
         return metric_dict
 
