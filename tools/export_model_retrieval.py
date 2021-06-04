@@ -39,8 +39,6 @@ if __name__ == "__main__":
 
     # set arch mode to eval
     config["Arch"]["mode"] = "infer"
-    assert "Head" in config["Arch"]
-    config["Arch"]["Head"]["class_num"] = config["Global"]["class_num"]
     eval_model = build_model(config["Arch"])
 
     if config["Global"]["checkpoints"] is not None:
