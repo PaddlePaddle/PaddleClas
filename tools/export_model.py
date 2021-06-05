@@ -38,7 +38,7 @@ class ExportModel(nn.Layer):
         super().__init__()
         self.base_model = build_model(config)
         self.infer_output_key = config.get("infer_output_key")
-        if config.get("infer_add_softmax", False):
+        if config.get("infer_add_softmax", True):
             self.softmax = nn.Softmax(axis=-1)
         else:
             self.softmax = None
