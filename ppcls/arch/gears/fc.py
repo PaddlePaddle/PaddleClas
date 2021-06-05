@@ -30,6 +30,6 @@ class FC(nn.Layer):
         self.fc = paddle.nn.Linear(
             self.embedding_size, self.class_num, weight_attr=weight_attr)
 
-    def forward(self, input, label):
+    def forward(self, input):
         out = self.fc(input)
         return out
