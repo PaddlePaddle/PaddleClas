@@ -341,10 +341,9 @@ class Trainer(object):
         if len(query_feas) % sim_block_size:
             sections.append(len(query_feas) % sim_block_size)
         fea_blocks = paddle.split(query_feas, num_or_sections=sections)
-        # if query_camera_id is not None:
-        #     camera_id_blocks = paddle.split(
-        #         query_camera_id, num_or_sections=sections)
-        # image_id_blocks = paddle.split(query_img_id, num_or_sections=sections)
+        if query_camera_id is not None:
+            camera_id_blocks = paddle.split(
+                query_camera_id, num_or_sections=sections)
         metric_key = None
 
         for block_idx, block_fea in enumerate(fea_blocks):
@@ -367,10 +366,13 @@ class Trainer(object):
                                                 query_img_id, gallery_img_id)
         else:
             metric_dict = {metric_key: 0.}
-        metric_msg = ", ".join([
-            "{}: {:.5f}".format(key, metric_dict[key].avg)
-            for key in metric_dict
-        ])
+        metric_info_list = []
+
+        for key in metric_dict:
+            if metric_key is None:
+                metric_key = key
+            metric_info_list.append("{}: {:.5f}".format(key, metric_dict[key]))
+        metric_msg = ", ".join(metric_info_list)
         logger.info("[Eval][Epoch {}][Avg]{}".format(epoch_id, metric_msg))
 
         return metric_dict[metric_key]
