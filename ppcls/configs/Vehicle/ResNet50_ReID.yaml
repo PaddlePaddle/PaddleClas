@@ -1,6 +1,4 @@
 # global configs
-Trainer:
-  name: TrainerReID
 Global:
   checkpoints: null
   pretrained_model: null
