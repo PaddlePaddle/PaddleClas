@@ -31,7 +31,7 @@ from ppcls.utils import logger
 from ppcls.data import build_dataloader
 from ppcls.arch import build_model
 from ppcls.loss import build_loss
-from ppcls.arch.loss_metrics import build_metrics
+from ppcls.metric import build_metrics
 from ppcls.optimizer import build_optimizer
 from ppcls.utils.save_load import load_dygraph_pretrain
 from ppcls.utils.save_load import init_model
@@ -81,43 +81,35 @@ class Trainer(object):
             self.vdl_writer = LogWriter(logdir=vdl_writer_path)
         logger.info('train with paddle {} and device {}'.format(
             paddle.__version__, self.device))
-
-    def _build_metric_info(self, metric_config, mode="train"):
-        """
-        _build_metric_info: build metrics according to current mode
-        Return:
-            metric: dict of the metrics info
-        """
-        metric = None
-        mode = mode.capitalize()
-        if mode in metric_config and metric_config[mode] is not None:
-            metric = build_metrics(metric_config[mode])
-        return metric
-
-    def _build_loss_info(self, loss_config, mode="train"):
-        """
-        _build_loss_info: build loss according to current mode
-        Return:
-            loss_dict: dict of the loss info
-        """
-        loss = None
-        mode = mode.capitalize()
-        if mode in loss_config and loss_config[mode] is not None:
-            loss = build_loss(loss_config[mode])
-        return loss
+        # init members
+        self.train_dataloader = None
+        self.eval_dataloader = None
+        self.gallery_dataloader = None
+        self.query_dataloader = None
+        self.eval_mode = self.config["Global"].get("eval_mode",
+                                                   "classification")
+        self.train_loss_func = None
+        self.eval_loss_func = None
+        self.train_metric_func = None
+        self.eval_metric_func = None
 
     def train(self):
         # build train loss and metric info
-        loss_func = self._build_loss_info(self.config["Loss"])
-        if "Metric" in self.config:
-            metric_func = self._build_metric_info(self.config["Metric"])
-        else:
-            metric_func = None
+        if self.train_loss_func is None:
+            loss_info = self.config["Loss"]["Train"]
+            self.train_loss_func = build_loss(loss_info)
+        if self.train_metric_func is None:
+            metric_config = self.config.get("Metric")
+            if metric_config is not None:
+                metric_config = metric_config.get("Train")
+                if metric_config is not None:
+                    self.train_metric_func = build_metrics(metric_config)
 
-        train_dataloader = build_dataloader(self.config["DataLoader"], "Train",
-                                            self.device)
+        if self.train_dataloader is None:
+            self.train_dataloader = build_dataloader(self.config["DataLoader"],
+                                                     "Train", self.device)
 
-        step_each_epoch = len(train_dataloader)
+        step_each_epoch = len(self.train_dataloader)
 
         optimizer, lr_sch = build_optimizer(self.config["Optimizer"],
                                             self.config["Global"]["epochs"],
@@ -146,8 +138,7 @@ class Trainer(object):
         for epoch_id in range(best_metric["epoch"] + 1,
                               self.config["Global"]["epochs"] + 1):
             acc = 0.0
-            self.model.train()
-            for iter_id, batch in enumerate(train_dataloader()):
+            for iter_id, batch in enumerate(self.train_dataloader()):
                 batch_size = batch[0].shape[0]
                 batch[1] = paddle.to_tensor(batch[1].numpy().astype("int64")
                                             .reshape([-1, 1]))
@@ -158,15 +149,15 @@ class Trainer(object):
                 else:
                     out = self.model(batch[0], batch[1])
                 # calc loss
-                loss_dict = loss_func(out, batch[1])
+                loss_dict = self.train_loss_func(out, batch[1])
                 for key in loss_dict:
                     if not key in output_info:
                         output_info[key] = AverageMeter(key, '7.5f')
                     output_info[key].update(loss_dict[key].numpy()[0],
                                             batch_size)
                 # calc metric
-                if metric_func is not None:
-                    metric_dict = metric_func(out, batch[-1])
+                if self.train_metric_func is not None:
+                    metric_dict = self.train_metric_func(out, batch[-1])
                     for key in metric_dict:
                         if not key in output_info:
                             output_info[key] = AverageMeter(key, '7.5f')
@@ -181,7 +172,7 @@ class Trainer(object):
                     ])
                     logger.info("[Train][Epoch {}][Iter: {}/{}]{}, {}".format(
                         epoch_id, iter_id,
-                        len(train_dataloader), lr_msg, metric_msg))
+                        len(self.train_dataloader), lr_msg, metric_msg))
 
                 # step opt and lr
                 loss_dict["loss"].backward()
@@ -212,6 +203,7 @@ class Trainer(object):
                         self.output_dir,
                         model_name=self.config["Arch"]["name"],
                         prefix="best_model")
+                self.model.train()
 
             # save model
             if epoch_id % save_interval == 0:
@@ -228,20 +220,56 @@ class Trainer(object):
 
     @paddle.no_grad()
     def eval(self, epoch_id=0):
-        output_info = dict()
-
-        eval_dataloader = build_dataloader(self.config["DataLoader"], "Eval",
-                                           self.device)
-
         self.model.eval()
+        if self.eval_loss_func is None:
+            loss_config = self.config.get("Loss", None)
+            if loss_config is not None:
+                loss_config = loss_config.get("Eval")
+                if loss_config is not None:
+                    self.eval_loss_func = build_loss(loss_config)
+        if self.eval_mode == "classification":
+            if self.eval_dataloader is None:
+                self.eval_dataloader = build_dataloader(
+                    self.config["DataLoader"], "Eval", self.device)
+
+            if self.eval_metric_func is None:
+                metric_config = self.config.get("Metric")
+                if metric_config is not None:
+                    metric_config = metric_config.get("Eval")
+                    if metric_config is not None:
+                        self.eval_metric_func = build_metrics(metric_config)
+
+            eval_result = self.eval_cls(epoch_id)
+
+        elif self.eval_mode == "retrieval":
+            if self.gallery_dataloader is None:
+                self.gallery_dataloader = build_dataloader(
+                    self.config["DataLoader"]["Eval"], "Gallery", self.device)
+
+            if self.query_dataloader is None:
+                self.query_dataloader = build_dataloader(
+                    self.config["DataLoader"]["Eval"], "Query", self.device)
+            # build metric info
+            if self.eval_metric_func is None:
+                metric_config = self.config.get("Metric", None)
+                if metric_config is None:
+                    metric_config = [{"name": "Recallk", "topk": (1, 5)}]
+                else:
+                    metric_config = metric_config["Eval"]
+                self.eval_metric_func = build_metrics(metric_config)
+            eval_result = self.eval_retrieval(epoch_id)
+        else:
+            logger.warning("Invalid eval mode: {}".format(self.eval_mode))
+            eval_result = None
+        self.model.train()
+        return eval_result
+
+    def eval_cls(self, epoch_id=0):
+        output_info = dict()
         print_batch_step = self.config["Global"]["print_batch_step"]
 
-        # build train loss and metric info
-        loss_func = self._build_loss_info(self.config["Loss"], "eval")
-        metric_func = self._build_metric_info(self.config["Metric"], "eval")
         metric_key = None
-
-        for iter_id, batch in enumerate(eval_dataloader()):
+        for iter_id, batch in enumerate(self.eval_dataloader()):
             batch_size = batch[0].shape[0]
             batch[0] = paddle.to_tensor(batch[0]).astype("float32")
             batch[1] = paddle.to_tensor(batch[1]).reshape([-1, 1])
@@ -250,32 +278,32 @@ class Trainer(object):
                 out = self.model(batch[0], batch[1])
             else:
                 out = self.model(batch[0])
-            # calc build
-            if loss_func is not None:
-                loss_dict = loss_func(out, batch[-1])
+            # calc loss
+            if self.eval_loss_func is not None:
+                loss_dict = self.eval_loss_func(out, batch[-1])
                 for key in loss_dict:
                     if not key in output_info:
                         output_info[key] = AverageMeter(key, '7.5f')
                     output_info[key].update(loss_dict[key].numpy()[0],
                                             batch_size)
-                # calc metric
-                if metric_func is not None:
-                    metric_dict = metric_func(out, batch[-1])
-                    if paddle.distributed.get_world_size() > 1:
-                        for key in metric_dict:
-                            paddle.distributed.all_reduce(
-                                metric_dict[key],
-                                op=paddle.distributed.ReduceOp.SUM)
-                            metric_dict[key] = metric_dict[
-                                key] / paddle.distributed.get_world_size()
+            # calc metric
+            if self.eval_metric_func is not None:
+                metric_dict = self.eval_metric_func(out, batch[-1])
+                if paddle.distributed.get_world_size() > 1:
                     for key in metric_dict:
-                        if metric_key is None:
-                            metric_key = key
-                        if not key in output_info:
-                            output_info[key] = AverageMeter(key, '7.5f')
+                        paddle.distributed.all_reduce(
+                            metric_dict[key],
+                            op=paddle.distributed.ReduceOp.SUM)
+                        metric_dict[key] = metric_dict[
+                            key] / paddle.distributed.get_world_size()
+                for key in metric_dict:
+                    if metric_key is None:
+                        metric_key = key
+                    if not key in output_info:
+                        output_info[key] = AverageMeter(key, '7.5f')
 
-                        output_info[key].update(metric_dict[key].numpy()[0],
-                                                batch_size)
+                    output_info[key].update(metric_dict[key].numpy()[0],
+                                            batch_size)
 
             if iter_id % print_batch_step == 0:
                 metric_msg = ", ".join([
@@ -283,7 +311,7 @@ class Trainer(object):
                     for key in output_info
                 ])
                 logger.info("[Eval][Epoch {}][Iter: {}/{}]{}".format(
-                    epoch_id, iter_id, len(eval_dataloader), metric_msg))
+                    epoch_id, iter_id, len(self.eval_dataloader), metric_msg))
 
         metric_msg = ", ".join([
             "{}: {:.5f}".format(key, output_info[key].avg)
@@ -291,12 +319,127 @@ class Trainer(object):
         ])
         logger.info("[Eval][Epoch {}][Avg]{}".format(epoch_id, metric_msg))
 
-        self.model.train()
         # do not try to save best model
-        if metric_func is None:
+        if self.eval_metric_func is None:
             return -1
         # return 1st metric in the dict
         return output_info[metric_key].avg
+
+    def eval_retrieval(self, epoch_id=0):
+        self.model.eval()
+        cum_similarity_matrix = None
+        # step1. build gallery
+        gallery_feas, gallery_img_id, gallery_camera_id = self._cal_feature(
+            name='gallery')
+        query_feas, query_img_id, query_camera_id = self._cal_feature(
+            name='query')
+        gallery_img_id = gallery_img_id
+        # if gallery_camera_id is not None:
+        #     gallery_camera_id = gallery_camera_id
+        # step2. do evaluation
+        sim_block_size = self.config["Global"].get("sim_block_size", 64)
+        sections = [sim_block_size] * (len(query_feas) // sim_block_size)
+        if len(query_feas) % sim_block_size:
+            sections.append(len(query_feas) % sim_block_size)
+        fea_blocks = paddle.split(query_feas, num_or_sections=sections)
+        if query_camera_id is not None:
+            camera_id_blocks = paddle.split(
+                query_camera_id, num_or_sections=sections)
+            image_id_blocks = paddle.split(
+                query_img_id, num_or_sections=sections)
+        metric_key = None
+
+        for block_idx, block_fea in enumerate(fea_blocks):
+            similarity_matrix = paddle.matmul(
+                block_fea, gallery_feas, transpose_y=True)
+            if query_camera_id is not None:
+                camera_id_block = camera_id_blocks[block_idx]
+                camera_id_mask = (camera_id_block != gallery_camera_id.t())
+
+                image_id_block = image_id_blocks[block_idx]
+                image_id_mask = (image_id_block != gallery_img_id.t())
+
+                keep_mask = paddle.logical_or(camera_id_mask, image_id_mask)
+                similarity_matrix = similarity_matrix * keep_mask.astype(
+                    "float32")
+            if cum_similarity_matrix is None:
+                cum_similarity_matrix = similarity_matrix
+            else:
+                cum_similarity_matrix = paddle.concat(
+                    [cum_similarity_matrix, similarity_matrix], axis=0)
+
+        # calc metric
+        if self.eval_metric_func is not None:
+            metric_dict = self.eval_metric_func(cum_similarity_matrix,
+                                                query_img_id, gallery_img_id)
+        else:
+            metric_dict = {metric_key: 0.}
+        metric_info_list = []
+
+        for key in metric_dict:
+            if metric_key is None:
+                metric_key = key
+            metric_info_list.append("{}: {:.5f}".format(key, metric_dict[key]))
+        metric_msg = ", ".join(metric_info_list)
+        logger.info("[Eval][Epoch {}][Avg]{}".format(epoch_id, metric_msg))
+
+        return metric_dict[metric_key]
+
+    def _cal_feature(self, name='gallery'):
+        all_feas = None
+        all_image_id = None
+        all_camera_id = None
+        if name == 'gallery':
+            dataloader = self.gallery_dataloader
+        elif name == 'query':
+            dataloader = self.query_dataloader
+        else:
+            raise RuntimeError("Only support gallery or query dataset")
+
+        has_cam_id = False
+        for idx, batch in enumerate(dataloader(
+        )):  # load is very time-consuming
+            batch = [paddle.to_tensor(x) for x in batch]
+            batch[1] = batch[1].reshape([-1, 1])
+            if len(batch) == 3:
+                has_cam_id = True
+                batch[2] = batch[2].reshape([-1, 1])
+            out = self.model(batch[0], batch[1])
+            batch_feas = out["features"]
+
+            # do norm
+            if self.config["Global"].get("feature_normalize", True):
+                feas_norm = paddle.sqrt(
+                    paddle.sum(paddle.square(batch_feas), axis=1,
+                               keepdim=True))
+                batch_feas = paddle.divide(batch_feas, feas_norm)
+
+            if all_feas is None:
+                all_feas = batch_feas
+                if has_cam_id:
+                    all_camera_id = batch[2]
+                all_image_id = batch[1]
+            else:
+                all_feas = paddle.concat([all_feas, batch_feas])
+                all_image_id = paddle.concat([all_image_id, batch[1]])
+                if has_cam_id:
+                    all_camera_id = paddle.concat([all_camera_id, batch[2]])
+
+        if paddle.distributed.get_world_size() > 1:
+            feat_list = []
+            img_id_list = []
+            cam_id_list = []
+            paddle.distributed.all_gather(feat_list, all_feas)
+            paddle.distributed.all_gather(img_id_list, all_image_id)
+            all_feas = paddle.concat(feat_list, axis=0)
+            all_image_id = paddle.concat(img_id_list, axis=0)
+            if has_cam_id:
+                paddle.distributed.all_gather(cam_id_list, all_camera_id)
+                all_camera_id = paddle.concat(cam_id_list, axis=0)
+
+        logger.info("Build {} done, all feat shape: {}, begin to eval..".
+                    format(name, all_feas.shape))
+        return all_feas, all_image_id, all_camera_id
 
     @paddle.no_grad()
     def infer(self, ):
