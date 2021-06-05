@@ -39,7 +39,7 @@ class ArcMargin(nn.Layer):
             weight_attr=weight_attr,
             bias_attr=False)
 
-    def forward(self, input, label):
+    def forward(self, input, label=None):
         input_norm = paddle.sqrt(
             paddle.sum(paddle.square(input), axis=1, keepdim=True))
         input = paddle.divide(input, input_norm)
@@ -50,7 +50,7 @@ class ArcMargin(nn.Layer):
         weight = paddle.divide(weight, weight_norm)
 
         cos = paddle.matmul(input, weight)
-        if not self.training:
+        if not self.training or label is None:
             return cos
         sin = paddle.sqrt(1.0 - paddle.square(cos) + 1e-6)
         cos_m = math.cos(self.margin)
