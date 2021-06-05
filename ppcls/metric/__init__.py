@@ -26,7 +26,6 @@ class CombinedMetrics(nn.Layer):
         assert isinstance(config_list, list), (
             'operator config should be a list')
         for config in config_list:
-            print(config)
             assert isinstance(config,
                               dict) and len(config) == 1, "yaml format error"
             metric_name = list(config)[0]
