@@ -53,7 +53,7 @@ class RecModel(nn.Layer):
         else:
             self.head = None
 
-    def forward(self, x, label):
+    def forward(self, x, label=None):
         x = self.backbone(x)
         if self.neck is not None:
             x = self.neck(x)
