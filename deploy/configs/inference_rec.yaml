@@ -58,7 +58,7 @@ IndexProcess:
     enable: True
     index_path: "./logo_index/"
     image_root: "dataset/LogoDet-3K-crop/train"
-    datafile: "dataset/LogoDet-3K-crop/LogoDet-3K+train.txt"
+    data_file: "dataset/LogoDet-3K-crop/LogoDet-3K+train.txt"
     spacer: " "
     dist_type: "IP"
     pq_size: 100
