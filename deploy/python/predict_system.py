@@ -82,8 +82,7 @@ class SystemPredictor(object):
         output = []
         results = self.det_predictor.predict(img)
         for result in results:
-            #print(result)
-            xmin, xmax, ymin, ymax = result["bbox"].astype("int")
+            xmin, ymin, xmax, ymax = result["bbox"].astype("int")
             crop_img = img[xmin:xmax, ymin:ymax, :].copy()
             rec_results = self.rec_predictor.predict(crop_img)
             result["featrue"] = rec_results
