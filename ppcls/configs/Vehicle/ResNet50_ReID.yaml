@@ -147,7 +147,7 @@ Metric:
   Eval:
     - Recallk:
         topk: [1, 5]
-    - mAP:
+    - mAP: {}
 
 Infer:
   infer_imgs: "docs/images/whl/demo.jpg"
