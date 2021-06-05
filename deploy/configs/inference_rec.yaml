@@ -50,3 +50,20 @@ RecPreProcess:
     - ToCHWImage:
 
 RecPostProcess: null
+
+
+# indexing engine config
+IndexProcess:
+  build:  
+    enable: True
+    index_path: "./logo_index/"
+    image_root: "dataset/LogoDet-3K-crop/train"
+    data_file: "dataset/LogoDet-3K-crop/LogoDet-3K+train.txt"
+    spacer: " "
+    dist_type: "IP"
+    pq_size: 100
+    embedding_size: 1000
+  infer:
+    index_path: "./logo_index/"
+    search_budget: 100
+    return_k: 10

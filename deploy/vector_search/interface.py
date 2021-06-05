@@ -22,7 +22,9 @@ import json
 from ctypes import *
 from numpy.ctypeslib import ndpointer
 
-lib = ctypes.cdll.LoadLibrary("./index.so")
+__dir__ = os.path.dirname(os.path.abspath(__file__))
+so_path = os.path.join(__dir__, "index.so")
+lib = ctypes.cdll.LoadLibrary(so_path)
 
 class IndexContext(Structure):
     _fields_=[("graph",c_void_p),
