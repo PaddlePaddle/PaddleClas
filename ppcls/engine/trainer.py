@@ -344,6 +344,8 @@ class Trainer(object):
         if query_camera_id is not None:
             camera_id_blocks = paddle.split(
                 query_camera_id, num_or_sections=sections)
+            image_id_blocks = paddle.split(
+                query_img_id, num_or_sections=sections)
         metric_key = None
 
         for block_idx, block_fea in enumerate(fea_blocks):
@@ -351,8 +353,13 @@ class Trainer(object):
                 block_fea, gallery_feas, transpose_y=True)
             if query_camera_id is not None:
                 camera_id_block = camera_id_blocks[block_idx]
-                camera_id_mask = (camera_id_block != gallery_camera_id.t())
-                similarity_matrix = similarity_matrix * camera_id_mask.astype(
+                camera_id_same = (camera_id_block == gallery_camera_id.t())
+
+                image_id_block = image_id_blocks[block_idx]
+                image_id_same = (image_id_block == gallery_img_id.t())
+
+                keep_mask = not (camera_id_same and image_id_same)
+                similarity_matrix = similarity_matrix * keep_mask.astype(
                     "float32")
             if cum_similarity_matrix is None:
                 cum_similarity_matrix = similarity_matrix
