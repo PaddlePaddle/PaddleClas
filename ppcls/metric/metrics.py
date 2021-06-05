@@ -120,11 +120,7 @@ def get_metrics(indices, num_q, num_g, q_pids, g_pids, max_rank=50):
     num_valid_q = 0
     matches = (g_pids[indices] == q_pids[:, np.newaxis]).astype(np.int32)
     for q_idx in range(num_q):
-        q_pid = q_pids[q_idx]
-        order = indices[q_idx]
-        remove = g_pids[order] == q_pid
-        keep = np.invert(remove)
-        raw_cmc = matches[q_idx][keep]
+        raw_cmc = matches[q_idx]
         if not np.any(raw_cmc):
             continue
         cmc = raw_cmc.cumsum()
