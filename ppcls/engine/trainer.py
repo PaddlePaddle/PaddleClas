@@ -351,9 +351,9 @@ class Trainer(object):
                 block_fea, gallery_feas, transpose_y=True)
             if query_camera_id is not None:
                 camera_id_block = camera_id_blocks[block_idx]
-                camera_id_mask = (camera_id_block != gallery_camera_id)
-                similarity_matrix = similarity_matrix.masked_select(
-                    camera_id_mask)
+                camera_id_mask = (camera_id_block != gallery_camera_id.t())
+                similarity_matrix = similarity_matrix * camera_id_mask.astype(
+                    "float32")
             if cum_similarity_matrix is None:
                 cum_similarity_matrix = similarity_matrix
             else:
