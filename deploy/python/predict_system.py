@@ -42,7 +42,7 @@ class SystemPredictor(object):
             xmin, xmax, ymin, ymax = result["bbox"].astype("int")
             crop_img = img[xmin:xmax, ymin:ymax, :].copy()
             rec_results = self.rec_predictor.predict(crop_img)
-            result["featrue"] = rec_results
+            result["feature"] = rec_results
             output.append(result)
         return output
 
