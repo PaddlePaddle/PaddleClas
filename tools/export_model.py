@@ -25,7 +25,8 @@ import paddle.nn as nn
 
 from ppcls.utils import config
 from ppcls.engine.trainer import Trainer
-from ppcls.arch import build_model
+from ppcls.arch import build_model, RecModel
+from ppcls.arch.backbone.base.theseus_layer import Identity
 from ppcls.utils.save_load import load_dygraph_pretrain
 
 
@@ -38,6 +39,9 @@ class ExportModel(nn.Layer):
         super().__init__()
         self.base_model = build_model(config)
         self.infer_output_key = config.get("infer_output_key")
+        if self.infer_output_key == "features" and isinstance(self.base_model,
+                                                              RecModel):
+            self.base_model.neck = Identity()
         if config.get("infer_add_softmax", True):
             self.softmax = nn.Softmax(axis=-1)
         else:
