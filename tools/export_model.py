@@ -41,7 +41,7 @@ class ExportModel(nn.Layer):
         self.infer_output_key = config.get("infer_output_key")
         if self.infer_output_key == "features" and isinstance(self.base_model,
                                                               RecModel):
-            self.base_model.neck = Identity()
+            self.base_model.head = IdentityHead()
         if config.get("infer_add_softmax", True):
             self.softmax = nn.Softmax(axis=-1)
         else:
@@ -60,6 +60,14 @@ class ExportModel(nn.Layer):
         if self.softmax is not None:
             x = self.softmax(x)
         return x
+
+
+class IdentityHead(nn.Layer):
+    def __init__(self):
+        super(IdentityHead, self).__init__()
+
+    def forward(self, x, label):
+        return {"features": x, "logits": None}
 
 
 if __name__ == "__main__":
