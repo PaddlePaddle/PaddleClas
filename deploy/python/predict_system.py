@@ -20,6 +20,7 @@ sys.path.append(os.path.abspath(os.path.join(__dir__, '../')))
 import copy
 import cv2
 import numpy as np
+from tqdm import tqdm
 
 from python.predict_rec import RecPredictor
 from python.predict_det import DetPredictor
@@ -29,7 +30,7 @@ from utils import logger
 from utils import config
 from utils.get_image_list import get_image_list
 
-
+'''
 def split_datafile(data_file, image_root):
     gallery_images = []
     gallery_docs = []
@@ -41,6 +42,25 @@ def split_datafile(data_file, image_root):
                  continue
             image_file = os.path.join(image_root, line[3])
             image_doc = line[1]
+            gallery_images.append(image_file)
+            gallery_docs.append(image_doc)
+    return gallery_images, gallery_docs
+'''
+
+def split_datafile(data_file, image_root, spacer="\t"):
+    '''
+        data_file: image path and info, which can be splitted by spacer 
+        image_root: image path root
+        spacer: delimiter 
+    '''
+    gallery_images = []
+    gallery_docs = []
+    with open(data_file) as f:
+        lines = f.readlines()
+        for i, line in enumerate(lines):
+            line = line.strip().split(spacer)
+            image_file = os.path.join(image_root, line[0])
+            image_doc = line[1] 
             gallery_images.append(image_file)
             gallery_docs.append(image_doc)
     return gallery_images, gallery_docs
@@ -62,10 +82,10 @@ class SystemPredictor(object):
         if 'build' in config.keys() and config['build']['enable']:  # build the index from scratch    
             with open(config['build']['data_file']) as f:
                 lines = f.readlines()
-            gallery_images, gallery_docs = split_datafile(config['build']['data_file'], config['build']['image_root'])
+            gallery_images, gallery_docs = split_datafile(config['build']['data_file'], config['build']['image_root'], config['build']['spacer'])
             # extract gallery features
             gallery_features = np.zeros([len(gallery_images), config['build']['embedding_size']], dtype=np.float32)
-            for i, image_file in enumerate(gallery_images):
+            for i, image_file in enumerate(tqdm(gallery_images)):
                 img = cv2.imread(image_file)[:, :, ::-1]
                 rec_feat = self.rec_predictor.predict(img)
                 gallery_features[i,:] = rec_feat
@@ -82,16 +102,17 @@ class SystemPredictor(object):
         output = []
         results = self.det_predictor.predict(img)
         for result in results:
+            preds = {}
             xmin, ymin, xmax, ymax = result["bbox"].astype("int")
             crop_img = img[xmin:xmax, ymin:ymax, :].copy()
             rec_results = self.rec_predictor.predict(crop_img)
-            result["feature"] = rec_results
-
+            #preds["feature"] = rec_results
+            preds["bbox"] = [xmin, ymin, xmax, ymax]
             scores, docs = self.Searcher.search(query=rec_results, return_k=self.return_k, search_budget=self.search_budget)
-            result["ret_docs"] = docs
-            result["ret_scores"] = scores
+            preds["rec_docs"] = docs
+            preds["rec_scores"] = scores
 
-            output.append(result)
+            output.append(preds)
         return output
             
 
@@ -104,7 +125,7 @@ def main(config):
     for idx, image_file in enumerate(image_list):
         img = cv2.imread(image_file)[:, :, ::-1]
         output = system_predictor.predict(img)
-        #print(output)
+        print(output)
     return
 
 
