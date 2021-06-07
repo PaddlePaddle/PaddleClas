@@ -14,7 +14,6 @@ Global:
   # used for static mode and model export
   image_shape: [3, 224, 224]
   save_inference_dir: "./inference"
-  #sim_block_size: 15
   eval_mode: "retrieval"
 
 # model architecture
@@ -34,7 +33,6 @@ Arch:
     margin: 0.35
     scale:  64
     embedding_size: 512
-    #class_num: 3000
 
 # loss function config for traing/eval process
 Loss:
