@@ -24,10 +24,9 @@ import paddle
 import paddle.nn as nn
 
 from ppcls.utils import config
-from ppcls.engine.trainer import Trainer
 from ppcls.arch import build_model, RecModel
-from ppcls.arch.backbone.base.theseus_layer import Identity
 from ppcls.utils.save_load import load_dygraph_pretrain
+from ppcls.arch.gears.identity_head import IdentityHead
 
 
 class ExportModel(nn.Layer):
@@ -60,14 +59,6 @@ class ExportModel(nn.Layer):
         if self.softmax is not None:
             x = self.softmax(x)
         return x
-
-
-class IdentityHead(nn.Layer):
-    def __init__(self):
-        super(IdentityHead, self).__init__()
-
-    def forward(self, x, label=None):
-        return {"features": x, "logits": None}
 
 
 if __name__ == "__main__":
