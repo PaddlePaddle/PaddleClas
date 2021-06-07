@@ -20,7 +20,7 @@ import paddle.nn.functional as F
 
 class CircleMargin(nn.Layer):
     def __init__(self, embedding_size, class_num, margin, scale):
-        super(CircleSoftmax, self).__init__()
+        super(CircleMargin, self).__init__()
         self.scale = scale
         self.margin = margin
         self.embedding_size = embedding_size
