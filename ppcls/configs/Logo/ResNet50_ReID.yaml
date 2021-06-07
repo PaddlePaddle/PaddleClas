@@ -36,8 +36,6 @@ Arch:
     embedding_size: 512
     #class_num: 3000
 
-
-# loss function config for traing/eval process
 # loss function config for traing/eval process
 Loss:
   Train:
@@ -66,8 +64,8 @@ DataLoader:
   Train:
     dataset:
         name: LogoDataset
-        image_root: "/mnt/huangfei/dataset/LogoDet-3K-crop/train/"
-        cls_label_path: "/mnt/huangfei/dataset/LogoDet-3K-crop/LogoDet-3K+train.txt"
+        image_root: "dataset/LogoDet-3K-crop/train/"
+        cls_label_path: "dataset/LogoDet-3K-crop/LogoDet-3K+train.txt"
         transform_ops:
           - ResizeImage:
               size: 224
@@ -96,8 +94,8 @@ DataLoader:
       # TOTO: modify to the latest trainer
       dataset:
           name: LogoDataset
-          image_root: "/mnt/huangfei/dataset/LogoDet-3K-crop/val/"
-          cls_label_path: "/mnt/huangfei/dataset/LogoDet-3K-crop/LogoDet-3K+val.txt"
+          image_root: "dataset/LogoDet-3K-crop/val/"
+          cls_label_path: "LogoDet-3K-crop/LogoDet-3K+query.txt"
           transform_ops:
             - ResizeImage:
                 size: 224
@@ -119,8 +117,8 @@ DataLoader:
       # TOTO: modify to the latest trainer
       dataset:
           name: LogoDataset
-          image_root: "/mnt/huangfei/dataset/LogoDet-3K-crop/train/"
-          cls_label_path: "/mnt/huangfei/dataset/LogoDet-3K-crop/LogoDet-3K+train.txt"
+          image_root: "dataset/LogoDet-3K-crop/train/"
+          cls_label_path: "dataset/LogoDet-3K-crop/LogoDet-3K+gallery.txt"
           transform_ops:
             - ResizeImage:
                 size: 224
