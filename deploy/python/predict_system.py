@@ -33,7 +33,7 @@ from utils.get_image_list import get_image_list
 def split_datafile(data_file, image_root):
     gallery_images = []
     gallery_docs = []
-    with open(datafile) as f:
+    with open(data_file) as f:
         lines = f.readlines()
         for i, line in enumerate(lines):
             line = line.strip().split("\t")
@@ -60,7 +60,7 @@ class SystemPredictor(object):
     
     def indexer(self, config):
         if 'build' in config.keys() and config['build']['enable']:  # build the index from scratch    
-            with open(config['build']['datafile']) as f:
+            with open(config['build']['data_file']) as f:
                 lines = f.readlines()
             gallery_images, gallery_docs = split_datafile(config['build']['data_file'], config['build']['image_root'])
             # extract gallery features
@@ -85,7 +85,7 @@ class SystemPredictor(object):
             xmin, ymin, xmax, ymax = result["bbox"].astype("int")
             crop_img = img[xmin:xmax, ymin:ymax, :].copy()
             rec_results = self.rec_predictor.predict(crop_img)
-            result["featrue"] = rec_results
+            result["feature"] = rec_results
 
             scores, docs = self.Searcher.search(query=rec_results, return_k=self.return_k, search_budget=self.search_budget)
             result["ret_docs"] = docs
