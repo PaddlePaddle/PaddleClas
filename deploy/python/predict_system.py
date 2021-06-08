@@ -49,7 +49,7 @@ class SystemPredictor(object):
         for result in results:
             preds = {}
             xmin, ymin, xmax, ymax = result["bbox"].astype("int")
-            crop_img = img[xmin:xmax, ymin:ymax, :].copy()
+            crop_img = img[ymin:ymax, xmin:xmax, :].copy()
             rec_results = self.rec_predictor.predict(crop_img)
             #preds["feature"] = rec_results
             preds["bbox"] = [xmin, ymin, xmax, ymax]
