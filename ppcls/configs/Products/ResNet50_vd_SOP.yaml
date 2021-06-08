@@ -6,8 +6,8 @@ Global:
   device: "gpu"
   class_num: 11319
   save_interval: 10
-  eval_during_train: False
-  eval_interval: 1
+  eval_during_train: True
+  eval_interval: 10
   epochs: 120
   print_batch_step: 10
   use_visualdl: False
