@@ -23,10 +23,8 @@ import shutil
 import tempfile
 
 import paddle
-from paddle.static import load_program_state
-from paddle.utils.download import get_weights_path_from_url
-
 from ppcls.utils import logger
+from .download import get_weights_path_from_url
 
 __all__ = ['init_model', 'save_model', 'load_dygraph_pretrain']
 
