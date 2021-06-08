@@ -118,9 +118,9 @@ Infer:
 
 Metric:
     Train:
-    - Topk:
-        k: [1, 5]
+    - TopkAcc:
+        topk: [1, 5]
     Eval:
-    - Topk:
-        k: [1, 5]
+    - TopkAcc:
+        topk: [1, 5]
 
