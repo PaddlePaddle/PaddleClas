@@ -123,4 +123,3 @@ Metric:
     Eval:
     - TopkAcc:
         topk: [1, 5]
-
