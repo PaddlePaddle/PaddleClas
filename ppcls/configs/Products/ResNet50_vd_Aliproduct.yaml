@@ -5,9 +5,9 @@ Global:
   output_dir: "./output/"
   device: "gpu"
   class_num: 50030
-  save_interval: 10
-  eval_during_train: False
-  eval_interval: 1
+  save_interval: 1
+  eval_during_train: True
+  eval_interval: 10
   epochs: 120
   print_batch_step: 10
   use_visualdl: False
@@ -58,7 +58,7 @@ DataLoader:
     dataset:
         name: "ImageNetDataset"
         image_root: "./dataset/Aliproduct/"
-        cls_label_path: "./dataset/Aliproduct/train_list.txt"
+        cls_label_path: "./dataset/Aliproduct/val_list.txt"
         transform_ops:
           - ResizeImage:
               size: 224
