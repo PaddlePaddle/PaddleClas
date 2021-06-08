@@ -9,7 +9,7 @@ python3.7 python/predict_cls.py -c configs/inference_cls.yaml
 
 
 # build system
-#python3.7 python/build_system.py -c configs/build_logo.yaml 
+#python3.7 python/build_gallery.py -c configs/build_logo.yaml 
 
 # inference system
 # python3.7 python/predict_system.py -c configs/inference_logo.yaml 
