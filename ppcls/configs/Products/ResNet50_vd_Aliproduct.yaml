@@ -58,7 +58,7 @@ DataLoader:
     dataset:
         name: "ImageNetDataset"
         image_root: "./dataset/Aliproduct/"
-        cls_label_path: "./dataset/Aliproduct/val_list.txt"
+        cls_label_path: "./dataset/Aliproduct/train_list.txt"
         transform_ops:
           - ResizeImage:
               size: 224
