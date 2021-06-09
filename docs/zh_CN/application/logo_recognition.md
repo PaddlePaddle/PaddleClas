@@ -12,7 +12,7 @@
 
 ### LogoDet-3K数据集
 
-<img src="../../images/logo/logo3k.JPG" style="zoom:50%;" />
+<img src="../../images/logo/logodet3k.jpg" style="zoom:50%;" />
 
 LogoDet-3K数据集是具有完整标注的Logo数据集，有3000个标识类别，约20万个高质量的人工标注的标识对象和158652张图片。相关数据介绍参考[原论文](https://arxiv.org/abs/2008.05359)
 
