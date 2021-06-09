@@ -22,7 +22,7 @@ from .backbone import *
 from .gears import build_gear
 from .utils import *
 
-__all__ = ["build_model", "RecModel"]
+__all__ = ["build_model", "RecModel", "DistillationModel"]
 
 
 def build_model(config):
@@ -62,3 +62,31 @@ class RecModel(nn.Layer):
         else:
             y = None
         return {"features": x, "logits": y}
+
+
+class DistillationModel(nn.Layer):
+    def __init__(self, models=None):
+        super().__init__()
+        assert isinstance(models, dict)
+        self.model_list = []
+        self.model_name_list = []
+        for key in models:
+            model_config = models[key]
+            freeze_params = False
+            pretrained = None
+            if "freeze_params" in model_config:
+                freeze_params = model_config.pop("freeze_params")
+            if "pretrained" in model_config:
+                pretrained = model_config.pop("pretrained")
+            model_name = models.pop(model_name)
+            model = eval(model_name)(model_config)
+            if pretrained is not None:
+                init_model(model, path=pretrained)
+            if freeze_params:
+                for param in model.parameters():
+                    param.trainable = False
+            self.model_list.append(self.add_sublayer(key, model))
+            self.model_name_list.append(key)
+
+    def forward(self, x, label=None):
+        return None
