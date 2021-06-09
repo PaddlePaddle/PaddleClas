@@ -36,10 +36,10 @@ LogoDet-3K数据集是具有完整标注的Logo数据集，有3000个标识类�
 
 ## Loss的设置
 
-在Logo识别中，使用了[Pairwise cosface + CircleMargin](https://arxiv.org/abs/2002.10857) 联合训练，其中权重比例为1:1
+在Logo识别中，使用了[Pairwise Cosface + CircleMargin](https://arxiv.org/abs/2002.10857) 联合训练，其中权重比例为1:1
 
-具体代码详见：pairwisecosface.py 、circlemargin.py 代码
+具体代码详见：[PairwiseCosface](../../../ppcls/loss/pairwisecosface.py) 、[CircleMargin](../../../ppcls/arch/gears/circlemargin.py)
 
 
 
-全部的超参数及具体配置：ResNet50_Logo.yaml。
+全部的超参数及具体配置：[ResNet50_ReID.yaml](../../../ppcls/configs/Logo/ResNet50_ReID.yaml)。
