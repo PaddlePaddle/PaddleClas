@@ -1,7 +1,7 @@
 Global:
   infer_imgs: "./dataset/iCartoonFace/val2/0000000.jpg"
-  det_inference_model_dir: "./output/det"
-  rec_inference_model_dir: "./output/"
+  det_inference_model_dir: "./cartoon/det"
+  rec_inference_model_dir: "./cartoon/rec"
   batch_size: 1
   image_shape: [3, 640, 640]
   threshold: 0.5
@@ -9,7 +9,6 @@ Global:
   labe_list:
   - foreground
 
-  # inference engine config
   use_gpu: True
   enable_mkldnn: True
   cpu_num_threads: 100
@@ -50,18 +49,7 @@ RecPreProcess:
 
 RecPostProcess: null
 
-# indexing engine config
 IndexProcess:
-  build:  
-    enable: False
-    index_path: "./icartoon_index/"
-    image_root: "./dataset/iCartoonFace"
-    data_file:  "./dataset/iCartoonFace/gallery_pesudo.txt"
-    spacer: "\t"
-    dist_type: "IP"
-    pq_size: 100
-    embedding_size: 2048
-  infer:
-    index_path: "./icartoon_index/"
+    index_path: "./cartoon/index/"
     search_budget: 100
     return_k: 10
