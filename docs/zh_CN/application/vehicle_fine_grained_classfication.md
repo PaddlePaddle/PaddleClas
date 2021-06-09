@@ -3,8 +3,10 @@
 其训练过程与车辆ReID相比，有以下不同：
 - 数据集不同
 - Loss设置不同
+
 其他部分请详见[车辆ReID](./vehicle_reid.md)
 整体配置文件：[ResNet50.yaml](../../../ppcls/configs/Vehicle/ResNet50.yaml)
+
 ## 数据集
 在此demo中，使用[CompCars](http://mmlab.ie.cuhk.edu.hk/datasets/comp_cars/index.html)作为训练数据集。
 
