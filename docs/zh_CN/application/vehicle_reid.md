@@ -18,7 +18,9 @@ ReID，也就是 Re-identification，其定义是利用算法，在图像库中�
 - [AugMix](https://arxiv.org/abs/1912.02781v1)
 - Normlize：归一化到0~1
 - [RandomErasing](https://arxiv.org/pdf/1708.04896v2.pdf)
+
 在配置文件中设置如下，详见`transform_ops`部分：
+
 ```yaml
 DataLoader:
   Train:
