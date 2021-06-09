@@ -33,7 +33,7 @@ Arch:
   Head:
     name: "ArcMargin"  
     embedding_size: 512
-    class_num: 431
+    class_num: 30671
     margin: 0.15
     scale: 32
  
