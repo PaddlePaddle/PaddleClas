@@ -33,7 +33,6 @@ DetPreProcess:
 
 DetPostProcess: {}
 
-
 RecPreProcess:
   transform_ops:
     - ResizeImage:
