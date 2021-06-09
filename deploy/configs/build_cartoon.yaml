@@ -27,11 +27,10 @@ RecPreProcess:
 RecPostProcess: null
 
 IndexProcess:
-  build:  
-    index_path: "./cartoon/index/"
-    image_root: "./cartoon/dataset/"
-    data_file:  "./cartoon/data_file.txt"
-    delimiter:  "\t"
-    dist_type: "IP"
-    pq_size: 100
-    embedding_size: 2048
+  index_path: "./cartoon/index/"
+  image_root: "./cartoon/dataset/"
+  data_file:  "./cartoon/data_file.txt"
+  delimiter:  "\t"
+  dist_type: "IP"
+  pq_size: 100
+  embedding_size: 2048
