@@ -26,7 +26,7 @@ LogoDet-3K数据集是具有完整标注的Logo数据集，有3000个标识类�
 - Normlize：归一化到0～1
 - [RandomErasing](https://arxiv.org/pdf/1708.04896v2.pdf)
 
-## Backbone的具体设置
+## Backbone的设置
 
 具体是用`ResNet50`作为backbone，但在`ResNet50`基础上做了如下修改：
 
