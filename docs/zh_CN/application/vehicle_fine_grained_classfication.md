@@ -5,6 +5,7 @@
 - Loss设置不同
 
 其他部分请详见[车辆ReID](./vehicle_reid.md)
+
 整体配置文件：[ResNet50.yaml](../../../ppcls/configs/Vehicle/ResNet50.yaml)
 
 ## 数据集
