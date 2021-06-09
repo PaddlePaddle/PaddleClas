@@ -52,10 +52,6 @@ DataLoader:
               order: ''
           - RandomErasing:
               EPSILON: 0.5
-              sl: 0.02
-              sh: 0.4
-              r1: 0.3
-              mean: [0., 0., 0.]
     sampler:
         name: DistributedRandomIdentitySampler
         batch_size: 128
