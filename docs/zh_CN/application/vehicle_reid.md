@@ -23,7 +23,7 @@ ReID，也就是 Re-identification，其定义是利用算法，在图像库中�
 DataLoader:
   Train:
     dataset:
-    		# 具体使用的Dataset的的名称
+        # 具体使用的Dataset的的名称
         name: "VeriWild"
         # 使用此数据集的具体参数
         image_root: "/work/dataset/VeRI-Wild/images/"
@@ -67,7 +67,7 @@ DataLoader:
 
 ```yaml
 Arch:
-	# 使用RecModel模型进行训练，目前支持普通ImageNet和RecModel两个方式
+  # 使用RecModel模型进行训练，目前支持普通ImageNet和RecModel两个方式
   name: "RecModel"
   # 导出inference model的具体配置
   infer_output_key: "features"
