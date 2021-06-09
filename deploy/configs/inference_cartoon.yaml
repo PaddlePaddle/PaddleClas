@@ -1,7 +1,7 @@
 Global:
-  infer_imgs: "./dataset/iCartoonFace/val2/0000000.jpg"
-  det_inference_model_dir: "./output/det"
-  rec_inference_model_dir: "./output/"
+  infer_imgs: "./dataset/cartoon_demo_data_v1.0/query/"
+  det_inference_model_dir: "./models/ppyolov2_r50vd_dcn_mainbody_v1.0_infer/"
+  rec_inference_model_dir: "./models/cartoon_rec_ResNet50_iCartoon_v1.0_infer/"
   batch_size: 1
   image_shape: [3, 640, 640]
   threshold: 0.5
@@ -52,16 +52,7 @@ RecPostProcess: null
 
 # indexing engine config
 IndexProcess:
-  build:  
-    enable: False
-    index_path: "./icartoon_index/"
-    image_root: "./dataset/iCartoonFace"
-    data_file:  "./dataset/iCartoonFace/gallery_pesudo.txt"
-    spacer: "\t"
-    dist_type: "IP"
-    pq_size: 100
-    embedding_size: 2048
-  infer:
-    index_path: "./icartoon_index/"
-    search_budget: 100
-    return_k: 10
+  index_path: "./dataset/cartoon_demo_data_v1.0/index/"
+  search_budget: 100
+  return_k: 5
+  dist_type: "IP"

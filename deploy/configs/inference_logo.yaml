@@ -1,5 +1,5 @@
 Global:
-  infer_imgs: "./images/logo_demo_data_v1.0/query/logo_AKG.jpg"
+  infer_imgs: "./dataset/logo_demo_data_v1.0/query/logo_AKG.jpg"
   det_inference_model_dir: "./models/ppyolov2_r50vd_dcn_mainbody_v1.0_infer/"
   rec_inference_model_dir: "./models/logo_rec_ResNet50_Logo3K_v1.0_infer/"
   batch_size: 1
@@ -48,7 +48,7 @@ RecPostProcess: null
 
 # indexing engine config
 IndexProcess:
-  index_path: "./images/logo_demo_data_v1.0/index/"
+  index_path: "./dataset/logo_demo_data_v1.0/index/"
   search_budget: 100
   return_k: 5
   dist_type: "IP"
