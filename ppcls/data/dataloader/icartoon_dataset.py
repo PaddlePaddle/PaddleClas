@@ -35,6 +35,6 @@ class ICartoonDataset(CommonDataset):
                 np.random.shuffle(lines)
             for l in lines:
                 l = l.strip().split("\t")
-                self.images.append(os.path.join(self._img_root, l[0][2:]))
+                self.images.append(os.path.join(self._img_root, l[0]))
                 self.labels.append(int(l[1]))
                 assert os.path.exists(self.images[-1])
