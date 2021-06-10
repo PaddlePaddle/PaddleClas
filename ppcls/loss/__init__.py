@@ -13,7 +13,12 @@ from .trihardloss import TriHardLoss
 from .triplet import TripletLoss, TripletLossV2
 from .supconloss import SupConLoss
 from .pairwisecosface import PairwiseCosface
+from .dmlloss import DMLLoss
+from .distanceloss import DistanceLoss
 
+from .distillationloss import DistillationCELoss
+from .distillationloss import DistillationGTCELoss
+from .distillationloss import DistillationDMLLoss
 
 
 class CombinedLoss(nn.Layer):

@@ -17,6 +17,8 @@ import copy
 from collections import OrderedDict
 
 from .metrics import TopkAcc, mAP, mINP, Recallk, RetriMetric
+from .metrics import DistillationTopkAcc
+
 
 class CombinedMetrics(nn.Layer):
     def __init__(self, config_list):
@@ -24,7 +26,7 @@ class CombinedMetrics(nn.Layer):
         self.metric_func_list = []
         assert isinstance(config_list, list), (
             'operator config should be a list')
-        
+
         self.retri_config = dict()  # retrieval metrics config
         for config in config_list:
             assert isinstance(config,
@@ -35,7 +37,7 @@ class CombinedMetrics(nn.Layer):
                 continue
             metric_params = config[metric_name]
             self.metric_func_list.append(eval(metric_name)(**metric_params))
-            
+
         if self.retri_config:
             self.metric_func_list.append(RetriMetric(self.retri_config))
 
