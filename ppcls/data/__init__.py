@@ -35,13 +35,13 @@ from ppcls.data.preprocess import transform
 
 
 def build_dataloader(config, mode, device, seed=None):
-    assert mode in ['Train', 'Eval', 'Test', 'Gallery', 'Query'
-                    ], "Mode should be Train, Eval, Test, Gallery or Query"
+    assert mode in ['Train', 'Eval', 'Test', 
+                    ], "Mode should be Train, Eval, Test"
     # build dataset
     config_dataset = config[mode]['dataset']
     config_dataset = copy.deepcopy(config_dataset)
     dataset_name = config_dataset.pop('name')
-    if 'batch_transform_ops' in config_dataset:
+    if 'batch_transform_ops' in config_dataset:h
         batch_transform = config_dataset.pop('batch_transform_ops')
     else:
         batch_transform = None

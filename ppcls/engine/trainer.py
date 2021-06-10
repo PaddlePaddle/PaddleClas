@@ -223,7 +223,7 @@ class Trainer(object):
             # eval model and save model if possible
             if self.config["Global"][
                     "eval_during_train"] and epoch_id % self.config["Global"][
-                        "eval_during_train"] == 0:
+                        "eval_interval"] == 0:
                 acc = self.eval(epoch_id)
                 if acc > best_metric["metric"]:
                     best_metric["metric"] = acc
