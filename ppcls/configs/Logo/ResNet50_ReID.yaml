@@ -157,9 +157,6 @@ Infer:
     - DecodeImage:
         to_rgb: True
         channel_first: False
-    - DecodeImage:
-        to_rgb: True
-        channel_first: False
     - ResizeImage:
         resize_short: 224
     - NormalizeImage:
