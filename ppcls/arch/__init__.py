@@ -71,7 +71,7 @@ class DistillationModel(nn.Layer):
                  pretrained_list=None,
                  freeze_params_list=None):
         super().__init__()
-        assert isinstance(models, dict)
+        assert isinstance(models, list)
         self.model_list = []
         self.model_name_list = []
         if pretrained_list is not None:
@@ -80,14 +80,15 @@ class DistillationModel(nn.Layer):
         if freeze_params_list is None:
             freeze_params_list = [False] * len(models)
         assert len(freeze_params_list) == len(models)
-        index = -1
-        for key in models:
-            index += 1
-            model_config = models[key]
+        for idx, model_config in enumerate(models):
+            assert len(model_config) == 1
+            key = list(model_config.keys())[0]
+            model_config = model_config[key]
+            print(model_config)
             model_name = model_config.pop("name")
             model = eval(model_name)(**model_config)
 
-            if freeze_params_list[index]:
+            if freeze_params_list[idx]:
                 for param in model.parameters():
                     param.trainable = False
             self.model_list.append(self.add_sublayer(key, model))
