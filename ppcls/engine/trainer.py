@@ -252,7 +252,6 @@ class Trainer(object):
 
     @paddle.no_grad()
     def eval(self, epoch_id=0):
-
         self.model.eval()
         if self.eval_loss_func is None:
             loss_config = self.config.get("Loss", None)

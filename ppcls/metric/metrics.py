@@ -18,7 +18,6 @@ import paddle.nn as nn
 from functools import lru_cache
 
 
-# TODO: fix the format
 class TopkAcc(nn.Layer):
     def __init__(self, topk=(1, 5)):
         super().__init__()
@@ -84,6 +83,7 @@ class Recallk(nn.Layer):
             metric_dict["recall{}".format(k)] = all_cmc[k - 1]
         return metric_dict
 
+
 # retrieval metrics
 class RetriMetric(nn.Layer):
     def __init__(self, config):
@@ -93,8 +93,8 @@ class RetriMetric(nn.Layer):
 
     def forward(self, similarities_matrix, query_img_id, gallery_img_id):
         metric_dict = dict()
-        all_cmc, all_AP, all_INP = get_metrics(similarities_matrix, query_img_id,
-                                   gallery_img_id, self.max_rank)
+        all_cmc, all_AP, all_INP = get_metrics(
+            similarities_matrix, query_img_id, gallery_img_id, self.max_rank)
         if "Recallk" in self.config.keys():
             topk = self.config['Recallk']['topk']
             for k in topk:
@@ -106,7 +106,7 @@ class RetriMetric(nn.Layer):
             mINP = np.mean(all_INP)
             metric_dict["mINP"] = mINP
         return metric_dict
-    
+
 
 @lru_cache()
 def get_metrics(similarities_matrix, query_img_id, gallery_img_id,
@@ -152,3 +152,16 @@ def get_metrics(similarities_matrix, query_img_id, gallery_img_id,
     all_cmc = all_cmc.sum(0) / num_valid_q
 
     return all_cmc, all_AP, all_INP
+
+
+class DistillationTopkAcc(TopkAcc):
+    def __init__(self, model_key, feature_key=None, topk=(1, 5)):
+        super().__init__(topk=topk)
+        self.model_key = model_key
+        self.feature_key = feature_key
+
+    def forward(self, x, label):
+        x = x[self.model_key]
+        if self.feature_key is not None:
+            x = x[self.feature_key]
+        return super().forward(x, label)

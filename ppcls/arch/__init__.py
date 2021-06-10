@@ -21,6 +21,7 @@ from . import backbone, gears
 from .backbone import *
 from .gears import build_gear
 from .utils import *
+from ppcls.utils.save_load import load_dygraph_pretrain
 
 __all__ = ["build_model", "RecModel", "DistillationModel"]
 
@@ -65,28 +66,44 @@ class RecModel(nn.Layer):
 
 
 class DistillationModel(nn.Layer):
-    def __init__(self, models=None):
+    def __init__(self,
+                 models=None,
+                 pretrained_list=None,
+                 freeze_params_list=None):
         super().__init__()
         assert isinstance(models, dict)
         self.model_list = []
         self.model_name_list = []
+        if pretrained_list is not None:
+            assert len(pretrained_list) == len(models)
+
+        if freeze_params_list is None:
+            freeze_params_list = [False] * len(models)
+        assert len(freeze_params_list) == len(models)
+        index = -1
         for key in models:
+            index += 1
             model_config = models[key]
-            freeze_params = False
-            pretrained = None
-            if "freeze_params" in model_config:
-                freeze_params = model_config.pop("freeze_params")
-            if "pretrained" in model_config:
-                pretrained = model_config.pop("pretrained")
-            model_name = models.pop(model_name)
-            model = eval(model_name)(model_config)
-            if pretrained is not None:
-                init_model(model, path=pretrained)
-            if freeze_params:
+            model_name = model_config.pop("name")
+            model = eval(model_name)(**model_config)
+
+            if freeze_params_list[index]:
                 for param in model.parameters():
                     param.trainable = False
             self.model_list.append(self.add_sublayer(key, model))
             self.model_name_list.append(key)
 
+        if pretrained_list is not None:
+            for idx, pretrained in enumerate(pretrained_list):
+                if pretrained is not None:
+                    load_dygraph_pretrain(
+                        self.model_name_list[idx], path=pretrained)
+
     def forward(self, x, label=None):
-        return None
+        result_dict = dict()
+        for idx, model_name in enumerate(self.model_name_list):
+            if label is None:
+                result_dict[model_name] = self.model_list[idx](x)
+            else:
+                result_dict[model_name] = self.model_list[idx](x)
+        return result_dict
