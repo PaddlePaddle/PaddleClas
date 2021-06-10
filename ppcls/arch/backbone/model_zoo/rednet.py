@@ -20,6 +20,9 @@ MODEL_URLS = {
 }
 
 
+__all__ = MODEL_URLS.keys()
+
+
 class Involution(nn.Layer):
     def __init__(self, channels, kernel_size, stride):
         super(Involution, self).__init__()

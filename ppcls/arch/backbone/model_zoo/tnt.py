@@ -16,6 +16,9 @@ MODEL_URLS = {
 }
 
 
+__all__ = MODEL_URLS.keys()
+
+
 trunc_normal_ = TruncatedNormal(std=.02)
 zeros_ = Constant(value=0.)
 ones_ = Constant(value=1.)

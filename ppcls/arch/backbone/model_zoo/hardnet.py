@@ -16,6 +16,9 @@ MODEL_URLS = {
 }
 
 
+__all__ = MODEL_URLS.keys()
+
+
 def ConvLayer(in_channels, out_channels, kernel_size=3, stride=1, bias_attr=False):
     layer = nn.Sequential(
         ('conv', nn.Conv2D(
