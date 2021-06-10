@@ -18,7 +18,7 @@ Global:
 # model architecture
 Arch:
   name: DLA46_c
- 
+
 # loss function config for traing/eval process
 Loss:
   Train:
@@ -50,6 +50,9 @@ DataLoader:
       image_root: ./dataset/ILSVRC2012/
       cls_label_path: ./dataset/ILSVRC2012/train_list.txt
       transform_ops:
+        - DecodeImage:
+            to_rgb: True
+            channel_first: False
         - RandCropImage:
             size: 224
         - RandFlipImage:
@@ -76,6 +79,9 @@ DataLoader:
       image_root: ./dataset/ILSVRC2012/
       cls_label_path: ./dataset/ILSVRC2012/val_list.txt
       transform_ops:
+        - DecodeImage:
+            to_rgb: True
+            channel_first: False
         - ResizeImage:
             resize_short: 256
         - CropImage:
