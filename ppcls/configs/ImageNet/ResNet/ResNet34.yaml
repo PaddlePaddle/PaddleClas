@@ -2,8 +2,8 @@
 Global:
   checkpoints: null
   pretrained_model: null
-  output_dir: "./output/"
-  device: "gpu"
+  output_dir: ./output/
+  device: gpu
   class_num: 1000
   save_interval: 1
   eval_during_train: True
@@ -13,11 +13,11 @@ Global:
   use_visualdl: False
   # used for static mode and model export
   image_shape: [3, 224, 224]
-  save_inference_dir: "./inference"
+  save_inference_dir: ./inference
 
 # model architecture
 Arch:
-  name: "ResNet34"
+  name: ResNet34
  
 # loss function config for traing/eval process
 Loss:
@@ -30,10 +30,10 @@ Loss:
 
 
 Optimizer:
-  name: "Momentum"
+  name: Momentum
   momentum: 0.9
   lr:
-    name: "Piecewise"
+    name: Piecewise
     learning_rate: 0.1
     decay_epochs: [30, 60, 90]
     values: [0.1, 0.01, 0.001, 0.0001]
@@ -46,9 +46,9 @@ Optimizer:
 DataLoader:
   Train:
     dataset:
-      name: "ImageNetDataset"
-      image_root: "./dataset/ILSVRC2012/"
-      cls_label_path: "./dataset/ILSVRC2012/train_list.txt"
+      name: ImageNetDataset
+      image_root: ./dataset/ILSVRC2012/
+      cls_label_path: ./dataset/ILSVRC2012/train_list.txt
       transform_ops:
         - RandCropImage:
             size: 224
@@ -61,20 +61,20 @@ DataLoader:
             order: ''
 
     sampler:
-      name: "DistributedBatchSampler"
+      name: DistributedBatchSampler
       batch_size: 64
       drop_last: False
       shuffle: True
     loader:
-      num_workers: 6
+      num_workers: 4
       use_shared_memory: True
 
   Eval:
     # TOTO: modify to the latest trainer
     dataset: 
-      name: "ImageNetDataset"
-      image_root: "./dataset/ILSVRC2012/"
-      cls_label_path: "./dataset/ILSVRC2012/val_list.txt"
+      name: ImageNetDataset
+      image_root: ./dataset/ILSVRC2012/
+      cls_label_path: ./dataset/ILSVRC2012/val_list.txt
       transform_ops:
         - ResizeImage:
             resize_short: 256
@@ -86,16 +86,16 @@ DataLoader:
             std: [0.229, 0.224, 0.225]
             order: ''
     sampler:
-      name: "DistributedBatchSampler"
+      name: DistributedBatchSampler
       batch_size: 64
       drop_last: False
       shuffle: False
     loader:
-      num_workers: 6
+      num_workers: 4
       use_shared_memory: True
 
 Infer:
-  infer_imgs: "docs/images/whl/demo.jpg"
+  infer_imgs: docs/images/whl/demo.jpg
   batch_size: 10
   transforms:
     - DecodeImage:
@@ -112,9 +112,9 @@ Infer:
         order: ''
     - ToCHWImage:
   PostProcess:
-    name: "Topk"
+    name: Topk
     topk: 5
-    class_id_map_file: "ppcls/utils/imagenet1k_label_list.txt"
+    class_id_map_file: ppcls/utils/imagenet1k_label_list.txt
 
 Metric:
   Train:
