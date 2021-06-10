@@ -3,9 +3,9 @@ Global:
   checkpoints: null
 # please download pretrained model via this link:
 # https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/pretrain/product_ResNet50_vd_Aliproduct_v1.0_pretrained.pdparams
-  pretrained_model: "product_ResNet50_vd_Aliproduct_v1.0_pretrained"
-  output_dir: "./output/"
-  device: "gpu"
+  pretrained_model: product_ResNet50_vd_Aliproduct_v1.0_pretrained
+  output_dir: ./output/
+  device: gpu
   class_num: 11319
   save_interval: 10
   eval_during_train: True
@@ -15,28 +15,28 @@ Global:
   use_visualdl: False
   # used for static mode and model export
   image_shape: [3, 224, 224]
-  save_inference_dir: "./inference"
-  eval_mode: "retrieval"
+  save_inference_dir: ./inference
+  eval_mode: retrieval
 
 # model architecture
 Arch:
-  name: "RecModel"
+  name: RecModel
   Backbone: 
-    name: "ResNet50_vd"
+    name: ResNet50_vd
     pretrained: False
   BackboneStopLayer:
-    name: "flatten_0"
+    name: flatten_0
   Neck:
-    name: "FC"
+    name: FC
     embedding_size: 2048
     class_num: 512
   Head:
-    name: "ArcMargin"  
+    name: ArcMargin  
     embedding_size: 512
     class_num: 11319
     margin: 0.15
     scale: 30
-  infer_output_key: "features"
+  infer_output_key: features
   infer_add_softmax: False
 
 # loss function config for traing/eval process
@@ -69,9 +69,9 @@ Optimizer:
 DataLoader:
   Train:
     dataset:
-      name: "ImageNetDataset"
-      image_root: "./dataset/Stanford_Online_Products/"
-      cls_label_path: "./dataset/Stanford_Online_Products/train_list.txt"
+      name: ImageNetDataset
+      image_root: ./dataset/Stanford_Online_Products/
+      cls_label_path: ./dataset/Stanford_Online_Products/train_list.txt
       transform_ops:
         - ResizeImage:
             size: 224
@@ -101,9 +101,9 @@ DataLoader:
   Eval:
     Query:
       dataset: 
-        name: "ImageNetDataset"
-        image_root: "./dataset/Stanford_Online_Products/"
-        cls_label_path: "./dataset/Stanford_Online_Products/test_list.txt"
+        name: ImageNetDataset
+        image_root: ./dataset/Stanford_Online_Products/
+        cls_label_path: ./dataset/Stanford_Online_Products/test_list.txt
         transform_ops:
           - ResizeImage:
               size: 224
@@ -123,9 +123,9 @@ DataLoader:
 
     Gallery:
       dataset: 
-        name: "ImageNetDataset"
-        image_root: "./dataset/Stanford_Online_Products/"
-        cls_label_path: "./dataset/Stanford_Online_Products/test_list.txt"
+        name: ImageNetDataset
+        image_root: ./dataset/Stanford_Online_Products/
+        cls_label_path: ./dataset/Stanford_Online_Products/test_list.txt
         transform_ops:
           - ResizeImage:
               size: 224
@@ -149,7 +149,7 @@ Metric:
         topk: [1, 5]
 
 Infer:
-  infer_imgs: "docs/images/whl/demo.jpg"
+  infer_imgs: docs/images/whl/demo.jpg
   batch_size: 10
   transforms:
     - DecodeImage:

@@ -2,8 +2,8 @@
 Global:
   checkpoints: null
   pretrained_model: null
-  output_dir: "./output/"
-  device: "gpu"
+  output_dir: ./output/
+  device: gpu
   class_num: 50030
   save_interval: 1
   eval_during_train: True
@@ -13,23 +13,23 @@ Global:
   use_visualdl: False
   # used for static mode and model export
   image_shape: [3, 224, 224]
-  save_inference_dir: "./inference"
-  eval_mode: "classification"
+  save_inference_dir: ./inference
+  eval_mode: classification
 
 # model architecture
 Arch:
-  name: "RecModel"
+  name: RecModel
   Backbone: 
-    name: "ResNet50_vd"
+    name: ResNet50_vd
     pretrained: True
   BackboneStopLayer:
-    name: "flatten_0"
+    name: flatten_0
   Neck:
-    name: "FC"
+    name: FC
     embedding_size: 2048
     class_num: 512
   Head:
-    name: "FC"  
+    name: FC  
     embedding_size: 512
     class_num: 50030
  
@@ -56,9 +56,9 @@ Optimizer:
 DataLoader:
   Train:
     dataset:
-      name: "ImageNetDataset"
-      image_root: "./dataset/Aliproduct/"
-      cls_label_path: "./dataset/Aliproduct/train_list.txt"
+      name: ImageNetDataset
+      image_root: ./dataset/Aliproduct/
+      cls_label_path: ./dataset/Aliproduct/train_list.txt
       transform_ops:
         - ResizeImage:
             size: 224
@@ -81,9 +81,9 @@ DataLoader:
   Eval:
     # TOTO: modify to the latest trainer
     dataset: 
-      name: "ImageNetDataset"
-      image_root: "./dataset/Aliproduct/"
-      cls_label_path: "./dataset/Aliproduct/val_list.txt"
+      name: ImageNetDataset
+      image_root: ./dataset/Aliproduct/
+      cls_label_path: ./dataset/Aliproduct/val_list.txt
       transform_ops:
         - ResizeImage:
             resize_short: 256
@@ -111,7 +111,7 @@ Metric:
         topk: [1, 5]
 
 Infer:
-  infer_imgs: "docs/images/whl/demo.jpg"
+  infer_imgs: docs/images/whl/demo.jpg
   batch_size: 10
   transforms:
     - DecodeImage:
