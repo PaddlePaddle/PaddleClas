@@ -17,8 +17,8 @@ Global:
 
 # model architecture
 Arch:
-  name: RedNet26
- 
+  name: DLA102
+
 # loss function config for traing/eval process
 Loss:
   Train:
