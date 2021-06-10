@@ -60,6 +60,9 @@ DataLoader:
       image_root: ./dataset/Aliproduct/
       cls_label_path: ./dataset/Aliproduct/train_list.txt
       transform_ops:
+        - DecodeImage:
+            to_rgb: True
+            channel_first: False
         - ResizeImage:
             size: 224
         - RandFlipImage:
@@ -85,6 +88,9 @@ DataLoader:
       image_root: ./dataset/Aliproduct/
       cls_label_path: ./dataset/Aliproduct/val_list.txt
       transform_ops:
+        - DecodeImage:
+            to_rgb: True
+            channel_first: False
         - ResizeImage:
             resize_short: 256
         - CropImage:

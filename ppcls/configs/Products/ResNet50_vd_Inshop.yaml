@@ -74,6 +74,9 @@ DataLoader:
       image_root: ./dataset/Inshop/
       cls_label_path: ./dataset/Inshop/train_list.txt
       transform_ops:
+        - DecodeImage:
+            to_rgb: True
+            channel_first: False
         - ResizeImage:
             size: 224
         - RandFlipImage:
@@ -106,6 +109,9 @@ DataLoader:
         image_root: ./dataset/Inshop/
         cls_label_path: ./dataset/Inshop/query_list.txt
         transform_ops:
+          - DecodeImage:
+              to_rgb: True
+              channel_first: False
           - ResizeImage:
               size: 224
           - NormalizeImage:
@@ -128,6 +134,9 @@ DataLoader:
         image_root: ./dataset/Inshop/
         cls_label_path: ./dataset/Inshop/gallery_list.txt
         transform_ops:
+          - DecodeImage:
+              to_rgb: True
+              channel_first: False
           - ResizeImage:
               size: 224
           - NormalizeImage:
