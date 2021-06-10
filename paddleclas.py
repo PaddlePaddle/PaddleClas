@@ -24,6 +24,7 @@ import shutil
 import textwrap
 import tarfile
 import requests
+import warnings
 from functools import partial
 from difflib import SequenceMatcher
 
@@ -41,7 +42,7 @@ BASE_DIR = os.path.expanduser("~/.paddleclas/")
 BASE_INFERENCE_MODEL_DIR = os.path.join(BASE_DIR, 'inference_model')
 BASE_IMAGES_DIR = os.path.join(BASE_DIR, 'images')
 BASE_DOWNLOAD_URL = "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/{}_infer.tar"
-model_series = {
+MODEL_SERIES = {
     "AlexNet": ["AlexNet"],
     "DarkNet": ["DarkNet53"],
     "DeiT": [
@@ -143,16 +144,24 @@ model_series = {
 }
 
 
-class ModelNameError(Exception):
-    """ ModelNameError
+class ImageTypeError(Exception):
+    """ImageTypeError.
     """
 
-    def __init__(self, message=''):
+    def __init__(self, message=""):
+        super().__init__(message)
+
+
+class InputModelError(Exception):
+    """InputModelError.
+    """
+
+    def __init__(self, message=""):
         super().__init__(message)
 
 
 def print_info():
-    """
+    """Print list of supported models in formatted.
     """
     table = PrettyTable(['Series', 'Name'])
     try:
@@ -160,8 +169,8 @@ def print_info():
         width = sz.columns - 30 if sz.columns > 50 else 10
     except OSError:
         width = 100
-    for series in model_series:
-        names = textwrap.fill("  ".join(model_series[series]), width=width)
+    for series in MODEL_SERIES:
+        names = textwrap.fill("  ".join(MODEL_SERIES[series]), width=width)
         table.add_row([series, names])
     width = len(str(table).split("\n")[0])
     print("{}".format("-" * width))
@@ -172,15 +181,16 @@ def print_info():
 
 
 def get_model_names():
+    """Get the model names list.
+    """
     model_names = []
-    for series in model_series:
-        model_names += model_series[series]
+    for series in MODEL_SERIES:
+        model_names += (MODEL_SERIES[series])
     return model_names
 
 
 def similar_architectures(name='', names=[], thresh=0.1, topk=10):
-    """
-    inferred similar architectures
+    """Find the most similar topk model names.
     """
     scores = []
     for idx, n in enumerate(names):
@@ -195,6 +205,8 @@ def similar_architectures(name='', names=[], thresh=0.1, topk=10):
 
 
 def download_with_progressbar(url, save_path):
+    """Download from url with progressbar.
+    """
     if os.path.isfile(save_path):
         os.remove(save_path)
     response = requests.get(url, stream=True)
@@ -206,14 +218,15 @@ def download_with_progressbar(url, save_path):
             progress_bar.update(len(data))
             file.write(data)
     progress_bar.close()
-    if total_size_in_bytes == 0 or progress_bar.n != total_size_in_bytes:
+    if total_size_in_bytes == 0 or progress_bar.n != total_size_in_bytes or not os.path.isfile(
+            save_path):
         raise Exception(
-            "Something went wrong while downloading model/image from {}".
-            format(url))
-    assert os.path.isfile(save_path), "Download Error"
+            f"Something went wrong while downloading model/image from {url}")
 
 
-def check_download(model_name):
+def check_model_file(model_name):
+    """Check the model files exist and download and untar when no exist. 
+    """
     storage_directory = partial(os.path.join, BASE_INFERENCE_MODEL_DIR,
                                 model_name)
     url = BASE_DOWNLOAD_URL.format(model_name)
@@ -226,7 +239,7 @@ def check_download(model_name):
     if not os.path.exists(model_file_path) or not os.path.exists(
             params_file_path):
         tmp_path = storage_directory(url.split('/')[-1])
-        print('download {} to {}'.format(url, tmp_path))
+        print(f'download {url} to {tmp_path}')
         os.makedirs(storage_directory(), exist_ok=True)
         download_with_progressbar(url, tmp_path)
         with tarfile.open(tmp_path, 'r') as tarObj:
@@ -241,12 +254,18 @@ def check_download(model_name):
                 with open(storage_directory(filename), 'wb') as f:
                     f.write(file.read())
         os.remove(tmp_path)
-    assert os.path.exists(model_file_path) or not os.path.exists(
-        params_file_path), "The model prepared error!"
+    if not os.path.exists(model_file_path) or not os.path.exists(
+            params_file_path):
+        raise Exception(
+            f"Something went wrong while praparing the model[{model_name}] files!"
+        )
+
     return storage_directory()
 
 
 def save_prelabel_results(class_id, input_file_path, output_dir):
+    """Save the predicted image according to the prediction.
+    """
     output_dir = os.path.join(output_dir, str(class_id))
     if not os.path.isdir(output_dir):
         os.makedirs(output_dir)
@@ -254,32 +273,59 @@ def save_prelabel_results(class_id, input_file_path, output_dir):
 
 
 class PaddleClas(object):
+    """PaddleClas.
+    """
+
     print_info()
 
     def __init__(self, config):
+        """Init PaddleClas with config.
+        """
+        super().__init__()
+        self.config = config
+        self._check_input_model()
+        self.cls_predictor = ClsPredictor(config)
+
+    def _check_input_model(self):
+        """Check input model name or model files.
+        """
         candidate_model_names = get_model_names()
-        input_model_name = config.Global.get("model_name", None)
+        input_model_name = self.config.Global.get("model_name", None)
+        inference_model_dir = self.config.Global.get("inference_model_dir",
+                                                     None)
         if input_model_name is not None:
             similar_names = similar_architectures(input_model_name,
                                                   candidate_model_names)
             similar_names_str = ', '.join(similar_names)
             if input_model_name not in similar_names_str:
                 err = f"{input_model_name} is not exist! Maybe you want: [{similar_names_str}]"
-                raise ModelNameError(err)
+                raise InputModelError(err)
             if input_model_name not in candidate_model_names:
                 err = f"{input_model_name} is not provided by PaddleClas. If you want to use your own model, please input model_file as model path!"
-                raise ModelNameError(err)
-            config.inference_model_dir = check_download(input_model_name)
-        self.config = config
-        self.cls_predictor = ClsPredictor(config)
+                raise InputModelError(err)
+            self.config.inference_model_dir = check_model_file(
+                input_model_name)
+            return
+        elif inference_model_dir is not None:
+            model_file_path = os.path.join(inference_model_dir,
+                                           "inference.pdmodel")
+            params_file_path = os.path.join(inference_model_dir,
+                                            "inference.pdiparams")
+            if not os.path.isfile(model_file_path) or not os.path.isfile(
+                    params_file_path):
+                err = f"There is no model file or params file in this directory: {inference_model_dir}"
+                raise InputModelError(err)
+            return
+        else:
+            err = f"Please specify the model name supported by PaddleClas or directory contained model file and params file."
+            raise InputModelError(err)
+        return
 
     def predict(self, input_data, print_pred=True):
-        """
-        predict label of img with paddleclas
+        """Predict label of img with paddleclas.
         Args:
-            input_data(string, NumPy.ndarray): image to be classified, support:
-                string: local path of image file, internet URL, directory containing series of images;
-                NumPy.ndarray: preprocessed image data that has 3 channels and accords with [C, H, W], or raw image data that has 3 channels and accords with [H, W, C]
+            input_data(str, NumPy.ndarray): 
+                image to be classified, support: str(local path of image file, internet URL, directory containing series of images) and NumPy.ndarray(preprocessed image data that has 3 channels and accords with [C, H, W], or raw image data that has 3 channels and accords with [H, W, C]).
         Returns:
             dict: {image_name: "", class_id: [], scores: [], label_names: []}，if label name path == None，label_names will be empty.
         """
@@ -293,7 +339,7 @@ class PaddleClas(object):
                 image_save_path = image_storage_dir("tmp.jpg")
                 download_with_progressbar(input_data, image_save_path)
                 input_data = image_save_path
-                print(
+                warnings.warn(
                     f"Image to be predicted from Internet: {input_data}, has been saved to: {image_save_path}"
                 )
             image_list = get_image_list(input_data)
@@ -309,9 +355,9 @@ class PaddleClas(object):
             for idx, img_path in enumerate(image_list):
                 img = cv2.imread(img_path)
                 if img is None:
-                    print(
-                        "Warning: Image file failed to read and has been skipped. The path: {}".
-                        format(img_path))
+                    warnings.warn(
+                        f"Image file failed to read and has been skipped. The path: {img_path}"
+                    )
                     continue
                 img_list.append(img)
                 img_path_list.append(img_path)
@@ -319,28 +365,33 @@ class PaddleClas(object):
 
                 if cnt % batch_size == 0 or (idx + 1) == len(image_list):
                     outputs = self.cls_predictor.predict(img_list)
-                    preds = self.cls_predictor.postprocess(outputs)
                     output_list.append(outputs[0])
+                    preds = self.cls_predictor.postprocess(outputs)
                     for nu, pred in enumerate(preds):
                         if pre_label_out_idr:
                             save_prelabel_results(pred["class_ids"][0],
                                                   img_path_list[nu],
                                                   pre_label_out_idr)
                         if print_pred:
-                            pred_str = f"filename: {img_path_list[nu]}, top-{self.config.PostProcess.get('topk', 1)}, "
-                            pred_str += ", ".join("{}: {}".format(k, v)
-                                                  for k, v in pred.items())
-                            print(pred_str)
+                            pred_str_list = [
+                                f"filename: {img_path_list[nu]}",
+                                f"top-{self.config.PostProcess.get('topk', 1)}"
+                            ]
+                            for k in pred:
+                                pred_str_list.append(f"{k}: {pred[k]}")
+                            print(", ".join(pred_str_list))
                     img_list = []
                     img_path_list = []
             return output_list
         else:
-            err = "Error: Please input legal image! The type of image supported by PaddleClas are: NumPy.ndarray and string of local path or Ineternet URL"
-            raise Exception(err)
+            err = "Please input legal image! The type of image supported by PaddleClas are: NumPy.ndarray and string of local path or Ineternet URL"
+            raise ImageTypeError(err)
 
 
 # for cmd
 def main():
+    """Function API used for commad line.
+    """
     args = config.parse_args()
     cfg = config.get_config(
         args.config, overrides=args.override, show=args.verbose)
