@@ -12,10 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from collections import Callable
+
 import numpy as np
 import paddle
 import paddle.nn as nn
-from paddle.nn.initializer import TruncatedNormal, Constant
+from paddle.nn.initializer import TruncatedNormal, Constant, Normal
 
 __all__ = [
     "VisionTransformer", "ViT_small_patch16_224", "ViT_base_patch16_224",
@@ -25,6 +27,7 @@ __all__ = [
 ]
 
 trunc_normal_ = TruncatedNormal(std=.02)
+normal_ = Normal
 zeros_ = Constant(value=0.)
 ones_ = Constant(value=1.)
 
@@ -141,7 +144,13 @@ class Block(nn.Layer):
                  norm_layer='nn.LayerNorm',
                  epsilon=1e-5):
         super().__init__()
-        self.norm1 = eval(norm_layer)(dim, epsilon=epsilon)
+        if isinstance(norm_layer, str):
+            self.norm1 = eval(norm_layer)(dim, epsilon=epsilon)
+        elif isinstance(norm_layer, Callable):
+            self.norm1 = norm_layer(dim)
+        else:
+            raise TypeError(
+                "The norm_layer must be str or paddle.nn.layer.Layer class")
         self.attn = Attention(
             dim,
             num_heads=num_heads,
@@ -151,7 +160,13 @@ class Block(nn.Layer):
             proj_drop=drop)
         # NOTE: drop path for stochastic depth, we shall see if this is better than dropout here
         self.drop_path = DropPath(drop_path) if drop_path > 0. else Identity()
-        self.norm2 = eval(norm_layer)(dim, epsilon=epsilon)
+        if isinstance(norm_layer, str):
+            self.norm2 = eval(norm_layer)(dim, epsilon=epsilon)
+        elif isinstance(norm_layer, Callable):
+            self.norm2 = norm_layer(dim)
+        else:
+            raise TypeError(
+                "The norm_layer must be str or paddle.nn.layer.Layer class")
         mlp_hidden_dim = int(dim * mlp_ratio)
         self.mlp = Mlp(in_features=dim,
                        hidden_features=mlp_hidden_dim,
