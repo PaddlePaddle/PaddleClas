@@ -35,8 +35,8 @@ from ppcls.data.preprocess import transform
 
 
 def build_dataloader(config, mode, device, seed=None):
-    assert mode in ['Train', 'Eval', 'Test', 'Gallery', 'Query'
-                    ], "Mode should be Train, Eval, Test, Gallery or Query"
+    assert mode in ['Train', 'Eval', 'Test', 
+                    ], "Mode should be Train, Eval, Test"
     # build dataset
     config_dataset = config[mode]['dataset']
     config_dataset = copy.deepcopy(config_dataset)
