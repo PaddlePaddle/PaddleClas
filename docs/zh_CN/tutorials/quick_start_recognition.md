@@ -113,8 +113,8 @@ python3.7 python/predict_system.py -c configs/inference_logo.yaml
 ```yaml
 Global:
   infer_imgs: "./dataset/logo_demo_data_v1.0/query/" # 预测图像
-  det_inference_model_dir: "./models/logo_rec_ResNet50_Logo3K_v1.0_infer/" # 检测inference模型文件夹
-  rec_inference_model_dir: "./models/ppyolov2_r50vd_dcn_mainbody_v1.0_infer/" # 识别inference模型文件夹
+  det_inference_model_dir: "./models/ppyolov2_r50vd_dcn_mainbody_v1.0_infer/" # 检测inference模型文件夹
+  rec_inference_model_dir: "./models/logo_rec_ResNet50_Logo3K_v1.0_infer/" # 识别inference模型文件夹
   batch_size: 1 # 预测的批大小
   image_shape: [3, 640, 640] # 检测的图像尺寸
   threshold: 0.5 # 检测的阈值，得分超过该阈值的检测框才会被检出
