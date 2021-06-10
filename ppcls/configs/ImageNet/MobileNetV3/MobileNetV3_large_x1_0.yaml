@@ -31,10 +31,10 @@ Loss:
 
 
 Optimizer:
-  name: Momentum
+  name: "Momentum"
   momentum: 0.9
   lr:
-    name: Cosine
+    name: "Cosine"
     learning_rate: 1.3
   regularizer:
     name: 'L2'
@@ -45,81 +45,81 @@ Optimizer:
 DataLoader:
   Train:
     dataset:
-        name: ImageNetDataset
-        image_root: "./dataset/ILSVRC2012/"
-        cls_label_path: "./dataset/ILSVRC2012/train_list.txt"
-        transform_ops:
-          - RandCropImage:
-              size: 224
-          - RandFlipImage:
-              flip_code: 1
-          - AutoAugment:
-          - NormalizeImage:
-              scale: 0.00392157
-              mean: [0.485, 0.456, 0.406]
-              std: [0.229, 0.224, 0.225]
-              order: ''
+      name: "ImageNetDataset"
+      image_root: "./dataset/ILSVRC2012/"
+      cls_label_path: "./dataset/ILSVRC2012/train_list.txt"
+      transform_ops:
+        - RandCropImage:
+            size: 224
+        - RandFlipImage:
+            flip_code: 1
+        - AutoAugment:
+        - NormalizeImage:
+            scale: 1.0/255.0
+            mean: [0.485, 0.456, 0.406]
+            std: [0.229, 0.224, 0.225]
+            order: ''
 
     sampler:
-        name: DistributedBatchSampler
-        batch_size: 512
-        drop_last: False
-        shuffle: True
+      name: "DistributedBatchSampler"
+      batch_size: 512
+      drop_last: False
+      shuffle: True
     loader:
-        num_workers: 6
-        use_shared_memory: True
+      num_workers: 4
+      use_shared_memory: True
 
   Eval:
     # TOTO: modify to the latest trainer
     dataset: 
-        name: ImageNetDataset
-        image_root: "./dataset/ILSVRC2012/"
-        cls_label_path: "./dataset/ILSVRC2012/val_list.txt"
-        transform_ops:
-          - ResizeImage:
-              resize_short: 256
-          - CropImage:
-              size: 224
-          - NormalizeImage:
-              scale: 0.00392157
-              mean: [0.485, 0.456, 0.406]
-              std: [0.229, 0.224, 0.225]
-              order: ''
+      name: "ImageNetDataset"
+      image_root: "./dataset/ILSVRC2012/"
+      cls_label_path: "./dataset/ILSVRC2012/val_list.txt"
+      transform_ops:
+        - ResizeImage:
+            resize_short: 256
+        - CropImage:
+            size: 224
+        - NormalizeImage:
+            scale: 1.0/255.0
+            mean: [0.485, 0.456, 0.406]
+            std: [0.229, 0.224, 0.225]
+            order: ''
     sampler:
-        name: DistributedBatchSampler
-        batch_size: 64
-        drop_last: False
-        shuffle: False
+      name: "DistributedBatchSampler"
+      batch_size: 64
+      drop_last: False
+      shuffle: False
     loader:
-        num_workers: 6
-        use_shared_memory: True
+      num_workers: 4
+      use_shared_memory: True
 
 Infer:
   infer_imgs: "docs/images/whl/demo.jpg"
   batch_size: 10
   transforms:
-      - DecodeImage:
-          to_rgb: True
-          channel_first: False
-      - ResizeImage:
-          resize_short: 256
-      - CropImage:
-          size: 224
-      - NormalizeImage:
-          scale: 1.0/255.0
-          mean: [0.485, 0.456, 0.406]
-          std: [0.229, 0.224, 0.225]
-          order: ''
-      - ToCHWImage:
+    - DecodeImage:
+        to_rgb: True
+        channel_first: False
+    - ResizeImage:
+        resize_short: 256
+    - CropImage:
+        size: 224
+    - NormalizeImage:
+        scale: 1.0/255.0
+        mean: [0.485, 0.456, 0.406]
+        std: [0.229, 0.224, 0.225]
+        order: ''
+    - ToCHWImage:
   PostProcess:
-    name: Topk
+    name: "Topk"
     topk: 5
     class_id_map_file: "ppcls/utils/imagenet1k_label_list.txt"
 
 Metric:
-    Train:
+  Train:
     - TopkAcc:
         topk: [1, 5]
-    Eval:
+  Eval:
     - TopkAcc:
         topk: [1, 5]

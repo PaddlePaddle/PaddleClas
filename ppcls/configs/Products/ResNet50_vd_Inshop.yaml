@@ -1,7 +1,9 @@
 # global configs
 Global:
   checkpoints: null
-  pretrained_model: null
+# please download pretrained model via this link:
+# https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/pretrain/product_ResNet50_vd_Aliproduct_v1.0_pretrained.pdparams
+  pretrained_model: "product_ResNet50_vd_Aliproduct_v1.0_pretrained"
   output_dir: "./output/"
   device: "gpu"
   class_num: 3997
@@ -19,6 +21,9 @@ Global:
 # model architecture
 Arch:
   name: "RecModel"
+  infer_output_key: "features"
+  infer_add_softmax: False
+  
   Backbone: 
     name: "ResNet50_vd"
     pretrained: False
@@ -34,8 +39,6 @@ Arch:
     class_num: 3997
     margin: 0.15
     scale: 30
-  infer_output_key: "features"
-  infer_add_softmax: False
    
 # loss function config for traing/eval process
 Loss:
@@ -67,38 +70,37 @@ Optimizer:
 DataLoader:
   Train:
     dataset:
-        name: "ImageNetDataset"
-        image_root: "./dataset/Inshop/"
-        cls_label_path: "./dataset/Inshop/train_list.txt"
-        transform_ops:
-          - ResizeImage:
-              size: 224
-          - RandFlipImage:
-              flip_code: 1
-          - NormalizeImage:
-              scale: 0.00392157
-              mean: [0.485, 0.456, 0.406]
-              std: [0.229, 0.224, 0.225]
-              order: ''
-          - RandomErasing:
-              EPSILON: 0.5
-              sl: 0.02
-              sh: 0.4
-              r1: 0.3
-              mean: [0., 0., 0.]
-
+      name: "ImageNetDataset"
+      image_root: "./dataset/Inshop/"
+      cls_label_path: "./dataset/Inshop/train_list.txt"
+      transform_ops:
+        - ResizeImage:
+            size: 224
+        - RandFlipImage:
+            flip_code: 1
+        - NormalizeImage:
+            scale: 0.00392157
+            mean: [0.485, 0.456, 0.406]
+            std: [0.229, 0.224, 0.225]
+            order: ''
+        - RandomErasing:
+            EPSILON: 0.5
+            sl: 0.02
+            sh: 0.4
+            r1: 0.3
+            mean: [0., 0., 0.]
     sampler:
-        name: DistributedRandomIdentitySampler
-        batch_size: 64
-        num_instances: 2
-        drop_last: False
-        shuffle: True
+      name: "DistributedRandomIdentitySampler"
+      batch_size: 64
+      num_instances: 2
+      drop_last: False
+      shuffle: True
     loader:
-        num_workers: 6
-        use_shared_memory: True
+      num_workers: 4
+      use_shared_memory: True
+      
   Eval:
     Query:
-    # TOTO: modify to the latest trainer
       dataset: 
         name: "ImageNetDataset"
         image_root: "./dataset/Inshop/"
@@ -112,16 +114,15 @@ DataLoader:
               std: [0.229, 0.224, 0.225]
               order: ''
       sampler:
-        name: DistributedBatchSampler
+        name: "DistributedBatchSampler"
         batch_size: 64
         drop_last: False
         shuffle: False
       loader:
-        num_workers: 6
+        num_workers: 4
         use_shared_memory: True
 
     Gallery:
-    # TOTO: modify to the latest trainer
       dataset: 
         name: "ImageNetDataset"
         image_root: "./dataset/Inshop/"
@@ -130,17 +131,17 @@ DataLoader:
           - ResizeImage:
               size: 224
           - NormalizeImage:
-              scale: 0.00392157
+              scale: 1.0/255.0
               mean: [0.485, 0.456, 0.406]
               std: [0.229, 0.224, 0.225]
               order: ''
       sampler:
-        name: DistributedBatchSampler
+        name: "DistributedBatchSampler"
         batch_size: 64
         drop_last: False
         shuffle: False
       loader:
-        num_workers: 6
+        num_workers: 4
         use_shared_memory: True
 
 Metric:
@@ -152,14 +153,14 @@ Infer:
   infer_imgs: "docs/images/whl/demo.jpg"
   batch_size: 10
   transforms:
-      - DecodeImage:
-          to_rgb: True
-          channel_first: False
-      - ResizeImage:
-          resize_short: 224
-      - NormalizeImage:
-          scale: 1.0/255.0
-          mean: [0.485, 0.456, 0.406]
-          std: [0.229, 0.224, 0.225]
-          order: ''
-      - ToCHWImage:
+    - DecodeImage:
+        to_rgb: True
+        channel_first: False
+    - ResizeImage:
+        resize_short: 224
+    - NormalizeImage:
+        scale: 1.0/255.0
+        mean: [0.485, 0.456, 0.406]
+        std: [0.229, 0.224, 0.225]
+        order: ''
+    - ToCHWImage:

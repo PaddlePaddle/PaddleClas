@@ -66,7 +66,7 @@ DataLoader:
       drop_last: False
       shuffle: True
     loader:
-      num_workers: 6
+      num_workers: 4
       use_shared_memory: True
 
   Eval:
@@ -91,7 +91,7 @@ DataLoader:
       drop_last: False
       shuffle: False
     loader:
-      num_workers: 6
+      num_workers: 4
       use_shared_memory: True
 
 Infer:
