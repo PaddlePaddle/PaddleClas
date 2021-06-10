@@ -63,8 +63,8 @@ class CommonDataset(Dataset):
 
     def __getitem__(self, idx):
         try:
-            img = cv2.imread(self.images[idx])
-            img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+            with open(self.images[idx], 'rb') as f:
+                img = f.read()
             if self._transform_ops:
                 img = transform(img, self._transform_ops)
             img = img.transpose((2, 0, 1))
