@@ -1,7 +1,7 @@
 Global:
-  infer_imgs: "./vehicle/demo/2e3521935c280c.jpg"
-  det_inference_model_dir: "./det/"
-  rec_inference_model_dir: "./vehicle/rec/"
+  infer_imgs: "./dataset/vehicle_demo_data_v1.0/query/"
+  det_inference_model_dir: "./models/ppyolov2_r50vd_dcn_mainbody_v1.0_infer/"
+  rec_inference_model_dir: "./models/vehicle_cls_ResNet50_CompCars_v1.0_infer/"
   batch_size: 1
   image_shape: [3, 640, 640]
   threshold: 0.5
@@ -50,7 +50,7 @@ RecPostProcess: null
 
 # indexing engine config
 IndexProcess:
-    index_path: "./vehicle_index/"
+    index_path: "./dataset/vehicle_demo_data_v1.0/index/"
     search_budget: 100
-    return_k: 10
+    return_k: 5
     dist_type: "IP"

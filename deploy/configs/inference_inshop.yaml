@@ -50,5 +50,5 @@ RecPostProcess: null
 IndexProcess:
   index_path: "./dataset/product_demo_data_v1.0/index"
   search_budget: 100
-  return_k: 10
+  return_k: 5
   dist_type: "IP"

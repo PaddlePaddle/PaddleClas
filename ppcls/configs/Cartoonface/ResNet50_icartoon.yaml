@@ -138,4 +138,4 @@ Metric:
         topk: [1, 5]
     Eval:
     - Recallk:
-        topk: 1
+        topk: [1]
