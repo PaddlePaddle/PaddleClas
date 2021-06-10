@@ -3,3 +3,7 @@ include README.md
 include docs/en/whl_en.md
 recursive-include deploy/python predict_cls.py preprocess.py postprocess.py det_preprocess.py
 recursive-include deploy/utils get_image_list.py config.py logger.py predictor.py
+
+include ppcls/arch/backbone/__init__.py
+recursive-include ppcls/arch/backbone/legendary_models *.py
+recursive-include ppcls/arch/backbone/model_zoo *.py

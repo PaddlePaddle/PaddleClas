@@ -37,7 +37,10 @@ from deploy.python.predict_cls import ClsPredictor
 from deploy.utils.get_image_list import get_image_list
 from deploy.utils import config
 
+from ppcls.arch.backbone import *
+
 __all__ = ['PaddleClas']
+
 BASE_DIR = os.path.expanduser("~/.paddleclas/")
 BASE_INFERENCE_MODEL_DIR = os.path.join(BASE_DIR, 'inference_model')
 BASE_IMAGES_DIR = os.path.join(BASE_DIR, 'images')
