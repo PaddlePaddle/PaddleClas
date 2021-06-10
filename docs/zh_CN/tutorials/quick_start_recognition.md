@@ -4,9 +4,10 @@
 
 ## 1. 环境配置
 
-请先参考[快速安装](./installation.md)配置PaddleClas运行环境。
+* 请先参考[快速安装](./installation.md)配置PaddleClas运行环境。
 
-本部分内容需要在`deploy`文件夹下运行，在PaddleClas代码的根目录下，可以通过以下方法进入该文件夹
+* 注意：
+**本部分内容需要在`deploy`文件夹下运行，在PaddleClas代码的根目录下，可以通过以下方法进入该文件夹**
 
 ```shell
 cd deploy
