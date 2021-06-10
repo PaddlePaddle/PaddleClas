@@ -235,6 +235,8 @@ class Trainer(object):
                         self.output_dir,
                         model_name=self.config["Arch"]["name"],
                         prefix="best_model")
+                logger.info("[Eval][Epoch {}][best metric: {}]".format(
+                    epoch_id, acc))
                 self.model.train()
 
             # save model
@@ -245,7 +247,15 @@ class Trainer(object):
                                 "epoch": epoch_id},
                     self.output_dir,
                     model_name=self.config["Arch"]["name"],
-                    prefix="ppcls_epoch_{}".format(epoch_id))
+                    prefix="epoch_{}".format(epoch_id))
+                # save the latest model
+                save_load.save_model(
+                    self.model,
+                    optimizer, {"metric": acc,
+                                "epoch": epoch_id},
+                    self.output_dir,
+                    model_name=self.config["Arch"]["name"],
+                    prefix="latest")
 
     def build_avg_metrics(self, info_dict):
         return {key: AverageMeter(key, '7.5f') for key in info_dict}
