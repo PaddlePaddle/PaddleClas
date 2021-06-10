@@ -84,7 +84,6 @@ class DistillationModel(nn.Layer):
             assert len(model_config) == 1
             key = list(model_config.keys())[0]
             model_config = model_config[key]
-            print(model_config)
             model_name = model_config.pop("name")
             model = eval(model_name)(**model_config)
 

@@ -41,7 +41,7 @@ from ppcls.utils import save_load
 
 from ppcls.data.utils.get_image_list import get_image_list
 from ppcls.data.postprocess import build_postprocess
-from ppcls.data.reader import create_operators
+from ppcls.data import create_operators
 
 
 class Trainer(object):
@@ -413,8 +413,7 @@ class Trainer(object):
         if query_query_id is not None:
             query_id_blocks = paddle.split(
                 query_query_id, num_or_sections=sections)
-        image_id_blocks = paddle.split(
-            query_img_id, num_or_sections=sections)
+        image_id_blocks = paddle.split(query_img_id, num_or_sections=sections)
         metric_key = None
 
         if self.eval_metric_func is None:
@@ -432,20 +431,23 @@ class Trainer(object):
                     image_id_mask = (image_id_block != gallery_img_id.t())
 
                     keep_mask = paddle.logical_or(query_id_mask, image_id_mask)
-                    similarity_matrix = similarity_matrix * keep_mask.astype("float32")
-                    
-                metric_tmp = self.eval_metric_func(similarity_matrix,image_id_blocks[block_idx], gallery_img_id)
-                
+                    similarity_matrix = similarity_matrix * keep_mask.astype(
+                        "float32")
+
+                metric_tmp = self.eval_metric_func(similarity_matrix,
+                                                   image_id_blocks[block_idx],
+                                                   gallery_img_id)
+
                 for key in metric_tmp:
                     if key not in metric_dict:
                         metric_dict[key] = metric_tmp[key]
                     else:
                         metric_dict[key] += metric_tmp[key]
-                        
+
             num_sections = len(fea_blocks)
             for key in metric_dict:
-                metric_dict[key] = metric_dict[key]/num_sections
-                
+                metric_dict[key] = metric_dict[key] / num_sections
+
         metric_info_list = []
         for key in metric_dict:
             if metric_key is None:
@@ -454,8 +456,7 @@ class Trainer(object):
         metric_msg = ", ".join(metric_info_list)
         logger.info("[Eval][Epoch {}][Avg]{}".format(epoch_id, metric_msg))
 
-        return metric_dict[metric_key]           
-                
+        return metric_dict[metric_key]
 
     def _cal_feature(self, name='gallery'):
         all_feas = None
