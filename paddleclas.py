@@ -163,6 +163,46 @@ class InputModelError(Exception):
         super().__init__(message)
 
 
+def get_default_confg():
+    return {
+        'Global': {
+            'model_name': 'MobileNetV3_small_x0_35',
+            'use_gpu': False,
+            'use_fp16': False,
+            'enable_mkldnn': False,
+            'cpu_num_threads': 1,
+            'use_tensorrt': False,
+            'ir_optim': False,
+            'enable_profile': False
+        },
+        'PreProcess': {
+            'transform_ops': [{
+                'ResizeImage': {
+                    'resize_short': 256
+                }
+            }, {
+                'CropImage': {
+                    'size': 224
+                }
+            }, {
+                'NormalizeImage': {
+                    'scale': 0.00392157,
+                    'mean': [0.485, 0.456, 0.406],
+                    'std': [0.229, 0.224, 0.225],
+                    'order': ''
+                }
+            }, {
+                'ToCHWImage': None
+            }]
+        },
+        'PostProcess': {
+            'name': 'Topk',
+            'topk': 5,
+            'class_id_map_file': './ppcls/utils/imagenet1k_label_list.txt'
+        }
+    }
+
+
 def print_info():
     """Print list of supported models in formatted.
     """
@@ -281,21 +321,65 @@ class PaddleClas(object):
 
     print_info()
 
-    def __init__(self, config):
+    def __init__(self,
+                 config: dict=None,
+                 model_name: str=None,
+                 inference_model_dir: str=None,
+                 use_gpu: bool=None,
+                 batch_size: int=None,
+                 **kwargs):
         """Init PaddleClas with config.
+
+        Args:
+            config: The config of PaddleClas's predictor, default by None. If default, the default configuration is used. Please refer doc for more information.
+            model_name: The model name supported by PaddleClas, default by None. If specified, override config.
+            inference_model_dir: The directory that contained model file and params file to be used, default by None. If specified, override config.
+            use_gpu: Wheather use GPU, default by None. If specified, override config.
+            batch_size: The batch size to pridict, default by None. If specified, override config.
         """
         super().__init__()
-        self.config = config
+        self._config = config
+        self._check_config(model_name, inference_model_dir, use_gpu,
+                           batch_size, **kwargs)
         self._check_input_model()
-        self.cls_predictor = ClsPredictor(config)
+        self.cls_predictor = ClsPredictor(self._config)
+
+    def get_config(self):
+        """Get the config.
+        """
+        return self._config
+
+    def _check_config(self,
+                      model_name=None,
+                      inference_model_dir=None,
+                      use_gpu=None,
+                      batch_size=None,
+                      **kwargs):
+        if self._config is None:
+            self._config = get_default_confg()
+            warnings.warn("config is not provided, use default!")
+        if isinstance(self._config, dict):
+            self._config = config.AttrDict(self._config)
+            config.create_attr_dict(self._config)
+
+        if model_name is not None:
+            self._config["model_name"] = model_name
+        if inference_model_dir is not None:
+            self._config["inference_model_dir"] = inference_model_dir
+        if use_gpu is not None:
+            self._config["use_gpu"] = use_gpu
+        if batch_size is not None:
+            self._config["batch_size"] = batch_size
+        for k in kwargs:
+            self._config[k] = kwargs[k]
 
     def _check_input_model(self):
         """Check input model name or model files.
         """
         candidate_model_names = get_model_names()
-        input_model_name = self.config.Global.get("model_name", None)
-        inference_model_dir = self.config.Global.get("inference_model_dir",
-                                                     None)
+        input_model_name = self._config.Global.get("model_name", None)
+        inference_model_dir = self._config.Global.get("inference_model_dir",
+                                                      None)
         if input_model_name is not None:
             similar_names = similar_architectures(input_model_name,
                                                   candidate_model_names)
@@ -306,7 +390,7 @@ class PaddleClas(object):
             if input_model_name not in candidate_model_names:
                 err = f"{input_model_name} is not provided by PaddleClas. If you want to use your own model, please input model_file as model path!"
                 raise InputModelError(err)
-            self.config.inference_model_dir = check_model_file(
+            self._config.Global.inference_model_dir = check_model_file(
                 input_model_name)
             return
         elif inference_model_dir is not None:
@@ -347,9 +431,9 @@ class PaddleClas(object):
                 )
             image_list = get_image_list(input_data)
 
-            batch_size = self.config.Global.get("batch_size", 1)
-            pre_label_out_idr = self.config.Global.get("pre_label_out_idr",
-                                                       False)
+            batch_size = self._config.Global.get("batch_size", 1)
+            pre_label_out_idr = self._config.Global.get("pre_label_out_idr",
+                                                        False)
 
             img_list = []
             img_path_list = []
@@ -378,7 +462,7 @@ class PaddleClas(object):
                         if print_pred:
                             pred_str_list = [
                                 f"filename: {img_path_list[nu]}",
-                                f"top-{self.config.PostProcess.get('topk', 1)}"
+                                f"top-{self._config.PostProcess.get('topk', 1)}"
                             ]
                             for k in pred:
                                 pred_str_list.append(f"{k}: {pred[k]}")

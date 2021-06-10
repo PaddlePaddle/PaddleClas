@@ -1,4 +1,4 @@
-# copyright (c) 2020 PaddlePaddle Authors. All Rights Reserve.
+# copyright (c) 2021 PaddlePaddle Authors. All Rights Reserve.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -11,6 +11,9 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
+import sys
+import inspect
 
 from ppcls.arch.backbone.legendary_models.mobilenet_v1 import MobileNetV1_x0_25, MobileNetV1_x0_5, MobileNetV1_x0_75, MobileNetV1
 from ppcls.arch.backbone.legendary_models.mobilenet_v3 import MobileNetV3_small_x0_35, MobileNetV3_small_x0_5, MobileNetV3_small_x0_75, MobileNetV3_small_x1_0, MobileNetV3_small_x1_25, MobileNetV3_large_x0_35, MobileNetV3_large_x0_5, MobileNetV3_large_x0_75, MobileNetV3_large_x1_0, MobileNetV3_large_x1_25
@@ -48,3 +51,18 @@ from ppcls.arch.backbone.model_zoo.swin_transformer import SwinTransformer_tiny_
 from ppcls.arch.backbone.model_zoo.mixnet import MixNet_S, MixNet_M, MixNet_L
 from ppcls.arch.backbone.model_zoo.rexnet import ReXNet_1_0, ReXNet_1_3, ReXNet_1_5, ReXNet_2_0, ReXNet_3_0
 from ppcls.arch.backbone.variant_models.resnet_variant import ResNet50_last_stage_stride1
+
+
+def get_apis():
+    current_func = sys._getframe().f_code.co_name
+    current_module = sys.modules[__name__]
+    api = []
+    for _, obj in inspect.getmembers(current_module,
+                                     inspect.isclass) + inspect.getmembers(
+                                         current_module, inspect.isfunction):
+        api.append(obj.__name__)
+    api.remove(current_func)
+    return api
+
+
+__all__ = get_apis()
