@@ -100,7 +100,6 @@ class RetriMetric(nn.Layer):
             assert isinstance(topk, (int, list, tuple))
             if isinstance(topk, int):
                 topk = [topk]
-            self.topk = topk
             for k in topk:
                 metric_dict["recall{}".format(k)] = all_cmc[k - 1]
         if "mAP" in self.config.keys():
