@@ -120,7 +120,7 @@ cd ..
 提供的底库图像均在`dataset/logo_demo_data_v1.0/gallery/`文件夹下面，部分示例图像如下所示。
 
 <div align="center">
-<img src="../../images/recognition/logo_gallery_demo.png"  width = "200" />
+<img src="../../images/recognition/logo_demo/gallery/logo_gallery_demo.png"  width = "600" />
 </div>
 
 
@@ -132,7 +132,7 @@ python3.7 python/predict_system.py -c configs/inference_logo.yaml
 
 待检索图像如下所示。
 <div align="center">
-<img src="../../images/recognition/logo_demo/query/logo_auxx-1.jpg"  width = "200" />
+<img src="../../images/recognition/logo_demo/query/logo_auxx-1.jpg"  width = "600" />
 </div>
 
 
@@ -169,7 +169,7 @@ IndexProcess:
 匹配的一些示例图像如下所示。
 
 <center class="half">
-    <img src="../../images/recognition/logo_demo/gallery/auxx-1_59_0.jpg" width="200"/><img src="./images/logo_demo/gallery/auxx-1_79_0.jpg" width="200"/><img src="./images/logo_demo/gallery/auxx-2_47_0.jpg" width="200"/><img src="./images/logo_demo/gallery/auxx-2_59_0.jpg" width="200"/><img src="./images/logo_demo/gallery/auxx-2_79_0.jpg" width="200"/>
+    <img src="../../images/recognition/logo_demo/gallery/auxx-1_59_0.jpg" width="200"/><img src="../../images/recognition/logo_demo/gallery/auxx-1_79_0.jpg" width="200"/><img src="../../images/recognition/logo_demo/gallery/auxx-2_47_0.jpg" width="200"/><img src="../../images/recognition/logo_demo/gallery/auxx-2_59_0.jpg" width="200"/><img src="../../images/recognition/logo_demo/gallery/auxx-2_79_0.jpg" width="200"/>
 </center>
 
 
