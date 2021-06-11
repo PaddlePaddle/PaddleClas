@@ -22,15 +22,15 @@ from ppcls.utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_f
 
 MODEL_URLS = {
     "RedNet26":
-    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/model_zoo/RedNet26_pretrained.pdparams",
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/RedNet26_pretrained.pdparams",
     "RedNet38":
-    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/model_zoo/RedNet38_pretrained.pdparams",
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/RedNet38_pretrained.pdparams",
     "RedNet50":
-    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/model_zoo/RedNet50_pretrained.pdparams",
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/RedNet50_pretrained.pdparams",
     "RedNet101":
-    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/model_zoo/RedNet101_pretrained.pdparams",
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/RedNet101_pretrained.pdparams",
     "RedNet152":
-    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/model_zoo/RedNet152_pretrained.pdparams"
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/RedNet152_pretrained.pdparams"
 }
 
 

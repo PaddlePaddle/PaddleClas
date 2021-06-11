@@ -27,7 +27,16 @@ from paddle.nn.initializer import Uniform
 
 import math
 
-__all__ = ["ResNet18", "ResNet34", "ResNet50", "ResNet101", "ResNet152"]
+from ppcls.utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
+
+MODEL_URLS = {"ResNet18": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ResNet18_pretrained.pdparams",
+              "ResNet34": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ResNet34_pretrained.pdparams",
+              "ResNet50": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ResNet50_pretrained.pdparams",
+              "ResNet101": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ResNet101_pretrained.pdparams",
+              "ResNet152": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ResNet152_pretrained.pdparams",
+             }
+
+__all__ = list(MODEL_URLS.keys())
 
 
 class ConvBNLayer(nn.Layer):
@@ -290,27 +299,45 @@ class ResNet(nn.Layer):
             y = self.out(y)
             return y
 
-
-def ResNet18(**args):
-    model = ResNet(layers=18, **args)
+        
+def _load_pretrained(pretrained, model, model_url, use_ssld=False):
+    if pretrained is False:
+        pass
+    elif pretrained is True:
+        load_dygraph_pretrain_from_url(model, model_url, use_ssld=use_ssld)
+    elif isinstance(pretrained, str):
+        load_dygraph_pretrain(model, pretrained)
+    else:
+        raise RuntimeError(
+            "pretrained type is not available. Please use `string` or `boolean` type."
+        )
+        
+        
+def ResNet18(pretrained=False, use_ssld=False, **kwargs):
+    model = ResNet(layers=18, **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["ResNet18"], use_ssld=use_ssld)
     return model
 
 
-def ResNet34(**args):
-    model = ResNet(layers=34, **args)
+def ResNet34(pretrained=False, use_ssld=False, **kwargs):
+    model = ResNet(layers=34, **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["ResNet34"], use_ssld=use_ssld)
     return model
 
 
-def ResNet50(**args):
-    model = ResNet(layers=50, **args)
+def ResNet50(pretrained=False, use_ssld=False, **kwargs):
+    model = ResNet(layers=50, **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["ResNet50"], use_ssld=use_ssld)
     return model
 
 
-def ResNet101(**args):
-    model = ResNet(layers=101, **args)
+def ResNet101(pretrained=False, use_ssld=False, **kwargs):
+    model = ResNet(layers=101, **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["ResNet101"], use_ssld=use_ssld)
     return model
 
 
-def ResNet152(**args):
-    model = ResNet(layers=152, **args)
+def ResNet152(pretrained=False, use_ssld=False, **kwargs):
+    model = ResNet(layers=152, **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["ResNet152"], use_ssld=use_ssld)
     return model

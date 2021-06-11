@@ -1,3 +1,17 @@
+# copyright (c) 2020 PaddlePaddle Authors. All Rights Reserve.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#    http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 import paddle
 from paddle import ParamAttr
 import paddle.nn as nn
@@ -5,7 +19,14 @@ import paddle.nn.functional as F
 from paddle.nn import Conv2D, BatchNorm, Linear, Dropout
 from paddle.nn import AdaptiveAvgPool2D, MaxPool2D, AvgPool2D
 
-__all__ = ["SqueezeNet1_0", "SqueezeNet1_1"]
+from ppcls.utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
+
+MODEL_URLS = {
+              "SqueezeNet1_0": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/SqueezeNet1_0_pretrained.pdparams",
+              "SqueezeNet1_1": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/SqueezeNet1_1_pretrained.pdparams",
+             }
+
+__all__ = list(MODEL_URLS.keys())
 
 
 class MakeFireConv(nn.Layer):
@@ -143,12 +164,26 @@ class SqueezeNet(nn.Layer):
         x = paddle.squeeze(x, axis=[2, 3])
         return x
 
+def _load_pretrained(pretrained, model, model_url, use_ssld=False):
+    if pretrained is False:
+        pass
+    elif pretrained is True:
+        load_dygraph_pretrain_from_url(model, model_url, use_ssld=use_ssld)
+    elif isinstance(pretrained, str):
+        load_dygraph_pretrain(model, pretrained)
+    else:
+        raise RuntimeError(
+            "pretrained type is not available. Please use `string` or `boolean` type."
+        )
+        
 
-def SqueezeNet1_0(**args):
-    model = SqueezeNet(version="1.0", **args)
+def SqueezeNet1_0(pretrained=False, use_ssld=False, **kwargs):
+    model = SqueezeNet(version="1.0", **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["SqueezeNet1_0"], use_ssld=use_ssld)
     return model
 
 
-def SqueezeNet1_1(**args):
-    model = SqueezeNet(version="1.1", **args)
+def SqueezeNet1_1(pretrained=False, use_ssld=False, **kwargs):
+    model = SqueezeNet(version="1.1", **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["SqueezeNet1_1"], use_ssld=use_ssld)
     return model

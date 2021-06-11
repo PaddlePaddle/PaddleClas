@@ -22,11 +22,19 @@ from paddle.nn import Layer, Conv2D, MaxPool2D, AdaptiveAvgPool2D, BatchNorm, Li
 from paddle.nn.initializer import KaimingNormal
 from paddle.nn.functional import swish
 
-__all__ = [
-    "ShuffleNetV2_x0_25", "ShuffleNetV2_x0_33", "ShuffleNetV2_x0_5",
-    "ShuffleNetV2_x1_0", "ShuffleNetV2_x1_5", "ShuffleNetV2_x2_0",
-    "ShuffleNetV2_swish"
-]
+from ppcls.utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
+
+MODEL_URLS = {
+              "ShuffleNetV2_x0_25": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ShuffleNetV2_x0_25_pretrained.pdparams",
+              "ShuffleNetV2_x0_33": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ShuffleNetV2_x0_33_pretrained.pdparams",
+              "ShuffleNetV2_x0_5": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ShuffleNetV2_x0_5_pretrained.pdparams",
+              "ShuffleNetV2_x1_0": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ShuffleNetV2_x1_0_pretrained.pdparams",
+              "ShuffleNetV2_x1_5": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ShuffleNetV2_x1_5_pretrained.pdparams",
+              "ShuffleNetV2_x2_0": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ShuffleNetV2_x2_0_pretrained.pdparams",
+              "ShuffleNetV2_swish": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ShuffleNetV2_swish_pretrained.pdparams"
+             }
+
+__all__ = list(MODEL_URLS.keys())
 
 
 def channel_shuffle(x, groups):
@@ -285,36 +293,56 @@ class ShuffleNet(Layer):
         return y
 
 
-def ShuffleNetV2_x0_25(**args):
-    model = ShuffleNet(scale=0.25, **args)
+def _load_pretrained(pretrained, model, model_url, use_ssld=False):
+    if pretrained is False:
+        pass
+    elif pretrained is True:
+        load_dygraph_pretrain_from_url(model, model_url, use_ssld=use_ssld)
+    elif isinstance(pretrained, str):
+        load_dygraph_pretrain(model, pretrained)
+    else:
+        raise RuntimeError(
+            "pretrained type is not available. Please use `string` or `boolean` type."
+        )
+
+
+def ShuffleNetV2_x0_25(pretrained=False, use_ssld=False, **kwargs):
+    model = ShuffleNet(scale=0.25, **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["ShuffleNetV2_x0_25"], use_ssld=use_ssld)
     return model
 
 
-def ShuffleNetV2_x0_33(**args):
-    model = ShuffleNet(scale=0.33, **args)
+def ShuffleNetV2_x0_33(pretrained=False, use_ssld=False, **kwargs):
+    model = ShuffleNet(scale=0.33, **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["ShuffleNetV2_x0_33"], use_ssld=use_ssld)
     return model
 
 
-def ShuffleNetV2_x0_5(**args):
-    model = ShuffleNet(scale=0.5, **args)
+def ShuffleNetV2_x0_5(pretrained=False, use_ssld=False, **kwargs):
+    model = ShuffleNet(scale=0.5, **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["ShuffleNetV2_x0_5"], use_ssld=use_ssld)
     return model
 
 
-def ShuffleNetV2_x1_0(**args):
-    model = ShuffleNet(scale=1.0, **args)
+def ShuffleNetV2_x1_0(pretrained=False, use_ssld=False, **kwargs):
+    model = ShuffleNet(scale=1.0, **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["ShuffleNetV2_x1_0"], use_ssld=use_ssld)
     return model
 
 
-def ShuffleNetV2_x1_5(**args):
-    model = ShuffleNet(scale=1.5, **args)
+def ShuffleNetV2_x1_5(pretrained=False, use_ssld=False, **kwargs):
+    model = ShuffleNet(scale=1.5, **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["ShuffleNetV2_x1_5"], use_ssld=use_ssld)
     return model
 
 
-def ShuffleNetV2_x2_0(**args):
-    model = ShuffleNet(scale=2.0, **args)
+def ShuffleNetV2_x2_0(pretrained=False, use_ssld=False, **kwargs):
+    model = ShuffleNet(scale=2.0, **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["ShuffleNetV2_x2_0"], use_ssld=use_ssld)
     return model
 
 
-def ShuffleNetV2_swish(**args):
-    model = ShuffleNet(scale=1.0, act="swish", **args)
+def ShuffleNetV2_swish(pretrained=False, use_ssld=False, **kwargs):
+    model = ShuffleNet(scale=1.0, act="swish", **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["ShuffleNetV2_swish"], use_ssld=use_ssld)
     return model

@@ -27,10 +27,18 @@ from paddle.nn.initializer import Uniform
 
 import math
 
-__all__ = [
-    "ResNeXt50_32x4d", "ResNeXt50_64x4d", "ResNeXt101_32x4d",
-    "ResNeXt101_64x4d", "ResNeXt152_32x4d", "ResNeXt152_64x4d"
-]
+from ppcls.utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
+
+MODEL_URLS = {
+              "ResNeXt50_32x4d": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ResNeXt50_32x4d_pretrained.pdparams",
+              "ResNeXt50_64x4d": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ResNeXt50_64x4d_pretrained.pdparams",
+              "ResNeXt101_32x4d": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ResNeXt101_32x4d_pretrained.pdparams",
+              "ResNeXt101_64x4d": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ResNeXt101_64x4d_pretrained.pdparams",
+              "ResNeXt152_32x4d": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ResNeXt152_32x4d_pretrained.pdparams",
+              "ResNeXt152_64x4d": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ResNeXt152_64x4d_pretrained.pdparams",
+             }
+
+__all__ = list(MODEL_URLS.keys())
 
 
 class ConvBNLayer(nn.Layer):
@@ -222,32 +230,51 @@ class ResNeXt(nn.Layer):
             y = self.out(y)
             return y
 
+        
+def _load_pretrained(pretrained, model, model_url, use_ssld=False):
+    if pretrained is False:
+        pass
+    elif pretrained is True:
+        load_dygraph_pretrain_from_url(model, model_url, use_ssld=use_ssld)
+    elif isinstance(pretrained, str):
+        load_dygraph_pretrain(model, pretrained)
+    else:
+        raise RuntimeError(
+            "pretrained type is not available. Please use `string` or `boolean` type."
+        )
 
-def ResNeXt50_32x4d(**args):
-    model = ResNeXt(layers=50, cardinality=32, **args)
+
+def ResNeXt50_32x4d(pretrained=False, use_ssld=False, **kwargs):
+    model = ResNeXt(layers=50, cardinality=32, **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["ResNeXt50_32x4d"], use_ssld=use_ssld)
     return model
 
 
-def ResNeXt50_64x4d(**args):
-    model = ResNeXt(layers=50, cardinality=64, **args)
+def ResNeXt50_64x4d(pretrained=False, use_ssld=False, **kwargs):
+    model = ResNeXt(layers=50, cardinality=64, **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["ResNeXt50_64x4d"], use_ssld=use_ssld)
     return model
 
 
-def ResNeXt101_32x4d(**args):
-    model = ResNeXt(layers=101, cardinality=32, **args)
+def ResNeXt101_32x4d(pretrained=False, use_ssld=False, **kwargs):
+    model = ResNeXt(layers=101, cardinality=32, **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["ResNeXt101_32x4d"], use_ssld=use_ssld)
     return model
 
 
-def ResNeXt101_64x4d(**args):
-    model = ResNeXt(layers=101, cardinality=64, **args)
+def ResNeXt101_64x4d(pretrained=False, use_ssld=False, **kwargs):
+    model = ResNeXt(layers=101, cardinality=64, **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["ResNeXt101_64x4d"], use_ssld=use_ssld)
     return model
 
 
-def ResNeXt152_32x4d(**args):
-    model = ResNeXt(layers=152, cardinality=32, **args)
+def ResNeXt152_32x4d(pretrained=False, use_ssld=False, **kwargs):
+    model = ResNeXt(layers=152, cardinality=32, **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["ResNeXt152_32x4d"], use_ssld=use_ssld)
     return model
 
 
-def ResNeXt152_64x4d(**args):
-    model = ResNeXt(layers=152, cardinality=64, **args)
+def ResNeXt152_64x4d(pretrained=False, use_ssld=False, **kwargs):
+    model = ResNeXt(layers=152, cardinality=64, **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["ResNeXt152_64x4d"], use_ssld=use_ssld)
     return model
