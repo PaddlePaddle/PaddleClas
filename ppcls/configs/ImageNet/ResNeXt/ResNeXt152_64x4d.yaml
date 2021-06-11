@@ -8,23 +8,22 @@ Global:
   save_interval: 1
   eval_during_train: True
   eval_interval: 1
-  epochs: 200
+  epochs: 120
   print_batch_step: 10
   use_visualdl: False
   # used for static mode and model export
-  image_shape: [3, 299, 299]
+  image_shape: [3, 224, 224]
   save_inference_dir: ./inference
 
 # model architecture
 Arch:
-  name: InceptionV3
+  name: ResNeXt152_64x4d
  
 # loss function config for traing/eval process
 Loss:
   Train:
     - CELoss:
         weight: 1.0
-        epsilon: 0.1
   Eval:
     - CELoss:
         weight: 1.0
@@ -34,11 +33,13 @@ Optimizer:
   name: Momentum
   momentum: 0.9
   lr:
-    name: Cosine
-    learning_rate: 0.045
+    name: Piecewise
+    learning_rate: 0.1
+    decay_epochs: [30, 60, 90]
+    values: [0.1, 0.01, 0.001, 0.0001]
   regularizer:
     name: 'L2'
-    coeff: 0.0001
+    coeff: 0.00018
 
 
 # data loader for train and eval
@@ -49,8 +50,11 @@ DataLoader:
       image_root: ./dataset/ILSVRC2012/
       cls_label_path: ./dataset/ILSVRC2012/train_list.txt
       transform_ops:
+        - DecodeImage:
+            to_rgb: True
+            channel_first: False
         - RandCropImage:
-            size: 299
+            size: 224
         - RandFlipImage:
             flip_code: 1
         - NormalizeImage:
@@ -75,10 +79,13 @@ DataLoader:
       image_root: ./dataset/ILSVRC2012/
       cls_label_path: ./dataset/ILSVRC2012/val_list.txt
       transform_ops:
+        - DecodeImage:
+            to_rgb: True
+            channel_first: False
         - ResizeImage:
-            resize_short: 320
+            resize_short: 256
         - CropImage:
-            size: 299
+            size: 224
         - NormalizeImage:
             scale: 1.0/255.0
             mean: [0.485, 0.456, 0.406]
@@ -101,9 +108,9 @@ Infer:
         to_rgb: True
         channel_first: False
     - ResizeImage:
-        resize_short: 320
+        resize_short: 256
     - CropImage:
-        size: 299
+        size: 224
     - NormalizeImage:
         scale: 1.0/255.0
         mean: [0.485, 0.456, 0.406]
