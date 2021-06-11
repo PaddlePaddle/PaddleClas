@@ -19,11 +19,12 @@ from ppcls.arch.backbone.legendary_models.vgg import VGG11, VGG13, VGG16, VGG19
 from ppcls.arch.backbone.legendary_models.inception_v3 import InceptionV3
 from ppcls.arch.backbone.legendary_models.hrnet import HRNet_W18_C, HRNet_W30_C, HRNet_W32_C, HRNet_W40_C, HRNet_W44_C, HRNet_W48_C, HRNet_W60_C, HRNet_W64_C, SE_HRNet_W64_C
 
-from ppcls.arch.backbone.model_zoo.resnet_vc import ResNet18_vc, ResNet34_vc, ResNet50_vc, ResNet101_vc, ResNet152_vc
+from ppcls.arch.backbone.model_zoo.resnet_vc import ResNet50_vc
 from ppcls.arch.backbone.model_zoo.resnext import ResNeXt50_32x4d, ResNeXt50_64x4d, ResNeXt101_32x4d, ResNeXt101_64x4d, ResNeXt152_32x4d, ResNeXt152_64x4d
-from ppcls.arch.backbone.model_zoo.res2net import Res2Net50_48w_2s, Res2Net50_26w_4s, Res2Net50_14w_8s, Res2Net50_48w_2s, Res2Net50_26w_6s, Res2Net50_26w_8s, Res2Net101_26w_4s, Res2Net152_26w_4s, Res2Net200_26w_4s
-from ppcls.arch.backbone.model_zoo.res2net_vd import Res2Net50_vd_48w_2s, Res2Net50_vd_26w_4s, Res2Net50_vd_14w_8s, Res2Net50_vd_48w_2s, Res2Net50_vd_26w_6s, Res2Net50_vd_26w_8s, Res2Net101_vd_26w_4s, Res2Net152_vd_26w_4s, Res2Net200_vd_26w_4s
-from ppcls.arch.backbone.model_zoo.se_resnet_vd import SE_ResNet18_vd, SE_ResNet34_vd, SE_ResNet50_vd, SE_ResNet101_vd, SE_ResNet152_vd, SE_ResNet200_vd
+from ppcls.arch.backbone.model_zoo.resnext_vd import ResNeXt50_vd_32x4d, ResNeXt50_vd_64x4d, ResNeXt101_vd_32x4d, ResNeXt101_vd_64x4d, ResNeXt152_vd_32x4d, ResNeXt152_vd_64x4d
+from ppcls.arch.backbone.model_zoo.res2net import Res2Net50_26w_4s, Res2Net50_14w_8s
+from ppcls.arch.backbone.model_zoo.res2net_vd import Res2Net50_vd_26w_4s, Res2Net101_vd_26w_4s, Res2Net200_vd_26w_4s
+from ppcls.arch.backbone.model_zoo.se_resnet_vd import SE_ResNet18_vd, SE_ResNet34_vd, SE_ResNet50_vd
 from ppcls.arch.backbone.model_zoo.se_resnext_vd import SE_ResNeXt50_vd_32x4d, SE_ResNeXt50_vd_32x4d, SENet154_vd
 from ppcls.arch.backbone.model_zoo.se_resnext import SE_ResNeXt50_32x4d, SE_ResNeXt101_32x4d, SE_ResNeXt152_64x4d
 from ppcls.arch.backbone.model_zoo.dpn import DPN68, DPN92, DPN98, DPN107, DPN131
@@ -33,10 +34,11 @@ from ppcls.arch.backbone.model_zoo.resnest import ResNeSt50_fast_1s1x64d, ResNeS
 from ppcls.arch.backbone.model_zoo.googlenet import GoogLeNet
 from ppcls.arch.backbone.model_zoo.mobilenet_v2 import MobileNetV2_x0_25, MobileNetV2_x0_5, MobileNetV2_x0_75, MobileNetV2, MobileNetV2_x1_5, MobileNetV2_x2_0
 from ppcls.arch.backbone.model_zoo.shufflenet_v2 import ShuffleNetV2_x0_25, ShuffleNetV2_x0_33, ShuffleNetV2_x0_5, ShuffleNetV2_x1_0, ShuffleNetV2_x1_5, ShuffleNetV2_x2_0, ShuffleNetV2_swish
+from ppcls.arch.backbone.model_zoo.ghostnet import GhostNet_x0_5, GhostNet_x1_0, GhostNet_x1_3
 from ppcls.arch.backbone.model_zoo.alexnet import AlexNet
 from ppcls.arch.backbone.model_zoo.inception_v4 import InceptionV4
 from ppcls.arch.backbone.model_zoo.xception import Xception41, Xception65, Xception71
-from ppcls.arch.backbone.model_zoo.xception_deeplab import Xception41_deeplab, Xception65_deeplab, Xception71_deeplab
+from ppcls.arch.backbone.model_zoo.xception_deeplab import Xception41_deeplab, Xception65_deeplab
 from ppcls.arch.backbone.model_zoo.resnext101_wsl import ResNeXt101_32x8d_wsl, ResNeXt101_32x16d_wsl, ResNeXt101_32x32d_wsl, ResNeXt101_32x48d_wsl
 from ppcls.arch.backbone.model_zoo.squeezenet import SqueezeNet1_0, SqueezeNet1_1
 from ppcls.arch.backbone.model_zoo.darknet import DarkNet53

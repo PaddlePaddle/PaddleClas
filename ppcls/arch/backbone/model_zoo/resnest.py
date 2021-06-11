@@ -27,7 +27,14 @@ from paddle.nn import Conv2D, BatchNorm, Linear, Dropout
 from paddle.nn import AdaptiveAvgPool2D, MaxPool2D, AvgPool2D
 from paddle.regularizer import L2Decay
 
-__all__ = ["ResNeSt50_fast_1s1x64d", "ResNeSt50", "ResNeSt101"]
+from ppcls.utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
+
+MODEL_URLS = {"ResNeSt50_fast_1s1x64d": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ResNeSt50_fast_1s1x64d_pretrained.pdparams",
+              "ResNeSt50": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ResNeSt50_pretrained.pdparams",
+              "ResNeSt101": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ResNeSt101_pretrained.pdparams",
+             }
+
+__all__ = list(MODEL_URLS.keys())
 
 
 class ConvBNLayer(nn.Layer):
@@ -656,8 +663,21 @@ class ResNeSt(nn.Layer):
         x = self.out(x)
         return x
 
-
-def ResNeSt50_fast_1s1x64d(**args):
+    
+def _load_pretrained(pretrained, model, model_url, use_ssld=False):
+    if pretrained is False:
+        pass
+    elif pretrained is True:
+        load_dygraph_pretrain_from_url(model, model_url, use_ssld=use_ssld)
+    elif isinstance(pretrained, str):
+        load_dygraph_pretrain(model, pretrained)
+    else:
+        raise RuntimeError(
+            "pretrained type is not available. Please use `string` or `boolean` type."
+        )
+        
+    
+def ResNeSt50_fast_1s1x64d(pretrained=False, use_ssld=False, **kwargs):
     model = ResNeSt(
         layers=[3, 4, 6, 3],
         radix=1,
@@ -669,11 +689,12 @@ def ResNeSt50_fast_1s1x64d(**args):
         avd=True,
         avd_first=True,
         final_drop=0.0,
-        **args)
+        **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["ResNeSt50_fast_1s1x64d"], use_ssld=use_ssld)
     return model
 
 
-def ResNeSt50(**args):
+def ResNeSt50(pretrained=False, use_ssld=False, **kwargs):
     model = ResNeSt(
         layers=[3, 4, 6, 3],
         radix=2,
@@ -685,11 +706,12 @@ def ResNeSt50(**args):
         avd=True,
         avd_first=False,
         final_drop=0.0,
-        **args)
+        **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["ResNeSt50"], use_ssld=use_ssld)
     return model
 
 
-def ResNeSt101(**args):
+def ResNeSt101(pretrained=False, use_ssld=False, **kwargs):
     model = ResNeSt(
         layers=[3, 4, 23, 3],
         radix=2,
@@ -701,5 +723,6 @@ def ResNeSt101(**args):
         avd=True,
         avd_first=False,
         final_drop=0.0,
-        **args)
+        **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["ResNeSt101"], use_ssld=use_ssld)
     return model

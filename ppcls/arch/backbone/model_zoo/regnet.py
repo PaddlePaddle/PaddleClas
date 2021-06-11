@@ -26,10 +26,17 @@ from paddle.nn import AdaptiveAvgPool2D, MaxPool2D, AvgPool2D
 from paddle.nn.initializer import Uniform
 import math
 
-__all__ = [
-    "RegNetX_200MF", "RegNetX_4GF", "RegNetX_32GF", "RegNetY_200MF",
-    "RegNetY_4GF", "RegNetY_32GF"
-]
+from ppcls.utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
+
+MODEL_URLS = {"RegNetX_200MF": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/RegNetX_200MF_pretrained.pdparams", 
+              "RegNetX_4GF": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/RegNetX_4GF_pretrained.pdparams", 
+              "RegNetX_32GF": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/RegNetX_32GF_pretrained.pdparams", 
+              "RegNetY_200MF": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/RegNetY_200MF_pretrained.pdparams", 
+              "RegNetY_4GF": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/RegNetY_4GF_pretrained.pdparams", 
+              "RegNetY_32GF": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/RegNetY_32GF_pretrained.pdparams", 
+             }
+
+__all__ = list(MODEL_URLS.keys())
 
 
 def quantize_float(f, q):
@@ -308,14 +315,28 @@ class RegNet(nn.Layer):
         y = self.out(y)
         return y
 
-
-def RegNetX_200MF(**args):
+    
+def _load_pretrained(pretrained, model, model_url, use_ssld=False):
+    if pretrained is False:
+        pass
+    elif pretrained is True:
+        load_dygraph_pretrain_from_url(model, model_url, use_ssld=use_ssld)
+    elif isinstance(pretrained, str):
+        load_dygraph_pretrain(model, pretrained)
+    else:
+        raise RuntimeError(
+            "pretrained type is not available. Please use `string` or `boolean` type."
+        )
+        
+    
+def RegNetX_200MF(pretrained=False, use_ssld=False, **kwargs):
     model = RegNet(
-        w_a=36.44, w_0=24, w_m=2.49, d=13, group_w=8, bot_mul=1.0, q=8, **args)
+        w_a=36.44, w_0=24, w_m=2.49, d=13, group_w=8, bot_mul=1.0, q=8, **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["RegNetX_200MF"], use_ssld=use_ssld)
     return model
 
 
-def RegNetX_4GF(**args):
+def RegNetX_4GF(pretrained=False, use_ssld=False, **kwargs):
     model = RegNet(
         w_a=38.65,
         w_0=96,
@@ -324,11 +345,12 @@ def RegNetX_4GF(**args):
         group_w=40,
         bot_mul=1.0,
         q=8,
-        **args)
+        **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["RegNetX_4GF"], use_ssld=use_ssld)
     return model
 
 
-def RegNetX_32GF(**args):
+def RegNetX_32GF(pretrained=False, use_ssld=False, **kwargs):
     model = RegNet(
         w_a=69.86,
         w_0=320,
@@ -337,11 +359,12 @@ def RegNetX_32GF(**args):
         group_w=168,
         bot_mul=1.0,
         q=8,
-        **args)
+        **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["RegNetX_32GF"], use_ssld=use_ssld)
     return model
 
 
-def RegNetY_200MF(**args):
+def RegNetY_200MF(pretrained=False, use_ssld=False, **kwargs):
     model = RegNet(
         w_a=36.44,
         w_0=24,
@@ -351,11 +374,12 @@ def RegNetY_200MF(**args):
         bot_mul=1.0,
         q=8,
         se_on=True,
-        **args)
+        **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["RegNetX_32GF"], use_ssld=use_ssld)
     return model
 
 
-def RegNetY_4GF(**args):
+def RegNetY_4GF(pretrained=False, use_ssld=False, **kwargs):
     model = RegNet(
         w_a=31.41,
         w_0=96,
@@ -365,11 +389,12 @@ def RegNetY_4GF(**args):
         bot_mul=1.0,
         q=8,
         se_on=True,
-        **args)
+        **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["RegNetX_32GF"], use_ssld=use_ssld)
     return model
 
 
-def RegNetY_32GF(**args):
+def RegNetY_32GF(pretrained=False, use_ssld=False, **kwargs):
     model = RegNet(
         w_a=115.89,
         w_0=232,
@@ -379,5 +404,6 @@ def RegNetY_32GF(**args):
         bot_mul=1.0,
         q=8,
         se_on=True,
-        **args)
+        **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["RegNetX_32GF"], use_ssld=use_ssld)
     return model

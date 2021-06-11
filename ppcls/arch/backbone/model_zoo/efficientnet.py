@@ -9,11 +9,20 @@ import collections
 import re
 import copy
 
-__all__ = [
-    'EfficientNet', 'EfficientNetB0_small', 'EfficientNetB0', 'EfficientNetB1',
-    'EfficientNetB2', 'EfficientNetB3', 'EfficientNetB4', 'EfficientNetB5',
-    'EfficientNetB6', 'EfficientNetB7'
-]
+from ppcls.utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
+
+MODEL_URLS = {"EfficientNetB0_small":  "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/EfficientNetB0_small_pretrained.pdparams",
+              "EfficientNetB0": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/EfficientNetB0_pretrained.pdparams",
+              "EfficientNetB1": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/EfficientNetB1_pretrained.pdparams",
+              "EfficientNetB2": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/EfficientNetB2_pretrained.pdparams",
+              "EfficientNetB3": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/EfficientNetB3_pretrained.pdparams",
+              "EfficientNetB4": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/EfficientNetB4_pretrained.pdparams",
+              "EfficientNetB5": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/EfficientNetB5_pretrained.pdparams",
+              "EfficientNetB6": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/EfficientNetB6_pretrained.pdparams",
+              "EfficientNetB7": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/EfficientNetB7_pretrained.pdparams",
+             }
+
+__all__ = list(MODEL_URLS.keys())
 
 GlobalParams = collections.namedtuple('GlobalParams', [
     'batch_norm_momentum',
@@ -783,119 +792,159 @@ class EfficientNet(nn.Layer):
         x = self._fc(x)
         return x
 
+    
+def _load_pretrained(pretrained, model, model_url, use_ssld=False):
+    if pretrained is False:
+        pass
+    elif pretrained is True:
+        load_dygraph_pretrain_from_url(model, model_url, use_ssld=use_ssld)
+    elif isinstance(pretrained, str):
+        load_dygraph_pretrain(model, pretrained)
+    else:
+        raise RuntimeError(
+            "pretrained type is not available. Please use `string` or `boolean` type."
+        )  
+
 
 def EfficientNetB0_small(padding_type='DYNAMIC',
                          override_params=None,
                          use_se=False,
-                         **args):
+                         pretrained=False, 
+                         use_ssld=False, 
+                         **kwargs):
     model = EfficientNet(
         name='b0',
         padding_type=padding_type,
         override_params=override_params,
         use_se=use_se,
-        **args)
+        **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["EfficientNetB0_small"])
     return model
 
 
 def EfficientNetB0(padding_type='SAME',
                    override_params=None,
                    use_se=True,
-                   **args):
+                   pretrained=False, 
+                   use_ssld=False, 
+                   **kwargs):
     model = EfficientNet(
         name='b0',
         padding_type=padding_type,
         override_params=override_params,
         use_se=use_se,
-        **args)
+        **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["EfficientNetB0"])
     return model
 
 
 def EfficientNetB1(padding_type='SAME',
                    override_params=None,
                    use_se=True,
-                   **args):
+                   pretrained=False, 
+                   use_ssld=False, 
+                   **kwargs):
     model = EfficientNet(
         name='b1',
         padding_type=padding_type,
         override_params=override_params,
         use_se=use_se,
-        **args)
+        **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["EfficientNetB1"])
     return model
 
 
 def EfficientNetB2(padding_type='SAME',
                    override_params=None,
                    use_se=True,
-                   **args):
+                   pretrained=False, 
+                   use_ssld=False, 
+                   **kwargs):
     model = EfficientNet(
         name='b2',
         padding_type=padding_type,
         override_params=override_params,
         use_se=use_se,
-        **args)
+        **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["EfficientNetB2"])
     return model
 
 
 def EfficientNetB3(padding_type='SAME',
                    override_params=None,
                    use_se=True,
-                   **args):
+                   pretrained=False, 
+                   use_ssld=False, 
+                   **kwargs):
     model = EfficientNet(
         name='b3',
         padding_type=padding_type,
         override_params=override_params,
         use_se=use_se,
-        **args)
+        **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["EfficientNetB3"])
     return model
 
 
 def EfficientNetB4(padding_type='SAME',
                    override_params=None,
                    use_se=True,
-                   **args):
+                   pretrained=False, 
+                   use_ssld=False, 
+                   **kwargs):
     model = EfficientNet(
         name='b4',
         padding_type=padding_type,
         override_params=override_params,
         use_se=use_se,
-        **args)
+        **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["EfficientNetB4"])
     return model
 
 
 def EfficientNetB5(padding_type='SAME',
                    override_params=None,
                    use_se=True,
-                   **args):
+                   pretrained=False, 
+                   use_ssld=False, 
+                   **kwargs):
     model = EfficientNet(
         name='b5',
         padding_type=padding_type,
         override_params=override_params,
         use_se=use_se,
-        **args)
+        **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["EfficientNetB5"])
     return model
 
 
 def EfficientNetB6(padding_type='SAME',
                    override_params=None,
                    use_se=True,
-                   **args):
+                   pretrained=False, 
+                   use_ssld=False, 
+                   **kwargs):
     model = EfficientNet(
         name='b6',
         padding_type=padding_type,
         override_params=override_params,
         use_se=use_se,
-        **args)
+        **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["EfficientNetB6"])
     return model
 
 
 def EfficientNetB7(padding_type='SAME',
                    override_params=None,
                    use_se=True,
-                   **args):
+                   pretrained=False, 
+                   use_ssld=False, 
+                   **kwargs):
     model = EfficientNet(
         name='b7',
         padding_type=padding_type,
         override_params=override_params,
         use_se=use_se,
-        **args)
+        **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["EfficientNetB7"])
     return model

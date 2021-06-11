@@ -27,9 +27,18 @@ from paddle.nn.initializer import Uniform
 
 import math
 
-__all__ = [
-    "ResNet18_vd", "ResNet34_vd", "ResNet50_vd", "ResNet101_vd", "ResNet152_vd"
-]
+from ppcls.utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
+
+MODEL_URLS = {
+              "ResNet18_vd": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ResNet18_vd_pretrained.pdparams",
+              "ResNet34_vd": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ResNet34_vd_pretrained.pdparams",
+              "ResNet50_vd": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ResNet50_vd_pretrained.pdparams",
+              "ResNet101_vd": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ResNet101_vd_pretrained.pdparams",
+              "ResNet152_vd": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ResNet152_vd_pretrained.pdparams",
+              "ResNet200_vd": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ResNet200_vd_pretrained.pdparams",
+             }
+
+__all__ = list(MODEL_URLS.keys())
 
 
 class ConvBNLayer(nn.Layer):
@@ -324,31 +333,50 @@ class ResNet_vd(nn.Layer):
         return y
 
 
-def ResNet18_vd(**args):
-    model = ResNet_vd(layers=18, **args)
+def _load_pretrained(pretrained, model, model_url, use_ssld=False):
+    if pretrained is False:
+        pass
+    elif pretrained is True:
+        load_dygraph_pretrain_from_url(model, model_url, use_ssld=use_ssld)
+    elif isinstance(pretrained, str):
+        load_dygraph_pretrain(model, pretrained)
+    else:
+        raise RuntimeError(
+            "pretrained type is not available. Please use `string` or `boolean` type."
+        )
+
+
+def ResNet18_vd(pretrained=False, use_ssld=False, **kwargs):
+    model = ResNet_vd(layers=18, **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["ResNet18_vd"], use_ssld=use_ssld)
     return model
 
 
-def ResNet34_vd(**args):
-    model = ResNet_vd(layers=34, **args)
+def ResNet34_vd(pretrained=False, use_ssld=False, **kwargs):
+    model = ResNet_vd(layers=34, **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["ResNet34_vd"], use_ssld=use_ssld)
     return model
 
 
-def ResNet50_vd(**args):
-    model = ResNet_vd(layers=50, **args)
+def ResNet50_vd(pretrained=False, use_ssld=False, **kwargs):
+    model = ResNet_vd(layers=50, **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["ResNet50_vd"], use_ssld=use_ssld)
     return model
 
 
-def ResNet101_vd(**args):
-    model = ResNet_vd(layers=101, **args)
+def ResNet101_vd(pretrained=False, use_ssld=False, **kwargs):
+    model = ResNet_vd(layers=101, **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["ResNet101_vd"], use_ssld=use_ssld)
     return model
 
 
-def ResNet152_vd(**args):
-    model = ResNet_vd(layers=152, **args)
+def ResNet152_vd(pretrained=False, use_ssld=False, **kwargs):
+    model = ResNet_vd(layers=152, **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["ResNet152_vd"], use_ssld=use_ssld)
     return model
 
 
-def ResNet200_vd(**args):
-    model = ResNet_vd(layers=200, **args)
+def ResNet200_vd(pretrained=False, use_ssld=False, **kwargs):
+    model = ResNet_vd(layers=200, **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["ResNet200_vd"], use_ssld=use_ssld)
     return model

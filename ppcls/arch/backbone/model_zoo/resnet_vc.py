@@ -27,9 +27,13 @@ from paddle.nn.initializer import Uniform
 
 import math
 
-__all__ = [
-    "ResNet18_vc", "ResNet34_vc", "ResNet50_vc", "ResNet101_vc", "ResNet152_vc"
-]
+from ppcls.utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
+
+MODEL_URLS = {
+              "ResNet50_vc": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ResNet50_vc_pretrained.pdparams",
+             }
+
+__all__ = list(MODEL_URLS.keys())
 
 
 class ConvBNLayer(nn.Layer):
@@ -283,27 +287,22 @@ class ResNet_vc(nn.Layer):
         y = self.out(y)
         return y
 
+    
+def _load_pretrained(pretrained, model, model_url, use_ssld=False):
+    if pretrained is False:
+        pass
+    elif pretrained is True:
+        load_dygraph_pretrain_from_url(model, model_url, use_ssld=use_ssld)
+    elif isinstance(pretrained, str):
+        load_dygraph_pretrain(model, pretrained)
+    else:
+        raise RuntimeError(
+            "pretrained type is not available. Please use `string` or `boolean` type."
+        )
 
-def ResNet18_vc(**args):
-    model = ResNet_vc(layers=18, **args)
+        
+def ResNet50_vc(pretrained=False, use_ssld=False, **kwargs):
+    model = ResNet_vc(layers=50, **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["ResNet50_vc"], use_ssld=use_ssld)
     return model
 
-
-def ResNet34_vc(**args):
-    model = ResNet_vc(layers=34, **args)
-    return model
-
-
-def ResNet50_vc(**args):
-    model = ResNet_vc(layers=50, **args)
-    return model
-
-
-def ResNet101_vc(**args):
-    model = ResNet_vc(layers=101, **args)
-    return model
-
-
-def ResNet152_vc(**args):
-    model = ResNet_vc(layers=152, **args)
-    return model

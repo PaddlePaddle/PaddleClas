@@ -5,7 +5,16 @@ import paddle.nn.functional as F
 from paddle.nn import Conv2D, BatchNorm, Linear, Dropout
 from paddle.nn import AdaptiveAvgPool2D, MaxPool2D, AvgPool2D
 
-__all__ = ["VGG11", "VGG13", "VGG16", "VGG19"]
+from ppcls.utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
+
+MODEL_URLS = {
+              "VGG11": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/VGG11_pretrained.pdparams",
+              "VGG13": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/VGG13_pretrained.pdparams",
+              "VGG16": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/VGG16_pretrained.pdparams",
+              "VGG19": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/VGG19_pretrained.pdparams",
+             }
+
+__all__ = list(MODEL_URLS.keys())
 
 
 class ConvBlock(nn.Layer):
@@ -131,22 +140,40 @@ class VGGNet(nn.Layer):
         x = self._out(x)
         return x
 
+    
+    
+def _load_pretrained(pretrained, model, model_url, use_ssld=False):
+    if pretrained is False:
+        pass
+    elif pretrained is True:
+        load_dygraph_pretrain_from_url(model, model_url, use_ssld=use_ssld)
+    elif isinstance(pretrained, str):
+        load_dygraph_pretrain(model, pretrained)
+    else:
+        raise RuntimeError(
+            "pretrained type is not available. Please use `string` or `boolean` type."
+        )
 
-def VGG11(**args):
-    model = VGGNet(layers=11, **args)
+
+def VGG11(pretrained, model, model_url, use_ssld=False, **kwargs):
+    model = VGGNet(layers=11, **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["VGG11"], use_ssld=use_ssld)
     return model
 
 
-def VGG13(**args):
-    model = VGGNet(layers=13, **args)
+def VGG13(pretrained, model, model_url, use_ssld=False, **kwargs):
+    model = VGGNet(layers=13, **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["VGG13"], use_ssld=use_ssld)
     return model
 
 
-def VGG16(**args):
-    model = VGGNet(layers=16, **args)
+def VGG16(pretrained, model, model_url, use_ssld=False, **kwargs):
+    model = VGGNet(layers=16, **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["VGG16"], use_ssld=use_ssld)
     return model
 
 
-def VGG19(**args):
-    model = VGGNet(layers=19, **args)
+def VGG19(pretrained, model, model_url, use_ssld=False, **kwargs):
+    model = VGGNet(layers=19, **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["VGG19"], use_ssld=use_ssld)
     return model
