@@ -193,7 +193,7 @@ python3.7 python/build_gallery.py -c configs/build_logo.yaml -o IndexProcess.dat
 
 
 <a name="基于新的索引库的图像识别"></a>
-3.2 基于新的索引库的图像识别
+### 3.2 基于新的索引库的图像识别
 
 对图像`xxxx`进行识别，运行命令如下。
 
