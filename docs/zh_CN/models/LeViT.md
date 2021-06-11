@@ -5,7 +5,7 @@ LeViT是一种快速推理的、用于图像分类任务的混合神经网络。
 
 ## 精度、FLOPS和参数量
 
-| Models           | Top1 | Top5 | Reference<br>top1 | Reference<br>top5 | FLOPS<br>(G) | Params<br>(M) |
+| Models           | Top1 | Top5 | Reference<br>top1 | Reference<br>top5 | FLOPS<br>(M) | Params<br>(M) |
 |:--:|:--:|:--:|:--:|:--:|:--:|:--:|
 | LeViT-128S | 0.7621 | 0.9277 | 0.766 | 0.929 | 305  | 7.8 |
 | LeViT-128  | 0.7833 | 0.9378 | 0.786 | 0.940 | 406  | 9.2 |
