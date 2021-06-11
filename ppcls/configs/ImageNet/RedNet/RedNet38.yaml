@@ -8,7 +8,7 @@ Global:
   save_interval: 1
   eval_during_train: True
   eval_interval: 1
-  epochs: 360
+  epochs: 120
   print_batch_step: 10
   use_visualdl: False
   # used for static mode and model export
@@ -17,14 +17,13 @@ Global:
 
 # model architecture
 Arch:
-  name: MobileNetV3_small_x0_35
+  name: RedNet38
  
 # loss function config for traing/eval process
 Loss:
   Train:
     - CELoss:
         weight: 1.0
-        epsilon: 0.1
   Eval:
     - CELoss:
         weight: 1.0
@@ -34,12 +33,13 @@ Optimizer:
   name: Momentum
   momentum: 0.9
   lr:
-    name: Cosine
-    learning_rate: 1.3
-    warmup_epoch: 5
+    name: Piecewise
+    learning_rate: 0.1
+    decay_epochs: [30, 60, 90]
+    values: [0.1, 0.01, 0.001, 0.0001]
   regularizer:
     name: 'L2'
-    coeff: 0.00001
+    coeff: 0.0001
 
 
 # data loader for train and eval
@@ -58,14 +58,14 @@ DataLoader:
         - RandFlipImage:
             flip_code: 1
         - NormalizeImage:
-            scale: 1.0/255.0
-            mean: [0.485, 0.456, 0.406]
-            std: [0.229, 0.224, 0.225]
+            scale: 1.0
+            mean: [123.675, 116.28, 103.53]
+            std: [58.395, 57.12, 57.375]
             order: ''
 
     sampler:
       name: DistributedBatchSampler
-      batch_size: 512
+      batch_size: 64
       drop_last: False
       shuffle: True
     loader:
@@ -87,9 +87,9 @@ DataLoader:
         - CropImage:
             size: 224
         - NormalizeImage:
-            scale: 1.0/255.0
-            mean: [0.485, 0.456, 0.406]
-            std: [0.229, 0.224, 0.225]
+            scale: 1.0
+            mean: [123.675, 116.28, 103.53]
+            std: [58.395, 57.12, 57.375]
             order: ''
     sampler:
       name: DistributedBatchSampler
@@ -112,9 +112,9 @@ Infer:
     - CropImage:
         size: 224
     - NormalizeImage:
-        scale: 1.0/255.0
-        mean: [0.485, 0.456, 0.406]
-        std: [0.229, 0.224, 0.225]
+        scale: 1.0
+        mean: [123.675, 116.28, 103.53]
+        std: [58.395, 57.12, 57.375]
         order: ''
     - ToCHWImage:
   PostProcess:
