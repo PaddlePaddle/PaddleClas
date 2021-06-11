@@ -29,6 +29,7 @@ from ppcls.data.dataloader.icartoon_dataset import ICartoonDataset
 
 # sampler
 from ppcls.data.dataloader.DistributedRandomIdentitySampler import DistributedRandomIdentitySampler
+from ppcls.data import preprocess
 from ppcls.data.preprocess import transform
 
 
@@ -46,7 +47,7 @@ def create_operators(params):
                           dict) and len(operator) == 1, "yaml format error"
         op_name = list(operator)[0]
         param = {} if operator[op_name] is None else operator[op_name]
-        op = getattr(imaug, op_name)(**param)
+        op = getattr(preprocess, op_name)(**param)
         ops.append(op)
 
     return ops
