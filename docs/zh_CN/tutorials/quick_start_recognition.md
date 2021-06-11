@@ -4,17 +4,18 @@
 
 ## 1. 环境配置
 
+### 1.1 安装
+
 * 请先参考[快速安装](./installation.md)配置PaddleClas运行环境。
 
 
-注意：
+### 1.2 进入运行目录
 
 **本部分内容需要在`deploy`文件夹下运行，在PaddleClas代码的根目录下，可以通过以下方法进入该文件夹**
 
 ```shell
 cd deploy
 ```
-
 
 ## 2. inference 模型和数据下载
 
@@ -29,10 +30,10 @@ cd deploy
 | 商品识别模型 | 商品场景  | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/data/product_demo_data_v1.0.tar) |  [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/inference/product_ResNet50_vd_Inshop_v1.0_infer.tar) |
 
 
-**注意**：windows 环境下如果没有安装wget,下载模型时可将链接复制到浏览器中下载，并解压放置在相应目录下
+**注意**：windows 环境下如果没有安装wget,下载模型时可将链接复制到浏览器中下载，并解压放置在相应目录下。
 
 
-* 下载并解压数据与模型
+* 可以按照下面的命令下载并解压数据与模型
 
 ```shell
 mkdir dataset
@@ -51,6 +52,11 @@ cd ..
 
 ### 2.1 下载通用检测模型
 
+
+检测是图像识别的前续步骤，通过检测，找到图像中的主体内容，再对检测结果进行识别与检索。
+
+通过下面的命令下载检测模型。
+
 ```shell
 mkdir models
 cd models
@@ -59,10 +65,13 @@ wget https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/infere
 cd ..
 ```
 
+### 2.2 Logo识别与检索
 
-### 2.1 Logo识别
+以Logo识别demo为例，展示识别与检索过程。
 
-以Logo识别demo为例，按照下面的命令下载demo数据与模型。
+#### 2.2.1 下载demo数据与inference模型
+
+按照下面的命令下载demo数据与模型。
 
 ```shell
 mkdir dataset
@@ -89,6 +98,9 @@ cd ..
 ├── ...
 ```
 
+其中`data_file.txt`是用于构建底库的图像列表文件，`gallery`文件夹中是所有用于构建底库的图像原始文件，`index`文件夹中是构建底库生成的索引文件，`query`是用来测试识别效果的demo图像。
+
+
 `models`文件夹下应有如下文件结构：
 
 ```
@@ -102,17 +114,33 @@ cd ..
 │   └── inference.pdmodel
 ```
 
-按照下面的方式可以完成对于图片的检索
+
+#### 2.2.2 识别单张图像
+
+提供的底库图像均在`dataset/logo_demo_data_v1.0/gallery/`文件夹下面，部分示例图像如下所示。
+
+<div align="center">
+<img src="./images/logo_gallery_demo.png"  width = "200" />
+</div>
+
+
+运行下面的命令，对图像`./dataset/logo_demo_data_v1.0/query/logo_auxx-1.jpg`进行识别与检索
 
 ```shell
 python3.7 python/predict_system.py -c configs/inference_logo.yaml
 ```
 
+待检索图像如下所示。
+<div align="center">
+<img src="./images/logo_demo/query/logo_auxx-1.jpg"  width = "200" />
+</div>
+
+
 配置文件中，部分关键字段解释如下
 
 ```yaml
 Global:
-  infer_imgs: "./dataset/logo_demo_data_v1.0/query/" # 预测图像
+  infer_imgs: "./dataset/logo_demo_data_v1.0/query/logo_auxx-1.jpg" # 预测图像
   det_inference_model_dir: "./models/ppyolov2_r50vd_dcn_mainbody_v1.0_infer/" # 检测inference模型文件夹
   rec_inference_model_dir: "./models/logo_rec_ResNet50_Logo3K_v1.0_infer/" # 识别inference模型文件夹
   batch_size: 1 # 预测的批大小
@@ -129,20 +157,31 @@ IndexProcess:
 ```
 
 
-
 最终输出结果如下
 
 ```
-[{'bbox': [25, 21, 483, 382], 'rec_docs': ['AKG', 'AKG', 'AKG', 'AKG', 'AKG'], 'rec_scores': array([2.32288337, 2.31903863, 2.28398442, 2.16804123, 2.10190272])}]
+[{'bbox': [129, 219, 230, 253], 'rec_docs': ['auxx-2', 'auxx-1', 'auxx-2', 'auxx-1', 'auxx-2'], 'rec_scores': array([3.09635019, 3.09635019, 2.83965826, 2.83965826, 2.64057827])}]
 ```
 
 其中bbox表示检测出的主体所在位置，rec_docs表示底库中与检出主体最相近的若干张图像对应的标签，rec_scores表示对应的相似度。
 
-如果希望预测文件夹内的图像，可以直接修改配置文件，也可以通过下面的`-o`参数修改对应的配置。
+
+匹配的一些示例图像如下所示。
+
+<center class="half">
+    <img src="./images/logo_demo/gallery/auxx-1_59_0.jpg" width="200"/><img src="./images/logo_demo/gallery/auxx-1_79_0.jpg" width="200"/><img src="./images/logo_demo/gallery/auxx-2_47_0.jpg" width="200"/><img src="./images/logo_demo/gallery/auxx-2_59_0.jpg" width="200"/><img src="./images/logo_demo/gallery/auxx-2_79_0.jpg" width="200"/>
+</center>
+
+
+#### 2.2.3 识别文件夹内的图像
+
+如果希望预测文件夹内的图像，可以直接修改配置文件中的`Global.infer_imgs`字段，也可以通过下面的`-o`参数修改对应的配置。
 
 ```shell
 python3.7 python/predict_system.py -c configs/inference_logo.yaml -o Global.infer_imgs="./dataset/logo_demo_data_v1.0/query"
 ```
+
+#### 2.2.4 基于自己的数据集构建底库
 
 如果希望在底库中新增图像，重新构建idnex，可以使用下面的命令重新构建index。
 
@@ -158,9 +197,9 @@ IndexProcess:
   index_path: "./dataset/logo_demo_data_v1.0/index/" # 保存的索引地址
   image_root: "./dataset/logo_demo_data_v1.0/" # 图像的根目录
   data_file:  "./dataset/logo_demo_data_v1.0/data_file.txt" # 图像的数据list文本，每一行包含图像的文件名与标签信息
-  delimiter: "\t"
-  dist_type: "IP"
-  pq_size: 100
+  delimiter: "\t" # 图像和对应标签之间的分割符
+  dist_type: "IP" # 向量相似度计算方式，只支持“L2“和“IP“
+  pq_size: 100 # 建图时的搜索参数，值越大，构建索引越慢，但是效果越好
   embedding_size: 512 # 特征维度
 ```
 
@@ -169,7 +208,7 @@ IndexProcess:
 2. 图像的数据list文本中添加图像新的内容，每行包含图像文件名以及对应的标签信息。
 
 
-### 2.2 其他任务的识别
+### 2.3 其他任务的识别
 
 如果希望尝试其他方向的识别与检索效果，在下载解压好对应的demo数据与模型之后，替换对应的配置文件即可完成预测。
 
