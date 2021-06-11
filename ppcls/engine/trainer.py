@@ -401,9 +401,7 @@ class Trainer(object):
             name='gallery')
         query_feas, query_img_id, query_query_id = self._cal_feature(
             name='query')
-        gallery_img_id = gallery_img_id
-        # if gallery_unique_id is not None:
-        #     gallery_unique_id = gallery_unique_id
+
         # step2. do evaluation
         sim_block_size = self.config["Global"].get("sim_block_size", 64)
         sections = [sim_block_size] * (len(query_feas) // sim_block_size)
@@ -440,13 +438,9 @@ class Trainer(object):
 
                 for key in metric_tmp:
                     if key not in metric_dict:
-                        metric_dict[key] = metric_tmp[key]
+                        metric_dict[key] = metric_tmp[key] * block_fea.shape[0] / len(query_feas)
                     else:
-                        metric_dict[key] += metric_tmp[key]
-
-            num_sections = len(fea_blocks)
-            for key in metric_dict:
-                metric_dict[key] = metric_dict[key] / num_sections
+                        metric_dict[key] += metric_tmp[key] * block_fea.shape[0] / len(query_feas)
 
         metric_info_list = []
         for key in metric_dict:
