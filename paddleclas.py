@@ -326,8 +326,7 @@ class PaddleClas(object):
                  model_name: str=None,
                  inference_model_dir: str=None,
                  use_gpu: bool=None,
-                 batch_size: int=None,
-                 **kwargs):
+                 batch_size: int=None):
         """Init PaddleClas with config.
 
         Args:
@@ -340,7 +339,7 @@ class PaddleClas(object):
         super().__init__()
         self._config = config
         self._check_config(model_name, inference_model_dir, use_gpu,
-                           batch_size, **kwargs)
+                           batch_size)
         self._check_input_model()
         self.cls_predictor = ClsPredictor(self._config)
 
@@ -353,25 +352,21 @@ class PaddleClas(object):
                       model_name=None,
                       inference_model_dir=None,
                       use_gpu=None,
-                      batch_size=None,
-                      **kwargs):
+                      batch_size=None):
         if self._config is None:
             self._config = get_default_confg()
             warnings.warn("config is not provided, use default!")
-        if isinstance(self._config, dict):
-            self._config = config.AttrDict(self._config)
-            config.create_attr_dict(self._config)
+        self._config = config.AttrDict(self._config)
+        config.create_attr_dict(self._config)
 
         if model_name is not None:
-            self._config["model_name"] = model_name
+            self._config.Global["model_name"] = model_name
         if inference_model_dir is not None:
-            self._config["inference_model_dir"] = inference_model_dir
+            self._config.Global["inference_model_dir"] = inference_model_dir
         if use_gpu is not None:
-            self._config["use_gpu"] = use_gpu
+            self._config.Global["use_gpu"] = use_gpu
         if batch_size is not None:
-            self._config["batch_size"] = batch_size
-        for k in kwargs:
-            self._config[k] = kwargs[k]
+            self._config.Global["batch_size"] = batch_size
 
     def _check_input_model(self):
         """Check input model name or model files.
