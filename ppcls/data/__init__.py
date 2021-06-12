@@ -58,7 +58,9 @@ def build_dataloader(config, mode, device, seed=None):
         'Train',
         'Eval',
         'Test',
-    ], "Mode should be Train, Eval, Test"
+        'Gallery',
+        'Query'
+    ], "Mode should be Train, Eval, Test, Gallery, Query"
     # build dataset
     config_dataset = config[mode]['dataset']
     config_dataset = copy.deepcopy(config_dataset)
