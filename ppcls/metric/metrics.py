@@ -18,7 +18,6 @@ import paddle.nn as nn
 from functools import lru_cache
 
 
-# TODO: fix the format
 class TopkAcc(nn.Layer):
     def __init__(self, topk=(1, 5)):
         super().__init__()
@@ -69,7 +68,7 @@ class mINP(nn.Layer):
 class Recallk(nn.Layer):
     def __init__(self, topk=(1, 5)):
         super().__init__()
-        assert isinstance(topk, (int, list))
+        assert isinstance(topk, (int, list, tuple))
         if isinstance(topk, int):
             topk = [topk]
         self.topk = topk
@@ -82,6 +81,33 @@ class Recallk(nn.Layer):
 
         for k in self.topk:
             metric_dict["recall{}".format(k)] = all_cmc[k - 1]
+        return metric_dict
+
+
+# retrieval metrics
+class RetriMetric(nn.Layer):
+    def __init__(self, config):
+        super().__init__()
+        self.config = config
+        self.max_rank = 50  #max(self.topk) if max(self.topk) > 50 else 50
+
+    def forward(self, similarities_matrix, query_img_id, gallery_img_id):
+        metric_dict = dict()
+        all_cmc, all_AP, all_INP = get_metrics(
+            similarities_matrix, query_img_id, gallery_img_id, self.max_rank)
+        if "Recallk" in self.config.keys():
+            topk = self.config['Recallk']['topk']
+            assert isinstance(topk, (int, list, tuple))
+            if isinstance(topk, int):
+                topk = [topk]
+            for k in topk:
+                metric_dict["recall{}".format(k)] = all_cmc[k - 1]
+        if "mAP" in self.config.keys():
+            mAP = np.mean(all_AP)
+            metric_dict["mAP"] = mAP
+        if "mINP" in self.config.keys():
+            mINP = np.mean(all_INP)
+            metric_dict["mINP"] = mINP
         return metric_dict
 
 
@@ -129,3 +155,16 @@ def get_metrics(similarities_matrix, query_img_id, gallery_img_id,
     all_cmc = all_cmc.sum(0) / num_valid_q
 
     return all_cmc, all_AP, all_INP
+
+
+class DistillationTopkAcc(TopkAcc):
+    def __init__(self, model_key, feature_key=None, topk=(1, 5)):
+        super().__init__(topk=topk)
+        self.model_key = model_key
+        self.feature_key = feature_key
+
+    def forward(self, x, label):
+        x = x[self.model_key]
+        if self.feature_key is not None:
+            x = x[self.feature_key]
+        return super().forward(x, label)

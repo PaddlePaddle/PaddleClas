@@ -27,24 +27,18 @@ from paddle.nn.initializer import Uniform
 
 import math
 
-__all__ = [
-    "HRNet_W18_C",
-    "HRNet_W30_C",
-    "HRNet_W32_C",
-    "HRNet_W40_C",
-    "HRNet_W44_C",
-    "HRNet_W48_C",
-    "HRNet_W60_C",
-    "HRNet_W64_C",
-    "SE_HRNet_W18_C",
-    "SE_HRNet_W30_C",
-    "SE_HRNet_W32_C",
-    "SE_HRNet_W40_C",
-    "SE_HRNet_W44_C",
-    "SE_HRNet_W48_C",
-    "SE_HRNet_W60_C",
-    "SE_HRNet_W64_C",
-]
+from ppcls.utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
+
+MODEL_URLS = {"HRNet_W18_C": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/HRNet_W18_C_pretrained.pdparams",
+              "HRNet_W30_C": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/HRNet_W30_C_pretrained.pdparams",
+              "HRNet_W32_C": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/HRNet_W32_C_pretrained.pdparams",
+              "HRNet_W40_C": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/HRNet_W40_C_pretrained.pdparams",
+              "HRNet_W44_C": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/HRNet_W44_C_pretrained.pdparams",
+              "HRNet_W48_C": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/HRNet_W48_C_pretrained.pdparams",
+              "HRNet_W64_C": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/HRNet_W64_C_pretrained.pdparams",
+             }
+
+__all__ = list(MODEL_URLS.keys())
 
 
 class ConvBNLayer(nn.Layer):
@@ -661,82 +655,62 @@ class HRNet(nn.Layer):
         y = self.out(y)
         return y
 
+def _load_pretrained(pretrained, model, model_url, use_ssld=False):
+    if pretrained is False:
+        pass
+    elif pretrained is True:
+        load_dygraph_pretrain_from_url(model, model_url, use_ssld=use_ssld)
+    elif isinstance(pretrained, str):
+        load_dygraph_pretrain(model, pretrained)
+    else:
+        raise RuntimeError(
+            "pretrained type is not available. Please use `string` or `boolean` type."
+        )
 
-def HRNet_W18_C(**args):
-    model = HRNet(width=18, **args)
+
+def HRNet_W18_C(pretrained=False, use_ssld=False, **kwarg):
+    model = HRNet(width=18, **kwarg)
+    _load_pretrained(pretrained, model, MODEL_URLS["HRNet_W18_C"], use_ssld=use_ssld)
     return model
 
 
-def HRNet_W30_C(**args):
-    model = HRNet(width=30, **args)
+def HRNet_W30_C(pretrained=False, use_ssld=False, **kwarg):
+    model = HRNet(width=30, **kwarg)
+    _load_pretrained(pretrained, model, MODEL_URLS["HRNet_W30_C"], use_ssld=use_ssld)
     return model
 
 
-def HRNet_W32_C(**args):
-    model = HRNet(width=32, **args)
+def HRNet_W32_C(pretrained=False, use_ssld=False, **kwarg):
+    model = HRNet(width=32, **kwarg)
+    _load_pretrained(pretrained, model, MODEL_URLS["HRNet_W32_C"], use_ssld=use_ssld)
     return model
 
 
-def HRNet_W40_C(**args):
-    model = HRNet(width=40, **args)
+def HRNet_W40_C(pretrained=False, use_ssld=False, **kwarg):
+    model = HRNet(width=40, **kwarg)
+    _load_pretrained(pretrained, model, MODEL_URLS["HRNet_W40_C"], use_ssld=use_ssld)
     return model
 
 
-def HRNet_W44_C(**args):
-    model = HRNet(width=44, **args)
+def HRNet_W44_C(pretrained=False, use_ssld=False, **kwarg):
+    model = HRNet(width=44, **kwarg)
+    _load_pretrained(pretrained, model, MODEL_URLS["HRNet_W44_C"], use_ssld=use_ssld)
     return model
 
 
-def HRNet_W48_C(**args):
-    model = HRNet(width=48, **args)
+def HRNet_W48_C(pretrained=False, use_ssld=False, **kwarg):
+    model = HRNet(width=48, **kwarg)
+    _load_pretrained(pretrained, model, MODEL_URLS["HRNet_W48_C"], use_ssld=use_ssld)
     return model
 
 
-def HRNet_W60_C(**args):
-    model = HRNet(width=60, **args)
+def HRNet_W64_C(pretrained=False, use_ssld=False, **kwarg):
+    model = HRNet(width=64, **kwarg)
+    _load_pretrained(pretrained, model, MODEL_URLS["HRNet_W64_C"], use_ssld=use_ssld)
     return model
 
 
-def HRNet_W64_C(**args):
-    model = HRNet(width=64, **args)
-    return model
-
-
-def SE_HRNet_W18_C(**args):
-    model = HRNet(width=18, has_se=True, **args)
-    return model
-
-
-def SE_HRNet_W30_C(**args):
-    model = HRNet(width=30, has_se=True, **args)
-    return model
-
-
-def SE_HRNet_W32_C(**args):
-    model = HRNet(width=32, has_se=True, **args)
-    return model
-
-
-def SE_HRNet_W40_C(**args):
-    model = HRNet(width=40, has_se=True, **args)
-    return model
-
-
-def SE_HRNet_W44_C(**args):
-    model = HRNet(width=44, has_se=True, **args)
-    return model
-
-
-def SE_HRNet_W48_C(**args):
-    model = HRNet(width=48, has_se=True, **args)
-    return model
-
-
-def SE_HRNet_W60_C(**args):
-    model = HRNet(width=60, has_se=True, **args)
-    return model
-
-
-def SE_HRNet_W64_C(**args):
-    model = HRNet(width=64, has_se=True, **args)
+def SE_HRNet_W64_C(pretrained=False, use_ssld=False, **kwarg):
+    model = HRNet(width=64, **kwarg)
+    _load_pretrained(pretrained, model, MODEL_URLS["SE_HRNet_W64_C"], use_ssld=use_ssld)
     return model

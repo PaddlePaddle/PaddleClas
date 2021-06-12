@@ -8,7 +8,12 @@ from paddle.nn.initializer import Uniform
 
 import math
 
-__all__ = ['GoogLeNet']
+from ppcls.utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
+
+MODEL_URLS = {"GoogLeNet": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/GoogLeNet_pretrained.pdparams",
+             }
+
+__all__ = list(MODEL_URLS.keys())
 
 
 def xavier(channels, filter_size, name):
@@ -200,8 +205,22 @@ class GoogLeNetDY(nn.Layer):
         x = self._drop_o2(x)
         out2 = self._out2(x)
         return [out, out1, out2]
+    
+    
+def _load_pretrained(pretrained, model, model_url, use_ssld=False):
+    if pretrained is False:
+        pass
+    elif pretrained is True:
+        load_dygraph_pretrain_from_url(model, model_url, use_ssld=use_ssld)
+    elif isinstance(pretrained, str):
+        load_dygraph_pretrain(model, pretrained)
+    else:
+        raise RuntimeError(
+            "pretrained type is not available. Please use `string` or `boolean` type."
+        )
 
 
-def GoogLeNet(**args):
-    model = GoogLeNetDY(**args)
+def GoogLeNet(pretrained=False, use_ssld=False, **kwargs):
+    model = GoogLeNetDY(**kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["GoogLeNet"], use_ssld=use_ssld)
     return model

@@ -1,3 +1,17 @@
+# copyright (c) 2021 PaddlePaddle Authors. All Rights Reserve.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#    http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 import paddle
 from paddle import ParamAttr
 import paddle.nn as nn
@@ -5,7 +19,12 @@ import paddle.nn.functional as F
 from paddle.nn import Conv2D, BatchNorm, Linear, Dropout
 from paddle.nn import AdaptiveAvgPool2D, MaxPool2D, AvgPool2D
 
-__all__ = ["Xception41_deeplab", "Xception65_deeplab", "Xception71_deeplab"]
+from ppcls.utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
+
+MODEL_URLS = {"Xception41_deeplab": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/Xception41_deeplab_pretrained.pdparams",
+             "Xception65_deeplab": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/Xception41_deeplab_pretrained.pdparams"}
+
+__all__ = list(MODEL_URLS.keys())
 
 
 def check_data(data, number):
@@ -369,18 +388,28 @@ class XceptionDeeplab(nn.Layer):
         x = paddle.squeeze(x, axis=[2, 3])
         x = self._fc(x)
         return x
+    
+    
+def _load_pretrained(pretrained, model, model_url, use_ssld=False):
+    if pretrained is False:
+        pass
+    elif pretrained is True:
+        load_dygraph_pretrain_from_url(model, model_url, use_ssld=use_ssld)
+    elif isinstance(pretrained, str):
+        load_dygraph_pretrain(model, pretrained)
+    else:
+        raise RuntimeError(
+            "pretrained type is not available. Please use `string` or `boolean` type."
+        )
 
 
-def Xception41_deeplab(**args):
-    model = XceptionDeeplab('xception_41', **args)
+def Xception41_deeplab(pretrained=False, use_ssld=False, **kwargs):
+    model = XceptionDeeplab('xception_41', **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["Xception41_deeplab"], use_ssld=use_ssld)
     return model
 
 
-def Xception65_deeplab(**args):
-    model = XceptionDeeplab("xception_65", **args)
-    return model
-
-
-def Xception71_deeplab(**args):
-    model = XceptionDeeplab("xception_71", **args)
+def Xception65_deeplab(pretrained=False, use_ssld=False, **kwargs):
+    model = XceptionDeeplab("xception_65", **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["Xception65_deeplab"], use_ssld=use_ssld)
     return model

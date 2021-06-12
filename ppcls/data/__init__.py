@@ -19,21 +19,48 @@ from paddle.io import DistributedBatchSampler, BatchSampler, DataLoader
 from ppcls.utils import logger
 
 from ppcls.data import dataloader
-from ppcls.data import imaug
 # dataset
 from ppcls.data.dataloader.imagenet_dataset import ImageNetDataset
 from ppcls.data.dataloader.multilabel_dataset import MultiLabelDataset
 from ppcls.data.dataloader.common_dataset import create_operators
 from ppcls.data.dataloader.vehicle_dataset import CompCars, VeriWild
+from ppcls.data.dataloader.logo_dataset import LogoDataset
+from ppcls.data.dataloader.icartoon_dataset import ICartoonDataset
 
 # sampler
 from ppcls.data.dataloader.DistributedRandomIdentitySampler import DistributedRandomIdentitySampler
+from ppcls.data import preprocess
 from ppcls.data.preprocess import transform
 
 
+def create_operators(params):
+    """
+    create operators based on the config
+
+    Args:
+        params(list): a dict list, used to create some operators
+    """
+    assert isinstance(params, list), ('operator config should be a list')
+    ops = []
+    for operator in params:
+        assert isinstance(operator,
+                          dict) and len(operator) == 1, "yaml format error"
+        op_name = list(operator)[0]
+        param = {} if operator[op_name] is None else operator[op_name]
+        op = getattr(preprocess, op_name)(**param)
+        ops.append(op)
+
+    return ops
+
+
 def build_dataloader(config, mode, device, seed=None):
-    assert mode in ['Train', 'Eval', 'Test', 'Gallery', 'Query'
-                    ], "Mode should be Train, Eval, Test, Gallery or Query"
+    assert mode in [
+        'Train',
+        'Eval',
+        'Test',
+        'Gallery',
+        'Query'
+    ], "Mode should be Train, Eval, Test, Gallery, Query"
     # build dataset
     config_dataset = config[mode]['dataset']
     config_dataset = copy.deepcopy(config_dataset)
@@ -106,16 +133,4 @@ def build_dataloader(config, mode, device, seed=None):
             collate_fn=batch_collate_fn)
 
     logger.info("build data_loader({}) success...".format(data_loader))
-
     return data_loader
-
-
-'''
-# TODO: fix the format
-def build_dataloader(config, mode, device, seed=None):
-    from . import reader
-    from .reader import Reader
-    dataloader = Reader(config, mode=mode, places=device)()
-    return dataloader
-
-'''

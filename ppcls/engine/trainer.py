@@ -20,6 +20,8 @@ import numpy as np
 __dir__ = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.path.abspath(os.path.join(__dir__, '../../')))
 
+import time
+import datetime
 import argparse
 import paddle
 import paddle.nn as nn
@@ -39,7 +41,7 @@ from ppcls.utils import save_load
 
 from ppcls.data.utils.get_image_list import get_image_list
 from ppcls.data.postprocess import build_postprocess
-from ppcls.data.reader import create_operators
+from ppcls.data import create_operators
 
 
 class Trainer(object):
@@ -126,6 +128,12 @@ class Trainer(object):
         # key: 
         # val: metrics list word
         output_info = dict()
+        time_info = {
+            "batch_cost": AverageMeter(
+                "batch_cost", '.5f', postfix=" s,"),
+            "reader_cost": AverageMeter(
+                "reader_cost", ".5f", postfix=" s,"),
+        }
         # global iter counter
         global_step = 0
 
@@ -135,10 +143,15 @@ class Trainer(object):
             if metric_info is not None:
                 best_metric.update(metric_info)
 
+        tic = time.time()
         for epoch_id in range(best_metric["epoch"] + 1,
                               self.config["Global"]["epochs"] + 1):
             acc = 0.0
             for iter_id, batch in enumerate(self.train_dataloader()):
+                if iter_id == 5:
+                    for key in time_info:
+                        time_info[key].reset()
+                time_info["reader_cost"].update(time.time() - tic)
                 batch_size = batch[0].shape[0]
                 batch[1] = paddle.to_tensor(batch[1].numpy().astype("int64")
                                             .reshape([-1, 1]))
@@ -148,8 +161,10 @@ class Trainer(object):
                     out = self.model(batch[0])
                 else:
                     out = self.model(batch[0], batch[1])
+
                 # calc loss
                 loss_dict = self.train_loss_func(out, batch[1])
+
                 for key in loss_dict:
                     if not key in output_info:
                         output_info[key] = AverageMeter(key, '7.5f')
@@ -164,21 +179,38 @@ class Trainer(object):
                         output_info[key].update(metric_dict[key].numpy()[0],
                                                 batch_size)
 
+                # step opt and lr
+                loss_dict["loss"].backward()
+                optimizer.step()
+                optimizer.clear_grad()
+                lr_sch.step()
+
+                time_info["batch_cost"].update(time.time() - tic)
+
                 if iter_id % print_batch_step == 0:
                     lr_msg = "lr: {:.5f}".format(lr_sch.get_lr())
                     metric_msg = ", ".join([
                         "{}: {:.5f}".format(key, output_info[key].avg)
                         for key in output_info
                     ])
-                    logger.info("[Train][Epoch {}][Iter: {}/{}]{}, {}".format(
-                        epoch_id, iter_id,
-                        len(self.train_dataloader), lr_msg, metric_msg))
+                    time_msg = "s, ".join([
+                        "{}: {:.5f}".format(key, time_info[key].avg)
+                        for key in time_info
+                    ])
 
-                # step opt and lr
-                loss_dict["loss"].backward()
-                optimizer.step()
-                optimizer.clear_grad()
-                lr_sch.step()
+                    ips_msg = "ips: {:.5f} images/sec".format(
+                        batch_size / time_info["batch_cost"].avg)
+                    eta_sec = ((self.config["Global"]["epochs"] - epoch_id + 1
+                                ) * len(self.train_dataloader) - iter_id
+                               ) * time_info["batch_cost"].avg
+                    eta_msg = "eta: {:s}".format(
+                        str(datetime.timedelta(seconds=int(eta_sec))))
+                    logger.info(
+                        "[Train][Epoch {}][Iter: {}/{}]{}, {}, {}, {}, {}".
+                        format(epoch_id, iter_id,
+                               len(self.train_dataloader), lr_msg, metric_msg,
+                               time_msg, ips_msg, eta_msg))
+                tic = time.time()
 
             metric_msg = ", ".join([
                 "{}: {:.5f}".format(key, output_info[key].avg)
@@ -191,7 +223,7 @@ class Trainer(object):
             # eval model and save model if possible
             if self.config["Global"][
                     "eval_during_train"] and epoch_id % self.config["Global"][
-                        "eval_during_train"] == 0:
+                        "eval_interval"] == 0:
                 acc = self.eval(epoch_id)
                 if acc > best_metric["metric"]:
                     best_metric["metric"] = acc
@@ -203,6 +235,8 @@ class Trainer(object):
                         self.output_dir,
                         model_name=self.config["Arch"]["name"],
                         prefix="best_model")
+                logger.info("[Eval][Epoch {}][best metric: {}]".format(
+                    epoch_id, best_metric["metric"]))
                 self.model.train()
 
             # save model
@@ -213,7 +247,15 @@ class Trainer(object):
                                 "epoch": epoch_id},
                     self.output_dir,
                     model_name=self.config["Arch"]["name"],
-                    prefix="ppcls_epoch_{}".format(epoch_id))
+                    prefix="epoch_{}".format(epoch_id))
+                # save the latest model
+                save_load.save_model(
+                    self.model,
+                    optimizer, {"metric": acc,
+                                "epoch": epoch_id},
+                    self.output_dir,
+                    model_name=self.config["Arch"]["name"],
+                    prefix="latest")
 
     def build_avg_metrics(self, info_dict):
         return {key: AverageMeter(key, '7.5f') for key in info_dict}
@@ -264,12 +306,25 @@ class Trainer(object):
         self.model.train()
         return eval_result
 
+    @paddle.no_grad()
     def eval_cls(self, epoch_id=0):
         output_info = dict()
+        time_info = {
+            "batch_cost": AverageMeter(
+                "batch_cost", '.5f', postfix=" s,"),
+            "reader_cost": AverageMeter(
+                "reader_cost", ".5f", postfix=" s,"),
+        }
         print_batch_step = self.config["Global"]["print_batch_step"]
 
         metric_key = None
+        tic = time.time()
         for iter_id, batch in enumerate(self.eval_dataloader()):
+            if iter_id == 5:
+                for key in time_info:
+                    time_info[key].reset()
+
+            time_info["reader_cost"].update(time.time() - tic)
             batch_size = batch[0].shape[0]
             batch[0] = paddle.to_tensor(batch[0]).astype("float32")
             batch[1] = paddle.to_tensor(batch[1]).reshape([-1, 1])
@@ -305,13 +360,26 @@ class Trainer(object):
                     output_info[key].update(metric_dict[key].numpy()[0],
                                             batch_size)
 
+            time_info["batch_cost"].update(time.time() - tic)
+
             if iter_id % print_batch_step == 0:
+                time_msg = "s, ".join([
+                    "{}: {:.5f}".format(key, time_info[key].avg)
+                    for key in time_info
+                ])
+
+                ips_msg = "ips: {:.5f} images/sec".format(
+                    batch_size / time_info["batch_cost"].avg)
+
                 metric_msg = ", ".join([
                     "{}: {:.5f}".format(key, output_info[key].val)
                     for key in output_info
                 ])
-                logger.info("[Eval][Epoch {}][Iter: {}/{}]{}".format(
-                    epoch_id, iter_id, len(self.eval_dataloader), metric_msg))
+                logger.info("[Eval][Epoch {}][Iter: {}/{}]{}, {}, {}".format(
+                    epoch_id, iter_id,
+                    len(self.eval_dataloader), metric_msg, time_msg, ips_msg))
+
+            tic = time.time()
 
         metric_msg = ", ".join([
             "{}: {:.5f}".format(key, output_info[key].avg)
@@ -345,37 +413,42 @@ class Trainer(object):
         if query_query_id is not None:
             query_id_blocks = paddle.split(
                 query_query_id, num_or_sections=sections)
-            image_id_blocks = paddle.split(
-                query_img_id, num_or_sections=sections)
+        image_id_blocks = paddle.split(query_img_id, num_or_sections=sections)
         metric_key = None
 
-        for block_idx, block_fea in enumerate(fea_blocks):
-            similarity_matrix = paddle.matmul(
-                block_fea, gallery_feas, transpose_y=True)
-            if query_query_id is not None:
-                query_id_block = query_id_blocks[block_idx]
-                query_id_mask = (query_id_block != gallery_unique_id.t())
-
-                image_id_block = image_id_blocks[block_idx]
-                image_id_mask = (image_id_block != gallery_img_id.t())
-
-                keep_mask = paddle.logical_or(query_id_mask, image_id_mask)
-                similarity_matrix = similarity_matrix * keep_mask.astype(
-                    "float32")
-            if cum_similarity_matrix is None:
-                cum_similarity_matrix = similarity_matrix
-            else:
-                cum_similarity_matrix = paddle.concat(
-                    [cum_similarity_matrix, similarity_matrix], axis=0)
-
-        # calc metric
-        if self.eval_metric_func is not None:
-            metric_dict = self.eval_metric_func(cum_similarity_matrix,
-                                                query_img_id, gallery_img_id)
-        else:
+        if self.eval_metric_func is None:
             metric_dict = {metric_key: 0.}
-        metric_info_list = []
+        else:
+            metric_dict = dict()
+            for block_idx, block_fea in enumerate(fea_blocks):
+                similarity_matrix = paddle.matmul(
+                    block_fea, gallery_feas, transpose_y=True)
+                if query_query_id is not None:
+                    query_id_block = query_id_blocks[block_idx]
+                    query_id_mask = (query_id_block != gallery_unique_id.t())
 
+                    image_id_block = image_id_blocks[block_idx]
+                    image_id_mask = (image_id_block != gallery_img_id.t())
+
+                    keep_mask = paddle.logical_or(query_id_mask, image_id_mask)
+                    similarity_matrix = similarity_matrix * keep_mask.astype(
+                        "float32")
+
+                metric_tmp = self.eval_metric_func(similarity_matrix,
+                                                   image_id_blocks[block_idx],
+                                                   gallery_img_id)
+
+                for key in metric_tmp:
+                    if key not in metric_dict:
+                        metric_dict[key] = metric_tmp[key]
+                    else:
+                        metric_dict[key] += metric_tmp[key]
+
+            num_sections = len(fea_blocks)
+            for key in metric_dict:
+                metric_dict[key] = metric_dict[key] / num_sections
+
+        metric_info_list = []
         for key in metric_dict:
             if metric_key is None:
                 metric_key = key

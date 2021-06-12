@@ -28,13 +28,20 @@ from paddle.regularizer import L2Decay
 
 import math
 
-__all__ = [
-    "MobileNetV3_small_x0_35", "MobileNetV3_small_x0_5",
-    "MobileNetV3_small_x0_75", "MobileNetV3_small_x1_0",
-    "MobileNetV3_small_x1_25", "MobileNetV3_large_x0_35",
-    "MobileNetV3_large_x0_5", "MobileNetV3_large_x0_75",
-    "MobileNetV3_large_x1_0", "MobileNetV3_large_x1_25"
-]
+from ppcls.utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
+
+MODEL_URLS = {"MobileNetV3_small_x0_35": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/MobileNetV3_small_x0_35_pretrained.pdparams", 
+             "MobileNetV3_small_x0_5": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/MobileNetV3_small_x0_5_pretrained.pdparams", 
+             "MobileNetV3_small_x0_75": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/MobileNetV3_small_x0_75_pretrained.pdparams", 
+             "MobileNetV3_small_x1_0": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/MobileNetV3_small_x1_0_pretrained.pdparams", 
+             "MobileNetV3_small_x1_25": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/MobileNetV3_small_x1_25_pretrained.pdparams",
+             "MobileNetV3_large_x0_35": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/MobileNetV3_large_x0_35_pretrained.pdparams", 
+             "MobileNetV3_large_x0_5": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/MobileNetV3_large_x0_5_pretrained.pdparams", 
+             "MobileNetV3_large_x0_75": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/MobileNetV3_large_x0_75_pretrained.pdparams", 
+             "MobileNetV3_large_x1_0": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/MobileNetV3_large_x1_0_pretrained.pdparams", 
+             "MobileNetV3_large_x1_25": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/MobileNetV3_large_x1_25_pretrained.pdparams"}
+
+__all__ = list(MODEL_URLS.keys())
 
 
 def make_divisible(v, divisor=8, min_value=None):
@@ -308,52 +315,75 @@ class SEModule(nn.Layer):
         outputs = hardsigmoid(outputs, slope=0.2, offset=0.5)
         return paddle.multiply(x=inputs, y=outputs)
 
+    
+def _load_pretrained(pretrained, model, model_url, use_ssld=False):
+    if pretrained is False:
+        pass
+    elif pretrained is True:
+        load_dygraph_pretrain_from_url(model, model_url, use_ssld=use_ssld)
+    elif isinstance(pretrained, str):
+        load_dygraph_pretrain(model, pretrained)
+    else:
+        raise RuntimeError(
+            "pretrained type is not available. Please use `string` or `boolean` type."
+        )
+        
 
-def MobileNetV3_small_x0_35(**args):
-    model = MobileNetV3(model_name="small", scale=0.35, **args)
+def MobileNetV3_small_x0_35(pretrained=False, use_ssld=False, **kwargs):
+    model = MobileNetV3(model_name="small", scale=0.35, **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["MobileNetV3_small_x0_35"], use_ssld=use_ssld)
     return model
 
 
-def MobileNetV3_small_x0_5(**args):
-    model = MobileNetV3(model_name="small", scale=0.5, **args)
+def MobileNetV3_small_x0_5(pretrained=False, use_ssld=False, **kwargs):
+    model = MobileNetV3(model_name="small", scale=0.5, **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["MobileNetV3_small_x0_5"], use_ssld=use_ssld)
     return model
 
 
-def MobileNetV3_small_x0_75(**args):
-    model = MobileNetV3(model_name="small", scale=0.75, **args)
+def MobileNetV3_small_x0_75(pretrained=False, use_ssld=False, **kwargs):
+    model = MobileNetV3(model_name="small", scale=0.75, **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["MobileNetV3_small_x0_75"], use_ssld=use_ssld)
     return model
 
 
-def MobileNetV3_small_x1_0(**args):
-    model = MobileNetV3(model_name="small", scale=1.0, **args)
+def MobileNetV3_small_x1_0(pretrained=False, use_ssld=False, **kwargs):
+    model = MobileNetV3(model_name="small", scale=1.0, **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["MobileNetV3_small_x1_0"], use_ssld=use_ssld)
     return model
 
 
-def MobileNetV3_small_x1_25(**args):
-    model = MobileNetV3(model_name="small", scale=1.25, **args)
+def MobileNetV3_small_x1_25(pretrained=False, use_ssld=False, **kwargs):
+    model = MobileNetV3(model_name="small", scale=1.25, **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["MobileNetV3_small_x1_25"], use_ssld=use_ssld)
+    return model
+
+                        
+def MobileNetV3_large_x0_35(pretrained=False, use_ssld=False, **kwargs):
+    model = MobileNetV3(model_name="large", scale=0.35, **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["MobileNetV3_large_x0_35"], use_ssld=use_ssld)
     return model
 
 
-def MobileNetV3_large_x0_35(**args):
-    model = MobileNetV3(model_name="large", scale=0.35, **args)
+def MobileNetV3_large_x0_5(pretrained=False, use_ssld=False, **kwargs):
+    model = MobileNetV3(model_name="large", scale=0.5, **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["MobileNetV3_large_x0_5"], use_ssld=use_ssld)
     return model
 
 
-def MobileNetV3_large_x0_5(**args):
-    model = MobileNetV3(model_name="large", scale=0.5, **args)
+def MobileNetV3_large_x0_75(pretrained=False, use_ssld=False, **kwargs):
+    model = MobileNetV3(model_name="large", scale=0.75, **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["MobileNetV3_large_x0_75"], use_ssld=use_ssld)
     return model
 
 
-def MobileNetV3_large_x0_75(**args):
-    model = MobileNetV3(model_name="large", scale=0.75, **args)
+def MobileNetV3_large_x1_0(pretrained=False, use_ssld=False, **kwargs):
+    model = MobileNetV3(model_name="large", scale=1.0, **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["MobileNetV3_large_x1_0"], use_ssld=use_ssld)
     return model
 
 
-def MobileNetV3_large_x1_0(**args):
-    model = MobileNetV3(model_name="large", scale=1.0, **args)
-    return model
-
-
-def MobileNetV3_large_x1_25(**args):
-    model = MobileNetV3(model_name="large", scale=1.25, **args)
+def MobileNetV3_large_x1_25(pretrained=False, use_ssld=False, **kwargs):
+    model = MobileNetV3(model_name="large", scale=1.25, **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["MobileNetV3_large_x1_25"], use_ssld=use_ssld)
     return model

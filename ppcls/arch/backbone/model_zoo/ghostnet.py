@@ -1,4 +1,4 @@
-# copyright (c) 2020 PaddlePaddle Authors. All Rights Reserve.
+# copyright (c) 2021 PaddlePaddle Authors. All Rights Reserve.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -21,7 +21,14 @@ from paddle.nn import Conv2D, BatchNorm, AdaptiveAvgPool2D, Linear
 from paddle.regularizer import L2Decay
 from paddle.nn.initializer import Uniform, KaimingNormal
 
-__all__ = ["GhostNet_x0_5", "GhostNet_x1_0", "GhostNet_x1_3"]
+from ppcls.utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
+
+MODEL_URLS = {"GhostNet_x0_5": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/GhostNet_x0_5_pretrained.pdparams",
+              "GhostNet_x1_0": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/GhostNet_x1_0_pretrained.pdparams",
+              "GhostNet_x1_3": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/GhostNet_x1_3_pretrained.pdparams",
+             }
+
+__all__ = list(MODEL_URLS.keys())
 
 
 class ConvBNLayer(nn.Layer):
@@ -315,17 +322,33 @@ class GhostNet(nn.Layer):
             new_v += divisor
         return new_v
 
+    
+def _load_pretrained(pretrained, model, model_url, use_ssld=False):
+    if pretrained is False:
+        pass
+    elif pretrained is True:
+        load_dygraph_pretrain_from_url(model, model_url, use_ssld=use_ssld)
+    elif isinstance(pretrained, str):
+        load_dygraph_pretrain(model, pretrained)
+    else:
+        raise RuntimeError(
+            "pretrained type is not available. Please use `string` or `boolean` type."
+        )
 
-def GhostNet_x0_5(**args):
-    model = GhostNet(scale=0.5)
+
+def GhostNet_x0_5(pretrained=False, use_ssld=False, **kwargs):
+    model = GhostNet(scale=0.5, **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["GhostNet_x0_5"], use_ssld=use_ssld)
     return model
 
 
-def GhostNet_x1_0(**args):
-    model = GhostNet(scale=1.0)
+def GhostNet_x1_0(pretrained=False, use_ssld=False, **kwargs):
+    model = GhostNet(scale=1.0, **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["GhostNet_x1_0"], use_ssld=use_ssld)
     return model
 
 
-def GhostNet_x1_3(**args):
-    model = GhostNet(scale=1.3)
+def GhostNet_x1_3(pretrained=False, use_ssld=False, **kwargs):
+    model = GhostNet(scale=1.3, **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["GhostNet_x1_3"], use_ssld=use_ssld)
     return model
