@@ -21,6 +21,19 @@ from paddle.nn.initializer import TruncatedNormal, Constant
 
 from .vision_transformer import trunc_normal_, zeros_, ones_, to_2tuple, DropPath, Identity
 
+from ppcls.utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
+
+MODEL_URLS = {
+              "SwinTransformer_tiny_patch4_window7_224": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/SwinTransformer_tiny_patch4_window7_224_pretrained.pdparams",
+              "SwinTransformer_small_patch4_window7_224": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/SwinTransformer_small_patch4_window7_224_pretrained.pdparams",
+              "SwinTransformer_base_patch4_window7_224": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/SwinTransformer_base_patch4_window7_224_pretrained.pdparams",
+              "SwinTransformer_base_patch4_window12_384": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/SwinTransformer_base_patch4_window12_384_pretrained.pdparams",
+              "SwinTransformer_large_patch4_window7_224": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/SwinTransformer_large_patch4_window7_224_pretrained.pdparams",
+              "SwinTransformer_large_patch4_window12_384": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/SwinTransformer_large_patch4_window12_384_pretrained.pdparams",
+             }
+
+__all__ = list(MODEL_URLS.keys())
+
 
 class Mlp(nn.Layer):
     def __init__(self,
@@ -716,40 +729,56 @@ class SwinTransformer(nn.Layer):
         flops += self.num_features * self.num_classes
         return flops
 
+    
+def _load_pretrained(pretrained, model, model_url, use_ssld=False):
+    if pretrained is False:
+        pass
+    elif pretrained is True:
+        load_dygraph_pretrain_from_url(model, model_url, use_ssld=use_ssld)
+    elif isinstance(pretrained, str):
+        load_dygraph_pretrain(model, pretrained)
+    else:
+        raise RuntimeError(
+            "pretrained type is not available. Please use `string` or `boolean` type."
+        )
 
-def SwinTransformer_tiny_patch4_window7_224(**args):
+
+def SwinTransformer_tiny_patch4_window7_224(pretrained=False, use_ssld=False, **kwargs):
     model = SwinTransformer(
         embed_dim=96,
         depths=[2, 2, 6, 2],
         num_heads=[3, 6, 12, 24],
         window_size=7,
         drop_path_rate=0.2,
-        **args)
+        **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["SwinTransformer_tiny_patch4_window7_224"], use_ssld=use_ssld)
     return model
 
 
-def SwinTransformer_small_patch4_window7_224(**args):
+def SwinTransformer_small_patch4_window7_224(pretrained=False, use_ssld=False, **kwargs):
     model = SwinTransformer(
         embed_dim=96,
         depths=[2, 2, 18, 2],
         num_heads=[3, 6, 12, 24],
         window_size=7,
-        **args)
+        **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["SwinTransformer_small_patch4_window7_224"], use_ssld=use_ssld)
     return model
 
 
-def SwinTransformer_base_patch4_window7_224(**args):
+def SwinTransformer_base_patch4_window7_224(pretrained=False, use_ssld=False, **kwargs):
     model = SwinTransformer(
         embed_dim=128,
         depths=[2, 2, 18, 2],
         num_heads=[4, 8, 16, 32],
         window_size=7,
         drop_path_rate=0.5,
-        **args)
+        **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["SwinTransformer_base_patch4_window7_224"], use_ssld=use_ssld)
     return model
 
 
-def SwinTransformer_base_patch4_window12_384(**args):
+def SwinTransformer_base_patch4_window12_384(pretrained=False, use_ssld=False, **kwargs):
     model = SwinTransformer(
         img_size=384,
         embed_dim=128,
@@ -757,26 +786,29 @@ def SwinTransformer_base_patch4_window12_384(**args):
         num_heads=[4, 8, 16, 32],
         window_size=12,
         drop_path_rate=0.5,  # NOTE: do not appear in offical code
-        **args)
+        **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["SwinTransformer_base_patch4_window12_384"], use_ssld=use_ssld)
     return model
 
 
-def SwinTransformer_large_patch4_window7_224(**args):
+def SwinTransformer_large_patch4_window7_224(pretrained=False, use_ssld=False, **kwargs):
     model = SwinTransformer(
         embed_dim=192,
         depths=[2, 2, 18, 2],
         num_heads=[6, 12, 24, 48],
         window_size=7,
-        **args)
+        **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["SwinTransformer_large_patch4_window7_224"], use_ssld=use_ssld)
     return model
 
 
-def SwinTransformer_large_patch4_window12_384(**args):
+def SwinTransformer_large_patch4_window12_384(pretrained=False, use_ssld=False, **kwargs):
     model = SwinTransformer(
         img_size=384,
         embed_dim=192,
         depths=[2, 2, 18, 2],
         num_heads=[6, 12, 24, 48],
         window_size=12,
-        **args)
+        **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["SwinTransformer_large_patch4_window12_384"], use_ssld=use_ssld)
     return model

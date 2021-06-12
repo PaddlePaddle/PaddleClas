@@ -26,7 +26,7 @@ from ppcls.utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_f
 
 MODEL_URLS = {
     "TNT_small":
-    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/model_zoo/TNT_small_pretrained.pdparams"
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/TNT_small_pretrained.pdparams"
 }
 
 

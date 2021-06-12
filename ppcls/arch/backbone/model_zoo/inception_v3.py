@@ -1,4 +1,4 @@
-# copyright (c) 2020 PaddlePaddle Authors. All Rights Reserve.
+# copyright (c) 2021 PaddlePaddle Authors. All Rights Reserve.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -26,7 +26,11 @@ from paddle.nn import AdaptiveAvgPool2D, MaxPool2D, AvgPool2D
 from paddle.nn.initializer import Uniform
 import math
 
-__all__ = ["InceptionV3"]
+from ppcls.utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
+
+MODEL_URLS = {"InceptionV3": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/InceptionV3_pretrained.pdparams"}
+
+__all__ = list(MODEL_URLS.keys())
 
 
 class ConvBNLayer(nn.Layer):
@@ -425,9 +429,9 @@ class InceptionE(nn.Layer):
         return outputs   
 
     
-class InceptionV3(nn.Layer):
+class Inception_V3(nn.Layer):
     def __init__(self, class_dim=1000):
-        super(InceptionV3, self).__init__()
+        super(Inception_V3, self).__init__()
         self.inception_a_list = [[192, 256, 288], [32, 64, 64]]
         self.inception_c_list = [[768, 768, 768, 768], [128, 160, 160, 192]]
         
@@ -472,10 +476,28 @@ class InceptionV3(nn.Layer):
     def forward(self, x):
         y = self.inception_stem(x)
         for inception_block in self.inception_block_list:
-           y = inception_block(y)
+            y = inception_block(y)
         y = self.gap(y)
         y = paddle.reshape(y, shape=[-1, 2048])
         y = self.drop(y)
         y = self.out(y)
         return y
     
+    
+def _load_pretrained(pretrained, model, model_url, use_ssld=False):
+    if pretrained is False:
+        pass
+    elif pretrained is True:
+        load_dygraph_pretrain_from_url(model, model_url, use_ssld=use_ssld)
+    elif isinstance(pretrained, str):
+        load_dygraph_pretrain(model, pretrained)
+    else:
+        raise RuntimeError(
+            "pretrained type is not available. Please use `string` or `boolean` type."
+        )
+
+def InceptionV3(pretrained=False, use_ssld=False, **kwargs):
+    model = Inception_V3(**kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["InceptionV3"], use_ssld=use_ssld)
+    return model
+

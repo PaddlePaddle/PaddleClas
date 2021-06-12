@@ -22,9 +22,17 @@ from paddle import ParamAttr
 import paddle.nn as nn
 from math import ceil
 
-__all__ = [
-    "ReXNet_1_0", "ReXNet_1_3", "ReXNet_1_5", "ReXNet_2_0", "ReXNet_3_0"
-]
+from ppcls.utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
+
+MODEL_URLS = {
+              "ReXNet_1_0": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ReXNet_1_0_pretrained.pdparams",
+              "ReXNet_1_3": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ReXNet_1_3_pretrained.pdparams",
+              "ReXNet_1_5": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ReXNet_1_5_32x4d_pretrained.pdparams",
+              "ReXNet_2_0": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ReXNet_2_0_pretrained.pdparams",
+              "ReXNet_3_0": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ReXNet_3_0_pretrained.pdparams",
+             }
+
+__all__ = list(MODEL_URLS.keys())
 
 
 def conv_bn_act(out,
@@ -220,21 +228,44 @@ class ReXNetV1(nn.Layer):
         return x
 
 
-def ReXNet_1_0(**args):
-    return ReXNetV1(width_mult=1.0, **args)
+def _load_pretrained(pretrained, model, model_url, use_ssld=False):
+    if pretrained is False:
+        pass
+    elif pretrained is True:
+        load_dygraph_pretrain_from_url(model, model_url, use_ssld=use_ssld)
+    elif isinstance(pretrained, str):
+        load_dygraph_pretrain(model, pretrained)
+    else:
+        raise RuntimeError(
+            "pretrained type is not available. Please use `string` or `boolean` type."
+        )
+    
+    
+def ReXNet_1_0(pretrained=False, use_ssld=False, **kwargs):
+    model = ReXNetV1(width_mult=1.0, **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["ReXNet_1_0"], use_ssld=use_ssld)
+    return model
 
 
-def ReXNet_1_3(**args):
-    return ReXNetV1(width_mult=1.3, **args)
+def ReXNet_1_3(pretrained=False, use_ssld=False, **kwargs):
+    model = ReXNetV1(width_mult=1.3, **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["ReXNet_1_3"], use_ssld=use_ssld)
+    return model
 
 
-def ReXNet_1_5(**args):
-    return ReXNetV1(width_mult=1.5, **args)
+def ReXNet_1_5(pretrained=False, use_ssld=False, **kwargs):
+    model = ReXNetV1(width_mult=1.5, **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["ReXNet_1_5"], use_ssld=use_ssld)
+    return model
 
 
-def ReXNet_2_0(**args):
-    return ReXNetV1(width_mult=2.0, **args)
+def ReXNet_2_0(pretrained=False, use_ssld=False, **kwargs):
+    model = ReXNetV1(width_mult=2.0, **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["ReXNet_2_0"], use_ssld=use_ssld)
+    return model
 
 
-def ReXNet_3_0(**args):
-    return ReXNetV1(width_mult=3.0, **args)
+def ReXNet_3_0(pretrained=False, use_ssld=False, **kwargs):
+    model = ReXNetV1(width_mult=3.0, **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["ReXNet_3_0"], use_ssld=use_ssld)
+    return model

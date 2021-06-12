@@ -236,7 +236,7 @@ class Trainer(object):
                         model_name=self.config["Arch"]["name"],
                         prefix="best_model")
                 logger.info("[Eval][Epoch {}][best metric: {}]".format(
-                    epoch_id, acc))
+                    epoch_id, best_metric["metric"]))
                 self.model.train()
 
             # save model

@@ -2,22 +2,29 @@ import paddle.nn as nn
 import paddle
 import numpy as np
 
-__all__ = [
-    'RepVGG',
-    'RepVGG_A0',
-    'RepVGG_A1',
-    'RepVGG_A2',
-    'RepVGG_B0',
-    'RepVGG_B1',
-    'RepVGG_B2',
-    'RepVGG_B3',
-    'RepVGG_B1g2',
-    'RepVGG_B1g4',
-    'RepVGG_B2g2',
-    'RepVGG_B2g4',
-    'RepVGG_B3g2',
-    'RepVGG_B3g4',
-]
+from ppcls.utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
+
+MODEL_URLS = {"RepVGG_A0": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/RepVGG_A0_pretrained.pdparams",
+              "RepVGG_A1": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/RepVGG_A1_pretrained.pdparams",
+              "RepVGG_A2": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/RepVGG_A2_pretrained.pdparams",
+              "RepVGG_B0": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/RepVGG_B0_pretrained.pdparams",
+              "RepVGG_B1": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/RepVGG_B1_pretrained.pdparams",
+              "RepVGG_B2": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/RepVGG_B2_pretrained.pdparams",
+              "RepVGG_B3": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/RepVGG_B3_pretrained.pdparams",
+              "RepVGG_B1g2": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/RepVGG_B1g2_pretrained.pdparams",
+              "RepVGG_B1g4": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/RepVGG_B1g4_pretrained.pdparams",
+              "RepVGG_B2g2": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/RepVGG_B2g2_pretrained.pdparams",
+              "RepVGG_B2g4": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/RepVGG_B2g4_pretrained.pdparams",
+              "RepVGG_B3g2": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/RepVGG_B3g2_pretrained.pdparams",
+              "RepVGG_B3g4": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/RepVGG_B3g4_pretrained.pdparams",
+             }
+
+__all__ = list(MODEL_URLS.keys())
+
+
+optional_groupwise_layers = [2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26]
+g2_map = {l: 2 for l in optional_groupwise_layers}
+g4_map = {l: 4 for l in optional_groupwise_layers}
 
 
 class ConvBN(nn.Layer):
@@ -230,110 +237,144 @@ class RepVGG(nn.Layer):
         return out
 
 
-optional_groupwise_layers = [2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26]
-g2_map = {l: 2 for l in optional_groupwise_layers}
-g4_map = {l: 4 for l in optional_groupwise_layers}
+def _load_pretrained(pretrained, model, model_url, use_ssld=False):
+    if pretrained is False:
+        pass
+    elif pretrained is True:
+        load_dygraph_pretrain_from_url(model, model_url, use_ssld=use_ssld)
+    elif isinstance(pretrained, str):
+        load_dygraph_pretrain(model, pretrained)
+    else:
+        raise RuntimeError(
+            "pretrained type is not available. Please use `string` or `boolean` type."
+        )
+        
 
-
-def RepVGG_A0(**kwargs):
-    return RepVGG(
+def RepVGG_A0(pretrained=False, use_ssld=False, **kwargs):
+    model = RepVGG(
         num_blocks=[2, 4, 14, 1],
         width_multiplier=[0.75, 0.75, 0.75, 2.5],
         override_groups_map=None,
         **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["RepVGG_A0"], use_ssld=use_ssld)
+    return model
 
 
-def RepVGG_A1(**kwargs):
-    return RepVGG(
+def RepVGG_A1(pretrained=False, use_ssld=False, **kwargs):
+    model = RepVGG(
         num_blocks=[2, 4, 14, 1],
         width_multiplier=[1, 1, 1, 2.5],
         override_groups_map=None,
         **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["RepVGG_A1"], use_ssld=use_ssld)
+    return model
 
 
-def RepVGG_A2(**kwargs):
-    return RepVGG(
+def RepVGG_A2(pretrained=False, use_ssld=False, **kwargs):
+    model = RepVGG(
         num_blocks=[2, 4, 14, 1],
         width_multiplier=[1.5, 1.5, 1.5, 2.75],
         override_groups_map=None,
         **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["RepVGG_A2"], use_ssld=use_ssld)
+    return model
 
 
-def RepVGG_B0(**kwargs):
-    return RepVGG(
+def RepVGG_B0(pretrained=False, use_ssld=False, **kwargs):
+    model = RepVGG(
         num_blocks=[4, 6, 16, 1],
         width_multiplier=[1, 1, 1, 2.5],
         override_groups_map=None,
         **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["RepVGG_B0"], use_ssld=use_ssld)
+    return model
 
 
-def RepVGG_B1(**kwargs):
-    return RepVGG(
+def RepVGG_B1(pretrained=False, use_ssld=False, **kwargs):
+    model = RepVGG(
         num_blocks=[4, 6, 16, 1],
         width_multiplier=[2, 2, 2, 4],
         override_groups_map=None,
         **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["RepVGG_B1"], use_ssld=use_ssld)
+    return model
 
 
-def RepVGG_B1g2(**kwargs):
-    return RepVGG(
+def RepVGG_B1g2(pretrained=False, use_ssld=False, **kwargs):
+    model = RepVGG(
         num_blocks=[4, 6, 16, 1],
         width_multiplier=[2, 2, 2, 4],
         override_groups_map=g2_map,
         **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["RepVGG_B1g2"], use_ssld=use_ssld)
+    return model
 
 
-def RepVGG_B1g4(**kwargs):
-    return RepVGG(
+def RepVGG_B1g4(pretrained=False, use_ssld=False, **kwargs):
+    model = RepVGG(
         num_blocks=[4, 6, 16, 1],
         width_multiplier=[2, 2, 2, 4],
         override_groups_map=g4_map,
         **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["RepVGG_B1g4"], use_ssld=use_ssld)
+    return model
 
 
-def RepVGG_B2(**kwargs):
-    return RepVGG(
+def RepVGG_B2(pretrained=False, use_ssld=False, **kwargs):
+    model = RepVGG(
         num_blocks=[4, 6, 16, 1],
         width_multiplier=[2.5, 2.5, 2.5, 5],
         override_groups_map=None,
         **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["RepVGG_B2"], use_ssld=use_ssld)
+    return model
 
 
-def RepVGG_B2g2(**kwargs):
-    return RepVGG(
+def RepVGG_B2g2(pretrained=False, use_ssld=False, **kwargs):
+    model = RepVGG(
         num_blocks=[4, 6, 16, 1],
         width_multiplier=[2.5, 2.5, 2.5, 5],
         override_groups_map=g2_map,
         **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["RepVGG_B2g2"], use_ssld=use_ssld)
+    return model
 
 
-def RepVGG_B2g4(**kwargs):
-    return RepVGG(
+def RepVGG_B2g4(pretrained=False, use_ssld=False, **kwargs):
+    model = RepVGG(
         num_blocks=[4, 6, 16, 1],
         width_multiplier=[2.5, 2.5, 2.5, 5],
         override_groups_map=g4_map,
         **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["RepVGG_B2g4"], use_ssld=use_ssld)
+    return model
 
 
-def RepVGG_B3(**kwargs):
-    return RepVGG(
+def RepVGG_B3(pretrained=False, use_ssld=False, **kwargs):
+    model = RepVGG(
         num_blocks=[4, 6, 16, 1],
         width_multiplier=[3, 3, 3, 5],
         override_groups_map=None,
         **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["RepVGG_B3"], use_ssld=use_ssld)
+    return model
 
 
-def RepVGG_B3g2(**kwargs):
-    return RepVGG(
+def RepVGG_B3g2(pretrained=False, use_ssld=False, **kwargs):
+    model = RepVGG(
         num_blocks=[4, 6, 16, 1],
         width_multiplier=[3, 3, 3, 5],
         override_groups_map=g2_map,
         **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["RepVGG_B3g2"], use_ssld=use_ssld)
+    return model
 
 
-def RepVGG_B3g4(**kwargs):
-    return RepVGG(
+def RepVGG_B3g4(pretrained=False, use_ssld=False, **kwargs):
+    model = RepVGG(
         num_blocks=[4, 6, 16, 1],
         width_multiplier=[3, 3, 3, 5],
         override_groups_map=g4_map,
         **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["RepVGG_B3g4"], use_ssld=use_ssld)
+    return model

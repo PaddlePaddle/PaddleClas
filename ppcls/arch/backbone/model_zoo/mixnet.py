@@ -17,13 +17,19 @@
     https://arxiv.org/abs/1907.09595.
 """
 
-__all__ = ['MixNet_S', 'MixNet_M', 'MixNet_L']
-
 import os
 from inspect import isfunction
 from functools import reduce
 import paddle
 import paddle.nn as nn
+
+from ppcls.utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
+
+MODEL_URLS = {"MixNet_S": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/MixNet_S_pretrained.pdparams", 
+              "MixNet_M": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/MixNet_M_pretrained.pdparams", 
+              "MixNet_L": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/MixNet_L_pretrained.pdparams"}
+
+__all__ = list(MODEL_URLS.keys())
 
 
 class Identity(nn.Layer):
@@ -755,13 +761,33 @@ def get_mixnet(version, width_scale, model_name=None, **kwargs):
     return net
 
 
+def _load_pretrained(pretrained, model, model_url, use_ssld=False):
+    if pretrained is False:
+        pass
+    elif pretrained is True:
+        load_dygraph_pretrain_from_url(model, model_url, use_ssld=use_ssld)
+    elif isinstance(pretrained, str):
+        load_dygraph_pretrain(model, pretrained)
+    else:
+        raise RuntimeError(
+            "pretrained type is not available. Please use `string` or `boolean` type."
+        )
+
+def MixNet_S(pretrained=False, use_ssld=False, **kwargs):
+    model = InceptionV4DY(**kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["InceptionV4"], use_ssld=use_ssld)
+    return model
+
+
 def MixNet_S(**kwargs):
     """
     MixNet-S model from 'MixConv: Mixed Depthwise Convolutional Kernels,'
     https://arxiv.org/abs/1907.09595.
     """
-    return get_mixnet(
+    model = get_mixnet(
         version="s", width_scale=1.0, model_name="MixNet_S", **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["MixNet_S"], use_ssld=use_ssld)
+    return model
 
 
 def MixNet_M(**kwargs):
@@ -769,14 +795,19 @@ def MixNet_M(**kwargs):
     MixNet-M model from 'MixConv: Mixed Depthwise Convolutional Kernels,'
     https://arxiv.org/abs/1907.09595.
     """
-    return get_mixnet(
+    model = get_mixnet(
         version="m", width_scale=1.0, model_name="MixNet_M", **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["MixNet_M"], use_ssld=use_ssld)
+    return model
 
 
 def MixNet_L(**kwargs):
     """
-    MixNet-L model from 'MixConv: Mixed Depthwise Convolutional Kernels,'
+    MixNet-S model from 'MixConv: Mixed Depthwise Convolutional Kernels,'
     https://arxiv.org/abs/1907.09595.
     """
-    return get_mixnet(
+    model = get_mixnet(
         version="m", width_scale=1.3, model_name="MixNet_L", **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["MixNet_L"], use_ssld=use_ssld)
+    return model
+

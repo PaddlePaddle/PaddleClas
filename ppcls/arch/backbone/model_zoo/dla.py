@@ -26,25 +26,25 @@ from ppcls.utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_f
 
 MODEL_URLS = {
     "DLA34":
-    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/model_zoo/DLA34_pretrained.pdparams",
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DLA34_pretrained.pdparams",
     "DLA46_c":
-    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/model_zoo/DLA46_c_pretrained.pdparams",
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DLA46_c_pretrained.pdparams",
     "DLA46x_c":
-    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/model_zoo/DLA46x_c_pretrained.pdparams",
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DLA46x_c_pretrained.pdparams",
     "DLA60":
-    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/model_zoo/DLA60_pretrained.pdparams",
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DLA60_pretrained.pdparams",
     "DLA60x":
-    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/model_zoo/DLA60x_pretrained.pdparams",
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DLA60x_pretrained.pdparams",
     "DLA60x_c":
-    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/model_zoo/DLA60x_c_pretrained.pdparams",
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DLA60x_c_pretrained.pdparams",
     "DLA102":
-    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/model_zoo/DLA102_pretrained.pdparams",
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DLA102_pretrained.pdparams",
     "DLA102x":
-    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/model_zoo/DLA102x_pretrained.pdparams",
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DLA102x_pretrained.pdparams",
     "DLA102x2":
-    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/model_zoo/DLA102x2_pretrained.pdparams",
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DLA102x2_pretrained.pdparams",
     "DLA169":
-    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/model_zoo/DLA169_pretrained.pdparams"
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DLA169_pretrained.pdparams"
 }
 
 

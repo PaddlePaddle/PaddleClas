@@ -20,13 +20,13 @@ from ppcls.utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_f
 
 MODEL_URLS = {
     'HarDNet39_ds':
-    'https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/model_zoo/HarDNet39_ds_pretrained.pdparams',
+    'https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/HarDNet39_ds_pretrained.pdparams',
     'HarDNet68_ds':
-    'https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/model_zoo/HarDNet68_ds_pretrained.pdparams',
+    'https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/HarDNet68_ds_pretrained.pdparams',
     'HarDNet68':
-    'https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/model_zoo/HarDNet68_pretrained.pdparams',
+    'https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/HarDNet68_pretrained.pdparams',
     'HarDNet85':
-    'https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/model_zoo/HarDNet85_pretrained.pdparams'
+    'https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/HarDNet85_pretrained.pdparams'
 }
 
 

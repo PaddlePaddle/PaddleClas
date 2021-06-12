@@ -26,10 +26,16 @@ from paddle.nn import AdaptiveAvgPool2D, MaxPool2D, AvgPool2D
 
 import math
 
-__all__ = [
-    "MobileNetV2_x0_25", "MobileNetV2_x0_5", "MobileNetV2_x0_75",
-    "MobileNetV2", "MobileNetV2_x1_5", "MobileNetV2_x2_0"
-]
+from ppcls.utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
+
+MODEL_URLS = {"MobileNetV2_x0_25": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/MobileNetV2_x0_25_pretrained.pdparams", 
+              "MobileNetV2_x0_5": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/MobileNetV2_x0_5_pretrained.pdparams", 
+              "MobileNetV2_x0_75": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/MobileNetV2_x0_75_pretrained.pdparams",
+              "MobileNetV2": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/MobileNetV2_pretrained.pdparams",
+              "MobileNetV2_x1_5": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/MobileNetV2_x1_5_pretrained.pdparams",
+              "MobileNetV2_x2_0": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/MobileNetV2_x2_0_pretrained.pdparams"}
+
+__all__ = list(MODEL_URLS.keys())
 
 
 class ConvBNLayer(nn.Layer):
@@ -149,7 +155,7 @@ class InvresiBlocks(nn.Layer):
 
 
 class MobileNet(nn.Layer):
-    def __init__(self, class_dim=1000, scale=1.0, prefix_name="", **args):
+    def __init__(self, class_dim=1000, scale=1.0, prefix_name=""):
         super(MobileNet, self).__init__()
         self.scale = scale
         self.class_dim = class_dim
@@ -216,33 +222,52 @@ class MobileNet(nn.Layer):
         y = paddle.flatten(y, start_axis=1, stop_axis=-1)
         y = self.out(y)
         return y
+    
+    
+def _load_pretrained(pretrained, model, model_url, use_ssld=False):
+    if pretrained is False:
+        pass
+    elif pretrained is True:
+        load_dygraph_pretrain_from_url(model, model_url, use_ssld=use_ssld)
+    elif isinstance(pretrained, str):
+        load_dygraph_pretrain(model, pretrained)
+    else:
+        raise RuntimeError(
+            "pretrained type is not available. Please use `string` or `boolean` type."
+        )
+        
 
-
-def MobileNetV2_x0_25(**args):
-    model = MobileNet(scale=0.25, **args)
+def MobileNetV2_x0_25(pretrained=False, use_ssld=False, **kwargs):
+    model = MobileNet(scale=0.25, **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["MobileNetV2_x0_25"], use_ssld=use_ssld)
     return model
 
 
-def MobileNetV2_x0_5(**args):
-    model = MobileNet(scale=0.5, **args)
+def MobileNetV2_x0_5(pretrained=False, use_ssld=False, **kwargs):
+    model = MobileNet(scale=0.5, **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["MobileNetV2_x0_5"], use_ssld=use_ssld)
     return model
 
 
-def MobileNetV2_x0_75(**args):
-    model = MobileNet(scale=0.75, **args)
+def MobileNetV2_x0_75(pretrained=False, use_ssld=False, **kwargs):
+    model = MobileNet(scale=0.75, **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["MobileNetV2_x0_75"], use_ssld=use_ssld)
     return model
 
 
-def MobileNetV2(**args):
-    model = MobileNet(scale=1.0, **args)
+def MobileNetV2(pretrained=False, use_ssld=False, **kwargs):
+    model = MobileNet(scale=1.0, **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["MobileNetV2"], use_ssld=use_ssld)
     return model
 
 
-def MobileNetV2_x1_5(**args):
-    model = MobileNet(scale=1.5, **args)
+def MobileNetV2_x1_5(pretrained=False, use_ssld=False, **kwargs):
+    model = MobileNet(scale=1.5, **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["MobileNetV2_x1_5"], use_ssld=use_ssld)
     return model
 
 
-def MobileNetV2_x2_0(**args):
-    model = MobileNet(scale=2.0, **args)
+def MobileNetV2_x2_0(pretrained=False, use_ssld=False, **kwargs):
+    model = MobileNet(scale=2.0, **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["MobileNetV2_x2_0"], use_ssld=use_ssld)
     return model

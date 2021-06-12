@@ -26,10 +26,16 @@ from paddle.nn.initializer import Uniform
 
 import math
 
-__all__ = [
-    "SE_ResNet18_vd", "SE_ResNet34_vd", "SE_ResNet50_vd", "SE_ResNet101_vd",
-    "SE_ResNet152_vd", "SE_ResNet200_vd"
-]
+from ppcls.utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
+
+MODEL_URLS = {
+              "SE_ResNet18_vd": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/SE_ResNet18_vd_pretrained.pdparams",
+              "SE_ResNet34_vd": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/SE_ResNet34_vd_pretrained.pdparams",
+              "SE_ResNet50_vd": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/SE_ResNet50_vd_pretrained.pdparams",
+
+             }
+
+__all__ = list(MODEL_URLS.keys())
 
 
 class ConvBNLayer(nn.Layer):
@@ -347,32 +353,33 @@ class SE_ResNet_vd(nn.Layer):
         y = self.out(y)
         return y
 
+    
+def _load_pretrained(pretrained, model, model_url, use_ssld=False):
+    if pretrained is False:
+        pass
+    elif pretrained is True:
+        load_dygraph_pretrain_from_url(model, model_url, use_ssld=use_ssld)
+    elif isinstance(pretrained, str):
+        load_dygraph_pretrain(model, pretrained)
+    else:
+        raise RuntimeError(
+            "pretrained type is not available. Please use `string` or `boolean` type."
+        )
+    
 
-def SE_ResNet18_vd(**args):
-    model = SE_ResNet_vd(layers=18, **args)
+def SE_ResNet18_vd(pretrained=False, use_ssld=False, **kwargs):
+    model = SE_ResNet_vd(layers=18, **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["SE_ResNet18_vd"], use_ssld=use_ssld)
     return model
 
 
-def SE_ResNet34_vd(**args):
-    model = SE_ResNet_vd(layers=34, **args)
+def SE_ResNet34_vd(pretrained=False, use_ssld=False, **kwargs):
+    model = SE_ResNet_vd(layers=34, **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["SE_ResNet34_vd"], use_ssld=use_ssld)
     return model
 
 
-def SE_ResNet50_vd(**args):
-    model = SE_ResNet_vd(layers=50, **args)
-    return model
-
-
-def SE_ResNet101_vd(**args):
-    model = SE_ResNet_vd(layers=101, **args)
-    return model
-
-
-def SE_ResNet152_vd(**args):
-    model = SE_ResNet_vd(layers=152, **args)
-    return model
-
-
-def SE_ResNet200_vd(**args):
-    model = SE_ResNet_vd(layers=200, **args)
+def SE_ResNet50_vd(pretrained=False, use_ssld=False, **kwargs):
+    model = SE_ResNet_vd(layers=50, **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["SE_ResNet50_vd"], use_ssld=use_ssld)
     return model

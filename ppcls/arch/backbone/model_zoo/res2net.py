@@ -27,11 +27,13 @@ from paddle.nn.initializer import Uniform
 
 import math
 
-__all__ = [
-    "Res2Net50_48w_2s", "Res2Net50_26w_4s", "Res2Net50_14w_8s",
-    "Res2Net50_48w_2s", "Res2Net50_26w_6s", "Res2Net50_26w_8s",
-    "Res2Net101_26w_4s", "Res2Net152_26w_4s", "Res2Net200_26w_4s"
-]
+from ppcls.utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
+
+MODEL_URLS = {"Res2Net50_26w_4s": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/Res2Net50_26w_4s_pretrained.pdparams",
+              "Res2Net50_14w_8s": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/Res2Net50_14w_8s_pretrained.pdparams",
+             }
+
+__all__ = list(MODEL_URLS.keys())
 
 
 class ConvBNLayer(nn.Layer):
@@ -232,41 +234,26 @@ class Res2Net(nn.Layer):
         return y
 
 
-def Res2Net50_48w_2s(**args):
-    model = Res2Net(layers=50, scales=2, width=48, **args)
+def _load_pretrained(pretrained, model, model_url, use_ssld=False):
+    if pretrained is False:
+        pass
+    elif pretrained is True:
+        load_dygraph_pretrain_from_url(model, model_url, use_ssld=use_ssld)
+    elif isinstance(pretrained, str):
+        load_dygraph_pretrain(model, pretrained)
+    else:
+        raise RuntimeError(
+            "pretrained type is not available. Please use `string` or `boolean` type."
+        )
+        
+
+def Res2Net50_26w_4s(pretrained=False, use_ssld=False, **kwargs):
+    model = Res2Net(layers=50, scales=4, width=26, **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["Res2Net50_26w_4s"], use_ssld=use_ssld)
     return model
 
 
-def Res2Net50_26w_4s(**args):
-    model = Res2Net(layers=50, scales=4, width=26, **args)
-    return model
-
-
-def Res2Net50_14w_8s(**args):
-    model = Res2Net(layers=50, scales=8, width=14, **args)
-    return model
-
-
-def Res2Net50_26w_6s(**args):
-    model = Res2Net(layers=50, scales=6, width=26, **args)
-    return model
-
-
-def Res2Net50_26w_8s(**args):
-    model = Res2Net(layers=50, scales=8, width=26, **args)
-    return model
-
-
-def Res2Net101_26w_4s(**args):
-    model = Res2Net(layers=101, scales=4, width=26, **args)
-    return model
-
-
-def Res2Net152_26w_4s(**args):
-    model = Res2Net(layers=152, scales=4, width=26, **args)
-    return model
-
-
-def Res2Net200_26w_4s(**args):
-    model = Res2Net(layers=200, scales=4, width=26, **args)
+def Res2Net50_14w_8s(pretrained=False, use_ssld=False, **kwargs):
+    model = Res2Net(layers=50, scales=8, width=14, **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["Res2Net50_14w_8s"], use_ssld=use_ssld)
     return model
