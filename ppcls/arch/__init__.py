@@ -69,7 +69,8 @@ class DistillationModel(nn.Layer):
     def __init__(self,
                  models=None,
                  pretrained_list=None,
-                 freeze_params_list=None):
+                 freeze_params_list=None,
+                 **kargs):
         super().__init__()
         assert isinstance(models, list)
         self.model_list = []
@@ -105,5 +106,5 @@ class DistillationModel(nn.Layer):
             if label is None:
                 result_dict[model_name] = self.model_list[idx](x)
             else:
-                result_dict[model_name] = self.model_list[idx](x)
+                result_dict[model_name] = self.model_list[idx](x, label)
         return result_dict

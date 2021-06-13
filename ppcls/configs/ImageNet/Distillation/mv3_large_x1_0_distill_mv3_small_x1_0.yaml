@@ -33,6 +33,8 @@ Arch:
         name: MobileNetV3_small_x1_0
         pretrained: False
 
+  infer_model_name: "Student"
+
 
 # loss function config for traing/eval process
 Loss:
@@ -136,7 +138,8 @@ Infer:
           order: ''
       - ToCHWImage:
   PostProcess:
-    name: Topk
+    name: DistillationPostProcess
+    func: Topk
     topk: 5
     class_id_map_file: "ppcls/utils/imagenet1k_label_list.txt"
 

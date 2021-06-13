@@ -24,20 +24,27 @@ import paddle
 import paddle.nn as nn
 
 from ppcls.utils import config
-from ppcls.arch import build_model, RecModel
+from ppcls.arch import build_model, RecModel, DistillationModel
 from ppcls.utils.save_load import load_dygraph_pretrain
 from ppcls.arch.gears.identity_head import IdentityHead
 
 
 class ExportModel(nn.Layer):
     """
-    ClasModel: add softmax onto the model
+    ExportModel: add softmax onto the model
     """
 
     def __init__(self, config):
         super().__init__()
         self.base_model = build_model(config)
-        self.infer_output_key = config.get("infer_output_key")
+
+        # we should choose a final model to export
+        if isinstance(self.base_model, DistillationModel):
+            self.infer_model_name = config["infer_model_name"]
+        else:
+            self.infer_model_name = None
+
+        self.infer_output_key = config.get("infer_output_key", None)
         if self.infer_output_key == "features" and isinstance(self.base_model,
                                                               RecModel):
             self.base_model.head = IdentityHead()
@@ -54,6 +61,8 @@ class ExportModel(nn.Layer):
 
     def forward(self, x):
         x = self.base_model(x)
+        if self.infer_model_name is not None:
+            x = x[self.infer_model_name]
         if self.infer_output_key is not None:
             x = x[self.infer_output_key]
         if self.softmax is not None:
