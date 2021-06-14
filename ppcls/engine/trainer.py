@@ -30,6 +30,8 @@ import paddle.distributed as dist
 from ppcls.utils.check import check_gpu
 from ppcls.utils.misc import AverageMeter
 from ppcls.utils import logger
+from ppcls.utils.logger import init_logger
+from ppcls.utils.config import print_config
 from ppcls.data import build_dataloader
 from ppcls.arch import build_model
 from ppcls.loss import build_loss
@@ -49,6 +51,11 @@ class Trainer(object):
         self.mode = mode
         self.config = config
         self.output_dir = self.config['Global']['output_dir']
+
+        log_file = os.path.join(self.output_dir, self.config["Arch"]["name"],
+                                f"{mode}.log")
+        init_logger(name='root', log_file=log_file)
+        print_config(config)
         # set device
         assert self.config["Global"]["device"] in ["cpu", "gpu", "xpu"]
         self.device = paddle.set_device(self.config["Global"]["device"])
@@ -438,9 +445,11 @@ class Trainer(object):
 
                 for key in metric_tmp:
                     if key not in metric_dict:
-                        metric_dict[key] = metric_tmp[key] * block_fea.shape[0] / len(query_feas)
+                        metric_dict[key] = metric_tmp[key] * block_fea.shape[
+                            0] / len(query_feas)
                     else:
-                        metric_dict[key] += metric_tmp[key] * block_fea.shape[0] / len(query_feas)
+                        metric_dict[key] += metric_tmp[key] * block_fea.shape[
+                            0] / len(query_feas)
 
         metric_info_list = []
         for key in metric_dict:
