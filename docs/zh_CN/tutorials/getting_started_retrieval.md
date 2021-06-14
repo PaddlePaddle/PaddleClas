@@ -12,6 +12,8 @@ PaddleClas目前支持的训练/评估环境如下：
     └── Linux
 ```
 
+## 注意:  本文主要介绍基于检索方式的识别
+
 ## 1. 基于CPU/单卡GPU上的训练与评估
 
 在基于CPU/单卡GPU上训练与评估，推荐使用`tools/train.py`与`tools/eval.py`脚本。关于Linux平台多卡GPU环境下的训练与评估，请参考[2. 基于Linux+GPU的模型训练与评估](#2)。
@@ -23,7 +25,7 @@ PaddleClas目前支持的训练/评估环境如下：
 
 ```
 python tools/train.py \
-    -c configs/quick_start/MobileNetV3_large_x1_0_finetune.yaml \
+    -c configs/quick_start/ResNet50_flowers_retrieval_finetune.yaml \
     -o pretrained_model="" \
     -o use_gpu=True
 ```
@@ -61,8 +63,8 @@ python tools/train.py \
 
 ```
 python tools/train.py \
-    -c configs/quick_start/MobileNetV3_large_x1_0_finetune.yaml \
-    -o pretrained_model="./pretrained/MobileNetV3_large_x1_0_pretrained" \
+    -c configs/quick_start/ResNet50_flowers_retrieval_finetune.yaml \
+    -o Arch.Backbone.pretrained=True
     -o use_gpu=True
 ```
 
@@ -77,8 +79,8 @@ python tools/train.py \
 
 ```
 python tools/train.py \
-    -c configs/quick_start/MobileNetV3_large_x1_0_finetune.yaml \
-    -o checkpoints="./output/MobileNetV3_large_x1_0/5/ppcls" \
+    -c configs/quick_start/ResNet50_flowers_retrieval_finetune.yaml \
+    -o checkpoints="./output/RecModel/ppcls_epoch_5" \
     -o last_epoch=5 \
     -o use_gpu=True
 ```
@@ -88,7 +90,7 @@ python tools/train.py \
 **注意**：
 * 参数`-o last_epoch=5`表示将上一次训练轮次数记为`5`，即本次训练轮次数从`6`开始计算，该值默认为-1，表示本次训练轮次数从`0`开始计算。
 
-* `-o checkpoints`参数无需包含断点权重文件的后缀名，上述训练命令会在训练过程中生成如下所示的断点权重文件，若想从断点`5`继续训练，则`checkpoints`参数只需设置为`"./output/MobileNetV3_large_x1_0_gpupaddle/5/ppcls"`，PaddleClas会自动补充后缀名。
+* `-o checkpoints`参数无需包含断点权重文件的后缀名，上述训练命令会在训练过程中生成如下所示的断点权重文件，若想从断点`5`继续训练，则`checkpoints`参数只需设置为`"./output/RecModel/ppcls_epoch_5"`，PaddleClas会自动补充后缀名。
     ```shell
     output/
     └── MobileNetV3_large_x1_0
@@ -110,19 +112,11 @@ python tools/train.py \
 
 ```bash
 python tools/eval.py \
-    -c ./configs/quick_start/MobileNetV3_large_x1_0_finetune.yaml \
-    -o pretrained_model="./output/MobileNetV3_large_x1_0/best_model/ppcls"\
-    -o load_static_weights=False
+    -c ./configs/quick_start/ResNet50_flowers_retrieval_finetune.yaml \
+    -o pretrained_model="./output/RecModel/best_model"\
 ```
 
-上述命令将使用`./configs/quick_start/MobileNetV3_large_x1_0_finetune.yaml`作为配置文件，对上述训练得到的模型`./output/MobileNetV3_large_x1_0/best_model/ppcls`进行评估。你也可以通过更改配置文件中的参数来设置评估，也可以通过`-o`参数更新配置，如上所示。
-
-可配置的部分评估参数说明如下：
-* `ARCHITECTURE.name`：模型名称
-* `pretrained_model`：待评估的模型文件路径
-* `load_static_weights`：待评估模型是否为静态图模型
-
-**注意：** 如果模型为动态图模型，则在加载待评估模型时，需要指定模型文件的路径，但无需包含文件后缀名，PaddleClas会自动补齐`.pdparams`的后缀，如[1.3 模型恢复训练](#1.3)。
+上述命令将使用`./configs/quick_start/ResNet50_flowers_retrieval_finetune.yaml`作为配置文件，对上述训练得到的模型`./output/RecModel/best_model`进行评估。你也可以通过更改配置文件中的参数来设置评估，也可以通过`-o`参数更新配置，如上所示。
 
 <a name="2"></a>
 ## 2. 基于Linux+GPU的模型训练与评估
@@ -141,7 +135,7 @@ export CUDA_VISIBLE_DEVICES=0,1,2,3
 python -m paddle.distributed.launch \
     --gpus="0,1,2,3" \
     tools/train.py \
-        -c ./configs/quick_start/MobileNetV3_large_x1_0_finetune.yaml
+        -c ./configs/quick_start/ResNet50_flowers_retrieval_finetune.yaml
 ```
 
 其中，`-c`用于指定配置文件的路径，可通过配置文件修改相关训练配置信息，也可以通过添加`-o`参数来更新配置：
@@ -150,7 +144,7 @@ python -m paddle.distributed.launch \
 python -m paddle.distributed.launch \
     --gpus="0,1,2,3" \
     tools/train.py \
-        -c ./configs/quick_start/MobileNetV3_large_x1_0_finetune.yaml \
+        -c ./configs/quick_start/ResNet50_flowers_retrieval_finetune.yaml \
         -o pretrained_model="" \
         -o use_gpu=True
 ```
@@ -168,16 +162,12 @@ export CUDA_VISIBLE_DEVICES=0,1,2,3
 python -m paddle.distributed.launch \
     --gpus="0,1,2,3" \
     tools/train.py \
-        -c ./configs/quick_start/MobileNetV3_large_x1_0_finetune.yaml \
-        -o pretrained_model="./pretrained/MobileNetV3_large_x1_0_pretrained"
+        -c ./configs/quick_start/ResNet50_flowers_retrieval_finetune.yaml \
+        -o Arch.Backbone.pretrained=True
 ```
-
-其中`pretrained_model`用于设置加载预训练权重文件的路径，使用时需要换成自己的预训练模型权重文件路径，也可以直接在配置文件中修改该路径。
 
 30分钟玩转PaddleClas[尝鲜版](./quick_start_new_user.md)与[进阶版](./quick_start_professional.md)中包含大量模型微调的示例，可以参考该章节在特定的数据集上进行模型微调。
 
-
-<a name="model_resume"></a>
 ### 2.3 模型恢复训练
 
 如果训练任务因为其他原因被终止，也可以加载断点权重文件继续训练。
@@ -188,8 +178,8 @@ export CUDA_VISIBLE_DEVICES=0,1,2,3
 python -m paddle.distributed.launch \
     --gpus="0,1,2,3" \
     tools/train.py \
-        -c ./configs/quick_start/MobileNetV3_large_x1_0_finetune.yaml \
-        -o checkpoints="./output/MobileNetV3_large_x1_0/5/ppcls" \
+        -c ./configs/quick_start/ResNet50_flowers_retrieval_finetune.yaml \
+        -o checkpoints="./output/RecModel/ppcls_epoch_5" \
         -o last_epoch=5 \
         -o use_gpu=True
 ```
@@ -203,63 +193,37 @@ python -m paddle.distributed.launch \
 
 ```bash
 python tools/eval.py \
-    -c ./configs/quick_start/MobileNetV3_large_x1_0_finetune.yaml \
-    -o pretrained_model="./output/MobileNetV3_large_x1_0/best_model/ppcls"\
-    -o load_static_weights=False
+    -c ./configs/quick_start/ResNet50_flowers_retrieval_finetune.yaml \
+    -o pretrained_model="./output/RecModel/best_model"\
 ```
 
 参数说明详见[1.4 模型评估](#1.4)。
 
-
-<a name="model_infer"></a>
-## 3. 使用预训练模型进行模型预测
-
-模型训练完成之后，可以加载训练得到的预训练模型，进行模型预测。在模型库的 `tools/infer/infer.py` 中提供了完整的示例，只需执行下述命令即可完成模型预测：
-
-```python
-python tools/infer/infer.py \
-    -i 待预测的图片文件路径 \
-    --model MobileNetV3_large_x1_0 \
-    --pretrained_model "./output/MobileNetV3_large_x1_0/best_model/ppcls" \
-    --use_gpu True \
-    --class_num 1000
-```
-
-参数说明：
-+ `image_file`(简写 i)：待预测的图片文件路径或者批量预测时的图片文件夹，如 `./test.jpeg`
-+ `model`：模型名称，如 `MobileNetV3_large_x1_0`
-+ `pretrained_model`：模型权重文件路径，如 `./output/MobileNetV3_large_x1_0/best_model/ppcls`
-+ `use_gpu` : 是否开启GPU训练，默认值：`True`
-+ `class_num` : 类别数，默认为1000，需要根据自己的数据进行修改。
-+ `resize_short`: 对输入图像进行等比例缩放，表示最短边的尺寸，默认值：`256`
-+ `resize`: 对`resize_short`操作后的进行居中裁剪，表示裁剪的尺寸，默认值：`224`
-+ `pre_label_image` : 是否对图像数据进行预标注，默认值：`False`
-+ `pre_label_out_idr` : 预标注图像数据的输出文件夹，当`pre_label_image=True`时，会在该文件夹下面生成很多个子文件夹，每个文件夹名称为类别id，其中存储模型预测属于该类别的所有图像。
-
-**注意**: 如果使用`Transformer`系列模型，如`DeiT_***_384`, `ViT_***_384`等，请注意模型的输入数据尺寸，需要设置参数`resize_short=384`, `resize=384`。
-
-
 <a name="model_inference"></a>
-## 4. 使用inference模型进行模型推理
+## 3. 使用inference模型进行模型推理
+### 3.1 导出推理模型
 
 通过导出inference模型，PaddlePaddle支持使用预测引擎进行预测推理。接下来介绍如何用预测引擎进行推理：
 首先，对训练好的模型进行转换：
 
 ```bash
 python tools/export_model.py \
-    --model MobileNetV3_large_x1_0 \
-    --pretrained_model ./output/MobileNetV3_large_x1_0/best_model/ppcls \
+    --pretrained_model ./output/RecModel/best_model \
     --output_path ./inference \
-    --class_dim 1000
 ```
 
-其中，参数`--model`用于指定模型名称，`--pretrained_model`用于指定模型文件路径，该路径仍无需包含模型文件后缀名（如[1.3 模型恢复训练](#1.3)），`--output_path`用于指定转换后模型的存储路径，`class_dim`表示模型所包含的类别数，默认为1000。
+其中，`--pretrained_model`用于指定模型文件路径，该路径仍无需包含模型文件后缀名（如[1.3 模型恢复训练](#1.3)），`--output_path`用于指定转换后模型的存储路径。
 
 **注意**：
 1. `--output_path`表示输出的inference模型文件夹路径，若`--output_path=./inference`，则会在`inference`文件夹下生成`inference.pdiparams`、`inference.pdmodel`和`inference.pdiparams.info`文件。
 2. 可以通过设置参数`--img_size`指定模型输入图像的`shape`，默认为`224`，表示图像尺寸为`224*224`，请根据实际情况修改。
 
-上述命令将生成模型结构文件（`inference.pdmodel`）和模型权重文件（`inference.pdiparams`），然后可以使用预测引擎进行推理：
+### 3.2 构建底库
+通过检索方式来进行图像识别，需要构建底库。底裤构建方式如下：
+
+### 3.3 推理预测
+
+通过3.1生成模型结构文件（`inference.pdmodel`）和模型权重文件（`inference.pdiparams`），通过3.2构建好底库， 然后可以使用预测引擎进行推理：
 
 ```bash
 python tools/infer/predict.py \
@@ -280,7 +244,6 @@ python tools/infer/predict.py \
 + `resize`: 对`resize_short`操作后的进行居中裁剪，表示裁剪的尺寸，默认值：`224`
 + `enable_calc_topk`: 是否计算预测结果的Topk精度指标，默认为`False`，
 + `gt_label_path`: 图像文件名以及真值标签文件，当`enable_calc_topk`为True时生效，用于读取待预测的图像列表及其标签。
-
 
 **注意**: 如果使用`Transformer`系列模型，如`DeiT_***_384`, `ViT_***_384`等，请注意模型的输入数据尺寸，需要设置参数`resize_short=384`, `resize=384`。
 
