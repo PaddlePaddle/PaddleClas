@@ -219,7 +219,20 @@ python tools/export_model.py \
 2. 可以通过设置参数`--img_size`指定模型输入图像的`shape`，默认为`224`，表示图像尺寸为`224*224`，请根据实际情况修改。
 
 ### 3.2 构建底库
-通过检索方式来进行图像识别，需要构建底库。底裤构建方式如下：
+通过检索方式来进行图像识别，需要构建底库。底库构建方式如下：
+```bash
+python python/build_gallery.py 
+       -c configs/build_flowers.yaml \
+       -o Global.rec_inference_model_dir "../inference" \
+       -o IndexProcess.index_path "../dataset/index" \
+       -o IndexProcess.image_root: "../dataset" \
+       -o IndexProcess.data_file: "../dataset/train_list.txt" 
+```
+其中
++ `Global.rec_inference_model_dir`：3.1生成的推理模型的路径
++ `IndexProcess.index_path`：gallery库index的路径
++ `IndexProcess.image_root`：gallery库图片的根目录
++ `IndexProcess.data_file`：gallery库图片的文件列表
 
 ### 3.3 推理预测
 
@@ -227,10 +240,11 @@ python tools/export_model.py \
 
 ```bash
 python python/predict_rec.py \
-    --Global.infer_imgs 图片路径 \
-    --Global.rec_inference_model_dir "./inference"
-    --Global.use_gpu=True \
-    --Global.use_tensorrt=False
+    -c configs/inference_flowers.yaml \
+    -o Global.infer_imgs 图片路径 \
+    -o Global.rec_inference_model_dir "./inference"
+    -o Global.use_gpu=True \
+    -o Global.use_tensorrt=False
 ```
 其中：
 + `Global.infer_imgs`：待预测的图片文件路径，如 `./test.jpeg`
