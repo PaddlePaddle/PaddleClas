@@ -25,43 +25,6 @@ LogoDet-3K数据集是具有完整标注的Logo数据集，有3000个标识类�
 - Normlize：归一化到0~1
 - [RandomErasing](https://arxiv.org/pdf/1708.04896v2.pdf)
 
-在配置文件中设置如下，详见`transform_ops`部分：
-
-```yaml
-DataLoader:
-  Train:
-    dataset:
-        # 具体使用的Dataset的的名称
-        name: "LogoDataset"
-        # 使用此数据集的具体参数
-        image_root: "dataset/LogoDet-3K-crop/train/"
-        cls_label_path: "dataset/LogoDet-3K-crop/LogoDet-3K+train.txt"
-        # 图像增广策略：ResizeImage、RandFlipImage等
-        transform_ops:
-          - ResizeImage:
-              size: 224
-          - RandFlipImage:
-              flip_code: 1
-          - AugMix:
-              prob: 0.5
-          - NormalizeImage:
-              scale: 0.00392157
-              mean: [0.485, 0.456, 0.406]
-              std: [0.229, 0.224, 0.225]
-              order: ''
-          - RandomErasing:
-              EPSILON: 0.5
-    sampler:
-        name: DistributedRandomIdentitySampler
-        batch_size: 128
-        num_instances: 2
-        drop_last: False
-        shuffle: True
-    loader:
-        num_workers: 6
-        use_shared_memory: False
-```
-
 ## Backbone的具体设置
 
 具体是用`ResNet50`作为backbone，主要做了如下修改：
@@ -74,111 +37,12 @@ DataLoader:
 
    具体代码：[ResNet50_last_stage_stride1](../../../ppcls/arch/backbone/variant_models/resnet_variant.py)
 
-在配置文件中Backbone设置如下：
-
-```yaml
-Arch:
-  # 使用RecModel模型进行训练，目前支持普通ImageNet和RecModel两个方式
-  name: "RecModel"
-  # 导出inference model的具体配置
-  infer_output_key: "features"
-  infer_add_softmax: False
-  # 使用的Backbone
-  Backbone:
-    name: "ResNet50_last_stage_stride1"
-    pretrained: True
-  # 使用此层作为Backbone的feature输出，name为具体层的full_name
-  BackboneStopLayer:
-    name: "adaptive_avg_pool2d_0"
-  # Backbone的基础上，新增网络层。此模型添加1x1的卷积层（embedding）
-  Neck:
-    name: "VehicleNeck"
-    in_channels: 2048
-    out_channels: 512
-  # 增加CircleMargin head
-  Head:
-    name: "CircleMargin"
-    margin: 0.35
-    scale:  64
-    embedding_size: 512
-```
-
 ## Loss的设置
 
 在Logo识别中，使用了[Pairwise Cosface + CircleMargin](https://arxiv.org/abs/2002.10857) 联合训练，其中权重比例为1:1
 
 具体代码详见：[PairwiseCosface](../../../ppcls/loss/pairwisecosface.py) 、[CircleMargin](../../../ppcls/arch/gears/circlemargin.py)
 
-在配置文件中设置如下：
 
-```yaml
-Loss:
-  Train:
-    - CELoss:
-        weight: 1.0
-    - PairwiseCosface:
-        margin: 0.35
-        gamma: 64
-        weight: 1.0
-  Eval:
-    - CELoss:
-        weight: 1.0
-```
 
-## 其他相关设置
-
-### Optimizer设置
-
-```yaml
-Optimizer:
-  # 使用的优化器名称
-  name: Momentum
-  # 优化器具体参数
-  momentum: 0.9
-  lr:
-    # 使用的学习率调节具体名称
-    name: Cosine
-    # 学习率调节算法具体参数
-    learning_rate: 0.01
-  regularizer:
-    name: 'L2'
-    coeff: 0.0001
-```
-
-### Eval Metric设置
-
-```yaml
-Metric:
-  Eval:
-    # 使用Recallk和mAP两种评价指标
-    - Recallk:
-        topk: [1, 5]
-    - mAP: {}
-```
-
-### 其他超参数设置
-
-```yaml
-Global:
-  # 如为null则从头开始训练。若指定中间训练保存的状态地址，则继续训练
-  checkpoints: null
-  pretrained_model: null
-  output_dir: "./output/"
-  device: "gpu"
-  class_num: 3000
-  # 保存模型的粒度，每个epoch保存一次
-  save_interval: 1
-  eval_during_train: True
-  eval_interval: 1
-  # 训练的epoch数
-  epochs: 120
-  # log输出频率
-  print_batch_step: 10
-  # 是否使用visualdl库
-  use_visualdl: False
-  # used for static mode and model export
-  image_shape: [3, 224, 224]
-  save_inference_dir: "./inference"
-  # 使用retrival的方式进行评测
-  eval_mode: "retrieval"
-```
+其他部分参数，详见[配置文件](../../../ppcls/configs/Logo/ResNet50_ReID.yaml)。
