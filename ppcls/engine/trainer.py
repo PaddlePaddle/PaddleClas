@@ -213,8 +213,9 @@ class Trainer(object):
                     eta_msg = "eta: {:s}".format(
                         str(datetime.timedelta(seconds=int(eta_sec))))
                     logger.info(
-                        "[Train][Epoch {}][Iter: {}/{}]{}, {}, {}, {}, {}".
-                        format(epoch_id, iter_id,
+                        "[Train][Epoch {}/{}][Iter: {}/{}]{}, {}, {}, {}, {}".
+                        format(epoch_id, self.config["Global"][
+                            "epochs"], iter_id,
                                len(self.train_dataloader), lr_msg, metric_msg,
                                time_msg, ips_msg, eta_msg))
                 tic = time.time()
@@ -223,8 +224,8 @@ class Trainer(object):
                 "{}: {:.5f}".format(key, output_info[key].avg)
                 for key in output_info
             ])
-            logger.info("[Train][Epoch {}][Avg]{}".format(epoch_id,
-                                                          metric_msg))
+            logger.info("[Train][Epoch {}/{}][Avg]{}".format(
+                epoch_id, self.config["Global"]["epochs"], metric_msg))
             output_info.clear()
 
             # eval model and save model if possible

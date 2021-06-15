@@ -80,6 +80,11 @@ def info(fmt, *args):
 
 
 @log_at_trainer0
+def debug(fmt, *args):
+    _logger.debug(fmt, *args)
+
+
+@log_at_trainer0
 def warning(fmt, *args):
     _logger.warning(fmt, *args)
 

@@ -115,19 +115,6 @@ def init_model(config, net, optimizer=None):
                     pretrained_model), "HEADER"))
 
 
-def _save_student_model(net, model_prefix):
-    """
-    save student model if the net is the network contains student
-    """
-    student_model_prefix = model_prefix + "_student.pdparams"
-    if hasattr(net, "_layers"):
-        net = net._layers
-    if hasattr(net, "student"):
-        paddle.save(net.student.state_dict(), student_model_prefix)
-        logger.info("Already save student model in {}".format(
-            student_model_prefix))
-
-
 def save_model(net,
                optimizer,
                metric_info,
@@ -141,11 +128,9 @@ def save_model(net,
         return
     model_path = os.path.join(model_path, model_name)
     _mkdir_if_not_exist(model_path)
-    model_prefix = os.path.join(model_path, prefix)
+    model_path = os.path.join(model_path, prefix)
 
-    _save_student_model(net, model_prefix)
-
-    paddle.save(net.state_dict(), model_prefix + ".pdparams")
-    paddle.save(optimizer.state_dict(), model_prefix + ".pdopt")
-    paddle.save(metric_info, model_prefix + ".pdstates")
+    paddle.save(net.state_dict(), model_path + ".pdparams")
+    paddle.save(optimizer.state_dict(), model_path + ".pdopt")
+    paddle.save(metric_info, model_path + ".pdstates")
     logger.info("Already save model in {}".format(model_path))

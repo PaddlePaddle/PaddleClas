@@ -54,13 +54,8 @@ def create_operators(params):
 
 
 def build_dataloader(config, mode, device, seed=None):
-    assert mode in [
-        'Train',
-        'Eval',
-        'Test',
-        'Gallery',
-        'Query'
-    ], "Mode should be Train, Eval, Test, Gallery, Query"
+    assert mode in ['Train', 'Eval', 'Test', 'Gallery', 'Query'
+                    ], "Mode should be Train, Eval, Test, Gallery, Query"
     # build dataset
     config_dataset = config[mode]['dataset']
     config_dataset = copy.deepcopy(config_dataset)
@@ -72,7 +67,7 @@ def build_dataloader(config, mode, device, seed=None):
 
     dataset = eval(dataset_name)(**config_dataset)
 
-    logger.info("build dataset({}) success...".format(dataset))
+    logger.debug("build dataset({}) success...".format(dataset))
 
     # build sampler
     config_sampler = config[mode]['sampler']
@@ -85,7 +80,7 @@ def build_dataloader(config, mode, device, seed=None):
         sampler_name = config_sampler.pop("name")
         batch_sampler = eval(sampler_name)(dataset, **config_sampler)
 
-    logger.info("build batch_sampler({}) success...".format(batch_sampler))
+    logger.debug("build batch_sampler({}) success...".format(batch_sampler))
 
     # build batch operator
     def mix_collate_fn(batch):
@@ -132,5 +127,5 @@ def build_dataloader(config, mode, device, seed=None):
             batch_sampler=batch_sampler,
             collate_fn=batch_collate_fn)
 
-    logger.info("build data_loader({}) success...".format(data_loader))
+    logger.debug("build data_loader({}) success...".format(data_loader))
     return data_loader
