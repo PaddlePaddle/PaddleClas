@@ -236,5 +236,4 @@ python python/predict_rec.py \
 + `Global.infer_imgs`：待预测的图片文件路径，如 `./test.jpeg`
 + `Global.rec_inference_model_dir`：模型结构文件路径，如 `./inference/`
 + `Global.use_tensorrt`：是否使用 TesorRT 预测引擎，默认值：`True`
-+ `Global.use_gpu`：是否使用 GPU 预测，默认值：`True`
-+ 
++ `Global.use_gpu`：是否使用 GPU 预测，默认值：`True` 
