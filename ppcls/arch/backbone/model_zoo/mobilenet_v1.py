@@ -26,9 +26,14 @@ from paddle.nn import AdaptiveAvgPool2D, MaxPool2D, AvgPool2D
 from paddle.nn.initializer import KaimingNormal
 import math
 
-__all__ = [
-    "MobileNetV1_x0_25", "MobileNetV1_x0_5", "MobileNetV1_x0_75", "MobileNetV1"
-]
+from ppcls.utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
+
+MODEL_URLS = {"MobileNetV1_x0_25": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/MobileNetV1_x0_25_pretrained.pdparams", 
+              "MobileNetV1_x0_5": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/MobileNetV1_x0_5_pretrained.pdparams", 
+              "MobileNetV1_x0_75": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/MobileNetV1_x0_75_pretrained.pdparams",
+              "MobileNetV1": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/MobileNetV1_pretrained.pdparams"}
+
+__all__ = list(MODEL_URLS.keys())
 
 
 class ConvBNLayer(nn.Layer):
@@ -245,22 +250,39 @@ class MobileNet(nn.Layer):
         y = self.out(y)
         return y
 
+    
+def _load_pretrained(pretrained, model, model_url, use_ssld=False):
+    if pretrained is False:
+        pass
+    elif pretrained is True:
+        load_dygraph_pretrain_from_url(model, model_url, use_ssld=use_ssld)
+    elif isinstance(pretrained, str):
+        load_dygraph_pretrain(model, pretrained)
+    else:
+        raise RuntimeError(
+            "pretrained type is not available. Please use `string` or `boolean` type."
+        )
+        
 
-def MobileNetV1_x0_25(**args):
-    model = MobileNet(scale=0.25, **args)
+def MobileNetV1_x0_25(pretrained=False, use_ssld=False, **kwargs):
+    model = MobileNet(scale=0.25, **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["MobileNetV1_x0_25"], use_ssld=use_ssld)
     return model
 
 
-def MobileNetV1_x0_5(**args):
-    model = MobileNet(scale=0.5, **args)
+def MobileNetV1_x0_5(pretrained=False, use_ssld=False, **kwargs):
+    model = MobileNet(scale=0.5, **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["MobileNetV1_x0_5"], use_ssld=use_ssld)
     return model
 
 
-def MobileNetV1_x0_75(**args):
-    model = MobileNet(scale=0.75, **args)
+def MobileNetV1_x0_75(pretrained=False, use_ssld=False, **kwargs):
+    model = MobileNet(scale=0.75, **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["MobileNetV1_x0_75"], use_ssld=use_ssld)
     return model
 
 
-def MobileNetV1(**args):
-    model = MobileNet(scale=1.0, **args)
+def MobileNetV1(pretrained=False, use_ssld=False, **kwargs):
+    model = MobileNet(scale=1.0, **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["MobileNetV1"], use_ssld=use_ssld)
     return model

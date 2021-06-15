@@ -21,7 +21,11 @@ from paddle.nn import AdaptiveAvgPool2D, MaxPool2D, AvgPool2D
 from paddle.nn.initializer import Uniform
 import math
 
-__all__ = ["InceptionV4"]
+from ppcls.utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
+
+MODEL_URLS = {"InceptionV4": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/InceptionV4_pretrained.pdparams"}
+
+__all__ = list(MODEL_URLS.keys())
 
 
 class ConvBNLayer(nn.Layer):
@@ -450,6 +454,19 @@ class InceptionV4DY(nn.Layer):
         return x
 
 
-def InceptionV4(**args):
-    model = InceptionV4DY(**args)
+def _load_pretrained(pretrained, model, model_url, use_ssld=False):
+    if pretrained is False:
+        pass
+    elif pretrained is True:
+        load_dygraph_pretrain_from_url(model, model_url, use_ssld=use_ssld)
+    elif isinstance(pretrained, str):
+        load_dygraph_pretrain(model, pretrained)
+    else:
+        raise RuntimeError(
+            "pretrained type is not available. Please use `string` or `boolean` type."
+        )
+
+def InceptionV4(pretrained=False, use_ssld=False, **kwargs):
+    model = InceptionV4DY(**kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["InceptionV4"], use_ssld=use_ssld)
     return model

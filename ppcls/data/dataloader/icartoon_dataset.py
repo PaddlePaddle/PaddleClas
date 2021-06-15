@@ -29,12 +29,8 @@ class ICartoonDataset(CommonDataset):
 
         with open(self._cls_path) as fd:
             lines = fd.readlines()
-            if seed is not None:
-                np.random.RandomState(seed).shuffle(lines)
-            else:
-                np.random.shuffle(lines)
             for l in lines:
                 l = l.strip().split("\t")
-                self.images.append(os.path.join(self._img_root, l[0][2:]))
+                self.images.append(os.path.join(self._img_root, l[0]))
                 self.labels.append(int(l[1]))
                 assert os.path.exists(self.images[-1])

@@ -25,3 +25,17 @@ def build_postprocess(config):
     mod = importlib.import_module(__name__)
     postprocess_func = getattr(mod, model_name)(**config)
     return postprocess_func
+
+
+class DistillationPostProcess(object):
+    def __init__(self, model_name="Student", key=None, func="Topk", **kargs):
+        super().__init__()
+        self.func = eval(func)(**kargs)
+        self.model_name = model_name
+        self.key = key
+
+    def __call__(self, x, file_names=None):
+        x = x[self.model_name]
+        if self.key is not None:
+            x = x[self.key]
+        return self.func(x, file_names=file_names)

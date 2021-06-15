@@ -73,6 +73,9 @@ DataLoader:
         bbox_crop: True
         cls_label_path: "./dataset/CompCars/train_test_split/classification/train_label.txt"
         transform_ops:
+          - DecodeImage:
+              to_rgb: True
+              channel_first: False
           - ResizeImage:
               size: 224
           - RandFlipImage:
@@ -98,8 +101,8 @@ DataLoader:
         drop_last: False
         shuffle: True
     loader:
-        num_workers: 6
-        use_shared_memory: False
+        num_workers: 8
+        use_shared_memory: True
 
   Eval:
     # TOTO: modify to the latest trainer
@@ -110,6 +113,9 @@ DataLoader:
         cls_label_path: "./dataset/CompCars/train_test_split/classification/test_label.txt"
         bbox_crop: True
         transform_ops:
+          - DecodeImage:
+              to_rgb: True
+              channel_first: False
           - ResizeImage:
               size: 224
           - NormalizeImage:
@@ -123,8 +129,8 @@ DataLoader:
         drop_last: False
         shuffle: False
     loader:
-        num_workers: 6
-        use_shared_memory: False
+        num_workers: 8
+        use_shared_memory: True
 
 Infer:
   infer_imgs: "docs/images/whl/demo.jpg"

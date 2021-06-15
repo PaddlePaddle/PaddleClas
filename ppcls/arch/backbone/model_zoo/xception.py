@@ -8,7 +8,16 @@ from paddle.nn.initializer import Uniform
 import math
 import sys
 
-__all__ = ['Xception41', 'Xception65', 'Xception71']
+
+from ppcls.utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
+
+MODEL_URLS = {
+              "Xception41": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/Xception41_pretrained.pdparams",
+              "Xception65": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/Xception65_pretrained.pdparams",
+              "Xception71": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/Xception71_pretrained.pdparams"
+             }
+
+__all__ = list(MODEL_URLS.keys())
 
 
 class ConvBNLayer(nn.Layer):
@@ -329,17 +338,32 @@ class Xception(nn.Layer):
         x = self._exit_flow(x)
         return x
 
+def _load_pretrained(pretrained, model, model_url, use_ssld=False):
+    if pretrained is False:
+        pass
+    elif pretrained is True:
+        load_dygraph_pretrain_from_url(model, model_url, use_ssld=use_ssld)
+    elif isinstance(pretrained, str):
+        load_dygraph_pretrain(model, pretrained)
+    else:
+        raise RuntimeError(
+            "pretrained type is not available. Please use `string` or `boolean` type."
+        )
+        
 
-def Xception41(**args):
-    model = Xception(entry_flow_block_num=3, middle_flow_block_num=8, **args)
+def Xception41(pretrained=False, use_ssld=False, **kwargs):
+    model = Xception(entry_flow_block_num=3, middle_flow_block_num=8, **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["Xception41"], use_ssld=use_ssld)
     return model
 
 
-def Xception65(**args):
-    model = Xception(entry_flow_block_num=3, middle_flow_block_num=16, **args)
+def Xception65(pretrained=False, use_ssld=False, **kwargs):
+    model = Xception(entry_flow_block_num=3, middle_flow_block_num=16, **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["Xception65"], use_ssld=use_ssld)
     return model
 
 
-def Xception71(**args):
-    model = Xception(entry_flow_block_num=5, middle_flow_block_num=16, **args)
+def Xception71(pretrained=False, use_ssld=False, **kwargs):
+    model = Xception(entry_flow_block_num=5, middle_flow_block_num=16, **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["Xception71"], use_ssld=use_ssld)
     return model

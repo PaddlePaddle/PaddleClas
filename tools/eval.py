@@ -25,6 +25,7 @@ from ppcls.engine.trainer import Trainer
 
 if __name__ == "__main__":
     args = config.parse_args()
-    config = config.get_config(args.config, overrides=args.override, show=True)
+    config = config.get_config(
+        args.config, overrides=args.override, show=False)
     trainer = Trainer(config, mode="eval")
     trainer.eval()

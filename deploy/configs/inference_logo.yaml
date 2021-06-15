@@ -1,7 +1,7 @@
 Global:
-  infer_imgs: "./logo/demo/logo_APK.jpg"
-  det_inference_model_dir: "./logo/det/"
-  rec_inference_model_dir: "./logo/rec/"
+  infer_imgs: "./dataset/logo_demo_data_v1.0/query/logo_AKG.jpg"
+  det_inference_model_dir: "./models/ppyolov2_r50vd_dcn_mainbody_v1.0_infer/"
+  rec_inference_model_dir: "./models/logo_rec_ResNet50_Logo3K_v1.0_infer/"
   batch_size: 1
   image_shape: [3, 640, 640]
   threshold: 0.5
@@ -48,7 +48,7 @@ RecPostProcess: null
 
 # indexing engine config
 IndexProcess:
-  index_path: "./logo_index/"
+  index_path: "./dataset/logo_demo_data_v1.0/index/"
   search_budget: 100
-  return_k: 10
+  return_k: 5
   dist_type: "IP"

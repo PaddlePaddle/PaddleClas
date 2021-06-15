@@ -27,14 +27,16 @@ from paddle.nn.initializer import Uniform
 
 import math
 
-__all__ = [
-    "DPN",
-    "DPN68",
-    "DPN92",
-    "DPN98",
-    "DPN107",
-    "DPN131",
-]
+from ppcls.utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
+
+MODEL_URLS = {"DPN68": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DPN68_pretrained.pdparams",
+              "DPN92": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DPN92_pretrained.pdparams",
+              "DPN98": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DPN98_pretrained.pdparams",
+              "DPN107": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DPN107_pretrained.pdparams",
+              "DPN131": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DPN131_pretrained.pdparams",
+             }
+
+__all__ = list(MODEL_URLS.keys())
 
 
 class ConvBNLayer(nn.Layer):
@@ -398,28 +400,45 @@ class DPN(nn.Layer):
         net_arg['init_padding'] = init_padding
 
         return net_arg
+    
+def _load_pretrained(pretrained, model, model_url, use_ssld=False):
+    if pretrained is False:
+        pass
+    elif pretrained is True:
+        load_dygraph_pretrain_from_url(model, model_url, use_ssld=use_ssld)
+    elif isinstance(pretrained, str):
+        load_dygraph_pretrain(model, pretrained)
+    else:
+        raise RuntimeError(
+            "pretrained type is not available. Please use `string` or `boolean` type."
+        )  
 
 
-def DPN68(**args):
-    model = DPN(layers=68, **args)
+def DPN68(pretrained=False, use_ssld=False, **kwargs):
+    model = DPN(layers=68, **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["DPN68"])
     return model
 
 
-def DPN92(**args):
-    model = DPN(layers=92, **args)
+def DPN92(pretrained=False, use_ssld=False, **kwargs):
+    model = DPN(layers=92, **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["DPN92"])
     return model
 
 
-def DPN98(**args):
-    model = DPN(layers=98, **args)
+def DPN98(pretrained=False, use_ssld=False, **kwargs):
+    model = DPN(layers=98, **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["DPN98"])
     return model
 
 
-def DPN107(**args):
-    model = DPN(layers=107, **args)
+def DPN107(pretrained=False, use_ssld=False, **kwargs):
+    model = DPN(layers=107, **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["DPN107"])
     return model
 
 
-def DPN131(**args):
-    model = DPN(layers=131, **args)
+def DPN131(pretrained=False, use_ssld=False, **kwargs):
+    model = DPN(layers=131, **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["DPN131"])
     return model

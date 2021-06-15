@@ -6,10 +6,18 @@ from paddle.nn import Conv2D, BatchNorm, Linear, Dropout
 from paddle.nn import AdaptiveAvgPool2D, MaxPool2D, AvgPool2D
 from paddle.nn.initializer import Uniform
 
-__all__ = [
-    "ResNeXt101_32x8d_wsl", "ResNeXt101_32x16d_wsl", "ResNeXt101_32x32d_wsl",
-    "ResNeXt101_32x48d_wsl"
-]
+from ppcls.utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
+
+MODEL_URLS = {
+              "ResNeXt101_32x8d_wsl": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ResNeXt101_32x8d_wsl_pretrained.pdparams",
+              "ResNeXt101_32x16d_wsl": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ResNeXt101_32x816_wsl_pretrained.pdparams",
+              "ResNeXt101_32x32d_wsl": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ResNeXt101_32x32d_wsl_pretrained.pdparams",
+              "ResNeXt101_32x48d_wsl": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ResNeXt101_32x48d_wsl_pretrained.pdparams",
+
+             }
+
+__all__ = list(MODEL_URLS.keys())
+
 
 
 class ConvBNLayer(nn.Layer):
@@ -426,22 +434,39 @@ class ResNeXt101WSL(nn.Layer):
         x = self._out(x)
         return x
 
+    
+def _load_pretrained(pretrained, model, model_url, use_ssld=False):
+    if pretrained is False:
+        pass
+    elif pretrained is True:
+        load_dygraph_pretrain_from_url(model, model_url, use_ssld=use_ssld)
+    elif isinstance(pretrained, str):
+        load_dygraph_pretrain(model, pretrained)
+    else:
+        raise RuntimeError(
+            "pretrained type is not available. Please use `string` or `boolean` type."
+        )
 
-def ResNeXt101_32x8d_wsl(**args):
-    model = ResNeXt101WSL(cardinality=32, width=8, **args)
+
+def ResNeXt101_32x8d_wsl(pretrained=False, use_ssld=False, **kwargs):
+    model = ResNeXt101WSL(cardinality=32, width=8, **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["ResNeXt101_32x8d_wsl"], use_ssld=use_ssld)
     return model
 
 
 def ResNeXt101_32x16d_wsl(**args):
-    model = ResNeXt101WSL(cardinality=32, width=16, **args)
+    model = ResNeXt101WSL(cardinality=32, width=16, **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["ResNeXt101_32x16d_ws"], use_ssld=use_ssld)
     return model
 
 
 def ResNeXt101_32x32d_wsl(**args):
-    model = ResNeXt101WSL(cardinality=32, width=32, **args)
+    model = ResNeXt101WSL(cardinality=32, width=32, **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["ResNeXt101_32x32d_wsl"], use_ssld=use_ssld)
     return model
 
 
 def ResNeXt101_32x48d_wsl(**args):
-    model = ResNeXt101WSL(cardinality=32, width=48, **args)
+    model = ResNeXt101WSL(cardinality=32, width=48, **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["ResNeXt101_32x48d_wsl"], use_ssld=use_ssld)
     return model

@@ -71,6 +71,9 @@ DataLoader:
         image_root: "./dataset/VeRI-Wild/images/"
         cls_label_path: "./dataset/VeRI-Wild/train_test_split/train_list_start0.txt"
         transform_ops:
+          - DecodeImage:
+              to_rgb: True
+              channel_first: False
           - ResizeImage:
               size: 224
           - RandFlipImage:
@@ -106,6 +109,9 @@ DataLoader:
         image_root: "./dataset/VeRI-Wild/images"
         cls_label_path: "./dataset/VeRI-Wild/train_test_split/test_3000_id_query.txt"
         transform_ops:
+          - DecodeImage:
+              to_rgb: True
+              channel_first: False
           - ResizeImage:
               size: 224
           - NormalizeImage:
@@ -129,6 +135,9 @@ DataLoader:
         image_root: "./dataset/VeRI-Wild/images"
         cls_label_path: "./dataset/VeRI-Wild/train_test_split/test_3000_id.txt"
         transform_ops:
+          - DecodeImage:
+              to_rgb: True
+              channel_first: False
           - ResizeImage:
               size: 224
           - NormalizeImage:
