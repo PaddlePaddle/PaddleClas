@@ -137,7 +137,7 @@ def override(dl, ks, v):
         if len(ks) == 1:
             # assert ks[0] in dl, ('{} is not exist in {}'.format(ks[0], dl))
             if not ks[0] in dl:
-                print('A new filed ({}) detected!'.format(ks[0], dl))
+                logger.warning('A new filed ({}) detected!'.format(ks[0], dl))
             dl[ks[0]] = str2num(v)
         else:
             override(dl[ks[0]], ks[1:], v)
