@@ -31,9 +31,11 @@ sudo docker run --name ppcls -v $PWD:/paddle --shm-size=8G --network=host -it do
 
 # Use the following command to create a container if you want to use GPU in the container
 sudo nvidia-docker run --name ppcls -v $PWD:/paddle --shm-size=8G --network=host -it docker pull paddlepaddle/paddle:2.1.0-gpu-cuda10.2-cudnn7 /bin/bash
+```
 
 You can also visit [DockerHub](https://hub.docker.com/r/paddlepaddle/paddle/tags/) to get more docker images.
 
+```
 # use ctrl+P+Q to exit docker, to re-enter docker using the following command:
 sudo docker container exec -it ppcls /bin/bash
 ```
@@ -53,13 +55,10 @@ pip3 install paddlepaddle --upgrade -i https://mirror.baidu.com/pypi/simple
 ```
 
 **Note:**
-If you have already installed CPU version of PaddlePaddle and want to use GPU version now, you should uninstall CPU version of PaddlePaddle and then install GPU version to avoid package confusion.
+* If you have already installed CPU version of PaddlePaddle and want to use GPU version now, you should uninstall CPU version of PaddlePaddle and then install GPU version to avoid package confusion.
+* You can also compile PaddlePaddle from source code, please refer to [PaddlePaddle Installation tutorial](http://www.paddlepaddle.org.cn/install/quick) to more compile options.
 
-### 1.4 Install PaddlePaddle from source code
-
-You can also compile PaddlePaddle from source code, please refer to [PaddlePaddle Installation tutorial](http://www.paddlepaddle.org.cn/install/quick) to more compile options.
-
-### 1.5 Verify Installation process
+### 1.4 Verify Installation process
 
 ```python
 import paddle

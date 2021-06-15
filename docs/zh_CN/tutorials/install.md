@@ -18,7 +18,7 @@
 
 建议使用我们提供的docker运行PaddleClas，有关docker、nvidia-docker使用请参考[链接](https://www.runoob.com/docker/docker-tutorial.html/)。
 
-如果不使用docker，直接跳过1.2部分内容，从1.3部分开始执行。
+如果不使用docker，可以直接跳过1.2部分内容，从1.3部分开始执行。
 
 
 ### 1.2 （建议）准备docker环境。第一次使用这个镜像，会自动下载该镜像，请耐心等待。
@@ -34,9 +34,12 @@ sudo docker run --name ppcls -v $PWD:/paddle --shm-size=8G --network=host -it do
 
 如果希望使用GPU版本的容器，请运行以下命令创建容器。
 sudo nvidia-docker run --name ppcls -v $PWD:/paddle --shm-size=8G --network=host -it docker pull paddlepaddle/paddle:2.1.0-gpu-cuda10.2-cudnn7 /bin/bash
+```
+
 
 您也可以访问[DockerHub](https://hub.docker.com/r/paddlepaddle/paddle/tags/)获取与您机器适配的镜像。
 
+```
 # ctrl+P+Q可退出docker 容器，重新进入docker 容器使用如下命令
 sudo docker container exec -it ppcls /bin/bash
 ```
@@ -56,12 +59,8 @@ pip3 install paddlepaddle --upgrade -i https://mirror.baidu.com/pypi/simple
 ```
 
 **注意：**
-如果先安装了CPU版本的paddlepaddle，之后想切换到GPU版本，那么需要首先卸载CPU版本的paddle，再安装GPU版本的paddle，否则容易导致使用的paddle版本混乱。
-
-
-### 1.4 源码编译PaddlePaddle
-
-您也可以从源码编译安装PaddlePaddle，请参照[安装文档](http://www.paddlepaddle.org.cn/install/quick)中的说明进行操作。
+* 如果先安装了CPU版本的paddlepaddle，之后想切换到GPU版本，那么需要首先卸载CPU版本的paddle，再安装GPU版本的paddle，否则容易导致使用的paddle版本混乱。
+* 您也可以从源码编译安装PaddlePaddle，请参照[PaddlePaddle 安装文档](http://www.paddlepaddle.org.cn/install/quick)中的说明进行操作。
 
 
 ### 1.5 验证是否安装成功
