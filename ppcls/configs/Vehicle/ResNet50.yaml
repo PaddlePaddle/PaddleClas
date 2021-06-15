@@ -18,6 +18,8 @@ Global:
 # model architecture
 Arch:
   name: "RecModel"
+  infer_output_key: "features"
+  infer_add_softmax: False
   Backbone: 
     name: "ResNet50_last_stage_stride1"
     pretrained: True
@@ -66,10 +68,10 @@ DataLoader:
   Train:
     dataset:
         name: "CompCars"
-        image_root: "/work/dataset/CompCars/image/"
-        label_root: "/work/dataset/CompCars/label/"
+        image_root: "./dataset/CompCars/image/"
+        label_root: "./dataset/CompCars/label/"
         bbox_crop: True
-        cls_label_path: "/work/dataset/CompCars/train_test_split/classification/train_label.txt"
+        cls_label_path: "./dataset/CompCars/train_test_split/classification/train_label.txt"
         transform_ops:
           - DecodeImage:
               to_rgb: True
@@ -106,7 +108,7 @@ DataLoader:
     # TOTO: modify to the latest trainer
     dataset: 
         name: "CompCars"
-        image_root: ".dataset/CompCars/image/"
+        image_root: "./dataset/CompCars/image/"
         label_root: "./dataset/CompCars/label/"
         cls_label_path: "./dataset/CompCars/train_test_split/classification/test_label.txt"
         bbox_crop: True
