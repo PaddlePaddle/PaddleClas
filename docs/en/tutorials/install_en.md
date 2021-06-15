@@ -13,7 +13,7 @@ This tutorial introduces how to install PaddleClas and its requirements.
 - cuda >= 10.1 (necessary if you want to use paddlepaddle-gpu)
 - cudnn >= 7.6.4 (necessary if you want to use paddlepaddle-gpu)
 - nccl >= 2.1.2 (necessary if you want the use distributed training/eval)
-- gcc 8.2
+- gcc >= 8.2
 
 Docker is recomended to run Paddleclas, for more detailed information about docker and nvidia-docker, you can refer to the [tutorial](https://www.runoob.com/docker/docker-tutorial.html).
 

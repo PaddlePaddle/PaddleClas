@@ -14,7 +14,7 @@
 - cuda >= 10.1 (如果使用paddlepaddle-gpu)
 - cudnn >= 7.6.4 (如果使用paddlepaddle-gpu)
 - nccl >= 2.1.2 (如果使用分布式训练/评估)
-- gcc 8.2
+- gcc >= 8.2
 
 建议使用我们提供的docker运行PaddleClas，有关docker、nvidia-docker使用请参考[链接](https://www.runoob.com/docker/docker-tutorial.html)。
 
