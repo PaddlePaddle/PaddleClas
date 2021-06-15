@@ -19,6 +19,8 @@ Global:
 # model architecture
 Arch:
   name: "RecModel"
+  infer_output_key: "features"
+  infer_add_softmax: False
   Backbone: 
     name: "ResNet50_last_stage_stride1"
     pretrained: True
@@ -31,7 +33,7 @@ Arch:
   Head:
     name: "ArcMargin"  
     embedding_size: 512
-    class_num: 431
+    class_num: 30671
     margin: 0.15
     scale: 32
  
@@ -66,8 +68,8 @@ DataLoader:
   Train:
     dataset:
         name: "VeriWild"
-        image_root: "/work/dataset/VeRI-Wild/images/"
-        cls_label_path: "/work/dataset/VeRI-Wild/train_test_split/train_list_start0.txt"
+        image_root: "./dataset/VeRI-Wild/images/"
+        cls_label_path: "./dataset/VeRI-Wild/train_test_split/train_list_start0.txt"
         transform_ops:
           - DecodeImage:
               to_rgb: True
@@ -104,8 +106,8 @@ DataLoader:
     # TOTO: modify to the latest trainer
       dataset: 
         name: "VeriWild"
-        image_root: "/work/dataset/VeRI-Wild/images"
-        cls_label_path: "/work/dataset/VeRI-Wild/train_test_split/test_3000_id_query.txt"
+        image_root: "./dataset/VeRI-Wild/images"
+        cls_label_path: "./dataset/VeRI-Wild/train_test_split/test_3000_id_query.txt"
         transform_ops:
           - DecodeImage:
               to_rgb: True
@@ -130,8 +132,8 @@ DataLoader:
     # TOTO: modify to the latest trainer
       dataset: 
         name: "VeriWild"
-        image_root: "/work/dataset/VeRI-Wild/images"
-        cls_label_path: "/work/dataset/VeRI-Wild/train_test_split/test_3000_id.txt"
+        image_root: "./dataset/VeRI-Wild/images"
+        cls_label_path: "./dataset/VeRI-Wild/train_test_split/test_3000_id.txt"
         transform_ops:
           - DecodeImage:
               to_rgb: True
