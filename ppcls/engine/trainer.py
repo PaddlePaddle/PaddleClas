@@ -160,8 +160,8 @@ class Trainer(object):
                         time_info[key].reset()
                 time_info["reader_cost"].update(time.time() - tic)
                 batch_size = batch[0].shape[0]
-                batch[1] = paddle.to_tensor(batch[1].numpy().astype("int64")
-                                            .reshape([-1, 1]))
+                batch[1] = batch[1].reshape([-1, 1]).astype("int64")
+
                 global_step += 1
                 # image input
                 if not self.is_rec:
@@ -335,7 +335,7 @@ class Trainer(object):
             time_info["reader_cost"].update(time.time() - tic)
             batch_size = batch[0].shape[0]
             batch[0] = paddle.to_tensor(batch[0]).astype("float32")
-            batch[1] = paddle.to_tensor(batch[1]).reshape([-1, 1])
+            batch[1] = batch[1].reshape([-1, 1]).astype("int64")
             # image input
             if self.is_rec:
                 out = self.model(batch[0], batch[1])
@@ -477,10 +477,10 @@ class Trainer(object):
         for idx, batch in enumerate(dataloader(
         )):  # load is very time-consuming
             batch = [paddle.to_tensor(x) for x in batch]
-            batch[1] = batch[1].reshape([-1, 1])
+            batch[1] = batch[1].reshape([-1, 1]).astype("int64")
             if len(batch) == 3:
                 has_unique_id = True
-                batch[2] = batch[2].reshape([-1, 1])
+                batch[2] = batch[2].reshape([-1, 1]).astype("int64")
             out = self.model(batch[0], batch[1])
             batch_feas = out["features"]
 
