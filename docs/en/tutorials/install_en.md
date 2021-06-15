@@ -58,7 +58,7 @@ pip3 install paddlepaddle --upgrade -i https://mirror.baidu.com/pypi/simple
 
 **Note:**
 * If you have already installed CPU version of PaddlePaddle and want to use GPU version now, you should uninstall CPU version of PaddlePaddle and then install GPU version to avoid package confusion.
-* You can also compile PaddlePaddle from source code, please refer to [PaddlePaddle Installation tutorial](http://www.paddlepaddle.org.cn/install/quick) to more compile options.
+* You can also compile PaddlePaddle from source code, please refer to [PaddlePaddle Installation tutorial](http://www.paddlepaddle.org.cn/install/quick) to more compilation options.
 
 ### 1.4 Verify Installation process
 
