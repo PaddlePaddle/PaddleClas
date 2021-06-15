@@ -1,17 +1,14 @@
 # 安装说明
 
 ---
-
-## 一、简介
-
 本章将介绍如何安装PaddleClas及其依赖项。
 
 
-## 二、安装PaddlePaddle
+## 1. 安装PaddlePaddle
 
 运行PaddleClas需要`PaddlePaddle 2.0`或更高版本。请参照[安装文档](http://www.paddlepaddle.org.cn/install/quick)中的说明进行操作。
 
-### 通过pip安装PaddlePaddle
+### 1.1 通过pip安装PaddlePaddle
 
 如果已经安装好了cuda、cudnn、nccl或者安装好了docker、nvidia-docker运行环境，可以pip安装最新GPU版本PaddlePaddle
 
@@ -25,7 +22,9 @@ pip3 install paddlepaddle-gpu --upgrade -i https://mirror.baidu.com/pypi/simple
 pip3 install paddlepaddle --upgrade -i https://mirror.baidu.com/pypi/simple
 ```
 
-### 源码编译PaddlePaddle
+
+
+### 1.2 源码编译PaddlePaddle
 
 您也可以从源码编译安装PaddlePaddle，请参照[安装文档](http://www.paddlepaddle.org.cn/install/quick)中的说明进行操作。
 
@@ -56,9 +55,9 @@ python3 -c "import paddle; print(paddle.__version__)"
 - nccl >= 2.1.2
 
 
-## 三、安装PaddleClas
+## 2. 安装PaddleClas
 
-**克隆PaddleClas模型库：**
+### 2.1 克隆PaddleClas模型库
 
 ```bash
 git clone https://github.com/PaddlePaddle/PaddleClas.git -b develop
@@ -70,20 +69,10 @@ git clone https://github.com/PaddlePaddle/PaddleClas.git -b develop
 git clone https://gitee.com/paddlepaddle/PaddleClas.git -b develop
 ```
 
-
-
-**安装Python依赖库：**
+### 2.2 安装Python依赖库
 
 Python依赖库在`requirements.txt`中给出，可通过如下命令安装：
 
 ```bash
 pip3 install --upgrade -r requirements.txt -i https://mirror.baidu.com/pypi/simple
 ```
-
-visualdl可能出现安装失败，请尝试
-
-```bash
-pip3 install --upgrade visualdl -i https://mirror.baidu.com/pypi/simple
-```
-
-此外，visualdl目前只支持在python3下运行，因此如果希望使用visualdl，需要使用python3。
