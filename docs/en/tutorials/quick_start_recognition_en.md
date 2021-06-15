@@ -124,7 +124,8 @@ Run the following command to identify and retrieve the image `. /dataset/logo_de
 python3.7 python/predict_system.py -c configs/inference_logo.yaml
 ```
 
-The images to be retrieved are shown below.
+The image to be retrieved is shown below.
+
 <div align="center">
 <img src="../../images/recognition/logo_demo/query/logo_auxx-1.jpg"  width = "400" />
 </div>
@@ -135,14 +136,8 @@ The final output is shown below.
 ```
 [{'bbox': [129, 219, 230, 253], 'rec_docs': ['auxx-2', 'auxx-1', 'auxx-2', 'auxx-1', 'auxx-2'], 'rec_scores': array([3.09635019, 3.09635019, 2.83965826, 2.83965826, 2.64057827])}]
 ```
-Where bbox indicates the location of the detected subject, rec_docs indicates the labels corresponding to a number of images in the index dabase that are most similar to the detected subject, and rec_scores indicates the corresponding similarity.
+where bbox indicates the location of the detected subject, rec_docs indicates the labels corresponding to a number of images in the index dabase that are most similar to the detected subject, and rec_scores indicates the corresponding similarity.
 
-
-Some example images of the matches are shown below.
-
-<center class="half">
-    <img src="../../images/recognition/logo_demo/gallery/auxx-1_59_0.jpg" width="100"/><img src="../../images/recognition/logo_demo/gallery/auxx-1_79_0.jpg" width="100"/><img src="../../images/recognition/logo_demo/gallery/auxx-2_47_0.jpg" width="100"/><img src="../../images/recognition/logo_demo/gallery/auxx-2_59_0.jpg" width="100"/><img src="../../images/recognition/logo_demo/gallery/auxx-2_79_0.jpg" width="100"/>
-</center>
 
 <a name="folder_based_batch_recognition"></a>
 #### 2.2.2 Folder-based Batch Recognition
@@ -159,20 +154,25 @@ Furthermore, the recognition inference model path can be changed by modifying th
 <a name="unkonw_category_image_recognition_experience"></a>
 ## 3. Recognize Images of Unknown Category
 
-To recognize the image `xxxx`, run the command as follows:
+To recognize the image `./dataset/logo_demo_data_v1.0/query/logo_cola.jpg`, run the command as follows:
 
 ```shell
-python3.7 python/predict_system.py -c configs/inference_logo.yaml -o Global.infer_imgs="./dataset/logo_demo_data_v1.0/query/new_img.jpg"
+python3.7 python/predict_system.py -c configs/inference_logo.yaml -o Global.infer_imgs="./dataset/logo_demo_data_v1.0/query/logo_cola.jpg"
 ```
+
+The image to be retrieved is shown below.
+
+<div align="center">
+<img src="../../images/recognition/logo_demo/query/logo_cola.jpg"  width = "400" />
+</div>
 
 The output is as follows:
 
 ```
-old index out
+[{'bbox': [635, 0, 1382, 1043], 'rec_docs': ['Arcam', 'univox', 'univox', 'Arecont Vision', 'univox'], 'rec_scores': array([0.47730467, 0.47625482, 0.46496609, 0.46296868, 0.45239362])}]
 ```
 
-Since the infomation of index is not included in the corresponding index databse, the recognition results are not proper. At this time, we can complete the image recognition of unknown categories by constructing a new index database.
-
+Since the index infomation is not included in the corresponding index databse, the recognition results are not proper. At this time, we can complete the image recognition of unknown categories by constructing a new index database.
 
 When the index database cannot cover the scenes we actually recognise, i.e. when predicting images of unknown categories, we need to add similar images of the corresponding categories to the index databasey, thus completing the recognition of images of unknown categories ，which does not require retraining.
 
@@ -194,16 +194,16 @@ Finally, the new index information is stored in the folder`./dataset/logo_demo_d
 <a name="Image_differentiation_based_on_the_new_index_library"></a>
 ### 3.2 Recognize the Unknown Category Images
 
-To recognize the image `xxxx`, run the command as follows.
+To recognize the image `./dataset/logo_demo_data_v1.0/query/logo_cola.jpg`, run the command as follows.
 
 ```shell
-python3.7 python/predict_system.py -c configs/inference_logo.yaml -o Global.infer_imgs="./dataset/logo_demo_data_v1.0/query/new_img.jpg" -o IndexProcess.index_path="./dataset/logo_demo_data_v1.0/index_update"
+python3.7 python/predict_system.py -c configs/inference_logo.yaml -o Global.infer_imgs="./dataset/logo_demo_data_v1.0/query/logo_cola.jpg" -o IndexProcess.index_path="./dataset/logo_demo_data_v1.0/index_update"
 ```
 
 The output is as follows:
 
 ```
-new index out
+[{'bbox': [635, 0, 1382, 1043], 'rec_docs': ['coca cola', 'coca cola', 'coca cola', 'coca cola', 'coca cola'], 'rec_scores': array([0.57111013, 0.56019932, 0.55656564, 0.54122502, 0.48266801])}]
 ```
 
 The recognition result is correct.
