@@ -17,6 +17,8 @@ This tutorial introduces how to install PaddleClas and its requirements.
 
 Docker is recomended to run Paddleclas, for more detailed information about docker and nvidia-docker, you can refer to the [tutorial](https://www.runoob.com/docker/docker-tutorial.html).
 
+When you use cuda10.1, the driver version needs to be larger or equal than 418.39. When you use cuda10.2, the driver version needs to be larger or equal than 440.33. For more cuda versions and specific driver versions, you can refer to the [link](https://docs.nvidia.com/deploy/cuda-compatibility/index.html).
+
 If you do not want to use docker, you can skip section 1.2 and go into section 1.3 directly.
 
 

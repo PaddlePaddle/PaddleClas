@@ -18,6 +18,9 @@
 
 建议使用我们提供的docker运行PaddleClas，有关docker、nvidia-docker使用请参考[链接](https://www.runoob.com/docker/docker-tutorial.html)。
 
+在cuda10.1时，建议显卡驱动版本大于等于418.39；在使用cuda10.2时，建议显卡驱动版本大于440.33，更多cuda版本与要求的显卡驱动版本可以参考[链接](https://docs.nvidia.com/deploy/cuda-compatibility/index.html)。
+
+
 如果不使用docker，可以直接跳过1.2部分内容，从1.3部分开始执行。
 
 
