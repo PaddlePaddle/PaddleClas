@@ -226,26 +226,15 @@ python tools/export_model.py \
 通过3.1生成模型结构文件（`inference.pdmodel`）和模型权重文件（`inference.pdiparams`），通过3.2构建好底库， 然后可以使用预测引擎进行推理：
 
 ```bash
-python tools/infer/predict.py \
-    --image_file 图片路径 \
-    --model_file "./inference/inference.pdmodel" \
-    --params_file "./inference/inference.pdiparams" \
-    --use_gpu=True \
-    --use_tensorrt=False
+python python/predict_rec.py \
+    --Global.infer_imgs 图片路径 \
+    --Global.rec_inference_model_dir "./inference"
+    --Global.use_gpu=True \
+    --Global.use_tensorrt=False
 ```
 其中：
-+ `image_file`：待预测的图片文件路径，如 `./test.jpeg`
-+ `model_file`：模型结构文件路径，如 `./inference/inference.pdmodel`
-+ `params_file`：模型权重文件路径，如 `./inference/inference.pdiparams`
-+ `use_tensorrt`：是否使用 TesorRT 预测引擎，默认值：`True`
-+ `use_gpu`：是否使用 GPU 预测，默认值：`True`
-+ `enable_mkldnn`：是否启用`MKL-DNN`加速，默认为`False`。注意`enable_mkldnn`与`use_gpu`同时为`True`时，将忽略`enable_mkldnn`，而使用GPU运行。
-+ `resize_short`: 对输入图像进行等比例缩放，表示最短边的尺寸，默认值：`256`
-+ `resize`: 对`resize_short`操作后的进行居中裁剪，表示裁剪的尺寸，默认值：`224`
-+ `enable_calc_topk`: 是否计算预测结果的Topk精度指标，默认为`False`，
-+ `gt_label_path`: 图像文件名以及真值标签文件，当`enable_calc_topk`为True时生效，用于读取待预测的图像列表及其标签。
-
-**注意**: 如果使用`Transformer`系列模型，如`DeiT_***_384`, `ViT_***_384`等，请注意模型的输入数据尺寸，需要设置参数`resize_short=384`, `resize=384`。
-
-* 如果你希望评测模型速度，建议使用该脚本(`tools/infer/predict.py`)，同时开启TensorRT加速预测。
-
++ `Global.infer_imgs`：待预测的图片文件路径，如 `./test.jpeg`
++ `Global.rec_inference_model_dir`：模型结构文件路径，如 `./inference/`
++ `Global.use_tensorrt`：是否使用 TesorRT 预测引擎，默认值：`True`
++ `Global.use_gpu`：是否使用 GPU 预测，默认值：`True`
++ 
