@@ -63,7 +63,7 @@ pip3 install paddlepaddle --upgrade -i https://mirror.baidu.com/pypi/simple
 * 您也可以从源码编译安装PaddlePaddle，请参照[PaddlePaddle 安装文档](http://www.paddlepaddle.org.cn/install/quick)中的说明进行操作。
 
 
-### 1.5 验证是否安装成功
+### 1.4 验证是否安装成功
 
 使用以下命令可以验证PaddlePaddle是否安装成功。
 
