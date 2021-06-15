@@ -16,7 +16,7 @@
 - nccl >= 2.1.2 (如果使用分布式训练/评估)
 - gcc 8.2
 
-建议使用我们提供的docker运行PaddleClas，有关docker、nvidia-docker使用请参考[链接](https://www.runoob.com/docker/docker-tutorial.html/)。
+建议使用我们提供的docker运行PaddleClas，有关docker、nvidia-docker使用请参考[链接](https://www.runoob.com/docker/docker-tutorial.html)。
 
 如果不使用docker，可以直接跳过1.2部分内容，从1.3部分开始执行。
 
