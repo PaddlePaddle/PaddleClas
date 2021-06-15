@@ -30,6 +30,8 @@ import paddle.distributed as dist
 from ppcls.utils.check import check_gpu
 from ppcls.utils.misc import AverageMeter
 from ppcls.utils import logger
+from ppcls.utils.logger import init_logger
+from ppcls.utils.config import print_config
 from ppcls.data import build_dataloader
 from ppcls.arch import build_model
 from ppcls.loss import build_loss
@@ -49,6 +51,11 @@ class Trainer(object):
         self.mode = mode
         self.config = config
         self.output_dir = self.config['Global']['output_dir']
+
+        log_file = os.path.join(self.output_dir, self.config["Arch"]["name"],
+                                f"{mode}.log")
+        init_logger(name='root', log_file=log_file)
+        print_config(config)
         # set device
         assert self.config["Global"]["device"] in ["cpu", "gpu", "xpu"]
         self.device = paddle.set_device(self.config["Global"]["device"])
@@ -153,8 +160,8 @@ class Trainer(object):
                         time_info[key].reset()
                 time_info["reader_cost"].update(time.time() - tic)
                 batch_size = batch[0].shape[0]
-                batch[1] = paddle.to_tensor(batch[1].numpy().astype("int64")
-                                            .reshape([-1, 1]))
+                batch[1] = batch[1].reshape([-1, 1]).astype("int64")
+
                 global_step += 1
                 # image input
                 if not self.is_rec:
@@ -206,8 +213,9 @@ class Trainer(object):
                     eta_msg = "eta: {:s}".format(
                         str(datetime.timedelta(seconds=int(eta_sec))))
                     logger.info(
-                        "[Train][Epoch {}][Iter: {}/{}]{}, {}, {}, {}, {}".
-                        format(epoch_id, iter_id,
+                        "[Train][Epoch {}/{}][Iter: {}/{}]{}, {}, {}, {}, {}".
+                        format(epoch_id, self.config["Global"][
+                            "epochs"], iter_id,
                                len(self.train_dataloader), lr_msg, metric_msg,
                                time_msg, ips_msg, eta_msg))
                 tic = time.time()
@@ -216,8 +224,8 @@ class Trainer(object):
                 "{}: {:.5f}".format(key, output_info[key].avg)
                 for key in output_info
             ])
-            logger.info("[Train][Epoch {}][Avg]{}".format(epoch_id,
-                                                          metric_msg))
+            logger.info("[Train][Epoch {}/{}][Avg]{}".format(
+                epoch_id, self.config["Global"]["epochs"], metric_msg))
             output_info.clear()
 
             # eval model and save model if possible
@@ -327,7 +335,7 @@ class Trainer(object):
             time_info["reader_cost"].update(time.time() - tic)
             batch_size = batch[0].shape[0]
             batch[0] = paddle.to_tensor(batch[0]).astype("float32")
-            batch[1] = paddle.to_tensor(batch[1]).reshape([-1, 1])
+            batch[1] = batch[1].reshape([-1, 1]).astype("int64")
             # image input
             if self.is_rec:
                 out = self.model(batch[0], batch[1])
@@ -438,9 +446,11 @@ class Trainer(object):
 
                 for key in metric_tmp:
                     if key not in metric_dict:
-                        metric_dict[key] = metric_tmp[key] * block_fea.shape[0] / len(query_feas)
+                        metric_dict[key] = metric_tmp[key] * block_fea.shape[
+                            0] / len(query_feas)
                     else:
-                        metric_dict[key] += metric_tmp[key] * block_fea.shape[0] / len(query_feas)
+                        metric_dict[key] += metric_tmp[key] * block_fea.shape[
+                            0] / len(query_feas)
 
         metric_info_list = []
         for key in metric_dict:
@@ -467,10 +477,10 @@ class Trainer(object):
         for idx, batch in enumerate(dataloader(
         )):  # load is very time-consuming
             batch = [paddle.to_tensor(x) for x in batch]
-            batch[1] = batch[1].reshape([-1, 1])
+            batch[1] = batch[1].reshape([-1, 1]).astype("int64")
             if len(batch) == 3:
                 has_unique_id = True
-                batch[2] = batch[2].reshape([-1, 1])
+                batch[2] = batch[2].reshape([-1, 1]).astype("int64")
             out = self.model(batch[0], batch[1])
             batch_feas = out["features"]
 
