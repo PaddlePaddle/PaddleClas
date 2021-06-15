@@ -24,6 +24,8 @@ import paddle
 import paddle.nn as nn
 
 from ppcls.utils import config
+from ppcls.utils.logger import init_logger
+from ppcls.utils.config import print_config
 from ppcls.arch import build_model, RecModel, DistillationModel
 from ppcls.utils.save_load import load_dygraph_pretrain
 from ppcls.arch.gears.identity_head import IdentityHead
@@ -72,7 +74,14 @@ class ExportModel(nn.Layer):
 
 if __name__ == "__main__":
     args = config.parse_args()
-    config = config.get_config(args.config, overrides=args.override, show=True)
+    config = config.get_config(
+        args.config, overrides=args.override, show=False)
+
+    log_file = os.path.join(config['Global']['output_dir'],
+                            config["Arch"]["name"], "export.log")
+    init_logger(name='root', log_file=log_file)
+    print_config(config)
+
     # set device
     assert config["Global"]["device"] in ["cpu", "gpu", "xpu"]
     device = paddle.set_device(config["Global"]["device"])
