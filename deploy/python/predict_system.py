@@ -28,6 +28,8 @@ from vector_search import Graph_Index
 from utils import logger
 from utils import config
 from utils.get_image_list import get_image_list
+from utils.draw_bbox import draw_bbox_results
+
 
 class SystemPredictor(object):
     def __init__(self, config):
@@ -40,7 +42,8 @@ class SystemPredictor(object):
         self.return_k = self.config['IndexProcess']['return_k']
         self.search_budget = self.config['IndexProcess']['search_budget']
 
-        self.Searcher = Graph_Index(dist_type=config['IndexProcess']['dist_type']) 
+        self.Searcher = Graph_Index(
+            dist_type=config['IndexProcess']['dist_type'])
         self.Searcher.load(config['IndexProcess']['index_path'])
 
     def predict(self, img):
@@ -53,13 +56,16 @@ class SystemPredictor(object):
             rec_results = self.rec_predictor.predict(crop_img)
             #preds["feature"] = rec_results
             preds["bbox"] = [xmin, ymin, xmax, ymax]
-            scores, docs = self.Searcher.search(query=rec_results, return_k=self.return_k, search_budget=self.search_budget)
+            scores, docs = self.Searcher.search(
+                query=rec_results,
+                return_k=self.return_k,
+                search_budget=self.search_budget)
             preds["rec_docs"] = docs
             preds["rec_scores"] = scores
 
             output.append(preds)
         return output
-            
+
 
 def main(config):
     system_predictor = SystemPredictor(config)
@@ -69,6 +75,7 @@ def main(config):
     for idx, image_file in enumerate(image_list):
         img = cv2.imread(image_file)[:, :, ::-1]
         output = system_predictor.predict(img)
+        draw_bbox_results(img[:, :, ::-1], output, image_file)
         print(output)
     return
 

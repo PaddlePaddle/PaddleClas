@@ -125,6 +125,7 @@ python3.7 python/predict_system.py -c configs/inference_logo.yaml
 ```
 
 待检索图像如下所示。
+
 <div align="center">
 <img src="../../images/recognition/logo_demo/query/logo_auxx-1.jpg"  width = "400" />
 </div>
@@ -136,14 +137,8 @@ python3.7 python/predict_system.py -c configs/inference_logo.yaml
 [{'bbox': [129, 219, 230, 253], 'rec_docs': ['auxx-2', 'auxx-1', 'auxx-2', 'auxx-1', 'auxx-2'], 'rec_scores': array([3.09635019, 3.09635019, 2.83965826, 2.83965826, 2.64057827])}]
 ```
 
-其中bbox表示检测出的主体所在位置，rec_docs表示索引库中与检出主体最相近的若干张图像对应的标签，rec_scores表示对应的相似度。
+其中bbox表示检测出的主体所在位置，rec_docs表示索引库中与检出主体最相近的若干张图像对应的标签，rec_scores表示对应的相似度。由rec_docs字段可以看出，返回的若干个结果均为aux，识别正确。
 
-
-匹配的一些示例图像如下所示。
-
-<center class="half">
-    <img src="../../images/recognition/logo_demo/gallery/auxx-1_59_0.jpg" width="100"/><img src="../../images/recognition/logo_demo/gallery/auxx-1_79_0.jpg" width="100"/><img src="../../images/recognition/logo_demo/gallery/auxx-2_47_0.jpg" width="100"/><img src="../../images/recognition/logo_demo/gallery/auxx-2_59_0.jpg" width="100"/><img src="../../images/recognition/logo_demo/gallery/auxx-2_79_0.jpg" width="100"/>
-</center>
 
 <a name="基于文件夹的批量识别"></a>
 #### 2.2.2 基于文件夹的批量识别
@@ -160,20 +155,26 @@ python3.7 python/predict_system.py -c configs/inference_logo.yaml -o Global.infe
 <a name="未知类别的图像识别体验"></a>
 ## 3. 未知类别的图像识别体验
 
-对图像`xxxx`进行识别，命令如下
+对图像`./dataset/logo_demo_data_v1.0/query/logo_cola.jpg`进行识别，命令如下
 
 ```shell
-python3.7 python/predict_system.py -c configs/inference_logo.yaml -o Global.infer_imgs="./dataset/logo_demo_data_v1.0/query/new_img.jpg"
+python3.7 python/predict_system.py -c configs/inference_logo.yaml -o Global.infer_imgs="./dataset/logo_demo_data_v1.0/query/logo_cola.jpg"
 ```
+
+待识别图像如下所示。
+
+<div align="center">
+<img src="../../images/recognition/logo_demo/query/logo_cola.jpg"  width = "400" />
+</div>
+
 
 输出结果如下
 
 ```
-old index out
+[{'bbox': [635, 0, 1382, 1043], 'rec_docs': ['Arcam', 'univox', 'univox', 'Arecont Vision', 'univox'], 'rec_scores': array([0.47730467, 0.47625482, 0.46496609, 0.46296868, 0.45239362])}]
 ```
 
-由于索引库中不包含对应的索引信息，所以这里的识别结果有误，此时我们可以通过构建新的索引库的方式，完成未知类别的图像识别。
-
+由于默认的索引库中不包含对应的索引信息，所以这里的识别结果有误，此时我们可以通过构建新的索引库的方式，完成未知类别的图像识别。
 
 当索引库中的图像无法覆盖我们实际识别的场景时，即在预测未知类别的图像时，我们需要将对应类别的相似图像添加到索引库中，从而完成对未知类别的图像识别，这一过程是不需要重新训练的。
 
@@ -188,22 +189,22 @@ old index out
 python3.7 python/build_gallery.py -c configs/build_logo.yaml -o IndexProcess.data_file="./dataset/logo_demo_data_v1.0/data_file_update.txt" -o IndexProcess.index_path="./dataset/logo_demo_data_v1.0/index_update"
 ```
 
-最终新的索引信息保存在文件夹`./dataset/logo_demo_data_v1.0/index_update`中。使用新的索引库对上述索引
+最终新的索引信息保存在文件夹`./dataset/logo_demo_data_v1.0/index_update`中。
 
 
 <a name="基于新的索引库的图像识别"></a>
 ### 3.2 基于新的索引库的图像识别
 
-对图像`xxxx`进行识别，运行命令如下。
+使用新的索引库，对上述图像进行识别，运行命令如下。
 
 ```shell
-python3.7 python/predict_system.py -c configs/inference_logo.yaml -o Global.infer_imgs="./dataset/logo_demo_data_v1.0/query/new_img.jpg" -o IndexProcess.index_path="./dataset/logo_demo_data_v1.0/index_update"
+python3.7 python/predict_system.py -c configs/inference_logo.yaml -o Global.infer_imgs="./dataset/logo_demo_data_v1.0/query/logo_cola.jpg" -o IndexProcess.index_path="./dataset/logo_demo_data_v1.0/index_update"
 ```
 
 输出结果如下。
 
 ```
-new index out
+[{'bbox': [635, 0, 1382, 1043], 'rec_docs': ['coca cola', 'coca cola', 'coca cola', 'coca cola', 'coca cola'], 'rec_scores': array([0.57111013, 0.56019932, 0.55656564, 0.54122502, 0.48266801])}]
 ```
 
-识别结果无误。
+识别结果正确。
