@@ -24,7 +24,7 @@ PaddleClas目前支持的训练/评估环境如下：
 
 ```
 python tools/train.py \
-    -c configs/quick_start/ResNet50_vd_finetune_retrieval.yaml \
+    -c ppcls/configs/quick_start/ResNet50_vd_finetune_retrieval.yaml \
     -o Global.use_gpu=True
 ```
 
@@ -40,7 +40,7 @@ python tools/train.py \
 
 ```
 python tools/train.py \
-    -c configs/quick_start/ResNet50_vd_finetune_retrieval.yaml \
+    -c ppcls/configs/quick_start/ResNet50_vd_finetune_retrieval.yaml \
     -o Arch.Backbone.pretrained=True
 ```
 
@@ -53,13 +53,10 @@ python tools/train.py \
 
 ```
 python tools/train.py \
-    -c configs/quick_start/ResNet50_vd_finetune_retrieval.yaml \
-    -o Global.checkpoints="./output/RecModel/ppcls_epoch_5" \
+    -c ppcls/configs/quick_start/ResNet50_vd_finetune_retrieval.yaml \
+    -o Global.checkpoints="./output/RecModel/epoch_5" \
 ```
-其中配置文件不需要做任何修改，只需要在继续训练时设置`Global.checkpoints`参数即可，表示加载的断点权重文件路径，使用该参数会同时加载保存的断点权重和学习率、优化器等信息。
-
-**注意**：
-* `-o Global.checkpoints`参数无需包含断点权重文件的后缀名，上述训练命令会在训练过程中生成如下所示的断点权重文件，若想从断点`5`继续训练，则`checkpoints`参数只需设置为`"./output/RecModel/ppcls_epoch_5"`，PaddleClas会自动补充后缀名。
+只需要在继续训练时设置`Global.checkpoints`参数即可，表示加载的断点权重文件路径，使用该参数会同时加载保存的断点权重和学习率、优化器等信息。
 
 <a name="1.4"></a>
 ### 1.4 模型评估
@@ -68,10 +65,9 @@ python tools/train.py \
 
 ```bash
 python tools/eval.py \
-    -c ./configs/quick_start/ResNet50_vd_finetune_retrieval.yaml \
+    -c ppcls/configs/quick_start/ResNet50_vd_finetune_retrieval.yaml \
     -o Global.pretrained_model="./output/RecModel/best_model"\
 ```
-上述命令将使用`./configs/quick_start/ResNet50_vd_finetune_retrieval.yaml`作为配置文件，对上述训练得到的模型`./output/RecModel/best_model`进行评估。你也可以通过更改配置文件中的参数来设置评估，也可以通过`-o`参数更新配置，如上所示。
 
 <a name="2"></a>
 ## 2. 基于Linux+GPU的模型训练与评估
