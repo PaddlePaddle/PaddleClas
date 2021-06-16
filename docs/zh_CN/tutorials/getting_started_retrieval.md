@@ -87,7 +87,7 @@ export CUDA_VISIBLE_DEVICES=0,1,2,3
 python -m paddle.distributed.launch \
     --gpus="0,1,2,3" \
     tools/train.py \
-        -c ./configs/quick_start/ResNet50_vd_finetune_retrieval.yaml
+        -c ppcls/configs/quick_start/ResNet50_vd_finetune_retrieval.yaml
 ```
 
 ### 2.2 模型微调
@@ -100,7 +100,7 @@ export CUDA_VISIBLE_DEVICES=0,1,2,3
 python -m paddle.distributed.launch \
     --gpus="0,1,2,3" \
     tools/train.py \
-        -c ./configs/quick_start/ResNet50_vd_finetune_retrieval.yaml \
+        -c ppcls/configs/quick_start/ResNet50_vd_finetune_retrieval.yaml \
         -o Arch.Backbone.pretrained=True
 ```
 
@@ -114,12 +114,9 @@ export CUDA_VISIBLE_DEVICES=0,1,2,3
 python -m paddle.distributed.launch \
     --gpus="0,1,2,3" \
     tools/train.py \
-        -c ./configs/quick_start/ResNet50_vd_finetune_retrieval.yaml \
-        -o Global.checkpoints="./output/RecModel/ppcls_epoch_5" \
+        -c ppcls/configs/quick_start/ResNet50_vd_finetune_retrieval.yaml \
+        -o Global.checkpoints="./output/RecModel/epoch_5" \
 ```
-
-其中配置文件不需要做任何修改，只需要在训练时设置`checkpoints`参数与`last_epoch`参数即可，该参数表示加载的断点权重文件路径，使用该参数会同时加载保存的模型参数权重和学习率、优化器等信息，详见[1.3 模型恢复训练](#1.3)。
-
 
 ### 2.4 模型评估
 
@@ -129,11 +126,9 @@ python -m paddle.distributed.launch \
 python. -m paddle.distributed.launch \ 
     --gpus="0,1,2,3" \
     tools/eval.py \
-    -c ./configs/quick_start/ResNet50_vd_finetune_retrieval.yaml \
+    -c ppcls/configs/quick_start/ResNet50_vd_finetune_retrieval.yaml \
     -o Global.pretrained_model="./output/RecModel/best_model"\
 ```
-
-参数说明详见[1.4 模型评估](#1.4)。
 
 <a name="model_inference"></a>
 ## 3. 使用inference模型进行模型推理
@@ -148,11 +143,8 @@ python tools/export_model.py \
     --Global.save_inference_dir ./inference \
 ```
 
-其中，`--pretrained_model`用于指定模型文件路径，该路径仍无需包含模型文件后缀名（如[1.3 模型恢复训练](#1.3)），`--save_inference_dir`用于指定转换后模型的存储路径。
-
-**注意**：
-1. `--save_inference_dir`表示输出的inference模型文件夹路径，若`--save_inference_dir=./inference`，则会在`inference`文件夹下生成`inference.pdiparams`、`inference.pdmodel`和`inference.pdiparams.info`文件。
-2. 可以通过设置参数`--img_size`指定模型输入图像的`shape`，默认为`224`，表示图像尺寸为`224*224`，请根据实际情况修改。
+其中，`--Global.pretrained_model`用于指定模型文件路径，该路径仍无需包含模型文件后缀名（如[1.3 模型恢复训练](#1.3)），`--Global.save_inference_dir`用于指定转换后模型的存储路径。
+若`--save_inference_dir=./inference`，则会在`inference`文件夹下生成`inference.pdiparams`、`inference.pdmodel`和`inference.pdiparams.info`文件。
 
 ### 3.2 构建底库
 通过检索方式来进行图像识别，需要构建底库。底库构建方式如下：
