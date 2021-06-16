@@ -58,6 +58,7 @@
         - [车辆识别](./docs/zh_CN/application/vehicle_fine_grained_classfication.md)
         - [车辆ReID](./docs/zh_CN/application/vehicle_reid.md)
         - [logo识别](./docs/zh_CN/application/logo_recognition.md)
+        - [动漫人物识别](./docs/zh_CN/application/cartoon_character_recognition.md)
     - [向量检索](./deploy/vector_search/README.md)
 - 模型训练/评估
     - [图像分类任务](./docs/zh_CN/tutorials/getting_started.md)

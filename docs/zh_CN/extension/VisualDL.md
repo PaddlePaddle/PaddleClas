@@ -10,7 +10,7 @@ VisualDL是飞桨可视化分析工具，以丰富的图表呈现训练参数变
 在PaddleClas中使用VisualDL，只需在训练配置文件（config文件）添加如下字段：
 
 ```yaml
-# confit.txt
+# config.yaml
 vdl_dir: "./vdl.log"
 ```
 `vdl_dir` 用于指定VisualDL用于保存log信息的目录。
@@ -18,7 +18,7 @@ vdl_dir: "./vdl.log"
 然后正常启动训练即可：
 
 ```shell
-python3 tools/train.py -c config.txt
+python3 tools/train.py -c config.yaml
 ```
 
 ### 启动VisualDL

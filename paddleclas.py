@@ -160,10 +160,15 @@ class ModelNameError(Exception):
 
 def print_info():
     table = PrettyTable(['Series', 'Name'])
+    try:
+        sz = os.get_terminal_size()
+        width = sz.columns - 30 if sz.columns > 50 else 10
+    except OSError:
+        width = 100
     for series in model_series:
-        names = textwrap.fill("  ".join(model_series[series]), width=100)
+        names = textwrap.fill("  ".join(model_series[series]), width=width)
         table.add_row([series, names])
-    print('Inference models that Paddle provides are listed as follows:')
+    print('Inference models that PaddleClas provides are listed as follows:')
     print(table)
 
 
