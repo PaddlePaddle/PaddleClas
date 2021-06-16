@@ -20,8 +20,12 @@
 - Normalize：归一化到0~1
 
 
-## 参数设置
+## 模型
+采用ResNet50作为backbone, 主要的提升策略包括：
+- 加载预训练模型
+- 分布式训练，更大的batch_size
+- 大模型蒸馏
 
-详见[配置文件](../../../ppcls/configs/Cartoonface/ResNet50_icartoon.yaml)。
+具体配置信息详见[配置文件](../../../ppcls/configs/Cartoonface/ResNet50_icartoon.yaml)。
 
 
