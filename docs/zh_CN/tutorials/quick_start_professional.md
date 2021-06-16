@@ -25,36 +25,6 @@ tar -xf CIFAR100.tar
 cd ../
 ```
 
-#### 1.1.2 准备NUS-WIDE-SCENE
-
-* 创建并进入`dataset/NUS-WIDE-SCENE`目录，下载并解压NUS-WIDE-SCENE数据集。
-
-```shell
-mkdir dataset/NUS-WIDE-SCENE
-cd dataset/NUS-WIDE-SCENE
-wget https://paddle-imagenet-models-name.bj.bcebos.com/data/NUS-SCENE-dataset.tar
-tar -xf NUS-SCENE-dataset.tar
-```
-
-* 返回`PaddleClas`根目录
-
-```
-cd ../../
-```
-
-### 1.2 模型准备
-
-通过下面的命令下载所需要的预训练模型。
-
-```bash
-mkdir pretrained
-cd pretrained
-wget https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ResNet50_vd_pretrained.pdparams
-wget https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ResNet50_vd_ssld_pretrained.pdparams
-wget https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/MobileNetV3_large_x1_0_pretrained.pdparams
-cd ../
-```
-
 
 ## 二、模型训练
 
@@ -69,8 +39,8 @@ export CUDA_VISIBLE_DEVICES=0,1,2,3
 python3 -m paddle.distributed.launch \
     --gpus="0,1,2,3" \
     tools/train.py \
-        -c ./configs/quick_start/professional/ResNet50_vd_CIFAR100.yaml \
-        -o model_save_dir="output_CIFAR"
+        -c ./ppcls/configs/quick_start/professional/ResNet50_vd_CIFAR100.yaml \
+        -o Global.output_dir="output_CIFAR"
 ```
 
 
@@ -86,8 +56,9 @@ export CUDA_VISIBLE_DEVICES=0,1,2,3
 python3 -m paddle.distributed.launch \
     --gpus="0,1,2,3" \
     tools/train.py \
-        -c ./configs/quick_start/professional/ResNet50_vd_CIFAR100_finetune.yaml \
-        -o model_save_dir="output_CIFAR"
+        -c ./ppcls/configs/quick_start/professional/ResNet50_vd_CIFAR100.yaml \
+        -o Global.output_dir="output_CIFAR" \
+        -o Arch.pretrained=True
 ```
 
 验证集最高准确率为0.718左右，加载预训练模型之后，CIFAR100数据集精度大幅提升，绝对精度涨幅30\%。
@@ -99,8 +70,10 @@ export CUDA_VISIBLE_DEVICES=0,1,2,3
 python3 -m paddle.distributed.launch \
     --gpus="0,1,2,3" \
     tools/train.py \
-        -c ./configs/quick_start/professional/ResNet50_vd_ssld_CIFAR100_finetune.yaml \
-        -o model_save_dir="output_CIFAR"
+        -c ./ppcls/configs/quick_start/professional/ResNet50_vd_CIFAR100.yaml \
+        -o Global.output_dir="output_CIFAR" \
+        -o Arch.pretrained=True \
+        -o Arch.use_ssld=True
 ```
 
 最终CIFAR100验证集上精度指标为0.73，相对于79.12\%预训练模型的微调结构，新数据集指标可以再次提升1.2\%。
@@ -112,29 +85,12 @@ export CUDA_VISIBLE_DEVICES=0,1,2,3
 python3 -m paddle.distributed.launch \
     --gpus="0,1,2,3" \
     tools/train.py \
-        -c ./configs/quick_start/professional/MobileNetV3_large_x1_0_CIFAR100_finetune.yaml \
-        -o model_save_dir="output_CIFAR"
+        -c ./ppcls/configs/quick_start/professional/MobileNetV3_large_x1_0_CIFAR100_finetune.yaml \
+        -o Global.output_dir="output_CIFAR" \
+        -o Arch.pretrained=True
 ```
 
 验证集最高准确率为0.601左右, 较ResNet50_vd低近12%。
-
-
-### 2.2 多标签训练
-
-* 基于ImageNet1k分类预训练模型进行微调NUS-WIDE-SCENE数据集，该是数据集NUS-WIDE的一个子集，类别数目为33类，图片总数是17463张，训练脚本如下所示。
-
-```shell
-export CUDA_VISIBLE_DEVICES=0,1,2,3
-python3 -m paddle.distributed.launch \
-    --gpus="0,1,2,3" \
-    tools/train.py \
-        -c ./configs/quick_start/ResNet50_vd_multilabel.yaml \
-        -o model_save_dir="output_NUS-WIDE-SCENE"
-```
-
-训练10epoch之后，验证集最好的准确率应该在0.95左右。
-
-* 零基础训练(不加载预训练模型)只需要将配置文件中的`pretrained_model`置为`""`即可。
 
 
 ## 三、数据增广
@@ -150,8 +106,8 @@ export CUDA_VISIBLE_DEVICES=0,1,2,3
 python3 -m paddle.distributed.launch \
     --gpus="0,1,2,3" \
     tools/train.py \
-        -c ./configs/quick_start/professional/ResNet50_vd_mixup_CIFAR100_finetune.yaml \
-        -o model_save_dir="output_CIFAR"
+        -c ./ppcls/configs/quick_start/professional/ResNet50_vd_mixup_CIFAR100_finetune.yaml \
+        -o Global.output_dir="output_CIFAR"
 
 ```
 
@@ -161,7 +117,7 @@ python3 -m paddle.distributed.launch \
 
 * **注意**
 
-    * 其他数据增广的配置文件可以参考`configs/DataAugment`中的配置文件。
+    * 其他数据增广的配置文件可以参考`ppcls/configs/DataAugment`中的配置文件。
 
     * 训练CIFAR100的迭代轮数较少，因此进行训练时，验证集的精度指标可能会有1\%左右的波动。
 
@@ -172,18 +128,42 @@ python3 -m paddle.distributed.launch \
 PaddleClas包含了自研的SSLD知识蒸馏方案，具体的内容可以参考[知识蒸馏章节](../advanced_tutorials/distillation/distillation.md)本小节将尝试使用知识蒸馏技术对MobileNetV3_large_x1_0模型进行训练，使用`2.1.2小节`训练得到的ResNet50_vd模型作为蒸馏所用的教师模型，首先将`2.1.2小节`训练得到的ResNet50_vd模型保存到指定目录，脚本如下。
 
 ```shell
-cp -r output_CIFAR/ResNet50_vd/best_model/  ./pretrained/CIFAR100_R50_vd_final/
+mkdir pretrained 
+cp -r output_CIFAR/ResNet50_vd/best_model.pdparams  ./pretrained/
 ```
 
-配置文件中数据数量、模型结构、预训练地址以及训练的数据配置如下：
+配置文件中模型名字、教师模型哈学生模型的配置、预训练地址配置以及freeze_params配置如下，其中freeze_params_list中的两个值分别代表教师模型和学生模型是否冻结参数训练。
 
 ```yaml
-total_images: 50000
-ARCHITECTURE:
-    name: 'ResNet50_vd_distill_MobileNetV3_large_x1_0'
-pretrained_model:
-    - "./pretrained/CIFAR100_R50_vd_final/ppcls"
-    - "./pretrained/MobileNetV3_large_x1_0_pretrained/”
+Arch:
+  name: "DistillationModel"
+  # if not null, its lengths should be same as models
+  pretrained_list:
+  # if not null, its lengths should be same as models
+  freeze_params_list:
+  - True
+  - False
+  models:
+    - Teacher:
+        name: ResNet50_vd
+        pretrained: "./pretrained/best_model"
+    - Student:
+        name: MobileNetV3_large_x1_0
+        pretrained: True
+```
+
+Loss配置如下，其中训练Loss是学生模型的输出和教师模型的输出的交叉熵、验证Loss是学生模型的输出和真实标签的交叉熵。
+```yaml
+Loss:
+  Train:
+    - DistillationCELoss:
+        weight: 1.0
+        model_name_pairs:
+        - ["Student", "Teacher"]
+  Eval:
+    - DistillationGTCELoss:
+        weight: 1.0
+        model_names: ["Student"]
 ```
 
 最终的训练脚本如下所示。
@@ -193,8 +173,8 @@ export CUDA_VISIBLE_DEVICES=0,1,2,3
 python3 -m paddle.distributed.launch \
     --gpus="0,1,2,3" \
     tools/train.py \
-        -c ./configs/quick_start/professional/R50_vd_distill_MV3_large_x1_0_CIFAR100.yaml \
-        -o model_save_dir="output_CIFAR"
+        -c ./ppcls/configs/quick_start/professional/R50_vd_distill_MV3_large_x1_0_CIFAR100.yaml \
+        -o Global.output_dir="output_CIFAR"
 
 ```
 
@@ -217,20 +197,19 @@ python3 -m paddle.distributed.launch \
 
 ```bash
 python3 tools/eval.py \
-    -c ./configs/quick_start/professional/ResNet50_vd_CIFAR100.yaml \
-    -o pretrained_model="./output_CIFAR/ResNet50_vd/best_model/ppcls"
+    -c ./ppcls/configs/quick_start/professional/ResNet50_vd_CIFAR100.yaml \
+    -o Global.pretrained_model="output_CIFAR/ResNet50_vd/best_model"
 ```
 
 #### 5.1.2 单标签分类模型预测
 
-模型训练完成之后，可以加载训练得到的预训练模型，进行模型预测。在模型库的 `tools/infer/infer.py` 中提供了完整的示例，只需执行下述命令即可完成模型预测：
+模型训练完成之后，可以加载训练得到的预训练模型，进行模型预测。在模型库的 `tools/infer.py` 中提供了完整的示例，只需执行下述命令即可完成模型预测：
 
 ```python
-python3 tools/infer/infer.py \
-    -i "./dataset/CIFAR100/test/0/0001.png" \
-    --model ResNet50_vd \
-    --pretrained_model "./output_CIFAR/ResNet50_vd/best_model/ppcls" \
-    --use_gpu True
+python3 tools/infer.py \
+    -c ./ppcls/configs/quick_start/professional/ResNet50_vd_CIFAR100.yaml \
+    -o Infer.infer_imgs=./dataset/CIFAR100/test/0/0001.png \
+    -o Global.pretrained_model=output_CIFAR/ResNet50_vd/best_model
 ```
 
 
@@ -241,53 +220,41 @@ python3 tools/infer/infer.py \
 
 ```bash
 python3 tools/export_model.py \
-    --model ResNet50_vd \
-    --pretrained_model ./output_CIFAR/ResNet50_vd/best_model/ppcls \
-    --output_path ./inference \
-    --class_dim 100 \
-    --img_size 32
+    -c ./ppcls/configs/quick_start/professional/ResNet50_vd_CIFAR100.yaml \
+    -o Global.pretrained_model=output_CIFAR/ResNet50_vd/best_model
 ```
 
-其中，参数`--model`用于指定模型名称，`--pretrained_model`用于指定模型文件路径，`--output_path`用于指定转换后模型的存储路径。
+* 默认会在`inference`文件夹下生成`inference.pdiparams`、`inference.pdmodel`和`inference.pdiparams.info`文件。
 
-* **注意**：
-    * `--output_path`表示输出的inference模型文件夹路径，若`--output_path=./inference`，则会在`inference`文件夹下生成`inference.pdiparams`、`inference.pdmodel`和`inference.pdiparams.info`文件。
+使用预测引擎进行推理：
 
-    * 可以通过设置参数`--img_size`指定模型输入图像的`shape`，默认为`224`，表示图像尺寸为`224*224`，请根据实际情况修改。
-
-上述命令将生成模型结构文件（`inference.pdmodel`）和模型权重文件（`inference.pdiparams`），然后可以使用预测引擎进行推理：
+进入deploy目录下：
 
 ```bash
-python3 tools/infer/predict.py \
-    --image_file "./dataset/CIFAR100/test/0/0001.png" \
-    --model_file "./inference/inference.pdmodel" \
-    --params_file "./inference/inference.pdiparams" \
-    --use_gpu=True \
-    --use_tensorrt=False
+cd deploy
+```
+更改inference_cls.yaml文件，由于训练CIFAR100采用的分辨率是32x32，所以需要改变相关的分辨率，最终配置文件中的图像预处理如下：
+
+```yaml
+PreProcess:
+  transform_ops:
+    - ResizeImage:
+        resize_short: 36
+    - CropImage:
+        size: 32
+    - NormalizeImage:
+        scale: 0.00392157
+        mean: [0.485, 0.456, 0.406]
+        std: [0.229, 0.224, 0.225]
+        order: ''
+    - ToCHWImage:
 ```
 
-### 5.2 多标签分类模型评估与预测
-
-#### 5.2.1 多标签分类模型评估
-
-训练好模型之后，可以通过以下命令实现对模型精度的评估。
+执行命令进行预测，由于默认class_id_map_file是ImageNet数据集的映射文件，所以此处需要置None。
 
 ```bash
-python3 tools/eval.py \
-    -c ./configs/quick_start/ResNet50_vd_multilabel.yaml \
-    -o pretrained_model="./output_NUS-WIDE-SCENE/ResNet50_vd/best_model/ppcls"
-```
-
-评估指标采用mAP，验证集的mAP应该在0.57左右。
-
-#### 5.2.2 多标签分类模型预测
-
-```bash
-python3 tools/infer/infer.py \
-    -i "./dataset/NUS-WIDE-SCENE/NUS-SCENE-dataset/images/0199_434752251.jpg" \
-    --model ResNet50_vd \
-    --pretrained_model "./output_NUS-WIDE-SCENE/ResNet50_vd/best_model/ppcls" \
-    --use_gpu True \
-    --multilabel True \
-    --class_num 33
+python3 python/predict_cls.py \
+    -c configs/inference_cls.yaml \
+    -o Global.infer_imgs=../dataset/CIFAR100/test/0/0001.png \
+    -o PostProcess.class_id_map_file=None
 ```
