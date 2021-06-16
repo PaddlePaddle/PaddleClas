@@ -6,6 +6,10 @@
 近日，来自爱奇艺的一项新研究提出了一个新的基准数据集，名为iCartoonFace。该数据集由 5013 个动漫角色的 389678 张图像组成，并带有 ID、边界框、姿势和其他辅助属性。 iCartoonFace 是目前图像识别领域规模最大的卡通媒体数据集，而且质量高、注释丰富、内容全面，其中包含相似图像、有遮挡的图像以及外观有变化的图像。
 与其他数据集相比，iCartoonFace无论在图像数量还是实体数量上，均具有明显领先的优势:
 
-![icartoon](./icartoon1.jpg)
+![icartoon](../../images/icartoon1.png)
 
 论文地址：https://arxiv.org/pdf/1907.1339
+
+## 参数设置
+详细的参数设置见[ResNet50_icartoon.yaml](../../../ppcls/configs/Cartoon/ResNet50_icartoon.yaml)
+
