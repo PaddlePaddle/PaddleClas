@@ -126,28 +126,6 @@ DataLoader:
         num_workers: 8
         use_shared_memory: True
 
-Infer:
-  infer_imgs: "docs/images/whl/demo.jpg"
-  batch_size: 10
-  transforms:
-      - DecodeImage:
-          to_rgb: True
-          channel_first: False
-      - ResizeImage:
-          resize_short: 256
-      - CropImage:
-          size: 224
-      - NormalizeImage:
-          scale: 1.0/255.0
-          mean: [0.485, 0.456, 0.406]
-          std: [0.229, 0.224, 0.225]
-          order: ''
-      - ToCHWImage:
-  PostProcess:
-    name: Topk
-    topk: 5
-    class_id_map_file: "ppcls/utils/imagenet1k_label_list.txt"
-
 Metric:
     Train:
     - TopkAcc:
