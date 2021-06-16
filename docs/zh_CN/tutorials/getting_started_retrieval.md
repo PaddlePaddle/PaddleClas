@@ -55,13 +55,10 @@ python tools/train.py \
 python tools/train.py \
     -c configs/quick_start/ResNet50_vd_finetune_retrieval.yaml \
     -o Global.checkpoints="./output/RecModel/ppcls_epoch_5" \
-    -o Global.last_epoch=5 \
 ```
 其中配置文件不需要做任何修改，只需要在继续训练时设置`Global.checkpoints`参数即可，表示加载的断点权重文件路径，使用该参数会同时加载保存的断点权重和学习率、优化器等信息。
 
 **注意**：
-* 参数`-o Global.last_epoch=5`表示将上一次训练轮次数记为`5`，即本次训练轮次数从`6`开始计算，该值默认为-1，表示本次训练轮次数从`0`开始计算。
-
 * `-o Global.checkpoints`参数无需包含断点权重文件的后缀名，上述训练命令会在训练过程中生成如下所示的断点权重文件，若想从断点`5`继续训练，则`checkpoints`参数只需设置为`"./output/RecModel/ppcls_epoch_5"`，PaddleClas会自动补充后缀名。
 
 <a name="1.4"></a>
@@ -110,8 +107,6 @@ python -m paddle.distributed.launch \
         -o Arch.Backbone.pretrained=True
 ```
 
-30分钟玩转PaddleClas[尝鲜版](./quick_start_new_user.md)与[进阶版](./quick_start_professional.md)中包含大量模型微调的示例，可以参考该章节在特定的数据集上进行模型微调。
-
 ### 2.3 模型恢复训练
 
 如果训练任务因为其他原因被终止，也可以加载断点权重文件继续训练。
@@ -124,7 +119,6 @@ python -m paddle.distributed.launch \
     tools/train.py \
         -c ./configs/quick_start/ResNet50_vd_finetune_retrieval.yaml \
         -o Global.checkpoints="./output/RecModel/ppcls_epoch_5" \
-        -o Global.last_epoch=5 \
 ```
 
 其中配置文件不需要做任何修改，只需要在训练时设置`checkpoints`参数与`last_epoch`参数即可，该参数表示加载的断点权重文件路径，使用该参数会同时加载保存的模型参数权重和学习率、优化器等信息，详见[1.3 模型恢复训练](#1.3)。
