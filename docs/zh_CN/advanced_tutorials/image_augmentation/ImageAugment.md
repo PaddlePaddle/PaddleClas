@@ -65,10 +65,6 @@ PaddleClas中集成了上述所有的数据增广策略，每种数据增广策�
 PaddleClas中`AutoAugment`的使用方法如下所示。
 
 ```python
-from ppcls.data.imaug import DecodeImage
-from ppcls.data.imaug import ResizeImage
-from ppcls.data.imaug import ImageNetPolicy
-from ppcls.data.imaug import transform
 
 size = 224
 
@@ -104,10 +100,6 @@ for f in fnames:
 PaddleClas中`RandAugment`的使用方法如下所示。
 
 ```python
-from ppcls.data.imaug import DecodeImage
-from ppcls.data.imaug import ResizeImage
-from ppcls.data.imaug import RandAugment
-from ppcls.data.imaug import transform
 
 size = 224
 
@@ -154,10 +146,6 @@ Cutout 可以理解为 Dropout 的一种扩展操作，不同的是 Dropout 是�
 PaddleClas中`Cutout`的使用方法如下所示。
 
 ```python
-from ppcls.data.imaug import DecodeImage
-from ppcls.data.imaug import ResizeImage
-from ppcls.data.imaug import Cutout
-from ppcls.data.imaug import transform
 
 size = 224
 
@@ -190,11 +178,6 @@ for f in fnames:
 PaddleClas中`RandomErasing`的使用方法如下所示。
 
 ```python
-from ppcls.data.imaug import DecodeImage
-from ppcls.data.imaug import ResizeImage
-from ppcls.data.imaug import ToCHWImage
-from ppcls.data.imaug import RandomErasing
-from ppcls.data.imaug import transform
 
 size = 224
 
@@ -233,11 +216,6 @@ for f in fnames:
 PaddleClas中`HideAndSeek`的使用方法如下所示。
 
 ```python
-from ppcls.data.imaug import DecodeImage
-from ppcls.data.imaug import ResizeImage
-from ppcls.data.imaug import ToCHWImage
-from ppcls.data.imaug import HideAndSeek
-from ppcls.data.imaug import transform
 
 size = 224
 
@@ -290,11 +268,6 @@ PaddleClas中`GridMask`的使用方法如下所示。
 
 
 ```python
-from data.imaug import DecodeImage
-from data.imaug import ResizeImage
-from data.imaug import ToCHWImage
-from data.imaug import GridMask
-from data.imaug import transform
 
 size = 224
 
@@ -341,11 +314,6 @@ Mixup 是最先提出的图像混叠增广方案，其原理简单、方便实�
 PaddleClas中`Mixup`的使用方法如下所示。
 
 ```python
-from ppcls.data.imaug import DecodeImage
-from ppcls.data.imaug import ResizeImage
-from ppcls.data.imaug import ToCHWImage
-from ppcls.data.imaug import transform
-from ppcls.data.imaug import MixupOperator
 
 size = 224
 
@@ -383,11 +351,6 @@ new_batch = mixup_op(batch)
 与  `Mixup` 直接对两幅图进行相加不一样，`Cutmix` 是从一幅图中随机裁剪出一个 `ROI`，然后覆盖当前图像中对应的区域，代码实现如下所示：
 
 ```python
-from ppcls.data.imaug import DecodeImage
-from ppcls.data.imaug import ResizeImage
-from ppcls.data.imaug import ToCHWImage
-from ppcls.data.imaug import transform
-from ppcls.data.imaug import CutmixOperator
 
 size = 224
 
@@ -450,11 +413,10 @@ new_batch = cutmix_op(batch)
 
 `RandAugment`的图像增广方式的配置如下，其中用户需要指定其中的参数`num_layers`与`magnitude`，默认的数值分别是`2`和`5`。`RandAugment`是在uint8的数据格式上转换的，所以其处理过程应该放在归一化操作（`NormalizeImage`）之前。
 
-```yaml
-    transforms:
+```yaml        
+      transform_ops:
         - DecodeImage:
             to_rgb: True
-            to_np: False
             channel_first: False
         - RandCropImage:
             size: 224
@@ -464,11 +426,10 @@ new_batch = cutmix_op(batch)
             num_layers: 2
             magnitude: 5
         - NormalizeImage:
-            scale: 1./255.
+            scale: 1.0/255.0
             mean: [0.485, 0.456, 0.406]
             std: [0.229, 0.224, 0.225]
             order: ''
-        - ToCHWImage:
 ```
 
 ### Cutout
@@ -476,24 +437,22 @@ new_batch = cutmix_op(batch)
 `Cutout`的图像增广方式的配置如下，其中用户需要指定其中的参数`n_holes`与`length`，默认的数值分别是`1`和`112`。类似其他图像裁剪类的数据增广方式，`Cutout`既可以在uint8格式的数据上操作，也可以在归一化（`NormalizeImage`）后的数据上操作，此处给出的是在归一化后的操作。
 
 ```yaml
-    transforms:
+      transform_ops:
         - DecodeImage:
             to_rgb: True
-            to_np: False
             channel_first: False
         - RandCropImage:
             size: 224
         - RandFlipImage:
             flip_code: 1
         - NormalizeImage:
-            scale: 1./255.
+            scale: 1.0/255.0
             mean: [0.485, 0.456, 0.406]
             std: [0.229, 0.224, 0.225]
             order: ''
         - Cutout:
             n_holes: 1
             length: 112
-        - ToCHWImage:
 ```
 
 ### Mixup
@@ -501,51 +460,48 @@ new_batch = cutmix_op(batch)
 `Mixup`的图像增广方式的配置如下，其中用户需要指定其中的参数`alpha`，默认的数值是`0.2`。类似其他图像混合类的数据增广方式，`Mixup`是在图像做完数据处理后将每个batch内的数据做图像混叠，将混叠后的图像和标签输入网络中训练，所以其是在图像数据处理（图像变换、图像裁剪）后操作。另外，在配置文件中，需要将`use_mix`参数设置为`True`。
 
 ```yaml
-    transforms:
+      transform_ops:
         - DecodeImage:
             to_rgb: True
-            to_np: False
             channel_first: False
         - RandCropImage:
             size: 224
         - RandFlipImage:
             flip_code: 1
         - NormalizeImage:
-            scale: 1./255.
+            scale: 1.0/255.0
             mean: [0.485, 0.456, 0.406]
             std: [0.229, 0.224, 0.225]
             order: ''
-        - ToCHWImage:
-    mix:
+      batch_transform_ops:
         - MixupOperator:
             alpha: 0.2
 ```
 
 ## 7.2 启动命令
 
-当用户配置完训练环境后，类似于训练其他分类任务，只需要将`tools/run.sh`中的配置文件替换成为相应的数据增广方式的配置文件即可。
+当用户配置完训练环境后，类似于训练其他分类任务，只需要将`tools/train.sh`中的配置文件替换成为相应的数据增广方式的配置文件即可。
 
-其中`run.sh`中的内容如下：
+其中`train.sh`中的内容如下：
 
 ```bash
-export PYTHONPATH=path_to_PaddleClas:$PYTHONPATH
 
-python -m paddle.distributed.launch \
+python3 -m paddle.distributed.launch \
     --selected_gpus="0,1,2,3" \
     --log_dir=ResNet50_Cutout \
     tools/train.py \
-        -c ./configs/DataAugment/ResNet50_Cutout.yaml
+        -c ./ppcls/configs/ImageNet/DataAugment/ResNet50_Cutout.yaml
 ```
 
-运行`run.sh`：
+运行`train.sh`：
 
 ```bash
-sh tools/run.sh
+sh tools/train.sh
 ```
 
 ## 7.3 注意事项
 
-* 在使用图像混叠类的数据处理时，需要将配置文件中的`use_mix`设置为`True`，另外由于图像混叠时需对label进行混叠，无法计算训练数据的准确率，所以在训练过程中没有打印训练准确率。
+* 由于图像混叠时需对label进行混叠，无法计算训练数据的准确率，所以在训练过程中没有打印训练准确率。
 
 * 在使用数据增广后，由于训练数据更难，所以训练损失函数可能较大，训练集的准确率相对较低，但其有拥更好的泛化能力，所以验证集的准确率相对较高。
 

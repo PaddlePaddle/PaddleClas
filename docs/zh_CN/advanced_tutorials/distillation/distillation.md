@@ -115,8 +115,6 @@ SSLD的流程图如下图所示。
 
 ### 3.4 实验过程中的一些问题
 
-#### 3.4.1 bn的计算方法
-
 * 在预测过程中，batch norm的平均值与方差是通过加载预训练模型得到（设其模式为test mode）。在训练过程中，batch norm是通过统计当前batch的信息（设其模式为train mode），与历史保存信息进行滑动平均计算得到，在蒸馏任务中，我们发现通过train mode，即教师模型的bn实时变化的模式，去指导学生模型，比通过test mode蒸馏，得到的学生模型性能更好一些，下面是一组实验结果。因此我们在该蒸馏方案中，均使用train mode去得到教师模型的soft label。
 
 |Teacher Model | Teacher Top1 | Student Model | Student Top1|
@@ -124,26 +122,6 @@ SSLD的流程图如下图所示。
 | ResNet50_vd | 82.35% | MobileNetV3_large_x1_0 | 76.00% |
 | ResNet50_vd | 82.35% | MobileNetV3_large_x1_0 | 75.84% |
 
-#### 3.4.2 模型名字冲突问题的解决办法
-* 在蒸馏过程中，如果遇到命名冲突的问题，如使用ResNet50_vd蒸馏ResNet34_vd，此时直接训练，会提示相同variable名称不匹配的问题，此时可以通过给学生模型或者教师模型中的变量名添加名称的方式解决该问题，如下所示。在训练之后也可以直接根据后缀区分学生模型和教师模型各自包含的参数。
-
-```python
-def net(self, input, class_dim=1000):
-    student = ResNet34_vd(postfix_name="_student")
-    out_student = student.net( input, class_dim=class_dim )
-
-    teacher = ResNet50_vd()
-    out_teacher = teacher.net( input, class_dim=class_dim )
-    out_teacher.stop_gradient = True
-
-    return  out_teacher, out_student
-```
-
-* 训练完成后，可以通过批量重名的方式修改学生模型的参数，以上述代码为例，批量重命名的命令行如下。
-```shell
-cd model_final # enter model dir
-for var in ./*_student; do cp "$var" "../student_model/${var%_student}"; done # batch copy and rename
-```
 
 ## 四、蒸馏模型的应用
 
@@ -151,7 +129,7 @@ for var in ./*_student; do cp "$var" "../student_model/${var%_student}"; done # 
 
 * 中间层学习率调整。蒸馏得到的模型的中间层特征图更加精细化，因此将蒸馏模型预训练应用到其他任务中时，如果采取和之前相同的学习率，容易破坏中间层特征。而如果降低整体模型训练的学习率，则会带来训练收敛速度慢的问题。因此我们使用了中间层学习率调整的策略。具体地：
     * 针对ResNet50_vd，我们设置一个学习率倍数列表，res block之前的3个conv2d卷积参数具有统一的学习率倍数，4个res block的conv2d分别有一个学习率参数，共需设置5个学习率倍数的超参。在实验中发现。用于迁移学习finetune分类模型时，`[0.1,0.1,0.2,0.2,0.3]`的中间层学习率倍数设置在绝大多数的任务中都性能更好；而在目标检测任务中，`[0.05,0.05,0.05,0.1,0.15]`的中间层学习率倍数设置能够带来更大的精度收益。
-    * 对于MoblileNetV3_large_1x0，由于其包含15个block，我们设置每3个block共享一个学习率倍数参数，因此需要共5个学习率倍数的参数，最终发现在分类和检测任务中，`[0.25,0.25,0.5,0.5,0.75]`的中间层学习率倍数能够带来更大的精度收益。
+    * 对于MoblileNetV3_large_x1_0，由于其包含15个block，我们设置每3个block共享一个学习率倍数参数，因此需要共5个学习率倍数的参数，最终发现在分类和检测任务中，`[0.25,0.25,0.5,0.5,0.75]`的中间层学习率倍数能够带来更大的精度收益。
 
 
 * 适当的l2 decay。不同分类模型在训练的时候一般都会根据模型设置不同的l2 decay，大模型为了防止过拟合，往往会设置更大的l2 decay，如ResNet50等模型，一般设置为`1e-4`；而如MobileNet系列模型，在训练时往往都会设置为`1e-5~4e-5`，防止模型过度欠拟合，在蒸馏时亦是如此。在将蒸馏模型应用到目标检测任务中时，我们发现也需要调节backbone甚至特定任务模型模型的l2 decay，和预训练蒸馏时的l2 decay尽可能保持一致。以Faster RCNN MobiletNetV3 FPN为例，我们发现仅修改该参数，在COCO2017数据集上就可以带来最多0.5%左右的精度(mAP)提升（默认Faster RCNN l2 decay为1e-4，我们修改为1e-5~4e-5均有0.3%~0.5%的提升）。
@@ -201,63 +179,56 @@ for var in ./*_student; do cp "$var" "../student_model/${var%_student}"; done # 
 
 ### 5.1 参数配置
 
-实战部分提供了SSLD蒸馏的示例，在`ppcls/modeling/architectures/distillation_models.py`中提供了`ResNeXt101_32x16d_wsl`蒸馏`ResNet50_vd`与`ResNet50_vd_ssld`蒸馏`MobileNetV3_large_x1_0`的示例，`configs/Distillation`里分别提供了二者的配置文件，用户可以在`tools/run.sh`里直接替换配置文件的路径即可使用。
-
-#### ResNeXt101_32x16d_wsl蒸馏ResNet50_vd
-
-`ResNeXt101_32x16d_wsl`蒸馏`ResNet50_vd`的配置如下，其中`pretrained model`指定了`ResNeXt101_32x16d_wsl`（教师模型）的预训练模型的路径，该路径也可以同时指定教师模型与学生模型的预训练模型的路径，用户只需要同时传入二者预训练的路径即可（配置中的注释部分）。
+实战部分提供了SSLD蒸馏的示例，在`ppcls/configs/ImageNet/Distillation/mv3_large_x1_0_distill_mv3_small_x1_0.yaml`中提供了`MobileNetV3_large_x1_0`蒸馏`MobileNetV3_small_x1_0`的配置文件，用户可以在`tools/train.sh`里直接替换配置文件的路径即可使用。
 
 ```yaml
-ARCHITECTURE:
-    name: 'ResNeXt101_32x16d_wsl_distill_ResNet50_vd'
-pretrained_model: "./pretrained/ResNeXt101_32x16d_wsl_pretrained/"
-# pretrained_model:
-#     - "./pretrained/ResNeXt101_32x16d_wsl_pretrained/"
-#     - "./pretrained/ResNet50_vd_pretrained/"
-use_distillation: True
+Arch:
+  name: "DistillationModel"
+  # if not null, its lengths should be same as models
+  pretrained_list:
+  # if not null, its lengths should be same as models
+  freeze_params_list:
+  - True
+  - False
+  models:
+    - Teacher:
+        name: MobileNetV3_large_x1_0
+        pretrained: True
+        use_ssld: True
+    - Student:
+        name: MobileNetV3_small_x1_0
+        pretrained: False
+
+  infer_model_name: "Student"
 ```
 
-#### ResNet50_vd_ssld蒸馏MobileNetV3_large_x1_0
+在参数配置中，`freeze_params_list`中需要指定模型是否需要冻结参数，`models`中需要指定Teacher模型和Student模型，其中Teacher模型需要加载预训练模型。用户可以直接在此处更改模型。
 
-类似于`ResNeXt101_32x16d_wsl`蒸馏`ResNet50_vd`，`ResNet50_vd_ssld`蒸馏`MobileNetV3_large_x1_0`的配置如下:
-
-```yaml
-ARCHITECTURE:
-    name: 'ResNet50_vd_distill_MobileNetV3_large_x1_0'
-pretrained_model: "./pretrained/ResNet50_vd_ssld_pretrained/"
-# pretrained_model:
-#     - "./pretrained/ResNet50_vd_ssld_pretrained/"
-#     - "./pretrained/ResNet50_vd_pretrained/"
-use_distillation: True
-```
 
 ### 5.2 启动命令
 
-当用户配置完训练环境后，类似于训练其他分类任务，只需要将`tools/run.sh`中的配置文件替换成为相应的蒸馏配置文件即可。
+当用户配置完训练环境后，类似于训练其他分类任务，只需要将`tools/train.sh`中的配置文件替换成为相应的蒸馏配置文件即可。
 
-其中`run.sh`中的内容如下：
+其中`train.sh`中的内容如下：
 
 ```bash
-export PYTHONPATH=path_to_PaddleClas:$PYTHONPATH
 
 python -m paddle.distributed.launch \
     --selected_gpus="0,1,2,3" \
-    --log_dir=R50_vd_distill_MV3_large_x1_0 \
+    --log_dir=mv3_large_x1_0_distill_mv3_small_x1_0 \
     tools/train.py \
-        -c ./configs/Distillation/R50_vd_distill_MV3_large_x1_0.yaml
+        -c ./ppcls/configs/ImageNet/Distillation/mv3_large_x1_0_distill_mv3_small_x1_0.yaml
 ```
 
-运行`run.sh`：
+运行`train.sh`：
 
 ```bash
-sh tools/run.sh
+sh tools/train.sh
 ```
 
 ### 5.3 注意事项
 
 * 用户在使用SSLD蒸馏之前，首先需要在目标数据集上训练一个教师模型，该教师模型用于指导学生模型在该数据集上的训练。
-
-* 在用户使用SSLD蒸馏的时候需要将配置文件中的`use_distillation`设置为`True`，另外由于学生模型学习带有知识信息的soft-label，所以需要关掉label_smoothing选项，即将`ls_epsilon`中的值设置在[0,1]之外。
 
 * 如果学生模型没有加载预训练模型，训练的其他超参数可以参考该学生模型在ImageNet-1k上训练的超参数，如果学生模型加载了预训练模型，学习率可以调整到原来的1/10或者1/100。
 
