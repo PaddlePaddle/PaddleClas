@@ -184,5 +184,10 @@ def parse_args():
         action='append',
         default=[],
         help='config options to be overridden')
+    parser.add_argument(
+        '-v',
+        '--verbose',
+        action='store_true',
+        help='wheather print the config info')
     args = parser.parse_args()
     return args

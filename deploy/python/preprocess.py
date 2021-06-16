@@ -128,6 +128,12 @@ class CropImage(object):
     def __call__(self, img):
         w, h = self.size
         img_h, img_w = img.shape[:2]
+
+        if img_h < h or img_w < w:
+            raise Exception(
+                f"The size({h}, {w}) of CropImage must be greater than size({img_h}, {img_w}) of image. Please check image original size and size of ResizeImage if used."
+            )
+
         w_start = (img_w - w) // 2
         h_start = (img_h - h) // 2
 
