@@ -176,13 +176,13 @@ python python/build_gallery.py \
 ```bash
 python python/predict_rec.py \
     -c configs/inference_flowers.yaml \
-    -o Global.infer_imgs="../dataset/flowers/jpg/image_00001.jpg" \
+    -o Global.infer_imgs="./images/image_00002.jpg" \
     -o Global.rec_inference_model_dir="./inference"
     -o Global.use_gpu=True \
     -o Global.use_tensorrt=False
 ```
 其中：
-+ `Global.infer_imgs`：待预测的图片文件路径，如 `../dataset/flowers/jpg/image_00001.jpg`
++ `Global.infer_imgs`：待预测的图片文件路径，如 `./images/image_00002.jpg`
 + `Global.rec_inference_model_dir`：预测模型文件路径，如 `./inference/`
 + `Global.use_tensorrt`：是否使用 TesorRT 预测引擎，默认值：`True`
 + `Global.use_gpu`：是否使用 GPU 预测，默认值：`True` 
