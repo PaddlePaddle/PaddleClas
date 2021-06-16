@@ -96,7 +96,7 @@ DataLoader:
       dataset:
         name: LogoDataset
         image_root: "dataset/LogoDet-3K-crop/val/"
-        cls_label_path: "LogoDet-3K-crop/LogoDet-3K+query.txt"
+        cls_label_path: "dataset/LogoDet-3K-crop/LogoDet-3K+query.txt"
         transform_ops:
           - DecodeImage:
               to_rgb: True

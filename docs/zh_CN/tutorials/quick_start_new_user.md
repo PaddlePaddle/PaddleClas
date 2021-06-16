@@ -75,20 +75,6 @@ cd ../../
 
 ### 预训练模型下载
 
-```shell
-# 创建文件夹pretrained文件夹并进入
-mkdir pretrained && cd pretrained
-# 下载预训练模型
-# 下载ResNet50_vd模型
-wget https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ResNet50_vd_pretrained.pdparams
-# 下载ShuffleNetV2_x0_25模型
-wget https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ShuffleNetV2_x0_25_pretrained.pdparams
-# 回到PaddleClas主目录
-cd ..
-```
-
-Windows操作如上提示，在PaddleClas根目录下创建相应文件夹，并下载好预训练模型后，放到此文件夹中。
-
 ### 训练模型
 
 #### 使用CPU进行模型训练
@@ -99,20 +85,19 @@ Windows操作如上提示，在PaddleClas根目录下创建相应文件夹，并
 
 ```shell
 #windows在cmd中进入PaddleClas根目录，执行此命令
-python tools/train.py -c ./configs/quick_start/new_user/ShuffleNetV2_x0_25.yaml
+python tools/train.py -c ./ppcls/configs/quick_start/new_user/ShuffleNetV2_x0_25.yaml
 ```
 
 - `-c` 参数是指定训练的配置文件路径，训练的具体超参数可查看`yaml`文件
-- `yaml`文`use_gpu` 参数设置为`False`，即使用CPU进行训练（若不设置，此参数默认为`True`）
+- `yaml`文`Global.device` 参数设置为`cpu`，即使用CPU进行训练（若不设置，此参数默认为`True`）
 - `yaml`文件中`epochs`参数设置为20，说明对整个数据集进行20个epoch迭代，预计训练20分钟左右（不同CPU，训练时间略有不同），此时训练模型不充分。若提高训练模型精度，请将此参数设大，如**40**，训练时间也会相应延长
 
 ##### 使用预训练模型
 
 ```shell
-python tools/train.py -c ./configs/quick_start/new_user/ShuffleNetV2_x0_25.yaml  -o pretrained_model="pretrained/ShuffleNetV2_x0_25_pretrained"
-```
+python tools/train.py -c ./ppcls/configs/quick_start/new_user/ShuffleNetV2_x0_25.yaml  -o Arch.pretrained=True
 
-- `-o` 参数加入预训练模型地址，注意：预训练模型路径不要加上：`.pdparams`
+- `-o` 参数可以选择为True或False，也可以是预训练模型存放路径，当选择为True时，预训练权重会自动下载到本地。注意：若为预训练模型路径，则不要加上：`.pdparams`
 
 可以使用将使用与不使用预训练模型训练进行对比，观察loss的下降情况。
 
@@ -137,7 +122,7 @@ python tools/train.py -c ./configs/quick_start/new_user/ShuffleNetV2_x0_25.yaml 
 ##### 不使用预训练模型
 
 ```shell
-python tools/train.py -c ./configs/quick_start/ResNet50_vd.yaml
+python3 tools/train.py -c ./ppcls/configs/quick_start/ResNet50_vd.yaml
 ```
 
 训练完成后，验证集的`Top1 Acc`曲线如下所示，最高准确率为0.2735。训练精度曲线下图所示
@@ -149,13 +134,12 @@ python tools/train.py -c ./configs/quick_start/ResNet50_vd.yaml
 基于ImageNet1k分类预训练模型进行微调，训练脚本如下所示
 
 ```shell
-python tools/train.py -c ./configs/quick_start/ResNet50_vd_finetune.yaml
+python3 tools/train.py -c ./ppcls/configs/quick_start/ResNet50_vd.yaml -o Arch.pretrained=True
 ```
 
 **注**：
 
 - 此训练脚本使用GPU，如使用CPU可按照上文中[使用CPU进行模型训练](#使用CPU进行模型训练)所示，进行修改
-- 与[不使用预训练模型](#不使用预训练模型)的`yaml`文件的主要不同，此`ymal`文件中加入 `pretrained_model` 参数，此参数指明预训练模型的位置
 
 验证集的`Top1 Acc`曲线如下所示，最高准确率为0.9402，加载预训练模型之后，flowers102数据集精度大幅提升，绝对精度涨幅超过65%。
 
@@ -167,35 +151,16 @@ python tools/train.py -c ./configs/quick_start/ResNet50_vd_finetune.yaml
 
 ```shell
 cd $path_to_PaddleClas
-python tools/infer/infer.py --model ShuffleNetV2_x0_25 -i dataset/flowers102/jpg/image_00001.jpg --pretrained_model output/ShuffleNetV2_x0_25/best_model/ppcls --class_num 102 --use_gpu False
+python3 tools/infer.py -c ./ppcls/configs/quick_start/new_user/ShuffleNetV2_x0_25.yaml -o Infer.infer_imgs=dataset/flowers102/jpg/image_00001.jpg -o Global.pretrained_model=output/ShuffleNetV2_x0_25/best_model
 ```
-
-其中主要参数如下：
-
-- `--model`：训练时使用擦网络模型，如 ShuffleNetV2_x0_25、ResNet50_vd，具体可查看训练时`yaml`文件中**ARCHITECTURE**下 **name**参数的值
-- `-i`：图像文件路径或者图像所在目录
-- `--pretrained_model`： 存放的模型权重位置。上述CPU训练过程中，最优模型存放位置如下：`output/ShuffleNetV2_x0_25/best_model/ppcls.pdparams`，此时此参数应如下填写：`output/ShuffleNetV2_x0_25/best_model/ppcls`，去掉`.pdparams`
-- `--class_num`：为图像类别数，`flowers102`数据集为102类。若用其他数据集，改成相应类别数即可
-- `--use_gpu`：是否使用GPU
 
 `-i`输入为单张图像路径，运行成功后，示例结果如下：
 
-`File:image_00001.jpg, Top-1 result: class id(s): [72], score(s): [0.03]`
+`[{'class_ids': [76, 65, 34, 9, 69], 'scores': [0.91762, 0.01801, 0.00833, 0.0071, 0.00669], 'file_name': 'dataset/flowers102/jpg/image_00001.jpg', 'label_names': []}]`
 
 `-i`输入为图像集所在目录，运行成功后，示例结果如下：
 
 ```txt
-File:image_02993.jpg, Top-1 result: class id(s): [77], score(s): [0.02]
-File:image_00448.jpg, Top-1 result: class id(s): [77], score(s): [0.02]
-File:image_08001.jpg, Top-1 result: class id(s): [77], score(s): [0.01]
-File:image_00804.jpg, Top-1 result: class id(s): [100], score(s): [0.02]
-File:image_01842.jpg, Top-1 result: class id(s): [100], score(s): [0.02]
-File:image_02790.jpg, Top-1 result: class id(s): [70], score(s): [0.05]
-File:image_03412.jpg, Top-1 result: class id(s): [100], score(s): [0.02]
-File:image_05196.jpg, Top-1 result: class id(s): [77], score(s): [0.02]
-File:image_06860.jpg, Top-1 result: class id(s): [70], score(s): [0.03]
-File:image_05312.jpg, Top-1 result: class id(s): [77], score(s): [0.02]
-File:image_05930.jpg, Top-1 result: class id(s): [100], score(s): [0.02]
-File:image_05711.jpg, Top-1 result: class id(s): [77], score(s): [0.01]
-File:image_01180.jpg, Top-1 result: class id(s): [70], score(s): [0.03]
+[{'class_ids': [76, 65, 34, 9, 69], 'scores': [0.91762, 0.01801, 0.00833, 0.0071, 0.00669], 'file_name': 'dataset/flowers102/jpg/image_00001.jpg', 'label_names': []}, {'class_ids': [76, 69, 34, 28, 9], 'scores': [0.77122, 0.06295, 0.02537, 0.02531, 0.0251], 'file_name': 'dataset/flowers102/jpg/image_00002.jpg', 'label_names': []}, {'class_ids': [99, 76, 81, 85, 16], 'scores': [0.26374, 0.20423, 0.07818, 0.06042, 0.05499], 'file_name': 'dataset/flowers102/jpg/image_00003.jpg', 'label_names': []}, {'class_ids': [9, 37, 34, 24, 76], 'scores': [0.17784, 0.16651, 0.14539, 0.12096, 0.04816], 'file_name': 'dataset/flowers102/jpg/image_00004.jpg', 'label_names': []}, {'class_ids': [76, 66, 91, 16, 13], 'scores': [0.95494, 0.00688, 0.00596, 0.00352, 0.00308], 'file_name': 'dataset/flowers102/jpg/image_00005.jpg', 'label_names': []}, {'class_ids': [76, 66, 34, 8, 43], 'scores': [0.44425, 0.07487, 0.05609, 0.05609, 0.03667], 'file_name': 'dataset/flowers102/jpg/image_00006.jpg', 'label_names': []}, {'class_ids': [86, 93, 81, 22, 21], 'scores': [0.44714, 0.13582, 0.07997, 0.0514, 0.03497], 'file_name': 'dataset/flowers102/jpg/image_00007.jpg', 'label_names': []}, {'class_ids': [13, 76, 81, 18, 97], 'scores': [0.26771, 0.1734, 0.06576, 0.0451, 0.03986], 'file_name': 'dataset/flowers102/jpg/image_00008.jpg', 'label_names': []}, {'class_ids': [34, 76, 8, 5, 9], 'scores': [0.67224, 0.31896, 0.00241, 0.00227, 0.00102], 'file_name': 'dataset/flowers102/jpg/image_00009.jpg', 'label_names': []}, {'class_ids': [76, 34, 69, 65, 66], 'scores': [0.95185, 0.01101, 0.00875, 0.00452, 0.00406], 'file_name': 'dataset/flowers102/jpg/image_00010.jpg', 'label_names': []}]
 ```
+其中，列表的长度为batch_size的大小。

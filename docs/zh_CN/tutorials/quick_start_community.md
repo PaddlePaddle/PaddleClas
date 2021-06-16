@@ -51,34 +51,30 @@ train/n01440764/n01440764_10027.JPEG 0
 对于读入的数据，需要通过数据转换，将原始的图像数据进行转换。训练时，标准的数据预处理包含：`DecodeImage`, `RandCropImage`, `RandFlipImage`, `NormalizeImage`, `ToCHWImage`。在配置文件中体现如下，数据预处理主要包含在`transforms`字段中，以列表形式呈现，会按照顺序对数据依次做这些转换。
 
 ```yaml
-TRAIN:
-    batch_size: 256 # 所有训练设备上的总batch size
-    num_workers: 4 # 训练时每块设备上的进程数
-    file_list: "./dataset/ILSVRC2012/train_list.txt" # 训练标签文件
-    data_dir: "./dataset/ILSVRC2012/" # 训练图片文件夹
-    shuffle_seed: 0 # 随机打散的种子数
-    transforms:
-        - DecodeImage: # 对图像文件进行解码，转成numpy矩阵
+DataLoader:
+  Train:
+    dataset:
+      name: ImageNetDataset
+      image_root: ./dataset/ILSVRC2012/
+      cls_label_path: ./dataset/ILSVRC2012/train_list.txt
+      transform_ops:
+        - DecodeImage:
             to_rgb: True
             channel_first: False
-        - RandCropImage: # 对图像做随机裁剪
+        - RandCropImage:
             size: 224
-        - RandFlipImage: # 对图像做随机翻转
+        - RandFlipImage:
             flip_code: 1
-        - NormalizeImage: # 对图像做归一化
-            scale: 1./255.
+        - NormalizeImage:
+            scale: 1.0/255.0
             mean: [0.485, 0.456, 0.406]
             std: [0.229, 0.224, 0.225]
             order: ''
-        - ToCHWImage: # 将图像从HWC格式转成CHW格式
-    mix:
-        - MixupOperator: # mixup数据增广，在全局配置use_mix=True时生效
-            alpha: 0.2
 ```
 
-PaddleClas中也包含了`AutoAugment`, `RandAugment`等数据增广方法，也可以通过在配置文件中配置，从而添加到训练过程的数据预处理中。每个数据转换的方法均以类实现，方便迁移和复用，更多的数据处理具体实现过程可以参考：`ppcls/data/imaug/operators.py`。
+PaddleClas中也包含了`AutoAugment`, `RandAugment`等数据增广方法，也可以通过在配置文件中配置，从而添加到训练过程的数据预处理中。每个数据转换的方法均以类实现，方便迁移和复用，更多的数据处理具体实现过程可以参考`ppcls/data/preprocess/ops/`下的代码。
 
-对于组成一个batch的数据，也可以使用mixup或者cutmix等方法进行数据增广。PaddleClas中集成了`MixupOperator`, `CutmixOperator`, `FmixOperator`等基于batch的数据增广方法，可以在配置文件中配置mix参数进行配置，更加具体的实现可以参考`ppcls/data/imaug/batch_operators.py`。
+对于组成一个batch的数据，也可以使用mixup或者cutmix等方法进行数据增广。PaddleClas中集成了`MixupOperator`, `CutmixOperator`, `FmixOperator`等基于batch的数据增广方法，可以在配置文件中配置mix参数进行配置，更加具体的实现可以参考`ppcls/data/preprocess/batch_ops/batch_operators.py`。
 
 图像分类中，数据后处理主要为`argmax`操作，在此不再赘述。
 
@@ -87,69 +83,47 @@ PaddleClas中也包含了`AutoAugment`, `RandAugment`等数据增广方法，也
 在配置文件中，模型结构定义如下
 
 ```yaml
-ARCHITECTURE:
-    name: "EfficientNetB0"
-    params: # 模型需要传入的额外参数，如果没有可不填
-        padding_type : "SAME"
-        override_params:
-            drop_connect_rate: 0.1
+Arch:
+  name: ResNet50
+  pretrained: False
+  use_ssld: False
 ```
 
+`Arch.name`表示模型名称，`Arch.pretrained`表示是否添加预训练模型。所有的模型名称均在`ppcls/arch/backbone/__init__.py`中定义。
 
-`ARCHITECTURE.name`表示模型名称，`ARCHITECTURE.params`表示需要额外传入的参数，默认为空。所有的模型名称均在`/ppcls/modeling/architectures/__init__.py`中定义。
-
-对应的，在`tools/program.py`中，通过`create_model`方法创建模型对象。
+对应的，在`ppcls/arch/__init__.py`中，通过`build_model`方法创建模型对象。
 
 ```python
-def create_model(architecture, classes_num):
-    name = architecture["name"]
-    params = architecture.get("params", {})
-    return architectures.__dict__[name](class_dim=classes_num, **params)
+def build_model(config):
+    config = copy.deepcopy(config)
+    model_type = config.pop("name")
+    mod = importlib.import_module(__name__)
+    arch = getattr(mod, model_type)(**config)
+    return arch
 ```
 
 * 损失函数
 
-PaddleClas中，包含了`CELoss`, `MixCELoss`, `GoogLeNetLoss`, `JSDivLoss`, `MultiLabelLoss`等损失函数，均定义在`ppcls/modeling/loss.py`中。
+PaddleClas中，包含了`CELoss`, `JSDivLoss`, `TripletLoss`, `CenterLoss`等损失函数，均定义在`ppcls/loss`中。
 
-在`tools/program.py`文件中，使用`create_loss`构建模型的损失函数，不同训练策略中所需要的损失函数与计算方法不同，PaddleClas在构建损失函数过程中，主要考虑了以下几个因素。
+在`ppcls/loss/__init__.py`文件中，使用`CombinedLoss`来构建及合并损失函数，不同训练策略中所需要的损失函数与计算方法不同，PaddleClas在构建损失函数过程中，主要考虑了以下几个因素。
 
 1. 是否使用label smooth
 2. 是否使用mixup或者cutmix
 3. 是否使用蒸馏方法进行训练
-4. 是否进行多标签训练
+4. 是否是训练metric learning
 
-```python
-def create_loss(feeds,
-                out,
-                architecture,
-                classes_num=1000,
-                epsilon=None,
-                use_mix=False,
-                use_distillation=False,
-                multilabel=False):
-    if architecture["name"] == "GoogLeNet":
-        assert len(out) == 3, "GoogLeNet should have 3 outputs"
-        loss = GoogLeNetLoss(class_dim=classes_num, epsilon=epsilon)
-        return loss(out[0], out[1], out[2], feeds["label"])
 
-    if use_distillation:
-        assert len(out) == 2, ("distillation output length must be 2, "
-                               "but got {}".format(len(out)))
-        loss = JSDivLoss(class_dim=classes_num, epsilon=epsilon)
-        return loss(out[1], out[0])
+用户可以在配置文件中指定损失函数的类型及权重，如在训练中添加TripletLossV2，配置文件如下：
 
-    if use_mix:
-        loss = MixCELoss(class_dim=classes_num, epsilon=epsilon)
-        feed_y_a = feeds['y_a']
-        feed_y_b = feeds['y_b']
-        feed_lam = feeds['lam']
-        return loss(out, feed_y_a, feed_y_b, feed_lam)
-    else:
-        if not multilabel:
-            loss = CELoss(class_dim=classes_num, epsilon=epsilon)
-        else:
-            loss = MultiLabelLoss(class_dim=classes_num, epsilon=epsilon)
-        return loss(out, feeds["label"])
+```yaml
+Loss:
+  Train:
+    - CELoss:
+        weight: 1.0
+    - TripletLossV2:
+        weight: 1.0
+        margin: 0.5
 ```
 
 * 优化器和学习率衰减、权重衰减策略
@@ -158,48 +132,53 @@ def create_loss(feeds,
 
 权重衰减策略是一种比较常用的正则化方法，主要用于防止模型过拟合。PaddleClas中提供了`L1Decay`和`L2Decay`两种权重衰减策略。
 
-学习率衰减是图像分类任务中必不可少的精度提升训练方法，PaddleClas目前支持`Cosine`, `Piecewise`, `CosineWarmup`, `ExponentialWarmup`等学习率衰减策略。
+学习率衰减是图像分类任务中必不可少的精度提升训练方法，PaddleClas目前支持`Cosine`, `Piecewise`, `Linear`等学习率衰减策略。
 
-在配置文件中，优化器和权重衰减策略可以通过以下的字段进行配置。
-
-```yaml
-OPTIMIZER:
-    function: 'Momentum' # Momentum优化器
-    params:
-        momentum: 0.9
-    regularizer:
-        function: 'L2' # L1 means L1Decay, L2 means L2Decay
-        factor: 0.00010
-```
-
-学习率衰减策略可以通过以下的字段进行配置。
+在配置文件中，优化器、权重衰减策略、学习率衰减策略可以通过以下的字段进行配置。
 
 ```yaml
-LEARNING_RATE:
-    function: 'Piecewise' # Piecewise学习率衰减策略
-    params:
-        lr: 0.1 # 初始学习率
-        decay_epochs: [30, 60, 90] # 学习率下降时对应的epoch数量
-        gamma: 0.1 # 学习率衰减倍数
+Optimizer:
+  name: Momentum
+  momentum: 0.9
+  lr:
+    name: Piecewise
+    learning_rate: 0.1
+    decay_epochs: [30, 60, 90]
+    values: [0.1, 0.01, 0.001, 0.0001]
+  regularizer:
+    name: 'L2'
+    coeff: 0.0001
 ```
 
-在`tools/program.py`中使用`create_optimizer`创建优化器和学习率对象。
+在`ppcls/optimizer/__init__.py`中使用`build_optimizer`创建优化器和学习率对象。
 
 ```python
-def create_optimizer(config, parameter_list=None):
-    # create learning_rate instance
-    lr_config = config['LEARNING_RATE']
-    lr_config['params'].update({
-        'epochs': config['epochs'],
-        'step_each_epoch':
-        config['total_images'] // config['TRAIN']['batch_size'],
-    })
-    lr = LearningRateBuilder(**lr_config)()
-
-    # create optimizer instance
-    opt_config = config['OPTIMIZER']
-    opt = OptimizerBuilder(**opt_config)
-    return opt(lr, parameter_list), lr
+def build_optimizer(config, epochs, step_each_epoch, parameters):
+    config = copy.deepcopy(config)
+    # step1 build lr
+    lr = build_lr_scheduler(config.pop('lr'), epochs, step_each_epoch)
+    logger.debug("build lr ({}) success..".format(lr))
+    # step2 build regularization
+    if 'regularizer' in config and config['regularizer'] is not None:
+        reg_config = config.pop('regularizer')
+        reg_name = reg_config.pop('name') + 'Decay'
+        reg = getattr(paddle.regularizer, reg_name)(**reg_config)
+    else:
+        reg = None
+    logger.debug("build regularizer ({}) success..".format(reg))
+    # step3 build optimizer
+    optim_name = config.pop('name')
+    if 'clip_norm' in config:
+        clip_norm = config.pop('clip_norm')
+        grad_clip = paddle.nn.ClipGradByNorm(clip_norm=clip_norm)
+    else:
+        grad_clip = None
+    optim = getattr(optimizer, optim_name)(learning_rate=lr,
+                                           weight_decay=reg,
+                                           grad_clip=grad_clip,
+                                           **config)(parameters=parameters)
+    logger.debug("build optimizer ({}) success..".format(optim))
+    return optim, lr
  ```
 
  不同优化器和权重衰减策略均以类的形式实现，具体实现可以参考文件`ppcls/optimizer/optimizer.py`；不同的学习率衰减策略可以参考文件`ppcls/optimizer/learning_rate.py`。
@@ -210,27 +189,22 @@ def create_optimizer(config, parameter_list=None):
 模型在训练的时候，可以设置模型保存的间隔，也可以选择每隔若干个epoch对验证集进行评估，从而可以保存在验证集上精度最佳的模型。配置文件中，可以通过下面的字段进行配置。
 
 ```yaml
-save_interval: 1 # 模型保存的epoch间隔
-validate: True # 是否进行训练时评估
-valid_interval: 1 # 评估的epoch间隔
+Global:
+  save_interval: 1 # 模型保存的epoch间隔
+  eval_during_train: True # 是否进行训练时评估
+  eval_interval: 1 # 评估的epoch间隔
 ```
 
 模型存储是通过 Paddle 框架的 `paddle.save()` 函数实现的，存储的是模型的 persistable 版本，便于继续训练。具体实现如下
 
 ```python
-def save_model(net, optimizer, model_path, epoch_id, prefix='ppcls'):
-    # just save model in trainer_id=0
-    if paddle.distributed.get_rank() != 0:
-        return
+ef save_model(program, model_path, epoch_id, prefix='ppcls'):
     model_path = os.path.join(model_path, str(epoch_id))
     _mkdir_if_not_exist(model_path)
     model_prefix = os.path.join(model_path, prefix)
-    # save student model during distillation
-    _save_student_model(net, model_prefix)
-
-    paddle.save(net.state_dict(), model_prefix + ".pdparams")
-    paddle.save(optimizer.state_dict(), model_prefix + ".pdopt")
-    logger.info("Already save model in {}".format(model_path))
+    paddle.static.save(program, model_prefix)
+    logger.info(
+        logger.coloring("Already save model in {}".format(model_path), "HEADER"))
 ```
 
 在保存的时候有两点需要注意：

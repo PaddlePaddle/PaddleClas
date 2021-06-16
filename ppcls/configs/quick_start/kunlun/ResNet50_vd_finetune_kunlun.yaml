@@ -1,0 +1,69 @@
+mode: 'train'
+ARCHITECTURE:
+    name: 'ResNet50_vd'
+pretrained_model: "./pretrained/ResNet50_vd_pretrained"
+load_static_weights: true
+model_save_dir: "./output/"
+classes_num: 102
+total_images: 1020
+save_interval: 1
+validate: True
+valid_interval: 1
+epochs: 20
+topk: 5
+image_shape: [3, 224, 224]
+
+LEARNING_RATE:
+    function: 'Cosine'          
+    params:                   
+        lr: 0.00375
+
+OPTIMIZER:
+    function: 'Momentum'
+    params:
+        momentum: 0.9
+    regularizer:
+        function: 'L2'
+        factor: 0.000001
+
+TRAIN:
+    batch_size: 20
+    num_workers: 1
+    file_list: "./dataset/flowers102/train_list.txt"
+    data_dir: "./dataset/flowers102/"
+    shuffle_seed: 0
+    transforms:
+        - DecodeImage:
+            to_rgb: True
+            channel_first: False
+        - RandCropImage:
+            size: 224
+        - RandFlipImage:
+            flip_code: 1
+        - NormalizeImage:
+            scale: 1./255.
+            mean: [0.485, 0.456, 0.406]
+            std: [0.229, 0.224, 0.225]
+            order: ''
+        - ToCHWImage:
+
+VALID:
+    batch_size: 20
+    num_workers: 1
+    file_list: "./dataset/flowers102/val_list.txt"
+    data_dir: "./dataset/flowers102/"
+    shuffle_seed: 0
+    transforms:
+        - DecodeImage:
+            to_rgb: True
+            channel_first: False
+        - ResizeImage:
+            resize_short: 256
+        - CropImage:
+            size: 224
+        - NormalizeImage:
+            scale: 1.0/255.0
+            mean: [0.485, 0.456, 0.406]
+            std: [0.229, 0.224, 0.225]
+            order: ''
+        - ToCHWImage:
