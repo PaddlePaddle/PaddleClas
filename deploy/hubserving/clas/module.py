@@ -22,10 +22,10 @@ import numpy as np
 import paddle.nn as nn
 from paddlehub.module.module import moduleinfo, serving
 
-from deploy.hubserving.clas.params import get_default_confg
-from deploy.python.predict_cls import ClsPredictor
-from deploy.utils import config
-from deploy.utils.encode_decode import b64_to_np
+from hubserving.clas.params import get_default_confg
+from python.predict_cls import ClsPredictor
+from utils import config
+from utils.encode_decode import b64_to_np
 
 
 @moduleinfo(
@@ -94,7 +94,7 @@ if __name__ == "__main__":
     import paddlehub as hub
 
     module = hub.Module(name="clas_system")
-    img_path = "./deploy/hubserving/ILSVRC2012_val_00006666.JPEG"
+    img_path = "./hubserving/ILSVRC2012_val_00006666.JPEG"
     img = cv2.imread(img_path)[:, :, ::-1]
     img = cv2.resize(img, (224, 224)).transpose((2, 0, 1))
     res = module.predict([img.astype(np.float32)])

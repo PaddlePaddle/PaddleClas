@@ -15,7 +15,7 @@
 import os
 import sys
 __dir__ = os.path.dirname(os.path.abspath(__file__))
-sys.path.append(os.path.abspath(os.path.join(__dir__, '../../')))
+sys.path.append(os.path.abspath(os.path.join(__dir__, '../')))
 
 import time
 import requests
@@ -26,11 +26,11 @@ import argparse
 import numpy as np
 import cv2
 
-from ppcls.utils import logger
-from deploy.utils.get_image_list import get_image_list
-from deploy.utils import config
-from deploy.utils.encode_decode import np_to_b64
-from deploy.python.preprocess import create_operators
+from utils import logger
+from utils.get_image_list import get_image_list
+from utils import config
+from utils.encode_decode import np_to_b64
+from python.preprocess import create_operators
 
 preprocess_config = [{
     'ResizeImage': {
@@ -53,7 +53,6 @@ preprocess_config = [{
 
 
 def main(args):
-    logger.init_logger()
     image_path_list = get_image_list(args.image_file)
     headers = {"Content-type": "application/json"}
     preprocess_ops = create_operators(preprocess_config)

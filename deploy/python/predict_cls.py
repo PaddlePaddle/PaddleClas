@@ -15,17 +15,17 @@ import os
 import sys
 
 __dir__ = os.path.dirname(os.path.abspath(__file__))
-sys.path.append(os.path.abspath(os.path.join(__dir__, '../../')))
+sys.path.append(os.path.abspath(os.path.join(__dir__, '../')))
 
 import cv2
 import numpy as np
 
-from deploy.utils import logger
-from deploy.utils import config
-from deploy.utils.predictor import Predictor
-from deploy.utils.get_image_list import get_image_list
-from deploy.python.preprocess import create_operators
-from deploy.python.postprocess import build_postprocess
+from utils import logger
+from utils import config
+from utils.predictor import Predictor
+from utils.get_image_list import get_image_list
+from python.preprocess import create_operators
+from python.postprocess import build_postprocess
 
 
 class ClsPredictor(Predictor):

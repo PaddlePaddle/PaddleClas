@@ -20,7 +20,7 @@ from __future__ import print_function
 def get_default_confg():
     return {
         'Global': {
-            "inference_model_dir": "./inference/",
+            "inference_model_dir": "../inference/",
             "batch_size": 1,
             'use_gpu': False,
             'use_fp16': False,
@@ -35,6 +35,6 @@ def get_default_confg():
         'PostProcess': {
             'name': 'Topk',
             'topk': 5,
-            'class_id_map_file': './ppcls/utils/imagenet1k_label_list.txt'
+            'class_id_map_file': './utils/imagenet1k_label_list.txt'
         }
     }
