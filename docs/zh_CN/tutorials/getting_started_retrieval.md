@@ -25,8 +25,8 @@ PaddleClas目前支持的训练/评估环境如下：
 ```
 python tools/train.py \
     -c configs/quick_start/ResNet50_vd_finetune_retrieval.yaml \
-    -o pretrained_model="" \
-    -o use_gpu=True
+    -o Global.pretrained_model="" \
+    -o Global.use_gpu=True
 ```
 
 其中，`-c`用于指定配置文件的路径，`-o`用于指定需要修改或者添加的参数，其中`-o pretrained_model=""`表示不使用预训练模型，`-o use_gpu=True`表示使用GPU进行训练。如果希望使用CPU进行训练，则需要将`use_gpu`设置为`False`。
@@ -43,12 +43,10 @@ python tools/train.py \
 python tools/train.py \
     -c configs/quick_start/ResNet50_vd_finetune_retrieval.yaml \
     -o Arch.Backbone.pretrained=True
-    -o use_gpu=True
+    -o Global.use_gpu=True
 ```
 
-其中`-o pretrained_model`用于设置加载预训练模型权重文件的地址，使用时需要换成自己的预训练模型权重文件的路径，也可以直接在配置文件中修改该路径。
-
-我们也提供了大量基于`ImageNet-1k`数据集的预训练模型，模型列表及下载地址详见[模型库概览](../models/models_intro.md)。
+其中`-o Arch.Backbone.pretrained`用于设置是否加载预训练模型；为True时，会自动下载预训练模型，并加载。
 
 <a name="1.3"></a>
 ### 1.3 模型恢复训练
@@ -58,15 +56,15 @@ python tools/train.py \
 ```
 python tools/train.py \
     -c configs/quick_start/ResNet50_vd_finetune_retrieval.yaml \
-    -o checkpoints="./output/RecModel/ppcls_epoch_5" \
-    -o last_epoch=5 \
-    -o use_gpu=True
+    -o Global.checkpoints="./output/RecModel/ppcls_epoch_5" \
+    -o Global.last_epoch=5 \
+    -o Global.use_gpu=True
 ```
 
-其中配置文件不需要做任何修改，只需要在继续训练时设置`checkpoints`参数即可，表示加载的断点权重文件路径，使用该参数会同时加载保存的断点权重和学习率、优化器等信息。
+其中配置文件不需要做任何修改，只需要在继续训练时设置`Global.checkpoints`参数即可，表示加载的断点权重文件路径，使用该参数会同时加载保存的断点权重和学习率、优化器等信息。
 
 **注意**：
-* 参数`-o last_epoch=5`表示将上一次训练轮次数记为`5`，即本次训练轮次数从`6`开始计算，该值默认为-1，表示本次训练轮次数从`0`开始计算。
+* 参数`-o Global.last_epoch=5`表示将上一次训练轮次数记为`5`，即本次训练轮次数从`6`开始计算，该值默认为-1，表示本次训练轮次数从`0`开始计算。
 
 * `-o checkpoints`参数无需包含断点权重文件的后缀名，上述训练命令会在训练过程中生成如下所示的断点权重文件，若想从断点`5`继续训练，则`checkpoints`参数只需设置为`"./output/RecModel/ppcls_epoch_5"`，PaddleClas会自动补充后缀名。
 
@@ -78,7 +76,7 @@ python tools/train.py \
 ```bash
 python tools/eval.py \
     -c ./configs/quick_start/ResNet50_vd_finetune_retrieval.yaml \
-    -o pretrained_model="./output/RecModel/best_model"\
+    -o Global.pretrained_model="./output/RecModel/best_model"\
 ```
 
 上述命令将使用`./configs/quick_start/ResNet50_vd_finetune_retrieval.yaml`作为配置文件，对上述训练得到的模型`./output/RecModel/best_model`进行评估。你也可以通过更改配置文件中的参数来设置评估，也可以通过`-o`参数更新配置，如上所示。
@@ -110,8 +108,8 @@ python -m paddle.distributed.launch \
     --gpus="0,1,2,3" \
     tools/train.py \
         -c ./configs/quick_start/ResNet50_vd_finetune_retrieval.yaml \
-        -o pretrained_model="" \
-        -o use_gpu=True
+        -o Global.pretrained_model="" \
+        -o Global.use_gpu=True
 ```
 `-o`用于指定需要修改或者添加的参数，其中`-o pretrained_model=""`表示不使用预训练模型，`-o use_gpu=True`表示使用GPU进行训练。
 
@@ -144,9 +142,9 @@ python -m paddle.distributed.launch \
     --gpus="0,1,2,3" \
     tools/train.py \
         -c ./configs/quick_start/ResNet50_vd_finetune_retrieval.yaml \
-        -o checkpoints="./output/RecModel/ppcls_epoch_5" \
-        -o last_epoch=5 \
-        -o use_gpu=True
+        -o Global.checkpoints="./output/RecModel/ppcls_epoch_5" \
+        -o Global.last_epoch=5 \
+        -o Global.use_gpu=True
 ```
 
 其中配置文件不需要做任何修改，只需要在训练时设置`checkpoints`参数与`last_epoch`参数即可，该参数表示加载的断点权重文件路径，使用该参数会同时加载保存的模型参数权重和学习率、优化器等信息，详见[1.3 模型恢复训练](#1.3)。
@@ -159,7 +157,7 @@ python -m paddle.distributed.launch \
 ```bash
 python tools/eval.py \
     -c ./configs/quick_start/ResNet50_vd_finetune_retrieval.yaml \
-    -o pretrained_model="./output/RecModel/best_model"\
+    -o Global.pretrained_model="./output/RecModel/best_model"\
 ```
 
 参数说明详见[1.4 模型评估](#1.4)。
@@ -173,14 +171,14 @@ python tools/eval.py \
 
 ```bash
 python tools/export_model.py \
-    --pretrained_model ./output/RecModel/best_model \
-    --output_path ./inference \
+    --Global.pretrained_model ./output/RecModel/best_model \
+    --Global.save_inference_dir ./inference \
 ```
 
 其中，`--pretrained_model`用于指定模型文件路径，该路径仍无需包含模型文件后缀名（如[1.3 模型恢复训练](#1.3)），`--output_path`用于指定转换后模型的存储路径。
 
 **注意**：
-1. `--output_path`表示输出的inference模型文件夹路径，若`--output_path=./inference`，则会在`inference`文件夹下生成`inference.pdiparams`、`inference.pdmodel`和`inference.pdiparams.info`文件。
+1. `--save_inference_dir`表示输出的inference模型文件夹路径，若`--save_inference_dir=./inference`，则会在`inference`文件夹下生成`inference.pdiparams`、`inference.pdmodel`和`inference.pdiparams.info`文件。
 2. 可以通过设置参数`--img_size`指定模型输入图像的`shape`，默认为`224`，表示图像尺寸为`224*224`，请根据实际情况修改。
 
 ### 3.2 构建底库
