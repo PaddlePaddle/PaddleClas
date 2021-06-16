@@ -1,11 +1,11 @@
 Global:
   infer_imgs: "./dataset/product_demo_data_v1.0/query"
   det_inference_model_dir: "./models/ppyolov2_r50vd_dcn_mainbody_v1.0_infer"
-  rec_inference_model_dir: "./models/product_ResNet50_vd_Inshop_v1.0_infer"
+  rec_inference_model_dir: "./models/product_ResNet50_vd_aliproduct_v1.0_infer"
   batch_size: 1
   image_shape: [3, 640, 640]
-  threshold: 0.0
-  max_det_results: 1
+  threshold: 0.2
+  max_det_results: 2
   labe_list:
   - foreground
 

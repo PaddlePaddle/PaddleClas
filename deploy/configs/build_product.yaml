@@ -1,5 +1,5 @@
 Global:
-  rec_inference_model_dir: "./models/product_ResNet50_vd_Inshop_v1.0_infer"
+  rec_inference_model_dir: "./models/product_ResNet50_vd_aliproduct_v1.0_infer"
   batch_size: 1
   use_gpu: True
   enable_mkldnn: True
