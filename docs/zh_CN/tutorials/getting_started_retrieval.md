@@ -168,6 +168,7 @@ python python/build_gallery.py \
 + `IndexProcess.index_path`：gallery库index的路径
 + `IndexProcess.image_root`：gallery库图片的根目录
 + `IndexProcess.data_file`：gallery库图片的文件列表
+执行完上述命令之后，会在`../dataset/flowers102`目录下面生成`index`目录，index目录下面包含3个文件`index.data`, `1index.graph`, `info.json`
 
 ### 3.3 推理预测
 
@@ -186,3 +187,8 @@ python python/predict_rec.py \
 + `Global.rec_inference_model_dir`：预测模型文件路径，如 `./inference/`
 + `Global.use_tensorrt`：是否使用 TesorRT 预测引擎，默认值：`True`
 + `Global.use_gpu`：是否使用 GPU 预测，默认值：`True` 
+执行完上述命令之后，会得到输入图片对应的特征信息； 本例子中特征维度为2048；显示如下：
+```
+(1, 2048)
+[[0.00033124 0.00056205 0.00032261 ... 0.00030939 0.00050748 0.00030271]]
+```
