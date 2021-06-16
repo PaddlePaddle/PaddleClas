@@ -177,7 +177,7 @@ python python/build_gallery.py \
 python python/predict_rec.py \
     -c configs/inference_flowers.yaml \
     -o Global.infer_imgs="./images/image_00002.jpg" \
-    -o Global.rec_inference_model_dir="./inference"
+    -o Global.rec_inference_model_dir="./inference" \
     -o Global.use_gpu=True \
     -o Global.use_tensorrt=False
 ```
