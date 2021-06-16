@@ -10,6 +10,7 @@
 
 论文地址：https://arxiv.org/pdf/1907.1339
 
+
 ## 参数设置
-详细的参数设置见[ResNet50_icartoon.yaml](../../../ppcls/configs/Cartoon/ResNet50_icartoon.yaml)
+详细的参数设置见. [ResNet50_icartoon.yaml](../../../../ppcls/configs/Cartoon/ResNet50_icartoon.yaml)
 
