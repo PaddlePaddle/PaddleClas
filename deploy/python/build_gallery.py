@@ -37,7 +37,7 @@ def split_datafile(data_file, image_root, delimiter="\t"):
     '''
     gallery_images = []
     gallery_docs = []
-    with open(data_file) as f:
+    with open(data_file, 'r', encoding='utf-8') as f:
         lines = f.readlines()
         for i, line in enumerate(lines):
             line = line.strip().split(delimiter)
