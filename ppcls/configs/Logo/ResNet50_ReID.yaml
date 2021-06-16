@@ -93,7 +93,6 @@ DataLoader:
         use_shared_memory: False
   Eval:
     Query:
-      # TOTO: modify to the latest trainer
       dataset:
         name: LogoDataset
         image_root: "dataset/LogoDet-3K-crop/val/"
@@ -119,7 +118,6 @@ DataLoader:
           use_shared_memory: True
 
     Gallery:
-      # TOTO: modify to the latest trainer
       dataset:
           name: LogoDataset
           image_root: "dataset/LogoDet-3K-crop/train/"

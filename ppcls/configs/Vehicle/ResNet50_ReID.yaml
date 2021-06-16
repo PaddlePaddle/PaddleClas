@@ -103,7 +103,6 @@ DataLoader:
         use_shared_memory: False
   Eval:
     Query:
-    # TOTO: modify to the latest trainer
       dataset: 
         name: "VeriWild"
         image_root: "./dataset/VeRI-Wild/images"
@@ -129,7 +128,6 @@ DataLoader:
         use_shared_memory: False
 
     Gallery:
-    # TOTO: modify to the latest trainer
       dataset: 
         name: "VeriWild"
         image_root: "./dataset/VeRI-Wild/images"
