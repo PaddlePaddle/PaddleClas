@@ -25,7 +25,7 @@ from numpy.ctypeslib import ndpointer
 
 __dir__ = os.path.dirname(os.path.abspath(__file__))
 if platform.system() == "Windows":
-    lib_filename = "index.exe"
+    lib_filename = "index.dll"
 else:
     lib_filename = "index.so"
 so_path = os.path.join(__dir__, lib_filename)

@@ -1,7 +1,7 @@
 CXX=g++
 
 ifeq ($(OS),Windows_NT)
- postfix=exe
+ postfix=dll
 else
  postfix=so
 endif

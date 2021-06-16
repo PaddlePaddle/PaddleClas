@@ -13,7 +13,7 @@ Mobius 算法细节详见论文 （[Möbius Transformation for Fast Inner Produc
 
 ### 2.1 直接使用提供的库文件
 
-该文件夹下有已经编译好的`index.so`(gcc8.2.0下编译，用于Linux)以及`index.exe`(gcc10.3.0下编译，用于Windows)，可以跳过2.2与2.3节，直接使用。
+该文件夹下有已经编译好的`index.so`(gcc8.2.0下编译，用于Linux)以及`index.dll`(gcc10.3.0下编译，用于Windows)，可以跳过2.2与2.3节，直接使用。
 
 如果因为gcc版本过低或者环境不兼容的问题，导致库文件无法使用，则需要在不同的平台下手动编译库文件。
 
@@ -48,7 +48,7 @@ Windows上首先需要安装gcc编译工具，推荐使用[TDM-GCC](https://jmeu
 
 安装完成后，可以打开一个命令行终端，通过命令`gcc -v`查看gcc版本。
 
-在该文件夹下，运行命令`mingw32-make`，即可生成`index.exe`库文件。如果希望重新生成`index.exe`文件，可以首先使用`mingw32-make clean`清除已经生成的缓存，再使用`mingw32-make`生成更新之后的库文件。
+在该文件夹下，运行命令`mingw32-make`，即可生成`index.dll`库文件。如果希望重新生成`index.dll`文件，可以首先使用`mingw32-make clean`清除已经生成的缓存，再使用`mingw32-make`生成更新之后的库文件。
 
 
 ## 3. 快速使用
