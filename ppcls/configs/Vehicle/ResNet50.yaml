@@ -102,7 +102,6 @@ DataLoader:
         use_shared_memory: True
 
   Eval:
-    # TOTO: modify to the latest trainer
     dataset: 
         name: "CompCars"
         image_root: "./dataset/CompCars/image/"
