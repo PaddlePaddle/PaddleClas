@@ -29,39 +29,13 @@ Aliproduct数据是天池竞赛开源的一个数据集，也是目前开源的�
 
  - 在GAP后、分类层前加入一个512维的embedding FC层，没有做BatchNorm和激活。
 
-配置文件如下，其中BackboneStopLayer定义了backbone的输出层，在此处为GAP经过flatten后的层，Neck部分为embedding层，也是最后表示特征的层，Head部分为分类层，其输出维度等于训练数据集的类别数。
 
-```yaml
-Arch:
-  name: RecModel
-  Backbone:
-    name: ResNet50_vd
-    pretrained: True
-  BackboneStopLayer:
-    name: flatten_0
-  Neck:
-    name: FC
-    embedding_size: 2048
-    class_num: 512
-  Head:
-    name: FC
-    embedding_size: 512
-    class_num: 50030
-```
-   
 ### 4 Loss的设置
 
-在Aliproduct商品识别中，使用了[CELoss](../../../ppcls/loss/celoss.py)训练, 为了获得更加鲁棒的特征，后续会使用其他Loss参与训练，敬请期待。配置文件如下：
+在Aliproduct商品识别中，使用了[CELoss](../../../ppcls/loss/celoss.py)训练, 为了获得更加鲁棒的特征，后续会使用其他Loss参与训练，敬请期待。
 
-```yaml
-Loss:
-  Train:
-    - CELoss:
-        weight: 1.0
-  Eval:
-    - CELoss:
-        weight: 1.0
-```
+全部的超参数及具体配置：[ResNet50_vd_Aliproduct.yaml](../../../ppcls/configs/Products/ResNet50_vd_Aliproduct.yaml)
+
 
 ## 2 Inshop
 
@@ -87,46 +61,10 @@ Inshop数据集是DeepFashion的子集，其是香港中文大学开放的一个
 
  - 在GAP后、分类层前加入一个512维的embedding FC层，没有做BatchNorm和激活。
  
- - 分类层采用Arcmargin Head，具体原理可参考[原论文](https://arxiv.org/pdf/1801.07698.pdf)。
-
-配置文件如下，其中BackboneStopLayer定义了backbone的输出层，在此处为GAP经过flatten后的层，Neck部分为embedding层，也是最后表示特征的层，Head部分为arcmargin head, 代码实现为[arcmargin.py](../../../ppcls/arch/gears/arcmargin.py)，其输出维度等于训练数据集的类别数。
-
-```yaml
-Arch:
-  name: RecModel
-  infer_output_key: features
-  infer_add_softmax: False
-
-  Backbone:
-    name: ResNet50_vd
-    pretrained: False
-  BackboneStopLayer:
-    name: flatten_0
-  Neck:
-    name: FC
-    embedding_size: 2048
-    class_num: 512
-  Head:
-    name: ArcMargin
-    embedding_size: 512
-    class_num: 3997
-    margin: 0.15
-    scale: 30
-```
+ - 分类层采用[Arcmargin Head](../../../ppcls/arch/gears/arcmargin.py)，具体原理可参考[原论文](https://arxiv.org/pdf/1801.07698.pdf)。
    
 ### 4 Loss的设置
 
-在Inshop商品识别中，使用了[CELoss](../../../ppcls/loss/celoss.py)和[TripletLossV2](../../../ppcls/loss/triplet.py)联合训练。配置文件如下：
+在Inshop商品识别中，使用了[CELoss](../../../ppcls/loss/celoss.py)和[TripletLossV2](../../../ppcls/loss/triplet.py)联合训练。
 
-```yaml
-Loss:
-  Train:
-    - CELoss:
-        weight: 1.0
-    - TripletLossV2:
-        weight: 1.0
-        margin: 0.5
-  Eval:
-    - CELoss:
-        weight: 1.0
-```
+全部的超参数及具体配置：[ResNet50_vd_Inshop.yaml](../../../ppcls/configs/Products/ResNet50_vd_Inshop.yaml)
