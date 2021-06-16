@@ -24,7 +24,7 @@ PaddleClas目前支持的训练/评估环境如下：
 
 ```
 python tools/train.py \
-    -c configs/quick_start/ResNet50_flowers_retrieval_finetune.yaml \
+    -c configs/quick_start/ResNet50_vd_finetune_retrieval.yaml \
     -o pretrained_model="" \
     -o use_gpu=True
 ```
@@ -41,7 +41,7 @@ python tools/train.py \
 
 ```
 python tools/train.py \
-    -c configs/quick_start/ResNet50_flowers_retrieval_finetune.yaml \
+    -c configs/quick_start/ResNet50_vd_finetune_retrieval.yaml \
     -o Arch.Backbone.pretrained=True
     -o use_gpu=True
 ```
@@ -57,7 +57,7 @@ python tools/train.py \
 
 ```
 python tools/train.py \
-    -c configs/quick_start/ResNet50_flowers_retrieval_finetune.yaml \
+    -c configs/quick_start/ResNet50_vd_finetune_retrieval.yaml \
     -o checkpoints="./output/RecModel/ppcls_epoch_5" \
     -o last_epoch=5 \
     -o use_gpu=True
@@ -77,11 +77,11 @@ python tools/train.py \
 
 ```bash
 python tools/eval.py \
-    -c ./configs/quick_start/ResNet50_flowers_retrieval_finetune.yaml \
+    -c ./configs/quick_start/ResNet50_vd_finetune_retrieval.yaml \
     -o pretrained_model="./output/RecModel/best_model"\
 ```
 
-上述命令将使用`./configs/quick_start/ResNet50_flowers_retrieval_finetune.yaml`作为配置文件，对上述训练得到的模型`./output/RecModel/best_model`进行评估。你也可以通过更改配置文件中的参数来设置评估，也可以通过`-o`参数更新配置，如上所示。
+上述命令将使用`./configs/quick_start/ResNet50_vd_finetune_retrieval.yaml`作为配置文件，对上述训练得到的模型`./output/RecModel/best_model`进行评估。你也可以通过更改配置文件中的参数来设置评估，也可以通过`-o`参数更新配置，如上所示。
 
 <a name="2"></a>
 ## 2. 基于Linux+GPU的模型训练与评估
@@ -100,7 +100,7 @@ export CUDA_VISIBLE_DEVICES=0,1,2,3
 python -m paddle.distributed.launch \
     --gpus="0,1,2,3" \
     tools/train.py \
-        -c ./configs/quick_start/ResNet50_flowers_retrieval_finetune.yaml
+        -c ./configs/quick_start/ResNet50_vd_finetune_retrieval.yaml
 ```
 
 其中，`-c`用于指定配置文件的路径，可通过配置文件修改相关训练配置信息，也可以通过添加`-o`参数来更新配置：
@@ -109,7 +109,7 @@ python -m paddle.distributed.launch \
 python -m paddle.distributed.launch \
     --gpus="0,1,2,3" \
     tools/train.py \
-        -c ./configs/quick_start/ResNet50_flowers_retrieval_finetune.yaml \
+        -c ./configs/quick_start/ResNet50_vd_finetune_retrieval.yaml \
         -o pretrained_model="" \
         -o use_gpu=True
 ```
@@ -127,7 +127,7 @@ export CUDA_VISIBLE_DEVICES=0,1,2,3
 python -m paddle.distributed.launch \
     --gpus="0,1,2,3" \
     tools/train.py \
-        -c ./configs/quick_start/ResNet50_flowers_retrieval_finetune.yaml \
+        -c ./configs/quick_start/ResNet50_vd_finetune_retrieval.yaml \
         -o Arch.Backbone.pretrained=True
 ```
 
@@ -143,7 +143,7 @@ export CUDA_VISIBLE_DEVICES=0,1,2,3
 python -m paddle.distributed.launch \
     --gpus="0,1,2,3" \
     tools/train.py \
-        -c ./configs/quick_start/ResNet50_flowers_retrieval_finetune.yaml \
+        -c ./configs/quick_start/ResNet50_vd_finetune_retrieval.yaml \
         -o checkpoints="./output/RecModel/ppcls_epoch_5" \
         -o last_epoch=5 \
         -o use_gpu=True
@@ -158,7 +158,7 @@ python -m paddle.distributed.launch \
 
 ```bash
 python tools/eval.py \
-    -c ./configs/quick_start/ResNet50_flowers_retrieval_finetune.yaml \
+    -c ./configs/quick_start/ResNet50_vd_finetune_retrieval.yaml \
     -o pretrained_model="./output/RecModel/best_model"\
 ```
 
