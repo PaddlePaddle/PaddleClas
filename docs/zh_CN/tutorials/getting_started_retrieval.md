@@ -139,23 +139,29 @@ python. -m paddle.distributed.launch \
 
 ```bash
 python tools/export_model.py \
-    --Global.pretrained_model ./output/RecModel/best_model \
-    --Global.save_inference_dir ./inference \
+    -c ppcls/configs/quick_start/ResNet50_vd_finetune_retrieval.yaml \
+    -o Global.pretrained_model=./output/RecModel/best_model \
+    -o Global.save_inference_dir=./inference \
 ```
-
 其中，`--Global.pretrained_model`用于指定模型文件路径，该路径仍无需包含模型文件后缀名（如[1.3 模型恢复训练](#1.3)），`--Global.save_inference_dir`用于指定转换后模型的存储路径。
 若`--save_inference_dir=./inference`，则会在`inference`文件夹下生成`inference.pdiparams`、`inference.pdmodel`和`inference.pdiparams.info`文件。
 
 ### 3.2 构建底库
-通过检索方式来进行图像识别，需要构建底库。底库构建方式如下：
+通过检索方式来进行图像识别，需要构建底库。
+首先, 将生成的模型拷贝到deploy目录下，并进入deploy目录：
 ```bash
+mv ./inference ./deploy
 cd deploy
+```
+
+其次，构建底库，命令如下：
+```bash
 python python/build_gallery.py 
        -c configs/build_flowers.yaml \
-       -o Global.rec_inference_model_dir "../inference" \
-       -o IndexProcess.index_path "../dataset/index" \
-       -o IndexProcess.image_root: "../dataset" \
-       -o IndexProcess.data_file: "../dataset/train_list.txt" 
+       -o Global.rec_inference_model_dir "./inference" \
+       -o IndexProcess.index_path  "../dataset/flowers102/index" \
+       -o IndexProcess.image_root: "../dataset/flowers102/" \
+       -o IndexProcess.data_file: "../dataset/flowers102/train_list.txt" 
 ```
 其中
 + `Global.rec_inference_model_dir`：3.1生成的推理模型的路径
@@ -171,12 +177,12 @@ python python/build_gallery.py
 python python/predict_rec.py \
     -c configs/inference_flowers.yaml \
     -o Global.infer_imgs 图片路径 \
-    -o Global.rec_inference_model_dir "./inference"
+    -o Global.rec_inference_model_dir "../inference"
     -o Global.use_gpu=True \
     -o Global.use_tensorrt=False
 ```
 其中：
 + `Global.infer_imgs`：待预测的图片文件路径，如 `./test.jpeg`
-+ `Global.rec_inference_model_dir`：模型结构文件路径，如 `./inference/`
++ `Global.rec_inference_model_dir`：模型结构文件路径，如 `../inference/`
 + `Global.use_tensorrt`：是否使用 TesorRT 预测引擎，默认值：`True`
 + `Global.use_gpu`：是否使用 GPU 预测，默认值：`True` 
