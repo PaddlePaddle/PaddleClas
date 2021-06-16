@@ -1,7 +1,7 @@
 # 开始使用
 ## 注意:  本文主要介绍基于检索方式的识别
 ---
-请参考[安装指南](./install.md)配置运行环境，并根据[快速开始](./quick_start_new_user.md)文档准备flower102数据集，本章节下面所有的实验均以flower102数据集为例。
+请参考[安装指南](./install.md)配置运行环境，并根据[快速开始](./quick_start_new_user.md)文档准备flowers102数据集，本章节下面所有的实验均以flowers102数据集为例。
 
 PaddleClas目前支持的训练/评估环境如下：
 ```shell
