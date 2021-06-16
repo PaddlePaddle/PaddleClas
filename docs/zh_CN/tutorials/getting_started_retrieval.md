@@ -158,10 +158,10 @@ cd deploy
 ```bash
 python python/build_gallery.py \
        -c configs/build_flowers.yaml \
-       -o Global.rec_inference_model_dir "./inference" \
-       -o IndexProcess.index_path  "../dataset/flowers102/index" \
-       -o IndexProcess.image_root: "../dataset/flowers102/" \
-       -o IndexProcess.data_file: "../dataset/flowers102/train_list.txt" 
+       -o Global.rec_inference_model_dir="./inference" \
+       -o IndexProcess.index_path="../dataset/flowers102/index" \
+       -o IndexProcess.image_root="../dataset/flowers102/" \
+       -o IndexProcess.data_file="../dataset/flowers102/train_list.txt" 
 ```
 其中
 + `Global.rec_inference_model_dir`：3.1生成的推理模型的路径
@@ -176,8 +176,8 @@ python python/build_gallery.py \
 ```bash
 python python/predict_rec.py \
     -c configs/inference_flowers.yaml \
-    -o Global.infer_imgs 图片路径 \
-    -o Global.rec_inference_model_dir "../inference"
+    -o Global.infer_imgs="../dataset/flowers/jpg/image_00001.jpg" \
+    -o Global.rec_inference_model_dir="./inference"
     -o Global.use_gpu=True \
     -o Global.use_tensorrt=False
 ```
