@@ -232,6 +232,10 @@ python3 tools/export_model.py \
 
 其中，`Global.pretrained_model`用于指定模型文件路径，该路径仍无需包含模型文件后缀名（如[1.3 模型恢复训练](#1.3)）。
 
+**注意**：
+1. `--output_path`表示输出的inference模型文件夹路径，若`--output_path=./inference`，则会在`inference`文件夹下生成`inference.pdiparams`、`inference.pdmodel`和`inference.pdiparams.info`文件。
+2. 可以通过设置参数`--img_size`指定模型输入图像的`shape`，默认为`224`，表示图像尺寸为`224*224`，请根据实际情况修改；如果使用`Transformer`系列模型，如`DeiT_***_384`, `ViT_***_384`等，请注意模型的输入数据尺寸，需要设置参数`img_size=384`。
+
 
 上述命令将生成模型结构文件（`inference.pdmodel`）和模型权重文件（`inference.pdiparams`），然后可以使用预测引擎进行推理：
 
@@ -249,7 +253,7 @@ python3 python/predict_cls.py \
     -o Global.infer_imgs=../dataset/flowers102/jpg/image_00001.jpg \
     -o Global.inference_model_dir=../inference/ \
     -o PostProcess.class_id_map_file=None
-    
+
 
 其中：
 + `Global.infer_imgs`：待预测的图片文件路径。
@@ -258,5 +262,7 @@ python3 python/predict_cls.py \
 + `Global.use_gpu`：是否使用 GPU 预测，默认值：`True`
 + `Global.enable_mkldnn`：是否启用`MKL-DNN`加速，默认为`False`。注意`enable_mkldnn`与`use_gpu`同时为`True`时，将忽略`enable_mkldnn`，而使用GPU运行。
 + `Global.use_fp16`：是否启用`FP16`，默认为`False`。
+
+**注意**: 如果使用`Transformer`系列模型，如`DeiT_***_384`, `ViT_***_384`等，请注意模型的输入数据尺寸，需要设置参数`resize_short=384`, `resize=384`。
 
 * 如果你希望提升评测模型速度，使用gpu评测时，建议开启TensorRT加速预测，使用cpu评测时，建议开启MKL-DNN加速预测。

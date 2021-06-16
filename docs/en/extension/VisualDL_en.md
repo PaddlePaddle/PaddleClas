@@ -10,7 +10,7 @@ Now PaddleClas support use VisualDL to visualize the changes of learning rate, l
 You only need to set the `vdl_dir` field in train config:
 
 ```yaml
-# confit.txt
+# config.yaml
 vdl_dir: "./vdl.log"
 ```
 
@@ -19,7 +19,7 @@ vdl_dir: "./vdl.log"
 Then normal start training:
 
 ```shell
-python3 tools/train.py -c config.txt
+python3 tools/train.py -c config.yaml
 ```
 
 ### Start VisualDL
