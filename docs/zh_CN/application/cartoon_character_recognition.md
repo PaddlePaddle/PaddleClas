@@ -21,20 +21,14 @@
 
 ## 2 Backbone的具体设置
 
-具体是用`ResNet50`作为backbone，主要做了如下修改：
-
- - 使用ImageNet预训练模型
+具体是用`ResNet50`作为backbone，主要做了如下优化：
+- 加载预训练模型
+- 采用更大的网络进行蒸馏
 
 
 ## 3 Loss的设置
 
-在Logo识别中，使用了[Pairwise Cosface + CircleMargin](https://arxiv.org/abs/2002.10857) 联合训练，其中权重比例为1:1
 
-具体代码详见：[PairwiseCosface](../../../ppcls/loss/pairwisecosface.py) 、[CircleMargin](../../../ppcls/arch/gears/circlemargin.py)
+其他部分参数，详见[配置文件](../../../ppcls/configs/Cartoon/ResNet50_icartoon.yaml)。
 
-
-其他部分参数，详见[配置文件](../../../ppcls/configs/Logo/ResNet50_ReID.yaml)。
-
-## 参数设置
-详细的参数设置见. [ResNet50_icartoon.yaml](../../../../ppcls/configs/Cartoon/ResNet50_icartoon.yaml)
 
