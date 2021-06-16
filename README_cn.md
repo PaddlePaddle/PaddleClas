@@ -8,7 +8,10 @@
 
 **近期更新**
 
-- 2021.06.16 PaddleClas v2.2版本升级，集成Metric learning，向量检索等组件，新增4个图像识别应用。
+- 2021.06.16 PaddleClas v2.2版本升级
+   - 集成Metric learning，向量检索等组件。
+   - 新增商品识别、动漫人物识别、车辆识别和logo识别等4个图像识别应用。
+   - 新增xxx模型（todo @崔程）
 - [more](./docs/zh_CN/update_history.md)
 
 
@@ -43,23 +46,22 @@
 ## 文档教程
 
 - [快速安装](./docs/zh_CN/tutorials/install.md)
-- 图像识别快速体验(若愚)
-- 图像分类快速体验(崔程，基于30分钟入门版修改)
+- [图像识别快速体验](./docs/zh_CN/tutorials/quick_start_recognition.md)
+- [图像分类快速体验](./docs/zh_CN/tutorials/quick_start_new_user.md)
 - 算法介绍
-    - 图像识别系统] (胜禹)
-    - [模型库介绍和预训练模型](./docs/zh_CN/models/models_intro.md)
-    - [图像分类]
-        - ImageNet分类任务(崔程,基于30分钟进阶版修改)
-        - [多标签分类任务]()
-    - [特征学习]
-        - [商品识别]()
-        - [车辆识别]()
-        - [logo识别]()
-        - [动漫人物识别]()
-    - [向量检索]()
+    - [骨干网络模型库和预训练模型介绍](./docs/zh_CN/models/models_intro.md)
+    - [主体检测](./docs/zh_CN/application/object_detection.md)
+    - 图像分类
+        - [ImageNet分类任务](./docs/zh_CN/tutorials/quick_start_professional.md)
+    - 特征学习
+        - [商品识别](todo@崔程)
+        - [车辆识别](./docs/zh_CN/application/vehicle_fine_grained_classfication.md)
+        - [车辆ReID](./docs/zh_CN/application/vehicle_reid.md)
+        - [logo识别](./docs/zh_CN/application/logo_recognition.md)
+    - [向量检索](./deploy/vector_search/README.md)
 - 模型训练/评估
-    - 图像分类任务(崔程，基于原有训练文档整理)
-    - 特征学习任务（陆彬）
+    - [图像分类任务](./docs/zh_CN/tutorials/getting_started.md)
+    - [特征学习任务](./docs/zh_CN/application/feature_learning.md)
 - 模型预测
     - [基于训练引擎预测推理](./docs/zh_CN/tutorials/getting_started.md)
     - [基于Python预测引擎预测推理](./docs/zh_CN/tutorials/getting_started.md)
@@ -74,7 +76,7 @@
     - [数据增广](./docs/zh_CN/advanced_tutorials/image_augmentation/ImageAugment.md)
     - [代码解析与社区贡献指南](./docs/zh_CN/tutorials/quick_start_community.md)
 - FAQ(暂停更新)
-    - [图像分类任务FAQ]
+    - [图像分类任务FAQ](docs/zh_CN/faq.md)
 - [许可证书](#许可证书)
 - [贡献代码](#贡献代码)
 

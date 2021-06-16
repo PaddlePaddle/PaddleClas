@@ -8,13 +8,10 @@ PaddleClas is a toolset for image classification tasks prepared for the industry
 
 **Recent update**
 
-- 2021.05.14 Add `SwinTransformer` series pretrained models, whose Top-1 Acc on ImageNet-1k dataset reaches 87.19%.
-- 2021.04.15 Add `MixNet` and `ReXNet` pretrained models, `MixNet_L`'s Top-1 Acc on ImageNet-1k reaches 78.6% and `ReXNet_3_0` reaches 82.09%.
-- 2021.03.02 Add support for model quantization.
-- 2021.02.01 Add `RepVGG` pretrained models, whose Top-1 Acc on ImageNet-1k dataset reaches 79.65%.
-- 2021.01.27 Add `ViT` and `DeiT` pretrained models, `ViT`'s Top-1 Acc on ImageNet-1k dataset reaches 85.13%, and `DeiT` reaches 85.1%.
-- 2021.01.08 Add support for whl package and its usage, Model inference can be done by simply install paddleclas using pip.
-- 2020.12.16 Add support for TensorRT when using cpp inference to obain more obvious acceleration.
+- 2021.06.16 PaddleClas release/2.2.
+   - Add metric learning and vector search module.
+   - Add product recognition, cartoon character recognition, car recognition and logo recognition.
+   - Add xxx models(todo @崔程)
 - [more](./docs/en/update_history_en.md)
 
 
