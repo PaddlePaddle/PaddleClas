@@ -82,7 +82,6 @@ DataLoader:
       num_workers: 4
       use_shared_memory: True
   Eval:
-    # TOTO: modify to the latest trainer
     dataset: 
       name: ImageNetDataset
       image_root: ./dataset/Aliproduct/
