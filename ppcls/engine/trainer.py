@@ -476,6 +476,10 @@ class Trainer(object):
         has_unique_id = False
         for idx, batch in enumerate(dataloader(
         )):  # load is very time-consuming
+            if idx % self.config["Global"]["print_batch_step"] == 0:
+                logger.info(
+                    f"{name} feature calculation process: [{idx}/{len(dataloader)}]"
+                )
             batch = [paddle.to_tensor(x) for x in batch]
             batch[1] = batch[1].reshape([-1, 1]).astype("int64")
             if len(batch) == 3:
