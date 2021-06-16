@@ -180,7 +180,7 @@ When the index database cannot cover the scenes we actually recognise, i.e. when
 ### 3.1 Build the Base Library Based on Your Own Dataset
 
 
-First, you need to obtain the original images to store in the database (store in `./dataset/logo_demo_data_v1.0/gallery`) and the corresponding label infomation，recording the category of the original images and the label information）store in the text file[data_file_update.txt](./dataset/logo_demo_data_v1.0/data_file_update.txt)
+First, you need to obtain the original images to store in the database (store in `./dataset/logo_demo_data_v1.0/gallery`) and the corresponding label infomation，recording the category of the original images and the label information）store in the text file `./dataset/logo_demo_data_v1.0/data_file_update.txt`
 
 Then use the following command to build the index to accelerate the retrieval process after recognition.
 

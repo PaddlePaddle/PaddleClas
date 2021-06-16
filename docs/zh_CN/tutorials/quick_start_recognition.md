@@ -161,7 +161,7 @@ python3.7 python/predict_system.py -c configs/inference_logo.yaml -o Global.infe
 python3.7 python/predict_system.py -c configs/inference_logo.yaml -o Global.infer_imgs="./dataset/logo_demo_data_v1.0/query/logo_cola.jpg"
 ```
 
-待识别图像如下所示。
+待检索图像如下所示。
 
 <div align="center">
 <img src="../../images/recognition/logo_demo/query/logo_cola.jpg"  width = "400" />
@@ -181,7 +181,7 @@ python3.7 python/predict_system.py -c configs/inference_logo.yaml -o Global.infe
 <a name="基于自己的数据集构建索引库"></a>
 ### 3.1 基于自己的数据集构建索引库
 
-首先需要获取待入库的原始图像文件(保存在`./dataset/logo_demo_data_v1.0/gallery`文件夹中)以及对应的标签信息，记录原始图像文件的文件名与标签信息）保存在文本文件[data_file_update.txt](./dataset/logo_demo_data_v1.0/data_file_update.txt)中）。
+首先需要获取待入库的原始图像文件(保存在`./dataset/logo_demo_data_v1.0/gallery`文件夹中)以及对应的标签信息，记录原始图像文件的文件名与标签信息）保存在文本文件`./dataset/logo_demo_data_v1.0/data_file_update.txt`中）。
 
 然后使用下面的命令构建index索引，加速识别后的检索过程。
 
