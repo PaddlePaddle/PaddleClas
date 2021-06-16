@@ -79,14 +79,12 @@ python3 tools/train.py \
 python3 tools/train.py \
     -c ./ppcls/configs/quick_start/MobileNetV3_large_x1_0.yaml \
     -o Global.checkpoints="./output/MobileNetV3_large_x1_0/epoch_5" \
-    -o Optimizer.lr.last_epoch=5 \
     -o Global.device=gpu
 ```
 
 其中配置文件不需要做任何修改，只需要在继续训练时设置`checkpoints`参数即可，表示加载的断点权重文件路径，使用该参数会同时加载保存的断点权重和学习率、优化器等信息。
 
 **注意**：
-* 参数`-o Optimizer.lr.last_epoch=5`表示将上一次训练轮次数记为`5`，即本次训练轮次数从`6`开始计算，该值默认为-1，表示本次训练轮次数从`0`开始计算。
 
 * `-o Global.checkpoints`参数无需包含断点权重文件的后缀名，上述训练命令会在训练过程中生成如下所示的断点权重文件，若想从断点`5`继续训练，则`Global.checkpoints`参数只需设置为`"../output/MobileNetV3_large_x1_0/epoch_5"`，PaddleClas会自动补充后缀名。
 
