@@ -73,9 +73,6 @@ DataLoader:
         bbox_crop: True
         cls_label_path: "./dataset/CompCars/train_test_split/classification/train_label.txt"
         transform_ops:
-          - DecodeImage:
-              to_rgb: True
-              channel_first: False
           - ResizeImage:
               size: 224
           - RandFlipImage:
@@ -113,9 +110,6 @@ DataLoader:
         cls_label_path: "./dataset/CompCars/train_test_split/classification/test_label.txt"
         bbox_crop: True
         transform_ops:
-          - DecodeImage:
-              to_rgb: True
-              channel_first: False
           - ResizeImage:
               size: 224
           - NormalizeImage:
