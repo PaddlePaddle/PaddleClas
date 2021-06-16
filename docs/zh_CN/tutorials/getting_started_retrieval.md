@@ -68,6 +68,7 @@ python tools/eval.py \
     -c ppcls/configs/quick_start/ResNet50_vd_finetune_retrieval.yaml \
     -o Global.pretrained_model="./output/RecModel/best_model"\
 ```
+其中`-o Global.pretrained_model`用于设置需要进行评估的模型的路径
 
 <a name="2"></a>
 ## 2. 基于Linux+GPU的模型训练与评估
