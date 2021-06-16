@@ -33,27 +33,6 @@ python tools/train.py \
 
 更详细的训练配置，也可以直接修改模型对应的配置文件。具体配置参数参考[配置文档](config.md)。
 
-运行上述命令，可以看到输出日志，示例如下：
-
-* 如果在训练中使用了mixup或者cutmix的数据增广方式，那么日志中将不会打印top-1与top-k（默认为5）信息：
-    ```
-    ...
-    epoch:0  , train step:20   , loss: 4.53660, lr: 0.003750, batch_cost: 1.23101 s, reader_cost: 0.74311 s, ips: 25.99489 images/sec, eta: 0:12:43
-    ...
-    END epoch:1   valid top1: 0.01569, top5: 0.06863, loss: 4.61747,  batch_cost: 0.26155 s, reader_cost: 0.16952 s, batch_cost_sum: 10.72348 s, ips: 76.46772 images/sec.
-    ...
-    ```
-
-* 如果训练过程中没有使用mixup或者cutmix的数据增广，那么除了上述信息外，日志中也会打印出top-1与top-k(默认为5)的信息：
-
-    ```
-    ...
-    epoch:0  , train step:30  , top1: 0.06250, top5: 0.09375, loss: 4.62766, lr: 0.003728, batch_cost: 0.64089 s, reader_cost: 0.18857 s, ips: 49.93080 images/sec, eta: 0:06:18
-    ...
-    END epoch:0   train top1: 0.01310, top5: 0.04738, loss: 4.65124,  batch_cost: 0.64089 s, reader_cost: 0.18857 s, batch_cost_sum: 13.45863 s, ips: 49.93080 images/sec.
-    ...
-    ```
-
 训练期间也可以通过VisualDL实时观察loss变化，详见[VisualDL](../extension/VisualDL.md)。
 
 ### 1.2 模型微调
@@ -90,19 +69,6 @@ python tools/train.py \
 * 参数`-o last_epoch=5`表示将上一次训练轮次数记为`5`，即本次训练轮次数从`6`开始计算，该值默认为-1，表示本次训练轮次数从`0`开始计算。
 
 * `-o checkpoints`参数无需包含断点权重文件的后缀名，上述训练命令会在训练过程中生成如下所示的断点权重文件，若想从断点`5`继续训练，则`checkpoints`参数只需设置为`"./output/RecModel/ppcls_epoch_5"`，PaddleClas会自动补充后缀名。
-    ```shell
-    output/
-    └── MobileNetV3_large_x1_0
-        ├── 0
-        │   ├── ppcls.pdopt
-        │   └── ppcls.pdparams
-        ├── 1
-        │   ├── ppcls.pdopt
-        │   └── ppcls.pdparams
-        .
-        .
-        .
-    ```
 
 <a name="1.4"></a>
 ### 1.4 模型评估
