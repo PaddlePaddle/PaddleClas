@@ -29,6 +29,6 @@
 ## 3 Loss的设置
 
 
-其他部分参数，详见[配置文件](../../../ppcls/configs/Cartoon/ResNet50_icartoon.yaml)。
+其他部分参数，详见[配置文件](../../../ppcls/configs/Cartoonface/ResNet50_icartoon.yaml)。
 
 
