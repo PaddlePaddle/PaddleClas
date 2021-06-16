@@ -156,7 +156,7 @@ cd deploy
 
 其次，构建底库，命令如下：
 ```bash
-python python/build_gallery.py 
+python python/build_gallery.py \
        -c configs/build_flowers.yaml \
        -o Global.rec_inference_model_dir "./inference" \
        -o IndexProcess.index_path  "../dataset/flowers102/index" \
