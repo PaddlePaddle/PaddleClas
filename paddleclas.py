@@ -294,6 +294,12 @@ def download_with_progressbar(url, save_path):
         raise Exception(
             f"Something went wrong while downloading model/image from {url}")
 
+def check_model_file(model_name):
+    """Check the model files exist and download and untar when no exist. 
+    """
+    storage_directory = partial(os.path.join, BASE_INFERENCE_MODEL_DIR,
+                                model_name)
+    url = BASE_DOWNLOAD_URL.format(model_name)
 
 def check_model_file(model_name):
     """Check the model files exist and download and untar when no exist. 
