@@ -263,6 +263,7 @@ python3 python/predict_cls.py \
 + `Global.enable_mkldnn`：是否启用`MKL-DNN`加速，默认为`False`。注意`enable_mkldnn`与`use_gpu`同时为`True`时，将忽略`enable_mkldnn`，而使用GPU运行。
 + `Global.use_fp16`：是否启用`FP16`，默认为`False`。
 
+
 **注意**: 如果使用`Transformer`系列模型，如`DeiT_***_384`, `ViT_***_384`等，请注意模型的输入数据尺寸，需要设置参数`resize_short=384`, `resize=384`。
 
 * 如果你希望提升评测模型速度，使用gpu评测时，建议开启TensorRT加速预测，使用cpu评测时，建议开启MKL-DNN加速预测。
