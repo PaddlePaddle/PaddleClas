@@ -8,15 +8,15 @@
 
 全部的超参数及具体配置：[ResNet50_ReID.yaml](../../../ppcls/configs/Logo/ResNet50_ReID.yaml)
 
-## 数据集及预处理
+## 1 数据集及预处理
 
-### LogoDet-3K数据集
+### 1.1 LogoDet-3K数据集
 
 <img src="../../images/logo/logodet3k.jpg" style="zoom:50%;" />
 
 LogoDet-3K数据集是具有完整标注的Logo数据集，有3000个标识类别，约20万个高质量的人工标注的标识对象和158652张图片。相关数据介绍参考[原论文](https://arxiv.org/abs/2008.05359)
 
-## 数据预处理
+### 1.2 数据预处理
 
 由于原始的数据集中，图像包含标注的检测框，在识别阶段只考虑检测器抠图后的logo区域，因此采用原始的标注框抠出Logo区域图像构成训练集，排除背景在识别阶段的影响。对数据集进行划分，产生155427张训练集，覆盖3000个logo类别（同时作为测试时gallery图库），3225张测试集，用于作为查询集。抠图后的训练集可[在此下载](https://arxiv.org/abs/2008.05359)
 - 图像`Resize`到224
@@ -25,7 +25,7 @@ LogoDet-3K数据集是具有完整标注的Logo数据集，有3000个标识类�
 - Normlize：归一化到0~1
 - [RandomErasing](https://arxiv.org/pdf/1708.04896v2.pdf)
 
-## Backbone的具体设置
+## 2 Backbone的具体设置
 
 具体是用`ResNet50`作为backbone，主要做了如下修改：
 
@@ -37,7 +37,7 @@ LogoDet-3K数据集是具有完整标注的Logo数据集，有3000个标识类�
 
    具体代码：[ResNet50_last_stage_stride1](../../../ppcls/arch/backbone/variant_models/resnet_variant.py)
 
-## Loss的设置
+## 3 Loss的设置
 
 在Logo识别中，使用了[Pairwise Cosface + CircleMargin](https://arxiv.org/abs/2002.10857) 联合训练，其中权重比例为1:1
 

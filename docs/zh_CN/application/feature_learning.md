@@ -10,7 +10,7 @@
 
 `RecModel`的训练模式与普通分类训练的配置类似，配置文件主要分为以下几个部分：
 
-### 全局设置部分
+### 1 全局设置部分
 
 ```yaml
 Global:
@@ -39,7 +39,7 @@ Global:
   eval_mode: "retrieval"
 ```
 
-### 数据部分
+### 2 数据部分
 
 ```yaml
 DataLoader:
@@ -48,8 +48,8 @@ DataLoader:
         # 具体使用的Dataset的的名称
         name: "VeriWild"
         # 使用此数据集的具体参数
-        image_root: "/work/dataset/VeRI-Wild/images/"
-        cls_label_path: "/work/dataset/VeRI-Wild/train_test_split/train_list_start0.txt"
+        image_root: "./dataset/VeRI-Wild/images/"
+        cls_label_path: "./dataset/VeRI-Wild/train_test_split/train_list_start0.txt"
         # 图像增广策略：ResizeImage、RandFlipImage等
         transform_ops:
           - ResizeImage:
@@ -82,7 +82,7 @@ DataLoader:
 
 `val dataset`设置与`train dataset`除图像增广策略外，设置基本一致
 
-### Backbone的具体设置
+### 3 Backbone的具体设置
 
 ```yaml
 Arch:
@@ -116,7 +116,7 @@ Arch:
 
 `Head`部分主要是为了支持`metric learning`等具体loss函数，如`ArcMargin`([ArcFace Loss](https://arxiv.org/abs/1801.07698)的fc层的具体实现)，在完成训练后，一般将此部分剔除。
 
-### Loss的设置
+### 4 Loss的设置
 
 ```yaml
 Loss:
@@ -134,7 +134,7 @@ Loss:
 
 训练时同时使用`CELoss`和`SupConLoss`，权重比例为`1:1`，测试时只使用`CELoss`
 
-### 优化器设置
+### 5 优化器设置
 
 ```yaml
 Optimizer:
@@ -156,7 +156,7 @@ Optimizer:
     coeff: 0.0005
 ```
 
-### Eval Metric设置
+### 6 Eval Metric设置
 
 ```yaml
 Metric:
