@@ -1,4 +1,4 @@
-# Copyright (c) 2020 PaddlePaddle Authors. All Rights Reserved.
+# Copyright (c) 2021 PaddlePaddle Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,40 +12,48 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import argparse
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
 import os
 import sys
 __dir__ = os.path.dirname(os.path.abspath(__file__))
-sys.path.append(__dir__)
-sys.path.append(os.path.abspath(os.path.join(__dir__, '..')))
+sys.path.append(os.path.abspath(os.path.join(__dir__, '../')))
 
-from ppcls.modeling import architectures
-from ppcls.utils.save_load import load_dygraph_pretrain
 import paddle
-import paddle.nn.functional as F
-from paddle.jit import to_static
+import paddle.nn as nn
+
+from ppcls.utils import config
+from ppcls.utils.logger import init_logger
+from ppcls.utils.config import print_config
+from ppcls.arch import build_model, RecModel, DistillationModel
+from ppcls.utils.save_load import load_dygraph_pretrain
+from ppcls.arch.gears.identity_head import IdentityHead
 
 
-def parse_args():
-    def str2bool(v):
-        return v.lower() in ("true", "t", "1")
+class ExportModel(nn.Layer):
+    """
+    ExportModel: add softmax onto the model
+    """
 
-    parser = argparse.ArgumentParser()
-    parser.add_argument("-m", "--model", type=str)
-    parser.add_argument("-p", "--pretrained_model", type=str)
-    parser.add_argument("-o", "--output_path", type=str, default="./inference")
-    parser.add_argument("--class_dim", type=int, default=1000)
-    parser.add_argument("--load_static_weights", type=str2bool, default=False)
-    parser.add_argument("--img_size", type=int, default=224)
+    def __init__(self, config):
+        super().__init__()
+        self.base_model = build_model(config)
 
-    return parser.parse_args()
+        # we should choose a final model to export
+        if isinstance(self.base_model, DistillationModel):
+            self.infer_model_name = config["infer_model_name"]
+        else:
+            self.infer_model_name = None
 
-
-class Net(paddle.nn.Layer):
-    def __init__(self, net, class_dim, model):
-        super(Net, self).__init__()
-        self.pre_net = net(class_dim=class_dim)
-        self.model = model
+        self.infer_output_key = config.get("infer_output_key", None)
+        if self.infer_output_key == "features" and isinstance(self.base_model,
+                                                              RecModel):
+            self.base_model.head = IdentityHead()
+        if config.get("infer_add_softmax", True):
+            self.softmax = nn.Softmax(axis=-1)
+        else:
+            self.softmax = None
 
     def eval(self):
         self.training = False
@@ -53,33 +61,45 @@ class Net(paddle.nn.Layer):
             layer.training = False
             layer.eval()
 
-    def forward(self, inputs):
-        x = self.pre_net(inputs)
-        if self.model == "GoogLeNet":
-            x = x[0]
-        x = F.softmax(x)
+    def forward(self, x):
+        x = self.base_model(x)
+        if self.infer_model_name is not None:
+            x = x[self.infer_model_name]
+        if self.infer_output_key is not None:
+            x = x[self.infer_output_key]
+        if self.softmax is not None:
+            x = self.softmax(x)
         return x
 
 
-def main():
-    args = parse_args()
+if __name__ == "__main__":
+    args = config.parse_args()
+    config = config.get_config(
+        args.config, overrides=args.override, show=False)
 
-    net = architectures.__dict__[args.model]
-    model = Net(net, args.class_dim, args.model)
-    load_dygraph_pretrain(
-        model.pre_net,
-        path=args.pretrained_model,
-        load_static_weights=args.load_static_weights)
+    log_file = os.path.join(config['Global']['output_dir'],
+                            config["Arch"]["name"], "export.log")
+    init_logger(name='root', log_file=log_file)
+    print_config(config)
+
+    # set device
+    assert config["Global"]["device"] in ["cpu", "gpu", "xpu"]
+    device = paddle.set_device(config["Global"]["device"])
+    model = ExportModel(config["Arch"])
+
+    if config["Global"]["pretrained_model"] is not None:
+        load_dygraph_pretrain(model.base_model,
+                              config["Global"]["pretrained_model"])
+
     model.eval()
 
-    model = to_static(
+    model = paddle.jit.to_static(
         model,
         input_spec=[
             paddle.static.InputSpec(
-                shape=[None, 3, args.img_size, args.img_size], dtype='float32')
+                shape=[None] + config["Global"]["image_shape"],
+                dtype='float32')
         ])
-    paddle.jit.save(model, os.path.join(args.output_path, "inference"))
-
-
-if __name__ == "__main__":
-    main()
+    paddle.jit.save(model,
+                    os.path.join(config["Global"]["save_inference_dir"],
+                                 "inference"))

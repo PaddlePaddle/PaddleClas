@@ -21,7 +21,7 @@ sys.path.append(os.path.abspath(os.path.join(__dir__, '..', '..', '..')))
 sys.path.append(
     os.path.abspath(os.path.join(__dir__, '..', '..', '..', 'tools')))
 
-from ppcls.modeling import architectures
+from ppcls.arch import backbone
 from ppcls.utils.save_load import load_dygraph_pretrain
 import paddle
 import paddle.nn.functional as F
@@ -63,7 +63,7 @@ class Net(paddle.nn.Layer):
 def main():
     args = parse_args()
 
-    net = architectures.__dict__[args.model]
+    net = backbone.__dict__[args.model]
     model = Net(net, args.class_dim, args.model)
 
     # get QAT model

@@ -6,7 +6,7 @@
 
 ## 二、准备工作
 
-首先需要选定研究的模型，本文设定ResNet50作为研究模型，将resnet.py从[模型库](../../../ppcls/modeling/architecture/)拷贝到当前目录下，并下载预训练模型[预训练模型](../../zh_CN/models/models_intro), 复制resnet50的模型链接，使用下列命令下载并解压预训练模型。
+首先需要选定研究的模型，本文设定ResNet50作为研究模型，将resnet.py从[模型库](../../../ppcls/arch/architecture/)拷贝到当前目录下，并下载预训练模型[预训练模型](../../zh_CN/models/models_intro), 复制resnet50的模型链接，使用下列命令下载并解压预训练模型。
 
 ```bash
 wget The Link for Pretrained Model
@@ -37,7 +37,7 @@ def forward(self, inputs):
     y = self.pool2d_max(y)
     for bottleneck_block in self.bottleneck_block_list:
         y = bottleneck_block(y)
-    y = self.pool2d_avg(y)
+    y = self.avg_pool(y)
     y = fluid.layers.reshape(y, shape=[-1, self.pool2d_avg_output])
     y = self.out(y)
     return y, self.fm
