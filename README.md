@@ -2,7 +2,9 @@
 
 # PaddleClas
 
-<img src="./docs/images/recognition.gif"  width = "200" />
+<div align="center">
+<img src="./docs/images/recognition.gif"  width = "400" />
+</div>
 
 ## 简介
 
@@ -24,7 +26,7 @@
 
 ## 特性
 <div align="center">
-<img src="./docs/images/structure.png"  width = "200" />
+<img src="./docs/images/structure.png"  width = "400" />
 </div>
 - 完整的图像识别解决方案：集成了检测、特征学习、检索等模块，广泛适用于各类图像识别任务。
 提供商品识别、车辆识别、logo识别和动漫人物识别等4个示例解决方案。
