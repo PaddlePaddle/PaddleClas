@@ -9,7 +9,7 @@
 * [1. 环境配置](#环境配置)
 * [2. 图像识别体验](#图像识别体验)
   * [2.1 下载、解压inference 模型与demo数据](#下载、解压inference_模型与demo数据)
-  * [2.2 商品识别与检索](#商品识别与检索)
+  * [2.2 商品别与检索](#商品识别与检索)
     * [2.2.1 识别单张图像](#识别单张图像)
     * [2.2.2 基于文件夹的批量识别](#基于文件夹的批量识别)
 * [3. 未知类别的图像识别体验](#未知类别的图像识别体验)
@@ -122,7 +122,10 @@ cd ..
 运行下面的命令，对图像`./dataset/product_demo_data_v1.0/query/wangzai.jpg`进行识别与检索
 
 ```shell
+# 使用下面的命令使用GPU进行预测
 python3.7 python/predict_system.py -c configs/inference_product.yaml
+# 使用下面的命令使用CPU进行预测
+python3.7 python/predict_system.py -c configs/inference_product.yaml -o Global.use_gpu=False
 ```
 
 待检索图像如下所示。
@@ -154,6 +157,7 @@ python3.7 python/predict_system.py -c configs/inference_product.yaml
 如果希望预测文件夹内的图像，可以直接修改配置文件中的`Global.infer_imgs`字段，也可以通过下面的`-o`参数修改对应的配置。
 
 ```shell
+# 使用下面的命令使用GPU进行预测，如果希望使用CPU预测，可以在命令后面添加-o Global.use_gpu=False
 python3.7 python/predict_system.py -c configs/inference_product.yaml -o Global.infer_imgs="./dataset/product_demo_data_v1.0/query/"
 ```
 
@@ -166,6 +170,7 @@ python3.7 python/predict_system.py -c configs/inference_product.yaml -o Global.i
 对图像`./dataset/product_demo_data_v1.0/query/anmuxi.jpg`进行识别，命令如下
 
 ```shell
+# 使用下面的命令使用GPU进行预测，如果希望使用CPU预测，可以在命令后面添加-o Global.use_gpu=False
 python3.7 python/predict_system.py -c configs/inference_product.yaml -o Global.infer_imgs="./dataset/product_demo_data_v1.0/query/anmuxi.jpg"
 ```
 
@@ -234,6 +239,7 @@ python3.7 python/build_gallery.py -c configs/build_product.yaml -o IndexProcess.
 使用新的索引库，对上述图像进行识别，运行命令如下。
 
 ```shell
+# 使用下面的命令使用GPU进行预测，如果希望使用CPU预测，可以在命令后面添加-o Global.use_gpu=False
 python3.7 python/predict_system.py -c configs/inference_product.yaml -o Global.infer_imgs="./dataset/product_demo_data_v1.0/query/anmuxi.jpg" -o IndexProcess.index_path="./dataset/product_demo_data_v1.0/index_update"
 ```
 
