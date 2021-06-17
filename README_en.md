@@ -26,7 +26,7 @@ PaddleClas is a image recognition toolset for industry and academia, helping use
 - A practical image recognition system consist of detection, feature learning and retrieval modules, widely applicable to all types of image recognition tasks.
 Four sample solutions are provided, including product recognition, vehicle recognition, logo recognition and animation character recognition.
 
-- Rich library of pre-trained models: Provide a total of 134 ImageNet pre-trained models in 29 series, among which 6 selected series of models support fast structural modification.
+- Rich library of pre-trained models: Provide a total of 164 ImageNet pre-trained models in 34 series, among which 6 selected series of models support fast structural modification.
 
 - Comprehensive and easy-to-use feature learning components: 12 metric learning methods are integrated and can be combined and switched at will through configuration files.
 
