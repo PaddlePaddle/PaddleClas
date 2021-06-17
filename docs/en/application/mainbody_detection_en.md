@@ -1,6 +1,6 @@
 # Mainbody Detection
 
-The mainbody detection technology is currently a very widely used detection technology, which refers to the detect one or more mainbody objects in the picture, crop the corresponding area in the image and carry out recognition, thereby completing the entire recognition process. Mainbody detection is the first step of the recognition task, which can effectively improve the recognition accuracy.
+The mainbody detection technology is currently a very widely used detection technology, which refers to the detect one or some mainbody objects in the picture, crop the corresponding area in the image and carry out recognition, thereby completing the entire recognition process. Mainbody detection is the first step of the recognition task, which can effectively improve the recognition accuracy.
 
 
 This tutorial will introduce the dataset and model training for mainbody detection in PaddleClas.
@@ -11,7 +11,7 @@ This tutorial will introduce the dataset and model training for mainbody detecti
 The datasets we used for mainbody detection task are shown in the following table.
 
 
-| Dataset       | Image number   | Image number used in mainbody detection   | Scenarios  | Dataset link |
+| Dataset       | Image number   | Image number used in <<br>>mainbody detection   | Scenarios  | Dataset link |
 | ------------  | ------------- | -------| ------- | -------- |
 | Objects365 | 170W | 6k | General Scenarios | [link](https://www.objects365.org/overview.html) |
 | COCO2017 | 12W | 5k  | General Scenarios | [link](https://cocodataset.org/) |
@@ -26,10 +26,6 @@ In the actual training process, all datasets are mixed together. Categories of a
 
 
 There are many types of object detection methods such as the commonly used two-stage detectors (FasterRCNN series, etc.), single-stage detectors (YOLO, SSD, etc.), anchor-free detectors (FCOS, etc.) and so on.
-
-PP-YOLO由[PaddleDetection](https://github.com/PaddlePaddle/PaddleDetection)提出，从骨干网络、数据增广、正则化策略、损失函数、后处理等多个角度对yolov3模型进行深度优化，最终在"速度-精度"方面达到了业界领先的水平。具体地，优化的策略如下。
-
-
 
 PP-YOLO is proposed by [PaddleDetection](https://github.com/PaddlePaddle/PaddleDetection). It deeply optimizes the yolov3 model from multiple perspectives such as backbone, data augmentation, regularization strategy, loss function, and post-processing. Finally, it reached the state of the art in terms of "speed-precision". Specifically, the optimization strategy is as follows.
 
@@ -48,4 +44,4 @@ For more information about PP-YOLO, you can refer to [PP-YOLO tutorial](https://
 
 
 In the mainbody detection task, we use `ResNet50vd-DCN` as our backbone for better performance. The config file is [ppyolov2_r50vd_dcn_365e_coco.yml](https://github.com/PaddlePaddle/PaddleDetection/blob/release/2.1/configs/ppyolo/ppyolov2_r50vd_dcn_365e_coco.yml) used for the model training, in which the dagtaset path is modified to the mainbody detection dataset.
-The final inference model can be downloaded here: [link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/inference/ppyolov2_r50vd_dcn_mainbody_v1.0_infer.tar).
+The final inference model can be downloaded [here](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/inference/ppyolov2_r50vd_dcn_mainbody_v1.0_infer.tar).
