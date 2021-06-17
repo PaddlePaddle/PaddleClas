@@ -1,4 +1,4 @@
-# Copyright (c) 2020 PaddlePaddle Authors. All Rights Reserved.
+# Copyright (c) 2021 PaddlePaddle Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,15 +18,14 @@ sys.path.insert(0, ".")
 
 import time
 
-from paddlehub.utils.log import logger
-from paddlehub.module.module import moduleinfo, serving
-import cv2
 import numpy as np
 import paddle.nn as nn
+from paddlehub.module.module import moduleinfo, serving
 
-from tools.infer.predict import Predictor
-from tools.infer.utils import b64_to_np, postprocess
-from deploy.hubserving.clas.params import read_params
+from hubserving.clas.params import get_default_confg
+from python.predict_cls import ClsPredictor
+from utils import config
+from utils.encode_decode import b64_to_np
 
 
 @moduleinfo(
@@ -41,19 +40,24 @@ class ClasSystem(nn.Layer):
         """
         initialize with the necessary elements
         """
-        cfg = read_params()
+        self._config = self._load_config(
+            use_gpu=use_gpu, enable_mkldnn=enable_mkldnn)
+        self.cls_predictor = ClsPredictor(self._config)
+
+    def _load_config(self, use_gpu=None, enable_mkldnn=None):
+        cfg = get_default_confg()
+        cfg = config.AttrDict(cfg)
+        config.create_attr_dict(cfg)
         if use_gpu is not None:
-            cfg.use_gpu = use_gpu
+            cfg.Global.use_gpu = use_gpu
         if enable_mkldnn is not None:
-            cfg.enable_mkldnn = enable_mkldnn
-        cfg.hubserving = True
+            cfg.Global.enable_mkldnn = enable_mkldnn
         cfg.enable_benchmark = False
-        self.args = cfg
-        if cfg.use_gpu:
+        if cfg.Global.use_gpu:
             try:
                 _places = os.environ["CUDA_VISIBLE_DEVICES"]
                 int(_places[0])
-                print("Use GPU, GPU Memery:{}".format(cfg.gpu_mem))
+                print("Use GPU, GPU Memery:{}".format(cfg.Global.gpu_mem))
                 print("CUDA_VISIBLE_DEVICES: ", _places)
             except:
                 raise RuntimeError(
@@ -62,24 +66,36 @@ class ClasSystem(nn.Layer):
         else:
             print("Use CPU")
             print("Enable MKL-DNN") if enable_mkldnn else None
-        self.predictor = Predictor(self.args)
+        return cfg
 
-    def predict(self, batch_input_data, top_k=1):
-        assert isinstance(
-            batch_input_data,
-            np.ndarray), "The input data is inconsistent with expectations."
+    def predict(self, inputs):
+        if not isinstance(inputs, list):
+            raise Exception(
+                "The input data is inconsistent with expectations.")
 
         starttime = time.time()
-        batch_outputs = self.predictor.predict(batch_input_data)
+        outputs = self.cls_predictor.predict(inputs)
         elapse = time.time() - starttime
-        batch_result_list = postprocess(batch_outputs, top_k)
-        return {"prediction": batch_result_list, "elapse": elapse}
+        preds = self.cls_predictor.postprocess(outputs)
+        return {"prediction": preds, "elapse": elapse}
 
     @serving
-    def serving_method(self, images, revert_params, **kwargs):
+    def serving_method(self, images, revert_params):
         """
         Run as a service.
         """
         input_data = b64_to_np(images, revert_params)
-        results = self.predict(batch_input_data=input_data, **kwargs)
+        results = self.predict(inputs=list(input_data))
         return results
+
+
+if __name__ == "__main__":
+    import cv2
+    import paddlehub as hub
+
+    module = hub.Module(name="clas_system")
+    img_path = "./hubserving/ILSVRC2012_val_00006666.JPEG"
+    img = cv2.imread(img_path)[:, :, ::-1]
+    img = cv2.resize(img, (224, 224)).transpose((2, 0, 1))
+    res = module.predict([img.astype(np.float32)])
+    print("The returned result of {}: {}".format(img_path, res))
