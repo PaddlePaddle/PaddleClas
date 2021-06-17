@@ -2,29 +2,17 @@
 
 # PaddleClas
 
-<div align="center">
-<img src="./docs/images/recognition.gif"  width = "400" />
-</div>
-
 ## 简介
 
 飞桨图像识别套件PaddleClas是飞桨为工业界和学术界所准备的一个图像识别任务的工具集，助力使用者训练出更好的视觉模型和应用落地。
 
 **近期更新**
 
-- 2021.06.16 PaddleClas v2.2版本升级
-   - 集成Metric learning，向量检索等组件。
-   - 新增商品识别、动漫人物识别、车辆识别和logo识别等4个图像识别应用。
-   - 新增LeViT、Twins、TNT、DLA、HarDNet、RedNet系列30个预训练模型，精度与论文大致持平。
-
-- 2021.05.14
-   - 添加`SwinTransformer` 系列模型，在ImageNet-1k上，Top1 Acc可达87.19%
-
-- 2021.04.15
-   - 添加`MixNet_L`和`ReXNet_3_0`系列模型，在ImageNet-1k上`MixNet` 模型Top1 Acc可达78.6%，`ReXNet`模型可达82.09%
+- 2021.06.16 PaddleClas v2.2版本升级，集成Metric learning，向量检索等组件。新增商品识别、动漫人物识别、车辆识别和logo识别等4个图像识别应用。新增LeViT、Twins、TNT、DLA、HarDNet、RedNet系列30个预训练模型。
+- 2021.05.14 添加`SwinTransformer` 系列模型。
+- 2021.04.15 添加`MixNet_L`和`ReXNet_3_0`系列模型。 
 
 - [more](./docs/zh_CN/update_history.md)
-
 
 ## 特性
 
@@ -40,6 +28,11 @@ Res2Net200_vd预训练模型Top-1精度高达85.1%。
 
 - 数据增广：支持AutoAugment、Cutout、Cutmix等8种数据增广算法详细介绍、代码复现和在统一实验环境下的效果评估。
 
+## 图像识别系统效果展示
+<div align="center">
+<img src="./docs/images/recognition.gif"  width = "400" />
+</div>
+
 ## 欢迎加入技术交流群
 
 * 您也可以扫描下面的微信群二维码， 加入PaddleClas 微信交流群。获得更高效的问题答疑，与各行各业开发者充分交流，期待您的加入。
@@ -48,6 +41,8 @@ Res2Net200_vd预训练模型Top-1精度高达85.1%。
 <img src="./docs/images/wx_group.png"  width = "200" />
 </div>
 
+## 快速体验
+图像识别快速体验：[点击这里](./docs/zh_CN/tutorials/quick_start_recognition.md)
 
 ## 文档教程
 
@@ -83,11 +78,16 @@ Res2Net200_vd预训练模型Top-1精度高达85.1%。
 - [贡献代码](#贡献代码)
 
 
+## 图像识别系统介绍
+
 <a name="图像识别系统介绍"></a>
 <div align="center">
 <img src="./docs/images/structure.png"  width = "400" />
 </div>
 
+整个图像识别系统分为三步：（1）通过一个目标检测模型，检测图像物体候选区域（2）对每个候选区域进行特征提取（3）与检索库中图像进行特征匹配，提取识别结果。
+
+对于新的未知类别，无需重新训练模型，只需要在检索库补入该类别图像，重新建立检索库，就可以识别该类别。
 
 <a name="许可证书"></a>
 
