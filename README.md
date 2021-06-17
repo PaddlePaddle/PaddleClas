@@ -41,7 +41,7 @@ Res2Net200_vd预训练模型Top-1精度高达85.1%。
 </div>
 
 ## 快速体验
-图像识别快速体验：./docs/zh_CN/tutorials/quick_start_recognition.md
+图像识别快速体验：[点击这里](./docs/zh_CN/tutorials/quick_start_recognition.md)
 
 ## 文档教程
 
