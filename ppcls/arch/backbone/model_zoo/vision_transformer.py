@@ -22,19 +22,27 @@ from paddle.nn.initializer import TruncatedNormal, Constant, Normal
 from ppcls.utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
 
 MODEL_URLS = {
-              "ViT_small_patch16_224": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ViT_small_patch16_224_pretrained.pdparams",
-              "ViT_base_patch16_224": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ViT_base_patch16_224_pretrained.pdparams",
-              "ViT_base_patch16_384": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ViT_base_patch16_384_pretrained.pdparams",
-              "ViT_base_patch32_384": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ViT_base_patch32_384_pretrained.pdparams",
-              "ViT_large_patch16_224": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ViT_large_patch16_224_pretrained.pdparams",
-              "ViT_large_patch16_384": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ViT_large_patch16_384_pretrained.pdparams", 
-              "ViT_large_patch32_384": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ViT_large_patch32_384_pretrained.pdparams",
-              "ViT_huge_patch16_224": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ViT_huge_patch16_224_pretrained.pdparams",
-              "ViT_huge_patch32_384": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ViT_huge_patch32_384_pretrained.pdparams"
-             }
+    "ViT_small_patch16_224":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ViT_small_patch16_224_pretrained.pdparams",
+    "ViT_base_patch16_224":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ViT_base_patch16_224_pretrained.pdparams",
+    "ViT_base_patch16_384":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ViT_base_patch16_384_pretrained.pdparams",
+    "ViT_base_patch32_384":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ViT_base_patch32_384_pretrained.pdparams",
+    "ViT_large_patch16_224":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ViT_large_patch16_224_pretrained.pdparams",
+    "ViT_large_patch16_384":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ViT_large_patch16_384_pretrained.pdparams",
+    "ViT_large_patch32_384":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ViT_large_patch32_384_pretrained.pdparams",
+    "ViT_huge_patch16_224":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ViT_huge_patch16_224_pretrained.pdparams",
+    "ViT_huge_patch32_384":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ViT_huge_patch32_384_pretrained.pdparams"
+}
 
 __all__ = list(MODEL_URLS.keys())
-
 
 trunc_normal_ = TruncatedNormal(std=.02)
 normal_ = Normal
@@ -209,7 +217,7 @@ class PatchEmbed(nn.Layer):
     def forward(self, x):
         B, C, H, W = x.shape
         assert H == self.img_size[0] and W == self.img_size[1], \
-            "Input image size ({H}*{W}) doesn't match model ({self.img_size[0]}*{self.img_size[1]})."
+            f"Input image size ({H}*{W}) doesn't match model ({self.img_size[0]}*{self.img_size[1]})."
 
         x = self.proj(x).flatten(2).transpose((0, 2, 1))
         return x
@@ -323,8 +331,11 @@ def _load_pretrained(pretrained, model, model_url, use_ssld=False):
         )
 
 
-        
-def ViT_small_patch16_224(pretrained, model, model_url, use_ssld=False, **kwargs):
+def ViT_small_patch16_224(pretrained,
+                          model,
+                          model_url,
+                          use_ssld=False,
+                          **kwargs):
     model = VisionTransformer(
         patch_size=16,
         embed_dim=768,
@@ -333,12 +344,19 @@ def ViT_small_patch16_224(pretrained, model, model_url, use_ssld=False, **kwargs
         mlp_ratio=3,
         qk_scale=768**-0.5,
         **kwargs)
-    _load_pretrained(pretrained, model, MODEL_URLS["ViT_small_patch16_224"], use_ssld=use_ssld)
+    _load_pretrained(
+        pretrained,
+        model,
+        MODEL_URLS["ViT_small_patch16_224"],
+        use_ssld=use_ssld)
     return model
 
 
-
-def ViT_base_patch16_224(pretrained, model, model_url, use_ssld=False, **kwargs):
+def ViT_base_patch16_224(pretrained,
+                         model,
+                         model_url,
+                         use_ssld=False,
+                         **kwargs):
     model = VisionTransformer(
         patch_size=16,
         embed_dim=768,
@@ -348,11 +366,19 @@ def ViT_base_patch16_224(pretrained, model, model_url, use_ssld=False, **kwargs)
         qkv_bias=True,
         epsilon=1e-6,
         **kwargs)
-    _load_pretrained(pretrained, model, MODEL_URLS["ViT_base_patch16_224"], use_ssld=use_ssld)
+    _load_pretrained(
+        pretrained,
+        model,
+        MODEL_URLS["ViT_base_patch16_224"],
+        use_ssld=use_ssld)
     return model
 
 
-def ViT_base_patch16_384(pretrained, model, model_url, use_ssld=False, **kwargs):
+def ViT_base_patch16_384(pretrained,
+                         model,
+                         model_url,
+                         use_ssld=False,
+                         **kwargs):
     model = VisionTransformer(
         img_size=384,
         patch_size=16,
@@ -363,11 +389,19 @@ def ViT_base_patch16_384(pretrained, model, model_url, use_ssld=False, **kwargs)
         qkv_bias=True,
         epsilon=1e-6,
         **kwargs)
-    _load_pretrained(pretrained, model, MODEL_URLS["ViT_base_patch16_384"], use_ssld=use_ssld)
+    _load_pretrained(
+        pretrained,
+        model,
+        MODEL_URLS["ViT_base_patch16_384"],
+        use_ssld=use_ssld)
     return model
 
 
-def ViT_base_patch32_384(pretrained, model, model_url, use_ssld=False, **kwargs):
+def ViT_base_patch32_384(pretrained,
+                         model,
+                         model_url,
+                         use_ssld=False,
+                         **kwargs):
     model = VisionTransformer(
         img_size=384,
         patch_size=32,
@@ -378,11 +412,19 @@ def ViT_base_patch32_384(pretrained, model, model_url, use_ssld=False, **kwargs)
         qkv_bias=True,
         epsilon=1e-6,
         **kwargs)
-    _load_pretrained(pretrained, model, MODEL_URLS["ViT_base_patch32_384"], use_ssld=use_ssld)
+    _load_pretrained(
+        pretrained,
+        model,
+        MODEL_URLS["ViT_base_patch32_384"],
+        use_ssld=use_ssld)
     return model
 
 
-def ViT_large_patch16_224(pretrained, model, model_url, use_ssld=False, **kwargs):
+def ViT_large_patch16_224(pretrained,
+                          model,
+                          model_url,
+                          use_ssld=False,
+                          **kwargs):
     model = VisionTransformer(
         patch_size=16,
         embed_dim=1024,
@@ -392,11 +434,19 @@ def ViT_large_patch16_224(pretrained, model, model_url, use_ssld=False, **kwargs
         qkv_bias=True,
         epsilon=1e-6,
         **kwargs)
-    _load_pretrained(pretrained, model, MODEL_URLS["ViT_large_patch16_224"], use_ssld=use_ssld)
+    _load_pretrained(
+        pretrained,
+        model,
+        MODEL_URLS["ViT_large_patch16_224"],
+        use_ssld=use_ssld)
     return model
 
 
-def ViT_large_patch16_384(pretrained, model, model_url, use_ssld=False, **kwargs):
+def ViT_large_patch16_384(pretrained,
+                          model,
+                          model_url,
+                          use_ssld=False,
+                          **kwargs):
     model = VisionTransformer(
         img_size=384,
         patch_size=16,
@@ -407,11 +457,19 @@ def ViT_large_patch16_384(pretrained, model, model_url, use_ssld=False, **kwargs
         qkv_bias=True,
         epsilon=1e-6,
         **kwargs)
-    _load_pretrained(pretrained, model, MODEL_URLS["ViT_large_patch16_384"], use_ssld=use_ssld)
+    _load_pretrained(
+        pretrained,
+        model,
+        MODEL_URLS["ViT_large_patch16_384"],
+        use_ssld=use_ssld)
     return model
 
 
-def ViT_large_patch32_384(pretrained, model, model_url, use_ssld=False, **kwargs):
+def ViT_large_patch32_384(pretrained,
+                          model,
+                          model_url,
+                          use_ssld=False,
+                          **kwargs):
     model = VisionTransformer(
         img_size=384,
         patch_size=32,
@@ -422,11 +480,19 @@ def ViT_large_patch32_384(pretrained, model, model_url, use_ssld=False, **kwargs
         qkv_bias=True,
         epsilon=1e-6,
         **kwargs)
-    _load_pretrained(pretrained, model, MODEL_URLS["ViT_large_patch32_384"], use_ssld=use_ssld)
+    _load_pretrained(
+        pretrained,
+        model,
+        MODEL_URLS["ViT_large_patch32_384"],
+        use_ssld=use_ssld)
     return model
 
 
-def ViT_huge_patch16_224(pretrained, model, model_url, use_ssld=False, **kwargs):
+def ViT_huge_patch16_224(pretrained,
+                         model,
+                         model_url,
+                         use_ssld=False,
+                         **kwargs):
     model = VisionTransformer(
         patch_size=16,
         embed_dim=1280,
@@ -434,11 +500,19 @@ def ViT_huge_patch16_224(pretrained, model, model_url, use_ssld=False, **kwargs)
         num_heads=16,
         mlp_ratio=4,
         **kwargs)
-    _load_pretrained(pretrained, model, MODEL_URLS["ViT_huge_patch16_224"], use_ssld=use_ssld)
+    _load_pretrained(
+        pretrained,
+        model,
+        MODEL_URLS["ViT_huge_patch16_224"],
+        use_ssld=use_ssld)
     return model
 
 
-def ViT_huge_patch32_384(pretrained, model, model_url, use_ssld=False, **kwargs):
+def ViT_huge_patch32_384(pretrained,
+                         model,
+                         model_url,
+                         use_ssld=False,
+                         **kwargs):
     model = VisionTransformer(
         img_size=384,
         patch_size=32,
@@ -447,5 +521,9 @@ def ViT_huge_patch32_384(pretrained, model, model_url, use_ssld=False, **kwargs)
         num_heads=16,
         mlp_ratio=4,
         **kwargs)
-    _load_pretrained(pretrained, model, MODEL_URLS["ViT_huge_patch32_384"], use_ssld=use_ssld)
+    _load_pretrained(
+        pretrained,
+        model,
+        MODEL_URLS["ViT_huge_patch32_384"],
+        use_ssld=use_ssld)
     return model

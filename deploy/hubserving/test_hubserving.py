@@ -69,8 +69,8 @@ def main(args):
         img = cv2.imread(img_path)
         if img is None:
             logger.warning(
-                "Image file failed to read and has been skipped. The path: {}".
-                format(img_path))
+                f"Image file failed to read and has been skipped. The path: {img_path}"
+            )
             continue
         else:
             for ops in preprocess_ops:
@@ -101,8 +101,7 @@ def main(args):
                     msg = r.json()["msg"]
                     raise Exception(msg)
             except Exception as e:
-                logger.error("{}, in file(s): {} etc.".format(e, img_name_list[
-                    0]))
+                logger.error(f"{e}, in file(s): {img_name_list[0]} etc.")
                 continue
             else:
                 results = r.json()["results"]
@@ -120,8 +119,9 @@ def main(args):
                             result_list["class_ids"][i],
                             result_list["scores"][i])
 
-                    logger.info("File:{}, The result(s): {}".format(
-                        img_name_list[number], result_str))
+                    logger.info(
+                        f"File:{img_name_list[number]}, The result(s): {result_str}"
+                    )
 
             finally:
                 img_data_list = []
