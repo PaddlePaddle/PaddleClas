@@ -7,16 +7,9 @@
 飞桨图像识别套件PaddleClas是飞桨为工业界和学术界所准备的一个图像识别任务的工具集，助力使用者训练出更好的视觉模型和应用落地。
 
 **近期更新**
-
-- 2021.06.16 PaddleClas v2.2版本升级
-   - 集成Metric learning，向量检索等组件。
-   - 新增商品识别、动漫人物识别、车辆识别和logo识别等4个图像识别应用。
-   - 新增LeViT、Twins、TNT、DLA、HarDNet、RedNet系列30个预训练模型。
-- 2021.05.14
-   - 添加`SwinTransformer` 系列模型。
-- 2021.04.15
-   - 添加`MixNet_L`和`ReXNet_3_0`系列模型。
-   - 
+- 2021.06.16 PaddleClas v2.2版本升级，集成Metric learning，向量检索等组件。新增商品识别、动漫人物识别、车辆识别和logo识别等4个图像识别应用。新增LeViT、Twins、TNT、DLA、HarDNet、RedNet系列30个预训练模型。
+- 2021.05.14 添加`SwinTransformer` 系列模型。
+- 2021.04.15 添加`MixNet_L`和`ReXNet_3_0`系列模型。 
 - [more](./docs/zh_CN/update_history.md)
 
 
