@@ -88,14 +88,13 @@ cd ..
 ```
 ├── product_demo_data_v1.0
 │   ├── data_file.txt
-│   ├── data_file_update.txt
 │   ├── gallery
 │   ├── index
 │   └── query
 ├── ...
 ```
 
-其中`data_file.txt`与`data_file_update.txt`是用于构建索引库的图像列表文件，`data_file_update.txt`相比于`data_file_update.txt`多了安慕希的图片列表，用于构建更新的索引库，`gallery`文件夹中是所有用于构建索引库的图像原始文件，`index`文件夹中是构建索引库生成的索引文件，`query`是用来测试识别效果的demo图像。
+其中`data_file.txt`是用于构建索引库的图像列表文件，`gallery`文件夹中是所有用于构建索引库的图像原始文件，`index`文件夹中是构建索引库生成的索引文件，`query`是用来测试识别效果的demo图像。
 
 `models`文件夹下应有如下文件结构：
 
@@ -140,6 +139,13 @@ python3.7 python/predict_system.py -c configs/inference_product.yaml
 
 其中bbox表示检测出的主体所在位置，rec_docs表示索引库中与检出主体最相近的若干张图像对应的标签，rec_scores表示对应的相似度。由rec_docs字段可以看出，返回的5个结果中，有4个为`旺仔牛奶`，识别正确。
 
+检测的可视化结果也保存在`output`文件夹下。
+
+<div align="center">
+<img src="../../images/recognition/product_demo/wangzai_det_result.jpg"  width = "400" />
+</div>
+
+
 
 <a name="基于文件夹的批量识别"></a>
 #### 2.2.2 基于文件夹的批量识别
@@ -182,7 +188,32 @@ python3.7 python/predict_system.py -c configs/inference_product.yaml -o Global.i
 <a name="基于自己的数据集构建索引库"></a>
 ### 3.1 基于自己的数据集构建索引库
 
-首先需要获取待入库的原始图像文件(保存在`./dataset/product_demo_data_v1.0.0/gallery`文件夹中)以及对应的标签信息，记录原始图像文件的文件名与标签信息）保存在文本文件`./dataset/product_demo_data_v1.0/data_file_update.txt`中）。
+首先需要将与待检索图像相似的图像列表拷贝到索引库原始图像的文件夹(`./dataset/product_demo_data_v1.0.0/gallery`)中，运行下面的命令拷贝相似图像。
+
+```shell
+cp -r  ../docs/images/recognition/product_demo/gallery/anmuxi ./dataset/product_demo_data_v1.0/gallery/
+```
+
+然后需要编辑记录了图像路径和标签信息的文本文件(`./dataset/product_demo_data_v1.0/data_file.txt`)，这里基于原始标签文件，新建一个文件。命令如下。
+
+```shell
+# 复制文件
+cp dataset/product_demo_data_v1.0/data_file.txt dataset/product_demo_data_v1.0/data_file_update.txt
+```
+
+然后在文件`dataset/product_demo_data_v1.0/data_file_update.txt`中添加以下的信息，
+
+```
+gallery/anmuxi/001.jpg 安慕希酸奶
+gallery/anmuxi/002.jpg 安慕希酸奶
+gallery/anmuxi/003.jpg 安慕希酸奶
+gallery/anmuxi/004.jpg 安慕希酸奶
+gallery/anmuxi/005.jpg 安慕希酸奶
+gallery/anmuxi/006.jpg 安慕希酸奶
+```
+
+每一行的文本中，第一个字段表示图像的相对路径，第二个字段表示图像对应的标签信息，中间用`空格符`分隔开。
+
 
 然后使用下面的命令构建index索引，加速识别后的检索过程。
 
