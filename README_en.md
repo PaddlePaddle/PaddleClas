@@ -4,13 +4,13 @@
 
 ## Introduction
 
-PaddleClas is a image recognition toolset for industry and academia, helping users train better computer vision models and apply them in real scenarios.
+PaddleClas is an image recognition toolset for industry and academia, helping users train better computer vision models and apply them in real scenarios.
 
 **Recent updates**
 
 - 2021.06.16 PaddleClas release/2.2.
-   - Add metric learning and vector search module.
-   - Add product recognition, cartoon character recognition, car recognition and logo recognition.
+   - Add metric learning and vector search modules.
+   - Add product recognition, animation character recognition, vehicle recognition and logo recognition.
    - Added 30 pretrained models of LeViT, Twins, TNT, DLA, HarDNet, and RedNet, and the accuracy is roughly the same as that of the paper.
 
 - 2021.05.14
@@ -61,12 +61,12 @@ Quick experience of image recognition：[Link](./docs/zh_CN/tutorials/quick_star
     - [Mainbody Detection](./docs/zh_CN/application/object_detection.md)
     - Image Classification
         - [ImageNet Classification](./docs/zh_CN/tutorials/quick_start_professional.md)
-    - 特征学习
+    - Feature Learning
         - [Product Recognition](./docs/zh_CN/application/product_recognition.md)
         - [Vehicle Recognition](./docs/zh_CN/application/vehicle_reid.md)
         - [Logo Recognition](./docs/zh_CN/application/logo_recognition.md)
         - [Animation Character Recognition](./docs/zh_CN/application/cartoon_character_recognition.md)
-    - [Vector Retrieval](./deploy/vector_search/README.md)
+        - [Vector Retrieval](./deploy/vector_search/README.md)
 - Models Training/Evaluation
     - [Image Classification](./docs/zh_CN/tutorials/getting_started.md)
     - [Feature Learning](./docs/zh_CN/application/feature_learning.md)
