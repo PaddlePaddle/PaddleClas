@@ -13,8 +13,9 @@
     * [2.2.1 识别单张图像](#识别单张图像)
     * [2.2.2 基于文件夹的批量识别](#基于文件夹的批量识别)
 * [3. 未知类别的图像识别体验](#未知类别的图像识别体验)
-  * [3.1 基于自己的数据集构建索引库](#基于自己的数据集构建索引库)
-  * [3.2 基于新的索引库的图像识别](#基于新的索引库的图像识别)
+  * [3.1 准备新的数据与标签](#准备新的数据与标签)
+  * [3.2 建立新的索引库](#建立新的索引库)
+  * [3.3 基于新的索引库的图像识别](#基于新的索引库的图像识别)
 
 
 <a name="环境配置"></a>
@@ -185,8 +186,8 @@ python3.7 python/predict_system.py -c configs/inference_product.yaml -o Global.i
 
 当索引库中的图像无法覆盖我们实际识别的场景时，即在预测未知类别的图像时，我们需要将对应类别的相似图像添加到索引库中，从而完成对未知类别的图像识别，这一过程是不需要重新训练的。
 
-<a name="基于自己的数据集构建索引库"></a>
-### 3.1 基于自己的数据集构建索引库
+<a name="准备新的数据与标签"></a>
+### 3.1 准备新的数据与标签
 
 首先需要将与待检索图像相似的图像列表拷贝到索引库原始图像的文件夹(`./dataset/product_demo_data_v1.0.0/gallery`)中，运行下面的命令拷贝相似图像。
 
@@ -215,7 +216,10 @@ gallery/anmuxi/006.jpg 安慕希酸奶
 每一行的文本中，第一个字段表示图像的相对路径，第二个字段表示图像对应的标签信息，中间用`空格符`分隔开。
 
 
-然后使用下面的命令构建index索引，加速识别后的检索过程。
+<a name="建立新的索引库"></a>
+### 3.2 建立新的索引库
+
+使用下面的命令构建index索引，加速识别后的检索过程。
 
 ```shell
 python3.7 python/build_gallery.py -c configs/build_product.yaml -o IndexProcess.data_file="./dataset/product_demo_data_v1.0/data_file_update.txt" -o IndexProcess.index_path="./dataset/product_demo_data_v1.0/index_update"
@@ -225,7 +229,7 @@ python3.7 python/build_gallery.py -c configs/build_product.yaml -o IndexProcess.
 
 
 <a name="基于新的索引库的图像识别"></a>
-### 3.2 基于新的索引库的图像识别
+### 3.3 基于新的索引库的图像识别
 
 使用新的索引库，对上述图像进行识别，运行命令如下。
 
