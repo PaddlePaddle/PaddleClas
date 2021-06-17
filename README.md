@@ -27,7 +27,7 @@ Res2Net200_vd预训练模型Top-1精度高达85.1%。
 
 - 数据增广：支持AutoAugment、Cutout、Cutmix等8种数据增广算法详细介绍、代码复现和在统一实验环境下的效果评估。
 
-## 效果展示
+## 图像识别系统效果展示
 <div align="center">
 <img src="./docs/images/recognition.gif"  width = "400" />
 </div>
@@ -40,6 +40,8 @@ Res2Net200_vd预训练模型Top-1精度高达85.1%。
 <img src="./docs/images/wx_group.jpeg"  width = "200" />
 </div>
 
+## 快速体验
+图像识别快速体验：./docs/zh_CN/tutorials/quick_start_recognition.md
 
 ## 文档教程
 
