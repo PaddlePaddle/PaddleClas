@@ -12,19 +12,19 @@
 
 常见服务器端模型的精度指标与其预测耗时的变化曲线如下图所示。
 
-![](./docs/images/models/T4_benchmark/t4.fp32.bs1.main_fps_top1.png)
+![](../images/models/T4_benchmark/t4.fp32.bs1.main_fps_top1.png)
 
 
 常见移动端模型的精度指标与其预测耗时、模型存储大小的变化曲线如下图所示。
 
-![](./docs/images/models/mobile_arm_storage.png)
+![](../images/models/mobile_arm_storage.png)
 
-![](./docs/images/models/mobile_arm_top1.png)
+![](../images/models/mobile_arm_top1.png)
 
 
 <a name="SSLD知识蒸馏系列"></a>
 ### SSLD知识蒸馏预训练模型
-基于SSLD知识蒸馏的预训练模型列表如下所示，更多关于SSLD知识蒸馏方案的介绍可以参考：[SSLD知识蒸馏文档](./docs/zh_CN/advanced_tutorials/distillation/distillation.md)。
+基于SSLD知识蒸馏的预训练模型列表如下所示，更多关于SSLD知识蒸馏方案的介绍可以参考：[SSLD知识蒸馏文档](./advanced_tutorials/distillation/distillation.md)。
 
 * 服务器端知识蒸馏模型
 
@@ -59,7 +59,7 @@
 <a name="ResNet及其Vd系列"></a>
 ### ResNet及其Vd系列
 
-ResNet及其Vd系列模型的精度、速度指标如下表所示，更多关于该系列的模型介绍可以参考：[ResNet及其Vd系列模型文档](./docs/zh_CN/models/ResNet_and_vd.md)。
+ResNet及其Vd系列模型的精度、速度指标如下表所示，更多关于该系列的模型介绍可以参考：[ResNet及其Vd系列模型文档](./models/ResNet_and_vd.md)。
 
 | 模型                  | Top-1 Acc | Top-5 Acc | time(ms)<br>bs=1 | time(ms)<br>bs=4 | Flops(G) | Params(M) | 下载地址                                                                                         |
 |---------------------|-----------|-----------|-----------------------|----------------------|----------|-----------|----------------------------------------------------------------------------------------------|
@@ -85,7 +85,7 @@ ResNet及其Vd系列模型的精度、速度指标如下表所示，更多关于
 <a name="移动端系列"></a>
 ### 移动端系列
 
-移动端系列模型的精度、速度指标如下表所示，更多关于该系列的模型介绍可以参考：[移动端系列模型文档](./docs/zh_CN/models/Mobile.md)。
+移动端系列模型的精度、速度指标如下表所示，更多关于该系列的模型介绍可以参考：[移动端系列模型文档](./models/Mobile.md)。
 
 | 模型          | Top-1 Acc | Top-5 Acc | SD855 time(ms)<br>bs=1 | Flops(G) | Params(M) | 模型大小(M) | 下载地址   |
 |----------------------------------|-----------|-----------|------------------------|----------|-----------|---------|-----------------------------------------------------------------------------------------------------------|
@@ -130,7 +130,7 @@ ResNet及其Vd系列模型的精度、速度指标如下表所示，更多关于
 <a name="SEResNeXt与Res2Net系列"></a>
 ### SEResNeXt与Res2Net系列
 
-SEResNeXt与Res2Net系列模型的精度、速度指标如下表所示，更多关于该系列的模型介绍可以参考：[SEResNeXt与Res2Net系列模型文档](./docs/zh_CN/models/SEResNext_and_Res2Net.md)。
+SEResNeXt与Res2Net系列模型的精度、速度指标如下表所示，更多关于该系列的模型介绍可以参考：[SEResNeXt与Res2Net系列模型文档](./models/SEResNext_and_Res2Net.md)。
 
 
 | 模型                  | Top-1 Acc | Top-5 Acc | time(ms)<br>bs=1 | time(ms)<br>bs=4 | Flops(G) | Params(M) | 下载地址                                                                                         |
@@ -165,7 +165,7 @@ SEResNeXt与Res2Net系列模型的精度、速度指标如下表所示，更多�
 <a name="DPN与DenseNet系列"></a>
 ### DPN与DenseNet系列
 
-DPN与DenseNet系列模型的精度、速度指标如下表所示，更多关于该系列的模型介绍可以参考：[DPN与DenseNet系列模型文档](./docs/zh_CN/models/DPN_DenseNet.md)。
+DPN与DenseNet系列模型的精度、速度指标如下表所示，更多关于该系列的模型介绍可以参考：[DPN与DenseNet系列模型文档](./models/DPN_DenseNet.md)。
 
 
 | 模型                  | Top-1 Acc | Top-5 Acc | time(ms)<br>bs=1 | time(ms)<br>bs=4 | Flops(G) | Params(M) | 下载地址                                                                                         |
@@ -186,7 +186,7 @@ DPN与DenseNet系列模型的精度、速度指标如下表所示，更多关于
 <a name="HRNet系列"></a>
 ### HRNet系列
 
-HRNet系列模型的精度、速度指标如下表所示，更多关于该系列的模型介绍可以参考：[HRNet系列模型文档](./docs/zh_CN/models/HRNet.md)。
+HRNet系列模型的精度、速度指标如下表所示，更多关于该系列的模型介绍可以参考：[HRNet系列模型文档](./models/HRNet.md)。
 
 
 | 模型          | Top-1 Acc | Top-5 Acc | time(ms)<br>bs=1 | time(ms)<br>bs=4 | Flops(G) | Params(M) | 下载地址                                                                                 |
@@ -206,7 +206,7 @@ HRNet系列模型的精度、速度指标如下表所示，更多关于该系列
 <a name="Inception系列"></a>
 ### Inception系列
 
-Inception系列模型的精度、速度指标如下表所示，更多关于该系列的模型介绍可以参考：[Inception系列模型文档](./docs/zh_CN/models/Inception.md)。
+Inception系列模型的精度、速度指标如下表所示，更多关于该系列的模型介绍可以参考：[Inception系列模型文档](./models/Inception.md)。
 
 | 模型                  | Top-1 Acc | Top-5 Acc | time(ms)<br>bs=1 | time(ms)<br>bs=4 | Flops(G) | Params(M) | 下载地址                                                                                         |
 |--------------------|-----------|-----------|-----------------------|----------------------|----------|-----------|---------------------------------------------------------------------------------------------|
@@ -223,7 +223,7 @@ Inception系列模型的精度、速度指标如下表所示，更多关于该�
 <a name="EfficientNet与ResNeXt101_wsl系列"></a>
 ### EfficientNet与ResNeXt101_wsl系列
 
-EfficientNet与ResNeXt101_wsl系列模型的精度、速度指标如下表所示，更多关于该系列的模型介绍可以参考：[EfficientNet与ResNeXt101_wsl系列模型文档](./docs/zh_CN/models/EfficientNet_and_ResNeXt101_wsl.md)。
+EfficientNet与ResNeXt101_wsl系列模型的精度、速度指标如下表所示，更多关于该系列的模型介绍可以参考：[EfficientNet与ResNeXt101_wsl系列模型文档](./models/EfficientNet_and_ResNeXt101_wsl.md)。
 
 
 | 模型                        | Top-1 Acc | Top-5 Acc | time(ms)<br>bs=1 | time(ms)<br>bs=4 | Flops(G) | Params(M) | 下载地址                                                                                               |
@@ -247,7 +247,7 @@ EfficientNet与ResNeXt101_wsl系列模型的精度、速度指标如下表所示
 <a name="ResNeSt与RegNet系列"></a>
 ### ResNeSt与RegNet系列
 
-ResNeSt与RegNet系列模型的精度、速度指标如下表所示，更多关于该系列的模型介绍可以参考：[ResNeSt与RegNet系列模型文档](./docs/zh_CN/models/ResNeSt_RegNet.md)。
+ResNeSt与RegNet系列模型的精度、速度指标如下表所示，更多关于该系列的模型介绍可以参考：[ResNeSt与RegNet系列模型文档](./models/ResNeSt_RegNet.md)。
 
 
 | 模型                     | Top-1 Acc | Top-5 Acc | time(ms)<br>bs=1 | time(ms)<br>bs=4 | Flops(G) | Params(M) | 下载地址                                                                                                 |
@@ -260,7 +260,7 @@ ResNeSt与RegNet系列模型的精度、速度指标如下表所示，更多关�
 <a name="ViT_and_DeiT系列"></a>
 ### ViT_and_DeiT系列
 
-ViT（Vision Transformer）与DeiT（Data-efficient Image Transformers）系列模型的精度、速度指标如下表所示. 更多关于该系列模型的介绍可以参考： [ViT_and_DeiT系列模型文档](./docs/zh_CN/models/ViT_and_DeiT.md)。
+ViT（Vision Transformer）与DeiT（Data-efficient Image Transformers）系列模型的精度、速度指标如下表所示. 更多关于该系列模型的介绍可以参考： [ViT_and_DeiT系列模型文档](./models/ViT_and_DeiT.md)。
 
 
 | 模型                  | Top-1 Acc | Top-5 Acc | time(ms)<br>bs=1 | time(ms)<br>bs=4 | Flops(G) | Params(M) | 下载地址 |
@@ -291,7 +291,7 @@ ViT（Vision Transformer）与DeiT（Data-efficient Image Transformers）系列�
 
 ### RepVGG系列
 
-关于RepVGG系列模型的精度、速度指标如下表所示，更多介绍可以参考：[RepVGG系列模型文档](./docs/zh_CN/models/RepVGG.md)。
+关于RepVGG系列模型的精度、速度指标如下表所示，更多介绍可以参考：[RepVGG系列模型文档](./models/RepVGG.md)。
 
 
 | 模型                     | Top-1 Acc | Top-5 Acc | time(ms)<br>bs=1 | time(ms)<br>bs=4 | Flops(G) | Params(M) | 下载地址 |
@@ -311,7 +311,7 @@ ViT（Vision Transformer）与DeiT（Data-efficient Image Transformers）系列�
 
 ### MixNet系列
 
-关于MixNet系列模型的精度、速度指标如下表所示，更多介绍可以参考：[MixNet系列模型文档](./docs/zh_CN/models/MixNet.md)。
+关于MixNet系列模型的精度、速度指标如下表所示，更多介绍可以参考：[MixNet系列模型文档](./models/MixNet.md)。
 
 | 模型     | Top-1 Acc | Top-5 Acc | time(ms)<br>bs=1 | time(ms)<br>bs=4 | Flops(M) | Params(M) | 下载地址                                                     |
 | -------- | --------- | --------- | ---------------- | ---------------- | -------- | --------- | ------------------------------------------------------------ |
@@ -323,7 +323,7 @@ ViT（Vision Transformer）与DeiT（Data-efficient Image Transformers）系列�
 
 ### ReXNet系列
 
-关于ReXNet系列模型的精度、速度指标如下表所示，更多介绍可以参考：[ReXNet系列模型文档](./docs/zh_CN/models/ReXNet.md)。
+关于ReXNet系列模型的精度、速度指标如下表所示，更多介绍可以参考：[ReXNet系列模型文档](./models/ReXNet.md)。
 
 | 模型       | Top-1 Acc | Top-5 Acc | time(ms)<br>bs=1 | time(ms)<br>bs=4 | Flops(G) | Params(M) | 下载地址                                                     |
 | ---------- | --------- | --------- | ---------------- | ---------------- | -------- | --------- | ------------------------------------------------------------ |
@@ -337,7 +337,7 @@ ViT（Vision Transformer）与DeiT（Data-efficient Image Transformers）系列�
 
 ### SwinTransformer系列
 
-关于SwinTransformer系列模型的精度、速度指标如下表所示，更多介绍可以参考：[SwinTransformer系列模型文档](./docs/zh_CN/models/SwinTransformer.md)。
+关于SwinTransformer系列模型的精度、速度指标如下表所示，更多介绍可以参考：[SwinTransformer系列模型文档](./models/SwinTransformer.md)。
 
 | 模型       | Top-1 Acc | Top-5 Acc | time(ms)<br>bs=1 | time(ms)<br>bs=4 | Flops(G) | Params(M) | 下载地址                                                     |
 | ---------- | --------- | --------- | ---------------- | ---------------- | -------- | --------- | ------------------------------------------------------------ |
@@ -356,7 +356,7 @@ ViT（Vision Transformer）与DeiT（Data-efficient Image Transformers）系列�
 
 ### 其他模型
 
-关于AlexNet、SqueezeNet系列、VGG系列、DarkNet53等模型的精度、速度指标如下表所示，更多介绍可以参考：[其他模型文档](./docs/zh_CN/models/Others.md)。
+关于AlexNet、SqueezeNet系列、VGG系列、DarkNet53等模型的精度、速度指标如下表所示，更多介绍可以参考：[其他模型文档](./models/Others.md)。
 
 
 | 模型                     | Top-1 Acc | Top-5 Acc | time(ms)<br>bs=1 | time(ms)<br>bs=4 | Flops(G) | Params(M) | 下载地址 |
