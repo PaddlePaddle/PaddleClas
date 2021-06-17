@@ -14,7 +14,7 @@ Global:
   use_visualdl: False
   image_shape: [3, 224, 224]
   infer_imgs:
-  save_inference_dir: "./output"
+  save_inference_dir: "./inference"
   feature_normalize: True
 
 Arch:  
