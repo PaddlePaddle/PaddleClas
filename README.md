@@ -2,10 +2,6 @@
 
 # PaddleClas
 
-<div align="center">
-<img src="./docs/images/recognition.gif"  width = "400" />
-</div>
-
 ## 简介
 
 飞桨图像识别套件PaddleClas是飞桨为工业界和学术界所准备的一个图像识别任务的工具集，助力使用者训练出更好的视觉模型和应用落地。
@@ -37,6 +33,11 @@
 Res2Net200_vd预训练模型Top-1精度高达85.1%。
 
 - 数据增广：支持AutoAugment、Cutout、Cutmix等8种数据增广算法详细介绍、代码复现和在统一实验环境下的效果评估。
+
+## 效果展示
+<div align="center">
+<img src="./docs/images/recognition.gif"  width = "400" />
+</div>
 
 ## 欢迎加入技术交流群
 
