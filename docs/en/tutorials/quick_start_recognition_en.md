@@ -15,7 +15,7 @@ If the image category already exists in the image index database, then you can t
 * [3. Unknown Category Image Recognition Experience](#unkonw_category_image_recognition_experience)
   * [3.1 Prepare for the new images and labels](#3.1)
   * [3.2 Build a new Index Library](#build_a_new_index_library)
-  * [3.3 ecognize the Unknown Category Images](#Image_differentiation_based_on_the_new_index_library)
+  * [3.3 Recognize the Unknown Category Images](#Image_differentiation_based_on_the_new_index_library)
 
 
 <a name="enviroment_preparation"></a>
