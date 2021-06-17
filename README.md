@@ -25,17 +25,16 @@
 
 
 ## 特性
-<div align="center">
-<img src="./docs/images/structure.png"  width = "400" />
-</div>
+
 - 完整的图像识别解决方案：集成了检测、特征学习、检索等模块，广泛适用于各类图像识别任务。
 提供商品识别、车辆识别、logo识别和动漫人物识别等4个示例解决方案。
 
-- 丰富的预训练模型库：提供了29个系列共134个ImageNet预训练模型，其中6个精选系列模型支持结构快速修改。
+- 丰富的预训练模型库：提供了35个系列共164个ImageNet预训练模型，其中6个精选系列模型支持结构快速修改。
 
-- 全面易用的特征学习组件：集成大量度量学习方法，通过配置文件即可随意组合切换。
+- 全面易用的特征学习组件：集成arcmargin, triplet loss等12度量学习方法，通过配置文件即可随意组合切换。
 
-- SSLD知识蒸馏：基于该方案蒸馏模型的识别准确率普遍提升3%以上。
+- SSLD知识蒸馏：14个分类预训练模型，精度普遍提升3%以上；其中ResNet50_vd模型在ImageNet-1k数据集上的Top-1精度达到了84.0%，
+Res2Net200_vd预训练模型Top-1精度高达85.1%。
 
 - 数据增广：支持AutoAugment、Cutout、Cutmix等8种数据增广算法详细介绍、代码复现和在统一实验环境下的效果评估。
 
@@ -52,8 +51,7 @@
 
 - [快速安装](./docs/zh_CN/tutorials/install.md)
 - [图像识别快速体验](./docs/zh_CN/tutorials/quick_start_recognition.md)
-- [图像分类快速体验](./docs/zh_CN/tutorials/quick_start_new_user.md)
-- 算法介绍
+- 算法介绍（更新中）
     - [骨干网络模型库和预训练模型介绍](./docs/zh_CN/models/models_intro.md)
     - [主体检测](./docs/zh_CN/application/object_detection.md)
     - 图像分类
@@ -81,6 +79,22 @@
     - [图像分类任务FAQ](docs/zh_CN/faq.md)
 - [许可证书](#许可证书)
 - [贡献代码](#贡献代码)
+
+
+<a name="图像识别系统介绍"></a>
+<div align="center">
+<img src="./docs/images/structure.png"  width = "400" />
+</div>
+
+PaddleClas图像识别系统包含4个主要模块：
+
+主体检测：采用高精准超轻量的PP-YOLOv2检测算法，快速对图像进行主体检测，提升识别效率。
+
+骨干网络：精选6个系列Backbone，覆盖最精巧的移动端模型和高精准的服务端模型，支持对结构进行快速修改，满足不同使用场景的需求。
+
+度量学习：集成ArcMargin, CenterLoss, TriHard等业界最领先的度量学习方法，并能任意组合，轻松训练出鲁棒的图像特征。
+
+检索系统：集成百度自研的Möbius算法，高效完成向量检索，并能随时更新检索库，一次训练长期使用。
 
 
 <a name="许可证书"></a>
