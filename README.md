@@ -12,7 +12,7 @@
 - 2021.05.14 添加`SwinTransformer` 系列模型。
 - 2021.04.15 添加`MixNet_L`和`ReXNet_3_0`系列模型。 
 
-- [more](./docs/zh_CN/update_history.md)
+[more](./docs/zh_CN/update_history.md)
 
 ## 特性
 
