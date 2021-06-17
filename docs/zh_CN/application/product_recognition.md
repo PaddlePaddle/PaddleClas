@@ -4,72 +4,34 @@
 
 ## 1 算法介绍
 
-算法整体流程，详见[特征学习](./feature_learning.md)整体流程。此方案在不同的数据集
+算法整体流程，详见[特征学习](./feature_learning.md)整体流程。
 
-车辆ReID整体设置详见: [ResNet50_ReID.yaml](../../../ppcls/configs/Vehicle/ResNet50_ReID.yaml)。
-
-车辆细分类整体设置详见：[ResNet50.yaml](../../../ppcls/configs/Vehicle/ResNet50.yaml)
+整体设置详见: [ResNet50_vd_Aliproduct.yaml](../../../ppcls/configs/Products/ResNet50_vd_Aliproduct.yaml)
 
 具体细节如下所示。
 
-
-## 1 Aliproduct
-
-### 1 数据集
-
-<img src="../../images/product/aliproduct.png" style="zoom:50%;" />
-
-Aliproduct数据是天池竞赛开源的一个数据集，也是目前开源的最大的商品数据集，其有5万多个标识类别，约250万训练图片。相关数据介绍参考[原论文](https://arxiv.org/abs/2008.05359)。
-
-### 2 图像预处理
+### 1.1数据增强
 
 - 图像`Resize`到224x224
 - 图像`RandomFlip`
 - Normlize：图像归一化  
 
-### 3 Backbone的具体设置
+### 1.2 Backbone的具体设置
 
-具体是用`ResNet50_vd`作为backbone，主要做了如下修改：
+具体是用`ResNet50_vd`作为backbone，使用ImageNet预训练模型
 
- - 使用ImageNet预训练模型
+### 1.3 Neck部分
 
- - 在GAP后、分类层前加入一个512维的embedding FC层，没有做BatchNorm和激活。
+加入一个512维的embedding FC层，没有做BatchNorm和激活。
 
+### 1.4 Metric Learning相关Loss的设置
 
-### 4 Loss的设置
+目前使用了[CELoss](../../../ppcls/loss/celoss.py)训练, 为了获得更加鲁棒的特征，后续会使用其他Loss参与训练，敬请期待
 
-在Aliproduct商品识别中，使用了[CELoss](../../../ppcls/loss/celoss.py)训练, 为了获得更加鲁棒的特征，后续会使用其他Loss参与训练，敬请期待。
+## 2 实验结果
 
-全部的超参数及具体配置：[ResNet50_vd_Aliproduct.yaml](../../../ppcls/configs/Products/ResNet50_vd_Aliproduct.yaml)
+<img src="../../images/product/aliproduct.png" style="zoom:50%;" />
 
+此方案在Aliproduct数据集上进行实验。此数据集是天池竞赛开源的一个数据集，也是目前开源的最大的商品数据集，其有5万多个标识类别，约250万训练图片。相关数据介绍参考[原论文](https://arxiv.org/abs/2008.05359)。
 
-## 2 Inshop
-
-### 1 数据集
-
-<img src="../../images/product/inshop.png" style="zoom:50%;" />
-
-Inshop数据集是DeepFashion的子集，其是香港中文大学开放的一个large-scale服装数据集，Inshop数据集是其中服装检索数据集，涵盖了大量买家秀的服装。相关数据介绍参考[原论文](https://openaccess.thecvf.com/content_cvpr_2016/papers/Liu_DeepFashion_Powering_Robust_CVPR_2016_paper.pdf)。
-
-### 2 图像预处理
-
-数据增强是训练大规模
-- 图像`Resize`到224x224
-- 图像`RandomFlip`
-- Normlize：图像归一化
-- [RandomErasing](https://arxiv.org/pdf/1708.04896v2.pdf)
-
-### 3 Backbone的具体设置
-
-具体是用`ResNet50_vd`作为backbone，主要做了如下修改：
-
- - 使用ImageNet预训练模型
-
- - 在GAP后、分类层前加入一个512维的embedding FC层，没有做BatchNorm和激活。
-
- - 分类层采用[Arcmargin Head](../../../ppcls/arch/gears/arcmargin.py)，具体原理可参考[原论文](https://arxiv.org/pdf/1801.07698.pdf)。
-### 4 Loss的设置
-
-在Inshop商品识别中，使用了[CELoss](../../../ppcls/loss/celoss.py)和[TripletLossV2](../../../ppcls/loss/triplet.py)联合训练。
-
-全部的超参数及具体配置：[ResNet50_vd_Inshop.yaml](../../../ppcls/configs/Products/ResNet50_vd_Inshop.yaml)
+在此数据上，单模型Top 1 Acc：85.67%。
