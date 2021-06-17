@@ -10,6 +10,8 @@
 
 飞桨图像识别套件PaddleClas是飞桨为工业界和学术界所准备的一个图像识别任务的工具集，助力使用者训练出更好的视觉模型和应用落地。
 
+**近期更新**
+
 - 2021.06.16 PaddleClas v2.2版本升级
    - 集成Metric learning，向量检索等组件。
    - 新增商品识别、动漫人物识别、车辆识别和logo识别等4个图像识别应用。
@@ -43,7 +45,7 @@ Res2Net200_vd预训练模型Top-1精度高达85.1%。
 * 您也可以扫描下面的微信群二维码， 加入PaddleClas 微信交流群。获得更高效的问题答疑，与各行各业开发者充分交流，期待您的加入。
 
 <div align="center">
-<img src="./docs/images/wx_group.jpeg"  width = "200" />
+<img src="./docs/images/wx_group.png"  width = "200" />
 </div>
 
 
