@@ -128,7 +128,7 @@ python3.7 python/predict_system.py -c configs/inference_product.yaml
 待检索图像如下所示。
 
 <div align="center">
-<img src="../docs/images/recognition/product_demo/wangzai.jpg"  width = "400" />
+<img src="../../images/recognition/product_demo/wangzai.jpg"  width = "400" />
 </div>
 
 
@@ -165,7 +165,7 @@ python3.7 python/predict_system.py -c configs/inference_product.yaml -o Global.i
 待检索图像如下所示。
 
 <div align="center">
-<img src="../docs/images/recognition/product_demo/anmuxi.jpg"  width = "400" />
+<img src="../../images/recognition/product_demo/anmuxi.jpg"  width = "400" />
 </div>
 
 
