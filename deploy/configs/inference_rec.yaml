@@ -10,7 +10,7 @@ Global:
 
   # inference engine config
   use_gpu: False
-  enable_mkldnn: True
+  enable_mkldnn: False
   cpu_num_threads: 100
   enable_benchmark: True
   use_fp16: False
