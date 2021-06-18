@@ -11,8 +11,8 @@ inference 模型（`paddle.jit.save`保存的模型）
 
 
 - [一、训练模型转inference模型](#训练模型转inference模型)
-    - [1. 特征提取模型转inference模型](#特征提取模型转inference模型)  
-    - [2. 分类模型转inference模型](#分类模型转inference模型)
+    - [1.1 特征提取模型转inference模型](#特征提取模型转inference模型)  
+    - [1.2 分类模型转inference模型](#分类模型转inference模型)
 
 - [二、主体检测模型推理](#主体检测模型推理)
 
@@ -27,7 +27,7 @@ inference 模型（`paddle.jit.save`保存的模型）
 ## 一、训练模型转inference模型
 
 <a name="特征提取模型转inference模型"></a>
-### \1. 特征提取模型转inference模型
+### 1.1 特征提取模型转inference模型
 以下命令请在PaddleClas的根目录执行。以商品识别特征提取模型模型为例，首先下载预训练模型：
 
 ```shell script
@@ -55,7 +55,7 @@ python3.7 tools/export_model.py -c ppcls/configs/Products/ResNet50_vd_Aliproduct
 ```
 
 <a name="分类模型转inference模型"></a>
-### \2. 分类模型转inference模型
+### 1.2 分类模型转inference模型
 
 下载预训练模型：
 ``` shell script
