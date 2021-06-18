@@ -57,8 +57,6 @@ brew install wget
 3. 如果希望在windows环境下安装wget，可以参考：[链接](https://www.cnblogs.com/jeshy/p/10518062.html)；如果希望在windows环境中安装tar命令，可以参考：[链接](https://www.cnblogs.com/chooperman/p/14190107.html)。
 
 
-
-
 * 可以按照下面的命令下载并解压数据与模型
 
 ```shell
@@ -82,6 +80,12 @@ cd ..
 以商品识别为例，下载通用检测、识别模型以及商品识别demo数据，命令如下。
 
 ```shell
+mkdir dataset
+cd dataset
+# 下载demo数据并解压
+wget https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/data/product_demo_data_v1.0.tar && tar -xf product_demo_data_v1.0.tar
+cd ..
+
 mkdir models
 cd models
 # 下载通用检测inference模型并解压
@@ -89,11 +93,6 @@ wget https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/infere
 # 下载识别inference模型并解压
 wget https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/inference/product_ResNet50_vd_aliproduct_v1.0_infer.tar && tar -xf product_ResNet50_vd_aliproduct_v1.0_infer.tar
 
-cd ..
-mkdir dataset
-cd dataset
-# 下载demo数据并解压
-wget https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/data/product_demo_data_v1.0.tar && tar -xf product_demo_data_v1.0.tar
 cd ..
 ```
 
