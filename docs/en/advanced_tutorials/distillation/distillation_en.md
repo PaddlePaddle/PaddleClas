@@ -106,6 +106,14 @@ Finetuning is carried out on ImageNet1k dataset to restore distribution between 
 
 * For image classsification tasks, The model accuracy can be further improved when the test scale is 1.15 times that of training[5]. For the 82.99% ResNet50_vd pretrained model, it comes to 83.7% using 320x320 for the evaluation. We use Fix strategy to finetune the model with the training scale set as 320x320. During the process, the pre-preocessing pipeline is same for both training and test. All the weights except the fully connected layer are freezed. Finally the top-1 accuracy comes to **84.0%**.
 
+### Some phenomena during the experiment
+
+In the prediction process, the average value and variance of the batch norm are obtained by loading the pretrained model (set its mode as test mode). In the training process, batch norm is obtained by counting the information of the current batch (set its mode as train mode) and calculating the moving average with the historical saved information. In the distillation task, we found that through the train mode, In the distillation task, we found that the real-time change of the bn parameter of the teacher model to guide the student model is better than the student model obtained through the test mode distillation. The following is a set of experimental results. Therefore, in this distillation scheme, we use train mode to get the soft label of the teacher model.
+
+|Teacher Model | Teacher Top1 | Student Model | Student Top1|
+|- |:-: |:-: | :-: |
+| ResNet50_vd | 82.35% | MobileNetV3_large_x1_0 | 76.00% |
+| ResNet50_vd | 82.35% | MobileNetV3_large_x1_0 | 75.84% |
 
 ## Application of the distillation model
 
@@ -113,7 +121,7 @@ Finetuning is carried out on ImageNet1k dataset to restore distribution between 
 
 * Adjust the learning rate of the middle layer. The middle layer feature map of the model obtained by distillation is more refined. Therefore, when the distillation model is used as the pretrained model in other tasks, if the same learning rate as before is adopted, it is easy to destroy the features. If the learning rate of the overall model training is reduced, it will bring about the problem of slow convergence. Therefore, we use the strategy of adjusting the learning rate of the middle layer. specifically:
     * For ResNet50_vd, we set up a learning rate list. The three conv2d convolution parameters before the resiual block have a uniform learning rate multiple, and the four resiual block conv2d have theirs own learning rate parameters, respectively. 5 values need to be set in the list. By the experiment, we find that when used for transfer learning finetune classification model, the learning rate list with `[0.1,0.1,0.2,0.2,0.3]` performs better in most tasks; while in the object detection tasks, `[0.05, 0.05, 0.05, 0.1, 0.15]` can bring greater accuracy gains.
-    * For MoblileNetV3_large_1x0, because it contains 15 blocks, we set each 3 blocks to share a learning rate, so 5 learning rate values are required. We find that in classification and detection tasks, the learning rate list with `[0.25, 0.25, 0.5, 0.5, 0.75]` performs better in most tasks.
+    * For MoblileNetV3_large_x1_0, because it contains 15 blocks, we set each 3 blocks to share a learning rate, so 5 learning rate values are required. We find that in classification and detection tasks, the learning rate list with `[0.25, 0.25, 0.5, 0.5, 0.75]` performs better in most tasks.
 * Appropriate l2 decay. Different l2 decay values are set for different models during training. In order to prevent overfitting, l2 decay is ofen set as large for large models. L2 decay is set as `1e-4` for ResNet50, and `1e-5 ~ 4e-5` for MobileNet series models. L2 decay needs also to be adjusted when applied in other tasks. Taking Faster_RCNN_MobiletNetV3_FPN as an example, we found that only modifying l2 decay can bring up to 0.5% accuracy (mAP) improvement on the COCO2017 dataset.
 
 
@@ -167,53 +175,51 @@ This section will introduce the SSLD distillation experiments in detail based on
 
 
 
-#### Distill ResNet50_vd using ResNeXt101_32x16d_wsl
+#### Distill MobileNetV3_small_x1_0 using MobileNetV3_large_x1_0
 
-Configuration of distilling `ResNet50_vd` using `ResNeXt101_32x16d_wsl` is as follows.
+An example of SSLD distillation is provided here. The configuration file of `MobileNetV3_large_x1_0` distilling `MobileNetV3_small_x1_0` is provided in `ppcls/configs/ImageNet/Distillation/mv3_large_x1_0_distill_mv3_small_x1_0.yaml`, and the user can directly replace the path of the configuration file in `tools/train.sh` to use it.
 
-```yaml
-ARCHITECTURE:
-    name: 'ResNeXt101_32x16d_wsl_distill_ResNet50_vd'
-pretrained_model: "./pretrained/ResNeXt101_32x16d_wsl_pretrained/"
-# pretrained_model:
-#     - "./pretrained/ResNeXt101_32x16d_wsl_pretrained/"
-#     - "./pretrained/ResNet50_vd_pretrained/"
-use_distillation: True
-```
-
-#### Distill MobileNetV3_large_x1_0 using ResNet50_vd_ssld
-
-The detailed configuration is as follows.
+Configuration of distilling `MobileNetV3_large_x1_0` using `MobileNetV3_small_x1_0` is as follows.
 
 ```yaml
-ARCHITECTURE:
-    name: 'ResNet50_vd_distill_MobileNetV3_large_x1_0'
-pretrained_model: "./pretrained/ResNet50_vd_ssld_pretrained/"
-# pretrained_model:
-#     - "./pretrained/ResNet50_vd_ssld_pretrained/"
-#     - "./pretrained/ResNet50_vd_pretrained/"
-use_distillation: True
+Arch:
+  name: "DistillationModel"
+  # if not null, its lengths should be same as models
+  pretrained_list:
+  # if not null, its lengths should be same as models
+  freeze_params_list:
+  - True
+  - False
+  models:
+    - Teacher:
+        name: MobileNetV3_large_x1_0
+        pretrained: True
+        use_ssld: True
+    - Student:
+        name: MobileNetV3_small_x1_0
+        pretrained: False
+
+  infer_model_name: "Student"
 ```
+
+In configuration file, the `freeze_params_list` needs to specify whether the model needs to freeze the parameters, the `models` needs to specify the teacher model and the student model, and the teacher model needs to load the pretrained model. The user can directly change the model here.
 
 ### Begin to train the network
 
 If everything is ready, users can begin to train the network using the following command.
 
 ```bash
-export PYTHONPATH=path_to_PaddleClas:$PYTHONPATH
 
 python -m paddle.distributed.launch \
     --selected_gpus="0,1,2,3" \
-    --log_dir=R50_vd_distill_MV3_large_x1_0 \
+    --log_dir=mv3_large_x1_0_distill_mv3_small_x1_0 \
     tools/train.py \
-        -c ./configs/Distillation/R50_vd_distill_MV3_large_x1_0.yaml
+        -c ./ppcls/configs/ImageNet/Distillation/mv3_large_x1_0_distill_mv3_small_x1_0.yaml
 ```
 
 ### Note
 
 * Before using SSLD, users need to train a teacher model on the target dataset firstly. The teacher model is used to guide the training of the student model.
-
-* When using SSLD, users need to set `use_distillation` in the configuration file to` True`. In addition, because the student model learns soft-label with knowledge information, you need to turn off the `label_smoothing` option.
 
 * If the student model is not loaded with a pretrained model, the other hyperparameters of the training can refer to the hyperparameters trained by the student model on ImageNet-1k. If the student model is loaded with the pre-trained model, the learning rate can be adjusted to `1/100~1/10` of the standard learning rate.
 
