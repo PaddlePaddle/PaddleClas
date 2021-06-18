@@ -12,7 +12,7 @@
 
 ### 1.1数据增强
 
-- 图像`Resize`到224x224
+- 图像`RandomCrop`到224x224
 - 图像`RandomFlip`
 - Normlize：图像归一化  
 
@@ -26,12 +26,16 @@
 
 ### 1.4 Metric Learning相关Loss的设置
 
-目前使用了[CELoss](../../../ppcls/loss/celoss.py)训练, 为了获得更加鲁棒的特征，后续会使用其他Loss参与训练，敬请期待
+目前使用了[CELoss](../../../ppcls/loss/celoss.py)训练, 为了获得更加鲁棒的特征，后续会使用其他Loss参与训练，敬请期待。
 
 ## 2 实验结果
 
 <img src="../../images/product/aliproduct.png" style="zoom:50%;" />
 
-此方案在Aliproduct数据集上进行实验。此数据集是天池竞赛开源的一个数据集，也是目前开源的最大的商品数据集，其有5万多个标识类别，约250万训练图片。相关数据介绍参考[原论文](https://arxiv.org/abs/2008.05359)。
+此方案在Aliproduct[1]数据集上进行实验。此数据集是天池竞赛开源的一个数据集，也是目前开源的最大的商品数据集，其有5万多个标识类别，约250万训练图片。
 
 在此数据上，单模型Top 1 Acc：85.67%。
+
+## 3 参考文献
+
+[1] Weakly Supervised Learning with Side Information for Noisy Labeled Images. ECCV, 2020.
