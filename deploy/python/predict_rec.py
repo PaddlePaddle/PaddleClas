@@ -68,7 +68,7 @@ def main(config):
         output = rec_predictor.predict(img)
         if rec_predictor.postprocess is not None:
             output = rec_predictor.postprocess(output)
-        print(output.shape)
+        print(output)
     return
 
 
