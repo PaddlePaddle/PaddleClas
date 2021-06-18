@@ -36,7 +36,7 @@ class RecPredictor(Predictor):
             "transform_ops"])
         self.postprocess = build_postprocess(config["RecPostProcess"])
 
-    def predict(self, images, feature_normalize=False):
+    def predict(self, images, feature_normalize=True):
         input_names = self.paddle_predictor.get_input_names()
         input_tensor = self.paddle_predictor.get_input_handle(input_names[0])
 
