@@ -36,7 +36,7 @@ class RecPredictor(Predictor):
             "transform_ops"])
         self.postprocess = build_postprocess(config["RecPostProcess"])
 
-    def predict(self, images):
+    def predict(self, images, feature_normalize=False):
         input_names = self.paddle_predictor.get_input_names()
         input_tensor = self.paddle_predictor.get_input_handle(input_names[0])
 
@@ -54,6 +54,12 @@ class RecPredictor(Predictor):
         input_tensor.copy_from_cpu(image)
         self.paddle_predictor.run()
         batch_output = output_tensor.copy_to_cpu()
+        
+        if feature_normalize:
+            feas_norm = np.sqrt(
+                np.sum(np.square(batch_output), axis=1, keepdims=True))
+            batch_output = np.divide(batch_output, feas_norm)
+            
         return batch_output
 
 
