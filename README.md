@@ -55,6 +55,7 @@ Res2Net200_vd预训练模型Top-1精度高达85.1%。
     - 图像分类
         - [ImageNet分类任务](./docs/zh_CN/tutorials/quick_start_professional.md)
     - [特征学习](./docs/zh_CN/application/feature_learning.md)
+        - [特征学习](./docs/zh_CN/application/feature_learning.md)
         - [商品识别](./docs/zh_CN/application/product_recognition.md)
         - [车辆识别](./docs/zh_CN/application/vehicle_recognition.md)
         - [logo识别](./docs/zh_CN/application/logo_recognition.md)
@@ -62,7 +63,7 @@ Res2Net200_vd预训练模型Top-1精度高达85.1%。
     - [向量检索](./deploy/vector_search/README.md)
 - 模型训练/评估
     - [图像分类任务](./docs/zh_CN/tutorials/getting_started.md)
-    - [特征学习任务](./docs/zh_CN/application/feature_learning.md)
+    - [特征学习任务](./docs/zh_CN/tutorials/getting_started_retrieval.md)
 - 模型预测（当前只支持图像分类任务，图像识别更新中）
     - [基于Python预测引擎预测推理](./docs/zh_CN/tutorials/getting_started.md)
     - [基于C++预测引擎预测推理](./deploy/cpp_infer/readme.md)

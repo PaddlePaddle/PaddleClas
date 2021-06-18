@@ -92,7 +92,7 @@ DataLoader:
 
     loader:
         num_workers: 6
-        use_shared_memory: False
+        use_shared_memory: True
   Eval:
     Query:
       dataset:

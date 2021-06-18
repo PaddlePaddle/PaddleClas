@@ -1,6 +1,6 @@
 # 30分钟玩转PaddleClas（进阶版）
 
-此处提供了专业用户在linux操作系统上使用PaddleClas的快速上手教程，主要内容包括基于CIFAR-100数据集和NUS-WIDE-SCENE数据集，快速体验不同模型的单标签训练及多标签训练、加载不同预训练模型、SSLD知识蒸馏方案和数据增广的效果。请事先参考[安装指南](install.md)配置运行环境和克隆PaddleClas代码。
+此处提供了专业用户在linux操作系统上使用PaddleClas的快速上手教程，主要内容基于CIFAR-100数据集，快速体验不同模型的训练、加载不同预训练模型、SSLD知识蒸馏方案和数据增广的效果。请事先参考[安装指南](install.md)配置运行环境和克隆PaddleClas代码。
 
 
 ## 一、数据和模型准备
@@ -125,7 +125,7 @@ python3 -m paddle.distributed.launch \
 ## 四、知识蒸馏
 
 
-PaddleClas包含了自研的SSLD知识蒸馏方案，具体的内容可以参考[知识蒸馏章节](../advanced_tutorials/distillation/distillation.md)本小节将尝试使用知识蒸馏技术对MobileNetV3_large_x1_0模型进行训练，使用`2.1.2小节`训练得到的ResNet50_vd模型作为蒸馏所用的教师模型，首先将`2.1.2小节`训练得到的ResNet50_vd模型保存到指定目录，脚本如下。
+PaddleClas包含了自研的SSLD知识蒸馏方案，具体的内容可以参考[知识蒸馏章节](../advanced_tutorials/distillation/distillation.md), 本小节将尝试使用知识蒸馏技术对MobileNetV3_large_x1_0模型进行训练，使用`2.1.2小节`训练得到的ResNet50_vd模型作为蒸馏所用的教师模型，首先将`2.1.2小节`训练得到的ResNet50_vd模型保存到指定目录，脚本如下。
 
 ```shell
 mkdir pretrained 
