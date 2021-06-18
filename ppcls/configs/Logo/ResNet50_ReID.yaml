@@ -19,6 +19,8 @@ Global:
 # model architecture
 Arch:
   name: "RecModel"
+  infer_output_key: "features"
+  infer_add_softmax: False
   Backbone:
     name: "ResNet50_last_stage_stride1"
     pretrained: True
