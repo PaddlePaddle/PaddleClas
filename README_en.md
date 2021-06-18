@@ -34,7 +34,7 @@ Four sample solutions are provided, including product recognition, vehicle recog
 
 - Data augmentation: Provide 8 data augmentation algorithms such as AutoAugment, Cutout, Cutmix, etc.  with detailed introduction, code replication and evaluation of effectiveness in a unified experimental environment.
 
- 
+
 
 ## Image Recognition System Effect Demonstration
 <div align="center">
@@ -49,7 +49,7 @@ Four sample solutions are provided, including product recognition, vehicle recog
 <img src="./docs/images/wx_group.png"  width = "200" />
 </div>
 
-## Quick Start 
+## Quick Start
 Quick experience of image recognition：[Link](./docs/zh_CN/tutorials/quick_start_recognition.md)
 
 ## Tutorials
@@ -61,15 +61,15 @@ Quick experience of image recognition：[Link](./docs/zh_CN/tutorials/quick_star
     - [Mainbody Detection](./docs/zh_CN/application/object_detection.md)
     - Image Classification
         - [ImageNet Classification](./docs/zh_CN/tutorials/quick_start_professional.md)
-    - Feature Learning
-        - [Product Recognition](./docs/zh_CN/application/product_recognition.md)
-        - [Vehicle Recognition](./docs/zh_CN/application/vehicle_reid.md)
-        - [Logo Recognition](./docs/zh_CN/application/logo_recognition.md)
-        - [Animation Character Recognition](./docs/zh_CN/application/cartoon_character_recognition.md)
+    - [Feature Learning](./docs/en/application/feature_learning_en.md)
+        - [Product Recognition](./docs/en/application/product_recognition_en.md)
+        - [Vehicle Recognition](./docs/en/application/vehicle_recognition_en.md)
+        - [Logo Recognition](./docs/en/application/logo_recognition_en.md)
+        - [Cartoon Character Recognition](./docs/en/application/cartoon_character_recognition_en.md)
         - [Vector Retrieval](./deploy/vector_search/README.md)
 - Models Training/Evaluation
     - [Image Classification](./docs/zh_CN/tutorials/getting_started.md)
-    - [Feature Learning](./docs/zh_CN/application/feature_learning.md)
+    - [Feature Learning](./docs/en/application/feature_learning_en.md)
 - Inference Model Prediction（Updating）
     - [Python Inference](./docs/zh_CN/tutorials/getting_started.md)
     - [C++ Inference](./deploy/cpp_infer/readme.md)
