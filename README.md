@@ -10,7 +10,7 @@
 
 - 2021.06.16 PaddleClas v2.2版本升级，集成Metric learning，向量检索等组件。新增商品识别、动漫人物识别、车辆识别和logo识别等4个图像识别应用。新增LeViT、Twins、TNT、DLA、HarDNet、RedNet系列30个预训练模型。
 - 2021.05.14 添加`SwinTransformer` 系列模型。
-- 2021.04.15 添加`MixNet_L`和`ReXNet_3_0`系列模型。 
+- 2021.04.15 添加`MixNet_L`和`ReXNet_3_0`系列模型。
 
 - [more](./docs/zh_CN/update_history.md)
 
@@ -53,9 +53,9 @@ Res2Net200_vd预训练模型Top-1精度高达85.1%。
     - [主体检测](./docs/zh_CN/application/object_detection.md)
     - 图像分类
         - [ImageNet分类任务](./docs/zh_CN/tutorials/quick_start_professional.md)
-    - 特征学习
+    - [特征学习](./docs/zh_CN/application/feature_learning.md)
         - [商品识别](./docs/zh_CN/application/product_recognition.md)
-        - [车辆识别](./docs/zh_CN/application/vehicle_reid.md)
+        - [车辆识别](./docs/zh_CN/application/vehicle_recognition.md)
         - [logo识别](./docs/zh_CN/application/logo_recognition.md)
         - [动漫人物识别](./docs/zh_CN/application/cartoon_character_recognition.md)
     - [向量检索](./deploy/vector_search/README.md)
