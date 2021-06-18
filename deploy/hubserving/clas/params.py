@@ -1,4 +1,4 @@
-# Copyright (c) 2020 PaddlePaddle Authors. All Rights Reserved.
+# Copyright (c) 2021 PaddlePaddle Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -17,28 +17,24 @@ from __future__ import division
 from __future__ import print_function
 
 
-class Config(object):
-    pass
-
-
-def read_params():
-    cfg = Config()
-
-    cfg.model_file = "./inference/cls_infer.pdmodel"
-    cfg.params_file = "./inference/cls_infer.pdiparams"
-    cfg.batch_size = 1
-    cfg.use_gpu = False
-    cfg.enable_mkldnn = False
-    cfg.ir_optim = True
-    cfg.gpu_mem = 8000
-    cfg.use_fp16 = False
-    cfg.use_tensorrt = False
-    cfg.cpu_num_threads = 10
-    cfg.enable_profile = False
-
-    # params for preprocess
-    cfg.resize_short = 256
-    cfg.resize = 224
-    cfg.normalize = True
-
-    return cfg
+def get_default_confg():
+    return {
+        'Global': {
+            "inference_model_dir": "../inference/",
+            "batch_size": 1,
+            'use_gpu': False,
+            'use_fp16': False,
+            'enable_mkldnn': False,
+            'cpu_num_threads': 1,
+            'use_tensorrt': False,
+            'ir_optim': False,
+            "gpu_mem": 8000,
+            'enable_profile': False,
+            "enable_benchmark": False
+        },
+        'PostProcess': {
+            'name': 'Topk',
+            'topk': 5,
+            'class_id_map_file': './utils/imagenet1k_label_list.txt'
+        }
+    }

@@ -33,14 +33,26 @@
 | ls_epsilon | label_smoothing epsilon值| 0 | float |
 | use_distillation | 是否进行模型蒸馏 | False | bool |
 
-
 ## 结构(ARCHITECTURE)
+
+### 分类模型结构配置
 
 | 参数名字 | 具体含义 | 默认值 | 可选值 |
 |:---:|:---:|:---:|:---:|
 | name | 模型结构名字 | "ResNet50_vd" | PaddleClas提供的模型结构 |
 | params | 模型传参 | {} | 模型结构所需的额外字典，如EfficientNet等配置文件中需要传入`padding_type`等参数，可以通过这种方式传入 |
 
+### 识别模型结构配置
+
+|     参数名字      |         具体含义          |   默认值   |                            可选值                            |
+| :---------------: | :-----------------------: | :--------: | :----------------------------------------------------------: |
+|       name        |         模型结构          | "RecModel" |                         ["RecModel"]                         |
+| infer_output_key  |    inference时的输出值    | “feature”  |                    ["feature", "logits"]                     |
+| infer_add_softmax |  infercne是否添加softmax  |    True    |                        [True, False]                         |
+|     Backbone      |    使用Backbone的名字     |            | 需传入字典结构，包含`name`、`pretrained`等key值。其中`name`为分类模型名字， `pretrained`为布尔值 |
+| BackboneStopLayer | Backbone中的feature输出层 |            | 需传入字典结构，包含`name`key值，具体值为Backbone中的特征输出层的`full_name` |
+|       Neck        |    添加的网络Neck部分     |            |           需传入字典结构，Neck网络层的具体输入参数           |
+|       Head        |    添加的网络Head部分     |            |           需传入字典结构，Head网络层的具体输入参数           |
 
 ### 学习率(LEARNING_RATE)
 

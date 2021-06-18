@@ -17,8 +17,8 @@
 
 ## 特性
 
-- 实用的图像识别系统：集成了检测、特征学习、检索等模块，广泛适用于各类图像识别任务。
-提供商品识别、车辆识别、logo识别和动漫人物识别等4个示例。
+- 实用的图像识别系统：集成了目标检测、特征学习、图像检索等模块，广泛适用于各类图像识别任务。
+提供商品识别、车辆识别、logo识别和动漫人物识别等4个场景应用示例。
 
 - 丰富的预训练模型库：提供了35个系列共164个ImageNet预训练模型，其中6个精选系列模型支持结构快速修改。
 
@@ -36,7 +36,7 @@ Res2Net200_vd预训练模型Top-1精度高达85.1%。
 
 ## 欢迎加入技术交流群
 
-* 您也可以扫描下面的微信群二维码， 加入PaddleClas 微信交流群。获得更高效的问题答疑，与各行各业开发者充分交流，期待您的加入。
+* 您可以扫描下面的微信群二维码， 加入PaddleClas 微信交流群。获得更高效的问题答疑，与各行各业开发者充分交流，期待您的加入。
 
 <div align="center">
 <img src="./docs/images/wx_group.png"  width = "200" />
@@ -51,7 +51,7 @@ Res2Net200_vd预训练模型Top-1精度高达85.1%。
 - [图像识别快速体验](./docs/zh_CN/tutorials/quick_start_recognition.md)
 - 算法介绍（更新中）
     - [骨干网络和预训练模型库](./docs/zh_CN/ImageNet_models_cn.md)
-    - [主体检测](docs/zh_CN/application/mainbody_detection.md)
+    - [主体检测](./docs/zh_CN/application/mainbody_detection.md)
     - 图像分类
         - [ImageNet分类任务](./docs/zh_CN/tutorials/quick_start_professional.md)
     - 特征学习
