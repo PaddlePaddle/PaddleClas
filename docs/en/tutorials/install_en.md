@@ -31,10 +31,10 @@ cd /home/Projects
 # You need to create a docker container for the first run, and do not need to run the current command when you run it again
 # Create a docker container named ppcls and map the current directory to the /paddle directory of the container
 # It is recommended to set a shared memory greater than or equal to 8G through the --shm-size parameter
-sudo docker run --name ppcls -v $PWD:/paddle --shm-size=8G --network=host -it docker pull paddlepaddle/paddle:2.1.0 /bin/bash
+sudo docker run --name ppcls -v $PWD:/paddle --shm-size=8G --network=host -it paddlepaddle/paddle:2.1.0 /bin/bash
 
 # Use the following command to create a container if you want to use GPU in the container
-sudo nvidia-docker run --name ppcls -v $PWD:/paddle --shm-size=8G --network=host -it docker pull paddlepaddle/paddle:2.1.0-gpu-cuda10.2-cudnn7 /bin/bash
+sudo nvidia-docker run --name ppcls -v $PWD:/paddle --shm-size=8G --network=host -it paddlepaddle/paddle:2.1.0-gpu-cuda10.2-cudnn7 /bin/bash
 ```
 
 You can also visit [DockerHub](https://hub.docker.com/r/paddlepaddle/paddle/tags/) to get more docker images.
