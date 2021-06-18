@@ -15,7 +15,8 @@
 import os
 import sys
 __dir__ = os.path.dirname(__file__)
-sys.path.append(os.path.join(__dir__, ''))
+sys.path.append(os.path.join(__dir__, ""))
+sys.path.append(os.path.join(__dir__, "deploy"))
 
 import argparse
 import shutil
@@ -37,20 +38,20 @@ from deploy.utils import config
 
 from ppcls.arch.backbone import *
 
-__all__ = ['PaddleClas']
+__all__ = ["PaddleClas"]
 
 BASE_DIR = os.path.expanduser("~/.paddleclas/")
-BASE_INFERENCE_MODEL_DIR = os.path.join(BASE_DIR, 'inference_model')
-BASE_IMAGES_DIR = os.path.join(BASE_DIR, 'images')
+BASE_INFERENCE_MODEL_DIR = os.path.join(BASE_DIR, "inference_model")
+BASE_IMAGES_DIR = os.path.join(BASE_DIR, "images")
 BASE_DOWNLOAD_URL = "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/{}_infer.tar"
 MODEL_SERIES = {
     "AlexNet": ["AlexNet"],
     "DarkNet": ["DarkNet53"],
     "DeiT": [
-        'DeiT_base_distilled_patch16_224', 'DeiT_base_distilled_patch16_384',
-        'DeiT_base_patch16_224', 'DeiT_base_patch16_384',
-        'DeiT_small_distilled_patch16_224', 'DeiT_small_patch16_224',
-        'DeiT_tiny_distilled_patch16_224', 'DeiT_tiny_patch16_224'
+        "DeiT_base_distilled_patch16_224", "DeiT_base_distilled_patch16_384",
+        "DeiT_base_patch16_224", "DeiT_base_patch16_384",
+        "DeiT_small_distilled_patch16_224", "DeiT_small_patch16_224",
+        "DeiT_tiny_distilled_patch16_224", "DeiT_tiny_patch16_224"
     ],
     "DenseNet": [
         "DenseNet121", "DenseNet161", "DenseNet169", "DenseNet201",
@@ -161,42 +162,71 @@ class InputModelError(Exception):
         super().__init__(message)
 
 
+def args_cfg():
+    parser = config.parser()
+    other_options = [
+        ("infer_imgs", str, None, "The image(s) to be predicted."),
+        ("model_name", str, None, "The model name to be used."),
+        ("inference_model_dir", str, None, "The directory of model files."),
+        ("use_gpu", bool, True, "Whether use GPU. Default by True."), (
+            "enable_mkldnn", bool, False,
+            "Whether use MKLDNN. Default by False."),
+        ("batch_size", int, 1, "Batch size. Default by 1.")
+    ]
+    for name, opt_type, default, description in other_options:
+        parser.add_argument(
+            "--" + name, type=opt_type, default=default, help=description)
+
+    args = parser.parse_args()
+
+    for name, opt_type, default, description in other_options:
+        val = eval("args." + name)
+        full_name = "Global." + name
+        args.override.append(
+            f"{full_name}={val}") if val is not default else None
+
+    cfg = config.get_config(
+        args.config, overrides=args.override, show=args.verbose)
+
+    return cfg
+
+
 def get_default_confg():
     return {
-        'Global': {
-            'model_name': 'MobileNetV3_small_x0_35',
-            'use_gpu': False,
-            'use_fp16': False,
-            'enable_mkldnn': False,
-            'cpu_num_threads': 1,
-            'use_tensorrt': False,
-            'ir_optim': False,
-            'enable_profile': False
+        "Global": {
+            "model_name": "MobileNetV3_small_x0_35",
+            "use_gpu": False,
+            "use_fp16": False,
+            "enable_mkldnn": False,
+            "cpu_num_threads": 1,
+            "use_tensorrt": False,
+            "ir_optim": False,
+            "enable_profile": False
         },
-        'PreProcess': {
-            'transform_ops': [{
-                'ResizeImage': {
-                    'resize_short': 256
+        "PreProcess": {
+            "transform_ops": [{
+                "ResizeImage": {
+                    "resize_short": 256
                 }
             }, {
-                'CropImage': {
-                    'size': 224
+                "CropImage": {
+                    "size": 224
                 }
             }, {
-                'NormalizeImage': {
-                    'scale': 0.00392157,
-                    'mean': [0.485, 0.456, 0.406],
-                    'std': [0.229, 0.224, 0.225],
-                    'order': ''
+                "NormalizeImage": {
+                    "scale": 0.00392157,
+                    "mean": [0.485, 0.456, 0.406],
+                    "std": [0.229, 0.224, 0.225],
+                    "order": ""
                 }
             }, {
-                'ToCHWImage': None
+                "ToCHWImage": None
             }]
         },
-        'PostProcess': {
-            'name': 'Topk',
-            'topk': 5,
-            'class_id_map_file': './ppcls/utils/imagenet1k_label_list.txt'
+        "PostProcess": {
+            "name": "Topk",
+            "topk": 5,
+            "class_id_map_file": "./ppcls/utils/imagenet1k_label_list.txt"
         }
     }
 
@@ -204,7 +234,7 @@ def get_default_confg():
 def print_info():
     """Print list of supported models in formatted.
     """
-    table = PrettyTable(['Series', 'Name'])
+    table = PrettyTable(["Series", "Name"])
     try:
         sz = os.get_terminal_size()
         width = sz.columns - 30 if sz.columns > 50 else 10
@@ -230,12 +260,12 @@ def get_model_names():
     return model_names
 
 
-def similar_architectures(name='', names=[], thresh=0.1, topk=10):
+def similar_architectures(name="", names=[], thresh=0.1, topk=10):
     """Find the most similar topk model names.
     """
     scores = []
     for idx, n in enumerate(names):
-        if n.startswith('__'):
+        if n.startswith("__"):
             continue
         score = SequenceMatcher(None, n.lower(), name.lower()).quick_ratio()
         if score > thresh:
@@ -251,10 +281,10 @@ def download_with_progressbar(url, save_path):
     if os.path.isfile(save_path):
         os.remove(save_path)
     response = requests.get(url, stream=True)
-    total_size_in_bytes = int(response.headers.get('content-length', 0))
+    total_size_in_bytes = int(response.headers.get("content-length", 0))
     block_size = 1024  # 1 Kibibyte
-    progress_bar = tqdm(total=total_size_in_bytes, unit='iB', unit_scale=True)
-    with open(save_path, 'wb') as file:
+    progress_bar = tqdm(total=total_size_in_bytes, unit="iB", unit_scale=True)
+    with open(save_path, "wb") as file:
         for data in response.iter_content(block_size):
             progress_bar.update(len(data))
             file.write(data)
@@ -273,17 +303,17 @@ def check_model_file(model_name):
     url = BASE_DOWNLOAD_URL.format(model_name)
 
     tar_file_name_list = [
-        'inference.pdiparams', 'inference.pdiparams.info', 'inference.pdmodel'
+        "inference.pdiparams", "inference.pdiparams.info", "inference.pdmodel"
     ]
-    model_file_path = storage_directory('inference.pdmodel')
-    params_file_path = storage_directory('inference.pdiparams')
+    model_file_path = storage_directory("inference.pdmodel")
+    params_file_path = storage_directory("inference.pdiparams")
     if not os.path.exists(model_file_path) or not os.path.exists(
             params_file_path):
-        tmp_path = storage_directory(url.split('/')[-1])
-        print(f'download {url} to {tmp_path}')
+        tmp_path = storage_directory(url.split("/")[-1])
+        print(f"download {url} to {tmp_path}")
         os.makedirs(storage_directory(), exist_ok=True)
         download_with_progressbar(url, tmp_path)
-        with tarfile.open(tmp_path, 'r') as tarObj:
+        with tarfile.open(tmp_path, "r") as tarObj:
             for member in tarObj.getmembers():
                 filename = None
                 for tar_file_name in tar_file_name_list:
@@ -292,7 +322,7 @@ def check_model_file(model_name):
                 if filename is None:
                     continue
                 file = tarObj.extractfile(member)
-                with open(storage_directory(filename), 'wb') as f:
+                with open(storage_directory(filename), "wb") as f:
                     f.write(file.read())
         os.remove(tmp_path)
     if not os.path.exists(model_file_path) or not os.path.exists(
@@ -376,7 +406,7 @@ class PaddleClas(object):
         if input_model_name is not None:
             similar_names = similar_architectures(input_model_name,
                                                   candidate_model_names)
-            similar_names_str = ', '.join(similar_names)
+            similar_names_str = ", ".join(similar_names)
             if input_model_name not in similar_names_str:
                 err = f"{input_model_name} is not exist! Maybe you want: [{similar_names_str}]"
                 raise InputModelError(err)
@@ -466,19 +496,18 @@ class PaddleClas(object):
         else:
             err = "Please input legal image! The type of image supported by PaddleClas are: NumPy.ndarray and string of local path or Ineternet URL"
             raise ImageTypeError(err)
+        return
 
 
-# for cmd
+# for CLI
 def main():
     """Function API used for commad line.
     """
-    args = config.parse_args()
-    cfg = config.get_config(
-        args.config, overrides=args.override, show=args.verbose)
+    cfg = args_cfg()
     clas_engine = PaddleClas(cfg)
     clas_engine.predict(cfg["Global"]["infer_imgs"], print_pred=True)
     return
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
