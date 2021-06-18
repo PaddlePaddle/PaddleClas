@@ -41,19 +41,19 @@ CIFAR-10数据集由10个类的60000个彩色图像组成，图像分辨率为32
 
 ## 主要算法简介
 
-LeNet：Yan LeCun等人于上个世纪九十年代第一次将卷积神经网络应用到图像分类任务上，创造性的提出了LeNet，在手写数字识别任务上取得了巨大的成功。
+- LeNet：Yan LeCun等人于上个世纪九十年代第一次将卷积神经网络应用到图像分类任务上，创造性的提出了LeNet，在手写数字识别任务上取得了巨大的成功。
 
-AlexNet：Alex Krizhevsky等人在2012年提出了AlexNet，并应用于ImageNet上，获得了2012年ImageNet分类比赛的冠军，从此，掀起了深度学习的热潮。
+- AlexNet：Alex Krizhevsky等人在2012年提出了AlexNet，并应用于ImageNet上，获得了2012年ImageNet分类比赛的冠军，从此，掀起了深度学习的热潮。
 
-VGG：Simonyan和Zisserman于2014年提出了VGG网络结构，该网络结构使用了更小的卷积核堆叠整个网络，在ImageNet分类上取得了更好的性能，也为之后的网络结构设计提供了新的思路。
+- VGG：Simonyan和Zisserman于2014年提出了VGG网络结构，该网络结构使用了更小的卷积核堆叠整个网络，在ImageNet分类上取得了更好的性能，也为之后的网络结构设计提供了新的思路。
 
-GoogLeNet：Christian Szegedy等人在2014年提出了GoogLeNet，该网络使用了多分支结构和全局平均池化层（GAP），在保持模型精度的同时，模型存储和计算量大大缩减。该网络取得了2014年ImageNet分类比赛的冠军。
+- GoogLeNet：Christian Szegedy等人在2014年提出了GoogLeNet，该网络使用了多分支结构和全局平均池化层（GAP），在保持模型精度的同时，模型存储和计算量大大缩减。该网络取得了2014年ImageNet分类比赛的冠军。
 
-ResNet：Kaiming He等人在2015年提出了ResNet，通过引入残差模块加深了网络的深度，最终该网络将ImageNet分类的识别错误率降低到了3.6\%，首次超出正常人眼的识别精度。
+- ResNet：Kaiming He等人在2015年提出了ResNet，通过引入残差模块加深了网络的深度，最终该网络将ImageNet分类的识别错误率降低到了3.6\%，首次超出正常人眼的识别精度。
 
-DenseNet：Huang Gao等人在2017年提出了DenseNet，该网络设计了一种更稠密连接的block，在更小的参数量上获得了更高的性能。
+- DenseNet：Huang Gao等人在2017年提出了DenseNet，该网络设计了一种更稠密连接的block，在更小的参数量上获得了更高的性能。
 
-EfficientNet：Mingxing Tan等人在2019年提出了EfficientNet，该网络平衡了网络的宽度、网络的深度、以及输入图片的分辨率，在同样FLOPS与参数量的情况下，精度达到了state-of-the-art的效果。
+- EfficientNet：Mingxing Tan等人在2019年提出了EfficientNet，该网络平衡了网络的宽度、网络的深度、以及输入图片的分辨率，在同样FLOPS与参数量的情况下，精度达到了state-of-the-art的效果。
 
 关于更多的算法介绍，请参考[算法介绍](../models)。
 
