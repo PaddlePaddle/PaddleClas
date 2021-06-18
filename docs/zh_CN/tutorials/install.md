@@ -33,10 +33,10 @@ cd /home/Projects
 # 创建一个名字为ppcls的docker容器，并将当前目录映射到容器的/paddle目录下
 
 如果您希望在CPU环境下使用docker，使用docker而不是nvidia-docker创建docker，设置docker容器共享内存shm-size为8G，建议设置8G以上
-sudo docker run --name ppcls -v $PWD:/paddle --shm-size=8G --network=host -it docker pull paddlepaddle/paddle:2.1.0 /bin/bash
+sudo docker run --name ppcls -v $PWD:/paddle --shm-size=8G --network=host -it paddlepaddle/paddle:2.1.0 /bin/bash
 
 如果希望使用GPU版本的容器，请运行以下命令创建容器。
-sudo nvidia-docker run --name ppcls -v $PWD:/paddle --shm-size=8G --network=host -it docker pull paddlepaddle/paddle:2.1.0-gpu-cuda10.2-cudnn7 /bin/bash
+sudo nvidia-docker run --name ppcls -v $PWD:/paddle --shm-size=8G --network=host -it paddlepaddle/paddle:2.1.0-gpu-cuda10.2-cudnn7 /bin/bash
 ```
 
 
