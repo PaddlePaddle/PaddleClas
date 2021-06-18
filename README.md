@@ -8,17 +8,17 @@
 
 **近期更新**
 
-- 2021.06.22,23,24 PaddleOCR官方研发团队带来技术深入解读三日直播课，6月22日、23日、24日晚上20:30，[直播地址](https://live.bilibili.com/21689802)
+- 2021.06.22,23,24 PaddleClas官方研发团队带来技术深入解读三日直播课，6月22日、23日、24日晚上20:30，[直播地址](https://live.bilibili.com/21689802)
 - 2021.06.16 PaddleClas v2.2版本升级，集成Metric learning，向量检索等组件。新增商品识别、动漫人物识别、车辆识别和logo识别等4个图像识别应用。新增LeViT、Twins、TNT、DLA、HarDNet、RedNet系列30个预训练模型。
 - 2021.05.14 添加`SwinTransformer` 系列模型。
-- 2021.04.15 添加`MixNet_L`和`ReXNet_3_0`系列模型。 
- 
+- 2021.04.15 添加`MixNet_L`和`ReXNet_3_0`系列模型。
+
 [more](./docs/zh_CN/update_history.md)
 
 ## 特性
 
-- 实用的图像识别系统：集成了检测、特征学习、检索等模块，广泛适用于各类图像识别任务。
-提供商品识别、车辆识别、logo识别和动漫人物识别等4个示例。
+- 实用的图像识别系统：集成了目标检测、特征学习、图像检索等模块，广泛适用于各类图像识别任务。
+提供商品识别、车辆识别、logo识别和动漫人物识别等4个场景应用示例。
 
 - 丰富的预训练模型库：提供了35个系列共164个ImageNet预训练模型，其中6个精选系列模型支持结构快速修改。
 
@@ -36,7 +36,7 @@ Res2Net200_vd预训练模型Top-1精度高达85.1%。
 
 ## 欢迎加入技术交流群
 
-* 您也可以扫描下面的微信群二维码， 加入PaddleClas 微信交流群。获得更高效的问题答疑，与各行各业开发者充分交流，期待您的加入。
+* 您可以扫描下面的微信群二维码， 加入PaddleClas 微信交流群。获得更高效的问题答疑，与各行各业开发者充分交流，期待您的加入。
 
 <div align="center">
 <img src="./docs/images/wx_group.png"  width = "200" />
@@ -51,7 +51,7 @@ Res2Net200_vd预训练模型Top-1精度高达85.1%。
 - [图像识别快速体验](./docs/zh_CN/tutorials/quick_start_recognition.md)
 - 算法介绍（更新中）
     - [骨干网络和预训练模型库](./docs/zh_CN/ImageNet_models_cn.md)
-    - [主体检测](./docs/zh_CN/application/object_detection.md)
+    - [主体检测](./docs/zh_CN/application/mainbody_detection.md)
     - 图像分类
         - [Cifar100分类任务](./docs/zh_CN/tutorials/quick_start_professional.md)
     - 特征学习

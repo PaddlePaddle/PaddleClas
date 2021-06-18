@@ -1,4 +1,4 @@
-# Copyright (c) 2020 PaddlePaddle Authors. All Rights Reserved.
+# Copyright (c) 2021 PaddlePaddle Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,29 +15,54 @@
 import os
 import sys
 __dir__ = os.path.dirname(os.path.abspath(__file__))
-sys.path.append(__dir__)
-sys.path.append(os.path.abspath(os.path.join(__dir__, '..')))
+sys.path.append(os.path.abspath(os.path.join(__dir__, '../')))
 
-from tools.infer.utils import parse_args, get_image_list, preprocess, np_to_b64
-from ppcls.utils import logger
-import numpy as np
-import cv2
 import time
 import requests
 import json
 import base64
+import argparse
+
+import numpy as np
+import cv2
+
+from utils import logger
+from utils.get_image_list import get_image_list
+from utils import config
+from utils.encode_decode import np_to_b64
+from python.preprocess import create_operators
+
+preprocess_config = [{
+    'ResizeImage': {
+        'resize_short': 256
+    }
+}, {
+    'CropImage': {
+        'size': 224
+    }
+}, {
+    'NormalizeImage': {
+        'scale': 0.00392157,
+        'mean': [0.485, 0.456, 0.406],
+        'std': [0.229, 0.224, 0.225],
+        'order': ''
+    }
+}, {
+    'ToCHWImage': None
+}]
 
 
 def main(args):
     image_path_list = get_image_list(args.image_file)
     headers = {"Content-type": "application/json"}
+    preprocess_ops = create_operators(preprocess_config)
 
     cnt = 0
     predict_time = 0
     all_score = 0.0
     start_time = time.time()
 
-    batch_input_list = []
+    img_data_list = []
     img_name_list = []
     cnt = 0
     for idx, img_path in enumerate(image_path_list):
@@ -48,22 +73,23 @@ def main(args):
                 format(img_path))
             continue
         else:
-            img = img[:, :, ::-1]
-            data = preprocess(img, args)
-            batch_input_list.append(data)
+            for ops in preprocess_ops:
+                img = ops(img)
+            img = np.array(img)
+            img_data_list.append(img)
+
             img_name = img_path.split('/')[-1]
             img_name_list.append(img_name)
             cnt += 1
         if cnt % args.batch_size == 0 or (idx + 1) == len(image_path_list):
-            batch_input = np.array(batch_input_list)
-            b64str, revert_shape = np_to_b64(batch_input)
+            inputs = np.array(img_data_list)
+            b64str, revert_shape = np_to_b64(inputs)
             data = {
                 "images": b64str,
                 "revert_params": {
                     "shape": revert_shape,
-                    "dtype": str(batch_input.dtype)
-                },
-                "top_k": args.top_k
+                    "dtype": str(inputs.dtype)
+                }
             }
             try:
                 r = requests.post(
@@ -80,24 +106,25 @@ def main(args):
                 continue
             else:
                 results = r.json()["results"]
-                batch_result_list = results["prediction"]
+                preds = results["prediction"]
                 elapse = results["elapse"]
 
-                cnt += len(batch_result_list)
+                cnt += len(preds)
                 predict_time += elapse
 
-                for number, result_list in enumerate(batch_result_list):
+                for number, result_list in enumerate(preds):
                     all_score += result_list["scores"][0]
                     result_str = ""
-                    for i in range(len(result_list["clas_ids"])):
+                    for i in range(len(result_list["class_ids"])):
                         result_str += "{}: {:.2f}\t".format(
-                            result_list["clas_ids"][i],
+                            result_list["class_ids"][i],
                             result_list["scores"][i])
-                    logger.info("File:{}, The top-{} result(s): {}".format(
-                        img_name_list[number], args.top_k, result_str))
+
+                    logger.info("File:{}, The result(s): {}".format(
+                        img_name_list[number], result_str))
 
             finally:
-                batch_input_list = []
+                img_data_list = []
                 img_name_list = []
 
     total_time = time.time() - start_time
@@ -109,5 +136,10 @@ def main(args):
 
 
 if __name__ == '__main__':
-    args = parse_args()
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--server_url", type=str)
+    parser.add_argument("--image_file", type=str)
+    parser.add_argument("--batch_size", type=int, default=1)
+    args = parser.parse_args()
+
     main(args)
