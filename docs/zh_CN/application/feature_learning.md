@@ -6,7 +6,7 @@
 - 支持在`backbone`的feature输出层后，添加可配置的网络层，即`Neck`部分
 - 支持`ArcFace Loss`等`metric learning` 相关loss函数，提升特征学习能力
 
-## 整体流程
+## 1 整体流程
 
 ![](../../images/recognition/rec_pipeline.png)
 
@@ -14,6 +14,6 @@
 
 针对不同的应用，可以根据需要，对每一部分自由选择。每一部分的具体配置，如数据增强、Backbone、Neck、Metric Learning相关Loss等设置，详见具体应用：[车辆识别](./vehicle_recognition.md)、[Logo识别](./logo_recognition.md)、[动漫人物识别](./cartoon_character_recognition.md)、[商品识别](./product_recognition.md)
 
-## 配置文件说明
+## 2 配置文件说明
 
 配置文件说明详见[yaml配置文件说明文档](../tutorials/config.md)。其中模型结构配置，详见文档中**识别模型结构配置**部分。

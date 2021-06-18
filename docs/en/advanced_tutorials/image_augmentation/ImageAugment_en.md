@@ -69,10 +69,6 @@ Unlike conventional artificially designed image augmentation methods, AutoAugmen
 In PaddleClas, `AutoAugment` is used as follows.
 
 ```python
-from ppcls.data.imaug import DecodeImage
-from ppcls.data.imaug import ResizeImage
-from ppcls.data.imaug import ImageNetPolicy
-from ppcls.data.imaug import transform
 
 size = 224
 
@@ -107,10 +103,6 @@ In `RandAugment`, the author proposes a random augmentation method. Instead of u
 In PaddleClas, `RandAugment` is used as follows.
 
 ```python
-from ppcls.data.imaug import DecodeImage
-from ppcls.data.imaug import ResizeImage
-from ppcls.data.imaug import RandAugment
-from ppcls.data.imaug import transform
 
 size = 224
 
@@ -153,10 +145,6 @@ Cutout is a kind of dropout, but occludes input image rather than feature map. I
 In PaddleClas, `Cutout` is used as follows.
 
 ```python
-from ppcls.data.imaug import DecodeImage
-from ppcls.data.imaug import ResizeImage
-from ppcls.data.imaug import Cutout
-from ppcls.data.imaug import transform
 
 size = 224
 
@@ -188,11 +176,6 @@ RandomErasing is similar to the Cutout. It is also to solve the problem of poor 
 In PaddleClas, `RandomErasing` is used as follows.
 
 ```python
-from ppcls.data.imaug import DecodeImage
-from ppcls.data.imaug import ResizeImage
-from ppcls.data.imaug import ToCHWImage
-from ppcls.data.imaug import RandomErasing
-from ppcls.data.imaug import transform
 
 size = 224
 
@@ -229,11 +212,6 @@ Images are divided into some patches for `HideAndSeek` and masks are generated w
 In PaddleClas, `HideAndSeek` is used as follows.
 
 ```python
-from ppcls.data.imaug import DecodeImage
-from ppcls.data.imaug import ResizeImage
-from ppcls.data.imaug import ToCHWImage
-from ppcls.data.imaug import HideAndSeek
-from ppcls.data.imaug import transform
 
 size = 224
 
@@ -283,11 +261,6 @@ It shows that the second method is better.
 The usage of `GridMask` in PaddleClas is shown below.
 
 ```python
-from data.imaug import DecodeImage
-from data.imaug import ResizeImage
-from data.imaug import ToCHWImage
-from data.imaug import GridMask
-from data.imaug import transform
 
 size = 224
 
@@ -329,11 +302,6 @@ Mixup is the first solution for image aliasing, it is easy to realize and perfor
 The usage of `Mixup` in PaddleClas is shown below.
 
 ```python
-from ppcls.data.imaug import DecodeImage
-from ppcls.data.imaug import ResizeImage
-from ppcls.data.imaug import ToCHWImage
-from ppcls.data.imaug import transform
-from ppcls.data.imaug import MixupOperator
 
 size = 224
 
@@ -373,11 +341,6 @@ Cutmix randomly cuts out an `ROI` from one image, and then covered onto the corr
 
 
 ```python
-rom ppcls.data.imaug import DecodeImage
-from ppcls.data.imaug import ResizeImage
-from ppcls.data.imaug import ToCHWImage
-from ppcls.data.imaug import transform
-from ppcls.data.imaug import CutmixOperator
 
 size = 224
 
@@ -444,10 +407,9 @@ Configuration of `RandAugment` is shown as follows. `Num_layers`(default as 2) a
 
 
 ```yaml
-    transforms:
+      transform_ops:
         - DecodeImage:
             to_rgb: True
-            to_np: False
             channel_first: False
         - RandCropImage:
             size: 224
@@ -457,11 +419,10 @@ Configuration of `RandAugment` is shown as follows. `Num_layers`(default as 2) a
             num_layers: 2
             magnitude: 5
         - NormalizeImage:
-            scale: 1./255.
+            scale: 1.0/255.0
             mean: [0.485, 0.456, 0.406]
             std: [0.229, 0.224, 0.225]
             order: ''
-        - ToCHWImage:
 ```
 
 ### Cutout
@@ -469,24 +430,22 @@ Configuration of `RandAugment` is shown as follows. `Num_layers`(default as 2) a
 Configuration of `Cutout` is shown as follows. `n_holes`(default as 1) and `n_holes`(default as 112) are two hyperparameters.
 
 ```yaml
-    transforms:
+      transform_ops:
         - DecodeImage:
             to_rgb: True
-            to_np: False
             channel_first: False
         - RandCropImage:
             size: 224
         - RandFlipImage:
             flip_code: 1
         - NormalizeImage:
-            scale: 1./255.
+            scale: 1.0/255.0
             mean: [0.485, 0.456, 0.406]
             std: [0.229, 0.224, 0.225]
             order: ''
         - Cutout:
             n_holes: 1
             length: 112
-        - ToCHWImage:
 ```
 
 ### Mixup
@@ -495,42 +454,39 @@ Configuration of `Cutout` is shown as follows. `n_holes`(default as 1) and `n_ho
 Configuration of `Mixup` is shown as follows. `alpha`(default as 0.2) is hyperparameter which users need to care about. What's more, `use_mix` need to be set as `True` in the root of the configuration.
 
 ```yaml
-    transforms:
+      transform_ops:
         - DecodeImage:
             to_rgb: True
-            to_np: False
             channel_first: False
         - RandCropImage:
             size: 224
         - RandFlipImage:
             flip_code: 1
         - NormalizeImage:
-            scale: 1./255.
+            scale: 1.0/255.0
             mean: [0.485, 0.456, 0.406]
             std: [0.229, 0.224, 0.225]
             order: ''
-        - ToCHWImage:
-    mix:
+      batch_transform_ops:
         - MixupOperator:
             alpha: 0.2
 ```
 
-## 启动命令
+## Start training
 
-Users can use the following command to start the training process, which can also be referred to `tools/run.sh`.
+Users can use the following command to start the training process, which can also be referred to `tools/train.sh`.
 
 ```bash
-export PYTHONPATH=path_to_PaddleClas:$PYTHONPATH
-
-python -m paddle.distributed.launch \
+python3 -m paddle.distributed.launch \
     --selected_gpus="0,1,2,3" \
+    --log_dir=ResNet50_Cutout \
     tools/train.py \
-        -c ./configs/DataAugment/ResNet50_Cutout.yaml
+        -c ./ppcls/configs/ImageNet/DataAugment/ResNet50_Cutout.yaml
 ```
 
 ## Note
 
-* When using augmentation methods based on image aliasing, users need to set `use_mix` in the configuration file as `True`. In addition, because the label needs to be aliased when the image is aliased, the accuracy of the training data cannot be calculated. The training accuracy rate was not printed during the training process.
+* In addition, because the label needs to be aliased when the image is aliased, the accuracy of the training data cannot be calculated. The training accuracy rate was not printed during the training process.
 
 * The training data is more difficult with data augmentation, so the training loss may be larger, the training set accuracy is relatively low, but it has better generalization ability, so the validation set accuracy is relatively higher.
 

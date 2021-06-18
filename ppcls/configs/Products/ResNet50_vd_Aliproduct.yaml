@@ -66,7 +66,7 @@ DataLoader:
         - DecodeImage:
             to_rgb: True
             channel_first: False
-        - ResizeImage:
+        - RandCropImage:
             size: 224
         - RandFlipImage:
             flip_code: 1
