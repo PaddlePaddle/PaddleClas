@@ -43,16 +43,16 @@ After a model is trained, the evaluation results of the model on the validation 
 
 - LeNet: Yan LeCun et al. first applied convolutional neural networks to image classification tasks in the 1990s, and creatively proposed LeNet, which achieved great success in handwritten digit recognition tasks.
 
-- AlexNet: Alex Krizhevsky and others proposed AlexNet in 2012 and applied it to ImageNet, and won the 2012 ImageNet classification competition. Since then, deep learning has become popular
+- AlexNet: Alex Krizhevsky et al. proposed AlexNet in 2012 and applied it to ImageNet, and won the 2012 ImageNet classification competition. Since then, deep learning has become popular
 
--VGG: Simonyan and Zisserman proposed the VGG network structure in 2014. This network structure uses a smaller convolution kernel to stack the entire network, achieving better performance in ImageNet classification, it provides new ideas for the subsequent network structure design.
+- VGG: Simonyan and Zisserman proposed the VGG network structure in 2014. This network structure uses a smaller convolution kernel to stack the entire network, achieving better performance in ImageNet classification, it provides new ideas for the subsequent network structure design.
 
--GoogLeNet: Christian Szegedy et al. proposed GoogLeNet in 2014. This network uses a multi-branch structure and a global average pooling layer (GAP). While maintaining the accuracy of the model, the amount of model storage and calculation is greatly reduced. The network won the 2014 ImageNet classification competition.
+- GoogLeNet: Christian Szegedy et al. proposed GoogLeNet in 2014. This network uses a multi-branch structure and a global average pooling layer (GAP). While maintaining the accuracy of the model, the amount of model storage and calculation is greatly reduced. The network won the 2014 ImageNet classification competition.
 
--ResNet: Kaiming He et al. proposed ResNet in 2015, which deepened the depth of the network by introducing a residual module. In the end, the network reduced the recognition error rate of ImageNet classification to 3.6%, which exceeded the recognition accuracy of normal human eyes for the first time.
+- ResNet: Kaiming He et al. proposed ResNet in 2015, which deepened the depth of the network by introducing a residual module. In the end, the network reduced the recognition error rate of ImageNet classification to 3.6%, which exceeded the recognition accuracy of normal human eyes for the first time.
 
--DenseNet: Huang Gao et al. proposed DenseNet in 2017. The network designed a denser connected block and achieved higher performance with a smaller amount of parameters.
+- DenseNet: Huang Gao et al. proposed DenseNet in 2017. The network designed a denser connected block and achieved higher performance with a smaller amount of parameters.
 
--EfficientNet: Mingxing Tan et al. proposed EfficientNet in 2019. This network balances the width of the network, the depth of the network, and the resolution of the input image. With the same FLOPS and parameters, the accuracy reaches the state-of-the-art.
+- EfficientNet: Mingxing Tan et al. proposed EfficientNet in 2019. This network balances the width of the network, the depth of the network, and the resolution of the input image. With the same FLOPS and parameters, the accuracy reaches the state-of-the-art.
 
-For more algorithm introduction, please refer to [Algorithm Introduction](../models)。
+For more algorithm introduction, please refer to [Algorithm Introduction](../models).
