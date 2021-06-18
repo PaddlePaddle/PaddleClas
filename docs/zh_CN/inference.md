@@ -59,7 +59,7 @@ python3.7 tools/export_model.py -c ppcls/configs/Products/ResNet50_vd_Aliproduct
 
 下载预训练模型：
 ``` shell script
-wget -P ./cls_pretrain/ https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ResNet50_vd_pretrained.pdparams
+wget -P ./cls_pretrain/ https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/ResNet50_vd_pretrained.pdparams
 ```
 
 上述模型是使用ResNet50_vd在ImageNet上训练的模型，使用的配置文件为`ppcls/configs/ImageNet/ResNet/ResNet50_vd.yaml`。
@@ -104,8 +104,7 @@ python3.7 python/predict_det.py -c configs/inference_det.yaml
 [](../images/recognition/product_demo/wangzai.jpg)
 最终输出结果如下：
 ```text
-[{'class_id': 0, 'score': 0.4762245, 'bbox': array([305.55115, 226.05322, 776.61084, 930.42395], 
-dtype=float32), 'label_name': 'foreground'}]
+[{'class_id': 0, 'score': 0.4762245, 'bbox': array([305.55115, 226.05322, 776.61084, 930.42395], dtype=float32), 'label_name': 'foreground'}]
 ```
 检测的可视化结果如下：
 [](../images/recognition/product_demo/wangzai_det_result.jpg)
@@ -119,7 +118,7 @@ python3.7 python/predict_det.py -c configs/inference_det.yaml -o Global.infer_im
 
 如果想使用CPU进行预测，可以将配置文件中use_gpu选项设置为False，或者执行命令：
 ```
-python3 tools/infer/predict_det.py  -o Global.use_gpu=False
+python3.7 python/predict_det.py -c configs/inference_det.yaml  -o Global.use_gpu=False
 ```
 
 ## 三、特征提取模型推理
@@ -151,7 +150,7 @@ python3.7 python/predict_rec.py -c configs/inference_rec.yaml -o Global.infer_im
 
 如果想使用CPU进行预测，可以将配置文件中use_gpu选项设置为False，或者执行命令：
 ```
-python3 tools/infer/predict_rec.py  -o Global.use_gpu=False
+python3.7 python/predict_rec.py -c configs/inference_rec.yaml  -o Global.use_gpu=False
 ```
 
 <a name="主体检测、特征提取和向量检索串联"></a>
@@ -170,19 +169,19 @@ cd deploy
 导出inference模型后，可以使用下面的命令预测：
 ```shell script
 
-python3.7 python/predict_cls.py -c configs/inference_rec.yaml
+python3.7 python/predict_cls.py -c configs/inference_cls.yaml
 ```
 
 如果想要修改图像，可以在configs/inference_det.yaml中，修改infer_imgs的值，或使用-o Global.infer_imgs修改，
 例如，要使用`images/ILSVRC2012_val_00010010.jpeg`可以运行：
 
 ```shell script
-python3.7 python/predict_cls.py -c configs/inference_rec.yaml -o Global.infer_imgs=images/ILSVRC2012_val_00010010.jpeg
+python3.7 python/predict_cls.py -c configs/inference_cls.yaml -o Global.infer_imgs=images/ILSVRC2012_val_00010010.jpeg
 
 ```
 
 如果想使用CPU进行预测，可以将配置文件中use_gpu选项设置为False，或者执行命令：
 ```
-python3 tools/infer/predict_rec.py  -o Global.use_gpu=False
+python3.7 python/predict_cls.py -c configs/inference_cls.yaml  -o Global.use_gpu=False
 ```
 

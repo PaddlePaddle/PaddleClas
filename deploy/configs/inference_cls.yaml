@@ -1,4 +1,3 @@
-
 Global:
   infer_imgs: "./images/ILSVRC2012_val_00000010.jpeg"
   inference_model_dir: "./models"
