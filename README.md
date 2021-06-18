@@ -64,9 +64,10 @@ Res2Net200_vd预训练模型Top-1精度高达85.1%。
 - 模型训练/评估
     - [图像分类任务](./docs/zh_CN/tutorials/getting_started.md)
     - [特征学习任务](./docs/zh_CN/tutorials/getting_started_retrieval.md)
-- 模型预测（当前只支持图像分类任务，图像识别更新中）
-    - [基于Python预测引擎预测推理](./docs/zh_CN/tutorials/getting_started.md)
-    - [基于C++预测引擎预测推理](./deploy/cpp_infer/readme.md)
+- 模型预测
+    - [基于Python预测引擎预测推理](./docs/zh_CN/inference.md)
+    - [基于C++预测引擎预测推理](./deploy/cpp/readme.md)(当前只支持图像分类任务，图像识别更新中)
+- 模型部署（当前只支持图像分类任务，图像识别更新中）
     - [服务化部署](./deploy/hubserving/readme.md)
     - [端侧部署](./deploy/lite/readme.md)
     - [whl包预测](./docs/zh_CN/whl.md)
