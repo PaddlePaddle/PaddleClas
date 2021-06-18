@@ -404,7 +404,7 @@ ViT（Vision Transformer）与DeiT（Data-efficient Image Transformers）系列�
 | DLA102x| 0.781   | 0.9400   |                  |                  | 5.9  | 26.4    | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DLA102x_pretrained.pdparams) |
 | DLA169 | 0.7809  | 0.9409   |                  |                  | 11.6  | 53.5  | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DLA169_pretrained.pdparams) |
 | DLA34 | 0.7603   | 0.9298    |                  |                  | 3.1   |  15.8    | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DLA34_pretrained.pdparams) |
-| DLA46_c |0.6321   | 0.853   |                  |                  | 0.5   | 1.3 | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DLA46_c _pretrained.pdparams) |
+| DLA46_c |0.6321   | 0.853   |                  |                  | 0.5   | 1.3 | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DLA46_c_pretrained.pdparams) |
 | DLA60 | 0.7610   | 0.9292   |                  |                  | 4.2   | 22.0    | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DLA60_pretrained.pdparams) |
 | DLA60x_c | 0.6645   | 0.8754   |                  |                  | 0.6   | 1.3  | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DLA60x_c_pretrained.pdparams) |
 | DLA60x | 0.7753  | 0.9378  |                  |                  | 3.5   | 17.4  | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DLA60x_pretrained.pdparams) |
