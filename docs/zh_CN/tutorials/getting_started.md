@@ -82,11 +82,11 @@ python3 tools/train.py \
     -o Global.device=gpu
 ```
 
-其中配置文件不需要做任何修改，只需要在继续训练时设置`checkpoints`参数即可，表示加载的断点权重文件路径，使用该参数会同时加载保存的断点权重和学习率、优化器等信息。
+其中配置文件不需要做任何修改，只需要在继续训练时设置`Global.checkpoints`参数即可，表示加载的断点权重文件路径，使用该参数会同时加载保存的断点权重和学习率、优化器等信息。
 
 **注意**：
 
-* `-o Global.checkpoints`参数无需包含断点权重文件的后缀名，上述训练命令会在训练过程中生成如下所示的断点权重文件，若想从断点`5`继续训练，则`Global.checkpoints`参数只需设置为`"../output/MobileNetV3_large_x1_0/epoch_5"`，PaddleClas会自动补充后缀名。
+* `-o Global.checkpoints`参数无需包含断点权重文件的后缀名，上述训练命令会在训练过程中生成如下所示的断点权重文件，若想从断点`5`继续训练，则`Global.checkpoints`参数只需设置为`"../output/MobileNetV3_large_x1_0/epoch_5"`，PaddleClas会自动补充后缀名。output目录下的文件结构如下所示：
 
     ```shell
     output
@@ -117,7 +117,7 @@ python3 tools/eval.py \
 
 可配置的部分评估参数说明如下：
 * `Arch.name`：模型名称
-* `Global.pretrained_model`：待评估的模型文件路径
+* `Global.pretrained_model`：待评估的模型预训练模型文件路径
 
 **注意：** 在加载待评估模型时，需要指定模型文件的路径，但无需包含文件后缀名，PaddleClas会自动补齐`.pdparams`的后缀，如[1.3 模型恢复训练](#1.3)。
 
@@ -175,11 +175,10 @@ python3 -m paddle.distributed.launch \
     tools/train.py \
         -c ./ppcls/configs/quick_start/MobileNetV3_large_x1_0.yaml \
         -o Global.checkpoints="./output/MobileNetV3_large_x1_0/epoch_5" \
-        -o Optimizer.lr.last_epoch=5 \
         -o Global.device=gpu
 ```
 
-其中配置文件不需要做任何修改，只需要在训练时设置`Global.checkpoints`参数与`Optimizer.lr.last_epoch`参数即可，该参数表示加载的断点权重文件路径，使用该参数会同时加载保存的模型参数权重和学习率、优化器等信息，详见[1.3 模型恢复训练](#1.3)。
+其中配置文件不需要做任何修改，只需要在训练时设置`Global.checkpoints`参数即可，该参数表示加载的断点权重文件路径，使用该参数会同时加载保存的模型参数权重和学习率、优化器等信息，详见[1.3 模型恢复训练](#1.3)。
 
 
 ### 2.4 模型评估
@@ -229,11 +228,6 @@ python3 tools/export_model.py \
 
 
 其中，`Global.pretrained_model`用于指定模型文件路径，该路径仍无需包含模型文件后缀名（如[1.3 模型恢复训练](#1.3)）。
-
-**注意**：
-1. `--output_path`表示输出的inference模型文件夹路径，若`--output_path=./inference`，则会在`inference`文件夹下生成`inference.pdiparams`、`inference.pdmodel`和`inference.pdiparams.info`文件。
-2. 可以通过设置参数`--img_size`指定模型输入图像的`shape`，默认为`224`，表示图像尺寸为`224*224`，请根据实际情况修改；如果使用`Transformer`系列模型，如`DeiT_***_384`, `ViT_***_384`等，请注意模型的输入数据尺寸，需要设置参数`img_size=384`。
-
 
 上述命令将生成模型结构文件（`inference.pdmodel`）和模型权重文件（`inference.pdiparams`），然后可以使用预测引擎进行推理：
 
