@@ -93,13 +93,13 @@ python3 -c "import paddle; print(paddle.__version__)"
 ### 2.1 克隆PaddleClas模型库
 
 ```bash
-git clone https://github.com/PaddlePaddle/PaddleClas.git -b develop
+git clone https://github.com/PaddlePaddle/PaddleClas.git -b release/2.2
 ```
 
 如果从github上网速太慢，可以从gitee下载，下载命令如下：
 
 ```bash
-git clone https://gitee.com/paddlepaddle/PaddleClas.git -b develop
+git clone https://gitee.com/paddlepaddle/PaddleClas.git -b release/2.2
 ```
 
 ### 2.2 安装Python依赖库
