@@ -6,8 +6,8 @@ inference 模型（`paddle.jit.save`保存的模型）
 训练过程中保存的模型是checkpoints模型，保存的只有模型的参数，多用于恢复训练等。
 与checkpoints模型相比，inference 模型会额外保存模型的结构信息，在预测部署、加速推理上性能优越，灵活方便，适合于实际系统集成。
 
-接下来首先介绍如何将训练的模型转换成inference模型，然后将依次介绍主体检测、特征提取在CPU、GPU上的预测方法，
-之后介绍了主体检测、特征提取、特征检索串联的预测方法，最后介绍了图像分类的预测方法。
+接下来首先介绍如何将训练的模型转换成inference模型，然后依次介绍主体检测、特征提取在CPU、GPU上的预测方法，
+之后介绍主体检测、特征提取、特征检索串联的预测方法，最后介绍图像分类的预测方法。
 
 
 - [一、训练模型转inference模型](#训练模型转inference模型)
@@ -27,7 +27,7 @@ inference 模型（`paddle.jit.save`保存的模型）
 ## 一、训练模型转inference模型
 
 <a name="特征提取模型转inference模型"></a>
-### 特征提取模型转inference模型
+### 1. 特征提取模型转inference模型
 以下命令请在PaddleClas的根目录执行。以商品识别特征提取模型模型为例，首先下载预训练模型：
 
 ```shell script
@@ -55,7 +55,7 @@ python3.7 tools/export_model.py -c ppcls/configs/Products/ResNet50_vd_Aliproduct
 ```
 
 <a name="分类模型转inference模型"></a>
-### 分类模型转inference模型
+### 2. 分类模型转inference模型
 
 下载预训练模型：
 ``` shell script
@@ -121,6 +121,7 @@ python3.7 python/predict_det.py -c configs/inference_det.yaml -o Global.infer_im
 python3.7 python/predict_det.py -c configs/inference_det.yaml  -o Global.use_gpu=False
 ```
 
+<a name="特征提取模型推理"></a>
 ## 三、特征提取模型推理
 
 下面以商品特征提取为例，介绍特征提取模型推理。其他应用可以参考图像识别快速开始中的[模型地址](./tutorials/quick_start_recognition.md#2-%E5%9B%BE%E5%83%8F%E8%AF%86%E5%88%AB%E4%BD%93%E9%AA%8C)，
@@ -140,6 +141,7 @@ cd ..
 # 用下载的inference模型进行预测
 python3.7 python/predict_rec.py -c configs/inference_rec.yaml
 ```
+预测可以得到一个512特征向量，直接在命令行输出显示。
 
 如果想要修改图像，可以在configs/inference_det.yaml中，修改infer_imgs的值，或使用-o Global.infer_imgs修改，
 例如，要使用`images/anmuxi.jpg`可以运行：
