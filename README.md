@@ -53,7 +53,7 @@ Res2Net200_vd预训练模型Top-1精度高达85.1%。
     - [骨干网络和预训练模型库](./docs/zh_CN/ImageNet_models_cn.md)
     - [主体检测](./docs/zh_CN/application/object_detection.md)
     - 图像分类
-        - [ImageNet分类任务](./docs/zh_CN/tutorials/quick_start_professional.md)
+        - [Cifar100分类任务](./docs/zh_CN/tutorials/quick_start_professional.md)
     - 特征学习
         - [商品识别](./docs/zh_CN/application/product_recognition.md)
         - [车辆识别](./docs/zh_CN/application/vehicle_reid.md)
@@ -63,9 +63,10 @@ Res2Net200_vd预训练模型Top-1精度高达85.1%。
 - 模型训练/评估
     - [图像分类任务](./docs/zh_CN/tutorials/getting_started.md)
     - [特征学习任务](./docs/zh_CN/application/feature_learning.md)
-- 模型预测（当前只支持图像分类任务，图像识别更新中）
-    - [基于Python预测引擎预测推理](./docs/zh_CN/tutorials/getting_started.md)
-    - [基于C++预测引擎预测推理](./deploy/cpp_infer/readme.md)
+- 预测引擎推理
+    - [基于Python预测引擎预测推理](./docs/zh_CN/tutorials/getting_started.md#4-使用inference模型进行模型推理)
+    - [基于C++预测引擎预测推理（当前只支持图像分类任务，图像识别更新中）](./deploy/cpp_infer/readme.md)
+- 模型部署（当前只支持图像分类任务，图像识别更新中）
     - [服务化部署](./deploy/hubserving/readme.md)
     - [端侧部署](./deploy/lite/readme.md)
     - [whl包预测](./docs/zh_CN/whl.md)
