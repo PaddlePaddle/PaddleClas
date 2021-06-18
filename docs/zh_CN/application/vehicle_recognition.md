@@ -46,8 +46,6 @@ ReID，也就是 Re-identification，其定义是利用算法，在图像库中�
 
 ### 2.1 车辆ReID
 
-
-
 <img src="../../images/recognition/vehicle/cars.JPG" style="zoom:50%;" />
 
 此方法在VERI-Wild数据集上进行了实验。此数据集是在一个大型闭路电视监控系统，在无约束的场景下，一个月内（30*24小时）中捕获的。该系统由174个摄像头组成，其摄像机分布在200多平方公里的大型区域。原始车辆图像集包含1200万个车辆图像，经过数据清理和标注，采集了416314张40671个不同的车辆图像。[具体详见论文](https://github.com/PKU-IMRE/VERI-Wild)
