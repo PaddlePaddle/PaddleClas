@@ -8,12 +8,12 @@ This part mainly explains the training mode of feature learning, which is `RecMo
 
 - Support `Arcface Loss` and other `metric learning`loss functions to improve feature learning ability
 
-# Pipeline
+# 1 Pipeline
 
 ![](../../images/recognition/rec_pipeline.png)
 
 The overall structure of feature learning is shown in the figure above, which mainly includes `Data Augmentation`, `Backbone`, `Neck`, `Metric Learning` and so on. The `Neck` part is a freely added  layers, such as  `Embedding layer`. Of course, this module can be omitted if not needed. During training, the loss of `Metric Learning`  is used to optimize the model. Generally speaking, the output of the `Neck`  is used as the feature output when in inference stage.
 
-## Config Description
+## 2 Config Description
 
 The feature learning config file description can be found in [yaml description](../tutorials/config_en.md).

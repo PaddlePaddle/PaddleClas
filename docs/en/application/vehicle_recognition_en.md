@@ -28,8 +28,6 @@ Different from classification, this part mainly uses the following methods:
 
 ### 1.2 Backbone
 
-使用`ResNet50`作为backbone，同时做了如下修改：
-
  Using `ResNet50` as  backbone, and make the following modifications:
 
 - Last stage stride = 1, keep the size of the final output feature map to 14x14. At the cost of increasing a small amount of calculation, the ability of feature expression is greatly improved.
@@ -38,14 +36,14 @@ code：[ResNet50_last_stage_stride1](../../../ppcls/arch/backbone/variant_models
 
 ### 1.3 Neck
 
-In order to reduce the complexity of calculating feature distance in inferencne, an embedding convolution layer is added, and the feature dimension is 512.
+In order to reduce the complexity of calculating feature distance in inference, an embedding convolution layer is added, and the feature dimension is set to 512.
 
 ### 1.4 Metric Learning Losses
 
 - In vehicle ReID，[SupConLoss](../../../ppcls/loss/supconloss.py) , [ArcLoss](../../../ppcls/arch/gears/arcmargin.py) are used. The weight ratio of two losses is 1:1.
 - In vehicle fine-grained classification, [TtripLet Loss](../../../ppcls/loss/triplet.py), [ArcLoss](../../../ppcls/arch/gears/arcmargin.py) are used. The weight ratio of two losses is 1:1.
 
-## Experiment
+## 2 Experiment
 
 ### 2.1 Vehicle ReID
 
