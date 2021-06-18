@@ -28,7 +28,7 @@ The quality and quantity of data often determine the performance of a model. In 
 
 ### 2.2 Prepare the model
 
-After the data is determined, the model often determines the upper limit of the final accuracy. In the field of image classification, classic models emerge in an endless stream. PaddleClas provides 35 series and a total of 164 ImageNet pre-trained models. For specific accuracy, speed and other indicators, please refer to[Backbone network introduction](../models)。
+After the data is determined, the model often determines the upper limit of the final accuracy. In the field of image classification, classic models emerge in an endless stream. PaddleClas provides 35 series and a total of 164 ImageNet pre-trained models. For specific accuracy, speed and other indicators, please refer to[Backbone network introduction](../models).
 
 ### 2.3 Train the model
 
