@@ -1,6 +1,6 @@
 # Quick Start
 ---
-At first，please take a reference to [Installation Guide](./iinstall_en.md)to prepare your environment.
+At first，please take a reference to [Installation Guide](./install_en.md)to prepare your environment.
 
 PaddleClas image retrieval supports the following training/evaluation environments:
 ```shell
@@ -108,7 +108,7 @@ For training and evaluation on a single GPU, the `tools/train.py` and `tools/eva
 <a name="Model-Training"></a>
 ### 2.1 Model Training
 
-Once you have prepared the configuration file, you can start training the image retrieval task in the following way. the method used by PaddleClas to train the image retrieval is metric learning, refering to [metric learning](#metric-learning) for an explanation of metric learning.
+Once you have prepared the configuration file, you can start training the image retrieval task in the following way. the method used by PaddleClas to train the image retrieval is metric learning, refering to [metric learning](#Metric-Learning) for an explanation of metric learning.
 
 
 ```
@@ -120,7 +120,7 @@ python3 tools/train.py \
 
  `-c` is used to specify the path to the configuration file, and `-o` is used to specify the parameters that need to be modified or added, where `-o Arch.Backbone.pretrained=True` indicates that the Backbone part uses the pre-trained model, in addition, `Arch.Backbone.pretrained` can also specify backbone.`pretrained` can also specify the address of a specific model weight file, which needs to be replaced with the path to your own pre-trained model weight file when using it. `-o Global.device=gpu` indicates that the GPU is used for training. If you want to use a CPU for training, you need to set `Global.device` to `cpu`.
 
-For more detailed training configuration, you can also modify the corresponding configuration file of the model directly. Refer to the [configuration document](config.md) for specific configuration parameters.
+For more detailed training configuration, you can also modify the corresponding configuration file of the model directly. Refer to the [configuration document](config_en.md) for specific configuration parameters.
 
 Run the above commands to check the output log, an example is as follows:
 
@@ -225,7 +225,7 @@ The above command will generate the model structure file (`inference.pdmodel`) a
 
 Image retrieval refers to a query image given a specific instance (e.g. a specific target, scene, item, etc.) that contains the same instance from a database image. Unlike image classification, image retrieval solves an open set problem where the training set may not contain the class of the image being recognised. The overall process of image retrieval is: firstly, the images are represented in a suitable feature vector, secondly, a nearest neighbour search is performed on these image feature vectors using Euclidean or Cosine distances to find similar images in the base, and finally, some post-processing techniques can be used to fine-tune the retrieval results and determine information such as the category of the image being recognised. Therefore, the key to determining the performance of an image retrieval algorithm lies in the goodness of the feature vectors corresponding to the images.
 
-<a name="Metric Learning"></a>
+<a name="Metric-Learning"></a>
 - Metric Learning
 
 Metric learning studies how to learn a distance function on a particular task so that the distance function can help nearest-neighbour based algorithms (kNN, k-means, etc.) to achieve better performance. Deep Metric Learning is a method of metric learning that aims to learn a mapping from the original features to a low-dimensional dense vector space (embedding space) such that similar objects on the embedding space are closer together using commonly used distance functions (Euclidean distance, cosine distance, etc.) ) on the embedding space, while the distances between objects of different classes are relatively close to each other. Deep metric learning has achieved very successful applications in the field of computer vision, such as face recognition, commodity recognition, image retrieval, pedestrian re-identification, etc.
