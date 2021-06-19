@@ -54,34 +54,32 @@ Quick experience of image recognition：[Link](./docs/zh_CN/tutorials/quick_star
 
 ## Tutorials
 
-- [Quick Installatiopn](./docs/zh_CN/tutorials/install.md)
-- [Quick Start of Recognition](./docs/zh_CN/tutorials/quick_start_recognition.md)
+- [Quick Installatiopn](./docs/en/tutorials/install.md)
+- [Quick Start of Recognition](./docs/en/tutorials/quick_start_recognition.md)
 - Algorithms Introduction（Updating）
-    - [Backbone Network and Pre-trained Model Library](./docs/zh_CN/models/models_intro.md)
-    - [Mainbody Detection](./docs/zh_CN/application/object_detection.md)
-    - Image Classification
-        - [ImageNet Classification](./docs/zh_CN/tutorials/quick_start_professional.md)
-    - Feature Learning
-        - [Product Recognition](./docs/zh_CN/application/product_recognition.md)
-        - [Vehicle Recognition](./docs/zh_CN/application/vehicle_reid.md)
-        - [Logo Recognition](./docs/zh_CN/application/logo_recognition.md)
-        - [Animation Character Recognition](./docs/zh_CN/application/cartoon_character_recognition.md)
+    - Backbone Network and Pre-trained Model Library
+    - [Mainbody Detection](./docs/en/application/object_detection_en.md)
+    - [Image Classification](./docs/en/tutorials/image_classification_en.md)
+    - [Feature Learning](./docs/en/application/feature_learning_en.md)
+        - [Product Recognition](./docs/en/application/product_recognition_en.md)
+        - [Vehicle Recognition](./docs/en/application/vehicle_recognition_en.md)
+        - [Logo Recognition](./docs/en/application/logo_recognition_en.md)
+        - [Animation Character Recognition](./docs/en/application/cartoon_character_recognition_en.md)
         - [Vector Retrieval](./deploy/vector_search/README.md)
 - Models Training/Evaluation
-    - [Image Classification](./docs/zh_CN/tutorials/getting_started.md)
-    - [Feature Learning](./docs/zh_CN/application/feature_learning.md)
+    - [Image Classification](./docs/en/tutorials/getting_started_en.md)
+    - Feature Learning
 - Inference Model Prediction（Updating）
-    - [Python Inference](./docs/zh_CN/tutorials/getting_started.md)
-    - [C++ Inference](./deploy/cpp_infer/readme.md)
-    - [Hub Serving Deployment](./deploy/hubserving/readme.md)
-    - [Mobile Deployment](./deploy/lite/readme.md)
-    - [Inference Using whl](./docs/zh_CN/whl.md)
+    - Python Inference
+    - [C++ Inference](./deploy/cpp/readme_en.md)(only support classification for now, recognition coming soon)
+- Model Deploy (only support classification for now, recognition coming soon)
+    - [Hub Serving Deployment](./deploy/hubserving/readme_en.md)
+    - [Mobile Deployment](./deploy/lite/readme_en.md)
+    - [Inference Using whl](./docs/en/whl_en.md)
 - Advanced Tutorial
-    - [Knowledge Distillation](./docs/zh_CN/advanced_tutorials/distillation/distillation.md)
-    - [Model Quantization](./docs/zh_CN/extension/paddle_quantization.md)
-    - [Data Augmentation](./docs/zh_CN/advanced_tutorials/image_augmentation/ImageAugment.md)
-- FAQ(Suspended Updates)
-    - [Image Classification FAQ](docs/zh_CN/faq.md)
+    - [Knowledge Distillation](./docs/en/advanced_tutorials/distillation/distillation_en.md)
+    - [Model Quantization](./docs/en/extension/paddle_quantization_en.md)
+    - [Data Augmentation](./docs/en/advanced_tutorials/image_augmentation/ImageAugment_en.md)
 - [License](#License)
 - [Contribution](#Contribution)
 
