@@ -197,7 +197,7 @@ The above command will use `. /configs/quick_start/MobileNetV1_retrieval.yaml` a
 Some of the configurable evaluation parameters are introduced as follows.
 * `Arch.name`: the name of the model
 * `Global.pretrained_model`: path to the pre-trained model file of the model to be evaluated, unlike `Global.Backbone.pretrained` where the pre-trained model is the weight of the whole model, whereas `Global.Backbone.pretrained` is only the Backbone.`pretrained` is only the weight of the Backbone part. When it is time to do model evaluation, the weights of the whole model need to be loaded.
-* `Metric.Eval`: the metric to be evaluated, by default evaluates recall@1, recall@5, mAP. when you are not going to evaluate a metric, you can remove the corresponding trial marker from the configuration file; when you want to add a certain evaluation metric, you can also refer to [Metric](... /... /... /ppcls/metric/metrics.py) section to add the relevant metric to the configuration file `Metric.Eval`.
+* `Metric.Eval`: the metric to be evaluated, by default evaluates recall@1, recall@5, mAP. when you are not going to evaluate a metric, you can remove the corresponding trial marker from the configuration file; when you want to add a certain evaluation metric, you can also refer to [Metric](../../../ppcls/metric/metrics.py) section to add the relevant metric to the configuration file `Metric.Eval`.
 
 **Note：** 
 
