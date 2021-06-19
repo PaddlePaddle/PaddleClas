@@ -1,6 +1,6 @@
 # Quick Start
 ---
-At first，please take a reference to [Installation Guide](./install_en.md)to prepare your environment.
+At first，please take a reference to [Installation Guide](./install_en.md) to prepare your environment.
 
 PaddleClas image retrieval supports the following training/evaluation environments:
 ```shell
