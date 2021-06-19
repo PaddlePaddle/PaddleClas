@@ -12,9 +12,9 @@ PaddleClas image retrieval supports the following training/evaluation environmen
 
 * [1. Data Preparation](#Data-Preparation)
 * [2. Training and Evaluation on Single GPU](#Training-and-Evaluation-on-Single-GPU)
-  * [2.1 Training](#Training)
+  * [2.1 Model Training](#Model-Training)
   * [2.2 Resume Training](#Resume-Training)
-  * [2.3 Evaluation](#Evaluation)
+  * [2.3 Model Evaluation](#Model-Evaluation)
 * [3. Export Inference Model](#Export-Inference-Model)
   
 <a name="Data-Preparation"></a>   
@@ -92,20 +92,20 @@ The format of testing set is the same as the one of training set.
 
 * When the gallery dataset and query dataset are the same, in order to remove the first data retrieved (the retrieved images themselves do not need to be evaluated), each data needs to correspond to a unique id for subsequent evaluation of metrics such as mAP, recall@1, etc. Please refer to [Introduction to image retrieval datasets](#Introduction to image retrieval datasets) for the analysis of gallery datasets and query datasets, and [Image retrieval evaluation metrics](#Image retrieval evaluation metrics) for the evaluation of mAP, recall@1, etc.
 
-Back to `PaddleClas`root directory
+Back to `PaddleClas` root directory
 
 ```shell
 # linux or mac
 cd ../../
 ```
 
-<a name="Single GPU-based Training and Evaluation"></a>  
+<a name="Training-and-Evaluation-on-Single-GPU"></a>  
 ## 2. Single GPU-based Training and Evaluation
 
 For training and evaluation on a single GPU, the `tools/train.py` and `tools/eval.py` scripts are recommended.
 
 
-<a name="Model Training"></a>
+<a name="Model-Training"></a>
 ### 2.1 Model Training
 
 Once you have prepared the configuration file, you can start training the image retrieval task in the following way. the method used by PaddleClas to train the image retrieval is metric learning, refering to [metric learning](#metric-learning) for an explanation of metric learning.
@@ -134,7 +134,7 @@ Run the above commands to check the output log, an example is as follows:
 
 The Backbone here is MobileNetV1, if you want to use other backbone, you can rewrite the parameter `Arch.Backbone.name`, for example by adding `-o Arch.Backbone.name={other Backbone}` to the command. In addition, as the input dimension of the `Neck` section differs between models, replacing a Backbone may require rewriting the input size here in a similar way to replacing the Backbone's name.
 
-In the Training Loss section, [CELoss] is used here (... /... /... /ppcls/loss/celoss.py) and [TripletLossV2](... /... /... /ppcls/loss/triplet.py), with the following configuration files.
+In the Training Loss section, [CELoss](../../../ppcls/loss/celoss.py) and [TripletLossV2](../../../ppcls/loss/triplet.py) is used here  with the following configuration files.
 
 ```
 Loss:
@@ -146,10 +146,10 @@ Loss:
         margin: 0.5
 ```
     
-The final total Loss is a weighted sum of all Losses, where weight defines the weight of a particular Loss in the final total. If you want to replace other Losses, you can also change the Loss field in the configuration file, for the currently supported Losses please refer to [Loss](... /... /... /ppcls/loss).
+The final total Loss is a weighted sum of all Losses, where weight defines the weight of a particular Loss in the final total. If you want to replace other Losses, you can also change the Loss field in the configuration file, for the currently supported Losses please refer to [Loss](../../../ppcls/loss).
 
-<a name="Model Recovery Training"></a>
-### 2.2 Model Recovery Training
+<a name="Resume-Training"></a>
+### 2.2 Resume Training
 
 If the training task is terminated for some reasons, it can be recovered by loading the checkpoints weights file and continue training.
 
@@ -181,7 +181,7 @@ There is no need to modify the configuration file, just set the `Global.checkpoi
         .
     ```
 
-<a name="Model Evaluation"></a>
+<a name="Model-Evaluation"></a>
 ### 2.3 Model Evaluation
 
 Model evaluation can be carried out with the following commands.
@@ -201,14 +201,13 @@ Some of the configurable evaluation parameters are introduced as follows.
 
 **Note：** 
 
-* When loading the model to be evaluated, the path to the model file needs to be specified, but it is not necessary to include the file suffix, PaddleClas will automatically complete the `.pdparams` suffix, e.g. [2.2 Model recovery training](#Model recovery training).
+* When loading the model to be evaluated, the path to the model file needs to be specified, but it is not necessary to include the file suffix, PaddleClas will automatically complete the `.pdparams` suffix, e.g. [2.2 Resume Training](#Resume-Training).
 
 * Metric learning are generally not evaluated for TopkAcc.
 
-<a name="Export inference Model"></a>
-## 3. Export inference Model
+<a name="Export-Inference-Model"></a>
+## 3. Export Inference Model
 
-通过导出inference模型，PaddlePaddle支持使用预测引擎进行预测推理。对训练好的模型进行转换：
 By exporting the inference model, PaddlePaddle supports the transformation of the trained model using prediction with inference engine.
 
 ```bash
