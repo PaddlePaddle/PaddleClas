@@ -29,7 +29,14 @@ if platform.system() == "Windows":
 else:
     lib_filename = "index.so"
 so_path = os.path.join(__dir__, lib_filename)
-lib = ctypes.cdll.LoadLibrary(so_path)
+try:
+    lib = ctypes.cdll.LoadLibrary(so_path)
+except Exception as ex:
+    readme_path = os.path.join(__dir__, "README.md")
+    print(
+        f"Error happened when load lib {so_path} with msg {ex},\nplease refer to {readme_path} to rebuild your library."
+    )
+    exit(-1)
 
 
 class IndexContext(Structure):
