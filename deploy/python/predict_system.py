@@ -46,22 +46,38 @@ class SystemPredictor(object):
             dist_type=config['IndexProcess']['dist_type'])
         self.Searcher.load(config['IndexProcess']['index_path'])
 
+    def append_self(self, results, shape):
+        results.append({
+            "class_id": 0,
+            "score": 1.0,
+            "bbox": np.array([0, 0, shape[1], shape[0]]),
+            "label_name": "foreground",
+        })
+        return results
+
     def predict(self, img):
         output = []
         results = self.det_predictor.predict(img)
+        # add the whole image for recognition
+        results = self.append_self(results, img.shape)
+
         for result in results:
             preds = {}
             xmin, ymin, xmax, ymax = result["bbox"].astype("int")
             crop_img = img[ymin:ymax, xmin:xmax, :].copy()
             rec_results = self.rec_predictor.predict(crop_img)
-            #preds["feature"] = rec_results
             preds["bbox"] = [xmin, ymin, xmax, ymax]
             scores, docs = self.Searcher.search(
                 query=rec_results,
                 return_k=self.return_k,
                 search_budget=self.search_budget)
-            preds["rec_docs"] = docs
-            preds["rec_scores"] = scores
+            # just top-1 result will be returned for the final
+            if scores[0] >= self.config["IndexProcess"]["score_thres"]:
+                preds["rec_docs"] = docs[0]
+                preds["rec_scores"] = scores[0]
+            else:
+                preds["rec_docs"] = None
+                preds["rec_scores"] = 0.0
 
             output.append(preds)
         return output
@@ -75,7 +91,7 @@ def main(config):
     for idx, image_file in enumerate(image_list):
         img = cv2.imread(image_file)[:, :, ::-1]
         output = system_predictor.predict(img)
-        draw_bbox_results(img[:, :, ::-1], output, image_file)
+        draw_bbox_results(img, output, image_file)
         print(output)
     return
 
