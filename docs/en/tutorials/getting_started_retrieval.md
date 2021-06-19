@@ -1,6 +1,6 @@
 # Quick Start
 ---
-At first，please take a reference to [Installation Guide](./install.md)to prepare your environment.
+At first，please take a reference to [Installation Guide](./iinstall_en.md)to prepare your environment.
 
 PaddleClas image retrieval supports the following training/evaluation environments:
 ```shell
@@ -17,7 +17,7 @@ PaddleClas image retrieval supports the following training/evaluation environmen
   * [2.3 Evaluation](#Evaluation)
 * [3. Export Inference Model](#Export-Inference-Model)
   
-<a name="Data Preparation"></a>   
+<a name="Data-Preparation"></a>   
 ## 1. Data Preparation
 
 * Go to PaddleClas directory。
@@ -43,7 +43,7 @@ tar -xzvf CUB_200_2011.tgz
 cd CUB_200_2011
 ```
 
-When using the dataset for image retrieval task, we usually use the first 100 classes as the training set, and the last 100 classes as the testing set, so we need to process those data so as to adapt the model training of image retrival.
+When using the dataset for image retrieval, we usually use the first 100 classes as the training set, and the last 100 classes as the testing set, so we need to process those data so as to adapt the model training of image retrival.
 
 ```shell
 #Create train and test directories
@@ -53,7 +53,7 @@ mkdir train && mkdir test
 ls images | awk -F "." '{if(int($1)<101)print "mv images/"$0" train/"int($1)}' | sh
 ls images | awk -F "." '{if(int($1)>100)print "mv images/"$0" test/"int($1)}' | sh
 
-#Generate train_list and test_list
+#Generate train_list.txt test_list.txt
 tree -r -i -f train | grep jpg | awk -F "/" '{print $0" "int($2) " "NR}' > train_list.txt
 tree -r -i -f test | grep jpg | awk -F "/" '{print $0" "int($2) " "NR}' > test_list.txt
 ```
@@ -118,7 +118,7 @@ python3 tools/train.py \
     -o Global.device=gpu
 ```
 
- `-c` is used to specify the path to the configuration file, and `-o` is used to specify the parameters that need to be modified or added, where `-o Arch.Backbone.pretrained=True` indicates that the Backbone part uses the pre-trained model, in addition, `Arch.Backbone.pretrained` can also specify backbone.pretrained` can also specify the address of a specific model weight file, which needs to be replaced with the path to your own pre-trained model weight file when using it. `-o Global.device=gpu` indicates that the GPU is used for training. If you want to use a CPU for training, you need to set `Global.device` to `cpu`.
+ `-c` is used to specify the path to the configuration file, and `-o` is used to specify the parameters that need to be modified or added, where `-o Arch.Backbone.pretrained=True` indicates that the Backbone part uses the pre-trained model, in addition, `Arch.Backbone.pretrained` can also specify backbone.`pretrained` can also specify the address of a specific model weight file, which needs to be replaced with the path to your own pre-trained model weight file when using it. `-o Global.device=gpu` indicates that the GPU is used for training. If you want to use a CPU for training, you need to set `Global.device` to `cpu`.
 
 For more detailed training configuration, you can also modify the corresponding configuration file of the model directly. Refer to the [configuration document](config.md) for specific configuration parameters.
 
@@ -151,7 +151,7 @@ The final total Loss is a weighted sum of all Losses, where weight defines the w
 <a name="Model Recovery Training"></a>
 ### 2.2 Model Recovery Training
 
-If the training task is terminated for some reasons, it can be recovered by loading the breakpoint weights file and continue training.
+If the training task is terminated for some reasons, it can be recovered by loading the checkpoints weights file and continue training.
 
 
 ```
@@ -161,11 +161,11 @@ python3 tools/train.py \
     -o Global.device=gpu
 ```
 
-There is no need to modify the configuration file, just set the `Global.checkpoints` parameter when continuing training, indicating the path to the loaded breakpoint weights file, using this parameter will load both the saved breakpoint weights and information about the learning rate, optimizer, etc.
+There is no need to modify the configuration file, just set the `Global.checkpoints` parameter when continuing training, indicating the path to the loaded breakpoint weights file, using this parameter will load both the saved checkpoints weights and information about the learning rate, optimizer, etc.
 
 **Note**：
 
-* The `-o Global.checkpoints` parameter need not contain the suffix name of the breakpoint weights file, the above training command will generate the breakpoint weights file as shown below during training, if you want to continue training from breakpoint `5` then the `Global.checkpoints` parameter just needs to be set to `". /output/RecModel/epoch_5"` and PaddleClas will automatically supplement the suffix name.
+* The `-o Global.checkpoints` parameter need not contain the suffix name of the checkpoint weights file, the above training command will generate the breakpoint weights file as shown below during training, if you want to continue training from breakpoint `5` then the `Global.checkpoints` parameter just needs to be set to `". /output/RecModel/epoch_5"` and PaddleClas will automatically supplement the suffix name.
 
     ```shell
     output/
@@ -196,7 +196,7 @@ The above command will use `. /configs/quick_start/MobileNetV1_retrieval.yaml` a
 
 Some of the configurable evaluation parameters are introduced as follows.
 * `Arch.name`: the name of the model
-* `Global.pretrained_model`: path to the pre-trained model file of the model to be evaluated, unlike `Global.Backbone.pretrained` where the pre-trained model is the weight of the whole model, whereas `Global.Backbone.pretrained` is only the Backbone.pretrained` is only the weight of the Backbone part. When it is time to do model evaluation, the weights of the whole model need to be loaded.
+* `Global.pretrained_model`: path to the pre-trained model file of the model to be evaluated, unlike `Global.Backbone.pretrained` where the pre-trained model is the weight of the whole model, whereas `Global.Backbone.pretrained` is only the Backbone.`pretrained` is only the weight of the Backbone part. When it is time to do model evaluation, the weights of the whole model need to be loaded.
 * `Metric.Eval`: the metric to be evaluated, by default evaluates recall@1, recall@5, mAP. when you are not going to evaluate a metric, you can remove the corresponding trial marker from the configuration file; when you want to add a certain evaluation metric, you can also refer to [Metric](... /... /... /ppcls/metric/metrics.py) section to add the relevant metric to the configuration file `Metric.Eval`.
 
 **Note：** 
