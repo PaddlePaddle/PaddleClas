@@ -39,9 +39,12 @@ def split_datafile(data_file, image_root, delimiter="\t"):
     gallery_docs = []
     with open(data_file, 'r', encoding='utf-8') as f:
         lines = f.readlines()
-        for i, line in enumerate(lines):
-            line = line.strip().split(delimiter)
+        for _, ori_line in enumerate(lines):
+            line = ori_line.strip().split(delimiter)
+            text_num = len(line)
+            assert text_num >= 2, f"line({ori_line}) must be splitted into at least 2 parts, but got {text_num}"
             image_file = os.path.join(image_root, line[0])
+            
             image_doc = line[1]
             gallery_images.append(image_file)
             gallery_docs.append(image_doc)
