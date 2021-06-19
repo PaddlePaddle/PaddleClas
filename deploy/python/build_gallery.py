@@ -44,7 +44,7 @@ def split_datafile(data_file, image_root, delimiter="\t"):
             text_num = len(line)
             assert text_num >= 2, f"line({ori_line}) must be splitted into at least 2 parts, but got {text_num}"
             image_file = os.path.join(image_root, line[0])
-            
+
             image_doc = line[1]
             gallery_images.append(image_file)
             gallery_docs.append(image_doc)

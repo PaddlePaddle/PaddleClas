@@ -50,11 +50,12 @@ class SystemPredictor(object):
         results.append({
             "class_id": 0,
             "score": 1.0,
-            "bbox": np.array([0, 0, shape[1], shape[0]]), # xmin, ymin, xmax, ymax
+            "bbox":
+            np.array([0, 0, shape[1], shape[0]]),  # xmin, ymin, xmax, ymax
             "label_name": "foreground",
         })
         return results
-    
+
     def nms_to_rec_results(self, results, thresh=0.3):
         filtered_results = []
         x1 = np.array([r["bbox"][0] for r in results]).astype("float32")
@@ -62,10 +63,10 @@ class SystemPredictor(object):
         x2 = np.array([r["bbox"][2] for r in results]).astype("float32")
         y2 = np.array([r["bbox"][3] for r in results]).astype("float32")
         scores = np.array([r["rec_scores"] for r in results])
-        
+
         areas = (x2 - x1 + 1) * (y2 - y1 + 1)
         order = scores.argsort()[::-1]
-        
+
         while order.size > 0:
             i = order[0]
             xx1 = np.maximum(x1[i], x1[order[1:]])
@@ -89,7 +90,7 @@ class SystemPredictor(object):
         output = []
         # st1: get all detection results
         results = self.det_predictor.predict(img)
-        
+
         # st2: add the whole image for recognition to improve recall
         results = self.append_self(results, img.shape)
 
@@ -111,7 +112,8 @@ class SystemPredictor(object):
                 output.append(preds)
 
         # st5: nms to the final results to avoid fetching duplicate results
-        output = self.nms_to_rec_results(output, self.config["Global"]["rec_nms_thresold"])
+        output = self.nms_to_rec_results(
+            output, self.config["Global"]["rec_nms_thresold"])
 
         return output
 
