@@ -140,6 +140,8 @@ python3.7 python/predict_system.py -c configs/inference_product.yaml
 python3.7 python/predict_system.py -c configs/inference_product.yaml -o Global.use_gpu=False
 ```
 
+注意：这里使用了默认编译生成的库文件进行特征索引，如果与您的环境不兼容，导致程序报错，可以参考[向量检索教程](../../../deploy/vector_search/README.md)重新编译库文件。
+
 待检索图像如下所示。
 
 <div align="center">
@@ -186,7 +188,7 @@ python3.7 python/predict_system.py -c configs/inference_product.yaml -o Global.i
 ...
 ```
 
-所以图像的识别结果可视化图像也保存在`output`文件夹内。
+所有图像的识别结果可视化图像也保存在`output`文件夹内。
 
 
 更多地，可以通过修改`Global.rec_inference_model_dir`字段来更改识别inference模型的路径，通过修改`IndexProcess.index_path`字段来更改索引库索引的路径。
