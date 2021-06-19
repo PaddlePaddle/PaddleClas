@@ -26,10 +26,10 @@ RecPostProcess: null
 
 # indexing engine config
 IndexProcess:
-  index_path: "./dataset/product_demo_data_v1.0/index"
-  image_root: "./dataset/product_demo_data_v1.0"
-  data_file:  "./dataset/product_demo_data_v1.0/data_file.txt"
-  delimiter: " "
+  index_path: "./recognition_demo_data_v1.0/gallery_product/index"
+  image_root: "./recognition_demo_data_v1.0/gallery_product/"
+  data_file:  "./recognition_demo_data_v1.0/gallery_product/data_file.txt"
+  delimiter: "\t"
   dist_type: "IP"
   pq_size: 100
   embedding_size: 512

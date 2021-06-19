@@ -1,7 +1,9 @@
 Global:
-  infer_imgs: "./dataset/logo_demo_data_v1.0/query/logo_auxx-1.jpg"
+  infer_imgs: "./recognition_demo_data_v1.0/gallery/test_logo"
   det_inference_model_dir: "./models/ppyolov2_r50vd_dcn_mainbody_v1.0_infer/"
   rec_inference_model_dir: "./models/logo_rec_ResNet50_Logo3K_v1.0_infer/"
+  rec_nms_thresold: 0.3
+
   batch_size: 1
   image_shape: [3, 640, 640]
   threshold: 0.2
@@ -48,7 +50,7 @@ RecPostProcess: null
 
 # indexing engine config
 IndexProcess:
-  index_path: "./dataset/logo_demo_data_v1.0/index/"
+  index_path: "./recognition_demo_data_v1.0/gallery_logo/index/"
   search_budget: 100
   return_k: 5
   dist_type: "IP"
