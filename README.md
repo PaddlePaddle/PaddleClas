@@ -34,6 +34,8 @@ Res2Net200_vd预训练模型Top-1精度高达85.1%。
 <img src="./docs/images/recognition.gif"  width = "400" />
 </div>
 
+更多效果图请见：[识别效果展示页面](./docs/zh_CN/more_demo.md)
+
 ## 欢迎加入技术交流群
 
 * 您可以扫描下面的微信群二维码， 加入PaddleClas 微信交流群。获得更高效的问题答疑，与各行各业开发者充分交流，期待您的加入。
