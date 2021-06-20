@@ -56,6 +56,8 @@ Quick experience of image recognition：[Link](./docs/en/tutorials/quick_start_r
 
 - [Quick Installatiopn](./docs/en/tutorials/install_en.md)
 - [Quick Start of Recognition](./docs/en/tutorials/quick_start_recognition_en.md)
+- [Introduction to Image Recognition Systems](#Introduction to Image Recognition Systems)
+- [Demo images](#Demo images)
 - Algorithms Introduction
     - [Backbone Network and Pre-trained Model Library](./docs/en/ImageNet_models.md)
     - [Mainbody Detection](./docs/en/application/mainbody_detection_en.md)
@@ -83,10 +85,9 @@ Quick experience of image recognition：[Link](./docs/en/tutorials/quick_start_r
 - [License](#License)
 - [Contribution](#Contribution)
 
-
+<a name="Introduction to Image Recognition Systems"></a>
 ## Introduction to Image Recognition Systems
 
-<a name="Introduction to Image Recognition Systems"></a>
 <div align="center">
 <img src="./docs/images/structure.png"  width = "400" />
 </div>
@@ -98,8 +99,41 @@ Image recognition can be divided into three steps:
 
 For a new unknown category, there is no need to retrain the model, just prepare images of new category, extract features and update retrieval database and the category can be recognised.
 
-<a name="License"></a>
+<a name="Demo images"></a>
+## Demo images [more](./docs/en/more_demo.md)
+- Product recognition
+<div align="center">
+<img src="./docs/images/recognition/more_demo_images/output_product/channelhandle_5.jpg"  width = "400" />
+</div>
+<div align="center">
+<img src="./docs/images/recognition/more_demo_images/output_product/daoxiangcunjinzhubing_10.jpg"  width = "400" />
+</div>
 
+- Cartoon character recognition
+<div align="center">
+<img src="./docs/images/recognition/more_demo_images/output_cartoon/labixiaoxin-005.jpeg"  width = "400" />
+</div>
+<div align="center">
+<img src="./docs/images/recognition/more_demo_images/output_cartoon/liuchuanfeng-010.jpeg"  width = "400" />
+</div>
+
+- Logo recognition
+<div align="center">
+<img src="./docs/images/recognition/more_demo_images/output_logo/cctv_4.jpg"  width = "400" />
+</div>
+<div align="center">
+<img src="./docs/images/recognition/more_demo_images/output_logo/mangguo_8.jpeg"  width = "400" />
+</div>
+
+- Car recognition
+<div align="center">
+<img src="./docs/images/recognition/more_demo_images/output_vehicle/audia5-115.jpeg"  width = "400" />
+</div>
+<div align="center">
+<img src="./docs/images/recognition/more_demo_images/output_vehicle/bentian-yage-101.jpeg"  width = "400" />
+</div>
+
+<a name="License"></a>
 ## License
 PaddleClas is released under the Apache 2.0 license <a href="https://github.com/PaddlePaddle/PaddleCLS/blob/master/LICENSE">Apache 2.0 license</a>
 
