@@ -140,6 +140,9 @@ python3.7 python/predict_system.py -c configs/inference_product.yaml
 python3.7 python/predict_system.py -c configs/inference_product.yaml
 ```
 
+**Note:** Program lib used to build index is compliled on our machine, if error occured because of the environment, you can refer to [vector search tutorial](../../../deploy/vector_search/README.md) to rebuild the lib.
+
+
 The image to be retrieved is shown below.
 
 <div align="center">
