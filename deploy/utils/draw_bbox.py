@@ -28,7 +28,8 @@ def draw_bbox_results(image,
     draw = ImageDraw.Draw(image)
     font = ImageFont.truetype(font_path, 20, encoding="utf-8")
 
-    color = (0, 255, 0)
+#     color = (0, 255, 0)
+    color = (0, 102, 255)
 
     for result in results:
         # empty results
@@ -40,9 +41,10 @@ def draw_bbox_results(image,
         th = 20
         tw = int(len(result["rec_docs"]) * 20) + 60
         start_y = max(0, ymin - th)
-        draw.rectangle(
-            [(xmin + 1, start_y), (xmin + tw + 1, start_y + th)],
-            outline=color)
+        
+#         draw.rectangle(
+#             [(xmin + 1, start_y), (xmin + tw + 1, start_y + th)],
+#             outline=color)
 
         draw.text((xmin + 1, start_y), text, fill=color, font=font)
 

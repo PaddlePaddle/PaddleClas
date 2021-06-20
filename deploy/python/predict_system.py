@@ -56,7 +56,7 @@ class SystemPredictor(object):
         })
         return results
 
-    def nms_to_rec_results(self, results, thresh=0.3):
+    def nms_to_rec_results(self, results, thresh=0.1):
         filtered_results = []
         x1 = np.array([r["bbox"][0] for r in results]).astype("float32")
         y1 = np.array([r["bbox"][1] for r in results]).astype("float32")
@@ -66,22 +66,19 @@ class SystemPredictor(object):
 
         areas = (x2 - x1 + 1) * (y2 - y1 + 1)
         order = scores.argsort()[::-1]
-
         while order.size > 0:
             i = order[0]
             xx1 = np.maximum(x1[i], x1[order[1:]])
-            yy1 = np.minimum(y1[i], y1[order[1:]])
+            yy1 = np.maximum(y1[i], y1[order[1:]])
             xx2 = np.minimum(x2[i], x2[order[1:]])
-            yy2 = np.maximum(y2[i], y2[order[1:]])
+            yy2 = np.minimum(y2[i], y2[order[1:]])
 
             w = np.maximum(0.0, xx2 - xx1 + 1)
             h = np.maximum(0.0, yy2 - yy1 + 1)
             inter = w * h
             ovr = inter / (areas[i] + areas[order[1:]] - inter)
-
             inds = np.where(ovr <= thresh)[0]
             order = order[inds + 1]
-
             filtered_results.append(results[i])
 
         return filtered_results
