@@ -109,15 +109,15 @@ python3.7 python/predict_det.py -c configs/inference_det.yaml
 检测的可视化结果如下：
 [](../images/recognition/product_demo/wangzai_det_result.jpg)
 
-如果想要修改图像，可以在configs/inference_det.yaml中，修改infer_imgs的值，或使用-o Global.infer_imgs修改，
+如果想要修改图像，可以在`configs/inference_det.yaml`中，修改infer_imgs的值，或使用-o Global.infer_imgs修改，
 例如，要使用`images/anmuxi.jpg`可以运行：
 
 ```shell script
 python3.7 python/predict_det.py -c configs/inference_det.yaml -o Global.infer_imgs=images/anmuxi.jpg
 ```
 
-如果想使用CPU进行预测，可以将配置文件中use_gpu选项设置为False，或者执行命令：
-```
+如果想使用CPU进行预测，可以将配置文件中`use_gpu`选项设置为`False`，或者执行命令：
+```shell script
 python3.7 python/predict_det.py -c configs/inference_det.yaml  -o Global.use_gpu=False
 ```
 
@@ -170,7 +170,6 @@ cd deploy
 
 导出inference模型后，可以使用下面的命令预测：
 ```shell script
-
 python3.7 python/predict_cls.py -c configs/inference_cls.yaml
 ```
 
