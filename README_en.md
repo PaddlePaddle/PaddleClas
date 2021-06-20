@@ -54,8 +54,8 @@ Quick experience of image recognition：[Link](./docs/zh_CN/tutorials/quick_star
 
 ## Tutorials
 
-- [Quick Installatiopn](./docs/en/tutorials/install.md)
-- [Quick Start of Recognition](./docs/en/tutorials/quick_start_recognition.md)
+- [Quick Installatiopn](./docs/en/tutorials/install_en.md)
+- [Quick Start of Recognition](./docs/en/tutorials/quick_start_recognition_en.md)
 - Algorithms Introduction（Updating）
     - Backbone Network and Pre-trained Model Library
     - [Mainbody Detection](./docs/en/application/object_detection_en.md)
