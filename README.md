@@ -98,6 +98,7 @@ Res2Net200_vd预训练模型Top-1精度高达85.1%。
 
 <a name="识别效果展示"></a>
 ## 识别效果展示
+- 商品识别
 <div align="center">
 <img src="./docs/images/recognition/more_demo_images/output_product/channelhandle_5.jpg"  width = "400" />
 </div>
@@ -122,6 +123,7 @@ Res2Net200_vd预训练模型Top-1精度高达85.1%。
 <div align="center">
 <img src="./docs/images/recognition/more_demo_images/output_product/weiduomeinaiyougege_10.jpg"  width = "400" />
 </div>
+- 动漫人物识别
 <div align="center">
 <img src="./docs/images/recognition/more_demo_images/output_cartoon/labixiaoxin-005.jpeg"  width = "400" />
 </div>
@@ -131,6 +133,7 @@ Res2Net200_vd预训练模型Top-1精度高达85.1%。
 <div align="center">
 <img src="./docs/images/recognition/more_demo_images/output_cartoon/zhangchulan-007.jpeg"  width = "400" />
 </div>
+- logo识别
 <div align="center">
 <img src="./docs/images/recognition/more_demo_images/output_logo/cctv_4.jpg"  width = "400" />
 </div>
@@ -140,6 +143,7 @@ Res2Net200_vd预训练模型Top-1精度高达85.1%。
 <div align="center">
 <img src="./docs/images/recognition/more_demo_images/output_logo/zhongshiyou-007.jpg"  width = "400" />
 </div>
+- 车辆识别
 <div align="center">
 <img src="./docs/images/recognition/more_demo_images/output_vehicle/audia5-115.jpeg"  width = "400" />
 </div>
