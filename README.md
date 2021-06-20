@@ -45,16 +45,19 @@ Res2Net200_vd预训练模型Top-1精度高达85.1%。
 ## 快速体验
 图像识别快速体验：[点击这里](./docs/zh_CN/tutorials/quick_start_recognition.md)
 
+## [效果展示](识别效果展示)
+
 ## 文档教程
 
 - [快速安装](./docs/zh_CN/tutorials/install.md)
 - [图像识别快速体验](./docs/zh_CN/tutorials/quick_start_recognition.md)
-- 算法介绍（更新中）
+- [图像识别系统介绍](#图像识别系统介绍)
+- [识别效果展示](#识别效果展示)
+- 算法介绍
     - [骨干网络和预训练模型库](./docs/zh_CN/ImageNet_models_cn.md)
     - [主体检测](./docs/zh_CN/application/mainbody_detection.md)
     - [图像分类](./docs/zh_CN/tutorials/image_classification.md)
     - [特征学习](./docs/zh_CN/application/feature_learning.md)
-        - [特征学习](./docs/zh_CN/application/feature_learning.md)
         - [商品识别](./docs/zh_CN/application/product_recognition.md)
         - [车辆识别](./docs/zh_CN/application/vehicle_recognition.md)
         - [logo识别](./docs/zh_CN/application/logo_recognition.md)
@@ -80,6 +83,7 @@ Res2Net200_vd预训练模型Top-1精度高达85.1%。
 - [贡献代码](#贡献代码)
 
 
+<a name="图像识别系统介绍"></a>
 ## 图像识别系统介绍
 
 <a name="图像识别系统介绍"></a>
@@ -90,6 +94,63 @@ Res2Net200_vd预训练模型Top-1精度高达85.1%。
 整个图像识别系统分为三步：（1）通过一个目标检测模型，检测图像物体候选区域（2）对每个候选区域进行特征提取（3）与检索库中图像进行特征匹配，提取识别结果。
 
 对于新的未知类别，无需重新训练模型，只需要在检索库补入该类别图像，重新建立检索库，就可以识别该类别。
+
+
+<a name="识别效果展示"></a>
+## 识别效果展示
+<div align="center">
+<img src="./docs/images/recognition/more_demo_images/output_product/channelhandle_5.jpg"  width = "400" />
+</div>
+<div align="center">
+<img src="./docs/images/recognition/more_demo_images/output_product/cliniqueblush_1.jpg"  width = "400" />
+</div>
+<div align="center">
+<img src="./docs/images/recognition/more_demo_images/output_product/daoxiangcunjinzhubing_10.jpg"  width = "400" />
+</div>
+<div align="center">
+<img src="./docs/images/recognition/more_demo_images/output_product/gannidress_10.jpg"  width = "400" />
+</div>
+<div align="center">
+<img src="./docs/images/recognition/more_demo_images/output_product/gbyingerche_15.jpg"  width = "400" />
+</div>
+<div align="center">
+<img src="./docs/images/recognition/more_demo_images/output_product/lafiolewine_03.jpg"  width = "400" />
+</div>
+<div align="center">
+<img src="./docs/images/recognition/more_demo_images/output_product/taochunqiu_8.jpg"  width = "400" />
+</div>
+<div align="center">
+<img src="./docs/images/recognition/more_demo_images/output_product/weiduomeinaiyougege_10.jpg"  width = "400" />
+</div>
+<div align="center">
+<img src="./docs/images/recognition/more_demo_images/output_cartoon/labixiaoxin-005.jpeg"  width = "400" />
+</div>
+<div align="center">
+<img src="./docs/images/recognition/more_demo_images/output_cartoon/liuchuanfeng-010.jpeg"  width = "400" />
+</div>
+<div align="center">
+<img src="./docs/images/recognition/more_demo_images/output_cartoon/zhangchulan-007.jpeg"  width = "400" />
+</div>
+<div align="center">
+<img src="./docs/images/recognition/more_demo_images/output_logo/cctv_4.jpg"  width = "400" />
+</div>
+<div align="center">
+<img src="./docs/images/recognition/more_demo_images/output_logo/mangguo_8.jpeg"  width = "400" />
+</div>
+<div align="center">
+<img src="./docs/images/recognition/more_demo_images/output_logo/zhongshiyou-007.jpg"  width = "400" />
+</div>
+<div align="center">
+<img src="./docs/images/recognition/more_demo_images/output_vehicle/audia5-115.jpeg"  width = "400" />
+</div>
+<div align="center">
+<img src="./docs/images/recognition/more_demo_images/output_vehicle/bentian-yage-101.jpeg"  width = "400" />
+</div>
+<div align="center">
+<img src="./docs/images/recognition/more_demo_images/output_vehicle/bmw-m340-107.jpeg"  width = "400" />
+</div>
+
+[更多效果图](./docs/images/recognition/more_demo_images)
 
 <a name="许可证书"></a>
 
