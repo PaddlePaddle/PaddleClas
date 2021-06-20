@@ -1,11 +1,13 @@
 Global:
-  infer_imgs: "./dataset/cartoon_demo_data_v1.0/query/"
+  infer_imgs: "./recognition_demo_data_v1.0/test_cartoon"
   det_inference_model_dir: "./models/ppyolov2_r50vd_dcn_mainbody_v1.0_infer/"
   rec_inference_model_dir: "./models/cartoon_rec_ResNet50_iCartoon_v1.0_infer/"
+  rec_nms_thresold: 0.05
+
   batch_size: 1
   image_shape: [3, 640, 640]
-  threshold: 0.5
-  max_det_results: 1
+  threshold: 0.2
+  max_det_results: 5
   labe_list:
   - foreground
 
@@ -49,7 +51,8 @@ RecPreProcess:
 RecPostProcess: null
 
 IndexProcess:
-  index_path: "./dataset/cartoon_demo_data_v1.0/index/"
+  index_path: "./recognition_demo_data_v1.0/gallery_cartoon/index/"
   search_budget: 100
   return_k: 5
   dist_type: "IP"
+  score_thres: 0.5

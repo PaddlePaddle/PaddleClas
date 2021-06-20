@@ -46,24 +46,72 @@ class SystemPredictor(object):
             dist_type=config['IndexProcess']['dist_type'])
         self.Searcher.load(config['IndexProcess']['index_path'])
 
+    def append_self(self, results, shape):
+        results.append({
+            "class_id": 0,
+            "score": 1.0,
+            "bbox":
+            np.array([0, 0, shape[1], shape[0]]),  # xmin, ymin, xmax, ymax
+            "label_name": "foreground",
+        })
+        return results
+
+    def nms_to_rec_results(self, results, thresh=0.1):
+        filtered_results = []
+        x1 = np.array([r["bbox"][0] for r in results]).astype("float32")
+        y1 = np.array([r["bbox"][1] for r in results]).astype("float32")
+        x2 = np.array([r["bbox"][2] for r in results]).astype("float32")
+        y2 = np.array([r["bbox"][3] for r in results]).astype("float32")
+        scores = np.array([r["rec_scores"] for r in results])
+
+        areas = (x2 - x1 + 1) * (y2 - y1 + 1)
+        order = scores.argsort()[::-1]
+        while order.size > 0:
+            i = order[0]
+            xx1 = np.maximum(x1[i], x1[order[1:]])
+            yy1 = np.maximum(y1[i], y1[order[1:]])
+            xx2 = np.minimum(x2[i], x2[order[1:]])
+            yy2 = np.minimum(y2[i], y2[order[1:]])
+
+            w = np.maximum(0.0, xx2 - xx1 + 1)
+            h = np.maximum(0.0, yy2 - yy1 + 1)
+            inter = w * h
+            ovr = inter / (areas[i] + areas[order[1:]] - inter)
+            inds = np.where(ovr <= thresh)[0]
+            order = order[inds + 1]
+            filtered_results.append(results[i])
+
+        return filtered_results
+
     def predict(self, img):
         output = []
+        # st1: get all detection results
         results = self.det_predictor.predict(img)
+
+        # st2: add the whole image for recognition to improve recall
+        results = self.append_self(results, img.shape)
+
+        # st3: recognition process, use score_thres to ensure accuracy
         for result in results:
             preds = {}
             xmin, ymin, xmax, ymax = result["bbox"].astype("int")
             crop_img = img[ymin:ymax, xmin:xmax, :].copy()
             rec_results = self.rec_predictor.predict(crop_img)
-            #preds["feature"] = rec_results
             preds["bbox"] = [xmin, ymin, xmax, ymax]
             scores, docs = self.Searcher.search(
                 query=rec_results,
                 return_k=self.return_k,
                 search_budget=self.search_budget)
-            preds["rec_docs"] = docs
-            preds["rec_scores"] = scores
+            # just top-1 result will be returned for the final
+            if scores[0] >= self.config["IndexProcess"]["score_thres"]:
+                preds["rec_docs"] = docs[0]
+                preds["rec_scores"] = scores[0]
+                output.append(preds)
 
-            output.append(preds)
+        # st5: nms to the final results to avoid fetching duplicate results
+        output = self.nms_to_rec_results(
+            output, self.config["Global"]["rec_nms_thresold"])
+
         return output
 
 
@@ -75,7 +123,7 @@ def main(config):
     for idx, image_file in enumerate(image_list):
         img = cv2.imread(image_file)[:, :, ::-1]
         output = system_predictor.predict(img)
-        draw_bbox_results(img[:, :, ::-1], output, image_file)
+        draw_bbox_results(img, output, image_file)
         print(output)
     return
 
