@@ -113,9 +113,6 @@ Res2Net200_vd预训练模型Top-1精度高达85.1%。
 <div align="center">
 <img src="./docs/images/recognition/more_demo_images/output_cartoon/labixiaoxin-005.jpeg"  width = "400" />
 </div>
-<div align="center">
-<img src="./docs/images/recognition/more_demo_images/output_cartoon/liuchuanfeng-010.jpeg"  width = "400" />
-</div>
 
 - logo识别
 <div align="center">
