@@ -56,8 +56,8 @@ Quick experience of image recognition：[Link](./docs/en/tutorials/quick_start_r
 
 - [Quick Installatiopn](./docs/en/tutorials/install_en.md)
 - [Quick Start of Recognition](./docs/en/tutorials/quick_start_recognition_en.md)
-- [Introduction to Image Recognition Systems](#Introduction to Image Recognition Systems)
-- [Demo images](#Demo images)
+- [Introduction to Image Recognition Systems](#Introduction_to_Image_Recognition_Systems)
+- [Demo images](#Demo_images)
 - Algorithms Introduction
     - [Backbone Network and Pre-trained Model Library](./docs/en/ImageNet_models.md)
     - [Mainbody Detection](./docs/en/application/mainbody_detection_en.md)
@@ -70,7 +70,7 @@ Quick experience of image recognition：[Link](./docs/en/tutorials/quick_start_r
     - [Vector Search](./deploy/vector_search/README.md)
 - Models Training/Evaluation
     - [Image Classification](./docs/en/tutorials/getting_started_en.md)
-    - Feature Learning (coming soon)
+    - [Feature Learning](./docs/en/tutorials/getting_started_retrieval_en.md)
 - Inference Model Prediction
     - [Python Inference](./docs/en/inference.md)
     - [C++ Inference](./deploy/cpp/readme_en.md)(only support classification for now, recognition coming soon)
@@ -85,7 +85,7 @@ Quick experience of image recognition：[Link](./docs/en/tutorials/quick_start_r
 - [License](#License)
 - [Contribution](#Contribution)
 
-<a name="Introduction to Image Recognition Systems"></a>
+<a name="Introduction_to_Image_Recognition_Systems"></a>
 ## Introduction to Image Recognition Systems
 
 <div align="center">
@@ -99,7 +99,7 @@ Image recognition can be divided into three steps:
 
 For a new unknown category, there is no need to retrain the model, just prepare images of new category, extract features and update retrieval database and the category can be recognised.
 
-<a name="Demo images"></a>
+<a name="Demo_images"></a>
 ## Demo images [more](./docs/en/more_demo.md)
 - Product recognition
 <div align="center">
