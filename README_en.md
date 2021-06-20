@@ -58,7 +58,7 @@ Quick experience of image recognition：[Link](./docs/zh_CN/tutorials/quick_star
 - [Quick Start of Recognition](./docs/en/tutorials/quick_start_recognition_en.md)
 - Algorithms Introduction（Updating）
     - Backbone Network and Pre-trained Model Library
-    - [Mainbody Detection](./docs/en/application/object_detection_en.md)
+    - [Mainbody Detection](./docs/en/application/mainbody_detection_en.md)
     - [Image Classification](./docs/en/tutorials/image_classification_en.md)
     - [Feature Learning](./docs/en/application/feature_learning_en.md)
         - [Product Recognition](./docs/en/application/product_recognition_en.md)
