@@ -50,7 +50,7 @@ Four sample solutions are provided, including product recognition, vehicle recog
 </div>
 
 ## Quick Start 
-Quick experience of image recognition：[Link](./docs/zh_CN/tutorials/quick_start_recognition.md)
+Quick experience of image recognition：[Link](./docs/en/tutorials/quick_start_recognition_en.md)
 
 ## Tutorials
 
