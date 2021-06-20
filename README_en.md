@@ -50,14 +50,14 @@ Four sample solutions are provided, including product recognition, vehicle recog
 </div>
 
 ## Quick Start 
-Quick experience of image recognition：[Link](./docs/zh_CN/tutorials/quick_start_recognition.md)
+Quick experience of image recognition：[Link](./docs/en/tutorials/quick_start_recognition_en.md)
 
 ## Tutorials
 
 - [Quick Installatiopn](./docs/en/tutorials/install_en.md)
 - [Quick Start of Recognition](./docs/en/tutorials/quick_start_recognition_en.md)
-- Algorithms Introduction（Updating）
-    - Backbone Network and Pre-trained Model Library
+- Algorithms Introduction
+    - [Backbone Network and Pre-trained Model Library](./docs/en/ImageNet_models.md)
     - [Mainbody Detection](./docs/en/application/mainbody_detection_en.md)
     - [Image Classification](./docs/en/tutorials/image_classification_en.md)
     - [Feature Learning](./docs/en/application/feature_learning_en.md)
@@ -65,12 +65,12 @@ Quick experience of image recognition：[Link](./docs/zh_CN/tutorials/quick_star
         - [Vehicle Recognition](./docs/en/application/vehicle_recognition_en.md)
         - [Logo Recognition](./docs/en/application/logo_recognition_en.md)
         - [Animation Character Recognition](./docs/en/application/cartoon_character_recognition_en.md)
-        - [Vector Retrieval](./deploy/vector_search/README.md)
+    - [Vector Search](./deploy/vector_search/README.md)
 - Models Training/Evaluation
     - [Image Classification](./docs/en/tutorials/getting_started_en.md)
-    - Feature Learning
-- Inference Model Prediction（Updating）
-    - Python Inference
+    - Feature Learning (coming soon)
+- Inference Model Prediction
+    - [Python Inference](./docs/en/inference.md)
     - [C++ Inference](./deploy/cpp/readme_en.md)(only support classification for now, recognition coming soon)
 - Model Deploy (only support classification for now, recognition coming soon)
     - [Hub Serving Deployment](./deploy/hubserving/readme_en.md)
