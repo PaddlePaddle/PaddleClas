@@ -70,7 +70,7 @@ Quick experience of image recognition：[Link](./docs/zh_CN/tutorials/quick_star
     - [Image Classification](./docs/en/tutorials/getting_started_en.md)
     - Feature Learning
 - Inference Model Prediction（Updating）
-    - Python Inference
+    - [Python Inference](./docs/en/inference.md)
     - [C++ Inference](./deploy/cpp/readme_en.md)(only support classification for now, recognition coming soon)
 - Model Deploy (only support classification for now, recognition coming soon)
     - [Hub Serving Deployment](./deploy/hubserving/readme_en.md)
