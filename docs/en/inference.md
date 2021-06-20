@@ -44,9 +44,9 @@ When converting to an inference model, the configuration file used is the same a
 After the conversion is successful, there are three files in the model save directory:
 ``` 
 ├── product_ResNet50_vd_aliproduct_v1.0_infer
-│   ├── inference.pdiparams         # 识别inference模型的参数文件
-│   ├── inference.pdiparams.info    # 识别inference模型的参数信息，可忽略
-│   └── inference.pdmodel           # 识别inference模型的program文件
+│   ├── inference.pdiparams
+│   ├── inference.pdiparams.info
+│   └── inference.pdmodel
 ```
 
 <a name="Convert_class"></a>
@@ -71,9 +71,9 @@ python3.7 tools/export_model.py -c ppcls/configs/ImageNet/ResNet/ResNet50_vd.yam
 After the conversion is successful, there are three files in the model save directory:
 ```
 ├── class_ResNet50_vd_ImageNet_infer
-│   ├── inference.pdiparams         # 识别inference模型的参数文件
-│   ├── inference.pdiparams.info    # 识别inference模型的参数信息，可忽略
-│   └── inference.pdmodel           # 识别inference模型的program文件
+│   ├── inference.pdiparams
+│   ├── inference.pdiparams.info
+│   └── inference.pdmodel
 ```
 
 <a name="DETECTION_MODEL_INFERENCE"></a>
