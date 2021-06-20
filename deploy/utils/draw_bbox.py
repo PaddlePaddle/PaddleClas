@@ -26,9 +26,9 @@ def draw_bbox_results(image,
     if isinstance(image, np.ndarray):
         image = Image.fromarray(image)
     draw = ImageDraw.Draw(image)
-    font = ImageFont.truetype(font_path, 20, encoding="utf-8")
+    font_size = 18
+    font = ImageFont.truetype(font_path, font_size, encoding="utf-8")
 
-#     color = (0, 255, 0)
     color = (0, 102, 255)
 
     for result in results:
@@ -38,15 +38,14 @@ def draw_bbox_results(image,
 
         xmin, ymin, xmax, ymax = result["bbox"]
         text = "{}, {:.2f}".format(result["rec_docs"], result["rec_scores"])
-        th = 20
-        tw = int(len(result["rec_docs"]) * 20) + 60
+        th = font_size
+        tw = int(len(result["rec_docs"]) * font_size) + 60
         start_y = max(0, ymin - th)
-        
-#         draw.rectangle(
-#             [(xmin + 1, start_y), (xmin + tw + 1, start_y + th)],
-#             outline=color)
 
-        draw.text((xmin + 1, start_y), text, fill=color, font=font)
+        draw.rectangle(
+            [(xmin + 1, start_y), (xmin + tw + 1, start_y + th)], fill=color)
+
+        draw.text((xmin + 1, start_y), text, fill=(255, 255, 255), font=font)
 
         draw.rectangle(
             [(xmin, ymin), (xmax, ymax)], outline=(255, 0, 0), width=2)
