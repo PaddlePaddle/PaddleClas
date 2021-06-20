@@ -57,7 +57,7 @@ Quick experience of image recognition：[Link](./docs/en/tutorials/quick_start_r
 - [Quick Installatiopn](./docs/en/tutorials/install_en.md)
 - [Quick Start of Recognition](./docs/en/tutorials/quick_start_recognition_en.md)
 - Algorithms Introduction（Updating）
-    - Backbone Network and Pre-trained Model Library
+    - [Backbone Network and Pre-trained Model Library](./docs/en/ImageNet_models.md)
     - [Mainbody Detection](./docs/en/application/mainbody_detection_en.md)
     - [Image Classification](./docs/en/tutorials/image_classification_en.md)
     - [Feature Learning](./docs/en/application/feature_learning_en.md)
@@ -70,7 +70,7 @@ Quick experience of image recognition：[Link](./docs/en/tutorials/quick_start_r
     - [Image Classification](./docs/en/tutorials/getting_started_en.md)
     - Feature Learning
 - Inference Model Prediction（Updating）
-    - Python Inference
+    - [Python Inference](./docs/en/inference.md)
     - [C++ Inference](./deploy/cpp/readme_en.md)(only support classification for now, recognition coming soon)
 - Model Deploy (only support classification for now, recognition coming soon)
     - [Hub Serving Deployment](./deploy/hubserving/readme_en.md)
