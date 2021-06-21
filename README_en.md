@@ -54,7 +54,7 @@ Quick experience of image recognition：[Link](./docs/en/tutorials/quick_start_r
 
 ## Tutorials
 
-- [Quick Installatiopn](./docs/en/tutorials/install_en.md)
+- [Quick Installation](./docs/en/tutorials/install_en.md)
 - [Quick Start of Recognition](./docs/en/tutorials/quick_start_recognition_en.md)
 - [Introduction to Image Recognition Systems](#Introduction_to_Image_Recognition_Systems)
 - [Demo images](#Demo_images)
@@ -103,34 +103,34 @@ For a new unknown category, there is no need to retrain the model, just prepare 
 ## Demo images [more](./docs/en/more_demo.md)
 - Product recognition
 <div align="center">
-<img src="./docs/images/recognition/more_demo_images/output_product/channelhandle_5.jpg"  width = "400" />
+<img src="./docs/images/recognition/more_demo_images/output_product/channelhandle_5_en.jpg"  width = "400" />
 </div>
 <div align="center">
-<img src="./docs/images/recognition/more_demo_images/output_product/daoxiangcunjinzhubing_10.jpg"  width = "400" />
+<img src="./docs/images/recognition/more_demo_images/output_product/daoxiangcunjinzhubing_10_en.jpg"  width = "400" />
 </div>
 
 - Cartoon character recognition
 <div align="center">
-<img src="./docs/images/recognition/more_demo_images/output_cartoon/labixiaoxin-005.jpeg"  width = "400" />
+<img src="./docs/images/recognition/more_demo_images/output_cartoon/labixiaoxin-005_en.jpeg"  width = "400" />
 </div>
 <div align="center">
-<img src="./docs/images/recognition/more_demo_images/output_cartoon/liuchuanfeng-010.jpeg"  width = "400" />
+<img src="./docs/images/recognition/more_demo_images/output_cartoon/liuchuanfeng-010_en.jpeg"  width = "400" />
 </div>
 
 - Logo recognition
 <div align="center">
-<img src="./docs/images/recognition/more_demo_images/output_logo/cctv_4.jpg"  width = "400" />
+<img src="./docs/images/recognition/more_demo_images/output_logo/cctv_4_en.jpg"  width = "400" />
 </div>
 <div align="center">
-<img src="./docs/images/recognition/more_demo_images/output_logo/mangguo_8.jpeg"  width = "400" />
+<img src="./docs/images/recognition/more_demo_images/output_logo/mangguo_8_en.jpeg"  width = "400" />
 </div>
 
 - Car recognition
 <div align="center">
-<img src="./docs/images/recognition/more_demo_images/output_vehicle/audia5-115.jpeg"  width = "400" />
+<img src="./docs/images/recognition/more_demo_images/output_vehicle/audia5-115_en.jpeg"  width = "400" />
 </div>
 <div align="center">
-<img src="./docs/images/recognition/more_demo_images/output_vehicle/bentian-yage-101.jpeg"  width = "400" />
+<img src="./docs/images/recognition/more_demo_images/output_vehicle/bentian-yage-101_en.jpeg"  width = "400" />
 </div>
 
 <a name="License"></a>
