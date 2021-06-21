@@ -30,7 +30,7 @@ Four sample solutions are provided, including product recognition, vehicle recog
 
 ## Image Recognition System Effect Demonstration
 <div align="center">
-<img src="./docs/images/recognition.gif"  width = "400" />
+<img src="./docs/images/recognition_en.gif"  width = "400" />
 </div>
 
 For more effect pictures, please see [Demo images](./docs/en/more_demo.md).
