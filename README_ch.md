@@ -99,35 +99,25 @@ Res2Net200_vd预训练模型Top-1精度高达85.1%。
 ## 识别效果展示 [more](./docs/zh_CN/more_demo.md)
 - 商品识别
 <div align="center">
-<img src="./docs/images/recognition/more_demo_images/output_product/channelhandle_5.jpg"  width = "400" />
-</div>
-<div align="center">
-<img src="./docs/images/recognition/more_demo_images/output_product/daoxiangcunjinzhubing_10.jpg"  width = "400" />
+<img src="https://user-images.githubusercontent.com/18028216/122769644-51604f80-d2d7-11eb-8290-c53b12a5c1f6.gif"  width = "400" />
 </div>
 
 - 动漫人物识别
 <div align="center">
-<img src="./docs/images/recognition/more_demo_images/output_cartoon/labixiaoxin-005.jpeg"  width = "400" />
-</div>
-<div align="center">
-<img src="./docs/images/recognition/more_demo_images/output_cartoon/liuchuanfeng-010.jpeg"  width = "400" />
+<img src="https://user-images.githubusercontent.com/18028216/122769746-6b019700-d2d7-11eb-86df-f1d710999ba6.gif"  width = "400" />
 </div>
 
 - logo识别
 <div align="center">
-<img src="./docs/images/recognition/more_demo_images/output_logo/cctv_4.jpg"  width = "400" />
+<img src="https://user-images.githubusercontent.com/18028216/122769837-7fde2a80-d2d7-11eb-9b69-04140e9d785f.gif"  width = "400" />
 </div>
-<div align="center">
-<img src="./docs/images/recognition/more_demo_images/output_logo/mangguo_8.jpeg"  width = "400" />
-</div>
+
 
 - 车辆识别
 <div align="center">
-<img src="./docs/images/recognition/more_demo_images/output_vehicle/audia5-115.jpeg"  width = "400" />
+<img src="https://user-images.githubusercontent.com/18028216/122769916-8ec4dd00-d2d7-11eb-8c60-42d89e25030c.gif"  width = "400" />
 </div>
-<div align="center">
-<img src="./docs/images/recognition/more_demo_images/output_vehicle/bentian-yage-101.jpeg"  width = "400" />
-</div>
+
 
 <a name="许可证书"></a>
 
