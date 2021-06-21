@@ -16,9 +16,6 @@ PaddleClas is an image recognition toolset for industry and academia, helping us
 - 2021.05.14
    - Add `SwinTransformer` series pretrained models, whose Top-1 Acc on ImageNet-1k dataset reaches 87.19%.
 
-- 2021.04.15
-   - Add `MixNet` and `ReXNet` pretrained models, `MixNet_L`'s Top-1 Acc on ImageNet-1k reaches 78.6% and `ReXNet_3_0` reaches 82.09%.
-
 - [more](./docs/en/update_history_en.md)
 
 ## Features
