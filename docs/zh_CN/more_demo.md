@@ -58,4 +58,4 @@
 <img src="../images/recognition/more_demo_images/output_vehicle/bmw-m340-107.jpeg"  width = "400" />
 </div>
 
-[更多效果图](../images/recognition/more_demo_images)
+[更多效果图](https://github.com/PaddlePaddle/PaddleClas/tree/release/2.2/docs/images/recognition/more_demo_images)
