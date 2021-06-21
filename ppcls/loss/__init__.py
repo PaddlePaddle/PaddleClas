@@ -5,6 +5,7 @@ import paddle.nn as nn
 from ppcls.utils import logger
 
 from .celoss import CELoss
+from .googlenetloss import GoogLeNetLoss
 from .centerloss import CenterLoss
 from .emlloss import EmlLoss
 from .msmloss import MSMLoss

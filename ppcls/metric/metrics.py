@@ -25,6 +25,8 @@ class TopkAcc(nn.Layer):
         self.topk = topk
 
     def forward(self, x, label):
+        if isinstance(x, list):
+            x = x[0]
         if isinstance(x, dict):
             x = x["logits"]
 
