@@ -17,7 +17,7 @@ Global:
 
 # model architecture
 Arch:
-  name: LeViT256
+  name: LeViT_256
  
 # loss function config for traing/eval process
 Loss:
