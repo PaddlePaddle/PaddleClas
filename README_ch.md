@@ -82,10 +82,6 @@ Res2Net200_vd预训练模型Top-1精度高达85.1%。
 - [贡献代码](#贡献代码)
 
 
-<a name="图像识别系统介绍"></a>
-## 图像识别系统介绍
-
-<a name="图像识别系统介绍"></a>
 <div align="center">
 <img src="./docs/images/structure.png"  width = "400" />
 </div>
@@ -96,7 +92,7 @@ Res2Net200_vd预训练模型Top-1精度高达85.1%。
 
 
 <a name="识别效果展示"></a>
-## 识别效果展示 [more](./docs/zh_CN/more_demo.md)
+## 更多效果展示 [more](./docs/zh_CN/more_demo.md)
 - 商品识别
 <div align="center">
 <img src="https://user-images.githubusercontent.com/18028216/122769644-51604f80-d2d7-11eb-8290-c53b12a5c1f6.gif"  width = "400" />
