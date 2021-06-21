@@ -41,7 +41,7 @@ You can also visit [DockerHub](https://hub.docker.com/r/paddlepaddle/paddle/tags
 
 ```
 # use ctrl+P+Q to exit docker, to re-enter docker using the following command:
-sudo docker container exec -it ppcls /bin/bash
+sudo docker exec -it ppcls /bin/bash
 ```
 
 ### 1.3 Install PaddlePaddle using pip
