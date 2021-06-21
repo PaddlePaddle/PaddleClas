@@ -27,12 +27,11 @@ Four sample solutions are provided, including product recognition, vehicle recog
 
 
 
-## Image Recognition System Effect Demonstration
+
 <div align="center">
 <img src="./docs/images/recognition_en.gif"  width = "400" />
 </div>
 
-For more effect pictures, please see [Demo images](./docs/en/more_demo.md).
 
 ## Welcome to Join the Technical Exchange Group
 
@@ -93,7 +92,7 @@ Image recognition can be divided into three steps:
 For a new unknown category, there is no need to retrain the model, just prepare images of new category, extract features and update retrieval database and the category can be recognised.
 
 <a name="Demo_images"></a>
-## Demo images [more](./docs/en/more_demo.md)
+## Demo images [more](https://github.com/PaddlePaddle/PaddleClas/tree/release/2.2/docs/images/recognition/more_demo_images)
 - Product recognition
 <div align="center">
 <img src="https://user-images.githubusercontent.com/18028216/122769644-51604f80-d2d7-11eb-8290-c53b12a5c1f6.gif"  width = "400" />
