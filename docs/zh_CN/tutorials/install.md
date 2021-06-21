@@ -44,7 +44,7 @@ sudo nvidia-docker run --name ppcls -v $PWD:/paddle --shm-size=8G --network=host
 
 ```
 # ctrl+P+Q可退出docker 容器，重新进入docker 容器使用如下命令
-sudo docker container exec -it ppcls /bin/bash
+sudo docker exec -it ppcls /bin/bash
 ```
 
 ### 1.3 通过pip安装PaddlePaddle
