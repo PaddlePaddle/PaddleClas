@@ -34,7 +34,7 @@ Four sample solutions are provided, including product recognition, vehicle recog
 
 - Data augmentation: Provide 8 data augmentation algorithms such as AutoAugment, Cutout, Cutmix, etc.  with detailed introduction, code replication and evaluation of effectiveness in a unified experimental environment.
 
- 
+
 
 ## Image Recognition System Effect Demonstration
 <div align="center">
@@ -49,7 +49,7 @@ Four sample solutions are provided, including product recognition, vehicle recog
 <img src="./docs/images/wx_group.jpeg"  width = "200" />
 </div>
 
-## Quick Start 
+## Quick Start
 Quick experience of image recognition：[Link](./docs/en/tutorials/quick_start_recognition_en.md)
 
 ## Tutorials
@@ -89,7 +89,7 @@ Quick experience of image recognition：[Link](./docs/en/tutorials/quick_start_r
 ## Introduction to Image Recognition Systems
 
 <div align="center">
-<img src="./docs/images/structure.png"  width = "400" />
+<img src="./docs/images/mainpage/recognition_pipeline_en.png"  width = "400" />
 </div>
 
 Image recognition can be divided into three steps:
