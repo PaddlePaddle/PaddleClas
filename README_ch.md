@@ -8,7 +8,6 @@
 
 **近期更新**
 
-- 2021.06.22,23,24 PaddleClas官方研发团队带来技术深入解读三日直播课，6月22日、23日、24日晚上20:30，[直播地址](https://live.bilibili.com/21689802)
 - 🔥🔥🔥: 2021.06.16 PaddleClas v2.2版本升级，集成Metric learning，向量检索等组件。新增商品识别、动漫人物识别、车辆识别和logo识别等4个图像识别应用。新增LeViT、Twins、TNT、DLA、HarDNet、RedNet系列30个预训练模型。
 - 2021.05.14 添加`SwinTransformer` 系列模型。
 - 2021.04.15 添加`MixNet_L`和`ReXNet_3_0`系列模型。
