@@ -96,34 +96,22 @@ For a new unknown category, there is no need to retrain the model, just prepare 
 ## Demo images [more](./docs/en/more_demo.md)
 - Product recognition
 <div align="center">
-<img src="./docs/images/recognition/more_demo_images/output_product/channelhandle_5_en.jpg"  width = "400" />
-</div>
-<div align="center">
-<img src="./docs/images/recognition/more_demo_images/output_product/daoxiangcunjinzhubing_10_en.jpg"  width = "400" />
+<img src="https://user-images.githubusercontent.com/18028216/122769644-51604f80-d2d7-11eb-8290-c53b12a5c1f6.gif"  width = "400" />
 </div>
 
 - Cartoon character recognition
 <div align="center">
-<img src="./docs/images/recognition/more_demo_images/output_cartoon/labixiaoxin-005_en.jpeg"  width = "400" />
-</div>
-<div align="center">
-<img src="./docs/images/recognition/more_demo_images/output_cartoon/liuchuanfeng-010_en.jpeg"  width = "400" />
+<img src="https://user-images.githubusercontent.com/18028216/122769746-6b019700-d2d7-11eb-86df-f1d710999ba6.gif"  width = "400" />
 </div>
 
 - Logo recognition
 <div align="center">
-<img src="./docs/images/recognition/more_demo_images/output_logo/cctv_4_en.jpg"  width = "400" />
-</div>
-<div align="center">
-<img src="./docs/images/recognition/more_demo_images/output_logo/mangguo_8_en.jpeg"  width = "400" />
+<img src="https://user-images.githubusercontent.com/18028216/122769837-7fde2a80-d2d7-11eb-9b69-04140e9d785f.gif"  width = "400" />
 </div>
 
 - Car recognition
 <div align="center">
-<img src="./docs/images/recognition/more_demo_images/output_vehicle/audia5-115_en.jpeg"  width = "400" />
-</div>
-<div align="center">
-<img src="./docs/images/recognition/more_demo_images/output_vehicle/bentian-yage-101_en.jpeg"  width = "400" />
+<img src="https://user-images.githubusercontent.com/18028216/122769916-8ec4dd00-d2d7-11eb-8c60-42d89e25030c.gif"  width = "400" />
 </div>
 
 <a name="License"></a>
