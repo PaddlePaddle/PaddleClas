@@ -18,6 +18,7 @@ from collections import OrderedDict
 
 from .metrics import TopkAcc, mAP, mINP, Recallk
 from .metrics import DistillationTopkAcc
+from .metrics import GoogLeNetTopkAcc
 
 class CombinedMetrics(nn.Layer):
     def __init__(self, config_list):

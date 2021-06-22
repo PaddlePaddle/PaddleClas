@@ -25,8 +25,6 @@ class TopkAcc(nn.Layer):
         self.topk = topk
 
     def forward(self, x, label):
-        if isinstance(x, list):
-            x = x[0]
         if isinstance(x, dict):
             x = x["logits"]
 
@@ -122,3 +120,16 @@ class DistillationTopkAcc(TopkAcc):
         if self.feature_key is not None:
             x = x[self.feature_key]
         return super().forward(x, label)
+
+
+class GoogLeNetTopkAcc(TopkAcc):
+    def __init__(self, topk=(1, 5)):
+        super().__init__()
+        assert isinstance(topk, (int, list, tuple))
+        if isinstance(topk, int):
+            topk = [topk]
+        self.topk = topk
+
+    def forward(self, x, label):
+        return super().forward(x[0], label)
+

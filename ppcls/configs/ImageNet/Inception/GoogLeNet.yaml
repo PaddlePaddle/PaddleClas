@@ -122,8 +122,8 @@ Infer:
 
 Metric:
   Train:
-    - TopkAcc:
+    - GoogLeNetTopkAcc:
         topk: [1, 5]
   Eval:
-    - TopkAcc:
+    - GoogLeNetTopkAcc:
         topk: [1, 5]
