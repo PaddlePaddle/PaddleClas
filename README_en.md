@@ -1,4 +1,4 @@
-[简体中文](README.md) | English
+[简体中文](README_ch.md) | English
 
 # PaddleClas
 
@@ -8,17 +8,7 @@ PaddleClas is an image recognition toolset for industry and academia, helping us
 
 **Recent updates**
 
-- 2021.06.16 PaddleClas release/2.2.
-   - Add metric learning and vector search modules.
-   - Add product recognition, animation character recognition, vehicle recognition and logo recognition.
-   - Added 30 pretrained models of LeViT, Twins, TNT, DLA, HarDNet, and RedNet, and the accuracy is roughly the same as that of the paper.
-
-- 2021.05.14
-   - Add `SwinTransformer` series pretrained models, whose Top-1 Acc on ImageNet-1k dataset reaches 87.19%.
-
-- 2021.04.15
-   - Add `MixNet` and `ReXNet` pretrained models, `MixNet_L`'s Top-1 Acc on ImageNet-1k reaches 78.6% and `ReXNet_3_0` reaches 82.09%.
-
+- 🔥🔥🔥: 2021.06.16 PaddleClas release/2.2. Add metric learning and vector search modules. Add product recognition, animation character recognition, vehicle recognition and logo recognition. Added 30 pretrained models of LeViT, Twins, TNT, DLA, HarDNet, and RedNet, and the accuracy is roughly the same as that of the paper.
 - [more](./docs/en/update_history_en.md)
 
 ## Features
@@ -36,61 +26,61 @@ Four sample solutions are provided, including product recognition, vehicle recog
 
 
 
-## Image Recognition System Effect Demonstration
+
 <div align="center">
-<img src="./docs/images/recognition.gif"  width = "400" />
+<img src="./docs/images/recognition_en.gif"  width = "400" />
 </div>
+
 
 ## Welcome to Join the Technical Exchange Group
 
 * You can also scan the QR code below to join the PaddleClas WeChat group to get more efficient answers to your questions and to communicate with developers from all walks of life. We look forward to hearing from you.
 
 <div align="center">
-<img src="./docs/images/wx_group.png"  width = "200" />
+<img src="./docs/images/wx_group.jpeg"  width = "200" />
 </div>
 
 ## Quick Start
-Quick experience of image recognition：[Link](./docs/zh_CN/tutorials/quick_start_recognition.md)
+Quick experience of image recognition：[Link](./docs/en/tutorials/quick_start_recognition_en.md)
 
 ## Tutorials
 
-- [Quick Installatiopn](./docs/zh_CN/tutorials/install.md)
-- [Quick Start of Recognition](./docs/zh_CN/tutorials/quick_start_recognition.md)
-- Algorithms Introduction（Updating）
-    - [Backbone Network and Pre-trained Model Library](./docs/zh_CN/models/models_intro.md)
-    - [Mainbody Detection](./docs/zh_CN/application/object_detection.md)
-    - Image Classification
-        - [ImageNet Classification](./docs/zh_CN/tutorials/quick_start_professional.md)
+- [Quick Installation](./docs/en/tutorials/install_en.md)
+- [Quick Start of Recognition](./docs/en/tutorials/quick_start_recognition_en.md)
+- [Introduction to Image Recognition Systems](#Introduction_to_Image_Recognition_Systems)
+- [Demo images](#Demo_images)
+- Algorithms Introduction
+    - [Backbone Network and Pre-trained Model Library](./docs/en/ImageNet_models.md)
+    - [Mainbody Detection](./docs/en/application/mainbody_detection_en.md)
+    - [Image Classification](./docs/en/tutorials/image_classification_en.md)
     - [Feature Learning](./docs/en/application/feature_learning_en.md)
         - [Product Recognition](./docs/en/application/product_recognition_en.md)
         - [Vehicle Recognition](./docs/en/application/vehicle_recognition_en.md)
         - [Logo Recognition](./docs/en/application/logo_recognition_en.md)
-        - [Cartoon Character Recognition](./docs/en/application/cartoon_character_recognition_en.md)
-        - [Vector Retrieval](./deploy/vector_search/README.md)
+        - [Animation Character Recognition](./docs/en/application/cartoon_character_recognition_en.md)
+    - [Vector Search](./deploy/vector_search/README.md)
 - Models Training/Evaluation
-    - [Image Classification](./docs/zh_CN/tutorials/getting_started.md)
-    - [Feature Learning](./docs/en/application/feature_learning_en.md)
-- Inference Model Prediction（Updating）
-    - [Python Inference](./docs/zh_CN/tutorials/getting_started.md)
-    - [C++ Inference](./deploy/cpp_infer/readme.md)
-    - [Hub Serving Deployment](./deploy/hubserving/readme.md)
-    - [Mobile Deployment](./deploy/lite/readme.md)
-    - [Inference Using whl](./docs/zh_CN/whl.md)
+    - [Image Classification](./docs/en/tutorials/getting_started_en.md)
+    - [Feature Learning](./docs/en/tutorials/getting_started_retrieval_en.md)
+- Inference Model Prediction
+    - [Python Inference](./docs/en/inference.md)
+    - [C++ Inference](./deploy/cpp/readme_en.md)(only support classification for now, recognition coming soon)
+- Model Deploy (only support classification for now, recognition coming soon)
+    - [Hub Serving Deployment](./deploy/hubserving/readme_en.md)
+    - [Mobile Deployment](./deploy/lite/readme_en.md)
+    - [Inference Using whl](./docs/en/whl_en.md)
 - Advanced Tutorial
-    - [Knowledge Distillation](./docs/zh_CN/advanced_tutorials/distillation/distillation.md)
-    - [Model Quantization](./docs/zh_CN/extension/paddle_quantization.md)
-    - [Data Augmentation](./docs/zh_CN/advanced_tutorials/image_augmentation/ImageAugment.md)
-- FAQ(Suspended Updates)
-    - [Image Classification FAQ](docs/zh_CN/faq.md)
+    - [Knowledge Distillation](./docs/en/advanced_tutorials/distillation/distillation_en.md)
+    - [Model Quantization](./docs/en/extension/paddle_quantization_en.md)
+    - [Data Augmentation](./docs/en/advanced_tutorials/image_augmentation/ImageAugment_en.md)
 - [License](#License)
 - [Contribution](#Contribution)
 
-
+<a name="Introduction_to_Image_Recognition_Systems"></a>
 ## Introduction to Image Recognition Systems
 
-<a name="Introduction to Image Recognition Systems"></a>
 <div align="center">
-<img src="./docs/images/structure.png"  width = "400" />
+<img src="./docs/images/mainpage/recognition_pipeline_en.png"  width = "400" />
 </div>
 
 Image recognition can be divided into three steps:
@@ -100,8 +90,29 @@ Image recognition can be divided into three steps:
 
 For a new unknown category, there is no need to retrain the model, just prepare images of new category, extract features and update retrieval database and the category can be recognised.
 
-<a name="License"></a>
+<a name="Demo_images"></a>
+## Demo images [more](https://github.com/PaddlePaddle/PaddleClas/tree/release/2.2/docs/images/recognition/more_demo_images)
+- Product recognition
+<div align="center">
+<img src="https://user-images.githubusercontent.com/18028216/122769644-51604f80-d2d7-11eb-8290-c53b12a5c1f6.gif"  width = "400" />
+</div>
 
+- Cartoon character recognition
+<div align="center">
+<img src="https://user-images.githubusercontent.com/18028216/122769746-6b019700-d2d7-11eb-86df-f1d710999ba6.gif"  width = "400" />
+</div>
+
+- Logo recognition
+<div align="center">
+<img src="https://user-images.githubusercontent.com/18028216/122769837-7fde2a80-d2d7-11eb-9b69-04140e9d785f.gif"  width = "400" />
+</div>
+
+- Car recognition
+<div align="center">
+<img src="https://user-images.githubusercontent.com/18028216/122769916-8ec4dd00-d2d7-11eb-8c60-42d89e25030c.gif"  width = "400" />
+</div>
+
+<a name="License"></a>
 ## License
 PaddleClas is released under the Apache 2.0 license <a href="https://github.com/PaddlePaddle/PaddleCLS/blob/master/LICENSE">Apache 2.0 license</a>
 

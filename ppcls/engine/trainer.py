@@ -34,6 +34,7 @@ from ppcls.utils.logger import init_logger
 from ppcls.utils.config import print_config
 from ppcls.data import build_dataloader
 from ppcls.arch import build_model
+from ppcls.arch import apply_to_static
 from ppcls.loss import build_loss
 from ppcls.metric import build_metrics
 from ppcls.optimizer import build_optimizer
@@ -73,6 +74,8 @@ class Trainer(object):
             self.is_rec = False
 
         self.model = build_model(self.config["Arch"])
+        # set @to_static for benchmark, skip this by default.
+        apply_to_static(self.config, self.model)
 
         if self.config["Global"]["pretrained_model"] is not None:
             load_dygraph_pretrain(self.model,
@@ -439,10 +442,12 @@ class Trainer(object):
                     keep_mask = paddle.logical_or(query_id_mask, image_id_mask)
                     similarity_matrix = similarity_matrix * keep_mask.astype(
                         "float32")
+                else:
+                    keep_mask = None
 
                 metric_tmp = self.eval_metric_func(similarity_matrix,
                                                    image_id_blocks[block_idx],
-                                                   gallery_img_id)
+                                                   gallery_img_id, keep_mask)
 
                 for key in metric_tmp:
                     if key not in metric_dict:

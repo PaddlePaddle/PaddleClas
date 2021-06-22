@@ -1,8 +1,6 @@
 Global:
-  infer_imgs: "images/coco_000000570688.jpg"
-  # infer_imgs: "../docs/images/whl/demo.jpg"
-  det_inference_model_dir: "./ppyolov2_r50vd_dcn_365e_mainbody_infer/"
-  rec_inference_model_dir: "./MobileNetV1_infer/"
+  infer_imgs: "./images/wangzai.jpg"
+  rec_inference_model_dir: "./models/product_ResNet50_vd_aliproduct_v1.0_infer"
   batch_size: 1
   image_shape: [3, 640, 640]
   threshold: 0.5
@@ -12,7 +10,7 @@ Global:
 
   # inference engine config
   use_gpu: False
-  enable_mkldnn: True
+  enable_mkldnn: False
   cpu_num_threads: 100
   enable_benchmark: True
   use_fp16: False
@@ -20,21 +18,6 @@ Global:
   use_tensorrt: False
   gpu_mem: 8000
   enable_profile: False
-
-DetPreProcess:
-  transform_ops:
-    - DetResize:
-        interp: 2
-        keep_ratio: false
-        target_size: [640, 640]
-    - DetNormalizeImage:
-        is_scale: true
-        mean: [0.485, 0.456, 0.406]
-        std: [0.229, 0.224, 0.225]
-    - DetPermute: {}
-
-DetPostProcess: {}
-
 
 RecPreProcess:
   transform_ops:
@@ -50,20 +33,3 @@ RecPreProcess:
     - ToCHWImage:
 
 RecPostProcess: null
-
-
-# indexing engine config
-IndexProcess:
-  build:  
-    enable: True
-    index_path: "./logo_index/"
-    image_root: "dataset/LogoDet-3K-crop/train"
-    data_file: "dataset/LogoDet-3K-crop/LogoDet-3K+train.txt"
-    spacer: " "
-    dist_type: "IP"
-    pq_size: 100
-    embedding_size: 1000
-  infer:
-    index_path: "./logo_index/"
-    search_budget: 100
-    return_k: 10

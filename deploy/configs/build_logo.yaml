@@ -2,7 +2,7 @@ Global:
   rec_inference_model_dir: "./models/logo_rec_ResNet50_Logo3K_v1.0_infer/"
   batch_size: 1
   use_gpu: True
-  enable_mkldnn: True
+  enable_mkldnn: False
   cpu_num_threads: 100
   enable_benchmark: True
   use_fp16: False
@@ -26,9 +26,9 @@ RecPostProcess: null
 
 # indexing engine config
 IndexProcess:
-  index_path: "./dataset/logo_demo_data_v1.0/index/"
-  image_root: "./dataset/logo_demo_data_v1.0/"
-  data_file:  "./dataset/logo_demo_data_v1.0/data_file.txt"
+  index_path: "./recognition_demo_data_v1.0/gallery_logo/index/"
+  image_root: "./recognition_demo_data_v1.0/gallery_logo/"
+  data_file:  "./recognition_demo_data_v1.0/gallery_logo/data_file.txt"
   delimiter: "\t"
   dist_type: "IP"
   pq_size: 100
