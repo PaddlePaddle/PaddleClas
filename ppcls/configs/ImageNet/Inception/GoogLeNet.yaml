@@ -22,11 +22,10 @@ Arch:
 # loss function config for traing/eval process
 Loss:
   Train:
-    - CELoss:
+    - GoogLeNetLoss:
         weight: 1.0
-        epsilon: 0.1
   Eval:
-    - CELoss:
+    - GoogLeNetLoss:
         weight: 1.0
 
 
@@ -36,6 +35,7 @@ Optimizer:
   lr:
     name: Cosine
     learning_rate: 0.01
+    warmup_epoch: 5
   regularizer:
     name: 'L2'
     coeff: 0.0001
@@ -77,6 +77,9 @@ DataLoader:
       image_root: ./dataset/ILSVRC2012/
       cls_label_path: ./dataset/ILSVRC2012/val_list.txt
       transform_ops:
+        - DecodeImage:
+            to_rgb: True
+            channel_first: False
         - ResizeImage:
             resize_short: 256
         - CropImage:
@@ -119,8 +122,8 @@ Infer:
 
 Metric:
   Train:
-    - TopkAcc:
+    - GoogLeNetTopkAcc:
         topk: [1, 5]
   Eval:
-    - TopkAcc:
+    - GoogLeNetTopkAcc:
         topk: [1, 5]

@@ -12,12 +12,12 @@ Global:
   print_batch_step: 10
   use_visualdl: False
   # used for static mode and model export
-  image_shape: [3, 224, 224]
+  image_shape: [3, 384, 384]
   save_inference_dir: ./inference
 
 # model architecture
 Arch:
-  name: LeViT_256
+  name: DeiT_base_distilled_patch16_384
  
 # loss function config for traing/eval process
 Loss:
@@ -54,7 +54,7 @@ DataLoader:
             to_rgb: True
             channel_first: False
         - RandCropImage:
-            size: 224
+            size: 384
         - RandFlipImage:
             flip_code: 1
         - NormalizeImage:
@@ -82,9 +82,9 @@ DataLoader:
             to_rgb: True
             channel_first: False
         - ResizeImage:
-            resize_short: 256
+            resize_short: 426
         - CropImage:
-            size: 224
+            size: 384
         - NormalizeImage:
             scale: 1.0/255.0
             mean: [0.485, 0.456, 0.406]
@@ -107,9 +107,9 @@ Infer:
         to_rgb: True
         channel_first: False
     - ResizeImage:
-        resize_short: 256
+        resize_short: 426
     - CropImage:
-        size: 224
+        size: 384
     - NormalizeImage:
         scale: 1.0/255.0
         mean: [0.485, 0.456, 0.406]
