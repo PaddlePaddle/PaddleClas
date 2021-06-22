@@ -442,10 +442,12 @@ class Trainer(object):
                     keep_mask = paddle.logical_or(query_id_mask, image_id_mask)
                     similarity_matrix = similarity_matrix * keep_mask.astype(
                         "float32")
+                else:
+                    keep_mask = None
 
                 metric_tmp = self.eval_metric_func(similarity_matrix,
                                                    image_id_blocks[block_idx],
-                                                   gallery_img_id)
+                                                   gallery_img_id, keep_mask)
 
                 for key in metric_tmp:
                     if key not in metric_dict:
