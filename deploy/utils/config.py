@@ -170,7 +170,7 @@ def get_config(fname, overrides=None, show=True):
     return config
 
 
-def parse_args():
+def parser():
     parser = argparse.ArgumentParser("generic-image-rec train script")
     parser.add_argument(
         '-c',
@@ -184,5 +184,14 @@ def parse_args():
         action='append',
         default=[],
         help='config options to be overridden')
-    args = parser.parse_args()
+    parser.add_argument(
+        '-v',
+        '--verbose',
+        action='store_true',
+        help='wheather print the config info')
+    return parser
+
+
+def parse_args():
+    args = parser().parse_args()
     return args
