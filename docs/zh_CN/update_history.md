@@ -1,8 +1,6 @@
 # 更新日志
 
 
-- 2021.05.14
-   - 添加`SwinTransformer` 系列模型，在ImageNet-1k上，Top1 Acc可达87.19%
 - 2021.04.15
    - 添加`MixNet_L`和`ReXNet_3_0`系列模型，在ImageNet-1k上`MixNet` 模型Top1 Acc可达78.6%，`ReXNet`模型可达82.09%
 - 2021.01.27

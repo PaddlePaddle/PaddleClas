@@ -17,7 +17,7 @@ Global:
 
 # model architecture
 Arch:
-  name: LeViT_256
+  name: DeiT_small_distilled_patch16_224
  
 # loss function config for traing/eval process
 Loss:
