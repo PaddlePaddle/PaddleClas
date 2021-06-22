@@ -14,6 +14,8 @@ Global:
   # used for static mode and model export
   image_shape: [3, 224, 224]
   save_inference_dir: ./inference
+  # training model under @to_static
+  to_static: False
 
 # model architecture
 Arch:

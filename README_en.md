@@ -1,4 +1,4 @@
-[简体中文](README.md) | English
+[简体中文](README_ch.md) | English
 
 # PaddleClas
 
@@ -8,17 +8,7 @@ PaddleClas is an image recognition toolset for industry and academia, helping us
 
 **Recent updates**
 
-- 🔥🔥🔥: 2021.06.16 PaddleClas release/2.2.
-   - Add metric learning and vector search modules.
-   - Add product recognition, animation character recognition, vehicle recognition and logo recognition.
-   - Added 30 pretrained models of LeViT, Twins, TNT, DLA, HarDNet, and RedNet, and the accuracy is roughly the same as that of the paper.
-
-- 2021.05.14
-   - Add `SwinTransformer` series pretrained models, whose Top-1 Acc on ImageNet-1k dataset reaches 87.19%.
-
-- 2021.04.15
-   - Add `MixNet` and `ReXNet` pretrained models, `MixNet_L`'s Top-1 Acc on ImageNet-1k reaches 78.6% and `ReXNet_3_0` reaches 82.09%.
-
+- 🔥🔥🔥: 2021.06.16 PaddleClas release/2.2. Add metric learning and vector search modules. Add product recognition, animation character recognition, vehicle recognition and logo recognition. Added 30 pretrained models of LeViT, Twins, TNT, DLA, HarDNet, and RedNet, and the accuracy is roughly the same as that of the paper.
 - [more](./docs/en/update_history_en.md)
 
 ## Features
@@ -34,27 +24,29 @@ Four sample solutions are provided, including product recognition, vehicle recog
 
 - Data augmentation: Provide 8 data augmentation algorithms such as AutoAugment, Cutout, Cutmix, etc.  with detailed introduction, code replication and evaluation of effectiveness in a unified experimental environment.
 
- 
+
 
 ## Image Recognition System Effect Demonstration
 <div align="center">
-<img src="./docs/images/recognition.gif"  width = "400" />
+<img src="./docs/images/recognition_en.gif"  width = "400" />
 </div>
+
+For more effect pictures, please see [Demo images](./docs/en/more_demo.md).
 
 ## Welcome to Join the Technical Exchange Group
 
 * You can also scan the QR code below to join the PaddleClas WeChat group to get more efficient answers to your questions and to communicate with developers from all walks of life. We look forward to hearing from you.
 
 <div align="center">
-<img src="./docs/images/wx_group.png"  width = "200" />
+<img src="./docs/images/wx_group.jpeg"  width = "200" />
 </div>
 
-## Quick Start 
+## Quick Start
 Quick experience of image recognition：[Link](./docs/en/tutorials/quick_start_recognition_en.md)
 
 ## Tutorials
 
-- [Quick Installatiopn](./docs/en/tutorials/install_en.md)
+- [Quick Installation](./docs/en/tutorials/install_en.md)
 - [Quick Start of Recognition](./docs/en/tutorials/quick_start_recognition_en.md)
 - [Introduction to Image Recognition Systems](#Introduction_to_Image_Recognition_Systems)
 - [Demo images](#Demo_images)
@@ -89,7 +81,7 @@ Quick experience of image recognition：[Link](./docs/en/tutorials/quick_start_r
 ## Introduction to Image Recognition Systems
 
 <div align="center">
-<img src="./docs/images/structure.png"  width = "400" />
+<img src="./docs/images/mainpage/recognition_pipeline_en.png"  width = "400" />
 </div>
 
 Image recognition can be divided into three steps:
@@ -103,34 +95,34 @@ For a new unknown category, there is no need to retrain the model, just prepare 
 ## Demo images [more](./docs/en/more_demo.md)
 - Product recognition
 <div align="center">
-<img src="./docs/images/recognition/more_demo_images/output_product/channelhandle_5.jpg"  width = "400" />
+<img src="./docs/images/recognition/more_demo_images/output_product/channelhandle_5_en.jpg"  width = "400" />
 </div>
 <div align="center">
-<img src="./docs/images/recognition/more_demo_images/output_product/daoxiangcunjinzhubing_10.jpg"  width = "400" />
+<img src="./docs/images/recognition/more_demo_images/output_product/daoxiangcunjinzhubing_10_en.jpg"  width = "400" />
 </div>
 
 - Cartoon character recognition
 <div align="center">
-<img src="./docs/images/recognition/more_demo_images/output_cartoon/labixiaoxin-005.jpeg"  width = "400" />
+<img src="./docs/images/recognition/more_demo_images/output_cartoon/labixiaoxin-005_en.jpeg"  width = "400" />
 </div>
 <div align="center">
-<img src="./docs/images/recognition/more_demo_images/output_cartoon/liuchuanfeng-010.jpeg"  width = "400" />
+<img src="./docs/images/recognition/more_demo_images/output_cartoon/liuchuanfeng-010_en.jpeg"  width = "400" />
 </div>
 
 - Logo recognition
 <div align="center">
-<img src="./docs/images/recognition/more_demo_images/output_logo/cctv_4.jpg"  width = "400" />
+<img src="./docs/images/recognition/more_demo_images/output_logo/cctv_4_en.jpg"  width = "400" />
 </div>
 <div align="center">
-<img src="./docs/images/recognition/more_demo_images/output_logo/mangguo_8.jpeg"  width = "400" />
+<img src="./docs/images/recognition/more_demo_images/output_logo/mangguo_8_en.jpeg"  width = "400" />
 </div>
 
 - Car recognition
 <div align="center">
-<img src="./docs/images/recognition/more_demo_images/output_vehicle/audia5-115.jpeg"  width = "400" />
+<img src="./docs/images/recognition/more_demo_images/output_vehicle/audia5-115_en.jpeg"  width = "400" />
 </div>
 <div align="center">
-<img src="./docs/images/recognition/more_demo_images/output_vehicle/bentian-yage-101.jpeg"  width = "400" />
+<img src="./docs/images/recognition/more_demo_images/output_vehicle/bentian-yage-101_en.jpeg"  width = "400" />
 </div>
 
 <a name="License"></a>

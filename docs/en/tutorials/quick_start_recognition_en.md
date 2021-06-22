@@ -40,10 +40,10 @@ The detection model with the recognition inference model for the 4 directions (L
 | Logo Recognition Model | Logo Scenario  |  [Model Download Link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/inference/logo_rec_ResNet50_Logo3K_v1.0_infer.tar) | [inference_logo.yaml](../../../deploy/configs/inference_logo.yaml) | [build_logo.yaml](../../../deploy/configs/build_logo.yaml) |
 | Cartoon Face Recognition Model| Cartoon Face Scenario  | [Model Download Link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/inference/cartoon_rec_ResNet50_iCartoon_v1.0_infer.tar) | [inference_cartoon.yaml](../../../deploy/configs/inference_cartoon.yaml) | [build_cartoon.yaml](../../../deploy/configs/build_cartoon.yaml) |
 | Vehicle Subclassification Model | Vehicle Scenario  |   [Model Download Link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/inference/vehicle_cls_ResNet50_CompCars_v1.0_infer.tar) | [inference_vehicle.yaml](../../../deploy/configs/inference_vehicle.yaml) | [build_vehicle.yaml](../../../deploy/configs/build_vehicle.yaml) |
-| Product Recignition Model | Product Scenario  |  [Model Download Link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/inference/product_ResNet50_vd_Inshop_v1.0_infer.tar) | [inference_inshop.yaml](../../../deploy/configs/) | [build_inshop.yaml](../../../deploy/configs/build_inshop.yaml) |
+| Product Recignition Model | Product Scenario  |  [Model Download Link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/inference/product_ResNet50_vd_Inshop_v1.0_infer.tar) | [inference_product.yaml](../../../deploy/configs/inference_product.yaml) | [build_product.yaml](../../../deploy/configs/build_product.yaml) |
 
 
-Demo data in this tutorial can be downloaded here: [download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/data/recognition_demo_data_v1.0.tar).
+Demo data in this tutorial can be downloaded here: [download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/data/recognition_demo_data_en_v1.0.tar).
 
 
 **Attention**
@@ -89,7 +89,7 @@ wget https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/infere
 cd ..
 
 # Download the demo data and unzip it
-wget https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/data/recognition_demo_data_v1.0.tar && tar -xf recognition_demo_data_v1.0.tar
+wget https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/data/recognition_demo_data_en_v1.0.tar && tar -xf recognition_demo_data_en_v1.0.tar
 ```
 
 Once unpacked, the `recognition_demo_data_v1.0` folder should have the following file structure.
@@ -123,7 +123,7 @@ The `models` folder should have the following file structure.
 ```
 
 <a name="Product_recognition_and_retrival"></a>
-### 2.2 Product Recognition and Retrival
+### 2.2 Product Recognition and Retrieval
 
 Take the product recognition demo as an example to show the recognition and retrieval process (if you wish to try other scenarios of recognition and retrieval, replace the corresponding configuration file after downloading and unzipping the corresponding demo data and model to complete the prediction)。
 
@@ -137,7 +137,7 @@ Run the following command to identify and retrieve the image `./recognition_demo
 # use the following command to predict using GPU.
 python3.7 python/predict_system.py -c configs/inference_product.yaml
 # use the following command to predict using CPU
-python3.7 python/predict_system.py -c configs/inference_product.yaml
+python3.7 python/predict_system.py -c configs/inference_product.yaml -o Global.use_gpu=False
 ```
 
 **Note:** Program lib used to build index is compliled on our machine, if error occured because of the environment, you can refer to [vector search tutorial](../../../deploy/vector_search/README.md) to rebuild the lib.
@@ -153,7 +153,7 @@ The image to be retrieved is shown below.
 The final output is shown below.
 
 ```
-[{'bbox': [287, 129, 497, 326], 'rec_docs': '稻香村金猪饼', 'rec_scores': 0.8309420943260193}, {'bbox': [99, 242, 313, 426], 'rec_docs': '稻香村金猪饼', 'rec_scores': 0.7245652079582214}]
+[{'bbox': [287, 129, 497, 326], 'rec_docs': 'Daoxaingcun Golden Piggie Cake', 'rec_scores': 0.8309420347213745}, {'bbox': [99, 242, 313, 426], 'rec_docs': 'Daoxaingcun Golden Piggie Cake', 'rec_scores': 0.7245651483535767}]
 ```
 
 
@@ -163,7 +163,7 @@ where bbox indicates the location of the detected object, rec_docs indicates the
 The detection result is also saved in the folder `output`, for this image, the visualization result is as follows.
 
 <div align="center">
-<img src="../../images/recognition/product_demo/result/daoxiangcunjinzhubing_6.jpg"  width = "400" />
+<img src="../../images/recognition/product_demo/result/daoxiangcunjinzhubing_6_en.jpg"  width = "400" />
 </div>
 
 
@@ -182,13 +182,12 @@ The results on the screen are shown as following.
 
 ```
 ...
-[{'bbox': [37, 29, 123, 89], 'rec_docs': '香奈儿包', 'rec_scores': 0.6163763999938965}, {'bbox': [153, 96, 235, 175], 'rec_docs': '香奈儿包', 'rec_scores': 0.5279821157455444}]
-[{'bbox': [735, 562, 1133, 851], 'rec_docs': '香奈儿包', 'rec_scores': 0.5588355660438538}]
-[{'bbox': [124, 50, 230, 129], 'rec_docs': '香奈儿包', 'rec_scores': 0.6980369687080383}]
-[{'bbox': [0, 0, 275, 183], 'rec_docs': '香奈儿包', 'rec_scores': 0.5818190574645996}]
-[{'bbox': [400, 1179, 905, 1537], 'rec_docs': '香奈儿包', 'rec_scores': 0.9814301133155823}]
-[{'bbox': [544, 4, 1482, 932], 'rec_docs': '香奈儿包', 'rec_scores': 0.5143815279006958}]
-[{'bbox': [29, 42, 194, 183], 'rec_docs': '香奈儿包', 'rec_scores': 0.9543638229370117}]
+[{'bbox': [37, 29, 123, 89], 'rec_docs': 'Chanel Handbag', 'rec_scores': 0.6163763999938965}, {'bbox': [153, 96, 235, 175], 'rec_docs': 'Chanel Handbag', 'rec_scores': 0.5279821157455444}]
+[{'bbox': [735, 562, 1133, 851], 'rec_docs': 'Chanel Handbag', 'rec_scores': 0.5588355660438538}]
+[{'bbox': [124, 50, 230, 129], 'rec_docs': 'Chanel Handbag', 'rec_scores': 0.6980369687080383}]
+[{'bbox': [0, 0, 275, 183], 'rec_docs': 'Chanel Handbag', 'rec_scores': 0.5818190574645996}]
+[{'bbox': [400, 1179, 905, 1537], 'rec_docs': 'Chanel Handbag', 'rec_scores': 0.9814301133155823}, {'bbox': [295, 713, 820, 1046], 'rec_docs': 'Chanel Handbag', 'rec_scores': 0.9496176242828369}, {'bbox': [153, 236, 694, 614], 'rec_docs': 'Chanel Handbag', 'rec_scores': 0.8395382761955261}]
+[{'bbox': [544, 4, 1482, 932], 'rec_docs': 'Chanel Handbag', 'rec_scores': 0.5143815279006958}]
 ...
 ```
 
@@ -238,12 +237,12 @@ cp recognition_demo_data_v1.0/gallery_product/data_file.txt recognition_demo_dat
 Then add some new lines into the new label file, which is shown as follows.
 
 ```
-gallery/anmuxi/001.jpg	安慕希酸奶
-gallery/anmuxi/002.jpg	安慕希酸奶
-gallery/anmuxi/003.jpg	安慕希酸奶
-gallery/anmuxi/004.jpg	安慕希酸奶
-gallery/anmuxi/005.jpg	安慕希酸奶
-gallery/anmuxi/006.jpg	安慕希酸奶
+gallery/anmuxi/001.jpg	Anmuxi Ambrosial Yogurt
+gallery/anmuxi/002.jpg	Anmuxi Ambrosial Yogurt
+gallery/anmuxi/003.jpg	Anmuxi Ambrosial Yogurt
+gallery/anmuxi/004.jpg	Anmuxi Ambrosial Yogurt
+gallery/anmuxi/005.jpg	Anmuxi Ambrosial Yogurt
+gallery/anmuxi/006.jpg	Anmuxi Ambrosial Yogurt
 ```
 
 Each line can be splited into two fields. The first field denotes the relative image path, and the second field denotes its label. The `delimiter` is `tab` here.
@@ -274,11 +273,11 @@ python3.7 python/predict_system.py -c configs/inference_product.yaml -o Global.i
 The output is as follows:
 
 ```
-[{'bbox': [243, 80, 523, 522], 'rec_docs': '安慕希酸奶', 'rec_scores': 0.5570770502090454}]
+[{'bbox': [243, 80, 523, 522], 'rec_docs': 'Anmuxi Ambrosial Yogurt', 'rec_scores': 0.5570770502090454}]
 ```
 
-The final recognition result is `安慕希酸奶`, which is corrrect, the visualization result is as follows.
+The final recognition result is `Anmuxi Ambrosial Yogurt`, which is corrrect, the visualization result is as follows.
 
 <div align="center">
-<img src="../../images/recognition/product_demo/result/anmuxi.jpg"  width = "400" />
+<img src="../../images/recognition/product_demo/result/anmuxi_en.jpg"  width = "400" />
 </div>
