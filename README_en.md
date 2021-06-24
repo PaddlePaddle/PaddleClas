@@ -37,7 +37,7 @@ Four sample solutions are provided, including product recognition, vehicle recog
 * You can also scan the QR code below to join the PaddleClas WeChat group to get more efficient answers to your questions and to communicate with developers from all walks of life. We look forward to hearing from you.
 
 <div align="center">
-<img src="./docs/images/wx_group.jpeg"  width = "200" />
+<img src="./docs/images/wx_group.png"  width = "200" />
 </div>
 
 ## Quick Start
