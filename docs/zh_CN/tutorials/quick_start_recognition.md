@@ -87,6 +87,7 @@ wget https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/infere
 # 下载识别inference模型并解压
 wget https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/inference/product_ResNet50_vd_aliproduct_v1.0_infer.tar && tar -xf product_ResNet50_vd_aliproduct_v1.0_infer.tar
 
+cd ../
 # 下载demo数据并解压
 wget https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/data/recognition_demo_data_v1.0.tar && tar -xf recognition_demo_data_v1.0.tar
 ```

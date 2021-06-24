@@ -17,6 +17,7 @@ import paddle
 import numpy.ctypeslib as ctl
 import numpy as np
 import os
+import sys
 import json
 import platform
 
@@ -24,13 +25,19 @@ from ctypes import *
 from numpy.ctypeslib import ndpointer
 
 __dir__ = os.path.dirname(os.path.abspath(__file__))
+winmode = None
 if platform.system() == "Windows":
     lib_filename = "index.dll"
+    if sys.version_info.minor >= 8:
+        winmode = 0x8
 else:
     lib_filename = "index.so"
 so_path = os.path.join(__dir__, lib_filename)
 try:
-    lib = ctypes.cdll.LoadLibrary(so_path)
+    if winmode is not None:
+        lib = ctypes.CDLL(so_path, winmode=winmode)
+    else:
+        lib = ctypes.CDLL(so_path)
 except Exception as ex:
     readme_path = os.path.join(__dir__, "README.md")
     print(
