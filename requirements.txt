@@ -1,6 +1,6 @@
 prettytable
 ujson
-opencv-python==4.1.2.30
+opencv-python==4.4.0.46
 pillow
 tqdm
 PyYAML
