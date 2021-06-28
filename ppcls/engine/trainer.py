@@ -221,6 +221,18 @@ class Trainer(object):
                             "epochs"], iter_id,
                                len(self.train_dataloader), lr_msg, metric_msg,
                                time_msg, ips_msg, eta_msg))
+
+                    logger.scaler(
+                        name="lr",
+                        value=lr_sch.get_lr(),
+                        step=global_step,
+                        writer=self.vdl_writer)
+                    for key in output_info:
+                        logger.scaler(
+                            name="train_{}".format(key),
+                            value=output_info[key].avg,
+                            step=global_step,
+                            writer=self.vdl_writer)
                 tic = time.time()
 
             metric_msg = ", ".join([
