@@ -38,7 +38,6 @@ class ExportModel(nn.Layer):
 
     def __init__(self, config):
         super().__init__()
-        print (config)
         self.base_model = build_model(config)
 
         # we should choose a final model to export
