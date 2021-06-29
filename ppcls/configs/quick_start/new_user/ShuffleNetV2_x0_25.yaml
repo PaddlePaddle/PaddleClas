@@ -3,7 +3,7 @@ Global:
   checkpoints: null
   pretrained_model: null
   output_dir: ./output/
-  device: gpu
+  device: cpu
   class_num: 102
   save_interval: 1
   eval_during_train: True
