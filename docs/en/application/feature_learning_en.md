@@ -17,3 +17,12 @@ The overall structure of feature learning is shown in the figure above, which ma
 ## 2 Config Description
 
 The feature learning config file description can be found in [yaml description](../tutorials/config_en.md).
+
+## 3 Pretrained Model
+
+- [Vehicle Fine-Grained Classification](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/pretrain/vehicle_cls_ResNet50_CompCars_v1.1_pretrained.pdparams)
+- [Vehicle ReID](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/pretrain/vehicle_reid_ResNet50_VERIWild_v1.0_pretrained.pdparams)
+- [Cartoon Character Recognition](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/pretrain/cartoon_rec_ResNet50_iCartoon_v1.0_pretrained.pdparams)
+- [Logo recognition](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/pretrain/logo_rec_ResNet50_Logo3K_v1.0_pretrained.pdparams)
+- Product recgnition： [Inshop Dataset](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/pretrain/product_ResNet50_vd_Inshop_pretrained_v1.0.pdparams)、[Aliproduct Dataset](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/pretrain/product_ResNet50_vd_Aliproduct_v1.0_pretrained.pdparams) 
+
