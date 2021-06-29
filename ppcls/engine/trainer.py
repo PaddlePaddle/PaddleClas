@@ -67,8 +67,6 @@ class Trainer(object):
             dist.init_parallel_env()
 
         if "Head" in self.config["Arch"]:
-            self.config["Arch"]["Head"]["class_num"] = self.config["Global"][
-                "class_num"]
             self.is_rec = True
         else:
             self.is_rec = False
