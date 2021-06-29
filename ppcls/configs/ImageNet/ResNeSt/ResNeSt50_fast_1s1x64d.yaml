@@ -63,9 +63,6 @@ DataLoader:
             std: [0.229, 0.224, 0.225]
             order: ''
       batch_transform_ops:
-        - DecodeImage:
-            to_rgb: True
-            channel_first: False
         - MixupOperator:
             alpha: 0.2
 
@@ -84,6 +81,9 @@ DataLoader:
       image_root: ./dataset/ILSVRC2012/
       cls_label_path: ./dataset/ILSVRC2012/val_list.txt
       transform_ops:
+        - DecodeImage:
+            to_rgb: True
+            channel_first: False
         - ResizeImage:
             resize_short: 256
         - CropImage:
