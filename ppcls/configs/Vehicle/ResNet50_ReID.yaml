@@ -4,7 +4,6 @@ Global:
   pretrained_model: null
   output_dir: "./output/"
   device: "gpu"
-  class_num: 30671
   save_interval: 1
   eval_during_train: True
   eval_interval: 1

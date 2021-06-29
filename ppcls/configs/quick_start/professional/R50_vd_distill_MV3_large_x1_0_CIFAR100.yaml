@@ -4,7 +4,6 @@ Global:
   pretrained_model: null
   output_dir: "./output/"
   device: "gpu"
-  class_num: 100
   save_interval: 1
   eval_during_train: True
   eval_interval: 1
@@ -27,9 +26,11 @@ Arch:
   models:
     - Teacher:
         name: ResNet50_vd
+        class_num: 100
         pretrained: "./pretrained/best_model"
     - Student:
         name: MobileNetV3_large_x1_0
+        class_num: 100
         pretrained: True
 
   infer_model_name: "Student"

@@ -6,7 +6,6 @@ Global:
   pretrained_model: product_ResNet50_vd_Aliproduct_v1.0_pretrained
   output_dir: ./output/
   device: gpu
-  class_num: 11319
   save_interval: 10
   eval_during_train: True
   eval_interval: 10
