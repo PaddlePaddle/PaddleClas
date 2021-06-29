@@ -24,5 +24,5 @@
 - [车辆ReID](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/pretrain/vehicle_reid_ResNet50_VERIWild_v1.0_pretrained.pdparams)
 - [动漫人物](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/pretrain/cartoon_rec_ResNet50_iCartoon_v1.0_pretrained.pdparams)
 - [Logo识别](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/pretrain/logo_rec_ResNet50_Logo3K_v1.0_pretrained.pdparams)
-- 商品识别： [Inshop数据集](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/pretrain/product_ResNet50_vd_Inshop_pretrained_v1.0.pdparams)、[Aliproduct数据集](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/pretrain/product_ResNet50_vd_Aliproduct_v1.0_pretrained.pdparams) 
+- 商品识别： [Inshop](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/pretrain/product_ResNet50_vd_Inshop_pretrained_v1.0.pdparams)、[Aliproduct](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/pretrain/product_ResNet50_vd_Aliproduct_v1.0_pretrained.pdparams) 
 
