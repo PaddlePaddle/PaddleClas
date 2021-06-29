@@ -209,6 +209,20 @@ python tools/infer/predict.py \
     - [RegNetX_4GF](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/RegNetX_4GF_pretrained.pdparams)
 
 
+- Transformer series
+  - Swin-transformer series<sup>[[27](#ref27)]</sup>([论文地址](https://arxiv.org/pdf/2103.14030.pdf))
+    - [SwinTransformer_tiny_patch4_window7_224](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/SwinTransformer_tiny_patch4_window7_224_pretrained.pdparams)
+    - [SwinTransformer_small_patch4_window7_224](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/SwinTransformer_small_patch4_window7_224_pretrained.pdparams)
+    - [SwinTransformer_base_patch4_window7_224](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/SwinTransformer_base_patch4_window7_224_pretrained.pdparams)
+    - [SwinTransformer_base_patch4_window12_384](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/SwinTransformer_base_patch4_window12_384_pretrained.pdparams)
+    - [SwinTransformer_base_patch4_window7_224_22k](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/SwinTransformer_base_patch4_window7_224_22k_pretrained.pdparams)
+    - [SwinTransformer_base_patch4_window7_224_22kto1k](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/SwinTransformer_base_patch4_window7_224_22kto1k_pretrained.pdparams)
+    - [SwinTransformer_large_patch4_window12_384_22k](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/SwinTransformer_large_patch4_window12_384_22k_pretrained.pdparams)
+    - [SwinTransformer_large_patch4_window12_384_22kto1k](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/SwinTransformer_large_patch4_window12_384_22kto1k_pretrained.pdparams)
+    - [SwinTransformer_large_patch4_window7_224_22k](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/SwinTransformer_large_patch4_window7_224_22k_pretrained.pdparams)
+    - [SwinTransformer_large_patch4_window7_224_22kto1k](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/SwinTransformer_large_patch4_window7_224_22kto1k_pretrained.pdparams)
+
+
 
 - Other models
   - AlexNet series<sup>[[18](#ref18)]</sup>([paper link](https://papers.nips.cc/paper/4824-imagenet-classification-with-deep-convolutional-neural-networks.pdf))
@@ -284,3 +298,5 @@ python tools/infer/predict.py \
 <a name="ref25">[25]</a> Radosavovic I, Kosaraju R P, Girshick R, et al. Designing network design spaces[C]//Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition. 2020: 10428-10436.
 
 <a name="ref26">[26]</a> C.Szegedy, V.Vanhoucke, S.Ioffe, J.Shlens, and Z.Wojna. Rethinking the inception architecture for computer vision. arXiv preprint arXiv:1512.00567, 2015.
+
+<a name="ref27">[27]</a> Ze Liu, Yutong Lin, Yue Cao, Han Hu, Yixuan Wei, Zheng Zhang, Stephen Lin and Baining Guo. Swin Transformer: Hierarchical Vision Transformer using Shifted Windows.

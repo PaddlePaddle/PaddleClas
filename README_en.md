@@ -8,7 +8,8 @@ PaddleClas is an image recognition toolset for industry and academia, helping us
 
 **Recent updates**
 
-- 🔥🔥🔥: 2021.06.16 PaddleClas release/2.2. Add metric learning and vector search modules. Add product recognition, animation character recognition, vehicle recognition and logo recognition. Added 24 pretrained models of LeViT, TNT, DLA, HarDNet, and RedNet, and the accuracy is roughly the same as that of the paper.
+- 2021.06.29 Add Swin-transformer series model，Top1 Acc on ImageNet1k dataset reaches 87.2%, training, evaluation and inference are all supported. Pretrained models can be downloaded [here](docs/en/models/models_intro_en.md).
+- 2021.06.16 PaddleClas release/2.2. Add metric learning and vector search modules. Add product recognition, animation character recognition, vehicle recognition and logo recognition. Added 24 pretrained models of LeViT, TNT, DLA, HarDNet, and RedNet, and the accuracy is roughly the same as that of the paper.
 - [more](./docs/en/update_history_en.md)
 
 ## Features
