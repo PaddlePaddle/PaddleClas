@@ -29,11 +29,13 @@ import math
 from ppcls.utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
 
 MODEL_URLS = {
-              "SE_ResNet18_vd": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/SE_ResNet18_vd_pretrained.pdparams",
-              "SE_ResNet34_vd": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/SE_ResNet34_vd_pretrained.pdparams",
-              "SE_ResNet50_vd": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/SE_ResNet50_vd_pretrained.pdparams",
-
-             }
+    "SE_ResNet18_vd":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/SE_ResNet18_vd_pretrained.pdparams",
+    "SE_ResNet34_vd":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/SE_ResNet34_vd_pretrained.pdparams",
+    "SE_ResNet50_vd":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/SE_ResNet50_vd_pretrained.pdparams",
+}
 
 __all__ = list(MODEL_URLS.keys())
 
@@ -240,7 +242,7 @@ class SELayer(nn.Layer):
 
 
 class SE_ResNet_vd(nn.Layer):
-    def __init__(self, layers=50, class_dim=1000):
+    def __init__(self, layers=50, class_num=1000):
         super(SE_ResNet_vd, self).__init__()
 
         self.layers = layers
@@ -336,7 +338,7 @@ class SE_ResNet_vd(nn.Layer):
 
         self.out = Linear(
             self.pool2d_avg_channels,
-            class_dim,
+            class_num,
             weight_attr=ParamAttr(
                 initializer=Uniform(-stdv, stdv), name="fc6_weights"),
             bias_attr=ParamAttr(name="fc6_offset"))
@@ -353,7 +355,7 @@ class SE_ResNet_vd(nn.Layer):
         y = self.out(y)
         return y
 
-    
+
 def _load_pretrained(pretrained, model, model_url, use_ssld=False):
     if pretrained is False:
         pass
@@ -365,21 +367,24 @@ def _load_pretrained(pretrained, model, model_url, use_ssld=False):
         raise RuntimeError(
             "pretrained type is not available. Please use `string` or `boolean` type."
         )
-    
+
 
 def SE_ResNet18_vd(pretrained=False, use_ssld=False, **kwargs):
     model = SE_ResNet_vd(layers=18, **kwargs)
-    _load_pretrained(pretrained, model, MODEL_URLS["SE_ResNet18_vd"], use_ssld=use_ssld)
+    _load_pretrained(
+        pretrained, model, MODEL_URLS["SE_ResNet18_vd"], use_ssld=use_ssld)
     return model
 
 
 def SE_ResNet34_vd(pretrained=False, use_ssld=False, **kwargs):
     model = SE_ResNet_vd(layers=34, **kwargs)
-    _load_pretrained(pretrained, model, MODEL_URLS["SE_ResNet34_vd"], use_ssld=use_ssld)
+    _load_pretrained(
+        pretrained, model, MODEL_URLS["SE_ResNet34_vd"], use_ssld=use_ssld)
     return model
 
 
 def SE_ResNet50_vd(pretrained=False, use_ssld=False, **kwargs):
     model = SE_ResNet_vd(layers=50, **kwargs)
-    _load_pretrained(pretrained, model, MODEL_URLS["SE_ResNet50_vd"], use_ssld=use_ssld)
+    _load_pretrained(
+        pretrained, model, MODEL_URLS["SE_ResNet50_vd"], use_ssld=use_ssld)
     return model

@@ -23,7 +23,10 @@ import math
 
 from ppcls.utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
 
-MODEL_URLS = {"InceptionV4": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/InceptionV4_pretrained.pdparams"}
+MODEL_URLS = {
+    "InceptionV4":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/InceptionV4_pretrained.pdparams"
+}
 
 __all__ = list(MODEL_URLS.keys())
 
@@ -392,7 +395,7 @@ class InceptionC(nn.Layer):
 
 
 class InceptionV4DY(nn.Layer):
-    def __init__(self, class_dim=1000):
+    def __init__(self, class_num=1000):
         super(InceptionV4DY, self).__init__()
         self._inception_stem = InceptionStem()
 
@@ -420,7 +423,7 @@ class InceptionV4DY(nn.Layer):
         stdv = 1.0 / math.sqrt(1536 * 1.0)
         self.out = Linear(
             1536,
-            class_dim,
+            class_num,
             weight_attr=ParamAttr(
                 initializer=Uniform(-stdv, stdv), name="final_fc_weights"),
             bias_attr=ParamAttr(name="final_fc_offset"))
@@ -466,7 +469,9 @@ def _load_pretrained(pretrained, model, model_url, use_ssld=False):
             "pretrained type is not available. Please use `string` or `boolean` type."
         )
 
+
 def InceptionV4(pretrained=False, use_ssld=False, **kwargs):
     model = InceptionV4DY(**kwargs)
-    _load_pretrained(pretrained, model, MODEL_URLS["InceptionV4"], use_ssld=use_ssld)
+    _load_pretrained(
+        pretrained, model, MODEL_URLS["InceptionV4"], use_ssld=use_ssld)
     return model

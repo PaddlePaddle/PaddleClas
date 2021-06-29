@@ -29,10 +29,14 @@ from paddle.regularizer import L2Decay
 
 from ppcls.utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
 
-MODEL_URLS = {"ResNeSt50_fast_1s1x64d": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ResNeSt50_fast_1s1x64d_pretrained.pdparams",
-              "ResNeSt50": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ResNeSt50_pretrained.pdparams",
-              "ResNeSt101": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ResNeSt101_pretrained.pdparams",
-             }
+MODEL_URLS = {
+    "ResNeSt50_fast_1s1x64d":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ResNeSt50_fast_1s1x64d_pretrained.pdparams",
+    "ResNeSt50":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ResNeSt50_pretrained.pdparams",
+    "ResNeSt101":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ResNeSt101_pretrained.pdparams",
+}
 
 __all__ = list(MODEL_URLS.keys())
 
@@ -453,7 +457,7 @@ class ResNeSt(nn.Layer):
                  avd_first=False,
                  final_drop=0.0,
                  last_gamma=False,
-                 class_dim=1000):
+                 class_num=1000):
         super(ResNeSt, self).__init__()
 
         self.cardinality = groups
@@ -643,7 +647,7 @@ class ResNeSt(nn.Layer):
 
         self.out = Linear(
             self.out_channels,
-            class_dim,
+            class_num,
             weight_attr=ParamAttr(
                 initializer=nn.initializer.Uniform(-stdv, stdv),
                 name="fc_weights"),
@@ -663,7 +667,7 @@ class ResNeSt(nn.Layer):
         x = self.out(x)
         return x
 
-    
+
 def _load_pretrained(pretrained, model, model_url, use_ssld=False):
     if pretrained is False:
         pass
@@ -675,8 +679,8 @@ def _load_pretrained(pretrained, model, model_url, use_ssld=False):
         raise RuntimeError(
             "pretrained type is not available. Please use `string` or `boolean` type."
         )
-        
-    
+
+
 def ResNeSt50_fast_1s1x64d(pretrained=False, use_ssld=False, **kwargs):
     model = ResNeSt(
         layers=[3, 4, 6, 3],
@@ -690,7 +694,11 @@ def ResNeSt50_fast_1s1x64d(pretrained=False, use_ssld=False, **kwargs):
         avd_first=True,
         final_drop=0.0,
         **kwargs)
-    _load_pretrained(pretrained, model, MODEL_URLS["ResNeSt50_fast_1s1x64d"], use_ssld=use_ssld)
+    _load_pretrained(
+        pretrained,
+        model,
+        MODEL_URLS["ResNeSt50_fast_1s1x64d"],
+        use_ssld=use_ssld)
     return model
 
 
@@ -707,7 +715,8 @@ def ResNeSt50(pretrained=False, use_ssld=False, **kwargs):
         avd_first=False,
         final_drop=0.0,
         **kwargs)
-    _load_pretrained(pretrained, model, MODEL_URLS["ResNeSt50"], use_ssld=use_ssld)
+    _load_pretrained(
+        pretrained, model, MODEL_URLS["ResNeSt50"], use_ssld=use_ssld)
     return model
 
 
@@ -724,5 +733,6 @@ def ResNeSt101(pretrained=False, use_ssld=False, **kwargs):
         avd_first=False,
         final_drop=0.0,
         **kwargs)
-    _load_pretrained(pretrained, model, MODEL_URLS["ResNeSt101"], use_ssld=use_ssld)
+    _load_pretrained(
+        pretrained, model, MODEL_URLS["ResNeSt101"], use_ssld=use_ssld)
     return model

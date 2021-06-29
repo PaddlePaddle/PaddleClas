@@ -231,7 +231,7 @@ class VisionTransformer(nn.Layer):
                  img_size=224,
                  patch_size=16,
                  in_chans=3,
-                 class_dim=1000,
+                 class_num=1000,
                  embed_dim=768,
                  depth=12,
                  num_heads=12,
@@ -245,7 +245,7 @@ class VisionTransformer(nn.Layer):
                  epsilon=1e-5,
                  **args):
         super().__init__()
-        self.class_dim = class_dim
+        self.class_num = class_num
 
         self.num_features = self.embed_dim = embed_dim
 
@@ -284,7 +284,7 @@ class VisionTransformer(nn.Layer):
 
         # Classifier head
         self.head = nn.Linear(embed_dim,
-                              class_dim) if class_dim > 0 else Identity()
+                              class_num) if class_num > 0 else Identity()
 
         trunc_normal_(self.pos_embed)
         trunc_normal_(self.cls_token)

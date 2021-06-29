@@ -25,12 +25,17 @@ from math import ceil
 from ppcls.utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
 
 MODEL_URLS = {
-              "ReXNet_1_0": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ReXNet_1_0_pretrained.pdparams",
-              "ReXNet_1_3": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ReXNet_1_3_pretrained.pdparams",
-              "ReXNet_1_5": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ReXNet_1_5_32x4d_pretrained.pdparams",
-              "ReXNet_2_0": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ReXNet_2_0_pretrained.pdparams",
-              "ReXNet_3_0": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ReXNet_3_0_pretrained.pdparams",
-             }
+    "ReXNet_1_0":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ReXNet_1_0_pretrained.pdparams",
+    "ReXNet_1_3":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ReXNet_1_3_pretrained.pdparams",
+    "ReXNet_1_5":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ReXNet_1_5_32x4d_pretrained.pdparams",
+    "ReXNet_2_0":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ReXNet_2_0_pretrained.pdparams",
+    "ReXNet_3_0":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ReXNet_3_0_pretrained.pdparams",
+}
 
 __all__ = list(MODEL_URLS.keys())
 
@@ -154,7 +159,7 @@ class ReXNetV1(nn.Layer):
                  final_ch=180,
                  width_mult=1.0,
                  depth_mult=1.0,
-                 class_dim=1000,
+                 class_num=1000,
                  use_se=True,
                  se_ratio=12,
                  dropout_ratio=0.2,
@@ -220,7 +225,7 @@ class ReXNetV1(nn.Layer):
         self.output = nn.Sequential(
             nn.Dropout(dropout_ratio),
             nn.Conv2D(
-                pen_channels, class_dim, 1, bias_attr=True))
+                pen_channels, class_num, 1, bias_attr=True))
 
     def forward(self, x):
         x = self.features(x)
@@ -239,33 +244,38 @@ def _load_pretrained(pretrained, model, model_url, use_ssld=False):
         raise RuntimeError(
             "pretrained type is not available. Please use `string` or `boolean` type."
         )
-    
-    
+
+
 def ReXNet_1_0(pretrained=False, use_ssld=False, **kwargs):
     model = ReXNetV1(width_mult=1.0, **kwargs)
-    _load_pretrained(pretrained, model, MODEL_URLS["ReXNet_1_0"], use_ssld=use_ssld)
+    _load_pretrained(
+        pretrained, model, MODEL_URLS["ReXNet_1_0"], use_ssld=use_ssld)
     return model
 
 
 def ReXNet_1_3(pretrained=False, use_ssld=False, **kwargs):
     model = ReXNetV1(width_mult=1.3, **kwargs)
-    _load_pretrained(pretrained, model, MODEL_URLS["ReXNet_1_3"], use_ssld=use_ssld)
+    _load_pretrained(
+        pretrained, model, MODEL_URLS["ReXNet_1_3"], use_ssld=use_ssld)
     return model
 
 
 def ReXNet_1_5(pretrained=False, use_ssld=False, **kwargs):
     model = ReXNetV1(width_mult=1.5, **kwargs)
-    _load_pretrained(pretrained, model, MODEL_URLS["ReXNet_1_5"], use_ssld=use_ssld)
+    _load_pretrained(
+        pretrained, model, MODEL_URLS["ReXNet_1_5"], use_ssld=use_ssld)
     return model
 
 
 def ReXNet_2_0(pretrained=False, use_ssld=False, **kwargs):
     model = ReXNetV1(width_mult=2.0, **kwargs)
-    _load_pretrained(pretrained, model, MODEL_URLS["ReXNet_2_0"], use_ssld=use_ssld)
+    _load_pretrained(
+        pretrained, model, MODEL_URLS["ReXNet_2_0"], use_ssld=use_ssld)
     return model
 
 
 def ReXNet_3_0(pretrained=False, use_ssld=False, **kwargs):
     model = ReXNetV1(width_mult=3.0, **kwargs)
-    _load_pretrained(pretrained, model, MODEL_URLS["ReXNet_3_0"], use_ssld=use_ssld)
+    _load_pretrained(
+        pretrained, model, MODEL_URLS["ReXNet_3_0"], use_ssld=use_ssld)
     return model

@@ -23,10 +23,14 @@ from paddle.nn.initializer import Uniform, KaimingNormal
 
 from ppcls.utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
 
-MODEL_URLS = {"GhostNet_x0_5": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/GhostNet_x0_5_pretrained.pdparams",
-              "GhostNet_x1_0": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/GhostNet_x1_0_pretrained.pdparams",
-              "GhostNet_x1_3": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/GhostNet_x1_3_pretrained.pdparams",
-             }
+MODEL_URLS = {
+    "GhostNet_x0_5":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/GhostNet_x0_5_pretrained.pdparams",
+    "GhostNet_x1_0":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/GhostNet_x1_0_pretrained.pdparams",
+    "GhostNet_x1_3":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/GhostNet_x1_3_pretrained.pdparams",
+}
 
 __all__ = list(MODEL_URLS.keys())
 
@@ -215,7 +219,7 @@ class GhostBottleneck(nn.Layer):
 
 
 class GhostNet(nn.Layer):
-    def __init__(self, scale, class_dim=1000):
+    def __init__(self, scale, class_num=1000):
         super(GhostNet, self).__init__()
         self.cfgs = [
             # k, t, c, SE, s
@@ -290,7 +294,7 @@ class GhostNet(nn.Layer):
         stdv = 1.0 / math.sqrt(self._fc0_output_channels * 1.0)
         self.fc_1 = Linear(
             self._fc0_output_channels,
-            class_dim,
+            class_num,
             weight_attr=ParamAttr(
                 name="fc_1_weights", initializer=Uniform(-stdv, stdv)),
             bias_attr=ParamAttr(name="fc_1_offset"))
@@ -322,7 +326,7 @@ class GhostNet(nn.Layer):
             new_v += divisor
         return new_v
 
-    
+
 def _load_pretrained(pretrained, model, model_url, use_ssld=False):
     if pretrained is False:
         pass
@@ -338,17 +342,20 @@ def _load_pretrained(pretrained, model, model_url, use_ssld=False):
 
 def GhostNet_x0_5(pretrained=False, use_ssld=False, **kwargs):
     model = GhostNet(scale=0.5, **kwargs)
-    _load_pretrained(pretrained, model, MODEL_URLS["GhostNet_x0_5"], use_ssld=use_ssld)
+    _load_pretrained(
+        pretrained, model, MODEL_URLS["GhostNet_x0_5"], use_ssld=use_ssld)
     return model
 
 
 def GhostNet_x1_0(pretrained=False, use_ssld=False, **kwargs):
     model = GhostNet(scale=1.0, **kwargs)
-    _load_pretrained(pretrained, model, MODEL_URLS["GhostNet_x1_0"], use_ssld=use_ssld)
+    _load_pretrained(
+        pretrained, model, MODEL_URLS["GhostNet_x1_0"], use_ssld=use_ssld)
     return model
 
 
 def GhostNet_x1_3(pretrained=False, use_ssld=False, **kwargs):
     model = GhostNet(scale=1.3, **kwargs)
-    _load_pretrained(pretrained, model, MODEL_URLS["GhostNet_x1_3"], use_ssld=use_ssld)
+    _load_pretrained(
+        pretrained, model, MODEL_URLS["GhostNet_x1_3"], use_ssld=use_ssld)
     return model

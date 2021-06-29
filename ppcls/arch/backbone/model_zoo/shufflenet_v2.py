@@ -25,14 +25,21 @@ from paddle.nn.functional import swish
 from ppcls.utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
 
 MODEL_URLS = {
-              "ShuffleNetV2_x0_25": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ShuffleNetV2_x0_25_pretrained.pdparams",
-              "ShuffleNetV2_x0_33": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ShuffleNetV2_x0_33_pretrained.pdparams",
-              "ShuffleNetV2_x0_5": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ShuffleNetV2_x0_5_pretrained.pdparams",
-              "ShuffleNetV2_x1_0": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ShuffleNetV2_x1_0_pretrained.pdparams",
-              "ShuffleNetV2_x1_5": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ShuffleNetV2_x1_5_pretrained.pdparams",
-              "ShuffleNetV2_x2_0": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ShuffleNetV2_x2_0_pretrained.pdparams",
-              "ShuffleNetV2_swish": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ShuffleNetV2_swish_pretrained.pdparams"
-             }
+    "ShuffleNetV2_x0_25":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ShuffleNetV2_x0_25_pretrained.pdparams",
+    "ShuffleNetV2_x0_33":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ShuffleNetV2_x0_33_pretrained.pdparams",
+    "ShuffleNetV2_x0_5":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ShuffleNetV2_x0_5_pretrained.pdparams",
+    "ShuffleNetV2_x1_0":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ShuffleNetV2_x1_0_pretrained.pdparams",
+    "ShuffleNetV2_x1_5":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ShuffleNetV2_x1_5_pretrained.pdparams",
+    "ShuffleNetV2_x2_0":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ShuffleNetV2_x2_0_pretrained.pdparams",
+    "ShuffleNetV2_swish":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ShuffleNetV2_swish_pretrained.pdparams"
+}
 
 __all__ = list(MODEL_URLS.keys())
 
@@ -207,10 +214,10 @@ class InvertedResidualDS(Layer):
 
 
 class ShuffleNet(Layer):
-    def __init__(self, class_dim=1000, scale=1.0, act="relu"):
+    def __init__(self, class_num=1000, scale=1.0, act="relu"):
         super(ShuffleNet, self).__init__()
         self.scale = scale
-        self.class_dim = class_dim
+        self.class_num = class_num
         stage_repeats = [4, 8, 4]
 
         if scale == 0.25:
@@ -277,7 +284,7 @@ class ShuffleNet(Layer):
         # 5. fc
         self._fc = Linear(
             stage_out_channels[-1],
-            class_dim,
+            class_num,
             weight_attr=ParamAttr(name='fc6_weights'),
             bias_attr=ParamAttr(name='fc6_offset'))
 
@@ -308,41 +315,48 @@ def _load_pretrained(pretrained, model, model_url, use_ssld=False):
 
 def ShuffleNetV2_x0_25(pretrained=False, use_ssld=False, **kwargs):
     model = ShuffleNet(scale=0.25, **kwargs)
-    _load_pretrained(pretrained, model, MODEL_URLS["ShuffleNetV2_x0_25"], use_ssld=use_ssld)
+    _load_pretrained(
+        pretrained, model, MODEL_URLS["ShuffleNetV2_x0_25"], use_ssld=use_ssld)
     return model
 
 
 def ShuffleNetV2_x0_33(pretrained=False, use_ssld=False, **kwargs):
     model = ShuffleNet(scale=0.33, **kwargs)
-    _load_pretrained(pretrained, model, MODEL_URLS["ShuffleNetV2_x0_33"], use_ssld=use_ssld)
+    _load_pretrained(
+        pretrained, model, MODEL_URLS["ShuffleNetV2_x0_33"], use_ssld=use_ssld)
     return model
 
 
 def ShuffleNetV2_x0_5(pretrained=False, use_ssld=False, **kwargs):
     model = ShuffleNet(scale=0.5, **kwargs)
-    _load_pretrained(pretrained, model, MODEL_URLS["ShuffleNetV2_x0_5"], use_ssld=use_ssld)
+    _load_pretrained(
+        pretrained, model, MODEL_URLS["ShuffleNetV2_x0_5"], use_ssld=use_ssld)
     return model
 
 
 def ShuffleNetV2_x1_0(pretrained=False, use_ssld=False, **kwargs):
     model = ShuffleNet(scale=1.0, **kwargs)
-    _load_pretrained(pretrained, model, MODEL_URLS["ShuffleNetV2_x1_0"], use_ssld=use_ssld)
+    _load_pretrained(
+        pretrained, model, MODEL_URLS["ShuffleNetV2_x1_0"], use_ssld=use_ssld)
     return model
 
 
 def ShuffleNetV2_x1_5(pretrained=False, use_ssld=False, **kwargs):
     model = ShuffleNet(scale=1.5, **kwargs)
-    _load_pretrained(pretrained, model, MODEL_URLS["ShuffleNetV2_x1_5"], use_ssld=use_ssld)
+    _load_pretrained(
+        pretrained, model, MODEL_URLS["ShuffleNetV2_x1_5"], use_ssld=use_ssld)
     return model
 
 
 def ShuffleNetV2_x2_0(pretrained=False, use_ssld=False, **kwargs):
     model = ShuffleNet(scale=2.0, **kwargs)
-    _load_pretrained(pretrained, model, MODEL_URLS["ShuffleNetV2_x2_0"], use_ssld=use_ssld)
+    _load_pretrained(
+        pretrained, model, MODEL_URLS["ShuffleNetV2_x2_0"], use_ssld=use_ssld)
     return model
 
 
 def ShuffleNetV2_swish(pretrained=False, use_ssld=False, **kwargs):
     model = ShuffleNet(scale=1.0, act="swish", **kwargs)
-    _load_pretrained(pretrained, model, MODEL_URLS["ShuffleNetV2_swish"], use_ssld=use_ssld)
+    _load_pretrained(
+        pretrained, model, MODEL_URLS["ShuffleNetV2_swish"], use_ssld=use_ssld)
     return model

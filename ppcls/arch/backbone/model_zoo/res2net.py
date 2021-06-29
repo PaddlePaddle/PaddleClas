@@ -29,9 +29,12 @@ import math
 
 from ppcls.utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
 
-MODEL_URLS = {"Res2Net50_26w_4s": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/Res2Net50_26w_4s_pretrained.pdparams",
-              "Res2Net50_14w_8s": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/Res2Net50_14w_8s_pretrained.pdparams",
-             }
+MODEL_URLS = {
+    "Res2Net50_26w_4s":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/Res2Net50_26w_4s_pretrained.pdparams",
+    "Res2Net50_14w_8s":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/Res2Net50_14w_8s_pretrained.pdparams",
+}
 
 __all__ = list(MODEL_URLS.keys())
 
@@ -151,7 +154,7 @@ class BottleneckBlock(nn.Layer):
 
 
 class Res2Net(nn.Layer):
-    def __init__(self, layers=50, scales=4, width=26, class_dim=1000):
+    def __init__(self, layers=50, scales=4, width=26, class_num=1000):
         super(Res2Net, self).__init__()
 
         self.layers = layers
@@ -218,7 +221,7 @@ class Res2Net(nn.Layer):
 
         self.out = Linear(
             self.pool2d_avg_channels,
-            class_dim,
+            class_num,
             weight_attr=ParamAttr(
                 initializer=Uniform(-stdv, stdv), name="fc_weights"),
             bias_attr=ParamAttr(name="fc_offset"))
@@ -245,15 +248,17 @@ def _load_pretrained(pretrained, model, model_url, use_ssld=False):
         raise RuntimeError(
             "pretrained type is not available. Please use `string` or `boolean` type."
         )
-        
+
 
 def Res2Net50_26w_4s(pretrained=False, use_ssld=False, **kwargs):
     model = Res2Net(layers=50, scales=4, width=26, **kwargs)
-    _load_pretrained(pretrained, model, MODEL_URLS["Res2Net50_26w_4s"], use_ssld=use_ssld)
+    _load_pretrained(
+        pretrained, model, MODEL_URLS["Res2Net50_26w_4s"], use_ssld=use_ssld)
     return model
 
 
 def Res2Net50_14w_8s(pretrained=False, use_ssld=False, **kwargs):
     model = Res2Net(layers=50, scales=8, width=14, **kwargs)
-    _load_pretrained(pretrained, model, MODEL_URLS["Res2Net50_14w_8s"], use_ssld=use_ssld)
+    _load_pretrained(
+        pretrained, model, MODEL_URLS["Res2Net50_14w_8s"], use_ssld=use_ssld)
     return model
