@@ -23,9 +23,13 @@ import math
 
 from ppcls.utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
 
-MODEL_URLS = {"DarkNet53": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DarkNet53_pretrained.pdparams"}
+MODEL_URLS = {
+    "DarkNet53":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DarkNet53_pretrained.pdparams"
+}
 
 __all__ = list(MODEL_URLS.keys())
+
 
 class ConvBNLayer(nn.Layer):
     def __init__(self,
@@ -77,7 +81,7 @@ class BasicBlock(nn.Layer):
 
 
 class DarkNet(nn.Layer):
-    def __init__(self, class_dim=1000):
+    def __init__(self, class_num=1000):
         super(DarkNet, self).__init__()
 
         self.stages = [1, 2, 8, 8, 4]
@@ -126,7 +130,7 @@ class DarkNet(nn.Layer):
         stdv = 1.0 / math.sqrt(1024.0)
         self._out = Linear(
             1024,
-            class_dim,
+            class_num,
             weight_attr=ParamAttr(
                 name="fc_weights", initializer=Uniform(-stdv, stdv)),
             bias_attr=ParamAttr(name="fc_offset"))
@@ -172,6 +176,7 @@ class DarkNet(nn.Layer):
         x = self._out(x)
         return x
 
+
 def _load_pretrained(pretrained, model, model_url, use_ssld=False):
     if pretrained is False:
         pass
@@ -183,8 +188,10 @@ def _load_pretrained(pretrained, model, model_url, use_ssld=False):
         raise RuntimeError(
             "pretrained type is not available. Please use `string` or `boolean` type."
         )
-        
+
+
 def DarkNet53(pretrained=False, use_ssld=False, **kwargs):
     model = DarkNet(**kwargs)
-    _load_pretrained(pretrained, model, MODEL_URLS["DarkNet53"], use_ssld=use_ssld)
+    _load_pretrained(
+        pretrained, model, MODEL_URLS["DarkNet53"], use_ssld=use_ssld)
     return model

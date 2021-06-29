@@ -19,7 +19,6 @@ from paddle.vision.models import resnet
 
 from ppcls.utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
 
-
 MODEL_URLS = {
     "RedNet26":
     "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/RedNet26_pretrained.pdparams",
@@ -32,7 +31,6 @@ MODEL_URLS = {
     "RedNet152":
     "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/RedNet152_pretrained.pdparams"
 }
-
 
 __all__ = MODEL_URLS.keys()
 
@@ -51,50 +49,53 @@ class Involution(nn.Layer):
                 in_channels=channels,
                 out_channels=channels // reduction_ratio,
                 kernel_size=1,
-                bias_attr=False
-            )),
+                bias_attr=False)),
             ('bn', nn.BatchNorm2D(channels // reduction_ratio)),
-            ('activate', nn.ReLU())
-        )
-        self.conv2 = nn.Sequential(
-            ('conv', nn.Conv2D(
-                in_channels=channels // reduction_ratio,
-                out_channels=kernel_size**2 * self.groups,
-                kernel_size=1,
-                stride=1
-            ))
-        )
+            ('activate', nn.ReLU()))
+        self.conv2 = nn.Sequential(('conv', nn.Conv2D(
+            in_channels=channels // reduction_ratio,
+            out_channels=kernel_size**2 * self.groups,
+            kernel_size=1,
+            stride=1)))
         if stride > 1:
             self.avgpool = nn.AvgPool2D(stride, stride)
 
     def forward(self, x):
-        weight = self.conv2(self.conv1(x if self.stride == 1 else self.avgpool(x)))
+        weight = self.conv2(
+            self.conv1(x if self.stride == 1 else self.avgpool(x)))
         b, c, h, w = weight.shape
-        weight = weight.reshape((b, self.groups, self.kernel_size**2, h, w)).unsqueeze(2)
+        weight = weight.reshape(
+            (b, self.groups, self.kernel_size**2, h, w)).unsqueeze(2)
 
-        out = nn.functional.unfold(x, self.kernel_size, self.stride, (self.kernel_size-1)//2, 1)
-        out = out.reshape((b, self.groups, self.group_channels, self.kernel_size**2, h, w))
+        out = nn.functional.unfold(x, self.kernel_size, self.stride,
+                                   (self.kernel_size - 1) // 2, 1)
+        out = out.reshape(
+            (b, self.groups, self.group_channels, self.kernel_size**2, h, w))
         out = (weight * out).sum(axis=3).reshape((b, self.channels, h, w))
         return out
 
 
 class BottleneckBlock(resnet.BottleneckBlock):
-    def __init__(self, inplanes, planes, stride=1, downsample=None, 
-                 groups=1, base_width=64, dilation=1, norm_layer=None):
-        super(BottleneckBlock, self).__init__(
-            inplanes, planes, stride, downsample, 
-            groups, base_width, dilation, norm_layer
-        )
+    def __init__(self,
+                 inplanes,
+                 planes,
+                 stride=1,
+                 downsample=None,
+                 groups=1,
+                 base_width=64,
+                 dilation=1,
+                 norm_layer=None):
+        super(BottleneckBlock, self).__init__(inplanes, planes, stride,
+                                              downsample, groups, base_width,
+                                              dilation, norm_layer)
         width = int(planes * (base_width / 64.)) * groups
         self.conv2 = Involution(width, 7, stride)
 
 
 class RedNet(resnet.ResNet):
-    def __init__(self, block, depth, class_dim=1000, with_pool=True):
+    def __init__(self, block, depth, class_num=1000, with_pool=True):
         super(RedNet, self).__init__(
-            block=block, depth=50, 
-            num_classes=class_dim, with_pool=with_pool
-        )
+            block=block, depth=50, num_classes=class_num, with_pool=with_pool)
         layer_cfg = {
             26: [1, 2, 4, 1],
             38: [2, 3, 5, 2],
@@ -108,7 +109,7 @@ class RedNet(resnet.ResNet):
         self.bn1 = None
         self.relu = None
         self.inplanes = 64
-        self.class_dim = class_dim
+        self.class_num = class_num
         self.stem = nn.Sequential(
             nn.Sequential(
                 ('conv', nn.Conv2D(
@@ -117,11 +118,9 @@ class RedNet(resnet.ResNet):
                     kernel_size=3,
                     stride=2,
                     padding=1,
-                    bias_attr=False
-                )),
+                    bias_attr=False)),
                 ('bn', nn.BatchNorm2D(self.inplanes // 2)),
-                ('activate', nn.ReLU())
-            ),
+                ('activate', nn.ReLU())),
             Involution(self.inplanes // 2, 3, 1),
             nn.BatchNorm2D(self.inplanes // 2),
             nn.ReLU(),
@@ -132,12 +131,8 @@ class RedNet(resnet.ResNet):
                     kernel_size=3,
                     stride=1,
                     padding=1,
-                    bias_attr=False
-                )),
-                ('bn', nn.BatchNorm2D(self.inplanes)),
-                ('activate', nn.ReLU())
-            )
-        )
+                    bias_attr=False)), ('bn', nn.BatchNorm2D(self.inplanes)),
+                ('activate', nn.ReLU())))
 
         self.layer1 = self._make_layer(block, 64, layers[0])
         self.layer2 = self._make_layer(block, 128, layers[1], stride=2)
@@ -156,7 +151,7 @@ class RedNet(resnet.ResNet):
         if self.with_pool:
             x = self.avgpool(x)
 
-        if self.class_dim > 0:
+        if self.class_num > 0:
             x = paddle.flatten(x, 1)
             x = self.fc(x)
 

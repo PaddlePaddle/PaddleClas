@@ -29,12 +29,18 @@ import math
 
 from ppcls.utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
 
-MODEL_URLS = {"DPN68": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DPN68_pretrained.pdparams",
-              "DPN92": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DPN92_pretrained.pdparams",
-              "DPN98": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DPN98_pretrained.pdparams",
-              "DPN107": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DPN107_pretrained.pdparams",
-              "DPN131": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DPN131_pretrained.pdparams",
-             }
+MODEL_URLS = {
+    "DPN68":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DPN68_pretrained.pdparams",
+    "DPN92":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DPN92_pretrained.pdparams",
+    "DPN98":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DPN98_pretrained.pdparams",
+    "DPN107":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DPN107_pretrained.pdparams",
+    "DPN131":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DPN131_pretrained.pdparams",
+}
 
 __all__ = list(MODEL_URLS.keys())
 
@@ -211,10 +217,10 @@ class DualPathFactory(nn.Layer):
 
 
 class DPN(nn.Layer):
-    def __init__(self, layers=68, class_dim=1000):
+    def __init__(self, layers=68, class_num=1000):
         super(DPN, self).__init__()
 
-        self._class_dim = class_dim
+        self._class_num = class_num
 
         args = self.get_net_args(layers)
         bws = args['bw']
@@ -309,7 +315,7 @@ class DPN(nn.Layer):
 
         self.out = Linear(
             out_channel,
-            class_dim,
+            class_num,
             weight_attr=ParamAttr(
                 initializer=Uniform(-stdv, stdv), name="fc_weights"),
             bias_attr=ParamAttr(name="fc_offset"))
@@ -400,7 +406,8 @@ class DPN(nn.Layer):
         net_arg['init_padding'] = init_padding
 
         return net_arg
-    
+
+
 def _load_pretrained(pretrained, model, model_url, use_ssld=False):
     if pretrained is False:
         pass
@@ -411,7 +418,7 @@ def _load_pretrained(pretrained, model, model_url, use_ssld=False):
     else:
         raise RuntimeError(
             "pretrained type is not available. Please use `string` or `boolean` type."
-        )  
+        )
 
 
 def DPN68(pretrained=False, use_ssld=False, **kwargs):

@@ -19,15 +19,23 @@ from .vision_transformer import VisionTransformer, Identity, trunc_normal_, zero
 from ppcls.utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
 
 MODEL_URLS = {
-              "DeiT_tiny_patch16_224": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DeiT_tiny_patch16_224_pretrained.pdparams",
-              "DeiT_small_patch16_224": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DeiT_small_patch16_224_pretrained.pdparams",
-              "DeiT_base_patch16_224": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DeiT_base_patch16_224_pretrained.pdparams",
-              "DeiT_tiny_distilled_patch16_224": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DeiT_tiny_distilled_patch16_224_pretrained.pdparams",
-              "DeiT_small_distilled_patch16_224": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DeiT_small_distilled_patch16_224_pretrained.pdparams",
-              "DeiT_base_distilled_patch16_224": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DeiT_base_distilled_patch16_224_pretrained.pdparams", 
-              "DeiT_base_patch16_384": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DeiT_base_patch16_384_pretrained.pdparams",
-              "DeiT_base_distilled_patch16_384": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DeiT_base_distilled_patch16_384_pretrained.pdparams",
-             }
+    "DeiT_tiny_patch16_224":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DeiT_tiny_patch16_224_pretrained.pdparams",
+    "DeiT_small_patch16_224":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DeiT_small_patch16_224_pretrained.pdparams",
+    "DeiT_base_patch16_224":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DeiT_base_patch16_224_pretrained.pdparams",
+    "DeiT_tiny_distilled_patch16_224":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DeiT_tiny_distilled_patch16_224_pretrained.pdparams",
+    "DeiT_small_distilled_patch16_224":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DeiT_small_distilled_patch16_224_pretrained.pdparams",
+    "DeiT_base_distilled_patch16_224":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DeiT_base_distilled_patch16_224_pretrained.pdparams",
+    "DeiT_base_patch16_384":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DeiT_base_patch16_384_pretrained.pdparams",
+    "DeiT_base_distilled_patch16_384":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DeiT_base_distilled_patch16_384_pretrained.pdparams",
+}
 
 __all__ = list(MODEL_URLS.keys())
 
@@ -36,7 +44,7 @@ class DistilledVisionTransformer(VisionTransformer):
     def __init__(self,
                  img_size=224,
                  patch_size=16,
-                 class_dim=1000,
+                 class_num=1000,
                  embed_dim=768,
                  depth=12,
                  num_heads=12,
@@ -48,7 +56,7 @@ class DistilledVisionTransformer(VisionTransformer):
         super().__init__(
             img_size=img_size,
             patch_size=patch_size,
-            class_dim=class_dim,
+            class_num=class_num,
             embed_dim=embed_dim,
             depth=depth,
             num_heads=num_heads,
@@ -68,7 +76,7 @@ class DistilledVisionTransformer(VisionTransformer):
 
         self.head_dist = nn.Linear(
             self.embed_dim,
-            self.class_dim) if self.class_dim > 0 else Identity()
+            self.class_num) if self.class_num > 0 else Identity()
 
         trunc_normal_(self.dist_token)
         trunc_normal_(self.pos_embed)
@@ -109,7 +117,7 @@ def _load_pretrained(pretrained, model, model_url, use_ssld=False):
         raise RuntimeError(
             "pretrained type is not available. Please use `string` or `boolean` type."
         )
-        
+
 
 def DeiT_tiny_patch16_224(pretrained=False, use_ssld=False, **kwargs):
     model = VisionTransformer(
@@ -121,7 +129,11 @@ def DeiT_tiny_patch16_224(pretrained=False, use_ssld=False, **kwargs):
         qkv_bias=True,
         epsilon=1e-6,
         **kwargs)
-    _load_pretrained(pretrained, model, MODEL_URLS["DeiT_tiny_patch16_224"], use_ssld=use_ssld)
+    _load_pretrained(
+        pretrained,
+        model,
+        MODEL_URLS["DeiT_tiny_patch16_224"],
+        use_ssld=use_ssld)
     return model
 
 
@@ -135,7 +147,11 @@ def DeiT_small_patch16_224(pretrained=False, use_ssld=False, **kwargs):
         qkv_bias=True,
         epsilon=1e-6,
         **kwargs)
-    _load_pretrained(pretrained, model, MODEL_URLS["DeiT_small_patch16_224"], use_ssld=use_ssld)
+    _load_pretrained(
+        pretrained,
+        model,
+        MODEL_URLS["DeiT_small_patch16_224"],
+        use_ssld=use_ssld)
     return model
 
 
@@ -149,11 +165,16 @@ def DeiT_base_patch16_224(pretrained=False, use_ssld=False, **kwargs):
         qkv_bias=True,
         epsilon=1e-6,
         **kwargs)
-    _load_pretrained(pretrained, model, MODEL_URLS["DeiT_base_patch16_224"], use_ssld=use_ssld)
+    _load_pretrained(
+        pretrained,
+        model,
+        MODEL_URLS["DeiT_base_patch16_224"],
+        use_ssld=use_ssld)
     return model
 
 
-def DeiT_tiny_distilled_patch16_224(pretrained=False, use_ssld=False, **kwargs):
+def DeiT_tiny_distilled_patch16_224(pretrained=False, use_ssld=False,
+                                    **kwargs):
     model = DistilledVisionTransformer(
         patch_size=16,
         embed_dim=192,
@@ -163,11 +184,17 @@ def DeiT_tiny_distilled_patch16_224(pretrained=False, use_ssld=False, **kwargs):
         qkv_bias=True,
         epsilon=1e-6,
         **kwargs)
-    _load_pretrained(pretrained, model, MODEL_URLS["DeiT_tiny_distilled_patch16_224"], use_ssld=use_ssld)
+    _load_pretrained(
+        pretrained,
+        model,
+        MODEL_URLS["DeiT_tiny_distilled_patch16_224"],
+        use_ssld=use_ssld)
     return model
 
 
-def DeiT_small_distilled_patch16_224(pretrained=False, use_ssld=False, **kwargs):
+def DeiT_small_distilled_patch16_224(pretrained=False,
+                                     use_ssld=False,
+                                     **kwargs):
     model = DistilledVisionTransformer(
         patch_size=16,
         embed_dim=384,
@@ -177,11 +204,16 @@ def DeiT_small_distilled_patch16_224(pretrained=False, use_ssld=False, **kwargs)
         qkv_bias=True,
         epsilon=1e-6,
         **kwargs)
-    _load_pretrained(pretrained, model, MODEL_URLS["DeiT_small_distilled_patch16_224"], use_ssld=use_ssld)
+    _load_pretrained(
+        pretrained,
+        model,
+        MODEL_URLS["DeiT_small_distilled_patch16_224"],
+        use_ssld=use_ssld)
     return model
 
 
-def DeiT_base_distilled_patch16_224(pretrained=False, use_ssld=False, **kwargs):
+def DeiT_base_distilled_patch16_224(pretrained=False, use_ssld=False,
+                                    **kwargs):
     model = DistilledVisionTransformer(
         patch_size=16,
         embed_dim=768,
@@ -191,7 +223,11 @@ def DeiT_base_distilled_patch16_224(pretrained=False, use_ssld=False, **kwargs):
         qkv_bias=True,
         epsilon=1e-6,
         **kwargs)
-    _load_pretrained(pretrained, model, MODEL_URLS["DeiT_base_distilled_patch16_224"], use_ssld=use_ssld)
+    _load_pretrained(
+        pretrained,
+        model,
+        MODEL_URLS["DeiT_base_distilled_patch16_224"],
+        use_ssld=use_ssld)
     return model
 
 
@@ -206,11 +242,16 @@ def DeiT_base_patch16_384(pretrained=False, use_ssld=False, **kwargs):
         qkv_bias=True,
         epsilon=1e-6,
         **kwargs)
-    _load_pretrained(pretrained, model, MODEL_URLS["DeiT_base_patch16_384"], use_ssld=use_ssld)
+    _load_pretrained(
+        pretrained,
+        model,
+        MODEL_URLS["DeiT_base_patch16_384"],
+        use_ssld=use_ssld)
     return model
 
 
-def DeiT_base_distilled_patch16_384(pretrained=False, use_ssld=False, **kwargs):
+def DeiT_base_distilled_patch16_384(pretrained=False, use_ssld=False,
+                                    **kwargs):
     model = DistilledVisionTransformer(
         img_size=384,
         patch_size=16,
@@ -221,5 +262,9 @@ def DeiT_base_distilled_patch16_384(pretrained=False, use_ssld=False, **kwargs):
         qkv_bias=True,
         epsilon=1e-6,
         **kwargs)
-    _load_pretrained(pretrained, model, MODEL_URLS["DeiT_base_distilled_patch16_384"], use_ssld=use_ssld)
+    _load_pretrained(
+        pretrained,
+        model,
+        MODEL_URLS["DeiT_base_distilled_patch16_384"],
+        use_ssld=use_ssld)
     return model
