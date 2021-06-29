@@ -22,7 +22,7 @@ from paddle.nn import AdaptiveAvgPool2D, MaxPool2D, AvgPool2D
 from ppcls.utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
 
 MODEL_URLS = {"Xception41_deeplab": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/Xception41_deeplab_pretrained.pdparams",
-             "Xception65_deeplab": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/Xception41_deeplab_pretrained.pdparams"}
+             "Xception65_deeplab": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/Xception65_deeplab_pretrained.pdparams"}
 
 __all__ = list(MODEL_URLS.keys())
 
