@@ -210,7 +210,7 @@ python tools/infer/predict.py \
 
 
 - Transformer series
-  - Swin-transformer series<sup>[[27](#ref27)]</sup>([论文地址](https://arxiv.org/pdf/2103.14030.pdf))
+  - Swin-transformer series<sup>[[27](#ref27)]</sup>([paper link](https://arxiv.org/pdf/2103.14030.pdf))
     - [SwinTransformer_tiny_patch4_window7_224](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/SwinTransformer_tiny_patch4_window7_224_pretrained.pdparams)
     - [SwinTransformer_small_patch4_window7_224](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/SwinTransformer_small_patch4_window7_224_pretrained.pdparams)
     - [SwinTransformer_base_patch4_window7_224](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/SwinTransformer_base_patch4_window7_224_pretrained.pdparams)
