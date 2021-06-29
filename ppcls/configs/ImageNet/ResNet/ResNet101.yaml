@@ -17,9 +17,9 @@ Global:
   to_static: False
 
 # model architecture
-  class_num: 1000
 Arch:
   name: ResNet101
+  class_num: 1000
  
 # loss function config for traing/eval process
 Loss:
