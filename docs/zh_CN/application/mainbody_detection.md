@@ -64,15 +64,13 @@ pip install -r requirements.txt
 
 ### 3.2 数据准备
 
-对于自定义数据集，首先需要将自己的数据集修改为COCO格式，可以参考该[自定义检测数据集教程](https://github.com/PaddlePaddle/PaddleDetection/blob/release/2.1/static/docs/tutorials/Custom_DataSet.md)制作COCO格式的数据集。
+对于自定义数据集，首先需要将自己的数据集修改为COCO格式，可以参考[自定义检测数据集教程](https://github.com/PaddlePaddle/PaddleDetection/blob/release/2.1/static/docs/tutorials/Custom_DataSet.md)制作COCO格式的数据集。
 
-主体检测任务中，所有的检测框均属于前景，在这里需要将标注文件中，检测框的`category_id`修改为1，同时将整个系统中的`categories`映射表修改为下面的格式，即整个类别映射表中只包含`前景`类别。
+主体检测任务中，所有的检测框均属于前景，在这里需要将标注文件中，检测框的`category_id`修改为1，同时将整个标注文件中的`categories`映射表修改为下面的格式，即整个类别映射表中只包含`前景`类别。
 
 ```json
 [{u'id': 1, u'name': u'foreground', u'supercategory': u'foreground'}]
 ```
-
-<a name="配置文件改动和说明"></a>
 
 ### 3.3 配置文件改动和说明
 
