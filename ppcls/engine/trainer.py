@@ -176,7 +176,9 @@ class Trainer(object):
                 global_step += 1
                 # image input
                 if self.amp:
-                    with paddle.amp.auto_cast():
+                    with paddle.amp.auto_cast(custom_black_list={
+                            "flatten_contiguous_range", "greater_than"
+                    }):
                         out = self.forward(batch)
                         loss_dict = self.train_loss_func(out, batch[1])
                 else:
