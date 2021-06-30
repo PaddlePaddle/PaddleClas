@@ -63,6 +63,8 @@ class ExportModel(nn.Layer):
 
     def forward(self, x):
         x = self.base_model(x)
+        if isinstance(x, list):
+            x = x[0]
         if self.infer_model_name is not None:
             x = x[self.infer_model_name]
         if self.infer_output_key is not None:
@@ -76,7 +78,6 @@ if __name__ == "__main__":
     args = config.parse_args()
     config = config.get_config(
         args.config, overrides=args.override, show=False)
-
     log_file = os.path.join(config['Global']['output_dir'],
                             config["Arch"]["name"], "export.log")
     init_logger(name='root', log_file=log_file)
@@ -86,7 +87,6 @@ if __name__ == "__main__":
     assert config["Global"]["device"] in ["cpu", "gpu", "xpu"]
     device = paddle.set_device(config["Global"]["device"])
     model = ExportModel(config["Arch"])
-
     if config["Global"]["pretrained_model"] is not None:
         load_dygraph_pretrain(model.base_model,
                               config["Global"]["pretrained_model"])

@@ -574,6 +574,8 @@ class Trainer(object):
             if len(batch_data) >= batch_size or idx == len(image_list) - 1:
                 batch_tensor = paddle.to_tensor(batch_data)
                 out = self.model(batch_tensor)
+                if isinstance(out, list):
+                    out = out[0]
                 result = postprocess_func(out, image_file_list)
                 print(result)
                 batch_data.clear()
