@@ -40,8 +40,7 @@ In order to reduce the complexity of calculating feature distance in inference, 
 
 ### 1.4 Metric Learning Losses
 
-- In vehicle ReID，[SupConLoss](../../../ppcls/loss/supconloss.py) , [ArcLoss](../../../ppcls/arch/gears/arcmargin.py) are used. The weight ratio of two losses is 1:1.
-- In vehicle fine-grained classification, [TtripLet Loss](../../../ppcls/loss/triplet.py), [ArcLoss](../../../ppcls/arch/gears/arcmargin.py) are used. The weight ratio of two losses is 1:1.
+In vehicle ReID and vehicle fine-grained classification，[SupConLoss](../../../ppcls/loss/supconloss.py) , [ArcLoss](../../../ppcls/arch/gears/arcmargin.py) are used. The weight ratio of two losses is 1:1.
 
 ## 2 Experiment
 
@@ -74,13 +73,13 @@ The images in the dataset mainly come from the network and monitoring  data. The
 
  It is worth noting that this dataset needs to generate labels  according to its own needs. For example, in this demo, vehicles of the  same model produced in different years are regarded as the same  category. Therefore, the total number of categories is 431.
 
-|           **Methods**           | Top1 Acc  |
-| :-----------------------------: | :-------: |
-|        ResNet101-swp[6]         |   97.6%   |
-|      Fine-Tuning DARTS[7]       |   95.9%   |
-|       Resnet50 + COOC[8]        |   95.6%   |
-|             A3M[9]              |   95.4%   |
-| PaddleClas  baseline (ResNet50) | **97.1**% |
+|           **Methods**           |  Top1 Acc  |
+| :-----------------------------: | :--------: |
+|        ResNet101-swp[6]         |   97.6%    |
+|      Fine-Tuning DARTS[7]       |   95.9%    |
+|       Resnet50 + COOC[8]        |   95.6%    |
+|             A3M[9]              |   95.4%    |
+| PaddleClas  baseline (ResNet50) | **97.36**% |
 
 ## 3 References
 

@@ -4,7 +4,6 @@ Global:
   pretrained_model: null
   output_dir: "./output/"
   device: "gpu"
-  class_num: 431
   save_interval: 1
   eval_during_train: True
   eval_interval: 1
@@ -41,9 +40,9 @@ Loss:
   Train:
     - CELoss:
         weight: 1.0
-    - TripletLossV2:
+    - SupConLoss:
         weight: 1.0
-        margin: 0.5
+        views: 2
   Eval:
     - CELoss:
         weight: 1.0

@@ -25,16 +25,21 @@ from .vision_transformer import Block as ViTBlock
 from ppcls.utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
 
 MODEL_URLS = {
-              "pcpvt_small": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/pcpvt_small_pretrained.pdparams",
-              "pcpvt_base": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/pcpvt_base_pretrained.pdparams",
-              "pcpvt_large": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/pcpvt_large_pretrained.pdparams",
-              "alt_gvt_small": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/alt_gvt_small_pretrained.pdparams",
-              "alt_gvt_base": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/alt_gvt_base_pretrained.pdparams",
-              "alt_gvt_large": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/alt_gvt_large_pretrained.pdparams"
-             }
+    "pcpvt_small":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/pcpvt_small_pretrained.pdparams",
+    "pcpvt_base":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/pcpvt_base_pretrained.pdparams",
+    "pcpvt_large":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/pcpvt_large_pretrained.pdparams",
+    "alt_gvt_small":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/alt_gvt_small_pretrained.pdparams",
+    "alt_gvt_base":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/alt_gvt_base_pretrained.pdparams",
+    "alt_gvt_large":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/alt_gvt_large_pretrained.pdparams"
+}
 
 __all__ = list(MODEL_URLS.keys())
-
 
 
 class GroupAttention(nn.Layer):
@@ -522,7 +527,7 @@ class ALTGVT(PCPVT):
                  img_size=224,
                  patch_size=4,
                  in_chans=3,
-                 class_dim=1000,
+                 class_num=1000,
                  embed_dims=[64, 128, 256],
                  num_heads=[1, 2, 4],
                  mlp_ratios=[4, 4, 4],
@@ -536,7 +541,7 @@ class ALTGVT(PCPVT):
                  sr_ratios=[4, 2, 1],
                  block_cls=GroupBlock,
                  wss=[7, 7, 7]):
-        super().__init__(img_size, patch_size, in_chans, class_dim, embed_dims,
+        super().__init__(img_size, patch_size, in_chans, class_num, embed_dims,
                          num_heads, mlp_ratios, qkv_bias, qk_scale, drop_rate,
                          attn_drop_rate, drop_path_rate, norm_layer, depths,
                          sr_ratios, block_cls)
@@ -568,6 +573,7 @@ class ALTGVT(PCPVT):
             cur += depths[k]
         self.apply(self._init_weights)
 
+
 def _load_pretrained(pretrained, model, model_url, use_ssld=False):
     if pretrained is False:
         pass
@@ -593,7 +599,8 @@ def pcpvt_small(pretrained=False, use_ssld=False, **kwargs):
         depths=[3, 4, 6, 3],
         sr_ratios=[8, 4, 2, 1],
         **kwargs)
-    _load_pretrained(pretrained, model, MODEL_URLS["pcpvt_small"], use_ssld=use_ssld)
+    _load_pretrained(
+        pretrained, model, MODEL_URLS["pcpvt_small"], use_ssld=use_ssld)
     return model
 
 
@@ -609,7 +616,8 @@ def pcpvt_base(pretrained=False, use_ssld=False, **kwargs):
         depths=[3, 4, 18, 3],
         sr_ratios=[8, 4, 2, 1],
         **kwargs)
-    _load_pretrained(pretrained, model, MODEL_URLS["pcpvt_base"], use_ssld=use_ssld)
+    _load_pretrained(
+        pretrained, model, MODEL_URLS["pcpvt_base"], use_ssld=use_ssld)
     return model
 
 
@@ -625,7 +633,8 @@ def pcpvt_large(pretrained=False, use_ssld=False, **kwargs):
         depths=[3, 8, 27, 3],
         sr_ratios=[8, 4, 2, 1],
         **kwargs)
-    _load_pretrained(pretrained, model, MODEL_URLS["pcpvt_large"], use_ssld=use_ssld)
+    _load_pretrained(
+        pretrained, model, MODEL_URLS["pcpvt_large"], use_ssld=use_ssld)
     return model
 
 
@@ -642,7 +651,8 @@ def alt_gvt_small(pretrained=False, use_ssld=False, **kwargs):
         wss=[7, 7, 7, 7],
         sr_ratios=[8, 4, 2, 1],
         **kwargs)
-    _load_pretrained(pretrained, model, MODEL_URLS["alt_gvt_small"], use_ssld=use_ssld)
+    _load_pretrained(
+        pretrained, model, MODEL_URLS["alt_gvt_small"], use_ssld=use_ssld)
     return model
 
 
@@ -659,7 +669,8 @@ def alt_gvt_base(pretrained=False, use_ssld=False, **kwargs):
         wss=[7, 7, 7, 7],
         sr_ratios=[8, 4, 2, 1],
         **kwargs)
-    _load_pretrained(pretrained, model, MODEL_URLS["alt_gvt_base"], use_ssld=use_ssld)
+    _load_pretrained(
+        pretrained, model, MODEL_URLS["alt_gvt_base"], use_ssld=use_ssld)
     return model
 
 
@@ -676,5 +687,6 @@ def alt_gvt_large(pretrained=False, use_ssld=False, **kwargs):
         wss=[7, 7, 7, 7],
         sr_ratios=[8, 4, 2, 1],
         **kwargs)
-    _load_pretrained(pretrained, model, MODEL_URLS["alt_gvt_large"], use_ssld=use_ssld)
+    _load_pretrained(
+        pretrained, model, MODEL_URLS["alt_gvt_large"], use_ssld=use_ssld)
     return model

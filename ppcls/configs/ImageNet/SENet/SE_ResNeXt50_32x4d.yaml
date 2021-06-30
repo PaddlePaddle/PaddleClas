@@ -4,7 +4,6 @@ Global:
   pretrained_model: null
   output_dir: ./output/
   device: gpu
-  class_num: 1000
   save_interval: 1
   eval_during_train: True
   eval_interval: 1
@@ -18,6 +17,7 @@ Global:
 # model architecture
 Arch:
   name: SE_ResNeXt50_32x4d
+  class_num: 1000
  
 # loss function config for traing/eval process
 Loss:

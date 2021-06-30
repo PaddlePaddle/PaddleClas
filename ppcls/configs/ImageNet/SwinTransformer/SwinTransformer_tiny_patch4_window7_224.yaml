@@ -4,7 +4,6 @@ Global:
   pretrained_model: null
   output_dir: ./output/
   device: gpu
-  class_num: 1000
   save_interval: 1
   eval_during_train: True
   eval_interval: 1
@@ -20,6 +19,7 @@ Global:
 # model architecture
 Arch:
   name: SwinTransformer_tiny_patch4_window7_224
+  class_num: 1000
  
 # loss function config for traing/eval process
 Loss:

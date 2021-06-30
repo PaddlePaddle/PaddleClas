@@ -10,8 +10,10 @@ import math
 
 from ppcls.utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
 
-MODEL_URLS = {"GoogLeNet": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/GoogLeNet_pretrained.pdparams",
-             }
+MODEL_URLS = {
+    "GoogLeNet":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/GoogLeNet_pretrained.pdparams",
+}
 
 __all__ = list(MODEL_URLS.keys())
 
@@ -101,7 +103,7 @@ class Inception(nn.Layer):
 
 
 class GoogLeNetDY(nn.Layer):
-    def __init__(self, class_dim=1000):
+    def __init__(self, class_num=1000):
         super(GoogLeNetDY, self).__init__()
         self._conv = ConvLayer(3, 64, 7, 2, name="conv1")
         self._pool = MaxPool2D(kernel_size=3, stride=2)
@@ -134,7 +136,7 @@ class GoogLeNetDY(nn.Layer):
         self._drop = Dropout(p=0.4, mode="downscale_in_infer")
         self._fc_out = Linear(
             1024,
-            class_dim,
+            class_num,
             weight_attr=xavier(1024, 1, "out"),
             bias_attr=ParamAttr(name="out_offset"))
         self._pool_o1 = AvgPool2D(kernel_size=5, stride=3)
@@ -147,7 +149,7 @@ class GoogLeNetDY(nn.Layer):
         self._drop_o1 = Dropout(p=0.7, mode="downscale_in_infer")
         self._out1 = Linear(
             1024,
-            class_dim,
+            class_num,
             weight_attr=xavier(1024, 1, "out1"),
             bias_attr=ParamAttr(name="out1_offset"))
         self._pool_o2 = AvgPool2D(kernel_size=5, stride=3)
@@ -160,7 +162,7 @@ class GoogLeNetDY(nn.Layer):
         self._drop_o2 = Dropout(p=0.7, mode="downscale_in_infer")
         self._out2 = Linear(
             1024,
-            class_dim,
+            class_num,
             weight_attr=xavier(1024, 1, "out2"),
             bias_attr=ParamAttr(name="out2_offset"))
 
@@ -205,8 +207,8 @@ class GoogLeNetDY(nn.Layer):
         x = self._drop_o2(x)
         out2 = self._out2(x)
         return [out, out1, out2]
-    
-    
+
+
 def _load_pretrained(pretrained, model, model_url, use_ssld=False):
     if pretrained is False:
         pass
@@ -222,5 +224,6 @@ def _load_pretrained(pretrained, model, model_url, use_ssld=False):
 
 def GoogLeNet(pretrained=False, use_ssld=False, **kwargs):
     model = GoogLeNetDY(**kwargs)
-    _load_pretrained(pretrained, model, MODEL_URLS["GoogLeNet"], use_ssld=use_ssld)
+    _load_pretrained(
+        pretrained, model, MODEL_URLS["GoogLeNet"], use_ssld=use_ssld)
     return model

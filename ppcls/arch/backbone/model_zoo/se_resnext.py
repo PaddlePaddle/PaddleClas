@@ -30,11 +30,13 @@ import math
 from ppcls.utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
 
 MODEL_URLS = {
-              "SE_ResNeXt50_32x4d": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/SE_ResNeXt50_32x4d_pretrained.pdparams",
-              "SE_ResNeXt101_32x4d": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/SE_ResNeXt101_32x4d_pretrained.pdparams",
-              "SE_ResNeXt152_64x4d": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/SE_ResNeXt152_64x4d_pretrained.pdparams",
-
-             }
+    "SE_ResNeXt50_32x4d":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/SE_ResNeXt50_32x4d_pretrained.pdparams",
+    "SE_ResNeXt101_32x4d":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/SE_ResNeXt101_32x4d_pretrained.pdparams",
+    "SE_ResNeXt152_64x4d":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/SE_ResNeXt152_64x4d_pretrained.pdparams",
+}
 
 __all__ = list(MODEL_URLS.keys())
 
@@ -148,7 +150,12 @@ class BottleneckBlock(nn.Layer):
 
 
 class SELayer(nn.Layer):
-    def __init__(self, num_channels, num_filters, reduction_ratio, name=None, data_format="NCHW"):
+    def __init__(self,
+                 num_channels,
+                 num_filters,
+                 reduction_ratio,
+                 name=None,
+                 data_format="NCHW"):
         super(SELayer, self).__init__()
 
         self.data_format = data_format
@@ -193,7 +200,12 @@ class SELayer(nn.Layer):
 
 
 class ResNeXt(nn.Layer):
-    def __init__(self, layers=50, class_dim=1000, cardinality=32, input_image_channel=3, data_format="NCHW"):
+    def __init__(self,
+                 layers=50,
+                 class_num=1000,
+                 cardinality=32,
+                 input_image_channel=3,
+                 data_format="NCHW"):
         super(ResNeXt, self).__init__()
 
         self.layers = layers
@@ -254,7 +266,8 @@ class ResNeXt(nn.Layer):
                 name="conv3",
                 data_format=self.data_format)
 
-        self.pool2d_max = MaxPool2D(kernel_size=3, stride=2, padding=1, data_format=self.data_format)
+        self.pool2d_max = MaxPool2D(
+            kernel_size=3, stride=2, padding=1, data_format=self.data_format)
 
         self.block_list = []
         n = 1 if layers == 50 or layers == 101 else 3
@@ -286,13 +299,13 @@ class ResNeXt(nn.Layer):
 
         self.out = Linear(
             self.pool2d_avg_channels,
-            class_dim,
+            class_num,
             weight_attr=ParamAttr(
                 initializer=Uniform(-stdv, stdv), name="fc6_weights"),
             bias_attr=ParamAttr(name="fc6_offset"))
 
     def forward(self, inputs):
-         with paddle.static.amp.fp16_guard():
+        with paddle.static.amp.fp16_guard():
             if self.data_format == "NHWC":
                 inputs = paddle.tensor.transpose(inputs, [0, 2, 3, 1])
                 inputs.stop_gradient = True
@@ -310,7 +323,7 @@ class ResNeXt(nn.Layer):
             y = self.out(y)
             return y
 
-        
+
 def _load_pretrained(pretrained, model, model_url, use_ssld=False):
     if pretrained is False:
         pass
@@ -322,21 +335,30 @@ def _load_pretrained(pretrained, model, model_url, use_ssld=False):
         raise RuntimeError(
             "pretrained type is not available. Please use `string` or `boolean` type."
         )
-        
+
 
 def SE_ResNeXt50_32x4d(pretrained=False, use_ssld=False, **kwargs):
     model = ResNeXt(layers=50, cardinality=32, **kwargs)
-    _load_pretrained(pretrained, model, MODEL_URLS["SE_ResNeXt50_32x4d"], use_ssld=use_ssld)
+    _load_pretrained(
+        pretrained, model, MODEL_URLS["SE_ResNeXt50_32x4d"], use_ssld=use_ssld)
     return model
 
 
 def SE_ResNeXt101_32x4d(pretrained=False, use_ssld=False, **kwargs):
     model = ResNeXt(layers=101, cardinality=32, **kwargs)
-    _load_pretrained(pretrained, model, MODEL_URLS["SE_ResNeXt101_32x4d"], use_ssld=use_ssld)
+    _load_pretrained(
+        pretrained,
+        model,
+        MODEL_URLS["SE_ResNeXt101_32x4d"],
+        use_ssld=use_ssld)
     return model
 
 
 def SE_ResNeXt152_64x4d(pretrained=False, use_ssld=False, **kwargs):
     model = ResNeXt(layers=152, cardinality=64, **kwargs)
-    _load_pretrained(pretrained, model, MODEL_URLS["SE_ResNeXt152_64x4d"], use_ssld=use_ssld)
+    _load_pretrained(
+        pretrained,
+        model,
+        MODEL_URLS["SE_ResNeXt152_64x4d"],
+        use_ssld=use_ssld)
     return model

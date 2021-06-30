@@ -28,12 +28,18 @@ import math
 
 from ppcls.utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
 
-MODEL_URLS = {"DenseNet121": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DenseNet121_pretrained.pdparams",
-              "DenseNet161": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DenseNet161_pretrained.pdparams",
-              "DenseNet169": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DenseNet169_pretrained.pdparams",
-              "DenseNet201": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DenseNet201_pretrained.pdparams",
-              "DenseNet264": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DenseNet264_pretrained.pdparams",
-             }
+MODEL_URLS = {
+    "DenseNet121":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DenseNet121_pretrained.pdparams",
+    "DenseNet161":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DenseNet161_pretrained.pdparams",
+    "DenseNet169":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DenseNet169_pretrained.pdparams",
+    "DenseNet201":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DenseNet201_pretrained.pdparams",
+    "DenseNet264":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DenseNet264_pretrained.pdparams",
+}
 
 __all__ = list(MODEL_URLS.keys())
 
@@ -196,7 +202,7 @@ class ConvBNLayer(nn.Layer):
 
 
 class DenseNet(nn.Layer):
-    def __init__(self, layers=60, bn_size=4, dropout=0, class_dim=1000):
+    def __init__(self, layers=60, bn_size=4, dropout=0, class_num=1000):
         super(DenseNet, self).__init__()
 
         supported_layers = [121, 161, 169, 201, 264]
@@ -269,7 +275,7 @@ class DenseNet(nn.Layer):
 
         self.out = Linear(
             num_features,
-            class_dim,
+            class_num,
             weight_attr=ParamAttr(
                 initializer=Uniform(-stdv, stdv), name="fc_weights"),
             bias_attr=ParamAttr(name="fc_offset"))
@@ -289,6 +295,7 @@ class DenseNet(nn.Layer):
         y = self.out(y)
         return y
 
+
 def _load_pretrained(pretrained, model, model_url, use_ssld=False):
     if pretrained is False:
         pass
@@ -301,31 +308,37 @@ def _load_pretrained(pretrained, model, model_url, use_ssld=False):
             "pretrained type is not available. Please use `string` or `boolean` type."
         )
 
+
 def DenseNet121(pretrained=False, use_ssld=False, **kwargs):
     model = DenseNet(layers=121, **kwargs)
-    _load_pretrained(pretrained, model, MODEL_URLS["DenseNet121"], use_ssld=use_ssld)
+    _load_pretrained(
+        pretrained, model, MODEL_URLS["DenseNet121"], use_ssld=use_ssld)
     return model
 
 
 def DenseNet161(pretrained=False, use_ssld=False, **kwargs):
     model = DenseNet(layers=161, **kwargs)
-    _load_pretrained(pretrained, model, MODEL_URLS["DenseNet161"], use_ssld=use_ssld)
+    _load_pretrained(
+        pretrained, model, MODEL_URLS["DenseNet161"], use_ssld=use_ssld)
     return model
 
 
 def DenseNet169(pretrained=False, use_ssld=False, **kwargs):
     model = DenseNet(layers=169, **kwargs)
-    _load_pretrained(pretrained, model, MODEL_URLS["DenseNet169"], use_ssld=use_ssld)
+    _load_pretrained(
+        pretrained, model, MODEL_URLS["DenseNet169"], use_ssld=use_ssld)
     return model
 
 
 def DenseNet201(pretrained=False, use_ssld=False, **kwargs):
     model = DenseNet(layers=201, **kwargs)
-    _load_pretrained(pretrained, model, MODEL_URLS["DenseNet201"], use_ssld=use_ssld)
+    _load_pretrained(
+        pretrained, model, MODEL_URLS["DenseNet201"], use_ssld=use_ssld)
     return model
 
 
 def DenseNet264(pretrained=False, use_ssld=False, **kwargs):
     model = DenseNet(layers=264, **kwargs)
-    _load_pretrained(pretrained, model, MODEL_URLS["DenseNet264"], use_ssld=use_ssld)
+    _load_pretrained(
+        pretrained, model, MODEL_URLS["DenseNet264"], use_ssld=use_ssld)
     return model

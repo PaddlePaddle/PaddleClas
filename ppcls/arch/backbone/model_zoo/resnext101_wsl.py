@@ -9,15 +9,17 @@ from paddle.nn.initializer import Uniform
 from ppcls.utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
 
 MODEL_URLS = {
-              "ResNeXt101_32x8d_wsl": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ResNeXt101_32x8d_wsl_pretrained.pdparams",
-              "ResNeXt101_32x16d_wsl": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ResNeXt101_32x816_wsl_pretrained.pdparams",
-              "ResNeXt101_32x32d_wsl": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ResNeXt101_32x32d_wsl_pretrained.pdparams",
-              "ResNeXt101_32x48d_wsl": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ResNeXt101_32x48d_wsl_pretrained.pdparams",
-
-             }
+    "ResNeXt101_32x8d_wsl":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ResNeXt101_32x8d_wsl_pretrained.pdparams",
+    "ResNeXt101_32x16d_wsl":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ResNeXt101_32x816_wsl_pretrained.pdparams",
+    "ResNeXt101_32x32d_wsl":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ResNeXt101_32x32d_wsl_pretrained.pdparams",
+    "ResNeXt101_32x48d_wsl":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ResNeXt101_32x48d_wsl_pretrained.pdparams",
+}
 
 __all__ = list(MODEL_URLS.keys())
-
 
 
 class ConvBNLayer(nn.Layer):
@@ -128,10 +130,10 @@ class BottleneckBlock(nn.Layer):
 
 
 class ResNeXt101WSL(nn.Layer):
-    def __init__(self, layers=101, cardinality=32, width=48, class_dim=1000):
+    def __init__(self, layers=101, cardinality=32, width=48, class_num=1000):
         super(ResNeXt101WSL, self).__init__()
 
-        self.class_dim = class_dim
+        self.class_num = class_num
 
         self.layers = layers
         self.cardinality = cardinality
@@ -384,7 +386,7 @@ class ResNeXt101WSL(nn.Layer):
         self._avg_pool = AdaptiveAvgPool2D(1)
         self._out = Linear(
             num_filters[3] // (width // 8),
-            class_dim,
+            class_num,
             weight_attr=ParamAttr(name="fc.weight"),
             bias_attr=ParamAttr(name="fc.bias"))
 
@@ -434,7 +436,7 @@ class ResNeXt101WSL(nn.Layer):
         x = self._out(x)
         return x
 
-    
+
 def _load_pretrained(pretrained, model, model_url, use_ssld=False):
     if pretrained is False:
         pass
@@ -450,23 +452,39 @@ def _load_pretrained(pretrained, model, model_url, use_ssld=False):
 
 def ResNeXt101_32x8d_wsl(pretrained=False, use_ssld=False, **kwargs):
     model = ResNeXt101WSL(cardinality=32, width=8, **kwargs)
-    _load_pretrained(pretrained, model, MODEL_URLS["ResNeXt101_32x8d_wsl"], use_ssld=use_ssld)
+    _load_pretrained(
+        pretrained,
+        model,
+        MODEL_URLS["ResNeXt101_32x8d_wsl"],
+        use_ssld=use_ssld)
     return model
 
 
 def ResNeXt101_32x16d_wsl(**args):
     model = ResNeXt101WSL(cardinality=32, width=16, **kwargs)
-    _load_pretrained(pretrained, model, MODEL_URLS["ResNeXt101_32x16d_ws"], use_ssld=use_ssld)
+    _load_pretrained(
+        pretrained,
+        model,
+        MODEL_URLS["ResNeXt101_32x16d_ws"],
+        use_ssld=use_ssld)
     return model
 
 
 def ResNeXt101_32x32d_wsl(**args):
     model = ResNeXt101WSL(cardinality=32, width=32, **kwargs)
-    _load_pretrained(pretrained, model, MODEL_URLS["ResNeXt101_32x32d_wsl"], use_ssld=use_ssld)
+    _load_pretrained(
+        pretrained,
+        model,
+        MODEL_URLS["ResNeXt101_32x32d_wsl"],
+        use_ssld=use_ssld)
     return model
 
 
 def ResNeXt101_32x48d_wsl(**args):
     model = ResNeXt101WSL(cardinality=32, width=48, **kwargs)
-    _load_pretrained(pretrained, model, MODEL_URLS["ResNeXt101_32x48d_wsl"], use_ssld=use_ssld)
+    _load_pretrained(
+        pretrained,
+        model,
+        MODEL_URLS["ResNeXt101_32x48d_wsl"],
+        use_ssld=use_ssld)
     return model

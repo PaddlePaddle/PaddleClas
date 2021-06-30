@@ -27,12 +27,17 @@ from .vision_transformer import trunc_normal_, zeros_, ones_, Identity
 from ppcls.utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
 
 MODEL_URLS = {
-              "LeViT_128S": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/LeViT_128S_pretrained.pdparams",
-              "LeViT_128": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/LeViT_128_pretrained.pdparams",
-              "LeViT_192": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/LeViT_192_pretrained.pdparams",
-              "LeViT_256": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/LeViT_256_pretrained.pdparams",
-              "LeViT_384": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/LeViT_384_pretrained.pdparams",
-             }
+    "LeViT_128S":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/LeViT_128S_pretrained.pdparams",
+    "LeViT_128":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/LeViT_128_pretrained.pdparams",
+    "LeViT_192":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/LeViT_192_pretrained.pdparams",
+    "LeViT_256":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/LeViT_256_pretrained.pdparams",
+    "LeViT_384":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/LeViT_384_pretrained.pdparams",
+}
 
 __all__ = list(MODEL_URLS.keys())
 
@@ -326,7 +331,7 @@ class LeViT(nn.Layer):
                  img_size=224,
                  patch_size=16,
                  in_chans=3,
-                 class_dim=1000,
+                 class_num=1000,
                  embed_dim=[192],
                  key_dim=[64],
                  depth=[12],
@@ -341,7 +346,7 @@ class LeViT(nn.Layer):
                  drop_path=0):
         super().__init__()
 
-        self.class_dim = class_dim
+        self.class_num = class_num
         self.num_features = embed_dim[-1]
         self.embed_dim = embed_dim
         self.distillation = distillation
@@ -403,10 +408,10 @@ class LeViT(nn.Layer):
 
         # Classifier head
         self.head = BN_Linear(embed_dim[-1],
-                              class_dim) if class_dim > 0 else Identity()
+                              class_num) if class_num > 0 else Identity()
         if distillation:
             self.head_dist = BN_Linear(
-                embed_dim[-1], class_dim) if class_dim > 0 else Identity()
+                embed_dim[-1], class_num) if class_num > 0 else Identity()
 
     def forward(self, x):
         x = self.patch_embed(x)
@@ -423,7 +428,7 @@ class LeViT(nn.Layer):
         return x
 
 
-def model_factory(C, D, X, N, drop_path, class_dim, distillation):
+def model_factory(C, D, X, N, drop_path, class_num, distillation):
     embed_dim = [int(x) for x in C.split('_')]
     num_heads = [int(x) for x in N.split('_')]
     depth = [int(x) for x in X.split('_')]
@@ -444,7 +449,7 @@ def model_factory(C, D, X, N, drop_path, class_dim, distillation):
         attention_activation=act,
         mlp_activation=act,
         hybrid_backbone=b16(embed_dim[0], activation=act),
-        class_dim=class_dim,
+        class_num=class_num,
         drop_path=drop_path,
         distillation=distillation)
 
@@ -489,6 +494,7 @@ specification = {
     },
 }
 
+
 def _load_pretrained(pretrained, model, model_url, use_ssld=False):
     if pretrained is False:
         pass
@@ -502,46 +508,71 @@ def _load_pretrained(pretrained, model, model_url, use_ssld=False):
         )
 
 
-def LeViT_128S(pretrained=False, use_ssld=False, class_dim=1000, distillation=False, **kwargs):
+def LeViT_128S(pretrained=False,
+               use_ssld=False,
+               class_num=1000,
+               distillation=False,
+               **kwargs):
     model = model_factory(
         **specification['LeViT_128S'],
-        class_dim=class_dim,
+        class_num=class_num,
         distillation=distillation)
-    _load_pretrained(pretrained, model, MODEL_URLS["LeViT_128S"], use_ssld=use_ssld)
+    _load_pretrained(
+        pretrained, model, MODEL_URLS["LeViT_128S"], use_ssld=use_ssld)
     return model
 
 
-def LeViT_128(pretrained=False, use_ssld=False, class_dim=1000, distillation=False, **kwargs):
+def LeViT_128(pretrained=False,
+              use_ssld=False,
+              class_num=1000,
+              distillation=False,
+              **kwargs):
     model = model_factory(
         **specification['LeViT_128'],
-        class_dim=class_dim,
+        class_num=class_num,
         distillation=distillation)
-    _load_pretrained(pretrained, model, MODEL_URLS["LeViT_128"], use_ssld=use_ssld)
+    _load_pretrained(
+        pretrained, model, MODEL_URLS["LeViT_128"], use_ssld=use_ssld)
     return model
 
 
-def LeViT_192(pretrained=False, use_ssld=False, class_dim=1000, distillation=False, **kwargs):
+def LeViT_192(pretrained=False,
+              use_ssld=False,
+              class_num=1000,
+              distillation=False,
+              **kwargs):
     model = model_factory(
         **specification['LeViT_192'],
-        class_dim=class_dim,
+        class_num=class_num,
         distillation=distillation)
-    _load_pretrained(pretrained, model, MODEL_URLS["LeViT_192"], use_ssld=use_ssld)
+    _load_pretrained(
+        pretrained, model, MODEL_URLS["LeViT_192"], use_ssld=use_ssld)
     return model
 
 
-def LeViT_256(pretrained=False, use_ssld=False, class_dim=1000, distillation=False, **kwargs):
+def LeViT_256(pretrained=False,
+              use_ssld=False,
+              class_num=1000,
+              distillation=False,
+              **kwargs):
     model = model_factory(
         **specification['LeViT_256'],
-        class_dim=class_dim,
+        class_num=class_num,
         distillation=distillation)
-    _load_pretrained(pretrained, model, MODEL_URLS["LeViT_256"], use_ssld=use_ssld)
+    _load_pretrained(
+        pretrained, model, MODEL_URLS["LeViT_256"], use_ssld=use_ssld)
     return model
 
 
-def LeViT_384(pretrained=False, use_ssld=False, class_dim=1000, distillation=False, **kwargs):
+def LeViT_384(pretrained=False,
+              use_ssld=False,
+              class_num=1000,
+              distillation=False,
+              **kwargs):
     model = model_factory(
         **specification['LeViT_384'],
-        class_dim=class_dim,
+        class_num=class_num,
         distillation=distillation)
-    _load_pretrained(pretrained, model, MODEL_URLS["LeViT_384"], use_ssld=use_ssld)
+    _load_pretrained(
+        pretrained, model, MODEL_URLS["LeViT_384"], use_ssld=use_ssld)
     return model

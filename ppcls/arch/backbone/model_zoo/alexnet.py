@@ -23,9 +23,13 @@ import math
 
 from ppcls.utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
 
-MODEL_URLS = {"AlexNet": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/AlexNet_pretrained.pdparams"}
+MODEL_URLS = {
+    "AlexNet":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/AlexNet_pretrained.pdparams"
+}
 
 __all__ = list(MODEL_URLS.keys())
+
 
 class ConvPoolLayer(nn.Layer):
     def __init__(self,
@@ -64,7 +68,7 @@ class ConvPoolLayer(nn.Layer):
 
 
 class AlexNetDY(nn.Layer):
-    def __init__(self, class_dim=1000):
+    def __init__(self, class_num=1000):
         super(AlexNetDY, self).__init__()
 
         stdv = 1.0 / math.sqrt(3 * 11 * 11)
@@ -119,7 +123,7 @@ class AlexNetDY(nn.Layer):
                 name="fc7_offset", initializer=Uniform(-stdv, stdv)))
         self._fc8 = Linear(
             in_features=4096,
-            out_features=class_dim,
+            out_features=class_num,
             weight_attr=ParamAttr(
                 name="fc8_weights", initializer=Uniform(-stdv, stdv)),
             bias_attr=ParamAttr(
@@ -143,6 +147,7 @@ class AlexNetDY(nn.Layer):
         x = self._fc8(x)
         return x
 
+
 def _load_pretrained(pretrained, model, model_url, use_ssld=False):
     if pretrained is False:
         pass
@@ -155,7 +160,9 @@ def _load_pretrained(pretrained, model, model_url, use_ssld=False):
             "pretrained type is not available. Please use `string` or `boolean` type."
         )
 
+
 def AlexNet(pretrained=False, use_ssld=False, **kwargs):
     model = AlexNetDY(**kwargs)
-    _load_pretrained(pretrained, model, MODEL_URLS["AlexNet"], use_ssld=use_ssld)
+    _load_pretrained(
+        pretrained, model, MODEL_URLS["AlexNet"], use_ssld=use_ssld)
     return model

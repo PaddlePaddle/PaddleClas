@@ -26,6 +26,7 @@ import argparse
 import paddle
 import paddle.nn as nn
 import paddle.distributed as dist
+from visualdl import LogWriter
 
 from ppcls.utils.check import check_gpu
 from ppcls.utils.misc import AverageMeter
@@ -67,8 +68,6 @@ class Trainer(object):
             dist.init_parallel_env()
 
         if "Head" in self.config["Arch"]:
-            self.config["Arch"]["Head"]["class_num"] = self.config["Global"][
-                "class_num"]
             self.is_rec = True
         else:
             self.is_rec = False
@@ -85,8 +84,7 @@ class Trainer(object):
             self.model = paddle.DataParallel(self.model)
 
         self.vdl_writer = None
-        if self.config['Global']['use_visualdl']:
-            from visualdl import LogWriter
+        if self.config['Global']['use_visualdl'] and mode == "train":
             vdl_writer_path = os.path.join(self.output_dir, "vdl")
             if not os.path.exists(vdl_writer_path):
                 os.makedirs(vdl_writer_path)
@@ -221,6 +219,18 @@ class Trainer(object):
                             "epochs"], iter_id,
                                len(self.train_dataloader), lr_msg, metric_msg,
                                time_msg, ips_msg, eta_msg))
+
+                    logger.scaler(
+                        name="lr",
+                        value=lr_sch.get_lr(),
+                        step=global_step,
+                        writer=self.vdl_writer)
+                    for key in output_info:
+                        logger.scaler(
+                            name="train_{}".format(key),
+                            value=output_info[key].avg,
+                            step=global_step,
+                            writer=self.vdl_writer)
                 tic = time.time()
 
             metric_msg = ", ".join([
@@ -248,6 +258,12 @@ class Trainer(object):
                         prefix="best_model")
                 logger.info("[Eval][Epoch {}][best metric: {}]".format(
                     epoch_id, best_metric["metric"]))
+                logger.scaler(
+                    name="eval_acc",
+                    value=acc,
+                    step=epoch_id,
+                    writer=self.vdl_writer)
+
                 self.model.train()
 
             # save model
@@ -267,6 +283,9 @@ class Trainer(object):
                     self.output_dir,
                     model_name=self.config["Arch"]["name"],
                     prefix="latest")
+
+        if self.vdl_writer is not None:
+            self.vdl_writer.close()
 
     def build_avg_metrics(self, info_dict):
         return {key: AverageMeter(key, '7.5f') for key in info_dict}
@@ -555,6 +574,8 @@ class Trainer(object):
             if len(batch_data) >= batch_size or idx == len(image_list) - 1:
                 batch_tensor = paddle.to_tensor(batch_data)
                 out = self.model(batch_tensor)
+                if isinstance(out, list):
+                    out = out[0]
                 result = postprocess_func(out, image_file_list)
                 print(result)
                 batch_data.clear()

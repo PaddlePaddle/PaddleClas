@@ -21,8 +21,12 @@ from paddle.nn import AdaptiveAvgPool2D, MaxPool2D, AvgPool2D
 
 from ppcls.utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
 
-MODEL_URLS = {"Xception41_deeplab": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/Xception41_deeplab_pretrained.pdparams",
-             "Xception65_deeplab": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/Xception65_deeplab_pretrained.pdparams"}
+MODEL_URLS = {
+    "Xception41_deeplab":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/Xception41_deeplab_pretrained.pdparams",
+    "Xception65_deeplab":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/Xception65_deeplab_pretrained.pdparams"
+}
 
 __all__ = list(MODEL_URLS.keys())
 
@@ -268,7 +272,7 @@ class Xception_Block(nn.Layer):
 
 
 class XceptionDeeplab(nn.Layer):
-    def __init__(self, backbone, class_dim=1000):
+    def __init__(self, backbone, class_num=1000):
         super(XceptionDeeplab, self).__init__()
 
         bottleneck_params = gen_bottleneck_params(backbone)
@@ -370,7 +374,7 @@ class XceptionDeeplab(nn.Layer):
         self._pool = AdaptiveAvgPool2D(1)
         self._fc = Linear(
             self.chns[1][-1],
-            class_dim,
+            class_num,
             weight_attr=ParamAttr(name="fc_weights"),
             bias_attr=ParamAttr(name="fc_bias"))
 
@@ -388,8 +392,8 @@ class XceptionDeeplab(nn.Layer):
         x = paddle.squeeze(x, axis=[2, 3])
         x = self._fc(x)
         return x
-    
-    
+
+
 def _load_pretrained(pretrained, model, model_url, use_ssld=False):
     if pretrained is False:
         pass
@@ -405,11 +409,13 @@ def _load_pretrained(pretrained, model, model_url, use_ssld=False):
 
 def Xception41_deeplab(pretrained=False, use_ssld=False, **kwargs):
     model = XceptionDeeplab('xception_41', **kwargs)
-    _load_pretrained(pretrained, model, MODEL_URLS["Xception41_deeplab"], use_ssld=use_ssld)
+    _load_pretrained(
+        pretrained, model, MODEL_URLS["Xception41_deeplab"], use_ssld=use_ssld)
     return model
 
 
 def Xception65_deeplab(pretrained=False, use_ssld=False, **kwargs):
     model = XceptionDeeplab("xception_65", **kwargs)
-    _load_pretrained(pretrained, model, MODEL_URLS["Xception65_deeplab"], use_ssld=use_ssld)
+    _load_pretrained(
+        pretrained, model, MODEL_URLS["Xception65_deeplab"], use_ssld=use_ssld)
     return model

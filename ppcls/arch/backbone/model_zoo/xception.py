@@ -8,14 +8,16 @@ from paddle.nn.initializer import Uniform
 import math
 import sys
 
-
 from ppcls.utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
 
 MODEL_URLS = {
-              "Xception41": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/Xception41_pretrained.pdparams",
-              "Xception65": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/Xception65_pretrained.pdparams",
-              "Xception71": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/Xception71_pretrained.pdparams"
-             }
+    "Xception41":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/Xception41_pretrained.pdparams",
+    "Xception65":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/Xception65_pretrained.pdparams",
+    "Xception71":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/Xception71_pretrained.pdparams"
+}
 
 __all__ = list(MODEL_URLS.keys())
 
@@ -290,7 +292,7 @@ class ExitFlowBottleneckBlock(nn.Layer):
 
 
 class ExitFlow(nn.Layer):
-    def __init__(self, class_dim):
+    def __init__(self, class_num):
         super(ExitFlow, self).__init__()
 
         name = "exit_flow"
@@ -303,7 +305,7 @@ class ExitFlow(nn.Layer):
         stdv = 1.0 / math.sqrt(2048 * 1.0)
         self._out = Linear(
             2048,
-            class_dim,
+            class_num,
             weight_attr=ParamAttr(
                 name="fc_weights", initializer=Uniform(-stdv, stdv)),
             bias_attr=ParamAttr(name="fc_offset"))
@@ -324,19 +326,20 @@ class Xception(nn.Layer):
     def __init__(self,
                  entry_flow_block_num=3,
                  middle_flow_block_num=8,
-                 class_dim=1000):
+                 class_num=1000):
         super(Xception, self).__init__()
         self.entry_flow_block_num = entry_flow_block_num
         self.middle_flow_block_num = middle_flow_block_num
         self._entry_flow = EntryFlow(entry_flow_block_num)
         self._middle_flow = MiddleFlow(middle_flow_block_num)
-        self._exit_flow = ExitFlow(class_dim)
+        self._exit_flow = ExitFlow(class_num)
 
     def forward(self, inputs):
         x = self._entry_flow(inputs)
         x = self._middle_flow(x)
         x = self._exit_flow(x)
         return x
+
 
 def _load_pretrained(pretrained, model, model_url, use_ssld=False):
     if pretrained is False:
@@ -349,21 +352,26 @@ def _load_pretrained(pretrained, model, model_url, use_ssld=False):
         raise RuntimeError(
             "pretrained type is not available. Please use `string` or `boolean` type."
         )
-        
+
 
 def Xception41(pretrained=False, use_ssld=False, **kwargs):
     model = Xception(entry_flow_block_num=3, middle_flow_block_num=8, **kwargs)
-    _load_pretrained(pretrained, model, MODEL_URLS["Xception41"], use_ssld=use_ssld)
+    _load_pretrained(
+        pretrained, model, MODEL_URLS["Xception41"], use_ssld=use_ssld)
     return model
 
 
 def Xception65(pretrained=False, use_ssld=False, **kwargs):
-    model = Xception(entry_flow_block_num=3, middle_flow_block_num=16, **kwargs)
-    _load_pretrained(pretrained, model, MODEL_URLS["Xception65"], use_ssld=use_ssld)
+    model = Xception(
+        entry_flow_block_num=3, middle_flow_block_num=16, **kwargs)
+    _load_pretrained(
+        pretrained, model, MODEL_URLS["Xception65"], use_ssld=use_ssld)
     return model
 
 
 def Xception71(pretrained=False, use_ssld=False, **kwargs):
-    model = Xception(entry_flow_block_num=5, middle_flow_block_num=16, **kwargs)
-    _load_pretrained(pretrained, model, MODEL_URLS["Xception71"], use_ssld=use_ssld)
+    model = Xception(
+        entry_flow_block_num=5, middle_flow_block_num=16, **kwargs)
+    _load_pretrained(
+        pretrained, model, MODEL_URLS["Xception71"], use_ssld=use_ssld)
     return model

@@ -24,13 +24,19 @@ from .vision_transformer import trunc_normal_, zeros_, ones_, to_2tuple, DropPat
 from ppcls.utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
 
 MODEL_URLS = {
-              "SwinTransformer_tiny_patch4_window7_224": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/SwinTransformer_tiny_patch4_window7_224_pretrained.pdparams",
-              "SwinTransformer_small_patch4_window7_224": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/SwinTransformer_small_patch4_window7_224_pretrained.pdparams",
-              "SwinTransformer_base_patch4_window7_224": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/SwinTransformer_base_patch4_window7_224_pretrained.pdparams",
-              "SwinTransformer_base_patch4_window12_384": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/SwinTransformer_base_patch4_window12_384_pretrained.pdparams",
-              "SwinTransformer_large_patch4_window7_224": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/SwinTransformer_large_patch4_window7_224_pretrained.pdparams",
-              "SwinTransformer_large_patch4_window12_384": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/SwinTransformer_large_patch4_window12_384_pretrained.pdparams",
-             }
+    "SwinTransformer_tiny_patch4_window7_224":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/SwinTransformer_tiny_patch4_window7_224_pretrained.pdparams",
+    "SwinTransformer_small_patch4_window7_224":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/SwinTransformer_small_patch4_window7_224_pretrained.pdparams",
+    "SwinTransformer_base_patch4_window7_224":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/SwinTransformer_base_patch4_window7_224_pretrained.pdparams",
+    "SwinTransformer_base_patch4_window12_384":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/SwinTransformer_base_patch4_window12_384_pretrained.pdparams",
+    "SwinTransformer_large_patch4_window7_224":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/SwinTransformer_large_patch4_window7_224_pretrained.pdparams",
+    "SwinTransformer_large_patch4_window12_384":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/SwinTransformer_large_patch4_window12_384_pretrained.pdparams",
+}
 
 __all__ = list(MODEL_URLS.keys())
 
@@ -611,7 +617,7 @@ class SwinTransformer(nn.Layer):
                  img_size=224,
                  patch_size=4,
                  in_chans=3,
-                 class_dim=1000,
+                 class_num=1000,
                  embed_dim=96,
                  depths=[2, 2, 6, 2],
                  num_heads=[3, 6, 12, 24],
@@ -629,7 +635,7 @@ class SwinTransformer(nn.Layer):
                  **kwargs):
         super(SwinTransformer, self).__init__()
 
-        self.num_classes = num_classes = class_dim
+        self.num_classes = num_classes = class_num
         self.num_layers = len(depths)
         self.embed_dim = embed_dim
         self.ape = ape
@@ -729,7 +735,7 @@ class SwinTransformer(nn.Layer):
         flops += self.num_features * self.num_classes
         return flops
 
-    
+
 def _load_pretrained(pretrained, model, model_url, use_ssld=False):
     if pretrained is False:
         pass
@@ -743,7 +749,9 @@ def _load_pretrained(pretrained, model, model_url, use_ssld=False):
         )
 
 
-def SwinTransformer_tiny_patch4_window7_224(pretrained=False, use_ssld=False, **kwargs):
+def SwinTransformer_tiny_patch4_window7_224(pretrained=False,
+                                            use_ssld=False,
+                                            **kwargs):
     model = SwinTransformer(
         embed_dim=96,
         depths=[2, 2, 6, 2],
@@ -751,22 +759,34 @@ def SwinTransformer_tiny_patch4_window7_224(pretrained=False, use_ssld=False, **
         window_size=7,
         drop_path_rate=0.2,
         **kwargs)
-    _load_pretrained(pretrained, model, MODEL_URLS["SwinTransformer_tiny_patch4_window7_224"], use_ssld=use_ssld)
+    _load_pretrained(
+        pretrained,
+        model,
+        MODEL_URLS["SwinTransformer_tiny_patch4_window7_224"],
+        use_ssld=use_ssld)
     return model
 
 
-def SwinTransformer_small_patch4_window7_224(pretrained=False, use_ssld=False, **kwargs):
+def SwinTransformer_small_patch4_window7_224(pretrained=False,
+                                             use_ssld=False,
+                                             **kwargs):
     model = SwinTransformer(
         embed_dim=96,
         depths=[2, 2, 18, 2],
         num_heads=[3, 6, 12, 24],
         window_size=7,
         **kwargs)
-    _load_pretrained(pretrained, model, MODEL_URLS["SwinTransformer_small_patch4_window7_224"], use_ssld=use_ssld)
+    _load_pretrained(
+        pretrained,
+        model,
+        MODEL_URLS["SwinTransformer_small_patch4_window7_224"],
+        use_ssld=use_ssld)
     return model
 
 
-def SwinTransformer_base_patch4_window7_224(pretrained=False, use_ssld=False, **kwargs):
+def SwinTransformer_base_patch4_window7_224(pretrained=False,
+                                            use_ssld=False,
+                                            **kwargs):
     model = SwinTransformer(
         embed_dim=128,
         depths=[2, 2, 18, 2],
@@ -774,11 +794,17 @@ def SwinTransformer_base_patch4_window7_224(pretrained=False, use_ssld=False, **
         window_size=7,
         drop_path_rate=0.5,
         **kwargs)
-    _load_pretrained(pretrained, model, MODEL_URLS["SwinTransformer_base_patch4_window7_224"], use_ssld=use_ssld)
+    _load_pretrained(
+        pretrained,
+        model,
+        MODEL_URLS["SwinTransformer_base_patch4_window7_224"],
+        use_ssld=use_ssld)
     return model
 
 
-def SwinTransformer_base_patch4_window12_384(pretrained=False, use_ssld=False, **kwargs):
+def SwinTransformer_base_patch4_window12_384(pretrained=False,
+                                             use_ssld=False,
+                                             **kwargs):
     model = SwinTransformer(
         img_size=384,
         embed_dim=128,
@@ -787,22 +813,34 @@ def SwinTransformer_base_patch4_window12_384(pretrained=False, use_ssld=False, *
         window_size=12,
         drop_path_rate=0.5,  # NOTE: do not appear in offical code
         **kwargs)
-    _load_pretrained(pretrained, model, MODEL_URLS["SwinTransformer_base_patch4_window12_384"], use_ssld=use_ssld)
+    _load_pretrained(
+        pretrained,
+        model,
+        MODEL_URLS["SwinTransformer_base_patch4_window12_384"],
+        use_ssld=use_ssld)
     return model
 
 
-def SwinTransformer_large_patch4_window7_224(pretrained=False, use_ssld=False, **kwargs):
+def SwinTransformer_large_patch4_window7_224(pretrained=False,
+                                             use_ssld=False,
+                                             **kwargs):
     model = SwinTransformer(
         embed_dim=192,
         depths=[2, 2, 18, 2],
         num_heads=[6, 12, 24, 48],
         window_size=7,
         **kwargs)
-    _load_pretrained(pretrained, model, MODEL_URLS["SwinTransformer_large_patch4_window7_224"], use_ssld=use_ssld)
+    _load_pretrained(
+        pretrained,
+        model,
+        MODEL_URLS["SwinTransformer_large_patch4_window7_224"],
+        use_ssld=use_ssld)
     return model
 
 
-def SwinTransformer_large_patch4_window12_384(pretrained=False, use_ssld=False, **kwargs):
+def SwinTransformer_large_patch4_window12_384(pretrained=False,
+                                              use_ssld=False,
+                                              **kwargs):
     model = SwinTransformer(
         img_size=384,
         embed_dim=192,
@@ -810,5 +848,9 @@ def SwinTransformer_large_patch4_window12_384(pretrained=False, use_ssld=False, 
         num_heads=[6, 12, 24, 48],
         window_size=12,
         **kwargs)
-    _load_pretrained(pretrained, model, MODEL_URLS["SwinTransformer_large_patch4_window12_384"], use_ssld=use_ssld)
+    _load_pretrained(
+        pretrained,
+        model,
+        MODEL_URLS["SwinTransformer_large_patch4_window12_384"],
+        use_ssld=use_ssld)
     return model

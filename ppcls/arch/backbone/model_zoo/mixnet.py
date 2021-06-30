@@ -25,9 +25,14 @@ import paddle.nn as nn
 
 from ppcls.utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
 
-MODEL_URLS = {"MixNet_S": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/MixNet_S_pretrained.pdparams", 
-              "MixNet_M": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/MixNet_M_pretrained.pdparams", 
-              "MixNet_L": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/MixNet_L_pretrained.pdparams"}
+MODEL_URLS = {
+    "MixNet_S":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/MixNet_S_pretrained.pdparams",
+    "MixNet_M":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/MixNet_M_pretrained.pdparams",
+    "MixNet_L":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/MixNet_L_pretrained.pdparams"
+}
 
 __all__ = list(MODEL_URLS.keys())
 
@@ -617,7 +622,7 @@ class MixNet(nn.Layer):
         Number of input channels.
     in_size : tuple of two ints, default (224, 224)
         Spatial size of the expected input image.
-    class_dim : int, default 1000
+    class_num : int, default 1000
         Number of classification classes.
     """
 
@@ -632,10 +637,10 @@ class MixNet(nn.Layer):
                  se_factors,
                  in_channels=3,
                  in_size=(224, 224),
-                 class_dim=1000):
+                 class_num=1000):
         super(MixNet, self).__init__()
         self.in_size = in_size
-        self.class_dim = class_dim
+        self.class_num = class_num
 
         self.features = nn.Sequential()
         self.features.add_sublayer(
@@ -687,7 +692,7 @@ class MixNet(nn.Layer):
                 kernel_size=7, stride=1))
 
         self.output = nn.Linear(
-            in_features=in_channels, out_features=class_dim)
+            in_features=in_channels, out_features=class_num)
 
     def forward(self, x):
         x = self.features(x)
@@ -773,9 +778,11 @@ def _load_pretrained(pretrained, model, model_url, use_ssld=False):
             "pretrained type is not available. Please use `string` or `boolean` type."
         )
 
+
 def MixNet_S(pretrained=False, use_ssld=False, **kwargs):
     model = InceptionV4DY(**kwargs)
-    _load_pretrained(pretrained, model, MODEL_URLS["InceptionV4"], use_ssld=use_ssld)
+    _load_pretrained(
+        pretrained, model, MODEL_URLS["InceptionV4"], use_ssld=use_ssld)
     return model
 
 
@@ -786,7 +793,8 @@ def MixNet_S(**kwargs):
     """
     model = get_mixnet(
         version="s", width_scale=1.0, model_name="MixNet_S", **kwargs)
-    _load_pretrained(pretrained, model, MODEL_URLS["MixNet_S"], use_ssld=use_ssld)
+    _load_pretrained(
+        pretrained, model, MODEL_URLS["MixNet_S"], use_ssld=use_ssld)
     return model
 
 
@@ -797,7 +805,8 @@ def MixNet_M(**kwargs):
     """
     model = get_mixnet(
         version="m", width_scale=1.0, model_name="MixNet_M", **kwargs)
-    _load_pretrained(pretrained, model, MODEL_URLS["MixNet_M"], use_ssld=use_ssld)
+    _load_pretrained(
+        pretrained, model, MODEL_URLS["MixNet_M"], use_ssld=use_ssld)
     return model
 
 
@@ -808,6 +817,6 @@ def MixNet_L(**kwargs):
     """
     model = get_mixnet(
         version="m", width_scale=1.3, model_name="MixNet_L", **kwargs)
-    _load_pretrained(pretrained, model, MODEL_URLS["MixNet_L"], use_ssld=use_ssld)
+    _load_pretrained(
+        pretrained, model, MODEL_URLS["MixNet_L"], use_ssld=use_ssld)
     return model
-

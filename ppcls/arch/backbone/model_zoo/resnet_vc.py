@@ -30,8 +30,9 @@ import math
 from ppcls.utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
 
 MODEL_URLS = {
-              "ResNet50_vc": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ResNet50_vc_pretrained.pdparams",
-             }
+    "ResNet50_vc":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ResNet50_vc_pretrained.pdparams",
+}
 
 __all__ = list(MODEL_URLS.keys())
 
@@ -177,7 +178,7 @@ class BasicBlock(nn.Layer):
 
 
 class ResNet_vc(nn.Layer):
-    def __init__(self, layers=50, class_dim=1000):
+    def __init__(self, layers=50, class_num=1000):
         super(ResNet_vc, self).__init__()
 
         self.layers = layers
@@ -270,7 +271,7 @@ class ResNet_vc(nn.Layer):
 
         self.out = Linear(
             self.pool2d_avg_channels,
-            class_dim,
+            class_num,
             weight_attr=ParamAttr(
                 initializer=Uniform(-stdv, stdv), name="fc_0.w_0"),
             bias_attr=ParamAttr(name="fc_0.b_0"))
@@ -287,7 +288,7 @@ class ResNet_vc(nn.Layer):
         y = self.out(y)
         return y
 
-    
+
 def _load_pretrained(pretrained, model, model_url, use_ssld=False):
     if pretrained is False:
         pass
@@ -300,9 +301,9 @@ def _load_pretrained(pretrained, model, model_url, use_ssld=False):
             "pretrained type is not available. Please use `string` or `boolean` type."
         )
 
-        
+
 def ResNet50_vc(pretrained=False, use_ssld=False, **kwargs):
     model = ResNet_vc(layers=50, **kwargs)
-    _load_pretrained(pretrained, model, MODEL_URLS["ResNet50_vc"], use_ssld=use_ssld)
+    _load_pretrained(
+        pretrained, model, MODEL_URLS["ResNet50_vc"], use_ssld=use_ssld)
     return model
-
