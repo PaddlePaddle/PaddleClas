@@ -64,9 +64,7 @@ cd PaddleDetection
 pip install -r requirements.txt
 ```
 
-For more installation tutorials, please refer to [Installation tutorial]()
-
-更多安装教程，请参考: [安装文档](https://github.com/PaddlePaddle/PaddleDetection/blob/release/2.1/docs/tutorials/INSTALL.md)
+For more installation tutorials, please refer to [Installation tutorial](https://github.com/PaddlePaddle/PaddleDetection/blob/release/2.1/docs/tutorials/INSTALL.md)
 
 ### 3.2 Prepare for the dataset
 
@@ -125,6 +123,16 @@ python -m paddle.distributed.launch --gpus 0,1,2,3 tools/train.py -c configs/ppy
 ```
 
 --eval：eval during training
+
+* (**Recommend**) Model finetune
+If you want to finetune the model on your own dataset, you can run the following command to train the model.
+
+```bash
+export CUDA_VISIBLE_DEVICES=0
+# assign pretrain_weights, load the general mainbody-detection pretrained model
+python tools/train.py -c configs/ppyolo/ppyolov2_r50vd_dcn_365e_coco.yml -o pretrain_weights=https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/pretrain/ppyolov2_r50vd_dcn_mainbody_v1.0_pretrained.pdparams
+```
+
 
 * Resume training: you can use `-r` to load checkpoints and resume training.
 
