@@ -39,8 +39,7 @@ ReID，也就是 Re-identification，其定义是利用算法，在图像库中�
 
 ### 1.4 Metric Learning相关Loss的设置
 
-- 车辆ReID中，使用了[SupConLoss](../../../ppcls/loss/supconloss.py) + [ArcLoss](../../../ppcls/arch/gears/arcmargin.py)，其中权重比例为1:1
-- 车辆细分类，使用[TtripLet Loss](../../../ppcls/loss/triplet.py) + [ArcLoss](../../../ppcls/arch/gears/arcmargin.py)，其中权重比例为1:1
+车辆ReID及细粒度分类中，使用了[SupConLoss](../../../ppcls/loss/supconloss.py) + [ArcLoss](../../../ppcls/arch/gears/arcmargin.py)，其中权重比例为1:1
 
 ## 2 实验结果
 
@@ -72,13 +71,13 @@ ReID，也就是 Re-identification，其定义是利用算法，在图像库中�
 数据集中图像主要来自网络和监控数据，其中网络数据包含163个汽车制造商、1716个汽车型号的汽车。共**136,726**张全车图像，**27,618**张部分车图像。其中网络汽车数据包含bounding box、视角、5个属性（最大速度、排量、车门数、车座数、汽车类型）。监控数据包含**50,000**张前视角图像。
 值得注意的是，此数据集中需要根据自己的需要生成不同的label，如本demo中，将不同年份生产的相同型号的车辆视为同一类，因此，类别总数为：431类。
 
-|           **Methods**           | Top1 Acc  |
-| :-----------------------------: | :-------: |
-|        ResNet101-swp[6]         |   97.6%   |
-|      Fine-Tuning DARTS[7]       |   95.9%   |
-|       Resnet50 + COOC[8]        |   95.6%   |
-|             A3M[9]              |   95.4%   |
-| PaddleClas  baseline (ResNet50) | **97.1**% |
+|           **Methods**           |  Top1 Acc  |
+| :-----------------------------: | :--------: |
+|        ResNet101-swp[6]         |   97.6%    |
+|      Fine-Tuning DARTS[7]       |   95.9%    |
+|       Resnet50 + COOC[8]        |   95.6%    |
+|             A3M[9]              |   95.4%    |
+| PaddleClas  baseline (ResNet50) | **97.37**% |
 
 ## 3 参考文献
 
