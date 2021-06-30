@@ -16,7 +16,7 @@ Global:
 
 # model architecture
 Arch:
-  name: ViT_base_patch16_224
+  name: ViT_base_patch16_384
   class_num: 1000
  
 # loss function config for traing/eval process

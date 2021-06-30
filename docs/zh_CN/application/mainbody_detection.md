@@ -117,7 +117,18 @@ export CUDA_VISIBLE_DEVICES=0,1,2,3
 python -m paddle.distributed.launch --gpus 0,1,2,3 tools/train.py -c configs/ppyolo/ppyolov2_r50vd_dcn_365e_coco.yml --eval
 ```
 
---eval：表示边训练边验证
+--eval：表示边训练边验证。
+
+
+* (**推荐**)模型微调
+如果希望加载PaddleClas中已经训练好的主体检测模型，在自己的数据集上进行模型微调，可以使用下面的命令进行训练。
+
+```bash
+export CUDA_VISIBLE_DEVICES=0
+# 指定pretrain_weights参数，加载通用的主体检测预训练模型
+python tools/train.py -c configs/ppyolo/ppyolov2_r50vd_dcn_365e_coco.yml -o pretrain_weights=https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/pretrain/ppyolov2_r50vd_dcn_mainbody_v1.0_pretrained.pdparams
+```
+
 
 * 模型恢复训练
 
