@@ -98,6 +98,10 @@ class Trainer(object):
         self.query_dataloader = None
         self.eval_mode = self.config["Global"].get("eval_mode",
                                                    "classification")
+        self.amp = self.config["Global"].get("fp16", False)
+        self.scale_loss = self.config["Global"].get("scale_loss", 1.0)
+        self.use_dynamic_loss_scaling = self.config["Global"].get(
+            "use_dynamic_loss_scaling", False)
         self.train_loss_func = None
         self.eval_loss_func = None
         self.train_metric_func = None
@@ -151,6 +155,12 @@ class Trainer(object):
             if metric_info is not None:
                 best_metric.update(metric_info)
 
+        # for amp training
+        if self.amp:
+            scaler = paddle.amp.GradScaler(
+                init_loss_scaling=self.scale_loss,
+                use_dynamic_loss_scaling=self.use_dynamic_loss_scaling)
+
         tic = time.time()
         for epoch_id in range(best_metric["epoch"] + 1,
                               self.config["Global"]["epochs"] + 1):
@@ -165,13 +175,13 @@ class Trainer(object):
 
                 global_step += 1
                 # image input
-                if not self.is_rec:
-                    out = self.model(batch[0])
+                if self.amp:
+                    with paddle.amp.auto_cast():
+                        out = self.forward(batch)
+                        loss_dict = self.train_loss_func(out, batch[1])
                 else:
-                    out = self.model(batch[0], batch[1])
-
-                # calc loss
-                loss_dict = self.train_loss_func(out, batch[1])
+                    out = self.forward(batch)
+                    loss_dict = self.train_loss_func(out, batch[1])
 
                 for key in loss_dict:
                     if not key in output_info:
@@ -188,8 +198,13 @@ class Trainer(object):
                                                 batch_size)
 
                 # step opt and lr
-                loss_dict["loss"].backward()
-                optimizer.step()
+                if self.amp:
+                    scaled = scaler.scale(loss_dict["loss"])
+                    scaled.backward()
+                    scaler.minimize(optimizer, scaled)
+                else:
+                    loss_dict["loss"].backward()
+                    optimizer.step()
                 optimizer.clear_grad()
                 lr_sch.step()
 
@@ -336,6 +351,13 @@ class Trainer(object):
         self.model.train()
         return eval_result
 
+    def forward(self, batch):
+        if not self.is_rec:
+            out = self.model(batch[0])
+        else:
+            out = self.model(batch[0], batch[1])
+        return out
+
     @paddle.no_grad()
     def eval_cls(self, epoch_id=0):
         output_info = dict()
@@ -359,10 +381,7 @@ class Trainer(object):
             batch[0] = paddle.to_tensor(batch[0]).astype("float32")
             batch[1] = batch[1].reshape([-1, 1]).astype("int64")
             # image input
-            if self.is_rec:
-                out = self.model(batch[0], batch[1])
-            else:
-                out = self.model(batch[0])
+            out = self.forward(batch)
             # calc loss
             if self.eval_loss_func is not None:
                 loss_dict = self.eval_loss_func(out, batch[-1])
