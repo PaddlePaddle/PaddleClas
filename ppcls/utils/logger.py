@@ -102,6 +102,8 @@ def scaler(name, value, step, writer):
            visualdl --logdir ./scalar --host 0.0.0.0 --port 8830 
            to preview loss corve in real time.
     """
+    if writer is None:
+        return
     writer.add_scalar(tag=name, step=step, value=value)
 
 
