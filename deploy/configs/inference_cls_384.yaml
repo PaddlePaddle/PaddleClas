@@ -1,9 +1,10 @@
+
 Global:
-  infer_imgs: "./images/ILSVRC2012_val_00000010.jpeg"
-  inference_model_dir: "./models"
+  infer_imgs: "../docs/images/whl/demo.jpg"
+  inference_model_dir: "../inference/"
   batch_size: 1
   use_gpu: True
-  enable_mkldnn: False
+  enable_mkldnn: True
   cpu_num_threads: 100
   enable_benchmark: True
   use_fp16: False
@@ -14,9 +15,9 @@ Global:
 PreProcess:
   transform_ops:
     - ResizeImage:
-        resize_short: 256
+        resize_short: 384
     - CropImage:
-        size: 224
+        size: 384
     - NormalizeImage:
         scale: 0.00392157
         mean: [0.485, 0.456, 0.406]

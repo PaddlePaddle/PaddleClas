@@ -38,7 +38,7 @@ from deploy.utils import config
 
 from ppcls.arch.backbone import *
 
-__all__ = ["PaddleClas"]
+__all__ = ["PaddleClas", "get_default_confg"]
 
 BASE_DIR = os.path.expanduser("~/.paddleclas/")
 BASE_INFERENCE_MODEL_DIR = os.path.join(BASE_DIR, "inference_model")
@@ -163,30 +163,47 @@ class InputModelError(Exception):
 
 
 def args_cfg():
+    def str2bool(v):
+        return v.lower() in ("true", "t", "1")
+
     parser = config.parser()
-    other_options = [
+    global_options = [
         ("infer_imgs", str, None, "The image(s) to be predicted."),
         ("model_name", str, None, "The model name to be used."),
         ("inference_model_dir", str, None, "The directory of model files."),
-        ("use_gpu", bool, True, "Whether use GPU. Default by True."), (
-            "enable_mkldnn", bool, False,
-            "Whether use MKLDNN. Default by False."),
-        ("batch_size", int, 1, "Batch size. Default by 1.")
+        ("use_gpu", str2bool, None, "Whether use GPU."),
+        ("enable_mkldnn", str2bool, None, "Whether use MKLDNN."),
+        ("batch_size", int, None, "Batch size. Default by 1.")
     ]
-    for name, opt_type, default, description in other_options:
+
+    postprocess_options = [
+        ("topk", int, None, "Return topk score(s) and corresponding results."),
+        ("class_id_map_file", str, None,
+         "The path of file that map class_id and label."), (
+             "save_pre_label", str, None,
+             "The directory to save pre-label results.")
+    ]
+
+    for name, opt_type, default, description in global_options + postprocess_options:
         parser.add_argument(
             "--" + name, type=opt_type, default=default, help=description)
 
     args = parser.parse_args()
-
-    for name, opt_type, default, description in other_options:
-        val = eval("args." + name)
-        full_name = "Global." + name
-        args.override.append(
-            f"{full_name}={val}") if val is not default else None
-
     cfg = config.get_config(
         args.config, overrides=args.override, show=args.verbose)
+
+    for name, opt_type, default, description in global_options:
+        val = eval("args." + name)
+        if val is not None:
+            cfg["Global"][name] = val
+
+    if args.topk is not None:
+        cfg["PostProcess"]["Topk"]["topk"] = args.topk
+    if args.class_id_map_file is not None:
+        cfg["PostProcess"]["Topk"][
+            "class_id_map_file"] = args.class_id_map_file
+    if args.save_pre_label is not None:
+        cfg["PostProcess"]["SavePreLabel"]["save_dir"] = args.save_pre_label
 
     return cfg
 
@@ -201,7 +218,8 @@ def get_default_confg():
             "cpu_num_threads": 1,
             "use_tensorrt": False,
             "ir_optim": False,
-            "enable_profile": False
+            "enable_profile": False,
+            "gpu_mem": 8000
         },
         "PreProcess": {
             "transform_ops": [{
@@ -340,15 +358,6 @@ def check_model_file(model_name):
     return storage_directory()
 
 
-def save_prelabel_results(class_id, input_file_path, output_dir):
-    """Save the predicted image according to the prediction.
-    """
-    output_dir = os.path.join(output_dir, str(class_id))
-    if not os.path.isdir(output_dir):
-        os.makedirs(output_dir)
-    shutil.copy(input_file_path, output_dir)
-
-
 class PaddleClas(object):
     """PaddleClas.
     """
@@ -360,20 +369,22 @@ class PaddleClas(object):
                  model_name: str=None,
                  inference_model_dir: str=None,
                  use_gpu: bool=None,
-                 batch_size: int=None):
+                 batch_size: int=None,
+                 topk: int=None):
         """Init PaddleClas with config.
 
         Args:
-            config: The config of PaddleClas's predictor, default by None. If default, the default configuration is used. Please refer doc for more information.
+            config: The config of PaddleClas's predictor, default by None, and the default configuration is used. Please refer doc for more information.
             model_name: The model name supported by PaddleClas, default by None. If specified, override config.
             inference_model_dir: The directory that contained model file and params file to be used, default by None. If specified, override config.
             use_gpu: Wheather use GPU, default by None. If specified, override config.
             batch_size: The batch size to pridict, default by None. If specified, override config.
+            topk: Return the top k prediction results with the highest score.
         """
         super().__init__()
         self._config = config
         self._check_config(model_name, inference_model_dir, use_gpu,
-                           batch_size)
+                           batch_size, topk)
         self._check_input_model()
         self.cls_predictor = ClsPredictor(self._config)
 
@@ -386,7 +397,8 @@ class PaddleClas(object):
                       model_name=None,
                       inference_model_dir=None,
                       use_gpu=None,
-                      batch_size=None):
+                      batch_size=None,
+                      topk=None):
         if self._config is None:
             self._config = get_default_confg()
             warnings.warn("config is not provided, use default!")
@@ -401,6 +413,8 @@ class PaddleClas(object):
             self._config.Global["use_gpu"] = use_gpu
         if batch_size is not None:
             self._config.Global["batch_size"] = batch_size
+        if topk is not None:
+            self._config.PostProcess["topk"] = topk
 
     def _check_input_model(self):
         """Check input model name or model files.
@@ -437,7 +451,7 @@ class PaddleClas(object):
             raise InputModelError(err)
         return
 
-    def predict(self, input_data, print_pred=True):
+    def predict(self, input_data, print_pred=False):
         """Predict label of img with paddleclas.
         Args:
             input_data(str, NumPy.ndarray): 
@@ -446,9 +460,10 @@ class PaddleClas(object):
             dict: {image_name: "", class_id: [], scores: [], label_names: []}，if label name path == None，label_names will be empty.
         """
         if isinstance(input_data, np.ndarray):
-            return self.cls_predictor.predict(input_data)
+            outputs = self.cls_predictor.predict(input_data)
+            yield self.cls_predictor.postprocess(outputs)
         elif isinstance(input_data, str):
-            if input_data.startswith("http"):
+            if input_data.startswith("http") or input_data.startswith("https"):
                 image_storage_dir = partial(os.path.join, BASE_IMAGES_DIR)
                 if not os.path.exists(image_storage_dir()):
                     os.makedirs(image_storage_dir())
@@ -466,7 +481,6 @@ class PaddleClas(object):
 
             img_list = []
             img_path_list = []
-            output_list = []
             cnt = 0
             for idx, img_path in enumerate(image_list):
                 img = cv2.imread(img_path)
@@ -481,8 +495,8 @@ class PaddleClas(object):
 
                 if cnt % batch_size == 0 or (idx + 1) == len(image_list):
                     outputs = self.cls_predictor.predict(img_list)
-                    output_list.append(outputs[0])
-                    preds = self.cls_predictor.postprocess(outputs)
+                    preds = self.cls_predictor.postprocess(outputs,
+                                                           img_path_list)
                     for nu, pred in enumerate(preds):
                         if pre_label_out_idr:
                             save_prelabel_results(pred["class_ids"][0],
@@ -498,7 +512,7 @@ class PaddleClas(object):
                             print(", ".join(pred_str_list))
                     img_list = []
                     img_path_list = []
-            return output_list
+                    yield preds
         else:
             err = "Please input legal image! The type of image supported by PaddleClas are: NumPy.ndarray and string of local path or Ineternet URL"
             raise ImageTypeError(err)
@@ -511,7 +525,10 @@ def main():
     """
     cfg = args_cfg()
     clas_engine = PaddleClas(cfg)
-    clas_engine.predict(cfg["Global"]["infer_imgs"], print_pred=True)
+    res = clas_engine.predict(cfg["Global"]["infer_imgs"], print_pred=True)
+    for _ in res:
+        pass
+    print("Predict complete!")
     return
 
 

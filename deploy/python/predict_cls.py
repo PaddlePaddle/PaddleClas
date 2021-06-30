@@ -70,7 +70,7 @@ def main(config):
     for idx, image_file in enumerate(image_list):
         img = cv2.imread(image_file)[:, :, ::-1]
         output = cls_predictor.predict(img)
-        output = cls_predictor.postprocess(output)
+        output = cls_predictor.postprocess(output, [image_file])
         print(output)
     return
 

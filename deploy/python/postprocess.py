@@ -14,6 +14,8 @@
 
 import os
 import copy
+import shutil
+from functools import partial
 import importlib
 import numpy as np
 import paddle
@@ -23,11 +25,27 @@ import paddle.nn.functional as F
 def build_postprocess(config):
     if config is None:
         return None
-    config = copy.deepcopy(config)
-    model_name = config.pop("name")
+
     mod = importlib.import_module(__name__)
-    postprocess_func = getattr(mod, model_name)(**config)
-    return postprocess_func
+    config = copy.deepcopy(config)
+    func_list = []
+    for func in config:
+        func_list.append(getattr(mod, func)(**config[func]))
+    return PostProcesser(func_list)
+
+
+class PostProcesser(object):
+    def __init__(self, func_list):
+        self.return_func = ["Topk"]
+        self.func_list = func_list
+
+    def __call__(self, x, image_file):
+        rtn = None
+        for func in self.func_list:
+            tmp = func(x, image_file)
+            if isinstance(func, Topk):
+                rtn = tmp
+        return rtn
 
 
 class Topk(object):
@@ -82,3 +100,23 @@ class Topk(object):
                 result["label_names"] = label_name_list
             y.append(result)
         return y
+
+
+class SavePreLabel(object):
+    def __init__(self, save_dir):
+        if save_dir is None:
+            raise Exception(
+                "Please specify save_dir if SavePreLabel specified.")
+        self.save_dir = partial(os.path.join, save_dir)
+
+    def __call__(self, x, file_names):
+        assert x.shape[0] == len(file_names)
+        for idx, probs in enumerate(x):
+            index = probs.argsort(axis=0)[-1].astype("int32")
+            self.save(index, file_names[idx])
+
+    def save(self, id, image_file):
+        output_dir = self.save_dir(str(id))
+        if not os.path.isdir(output_dir):
+            os.makedirs(output_dir)
+        shutil.copy(image_file, output_dir)
