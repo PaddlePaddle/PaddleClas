@@ -44,7 +44,7 @@ def drop_path(x, drop_prob=0., training=False):
         return x
     keep_prob = paddle.to_tensor(1 - drop_prob)
     shape = (paddle.shape(x)[0], ) + (1, ) * (x.ndim - 1)
-    random_tensor = paddle.add(keep_prob,  paddle.rand(shape, dtype=x.dtype))
+    random_tensor = paddle.add(keep_prob, paddle.rand(shape, dtype=x.dtype))
     random_tensor = paddle.floor(random_tensor)  # binarize
     output = x.divide(keep_prob) * random_tensor
     return output
@@ -114,15 +114,17 @@ class Attention(nn.Layer):
                 (2, 0, 3, 1, 4))
 
         q, k = qk[0], qk[1]
-        v = self.v(x).reshape((B, N, self.num_heads, x.shape[-1] // self.num_heads)).transpose(
-            (0, 2, 1, 3))
+        v = self.v(x).reshape(
+            (B, N, self.num_heads, x.shape[-1] // self.num_heads)).transpose(
+                (0, 2, 1, 3))
 
         attn = paddle.matmul(q, k.transpose((0, 1, 3, 2))) * self.scale
         attn = nn.functional.softmax(attn, axis=-1)
         attn = self.attn_drop(attn)
 
         x = paddle.matmul(attn, v)
-        x = x.transpose((0, 2, 1, 3)).reshape((B, N, x.shape[-1] * x.shape[-3]))
+        x = x.transpose((0, 2, 1, 3)).reshape(
+            (B, N, x.shape[-1] * x.shape[-3]))
         x = self.proj(x)
         x = self.proj_drop(x)
         return x
@@ -183,18 +185,22 @@ class Block(nn.Layer):
 
     def forward(self, pixel_embed, patch_embed):
         # inner
-        pixel_embed = paddle.add(pixel_embed, self.drop_path(
-            self.attn_in(self.norm_in(pixel_embed))))
-        pixel_embed = paddle.add(pixel_embed, self.drop_path(
-            self.mlp_in(self.norm_mlp_in(pixel_embed))))
+        pixel_embed = paddle.add(
+            pixel_embed,
+            self.drop_path(self.attn_in(self.norm_in(pixel_embed))))
+        pixel_embed = paddle.add(
+            pixel_embed,
+            self.drop_path(self.mlp_in(self.norm_mlp_in(pixel_embed))))
         # outer
         B, N, C = patch_embed.shape
-        patch_embed[:, 1:] = paddle.add(patch_embed[:, 1:], self.proj(
-            self.norm1_proj(pixel_embed).reshape((B, N - 1, -1))))
-        patch_embed = paddle.add(patch_embed, self.drop_path(
-            self.attn_out(self.norm_out(patch_embed))))
-        patch_embed = paddle.add(patch_embed, self.drop_path(
-            self.mlp(self.norm_mlp(patch_embed))))
+        patch_embed[:, 1:] = paddle.add(
+            patch_embed[:, 1:],
+            self.proj(self.norm1_proj(pixel_embed).reshape((B, N - 1, -1))))
+        patch_embed = paddle.add(
+            patch_embed,
+            self.drop_path(self.attn_out(self.norm_out(patch_embed))))
+        patch_embed = paddle.add(
+            patch_embed, self.drop_path(self.mlp(self.norm_mlp(patch_embed))))
         return pixel_embed, patch_embed
 
 
@@ -225,8 +231,8 @@ class PixelEmbed(nn.Layer):
         x = x.transpose((0, 2, 1)).reshape(
             (-1, self.in_dim, self.new_patch_size, self.new_patch_size))
         x = x + pixel_pos
-        x = x.reshape((-1, self.in_dim, self.new_patch_size * self.new_patch_size)).transpose(
-            (0, 2, 1))
+        x = x.reshape((-1, self.in_dim, self.new_patch_size *
+                       self.new_patch_size)).transpose((0, 2, 1))
         return x
 
 
@@ -328,7 +334,8 @@ class TNT(nn.Layer):
         patch_embed = self.norm2_proj(
             self.proj(
                 self.norm1_proj(
-                    pixel_embed.reshape((-1, self.num_patches, pixel_embed.shape[-1] * pixel_embed.shape[-2])))))
+                    pixel_embed.reshape((-1, self.num_patches, pixel_embed.
+                                         shape[-1] * pixel_embed.shape[-2])))))
         patch_embed = paddle.concat(
             (self.cls_token.expand((B, -1, -1)), patch_embed), axis=1)
         patch_embed = patch_embed + self.patch_pos
