@@ -80,7 +80,10 @@ class Linear_BN(nn.Sequential):
         super().__init__()
         self.add_sublayer('c', nn.Linear(a, b, bias_attr=False))
         bn = nn.BatchNorm1D(b)
-        ones_(bn.weight)
+        if bn_weight_init == 0:
+            zeros_(bn.weight)
+        else:
+            ones_(bn.weight)
         zeros_(bn.bias)
         self.add_sublayer('bn', bn)
 
