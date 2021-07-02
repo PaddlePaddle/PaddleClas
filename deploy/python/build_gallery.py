@@ -86,7 +86,8 @@ class GalleryBuilder(object):
             gallery_vectors=gallery_features,
             gallery_docs=gallery_docs,
             pq_size=config['pq_size'],
-            index_path=config['index_path'])
+            index_path=config['index_path'],
+            append_index=config["append_index"])
 
 
 def main(config):

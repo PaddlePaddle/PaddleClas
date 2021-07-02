@@ -31,6 +31,7 @@ IndexProcess:
   index_path: "./recognition_demo_data_v1.0/gallery_cartoon/index/"
   image_root: "./recognition_demo_data_v1.0/gallery_cartoon/"
   data_file:  "./recognition_demo_data_v1.0/gallery_cartoon/data_file.txt"
+  append_index: False
   delimiter: "\t"
   dist_type: "IP"
   pq_size: 100

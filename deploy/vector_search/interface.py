@@ -132,7 +132,8 @@ class Graph_Index(object):
               gallery_vectors,
               gallery_docs=[],
               pq_size=100,
-              index_path='graph_index/'):
+              index_path='graph_index/',
+              append_index=False):
         """
         build index 
         """
@@ -181,7 +182,25 @@ class Graph_Index(object):
         self.gallery_doc_dict["dist_type"] = self.dist_type
         self.gallery_doc_dict["with_attr"] = self.with_attr
 
-        with open(index_path + "/info.json", "w") as f:
+        output_path = os.path.join(index_path, "info.json")
+        if append_index is True and os.path.exists(output_path):
+            with open(output_path, "r") as fin:
+                lines = fin.readlines()[0]
+                ori_gallery_doc_dict = json.loads(lines)
+            assert ori_gallery_doc_dict["dist_type"] == self.gallery_doc_dict[
+                "dist_type"]
+            assert ori_gallery_doc_dict["dim"] == self.gallery_doc_dict["dim"]
+            assert ori_gallery_doc_dict["with_attr"] == self.gallery_doc_dict[
+                "with_attr"]
+            offset = ori_gallery_doc_dict["total_num"]
+            for i in range(0, self.gallery_doc_dict["total_num"]):
+                ori_gallery_doc_dict[str(i + offset)] = self.gallery_doc_dict[
+                    str(i)]
+
+            ori_gallery_doc_dict["total_num"] += self.gallery_doc_dict[
+                "total_num"]
+            self.gallery_doc_dict = ori_gallery_doc_dict
+        with open(output_path, "w") as f:
             json.dump(self.gallery_doc_dict, f)
 
         print("finished creating index ...")
