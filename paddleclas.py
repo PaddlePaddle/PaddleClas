@@ -38,7 +38,7 @@ from deploy.utils import config
 
 from ppcls.arch.backbone import *
 
-__all__ = ["PaddleClas", "get_default_confg"]
+__all__ = ["PaddleClas"]
 
 BASE_DIR = os.path.expanduser("~/.paddleclas/")
 BASE_INFERENCE_MODEL_DIR = os.path.join(BASE_DIR, "inference_model")
@@ -162,91 +162,123 @@ class InputModelError(Exception):
         super().__init__(message)
 
 
-def args_cfg():
-    def str2bool(v):
-        return v.lower() in ("true", "t", "1")
-
-    parser = config.parser()
-    global_options = [
-        ("infer_imgs", str, None, "The image(s) to be predicted."),
-        ("model_name", str, None, "The model name to be used."),
-        ("inference_model_dir", str, None, "The directory of model files."),
-        ("use_gpu", str2bool, None, "Whether use GPU."),
-        ("enable_mkldnn", str2bool, None, "Whether use MKLDNN."),
-        ("batch_size", int, None, "Batch size. Default by 1.")
-    ]
-
-    postprocess_options = [
-        ("topk", int, None, "Return topk score(s) and corresponding results."),
-        ("class_id_map_file", str, None,
-         "The path of file that map class_id and label."), (
-             "save_pre_label", str, None,
-             "The directory to save pre-label results.")
-    ]
-
-    for name, opt_type, default, description in global_options + postprocess_options:
-        parser.add_argument(
-            "--" + name, type=opt_type, default=default, help=description)
-
-    args = parser.parse_args()
-    cfg = config.get_config(
-        args.config, overrides=args.override, show=args.verbose)
-
-    for name, opt_type, default, description in global_options:
-        val = eval("args." + name)
-        if val is not None:
-            cfg["Global"][name] = val
-
-    if args.topk is not None:
-        cfg["PostProcess"]["Topk"]["topk"] = args.topk
-    if args.class_id_map_file is not None:
-        cfg["PostProcess"]["Topk"][
-            "class_id_map_file"] = args.class_id_map_file
-    if args.save_pre_label is not None:
-        cfg["PostProcess"]["SavePreLabel"]["save_dir"] = args.save_pre_label
-
-    return cfg
-
-
-def get_default_confg():
-    return {
+def init_config(model_name, inference_model_dir, use_gpu, batch_size, topk,
+                **kwargs):
+    imagenet1k_map_path = os.path.join(
+        os.path.abspath(__dir__), "ppcls/utils/imagenet1k_label_list.txt")
+    cfg = {
         "Global": {
-            "model_name": "MobileNetV3_small_x0_35",
-            "use_gpu": False,
-            "use_fp16": False,
-            "enable_mkldnn": False,
-            "cpu_num_threads": 1,
-            "use_tensorrt": False,
-            "ir_optim": False,
-            "enable_profile": False,
-            "gpu_mem": 8000
+            "infer_imgs": kwargs["infer_imgs"]
+            if "infer_imgs" in kwargs else False,
+            "model_name": model_name,
+            "inference_model_dir": inference_model_dir,
+            "batch_size": batch_size,
+            "use_gpu": use_gpu,
+            "enable_mkldnn": kwargs["enable_mkldnn"]
+            if "enable_mkldnn" in kwargs else False,
+            "cpu_num_threads": kwargs["cpu_num_threads"]
+            if "cpu_num_threads" in kwargs else 1,
+            "enable_benchmark": False,
+            "use_fp16": kwargs["use_fp16"] if "use_fp16" in kwargs else False,
+            "ir_optim": True,
+            "use_tensorrt": kwargs["use_tensorrt"]
+            if "use_tensorrt" in kwargs else False,
+            "gpu_mem": kwargs["gpu_mem"] if "gpu_mem" in kwargs else 8000,
+            "enable_profile": False
         },
         "PreProcess": {
             "transform_ops": [{
                 "ResizeImage": {
-                    "resize_short": 256
+                    "resize_short": kwargs["resize_short"]
+                    if "resize_short" in kwargs else 256
                 }
             }, {
                 "CropImage": {
-                    "size": 224
+                    "size": kwargs["crop_size"]
+                    if "crop_size" in kwargs else 224
                 }
             }, {
                 "NormalizeImage": {
                     "scale": 0.00392157,
                     "mean": [0.485, 0.456, 0.406],
                     "std": [0.229, 0.224, 0.225],
-                    "order": ""
+                    "order": ''
                 }
             }, {
                 "ToCHWImage": None
             }]
         },
         "PostProcess": {
-            "name": "Topk",
-            "topk": 5,
-            "class_id_map_file": "./ppcls/utils/imagenet1k_label_list.txt"
+            "Topk": {
+                "topk": topk,
+                "class_id_map_file": imagenet1k_map_path
+            }
         }
     }
+    if "save_dir" in kwargs:
+        if kwargs["save_dir"] is not None:
+            cfg["PostProcess"]["SavePreLabel"] = {
+                "save_dir": kwargs["save_dir"]
+            }
+    if "class_id_map_file" in kwargs:
+        if kwargs["class_id_map_file"] is not None:
+            cfg["PostProcess"]["Topk"]["class_id_map_file"] = kwargs[
+                "class_id_map_file"]
+
+    cfg = config.AttrDict(cfg)
+    config.create_attr_dict(cfg)
+    return cfg
+
+
+def args_cfg():
+    def str2bool(v):
+        return v.lower() in ("true", "t", "1")
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "--infer_imgs",
+        type=str,
+        required=True,
+        help="The image(s) to be predicted.")
+    parser.add_argument(
+        "--model_name", type=str, help="The model name to be used.")
+    parser.add_argument(
+        "--inference_model_dir",
+        type=str,
+        help="The directory of model files. Valid when model_name not specifed."
+    )
+    parser.add_argument(
+        "--use_gpu", type=str, default=True, help="Whether use GPU.")
+    parser.add_argument("--gpu_mem", type=int, default=8000, help="")
+    parser.add_argument(
+        "--enable_mkldnn",
+        type=str2bool,
+        default=False,
+        help="Whether use MKLDNN. Valid when use_gpu is False")
+    parser.add_argument("--cpu_num_threads", type=int, default=1, help="")
+    parser.add_argument(
+        "--use_tensorrt", type=str2bool, default=False, help="")
+    parser.add_argument("--use_fp16", type=str2bool, default=False, help="")
+    parser.add_argument(
+        "--batch_size", type=int, default=1, help="Batch size. Default by 1.")
+    parser.add_argument(
+        "--topk",
+        type=int,
+        default=5,
+        help="Return topk score(s) and corresponding results. Default by 5.")
+    parser.add_argument(
+        "--class_id_map_file",
+        type=str,
+        help="The path of file that map class_id and label.")
+    parser.add_argument(
+        "--save_dir",
+        type=str,
+        help="The directory to save prediction results as pre-label.")
+    parser.add_argument("--resize_short", type=int, default=256, help="")
+    parser.add_argument("--crop_size", type=int, default=224, help="")
+
+    args = parser.parse_args()
+    return vars(args)
 
 
 def print_info():
@@ -310,14 +342,8 @@ def download_with_progressbar(url, save_path):
     if total_size_in_bytes == 0 or progress_bar.n != total_size_in_bytes or not os.path.isfile(
             save_path):
         raise Exception(
-            f"Something went wrong while downloading model/image from {url}")
+            f"Something went wrong while downloading file from {url}")
 
-def check_model_file(model_name):
-    """Check the model files exist and download and untar when no exist. 
-    """
-    storage_directory = partial(os.path.join, BASE_INFERENCE_MODEL_DIR,
-                                model_name)
-    url = BASE_DOWNLOAD_URL.format(model_name)
 
 def check_model_file(model_name):
     """Check the model files exist and download and untar when no exist. 
@@ -365,12 +391,12 @@ class PaddleClas(object):
     print_info()
 
     def __init__(self,
-                 config: dict=None,
                  model_name: str=None,
                  inference_model_dir: str=None,
-                 use_gpu: bool=None,
-                 batch_size: int=None,
-                 topk: int=None):
+                 use_gpu: bool=True,
+                 batch_size: int=1,
+                 topk: int=5,
+                 **kwargs):
         """Init PaddleClas with config.
 
         Args:
@@ -382,9 +408,8 @@ class PaddleClas(object):
             topk: Return the top k prediction results with the highest score.
         """
         super().__init__()
-        self._config = config
-        self._check_config(model_name, inference_model_dir, use_gpu,
-                           batch_size, topk)
+        self._config = init_config(model_name, inference_model_dir, use_gpu,
+                                   batch_size, topk, **kwargs)
         self._check_input_model()
         self.cls_predictor = ClsPredictor(self._config)
 
@@ -392,29 +417,6 @@ class PaddleClas(object):
         """Get the config.
         """
         return self._config
-
-    def _check_config(self,
-                      model_name=None,
-                      inference_model_dir=None,
-                      use_gpu=None,
-                      batch_size=None,
-                      topk=None):
-        if self._config is None:
-            self._config = get_default_confg()
-            warnings.warn("config is not provided, use default!")
-        self._config = config.AttrDict(self._config)
-        config.create_attr_dict(self._config)
-
-        if model_name is not None:
-            self._config.Global["model_name"] = model_name
-        if inference_model_dir is not None:
-            self._config.Global["inference_model_dir"] = inference_model_dir
-        if use_gpu is not None:
-            self._config.Global["use_gpu"] = use_gpu
-        if batch_size is not None:
-            self._config.Global["batch_size"] = batch_size
-        if topk is not None:
-            self._config.PostProcess["topk"] = topk
 
     def _check_input_model(self):
         """Check input model name or model files.
@@ -427,11 +429,8 @@ class PaddleClas(object):
             similar_names = similar_architectures(input_model_name,
                                                   candidate_model_names)
             similar_names_str = ", ".join(similar_names)
-            if input_model_name not in similar_names_str:
-                err = f"{input_model_name} is not exist! Maybe you want: [{similar_names_str}]"
-                raise InputModelError(err)
             if input_model_name not in candidate_model_names:
-                err = f"{input_model_name} is not provided by PaddleClas. If you want to use your own model, please input model_file as model path!"
+                err = f"{input_model_name} is not provided by PaddleClas. \nMaybe you want: [{similar_names_str}]. \nIf you want to use your own model, please specify inference_model_dir!"
                 raise InputModelError(err)
             self._config.Global.inference_model_dir = check_model_file(
                 input_model_name)
@@ -447,7 +446,7 @@ class PaddleClas(object):
                 raise InputModelError(err)
             return
         else:
-            err = f"Please specify the model name supported by PaddleClas or directory contained model file and params file."
+            err = f"Please specify the model name supported by PaddleClas or directory contained model files(inference.pdmodel, inference.pdiparams)."
             raise InputModelError(err)
         return
 
@@ -524,8 +523,8 @@ def main():
     """Function API used for commad line.
     """
     cfg = args_cfg()
-    clas_engine = PaddleClas(cfg)
-    res = clas_engine.predict(cfg["Global"]["infer_imgs"], print_pred=True)
+    clas_engine = PaddleClas(**cfg)
+    res = clas_engine.predict(cfg["infer_imgs"], print_pred=True)
     for _ in res:
         pass
     print("Predict complete!")

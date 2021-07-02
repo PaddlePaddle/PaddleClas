@@ -39,7 +39,7 @@ class PostProcesser(object):
         self.return_func = ["Topk"]
         self.func_list = func_list
 
-    def __call__(self, x, image_file):
+    def __call__(self, x, image_file=None):
         rtn = None
         for func in self.func_list:
             tmp = func(x, image_file)
@@ -109,7 +109,9 @@ class SavePreLabel(object):
                 "Please specify save_dir if SavePreLabel specified.")
         self.save_dir = partial(os.path.join, save_dir)
 
-    def __call__(self, x, file_names):
+    def __call__(self, x, file_names=None):
+        if file_names is None:
+            return
         assert x.shape[0] == len(file_names)
         for idx, probs in enumerate(x):
             index = probs.argsort(axis=0)[-1].astype("int32")
