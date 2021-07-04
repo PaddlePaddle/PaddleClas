@@ -36,7 +36,6 @@ def build_postprocess(config):
 
 class PostProcesser(object):
     def __init__(self, func_list):
-        self.return_func = ["Topk"]
         self.func_list = func_list
 
     def __call__(self, x, image_file=None):

@@ -162,7 +162,11 @@ class InputModelError(Exception):
         super().__init__(message)
 
 
-def init_config(model_name, inference_model_dir, use_gpu, batch_size, topk,
+def init_config(model_name,
+                inference_model_dir,
+                use_gpu=True,
+                batch_size=1,
+                topk=5,
                 **kwargs):
     imagenet1k_map_path = os.path.join(
         os.path.abspath(__dir__), "ppcls/utils/imagenet1k_label_list.txt")
@@ -400,7 +404,6 @@ class PaddleClas(object):
         """Init PaddleClas with config.
 
         Args:
-            config: The config of PaddleClas's predictor, default by None, and the default configuration is used. Please refer doc for more information.
             model_name: The model name supported by PaddleClas, default by None. If specified, override config.
             inference_model_dir: The directory that contained model file and params file to be used, default by None. If specified, override config.
             use_gpu: Wheather use GPU, default by None. If specified, override config.
@@ -475,8 +478,7 @@ class PaddleClas(object):
             image_list = get_image_list(input_data)
 
             batch_size = self._config.Global.get("batch_size", 1)
-            pre_label_out_idr = self._config.Global.get("pre_label_out_idr",
-                                                        False)
+            topk = self._config.PostProcess.get('topk', 1)
 
             img_list = []
             img_path_list = []
@@ -496,19 +498,14 @@ class PaddleClas(object):
                     outputs = self.cls_predictor.predict(img_list)
                     preds = self.cls_predictor.postprocess(outputs,
                                                            img_path_list)
-                    for nu, pred in enumerate(preds):
-                        if pre_label_out_idr:
-                            save_prelabel_results(pred["class_ids"][0],
-                                                  img_path_list[nu],
-                                                  pre_label_out_idr)
-                        if print_pred:
-                            pred_str_list = [
-                                f"filename: {img_path_list[nu]}",
-                                f"top-{self._config.PostProcess.get('topk', 1)}"
-                            ]
-                            for k in pred:
-                                pred_str_list.append(f"{k}: {pred[k]}")
-                            print(", ".join(pred_str_list))
+                    if print_pred:
+                        for nu, pred in enumerate(preds):
+                            pred_str = ", ".join(
+                                [f"{k}: {pred[k]}" for k in pred])
+                            print(
+                                f"filename: {img_path_list[nu]}, top-{topk}, {pred_str}"
+                            )
+
                     img_list = []
                     img_path_list = []
                     yield preds
