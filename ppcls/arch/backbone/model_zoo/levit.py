@@ -221,8 +221,6 @@ class Subsample(nn.Layer):
 
     def forward(self, x):
         B, N, C = x.shape
-        #x = paddle.reshape(x, [B, self.resolution, self.resolution,
-        #                        C])[:, ::self.stride, ::self.stride]
         x = paddle.reshape(x, [B, self.resolution, self.resolution, C])
         end1, end2 = x.shape[1], x.shape[2]
         x = x[:, 0:end1:self.stride, 0:end2:self.stride]
