@@ -213,6 +213,7 @@ def init_config(model_name,
             }]
         },
         "PostProcess": {
+            "main_indicator": "Topk",
             "Topk": {
                 "topk": topk,
                 "class_id_map_file": imagenet1k_map_path
@@ -498,7 +499,7 @@ class PaddleClas(object):
                     outputs = self.cls_predictor.predict(img_list)
                     preds = self.cls_predictor.postprocess(outputs,
                                                            img_path_list)
-                    if print_pred:
+                    if print_pred and preds:
                         for nu, pred in enumerate(preds):
                             pred_str = ", ".join(
                                 [f"{k}: {pred[k]}" for k in pred])

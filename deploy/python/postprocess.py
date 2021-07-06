@@ -28,21 +28,27 @@ def build_postprocess(config):
 
     mod = importlib.import_module(__name__)
     config = copy.deepcopy(config)
+
+    main_indicator = config.pop(
+        "main_indicator") if "main_indicator" in config else None
+    main_indicator = main_indicator if main_indicator else ""
+
     func_list = []
     for func in config:
         func_list.append(getattr(mod, func)(**config[func]))
-    return PostProcesser(func_list)
+    return PostProcesser(func_list, main_indicator)
 
 
 class PostProcesser(object):
-    def __init__(self, func_list):
+    def __init__(self, func_list, main_indicator="Topk"):
         self.func_list = func_list
+        self.main_indicator = main_indicator
 
     def __call__(self, x, image_file=None):
         rtn = None
         for func in self.func_list:
             tmp = func(x, image_file)
-            if isinstance(func, Topk):
+            if type(func).__name__ in self.main_indicator:
                 rtn = tmp
         return rtn
 
