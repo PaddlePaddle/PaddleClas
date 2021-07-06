@@ -40,7 +40,7 @@
 * 进入PaddleClas目录。
 
 ```bash
-## linux or mac， $path_to_PaddleClas表示PaddleClas的根目录，用户需要根据自己的真实目录修改
+# linux or mac， $path_to_PaddleClas表示PaddleClas的根目录，用户需要根据自己的真实目录修改
 cd $path_to_PaddleClas
 ```
 
@@ -61,7 +61,9 @@ unzip flowers102.zip
 
 此时flowers102数据集存放在**dataset/flowers102/jpg** 文件夹中，图像示例如下：
 
-<img src="../../images/quick_start/Examples-Flower-102.png" style="zoom:50%;" />
+<div align="center">
+<img src="../../images/quick_start/Examples-Flower-102.png" width = "800" />
+</div>
 
 * 返回`PaddleClas`根目录
 
@@ -73,18 +75,14 @@ cd ../../
 
 ## 四、模型训练
 
-### 预训练模型下载
-
-### 训练模型
-
-#### 使用CPU进行模型训练
+### 使用CPU进行模型训练
 
 由于使用CPU来进行模型训练，计算速度较慢，因此，此处以ShuffleNetV2_x0_25为例。此模型计算量较小，在CPU上计算速度较快。但是也因为模型较小，训练好的模型精度也不会太高。
 
-##### 不使用预训练模型
+#### 不使用预训练模型
 
 ```shell
-#windows在cmd中进入PaddleClas根目录，执行此命令
+# windows在cmd中进入PaddleClas根目录，执行此命令
 python tools/train.py -c ./ppcls/configs/quick_start/new_user/ShuffleNetV2_x0_25.yaml
 ```
 
@@ -92,16 +90,17 @@ python tools/train.py -c ./ppcls/configs/quick_start/new_user/ShuffleNetV2_x0_25
 - `yaml`文`Global.device` 参数设置为`cpu`，即使用CPU进行训练（若不设置，此参数默认为`True`）
 - `yaml`文件中`epochs`参数设置为20，说明对整个数据集进行20个epoch迭代，预计训练20分钟左右（不同CPU，训练时间略有不同），此时训练模型不充分。若提高训练模型精度，请将此参数设大，如**40**，训练时间也会相应延长
 
-##### 使用预训练模型
+#### 使用预训练模型
 
 ```shell
 python tools/train.py -c ./ppcls/configs/quick_start/new_user/ShuffleNetV2_x0_25.yaml  -o Arch.pretrained=True
+```
 
 - `-o` 参数可以选择为True或False，也可以是预训练模型存放路径，当选择为True时，预训练权重会自动下载到本地。注意：若为预训练模型路径，则不要加上：`.pdparams`
 
 可以使用将使用与不使用预训练模型训练进行对比，观察loss的下降情况。
 
-#### 使用GPU进行模型训练
+### 使用GPU进行模型训练
 
 由于GPU训练速度更快，可以使用更复杂模型，因此以ResNet50_vd为例。与ShuffleNetV2_x0_25相比，此模型计算量较大， 训练好的模型精度也会更高。
 
@@ -119,7 +118,7 @@ python tools/train.py -c ./ppcls/configs/quick_start/new_user/ShuffleNetV2_x0_25
   set CUDA_VISIBLE_DEVICES=0
   ```
 
-##### 不使用预训练模型
+#### 不使用预训练模型
 
 ```shell
 python3 tools/train.py -c ./ppcls/configs/quick_start/ResNet50_vd.yaml
@@ -127,9 +126,11 @@ python3 tools/train.py -c ./ppcls/configs/quick_start/ResNet50_vd.yaml
 
 训练完成后，验证集的`Top1 Acc`曲线如下所示，最高准确率为0.2735。训练精度曲线下图所示
 
-![image-20210329103510936](../../images/quick_start/r50_vd_acc.png)
+<div align="center">
+<img src="../../images/quick_start/r50_vd_acc.png"  width = "800" />
+</div>
 
-##### 使用预训练模型进行训练
+#### 使用预训练模型进行训练
 
 基于ImageNet1k分类预训练模型进行微调，训练脚本如下所示
 
@@ -143,7 +144,9 @@ python3 tools/train.py -c ./ppcls/configs/quick_start/ResNet50_vd.yaml -o Arch.p
 
 验证集的`Top1 Acc`曲线如下所示，最高准确率为0.9402，加载预训练模型之后，flowers102数据集精度大幅提升，绝对精度涨幅超过65%。
 
-![image-20210329105947361](../../images/quick_start/r50_vd_pretrained_acc.png)
+<div align="center">
+<img src="../../images/quick_start/r50_vd_pretrained_acc.png"  width = "800" />
+</div>
 
 ## 五、模型预测
 
