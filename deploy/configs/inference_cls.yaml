@@ -24,6 +24,9 @@ PreProcess:
         order: ''
     - ToCHWImage:
 PostProcess:
-  name: Topk
-  topk: 5
-  class_id_map_file: "../ppcls/utils/imagenet1k_label_list.txt"
+  main_indicator: Topk
+  Topk:
+    topk: 5
+    class_id_map_file: "../ppcls/utils/imagenet1k_label_list.txt"
+  SavePreLabel:
+    save_dir: ./pre_label/
