@@ -57,10 +57,7 @@ ReID，也就是 Re-identification，其定义是利用算法，在图像库中�
 |   GLAMOR(Resnet50+PGN)[3]    |   77.15   |   92.13   |   97.43   |
 |      PVEN(Resnet50)[4]       |   79.8    |   94.01   |   98.06   |
 |    SAVER(VAE+Resnet50)[5]    |   80.9    |   93.78   |   97.93   |
-|    PaddleClas  baseline1     |   65.6    |   92.37   |   97.23   |
-|    PaddleClas  baseline2     |   80.09   | **93.81** | **98.26** |
-
-注：baseline1 为目前的开源模型，baseline2即将开源
+|     PaddleClas  baseline     |   80.57   | **93.81** | **98.06** |
 
 ### 2.2 车辆细分类
 

@@ -58,10 +58,7 @@ This method is used in VERI-Wild dataset. This dataset was captured in a large C
 |   GLAMOR(Resnet50+PGN)[3]    |   77.15   |   92.13   |   97.43   |
 |      PVEN(Resnet50)[4]       |   79.8    |   94.01   |   98.06   |
 |    SAVER(VAE+Resnet50)[5]    |   80.9    |   93.78   |   97.93   |
-|    PaddleClas  baseline1     |   65.6    |   92.37   |   97.23   |
-|    PaddleClas  baseline2     |   80.09   | **93.81** | **98.26** |
-
- Baseline1 is the released, and baseline2 will be released soon.
+|     PaddleClas  baseline     |   80.57   | **93.81** | **98.06** |
 
 ### 2.2 Vehicle Fine-grained Classification
 
@@ -79,7 +76,7 @@ The images in the dataset mainly come from the network and monitoring  data. The
 |      Fine-Tuning DARTS[7]       |   95.9%    |
 |       Resnet50 + COOC[8]        |   95.6%    |
 |             A3M[9]              |   95.4%    |
-| PaddleClas  baseline (ResNet50) | **97.36**% |
+| PaddleClas  baseline (ResNet50) | **97.37**% |
 
 ## 3 References
 
