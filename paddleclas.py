@@ -455,12 +455,18 @@ class PaddleClas(object):
         return
 
     def predict(self, input_data, print_pred=False):
-        """Predict label of img with paddleclas.
+        """Predict input_data.
+
         Args:
-            input_data(str, NumPy.ndarray): 
-                image to be classified, support: str(local path of image file, internet URL, directory containing series of images) and NumPy.ndarray(preprocessed image data that has 3 channels and accords with [C, H, W], or raw image data that has 3 channels and accords with [H, W, C]).
-        Returns:
-            dict: {image_name: "", class_id: [], scores: [], label_names: []}，if label name path == None，label_names will be empty.
+            input_data (str | NumPy.array): The path of image, or the directory containing images, or the URL of image from Internet.
+            print_pred (bool, optional): Wheather print the prediction result. Defaults to False.
+
+        Raises:
+            ImageTypeError: Illegal input_data.
+
+        Yields:
+            list: The prediction result(s) of input_data by batch_size. For every one image, prediction result(s) is zipped as a dict, that includs topk "class_ids", "scores" and "label_names". The format is as follow:
+            [{"class_ids": [...], "scores": [...], "label_names": [...]}, ...]
         """
         if isinstance(input_data, np.ndarray):
             outputs = self.cls_predictor.predict(input_data)

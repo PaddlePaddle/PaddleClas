@@ -124,6 +124,5 @@ class SavePreLabel(object):
 
     def save(self, id, image_file):
         output_dir = self.save_dir(str(id))
-        if not os.path.isdir(output_dir):
-            os.makedirs(output_dir)
+        os.makedirs(output_dir, exist_ok=True)
         shutil.copy(image_file, output_dir)

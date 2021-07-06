@@ -32,6 +32,8 @@ result=clas.predict(infer_imgs)
 print(next(result))
 ```
 
+**Note**: `PaddleClas.predict()` is a `generator`. Therefore you need to use `next()` or `for` call it iteratively. It will perform a prediction by `batch_size` and return the prediction result(s) when called. Examples of returned results are as follows:
+
 ```
 >>> result
 [{'class_ids': [8, 7, 136, 80, 84], 'scores': [0.79368, 0.16329, 0.01853, 0.00959, 0.00239], 'label_names': ['hen', 'cock', 'European gallinule, Porphyrio porphyrio', 'black grouse', 'peacock']}]
@@ -97,8 +99,8 @@ PaddleClas provides two ways to use:
 paddleclas -h
 ```
 
-### 4.2 Prediction using pre-trained model provide by PaddleClas
-You can use the pre-trained model provided by PaddleClas to predict, and only need to specify `model_name`. In this case, PaddleClas will automatically download files of specified model and save them in the directory `~/.paddleclas/`.
+### 4.2 Prediction using inference model provide by PaddleClas
+You can use the inference model provided by PaddleClas to predict, and only need to specify `model_name`. In this case, PaddleClas will automatically download files of specified model and save them in the directory `~/.paddleclas/`.
 
 * Python
 ```python
