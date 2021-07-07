@@ -23,9 +23,11 @@ py_version = sys.version_info[0]
 
 def predict(image_path, server):
     if py_version == 2:
-        image = base64.b64encode(open(image_path).read())
+        with open(image_path) as f:
+            image = base64.b64encode(f.read())
     else:
-        image = base64.b64encode(open(image_path, "rb").read()).decode("utf-8")
+        with open(image_path, "rb") as f:
+            image = base64.b64encode(f.read()).decode("utf-8")
     req = json.dumps({"feed": [{"image": image}], "fetch": ["prediction"]})
     r = requests.post(
         server, data=req, headers={"Content-Type": "application/json"})

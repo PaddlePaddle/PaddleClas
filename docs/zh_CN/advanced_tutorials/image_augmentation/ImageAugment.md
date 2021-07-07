@@ -74,10 +74,12 @@ autoaugment_op = ImageNetPolicy()
 
 ops = [decode_op, resize_op, autoaugment_op]
 
-imgs_dir = 图像路径
-fnames = os.listdir(imgs_dir)
-for f in fnames:
-    data = open(os.path.join(imgs_dir, f)).read()
+imgs_dir = "imgs_dir"
+file_names = os.listdir(imgs_dir)
+for file_name in file_names:
+    file_path = os.join(imgs_dir, file_name)
+    with open(file_path) as f:
+        data = f.read()
     img = transform(data, ops)
 ```
 
