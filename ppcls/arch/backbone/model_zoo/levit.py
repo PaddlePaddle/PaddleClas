@@ -45,12 +45,13 @@ __all__ = list(MODEL_URLS.keys())
 def cal_attention_biases(attention_biases, attention_bias_idxs):
     gather_list = []
     attention_bias_t = paddle.transpose(attention_biases, (1, 0))
-    for idx in attention_bias_idxs:
-        gather = paddle.gather(attention_bias_t, idx)
+    nums = attention_bias_idxs.shape[0]
+    for idx in range(nums):
+        gather = paddle.gather(attention_bias_t, attention_bias_idxs[idx])
         gather_list.append(gather)
     shape0, shape1 = attention_bias_idxs.shape
-    return paddle.transpose(paddle.concat(gather_list), (1, 0)).reshape(
-        (0, shape0, shape1))
+    gather = paddle.concat(gather_list)
+    return paddle.transpose(gather, (1, 0)).reshape((0, shape0, shape1))
 
 
 class Conv2d_BN(nn.Sequential):
@@ -127,11 +128,12 @@ class Residual(nn.Layer):
 
     def forward(self, x):
         if self.training and self.drop > 0:
-            return x + self.m(x) * paddle.rand(
-                x.size(0), 1, 1,
-                device=x.device).ge_(self.drop).div(1 - self.drop).detach()
+            y = paddle.rand(
+                shape=[x.shape[0], 1, 1]).__ge__(self.drop).astype("float32")
+            y = y.divide(paddle.full_like(y, 1 - self.drop))
+            return paddle.add(x, y)
         else:
-            return x + self.m(x)
+            return paddle.add(x, self.m(x))
 
 
 class Attention(nn.Layer):
@@ -203,9 +205,9 @@ class Attention(nn.Layer):
                                                     self.attention_bias_idxs)
         else:
             attention_biases = self.ab
-        attn = ((q @k_transpose) * self.scale + attention_biases)
+        attn = (paddle.matmul(q, k_transpose) * self.scale + attention_biases)
         attn = F.softmax(attn)
-        x = paddle.transpose(attn @v, perm=[0, 2, 1, 3])
+        x = paddle.transpose(paddle.matmul(attn, v), perm=[0, 2, 1, 3])
         x = paddle.reshape(x, [B, N, self.dh])
         x = self.proj(x)
         return x
@@ -219,8 +221,9 @@ class Subsample(nn.Layer):
 
     def forward(self, x):
         B, N, C = x.shape
-        x = paddle.reshape(x, [B, self.resolution, self.resolution,
-                               C])[:, ::self.stride, ::self.stride]
+        x = paddle.reshape(x, [B, self.resolution, self.resolution, C])
+        end1, end2 = x.shape[1], x.shape[2]
+        x = x[:, 0:end1:self.stride, 0:end2:self.stride]
         x = paddle.reshape(x, [B, -1, C])
         return x
 
@@ -315,13 +318,14 @@ class AttentionSubsample(nn.Layer):
         else:
             attention_biases = self.ab
 
-        attn = (q @paddle.transpose(
-            k, perm=[0, 1, 3, 2])) * self.scale + attention_biases
+        attn = (paddle.matmul(
+            q, paddle.transpose(
+                k, perm=[0, 1, 3, 2]))) * self.scale + attention_biases
         attn = F.softmax(attn)
 
         x = paddle.reshape(
             paddle.transpose(
-                (attn @v), perm=[0, 2, 1, 3]), [B, -1, self.dh])
+                paddle.matmul(attn, v), perm=[0, 2, 1, 3]), [B, -1, self.dh])
         x = self.proj(x)
         return x
 
@@ -422,6 +426,7 @@ class LeViT(nn.Layer):
         x = paddle.transpose(x, perm=[0, 2, 1])
         x = self.blocks(x)
         x = x.mean(1)
+        x = paddle.reshape(x, [-1, x.shape[-1]])
         if self.distillation:
             x = self.head(x), self.head_dist(x)
             if not self.training:
