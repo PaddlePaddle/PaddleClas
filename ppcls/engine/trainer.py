@@ -98,7 +98,7 @@ class Trainer(object):
         self.query_dataloader = None
         self.eval_mode = self.config["Global"].get("eval_mode",
                                                    "classification")
-        self.amp = self.config["Global"].get("fp16", False)
+        self.amp = self.config["Global"].get("amp", False)
         self.scale_loss = self.config["Global"].get("scale_loss", 1.0)
         self.use_dynamic_loss_scaling = self.config["Global"].get(
             "use_dynamic_loss_scaling", False)
@@ -446,7 +446,6 @@ class Trainer(object):
 
     def eval_retrieval(self, epoch_id=0):
         self.model.eval()
-        cum_similarity_matrix = None
         # step1. build gallery
         gallery_feas, gallery_img_id, gallery_unique_id = self._cal_feature(
             name='gallery')

@@ -57,6 +57,9 @@ def build_dataloader(config, mode, device, seed=None):
     assert mode in ['Train', 'Eval', 'Test', 'Gallery', 'Query'
                     ], "Mode should be Train, Eval, Test, Gallery, Query"
     # build dataset
+    if config[mode].get('use_dali', False):
+        from ppcls.data.dataloader.dali import dali_dataloader
+        return dali_dataloader(config, mode, device, seed)
     config_dataset = config[mode]['dataset']
     config_dataset = copy.deepcopy(config_dataset)
     dataset_name = config_dataset.pop('name')
