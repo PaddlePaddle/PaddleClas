@@ -1,176 +1,217 @@
-# paddleclas package
+# PaddleClas wheel package
 
-## Get started quickly
+## 1. Installation
 
-### install package
+* installing from pypi
 
-install by pypi
 ```bash
-pip install paddleclas==2.0.3
+pip3 install paddleclas==2.2.0
 ```
 
-build own whl package and install
+* build own whl package and install
+
 ```bash
 python3 setup.py bdist_wheel
-pip3 install dist/paddleclas-x.x.x-py3-none-any.whl
+pip3 install dist/*
 ```
 
-### 1. Quick Start
 
-* Assign `image_file='docs/images/whl/demo.jpg'`, Use inference model that Paddle provides `model_name='ResNet50'`
-
-**Here is demo.jpg**
+## 2. Quick Start
+* Using the `ResNet50` model provided by PaddleClas, the following image(`'docs/images/whl/demo.jpg'`) as an example.
 
 <div align="center">
 <img src="../images/whl/demo.jpg"  width = "400" />
 </div>
 
+* Python
 ```python
 from paddleclas import PaddleClas
-clas = PaddleClas(model_name='ResNet50', top_k=5)
-image_file='docs/images/whl/demo.jpg'
-result=clas.predict(image_file)
-print(result)
+clas = PaddleClas(model_name='ResNet50')
+infer_imgs='docs/images/whl/demo.jpg'
+result=clas.predict(infer_imgs)
+print(next(result))
 ```
 
+**Note**: `PaddleClas.predict()` is a `generator`. Therefore you need to use `next()` or `for` call it iteratively. It will perform a prediction by `batch_size` and return the prediction result(s) when called. Examples of returned results are as follows:
+
 ```
-    >>> result
-    [{'class_ids': array([ 8,  7, 86, 82, 80]), 'scores': array([9.7967714e-01, 2.0280687e-02, 2.7053760e-05, 6.1860351e-06,
-       2.6378802e-06], dtype=float32), 'label_names': ['hen', 'cock', 'partridge', 'ruffed grouse, partridge, Bonasa umbellus', 'black grouse'], 'filename': 'docs/images/whl/demo.jpg'}
+>>> result
+[{'class_ids': [8, 7, 136, 80, 84], 'scores': [0.79368, 0.16329, 0.01853, 0.00959, 0.00239], 'label_names': ['hen', 'cock', 'European gallinule, Porphyrio porphyrio', 'black grouse', 'peacock']}]
 ```
 
-* Using command line interactive programming
+* CLI
 ```bash
-paddleclas --model_name=ResNet50 --top_k=5 --image_file='docs/images/whl/demo.jpg'
+paddleclas --model_name=ResNet50  --infer_imgs="docs/images/whl/demo.jpg"
 ```
 
 ```
-    >>> result
-    **********docs/images/whl/demo.jpg**********
-    filename: docs/images/whl/demo.jpg; class id: 8, 7, 86, 82, 80; scores: 0.9797, 0.0203, 0.0000, 0.0000, 0.0000; label: hen, cock, partridge, ruffed grouse, partridge, Bonasa umbellus, black grouse
-    Predict complete!
+>>> result
+filename: docs/images/whl/demo.jpg, top-5, class_ids: [8, 7, 136, 80, 84], scores: [0.79368, 0.16329, 0.01853, 0.00959, 0.00239], label_names: ['hen', 'cock', 'European gallinule, Porphyrio porphyrio', 'black grouse', 'peacock']
+Predict complete!
 ```
 
-### 2. Definition of Parameters
-* model_name(str): model's name. If not assigning `model_file`and`params_file`, you can assign this param. If using inference model based on ImageNet1k provided by Paddle, set as default='ResNet50'.
-* image_file(str or numpy.ndarray): image's path. Support assigning single local image, internet image and folder containing series of images. Also Support numpy.ndarray, the channel order is [B, G, R].
-* use_gpu(bool): Whether to use GPU or not, defalut=False。
-* use_tensorrt(bool): whether to open tensorrt or not. Using it can greatly promote predict preformance, default=False.
-* is_preprocessed(bool): Assign the image data has been preprocessed or not when the image_file is numpy.ndarray.
-* resize_short(int): resize the minima between height and width into resize_short(int), default=256
-* resize(int): resize image into resize(int), default=224.
-* normalize(bool): whether normalize image or not, default=True.
-* batch_size(int): batch number, default=1.
-* model_file(str): path of inference.pdmodel. If not assign this param，you need assign `model_name` for downloading.
-* params_file(str): path of inference.pdiparams. If not assign this param，you need assign `model_name` for downloading.
-* ir_optim(bool): whether enable IR optimization or not, default=True.
-* gpu_mem(int): GPU memory usages，default=8000。
-* enable_profile(bool): whether enable profile or not,default=False.
-* top_k(int): Assign top_k, default=1.
-* enable_mkldnn(bool): whether enable MKLDNN or not, default=False.
-* cpu_num_threads(int): Assign number of cpu threads, default=10.
-* label_name_path(str): Assign path of label_name_dict you use. If using your own training model, you can assign this param. If using inference model based on ImageNet1k provided by Paddle, you may not assign this param.Defaults take ImageNet1k's label name.
+
+
+
+## 3. Definition of Parameters
+
+The following parameters can be specified in Command Line or used as parameters of the constructor when instantiating the PaddleClas object in Python.
+* model_name(str): If using inference model based on ImageNet1k provided by Paddle, please specify the model's name by the parameter.
+* inference_model_dir(str): Local model files directory, which is valid when `model_name` is not specified. The directory should contain `inference.pdmodel` and `inference.pdiparams`.
+* infer_imgs(str): The path of image to be predicted, or the directory containing the image files, or the URL of the image from Internet.
+* use_gpu(bool): Whether to use GPU or not, default by `True`.
+* gpu_mem(int): GPU memory usages，default by `8000`。
+* use_tensorrt(bool): Whether to open TensorRT or not. Using it can greatly promote predict preformance, default by `False`.
+* enable_mkldnn(bool): Whether enable MKLDNN or not, default `False`.
+* cpu_num_threads(int): Assign number of cpu threads, valid when `--use_gpu` is `False` and `--enable_mkldnn` is `True`, default by `10`.
+* batch_size(int): Batch size, default by `1`.
+* resize_short(int): Resize the minima between height and width into `resize_short`, default by `256`.
+* crop_size(int): Center crop image to `crop_size`, default by `224`.
+* topk(int): Print (return) the `topk` prediction results, default by `5`.
+* class_id_map_file(str): The mapping file between class ID and label, default by `ImageNet1K` dataset's mapping.
 * pre_label_image(bool): whether prelabel or not, default=False.
-* pre_label_out_idr(str): If prelabeling, the path of output.
+* save_dir(str): The directory to save the prediction results that can be used as pre-label, default by `None`, that is, not to save.
 
-**Note**: If you want to use `Transformer series models`, such as `DeiT_***_384`, `ViT_***_384`, etc., please pay attention to the input size of model, and need to set `resize_short=384`, `resize=384` when building a `PaddleClas` object. The following is a demo.
+**Note**: If you want to use `Transformer series models`, such as `DeiT_***_384`, `ViT_***_384`, etc., please pay attention to the input size of model, and need to set `resize_short=384`, `resize=384`. The following is a demo.
 
-* Bash:
-    ```bash
-    paddleclas --model_name=ViT_base_patch16_384 --image_file='docs/images/whl/demo.jpg' --resize_short=384 --resize=384
-    ```
+* CLI:
+```bash
+from paddleclas import PaddleClas, get_default_confg
+paddleclas --model_name=ViT_base_patch16_384 --infer_imgs='docs/images/whl/demo.jpg' --resize_short=384 --crop_size=384
+```
 
 * Python:
-    ```python
-    clas = PaddleClas(model_name='ViT_base_patch16_384', top_k=5, resize_short=384, resize=384)
-    ```
+```python
+from paddleclas import PaddleClas
+clas = PaddleClas(model_name='ViT_base_patch16_384', resize_short=384, crop_size=384)
+```
 
-### 3. Different Usages of Codes
+## 4. Usage
 
-**We provide two ways to use: 1. Python interative programming 2. Bash command line programming**
+PaddleClas provides two ways to use:
+1. Python interative programming;
+2. Bash command line programming.
 
-* check `help` information
+### 4.1 View help information
+
+* CLI
 ```bash
 paddleclas -h
 ```
 
-* Use user-specified model, you need to assign model's path `model_file` and parameters's path`params_file`
+### 4.2 Prediction using inference model provide by PaddleClas
+You can use the inference model provided by PaddleClas to predict, and only need to specify `model_name`. In this case, PaddleClas will automatically download files of specified model and save them in the directory `~/.paddleclas/`.
 
-###### python
-```python
-from paddleclas import PaddleClas
-clas = PaddleClas(model_file='the path of model file',
-    params_file='the path of params file')
-image_file = 'docs/images/whl/demo.jpg'
-result=clas.predict(image_file)
-print(result)
-```
-
-###### bash
-```bash
-paddleclas --model_file='user-specified model path' --params_file='parmas path' --image_file='docs/images/whl/demo.jpg'
-```
-
-* Use inference model which PaddlePaddle provides to predict, you need to choose one of model proviede by PaddleClas to assign `model_name`. So there's no need to assign `model_file`. And the model you chosen will be download in `~/.paddleclas/`, which will be saved in folder named by `model_name`.
-
-###### python
+* Python
 ```python
 from paddleclas import PaddleClas
 clas = PaddleClas(model_name='ResNet50')
-image_file = 'docs/images/whl/demo.jpg'
-result=clas.predict(image_file)
-print(result)
+infer_imgs = 'docs/images/whl/demo.jpg'
+result=clas.predict(infer_imgs)
+print(next(result))
 ```
 
-###### bash
+* CLI
 ```bash
-paddleclas --model_name='ResNet50' --image_file='docs/images/whl/demo.jpg'
+paddleclas --model_name='ResNet50' --infer_imgs='docs/images/whl/demo.jpg'
 ```
 
-* You can assign input as format `numpy.ndarray` which has been preprocessed `image_file=np.ndarray`. Note that the image data must be three channel. If need To preprocess the image, the image channels order must be [B, G, R].
 
-###### python
+### 4.3 Prediction using local model files
+You can use the local model files trained by yourself to predict, and only need to specify `inference_model_dir`. Note that the directory must contain `inference.pdmodel` and `inference.pdiparams`.
+
+* Python
+```python
+from paddleclas import PaddleClas
+clas = PaddleClas(inference_model_dir='./inference/')
+infer_imgs = 'docs/images/whl/demo.jpg'
+result=clas.predict(infer_imgs)
+print(next(result))
+```
+
+* CLI
+```bash
+paddleclas --inference_model_dir='./inference/' --infer_imgs='docs/images/whl/demo.jpg'
+```
+
+### 4.4 Prediction by batch
+You can predict by batch, only need to specify `batch_size` when `infer_imgs` is direcotry contain image files.
+
+* Python
+```python
+from paddleclas import PaddleClas
+clas = PaddleClas(model_name='ResNet50', batch_size=2)
+infer_imgs = 'docs/images/'
+result=clas.predict(infer_imgs)
+for r in result:
+    print(r)
+```
+
+* CLI
+```bash
+paddleclas --model_name='ResNet50' --infer_imgs='docs/images/' --batch_size 2
+```
+
+
+### 4.5 Prediction of Internet image
+You can predict the Internet image, only need to specify URL of Internet image by `infer_imgs`. In this case, the image file will be downloaded and saved in the directory `~/.paddleclas/images/`.
+
+* Python
+```python
+from paddleclas import PaddleClas
+clas = PaddleClas(model_name='ResNet50')
+infer_imgs = 'https://raw.githubusercontent.com/paddlepaddle/paddleclas/release/2.2/docs/images/whl/demo.jpg'
+result=clas.predict(infer_imgs)
+print(next(result))
+```
+
+* CLI
+```bash
+paddleclas --model_name='ResNet50' --infer_imgs='https://raw.githubusercontent.com/paddlepaddle/paddleclas/release/2.2/docs/images/whl/demo.jpg'
+```
+
+
+### 4.6 Prediction of NumPy.array format image
+In Python code, you can predict the NumPy.array format image, only need to use the `infer_imgs` to transfer variable of image data. Note that the image data must be 3 channels.
+
+* python
 ```python
 import cv2
 from paddleclas import PaddleClas
 clas = PaddleClas(model_name='ResNet50')
-image_file = cv2.imread("docs/images/whl/demo.jpg")
-result=clas.predict(image_file)
+infer_imgs = cv2.imread("docs/images/whl/demo.jpg")
+result=clas.predict(infer_imgs)
+print(next(result))
 ```
 
-* You can assign `image_file` as a folder path containing series of images.
+### 4.7 Save the prediction result(s)
+You can save the prediction result(s) as pre-label, only need to use `pre_label_out_dir` to specify the directory to save.
 
-###### python
+* python
 ```python
 from paddleclas import PaddleClas
-clas = PaddleClas(model_name='ResNet50')
-image_file = 'docs/images/whl/' # it can be image_file folder path which contains all of images you want to predict.
-result=clas.predict(image_file)
-print(result)
+clas = PaddleClas(model_name='ResNet50', save_dir='./output_pre_label/')
+infer_imgs = 'docs/images/whl/' # it can be infer_imgs folder path which contains all of images you want to predict.
+result=clas.predict(infer_imgs)
+print(next(result))
 ```
 
-###### bash
+* CLI
 ```bash
-paddleclas --model_name='ResNet50' --image_file='docs/images/whl/'
+paddleclas --model_name='ResNet50' --infer_imgs='docs/images/whl/' --save_dir='./output_pre_label/'
 ```
 
-* You can assign `--pre_label_image=True`, `--pre_label_out_idr= './output_pre_label/'`. Then images will be copied into folder named by top-1 class_id.
 
-###### python
-```python
-from paddleclas import PaddleClas
-clas = PaddleClas(model_name='ResNet50', pre_label_image=True, pre_label_out_idr='./output_pre_label/')
-image_file = 'docs/images/whl/' # it can be image_file folder path which contains all of images you want to predict.
-result=clas.predict(image_file)
-print(result)
+### 4.8 Specify the mapping between class id and label name
+You can specify the mapping between class id and label name, only need to use `class_id_map_file` to specify the mapping file. PaddleClas uses ImageNet1K's mapping by default.
+
+The content format of mapping file shall be:
+
+```
+class_id<space>class_name<\n>
 ```
 
-###### bash
-```bash
-paddleclas --model_name='ResNet50' --image_file='docs/images/whl/' --pre_label_image=True --pre_label_out_idr='./output_pre_label/'
-```
-
-* You can assign `--label_name_path` as your own label_dict_file, format should be as(class_id<space>class_name<\n>).
+For example:
 
 ```
 0 tench, Tinca tinca
@@ -179,32 +220,16 @@ paddleclas --model_name='ResNet50' --image_file='docs/images/whl/' --pre_label_i
 ......
 ```
 
-* If you use inference model that PaddleClas provides, you do not need assign `label_name_path`. Program will take `ppcls/utils/imagenet1k_label_list.txt` as defaults. If you hope using your own training model, you can provide `label_name_path` outputing 'label_name' and scores, otherwise no 'label_name' in output information.
-
-###### python
+* Python
 ```python
 from paddleclas import PaddleClas
-clas = PaddleClas(model_file= 'the path of model file', params_file = 'the path of params file', label_name_path='./ppcls/utils/imagenet1k_label_list.txt')
-image_file = 'docs/images/whl/demo.jpg' # it can be image_file folder path which contains all of images you want to predict.
-result=clas.predict(image_file)
-print(result)
+clas = PaddleClas(model_name='ResNet50', class_id_map_file='./ppcls/utils/imagenet1k_label_list.txt')
+infer_imgs = 'docs/images/whl/demo.jpg'
+result=clas.predict(infer_imgs)
+print(next(result))
 ```
 
-###### bash
+* CLI
 ```bash
-paddleclas --model_file='the path of model file' --params_file='the path of params file' --image_file='docs/images/whl/demo.jpg' --label_name_path='./ppcls/utils/imagenet1k_label_list.txt'
-```
-
-###### python
-```python
-from paddleclas import PaddleClas
-clas = PaddleClas(model_name='ResNet50')
-image_file = 'docs/images/whl/' # it can be directory which contains all of images you want to predict.
-result=clas.predict(image_file)
-print(result)
-```
-
-###### bash
-```bash
-paddleclas --model_name='ResNet50' --image_file='docs/images/whl/'
+paddleclas --model_name='ResNet50' --infer_imgs='docs/images/whl/demo.jpg' --class_id_map_file='./ppcls/utils/imagenet1k_label_list.txt'
 ```
