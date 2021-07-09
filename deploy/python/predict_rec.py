@@ -89,8 +89,7 @@ def main(config):
             batch_names.append(img_name)
             cnt += 1
 
-        if cnt % config["Global"]["batch_size"] == 0 or (idx + 1
-                                                         ) == len(image_list):
+        if cnt % config["Global"]["batch_size"] == 0 or (idx + 1) == len(image_list):
             batch_results = rec_predictor.predict(batch_imgs)
             for number, result_dict in enumerate(batch_results):
                 filename = batch_names[number]
