@@ -106,6 +106,7 @@ class Trainer(object):
         self.eval_loss_func = None
         self.train_metric_func = None
         self.eval_metric_func = None
+        self.use_dali = self.config['DataLoader'].get("use_dali", False)
 
     def train(self):
         # build train loss and metric info
@@ -165,11 +166,18 @@ class Trainer(object):
         for epoch_id in range(best_metric["epoch"] + 1,
                               self.config["Global"]["epochs"] + 1):
             acc = 0.0
-            for iter_id, batch in enumerate(self.train_dataloader()):
+            train_dataloader = self.train_dataloader if self.use_dali else self.train_dataloader(
+            )
+            for iter_id, batch in enumerate(train_dataloader):
                 if iter_id == 5:
                     for key in time_info:
                         time_info[key].reset()
                 time_info["reader_cost"].update(time.time() - tic)
+                if self.use_dali:
+                    batch = [
+                        paddle.to_tensor(batch[0]['data']),
+                        paddle.to_tensor(batch[0]['label'])
+                    ]
                 batch_size = batch[0].shape[0]
                 batch[1] = batch[1].reshape([-1, 1]).astype("int64")
 
@@ -249,7 +257,8 @@ class Trainer(object):
                             step=global_step,
                             writer=self.vdl_writer)
                 tic = time.time()
-
+            if self.use_dali:
+                self.train_dataloader.reset()
             metric_msg = ", ".join([
                 "{}: {:.5f}".format(key, output_info[key].avg)
                 for key in output_info
@@ -373,11 +382,17 @@ class Trainer(object):
 
         metric_key = None
         tic = time.time()
-        for iter_id, batch in enumerate(self.eval_dataloader()):
+        eval_dataloader = self.eval_dataloader if self.use_dali else self.eval_dataloader(
+        )
+        for iter_id, batch in enumerate(eval_dataloader):
             if iter_id == 5:
                 for key in time_info:
                     time_info[key].reset()
-
+            if self.use_dali:
+                batch = [
+                    paddle.to_tensor(batch[0]['data']),
+                    paddle.to_tensor(batch[0]['label'])
+                ]
             time_info["reader_cost"].update(time.time() - tic)
             batch_size = batch[0].shape[0]
             batch[0] = paddle.to_tensor(batch[0]).astype("float32")
@@ -431,7 +446,8 @@ class Trainer(object):
                     len(self.eval_dataloader), metric_msg, time_msg, ips_msg))
 
             tic = time.time()
-
+        if self.use_dali:
+            self.eval_dataloader.reset()
         metric_msg = ", ".join([
             "{}: {:.5f}".format(key, output_info[key].avg)
             for key in output_info
@@ -518,12 +534,18 @@ class Trainer(object):
             raise RuntimeError("Only support gallery or query dataset")
 
         has_unique_id = False
-        for idx, batch in enumerate(dataloader(
-        )):  # load is very time-consuming
+        dataloader_tmp = dataloader if self.use_dali else dataloader()
+        for idx, batch in enumerate(
+                dataloader_tmp):  # load is very time-consuming
             if idx % self.config["Global"]["print_batch_step"] == 0:
                 logger.info(
                     f"{name} feature calculation process: [{idx}/{len(dataloader)}]"
                 )
+            if self.use_dali:
+                batch = [
+                    paddle.to_tensor(batch[0]['data']),
+                    paddle.to_tensor(batch[0]['label'])
+                ]
             batch = [paddle.to_tensor(x) for x in batch]
             batch[1] = batch[1].reshape([-1, 1]).astype("int64")
             if len(batch) == 3:
@@ -549,7 +571,8 @@ class Trainer(object):
                 all_image_id = paddle.concat([all_image_id, batch[1]])
                 if has_unique_id:
                     all_unique_id = paddle.concat([all_unique_id, batch[2]])
-
+        if self.use_dali:
+            dataloader_tmp.reset()
         if paddle.distributed.get_world_size() > 1:
             feat_list = []
             img_id_list = []

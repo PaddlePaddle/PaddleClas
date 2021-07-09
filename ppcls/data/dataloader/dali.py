@@ -21,9 +21,10 @@ import numpy as np
 import nvidia.dali.ops as ops
 import nvidia.dali.types as types
 import paddle
+from nvidia.dali import fn
 from nvidia.dali.pipeline import Pipeline
-from nvidia.dali.plugin.paddle import DALIGenericIterator
 from nvidia.dali.plugin.base_iterator import LastBatchPolicy
+from nvidia.dali.plugin.paddle import DALIGenericIterator
 
 
 class HybridTrainPipe(Pipeline):
@@ -50,7 +51,7 @@ class HybridTrainPipe(Pipeline):
                  dataset='Train'):
         super(HybridTrainPipe, self).__init__(
             batch_size, num_threads, device_id, seed=seed)
-        self.input = ops.FileReader(
+        self.input = ops.readers.File(
             file_root=file_root,
             file_list=file_list,
             shard_id=shard_id,
@@ -60,28 +61,26 @@ class HybridTrainPipe(Pipeline):
         # without additional reallocations
         device_memory_padding = 211025920
         host_memory_padding = 140544512
-        self.decode = ops.ImageDecoderRandomCrop(
+        self.decode = ops.decoders.ImageRandomCrop(
             device='mixed',
-            output_type=types.RGB,
+            output_type=types.DALIImageType.RGB,
             device_memory_padding=device_memory_padding,
             host_memory_padding=host_memory_padding,
             random_aspect_ratio=[lower, upper],
             random_area=[min_area, 1.0],
             num_attempts=100)
-        self.decode = ops.ImageDecoder(device="mixed", output_type=types.RGB)
         self.res = ops.Resize(
             device='gpu', resize_x=crop, resize_y=crop, interp_type=interp)
         self.cmnp = ops.CropMirrorNormalize(
             device="gpu",
-            output_dtype=output_dtype,
-            output_layout=types.NCHW,
+            dtype=output_dtype,
+            output_layout='CHW',
             crop=(crop, crop),
-            image_type=types.RGB,
             mean=mean,
             std=std,
             pad_output=pad_output)
-        self.coin = ops.CoinFlip(probability=0.5)
-        self.to_int64 = ops.Cast(dtype=types.INT64, device="gpu")
+        self.coin = ops.random.CoinFlip(probability=0.5)
+        self.to_int64 = ops.Cast(dtype=types.DALIDataType.INT64, device="gpu")
 
     def define_graph(self):
         rng = self.coin()
@@ -115,25 +114,24 @@ class HybridValPipe(Pipeline):
                  output_dtype=types.FLOAT):
         super(HybridValPipe, self).__init__(
             batch_size, num_threads, device_id, seed=seed)
-        self.input = ops.FileReader(
+        self.input = ops.readers.File(
             file_root=file_root,
             file_list=file_list,
             shard_id=shard_id,
             num_shards=num_shards,
             random_shuffle=random_shuffle)
-        self.decode = ops.ImageDecoder(device="mixed", output_type=types.RGB)
+        self.decode = ops.decoders.Image(device="mixed")
         self.res = ops.Resize(
             device="gpu", resize_shorter=resize_shorter, interp_type=interp)
         self.cmnp = ops.CropMirrorNormalize(
             device="gpu",
-            output_dtype=output_dtype,
-            output_layout=types.NCHW,
+            dtype=output_dtype,
+            output_layout='CHW',
             crop=(crop, crop),
-            image_type=types.RGB,
             mean=mean,
             std=std,
             pad_output=pad_output)
-        self.to_int64 = ops.Cast(dtype=types.INT64, device="gpu")
+        self.to_int64 = ops.Cast(dtype=types.DALIDataType.INT64, device="gpu")
 
     def define_graph(self):
         jpegs, labels = self.input(name="Reader")
@@ -147,11 +145,15 @@ class HybridValPipe(Pipeline):
 
 
 def dali_dataloader(config, mode, device, seed=None):
-    assert device.lower() == "gpu", "gpu training is required for DALI"
+    assert "gpu" in device, "gpu training is required for DALI"
+    device_id = int(device.split(':')[1])
     config_dataloader = config[mode]
     # mode = 'train' if mode.lower() == 'train' else 'eval'
     seed = 42 if seed is None else seed
-    ops = [x.keys[0] for x in config_dataloader["dataset"]["transform_ops"]]
+    ops = [
+        list(x.keys())[0]
+        for x in config_dataloader["dataset"]["transform_ops"]
+    ]
     support_ops_train = [
         "DecodeImage", "NormalizeImage", "RandFlipImage", "RandCropImage"
     ]
@@ -170,9 +172,9 @@ def dali_dataloader(config, mode, device, seed=None):
             ",".join(support_ops_eval))
 
     env = os.environ
-    assert float(env.get('FLAGS_fraction_of_gpu_memory_to_use', 0.92)) < 0.9, \
-        "Please leave enough GPU memory for DALI workspace, e.g., by setting" \
-        " `export FLAGS_fraction_of_gpu_memory_to_use=0.8`"
+    #  assert float(env.get('FLAGS_fraction_of_gpu_memory_to_use', 0.92)) < 0.9, \
+    #      "Please leave enough GPU memory for DALI workspace, e.g., by setting" \
+    #      " `export FLAGS_fraction_of_gpu_memory_to_use=0.8`"
 
     gpu_num = paddle.distributed.get_world_size()
 
@@ -186,10 +188,11 @@ def dali_dataloader(config, mode, device, seed=None):
 
     interp = 1  # settings.interpolation or 1  # default to linear
     interp_map = {
-        0: types.INTERP_NN,  # cv2.INTER_NEAREST
-        1: types.INTERP_LINEAR,  # cv2.INTER_LINEAR
-        2: types.INTERP_CUBIC,  # cv2.INTER_CUBIC
-        4: types.INTERP_LANCZOS3,  # XXX use LANCZOS3 for cv2.INTER_LANCZOS4
+        0: types.DALIInterpType.INTERP_NN,  # cv2.INTER_NEAREST
+        1: types.DALIInterpType.INTERP_LINEAR,  # cv2.INTER_LINEAR
+        2: types.DALIInterpType.INTERP_CUBIC,  # cv2.INTER_CUBIC
+        3: types.DALIInterpType.
+        INTERP_LANCZOS3,  # XXX use LANCZOS3 for cv2.INTER_LANCZOS4
     }
 
     output_dtype = (types.FLOAT16 if 'AMP' in config and
@@ -209,6 +212,7 @@ def dali_dataloader(config, mode, device, seed=None):
     }
 
     scale = transforms["NormalizeImage"].get("scale", 1.0 / 255)
+    scale = eval(scale) if isinstance(scale, str) else scale
     mean = transforms["NormalizeImage"].get("mean", [0.485, 0.456, 0.406])
     std = transforms["NormalizeImage"].get("std", [0.229, 0.224, 0.225])
     mean = [v / scale for v in mean]
@@ -247,7 +251,7 @@ def dali_dataloader(config, mode, device, seed=None):
                 output_dtype=output_dtype)
             pipe.build()
             pipelines = [pipe]
-            sample_per_shard = len(pipe) // num_shards
+            #  sample_per_shard = len(pipe) // num_shards
         else:
             pipe = HybridTrainPipe(
                 file_root,
@@ -261,7 +265,7 @@ def dali_dataloader(config, mode, device, seed=None):
                 interp,
                 mean,
                 std,
-                device_id=int(os.environ.get('CUDA_VISIBLE_DEVICES', 0)),
+                device_id=device_id,
                 shard_id=0,
                 num_shards=1,
                 seed=seed,
@@ -269,28 +273,43 @@ def dali_dataloader(config, mode, device, seed=None):
                 output_dtype=output_dtype)
             pipe.build()
             pipelines = [pipe]
-            sample_per_shard = len(pipelines[0])
+            #  sample_per_shard = len(pipelines[0])
         return DALIGenericIterator(
-            pipelines, ['data', 'label'], size=sample_per_shard)
+            pipelines, ['data', 'label'], reader_name='Reader')
     else:
         resize_shorter = transforms["ResizeImage"].get("resize_short", 256)
         crop = transforms["CropImage"]["size"]
-
-        pipe = HybridValPipe(
-            file_root,
-            file_list,
-            batch_size,
-            resize_shorter,
-            crop,
-            interp,
-            mean,
-            std,
-            device_id=int(os.environ.get('CUDA_VISIBLE_DEVICES', 0)),
-            pad_output=pad_output,
-            output_dtype=output_dtype)
+        if 'PADDLE_TRAINER_ID' in env and 'PADDLE_TRAINERS_NUM' in env:
+            shard_id = int(env['PADDLE_TRAINER_ID'])
+            num_shards = int(env['PADDLE_TRAINERS_NUM'])
+            device_id = int(env['FLAGS_selected_gpus'])
+            pipe = HybridValPipe(
+                file_root,
+                file_list,
+                batch_size,
+                resize_shorter,
+                crop,
+                interp,
+                mean,
+                std,
+                device_id=device_id,
+                shard_id=shard_id,
+                num_shards=num_shards,
+                pad_output=pad_output,
+                output_dtype=output_dtype)
+        else:
+            pipe = HybridValPipe(
+                file_root,
+                file_list,
+                batch_size,
+                resize_shorter,
+                crop,
+                interp,
+                mean,
+                std,
+                device_id=device_id,
+                pad_output=pad_output,
+                output_dtype=output_dtype)
         pipe.build()
         return DALIGenericIterator(
-            [pipe], ['data', 'label'],
-            size=len(pipe),
-            last_batch_policy=LastBatchPolicy.PARTIAL,
-            last_batch_padded=True)
+            [pipe], ['data', 'label'], reader_name="Reader")
