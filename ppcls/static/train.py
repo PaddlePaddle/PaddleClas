@@ -102,14 +102,14 @@ def main(args):
         vdl_writer = LogWriter(vdl_dir)
 
     # build dataloader
-    eva_dataloader = None
+    eval_dataloader = None
     if not global_config.get('use_dali', False):
         train_dataloader = build_dataloader(
             config["DataLoader"], "Train", device=device)
 
         if global_config["eval_during_train"] and paddle.distributed.get_rank(
         ) == 0:
-            eva_dataloader = build_dataloader(
+            eval_dataloader = build_dataloader(
                 config["DataLoader"], "Eval", device=device)
     else:
         assert use_gpu is True, "DALI only support gpu, please set use_gpu to True!"
@@ -117,7 +117,7 @@ def main(args):
         train_dataloader = dali.train(config)
         if global_config["eval_during_train"] and paddle.distributed.get_rank(
         ) == 0:
-            eva_dataloader = dali.val(config)
+            eval_dataloader = dali.val(config)
 
     step_each_epoch = len(train_dataloader)
 
@@ -137,15 +137,15 @@ def main(args):
         is_distributed=global_config.get("is_distributed", True))
 
     if global_config["eval_during_train"]:
-        eva_prog = paddle.static.Program()
-        eva_fetchs, _, eval_feeds, _ = program.build(
+        eval_prog = paddle.static.Program()
+        eval_fetchs, _, eval_feeds, _ = program.build(
             config,
-            eva_prog,
+            eval_prog,
             startup_prog,
             is_train=False,
             is_distributed=global_config.get("is_distributed", True))
-        # clone to prune some content which is irrelevant in eva_prog
-        eva_prog = eva_prog.clone(for_test=True)
+        # clone to prune some content which is irrelevant in eval_prog
+        eval_prog = eval_prog.clone(for_test=True)
 
     # create the "Executor" with the statement of which device
     exe = paddle.static.Executor(device)
@@ -158,7 +158,7 @@ def main(args):
         optimizer.amp_init(
             device,
             scope=paddle.static.global_scope(),
-            test_program=eva_prog
+            test_program=eval_prog
             if global_config["eval_during_train"] else None)
 
     if not global_config.get("is_distributed", True):
@@ -167,8 +167,8 @@ def main(args):
     else:
         compiled_train_prog = train_prog
 
-    if eva_dataloader is not None:
-        compiled_eva_prog = program.compile(config, eva_prog)
+    if eval_dataloader is not None:
+        compiled_eval_prog = program.compile(config, eval_prog)
 
     for epoch_id in range(global_config["epochs"]):
         # 1. train with train dataset
@@ -176,12 +176,12 @@ def main(args):
                     train_fetchs, epoch_id, 'train', config, vdl_writer,
                     lr_scheduler)
         if paddle.distributed.get_rank() == 0:
-            # 2. evaate with evaate dataset
+            # 2. evaate with eval dataset
             if global_config["eval_during_train"] and epoch_id % global_config[
                     "eval_interval"] == 0:
-                top1_acc = program.run(eva_dataloader, exe, compiled_eva_prog,
-                                       eva_feeds, eva_fetchs, epoch_id, 'eva',
-                                       config)
+                top1_acc = program.run(eval_dataloader, exe,
+                                       compiled_eval_prog, eval_feeds,
+                                       eval_fetchs, epoch_id, "eval", config)
                 if top1_acc > best_top1_acc:
                     best_top1_acc = top1_acc
                     message = "The best top1 acc {:.5f}, in epoch: {:d}".format(
