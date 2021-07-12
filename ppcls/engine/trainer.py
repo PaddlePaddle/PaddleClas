@@ -366,7 +366,6 @@ class Trainer(object):
             if self.is_rec:
                 out = self.model(batch[0], batch[1])
             else:
-                self.model.eval()
                 out = self.model(batch[0])
             # calc loss
             if self.eval_loss_func is not None:
