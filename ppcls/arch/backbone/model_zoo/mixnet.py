@@ -780,13 +780,6 @@ def _load_pretrained(pretrained, model, model_url, use_ssld=False):
 
 
 def MixNet_S(pretrained=False, use_ssld=False, **kwargs):
-    model = InceptionV4DY(**kwargs)
-    _load_pretrained(
-        pretrained, model, MODEL_URLS["InceptionV4"], use_ssld=use_ssld)
-    return model
-
-
-def MixNet_S(**kwargs):
     """
     MixNet-S model from 'MixConv: Mixed Depthwise Convolutional Kernels,'
     https://arxiv.org/abs/1907.09595.
@@ -798,7 +791,7 @@ def MixNet_S(**kwargs):
     return model
 
 
-def MixNet_M(**kwargs):
+def MixNet_M(pretrained=False, use_ssld=False, **kwargs):
     """
     MixNet-M model from 'MixConv: Mixed Depthwise Convolutional Kernels,'
     https://arxiv.org/abs/1907.09595.
@@ -810,7 +803,7 @@ def MixNet_M(**kwargs):
     return model
 
 
-def MixNet_L(**kwargs):
+def MixNet_L(pretrained=False, use_ssld=False, **kwargs):
     """
     MixNet-S model from 'MixConv: Mixed Depthwise Convolutional Kernels,'
     https://arxiv.org/abs/1907.09595.
