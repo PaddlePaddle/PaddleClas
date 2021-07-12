@@ -17,12 +17,12 @@
 
 | 参数名字 | 具体含义 | 默认值 | 可选值 |
 |:---:|:---:|:---:|:---:|
-| checkpoints | 断点模型路径，用于恢复训练 | null | Str |
-| pretrained_model | 预训练模型路径 | null | Str |
-| output_dir | 保存模型路径 | "./output/" | Str |
+| checkpoints | 断点模型路径，用于恢复训练 | null | str |
+| pretrained_model | 预训练模型路径 | null | str |
+| output_dir | 保存模型路径 | "./output/" | str |
 | save_interval | 每隔多少个epoch保存模型 | 1 | int |
-| eval_during_train| 是否在训练时进行评估 | TRUE | bool |
-| eval_interval | 每隔多少个epoch进行模型评估 | 1 | int
+| eval_during_train| 是否在训练时进行评估 | True | bool |
+| eval_interval | 每隔多少个epoch进行模型评估 | 1 | int |
 | epochs | 训练总epoch数 |  | int |
 | print_batch_step | 每隔多少个mini-batch打印输出 | 10 | int |
 | use_visualdl | 是否是用visualdl可视化训练过程 | False | bool |
