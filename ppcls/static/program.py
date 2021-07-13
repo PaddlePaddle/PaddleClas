@@ -445,6 +445,4 @@ def run(dataloader,
 
     # return top1_acc in order to save the best model
     if mode == 'eval':
-        print(fetchs["top1"])
-        # exit()
         return fetchs["top1"][1].avg
