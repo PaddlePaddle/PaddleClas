@@ -173,9 +173,12 @@ class Trainer(object):
                     out = self.model(batch[0])
                 else:
                     out = self.model(batch[0], batch[1])
-
                 # calc loss
-                loss_dict = self.train_loss_func(out, batch[1])
+                if self.config["DataLoader"]["Train"]["dataset"].get(
+                        "batch_transform_ops", None):
+                    loss_dict = self.train_loss_func(out, batch[1:])
+                else:
+                    loss_dict = self.train_loss_func(out, batch[1])
 
                 for key in loss_dict:
                     if not key in output_info:
