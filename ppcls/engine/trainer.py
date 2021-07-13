@@ -507,8 +507,8 @@ class Trainer(object):
             raise RuntimeError("Only support gallery or query dataset")
 
         has_unique_id = False
-        max_iter = len(self.train_dataloader) - 1 if platform.system(
-        ) == "Windows" else len(self.train_dataloader)
+        max_iter = len(dataloader) - 1 if platform.system(
+        ) == "Windows" else len(dataloader)
         for idx, batch in enumerate(dataloader(
         )):  # load is very time-consuming
             if idx >= max_iter:
