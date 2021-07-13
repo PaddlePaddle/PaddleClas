@@ -49,7 +49,7 @@ Windows上首先需要安装gcc编译工具，推荐使用[TDM-GCC](https://jmeu
 
 在该文件夹下，运行命令`mingw32-make`，即可生成`index.dll`库文件。如果希望重新生成`index.dll`文件，可以首先使用`mingw32-make clean`清除已经生成的缓存，再使用`mingw32-make`生成更新之后的库文件。
 
-### 2.2 MacOS上编译生成库文件
+### 2.4 MacOS上编译生成库文件
 
 运行下面的命令，安装gcc与g++。
 
