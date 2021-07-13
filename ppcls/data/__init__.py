@@ -53,11 +53,11 @@ def create_operators(params):
     return ops
 
 
-def build_dataloader(config, mode, device, seed=None):
+def build_dataloader(config, mode, device, use_dali=False, seed=None):
     assert mode in ['Train', 'Eval', 'Test', 'Gallery', 'Query'
                     ], "Mode should be Train, Eval, Test, Gallery, Query"
     # build dataset
-    if config.get('use_dali', False):
+    if use_dali:
         from ppcls.data.dataloader.dali import dali_dataloader
         return dali_dataloader(config, mode, paddle.device.get_device(), seed)
     config_dataset = config[mode]['dataset']

@@ -98,15 +98,15 @@ class Trainer(object):
         self.query_dataloader = None
         self.eval_mode = self.config["Global"].get("eval_mode",
                                                    "classification")
-        self.amp = self.config["Global"].get("amp", False)
-        self.scale_loss = self.config["Global"].get("scale_loss", 1.0)
-        self.use_dynamic_loss_scaling = self.config["Global"].get(
+        self.amp = True if "AMP" in self.config else False
+        self.scale_loss = self.config["AMP"].get("scale_loss", 1.0)
+        self.use_dynamic_loss_scaling = self.config["AMP"].get(
             "use_dynamic_loss_scaling", False)
         self.train_loss_func = None
         self.eval_loss_func = None
         self.train_metric_func = None
         self.eval_metric_func = None
-        self.use_dali = self.config['DataLoader'].get("use_dali", False)
+        self.use_dali = self.config['Global'].get("use_dali", False)
 
     def train(self):
         # build train loss and metric info
@@ -121,8 +121,8 @@ class Trainer(object):
                     self.train_metric_func = build_metrics(metric_config)
 
         if self.train_dataloader is None:
-            self.train_dataloader = build_dataloader(self.config["DataLoader"],
-                                                     "Train", self.device)
+            self.train_dataloader = build_dataloader(
+                self.config["DataLoader"], "Train", self.device, self.use_dali)
 
         step_each_epoch = len(self.train_dataloader)
 
@@ -328,7 +328,8 @@ class Trainer(object):
         if self.eval_mode == "classification":
             if self.eval_dataloader is None:
                 self.eval_dataloader = build_dataloader(
-                    self.config["DataLoader"], "Eval", self.device)
+                    self.config["DataLoader"], "Eval", self.device,
+                    self.use_dali)
 
             if self.eval_metric_func is None:
                 metric_config = self.config.get("Metric")
@@ -342,11 +343,13 @@ class Trainer(object):
         elif self.eval_mode == "retrieval":
             if self.gallery_dataloader is None:
                 self.gallery_dataloader = build_dataloader(
-                    self.config["DataLoader"]["Eval"], "Gallery", self.device)
+                    self.config["DataLoader"]["Eval"], "Gallery", self.device,
+                    self.use_dali)
 
             if self.query_dataloader is None:
                 self.query_dataloader = build_dataloader(
-                    self.config["DataLoader"]["Eval"], "Query", self.device)
+                    self.config["DataLoader"]["Eval"], "Query", self.device,
+                    self.use_dali)
             # build metric info
             if self.eval_metric_func is None:
                 metric_config = self.config.get("Metric", None)
