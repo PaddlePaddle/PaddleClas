@@ -17,10 +17,12 @@ from __future__ import print_function
 import os
 import sys
 import numpy as np
+
 __dir__ = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.path.abspath(os.path.join(__dir__, '../../')))
 
 import time
+import platform
 import datetime
 import argparse
 import paddle
@@ -138,7 +140,7 @@ class Trainer(object):
             "metric": 0.0,
             "epoch": 0,
         }
-        # key: 
+        # key:
         # val: metrics list word
         output_info = dict()
         time_info = {
@@ -163,12 +165,16 @@ class Trainer(object):
                 use_dynamic_loss_scaling=self.use_dynamic_loss_scaling)
 
         tic = time.time()
+        max_iter = len(self.train_dataloader) - 1 if platform.system(
+        ) == "Windows" else len(self.train_dataloader)
         for epoch_id in range(best_metric["epoch"] + 1,
                               self.config["Global"]["epochs"] + 1):
             acc = 0.0
             train_dataloader = self.train_dataloader if self.use_dali else self.train_dataloader(
             )
             for iter_id, batch in enumerate(train_dataloader):
+                if iter_id >= max_iter:
+                    break
                 if iter_id == 5:
                     for key in time_info:
                         time_info[key].reset()
@@ -387,7 +393,11 @@ class Trainer(object):
         tic = time.time()
         eval_dataloader = self.eval_dataloader if self.use_dali else self.eval_dataloader(
         )
+        max_iter = len(self.eval_dataloader) - 1 if platform.system(
+        ) == "Windows" else len(self.eval_dataloader)
         for iter_id, batch in enumerate(eval_dataloader):
+            if iter_id >= max_iter:
+                break
             if iter_id == 5:
                 for key in time_info:
                     time_info[key].reset()
@@ -537,9 +547,13 @@ class Trainer(object):
             raise RuntimeError("Only support gallery or query dataset")
 
         has_unique_id = False
+        max_iter = len(dataloader) - 1 if platform.system(
+        ) == "Windows" else len(dataloader)
         dataloader_tmp = dataloader if self.use_dali else dataloader()
         for idx, batch in enumerate(
                 dataloader_tmp):  # load is very time-consuming
+            if idx >= max_iter:
+                break
             if idx % self.config["Global"]["print_batch_step"] == 0:
                 logger.info(
                     f"{name} feature calculation process: [{idx}/{len(dataloader)}]"
