@@ -51,7 +51,7 @@ Windows上首先需要安装gcc编译工具，推荐使用[TDM-GCC](https://jmeu
 
 ### 2.4 MacOS上编译生成库文件
 
-运行下面的命令，安装gcc与g++。
+运行下面的命令，安装gcc与g++:
 
 ```shell
 brew install gcc
