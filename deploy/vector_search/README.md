@@ -60,7 +60,7 @@ brew install gcc
 ```
 ls /usr/local/bin/gcc*
 ```
-可以看到本地gcc对应的版本号为gcc-11，编译：
+可以看到本地gcc对应的版本号为gcc-11，编译命令如下：
 ```
 CXX=g++-11 make
 ```
