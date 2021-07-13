@@ -101,9 +101,13 @@ class Trainer(object):
         self.eval_mode = self.config["Global"].get("eval_mode",
                                                    "classification")
         self.amp = True if "AMP" in self.config else False
-        self.scale_loss = self.config["AMP"].get("scale_loss", 1.0)
-        self.use_dynamic_loss_scaling = self.config["AMP"].get(
-            "use_dynamic_loss_scaling", False)
+        if self.amp:
+            self.scale_loss = self.config["AMP"].get("scale_loss", 1.0)
+            self.use_dynamic_loss_scaling = self.config["AMP"].get(
+                "use_dynamic_loss_scaling", False)
+        else:
+            self.scale_loss = None
+            self.use_dynamic_loss_scaling = False
         self.train_loss_func = None
         self.eval_loss_func = None
         self.train_metric_func = None
