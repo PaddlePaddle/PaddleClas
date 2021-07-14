@@ -103,21 +103,13 @@ def main(args):
 
     # build dataloader
     eval_dataloader = None
-    if not global_config.get('use_dali', False):
-        train_dataloader = build_dataloader(
-            config["DataLoader"], "Train", device=device)
+    use_dali = global_config.get('use_dali', False)
 
-        if global_config["eval_during_train"] and paddle.distributed.get_rank(
-        ) == 0:
-            eval_dataloader = build_dataloader(
-                config["DataLoader"], "Eval", device=device)
-    else:
-        assert use_gpu is True, "DALI only support gpu, please set use_gpu to True!"
-        import dali
-        train_dataloader = dali.train(config)
-        if global_config["eval_during_train"] and paddle.distributed.get_rank(
-        ) == 0:
-            eval_dataloader = dali.val(config)
+    train_dataloader = build_dataloader(
+        config["DataLoader"], "Train", device=device, use_dali=use_dali)
+    if global_config["eval_during_train"]:
+        eval_dataloader = build_dataloader(
+            config["DataLoader"], "Eval", device=device, use_dali=use_dali)
 
     step_each_epoch = len(train_dataloader)
 
@@ -175,29 +167,28 @@ def main(args):
         program.run(train_dataloader, exe, compiled_train_prog, train_feeds,
                     train_fetchs, epoch_id, 'train', config, vdl_writer,
                     lr_scheduler)
-        if paddle.distributed.get_rank() == 0:
-            # 2. evaate with eval dataset
-            if global_config["eval_during_train"] and epoch_id % global_config[
-                    "eval_interval"] == 0:
-                top1_acc = program.run(eval_dataloader, exe,
-                                       compiled_eval_prog, eval_feeds,
-                                       eval_fetchs, epoch_id, "eval", config)
-                if top1_acc > best_top1_acc:
-                    best_top1_acc = top1_acc
-                    message = "The best top1 acc {:.5f}, in epoch: {:d}".format(
-                        best_top1_acc, epoch_id)
-                    logger.info(message)
-                    if epoch_id % global_config["save_interval"] == 0:
+        # 2. evaate with eval dataset
+        if global_config["eval_during_train"] and epoch_id % global_config[
+                "eval_interval"] == 0:
+            top1_acc = program.run(eval_dataloader, exe, compiled_eval_prog,
+                                   eval_feeds, eval_fetchs, epoch_id, "eval",
+                                   config)
+            if top1_acc > best_top1_acc:
+                best_top1_acc = top1_acc
+                message = "The best top1 acc {:.5f}, in epoch: {:d}".format(
+                    best_top1_acc, epoch_id)
+                logger.info(message)
+                if epoch_id % global_config["save_interval"] == 0:
 
-                        model_path = os.path.join(global_config["output_dir"],
-                                                  config["Arch"]["name"])
-                        save_model(train_prog, model_path, "best_model")
+                    model_path = os.path.join(global_config["output_dir"],
+                                              config["Arch"]["name"])
+                    save_model(train_prog, model_path, "best_model")
 
-            # 3. save the persistable model
-            if epoch_id % global_config["save_interval"] == 0:
-                model_path = os.path.join(global_config["output_dir"],
-                                          config["Arch"]["name"])
-                save_model(train_prog, model_path, epoch_id)
+        # 3. save the persistable model
+        if epoch_id % global_config["save_interval"] == 0:
+            model_path = os.path.join(global_config["output_dir"],
+                                      config["Arch"]["name"])
+            save_model(train_prog, model_path, epoch_id)
 
 
 if __name__ == '__main__':

@@ -41,7 +41,7 @@ from ppcls.utils.misc import AverageMeter
 from ppcls.utils import logger
 
 
-def create_feeds(image_shape, use_mix=None, use_dali=None, dtype="float32"):
+def create_feeds(image_shape, use_mix=None, dtype="float32"):
     """
     Create feeds as model input
 
@@ -53,18 +53,18 @@ def create_feeds(image_shape, use_mix=None, use_dali=None, dtype="float32"):
         feeds(dict): dict of model input variables
     """
     feeds = OrderedDict()
-    feeds['image'] = paddle.static.data(
-        name="feed_image", shape=[None] + image_shape, dtype=dtype)
-    if use_mix and not use_dali:
-        feeds['feed_y_a'] = paddle.static.data(
-            name="feed_y_a", shape=[None, 1], dtype="int64")
-        feeds['feed_y_b'] = paddle.static.data(
-            name="feed_y_b", shape=[None, 1], dtype="int64")
-        feeds['feed_lam'] = paddle.static.data(
-            name="feed_lam", shape=[None, 1], dtype=dtype)
+    feeds['data'] = paddle.static.data(
+        name="data", shape=[None] + image_shape, dtype=dtype)
+    if use_mix:
+        feeds['y_a'] = paddle.static.data(
+            name="y_a", shape=[None, 1], dtype="int64")
+        feeds['y_b'] = paddle.static.data(
+            name="y_b", shape=[None, 1], dtype="int64")
+        feeds['lam'] = paddle.static.data(
+            name="lam", shape=[None, 1], dtype=dtype)
     else:
         feeds['label'] = paddle.static.data(
-            name="feed_label", shape=[None, 1], dtype="int64")
+            name="label", shape=[None, 1], dtype="int64")
 
     return feeds
 
@@ -98,9 +98,9 @@ def create_fetchs(out,
     # build loss
     # TODO(littletomatodonkey): support mix training
     if use_mix:
-        feed_y_a = paddle.reshape(feeds['feed_y_a'], [-1, 1])
-        feed_y_b = paddle.reshape(feeds['feed_y_b'], [-1, 1])
-        feed_lam = paddle.reshape(feeds['feed_lam'], [-1, 1])
+        y_a = paddle.reshape(feeds['y_a'], [-1, 1])
+        y_b = paddle.reshape(feeds['y_b'], [-1, 1])
+        lam = paddle.reshape(feeds['lam'], [-1, 1])
     else:
         target = paddle.reshape(feeds['label'], [-1, 1])
 
@@ -109,13 +109,16 @@ def create_fetchs(out,
     # TODO: support mix training
     loss_dict = loss_func(out, target)
 
+    loss_out = loss_dict["loss"]
+    # if "AMP" in config and config.AMP.get("use_pure_fp16", False):
+    # loss_out = loss_out.astype("float16")
+
     # if use_mix:
     #     return loss_func(out, feed_y_a, feed_y_b, feed_lam)
     # else:
     #     return loss_func(out, target)
 
-    fetchs['loss'] = (loss_dict["loss"], AverageMeter(
-        'loss', '7.4f', need_avg=True))
+    fetchs['loss'] = (loss_out, AverageMeter('loss', '7.4f', need_avg=True))
 
     assert use_mix is False
 
@@ -126,6 +129,12 @@ def create_fetchs(out,
         metric_dict = metric_func(out, target)
 
         for key in metric_dict:
+            if mode != "Train" and paddle.distributed.get_world_size() > 1:
+                paddle.distributed.all_reduce(
+                    metric_dict[key], op=paddle.distributed.ReduceOp.SUM)
+                metric_dict[key] = metric_dict[
+                    key] / paddle.distributed.get_world_size()
+
             fetchs[key] = (metric_dict[key], AverageMeter(
                 key, '7.4f', need_avg=True))
 
@@ -249,11 +258,7 @@ def build(config,
             feeds = create_feeds(
                 config["Global"]["image_shape"],
                 use_mix=use_mix,
-                use_dali=use_dali,
                 dtype="float32")
-            if use_dali and use_mix:
-                import dali
-                feeds = dali.mix(feeds, config, is_train)
 
             # build model
             # data_format should be assigned in arch-dict
@@ -265,7 +270,7 @@ def build(config,
                     format(input_image_channel))
                 config["Arch"]["input_image_channel"] = input_image_channel
             model = build_model(config["Arch"])
-            out = model(feeds["image"])
+            out = model(feeds["data"])
             # end of build model
 
             fetchs = create_fetchs(
@@ -356,8 +361,10 @@ def run(dataloader,
         m.reset()
 
     use_dali = config["Global"].get('use_dali', False)
-    dataloader = dataloader if use_dali else dataloader()
     tic = time.time()
+
+    if not use_dali:
+        dataloader = dataloader()
 
     idx = 0
     batch_size = None
@@ -381,7 +388,7 @@ def run(dataloader,
         metric_dict['reader_time'].update(time.time() - tic)
 
         if use_dali:
-            batch_size = batch[0]["feed_image"].shape()[0]
+            batch_size = batch[0]["data"].shape()[0]
             feed_dict = batch[0]
         else:
             batch_size = batch[0].shape()[0]
@@ -389,6 +396,7 @@ def run(dataloader,
                 key.name: batch[idx]
                 for idx, key in enumerate(feeds.values())
             }
+
         metrics = exe.run(program=program,
                           feed=feed_dict,
                           fetch_list=fetch_list)
