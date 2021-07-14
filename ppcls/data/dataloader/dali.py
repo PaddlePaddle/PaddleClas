@@ -179,9 +179,9 @@ def dali_dataloader(config, mode, device, seed=None):
     gpu_num = paddle.distributed.get_world_size()
 
     batch_size = config_dataloader["sampler"]["batch_size"]
-    assert batch_size % gpu_num == 0, \
-        "batch size must be multiple of number of devices"
-    batch_size = batch_size // gpu_num
+    #  assert batch_size % gpu_num == 0, \
+    #  "batch size must be multiple of number of devices"
+    #  batch_size = batch_size // gpu_num
 
     file_root = config_dataloader["dataset"]["image_root"]
     file_list = config_dataloader["dataset"]["cls_label_path"]

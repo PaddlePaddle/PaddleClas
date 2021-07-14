@@ -74,10 +74,10 @@ def build_dataloader(config, mode, device, use_dali=False, seed=None):
 
     # build sampler
     config_sampler = config[mode]['sampler']
-    config_sampler["batch_size"] = config_sampler[
-        "batch_size"] // paddle.distributed.get_world_size()
-    assert config_sampler[
-        "batch_size"] >= 1, "The batch_size should be larger than gpu number."
+    #config_sampler["batch_size"] = config_sampler[
+    #    "batch_size"] // paddle.distributed.get_world_size()
+    #assert config_sampler[
+    #    "batch_size"] >= 1, "The batch_size should be larger than gpu number."
     if "name" not in config_sampler:
         batch_sampler = None
         batch_size = config_sampler["batch_size"]
