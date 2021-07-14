@@ -57,7 +57,7 @@ DataLoader:
     dataset:
       name: ImageNetDataset
       image_root: ./dataset/ILSVRC2012/
-      cls_label_path: ./dataset/ILSVRC2012/val_list_1k.txt
+      cls_label_path: ./dataset/ILSVRC2012/train_list.txt
       transform_ops:
         - DecodeImage:
             to_rgb: True
