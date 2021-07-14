@@ -41,7 +41,7 @@ from ppcls.arch import apply_to_static
 from ppcls.loss import build_loss
 from ppcls.metric import build_metrics
 from ppcls.optimizer import build_optimizer
-from ppcls.utils.save_load import load_dygraph_pretrain
+from ppcls.utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
 from ppcls.utils.save_load import init_model
 from ppcls.utils import save_load
 
@@ -79,8 +79,12 @@ class Trainer(object):
         apply_to_static(self.config, self.model)
 
         if self.config["Global"]["pretrained_model"] is not None:
-            load_dygraph_pretrain(self.model,
-                                  self.config["Global"]["pretrained_model"])
+            if self.config["Global"]["pretrained_model"].startswith("http"):
+                load_dygraph_pretrain_from_url(
+                    self.model, self.config["Global"]["pretrained_model"])
+            else:
+                load_dygraph_pretrain(
+                    self.model, self.config["Global"]["pretrained_model"])
 
         if self.config["Global"]["distributed"]:
             self.model = paddle.DataParallel(self.model)
@@ -201,6 +205,12 @@ class Trainer(object):
                         loss_dict = self.train_loss_func(out, batch[1])
                 else:
                     out = self.forward(batch)
+
+                # calc loss
+                if self.config["DataLoader"]["Train"]["dataset"].get(
+                        "batch_transform_ops", None):
+                    loss_dict = self.train_loss_func(out, batch[1:])
+                else:
                     loss_dict = self.train_loss_func(out, batch[1])
 
                 for key in loss_dict:

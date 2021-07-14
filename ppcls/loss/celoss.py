@@ -18,6 +18,10 @@ import paddle.nn.functional as F
 
 
 class CELoss(nn.Layer):
+    """
+    Cross entropy loss
+    """
+
     def __init__(self, epsilon=None):
         super().__init__()
         if epsilon is not None and (epsilon <= 0 or epsilon >= 1):
@@ -50,3 +54,21 @@ class CELoss(nn.Layer):
             loss = F.cross_entropy(x, label=label, soft_label=soft_label)
         loss = loss.mean()
         return {"CELoss": loss}
+
+
+class MixCELoss(CELoss):
+    """
+    Cross entropy loss with mix(mixup, cutmix, fixmix)
+    """
+
+    def __init__(self, epsilon=None):
+        super().__init__()
+        self.epsilon = epsilon
+
+    def __call__(self, input, batch):
+        target0, target1, lam = batch
+        loss0 = super().forward(input, target0)["CELoss"]
+        loss1 = super().forward(input, target1)["CELoss"]
+        loss = lam * loss0 + (1.0 - lam) * loss1
+        loss = paddle.mean(loss)
+        return {"MixCELoss": loss}
