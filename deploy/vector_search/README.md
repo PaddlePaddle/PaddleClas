@@ -56,6 +56,10 @@ Windows上首先需要安装gcc编译工具，推荐使用[TDM-GCC](https://jmeu
 ```shell
 brew install gcc
 ```
+#### 注意：
+1. 若提示 `Error: Running Homebrew as root is extremely dangerous and no longer supported...`,  参考该[链接](https://jingyan.baidu.com/article/e52e3615057a2840c60c519c.html)处理
+2. 若提示 `Error: Failure while executing; `tar --extract --no-same-owner --file...` 参考该[链接](https://blog.csdn.net/Dawn510/article/details/117787358)处理
+
 在安装之后编译后的可执行程序会被复制到/usr/local/bin下面，查看这个文件夹下的gcc：
 ```
 ls /usr/local/bin/gcc*
