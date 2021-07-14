@@ -17,6 +17,7 @@ from __future__ import print_function
 import os
 import sys
 import numpy as np
+
 __dir__ = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.path.abspath(os.path.join(__dir__, '../../')))
 
@@ -103,10 +104,19 @@ class Trainer(object):
         self.query_dataloader = None
         self.eval_mode = self.config["Global"].get("eval_mode",
                                                    "classification")
+        self.amp = True if "AMP" in self.config else False
+        if self.amp and self.config["AMP"] is not None:
+            self.scale_loss = self.config["AMP"].get("scale_loss", 1.0)
+            self.use_dynamic_loss_scaling = self.config["AMP"].get(
+                "use_dynamic_loss_scaling", False)
+        else:
+            self.scale_loss = 1.0
+            self.use_dynamic_loss_scaling = False
         self.train_loss_func = None
         self.eval_loss_func = None
         self.train_metric_func = None
         self.eval_metric_func = None
+        self.use_dali = self.config['Global'].get("use_dali", False)
 
     def train(self):
         # build train loss and metric info
@@ -121,8 +131,8 @@ class Trainer(object):
                     self.train_metric_func = build_metrics(metric_config)
 
         if self.train_dataloader is None:
-            self.train_dataloader = build_dataloader(self.config["DataLoader"],
-                                                     "Train", self.device)
+            self.train_dataloader = build_dataloader(
+                self.config["DataLoader"], "Train", self.device, self.use_dali)
 
         step_each_epoch = len(self.train_dataloader)
 
@@ -138,7 +148,7 @@ class Trainer(object):
             "metric": 0.0,
             "epoch": 0,
         }
-        # key: 
+        # key:
         # val: metrics list word
         output_info = dict()
         time_info = {
@@ -156,28 +166,46 @@ class Trainer(object):
             if metric_info is not None:
                 best_metric.update(metric_info)
 
+        # for amp training
+        if self.amp:
+            scaler = paddle.amp.GradScaler(
+                init_loss_scaling=self.scale_loss,
+                use_dynamic_loss_scaling=self.use_dynamic_loss_scaling)
+
         tic = time.time()
         max_iter = len(self.train_dataloader) - 1 if platform.system(
         ) == "Windows" else len(self.train_dataloader)
         for epoch_id in range(best_metric["epoch"] + 1,
                               self.config["Global"]["epochs"] + 1):
             acc = 0.0
-            for iter_id, batch in enumerate(self.train_dataloader()):
+            train_dataloader = self.train_dataloader if self.use_dali else self.train_dataloader(
+            )
+            for iter_id, batch in enumerate(train_dataloader):
                 if iter_id >= max_iter:
                     break
                 if iter_id == 5:
                     for key in time_info:
                         time_info[key].reset()
                 time_info["reader_cost"].update(time.time() - tic)
+                if self.use_dali:
+                    batch = [
+                        paddle.to_tensor(batch[0]['data']),
+                        paddle.to_tensor(batch[0]['label'])
+                    ]
                 batch_size = batch[0].shape[0]
                 batch[1] = batch[1].reshape([-1, 1]).astype("int64")
 
                 global_step += 1
                 # image input
-                if not self.is_rec:
-                    out = self.model(batch[0])
+                if self.amp:
+                    with paddle.amp.auto_cast(custom_black_list={
+                            "flatten_contiguous_range", "greater_than"
+                    }):
+                        out = self.forward(batch)
+                        loss_dict = self.train_loss_func(out, batch[1])
                 else:
-                    out = self.model(batch[0], batch[1])
+                    out = self.forward(batch)
+
                 # calc loss
                 if self.config["DataLoader"]["Train"]["dataset"].get(
                         "batch_transform_ops", None):
@@ -200,8 +228,13 @@ class Trainer(object):
                                                 batch_size)
 
                 # step opt and lr
-                loss_dict["loss"].backward()
-                optimizer.step()
+                if self.amp:
+                    scaled = scaler.scale(loss_dict["loss"])
+                    scaled.backward()
+                    scaler.minimize(optimizer, scaled)
+                else:
+                    loss_dict["loss"].backward()
+                    optimizer.step()
                 optimizer.clear_grad()
                 lr_sch.step()
 
@@ -244,7 +277,8 @@ class Trainer(object):
                             step=global_step,
                             writer=self.vdl_writer)
                 tic = time.time()
-
+            if self.use_dali:
+                self.train_dataloader.reset()
             metric_msg = ", ".join([
                 "{}: {:.5f}".format(key, output_info[key].avg)
                 for key in output_info
@@ -314,7 +348,8 @@ class Trainer(object):
         if self.eval_mode == "classification":
             if self.eval_dataloader is None:
                 self.eval_dataloader = build_dataloader(
-                    self.config["DataLoader"], "Eval", self.device)
+                    self.config["DataLoader"], "Eval", self.device,
+                    self.use_dali)
 
             if self.eval_metric_func is None:
                 metric_config = self.config.get("Metric")
@@ -328,11 +363,13 @@ class Trainer(object):
         elif self.eval_mode == "retrieval":
             if self.gallery_dataloader is None:
                 self.gallery_dataloader = build_dataloader(
-                    self.config["DataLoader"]["Eval"], "Gallery", self.device)
+                    self.config["DataLoader"]["Eval"], "Gallery", self.device,
+                    self.use_dali)
 
             if self.query_dataloader is None:
                 self.query_dataloader = build_dataloader(
-                    self.config["DataLoader"]["Eval"], "Query", self.device)
+                    self.config["DataLoader"]["Eval"], "Query", self.device,
+                    self.use_dali)
             # build metric info
             if self.eval_metric_func is None:
                 metric_config = self.config.get("Metric", None)
@@ -348,6 +385,13 @@ class Trainer(object):
         self.model.train()
         return eval_result
 
+    def forward(self, batch):
+        if not self.is_rec:
+            out = self.model(batch[0])
+        else:
+            out = self.model(batch[0], batch[1])
+        return out
+
     @paddle.no_grad()
     def eval_cls(self, epoch_id=0):
         output_info = dict()
@@ -361,24 +405,27 @@ class Trainer(object):
 
         metric_key = None
         tic = time.time()
+        eval_dataloader = self.eval_dataloader if self.use_dali else self.eval_dataloader(
+        )
         max_iter = len(self.eval_dataloader) - 1 if platform.system(
         ) == "Windows" else len(self.eval_dataloader)
-        for iter_id, batch in enumerate(self.eval_dataloader()):
+        for iter_id, batch in enumerate(eval_dataloader):
             if iter_id >= max_iter:
                 break
             if iter_id == 5:
                 for key in time_info:
                     time_info[key].reset()
-
+            if self.use_dali:
+                batch = [
+                    paddle.to_tensor(batch[0]['data']),
+                    paddle.to_tensor(batch[0]['label'])
+                ]
             time_info["reader_cost"].update(time.time() - tic)
             batch_size = batch[0].shape[0]
             batch[0] = paddle.to_tensor(batch[0]).astype("float32")
             batch[1] = batch[1].reshape([-1, 1]).astype("int64")
             # image input
-            if self.is_rec:
-                out = self.model(batch[0], batch[1])
-            else:
-                out = self.model(batch[0])
+            out = self.forward(batch)
             # calc loss
             if self.eval_loss_func is not None:
                 loss_dict = self.eval_loss_func(out, batch[-1])
@@ -426,7 +473,8 @@ class Trainer(object):
                     len(self.eval_dataloader), metric_msg, time_msg, ips_msg))
 
             tic = time.time()
-
+        if self.use_dali:
+            self.eval_dataloader.reset()
         metric_msg = ", ".join([
             "{}: {:.5f}".format(key, output_info[key].avg)
             for key in output_info
@@ -441,7 +489,6 @@ class Trainer(object):
 
     def eval_retrieval(self, epoch_id=0):
         self.model.eval()
-        cum_similarity_matrix = None
         # step1. build gallery
         gallery_feas, gallery_img_id, gallery_unique_id = self._cal_feature(
             name='gallery')
@@ -516,14 +563,20 @@ class Trainer(object):
         has_unique_id = False
         max_iter = len(dataloader) - 1 if platform.system(
         ) == "Windows" else len(dataloader)
-        for idx, batch in enumerate(dataloader(
-        )):  # load is very time-consuming
+        dataloader_tmp = dataloader if self.use_dali else dataloader()
+        for idx, batch in enumerate(
+                dataloader_tmp):  # load is very time-consuming
             if idx >= max_iter:
                 break
             if idx % self.config["Global"]["print_batch_step"] == 0:
                 logger.info(
                     f"{name} feature calculation process: [{idx}/{len(dataloader)}]"
                 )
+            if self.use_dali:
+                batch = [
+                    paddle.to_tensor(batch[0]['data']),
+                    paddle.to_tensor(batch[0]['label'])
+                ]
             batch = [paddle.to_tensor(x) for x in batch]
             batch[1] = batch[1].reshape([-1, 1]).astype("int64")
             if len(batch) == 3:
@@ -549,7 +602,8 @@ class Trainer(object):
                 all_image_id = paddle.concat([all_image_id, batch[1]])
                 if has_unique_id:
                     all_unique_id = paddle.concat([all_unique_id, batch[2]])
-
+        if self.use_dali:
+            dataloader_tmp.reset()
         if paddle.distributed.get_world_size() > 1:
             feat_list = []
             img_id_list = []
