@@ -1,9 +1,7 @@
 # global configs
 Global:
   checkpoints: null
-# please download pretrained model via this link:
-# https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/pretrain/product_ResNet50_vd_Aliproduct_v1.0_pretrained.pdparams
-  pretrained_model: product_ResNet50_vd_Aliproduct_v1.0_pretrained
+  pretrained_model: "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/pretrain/product_ResNet50_vd_Aliproduct_v1.0_pretrained.pdparams"
   output_dir: ./output/
   device: gpu
   save_interval: 10
