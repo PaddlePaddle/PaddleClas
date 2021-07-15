@@ -119,7 +119,6 @@ class RMSProp(object):
         self.epsilon = epsilon
         self.weight_decay = weight_decay
         self.grad_clip = grad_clip
-        self.multi_precision = multi_precision
 
     def __call__(self, parameters):
         opt = optim.RMSProp(
@@ -129,6 +128,5 @@ class RMSProp(object):
             epsilon=self.epsilon,
             weight_decay=self.weight_decay,
             grad_clip=self.grad_clip,
-            multi_precision=self.multi_precision,
             parameters=parameters)
         return opt
