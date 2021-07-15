@@ -60,6 +60,7 @@ def build_dataloader(config, mode, device, use_dali=False, seed=None):
     if use_dali:
         from ppcls.data.dataloader.dali import dali_dataloader
         return dali_dataloader(config, mode, paddle.device.get_device(), seed)
+
     config_dataset = config[mode]['dataset']
     config_dataset = copy.deepcopy(config_dataset)
     dataset_name = config_dataset.pop('name')
@@ -74,10 +75,6 @@ def build_dataloader(config, mode, device, use_dali=False, seed=None):
 
     # build sampler
     config_sampler = config[mode]['sampler']
-    #config_sampler["batch_size"] = config_sampler[
-    #    "batch_size"] // paddle.distributed.get_world_size()
-    #assert config_sampler[
-    #    "batch_size"] >= 1, "The batch_size should be larger than gpu number."
     if "name" not in config_sampler:
         batch_sampler = None
         batch_size = config_sampler["batch_size"]

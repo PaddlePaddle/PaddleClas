@@ -148,7 +148,6 @@ def dali_dataloader(config, mode, device, seed=None):
     assert "gpu" in device, "gpu training is required for DALI"
     device_id = int(device.split(':')[1])
     config_dataloader = config[mode]
-    # mode = 'train' if mode.lower() == 'train' else 'eval'
     seed = 42 if seed is None else seed
     ops = [
         list(x.keys())[0]
@@ -160,6 +159,7 @@ def dali_dataloader(config, mode, device, seed=None):
     support_ops_eval = [
         "DecodeImage", "ResizeImage", "CropImage", "NormalizeImage"
     ]
+
     if mode.lower() == 'train':
         assert set(ops) == set(
             support_ops_train
@@ -171,6 +171,14 @@ def dali_dataloader(config, mode, device, seed=None):
         ), "The supported trasform_ops for eval_dataset in dali is : {}".format(
             ",".join(support_ops_eval))
 
+    normalize_ops = [
+        op for op in config_dataloader["dataset"]["transform_ops"]
+        if "NormalizeImage" in op
+    ][0]["NormalizeImage"]
+    channel_num = normalize_ops.get("channel_num", 3)
+    output_dtype = types.FLOAT16 if normalize_ops.get("output_fp16",
+                                                      False) else types.FLOAT
+
     env = os.environ
     #  assert float(env.get('FLAGS_fraction_of_gpu_memory_to_use', 0.92)) < 0.9, \
     #      "Please leave enough GPU memory for DALI workspace, e.g., by setting" \
@@ -179,9 +187,6 @@ def dali_dataloader(config, mode, device, seed=None):
     gpu_num = paddle.distributed.get_world_size()
 
     batch_size = config_dataloader["sampler"]["batch_size"]
-    #  assert batch_size % gpu_num == 0, \
-    #  "batch size must be multiple of number of devices"
-    #  batch_size = batch_size // gpu_num
 
     file_root = config_dataloader["dataset"]["image_root"]
     file_list = config_dataloader["dataset"]["cls_label_path"]
@@ -195,15 +200,9 @@ def dali_dataloader(config, mode, device, seed=None):
         INTERP_LANCZOS3,  # XXX use LANCZOS3 for cv2.INTER_LANCZOS4
     }
 
-    output_dtype = (types.FLOAT16 if 'AMP' in config and
-                    config.AMP.get("use_pure_fp16", False) else types.FLOAT)
-
     assert interp in interp_map, "interpolation method not supported by DALI"
     interp = interp_map[interp]
-    pad_output = False
-    image_shape = config.get("image_shape", None)
-    if image_shape and image_shape[0] == 4:
-        pad_output = True
+    pad_output = channel_num == 4
 
     transforms = {
         k: v
@@ -217,6 +216,10 @@ def dali_dataloader(config, mode, device, seed=None):
     std = transforms["NormalizeImage"].get("std", [0.229, 0.224, 0.225])
     mean = [v / scale for v in mean]
     std = [v / scale for v in std]
+
+    sampler_name = config_dataloader["sampler"].get("name",
+                                                    "DistributedBatchSampler")
+    assert sampler_name in ["DistributedBatchSampler", "BatchSampler"]
 
     if mode.lower() == "train":
         resize_shorter = 256
@@ -279,10 +282,11 @@ def dali_dataloader(config, mode, device, seed=None):
     else:
         resize_shorter = transforms["ResizeImage"].get("resize_short", 256)
         crop = transforms["CropImage"]["size"]
-        if 'PADDLE_TRAINER_ID' in env and 'PADDLE_TRAINERS_NUM' in env:
+        if 'PADDLE_TRAINER_ID' in env and 'PADDLE_TRAINERS_NUM' in env and sampler_name == "DistributedBatchSampler":
             shard_id = int(env['PADDLE_TRAINER_ID'])
             num_shards = int(env['PADDLE_TRAINERS_NUM'])
             device_id = int(env['FLAGS_selected_gpus'])
+
             pipe = HybridValPipe(
                 file_root,
                 file_list,
