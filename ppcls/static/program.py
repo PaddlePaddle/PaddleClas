@@ -264,11 +264,6 @@ def build(config,
             # data_format should be assigned in arch-dict
             input_image_channel = config["Global"]["image_shape"][
                 0]  # default as [3, 224, 224]
-            if input_image_channel != 3:
-                logger.warning(
-                    "Input image channel is changed to {}, maybe for better speed-up".
-                    format(input_image_channel))
-                config["Arch"]["input_image_channel"] = input_image_channel
             model = build_model(config["Arch"])
             out = model(feeds["data"])
             # end of build model
