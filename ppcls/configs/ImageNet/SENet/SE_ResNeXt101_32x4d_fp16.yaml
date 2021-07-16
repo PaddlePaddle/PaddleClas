@@ -19,6 +19,7 @@ Global:
 Arch:
   name: SE_ResNeXt101_32x4d
   class_num: 1000
+  input_image_channel: *image_channel
  
 # loss function config for traing/eval process
 Loss:

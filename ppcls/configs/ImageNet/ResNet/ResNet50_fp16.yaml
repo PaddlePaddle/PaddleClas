@@ -27,6 +27,7 @@ AMP:
 Arch:
   name: ResNet50
   class_num: 1000
+  input_image_channel: *image_channel
  
 # loss function config for traing/eval process
 Loss:
