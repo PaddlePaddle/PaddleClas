@@ -1,6 +1,6 @@
 Global:
   rec_inference_model_dir: "./models/vehicle_cls_ResNet50_CompCars_v1.0_infer/"
-  batch_size: 1
+  batch_size: 32
   use_gpu: True
   enable_mkldnn: False
   cpu_num_threads: 100
