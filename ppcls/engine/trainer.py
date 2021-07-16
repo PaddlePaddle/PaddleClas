@@ -112,6 +112,12 @@ class Trainer(object):
         else:
             self.scale_loss = 1.0
             self.use_dynamic_loss_scaling = False
+        if self.amp:
+            AMP_RELATED_FLAGS_SETTING = {
+                'FLAGS_cudnn_batchnorm_spatial_persistent': 1,
+                'FLAGS_max_inplace_grad_add': 8,
+            }
+            paddle.fluid.set_flags(AMP_RELATED_FLAGS_SETTING)
         self.train_loss_func = None
         self.eval_loss_func = None
         self.train_metric_func = None
