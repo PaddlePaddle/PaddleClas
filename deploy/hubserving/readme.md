@@ -15,7 +15,7 @@ hubserving/clas/
 ### 1. 准备环境
 ```shell
 # 安装paddlehub,请安装2.0版本
-pip3 install paddlehub==2.0.0b1 --upgrade -i https://pypi.tuna.tsinghua.edu.cn/simple
+pip3 install paddlehub==2.1.0 --upgrade -i https://pypi.tuna.tsinghua.edu.cn/simple
 ```
 
 ### 2. 下载推理模型
@@ -128,8 +128,12 @@ python hubserving/test_hubserving.py server_url image_path
 `http://[ip_address]:[port]/predict/[module_name]`  
 - **image_path**：测试图像路径，可以是单张图片路径，也可以是图像集合目录路径。
 - **batch_size**：[**可选**] 以`batch_size`大小为单位进行预测，默认为`1`。
+- **resize_short**：[**可选**] 预处理时，按短边调整大小，默认为`256`。
+- **crop_size**：[**可选**] 预处理时，居中裁剪的大小，默认为`224`。
+- **normalize**：[**可选**] 预处理时，是否进行`normalize`，默认为`True`。
+- **to_chw**：[**可选**] 预处理时，是否调整为`CHW`顺序，默认为`True`。
 
-**注意**：如果使用`Transformer`系列模型，如`DeiT_***_384`, `ViT_***_384`等，请注意模型的输入数据尺寸。需要指定`--resize_short=384 --resize=384`。
+**注意**：如果使用`Transformer`系列模型，如`DeiT_***_384`, `ViT_***_384`等，请注意模型的输入数据尺寸。需要`--resize_short=384 --crop_size=384`。
 
 
 访问示例：  

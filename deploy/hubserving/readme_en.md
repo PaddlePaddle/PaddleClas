@@ -15,7 +15,7 @@ hubserving/clas/
 ### 1. Prepare the environment
 ```shell
 # Install version 2.0 of PaddleHub  
-pip3 install paddlehub==2.0.0b1 --upgrade -i https://pypi.tuna.tsinghua.edu.cn/simple
+pip3 install paddlehub==2.1.0 --upgrade -i https://pypi.tuna.tsinghua.edu.cn/simple
 ```
 
 ### 2. Download inference model
@@ -126,9 +126,13 @@ Two required parameters need to be passed to the script:
 `http://[ip_address]:[port]/predict/[module_name]`  
 - **image_path**: Test image path, can be a single image path or an image directory path
 - **batch_size**: [**Optional**] batch_size. Default by `1`.
+- **resize_short**: [**Optional**] In preprocessing, resize according to short size. Default by `256`。
+- **crop_size**: [**Optional**] In preprocessing, centor crop size. Default by `224`。
+- **normalize**: [**Optional**] In preprocessing, whether to do `normalize`. Default by `True`。
+- **to_chw**: [**Optional**] In preprocessing, whether to transpose to `CHW`. Default by `True`。
 
 **Notice**:
-If you want to use `Transformer series models`, such as `DeiT_***_384`, `ViT_***_384`, etc., please pay attention to the input size of model, and need to set `--resize_short=384`, `--resize=384`.
+If you want to use `Transformer series models`, such as `DeiT_***_384`, `ViT_***_384`, etc., please pay attention to the input size of model, and need to set `--resize_short=384`, `--crop_size=384`.
 
 **Eg.**
 ```shell
