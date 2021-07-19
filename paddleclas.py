@@ -412,7 +412,7 @@ class PaddleClas(object):
         Args:
             model_name: The model name supported by PaddleClas, default by None. If specified, override config.
             inference_model_dir: The directory that contained model file and params file to be used, default by None. If specified, override config.
-            use_gpu: whether use GPU, default by None. If specified, override config.
+            use_gpu: Whether use GPU, default by None. If specified, override config.
             batch_size: The batch size to pridict, default by None. If specified, override config.
             topk: Return the top k prediction results with the highest score.
         """
@@ -464,7 +464,7 @@ class PaddleClas(object):
 
         Args:
             input_data (str | NumPy.array): The path of image, or the directory containing images, or the URL of image from Internet.
-            print_pred (bool, optional): whether print the prediction result. Defaults to False.
+            print_pred (bool, optional): Whether print the prediction result. Defaults to False.
 
         Raises:
             ImageTypeError: Illegal input_data.

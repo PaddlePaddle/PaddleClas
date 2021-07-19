@@ -133,7 +133,7 @@ python hubserving/test_hubserving.py server_url image_path
 - **normalize**：[**可选**] 预处理时，是否进行`normalize`，默认为`True`。
 - **to_chw**：[**可选**] 预处理时，是否调整为`CHW`顺序，默认为`True`。
 
-**注意**：如果使用`Transformer`系列模型，如`DeiT_***_384`, `ViT_***_384`等，请注意模型的输入数据尺寸。需要`--resize_short=384 --crop_size=384`。
+**注意**：如果使用`Transformer`系列模型，如`DeiT_***_384`, `ViT_***_384`等，请注意模型的输入数据尺寸，需要指定`--resize_short=384 --crop_size=384`。
 
 
 访问示例：  
