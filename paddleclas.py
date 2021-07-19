@@ -279,8 +279,13 @@ def args_cfg():
         "--save_dir",
         type=str,
         help="The directory to save prediction results as pre-label.")
-    parser.add_argument("--resize_short", type=int, default=256, help="")
-    parser.add_argument("--crop_size", type=int, default=224, help="")
+    parser.add_argument(
+        "--resize_short",
+        type=int,
+        default=256,
+        help="Resize according to short size.")
+    parser.add_argument(
+        "--crop_size", type=int, default=224, help="Centor crop size.")
 
     args = parser.parse_args()
     return vars(args)
@@ -506,12 +511,12 @@ class PaddleClas(object):
                     preds = self.cls_predictor.postprocess(outputs,
                                                            img_path_list)
                     if print_pred and preds:
-                        for nu, pred in enumerate(preds):
+                        for pred in preds:
+                            filename = pred.pop("file_name")
                             pred_str = ", ".join(
                                 [f"{k}: {pred[k]}" for k in pred])
                             print(
-                                f"filename: {img_path_list[nu]}, top-{topk}, {pred_str}"
-                            )
+                                f"filename: {filename}, top-{topk}, {pred_str}")
 
                     img_list = []
                     img_path_list = []
