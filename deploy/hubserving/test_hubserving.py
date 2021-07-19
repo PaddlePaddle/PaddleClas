@@ -32,30 +32,59 @@ from utils import config
 from utils.encode_decode import np_to_b64
 from python.preprocess import create_operators
 
-preprocess_config = [{
-    'ResizeImage': {
-        'resize_short': 256
-    }
-}, {
-    'CropImage': {
-        'size': 224
-    }
-}, {
-    'NormalizeImage': {
-        'scale': 0.00392157,
-        'mean': [0.485, 0.456, 0.406],
-        'std': [0.229, 0.224, 0.225],
-        'order': ''
-    }
-}, {
-    'ToCHWImage': None
-}]
+
+def get_args():
+    def str2bool(v):
+        return v.lower() in ("true", "t", "1")
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--server_url", type=str)
+    parser.add_argument("--image_file", type=str)
+    parser.add_argument("--batch_size", type=int, default=1)
+    parser.add_argument("--resize_short", type=int, default=256)
+    parser.add_argument("--crop_size", type=int, default=224)
+    parser.add_argument("--normalize", type=str2bool, default=True)
+    parser.add_argument("--to_chw", type=str2bool, default=True)
+    return parser.parse_args()
+
+
+class PreprocessConfig(object):
+    def __init__(self,
+                 resize_short=256,
+                 crop_size=224,
+                 normalize=True,
+                 to_chw=True):
+        self.config = [{
+            'ResizeImage': {
+                'resize_short': resize_short
+            }
+        }, {
+            'CropImage': {
+                'size': crop_size
+            }
+        }]
+        if normalize:
+            self.config.append({
+                'NormalizeImage': {
+                    'scale': 0.00392157,
+                    'mean': [0.485, 0.456, 0.406],
+                    'std': [0.229, 0.224, 0.225],
+                    'order': ''
+                }
+            })
+        if to_chw:
+            self.config.append({'ToCHWImage': None})
+
+    def __call__(self):
+        return self.config
 
 
 def main(args):
     image_path_list = get_image_list(args.image_file)
     headers = {"Content-type": "application/json"}
-    preprocess_ops = create_operators(preprocess_config)
+    preprocess_ops = create_operators(
+        PreprocessConfig(args.resize_short, args.crop_size, args.normalize,
+                         args.to_chw)())
 
     cnt = 0
     predict_time = 0
@@ -113,14 +142,10 @@ def main(args):
 
                 for number, result_list in enumerate(preds):
                     all_score += result_list["scores"][0]
-                    result_str = ""
-                    for i in range(len(result_list["class_ids"])):
-                        result_str += "{}: {:.2f}\t".format(
-                            result_list["class_ids"][i],
-                            result_list["scores"][i])
-
+                    pred_str = ", ".join(
+                        [f"{k}: {result_list[k]}" for k in result_list])
                     logger.info(
-                        f"File:{img_name_list[number]}, The result(s): {result_str}"
+                        f"File:{img_name_list[number]}, The result(s): {pred_str}"
                     )
 
             finally:
@@ -136,10 +161,5 @@ def main(args):
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--server_url", type=str)
-    parser.add_argument("--image_file", type=str)
-    parser.add_argument("--batch_size", type=int, default=1)
-    args = parser.parse_args()
-
+    args = get_args()
     main(args)

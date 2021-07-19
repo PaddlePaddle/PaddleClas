@@ -279,8 +279,13 @@ def args_cfg():
         "--save_dir",
         type=str,
         help="The directory to save prediction results as pre-label.")
-    parser.add_argument("--resize_short", type=int, default=256, help="")
-    parser.add_argument("--crop_size", type=int, default=224, help="")
+    parser.add_argument(
+        "--resize_short",
+        type=int,
+        default=256,
+        help="Resize according to short size.")
+    parser.add_argument(
+        "--crop_size", type=int, default=224, help="Centor crop size.")
 
     args = parser.parse_args()
     return vars(args)
@@ -407,7 +412,7 @@ class PaddleClas(object):
         Args:
             model_name: The model name supported by PaddleClas, default by None. If specified, override config.
             inference_model_dir: The directory that contained model file and params file to be used, default by None. If specified, override config.
-            use_gpu: Wheather use GPU, default by None. If specified, override config.
+            use_gpu: Whether use GPU, default by None. If specified, override config.
             batch_size: The batch size to pridict, default by None. If specified, override config.
             topk: Return the top k prediction results with the highest score.
         """
@@ -459,7 +464,7 @@ class PaddleClas(object):
 
         Args:
             input_data (str | NumPy.array): The path of image, or the directory containing images, or the URL of image from Internet.
-            print_pred (bool, optional): Wheather print the prediction result. Defaults to False.
+            print_pred (bool, optional): Whether print the prediction result. Defaults to False.
 
         Raises:
             ImageTypeError: Illegal input_data.
@@ -506,12 +511,12 @@ class PaddleClas(object):
                     preds = self.cls_predictor.postprocess(outputs,
                                                            img_path_list)
                     if print_pred and preds:
-                        for nu, pred in enumerate(preds):
+                        for pred in preds:
+                            filename = pred.pop("file_name")
                             pred_str = ", ".join(
                                 [f"{k}: {pred[k]}" for k in pred])
                             print(
-                                f"filename: {img_path_list[nu]}, top-{topk}, {pred_str}"
-                            )
+                                f"filename: {filename}, top-{topk}, {pred_str}")
 
                     img_list = []
                     img_path_list = []
