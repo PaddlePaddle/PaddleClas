@@ -2,9 +2,7 @@
 FILENAME=$1
 # MODE be one of ['lite_train_infer' 'whole_infer' 'whole_train_infer', 'infer']
 MODE=$2
-
 dataline=$(cat ${FILENAME})
-
 # parser params
 IFS=$'\n'
 lines=(${dataline})
@@ -166,21 +164,21 @@ for gpu in ${gpu_list[*]}; do
         status_check $? "${cmd}" "${status_log}"
 
         # run eval
-        eval_cmd="${python} ${eval_py} -o Arch.name=${model_name} -o ${pretrain_model_key}=${save_log}/${model_name}/best_model" 
+        eval_cmd="${python} ${eval_py} -o Arch.name=${model_name} -o ${pretrain_model_key}=${save_log}/${model_name}/latest" 
         eval $eval_cmd
         status_check $? "${eval_cmd}" "${status_log}"
 
         # run export model
-        save_infer_path="${save_log}"
-        export_cmd="${python} ${norm_export} -o Arch.name=${model_name} -o ${pretrain_model_key}=${save_log}/${model_name}/best_model -o ${save_infer_key}=${save_infer_path}"
+        save_infer_path="${save_log}/inference"
+        export_cmd="${python} ${norm_export} -o Arch.name=${model_name} -o ${pretrain_model_key}=${save_log}/${model_name}/latest -o ${save_infer_key}=${save_infer_path}"
         eval $export_cmd
         status_check $? "${export_cmd}" "${status_log}"
 
         #run inference
         eval $env
-        save_infer_path="${save_log}"
+        save_infer_path="${save_log}/inference"
 	cd deploy
-        func_inference "${python}" "${inference_py}" "../${save_log}" "../${LOG_PATH}" "../${infer_img_dir}" model_name
+        func_inference "${python}" "${inference_py}" "../${save_infer_path}" "../${LOG_PATH}" "../${infer_img_dir}" "${model_name}"
         eval "unset CUDA_VISIBLE_DEVICES"
 	cd ..
     done
@@ -203,7 +201,7 @@ else
     #run inference
     cd deploy
     for model_name in ${model_name_list[*]}; do
-        func_inference "${python}" "${inference_py}" "../inference_models/${model_name}" "../${LOG_PATH}" "../${infer_img_dir}"
+        func_inference "${python}" "${inference_py}" "../inference_models/${model_name}" "../${LOG_PATH}" "../${infer_img_dir}" "${model_name}"
     done
     cd ..
 fi

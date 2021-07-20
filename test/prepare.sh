@@ -9,9 +9,10 @@ IFS=$'\n'
 lines=(${dataline})
 function func_parser_value(){
     strs=$1
-    ifs=":"
+    IFS=":"
     array=(${strs})
-    tmp=${array[1]}
+    IFS="|"
+    tmp="${array[1]}:${array[2]}"
     echo ${tmp}
 }
 ResNet50_vd=$(func_parser_value "${lines[49]}")
@@ -22,8 +23,6 @@ DarkNet53=$(func_parser_value "${lines[53]}")
 MobileNetV1=$(func_parser_value "${lines[54]}")
 MobileNetV2=$(func_parser_value "${lines[55]}")
 ShuffleNetV2_x1_0=$(func_parser_value "${lines[56]}")
-
-model_name_list=$(func_parser_value "${lines[1]}")
 
 if [ ${MODE} = "lite_train_infer" ] || [ ${MODE} = "whole_infer" ];then
     # pretrain lite train data
@@ -36,7 +35,7 @@ elif [ ${MODE} = "infer" ];then
     # download data
     cd dataset
     wget -nc http://10.21.226.181:8011/dataset/quanliantiao/infer.tar
-    tar xf little.tar
+    tar xf infer.tar
     ln -s infer chain_dataset
     cd ../
     # download pretrained model

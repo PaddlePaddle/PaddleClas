@@ -42,7 +42,7 @@ class ClsPredictor(Predictor):
             self.postprocess = build_postprocess(config["PostProcess"])
 
         # for whole_chain project to test each repo of paddle
-        self.benchmark = config.get(["benchmark"], False)
+        self.benchmark = config.get("benchmark", False)
         if self.benchmark:
             import auto_log
             import os
