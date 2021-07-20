@@ -48,18 +48,21 @@ class ClsPredictor(Predictor):
             import os
             pid = os.getpid()
             self.auto_log = auto_log.AutoLogger(
-                model_name='cls',
+                model_name=config["Global"].get("model_name", "cls"),
                 model_precision='fp16'
                 if config["Global"]["use_fp16"] else 'fp32',
-                batch_size=1,
+                batch_size=config["Global"].get("batch_size", 1),
                 data_shape=[3, 224, 224],
-                save_path="../output/auto_log.lpg",
-                inference_config=None,
+                save_path=config["Global"].get("save_log_path",
+                                               "./auto_log.log"),
+                inference_config=self.config,
                 pids=pid,
                 process_name=None,
                 gpu_ids=None,
-                time_keys=['preprocess_time', 'inference_time'],
-                warmup=10)
+                time_keys=[
+                    'preprocess_time', 'inference_time', 'postprocess_time'
+                ],
+                warmup=2)
 
     def predict(self, images):
         input_names = self.paddle_predictor.get_input_names()
@@ -99,8 +102,8 @@ def main(config):
         output = cls_predictor.postprocess(output, [image_file])
         if cls_predictor.benchmark:
             cls_predictor.auto_log.times.end(stamp=True)
-            cls_predictor.auto_log.report()
         print(output)
+    cls_predictor.auto_log.report()
     return
 
 

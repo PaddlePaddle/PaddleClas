@@ -28,7 +28,7 @@ class Predictor(object):
         if args.use_fp16 is True:
             assert args.use_tensorrt is True
         self.args = args
-        self.paddle_predictor = self.create_paddle_predictor(
+        self.paddle_predictor, self.config = self.create_paddle_predictor(
             args, inference_model_dir)
 
     def predict(self, image):
@@ -66,4 +66,4 @@ class Predictor(object):
         config.switch_use_feed_fetch_ops(False)
         predictor = create_predictor(config)
 
-        return predictor
+        return predictor, config

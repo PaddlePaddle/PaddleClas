@@ -92,7 +92,7 @@ function func_inference(){
                 for threads in ${cpu_threads_list[*]}; do
                     for batch_size in ${batch_size_list[*]}; do
                         _save_log_path="${_log_path}/${_model_name}_infer_cpu_usemkldnn_${use_mkldnn}_threads_${threads}_batchsize_${batch_size}.log"
-                        command="${_python} ${_script} -o ${use_gpu_key}=${use_gpu} -o ${use_mkldnn_key}=${use_mkldnn} -o ${cpu_threads_key}=${threads} -o ${infer_model_key}=${_model_dir} -o ${batch_size_key}=${batch_size} -o ${image_dir_key}=${_img_dir} -o ${save_log_key}=${_save_log_path} -o benchmark=True"
+                        command="${_python} ${_script} -o ${use_gpu_key}=${use_gpu} -o ${use_mkldnn_key}=${use_mkldnn} -o ${cpu_threads_key}=${threads} -o ${infer_model_key}=${_model_dir} -o ${batch_size_key}=${batch_size} -o ${image_dir_key}=${_img_dir} -o ${save_log_key}=${_save_log_path} -o benchmark=True -o Global.model_name=${_model_name}"
                         eval $command
                         status_check $? "${command}" "${status_log}"
                     done
@@ -106,7 +106,7 @@ function func_inference(){
                     fi
                     for batch_size in ${batch_size_list[*]}; do
                         _save_log_path="${_log_path}/${_model_name}_infer_gpu_usetrt_${use_trt}_precision_${precision}_batchsize_${batch_size}.log"
-                        command="${_python} ${_script} -o ${use_gpu_key}=${use_gpu} -o ${use_trt_key}=${use_trt} -o ${precision_key}=${precision} -o ${infer_model_key}=${_model_dir} -o ${batch_size_key}=${batch_size} -o ${image_dir_key}=${_img_dir} -o ${save_log_key}=${_save_log_path}  -o benchmark=True"
+                        command="${_python} ${_script} -o ${use_gpu_key}=${use_gpu} -o ${use_trt_key}=${use_trt} -o ${precision_key}=${precision} -o ${infer_model_key}=${_model_dir} -o ${batch_size_key}=${batch_size} -o ${image_dir_key}=${_img_dir} -o ${save_log_key}=${_save_log_path}  -o benchmark=True -o Global.model_name=${_model_name}"
                         eval $command
                         status_check $? "${command}" "${status_log}"
                     done
