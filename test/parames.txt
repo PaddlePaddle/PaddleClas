@@ -5,7 +5,7 @@ model_name_fpgm:ResNet50_vd|MobileNetV3_large_x1_0
 model_name_kl:ResNet50_vd|MobileNetV3_large_x1_0
 python:python3.7
 gpu_list:0|0,1|-1
-Global.epoch_num:10
+Global.epochs:10
 Global.output_dir:./output/
 Global.pretrained_model:null
 Global.save_inference_dir:null

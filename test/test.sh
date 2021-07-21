@@ -143,7 +143,7 @@ for gpu in ${gpu_list[*]}; do
     for model_name in ${model_name_list[*]}; do 
         # not set epoch when whole_train_infer
         if [ ${MODE} != "whole_train_infer" ]; then
-            set_epoch="-o ${epoch_key}=${epoch_num}"
+            set_epoch="-o ${epoch_key}=${epoch_value}"
         else
             set_epoch=" "
         fi
