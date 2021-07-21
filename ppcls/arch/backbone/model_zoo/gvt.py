@@ -433,7 +433,7 @@ class CPVTV2(PyramidVisionTransformer):
                  img_size=224,
                  patch_size=4,
                  in_chans=3,
-                 num_classes=1000,
+                 class_num=1000,
                  embed_dims=[64, 128, 256, 512],
                  num_heads=[1, 2, 4, 8],
                  mlp_ratios=[4, 4, 4, 4],
@@ -446,7 +446,7 @@ class CPVTV2(PyramidVisionTransformer):
                  depths=[3, 4, 6, 3],
                  sr_ratios=[8, 4, 2, 1],
                  block_cls=Block):
-        super().__init__(img_size, patch_size, in_chans, num_classes,
+        super().__init__(img_size, patch_size, in_chans, class_num,
                          embed_dims, num_heads, mlp_ratios, qkv_bias, qk_scale,
                          drop_rate, attn_drop_rate, drop_path_rate, norm_layer,
                          depths, sr_ratios, block_cls)
@@ -499,7 +499,7 @@ class PCPVT(CPVTV2):
                  img_size=224,
                  patch_size=4,
                  in_chans=3,
-                 num_classes=1000,
+                 class_num=1000,
                  embed_dims=[64, 128, 256],
                  num_heads=[1, 2, 4],
                  mlp_ratios=[4, 4, 4],
@@ -512,7 +512,7 @@ class PCPVT(CPVTV2):
                  depths=[4, 4, 4],
                  sr_ratios=[4, 2, 1],
                  block_cls=SBlock):
-        super().__init__(img_size, patch_size, in_chans, num_classes,
+        super().__init__(img_size, patch_size, in_chans, class_num,
                          embed_dims, num_heads, mlp_ratios, qkv_bias, qk_scale,
                          drop_rate, attn_drop_rate, drop_path_rate, norm_layer,
                          depths, sr_ratios, block_cls)
