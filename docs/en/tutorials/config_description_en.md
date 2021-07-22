@@ -79,7 +79,7 @@ Referring to [learning_rate.py](https://github.com/PaddlePaddle/PaddleClas/blob/
 
 | Parameter name      | Specific meaning                     | Defult value                        | Optional value                 |
 | ------------------- | ------------------------------------ | ----------------------------------- | ------------------------------ |
-| name                | 读取数据的类的名字                   | ImageNetDataset                     | VeriWild等其他读取数据类的名字 |
+| name                | The name of the class to read the data                   | ImageNetDataset                     | VeriWild and other Dataet type |
 | image_root          | The path where the dataset is stored | ./dataset/ILSVRC2012/               | str                            |
 | cls_label_path      | data label list                      | ./dataset/ILSVRC2012/train_list.txt | str                            |
 | transform_ops       | data preprocessing for single images | ——                                  | ——                             |
@@ -104,7 +104,7 @@ The parameter meaning of batch_transform_ops:
 
 | Function name | Parameter name | Specific meaning                        |
 | ------------- | -------------- | --------------------------------------- |
-| MixupOperator | alpha          | Mixup parameter value，该值越大增强越强 |
+| MixupOperator | alpha          | Mixup parameter value，the larger the value, the stronger the augment |
 
 ##### 1.5.2 sampler
 
@@ -217,7 +217,7 @@ The parameter meaning of batch_transform_ops:
 
 1.In PaddleClas, the `Neck` part is the connection part between Backbone and embedding layer, and `Head` part is the connection part between embedding layer and classification layer.。
 
-2.`BackboneStopLayer.name can be obtained by visualizing the model, visualization can be referred to [Netron](https://github.com/lutzroeder/netron)或者[visualdl](https://github.com/PaddlePaddle/VisualDL).
+2.`BackboneStopLayer.name` can be obtained by visualizing the model, visualization can be referred to [Netron](https://github.com/lutzroeder/netron) or [visualdl](https://github.com/PaddlePaddle/VisualDL).
 
 3.Calling tools/export_model.py will convert the model weights to inference model, where the infer_add_softmax parameter will control whether to add the Softmax activation function afterwards, the code default is True (the last output layer in the classification task will be connected to the Softmax activation function). In the recognition task, the activation function is not required for the feature layer, so it should be set to False here.
 
