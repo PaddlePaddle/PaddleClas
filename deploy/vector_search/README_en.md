@@ -81,7 +81,7 @@ query_vector = np.random.rand(128).astype(np.float32)
 index_docs = ["ID_"+str(i) for i in range(100000)]
 
 # Initialize index structure
-indexer = Graph_Index(dist_type="IP") #支持"IP"和"L2"
+indexer = Graph_Index(dist_type="IP") #support "IP" and "L2"
 indexer.build(gallery_vectors=index_vectors, gallery_docs=index_docs, pq_size=100, index_path='test')
 
 # Query
