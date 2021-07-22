@@ -22,7 +22,7 @@ PreProcess:
         mean: [0.485, 0.456, 0.406]
         std: [0.229, 0.224, 0.225]
         order: ''
-        channel_num: 3
+        channel_num: 4
     - ToCHWImage:
 PostProcess:
   main_indicator: Topk

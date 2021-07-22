@@ -28,6 +28,7 @@ Arch:
   name: ResNet50
   class_num: 1000
   input_image_channel: *image_channel
+  data_format: "NHWC"
  
 # loss function config for traing/eval process
 Loss:
@@ -41,7 +42,7 @@ Loss:
 Optimizer:
   name: Momentum
   momentum: 0.9
-  multi_precision: False # *use_pure_fp16
+  multi_precision: *use_pure_fp16
   lr:
     name: Piecewise
     learning_rate: 0.1
