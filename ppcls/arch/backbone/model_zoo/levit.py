@@ -426,7 +426,8 @@ class LeViT(nn.Layer):
         x = paddle.transpose(x, perm=[0, 2, 1])
         x = self.blocks(x)
         x = x.mean(1)
-        x = paddle.reshape(x, [-1, x.shape[-1]])
+
+        x = paddle.reshape(x, [-1, self.embed_dim[-1]])
         if self.distillation:
             x = self.head(x), self.head_dist(x)
             if not self.training:
