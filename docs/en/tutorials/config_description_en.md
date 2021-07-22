@@ -57,7 +57,7 @@ Here the configuration of `ResNet50_vd` on`ImageNet-1k`is used as an example to 
 | momentum          | momentum value                   | 0.9          | float                                              |
 | lr.name           | method of dropping learning rate | "Cosine"     | Other dropping methods of "Linear" and "Piecewise" |
 | lr.learning_rate  | initial value of learning rate   | 0.1          | float                                              |
-| lr.warmup_epoch   | warmup rounds                    | 0            | int，如5                                           |
+| lr.warmup_epoch   | warmup rounds                    | 0            | int，such as 5                                           |
 | regularizer.name  | regularization method name       | "L2"         | ["L1", "L2"]                                       |
 | regularizer.coeff | regularization factor            | 0.00007      | float                                              |
 
