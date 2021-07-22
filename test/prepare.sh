@@ -27,16 +27,16 @@ ShuffleNetV2_x1_0=$(func_parser_value "${lines[56]}")
 if [ ${MODE} = "lite_train_infer" ] || [ ${MODE} = "whole_infer" ];then
     # pretrain lite train data
     cd dataset
-    wget -nc http://10.21.226.181:8011/dataset/quanliantiao/little_train.tar
-    tar xf little_train.tar
-    ln -s little_train chain_dataset
+    wget -nc https://paddle-imagenet-models-name.bj.bcebos.com/data/whole_chain/whole_chain_little_train.tar
+    tar xf whole_chain_little_train.tar
+    ln -s whole_chain_little_train chain_dataset
     cd ../
 elif [ ${MODE} = "infer" ];then
     # download data
     cd dataset
-    wget -nc http://10.21.226.181:8011/dataset/quanliantiao/infer.tar
-    tar xf infer.tar
-    ln -s infer chain_dataset
+    wget -nc https://paddle-imagenet-models-name.bj.bcebos.com/data/whole_chain/whole_chain_infer.tar
+    tar xf whole_chain_infer.tar
+    ln -s whole_chain_infer chain_dataset
     cd ../
     # download pretrained model
     mkdir -p pretrained_models
@@ -52,7 +52,7 @@ elif [ ${MODE} = "infer" ];then
 
 elif [ ${MODE} = "whole_train_infer" ];then
     cd dataset
-    wget -nc http://10.21.226.181:8011/dataset/quanliantiao/CIFAR100.tar
-    tar xf CIFAR100.tar
-    ln -s CIFAR100 chain_dataset
+    wget -nc https://paddle-imagenet-models-name.bj.bcebos.com/data/whole_chain/whole_chain_CIFAR100.tar
+    tar xf whole_chain_CIFAR100.tar
+    ln -s whole_chain_CIFAR100 chain_dataset
 fi
