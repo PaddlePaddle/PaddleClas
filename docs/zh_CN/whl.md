@@ -5,7 +5,7 @@
 * pip安装
 
 ```bash
-pip3 install paddleclas==2.2.0
+pip3 install paddleclas==2.2.1
 ```
 
 * 本地构建并安装
