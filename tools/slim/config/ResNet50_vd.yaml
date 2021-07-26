@@ -18,12 +18,12 @@ Global:
 # for paddleslim
 Slim:
   # for quantalization
-  quant:
-    name: pact
+#   quant:
+#     name: pact
   ## for prune
-  #prune:
-  #  name: fpgm
-  #  prune_ratio: 0.3
+  prune:
+   name: fpgm
+   pruned_ratio: 0.3
 
 # model architecture
 Arch:
@@ -58,7 +58,7 @@ DataLoader:
     dataset:
       name: ImageNetDataset
       image_root: ./dataset/ILSVRC2012/
-      cls_label_path: ./dataset/ILSVRC2012/train_list.txt
+      cls_label_path: ./dataset/ILSVRC2012/train.txt
       transform_ops:
         - DecodeImage:
             to_rgb: True
@@ -89,7 +89,7 @@ DataLoader:
     dataset: 
       name: ImageNetDataset
       image_root: ./dataset/ILSVRC2012/
-      cls_label_path: ./dataset/ILSVRC2012/val_list.txt
+      cls_label_path: ./dataset/ILSVRC2012/val.txt
       transform_ops:
         - DecodeImage:
             to_rgb: True
