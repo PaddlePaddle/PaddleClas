@@ -55,7 +55,7 @@ brew install gcc
 #### Caution：
 
 1. If prompted with `Error: Running Homebrew as root is extremely dangerous and no longer supported... `, refer to this [link](https://jingyan.baidu.com/article/e52e3615057a2840c60c519c.html)
-2.  If prompted with `Error: Failure while executing; `tar --extract --no-same-owner --file... ', refer to this [link](https://blog.csdn.net/Dawn510/article/details/117787358).
+2.  If prompted with `Error: Failure while executing; tar --extract --no-same-owner --file... `, refer to this [link](https://blog.csdn.net/Dawn510/article/details/117787358).
 
 After installation the compiled executable is copied under /usr/local/bin, look at the gcc in this folder: 
 
