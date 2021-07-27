@@ -1,14 +1,13 @@
 # global configs
 Global:
   checkpoints: null
-  pretrained_model: ./output/ResNet50_vd/best_model
   pretrained_model: null 
   output_dir: ./output/
   device: gpu
   save_interval: 1
   eval_during_train: True
   eval_interval: 1
-  epochs: 30
+  epochs: 200
   print_batch_step: 10
   use_visualdl: False
   # used for static mode and model export
@@ -26,6 +25,7 @@ Slim:
 Arch:
   name: ResNet50_vd
   class_num: 1000
+  pretrained: True
  
 # loss function config for traing/eval process
 Loss:

@@ -1,7 +1,6 @@
 # global configs
 Global:
   checkpoints: null
-  pretrained_model: ./output/ResNet50_vd/best_model
   pretrained_model: null 
   output_dir: ./output/
   device: gpu
@@ -25,6 +24,7 @@ Slim:
 Arch:
   name: ResNet50_vd
   class_num: 1000
+  pretrained: True
  
 # loss function config for traing/eval process
 Loss:

@@ -67,7 +67,7 @@ def main():
         quantize_model_path=os.path.join(
             config["Global"]["save_inference_dir"], "quant_post_static_model"),
         sample_generator=sample_generator(train_dataloader),
-        batch_nums=5)
+        batch_nums=10)
 
 
 if __name__ == "__main__":
