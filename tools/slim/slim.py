@@ -18,9 +18,11 @@ import os
 import sys
 
 import paddle
+import numpy as np
 import paddleslim
 from paddle.jit import to_static
 from paddleslim.analysis import dygraph_flops as flops
+import argparse
 
 __dir__ = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.path.abspath(os.path.join(__dir__, '../../')))
@@ -29,6 +31,7 @@ from paddleslim.dygraph.quant import QAT
 from ppcls.engine.trainer import Trainer
 from ppcls.utils import config, logger
 from ppcls.utils.save_load import load_dygraph_pretrain
+from ppcls.data import build_dataloader
 
 quant_config = {
     # weight preprocess type, default is None and no preprocessing is performed. 
@@ -79,7 +82,7 @@ class Trainer_slim(Trainer):
             else:
                 logger.info("FLOPs before pruning: {}GFLOPs".format(
                     flops(self.model, [1] + self.config["Global"][
-                        "image_shape"]) / 1000000))
+                        "image_shape"]) / 1e9))
                 self.model.eval()
 
                 if prune_config["name"].lower() == "fpgm":
@@ -95,11 +98,6 @@ class Trainer_slim(Trainer):
 
         if self.quanter is None and self.pruner is None:
             logger.info("Training without slim")
-
-    def train(self):
-        super().train()
-        if self.config["Global"].get("save_inference_dir", None):
-            self.export_inference_model()
 
     def export_inference_model(self):
         if os.path.exists(
@@ -153,7 +151,7 @@ class Trainer_slim(Trainer):
 
         logger.info("FLOPs after pruning: {}GFLOPs; pruned ratio: {}".format(
             flops(self.model, [1] + self.config["Global"]["image_shape"]) /
-            1000000, plan.pruned_flops))
+            1e9, plan.pruned_flops))
 
         for param in self.model.parameters():
             if "conv2d" in param.name:
@@ -162,9 +160,46 @@ class Trainer_slim(Trainer):
         self.model.train()
 
 
+def parse_args():
+    parser = argparse.ArgumentParser(
+        "generic-image-rec slim script, for train, eval and export inference model"
+    )
+    parser.add_argument(
+        '-c',
+        '--config',
+        type=str,
+        default='configs/config.yaml',
+        help='config file path')
+    parser.add_argument(
+        '-o',
+        '--override',
+        action='append',
+        default=[],
+        help='config options to be overridden')
+    parser.add_argument(
+        '-m',
+        '--mode',
+        type=str,
+        default='train',
+        choices=['train', 'eval', 'infer', 'export'],
+        help='the different function')
+    args = parser.parse_args()
+    return args
+
+
 if __name__ == "__main__":
-    args = config.parse_args()
+    args = parse_args()
     config = config.get_config(
         args.config, overrides=args.override, show=False)
-    trainer = Trainer_slim(config, mode="train")
-    trainer.train()
+    if args.mode == 'train':
+        trainer = Trainer_slim(config, mode="train")
+        trainer.train()
+    elif args.mode == 'eval':
+        trainer = Trainer_slim(config, mode="eval")
+        trainer.eval()
+    elif args.mode == 'infer':
+        trainer = Trainer_slim(config, mode="infer")
+        trainer.infer()
+    else:
+        trainer = Trainer_slim(config, mode="train")
+        trainer.export_inference_model()

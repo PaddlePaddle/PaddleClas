@@ -1,7 +1,7 @@
 # global configs
 Global:
   checkpoints: null
-  # pretrained_model: ./output/ResNet50_vd/epoch_29
+  pretrained_model: ./output/ResNet50_vd/best_model
   pretrained_model: null 
   output_dir: ./output/
   device: gpu
@@ -15,19 +15,15 @@ Global:
   image_shape: [3, 224, 224]
   save_inference_dir: ./inference
 
-# for paddleslim
+# for quantalization or prune model 
 Slim:
-  # for quantalization
-#   quant:
-#     name: pact
-  ## for prune
-  prune:
-   name: fpgm
-   pruned_ratio: 0.3
+  ## for quantalization
+  quant:
+    name: pact
 
 # model architecture
 Arch:
-  name: MobileNetV3_large_x1_0
+  name: ResNet50_vd
   class_num: 1000
  
 # loss function config for traing/eval process
@@ -58,7 +54,7 @@ DataLoader:
     dataset:
       name: ImageNetDataset
       image_root: ./dataset/ILSVRC2012/
-      cls_label_path: ./dataset/ILSVRC2012/train.txt
+      cls_label_path: ./dataset/ILSVRC2012/train_list.txt
       transform_ops:
         - DecodeImage:
             to_rgb: True
@@ -89,7 +85,7 @@ DataLoader:
     dataset: 
       name: ImageNetDataset
       image_root: ./dataset/ILSVRC2012/
-      cls_label_path: ./dataset/ILSVRC2012/val.txt
+      cls_label_path: ./dataset/ILSVRC2012/val_list.txt
       transform_ops:
         - DecodeImage:
             to_rgb: True
