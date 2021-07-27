@@ -61,7 +61,8 @@ class CompCars(Dataset):
                     label_path = os.path.join(self._label_root,
                                               l[0].split('.')[0] + '.txt')
                     assert os.path.exists(label_path)
-                    bbox = open(label_path).readlines()[-1].strip().split()
+                    with open(label_path) as f:
+                        bbox = f.readlines()[-1].strip().split()
                     bbox = [int(x) for x in bbox]
                     self.images.append(os.path.join(self._img_root, l[0]))
                     self.labels.append(int(l[1]))

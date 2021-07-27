@@ -54,7 +54,7 @@ def load_dygraph_pretrain(model, path=None):
     return
 
 
-def load_dygraph_pretrain_from_url(model, pretrained_url, use_ssld):
+def load_dygraph_pretrain_from_url(model, pretrained_url, use_ssld=False):
     if use_ssld:
         pretrained_url = pretrained_url.replace("_pretrained",
                                                 "_ssld_pretrained")

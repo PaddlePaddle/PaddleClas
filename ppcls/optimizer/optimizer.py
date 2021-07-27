@@ -33,12 +33,14 @@ class Momentum(object):
                  learning_rate,
                  momentum,
                  weight_decay=None,
-                 grad_clip=None):
+                 grad_clip=None,
+                 multi_precision=False):
         super(Momentum, self).__init__()
         self.learning_rate = learning_rate
         self.momentum = momentum
         self.weight_decay = weight_decay
         self.grad_clip = grad_clip
+        self.multi_precision = multi_precision
 
     def __call__(self, parameters):
         opt = optim.Momentum(
@@ -46,6 +48,7 @@ class Momentum(object):
             momentum=self.momentum,
             weight_decay=self.weight_decay,
             grad_clip=self.grad_clip,
+            multi_precision=self.multi_precision,
             parameters=parameters)
         return opt
 
@@ -60,7 +63,8 @@ class Adam(object):
                  weight_decay=None,
                  grad_clip=None,
                  name=None,
-                 lazy_mode=False):
+                 lazy_mode=False,
+                 multi_precision=False):
         self.learning_rate = learning_rate
         self.beta1 = beta1
         self.beta2 = beta2
@@ -71,6 +75,7 @@ class Adam(object):
         self.grad_clip = grad_clip
         self.name = name
         self.lazy_mode = lazy_mode
+        self.multi_precision = multi_precision
 
     def __call__(self, parameters):
         opt = optim.Adam(
@@ -82,6 +87,7 @@ class Adam(object):
             grad_clip=self.grad_clip,
             name=self.name,
             lazy_mode=self.lazy_mode,
+            multi_precision=self.multi_precision,
             parameters=parameters)
         return opt
 
@@ -104,7 +110,8 @@ class RMSProp(object):
                  rho=0.95,
                  epsilon=1e-6,
                  weight_decay=None,
-                 grad_clip=None):
+                 grad_clip=None,
+                 multi_precision=False):
         super(RMSProp, self).__init__()
         self.learning_rate = learning_rate
         self.momentum = momentum

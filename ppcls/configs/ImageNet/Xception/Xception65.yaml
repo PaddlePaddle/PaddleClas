@@ -16,13 +16,13 @@ Global:
 
 # model architecture
 Arch:
-  name: Xception41_deeplab
+  name: Xception65
   class_num: 1000
  
 # loss function config for traing/eval process
 Loss:
   Train:
-    - CELoss:
+    - MixCELoss:
         weight: 1.0
         epsilon: 0.1
   Eval:

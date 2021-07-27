@@ -4,7 +4,7 @@ import paddle
 import paddle.nn as nn
 from ppcls.utils import logger
 
-from .celoss import CELoss
+from .celoss import CELoss, MixCELoss
 from .googlenetloss import GoogLeNetLoss
 from .centerloss import CenterLoss
 from .emlloss import EmlLoss
@@ -30,7 +30,6 @@ class CombinedLoss(nn.Layer):
         assert isinstance(config_list, list), (
             'operator config should be a list')
         for config in config_list:
-            print(config)
             assert isinstance(config,
                               dict) and len(config) == 1, "yaml format error"
             name = list(config)[0]
