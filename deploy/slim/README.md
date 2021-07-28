@@ -51,6 +51,8 @@ PaddleClas提供了一系列训练好的[模型](../../docs/zh_CN/models/models_
 cd PaddleClas
 ```
 
+`slim`相关代码都位于`deploy/slim`目录下
+
 #### 3.1 模型量化
 
 量化训练包括离线量化训练和在线量化训练，在线量化训练效果更好，需加载预训练模型，在定义好量化策略后即可对模型进行量化。
@@ -65,9 +67,9 @@ cd PaddleClas
 python3.7 deploy/slim/slim.py -m train -c ppcls/configs/slim/ResNet50_vd_quantalization.yaml -o Global.device cpu
 ```
 
-其中`yaml`文件解析详见[参考文档](../../docs/zh_CN/tutorials/config_description.md)
+其中`yaml`文件解析详见[参考文档](../../docs/zh_CN/tutorials/config_description.md)。为了保证精度，`yaml`文件中已经使用`pretrained model`.
 
-`-m`：表示`slim.py`支持的模式，有`train、val、infer、export`，4种模式，分别为：训练、测试、动态图预测、导出`inference model`
+`-m`：表示`slim.py`支持的模式，有`train、eval、infer、export`，4种模式，分别为：训练、测试、动态图预测、导出`inference model`
 
 * 单机单卡/单机多卡/多机多卡启动
 
@@ -82,7 +84,9 @@ python3.7 -m paddle.distributed.launch \
 
 ##### 3.1.2 离线量化
 
-**注意**：目前离线量化，必须使用已经训练好的模型，导出的`inference model`进行量化。一般模型导出`inference model`可参考[教程](../../docs/zh_CN/inference.md)
+**注意**：目前离线量化，必须使用已经训练好的模型，导出的`inference model`进行量化。一般模型导出`inference model`可参考[教程](../../docs/zh_CN/inference.md).
+
+一般来说，离线量化损失模型精度较多。
 
 生成`inference model`后，离线量化运行方式如下
 
@@ -90,7 +94,9 @@ python3.7 -m paddle.distributed.launch \
 python3.7 deploy/slim/quant_post_static.py -c ppcls/configs/ImageNet/ResNet/ResNet50_vd.yaml -o Global.save_inference_dir=./deploy/models/class_ResNet50_vd_ImageNet_infer
 ```
 
-其中`Global.save_inference_dir`是`inference model`存放的目录。执行成功后，在`Global.save_inference_dir`的目录下，生成`quant_post_static_model`文件夹，其中存储生成的离线量化模型，其可以直接进行预测部署，无需再重新导出模型。
+`Global.save_inference_dir`是`inference model`存放的目录。
+
+执行成功后，在`Global.save_inference_dir`的目录下，生成`quant_post_static_model`文件夹，其中存储生成的离线量化模型，其可以直接进行预测部署，无需再重新导出模型。
 
 #### 3.2 模型剪枝
 
@@ -128,7 +134,7 @@ python3.7 deploy/slim/slim.py \
 ### 5. 模型部署
 
 上述步骤导出的模型可以通过PaddleLite的opt模型转换工具完成模型转换。
-量化模型部署的可参考 [移动端模型部署](../lite/readme.md)
+模型部署的可参考 [移动端模型部署](../lite/readme.md)
 
 
 ## 训练超参数建议

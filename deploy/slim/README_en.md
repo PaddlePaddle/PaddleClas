@@ -1,23 +1,21 @@
 
-## Introduction
+## Introduction to Slim
 
-Generally, a more complex model would achive better performance in the task, but it also leads to some redundancy in the model.
-Quantization is a technique that reduces this redundancy by reducing the full precision data to a fixed number,
-so as to reduce model calculation complexity and improve model inference performance.
+Generally, a more complex model would achive better performance in the task, but it also leads to some redundancy in the model.  This part provides the function of compressing the model, including two parts: model quantization (offline quantization training and online quantization training) and model pruning.
+Quantization is a technique that reduces this redundancy by reducing the full precision data to a fixed number, so as to reduce model calculation complexity and improve model inference performance.
 
-This example uses PaddleSlim provided [APIs of Quantization](https://paddlepaddle.github.io/PaddleSlim/api/quantization_api/) to compress the PaddleClas models.
+Model pruning cuts off the unimportant convolution kernel in CNN to reduce  the amount of model parameters, so as to reduce the computational  complexity of the model.
 
 It is recommended that you could understand following pages before reading this example：
-- [The training strategy of PaddleClas models](../../../docs/en/tutorials/quick_start_en.md)
-- [PaddleSlim Document](https://paddlepaddle.github.io/PaddleSlim/api/quantization_api/)
+- [The training strategy of PaddleClas models](../../docs/en/tutorials/getting_started_en.md)
+- [PaddleSlim](https://github.com/PaddlePaddle/PaddleSlim)
 
 ## Quick Start
-Quantization is mostly suitable for the deployment of lightweight models on mobile terminals.
-After training, if you want to further compress the model size and accelerate the prediction, you can use quantization methods to compress the model according to the following steps.
+ After training a model, if you want to further compress the model size and  speed up the prediction, you can use quantization or pruning to compress the model according to the following steps.
 
 1. Install PaddleSlim
 2. Prepare trained model
-3. Quantization-Aware Training
+3. Model compression
 4. Export inference model
 5. Deploy quantization inference model
 
@@ -27,7 +25,7 @@ After training, if you want to further compress the model size and accelerate th
 * Install by pip.
 
 ```bash
-pip3.7 install paddleslim==2.0.0
+pip install paddleslim -i https://pypi.tuna.tsinghua.edu.cn/simple
 ```
 
 * Install from source code to get the lastest features.
@@ -40,71 +38,103 @@ python setup.py install
 
 
 ### 2. Download Pretrain Model
-PaddleClas provides a series of trained [models](../../../docs/en/models/models_intro_en.md).
-If the model to be quantified is not in the list, you need to follow the [Regular Training](../../../docs/en/tutorials/getting_started_en.md) method to get the trained model.
+PaddleClas provides a series of trained [models](../../docs/en/models/models_intro_en.md).
+If the model to be quantified is not in the list, you need to follow the [Regular Training](../../docs/en/tutorials/getting_started_en.md) method to get the trained model.
 
+### 3. Model Compression
 
-### 3. Quant-Aware Training
-Quantization training includes offline quantization training and online quantization training.
+Go to the root directory of PaddleClas
+
+```bash
+cd PaddleClase
+```
+
+The code of slim is located in `deploy/slim`
+
+#### 3.1 Model Quantization
+
+Quantization training includes offline quantization  and online quantization training.
+
+##### 3.1.1 Online quantization training
+
 Online quantization training is more effective. It is necessary to load the pre-trained model.
 After the quantization strategy is defined, the model can be quantified.
 
-The code for quantization training is located in `deploy/slim/quant/quant.py`. The training command is as follow:
+The training command is as follow:
 
 * CPU/Single GPU training
 
 ```bash
-python3.7 deploy/slim/quant/quant.py \
-    -c configs/MobileNetV3/MobileNetV3_large_x1_0.yaml \
-    -o pretrained_model="./MobileNetV3_large_x1_0_pretrained"
+python3.7 deploy/slim/slim.py -m train -c ppcls/configs/slim/ResNet50_vd_quantalization.yaml -o Global.device cpu
 ```
+
+The description of `yaml` file can be found  in this [doc](../../docs/en/tutorials/config_en.md). To get better accuracy, the `pretrained model`is used in `yaml`.
+
+`-m`: the mode of `slim.py` supported, include ` train, eval, infer, export`, means training models, evaluating model, inferring images using dygraph model and exporting inference model for deploy respectively.
 
 * Distributed training
 
 ```bash
-export CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7
+export CUDA_VISIBLE_DEVICES=0,1,2,3
 python3.7 -m paddle.distributed.launch \
-    --gpus="0,1,2,3,4,5,6,7" \
-    deploy/slim/quant/quant.py \
-        -c configs/MobileNetV3/MobileNetV3_large_x1_0.yaml \
-        -o pretrained_model="./MobileNetV3_large_x1_0_pretrained"
+    --gpus="0,1,2,3" \
+      deploy/slim/slim.py \
+      -m train \
+      -c ppcls/configs/slim/ResNet50_vd_quantalization.yaml
 ```
 
-* The command of quantizing `MobileNetV3_large_x1_0` model is as follow:
+##### 3.1.2 Offline quantization
+
+**Attention**:  At present, offline quantization must use `inference model` as input, which can be exported by trained model.  The process of exporting `inference model` for trained model can refer to this [doc](../../docs/en/inference.md).
+
+Generally speaking, the offline quantization gets more loss of accuracy than online qutization training.
+
+After getting `inference model`, we can run following command to get offline quantization model.
+
+```
+python3.7 deploy/slim/quant_post_static.py -c ppcls/configs/ImageNet/ResNet/ResNet50_vd.yaml -o Global.save_inference_dir=./deploy/models/class_ResNet50_vd_ImageNet_infer
+```
+
+`Global.save_inference_dir` is the directory storing the `inference model`.
+
+If run successfully, the directory `quant_post_static_model` is generated in `Global.save_inference_dir`, which stores the offline quantization model that can be used for deploy directly.
+
+#### 3.2 Model Pruning
+
+- CPU/Single GPU training
 
 ```bash
-# download pre-trained model
-wget https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/MobileNetV3_large_x1_0_pretrained.pdparams
-
-# run training
-python3.7 -m paddle.distributed.launch \
-    --gpus="0,1,2,3,4,5,6,7" \
-    deploy/slim/quant/quant.py \
-        -c configs/MobileNetV3/MobileNetV3_large_x1_0.yaml \
-        -o pretrained_model="./MobileNetV3_large_x1_0_pretrained"
-        -o LEARNING_RATE.params.lr=0.13 \
-        -o epochs=100
+python3.7 deploy/slim/slim.py -m export -c ppcls/configs/slim/ResNet50_vd_prune.yaml -o Global.device cpu
 ```
+
+- Distributed training
+
+```bash
+export CUDA_VISIBLE_DEVICES=0,1,2,3
+python3.7 -m paddle.distributed.launch \
+    --gpus="0,1,2,3" \
+      deploy/slim/slim.py \
+      -m train \
+      -c ppcls/configs/slim/ResNet50_vd_prune.yaml
+```
+
 
 
 ### 4. Export inference model
 
-After getting the model quantization aware trained, we can export it as inference model for predictive deployment:
+After getting the compressed model, we can export it as inference model for predictive deployment. Using pruned model as example:
 
 ```bash
-python3.7 deploy/slim/quant/export_model.py \
-    -m MobileNetV3_large_x1_0 \
-    -p output/MobileNetV3_large_x1_0/best_model/ppcls \
-    -o ./MobileNetV3_large_x1_0_infer/ \
-    --img_size=224 \
-    --class_dim=1000
+python3.7 deploy/slim/slim.py \
+    -m export \
+    -c ppcls/configs/slim/ResNet50_vd_prune.yaml \
+        -o Global.save_inference_dir=./inference
 ```
 
 ### 5. Deploy
-The type of quantized model's parameters derived from the above steps is still FP32, but the numerical range of the parameters is int8.
 The derived model can be converted through the `opt tool` of PaddleLite.
 
-For quantitative model deployment, please refer to [Mobile terminal model deployment](../../lite/readme_en.md)
+For compresed model deployment, please refer to [Mobile terminal model deployment](../lite/readme_en.md)
 
 ## Notes:
 
