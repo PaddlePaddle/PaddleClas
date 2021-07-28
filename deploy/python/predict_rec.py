@@ -82,11 +82,14 @@ def main(config):
         else:
             img = img[:, :, ::-1]
             batch_imgs.append(img)
-            img_name = img_path.split("/")[-1]
+            img_name = os.path.basename(img_path)
             batch_names.append(img_name)
             cnt += 1
 
         if cnt % config["Global"]["batch_size"] == 0 or (idx + 1) == len(image_list):
+            if len(batch_imgs) == 0: 
+                continue
+                
             batch_results = rec_predictor.predict(batch_imgs)
             for number, result_dict in enumerate(batch_results):
                 filename = batch_names[number]
