@@ -62,7 +62,9 @@ After the quantization strategy is defined, the model can be quantified.
 
 The training command is as follow:
 
-* CPU
+* CPU/Single GPU
+
+If using GPU, change the `cpu` to `gpu` in the following command.
 
 ```bash
 python3.7 deploy/slim/slim.py -m train -c ppcls/configs/slim/ResNet50_vd_quantalization.yaml -o Global.device=cpu
@@ -101,7 +103,9 @@ If run successfully, the directory `quant_post_static_model` is generated in `Gl
 
 #### 3.2 Model Pruning
 
-- CPU
+- CPU/Single GPU
+
+If using GPU, change the `cpu` to `gpu` in the following command.
 
 ```bash
 python3.7 deploy/slim/slim.py -m train -c ppcls/configs/slim/ResNet50_vd_prune.yaml -o Global.device=cpu

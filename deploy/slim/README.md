@@ -61,7 +61,9 @@ cd PaddleClas
 
 训练指令如下：
 
-* CPU
+* CPU/单卡GPU
+
+以CPU为例，若使用GPU，则将命令中改成`cpu`改成`gpu`
 
 ```bash
 python3.7 deploy/slim/slim.py -m train -c ppcls/configs/slim/ResNet50_vd_quantalization.yaml -o Global.device=cpu
@@ -71,7 +73,7 @@ python3.7 deploy/slim/slim.py -m train -c ppcls/configs/slim/ResNet50_vd_quantal
 
 `-m`：表示`slim.py`支持的模式，有`train、eval、infer、export`，4种模式，分别为：训练、测试、动态图预测、导出`inference model`
 
-* 单机单卡/单机多卡/多机多卡启动
+* 单机多卡/多机多卡启动
 
 ```bash
 export CUDA_VISIBLE_DEVICES=0,1,2,3
@@ -102,7 +104,9 @@ python3.7 deploy/slim/quant_post_static.py -c ppcls/configs/ImageNet/ResNet/ResN
 
 训练指令如下：
 
-- CPU
+- CPU/单卡GPU
+
+以CPU为例，若使用GPU，则将命令中改成`cpu`改成`gpu`
 
 ```bash
 python3.7 deploy/slim/slim.py -m train -c ppcls/configs/slim/ResNet50_vd_prune.yaml -o Global.device=cpu
