@@ -68,9 +68,6 @@ def main(config):
     cls_predictor = ClsPredictor(config)
     image_list = get_image_list(config["Global"]["infer_imgs"])
 
-    if len(image_list) == 1:
-        assert config["Global"]["batch_size"] == 1
-
     batch_imgs = []
     batch_names = []
     cnt = 0
