@@ -78,7 +78,6 @@ def main(config):
             logger.warning(
                 "Image file failed to read and has been skipped. The path: {}".
                 format(img_path))
-            continue
         else:
             img = img[:, :, ::-1]
             batch_imgs.append(img)
