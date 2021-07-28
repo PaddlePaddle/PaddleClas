@@ -93,7 +93,7 @@ def main(config):
             batch_results = rec_predictor.predict(batch_imgs)
             for number, result_dict in enumerate(batch_results):
                 filename = batch_names[number]
-                print("{}:\n{}".format(filename, result_dict))
+                print("{}:\t{}".format(filename, result_dict))
             batch_imgs = []
             batch_names = []
 
