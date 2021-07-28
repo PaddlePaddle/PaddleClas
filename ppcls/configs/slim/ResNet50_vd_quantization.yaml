@@ -16,7 +16,7 @@ Global:
 
 # for quantalization or prune model 
 Slim:
-  ## for quantalization
+  ## for quantization
   quant:
     name: pact
 

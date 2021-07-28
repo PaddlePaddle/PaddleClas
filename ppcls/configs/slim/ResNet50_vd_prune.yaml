@@ -14,7 +14,7 @@ Global:
   image_shape: [3, 224, 224]
   save_inference_dir: ./inference
 
-# for quantalization or prune model 
+# for quantization or prune model 
 Slim:
   ## for prune
   prune:

@@ -18,6 +18,7 @@ import os
 import sys
 
 import paddle
+from paddle import nn
 import numpy as np
 import paddleslim
 from paddle.jit import to_static
@@ -37,7 +38,8 @@ from ppcls.utils.config import print_config
 from ppcls.utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
 from ppcls.data import build_dataloader
 from ppcls.arch import apply_to_static
-from ppcls.arch import build_model
+from ppcls.arch import build_model, RecModel, DistillationModel
+from ppcls.arch.gears.identity_head import IdentityHead
 
 quant_config = {
     # weight preprocess type, default is None and no preprocessing is performed. 
@@ -61,6 +63,49 @@ quant_config = {
     # for dygraph quantization, layers of type in quantizable_layer_type will be quantized
     'quantizable_layer_type': ['Conv2D', 'Linear'],
 }
+
+
+class ExportModel(nn.Layer):
+    """
+    ExportModel: add softmax onto the model
+    """
+
+    def __init__(self, config, model):
+        super().__init__()
+        self.base_model = model
+
+        # we should choose a final model to export
+        if isinstance(self.base_model, DistillationModel):
+            self.infer_model_name = config["infer_model_name"]
+        else:
+            self.infer_model_name = None
+
+        self.infer_output_key = config.get("infer_output_key", None)
+        if self.infer_output_key == "features" and isinstance(self.base_model,
+                                                              RecModel):
+            self.base_model.head = IdentityHead()
+        if config.get("infer_add_softmax", True):
+            self.softmax = nn.Softmax(axis=-1)
+        else:
+            self.softmax = None
+
+    def eval(self):
+        self.training = False
+        for layer in self.sublayers():
+            layer.training = False
+            layer.eval()
+
+    def forward(self, x):
+        x = self.base_model(x)
+        if isinstance(x, list):
+            x = x[0]
+        if self.infer_model_name is not None:
+            x = x[self.infer_model_name]
+        if self.infer_output_key is not None:
+            x = x[self.infer_output_key]
+        if self.softmax is not None:
+            x = self.softmax(x)
+        return x
 
 
 class Trainer_slim(Trainer):
@@ -195,11 +240,12 @@ class Trainer_slim(Trainer):
             raise RuntimeError(
                 "The best_model or pretraine_model should exist to generate inference model"
             )
+        model = ExportModel(self.config["Arch"], self.model)
         save_path = os.path.join(self.config["Global"]["save_inference_dir"],
                                  "inference")
         if self.quanter:
             self.quanter.save_quantized_model(
-                self.model,
+                model,
                 save_path,
                 input_spec=[
                     paddle.static.InputSpec(
@@ -208,7 +254,7 @@ class Trainer_slim(Trainer):
                 ])
         else:
             model = to_static(
-                self.model,
+                model,
                 input_spec=[
                     paddle.static.InputSpec(
                         shape=[None] + self.config["Global"]["image_shape"],
