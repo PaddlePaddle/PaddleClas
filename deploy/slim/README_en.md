@@ -67,7 +67,7 @@ The training command is as follow:
 If using GPU, change the `cpu` to `gpu` in the following command.
 
 ```bash
-python3.7 deploy/slim/slim.py -m train -c ppcls/configs/slim/ResNet50_vd_quantalization.yaml -o Global.device=cpu
+python3.7 deploy/slim/slim.py -m train -c ppcls/configs/slim/ResNet50_vd_quantization.yaml -o Global.device=cpu
 ```
 
 The description of `yaml` file can be found  in this [doc](../../docs/en/tutorials/config_en.md). To get better accuracy, the `pretrained model`is used in `yaml`.
@@ -82,7 +82,7 @@ python3.7 -m paddle.distributed.launch \
     --gpus="0,1,2,3" \
       deploy/slim/slim.py \
       -m train \
-      -c ppcls/configs/slim/ResNet50_vd_quantalization.yaml
+      -c ppcls/configs/slim/ResNet50_vd_quantization.yaml
 ```
 
 ##### 3.1.2 Offline quantization
@@ -132,7 +132,7 @@ After getting the compressed model, we can export it as inference model for pred
 python3.7 deploy/slim/slim.py \
     -m export \
     -c ppcls/configs/slim/ResNet50_vd_prune.yaml \
-        -o Global.save_inference_dir=./inference
+    -o Global.save_inference_dir=./inference
 ```
 
 ### 5. Deploy

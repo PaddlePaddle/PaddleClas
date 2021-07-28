@@ -66,7 +66,7 @@ cd PaddleClas
 以CPU为例，若使用GPU，则将命令中改成`cpu`改成`gpu`
 
 ```bash
-python3.7 deploy/slim/slim.py -m train -c ppcls/configs/slim/ResNet50_vd_quantalization.yaml -o Global.device=cpu
+python3.7 deploy/slim/slim.py -m train -c ppcls/configs/slim/ResNet50_vd_quantization.yaml -o Global.device=cpu
 ```
 
 其中`yaml`文件解析详见[参考文档](../../docs/zh_CN/tutorials/config_description.md)。为了保证精度，`yaml`文件中已经使用`pretrained model`.
@@ -81,7 +81,7 @@ python3.7 -m paddle.distributed.launch \
     --gpus="0,1,2,3" \
       deploy/slim/slim.py \
       -m train \
-      -c ppcls/configs/slim/ResNet50_vd_quantalization.yaml
+      -c ppcls/configs/slim/ResNet50_vd_quantization.yaml
 ```
 
 ##### 3.1.2 离线量化
@@ -131,7 +131,7 @@ python3.7 -m paddle.distributed.launch \
 python3.7 deploy/slim/slim.py \
     -m export \
     -c ppcls/configs/slim/ResNet50_vd_prune.yaml \
-        -o Global.save_inference_dir=./inference
+    -o Global.save_inference_dir=./inference
 ```
 
 
