@@ -61,10 +61,10 @@ cd PaddleClas
 
 训练指令如下：
 
-* CPU/单机单卡启动
+* CPU
 
 ```bash
-python3.7 deploy/slim/slim.py -m train -c ppcls/configs/slim/ResNet50_vd_quantalization.yaml -o Global.device cpu
+python3.7 deploy/slim/slim.py -m train -c ppcls/configs/slim/ResNet50_vd_quantalization.yaml -o Global.device=cpu
 ```
 
 其中`yaml`文件解析详见[参考文档](../../docs/zh_CN/tutorials/config_description.md)。为了保证精度，`yaml`文件中已经使用`pretrained model`.
@@ -102,10 +102,10 @@ python3.7 deploy/slim/quant_post_static.py -c ppcls/configs/ImageNet/ResNet/ResN
 
 训练指令如下：
 
-- CPU/单机单卡启动
+- CPU
 
 ```bash
-python3.7 deploy/slim/slim.py -m export -c ppcls/configs/slim/ResNet50_vd_prune.yaml -o Global.device cpu
+python3.7 deploy/slim/slim.py -m train -c ppcls/configs/slim/ResNet50_vd_prune.yaml -o Global.device=cpu
 ```
 
 - 单机单卡/单机多卡/多机多卡启动

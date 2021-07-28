@@ -62,10 +62,10 @@ After the quantization strategy is defined, the model can be quantified.
 
 The training command is as follow:
 
-* CPU/Single GPU training
+* CPU
 
 ```bash
-python3.7 deploy/slim/slim.py -m train -c ppcls/configs/slim/ResNet50_vd_quantalization.yaml -o Global.device cpu
+python3.7 deploy/slim/slim.py -m train -c ppcls/configs/slim/ResNet50_vd_quantalization.yaml -o Global.device=cpu
 ```
 
 The description of `yaml` file can be found  in this [doc](../../docs/en/tutorials/config_en.md). To get better accuracy, the `pretrained model`is used in `yaml`.
@@ -101,10 +101,10 @@ If run successfully, the directory `quant_post_static_model` is generated in `Gl
 
 #### 3.2 Model Pruning
 
-- CPU/Single GPU training
+- CPU
 
 ```bash
-python3.7 deploy/slim/slim.py -m export -c ppcls/configs/slim/ResNet50_vd_prune.yaml -o Global.device cpu
+python3.7 deploy/slim/slim.py -m train -c ppcls/configs/slim/ResNet50_vd_prune.yaml -o Global.device=cpu
 ```
 
 - Distributed training

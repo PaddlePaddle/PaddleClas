@@ -23,6 +23,8 @@ import paddleslim
 from paddle.jit import to_static
 from paddleslim.analysis import dygraph_flops as flops
 import argparse
+import paddle.distributed as dist
+from visualdl import LogWriter
 
 __dir__ = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.path.abspath(os.path.join(__dir__, '../../')))
@@ -30,8 +32,12 @@ from paddleslim.dygraph.quant import QAT
 
 from ppcls.engine.trainer import Trainer
 from ppcls.utils import config, logger
-from ppcls.utils.save_load import load_dygraph_pretrain
+from ppcls.utils.logger import init_logger
+from ppcls.utils.config import print_config
+from ppcls.utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
 from ppcls.data import build_dataloader
+from ppcls.arch import apply_to_static
+from ppcls.arch import build_model
 
 quant_config = {
     # weight preprocess type, default is None and no preprocessing is performed. 
@@ -59,7 +65,75 @@ quant_config = {
 
 class Trainer_slim(Trainer):
     def __init__(self, config, mode="train"):
-        super().__init__(config, mode)
+
+        self.mode = mode
+        self.config = config
+        self.output_dir = self.config['Global']['output_dir']
+
+        log_file = os.path.join(self.output_dir, self.config["Arch"]["name"],
+                                f"{mode}.log")
+        init_logger(name='root', log_file=log_file)
+        print_config(config)
+        # set device
+        assert self.config["Global"]["device"] in ["cpu", "gpu", "xpu"]
+        self.device = paddle.set_device(self.config["Global"]["device"])
+        # set dist
+        self.config["Global"][
+            "distributed"] = paddle.distributed.get_world_size() != 1
+
+        if "Head" in self.config["Arch"]:
+            self.is_rec = True
+        else:
+            self.is_rec = False
+
+        self.model = build_model(self.config["Arch"])
+        # set @to_static for benchmark, skip this by default.
+        apply_to_static(self.config, self.model)
+
+        if self.config["Global"]["pretrained_model"] is not None:
+            if self.config["Global"]["pretrained_model"].startswith("http"):
+                load_dygraph_pretrain_from_url(
+                    self.model, self.config["Global"]["pretrained_model"])
+            else:
+                load_dygraph_pretrain(
+                    self.model, self.config["Global"]["pretrained_model"])
+
+        self.vdl_writer = None
+        if self.config['Global']['use_visualdl'] and mode == "train":
+            vdl_writer_path = os.path.join(self.output_dir, "vdl")
+            if not os.path.exists(vdl_writer_path):
+                os.makedirs(vdl_writer_path)
+            self.vdl_writer = LogWriter(logdir=vdl_writer_path)
+        logger.info('train with paddle {} and device {}'.format(
+            paddle.__version__, self.device))
+        # init members
+        self.train_dataloader = None
+        self.eval_dataloader = None
+        self.gallery_dataloader = None
+        self.query_dataloader = None
+        self.eval_mode = self.config["Global"].get("eval_mode",
+                                                   "classification")
+        self.amp = True if "AMP" in self.config else False
+        if self.amp and self.config["AMP"] is not None:
+            self.scale_loss = self.config["AMP"].get("scale_loss", 1.0)
+            self.use_dynamic_loss_scaling = self.config["AMP"].get(
+                "use_dynamic_loss_scaling", False)
+        else:
+            self.scale_loss = 1.0
+            self.use_dynamic_loss_scaling = False
+        if self.amp:
+            AMP_RELATED_FLAGS_SETTING = {
+                'FLAGS_cudnn_batchnorm_spatial_persistent': 1,
+                'FLAGS_max_inplace_grad_add': 8,
+            }
+            paddle.fluid.set_flags(AMP_RELATED_FLAGS_SETTING)
+        self.train_loss_func = None
+        self.eval_loss_func = None
+        self.train_metric_func = None
+        self.eval_metric_func = None
+        self.use_dali = self.config['Global'].get("use_dali", False)
+
+        # for slim
         pact = self.config["Slim"].get("quant", False)
         self.pact = pact.get("name", False) if pact else pact
 
@@ -98,6 +172,11 @@ class Trainer_slim(Trainer):
 
         if self.quanter is None and self.pruner is None:
             logger.info("Training without slim")
+
+        # for distributed training
+        if self.config["Global"]["distributed"]:
+            dist.init_parallel_env()
+            self.model = paddle.DataParallel(self.model)
 
     def export_inference_model(self):
         if os.path.exists(
