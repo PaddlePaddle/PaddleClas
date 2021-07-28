@@ -1,9 +1,9 @@
 Global:
   rec_inference_model_dir: "./models/cartoon_rec_ResNet50_iCartoon_v1.0_infer/"
-  batch_size: 1
+  batch_size: 32
   use_gpu: True
-  enable_mkldnn: False
-  cpu_num_threads: 100
+  enable_mkldnn: True
+  cpu_num_threads: 10
   enable_benchmark: True
   use_fp16: False
   ir_optim: True

@@ -35,7 +35,6 @@ sudo apt-get install build-essential gcc g++
 
 进入该文件夹，直接运行`make`即可，如果希望重新生成`index.so`文件，可以首先使用`make clean`清除已经生成的缓存，再使用`make`生成更新之后的库文件。
 
-
 ### 2.3 Windows上编译生成库文件
 
 Windows上首先需要安装gcc编译工具，推荐使用[TDM-GCC](https://jmeubank.github.io/tdm-gcc/articles/2020-03/9.2.0-release)，进入官网之后，可以选择合适的版本进行下载。推荐下载[tdm64-gcc-10.3.0-2.exe](https://github.com/jmeubank/tdm-gcc/releases/download/v10.3.0-tdm64-2/tdm64-gcc-10.3.0-2.exe)。
@@ -48,8 +47,27 @@ Windows上首先需要安装gcc编译工具，推荐使用[TDM-GCC](https://jmeu
 
 安装完成后，可以打开一个命令行终端，通过命令`gcc -v`查看gcc版本。
 
-在该文件夹下，运行命令`mingw32-make`，即可生成`index.dll`库文件。如果希望重新生成`index.dll`文件，可以首先使用`mingw32-make clean`清除已经生成的缓存，再使用`mingw32-make`生成更新之后的库文件。
+在该文件夹(deploy/vector_search)下，运行命令`mingw32-make`，即可生成`index.dll`库文件。如果希望重新生成`index.dll`文件，可以首先使用`mingw32-make clean`清除已经生成的缓存，再使用`mingw32-make`生成更新之后的库文件。
 
+### 2.4 MacOS上编译生成库文件
+
+运行下面的命令，安装gcc与g++:
+
+```shell
+brew install gcc
+```
+#### 注意：
+1. 若提示 `Error: Running Homebrew as root is extremely dangerous and no longer supported...`,  参考该[链接](https://jingyan.baidu.com/article/e52e3615057a2840c60c519c.html)处理
+2. 若提示 `Error: Failure while executing; `tar --extract --no-same-owner --file...`， 参考该[链接](https://blog.csdn.net/Dawn510/article/details/117787358)处理
+
+在安装之后编译后的可执行程序会被复制到/usr/local/bin下面，查看这个文件夹下的gcc：
+```
+ls /usr/local/bin/gcc*
+```
+可以看到本地gcc对应的版本号为gcc-11，编译命令如下: (如果本地gcc版本为gcc-9, 则相应命令修改为`CXX=g++-9 make`)
+```
+CXX=g++-11 make
+```
 
 ## 3. 快速使用
 

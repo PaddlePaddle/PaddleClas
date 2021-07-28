@@ -27,7 +27,6 @@ from utils.get_image_list import get_image_list
 from python.preprocess import create_operators
 from python.postprocess import build_postprocess
 
-
 class ClsPredictor(Predictor):
     def __init__(self, config):
         super().__init__(config["Global"])
@@ -96,13 +95,11 @@ def main(config):
                 scores_str = "[{}]".format(", ".join("{:.2f}".format(
                     r) for r in result_dict["scores"]))
                 label_names = result_dict["label_names"]
-                print("{}:\nclass id(s): {}, score(s): {}, label_name(s): {}".
+                print("{}:\tclass id(s): {}, score(s): {}, label_name(s): {}".
                       format(filename, clas_ids, scores_str, label_names))
             batch_imgs = []
             batch_names = []
-
     return
-
 
 if __name__ == "__main__":
     args = config.parse_args()

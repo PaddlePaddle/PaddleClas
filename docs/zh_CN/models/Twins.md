@@ -3,9 +3,9 @@
 ## 概述
 Twins网络包括Twins-PCPVT和Twins-SVT，其重点对空间注意力机制进行了精心设计，得到了简单却更为有效的方案。由于该体系结构仅涉及矩阵乘法，而目前的深度学习框架中对矩阵乘法有较高的优化程度，因此该体系结构十分高效且易于实现。并且，该体系结构在图像分类、目标检测和语义分割等多种下游视觉任务中都能够取得优异的性能。[论文地址](https://arxiv.org/abs/2104.13840)。
 
-## 精度、FLOPS和参数量
+## 精度、FLOPs和参数量
 
-| Models        | Top1 | Top5 | Reference<br>top1 | Reference<br>top5 | FLOPS<br>(G) | Params<br>(M) |
+| Models        | Top1 | Top5 | Reference<br>top1 | Reference<br>top5 | FLOPs<br>(G) | Params<br>(M) |
 |:--:|:--:|:--:|:--:|:--:|:--:|:--:|
 | pcpvt_small   | 0.8082 | 0.9552 | 0.812 | - | 3.7 | 24.1   |
 | pcpvt_base    | 0.8242 | 0.9619 | 0.827 | - | 6.4 | 43.8   |

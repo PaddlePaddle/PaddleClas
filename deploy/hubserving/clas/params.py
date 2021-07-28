@@ -33,8 +33,10 @@ def get_default_confg():
             "enable_benchmark": False
         },
         'PostProcess': {
-            'name': 'Topk',
-            'topk': 5,
-            'class_id_map_file': './utils/imagenet1k_label_list.txt'
+            'main_indicator': 'Topk',
+            'Topk': {
+                'topk': 5,
+                'class_id_map_file': './utils/imagenet1k_label_list.txt'
+            }
         }
     }
