@@ -172,8 +172,8 @@ def create_metric(out,
         metric_names.append(ham_dist_name)
         metric_names.append(accuracy_name)
 
-        fetch_list.append(accuracy)
         fetch_list.append(ham_dist)
+        fetch_list.append(accuracy)
 
     # multi cards' eval
     if not use_xpu:
