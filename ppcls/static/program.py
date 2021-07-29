@@ -38,7 +38,7 @@ from ppcls.optimizer import build_optimizer
 from ppcls.optimizer import build_lr_scheduler
 
 from ppcls.utils.misc import AverageMeter
-from ppcls.utils import logger
+from ppcls.utils import logger, profiler
 
 
 def create_feeds(image_shape, use_mix=None, dtype="float32"):
@@ -326,7 +326,8 @@ def run(dataloader,
         mode='train',
         config=None,
         vdl_writer=None,
-        lr_scheduler=None):
+        lr_scheduler=None,
+        profiler_options=None):
     """
     Feed data to the model and fetch the measures and loss
 
@@ -381,6 +382,8 @@ def run(dataloader,
             metric_dict["reader_time"].reset()
 
         metric_dict['reader_time'].update(time.time() - tic)
+
+        profiler.add_profiler_step(profiler_options)
 
         if use_dali:
             batch_size = batch[0]["data"].shape()[0]
