@@ -38,7 +38,7 @@ class CosMargin(paddle.nn.Layer):
 
         input_norm = paddle.sqrt(
             paddle.sum(paddle.square(input), axis=1, keepdim=True))
-        input = paddle.divide(input, x_norm)
+        input = paddle.divide(input, input_norm)
 
         weight = self.fc.weight
         weight_norm = paddle.sqrt(

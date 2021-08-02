@@ -7,7 +7,7 @@ Global:
   save_interval: 1
   eval_during_train: True
   eval_interval: 1
-  epochs: 10
+  epochs: 120
   print_batch_step: 10
   use_visualdl: False
   # used for static mode and model export
@@ -18,7 +18,7 @@ Global:
 
 # model architecture
 Arch:
-  name: ResNet50
+  name: pcpvt_base
   class_num: 1000
  
 # loss function config for traing/eval process
@@ -49,8 +49,8 @@ DataLoader:
   Train:
     dataset:
       name: ImageNetDataset
-      image_root: ./dataset/chain_dataset/
-      cls_label_path: ./dataset/chain_dataset/train.txt
+      image_root: ./dataset/ILSVRC2012/
+      cls_label_path: ./dataset/ILSVRC2012/train_list.txt
       transform_ops:
         - DecodeImage:
             to_rgb: True
@@ -77,8 +77,8 @@ DataLoader:
   Eval:
     dataset: 
       name: ImageNetDataset
-      image_root: ./dataset/chain_dataset/
-      cls_label_path: ./dataset/chain_dataset/val.txt
+      image_root: ./dataset/ILSVRC2012/
+      cls_label_path: ./dataset/ILSVRC2012/val_list.txt
       transform_ops:
         - DecodeImage:
             to_rgb: True

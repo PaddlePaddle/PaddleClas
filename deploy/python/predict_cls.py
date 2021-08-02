@@ -42,7 +42,7 @@ class ClsPredictor(Predictor):
             self.postprocess = build_postprocess(config["PostProcess"])
 
         # for whole_chain project to test each repo of paddle
-        self.benchmark = config.get("benchmark", False)
+        self.benchmark = config["Global"].get("benchmark", False)
         if self.benchmark:
             import auto_log
             import os
@@ -88,6 +88,10 @@ class ClsPredictor(Predictor):
         batch_output = output_tensor.copy_to_cpu()
         if self.benchmark:
             self.auto_log.times.stamp()
+        if self.postprocess is not None:
+            batch_output = self.postprocess(batch_output)
+        if self.benchmark:
+            self.auto_log.times.end(stamp=True)
         return batch_output
 
 
@@ -95,14 +99,38 @@ def main(config):
     cls_predictor = ClsPredictor(config)
     image_list = get_image_list(config["Global"]["infer_imgs"])
 
-    assert config["Global"]["batch_size"] == 1
-    for idx, image_file in enumerate(image_list):
-        img = cv2.imread(image_file)[:, :, ::-1]
-        output = cls_predictor.predict(img)
-        output = cls_predictor.postprocess(output, [image_file])
-        if cls_predictor.benchmark:
-            cls_predictor.auto_log.times.end(stamp=True)
-        print(output)
+    batch_imgs = []
+    batch_names = []
+    cnt = 0
+    for idx, img_path in enumerate(image_list):
+        img = cv2.imread(img_path)
+        if img is None:
+            logger.warning(
+                "Image file failed to read and has been skipped. The path: {}".
+                format(img_path))
+        else:
+            img = img[:, :, ::-1]
+            batch_imgs.append(img)
+            img_name = os.path.basename(img_path)
+            batch_names.append(img_name)
+            cnt += 1
+
+        if cnt % config["Global"]["batch_size"] == 0 or (idx + 1
+                                                         ) == len(image_list):
+            if len(batch_imgs) == 0:
+                continue
+
+            batch_results = cls_predictor.predict(batch_imgs)
+            for number, result_dict in enumerate(batch_results):
+                filename = batch_names[number]
+                clas_ids = result_dict["class_ids"]
+                scores_str = "[{}]".format(", ".join("{:.2f}".format(
+                    r) for r in result_dict["scores"]))
+                label_names = result_dict["label_names"]
+                print("{}:\tclass id(s): {}, score(s): {}, label_name(s): {}".
+                      format(filename, clas_ids, scores_str, label_names))
+            batch_imgs = []
+            batch_names = []
     cls_predictor.auto_log.report()
     return
 

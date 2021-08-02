@@ -3,9 +3,9 @@
 ## Overview
 The Twins network includes Twins-PCPVT and Twins-SVT, which focuses on the meticulous design of the spatial attention mechanism, resulting in a simple but more effective solution. Since the architecture only involves matrix multiplication, and the current deep learning framework has a high degree of optimization for matrix multiplication, the architecture is very efficient and easy to implement. Moreover, this architecture can achieve excellent performance in a variety of downstream vision tasks such as image classification, target detection, and semantic segmentation. [Paper](https://arxiv.org/abs/2104.13840).
 
-## Accuracy, FLOPS and Parameters
+## Accuracy, FLOPs and Parameters
 
-| Models        | Top1 | Top5 | Reference<br>top1 | Reference<br>top5 | FLOPS<br>(G) | Params<br>(M) |
+| Models        | Top1 | Top5 | Reference<br>top1 | Reference<br>top5 | FLOPs<br>(G) | Params<br>(M) |
 |:--:|:--:|:--:|:--:|:--:|:--:|:--:|
 | pcpvt_small   | 0.8082 | 0.9552 | 0.812 | - | 3.7 | 24.1   |
 | pcpvt_base    | 0.8242 | 0.9619 | 0.827 | - | 6.4 | 43.8   |

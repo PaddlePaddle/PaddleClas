@@ -12,8 +12,8 @@ Global:
   - foreground
 
   use_gpu: True
-  enable_mkldnn: False
-  cpu_num_threads: 100
+  enable_mkldnn: True
+  cpu_num_threads: 10
   enable_benchmark: True
   use_fp16: False
   ir_optim: True
