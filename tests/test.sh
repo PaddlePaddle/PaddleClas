@@ -227,6 +227,7 @@ if [ ${MODE} = "infer" ]; then
     IFS="|"
     infer_run_exports=(${infer_export_list})
     infer_quant_flag=(${infer_is_quant})
+    cd deploy
     for infer_model in ${infer_model_dir_list[*]}; do
         # run export
         if [ ${infer_run_exports[Count]} != "null" ];then
@@ -236,15 +237,16 @@ if [ ${MODE} = "infer" ]; then
             eval $export_cmd
             status_export=$?
             if [ ${status_export} = 0 ];then
-                status_check $status_export "${export_cmd}" "${status_log}"
+                status_check $status_export "${export_cmd}" "../${status_log}"
             fi
         fi
         #run inference
         is_quant=${infer_quant_flag[Count]}
         echo "is_quant: ${is_quant}"
-        func_inference "${python}" "${inference_py}" "${infer_model}" "${LOG_PATH}" "${infer_img_dir}" ${is_quant}
+        func_inference "${python}" "${inference_py}" "${infer_model}" "../${LOG_PATH}" "${infer_img_dir}" ${is_quant}
         Count=$(($Count + 1))
     done
+    cd ..
 
 else
     IFS="|"

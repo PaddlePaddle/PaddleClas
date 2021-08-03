@@ -33,7 +33,7 @@ fpgm_export:null
 distill_export:null
 export1:null
 export2:null
-##
+infer_model_url:https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/whole_chain/MobileNetV2_inference.tar
 infer_model:../inference/
 infer_export:null
 infer_quant:Fasle
@@ -48,16 +48,4 @@ inference:python/predict_cls.py -c configs/inference_cls.yaml
 -o Global.infer_imgs:../dataset/ILSVRC2012/val
 -o Global.save_log_path:null
 -o Global.benchmark:True
-#
-#
-#
-#
-===========================pretrained_model===========================
-ResNet50_vd:https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/ResNet50_vd_pretrained.pdparams   
-ResNeXt101_vd_64x4d:https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ResNeXt101_vd_64x4d_pretrained.pdparams
-HRNet_W18_C:https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/HRNet_W18_C_pretrained.pdparams
-MobileNetV3_large_x1_0:https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/MobileNetV3_large_x1_0_pretrained.pdparams
-DarkNet53:https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DarkNet53_pretrained.pdparams 
-MobileNetV1:https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/MobileNetV1_pretrained.pdparams
-MobileNetV2:https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/MobileNetV2_pretrained.pdparams 
-ShuffleNetV2_x1_0:https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ShuffleNetV2_x1_0_pretrained.pdparams
+null:null

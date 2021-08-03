@@ -59,7 +59,8 @@ class Predictor(object):
             config.enable_tensorrt_engine(
                 precision_mode=Config.Precision.Half
                 if args.use_fp16 else Config.Precision.Float32,
-                max_batch_size=args.batch_size)
+                max_batch_size=args.batch_size,
+                min_subgraph_size=30)
 
         config.enable_memory_optim()
         # use zero copy
