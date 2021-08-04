@@ -460,17 +460,17 @@ def ResNeXt101_32x8d_wsl(pretrained=False, use_ssld=False, **kwargs):
     return model
 
 
-def ResNeXt101_32x16d_wsl(**args):
+def ResNeXt101_32x16d_wsl(pretrained=False, use_ssld=False, **kwargs):
     model = ResNeXt101WSL(cardinality=32, width=16, **kwargs)
     _load_pretrained(
         pretrained,
         model,
-        MODEL_URLS["ResNeXt101_32x16d_ws"],
+        MODEL_URLS["ResNeXt101_32x16d_wsl"],
         use_ssld=use_ssld)
     return model
 
 
-def ResNeXt101_32x32d_wsl(**args):
+def ResNeXt101_32x32d_wsl(pretrained=False, use_ssld=False, **kwargs):
     model = ResNeXt101WSL(cardinality=32, width=32, **kwargs)
     _load_pretrained(
         pretrained,
@@ -480,7 +480,7 @@ def ResNeXt101_32x32d_wsl(**args):
     return model
 
 
-def ResNeXt101_32x48d_wsl(**args):
+def ResNeXt101_32x48d_wsl(pretrained=False, use_ssld=False, **kwargs):
     model = ResNeXt101WSL(cardinality=32, width=48, **kwargs)
     _load_pretrained(
         pretrained,
