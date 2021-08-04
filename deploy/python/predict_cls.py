@@ -47,7 +47,7 @@ class ClsPredictor(Predictor):
             import auto_log
             import os
             pid = os.getpid()
-            self.auto_log = auto_log.AutoLogger(
+            self.auto_logger = auto_log.AutoLogger(
                 model_name=config["Global"].get("model_name", "cls"),
                 model_precision='fp16'
                 if config["Global"]["use_fp16"] else 'fp32',
@@ -73,7 +73,7 @@ class ClsPredictor(Predictor):
             0])
 
         if self.benchmark:
-            self.auto_log.times.start()
+            self.auto_logger.times.start()
         if not isinstance(images, (list, )):
             images = [images]
         for idx in range(len(images)):
@@ -81,17 +81,17 @@ class ClsPredictor(Predictor):
                 images[idx] = ops(images[idx])
         image = np.array(images)
         if self.benchmark:
-            self.auto_log.times.stamp()
+            self.auto_logger.times.stamp()
 
         input_tensor.copy_from_cpu(image)
         self.paddle_predictor.run()
         batch_output = output_tensor.copy_to_cpu()
         if self.benchmark:
-            self.auto_log.times.stamp()
+            self.auto_logger.times.stamp()
         if self.postprocess is not None:
             batch_output = self.postprocess(batch_output)
         if self.benchmark:
-            self.auto_log.times.end(stamp=True)
+            self.auto_logger.times.end(stamp=True)
         return batch_output
 
 
@@ -131,7 +131,8 @@ def main(config):
                       format(filename, clas_ids, scores_str, label_names))
             batch_imgs = []
             batch_names = []
-    cls_predictor.auto_log.report()
+    if cls_predictor.benchmark:
+        cls_predictor.auto_logger.report()
     return
 
 
