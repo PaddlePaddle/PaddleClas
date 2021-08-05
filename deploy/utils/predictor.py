@@ -28,7 +28,7 @@ class Predictor(object):
         if args.use_fp16 is True:
             assert args.use_tensorrt is True
         self.args = args
-        self.paddle_predictor = self.create_paddle_predictor(
+        self.paddle_predictor, self.config = self.create_paddle_predictor(
             args, inference_model_dir)
 
     def predict(self, image):
@@ -59,11 +59,12 @@ class Predictor(object):
             config.enable_tensorrt_engine(
                 precision_mode=Config.Precision.Half
                 if args.use_fp16 else Config.Precision.Float32,
-                max_batch_size=args.batch_size)
+                max_batch_size=args.batch_size,
+                min_subgraph_size=30)
 
         config.enable_memory_optim()
         # use zero copy
         config.switch_use_feed_fetch_ops(False)
         predictor = create_predictor(config)
 
-        return predictor
+        return predictor, config

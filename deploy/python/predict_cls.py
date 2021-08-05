@@ -27,6 +27,7 @@ from utils.get_image_list import get_image_list
 from python.preprocess import create_operators
 from python.postprocess import build_postprocess
 
+
 class ClsPredictor(Predictor):
     def __init__(self, config):
         super().__init__(config["Global"])
@@ -40,6 +41,29 @@ class ClsPredictor(Predictor):
         if "PostProcess" in config:
             self.postprocess = build_postprocess(config["PostProcess"])
 
+        # for whole_chain project to test each repo of paddle
+        self.benchmark = config["Global"].get("benchmark", False)
+        if self.benchmark:
+            import auto_log
+            import os
+            pid = os.getpid()
+            self.auto_logger = auto_log.AutoLogger(
+                model_name=config["Global"].get("model_name", "cls"),
+                model_precision='fp16'
+                if config["Global"]["use_fp16"] else 'fp32',
+                batch_size=config["Global"].get("batch_size", 1),
+                data_shape=[3, 224, 224],
+                save_path=config["Global"].get("save_log_path",
+                                               "./auto_log.log"),
+                inference_config=self.config,
+                pids=pid,
+                process_name=None,
+                gpu_ids=None,
+                time_keys=[
+                    'preprocess_time', 'inference_time', 'postprocess_time'
+                ],
+                warmup=2)
+
     def predict(self, images):
         input_names = self.paddle_predictor.get_input_names()
         input_tensor = self.paddle_predictor.get_input_handle(input_names[0])
@@ -48,18 +72,26 @@ class ClsPredictor(Predictor):
         output_tensor = self.paddle_predictor.get_output_handle(output_names[
             0])
 
+        if self.benchmark:
+            self.auto_logger.times.start()
         if not isinstance(images, (list, )):
             images = [images]
         for idx in range(len(images)):
             for ops in self.preprocess_ops:
                 images[idx] = ops(images[idx])
         image = np.array(images)
+        if self.benchmark:
+            self.auto_logger.times.stamp()
 
         input_tensor.copy_from_cpu(image)
         self.paddle_predictor.run()
         batch_output = output_tensor.copy_to_cpu()
+        if self.benchmark:
+            self.auto_logger.times.stamp()
         if self.postprocess is not None:
             batch_output = self.postprocess(batch_output)
+        if self.benchmark:
+            self.auto_logger.times.end(stamp=True)
         return batch_output
 
 
@@ -83,10 +115,11 @@ def main(config):
             batch_names.append(img_name)
             cnt += 1
 
-        if cnt % config["Global"]["batch_size"] == 0 or (idx + 1) == len(image_list):
-            if len(batch_imgs) == 0: 
+        if cnt % config["Global"]["batch_size"] == 0 or (idx + 1
+                                                         ) == len(image_list):
+            if len(batch_imgs) == 0:
                 continue
-                
+
             batch_results = cls_predictor.predict(batch_imgs)
             for number, result_dict in enumerate(batch_results):
                 filename = batch_names[number]
@@ -98,7 +131,10 @@ def main(config):
                       format(filename, clas_ids, scores_str, label_names))
             batch_imgs = []
             batch_names = []
+    if cls_predictor.benchmark:
+        cls_predictor.auto_logger.report()
     return
+
 
 if __name__ == "__main__":
     args = config.parse_args()
