@@ -12,12 +12,10 @@ class Identity(nn.Layer):
 
 
 class TheseusLayer(nn.Layer):
-    def __init__(self, *args, return_patterns=None, **kwargs):
+    def __init__(self, *args, **kwargs):
         super(TheseusLayer, self).__init__()
         self.res_dict = None
         self.register_forward_post_hook(self._disconnect_res_dict_hook)
-        if return_patterns is not None:
-            self._update_res(return_patterns)
 
     def forward(self, *input, res_dict=None, **kwargs):
         if res_dict is not None:
@@ -51,7 +49,7 @@ class TheseusLayer(nn.Layer):
         if self.res_dict is not None:
             self.res_dict[layer.full_name()] = output
 
-    def _disconnect_res_dict_hook(self, input, output):
+    def _disconnect_res_dict_hook(self, *args, **kwargs):
         self.res_dict = None
 
     def replace_sub(self, layer_name_pattern, replace_function, recursive=True):
