@@ -662,7 +662,7 @@ class Trainer(object):
             image_file_list.append(image_file)
             if len(batch_data) >= batch_size or idx == len(image_list) - 1:
                 batch_tensor = paddle.to_tensor(batch_data)
-                out = self.forward(batch_tensor)
+                out = self.forward([batch_tensor])
                 if isinstance(out, list):
                     out = out[0]
                 result = postprocess_func(out, image_file_list)
