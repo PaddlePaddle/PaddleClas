@@ -75,6 +75,8 @@ class Trainer(object):
             self.is_rec = False
 
         self.model = build_model(self.config["Arch"])
+        if "return_pattern" in self.config["Arch"]:
+            self.return_inter = True
         # set @to_static for benchmark, skip this by default.
         apply_to_static(self.config, self.model)
 

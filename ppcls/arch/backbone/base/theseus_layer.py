@@ -37,15 +37,15 @@ class TheseusLayer(nn.Layer):
                     stop_layer_name)
         return after_stop
 
-    def _update_res(self, return_layers):
+    def _update_res(self, return_patterns):
         for layer_i in self._sub_layers:
             layer_name = self._sub_layers[layer_i].full_name()
-            for return_pattern in return_layers:
-                if return_layers is not None and re.match(return_pattern, layer_name):
+            for return_pattern in return_patterns:
+                if return_patterns is not None and re.match(return_pattern, layer_name):
                     self._sub_layers[layer_i].register_forward_post_hook(
                         self._save_sub_res_hook)
             if isinstance(self._sub_layers[layer_i], TheseusLayer):
-                self._sub_layers[layer_i]._update_res(return_layers)
+                self._sub_layers[layer_i]._update_res(return_patterns)
 
     def _save_sub_res_hook(self, layer, input, output):
         if self.res_dict is not None:
