@@ -44,6 +44,8 @@ class TheseusLayer(nn.Layer):
                 if return_layers is not None and re.match(return_pattern, layer_name):
                     self._sub_layers[layer_i].register_forward_post_hook(
                         self._save_sub_res_hook)
+            if isinstance(self._sub_layers[layer_i], TheseusLayer):
+                self._sub_layers[layer_i]._update_res(return_layers)
 
     def _save_sub_res_hook(self, layer, input, output):
         if self.res_dict is not None:

@@ -392,10 +392,14 @@ class Trainer(object):
         return eval_result
 
     def forward(self, batch):
-        if not self.is_rec:
-            out = self.model(batch[0])
+        if self.return_inter:
+            return_dict = {}
         else:
-            out = self.model(batch[0], batch[1])
+            return_dict = None
+        if not self.is_rec:
+            out = self.model(batch[0], return_dict=return_dict)
+        else:
+            out = self.model(batch[0], batch[1], return_dict=return_dict)
         return out
 
     @paddle.no_grad()

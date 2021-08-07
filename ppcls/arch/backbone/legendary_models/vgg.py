@@ -45,7 +45,7 @@ NET_CONFIG = {
 
 
 class ConvBlock(TheseusLayer):
-    def __init__(self, input_channels, output_channels, groups, return_patterns=None):
+    def __init__(self, input_channels, output_channels, groups):
         super().__init__()
 
         self.groups = groups
@@ -83,7 +83,6 @@ class ConvBlock(TheseusLayer):
 
         self.max_pool = MaxPool2D(kernel_size=2, stride=2, padding=0)
         self.relu = nn.ReLU()
-        self._update_res(return_patterns)
 
     def forward(self, inputs):
         x = self.conv1(inputs)
@@ -117,11 +116,11 @@ class VGGNet(TheseusLayer):
 
         self.stop_grad_layers = stop_grad_layers
 
-        self.conv_block_1 = ConvBlock(3, 64, config[0], return_patterns)
-        self.conv_block_2 = ConvBlock(64, 128, config[1], return_patterns)
-        self.conv_block_3 = ConvBlock(128, 256, config[2], return_patterns)
-        self.conv_block_4 = ConvBlock(256, 512, config[3], return_patterns)
-        self.conv_block_5 = ConvBlock(512, 512, config[4], return_patterns)
+        self.conv_block_1 = ConvBlock(3, 64, config[0])
+        self.conv_block_2 = ConvBlock(64, 128, config[1])
+        self.conv_block_3 = ConvBlock(128, 256, config[2])
+        self.conv_block_4 = ConvBlock(256, 512, config[3])
+        self.conv_block_5 = ConvBlock(512, 512, config[4])
 
         self.relu = nn.ReLU()
         self.flatten = nn.Flatten(start_axis=1, stop_axis=-1)
