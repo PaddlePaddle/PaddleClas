@@ -94,7 +94,7 @@ class WrapLayer(TheseusLayer):
         return self.name
 
     def forward(self, *inputs, **kwargs):
-        self.sub_layer(*inputs, **kwargs)
+        return self.sub_layer(*inputs, **kwargs)
 
     def update_res(self, return_patterns):
         if not return_patterns or not isinstance(self.sub_layer, (nn.Sequential, nn.LayerList)):
@@ -104,7 +104,7 @@ class WrapLayer(TheseusLayer):
                 self.sub_layer._sub_layers[layer_i] = wrap_theseus(self.sub_layer._sub_layers[layer_i])
                 self.sub_layer._sub_layers[layer_i].res_dict = self.res_dict
                 self.sub_layer._sub_layers[layer_i].update_res(return_patterns)
-                
+
             layer_name = self.sub_layer._sub_layers[layer_i].full_name()
             for return_pattern in return_patterns:
                 if re.match(return_pattern, layer_name):
