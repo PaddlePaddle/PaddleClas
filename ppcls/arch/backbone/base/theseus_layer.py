@@ -50,11 +50,11 @@ class TheseusLayer(nn.Layer):
                             self._sub_layers[layer_i]._save_sub_res_hook)
                         self._sub_layers[layer_i].res_dict = self.res_dict
                 if isinstance(self._sub_layers[layer_i], TheseusLayer):
+                    self._sub_layers[layer_i].res_dict = self.res_dict
                     self._sub_layers[layer_i].update_res(return_patterns)
 
     def _save_sub_res_hook(self, layer, input, output):
-        if self.res_dict is not None:
-            self.res_dict[layer.full_name()] = output
+        self.res_dict[layer.full_name()] = output
 
     def replace_sub(self, layer_name_pattern, replace_function, recursive=True):
         for layer_i in self._sub_layers:
@@ -109,7 +109,7 @@ class WrapLayer(TheseusLayer):
             for return_pattern in return_patterns:
                 if re.match(return_pattern, layer_name):
                     self.sub_layer._sub_layers[layer_i].res_dict = self.res_dict
-                    self._sub_layers[layer_i].register_forward_post_hook(
+                    self.sub_layer._sub_layers[layer_i].register_forward_post_hook(
                         self._sub_layers[layer_i]._save_sub_res_hook)
 
             if isinstance(self.sub_layer._sub_layers[layer_i], TheseusLayer):

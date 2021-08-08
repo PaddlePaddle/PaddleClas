@@ -152,7 +152,7 @@ class VGGNet(TheseusLayer):
         x = self.relu(x)
         x = self.drop(x)
         x = self.fc3(x)
-        if self.res_dict:
+        if self.res_dict and res_dict is not None:
             for res_key in list(self.res_dict):
                 res_dict[res_key] = self.res_dict.pop(res_key)
         return x
