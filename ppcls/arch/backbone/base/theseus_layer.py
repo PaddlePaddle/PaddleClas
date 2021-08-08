@@ -16,10 +16,6 @@ class TheseusLayer(nn.Layer):
         super(TheseusLayer, self).__init__()
         self.res_dict = None
 
-    def forward(self, *input, res_dict=None, **kwargs):
-        if res_dict is not None:
-            self.res_dict = res_dict
-
     # stop doesn't work when stop layer has a parallel branch.
     def stop_after(self, stop_layer_name: str):
         after_stop = False
@@ -44,6 +40,7 @@ class TheseusLayer(nn.Layer):
                     if isinstance(self._sub_layers[layer_i], TheseusLayer):
                         self._sub_layers[layer_i].register_forward_post_hook(
                             self._sub_layers[layer_i]._save_sub_res_hook)
+                        self._sub_layers[layer_i].res_dict = self.res_dict
             if isinstance(self._sub_layers[layer_i], TheseusLayer):
                 self._sub_layers[layer_i]._update_res(return_patterns)
 

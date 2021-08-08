@@ -84,8 +84,7 @@ class ConvBlock(TheseusLayer):
         self.max_pool = MaxPool2D(kernel_size=2, stride=2, padding=0)
         self.relu = nn.ReLU()
 
-    def forward(self, inputs, res_dict=None):
-        super(ConvBlock, self).forward(inputs, res_dict=res_dict)
+    def forward(self, inputs):
         x = self.conv1(inputs)
         x = self.relu(x)
         if self.groups == 2 or self.groups == 3 or self.groups == 4:
@@ -141,7 +140,6 @@ class VGGNet(TheseusLayer):
         self._update_res(return_patterns)
 
     def forward(self, inputs, res_dict=None):
-        super(VGGNet, self).forward(inputs, res_dict=res_dict)
         x = self.conv_block_1(inputs, res_dict)
         x = self.conv_block_2(x, res_dict)
         x = self.conv_block_3(x, res_dict)
@@ -155,6 +153,9 @@ class VGGNet(TheseusLayer):
         x = self.relu(x)
         x = self.drop(x)
         x = self.fc3(x)
+        if self.res_dict:
+            for res_key in self.res_dict:
+                res_dict[res_key] = self.res_dict.pop(res_key)
         return x
 
 
