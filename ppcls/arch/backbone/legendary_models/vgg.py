@@ -137,7 +137,7 @@ class VGGNet(TheseusLayer):
         self.fc1 = Linear(7 * 7 * 512, 4096)
         self.fc2 = Linear(4096, 4096)
         self.fc3 = Linear(4096, class_num)
-        self._update_res(return_patterns)
+        self.update_res(return_patterns)
 
     def forward(self, inputs, res_dict=None):
         x = self.conv_block_1(inputs)

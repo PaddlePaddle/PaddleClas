@@ -396,11 +396,7 @@ class Trainer(object):
         self.model.train()
         return eval_result
 
-    def forward(self, batch):
-        if self.return_inter:
-            res_dict = {}
-        else:
-            res_dict = None
+    def forward(self, batch, res_dict=None):
         if not self.is_rec:
             out = self.model(batch[0], res_dict=res_dict)
         else:
@@ -662,7 +658,11 @@ class Trainer(object):
             image_file_list.append(image_file)
             if len(batch_data) >= batch_size or idx == len(image_list) - 1:
                 batch_tensor = paddle.to_tensor(batch_data)
-                out = self.forward([batch_tensor])
+                if self.return_inter:
+                    res_dict = {}
+                else:
+                    res_dict = None
+                out = self.forward([batch_tensor], res_dict)
                 if isinstance(out, list):
                     out = out[0]
                 result = postprocess_func(out, image_file_list)

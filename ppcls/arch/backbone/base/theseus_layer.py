@@ -32,7 +32,7 @@ class TheseusLayer(nn.Layer):
                     stop_layer_name)
         return after_stop
 
-    def _update_res(self, return_patterns):
+    def update_res(self, return_patterns):
         if not return_patterns:
             return
         for layer_i in self._sub_layers:
@@ -47,7 +47,7 @@ class TheseusLayer(nn.Layer):
                         self._sub_layers[layer_i]._save_sub_res_hook)
                     self._sub_layers[layer_i].res_dict = self.res_dict
             if isinstance(self._sub_layers[layer_i], TheseusLayer):
-                self._sub_layers[layer_i]._update_res(return_patterns)
+                self._sub_layers[layer_i].update_res(return_patterns)
 
     def _save_sub_res_hook(self, layer, input, output):
         if self.res_dict is not None:
