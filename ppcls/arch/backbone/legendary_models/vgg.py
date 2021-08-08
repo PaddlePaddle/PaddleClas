@@ -140,11 +140,11 @@ class VGGNet(TheseusLayer):
         self._update_res(return_patterns)
 
     def forward(self, inputs, res_dict=None):
-        x = self.conv_block_1(inputs, res_dict)
-        x = self.conv_block_2(x, res_dict)
-        x = self.conv_block_3(x, res_dict)
-        x = self.conv_block_4(x, res_dict)
-        x = self.conv_block_5(x, res_dict)
+        x = self.conv_block_1(inputs)
+        x = self.conv_block_2(x)
+        x = self.conv_block_3(x)
+        x = self.conv_block_4(x)
+        x = self.conv_block_5(x)
         x = self.flatten(x)
         x = self.fc1(x)
         x = self.relu(x)
