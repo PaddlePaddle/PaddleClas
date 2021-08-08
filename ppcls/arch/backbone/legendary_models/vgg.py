@@ -85,7 +85,7 @@ class ConvBlock(TheseusLayer):
         self.relu = nn.ReLU()
 
     def forward(self, inputs, res_dict=None):
-        super(ConvBlock, self).forward(inputs, res_dict)
+        super(ConvBlock, self).forward(inputs, res_dict=res_dict)
         x = self.conv1(inputs)
         x = self.relu(x)
         if self.groups == 2 or self.groups == 3 or self.groups == 4:
