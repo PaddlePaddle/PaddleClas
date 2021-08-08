@@ -42,8 +42,9 @@ class TheseusLayer(nn.Layer):
             layer_name = self._sub_layers[layer_i].full_name()
             for return_pattern in return_patterns:
                 if return_patterns is not None and re.match(return_pattern, layer_name):
-                    self._sub_layers[layer_i].register_forward_post_hook(
-                        self._save_sub_res_hook)
+                    if isinstance(self._sub_layers[layer_i], TheseusLayer):
+                        self._sub_layers[layer_i].register_forward_post_hook(
+                            self._sub_layers[layer_i]._save_sub_res_hook)
             if isinstance(self._sub_layers[layer_i], TheseusLayer):
                 self._sub_layers[layer_i]._update_res(return_patterns)
 
