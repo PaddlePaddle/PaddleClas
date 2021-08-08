@@ -77,6 +77,7 @@ class Trainer(object):
 
         self.model = build_model(self.config["Arch"])
         if "return_patterns" in self.config["Arch"] and isinstance(self.model, TheseusLayer):
+            self.model.update_res(self.config["Arch"]["return_patterns"])
             self.return_inter = True
         else:
             self.return_inter = False

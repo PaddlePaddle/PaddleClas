@@ -109,6 +109,8 @@ class WrapLayer(TheseusLayer):
             for return_pattern in return_patterns:
                 if re.match(return_pattern, layer_name):
                     self.sub_layer._sub_layers[layer_i].res_dict = self.res_dict
+                    self._sub_layers[layer_i].register_forward_post_hook(
+                        self._sub_layers[layer_i]._save_sub_res_hook)
 
             if isinstance(self.sub_layer._sub_layers[layer_i], TheseusLayer):
                 self.sub_layer._sub_layers[layer_i].update_res(return_patterns)
