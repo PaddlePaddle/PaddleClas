@@ -154,7 +154,7 @@ class VGGNet(TheseusLayer):
         x = self.drop(x)
         x = self.fc3(x)
         if self.res_dict:
-            for res_key in self.res_dict:
+            for res_key in list(self.res_dict):
                 res_dict[res_key] = self.res_dict.pop(res_key)
         return x
 

@@ -14,7 +14,7 @@ class Identity(nn.Layer):
 class TheseusLayer(nn.Layer):
     def __init__(self, *args, **kwargs):
         super(TheseusLayer, self).__init__()
-        self.res_dict = None
+        self.res_dict = {}
 
     # stop doesn't work when stop layer has a parallel branch.
     def stop_after(self, stop_layer_name: str):
