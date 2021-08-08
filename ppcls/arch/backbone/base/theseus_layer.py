@@ -15,7 +15,6 @@ class TheseusLayer(nn.Layer):
     def __init__(self, *args, **kwargs):
         super(TheseusLayer, self).__init__()
         self.res_dict = None
-        self.register_forward_post_hook(self._disconnect_res_dict_hook)
 
     def forward(self, *input, res_dict=None, **kwargs):
         if res_dict is not None:
@@ -51,9 +50,6 @@ class TheseusLayer(nn.Layer):
     def _save_sub_res_hook(self, layer, input, output):
         if self.res_dict is not None:
             self.res_dict[layer.full_name()] = output
-
-    def _disconnect_res_dict_hook(self, *args, **kwargs):
-        self.res_dict = None
 
     def replace_sub(self, layer_name_pattern, replace_function, recursive=True):
         for layer_i in self._sub_layers:
