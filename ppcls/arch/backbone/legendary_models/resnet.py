@@ -104,7 +104,8 @@ class ConvBNLayer(TheseusLayer):
                  groups=1,
                  is_vd_mode=False,
                  act=None,
-                 lr_mult=1.0):
+                 lr_mult=1.0,
+                 data_format="NCHW"):
         super().__init__()
         self.is_vd_mode = is_vd_mode
         self.act = act
@@ -118,11 +119,13 @@ class ConvBNLayer(TheseusLayer):
             padding=(filter_size - 1) // 2,
             groups=groups,
             weight_attr=ParamAttr(learning_rate=lr_mult),
-            bias_attr=False)
+            bias_attr=False,
+            data_format=data_format)
         self.bn = BatchNorm(
             num_filters,
             param_attr=ParamAttr(learning_rate=lr_mult),
-            bias_attr=ParamAttr(learning_rate=lr_mult))
+            bias_attr=ParamAttr(learning_rate=lr_mult),
+            data_layout=data_format)
         self.relu = nn.ReLU()
 
     def forward(self, x):
@@ -136,14 +139,14 @@ class ConvBNLayer(TheseusLayer):
 
 
 class BottleneckBlock(TheseusLayer):
-    def __init__(
-            self,
-            num_channels,
-            num_filters,
-            stride,
-            shortcut=True,
-            if_first=False,
-            lr_mult=1.0, ):
+    def __init__(self,
+                 num_channels,
+                 num_filters,
+                 stride,
+                 shortcut=True,
+                 if_first=False,
+                 lr_mult=1.0,
+                 data_format="NCHW"):
         super().__init__()
 
         self.conv0 = ConvBNLayer(
@@ -151,20 +154,23 @@ class BottleneckBlock(TheseusLayer):
             num_filters=num_filters,
             filter_size=1,
             act="relu",
-            lr_mult=lr_mult)
+            lr_mult=lr_mult,
+            data_format=data_format)
         self.conv1 = ConvBNLayer(
             num_channels=num_filters,
             num_filters=num_filters,
             filter_size=3,
             stride=stride,
             act="relu",
-            lr_mult=lr_mult)
+            lr_mult=lr_mult,
+            data_format=data_format)
         self.conv2 = ConvBNLayer(
             num_channels=num_filters,
             num_filters=num_filters * 4,
             filter_size=1,
             act=None,
-            lr_mult=lr_mult)
+            lr_mult=lr_mult,
+            data_format=data_format)
 
         if not shortcut:
             self.short = ConvBNLayer(
@@ -173,7 +179,8 @@ class BottleneckBlock(TheseusLayer):
                 filter_size=1,
                 stride=stride if if_first else 1,
                 is_vd_mode=False if if_first else True,
-                lr_mult=lr_mult)
+                lr_mult=lr_mult,
+                data_format=data_format)
         self.relu = nn.ReLU()
         self.shortcut = shortcut
 
@@ -199,7 +206,8 @@ class BasicBlock(TheseusLayer):
                  stride,
                  shortcut=True,
                  if_first=False,
-                 lr_mult=1.0):
+                 lr_mult=1.0,
+                 data_format="NCHW"):
         super().__init__()
 
         self.stride = stride
@@ -209,13 +217,15 @@ class BasicBlock(TheseusLayer):
             filter_size=3,
             stride=stride,
             act="relu",
-            lr_mult=lr_mult)
+            lr_mult=lr_mult,
+            data_format=data_format)
         self.conv1 = ConvBNLayer(
             num_channels=num_filters,
             num_filters=num_filters,
             filter_size=3,
             act=None,
-            lr_mult=lr_mult)
+            lr_mult=lr_mult,
+            data_format=data_format)
         if not shortcut:
             self.short = ConvBNLayer(
                 num_channels=num_channels,
@@ -223,7 +233,8 @@ class BasicBlock(TheseusLayer):
                 filter_size=1,
                 stride=stride if if_first else 1,
                 is_vd_mode=False if if_first else True,
-                lr_mult=lr_mult)
+                lr_mult=lr_mult,
+                data_format=data_format)
         self.shortcut = shortcut
         self.relu = nn.ReLU()
 
@@ -256,7 +267,9 @@ class ResNet(TheseusLayer):
                  config,
                  version="vb",
                  class_num=1000,
-                 lr_mult_list=[1.0, 1.0, 1.0, 1.0, 1.0]):
+                 lr_mult_list=[1.0, 1.0, 1.0, 1.0, 1.0],
+                 data_format="NCHW",
+                 input_image_channel=3):
         super().__init__()
 
         self.cfg = config
@@ -279,22 +292,25 @@ class ResNet(TheseusLayer):
 
         self.stem_cfg = {
             #num_channels, num_filters, filter_size, stride
-            "vb": [[3, 64, 7, 2]],
-            "vd": [[3, 32, 3, 2], [32, 32, 3, 1], [32, 64, 3, 1]]
+            "vb": [[input_image_channel, 64, 7, 2]],
+            "vd":
+            [[input_image_channel, 32, 3, 2], [32, 32, 3, 1], [32, 64, 3, 1]]
         }
 
-        self.stem = nn.Sequential(*[
+        self.stem = nn.Sequential(* [
             ConvBNLayer(
                 num_channels=in_c,
                 num_filters=out_c,
                 filter_size=k,
                 stride=s,
                 act="relu",
-                lr_mult=self.lr_mult_list[0])
+                lr_mult=self.lr_mult_list[0],
+                data_format=data_format)
             for in_c, out_c, k, s in self.stem_cfg[version]
         ])
 
-        self.max_pool = MaxPool2D(kernel_size=3, stride=2, padding=1)
+        self.max_pool = MaxPool2D(
+            kernel_size=3, stride=2, padding=1, data_format=data_format)
         block_list = []
         for block_idx in range(len(self.block_depth)):
             shortcut = False
@@ -306,11 +322,12 @@ class ResNet(TheseusLayer):
                     stride=2 if i == 0 and block_idx != 0 else 1,
                     shortcut=shortcut,
                     if_first=block_idx == i == 0 if version == "vd" else True,
-                    lr_mult=self.lr_mult_list[block_idx + 1]))
+                    lr_mult=self.lr_mult_list[block_idx + 1],
+                    data_format=data_format))
                 shortcut = True
         self.blocks = nn.Sequential(*block_list)
 
-        self.avg_pool = AdaptiveAvgPool2D(1)
+        self.avg_pool = AdaptiveAvgPool2D(1, data_format=data_format)
         self.flatten = nn.Flatten()
         self.avg_pool_channels = self.num_channels[-1] * 2
         stdv = 1.0 / math.sqrt(self.avg_pool_channels * 1.0)
@@ -319,13 +336,19 @@ class ResNet(TheseusLayer):
             self.class_num,
             weight_attr=ParamAttr(initializer=Uniform(-stdv, stdv)))
 
+        self.data_format = data_format
+
     def forward(self, x):
-        x = self.stem(x)
-        x = self.max_pool(x)
-        x = self.blocks(x)
-        x = self.avg_pool(x)
-        x = self.flatten(x)
-        x = self.fc(x)
+        with paddle.static.amp.fp16_guard():
+            if self.data_format == "NHWC":
+                x = paddle.transpose(x, [0, 2, 3, 1])
+                x.stop_gradient = True
+            x = self.stem(x)
+            x = self.max_pool(x)
+            x = self.blocks(x)
+            x = self.avg_pool(x)
+            x = self.flatten(x)
+            x = self.fc(x)
         return x
 
 

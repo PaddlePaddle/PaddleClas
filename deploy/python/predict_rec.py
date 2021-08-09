@@ -54,12 +54,14 @@ class RecPredictor(Predictor):
         input_tensor.copy_from_cpu(image)
         self.paddle_predictor.run()
         batch_output = output_tensor.copy_to_cpu()
-        
+
         if feature_normalize:
             feas_norm = np.sqrt(
                 np.sum(np.square(batch_output), axis=1, keepdims=True))
             batch_output = np.divide(batch_output, feas_norm)
-            
+
+        if self.postprocess is not None:
+            batch_output = self.postprocess(batch_output)
         return batch_output
 
 
@@ -67,14 +69,33 @@ def main(config):
     rec_predictor = RecPredictor(config)
     image_list = get_image_list(config["Global"]["infer_imgs"])
 
-    assert config["Global"]["batch_size"] == 1
-    for idx, image_file in enumerate(image_list):
-        batch_input = []
-        img = cv2.imread(image_file)[:, :, ::-1]
-        output = rec_predictor.predict(img)
-        if rec_predictor.postprocess is not None:
-            output = rec_predictor.postprocess(output)
-        print(output)
+    batch_imgs = []
+    batch_names = []
+    cnt = 0
+    for idx, img_path in enumerate(image_list):
+        img = cv2.imread(img_path)
+        if img is None:
+            logger.warning(
+                "Image file failed to read and has been skipped. The path: {}".
+                format(img_path))
+        else:
+            img = img[:, :, ::-1]
+            batch_imgs.append(img)
+            img_name = os.path.basename(img_path)
+            batch_names.append(img_name)
+            cnt += 1
+
+        if cnt % config["Global"]["batch_size"] == 0 or (idx + 1) == len(image_list):
+            if len(batch_imgs) == 0: 
+                continue
+                
+            batch_results = rec_predictor.predict(batch_imgs)
+            for number, result_dict in enumerate(batch_results):
+                filename = batch_names[number]
+                print("{}:\t{}".format(filename, result_dict))
+            batch_imgs = []
+            batch_names = []
+
     return
 
 

@@ -74,9 +74,7 @@ def load_params(exe, prog, path, ignore_params=None):
         raise ValueError("Model pretrain path {} does not "
                          "exists.".format(path))
 
-    logger.info(
-        logger.coloring('Loading parameters from {}...'.format(path),
-                        'HEADER'))
+    logger.info("Loading parameters from {}...".format(path))
 
     ignore_set = set()
     state = _load_state(path)
@@ -116,9 +114,7 @@ def init_model(config, program, exe):
     checkpoints = config.get('checkpoints')
     if checkpoints:
         paddle.static.load(program, checkpoints, exe)
-        logger.info(
-            logger.coloring("Finish initing model from {}".format(checkpoints),
-                            "HEADER"))
+        logger.info("Finish initing model from {}".format(checkpoints))
         return
 
     pretrained_model = config.get('pretrained_model')
@@ -127,19 +123,17 @@ def init_model(config, program, exe):
             pretrained_model = [pretrained_model]
         for pretrain in pretrained_model:
             load_params(exe, program, pretrain)
-        logger.info(
-            logger.coloring("Finish initing model from {}".format(
-                pretrained_model), "HEADER"))
+        logger.info("Finish initing model from {}".format(pretrained_model))
 
 
 def save_model(program, model_path, epoch_id, prefix='ppcls'):
     """
     save model to the target path
     """
+    if paddle.distributed.get_rank() != 0:
+        return
     model_path = os.path.join(model_path, str(epoch_id))
     _mkdir_if_not_exist(model_path)
     model_prefix = os.path.join(model_path, prefix)
     paddle.static.save(program, model_prefix)
-    logger.info(
-        logger.coloring("Already save model in {}".format(model_path),
-                        "HEADER"))
+    logger.info("Already save model in {}".format(model_path))

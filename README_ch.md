@@ -8,9 +8,10 @@
 
 **近期更新**
 
+- 2021.07.08、07.27 添加26个[FAQ](docs/zh_CN/faq_series/faq_2021_s2.md)
 - 2021.06.29 添加Swin-transformer系列模型，ImageNet1k数据集上Top1 acc最高精度可达87.2%；支持训练预测评估与whl包部署，预训练模型可以从[这里](docs/zh_CN/models/models_intro.md)下载。
 - 2021.06.22,23,24 PaddleClas官方研发团队带来技术深入解读三日直播课。课程回放：[https://aistudio.baidu.com/aistudio/course/introduce/24519](https://aistudio.baidu.com/aistudio/course/introduce/24519)
-- 2021.06.16 PaddleClas v2.2版本升级，集成Metric learning，向量检索等组件。新增商品识别、动漫人物识别、车辆识别和logo识别等4个图像识别应用。新增LeViT、TNT、DLA、HarDNet、RedNet系列24个预训练模型。
+- 2021.06.16 PaddleClas v2.2版本升级，集成Metric learning，向量检索等组件。新增商品识别、动漫人物识别、车辆识别和logo识别等4个图像识别应用。新增LeViT、Twins、TNT、DLA、HarDNet、RedNet系列30个预训练模型。
 - [more](./docs/zh_CN/update_history.md)
 
 ## 特性
@@ -18,7 +19,7 @@
 - 实用的图像识别系统：集成了目标检测、特征学习、图像检索等模块，广泛适用于各类图像识别任务。
 提供商品识别、车辆识别、logo识别和动漫人物识别等4个场景应用示例。
 
-- 丰富的预训练模型库：提供了33个系列共150个ImageNet预训练模型，其中6个精选系列模型支持结构快速修改。
+- 丰富的预训练模型库：提供了35个系列共164个ImageNet预训练模型，其中6个精选系列模型支持结构快速修改。
 
 - 全面易用的特征学习组件：集成arcmargin, triplet loss等12度量学习方法，通过配置文件即可随意组合切换。
 
@@ -78,7 +79,8 @@ Res2Net200_vd预训练模型Top-1精度高达85.1%。
     - [知识蒸馏](./docs/zh_CN/advanced_tutorials/distillation/distillation.md)
     - [模型量化](./docs/zh_CN/extension/paddle_quantization.md)
     - [数据增广](./docs/zh_CN/advanced_tutorials/image_augmentation/ImageAugment.md)
-- FAQ(暂停更新)
+- FAQ
+    - [图像识别任务FAQ](docs/zh_CN/faq_series/faq_2021_s2.md)
     - [图像分类任务FAQ](docs/zh_CN/faq.md)
 - [许可证书](#许可证书)
 - [贡献代码](#贡献代码)
