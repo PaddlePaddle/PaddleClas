@@ -232,10 +232,10 @@ class Trainer_slim(Trainer):
                                                self.config["Arch"]["name"],
                                                "best_model"))
         elif self.config["Global"].get(
-                "pretraine_model", False) and os.path.exists(self.config[
-                    "Global"]["pretraine_model"] + ".pdparams"):
+                "pretrained_model", False) and os.path.exists(self.config[
+                    "Global"]["pretrained_model"] + ".pdparams"):
             load_dygraph_pretrain(self.model,
-                                  self.config["Global"]["pretraine_model"])
+                                  self.config["Global"]["pretrained_model"])
         else:
             raise RuntimeError(
                 "The best_model or pretraine_model should exist to generate inference model"
