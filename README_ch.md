@@ -51,6 +51,10 @@ Res2Net200_vd预训练模型Top-1精度高达85.1%。
 - [图像识别快速体验](./docs/zh_CN/tutorials/quick_start_recognition.md)
 - [图像识别系统介绍](#图像识别系统介绍)
 - [识别效果展示](#识别效果展示)
+- 图像分类快速体验
+    - [尝鲜版](./docs/zh_CN/tutorials/quick_start_new_user.md)
+    - [进阶版](./docs/zh_CN/tutorials/quick_start_professional.md)
+    - [社区版](./docs/zh_CN/tutorials/quick_start_community.md)
 - 算法介绍
     - [骨干网络和预训练模型库](./docs/zh_CN/ImageNet_models_cn.md)
     - [主体检测](./docs/zh_CN/application/mainbody_detection.md)
@@ -81,6 +85,8 @@ Res2Net200_vd预训练模型Top-1精度高达85.1%。
 - [许可证书](#许可证书)
 - [贡献代码](#贡献代码)
 
+<a name="图像识别系统介绍"></a>
+## 图像识别系统介绍
 
 <div align="center">
 <img src="./docs/images/structure.png"  width = "400" />
