@@ -5,7 +5,7 @@ This tutorial introduces how to install PaddleClas and its requirements.
 
 ## 1. Install PaddlePaddle
 
-`PaddlePaddle 2.0` or later is required for PaddleClas. You can use the following steps to install PaddlePaddle.
+`PaddlePaddle 2.1.2` or later is required for PaddleClas. You can use the following steps to install PaddlePaddle.
 
 ### 1.1 Environment requirements
 
