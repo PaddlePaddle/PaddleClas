@@ -350,7 +350,6 @@ class PyramidVisionTransformer(nn.Layer):
             shape=[1, 1, embed_dims[-1]],
             default_initializer=zeros_,
             attr=paddle.ParamAttr(regularizer=L2Decay(0.0)))
-        self.add_parameter("cls_token", self.cls_token)
 
         # classification head
         self.head = nn.Linear(embed_dims[-1],
