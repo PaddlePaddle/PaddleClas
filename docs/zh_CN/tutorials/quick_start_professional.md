@@ -128,7 +128,7 @@ python3 -m paddle.distributed.launch \
 PaddleClas包含了自研的SSLD知识蒸馏方案，具体的内容可以参考[知识蒸馏章节](../advanced_tutorials/distillation/distillation.md), 本小节将尝试使用知识蒸馏技术对MobileNetV3_large_x1_0模型进行训练，使用`2.1.2小节`训练得到的ResNet50_vd模型作为蒸馏所用的教师模型，首先将`2.1.2小节`训练得到的ResNet50_vd模型保存到指定目录，脚本如下。
 
 ```shell
-mkdir pretrained 
+mkdir pretrained
 cp -r output_CIFAR/ResNet50_vd/best_model.pdparams  ./pretrained/
 ```
 
@@ -256,5 +256,5 @@ PreProcess:
 python3 python/predict_cls.py \
     -c configs/inference_cls.yaml \
     -o Global.infer_imgs=../dataset/CIFAR100/test/0/0001.png \
-    -o PostProcess.class_id_map_file=None
+    -o PostProcess.Topk.class_id_map_file=None
 ```
