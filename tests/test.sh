@@ -185,7 +185,7 @@ function func_inference(){
         elif [ ${use_gpu} = "True" ] || [ ${use_gpu} = "gpu" ]; then
             for use_trt in ${use_trt_list[*]}; do
                 for precision in ${precision_list[*]}; do
-                    if [ ${precision} = "False" ] && [ ${use_trt} = "False" ]; then
+                    if [ ${precision} = "True" ] && [ ${use_trt} = "False" ]; then
                         continue
                     fi
                     if [[ ${use_trt} = "False" || ${precision} =~ "int8" ]] && [ ${_flag_quant} = "True" ]; then
