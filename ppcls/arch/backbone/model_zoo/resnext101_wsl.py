@@ -12,7 +12,7 @@ MODEL_URLS = {
     "ResNeXt101_32x8d_wsl":
     "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ResNeXt101_32x8d_wsl_pretrained.pdparams",
     "ResNeXt101_32x16d_wsl":
-    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ResNeXt101_32x816_wsl_pretrained.pdparams",
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ResNeXt101_32x16_wsl_pretrained.pdparams",
     "ResNeXt101_32x32d_wsl":
     "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ResNeXt101_32x32d_wsl_pretrained.pdparams",
     "ResNeXt101_32x48d_wsl":
