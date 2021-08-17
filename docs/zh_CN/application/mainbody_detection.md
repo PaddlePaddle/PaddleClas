@@ -179,7 +179,7 @@ python tools/export_model.py -c configs/ppyolo/ppyolov2_r50vd_dcn_365e_coco.yml 
 
 #### Q：可以使用其他的主体检测模型结构吗？
 
-* A：可以的，但是目前的检测预处理过程仅适配yolo系列的预处理，因此在使用的时候，建议使用自己的预处理
+* A：可以的，但是目前的检测预处理过程仅适配yolo系列的预处理，因此在使用的时候，建议优先使用yolo系列的模型进行训练，如果希望使用faster rcnn等其他系列的模型，需要按照PaddleDetection的数据预处理，修改下预处理逻辑，这块如果您有需求或者有问题的话，欢迎提issue或者在群里反馈。
 
 #### Q：可以修改主体检测的预测尺度吗？
 
