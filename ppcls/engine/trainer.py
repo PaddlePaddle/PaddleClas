@@ -588,7 +588,7 @@ class Trainer(object):
             if len(batch) == 3:
                 has_unique_id = True
                 batch[2] = batch[2].reshape([-1, 1]).astype("int64")
-            out = self.model(batch[0], batch[1])
+            out = self.forward(batch)
             batch_feas = out["features"]
 
             # do norm
@@ -653,7 +653,7 @@ class Trainer(object):
             image_file_list.append(image_file)
             if len(batch_data) >= batch_size or idx == len(image_list) - 1:
                 batch_tensor = paddle.to_tensor(batch_data)
-                out = self.model(batch_tensor)
+                out = self.forward([batch_tensor])
                 if isinstance(out, list):
                     out = out[0]
                 result = postprocess_func(out, image_file_list)

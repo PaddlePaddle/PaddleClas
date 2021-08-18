@@ -12,15 +12,9 @@ class Identity(nn.Layer):
 
 
 class TheseusLayer(nn.Layer):
-    def __init__(self, *args, return_patterns=None, **kwargs):
+    def __init__(self, *args, **kwargs):
         super(TheseusLayer, self).__init__()
-        self.res_dict = None
-        if return_patterns is not None:
-            self._update_res(return_patterns)
-
-    def forward(self, *input, res_dict=None, **kwargs):
-        if res_dict is not None:
-            self.res_dict = res_dict
+        self.res_dict = {}
 
     # stop doesn't work when stop layer has a parallel branch.
     def stop_after(self, stop_layer_name: str):
@@ -38,33 +32,43 @@ class TheseusLayer(nn.Layer):
                     stop_layer_name)
         return after_stop
 
-    def _update_res(self, return_layers):
+    def update_res(self, return_patterns):
+        if not return_patterns or isinstance(self, WrapLayer):
+            return
         for layer_i in self._sub_layers:
             layer_name = self._sub_layers[layer_i].full_name()
-            for return_pattern in return_layers:
-                if return_layers is not None and re.match(return_pattern,
-                                                          layer_name):
-                    self._sub_layers[layer_i].register_forward_post_hook(
-                        self._save_sub_res_hook)
+            if isinstance(self._sub_layers[layer_i], (nn.Sequential, nn.LayerList)):
+                self._sub_layers[layer_i] = wrap_theseus(self._sub_layers[layer_i])
+                self._sub_layers[layer_i].res_dict = self.res_dict
+                self._sub_layers[layer_i].update_res(return_patterns)
+            else:
+                for return_pattern in return_patterns:
+                    if re.match(return_pattern, layer_name):
+                        if not isinstance(self._sub_layers[layer_i], TheseusLayer):
+                            self._sub_layers[layer_i] = wrap_theseus(self._sub_layers[layer_i])
+                        self._sub_layers[layer_i].register_forward_post_hook(
+                            self._sub_layers[layer_i]._save_sub_res_hook)
+                        self._sub_layers[layer_i].res_dict = self.res_dict
+                if isinstance(self._sub_layers[layer_i], TheseusLayer):
+                    self._sub_layers[layer_i].res_dict = self.res_dict
+                    self._sub_layers[layer_i].update_res(return_patterns)
 
-    def replace_sub(self, layer_name_pattern, replace_function,
-                    recursive=True):
-        for k in self._sub_layers.keys():
-            layer_name = self._sub_layers[k].full_name()
+    def _save_sub_res_hook(self, layer, input, output):
+        self.res_dict[layer.full_name()] = output
+
+    def replace_sub(self, layer_name_pattern, replace_function, recursive=True):
+        for layer_i in self._sub_layers:
+            layer_name = self._sub_layers[layer_i].full_name()
             if re.match(layer_name_pattern, layer_name):
-                self._sub_layers[k] = replace_function(self._sub_layers[k])
+                self._sub_layers[layer_i] = replace_function(self._sub_layers[layer_i])
             if recursive:
-                if isinstance(self._sub_layers[k], TheseusLayer):
-                    self._sub_layers[k].replace_sub(
+                if isinstance(self._sub_layers[layer_i], TheseusLayer):
+                    self._sub_layers[layer_i].replace_sub(
                         layer_name_pattern, replace_function, recursive)
-                elif isinstance(self._sub_layers[k],
-                                nn.Sequential) or isinstance(
-                                    self._sub_layers[k], nn.LayerList):
-                    for kk in self._sub_layers[k]._sub_layers.keys():
-                        self._sub_layers[k]._sub_layers[kk].replace_sub(
+                elif isinstance(self._sub_layers[layer_i], (nn.Sequential, nn.LayerList)):
+                    for layer_j in self._sub_layers[layer_i]._sub_layers:
+                        self._sub_layers[layer_i]._sub_layers[layer_j].replace_sub(
                             layer_name_pattern, replace_function, recursive)
-                else:
-                    pass
 
     '''
     example of replace function:
@@ -78,3 +82,40 @@ class TheseusLayer(nn.Layer):
         return new_conv
 
         '''
+
+
+class WrapLayer(TheseusLayer):
+    def __init__(self, sub_layer):
+        super(WrapLayer, self).__init__()
+        self.sub_layer = sub_layer
+        self.name = sub_layer.full_name()
+
+    def full_name(self):
+        return self.name
+
+    def forward(self, *inputs, **kwargs):
+        return self.sub_layer(*inputs, **kwargs)
+
+    def update_res(self, return_patterns):
+        if not return_patterns or not isinstance(self.sub_layer, (nn.Sequential, nn.LayerList)):
+            return
+        for layer_i in self.sub_layer._sub_layers:
+            if isinstance(self.sub_layer._sub_layers[layer_i], (nn.Sequential, nn.LayerList)):
+                self.sub_layer._sub_layers[layer_i] = wrap_theseus(self.sub_layer._sub_layers[layer_i])
+                self.sub_layer._sub_layers[layer_i].res_dict = self.res_dict
+                self.sub_layer._sub_layers[layer_i].update_res(return_patterns)
+
+            layer_name = self.sub_layer._sub_layers[layer_i].full_name()
+            for return_pattern in return_patterns:
+                if re.match(return_pattern, layer_name):
+                    self.sub_layer._sub_layers[layer_i].res_dict = self.res_dict
+                    self.sub_layer._sub_layers[layer_i].register_forward_post_hook(
+                        self._sub_layers[layer_i]._save_sub_res_hook)
+
+            if isinstance(self.sub_layer._sub_layers[layer_i], TheseusLayer):
+                self.sub_layer._sub_layers[layer_i].update_res(return_patterns)
+
+
+def wrap_theseus(sub_layer):
+    wrapped_layer = WrapLayer(sub_layer)
+    return wrapped_layer
