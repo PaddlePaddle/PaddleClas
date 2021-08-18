@@ -244,7 +244,7 @@ python3 python/predict_cls.py \
     -c configs/inference_cls.yaml \
     -o Global.infer_imgs=../dataset/flowers102/jpg/image_00001.jpg \
     -o Global.inference_model_dir=../inference/ \
-    -o PostProcess.class_id_map_file=None
+    -o PostProcess.Topk.class_id_map_file=None
 
 
 其中：

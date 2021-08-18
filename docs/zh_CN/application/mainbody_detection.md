@@ -167,4 +167,22 @@ python tools/export_model.py -c configs/ppyolo/ppyolov2_r50vd_dcn_365e_coco.yml 
 
 更多模型导出教程，请参考：[EXPORT_MODEL](https://github.com/PaddlePaddle/PaddleDetection/blob/release/2.1/deploy/EXPORT_MODEL.md)
 
-导出模型之后，在主体检测与识别任务中，就可以将检测模型的路径更改为该inference模型路径，完成预测。图像识别快速体验可以参考：[图像识别快速开始教程](../tutorials/quick_start_recognition.md)。
+最终，目录`inference/ppyolov2_r50vd_dcn_365e_coco`中包含`inference.pdiparams`, `inference.pdiparams.info` 以及 `inference.pdmodel` 文件，其中`inference.pdiparams`为保存的inference模型权重文件，`inference.pdmodel`为保存的inference模型结构文件。
+
+
+导出模型之后，在主体检测与识别任务中，就可以将检测模型的路径更改为该inference模型路径，完成预测。
+
+以商品识别为例，其配置文件为[inference_product.yaml](../../../deploy/configs/inference_product.yaml)，修改其中的`Global.det_inference_model_dir`字段为导出的主体检测inference模型目录，参考[图像识别快速开始教程](../tutorials/quick_start_recognition.md)，即可完成商品检测与识别过程。
+
+
+### FAQ
+
+#### Q：可以使用其他的主体检测模型结构吗？
+
+* A：可以的，但是目前的检测预处理过程仅适配yolo系列的预处理，因此在使用的时候，建议优先使用yolo系列的模型进行训练，如果希望使用faster rcnn等其他系列的模型，需要按照PaddleDetection的数据预处理，修改下预处理逻辑，这块如果您有需求或者有问题的话，欢迎提issue或者在群里反馈。
+
+#### Q：可以修改主体检测的预测尺度吗？
+
+* A：可以的，但是需要注意2个地方
+  * PaddleClas中提供的主体检测模型是基于640x640的分辨率去训练的，因此预测的时候也是默认使用640x640的分辨率进行预测，使用其他分辨率预测的话，精度会有所降低。
+  * 在模型导出的时候，建议也修改下模型导出的分辨率，保持模型导出、模型预测的分辨率一致。

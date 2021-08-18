@@ -39,7 +39,7 @@ Optimizer:
     values: [0.1, 0.01, 0.001, 0.0001]
   regularizer:
     name: 'L2'
-    coeff: 0.0003
+    coeff: 0.00003
 
 
 # data loader for train and eval
