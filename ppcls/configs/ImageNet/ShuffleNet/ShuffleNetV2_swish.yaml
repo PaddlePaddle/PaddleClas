@@ -16,7 +16,7 @@ Global:
 
 # model architecture
 Arch:
-  name: MobileNetV2_x0_25
+  name: ShuffleNetV2_swish
   class_num: 1000
  
 # loss function config for traing/eval process
@@ -34,10 +34,11 @@ Optimizer:
   momentum: 0.9
   lr:
     name: Cosine
-    learning_rate: 0.045
+    learning_rate: 0.5
+    warmup_epoch: 5
   regularizer:
     name: 'L2'
-    coeff: 0.00003
+    coeff: 0.00004
 
 
 # data loader for train and eval
@@ -63,7 +64,7 @@ DataLoader:
 
     sampler:
       name: DistributedBatchSampler
-      batch_size: 64
+      batch_size: 256
       drop_last: False
       shuffle: True
     loader:

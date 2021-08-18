@@ -37,7 +37,7 @@ Optimizer:
     learning_rate: 0.045
   regularizer:
     name: 'L2'
-    coeff: 0.0003
+    coeff: 0.00003
 
 
 # data loader for train and eval

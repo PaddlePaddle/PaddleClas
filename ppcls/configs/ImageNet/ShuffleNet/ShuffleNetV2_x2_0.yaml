@@ -38,7 +38,7 @@ Optimizer:
     warmup_epoch: 5
   regularizer:
     name: 'L2'
-    coeff: 0.0004
+    coeff: 0.00004
 
 
 # data loader for train and eval
