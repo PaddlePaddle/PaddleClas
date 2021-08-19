@@ -63,9 +63,8 @@ with _SysPathG(
         Returns:
             model: nn.Layer. Specific `AlexNet` model depends on args.
         """
+        kwargs.update({'pretrained': pretrained})
         model = backbone.AlexNet(**kwargs)
-        if pretrained:
-            model = _load_pretrained_parameters(model, 'AlexNet')
 
         return model
 
@@ -80,9 +79,8 @@ with _SysPathG(
         Returns:
             model: nn.Layer. Specific `VGG11` model depends on args.
         """
+        kwargs.update({'pretrained': pretrained})
         model = backbone.VGG11(**kwargs)
-        if pretrained:
-            model = _load_pretrained_parameters(model, 'VGG11')
 
         return model
 
@@ -97,9 +95,8 @@ with _SysPathG(
         Returns:
             model: nn.Layer. Specific `VGG13` model depends on args.
         """
+        kwargs.update({'pretrained': pretrained})
         model = backbone.VGG13(**kwargs)
-        if pretrained:
-            model = _load_pretrained_parameters(model, 'VGG13')
 
         return model
 
@@ -114,9 +111,8 @@ with _SysPathG(
         Returns:
             model: nn.Layer. Specific `VGG16` model depends on args.
         """
+        kwargs.update({'pretrained': pretrained})
         model = backbone.VGG16(**kwargs)
-        if pretrained:
-            model = _load_pretrained_parameters(model, 'VGG16')
 
         return model
 
@@ -131,9 +127,8 @@ with _SysPathG(
         Returns:
             model: nn.Layer. Specific `VGG19` model depends on args.
         """
+        kwargs.update({'pretrained': pretrained})
         model = backbone.VGG19(**kwargs)
-        if pretrained:
-            model = _load_pretrained_parameters(model, 'VGG19')
 
         return model
 
@@ -149,9 +144,8 @@ with _SysPathG(
         Returns:
             model: nn.Layer. Specific `ResNet18` model depends on args.
         """
+        kwargs.update({'pretrained': pretrained})
         model = backbone.ResNet18(**kwargs)
-        if pretrained:
-            model = _load_pretrained_parameters(model, 'ResNet18')
 
         return model
 
@@ -167,9 +161,8 @@ with _SysPathG(
         Returns:
             model: nn.Layer. Specific `ResNet34` model depends on args.
         """
+        kwargs.update({'pretrained': pretrained})
         model = backbone.ResNet34(**kwargs)
-        if pretrained:
-            model = _load_pretrained_parameters(model, 'ResNet34')
 
         return model
 
@@ -185,9 +178,8 @@ with _SysPathG(
         Returns:
             model: nn.Layer. Specific `ResNet50` model depends on args.
         """
+        kwargs.update({'pretrained': pretrained})
         model = backbone.ResNet50(**kwargs)
-        if pretrained:
-            model = _load_pretrained_parameters(model, 'ResNet50')
 
         return model
 
@@ -203,9 +195,8 @@ with _SysPathG(
         Returns:
             model: nn.Layer. Specific `ResNet101` model depends on args.
         """
+        kwargs.update({'pretrained': pretrained})
         model = backbone.ResNet101(**kwargs)
-        if pretrained:
-            model = _load_pretrained_parameters(model, 'ResNet101')
 
         return model
 
@@ -221,9 +212,8 @@ with _SysPathG(
         Returns:
             model: nn.Layer. Specific `ResNet152` model depends on args.
         """
+        kwargs.update({'pretrained': pretrained})
         model = backbone.ResNet152(**kwargs)
-        if pretrained:
-            model = _load_pretrained_parameters(model, 'ResNet152')
 
         return model
 
@@ -237,9 +227,8 @@ with _SysPathG(
         Returns:
             model: nn.Layer. Specific `SqueezeNet1_0` model depends on args.
         """
+        kwargs.update({'pretrained': pretrained})
         model = backbone.SqueezeNet1_0(**kwargs)
-        if pretrained:
-            model = _load_pretrained_parameters(model, 'SqueezeNet1_0')
 
         return model
 
@@ -253,9 +242,8 @@ with _SysPathG(
         Returns:
             model: nn.Layer. Specific `SqueezeNet1_1` model depends on args.
         """
+        kwargs.update({'pretrained': pretrained})
         model = backbone.SqueezeNet1_1(**kwargs)
-        if pretrained:
-            model = _load_pretrained_parameters(model, 'SqueezeNet1_1')
 
         return model
 
@@ -271,9 +259,8 @@ with _SysPathG(
         Returns:
             model: nn.Layer. Specific `DenseNet121` model depends on args.
         """
+        kwargs.update({'pretrained': pretrained})
         model = backbone.DenseNet121(**kwargs)
-        if pretrained:
-            model = _load_pretrained_parameters(model, 'DenseNet121')
 
         return model
 
@@ -289,9 +276,8 @@ with _SysPathG(
         Returns:
             model: nn.Layer. Specific `DenseNet161` model depends on args.
         """
+        kwargs.update({'pretrained': pretrained})
         model = backbone.DenseNet161(**kwargs)
-        if pretrained:
-            model = _load_pretrained_parameters(model, 'DenseNet161')
 
         return model
 
@@ -307,9 +293,8 @@ with _SysPathG(
         Returns:
             model: nn.Layer. Specific `DenseNet169` model depends on args.
         """
+        kwargs.update({'pretrained': pretrained})
         model = backbone.DenseNet169(**kwargs)
-        if pretrained:
-            model = _load_pretrained_parameters(model, 'DenseNet169')
 
         return model
 
@@ -325,9 +310,8 @@ with _SysPathG(
         Returns:
             model: nn.Layer. Specific `DenseNet201` model depends on args.
         """
+        kwargs.update({'pretrained': pretrained})
         model = backbone.DenseNet201(**kwargs)
-        if pretrained:
-            model = _load_pretrained_parameters(model, 'DenseNet201')
 
         return model
 
@@ -343,9 +327,8 @@ with _SysPathG(
         Returns:
             model: nn.Layer. Specific `DenseNet264` model depends on args.
         """
+        kwargs.update({'pretrained': pretrained})
         model = backbone.DenseNet264(**kwargs)
-        if pretrained:
-            model = _load_pretrained_parameters(model, 'DenseNet264')
 
         return model
 
@@ -359,9 +342,8 @@ with _SysPathG(
         Returns:
             model: nn.Layer. Specific `InceptionV3` model depends on args.
         """
+        kwargs.update({'pretrained': pretrained})
         model = backbone.InceptionV3(**kwargs)
-        if pretrained:
-            model = _load_pretrained_parameters(model, 'InceptionV3')
 
         return model
 
@@ -375,9 +357,8 @@ with _SysPathG(
         Returns:
             model: nn.Layer. Specific `InceptionV4` model depends on args.
         """
+        kwargs.update({'pretrained': pretrained})
         model = backbone.InceptionV4(**kwargs)
-        if pretrained:
-            model = _load_pretrained_parameters(model, 'InceptionV4')
 
         return model
 
@@ -391,9 +372,8 @@ with _SysPathG(
         Returns:
             model: nn.Layer. Specific `GoogLeNet` model depends on args.
         """
+        kwargs.update({'pretrained': pretrained})
         model = backbone.GoogLeNet(**kwargs)
-        if pretrained:
-            model = _load_pretrained_parameters(model, 'GoogLeNet')
 
         return model
 
@@ -407,9 +387,8 @@ with _SysPathG(
         Returns:
             model: nn.Layer. Specific `ShuffleNetV2_x0_25` model depends on args.
         """
+        kwargs.update({'pretrained': pretrained})
         model = backbone.ShuffleNetV2_x0_25(**kwargs)
-        if pretrained:
-            model = _load_pretrained_parameters(model, 'ShuffleNetV2_x0_25')
 
         return model
 
@@ -423,9 +402,8 @@ with _SysPathG(
         Returns:
             model: nn.Layer. Specific `MobileNetV1` model depends on args.
         """
+        kwargs.update({'pretrained': pretrained})
         model = backbone.MobileNetV1(**kwargs)
-        if pretrained:
-            model = _load_pretrained_parameters(model, 'MobileNetV1')
 
         return model
 
@@ -439,9 +417,8 @@ with _SysPathG(
         Returns:
             model: nn.Layer. Specific `MobileNetV1_x0_25` model depends on args.
         """
+        kwargs.update({'pretrained': pretrained})
         model = backbone.MobileNetV1_x0_25(**kwargs)
-        if pretrained:
-            model = _load_pretrained_parameters(model, 'MobileNetV1_x0_25')
 
         return model
 
@@ -455,9 +432,8 @@ with _SysPathG(
         Returns:
             model: nn.Layer. Specific `MobileNetV1_x0_5` model depends on args.
         """
+        kwargs.update({'pretrained': pretrained})
         model = backbone.MobileNetV1_x0_5(**kwargs)
-        if pretrained:
-            model = _load_pretrained_parameters(model, 'MobileNetV1_x0_5')
 
         return model
 
@@ -471,9 +447,8 @@ with _SysPathG(
         Returns:
             model: nn.Layer. Specific `MobileNetV1_x0_75` model depends on args.
         """
+        kwargs.update({'pretrained': pretrained})
         model = backbone.MobileNetV1_x0_75(**kwargs)
-        if pretrained:
-            model = _load_pretrained_parameters(model, 'MobileNetV1_x0_75')
 
         return model
 
@@ -487,9 +462,8 @@ with _SysPathG(
         Returns:
             model: nn.Layer. Specific `MobileNetV2_x0_25` model depends on args.
         """
+        kwargs.update({'pretrained': pretrained})
         model = backbone.MobileNetV2_x0_25(**kwargs)
-        if pretrained:
-            model = _load_pretrained_parameters(model, 'MobileNetV2_x0_25')
 
         return model
 
@@ -503,9 +477,8 @@ with _SysPathG(
         Returns:
             model: nn.Layer. Specific `MobileNetV2_x0_5` model depends on args.
         """
+        kwargs.update({'pretrained': pretrained})
         model = backbone.MobileNetV2_x0_5(**kwargs)
-        if pretrained:
-            model = _load_pretrained_parameters(model, 'MobileNetV2_x0_5')
 
         return model
 
@@ -519,9 +492,8 @@ with _SysPathG(
         Returns:
             model: nn.Layer. Specific `MobileNetV2_x0_75` model depends on args.
         """
+        kwargs.update({'pretrained': pretrained})
         model = backbone.MobileNetV2_x0_75(**kwargs)
-        if pretrained:
-            model = _load_pretrained_parameters(model, 'MobileNetV2_x0_75')
 
         return model
 
@@ -535,9 +507,8 @@ with _SysPathG(
         Returns:
             model: nn.Layer. Specific `MobileNetV2_x1_5` model depends on args.
         """
+        kwargs.update({'pretrained': pretrained})
         model = backbone.MobileNetV2_x1_5(**kwargs)
-        if pretrained:
-            model = _load_pretrained_parameters(model, 'MobileNetV2_x1_5')
 
         return model
 
@@ -551,9 +522,8 @@ with _SysPathG(
         Returns:
             model: nn.Layer. Specific `MobileNetV2_x2_0` model depends on args.
         """
+        kwargs.update({'pretrained': pretrained})
         model = backbone.MobileNetV2_x2_0(**kwargs)
-        if pretrained:
-            model = _load_pretrained_parameters(model, 'MobileNetV2_x2_0')
 
         return model
 
@@ -567,10 +537,8 @@ with _SysPathG(
         Returns:
             model: nn.Layer. Specific `MobileNetV3_large_x0_35` model depends on args.
         """
+        kwargs.update({'pretrained': pretrained})
         model = backbone.MobileNetV3_large_x0_35(**kwargs)
-        if pretrained:
-            model = _load_pretrained_parameters(model,
-                                                'MobileNetV3_large_x0_35')
 
         return model
 
@@ -584,10 +552,8 @@ with _SysPathG(
         Returns:
             model: nn.Layer. Specific `MobileNetV3_large_x0_5` model depends on args.
         """
+        kwargs.update({'pretrained': pretrained})
         model = backbone.MobileNetV3_large_x0_5(**kwargs)
-        if pretrained:
-            model = _load_pretrained_parameters(model,
-                                                'MobileNetV3_large_x0_5')
 
         return model
 
@@ -601,10 +567,8 @@ with _SysPathG(
         Returns:
             model: nn.Layer. Specific `MobileNetV3_large_x0_75` model depends on args.
         """
+        kwargs.update({'pretrained': pretrained})
         model = backbone.MobileNetV3_large_x0_75(**kwargs)
-        if pretrained:
-            model = _load_pretrained_parameters(model,
-                                                'MobileNetV3_large_x0_75')
 
         return model
 
@@ -618,10 +582,8 @@ with _SysPathG(
         Returns:
             model: nn.Layer. Specific `MobileNetV3_large_x1_0` model depends on args.
         """
+        kwargs.update({'pretrained': pretrained})
         model = backbone.MobileNetV3_large_x1_0(**kwargs)
-        if pretrained:
-            model = _load_pretrained_parameters(model,
-                                                'MobileNetV3_large_x1_0')
 
         return model
 
@@ -635,10 +597,8 @@ with _SysPathG(
         Returns:
             model: nn.Layer. Specific `MobileNetV3_large_x1_25` model depends on args.
         """
+        kwargs.update({'pretrained': pretrained})
         model = backbone.MobileNetV3_large_x1_25(**kwargs)
-        if pretrained:
-            model = _load_pretrained_parameters(model,
-                                                'MobileNetV3_large_x1_25')
 
         return model
 
@@ -652,10 +612,8 @@ with _SysPathG(
         Returns:
             model: nn.Layer. Specific `MobileNetV3_small_x0_35` model depends on args.
         """
+        kwargs.update({'pretrained': pretrained})
         model = backbone.MobileNetV3_small_x0_35(**kwargs)
-        if pretrained:
-            model = _load_pretrained_parameters(model,
-                                                'MobileNetV3_small_x0_35')
 
         return model
 
@@ -669,10 +627,8 @@ with _SysPathG(
         Returns:
             model: nn.Layer. Specific `MobileNetV3_small_x0_5` model depends on args.
         """
+        kwargs.update({'pretrained': pretrained})
         model = backbone.MobileNetV3_small_x0_5(**kwargs)
-        if pretrained:
-            model = _load_pretrained_parameters(model,
-                                                'MobileNetV3_small_x0_5')
 
         return model
 
@@ -686,10 +642,8 @@ with _SysPathG(
         Returns:
             model: nn.Layer. Specific `MobileNetV3_small_x0_75` model depends on args.
         """
+        kwargs.update({'pretrained': pretrained})
         model = backbone.MobileNetV3_small_x0_75(**kwargs)
-        if pretrained:
-            model = _load_pretrained_parameters(model,
-                                                'MobileNetV3_small_x0_75')
 
         return model
 
@@ -703,10 +657,8 @@ with _SysPathG(
         Returns:
             model: nn.Layer. Specific `MobileNetV3_small_x1_0` model depends on args.
         """
+        kwargs.update({'pretrained': pretrained})
         model = backbone.MobileNetV3_small_x1_0(**kwargs)
-        if pretrained:
-            model = _load_pretrained_parameters(model,
-                                                'MobileNetV3_small_x1_0')
 
         return model
 
@@ -720,10 +672,8 @@ with _SysPathG(
         Returns:
             model: nn.Layer. Specific `MobileNetV3_small_x1_25` model depends on args.
         """
+        kwargs.update({'pretrained': pretrained})
         model = backbone.MobileNetV3_small_x1_25(**kwargs)
-        if pretrained:
-            model = _load_pretrained_parameters(model,
-                                                'MobileNetV3_small_x1_25')
 
         return model
 
@@ -737,9 +687,8 @@ with _SysPathG(
         Returns:
             model: nn.Layer. Specific `ResNeXt101_32x4d` model depends on args.
         """
+        kwargs.update({'pretrained': pretrained})
         model = backbone.ResNeXt101_32x4d(**kwargs)
-        if pretrained:
-            model = _load_pretrained_parameters(model, 'ResNeXt101_32x4d')
 
         return model
 
@@ -753,9 +702,8 @@ with _SysPathG(
         Returns:
             model: nn.Layer. Specific `ResNeXt101_64x4d` model depends on args.
         """
+        kwargs.update({'pretrained': pretrained})
         model = backbone.ResNeXt101_64x4d(**kwargs)
-        if pretrained:
-            model = _load_pretrained_parameters(model, 'ResNeXt101_64x4d')
 
         return model
 
@@ -769,9 +717,8 @@ with _SysPathG(
         Returns:
             model: nn.Layer. Specific `ResNeXt152_32x4d` model depends on args.
         """
+        kwargs.update({'pretrained': pretrained})
         model = backbone.ResNeXt152_32x4d(**kwargs)
-        if pretrained:
-            model = _load_pretrained_parameters(model, 'ResNeXt152_32x4d')
 
         return model
 
@@ -785,9 +732,8 @@ with _SysPathG(
         Returns:
             model: nn.Layer. Specific `ResNeXt152_64x4d` model depends on args.
         """
+        kwargs.update({'pretrained': pretrained})
         model = backbone.ResNeXt152_64x4d(**kwargs)
-        if pretrained:
-            model = _load_pretrained_parameters(model, 'ResNeXt152_64x4d')
 
         return model
 
@@ -801,9 +747,8 @@ with _SysPathG(
         Returns:
             model: nn.Layer. Specific `ResNeXt50_32x4d` model depends on args.
         """
+        kwargs.update({'pretrained': pretrained})
         model = backbone.ResNeXt50_32x4d(**kwargs)
-        if pretrained:
-            model = _load_pretrained_parameters(model, 'ResNeXt50_32x4d')
 
         return model
 
@@ -817,9 +762,8 @@ with _SysPathG(
         Returns:
             model: nn.Layer. Specific `ResNeXt50_64x4d` model depends on args.
         """
+        kwargs.update({'pretrained': pretrained})
         model = backbone.ResNeXt50_64x4d(**kwargs)
-        if pretrained:
-            model = _load_pretrained_parameters(model, 'ResNeXt50_64x4d')
 
         return model
 
@@ -833,8 +777,7 @@ with _SysPathG(
         Returns:
             model: nn.Layer. Specific `ResNeXt50_64x4d` model depends on args.
         """
+        kwargs.update({'pretrained': pretrained})
         model = backbone.DarkNet53(**kwargs)
-        if pretrained:
-            model = _load_pretrained_parameters(model, 'DarkNet53')
 
         return model
