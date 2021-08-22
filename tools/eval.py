@@ -21,11 +21,11 @@ __dir__ = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.path.abspath(os.path.join(__dir__, '../')))
 
 from ppcls.utils import config
-from ppcls.engine.trainer import Trainer
+from ppcls.engine.core import Core
 
 if __name__ == "__main__":
     args = config.parse_args()
     config = config.get_config(
         args.config, overrides=args.override, show=False)
-    trainer = Trainer(config, mode="eval")
-    trainer.eval()
+    evaler = Core(config, mode="eval")
+    evaler.eval()
