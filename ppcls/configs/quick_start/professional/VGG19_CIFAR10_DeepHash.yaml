@@ -121,7 +121,7 @@ DataLoader:
               to_rgb: True
               channel_first: False
           - ResizeImage:
-              size: 227
+              size: 224
           - NormalizeImage:
               scale: 1.0/255.0
               mean: [0.4914, 0.4822, 0.4465]
