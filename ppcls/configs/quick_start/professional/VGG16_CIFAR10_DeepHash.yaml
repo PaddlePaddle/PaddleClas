@@ -24,7 +24,7 @@ Global:
 Arch:
   name: "RecModel"
   Backbone:
-    name: "VGG19"
+    name: "VGG19Sigmoid"
     pretrained: True
     class_num: 48
   Head:
