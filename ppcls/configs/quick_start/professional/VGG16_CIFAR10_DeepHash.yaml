@@ -13,7 +13,7 @@ Global:
   use_visualdl: False
 
   # used for static mode and model export
-  image_shape: [3, 227, 227]
+  image_shape: [3, 224, 224]
   save_inference_dir: ./inference
 
   #feature postprocess
@@ -68,7 +68,7 @@ DataLoader:
         - ResizeImage:
             size: 256
         - RandCropImage:
-            size: 227
+            size: 224
         - RandFlipImage:
             flip_code: 1
         - NormalizeImage:
@@ -96,7 +96,7 @@ DataLoader:
               to_rgb: True
               channel_first: False
           - ResizeImage:
-              size: 227
+              size: 224
           - NormalizeImage:
               scale: 1.0/255.0
               mean: [0.4914, 0.4822, 0.4465]
