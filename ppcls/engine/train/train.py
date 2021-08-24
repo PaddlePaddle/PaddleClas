@@ -29,7 +29,7 @@ from ppcls.utils.misc import AverageMeter
 from ppcls.engine.train.utils import update_loss, update_metric, log_info
 
 
-def classification_train(trainer, epoch_id, print_batch_step):
+def train_epoch(trainer, epoch_id, print_batch_step):
     tic = time.time()
 
     train_dataloader = trainer.train_dataloader if trainer.use_dali else trainer.train_dataloader(
@@ -55,10 +55,10 @@ def classification_train(trainer, epoch_id, print_batch_step):
             with paddle.amp.auto_cast(custom_black_list={
                     "flatten_contiguous_range", "greater_than"
             }):
-                out = trainer.model(batch[0])
+                out = forward(trainer, batch)
                 loss_dict = trainer.train_loss_func(out, batch[1])
         else:
-            out = trainer.model(batch[0])
+            out = forward(trainer, batch)
 
         # calc loss
         if trainer.config["DataLoader"]["Train"]["dataset"].get(
@@ -87,3 +87,9 @@ def classification_train(trainer, epoch_id, print_batch_step):
         if iter_id % print_batch_step == 0:
             log_info(trainer, batch_size, epoch_id, iter_id)
         tic = time.time()
+
+def forward(trainer, batch):
+    if trainer.eval_mode == "classification":
+        return trainer.model(batch[0])
+    else:
+        return trainer.model(batch[0], batch[1])

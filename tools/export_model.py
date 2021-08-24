@@ -24,11 +24,11 @@ import paddle
 import paddle.nn as nn
 
 from ppcls.utils import config
-from ppcls.engine.core import Core
+from ppcls.engine.engine import Engine
 
 if __name__ == "__main__":
     args = config.parse_args()
     config = config.get_config(
         args.config, overrides=args.override, show=False)
-    exporter = Core(config, mode="export")
-    exporter.export()
+    engine = Engine(config, mode="export")
+    engine.export()

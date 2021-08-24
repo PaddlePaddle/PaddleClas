@@ -47,19 +47,18 @@ from ppcls.utils import save_load
 from ppcls.data.utils.get_image_list import get_image_list
 from ppcls.data.postprocess import build_postprocess
 from ppcls.data import create_operators
-from ppcls.engine.train import classification_train, retrieval_train
-from ppcls.engine.eval import classification_eval, retrieval_eval
+from ppcls.engine.train import train_epoch
+from ppcls.engine import evaluation
 from ppcls.arch.gears.identity_head import IdentityHead
 
 
-class Core(object):
+class Engine(object):
     def __init__(self, config, mode="train"):
-        assert mode in ['train', 'eval', 'infer', 'export']
+        assert mode in ["train", "eval", "infer", "export"]
         self.mode = mode
         self.config = config
         self.eval_mode = self.config["Global"].get("eval_mode",
                                                    "classification")
-
         # init logger
         self.output_dir = self.config['Global']['output_dir']
         log_file = os.path.join(self.output_dir, self.config["Arch"]["name"],
@@ -68,14 +67,10 @@ class Core(object):
         print_config(config)
 
         # init train_func and eval_func
-        if self.eval_mode == "classification":
-            self.evaler = classification_eval
-            self.trainer = classification_train
-        elif self.eval_mode == "retrieval":
-            self.trainer = retrieval_train
-            self.evaler = retrieval_eval
-        else:
-            logger.warning("Invalid eval mode: {}".format(self.eval_mode))
+        assert self.eval_mode in ["classification", "retrieval"], logger.error("Invalid eval mode: {}".format(self.eval_mode))
+        self.train_epoch_func = train_epoch
+        self.eval_func = getattr(evaluation, self.eval_mode + "_eval")
+
         self.use_dali = self.config['Global'].get("use_dali", False)
 
         # for visualdl
@@ -242,7 +237,7 @@ class Core(object):
                               self.config["Global"]["epochs"] + 1):
             acc = 0.0
             # for one epoch train
-            self.trainer(self, epoch_id, print_batch_step)
+            self.train_epoch_func(self, epoch_id, print_batch_step)
 
             if self.use_dali:
                 self.train_dataloader.reset()
@@ -304,7 +299,7 @@ class Core(object):
     def eval(self, epoch_id=0):
         assert self.mode in ["train", "eval"]
         self.model.eval()
-        eval_result = self.evaler(self, epoch_id)
+        eval_result = self.eval_func(self, epoch_id)
         self.model.train()
         return eval_result
 
