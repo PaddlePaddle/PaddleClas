@@ -14,14 +14,10 @@
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
-import os
-import sys
 import time
 import platform
 import paddle
 
-__dir__ = os.path.dirname(os.path.abspath(__file__))
-sys.path.append(os.path.abspath(os.path.join(__dir__, '../../../')))
 from ppcls.utils.misc import AverageMeter
 from ppcls.utils import logger
 
@@ -61,14 +57,14 @@ def classification_eval(evaler, epoch_id=0):
         out = evaler.model(batch[0])
         # calc loss
         if evaler.eval_loss_func is not None:
-            loss_dict = evaler.eval_loss_func(out, batch[-1])
+            loss_dict = evaler.eval_loss_func(out, batch[1])
             for key in loss_dict:
                 if key not in output_info:
                     output_info[key] = AverageMeter(key, '7.5f')
                 output_info[key].update(loss_dict[key].numpy()[0], batch_size)
         # calc metric
         if evaler.eval_metric_func is not None:
-            metric_dict = evaler.eval_metric_func(out, batch[-1])
+            metric_dict = evaler.eval_metric_func(out, batch[1])
             if paddle.distributed.get_world_size() > 1:
                 for key in metric_dict:
                     paddle.distributed.all_reduce(

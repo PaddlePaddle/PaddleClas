@@ -14,16 +14,6 @@
 from __future__ import absolute_import, division, print_function
 
 import datetime
-import os
-import platform
-import sys
-import time
-
-import numpy as np
-import paddle
-
-__dir__ = os.path.dirname(os.path.abspath(__file__))
-sys.path.append(os.path.abspath(os.path.join(__dir__, '../../../')))
 from ppcls.utils import logger
 from ppcls.utils.misc import AverageMeter
 

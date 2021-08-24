@@ -13,21 +13,13 @@
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
+
 import os
-import sys
-import numpy as np
-
-__dir__ = os.path.dirname(os.path.abspath(__file__))
-sys.path.append(os.path.abspath(os.path.join(__dir__, '../../')))
-
-import time
 import platform
-import datetime
-import argparse
 import paddle
-import paddle.nn as nn
 import paddle.distributed as dist
 from visualdl import LogWriter
+from paddle import nn
 
 from ppcls.utils.check import check_gpu
 from ppcls.utils.misc import AverageMeter
@@ -67,7 +59,8 @@ class Engine(object):
         print_config(config)
 
         # init train_func and eval_func
-        assert self.eval_mode in ["classification", "retrieval"], logger.error("Invalid eval mode: {}".format(self.eval_mode))
+        assert self.eval_mode in ["classification", "retrieval"], logger.error(
+            "Invalid eval mode: {}".format(self.eval_mode))
         self.train_epoch_func = train_epoch
         self.eval_func = getattr(evaluation, self.eval_mode + "_eval")
 

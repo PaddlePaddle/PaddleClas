@@ -13,19 +13,8 @@
 # limitations under the License.
 from __future__ import absolute_import, division, print_function
 
-import datetime
-import os
-import platform
-import sys
 import time
-
-import numpy as np
 import paddle
-
-__dir__ = os.path.dirname(os.path.abspath(__file__))
-sys.path.append(os.path.abspath(os.path.join(__dir__, '../../../')))
-from ppcls.utils import logger
-from ppcls.utils.misc import AverageMeter
 from ppcls.engine.train.utils import update_loss, update_metric, log_info
 
 
@@ -87,6 +76,7 @@ def train_epoch(trainer, epoch_id, print_batch_step):
         if iter_id % print_batch_step == 0:
             log_info(trainer, batch_size, epoch_id, iter_id)
         tic = time.time()
+
 
 def forward(trainer, batch):
     if trainer.eval_mode == "classification":
