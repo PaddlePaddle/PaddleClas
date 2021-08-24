@@ -11,7 +11,7 @@ class SigmoidSuffix(paddle.nn.Layer):
         self.origin_layer = origin_layer
         self.sigmoid = Sigmoid()
  
-    def forward(self, *input, res_dict=None, **kwargs):
+    def forward(self, input, res_dict=None, **kwargs):
         x = self.origin_layer(input)
         x = self.sigmoid(x)
         return x
