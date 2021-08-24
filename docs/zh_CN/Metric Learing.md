@@ -6,7 +6,7 @@ Metric learning全称是 Distance metric learning，就是通过机器学习的�
 ![corpus](../images/a.jpg)
  
 给定如上训练集，X表示样本，Y表示标签。Metric learning的目标就是学习一个变换函数（线性非线性均可）L将数据点从原始的向量空间映射到一个新的向量空间，在新的向量空间里相似点的距离更近，非相似点的距离更远，使得度量更符合任务的要求。Deep Metric learning，就是用深度神经网络来拟合这个变换函数。
-![example](../images/a.jpg)
+![example](../images/b.jpg)
 
 
 ## 应用
