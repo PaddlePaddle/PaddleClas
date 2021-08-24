@@ -17,5 +17,3 @@ Metric learning全称是 Distance metric learning，就是通过机器学习的�
 这是一类基于样本对的学习范式。他以样本对作为输入，通过直接学习样本对之间的相似度来得到有效的特征表示，常见的算法包括：Contrastive loss, Triplet loss, Lifted-Structure loss, N-pair loss, Histogram loss, Angular loss, Margin-based loss, Multi-Similarity loss等
 2021年发表的CircleLoss，从一个全新的视角统一了两种学习范式，让研究人员和从业者对Metric Learning问题有了更进一步的思考。
 
-
-![image](https://user-images.githubusercontent.com/17264083/130568111-e6e889e1-b9d4-477b-bbad-f03da76f388d.png)
