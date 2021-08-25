@@ -9,7 +9,7 @@
 
 ## 应用
    Metric Learning技术在生活实际中应用广泛，如我们耳熟能详的人脸识别（Face Recognition）、行人重识别（Person ReID）、图像检索（Image Retrieval）、细粒度分类（Fine-gained classification）等.  随着深度学习在工业实践中越来越广泛的应用，目前大家研究的方向基本都偏向于Deep Metric Learning（DML）. 
-   一般来说, DML包含三个部分: 特征提取网络来map embedding, 一个采样策略来将一个mini-batch里的样本组合成很多个sub-set, 最后loss function在每个sub-set上计算loss.如下图.
+   一般来说, DML包含三个部分: 特征提取网络来map embedding, 一个采样策略来将一个mini-batch里的样本组合成很多个sub-set, 最后loss function在每个sub-set上计算loss. 如下图所示：
    ![image](https://user-images.githubusercontent.com/17264083/130715695-a7a458b7-88a1-4b3b-9394-fb728ba877a5.png)
 
 
