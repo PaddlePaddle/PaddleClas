@@ -14,9 +14,6 @@
    ![image](https://user-images.githubusercontent.com/17264083/130715695-a7a458b7-88a1-4b3b-9394-fb728ba877a5.png)
 
 
-## 数据集
-   DML研究常见的有如下四个数据集：
-
 ## 算法
    Metric Learning主要有如下两种学习范式：
 ### 1.	Classification based:  
