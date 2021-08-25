@@ -20,7 +20,7 @@
    这是一类基于分类标签的Metric Learning方法。这类方法通过将每个样本分类到正确的类别中，来学习有效的特征表示，学习过程中需要每个样本的显式标签参与Loss计算。常见的算法有L2-Softmax, Large-margin Softmax, Angular Softmax, NormFace, AM-Softmax, CosFace, ArcFace等。 
    这类方法也被称作是proxy-based, 因为其本质上优化的是样本和一堆proxies之间的相似度。
 ### 2.	Pairwise based: 
-   这是一类基于样本对的学习范式。他以样本对作为输入，通过直接学习样本对之间的相似度来得到有效的特征表示，常见的算法包括：[Contrastive loss](http://yann.lecun.com/exdb/publis/pdf/hadsell-chopra-lecun-06.pdf), [Triplet loss](https://arxiv.org/abs/1503.03832), Lifted-Structure loss, [N-pair loss](https://papers.nips.cc/paper/2016/file/6b180037abbebea991d8b1232f8a8ca9-Paper.pdf),  Margin-based loss, Multi-Similarity loss等
+   这是一类基于样本对的学习范式。他以样本对作为输入，通过直接学习样本对之间的相似度来得到有效的特征表示，常见的算法包括：[Contrastive loss](http://yann.lecun.com/exdb/publis/pdf/hadsell-chopra-lecun-06.pdf), [Triplet loss](https://arxiv.org/abs/1503.03832), Lifted-Structure loss, [N-pair loss](https://papers.nips.cc/paper/2016/file/6b180037abbebea991d8b1232f8a8ca9-Paper.pdf),  Margin-based loss, [Multi-Similarity loss](https://arxiv.org/pdf/1904.06627.pdf)等
 
 2020年发表的[CircleLoss](https://arxiv.org/abs/2002.10857)，从一个全新的视角统一了两种学习范式，让研究人员和从业者对Metric Learning问题有了更进一步的思考。
 
