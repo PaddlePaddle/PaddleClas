@@ -3,7 +3,7 @@
 ## 简介
    在机器学习中，我们经常会遇到度量数据间距离的问题。一般来说，对于可度量的数据，我们可以直接通过欧式距离(Euclidean Distance)，向量内积（Inner Product）或者是余弦相似度（Cosine Similarity）来进行计算。但对于非结构化数据来说，我们却很难进行这样的操作，如计算一段视频和一首音乐的匹配程度。由于数据格式的不同，我们难以直接进行上述的向量运算，但先验知识告诉我们ED(laugh_video, laugh_music) < ED(laugh_video, blue_music), 如何去有效得表征这种”距离”关系呢? 这就是Metric Learning所要研究的课题。
    
-   Metric learning全称是 Distance Metric Learning，它是通过机器学习的形式，根据训练数据，自动构造出一种基于特定任务的度量函数。Metric Learning的目标是学习一个变换函数（线性非线性均可）L将数据点从原始的向量空间映射到一个新的向量空间，在新的向量空间里相似点的距离更近，非相似点的距离更远，使得度量更符合任务的要求，如下图所示。 Deep Metric learning，就是用深度神经网络来拟合这个变换函数。
+   Metric learning全称是 Distance Metric Learning，它是通过机器学习的形式，根据训练数据，自动构造出一种基于特定任务的度量函数。Metric Learning的目标是学习一个变换函数（线性非线性均可）L，将数据点从原始的向量空间映射到一个新的向量空间，在新的向量空间里相似点的距离更近，非相似点的距离更远，使得度量更符合任务的要求，如下图所示。 Deep Metric Learning，就是用深度神经网络来拟合这个变换函数。
 ![example](../images/b.jpg)
 
 
