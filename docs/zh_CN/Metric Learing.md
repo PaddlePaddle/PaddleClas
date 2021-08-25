@@ -15,7 +15,7 @@
 
 
 ## 算法
-   Metric Learning的算法很多，概括得讲，主要有如下两种学习范式：
+   Metric Learning主要有如下两种学习范式：
 ### 1.	Classification based:  
    这是一类基于分类标签的Metric Learning方法。这类方法通过将每个样本分类到正确的类别中，来学习有效的特征表示，学习过程中需要每个样本的显式标签参与Loss计算。常见的算法有L2-Softmax, Large-margin Softmax, Angular Softmax, NormFace, AM-Softmax, CosFace, ArcFace等。 
    这类方法也被称作是proxy-based, 因为其本质上优化的是样本和一堆proxies之间的相似度。
