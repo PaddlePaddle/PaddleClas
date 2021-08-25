@@ -57,7 +57,7 @@ class DSHSDLoss(nn.Layer):
 
         return {"dshsdloss": Lc + Ld * self.alpha}
 
-class LCDSHLoss(paddle.nn.Layer):
+class LCDSHLoss(nn.Layer):
     """
     # paper [Locality-Constrained Deep Supervised Hashing for Image Retrieval](https://www.ijcai.org/Proceedings/2017/0499.pdf)
     # [LCDSH] epoch:145, bit:48, dataset:cifar10-1,  MAP:0.798, Best MAP: 0.798
