@@ -70,7 +70,6 @@ class LCDSHLoss(nn.Layer):
 
     def forward(self, input, label):
         feature = input["features"]
-        label = label.astype("float32")
 
         # label to ont-hot
         label = paddle.flatten(label)
