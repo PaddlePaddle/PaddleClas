@@ -41,10 +41,15 @@ class _SysPathG(object):
             self.path)
 
 
-with _SysPathG(
-        os.path.join(
-            os.path.dirname(os.path.abspath(__file__)), 'ppcls', 'arch')):
-    import backbone
+with _SysPathG(os.path.dirname(os.path.abspath(__file__)), ):
+    import ppcls
+    import ppcls.arch.backbone as backbone
+
+    def ppclas_init():
+        if ppcls.utils.logger._logger is None:
+            ppcls.utils.logger.init_logger()
+
+    ppclas_init()
 
     def _load_pretrained_parameters(model, name):
         url = 'https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/{}_pretrained.pdparams'.format(
