@@ -1,7 +1,7 @@
 # global configs
 Global:
   checkpoints: null
-  pretrained_model: ./output_dlbhc/RecModel/best_model
+  pretrained_model: null
   output_dir: ./output_dlbhc/
   device: gpu
   save_interval: 1
@@ -138,7 +138,9 @@ Metric:
         topk: [1, 5]
   Eval:
     - TopkAcc:
-        topk: [1, 5]  
+        topk: [1, 5]
+        
+# switch to metric below when eval by retrieval
 #     - Recallk:
 #         topk: [1]
 #     - mAP:
