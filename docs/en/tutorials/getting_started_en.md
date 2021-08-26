@@ -23,7 +23,7 @@ Among them, `-c` is used to specify the path of the configuration file, `-o` is 
 `-o use_gpu=True` means to use GPU for training. If you want to use the CPU for training, you need to set `use_gpu` to `False`.
 
 
-Of course, you can also directly modify the configuration file to update the configuration. For specific configuration parameters, please refer to [Configuration Document](config_en.md).
+Of course, you can also directly modify the configuration file to update the configuration. For specific configuration parameters, please refer to [Configuration Document](config_description_en.md).
 
 * The output log examples are as follows:
     * If mixup or cutmix is used in training, top-1 and top-k (default by 5) will not be printed in the log:
