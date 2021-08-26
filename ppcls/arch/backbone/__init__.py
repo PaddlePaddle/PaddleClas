@@ -58,6 +58,7 @@ from ppcls.arch.backbone.model_zoo.rednet import RedNet26, RedNet38, RedNet50, R
 from ppcls.arch.backbone.model_zoo.tnt import TNT_small
 from ppcls.arch.backbone.model_zoo.hardnet import HarDNet68, HarDNet85, HarDNet39_ds, HarDNet68_ds
 from ppcls.arch.backbone.variant_models.resnet_variant import ResNet50_last_stage_stride1
+from ppcls.arch.backbone.variant_models.vgg_variant import VGG19Sigmoid
 
 
 def get_apis():
