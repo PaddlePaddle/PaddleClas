@@ -82,11 +82,11 @@ class GroupAttention(nn.Layer):
             B, total_groups, self.ws**2, 3, self.num_heads, C // self.num_heads
         ]).transpose([3, 0, 1, 4, 2, 5])
         q, k, v = qkv[0], qkv[1], qkv[2]
-        attn = (q @ k.transpose([0, 1, 2, 4, 3])) * self.scale
+        attn = paddle.matmul(q, k.transpose([0, 1, 2, 4, 3])) * self.scale
 
         attn = nn.Softmax(axis=-1)(attn)
         attn = self.attn_drop(attn)
-        attn = (attn @ v).transpose([0, 1, 3, 2, 4]).reshape(
+        attn = paddle.matmul(attn, v).transpose([0, 1, 3, 2, 4]).reshape(
             [B, h_group, w_group, self.ws, self.ws, C])
 
         x = attn.transpose([0, 1, 3, 2, 4, 5]).reshape([B, N, C])
@@ -147,11 +147,11 @@ class Attention(nn.Layer):
                     [2, 0, 3, 1, 4])
         k, v = kv[0], kv[1]
 
-        attn = (q @ k.transpose([0, 1, 3, 2])) * self.scale
+        attn = paddle.matmul(q, k.transpose([0, 1, 3, 2])) * self.scale
         attn = nn.Softmax(axis=-1)(attn)
         attn = self.attn_drop(attn)
 
-        x = (attn @ v).transpose([0, 2, 1, 3]).reshape([B, N, C])
+        x = paddle.matmul(attn, v).transpose([0, 2, 1, 3]).reshape([B, N, C])
         x = self.proj(x)
         x = self.proj_drop(x)
         return x
@@ -350,7 +350,6 @@ class PyramidVisionTransformer(nn.Layer):
             shape=[1, 1, embed_dims[-1]],
             default_initializer=zeros_,
             attr=paddle.ParamAttr(regularizer=L2Decay(0.0)))
-        self.add_parameter("cls_token", self.cls_token)
 
         # classification head
         self.head = nn.Linear(embed_dims[-1],

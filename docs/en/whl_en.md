@@ -5,7 +5,7 @@
 * installing from pypi
 
 ```bash
-pip3 install paddleclas==2.2.0
+pip3 install paddleclas==2.2.1
 ```
 
 * build own whl package and install

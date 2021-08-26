@@ -30,7 +30,7 @@ python3 tools/train.py \
 
 其中，`-c`用于指定配置文件的路径，`-o`用于指定需要修改或者添加的参数，其中`-o Arch.pretrained=False`表示不使用预训练模型，`-o Global.device=gpu`表示使用GPU进行训练。如果希望使用CPU进行训练，则需要将`Global.device`设置为`cpu`。
 
-更详细的训练配置，也可以直接修改模型对应的配置文件。具体配置参数参考[配置文档](config.md)。
+更详细的训练配置，也可以直接修改模型对应的配置文件。具体配置参数参考[配置文档](config_description.md)。
 
 运行上述命令，可以看到输出日志，示例如下：
 
@@ -244,7 +244,7 @@ python3 python/predict_cls.py \
     -c configs/inference_cls.yaml \
     -o Global.infer_imgs=../dataset/flowers102/jpg/image_00001.jpg \
     -o Global.inference_model_dir=../inference/ \
-    -o PostProcess.class_id_map_file=None
+    -o PostProcess.Topk.class_id_map_file=None
 
 
 其中：
