@@ -126,10 +126,10 @@ def cal_feature(evaler, name='gallery'):
             batch_feas = paddle.divide(batch_feas, feas_norm)
             
         # do binarize
-        if self.config["Global"].get("feature_binarize") == "round":
+        if evaler.config["Global"].get("feature_binarize") == "round":
             batch_feas = paddle.round(batch_feas).astype("float32") * 2.0 - 1.0
 
-        if self.config["Global"].get("feature_binarize") == "sign":
+        if evaler.config["Global"].get("feature_binarize") == "sign":
             batch_feas = paddle.sign(batch_feas).astype("float32")
 
         if all_feas is None:
