@@ -67,12 +67,11 @@ The training command is as follow:
 If using GPU, change the `cpu` to `gpu` in the following command.
 
 ```bash
-python3.7 deploy/slim/slim.py -m train -c ppcls/configs/slim/ResNet50_vd_quantization.yaml -o Global.device=cpu
+python3.7 tools/train.py -c ppcls/configs/slim/ResNet50_vd_quantization.yaml -o Global.device=cpu
 ```
 
 The description of `yaml` file can be found  in this [doc](../../docs/en/tutorials/config_en.md). To get better accuracy, the `pretrained model`is used in `yaml`.
 
-`-m`: the mode of `slim.py` supported, include ` train, eval, infer, export`, means training models, evaluating model, inferring images using dygraph model and exporting inference model for deploy respectively.
 
 * Distributed training
 
@@ -80,7 +79,7 @@ The description of `yaml` file can be found  in this [doc](../../docs/en/tutoria
 export CUDA_VISIBLE_DEVICES=0,1,2,3
 python3.7 -m paddle.distributed.launch \
     --gpus="0,1,2,3" \
-      deploy/slim/slim.py \
+      tools/train.py \
       -m train \
       -c ppcls/configs/slim/ResNet50_vd_quantization.yaml
 ```
@@ -108,7 +107,7 @@ If run successfully, the directory `quant_post_static_model` is generated in `Gl
 If using GPU, change the `cpu` to `gpu` in the following command.
 
 ```bash
-python3.7 deploy/slim/slim.py -m train -c ppcls/configs/slim/ResNet50_vd_prune.yaml -o Global.device=cpu
+python3.7 tools/train.py -c ppcls/configs/slim/ResNet50_vd_prune.yaml -o Global.device=cpu
 ```
 
 - Distributed training
@@ -117,8 +116,7 @@ python3.7 deploy/slim/slim.py -m train -c ppcls/configs/slim/ResNet50_vd_prune.y
 export CUDA_VISIBLE_DEVICES=0,1,2,3
 python3.7 -m paddle.distributed.launch \
     --gpus="0,1,2,3" \
-      deploy/slim/slim.py \
-      -m train \
+      tools/train.py \
       -c ppcls/configs/slim/ResNet50_vd_prune.yaml
 ```
 
@@ -129,9 +127,9 @@ python3.7 -m paddle.distributed.launch \
 After getting the compressed model, we can export it as inference model for predictive deployment. Using pruned model as example:
 
 ```bash
-python3.7 deploy/slim/slim.py \
-    -m export \
+python3.7 tools/export.py \
     -c ppcls/configs/slim/ResNet50_vd_prune.yaml \
+    -o Global.pretrained_model=./output/ResNet50_vd/best_model
     -o Global.save_inference_dir=./inference
 ```
 

@@ -66,12 +66,11 @@ cd PaddleClas
 以CPU为例，若使用GPU，则将命令中改成`cpu`改成`gpu`
 
 ```bash
-python3.7 deploy/slim/slim.py -m train -c ppcls/configs/slim/ResNet50_vd_quantization.yaml -o Global.device=cpu
+python3.7 tools/train.py -c ppcls/configs/slim/ResNet50_vd_quantization.yaml -o Global.device=cpu
 ```
 
 其中`yaml`文件解析详见[参考文档](../../docs/zh_CN/tutorials/config_description.md)。为了保证精度，`yaml`文件中已经使用`pretrained model`.
 
-`-m`：表示`slim.py`支持的模式，有`train、eval、infer、export`，4种模式，分别为：训练、测试、动态图预测、导出`inference model`
 
 * 单机多卡/多机多卡启动
 
@@ -79,8 +78,7 @@ python3.7 deploy/slim/slim.py -m train -c ppcls/configs/slim/ResNet50_vd_quantiz
 export CUDA_VISIBLE_DEVICES=0,1,2,3
 python3.7 -m paddle.distributed.launch \
     --gpus="0,1,2,3" \
-      deploy/slim/slim.py \
-      -m train \
+      tools/train.py \
       -c ppcls/configs/slim/ResNet50_vd_quantization.yaml
 ```
 
@@ -109,7 +107,7 @@ python3.7 deploy/slim/quant_post_static.py -c ppcls/configs/ImageNet/ResNet/ResN
 以CPU为例，若使用GPU，则将命令中改成`cpu`改成`gpu`
 
 ```bash
-python3.7 deploy/slim/slim.py -m train -c ppcls/configs/slim/ResNet50_vd_prune.yaml -o Global.device=cpu
+python3.7 tools/train.py -c ppcls/configs/slim/ResNet50_vd_prune.yaml -o Global.device=cpu
 ```
 
 - 单机单卡/单机多卡/多机多卡启动
@@ -118,8 +116,7 @@ python3.7 deploy/slim/slim.py -m train -c ppcls/configs/slim/ResNet50_vd_prune.y
 export CUDA_VISIBLE_DEVICES=0,1,2,3
 python3.7 -m paddle.distributed.launch \
     --gpus="0,1,2,3" \
-      deploy/slim/slim.py \
-      -m train \
+      tools/train.py \
       -c ppcls/configs/slim/ResNet50_vd_prune.yaml
 ```
 
@@ -128,9 +125,9 @@ python3.7 -m paddle.distributed.launch \
 在得到在线量化训练、模型剪枝保存的模型后，可以将其导出为inference model，用于预测部署，以模型剪枝为例：
 
 ```bash
-python3.7 deploy/slim/slim.py \
-    -m export \
+python3.7 tools/export.py \
     -c ppcls/configs/slim/ResNet50_vd_prune.yaml \
+    -o Global.pretrained_model=./output/ResNet50_vd/best_model \
     -o Global.save_inference_dir=./inference
 ```
 
