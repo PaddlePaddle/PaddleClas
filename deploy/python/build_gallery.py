@@ -109,7 +109,8 @@ class GalleryBuilder(object):
 
         if operation_method != "remove":
             start_id = max(ids.keys()) + 1 if ids else 0
-            ids_now = np.arange(0, len(gallery_images)) + start_id
+            ids_now = (
+                np.arange(0, len(gallery_images)) + start_id).astype(np.int64)
             if operation_method == "new":
                 index.train(gallery_features)
             index.add_with_ids(gallery_features, ids_now)
