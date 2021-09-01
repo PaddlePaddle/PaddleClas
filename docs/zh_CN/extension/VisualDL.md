@@ -7,15 +7,17 @@ VisualDL是飞桨可视化分析工具，以丰富的图表呈现训练参数变
 现在PaddleClas支持在训练阶段使用VisualDL查看训练过程中学习率（learning rate）、损失值（loss）以及准确率（accuracy）的变化情况。
 
 ### 设置config文件并启动训练
-在PaddleClas中使用VisualDL，只需在训练配置文件（config文件）添加如下字段：
+在PaddleClas中使用VisualDL，只需在训练配置文件（config文件）中设置字段 `Global.use_visualdl` 为 `True`：
 
 ```yaml
 # config.yaml
-vdl_dir: "./vdl.log"
+Global:
+...
+  use_visualdl: True
+...
 ```
-`vdl_dir` 用于指定VisualDL用于保存log信息的目录。
 
-然后正常启动训练即可：
+PaddleClas 会将 VisualDL 的日志保存在 `Global.output_dir` 字段指定目录下的 `vdl/` 子目录下，然后正常启动训练即可：
 
 ```shell
 python3 tools/train.py -c config.yaml
@@ -25,10 +27,10 @@ python3 tools/train.py -c config.yaml
 在启动训练程序后，可以在新的终端session中启动VisualDL服务：
 
 ```shell
- visualdl --logdir ./vdl.log
+ visualdl --logdir ./output/vdl/
  ```
 
-上述命令中，参数`--logdir`用于指定日志目录，VisualDL将遍历并且迭代寻找指定目录的子目录，将所有实验结果进行可视化。也同样可以使用下述参数设定VisualDL服务的ip及端口号：
+上述命令中，参数`--logdir`用于指定保存 VisualDL 日志的目录，VisualDL将遍历并且迭代寻找指定目录的子目录，将所有实验结果进行可视化。也同样可以使用下述参数设定VisualDL服务的ip及端口号：
 * `--host`：设定IP，默认为127.0.0.1
 * `--port`：设定端口，默认为8040
 

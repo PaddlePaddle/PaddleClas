@@ -33,9 +33,9 @@ MODEL_URLS = {
     "SwinTransformer_base_patch4_window12_384":
     "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/SwinTransformer_base_patch4_window12_384_pretrained.pdparams",
     "SwinTransformer_large_patch4_window7_224":
-    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/SwinTransformer_large_patch4_window7_224_pretrained.pdparams",
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/SwinTransformer_large_patch4_window7_224_22kto1k_pretrained.pdparams",
     "SwinTransformer_large_patch4_window12_384":
-    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/SwinTransformer_large_patch4_window12_384_pretrained.pdparams",
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/SwinTransformer_large_patch4_window12_384_22kto1k_pretrained.pdparams",
 }
 
 __all__ = list(MODEL_URLS.keys())
