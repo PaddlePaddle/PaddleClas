@@ -1,5 +1,5 @@
 Global:
-  infer_imgs: "./recognition_demo_data_v1.0/test_cartoon"
+  infer_imgs: "./recognition_demo_data_v1.1/test_cartoon"
   det_inference_model_dir: "./models/ppyolov2_r50vd_dcn_mainbody_v1.0_infer/"
   rec_inference_model_dir: "./models/cartoon_rec_ResNet50_iCartoon_v1.0_infer/"
   rec_nms_thresold: 0.05
@@ -51,6 +51,6 @@ RecPreProcess:
 RecPostProcess: null
 
 IndexProcess:
-  index_dir: "./recognition_demo_data_v1.0/gallery_cartoon/index/"
+  index_dir: "./recognition_demo_data_v1.1/gallery_cartoon/index/"
   return_k: 5
   score_thres: 0.5
