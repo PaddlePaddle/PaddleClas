@@ -51,6 +51,11 @@ class Engine(object):
         self.config = config
         self.eval_mode = self.config["Global"].get("eval_mode",
                                                    "classification")
+        if "Head" in self.config["Arch"]:
+            self.is_rec = True
+        else:
+            self.is_rec = False
+
         # init logger
         self.output_dir = self.config['Global']['output_dir']
         log_file = os.path.join(self.output_dir, self.config["Arch"]["name"],
