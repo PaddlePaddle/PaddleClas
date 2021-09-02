@@ -238,12 +238,12 @@ cp recognition_demo_data_v1.0/gallery_product/data_file.txt recognition_demo_dat
 Then add some new lines into the new label file, which is shown as follows.
 
 ```
-gallery/anmuxi/001.jpg    Anmuxi Ambrosial Yogurt
-gallery/anmuxi/002.jpg    Anmuxi Ambrosial Yogurt
-gallery/anmuxi/003.jpg    Anmuxi Ambrosial Yogurt
-gallery/anmuxi/004.jpg    Anmuxi Ambrosial Yogurt
-gallery/anmuxi/005.jpg    Anmuxi Ambrosial Yogurt
-gallery/anmuxi/006.jpg    Anmuxi Ambrosial Yogurt
+gallery/anmuxi/001.jpg	Anmuxi Ambrosial Yogurt
+gallery/anmuxi/002.jpg	Anmuxi Ambrosial Yogurt
+gallery/anmuxi/003.jpg	Anmuxi Ambrosial Yogurt
+gallery/anmuxi/004.jpg	Anmuxi Ambrosial Yogurt
+gallery/anmuxi/005.jpg	Anmuxi Ambrosial Yogurt
+gallery/anmuxi/006.jpg	Anmuxi Ambrosial Yogurt
 ```
 
 Each line can be splited into two fields. The first field denotes the relative image path, and the second field denotes its label. The `delimiter` is `tab` here.
