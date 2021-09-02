@@ -67,13 +67,19 @@ class GalleryBuilder(object):
 
         gallery_images, gallery_docs = split_datafile(
             config['data_file'], config['image_root'], config['delimiter'])
+
+        # when remove data in index, do not need extract fatures
         if operation_method != "remove":
             gallery_features = self._extract_features(gallery_images, config)
 
         assert operation_method in [
             "new", "remove", "append"
         ], "Only append, remove and new operation are supported"
+
+        # vector.index: faiss index file
+        # id_map.pkl: use this file to map id to image_doc
         if operation_method in ["remove", "append"]:
+            # if remove or append, vector.index and id_map.pkl must exist
             assert os.path.join(
                 config["index_dir"], "vector.index"
             ), "The vector.index dose not exist in {} when 'index_operation' is not None".format(
@@ -93,6 +99,8 @@ class GalleryBuilder(object):
             if not os.path.exists(config["index_dir"]):
                 os.makedirs(config["index_dir"], exist_ok=True)
             index_method = config.get("index_method", "HNSW32")
+
+            # if IVF method, cal ivf number automaticlly
             if index_method == "IVF":
                 index_method = index_method + str(
                     min(int(len(gallery_images) // 8), 65536)) + ",Flat"
@@ -108,9 +116,12 @@ class GalleryBuilder(object):
                 "The HNSW32 method dose not support 'remove' operation")
 
         if operation_method != "remove":
+            # calculate id for new data
             start_id = max(ids.keys()) + 1 if ids else 0
             ids_now = (
                 np.arange(0, len(gallery_images)) + start_id).astype(np.int64)
+
+            # only train when new index file
             if operation_method == "new":
                 index.train(gallery_features)
             index.add_with_ids(gallery_features, ids_now)
@@ -122,6 +133,7 @@ class GalleryBuilder(object):
                 raise RuntimeError(
                     "The index_method: HNSW32 dose not support 'remove' operation"
                 )
+            # remove ids in id_map, remove index data in faiss index
             remove_ids = list(
                 filter(lambda k: ids.get(k) in gallery_docs, ids.keys()))
             remove_ids = np.asarray(remove_ids)
@@ -129,6 +141,7 @@ class GalleryBuilder(object):
             for k in remove_ids:
                 del ids[k]
 
+        # store faiss index file and id_map file
         faiss.write_index(index,
                           os.path.join(config["index_dir"], "vector.index"))
         with open(os.path.join(config["index_dir"], "id_map.pkl"), 'wb') as fd:
