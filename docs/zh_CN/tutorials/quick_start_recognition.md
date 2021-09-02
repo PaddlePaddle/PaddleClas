@@ -44,7 +44,7 @@
 | 车辆ReID模型 | 车辆ReID场景 | [模型下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/inference/vehicle_reid_ResNet50_VERIWild_v1.0_infer.tar) | - | - |
 
 
-本章节demo数据下载地址如下: [数据下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/data/recognition_demo_data_v1.0.tar)。
+本章节demo数据下载地址如下: [数据下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/data/recognition_demo_data_v1.1.tar)。
 
 
 **注意**
@@ -238,12 +238,12 @@ cp recognition_demo_data_v1.0/gallery_product/data_file.txt recognition_demo_dat
 然后在文件`recognition_demo_data_v1.0/gallery_product/data_file_update.txt`中添加以下的信息，
 
 ```
-gallery/anmuxi/001.jpg	安慕希酸奶
-gallery/anmuxi/002.jpg	安慕希酸奶
-gallery/anmuxi/003.jpg	安慕希酸奶
-gallery/anmuxi/004.jpg	安慕希酸奶
-gallery/anmuxi/005.jpg	安慕希酸奶
-gallery/anmuxi/006.jpg	安慕希酸奶
+gallery/anmuxi/001.jpg    安慕希酸奶
+gallery/anmuxi/002.jpg    安慕希酸奶
+gallery/anmuxi/003.jpg    安慕希酸奶
+gallery/anmuxi/004.jpg    安慕希酸奶
+gallery/anmuxi/005.jpg    安慕希酸奶
+gallery/anmuxi/006.jpg    安慕希酸奶
 ```
 
 每一行的文本中，第一个字段表示图像的相对路径，第二个字段表示图像对应的标签信息，中间用`tab`键分隔开（注意：有些编辑器会将`tab`自动转换为`空格`，这种情况下会导致文件解析报错）。
