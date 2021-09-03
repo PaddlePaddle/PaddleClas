@@ -29,7 +29,7 @@ class CELoss(nn.Layer):
         self.epsilon = epsilon
 
     def _labelsmoothing(self, target, class_num):
-        if target.shape[-1] != class_num:
+        if target.ndim == 1 or target.shape[-1] != class_num:
             one_hot_target = F.one_hot(target, class_num)
         else:
             one_hot_target = target

@@ -46,6 +46,9 @@ class CosMargin(paddle.nn.Layer):
         weight = paddle.divide(weight, weight_norm)
 
         cos = paddle.matmul(input, weight)
+        if not self.training or label is None:
+            return cos
+        
         cos_m = cos - self.margin
 
         one_hot = paddle.nn.functional.one_hot(label, self.class_num)

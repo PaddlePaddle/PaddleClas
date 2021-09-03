@@ -16,7 +16,7 @@ from paddle import nn
 import copy
 from collections import OrderedDict
 
-from .metrics import TopkAcc, mAP, mINP, Recallk
+from .metrics import TopkAcc, mAP, mINP, Recallk, Precisionk
 from .metrics import DistillationTopkAcc
 from .metrics import GoogLeNetTopkAcc
 

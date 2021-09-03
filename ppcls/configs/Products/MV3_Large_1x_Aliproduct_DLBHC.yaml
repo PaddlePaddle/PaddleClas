@@ -1,0 +1,149 @@
+# global configs
+Global:
+  checkpoints: null
+  pretrained_model: null
+  output_dir: ./output_dlbhc/
+  device: gpu
+  save_interval: 1
+  eval_during_train: True
+  eval_interval: 1
+  epochs: 100
+  #eval_mode: "retrieval"
+  print_batch_step: 10
+  use_visualdl: False
+
+  # used for static mode and model export
+  image_shape: [3, 224, 224]
+  save_inference_dir: ./inference
+
+  #feature postprocess
+  feature_normalize: False
+  feature_binarize: "round"
+
+# model architecture
+Arch:  
+  name: "RecModel"
+  Backbone:
+    name: "MobileNetV3_large_x1_0"
+    pretrained: True
+    class_num: 512
+  Head:
+    name: "FC"
+    class_num: 50030
+    embedding_size: 512
+    
+  infer_output_key:  "features"
+  infer_add_softmax: "false"
+ 
+# loss function config for train/eval process
+Loss:
+  Train:
+    - CELoss:
+        weight: 1.0
+        epsilon: 0.1
+  Eval:
+    - CELoss:
+        weight: 1.0
+
+Optimizer:
+  name: Momentum
+  momentum: 0.9
+  lr:
+    name: Piecewise
+    learning_rate: 0.1
+    decay_epochs: [50, 150]
+    values: [0.1, 0.01, 0.001]
+
+# data loader for train and eval
+DataLoader:
+  Train:
+    dataset:
+      name: ImageNetDataset
+      image_root: ./dataset/Aliproduct/
+      cls_label_path: ./dataset/Aliproduct/train_list.txt
+      transform_ops:
+        - DecodeImage:
+            to_rgb: True
+            channel_first: False
+        - ResizeImage:
+            size: 256
+        - RandCropImage:
+            size: 227
+        - RandFlipImage:
+            flip_code: 1
+        - NormalizeImage:
+            scale: 1.0/255.0
+            mean: [0.4914, 0.4822, 0.4465]
+            std: [0.2023, 0.1994, 0.2010]
+            order: ''
+    sampler:
+      name: DistributedBatchSampler
+      batch_size: 128
+      drop_last: False
+      shuffle: True
+    loader:
+      num_workers: 4
+      use_shared_memory: True
+
+  Eval:
+    dataset: 
+      name: ImageNetDataset
+      image_root: ./dataset/Aliproduct/
+      cls_label_path: ./dataset/Aliproduct/val_list.txt
+      transform_ops:
+        - DecodeImage:
+            to_rgb: True
+            channel_first: False
+        - ResizeImage:
+            size: 227
+        - NormalizeImage:
+            scale: 1.0/255.0
+            mean: [0.4914, 0.4822, 0.4465]
+            std: [0.2023, 0.1994, 0.2010]
+            order: ''
+    sampler:
+      name: DistributedBatchSampler
+      batch_size: 256
+      drop_last: False
+      shuffle: False
+    loader:
+      num_workers: 4
+      use_shared_memory: True
+
+Infer:
+  infer_imgs: docs/images/whl/demo.jpg
+  batch_size: 10
+  transforms:
+    - DecodeImage:
+        to_rgb: True
+        channel_first: False
+    - ResizeImage:
+        resize_short: 256
+    - CropImage:
+        size: 227
+    - NormalizeImage:
+        scale: 1.0/255.0
+        mean: [0.4914, 0.4822, 0.4465]
+        std: [0.2023, 0.1994, 0.2010]
+        order: ''
+    - ToCHWImage:
+  PostProcess:
+    name: Topk
+    topk: 5
+    class_id_map_file: ppcls/utils/imagenet1k_label_list.txt
+
+Metric:
+  Train:
+    - TopkAcc:
+        topk: [1, 5]
+  Eval:
+    - TopkAcc:
+        topk: [1, 5]
+        
+# switch to metric below when eval by retrieval
+#     - Recallk:
+#         topk: [1]
+#     - mAP:
+#     - Precisionk:
+#         topk: [1]
+
