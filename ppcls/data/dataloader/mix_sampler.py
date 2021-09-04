@@ -34,10 +34,11 @@ class MixSampler(DistributedBatchSampler):
         batch_size_left = self.batch_size
         self.iter_list = []
         for i, config_i in enumerate(sample_configs):
+            self.start_list.append(dataset_list[i][1])
             sample_method = config_i.pop("name")
             ratio_i = config_i.pop("ratio")
             if i < len(sample_configs) - 1:
-                batch_size_i = self.batch_size * ratio_i
+                batch_size_i = int(self.batch_size * ratio_i)
                 batch_size_left -= batch_size_i
             else:
                 batch_size_i = batch_size_left

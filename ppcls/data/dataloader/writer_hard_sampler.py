@@ -33,10 +33,11 @@ class WriterHardSampler(DistributedBatchSampler):
     - batch_size (int): number of examples in a batch.
     """
 
-    def __init__(self, dataset, batch_size, **args):
+    def __init__(self, dataset, batch_size, shuffle=True, **args):
         super(WriterHardSampler, self).__init__(dataset, batch_size)
         self.dataset = dataset
         self.batch_size = batch_size
+        self.shuffle = shuffle
         assert not self.batch_size % 4, "bs of WriterHardSampler should be 3*N"
         assert isinstance(dataset, WriterHardDataset), "WriterHardSampler only support WriterHardDataset"
         self.num_pids_per_batch = self.batch_size // 4
@@ -45,7 +46,7 @@ class WriterHardSampler(DistributedBatchSampler):
         self.text_id_map = {}
         anno_list = dataset.anno_list
         for i, anno_i in enumerate(anno_list):
-            _, person_id, text_id = anno_i.split(" ")
+            _, person_id, text_id = anno_i.strip().split(" ")
             if text_id != "-1":
                 if random.random() < 0.5:
                     self.anchor_list.append([i, person_id, text_id])
@@ -59,11 +60,11 @@ class WriterHardSampler(DistributedBatchSampler):
                     self.person_id_map[person_id].append(i)
                 else:
                     self.person_id_map[person_id] = [i]
-
-        assert len(self.anchor_list) < self.batch_size, "anchor should be larger than batch_size"
+        assert len(self.anchor_list) > self.batch_size, "anchor should be larger than batch_size"
 
     def __iter__(self):
-        random.shuffle(self.anchor_list)
+        if self.shuffle:
+            random.shuffle(self.anchor_list)
         for i in range(len(self)):
             batch_indices = []
             for j in range(self.batch_size // 4):
@@ -79,4 +80,4 @@ class WriterHardSampler(DistributedBatchSampler):
             yield batch_indices
 
     def __len__(self):
-        len(self.anchor_list) * 4 // self.batch_size
+        return len(self.anchor_list) * 4 // self.batch_size
