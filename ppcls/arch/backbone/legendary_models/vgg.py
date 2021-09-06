@@ -111,7 +111,7 @@ class VGGNet(TheseusLayer):
         model: nn.Layer. Specific VGG model depends on args.
     """
 
-    def __init__(self, config, stop_grad_layers=0, class_num=1000, return_patterns=None):
+    def __init__(self, config, stop_grad_layers=0, class_num=1000):
         super().__init__()
 
         self.stop_grad_layers = stop_grad_layers

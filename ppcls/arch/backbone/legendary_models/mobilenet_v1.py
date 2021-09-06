@@ -146,12 +146,15 @@ class MobileNet(TheseusLayer):
             class_num,
             weight_attr=ParamAttr(initializer=KaimingNormal()))
 
-    def forward(self, x):
+    def forward(self, x, res_dict=None):
         x = self.conv(x)
         x = self.blocks(x)
         x = self.avg_pool(x)
         x = self.flatten(x)
         x = self.fc(x)
+        if self.res_dict and res_dict is not None:
+            for res_key in list(self.res_dict):
+                res_dict[res_key] = self.res_dict.pop(res_key)
         return x
 
 
