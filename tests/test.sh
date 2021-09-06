@@ -182,6 +182,7 @@ function func_cpp_inference(){
 		    echo "${cpp_cpu_threads_key} ${threads}" >> cpp_config.txt
 		    echo "${cpp_use_mkldnn_key} ${use_mkldnn}" >> cpp_config.txt
 		    echo "${cpp_use_tensorrt_key} 0" >> cpp_config.txt
+		    echo "${cpp_use_fp16_key} 0" >> cpp_config.txt
                     command="${_script} cpp_config.txt ${_img_dir} > ${_save_log_path} 2>&1 "
                     eval $command
                     last_status=${PIPESTATUS[0]}
@@ -203,7 +204,8 @@ function func_cpp_inference(){
 		    echo "${cpp_use_gpu_key} ${use_gpu}" >> cpp_config.txt
 		    echo "${cpp_cpu_threads_key} ${threads}" >> cpp_config.txt
 		    echo "${cpp_use_mkldnn_key} ${use_mkldnn}" >> cpp_config.txt
-		    echo "${cpp_use_tensorrt_key} ${precision}" >> cpp_config.txt
+		    echo "${cpp_use_tensorrt_key} ${use_trt}" >> cpp_config.txt
+		    echo "${cpp_use_fp16_key} ${precision}" >> cpp_config.txt
                     command="${_script} cpp_config.txt ${_img_dir} > ${_save_log_path} 2>&1 "
                     eval $command
                     last_status=${PIPESTATUS[0]}

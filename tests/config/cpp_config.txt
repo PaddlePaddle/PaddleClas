@@ -10,8 +10,8 @@ gpu_mem 2000
 # use_fp16 0
 
 # cls config
-cls_model_path inference/inference.pdmodel
-cls_params_path inference/inference.pdiparams
+cls_model_path ../inference/inference.pdmodel
+cls_params_path ../inference/inference.pdiparams
 resize_short_size 256
 crop_size 224
 

@@ -57,7 +57,7 @@ double Classifier::Run(cv::Mat &img, std::vector<double> *times) {
   cv::Mat resize_img;
   img.copyTo(srcimg);
 
-  auto preprocess_start = std::chrono::steady_clock::now();
+  auto preprocess_start = std::chrono::system_clock::now();
   this->resize_op_.Run(img, resize_img, this->resize_short_size_);
 
   this->crop_op_.Run(resize_img, this->crop_size_);
@@ -92,9 +92,9 @@ double Classifier::Run(cv::Mat &img, std::vector<double> *times) {
       max_element(out_data.begin(), out_data.end()) - out_data.begin();
   auto postprocess_end = std::chrono::system_clock::now();
 
-  // std::chrono::duration<float> preprocess_diff = preprocess_end -
-  // preprocess_start;
-  // times->push_back(double(preprocess_diff.count() * 1000));
+  std::chrono::duration<float> preprocess_diff =
+      preprocess_end - preprocess_start;
+  times->push_back(double(preprocess_diff.count() * 1000));
   std::chrono::duration<float> inference_diff = infer_end - infer_start;
   double inference_cost_time = double(inference_diff.count() * 1000);
   times->push_back(inference_cost_time);
