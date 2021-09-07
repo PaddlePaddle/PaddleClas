@@ -18,7 +18,7 @@ op:
         local_service_conf:
 
             #uci模型路径
-            model_config: ResNet50_vd/ppcls_model/
+            model_config: ResNet50_vd_serving
 
             #计算硬件类型: 空缺时由devices决定(CPU/GPU)，0=cpu, 1=gpu, 2=tensorRT, 3=arm cpu, 4=kunlun xpu
             device_type: 1
