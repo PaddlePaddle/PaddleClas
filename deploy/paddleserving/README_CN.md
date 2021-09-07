@@ -29,8 +29,7 @@ PaddleClas提供2种服务部署方式：
 
 需要准备PaddleClas的运行环境和PaddleServing的运行环境。
 
-- 准备PaddleClas的运行环境[链接](../../doc/doc_ch/installation.md)
-  根据环境下载对应的paddle whl包，推荐安装2.0.1版本
+- 准备PaddleClas的[运行环境](../../docs/zh_CN/tutorials/install.md), 根据环境下载对应的paddle whl包，推荐安装2.0.1版本
 
 - 准备PaddleServing的运行环境，步骤如下
 
