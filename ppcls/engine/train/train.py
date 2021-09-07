@@ -79,7 +79,7 @@ def train_epoch(trainer, epoch_id, print_batch_step):
 
 
 def forward(trainer, batch):
-    if trainer.eval_mode == "classification":
+    if not trainer.is_rec:
         return trainer.model(batch[0])
     else:
         return trainer.model(batch[0], batch[1])

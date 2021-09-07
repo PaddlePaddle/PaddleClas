@@ -51,6 +51,11 @@ class Engine(object):
         self.config = config
         self.eval_mode = self.config["Global"].get("eval_mode",
                                                    "classification")
+        if "Head" in self.config["Arch"]:
+            self.is_rec = True
+        else:
+            self.is_rec = False
+
         # init logger
         self.output_dir = self.config['Global']['output_dir']
         log_file = os.path.join(self.output_dir, self.config["Arch"]["name"],
@@ -106,12 +111,19 @@ class Engine(object):
                     self.config["DataLoader"], "Eval", self.device,
                     self.use_dali)
             elif self.eval_mode == "retrieval":
-                self.gallery_dataloader = build_dataloader(
-                    self.config["DataLoader"]["Eval"], "Gallery", self.device,
-                    self.use_dali)
-                self.query_dataloader = build_dataloader(
-                    self.config["DataLoader"]["Eval"], "Query", self.device,
-                    self.use_dali)
+                self.gallery_query_dataloader = None
+                if len(self.config["DataLoader"]["Eval"].keys()) == 1:
+                    key = list(self.config["DataLoader"]["Eval"].keys())[0]
+                    self.gallery_query_dataloader = build_dataloader(
+                        self.config["DataLoader"]["Eval"], key, self.device,
+                        self.use_dali)
+                else:
+                    self.gallery_dataloader = build_dataloader(
+                        self.config["DataLoader"]["Eval"], "Gallery",
+                        self.device, self.use_dali)
+                    self.query_dataloader = build_dataloader(
+                        self.config["DataLoader"]["Eval"], "Query",
+                        self.device, self.use_dali)
 
         # build loss
         if self.mode == "train":
