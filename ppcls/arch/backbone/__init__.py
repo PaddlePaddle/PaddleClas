@@ -21,6 +21,7 @@ from ppcls.arch.backbone.legendary_models.resnet import ResNet18, ResNet18_vd, R
 from ppcls.arch.backbone.legendary_models.vgg import VGG11, VGG13, VGG16, VGG19
 from ppcls.arch.backbone.legendary_models.inception_v3 import InceptionV3
 from ppcls.arch.backbone.legendary_models.hrnet import HRNet_W18_C, HRNet_W30_C, HRNet_W32_C, HRNet_W40_C, HRNet_W44_C, HRNet_W48_C, HRNet_W60_C, HRNet_W64_C, SE_HRNet_W64_C
+from ppcls.arch.backbone.legendary_models.lcnet import LCNet_x0_25, LCNet_x0_35, LCNet_x0_5, LCNet_x0_75, LCNet_x1_0, LCNet_x1_5, LCNet_x2_0, LCNet_x2_5
 
 from ppcls.arch.backbone.model_zoo.resnet_vc import ResNet50_vc
 from ppcls.arch.backbone.model_zoo.resnext import ResNeXt50_32x4d, ResNeXt50_64x4d, ResNeXt101_32x4d, ResNeXt101_64x4d, ResNeXt152_32x4d, ResNeXt152_64x4d
