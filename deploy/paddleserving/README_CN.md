@@ -27,9 +27,9 @@ PaddleClas提供2种服务部署方式：
 <a name="环境准备"></a>
 ## 环境准备
 
-需要准备PaddleClas的运行环境和Paddle Serving的运行环境。
+需要准备PaddleClas的运行环境和PaddleServing的运行环境。
 
-- 准备PaddleOCR的运行环境[链接](../../doc/doc_ch/installation.md)
+- 准备PaddleClas的运行环境[链接](../../doc/doc_ch/installation.md)
   根据环境下载对应的paddle whl包，推荐安装2.0.1版本
 
 - 准备PaddleServing的运行环境，步骤如下
@@ -62,19 +62,19 @@ PaddleClas提供2种服务部署方式：
 
 使用PaddleServing做服务化部署时，需要将保存的inference模型转换为serving易于部署的模型。
 
-首先，下载ResNet50_vd的[inference模型](https://github.com/PaddlePaddle/PaddleOCR#pp-ocr-20-series-model-listupdate-on-dec-15)
+首先，下载ResNet50_vd的inference模型
 ```
 # 下载并解压ResNet50_vd模型
-wget "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/ResNet50_vd_infer.tar" && tar xf ResNet50_vd_infer.tar
+wget https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/ResNet50_vd_infer.tar && tar xf ResNet50_vd_infer.tar
 ```
 
 接下来，用安装的paddle_serving_client把下载的inference模型转换成易于server部署的模型格式。
 
 ```
 # 转换ResNet50_vd模型
-python3 -m paddle_serving_client.convert --dirname ./inference/ \
-                                         --model_filename inference.pdmodel  \        \
-                                         --params_filename inference.pdiparams \       \
+python3 -m paddle_serving_client.convert --dirname ./ResNet50_vd_infer/ \
+                                         --model_filename inference.pdmodel  \
+                                         --params_filename inference.pdiparams \
                                          --serving_server ./ResNet50_vd_serving/ \
                                          --serving_client ./ResNet50_vd_client/
 ```
@@ -90,6 +90,26 @@ python3 -m paddle_serving_client.convert --dirname ./inference/ \
   |- serving_client_conf.prototxt  
   |- serving_client_conf.stream.prototxt
 
+```
+得到模型文件之后，需要修改serving_server_conf.prototxt中的alias名字： 将`feed_var`中的`alias_name`改为`image`, 将`fetch_var`中的`alias_name`改为`prediction`, 
+修改后的serving_server_conf.prototxt内容如下：
+```
+feed_var {
+  name: "inputs"
+  alias_name: "image"
+  is_lod_tensor: false
+  feed_type: 1
+  shape: 3
+  shape: 224
+  shape: 224
+}
+fetch_var {
+  name: "save_infer_model/scale_0.tmp_1"
+  alias_name: "prediction"
+  is_lod_tensor: true
+  fetch_type: 1
+  shape: -1
+}
 ```
 
 <a name="部署"></a>
@@ -126,12 +146,13 @@ python3 -m paddle_serving_client.convert --dirname ./inference/ \
     成功运行后，模型预测的结果会打印在cmd窗口中，结果示例为：
     ![](./imgs/results.png)
 
-    调整 config.yml 中的并发个数获得最大的QPS, 一般检测和识别的并发数为2：1
+    调整 config.yml 中的并发个数可以获得最大的QPS
     ```
     op:
         #并发数，is_thread_op=True时，为线程并发；否则为进程并发
         concurrency: 8
         ...
+    ```
     有需要的话可以同时发送多个服务请求
 
     预测性能数据会被自动写入 `PipelineServingLogs/pipeline.tracer` 文件中。
