@@ -9,7 +9,7 @@ The LCNet series is a network that has excellent performance on Intel-CPU propos
 ## Accuracy, FLOPS and Parameters
 
 | Models           | Top1 | Top5 | FLOPs<br>(M) | Parameters<br>(M) |
-|:--:|:--:|:--:|:--:|:--:|:--:|:--:|
+|:--:|:--:|:--:|:--:|:--:|
 | LCNet_x0_25        |0.5186           | 0.7565           | 18    | 1.5  |
 | LCNet_x0_35        |0.5809           | 0.8083           | 29    | 1.6  |
 | LCNet_x0_5         |0.6314           | 0.8466           | 47    | 1.9  |
