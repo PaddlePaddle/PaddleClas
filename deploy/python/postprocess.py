@@ -62,6 +62,7 @@ class Topk(object):
     def parse_class_id_map(self, class_id_map_file):
         if class_id_map_file is None:
             return None
+
         if not os.path.exists(class_id_map_file):
             print(
                 "Warning: If want to use your own label_dict, please input legal path!\nOtherwise label_names will be empty!"
@@ -126,3 +127,43 @@ class SavePreLabel(object):
         output_dir = self.save_dir(str(id))
         os.makedirs(output_dir, exist_ok=True)
         shutil.copy(image_file, output_dir)
+
+class Binarize(object):
+    def __init__(self, method = "round"):
+        self.method = method
+        self.unit = np.array([[128, 64, 32, 16, 8, 4, 2, 1]]).T
+
+    def __call__(self, x, file_names=None):
+        if self.method == "round":
+            x = np.round(x).astype("uint8")
+        
+        if self.method == "sign":
+            x = ((np.sign(x) + 1) / 2).astype("uint8")
+
+        embedding_size = x.shape[1]
+        assert embedding_size % 8 == 0, "The Binary index only support vectors with sizes multiple of 8"
+        
+        byte = np.zeros([x.shape[0], embedding_size // 8], dtype=np.uint8)
+        for i in range(embedding_size // 8):
+            byte[:, i:i+1] = np.dot(x[:, i * 8: (i + 1)* 8], self.unit)
+
+        return byte
+
+if __name__== "__main__":
+
+    a  = Binarize()
+    x  = np.random.random((31, 64)).astype('float32')
+
+    y = a(x)
+    print(y)
+    print(y.shape)
+
+
+
+
+
+
+            
+
+
+
