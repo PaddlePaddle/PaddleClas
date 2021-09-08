@@ -66,14 +66,14 @@ Accuracy and inference time metrics of LCNet series models are shown as follows.
 
 | Model           | Top-1 Acc | Top-5 Acc | Intel-Xeon-Gold-6148 time(ms)<br>bs=1 | FLOPs(M) | Params(M) | Download Address |
 |:--:|:--:|:--:|:--:|:--:|:--:|:--:|
-| LCNet_x0_25        |0.5186           | 0.7565   |  1.74      | 18    | 1.5  | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/LCNet_x0_25_pretrained.pdparams) |
-| LCNet_x0_35        |0.5809           | 0.8083   |  1.92      | 29    | 1.6  | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/LCNet_x0_35_pretrained.pdparams) |
-| LCNet_x0_5         |0.6314           | 0.8466   |  2.05      | 47    | 1.9  | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/LCNet_x0_5_pretrained.pdparams) |
-| LCNet_x0_75        |0.6818           | 0.8830   |  2.29      | 99    | 2.4  | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/LCNet_x0_75_pretrained.pdparams) |
-| LCNet_x1_0         |0.7132           | 0.9003   |  2.46      | 161   | 3.0  | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/LCNet_x1_0_pretrained.pdparams) |
-| LCNet_x1_5         |0.7371           | 0.9153   |  3.19      | 342   | 4.5  | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/LCNet_x1_5_pretrained.pdparams) |
-| LCNet_x2_0         |0.7518           | 0.9227   |  4.27      | 590   | 6.5  | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/LCNet_x2_0_pretrained.pdparams) |
-| LCNet_x2_5         |0.7660           | 0.9300   |  5.39      | 906   | 9.0  | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/LCNet_x2_5_pretrained.pdparams) |
+| LCNet_x0_25        |0.5186           | 0.7565   |  1.74      | 18    | 1.5  | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/LCNet_x0_25_pretrained.pdparams) |
+| LCNet_x0_35        |0.5809           | 0.8083   |  1.92      | 29    | 1.6  | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/LCNet_x0_35_pretrained.pdparams) |
+| LCNet_x0_5         |0.6314           | 0.8466   |  2.05      | 47    | 1.9  | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/LCNet_x0_5_pretrained.pdparams) |
+| LCNet_x0_75        |0.6818           | 0.8830   |  2.29      | 99    | 2.4  | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/LCNet_x0_75_pretrained.pdparams) |
+| LCNet_x1_0         |0.7132           | 0.9003   |  2.46      | 161   | 3.0  | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/LCNet_x1_0_pretrained.pdparams) |
+| LCNet_x1_5         |0.7371           | 0.9153   |  3.19      | 342   | 4.5  | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/LCNet_x1_5_pretrained.pdparams) |
+| LCNet_x2_0         |0.7518           | 0.9227   |  4.27      | 590   | 6.5  | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/LCNet_x2_0_pretrained.pdparams) |
+| LCNet_x2_5         |0.7660           | 0.9300   |  5.39      | 906   | 9.0  | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/LCNet_x2_5_pretrained.pdparams) |
 
 
 <a name="ResNet_and_Vd_series"></a>
