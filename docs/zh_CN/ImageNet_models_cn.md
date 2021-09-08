@@ -56,7 +56,7 @@
 * Intel CPU端知识蒸馏模型
 
 | 模型                  | Top-1 Acc | Reference<br>Top-1 Acc | Acc gain |  Intel-Xeon-Gold-6148 time(ms)<br>bs=1 | Flops(M) | Params(M)  | 下载地址   |
-|---------------------|-----------|-----------|---------------|----------------|-----------|----------|-----------|-----------------------------------|
+|---------------------|-----------|-----------|---------------|----------------|----------|-----------|-----------------------------------|
 | LCNet_x0_5_ssld   | 0.661    | 0.631    | 0.030 | 2.05     | 47     |   1.9   | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/LCNet_x0_5_ssld_pretrained.pdparams)                 |
 | LCNet_x1_0_ssld   | 0.744    | 0.713    | 0.033 | 2.46     | 161     |   3.0  | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/LCNet_x1_0_ssld_pretrained.pdparams)                 |
 | LCNet_x2_5_ssld   | 0.808    | 0.766    | 0.042 | 5.39     | 906     |   9.0  | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/LCNet_x2_5_ssld_pretrained.pdparams)                 |
