@@ -93,7 +93,7 @@ After the ResNet50_vd inference model is converted, there will be additional fol
   |- serving_client_conf.stream.prototxt
 ```
 
-Once you have the deploy model file, you need to change the alias name in serving_server_conf.prototxt: Change 'alias_name' in 'feed_var' to 'image', change 'alias_name' in 'fetch_var' to 'prediction',
+Once you have the model file for deployment, you need to change the alias name in `serving_server_conf.prototxt`: Change `alias_name` in `feed_var` to `image`, change `alias_name` in `fetch_var` to `prediction`,
 The modified serving_server_conf.prototxt file is as follows:
 ```
 feed_var {
@@ -149,14 +149,11 @@ fetch_var {
     After successfully running, the predicted result of the model will be printed in the cmd window. An example of the result is:
     ![](./imgs/results.png)  
 
-    Adjust the number of concurrency in config.yml to get the largest QPS. Generally, the number of concurrent detection and recognition is 2:1
+    Adjust the number of concurrency in config.yml to get the largest QPS. 
 
     ```
-    det:
+    op:
         concurrency: 8
-        ...
-    rec:
-        concurrency: 4
         ...
     ```
 
