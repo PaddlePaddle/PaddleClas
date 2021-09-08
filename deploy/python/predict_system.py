@@ -47,8 +47,14 @@ class SystemPredictor(object):
             index_dir, "vector.index")), "vector.index not found ..."
         assert os.path.exists(os.path.join(
             index_dir, "id_map.pkl")), "id_map.pkl not found ... "
-        self.Searcher = faiss.read_index(
-            os.path.join(index_dir, "vector.index"))
+        
+        if config['IndexProcess'].get("binary_index", False):
+            self.Searcher = faiss.read_index_binary(
+                os.path.join(index_dir, "vector.index"))
+        else:
+            self.Searcher = faiss.read_index(
+                os.path.join(index_dir, "vector.index"))
+                
         with open(os.path.join(index_dir, "id_map.pkl"), "rb") as fd:
             self.id_map = pickle.load(fd)
 
@@ -105,6 +111,7 @@ class SystemPredictor(object):
             rec_results = self.rec_predictor.predict(crop_img)
             preds["bbox"] = [xmin, ymin, xmax, ymax]
             scores, docs = self.Searcher.search(rec_results, self.return_k)
+            
             # just top-1 result will be returned for the final
             if scores[0][0] >= self.config["IndexProcess"]["score_thres"]:
                 preds["rec_docs"] = self.id_map[docs[0][0]].split()[1]

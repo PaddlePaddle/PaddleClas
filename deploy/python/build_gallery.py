@@ -28,7 +28,6 @@ from python.predict_rec import RecPredictor
 from utils import logger
 from utils import config
 
-
 def split_datafile(data_file, image_root, delimiter="\t"):
     '''
         data_file: image path and info, which can be splitted by spacer
@@ -70,7 +69,7 @@ class GalleryBuilder(object):
 
         # when remove data in index, do not need extract fatures
         if operation_method != "remove":
-            gallery_features = self._extract_features(gallery_images, config)
+            gallery_features = self._extract_features(gallery_images, config)    #76 * 512
 
         assert operation_method in [
             "new", "remove", "append"
@@ -104,11 +103,25 @@ class GalleryBuilder(object):
             if index_method == "IVF":
                 index_method = index_method + str(
                     min(int(len(gallery_images) // 8), 65536)) + ",Flat"
+            
+            #dist_type
             dist_type = faiss.METRIC_INNER_PRODUCT if config[
                 "dist_type"] == "IP" else faiss.METRIC_L2
-            index = faiss.index_factory(config["embedding_size"], index_method,
-                                        dist_type)
-            index = faiss.IndexIDMap2(index)
+            
+            #build index
+            if config["dist_type"]  == "hamming":
+                #use IVF
+                # quantizer = faiss.IndexBinaryFlat(config["embedding_size"])
+                # nlist = 2
+                # index = faiss.IndexBinaryIVF(quantizer, config["embedding_size"], nlist)
+                # index.nprobe = 1   #by default nprobe= 1
+
+                #use flat
+                index = faiss.IndexBinaryFlat(config["embedding_size"])
+            else:
+                index = faiss.index_factory(config["embedding_size"], index_method,
+                                            dist_type)
+                index = faiss.IndexIDMap2(index)
             ids = {}
 
         if config["index_method"] == "HNSW32":
@@ -119,12 +132,17 @@ class GalleryBuilder(object):
             # calculate id for new data
             start_id = max(ids.keys()) + 1 if ids else 0
             ids_now = (
-                np.arange(0, len(gallery_images)) + start_id).astype(np.int64)
+                np.arange(0, len(gallery_images)) + start_id).astype(np.int64)  #ids: just the number sequence
 
             # only train when new index file
             if operation_method == "new":
-                index.train(gallery_features)
-            index.add_with_ids(gallery_features, ids_now)
+                if config["dist_type"]  == "hamming":
+                    index.add(gallery_features)
+                else:
+                    index.train(gallery_features)
+            
+            if not config["dist_type"]  == "hamming":
+                index.add_with_ids(gallery_features, ids_now)
 
             for i, d in zip(list(ids_now), gallery_docs):
                 ids[i] = d
@@ -142,15 +160,25 @@ class GalleryBuilder(object):
                 del ids[k]
 
         # store faiss index file and id_map file
-        faiss.write_index(index,
-                          os.path.join(config["index_dir"], "vector.index"))
+        if  config["dist_type"]  == "hamming":
+            faiss.write_index_binary(index,
+                            os.path.join(config["index_dir"], "vector.index"))
+        else:
+            faiss.write_index(index,
+                            os.path.join(config["index_dir"], "vector.index"))
+
         with open(os.path.join(config["index_dir"], "id_map.pkl"), 'wb') as fd:
             pickle.dump(ids, fd)
 
     def _extract_features(self, gallery_images, config):
+
         # extract gallery features
-        gallery_features = np.zeros(
-            [len(gallery_images), config['embedding_size']], dtype=np.float32)
+        if config["dist_type"] == "hamming":
+            gallery_features = np.zeros(
+                [len(gallery_images), config['embedding_size'] // 8], dtype=np.uint8)
+        else:
+            gallery_features = np.zeros(
+                [len(gallery_images), config['embedding_size']], dtype=np.float32)
 
         #construct batch imgs and do inference
         batch_size = config.get("batch_size", 32)
@@ -164,7 +192,7 @@ class GalleryBuilder(object):
             batch_img.append(img)
 
             if (i + 1) % batch_size == 0:
-                rec_feat = self.rec_predictor.predict(batch_img)
+                rec_feat = self.rec_predictor.predict(batch_img)  #32 * 512
                 gallery_features[i - batch_size + 1:i + 1, :] = rec_feat
                 batch_img = []
 
@@ -172,6 +200,7 @@ class GalleryBuilder(object):
             rec_feat = self.rec_predictor.predict(batch_img)
             gallery_features[-len(batch_img):, :] = rec_feat
             batch_img = []
+
         return gallery_features
 
 
