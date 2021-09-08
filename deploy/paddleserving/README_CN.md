@@ -119,9 +119,9 @@ fetch_var {
     git clone https://github.com/PaddlePaddle/PaddleClas
 
     # 进入到工作目录
-    cd PaddleOCR/deploy/paddleserving/
+    cd PaddleClas/deploy/paddleserving/
     ```
-    pdserver目录包含启动pipeline服务和发送预测请求的代码，包括：
+    paddleserving目录包含启动pipeline服务和发送预测请求的代码，包括：
     ```
     __init__.py
     config.yml                 # 启动服务的配置文件
