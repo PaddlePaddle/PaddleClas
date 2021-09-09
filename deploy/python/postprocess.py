@@ -150,6 +150,10 @@ class Binarize(object):
         return byte
 
 if __name__== "__main__":
+<<<<<<< HEAD
+=======
+
+>>>>>>> 8cea8e08c85e90ca3abfd89260c0c586545bcc9e
     a  = Binarize()
     x  = np.random.random((31, 64)).astype('float32')
 
