@@ -8,7 +8,7 @@ PaddleClas provides two service deployment methods:
 
 # Service deployment based on PaddleServing  
 
-This document will introduce how to use the [PaddleServing](https://github.com/PaddlePaddle/Serving/blob/develop/README.md) to deploy the PPOCR dynamic graph model as a pipeline online service.
+This document will introduce how to use the [PaddleServing](https://github.com/PaddlePaddle/Serving/blob/develop/README.md) to deploy the ResNet50_vd model as a pipeline online service.
 
 Some Key Features of Paddle Serving:
 - Integrate with Paddle training pipeline seamlessly, most paddle models can be deployed with one line command.
@@ -137,7 +137,7 @@ fetch_var {
 2. Run the following command to start the service.
     ```
     # Start the service and save the running log in log.txt
-    python3 resnet50_web_service.py &>log.txt &
+    python3 classification_web_service.py &>log.txt &
     ```
     After the service is successfully started, a log similar to the following will be printed in log.txt
     ![](./imgs/start_server.png)

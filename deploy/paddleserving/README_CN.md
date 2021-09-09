@@ -29,7 +29,7 @@ PaddleClas提供2种服务部署方式：
 
 需要准备PaddleClas的运行环境和PaddleServing的运行环境。
 
-- 准备PaddleClas的[运行环境](../../docs/zh_CN/tutorials/install.md), 根据环境下载对应的paddle whl包，推荐安装2.0.1版本
+- 准备PaddleClas的[运行环境](../../docs/zh_CN/tutorials/install.md), 根据环境下载对应的paddle whl包，推荐安装2.1.0版本
 
 - 准备PaddleServing的运行环境，步骤如下
 
@@ -77,7 +77,7 @@ python3 -m paddle_serving_client.convert --dirname ./ResNet50_vd_infer/ \
                                          --serving_server ./ResNet50_vd_serving/ \
                                          --serving_client ./ResNet50_vd_client/
 ```
-检测模型转换完成后，会在当前文件夹多出`ResNet50_vd_serving` 和`ResNet50_vd_client`的文件夹，具备如下格式：
+ResNet50_vd推理模型转换完成后，会在当前文件夹多出`ResNet50_vd_serving` 和`ResNet50_vd_client`的文件夹，具备如下格式：
 ```
 |- ResNet50_vd_client/
   |- __model__  
@@ -133,7 +133,7 @@ fetch_var {
 2. 启动服务可运行如下命令：
     ```
     # 启动服务，运行日志保存在log.txt
-    python3 resnet50_web_service.py &>log.txt &
+    python3 classification_web_service.py &>log.txt &
     ```
     成功启动服务后，log.txt中会打印类似如下日志
     ![](./imgs/start_server.png)
