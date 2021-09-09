@@ -8,7 +8,7 @@ PaddleClas provides two service deployment methods:
 
 # Service deployment based on PaddleServing  
 
-This document will introduce how to use the [PaddleServing](https://github.com/PaddlePaddle/Serving/blob/develop/README.md) to deploy the PPOCR dynamic graph model as a pipeline online service.
+This document will introduce how to use the [PaddleServing](https://github.com/PaddlePaddle/Serving/blob/develop/README.md) to deploy the PaddleClas graph model as a pipeline online service.
 
 Some Key Features of Paddle Serving:
 - Integrate with Paddle training pipeline seamlessly, most paddle models can be deployed with one line command.
