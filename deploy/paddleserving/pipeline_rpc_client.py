@@ -15,12 +15,7 @@ try:
     from paddle_serving_server_gpu.pipeline import PipelineClient
 except ImportError:
     from paddle_serving_server.pipeline import PipelineClient
-import numpy as np
-import requests
-import json
-import cv2
 import base64
-import os
 
 client = PipelineClient()
 client.connect(['127.0.0.1:9993'])
