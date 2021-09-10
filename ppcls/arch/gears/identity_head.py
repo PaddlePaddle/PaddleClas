@@ -1,5 +1,4 @@
 from paddle import nn
-import paddle
 
 class IdentityHead(nn.Layer):
     def __init__(self):
