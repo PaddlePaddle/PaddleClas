@@ -51,7 +51,7 @@ PaddleClas提供了一系列训练好的[模型](../../docs/zh_CN/models/models_
 cd PaddleClas
 ```
 
-`slim`相关代码都位于`deploy/slim`目录下
+`slim`训练相关代码已经集成到`ppcls/engine/`下，离线量化代码位于`deploy/slim/quant_post_static.py`。
 
 #### 3.1 模型量化
 

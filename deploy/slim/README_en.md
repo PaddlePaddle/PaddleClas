@@ -49,7 +49,7 @@ Go to the root directory of PaddleClas
 cd PaddleClase
 ```
 
-The code of slim is located in `deploy/slim`
+The training related codes have been integrated into `ppcls/engine/`. The offline quantization code is located in `deploy/slim/quant_post_static.py`
 
 #### 3.1 Model Quantization
 

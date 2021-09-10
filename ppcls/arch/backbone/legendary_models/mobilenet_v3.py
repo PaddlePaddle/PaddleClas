@@ -333,8 +333,6 @@ class SEModule(TheseusLayer):
             stride=1,
             padding=0)
         self.hardsigmoid = Hardsigmoid(slope=0.2, offset=0.5)
-        self.conv1.skip_quant = True
-        self.conv2.skip_quant = True
 
     def forward(self, x):
         identity = x
