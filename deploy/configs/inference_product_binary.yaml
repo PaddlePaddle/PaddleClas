@@ -1,7 +1,7 @@
 Global:
   infer_imgs: "./recognition_demo_data_v1.1/test_product/daoxiangcunjinzhubing_6.jpg"
   det_inference_model_dir: "./models/ppyolov2_r50vd_dcn_mainbody_v1.0_infer"
-  rec_inference_model_dir: "./models/product_ResNet50_vd_aliproduct_v1.0_infer"
+  rec_inference_model_dir: "../inference"
   rec_nms_thresold: 0.05
   
   batch_size: 1
