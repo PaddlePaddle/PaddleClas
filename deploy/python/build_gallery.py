@@ -69,7 +69,7 @@ class GalleryBuilder(object):
 
         # when remove data in index, do not need extract fatures
         if operation_method != "remove":
-            gallery_features = self._extract_features(gallery_images, config)    #76 * 512
+            gallery_features = self._extract_features(gallery_images, config)
         
         assert operation_method in [
             "new", "remove", "append"
@@ -129,7 +129,7 @@ class GalleryBuilder(object):
             # calculate id for new data
             start_id = max(ids.keys()) + 1 if ids else 0
             ids_now = (
-                np.arange(0, len(gallery_images)) + start_id).astype(np.int64)  #ids: just the number sequence
+                np.arange(0, len(gallery_images)) + start_id).astype(np.int64)
 
             # only train when new index file
             if operation_method == "new":
@@ -189,7 +189,7 @@ class GalleryBuilder(object):
             batch_img.append(img)
 
             if (i + 1) % batch_size == 0:
-                rec_feat = self.rec_predictor.predict(batch_img)  #32 * 512
+                rec_feat = self.rec_predictor.predict(batch_img)
                 gallery_features[i - batch_size + 1:i + 1, :] = rec_feat
                 batch_img = []
 
