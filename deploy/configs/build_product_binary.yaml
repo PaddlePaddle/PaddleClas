@@ -30,7 +30,7 @@ RecPostProcess:
 
 # indexing engine config
 IndexProcess:
-  index_method: "IVF" # supported: HNSW32, IVF, Flat
+  index_method: "Flat"    # supported: HNSW32, Flat
   index_dir: "./recognition_demo_data_v1.1/gallery_product/index_binary"
   image_root: "./recognition_demo_data_v1.1/gallery_product/"
   data_file:  "./recognition_demo_data_v1.1/gallery_product/data_file.txt"

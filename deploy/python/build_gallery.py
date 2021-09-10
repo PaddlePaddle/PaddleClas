@@ -103,6 +103,10 @@ class GalleryBuilder(object):
             if index_method == "IVF":
                 index_method = index_method + str(
                     min(int(len(gallery_images) // 8), 65536)) + ",Flat"
+
+            # for binary index, add B at head of index_method
+            if  config["dist_type"]  == "hamming":
+                index_method = "B" + index_method
             
             #dist_type
             dist_type = faiss.METRIC_INNER_PRODUCT if config[
@@ -110,14 +114,7 @@ class GalleryBuilder(object):
             
             #build index
             if config["dist_type"]  == "hamming":
-                #use IVF
-                # quantizer = faiss.IndexBinaryFlat(config["embedding_size"])
-                # nlist = 2
-                # index = faiss.IndexBinaryIVF(quantizer, config["embedding_size"], nlist)
-                # index.nprobe = 1   #by default nprobe= 1
-
-                #use flat
-                index = faiss.IndexBinaryFlat(config["embedding_size"])
+                index = faiss.index_binary_factory(config["embedding_size"], index_method)
             else:
                 index = faiss.index_factory(config["embedding_size"], index_method,
                                             dist_type)
