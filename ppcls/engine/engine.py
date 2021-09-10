@@ -394,13 +394,10 @@ class ExportModel(nn.Layer):
         x = self.base_model(x)
         if isinstance(x, list):
             x = x[0]
-
         if self.infer_model_name is not None:
             x = x[self.infer_model_name]
-
         if self.infer_output_key is not None:
             x = x[self.infer_output_key]
-
         if self.softmax is not None:
             x = self.softmax(x)
         return x
