@@ -378,6 +378,7 @@ class ExportModel(nn.Layer):
         self.infer_output_key = config.get("infer_output_key", None)
         if self.infer_output_key == "features" and isinstance(self.base_model,
                                                               RecModel):
+            self.base_model.head = IdentityHead()
         if config.get("infer_add_softmax", True):
             self.softmax = nn.Softmax(axis=-1)
         else:
