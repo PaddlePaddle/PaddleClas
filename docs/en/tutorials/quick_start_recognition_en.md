@@ -90,13 +90,13 @@ wget https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/infere
 cd ..
 
 # Download the demo data and unzip it
-wget https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/data/recognition_demo_data_en_v1.0.tar && tar -xf recognition_demo_data_en_v1.0.tar
+wget https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/data/recognition_demo_data_en_v1.1.tar && tar -xf recognition_demo_data_en_v1.1.tar
 ```
 
-Once unpacked, the `recognition_demo_data_v1.0` folder should have the following file structure.
+Once unpacked, the `recognition_demo_data_v1.1` folder should have the following file structure.
 
 ```
-├── recognition_demo_data_v1.0
+├── recognition_demo_data_v1.1
 │   ├── gallery_cartoon
 │   ├── gallery_logo
 │   ├── gallery_product
@@ -126,13 +126,21 @@ The `models` folder should have the following file structure.
 <a name="Product_recognition_and_retrival"></a>
 ### 2.2 Product Recognition and Retrieval
 
-Take the product recognition demo as an example to show the recognition and retrieval process (if you wish to try other scenarios of recognition and retrieval, replace the corresponding configuration file after downloading and unzipping the corresponding demo data and model to complete the prediction)。
+Take the product recognition demo as an example to show the recognition and retrieval process (if you wish to try other scenarios of recognition and retrieval, replace the corresponding configuration file after downloading and unzipping the corresponding demo data and model to complete the prediction).
 
+**Note:**  `faiss` is used as search library. The installation method is as follows：
+
+```
+pip install faiss-cpu==1.7.1post2
+```
+
+If error happens when using `import faiss`, please uninstall `faiss` and reinstall it, especially on `Windows`.
 
 <a name="recognition_of_single_image"></a>
+
 #### 2.2.1 Single Image Recognition
 
-Run the following command to identify and retrieve the image `./recognition_demo_data_v1.0/test_product/daoxiangcunjinzhubing_6.jpg` for recognition and retrieval
+Run the following command to identify and retrieve the image `./recognition_demo_data_v1.1/test_product/daoxiangcunjinzhubing_6.jpg` for recognition and retrieval
 
 ```shell
 # use the following command to predict using GPU.
@@ -140,8 +148,6 @@ python3.7 python/predict_system.py -c configs/inference_product.yaml
 # use the following command to predict using CPU
 python3.7 python/predict_system.py -c configs/inference_product.yaml -o Global.use_gpu=False
 ```
-
-**Note:** Program lib used to build index is compliled on our machine, if error occured because of the environment, you can refer to [vector search tutorial](../../../deploy/vector_search/README.md) to rebuild the lib.
 
 
 The image to be retrieved is shown below.
@@ -175,7 +181,7 @@ If you want to predict the images in the folder, you can directly modify the `Gl
 
 ```shell
 # using the following command to predict using GPU, you can append `-o Global.use_gpu=False` to predict using CPU.
-python3.7 python/predict_system.py -c configs/inference_product.yaml -o Global.infer_imgs="./recognition_demo_data_v1.0/test_product/"
+python3.7 python/predict_system.py -c configs/inference_product.yaml -o Global.infer_imgs="./recognition_demo_data_v1.1/test_product/"
 ```
 
 
@@ -195,16 +201,16 @@ The results on the screen are shown as following.
 All the visualization results are also saved in folder `output`.
 
 
-Furthermore, the recognition inference model path can be changed by modifying the `Global.rec_inference_model_dir` field, and the path of the index to the index databass can be changed by modifying the `IndexProcess.index_path` field.
+Furthermore, the recognition inference model path can be changed by modifying the `Global.rec_inference_model_dir` field, and the path of the index to the index databass can be changed by modifying the `IndexProcess.index_dir` field.
 
 
 <a name="unkonw_category_image_recognition_experience"></a>
 ## 3. Recognize Images of Unknown Category
 
-To recognize the image `./recognition_demo_data_v1.0/test_product/anmuxi.jpg`, run the command as follows:
+To recognize the image `./recognition_demo_data_v1.1/test_product/anmuxi.jpg`, run the command as follows:
 
 ```shell
-python3.7 python/predict_system.py -c configs/inference_product.yaml -o Global.infer_imgs="./recognition_demo_data_v1.0/test_product/anmuxi.jpg"
+python3.7 python/predict_system.py -c configs/inference_product.yaml -o Global.infer_imgs="./recognition_demo_data_v1.1/test_product/anmuxi.jpg"
 ```
 
 The image to be retrieved is shown below.
@@ -225,14 +231,14 @@ When the index database cannot cover the scenes we actually recognise, i.e. when
 First, you need to copy the images which are similar with the image to retrieval to the original images for the index database. The command is as follows.
 
 ```shell
-cp -r  ../docs/images/recognition/product_demo/gallery/anmuxi ./recognition_demo_data_v1.0/gallery_product/gallery/
+cp -r  ../docs/images/recognition/product_demo/gallery/anmuxi ./recognition_demo_data_/gallery_product/gallery/
 ```
 
 Then you need to create a new label file which records the image path and label information. Use the following command to create a new file based on the original one.
 
 ```shell
 # copy the file
-cp recognition_demo_data_v1.0/gallery_product/data_file.txt recognition_demo_data_v1.0/gallery_product/data_file_update.txt
+cp recognition_demo_data_v1.1/gallery_product/data_file.txt recognition_demo_data_v1.1/gallery_product/data_file_update.txt
 ```
 
 Then add some new lines into the new label file, which is shown as follows.
@@ -255,20 +261,20 @@ Each line can be splited into two fields. The first field denotes the relative i
 Use the following command to build the index to accelerate the retrieval process after recognition.
 
 ```shell
-python3.7 python/build_gallery.py -c configs/build_product.yaml -o IndexProcess.data_file="./recognition_demo_data_v1.0/gallery_product/data_file_update.txt" -o IndexProcess.index_path="./recognition_demo_data_v1.0/gallery_product/index_update"
+python3.7 python/build_gallery.py -c configs/build_product.yaml -o IndexProcess.data_file="./recognition_demo_data_v1.1/gallery_product/data_file_update.txt" -o IndexProcess.index_dir="./recognition_demo_data_v1.1/gallery_product/index_update"
 ```
 
-Finally, the new index information is stored in the folder`./recognition_demo_data_v1.0/gallery_product/index_update`. Use the new index database for the above index.
+Finally, the new index information is stored in the folder`./recognition_demo_data_v1.1/gallery_product/index_update`. Use the new index database for the above index.
 
 
 <a name="Image_differentiation_based_on_the_new_index_library"></a>
 ### 3.2 Recognize the Unknown Category Images
 
-To recognize the image `./recognition_demo_data_v1.0/test_product/anmuxi.jpg`, run the command as follows.
+To recognize the image `./recognition_demo_data_v1.1/test_product/anmuxi.jpg`, run the command as follows.
 
 ```shell
 # using the following command to predict using GPU, you can append `-o Global.use_gpu=False` to predict using CPU.
-python3.7 python/predict_system.py -c configs/inference_product.yaml -o Global.infer_imgs="./recognition_demo_data_v1.0/test_product/anmuxi.jpg" -o IndexProcess.index_path="./recognition_demo_data_v1.0/gallery_product/index_update"
+python3.7 python/predict_system.py -c configs/inference_product.yaml -o Global.infer_imgs="./recognition_demo_data_v1.1/test_product/anmuxi.jpg" -o IndexProcess.index_dir="./recognition_demo_data_v1.1/gallery_product/index_update"
 ```
 
 The output is as follows:
