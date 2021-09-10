@@ -1,7 +1,7 @@
 # global configs
 Global:
   checkpoints: null
-  pretrained_model: ./output_product_binary/best_model
+  pretrained_model: null
   output_dir: ./output_dlbhc/
   device: gpu
   save_interval: 1
@@ -34,7 +34,6 @@ Arch:
     
   infer_output_key:  "features"
   infer_add_softmax: "false"
-  infer_binarize:    "round"
  
 # loss function config for train/eval process
 Loss:
