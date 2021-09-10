@@ -148,21 +148,3 @@ class Binarize(object):
             byte[:, i:i+1] = np.dot(x[:, i * 8: (i + 1)* 8], self.unit)
 
         return byte
-
-if __name__== "__main__":
-    a  = Binarize()
-    x  = np.random.random((31, 64)).astype('float32')
-
-    y = a(x)
-    print(y)
-    print(y.shape)
-
-
-
-
-
-
-            
-
-
-
