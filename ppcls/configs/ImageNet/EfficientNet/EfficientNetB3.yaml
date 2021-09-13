@@ -16,7 +16,7 @@ Global:
 
 # model architecture
 Arch:
-  name: EfficientNetB0
+  name: EfficientNetB3
   class_num: 1000
  
 # loss function config for traing/eval process
@@ -56,7 +56,7 @@ DataLoader:
             to_rgb: True
             channel_first: False
         - RandCropImage:
-            size: 224
+            size: 300
         - RandFlipImage:
             flip_code: 1
         - AutoAugment:
@@ -85,9 +85,9 @@ DataLoader:
             to_rgb: True
             channel_first: False
         - ResizeImage:
-            resize_short: 256
+            resize_short: 332
         - CropImage:
-            size: 224
+            size: 300
         - NormalizeImage:
             scale: 1.0/255.0
             mean: [0.485, 0.456, 0.406]
