@@ -24,22 +24,22 @@ from ppcls.arch.backbone.base.theseus_layer import TheseusLayer
 from ppcls.utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
 
 MODEL_URLS = {
-    "LCNet_x0_25":
-    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/LCNet_x0_25_pretrained.pdparams",
-    "LCNet_x0_35":
-    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/LCNet_x0_35_pretrained.pdparams",
-    "LCNet_x0_5":
-    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/LCNet_x0_5_pretrained.pdparams",
-    "LCNet_x0_75":
-    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/LCNet_x0_75_pretrained.pdparams",
-    "LCNet_x1_0":
-    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/LCNet_x1_0_pretrained.pdparams",
-    "LCNet_x1_5":
-    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/LCNet_x1_5_pretrained.pdparams",
-    "LCNet_x2_0":
-    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/LCNet_x2_0_pretrained.pdparams",
-    "LCNet_x2_5":
-    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/LCNet_x2_5_pretrained.pdparams"
+    "PPLCNet_x0_25":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/PPLCNet_x0_25_pretrained.pdparams",
+    "PPLCNet_x0_35":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/PPLCNet_x0_35_pretrained.pdparams",
+    "PPLCNet_x0_5":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/PPLCNet_x0_5_pretrained.pdparams",
+    "PPLCNet_x0_75":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/PPLCNet_x0_75_pretrained.pdparams",
+    "PPLCNet_x1_0":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/PPLCNet_x1_0_pretrained.pdparams",
+    "PPLCNet_x1_5":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/PPLCNet_x1_5_pretrained.pdparams",
+    "PPLCNet_x2_0":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/PPLCNet_x2_0_pretrained.pdparams",
+    "PPLCNet_x2_5":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/PPLCNet_x2_5_pretrained.pdparams"
 }
 
 __all__ = list(MODEL_URLS.keys())
@@ -166,7 +166,7 @@ class SEModule(TheseusLayer):
         return x
 
 
-class LCNet(TheseusLayer):
+class PPLCNet(TheseusLayer):
     def __init__(self,
                  scale=1.0,
                  class_num=1000,
@@ -279,121 +279,121 @@ def _load_pretrained(pretrained, model, model_url, use_ssld):
         )
 
 
-def LCNet_x0_25(pretrained=False, use_ssld=False, **kwargs):
+def PPLCNet_x0_25(pretrained=False, use_ssld=False, **kwargs):
     """
-    LCNet_x0_25
+    PPLCNet_x0_25
     Args:
         pretrained: bool=False or str. If `True` load pretrained parameters, `False` otherwise.
                     If str, means the path of the pretrained model.
         use_ssld: bool=False. Whether using distillation pretrained model when pretrained=True.
     Returns:
-        model: nn.Layer. Specific `LCNet_x0_25` model depends on args.
+        model: nn.Layer. Specific `PPLCNet_x0_25` model depends on args.
     """
-    model = LCNet(scale=0.25, **kwargs)
-    _load_pretrained(pretrained, model, MODEL_URLS["LCNet_x0_25"], use_ssld)
+    model = PPLCNet(scale=0.25, **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["PPLCNet_x0_25"], use_ssld)
     return model
 
 
-def LCNet_x0_35(pretrained=False, use_ssld=False, **kwargs):
+def PPLCNet_x0_35(pretrained=False, use_ssld=False, **kwargs):
     """
-    LCNet_x0_35
+    PPLCNet_x0_35
     Args:
         pretrained: bool=False or str. If `True` load pretrained parameters, `False` otherwise.
                     If str, means the path of the pretrained model.
         use_ssld: bool=False. Whether using distillation pretrained model when pretrained=True.
     Returns:
-        model: nn.Layer. Specific `LCNet_x0_35` model depends on args.
+        model: nn.Layer. Specific `PPLCNet_x0_35` model depends on args.
     """
-    model = LCNet(scale=0.35, **kwargs)
-    _load_pretrained(pretrained, model, MODEL_URLS["LCNet_x0_35"], use_ssld)
+    model = PPLCNet(scale=0.35, **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["PPLCNet_x0_35"], use_ssld)
     return model
 
 
-def LCNet_x0_5(pretrained=False, use_ssld=False, **kwargs):
+def PPLCNet_x0_5(pretrained=False, use_ssld=False, **kwargs):
     """
-    LCNet_x0_5
+    PPLCNet_x0_5
     Args:
         pretrained: bool=False or str. If `True` load pretrained parameters, `False` otherwise.
                     If str, means the path of the pretrained model.
         use_ssld: bool=False. Whether using distillation pretrained model when pretrained=True.
     Returns:
-        model: nn.Layer. Specific `LCNet_x0_5` model depends on args.
+        model: nn.Layer. Specific `PPLCNet_x0_5` model depends on args.
     """
-    model = LCNet(scale=0.5, **kwargs)
-    _load_pretrained(pretrained, model, MODEL_URLS["LCNet_x0_5"], use_ssld)
+    model = PPLCNet(scale=0.5, **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["PPLCNet_x0_5"], use_ssld)
     return model
 
 
-def LCNet_x0_75(pretrained=False, use_ssld=False, **kwargs):
+def PPLCNet_x0_75(pretrained=False, use_ssld=False, **kwargs):
     """
-    LCNet_x0_75
+    PPLCNet_x0_75
     Args:
         pretrained: bool=False or str. If `True` load pretrained parameters, `False` otherwise.
                     If str, means the path of the pretrained model.
         use_ssld: bool=False. Whether using distillation pretrained model when pretrained=True.
     Returns:
-        model: nn.Layer. Specific `LCNet_x0_75` model depends on args.
+        model: nn.Layer. Specific `PPLCNet_x0_75` model depends on args.
     """
-    model = LCNet(scale=0.75, **kwargs)
-    _load_pretrained(pretrained, model, MODEL_URLS["LCNet_x0_75"], use_ssld)
+    model = PPLCNet(scale=0.75, **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["PPLCNet_x0_75"], use_ssld)
     return model
 
 
-def LCNet_x1_0(pretrained=False, use_ssld=False, **kwargs):
+def PPLCNet_x1_0(pretrained=False, use_ssld=False, **kwargs):
     """
-    LCNet_x1_0
+    PPLCNet_x1_0
     Args:
         pretrained: bool=False or str. If `True` load pretrained parameters, `False` otherwise.
                     If str, means the path of the pretrained model.
         use_ssld: bool=False. Whether using distillation pretrained model when pretrained=True.
     Returns:
-        model: nn.Layer. Specific `LCNet_x1_0` model depends on args.
+        model: nn.Layer. Specific `PPLCNet_x1_0` model depends on args.
     """
-    model = LCNet(scale=1.0, **kwargs)
-    _load_pretrained(pretrained, model, MODEL_URLS["LCNet_x1_0"], use_ssld)
+    model = PPLCNet(scale=1.0, **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["PPLCNet_x1_0"], use_ssld)
     return model
 
 
-def LCNet_x1_5(pretrained=False, use_ssld=False, **kwargs):
+def PPLCNet_x1_5(pretrained=False, use_ssld=False, **kwargs):
     """
-    LCNet_x1_5
+    PPLCNet_x1_5
     Args:
         pretrained: bool=False or str. If `True` load pretrained parameters, `False` otherwise.
                     If str, means the path of the pretrained model.
         use_ssld: bool=False. Whether using distillation pretrained model when pretrained=True.
     Returns:
-        model: nn.Layer. Specific `LCNet_x1_5` model depends on args.
+        model: nn.Layer. Specific `PPLCNet_x1_5` model depends on args.
     """
-    model = LCNet(scale=1.5, **kwargs)
-    _load_pretrained(pretrained, model, MODEL_URLS["LCNet_x1_5"], use_ssld)
+    model = PPLCNet(scale=1.5, **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["PPLCNet_x1_5"], use_ssld)
     return model
 
 
-def LCNet_x2_0(pretrained=False, use_ssld=False, **kwargs):
+def PPLCNet_x2_0(pretrained=False, use_ssld=False, **kwargs):
     """
-    LCNet_x2_0
+    PPLCNet_x2_0
     Args:
         pretrained: bool=False or str. If `True` load pretrained parameters, `False` otherwise.
                     If str, means the path of the pretrained model.
         use_ssld: bool=False. Whether using distillation pretrained model when pretrained=True.
     Returns:
-        model: nn.Layer. Specific `LCNet_x2_0` model depends on args.
+        model: nn.Layer. Specific `PPLCNet_x2_0` model depends on args.
     """
-    model = LCNet(scale=2.0, **kwargs)
-    _load_pretrained(pretrained, model, MODEL_URLS["LCNet_x2_0"], use_ssld)
+    model = PPLCNet(scale=2.0, **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["PPLCNet_x2_0"], use_ssld)
     return model
 
 
-def LCNet_x2_5(pretrained=False, use_ssld=False, **kwargs):
+def PPLCNet_x2_5(pretrained=False, use_ssld=False, **kwargs):
     """
-    LCNet_x2_5
+    PPLCNet_x2_5
     Args:
         pretrained: bool=False or str. If `True` load pretrained parameters, `False` otherwise.
                     If str, means the path of the pretrained model.
         use_ssld: bool=False. Whether using distillation pretrained model when pretrained=True.
     Returns:
-        model: nn.Layer. Specific `LCNet_x2_5` model depends on args.
+        model: nn.Layer. Specific `PPLCNet_x2_5` model depends on args.
     """
-    model = LCNet(scale=2.5, **kwargs)
-    _load_pretrained(pretrained, model, MODEL_URLS["LCNet_x2_5"], use_ssld)
+    model = PPLCNet(scale=2.5, **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["PPLCNet_x2_5"], use_ssld)
     return model

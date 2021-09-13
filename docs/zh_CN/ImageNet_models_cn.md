@@ -57,30 +57,30 @@
 
 | 模型                  | Top-1 Acc | Reference<br>Top-1 Acc | Acc gain |  Intel-Xeon-Gold-6148 time(ms)<br>bs=1 | Flops(M) | Params(M)  | 下载地址   |
 |---------------------|-----------|-----------|---------------|----------------|----------|-----------|-----------------------------------|
-| LCNet_x0_5_ssld   | 0.661    | 0.631    | 0.030 | 2.05     | 47     |   1.9   | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/LCNet_x0_5_ssld_pretrained.pdparams)                 |
-| LCNet_x1_0_ssld   | 0.744    | 0.713    | 0.033 | 2.46     | 161     |   3.0  | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/LCNet_x1_0_ssld_pretrained.pdparams)                 |
-| LCNet_x2_5_ssld   | 0.808    | 0.766    | 0.042 | 5.39     | 906     |   9.0  | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/LCNet_x2_5_ssld_pretrained.pdparams)                 |
+| PPLCNet_x0_5_ssld   | 0.661    | 0.631    | 0.030 | 2.05     | 47     |   1.9   | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/PPLCNet_x0_5_ssld_pretrained.pdparams)                 |
+| PPLCNet_x1_0_ssld   | 0.744    | 0.713    | 0.033 | 2.46     | 161     |   3.0  | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/PPLCNet_x1_0_ssld_pretrained.pdparams)                 |
+| PPLCNet_x2_5_ssld   | 0.808    | 0.766    | 0.042 | 5.39     | 906     |   9.0  | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/PPLCNet_x2_5_ssld_pretrained.pdparams)                 |
 
 
 
 
 * 注: `Reference Top-1 Acc`表示PaddleClas基于ImageNet1k数据集训练得到的预训练模型精度。
 
-<a name="LCNet系列"></a>
-### LCNet系列
+<a name="PPLCNet系列"></a>
+### PPLCNet系列
 
-LCNet系列模型的精度、速度指标如下表所示，更多关于该系列的模型介绍可以参考：[LCNet系列模型文档](./models/LCNet.md)。
+PPLCNet系列模型的精度、速度指标如下表所示，更多关于该系列的模型介绍可以参考：[PPLCNet系列模型文档](./models/PPLCNet.md)。
 
 | 模型           | Top-1 Acc | Top-5 Acc | Intel-Xeon-Gold-6148 time(ms)<br>bs=1 | FLOPs(M) | Params(M) | 下载地址 |
 |:--:|:--:|:--:|:--:|:--:|:--:|:--:|
-| LCNet_x0_25        |0.5186           | 0.7565   |  1.74      | 18    | 1.5  | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/LCNet_x0_25_pretrained.pdparams) |
-| LCNet_x0_35        |0.5809           | 0.8083   |  1.92      | 29    | 1.6  | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/LCNet_x0_35_pretrained.pdparams) |
-| LCNet_x0_5         |0.6314           | 0.8466   |  2.05      | 47    | 1.9  | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/LCNet_x0_5_pretrained.pdparams) |
-| LCNet_x0_75        |0.6818           | 0.8830   |  2.29      | 99    | 2.4  | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/LCNet_x0_75_pretrained.pdparams) |
-| LCNet_x1_0         |0.7132           | 0.9003   |  2.46      | 161   | 3.0  | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/LCNet_x1_0_pretrained.pdparams) |
-| LCNet_x1_5         |0.7371           | 0.9153   |  3.19      | 342   | 4.5  | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/LCNet_x1_5_pretrained.pdparams) |
-| LCNet_x2_0         |0.7518           | 0.9227   |  4.27      | 590   | 6.5  | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/LCNet_x2_0_pretrained.pdparams) |
-| LCNet_x2_5         |0.7660           | 0.9300   |  5.39      | 906   | 9.0  | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/LCNet_x2_5_pretrained.pdparams) |
+| PPLCNet_x0_25        |0.5186           | 0.7565   |  1.74      | 18    | 1.5  | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/PPLCNet_x0_25_pretrained.pdparams) |
+| PPLCNet_x0_35        |0.5809           | 0.8083   |  1.92      | 29    | 1.6  | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/PPLCNet_x0_35_pretrained.pdparams) |
+| PPLCNet_x0_5         |0.6314           | 0.8466   |  2.05      | 47    | 1.9  | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/PPLCNet_x0_5_pretrained.pdparams) |
+| PPLCNet_x0_75        |0.6818           | 0.8830   |  2.29      | 99    | 2.4  | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/PPLCNet_x0_75_pretrained.pdparams) |
+| PPLCNet_x1_0         |0.7132           | 0.9003   |  2.46      | 161   | 3.0  | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/PPLCNet_x1_0_pretrained.pdparams) |
+| PPLCNet_x1_5         |0.7371           | 0.9153   |  3.19      | 342   | 4.5  | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/PPLCNet_x1_5_pretrained.pdparams) |
+| PPLCNet_x2_0         |0.7518           | 0.9227   |  4.27      | 590   | 6.5  | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/PPLCNet_x2_0_pretrained.pdparams) |
+| PPLCNet_x2_5         |0.7660           | 0.9300   |  5.39      | 906   | 9.0  | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/PPLCNet_x2_5_pretrained.pdparams) |
 
 
 <a name="ResNet及其Vd系列"></a>
