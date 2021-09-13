@@ -162,7 +162,7 @@ class MobileNetV3(TheseusLayer):
             if_act=True,
             act="hardswish")
 
-        self.blocks = nn.Sequential(*[
+        self.blocks = nn.Sequential(* [
             ResidualUnit(
                 in_c=_make_divisible(self.inplanes * self.scale if i == 0 else
                                      self.cfg[i - 1][2] * self.scale),
