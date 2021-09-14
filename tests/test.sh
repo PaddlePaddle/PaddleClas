@@ -380,7 +380,7 @@ else
                 set_pretrain=$(func_set_params "${pretrain_model_key}" "${pretrain_model_value}")
                 set_batchsize=$(func_set_params "${train_batch_key}" "${train_batch_value}")
                 set_train_params1=$(func_set_params "${train_param_key1}" "${train_param_value1}")
-                set_use_gpu=$(func_set_params "${train_use_gpu_key}" "${use_gpu}")
+                set_use_gpu=$(func_set_params "${train_use_gpu_key}" "${train_use_gpu_value}")
                 save_log="${LOG_PATH}/${trainer}_gpus_${gpu}_autocast_${autocast}"
                 
                 # load pretrain from norm training if current trainer is pact or fpgm trainer

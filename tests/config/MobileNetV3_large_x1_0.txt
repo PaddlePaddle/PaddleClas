@@ -12,10 +12,10 @@ train_model_name:latest
 train_infer_img_dir:./dataset/ILSVRC2012/val
 null:null
 ##
-trainer:norm_train
+trainer:norm_train|pact_train|fpgm_train
 norm_train:tools/train.py -c ppcls/configs/ImageNet/MobileNetV3/MobileNetV3_large_x1_0.yaml
-pact_train:deploy/slim/slim.py -c ppcls/configs/slim/MobileNetV3_large_x1_0_quantization.yaml
-fpgm_train:deploy/slim/slim.py -c ppcls/configs/slim/MobileNetV3_large_x1_0_prune.yaml
+pact_train:tools/train.py -c ppcls/configs/slim/MobileNetV3_large_x1_0_quantization.yaml
+fpgm_train:tools/train.py -c ppcls/configs/slim/MobileNetV3_large_x1_0_prune.yaml
 distill_train:null
 null:null
 null:null
@@ -28,8 +28,8 @@ null:null
 -o Global.save_inference_dir:./inference
 -o Global.pretrained_model:
 norm_export:tools/export_model.py -c ppcls/configs/ImageNet/MobileNetV3/MobileNetV3_large_x1_0.yaml
-quant_export:deploy/slim/slim.py -m export -c ppcls/configs/slim/MobileNetV3_large_x1_0_quantalization.yaml
-fpgm_export:deploy/slim/slim.py -m export -c ppcls/configs/slim/MobileNetV3_large_x1_0_prune.yaml
+quant_export:tools/export_model.py -c ppcls/configs/slim/MobileNetV3_large_x1_0_quantization.yaml
+fpgm_export:tools/export_model.py -c ppcls/configs/slim/MobileNetV3_large_x1_0_prune.yaml
 distill_export:null
 export1:null
 export2:null
@@ -49,3 +49,10 @@ inference:python/predict_cls.py -c configs/inference_cls.yaml
 -o Global.save_log_path:null
 -o Global.benchmark:True
 null:null
+null:null
+===========================cpp_infer_params===========================
+use_gpu:0|1
+cpu_threads:1|6
+use_mkldnn:0|1
+use_tensorrt:0|1
+use_fp16:0|1
