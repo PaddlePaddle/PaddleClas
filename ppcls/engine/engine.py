@@ -20,6 +20,8 @@ import paddle
 import paddle.distributed as dist
 from visualdl import LogWriter
 from paddle import nn
+import numpy as np
+import random
 
 from ppcls.utils.check import check_gpu
 from ppcls.utils.misc import AverageMeter
@@ -56,6 +58,14 @@ class Engine(object):
             self.is_rec = True
         else:
             self.is_rec = False
+
+        # set seed
+        seed = self.config["Global"].get("seed", False)
+        if seed:
+            assert isinstance(seed, int), "The 'seed' must be a integer!"
+            paddle.seed(seed)
+            np.random.seed(seed)
+            random.seed(seed)
 
         # init logger
         self.output_dir = self.config['Global']['output_dir']
