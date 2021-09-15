@@ -33,11 +33,8 @@ __all__ = ["build_model", "RecModel", "DistillationModel"]
 def build_model(config):
     config = copy.deepcopy(config)
     model_type = config.pop("name")
-    return_patterns = config.pop("return_patterns", None)
     mod = importlib.import_module(__name__)
     arch = getattr(mod, model_type)(**config)
-    if return_patterns is not None and isinstance(arch, TheseusLayer):
-        arch.update_res(return_patterns=return_patterns, return_dict=True)
     return arch
 
 
@@ -59,10 +56,7 @@ class RecModel(nn.Layer):
         super().__init__()
         backbone_config = config["Backbone"]
         backbone_name = backbone_config.pop("name")
-        return_patterns = config.pop("return_patterns", None)
         self.backbone = eval(backbone_name)(**backbone_config)
-        if return_patterns is not None and isinstance(self.backbone, TheseusLayer):
-            self.backbone.update_res(return_patterns=return_patterns, return_dict=True)
         if "BackboneStopLayer" in config:
             backbone_stop_layer = config["BackboneStopLayer"]["name"]
             self.backbone.stop_after(backbone_stop_layer)
