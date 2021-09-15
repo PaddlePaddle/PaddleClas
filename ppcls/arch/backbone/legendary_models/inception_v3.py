@@ -454,7 +454,7 @@ class Inception_V3(TheseusLayer):
         model: nn.Layer. Specific Inception_V3 model depends on args.
     """
 
-    def __init__(self, config, class_num=1000):
+    def __init__(self, config, class_num=1000, return_patterns=None):
         super().__init__()
 
         self.inception_a_list = config["inception_a"]
@@ -496,6 +496,9 @@ class Inception_V3(TheseusLayer):
             class_num,
             weight_attr=ParamAttr(initializer=Uniform(-stdv, stdv)),
             bias_attr=ParamAttr())
+        if return_patterns is not None:
+            self.update_res(return_patterns)
+            self.register_forward_post_hook(self._return_dict_hook)
 
     def forward(self, x):
         x = self.inception_stem(x)

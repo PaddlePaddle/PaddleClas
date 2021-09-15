@@ -38,23 +38,30 @@ class TheseusLayer(nn.Layer):
         for layer_i in self._sub_layers:
             layer_name = self._sub_layers[layer_i].full_name()
             if isinstance(self._sub_layers[layer_i], (nn.Sequential, nn.LayerList)):
-                self._sub_layers[layer_i] = wrap_theseus(self._sub_layers[layer_i])
-                self._sub_layers[layer_i].res_dict = self.res_dict
+                self._sub_layers[layer_i] = wrap_theseus(self._sub_layers[layer_i], self.res_dict)
                 self._sub_layers[layer_i].update_res(return_patterns)
             else:
                 for return_pattern in return_patterns:
                     if re.match(return_pattern, layer_name):
                         if not isinstance(self._sub_layers[layer_i], TheseusLayer):
-                            self._sub_layers[layer_i] = wrap_theseus(self._sub_layers[layer_i])
+                            self._sub_layers[layer_i] = wrap_theseus(self._sub_layers[layer_i], self.res_dict)
+                        else:
+                            self._sub_layers[layer_i].res_dict = self.res_dict
+
                         self._sub_layers[layer_i].register_forward_post_hook(
                             self._sub_layers[layer_i]._save_sub_res_hook)
-                        self._sub_layers[layer_i].res_dict = self.res_dict
-                if isinstance(self._sub_layers[layer_i], TheseusLayer):
-                    self._sub_layers[layer_i].res_dict = self.res_dict
-                    self._sub_layers[layer_i].update_res(return_patterns)
+            if isinstance(self._sub_layers[layer_i], TheseusLayer):
+                self._sub_layers[layer_i].res_dict = self.res_dict
+                self._sub_layers[layer_i].update_res(return_patterns)
 
     def _save_sub_res_hook(self, layer, input, output):
         self.res_dict[layer.full_name()] = output
+
+    def _return_dict_hook(self, layer, input, output):
+        res_dict = {"output": output}
+        for res_key in list(self.res_dict):
+            res_dict[res_key] = self.res_dict.pop(res_key)
+        return res_dict
 
     def replace_sub(self, layer_name_pattern, replace_function, recursive=True):
         for layer_i in self._sub_layers:
@@ -85,10 +92,12 @@ class TheseusLayer(nn.Layer):
 
 
 class WrapLayer(TheseusLayer):
-    def __init__(self, sub_layer):
+    def __init__(self, sub_layer, res_dict=None):
         super(WrapLayer, self).__init__()
         self.sub_layer = sub_layer
         self.name = sub_layer.full_name()
+        if res_dict is not None:
+            self.res_dict = res_dict
 
     def full_name(self):
         return self.name
@@ -101,14 +110,14 @@ class WrapLayer(TheseusLayer):
             return
         for layer_i in self.sub_layer._sub_layers:
             if isinstance(self.sub_layer._sub_layers[layer_i], (nn.Sequential, nn.LayerList)):
-                self.sub_layer._sub_layers[layer_i] = wrap_theseus(self.sub_layer._sub_layers[layer_i])
-                self.sub_layer._sub_layers[layer_i].res_dict = self.res_dict
+                self.sub_layer._sub_layers[layer_i] = wrap_theseus(self.sub_layer._sub_layers[layer_i], self.res_dict)
                 self.sub_layer._sub_layers[layer_i].update_res(return_patterns)
+            elif isinstance(self.sub_layer._sub_layers[layer_i], TheseusLayer):
+                self.sub_layer._sub_layers[layer_i].res_dict = self.res_dict
 
             layer_name = self.sub_layer._sub_layers[layer_i].full_name()
             for return_pattern in return_patterns:
                 if re.match(return_pattern, layer_name):
-                    self.sub_layer._sub_layers[layer_i].res_dict = self.res_dict
                     self.sub_layer._sub_layers[layer_i].register_forward_post_hook(
                         self._sub_layers[layer_i]._save_sub_res_hook)
 
@@ -116,6 +125,6 @@ class WrapLayer(TheseusLayer):
                 self.sub_layer._sub_layers[layer_i].update_res(return_patterns)
 
 
-def wrap_theseus(sub_layer):
-    wrapped_layer = WrapLayer(sub_layer)
+def wrap_theseus(sub_layer, res_dict=None):
+    wrapped_layer = WrapLayer(sub_layer, res_dict)
     return wrapped_layer
