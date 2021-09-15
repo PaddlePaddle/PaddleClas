@@ -57,6 +57,12 @@ class TheseusLayer(nn.Layer):
     def _save_sub_res_hook(self, layer, input, output):
         self.res_dict[layer.full_name()] = output
 
+    def _return_dict_hook(self, layer, input, output):
+        res_dict = {"output": output}
+        for res_key in list(self.res_dict):
+            res_dict[res_key] = self.res_dict.pop(res_key)
+        return res_dict
+
     def replace_sub(self, layer_name_pattern, replace_function, recursive=True):
         for layer_i in self._sub_layers:
             layer_name = self._sub_layers[layer_i].full_name()

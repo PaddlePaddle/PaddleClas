@@ -367,7 +367,7 @@ class HRNet(TheseusLayer):
         model: nn.Layer. Specific HRNet model depends on args.
     """
 
-    def __init__(self, width=18, has_se=False, class_num=1000):
+    def __init__(self, width=18, has_se=False, class_num=1000, return_patterns=None):
         super().__init__()
 
         self.width = width
@@ -456,8 +456,11 @@ class HRNet(TheseusLayer):
             2048,
             class_num,
             weight_attr=ParamAttr(initializer=Uniform(-stdv, stdv)))
+        if return_patterns is not None:
+            self.update_res(return_patterns)
+            self.register_forward_post_hook(self._return_dict_hook)
 
-    def forward(self, x, res_dict=None):
+    def forward(self, x):
         x = self.conv_layer1_1(x)
         x = self.conv_layer1_2(x)
 

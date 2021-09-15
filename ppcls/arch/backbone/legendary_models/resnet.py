@@ -269,7 +269,8 @@ class ResNet(TheseusLayer):
                  class_num=1000,
                  lr_mult_list=[1.0, 1.0, 1.0, 1.0, 1.0],
                  data_format="NCHW",
-                 input_image_channel=3):
+                 input_image_channel=3,
+                 return_patterns=None):
         super().__init__()
 
         self.cfg = config
@@ -337,6 +338,9 @@ class ResNet(TheseusLayer):
             weight_attr=ParamAttr(initializer=Uniform(-stdv, stdv)))
 
         self.data_format = data_format
+        if return_patterns is not None:
+            self.update_res(return_patterns)
+            self.register_forward_post_hook(self._return_dict_hook)
 
     def forward(self, x):
         with paddle.static.amp.fp16_guard():

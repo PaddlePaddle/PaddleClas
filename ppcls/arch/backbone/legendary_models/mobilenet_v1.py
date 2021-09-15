@@ -102,7 +102,7 @@ class MobileNet(TheseusLayer):
         model: nn.Layer. Specific MobileNet model depends on args.
     """
 
-    def __init__(self, scale=1.0, class_num=1000):
+    def __init__(self, scale=1.0, class_num=1000, return_patterns=None):
         super().__init__()
         self.scale = scale
 
@@ -145,16 +145,16 @@ class MobileNet(TheseusLayer):
             int(1024 * scale),
             class_num,
             weight_attr=ParamAttr(initializer=KaimingNormal()))
+        if return_patterns is not None:
+            self.update_res(return_patterns)
+            self.register_forward_post_hook(self._return_dict_hook)
 
-    def forward(self, x, res_dict=None):
+    def forward(self, x):
         x = self.conv(x)
         x = self.blocks(x)
         x = self.avg_pool(x)
         x = self.flatten(x)
         x = self.fc(x)
-        if self.res_dict and res_dict is not None:
-            for res_key in list(self.res_dict):
-                res_dict[res_key] = self.res_dict.pop(res_key)
         return x
 
 
