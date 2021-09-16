@@ -34,7 +34,6 @@ Optimizer:
   momentum: 0.9
   lr:
     name: Piecewise
-    learning_rate: 0.01
     decay_epochs: [30, 60, 90]
     values: [0.01, 0.001, 0.0001, 0.00001]
   regularizer:
