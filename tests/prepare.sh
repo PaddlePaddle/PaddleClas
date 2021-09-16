@@ -1,6 +1,5 @@
 #!/bin/bash
 FILENAME=$1
-
 # MODE be one of ['lite_train_infer' 'whole_infer' 'whole_train_infer', 'infer', "cpp_infer", "serving_infer"]
 MODE=$2
 
