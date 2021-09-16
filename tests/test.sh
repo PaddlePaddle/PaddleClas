@@ -425,7 +425,6 @@ elif [ ${MODE} = "cpp_infer" ]; then
     cd deploy
     func_cpp_inference "./cpp/build/clas_system" "../${LOG_PATH}" "${infer_img_dir}"
     cd ..
-
 elif [ ${MODE} = "serving_infer" ]; then
     GPUID=$3
     if [ ${#GPUID} -le 0 ];then
