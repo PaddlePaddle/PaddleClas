@@ -523,6 +523,7 @@ else
                 fi
                 # run train
 		eval "unset CUDA_VISIBLE_DEVICES"
+		export FLAGS_cudnn_deterministic=True
                 eval $cmd
                 status_check $? "${cmd}" "${status_log}"
 

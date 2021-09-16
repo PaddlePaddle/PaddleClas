@@ -96,7 +96,6 @@ def create_fetchs(out,
     """
     fetchs = OrderedDict()
     # build loss
-    # TODO(littletomatodonkey): support mix training
     if use_mix:
         y_a = paddle.reshape(feeds['y_a'], [-1, 1])
         y_b = paddle.reshape(feeds['y_b'], [-1, 1])
@@ -106,21 +105,13 @@ def create_fetchs(out,
 
     loss_func = build_loss(config["Loss"][mode])
 
-    # TODO: support mix training
-    loss_dict = loss_func(out, target)
+    if use_mix:
+        loss_dict = loss_func(out, [y_a, y_b, lam])
+    else:
+        loss_dict = loss_func(out, target)
 
     loss_out = loss_dict["loss"]
-    # if "AMP" in config and config.AMP.get("use_pure_fp16", False):
-    # loss_out = loss_out.astype("float16")
-
-    # if use_mix:
-    #     return loss_func(out, feed_y_a, feed_y_b, feed_lam)
-    # else:
-    #     return loss_func(out, target)
-
     fetchs['loss'] = (loss_out, AverageMeter('loss', '7.4f', need_avg=True))
-
-    assert use_mix is False
 
     # build metric
     if not use_mix:

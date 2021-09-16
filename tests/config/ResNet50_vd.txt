@@ -13,9 +13,9 @@ train_infer_img_dir:./dataset/ILSVRC2012/val
 null:null
 ##
 trainer:norm_train|pact_train|fpgm_train
-norm_train:tools/train.py -c ppcls/configs/ImageNet/ResNet/ResNet50_vd.yaml
-pact_train:tools/train.py -c ppcls/configs/slim/ResNet50_vd_quantization.yaml
-fpgm_train:tools/train.py -c ppcls/configs/slim/ResNet50_vd_prune.yaml
+norm_train:tools/train.py -c ppcls/configs/ImageNet/ResNet/ResNet50_vd.yaml -o Global.seed=1234 -o DataLoader.Train.sampler.shuffle=False -o DataLoader.Train.loader.num_workers=0 -o DataLoader.Train.loader.use_shared_memory=False
+pact_train:tools/train.py -c ppcls/configs/slim/ResNet50_vd_quantization.yaml -o Global.seed=1234 -o DataLoader.Train.sampler.shuffle=False -o DataLoader.Train.loader.num_workers=0 -o DataLoader.Train.loader.use_shared_memory=False
+fpgm_train:tools/train.py -c ppcls/configs/slim/ResNet50_vd_prune.yaml -o Global.seed=1234 -o DataLoader.Train.sampler.shuffle=False -o DataLoader.Train.loader.num_workers=0 -o DataLoader.Train.loader.use_shared_memory=False
 distill_train:null
 null:null
 null:null
