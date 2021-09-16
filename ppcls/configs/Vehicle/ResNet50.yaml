@@ -2,7 +2,7 @@
 Global:
   checkpoints: null
   pretrained_model: null
-  output_dir: "./output/"
+  output_dir: "./output_vehicle_cls/"
   device: "gpu"
   save_interval: 1
   eval_during_train: True
@@ -51,11 +51,8 @@ Optimizer:
   name: Momentum
   momentum: 0.9
   lr:
-    name: MultiStepDecay
+    name: Cosine
     learning_rate: 0.01
-    milestones: [30, 60, 70, 80, 90, 100, 120, 140]
-    gamma: 0.5
-    verbose: False
     last_epoch: -1
   regularizer:
     name: 'L2'

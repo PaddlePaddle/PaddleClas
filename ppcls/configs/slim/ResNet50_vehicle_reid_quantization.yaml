@@ -2,18 +2,24 @@
 Global:
   checkpoints: null
   pretrained_model: null
-  output_dir: "./output_vehicle_reid/"
+  output_dir: "./output_vehicle_reid_pact/"
   device: "gpu"
   save_interval: 1
   eval_during_train: True
   eval_interval: 1
-  epochs: 160
+  epochs: 40
   print_batch_step: 10
   use_visualdl: False
   # used for static mode and model export
   image_shape: [3, 224, 224]
   save_inference_dir: "./inference"
   eval_mode: "retrieval"
+
+# for quantizaiton or prune model
+Slim:
+  ## for prune
+  quant:
+    name: pact
 
 # model architecture
 Arch:
@@ -53,7 +59,7 @@ Optimizer:
   momentum: 0.9
   lr:
     name: Cosine
-    learning_rate: 0.01
+    learning_rate: 0.001
     last_epoch: -1
   regularizer:
     name: 'L2'
@@ -90,7 +96,7 @@ DataLoader:
 
     sampler:
         name: DistributedRandomIdentitySampler
-        batch_size: 128
+        batch_size: 64
         num_instances: 2
         drop_last: False
         shuffle: True
