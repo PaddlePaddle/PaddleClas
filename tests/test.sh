@@ -325,9 +325,7 @@ function func_serving(){
     set_serving_server=$(func_set_params "${serving_server_key}" "${serving_server_value}")
     set_serving_client=$(func_set_params "${serving_client_key}" "${serving_client_value}")
     trans_model_cmd="${python} ${trans_model_py} ${set_dirname} ${set_model_filename} ${set_params_filename} ${set_serving_server} ${set_serving_client}"
-    cd ${serving_dir_value}
-    #eval $trans_model_cmd
-    #exit  
+    cd ${serving_dir_value}  
     echo $PWD
     unset https_proxy
     unset http_proxy
