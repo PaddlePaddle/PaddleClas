@@ -35,7 +35,7 @@ Optimizer:
   lr:
     name: Piecewise
     decay_epochs: [30, 60, 90]
-    values: [0.1, 0.01, 0.001, 0.0001]
+    values: [0.01, 0.001, 0.0001, 0.00001]
   regularizer:
     name: 'L2'
     coeff: 0.0001
