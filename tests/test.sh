@@ -1,6 +1,5 @@
 #!/bin/bash
 FILENAME=$1
-
 # MODE be one of ['lite_train_infer' 'whole_infer' 'whole_train_infer', 'infer', 'cpp_infer', "serving_infer"] 
 MODE=$2
 
@@ -186,8 +185,6 @@ if [ ${MODE} = "serving_infer" ]; then
     web_precision_list=$(func_parser_value "${lines[73]}")
     pipeline_py=$(func_parser_value "${lines[74]}")
 fi
-
-
 
 LOG_PATH="./tests/output"
 mkdir -p ${LOG_PATH}
@@ -431,9 +428,6 @@ elif [ ${MODE} = "cpp_infer" ]; then
     func_cpp_inference "./cpp/build/clas_system" "../${LOG_PATH}" "${infer_img_dir}"
     cd ..
 
-
-
-
 elif [ ${MODE} = "serving_infer" ]; then
     GPUID=$3
     if [ ${#GPUID} -le 0 ];then
@@ -561,4 +555,3 @@ else
         done      # done with:    for autocast in ${autocast_list[*]}; do 
     done          # done with:    for gpu in ${gpu_list[*]}; do
 fi  # end if [ ${MODE} = "infer" ]; then
-
