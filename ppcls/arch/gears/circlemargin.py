@@ -26,20 +26,19 @@ class CircleMargin(nn.Layer):
         self.embedding_size = embedding_size
         self.class_num = class_num
 
-        weight_attr = paddle.ParamAttr(
-            initializer=paddle.nn.initializer.XavierNormal())
-        self.fc = paddle.nn.Linear(
-            self.embedding_size, self.class_num, weight_attr=weight_attr)
+        self.weight = self.create_parameter(
+            shape=[self.embedding_size, self.class_num],
+            is_bias=False,
+            default_initializer=paddle.nn.initializer.XavierNormal())
 
     def forward(self, input, label):
         feat_norm = paddle.sqrt(
             paddle.sum(paddle.square(input), axis=1, keepdim=True))
         input = paddle.divide(input, feat_norm)
 
-        weight = self.fc.weight
         weight_norm = paddle.sqrt(
-            paddle.sum(paddle.square(weight), axis=0, keepdim=True))
-        weight = paddle.divide(weight, weight_norm)
+            paddle.sum(paddle.square(self.weight), axis=0, keepdim=True))
+        weight = paddle.divide(self.weight, weight_norm)
 
         logits = paddle.matmul(input, weight)
         if not self.training or label is None:
@@ -49,9 +48,9 @@ class CircleMargin(nn.Layer):
         alpha_n = paddle.clip(logits.detach() + self.margin, min=0.)
         delta_p = 1 - self.margin
         delta_n = self.margin
-        
+
         m_hot = F.one_hot(label.reshape([-1]), num_classes=logits.shape[1])
-        
+
         logits_p = alpha_p * (logits - delta_p)
         logits_n = alpha_n * (logits - delta_n)
         pre_logits = logits_p * m_hot + logits_n * (1 - m_hot)

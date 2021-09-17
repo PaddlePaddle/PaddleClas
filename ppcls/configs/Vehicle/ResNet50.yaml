@@ -51,12 +51,8 @@ Optimizer:
   name: Momentum
   momentum: 0.9
   lr:
-    name: MultiStepDecay
+    name: Cosine
     learning_rate: 0.01
-    milestones: [30, 60, 70, 80, 90, 100, 120, 140]
-    gamma: 0.5
-    verbose: False
-    last_epoch: -1
   regularizer:
     name: 'L2'
     coeff: 0.0005

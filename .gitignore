@@ -3,10 +3,11 @@ __pycache__/
 *.sw*
 */workerlog*
 checkpoints/
-output/
+output*/
 pretrained/
 .ipynb_checkpoints/
 *.ipynb*
 _build/
 build/
+log/
 nohup.out
