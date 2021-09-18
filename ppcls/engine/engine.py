@@ -20,6 +20,8 @@ import paddle
 import paddle.distributed as dist
 from visualdl import LogWriter
 from paddle import nn
+import numpy as np
+import random
 
 from ppcls.utils.check import check_gpu
 from ppcls.utils.misc import AverageMeter
@@ -42,6 +44,7 @@ from ppcls.data import create_operators
 from ppcls.engine.train import train_epoch
 from ppcls.engine import evaluation
 from ppcls.arch.gears.identity_head import IdentityHead
+from ppcls.engine.slim import get_pruner, get_quaner
 
 
 class Engine(object):
@@ -55,6 +58,14 @@ class Engine(object):
             self.is_rec = True
         else:
             self.is_rec = False
+
+        # set seed
+        seed = self.config["Global"].get("seed", False)
+        if seed:
+            assert isinstance(seed, int), "The 'seed' must be a integer!"
+            paddle.seed(seed)
+            np.random.seed(seed)
+            random.seed(seed)
 
         # init logger
         self.output_dir = self.config['Global']['output_dir']
@@ -182,12 +193,14 @@ class Engine(object):
                     self.model, self.config["Global"]["pretrained_model"])
 
         # for slim
+        self.pruner = get_pruner(self.config, self.model)
+        self.quanter = get_quaner(self.config, self.model)
 
         # build optimizer
         if self.mode == 'train':
             self.optimizer, self.lr_sch = build_optimizer(
                 self.config["Optimizer"], self.config["Global"]["epochs"],
-                len(self.train_dataloader), self.model.parameters())
+                len(self.train_dataloader), [self.model])
 
         # for distributed
         self.config["Global"][
@@ -333,6 +346,8 @@ class Engine(object):
                 out = self.model(batch_tensor)
                 if isinstance(out, list):
                     out = out[0]
+                if isinstance(out, dict):
+                    out = out["output"]
                 result = self.postprocess_func(out, image_file_list)
                 print(result)
                 batch_data.clear()
@@ -346,18 +361,26 @@ class Engine(object):
                                   self.config["Global"]["pretrained_model"])
 
         model.eval()
-
-        model = paddle.jit.to_static(
-            model,
-            input_spec=[
-                paddle.static.InputSpec(
-                    shape=[None] + self.config["Global"]["image_shape"],
-                    dtype='float32')
-            ])
-        paddle.jit.save(
-            model,
-            os.path.join(self.config["Global"]["save_inference_dir"],
-                         "inference"))
+        save_path = os.path.join(self.config["Global"]["save_inference_dir"],
+                                 "inference")
+        if self.quanter:
+            self.quanter.save_quantized_model(
+                model,
+                save_path,
+                input_spec=[
+                    paddle.static.InputSpec(
+                        shape=[None] + self.config["Global"]["image_shape"],
+                        dtype='float32')
+                ])
+        else:
+            model = paddle.jit.to_static(
+                model,
+                input_spec=[
+                    paddle.static.InputSpec(
+                        shape=[None] + self.config["Global"]["image_shape"],
+                        dtype='float32')
+                ])
+            paddle.jit.save(model, save_path)
 
 
 class ExportModel(nn.Layer):

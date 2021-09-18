@@ -46,8 +46,8 @@
 
 本章节demo数据下载地址如下: [数据下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/data/recognition_demo_data_v1.1.tar)。
 
-
 **注意**
+
 1. windows 环境下如果没有安装wget,可以按照下面的步骤安装wget与tar命令，也可以在，下载模型时将链接复制到浏览器中下载，并解压放置在相应目录下；linux或者macOS用户可以右键点击，然后复制下载链接，即可通过`wget`命令下载。
 2. 如果macOS环境下没有安装`wget`命令，可以运行下面的命令进行安装。
 
@@ -74,8 +74,8 @@ cd ..
 wget {数据下载链接地址} && tar -xf {压缩包的名称}
 ```
 
-
 <a name="下载、解压inference_模型与demo数据"></a>
+
 ### 2.1 下载、解压inference 模型与demo数据
 
 以商品识别为例，下载demo数据集以及通用检测、识别模型，命令如下。
@@ -90,13 +90,13 @@ wget https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/infere
 
 cd ../
 # 下载demo数据并解压
-wget https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/data/recognition_demo_data_v1.0.tar && tar -xf recognition_demo_data_v1.0.tar
+wget https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/data/recognition_demo_data_v1.1.tar && tar -xf recognition_demo_data_v1.1.tar
 ```
 
-解压完毕后，`recognition_demo_data_v1.0`文件夹下应有如下文件结构：
+解压完毕后，`recognition_demo_data_v1.1`文件夹下应有如下文件结构：
 
 ```
-├── recognition_demo_data_v1.0
+├── recognition_demo_data_v1.1
 │   ├── gallery_cartoon
 │   ├── gallery_logo
 │   ├── gallery_product
@@ -129,11 +129,19 @@ wget https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/data/recognit
 
 以商品识别demo为例，展示识别与检索过程（如果希望尝试其他方向的识别与检索效果，在下载解压好对应的demo数据与模型之后，替换对应的配置文件即可完成预测）。
 
+注意，此部分使用了`faiss`作为检索库，安装方法如下：
+
+```python
+pip install faiss-cpu==1.7.1post2
+```
+
+若使用时，不能正常引用，则`uninstall` 之后，重新`install`，尤其是windows下。
 
 <a name="识别单张图像"></a>
+
 #### 2.2.1 识别单张图像
 
-运行下面的命令，对图像`./recognition_demo_data_v1.0/test_product/daoxiangcunjinzhubing_6.jpg`进行识别与检索
+运行下面的命令，对图像`./recognition_demo_data_v1.1/test_product/daoxiangcunjinzhubing_6.jpg`进行识别与检索
 
 ```shell
 # 使用下面的命令使用GPU进行预测
@@ -141,8 +149,6 @@ python3.7 python/predict_system.py -c configs/inference_product.yaml
 # 使用下面的命令使用CPU进行预测
 python3.7 python/predict_system.py -c configs/inference_product.yaml -o Global.use_gpu=False
 ```
-
-注意：这里使用了默认编译生成的库文件进行特征索引，如果与您的环境不兼容，导致程序报错，可以参考[向量检索教程](../../../deploy/vector_search/README.md)重新编译库文件。
 
 待检索图像如下所示。
 
@@ -173,7 +179,7 @@ python3.7 python/predict_system.py -c configs/inference_product.yaml -o Global.u
 
 ```shell
 # 使用下面的命令使用GPU进行预测，如果希望使用CPU预测，可以在命令后面添加-o Global.use_gpu=False
-python3.7 python/predict_system.py -c configs/inference_product.yaml -o Global.infer_imgs="./recognition_demo_data_v1.0/test_product/"
+python3.7 python/predict_system.py -c configs/inference_product.yaml -o Global.infer_imgs="./recognition_demo_data_v1.1/test_product/"
 ```
 
 终端中会输出该文件夹内所有图像的识别结果，如下所示。
@@ -193,17 +199,17 @@ python3.7 python/predict_system.py -c configs/inference_product.yaml -o Global.i
 所有图像的识别结果可视化图像也保存在`output`文件夹内。
 
 
-更多地，可以通过修改`Global.rec_inference_model_dir`字段来更改识别inference模型的路径，通过修改`IndexProcess.index_path`字段来更改索引库索引的路径。
-
+更多地，可以通过修改`Global.rec_inference_model_dir`字段来更改识别inference模型的路径，通过修改`IndexProcess.index_dir`字段来更改索引库索引的路径。
 
 <a name="未知类别的图像识别体验"></a>
+
 ## 3. 未知类别的图像识别体验
 
-对图像`./recognition_demo_data_v1.0/test_product/anmuxi.jpg`进行识别，命令如下
+对图像`./recognition_demo_data_v1.1/test_product/anmuxi.jpg`进行识别，命令如下
 
 ```shell
 # 使用下面的命令使用GPU进行预测，如果希望使用CPU预测，可以在命令后面添加-o Global.use_gpu=False
-python3.7 python/predict_system.py -c configs/inference_product.yaml -o Global.infer_imgs="./recognition_demo_data_v1.0/test_product/anmuxi.jpg"
+python3.7 python/predict_system.py -c configs/inference_product.yaml -o Global.infer_imgs="./recognition_demo_data_v1.1/test_product/anmuxi.jpg"
 ```
 
 待检索图像如下所示。
@@ -222,20 +228,20 @@ python3.7 python/predict_system.py -c configs/inference_product.yaml -o Global.i
 <a name="准备新的数据与标签"></a>
 ### 3.1 准备新的数据与标签
 
-首先需要将与待检索图像相似的图像列表拷贝到索引库原始图像的文件夹(`./recognition_demo_data_v1.0/gallery_product/gallery`)中，运行下面的命令拷贝相似图像。
+首先需要将与待检索图像相似的图像列表拷贝到索引库原始图像的文件夹(`./recognition_demo_data_v1.1/gallery_product/gallery`)中，运行下面的命令拷贝相似图像。
 
 ```shell
-cp -r  ../docs/images/recognition/product_demo/gallery/anmuxi ./recognition_demo_data_v1.0/gallery_product/gallery/
+cp -r  ../docs/images/recognition/product_demo/gallery/anmuxi ./recognition_demo_data_v1.1/gallery_product/gallery/
 ```
 
-然后需要编辑记录了图像路径和标签信息的文本文件(`./recognition_demo_data_v1.0/gallery_product/data_file_update.txt`)，这里基于原始标签文件，新建一个文件。命令如下。
+然后需要编辑记录了图像路径和标签信息的文本文件(`./recognition_demo_data_v1.1/gallery_product/data_file_update.txt`)，这里基于原始标签文件，新建一个文件。命令如下。
 
 ```shell
 # 复制文件
-cp recognition_demo_data_v1.0/gallery_product/data_file.txt recognition_demo_data_v1.0/gallery_product/data_file_update.txt
+cp recognition_demo_data_v1.1/gallery_product/data_file.txt recognition_demo_data_v1.1/gallery_product/data_file_update.txt
 ```
 
-然后在文件`recognition_demo_data_v1.0/gallery_product/data_file_update.txt`中添加以下的信息，
+然后在文件`recognition_demo_data_v1.1/gallery_product/data_file_update.txt`中添加以下的信息，
 
 ```
 gallery/anmuxi/001.jpg	安慕希酸奶
@@ -255,20 +261,20 @@ gallery/anmuxi/006.jpg	安慕希酸奶
 使用下面的命令构建index索引，加速识别后的检索过程。
 
 ```shell
-python3.7 python/build_gallery.py -c configs/build_product.yaml -o IndexProcess.data_file="./recognition_demo_data_v1.0/gallery_product/data_file_update.txt" -o IndexProcess.index_path="./recognition_demo_data_v1.0/gallery_product/index_update"
+python3.7 python/build_gallery.py -c configs/build_product.yaml -o IndexProcess.data_file="./recognition_demo_data_v1.1/gallery_product/data_file_update.txt" -o IndexProcess.index_dir="./recognition_demo_data_v1.1/gallery_product/index_update"
 ```
 
-最终新的索引信息保存在文件夹`./recognition_demo_data_v1.0/gallery_product/index_update`中。
-
+最终新的索引信息保存在文件夹`./recognition_demo_data_v1.1/gallery_product/index_update`中。
 
 <a name="基于新的索引库的图像识别"></a>
+
 ### 3.3 基于新的索引库的图像识别
 
 使用新的索引库，对上述图像进行识别，运行命令如下。
 
 ```shell
 # 使用下面的命令使用GPU进行预测，如果希望使用CPU预测，可以在命令后面添加-o Global.use_gpu=False
-python3.7 python/predict_system.py -c configs/inference_product.yaml -o Global.infer_imgs="./recognition_demo_data_v1.0/test_product/anmuxi.jpg" -o IndexProcess.index_path="./recognition_demo_data_v1.0/gallery_product/index_update"
+python3.7 python/predict_system.py -c configs/inference_product.yaml -o Global.infer_imgs="./recognition_demo_data_v1.1/test_product/anmuxi.jpg" -o IndexProcess.index_dir="./recognition_demo_data_v1.1/gallery_product/index_update"
 ```
 
 输出结果如下。

@@ -142,7 +142,8 @@ class MobileNetV3(TheseusLayer):
                  inplanes=STEM_CONV_NUMBER,
                  class_squeeze=LAST_SECOND_CONV_LARGE,
                  class_expand=LAST_CONV,
-                 dropout_prob=0.2):
+                 dropout_prob=0.2,
+                 return_patterns=None):
         super().__init__()
 
         self.cfg = config
@@ -162,7 +163,7 @@ class MobileNetV3(TheseusLayer):
             if_act=True,
             act="hardswish")
 
-        self.blocks = nn.Sequential(*[
+        self.blocks = nn.Sequential(* [
             ResidualUnit(
                 in_c=_make_divisible(self.inplanes * self.scale if i == 0 else
                                      self.cfg[i - 1][2] * self.scale),
@@ -199,6 +200,9 @@ class MobileNetV3(TheseusLayer):
         self.flatten = nn.Flatten(start_axis=1, stop_axis=-1)
 
         self.fc = Linear(self.class_expand, class_num)
+        if return_patterns is not None:
+            self.update_res(return_patterns)
+            self.register_forward_post_hook(self._return_dict_hook)
 
     def forward(self, x):
         x = self.conv(x)

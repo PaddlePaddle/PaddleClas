@@ -7,7 +7,7 @@
 飞桨图像识别套件PaddleClas是飞桨为工业界和学术界所准备的一个图像识别任务的工具集，助力使用者训练出更好的视觉模型和应用落地。
 
 **近期更新**
-
+- 2021.09.17 增加PaddleClas自研PP-LCNet系列模型, 这些模型在Intel CPU上有较强的竞争力。相关指标和预训练权重可以从 [这里](docs/zh_CN/ImageNet_models.md)下载。
 - 2021.08.11 更新7个[FAQ](docs/zh_CN/faq_series/faq_2021_s2.md)。
 - 2021.06.29 添加Swin-transformer系列模型，ImageNet1k数据集上Top1 acc最高精度可达87.2%；支持训练预测评估与whl包部署，预训练模型可以从[这里](docs/zh_CN/models/models_intro.md)下载。
 - 2021.06.22,23,24 PaddleClas官方研发团队带来技术深入解读三日直播课。课程回放：[https://aistudio.baidu.com/aistudio/course/introduce/24519](https://aistudio.baidu.com/aistudio/course/introduce/24519)
