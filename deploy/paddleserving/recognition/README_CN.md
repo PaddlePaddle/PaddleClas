@@ -113,7 +113,8 @@ fetch_var {
 接下来，下载并解压已经构建后的商品库index
 ```
 cd ../
-wget https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/data/recognition_demo_data_v1.1.tar && tar -xf recognition_demo_data_v1.1.tar
+wget https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/data/recognition_demo_data_v1.1.tar
+tar -xf recognition_demo_data_v1.1.tar
 ```
 
 
