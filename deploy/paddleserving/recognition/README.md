@@ -56,6 +56,7 @@ PaddleClas operating environment and PaddleServing operating environment are nee
 <a name="model-conversion"></a>
 ## Model conversion
 When using PaddleServing for service deployment, you need to convert the saved inference model into a serving model that is easy to deploy.
+The following assumes that the current working directory is the PaddleClas root directory
 
 Firstly, download the inference model of ResNet50_vd
 ```
@@ -92,7 +93,6 @@ After the ResNet50_vd inference model is converted, there will be additional fol
 Once you have the model file for deployment, you need to change the alias name in `serving_server_conf.prototxt`:  change `alias_name` in `fetch_var` to `features`,
 The modified serving_server_conf.prototxt file is as follows:
 ```
-```
 feed_var {
   name: "x"
   alias_name: "x"
@@ -110,7 +110,13 @@ fetch_var {
   shape: -1
 }
 ```
+
+Next，download and unpack the built index of product gallery
 ```
+cd ../
+wget https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/data/recognition_demo_data_v1.1.tar && tar -xf recognition_demo_data_v1.1.tar
+```
+
 
 <a name="paddle-serving-pipeline-deployment"></a>
 ## Paddle Serving pipeline deployment
