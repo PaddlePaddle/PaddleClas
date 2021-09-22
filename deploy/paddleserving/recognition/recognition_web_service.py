@@ -39,7 +39,7 @@ class RecogOp(Op):
         assert os.path.exists(os.path.join(
             index_dir, "id_map.pkl")), "id_map.pkl not found ... "
         
-        self.Searcher = faiss.read_index(
+        self.searcher = faiss.read_index(
             os.path.join(index_dir, "vector.index"))
                 
         with open(os.path.join(index_dir, "id_map.pkl"), "rb") as fd:
@@ -62,7 +62,7 @@ class RecogOp(Op):
         score_list = fetch_dict["features"]
         
         return_top_k = 1
-        scores, docs = self.Searcher.search(score_list,  return_top_k)  
+        scores, docs = self.searcher.search(score_list,  return_top_k)  
 
         result = {}
         result["label"] = self.id_map[docs[0][0]].split()[1]
