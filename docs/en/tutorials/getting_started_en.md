@@ -20,7 +20,7 @@ python tools/train.py \
 ```
 
 Among them, `-c` is used to specify the path of the configuration file, `-o` is used to specify the parameters needed to be modified or added, `-o Arch.pretrained=False` means to not using pre-trained models.
-`-o Global.device=gpu` means to use GPU for training. If you want to use the CPU for training, you need to set `Global.device` to `False`.
+`-o Global.device=gpu` means to use GPU for training. If you want to use the CPU for training, you need to set `Global.device` to `cpu`.
 
 
 Of course, you can also directly modify the configuration file to update the configuration. For specific configuration parameters, please refer to [Configuration Document](config_description_en.md).
@@ -59,7 +59,7 @@ python tools/train.py \
     -o Global.device=gpu
 ```
 
-Among them, `-o Arch.pretrained` is used to set the address to load the pretrained weights. When using it, you need to replace it with your own pretrained weights' path, or you can modify the path directly in the configuration file.
+Among them, `-o Arch.pretrained` is used to set the address to load the pretrained weights. When using it, you need to replace it with your own pretrained weights' path, or you can modify the path directly in the configuration file. You can also set it into `True` to use pretrained weights that trained in ImageNet1k.
 
 We also provide a lot of pre-trained models trained on the ImageNet-1k dataset. For the model list and download address, please refer to the [model library overview](../models/models_intro_en.md).
 
@@ -210,7 +210,7 @@ python3 tools/export_model.py \
     -o Global.pretrained_model=output/MobileNetV3_large_x1_0/best_model
 ```
 
-Among them,  `Global.pretrained_model` parameter is used to specify the model file path.
+Among them,  `Global.pretrained_model` parameter is used to specify the model file path that does not need to include the file suffix name.
 
 The above command will generate the model structure file (`inference.pdmodel`) and the model weight file (`inference.pdiparams`), and then the inference engine can be used for inference:
 
@@ -220,7 +220,7 @@ Go to the deploy directory:
 cd deploy
 ```
 
-Execute the command to inference. Cause the default value of `class_id_map_file` is the mapping file of the ImageNet dataset, we set it to `None` here.
+Using inference engine to inference. Because the mapping file of ImageNet1k dataset is used by default, we should set `PostProcess.Topk.class_id_map_file` into `None`.
 
 ```bash
 python3 python/predict_cls.py \
@@ -234,11 +234,9 @@ Among them:
 + `Global.inference_model_dir`: Model structure file path, such as `../inference/inference.pdmodel`;
 + `Global.use_tensorrt`: Whether to use the TesorRT, default by `False`;
 + `Global.use_gpu`: Whether to use the GPU, default by `True`
-+ `Global.enable_mkldnn`: Wheter to use `MKL-DNN`, default by `False`. When both `Global.use_gpu` and `enable_mkldnn` are set to `True`, GPU is used to run and `enable_mkldnn` will be ignored.
++ `Global.enable_mkldnn`: Wheter to use `MKL-DNN`, default by `False`. It is valid when `Global.use_gpu` is `False`.
 + `Global.use_fp16`: Whether to enable FP16, default by `False`;
 
 **Note**: If you want to use `Transformer series models`, such as `DeiT_***_384`, `ViT_***_384`, etc., please pay attention to the input size of model, and need to set `resize_short=384`, `resize=384`.
 
 If you want to evaluate the speed of the model, it is recommended to enable TensorRT to accelerate for GPU, and MKL-DNN for CPU.
-
-
