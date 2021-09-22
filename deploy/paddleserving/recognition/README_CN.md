@@ -52,7 +52,8 @@
 <a name="模型转换"></a>
 ## 模型转换
 
-使用PaddleServing做服务化部署时，需要将保存的inference模型转换为serving易于部署的模型.
+使用PaddleServing做服务化部署时，需要将保存的inference模型转换为serving易于部署的模型。
+
 以下内容假定当前工作目录为PaddleClas根目录。
 
 首先，下载商品识别的inference模型
