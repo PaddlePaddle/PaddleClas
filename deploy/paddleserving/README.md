@@ -4,7 +4,7 @@
 
 PaddleClas provides two service deployment methods:
 - Based on **PaddleHub Serving**: Code path is "`./deploy/hubserving`". Please refer to the [tutorial](../../deploy/hubserving/readme_en.md)
-- Based on **PaddleServing**: Code path is "`./deploy/paddleserving`".  if you prefer retrieval_based image reocognition service, please refer to [document](./recognition/README.md)，if you'd like image classification service, Please follow this tutorial.
+- Based on **PaddleServing**: Code path is "`./deploy/paddleserving`".  if you prefer retrieval_based image reocognition service, please refer to [tutorial](./recognition/README.md)，if you'd like image classification service, Please follow this tutorial.
 
 # Image Classification Service deployment based on PaddleServing  
 
