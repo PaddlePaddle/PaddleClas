@@ -1,8 +1,6 @@
-# PaddleClas 服务化部署
+# 基于PaddleServing的商品识别服务部署
 
 ([English](./README.md)|简体中文)
-
-# 基于PaddleServing的商品识别服务部署
 
 本文以商品识别为例，介绍如何使用[PaddleServing](https://github.com/PaddlePaddle/Serving/blob/develop/README_CN.md)工具部署PaddleClas动态图模型的pipeline在线服务。
 
@@ -54,7 +52,7 @@
 <a name="模型转换"></a>
 ## 模型转换
 
-使用PaddleServing做服务化部署时，需要将保存的inference模型转换为serving易于部署的模型。
+使用PaddleServing做服务化部署时，需要将保存的inference模型转换为serving易于部署的模型。 以下内容假定当前工作目录为PaddleClas根目录。
 
 首先，下载商品识别的inference模型
 ```
@@ -62,8 +60,8 @@ cd deploy
 
 # 下载并解压商品识别模型
 wget -P models/ https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/inference/product_ResNet50_vd_aliproduct_v1.0_infer.tar
-tar -xf product_ResNet50_vd_aliproduct_v1.0_infer.tar
 cd models
+tar -xf product_ResNet50_vd_aliproduct_v1.0_infer.tar
 ```
 
 接下来，用安装的paddle_serving_client把下载的inference模型转换成易于server部署的模型格式。
@@ -110,7 +108,7 @@ fetch_var {
 }
 ```
 
-接下来，下载并解压商品库index，关于如何构建index请参照[链接]
+接下来，下载并解压已经构建后的商品库index
 ```
 cd ../
 wget https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/data/recognition_demo_data_v1.1.tar && tar -xf recognition_demo_data_v1.1.tar
@@ -126,7 +124,7 @@ wget https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/data/recognit
     git clone https://github.com/PaddlePaddle/PaddleClas
 
     # 进入到工作目录
-    cd PaddleClas/deploy/paddleserving/
+    cd PaddleClas/deploy/paddleserving/recognition
     ```
     paddleserving目录包含启动pipeline服务和发送预测请求的代码，包括：
     ```
@@ -143,14 +141,14 @@ wget https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/data/recognit
     python3 recognition_web_service.py &>log.txt &
     ```
     成功启动服务后，log.txt中会打印类似如下日志
-    ![](./imgs/start_server_recog.png)
+    ![](../imgs/start_server_recog.png)
 
 3. 发送服务请求：
     ```
     python3 pipeline_http_client.py
     ```
     成功运行后，模型预测的结果会打印在cmd窗口中，结果示例为：
-    ![](./imgs/results_recog.png)
+    ![](../imgs/results_recog.png)
 
     调整 config.yml 中的并发个数可以获得最大的QPS
     ```

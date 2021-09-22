@@ -44,14 +44,11 @@ class RecogOp(Op):
                 
         with open(os.path.join(index_dir, "id_map.pkl"), "rb") as fd:
             self.id_map = pickle.load(fd)
-        print("init done!!!!!!")
 
     def preprocess(self, input_dicts, data_id, log_id):
-        print("1111111111")
         (_, input_dict), = input_dicts.items()
         batch_size = len(input_dict.keys())
         imgs = []
-        print("222222222")
         for key in input_dict.keys():
             data = base64.b64decode(input_dict[key].encode('utf8'))
             data = np.fromstring(data, np.uint8)
@@ -62,31 +59,21 @@ class RecogOp(Op):
         return {"x": input_imgs}, False, None, ""
 
     def postprocess(self, input_dicts, fetch_dict, log_id):
-        """
-        get feature and do retrieval
-        """
-        print("333333333")
         score_list = fetch_dict["features"]
-        print(score_list.shape)   #it is an array, print the shape (1, 512)
         
-        #search
-        scores, docs = self.Searcher.search(score_list,  1)
-        print(scores.shape)  # 1 * 1
-        print(docs.shape)    # 1 * 1
-            
-        # just top-1 result will be returned for the final
+        return_top_k = 1
+        scores, docs = self.Searcher.search(score_list,  return_top_k)  
+
         result = {}
         result["label"] = self.id_map[docs[0][0]].split()[1]
-        
-        #add result
+        result["dist"] = str(scores[0][0])
         return result, None, ""
 
-        
 class ProductRecognitionService(WebService):
     def get_pipeline_response(self, read_op):
         image_op = RecogOp(name="recog", input_ops=[read_op])
         return image_op
 
-uci_service = ProductRecognitionService(name="productrecog")
+uci_service = ProductRecognitionService(name="recog_service")
 uci_service.prepare_pipeline_config("config.yml")
 uci_service.run_service()

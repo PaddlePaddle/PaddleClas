@@ -62,8 +62,8 @@ Firstly, download the inference model of ResNet50_vd
 cd deploy
 # Download and unzip the ResNet50_vd model
 wget -P models/ https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/inference/product_ResNet50_vd_aliproduct_v1.0_infer.tar
-tar -xf product_ResNet50_vd_aliproduct_v1.0_infer.tar
 cd models
+tar -xf product_ResNet50_vd_aliproduct_v1.0_infer.tar
 ```
 
 Then, you can use installed paddle_serving_client tool to convert inference model to mobile model.
@@ -120,7 +120,7 @@ fetch_var {
     git clone https://github.com/PaddlePaddle/PaddleClas
 
     # Enter the working directory  
-    cd PaddleClas/deploy/paddleserving/
+    cd PaddleClas/deploy/paddleserving/recognition
     ```
 
     The paddleserving directory contains the code to start the pipeline service and send prediction requests, including:
@@ -129,23 +129,23 @@ fetch_var {
     config.yml                # configuration file of starting the service
     pipeline_http_client.py   # script to send pipeline prediction request by http
     pipeline_rpc_client.py    # script to send pipeline prediction request by rpc
-    resnet50_web_service.py   # start the script of the pipeline server
+    recognition_web_service.py   # start the script of the pipeline server
     ```
 
 2. Run the following command to start the service.
     ```
     # Start the service and save the running log in log.txt
-    python3 classification_web_service.py &>log.txt &
+    python3 recognition_web_service.py &>log.txt &
     ```
     After the service is successfully started, a log similar to the following will be printed in log.txt
-    ![](./imgs/start_server.png)
+    ![](../imgs/start_server_recog.png)
 
 3. Send service request
     ```
     python3 pipeline_http_client.py
     ```
     After successfully running, the predicted result of the model will be printed in the cmd window. An example of the result is:
-    ![](./imgs/results.png)  
+    ![](../imgs/results_recog.png)  
 
     Adjust the number of concurrency in config.yml to get the largest QPS. 
 
