@@ -4,7 +4,7 @@
 
 PaddleClas提供2种服务部署方式：
 - 基于PaddleHub Serving的部署：代码路径为"`./deploy/hubserving`"，使用方法参考[文档](../../deploy/hubserving/readme.md)；
-- 基于PaddleServing的部署：代码路径为"`./deploy/paddleserving`"， 基于检索方式的图像识别服务参考[文档]（./recognition/README_CN.md）， 图像分类服务按照本教程使用。
+- 基于PaddleServing的部署：代码路径为"`./deploy/paddleserving`"， 基于检索方式的图像识别服务参考[文档](./recognition/README_CN.md)， 图像分类服务按照本教程使用。
 
 # 基于PaddleServing的图像分类服务部署
 
