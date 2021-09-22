@@ -4,9 +4,9 @@
 
 PaddleClas provides two service deployment methods:
 - Based on **PaddleHub Serving**: Code path is "`./deploy/hubserving`". Please refer to the [tutorial](../../deploy/hubserving/readme_en.md)
-- Based on **PaddleServing**: Code path is "`./deploy/paddleserving`". Please follow this tutorial.
+- Based on **PaddleServing**: Code path is "`./deploy/paddleserving`".  if you prefer retrieval_based image reocognition service, please refer to [document](./recognition/README.md)，if you'd like image classification service, Please follow this tutorial.
 
-# Service deployment based on PaddleServing  
+# Image Classification Service deployment based on PaddleServing  
 
 This document will introduce how to use the [PaddleServing](https://github.com/PaddlePaddle/Serving/blob/develop/README.md) to deploy the ResNet50_vd model as a pipeline online service.
 
