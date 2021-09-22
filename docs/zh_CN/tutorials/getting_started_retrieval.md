@@ -117,7 +117,7 @@ python3 tools/train.py \
 
 其中，`-c`用于指定配置文件的路径，`-o`用于指定需要修改或者添加的参数，其中`-o Arch.Backbone.pretrained=True`表示Backbone部分使用预训练模型，此外，`Arch.Backbone.pretrained`也可以指定具体的模型权重文件的地址，使用时需要换成自己的预训练模型权重文件的路径。`-o Global.device=gpu`表示使用GPU进行训练。如果希望使用CPU进行训练，则需要将`Global.device`设置为`cpu`。
 
-更详细的训练配置，也可以直接修改模型对应的配置文件。具体配置参数参考[配置文档](config.md)。
+更详细的训练配置，也可以直接修改模型对应的配置文件。具体配置参数参考[配置文档](config_description.md)。
 
 运行上述命令，可以看到输出日志，示例如下：
 
