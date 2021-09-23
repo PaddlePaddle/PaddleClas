@@ -48,50 +48,59 @@ class PKSampler(DistributedBatchSampler):
             "PKSampler configs error, Sample_per_id must be a divisor of batch_size."
         assert hasattr(self.dataset,
                        "labels"), "Dataset must have labels attribute."
-        self.sample_per_id = sample_per_id
+        self.sample_per_label = sample_per_id
         self.label_dict = defaultdict(list)
         self.sample_method = sample_method
+        for idx, label in enumerate(self.dataset.labels):
+            self.label_dict[label].append(idx)
+        self.label_list = list(self.label_dict)
+        assert len(self.label_list) * self.sample_per_label > self.batch_size, \
+            "batch size should be smaller than "
         if self.sample_method == "id_avg_prob":
-            for idx, label in enumerate(self.dataset.labels):
-                self.label_dict[label].append(idx)
-            self.id_list = list(self.label_dict)
+            self.prob_list = np.array([1 / len(self.label_list)] *
+                                      len(self.label_list))
         elif self.sample_method == "sample_avg_prob":
-            self.id_list = []
-            for idx, label in enumerate(self.dataset.labels):
-                self.label_dict[label].append(idx)
+            counter = []
+            for label_i in self.label_list:
+                counter.append(len(self.label_list[label_i]))
+            self.prob_list = np.array(counter) / sum(counter)
         else:
             logger.error(
                 "PKSampler only support id_avg_prob and sample_avg_prob sample method, "
                 "but receive {}.".format(self.sample_method))
+        if sum(np.abs(self.prob_list - 1) > 0.00000001):
+            self.prob_list[-1] = 1 - sum(self.prob_list[:-1])
+            if self.prob_list[-1] > 1 or self.prob_list[-1] < 0:
+                logger.error("PKSampler prob list error")
+            else:
+                logger.info(
+                    "PKSampler: sum of prob list not equal to 1, change the last prob"
+                )
 
     def __iter__(self):
+        label_per_batch = self.batch_size // self.sample_per_label
         if self.shuffle:
-            np.random.RandomState(self.epoch).shuffle(self.id_list)
-        id_list = self.id_list[self.local_rank * len(self.id_list) //
-                               self.nranks:(self.local_rank + 1) * len(
-                                   self.id_list) // self.nranks]
-        if self.sample_method == "id_avg_prob":
-            id_batch_num = len(id_list) * self.sample_per_id // self.batch_size
-            if id_batch_num < len(self):
-                id_list = id_list * (len(self) // id_batch_num + 1)
-            id_list = id_list[0:len(self)]
-
-        id_per_batch = self.batch_size // self.sample_per_id
+            np.random.RandomState(self.epoch).shuffle(self.label_list)
         for i in range(len(self)):
             batch_index = []
-            for label_id in id_list[i * id_per_batch:(i + 1) * id_per_batch]:
-                idx_label_list = self.label_dict[label_id]
-                if self.sample_per_id <= len(idx_label_list):
+            batch_label_list = np.random.sample(
+                self.label_list,
+                size=label_per_batch,
+                replace=False,
+                p=self.prob_list)
+            for label_i in batch_label_list:
+                label_i_indexes = self.label_dict[label_i]
+                if self.sample_per_label <= len(label_i_indexes):
                     batch_index.extend(
                         np.random.choice(
-                            idx_label_list,
-                            size=self.sample_per_id,
+                            label_i_indexes,
+                            size=self.sample_per_label,
                             replace=False))
                 else:
                     batch_index.extend(
                         np.random.choice(
-                            idx_label_list,
-                            size=self.sample_per_id,
+                            label_i_indexes,
+                            size=self.sample_per_label,
                             replace=True))
             if not self.drop_last or len(batch_index) == self.batch_size:
                 yield batch_index
