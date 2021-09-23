@@ -24,7 +24,7 @@ Arch:
   infer_add_softmax: False
 
   Backbone: 
-    name: LCNet_x2_5
+    name: PPLCNet_x2_5
     pretrained: True
     use_ssld: True
   BackboneStopLayer:
