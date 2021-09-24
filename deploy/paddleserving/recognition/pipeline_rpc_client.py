@@ -30,5 +30,5 @@ if __name__ == "__main__":
     image = cv2_to_base64(image_data)
 
     for i in range(1):
-        ret = client.predict(feed_dict={"image": image}, fetch=["label", "dist"])
+        ret = client.predict(feed_dict={"image": image}, fetch=["result"])
         print(ret)
