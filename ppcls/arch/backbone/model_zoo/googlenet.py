@@ -131,7 +131,7 @@ class GoogLeNetDY(nn.Layer):
         self._ince5b = Inception(
             832, 832, 384, 192, 384, 48, 128, 128, name="ince5b")
 
-        self._pool_5 = AvgPool2D(kernel_size=7, stride=7)
+        self._pool_5 = AdaptiveAvgPool2D(1)
 
         self._drop = Dropout(p=0.4, mode="downscale_in_infer")
         self._fc_out = Linear(
