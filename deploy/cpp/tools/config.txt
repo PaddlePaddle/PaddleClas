@@ -8,8 +8,8 @@ use_tensorrt 0
 use_fp16 0
 
 # cls config
-cls_model_path  /PaddleClas/inference/cls_infer.pdmodel
-cls_params_path /PaddleClas/inference/cls_infer.pdiparams
+cls_model_path  ./inference/inference.pdmodel
+cls_params_path ./inference/inference.pdiparams
 resize_short_size 256
 crop_size 224
 

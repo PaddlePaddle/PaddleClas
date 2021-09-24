@@ -26,9 +26,12 @@
 #include <fstream>
 #include <numeric>
 
+#include "cls.h"
+#include "cls_config.h"
+
+#ifdef WHOLE_CHAIN
 #include <auto_log/autolog.h>
-#include <include/cls.h>
-#include <include/cls_config.h>
+#endif
 
 using namespace std;
 using namespace cv;
@@ -92,10 +95,12 @@ int main(int argc, char **argv) {
     }
   }
 
+#ifdef WHOLE_CHAIN
   std::string presion = "fp32";
 
   if (config.use_fp16)
     presion = "fp16";
+
   if (config.benchmark) {
     AutoLogger autolog("Classification", config.use_gpu, config.use_tensorrt,
                        config.use_mkldnn, config.cpu_threads, 1,
@@ -103,5 +108,6 @@ int main(int argc, char **argv) {
                        img_files_list.size());
     autolog.report();
   }
+#endif
   return 0;
 }

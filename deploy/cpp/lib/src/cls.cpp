@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <include/cls.h>
+#include "cls.h"
 
 namespace PaddleClas {
 
@@ -94,13 +94,13 @@ double Classifier::Run(cv::Mat &img, std::vector<double> *times) {
 
   std::chrono::duration<float> preprocess_diff =
       preprocess_end - preprocess_start;
-  times->push_back(double(preprocess_diff.count() * 1000));
+  times->push_back(double(preprocess_diff.count()));
   std::chrono::duration<float> inference_diff = infer_end - infer_start;
-  double inference_cost_time = double(inference_diff.count() * 1000);
+  double inference_cost_time = double(inference_diff.count());
   times->push_back(inference_cost_time);
   std::chrono::duration<float> postprocess_diff =
       postprocess_end - postprocess_start;
-  times->push_back(double(postprocess_diff.count() * 1000));
+  times->push_back(double(postprocess_diff.count()));
 
   std::cout << "result: " << std::endl;
   std::cout << "\tclass id: " << maxPosition << std::endl;

@@ -28,7 +28,7 @@
 #include <math.h>
 #include <numeric>
 
-#include <include/preprocess_op.h>
+#include "preprocess_op.h"
 
 namespace PaddleClas {
 

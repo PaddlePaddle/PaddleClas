@@ -12,28 +12,35 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#pragma once
+
+#include <chrono>
+#include <iomanip>
 #include <iostream>
 #include <ostream>
+#include <stdlib.h>
 #include <vector>
 
-#include <include/utility.h>
+#include <algorithm>
+#include <cstring>
+#include <fstream>
+#include <numeric>
+
+#include "opencv2/core.hpp"
+#include "opencv2/imgcodecs.hpp"
+#include "opencv2/imgproc.hpp"
 
 namespace PaddleClas {
 
-std::vector<std::string> Utility::ReadDict(const std::string &path) {
-  std::ifstream in(path);
-  std::string line;
-  std::vector<std::string> m_vec;
-  if (in) {
-    while (getline(in, line)) {
-      m_vec.push_back(line);
-    }
-  } else {
-    std::cout << "no such label file: " << path << ", exit the program..."
-              << std::endl;
-    exit(1);
-  }
-  return m_vec;
-}
+class Utility {
+public:
+  static std::vector<std::string> ReadDict(const std::string &path);
+
+  //   template <class ForwardIterator>
+  //   inline static size_t argmax(ForwardIterator first, ForwardIterator last)
+  //   {
+  //     return std::distance(first, std::max_element(first, last));
+  //   }
+};
 
 } // namespace PaddleClas

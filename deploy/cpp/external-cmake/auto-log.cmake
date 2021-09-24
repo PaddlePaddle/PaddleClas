@@ -1,7 +1,7 @@
-find_package(Git REQUIRED)
-include(FetchContent)
+FIND_PACKAGE(Git REQUIRED)
+INCLUDE(FetchContent)
 
-set(FETCHCONTENT_BASE_DIR "${CMAKE_CURRENT_BINARY_DIR}/third-party")
+SET(FETCHCONTENT_BASE_DIR "${CMAKE_CURRENT_BINARY_DIR}/third-party")
 
 FetchContent_Declare(
   extern_Autolog
