@@ -62,7 +62,7 @@ class PKSampler(DistributedBatchSampler):
         elif self.sample_method == "sample_avg_prob":
             counter = []
             for label_i in self.label_list:
-                counter.append(len(self.label_list[label_i]))
+                counter.append(len(self.label_dict[label_i]))
             self.prob_list = np.array(counter) / sum(counter)
         else:
             logger.error(
@@ -83,7 +83,7 @@ class PKSampler(DistributedBatchSampler):
             np.random.RandomState(self.epoch).shuffle(self.label_list)
         for i in range(len(self)):
             batch_index = []
-            batch_label_list = np.random.sample(
+            batch_label_list = np.random.choice(
                 self.label_list,
                 size=label_per_batch,
                 replace=False,
