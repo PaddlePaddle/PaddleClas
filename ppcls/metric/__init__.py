@@ -19,6 +19,8 @@ from collections import OrderedDict
 from .metrics import TopkAcc, mAP, mINP, Recallk, Precisionk
 from .metrics import DistillationTopkAcc
 from .metrics import GoogLeNetTopkAcc
+from .metrics import HammingDistance, AccuracyScore
+
 
 class CombinedMetrics(nn.Layer):
     def __init__(self, config_list):
@@ -32,7 +34,8 @@ class CombinedMetrics(nn.Layer):
             metric_name = list(config)[0]
             metric_params = config[metric_name]
             if metric_params is not None:
-                self.metric_func_list.append(eval(metric_name)(**metric_params))
+                self.metric_func_list.append(
+                    eval(metric_name)(**metric_params))
             else:
                 self.metric_func_list.append(eval(metric_name)())
 
@@ -41,6 +44,7 @@ class CombinedMetrics(nn.Layer):
         for idx, metric_func in enumerate(self.metric_func_list):
             metric_dict.update(metric_func(*args, **kwargs))
         return metric_dict
+
 
 def build_metrics(config):
     metrics_list = CombinedMetrics(copy.deepcopy(config))

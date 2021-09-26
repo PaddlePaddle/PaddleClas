@@ -36,8 +36,8 @@ def train_epoch(trainer, epoch_id, print_batch_step):
                 paddle.to_tensor(batch[0]['label'])
             ]
         batch_size = batch[0].shape[0]
-        batch[1] = batch[1].reshape([-1, 1]).astype("int64")
-
+        if not trainer.config["Global"].get("use_multilabel", False):
+            batch[1] = batch[1].reshape([-1, 1]).astype("int64")
         trainer.global_step += 1
         # image input
         if trainer.amp:
