@@ -81,16 +81,20 @@ class DetOp(Op):
         boxes = self.img_postprocess(fetch_dict, visualize=False)
         boxes.sort(key = lambda x: x["score"], reverse = True)
         boxes = filter(lambda x: x["score"] >= self.threshold, boxes[:self.max_det_results])
-        result = json.dumps(list(boxes))
-        res_dict = {"bbox_result": result, "image": self.raw_img}    
+        boxes = list(boxes)
+        for i in range(len(boxes)):
+            boxes[i]["bbox"][2] += boxes[i]["bbox"][0] - 1
+            boxes[i]["bbox"][3] += boxes[i]["bbox"][1] - 1
+        result = json.dumps(boxes)
+        res_dict = {"bbox_result": result, "image": self.raw_img}
         return res_dict,  None,  ""
 
 class RecOp(Op):
     def init_op(self):
         self.seq = Sequential([
-            Resize(256), CenterCrop(224), RGB2BGR(), Transpose((2, 0, 1)),
+            BGR2RGB(), Resize((224, 224)), 
             Div(255), Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225],
-                                True)
+                                False), Transpose((2, 0, 1))
         ])
 
         index_dir = "../../recognition_demo_data_v1.1/gallery_product/index"
@@ -107,6 +111,8 @@ class RecOp(Op):
 
         self.rec_nms_thresold = 0.05
         self.rec_score_thres = 0.5
+        self.feature_normalize = True
+        self.return_k = 1
 
     def preprocess(self, input_dicts, data_id, log_id):
         (_, input_dict), = input_dicts.items()
@@ -125,7 +131,7 @@ class RecOp(Op):
         imgs = []
         for box in boxes:
             box = [int(x) for x in box["bbox"]]
-            im = origin_img[box[1]: box[1] + box[3], box[0]: box[0] + box[2]].copy()
+            im = origin_img[box[1]: box[3], box[0]: box[2]].copy()
             img = self.seq(im)
             imgs.append(img[np.newaxis, :].copy())
 
@@ -159,14 +165,20 @@ class RecOp(Op):
         return filtered_results
 
     def postprocess(self, input_dicts, fetch_dict, log_id):
-        score_list = fetch_dict["features"]
-        scores, docs = self.searcher.search(score_list,  1) 
+        batch_features = fetch_dict["features"]
+
+        if self.feature_normalize:
+            feas_norm = np.sqrt(
+                np.sum(np.square(batch_features), axis=1, keepdims=True))
+            batch_features = np.divide(batch_features, feas_norm)
+
+        scores, docs = self.searcher.search(batch_features,  self.return_k)
 
         results = []
         for i in range(scores.shape[0]):
             pred = {}
             if scores[i][0] >= self.rec_score_thres:
-                pred["bbox"] = self.det_boxes[i]["bbox"]
+                pred["bbox"] = [int(x) for x in self.det_boxes[i]["bbox"]]
                 pred["rec_docs"] = self.id_map[docs[i][0]].split()[1]
                 pred["rec_scores"] = scores[i][0]
                 results.append(pred)
