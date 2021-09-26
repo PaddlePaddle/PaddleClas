@@ -1,15 +1,8 @@
-# PaddleClas 服务化部署
+# 基于PaddleServing的商品识别服务部署
 
 ([English](./README.md)|简体中文)
 
-PaddleClas提供2种服务部署方式：
-- 基于PaddleHub Serving的部署：代码路径为"`./deploy/hubserving`"，使用方法参考[文档](../../deploy/hubserving/readme.md)；
-- 基于PaddleServing的部署：代码路径为"`./deploy/paddleserving`"， 基于检索方式的图像识别服务参考[文档](./recognition/README_CN.md)， 图像分类服务按照本教程使用。
-
-# 基于PaddleServing的图像分类服务部署
-
-本文档以经典的ResNet50_vd模型为例，介绍如何使用[PaddleServing](https://github.com/PaddlePaddle/Serving/blob/develop/README_CN.md)工具部署PaddleClas
-动态图模型的pipeline在线服务。
+本文以商品识别为例，介绍如何使用[PaddleServing](https://github.com/PaddlePaddle/Serving/blob/develop/README_CN.md)工具部署PaddleClas动态图模型的pipeline在线服务。
 
 相比较于hubserving部署，PaddleServing具备以下优点：
 - 支持客户端和服务端之间高并发和高效通信
@@ -59,43 +52,48 @@ PaddleClas提供2种服务部署方式：
 <a name="模型转换"></a>
 ## 模型转换
 
-使用PaddleServing做服务化部署时，需要将保存的inference模型转换为serving易于部署的模型。
+使用PaddleServing做服务化部署时，需要将保存的inference模型转换为serving易于部署的模型。 
+以下内容假定当前工作目录为PaddleClas根目录。
 
-首先，下载ResNet50_vd的inference模型
+首先，下载商品识别的inference模型
 ```
-# 下载并解压ResNet50_vd模型
-wget https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/ResNet50_vd_infer.tar && tar xf ResNet50_vd_infer.tar
+cd deploy
+
+# 下载并解压商品识别模型
+wget -P models/ https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/inference/product_ResNet50_vd_aliproduct_v1.0_infer.tar
+cd models
+tar -xf product_ResNet50_vd_aliproduct_v1.0_infer.tar
 ```
 
 接下来，用安装的paddle_serving_client把下载的inference模型转换成易于server部署的模型格式。
 
 ```
-# 转换ResNet50_vd模型
-python3 -m paddle_serving_client.convert --dirname ./ResNet50_vd_infer/ \
+# 转换商品识别模型
+python3 -m paddle_serving_client.convert --dirname ./product_ResNet50_vd_aliproduct_v1.0_infer/ \
                                          --model_filename inference.pdmodel  \
                                          --params_filename inference.pdiparams \
-                                         --serving_server ./ResNet50_vd_serving/ \
-                                         --serving_client ./ResNet50_vd_client/
+                                         --serving_server ./product_ResNet50_vd_aliproduct_v1.0_serving/ \
+                                         --serving_client ./product_ResNet50_vd_aliproduct_v1.0_client/
 ```
-ResNet50_vd推理模型转换完成后，会在当前文件夹多出`ResNet50_vd_serving` 和`ResNet50_vd_client`的文件夹，具备如下格式：
+商品识别推理模型转换完成后，会在当前文件夹多出`product_ResNet50_vd_aliproduct_v1.0_serving` 和`product_ResNet50_vd_aliproduct_v1.0_client`的文件夹，具备如下格式：
 ```
-|- ResNet50_vd_client/
+|- product_ResNet50_vd_aliproduct_v1.0_serving/
   |- __model__  
   |- __params__
   |- serving_server_conf.prototxt  
   |- serving_server_conf.stream.prototxt
 
-|- ResNet50_vd_client
+|- product_ResNet50_vd_aliproduct_v1.0_client
   |- serving_client_conf.prototxt  
   |- serving_client_conf.stream.prototxt
 
 ```
-得到模型文件之后，需要修改serving_server_conf.prototxt中的alias名字： 将`feed_var`中的`alias_name`改为`image`, 将`fetch_var`中的`alias_name`改为`prediction`, 
+得到模型文件之后，需要修改serving_server_conf.prototxt中的alias名字： 将`fetch_var`中的`alias_name`改为`features`, 
 修改后的serving_server_conf.prototxt内容如下：
 ```
 feed_var {
-  name: "inputs"
-  alias_name: "image"
+  name: "x"
+  alias_name: "x"
   is_lod_tensor: false
   feed_type: 1
   shape: 3
@@ -104,12 +102,19 @@ feed_var {
 }
 fetch_var {
   name: "save_infer_model/scale_0.tmp_1"
-  alias_name: "prediction"
+  alias_name: "features"
   is_lod_tensor: true
   fetch_type: 1
   shape: -1
 }
 ```
+
+接下来，下载并解压已经构建后的商品库index
+```
+cd ../
+wget https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/data/recognition_demo_data_v1.1.tar && tar -xf recognition_demo_data_v1.1.tar
+```
+
 
 <a name="部署"></a>
 ## Paddle Serving pipeline部署
@@ -119,31 +124,31 @@ fetch_var {
     git clone https://github.com/PaddlePaddle/PaddleClas
 
     # 进入到工作目录
-    cd PaddleClas/deploy/paddleserving/
+    cd PaddleClas/deploy/paddleserving/recognition
     ```
     paddleserving目录包含启动pipeline服务和发送预测请求的代码，包括：
     ```
     __init__.py
-    config.yml                 # 启动服务的配置文件
-    pipeline_http_client.py    # http方式发送pipeline预测请求的脚本
-    pipeline_rpc_client.py     # rpc方式发送pipeline预测请求的脚本
-    classification_web_service.py    # 启动pipeline服务端的脚本
+    config.yml                    # 启动服务的配置文件
+    pipeline_http_client.py       # http方式发送pipeline预测请求的脚本
+    pipeline_rpc_client.py        # rpc方式发送pipeline预测请求的脚本
+    recognition_web_service.py    # 启动pipeline服务端的脚本
     ```
 
 2. 启动服务可运行如下命令：
     ```
     # 启动服务，运行日志保存在log.txt
-    python3 classification_web_service.py &>log.txt &
+    python3 recognition_web_service.py &>log.txt &
     ```
     成功启动服务后，log.txt中会打印类似如下日志
-    ![](./imgs/start_server.png)
+    ![](../imgs/start_server_recog.png)
 
 3. 发送服务请求：
     ```
     python3 pipeline_http_client.py
     ```
     成功运行后，模型预测的结果会打印在cmd窗口中，结果示例为：
-    ![](./imgs/results.png)
+    ![](../imgs/results_recog.png)
 
     调整 config.yml 中的并发个数可以获得最大的QPS
     ```
