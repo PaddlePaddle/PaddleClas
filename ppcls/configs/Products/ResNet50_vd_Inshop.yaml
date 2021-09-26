@@ -54,7 +54,7 @@ Optimizer:
   momentum: 0.9
   lr:
     name: MultiStepDecay
-    learning_rate: 0.01
+    learning_rate: 0.04
     milestones: [30, 60, 70, 80, 90, 100]
     gamma: 0.5
     verbose: False
