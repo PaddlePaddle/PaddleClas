@@ -1,50 +1,50 @@
 # global configs
 Global:
   checkpoints: null
-  pretrained_model: "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/pretrain/product_ResNet50_vd_Aliproduct_v1.0_pretrained.pdparams"
+  pretrained_model: null
   output_dir: ./output/
   device: gpu
-  save_interval: 10
+  save_interval: 1
   eval_during_train: True
-  eval_interval: 10
-  epochs: 120
+  eval_interval: 1
+  epochs: 100
   print_batch_step: 10
   use_visualdl: False
   # used for static mode and model export
   image_shape: [3, 224, 224]
   save_inference_dir: ./inference
   eval_mode: retrieval
+  use_dali: False
+  to_static: False
 
 # model architecture
 Arch:
   name: RecModel
   infer_output_key: features
   infer_add_softmax: False
-  
+
   Backbone: 
-    name: ResNet50_vd
-    pretrained: False
+    name: PPLCNet_x2_5
+    pretrained: True
+    use_ssld: True
   BackboneStopLayer:
     name: flatten_0
   Neck:
     name: FC
-    embedding_size: 2048
+    embedding_size: 1280
     class_num: 512
   Head:
-    name: ArcMargin  
+    name: ArcMargin 
     embedding_size: 512
-    class_num: 3997
-    margin: 0.15
+    class_num: 185341
+    margin: 0.2
     scale: 30
-   
+
 # loss function config for traing/eval process
 Loss:
   Train:
     - CELoss:
         weight: 1.0
-    - TripletLossV2:
-        weight: 1.0
-        margin: 0.5
   Eval:
     - CELoss:
         weight: 1.0
@@ -53,58 +53,50 @@ Optimizer:
   name: Momentum
   momentum: 0.9
   lr:
-    name: MultiStepDecay
+    name: Cosine
     learning_rate: 0.04
-    milestones: [30, 60, 70, 80, 90, 100]
-    gamma: 0.5
-    verbose: False
-    last_epoch: -1
+    warmup_epoch: 5
   regularizer:
     name: 'L2'
-    coeff: 0.0005
+    coeff: 0.00001
+
 
 # data loader for train and eval
 DataLoader:
   Train:
     dataset:
       name: ImageNetDataset
-      image_root: ./dataset/Inshop/
-      cls_label_path: ./dataset/Inshop/train_list.txt
+      image_root: ./dataset/
+      cls_label_path: ./dataset/train_reg_all_data.txt
       transform_ops:
         - DecodeImage:
             to_rgb: True
             channel_first: False
-        - ResizeImage:
+        - RandCropImage:
             size: 224
         - RandFlipImage:
             flip_code: 1
         - NormalizeImage:
-            scale: 0.00392157
+            scale: 1.0/255.0
             mean: [0.485, 0.456, 0.406]
             std: [0.229, 0.224, 0.225]
             order: ''
-        - RandomErasing:
-            EPSILON: 0.5
-            sl: 0.02
-            sh: 0.4
-            r1: 0.3
-            mean: [0., 0., 0.]
+
     sampler:
-      name: PKSampler
-      batch_size: 64
-      sample_per_id: 2
-      drop_last: True
+      name: DistributedBatchSampler
+      batch_size: 256
+      drop_last: False
       shuffle: True
     loader:
       num_workers: 4
       use_shared_memory: True
-      
+
   Eval:
     Query:
       dataset: 
-        name: ImageNetDataset
-        image_root: ./dataset/Inshop/
-        cls_label_path: ./dataset/Inshop/query_list.txt
+        name: VeriWild
+        image_root: ./dataset/Aliproduct/
+        cls_label_path: ./dataset/Aliproduct/val_list.txt
         transform_ops:
           - DecodeImage:
               to_rgb: True
@@ -127,9 +119,9 @@ DataLoader:
 
     Gallery:
       dataset: 
-        name: ImageNetDataset
-        image_root: ./dataset/Inshop/
-        cls_label_path: ./dataset/Inshop/gallery_list.txt
+        name: VeriWild
+        image_root: ./dataset/Aliproduct/
+        cls_label_path: ./dataset/Aliproduct/val_list.txt
         transform_ops:
           - DecodeImage:
               to_rgb: True
@@ -137,7 +129,7 @@ DataLoader:
           - ResizeImage:
               size: 224
           - NormalizeImage:
-              scale: 1.0/255.0
+              scale: 0.00392157
               mean: [0.485, 0.456, 0.406]
               std: [0.229, 0.224, 0.225]
               order: ''
@@ -154,4 +146,3 @@ Metric:
   Eval:
     - Recallk:
         topk: [1, 5]
-
