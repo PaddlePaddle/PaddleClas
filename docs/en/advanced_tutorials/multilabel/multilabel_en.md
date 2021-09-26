@@ -25,58 +25,68 @@ tar -xf NUS-SCENE-dataset.tar
 cd ../../
 ```
 
-## Environment
-
-### Download pretrained model
-
-You can use the following commands to download the pretrained model of ResNet50_vd.
-
-```bash
-mkdir pretrained
-cd pretrained
-wget https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ResNet50_vd_pretrained.pdparams
-cd ../
-```
-
 ## Training
 
 ```shell
-export CUDA_VISIBLE_DEVICES=0
-python -m paddle.distributed.launch \
-    --gpus="0" \
+export CUDA_VISIBLE_DEVICES=0,1,2,3
+python3 -m paddle.distributed.launch \
+    --gpus="0,1,2,3" \
     tools/train.py \
-        -c ./configs/quick_start/ResNet50_vd_multilabel.yaml
+        -c ./ppcls/configs/quick_start/professional/MobileNetV1_multilabel.yaml
 ```
 
-After training for 10 epochs, the best accuracy over the validation set should be around 0.72.
+After training for 10 epochs, the best accuracy over the validation set should be around 0.95.
 
 ## Evaluation
 
 ```bash
 python tools/eval.py \
-    -c ./configs/quick_start/ResNet50_vd_multilabel.yaml \
-    -o pretrained_model="./output/ResNet50_vd/best_model/ppcls" \
-    -o load_static_weights=False
+    -c ./ppcls/configs/quick_start/professional/MobileNetV1_multilabel.yaml \
+    -o Arch.pretrained="./output/MobileNetV1/best_model"
 ```
-
-The metric of evaluation is based on mAP, which is commonly used in multilabel task to show model perfermance. The mAP over validation set should be around 0.57.
 
 ## Prediction
 
 ```bash
-python tools/infer/infer.py \
-    -i "./dataset/NUS-WIDE-SCENE/NUS-SCENE-dataset/images/0199_434752251.jpg" \
-    --model ResNet50_vd \
-    --pretrained_model "./output/ResNet50_vd/best_model/ppcls" \
-    --use_gpu True \
-    --load_static_weights False \
-    --multilabel True \
-    --class_num 33
+python3 tools/infer.py
+    -c ./ppcls/configs/quick_start/professional/MobileNetV1_multilabel.yaml \
+    -o Arch.pretrained="./output/MobileNetV1/best_model"
 ```
 
 You will get multiple output such as the following:
-```    
-    class id: 3, probability: 0.6025
-    class id: 23, probability: 0.5491
-    class id: 32, probability: 0.7006
+```
+[{'class_ids': [6, 13, 17, 23, 26, 30], 'scores': [0.95683, 0.5567, 0.55211, 0.99088, 0.5943, 0.78767], 'file_name': './deploy/images/0517_2715693311.jpg', 'label_names': []}]  
+```
+
+## Prediction based on prediction engine
+
+### Export model
+
+```bash
+python3 tools/export_model.py \
+    -c ./ppcls/configs/quick_start/professional/MobileNetV1_multilabel.yaml \
+    -o Arch.pretrained="./output/MobileNetV1/best_model"
+```
+
+The default path of the inference model is under the current path `./inference`
+
+### Prediction based on prediction engine
+
+Enter the deploy directory:
+
+```bash
+cd ./deploy
+```
+
+Prediction based on prediction engine:
+
+```
+python3 python/predict_cls.py \
+     -c configs/inference_multilabel_cls.yaml
+```
+
+You will get multiple output such as the following:
+
+```
+0517_2715693311.jpg:    class id(s): [6, 13, 17, 23, 26, 30], score(s): [0.96, 0.56, 0.55, 0.99, 0.59, 0.79], label_name(s): []
 ```
