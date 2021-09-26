@@ -23,7 +23,7 @@ from .. import dataloader
 
 class MixDataset(Dataset):
     def __init__(self, datasets_config):
-        super(MixDataset, self).__init__()
+        super().__init__()
         self.dataset_list = []
         start_idx = 0
         end_idx = 0

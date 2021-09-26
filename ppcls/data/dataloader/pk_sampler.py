@@ -42,7 +42,7 @@ class PKSampler(DistributedBatchSampler):
                  shuffle=True,
                  drop_last=True,
                  sample_method="sample_avg_prob"):
-        super(PKSampler, self).__init__(
+        super().__init__(
             dataset, batch_size, shuffle=shuffle, drop_last=drop_last)
         assert batch_size % sample_per_id == 0, \
             "PKSampler configs error, Sample_per_id must be a divisor of batch_size."

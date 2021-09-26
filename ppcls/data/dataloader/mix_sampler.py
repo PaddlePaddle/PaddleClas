@@ -24,8 +24,9 @@ from ppcls.data import dataloader
 
 class MixSampler(DistributedBatchSampler):
     def __init__(self, dataset, batch_size, sample_configs, iter_per_epoch):
-        super(MixSampler, self).__init__(dataset, batch_size)
-        assert isinstance(dataset, MixDataset), "MixSampler only support MixDataset"
+        super().__init__(dataset, batch_size)
+        assert isinstance(dataset,
+                          MixDataset), "MixSampler only support MixDataset"
         self.sampler_list = []
         self.batch_size = batch_size
         self.start_list = []
@@ -45,9 +46,11 @@ class MixSampler(DistributedBatchSampler):
             assert batch_size_i <= len(dataset_list[i][2])
             config_i["batch_size"] = batch_size_i
             if sample_method == "DistributedBatchSampler":
-                sampler_i = DistributedBatchSampler(dataset_list[i][2], **config_i)
+                sampler_i = DistributedBatchSampler(dataset_list[i][2],
+                                                    **config_i)
             else:
-                sampler_i = getattr(dataloader, sample_method)(dataset_list[i][2], **config_i)
+                sampler_i = getattr(dataloader, sample_method)(
+                    dataset_list[i][2], **config_i)
             self.sampler_list.append(sampler_i)
             self.iter_list.append(iter(sampler_i))
             self.length += len(dataset_list[i][2]) * ratio_i
@@ -62,7 +65,8 @@ class MixSampler(DistributedBatchSampler):
                     iter_i = iter(self.sampler_list[i])
                     self.iter_list[i] = iter_i
                     batch_i = next(iter_i, None)
-                    assert batch_i is not None, "dataset {} return None".format(i)
+                    assert batch_i is not None, "dataset {} return None".format(
+                        i)
                 batch += [idx + self.start_list[i] for idx in batch_i]
             if len(batch) == self.batch_size:
                 self.iter_counter += 1
