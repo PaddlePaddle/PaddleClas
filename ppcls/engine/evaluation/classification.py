@@ -50,7 +50,7 @@ def classification_eval(engine, epoch_id=0):
         time_info["reader_cost"].update(time.time() - tic)
         batch_size = batch[0].shape[0]
         batch[0] = paddle.to_tensor(batch[0]).astype("float32")
-        if not evaler.config["Global"].get("use_multilabel", False):
+        if not engine.config["Global"].get("use_multilabel", False):
             batch[1] = batch[1].reshape([-1, 1]).astype("int64")
         # image input
         out = engine.model(batch[0])

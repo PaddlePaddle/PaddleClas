@@ -76,8 +76,8 @@ def train_epoch(engine, epoch_id, print_batch_step):
         tic = time.time()
 
 
-def forward(trainer, batch):
-    if not trainer.is_rec:
-        return trainer.model(batch[0])
+def forward(engine, batch):
+    if not engine.is_rec:
+        return engine.model(batch[0])
     else:
-        return trainer.model(batch[0], batch[1])
+        return engine.model(batch[0], batch[1])

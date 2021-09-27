@@ -46,8 +46,8 @@ DataLoader:
   Train:
     dataset:
       name: MultiLabelDataset
-      image_root: ./dataset/NUS-SCENE-dataset/images/
-      cls_label_path: ./dataset/NUS-SCENE-dataset/multilabel_train_list.txt
+      image_root: ./dataset/NUS-WIDE-SCENE/NUS-SCENE-dataset/images/
+      cls_label_path: ./dataset/NUS-WIDE-SCENE/NUS-SCENE-dataset/multilabel_train_list.txt
       transform_ops:
         - DecodeImage:
             to_rgb: True
@@ -74,8 +74,8 @@ DataLoader:
   Eval:
     dataset: 
       name: MultiLabelDataset
-      image_root: ./dataset/NUS-SCENE-dataset/images/
-      cls_label_path: ./dataset/NUS-SCENE-dataset/multilabel_test_list.txt
+      image_root: ./dataset/NUS-WIDE-SCENE/NUS-SCENE-dataset/images/
+      cls_label_path: ./dataset/NUS-WIDE-SCENE/NUS-SCENE-dataset/multilabel_test_list.txt
       transform_ops:
         - DecodeImage:
             to_rgb: True
