@@ -33,9 +33,10 @@ def train_epoch(engine, epoch_id, print_batch_step):
                 paddle.to_tensor(batch[0]['label'])
             ]
         batch_size = batch[0].shape[0]
-        batch[1] = batch[1].reshape([-1, 1]).astype("int64")
-
+        if not engine.config["Global"].get("use_multilabel", False):
+            batch[1] = batch[1].reshape([-1, 1]).astype("int64")
         engine.global_step += 1
+
         # image input
         if engine.amp:
             with paddle.amp.auto_cast(custom_black_list={
@@ -75,8 +76,8 @@ def train_epoch(engine, epoch_id, print_batch_step):
         tic = time.time()
 
 
-def forward(trainer, batch):
-    if not trainer.is_rec:
-        return trainer.model(batch[0])
+def forward(engine, batch):
+    if not engine.is_rec:
+        return engine.model(batch[0])
     else:
-        return trainer.model(batch[0], batch[1])
+        return engine.model(batch[0], batch[1])

@@ -71,7 +71,6 @@ class ClsPredictor(Predictor):
         output_names = self.paddle_predictor.get_output_names()
         output_tensor = self.paddle_predictor.get_output_handle(output_names[
             0])
-
         if self.benchmark:
             self.auto_logger.times.start()
         if not isinstance(images, (list, )):
@@ -119,7 +118,6 @@ def main(config):
                                                          ) == len(image_list):
             if len(batch_imgs) == 0:
                 continue
-
             batch_results = cls_predictor.predict(batch_imgs)
             for number, result_dict in enumerate(batch_results):
                 filename = batch_names[number]
