@@ -1,7 +1,7 @@
 # global configs
 Global:
   checkpoints: null
-  pretrained_model: null
+  pretrained_model: "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/pretrain/vehicle_reid_ResNet50_VERIWild_v1.1_pretrained.pdparams"
   output_dir: "./output_vehicle_reid_pact/"
   device: "gpu"
   save_interval: 1

@@ -1,7 +1,7 @@
 # global configs
 Global:
   checkpoints: null
-  pretrained_model: null
+  pretrained_model: "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/pretrain/vehicle_cls_ResNet50_CompCars_v1.2_pretrained.pdparams"
   output_dir: "./output_vehicle_cls_prune/"
   device: "gpu"
   save_interval: 1
