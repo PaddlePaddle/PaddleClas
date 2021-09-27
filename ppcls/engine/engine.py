@@ -200,7 +200,7 @@ class Engine(object):
         if self.mode == 'train':
             self.optimizer, self.lr_sch = build_optimizer(
                 self.config["Optimizer"], self.config["Global"]["epochs"],
-                len(self.train_dataloader), self.model.parameters())
+                len(self.train_dataloader), [self.model])
 
         # for distributed
         self.config["Global"][
@@ -355,7 +355,8 @@ class Engine(object):
 
     def export(self):
         assert self.mode == "export"
-        model = ExportModel(self.config["Arch"], self.model)
+        use_multilabel = self.config["Global"].get("use_multilabel", False)
+        model = ExportModel(self.config["Arch"], self.model, use_multilabel)
         if self.config["Global"]["pretrained_model"] is not None:
             load_dygraph_pretrain(model.base_model,
                                   self.config["Global"]["pretrained_model"])
@@ -388,10 +389,9 @@ class ExportModel(nn.Layer):
     ExportModel: add softmax onto the model
     """
 
-    def __init__(self, config, model):
+    def __init__(self, config, model, use_multilabel):
         super().__init__()
         self.base_model = model
-
         # we should choose a final model to export
         if isinstance(self.base_model, DistillationModel):
             self.infer_model_name = config["infer_model_name"]
@@ -402,10 +402,13 @@ class ExportModel(nn.Layer):
         if self.infer_output_key == "features" and isinstance(self.base_model,
                                                               RecModel):
             self.base_model.head = IdentityHead()
-        if config.get("infer_add_softmax", True):
-            self.softmax = nn.Softmax(axis=-1)
+        if use_multilabel:
+            self.out_act = nn.Sigmoid()
         else:
-            self.softmax = None
+            if config.get("infer_add_softmax", True):
+                self.out_act = nn.Softmax(axis=-1)
+            else:
+                self.out_act = None
 
     def eval(self):
         self.training = False
@@ -421,6 +424,6 @@ class ExportModel(nn.Layer):
             x = x[self.infer_model_name]
         if self.infer_output_key is not None:
             x = x[self.infer_output_key]
-        if self.softmax is not None:
-            x = self.softmax(x)
+        if self.out_act is not None:
+            x = self.out_act(x)
         return x

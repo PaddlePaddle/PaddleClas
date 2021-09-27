@@ -120,7 +120,7 @@ python3 tools/train.py \
 
  `-c` is used to specify the path to the configuration file, and `-o` is used to specify the parameters that need to be modified or added, where `-o Arch.Backbone.pretrained=True` indicates that the Backbone part uses the pre-trained model, in addition, `Arch.Backbone.pretrained` can also specify backbone.`pretrained` can also specify the address of a specific model weight file, which needs to be replaced with the path to your own pre-trained model weight file when using it. `-o Global.device=gpu` indicates that the GPU is used for training. If you want to use a CPU for training, you need to set `Global.device` to `cpu`.
 
-For more detailed training configuration, you can also modify the corresponding configuration file of the model directly. Refer to the [configuration document](config_en.md) for specific configuration parameters.
+For more detailed training configuration, you can also modify the corresponding configuration file of the model directly. Refer to the [configuration document](config_description_en.md) for specific configuration parameters.
 
 Run the above commands to check the output log, an example is as follows:
 
