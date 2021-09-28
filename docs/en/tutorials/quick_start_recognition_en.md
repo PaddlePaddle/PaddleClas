@@ -43,6 +43,11 @@ The detection model with the recognition inference model for the 4 directions (L
 | Product Recignition Model | Product Scenario  |  [Model Download Link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/inference/product_ResNet50_vd_aliproduct_v1.0_infer.tar) | [inference_product.yaml](../../../deploy/configs/inference_product.yaml) | [build_product.yaml](../../../deploy/configs/build_product.yaml) |
 | Vehicle ReID Model | Vehicle ReID Scenario | [Model Download Link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/inference/vehicle_reid_ResNet50_VERIWild_v1.0_infer.tar) | - | - |
 
+| Models Introduction       | Recommended Scenarios   | inference Model  | Predict Config File  | Config File to Build Index Database |
+| ------------  | ------------- | -------- | ------- | -------- |
+| Lightweight generic mainbody detection model | General Scenarios  |[Model Download Link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/inference/picodet_PPLCNet_x2_5_mainbody_lite_v1.0_infer.tar) | - | - |
+| Lightweight generic recognition model | General Scenarios  | [Model Download Link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/inference/general_PPLCNet_x2_5_lite_v1.0_infer.tar) | [inference_product.yaml](../../../deploy/configs/inference_product.yaml) | [build_product.yaml](../../../deploy/configs/build_product.yaml) |
+
 
 Demo data in this tutorial can be downloaded here: [download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/data/recognition_demo_data_en_v1.1.tar).
 
@@ -50,6 +55,7 @@ Demo data in this tutorial can be downloaded here: [download link](https://paddl
 **Attention**
 1. If you do not have wget installed on Windows, you can download the model by copying the link into your browser and unzipping it in the appropriate folder; for Linux or macOS users, you can right-click and copy the download link to download it via the `wget` command.
 2. If you want to install `wget` on macOS, you can run the following command.
+3. The predict config file of the lightweight generic recognition model and the config file to build index database are used for the config of product recognition model of server-side. You can modify the path of the model to complete the index building and prediction.
 
 ```shell
 # install homebrew
@@ -121,6 +127,13 @@ The `models` folder should have the following file structure.
 │   ├── inference.pdiparams
 │   ├── inference.pdiparams.info
 │   └── inference.pdmodel
+```
+
+**Attention**
+If you want to use the lightweight generic recognition model, you need to re-extract the features of the demo data and re-build the index. The way is as follows:
+
+```shell
+python3.7 python/build_gallery.py -c configs/build_product.yaml -o Global.rec_inference_model_dir=./models/general_PPLCNet_x2_5_lite_v1.0_infer
 ```
 
 <a name="Product_recognition_and_retrival"></a>
