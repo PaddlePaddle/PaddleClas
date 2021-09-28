@@ -121,6 +121,8 @@ wget https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/data/recognit
 <a name="paddle-serving-pipeline-deployment"></a>
 ## Paddle Serving pipeline deployment
 
+**Attention:** pipeline deployment mode does not support Windows platform
+
 1. Download the PaddleClas code, if you have already downloaded it, you can skip this step.
     ```
     git clone https://github.com/PaddlePaddle/PaddleClas
