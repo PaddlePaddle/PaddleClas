@@ -35,7 +35,7 @@ export1:null
 export2:null
 inference_model_url:https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/whole_chain/MobileNetV3_large_x1_0_inference.tar
 infer_model:../inference/
-infer_export:null
+kl_quant:deploy/slim/quant_post_static.py -c ppcls/configs/ImageNet/MobileNetV3/MobileNetV3_large_x1_0.yaml -o Global.save_inference_dir=./inference
 infer_quant:Fasle
 inference:python/predict_cls.py -c configs/inference_cls.yaml
 -o Global.use_gpu:True|False
