@@ -80,10 +80,7 @@ class PKSampler(DistributedBatchSampler):
 
     def __iter__(self):
         label_per_batch = self.batch_size // self.sample_per_label
-        if self.shuffle:
-            # It's not accurate literally, but it helps in some dataset.
-            np.random.RandomState(self.epoch).shuffle(self.label_list)
-        for i in range(len(self)):
+        for _ in range(len(self)):
             batch_index = []
             batch_label_list = np.random.choice(
                 self.label_list,
