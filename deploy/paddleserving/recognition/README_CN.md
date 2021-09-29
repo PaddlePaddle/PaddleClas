@@ -119,6 +119,8 @@ wget https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/data/recognit
 <a name="部署"></a>
 ## Paddle Serving pipeline部署
 
+**注意:**  pipeline部署方式不支持windows平台
+
 1. 下载PaddleClas代码，若已下载可跳过此步骤
     ```
     git clone https://github.com/PaddlePaddle/PaddleClas
