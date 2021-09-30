@@ -1,11 +1,11 @@
 #!/bin/bash
+dataset_url=$1
 
 cd dataset
 rm -rf ILSVRC2012
-wget -nc https://paddle-imagenet-models-name.bj.bcebos.com/data/whole_chain/whole_chain_little_train.tar
-tar xf whole_chain_little_train.tar
-ln -s whole_chain_little_train ILSVRC2012
-cd ILSVRC2012 
-mv train.txt train_list.txt
-mv val.txt val_list.txt
+wget -nc ${dataset_url}
+tar xf ILSVRC2012_val.tar
+ln -s ILSVRC2012_val ILSVRC2012
+cd ILSVRC2012
+ln -s val_list.txt train_list.txt
 cd ../../
