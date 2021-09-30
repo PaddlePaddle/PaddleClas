@@ -14,7 +14,7 @@ function _set_params(){
     device=${CUDA_VISIBLE_DEVICES//,/ }
     arr=(${device})
     num_gpu_devices=${#arr[*]}
-    log_file=${run_log_path}/${model_name}_${run_mode}_bs${batch_size}_${fp_item}_${num_gpu_devices}
+    log_file=${run_log_path}/clas_${model_name}_${run_mode}_bs${batch_size}_${fp_item}_${num_gpu_devices}
 }
 function _train(){
     echo "Train on ${num_gpu_devices} GPUs"
@@ -34,6 +34,7 @@ function _train(){
         log_parse_file="mylog/workerlog.0" ;;
     *) echo "choose run_mode(sp or mp)"; exit 1;
     esac
+    rm -rf mylog
 # 以下不用修改
     timeout 15m ${train_cmd} > ${log_file} 2>&1
     if [ $? -ne 0 ];then
