@@ -41,7 +41,8 @@ def build_lr_scheduler(lr_config, epochs, step_each_epoch):
     return lr
 
 
-def build_optimizer(config, epochs, step_each_epoch, model_list):
+# model_list is None in static graph
+def build_optimizer(config, epochs, step_each_epoch, model_list=None):
     config = copy.deepcopy(config)
     # step1 build lr
     lr = build_lr_scheduler(config.pop('lr'), epochs, step_each_epoch)
