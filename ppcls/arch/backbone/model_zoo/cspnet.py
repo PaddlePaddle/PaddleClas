@@ -20,12 +20,12 @@ from paddle import ParamAttr
 from ppcls.utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
 
 MODEL_URLS = {
-    "CSPDarknet53":
-    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/CSPDarknet53_pretrained.pdparams"
+    "CSPDarkNet53":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/CSPDarkNet53_pretrained.pdparams"
 }
 
 MODEL_CFGS = {
-    "CSPDarknet53": dict(
+    "CSPDarkNet53": dict(
         stem=dict(
             out_chs=32, kernel_size=3, stride=1, pool=''),
         stage=dict(
@@ -38,7 +38,7 @@ MODEL_CFGS = {
             down_growth=True, ))
 }
 
-__all__ = ['CSPDarknet53'
+__all__ = ['CSPDarkNet53'
            ]  # model_registry will add each entrypoint fn to this
 
 
@@ -367,8 +367,8 @@ def _load_pretrained(pretrained, model, model_url, use_ssld=False):
         )
 
 
-def CSPDarknet53(pretrained=False, use_ssld=False, **kwargs):
-    model = CSPNet(MODEL_CFGS["CSPDarknet53"], block_fn=DarkBlock, **kwargs)
+def CSPDarkNet53(pretrained=False, use_ssld=False, **kwargs):
+    model = CSPNet(MODEL_CFGS["CSPDarkNet53"], block_fn=DarkBlock, **kwargs)
     _load_pretrained(
-        pretrained, model, MODEL_URLS["DarkNet53"], use_ssld=use_ssld)
+        pretrained, model, MODEL_URLS["CSPDarkNet53"], use_ssld=use_ssld)
     return model
