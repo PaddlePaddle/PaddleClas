@@ -112,6 +112,8 @@ def main(args):
     eval_dataloader = None
     use_dali = global_config.get('use_dali', False)
 
+    class_num = config["Arch"].get("class_num", None)
+    config["DataLoader"].update({"class_num": class_num})
     train_dataloader = build_dataloader(
         config["DataLoader"], "Train", device=device, use_dali=use_dali)
     if global_config["eval_during_train"]:
@@ -131,6 +133,7 @@ def main(args):
         config,
         train_prog,
         startup_prog,
+        class_num,
         step_each_epoch=step_each_epoch,
         is_train=True,
         is_distributed=global_config.get("is_distributed", True))
