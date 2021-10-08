@@ -28,7 +28,7 @@
 
 | 模型      | 模型结构   | 预训练模型下载地址   | inference模型下载地址  | mAP | inference模型大小(MB) | 单张图片预测耗时(不包含预处理)(ms) |
 | :------------:  | :-------------: | :------: | :-------: | :--------: | :-------: | :--------: |
-| 轻量级主体检测模型 | PicoDet | [地址](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/pretrain/picodet_PPLCNet_x2_5_mainbody_lite_v1.0_pretrained.pdparams) | [地址](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/inference/picodet_PPLCNet_x2_5_mainbody_lite_v1.0_infer.tar) | 40.1% | 29.8 | 29.8  |
+| 轻量级主体检测模型 | PicoDet | [地址](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/pretrain/picodet_PPLCNet_x2_5_mainbody_lite_v1.0_pretrained.pdparams) | [地址](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/inference/picodet_PPLCNet_x2_5_mainbody_lite_v1.0_infer.tar) | 40.1% | 30.1 | 29.8  |
 | 服务端主体检测模型 | PicoDet | [地址](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/pretrain/ppyolov2_r50vd_dcn_mainbody_v1.0_pretrained.pdparams) | [地址](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/inference/ppyolov2_r50vd_dcn_mainbody_v1.0_infer.tar) | 42.5% | 210.5 | 466.6  |
 
 * 注意
