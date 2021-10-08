@@ -1,6 +1,9 @@
 # classification
 python3.7 python/predict_cls.py -c configs/inference_cls.yaml
 
+# multilabel_classification
+#python3.7 python/predict_cls.py -c configs/inference_multilabel_cls.yaml
+
 # feature extractor
 # python3.7 python/predict_rec.py -c configs/inference_rec.yaml
 

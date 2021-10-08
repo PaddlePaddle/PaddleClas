@@ -34,6 +34,8 @@
 
 检测模型与4个方向(Logo、动漫人物、车辆、商品)的识别inference模型、测试数据下载地址以及对应的配置文件地址如下。
 
+服务器端通用主体检测模型与各方向识别模型：
+
 | 模型简介       | 推荐场景   | inference模型  | 预测配置文件  | 构建索引库的配置文件 |
 | ------------  | ------------- | -------- | ------- | -------- |
 | 通用主体检测模型 | 通用场景  |[模型下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/inference/ppyolov2_r50vd_dcn_mainbody_v1.0_infer.tar) | - | - |
@@ -43,6 +45,12 @@
 | 商品识别模型 | 商品场景  |  [模型下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/inference/product_ResNet50_vd_aliproduct_v1.0_infer.tar) | [inference_product.yaml](../../../deploy/configs/inference_product.yaml) | [build_product.yaml](../../../deploy/configs/build_product.yaml) |
 | 车辆ReID模型 | 车辆ReID场景 | [模型下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/inference/vehicle_reid_ResNet50_VERIWild_v1.0_infer.tar) | - | - |
 
+轻量级通用主体检测模型与轻量级通用识别模型：
+
+| 模型简介       | 推荐场景   | inference模型  | 预测配置文件  | 构建索引库的配置文件 |
+| ------------  | ------------- | -------- | ------- | -------- |
+| 轻量级通用主体检测模型 | 通用场景  |[模型下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/inference/picodet_PPLCNet_x2_5_mainbody_lite_v1.0_infer.tar) | - | - |
+| 轻量级通用识别模型 | 通用场景  | [模型下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/inference/general_PPLCNet_x2_5_lite_v1.0_infer.tar) | [inference_product.yaml](../../../deploy/configs/inference_product.yaml) | [build_product.yaml](../../../deploy/configs/build_product.yaml) |
 
 本章节demo数据下载地址如下: [数据下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/data/recognition_demo_data_v1.1.tar)。
 
@@ -50,6 +58,7 @@
 
 1. windows 环境下如果没有安装wget,可以按照下面的步骤安装wget与tar命令，也可以在，下载模型时将链接复制到浏览器中下载，并解压放置在相应目录下；linux或者macOS用户可以右键点击，然后复制下载链接，即可通过`wget`命令下载。
 2. 如果macOS环境下没有安装`wget`命令，可以运行下面的命令进行安装。
+3. 轻量级通用识别模型的预测配置文件和构建索引的配置文件目前使用的是服务器端商品识别模型的配置，您可以自行修改模型的路径完成相应的索引构建和识别预测。
 
 ```shell
 # 安装 homebrew
@@ -122,6 +131,13 @@ wget https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/data/recognit
 │   ├── inference.pdiparams
 │   ├── inference.pdiparams.info
 │   └── inference.pdmodel
+```
+
+**注意**
+如果使用轻量级通用识别模型，Demo数据需要重新提取特征、够建索引，方式如下：
+
+```shell
+python3.7 python/build_gallery.py -c configs/build_product.yaml -o Global.rec_inference_model_dir=./models/general_PPLCNet_x2_5_lite_v1.0_infer
 ```
 
 <a name="商品识别与检索"></a>

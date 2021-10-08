@@ -1,14 +1,8 @@
-# PaddleClas Pipeline WebService
+# Product Recognition Service deployment based on PaddleServing  
 
 (English|[简体中文](./README_CN.md))
 
-PaddleClas provides two service deployment methods:
-- Based on **PaddleHub Serving**: Code path is "`./deploy/hubserving`". Please refer to the [tutorial](../../deploy/hubserving/readme_en.md)
-- Based on **PaddleServing**: Code path is "`./deploy/paddleserving`".  if you prefer retrieval_based image reocognition service, please refer to [tutorial](./recognition/README.md)，if you'd like image classification service, Please follow this tutorial.
-
-# Image Classification Service deployment based on PaddleServing  
-
-This document will introduce how to use the [PaddleServing](https://github.com/PaddlePaddle/Serving/blob/develop/README.md) to deploy the ResNet50_vd model as a pipeline online service.
+This document will introduce how to use the [PaddleServing](https://github.com/PaddlePaddle/Serving/blob/develop/README.md) to deploy the product recognition model based on retrieval method as a pipeline online service.
 
 Some Key Features of Paddle Serving:
 - Integrate with Paddle training pipeline seamlessly, most paddle models can be deployed with one line command.
@@ -16,7 +10,6 @@ Some Key Features of Paddle Serving:
 - Highly concurrent and efficient communication between clients and servers supported.
 
 The introduction and tutorial of Paddle Serving service deployment framework reference [document](https://github.com/PaddlePaddle/Serving/blob/develop/README.md).
-
 
 ## Contents
 - [Environmental preparation](#environmental-preparation)
@@ -63,42 +56,46 @@ PaddleClas operating environment and PaddleServing operating environment are nee
 <a name="model-conversion"></a>
 ## Model conversion
 When using PaddleServing for service deployment, you need to convert the saved inference model into a serving model that is easy to deploy.
+The following assumes that the current working directory is the PaddleClas root directory
 
 Firstly, download the inference model of ResNet50_vd
 ```
+cd deploy
 # Download and unzip the ResNet50_vd model
-wget https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/ResNet50_vd_infer.tar  && tar xf ResNet50_vd_infer.tar
+wget -P models/ https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/inference/product_ResNet50_vd_aliproduct_v1.0_infer.tar
+cd models
+tar -xf product_ResNet50_vd_aliproduct_v1.0_infer.tar
 ```
 
 Then, you can use installed paddle_serving_client tool to convert inference model to mobile model.
 ```
-#  ResNet50_vd model conversion
-python3 -m paddle_serving_client.convert --dirname ./ResNet50_vd_infer/ \
+#  Product recognition model conversion
+python3 -m paddle_serving_client.convert --dirname ./product_ResNet50_vd_aliproduct_v1.0_infer/ \
                                          --model_filename inference.pdmodel  \
                                          --params_filename inference.pdiparams \
-                                         --serving_server ./ResNet50_vd_serving/ \
-                                         --serving_client ./ResNet50_vd_client/
+                                         --serving_server ./product_ResNet50_vd_aliproduct_v1.0_serving/ \
+                                         --serving_client ./product_ResNet50_vd_aliproduct_v1.0_client/
 ```
 
-After the ResNet50_vd inference model is converted, there will be additional folders of `ResNet50_vd_serving` and `ResNet50_vd_client` in the current folder, with the following format:
+After the ResNet50_vd inference model is converted, there will be additional folders of `product_ResNet50_vd_aliproduct_v1.0_serving` and `product_ResNet50_vd_aliproduct_v1.0_client` in the current folder, with the following format:
 ```
-|- ResNet50_vd_client/
+|- product_ResNet50_vd_aliproduct_v1.0_serving/
   |- __model__  
   |- __params__
   |- serving_server_conf.prototxt  
   |- serving_server_conf.stream.prototxt
 
-|- ResNet50_vd_client
+|- product_ResNet50_vd_aliproduct_v1.0_client
   |- serving_client_conf.prototxt  
   |- serving_client_conf.stream.prototxt
 ```
 
-Once you have the model file for deployment, you need to change the alias name in `serving_server_conf.prototxt`: Change `alias_name` in `feed_var` to `image`, change `alias_name` in `fetch_var` to `prediction`,
+Once you have the model file for deployment, you need to change the alias name in `serving_server_conf.prototxt`:  change `alias_name` in `fetch_var` to `features`,
 The modified serving_server_conf.prototxt file is as follows:
 ```
 feed_var {
-  name: "inputs"
-  alias_name: "image"
+  name: "x"
+  alias_name: "x"
   is_lod_tensor: false
   feed_type: 1
   shape: 3
@@ -107,22 +104,31 @@ feed_var {
 }
 fetch_var {
   name: "save_infer_model/scale_0.tmp_1"
-  alias_name: "prediction"
+  alias_name: "features"
   is_lod_tensor: true
   fetch_type: 1
   shape: -1
 }
 ```
 
+Next，download and unpack the built index of product gallery
+```
+cd ../
+wget https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/data/recognition_demo_data_v1.1.tar && tar -xf recognition_demo_data_v1.1.tar
+```
+
+
 <a name="paddle-serving-pipeline-deployment"></a>
 ## Paddle Serving pipeline deployment
+
+**Attention:** pipeline deployment mode does not support Windows platform
 
 1. Download the PaddleClas code, if you have already downloaded it, you can skip this step.
     ```
     git clone https://github.com/PaddlePaddle/PaddleClas
 
     # Enter the working directory  
-    cd PaddleClas/deploy/paddleserving/
+    cd PaddleClas/deploy/paddleserving/recognition
     ```
 
     The paddleserving directory contains the code to start the pipeline service and send prediction requests, including:
@@ -131,23 +137,23 @@ fetch_var {
     config.yml                # configuration file of starting the service
     pipeline_http_client.py   # script to send pipeline prediction request by http
     pipeline_rpc_client.py    # script to send pipeline prediction request by rpc
-    classification_web_service.py   # start the script of the pipeline server
+    recognition_web_service.py   # start the script of the pipeline server
     ```
 
 2. Run the following command to start the service.
     ```
     # Start the service and save the running log in log.txt
-    python3 classification_web_service.py &>log.txt &
+    python3 recognition_web_service.py &>log.txt &
     ```
     After the service is successfully started, a log similar to the following will be printed in log.txt
-    ![](./imgs/start_server.png)
+    ![](../imgs/start_server_recog.png)
 
 3. Send service request
     ```
     python3 pipeline_http_client.py
     ```
     After successfully running, the predicted result of the model will be printed in the cmd window. An example of the result is:
-    ![](./imgs/results.png)
+    ![](../imgs/results_recog.png)  
 
     Adjust the number of concurrency in config.yml to get the largest QPS. 
 

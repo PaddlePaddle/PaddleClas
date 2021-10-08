@@ -54,7 +54,7 @@ Optimizer:
   momentum: 0.9
   lr:
     name: Cosine
-    learning_rate: 0.01
+    learning_rate: 0.04
   regularizer:
     name: 'L2'
     coeff: 0.0001
@@ -84,10 +84,10 @@ DataLoader:
           - RandomErasing:
               EPSILON: 0.5
     sampler:
-        name: DistributedRandomIdentitySampler
+        name: PKSampler
         batch_size: 128
-        num_instances: 2
-        drop_last: False
+        sample_per_id: 2
+        drop_last: True
 
     loader:
         num_workers: 6
@@ -97,7 +97,7 @@ DataLoader:
       dataset:
         name: LogoDataset
         image_root: "dataset/LogoDet-3K-crop/val/"
-        cls_label_path: "dataset/LogoDet-3K-crop/LogoDet-3K+query.txt"
+        cls_label_path: "dataset/LogoDet-3K-crop/LogoDet-3K+val.txt"
         transform_ops:
           - DecodeImage:
               to_rgb: True
@@ -122,7 +122,7 @@ DataLoader:
       dataset:
           name: LogoDataset
           image_root: "dataset/LogoDet-3K-crop/train/"
-          cls_label_path: "dataset/LogoDet-3K-crop/LogoDet-3K+gallery.txt"
+          cls_label_path: "dataset/LogoDet-3K-crop/LogoDet-3K+train.txt"
           transform_ops:
             - DecodeImage:
                 to_rgb: True
