@@ -29,7 +29,7 @@
 | 模型      | 模型结构   | 预训练模型下载地址   | inference模型下载地址  | mAP | inference模型大小(MB) | 单张图片预测耗时(不包含预处理)(ms) |
 | :------------:  | :-------------: | :------: | :-------: | :--------: | :-------: | :--------: |
 | 轻量级主体检测模型 | PicoDet | [地址](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/pretrain/picodet_PPLCNet_x2_5_mainbody_lite_v1.0_pretrained.pdparams) | [地址](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/inference/picodet_PPLCNet_x2_5_mainbody_lite_v1.0_infer.tar) | 40.1% | 29.8 | 29.8  |
-| 服务端主体检测模型 | PicoDet | [地址](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/pretrain/ppyolov2_r50vd_dcn_mainbody_v1.0_pretrained.pdparams) | [地址](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/inference/ppyolov2_r50vd_dcn_mainbody_v1.0_infer.tar) | 42.5% | 210.5 | 466.6  |
+| 服务端主体检测模型 | PP-YOLOv2 | [地址](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/pretrain/ppyolov2_r50vd_dcn_mainbody_v1.0_pretrained.pdparams) | [地址](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/inference/ppyolov2_r50vd_dcn_mainbody_v1.0_infer.tar) | 42.5% | 210.5 | 466.6  |
 
 * 注意
   * 速度评测机器的CPU具体信息为：`Intel(R) Xeon(R) Gold 6148 CPU @ 2.40GHz`，速度指标为开启 mkldnn ，线程数设置为 10 测试得到。
@@ -47,7 +47,7 @@ PicoDet 由 [PaddleDetection](https://github.com/PaddlePaddle/PaddleDetection) �
 - 轻量级检测 head
 
 
-更多关于 PicoDet 的优化细节与 benchmark 可以参考 [PicoDet 序列模型介绍](https://github.com/PaddlePaddle/PaddleDetection/blob/develop/configs/picodet/README.md)。
+更多关于 PicoDet 的优化细节与 benchmark 可以参考 [PicoDet 系列模型介绍](https://github.com/PaddlePaddle/PaddleDetection/blob/develop/configs/picodet/README.md)。
 
 在轻量级主体检测任务中，为了更好地兼顾检测速度与效果，我们使用 PPLCNet_x2_5 作为主体检测模型的骨干网络，同时将训练与预测的图像尺度修改为了 640x640，其余配置与 [picodet_m_shufflenetv2_416_coco.yml](https://github.com/PaddlePaddle/PaddleDetection/blob/develop/configs/picodet/picodet_m_shufflenetv2_416_coco.yml)完全一致。将数据集更换为自定义的主体检测数据集，进行训练，最终得到检测模型。
 
@@ -168,7 +168,7 @@ export CUDA_VISIBLE_DEVICES=0,1,2,3
 python -m paddle.distributed.launch --gpus 0,1,2,3 tools/train.py -c configs/ppyolo/ppyolov2_r50vd_dcn_365e_coco.yml --eval -r output/ppyolov2_r50vd_dcn_365e_coco/10000
 ```
 
-注意：如果遇到 "`Out of memory error`" 问题, 尝试在 `ppyolov2_reader.yml` 文件中调小`batch_size`
+注意：如果遇到 "`Out of memory error`" 问题, 尝试在 `ppyolov2_reader.yml` 文件中调小`batch_size`，同时等比例调小学习率。
 
 
 ### 3.5 模型预测与调试
