@@ -221,6 +221,18 @@ def mixed_precision_optimizer(config, optimizer):
             use_pure_fp16=use_pure_fp16,
             use_fp16_guard=True)
 
+    if 'AMP_BF16' in config:
+        amp_cfg = config.AMP_BF16 if config.AMP_BF16 else dict()
+        use_pure_bf16 = amp_cfg.get('use_pure_bf16', False)
+        optimizer = paddle.static.amp.bf16.decorate_bf16(
+            optimizer,
+            amp_lists=paddle.static.amp.bf16.AutoMixedPrecisionListsBF16(
+                custom_bf16_list={
+                    'conv2d', 'batch_norm', 'elementwise_add', 'relu'
+                }),
+            use_bf16_guard=False,
+            use_pure_bf16=False)
+
     return optimizer
 
 
