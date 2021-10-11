@@ -87,9 +87,9 @@ DataLoader:
               mean: [0., 0., 0.]
 
     sampler:
-        name: DistributedRandomIdentitySampler
+        name: PKSampler
         batch_size: 128
-        num_instances: 2
+        sample_per_id: 2
         drop_last: False
         shuffle: True
     loader:
