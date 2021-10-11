@@ -114,10 +114,10 @@ MobileNetV3-large-0.75x | 25.8 | 11.1 |
 
 | Backbone | mIoU(%) | Latency(ms) |
 |-------|-----------|----------|
-MobileNetV3-large-0.35x | 55.42 | 135 |
+MobileNetV3-large-0.5x | 55.42 | 135 |
 <b>PP-LCNet-0.5x<b> | <b>58.36<b> | <b>82<b> |
-MobileNetV3-large-0.75x | 64.53 | 11.1 |
-<b>PP-LCNet-1x<b> | <b>26.9<b> | <b>7.9<b> |
+MobileNetV3-large-0.75x | 64.53 | 151 |
+<b>PP-LCNet-1x<b> | <b>66.03<b> | <b>96<b> |
 
 ## 总结
 
