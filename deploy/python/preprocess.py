@@ -78,6 +78,9 @@ class UnifiedResize(object):
         if backend.lower() == "cv2":
             if isinstance(interpolation, str):
                 interpolation = _cv2_interp_from_str[interpolation.lower()]
+            # compatible with opencv < version 4.4.0
+            elif interpolation is None:
+                interpolation = cv2.INTER_LINEAR
             self.resize_func = partial(cv2.resize, interpolation=interpolation)
         elif backend.lower() == "pil":
             if isinstance(interpolation, str):

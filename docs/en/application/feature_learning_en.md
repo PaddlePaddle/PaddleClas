@@ -22,9 +22,8 @@ The feature learning config file description can be found in [yaml description](
 
 The following are the pretrained models trained on different dataset.
 
-- Vehicle Fine-Grained Classification：[CompCars](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/pretrain/vehicle_cls_ResNet50_CompCars_v1.1_pretrained.pdparams)
-- Vehicle ReID：[VERI-Wild](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/pretrain/vehicle_reid_ResNet50_VERIWild_v1.0_pretrained.pdparams)
+- Vehicle Fine-Grained Classification：[CompCars](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/pretrain/vehicle_cls_ResNet50_CompCars_v1.2_pretrained.pdparams)
+- Vehicle ReID：[VERI-Wild](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/pretrain/vehicle_reid_ResNet50_VERIWild_v1.1_pretrained.pdparams)
 - Cartoon Character Recognition：[iCartoon](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/pretrain/cartoon_rec_ResNet50_iCartoon_v1.0_pretrained.pdparams)
-- Logo Recognition：[Logo 3K](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/pretrain/logo_rec_ResNet50_Logo3K_v1.0_pretrained.pdparams)
-- Product Recognition： [Inshop](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/pretrain/product_ResNet50_vd_Inshop_pretrained_v1.0.pdparams)、[Aliproduct](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/pretrain/product_ResNet50_vd_Aliproduct_v1.0_pretrained.pdparams) 
-
+- Logo Recognition：[Logo 3K](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/pretrain/logo_rec_ResNet50_Logo3K_v1.1_pretrained.pdparams)
+- Product Recognition： [Inshop](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/pretrain/product_ResNet50_vd_Inshop_pretrained_v1.1.pdparams)、[Aliproduct](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/pretrain/product_ResNet50_vd_Aliproduct_v1.0_pretrained.pdparams)

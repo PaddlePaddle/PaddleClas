@@ -33,7 +33,7 @@ class MultiLabelDataset(CommonDataset):
         with open(self._cls_path) as fd:
             lines = fd.readlines()
             for l in lines:
-                l = l.strip().split(" ")
+                l = l.strip().split("\t")
                 self.images.append(os.path.join(self._img_root, l[0]))
 
                 labels = l[1].split(',')
@@ -44,13 +44,14 @@ class MultiLabelDataset(CommonDataset):
 
     def __getitem__(self, idx):
         try:
-            img = cv2.imread(self.images[idx])
-            img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+            with open(self.images[idx], 'rb') as f:
+                img = f.read()
             if self._transform_ops:
                 img = transform(img, self._transform_ops)
             img = img.transpose((2, 0, 1))
             label = np.array(self.labels[idx]).astype("float32")
             return (img, label)
+
         except Exception as ex:
             logger.error("Exception occured when parse line: {} with msg: {}".
                          format(self.images[idx], ex))

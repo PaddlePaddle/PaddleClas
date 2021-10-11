@@ -42,6 +42,7 @@ elif [ ${MODE} = "infer" ] || [ ${MODE} = "cpp_infer" ];then
     ln -s whole_chain_infer ILSVRC2012
     cd ILSVRC2012 
     mv val.txt val_list.txt
+    ln -s val_list.txt train_list.txt
     cd ../../
     # download inference model
     eval "wget -nc $inference_model_url"

@@ -35,7 +35,7 @@ export1:null
 export2:null
 infer_model_url:https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/whole_chain/ResNet50_vd_inference.tar
 infer_model:../inference/
-infer_export:null
+kl_quant:deploy/slim/quant_post_static.py -c ppcls/configs/ImageNet/ResNet/ResNet50_vd.yaml -o Global.save_inference_dir=./inference
 infer_quant:Fasle
 inference:python/predict_cls.py -c configs/inference_cls.yaml
 -o Global.use_gpu:True|False

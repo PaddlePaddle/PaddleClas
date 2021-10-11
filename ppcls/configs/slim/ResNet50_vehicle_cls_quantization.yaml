@@ -1,7 +1,7 @@
 # global configs
 Global:
   checkpoints: null
-  pretrained_model: null
+  pretrained_model: "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/pretrain/vehicle_cls_ResNet50_CompCars_v1.2_pretrained.pdparams"
   output_dir: "./output_vehicle_cls_pact/"
   device: "gpu"
   save_interval: 1
@@ -91,9 +91,9 @@ DataLoader:
               mean: [0., 0., 0.]
 
     sampler:
-        name: DistributedRandomIdentitySampler
-        batch_size: 128
-        num_instances: 2
+        name: PKSampler
+        batch_size: 64
+        sample_per_id: 2
         drop_last: False
         shuffle: True
     loader:

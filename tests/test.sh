@@ -403,17 +403,6 @@ if [ ${MODE} = "infer" ]; then
     infer_quant_flag=(${infer_is_quant})
     cd deploy
     for infer_model in ${infer_model_dir_list[*]}; do
-        # run export
-        if [ ${infer_run_exports[Count]} != "null" ];then
-            set_export_weight=$(func_set_params "${export_weight}" "${infer_model}")
-            set_save_infer_key=$(func_set_params "${save_infer_key}" "${infer_model}")
-            export_cmd="${python} ${norm_export} ${set_export_weight} ${set_save_infer_key}"
-            eval $export_cmd
-            status_export=$?
-            if [ ${status_export} = 0 ];then
-                status_check $status_export "${export_cmd}" "../${status_log}"
-            fi
-        fi
         #run inference
         is_quant=${infer_quant_flag[Count]}
         echo "is_quant: ${is_quant}"
@@ -421,6 +410,22 @@ if [ ${MODE} = "infer" ]; then
         Count=$(($Count + 1))
     done
     cd ..
+
+    # for kl_quant
+    echo "kl_quant"
+    if [ ${infer_run_exports} ]; then
+	command="${python} ${infer_run_exports}"
+	eval $command
+	last_status=${PIPESTATUS[0]}
+	status_check $last_status "${command}" "${status_log}"
+	cd inference/quant_post_static_model
+	ln -s __model__ inference.pdmodel
+	ln -s __params__ inference.pdiparams
+	cd ../../deploy
+	is_quant=True
+        func_inference "${python}" "${inference_py}" "${infer_model}/quant_post_static_model" "../${LOG_PATH}" "${infer_img_dir}" ${is_quant}
+	cd ..
+    fi
 elif [ ${MODE} = "cpp_infer" ]; then
     cd deploy
     func_cpp_inference "./cpp/build/clas_system" "../${LOG_PATH}" "${infer_img_dir}"

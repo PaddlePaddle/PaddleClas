@@ -81,12 +81,14 @@ class Topk(object):
             class_id_map = None
         return class_id_map
 
-    def __call__(self, x, file_names=None):
+    def __call__(self, x, file_names=None, multilabel=False):
         if file_names is not None:
             assert x.shape[0] == len(file_names)
         y = []
         for idx, probs in enumerate(x):
-            index = probs.argsort(axis=0)[-self.topk:][::-1].astype("int32")
+            index = probs.argsort(axis=0)[-self.topk:][::-1].astype(
+                "int32") if not multilabel else np.where(
+                    probs >= 0.5)[0].astype("int32")
             clas_id_list = []
             score_list = []
             label_name_list = []
@@ -106,6 +108,14 @@ class Topk(object):
                 result["label_names"] = label_name_list
             y.append(result)
         return y
+
+
+class MultiLabelTopk(Topk):
+    def __init__(self, topk=1, class_id_map_file=None):
+        super().__init__()
+
+    def __call__(self, x, file_names=None):
+        return super().__call__(x, file_names, multilabel=True)
 
 
 class SavePreLabel(object):
@@ -128,23 +138,24 @@ class SavePreLabel(object):
         os.makedirs(output_dir, exist_ok=True)
         shutil.copy(image_file, output_dir)
 
+
 class Binarize(object):
-    def __init__(self, method = "round"):
+    def __init__(self, method="round"):
         self.method = method
         self.unit = np.array([[128, 64, 32, 16, 8, 4, 2, 1]]).T
 
     def __call__(self, x, file_names=None):
         if self.method == "round":
             x = np.round(x + 1).astype("uint8") - 1
-        
+
         if self.method == "sign":
             x = ((np.sign(x) + 1) / 2).astype("uint8")
 
         embedding_size = x.shape[1]
         assert embedding_size % 8 == 0, "The Binary index only support vectors with sizes multiple of 8"
-        
+
         byte = np.zeros([x.shape[0], embedding_size // 8], dtype=np.uint8)
         for i in range(embedding_size // 8):
-            byte[:, i:i+1] = np.dot(x[:, i * 8: (i + 1)* 8], self.unit)
+            byte[:, i:i + 1] = np.dot(x[:, i * 8:(i + 1) * 8], self.unit)
 
         return byte
