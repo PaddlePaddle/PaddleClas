@@ -15,6 +15,12 @@
 import numpy as np
 import paddle
 import paddle.nn as nn
+import paddle.nn.functional as F
+
+from sklearn.metrics import hamming_loss
+from sklearn.metrics import accuracy_score as accuracy_metric
+from sklearn.metrics import multilabel_confusion_matrix
+from sklearn.preprocessing import binarize
 
 
 class TopkAcc(nn.Layer):
@@ -198,7 +204,7 @@ class Precisionk(nn.Layer):
             equal_flag = paddle.logical_and(equal_flag,
                                             keep_mask.astype('bool'))
         equal_flag = paddle.cast(equal_flag, 'float32')
-        
+
         Ns = paddle.arange(gallery_img_id.shape[0]) + 1
         equal_flag_cumsum = paddle.cumsum(equal_flag, axis=1)
         Precision_at_k = (paddle.mean(equal_flag_cumsum, axis=0) / Ns).numpy()
@@ -232,3 +238,71 @@ class GoogLeNetTopkAcc(TopkAcc):
 
     def forward(self, x, label):
         return super().forward(x[0], label)
+
+
+class MutiLabelMetric(object):
+    def __init__(self):
+        pass
+
+    def _multi_hot_encode(self, logits, threshold=0.5):
+        return binarize(logits, threshold=threshold)
+
+    def __call__(self, output):
+        output = F.sigmoid(output)
+        preds = self._multi_hot_encode(logits=output.numpy(), threshold=0.5)
+        return preds
+
+
+class HammingDistance(MutiLabelMetric):
+    """
+    Soft metric based label for multilabel classification
+    Returns:
+        The smaller the return value is, the better model is.
+    """
+
+    def __init__(self):
+        super().__init__()
+
+    def __call__(self, output, target):
+        preds = super().__call__(output)
+        metric_dict = dict()
+        metric_dict["HammingDistance"] = paddle.to_tensor(
+            hamming_loss(target, preds))
+        return metric_dict
+
+
+class AccuracyScore(MutiLabelMetric):
+    """
+    Hard metric for multilabel classification
+    Args:
+        base: ["sample", "label"], default="sample"
+            if "sample", return metric score based sample,
+            if "label", return metric score based label.
+    Returns:
+        accuracy:
+    """
+
+    def __init__(self, base="label"):
+        super().__init__()
+        assert base in ["sample", "label"
+                        ], 'must be one of ["sample", "label"]'
+        self.base = base
+
+    def __call__(self, output, target):
+        preds = super().__call__(output)
+        metric_dict = dict()
+        if self.base == "sample":
+            accuracy = accuracy_metric(target, preds)
+        elif self.base == "label":
+            mcm = multilabel_confusion_matrix(target, preds)
+            tns = mcm[:, 0, 0]
+            fns = mcm[:, 1, 0]
+            tps = mcm[:, 1, 1]
+            fps = mcm[:, 0, 1]
+            accuracy = (sum(tps) + sum(tns)) / (
+                sum(tps) + sum(tns) + sum(fns) + sum(fps))
+            precision = sum(tps) / (sum(tps) + sum(fps))
+            recall = sum(tps) / (sum(tps) + sum(fns))
+            F1 = 2 * (accuracy * recall) / (accuracy + recall)
+        metric_dict["AccuracyScore"] = paddle.to_tensor(accuracy)
+        return metric_dict

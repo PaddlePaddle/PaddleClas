@@ -1,0 +1,134 @@
+# global configs
+Global:
+  checkpoints: null
+  pretrained_model: "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/pretrain/vehicle_cls_ResNet50_CompCars_v1.2_pretrained.pdparams"
+  output_dir: "./output_vehicle_cls_pact/"
+  device: "gpu"
+  save_interval: 1
+  eval_during_train: True
+  eval_interval: 1
+  epochs: 80
+  print_batch_step: 10
+  use_visualdl: False
+  # used for static mode and model export
+  image_shape: [3, 224, 224]
+  save_inference_dir: "./inference"
+
+Slim:
+  quant:
+    name: pact
+
+# model architecture
+Arch:
+  name: "RecModel"
+  infer_output_key: "features"
+  infer_add_softmax: False
+  Backbone: 
+    name: "ResNet50_last_stage_stride1"
+    pretrained: True
+  BackboneStopLayer:
+    name: "adaptive_avg_pool2d_0"
+  Neck:
+    name: "VehicleNeck"
+    in_channels: 2048
+    out_channels: 512
+  Head:
+    name: "ArcMargin"  
+    embedding_size: 512
+    class_num: 431
+    margin: 0.15
+    scale: 32
+ 
+# loss function config for traing/eval process
+Loss:
+  Train:
+    - CELoss:
+        weight: 1.0
+    - SupConLoss:
+        weight: 1.0
+        views: 2
+  Eval:
+    - CELoss:
+        weight: 1.0
+
+Optimizer:
+  name: Momentum
+  momentum: 0.9
+  lr:
+    name: Cosine
+    learning_rate: 0.001
+  regularizer:
+    name: 'L2'
+    coeff: 0.0005
+
+
+# data loader for train and eval
+DataLoader:
+  Train:
+    dataset:
+        name: "CompCars"
+        image_root: "./dataset/CompCars/image/"
+        label_root: "./dataset/CompCars/label/"
+        bbox_crop: True
+        cls_label_path: "./dataset/CompCars/train_test_split/classification/train_label.txt"
+        transform_ops:
+          - ResizeImage:
+              size: 224
+          - RandFlipImage:
+              flip_code: 1
+          - AugMix:
+              prob: 0.5
+          - NormalizeImage:
+              scale: 0.00392157
+              mean: [0.485, 0.456, 0.406]
+              std: [0.229, 0.224, 0.225]
+              order: ''
+          - RandomErasing:
+              EPSILON: 0.5
+              sl: 0.02
+              sh: 0.4
+              r1: 0.3
+              mean: [0., 0., 0.]
+
+    sampler:
+        name: PKSampler
+        batch_size: 64
+        sample_per_id: 2
+        drop_last: False
+        shuffle: True
+    loader:
+        num_workers: 8
+        use_shared_memory: True
+
+  Eval:
+    dataset: 
+        name: "CompCars"
+        image_root: "./dataset/CompCars/image/"
+        label_root: "./dataset/CompCars/label/"
+        cls_label_path: "./dataset/CompCars/train_test_split/classification/test_label.txt"
+        bbox_crop: True
+        transform_ops:
+          - ResizeImage:
+              size: 224
+          - NormalizeImage:
+              scale: 0.00392157
+              mean: [0.485, 0.456, 0.406]
+              std: [0.229, 0.224, 0.225]
+              order: ''
+    sampler:
+        name: DistributedBatchSampler
+        batch_size: 128
+        drop_last: False
+        shuffle: False
+    loader:
+        num_workers: 8
+        use_shared_memory: True
+
+Metric:
+    Train:
+    - TopkAcc:
+        topk: [1, 5]
+    Eval:
+    - TopkAcc:
+        topk: [1, 5]
+

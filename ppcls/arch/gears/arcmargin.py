@@ -24,30 +24,25 @@ class ArcMargin(nn.Layer):
                  margin=0.5,
                  scale=80.0,
                  easy_margin=False):
-        super(ArcMargin, self).__init__()
+        super().__init__()
         self.embedding_size = embedding_size
         self.class_num = class_num
         self.margin = margin
         self.scale = scale
         self.easy_margin = easy_margin
-
-        weight_attr = paddle.ParamAttr(
-            initializer=paddle.nn.initializer.XavierNormal())
-        self.fc = nn.Linear(
-            self.embedding_size,
-            self.class_num,
-            weight_attr=weight_attr,
-            bias_attr=False)
+        self.weight = self.create_parameter(
+            shape=[self.embedding_size, self.class_num],
+            is_bias=False,
+            default_initializer=paddle.nn.initializer.XavierNormal())
 
     def forward(self, input, label=None):
         input_norm = paddle.sqrt(
             paddle.sum(paddle.square(input), axis=1, keepdim=True))
         input = paddle.divide(input, input_norm)
 
-        weight = self.fc.weight
         weight_norm = paddle.sqrt(
-            paddle.sum(paddle.square(weight), axis=0, keepdim=True))
-        weight = paddle.divide(weight, weight_norm)
+            paddle.sum(paddle.square(self.weight), axis=0, keepdim=True))
+        weight = paddle.divide(self.weight, weight_norm)
 
         cos = paddle.matmul(input, weight)
         if not self.training or label is None:

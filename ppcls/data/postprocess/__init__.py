@@ -16,7 +16,7 @@ import importlib
 
 from . import topk
 
-from .topk import Topk
+from .topk import Topk, MultiLabelTopk
 
 
 def build_postprocess(config):

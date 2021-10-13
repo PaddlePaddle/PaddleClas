@@ -1,8 +1,8 @@
 # global configs
 Global:
   checkpoints: null
-  pretrained_model: null
-  output_dir: "./output/"
+  pretrained_model: "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/pretrain/vehicle_reid_ResNet50_VERIWild_v1.1_pretrained.pdparams"
+  output_dir: "./output_vehicle_reid_prune/"
   device: "gpu"
   save_interval: 1
   eval_during_train: True
@@ -61,7 +61,6 @@ Optimizer:
   lr:
     name: Cosine
     learning_rate: 0.01
-    last_epoch: -1
   regularizer:
     name: 'L2'
     coeff: 0.0005
@@ -96,9 +95,9 @@ DataLoader:
               mean: [0., 0., 0.]
 
     sampler:
-        name: DistributedRandomIdentitySampler
+        name: PKSampler
         batch_size: 128
-        num_instances: 2
+        sample_per_id: 2
         drop_last: False
         shuffle: True
     loader:

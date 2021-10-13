@@ -113,14 +113,14 @@ norm_export=$(func_parser_value "${lines[29]}")
 pact_export=$(func_parser_value "${lines[30]}")
 fpgm_export=$(func_parser_value "${lines[31]}")
 distill_export=$(func_parser_value "${lines[32]}")
-export_key1=$(func_parser_key "${lines[33]}")
-export_value1=$(func_parser_value "${lines[33]}")
+kl_quant_cmd_key=$(func_parser_key "${lines[33]}")
+kl_quant_cmd_value=$(func_parser_value "${lines[33]}")
 export_key2=$(func_parser_key "${lines[34]}")
 export_value2=$(func_parser_value "${lines[34]}")
 
 # parser inference model 
 infer_model_dir_list=$(func_parser_value "${lines[36]}")
-infer_export_list=$(func_parser_value "${lines[37]}")
+infer_export_flag=$(func_parser_value "${lines[37]}")
 infer_is_quant=$(func_parser_value "${lines[38]}")
 # parser inference 
 inference_py=$(func_parser_value "${lines[39]}")
@@ -295,21 +295,15 @@ if [ ${MODE} = "infer" ]; then
     eval $env
     export Count=0
     IFS="|"
-    infer_run_exports=(${infer_export_list})
+    infer_export_flag=(${infer_export_flag})
     infer_quant_flag=(${infer_is_quant})
+    if [ ${infer_export_flag} != "null" ]  && [ ${infer_export_flag} != "False" ]; then
+	rm -rf ${infer_model_dir_list/..\//}
+        export_cmd="${python} ${norm_export} -o Global.pretrained_model=${model_name}_pretrained -o Global.save_inference_dir=${infer_model_dir_list/..\//}"
+        eval $export_cmd
+    fi
     cd deploy
     for infer_model in ${infer_model_dir_list[*]}; do
-        # run export
-        if [ ${infer_run_exports[Count]} != "null" ];then
-            set_export_weight=$(func_set_params "${export_weight}" "${infer_model}")
-            set_save_infer_key=$(func_set_params "${save_infer_key}" "${infer_model}")
-            export_cmd="${python} ${norm_export} ${set_export_weight} ${set_save_infer_key}"
-            eval $export_cmd
-            status_export=$?
-            if [ ${status_export} = 0 ];then
-                status_check $status_export "${export_cmd}" "../${status_log}"
-            fi
-        fi
         #run inference
         is_quant=${infer_quant_flag[Count]}
         echo "is_quant: ${is_quant}"
@@ -317,6 +311,22 @@ if [ ${MODE} = "infer" ]; then
         Count=$(($Count + 1))
     done
     cd ..
+
+    # for kl_quant
+    if [ ${kl_quant_cmd_value} != "null" ] && [ ${kl_quant_cmd_value} != "False" ]; then
+	echo "kl_quant"
+	command="${python} ${kl_quant_cmd_value}"
+	eval $command
+	last_status=${PIPESTATUS[0]}
+	status_check $last_status "${command}" "${status_log}"
+	cd inference/quant_post_static_model
+	ln -s __model__ inference.pdmodel
+	ln -s __params__ inference.pdiparams
+	cd ../../deploy
+	is_quant=True
+        func_inference "${python}" "${inference_py}" "${infer_model}/quant_post_static_model" "../${LOG_PATH}" "${infer_img_dir}" ${is_quant}
+	cd ..
+    fi
 elif [ ${MODE} = "cpp_infer" ]; then
     cd deploy
     func_cpp_inference "./cpp/build/clas_system" "../${LOG_PATH}" "${infer_img_dir}"

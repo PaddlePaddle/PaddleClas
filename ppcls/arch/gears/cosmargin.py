@@ -25,13 +25,10 @@ class CosMargin(paddle.nn.Layer):
         self.embedding_size = embedding_size
         self.class_num = class_num
 
-        weight_attr = paddle.ParamAttr(
-            initializer=paddle.nn.initializer.XavierNormal())
-        self.fc = nn.Linear(
-            self.embedding_size,
-            self.class_num,
-            weight_attr=weight_attr,
-            bias_attr=False)
+        self.weight = self.create_parameter(
+            shape=[self.embedding_size, self.class_num],
+            is_bias=False,
+            default_initializer=paddle.nn.initializer.XavierNormal())
 
     def forward(self, input, label):
         label.stop_gradient = True
@@ -40,15 +37,14 @@ class CosMargin(paddle.nn.Layer):
             paddle.sum(paddle.square(input), axis=1, keepdim=True))
         input = paddle.divide(input, input_norm)
 
-        weight = self.fc.weight
         weight_norm = paddle.sqrt(
-            paddle.sum(paddle.square(weight), axis=0, keepdim=True))
-        weight = paddle.divide(weight, weight_norm)
+            paddle.sum(paddle.square(self.weight), axis=0, keepdim=True))
+        weight = paddle.divide(self.weight, weight_norm)
 
         cos = paddle.matmul(input, weight)
         if not self.training or label is None:
             return cos
-        
+
         cos_m = cos - self.margin
 
         one_hot = paddle.nn.functional.one_hot(label, self.class_num)

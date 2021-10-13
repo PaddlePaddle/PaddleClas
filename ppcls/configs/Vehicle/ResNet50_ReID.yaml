@@ -53,8 +53,7 @@ Optimizer:
   momentum: 0.9
   lr:
     name: Cosine
-    learning_rate: 0.01
-    last_epoch: -1
+    learning_rate: 0.04
   regularizer:
     name: 'L2'
     coeff: 0.0005
@@ -89,10 +88,10 @@ DataLoader:
               mean: [0., 0., 0.]
 
     sampler:
-        name: DistributedRandomIdentitySampler
+        name: PKSampler
         batch_size: 128
-        num_instances: 2
-        drop_last: False
+        sample_per_id: 2
+        drop_last: True
         shuffle: True
     loader:
         num_workers: 6

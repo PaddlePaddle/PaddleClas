@@ -21,6 +21,7 @@ from ppcls.arch.backbone.legendary_models.resnet import ResNet18, ResNet18_vd, R
 from ppcls.arch.backbone.legendary_models.vgg import VGG11, VGG13, VGG16, VGG19
 from ppcls.arch.backbone.legendary_models.inception_v3 import InceptionV3
 from ppcls.arch.backbone.legendary_models.hrnet import HRNet_W18_C, HRNet_W30_C, HRNet_W32_C, HRNet_W40_C, HRNet_W44_C, HRNet_W48_C, HRNet_W60_C, HRNet_W64_C, SE_HRNet_W64_C
+from ppcls.arch.backbone.legendary_models.pp_lcnet import PPLCNet_x0_25, PPLCNet_x0_35, PPLCNet_x0_5, PPLCNet_x0_75, PPLCNet_x1_0, PPLCNet_x1_5, PPLCNet_x2_0, PPLCNet_x2_5
 
 from ppcls.arch.backbone.model_zoo.resnet_vc import ResNet50_vc
 from ppcls.arch.backbone.model_zoo.resnext import ResNeXt50_32x4d, ResNeXt50_64x4d, ResNeXt101_32x4d, ResNeXt101_64x4d, ResNeXt152_32x4d, ResNeXt152_64x4d
@@ -57,6 +58,7 @@ from ppcls.arch.backbone.model_zoo.dla import DLA34, DLA46_c, DLA46x_c, DLA60, D
 from ppcls.arch.backbone.model_zoo.rednet import RedNet26, RedNet38, RedNet50, RedNet101, RedNet152
 from ppcls.arch.backbone.model_zoo.tnt import TNT_small
 from ppcls.arch.backbone.model_zoo.hardnet import HarDNet68, HarDNet85, HarDNet39_ds, HarDNet68_ds
+from ppcls.arch.backbone.model_zoo.cspnet import CSPDarkNet53
 from ppcls.arch.backbone.variant_models.resnet_variant import ResNet50_last_stage_stride1
 from ppcls.arch.backbone.variant_models.vgg_variant import VGG19Sigmoid
 

@@ -4,9 +4,9 @@
 
 PaddleClas provides two service deployment methods:
 - Based on **PaddleHub Serving**: Code path is "`./deploy/hubserving`". Please refer to the [tutorial](../../deploy/hubserving/readme_en.md)
-- Based on **PaddleServing**: Code path is "`./deploy/paddleserving`". Please follow this tutorial.
+- Based on **PaddleServing**: Code path is "`./deploy/paddleserving`".  if you prefer retrieval_based image reocognition service, please refer to [tutorial](./recognition/README.md)，if you'd like image classification service, Please follow this tutorial.
 
-# Service deployment based on PaddleServing  
+# Image Classification Service deployment based on PaddleServing  
 
 This document will introduce how to use the [PaddleServing](https://github.com/PaddlePaddle/Serving/blob/develop/README.md) to deploy the ResNet50_vd model as a pipeline online service.
 
@@ -131,7 +131,7 @@ fetch_var {
     config.yml                # configuration file of starting the service
     pipeline_http_client.py   # script to send pipeline prediction request by http
     pipeline_rpc_client.py    # script to send pipeline prediction request by rpc
-    resnet50_web_service.py   # start the script of the pipeline server
+    classification_web_service.py   # start the script of the pipeline server
     ```
 
 2. Run the following command to start the service.
@@ -147,7 +147,7 @@ fetch_var {
     python3 pipeline_http_client.py
     ```
     After successfully running, the predicted result of the model will be printed in the cmd window. An example of the result is:
-    ![](./imgs/results.png)  
+    ![](./imgs/results.png)
 
     Adjust the number of concurrency in config.yml to get the largest QPS. 
 
