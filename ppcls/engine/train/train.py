@@ -24,7 +24,7 @@ def train_epoch(engine, epoch_id, print_batch_step):
     for iter_id, batch in enumerate(engine.train_dataloader):
         if iter_id >= engine.max_iter:
             break
-        profiler.add_profiler_step(trainer.config["profiler_options"])
+        profiler.add_profiler_step(engine.config["profiler_options"])
         if iter_id == 5:
             for key in engine.time_info:
                 engine.time_info[key].reset()
