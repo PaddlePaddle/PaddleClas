@@ -248,6 +248,8 @@ class Engine(object):
             self.scaler = paddle.amp.GradScaler(
                 init_loss_scaling=self.scale_loss,
                 use_dynamic_loss_scaling=self.use_dynamic_loss_scaling)
+            # imperative pure fp16 mode
+            self.model, self.optimizer = paddle.amp.decorate(models=self.model, optimizers=self.optimizer, level=self.config['AMP']['amp_level'])
 
         self.max_iter = len(self.train_dataloader) - 1 if platform.system(
         ) == "Windows" else len(self.train_dataloader)

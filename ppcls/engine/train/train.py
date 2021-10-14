@@ -16,6 +16,7 @@ from __future__ import absolute_import, division, print_function
 import time
 import paddle
 from ppcls.engine.train.utils import update_loss, update_metric, log_info
+import sys
 
 
 def train_epoch(engine, epoch_id, print_batch_step):
@@ -23,7 +24,7 @@ def train_epoch(engine, epoch_id, print_batch_step):
     for iter_id, batch in enumerate(engine.train_dataloader):
         if iter_id >= engine.max_iter:
             break
-        if iter_id == 5:
+        if iter_id == 50:
             for key in engine.time_info:
                 engine.time_info[key].reset()
         engine.time_info["reader_cost"].update(time.time() - tic)
@@ -40,20 +41,19 @@ def train_epoch(engine, epoch_id, print_batch_step):
         # image input
         if engine.amp:
             with paddle.amp.auto_cast(custom_black_list={
-                    "flatten_contiguous_range", "greater_than"
-            }):
+                    "flatten_contiguous_range", "greater_than"},
+                    level=engine.config['AMP']['amp_level']):
                 out = forward(engine, batch)
                 loss_dict = engine.train_loss_func(out, batch[1])
         else:
             out = forward(engine, batch)
-
-        # calc loss
-        if engine.config["DataLoader"]["Train"]["dataset"].get(
-                "batch_transform_ops", None):
-            loss_dict = engine.train_loss_func(out, batch[1:])
-        else:
-            loss_dict = engine.train_loss_func(out, batch[1])
-
+            # calc loss
+            if engine.config["DataLoader"]["Train"]["dataset"].get(
+                    "batch_transform_ops", None):
+                loss_dict = engine.train_loss_func(out, batch[1:])
+            else:
+                loss_dict = engine.train_loss_func(out, batch[1])
+        
         # step opt and lr
         if engine.amp:
             scaled = engine.scaler.scale(loss_dict["loss"])
