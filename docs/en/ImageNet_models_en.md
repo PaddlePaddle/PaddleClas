@@ -59,10 +59,10 @@ Accuracy and inference time of the prtrained models based on SSLD distillation a
 * Note: `Reference Top-1 Acc` means accuracy of pretrained models which are trained on ImageNet1k dataset.
 
 
-<a name="PPLCNet_series"></a>
-### PPLCNet_series
+<a name="PP-LCNet_series"></a>
+### PP-LCNet_series
 
-Accuracy and inference time metrics of PPLCNet series models are shown as follows. More detailed information can be refered to [PPLCNet series tutorial](../en/models/PPLCNet_en.md).
+Accuracy and inference time metrics of PPLCNet series models are shown as follows. More detailed information can be refered to [PPLCNet series tutorial](../en/models/PP-LCNet_en.md).
 
 | Model           | Top-1 Acc | Top-5 Acc | Intel-Xeon-Gold-6148 time(ms)<br>bs=1 | FLOPs(M) | Params(M) | Download Address |
 |:--:|:--:|:--:|:--:|:--:|:--:|:--:|
