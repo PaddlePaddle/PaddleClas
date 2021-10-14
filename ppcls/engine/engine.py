@@ -97,7 +97,10 @@ class Engine(object):
             paddle.__version__, self.device))
 
         # AMP training
-        self.amp = True if "AMP" in self.config else False
+        if ("AMP" in self.config) and (self.config['AMP']['use_pure_fp16'] is True):
+            self.amp = True
+        else:
+            self.amp = False
         if self.amp and self.config["AMP"] is not None:
             self.scale_loss = self.config["AMP"].get("scale_loss", 1.0)
             self.use_dynamic_loss_scaling = self.config["AMP"].get(

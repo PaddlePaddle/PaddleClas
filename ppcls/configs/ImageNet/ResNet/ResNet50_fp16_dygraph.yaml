@@ -23,7 +23,7 @@ AMP:
   scale_loss: 128.0
   use_dynamic_loss_scaling: True
   use_pure_fp16: &use_pure_fp16 True
-  amp_level: 'O2'   # O1-amp, O2-pure_fp16
+  amp_level: 'O1'   # O1-amp, O2-pure_fp16
 
 # model architecture
 Arch:
@@ -60,8 +60,8 @@ DataLoader:
   Train:
     dataset:
       name: ImageNetDataset
-      image_root: /Paddle/datasets/datasets/ILSVRC2012/
-      cls_label_path: /Paddle/datasets/datasets/ILSVRC2012/train_list.txt
+      image_root: ./dataset/ILSVRC2012/
+      cls_label_path: ./dataset/ILSVRC2012/train_list.txt
       transform_ops:
         - DecodeImage:
             to_rgb: True
@@ -90,8 +90,8 @@ DataLoader:
   Eval:
     dataset: 
       name: ImageNetDataset
-      image_root: /Paddle/datasets/datasets/ILSVRC2012/
-      cls_label_path: /Paddle/datasets/datasets/ILSVRC2012/val_list.txt
+      image_root: ./dataset/ILSVRC2012/
+      cls_label_path: ./dataset/ILSVRC2012/val_list.txt
       transform_ops:
         - DecodeImage:
             to_rgb: True
