@@ -1,4 +1,4 @@
-# PPLCNet系列
+# PP-LCNet系列
 
 ## 摘要
 
@@ -127,3 +127,17 @@ MobileNetV3-large-0.75x | 64.53 | 151 |
 ## 总结
 
 PP-LCNet没有像学术界那样死扣极致的FLOPs与Params，而是着眼于分析如何添加对Intel CPU友好的模块来提升模型的性能，这样可以更好的平衡准确率和推理时间，其中的实验结论也很适合其他网络结构设计的研究者，同时也为NAS搜索研究者提供了更小的搜索空间和一般结论。最终的PP-LCNet在产业界也可以更好的落地和应用。
+
+## 引用
+
+如果你的论文用到了PP-LCNet的方法，请添加如下cite：
+```
+@misc{cui2021pplcnet,
+      title={PP-LCNet: A Lightweight CPU Convolutional Neural Network}, 
+      author={Cheng Cui and Tingquan Gao and Shengyu Wei and Yuning Du and Ruoyu Guo and Shuilong Dong and Bin Lu and Ying Zhou and Xueying Lv and Qiwen Liu and Xiaoguang Hu and Dianhai Yu and Yanjun Ma},
+      year={2021},
+      eprint={2109.15099},
+      archivePrefix={arXiv},
+      primaryClass={cs.CV}
+}
+```

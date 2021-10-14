@@ -66,10 +66,10 @@
 
 * 注: `Reference Top-1 Acc`表示PaddleClas基于ImageNet1k数据集训练得到的预训练模型精度。
 
-<a name="PPLCNet系列"></a>
-### PPLCNet系列
+<a name="PP-LCNet系列"></a>
+### PP-LCNet系列
 
-PPLCNet系列模型的精度、速度指标如下表所示，更多关于该系列的模型介绍可以参考：[PPLCNet系列模型文档](./models/PPLCNet.md)。
+PP-LCNet系列模型的精度、速度指标如下表所示，更多关于该系列的模型介绍可以参考：[PP-LCNet系列模型文档](./models/PP-LCNet.md)。
 
 | 模型           | Top-1 Acc | Top-5 Acc | Intel-Xeon-Gold-6148 time(ms)<br>bs=1 | FLOPs(M) | Params(M) | 下载地址 |
 |:--:|:--:|:--:|:--:|:--:|:--:|:--:|
