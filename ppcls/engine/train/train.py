@@ -37,22 +37,22 @@ def train_epoch(engine, epoch_id, print_batch_step):
             batch[1] = batch[1].reshape([-1, 1]).astype("int64")
         engine.global_step += 1
 
+        if engine.config["DataLoader"]["Train"]["dataset"].get(
+                "batch_transform_ops", None):
+            gt_input = batch[1:]
+        else:
+            gt_input = batch[1]
+
         # image input
         if engine.amp:
             with paddle.amp.auto_cast(custom_black_list={
                     "flatten_contiguous_range", "greater_than"
             }):
                 out = forward(engine, batch)
-                loss_dict = engine.train_loss_func(out, batch[1])
+                loss_dict = engine.train_loss_func(out, gt_input)
         else:
             out = forward(engine, batch)
-
-        # calc loss
-        if engine.config["DataLoader"]["Train"]["dataset"].get(
-                "batch_transform_ops", None):
-            loss_dict = engine.train_loss_func(out, batch[1:])
-        else:
-            loss_dict = engine.train_loss_func(out, batch[1])
+            loss_dict = engine.train_loss_func(out, gt_input)
 
         # step opt and lr
         if engine.amp:
