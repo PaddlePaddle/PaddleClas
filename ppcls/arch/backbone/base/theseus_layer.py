@@ -40,16 +40,31 @@ class TheseusLayer(nn.Layer):
                 continue
             sub_layer_parent = self
             while len(pattern_list) > 1:
-                sub_layer_parent = getattr(sub_layer_parent, pattern_list[0],
-                                           None)
-                if sub_layer_parent is None:
-                    break
+                if '[' in pattern_list[0]:
+                    sub_layer_name = pattern_list[0].split('[')[0]
+                    sub_layer_index = pattern_list[0].split('[')[1].split(']')[0]
+                    sub_layer_parent = getattr(sub_layer_parent, sub_layer_name)[sub_layer_index]
+                else:
+                    sub_layer_parent = getattr(sub_layer_parent, pattern_list[0],
+                                               None)
+                    if sub_layer_parent is None:
+                        break
+                if isinstance(sub_layer_parent, WrapLayer):
+                    sub_layer_parent = sub_layer_parent.sub_layer
                 pattern_list = pattern_list[1:]
             if sub_layer_parent is None:
                 continue
-            sub_layer = getattr(sub_layer_parent, pattern_list[0])
-            if not isinstance(sub_layer, TheseusLayer):
-                sub_layer = wrap_theseus(sub_layer)
+            if '[' in pattern_list[0]:
+                sub_layer_name = pattern_list[0].split('[')[0]
+                sub_layer_index = pattern_list[0].split('[')[1].split(']')[0]
+                sub_layer = getattr(sub_layer_parent, sub_layer_name)[sub_layer_index]
+                if not isinstance(sub_layer, TheseusLayer):
+                    sub_layer = wrap_theseus(sub_layer)
+                getattr(sub_layer_parent, sub_layer_name)[sub_layer_index] = sub_layer
+            else:
+                sub_layer = getattr(sub_layer_parent, pattern_list[0])
+                if not isinstance(sub_layer, TheseusLayer):
+                    sub_layer = wrap_theseus(sub_layer)
                 setattr(sub_layer_parent, pattern_list[0], sub_layer)
 
             sub_layer.res_dict = self.res_dict
