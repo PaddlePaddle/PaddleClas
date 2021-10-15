@@ -28,7 +28,7 @@ export CUDA_VISIBLE_DEVICES="0"
 # 设置用于神经网络训练的显存大小，可根据具体情况设置，一般可设置为0.8或0.7，剩余显存则预留DALI使用
 export FLAGS_fraction_of_gpu_memory_to_use=0.80
 
-python tools/static/train.py -c configs/ResNet/ResNet50.yaml -o use_dali=True
+python ppcls/static/train.py -c ./ppcls/configs/ImageNet/ResNet/ResNet50.yaml -o use_dali=True
 ```
 
 也可以使用多卡训练：
@@ -42,8 +42,8 @@ export FLAGS_fraction_of_gpu_memory_to_use=0.80
 
 python -m paddle.distributed.launch \
     --gpus="0,1,2,3,4,5,6,7" \
-    tools/static/train.py \
-        -c ./configs/ResNet/ResNet50.yaml \
+    ppcls/static/train.py \
+        -c ./ppcls/configs/ImageNet/ResNet/ResNet50.yaml \
         -o use_dali=True
 ```
 
@@ -56,6 +56,6 @@ export FLAGS_fraction_of_gpu_memory_to_use=0.8
 
 python -m paddle.distributed.launch \
     --gpus="0,1,2,3,4,5,6,7" \
-    tools/static/train.py \
-    -c configs/ResNet/ResNet50_fp16.yaml
+    ppcls/static/train.py \
+    -c ./ppcls/configs/ImageNet/ResNet/ResNet50_fp16.yaml
 ```
