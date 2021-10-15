@@ -67,8 +67,8 @@ DataLoader:
   Train:
     dataset:
       name: VeriWild
-      image_root: ./dataset/Stanford_Online_Products/
-      cls_label_path: ./dataset/Stanford_Online_Products/train_list.txt
+      image_root: ./dataset/SOP/
+      cls_label_path: ./dataset/SOP/train_list.txt
       transform_ops:
         - DecodeImage:
             to_rgb: True
@@ -90,20 +90,20 @@ DataLoader:
             mean: [0., 0., 0.]
 
     sampler:
-      name: DistributedRandomIdentitySampler
+      name: PKSampler
       batch_size: 64
-      num_instances: 2
+      sample_per_id: 2
       drop_last: False
       shuffle: True
     loader:
-      num_workers: 6
+      num_workers: 4
       use_shared_memory: True
   Eval:
     Query:
       dataset: 
         name: VeriWild
-        image_root: ./dataset/Stanford_Online_Products/
-        cls_label_path: ./dataset/Stanford_Online_Products/test_list.txt
+        image_root: ./dataset/SOP/
+        cls_label_path: ./dataset/SOP/test_list.txt
         transform_ops:
           - DecodeImage:
               to_rgb: True
@@ -127,8 +127,8 @@ DataLoader:
     Gallery:
       dataset: 
         name: VeriWild
-        image_root: ./dataset/Stanford_Online_Products/
-        cls_label_path: ./dataset/Stanford_Online_Products/test_list.txt
+        image_root: ./dataset/SOP/
+        cls_label_path: ./dataset/SOP/test_list.txt
         transform_ops:
           - DecodeImage:
               to_rgb: True
@@ -153,4 +153,4 @@ Metric:
   Eval:
     - Recallk:
         topk: [1, 5]
-
+    - mAP: {}
