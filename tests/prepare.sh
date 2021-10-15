@@ -7,6 +7,15 @@ dataline=$(cat ${FILENAME})
 # parser params
 IFS=$'\n'
 lines=(${dataline})
+
+function func_parser_key(){
+    strs=$1
+    IFS=":"
+    array=(${strs})
+    tmp=${array[0]}
+    echo ${tmp}
+}
+
 function func_parser_value(){
     strs=$1
     IFS=":"
@@ -20,7 +29,8 @@ function func_parser_value(){
     fi
 }
 model_name=$(func_parser_value "${lines[1]}")
-inference_model_url=$(func_parser_value "${lines[35]}")
+model_url_value=$(func_parser_value "${lines[35]}")
+model_url_key=$(func_parser_key "${lines[35]}")
 
 if [ ${MODE} = "lite_train_infer" ] || [ ${MODE} = "whole_infer" ];then
     # pretrain lite train data
@@ -44,9 +54,12 @@ elif [ ${MODE} = "infer" ] || [ ${MODE} = "cpp_infer" ];then
     mv val.txt val_list.txt
     ln -s val_list.txt train_list.txt
     cd ../../
-    # download inference model
-    eval "wget -nc $inference_model_url"
-    tar xf "${model_name}_inference.tar"
+    # download inference or pretrained model
+    eval "wget -nc $model_url_value"
+    if [[ $model_url_key == *inference* ]]; then
+	rm -rf inference
+	tar xf "${model_name}_inference.tar"
+    fi
 
 elif [ ${MODE} = "whole_train_infer" ];then
     cd dataset
