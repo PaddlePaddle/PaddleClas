@@ -33,7 +33,7 @@ class TopkAcc(nn.Layer):
 
     def forward(self, x, label):
         if isinstance(x, dict):
-            x = x["logits"]
+            x = x["output"]
 
         metric_dict = dict()
         for k in self.topk:

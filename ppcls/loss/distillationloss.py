@@ -84,7 +84,7 @@ class DistillationDMLLoss(DMLLoss):
 
     def __init__(self,
                  model_name_pairs=[],
-                 act=None,
+                 act="softmax",
                  key=None,
                  name="loss_dml"):
         super().__init__(act=act)
@@ -125,7 +125,7 @@ class DistillationDistanceLoss(DistanceLoss):
         assert isinstance(model_name_pairs, list)
         self.key = key
         self.model_name_pairs = model_name_pairs
-        self.name = name + "_l2"
+        self.name = name + mode
 
     def forward(self, predicts, batch):
         loss_dict = dict()
