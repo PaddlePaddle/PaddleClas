@@ -102,6 +102,7 @@ def main(args):
             )
             continue
         else:
+            img = img[:, :, ::-1]
             for ops in preprocess_ops:
                 img = ops(img)
             img = np.array(img)
