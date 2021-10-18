@@ -46,7 +46,7 @@ In the paper of MixNet, the author analyzes the effect of convolutional kernel s
 
 Experiments show that a larger convolutional kernel placed at the middle and tail of the network can achieve the same accuracy as placed at all positions, coupled with faster inference. The option in the third row of the table was the final choice of PP-LCNet.
 
-### Larger dimensional 1 × 1 conv layer after GAP
+### Larger Dimensional 1 × 1 Conv Layer after GAP
 
 Since the introduction of GoogLeNet, GAP (Global-Average-Pooling) is often directly followed by a classification layer, which fails to result in further integration and processing of features extracted after GAP in the lightweight network. If a larger 1x1 convolutional layer (equivalent to the FC layer) is used after GAP, the extracted features, instead of directly passing through the classification layer, will first be integrated, and then classified. This can greatly improve the accuracy rate without affecting the inference speed of the model. The above four improvements were made to BaseNet to obtain PP-LCNet. The following table further illustrates the impact of each scheme on the results：
 
