@@ -183,6 +183,11 @@ class Engine(object):
         self.model = build_model(self.config["Arch"])
         # set @to_static for benchmark, skip this by default.
         apply_to_static(self.config, self.model)
+
+        # for slim
+        self.pruner = get_pruner(self.config, self.model)
+        self.quanter = get_quaner(self.config, self.model)
+
         # load_pretrain
         if self.config["Global"]["pretrained_model"] is not None:
             if self.config["Global"]["pretrained_model"].startswith("http"):
@@ -191,10 +196,6 @@ class Engine(object):
             else:
                 load_dygraph_pretrain(
                     self.model, self.config["Global"]["pretrained_model"])
-
-        # for slim
-        self.pruner = get_pruner(self.config, self.model)
-        self.quanter = get_quaner(self.config, self.model)
 
         # build optimizer
         if self.mode == 'train':
