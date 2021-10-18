@@ -20,7 +20,7 @@ Build on extensive experiments, we found that many seemingly less time-consuming
 
 Since the adoption of ReLU activation function by convolutional neural network, the network performance has been improved substantially, and variants of the ReLU activation function have appeared in recent years, such as Leaky-ReLU, P-ReLU, ELU, etc. In 2017, Google Brain searched to obtain the swish activation function, which performs well on lightweight networks. In 2019, the authors of MobileNetV3 further optimized this activation function to H-Swish, which removes the exponential operation, leading to faster speed and an almost unaffected network accuracy. After many experiments, we also recognized its excellent performance on lightweight networks. Therefore, this activation function is adopted in PP-LCNet.
 
-### Proper Addition of SE Module
+### SE Modules at Appropriate Positions
 
 The SE module is a channel attention mechanism proposed by SENet, which can effectively improve the accuracy of the model. However, on the Intel CPU side, the module also presents a large latency, leaving us the task of balancing accuracy and speed. The search of the location of the SE module in NAS search-based networks such as MobileNetV3 brings no general conclusions, but we found through our experiments that the closer the SE module is to the tail of the network the greater the improvement in model accuracy. The following table also shows some of our experimental results：
 
@@ -33,7 +33,7 @@ The SE module is a channel attention mechanism proposed by SENet, which can effe
 
 The option in the third row of the table was chosen for the location of the SE module in PP-LCNet.
 
-### Larger Convolution Kernel
+### Larger Convolution Kernels
 
 In the paper of MixNet, the author analyzes the effect of convolutional kernel size on model performance and concludes that larger convolutional kernels within a certain range can improve the performance of the model, but beyond this range will be detrimental to the model’s performance. So the author forms MixConv with split-concat paradigm combined, which can improve the performance of the model but is not conducive to inference. We experimentally summarize the role of some larger convolutional kernels at different positions that are similar to those of the SE module, and find that larger convolutional kernels display more prominent roles in the middle and tail of the network. The following table shows the effect of the position of the 5x5 convolutional kernels on the accuracy：
 
@@ -46,7 +46,7 @@ In the paper of MixNet, the author analyzes the effect of convolutional kernel s
 
 Experiments show that a larger convolutional kernel placed at the middle and tail of the network can achieve the same accuracy as placed at all positions, coupled with faster inference. The option in the third row of the table was the final choice of PP-LCNet.
 
-### 3.4	Larger 1x1 Convolutional Layer after GAP
+### Larger dimensional 1 × 1 conv layer after GAP
 
 Since the introduction of GoogLeNet, GAP (Global-Average-Pooling) is often directly followed by a classification layer, which fails to result in further integration and processing of features extracted after GAP in the lightweight network. If a larger 1x1 convolutional layer (equivalent to the FC layer) is used after GAP, the extracted features, instead of directly passing through the classification layer, will first be integrated, and then classified. This can greatly improve the accuracy rate without affecting the inference speed of the model. The above four improvements were made to BaseNet to obtain PP-LCNet. The following table further illustrates the impact of each scheme on the results：
 
@@ -79,7 +79,7 @@ For image classification, ImageNet dataset is adopted. Compared with the current
 | PP-LCNet-0.25x\* | 3.0 | 161 | 74.39 | 92.09 | 2.46 |
 | PP-LCNet-0.25x\* | 9.0 | 906 | 80.82 | 95.33 | 5.39 |
     
-* denotes the model after using SSLD distillation.
+\* denotes the model after using SSLD distillation.
 
 Performance comparison with other lightweight networks:
 
