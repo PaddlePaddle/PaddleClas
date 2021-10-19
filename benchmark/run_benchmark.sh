@@ -21,9 +21,9 @@ function _train(){
     echo "current CUDA_VISIBLE_DEVICES=$CUDA_VISIBLE_DEVICES, gpus=$num_gpu_devices, batch_size=$batch_size"
 
     if [ ${fp_item} = "fp32" ];then
-    	model_config=`find ppcls/configs/ -name ${model_name}.yaml` 
+        model_config=`find ppcls/configs/ImageNet -name ${model_name}.yaml` 
     else
-	model_config=`find ppcls/configs/ -name ${model_name}_fp16.yaml` 
+        model_config=`find ppcls/configs/ImageNet -name ${model_name}_fp16.yaml` 
     fi
 
     train_cmd="-c ${model_config} -o DataLoader.Train.sampler.batch_size=${batch_size} -o Global.epochs=${epochs}"   
