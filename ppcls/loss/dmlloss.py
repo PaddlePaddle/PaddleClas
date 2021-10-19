@@ -22,7 +22,7 @@ class DMLLoss(nn.Layer):
     DMLLoss
     """
 
-    def __init__(self, act="softmax"):
+    def __init__(self, act="softmax", eps=1e-12):
         super().__init__()
         if act is not None:
             assert act in ["softmax", "sigmoid"]
@@ -32,15 +32,19 @@ class DMLLoss(nn.Layer):
             self.act = nn.Sigmoid()
         else:
             self.act = None
+        self.eps = eps
 
-    def forward(self, out1, out2):
+    def _kldiv(self, x, target):
+        class_num = x.shape[-1]
+        cost = target * paddle.log(
+            (target + self.eps) / (x + self.eps)) * class_num
+        return cost
+
+    def forward(self, x, target):
         if self.act is not None:
-            out1 = self.act(out1)
-            out2 = self.act(out2)
-
-        log_out1 = paddle.log(out1)
-        log_out2 = paddle.log(out2)
-        loss = (F.kl_div(
-            log_out1, out2, reduction='batchmean') + F.kl_div(
-                log_out2, out1, reduction='batchmean')) / 2.0
+            x = F.softmax(x)
+            target = F.softmax(target)
+        loss = self._kldiv(x, target) + self._kldiv(target, x)
+        loss = loss / 2
+        loss = paddle.mean(loss)
         return {"DMLLoss": loss}

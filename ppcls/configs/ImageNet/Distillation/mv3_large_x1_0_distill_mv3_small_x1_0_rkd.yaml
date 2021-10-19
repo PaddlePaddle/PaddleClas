@@ -29,32 +29,43 @@ Arch:
         name: MobileNetV3_large_x1_0
         pretrained: True
         use_ssld: True
+        dropout_prob: null
+        return_patterns: ["blocks[5].expand_conv"]
     - Student:
         name: MobileNetV3_small_x1_0
         pretrained: False
-
+        dropout_prob: null
+        return_patterns: ["blocks[2].expand_conv"]
   infer_model_name: "Student"
 
 
 # loss function config for traing/eval process
 Loss:
   Train:
-    - DistillationCELoss:
+    - DistillationDMLLoss:
         weight: 1.0
+        key: "output"
         model_name_pairs:
         - ["Student", "Teacher"]
+    - DistillationRKDLoss:
+        weight: 1.0
+        avgpool: False
+        model_name_pairs:
+          - ["Student", "Teacher"]
+        student_keepkeys: ["blocks[2].expand_conv"]
+        teacher_keepkeys: ["blocks[5].expand_conv"]
   Eval:
     - DistillationGTCELoss:
         weight: 1.0
+        key: "output"
         model_names: ["Student"]
-        
 
 Optimizer:
   name: Momentum
   momentum: 0.9
   lr:
     name: Cosine
-    learning_rate: 1.3
+    learning_rate: 0.325
     warmup_epoch: 5
   regularizer:
     name: 'L2'
@@ -84,11 +95,11 @@ DataLoader:
 
     sampler:
         name: DistributedBatchSampler
-        batch_size: 512
+        batch_size: 64
         drop_last: False
         shuffle: True
     loader:
-        num_workers: 6
+        num_workers: 4
         use_shared_memory: True
 
   Eval:
@@ -115,7 +126,7 @@ DataLoader:
         drop_last: False
         shuffle: False
     loader:
-        num_workers: 6
+        num_workers: 4
         use_shared_memory: True
 
 Infer:

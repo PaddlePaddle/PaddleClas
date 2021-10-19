@@ -21,6 +21,7 @@ from .distillationloss import DistillationCELoss
 from .distillationloss import DistillationGTCELoss
 from .distillationloss import DistillationDMLLoss
 from .distillationloss import DistillationDistanceLoss
+from .distillationloss import DistillationRKDLoss
 from .multilabelloss import MultiLabelLoss
 
 
