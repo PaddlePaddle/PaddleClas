@@ -23,7 +23,7 @@ AMP:
   scale_loss: 128.0
   use_dynamic_loss_scaling: True
   use_pure_fp16: &use_pure_fp16 True
-  amp_level: 'O1'   # O1-amp, O2-pure_fp16
+  amp_level: 'O2'   # O1-amp, O2-pure_fp16
 
 # model architecture
 Arch:
@@ -80,7 +80,7 @@ DataLoader:
 
     sampler:
       name: DistributedBatchSampler
-      batch_size: 256
+      batch_size: 128
       drop_last: False
       shuffle: True
     loader:
