@@ -89,7 +89,6 @@ DataLoader:
               size: 224
           - RandFlipImage:
               flip_code: 1
-          - AutoAugment:
           - NormalizeImage:
               scale: 0.00392157
               mean: [0.485, 0.456, 0.406]
