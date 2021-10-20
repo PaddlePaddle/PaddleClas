@@ -171,7 +171,8 @@ class PPLCNet(TheseusLayer):
                  scale=1.0,
                  class_num=1000,
                  dropout_prob=0.2,
-                 class_expand=1280):
+                 class_expand=1280,
+                 return_patterns=None):
         super().__init__()
         self.scale = scale
         self.class_expand = class_expand
@@ -182,7 +183,7 @@ class PPLCNet(TheseusLayer):
             num_filters=make_divisible(16 * scale),
             stride=2)
 
-        self.blocks2 = nn.Sequential(*[
+        self.blocks2 = nn.Sequential(* [
             DepthwiseSeparable(
                 num_channels=make_divisible(in_c * scale),
                 num_filters=make_divisible(out_c * scale),
@@ -192,7 +193,7 @@ class PPLCNet(TheseusLayer):
             for i, (k, in_c, out_c, s, se) in enumerate(NET_CONFIG["blocks2"])
         ])
 
-        self.blocks3 = nn.Sequential(*[
+        self.blocks3 = nn.Sequential(* [
             DepthwiseSeparable(
                 num_channels=make_divisible(in_c * scale),
                 num_filters=make_divisible(out_c * scale),
@@ -202,7 +203,7 @@ class PPLCNet(TheseusLayer):
             for i, (k, in_c, out_c, s, se) in enumerate(NET_CONFIG["blocks3"])
         ])
 
-        self.blocks4 = nn.Sequential(*[
+        self.blocks4 = nn.Sequential(* [
             DepthwiseSeparable(
                 num_channels=make_divisible(in_c * scale),
                 num_filters=make_divisible(out_c * scale),
@@ -212,7 +213,7 @@ class PPLCNet(TheseusLayer):
             for i, (k, in_c, out_c, s, se) in enumerate(NET_CONFIG["blocks4"])
         ])
 
-        self.blocks5 = nn.Sequential(*[
+        self.blocks5 = nn.Sequential(* [
             DepthwiseSeparable(
                 num_channels=make_divisible(in_c * scale),
                 num_filters=make_divisible(out_c * scale),
@@ -222,7 +223,7 @@ class PPLCNet(TheseusLayer):
             for i, (k, in_c, out_c, s, se) in enumerate(NET_CONFIG["blocks5"])
         ])
 
-        self.blocks6 = nn.Sequential(*[
+        self.blocks6 = nn.Sequential(* [
             DepthwiseSeparable(
                 num_channels=make_divisible(in_c * scale),
                 num_filters=make_divisible(out_c * scale),
@@ -247,6 +248,10 @@ class PPLCNet(TheseusLayer):
         self.flatten = nn.Flatten(start_axis=1, stop_axis=-1)
 
         self.fc = Linear(self.class_expand, class_num)
+
+        if return_patterns is not None:
+            self.update_res(return_patterns)
+            self.register_forward_post_hook(self._return_dict_hook)
 
     def forward(self, x):
         x = self.conv1(x)

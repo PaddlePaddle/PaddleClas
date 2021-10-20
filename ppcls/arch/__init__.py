@@ -72,14 +72,19 @@ class RecModel(nn.Layer):
             self.head = None
 
     def forward(self, x, label=None):
+        out = dict()
         x = self.backbone(x)
+        out["backbone"] = x
         if self.neck is not None:
             x = self.neck(x)
+        out["features"] = x
         if self.head is not None:
             y = self.head(x, label)
+            out["neck"] = x
         else:
             y = None
-        return {"features": x, "logits": y}
+        out["logits"] = y
+        return out
 
 
 class DistillationModel(nn.Layer):
