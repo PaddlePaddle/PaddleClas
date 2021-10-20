@@ -116,7 +116,8 @@ class Engine(object):
         if self.mode == 'train':
             self.train_dataloader = build_dataloader(
                 self.config["DataLoader"], "Train", self.device, self.use_dali)
-        if self.mode in ["train", "eval"]:
+        if self.mode == "eval" or (self.mode == "train" and
+                                   self.config["Global"]["eval_during_train"]):
             if self.eval_mode == "classification":
                 self.eval_dataloader = build_dataloader(
                     self.config["DataLoader"], "Eval", self.device,
