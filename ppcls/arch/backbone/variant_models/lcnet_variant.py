@@ -1,6 +1,6 @@
 import paddle
 from paddle.nn import Tanh
-from ppcls.arch.backbone.legendary_models.lcnet import VGG19
+from ppcls.arch.backbone.legendary_models.pp_lcnet import PPLCNet_x2_5
  
 __all__ = ["LcNetTanh"]
  
@@ -22,7 +22,7 @@ def LcNetTanh(pretrained=False, use_ssld=False, **kwargs):
         new_layer = LcNetTanh(origin_layer)
         return new_layer
  
-    match_re = "linear_2"
-    model = VGG19(pretrained=pretrained, use_ssld=use_ssld, **kwargs)
+    match_re = "linear_1"
+    model = PPLCNet_x2_5(pretrained=pretrained, use_ssld=use_ssld, **kwargs)
     model.replace_sub(match_re, replace_function, True)
     return model
