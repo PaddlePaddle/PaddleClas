@@ -24,10 +24,10 @@ Arch:
   infer_add_softmax: False
 
   Backbone: 
-    name: PPLCNet_x2_5_Tanh
+    name: PPLCNet_x2_5Tanh
     pretrained: True
     use_ssld: True
-    n_classes: 512
+    class_num: 512
   Head:
     name: FC 
     embedding_size: 512
