@@ -21,6 +21,9 @@ Global:
 # model architecture
 Arch:
   name: "DistillationModel"
+  infer_output_key: features
+  infer_add_softmax: False
+  is_rec: True
   # if not null, its lengths should be same as models
   pretrained_list:
   # if not null, its lengths should be same as models

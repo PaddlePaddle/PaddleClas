@@ -54,7 +54,8 @@ class Engine(object):
         self.config = config
         self.eval_mode = self.config["Global"].get("eval_mode",
                                                    "classification")
-        if "Head" in self.config["Arch"]:
+        if "Head" in self.config["Arch"] or self.config["Arch"].get("is_rec",
+                                                                    False):
             self.is_rec = True
         else:
             self.is_rec = False
