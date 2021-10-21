@@ -2,7 +2,7 @@ import paddle
 from paddle.nn import Tanh
 from ppcls.arch.backbone.legendary_models.pp_lcnet import PPLCNet_x2_5
  
-__all__ = ["LcNetTanh"]
+__all__ = ["PPLCNet_x2_5Tanh"]
  
  
 class TanhSuffix(paddle.nn.Layer):
@@ -17,7 +17,7 @@ class TanhSuffix(paddle.nn.Layer):
         return x
  
  
-def LcNetTanh(pretrained=False, use_ssld=False, **kwargs):
+def PPLCNet_x2_5Tanh(pretrained=False, use_ssld=False, **kwargs):
     def replace_function(origin_layer):
         new_layer = LcNetTanh(origin_layer)
         return new_layer
