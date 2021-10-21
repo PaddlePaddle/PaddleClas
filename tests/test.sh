@@ -114,14 +114,14 @@ norm_export=$(func_parser_value "${lines[29]}")
 pact_export=$(func_parser_value "${lines[30]}")
 fpgm_export=$(func_parser_value "${lines[31]}")
 distill_export=$(func_parser_value "${lines[32]}")
-export_key1=$(func_parser_key "${lines[33]}")
-export_value1=$(func_parser_value "${lines[33]}")
+kl_quant_cmd_key=$(func_parser_key "${lines[33]}")
+kl_quant_cmd_value=$(func_parser_value "${lines[33]}")
 export_key2=$(func_parser_key "${lines[34]}")
 export_value2=$(func_parser_value "${lines[34]}")
 
 # parser inference model 
 infer_model_dir_list=$(func_parser_value "${lines[36]}")
-infer_export_list=$(func_parser_value "${lines[37]}")
+infer_export_flag=$(func_parser_value "${lines[37]}")
 infer_is_quant=$(func_parser_value "${lines[38]}")
 # parser inference 
 inference_py=$(func_parser_value "${lines[39]}")
@@ -399,8 +399,13 @@ if [ ${MODE} = "infer" ]; then
     eval $env
     export Count=0
     IFS="|"
-    infer_run_exports=(${infer_export_list})
+    infer_export_flag=(${infer_export_flag})
     infer_quant_flag=(${infer_is_quant})
+    if [ ${infer_export_flag} != "null" ]  && [ ${infer_export_flag} != "False" ]; then
+	rm -rf ${infer_model_dir_list/..\//}
+        export_cmd="${python} ${norm_export} -o Global.pretrained_model=${model_name}_pretrained -o Global.save_inference_dir=${infer_model_dir_list/..\//}"
+        eval $export_cmd
+    fi
     cd deploy
     for infer_model in ${infer_model_dir_list[*]}; do
         #run inference
@@ -412,9 +417,9 @@ if [ ${MODE} = "infer" ]; then
     cd ..
 
     # for kl_quant
-    echo "kl_quant"
-    if [ ${infer_run_exports} ]; then
-	command="${python} ${infer_run_exports}"
+    if [ ${kl_quant_cmd_value} != "null" ] && [ ${kl_quant_cmd_value} != "False" ]; then
+	echo "kl_quant"
+	command="${python} ${kl_quant_cmd_value}"
 	eval $command
 	last_status=${PIPESTATUS[0]}
 	status_check $last_status "${command}" "${status_log}"

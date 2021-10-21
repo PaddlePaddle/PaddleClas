@@ -4,7 +4,7 @@ opencv-python==4.4.0.46
 pillow
 tqdm
 PyYAML
-visualdl >= 2.0.0b
+visualdl >= 2.2.0
 scipy
 scikit-learn==0.23.2
 gast==0.3.3

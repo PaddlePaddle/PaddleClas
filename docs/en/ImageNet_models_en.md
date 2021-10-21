@@ -24,7 +24,7 @@ Accuracy and inference time of the prtrained models based on SSLD distillation a
 * Server-side distillation pretrained models
 
 | Model                  | Top-1 Acc | Reference<br>Top-1 Acc | Acc gain | time(ms)<br>bs=1 | time(ms)<br>bs=4 | Flops(G) | Params(M) | Download Address                                                                                         |
-|---------------------|-----------|-----------|---------------|----------------|----------|-----------|-----------------------------------|
+|---------------------|-----------|-----------|---------------|----------------|----------------|----------|-----------|-----------------------------------|
 | ResNet34_vd_ssld         | 0.797    | 0.760  | 0.037  | 2.434               | 6.222              | 7.39     | 21.82     | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/ResNet34_vd_ssld_pretrained.pdparams)         |
 | ResNet50_vd_ssld | 0.830    | 0.792    | 0.039 | 3.531               | 8.090              | 8.67     | 25.58     | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/ResNet50_vd_ssld_pretrained.pdparams) |
 | ResNet101_vd_ssld   | 0.837    | 0.802    | 0.035 |  6.117               | 13.762             | 16.1     | 44.57     | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/ResNet101_vd_ssld_pretrained.pdparams)   |
@@ -50,7 +50,7 @@ Accuracy and inference time of the prtrained models based on SSLD distillation a
 * Intel-CPU-side distillation pretrained models
 
 | Model                  | Top-1 Acc | Reference<br>Top-1 Acc | Acc gain |  Intel-Xeon-Gold-6148 time(ms)<br>bs=1 | Flops(M) | Params(M)  | Download Address   |
-|---------------------|-----------|-----------|---------------|----------------|-----------|----------|-----------|-----------------------------------|
+|---------------------|-----------|-----------|---------------|----------------|----------|-----------|-----------------------------------|
 | PPLCNet_x0_5_ssld   | 0.661    | 0.631    | 0.030 | 2.05     | 47     |   1.9   | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/PPLCNet_x0_5_ssld_pretrained.pdparams)                 |
 | PPLCNet_x1_0_ssld   | 0.744    | 0.713    | 0.033 | 2.46     | 161     |   3.0  | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/PPLCNet_x1_0_ssld_pretrained.pdparams)                 |
 | PPLCNet_x2_5_ssld   | 0.808    | 0.766    | 0.042 | 5.39     | 906     |   9.0  | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/PPLCNet_x2_5_ssld_pretrained.pdparams)                 |
@@ -59,10 +59,10 @@ Accuracy and inference time of the prtrained models based on SSLD distillation a
 * Note: `Reference Top-1 Acc` means accuracy of pretrained models which are trained on ImageNet1k dataset.
 
 
-<a name="PPLCNet_series"></a>
-### PPLCNet_series
+<a name="PP-LCNet_series"></a>
+### PP-LCNet_series
 
-Accuracy and inference time metrics of PPLCNet series models are shown as follows. More detailed information can be refered to [PPLCNet series tutorial](../en/models/PPLCNet_en.md).
+Accuracy and inference time metrics of PPLCNet series models are shown as follows. More detailed information can be refered to [PPLCNet series tutorial](../en/models/PP-LCNet_en.md).
 
 | Model           | Top-1 Acc | Top-5 Acc | Intel-Xeon-Gold-6148 time(ms)<br>bs=1 | FLOPs(M) | Params(M) | Download Address |
 |:--:|:--:|:--:|:--:|:--:|:--:|:--:|

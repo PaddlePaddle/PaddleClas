@@ -1,12 +1,12 @@
-# PPLCNet系列
+# PPLCNet series
 
-## 概述
+## Overview
 
-PPLCNet系列是百度PaddleCV团队提出的一种在Intel-CPU上表现优异的网络，作者总结了一些在Intel-CPU上可以提升模型精度但几乎不增加推理耗时的方法，将这些方法组合成了一个新的网络，即PPLCNet。与其他轻量级网络相比，PPLCNet可以在相同延时下取得更高的精度。PPLCNet已在图像分类、目标检测、语义分割上表现出了强大的竞争力。
+The PPLCNet series is a network that has excellent performance on Intel-CPU proposed by the Baidu PaddleCV team. The author summarizes some methods that can improve the accuracy of the model on Intel-CPU but hardly increase the inference time. The author combines these methods into a new network, namely PPLCNet. Compared with other lightweight networks, PPLCNet can achieve higher accuracy with the same inference time. PPLCNet has shown strong competitiveness in image classification, object detection, and semantic segmentation.
 
 
 
-## 精度、FLOPS和参数量
+## Accuracy, FLOPS and Parameters
 
 | Models           | Top1 | Top5 | FLOPs<br>(M) | Parameters<br>(M) |
 |:--:|:--:|:--:|:--:|:--:|
@@ -24,7 +24,7 @@ PPLCNet系列是百度PaddleCV团队提出的一种在Intel-CPU上表现优异�
 
 
 
-## 基于Intel(R) Xeon(R) Gold 6148 CPU @ 2.40GHz的预测速度
+## Inference speed based on Intel(R)-Xeon(R)-Gold-6148-CPU
 
 | Models                 | Crop Size | Resize Short Size | FP32<br>Batch Size=1<br>(ms) |
 |------------------|-----------|-------------------|--------------------------|
