@@ -181,6 +181,7 @@ import cv2
 from paddleclas import PaddleClas
 clas = PaddleClas(model_name='ResNet50')
 infer_imgs = cv2.imread("docs/images/whl/demo.jpg")
+infer_imgs = cv2.cvtColor(infer_imgs, cv2.COLOR_BGR2RGB)
 result=clas.predict(infer_imgs)
 print(next(result))
 ```
