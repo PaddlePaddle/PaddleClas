@@ -91,7 +91,7 @@ class Engine(object):
             self.vdl_writer = LogWriter(logdir=vdl_writer_path)
 
         # set device
-        assert self.config["Global"]["device"] in ["cpu", "gpu", "xpu"]
+        assert self.config["Global"]["device"] in ["cpu", "gpu", "xpu", "npu"]
         self.device = paddle.set_device(self.config["Global"]["device"])
         logger.info('train with paddle {} and device {}'.format(
             paddle.__version__, self.device))
