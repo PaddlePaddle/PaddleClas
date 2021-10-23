@@ -41,7 +41,7 @@ inference:python/predict_cls.py -c configs/inference_cls.yaml
 -o Global.use_gpu:True|Fasle
 -o Global.enable_mkldnn:True|False
 -o Global.cpu_num_threads:1|6
--o Global.batch_size:1
+-o Global.batch_size:1|16
 -o Global.use_tensorrt:True|False
 -o Global.use_fp16:True|False
 -o Global.inference_model_dir:../inference
