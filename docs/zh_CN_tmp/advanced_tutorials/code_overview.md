@@ -11,7 +11,6 @@ PaddleClas主要代码和目录结构如下
 * dataset：文件夹下存放数据集和用于处理数据集的脚本。脚本负责将数据集处理为适合Dataloader处理的格式。
 * deploy：文件夹存放的是部署工具，支持 python/cpp inference、Hub Serveing、Paddle Lite、Slim量化等多种部署方式。
 * ppcls：文件夹下存放PaddleClas框架主体。配置文件、模型训练、评估、预测、动转静导出等具体代码实现均在这里。
-  * 吃的
 * tools：训练、评估、预测、模型动转静导出的入口函数和脚本均在该文件下。
 * requirements.txt 文件用于安装 PaddleClas 的依赖项。使用pip进行升级安装使用。
 

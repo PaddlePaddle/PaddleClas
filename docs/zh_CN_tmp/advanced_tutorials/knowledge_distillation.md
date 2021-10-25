@@ -1,7 +1,7 @@
 
 # 知识蒸馏
 
-## 一、模型压缩方法简介
+## 一、模型压缩与知识蒸馏方法简介
 
 近年来，深度神经网络在计算机视觉、自然语言处理等领域被验证是一种极其有效的解决问题的方法。通过构建合适的神经网络，加以训练，最终网络模型的性能指标基本上都会超过传统算法。
 
@@ -9,9 +9,9 @@
 
 深度神经网络一般有较多的参数冗余，目前有几种主要的方法对模型进行压缩，减小其参数量。如裁剪、量化、知识蒸馏等，其中知识蒸馏是指使用教师模型 (teacher model) 去指导学生模型 (student model) 学习特定任务，保证小模型在参数量不变的情况下，得到比较大的性能提升，甚至获得与大模型相似的精度指标 [1]。 PaddleClas 融合已有的蒸馏方法 [2,3] ，提供了一种简单的半监督标签知识蒸馏方案 （SSLD，Simple Semi-supervised Label Distillation） ，基于 ImageNet1k 分类数据集，在 ResNet_vd 以及 MobileNet 系列上的精度均有超过 3% 的绝对精度提升，具体指标如下图所示。
 
-
-![](../../images/distillation/distillation_perform_s.jpg)
-
+<div align="center">
+<img src="../../images/distillation/distillation_perform_s.jpg"  width = "600" />
+</div>
 
 ## 二、SSLD 蒸馏策略
 
@@ -19,7 +19,9 @@
 
 SSLD 的流程图如下图所示。
 
-![](../../images/distillation/ppcls_distillation.png)
+<div align="center">
+<img src="../../images/distillation/ppcls_distillation.png"  width = "600" />
+</div>
 
 首先，我们从 ImageNet22k 中挖掘出了近400万张图片，同时与 ImageNet-1k 训练集整合在一起，得到了一个新的包含 500 万张图片的数据集。然后，我们将学生模型与教师模型组合成一个新的网络，该网络分别输出学生模型和教师模型的预测分布，与此同时，固定教师模型整个网络的梯度，而学生模型可以做正常的反向传播。最后，我们将两个模型的 logits 经过 softmax 激活函数转换为 soft label ，并将二者的 soft label 做 JS 散度作为损失函数，用于蒸馏模型训练。下面以 MobileNetV3 （该模型直接训练，精度为 75.3%） 的知识蒸馏为例，介绍该方案的核心关键点（ baseline 为 79.12% 的 ResNet50_vd 模型蒸馏 MobileNetV3 ，训练集为 ImageNet1k 训练集， loss 为 cross entropy loss ，迭代轮数为 120epoch ，精度指标为 75.6% ）。
 
@@ -40,7 +42,9 @@ SSLD 的流程图如下图所示。
 * SSLD 蒸馏方案的一大特色就是无需使用图像的真值标签，因此可以任意扩展数据集的大小，考虑到计算资源的限制，我们在这里仅基于 ImageNet22k 数据集对蒸馏任务的训练集进行扩充。在 SSLD 蒸馏任务中，我们使用了 `Top-k per class` 的数据采样方案 [3] 。具体步骤如下。
     * 训练集去重。我们首先基于 SIFT 特征相似度匹配的方式对 ImageNet22k 数据集与 ImageNet1k 验证集进行去重，防止添加的 ImageNet22k 训练集中包含 ImageNet1k 验证集图像，最终去除了 4511 张相似图片。部分过滤的相似图片如下所示。
 
-    ![](../../images/distillation/22k_1k_val_compare_w_sift.png)
+    <div align="center">
+    <img src="../../images/distillation/22k_1k_val_compare_w_sift.png"  width = "600" />
+    </div>
 
     * 大数据集 soft label 获取，对于去重后的 ImageNet22k 数据集，我们使用 `ResNeXt101_32x16d_wsl` 模型进行预测，得到每张图片的 soft label 。
     * Top-k 数据选择， ImageNet1k 数据共有 1000 类，对于每一类，找出属于该类并且得分最高的 `k` 张图片，最终得到一个数据量不超过`1000*k`的数据集（某些类上得到的图片数量可能少于 `k` 张）。
