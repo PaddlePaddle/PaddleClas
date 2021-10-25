@@ -25,7 +25,7 @@
 
 增广后的可视化效果如下所示。
 
-![](../../../images/image_aug/image_aug_samples_s.jpg)
+![](../../images/image_aug/image_aug_samples_s.jpg)
 
 具体如下表所示：
 
