@@ -13,7 +13,7 @@
 <div align="center">
 <img src="../../images/structure.png"  width = "400" />
 </div>
-体验整体图像识别系统，或查看特征库建立方法，详见[图像识别快速开始文档](../../zh_CN/tutorials/quick_start_recognition.md)。其中，图像识别快速开始文档主要讲解整体流程的使用过程。以下内容，主要对上述三个步骤的训练部分进行介绍。
+体验整体图像识别系统，或查看特征库建立方法，详见[图像识别快速开始文档](../../zh_CN/tutorials/quick_start_recognition.md) 。其中，图像识别快速开始文档主要讲解整体流程的使用过程。以下内容，主要对上述三个步骤的训练部分进行介绍。
 
 首先，请参考[安装指南](./install.md)配置运行环境。
 
