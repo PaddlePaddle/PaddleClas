@@ -33,8 +33,7 @@ Cars数据集包含了196类汽车的16185张图像。数据被分成8144张训�
 - CUB_200_2011: CUB_200_2011数据集是由加州理工学院在2010年提出的细粒度数据集，也是目前细粒度分类识别研究的基准图像数据集。该数据集共有11788张鸟类图像，包含200类鸟类子类，其中训练数据集有5994张图像，测试集有5794张图像，每张图像均提供了图像类标记信息，图像中鸟的bounding box，鸟的关键part信息，以及鸟类的属性信息，数据集如下图所示。
     
     地址: http://www.vision.caltech.edu/visipedia/CUB-200-2011.html
-    
- <a name="In-shop Clothes"></a>
+
 - In-shop Clothes： In-shop Clothes 是DeepFashion数据集的4个子集之一, 它是一个卖家秀图片集，每个商品id，有多张不同角度的卖家秀，放在同一个文件夹内。该数据集共包含7982件商品，共52712张图像，每张图片都有463中属性，Bbox，landmarks，以及店铺描述。
     
     地址： http://mmlab.ie.cuhk.edu.hk/projects/DeepFashion.html
@@ -64,7 +63,7 @@ Cars数据集包含了196类汽车的16185张图像。数据被分成8144张训�
 
     地址：https://www.kaggle.com/c/products-10k/data?select=train.csv
 
-+ DeepFashion-Inshop:  同通用图像识别数据集中的[In-shop Clothes](#In-shop Clothes)
++ DeepFashion-Inshop:  同通用图像识别数据集中的In-shop Clothes
 
 ### 2.2.3 Logo识别
 + Logo-2K+： Logo-2K+是一个仅用于logo图像识别的数据集，其包含10个大类，2341个小类和167140张图片。
