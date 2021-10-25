@@ -50,6 +50,7 @@ Res2Net200_vd预训练模型Top-1精度高达85.1%。
 - [快速安装](./docs/zh_CN/tutorials/install.md)
 - [图像识别快速体验](./docs/zh_CN/tutorials/quick_start_recognition.md)
 - [图像识别系统介绍](#图像识别系统介绍)
+- [往期课程链接](#往期课程链接)
 - [识别效果展示](#识别效果展示)
 - 图像分类快速体验
     - [尝鲜版](./docs/zh_CN/tutorials/quick_start_new_user.md)
@@ -96,6 +97,16 @@ Res2Net200_vd预训练模型Top-1精度高达85.1%。
 
 对于新的未知类别，无需重新训练模型，只需要在检索库补入该类别图像，重新建立检索库，就可以识别该类别。
 
+<a name="往期课程链接"></a>
+## 图像识别系统介绍
+
+- [**【AI快车道PaddleClas系列直播课】**](https://aistudio.baidu.com/aistudio/course/introduce/24519)
+
+  - 图像识别系统解析
+
+  - 商品识别系统全拆解
+
+  - 车辆ReID核心技术方案
 
 <a name="识别效果展示"></a>
 ## 更多效果展示 [more](https://github.com/PaddlePaddle/PaddleClas/tree/release/2.2/docs/images/recognition/more_demo_images)
