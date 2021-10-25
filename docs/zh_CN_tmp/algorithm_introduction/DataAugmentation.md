@@ -243,14 +243,14 @@ Mixup 是最先提出的图像混叠增广方案，其原理简单、方便实�
 
 
 
-[test_baseline]: ../../../images/image_aug/test_baseline.jpeg
-[test_autoaugment]: ../../../images/image_aug/test_autoaugment.jpeg
-[test_cutout]: ../../../images/image_aug/test_cutout.jpeg
-[test_gridmask]: ../../../images/image_aug/test_gridmask.jpeg
-[gridmask-0]: ../../../images/image_aug/gridmask-0.png
-[test_hideandseek]: ../../../images/image_aug/test_hideandseek.jpeg
-[test_randaugment]: ../../../images/image_aug/test_randaugment.jpeg
-[test_randomerassing]: ../../../images/image_aug/test_randomerassing.jpeg
-[hide_and_seek_mask_expanation]: ../../../images/image_aug/hide-and-seek-visual.png
-[test_mixup]: ../../../images/image_aug/test_mixup.png
-[test_cutmix]: ../../../images/image_aug/test_cutmix.png
+[test_baseline]: ../../images/image_aug/test_baseline.jpeg
+[test_autoaugment]: ../../images/image_aug/test_autoaugment.jpeg
+[test_cutout]: ../../images/image_aug/test_cutout.jpeg
+[test_gridmask]: ../../images/image_aug/test_gridmask.jpeg
+[gridmask-0]: ../../images/image_aug/gridmask-0.png
+[test_hideandseek]: ../../images/image_aug/test_hideandseek.jpeg
+[test_randaugment]: ../../images/image_aug/test_randaugment.jpeg
+[test_randomerassing]: ../../images/image_aug/test_randomerassing.jpeg
+[hide_and_seek_mask_expanation]: ../../images/image_aug/hide-and-seek-visual.png
+[test_mixup]: ../../images/image_aug/test_mixup.png
+[test_cutmix]: ../../images/image_aug/test_cutmix.png
