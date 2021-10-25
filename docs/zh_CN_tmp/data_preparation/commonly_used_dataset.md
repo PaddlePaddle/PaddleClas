@@ -24,32 +24,45 @@
 
 ## 2. 图像识别:
 ### 2.1 通用图像识别数据集
-- SOP
-- Cars196
-- CUB_200_2011
-- Clothes
+- SOP: SOP数据集是通用识别研究领域、MetricLearning技术研究方向常用的一个商品数据集, 其包含从eBay.com下载的22,634个产品的120,053张图片。其中, 训练集包含图片59551张, 类别数11318; 验证集包含图片60502张，类别数11316个。
+    
+    地址: https://cvgl.stanford.edu/projects/lifted_struct/
+- Cars196:
+Cars数据集包含了196类汽车的16185张图像。数据被分成8144张训练图像和8041张测试图像，每个类大致以50-50的比例分割。级别通常是在制造，模型，年，例如2012特斯拉模型S或2012宝马M3双门跑车。
+    
+    地址: https://ai.stanford.edu/~jkrause/cars/car_dataset.html
+- CUB_200_2011: CUB_200_2011数据集是由加州理工学院在2010年提出的细粒度数据集，也是目前细粒度分类识别研究的基准图像数据集。该数据集共有11788张鸟类图像，包含200类鸟类子类，其中训练数据集有5994张图像，测试集有5794张图像，每张图像均提供了图像类标记信息，图像中鸟的bounding box，鸟的关键part信息，以及鸟类的属性信息，数据集如下图所示。
+    
+    地址: http://www.vision.caltech.edu/visipedia/CUB-200-2011.html
+- In-shop Clothes： In-shop Clothes 是DeepFashion数据集的4个子集之一, 它是一个卖家秀图片集，每个商品id，有多张不同角度的卖家秀，放在同一个文件夹内。该数据集共包含7982件商品，共52712张图像，每张图片都有463中属性，Bbox，landmarks，以及店铺描述。
+    
+    地址： http://mmlab.ie.cuhk.edu.hk/projects/DeepFashion.html
 
 ### 2.2 垂类图像识别数据集
 
 #### 2.2.1 动漫人物识别
-+ CartoonFace
-+ Manga109
-+ IIT-CFW
++ iCartoonFace: iCartoonFace是由爱奇艺开放的目前全球最大的手工标注卡通人物检测数据集与识别数据集，它包含超过5013个卡通人物、389678张高质量实景图片。相比于其他数据集，它具有大规模、高质量、多样性丰富、挑战难度大等特点，是目前研究动漫人物识别最常用的数据集之一。
+    
+    地址： http://challenge.ai.iqiyi.com/detail?raceId=5def69ace9fcf68aef76a75d
 
-#### 2.2.4 商品识别
-+ AliProduct
-+ Product-10k
++ Manga109： Manga109是2020.5月发布的一个用于研究卡通人物检测和识别的数据集，其包含21142张图片，官方不允许用于商用。该数据集旗下的子集Manga109-s，可以供工业使用， 主要用于文本检测、基于线稿的任务检索、角色图像生成等任务。
+    
+    地址：http://www.manga109.org/en/
+
++ IIT-CFW：IIF-CFW数据集共包含8928个带有标注的明星人物卡通头像，覆盖100个人物形象，每个人卡通头像数不等。 另外，其还提供了1000张真实人脸照（100个公众人物，每个人10张真实头像）。该数据集既可以用于研究动漫人物识别，也经常被用于研究跨模态的检索任务。
+    
+    地址： http://cvit.iiit.ac.in/research/projects/cvit-projects/cartoonfaces
+
+
+#### 2.2.2 商品识别
++ AliProduct: AliProduct数据集是目前开源最大的商品数据集，它是一个SKU级别的图像分类数据集， 包含5万类别、300万张商品图像，商品图像的类别和总量均为业界之最。此数据集中涵盖了大量的生活用品、食物等，数据集中没有人工标注，数据较脏，数据分布较不均衡，且有很多相似的商品图片。
+    
+    地址:  https://retailvisionworkshop.github.io/recognition_challenge_2020/
+
++ Product-10k: Products-10k数据集中的所有图片均来自京东商城。数据集中共包含1万个经常购买的SKU。所有SKU组织成一个层次结构。总共有近19万张图片。在实际应用场景中，图像量的分布是不均衡的。所有图像都由生产专家团队手工检查/标记。
+
+    地址：https://www.kaggle.com/c/products-10k/data?select=train.csv
+
 + DeepFashion-Inshop
-
-#### 2.2.2 车辆识别
-+ CompCars
-+ BoxCars
-+ PKU-VD
-
-#### 2.2.3 Logo识别
-+ Logo2K+
-+ Tsinghua-Tencent 100K
-+ LogoDet-3K
-
 
 
