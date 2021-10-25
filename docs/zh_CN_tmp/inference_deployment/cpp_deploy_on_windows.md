@@ -48,19 +48,19 @@ paddle_inference_install_dir
 
 1. 打开 Visual Studio 2019 Community，点击 `继续但无需代码`
 
-![step2](./imgs/vs2019_step1.png)
+![step2](../../images/inference_deployment/vs2019_step1.png)
 
 2. 点击：`文件`->`打开`->`CMake`
 
-![step2.1](./imgs/vs2019_step2.png)
+![step2.1](../../images/inference_deployment/vs2019_step2.png)
 
 选择项目代码所在路径，并打开`CMakeList.txt`：
 
-![step2.2](./imgs/vs2019_step3.png)
+![step2.2](../../images/inference_deployment/vs2019_step3.png)
 
 3. 点击：`项目`->`CMake设置`
 
-![step3](./imgs/vs2019_step4.png)
+![step3](../../images/inference_deployment/vs2019_step4.png)
 
 4. 请设置以下参数的值
 
@@ -89,13 +89,13 @@ paddle_inference_install_dir
    * `PADDLE_LIB`：该路径下需要有`CMakeCache.txt`文件，一般为`paddle_inference_install_dir/`。
 * 在使用 `CPU` 版预测库时，请不要勾选 `WITH_GPU` - `保存到 JSON`。
 
-![step4](./imgs/vs2019_step5.png)
+![step4](../../images/inference_deployment/vs2019_step5.png)
 
 设置完成后，点击上图中 `保存并生成CMake缓存以加载变量`。
 
 5. 点击`生成`->`全部生成`
 
-![step6](./imgs/vs2019_step6.png)
+![step6](../../images/inference_deployment/vs2019_step6.png)
 
 在编译完成后，会生成可执行文件 `clas_system.exe`。并且，如未设置 `DCONFIG_LIB` 与 `DCLS_LIB`，则会在 `.\lib\` 目录下生成 `config lib` 和 `cls lib` 两个静态链接库文件（`libconfig.a`、`libcls.a`）。类似地，你也可以仅编译生成 `config lib` 和 `cls lib` 两个静态链接库文件，只需打开路径为 `D:\projects\PaddleClas\deploy\cpp\lib\CMakeList.txt` 的 `CMake` 文件并进行编译即可，具体参考[使用 Visual Studio 2019 编译](#2)，完成编译后，同样可在 `.\lib\` 目录下生成静态链接库文件，静态链接库文件可用于二次开发。
 
