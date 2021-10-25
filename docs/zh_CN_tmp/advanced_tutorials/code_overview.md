@@ -9,10 +9,11 @@ PaddleClas主要代码和目录结构如下
 
 * benchmark: 文件夹下存放了一些shell脚本，主要是为了测试PaddleClas中不同模型的速度指标，如单卡训练速度指标、多卡训练速度指标等。
 * dataset：文件夹下存放数据集和用于处理数据集的脚本。脚本负责将数据集处理为适合Dataloader处理的格式。
-* deploy：文件夹存放的是部署工具，支持 python/cpp inference、Hub Serveing、Paddle Lite、Slim量化等多种部署方式。
-* ppcls：文件夹下存放PaddleClas框架主体。配置文件、模型训练、评估、预测、动转静导出等具体代码实现均在这里。
+* deploy：部署核心代码，文件夹存放的是部署工具，支持 python/cpp inference、Hub Serveing、Paddle Lite、Slim离线量化等多种部署方式。
+* ppcls：训练核心代码，文件夹下存放PaddleClas框架主体。配置文件、模型训练、评估、预测、动转静导出等具体代码实现均在这里。
 * tools：训练、评估、预测、模型动转静导出的入口函数和脚本均在该文件下。
 * requirements.txt 文件用于安装 PaddleClas 的依赖项。使用pip进行升级安装使用。
+* tests：PaddleClas模型从训练到预测的全链路测试，验证各功能是否能够正常使用。
 
 ### 1.2 训练模块定义
 
@@ -108,7 +109,7 @@ Loss:
 
 * 优化器和学习率衰减、权重衰减策略
 
-图像分类任务中，`Momentum` 是一种比较常用的优化器， PaddleClas 中提供了 `Momentum` 与 `RMSProp` 两种优化器策略。
+图像分类任务中，`Momentum` 是一种比较常用的优化器， PaddleClas 中提供了 `Momentum` 、 `RMSProp`、`Adam`及`AdamW`等几种优化器策略。
 
 权重衰减策略是一种比较常用的正则化方法，主要用于防止模型过拟合。 PaddleClas 中提供了 `L1Decay` 和 `L2Decay` 两种权重衰减策略。
 
@@ -159,7 +160,7 @@ def build_optimizer(config, epochs, step_each_epoch, parameters):
                                            **config)(parameters=parameters)
     logger.debug("build optimizer ({}) success..".format(optim))
     return optim, lr
- ```
+```
 
  不同优化器和权重衰减策略均以类的形式实现，具体实现可以参考文件 `ppcls/optimizer/optimizer.py` ；不同的学习率衰减策略可以参考文件 `ppcls/optimizer/learning_rate.py` 。
 
@@ -178,7 +179,7 @@ Global:
 模型存储是通过 Paddle 框架的 `paddle.save()` 函数实现的，存储的是模型的动态图版本，以字典的形式存储，便于继续训练。具体实现如下
 
 ```python
-ef save_model(program, model_path, epoch_id, prefix='ppcls'):
+def save_model(program, model_path, epoch_id, prefix='ppcls'):
     model_path = os.path.join(model_path, str(epoch_id))
     _mkdir_if_not_exist(model_path)
     model_prefix = os.path.join(model_path, prefix)
@@ -191,9 +192,32 @@ ef save_model(program, model_path, epoch_id, prefix='ppcls'):
 1. 只在 0 号节点上保存模型。否则多卡训练的时候，如果所有节点都保存模型到相同的路径，则多个节点写文件时可能会发生写文件冲突，导致最终保存的模型无法被正确加载。
 2. 优化器参数也需要存储，方便后续的加载断点进行训练。
 
+* 模型裁剪、量化训练
+
+如果想对模型进行压缩训练，则通过下面字段进行配置
+
+模型裁剪：
+
+```yaml
+Slim:
+  prune:
+    name: fpgm
+    pruned_ratio: 0.3
+```
+
+模型量化：
+
+```yaml
+Slim:
+  quant:
+    name: pact
+```
+
+训练方法详见模型[裁剪量化使用介绍](../advanced_tutorials/model_prune_quantization.md)， 算法介绍详见[裁剪量化算法介绍](../algorithm_introduction/model_prune_quantization.md)。
+
 ### 1.3 预测部署代码和方式
 
 * 如果希望在服务端使用 cpp 进行部署，可以参考 [cpp inference 预测教程](../../../deploy/cpp_infer/readme.md) 。
 * 如果希望将分类模型部署为服务，可以参考 [hub serving 预测部署教程](../../../deploy/hubserving/readme.md) 。
-* 如果希望将对分类模型进行量化，可以参考 [Paddle Slim 量化教程](../../../deploy/slim/quant/README.md) 。
+* 如果希望将对分类模型进行离线量化，可以参考 [模型量化裁剪教程](../advanced_tutorials/model_prune_quantization.md) 中离线量化部分。
 * 如果希望在移动端使用分类模型进行预测，可以参考 [PaddleLite 预测部署教程](../../../deploy/lite/readme.md) 。
