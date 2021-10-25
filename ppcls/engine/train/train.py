@@ -43,7 +43,6 @@ def train_epoch(engine, epoch_id, print_batch_step):
                     "flatten_contiguous_range", "greater_than"
             }):
                 out = forward(engine, batch)
-                loss_dict = engine.train_loss_func(out, batch[1])
         else:
             out = forward(engine, batch)
 
