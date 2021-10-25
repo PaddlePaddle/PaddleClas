@@ -98,7 +98,7 @@ Res2Net200_vd预训练模型Top-1精度高达85.1%。
 对于新的未知类别，无需重新训练模型，只需要在检索库补入该类别图像，重新建立检索库，就可以识别该类别。
 
 <a name="往期课程链接"></a>
-## 图像识别系统介绍
+## 往期课程链接
 
 - [**【AI快车道PaddleClas系列直播课】**](https://aistudio.baidu.com/aistudio/course/introduce/24519)
 
