@@ -13,7 +13,7 @@
 <div align="center">
 <img src="../../images/structure.png"  width = "400" />
 </div>
-体验整体图像识别系统，或查看特征库建立方法，详见[图像识别快速开始文档](../../zh_CN/tutorials/quick_start_recognition.md)。其中，**图像识别快速开始文档**主要讲解整体流程的使用过程。以下内容，主要对上述三个步骤的训练部分进行介绍。
+体验整体图像识别系统，或查看特征库建立方法，详见[图像识别快速开始文档](../../zh_CN/tutorials/quick_start_recognition.md)。其中，图像识别快速开始文档主要讲解整体流程的使用过程。以下内容，主要对上述三个步骤的训练部分进行介绍。
 
 首先，请参考[安装指南](./install.md)配置运行环境。
 
@@ -33,6 +33,17 @@
 <a name="主体检测"></a>  
 
 ## 一、主体检测
+
+主体检测训练过程基于 [PaddleDetection](https://github.com/PaddlePaddle/PaddleDetection/tree/develop) ，唯一的区别在于，主体检测任务中，所有的检测框均属于前景，在这里需要将标注文件中，检测框的 `category_id` 修改为1，同时将整个标注文件中的 `categories` 映射表修改为下面的格式，即整个类别映射表中只包含`前景`类别。
+
+```json
+[{u'id': 1, u'name': u'foreground', u'supercategory': u'foreground'}]
+```
+
+关于主体检测训练方法可以参考： [PaddleDetection训练教程](https://github.com/PaddlePaddle/PaddleDetection/blob/develop/docs/tutorials/GETTING_STARTED_cn.md#4-%E8%AE%AD%E7%BB%83)。
+
+更多关于 PaddleClas 中提供的主体检测的模型介绍与下载请参考：[主体检测教程](../image_recognition_pipeline/mainbody_detection.md)。
+
 
 <a name="特征模型训练"></a>  
 
@@ -86,12 +97,12 @@ tree -r -i -f test | grep jpg | awk -F "/" '{print $0" "int($2) " "NR}' > test_l
 
 ```
 ├── 1
-│   ├── Black_Footed_Albatross_0001_796111.jpg
-│   ├── Black_Footed_Albatross_0002_55.jpg
+│   ├── Black_Footed_Albatross_0001_796111.jpg
+│   ├── Black_Footed_Albatross_0002_55.jpg
  ...
 ├── 10
-│   ├── Red_Winged_Blackbird_0001_3695.jpg
-│   ├── Red_Winged_Blackbird_0005_5636.jpg
+│   ├── Red_Winged_Blackbird_0001_3695.jpg
+│   ├── Red_Winged_Blackbird_0005_5636.jpg
 ...
 ```
 
@@ -271,9 +282,9 @@ PaddleClas图像检索部分目前支持的环境如下：
 
 ```shell
 └── CPU/单卡GPU
-    ├── Linux
-    ├── MacOS
-    └── Windows
+    ├── Linux
+    ├── MacOS
+    └── Windows
 ```
 
 此部分使用了[Faiss](https://github.com/facebookresearch/faiss)作为检索库，其是一个高效的特征检索及聚类的库。此库中集成了多种相似度检索算法，以满足不同的检索场景。在PaddleClas中，支持三种检索算法：
