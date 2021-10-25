@@ -17,11 +17,25 @@ import time
 import paddle
 from ppcls.engine.train.utils import update_loss, update_metric, log_info
 import sys
+from paddle.fluid import core
 
 
 def train_epoch(engine, epoch_id, print_batch_step):
     tic = time.time()
     for iter_id, batch in enumerate(engine.train_dataloader):
+        
+        if iter_id == 200:
+            core.nvprof_start()
+            core.nvprof_enable_record_event()
+            core.nvprof_nvtx_push(str(iter_id))
+        if iter_id == 205:
+            core.nvprof_nvtx_pop()
+            core.nvprof_stop()
+            sys.exit()
+        if iter_id >= 200 and iter_id < 205:
+            core.nvprof_nvtx_pop()
+            core.nvprof_nvtx_push(str(iter_id))
+
         if iter_id >= engine.max_iter:
             break
         if iter_id == 50:
