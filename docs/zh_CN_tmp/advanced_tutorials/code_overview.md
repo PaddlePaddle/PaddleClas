@@ -52,11 +52,11 @@ DataLoader:
             order: ''
 ```
 
-PaddleClas中也包含了`AutoAugment`, `RandAugment`等数据增广方法，也可以通过在配置文件中配置，从而添加到训练过程的数据预处理中。每个数据转换的方法均以类实现，方便迁移和复用，更多的数据处理具体实现过程可以参考`ppcls/data/preprocess/ops/`下的代码。
+PaddleClas 中也包含了 `AutoAugment`, `RandAugment` 等数据增广方法，也可以通过在配置文件中配置，从而添加到训练过程的数据预处理中。每个数据转换的方法均以类实现，方便迁移和复用，更多的数据处理具体实现过程可以参考 `ppcls/data/preprocess/ops/` 下的代码。
 
-对于组成一个batch的数据，也可以使用mixup或者cutmix等方法进行数据增广。PaddleClas中集成了`MixupOperator`, `CutmixOperator`, `FmixOperator`等基于batch的数据增广方法，可以在配置文件中配置mix参数进行配置，更加具体的实现可以参考`ppcls/data/preprocess/batch_ops/batch_operators.py`。
+对于组成一个 batch 的数据，也可以使用 mixup 或者 cutmix 等方法进行数据增广。 PaddleClas 中集成了 `MixupOperator`, `CutmixOperator`, `FmixOperator` 等基于 batch 的数据增广方法，可以在配置文件中配置 mix 参数进行配置，更加具体的实现可以参考 `ppcls/data/preprocess/batch_ops/batch_operators.py` 。
 
-图像分类中，数据后处理主要为`argmax`操作，在此不再赘述。
+图像分类中，数据后处理主要为 `argmax` 操作，在此不再赘述。
 
 * 模型结构
 
@@ -70,7 +70,7 @@ Arch:
   use_ssld: False
 ```
 
-`Arch.name` 表示模型名称， `Arch.pretrained` 表示是否添加预训练模型，`use_ssld` 表示是否使用基于 SSLD 知识蒸馏得到的预训练模型。所有的模型名称均在 `ppcls/arch/backbone/__init__.py` 中定义。
+`Arch.name` 表示模型名称， `Arch.pretrained` 表示是否添加预训练模型，`use_ssld` 表示是否使用基于 `SSLD` 知识蒸馏得到的预训练模型。所有的模型名称均在 `ppcls/arch/backbone/__init__.py` 中定义。
 
 对应的，在 `ppcls/arch/__init__.py` 中，通过 `build_model` 方法创建模型对象。
 
@@ -87,7 +87,7 @@ def build_model(config):
 
 PaddleClas中，包含了 `CELoss` , `JSDivLoss`, `TripletLoss`, `CenterLoss` 等损失函数，均定义在 `ppcls/loss` 中。
 
-在 `ppcls/loss/__init__.py` 文件中，使用`CombinedLoss`来构建及合并损失函数，不同训练策略中所需要的损失函数与计算方法不同，PaddleClas在构建损失函数过程中，主要考虑了以下几个因素。
+在 `ppcls/loss/__init__.py` 文件中，使用 `CombinedLoss` 来构建及合并损失函数，不同训练策略中所需要的损失函数与计算方法不同，PaddleClas 在构建损失函数过程中，主要考虑了以下几个因素。
 
 1. 是否使用 label smooth
 2. 是否使用 mixup 或者 cutmix
@@ -189,12 +189,12 @@ ef save_model(program, model_path, epoch_id, prefix='ppcls'):
 ```
 
 在保存的时候有两点需要注意：
-1. 只在0号节点上保存模型。否则多卡训练的时候，如果所有节点都保存模型到相同的路径，则多个节点写文件时可能会发生写文件冲突，导致最终保存的模型无法被正确加载。
+1. 只在 0 号节点上保存模型。否则多卡训练的时候，如果所有节点都保存模型到相同的路径，则多个节点写文件时可能会发生写文件冲突，导致最终保存的模型无法被正确加载。
 2. 优化器参数也需要存储，方便后续的加载断点进行训练。
 
 ### 1.3 预测部署代码和方式
 
-* 如果希望在服务端使用cpp进行部署，可以参考 [cpp inference预测教程](../../../deploy/cpp_infer/readme.md) 。
-* 如果希望将分类模型部署为服务，可以参考 [hub serving预测部署教程](../../../deploy/hubserving/readme.md) 。
-* 如果希望将对分类模型进行量化，可以参考 [Paddle Slim量化教程](../../../deploy/slim/quant/README.md) 。
-* 如果希望在移动端使用分类模型进行预测，可以参考 [PaddleLite预测部署教程](../../../deploy/lite/readme.md) 。
+* 如果希望在服务端使用 cpp 进行部署，可以参考 [cpp inference 预测教程](../../../deploy/cpp_infer/readme.md) 。
+* 如果希望将分类模型部署为服务，可以参考 [hub serving 预测部署教程](../../../deploy/hubserving/readme.md) 。
+* 如果希望将对分类模型进行量化，可以参考 [Paddle Slim 量化教程](../../../deploy/slim/quant/README.md) 。
+* 如果希望在移动端使用分类模型进行预测，可以参考 [PaddleLite 预测部署教程](../../../deploy/lite/readme.md) 。
