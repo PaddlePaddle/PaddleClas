@@ -6,7 +6,7 @@ PaddleClas的建设源于百度实际视觉业务应用的淬炼和视觉前沿�
 
 * 2019年Kaggle Open Images V5图像目标检测挑战赛亚军
     * 技术报告可以参考：[https://arxiv.org/pdf/1911.07171.pdf](https://arxiv.org/pdf/1911.07171.pdf)
-    * 详细文档与开源的模型可以参考：[OIDV5目标检测github地址](https://github.com/PaddlePaddle/PaddleDetection/blob/master/docs/featured_model/OIDV5_BASELINE_MODEL.md)
+    * 详细文档与开源的模型可以参考：[OIDV5目标检测github地址](https://github.com/PaddlePaddle/PaddleDetection/blob/release/2.2/static/docs/featured_model/champion_model/OIDV5_BASELINE_MODEL.md)
 
 * 2019年Kaggle地标检索挑战赛亚军
     * 技术报告可以参考：[https://arxiv.org/abs/1906.03990](https://arxiv.org/abs/1906.03990)

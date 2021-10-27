@@ -25,7 +25,7 @@
 
 <a name="SSLD知识蒸馏系列"></a>
 ### SSLD知识蒸馏预训练模型
-基于SSLD知识蒸馏的预训练模型列表如下所示，更多关于SSLD知识蒸馏方案的介绍可以参考：[SSLD知识蒸馏文档](./advanced_tutorials/distillation/distillation.md)。
+基于SSLD知识蒸馏的预训练模型列表如下所示，更多关于SSLD知识蒸馏方案的介绍可以参考：[SSLD知识蒸馏文档](./knowledge_distillation.md)。
 
 * 服务器端知识蒸馏模型
 
@@ -298,7 +298,7 @@ ViT（Vision Transformer）与DeiT（Data-efficient Image Transformers）系列�
 | ViT_large_<br/>patch16_224 | 0.8323  | 0.9650   | - | - |  | 307 | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ViT_large_patch16_224_pretrained.pdparams) |
 | ViT_large_<br/>patch16_384 | 0.8513  | 0.9736  | - | - |  |  | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ViT_large_patch16_384_pretrained.pdparams) |
 | ViT_large_<br/>patch32_384 | 0.8153   | 0.9608  | - | - |  |  | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ViT_large_patch32_384_pretrained.pdparams) |
-|                            |           |           |                  |                  |          |           |                                                              |
+
 
 
 | 模型                  | Top-1 Acc | Top-5 Acc | time(ms)<br>bs=1 | time(ms)<br>bs=4 | Flops(G) | Params(M) | 下载地址 |
@@ -311,7 +311,7 @@ ViT（Vision Transformer）与DeiT（Data-efficient Image Transformers）系列�
 | DeiT_small_<br>distilled_patch16_224 | 0.809 | 0.953 | - | - |  | 22 | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DeiT_small_distilled_patch16_224_pretrained.pdparams) |
 | DeiT_base_<br>distilled_patch16_224 | 0.831 | 0.964 | - | - |  | 87 | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DeiT_base_distilled_patch16_224_pretrained.pdparams) |
 | DeiT_base_<br>distilled_patch16_384 | 0.851 | 0.973 | - | - |  | 88 | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DeiT_base_distilled_patch16_384_pretrained.pdparams) |
-|  |  |  |  |  |  |  |  |
+
 
 <a name="RepVGG系列"></a>
 
