@@ -8,6 +8,5 @@ cd ${BUILD_DIR}
 cmake .. \
     -DOpenCV_DIR=${OpenCV_DIR} \
     -DPADDLE_LIB=${PADDLE_LIB_DIR} \
-    -DCMP_STATIC=ON
 
 make

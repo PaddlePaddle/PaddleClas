@@ -5,7 +5,6 @@ CUDNN_LIB_DIR=path/to/cudnn
 TENSORRT_LIB_DIR=path/to/tensorrt
 CONFIG_LIB_PATH=path/to/config/library
 CLS_LIB_PATH=path/to/cls/library
-CMP_STATIC=ON
 
 BUILD_DIR=build
 rm -rf ${BUILD_DIR}
@@ -21,6 +20,5 @@ cmake .. \
     -DCUDNN_LIB=${CUDNN_LIB_DIR} \
     -DCONFIG_LIB=${CONFIG_LIB_PATH} \
     -DCLS_LIB=${CLS_LIB_PATH} \
-    -DCMP_STATIC=OFF
 
 make -j
