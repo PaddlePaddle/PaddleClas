@@ -9,7 +9,7 @@
 - Linux 环境，推荐使用 docker。
 - Windows 环境，目前支持基于 `Visual Studio 2019 Community` 进行编译；此外，如果您希望通过生成 `sln解决方案` 的方式进行编译，可以参考该文档：[https://zhuanlan.zhihu.com/p/145446681](https://zhuanlan.zhihu.com/p/145446681)
 
-* 该文档主要介绍基于 Linux 环境下的 PaddleClas C++ 预测流程，如果需要在 Windows 环境下使用预测库进行 C++ 预测，具体编译方法请参考 [Windows下编译教程](./docs/windows_vs2019_build.md)。
+* 该文档主要介绍基于 Linux 环境下的 PaddleClas C++ 预测流程，如果需要在 Windows 环境下使用预测库进行 C++ 预测，具体编译方法请参考 [Windows下编译教程](./cpp_deploy_on_windows.md)。
 
 ### 1.1 编译opencv库
 
@@ -76,7 +76,7 @@ opencv3/
 * 有 2 种方式获取 Paddle 预测库，下面进行详细介绍。
 
 #### 1.2.1 预测库源码编译
-如果希望获取最新预测库特性，可以从 GitHub 上克隆 Paddle 最新代码，从源码编译预测库。对于不同平台的编译流程，请参考[Paddle预测库官网](https://paddleinference.paddlepaddle.org.cn/v2.1/user_guides/source_compile.html)的说明。编译示例如下：
+如果希望获取最新预测库特性，可以从 GitHub 上克隆 Paddle 最新代码，从源码编译预测库。对于不同平台的编译流程，请参考 [Paddle预测库官网](https://paddleinference.paddlepaddle.org.cn/v2.1/user_guides/source_compile.html) 的说明。编译示例如下：
 
 1. 使用Git获取源代码：
 
@@ -226,13 +226,13 @@ make
 * `DPADDLE_LIB`：Paddle 预测库路径，一般使用下载并解压的预编译库路径 `paddle_inference` 即可，或编译生成的预测库的路径 `build/paddle_inference_install_dir`，注意该路径下需要有 `paddle` 和 `third_party` 两个子路径；
 * `DCMP_STATIC`：是否将 `config lib` 和 `cls lib` 编译为静态链接库（`.a`），默认为 `ON`，如需编译为动态链接库（`.so`），请设置为 `OFF`。
 
-执行上述命令后，将在目录 `./lib/` 下生成 `config lib` 和 `cls lib` 的动态链接库（`libcls.so` 和 `libconfig.so`）或静态链接库（`libcls.a` 和 `libconfig.a`）。在[编译 PaddleClas C++ 预测 demo](#2.1)中，可以通过指定编译选项 `DCLS_LIB` 和 `DCONFIG_LIB` 指定已有链接库的路径，链接库同样也可用于二次开发。
+执行上述命令后，将在目录 `./lib/` 下生成 `config lib` 和 `cls lib` 的动态链接库（`libcls.so` 和 `libconfig.so`）或静态链接库（`libcls.a` 和 `libconfig.a`）。在[2.1 编译 PaddleClas C++ 预测 demo](#2.1)中，可以通过指定编译选项 `DCLS_LIB` 和 `DCONFIG_LIB` 指定已有链接库的路径，链接库同样也可用于二次开发。
 
 ## 3. 运行 demo
 
 ### 3.1 准备 inference model
 
-首先需要准备 inference model，关于将模型导出为 inference model 的具体步骤，可以参考[模型导出](../../docs/zh_CN/tutorials/getting_started.md#4-使用inference模型进行模型推理)文档。假设导出的预测模型文件放在`./inference`目录下，则目录结构如下。
+首先需要准备 inference model，关于将模型导出为 inference model 的具体步骤，可以参考 [模型导出](./export_model.md) 文档。假设导出的预测模型文件放在 `./inference` 目录下，则目录结构如下。
 
 ```
 inference/
@@ -270,7 +270,7 @@ sh tools/run.sh
 * 最终屏幕上会输出结果，如下图所示。
 
 <div align="center">
-    <img src="./docs/imgs/cpp_infer_result.png" width="600">
+    <img src="../../images/inference_deployment/cpp_infer_result.png" width="600">
 </div>
 
-其中`class id`表示置信度最高的类别对应的id，score表示图片属于该类别的概率。
+其中 `class id` 表示置信度最高的类别对应的 id，score 表示图片属于该类别的概率。

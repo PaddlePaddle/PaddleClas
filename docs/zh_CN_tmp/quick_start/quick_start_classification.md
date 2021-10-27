@@ -74,6 +74,8 @@ cd ../../
 
 ## 4. 模型训练
 
+<a name="4.1"></a>
+
 ### 4.1 使用CPU进行模型训练
 
 由于使用CPU来进行模型训练，计算速度较慢，因此，此处以 ShuffleNetV2_x0_25 为例。此模型计算量较小，在 CPU 上计算速度较快。但是也因为模型较小，训练好的模型精度也不会太高。
@@ -137,7 +139,7 @@ python3 tools/train.py -c ./ppcls/configs/quick_start/ResNet50_vd.yaml
 python3 tools/train.py -c ./ppcls/configs/quick_start/ResNet50_vd.yaml -o Arch.pretrained=True
 ```
 
-**注**：此训练脚本使用 GPU，如使用 CPU 可按照上文中[使用CPU进行模型训练](#使用CPU进行模型训练)所示，进行修改。
+**注**：此训练脚本使用 GPU，如使用 CPU 可按照上文中[4.1 使用CPU进行模型训练](#4.1)所示，进行修改。
 
 验证集的 `Top1 Acc` 曲线如下所示，最高准确率为 `0.9402`，加载预训练模型之后，flowers102 数据集精度大幅提升，绝对精度涨幅超过 65%。
 

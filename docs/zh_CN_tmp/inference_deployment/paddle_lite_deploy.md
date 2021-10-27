@@ -2,7 +2,9 @@
 
 本教程将介绍基于[Paddle Lite](https://github.com/PaddlePaddle/Paddle-Lite)在移动端部署 PaddleClas 分类模型的详细步骤。
 
-Paddle Lite是飞桨轻量化推理引擎，为手机、IOT端提供高效推理能力，并广泛整合跨平台硬件，为端侧部署及应用落地问题提供轻量化的部署方案。如果希望直接测试速度，可以参考[Paddle-Lite移动端benchmark测试教程](../../docs/zh_CN/extension/paddle_mobile_inference.md)。
+Paddle Lite是飞桨轻量化推理引擎，为手机、IOT端提供高效推理能力，并广泛整合跨平台硬件，为端侧部署及应用落地问题提供轻量化的部署方案。
+<!-- TODO(gaotingquan): 下述 benchmark 文档在新文档结构中缺失 -->
+<!-- 如果希望直接测试速度，可以参考[Paddle-Lite移动端benchmark测试教程](../../docs/zh_CN/extension/paddle_mobile_inference.md)。 -->
 
 ---
 
@@ -15,11 +17,7 @@ Paddle Lite 目前支持以下平台部署：
 ### 1.1 准备交叉编译环境
 
 交叉编译环境用于编译 Paddle Lite 和 PaddleClas 的 C++ demo。
-支持多种开发环境，不同开发环境的编译流程请参考对应文档。
-
-1. [Docker](https://paddle-lite.readthedocs.io/zh/latest/source_compile/compile_env.html#docker)
-2. [Linux](https://paddle-lite.readthedocs.io/zh/latest/source_compile/compile_env.html#linux)
-3. [MAC OS](https://paddle-lite.readthedocs.io/zh/latest/source_compile/compile_env.html#mac-os)
+支持多种开发环境，关于 Docker、Linux、macOS、Windows 等不同开发环境的编译流程请参考[文档](https://paddle-lite.readthedocs.io/zh/latest/source_compile/compile_env.html)。
 
 ### 1.2 准备预测库
 
@@ -44,7 +42,8 @@ cd Paddle-Lite
 git checkout develop
 ./lite/tools/build_android.sh  --arch=armv8  --with_cv=ON --with_extra=ON
 ```
-
+<!-- TODO(gaotingquan): 需要与lite同学确认，该编译选项是否需要更新：with_cv with_extra， -->
+<!-- https://paddle-lite.readthedocs.io/zh/latest/source_compile/compile_options.html -->
 **注意**：编译Paddle-Lite获得预测库时，需要打开`--with_cv=ON --with_extra=ON`两个选项，`--arch`表示`arm`版本，这里指定为armv8，更多编译命令介绍请参考[链接](https://paddle-lite.readthedocs.io/zh/latest/user_guides/Compile/Android.html#id2)。
 
 直接下载预测库并解压后，可以得到`inference_lite_lib.android.armv8/`文件夹，通过编译Paddle-Lite得到的预测库位于`Paddle-Lite/build.lite.android.armv8.gcc/inference_lite_lib.android.armv8/`文件夹下。
@@ -197,7 +196,7 @@ cp ../../../cxx/lib/libpaddle_light_api_shared.so ./debug/
 ```
 
 `prepare.sh` 以 `PaddleClas/deploy/lite/imgs/tabby_cat.jpg` 作为测试图像，将测试图像复制到 `demo/cxx/clas/debug/` 文件夹下。
-将 `paddle_lite_opt` 工具优化后的模型文件放置到 `/{lite prediction library path}/inference_lite_lib.android.armv8/demo/cxx/clas/debug/` 文件夹下。本例中，使用 [2.1.3](#2.1.3) 生成的 `MobileNetV3_large_x1_0.nb` 模型文件。
+将 `paddle_lite_opt` 工具优化后的模型文件放置到 `/{lite prediction library path}/inference_lite_lib.android.armv8/demo/cxx/clas/debug/` 文件夹下。本例中，使用 [2.1.3 转换示例](#2.1.3) 生成的 `MobileNetV3_large_x1_0.nb` 模型文件。
 
 执行完成后，clas 文件夹下将有如下文件格式：
 
@@ -253,7 +252,7 @@ export LD_LIBRARY_PATH=/data/local/tmp/debug:$LD_LIBRARY_PATH
 运行效果如下：
 
 <div align="center">
-    <img src="./imgs/lite_demo_result.png" width="600">
+    <img src="../../images/inference_deployment/lite_demo_result.png" width="600">
 </div>
 
 ## FAQ
