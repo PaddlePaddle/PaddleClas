@@ -13,15 +13,6 @@ SET(CUDA_LIB "" CACHE PATH "The root directory of CUDA Library")
 SET(CUDNN_LIB "" CACHE PATH "The root directory of cuDNN Library")
 SET(TENSORRT_LIB "" CACHE PATH "The root directory of TensorRT library")
 
-# TODO(gaotingquan): is this necessary?
-if(NOT WITH_STATIC_LIB)
-  add_definitions("-DPADDLE_WITH_SHARED_LIB")
-else()
-  # PD_INFER_DECL is mainly used to set the dllimport/dllexport attribute in dynamic library mode.
-  # Set it to empty in static library mode to avoid compilation issues.
-  add_definitions("/DPD_INFER_DECL=")
-endif()
-
 MACRO(safe_set_static_flag)
     FOREACH(flag_var
         CMAKE_CXX_FLAGS CMAKE_CXX_FLAGS_DEBUG CMAKE_CXX_FLAGS_RELEASE
@@ -142,30 +133,24 @@ IF(WIN32)
   ADD_DEFINITIONS("/DGOOGLE_GLOG_DLL_DECL=")
   #TODO(gaotingquan): Is it necessary to set MSVC_STATIC_CRT?
   option(MSVC_STATIC_CRT "use static C Runtime library by default" ON)
-  if(MSVC_STATIC_CRT)
-    if(WITH_MKL)
-      set(FLAG_OPENMP "/openmp")
-    endif()
-    set(CMAKE_C_FLAGS_DEBUG   "${CMAKE_C_FLAGS_DEBUG} /bigobj /MTd ${FLAG_OPENMP}")
-    set(CMAKE_C_FLAGS_RELEASE  "${CMAKE_C_FLAGS_RELEASE} /bigobj /MT ${FLAG_OPENMP}")
-    set(CMAKE_CXX_FLAGS_DEBUG  "${CMAKE_CXX_FLAGS_DEBUG} /bigobj /MTd ${FLAG_OPENMP}")
-    set(CMAKE_CXX_FLAGS_RELEASE   "${CMAKE_CXX_FLAGS_RELEASE} /bigobj /MT ${FLAG_OPENMP}")
-    #TODO(gaotingquan): where should safe_set_static_flag run?
-    #safe_set_static_flag()
-    if(WITH_STATIC_LIB)
+  IF(MSVC_STATIC_CRT)
+    IF(WITH_MKL)
+      SET(FLAG_OPENMP "/openmp")
+    ENDIF()
+    SET(CMAKE_C_FLAGS_DEBUG   "${CMAKE_C_FLAGS_DEBUG} /bigobj /MTd ${FLAG_OPENMP}")
+    SET(CMAKE_C_FLAGS_RELEASE  "${CMAKE_C_FLAGS_RELEASE} /bigobj /MT ${FLAG_OPENMP}")
+    SET(CMAKE_CXX_FLAGS_DEBUG  "${CMAKE_CXX_FLAGS_DEBUG} /bigobj /MTd ${FLAG_OPENMP}")
+    SET(CMAKE_CXX_FLAGS_RELEASE   "${CMAKE_CXX_FLAGS_RELEASE} /bigobj /MT ${FLAG_OPENMP}")
+    IF(WITH_STATIC_LIB)
       safe_set_static_flag()
-      add_definitions(-DSTATIC_LIB)
-    endif()
-  endif()
+      ADD_DEFINITIONS(-DSTATIC_LIB)
+    ENDIF()
+  ENDIF()
 
   # SET(CMAKE_C_FLAGS_DEBUG   "${CMAKE_C_FLAGS_DEBUG} /bigobj /MTd")
   # SET(CMAKE_C_FLAGS_RELEASE  "${CMAKE_C_FLAGS_RELEASE} /bigobj /MT")
   # SET(CMAKE_CXX_FLAGS_DEBUG  "${CMAKE_CXX_FLAGS_DEBUG} /bigobj /MTd")
   # SET(CMAKE_CXX_FLAGS_RELEASE   "${CMAKE_CXX_FLAGS_RELEASE} /bigobj /MT")
-  # IF (WITH_STATIC_LIB)
-  #     safe_set_static_flag()
-  #     ADD_DEFINITIONS(-DSTATIC_LIB)
-  # ENDIF()
 
 # for Linux
 ELSE()
@@ -182,10 +167,7 @@ ELSE()
   IF(WITH_MKL)
     SET(FLAG_OPENMP "-fopenmp")
   ENDIF()
-  # TODO(gaotingquan):
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 ${FLAG_OPENMP}")
-  # SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -o3 -std=c++11")
-  # SET(CMAKE_STATIC_LIBRARY_PREFIX "")
+  SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -O3 -std=c++11 ${FLAG_OPENMP}")
 ENDIF()
 MESSAGE(STATUS "FLAGS: ${CMAKE_CXX_FLAGS}")
 
