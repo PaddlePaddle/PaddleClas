@@ -3,7 +3,6 @@ CMAKE_MINIMUM_REQUIRED(VERSION 3.14)
 
 OPTION(WITH_MKL        "Compile demo with MKL/OpenBlas support, default use MKL."       ON)
 OPTION(WITH_GPU        "Compile demo with GPU/CPU, default use CPU."                    OFF)
-OPTION(WITH_STATIC_LIB "Compile demo with static/shared library, default use static."   ON)
 OPTION(WITH_TENSORRT "Compile demo with TensorRT."   OFF)
 OPTION(WHOLE_CHAIN "Whole chain testing switch" OFF)
 
@@ -122,11 +121,7 @@ SET(DEPS ${DEPS} ${MATH_LIB})
 
 # for Win
 IF(WIN32)
-  IF(WITH_STATIC_LIB)
-    SET(DEPS ${DEPS} ${PADDLE_LIB}/paddle/lib/libpaddle_inference${CMAKE_STATIC_LIBRARY_SUFFIX})
-  ELSE()
-    SET(DEPS ${DEPS} ${PADDLE_LIB}/paddle/lib/paddle_inference${CMAKE_SHARED_LIBRARY_SUFFIX})
-  ENDIF()
+  SET(DEPS ${DEPS} ${PADDLE_LIB}/paddle/lib/paddle_inference${CMAKE_SHARED_LIBRARY_SUFFIX})
 
   SET(DEPS ${DEPS} glog gflags_static libprotobuf xxhash cryptopp-static shlwapi.lib)
 
@@ -141,10 +136,6 @@ IF(WIN32)
     SET(CMAKE_C_FLAGS_RELEASE  "${CMAKE_C_FLAGS_RELEASE} /bigobj /MT ${FLAG_OPENMP}")
     SET(CMAKE_CXX_FLAGS_DEBUG  "${CMAKE_CXX_FLAGS_DEBUG} /bigobj /MTd ${FLAG_OPENMP}")
     SET(CMAKE_CXX_FLAGS_RELEASE   "${CMAKE_CXX_FLAGS_RELEASE} /bigobj /MT ${FLAG_OPENMP}")
-    IF(WITH_STATIC_LIB)
-      safe_set_static_flag()
-      ADD_DEFINITIONS(-DSTATIC_LIB)
-    ENDIF()
   ENDIF()
 
   # SET(CMAKE_C_FLAGS_DEBUG   "${CMAKE_C_FLAGS_DEBUG} /bigobj /MTd")
@@ -154,11 +145,7 @@ IF(WIN32)
 
 # for Linux
 ELSE()
-  IF(WITH_STATIC_LIB)
-    SET(DEPS ${DEPS} ${PADDLE_LIB}/paddle/lib/libpaddle_inference${CMAKE_STATIC_LIBRARY_SUFFIX})
-  ELSE()
-    SET(DEPS ${DEPS} ${PADDLE_LIB}/paddle/lib/libpaddle_inference${CMAKE_SHARED_LIBRARY_SUFFIX})
-  ENDIF()
+  SET(DEPS ${DEPS} ${PADDLE_LIB}/paddle/lib/libpaddle_inference${CMAKE_SHARED_LIBRARY_SUFFIX})
 
   SET(DEPS ${DEPS} glog gflags protobuf xxhash cryptopp)
   SET(EXTERNAL_LIB "-ldl -lrt -lgomp -lz -lm -lpthread")

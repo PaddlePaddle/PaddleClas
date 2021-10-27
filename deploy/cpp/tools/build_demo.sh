@@ -15,7 +15,6 @@ cmake .. \
     -DWITH_MKL=ON \
     -DWITH_GPU=OFF \
     -DWITH_TENSORRT=OFF \
-    -DWITH_STATIC_LIB=ON \
     -DOpenCV_DIR=${OpenCV_DIR} \
     -DPADDLE_LIB=${PADDLE_LIB_DIR} \
     -DCUDA_LIB=${CUDA_LIB_DIR} \
