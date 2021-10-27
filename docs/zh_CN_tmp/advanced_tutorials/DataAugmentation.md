@@ -1,6 +1,6 @@
 # 一、数据增强分类实战
 
-本节将基于ImageNet-1K的数据集详细介绍数据增强实验，如果想快速体验此方法，可以参考[**30分钟玩转PaddleClas（进阶版）**](../../tutorials/quick_start_professional.md)中基于CIFAR100的数据增强实验。如果想了解相关算法的内容，请参考[数据增强算法介绍](../algorithm_introduction/DataAugmentation.md)。
+本节将基于ImageNet-1K的数据集详细介绍数据增强实验，如果想快速体验此方法，可以参考[**30分钟玩转PaddleClas（进阶版）**](../quick_start/quick_start_classification.md)中基于CIFAR100的数据增强实验。如果想了解相关算法的内容，请参考[数据增强算法介绍](../algorithm_introduction/DataAugmentation.md)。
 
 ## 1.1 参数配置
 
