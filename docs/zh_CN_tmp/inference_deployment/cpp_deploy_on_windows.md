@@ -14,9 +14,10 @@ PaddleClas 在 Windows 平台下基于 `Visual Studio 2019 Community` 进行了�
 
 以下示例基于 `Visual Studio 2019 Community` 版本，以工作目录为 `D:\projects` 进行演示。
 
+<a name="1.1"></a>
 ### 1.1 下载 PaddlePaddle C++ 预测库 paddle_inference_install_dir
 
-PaddlePaddle C++ 预测库针对不同的 `CPU `和 `CUDA` 版本提供了不同的预编译版本，请根据实际情况下载:  [C++预测库下载列表](https://www.paddlepaddle.org.cn/documentation/docs/zh/develop/guides/05_inference_deployment/inference/windows_cpp_inference.html)，建议选择 `2.1.1` 版本。
+PaddlePaddle C++ 预测库针对不同的 `CPU `和 `CUDA` 版本提供了不同的预编译版本，请根据实际情况下载:  [C++预测库下载列表](https://paddleinference.paddlepaddle.org.cn/user_guides/download_lib.html#windows)，建议选择 `2.1.1` 版本。
 
 **注意**：在选择预测库时，所选预测库版本需要与后续编译选项一致：
 * CPU 预测库仅可用于 GPU 预测，具体又分为 `mkl` 和 `openblas`，分别对应其低层实现基于 `MKL` 数学运算库 和 `OpenBLAS` 数学运算库；
@@ -97,13 +98,13 @@ paddle_inference_install_dir
 
 ![step6](../../images/inference_deployment/vs2019_step6.png)
 
-在编译完成后，会生成可执行文件 `clas_system.exe`。并且，如未设置 `DCONFIG_LIB` 与 `DCLS_LIB`，则会在 `.\lib\` 目录下生成 `config lib` 和 `cls lib` 两个静态链接库文件（`libconfig.a`、`libcls.a`）。类似地，你也可以仅编译生成 `config lib` 和 `cls lib` 两个静态链接库文件，只需打开路径为 `D:\projects\PaddleClas\deploy\cpp\lib\CMakeList.txt` 的 `CMake` 文件并进行编译即可，具体参考[使用 Visual Studio 2019 编译](#2)，完成编译后，同样可在 `.\lib\` 目录下生成静态链接库文件，静态链接库文件可用于二次开发。
+在编译完成后，会生成可执行文件 `clas_system.exe`。并且，如未设置 `DCONFIG_LIB` 与 `DCLS_LIB`，则会在 `.\lib\` 目录下生成 `config lib` 和 `cls lib` 两个静态链接库文件（`libconfig.a`、`libcls.a`）。类似地，你也可以仅编译生成 `config lib` 和 `cls lib` 两个静态链接库文件，只需打开路径为 `D:\projects\PaddleClas\deploy\cpp\lib\CMakeList.txt` 的 `CMake` 文件并进行编译即可，具体参考[2. 使用 Visual Studio 2019 编译](#2)，完成编译后，同样可在 `.\lib\` 目录下生成静态链接库文件，静态链接库文件可用于二次开发。
 
 ## 3. 预测
 
 ### 3.1 准备 inference model
 
-首先需要准备 inference model，关于将模型导出为 inference model 的具体步骤，可以参考[模型导出](../../docs/zh_CN/tutorials/getting_started.md#4-使用inference模型进行模型推理)文档。假设导出的预测模型文件放在`./inference`目录下，则目录结构如下。
+首先需要准备 inference model，关于将模型导出为 inference model 的具体步骤，可以参考 [模型导出](./export_model.md) 文档。假设导出的预测模型文件放在 `./inference` 目录下，则目录结构如下。
 
 ```
 inference/
@@ -146,4 +147,4 @@ cd D:\projects\PaddleClas\deploy\cpp\out\build\x64-Release
 ### 4. 注意事项
 * 在 Windows 下的终端中执行文件 exe 时，可能会发生乱码的现象，此时需要在终端中输入 `CHCP 65001`，将终端的编码方式由 GBK 编码(默认)改为 UTF-8 编码，更加具体的解释可以参考这篇博客：[https://blog.csdn.net/qq_35038153/article/details/78430359](https://blog.csdn.net/qq_35038153/article/details/78430359)；
 * 如果需要使用 CPU 预测，PaddlePaddle 在 Windows 上仅支持 avx 的 CPU 预测，目前不支持 noavx 的 CPU 预测；
-* 在使用生成的 `clas_system.exe` 进行预测时，如提示 `由于找不到paddle_fluid.dll，无法继续执行代码。重新安装程序可能会解决此问题`，请检查是否将 Paddle 预测库路径添加到系统环境变量，详见[Step1: 下载PaddlePaddle C++ 预测库 paddle_inference_install_dir](#step1-下载paddlepaddle-c-预测库-paddle_inference_install_dir)。
+* 在使用生成的 `clas_system.exe` 进行预测时，如提示 `由于找不到paddle_fluid.dll，无法继续执行代码。重新安装程序可能会解决此问题`，请检查是否将 Paddle 预测库路径添加到系统环境变量，详见[1.1 下载 PaddlePaddle C++ 预测库 paddle_inference_install_dir](#1.1)。

@@ -37,7 +37,7 @@ pip3 install paddlehub==2.1.0 --upgrade -i https://pypi.tuna.tsinghua.edu.cn/sim
   ```
 需要注意，
   * 模型文件（包括 `.pdmodel` 与 `.pdiparams`）名称必须为`inference`。
-  * 我们也提供了大量基于ImageNet-1k数据集的预训练模型，模型列表及下载地址详见[模型库概览](../../docs/zh_CN/models/models_intro.md)，也可以使用自己训练转换好的模型。
+  * 我们也提供了大量基于ImageNet-1k数据集的预训练模型，模型列表及下载地址详见[模型库概览](../models/models_intro.md)，也可以使用自己训练转换好的模型。
 
 ## 4. 安装服务模块
 
@@ -186,7 +186,7 @@ list: 返回结果
 ```hub serving start -m clas_system```  
 
 **注意**：
-常用参数可在 [params.py](./clas/params.py) 中修改：
+常用参数可在 `PaddleClas/deploy/hubserving/clas/params.py` 中修改：
   * 更换模型，需要修改模型文件路径参数:
     ```python
     "inference_model_dir":
@@ -200,4 +200,4 @@ list: 返回结果
     'class_id_map_file':
     ```
 
-为了避免不必要的延时以及能够以 batch_size 进行预测，数据预处理逻辑（包括 `resize`、`crop` 等操作）均在客户端完成，因此需要在 [test_hubserving.py](./test_hubserving.py#L35-L52) 中修改。
+为了避免不必要的延时以及能够以 batch_size 进行预测，数据预处理逻辑（包括 `resize`、`crop` 等操作）均在客户端完成，因此需要在 `PaddleClas/deploy/hubserving/test_hubserving.py#L35-L52`中修改。

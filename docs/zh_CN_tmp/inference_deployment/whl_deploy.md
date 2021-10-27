@@ -21,10 +21,10 @@ pip3 install dist/*
 
 
 ## 2. 快速开始
-* 使用`ResNet50`模型，以下图（`'docs/images/whl/demo.jpg'`）为例进行说明。
+* 使用`ResNet50`模型，以下图（`PaddleClas/docs/images/inference_deployment/whl_demo.jpg`）为例进行说明。
 
 <div align="center">
-<img src="../images/whl/demo.jpg"  width = "400" />
+<img src="../../images/inference_deployment/whl_demo.jpg"  width = "400" />
 </div>
 
 
@@ -32,7 +32,7 @@ pip3 install dist/*
 ```python
 from paddleclas import PaddleClas
 clas = PaddleClas(model_name='ResNet50')
-infer_imgs='docs/images/whl/demo.jpg'
+infer_imgs='docs/images/inference_deployment/whl_demo.jpg'
 result=clas.predict(infer_imgs)
 print(next(result))
 ```
@@ -46,12 +46,12 @@ print(next(result))
 
 * 在命令行中使用
 ```bash
-paddleclas --model_name=ResNet50  --infer_imgs="docs/images/whl/demo.jpg"
+paddleclas --model_name=ResNet50  --infer_imgs="docs/images/inference_deployment/whl_demo.jpg"
 ```
 
 ```
 >>> result
-filename: docs/images/whl/demo.jpg, top-5, class_ids: [8, 7, 136, 80, 84], scores: [0.79368, 0.16329, 0.01853, 0.00959, 0.00239], label_names: ['hen', 'cock', 'European gallinule, Porphyrio porphyrio', 'black grouse', 'peacock']
+filename: docs/images/inference_deployment/whl_demo.jpg, top-5, class_ids: [8, 7, 136, 80, 84], scores: [0.79368, 0.16329, 0.01853, 0.00959, 0.00239], label_names: ['hen', 'cock', 'European gallinule, Porphyrio porphyrio', 'black grouse', 'peacock']
 Predict complete!
 ```
 
@@ -77,7 +77,7 @@ Predict complete!
 * 命令行中
 ```bash
 from paddleclas import PaddleClas, get_default_confg
-paddleclas --model_name=ViT_base_patch16_384 --infer_imgs='docs/images/whl/demo.jpg' --resize_short=384 --crop_size=384
+paddleclas --model_name=ViT_base_patch16_384 --infer_imgs='docs/images/inference_deployment/whl_demo.jpg' --resize_short=384 --crop_size=384
 ```
 
 * Python代码中
@@ -109,14 +109,14 @@ paddleclas -h
 ```python
 from paddleclas import PaddleClas
 clas = PaddleClas(model_name='ResNet50')
-infer_imgs = 'docs/images/whl/demo.jpg'
+infer_imgs = 'docs/images/inference_deployment/whl_demo.jpg'
 result=clas.predict(infer_imgs)
 print(next(result))
 ```
 
 * CLI
 ```bash
-paddleclas --model_name='ResNet50' --infer_imgs='docs/images/whl/demo.jpg'
+paddleclas --model_name='ResNet50' --infer_imgs='docs/images/inference_deployment/whl_demo.jpg'
 ```
 
 
@@ -127,14 +127,14 @@ paddleclas --model_name='ResNet50' --infer_imgs='docs/images/whl/demo.jpg'
 ```python
 from paddleclas import PaddleClas
 clas = PaddleClas(inference_model_dir='./inference/')
-infer_imgs = 'docs/images/whl/demo.jpg'
+infer_imgs = 'docs/images/inference_deployment/whl_demo.jpg'
 result=clas.predict(infer_imgs)
 print(next(result))
 ```
 
 * CLI
 ```bash
-paddleclas --inference_model_dir='./inference/' --infer_imgs='docs/images/whl/demo.jpg'
+paddleclas --inference_model_dir='./inference/' --infer_imgs='docs/images/inference_deployment/whl_demo.jpg'
 ```
 
 
@@ -164,14 +164,14 @@ paddleclas --model_name='ResNet50' --infer_imgs='docs/images/' --batch_size 2
 ```python
 from paddleclas import PaddleClas
 clas = PaddleClas(model_name='ResNet50')
-infer_imgs = 'https://raw.githubusercontent.com/paddlepaddle/paddleclas/release/2.2/docs/images/whl/demo.jpg'
+infer_imgs = 'https://raw.githubusercontent.com/paddlepaddle/paddleclas/release/2.2/docs/images/inference_deployment/whl_demo.jpg'
 result=clas.predict(infer_imgs)
 print(next(result))
 ```
 
 * CLI
 ```bash
-paddleclas --model_name='ResNet50' --infer_imgs='https://raw.githubusercontent.com/paddlepaddle/paddleclas/release/2.2/docs/images/whl/demo.jpg'
+paddleclas --model_name='ResNet50' --infer_imgs='https://raw.githubusercontent.com/paddlepaddle/paddleclas/release/2.2/docs/images/inference_deployment/whl_demo.jpg'
 ```
 
 
@@ -183,7 +183,7 @@ paddleclas --model_name='ResNet50' --infer_imgs='https://raw.githubusercontent.c
 import cv2
 from paddleclas import PaddleClas
 clas = PaddleClas(model_name='ResNet50')
-infer_imgs = cv2.imread("docs/images/whl/demo.jpg")
+infer_imgs = cv2.imread("docs/images/inference_deployment/whl_demo.jpg")
 result=clas.predict(infer_imgs)
 print(next(result))
 ```
@@ -229,12 +229,12 @@ class_id<space>class_name<\n>
 ```python
 from paddleclas import PaddleClas
 clas = PaddleClas(model_name='ResNet50', class_id_map_file='./ppcls/utils/imagenet1k_label_list.txt')
-infer_imgs = 'docs/images/whl/demo.jpg'
+infer_imgs = 'docs/images/inference_deployment/whl_demo.jpg'
 result=clas.predict(infer_imgs)
 print(next(result))
 ```
 
 * CLI
 ```bash
-paddleclas --model_name='ResNet50' --infer_imgs='docs/images/whl/demo.jpg' --class_id_map_file='./ppcls/utils/imagenet1k_label_list.txt'
+paddleclas --model_name='ResNet50' --infer_imgs='docs/images/inference_deployment/whl_demo.jpg' --class_id_map_file='./ppcls/utils/imagenet1k_label_list.txt'
 ```
