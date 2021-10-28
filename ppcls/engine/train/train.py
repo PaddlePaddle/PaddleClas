@@ -48,7 +48,7 @@ def train_epoch(engine, epoch_id, print_batch_step):
         else:
             out = forward(engine, batch)
 
-        loss_dict = engine.train_loss_func(out, batch[1])
+        loss_dict = engine.train_loss_func(out, batch[1].astype("int64"))
 
         # step opt and lr
         if engine.amp:
