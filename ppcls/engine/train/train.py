@@ -37,6 +37,7 @@ def train_epoch(engine, epoch_id, print_batch_step):
         batch_size = batch[0].shape[0]
         if not engine.config["Global"].get("use_multilabel", False):
             batch[1] = batch[1].reshape([batch_size, -1])
+        batch[1] = batch[1].astype("int64")
         engine.global_step += 1
 
         # image input
@@ -48,7 +49,7 @@ def train_epoch(engine, epoch_id, print_batch_step):
         else:
             out = forward(engine, batch)
 
-        loss_dict = engine.train_loss_func(out, batch[1].astype("int64"))
+        loss_dict = engine.train_loss_func(out, batch[1])
 
         # step opt and lr
         if engine.amp:
