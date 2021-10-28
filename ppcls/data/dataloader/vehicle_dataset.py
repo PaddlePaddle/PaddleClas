@@ -112,8 +112,8 @@ class VeriWild(Dataset):
             for l in lines:
                 l = l.strip().split()
                 self.images.append(os.path.join(self._img_root, l[0]))
-                self.labels.append(int(l[1]))
-                self.cameras.append(int(l[2]))
+                self.labels.append(np.int64(l[1]))
+                self.cameras.append(np.int64(l[2]))
                 assert os.path.exists(self.images[-1])
 
     def __getitem__(self, idx):
