@@ -75,14 +75,17 @@ Loss:
 ```
 可以看到此处选用的是CELoss和TripletLoss的一个组合，两者的比例为1：1.
 
-# 训练
+# 4.训练、评估、推理
 下面以`ppcls/configs/Products/ResNet50_vd_SOP.yaml`为例，介绍模型的训练、评估、推理过程
-## 单机单卡训练
+## 4.1 数据准备
+首先，下载SOP数据集， 数据链接
+## 4.2 训练
+- 单机单卡训练
 ```
 python tools/train.py -c ppcls/configs/ResNet50_vd_SOP.yaml
 ```
 
-## 单机多卡训练
+- 单机多卡训练
 ```
 python -m paddle.distributed.launch 
     --gpus="0,1,2,3" tools/train.py 
@@ -91,22 +94,13 @@ python -m paddle.distributed.launch
 训练完成之后，会在`output`目录下生成`best_model`
 
 
-# 评估
-## 1. 设置合适的评估方式
-评估方式在配置文件的Metric字段设置， 包含了Train和Eval字段，Train评估考虑到耗时较长可以选择忽略，即训练时不对训练数据评估。一般检索任务的评估方式可以选用Recal@k, Precision@k和mAP. 示例配置如下所示：
-```
-Metric:
-  Eval:
-    - Recallk:
-        topk: [1, 5]
-```
-
-## 2. 单卡评估
+## 4.3 评估
+- 单卡评估
 ```
 python tools/eval.py -c ppcls/configs/ResNet50_vd_SOP.yaml -o Global.pretrained_model = "output/ReModel/best_model"
 ```
 
-## 3. 多卡评估
+- 多卡评估
 ```
 python -m paddle.distributed.launch 
     --gpus="0,1,2,3" tools/eval.py 
@@ -114,18 +108,16 @@ python -m paddle.distributed.launch
     -o  Global.pretrained_model="output/ReModel/best_model"
 ```
 
-# 推理
+## 4.4  推理
 推理过程包括两个步骤： 1） 导出推理模型；  2） 获取特征向量
-## 1. 导出推理模型
+### 4.4.1 导出推理模型
 ```
 python tools/export_model -c xxx -o Global.pretrained_model = xxxx
 ```
 生成的推理模型位于inference目录，名字为inference.pd*
 
-## 2. 获取特征向量
+### 4.4.2 获取特征向量
 ```
 cd deploy
 python python/inference_rec.py -c configs/   O rec_inference_model_dir: "../inference/inference"
 ```
-
-
