@@ -112,6 +112,9 @@ class Engine(object):
             }
             paddle.fluid.set_flags(AMP_RELATED_FLAGS_SETTING)
 
+        #TODO(gaotingquan): support rec
+        class_num = config["Arch"].get("class_num", None)
+        self.config["DataLoader"].update({"class_num": class_num})
         # build dataloader
         if self.mode == 'train':
             self.train_dataloader = build_dataloader(

@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import inspect
 import copy
 import paddle
 import numpy as np
@@ -36,7 +37,7 @@ from ppcls.data import preprocess
 from ppcls.data.preprocess import transform
 
 
-def create_operators(params):
+def create_operators(params, class_num=None):
     """
     create operators based on the config
 
@@ -50,7 +51,10 @@ def create_operators(params):
                           dict) and len(operator) == 1, "yaml format error"
         op_name = list(operator)[0]
         param = {} if operator[op_name] is None else operator[op_name]
-        op = getattr(preprocess, op_name)(**param)
+        op_func = getattr(preprocess, op_name)
+        if "class_num" in inspect.getfullargspec(op_func).args:
+            param.update({"class_num": class_num})
+        op = op_func(**param)
         ops.append(op)
 
     return ops
@@ -65,6 +69,7 @@ def build_dataloader(config, mode, device, use_dali=False, seed=None):
         from ppcls.data.dataloader.dali import dali_dataloader
         return dali_dataloader(config, mode, paddle.device.get_device(), seed)
 
+    class_num = config.get("class_num", None)
     config_dataset = config[mode]['dataset']
     config_dataset = copy.deepcopy(config_dataset)
     dataset_name = config_dataset.pop('name')
@@ -104,7 +109,7 @@ def build_dataloader(config, mode, device, use_dali=False, seed=None):
         return [np.stack(slot, axis=0) for slot in slots]
 
     if isinstance(batch_transform, list):
-        batch_ops = create_operators(batch_transform)
+        batch_ops = create_operators(batch_transform, class_num)
         batch_collate_fn = mix_collate_fn
     else:
         batch_collate_fn = None

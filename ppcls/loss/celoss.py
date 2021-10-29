@@ -12,9 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import warnings
+
 import paddle
 import paddle.nn as nn
 import paddle.nn.functional as F
+
+from ppcls.utils import logger
 
 
 class CELoss(nn.Layer):
@@ -56,19 +60,8 @@ class CELoss(nn.Layer):
         return {"CELoss": loss}
 
 
-class MixCELoss(CELoss):
-    """
-    Cross entropy loss with mix(mixup, cutmix, fixmix)
-    """
-
-    def __init__(self, epsilon=None):
-        super().__init__()
-        self.epsilon = epsilon
-
-    def __call__(self, input, batch):
-        target0, target1, lam = batch
-        loss0 = super().forward(input, target0)["CELoss"]
-        loss1 = super().forward(input, target1)["CELoss"]
-        loss = lam * loss0 + (1.0 - lam) * loss1
-        loss = paddle.mean(loss)
-        return {"MixCELoss": loss}
+class MixCELoss(object):
+    def __init__(self, *args, **kwargs):
+        msg = "\"MixCELos\" is deprecated, please use \"CELoss\" instead."
+        logger.error(DeprecationWarning(msg))
+        raise DeprecationWarning(msg)

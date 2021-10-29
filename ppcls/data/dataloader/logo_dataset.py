@@ -28,6 +28,7 @@ import random
 
 from .common_dataset import CommonDataset
 
+
 class LogoDataset(CommonDataset):
     def _load_anno(self):
         assert os.path.exists(self._cls_path)
@@ -41,7 +42,5 @@ class LogoDataset(CommonDataset):
                 if l[0] == 'image_id':
                     continue
                 self.images.append(os.path.join(self._img_root, l[3]))
-                self.labels.append(int(l[1])-1)
+                self.labels.append(np.int64(l[1]) - 1)
                 assert os.path.exists(self.images[-1])
-
-                
