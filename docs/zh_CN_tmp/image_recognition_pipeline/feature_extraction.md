@@ -4,7 +4,7 @@
 ![image](https://user-images.githubusercontent.com/17264083/139409293-772ffc53-2bee-4736-8fa2-32d99a916572.png)
 
 
-[Deep Metric Learning](../algorithm_introduction.md)和 DeepHash分别用以研究如何通过深度学习的方法获得好的实值和二值特征表示。本文主要介绍如何使用PaddleClas构建一个特征学习网络， 如何进行训练、评估和推理。
+[Deep Metric Learning](../algorithm_introduction/metric_learning.md)和 DeepHash分别用以研究如何通过深度学习的方法获得好的实值和二值特征表示。本文主要介绍如何使用PaddleClas构建一个特征学习网络， 如何进行训练、评估和推理。
 ## 2. 网络结构
 ![](./framework.png)
 为了图像识别任务的灵活定制，我们将整个网络分为Backbone, Neck, Head以及Loss部分，整体结构如上图所示，下面分别介绍各自的功能:
