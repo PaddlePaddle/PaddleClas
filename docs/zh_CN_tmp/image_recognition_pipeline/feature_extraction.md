@@ -43,9 +43,9 @@ Arch:
 - **infer_output_key**: 推理时需要用到的Tensor的key, 训练模型下，网络会以字典的形式输出features和logits. 识别任务中，推理时只需要用到features即可
 - **infer_output_key**： 推理时是否需要加softmax。为了和分类任务的统一，分类任务推理时需要加softmax操作，识别任务不需要
 - **Backbone**:  骨干网络， 此处选用的是经过SSLD蒸馏之后的预训练模型
-- **BackboneStopLayer**:  该处用以指示在哪儿截断
-- **Neck**:  输出512维的特征向量
-- **Head**:  采用ArcMargin, 此处可以依据训练数据修改类别数class_num,  以及超参数margin和scale
+- **BackboneStopLayer**:  该处用以指示在何处截断网络，关于TheseLayer的用法，请参考文档xxx
+- **Neck**:  用以进行特征维度转换，此处输出512维的特征向量
+- **Head**:  采用ArcMargin, 此处可以依据训练数据修改类别数class_num, 以及超参数margin和scale
 
 ## Loss构成
 ### 单Loss示例
@@ -58,7 +58,7 @@ Loss:
     - CELoss:
         weight: 1.0
 ```
-可以看到此处选用的是CELoss， 结合Head部分的ArcMargin, 因此使用的是ArcFace中的算法
+可以看到此处选用的是CELoss， 结合Head部分的ArcMargin, 因此使用的是[ArcFace](https://arxiv.org/abs/1801.07698)中的算法
 
 ### 组合Loss示例
 ```
@@ -79,6 +79,7 @@ Loss:
 下面以`ppcls/configs/Products/ResNet50_vd_SOP.yaml`为例，介绍模型的训练、评估、推理过程
 ## 4.1 数据准备
 首先，下载SOP数据集， 数据链接
+
 ## 4.2 训练
 - 单机单卡训练
 ```
@@ -120,4 +121,6 @@ python tools/export_model -c xxx -o Global.pretrained_model = xxxx
 ```
 cd deploy
 python python/inference_rec.py -c configs/   O rec_inference_model_dir: "../inference/inference"
+```
+输出
 ```
