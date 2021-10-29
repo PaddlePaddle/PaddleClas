@@ -78,7 +78,7 @@ Loss:
 # 4.训练、评估、推理
 下面以`ppcls/configs/Products/ResNet50_vd_SOP.yaml`为例，介绍模型的训练、评估、推理过程
 ## 4.1 数据准备
-首先，下载SOP数据集， 数据链接
+首先，下载SOP数据集， 数据链接： https://cvgl.stanford.edu/projects/lifted_struct/
 
 ## 4.2 训练
 - 单机单卡训练
@@ -96,7 +96,7 @@ python -m paddle.distributed.launch
 ## 4.3 评估
 - 单卡评估
 ```
-python tools/eval.py -c ppcls/configs/ResNet50_vd_SOP.yaml -o Global.pretrained_model = "output/ReModel/best_model"
+python tools/eval.py -c ppcls/configs/ResNet50_vd_SOP.yaml -o Global.pretrained_model="output/ReModel/best_model"
 ```
 - 多卡评估
 ```
@@ -109,9 +109,9 @@ python -m paddle.distributed.launch
 推理过程包括两个步骤： 1） 导出推理模型；  2） 获取特征向量
 ### 4.4.1 导出推理模型
 ```
-python tools/export_model -c ppcls/configs/ResNet50_vd_SOP.yaml -o Global.pretrained_model = "output/ReModel/best_model"
+python tools/export_model -c ppcls/configs/ResNet50_vd_SOP.yaml -o Global.pretrained_model="output/ReModel/best_model"
 ```
-生成的推理模型位于inference目录，名字为inference.pd*
+生成的推理模型位于`inference`目录，名字为`inference.pd*`
 
 ### 4.4.2 获取特征向量
 ```
