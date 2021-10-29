@@ -113,14 +113,12 @@ python -m paddle.distributed.launch
 推理过程包括两个步骤： 1） 导出推理模型；  2） 获取特征向量
 ### 4.4.1 导出推理模型
 ```
-python tools/export_model -c xxx -o Global.pretrained_model = xxxx
+python tools/export_model -c ppcls/configs/ResNet50_vd_SOP.yaml -o Global.pretrained_model = "output/ReModel/best_model"
 ```
 生成的推理模型位于inference目录，名字为inference.pd*
 
 ### 4.4.2 获取特征向量
 ```
 cd deploy
-python python/inference_rec.py -c configs/   O rec_inference_model_dir: "../inference/inference"
-```
-输出
+python python/inference_rec.py -c configs/inference_product.yaml  -o rec_inference_model_dir="../inference/inference"
 ```
