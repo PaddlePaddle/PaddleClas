@@ -85,7 +85,6 @@ Loss:
 ```
 python tools/train.py -c ppcls/configs/ResNet50_vd_SOP.yaml
 ```
-
 - 单机多卡训练
 ```
 python -m paddle.distributed.launch 
@@ -94,13 +93,11 @@ python -m paddle.distributed.launch
 ```
 训练完成之后，会在`output`目录下生成`best_model`
 
-
 ## 4.3 评估
 - 单卡评估
 ```
 python tools/eval.py -c ppcls/configs/ResNet50_vd_SOP.yaml -o Global.pretrained_model = "output/ReModel/best_model"
 ```
-
 - 多卡评估
 ```
 python -m paddle.distributed.launch 
@@ -108,7 +105,6 @@ python -m paddle.distributed.launch
     -c  ppcls/configs/ResNet50_vd_SOP.yaml
     -o  Global.pretrained_model="output/ReModel/best_model"
 ```
-
 ## 4.4  推理
 推理过程包括两个步骤： 1） 导出推理模型；  2） 获取特征向量
 ### 4.4.1 导出推理模型
