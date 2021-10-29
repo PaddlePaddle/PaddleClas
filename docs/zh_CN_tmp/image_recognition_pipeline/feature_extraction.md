@@ -105,7 +105,7 @@ python -m paddle.distributed.launch
     -c  ppcls/configs/ResNet50_vd_SOP.yaml
     -o  Global.pretrained_model="output/ReModel/best_model"
 ```
-## 4.4  推理
+## 4.4 推理
 推理过程包括两个步骤： 1） 导出推理模型；  2） 获取特征向量
 ### 4.4.1 导出推理模型
 ```
