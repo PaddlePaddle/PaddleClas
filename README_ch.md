@@ -45,23 +45,23 @@ Res2Net200_vd预训练模型Top-1精度高达85.1%。
 </div>
 
 ## 快速体验
-图像识别快速体验：[点击这里](./docs/zh_CN/tutorials/quick_start_recognition.md)
+图像识别快速体验：[点击这里](./docs/zh_CN/quick_start/quick_start_recognition.md)
 
 ## 文档教程
 
-- [快速安装](./docs/zh_CN/tutorials/install.md)
-- [图像识别快速体验](./docs/zh_CN/tutorials/quick_start_recognition.md)
+- [快速安装](./docs/zh_CN/installation/install_paddleclas.md)
+- [图像识别快速体验](./docs/zh_CN/quick_start/quick_start_recognition.md)
 - [图像识别系统介绍](#图像识别系统介绍)
 - [识别效果展示](#识别效果展示)
 - 图像分类快速体验
-    - [尝鲜版](./docs/zh_CN/tutorials/quick_start_new_user.md)
-    - [进阶版](./docs/zh_CN/tutorials/quick_start_professional.md)
-    - [社区版](./docs/zh_CN/tutorials/quick_start_community.md)
+    - [尝鲜版](./docs/zh_CN/quick_start/quick_start_classification_new_user.md)
+    - [进阶版](./docs/zh_CN/quick_start/quick_start_classification_professional.md)
+    - [社区版](./docs/zh_CN/quick_start/quick_start_community.md)
 - 算法介绍
     - [骨干网络和预训练模型库](./docs/zh_CN/ImageNet_models_cn.md)
-    - [主体检测](./docs/zh_CN/application/mainbody_detection.md)
-    - [图像分类](./docs/zh_CN/tutorials/image_classification.md)
-    - [特征学习](./docs/zh_CN/application/feature_learning.md)
+    - [主体检测](./docs/zh_CN/image_recognition_pipeline/mainbody_detection.md)
+    - [图像分类](./docs/zh_CN/image_recognition_pipeline/image_classification.md)
+    - [特征学习](./docs/zh_CN/image_recognition_pipeline/feature_learning.md)
         - [商品识别](./docs/zh_CN/application/product_recognition.md)
         - [车辆识别](./docs/zh_CN/application/vehicle_recognition.md)
         - [logo识别](./docs/zh_CN/application/logo_recognition.md)
@@ -78,12 +78,12 @@ Res2Net200_vd预训练模型Top-1精度高达85.1%。
     - [端侧部署](./deploy/lite/readme.md)
     - [whl包预测](./docs/zh_CN/whl.md)
 - 高阶使用
-    - [知识蒸馏](./docs/zh_CN/advanced_tutorials/distillation/distillation.md)
-    - [模型量化](./docs/zh_CN/extension/paddle_quantization.md)
-    - [数据增广](./docs/zh_CN/advanced_tutorials/image_augmentation/ImageAugment.md)
+    - [知识蒸馏](./docs/zh_CN/advanced_tutorials/knowledge_distillation.md)
+    - [模型量化](./docs/zh_CN/advanced_tutorials/model_prune_quantization.md)
+    - [数据增广](./docs/zh_CN/advanced_tutorials/DataAugmentation.md)
 - FAQ
     - [图像识别任务FAQ](docs/zh_CN/faq_series/faq_2021_s2.md)
-    - [图像分类任务FAQ](docs/zh_CN/faq.md)
+    - [图像分类任务FAQ](docs/zh_CN/faq_series/faq.md)
 - [许可证书](#许可证书)
 - [贡献代码](#贡献代码)
 
