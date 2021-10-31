@@ -7,6 +7,8 @@
 飞桨图像识别套件PaddleClas是飞桨为工业界和学术界所准备的一个图像识别任务的工具集，助力使用者训练出更好的视觉模型和应用落地。
 
 **近期更新**
+- 2021.10.31 优化文档，新增饮料识别demo
+- 2021.10.23 新增轻量级检测、特征提取模型，新增DeepHash模块，检索模块切换为faiss，支持PaddleServing和PaddleSlim
 - 2021.09.17 增加PaddleClas自研PP-LCNet系列模型, 这些模型在Intel CPU上有较强的竞争力。PP-LCNet的介绍可以参考[论文](https://arxiv.org/pdf/2109.15099.pdf)或者[PP-LCNet模型介绍](docs/zh_CN/models/PP-LCNet.md)，相关指标和预训练权重可以从 [这里](docs/zh_CN/ImageNet_models_cn.md)下载。
 - 2021.08.11 更新7个[FAQ](docs/zh_CN/faq_series/faq_2021_s2.md)。
 - 2021.06.29 添加Swin-transformer系列模型，ImageNet1k数据集上Top1 acc最高精度可达87.2%；支持训练预测评估与whl包部署，预训练模型可以从[这里](docs/zh_CN/models/models_intro.md)下载。
@@ -89,7 +91,7 @@ Res2Net200_vd预训练模型Top-1精度高达85.1%。
 ## 图像识别系统介绍
 
 <div align="center">
-<img src="./docs/images/structure.png"  width = "400" />
+<img src="./docs/images/structure.jpg"  width = "400" />
 </div>
 
 整个图像识别系统分为三步：（1）通过一个目标检测模型，检测图像物体候选区域（2）对每个候选区域进行特征提取（3）与检索库中图像进行特征匹配，提取识别结果。
@@ -99,6 +101,10 @@ Res2Net200_vd预训练模型Top-1精度高达85.1%。
 
 <a name="识别效果展示"></a>
 ## 更多效果展示 [more](https://github.com/PaddlePaddle/PaddleClas/tree/release/2.2/docs/images/recognition/more_demo_images)
+- 瓶装饮料识别
+<div align="center">
+<img src="docs/images/drink_demo.gif">
+</div>
 - 商品识别
 <div align="center">
 <img src="https://user-images.githubusercontent.com/18028216/122769644-51604f80-d2d7-11eb-8290-c53b12a5c1f6.gif"  width = "400" />
