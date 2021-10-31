@@ -83,7 +83,7 @@ Quick experience of image recognition：[Link](./docs/en/tutorials/quick_start_r
 ## Introduction to Image Recognition Systems
 
 <div align="center">
-<img src="./docs/images/mainpage/recognition_pipeline_en.png"  width = "400" />
+<img src="./docs/images/structure.jpg"  width = "800" />
 </div>
 
 Image recognition can be divided into three steps:
