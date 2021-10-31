@@ -13,20 +13,20 @@
 <div align="center">
 <img src="../../images/structure.png"  width = "400" />
 </div>
-体验整体图像识别系统，或查看特征库建立方法，详见[图像识别快速开始文档](../../zh_CN/tutorials/quick_start_recognition.md) 。其中，图像识别快速开始文档主要讲解整体流程的使用过程。以下内容，主要对上述三个步骤的训练部分进行介绍。
+体验整体图像识别系统，或查看特征库建立方法，详见[图像识别快速开始文档](../quick_start/quick_start_recognition.md) 。其中，图像识别快速开始文档主要讲解整体流程的使用过程。以下内容，主要对上述三个步骤的训练部分进行介绍。
 
-首先，请参考[安装指南](./install.md)配置运行环境。
+首先，请参考[安装指南](../installation/install_paddleclas.md)配置运行环境。
 
 具体目录如下：
 
 - [主体检测](#主体检测)
-- [特征模型训练](特征模型训练)
+- [特征模型训练](#特征模型训练)
   - [2.1. 特征模型数据准备与处理](#特征模型数据准备与处理)
   - [2. 特征模型基于单卡GPU上的训练与评估](#特征模型基于单卡GPU上的训练与评估)
     - [2.1 特征模型训练](#特征模型训练)
-    - [2.2 特征模型恢复训练](#模型恢复训练)
+    - [2.2 特征模型恢复训练](#特征模型恢复训练)
     - [2.3 特征模型评估](#特征模型评估)
-  - [3. 特征模型导出inference模型](#特征导出inference模型)
+  - [3. 特征模型导出inference模型](#特征模型导出inference模型)
 - [特征检索](#特征检索)
 - [基础知识](#基础知识)
 
@@ -43,7 +43,6 @@
 关于主体检测训练方法可以参考： [PaddleDetection训练教程](https://github.com/PaddlePaddle/PaddleDetection/blob/develop/docs/tutorials/GETTING_STARTED_cn.md#4-%E8%AE%AD%E7%BB%83)。
 
 更多关于 PaddleClas 中提供的主体检测的模型介绍与下载请参考：[主体检测教程](../image_recognition_pipeline/mainbody_detection.md)。
-
 
 <a name="特征模型训练"></a>  
 
@@ -312,9 +311,10 @@ pip install faiss-cpu==1.7.1post2
 <a name="度量学习"></a>
 - 度量学习（Metric Learning）
 
-度量学习研究如何在一个特定的任务上学习一个距离函数，使得该距离函数能够帮助基于近邻的算法 (kNN、k-means等) 取得较好的性能。深度度量学习 (Deep Metric Learning )是度量学习的一种方法，它的目标是学习一个从原始特征到低维稠密的向量空间 (嵌入空间，embedding space) 的映射，使得同类对象在嵌入空间上使用常用的距离函数 (欧氏距离、cosine距离等) 计算的距离比较近，而不同类的对象之间的距离则比较远。深度度量学习在计算机视觉领域取得了非常多的成功的应用，比如人脸识别、商品识别、图像检索、行人重识别等。
+度量学习研究如何在一个特定的任务上学习一个距离函数，使得该距离函数能够帮助基于近邻的算法 (kNN、k-means等) 取得较好的性能。深度度量学习 (Deep Metric Learning )是度量学习的一种方法，它的目标是学习一个从原始特征到低维稠密的向量空间 (嵌入空间，embedding space) 的映射，使得同类对象在嵌入空间上使用常用的距离函数 (欧氏距离、cosine距离等) 计算的距离比较近，而不同类的对象之间的距离则比较远。深度度量学习在计算机视觉领域取得了非常多的成功的应用，比如人脸识别、商品识别、图像检索、行人重识别等。更详细的介绍请参考[此文档](../algorithm_introduction/metric_learning.md)。
 
 <a name="图像检索数据集介绍"></a>
+
 - 图像检索数据集介绍
 
   - 训练集合（train dataset）：用来训练模型，使模型能够学习该集合的图像特征。
