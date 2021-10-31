@@ -92,7 +92,7 @@ Res2Net200_vd预训练模型Top-1精度高达85.1%。
 ## 图像识别系统介绍
 
 <div align="center">
-<img src="./docs/images/structure.jpg"  width = "400" />
+<img src="./docs/images/structure.jpg"  width = "800" />
 </div>
 
 整个图像识别系统分为三步：（1）通过一个目标检测模型，检测图像物体候选区域（2）对每个候选区域进行特征提取（3）与检索库中图像进行特征匹配，提取识别结果。
