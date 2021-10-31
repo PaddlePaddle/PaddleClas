@@ -116,6 +116,7 @@ Res2Net200_vd预训练模型Top-1精度高达85.1%。
 <div align="center">
 <img src="docs/images/drink_demo.gif">
 </div>
+
 - 商品识别
 <div align="center">
 <img src="https://user-images.githubusercontent.com/18028216/122769644-51604f80-d2d7-11eb-8290-c53b12a5c1f6.gif"  width = "400" />
