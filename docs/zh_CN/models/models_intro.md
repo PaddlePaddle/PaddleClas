@@ -2,26 +2,13 @@
 
 ## 概述
 
-基于ImageNet1k分类数据集，PaddleClas支持的29种系列分类网络结构以及对应的134个图像分类预训练模型如下所示，训练技巧、每个系列网络结构的简单介绍和性能评估将在相应章节展现。
+基于ImageNet1k分类数据集，PaddleClas支持的36种系列分类网络结构以及对应的175个图像分类预训练模型如下所示，训练技巧、每个系列网络结构的简单介绍和性能评估将在相应章节展现。
 
 ## 评估环境
 * CPU的评估环境基于骁龙855（SD855）。
-* GPU评估环境基于V100和TensorRT，评估脚本如下。
+* Intel CPU的评估环境基于Intel(R) Xeon(R) Gold 6148。
+* GPU评估环境基于V100和TensorRT。
 
-```shell
-#!/usr/bin/env bash
-
-export PYTHONPATH=$PWD:$PYTHONPATH
-
-python tools/infer/predict.py \
-    --model_file='pretrained/infer/model' \
-    --params_file='pretrained/infer/params' \
-    --enable_benchmark=True \
-    --model_name=ResNet50_vd \
-    --use_tensorrt=True \
-    --use_fp16=False \
-    --batch_size=1
-```
 
 ![](../../images/models/T4_benchmark/t4.fp32.bs4.main_fps_top1.png)
 
@@ -34,6 +21,7 @@ python tools/infer/predict.py \
 
 
 ## 预训练模型列表及下载地址
+
 - ResNet及其Vd系列
   - ResNet系列<sup>[[1](#ref1)]</sup>([论文地址](http://openaccess.thecvf.com/content_cvpr_2016/html/He_Deep_Residual_Learning_CVPR_2016_paper.html))
     - [ResNet18](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ResNet18_pretrained.pdparams)
@@ -52,12 +40,23 @@ python tools/infer/predict.py \
     - [ResNet152_vd](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ResNet152_vd_pretrained.pdparams)
     - [ResNet200_vd](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ResNet200_vd_pretrained.pdparams)
     - [ResNet50_vd_ssld](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ResNet50_vd_ssld_pretrained.pdparams)
-    - [ResNet50_vd_ssld_v2](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ResNet50_vd_ssld_v2_pretrained.pdparams)
     - [Fix_ResNet50_vd_ssld_v2](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/Fix_ResNet50_vd_ssld_v2_pretrained.pdparams)
     - [ResNet101_vd_ssld](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ResNet101_vd_ssld_pretrained.pdparams)
 
 
-- 移动端系列
+- 轻量级模型系列
+  - PP-LCNet系列<sup>[[28](#28)]</sup>([论文地址](https://arxiv.org/pdf/2109.15099.pdf))
+    - [PPLCNet_x0_25](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/PPLCNet_x0_25_pretrained.pdparams)
+     - [PPLCNet_x0_35](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/PPLCNet_x0_35_pretrained.pdparams)
+    - [PPLCNet_x0_5](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/PPLCNet_x0_5_pretrained.pdparams)
+    - [PPLCNet_x0_75](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/PPLCNet_x0_75_pretrained.pdparams)
+    - [PPLCNet_x1_0](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/PPLCNet_x1_0_pretrained.pdparams)
+    - [PPLCNet_x1_5](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/PPLCNet_x1_5_pretrained.pdparams)
+    - [PPLCNet_x2_0](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/PPLCNet_x2_0_pretrained.pdparams)
+    - [PPLCNet_x2_5](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/PPLCNet_x2_5_pretrained.pdparams)
+    - [PPLCNet_x0_5_ssld](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/PPLCNet_x0_5__ssld_pretrained.pdparams)
+    - [PPLCNet_x1_0_ssld](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/PPLCNet_x1_0_ssld_pretrained.pdparams)
+    - [PPLCNet_x2_5_ssld](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/PPLCNet_x2_5__ssld_pretrained.pdparams)
   - MobileNetV3系列<sup>[[3](#ref3)]</sup>([论文地址](https://arxiv.org/abs/1905.02244))
     - [MobileNetV3_large_x0_35](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/MobileNetV3_large_x0_35_pretrained.pdparams)
     - [MobileNetV3_large_x0_5](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/MobileNetV3_large_x0_5_pretrained.pdparams)
@@ -99,7 +98,17 @@ python tools/infer/predict.py \
     - [GhostNet_x1_0](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/GhostNet_x1_0_pretrained.pdparams)
     - [GhostNet_x1_3](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/GhostNet_x1_3_pretrained.pdparams)
     - [GhostNet_x1_3_ssld](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/GhostNet_x1_3_ssld_pretrained.pdparams)
-
+  - MixNet系列<sup>[[29](#ref29)]</sup>([论文地址](https://arxiv.org/pdf/1907.09595.pdf))
+    - [MixNet_S](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/MixNet_S_pretrained.pdparams)
+    - [MixNet_M](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/MixNet_M_pretrained.pdparams)
+    - [MixNet_L](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/MixNet_L_pretrained.pdparams)
+  - ReXNet系列<sup>[[30](#ref30)]</sup>([论文地址](https://arxiv.org/pdf/2007.00992.pdf))
+    - [ReXNet_1_0](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ReXNet_1_0_pretrained.pdparams)
+    - [ReXNet_1_3](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ReXNet_1_3_pretrained.pdparams)
+    - [ReXNet_1_5](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ReXNet_1_5_pretrained.pdparams)
+    - [ReXNet_2_0](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ReXNet_2_0_pretrained.pdparams)
+    - [ReXNet_3_0](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ReXNet_3_0_pretrained.pdparams)
+    
 
 - SEResNeXt与Res2Net系列
   - ResNeXt系列<sup>[[7](#ref7)]</sup>([论文地址](https://arxiv.org/abs/1611.05431))
@@ -217,9 +226,38 @@ python tools/infer/predict.py \
     - [SwinTransformer_large_patch4_window12_384_22kto1k](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/SwinTransformer_large_patch4_window12_384_22kto1k_pretrained.pdparams)
     - [SwinTransformer_large_patch4_window7_224_22k](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/SwinTransformer_large_patch4_window7_224_22k_pretrained.pdparams)
     - [SwinTransformer_large_patch4_window7_224_22kto1k](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/SwinTransformer_large_patch4_window7_224_22kto1k_pretrained.pdparams)
-
-
-
+  - ViT系列<sup>[[31](#ref31)]</sup>([论文地址](https://arxiv.org/pdf/2010.11929.pdf))
+      - [ViT_small_patch16_224](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ViT_small_patch16_224_pretrained.pdparams)
+      - [ViT_base_patch16_224](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ViT_base_patch16_224_pretrained.pdparams)
+      - [ViT_base_patch16_384](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ViT_base_patch16_384_pretrained.pdparams)
+      - [ViT_base_patch32_384](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ViT_base_patch32_384_pretrained.pdparams)
+      - [ViT_large_patch16_224](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ViT_large_patch16_224_pretrained.pdparams)
+      - [ViT_large_patch16_384](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ViT_large_patch16_384_pretrained.pdparams)
+      - [ViT_large_patch32_384](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ViT_large_patch32_384_pretrained.pdparams)
+  - DeiT系列<sup>[[32](#ref32)]</sup>([论文地址](https://arxiv.org/pdf/2012.12877.pdf))
+      - [DeiT_tiny_patch16_224](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DeiT_tiny_patch16_224_pretrained.pdparams)
+      - [DeiT_small_patch16_224](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DeiT_small_patch16_224_pretrained.pdparams)
+      - [DeiT_base_patch16_224](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DeiT_base_patch16_224_pretrained.pdparams)
+      - [DeiT_base_patch16_384](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DeiT_base_patch16_384_pretrained.pdparams)
+      - [DeiT_tiny_distilled_patch16_224](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DeiT_tiny_distilled_patch16_224_pretrained.pdparams)
+      - [DeiT_small_distilled_patch16_224](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DeiT_small_distilled_patch16_224_pretrained.pdparams)
+      - [DeiT_base_distilled_patch16_224](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DeiT_base_distilled_patch16_224_pretrained.pdparams)
+      - [DeiT_base_distilled_patch16_384](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DeiT_base_distilled_patch16_384_pretrained.pdparams)
+  - LeViT系列<sup>[[33](#ref33)]</sup>([论文地址](https://arxiv.org/pdf/2104.01136.pdf))
+      - [LeViT_128S](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/LeViT_128S_pretrained.pdparams)
+      - [LeViT_128](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/LeViT_128_pretrained.pdparams)
+      - [LeViT_192](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/LeViT_192_pretrained.pdparams)
+      - [LeViT_256](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/LeViT_256_pretrained.pdparams)
+      - [LeViT_384](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/LeViT_384_pretrained.pdparams)
+  - Twins系列<sup>[[34](#ref43)]</sup>([论文地址](https://arxiv.org/pdf/2104.13840.pdf))
+      - [pcpvt_small](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/pcpvt_small_pretrained.pdparams)
+      - [pcpvt_base](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/pcpvt_base_pretrained.pdparams)
+      - [pcpvt_large](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/pcpvt_large_pretrained.pdparams)
+      - [alt_gvt_small](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/alt_gvt_small_pretrained.pdparams)
+      - [alt_gvt_base](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/alt_gvt_base_pretrained.pdparams)
+      - [alt_gvt_large](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/alt_gvt_large_pretrained.pdparams)
+  - TNT系列<sup>[[35](#ref35)]</sup>([论文地址](https://arxiv.org/pdf/2103.00112.pdf))
+      - [TNT_small](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/TNT_small_pretrained.pdparams)
 
 - 其他模型
   - AlexNet系列<sup>[[18](#ref18)]</sup>([论文地址](https://papers.nips.cc/paper/4824-imagenet-classification-with-deep-convolutional-neural-networks.pdf))
@@ -234,6 +272,40 @@ python tools/infer/predict.py \
     - [VGG19](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/VGG19_pretrained.pdparams)
   - DarkNet系列<sup>[[21](#ref21)]</sup>([论文地址](https://arxiv.org/abs/1506.02640))
     - [DarkNet53](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DarkNet53_pretrained.pdparams)
+  - RepVGG系列<sup>[[36](#ref36)]</sup>([论文地址](https://arxiv.org/pdf/2101.03697.pdf))
+      - [RepVGG_A0](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/RepVGG_A0_pretrained.pdparams)
+      - [RepVGG_A1](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/RepVGG_A1_pretrained.pdparams)
+      - [RepVGG_A2](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/RepVGG_A2_pretrained.pdparams)
+      - [RepVGG_B0](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/RepVGG_B0_pretrained.pdparams)
+      - [RepVGG_B1s](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/RepVGG_B1_pretrained.pdparams)
+      - [RepVGG_B2](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/RepVGG_B2_pretrained.pdparams)
+      - [RepVGG_B1g2](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/RepVGG_B1g2_pretrained.pdparams)
+      - [RepVGG_B1g4](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/RepVGG_B1g4_pretrained.pdparams)
+      - [RepVGG_B2g4](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/RepVGG_B2g4_pretrained.pdparams)
+      - [RepVGG_B3g4](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/RepVGG_B3g4_pretrained.pdparams)
+   - HarDNet系列<sup>[[37](#ref37)]</sup>([论文地址](https://arxiv.org/pdf/1909.00948.pdf))
+      - [HarDNet39_ds](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/HarDNet39_ds_pretrained.pdparams)
+      - [HarDNet68_ds](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/HarDNet68_ds_pretrained.pdparams)
+      - [HarDNet68](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/HarDNet68_pretrained.pdparams)
+      - [HarDNet85](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/HarDNet85_pretrained.pdparams)
+   - DLA系列<sup>[[38](#ref38)]</sup>([论文地址](https://arxiv.org/pdf/1707.06484.pdf))
+      - [DLA102](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DLA102_pretrained.pdparams)
+      - [DLA102x2](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DLA102x2_pretrained.pdparams)
+      - [DLA102x](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DLA102x_pretrained.pdparams)
+      - [DLA169](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DLA169_pretrained.pdparams)
+      - [DLA34](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DLA34_pretrained.pdparams)
+      - [DLA46_c](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DLA46_c_pretrained.pdparams)
+      - [DLA60](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DLA60_pretrained.pdparams)
+      - [DLA60x_c](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DLA60x_c_pretrained.pdparams)
+      - [DLA60x](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DLA60x_pretrained.pdparams)
+   - RedNet系列<sup>[[39](#ref39)]</sup>([论文地址](https://arxiv.org/pdf/2103.06255.pdf))
+      - [RedNet26](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/RedNet26_pretrained.pdparams)
+      - [RedNet38](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/RedNet38_pretrained.pdparams)
+      - [RedNet50](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/RedNet50_pretrained.pdparams)
+      - [RedNet101](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/RedNet101_pretrained.pdparams)
+      - [RedNet152](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/RedNet152_pretrained.pdparams)
+      
+    
 
 **注意**：以上模型中EfficientNetB1-B7的预训练模型转自[pytorch版EfficientNet](https://github.com/lukemelas/EfficientNet-PyTorch)，ResNeXt101_wsl系列预训练模型转自[官方repo](https://github.com/facebookresearch/WSL-Images)，剩余预训练模型均基于飞桨训练得到的，并在configs里给出了相应的训练超参数。
 
@@ -297,3 +369,28 @@ python tools/infer/predict.py \
 <a name="ref26">[26]</a> C.Szegedy, V.Vanhoucke, S.Ioffe, J.Shlens, and Z.Wojna. Rethinking the inception architecture for computer vision. arXiv preprint arXiv:1512.00567, 2015.
 
 <a name="ref27">[27]</a> Ze Liu, Yutong Lin, Yue Cao, Han Hu, Yixuan Wei, Zheng Zhang, Stephen Lin and Baining Guo. Swin Transformer: Hierarchical Vision Transformer using Shifted Windows.
+
+<a name="ref28">[28]</a>Cheng Cui, Tingquan Gao, Shengyu Wei, Yuning Du, Ruoyu Guo, Shuilong Dong, Bin Lu, Ying Zhou, Xueying Lv, Qiwen Liu, Xiaoguang Hu, Dianhai Yu, Yanjun Ma. PP-LCNet: A Lightweight CPU Convolutional Neural Network.
+
+<a name="ref29">[29]</a>Mingxing Tan, Quoc V. Le. MixConv: Mixed Depthwise Convolutional Kernels.
+
+<a name="ref30">[30]</a>Dongyoon Han, Sangdoo Yun, Byeongho Heo, YoungJoon Yoo. Rethinking Channel Dimensions for Efficient Model Design.
+
+<a name="ref31">[31]</a>Alexey Dosovitskiy, Lucas Beyer, Alexander Kolesnikov, Dirk Weissenborn, Xiaohua Zhai, Thomas Unterthiner, Mostafa Dehghani, Matthias Minderer, Georg Heigold, Sylvain Gelly, Jakob Uszkoreit, Neil Houlsby. AN IMAGE IS WORTH 16X16 WORDS:
+TRANSFORMERS FOR IMAGE RECOGNITION AT SCALE.
+
+<a name="ref32">[32]</a>Hugo Touvron, Matthieu Cord, Matthijs Douze, Francisco Massa, Alexandre Sablayrolles, Herve Jegou. Training data-efficient image transformers & distillation through attention.
+
+<a name="ref33">[33]</a>Benjamin Graham, Alaaeldin El-Nouby, Hugo Touvron, Pierre Stock, Armand Joulin, Herve Jegou, Matthijs Douze. LeViT: a Vision Transformer in ConvNet’s Clothing for Faster Inference.
+
+<a name="ref34">[34]</a>Xiangxiang Chu, Zhi Tian, Yuqing Wang, Bo Zhang, Haibing Ren, Xiaolin Wei, Huaxia Xia, Chunhua Shen. Twins: Revisiting the Design of Spatial Attention in Vision Transformers.
+
+<a name="ref35">[35]</a>Kai Han, An Xiao, Enhua Wu, Jianyuan Guo, Chunjing Xu, Yunhe Wang. Transformer in Transformer.
+
+<a name="ref36">[36]</a>Xiaohan Ding, Xiangyu Zhang, Ningning Ma, Jungong Han, Guiguang Ding, Jian Sun. RepVGG: Making VGG-style ConvNets Great Again.
+
+<a name="ref37">[37]</a>Ping Chao, Chao-Yang Kao, Yu-Shan Ruan, Chien-Hsiang Huang, Youn-Long Lin. HarDNet: A Low Memory Traffic Network.
+
+<a name="ref38">[38]</a>Fisher Yu, Dequan Wang, Evan Shelhamer, Trevor Darrell. Deep Layer Aggregation.
+
+<a name="ref39">[39]</a>Duo Lim Jie Hu, Changhu Wang, Xiangtai Li, Qi She, Lei Zhu, Tong Zhang, Qifeng Chen. Involution: Inverting the Inherence of Convolution for Visual Recognition.
