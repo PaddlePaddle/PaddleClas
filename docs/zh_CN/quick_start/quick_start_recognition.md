@@ -38,7 +38,7 @@
 | 模型简介       | 推荐场景   | inference模型  | 预测配置文件  | 构建索引库的配置文件 |
 | ------------  | ------------- | -------- | ------- | -------- |
 | 轻量级通用主体检测模型 | 通用场景  |[模型下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/inference/picodet_PPLCNet_x2_5_mainbody_lite_v1.0_infer.tar) | - | - |
-| 轻量级通用识别模型 | 通用场景  | [模型下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/inference/general_PPLCNet_x2_5_lite_v1.0_infer.tar) | [inference_product.yaml](../../../deploy/configs/inference_product.yaml) | [build_product.yaml](../../../deploy/configs/build_product.yaml) |
+| 轻量级通用识别模型 | 通用场景  | [模型下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/inference/general_PPLCNet_x2_5_lite_v1.0_infer.tar) | [inference_general.yaml](../../../deploy/configs/inference_general.yaml) | [build_general.yaml](../../../deploy/configs/build_general.yaml) |
 
 本章节 demo 数据下载地址如下: [瓶装饮料数据下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/data/drink_dataset_v1.0.tar)。
 
@@ -126,7 +126,7 @@ wget https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/data/drink_da
 
 ```shell
 # 下面是使用下载的服务端商品识别模型进行索引库构建
-python3.7 python/build_gallery.py -c configs/build_product.yaml -o Global.rec_inference_model_dir=./models/product_ResNet50_vd_aliproduct_v1.0_infer
+python3.7 python/build_gallery.py -c configs/build_general.yaml -o Global.rec_inference_model_dir=./models/product_ResNet50_vd_aliproduct_v1.0_infer
 ```
 
 <a name="商品识别与检索"></a>
@@ -150,9 +150,9 @@ pip install faiss-cpu==1.7.1post2
 
 ```shell
 # 使用下面的命令使用GPU进行预测
-python3.7 python/predict_system.py -c configs/inference_product.yaml
+python3.7 python/predict_system.py -c configs/inference_general.yaml
 # 使用下面的命令使用CPU进行预测
-python3.7 python/predict_system.py -c configs/inference_product.yaml -o Global.use_gpu=False
+python3.7 python/predict_system.py -c configs/inference_general.yaml -o Global.use_gpu=False
 ```
 
 待检索图像如下所示。
@@ -184,7 +184,7 @@ python3.7 python/predict_system.py -c configs/inference_product.yaml -o Global.u
 
 ```shell
 # 使用下面的命令使用GPU进行预测，如果希望使用CPU预测，可以在命令后面添加 -o Global.use_gpu=False
-python3.7 python/predict_system.py -c configs/inference_product.yaml -o Global.infer_imgs="./drink_dataset_v1.0/test_images/"
+python3.7 python/predict_system.py -c configs/inference_general.yaml -o Global.infer_imgs="./drink_dataset_v1.0/test_images/"
 ```
 
 终端中会输出该文件夹内所有图像的识别结果，如下所示。
@@ -218,7 +218,7 @@ Inference: 150.06470680236816 ms per batch image
 
 ```shell
 # 使用下面的命令使用 GPU 进行预测，如果希望使用 CPU 预测，可以在命令后面添加 -o Global.use_gpu=False
-python3.7 python/predict_system.py -c configs/inference_product.yaml -o Global.infer_imgs="./drink_dataset_v1.0/test_images/mosilian.jpeg"
+python3.7 python/predict_system.py -c configs/inference_general.yaml -o Global.infer_imgs="./drink_dataset_v1.0/test_images/mosilian.jpeg"
 ```
 
 待检索图像如下所示。
@@ -251,7 +251,7 @@ python3.7 python/predict_system.py -c configs/inference_product.yaml -o Global.i
 使用下面的命令构建 `index` 索引，加速识别后的检索过程。
 
 ```shell
-python3.7 python/build_gallery.py -c configs/build_product.yaml -o IndexProcess.data_file="./drink_dataset_v1.0/gallery/drink_label_all.txt" -o IndexProcess.index_dir="./drink_dataset_v1.0/index_all"
+python3.7 python/build_gallery.py -c configs/build_general.yaml -o IndexProcess.data_file="./drink_dataset_v1.0/gallery/drink_label_all.txt" -o IndexProcess.index_dir="./drink_dataset_v1.0/index_all"
 ```
 
 最终新的索引信息保存在文件夹 `./drink_dataset_v1.0/index_all` 中。
@@ -264,7 +264,7 @@ python3.7 python/build_gallery.py -c configs/build_product.yaml -o IndexProcess.
 
 ```shell
 # 使用下面的命令使用 GPU 进行预测，如果希望使用 CPU 预测，可以在命令后面添加 -o Global.use_gpu=False
-python3.7 python/predict_system.py -c configs/inference_product.yaml -o Global.infer_imgs="././drink_dataset_v1.0/test_images/mosilian.jpeg" -o IndexProcess.index_dir="./drink_dataset_v1.0/index_all"
+python3.7 python/predict_system.py -c configs/inference_general.yaml -o Global.infer_imgs="././drink_dataset_v1.0/test_images/mosilian.jpeg" -o IndexProcess.index_dir="./drink_dataset_v1.0/index_all"
 ```
 
 输出结果如下。
