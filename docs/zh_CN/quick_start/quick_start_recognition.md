@@ -22,7 +22,7 @@
 <a name="环境配置"></a>
 ## 1. 环境配置
 
-* 安装：请先参考[快速安装](./install.md)配置 PaddleClas 运行环境。
+* 安装：请先参考[Paddle安装教程](../installation/install_paddle.md) 以及 [PaddleClas安装教程](../installation/install_paddleclas.md) 配置 PaddleClas 运行环境。
 
 * 进入 `deploy` 运行目录。本部分所有内容与命令均需要在 `deploy` 目录下运行，可以通过下面的命令进入 `deploy` 目录。
 
@@ -40,7 +40,7 @@
 | 轻量级通用主体检测模型 | 通用场景  |[模型下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/inference/picodet_PPLCNet_x2_5_mainbody_lite_v1.0_infer.tar) | - | - |
 | 轻量级通用识别模型 | 通用场景  | [模型下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/inference/general_PPLCNet_x2_5_lite_v1.0_infer.tar) | [inference_product.yaml](../../../deploy/configs/inference_product.yaml) | [build_product.yaml](../../../deploy/configs/build_product.yaml) |
 
-本章节 demo 数据下载地址如下: [平均饮料数据下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/data/drink_dataset_v1.0.tar)。
+本章节 demo 数据下载地址如下: [瓶装饮料数据下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/data/drink_dataset_v1.0.tar)。
 
 
 如果希望体验服务端主体检测和各垂类方向的识别模型，可以参考[第4章](#4)。
@@ -293,3 +293,5 @@ python3.7 python/predict_system.py -c configs/inference_product.yaml -o Global.i
 | 车辆细分类模型 | 车辆场景  |  [模型下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/inference/vehicle_cls_ResNet50_CompCars_v1.0_infer.tar) | [inference_vehicle.yaml](../../../deploy/configs/inference_vehicle.yaml) | [build_vehicle.yaml](../../../deploy/configs/build_vehicle.yaml) |
 | 商品识别模型 | 商品场景  |  [模型下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/inference/product_ResNet50_vd_aliproduct_v1.0_infer.tar) | [inference_product.yaml](../../../deploy/configs/inference_product.yaml) | [build_product.yaml](../../../deploy/configs/build_product.yaml) |
 | 车辆ReID模型 | 车辆ReID场景 | [模型下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/inference/vehicle_reid_ResNet50_VERIWild_v1.0_infer.tar) | - | - |
+
+* 更多关于主体检测的介绍可以参考：[主体检测教程文档](../image_recognition_pipeline/mainbody_detection.md)；关于特征提取的介绍可以参考：[特征提取教程文档](../image_recognition_pipeline/feature_extraction.md)；关于向量检索的介绍可以参考：[向量检索教程文档](../image_recognition_pipeline/vector_search.md)。
