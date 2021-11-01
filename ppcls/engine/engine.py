@@ -61,7 +61,7 @@ class Engine(object):
 
         # set seed
         seed = self.config["Global"].get("seed", False)
-        if seed:
+        if seed or seed == 0:
             assert isinstance(seed, int), "The 'seed' must be a integer!"
             paddle.seed(seed)
             np.random.seed(seed)
