@@ -31,7 +31,7 @@
 
 >>
 * Q: 怎样根据自己的任务选择合适的模型进行训练？
-* A: 如果希望在服务器部署，或者希望精度尽可能地高，对模型存储大小或者预测速度的要求不是很高，那么推荐使用ResNet_vd、Res2Net_vd、DenseNet、Xception等适合于服务器端的系列模型；如果希望在移动端侧部署，则推荐使用MobileNetV3、GhostNet等适合于移动端的系列模型。同时，我们推荐在选择模型的时候可以参考[模型库](../models)中的速度-精度指标图。
+* A: 如果希望在服务器部署，或者希望精度尽可能地高，对模型存储大小或者预测速度的要求不是很高，那么推荐使用ResNet_vd、Res2Net_vd、DenseNet、Xception等适合于服务器端的系列模型；如果希望在移动端侧部署，则推荐使用MobileNetV3、GhostNet等适合于移动端的系列模型。同时，我们推荐在选择模型的时候可以参考[模型库](../models/models_intro.md)中的速度-精度指标图。
 
 >>
 * Q: 如何进行参数初始化，什么样的初始化可以加快模型收敛？
@@ -53,12 +53,12 @@
 ### 模型训练相关
 
 >>
-* Q: 使用深度卷积网络做图像分类如果训练一个拥有1000万个类的模型会碰到什么问题？
+* Q: 使用深度卷积网络做图像分类，如果训练一个拥有1000万个类的模型会碰到什么问题？
 * A: 因为FC层参数很多，内存/显存/模型的存储占用都会大幅增大；模型收敛速度也会变慢一些。建议在这种情况下，再最后的FC层前加一层维度较小的FC，这样可以大幅减少模型的存储大小。
 
 >>
 * Q: 训练过程中，如果模型收敛效果很差，可能的原因有哪些呢？
-* A: 主要有以下几个可以排查的地方：（1）应该检查数据标注，确保训练集和验证集的数据标注没有问题。（2）可以试着调整一下学习率（初期可以以10倍为单位进行调节），过大（训练震荡）或者过小（收敛太慢）的学习率都可能导致收敛效果差。（3）数据量太大，选择的模型太小，难以学习所有数据的特征。（4）可以看下数据预处理的过程中是否使用了归一化，如果没有使用归一化操作，收敛速度可能会比较慢。（5）如果数据量比较小，可以试着加载PaddleClas中提供的基于ImageNet-1k数据集的预训练模型，这可以大大提升训练收敛速度。（6）数据集存在长尾问题，可以参考[数据长尾问题解决方案](#jump)。
+* A: 主要有以下几个可以排查的地方：（1）应该检查数据标注，确保训练集和验证集的数据标注没有问题。（2）可以试着调整一下学习率（初期可以以10倍为单位进行调节），过大（训练震荡）或者过小（收敛太慢）的学习率都可能导致收敛效果差。（3）数据量太大，选择的模型太小，难以学习所有数据的特征。（4）可以看下数据预处理的过程中是否使用了归一化，如果没有使用归一化操作，收敛速度可能会比较慢。（5）如果数据量比较小，可以试着加载PaddleClas中提供的基于ImageNet-1k数据集的预训练模型，这可以大大提升训练收敛速度。（6）数据集存在长尾问题，可以参考[数据长尾问题解决方案](#long_tail)。
 
 >>
 * Q: 训练图像分类任务时，该怎么选择合适的优化器？
@@ -140,8 +140,9 @@
 * Q: 对于精度要求不是那么高的图像分类任务，大概需要准备多大的训练数据集呢？
 * A: 训练数据的数量和需要解决问题的复杂度有关系。难度越大，精度要求越高，则数据集需求越大，而且一般情况实际中的训练数据越多效果越好。当然，一般情况下，在加载预训练模型的情况下，每个类别包括10-20张图像即可保证基本的分类效果；不加载预训练模型的情况下，每个类别需要至少包含100-200张图像以保证基本的分类效果。
 
+<a name="long_tail"></a>
 >>
-* Q: <span id="jump">对于长尾分布的数据集，目前有哪些比较常用的方法？</span>
+* Q: 对于长尾分布的数据集，目前有哪些比较常用的方法？
 * A: （1）可以对数据量比较少的类别进行重采样，增加其出现的概率；（2）可以修改loss，增加图像较少对应的类别的图片的loss权重；（3）可以借鉴迁移学习的方法，从常见类别中学习通用知识，然后迁移到少样本的类别中。
 
 <a name="模型推理与预测相关"></a>
@@ -152,7 +153,7 @@
 * A: 可以在分类之前先加一个主体检测的模型，将前景物体检测出来之后再进行分类，可以大大提升最终的识别效果。如果不考虑时间成本，也可以使用multi-crop的方式对所有的预测做融合来决定最终的类别。
 >>
 * Q: 目前推荐的，模型预测方式有哪些？
-* A: 在模型训练完成之后，推荐使用导出的固化模型（inference model），基于Paddle预测引擎进行预测，目前支持python inference与cpp inference。如果希望基于服务化部署预测模型，那么推荐使用HubServing的部署方式。
+* A: 在模型训练完成之后，推荐使用导出的固化模型（inference model），基于Paddle预测引擎进行预测，目前支持python inference与cpp inference。如果希望基于服务化部署预测模型，那么推荐使用PaddleServing的部署方式。
 >>
 * Q: 模型训练完成之后，有哪些比较合适的预测方法进一步提升模型精度呢？
 * A: （1）可以使用更大的预测尺度，比如说训练的时候使用的是224，那么预测的时候可以考虑使用288或者320，这会直接带来0.5%左右的精度提升。（2）可以使用测试时增广的策略（Test Time Augmentation, TTA)，将测试集通过旋转、翻转、颜色变换等策略，创建多个副本，并分别预测，最后将所有的预测结果进行融合，这可以大大提升预测结果的精度和鲁棒性。（3）当然，也可以使用多模型融合的策略，将多个模型针对相同图片的预测结果进行融合。
@@ -169,15 +170,6 @@
 ## PaddleClas使用问题
 
 >>
-* Q: 多卡评估时，为什么每张卡输出的精度指标不相同？
-* A: 目前PaddleClas基于fleet api使用多卡，在多卡评估时，每张卡都是单独读取各自part的数据，不同卡中计算的图片是不同的，因此最终指标也会有微量差异，如果希望得到准确的评估指标，可以使用单卡评估。
-
->>
-* Q: 在配置文件的`TRAIN`字段中配置了`mix`的参数，为什么`mixup`的数据增广预处理没有生效呢？
-* A: 使用mixup时，数据预处理部分与模型输入部分均需要修改，因此还需要在配置文件中显式地配置`use_mix: True`，才能使得`mixup`生效。
-
-
->>
 * Q: 评估和预测时，已经指定了预训练模型所在文件夹的地址，但是仍然无法导入参数，这么为什么呢？
 * A: 加载预训练模型时，需要指定预训练模型的前缀，例如预训练模型参数所在的文件夹为`output/ResNet50_vd/19`，预训练模型参数的名称为`output/ResNet50_vd/19/ppcls.pdparams`，则`pretrained_model`参数需要指定为`output/ResNet50_vd/19/ppcls`，PaddleClas会自动补齐`.pdparams`的后缀。
 
@@ -186,16 +178,14 @@
 * Q: 在评测`EfficientNetB0_small`模型时，为什么最终的精度始终比官网的低0.3%左右？
 * A: `EfficientNet`系列的网络在进行resize的时候，是使用`cubic插值方式`(resize参数的interpolation值设置为2)，而其他模型默认情况下为None，因此在训练和评估的时候需要显式地指定resize的interpolation值。具体地，可以参考以下配置中预处理过程中ResizeImage的参数。
 ```
-VALID:
-    batch_size: 16
-    num_workers: 4
-    file_list: "./dataset/ILSVRC2012/val_list.txt"
-    data_dir: "./dataset/ILSVRC2012/"
-    shuffle_seed: 0
-    transforms:
+  Eval:
+    dataset:
+      name: ImageNetDataset
+      image_root: ./dataset/ILSVRC2012/
+      cls_label_path: ./dataset/ILSVRC2012/val_list.txt
+      transform_ops:
         - DecodeImage:
             to_rgb: True
-            to_np: False
             channel_first: False
         - ResizeImage:
             resize_short: 256
@@ -207,56 +197,46 @@ VALID:
             mean: [0.485, 0.456, 0.406]
             std: [0.229, 0.224, 0.225]
             order: ''
-        - ToCHWImage:
 ```
 
 >>
 * Q: python2下，使用visualdl的时候，报出以下错误，`TypeError: __init__() missing 1 required positional argument: 'sync_cycle'`，这是为什么呢？
-* A: 目前visualdl仅支持在python3下运行，visualdl需要是2.0以上的版本，如果visualdl版本不对的话，可以通过以下方式进行安装：`pip3 install visualdl==2.0.0b8  -i https://mirror.baidu.com/pypi/simple`
+* A: 目前visualdl仅支持在python3下运行，visualdl需要是2.0以上的版本，如果visualdl版本不对的话，可以通过以下方式进行安装：`pip3 install visualdl -i https://mirror.baidu.com/pypi/simple`
 
 >>
 * Q: 自己在测ResNet50_vd预测单张图片速度的时候发现比官网提供的速度benchmark慢了很多，而且CPU速度比GPU速度快很多，这个是为什么呢？
 * A: 模型预测需要初始化，初始化的过程比较耗时，因此在统计预测速度的时候，需要批量跑一批图片，去除前若干张图片的预测耗时，再统计下平均的时间。GPU比CPU速度测试单张图片速度慢是因为GPU的初始化并CPU要慢很多。
 
 >>
-* Q: 在动态图中加载静态图预训练模型的时候，需要注意哪些问题？
-* A: 在使用infer.py预测单张图片或者文件夹中的图片时，需要注意指定[infer.py](https://github.com/PaddlePaddle/PaddleClas/blob/53c5850df7c49a1bfcd8d989e6ccbea61f406a1d/tools/infer/infer.py#L40)中的`load_static_weights`为True，在finetune或者评估的时候需要添加`-o load_static_weights=True`的参数。
->>
 * Q: 灰度图可以用于模型训练吗？
 * A: 灰度图也可以用于模型训练，不过需要修改模型的输入shape为`[1, 224, 224]`，此外数据增广部分也需要注意适配一下。不过为了更好地使用PaddleClas代码的话，即使是灰度图，也建议调整为3通道的图片进行训练（RGB通道的像素值相等）。
 
 >>
 * Q: 怎么在windows上或者cpu上面模型训练呢？
-* A: 可以参考[PaddleClas开始使用教程](https://github.com/PaddlePaddle/PaddleClas/blob/master/docs/zh_CN/tutorials/getting_started.md)，详细介绍了在Linux、Windows、CPU等环境中进行模型训练、评估与预测的教程。
+* A: 可以参考[开始使用教程](../models_training/classification.md)，详细介绍了在Linux、Windows、CPU等环境中进行模型训练、评估与预测的教程。
 >>
 * Q: 怎样在模型训练的时候使用label smoothing呢？
-* A: 可以在配置文件中设置label smoothing epsilon的值，`ls_epsilon=0.1`，表示设置该值为0.1，若该值为-1，则表示不使用label smoothing。
+* A: 可以在配置文件中的`Loss`字段下进行设置，如下所示，`epsilon=0.1` 表示设置该值为0.1，若不设置 `epsilon` 字段，则不使用 `label smoothing`。
+```yaml
+Loss:
+  Train:
+    - CELoss:
+        weight: 1.0
+        epsilon: 0.1
+```
 >>
 * Q: PaddleClas提供的10W类图像分类预训练模型能否用于模型推断呢？
 * A: 该10W类图像分类预训练模型没有提供fc全连接层的参数，无法用于模型推断，目前可以用于模型微调。
 >>
-* Q: 在使用`tools/infere/predict.py`进行模型预测的时候，报了这个问题:`Error: Pass tensorrt_subgraph_pass has not been registered`，这是为什么呢？
-* A: 如果希望使用TensorRT进行模型预测推理的话，需要编译带TensorRT的PaddlePaddle，编译的时候参考以下的编译方式，其中`TENSORRT_ROOT`表示TensorRT的路径。
-```
-cmake  .. \
-        -DWITH_CONTRIB=OFF \
-        -DWITH_MKL=ON \
-        -DWITH_MKLDNN=ON  \
-        -DWITH_TESTING=OFF \
-        -DCMAKE_BUILD_TYPE=Release \
-        -DWITH_INFERENCE_API_TEST=OFF \
-        -DON_INFER=ON \
-        -DWITH_PYTHON=ON \
-        -DPY_VERSION=2.7 \
-        -DTENSORRT_ROOT=/usr/local/TensorRT6-cuda10.0-cudnn7/
-make -j16
-make inference_lib_dist
-```
+* Q: 在使用`deploy/python/predict_cls.py`进行模型预测的时候，报了这个问题:`Error: Pass tensorrt_subgraph_pass has not been registered`，这是为什么呢？
+* A: 如果希望使用TensorRT进行模型预测推理的话，需要安装或是自己编译带TensorRT的PaddlePaddle，Linux、Windows、macOS系统的用户下载安装可以参考参考[下载预测库](https://paddleinference.paddlepaddle.org.cn/user_guides/download_lib.html)，如果没有符合您所需要的版本，则需要本地编译安装，编译方法可以参考[源码编译](https://paddleinference.paddlepaddle.org.cn/user_guides/source_compile.html)。
 >>
 * Q: 怎样在训练的时候使用自动混合精度(Automatic Mixed Precision, AMP)训练呢？
-* A: 可以参考[ResNet50_fp16.yml](https://github.com/PaddlePaddle/PaddleClas/blob/master/configs/ResNet/ResNet50_fp16.yml)这个配置文件；具体地，如果希望自己的配置文件在模型训练的时候也支持自动混合精度，可以在配置文件中添加下面的配置信息。
+* A: 可以参考[ResNet50_fp16.yaml](../../../ppcls/configs/ImageNet/ResNet/ResNet50_fp16.yaml)这个配置文件；具体地，如果希望自己的配置文件在模型训练的时候也支持自动混合精度，可以在配置文件中添加下面的配置信息。
 ```
-use_fp16: True
-amp_scale_loss: 128.0
-use_dynamic_loss_scaling: True
+# mixed precision training
+AMP:
+  scale_loss: 128.0
+  use_dynamic_loss_scaling: True
+  use_pure_fp16: &use_pure_fp16 True
 ```
