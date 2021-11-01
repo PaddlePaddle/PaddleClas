@@ -1,7 +1,7 @@
 Global:
-  infer_imgs: "./recognition_demo_data_v1.1/test_product/daoxiangcunjinzhubing_6.jpg"
-  det_inference_model_dir: "./models/ppyolov2_r50vd_dcn_mainbody_v1.0_infer"
-  rec_inference_model_dir: "./models/product_ResNet50_vd_aliproduct_v1.0_infer"
+  infer_imgs: "./drink_dataset_v1.0/test_images/nongfu_spring.jpeg"
+  det_inference_model_dir: "./models/picodet_PPLCNet_x2_5_mainbody_lite_v1.0_infer"
+  rec_inference_model_dir: "./models/general_PPLCNet_x2_5_lite_v1.0_infer"
   rec_nms_thresold: 0.05
   
   batch_size: 1
@@ -50,6 +50,6 @@ RecPostProcess: null
 
 # indexing engine config
 IndexProcess:
-  index_dir: "./recognition_demo_data_v1.1/gallery_product/index"
+  index_dir: "./drink_dataset_v1.0/index/"
   return_k: 5
   score_thres: 0.5
