@@ -8,17 +8,19 @@
 
 **近期更新**
 - 2021.10.31 发布[PP-ShiTu技术报告](./docs/PP_ShiTu.pdf)，优化文档，新增饮料识别demo
-- 2021.10.23 发布PP-ShiTu图像识别系统，新增轻量级检测、特征提取模型，速度提升800%，新增DeepHash模块，检索模块切换为faiss，支持PaddleServing和PaddleSlim
+- 2021.10.23 发布PP-ShiTu图像识别系统，新增轻量级检测、特征提取模型，速度提升800%，新增DeepHash模块，检索模块切换为faiss，支持PaddleServing和PaddleSlim。
+[点击这里](./docs/zh_CN/quick_start/quick_start_recognition.md)立即体验
 - 2021.09.17 增加PaddleClas自研PP-LCNet系列模型, 这些模型在Intel CPU上有较强的竞争力。PP-LCNet的介绍可以参考[论文](https://arxiv.org/pdf/2109.15099.pdf), 或者[PP-LCNet模型介绍](docs/zh_CN/models/PP-LCNet.md)，相关指标和预训练权重可以从 [这里](docs/zh_CN/ImageNet_models_cn.md)下载。
 - [more](./docs/zh_CN/others/update_history.md)
 
 ## 特性
 
 - PP-ShiTu轻量图像识别系统：集成了目标检测、特征学习、图像检索等模块，广泛适用于各类图像识别任务。
-较上一版模型，CPU预测效率大幅提升，部分设备速度提升可达8倍。详情见[PP-ShiTu: A Practical Lightweight Image Recognition System](./docs/PP_ShiTu.pdf)
+笔记本cpu上200ms即可完成在10w+库的图像识别。
+详细介绍见[PP-ShiTu: A Practical Lightweight Image Recognition System](./docs/PP_ShiTu.pdf)
 
 - PP-LCNet轻量级CPU骨干网络：专门为CPU设备打造轻量级骨干网络，速度、精度均超越竞品。
-详情见[PP-LCNet: A Lightweight CPU Convolutional Neural Network](https://arxiv.org/pdf/2109.15099.pdf),
+详细介绍见[PP-LCNet: A Lightweight CPU Convolutional Neural Network](https://arxiv.org/pdf/2109.15099.pdf),
 或者[PP-LCNet模型介绍](docs/zh_CN/models/PP-LCNet.md)。
 
 - 丰富的预训练模型库：提供了35个系列共164个ImageNet预训练模型，其中6个精选系列模型支持结构快速修改。
@@ -45,13 +47,13 @@ Res2Net200_vd预训练模型Top-1精度高达85.1%。
 </div>
 
 ## 快速体验
-图像识别快速体验：[点击这里](./docs/zh_CN/quick_start/quick_start_recognition.md)
+PP-ShiTu图像识别快速体验：[点击这里](./docs/zh_CN/quick_start/quick_start_recognition.md)
 
 - 安装说明
   - [安装Paddle](./docs/zh_CN/installation/install_paddle.md)
   - [安装PaddleClas](./docs/zh_CN/installation/install_paddleclas.md)
 - 快速体验
-  - [图像识别快速体验](./docs/zh_CN/quick_start/quick_start_recognition.md)
+  - [PP-ShiTu图像识别快速体验](./docs/zh_CN/quick_start/quick_start_recognition.md)
   - 图像分类快速体验
     - [尝鲜版](./docs/zh_CN/quick_start/quick_start_classification_new_user.md)
     - [进阶版](./docs/zh_CN/quick_start/quick_start_classification_professional.md) 
@@ -102,7 +104,7 @@ Res2Net200_vd预训练模型Top-1精度高达85.1%。
 <img src="./docs/images/structure.jpg"  width = "800" />
 </div>
 
-整个图像识别系统分为三步：（1）通过一个目标检测模型，检测图像物体候选区域（2）对每个候选区域进行特征提取（3）与检索库中图像进行特征匹配，提取识别结果。
+PP-ShiTu图像识别系统分为三步：（1）通过一个目标检测模型，检测图像物体候选区域（2）对每个候选区域进行特征提取（3）与检索库中图像进行特征匹配，提取识别结果。
 
 对于新的未知类别，无需重新训练模型，只需要在检索库补入该类别图像，重新建立检索库，就可以识别该类别。
 
