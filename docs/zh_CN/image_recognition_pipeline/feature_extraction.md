@@ -2,8 +2,6 @@
 ## 1. 特征提取简介
 特征提取是图像识别中的关键一环，它的作用是将输入的图片转化为固定维度的特征向量，用于后续的[向量检索](./vector_search.md)。好的特征需要具备相似度保持性，即在特征空间中，相似度高的图片对其特征相似度要比较高（距离比较近）；相似度低的图片，其特征相似度要比较小（距离比较远）。依据应用场景的不同， 我们可以选用不同长度的实值特征(real-valued feature)或者是二值特征（binary feature)。顾名思义，实值特征的每个元素都是一个实数，而二值特征每个元素为非0即1（或者表示为-1和1），二者的差异如下图所示。
 ![image](../../images/feature_compare.png)
-
-
 [Deep Metric Learning](../algorithm_introduction/metric_learning.md)和 DeepHash分别用以研究如何通过深度学习的方法获得好的实值和二值特征表示。本文主要介绍如何使用PaddleClas构建一个特征学习网络， 如何进行训练、评估和推理。
 ## 2. 网络结构
 ![](../../images/feature_extraction_framework.png)
