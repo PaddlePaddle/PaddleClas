@@ -14,7 +14,7 @@
 - 2021.06.29 添加Swin-transformer系列模型，ImageNet1k数据集上Top1 acc最高精度可达87.2%；支持训练预测评估与whl包部署，预训练模型可以从[这里](docs/zh_CN/models/models_intro.md)下载。
 - 2021.06.22,23,24 PaddleClas官方研发团队带来技术深入解读三日直播课。课程回放：[https://aistudio.baidu.com/aistudio/course/introduce/24519](https://aistudio.baidu.com/aistudio/course/introduce/24519)
 - 2021.06.16 PaddleClas v2.2版本升级，集成Metric learning，向量检索等组件。新增商品识别、动漫人物识别、车辆识别和logo识别等4个图像识别应用。新增LeViT、Twins、TNT、DLA、HarDNet、RedNet系列30个预训练模型。
-- [more](./docs/zh_CN/update_history.md)
+- [more](./docs/zh_CN/others/update_history.md)
 
 ## 特性
 
@@ -56,27 +56,23 @@ Res2Net200_vd预训练模型Top-1精度高达85.1%。
 - 图像分类快速体验
     - [尝鲜版](./docs/zh_CN/quick_start/quick_start_classification_new_user.md)
     - [进阶版](./docs/zh_CN/quick_start/quick_start_classification_professional.md)
-    - [社区版](./docs/zh_CN/quick_start/quick_start_community.md)
 - 算法介绍
-    - [骨干网络和预训练模型库](./docs/zh_CN/ImageNet_models_cn.md)
+    - [骨干网络和预训练模型库](./docs/zh_CN/algorithm_introduction/ImageNet_models.md)
     - [主体检测](./docs/zh_CN/image_recognition_pipeline/mainbody_detection.md)
-    - [图像分类](./docs/zh_CN/image_recognition_pipeline/image_classification.md)
-    - [特征学习](./docs/zh_CN/image_recognition_pipeline/feature_learning.md)
-        - [商品识别](./docs/zh_CN/application/product_recognition.md)
-        - [车辆识别](./docs/zh_CN/application/vehicle_recognition.md)
-        - [logo识别](./docs/zh_CN/application/logo_recognition.md)
-        - [动漫人物识别](./docs/zh_CN/application/cartoon_character_recognition.md)
+    - [图像分类]()
+    - [特征学习]()
     - [向量检索](./deploy/vector_search/README.md)
 - 模型训练/评估
-    - [图像分类任务](./docs/zh_CN/tutorials/getting_started.md)
-    - [特征学习任务](./docs/zh_CN/tutorials/getting_started_retrieval.md)
+    - [图像分类任务](./docs/zh_CN/models_training/classification.md)
+    - [特征学习任务](./docs/zh_CN/models_training/recognition.md)
 - 模型预测
-    - [基于Python预测引擎预测推理](./docs/zh_CN/inference.md)
+    - [基于Python预测引擎预测推理](./docs/zh_CN/inference_deployment/python_deploy.md)
     - [基于C++预测引擎预测推理](./deploy/cpp/readme.md)(当前只支持图像分类任务，图像识别更新中)
 - 模型部署（当前只支持图像分类任务，图像识别更新中）
-    - [服务化部署](./deploy/hubserving/readme.md)
+    - [Paddle Serving服务化部署(推荐)](./docs/zh_CN/inference_deployment/paddle_serving_deploy.md)
+    - [Hub serving服务化部署](./docs/zh_CN/inference_deployment/paddle_hub_serving_deploy.md)
     - [端侧部署](./deploy/lite/readme.md)
-    - [whl包预测](./docs/zh_CN/whl.md)
+    - [whl包预测](./docs/zh_CN/inference_deployment/whl_deploy.md)
 - 高阶使用
     - [知识蒸馏](./docs/zh_CN/advanced_tutorials/knowledge_distillation.md)
     - [模型量化](./docs/zh_CN/advanced_tutorials/model_prune_quantization.md)
@@ -137,6 +133,8 @@ Res2Net200_vd预训练模型Top-1精度高达85.1%。
 <a name="贡献代码"></a>
 ## 贡献代码
 我们非常欢迎你为PaddleClas贡献代码，也十分感谢你的反馈。
+如果想为PaddleCLas贡献代码，可以参考[贡献指南](./docs/zh_CN/advanced_tutorials/how_to_contribute.md)。
+
 
 - 非常感谢[nblib](https://github.com/nblib)修正了PaddleClas中RandErasing的数据增广配置文件。
 - 非常感谢[chenpy228](https://github.com/chenpy228)修正了PaddleClas文档中的部分错别字。
