@@ -37,7 +37,7 @@ class MultiLabelDataset(CommonDataset):
                 self.images.append(os.path.join(self._img_root, l[0]))
 
                 labels = l[1].split(',')
-                labels = [int(i) for i in labels]
+                labels = [np.int64(i) for i in labels]
 
                 self.labels.append(labels)
                 assert os.path.exists(self.images[-1])
