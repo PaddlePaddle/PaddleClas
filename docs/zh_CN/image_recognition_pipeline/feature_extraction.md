@@ -130,5 +130,5 @@ python tools/export_model -c ppcls/configs/ResNet50_vd_SOP.yaml -o Global.pretra
 ### 4.4.2 获取特征向量
 ```
 cd deploy
-python python/predict_rec.py -c configs/inference_rec.yaml  -o rec_inference_model_dir="../inference"
+python python/predict_rec.py -c configs/inference_rec.yaml  -o Global.rec_inference_model_dir="../inference"
 ```
