@@ -7,8 +7,8 @@
 飞桨图像识别套件PaddleClas是飞桨为工业界和学术界所准备的一个图像识别任务的工具集，助力使用者训练出更好的视觉模型和应用落地。
 
 **近期更新**
-- 2021.10.31 优化文档，新增饮料识别demo
-- 2021.10.23 新增轻量级检测、特征提取模型，新增DeepHash模块，检索模块切换为faiss，支持PaddleServing和PaddleSlim
+- 2021.10.31 发布[PP-ShiTu技术报告](./docs/PP_ShiTu.pdf)，优化文档，新增饮料识别demo
+- 2021.10.23 发布PP-ShiTu图像识别系统，新增轻量级检测、特征提取模型，速度提升800%，新增DeepHash模块，检索模块切换为faiss，支持PaddleServing和PaddleSlim
 - 2021.09.17 增加PaddleClas自研PP-LCNet系列模型, 这些模型在Intel CPU上有较强的竞争力。PP-LCNet的介绍可以参考[论文](https://arxiv.org/pdf/2109.15099.pdf)或者[PP-LCNet模型介绍](docs/zh_CN/models/PP-LCNet.md)，相关指标和预训练权重可以从 [这里](docs/zh_CN/ImageNet_models_cn.md)下载。
 - 2021.08.11 更新7个[FAQ](docs/zh_CN/faq_series/faq_2021_s2.md)。
 - 2021.06.29 添加Swin-transformer系列模型，ImageNet1k数据集上Top1 acc最高精度可达87.2%；支持训练预测评估与whl包部署，预训练模型可以从[这里](docs/zh_CN/models/models_intro.md)下载。
@@ -16,10 +16,30 @@
 - 2021.06.16 PaddleClas v2.2版本升级，集成Metric learning，向量检索等组件。新增商品识别、动漫人物识别、车辆识别和logo识别等4个图像识别应用。新增LeViT、Twins、TNT、DLA、HarDNet、RedNet系列30个预训练模型。
 - [more](./docs/zh_CN/others/update_history.md)
 
-## 特性
+<a name="图像识别系统介绍"></a>
+## PP-ShiTu轻量级图像识别系统
 
-- 实用的图像识别系统：集成了目标检测、特征学习、图像检索等模块，广泛适用于各类图像识别任务。
-提供商品识别、车辆识别、logo识别和动漫人物识别等4个场景应用示例。
+<div align="center">
+<img src="./docs/images/recognition.gif"  width = "400" />
+</div>
+
+- 图像识别系统：集成了目标检测、特征学习、图像检索等模块，一套模型适用多个场景，下载即用。
+
+- 轻量级检测、特征提取模型：CPU预测速度大幅提升，部分场景速度较上一版模型提升800%，精度打平。
+
+<div align="center">
+<img src="./docs/images/structure.jpg"  width = "800" />
+</div>
+
+- 整个图像识别系统分为三步：
+  1. 通过一个目标检测模型，检测图像物体候选区域
+  2. 对每个候选区域进行特征提取
+  3. 与检索库中图像进行特征匹配，提取识别结果。 
+  - 对于新的未知类别，无需重新训练模型，只需要在检索库补入该类别图像，重新建立检索库，就可以识别该类别。
+
+- 更详细的内容请参见我们的[技术报告](./docs/PP_ShiTu.pdf)
+
+## PaddleClas特性
 
 - 丰富的预训练模型库：提供了35个系列共164个ImageNet预训练模型，其中6个精选系列模型支持结构快速修改。
 
@@ -29,12 +49,6 @@
 Res2Net200_vd预训练模型Top-1精度高达85.1%。
 
 - 数据增广：支持AutoAugment、Cutout、Cutmix等8种数据增广算法详细介绍、代码复现和在统一实验环境下的效果评估。
-
-
-<div align="center">
-<img src="./docs/images/recognition.gif"  width = "400" />
-</div>
-
 
 ## 欢迎加入技术交流群
 
@@ -51,7 +65,7 @@ Res2Net200_vd预训练模型Top-1精度高达85.1%。
 
 - [快速安装](./docs/zh_CN/installation/install_paddleclas.md)
 - [图像识别快速体验](./docs/zh_CN/quick_start/quick_start_recognition.md)
-- [图像识别系统介绍](#图像识别系统介绍)
+- [PP-ShiTu图像识别系统介绍](#图像识别系统介绍)
 - [识别效果展示](#识别效果展示)
 - 图像分类快速体验
     - [尝鲜版](./docs/zh_CN/quick_start/quick_start_classification_new_user.md)
@@ -82,18 +96,6 @@ Res2Net200_vd预训练模型Top-1精度高达85.1%。
     - [图像分类任务FAQ](docs/zh_CN/faq_series/faq.md)
 - [许可证书](#许可证书)
 - [贡献代码](#贡献代码)
-
-<a name="图像识别系统介绍"></a>
-## 图像识别系统介绍
-
-<div align="center">
-<img src="./docs/images/structure.jpg"  width = "800" />
-</div>
-
-整个图像识别系统分为三步：（1）通过一个目标检测模型，检测图像物体候选区域（2）对每个候选区域进行特征提取（3）与检索库中图像进行特征匹配，提取识别结果。
-
-对于新的未知类别，无需重新训练模型，只需要在检索库补入该类别图像，重新建立检索库，就可以识别该类别。
-
 
 <a name="识别效果展示"></a>
 ## 更多效果展示 [more](https://github.com/PaddlePaddle/PaddleClas/tree/release/2.2/docs/images/recognition/more_demo_images)
