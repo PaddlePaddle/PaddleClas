@@ -82,7 +82,7 @@ Res2Net200_vd预训练模型Top-1精度高达85.1%。
 - 模型预测
     - [基于Python预测引擎预测推理](./docs/zh_CN/inference_deployment/python_deploy.md)
     - [基于C++预测引擎预测推理](./deploy/cpp/readme.md)(当前只支持图像分类任务，图像识别更新中)
-- 模型部署（当前只支持图像分类任务，图像识别更新中）
+- 模型部署
     - [Paddle Serving服务化部署(推荐)](./docs/zh_CN/inference_deployment/paddle_serving_deploy.md)
     - [Hub serving服务化部署](./docs/zh_CN/inference_deployment/paddle_hub_serving_deploy.md)
     - [端侧部署](./deploy/lite/readme.md)
