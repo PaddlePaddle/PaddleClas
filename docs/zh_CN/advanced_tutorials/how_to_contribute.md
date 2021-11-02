@@ -1,6 +1,29 @@
 # PaddleClas 社区贡献指南
+---
 
+## 目录
 
+- [如何贡献代码](#1)
+    - [1.1 PaddleClas 分支说明](#1.1)
+    - [1.2 PaddleClas 代码提交流程与规范](#1.2)
+        - [1.2.1 fork 和 clone 代码](1.2.1)
+        - [1.2.2 和远程仓库建立连接](1.2.2)
+        - [1.2.3 创建本地分支](1.2.3)
+        - [1.2.4 使用 pre-commit 勾子](1.2.4)
+        - [1.2.5 修改与提交代码](1.2.5)
+        - [1.2.6 保持本地仓库最新](1.2.6)
+        - [1.2.7 push到远程仓库](1.2.7)
+        - [1.2.8 提交Pull Request](1.2.8)
+        - [1.2.9 签署 CLA 协议和通过单元测试](1.2.9)
+        - [1.2.10 删除分支](1.2.10)
+        - [1.2.11 提交代码的一些约定](1.2.11)
+- [总结](#2)
+- [参考文献](#3)
+
+<a name="1"></a>
+## 一、如何贡献代码
+
+<a name="1.1"></a>
 ### 1.1 PaddleClas 分支说明
 
 PaddleClas 未来将维护 2 种分支，分别为：
@@ -16,8 +39,10 @@ PaddleClas 的历史分支，未来将不再维护。考虑到一些同学可能
 
 PaddleClas 欢迎大家向 repo 中积极贡献代码，下面给出一些贡献代码的基本流程。
 
+<a name="1.2"></a>
 ### 1.2 PaddleClas 代码提交流程与规范
 
+<a name="1.2.1"></a>
 #### 1.2.1 fork 和 clone 代码
 
 * 跳转到 [PaddleClas GitHub首页](https://github.com/PaddlePaddle/PaddleClas) ，然后单击 Fork 按钮，生成自己目录下的仓库，比如 `https://github.com/USERNAME/PaddleClas` 。
@@ -42,6 +67,7 @@ clone 的地址可以从下面获取
 <img src="../../images/quick_start/community/002_clone.png"  width = "600" />
 </div>
 
+<a name="1.2.2"></a>
 #### 1.2.2 和远程仓库建立连接
 
 首先通过 `git remote -v` 查看当前远程仓库的信息。
@@ -68,6 +94,7 @@ upstream    https://github.com/PaddlePaddle/PaddleClas.git (push)
 
 这主要是为了后续在提交 pull request (PR) 时，始终保持本地仓库最新。
 
+<a name="1.2.3"></a>
 #### 1.2.3 创建本地分支
 
 可以基于当前分支创建新的本地分支，命令如下。
@@ -93,6 +120,7 @@ Branch new_branch set up to track remote branch develop from upstream.
 Switched to a new branch 'new_branch'
 ```
 
+<a name="1.2.4"></a>
 #### 1.2.4 使用 pre-commit 勾子
 
 Paddle 开发人员使用 pre-commit 工具来管理 Git 预提交钩子。 它可以帮助我们格式化源代码（C++，Python），在提交（commit）前自动检查一些基本事宜（如每个文件只有一个 EOL，Git 中不要添加大文件等）。
@@ -109,7 +137,7 @@ pre-commit install
 1. Paddle 使用 clang-format 来调整 C/C++ 源代码格式，请确保 `clang-format` 版本在 3.8 以上。
 2. 通过 `pip install pre-commit` 和 `conda install -c conda-forge pre-commit` 安装的 `yapf` 稍有不同的，PaddleClas 开发人员使用的是 `pip install pre-commit` 。
 
-
+<a name="1.2.5"></a>
 #### 1.2.5 修改与提交代码
 
 可以通过 `git status` 查看改动的文件。
@@ -133,6 +161,7 @@ pre-commit
 git commit -m "your commit info"
 ```
 
+<a name="1.2.6"></a>
 #### 1.2.6 保持本地仓库最新
 
 获取 upstream 的最新代码并更新当前分支。这里的 upstream 来自于 1.2 节的`和远程仓库建立连接`部分。
@@ -143,12 +172,14 @@ git fetch upstream
 git pull upstream develop
 ```
 
+<a name="1.2.7"></a>
 #### 1.2.7 push到远程仓库
 
 ```shell
 git push origin new_branch
 ```
 
+<a name="1.2.8"></a>
 #### 1.2.8 提交Pull Request
 
 点击 new pull request，选择本地分支和目标分支，如下图所示。在 PR 的描述说明中，填写该 PR 所完成的功能。接下来等待 review ，如果有需要修改的地方，参照上述步骤更新 origin 中的对应分支即可。
@@ -157,7 +188,7 @@ git push origin new_branch
 <img src="../../images/quick_start/community/004_create_pr.png"  width = "600" />
 </div>
 
-
+<a name="1.2.9"></a>
 #### 1.2.9 签署 CLA 协议和通过单元测试
 
 * 签署 CLA
@@ -166,6 +197,7 @@ git push origin new_branch
 1. 请您查看 PR 中的 Check 部分，找到 license/cla ，并点击右侧 detail ，进入 CLA 网站
 2. 点击 CLA 网站中的 `Sign in with GitHub to agree` , 点击完成后将会跳转回您的 Pull Request 页面
 
+<a name="1.2.10"></a>
 #### 1.2.10 删除分支
 
 * 删除远程分支
@@ -189,6 +221,7 @@ git checkout develop
 git branch -D new_branch
 ```
 
+<a name="1.2.11"></a>
 #### 1.2.11 提交代码的一些约定
 
 为了使官方维护人员在评审代码时更好地专注于代码本身，请您每次提交代码时，遵守以下约定：
@@ -219,11 +252,12 @@ git branch -D new_branch
 - 请给出总体的修改情况。
 - 请采用 `start a review` 进行回复，而非直接回复的方式。原因是每个回复都会发送一封邮件，会造成邮件灾难。
 
-
-## 2. 总结
+<a name="2"></a>
+## 二、总结
 
 * 开源社区依赖于众多开发者与用户的贡献和反馈，在这里感谢与期待大家向 PaddleClas 提出宝贵的意见与 Pull Request ，希望我们可以一起打造一个领先实用全面的图像识别代码仓库！
 
-## 3. 参考文献
+<a name="3"></a>
+## 三、参考文献
 1. [PaddlePaddle本地开发指南](https://www.paddlepaddle.org.cn/documentation/docs/zh/develop/guides/08_contribution/index_cn.html)
 2. [向开源框架提交pr的过程](https://blog.csdn.net/vim_wj/article/details/78300239)
