@@ -13,8 +13,7 @@
         - [1.2.2 直接下载安装](1.2.2)
 - [编译](#2)
     - [2.1 编译 PaddleClas C++ 预测 demo](#2.1)
-    - [2.2 编译 config lib 预测库与 cls lib 预测库](#2.2)
-    
+    - [2.2 编译 config lib 预测库与 cls lib 预测库](#2.2) 
 - [运行](#3)
     - [3.1 准备 inference model](#3.1)
     - [3.2 运行 demo](#3.2)
