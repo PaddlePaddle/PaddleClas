@@ -9,17 +9,17 @@
 **近期更新**
 
 - 2021.10.31 发布[PP-ShiTu技术报告](./docs/PP_ShiTu.pdf)，新增饮料识别demo
-- 2021.10.23 发布轻量级图像识别系统PP-ShiTu，cpu上200ms即可完成在10w+库的图像识别。
+- 2021.10.23 发布轻量级图像识别系统PP-ShiTu，cpu上0.2s即可完成在10w+库的图像识别。
 [点击这里](./docs/zh_CN/quick_start/quick_start_recognition.md)立即体验
-- 2021.09.17 发布PP-LCNet系列超轻量骨干网络模型, 在Intel CPU上有较强的竞争力，在同样精度的情况下，速度远超当前所有的骨干网络，最多可以有两倍性能优势。PP-LCNet的介绍可以参考[论文](https://arxiv.org/pdf/2109.15099.pdf), 或者[PP-LCNet模型介绍](docs/zh_CN/models/PP-LCNet.md)，相关指标和预训练权重可以从 [这里](docs/zh_CN/ImageNet_models_cn.md)下载。
+- 2021.09.17 发布PP-LCNet系列超轻量骨干网络模型, 在Intel CPU上，单张图像预测速度约5ms，ImageNet-1K数据集上Top1识别准确率达到80.82%，超越ResNet152的模型效果。PP-LCNet的介绍可以参考[论文](https://arxiv.org/pdf/2109.15099.pdf), 或者[PP-LCNet模型介绍](docs/zh_CN/models/PP-LCNet.md)，相关指标和预训练权重可以从 [这里](docs/zh_CN/ImageNet_models_cn.md)下载。
 - [more](./docs/zh_CN/others/update_history.md)
 
 ## 特性
 
 - PP-ShiTu轻量图像识别系统：集成了目标检测、特征学习、图像检索等模块，广泛适用于各类图像识别任务。
-cpu上200ms即可完成在10w+库的图像识别。
+cpu上0.2s即可完成在10w+库的图像识别。
 
-- PP-LCNet轻量级CPU骨干网络：专门为CPU设备打造轻量级骨干网络，速度、精度均超越竞品。
+- PP-LCNet轻量级CPU骨干网络：专门为CPU设备打造轻量级骨干网络，速度、精度均远超竞品。
 
 - 丰富的预训练模型库：提供了35个系列共164个ImageNet预训练模型，其中6个精选系列模型支持结构快速修改。
 
@@ -27,9 +27,6 @@ cpu上200ms即可完成在10w+库的图像识别。
 
 - SSLD知识蒸馏：14个分类预训练模型，精度普遍提升3%以上；其中ResNet50_vd模型在ImageNet-1k数据集上的Top-1精度达到了84.0%，
 Res2Net200_vd预训练模型Top-1精度高达85.1%。
-
-- 数据增广：支持AutoAugment、Cutout、Cutmix等8种数据增广算法详细介绍、代码复现和在统一实验环境下的效果评估。
-
 
 <div align="center">
 <img src="./docs/images/recognition.gif"  width = "400" />
