@@ -1,11 +1,16 @@
 # 模型服务化部署
+- [简介](#简介)
+- [Serving安装](#Serving安装)
+- [图像分类服务部署](#图像分类服务部署)
+- [图像识别服务部署](#图像识别服务部署)
 
+<a name="简介"></a>
 ## 1. 简介
 [Paddle Serving](https://github.com/PaddlePaddle/Serving) 旨在帮助深度学习开发者轻松部署在线预测服务，支持一键部署工业级的服务能力、客户端和服务端之间高并发和高效通信、并支持多种编程语言开发客户端。
 
 该部分以 HTTP 预测服务部署为例，介绍怎样在 PaddleClas 中使用 PaddleServing 部署模型服务。
 
-
+<a name="Serving安装"></a>
 ## 2. Serving安装
 
 Serving 官网推荐使用 docker 安装并部署 Serving 环境。首先需要拉取 docker 环境并创建基于 Serving 的 docker。
@@ -32,7 +37,7 @@ pip install paddle-serving-app
 ```shell
 pip install paddle-serving-server
 ```
-
+<a name="图像分类服务部署"></a>
 ## 3. 图像分类服务部署
 ### 3.1 模型转换
 使用PaddleServing做服务化部署时，需要将保存的inference模型转换为Serving模型。下面以经典的ResNet50_vd模型为例，介绍如何部署图像分类服务。
@@ -106,7 +111,6 @@ python3 classification_web_service.py &>log.txt &
 ```
 成功启动服务后，log.txt中会打印类似如下日志
 ![](../../../deploy/paddleserving/imgs/start_server.png)
-
 - 发送请求：
 ```shell
 # 发送服务请求
@@ -115,5 +119,7 @@ python3 pipeline_http_client.py
 成功运行后，模型预测的结果会打印在cmd窗口中，结果示例为：
 ![](../../../deploy/paddleserving/imgs/results.png)
 
-* 关于图像识别服务的部署，参考文档[基于PaddleServing的图像识别服务部署]（../../../deploy/paddleserving/recognition/README_CN.md）
+<a name="图像识别服务部署"></a>
+## 4.图像识别服务部署
+
 * 更多的服务部署类型，如 `RPC预测服务` 等，可以参考 Serving 的 github 官网：[https://github.com/PaddlePaddle/Serving/tree/develop/python/examples/imagenet](https://github.com/PaddlePaddle/Serving/tree/develop/python/examples/imagenet)
