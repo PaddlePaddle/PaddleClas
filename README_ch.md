@@ -16,8 +16,7 @@
 
 ## 特性
 
-- PP-ShiTu轻量图像识别系统：集成了目标检测、特征学习、图像检索等模块，广泛适用于各类图像识别任务。
-cpu上0.2s即可完成在10w+库的图像识别。
+- PP-ShiTu轻量图像识别系统：集成了目标检测、特征学习、图像检索等模块，广泛适用于各类图像识别任务。cpu上0.2s即可完成在10w+库的图像识别。
 
 - PP-LCNet轻量级CPU骨干网络：专门为CPU设备打造轻量级骨干网络，速度、精度均远超竞品。
 
@@ -45,6 +44,7 @@ Res2Net200_vd预训练模型Top-1精度高达85.1%。
 
 PP-ShiTu图像识别快速体验：[点击这里](./docs/zh_CN/quick_start/quick_start_recognition.md)
 
+## 文档教程
 - 安装说明
   - [安装Paddle](./docs/zh_CN/installation/install_paddle.md)
   - [安装PaddleClas](./docs/zh_CN/installation/install_paddleclas.md)
@@ -106,7 +106,7 @@ PP-ShiTu图像识别系统分为三步：（1）通过一个目标检测模型�
 
 
 <a name="识别效果展示"></a>
-## 更多效果展示 [more](https://github.com/PaddlePaddle/PaddleClas/tree/release/2.2/docs/images/recognition/more_demo_images)
+## PP-ShiTu图像识别系统效果展示 
 - 瓶装饮料识别
 <div align="center">
 <img src="docs/images/drink_demo.gif">
