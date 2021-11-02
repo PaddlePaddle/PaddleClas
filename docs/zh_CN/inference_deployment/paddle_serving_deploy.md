@@ -121,6 +121,92 @@ python3 pipeline_http_client.py
 
 <a name="图像识别服务部署"></a>
 ## 4.图像识别服务部署
+使用PaddleServing做服务化部署时，需要将保存的inference模型转换为serving易于部署的模型。 下面以PP-ShiTu中的超轻量商品识别模型为例，介绍图像识别服务的部署。
+## 4.1 模型转换
+- 下载检测inference模型和商品识别inference模型
+```
+cd deploy
+# 下载并解压商品识别模型
+wget -P models/ https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/inference/general_PPLCNet_x2_5_lite_v1.0_infer.tar
+cd models
+tar -xf general_PPLCNet_x2_5_lite_v1.0_infer.tar
+wget https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/inference/picodet_PPLCNet_x2_5_mainbody_lite_v1.0_infer.tar
+tar -xf picodet_PPLCNet_x2_5_mainbody_lite_v1.0_infer.tar
+```
+- 转换商品识别inference模型为易于server部署的模型格式：
+```
+# 转换商品识别模型
+python3 -m paddle_serving_client.convert --dirname ./general_PPLCNet_x2_5_lite_v1.0_infer/ \
+                                         --model_filename inference.pdmodel  \
+                                         --params_filename inference.pdiparams \
+                                         --serving_server ./general_PPLCNet_x2_5_lite_v1.0_serving/ \
+                                         --serving_client ./general_PPLCNet_x2_5_lite_v1.0_client/
+```
+商品识别推理模型转换完成后，会在当前文件夹多出`general_PPLCNet_x2_5_lite_v1.0_serving/` 和`general_PPLCNet_x2_5_lite_v1.0_serving/`的文件夹。修改serving_server_conf.prototxt中的alias名字： 将`fetch_var`中的`alias_name`改为`features`。
+修改后的serving_server_conf.prototxt内容如下：
+```
+feed_var {
+  name: "x"
+  alias_name: "x"
+  is_lod_tensor: false
+  feed_type: 1
+  shape: 3
+  shape: 224
+  shape: 224
+}
+fetch_var {
+  name: "save_infer_model/scale_0.tmp_1"
+  alias_name: "features"
+  is_lod_tensor: true
+  fetch_type: 1
+  shape: -1
+}
+```
+- 转换通用检测inference模型为易于server部署的模型格式：
+```
+# 转换通用检测模型
+python3 -m paddle_serving_client.convert --dirname ./picodet_PPLCNet_x2_5_mainbody_lite_v1.0_infer/ \
+                                         --model_filename inference.pdmodel  \
+                                         --params_filename inference.pdiparams \
+                                         --serving_server ./picodet_PPLCNet_x2_5_mainbody_lite_v1.0_serving/ \
+                                         --serving_client ./picodet_PPLCNet_x2_5_mainbody_lite_v1.0_client/
+```
+通用检测inference模型转换完成后，会在当前文件夹多出`picodet_PPLCNet_x2_5_mainbody_lite_v1.0_serving/` 和`picodet_PPLCNet_x2_5_mainbody_lite_v1.0_client/`的文件夹。
+
+- 下载并解压已经构建后的商品库index
+```
+cd ../
+wget https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/data/drink_dataset_v1.0.tar && tar -xf drink_dataset_v1.0.tar
+```
+
+## 4.2 服务部署和请求
+**注意:**  识别服务涉及到多个模型，采用PipeLine部署方式。Pipeline部署方式当前不支持windows平台。
+- 进入到工作目录
+```shell
+cd ./deploy/paddleserving/recognition
+```
+paddleserving目录包含启动pipeline服务和发送预测请求的代码，包括：
+```
+__init__.py
+config.yml                    # 启动服务的配置文件
+pipeline_http_client.py       # http方式发送pipeline预测请求的脚本
+pipeline_rpc_client.py        # rpc方式发送pipeline预测请求的脚本
+recognition_web_service.py    # 启动pipeline服务端的脚本
+```
+- 启动服务：
+```
+# 启动服务，运行日志保存在log.txt
+python3 recognition_web_service.py &>log.txt &
+```
+成功启动服务后，log.txt中会打印类似如下日志
+![](../../../deploy/paddleserving/recognition/imgs/start_server_recog.png)
+
+- 发送请求：
+```
+python3 pipeline_http_client.py
+```
+成功运行后，模型预测的结果会打印在cmd窗口中，结果示例为：
+![](../../../deploy/paddleserving/recognition/imgs/results_recog.png)
 
 <a name="FAQ"></a>
 ## 5.FAQ
