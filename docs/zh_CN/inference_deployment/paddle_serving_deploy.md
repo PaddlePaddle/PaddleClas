@@ -201,7 +201,7 @@ recognition_web_service.py    # 启动pipeline服务端的脚本
 python3 recognition_web_service.py &>log.txt &
 ```
 成功启动服务后，log.txt中会打印类似如下日志
-![](../../../deploy/paddleserving/imgs/start_server_recog_shitu.png)
+![](../../../deploy/paddleserving/imgs/start_server_shitu.png)
 
 - 发送请求：
 ```
