@@ -11,7 +11,7 @@
 - 2021.10.31 发布[PP-ShiTu技术报告](./docs/PP_ShiTu.pdf)，新增饮料识别demo
 - 2021.10.23 发布轻量级图像识别系统PP-ShiTu，cpu上200ms即可完成在10w+库的图像识别。
 [点击这里](./docs/zh_CN/quick_start/quick_start_recognition.md)立即体验
-- 2021.09.17 发布PP-LCNet系列超轻量骨干网络模型, 在Intel CPU上有较强的竞争力，在同样精度的情况下，速度远超当前所有的骨干网络，最多可以有两倍优势。PP-LCNet的介绍可以参考[论文](https://arxiv.org/pdf/2109.15099.pdf), 或者[PP-LCNet模型介绍](docs/zh_CN/models/PP-LCNet.md)，相关指标和预训练权重可以从 [这里](docs/zh_CN/ImageNet_models_cn.md)下载。
+- 2021.09.17 发布PP-LCNet系列超轻量骨干网络模型, 在Intel CPU上有较强的竞争力，在同样精度的情况下，速度远超当前所有的骨干网络，最多可以有两倍性能优势。PP-LCNet的介绍可以参考[论文](https://arxiv.org/pdf/2109.15099.pdf), 或者[PP-LCNet模型介绍](docs/zh_CN/models/PP-LCNet.md)，相关指标和预训练权重可以从 [这里](docs/zh_CN/ImageNet_models_cn.md)下载。
 - [more](./docs/zh_CN/others/update_history.md)
 
 ## 特性
