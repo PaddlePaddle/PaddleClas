@@ -22,6 +22,7 @@ nvidia-docker exec -it test bash
 pip install paddlepaddle-gpu
 pip install paddle-serving-client
 pip install paddle-serving-server-gpu
+pip install paddle-serving-app
 ```
 
 * 如果安装速度太慢，可以通过 `-i https://pypi.tuna.tsinghua.edu.cn/simple` 更换源，加速安装过程。
@@ -32,34 +33,86 @@ pip install paddle-serving-server-gpu
 pip install paddle-serving-server
 ```
 
-## 3. 导出模型
-
-使用 `tools/export_serving_model.py` 脚本导出 Serving 模型，以 `ResNet50_vd` 为例，使用方法如下。
-
+## 3. 图像分类服务部署
+### 3.1 模型转换
+使用PaddleServing做服务化部署时，需要将保存的inference模型转换为Serving模型。下面以经典的ResNet50_vd模型为例，介绍如何部署图像分类服务。
+进入工作目录：
 ```shell
-python tools/export_serving_model.py -m ResNet50_vd -p ./pretrained/ResNet50_vd_pretrained/ -o serving
+cd deploy/paddleserving
 ```
 
-最终在 serving 文件夹下会生成 `ppcls_client_conf` 与 `ppcls_model` 两个文件夹，分别存储了 client 配置、模型参数与结构文件。
-
-
-## 4. 服务部署与请求
-
-* 使用下面的方式启动 Serving 服务。
-
+下载ResNet50_vd的inference模型
 ```shell
-python tools/serving/image_service_gpu.py serving/ppcls_model workdir 9292
+# 下载并解压ResNet50_vd模型
+wget https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/ResNet50_vd_infer.tar && tar xf ResNet50_vd_infer.tar
 ```
 
-其中 `serving/ppcls_model` 为刚才保存的 Serving 模型地址，`workdir` 为工作目录，`9292` 为服务的端口号。
-
-
-* 使用下面的脚本向 Serving 服务发送识别请求，并返回结果。
-
+用paddle_serving_client把下载的inference模型转换成易于Server部署的模型格式
 ```
-python tools/serving/image_http_client.py  9292 ./docs/images/logo.png
+# 转换ResNet50_vd模型
+python3 -m paddle_serving_client.convert --dirname ./ResNet50_vd_infer/ \
+                                         --model_filename inference.pdmodel  \
+                                         --params_filename inference.pdiparams \
+                                         --serving_server ./ResNet50_vd_serving/ \
+                                         --serving_client ./ResNet50_vd_client/
 ```
+ResNet50_vd推理模型转换完成后，会在当前文件夹多出`ResNet50_vd_serving` 和`ResNet50_vd_client`的文件夹，具备如下格式：
+```
+|- ResNet50_vd_client/
+  |- __model__  
+  |- __params__
+  |- serving_server_conf.prototxt  
+  |- serving_server_conf.stream.prototxt
+|- ResNet50_vd_client
+  |- serving_client_conf.prototxt  
+  |- serving_client_conf.stream.prototxt
+```
+得到模型文件之后，需要修改serving_server_conf.prototxt中的alias名字： 将`feed_var`中的`alias_name`改为`image`, 将`fetch_var`中的`alias_name`改为`prediction`, 
+**备注**, Serving为了兼容不同模型的部署，提供了输入输出重命名的功能。这样，不同的模型在推理部署时，只需要修改配置文件的alias_name即可，无需修改代码，即可完成推理部署。
 
-`9292` 为发送请求的端口号，需要与服务启动时的端口号保持一致，`./docs/images/logo.png` 为待识别的图像文件。最终返回 Top1 识别结果的类别 ID 以及概率值。
+修改后的serving_server_conf.prototxt如下所示:
+```
+feed_var {
+  name: "inputs"
+  alias_name: "image"
+  is_lod_tensor: false
+  feed_type: 1
+  shape: 3
+  shape: 224
+  shape: 224
+}
+fetch_var {
+  name: "save_infer_model/scale_0.tmp_1"
+  alias_name: "prediction"
+  is_lod_tensor: true
+  fetch_type: 1
+  shape: -1
+}
+```
+### 3.2 服务部署和请求
+paddleserving目录包含了启动pipeline服务和发送预测请求的代码，包括：
+```shell
+__init__.py
+config.yml                 # 启动服务的配置文件
+pipeline_http_client.py    # http方式发送pipeline预测请求的脚本
+pipeline_rpc_client.py     # rpc方式发送pipeline预测请求的脚本
+classification_web_service.py    # 启动pipeline服务端的脚本
+```
+- 启动服务：
+```shell
+# 启动服务，运行日志保存在log.txt
+python3 classification_web_service.py &>log.txt &
+```
+成功启动服务后，log.txt中会打印类似如下日志
+![](../../../deploy/paddleserving/imgs/start_server.png)
+
+- 发送请求
+```shell
+# 发送服务请求
+python3 pipeline_http_client.py
+```
+成功运行后，模型预测的结果会打印在cmd窗口中，结果示例为：
+![](../../../deploy/paddleserving/imgs/results.png)
+
 
 * 更多的服务部署类型，如 `RPC预测服务` 等，可以参考 Serving 的 github 官网：[https://github.com/PaddlePaddle/Serving/tree/develop/python/examples/imagenet](https://github.com/PaddlePaddle/Serving/tree/develop/python/examples/imagenet)
