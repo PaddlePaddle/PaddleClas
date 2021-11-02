@@ -3,6 +3,7 @@
 - [Serving安装](#Serving安装)
 - [图像分类服务部署](#图像分类服务部署)
 - [图像识别服务部署](#图像识别服务部署)
+- [FAQ](#FAQ)
 
 <a name="简介"></a>
 ## 1. 简介
@@ -120,5 +121,15 @@ python3 pipeline_http_client.py
 
 <a name="图像识别服务部署"></a>
 ## 4.图像识别服务部署
+
+<a name="FAQ"></a>
+## 5.FAQ
+**Q1**： 发送请求后没有结果返回或者提示输出解码报错
+
+**A1**： 启动服务和发送请求时不要设置代理，可以在启动服务前和发送请求前关闭代理，关闭代理的命令是：
+```
+unset https_proxy
+unset http_proxy
+```
 
 更多的服务部署类型，如 `RPC预测服务` 等，可以参考 Serving 的 github 官网：[https://github.com/PaddlePaddle/Serving/tree/develop/python/examples/imagenet](https://github.com/PaddlePaddle/Serving/tree/develop/python/examples/imagenet)
