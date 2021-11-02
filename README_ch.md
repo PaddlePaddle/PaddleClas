@@ -18,11 +18,8 @@
 
 - PP-ShiTu轻量图像识别系统：集成了目标检测、特征学习、图像检索等模块，广泛适用于各类图像识别任务。
 cpu上200ms即可完成在10w+库的图像识别。
-详细介绍见[PP-ShiTu: A Practical Lightweight Image Recognition System](./docs/PP_ShiTu.pdf)
 
 - PP-LCNet轻量级CPU骨干网络：专门为CPU设备打造轻量级骨干网络，速度、精度均超越竞品。
-详细介绍见[PP-LCNet: A Lightweight CPU Convolutional Neural Network](https://arxiv.org/pdf/2109.15099.pdf),
-或者[PP-LCNet模型介绍](docs/zh_CN/models/PP-LCNet.md)。
 
 - 丰富的预训练模型库：提供了35个系列共164个ImageNet预训练模型，其中6个精选系列模型支持结构快速修改。
 
