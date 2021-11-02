@@ -36,18 +36,18 @@ pip install paddle-serving-server
 ## 3. 图像分类服务部署
 ### 3.1 模型转换
 使用PaddleServing做服务化部署时，需要将保存的inference模型转换为Serving模型。下面以经典的ResNet50_vd模型为例，介绍如何部署图像分类服务。
-- 1. 进入工作目录：
+- 进入工作目录：
 ```shell
 cd deploy/paddleserving
 ```
 
-- 2. 下载ResNet50_vd的inference模型
+- 下载ResNet50_vd的inference模型：
 ```shell
 # 下载并解压ResNet50_vd模型
 wget https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/ResNet50_vd_infer.tar && tar xf ResNet50_vd_infer.tar
 ```
 
-- 3. 用paddle_serving_client把下载的inference模型转换成易于Server部署的模型格式
+- 用paddle_serving_client把下载的inference模型转换成易于Server部署的模型格式：
 ```
 # 转换ResNet50_vd模型
 python3 -m paddle_serving_client.convert --dirname ./ResNet50_vd_infer/ \
@@ -67,8 +67,9 @@ ResNet50_vd推理模型转换完成后，会在当前文件夹多出`ResNet50_vd
   |- serving_client_conf.prototxt  
   |- serving_client_conf.stream.prototxt
 ```
-得到模型文件之后，需要修改serving_server_conf.prototxt中的alias名字： 将`feed_var`中的`alias_name`改为`image`, 将`fetch_var`中的`alias_name`改为`prediction`, 
-**备注**, Serving为了兼容不同模型的部署，提供了输入输出重命名的功能。这样，不同的模型在推理部署时，只需要修改配置文件的alias_name即可，无需修改代码，即可完成推理部署。
+得到模型文件之后，需要修改serving_server_conf.prototxt中的alias名字： 将`feed_var`中的`alias_name`改为`image`, 将`fetch_var`中的`alias_name`改为`prediction`
+
+**备注**:  Serving为了兼容不同模型的部署，提供了输入输出重命名的功能。这样，不同的模型在推理部署时，只需要修改配置文件的alias_name即可，无需修改代码即可完成推理部署。
 
 修改后的serving_server_conf.prototxt如下所示:
 ```
@@ -106,7 +107,7 @@ python3 classification_web_service.py &>log.txt &
 成功启动服务后，log.txt中会打印类似如下日志
 ![](../../../deploy/paddleserving/imgs/start_server.png)
 
-- 发送请求
+- 发送请求：
 ```shell
 # 发送服务请求
 python3 pipeline_http_client.py
