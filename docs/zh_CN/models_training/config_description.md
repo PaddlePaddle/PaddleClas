@@ -7,12 +7,35 @@
 本文档介绍了PaddleClas配置文件(`ppcls/configs/*.yaml`)中各参数的含义，以便您更快地自定义或修改超参数配置。
 
 
+
 ## 配置详解
 
+### 目录
+
+- [分类模型](#1)
+  - [1.1 全局配置(Global)](#1.1)
+  - [1.2 结构(Arch)](#1.2)
+  - [1.3 损失函数（Loss）](#1.3)
+  - [1.4 优化器(Optimizer)](#1.4)
+  - [1.5数据读取模块（DataLoader）](#1.5)
+      - [1.5.1 dataset](#1.5.1)
+      - [1.5.1 sampler](#1.5.2)
+      - [1.5.1 loader](#1.5.3)
+  - [1.6 评估指标（Metric）](#1.6)
+- [蒸馏模型](#2)
+  - [2.1 结构(Arch)](#2.1)
+  - [2.2 损失函数（Loss）](#2.2)
+  - [2.3 评估指标（Metric）](#2.3)
+- [识别模型](#3)
+  - [3.1 结构(Arch)](#3.1)
+  - [3.2 评估指标（Metric）](#3.2)
+  
+<a name="1"></a>
 ### 1.分类模型
 
 此处以`ResNet50_vd`在`ImageNet-1k`上的训练配置为例，详解各个参数的意义。[配置路径](../../../ppcls/configs/ImageNet/ResNet/ResNet50_vd.yaml)。
 
+<a name="1.1"></a>
 #### 1.1 全局配置(Global)
 
 | 参数名字 | 具体含义 | 默认值 | 可选值 |
@@ -34,6 +57,7 @@
 
 **注**：`pretrained_model`也可以填写存放预训练模型的http地址。
 
+<a name="1.2"></a>
 #### 1.2 结构(Arch)
 
 | 参数名字 | 具体含义 | 默认值 | 可选值 |
@@ -44,6 +68,7 @@
 
 **注**：此处的pretrained可以设置为`True`或者`False`，也可以设置权重的路径。另外当`Global.pretrained_model`也设置相应路径时，此处的`pretrained`失效。
 
+<a name="1.3"></a>
 #### 1.3 损失函数（Loss）
 
 | 参数名字 | 具体含义 | 默认值 | 可选值 |
@@ -52,7 +77,7 @@
 | CELoss.weight | CELoss的在整个Loss中的权重 | 1.0 | float |
 | CELoss.epsilon | CELoss中label_smooth的epsilon值 | 0.1 | float，0-1之间 |
 
-
+<a name="1.4"></a>
 #### 1.4 优化器(Optimizer)
 
 | 参数名字 | 具体含义 | 默认值 | 可选值 |
@@ -77,9 +102,10 @@
 
 添加方法及参数请查看[learning_rate.py](../../../ppcls/optimizer/learning_rate.py)。
 
-
+<a name="1.5"></a>
 #### 1.5数据读取模块（DataLoader）
 
+<a name="1.5.1"></a>
 ##### 1.5.1 dataset
 
 | 参数名字 | 具体含义 | 默认值 | 可选值 |
@@ -112,6 +138,7 @@ batch_transform_ops中参数的含义：
 |:---:|:---:|:---:|
 | MixupOperator | alpha | Mixup参数值，该值越大增强越强 |
 
+<a name="1.5.2"></a>
 ##### 1.5.2 sampler
 
 | 参数名字 | 具体含义 | 默认值 | 可选值 |
@@ -121,6 +148,7 @@ batch_transform_ops中参数的含义：
 | drop_last | 是否丢掉最后不够batch-size的数据 | False | bool |
 | shuffle | 数据是否做shuffle | True | bool |
 
+<a name="1.5.3"></a>
 ##### 1.5.3 loader
 
 | 参数名字 | 具体含义 | 默认值 | 可选值 |
@@ -128,13 +156,14 @@ batch_transform_ops中参数的含义：
 | num_workers | 数据读取线程数 | 4 | int |
 | use_shared_memory | 是否使用共享内存 | True | bool |
 
-
+<a name="1.6"></a>
 #### 1.6 评估指标（Metric）
 
 | 参数名字 | 具体含义 | 默认值 | 可选值 |
 |:---:|:---:|:---:|:---:|
 | TopkAcc | TopkAcc | [1, 5] | list, int |
 
+<a name="1.7"></a>
 #### 1.7 预测（Infer）
 
 | 参数名字 | 具体含义 | 默认值 | 可选值 |
@@ -147,11 +176,12 @@ batch_transform_ops中参数的含义：
 
 **注**：Infer模块的`transforms`的解释参考数据读取模块中的dataset中`transform_ops`的解释。
 
-
+<a name="2"></a>
 ### 2.蒸馏模型
 
 **注**：此处以`MobileNetV3_large_x1_0`在`ImageNet-1k`上蒸馏`MobileNetV3_small_x1_0`的训练配置为例，详解各个参数的意义。[配置路径](../../../ppcls/configs/ImageNet/Distillation/mv3_large_x1_0_distill_mv3_small_x1_0.yaml)。这里只介绍与分类模型有区别的参数。
 
+<a name="2.1"></a>
 #### 2.1 结构（Arch）
 
 | 参数名字 | 具体含义 | 默认值 | 可选值 |
@@ -175,6 +205,7 @@ batch_transform_ops中参数的含义：
 ```
 2.Student的参数情况类似，不再赘述。
 
+<a name="2.2"></a>
 #### 2.2 损失函数（Loss）
 
 | 参数名字 | 具体含义 | 默认值 | 可选值 |
@@ -186,7 +217,7 @@ batch_transform_ops中参数的含义：
 | DistillationGTCELos.weight | Loss权重 | 1.0 | float |
 | DistillationCELoss.model_names | 与真实label作交叉熵的模型名字 | ["Student"] | —— |
 
-
+<a name="2.3"></a>
 #### 2.3 评估指标（Metric）
 
 | 参数名字 | 具体含义 | 默认值 | 可选值 |
@@ -197,10 +228,12 @@ batch_transform_ops中参数的含义：
 
 **注**：`DistillationTopkAcc`与普通`TopkAcc`含义相同，只是只用在蒸馏任务中。
 
+<a name="3"></a>
 ### 3. 识别模型
 
 **注**：此处以`ResNet50`在`LogoDet-3k`上的训练配置为例，详解各个参数的意义。[配置路径](../../../ppcls/configs/Logo/ResNet50_ReID.yaml)。这里只介绍与分类模型有区别的参数。
 
+<a name="3.1"></a>
 #### 3.1 结构(Arch)
 
 |     参数名字      |         具体含义          |   默认值   |                            可选值                            |
@@ -228,6 +261,7 @@ batch_transform_ops中参数的含义：
 
 3.调用`tools/export_model.py`会将模型的权重转为inference model，其中`infer_add_softmax`参数会控制是否在其后增加`Softmax`激活函数，代码中默认为`True`(分类任务中最后的输出层会接`Softmax`激活函数)，识别任务中特征层无须接激活函数，此处要设置为`False`。
 
+<a name="3.2"></a>
 #### 3.2 评估指标（Metric）
 
 | 参数名字 | 具体含义 | 默认值 | 可选值 |

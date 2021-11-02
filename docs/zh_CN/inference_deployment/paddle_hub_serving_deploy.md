@@ -1,9 +1,23 @@
 # 基于PaddleHub Serving的服务部署
 
-PaddleClas 支持通过 PaddleHub 快速进行服务化部署。
+PaddleClas 支持通过 PaddleHub 快速进行服务化部署。目前支持图像分类的部署，图像识别的部署敬请期待。
 
 ---
 
+
+## 目录
+- [简介](#1)
+- [准备环境](#2)
+- [下载推理模型](#3)
+- [安装服务模块](#4)
+- [启动服务](#5)
+    - [5.1命令行命令启动](#5.1)
+    - [5.2 配置文件启动](#5.2)
+- [发送预测请求](#6)
+- [自定义修改服务模块](#7)
+    
+   
+<a name="1"></a>
 ## 1. 简介
 
 hubserving 服务部署配置服务包 `clas` 下包含 3 个必选文件，目录如下：
@@ -16,12 +30,16 @@ hubserving/clas/
   └─  params.py      参数文件，必选，包含模型路径、前后处理参数等参数
 ```
 
+
+<a name="2"></a>
 ## 2. 准备环境
 ```shell
 # 安装paddlehub,请安装2.0版本
 pip3 install paddlehub==2.1.0 --upgrade -i https://pypi.tuna.tsinghua.edu.cn/simple
 ```
 
+
+<a name="3"></a>
 ## 3. 下载推理模型
 
 安装服务模块前，需要准备推理模型并放到正确路径，默认模型路径为：
@@ -39,6 +57,8 @@ pip3 install paddlehub==2.1.0 --upgrade -i https://pypi.tuna.tsinghua.edu.cn/sim
   * 模型文件（包括 `.pdmodel` 与 `.pdiparams`）名称必须为`inference`。
   * 我们也提供了大量基于ImageNet-1k数据集的预训练模型，模型列表及下载地址详见[模型库概览](../models/models_intro.md)，也可以使用自己训练转换好的模型。
 
+
+<a name="4"></a>
 ## 4. 安装服务模块
 
 针对 Linux 环境和 Windows 环境，安装命令如下。
@@ -58,8 +78,12 @@ cd PaddleClas\deploy
 hub install hubserving\clas\
 ```
 
+
+<a name="5"></a>
 ## 5. 启动服务
 
+
+<a name="5.1"></a>
 ### 5.1 命令行命令启动
 
 该方式仅支持使用 CPU 预测。启动命令：
@@ -83,6 +107,8 @@ $ hub serving start --modules Module1==Version1 \
 
 这样就完成了一个服务化 API 的部署，使用默认端口号 8866。
 
+
+<a name="5.2"></a>
 ### 5.2 配置文件启动
 
 该方式仅支持使用 CPU 或 GPU 预测。启动命令：
@@ -130,6 +156,7 @@ export CUDA_VISIBLE_DEVICES=3
 hub serving start -c hubserving/clas/config.json
 ```
 
+<a name="6"></a>
 ## 6. 发送预测请求
 
 配置好服务端后，可使用以下命令发送预测请求，获取预测结果：
@@ -167,6 +194,8 @@ list: 返回结果
    └─ float: 该图分类耗时，单位秒
 ```
 
+
+<a name="7"></a>
 ## 7. 自定义修改服务模块
 
 如果需要修改服务逻辑，需要进行以下操作：  
