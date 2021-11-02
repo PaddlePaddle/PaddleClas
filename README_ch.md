@@ -8,10 +8,11 @@
 
 **近期更新**
 
-- 2021.10.31 发布[PP-ShiTu技术报告](./docs/PP_ShiTu.pdf)，优化文档，新增饮料识别demo
-- 2021.10.23 发布PP-ShiTu图像识别系统，新增轻量级检测、特征提取模型，速度提升800%，新增DeepHash模块，检索模块切换为faiss，支持PaddleServing和PaddleSlim。
+- 2021.10.31 发布[PP-ShiTu技术报告](./docs/PP_ShiTu.pdf)，新增饮料识别demo
+- 2021.10.23 发布轻量级图像识别系统PP-ShiTu，cpu上200ms即可完成在10w+库的图像识别。
 [点击这里](./docs/zh_CN/quick_start/quick_start_recognition.md)立即体验
-- 2021.09.17 增加PaddleClas自研PP-LCNet系列模型, 这些模型在Intel CPU上有较强的竞争力。PP-LCNet的介绍可以参考[论文](https://arxiv.org/pdf/2109.15099.pdf), 或者[PP-LCNet模型介绍](docs/zh_CN/models/PP-LCNet.md)，相关指标和预训练权重可以从 [这里](docs/zh_CN/ImageNet_models_cn.md)下载。
+- 2021.09.17 发布PP-LCNet系列超轻量骨干网络模型, 在Intel CPU上有较强的竞争力，在同样精度的情况下，速度远超当前所有的骨干网络，有两倍优势。[image](https://user-images.githubusercontent.com/10047064/139783232-d85fded5-f19c-4abd-95bb-b590ec5daa68.png)
+。PP-LCNet的介绍可以参考[论文](https://arxiv.org/pdf/2109.15099.pdf), 或者[PP-LCNet模型介绍](docs/zh_CN/models/PP-LCNet.md)，相关指标和预训练权重可以从 [这里](docs/zh_CN/ImageNet_models_cn.md)下载。
 - [more](./docs/zh_CN/others/update_history.md)
 
 ## 特性
