@@ -8,10 +8,10 @@
 
 **近期更新**
 
-- 2021.10.31 发布[PP-ShiTu技术报告](./docs/PP_ShiTu.pdf)，新增饮料识别demo
-- 2021.10.23 发布轻量级图像识别系统PP-ShiTu，cpu上0.2s即可完成在10w+库的图像识别。
+- 2021.11.1 发布[PP-ShiTu技术报告](https://arxiv.org/pdf/2111.00775.pdf)，新增饮料识别demo
+- 2021.10.23 发布轻量级图像识别系统PP-ShiTu，CPU上0.2s即可完成在10w+库的图像识别。
 [点击这里](./docs/zh_CN/quick_start/quick_start_recognition.md)立即体验
-- 2021.09.17 发布PP-LCNet系列超轻量骨干网络模型, 在Intel CPU上，单张图像预测速度约5ms，ImageNet-1K数据集上Top1识别准确率达到80.82%，超越ResNet152的模型效果。PP-LCNet的介绍可以参考[论文](https://arxiv.org/pdf/2109.15099.pdf), 或者[PP-LCNet模型介绍](docs/zh_CN/models/PP-LCNet.md)，相关指标和预训练权重可以从 [这里](docs/zh_CN/ImageNet_models_cn.md)下载。
+- 2021.09.17 发布PP-LCNet系列超轻量骨干网络模型, 在Intel CPU上，单张图像预测速度约5ms，ImageNet-1K数据集上Top1识别准确率达到80.82%，超越ResNet152的模型效果。PP-LCNet的介绍可以参考[论文](https://arxiv.org/pdf/2109.15099.pdf), 或者[PP-LCNet模型介绍](docs/zh_CN/models/PP-LCNet.md)，相关指标和预训练权重可以从 [这里](docs/zh_CN/algorithm_introduction/ImageNet_models.md)下载。
 - [more](./docs/zh_CN/others/update_history.md)
 
 ## 特性
@@ -20,7 +20,7 @@
 
 - PP-LCNet轻量级CPU骨干网络：专门为CPU设备打造轻量级骨干网络，速度、精度均远超竞品。
 
-- 丰富的预训练模型库：提供了35个系列共164个ImageNet预训练模型，其中6个精选系列模型支持结构快速修改。
+- 丰富的预训练模型库：提供了36个系列共175个ImageNet预训练模型，其中7个精选系列模型支持结构快速修改。
 
 - 全面易用的特征学习组件：集成arcmargin, triplet loss等12度量学习方法，通过配置文件即可随意组合切换。
 
@@ -54,9 +54,7 @@ PP-ShiTu图像识别快速体验：[点击这里](./docs/zh_CN/quick_start/quick
     - [尝鲜版](./docs/zh_CN/quick_start/quick_start_classification_new_user.md)
     - [进阶版](./docs/zh_CN/quick_start/quick_start_classification_professional.md) 
 - [PP-ShiTu图像识别系统介绍](#图像识别系统介绍)
-  - [主体检测](./docs/zh_CN/algorithm_introduction/mainbody_detection.md)
-  - [特征学习](./docs/zh_CN/algorithm_introduction/metric_learning.md)
-  - [向量检索](./deploy/vector_search/README.md)
+- [骨干网络和预训练模型库](./docs/zh_CN/algorithm_introduction/ImageNet_models.md)
 - 数据准备
   - [图像分类数据集介绍](./docs/zh_CN/data_preparation/classification_dataset.md)
   - [图像识别数据集介绍](./docs/zh_CN/data_preparation/recognition_dataset.md)
@@ -78,7 +76,6 @@ PP-ShiTu图像识别快速体验：[点击这里](./docs/zh_CN/quick_start/quick
 - 算法介绍
     - [图像分类任务介绍](./docs/zh_CN/algorithm_introduction/image_classification.md)
     - [度量学习介绍](./docs/zh_CN/algorithm_introduction/metric_learning.md)
-    - [骨干网络和预训练模型库](./docs/zh_CN/algorithm_introduction/ImageNet_models.md)
 - 高阶使用
     - [数据增广](./docs/zh_CN/advanced_tutorials/DataAugmentation.md)
     - [模型量化](./docs/zh_CN/advanced_tutorials/model_prune_quantization.md)
@@ -87,7 +84,7 @@ PP-ShiTu图像识别快速体验：[点击这里](./docs/zh_CN/quick_start/quick
     - [社区贡献指南](./docs/zh_CN/advanced_tutorials/how_to_contribute.md)
 - FAQ
     - [图像识别精选问题](docs/zh_CN/faq_series/faq_2021_s2.md)
-    - [图像分类精选问题](docs/zh_CN/faq_series/faq.md)
+    - [图像分类精选问题](docs/zh_CN/faq_series/faq_selected_30.md)
     - [图像分类FAQ第一季](docs/zh_CN/faq_series/faq_2020_s1.md)
     - [图像分类FAQ第二季](docs/zh_CN/faq_series/faq_2021_s1.md)
 - [许可证书](#许可证书)
@@ -100,9 +97,7 @@ PP-ShiTu图像识别快速体验：[点击这里](./docs/zh_CN/quick_start/quick
 <img src="./docs/images/structure.jpg"  width = "800" />
 </div>
 
-PP-ShiTu图像识别系统分为三步：（1）通过一个目标检测模型，检测图像物体候选区域（2）对每个候选区域进行特征提取（3）与检索库中图像进行特征匹配，提取识别结果。
-
-对于新的未知类别，无需重新训练模型，只需要在检索库补入该类别图像，重新建立检索库，就可以识别该类别。
+PP-ShiTu是一个实用的轻量级通用图像识别系统，主要由主体检测、特征学习和向量检索三个模块组成。该系统从骨干网络选择和调整、损失函数的选择、数据增强、学习率变换策略、正则化参数选择、预训练模型使用以及模型裁剪量化8个方面，采用多种策略，对各个模块的模型进行优化，最终得到在CPU上仅0.2s即可完成10w+库的图像识别的系统。更多细节请参考[PP-ShiTu技术方案](https://arxiv.org/pdf/2111.00775.pdf)。
 
 
 <a name="识别效果展示"></a>
@@ -148,4 +143,3 @@ PP-ShiTu图像识别系统分为三步：（1）通过一个目标检测模型�
 - 非常感谢[nblib](https://github.com/nblib)修正了PaddleClas中RandErasing的数据增广配置文件。
 - 非常感谢[chenpy228](https://github.com/chenpy228)修正了PaddleClas文档中的部分错别字。
 - 非常感谢[jm12138](https://github.com/jm12138)为PaddleClas添加ViT，DeiT系列模型和RepVGG系列模型。
-- 非常感谢[FutureSI](https://aistudio.baidu.com/aistudio/personalcenter/thirdview/76563)对PaddleClas代码的解析与总结。
