@@ -201,12 +201,15 @@ recognition_web_service.py    # 启动pipeline服务端的脚本
 python3 recognition_web_service.py &>log.txt &
 ```
 成功启动服务后，log.txt中会打印类似如下日志
-![](../../../deploy/paddleserving/imgs/start_server_recog.png)
+![](../../../deploy/paddleserving/imgs/start_server_recog_shitu.png)
 
 - 发送请求：
 ```
 python3 pipeline_http_client.py
 ```
+成功运行后，模型预测的结果会打印在cmd窗口中，结果示例为：
+![](../../../deploy/paddleserving/imgs/results_shitu.png)
+
 <a name="FAQ"></a>
 ## 5.FAQ
 **Q1**： 发送请求后没有结果返回或者提示输出解码报错
