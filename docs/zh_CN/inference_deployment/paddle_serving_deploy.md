@@ -123,13 +123,14 @@ python3 pipeline_http_client.py
 ## 4.图像识别服务部署
 使用PaddleServing做服务化部署时，需要将保存的inference模型转换为serving易于部署的模型。 下面以PP-ShiTu中的超轻量商品识别模型为例，介绍图像识别服务的部署。
 ## 4.1 模型转换
-- 下载检测inference模型和商品识别inference模型
+- 下载通用检测inference模型和商品识别inference模型
 ```
 cd deploy
 # 下载并解压商品识别模型
 wget -P models/ https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/inference/general_PPLCNet_x2_5_lite_v1.0_infer.tar
 cd models
 tar -xf general_PPLCNet_x2_5_lite_v1.0_infer.tar
+# 下载并解压通用检测模型
 wget https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/inference/picodet_PPLCNet_x2_5_mainbody_lite_v1.0_infer.tar
 tar -xf picodet_PPLCNet_x2_5_mainbody_lite_v1.0_infer.tar
 ```
@@ -199,14 +200,14 @@ recognition_web_service.py    # 启动pipeline服务端的脚本
 python3 recognition_web_service.py &>log.txt &
 ```
 成功启动服务后，log.txt中会打印类似如下日志
-![](../../../deploy/paddleserving/recognition/imgs/start_server_recog.png)
+![](../../../deploy/paddleserving/imgs/start_server_recog.png)
 
 - 发送请求：
 ```
 python3 pipeline_http_client.py
 ```
 成功运行后，模型预测的结果会打印在cmd窗口中，结果示例为：
-![](../../../deploy/paddleserving/recognition/imgs/results_recog.png)
+![](../../../deploy/paddleserving/imgs/results_recog.png)
 
 <a name="FAQ"></a>
 ## 5.FAQ
