@@ -45,13 +45,11 @@ pip install paddle-serving-server
 ```shell
 cd deploy/paddleserving
 ```
-
 - 下载ResNet50_vd的inference模型：
 ```shell
 # 下载并解压ResNet50_vd模型
 wget https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/ResNet50_vd_infer.tar && tar xf ResNet50_vd_infer.tar
 ```
-
 - 用paddle_serving_client把下载的inference模型转换成易于Server部署的模型格式：
 ```
 # 转换ResNet50_vd模型
@@ -75,7 +73,6 @@ ResNet50_vd推理模型转换完成后，会在当前文件夹多出`ResNet50_vd
 得到模型文件之后，需要修改serving_server_conf.prototxt中的alias名字： 将`feed_var`中的`alias_name`改为`image`, 将`fetch_var`中的`alias_name`改为`prediction`
 
 **备注**:  Serving为了兼容不同模型的部署，提供了输入输出重命名的功能。这样，不同的模型在推理部署时，只需要修改配置文件的alias_name即可，无需修改代码即可完成推理部署。
-
 修改后的serving_server_conf.prototxt如下所示:
 ```
 feed_var {
@@ -104,6 +101,7 @@ pipeline_http_client.py    # http方式发送pipeline预测请求的脚本
 pipeline_rpc_client.py     # rpc方式发送pipeline预测请求的脚本
 classification_web_service.py    # 启动pipeline服务端的脚本
 ```
+
 - 启动服务：
 ```shell
 # 启动服务，运行日志保存在log.txt
@@ -111,6 +109,7 @@ python3 classification_web_service.py &>log.txt &
 ```
 成功启动服务后，log.txt中会打印类似如下日志
 ![](../../../deploy/paddleserving/imgs/start_server.png)
+
 - 发送请求：
 ```shell
 # 发送服务请求
@@ -122,4 +121,4 @@ python3 pipeline_http_client.py
 <a name="图像识别服务部署"></a>
 ## 4.图像识别服务部署
 
-* 更多的服务部署类型，如 `RPC预测服务` 等，可以参考 Serving 的 github 官网：[https://github.com/PaddlePaddle/Serving/tree/develop/python/examples/imagenet](https://github.com/PaddlePaddle/Serving/tree/develop/python/examples/imagenet)
+更多的服务部署类型，如 `RPC预测服务` 等，可以参考 Serving 的 github 官网：[https://github.com/PaddlePaddle/Serving/tree/develop/python/examples/imagenet](https://github.com/PaddlePaddle/Serving/tree/develop/python/examples/imagenet)
