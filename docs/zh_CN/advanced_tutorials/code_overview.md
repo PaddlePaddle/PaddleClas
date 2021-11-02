@@ -1,9 +1,20 @@
 # PaddleClas代码解析
 
-## 1. 整体代码结构解析
+## 目录
 
+- [整体代码和目录概览](#1)
+- [训练模块定义](#2)
+    - [2.1 数据](#2.1)
+    - [2.2 模型结构](#2.2)
+    - [2.3 损失函数](#2.3)
+    - [2.4 优化器和学习率衰减、权重衰减策略](#2.4)
+    - [2.5 训练时评估](#2.5)
+    - [2.6 模型存储](#2.6)
+    - [2.7 模型裁剪与量化](#2.7)
+- [预测部署代码和方式](#3)
 
-### 1.1 整体代码和目录概览
+<a name="1"></a>
+## 一、整体代码和目录概览
 
 PaddleClas主要代码和目录结构如下
 
@@ -15,11 +26,15 @@ PaddleClas主要代码和目录结构如下
 * requirements.txt 文件用于安装 PaddleClas 的依赖项。使用pip进行升级安装使用。
 * tests：PaddleClas模型从训练到预测的全链路测试，验证各功能是否能够正常使用。
 
-### 1.2 训练模块定义
+<a name="2"></a>
+## 二、训练模块定义
 
-深度学习模型训练过程中，主要包含以下几个核心模块。
+深度学习模型训练过程中，主要包含数据、模型结构、损失函数、优化器和学习率衰减、权重衰减策略等，以下一一解读。
 
-* 数据：对于有监督任务来说，训练数据一般包含原始数据及其标注。在基于单标签的图像分类任务中，原始数据指的是图像数据，而标注则是该图像数据所属的类比。PaddleClas中，训练时需要提供标签文件，形式如下，每一行包含一条训练样本，分别表示图片路径和类别标签，用分隔符隔开（默认为空格）。
+<a name="2.1"></a>
+## 2.1 数据
+
+对于有监督任务来说，训练数据一般包含原始数据及其标注。在基于单标签的图像分类任务中，原始数据指的是图像数据，而标注则是该图像数据所属的类比。PaddleClas中，训练时需要提供标签文件，形式如下，每一行包含一条训练样本，分别表示图片路径和类别标签，用分隔符隔开（默认为空格）。
 
 ```
 train/n01440764/n01440764_10026.JPEG 0
@@ -58,7 +73,8 @@ PaddleClas 中也包含了 `AutoAugment`, `RandAugment` 等数据增广方法，
 
 图像分类中，数据后处理主要为 `argmax` 操作，在此不再赘述。
 
-* 模型结构
+<a name="2.2"></a>
+## 2.2 模型结构
 
 在配置文件中，模型结构定义如下
 
@@ -83,7 +99,8 @@ def build_model(config):
     return arch
 ```
 
-* 损失函数
+<a name="2.3"></a>
+## 2.3 损失函数
 
 PaddleClas中，包含了 `CELoss` , `JSDivLoss`, `TripletLoss`, `CenterLoss` 等损失函数，均定义在 `ppcls/loss` 中。
 
@@ -107,7 +124,8 @@ Loss:
         margin: 0.5
 ```
 
-* 优化器和学习率衰减、权重衰减策略
+<a name="2.4"></a>
+## 2.4 优化器和学习率衰减、权重衰减策略
 
 图像分类任务中，`Momentum` 是一种比较常用的优化器， PaddleClas 中提供了 `Momentum` 、 `RMSProp`、`Adam`及`AdamW`等几种优化器策略。
 
@@ -164,8 +182,8 @@ def build_optimizer(config, epochs, step_each_epoch, parameters):
 
  不同优化器和权重衰减策略均以类的形式实现，具体实现可以参考文件 `ppcls/optimizer/optimizer.py` ；不同的学习率衰减策略可以参考文件 `ppcls/optimizer/learning_rate.py` 。
 
-
-* 训练时评估与模型存储
+<a name="2.5"></a>
+## 2.5 训练时评估
 
 模型在训练的时候，可以设置模型保存的间隔，也可以选择每隔若干个epoch对验证集进行评估，从而可以保存在验证集上精度最佳的模型。配置文件中，可以通过下面的字段进行配置。
 
@@ -176,6 +194,8 @@ Global:
   eval_interval: 1 # 评估的epoch间隔
 ```
 
+<a name="2.6"></a>
+## 2.6 模型存储
 模型存储是通过 Paddle 框架的 `paddle.save()` 函数实现的，存储的是模型的动态图版本，以字典的形式存储，便于继续训练。具体实现如下
 
 ```python
@@ -196,7 +216,10 @@ def save_model(program, model_path, epoch_id, prefix='ppcls'):
 
 如果想对模型进行压缩训练，则通过下面字段进行配置
 
-模型裁剪：
+<a name="2.7"></a>
+## 2.7 模型裁剪与量化
+
+1.模型裁剪：
 
 ```yaml
 Slim:
@@ -205,7 +228,7 @@ Slim:
     pruned_ratio: 0.3
 ```
 
-模型量化：
+2.模型量化：
 
 ```yaml
 Slim:
@@ -215,9 +238,12 @@ Slim:
 
 训练方法详见模型[裁剪量化使用介绍](../advanced_tutorials/model_prune_quantization.md)， 算法介绍详见[裁剪量化算法介绍](../algorithm_introduction/model_prune_quantization.md)。
 
-### 1.3 预测部署代码和方式
+<a name="3"></a>
+## 三、预测部署代码和方式
 
-* 如果希望在服务端使用 cpp 进行部署，可以参考 [cpp inference 预测教程](../../../deploy/cpp_infer/readme.md) 。
-* 如果希望将分类模型部署为服务，可以参考 [hub serving 预测部署教程](../../../deploy/hubserving/readme.md) 。
 * 如果希望将对分类模型进行离线量化，可以参考 [模型量化裁剪教程](../advanced_tutorials/model_prune_quantization.md) 中离线量化部分。
-* 如果希望在移动端使用分类模型进行预测，可以参考 [PaddleLite 预测部署教程](../../../deploy/lite/readme.md) 。
+* 如果希望在服务端使用 python 进行部署，可以参考 [python inference 预测教程](../inference_deployment/python_deploy.md) 。
+* 如果希望在服务端使用 cpp 进行部署，可以参考 [cpp inference 预测教程](../inference_deployment/cpp_deploy.md) 。
+* 如果希望将分类模型部署为服务，可以参考 [hub serving 预测部署教程](../inference_deployment/paddle_hub_serving_deploy.md) 。
+* 如果希望在移动端使用分类模型进行预测，可以参考 [PaddleLite 预测部署教程](../inference_deployment/paddle_lite_deploy.md) 。
+* 如果希望使用whl包对分类模型进行预测，可以参考 [whl包预测](./docs/zh_CN/inference_deployment/whl_deploy.md) 。

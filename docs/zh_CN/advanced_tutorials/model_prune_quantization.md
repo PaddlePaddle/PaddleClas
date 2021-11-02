@@ -1,5 +1,6 @@
 
-## 模型量化、裁剪使用介绍
+# 模型量化、裁剪使用介绍
+
 复杂的模型有利于提高模型的性能，但也导致模型中存在一定冗余。此部分提供精简模型的功能，包括两部分：模型量化（量化训练、离线量化）、模型剪枝。
 
 其中模型量化将全精度缩减到定点数减少这种冗余，达到减少模型计算复杂度，提高模型推理性能的目的。
@@ -12,8 +13,23 @@
 
 在开始本教程之前，建议先了解[PaddleClas模型的训练方法](../models_training/classification.md)以及[PaddleSlim](https://paddleslim.readthedocs.io/zh_CN/latest/index.html)，相关裁剪、量化方法可以参考[模型裁剪量化算法介绍文档](../algorithm_introduction/model_prune_quantization.md)。
 
+## 目录
 
-## 快速开始
+- [准备环境](#1)
+    - [1.1 安装PaddleSlim](#1.1)
+    - [1.2 准备训练好的模型](#1.2)
+- [快速开始](#2)
+    - [2.1 模型量化](#2.1)
+        - [2.1.1 在线量化训练](2.1.1)
+        - [2.1.2 离线量化](2.1.2)
+    - [2.2 模型剪枝](#2.2)
+- [导出模型](#3) 
+- [模型部署](#4) 
+- [训练超参数建议](#5) 
+
+
+<a name="1"></a>
+## 一、准备环境
 当训练出一个模型后，如果希望进一步的压缩模型大小并加速预测，可使用量化或者剪枝的方法压缩模型。
 
 模型压缩主要包括五个步骤：
@@ -23,7 +39,8 @@
 4. 导出量化推理模型
 5. 量化模型预测部署
 
-### 1. 安装PaddleSlim
+<a name="1.1"></a>
+### 1.1 安装PaddleSlim
 
 * 可以通过pip install的方式进行安装。
 
@@ -39,11 +56,13 @@ cd Paddleslim
 python3.7 setup.py install
 ```
 
-### 2. 准备训练好的模型
+<a name="1.2"></a>
+### 1.2 准备训练好的模型
 
 PaddleClas提供了一系列训练好的[模型](../models/models_intro.md)，如果待量化的模型不在列表中，需要按照[常规训练](../models_training/classification.md)方法得到训练好的模型。
 
-### 3. 模型裁剪、量化
+<a name="2"></a>
+## 二、 快速开始
 
 进入PaddleClas根目录
 
@@ -53,11 +72,13 @@ cd PaddleClas
 
 `slim`训练相关代码已经集成到`ppcls/engine/`下，离线量化代码位于`deploy/slim/quant_post_static.py`。
 
-#### 3.1 模型量化
+<a name="2.1"></a>
+### 2.1 模型量化
 
 量化训练包括离线量化训练和在线量化训练，在线量化训练效果更好，需加载预训练模型，在定义好量化策略后即可对模型进行量化。
 
-##### 3.1.1 在线量化训练
+<a name="2.1.1"></a>
+#### 2.1.1 在线量化训练
 
 训练指令如下：
 
@@ -82,7 +103,8 @@ python3.7 -m paddle.distributed.launch \
       -c ppcls/configs/slim/ResNet50_vd_quantization.yaml
 ```
 
-##### 3.1.2 离线量化
+<a name="2.1.2"></a>
+#### 2.1.2 离线量化
 
 **注意**：目前离线量化，必须使用已经训练好的模型，导出的`inference model`进行量化。一般模型导出`inference model`可参考[教程](../inference_deployment/export_model.md).
 
@@ -98,7 +120,8 @@ python3.7 deploy/slim/quant_post_static.py -c ppcls/configs/ImageNet/ResNet/ResN
 
 执行成功后，在`Global.save_inference_dir`的目录下，生成`quant_post_static_model`文件夹，其中存储生成的离线量化模型，其可以直接进行预测部署，无需再重新导出模型。
 
-#### 3.2 模型剪枝
+<a name="2.2"></a>
+### 2.2 模型剪枝
 
 训练指令如下：
 
@@ -120,7 +143,8 @@ python3.7 -m paddle.distributed.launch \
       -c ppcls/configs/slim/ResNet50_vd_prune.yaml
 ```
 
-### 4. 导出模型
+<a name="3"></a>
+## 三、导出模型
 
 在得到在线量化训练、模型剪枝保存的模型后，可以将其导出为inference model，用于预测部署，以模型剪枝为例：
 
@@ -131,16 +155,16 @@ python3.7 tools/export.py \
     -o Global.save_inference_dir=./inference
 ```
 
+<a name="4"></a>
+## 四、模型部署
 
-### 5. 模型部署
-
-上述步骤导出的模型可以直接使用inferecne 进行部署，参考[inference部署](../inference_deployment/)。
+上述步骤导出的模型可以直接使用inferecne进行部署，参考[inference部署](../inference_deployment/)。
 
 也通过PaddleLite的opt模型转换工具，完成inference模型到移动端模型转换，用于移动端的模型部署。
-移动端模型部署的可参考 [移动端模型部署](../../../deploy/lite/readme.md)
+移动端模型部署的可参考 [移动端模型部署](../inference_deployment/paddle_lite_deploy.md)。
 
-
-## 训练超参数建议
+<a name="5"></a>
+## 五、训练超参数建议
 
 * 量化、裁剪训练时，建议加载常规训练得到的预训练模型，加速量化训练收敛。
 * 量化训练时，建议初始学习率修改为常规训练的`1/20~1/10`，同时将训练epoch数修改为常规训练的`1/5~1/2`，学习率策略方面，加上Warmup，其他配置信息不建议修改。

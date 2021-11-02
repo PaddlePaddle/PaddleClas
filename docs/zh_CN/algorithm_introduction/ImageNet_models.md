@@ -3,10 +3,38 @@
 
 ## ImageNet预训练模型库
 
+### 目录
+
+- [模型库概览图](#模型库概览图)
+- [SSLD知识蒸馏预训练模型](#模型库概览图)
+    - [服务器端知识蒸馏模型](#服务器端知识蒸馏模型)
+    - [移动端知识蒸馏模型](#移动端知识蒸馏模型)
+    - [Intel CPU端知识蒸馏模型](#Intel-CPU端知识蒸馏模型)
+- [PP-LCNet系列](#PP-LCNet系列)
+- [ResNet系列](#ResNet系列)
+- [移动端系列](#移动端系列)
+- [SEResNeXt与Res2Net系列](#SEResNeXt与Res2Net系列)
+- [DPN与DenseNet系列](#DPN与DenseNet系列)
+- [HRNet系列](#HRNet系列)
+- [Inception系列](#Inception系列)
+- [EfficientNet与ResNeXt101_wsl系列](#EfficientNet与ResNeXt101_wsl系列)
+- [ResNeSt与RegNet系列](#ResNeSt与RegNet系列)
+- [ViT_and_DeiT系列](#ViT_and_DeiT系列)
+- [RepVGG系列](#RepVGG系列)
+- [MixNet系列](#MixNet系列)
+- [SwinTransformer系列](#SwinTransformer系列)
+- [LeViT系列](#LeViT系列)
+- [HarDNet系列](#HarDNet系列)
+- [DLA系列](#DLA系列)
+- [RedNet系列](#RedNet系列)
+- [TNT系列](#TNT系列)
+- [其他模型](#其他模型)
+
+
 <a name="模型库概览图"></a>
 ### 模型库概览图
 
-基于ImageNet1k分类数据集，PaddleClas支持35个系列分类网络结构以及对应的164个图像分类预训练模型，训练技巧、每个系列网络结构的简单介绍和性能评估将在相应章节展现，下面所有的速度指标评估环境如下：
+基于ImageNet1k分类数据集，PaddleClas支持36个系列分类网络结构以及对应的175个图像分类预训练模型，训练技巧、每个系列网络结构的简单介绍和性能评估将在相应章节展现，下面所有的速度指标评估环境如下：
 * Arm CPU的评估环境基于骁龙855（SD855）。
 * Intel CPU的评估环境基于Intel(R) Xeon(R) Gold 6148。
 * GPU评估环境基于T4机器，在FP32+TensorRT配置下运行500次测得（去除前10次的warmup时间）。
@@ -27,7 +55,8 @@
 ### SSLD知识蒸馏预训练模型
 基于SSLD知识蒸馏的预训练模型列表如下所示，更多关于SSLD知识蒸馏方案的介绍可以参考：[SSLD知识蒸馏文档](./knowledge_distillation.md)。
 
-* 服务器端知识蒸馏模型
+<a name="服务器端知识蒸馏模型"></a>
+#### 服务器端知识蒸馏模型
 
 | 模型                  | Top-1 Acc | Reference<br>Top-1 Acc | Acc gain | time(ms)<br>bs=1 | time(ms)<br>bs=4 | Flops(G) | Params(M) | 下载地址                                                                                         |
 |---------------------|-----------|-----------|---------------|----------------|-----------|----------|-----------|-----------------------------------|
@@ -41,8 +70,8 @@
 | HRNet_W48_C_ssld | 0.836    | 0.790   | 0.046  | 13.707         | 34.435         | 34.58    | 77.47     | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/HRNet_W48_C_ssld_pretrained.pdparams) |
 | SE_HRNet_W64_C_ssld | 0.848    |  -    |  - |  31.697      |     94.995      | 57.83    | 128.97    | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/SE_HRNet_W64_C_ssld_pretrained.pdparams) |
 
-
-* 移动端知识蒸馏模型
+<a name="移动端知识蒸馏模型"></a>
+#### 移动端知识蒸馏模型
 
 | 模型                  | Top-1 Acc | Reference<br>Top-1 Acc | Acc gain | SD855 time(ms)<br>bs=1 | Flops(G) | Params(M) | 模型大小(M) | 下载地址   |
 |---------------------|-----------|-----------|---------------|----------------|-----------|----------|-----------|-----------------------------------|
@@ -53,8 +82,8 @@
 | MobileNetV3_small_x1_0_ssld      | 0.713    | 0.682  |  0.031  | 6.546                 | 0.123    | 2.94      | 12      | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/MobileNetV3_small_x1_0_ssld_pretrained.pdparams)      |
 | GhostNet_x1_3_ssld                    | 0.794    | 0.757   | 0.037 | 19.983                | 0.44     | 7.3       | 29      | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/GhostNet_x1_3_ssld_pretrained.pdparams)               |
 
-
-* Intel CPU端知识蒸馏模型
+<a name="Intel-CPU端知识蒸馏模型"></a>
+#### Intel CPU端知识蒸馏模型
 
 | 模型                  | Top-1 Acc | Reference<br>Top-1 Acc | Acc gain |  Intel-Xeon-Gold-6148 time(ms)<br>bs=1 | Flops(M) | Params(M)  | 下载地址   |
 |---------------------|-----------|-----------|---------------|----------------|----------|-----------|-----------------------------------|
@@ -84,8 +113,8 @@ PP-LCNet系列模型的精度、速度指标如下表所示，更多关于该系
 | PPLCNet_x2_5         |0.7660           | 0.9300   |  5.39      | 906   | 9.0  | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/PPLCNet_x2_5_pretrained.pdparams) |
 
 
-<a name="ResNet及其Vd系列"></a>
-### ResNet及其Vd系列
+<a name="ResNet系列"></a>
+### ResNet系列
 
 ResNet及其Vd系列模型的精度、速度指标如下表所示，更多关于该系列的模型介绍可以参考：[ResNet及其Vd系列模型文档](../models/ResNet_and_vd.md)。
 
@@ -314,7 +343,6 @@ ViT（Vision Transformer）与DeiT（Data-efficient Image Transformers）系列�
 
 
 <a name="RepVGG系列"></a>
-
 ### RepVGG系列
 
 关于RepVGG系列模型的精度、速度指标如下表所示，更多介绍可以参考：[RepVGG系列模型文档](../models/RepVGG.md)。
@@ -334,7 +362,6 @@ ViT（Vision Transformer）与DeiT（Data-efficient Image Transformers）系列�
 | RepVGG_B3g4 | 0.7965    | 0.9485    |  |  |  |  | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/RepVGG_B3g4_pretrained.pdparams) |
 
 <a name="MixNet系列"></a>
-
 ### MixNet系列
 
 关于MixNet系列模型的精度、速度指标如下表所示，更多介绍可以参考：[MixNet系列模型文档](../models/MixNet.md)。
@@ -346,7 +373,6 @@ ViT（Vision Transformer）与DeiT（Data-efficient Image Transformers）系列�
 | MixNet_L | 0.7860    | 0.9437    |                  |                  | 579.017  | 7.384     | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/MixNet_L_pretrained.pdparams) |
 
 <a name="ReXNet系列"></a>
-
 ### ReXNet系列
 
 关于ReXNet系列模型的精度、速度指标如下表所示，更多介绍可以参考：[ReXNet系列模型文档](../models/ReXNet.md)。
@@ -360,7 +386,6 @@ ViT（Vision Transformer）与DeiT（Data-efficient Image Transformers）系列�
 | ReXNet_3_0 | 0.8209    | 0.9612    |                  |                  | 3.445    | 34.833    | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ReXNet_3_0_pretrained.pdparams) |
 
 <a name="SwinTransformer系列"></a>
-
 ### SwinTransformer系列
 
 关于SwinTransformer系列模型的精度、速度指标如下表所示，更多介绍可以参考：[SwinTransformer系列模型文档](../models/SwinTransformer.md)。
@@ -463,7 +488,6 @@ ViT（Vision Transformer）与DeiT（Data-efficient Image Transformers）系列�
 **注**：TNT模型的数据预处理部分`NormalizeImage`中的`mean`与`std`均为0.5。
 
 <a name="其他模型"></a>
-
 ### 其他模型
 
 关于AlexNet、SqueezeNet系列、VGG系列、DarkNet53等模型的精度、速度指标如下表所示，更多介绍可以参考：[其他模型文档](../models/Others.md)。

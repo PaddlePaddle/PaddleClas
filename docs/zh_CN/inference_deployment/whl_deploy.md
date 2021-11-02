@@ -4,7 +4,23 @@ PaddleClas 支持 Python Whl 包方式进行预测，目前 Whl 包方式仅支�
 
 ---
 
-## 1. 安装
+## 目录
+
+- [安装paddleclas](#1)
+- [快速开始](#2)
+- [参数解释](#3)
+- [使用示例](#4)
+   - [4.1 查看帮助信息](#4.1)
+   - [4.2 使用PaddleClas提供的预训练模型进行预测](#4.2)
+   - [4.3 使用本地模型文件预测](#4.3)
+   - [4.4 批量预测](#4.4)
+   - [4.5 对网络图片进行预测](#4.5)
+   - [4.6 对`NumPy.ndarray`格式数据进行预测](#4.6)
+   - [4.7 保存预测结果](#4.7)
+   - [4.8 指定label name](#4.8)
+   
+<a name="1"></a>
+## 一、安装paddleclas
 
 * pip安装
 
@@ -19,8 +35,8 @@ python3 setup.py bdist_wheel
 pip3 install dist/*
 ```
 
-
-## 2. 快速开始
+<a name="2"></a>
+## 二、快速开始
 * 使用`ResNet50`模型，以下图（`PaddleClas/docs/images/inference_deployment/whl_demo.jpg`）为例进行说明。
 
 <div align="center">
@@ -55,7 +71,8 @@ filename: docs/images/inference_deployment/whl_demo.jpg, top-5, class_ids: [8, 7
 Predict complete!
 ```
 
-## 3. 参数解释
+<a name="3"></a>
+## 三、参数解释
 以下参数可在命令行方式使用中通过参数指定，或在Python代码中实例化PaddleClas对象时作为构造函数的参数使用。
 * model_name(str): 模型名称，使用PaddleClas提供的基于ImageNet1k的预训练模型。
 * inference_model_dir(str): 本地模型文件目录，当未指定 `model_name` 时该参数有效。该目录下需包含 `inference.pdmodel` 和 `inference.pdiparams` 两个模型文件。
@@ -86,14 +103,14 @@ from paddleclas import PaddleClas
 clas = PaddleClas(model_name='ViT_base_patch16_384', resize_short=384, crop_size=384)
 ```
 
-
-## 4. 使用示例
+<a name="4"></a>
+## 四、使用示例
 
 PaddleClas提供两种使用方式：
 1. Python代码中使用；
 2. 命令行中使用。
 
-
+<a name="4.1"></a>
 ### 4.1 查看帮助信息
 
 * CLI
@@ -101,7 +118,7 @@ PaddleClas提供两种使用方式：
 paddleclas -h
 ```
 
-
+<a name="4.2"></a>
 ### 4.2 使用PaddleClas提供的预训练模型进行预测
 可以使用PaddleClas提供的预训练模型来预测，并通过参数`model_name`指定。此时PaddleClas会根据`model_name`自动下载指定模型，并保存在目录`~/.paddleclas/`下。
 
@@ -119,7 +136,7 @@ print(next(result))
 paddleclas --model_name='ResNet50' --infer_imgs='docs/images/inference_deployment/whl_demo.jpg'
 ```
 
-
+<a name="4.3"></a>
 ### 4.3 使用本地模型文件预测
 可以使用本地的模型文件进行预测，通过参数`inference_model_dir`指定模型文件目录即可。需要注意，模型文件目录下必须包含`inference.pdmodel`和`inference.pdiparams`两个文件。
 
@@ -137,7 +154,7 @@ print(next(result))
 paddleclas --inference_model_dir='./inference/' --infer_imgs='docs/images/inference_deployment/whl_demo.jpg'
 ```
 
-
+<a name="4.4"></a>
 ### 4.4 批量预测
 当参数 `infer_imgs` 为包含图片文件的目录时，可以对图片进行批量预测，只需通过参数 `batch_size` 指定batch大小。
 
@@ -156,7 +173,7 @@ for r in result:
 paddleclas --model_name='ResNet50' --infer_imgs='docs/images/' --batch_size 2
 ```
 
-
+<a name="4.5"></a>
 ### 4.5 对网络图片进行预测
 可以对网络图片进行预测，只需通过参数`infer_imgs`指定图片`url`。此时图片会下载并保存在`~/.paddleclas/images/`目录下。
 
@@ -174,7 +191,7 @@ print(next(result))
 paddleclas --model_name='ResNet50' --infer_imgs='https://raw.githubusercontent.com/paddlepaddle/paddleclas/release/2.2/docs/images/inference_deployment/whl_demo.jpg'
 ```
 
-
+<a name="4.6"></a>
 ### 4.6 对`NumPy.ndarray`格式数据进行预测
 在Python中，可以对`Numpy.ndarray`格式的图像数据进行预测，只需通过参数`infer_imgs`指定即可。注意该图像数据必须为三通道图像数据。
 
@@ -188,7 +205,7 @@ result=clas.predict(infer_imgs)
 print(next(result))
 ```
 
-
+<a name="4.7"></a>
 ### 4.7 保存预测结果
 可以指定参数`pre_label_out_dir='./output_pre_label/'`，将图片按其top1预测结果保存到`pre_label_out_dir`目录下对应类别的文件夹中。
 
@@ -206,7 +223,7 @@ print(next(result))
 paddleclas --model_name='ResNet50' --infer_imgs='docs/images/whl/' --save_dir='./output_pre_label/'
 ```
 
-
+<a name="4.8"></a>
 ### 4.8 指定label name
 可以通过参数`class_id_map_file`指定`class id`与`lable`的对应关系。PaddleClas默认使用ImageNet1K的label_name（`ppcls/utils/imagenet1k_label_list.txt`）。
 
