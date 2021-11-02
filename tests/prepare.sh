@@ -42,6 +42,9 @@ if [ ${MODE} = "lite_train_infer" ] || [ ${MODE} = "whole_infer" ];then
     cd ILSVRC2012 
     mv train.txt train_list.txt
     mv val.txt val_list.txt
+    if [ ${MODE} = "lite_train_infer" ];then
+	cp -r train/* val/
+    fi
     cd ../../
 elif [ ${MODE} = "infer" ] || [ ${MODE} = "cpp_infer" ];then
     # download data

@@ -17,6 +17,8 @@ Global:
 # model architecture
 Arch:
   name: DeiT_base_distilled_patch16_224
+  drop_path_rate : 0.1
+  drop_rate : 0.0
   class_num: 1000
  
 # loss function config for traing/eval process

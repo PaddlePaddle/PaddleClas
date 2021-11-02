@@ -433,9 +433,8 @@ def run(dataloader,
 
     end_str = ' '.join([str(m.mean) for m in metric_dict.values()] +
                        [metric_dict["batch_time"].total])
-    ips_info = "ips: {:.5f} images/sec.".format(
-        batch_size * metric_dict["batch_time"].count /
-        metric_dict["batch_time"].sum)
+    ips_info = "ips: {:.5f} images/sec.".format(batch_size /
+                                                metric_dict["batch_time"].avg)
     if mode == 'eval':
         logger.info("END {:s} {:s} {:s}".format(mode, end_str, ips_info))
     else:

@@ -1,0 +1,36 @@
+Global:
+  rec_inference_model_dir: "./models/general_PPLCNet_x2_5_lite_v1.0_infer"
+  batch_size: 32
+  use_gpu: True
+  enable_mkldnn: True
+  cpu_num_threads: 10
+  enable_benchmark: True
+  use_fp16: False
+  ir_optim: True
+  use_tensorrt: False
+  gpu_mem: 8000
+  enable_profile: False
+
+RecPreProcess:
+  transform_ops:
+    - ResizeImage:
+        size: 224
+    - NormalizeImage:
+        scale: 0.00392157
+        mean: [0.485, 0.456, 0.406]
+        std: [0.229, 0.224, 0.225]
+        order: ''
+    - ToCHWImage:
+
+RecPostProcess: null
+
+# indexing engine config
+IndexProcess:
+  index_method: "HNSW32" # supported: HNSW32, IVF, Flat
+  image_root: "./drink_dataset_v1.0/gallery/"
+  index_dir: "./drink_dataset_v1.0/index"
+  data_file:  "./drink_dataset_v1.0/gallery/drink_label.txt"
+  index_operation: "new" # suported: "append", "remove", "new"
+  delimiter: "\t"
+  dist_type: "IP"
+  embedding_size: 512
