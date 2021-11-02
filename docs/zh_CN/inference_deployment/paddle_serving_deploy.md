@@ -121,7 +121,7 @@ python3 pipeline_http_client.py
 
 <a name="图像识别服务部署"></a>
 ## 4.图像识别服务部署
-使用PaddleServing做服务化部署时，需要将保存的inference模型转换为serving易于部署的模型。 下面以PP-ShiTu中的超轻量商品识别模型为例，介绍图像识别服务的部署。
+使用PaddleServing做服务化部署时，需要将保存的inference模型转换为Serving模型。 下面以PP-ShiTu中的超轻量商品识别模型为例，介绍图像识别服务的部署。
 ## 4.1 模型转换
 - 下载通用检测inference模型和商品识别inference模型
 ```
@@ -134,7 +134,7 @@ tar -xf general_PPLCNet_x2_5_lite_v1.0_infer.tar
 wget https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/inference/picodet_PPLCNet_x2_5_mainbody_lite_v1.0_infer.tar
 tar -xf picodet_PPLCNet_x2_5_mainbody_lite_v1.0_infer.tar
 ```
-- 转换商品识别inference模型为易于server部署的模型格式：
+- 转换商品识别inference模型为Serving模型：
 ```
 # 转换商品识别模型
 python3 -m paddle_serving_client.convert --dirname ./general_PPLCNet_x2_5_lite_v1.0_infer/ \
@@ -143,7 +143,7 @@ python3 -m paddle_serving_client.convert --dirname ./general_PPLCNet_x2_5_lite_v
                                          --serving_server ./general_PPLCNet_x2_5_lite_v1.0_serving/ \
                                          --serving_client ./general_PPLCNet_x2_5_lite_v1.0_client/
 ```
-商品识别推理模型转换完成后，会在当前文件夹多出`general_PPLCNet_x2_5_lite_v1.0_serving/` 和`general_PPLCNet_x2_5_lite_v1.0_serving/`的文件夹。修改serving_server_conf.prototxt中的alias名字： 将`fetch_var`中的`alias_name`改为`features`。
+商品识别推理模型转换完成后，会在当前文件夹多出`general_PPLCNet_x2_5_lite_v1.0_serving/` 和`general_PPLCNet_x2_5_lite_v1.0_serving/`的文件夹。修改`general_PPLCNet_x2_5_lite_v1.0_serving/`目录下的serving_server_conf.prototxt中的alias名字： 将`fetch_var`中的`alias_name`改为`features`。
 修改后的serving_server_conf.prototxt内容如下：
 ```
 feed_var {
@@ -163,7 +163,7 @@ fetch_var {
   shape: -1
 }
 ```
-- 转换通用检测inference模型为易于server部署的模型格式：
+- 转换通用检测inference模型为Serving模型：
 ```
 # 转换通用检测模型
 python3 -m paddle_serving_client.convert --dirname ./picodet_PPLCNet_x2_5_mainbody_lite_v1.0_infer/ \
@@ -173,6 +173,7 @@ python3 -m paddle_serving_client.convert --dirname ./picodet_PPLCNet_x2_5_mainbo
                                          --serving_client ./picodet_PPLCNet_x2_5_mainbody_lite_v1.0_client/
 ```
 通用检测inference模型转换完成后，会在当前文件夹多出`picodet_PPLCNet_x2_5_mainbody_lite_v1.0_serving/` 和`picodet_PPLCNet_x2_5_mainbody_lite_v1.0_client/`的文件夹。
+**注意:** 此处不需要修改`picodet_PPLCNet_x2_5_mainbody_lite_v1.0_serving/`目录下的serving_server_conf.prototxt中的alias名字。
 
 - 下载并解压已经构建后的商品库index
 ```
