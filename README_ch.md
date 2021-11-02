@@ -110,7 +110,7 @@ PP-ShiTu图像识别系统分为三步：（1）通过一个目标检测模型�
 对于新的未知类别，无需重新训练模型，只需要在检索库补入该类别图像，重新建立检索库，就可以识别该类别。
 
 <a name="识别效果展示"></a>
-## 更多效果展示 [more](https://github.com/PaddlePaddle/PaddleClas/tree/release/2.2/docs/images/recognition/more_demo_images)
+## PP-ShiTu图像识别系统效果展示 
 - 瓶装饮料识别
 <div align="center">
 <img src="docs/images/drink_demo.gif">
