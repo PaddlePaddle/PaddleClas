@@ -158,10 +158,10 @@ python3.7 tools/export.py \
 <a name="4"></a>
 ## 四、模型部署
 
-上述步骤导出的模型可以直接使用inferecne 进行部署，参考[inference部署](../inference_deployment/)。
+上述步骤导出的模型可以直接使用inferecne进行部署，参考[inference部署](../inference_deployment/)。
 
 也通过PaddleLite的opt模型转换工具，完成inference模型到移动端模型转换，用于移动端的模型部署。
-移动端模型部署的可参考 [移动端模型部署](../../../deploy/lite/readme.md)
+移动端模型部署的可参考 [移动端模型部署](../inference_deployment/paddle_lite_deploy.md)。
 
 <a name="5"></a>
 ## 五、训练超参数建议
