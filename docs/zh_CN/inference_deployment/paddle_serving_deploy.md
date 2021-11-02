@@ -36,18 +36,18 @@ pip install paddle-serving-server
 ## 3. 图像分类服务部署
 ### 3.1 模型转换
 使用PaddleServing做服务化部署时，需要将保存的inference模型转换为Serving模型。下面以经典的ResNet50_vd模型为例，介绍如何部署图像分类服务。
-进入工作目录：
+- 1. 进入工作目录：
 ```shell
 cd deploy/paddleserving
 ```
 
-下载ResNet50_vd的inference模型
+- 2. 下载ResNet50_vd的inference模型
 ```shell
 # 下载并解压ResNet50_vd模型
 wget https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/ResNet50_vd_infer.tar && tar xf ResNet50_vd_infer.tar
 ```
 
-用paddle_serving_client把下载的inference模型转换成易于Server部署的模型格式
+- 3. 用paddle_serving_client把下载的inference模型转换成易于Server部署的模型格式
 ```
 # 转换ResNet50_vd模型
 python3 -m paddle_serving_client.convert --dirname ./ResNet50_vd_infer/ \
