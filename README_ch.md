@@ -17,7 +17,7 @@
 ## 特性
 
 - PP-ShiTu轻量图像识别系统：集成了目标检测、特征学习、图像检索等模块，广泛适用于各类图像识别任务。
-笔记本cpu上200ms即可完成在10w+库的图像识别。
+cpu上200ms即可完成在10w+库的图像识别。
 详细介绍见[PP-ShiTu: A Practical Lightweight Image Recognition System](./docs/PP_ShiTu.pdf)
 
 - PP-LCNet轻量级CPU骨干网络：专门为CPU设备打造轻量级骨干网络，速度、精度均超越竞品。
