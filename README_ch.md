@@ -49,6 +49,7 @@ Res2Net200_vd预训练模型Top-1精度高达85.1%。
 ## 快速体验
 PP-ShiTu图像识别快速体验：[点击这里](./docs/zh_CN/quick_start/quick_start_recognition.md)
 
+## 文档教程
 - 安装说明
   - [安装Paddle](./docs/zh_CN/installation/install_paddle.md)
   - [安装PaddleClas](./docs/zh_CN/installation/install_paddleclas.md)
