@@ -182,7 +182,7 @@ cd ../
 wget https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/data/drink_dataset_v1.0.tar && tar -xf drink_dataset_v1.0.tar
 ```
 ## 4.2 服务部署和请求
-**注意:**  识别服务涉及到多个模型，采用PipeLine部署方式。Pipeline部署方式当前不支持windows平台。
+**注意:**  识别服务涉及到多个模型，出于性能考虑采用PipeLine部署方式。Pipeline部署方式当前不支持windows平台。
 - 进入到工作目录
 ```shell
 cd ./deploy/paddleserving/recognition
