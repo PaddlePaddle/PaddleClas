@@ -115,5 +115,5 @@ python3 pipeline_http_client.py
 成功运行后，模型预测的结果会打印在cmd窗口中，结果示例为：
 ![](../../../deploy/paddleserving/imgs/results.png)
 
-
+* 关于图像识别服务的部署，参考文档[基于PaddleServing的图像识别服务部署]（../../../deploy/paddleserving/recognition/README_CN.md）
 * 更多的服务部署类型，如 `RPC预测服务` 等，可以参考 Serving 的 github 官网：[https://github.com/PaddlePaddle/Serving/tree/develop/python/examples/imagenet](https://github.com/PaddlePaddle/Serving/tree/develop/python/examples/imagenet)
