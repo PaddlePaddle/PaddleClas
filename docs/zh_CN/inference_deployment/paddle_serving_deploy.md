@@ -173,6 +173,7 @@ python3 -m paddle_serving_client.convert --dirname ./picodet_PPLCNet_x2_5_mainbo
                                          --serving_client ./picodet_PPLCNet_x2_5_mainbody_lite_v1.0_client/
 ```
 通用检测inference模型转换完成后，会在当前文件夹多出`picodet_PPLCNet_x2_5_mainbody_lite_v1.0_serving/` 和`picodet_PPLCNet_x2_5_mainbody_lite_v1.0_client/`的文件夹。
+
 **注意:** 此处不需要修改`picodet_PPLCNet_x2_5_mainbody_lite_v1.0_serving/`目录下的serving_server_conf.prototxt中的alias名字。
 
 - 下载并解压已经构建后的商品库index
@@ -207,8 +208,6 @@ python3 recognition_web_service.py &>log.txt &
 ```
 python3 pipeline_http_client.py
 ```
-成功运行后，模型预测的结果会打印在cmd窗口中，结果示例为：
-![](../../../deploy/paddleserving/imgs/results_recog.png)
 
 <a name="FAQ"></a>
 ## 5.FAQ
