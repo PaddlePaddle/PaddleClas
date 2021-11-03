@@ -44,8 +44,6 @@
 
 <div align="center"> <img src="https://user-images.githubusercontent.com/12560511/139814821-c3915c4a-0ad2-46d3-b2c4-8ce50e0c265c.jpeg" width = "400" /> </div>
 
-<div align="center"> <img src="https://user-images.githubusercontent.com/12560511/139814828-427d7793-debb-4842-b7b0-d0dfca5ad1b2.jpeg" width = "400" /> </div>
-
 <div align="center"> <img src="https://user-images.githubusercontent.com/12560511/139814832-63a96c89-fcb4-49d1-b850-44333593c520.jpeg" width = "400" /> </div>
 
 <div align="center"> <img src="https://user-images.githubusercontent.com/12560511/139814840-f5983307-be5a-48ef-a7a3-101929ca20d0.jpeg" width = "400" /> </div>
@@ -53,7 +51,5 @@
 <div align="center"> <img src="https://user-images.githubusercontent.com/12560511/139814845-9b036e6c-3ad0-4662-83bb-f39c17952fb2.jpeg" width = "400" /> </div>
 
 <div align="center"> <img src="https://user-images.githubusercontent.com/12560511/139814850-c370bc93-4e99-4f87-b66b-f15fe956049e.jpeg" width = "400" /> </div>
-
-<div align="center"> <img src="https://user-images.githubusercontent.com/12560511/139814857-38fd6f7f-7bbb-498f-b772-c372d10cfa4d.jpeg" width = "400" /> </div>
 
 <div align="center"> <img src="https://user-images.githubusercontent.com/12560511/139814863-f665660e-cad7-4919-a2e7-8c29c5fdb1ed.jpeg" width = "400" /> </div>
