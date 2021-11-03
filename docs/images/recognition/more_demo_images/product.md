@@ -181,5 +181,3 @@
 <div align="center"> <img src="https://user-images.githubusercontent.com/12560511/139817687-d35f2ad8-d3f4-4414-b08b-148a5b17d226.jpg" width = "400" /> </div>
 
 <div align="center"> <img src="https://user-images.githubusercontent.com/12560511/139817693-a11846c4-fdc1-4c4b-a5c5-ed29ad20dfc7.jpg" width = "400" /> </div>
-
-<div align="center"> <img src="https://user-images.githubusercontent.com/12560511/139817698-6a35e345-894c-4ebd-9cd1-ed44a37c151f.jpg" width = "400" /> </div>
