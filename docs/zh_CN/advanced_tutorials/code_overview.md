@@ -246,4 +246,4 @@ Slim:
 * 如果希望在服务端使用 cpp 进行部署，可以参考 [cpp inference 预测教程](../inference_deployment/cpp_deploy.md) 。
 * 如果希望将分类模型部署为服务，可以参考 [hub serving 预测部署教程](../inference_deployment/paddle_hub_serving_deploy.md) 。
 * 如果希望在移动端使用分类模型进行预测，可以参考 [PaddleLite 预测部署教程](../inference_deployment/paddle_lite_deploy.md) 。
-* 如果希望使用whl包对分类模型进行预测，可以参考 [whl包预测](./docs/zh_CN/inference_deployment/whl_deploy.md) 。
+* 如果希望使用whl包对分类模型进行预测，可以参考 [whl包预测](../inference_deployment/whl_deploy.md) 。
