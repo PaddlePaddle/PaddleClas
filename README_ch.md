@@ -52,8 +52,11 @@ PP-ShiTu图像识别快速体验：[点击这里](./docs/zh_CN/quick_start/quick
   - [PP-ShiTu图像识别快速体验](./docs/zh_CN/quick_start/quick_start_recognition.md)
   - 图像分类快速体验
     - [尝鲜版](./docs/zh_CN/quick_start/quick_start_classification_new_user.md)
-    - [进阶版](./docs/zh_CN/quick_start/quick_start_classification_professional.md) 
+    - [进阶版](./docs/zh_CN/quick_start/quick_start_classification_professional.md)
 - [PP-ShiTu图像识别系统介绍](#图像识别系统介绍)
+    - [主体检测](./docs/zh_CN/image_recognition_pipeline/mainbody_detection.md)
+    - [特征提取](./docs/zh_CN/image_recognition_pipeline/feature_extraction.md)
+    - [向量检索](./docs/zh_CN/image_recognition_pipeline/vector_search.md)
 - [骨干网络和预训练模型库](./docs/zh_CN/algorithm_introduction/ImageNet_models.md)
 - 数据准备
   - [图像分类数据集介绍](./docs/zh_CN/data_preparation/classification_dataset.md)
@@ -101,7 +104,7 @@ PP-ShiTu是一个实用的轻量级通用图像识别系统，主要由主体检
 
 
 <a name="识别效果展示"></a>
-## PP-ShiTu图像识别系统效果展示 
+## PP-ShiTu图像识别系统效果展示
 - 瓶装饮料识别
 <div align="center">
 <img src="docs/images/drink_demo.gif">
