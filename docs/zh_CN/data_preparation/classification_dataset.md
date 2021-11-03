@@ -8,12 +8,12 @@
 
 - [数据集格式说明](#数据集格式说明)
 - [图像分类任务常见数据集介绍](#图像分类任务常见数据集介绍)
-    - [2.1 ImageNet1k](#ImageNet1k])
+    - [2.1 ImageNet1k](#ImageNet1k)
     - [2.2 Flowers102](#Flowers102)
     - [2.3 CIFAR10 / CIFAR100](#CIFAR10/CIFAR100)
     - [2.4 MNIST](#MNIST)
     - [2.5 NUS-WIDE](#NUS-WIDE)
-     
+
 <a name="数据集格式说明"></a>
 ## 一、数据集格式说明
 
