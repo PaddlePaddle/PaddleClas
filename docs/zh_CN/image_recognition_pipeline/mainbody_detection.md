@@ -203,7 +203,7 @@ python tools/export_model.py -c configs/ppyolo/ppyolov2_r50vd_dcn_365e_coco.yml 
 
 导出模型之后，在主体检测与识别任务中，就可以将检测模型的路径更改为该 inference 模型路径，完成预测。
 
-以商品识别为例，其配置文件为 [inference_product.yaml](../../../deploy/configs/inference_product.yaml) ，修改其中的 `Global.det_inference_model_dir` 字段为导出的主体检测 inference 模型目录，参考[图像识别快速开始教程](../tutorials/quick_start_recognition.md) ，即可完成商品检测与识别过程。
+以商品识别为例，其配置文件为 [inference_product.yaml](../../../deploy/configs/inference_product.yaml) ，修改其中的 `Global.det_inference_model_dir` 字段为导出的主体检测 inference 模型目录，参考[图像识别快速开始教程](../quick_start/quick_start_recognition.md) ，即可完成商品检测与识别过程。
 
 
 ### FAQ
