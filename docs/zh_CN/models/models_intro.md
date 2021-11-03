@@ -45,7 +45,7 @@
 
 
 - 轻量级模型系列
-  - PP-LCNet系列<sup>[[28](#28)]</sup>([论文地址](https://arxiv.org/pdf/2109.15099.pdf))
+  - PP-LCNet系列<sup>[[28](#ref28)]</sup>([论文地址](https://arxiv.org/pdf/2109.15099.pdf))
     - [PPLCNet_x0_25](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/PPLCNet_x0_25_pretrained.pdparams)
      - [PPLCNet_x0_35](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/PPLCNet_x0_35_pretrained.pdparams)
     - [PPLCNet_x0_5](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/PPLCNet_x0_5_pretrained.pdparams)
@@ -108,7 +108,7 @@
     - [ReXNet_1_5](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ReXNet_1_5_pretrained.pdparams)
     - [ReXNet_2_0](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ReXNet_2_0_pretrained.pdparams)
     - [ReXNet_3_0](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ReXNet_3_0_pretrained.pdparams)
-    
+
 
 - SEResNeXt与Res2Net系列
   - ResNeXt系列<sup>[[7](#ref7)]</sup>([论文地址](https://arxiv.org/abs/1611.05431))
@@ -304,8 +304,8 @@
       - [RedNet50](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/RedNet50_pretrained.pdparams)
       - [RedNet101](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/RedNet101_pretrained.pdparams)
       - [RedNet152](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/RedNet152_pretrained.pdparams)
-      
-    
+
+
 
 **注意**：以上模型中EfficientNetB1-B7的预训练模型转自[pytorch版EfficientNet](https://github.com/lukemelas/EfficientNet-PyTorch)，ResNeXt101_wsl系列预训练模型转自[官方repo](https://github.com/facebookresearch/WSL-Images)，剩余预训练模型均基于飞桨训练得到的，并在configs里给出了相应的训练超参数。
 
