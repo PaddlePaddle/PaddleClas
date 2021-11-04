@@ -11,10 +11,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""
-This code implements is borrowed from Timm: https://github.com/rwightman/pytorch-image-models.
-hacked together by / Copyright 2020 Ross Wightman
-"""
+
+# Code was heavily based on  https://github.com/rwightman/pytorch-image-models
 
 import random
 import math
