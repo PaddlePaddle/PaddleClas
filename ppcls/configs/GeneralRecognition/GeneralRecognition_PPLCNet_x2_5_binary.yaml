@@ -28,7 +28,7 @@ Arch:
   infer_add_softmax: False
 
   Backbone:
-    name: PPLCNet_x2_5Tanh
+    name: PPLCNet_x2_5_Tanh
     pretrained: True
     use_ssld: True
     class_num: 512
