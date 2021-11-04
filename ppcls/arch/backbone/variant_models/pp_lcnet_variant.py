@@ -8,7 +8,7 @@ __all__ = ["PPLCNet_x2_5_Tanh"]
 
 class TanhSuffix(paddle.nn.Layer):
     def __init__(self, origin_layer):
-        super(SigmoidSuffix, self).__init__()
+        super(TanhSuffix, self).__init__()
         self.origin_layer = origin_layer
         self.tanh = Tanh()
 
