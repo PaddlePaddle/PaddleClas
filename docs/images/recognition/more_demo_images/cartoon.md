@@ -1,55 +1,53 @@
 # 更多关于动漫人物图片识别的效果图请见下
 
-<div align="center"> <img src="https://user-images.githubusercontent.com/12560511/139814700-9cd1e61c-99ae-4dbc-8bdb-b7d39bc16c7f.jpeg" width = "400" /> </div>
+<div align="center"> <img src="https://user-images.githubusercontent.com/12560511/140069080-a821e0b7-8a10-4946-bf05-ff093cc16064.jpeg" width = "400" /> </div>
 
-<div align="center"> <img src="https://user-images.githubusercontent.com/12560511/139814719-81416fbe-cc8b-4653-8ddc-81fd28c4f36f.jpeg" width = "400" /> </div>
+<div align="center"> <img src="https://user-images.githubusercontent.com/12560511/140069100-7539d292-1bd8-4655-8a6d-d1f2238bd618.jpeg" width = "400" /> </div>
 
-<div align="center"> <img src="https://user-images.githubusercontent.com/12560511/139814723-1776047e-2626-4de9-8aae-672459aa09e6.jpeg" width = "400" /> </div>
+<div align="center"> <img src="https://user-images.githubusercontent.com/12560511/140069103-f91359d4-1197-4a6e-b2f7-434c76a6b704.jpeg" width = "400" /> </div>
 
-<div align="center"> <img src="https://user-images.githubusercontent.com/12560511/139814729-f09b63e5-9ae1-4f82-82d2-3c3c530f2d32.jpeg" width = "400" /> </div>
+<div align="center"> <img src="https://user-images.githubusercontent.com/12560511/140069108-ad54ae1d-610d-4cfa-9cd6-8ee8d280d61d.jpeg" width = "400" /> </div>
 
-<div align="center"> <img src="https://user-images.githubusercontent.com/12560511/139814737-949da6d0-937c-47c8-89fd-0f470a0ef6cf.jpeg" width = "400" /> </div>
+<div align="center"> <img src="https://user-images.githubusercontent.com/12560511/140069114-3c771434-84a8-4e58-961e-d35edfbfe5ef.jpeg" width = "400" /> </div>
 
-<div align="center"> <img src="https://user-images.githubusercontent.com/12560511/139814743-f8a89a19-d735-4777-9d18-5eda5983f9df.jpeg" width = "400" /> </div>
+<div align="center"> <img src="https://user-images.githubusercontent.com/12560511/140069119-e8d85be5-da87-4125-ae8b-9fd4cac139d9.jpeg" width = "400" /> </div>
 
-<div align="center"> <img src="https://user-images.githubusercontent.com/12560511/139814753-80e72f07-bb4f-4e79-bd72-b8f84263b67b.jpeg" width = "400" /> </div>
+<div align="center"> <img src="https://user-images.githubusercontent.com/12560511/140069124-98c30894-4837-4f2f-8399-3d3ebadfd0a1.jpeg" width = "400" /> </div>
 
-<div align="center"> <img src="https://user-images.githubusercontent.com/12560511/139814760-4bd6f664-4832-4eda-b5ab-df6fd372a9aa.jpeg" width = "400" /> </div>
+<div align="center"> <img src="https://user-images.githubusercontent.com/12560511/140069125-a9edf115-33a1-48bf-9e4f-7edbc4269a1e.jpeg" width = "400" /> </div>
 
-<div align="center"> <img src="https://user-images.githubusercontent.com/12560511/139814762-df8db5e8-8cbe-4faf-a0ad-615b5d80d38c.jpeg" width = "400" /> </div>
+<div align="center"> <img src="https://user-images.githubusercontent.com/12560511/140069129-98553a25-00e2-4f0f-9b44-dfc4e4f6b6d1.png " width = "400" /> </div>
 
-<div align="center"> <img src="https://user-images.githubusercontent.com/12560511/139814766-e5a8c5b9-b4b2-4255-8dee-b9c6748c6da1.png"  width = "400" /> </div>
+<div align="center"> <img src="https://user-images.githubusercontent.com/12560511/140069131-f7649bb2-255c-4725-a635-799b8b4d815a.jpeg" width = "400" /> </div>
 
-<div align="center"> <img src="https://user-images.githubusercontent.com/12560511/139814769-cc34e6a0-cd37-490c-a8c6-c9bf0091c45e.jpeg" width = "400" /> </div>
+<div align="center"> <img src="https://user-images.githubusercontent.com/12560511/140069135-acb69b89-55db-41ac-9846-e2536ef3d955.jpeg" width = "400" /> </div>
 
-<div align="center"> <img src="https://user-images.githubusercontent.com/12560511/139814775-a2f173df-c1ed-4d46-a727-e566e2fa61b1.jpeg" width = "400" /> </div>
+<div align="center"> <img src="https://user-images.githubusercontent.com/12560511/140069137-1f0abfdb-6608-432e-bd40-c8e1ab86ef8b.jpeg" width = "400" /> </div>
 
-<div align="center"> <img src="https://user-images.githubusercontent.com/12560511/139814777-879541c6-aabf-4b24-8a94-d2e6d70c8586.jpeg" width = "400" /> </div>
+<div align="center"> <img src="https://user-images.githubusercontent.com/12560511/140069140-18c6a439-f117-498d-9cdb-ade71cc2c248.jpeg" width = "400" /> </div>
 
-<div align="center"> <img src="https://user-images.githubusercontent.com/12560511/139814780-92956e4b-5d41-4dee-b760-90d3ab381222.jpeg" width = "400" /> </div>
+<div align="center"> <img src="https://user-images.githubusercontent.com/12560511/140069145-80452f86-afcf-42b5-8423-328cca9e4750.jpeg" width = "400" /> </div>
 
-<div align="center"> <img src="https://user-images.githubusercontent.com/12560511/139814784-2cf95980-ebc1-4743-a609-cc4a8ba24b07.jpeg" width = "400" /> </div>
+<div align="center"> <img src="https://user-images.githubusercontent.com/12560511/140069154-63a25c1c-b448-44c2-8baf-eb31952c5476.jpeg" width = "400" /> </div>
 
-<div align="center"> <img src="https://user-images.githubusercontent.com/12560511/139814788-2c04248d-9f5c-4ce1-b2f7-2a26c94787a3.jpeg" width = "400" /> </div>
+<div align="center"> <img src="https://user-images.githubusercontent.com/12560511/140069156-1b881c6b-5680-4f9a-aef1-2491af50675d.jpeg" width = "400" /> </div>
 
-<div align="center"> <img src="https://user-images.githubusercontent.com/12560511/139814798-1083b6db-2c91-47da-b59d-e0d3c10b0c07.jpeg" width = "400" /> </div>
+<div align="center"> <img src="https://user-images.githubusercontent.com/12560511/140069161-8759f3d4-8456-43ea-bf54-99a646d5a109.jpeg" width = "400" /> </div>
 
-<div align="center"> <img src="https://user-images.githubusercontent.com/12560511/139814802-b98cfc6b-5e32-461c-b714-cecc5a560fbb.jpeg" width = "400" /> </div>
+<div align="center"> <img src="https://user-images.githubusercontent.com/12560511/140069167-937aa847-c661-431c-b3dc-5a3c890b31cd.jpeg" width = "400" /> </div>
 
-<div align="center"> <img src="https://user-images.githubusercontent.com/12560511/139814806-365eace3-bc8e-480b-a7fd-a2202b9ff8eb.jpeg" width = "400" /> </div>
+<div align="center"> <img src="https://user-images.githubusercontent.com/12560511/140069170-43d0dce4-6c62-485d-adf4-364c8467c251.jpeg" width = "400" /> </div>
 
-<div align="center"> <img src="https://user-images.githubusercontent.com/12560511/139814811-f729941f-38bb-4648-bbcf-ba542feddc12.jpeg" width = "400" /> </div>
+<div align="center"> <img src="https://user-images.githubusercontent.com/12560511/140069175-70bc9e50-b833-4a2a-8a3f-c0775dac49c2.jpeg" width = "400" /> </div>
 
-<div align="center"> <img src="https://user-images.githubusercontent.com/12560511/139814815-30e3338c-18b3-43ef-9eae-4b2716e7cef4.jpeg" width = "400" /> </div>
+<div align="center"> <img src="https://user-images.githubusercontent.com/12560511/140069179-d01f8a0f-4383-4b08-b064-4e6bb006e745.jpeg" width = "400" /> </div>
 
-<div align="center"> <img src="https://user-images.githubusercontent.com/12560511/139814821-c3915c4a-0ad2-46d3-b2c4-8ce50e0c265c.jpeg" width = "400" /> </div>
+<div align="center"> <img src="https://user-images.githubusercontent.com/12560511/140069184-d423a84c-c9dd-4125-9dc7-397cae21efc9.jpeg" width = "400" /> </div>
 
-<div align="center"> <img src="https://user-images.githubusercontent.com/12560511/139814832-63a96c89-fcb4-49d1-b850-44333593c520.jpeg" width = "400" /> </div>
+<div align="center"> <img src="https://user-images.githubusercontent.com/12560511/140069188-fc4deb80-38a2-4c50-9a29-30cee4c8e374.jpeg" width = "400" /> </div>
 
-<div align="center"> <img src="https://user-images.githubusercontent.com/12560511/139814840-f5983307-be5a-48ef-a7a3-101929ca20d0.jpeg" width = "400" /> </div>
+<div align="center"> <img src="https://user-images.githubusercontent.com/12560511/140069193-77a19ee8-b1e2-4c27-9016-3440a1547470.jpeg" width = "400" /> </div>
 
-<div align="center"> <img src="https://user-images.githubusercontent.com/12560511/139814845-9b036e6c-3ad0-4662-83bb-f39c17952fb2.jpeg" width = "400" /> </div>
+<div align="center"> <img src="https://user-images.githubusercontent.com/12560511/140069196-5f050524-ac08-4831-89f5-9e9e3ce085c1.jpeg" width = "400" /> </div>
 
-<div align="center"> <img src="https://user-images.githubusercontent.com/12560511/139814850-c370bc93-4e99-4f87-b66b-f15fe956049e.jpeg" width = "400" /> </div>
-
-<div align="center"> <img src="https://user-images.githubusercontent.com/12560511/139814863-f665660e-cad7-4919-a2e7-8c29c5fdb1ed.jpeg" width = "400" /> </div>
+<div align="center"> <img src="https://user-images.githubusercontent.com/12560511/140069200-4f963171-c790-4f43-8ca3-2e701ad3731c.jpeg" width = "400" /> </div>
