@@ -25,9 +25,6 @@ PaddleClas支持在静态图训练方式中使用DALI加速，由于DALI仅支�
 # 设置用于训练的GPU卡号
 export CUDA_VISIBLE_DEVICES="0"
 
-# 设置用于神经网络训练的显存大小，可根据具体情况设置，一般可设置为0.8或0.7，剩余显存则预留DALI使用
-export FLAGS_fraction_of_gpu_memory_to_use=0.80
-
 python ppcls/static/train.py -c ppcls/configs/ImageNet/ResNet/ResNet50.yaml -o use_dali=True
 ```
 

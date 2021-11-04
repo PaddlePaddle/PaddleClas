@@ -10,23 +10,53 @@
 ### ResNet50
 * 命令：
 
-```python3.7 ppcls/static/train.py -c ppcls/configs/quick_start/kunlun/ResNet50_vd_finetune_kunlun.yaml -o use_gpu=False -o use_xpu=True -o is_distributed=False```
+```shell
+python3.7 ppcls/static/train.py \
+    -c ppcls/configs/quick_start/kunlun/ResNet50_vd_finetune_kunlun.yaml \
+    -o use_gpu=False \
+    -o use_xpu=True \
+    -o is_distributed=False
+```
 
 与cpu/gpu训练的区别是加上-o use_xpu=True, 表示执行在昆仑设备上。
 
 ### MobileNetV3
 * 命令：
 
-```python3.7 ppcls/static/train.py -c ppcls/configs/quick_start/MobileNetV3_large_x1_0.yaml -o use_gpu=False -o use_xpu=True -o is_distributed=False```
+```shell
+python3.7 ppcls/static/train.py \
+    -c ppcls/configs/quick_start/MobileNetV3_large_x1_0.yaml \
+    -o use_gpu=False \
+    -o use_xpu=True \
+    -o is_distributed=False
+```
 
 ### HRNet
 * 命令：
 
-```python3.7 ppcls/static/train.py -c ppcls/configs/quick_start/kunlun/HRNet_W18_C_finetune_kunlun.yaml -o is_distributed=False -o use_xpu=True -o use_gpu=False```
+```shell
+python3.7 ppcls/static/train.py \
+    -c ppcls/configs/quick_start/kunlun/HRNet_W18_C_finetune_kunlun.yaml \
+    -o is_distributed=False \
+    -o use_xpu=True \
+    -o use_gpu=False
+```
 
 
 ### VGG16/19
 * 命令：
 
-```python3.7 ppcls/static/train.py -c ppcls/configs/quick_start/VGG16_finetune_kunlun.yaml -o use_gpu=False -o use_xpu=True -o is_distributed=False```
-```python3.7 ppcls/static/train.py -c ppcls/configs/quick_start/VGG19_finetune_kunlun.yaml -o use_gpu=False -o use_xpu=True -o is_distributed=False```
+```shell
+python3.7 ppcls/static/train.py \
+    -c ppcls/configs/quick_start/VGG16_finetune_kunlun.yaml \
+    -o use_gpu=False \
+    -o use_xpu=True \
+    -o is_distributed=False
+```
+```shell
+python3.7 ppcls/static/train.py \
+    -c ppcls/configs/quick_start/VGG19_finetune_kunlun.yaml \
+    -o use_gpu=False \
+    -o use_xpu=True \
+    -o is_distributed=False
+```
