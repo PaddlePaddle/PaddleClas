@@ -74,8 +74,7 @@ cd ..
 wget {数据下载链接地址} && tar -xf {压缩包的名称}
 ```
 
-<a name="下载、解压inference_模型与demo数据"></a>
-
+<a name="下载、解压inference模型与demo数据"></a>
 ### 2.1 下载、解压 inference 模型与 demo 数据
 
 下载 demo 数据集以及轻量级主体检测、识别模型，命令如下。
