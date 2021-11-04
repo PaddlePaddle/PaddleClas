@@ -52,10 +52,12 @@ void Classifier::LoadModel(const std::string &model_path,
   this->predictor_ = CreatePredictor(config);
 }
 
-double Classifier::Run(cv::Mat &img, std::vector<double> *times) {
+void Classifier::Run(cv::Mat &img, std::vector<float> &out_data,
+                     std::vector<double> &times) {
   cv::Mat srcimg;
   cv::Mat resize_img;
   img.copyTo(srcimg);
+  std::vector<double> time;
 
   auto preprocess_start = std::chrono::system_clock::now();
   this->resize_op_.Run(img, resize_img, this->resize_short_,
@@ -74,7 +76,6 @@ double Classifier::Run(cv::Mat &img, std::vector<double> *times) {
   input_t->CopyFromCpu(input.data());
   this->predictor_->Run();
 
-  std::vector<float> out_data;
   auto output_names = this->predictor_->GetOutputNames();
   auto output_t = this->predictor_->GetOutputHandle(output_names[0]);
   std::vector<int> output_shape = output_t->shape();
@@ -85,27 +86,28 @@ double Classifier::Run(cv::Mat &img, std::vector<double> *times) {
   output_t->CopyToCpu(out_data.data());
   auto infer_end = std::chrono::system_clock::now();
 
-  auto postprocess_start = std::chrono::system_clock::now();
-  int maxPosition =
-      max_element(out_data.begin(), out_data.end()) - out_data.begin();
-  auto postprocess_end = std::chrono::system_clock::now();
+  // auto postprocess_start = std::chrono::system_clock::now();
+  // int maxPosition =
+  //     max_element(out_data.begin(), out_data.end()) - out_data.begin();
+  // auto postprocess_end = std::chrono::system_clock::now();
 
   std::chrono::duration<float> preprocess_diff =
       preprocess_end - preprocess_start;
-  times->push_back(double(preprocess_diff.count() * 1000));
+  time.push_back(double(preprocess_diff.count()));
   std::chrono::duration<float> inference_diff = infer_end - infer_start;
-  double inference_cost_time = double(inference_diff.count() * 1000);
-  times->push_back(inference_cost_time);
-  std::chrono::duration<float> postprocess_diff =
-      postprocess_end - postprocess_start;
-  times->push_back(double(postprocess_diff.count() * 1000));
+  double inference_cost_time = double(inference_diff.count());
+  time.push_back(inference_cost_time);
+  // std::chrono::duration<float> postprocess_diff =
+  //     postprocess_end - postprocess_start;
+  time.push_back(0);
 
-  std::cout << "result: " << std::endl;
-  std::cout << "\tclass id: " << maxPosition << std::endl;
-  std::cout << std::fixed << std::setprecision(10)
-            << "\tscore: " << double(out_data[maxPosition]) << std::endl;
-
-  return inference_cost_time;
+  // std::cout << "result: " << std::endl;
+  // std::cout << "\tclass id: " << maxPosition << std::endl;
+  // std::cout << std::fixed << std::setprecision(10)
+  //           << "\tscore: " << double(out_data[maxPosition]) << std::endl;
+  times[0] += time[0];
+  times[1] += time[1];
+  times[2] += time[2];
 }
 
 } // namespace PaddleClas

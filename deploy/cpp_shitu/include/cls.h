@@ -76,11 +76,12 @@ public:
   void LoadModel(const std::string &model_path, const std::string &params_path);
 
   // Run predictor
-  double Run(cv::Mat &img, std::vector<double> *times);
+  void Run(cv::Mat &img, std::vector<float> &out_data,
+           std::vector<double> &times);
 
-private:
   std::shared_ptr<Predictor> predictor_;
 
+private:
   bool use_gpu_ = false;
   int gpu_id_ = 0;
   int gpu_mem_ = 4000;
