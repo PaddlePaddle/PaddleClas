@@ -46,18 +46,19 @@ net = ResNet50()
 最后执行函数
 
 ```bash
-python tools/feature_maps_visualization/fm_vis.py -i the image you want to test \
-                                                -c channel_num -p pretrained model \
-                                                --show whether to show \
-                                                --interpolation interpolation method\
-                                                --save_path where to save \
-                                                --use_gpu whether to use gpu
+python tools/feature_maps_visualization/fm_vis.py \
+    -i the image you want to test \
+    -c channel_num -p pretrained model \
+    --show whether to show \
+    --interpolation interpolation method\
+    --save_path where to save \
+    --use_gpu whether to use gpu
 ```
 
 参数说明：
 + `-i`：待预测的图片文件路径，如 `./test.jpeg`
 + `-c`：特征图维度，如 `5`
-+ `-p`：权重文件路径，如 `./ResNet50_pretrained/`
++ `-p`：权重文件路径，如 `./ResNet50_pretrained`
 + `--interpolation`: 图像插值方式， 默认值 1
 + `--save_path`：保存路径，如：`./tools/`
 + `--use_gpu`：是否使用 GPU 预测，默认值：True
