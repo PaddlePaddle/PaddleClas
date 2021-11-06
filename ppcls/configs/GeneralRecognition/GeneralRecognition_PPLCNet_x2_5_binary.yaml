@@ -42,14 +42,10 @@ Loss:
   Train:
     - DSHSDLoss:
         weight: 1.0
-        n_class: *n_class
-        bit: *embedding_size
         alpha: 0.1
   Eval:
     - DSHSDLoss:
         weight: 1.0
-        n_class: *n_class
-        bit: *embedding_size
         alpha: 0.1
 
 Optimizer:
