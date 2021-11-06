@@ -97,7 +97,7 @@ class RecOp(Op):
                                 False), Transpose((2, 0, 1))
         ])
 
-        index_dir = "../../recognition_demo_data_v1.1/gallery_product/index"
+        index_dir = "../../drink_dataset_v1.0/index"
         assert os.path.exists(os.path.join(
             index_dir, "vector.index")), "vector.index not found ..."
         assert os.path.exists(os.path.join(
