@@ -83,3 +83,5 @@ python tools/export_model -c ppcls/configs/ResNet50_vd_SOP.yaml -o Global.pretra
 cd deploy
 python python/predict_rec.py -c configs/inference_rec.yaml -o Global.rec_inference_model_dir="../inference"
 ```
+得到的特征输出格式如下图所示：
+![](../image.jpg)
