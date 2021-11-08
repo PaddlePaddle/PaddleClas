@@ -3,12 +3,12 @@
 特征提取是图像识别中的关键一环，它的作用是将输入的图片转化为固定维度的特征向量，用于后续的[向量检索](./vector_search.md)。好的特征需要具备相似度保持性，即在特征空间中，相似度高的图片对其特征相似度要比较高（距离比较近）；相似度低的图片对，其特征相似度要比较小（距离比较远）。[Deep Metric Learning](../algorithm_introduction/metric_learning.md)用以研究如何通过深度学习的方法获得具有强表征能力的特征。
 
 ## 2. 网络结构
+为了图像识别任务的灵活定制，我们将整个网络分为Backbone, Neck, Head以及Loss部分，整体结构如下图所示，下面分别介绍各自的功能:
 ![](../../images/feature_extraction_framework.png)
-为了图像识别任务的灵活定制，我们将整个网络分为Backbone, Neck, Head以及Loss部分，整体结构如上图所示，下面分别介绍各自的功能:
-- Backbone:   指定所使用的骨干网络。 值得注意的是，PaddleClas提供的基于ImageNet的预训练模型，最后一层的输出为1000， 我们需要依据所需的特征维度定制最后一层的输出。
-- Neck:  用以特征增强及特征维度变换。  这儿的Neck，可以是一个简单的Linear Layer，用来做特征维度变换；也可以是较复杂的FPN结构，用以做特征增强。
-- Head:  用来将feature转化为logits。 除了常用的Fc Layer外，还可以替换为cosmargin, arcmargin, circlemargin等模块。
-- Loss:  指定所使用的Loss函数。  我们将Loss设计为组合loss的形式， 可以方便得将Classification Loss和Pair_wise Loss组合在一起。
+- **Backbone**:   指定所使用的骨干网络。 值得注意的是，PaddleClas提供的基于ImageNet的预训练模型，最后一层的输出为1000， 我们需要依据所需的特征维度定制最后一层的输出。
+- **Neck**:  用以特征增强及特征维度变换。  这儿的Neck，可以是一个简单的Linear Layer，用来做特征维度变换；也可以是较复杂的FPN结构，用以做特征增强。
+- **Head**:  用来将feature转化为logits。 除了常用的Fc Layer外，还可以替换为cosmargin, arcmargin, circlemargin等模块。
+- **Loss**:  指定所使用的Loss函数。  我们将Loss设计为组合loss的形式， 可以方便得将Classification Loss和Pair_wise Loss组合在一起。
 
 ## 3. 通用识别模型
 在PP-Shitu中, 我们采用[PP_LCNet_x2_5]作为骨干网络, Neck部分选用Linear Layer, Head部分选用ArcMargin, Loss部分选用CELoss, 详细的配置文件见[通用商品识别配置文件]（../../ppcls/configs/GeneralRecognition/GeneralRecognition_PPLCNet_x2_5.yaml）。其中，训练数据为如下7个公开数据集的汇总：
