@@ -71,7 +71,7 @@ python -m paddle.distributed.launch
 **推荐：** 建议使用多卡评估。多卡评估方式可以利用多卡并行计算快速得到整体数据集的特征集合，能够加速评估的过程。
 
 ## 4.4 模型推理
-推理过程包括两个步骤： 1)导出推理模型, 2)获取特征向量
+推理过程包括两个步骤： 1)导出推理模型; 2)获取特征向量
 ### 4.4.1 导出推理模型
 ```
 python tools/export_model -c ppcls/configs/GeneralRecognition/GeneralRecognition_PPLCNet_x2_5.yaml -o Global.pretrained_model="output/RecModel/best_model"
