@@ -15,14 +15,14 @@
 在PP-Shitu中, 我们采用[PP_LCNet_x2_5](../models/PP-LCNet.md)作为骨干网络， Neck部分选用Linear Layer， Head部分选用[ArcMargin](https://arxiv.org/abs/1801.07698)， Loss部分选用CELoss，详细的配置文件见[通用商品识别配置文件](../../../ppcls/configs/GeneralRecognition/GeneralRecognition_PPLCNet_x2_5.yaml)。其中，训练数据为如下7个公开数据集的汇总：
 | 数据集       | 数据量   | 类别数   | 场景  | 数据集地址 |
 | :------------:  | :-------------: | :-------: | :-------: | :--------: |
-| Aliproduct | 2498771 | 50030 | 商品 | [地址](https://www.objects365.org/overview.html) |
-| GLDv2 | 1580470 | 81313  | 地标 | [地址](https://cocodataset.org/) |
-| VeRI-Wild | 277797 | 30671 | 车辆 | [地址](https://github.com/luxiangju-PersonAI/iCartoonFace) |
+| Aliproduct | 2498771 | 50030 | 商品 | [地址](https://retailvisionworkshop.github.io/recognition_challenge_2020/) |
+| GLDv2 | 1580470 | 81313  | 地标 | [地址](https://github.com/cvdfoundation/google-landmark) |
+| VeRI-Wild | 277797 | 30671 | 车辆 | [地址](https://github.com/guishijin/veri-wild) |
 | LogoDet-3K | 155427 | 3000 | Logo | [地址](https://github.com/Wangjing1551/LogoDet-3K-Dataset) |
-| iCartoonFace | 389678 | 5013  | 动漫人物 | [地址](https://rpc-dataset.github.io/) |
-| SOP | 59551 | 11318  | 商品 | [地址](https://rpc-dataset.github.io/) |
-| Inshop | 25882 | 3997  | 商品 | [地址](https://rpc-dataset.github.io/) |
-| **Total** | **5M** | **185K**  | ---- | [地址](https://rpc-dataset.github.io/) |
+| iCartoonFace | 389678 | 5013  | 动漫人物 | [地址](http://challenge.ai.iqiyi.com/detail?raceId=5def69ace9fcf68aef76a75d) |
+| SOP | 59551 | 11318  | 商品 | [地址](https://cvgl.stanford.edu/projects/lifted_struct/) |
+| Inshop | 25882 | 3997  | 商品 | [地址](http://mmlab.ie.cuhk.edu.hk/projects/DeepFashion.html) |
+| **Total** | **5M** | **185K**  | ---- | [地址](----) |
 
 最终的模型效果如下表所示:
 | 模型       | Aliproduct  | VeRI-Wild  |  LogoDet-3K |  iCartoonFace | SOP | Inshop | Latency(ms) |
@@ -34,7 +34,7 @@ PP-LCNet-2.5x | 0.839 | 0.888 | 0.861 | 0.841 | 0.793 | 0.892 | 5.0
 # 4. 自定义特征提取
 自定义特征提取，是指依据自己的任务，重新训练特征提取模型。主要包含如下四个步骤：1）数据准备；2）模型训练；3）模型评估；4）模型推理。
 ## 4.1 数据准备
-首先，需要基于任务的需要，定制自己的数据集。数据的制作方法，参见
+首先，需要基于任务的需要，定制自己的数据集。数据集格式参见[格式说明](https://github.com/PaddlePaddle/PaddleClas/blob/develop/docs/zh_CN/data_preparation/recognition_dataset.md#%E6%95%B0%E6%8D%AE%E9%9B%86%E6%A0%BC%E5%BC%8F%E8%AF%B4%E6%98%8E)
 
 ## 4.2 模型训练
 - 单机单卡训练
@@ -49,7 +49,7 @@ python -m paddle.distributed.launch
     --gpus="0,1,2,3" tools/train.py
     -c ppcls/configs/GeneralRecognition/GeneralRecognition_PPLCNet_x2_5.yaml
 ```
-注意: 配置文件中默认采用`在线评估`的方式，如果你想加快训练速度，去除`在线评估`，只需要在上述命令后面，增加`-o eval_during_train=False`。
+**注意:** 配置文件中默认采用`在线评估`的方式，如果你想加快训练速度，去除`在线评估`，只需要在上述命令后面，增加`-o eval_during_train=False`。
 训练完毕后，在output目录下会生成最终模型文件`latest.pd*`，`best_model.pd*`和训练日志文件`train.log`。
 
 ## 4.3 模型评估
@@ -68,7 +68,7 @@ python -m paddle.distributed.launch
     -c  ppcls/configs/GeneralRecognition/GeneralRecognition_PPLCNet_x2_5.yaml
     -o  Global.pretrained_model="output/RecModel/best_model"
 ```
-**推荐：** 使用多卡评估，可以利用多卡快速计算得到整体数据集的特征集合，能够加速评估的过程。
+**推荐：** 建议使用多卡评估。多卡评估方式可以利用多卡并行计算快速得到整体数据集的特征集合，能够加速评估的过程。
 
 ## 4.4 模型推理
 推理过程包括两个步骤： 1)导出推理模型, 2)获取特征向量
