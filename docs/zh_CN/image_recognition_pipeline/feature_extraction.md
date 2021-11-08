@@ -84,4 +84,4 @@ cd deploy
 python python/predict_rec.py -c configs/inference_rec.yaml -o Global.rec_inference_model_dir="../inference"
 ```
 得到的特征输出格式如下图所示：
-![](../../../images/feature_extraction_output.png)
+![](../../images/feature_extraction_output.png)
