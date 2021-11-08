@@ -1,6 +1,6 @@
 # 特征提取
 ## 1. 简介
-特征提取是图像识别中的关键一环，它的作用是将输入的图片转化为固定维度的特征向量，用于后续的[向量检索](./vector_search.md)。好的特征需要具备相似度保持性，即在特征空间中，相似度高的图片对其特征相似度要比较高（距离比较近）；相似度低的图片对，其特征相似度要比较小（距离比较远）。[Deep Metric Learning](../algorithm_introduction/metric_learning.md)用以研究如何通过深度学习的方法获得具有强表征能力的特征。
+特征提取是图像识别中的关键一环，它的作用是将输入的图片转化为固定维度的特征向量，用于后续的[向量检索](./vector_search.md)。好的特征需要具备相似度保持性，即在特征空间中，相似度高的图片对其特征相似度要比较高（距离比较近），相似度低的图片对，其特征相似度要比较小（距离比较远）。[Deep Metric Learning](../algorithm_introduction/metric_learning.md)用以研究如何通过深度学习的方法获得具有强表征能力的特征。
 
 ## 2. 网络结构
 为了图像识别任务的灵活定制，我们将整个网络分为Backbone、 Neck、 Head以及Loss部分，整体结构如下图所示:
@@ -25,6 +25,11 @@
 | **Total** | **5M** | **185K**  | ---- | [地址](https://rpc-dataset.github.io/) |
 
 最终的模型效果如下表所示:
+| 模型       | Aliproduct  | VeRI-Wild  |  LogoDet-3K |  iCartoonFace | SOP | Inshop | Latency(ms) |
+| :----------:  | :---------: | :-------: | :-------: | :--------: | :--------: | :--------: | :--------: |
+PP-LCNet-2.5x | 0.839 | 0.888 | 0.861 | 0.841 | 0.793 | 0.892 | 5.0
+* 采用的评测指标为`Recall@1`
+* 速度评测机器的CPU具体信息为：`Intel(R) Xeon(R) Gold 6148 CPU @ 2.40GHz`，速度指标为开启 mkldnn ，线程数设置为 10 测试得到。
 
 # 4. 自定义特征提取
 自定义特征提取，是指依据自己的任务，重新训练特征提取模型。主要包含如下四个步骤：1）数据准备；2）模型训练；3）模型评估；4）模型推理。
@@ -63,6 +68,7 @@ python -m paddle.distributed.launch
     -c  ppcls/configs/GeneralRecognition/GeneralRecognition_PPLCNet_x2_5.yaml
     -o  Global.pretrained_model="output/RecModel/best_model"
 ```
+**推荐：** 使用多卡评估，可以利用多卡快速计算得到整体数据集的特征集合，能够加速评估的过程。
 
 ## 4.4 模型推理
 推理过程包括两个步骤： 1)导出推理模型, 2)获取特征向量
@@ -77,4 +83,3 @@ python tools/export_model -c ppcls/configs/ResNet50_vd_SOP.yaml -o Global.pretra
 cd deploy
 python python/predict_rec.py -c configs/inference_rec.yaml -o Global.rec_inference_model_dir="../inference"
 ```
-最终得到的模型向量，如下图所示：
