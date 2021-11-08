@@ -30,6 +30,7 @@
 #include <include/cls.h>
 #include <include/object_detector.h>
 #include <include/yaml_config.h>
+#include <include/vector_search.h>
 
 using namespace std;
 using namespace cv;
@@ -133,7 +134,7 @@ int main(int argc, char **argv) {
     exit(1);
   }
 
-  PaddleClas::YamlConfig config(argv[1]);
+  YamlConfig config(argv[1]);
   config.PrintConfigInfo();
 
   // config

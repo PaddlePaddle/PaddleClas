@@ -5,14 +5,22 @@ option(WITH_MKL        "Compile demo with MKL/OpenBlas support, default use MKL.
 option(WITH_GPU        "Compile demo with GPU/CPU, default use CPU."                    OFF)
 option(WITH_STATIC_LIB "Compile demo with static/shared library, default use static."   ON)
 option(WITH_TENSORRT "Compile demo with TensorRT."   OFF)
+option(FAISS_WITH_MKL "Faiss Compile demo with MKL."   OFF)
 
 SET(PADDLE_LIB "" CACHE PATH "Location of libraries")
 SET(OPENCV_DIR "" CACHE PATH "Location of libraries")
 SET(CUDA_LIB "" CACHE PATH "Location of libraries")
 SET(CUDNN_LIB "" CACHE PATH "Location of libraries")
 SET(TENSORRT_DIR "" CACHE PATH "Compile demo with TensorRT")
+SET(FAISS_DIR "" CACHE PATH "Location of libraries")
 
 set(DEMO_NAME "pp_shitu")
+
+if (FAISS_WITH_MKL)
+   SET(BLAS_NAME "mklml_intel")
+else()
+   SET(BLAS_NAME "openblas")
+endif()
 
 include(external-cmake/yaml-cpp.cmake)
 include_directories("${CMAKE_SOURCE_DIR}/")
@@ -34,6 +42,10 @@ if (WITH_MKL)
     ADD_DEFINITIONS(-DUSE_MKL)
 endif()
 
+if(NOT DEFINED FAISS_DIR)
+  message(FATAL_ERROR "please set FAISS_DIR with -DFAISS_DIR=/path/faiss")
+endif()
+
 if(NOT DEFINED PADDLE_LIB)
   message(FATAL_ERROR "please set PADDLE_LIB with -DPADDLE_LIB=/path/paddle/lib")
 endif()
@@ -42,6 +54,15 @@ if(NOT DEFINED OPENCV_DIR)
     message(FATAL_ERROR "please set OPENCV_DIR with -DOPENCV_DIR=/path/opencv")
 endif()
 
+if (WIN32)
+  include_directories("${FAISS_DIR}/include")
+  link_directories("${FAISS_DIR}/lib")
+  find_package(faiss REQUIRED PATHS ${FAISS_DIR}/share/faiss/ NO_DEFAULT_PATH)
+else()
+  find_package(faiss REQUIRED PATHS ${FAISS_DIR}/share/faiss NO_DEFAULT_PATH)
+  include_directories("${FAISS_DIR}/include")
+  link_directories("${FAISS_DIR}/lib")
+endif()
 
 if (WIN32)
   include_directories("${PADDLE_LIB}/paddle/fluid/inference")
@@ -213,6 +234,8 @@ AUX_SOURCE_DIRECTORY(./src SRCS)
 add_executable(${DEMO_NAME} ${SRCS})
 ADD_DEPENDENCIES(${DEMO_NAME} ext-yaml-cpp)
 target_link_libraries(${DEMO_NAME} ${DEPS})
+target_link_libraries(${DEMO_NAME} ${FAISS_DIR}/lib/libfaiss${CMAKE_STATIC_LIBRARY_SUFFIX})
+target_link_libraries(${DEMO_NAME} ${BLAS_NAME}${CMAKE_SHARED_LIBRARY_SUFFIX})
 
 if (WIN32 AND WITH_MKL)
     add_custom_command(TARGET ${DEMO_NAME} POST_BUILD

@@ -18,7 +18,6 @@
 
 #include <include/yaml_config.h>
 
-namespace PaddleClas {
 
 std::vector<std::string> YamlConfig::ReadDict(const std::string &path) {
   std::ifstream in(path);
@@ -77,5 +76,3 @@ void YamlConfig::PrintConfigInfo() {
   //   std::cout << it->as<std::string>() << "\n";
   //   }
 }
-
-} // namespace PaddleClas

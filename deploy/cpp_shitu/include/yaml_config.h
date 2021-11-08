@@ -39,7 +39,6 @@
 #include "opencv2/imgproc.hpp"
 #include "yaml-cpp/yaml.h"
 
-namespace PaddleClas {
 
 class YamlConfig {
 public:
@@ -52,5 +51,3 @@ public:
   void PrintConfigInfo();
   YAML::Node config_file;
 };
-
-} // namespace PaddleClas

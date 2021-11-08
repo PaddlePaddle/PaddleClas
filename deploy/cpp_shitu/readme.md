@@ -134,6 +134,15 @@ tar -xvf paddle_inference.tgz
 
 最终会在当前的文件夹中生成`paddle_inference/`的子文件夹。
 
+### 1.3 安装faiss库
+
+```shell
+ git clone https://github.com/facebookresearch/faiss.git
+ cd faiss 
+ cmake -B build . -DFAISS_ENABLE_PYTHON=OFF -DCMAKE_INSTALL_PREFIX=${faiss_install_path}
+ make -C build -j faiss
+ make -C build install
+```
 
 ## 2 开始运行
 
