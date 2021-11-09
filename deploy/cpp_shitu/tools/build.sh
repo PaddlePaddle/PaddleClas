@@ -3,6 +3,7 @@ LIB_DIR=/work/project/project/cpp_infer/paddle_inference/
 CUDA_LIB_DIR=/usr/local/cuda/lib64
 CUDNN_LIB_DIR=/usr/lib/x86_64-linux-gnu/
 FAISS_DIR=/work/project/project/cpp_infer/faiss/faiss_install
+FAISS_WITH_MKL=OFF
 
 BUILD_DIR=build
 rm -rf ${BUILD_DIR}
@@ -18,6 +19,6 @@ cmake .. \
     -DCUDNN_LIB=${CUDNN_LIB_DIR} \
     -DCUDA_LIB=${CUDA_LIB_DIR} \
     -DFAISS_DIR=${FAISS_DIR} \
-    -DFAISS_WITH_MKL=OFF
+    -DFAISS_WITH_MKL=${FAISS_WITH_MKL}
 
 make -j

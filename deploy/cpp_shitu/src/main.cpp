@@ -29,8 +29,8 @@
 #include <auto_log/autolog.h>
 #include <include/cls.h>
 #include <include/object_detector.h>
-#include <include/yaml_config.h>
 #include <include/vector_search.h>
+#include <include/yaml_config.h>
 
 using namespace std;
 using namespace cv;
@@ -137,6 +137,11 @@ int main(int argc, char **argv) {
   YamlConfig config(argv[1]);
   config.PrintConfigInfo();
 
+  // initialize detector, rec_Model, vector_search
+  PaddleClas::Classifier classifier(config.config_file);
+  PaddleDetection::ObjectDetector detector(config.config_file);
+  VectorSearch searcher(config.config_file);
+
   // config
   const int batch_size = config.config_file["Global"]["batch_size"].as<int>();
   bool visual_det = false;
@@ -152,6 +157,7 @@ int main(int argc, char **argv) {
     max_det_results = config.config_file["Global"]["max_det_results"].as<int>();
   }
 
+  // load image_file_path
   std::string path =
       config.config_file["Global"]["infer_imgs"].as<std::string>();
   std::vector<std::string> img_files_list;
@@ -164,11 +170,7 @@ int main(int argc, char **argv) {
   } else {
     img_files_list.push_back(path);
   }
-
   std::cout << "img_file_list length: " << img_files_list.size() << std::endl;
-
-  PaddleClas::Classifier classifier(config.config_file);
-  PaddleDetection::ObjectDetector detector(config.config_file);
 
   double elapsed_time = 0.0;
   std::vector<double> cls_times = {0, 0, 0};
@@ -177,6 +179,8 @@ int main(int argc, char **argv) {
   std::vector<std::string> img_paths;
   std::vector<PaddleDetection::ObjectResult> det_result;
   std::vector<int> det_bbox_num;
+  std::vector<float> features;
+  std::vector<float> feature;
 
   int warmup_iter = img_files_list.size() > 5 ? 5 : 0;
   for (int idx = 0; idx < img_files_list.size(); ++idx) {
@@ -206,20 +210,29 @@ int main(int argc, char **argv) {
     det_result.push_back(result_whole_img);
     det_bbox_num[0] = det_result.size() + 1;
 
-    // step3: recognition process, use score_thres to ensure accuracy
+    // step3: extract feature for all boxes in an inmage
+    SearchResult search_result;
     for (int j = 0; j < det_result.size(); ++j) {
       int w = det_result[j].rect[2] - det_result[j].rect[0];
       int h = det_result[j].rect[3] - det_result[j].rect[1];
       cv::Rect rect(det_result[j].rect[0], det_result[j].rect[1], w, h);
       cv::Mat crop_img = srcimg(rect);
-      std::vector<float> feature;
       classifier.Run(crop_img, feature, cls_times);
+      features.insert(features.end(), feature.begin(), feature.end());
     }
-    // double run_time = classifier.Run(srcimg, cls_times);
+
+    // step4: get search result
+    search_result = searcher.Search(features.data(), det_result.size());
+
+    // nms for search result
+
+    // for postprocess
     batch_imgs.clear();
     img_paths.clear();
     det_bbox_num.clear();
     det_result.clear();
+    feature.clear();
+    features.clear();
   }
 
   std::string presion = "fp32";

@@ -19,51 +19,46 @@
 #define OS_PATH_SEP "/"
 #endif
 
+#include "yaml-cpp/yaml.h"
+#include <cstring>
 #include <faiss/Index.h>
 #include <faiss/index_io.h>
-#include <cstring>
 #include <map>
-#include "yaml-cpp/yaml.h"
 
-struct SearchResult{
-  faiss::Index::idx_t* I;
-  float* D;
-  int query_number;
+struct SearchResult {
+  std::vector<faiss::Index::idx_t> I;
+  std::vector<float> D;
   int return_k;
 };
 
-class VectorSearch{
+class VectorSearch {
 public:
-  explicit VectorSearch(const YAML::Node &config_file){
+  explicit VectorSearch(const YAML::Node &config_file) {
     // IndexProcess
-    this->index_dir = config_file["IndexProcess"]["index_dir"].as<std::string>();
+    this->index_dir =
+        config_file["IndexProcess"]["index_dir"].as<std::string>();
     this->return_k = config_file["IndexProcess"]["return_k"].as<int>();
     this->score_thres = config_file["IndexProcess"]["score_thres"].as<float>();
-    this->max_query_number = config_file["Global"]["max_det_results"].as<int>() + 1;
+    this->max_query_number =
+        config_file["Global"]["max_det_results"].as<int>() + 1;
     LoadIdMap();
     LoadIndexFile();
-    this->I = new faiss::Index::idx_t[this->return_k * this->max_query_number];
-    this->D = new float[this->return_k * this->max_query_number];
-  }
-  ~VectorSearch(){
-    delete[] I;
-    delete[] D;
+    this->I.resize(this->return_k * this->max_query_number);
+    this->D.resize(this->return_k * this->max_query_number);
   };
   void LoadIdMap();
   void LoadIndexFile();
-  void Search(float* feature, int query_number);
-  const SearchResult& GetSearchResult();
-  const std::string& GetLabel(faiss::Index::idx_t ind);
+  const SearchResult &Search(float *feature, int query_number);
+  const std::string &GetLabel(faiss::Index::idx_t ind);
 
 private:
   std::string index_dir;
   int return_k = 5;
   float score_thres = 0.5;
-  std::map <long int, std::string> id_map;
-  faiss::Index * index;
+  std::map<long int, std::string> id_map;
+  faiss::Index *index;
   int max_query_number = 6;
-  int real_query_number = 0;
-  float *D = NULL;
-  faiss::Index::idx_t* I = NULL;
+  std::vector<float> D;
+  std::vector<faiss::Index::idx_t> I;
   SearchResult sr;
 };
