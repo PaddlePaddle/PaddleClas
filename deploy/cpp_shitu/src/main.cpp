@@ -27,6 +27,7 @@
 #include <numeric>
 
 #include <auto_log/autolog.h>
+#include <gflags/gflags.h>
 #include <include/cls.h>
 #include <include/object_detector.h>
 #include <include/vector_search.h>
@@ -34,6 +35,9 @@
 
 using namespace std;
 using namespace cv;
+
+DEFINE_string(config, "", "Path of yaml file");
+DEFINE_string(c, "", "Path of yaml file");
 
 void DetPredictImage(const std::vector<cv::Mat> &batch_imgs,
                      const std::vector<std::string> &all_img_paths,
@@ -129,12 +133,21 @@ void DetPredictImage(const std::vector<cv::Mat> &batch_imgs,
 }
 
 int main(int argc, char **argv) {
-  if (argc != 2) {
-    std::cerr << "[ERROR] usage: " << argv[0] << " yaml_path\n";
+  google::ParseCommandLineFlags(&argc, &argv, true);
+  std::string yaml_path = "";
+  if (FLAGS_config == "" && FLAGS_c == "") {
+    std::cerr << "[ERROR] usage: " << std::endl
+              << argv[0] << " -c $yaml_path" << std::endl
+              << "or:" << std::endl
+              << argv[0] << " -config $yaml_path" << std::endl;
     exit(1);
+  } else if (FLAGS_config != "") {
+    yaml_path = FLAGS_config;
+  } else {
+    yaml_path = FLAGS_c;
   }
 
-  YamlConfig config(argv[1]);
+  YamlConfig config(yaml_path);
   config.PrintConfigInfo();
 
   // initialize detector, rec_Model, vector_search
