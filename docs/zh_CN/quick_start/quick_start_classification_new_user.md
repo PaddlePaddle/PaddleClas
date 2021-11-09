@@ -47,18 +47,18 @@ cd $path_to_PaddleClas
 
 ```shell
 # linux or mac
-cd dataset/flowers102
+cd dataset/
 # 如果希望从浏览器中直接下载，可以复制该链接并访问，然后下载解压即可
 wget https://paddle-imagenet-models-name.bj.bcebos.com/data/flowers102.zip
 # 解压
 unzip flowers102.zip
 ```
 
-没有安装 `wget` 命令或者在 Windows 中下载的话，需要将地址拷贝到浏览器中下载，并进行解压到 PaddleClas 的根目录即可。
+没有安装 `wget` 命令或者在 Windows 中下载的话，需要将地址拷贝到浏览器中下载，并进行解压到目录 `PaddleClas/dataset/` 下面即可。
 
-解压完成后，在文件夹下已经生成用于训练和测试的三个 `.txt` 文件：`train_list.txt`（训练集，1020张图）、`val_list.txt`（验证集，1020张图）、`train_extra_list.txt`（更大的训练集，7169张图）。文件中每行格式：**图像相对路径**  **图像的label_id**（注意：中间有空格）。
+解压完成后，在目录 `PaddleClas/dataset/flowers102` 下有用于训练和测试的三个 `.txt` 文件：`train_list.txt`（训练集，1020张图）、`val_list.txt`（验证集，1020张图）、`train_extra_list.txt`（更大的训练集，7169张图）。文件中每行格式：**图像相对路径**  **图像的label_id**（注意：中间有空格），此外还有flowers102数据集 label id 与类别名称的映射文件：`flowers102_label_list.txt`。
 
-此时flowers102数据集存放在**dataset/flowers102/jpg** 文件夹中，图像示例如下：
+flowers102数据集的图像文件存放在 `dataset/flowers102/jpg` 目录中，图像示例如下：
 
 <div align="center">
 <img src="../../images/quick_start/Examples-Flower-102.png" width = "800" />
@@ -122,7 +122,7 @@ python tools/train.py -c ./ppcls/configs/quick_start/new_user/ShuffleNetV2_x0_25
 #### 不使用预训练模型
 
 ```shell
-python3 tools/train.py -c ./ppcls/configs/quick_start/ResNet50_vd.yaml
+python tools/train.py -c ./ppcls/configs/quick_start/ResNet50_vd.yaml
 ```
 
 训练完成后，验证集的`Top1 Acc`曲线如下所示，最高准确率为0.2735。训练精度曲线下图所示
@@ -136,7 +136,7 @@ python3 tools/train.py -c ./ppcls/configs/quick_start/ResNet50_vd.yaml
 基于 ImageNet1k 分类预训练模型进行微调，训练脚本如下所示
 
 ```shell
-python3 tools/train.py -c ./ppcls/configs/quick_start/ResNet50_vd.yaml -o Arch.pretrained=True
+python tools/train.py -c ./ppcls/configs/quick_start/ResNet50_vd.yaml -o Arch.pretrained=True
 ```
 
 **注**：此训练脚本使用 GPU，如使用 CPU 可按照上文中[4.1 使用CPU进行模型训练](#4.1)所示，进行修改。
@@ -149,20 +149,26 @@ python3 tools/train.py -c ./ppcls/configs/quick_start/ResNet50_vd.yaml -o Arch.p
 
 ## 5. 模型预测
 
-训练完成后预测代码如下：
+训练完成后，可以使用训练好的模型进行预测，以训练的 ResNet50_vd 模型为例，预测代码如下：
 
 ```shell
 cd $path_to_PaddleClas
-python3 tools/infer.py -c ./ppcls/configs/quick_start/new_user/ShuffleNetV2_x0_25.yaml -o Infer.infer_imgs=dataset/flowers102/jpg/image_00001.jpg -o Global.pretrained_model=output/ShuffleNetV2_x0_25/best_model
+python tools/infer.py -c ./ppcls/configs/quick_start/ResNet50_vd.yaml -o Infer.infer_imgs=dataset/flowers102/jpg/image_00001.jpg -o Global.pretrained_model=output/ResNet50_vd/best_model
 ```
 
 `-i` 输入为单张图像路径，运行成功后，示例结果如下：
 
-`[{'class_ids': [76, 65, 34, 9, 69], 'scores': [0.91762, 0.01801, 0.00833, 0.0071, 0.00669], 'file_name': 'dataset/flowers102/jpg/image_00001.jpg', 'label_names': []}]`
+`[{'class_ids': [76, 51, 37, 33, 9], 'scores': [0.99998, 0.0, 0.0, 0.0, 0.0], 'file_name': 'dataset/flowers102/jpg/image_00001.jpg', 'label_names': ['passion flower', 'wild pansy', 'great masterwort', 'mexican aster', 'globe thistle']}]`
 
-`-i` 输入为图像集所在目录，运行成功后，示例结果如下：
+当然也可以使用训练的 ShuffleNetV2_x0_25 模型进行预测，代码如下：
 
-```txt
-[{'class_ids': [76, 65, 34, 9, 69], 'scores': [0.91762, 0.01801, 0.00833, 0.0071, 0.00669], 'file_name': 'dataset/flowers102/jpg/image_00001.jpg', 'label_names': []}, {'class_ids': [76, 69, 34, 28, 9], 'scores': [0.77122, 0.06295, 0.02537, 0.02531, 0.0251], 'file_name': 'dataset/flowers102/jpg/image_00002.jpg', 'label_names': []}, {'class_ids': [99, 76, 81, 85, 16], 'scores': [0.26374, 0.20423, 0.07818, 0.06042, 0.05499], 'file_name': 'dataset/flowers102/jpg/image_00003.jpg', 'label_names': []}, {'class_ids': [9, 37, 34, 24, 76], 'scores': [0.17784, 0.16651, 0.14539, 0.12096, 0.04816], 'file_name': 'dataset/flowers102/jpg/image_00004.jpg', 'label_names': []}, {'class_ids': [76, 66, 91, 16, 13], 'scores': [0.95494, 0.00688, 0.00596, 0.00352, 0.00308], 'file_name': 'dataset/flowers102/jpg/image_00005.jpg', 'label_names': []}, {'class_ids': [76, 66, 34, 8, 43], 'scores': [0.44425, 0.07487, 0.05609, 0.05609, 0.03667], 'file_name': 'dataset/flowers102/jpg/image_00006.jpg', 'label_names': []}, {'class_ids': [86, 93, 81, 22, 21], 'scores': [0.44714, 0.13582, 0.07997, 0.0514, 0.03497], 'file_name': 'dataset/flowers102/jpg/image_00007.jpg', 'label_names': []}, {'class_ids': [13, 76, 81, 18, 97], 'scores': [0.26771, 0.1734, 0.06576, 0.0451, 0.03986], 'file_name': 'dataset/flowers102/jpg/image_00008.jpg', 'label_names': []}, {'class_ids': [34, 76, 8, 5, 9], 'scores': [0.67224, 0.31896, 0.00241, 0.00227, 0.00102], 'file_name': 'dataset/flowers102/jpg/image_00009.jpg', 'label_names': []}, {'class_ids': [76, 34, 69, 65, 66], 'scores': [0.95185, 0.01101, 0.00875, 0.00452, 0.00406], 'file_name': 'dataset/flowers102/jpg/image_00010.jpg', 'label_names': []}]
+```shell
+cd $path_to_PaddleClas
+python tools/infer.py -c ./ppcls/configs/quick_start/new_user/ShuffleNetV2_x0_25.yaml -o Infer.infer_imgs=dataset/flowers102/jpg/image_00001.jpg -o Global.pretrained_model=output/ShuffleNetV2_x0_25/best_model
 ```
+
+`-i` 参数也可以为待测图像文件所在目录（`dataset/flowers102/jpg/`），运行成功后，部分示例结果如下：
+
+`[{'class_ids': [76, 51, 37, 33, 9], 'scores': [0.99998, 0.0, 0.0, 0.0, 0.0], 'file_name': 'dataset/flowers102/jpg/image_00001.jpg', 'label_names': ['passion flower', 'wild pansy', 'great masterwort', 'mexican aster', 'globe thistle']}, {'class_ids': [76, 51, 37, 33, 32], 'scores': [0.99999, 0.0, 0.0, 0.0, 0.0], 'file_name': 'dataset/flowers102/jpg/image_00002.jpg', 'label_names': ['passion flower', 'wild pansy', 'great masterwort', 'mexican aster', 'love in the mist']}, {'class_ids': [76, 12, 39, 73, 78], 'scores': [0.99998, 0.0, 0.0, 0.0, 0.0], 'file_name': 'dataset/flowers102/jpg/image_00003.jpg', 'label_names': ['passion flower', 'king protea', 'lenten rose', 'rose', 'toad lily']}, {'class_ids': [76, 37, 34, 12, 9], 'scores': [0.86282, 0.11177, 0.00717, 0.00599, 0.00397], 'file_name': 'dataset/flowers102/jpg/image_00004.jpg', 'label_names': ['passion flower', 'great masterwort', 'alpine sea holly', 'king protea', 'globe thistle']}, {'class_ids': [76, 37, 33, 51, 69], 'scores': [0.9999, 1e-05, 1e-05, 0.0, 0.0], 'file_name': 'dataset/flowers102/jpg/image_00005.jpg', 'label_names': ['passion flower', 'great masterwort', 'mexican aster', 'wild pansy', 'tree poppy']}, {'class_ids': [76, 37, 51, 33, 73], 'scores': [0.99999, 0.0, 0.0, 0.0, 0.0], 'file_name': 'dataset/flowers102/jpg/image_00006.jpg', 'label_names': ['passion flower', 'great masterwort', 'wild pansy', 'mexican aster', 'rose']}, {'class_ids': [76, 37, 12, 91, 30], 'scores': [0.98746, 0.00211, 0.00201, 0.00136, 0.0007], 'file_name': 'dataset/flowers102/jpg/image_00007.jpg', 'label_names': ['passion flower', 'great masterwort', 'king protea', 'bee balm', 'carnation']}, {'class_ids': [76, 37, 81, 77, 72], 'scores': [0.99976, 3e-05, 2e-05, 2e-05, 1e-05], 'file_name': 'dataset/flowers102/jpg/image_00008.jpg', 'label_names': ['passion flower', 'great masterwort', 'clematis', 'lotus', 'water lily']}, {'class_ids': [76, 37, 13, 12, 34], 'scores': [0.99646, 0.00144, 0.00092, 0.00035, 0.00027], 'file_name': 'dataset/flowers102/jpg/image_00009.jpg', 'label_names': ['passion flower', 'great masterwort', 'spear thistle', 'king protea', 'alpine sea holly']}, {'class_ids': [76, 37, 34, 33, 51], 'scores': [0.99999, 0.0, 0.0, 0.0, 0.0], 'file_name': 'dataset/flowers102/jpg/image_00010.jpg', 'label_names': ['passion flower', 'great masterwort', 'alpine sea holly', 'mexican aster', 'wild pansy']}]`
+
 其中，列表的长度为 batch_size 的大小。
