@@ -28,13 +28,13 @@
 | 模型       | Aliproduct  | VeRI-Wild  |  LogoDet-3K |  iCartoonFace | SOP | Inshop | Latency(ms) |
 | :----------:  | :---------: | :-------: | :-------: | :--------: | :--------: | :--------: | :--------: |
 PP-LCNet-2.5x | 0.839 | 0.888 | 0.861 | 0.841 | 0.793 | 0.892 | 5.0
-* 采用的评测指标为：`Recall@1`;
-* 速度评测机器的CPU具体信息为：`Intel(R) Xeon(R) Gold 6148 CPU @ 2.40GHz`;
-* 速度指标的评测条件为： 开启MKLDNN, 线程数设置为10;
-* 预训练模型地址：[通用识别预训练模型](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/pretrain/general_PPLCNet_x2_5_pretrained_v1.0.pdparams)；
+* 采用的评测指标为：`Recall@1`
+* 速度评测机器的CPU具体信息为：`Intel(R) Xeon(R) Gold 6148 CPU @ 2.40GHz`
+* 速度指标的评测条件为： 开启MKLDNN, 线程数设置为10
+* 预训练模型地址：[通用识别预训练模型](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/pretrain/general_PPLCNet_x2_5_pretrained_v1.0.pdparams)
 
 # 4. 自定义特征提取
-自定义特征提取，是指依据自己的任务，重新训练特征提取模型。主要包含如下四个步骤：1）数据准备；2）模型训练；3）模型评估；4）模型推理。
+自定义特征提取，是指依据自己的任务，重新训练特征提取模型。主要包含四个步骤：1）数据准备；2）模型训练；3）模型评估；4）模型推理。
 ## 4.1 数据准备
 首先，需要基于任务定制自己的数据集。数据集格式参见[格式说明](https://github.com/PaddlePaddle/PaddleClas/blob/develop/docs/zh_CN/data_preparation/recognition_dataset.md#%E6%95%B0%E6%8D%AE%E9%9B%86%E6%A0%BC%E5%BC%8F%E8%AF%B4%E6%98%8E)。在启动模型训练之前，需要在配置文件中修改数据配置相关的内容, 主要包括数据集的地址以及类别数量。对应到配置文件中的位置如下所示：
 ```
@@ -80,9 +80,8 @@ python -m paddle.distributed.launch \
     -c ppcls/configs/GeneralRecognition/GeneralRecognition_PPLCNet_x2_5.yaml
 ```
 **注意:** 
-配置文件中默认采用`在线评估`的方式，如果你想加快训练速度，去除`在线评估`，只需要在上述命令后面，增加`-o eval_during_train=False`。
-训练完毕后，在output目录下会生成最终模型文件`latest.pd*`，`best_model.pd*`和训练日志文件`train.log`。
-其中，`best_model`用来存储当前评测指标下的最佳模型；`latest`用来存储最新生成的模型, 方便在任务中断的情况下从断点位置启动训练，断点重训命令如下所示：
+配置文件中默认采用`在线评估`的方式，如果你想加快训练速度，去除`在线评估`，只需要在上述命令后面，增加`-o eval_during_train=False`。训练完毕后，在output目录下会生成最终模型文件`latest`，`best_model`和训练日志文件`train.log`。其中，`best_model`用来存储当前评测指标下的最佳模型；`latest`用来存储最新生成的模型, 方便在任务中断的情况下从断点位置启动训练。
+- 断点续训：
 ```shell
 export CUDA_VISIBLE_DEVICES=0,1,2,3
 python -m paddle.distributed.launch \
@@ -95,7 +94,8 @@ python -m paddle.distributed.launch \
 - 单卡评估
 ```shell
 export CUDA_VISIBLE_DEVICES=0
-python tools/eval.py -c ppcls/configs/GeneralRecognition/GeneralRecognition_PPLCNet_x2_5.yaml \
+python tools/eval.py \
+-c ppcls/configs/GeneralRecognition/GeneralRecognition_PPLCNet_x2_5.yaml \
 -o Global.pretrained_model="output/RecModel/best_model"
 ```
 
