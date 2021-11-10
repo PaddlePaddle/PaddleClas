@@ -1,5 +1,0 @@
-include LICENSE.txt
-include README.md
-
-recursive-include tools/infer utils.py predict.py
-recursive-include ppcls/utils imagenet1k_label_list.txt

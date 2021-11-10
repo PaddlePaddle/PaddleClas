@@ -1,7 +1,0 @@
-ujson
-opencv-python==4.1.2.30
-pillow
-tqdm
-PyYAML
-visualdl >= 2.0.0b
-scipy
