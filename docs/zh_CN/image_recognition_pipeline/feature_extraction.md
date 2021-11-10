@@ -129,4 +129,4 @@ python python/predict_rec.py \
 得到的特征输出格式如下图所示：
 ![](../../images/feature_extraction_output.png)
 
-在实际使用过程中，单纯得到特征往往并不能够满足业务的需求。如果想进一步通过特征来进行图像识别，可以参照文档[向量检索](./vector_search.md)。
+在实际使用过程中，单纯得到特征往往并不能够满足业务的需求。如果想进一步通过特征检索来进行图像识别，可以参照文档[向量检索](./vector_search.md)。
