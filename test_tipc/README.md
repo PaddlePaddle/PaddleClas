@@ -23,6 +23,7 @@
 
 ## 3. 一键测试工具使用
 ### 目录介绍
+```
 ./test_tipc/
 ├── common_func.sh
 ├── config
@@ -41,6 +42,7 @@
 ├── README.md
 ├── results
 └── test_train_inference_python.sh
+```
 
 ### 测试流程
 使用本工具，可以测试不同功能的支持情况，以及预测结果是否对齐，测试流程如下：
