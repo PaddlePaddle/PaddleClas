@@ -64,7 +64,7 @@ class DetOp(Op):
             im_scale_y, im_scale_x = self.generate_scale(raw_im)
             im = self.img_preprocess(raw_im)
 
-            im_shape = np.array(list(im.shape[1:])).reshape(-1)
+            im_shape = np.array(im.shape[1:]).reshape(-1)
             scale_factor = np.array([im_scale_y, im_scale_x]).reshape(-1)
             imgs.append({
                 "image": im[np.newaxis, :],
