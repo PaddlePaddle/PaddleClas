@@ -51,7 +51,7 @@ PicoDet 由 [PaddleDetection](https://github.com/PaddlePaddle/PaddleDetection) �
 
 更多关于 PicoDet 的优化细节与 benchmark 可以参考 [PicoDet 系列模型介绍](https://github.com/PaddlePaddle/PaddleDetection/blob/develop/configs/picodet/README.md)。
 
-在轻量级主体检测任务中，为了更好地兼顾检测速度与效果，我们使用 PPLCNet_x2_5 作为主体检测模型的骨干网络，同时将训练与预测的图像尺度修改为了 640x640，其余配置与 [picodet_m_shufflenetv2_416_coco.yml](https://github.com/PaddlePaddle/PaddleDetection/blob/develop/configs/picodet/picodet_m_shufflenetv2_416_coco.yml)完全一致。将数据集更换为自定义的主体检测数据集，进行训练，最终得到检测模型。
+在轻量级主体检测任务中，为了更好地兼顾检测速度与效果，我们使用 PPLCNet_x2_5 作为主体检测模型的骨干网络，同时将训练与预测的图像尺度修改为了 640x640，其余配置与 [picodet_lcnet_1_5x_416_coco.yml](https://github.com/PaddlePaddle/PaddleDetection/blob/develop/configs/picodet/more_config/picodet_lcnet_1_5x_416_coco.yml)完全一致。将数据集更换为自定义的主体检测数据集，进行训练，最终得到检测模型。
 
 
 ### 2.2 服务端主体检测模型
@@ -203,7 +203,7 @@ python tools/export_model.py -c configs/ppyolo/ppyolov2_r50vd_dcn_365e_coco.yml 
 
 导出模型之后，在主体检测与识别任务中，就可以将检测模型的路径更改为该 inference 模型路径，完成预测。
 
-以商品识别为例，其配置文件为 [inference_product.yaml](../../../deploy/configs/inference_product.yaml) ，修改其中的 `Global.det_inference_model_dir` 字段为导出的主体检测 inference 模型目录，参考[图像识别快速开始教程](../tutorials/quick_start_recognition.md) ，即可完成商品检测与识别过程。
+以商品识别为例，其配置文件为 [inference_product.yaml](../../../deploy/configs/inference_product.yaml) ，修改其中的 `Global.det_inference_model_dir` 字段为导出的主体检测 inference 模型目录，参考[图像识别快速开始教程](../quick_start/quick_start_recognition.md) ，即可完成商品检测与识别过程。
 
 
 ### FAQ

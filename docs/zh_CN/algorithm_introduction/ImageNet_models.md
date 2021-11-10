@@ -1,4 +1,4 @@
-简体中文 | [English](README.md)
+<!-- 简体中文 | [English](../../en/algorithm_introduction/ImageNet_models.md) -->
 
 
 ## ImageNet预训练模型库

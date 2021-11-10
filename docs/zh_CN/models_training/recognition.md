@@ -271,7 +271,7 @@ python3 tools/export_model.py \
 
 其中，`Global.pretrained_model`用于指定模型文件路径，该路径仍无需包含模型文件后缀名（如[2.2.2 特征模型恢复训练](#特征模型恢复训练)）。当执行后，会在当前目录下生成`./inference`目录，目录下包含`inference.pdiparams`、`inference.pdiparams.info`、`inference.pdmodel`文件。`Global.save_inference_dir`可以指定导出inference模型的路径。此处保存的inference模型在embedding特征层做了截断，即模型最终的输出为n维embedding特征。
 
-上述命令将生成模型结构文件（`inference.pdmodel`）和模型权重文件（`inference.pdiparams`），然后可以使用预测引擎进行推理。使用inference模型推理的流程可以参考[基于Python预测引擎预测推理](https://github.com/PaddlePaddle/PaddleClas/blob/develop/docs/zh_CN/inference.md)。
+上述命令将生成模型结构文件（`inference.pdmodel`）和模型权重文件（`inference.pdiparams`），然后可以使用预测引擎进行推理。使用inference模型推理的流程可以参考[基于Python预测引擎预测推理](../inference_deployment/python_deploy.md)。
 
 <a name="特征检索"></a>  
 
