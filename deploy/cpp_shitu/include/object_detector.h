@@ -65,7 +65,6 @@ public:
     this->use_fp16_ = config_file["Global"]["use_fp16"].as<bool>();
     this->model_dir_ =
         config_file["Global"]["det_inference_model_dir"].as<std::string>();
-    this->nms_thres_ = config_file["Global"]["rec_nms_thresold"].as<float>();
     this->threshold_ = config_file["Global"]["threshold"].as<float>();
     this->max_det_results_ = config_file["Global"]["max_det_results"].as<int>();
     this->image_shape_ =
@@ -105,7 +104,6 @@ private:
   bool batch_size_ = 1;
   bool use_fp16_ = false;
   std::string model_dir_;
-  float nms_thres_ = 0.02;
   float threshold_ = 0.5;
   float max_det_results_ = 5;
   std::vector<int> image_shape_ = {3, 640, 640};

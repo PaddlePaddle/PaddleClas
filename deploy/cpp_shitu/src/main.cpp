@@ -29,6 +29,7 @@
 #include <auto_log/autolog.h>
 #include <gflags/gflags.h>
 #include <include/cls.h>
+#include <include/nms.h>
 #include <include/object_detector.h>
 #include <include/vector_search.h>
 #include <include/yaml_config.h>
@@ -132,6 +133,21 @@ void DetPredictImage(const std::vector<cv::Mat> &batch_imgs,
   }
 }
 
+void PrintResult(std::string &img_path,
+                 std::vector<PaddleDetection::ObjectResult> &det_result,
+                 std::vector<int> &indeices, VectorSearch &vector_search,
+                 SearchResult &search_result) {
+  printf("%s:\n", img_path.c_str());
+  for (int i = 0; i < indeices.size(); ++i) {
+    int t = indeices[i];
+    printf("\tresult%d: bbox[%d, %d, %d, %d], score: %f, label: %s\n", i,
+           det_result[t].rect[0], det_result[t].rect[1], det_result[t].rect[2],
+           det_result[t].rect[3], det_result[t].confidence,
+           vector_search.GetLabel(search_result.I[search_result.return_k * t])
+               .c_str());
+  }
+}
+
 int main(int argc, char **argv) {
   google::ParseCommandLineFlags(&argc, &argv, true);
   std::string yaml_path = "";
@@ -169,6 +185,11 @@ int main(int argc, char **argv) {
   if (config.config_file["Global"]["max_det_results"].IsDefined()) {
     max_det_results = config.config_file["Global"]["max_det_results"].as<int>();
   }
+  float rec_nms_thresold = 0.05;
+  if (config.config_file["Global"]["rec_nms_thresold"].IsDefined()) {
+    rec_nms_thresold =
+        config.config_file["Global"]["rec_nms_thresold"].as<float>();
+  }
 
   // load image_file_path
   std::string path =
@@ -184,16 +205,20 @@ int main(int argc, char **argv) {
     img_files_list.push_back(path);
   }
   std::cout << "img_file_list length: " << img_files_list.size() << std::endl;
-
-  double elapsed_time = 0.0;
+  // for time log
   std::vector<double> cls_times = {0, 0, 0};
   std::vector<double> det_times = {0, 0, 0};
+  // for read images
   std::vector<cv::Mat> batch_imgs;
   std::vector<std::string> img_paths;
+  // for detection
   std::vector<PaddleDetection::ObjectResult> det_result;
   std::vector<int> det_bbox_num;
+  // for vector search
   std::vector<float> features;
   std::vector<float> feature;
+  // for nms
+  std::vector<int> indeices;
 
   int warmup_iter = img_files_list.size() > 5 ? 5 : 0;
   for (int idx = 0; idx < img_files_list.size(); ++idx) {
@@ -214,8 +239,8 @@ int main(int argc, char **argv) {
                     det_bbox_num, det_times, visual_det, run_benchmark);
 
     // select max_det_results bbox
-    while (det_result.size() > max_det_results) {
-      det_result.pop_back();
+    if (det_result.size() > max_det_results) {
+      det_result.resize(max_det_results);
     }
     // step2: add the whole image for recognition to improve recall
     PaddleDetection::ObjectResult result_whole_img = {
@@ -238,6 +263,13 @@ int main(int argc, char **argv) {
     search_result = searcher.Search(features.data(), det_result.size());
 
     // nms for search result
+    for (int i = 0; i < det_result.size(); ++i) {
+      det_result[i].confidence = search_result.D[search_result.return_k * i];
+    }
+    NMSBoxes(det_result, detector.GetThreshold(), rec_nms_thresold, indeices);
+
+    // print result
+    PrintResult(img_path, det_result, indeices, searcher, search_result);
 
     // for postprocess
     batch_imgs.clear();
@@ -246,6 +278,7 @@ int main(int argc, char **argv) {
     det_result.clear();
     feature.clear();
     features.clear();
+    indeices.clear();
   }
 
   std::string presion = "fp32";
