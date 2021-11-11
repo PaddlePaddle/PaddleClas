@@ -24,6 +24,7 @@
 | :--- | :--- |  :----:  | :--------: |  :----  |   :----  |   :----  |
 | ResNet     |ResNet50_vd | 分类  | 支持 | 多机多卡 <br> 混合精度 | FPGM裁剪 <br> PACT量化|  |
 | MobileNetV3     |MobileNetV3_large_x1_0 | 分类  | 支持 | 多机多卡 <br> 混合精度 | FPGM裁剪 <br> PACT量化|  |
+| PPLCNet     |PPLCNet_x2_5 | 分类  | 支持 | 多机多卡 <br> 混合精度 | FPGM裁剪 <br> PACT量化|  |
 
 ## 3. 一键测试工具使用
 ### 目录介绍
