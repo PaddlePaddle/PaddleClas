@@ -1,0 +1,15 @@
+{
+  "name": "miniprogram",
+  "version": "1.0.0",
+  "main": "dist/index.js",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "paddlejs": "^1.0.17",
+    "weui-miniprogram": "^1.1.1"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "description": ""
+}

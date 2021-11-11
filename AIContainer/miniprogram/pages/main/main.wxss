@@ -1,0 +1,84 @@
+/* miniprogram/pages/main/main.wxss */
+page{
+  background:#191970;
+}
+.swiperCont{
+  width: 100%;
+  box-sizing: border-box;
+}
+.swiper{
+  width: 710rpx;
+  height: 310rpx;
+  text-align: center;
+  overflow: hidden;
+  border-radius: 50rpx;
+  margin: 15rpx auto 30rpx;
+}
+.swiper-item image{
+  width: 710rpx;
+  height: 310rpx;
+}
+.swiper .wx-swiper-dot{
+  width: 30rpx;
+  height: 8rpx;
+  border-radius: 5rpx;
+}
+.swiper .wx-swiper-dot-active{
+  background: #ffffff;
+}
+.mainimg{
+  width: 100%;
+  z-index: 1;
+}
+.leftround{
+  position:absolute;
+  width: 170rpx;
+  height: 170rpx;
+  margin-top: -500rpx;
+  border-radius: 50%;
+  background: linear-gradient(to right,rgba(255,255,255,0.2),rgba(205,92,92,0.2));
+  margin-left:40rpx
+}
+.rightround{
+  position:absolute;
+  width: 130rpx;
+  height: 130rpx;
+  margin-top: -390rpx;
+  border-radius: 50%;
+  background: linear-gradient(to right,rgba(255,255,255,0.2),rgba(205,92,92,0.2));
+  right:10rpx
+}
+.bottomtext1{
+  position: absolute;
+  width:400rpx;
+  margin-left: 240rpx;
+  margin-top: -220rpx;
+  background: linear-gradient(to right,rgba(0,191,255,1),rgba(178,34,34,1),rgba(255,215,0,1));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  z-index: 2;
+}
+.bottomtext11{
+  font-family: 'Times New Roman', Times, serif;
+  font-size: 74rpx;
+  font-weight: bold;
+}
+.bottomtext2{
+  position: absolute;
+  width:600rpx;
+  margin-left: 110rpx;
+  margin-top: -70rpx;
+  margin-bottom: 30rpx;
+  background: linear-gradient(to right,rgba(0,191,255,1),rgba(178,34,34,1),rgba(255,215,0,1));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  z-index: 2;
+}
+.bottomtext22{
+  font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+  font-size: 22rpx;
+  font-weight: bold;
+  letter-spacing:26rpx;
+} 

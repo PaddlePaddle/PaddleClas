@@ -1,0 +1,48 @@
+{
+  "pages": [
+    "pages/main/main",
+    "pages/mine/main",
+    "pages/main/uploadpage/upload",
+    "pages/main/revisepage/revise",
+    "pages/mine/information/information",
+    "pages/main/recognitionpage/recognition"
+  ],
+  "window": {
+    "backgroundColor": "#00FF00",
+    "backgroundTextStyle": "light",
+    "navigationBarBackgroundColor": "#005AED",
+    "navigationBarTitleText": "智能货柜",
+    "navigationBarTextStyle": "white",
+    "navigationStyle": "custom"
+  },
+  "plugins": {
+    "WechatSI": {
+      "version": "0.3.4",
+      "provider": "wx069ba97219f66d99"
+    },
+    "paddlejs-plugin": {
+      "version": "0.0.3",
+      "provider": "wx7138a7bb793608c3"
+    }
+  },
+  "usingComponents": {
+    "cu-custom": "/colorui/components/cu-custom"
+  },
+  "tabBar": {
+    "list": [
+      {
+        "pagePath": "pages/main/main",
+        "text": "主页",
+        "iconPath": "images/main_default.png",
+        "selectedIconPath": "images/main.png"
+      },
+      {
+        "pagePath": "pages/mine/main",
+        "text": "我的",
+        "iconPath": "images/mine_default.png",
+        "selectedIconPath": "images/mine.png"
+      }
+    ]
+  },
+  "sitemapLocation": "sitemap.json"
+}

@@ -1,0 +1,94 @@
+<!--pages/main/revisepage/revise.wxml-->
+<scroll-view scroll-y class="DrawerPage {{modalName==null?'':'show'}}" bindscroll="scrollPosition" scroll-top="{{topPosition}}">
+<!-- 顶部操作条 -->
+  <cu-custom bgColor="bg-gradual-blue" isBack="{{true}}">
+    <view slot="backText">返回</view>
+    <view slot="content">商品修改 </view>
+	</cu-custom>
+  <!-- 搜索框 -->
+  <view class="box">
+    <view class="cu-bar search bg-white">
+      <view class="search-form radius">
+        <text class="cuIcon-search"></text>
+        <input type="text" placeholder="搜索商品" confirm-type="search" value="{{searchtarget}}" bindinput='inputBind' bindconfirm='getSearch'></input>
+        <view class="action" style="margin-right: 0rpx;" bindtap="onClickCleanSearch">
+          <text class="cuIcon-close"></text>
+        </view>
+      </view>
+      <view class="action">
+        <button class="cu-btn bg-green shadow-blur radius" bindtap="getSearch">搜索</button>
+      </view>
+    </view>
+  </view>
+  <!-- 商品列表 -->
+  <view class="cu-list menu card-menu margin-top-xl margin-bottom-xl shadow-lg" style="margin-right: 20rpx;margin-left: 20rpx;margin-top: 30rpx;margin-bottom: 30rpx;">
+    <view class="cu-item arrow" wx:for="{{list}}" wx:key="index" bindtap="showModal" data-product="{{item}}" style="min-height: 150rpx;">
+      <!-- 商品信息 -->
+      <view class="cu-avatar square lg" style="background-image:url(http://106.12.78.130:8080/pictures//PaddleClas/dataset/retail/{{item[3]}});width: 105rpx;height: 105rpx;"></view>
+      <view class="content" style="margin-left: 40rpx;">
+        <text class="text-black" style="margin-top: 10rpx;font-size: 1.3em;display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;text-overflow:ellipsis;overflow: hidden;word-break:break-all;font-weight: bold;font-family:SimSun;">{{item[1]}}</text>
+        <view class="text-gray text-sm" style="margin-top: 16rpx;font-size: 1em;text-overflow:ellipsis;overflow: hidden;">单价：{{item[2]}}元</view>
+      </view>
+    </view>
+  </view>
+</scroll-view>
+<!-- 回到顶部按钮-->
+<block wx:if="{{showBackTop}}">
+	<view class="backTop" bindtap="onBackTop">
+		<image class="totop" src="/images/totop.png"></image>
+	</view>
+</block>
+<!-- 返回触摸区域 -->
+<view class="DrawerClose {{modalName==null?'':'show'}}" bindtap="hideModal">
+  <text class="cuIcon-pullright"></text>
+</view>
+<!-- 商品详情页 -->
+<scroll-view scroll-y="false" class="DrawerWindow {{modalName==null?'':'show'}}" >
+  <view class="cu-list menu card-menu margin-top-xl margin-bottom-xl shadow-lg" style="height: 70vh;margin-top: 10vh;" catchtouchmove="false">
+    <view class="cu-item" style="height: 100%;">
+      <form bindsubmit="formSubmit">	
+        <view class="cu-form-group margin-top">
+          <view class="title">商品名称</view>
+          <input placeholder="请输入商品名称" name="productname" value="{{modalName[1]}}"></input>
+        </view>
+        <view class="cu-form-group">
+          <view class="title">商品单价</view>
+          <input placeholder="请输入商品单价(元)" name="productunitprice" value="{{modalName[2]}}"></input>
+        </view>
+        <view class="cu-bar bg-white margin-top">
+          <view class="action">
+            商品图片
+          </view>
+          <view class="action">
+            {{imgList.length}}/1
+          </view>
+        </view>
+        <view class="cu-form-group">
+          <view class="grid col-4 grid-square flex-sub">
+            <view class="bg-img" wx:for="{{imgList}}" wx:key="index" bindtap="ViewImage" data-url="{{item}}">
+              <image wx:if="{{isimageRevised}}" src="{{item}}" mode="aspectFill"></image>
+              <image wx:else src='{{item}}' mode='aspectFill'></image>
+              <view class="cu-tag bg-red" catchtap="DelImg" data-index="{{index}}">
+                <text class="cuIcon-close"></text>
+              </view>
+            </view>
+            <view class="solids" bindtap="ChooseImage" wx:if="{{imgList.length<1}}">
+              <text class="cuIcon-cameraadd"></text>
+            </view>
+          </view>
+        </view>
+        <!-- 修改或删除按钮 -->
+        <view class="box" style="margin-top: 90rpx;">
+          <view class="cu-bar btn-group">
+            <button class="cu-btn bg-green shadow-blur round lg" form-type="submit" data-choice="revise">修改</button>
+          </view>
+        </view>
+        <view class="box" style="margin-top: 30rpx;">
+          <view class="cu-bar btn-group">
+            <button class="cu-btn bg-red shadow-blur round lg" form-type="submit" data-choice="delete">删除</button>
+          </view>
+        </view>
+      </form>
+    </view>
+  </view>
+</scroll-view>

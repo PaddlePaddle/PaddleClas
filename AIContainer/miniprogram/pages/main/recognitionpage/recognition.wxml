@@ -1,0 +1,58 @@
+<!--pages/main/recognitionpage/recognition.wxml-->
+<!-- 顶部操作条 -->
+<cu-custom bgColor="bg-gradual-blue" isBack="{{true}}">
+  <view slot="backText">返回</view>
+  <view slot="content">商品识别 </view>
+</cu-custom>
+<block wx:if="{{!isResult}}">
+  <!-- 相机页面 -->
+  <camera class="camera" wx:if="{{isCamera}}" device-position="back" flash="off" bindinitdone="cameraondonwn" binderror="error">
+    <cover-image class="cameraalbum" src="/images/album.png" bindtap="openalbum"></cover-image>
+    <cover-image class="cameratakephotobtn" src="/images/camerabtn.png" bindtap="takePhoto"></cover-image>
+  </camera>
+  <!-- 图片预览界面 -->
+  <view class="cameraimage" wx:else>
+    <image class="cameraimage" src="{{photo}}" mode="aspectFit"></image>
+    <cover-image class="cameraback" src="/images/back.png" bindtap="gobackCamera"></cover-image>
+    <button class="camerauploadbtn" type="primary" bindtap="photoUpload">确认上传</button>
+  </view>
+</block>
+<block wx:else>
+  <!-- 识别结果界面 -->
+  <!-- 识别结果图片 -->
+  <view class="cu-card case" style="height: 400rpx;">
+    <view class="cu-item shadow" style="height: 400rpx;">
+      <view class="image" style="height: 400rpx;">
+        <image wx:if="{{resultimg}}" src="http://106.12.78.130:8080/pictures/output/{{resultimg}}" style="height: 400rpx;" mode="aspectFit"></image>
+        <image wx:else src="{{photo}}" style="height: 400rpx;" mode="aspectFit"></image>
+      </view>
+    </view>
+  </view>
+  <!-- 识别结果列表 -->
+  <scroll-view scroll-y class="scrollPage" style="height: 670rpx;">
+    <view class="cu-list menu card-menu margin-top-xl margin-bottom-xl shadow-lg" style="margin-right: 20rpx;margin-left: 20rpx;margin-top: 25rpx;margin-bottom: 20rpx;">
+      <view class="cu-item" wx:for="{{result}}" wx:key="index" style="min-height: 100rpx;display: flex;align-items: center;">
+        <view class="content" style="margin-left: 15rpx;display: flex;flex-direction: row;">
+          <text class="text-black" style="width: 60%;font-size: 1.2em;font-weight: bold;font-family:SimSun;text-overflow:ellipsis;overflow: hidden;word-break: break-all;display: -webkit-box;-webkit-line-clamp: 1;-webkit-box-orient: vertical;">{{item[0]}}</text>
+          <view class="text-gray text-sm" style="width: 40%;font-size: 1.2em;">单价：{{item[1]}}元</view>
+        </view>
+      </view>
+    </view>
+    
+  </scroll-view>
+  <!-- 识别结果总价 -->
+  <view class="box" style="position: absolute;bottom: 0rpx;width: 98%;left: 1%;padding-bottom: 7.5rpx;padding-top: 7.5rpx;">
+    <view class="cu-bar flex bg-white tabbar border shop">
+      <view class="radius" style="width: 65%;display: flex;align-items: center;">
+        <text class="text-black" style="font-size: 1.2em;font-family:Arial, Helvetica, sans-serif;margin-left: 50rpx;">总价: {{price_all}}元</text>
+      </view>
+      <view class="radius bg-green submit" style="width: 35%;" bindtap="onClickBuy">立即下单</view>
+    </view>
+  </view>
+</block>
+
+
+
+
+
+

@@ -1,0 +1,2 @@
+.wx_loading_view{display:flex;justify-content:center;align-items:center;overflow:hidden}.wx_loading_view__hide{height:0!important;display:none}.wx_loading_view__animated.wx_loading_view__hide{display:flex}.loading{color:rgba(255,255,255,0.9);font-size:17px;text-align:center}.loading_view_translation{transition:height 0.2s 0.3s ease}
+

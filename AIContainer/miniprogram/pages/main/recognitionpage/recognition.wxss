@@ -1,0 +1,53 @@
+/* pages/main/recognitionpage/recognition.wxss */
+page{
+  height: 100%;
+}
+.camera{
+  width: 100%;
+  height:100%;
+}
+.cameraalbum{
+  margin-bottom: 0%;
+  width:80rpx;
+  height:80rpx;
+  position:absolute;
+  bottom:110rpx;
+  left:540rpx;
+}
+.cameratakephotobtn{
+  margin-bottom: 0%;
+  width:120rpx;
+  height:120rpx;
+  position:absolute;
+  bottom:90rpx;
+  left:315rpx;
+}
+.cameraimage{
+  width: 100%;
+  height:100%;
+}
+.cameraback{
+  margin-bottom: 0%;
+  width:70rpx;
+  height:70rpx;
+  position:absolute;
+  bottom:90rpx;
+  left:130rpx;
+}
+.camerauploadbtn{
+  margin-bottom: 0%;
+  position:absolute;
+  width: 260rpx;
+  height: 80rpx;
+  bottom:90rpx;
+  left:380rpx;
+  display: flex;   
+  justify-content: center; 
+  align-items: center; 
+}
+.resultimg{
+  width: 95%;
+  height:500rpx;
+  border-radius:90rpx;
+  left: 2.5%;
+}

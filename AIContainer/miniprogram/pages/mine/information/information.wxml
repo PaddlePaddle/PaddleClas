@@ -1,0 +1,6 @@
+<!--pages/mine/information/information.wxml-->
+<!-- 顶部操作条 -->
+<cu-custom bgColor="bg-gradual-blue" isBack="{{true}}">
+	<view slot="backText">返回</view>
+	<view slot="content">账号信息 </view>
+</cu-custom>

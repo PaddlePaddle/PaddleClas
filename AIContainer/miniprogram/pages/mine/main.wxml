@@ -1,0 +1,58 @@
+<!--miniprogram/pages/mine/main.wxml-->
+<scroll-view scroll-y class="scrollPage">
+  <!-- 登录及头像模块 -->
+  <block wx:if="{{!hasUserInfo}}">
+    <view class="UCenter-bg" >
+        <button bindtap="getUserProfile" class="cu-btn bg-green shadow-blur round lg">登录</button>
+    </view>
+  </block>
+  <block wx:else>
+    <view class="UCenter-bg" >
+      <image src="{{userInfo.avatarUrl}}" class="userinfo-avatar" mode="widthFix"></image>
+      <view class="text-xl">{{userInfo.nickName}}</view>
+      <view class="margin-top-sm">
+        <text>{{userInfo.city}}</text>
+      </view>
+    </view>
+  </block>
+  <!-- 数据信息展示模块 -->
+  <!-- <view class="padding flex text-center text-grey bg-white shadow-warp">
+    <view class="flex flex-sub flex-direction solid-right">
+      <view class="text-xxl text-orange">null</view>
+      <view class="margin-top-sm">
+        <text class="cuIcon-attentionfill"></text> null</view>
+    </view>
+    <view class="flex flex-sub flex-direction solid-right">
+      <view class="text-xxl text-blue">null</view>
+      <view class="margin-top-sm">
+        <text class="cuIcon-favorfill"></text> null</view>
+    </view>
+    <view class="flex flex-sub flex-direction">
+      <view class="text-xxl text-green">null</view>
+      <view class="margin-top-sm">
+        <text class="cuIcon-fork"></text> null</view>
+    </view>
+  </view> -->
+  <!-- 菜单列表模块 -->
+  <view class="cu-list menu card-menu margin-top-xl margin-bottom-xl shadow-lg radius">
+    <view class="cu-item arrow">
+      <navigator class="content" url="/pages/mine/information/information" hover-class="none">
+        <text class="cuIcon-profile text-green"></text>
+        <text class="text-grey">账号信息</text>
+      </navigator>
+    </view>
+    <view class="cu-item arrow">
+      <button class="cu-btn content" open-type="feedback">
+        <text class="cuIcon-writefill text-cyan"></text>
+        <text class="text-grey">意见反馈</text>
+      </button>
+    </view>
+    <view class="cu-item arrow">
+      <navigator class="content" url="/pages/about/test/list" hover-class="none">
+        <text class="cuIcon-creativefill text-orange"></text>
+        <text class="text-grey">Bug测试</text>
+      </navigator>
+    </view>
+  </view>
+  <view class="cu-tabbar-height"></view>
+</scroll-view>

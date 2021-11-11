@@ -1,0 +1,48 @@
+<!--miniprogram/pages/main/main.wxml-->
+<scroll-view scroll-y class="scrollPage">
+  <image src='/images/maintop.png' mode='widthFix' class='png' style='width:100%;height:486rpx'></image>
+  <!-- 搜索框 -->
+  <view class="box" style="margin-top: -30rpx;">
+    <view class="cu-bar search" style="background-color: #191970;">
+      <view class="search-form radius">
+        <text class="cuIcon-search"></text>
+        <input type="text" placeholder="搜索商品" confirm-type="search" value="{{searchtarget}}" bindinput='inputBind' bindconfirm='getSearch'></input>
+        <view class="action" style="margin-right: 0rpx;" bindtap="onClickCleanSearch">
+          <text class="cuIcon-close"></text>
+        </view>
+      </view>
+      <view class="action">
+        <button class="cu-btn bg-green shadow-blur radius" bindtap="getSearch">搜索</button>
+      </view>
+    </view>
+  </view>
+  <!-- 按钮 -->
+  <view class='nav-list' style="margin-top: 30rpx;">
+    <navigator open-type="navigate" hover-class='none' url="/pages/main/{{item.name}}page/{{item.name}}" class="nav-li bg-{{item.color}}" wx:for="{{elements}}" wx:key="index">
+      <view class="nav-title">{{item.title}}</view>
+      <view class="nav-name">{{item.name}}</view>
+      <text class='cuIcon-{{item.icon}}'></text>
+    </navigator>
+    <navigator open-type="navigate" hover-class='none' url="/pages/main/{{item.name}}page/{{item.name}}" class="nav-li bg-{{item.color}}" wx:for="{{element}}" wx:key="index"style="width: 95%;">
+      <view class="nav-title">{{item.title}}</view>
+      <view class="nav-name">{{item.name}}</view>
+      <text class='cuIcon-{{item.icon}}'></text>
+    </navigator>
+  </view>
+  <view class="ornament">
+    <image class="mainimg" src='/images/mainbackgroundimage.png' mode='widthFix' style='width:100%;margin-top:-70rpx;'></image>
+    <view class="leftround" >
+      <image src="/images/mainelement2.png" style="width: 150rpx;height: 150rpx;margin-top: 7rpx;margin-left: 18rpx;"></image>
+    </view>
+    <view class="rightround">
+      <image  src="/images/mainelement1.png" style="width: 100rpx;height: 100rpx;margin-left: 20rpx;margin-top: 10rpx;"></image>
+    </view>
+    <view class="bottomtext1" >
+      <text class="bottomtext11" >WAVE\nSUMMIT</text>
+    </view>
+    <view class="bottomtext2">
+      <text class="bottomtext22">\n2021深度学习开发者峰会</text>
+    </view>
+  </view>
+</scroll-view>
+
