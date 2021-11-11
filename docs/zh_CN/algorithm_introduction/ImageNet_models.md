@@ -181,10 +181,10 @@ ResNet及其Vd系列模型的精度、速度指标如下表所示，更多关于
 | GhostNet_<br>x1_0                    | 0.7402    | 0.9165    | 13.5587                | 0.294    | 5.2       | 20      | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/GhostNet_x1_0_pretrained.pdparams)               |
 | GhostNet_<br>x1_3                    | 0.7579    | 0.9254    | 19.9825                | 0.44     | 7.3       | 29      | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/GhostNet_x1_3_pretrained.pdparams)               |
 | GhostNet_<br>x1_3_ssld                    | 0.7938    | 0.9449    | 19.9825                | 0.44     | 7.3       | 29      | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/GhostNet_x1_3_ssld_pretrained.pdparams)               |
-| ESNet_x0_25 | 62.48 | 83.46 || 0.031 | 2.83 | 11 |[下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ESNet_x0_25_pretrained.pdparams) |
-| ESNet_x0_5 | 68.82 | 88.04 || 0.067 | 3.25 | 13 |[下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ESNet_x0_5_pretrained.pdparams)               |
-| ESNet_x0_75 | 72.24 | 90.45 || 0.124 | 3.87 | 15 |[下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ESNet_x0_75_pretrained.pdparams)               |
-| ESNet_x1_0 | 73.92 | 91.40 || 0.197 | 4.64 | 18 |[下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ESNet_x1_0_pretrained.pdparams)               |
+| ESNet_x0_25 | 62.48 | 83.46 || 0.031 | 2.83 | 11 |[下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/ESNet_x0_25_pretrained.pdparams) |
+| ESNet_x0_5 | 68.82 | 88.04 || 0.067 | 3.25 | 13 |[下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/ESNet_x0_5_pretrained.pdparams)               |
+| ESNet_x0_75 | 72.24 | 90.45 || 0.124 | 3.87 | 15 |[下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/ESNet_x0_75_pretrained.pdparams)               |
+| ESNet_x1_0 | 73.92 | 91.40 || 0.197 | 4.64 | 18 |[下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/ESNet_x1_0_pretrained.pdparams)               |
 
 
 <a name="SEResNeXt与Res2Net系列"></a>
