@@ -4,7 +4,7 @@ python:python3.7
 gpu_list:0|0,1
 -o Global.device:gpu
 -o Global.auto_cast:null
--o Global.epochs:lite_train_infer=2|whole_train_infer=120
+-o Global.epochs:lite_train_lite_infer=2|whole_train_whole_infer=120
 -o Global.output_dir:./output/
 -o DataLoader.Train.sampler.batch_size:8
 -o Global.pretrained_model:null
