@@ -91,12 +91,12 @@ public:
   }
 
   // Compute best resize scale for x-dimension, y-dimension
-  std::pair<float, float> GenerateScale(const cv::Mat &im);
+  std::pair<double, double> GenerateScale(const cv::Mat &im);
 
   virtual void Run(cv::Mat *im, ImageBlob *data);
 
 private:
-  int interp_;
+  int interp_ = 2;
   bool keep_ratio_;
   std::vector<int> target_size_;
   std::vector<int> in_net_shape_;

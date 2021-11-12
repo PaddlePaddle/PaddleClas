@@ -72,8 +72,8 @@ void Resize::Run(cv::Mat *im, ImageBlob *data) {
   };
 }
 
-std::pair<float, float> Resize::GenerateScale(const cv::Mat &im) {
-  std::pair<float, float> resize_scale;
+std::pair<double, double> Resize::GenerateScale(const cv::Mat &im) {
+  std::pair<double, double> resize_scale;
   int origin_w = im.cols;
   int origin_h = im.rows;
 
@@ -84,17 +84,17 @@ std::pair<float, float> Resize::GenerateScale(const cv::Mat &im) {
         *std::max_element(target_size_.begin(), target_size_.end());
     int target_size_min =
         *std::min_element(target_size_.begin(), target_size_.end());
-    float scale_min =
-        static_cast<float>(target_size_min) / static_cast<float>(im_size_min);
-    float scale_max =
-        static_cast<float>(target_size_max) / static_cast<float>(im_size_max);
-    float scale_ratio = std::min(scale_min, scale_max);
+    double scale_min =
+        static_cast<double>(target_size_min) / static_cast<double>(im_size_min);
+    double scale_max =
+        static_cast<double>(target_size_max) / static_cast<double>(im_size_max);
+    double scale_ratio = std::min(scale_min, scale_max);
     resize_scale = {scale_ratio, scale_ratio};
   } else {
     resize_scale.first =
-        static_cast<float>(target_size_[1]) / static_cast<float>(origin_w);
+        static_cast<double>(target_size_[1]) / static_cast<double>(origin_w);
     resize_scale.second =
-        static_cast<float>(target_size_[0]) / static_cast<float>(origin_h);
+        static_cast<double>(target_size_[0]) / static_cast<double>(origin_h);
   }
   return resize_scale;
 }

@@ -266,7 +266,7 @@ int main(int argc, char **argv) {
     for (int i = 0; i < det_result.size(); ++i) {
       det_result[i].confidence = search_result.D[search_result.return_k * i];
     }
-    NMSBoxes(det_result, detector.GetThreshold(), rec_nms_thresold, indeices);
+    NMSBoxes(det_result, searcher.GetThreshold(), rec_nms_thresold, indeices);
 
     // print result
     PrintResult(img_path, det_result, indeices, searcher, search_result);

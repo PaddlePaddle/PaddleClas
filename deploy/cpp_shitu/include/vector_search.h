@@ -50,6 +50,7 @@ public:
   void LoadIndexFile();
   const SearchResult &Search(float *feature, int query_number);
   const std::string &GetLabel(faiss::Index::idx_t ind);
+  const float &GetThreshold() { return this->score_thres; }
 
 private:
   std::string index_dir;
