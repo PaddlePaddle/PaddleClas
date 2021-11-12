@@ -29,7 +29,7 @@
 
 using namespace std;
 
-namespace PaddleClas {
+namespace Feature {
 
 class Normalize {
 public:
@@ -54,4 +54,4 @@ public:
                    int size = 0);
 };
 
-} // namespace PaddleClas
+} // namespace Feature

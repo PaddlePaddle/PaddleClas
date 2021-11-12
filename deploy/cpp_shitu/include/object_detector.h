@@ -31,7 +31,7 @@
 
 using namespace paddle_infer;
 
-namespace PaddleDetection {
+namespace Detection {
 // Object Detection Result
 struct ObjectResult {
   // Rectangle coordinates of detected object: left, right, top, down
@@ -132,4 +132,4 @@ private:
   std::vector<int> out_bbox_num_data_;
 };
 
-} // namespace PaddleDetection
+} // namespace Detection

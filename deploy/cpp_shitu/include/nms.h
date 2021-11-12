@@ -23,8 +23,8 @@ static inline bool SortScorePairDescend(const std::pair<float, T> &pair1,
   return pair1.first > pair2.first;
 }
 
-float RectOverlap(const PaddleDetection::ObjectResult &a,
-                  const PaddleDetection::ObjectResult &b) {
+float RectOverlap(const Detection::ObjectResult &a,
+                  const Detection::ObjectResult &b) {
   float Aa = (a.rect[2] - a.rect[0] + 1) * (a.rect[3] - a.rect[1] + 1);
   float Ab = (b.rect[2] - b.rect[0] + 1) * (b.rect[3] - b.rect[1] + 1);
 
@@ -40,7 +40,7 @@ float RectOverlap(const PaddleDetection::ObjectResult &a,
 //    top_k: if -1, keep all; otherwise, keep at most top_k.
 //    score_index_vec: store the sorted (score, index) pair.
 inline void
-GetMaxScoreIndex(const std::vector<PaddleDetection::ObjectResult> &det_result,
+GetMaxScoreIndex(const std::vector<Detection::ObjectResult> &det_result,
                  const float threshold,
                  std::vector<std::pair<float, int>> &score_index_vec) {
   // Generate index score pairs.
@@ -61,7 +61,7 @@ GetMaxScoreIndex(const std::vector<PaddleDetection::ObjectResult> &det_result,
   // }
 }
 
-void NMSBoxes(const std::vector<PaddleDetection::ObjectResult> det_result,
+void NMSBoxes(const std::vector<Detection::ObjectResult> det_result,
               const float score_threshold, const float nms_threshold,
               std::vector<int> &indices) {
   int a = 1;

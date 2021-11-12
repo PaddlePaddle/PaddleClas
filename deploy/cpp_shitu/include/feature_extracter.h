@@ -33,11 +33,11 @@
 
 using namespace paddle_infer;
 
-namespace PaddleClas {
+namespace Feature {
 
-class Classifier {
+class FeatureExtracter {
 public:
-  explicit Classifier(const YAML::Node &config_file) {
+  explicit FeatureExtracter(const YAML::Node &config_file) {
     this->use_gpu_ = config_file["Global"]["use_gpu"].as<bool>();
     if (config_file["Global"]["gpu_id"].IsDefined())
       this->gpu_id_ = config_file["Global"]["gpu_id"].as<int>();
@@ -68,6 +68,9 @@ public:
     this->std_ = config_file["RecPreProcess"]["transform_ops"][1]
                             ["NormalizeImage"]["std"]
                                 .as<std::vector<float>>();
+    if (config_file["Global"]["rec_feature_normlize"].IsDefined())
+      this->feature_norm =
+          config_file["Global"]["rec_feature_normlize"].as<bool>();
 
     LoadModel(cls_model_path_, cls_params_path_);
   }
@@ -78,6 +81,7 @@ public:
   // Run predictor
   void Run(cv::Mat &img, std::vector<float> &out_data,
            std::vector<double> &times);
+  void FeatureNorm(std::vector<float> &feature);
 
   std::shared_ptr<Predictor> predictor_;
 
@@ -88,6 +92,7 @@ private:
   int cpu_math_library_num_threads_ = 4;
   bool use_mkldnn_ = false;
   bool use_tensorrt_ = false;
+  bool feature_norm = true;
   bool use_fp16_ = false;
   std::vector<float> mean_ = {0.485f, 0.456f, 0.406f};
   std::vector<float> std_ = {0.229f, 0.224f, 0.225f};
@@ -103,4 +108,4 @@ private:
   Permute permute_op_;
 };
 
-} // namespace PaddleClas
+} // namespace Feature

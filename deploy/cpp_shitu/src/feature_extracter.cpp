@@ -12,12 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <include/cls.h>
+#include <cmath>
+#include <include/feature_extracter.h>
+#include <numeric>
 
-namespace PaddleClas {
+namespace Feature {
 
-void Classifier::LoadModel(const std::string &model_path,
-                           const std::string &params_path) {
+void FeatureExtracter::LoadModel(const std::string &model_path,
+                                 const std::string &params_path) {
   paddle_infer::Config config;
   config.SetModel(model_path, params_path);
 
@@ -52,11 +54,9 @@ void Classifier::LoadModel(const std::string &model_path,
   this->predictor_ = CreatePredictor(config);
 }
 
-void Classifier::Run(cv::Mat &img, std::vector<float> &out_data,
-                     std::vector<double> &times) {
-  cv::Mat srcimg;
+void FeatureExtracter::Run(cv::Mat &img, std::vector<float> &out_data,
+                           std::vector<double> &times) {
   cv::Mat resize_img;
-  img.copyTo(srcimg);
   std::vector<double> time;
 
   auto preprocess_start = std::chrono::system_clock::now();
@@ -86,10 +86,10 @@ void Classifier::Run(cv::Mat &img, std::vector<float> &out_data,
   output_t->CopyToCpu(out_data.data());
   auto infer_end = std::chrono::system_clock::now();
 
-  // auto postprocess_start = std::chrono::system_clock::now();
-  // int maxPosition =
-  //     max_element(out_data.begin(), out_data.end()) - out_data.begin();
-  // auto postprocess_end = std::chrono::system_clock::now();
+  auto postprocess_start = std::chrono::system_clock::now();
+  if (this->feature_norm)
+    FeatureNorm(out_data);
+  auto postprocess_end = std::chrono::system_clock::now();
 
   std::chrono::duration<float> preprocess_diff =
       preprocess_end - preprocess_start;
@@ -110,4 +110,10 @@ void Classifier::Run(cv::Mat &img, std::vector<float> &out_data,
   times[2] += time[2];
 }
 
-} // namespace PaddleClas
+void FeatureExtracter::FeatureNorm(std::vector<float> &featuer) {
+  float featuer_sqrt = std::sqrt(std::inner_product(
+      featuer.begin(), featuer.end(), featuer.begin(), 0.0f));
+  for (int i = 0; i < featuer.size(); ++i)
+    featuer[i] /= featuer_sqrt;
+}
+} // namespace Feature

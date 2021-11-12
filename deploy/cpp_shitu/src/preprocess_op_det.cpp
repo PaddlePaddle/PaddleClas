@@ -17,7 +17,7 @@
 
 #include "include/preprocess_op_det.h"
 
-namespace PaddleDetection {
+namespace Detection {
 
 void InitInfo::Run(cv::Mat *im, ImageBlob *data) {
   data->im_shape_ = {static_cast<float>(im->rows),
@@ -127,4 +127,4 @@ void Preprocessor::Run(cv::Mat *im, ImageBlob *data) {
   }
 }
 
-} // namespace PaddleDetection
+} // namespace Detection

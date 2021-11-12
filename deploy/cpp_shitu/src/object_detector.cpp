@@ -19,7 +19,7 @@
 
 using namespace paddle_infer;
 
-namespace PaddleDetection {
+namespace Detection {
 
 // Load Model and create model predictor
 void ObjectDetector::LoadModel(const std::string &model_dir,
@@ -362,4 +362,4 @@ std::vector<int> GenerateColorMap(int num_class) {
   return colormap;
 }
 
-} // namespace PaddleDetection
+} // namespace Detection

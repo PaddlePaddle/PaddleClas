@@ -28,7 +28,7 @@
 
 #include <auto_log/autolog.h>
 #include <gflags/gflags.h>
-#include <include/cls.h>
+#include <include/feature_extracter.h>
 #include <include/nms.h>
 #include <include/object_detector.h>
 #include <include/vector_search.h>
@@ -42,8 +42,8 @@ DEFINE_string(c, "", "Path of yaml file");
 
 void DetPredictImage(const std::vector<cv::Mat> &batch_imgs,
                      const std::vector<std::string> &all_img_paths,
-                     const int batch_size, PaddleDetection::ObjectDetector *det,
-                     std::vector<PaddleDetection::ObjectResult> &im_result,
+                     const int batch_size, Detection::ObjectDetector *det,
+                     std::vector<Detection::ObjectResult> &im_result,
                      std::vector<int> &im_bbox_num, std::vector<double> &det_t,
                      const bool visual_det = false,
                      const bool run_benchmark = false,
@@ -63,7 +63,7 @@ void DetPredictImage(const std::vector<cv::Mat> &batch_imgs,
     // }
 
     // Store all detected result
-    std::vector<PaddleDetection::ObjectResult> result;
+    std::vector<Detection::ObjectResult> result;
     std::vector<int> bbox_num;
     std::vector<double> det_times;
     bool is_rbox = false;
@@ -73,7 +73,7 @@ void DetPredictImage(const std::vector<cv::Mat> &batch_imgs,
       det->Predict(batch_imgs, 0, 1, &result, &bbox_num, &det_times);
       // get labels and colormap
       auto labels = det->GetLabelList();
-      auto colormap = PaddleDetection::GenerateColorMap(labels.size());
+      auto colormap = Detection::GenerateColorMap(labels.size());
 
       int item_start_idx = 0;
       for (int i = 0; i < left_image_cnt; i++) {
@@ -81,7 +81,7 @@ void DetPredictImage(const std::vector<cv::Mat> &batch_imgs,
         int detect_num = 0;
 
         for (int j = 0; j < bbox_num[i]; j++) {
-          PaddleDetection::ObjectResult item = result[item_start_idx + j];
+          Detection::ObjectResult item = result[item_start_idx + j];
           if (item.confidence < det->GetThreshold() || item.class_id == -1) {
             continue;
           }
@@ -110,8 +110,8 @@ void DetPredictImage(const std::vector<cv::Mat> &batch_imgs,
           std::cout << all_img_paths.at(idx * batch_size + i)
                     << " The number of detected box: " << detect_num
                     << std::endl;
-          cv::Mat vis_img = PaddleDetection::VisualizeResult(
-              im, im_result, labels, colormap, is_rbox);
+          cv::Mat vis_img = Detection::VisualizeResult(im, im_result, labels,
+                                                       colormap, is_rbox);
           std::vector<int> compression_params;
           compression_params.push_back(CV_IMWRITE_JPEG_QUALITY);
           compression_params.push_back(95);
@@ -134,7 +134,7 @@ void DetPredictImage(const std::vector<cv::Mat> &batch_imgs,
 }
 
 void PrintResult(std::string &img_path,
-                 std::vector<PaddleDetection::ObjectResult> &det_result,
+                 std::vector<Detection::ObjectResult> &det_result,
                  std::vector<int> &indeices, VectorSearch &vector_search,
                  SearchResult &search_result) {
   printf("%s:\n", img_path.c_str());
@@ -167,8 +167,8 @@ int main(int argc, char **argv) {
   config.PrintConfigInfo();
 
   // initialize detector, rec_Model, vector_search
-  PaddleClas::Classifier classifier(config.config_file);
-  PaddleDetection::ObjectDetector detector(config.config_file);
+  Feature::FeatureExtracter feature_extracter(config.config_file);
+  Detection::ObjectDetector detector(config.config_file);
   VectorSearch searcher(config.config_file);
 
   // config
@@ -212,7 +212,7 @@ int main(int argc, char **argv) {
   std::vector<cv::Mat> batch_imgs;
   std::vector<std::string> img_paths;
   // for detection
-  std::vector<PaddleDetection::ObjectResult> det_result;
+  std::vector<Detection::ObjectResult> det_result;
   std::vector<int> det_bbox_num;
   // for vector search
   std::vector<float> features;
@@ -243,7 +243,7 @@ int main(int argc, char **argv) {
       det_result.resize(max_det_results);
     }
     // step2: add the whole image for recognition to improve recall
-    PaddleDetection::ObjectResult result_whole_img = {
+    Detection::ObjectResult result_whole_img = {
         {0, 0, srcimg.cols - 1, srcimg.rows - 1}, 0, 1.0};
     det_result.push_back(result_whole_img);
     det_bbox_num[0] = det_result.size() + 1;
@@ -255,7 +255,7 @@ int main(int argc, char **argv) {
       int h = det_result[j].rect[3] - det_result[j].rect[1];
       cv::Rect rect(det_result[j].rect[0], det_result[j].rect[1], w, h);
       cv::Mat crop_img = srcimg(rect);
-      classifier.Run(crop_img, feature, cls_times);
+      feature_extracter.Run(crop_img, feature, cls_times);
       features.insert(features.end(), feature.begin(), feature.end());
     }
 

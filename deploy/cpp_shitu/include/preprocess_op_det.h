@@ -28,7 +28,7 @@
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 
-namespace PaddleDetection {
+namespace Detection {
 
 // Object for storing all preprocessed data
 class ImageBlob {
@@ -152,4 +152,4 @@ private:
   std::unordered_map<std::string, std::shared_ptr<PreprocessOp>> ops_;
 };
 
-} // namespace PaddleDetection
+} // namespace Detection
