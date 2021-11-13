@@ -22,6 +22,8 @@ from .distillationloss import DistillationGTCELoss
 from .distillationloss import DistillationDMLLoss
 from .multilabelloss import MultiLabelLoss
 
+from .deephashloss import DSHSDLoss, LCDSHLoss
+
 
 class CombinedLoss(nn.Layer):
     def __init__(self, config_list):

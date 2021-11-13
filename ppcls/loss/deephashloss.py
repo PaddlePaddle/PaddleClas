@@ -23,39 +23,41 @@ class DSHSDLoss(nn.Layer):
     # [DSHSD] epoch:250, bit:48,  dataset:nuswide_21, MAP:0.809, Best MAP: 0.815
     # [DSHSD] epoch:135, bit:48,  dataset:imagenet,   MAP:0.647, Best MAP: 0.647
     """
-    def __init__(self, n_class, bit, alpha, multi_label=False):
+    def __init__(self, alpha, multi_label=False):
         super(DSHSDLoss, self).__init__()
-        self.m = 2 * bit     
         self.alpha = alpha
         self.multi_label = multi_label
-        self.n_class = n_class
-        self.fc = paddle.nn.Linear(bit, n_class, bias_attr=False)
 
-    def forward(self, input, label):        
+    def forward(self, input, label):
         feature = input["features"]
-        feature = feature.tanh().astype("float32")
+        logits = input["logits"]
 
-        dist = paddle.sum(
-                    paddle.square((paddle.unsqueeze(feature, 1) - paddle.unsqueeze(feature, 0))), 
-                    axis=2)
-        
+        dist = paddle.sum(paddle.square(
+            (paddle.unsqueeze(feature, 1) - paddle.unsqueeze(feature, 0))),
+                          axis=2)
+
         # label to ont-hot
         label = paddle.flatten(label)
-        label = paddle.nn.functional.one_hot(label,  self.n_class).astype("float32")
+        n_class = logits.shape[1]
+        label = paddle.nn.functional.one_hot(label, n_class).astype("float32")
 
-        s = (paddle.matmul(label, label, transpose_y=True) == 0).astype("float32")
-        Ld = (1 - s) / 2 * dist + s / 2 * (self.m - dist).clip(min=0)
+        s = (paddle.matmul(
+            label, label, transpose_y=True) == 0).astype("float32")
+        margin = 2 * feature.shape[1]
+        Ld = (1 - s) / 2 * dist + s / 2 * (margin - dist).clip(min=0)
         Ld = Ld.mean()
-        
-        logits = self.fc(feature)
+
         if self.multi_label:
             # multiple labels classification loss
-            Lc = (logits - label * logits + ((1 + (-logits).exp()).log())).sum(axis=1).mean()
+            Lc = (logits - label * logits + (
+                (1 + (-logits).exp()).log())).sum(axis=1).mean()
         else:
             # single labels classification loss
-            Lc = (-paddle.nn.functional.softmax(logits).log() * label).sum(axis=1).mean()
+            Lc = (-paddle.nn.functional.softmax(logits).log() * label).sum(
+                axis=1).mean()
 
         return {"dshsdloss": Lc + Ld * self.alpha}
+
 
 class LCDSHLoss(nn.Layer):
     """
