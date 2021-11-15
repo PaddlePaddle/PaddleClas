@@ -65,6 +65,7 @@ MODEL_SERIES = {
         "EfficientNetB2", "EfficientNetB3", "EfficientNetB4", "EfficientNetB5",
         "EfficientNetB6", "EfficientNetB7"
     ],
+    "ESNet": ["ESNet_x0_25", "ESNet_x0_5", "ESNet_x0_75", "ESNet_x1_0"],
     "GhostNet":
     ["GhostNet_x0_5", "GhostNet_x1_0", "GhostNet_x1_3", "GhostNet_x1_3_ssld"],
     "HRNet": [
