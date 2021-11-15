@@ -31,125 +31,128 @@
 namespace Detection {
 
 // Object for storing all preprocessed data
-class ImageBlob {
-public:
-  // image width and height
-  std::vector<float> im_shape_;
-  // Buffer for image data after preprocessing
-  std::vector<float> im_data_;
-  // in net data shape(after pad)
-  std::vector<float> in_net_shape_;
-  // Evaluation image width and height
-  // std::vector<float>  eval_im_size_f_;
-  // Scale factor for image size to origin image size
-  std::vector<float> scale_factor_;
-};
+    class ImageBlob {
+    public:
+        // image width and height
+        std::vector<float> im_shape_;
+        // Buffer for image data after preprocessing
+        std::vector<float> im_data_;
+        // in net data shape(after pad)
+        std::vector<float> in_net_shape_;
+        // Evaluation image width and height
+        // std::vector<float>  eval_im_size_f_;
+        // Scale factor for image size to origin image size
+        std::vector<float> scale_factor_;
+    };
 
 // Abstraction of preprocessing opration class
-class PreprocessOp {
-public:
-  virtual void Init(const YAML::Node &item) = 0;
-  virtual void Run(cv::Mat *im, ImageBlob *data) = 0;
-};
+    class PreprocessOp {
+    public:
+        virtual void Init(const YAML::Node &item) = 0;
 
-class InitInfo : public PreprocessOp {
-public:
-  virtual void Init(const YAML::Node &item) {}
-  virtual void Run(cv::Mat *im, ImageBlob *data);
-};
+        virtual void Run(cv::Mat *im, ImageBlob *data) = 0;
+    };
 
-class NormalizeImage : public PreprocessOp {
-public:
-  virtual void Init(const YAML::Node &item) {
-    mean_ = item["mean"].as<std::vector<float>>();
-    scale_ = item["std"].as<std::vector<float>>();
-    is_scale_ = item["is_scale"].as<bool>();
-  }
+    class InitInfo : public PreprocessOp {
+    public:
+        virtual void Init(const YAML::Node &item) {}
 
-  virtual void Run(cv::Mat *im, ImageBlob *data);
+        virtual void Run(cv::Mat *im, ImageBlob *data);
+    };
 
-private:
-  // CHW or HWC
-  std::vector<float> mean_;
-  std::vector<float> scale_;
-  bool is_scale_;
-};
+    class NormalizeImage : public PreprocessOp {
+    public:
+        virtual void Init(const YAML::Node &item) {
+            mean_ = item["mean"].as < std::vector < float >> ();
+            scale_ = item["std"].as < std::vector < float >> ();
+            is_scale_ = item["is_scale"].as<bool>();
+        }
 
-class Permute : public PreprocessOp {
-public:
-  virtual void Init(const YAML::Node &item) {}
-  virtual void Run(cv::Mat *im, ImageBlob *data);
-};
+        virtual void Run(cv::Mat *im, ImageBlob *data);
 
-class Resize : public PreprocessOp {
-public:
-  virtual void Init(const YAML::Node &item) {
-    interp_ = item["interp"].as<int>();
-    // max_size_ = item["target_size"].as<int>();
-    keep_ratio_ = item["keep_ratio"].as<bool>();
-    target_size_ = item["target_size"].as<std::vector<int>>();
-  }
+    private:
+        // CHW or HWC
+        std::vector<float> mean_;
+        std::vector<float> scale_;
+        bool is_scale_;
+    };
 
-  // Compute best resize scale for x-dimension, y-dimension
-  std::pair<double, double> GenerateScale(const cv::Mat &im);
+    class Permute : public PreprocessOp {
+    public:
+        virtual void Init(const YAML::Node &item) {}
 
-  virtual void Run(cv::Mat *im, ImageBlob *data);
+        virtual void Run(cv::Mat *im, ImageBlob *data);
+    };
 
-private:
-  int interp_ = 2;
-  bool keep_ratio_;
-  std::vector<int> target_size_;
-  std::vector<int> in_net_shape_;
-};
+    class Resize : public PreprocessOp {
+    public:
+        virtual void Init(const YAML::Node &item) {
+            interp_ = item["interp"].as<int>();
+            // max_size_ = item["target_size"].as<int>();
+            keep_ratio_ = item["keep_ratio"].as<bool>();
+            target_size_ = item["target_size"].as < std::vector < int >> ();
+        }
+
+        // Compute best resize scale for x-dimension, y-dimension
+        std::pair<double, double> GenerateScale(const cv::Mat &im);
+
+        virtual void Run(cv::Mat *im, ImageBlob *data);
+
+    private:
+        int interp_ = 2;
+        bool keep_ratio_;
+        std::vector<int> target_size_;
+        std::vector<int> in_net_shape_;
+    };
 
 // Models with FPN need input shape % stride == 0
-class PadStride : public PreprocessOp {
-public:
-  virtual void Init(const YAML::Node &item) {
-    stride_ = item["stride"].as<int>();
-  }
+    class PadStride : public PreprocessOp {
+    public:
+        virtual void Init(const YAML::Node &item) {
+            stride_ = item["stride"].as<int>();
+        }
 
-  virtual void Run(cv::Mat *im, ImageBlob *data);
+        virtual void Run(cv::Mat *im, ImageBlob *data);
 
-private:
-  int stride_;
-};
+    private:
+        int stride_;
+    };
 
-class Preprocessor {
-public:
-  void Init(const YAML::Node &config_node) {
-    // initialize image info at first
-    ops_["InitInfo"] = std::make_shared<InitInfo>();
-    for (int i = 0; i < config_node.size(); ++i) {
-      if (config_node[i]["DetResize"].IsDefined()) {
-        ops_["Resize"] = std::make_shared<Resize>();
-        ops_["Resize"]->Init(config_node[i]["DetResize"]);
-      }
+    class Preprocessor {
+    public:
+        void Init(const YAML::Node &config_node) {
+            // initialize image info at first
+            ops_["InitInfo"] = std::make_shared<InitInfo>();
+            for (int i = 0; i < config_node.size(); ++i) {
+                if (config_node[i]["DetResize"].IsDefined()) {
+                    ops_["Resize"] = std::make_shared<Resize>();
+                    ops_["Resize"]->Init(config_node[i]["DetResize"]);
+                }
 
-      if (config_node[i]["DetNormalizeImage"].IsDefined()) {
-        ops_["NormalizeImage"] = std::make_shared<NormalizeImage>();
-        ops_["NormalizeImage"]->Init(config_node[i]["DetNormalizeImage"]);
-      }
+                if (config_node[i]["DetNormalizeImage"].IsDefined()) {
+                    ops_["NormalizeImage"] = std::make_shared<NormalizeImage>();
+                    ops_["NormalizeImage"]->Init(config_node[i]["DetNormalizeImage"]);
+                }
 
-      if (config_node[i]["DetPermute"].IsDefined()) {
-        ops_["Permute"] = std::make_shared<Permute>();
-        ops_["Permute"]->Init(config_node[i]["DetPermute"]);
-      }
+                if (config_node[i]["DetPermute"].IsDefined()) {
+                    ops_["Permute"] = std::make_shared<Permute>();
+                    ops_["Permute"]->Init(config_node[i]["DetPermute"]);
+                }
 
-      if (config_node[i]["DetPadStrid"].IsDefined()) {
-        ops_["PadStride"] = std::make_shared<PadStride>();
-        ops_["PadStride"]->Init(config_node[i]["DetPadStrid"]);
-      }
-    }
-  }
+                if (config_node[i]["DetPadStrid"].IsDefined()) {
+                    ops_["PadStride"] = std::make_shared<PadStride>();
+                    ops_["PadStride"]->Init(config_node[i]["DetPadStrid"]);
+                }
+            }
+        }
 
-  void Run(cv::Mat *im, ImageBlob *data);
+        void Run(cv::Mat *im, ImageBlob *data);
 
-public:
-  static const std::vector<std::string> RUN_ORDER;
+    public:
+        static const std::vector <std::string> RUN_ORDER;
 
-private:
-  std::unordered_map<std::string, std::shared_ptr<PreprocessOp>> ops_;
-};
+    private:
+        std::unordered_map <std::string, std::shared_ptr<PreprocessOp>> ops_;
+    };
 
 } // namespace Detection

@@ -6,10 +6,7 @@
 ## 1. 准备环境
 
 ### 运行准备
-- Linux环境，推荐使用docker。
-- Windows环境，目前支持基于`Visual Studio 2019 Community`进行编译；此外，如果您希望通过生成`sln解决方案`的方式进行编译，可以参考该文档：[https://zhuanlan.zhihu.com/p/145446681](https://zhuanlan.zhihu.com/p/145446681)
-
-* 该文档主要介绍基于Linux环境下的PaddleClas C++预测流程，如果需要在Windows环境下使用预测库进行C++预测，具体编译方法请参考[Windows下编译教程](./docs/windows_vs2019_build.md)。
+- Linux环境，推荐使用ubuntu docker。
 
 ### 1.1 编译opencv库
 
@@ -103,7 +100,7 @@ make -j
 make inference_lib_dist
 ```
 
-更多编译参数选项可以参考Paddle C++预测库官网：[https://www.paddlepaddle.org.cn/documentation/docs/zh/develop/guides/05_inference_deployment/inference/build_and_install_lib_cn.html#id16](https://www.paddlepaddle.org.cn/documentation/docs/zh/develop/guides/05_inference_deployment/inference/build_and_install_lib_cn.html#id16)。
+更多编译参数选项可以参考[Paddle C++预测库官网](https://www.paddlepaddle.org.cn/documentation/docs/zh/develop/guides/05_inference_deployment/inference/build_and_install_lib_cn.html#id16)。
 
 
 * 编译完成之后，可以在`build/paddle_inference_install_dir/`文件下看到生成了以下文件及文件夹。
@@ -137,29 +134,27 @@ tar -xvf paddle_inference.tgz
 ### 1.3 安装faiss库
 
 ```shell
+ # 下载 faiss
  git clone https://github.com/facebookresearch/faiss.git
  cd faiss 
- cmake -B build . -DFAISS_ENABLE_PYTHON=OFF -DCMAKE_INSTALL_PREFIX=${faiss_install_path}
+ cmake -B build . -DFAISS_ENABLE_PYTHON=OFF  -DCMAKE_INSTALL_PREFIX=${faiss_install_path}
  make -C build -j faiss
  make -C build install
 ```
 
-## 2 开始运行
+在安装`faiss`前，请安装`openblas`，`ubuntu`系统中安装命令如下：
 
-### 2.1 将模型导出为inference model
-
-* 可以参考[模型导出](../../tools/export_model.py)，导出`inference model`，用于模型预测。得到预测模型后，假设模型文件放在`inference`目录下，则目录结构如下。
-
+```shell
+apt-get install libopenblas-dev
 ```
-inference/
-|--cls_infer.pdmodel
-|--cls_infer.pdiparams
-```
-**注意**：上述文件中，`cls_infer.pdmodel`文件存储了模型结构信息，`cls_infer.pdiparams`文件存储了模型参数信息。注意两个文件的路径需要与配置文件`tools/config.txt`中的`cls_model_path`和`cls_params_path`参数对应一致。
+
+注意本教程以安装faiss cpu版本为例，安装时请参考[faiss](https://github.com/facebookresearch/faiss)官网文档，根据需求自行安装。
+
+## 2 代码编译
 
 ### 2.2 编译PaddleClas C++预测demo
 
-* 编译命令如下，其中Paddle C++预测库、opencv等其他依赖库的地址需要换成自己机器上的实际地址。
+编译命令如下，其中Paddle C++预测库、opencv等其他依赖库的地址需要换成自己机器上的实际地址。同时，编译过程中需要下载编译`yaml-cpp`等C++库，请保持联网环境。
 
 
 ```shell
@@ -169,11 +164,12 @@ sh tools/build.sh
 具体地，`tools/build.sh`中内容如下。
 
 ```shell
-OPENCV_DIR=your_opencv_dir
-LIB_DIR=your_paddle_inference_dir
-CUDA_LIB_DIR=your_cuda_lib_dir
-CUDNN_LIB_DIR=your_cudnn_lib_dir
-TENSORRT_DIR=your_tensorrt_lib_dir
+OPENCV_DIR=${opencv_install_dir}
+LIB_DIR=${paddle_inference_dir}
+CUDA_LIB_DIR=/usr/local/cuda/lib64
+CUDNN_LIB_DIR=/usr/lib/x86_64-linux-gnu/
+FAISS_DIR=${faiss_install_dir}
+FAISS_WITH_MKL=OFF
 
 BUILD_DIR=build
 rm -rf ${BUILD_DIR}
@@ -182,14 +178,14 @@ cd ${BUILD_DIR}
 cmake .. \
     -DPADDLE_LIB=${LIB_DIR} \
     -DWITH_MKL=ON \
-    -DDEMO_NAME=clas_system \
     -DWITH_GPU=OFF \
     -DWITH_STATIC_LIB=OFF \
-    -DWITH_TENSORRT=OFF \
-    -DTENSORRT_DIR=${TENSORRT_DIR} \
+    -DUSE_TENSORRT=OFF \
     -DOPENCV_DIR=${OPENCV_DIR} \
     -DCUDNN_LIB=${CUDNN_LIB_DIR} \
     -DCUDA_LIB=${CUDA_LIB_DIR} \
+    -DFAISS_DIR=${FAISS_DIR} \
+    -DFAISS_WITH_MKL=${FAISS_WITH_MKL}
 
 make -j
 ```
@@ -197,47 +193,75 @@ make -j
 上述命令中，
 
 * `OPENCV_DIR`为opencv编译安装的地址（本例中为`opencv-3.4.7/opencv3`文件夹的路径）；
-
 * `LIB_DIR`为下载的Paddle预测库（`paddle_inference`文件夹），或编译生成的Paddle预测库（`build/paddle_inference_install_dir`文件夹）的路径；
-
 * `CUDA_LIB_DIR`为cuda库文件地址，在docker中为`/usr/local/cuda/lib64`；
-
 * `CUDNN_LIB_DIR`为cudnn库文件地址，在docker中为`/usr/lib/x86_64-linux-gnu/`。
-
 * `TENSORRT_DIR`是tensorrt库文件地址，在dokcer中为`/usr/local/TensorRT6-cuda10.0-cudnn7/`，TensorRT需要结合GPU使用。
-
-在执行上述命令，编译完成之后，会在当前路径下生成`build`文件夹，其中生成一个名为`clas_system`的可执行文件。
-
-
-### 运行demo
-* 首先修改`tools/config.txt`中对应字段：
-  * use_gpu：是否使用GPU；
-  * gpu_id：使用的GPU卡号；
-  * gpu_mem：显存；
-  * cpu_math_library_num_threads：底层科学计算库所用线程的数量；
-  * use_mkldnn：是否使用MKLDNN加速；
-  * use_tensorrt: 是否使用tensorRT进行加速；
-  * use_fp16：是否使用半精度浮点数进行计算，该选项仅在use_tensorrt为true时有效；
-  * cls_model_path：预测模型结构文件路径；
-  * cls_params_path：预测模型参数文件路径；
-  * resize_short_size：预处理时图像缩放大小；
-  * crop_size：预处理时图像裁剪后的大小。
-
-* 然后修改`tools/run.sh`：
-  * `./build/clas_system ./tools/config.txt ./docs/imgs/ILSVRC2012_val_00000666.JPEG`
-  * 上述命令中分别为：编译得到的可执行文件`clas_system`；运行时的配置文件`config.txt`；待预测的图像。
-
-* 最后执行以下命令，完成对一幅图像的分类。
-
-```shell
-sh tools/run.sh
-```
-
-* 最终屏幕上会输出结果，如下图所示。
-
-<div align="center">
-    <img src="./docs/imgs/cpp_infer_result.png" width="600">
-</div>
+* `FAISS_DIR`是faiss的安装地址
+  * `FAISS_WITH_MKL`是指在编译faiss的过程中，是否使用了mkldnn，本文档中编译faiss，没有使用，而使用了openblas，故设置为`OFF`，若使用了mkldnn，则为`ON`.
 
 
-其中`class id`表示置信度最高的类别对应的id，score表示图片属于该类别的概率。
+在执行上述命令，编译完成之后，会在当前路径下生成`build`文件夹，其中生成一个名为`pp_shitu`的可执行文件。
+
+## 3 运行demo
+
+- 请参考[识别快速开始文档](../../docs/zh_CN/quick_start/quick_start_recognition.md)，下载好相应的 轻量级通用主体检测模型、轻量级通用识别模型及瓶装饮料测试数据并解压。
+
+  ```shell
+  mkdir models
+  cd models
+  wget https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/inference/picodet_PPLCNet_x2_5_mainbody_lite_v1.0_infer.tar
+  tar -xf picodet_PPLCNet_x2_5_mainbody_lite_v1.0_infer.tar
+  wget https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/inference/general_PPLCNet_x2_5_lite_v1.0_infer.tar
+  tar -xf general_PPLCNet_x2_5_lite_v1.0_infer.tar
+  cd ..
+  
+  mkdir data 
+  cd data
+  wget https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/data/drink_dataset_v1.0.tar
+  tar -xf drink_dataset_v1.0.tar
+  cd ..
+  ```
+
+- 将相应的yaml文件拷到`test`文件夹下
+
+  ```shell
+  cp ../configs/inference_drink.yaml .
+  ```
+
+- 将`inference_drink.yaml`中的相对路径，改成基于本目录的路径或者绝对路径。涉及到的参数有
+
+  - Global.infer_imgs ：此参数可以是具体的图像地址，也可以是图像集所在的目录
+  - Global.det_inference_model_dir ： 检测模型存储目录
+  - Global.rec_inference_model_dir ： 识别模型存储目录
+  - IndexProcess.index_dir ： 检索库的存储目录，在示例中，检索库在下载的demo数据中。
+
+- 字典转换
+
+  由于python的检索库的字典，使用`pickle`进行的序列化存储，导致C++不方便读取，因此进行转换
+
+  ```shell
+  python tools/transform_id_map.py -c inference_drink.yaml
+  ```
+
+  转换成功后，在`IndexProcess.index_dir`目录下生成`id_map.txt`，方便c++ 读取。
+
+- 执行程序
+
+  ```shell
+  ./build/pp_shitu -c inference_drink.yaml
+  # or
+  ./build/pp_shitu -config inference_drink.yaml
+  ```
+
+  若对图像集进行检索，则可能得到，如下结果。注意，此结果只做展示，具体以实际运行结果为准。
+
+  同时，需注意的是，由于opencv 版本问题，会导致图像在预处理的过程中，resize产生细微差别，导致python 和c++结果，轻微不同，如bbox相差几个像素，检索结果小数点后3位diff等。但不会改变最终检索label。
+
+  ![](../../docs/images/quick_start/shitu_c++_result.png)
+
+## 4  使用自己模型
+
+使用自己训练的模型，可以参考[模型导出](../../docs/zh_CN/inference_deployment/export_model.md)，导出`inference model`，用于模型预测。
+
+同时注意修改`yaml`文件中具体参数。

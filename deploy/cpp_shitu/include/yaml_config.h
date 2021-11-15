@@ -42,12 +42,17 @@
 
 class YamlConfig {
 public:
-  explicit YamlConfig(const std::string &path) {
-    config_file = ReadYamlConfig(path);
-  }
-  static std::vector<std::string> ReadDict(const std::string &path);
-  static std::map<int, std::string> ReadIndexId(const std::string &path);
-  static YAML::Node ReadYamlConfig(const std::string &path);
-  void PrintConfigInfo();
-  YAML::Node config_file;
+    explicit YamlConfig(const std::string &path) {
+        config_file = ReadYamlConfig(path);
+    }
+
+    static std::vector <std::string> ReadDict(const std::string &path);
+
+    static std::map<int, std::string> ReadIndexId(const std::string &path);
+
+    static YAML::Node ReadYamlConfig(const std::string &path);
+
+    void PrintConfigInfo();
+
+    YAML::Node config_file;
 };
