@@ -40,6 +40,9 @@ from deploy.utils import config
 from ppcls.arch.backbone import *
 from ppcls.utils.logger import init_logger
 
+# for building model with loading pretrained weights from backbone
+init_logger()
+
 __all__ = ["PaddleClas"]
 
 BASE_DIR = os.path.expanduser("~/.paddleclas/")
@@ -410,7 +413,6 @@ class PaddleClas(object):
     """PaddleClas.
     """
 
-    init_logger(name='root')
     print_info()
 
     def __init__(self,
