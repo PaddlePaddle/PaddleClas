@@ -1,6 +1,6 @@
 # 服务器端C++预测
 
-本教程将介绍在服务器端部署PaddleClas模型的详细步骤。
+本教程将介绍在服务器端部署PP-ShiTU的详细步骤。
 
 
 ## 1. 准备环境
@@ -161,7 +161,7 @@ apt-get install libopenblas-dev
 sh tools/build.sh
 ```
 
-具体地，`tools/build.sh`中内容如下。
+具体地，`tools/build.sh`中内容如下，请根据具体路径修改。
 
 ```shell
 OPENCV_DIR=${opencv_install_dir}
