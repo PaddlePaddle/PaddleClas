@@ -65,6 +65,7 @@ from ppcls.arch.backbone.variant_models.vgg_variant import VGG19Sigmoid
 from ppcls.arch.backbone.variant_models.pp_lcnet_variant import PPLCNet_x2_5_Tanh
 
 
+# help whl get all the models' api (class type) and components' api (func type)
 def get_apis():
     current_func = sys._getframe().f_code.co_name
     current_module = sys.modules[__name__]

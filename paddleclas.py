@@ -73,6 +73,7 @@ MODEL_SERIES = {
         "HRNet_W48_C_ssld"
     ],
     "Inception": ["GoogLeNet", "InceptionV3", "InceptionV4"],
+    "MixNet": ["MixNet_S", "MixNet_M", "MixNet_L"],
     "MobileNetV1": [
         "MobileNetV1_x0_25", "MobileNetV1_x0_5", "MobileNetV1_x0_75",
         "MobileNetV1", "MobileNetV1_ssld"
