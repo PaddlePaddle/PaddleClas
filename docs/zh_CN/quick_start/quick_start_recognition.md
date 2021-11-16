@@ -253,7 +253,7 @@ python3.7 python/predict_system.py -c configs/inference_general.yaml -o Global.i
 python3.7 python/build_gallery.py -c configs/build_general.yaml -o IndexProcess.data_file="./drink_dataset_v1.0/gallery/drink_label_all.txt" -o IndexProcess.index_dir="./drink_dataset_v1.0/index_all"
 ```
 
-最终新的索引信息保存在文件夹 `./drink_dataset_v1.0/index_all` 中。
+最终新的索引信息保存在文件夹 `./drink_dataset_v1.0/index_all` 中。具体`yaml`请参考[向量检索文档](../image_recognition_pipeline/vector_search.md)。
 
 <a name="基于新的索引库的图像识别"></a>
 
