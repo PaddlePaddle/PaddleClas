@@ -1,4 +1,6 @@
 # global configs
+# pretrained_model: https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/pretrain/vehicle_reid_PPLCNet2.5x_VERIWild_v1.0_pretrained.pdparams
+# VeriWild v1 small: recall1: 0.93736, recall5: 0.98427, mAP: 0.82125
 Global:
   checkpoints: null
   pretrained_model: null
