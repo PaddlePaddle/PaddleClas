@@ -62,6 +62,10 @@ MODEL_SERIES = {
         "DenseNet121", "DenseNet161", "DenseNet169", "DenseNet201",
         "DenseNet264"
     ],
+    "DLA": [
+        "DLA46_c", "DLA60x_c", "DLA34", "DLA60", "DLA60x", "DLA102", "DLA102x",
+        "DLA102x2", "DLA169"
+    ],
     "DPN": ["DPN68", "DPN92", "DPN98", "DPN107", "DPN131"],
     "EfficientNet": [
         "EfficientNetB0", "EfficientNetB0_small", "EfficientNetB1",
@@ -71,6 +75,7 @@ MODEL_SERIES = {
     "ESNet": ["ESNet_x0_25", "ESNet_x0_5", "ESNet_x0_75", "ESNet_x1_0"],
     "GhostNet":
     ["GhostNet_x0_5", "GhostNet_x1_0", "GhostNet_x1_3", "GhostNet_x1_3_ssld"],
+    "HarDNet": ["HarDNet39_ds", "HarDNet68_ds", "HarDNet68", "HarDNet85"],
     "HRNet": [
         "HRNet_W18_C", "HRNet_W30_C", "HRNet_W32_C", "HRNet_W40_C",
         "HRNet_W44_C", "HRNet_W48_C", "HRNet_W64_C", "HRNet_W18_C_ssld",
@@ -99,6 +104,7 @@ MODEL_SERIES = {
         "PPLCNet_x0_25", "PPLCNet_x0_35", "PPLCNet_x0_5", "PPLCNet_x0_75",
         "PPLCNet_x1_0", "PPLCNet_x1_5", "PPLCNet_x2_0", "PPLCNet_x2_5"
     ],
+    "RedNet": ["RedNet26", "RedNet38", "RedNet50", "RedNet101", "RedNet152"],
     "RegNet": ["RegNetX_4GF"],
     "Res2Net": [
         "Res2Net50_14w_8s", "Res2Net50_26w_4s", "Res2Net50_vd_26w_4s",
@@ -123,6 +129,8 @@ MODEL_SERIES = {
         "ResNeXt152_32x4d", "ResNeXt152_vd_32x4d", "ResNeXt152_64x4d",
         "ResNeXt152_vd_64x4d"
     ],
+    "ReXNet":
+    ["ReXNet_1_0", "ReXNet_1_3", "ReXNet_1_5", "ReXNet_2_0", "ReXNet_3_0"],
     "SENet": [
         "SENet154_vd", "SE_HRNet_W64_C_ssld", "SE_ResNet18_vd",
         "SE_ResNet34_vd", "SE_ResNet50_vd", "SE_ResNeXt50_32x4d",
