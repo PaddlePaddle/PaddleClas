@@ -56,6 +56,7 @@ def create_feeds(image_shape, use_mix=False, class_num=None, dtype="float32"):
     feeds = OrderedDict()
     feeds['data'] = paddle.static.data(
         name="data", shape=[None] + image_shape, dtype=dtype)
+    feeds['data'].stop_gradient = False
 
     if use_mix:
         if class_num is None:
@@ -376,6 +377,27 @@ def run(dataloader,
         if idx == 5:
             metric_dict["batch_time"].reset()
             metric_dict["reader_time"].reset()
+
+        # '''
+        if idx == 50:
+            paddle.fluid.core.nvprof_start()
+            paddle.fluid.core.nvprof_enable_record_event()
+            paddle.fluid.core.nvprof_nvtx_push(str(idx))
+        elif idx == 60:
+            paddle.fluid.core.nvprof_nvtx_pop()
+            paddle.fluid.core.nvprof_stop()
+            exit(0)
+        else:
+            paddle.fluid.core.nvprof_nvtx_pop()
+            paddle.fluid.core.nvprof_nvtx_push(str(idx))
+        # '''
+        '''
+        if idx == 50:
+            paddle.fluid.profiler.start_profiler('All', 'AllOpDetail')
+        elif idx == 60:
+            paddle.fluid.profiler.stop_profiler('total', '/Paddle/test/CINN/paddle_clas2.timeline')
+            exit(0)
+        '''
 
         metric_dict['reader_time'].update(time.time() - tic)
 
