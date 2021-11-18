@@ -56,7 +56,6 @@ def create_feeds(image_shape, use_mix=False, class_num=None, dtype="float32"):
     feeds = OrderedDict()
     feeds['data'] = paddle.static.data(
         name="data", shape=[None] + image_shape, dtype=dtype)
-    feeds['data'].stop_gradient = False
 
     if use_mix:
         if class_num is None:
