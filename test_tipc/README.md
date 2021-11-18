@@ -3,7 +3,7 @@
 
 ## 1. 简介
 
-飞桨除了基本的模型训练和预测，还提供了支持多端多平台的高性能推理部署工具。本文档提供了PaddleOCR中所有模型的飞桨训推一体认证 (Training and Inference Pipeline Certification(TIPC)) 信息和测试工具，方便用户查阅每种模型的训练推理部署打通情况，并可以进行一键测试。
+飞桨除了基本的模型训练和预测，还提供了支持多端多平台的高性能推理部署工具。本文档提供了PaddleClas中所有模型的飞桨训推一体认证 (Training and Inference Pipeline Certification(TIPC)) 信息和测试工具，方便用户查阅每种模型的训练推理部署打通情况，并可以进行一键测试。
 
 <div align="center">
     <img src="docs/guide.png" width="1000">
@@ -32,14 +32,14 @@
 ./test_tipc/
 ├── common_func.sh                      #test_*.sh会调用到的公共函数
 ├── config     # 配置文件目录
-│   ├── MobileNetV3_large_x1_0   # MobileNetV3_large_x1_0模型测试配置文件目录
-│   │   ├── train_infer_python.txt                                        #基础训练预测配置文件
-│   │   ├── train_linux_gpu_fleet_amp_infer_python_linux_gpu_cpu.txt      #多机多卡训练预测配置文件
-│   │   └── train_linux_gpu_normal_amp_infer_python_linux_gpu_cpu.txt     #混合精度训练预测配置文件
-│   └── ResNet50_vd              # ResNet50_vd模型测试配置文件目录
-│       ├── train_infer_python.txt                                        #基础训练预测配置文件
-│       ├── train_linux_gpu_fleet_amp_infer_python_linux_gpu_cpu.txt      #多机多卡训练预测配置文件
-│       └── train_linux_gpu_normal_amp_infer_python_linux_gpu_cpu.txt     #混合精度训练预测配置文件
+│   ├── MobileNetV3_large_x1_0   # MobileNetV3系列模型测试配置文件目录
+│   │   ├── MobileNetV3_large_x1_0_train_infer_python.txt                                    #基础训练预测配置文件
+│   │   ├── MobileNetV3_large_x1_0_train_linux_gpu_fleet_amp_infer_python_linux_gpu_cpu.txt  #多机多卡训练预测配置文件
+│   │   └── MobileNetV3_large_x1_0_train_linux_gpu_normal_amp_infer_python_linux_gpu_cpu.txt #混合精度训练预测配置文件
+│   └── ResNet              # ResNet系列模型测试配置文件目录
+│       ├── ResNet50_vd_train_infer_python.txt                                        #基础训练预测配置文件
+│       ├── ResNet50_vd_train_linux_gpu_fleet_amp_infer_python_linux_gpu_cpu.txt      #多机多卡训练预测配置文件
+│       └── ResNet50_vd_train_linux_gpu_normal_amp_infer_python_linux_gpu_cpu.txt     #混合精度训练预测配置文件
 |   ......
 ├── docs
 │   ├── guide.png
@@ -56,15 +56,15 @@
     <img src="docs/test.png" width="800">
 </div>
 
-1. 运行prepare.sh准备测试所需数据和模型；
+1. 运行`prepare.sh`准备测试所需数据和模型；
 2. 运行要测试的功能对应的测试脚本`test_*.sh`，产出log，由log可以看到不同配置是否运行成功；
 3. 用`compare_results.py`对比log中的预测结果和预存在results目录下的结果，判断预测精度是否符合预期（在误差范围内）。
 
 其中，有4个测试主程序，功能如下：
 - `test_train_inference_python.sh`：测试基于Python的模型训练、评估、推理等基本功能，包括裁剪、量化、蒸馏。
-- `test_inference_cpp.sh`：测试基于C++的模型推理。
-- `test_serving.sh`：测试基于Paddle Serving的服务化部署功能。
-- `test_lite.sh`：测试基于Paddle-Lite的端侧预测部署功能。
+- `test_inference_cpp.sh`：测试基于C++的模型推理。待支持
+- `test_serving.sh`：测试基于Paddle Serving的服务化部署功能。待支持
+- `test_lite.sh`：测试基于Paddle-Lite的端侧预测部署功能。待支持
 
 <a name="more"></a>
 #### 更多教程

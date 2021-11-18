@@ -156,8 +156,17 @@ function func_inference(){
     done
 }
 
-
 if [ ${MODE} = "whole_infer" ] || [ ${MODE} = "klquant_whole_infer" ]; then
+   IFS="|"
+   infer_export_flag=(${infer_export_flag})
+   if [ ${infer_export_flag} != "null" ]  && [ ${infer_export_flag} != "False" ]; then
+	rm -rf ${infer_model_dir_list/..\//}
+	export_cmd="${python} ${norm_export} -o Global.pretrained_model=${model_name}_pretrained -o Global.save_inference_dir=${infer_model_dir_list/..\//}"
+	eval $export_cmd
+   fi
+fi
+
+if [ ${MODE} = "whole_infer" ]; then
     GPUID=$3
     if [ ${#GPUID} -le 0 ];then
         env=" "
@@ -167,14 +176,6 @@ if [ ${MODE} = "whole_infer" ] || [ ${MODE} = "klquant_whole_infer" ]; then
     # set CUDA_VISIBLE_DEVICES
     eval $env
     export Count=0
-    IFS="|"
-    infer_export_flag=(${infer_export_flag})
-    infer_quant_flag=(${infer_is_quant})
-    if [ ${infer_export_flag} != "null" ]  && [ ${infer_export_flag} != "False" ]; then
-	rm -rf ${infer_model_dir_list/..\//}
-        export_cmd="${python} ${norm_export} -o Global.pretrained_model=${model_name}_pretrained -o Global.save_inference_dir=${infer_model_dir_list/..\//}"
-        eval $export_cmd
-    fi
     cd deploy
     for infer_model in ${infer_model_dir_list[*]}; do
         #run inference
@@ -185,6 +186,7 @@ if [ ${MODE} = "whole_infer" ] || [ ${MODE} = "klquant_whole_infer" ]; then
     done
     cd ..
 
+elif [ ${MODE} = "klquant_whole_infer" ]; then
     # for kl_quant
     if [ ${kl_quant_cmd_value} != "null" ] && [ ${kl_quant_cmd_value} != "False" ]; then
 	echo "kl_quant"
@@ -197,7 +199,7 @@ if [ ${MODE} = "whole_infer" ] || [ ${MODE} = "klquant_whole_infer" ]; then
 	ln -s __params__ inference.pdiparams
 	cd ../../deploy
 	is_quant=True
-        func_inference "${python}" "${inference_py}" "${infer_model}/quant_post_static_model" "../${LOG_PATH}" "${infer_img_dir}" ${is_quant}
+        func_inference "${python}" "${inference_py}" "${infer_model_dir_list}/quant_post_static_model" "../${LOG_PATH}" "${infer_img_dir}" ${is_quant}
 	cd ..
     fi
 else
