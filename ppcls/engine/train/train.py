@@ -18,24 +18,27 @@ import paddle
 from ppcls.engine.train.utils import update_loss, update_metric, log_info
 import sys
 from paddle.fluid import core
+import cProfile, pstats, io
 
 
 def train_epoch(engine, epoch_id, print_batch_step):
     tic = time.time()
+    # pr = cProfile.Profile()
     for iter_id, batch in enumerate(engine.train_dataloader):
-        
-        if iter_id == 200:
+        '''
+        if iter_id == 250:
             core.nvprof_start()
             core.nvprof_enable_record_event()
             core.nvprof_nvtx_push(str(iter_id))
-        if iter_id == 205:
+        if iter_id == 255:
             core.nvprof_nvtx_pop()
             core.nvprof_stop()
             sys.exit()
-        if iter_id >= 200 and iter_id < 205:
+        if iter_id >= 250 and iter_id < 255:
             core.nvprof_nvtx_pop()
             core.nvprof_nvtx_push(str(iter_id))
-
+        '''
+        
         if iter_id >= engine.max_iter:
             break
         if iter_id == 50:
@@ -72,11 +75,15 @@ def train_epoch(engine, epoch_id, print_batch_step):
         if engine.amp:
             scaled = engine.scaler.scale(loss_dict["loss"])
             scaled.backward()
+            # if iter_id == 200:
+            #   pr.enable()
             engine.scaler.minimize(engine.optimizer, scaled)
+            # if iter_id == 200:
+            #   pr.disable()
         else:
             loss_dict["loss"].backward()
             engine.optimizer.step()
-        engine.optimizer.clear_grad()
+        engine.optimizer.clear_grads()
         engine.lr_sch.step()
 
         # below code just for logging
@@ -88,6 +95,15 @@ def train_epoch(engine, epoch_id, print_batch_step):
         if iter_id % print_batch_step == 0:
             log_info(engine, batch_size, epoch_id, iter_id)
         tic = time.time()
+        
+        # if iter_id == 200:
+        #     s = io.StringIO()
+        #     sortby = 'cumulative'
+        #     ps = pstats.Stats(pr, stream=s).sort_stats(sortby)
+        #     ps.print_stats()
+        #     print(s.getvalue())
+        #     sys.exit()
+        
 
 
 def forward(engine, batch):

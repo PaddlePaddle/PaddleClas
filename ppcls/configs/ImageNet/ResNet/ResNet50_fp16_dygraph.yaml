@@ -80,7 +80,7 @@ DataLoader:
 
     sampler:
       name: DistributedBatchSampler
-      batch_size: 128
+      batch_size: 256
       drop_last: False
       shuffle: True
     loader:

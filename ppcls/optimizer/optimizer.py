@@ -57,6 +57,42 @@ class Momentum(object):
             parameters=parameters)
         return opt
 
+class MultiTensorMomentum(object):
+    """
+    Simple Momentum optimizer with velocity state.
+    Args:
+        learning_rate (float|Variable) - The learning rate used to update parameters.
+            Can be a float value or a Variable with one float value as data element.
+        momentum (float) - Momentum factor.
+        regularization (WeightDecayRegularizer, optional) - The strategy of regularization.
+    """
+
+    def __init__(self,
+                 learning_rate,
+                 momentum,
+                 weight_decay=None,
+                 grad_clip=None,
+                 multi_precision=False):
+        super().__init__()
+        self.learning_rate = learning_rate
+        self.momentum = momentum
+        self.weight_decay = weight_decay
+        self.grad_clip = grad_clip
+        self.multi_precision = multi_precision
+
+    def __call__(self, model_list):
+        # model_list is None in static graph
+        parameters = sum([m.parameters() for m in model_list],
+                         []) if model_list else None
+        opt = optim.MultiTensorMomentum(
+            learning_rate=self.learning_rate,
+            momentum=self.momentum,
+            weight_decay=self.weight_decay,
+            grad_clip=self.grad_clip,
+            multi_precision=self.multi_precision,
+            parameters=parameters)
+        return opt
+
 
 class Adam(object):
     def __init__(self,
