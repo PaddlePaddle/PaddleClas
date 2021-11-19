@@ -22,10 +22,11 @@ import cProfile, pstats, io
 
 
 def train_epoch(engine, epoch_id, print_batch_step):
+    paddle.seed(100)
     tic = time.time()
     # pr = cProfile.Profile()
     for iter_id, batch in enumerate(engine.train_dataloader):
-        '''
+        
         if iter_id == 250:
             core.nvprof_start()
             core.nvprof_enable_record_event()
@@ -37,7 +38,7 @@ def train_epoch(engine, epoch_id, print_batch_step):
         if iter_id >= 250 and iter_id < 255:
             core.nvprof_nvtx_pop()
             core.nvprof_nvtx_push(str(iter_id))
-        '''
+        
         
         if iter_id >= engine.max_iter:
             break

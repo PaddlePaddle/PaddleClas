@@ -43,7 +43,7 @@ Loss:
 
 
 Optimizer:
-  name: Momentum
+  name: MultiTensorMomentum
   momentum: 0.9
   lr:
     name: Piecewise
