@@ -8,7 +8,7 @@
 
 * [1. 环境配置](#环境配置)
 * [2. 图像识别体验](#图像识别体验)
-  * [2.1 下载、解压inference 模型与demo数据](#2.1)
+  * [2.1 下载、解压inference 模型与demo数据](#下载、解压inference模型与demo数据)
   * [2.2 瓶装饮料识别与检索](#瓶装饮料识别与检索)
     * [2.2.1 识别单张图像](#识别单张图像)
     * [2.2.2 基于文件夹的批量识别](#基于文件夹的批量识别)
@@ -35,6 +35,8 @@
 
 轻量级通用主体检测模型与轻量级通用识别模型和配置文件下载方式如下表所示。
 
+<a name="轻量级通用主体检测模型与轻量级通用识别模型"></a>
+
 | 模型简介       | 推荐场景   | inference模型  | 预测配置文件  | 构建索引库的配置文件 |
 | ------------  | ------------- | -------- | ------- | -------- |
 | 轻量级通用主体检测模型 | 通用场景  |[模型下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/inference/picodet_PPLCNet_x2_5_mainbody_lite_v1.0_infer.tar) | - | - |
@@ -44,7 +46,6 @@
 
 
 如果希望体验服务端主体检测和各垂类方向的识别模型，可以参考[第4章](#4)。
-
 
 **注意**
 
@@ -74,7 +75,7 @@ cd ..
 wget {数据下载链接地址} && tar -xf {压缩包的名称}
 ```
 
-<a name="2.1"></a>
+<a name="下载、解压inference模型与demo数据"></a>
 
 ### 2.1 下载、解压 inference 模型与 demo 数据
 
@@ -125,10 +126,11 @@ wget https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/data/drink_da
 
 ```shell
 # 下面是使用下载的服务端商品识别模型进行索引库构建
-python3.7 python/build_gallery.py -c configs/build_general.yaml -o Global.rec_inference_model_dir=./models/product_ResNet50_vd_aliproduct_v1.0_infer
+python3.7 python/build_gallery.py -c configs/build_general.yaml -o Global.rec_inference_model_dir=./models/general_PPLCNet_x2_5_lite_v1.0_infer
 ```
 
 <a name="瓶装饮料识别与检索"></a>
+
 ### 2.2 瓶装饮料识别与检索
 
 以瓶装饮料识别 demo 为例，展示识别与检索过程（如果希望尝试其他方向的识别与检索效果，在下载解压好对应的 demo 数据与模型之后，替换对应的配置文件即可完成预测）。
@@ -282,7 +284,7 @@ python3.7 python/predict_system.py -c configs/inference_general.yaml -o Global.i
 <a name="4"></a>
 ## 4. 服务端识别模型列表
 
-如果希望体验服务端识别模型，服务器端通用主体检测模型与各方向识别模型、测试数据下载地址以及对应的配置文件地址如下。
+目前，我们更推荐您使用[轻量级通用主体检测模型与轻量级通用识别模型](#轻量级通用主体检测模型与轻量级通用识别模型)，以获得更好的测试结果。但是如果您希望体验服务端识别模型，服务器端通用主体检测模型与各方向识别模型、测试数据下载地址以及对应的配置文件地址如下。
 
 | 模型简介       | 推荐场景   | inference模型  | 预测配置文件  | 构建索引库的配置文件 |
 | ------------  | ------------- | -------- | ------- | -------- |
@@ -293,4 +295,38 @@ python3.7 python/predict_system.py -c configs/inference_general.yaml -o Global.i
 | 商品识别模型 | 商品场景  |  [模型下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/inference/product_ResNet50_vd_aliproduct_v1.0_infer.tar) | [inference_product.yaml](../../../deploy/configs/inference_product.yaml) | [build_product.yaml](../../../deploy/configs/build_product.yaml) |
 | 车辆ReID模型 | 车辆ReID场景 | [模型下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/inference/vehicle_reid_ResNet50_VERIWild_v1.0_infer.tar) | - | - |
 
+在models文件夹下进行如下操作来获取模型：
+
+```shell
+# 下载通用主体检测模型并解压
+wget https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/inference/ppyolov2_r50vd_dcn_mainbody_v1.0_infer.tar
+# 下载识别模型并解压
+wget {识别模型下载链接地址} && tar -xf {压缩包的名称}
+```
+
+在deploy文件夹下使用如下命令下载各方向识别模型的测试数据：
+
+```shell
+# 下载测试数据并解压
+wget https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/data/recognition_demo_data_en_v1.1.tar && tar -xf recognition_demo_data_en_v1.1.tar
+```
+
+解压完毕后，`recognition_demo_data_v1.1` 文件夹下应有如下文件结构：
+
+```
+├── recognition_demo_data_v1.1
+│   ├── gallery_cartoon
+│   ├── gallery_logo
+│   ├── gallery_product
+│   ├── gallery_vehicle
+│   ├── test_cartoon
+│   ├── test_logo
+│   ├── test_product
+│   └── test_vehicle
+├── ...
+```
+
+按照上述步骤下载模型和测试数据后，您可以进行相关方向识别模型的测试。
+
 * 更多关于主体检测的介绍可以参考：[主体检测教程文档](../image_recognition_pipeline/mainbody_detection.md)；关于特征提取的介绍可以参考：[特征提取教程文档](../image_recognition_pipeline/feature_extraction.md)；关于向量检索的介绍可以参考：[向量检索教程文档](../image_recognition_pipeline/vector_search.md)。
+
