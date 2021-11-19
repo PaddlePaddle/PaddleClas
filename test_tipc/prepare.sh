@@ -51,7 +51,7 @@ if [ ${MODE} = "lite_train_lite_infer" ] || [ ${MODE} = "lite_train_whole_infer"
 	cp -r train/* val/
     fi
     cd ../../
-elif [ ${MODE} = "whole_infer" ] || [ ${MODE} = "cpp_infer" ];then
+elif [ ${MODE} = "whole_infer" ] || [ ${MODE} = "klquant_whole_infer" ];then
     # download data
     cd dataset
     rm -rf ILSVRC2012

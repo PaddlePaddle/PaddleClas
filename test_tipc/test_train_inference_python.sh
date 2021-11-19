@@ -156,7 +156,7 @@ function func_inference(){
     done
 }
 
-if [ ${MODE} = "whole_infer" ] || [${MODE} = "klquant_whole_infer" ]; then
+if [ ${MODE} = "whole_infer" ] || [ ${MODE} = "klquant_whole_infer" ]; then
    IFS="|"
    infer_export_flag=(${infer_export_flag})
    if [ ${infer_export_flag} != "null" ]  && [ ${infer_export_flag} != "False" ]; then
@@ -199,7 +199,7 @@ elif [ ${MODE} = "klquant_whole_infer" ]; then
 	ln -s __params__ inference.pdiparams
 	cd ../../deploy
 	is_quant=True
-        func_inference "${python}" "${inference_py}" "${infer_model}/quant_post_static_model" "../${LOG_PATH}" "${infer_img_dir}" ${is_quant}
+        func_inference "${python}" "${inference_py}" "${infer_model_dir_list}/quant_post_static_model" "../${LOG_PATH}" "${infer_img_dir}" ${is_quant}
 	cd ..
     fi
 else

@@ -41,11 +41,11 @@ def main():
                      'inference.pdmodel')) and os.path.exists(
                          os.path.join(config["Global"]["save_inference_dir"],
                                       'inference.pdiparams'))
-    config["DataLoader"]["Train"]["sampler"]["batch_size"] = 1
-    config["DataLoader"]["Train"]["loader"]["num_workers"] = 0
+    config["DataLoader"]["Eval"]["sampler"]["batch_size"] = 1
+    config["DataLoader"]["Eval"]["loader"]["num_workers"] = 0
     init_logger()
     device = paddle.set_device("cpu")
-    train_dataloader = build_dataloader(config["DataLoader"], "Train", device,
+    train_dataloader = build_dataloader(config["DataLoader"], "Eval", device,
                                         False)
 
     def sample_generator(loader):
