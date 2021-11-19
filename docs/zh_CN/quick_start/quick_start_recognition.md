@@ -299,7 +299,7 @@ python3.7 python/predict_system.py -c configs/inference_general.yaml -o Global.i
 
 ```shell
 # 下载通用主体检测模型并解压
-wget https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/inference/ppyolov2_r50vd_dcn_mainbody_v1.0_infer.tar
+wget https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/inference/ppyolov2_r50vd_dcn_mainbody_v1.0_infer.tar && tar -xf ppyolov2_r50vd_dcn_mainbody_v1.0_infer.tar
 # 下载识别模型并解压
 wget {识别模型下载链接地址} && tar -xf {压缩包的名称}
 ```
