@@ -76,7 +76,7 @@ elif [ ${MODE} = "whole_train_whole_infer" ];then
     ln -s whole_chain_CIFAR100 ILSVRC2012
     cd ILSVRC2012 
     mv train.txt train_list.txt
-    mv val.txt val_list.txt
+    mv test.txt val_list.txt
     cd ../../
 fi
 
