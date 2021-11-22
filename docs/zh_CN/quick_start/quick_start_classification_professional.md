@@ -1,6 +1,6 @@
 # 30分钟玩转PaddleClas（进阶版）
 
-此处提供了专业用户在linux操作系统上使用PaddleClas的快速上手教程，主要内容基于CIFAR-100数据集，快速体验不同模型的训练、加载不同预训练模型、SSLD知识蒸馏方案和数据增广的效果。请事先参考[安装指南](../installation/install_paddleclas.md)配置运行环境和克隆PaddleClas代码。
+此处提供了专业用户在 linux 操作系统上使用 PaddleClas 的快速上手教程，主要内容基于 CIFAR-100 数据集，快速体验不同模型的训练、加载不同预训练模型、SSLD 知识蒸馏方案和数据增广的效果。请事先参考[安装指南](../installation/install_paddleclas.md)配置运行环境和克隆 PaddleClas 代码。
 
 ------
 
@@ -32,7 +32,7 @@
 ### 1.1 数据准备
 
 
-* 进入PaddleClas目录。
+* 进入 PaddleClas 目录。
 
 ```
 cd path_to_PaddleClas
@@ -42,7 +42,7 @@ cd path_to_PaddleClas
 
 #### 1.1.1 准备CIFAR100
 
-* 进入`dataset/`目录，下载并解压CIFAR100数据集。
+* 进入 `dataset/` 目录，下载并解压 CIFAR100 数据集。
 
 ```shell
 cd dataset
@@ -108,7 +108,7 @@ python3 -m paddle.distributed.launch \
         -o Arch.use_ssld=True
 ```
 
-最终CIFAR100验证集上精度指标为 0.73，相对于 79.12% 预训练模型的微调结构，新数据集指标可以再次提升1.2%。
+最终 CIFAR100 验证集上精度指标为 0.73，相对于 79.12% 预训练模型的微调结构，新数据集指标可以再次提升 1.2%。
 
 * 替换 backbone 为 MobileNetV3_large_x1_0 进行微调，训练脚本如下所示。
 
@@ -129,7 +129,7 @@ python3 -m paddle.distributed.launch \
 
 ## 3. 数据增广
 
-PaddleClas包含了很多数据增广的方法，如 Mixup、Cutout、RandomErasing 等，具体的方法可以参考[数据增广的章节](../algorithm_introduction/DataAugmentation.md)。
+PaddleClas 包含了很多数据增广的方法，如 Mixup、Cutout、RandomErasing 等，具体的方法可以参考[数据增广的章节](../algorithm_introduction/DataAugmentation.md)。
 
 <a name="3.1"></a> 
 
