@@ -8,7 +8,47 @@
 ### 运行准备
 - Linux环境，推荐使用ubuntu docker。
 
-### 1.1 编译opencv库
+### 1.1 升级cmake
+
+由于依赖库编译需要较高版本的cmake，因此，第一步首先将cmake升级。
+
+- 下载最新版本cmake
+
+```shell
+# 当前版本最新为3.22.0，根据实际情况自行下载，建议最新版本
+wget https://github.com/Kitware/CMake/releases/download/v3.22.0/cmake-3.22.0.tar.gz
+tar xf cmake-3.22.0.tar.gz
+```
+
+最终可以在当前目录下看到`cmake-3.22.0/`的文件夹。
+
+- 编译cmake，首先设置came源码路径(`root_path`)以及安装路径(`install_path`)，`root_path`为下载的came源码路径，`install_path`为came的安装路径。在本例中，源码路径即为当前目录下的`cmake-3.22.0/`。
+
+```shell
+cd ./cmake-3.22.0
+export root_path=$PWD
+export install_path=${root_path}/cmake
+```
+
+- 然后在cmake源码路径下，按照下面的方式进行编译
+
+```shell
+./bootstrap --prefix=${install_path}
+make -j
+make install
+```
+
+- 设置环境变量
+
+```shell
+export PATH=${install_path}/bin:$PATH
+#检查是否正常使用
+cmake --version
+```
+
+此时，cmake就可以使用了
+
+### 1.2 编译opencv库
 
 * 首先需要从opencv官网上下载在Linux环境下源码编译的包，以3.4.7版本为例，下载及解压缩命令如下：
 
@@ -68,11 +108,11 @@ opencv3/
 |-- share
 ```
 
-### 1.2 下载或者编译Paddle预测库
+### 1.3 下载或者编译Paddle预测库
 
 * 有2种方式获取Paddle预测库，下面进行详细介绍。
 
-#### 1.2.1 预测库源码编译
+#### 1.3.1 预测库源码编译
 * 如果希望获取最新预测库特性，可以从Paddle github上克隆最新代码，源码编译预测库。
 * 可以参考[Paddle预测库官网](https://www.paddlepaddle.org.cn/documentation/docs/zh/develop/guides/05_inference_deployment/inference/build_and_install_lib_cn.html#id16)的说明，从github上获取Paddle代码，然后进行编译，生成最新的预测库。使用git获取代码方法如下。
 
@@ -115,15 +155,15 @@ build/paddle_inference_install_dir/
 
 其中`paddle`就是之后进行C++预测时所需的Paddle库，`version.txt`中包含当前预测库的版本信息。
 
-#### 1.2.2 直接下载安装
+#### 1.3.2 直接下载安装
 
-* [Paddle预测库官网](https://www.paddlepaddle.org.cn/documentation/docs/zh/develop/guides/05_inference_deployment/inference/build_and_install_lib_cn.html#id1)上提供了不同cuda版本的Linux预测库，可以在官网查看并选择合适的预测库版本，注意必须选择`develop`版本。
+* [Paddle预测库官网](https://paddle-inference.readthedocs.io/en/latest/user_guides/download_lib.html)上提供了不同cuda版本的Linux预测库，可以在官网查看并选择合适的预测库版本，注意必须选择`develop`版本。
 
-  以`ubuntu14.04_cuda9.0_cudnn7_avx_mkl`的`develop`版本为例，使用下述命令下载并解压：
+  以`https://paddle-inference-lib.bj.bcebos.com/2.1.1-gpu-cuda10.2-cudnn8.1-mkl-gcc8.2/paddle_inference.tgz`的`develop`版本为例，使用下述命令下载并解压：
 
 
 ```shell
-wget https://paddle-inference-lib.bj.bcebos.com/latest-gpu-cuda9-cudnn7-avx-mkl/paddle_inference.tgz
+wget https://paddle-inference-lib.bj.bcebos.com/2.1.1-gpu-cuda10.2-cudnn8.1-mkl-gcc8.2/paddle_inference.tgz
 
 tar -xvf paddle_inference.tgz
 ```
@@ -131,12 +171,13 @@ tar -xvf paddle_inference.tgz
 
 最终会在当前的文件夹中生成`paddle_inference/`的子文件夹。
 
-### 1.3 安装faiss库
+### 1.4 安装faiss库
 
 ```shell
  # 下载 faiss
  git clone https://github.com/facebookresearch/faiss.git
- cd faiss 
+ cd faiss
+ export faiss_install_path=$PWD/faiss_install
  cmake -B build . -DFAISS_ENABLE_PYTHON=OFF  -DCMAKE_INSTALL_PREFIX=${faiss_install_path}
  make -C build -j faiss
  make -C build install
@@ -215,8 +256,8 @@ make -j
   wget https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/inference/general_PPLCNet_x2_5_lite_v1.0_infer.tar
   tar -xf general_PPLCNet_x2_5_lite_v1.0_infer.tar
   cd ..
-  
-  mkdir data 
+
+  mkdir data
   cd data
   wget https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/data/drink_dataset_v1.0.tar
   tar -xf drink_dataset_v1.0.tar
