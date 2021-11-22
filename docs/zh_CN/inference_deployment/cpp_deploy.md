@@ -143,7 +143,7 @@ build/paddle_inference_install_dir/
 [Paddle预测库官网](https://paddleinference.paddlepaddle.org.cn/v2.1/user_guides/download_lib.html#c) 上提供了不同版本的 Paddle 预测库，包括多个操作系统平台和GPU、CPU等多个硬件平台的预编译库，可以在官网查找并选择合适的预测库版本进行下载，建议选择 `2.1.1` 版本。
 
 **注意**：在选择预测库时，所选预测库版本需要与后续编译选项一致：
-* CPU 预测库仅可用于 GPU 预测，具体又分为 `mkl` 和 `openblas`，分别对应其低层实现基于 `MKL` 数学运算库 和 `OpenBLAS` 数学运算库；
+* CPU 预测库仅可用于 CPU 预测，具体又分为 `mkl` 和 `openblas`，分别对应其低层实现基于 `MKL` 数学运算库 和 `OpenBLAS` 数学运算库；
 * GPU 预测库支持 GPU 预测和 CPU 预测，其 GPU 预测功能底层实现基于 CUDA、cuDNN，CPU 预测功能底层基于 `MKL` 实现。
 
 以 `manylinux_cuda10.2_cudnn8.1_avx_mkl_trt7_gcc8.2` 的 `2.1.1` 版本为例，可使用下述命令下载并解压：
