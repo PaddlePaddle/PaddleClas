@@ -4,26 +4,26 @@ Global:
   pretrained_model: null
   output_dir: ./output/
   device: gpu
+  class_num: 1000
   save_interval: 1
   eval_during_train: True
   eval_interval: 1
-  epochs: 20
+  epochs: 360
   print_batch_step: 10
   use_visualdl: False
   # used for static mode and model export
   image_shape: [3, 224, 224]
   save_inference_dir: ./inference
-
 # model architecture
 Arch:
-  name: ResNet50_vd 
-  class_num: 102
-
+  name: ESNet_x0_5
+ 
 # loss function config for traing/eval process
 Loss:
   Train:
     - CELoss:
         weight: 1.0
+        epsilon: 0.1
   Eval:
     - CELoss:
         weight: 1.0
@@ -34,11 +34,11 @@ Optimizer:
   momentum: 0.9
   lr:
     name: Cosine
-    learning_rate: 0.0125
+    learning_rate: 0.8
     warmup_epoch: 5
   regularizer:
     name: 'L2'
-    coeff: 0.00001
+    coeff: 0.00003
 
 
 # data loader for train and eval
@@ -46,8 +46,8 @@ DataLoader:
   Train:
     dataset:
       name: ImageNetDataset
-      image_root: ./dataset/flowers102/
-      cls_label_path: ./dataset/flowers102/train_list.txt
+      image_root: ./dataset/ILSVRC2012/
+      cls_label_path: ./dataset/ILSVRC2012/train_list.txt
       transform_ops:
         - DecodeImage:
             to_rgb: True
@@ -64,7 +64,7 @@ DataLoader:
 
     sampler:
       name: DistributedBatchSampler
-      batch_size: 32
+      batch_size: 512
       drop_last: False
       shuffle: True
     loader:
@@ -74,8 +74,8 @@ DataLoader:
   Eval:
     dataset: 
       name: ImageNetDataset
-      image_root: ./dataset/flowers102/
-      cls_label_path: ./dataset/flowers102/val_list.txt
+      image_root: ./dataset/ILSVRC2012/
+      cls_label_path: ./dataset/ILSVRC2012/val_list.txt
       transform_ops:
         - DecodeImage:
             to_rgb: True
@@ -118,7 +118,7 @@ Infer:
   PostProcess:
     name: Topk
     topk: 5
-    class_id_map_file: ./dataset/flowers102/flowers102_label_list.txt
+    class_id_map_file: ppcls/utils/imagenet1k_label_list.txt
 
 Metric:
   Train:
