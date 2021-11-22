@@ -76,7 +76,7 @@ python3 -m paddle.distributed.launch \
         -o Arch.use_ssld=True
 ```
 
-最终CIFAR100验证集上精度指标为0.73，相对于79.12\%预训练模型的微调结构，新数据集指标可以再次提升1.2\%。
+最终 CIFAR100 验证集上精度指标为 0.73，相对于 79.12% 预训练模型的微调结构，新数据集指标可以再次提升 1.2%。
 
 * 替换backbone为MobileNetV3_large_x1_0进行微调，训练脚本如下所示。
 
