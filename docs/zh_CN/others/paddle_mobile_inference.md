@@ -16,11 +16,11 @@
 ```shell
 python tools/export_model.py \
     -c ./ppcls/configs/ImageNet/MobileNetV1/MobileNetV1.yaml \
-    -o Global.pretrained_model=./pretrained/MobileNetV1_pretrained/ \
+    -o Arch.pretrained=./pretrained/MobileNetV1_pretrained/ \
     -o Global.save_inference_dir=./inference/MobileNetV1/
 ```
 
-最终在`inference/MobileNetV1`文件夹下会保存得到`inference.pdmodel`与`inference.pdiparmas`文件。
+在上述命令中，通过参数 `Arch.pretrained` 指定训练过程中保存的模型参数文件，也可以指定参数 `Arch.pretrained=True` 加载 PaddleClas 提供的基于 ImageNet1k 的预训练模型参数，最终在 `inference/MobileNetV1` 文件夹下会保存得到 `inference.pdmodel` 与 `inference.pdiparmas` 文件。
 
 
 ### 2.2 benchmark二进制文件下载
@@ -100,7 +100,7 @@ mkdir ${opt_models_dir}
 bash benchmark.sh ./benchmark_bin_v8 ./opt_models result_armv8.txt
 ```
 
-最终`result_armv8.txt`中结果如下。
+最终`result_armv8.txt`中结果如下：
 
 ```
 PaddleLite Benchmark
@@ -114,6 +114,6 @@ Threads=4 Warmup=10 Repeats=30
 MobileNetV1_lite              min = 10.00600    max = 9.90000     average = 9.96177
 ```
 
-以线程数为1为例，MobileNetV1在骁龙855上的平均速度为`30.84173FPS`。
+以线程数为1为例，MobileNetV1在骁龙855上的平均速度为`30.84173 ms`。
 
 更加具体的参数解释与Paddle-Lite使用方法可以参考 [Paddle-Lite 文档](https://paddle-lite.readthedocs.io/zh/latest/)。
