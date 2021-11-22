@@ -20,7 +20,10 @@ import base64
 client = PipelineClient()
 client.connect(['127.0.0.1:9994'])
 imgpath = "../../drink_dataset_v1.0/test_images/001.jpeg"
+<<<<<<< HEAD
 
+=======
+>>>>>>> fe3e776d114add6c6ad7aaede793bbc5cdcedbb9
 
 def cv2_to_base64(image):
     return base64.b64encode(image).decode('utf8')
