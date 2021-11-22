@@ -1,6 +1,6 @@
 # 30分钟玩转PaddleClas（进阶版）
 
-此处提供了专业用户在linux操作系统上使用PaddleClas的快速上手教程，主要内容基于CIFAR-100数据集，快速体验不同模型的训练、加载不同预训练模型、SSLD知识蒸馏方案和数据增广的效果。请事先参考[安装指南](../installation/install_paddleclas.md)配置运行环境和克隆PaddleClas代码。
+此处提供了专业用户在 linux 操作系统上使用 PaddleClas 的快速上手教程，主要内容基于 CIFAR-100 数据集，快速体验不同模型的训练、加载不同预训练模型、SSLD 知识蒸馏方案和数据增广的效果。请事先参考[安装指南](../installation/install_paddleclas.md)配置运行环境和克隆 PaddleClas 代码。
 
 
 ## 一、数据和模型准备
@@ -8,7 +8,7 @@
 ### 1.1 数据准备
 
 
-* 进入PaddleClas目录。
+* 进入 PaddleClas 目录。
 
 ```
 cd path_to_PaddleClas
@@ -16,7 +16,7 @@ cd path_to_PaddleClas
 
 #### 1.1.1 准备CIFAR100
 
-* 进入`dataset/`目录，下载并解压CIFAR100数据集。
+* 进入 `dataset/` 目录，下载并解压 CIFAR100 数据集。
 
 ```shell
 cd dataset
@@ -95,7 +95,8 @@ python3 -m paddle.distributed.launch \
 
 ## 三、数据增广
 
-PaddleClas包含了很多数据增广的方法，如Mixup、Cutout、RandomErasing等，具体的方法可以参考[数据增广的章节](../algorithm_introduction/DataAugmentation.md)。
+PaddleClas 包含了很多数据增广的方法，如 Mixup、Cutout、RandomErasing 等，具体的方法可以参考[数据增广的章节](../algorithm_introduction/DataAugmentation.md)。
+>>>>>>> fa066acb... modify space in documentation
 
 ### 数据增广的尝试-Mixup
 
