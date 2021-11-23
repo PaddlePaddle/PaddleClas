@@ -5,7 +5,6 @@
 # pip install ...
 # 2 拷贝该模型需要数据、预训练模型
 # 3 批量运行（如不方便批量，1，2需放到单个模型中）
-log_path=./benchmark
 model_mode_list=(MobileNetV1 MobileNetV2 MobileNetV3_large_x1_0 ShuffleNetV2_x1_0 HRNet_W48_C SwinTransformer_tiny_patch4_window7_224 alt_gvt_base)    # benchmark 监控模型列表
 #model_mode_list=(MobileNetV1 MobileNetV2 MobileNetV3_large_x1_0 EfficientNetB0 ShuffleNetV2_x1_0 DenseNet121 HRNet_W48_C SwinTransformer_tiny_patch4_window7_224 alt_gvt_base)   # 该脚本支持列表
 fp_item_list=(fp32)

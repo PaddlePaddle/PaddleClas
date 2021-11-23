@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -x
+set -xe
 # 运行示例：CUDA_VISIBLE_DEVICES=0 bash run_benchmark.sh ${run_mode} ${bs_item} ${fp_item} 500 ${model_mode}
 # 参数说明
 function _set_params(){
@@ -35,7 +35,7 @@ function _train(){
         model_config=`find ppcls/configs/ImageNet -name ${model_name}_fp16.yaml` 
     fi
 
-    train_cmd="-c ${model_config} -o DataLoader.Train.sampler.batch_size=${batch_size} -o Global.epochs=${epochs}  -o Global.eval_during_train=False"
+    train_cmd="-c ${model_config} -o DataLoader.Train.sampler.batch_size=${batch_size} -o Global.epochs=${epochs}  -o Global.eval_during_train=False -o Global.print_batch_step=2"
     case ${run_mode} in
     sp) train_cmd="python -u tools/train.py ${train_cmd}" ;;
     mp)
