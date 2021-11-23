@@ -45,7 +45,7 @@ function _train(){
     esac
     rm -rf mylog
 # 以下不用修改
-    timeout 15m ${train_cmd} > ${log_file} 2>&1
+    timeout 5m ${train_cmd} > ${log_file} 2>&1
     if [ $? -ne 0 ];then
         echo -e "${model_name}, FAIL"
         export job_fail_flag=1
