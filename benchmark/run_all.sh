@@ -8,11 +8,13 @@
 model_mode_list=(MobileNetV1 MobileNetV2 MobileNetV3_large_x1_0 ShuffleNetV2_x1_0 HRNet_W48_C SwinTransformer_tiny_patch4_window7_224 alt_gvt_base)    # benchmark 监控模型列表
 #model_mode_list=(MobileNetV1 MobileNetV2 MobileNetV3_large_x1_0 EfficientNetB0 ShuffleNetV2_x1_0 DenseNet121 HRNet_W48_C SwinTransformer_tiny_patch4_window7_224 alt_gvt_base)   # 该脚本支持列表
 fp_item_list=(fp32)
-bs_list=(64)     #32 64 96 128)
+#bs_list=(32 64 96 128)
 for model_mode in ${model_mode_list[@]}; do
       for fp_item in ${fp_item_list[@]}; do
           if [ ${model_mode} = MobileNetV3_large_x1_0 ] || [ ${model_mode} = ShuffleNetV2_x1_0 ]; then
               bs_list=(256)
+          else
+              bs_list=(64)
           fi
           for bs_item in ${bs_list[@]};do
 	    echo "index is speed, 1gpus, begin, ${model_name}"
