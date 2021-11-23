@@ -9,7 +9,11 @@
 
 值得注意的是，为了更好是适配性，目前版本，`PaddleClas`中暂时**只使用CPU进行向量检索**。
 
-如[README](../../../README_ch.md)中`PP-ShiTu图像识别系统介绍`图中所示，向量检索部分，在整个`PP-ShiTu`系统中有两部分内容
+<div align="center">
+<img src="../../images/structure.jpg"  width = "800" />
+</div>
+
+如上图中所示，向量检索部分，在整个`PP-ShiTu`系统中有两部分内容
 
 - 图中绿色部分：建立检索库，供检索时查询使用，同时提供增、删等功能
 - 图中蓝色部分：检索功能，即给定一张图的特征向量，返回库中相似图像的label
@@ -51,7 +55,11 @@ cd deploy
 python python/build_gallery.py -c configs/build_***.yaml
 ```
 
-其中`yaml`文件的建库的配置如下，在运行时，请根据实际情况进行修改。建库操作会将根据`data_file`的图像列表，将`image_root`下的图像进行特征提取，并在`index_dir`下进行存储，以待后续检索使用。关于特征提取的具体模型参数，可查看`yaml`文件。
+其中`yaml`文件的建库的配置如下，在运行时，请根据实际情况进行修改。建库操作会将根据`data_file`的图像列表，将`image_root`下的图像进行特征提取，并在`index_dir`下进行存储，以待后续检索使用。
+
+其中`data_file`文件存储的是图像文件的路径和标签，每一行的格式为：`image_path  label`。中间间隔以`yaml`文件中`delimiter`参数作为间隔。
+
+关于特征提取的具体模型参数，可查看`yaml`文件。
 
 ```yaml
 # indexing engine config
