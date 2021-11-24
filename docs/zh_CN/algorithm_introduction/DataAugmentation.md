@@ -105,7 +105,6 @@ PaddleClas 中集成了上述所有的数据增强策略，每种数据增强策
 
 开源代码 github 地址：[https://github.com/rwightman/pytorch-image-models/blob/master/timm/data/auto_augment.py](https://github.com/rwightman/pytorch-image-models/blob/master/timm/data/auto_augment.py)
 
-`TimmAutoAugment` 是开源作者对 AutoAugment 和 RandAugment 的改进，事实证明，其在很多视觉任务上有更好的表现，目前绝大多数 VisionTransformer 模型都是基于 TimmAutoAugment 去实现的。
 
 <a name="4"></a>
 ## 4. 图像裁剪类

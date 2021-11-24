@@ -62,6 +62,16 @@ pip install faiss-cpu==1.7.1post2
 
 <a name="3.1"></a> 
 
+=======
+
+<a name="3"></a> 
+
+## 3. 使用及配置文档介绍
+
+涉及检索模块配置文件位于：`deploy/configs/` 下，其中 `build_*.yaml` 是建立特征库的相关配置文件，`inference_*.yaml` 是检索或者分类的推理配置文件。
+
+<a name="3.1"></a> 
+
 ### 3.1 建库及配置文件参数
 
 建库的具体操作如下：
@@ -109,6 +119,11 @@ IndexProcess:
 
 其中，检索部分配置如下，整体检索配置文件，请参考 `deploy/configs/inference_*.yaml` 文件。
 
+将检索的过程融合到 `PP-ShiTu` 的整体流程中，请参考 [README](../../../README_ch.md) 中 `PP-ShiTu图像识别系统介绍` 部分。检索具体使用操作请参考[识别快速开始文档](../quick_start/quick_start_recognition.md)。
+
+其中，检索部分配置如下，整体检索配置文件，请参考 `deploy/configs/inference_*.yaml` 文件。
+
+>>>>>>> add menue to documentations
 ```yaml
 IndexProcess:
   index_dir: "./recognition_demo_data_v1.1/gallery_logo/index/"

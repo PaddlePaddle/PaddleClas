@@ -97,9 +97,9 @@ paddle_inference_install_dir
 * `CMAKE_BACKWARDS_COMPATIBILITY` 的值请根据自己 `cmake` 版本设置，`cmake` 版本可以通过命令：`cmake --version` 查询；
 * `CUDA_LIB` 、 `CUDNN_LIB` 的值仅需在使用 **GPU 版本**预测库时指定，其中 CUDA 库版本尽量对齐，**使用 9.0、10.0 版本，不使用 9.2、10.1 等版本 CUDA 库**；
 * 在设置 `CUDA_LIB`、`CUDNN_LIB`、`OPENCV_DIR`、`PADDLE_LIB` 时，点击 `浏览`，分别设置相应的路径；
-   * `CUDA_LIB` 和 `CUDNN_LIB`：该路径取决于 CUDA 与 CUDNN 的安装位置。
-   * `OpenCV_DIR`：该路径下需要有`.cmake` 文件，一般为 `opencv/build/`；
-   * `PADDLE_LIB`：该路径下需要有 `CMakeCache.txt` 文件，一般为 `paddle_inference_install_dir/`。
+   * `CUDA_LIB`和`CUDNN_LIB`：该路径取决于 CUDA 与 CUDNN 的安装位置。
+   * `OpenCV_DIR`：该路径下需要有`.cmake`文件，一般为`opencv/build/`；
+   * `PADDLE_LIB`：该路径下需要有`CMakeCache.txt`文件，一般为`paddle_inference_install_dir/`。
 * 在使用 `CPU` 版预测库时，请不要勾选 `WITH_GPU` - `保存到 JSON`。
 
 ![step4](../../images/inference_deployment/vs2019_step5.png)
@@ -159,7 +159,7 @@ cd D:\projects\PaddleClas\deploy\cpp\out\build\x64-Release
 
 注意，需要在配置文件中正确设置预测参数，包括所用模型文件的路径（`cls_model_path` 和 `cls_params_path`）。
 <a name='3.3'></a>
-### 3.3 注意事项
+### 3.3  注意事项
 * 在 Windows 下的终端中执行文件 exe 时，可能会发生乱码的现象，此时需要在终端中输入 `CHCP 65001`，将终端的编码方式由 GBK 编码(默认)改为 UTF-8 编码，更加具体的解释可以参考这篇博客：[https://blog.csdn.net/qq_35038153/article/details/78430359](https://blog.csdn.net/qq_35038153/article/details/78430359)；
 * 如果需要使用 CPU 预测，PaddlePaddle 在 Windows 上仅支持 avx 的 CPU 预测，目前不支持 noavx 的 CPU 预测；
 * 在使用生成的 `clas_system.exe` 进行预测时，如提示 `由于找不到 paddle_fluid.dll，无法继续执行代码。重新安装程序可能会解决此问题`，请检查是否将 Paddle 预测库路径添加到系统环境变量，详见[1.1 下载 PaddlePaddle C++ 预测库 paddle_inference_install_dir](#1.1)。

@@ -71,6 +71,7 @@
 | HRNet_W48_C_ssld | 0.836    | 0.790   | 0.046  | 13.707         | 17.34         | 17.34    | 77.57     | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/HRNet_W48_C_ssld_pretrained.pdparams) |
 | SE_HRNet_W64_C_ssld | 0.848    |  -    |  - |  31.697      |     94.995      | 29.00    | 129.12    | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/SE_HRNet_W64_C_ssld_pretrained.pdparams) |
 
+
 <a name="2.2"></a>
 
 ### 2.2 移动端知识蒸馏模型
@@ -85,9 +86,6 @@
 | GhostNet_x1_3_ssld                    | 0.794    | 0.757   | 0.037 | 19.983                | 236.89     | 7.38       | 29      | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/GhostNet_x1_3_ssld_pretrained.pdparams)               |
 
 
-
-<a name="Intel-CPU端知识蒸馏模型"></a>
-#### Intel CPU端知识蒸馏模型
 <a name="2.3"></a>
 
 ### 2.3 Intel CPU 端知识蒸馏模型
@@ -192,6 +190,7 @@ ResNet 及其 Vd 系列模型的精度、速度指标如下表所示，更多关
 | ESNet_x0_5 | 68.82 | 88.04 || 67.31 | 3.25 | 13 |[下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/ESNet_x0_5_pretrained.pdparams)               |
 | ESNet_x0_75 | 72.24 | 90.45 || 123.74 | 3.87 | 15 |[下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/ESNet_x0_75_pretrained.pdparams)               |
 | ESNet_x1_0 | 73.92 | 91.40 || 197.33 | 4.64 | 18 |[下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/ESNet_x1_0_pretrained.pdparams)               |
+
 
 <a name="6"></a>
 
