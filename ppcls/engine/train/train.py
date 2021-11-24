@@ -26,23 +26,23 @@ def train_epoch(engine, epoch_id, print_batch_step):
     tic = time.time()
     # pr = cProfile.Profile()
     for iter_id, batch in enumerate(engine.train_dataloader):
-        
-        if iter_id == 250:
+        '''
+        if iter_id == 150:
             core.nvprof_start()
             core.nvprof_enable_record_event()
             core.nvprof_nvtx_push(str(iter_id))
-        if iter_id == 255:
+        if iter_id == 155:
             core.nvprof_nvtx_pop()
             core.nvprof_stop()
             sys.exit()
-        if iter_id >= 250 and iter_id < 255:
+        if iter_id >= 150 and iter_id < 155:
             core.nvprof_nvtx_pop()
             core.nvprof_nvtx_push(str(iter_id))
-        
+        '''
         
         if iter_id >= engine.max_iter:
             break
-        if iter_id == 50:
+        if iter_id == 10:
             for key in engine.time_info:
                 engine.time_info[key].reset()
         engine.time_info["reader_cost"].update(time.time() - tic)
@@ -79,6 +79,8 @@ def train_epoch(engine, epoch_id, print_batch_step):
             # if iter_id == 200:
             #   pr.enable()
             engine.scaler.minimize(engine.optimizer, scaled)
+            # engine.scaler.step(engine.optimizer)
+            # engine.scaler.update()
             # if iter_id == 200:
             #   pr.disable()
         else:

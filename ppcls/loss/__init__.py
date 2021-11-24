@@ -45,9 +45,11 @@ class CombinedLoss(nn.Layer):
         for idx, loss_func in enumerate(self.loss_func):
             loss = loss_func(input, batch)
             weight = self.loss_weight[idx]
+            # loss = {key: loss[key] * weight for key in loss}
             if weight != 1.0:
                 loss = {key: loss[key] * weight for key in loss}
             loss_dict.update(loss)
+        # loss_dict["loss"] = paddle.add_n(list(loss_dict.values()))
         if len(list(loss_dict.values())) > 1:
             loss_dict["loss"] = paddle.add_n(list(loss_dict.values()))
         else:
