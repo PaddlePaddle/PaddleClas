@@ -1,44 +1,48 @@
 <!-- 简体中文 | [English](../../en/algorithm_introduction/ImageNet_models.md) -->
 
 
-## ImageNet预训练模型库
+# ImageNet 预训练模型库
 
-### 目录
+## 目录
 
-- [模型库概览图](#模型库概览图)
-- [SSLD知识蒸馏预训练模型](#模型库概览图)
-    - [服务器端知识蒸馏模型](#服务器端知识蒸馏模型)
-    - [移动端知识蒸馏模型](#移动端知识蒸馏模型)
-    - [Intel CPU端知识蒸馏模型](#Intel-CPU端知识蒸馏模型)
-- [PP-LCNet系列](#PP-LCNet系列)
-- [ResNet系列](#ResNet系列)
-- [移动端系列](#移动端系列)
-- [SEResNeXt与Res2Net系列](#SEResNeXt与Res2Net系列)
-- [DPN与DenseNet系列](#DPN与DenseNet系列)
-- [HRNet系列](#HRNet系列)
-- [Inception系列](#Inception系列)
-- [EfficientNet与ResNeXt101_wsl系列](#EfficientNet与ResNeXt101_wsl系列)
-- [ResNeSt与RegNet系列](#ResNeSt与RegNet系列)
-- [ViT_and_DeiT系列](#ViT_and_DeiT系列)
-- [RepVGG系列](#RepVGG系列)
-- [MixNet系列](#MixNet系列)
-- [SwinTransformer系列](#SwinTransformer系列)
-- [LeViT系列](#LeViT系列)
-- [HarDNet系列](#HarDNet系列)
-- [DLA系列](#DLA系列)
-- [RedNet系列](#RedNet系列)
-- [TNT系列](#TNT系列)
-- [其他模型](#其他模型)
+- [ImageNet 预训练模型库](#imagenet-预训练模型库)
+  - [目录](#目录)
+  - [1. 模型库概览图](#1)
+  - [2. SSLD 知识蒸馏预训练模型](#2)
+    - [2.1 服务器端知识蒸馏模型](#2.1)
+    - [2.2 移动端知识蒸馏模型](#2.2)
+    - [2.3 Intel CPU 端知识蒸馏模型](#2.3)
+  - [3. PP-LCNet 系列](#3)
+  - [4. ResNet 系列](#4)
+  - [5. 移动端系列](#5)
+  - [6. SEResNeXt 与 Res2Net 系列](#6)
+  - [7. DPN 与 DenseNet 系列](#7)
+  - [8. HRNet 系列](#8)
+  - [9. Inception 系列](#9)
+  - [10. EfficientNet 与 ResNeXt101_wsl 系列](#10)
+  - [11. ResNeSt 与 RegNet系列](#11)
+  - [12. ViT_and_DeiT 系列](#12)
+  - [13. RepVGG 系列](#13)
+  - [14. MixNet 系列](#14)
+  - [15. ReXNet 系列](#15)
+  - [16. SwinTransformer 系列](#16)
+  - [17. LeViT 系列](#17)
+  - [18. Twins 系列](#18)
+  - [19. HarDNet 系列](#19)
+  - [20. DLA 系列](#20)
+  - [21. RedNet 系列](#21)
+  - [22. TNT 系列](#22)
+  - [23. 其他模型](#23)
 
+<a name="1"></a>
 
-<a name="模型库概览图"></a>
-### 模型库概览图
+## 1. 模型库概览图
 
-基于ImageNet1k分类数据集，PaddleClas支持37个系列分类网络结构以及对应的217个图像分类预训练模型，训练技巧、每个系列网络结构的简单介绍和性能评估将在相应章节展现，下面所有的速度指标评估环境如下：
-* Arm CPU的评估环境基于骁龙855（SD855）。
-* Intel CPU的评估环境基于Intel(R) Xeon(R) Gold 6148。
-* GPU评估环境基于T4机器，在FP32+TensorRT配置下运行500次测得（去除前10次的warmup时间）。
-* FLOPs与Params通过`paddle.flops()`计算得到（PaddlePaddle版本为2.2）
+基于 ImageNet1k 分类数据集，PaddleClas 支持 37 个系列分类网络结构以及对应的 217 个图像分类预训练模型，训练技巧、每个系列网络结构的简单介绍和性能评估将在相应章节展现，下面所有的速度指标评估环境如下：
+* Arm CPU 的评估环境基于骁龙 855(SD855)。
+* Intel CPU 的评估环境基于 Intel(R) Xeon(R) Gold 6148。
+* GPU 评估环境基于 T4 机器，在 FP32+TensorRT 配置下运行 500 次测得（去除前 10 次的 warmup 时间）。
+* FLOPs 与 Params 通过 `paddle.flops()` 计算得到（PaddlePaddle 版本为 2.2）
 
 常见服务器端模型的精度指标与其预测耗时的变化曲线如下图所示。
 
@@ -51,13 +55,14 @@
 
 ![](../../images/models/mobile_arm_top1.png)
 
+<a name="2"></a>
 
-<a name="SSLD知识蒸馏系列"></a>
-### SSLD知识蒸馏预训练模型
-基于SSLD知识蒸馏的预训练模型列表如下所示，更多关于SSLD知识蒸馏方案的介绍可以参考：[SSLD知识蒸馏文档](./knowledge_distillation.md)。
+## 2. SSLD 知识蒸馏预训练模型
+基于 SSLD 知识蒸馏的预训练模型列表如下所示，更多关于 SSLD 知识蒸馏方案的介绍可以参考：[SSLD 知识蒸馏文档](./knowledge_distillation.md)。
 
-<a name="服务器端知识蒸馏模型"></a>
-#### 服务器端知识蒸馏模型
+<a name="2.1"></a>
+
+### 2.1 服务器端知识蒸馏模型
 
 | 模型                  | Top-1 Acc | Reference<br>Top-1 Acc | Acc gain | time(ms)<br>bs=1 | time(ms)<br>bs=4 | FLOPs(G) | Params(M) | 下载地址                                                                                         |
 |---------------------|-----------|-----------|---------------|----------------|-----------|----------|-----------|-----------------------------------|
@@ -71,8 +76,9 @@
 | HRNet_W48_C_ssld | 0.836    | 0.790   | 0.046  | 13.707         | 17.34         | 17.34    | 77.57     | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/HRNet_W48_C_ssld_pretrained.pdparams) |
 | SE_HRNet_W64_C_ssld | 0.848    |  -    |  - |  31.697      |     94.995      | 29.00    | 129.12    | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/SE_HRNet_W64_C_ssld_pretrained.pdparams) |
 
-<a name="移动端知识蒸馏模型"></a>
-#### 移动端知识蒸馏模型
+<a name="2.2"></a>
+
+### 2.2 移动端知识蒸馏模型
 
 | 模型                  | Top-1 Acc | Reference<br>Top-1 Acc | Acc gain | SD855 time(ms)<br>bs=1 | FLOPs(M) | Params(M) | 模型大小(M) | 下载地址   |
 |---------------------|-----------|-----------|---------------|----------------|-----------|----------|-----------|-----------------------------------|
@@ -83,9 +89,9 @@
 | MobileNetV3_small_x1_0_ssld      | 0.713    | 0.682  |  0.031  | 6.546                 | 63.67    | 2.95      | 12      | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/MobileNetV3_small_x1_0_ssld_pretrained.pdparams)      |
 | GhostNet_x1_3_ssld                    | 0.794    | 0.757   | 0.037 | 19.983                | 236.89     | 7.38       | 29      | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/GhostNet_x1_3_ssld_pretrained.pdparams)               |
 
+<a name="2.3"></a>
 
-<a name="Intel-CPU端知识蒸馏模型"></a>
-#### Intel CPU端知识蒸馏模型
+### 2.3 Intel CPU 端知识蒸馏模型
 
 | 模型                  | Top-1 Acc | Reference<br>Top-1 Acc | Acc gain |  Intel-Xeon-Gold-6148 time(ms)<br>bs=1 | FLOPs(M) | Params(M)  | 下载地址   |
 |---------------------|-----------|-----------|---------------|----------------|----------|-----------|-----------------------------------|
@@ -96,12 +102,13 @@
 
 
 
-* 注: `Reference Top-1 Acc`表示PaddleClas基于ImageNet1k数据集训练得到的预训练模型精度。
+* 注: `Reference Top-1 Acc`表示 PaddleClas 基于 ImageNet1k 数据集训练得到的预训练模型精度。
 
-<a name="PP-LCNet系列"></a>
-### PP-LCNet系列
+<a name="3"></a>
 
-PP-LCNet系列模型的精度、速度指标如下表所示，更多关于该系列的模型介绍可以参考：[PP-LCNet系列模型文档](../models/PP-LCNet.md)。
+## 3. PP-LCNet 系列
+
+PP-LCNet 系列模型的精度、速度指标如下表所示，更多关于该系列的模型介绍可以参考：[PP-LCNet 系列模型文档](../models/PP-LCNet.md)。
 
 | 模型           | Top-1 Acc | Top-5 Acc | Intel-Xeon-Gold-6148 time(ms)<br>bs=1 | FLOPs(M) | Params(M) | 下载地址 |
 |:--:|:--:|:--:|:--:|:--:|:--:|:--:|
@@ -114,11 +121,11 @@ PP-LCNet系列模型的精度、速度指标如下表所示，更多关于该系
 | PPLCNet_x2_0         |0.7518           | 0.9227   |  4.27      | 590   | 6.54  | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/PPLCNet_x2_0_pretrained.pdparams) |
 | PPLCNet_x2_5         |0.7660           | 0.9300   |  5.39      | 906   | 9.04  | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/PPLCNet_x2_5_pretrained.pdparams) |
 
+<a name="4"></a>
 
-<a name="ResNet系列"></a>
-### ResNet系列
+## 4. ResNet 系列
 
-ResNet及其Vd系列模型的精度、速度指标如下表所示，更多关于该系列的模型介绍可以参考：[ResNet及其Vd系列模型文档](../models/ResNet_and_vd.md)。
+ResNet 及其 Vd 系列模型的精度、速度指标如下表所示，更多关于该系列的模型介绍可以参考：[ResNet 及其 Vd 系列模型文档](../models/ResNet_and_vd.md)。
 
 | 模型                  | Top-1 Acc | Top-5 Acc | time(ms)<br>bs=1 | time(ms)<br>bs=4 | FLOPs(G) | Params(M) | 下载地址                                                                                         |
 |---------------------|-----------|-----------|-----------------------|----------------------|----------|-----------|----------------------------------------------------------------------------------------------|
@@ -138,9 +145,9 @@ ResNet及其Vd系列模型的精度、速度指标如下表所示，更多关于
 | ResNet50_vd_<br>ssld | 0.8300    | 0.9640    | 3.53131               | 8.09057              | 4.35     | 25.63     | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/ResNet50_vd_ssld_pretrained.pdparams) |
 | ResNet101_vd_<br>ssld   | 0.8373    | 0.9669    | 6.11704               | 13.76222             | 8.08     | 44.67     | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/ResNet101_vd_ssld_pretrained.pdparams)   |
 
+<a name="5"></a>
 
-<a name="移动端系列"></a>
-### 移动端系列
+## 5. 移动端系列
 
 移动端系列模型的精度、速度指标如下表所示，更多关于该系列的模型介绍可以参考：[移动端系列模型文档](../models/Mobile.md)。
 
@@ -187,11 +194,11 @@ ResNet及其Vd系列模型的精度、速度指标如下表所示，更多关于
 | ESNet_x0_75 | 72.24 | 90.45 || 123.74 | 3.87 | 15 |[下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/ESNet_x0_75_pretrained.pdparams)               |
 | ESNet_x1_0 | 73.92 | 91.40 || 197.33 | 4.64 | 18 |[下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/ESNet_x1_0_pretrained.pdparams)               |
 
+<a name="6"></a>
 
-<a name="SEResNeXt与Res2Net系列"></a>
-### SEResNeXt与Res2Net系列
+## 6. SEResNeXt 与 Res2Net 系列
 
-SEResNeXt与Res2Net系列模型的精度、速度指标如下表所示，更多关于该系列的模型介绍可以参考：[SEResNeXt与Res2Net系列模型文档](../models/SEResNext_and_Res2Net.md)。
+SEResNeXt 与 Res2Net 系列模型的精度、速度指标如下表所示，更多关于该系列的模型介绍可以参考：[SEResNeXt 与 Res2Net 系列模型文档](../models/SEResNext_and_Res2Net.md)。
 
 
 | 模型                  | Top-1 Acc | Top-5 Acc | time(ms)<br>bs=1 | time(ms)<br>bs=4 | FLOPs(G) | Params(M) | 下载地址                                                                                         |
@@ -222,11 +229,11 @@ SEResNeXt与Res2Net系列模型的精度、速度指标如下表所示，更多�
 | SE_ResNeXt101_<br>32x4d       | 0.7939    | 0.9443    | 18.82604              | 25.31814             | 8.03    | 49.09     | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/SE_ResNeXt101_32x4d_pretrained.pdparams)       |
 | SENet154_vd               | 0.8140    | 0.9548    | 53.79794              | 66.31684             | 24.45    | 122.03    | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/SENet154_vd_pretrained.pdparams)               |
 
+<a name="7"></a>
 
-<a name="DPN与DenseNet系列"></a>
-### DPN与DenseNet系列
+## 7. DPN 与 DenseNet 系列
 
-DPN与DenseNet系列模型的精度、速度指标如下表所示，更多关于该系列的模型介绍可以参考：[DPN与DenseNet系列模型文档](../models/DPN_DenseNet.md)。
+DPN 与 DenseNet 系列模型的精度、速度指标如下表所示，更多关于该系列的模型介绍可以参考：[DPN 与 DenseNet 系列模型文档](../models/DPN_DenseNet.md)。
 
 
 | 模型                  | Top-1 Acc | Top-5 Acc | time(ms)<br>bs=1 | time(ms)<br>bs=4 | FLOPs(G) | Params(M) | 下载地址                                                                                         |
@@ -244,10 +251,11 @@ DPN与DenseNet系列模型的精度、速度指标如下表所示，更多关于
 
 
 
-<a name="HRNet系列"></a>
-### HRNet系列
+<a name="8"></a>
 
-HRNet系列模型的精度、速度指标如下表所示，更多关于该系列的模型介绍可以参考：[HRNet系列模型文档](../models/HRNet.md)。
+## 8. HRNet 系列
+
+HRNet 系列模型的精度、速度指标如下表所示，更多关于该系列的模型介绍可以参考：[HRNet 系列模型文档](../models/HRNet.md)。
 
 
 | 模型          | Top-1 Acc | Top-5 Acc | time(ms)<br>bs=1 | time(ms)<br>bs=4 | FLOPs(G) | Params(M) | 下载地址                                                                                 |
@@ -263,11 +271,11 @@ HRNet系列模型的精度、速度指标如下表所示，更多关于该系列
 | HRNet_W64_C | 0.7930    | 0.9461    | 17.57527         | 47.9533          | 28.97    | 128.18    | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/HRNet_W64_C_pretrained.pdparams) |
 | SE_HRNet_W64_C_ssld | 0.8475    |  0.9726    |    31.69770      |     94.99546      | 29.00    | 129.12    | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/SE_HRNet_W64_C_ssld_pretrained.pdparams) |
 
+<a name="9"></a>
 
-<a name="Inception系列"></a>
-### Inception系列
+## 9. Inception 系列
 
-Inception系列模型的精度、速度指标如下表所示，更多关于该系列的模型介绍可以参考：[Inception系列模型文档](../models/Inception.md)。
+Inception 系列模型的精度、速度指标如下表所示，更多关于该系列的模型介绍可以参考：[Inception 系列模型文档](../models/Inception.md)。
 
 | 模型                  | Top-1 Acc | Top-5 Acc | time(ms)<br>bs=1 | time(ms)<br>bs=4 | FLOPs(G) | Params(M) | 下载地址                                                                                         |
 |--------------------|-----------|-----------|-----------------------|----------------------|----------|-----------|---------------------------------------------------------------------------------------------|
@@ -280,11 +288,11 @@ Inception系列模型的精度、速度指标如下表所示，更多关于该�
 | InceptionV3        | 0.7914    | 0.9459    | 6.64054              | 13.53630              | 5.73    | 23.87     | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/InceptionV3_pretrained.pdparams)        |
 | InceptionV4        | 0.8077    | 0.9526    | 12.99342              | 25.23416             | 12.29    | 42.74     | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/InceptionV4_pretrained.pdparams)        |
 
+<a name="10"></a>
 
-<a name="EfficientNet与ResNeXt101_wsl系列"></a>
-### EfficientNet与ResNeXt101_wsl系列
+## 10. EfficientNet 与 ResNeXt101_wsl 系列
 
-EfficientNet与ResNeXt101_wsl系列模型的精度、速度指标如下表所示，更多关于该系列的模型介绍可以参考：[EfficientNet与ResNeXt101_wsl系列模型文档](../models/EfficientNet_and_ResNeXt101_wsl.md)。
+EfficientNet 与 ResNeXt101_wsl 系列模型的精度、速度指标如下表所示，更多关于该系列的模型介绍可以参考：[EfficientNet 与 ResNeXt101_wsl 系列模型文档](../models/EfficientNet_and_ResNeXt101_wsl.md)。
 
 
 | 模型                        | Top-1 Acc | Top-5 Acc | time(ms)<br>bs=1 | time(ms)<br>bs=4 | FLOPs(G) | Params(M) | 下载地址                                                                                               |
@@ -304,11 +312,11 @@ EfficientNet与ResNeXt101_wsl系列模型的精度、速度指标如下表所示
 | EfficientNetB7            | 0.8430    | 0.9689    | 53.93823         | -                | 38.45    | 66.66     | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/EfficientNetB7_pretrained.pdparams)            |
 | EfficientNetB0_<br>small      | 0.7580    | 0.9258    | 2.3076           | 4.71886          | 0.40     | 4.69      | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/EfficientNetB0_small_pretrained.pdparams)      |
 
+<a name="11"></a>
 
-<a name="ResNeSt与RegNet系列"></a>
-### ResNeSt与RegNet系列
+## 11. ResNeSt 与 RegNet系列
 
-ResNeSt与RegNet系列模型的精度、速度指标如下表所示，更多关于该系列的模型介绍可以参考：[ResNeSt与RegNet系列模型文档](../models/ResNeSt_RegNet.md)。
+ResNeSt 与 RegNet 系列模型的精度、速度指标如下表所示，更多关于该系列的模型介绍可以参考：[ResNeSt 与 RegNet 系列模型文档](../models/ResNeSt_RegNet.md)。
 
 
 | 模型                     | Top-1 Acc | Top-5 Acc | time(ms)<br>bs=1 | time(ms)<br>bs=4 | FLOPs(G) | Params(M) | 下载地址                                                                                                 |
@@ -317,11 +325,11 @@ ResNeSt与RegNet系列模型的精度、速度指标如下表所示，更多关�
 | ResNeSt50              | 0.8083    | 0.9542    | 6.69042    | 8.01664                | 5.40    | 27.54      | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ResNeSt50_pretrained.pdparams)              |
 | RegNetX_4GF            | 0.785     | 0.9416    |    6.46478              |      11.19862           | 4.00        | 22.23      | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/RegNetX_4GF_pretrained.pdparams)            |
 
+<a name="12"></a>
 
-<a name="ViT_and_DeiT系列"></a>
-### ViT_and_DeiT系列
+## 12. ViT_and_DeiT 系列
 
-ViT（Vision Transformer）与DeiT（Data-efficient Image Transformers）系列模型的精度、速度指标如下表所示. 更多关于该系列模型的介绍可以参考： [ViT_and_DeiT系列模型文档](../models/ViT_and_DeiT.md)。
+ViT(Vision Transformer) 与 DeiT（Data-efficient Image Transformers）系列模型的精度、速度指标如下表所示. 更多关于该系列模型的介绍可以参考： [ViT_and_DeiT 系列模型文档](../models/ViT_and_DeiT.md)。
 
 
 | 模型                  | Top-1 Acc | Top-5 Acc | time(ms)<br>bs=1 | time(ms)<br>bs=4 | FLOPs(G) | Params(M) | 下载地址 |
@@ -349,11 +357,11 @@ ViT（Vision Transformer）与DeiT（Data-efficient Image Transformers）系列�
 | DeiT_base_<br>distilled_patch16_224 | 0.831 | 0.964 | - | - | 16.93 | 87.18 | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DeiT_base_distilled_patch16_224_pretrained.pdparams) |
 | DeiT_base_<br>distilled_patch16_384 | 0.851 | 0.973 | - | - | 49.43 | 87.18 | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DeiT_base_distilled_patch16_384_pretrained.pdparams) |
 
+<a name="13"></a>
 
-<a name="RepVGG系列"></a>
-### RepVGG系列
+## 13. RepVGG 系列
 
-关于RepVGG系列模型的精度、速度指标如下表所示，更多介绍可以参考：[RepVGG系列模型文档](../models/RepVGG.md)。
+关于 RepVGG 系列模型的精度、速度指标如下表所示，更多介绍可以参考：[RepVGG 系列模型文档](../models/RepVGG.md)。
 
 
 | 模型                     | Top-1 Acc | Top-5 Acc | time(ms)<br>bs=1 | time(ms)<br>bs=4 | FLOPs(G) | Params(M) | 下载地址 |
@@ -369,10 +377,11 @@ ViT（Vision Transformer）与DeiT（Data-efficient Image Transformers）系列�
 | RepVGG_B2g4 | 0.7881    | 0.9448    |  |  | 11.34 | 55.78 | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/RepVGG_B2g4_pretrained.pdparams) |
 | RepVGG_B3g4 | 0.7965    | 0.9485    |  |  | 16.07 | 75.63 | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/RepVGG_B3g4_pretrained.pdparams) |
 
-<a name="MixNet系列"></a>
-### MixNet系列
+<a name="14"></a>
 
-关于MixNet系列模型的精度、速度指标如下表所示，更多介绍可以参考：[MixNet系列模型文档](../models/MixNet.md)。
+## 14. MixNet 系列
+
+关于 MixNet 系列模型的精度、速度指标如下表所示，更多介绍可以参考：[MixNet 系列模型文档](../models/MixNet.md)。
 
 | 模型     | Top-1 Acc | Top-5 Acc | time(ms)<br>bs=1 | time(ms)<br>bs=4 | FLOPs(M) | Params(M) | 下载地址                                                     |
 | -------- | --------- | --------- | ---------------- | ---------------- | -------- | --------- | ------------------------------------------------------------ |
@@ -380,10 +389,11 @@ ViT（Vision Transformer）与DeiT（Data-efficient Image Transformers）系列�
 | MixNet_M | 0.7767    | 0.9364    |                  |                  | 357.119  | 5.065     | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/MixNet_M_pretrained.pdparams) |
 | MixNet_L | 0.7860    | 0.9437    |                  |                  | 579.017  | 7.384     | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/MixNet_L_pretrained.pdparams) |
 
-<a name="ReXNet系列"></a>
-### ReXNet系列
+<a name="15"></a>
 
-关于ReXNet系列模型的精度、速度指标如下表所示，更多介绍可以参考：[ReXNet系列模型文档](../models/ReXNet.md)。
+## 15. ReXNet 系列
+
+关于 ReXNet 系列模型的精度、速度指标如下表所示，更多介绍可以参考：[ReXNet 系列模型文档](../models/ReXNet.md)。
 
 | 模型       | Top-1 Acc | Top-5 Acc | time(ms)<br>bs=1 | time(ms)<br>bs=4 | FLOPs(G) | Params(M) | 下载地址                                                     |
 | ---------- | --------- | --------- | ---------------- | ---------------- | -------- | --------- | ------------------------------------------------------------ |
@@ -393,10 +403,11 @@ ViT（Vision Transformer）与DeiT（Data-efficient Image Transformers）系列�
 | ReXNet_2_0 | 0.8122    | 0.9536    |                  |                  | 1.56    | 16.45    | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ReXNet_2_0_pretrained.pdparams) |
 | ReXNet_3_0 | 0.8209    | 0.9612    |                  |                  | 3.44    | 34.83    | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ReXNet_3_0_pretrained.pdparams) |
 
-<a name="SwinTransformer系列"></a>
-### SwinTransformer系列
+<a name="16"></a>
 
-关于SwinTransformer系列模型的精度、速度指标如下表所示，更多介绍可以参考：[SwinTransformer系列模型文档](../models/SwinTransformer.md)。
+## 16. SwinTransformer 系列
+
+关于 SwinTransformer 系列模型的精度、速度指标如下表所示，更多介绍可以参考：[SwinTransformer 系列模型文档](../models/SwinTransformer.md)。
 
 | 模型       | Top-1 Acc | Top-5 Acc | time(ms)<br>bs=1 | time(ms)<br>bs=4 | FLOPs(G) | Params(M) | 下载地址                                                     |
 | ---------- | --------- | --------- | ---------------- | ---------------- | -------- | --------- | ------------------------------------------------------------ |
@@ -409,12 +420,13 @@ ViT（Vision Transformer）与DeiT（Data-efficient Image Transformers）系列�
 | SwinTransformer_large_patch4_window7_224<sup>[1]</sup>    | 0.8596 | 0.9783 |                  |                  | 34.02 | 196.43  | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/SwinTransformer_large_patch4_window7_224_22kto1k_pretrained.pdparams) |
 | SwinTransformer_large_patch4_window12_384<sup>[1]</sup>   | 0.8719 | 0.9823 |                  |                  | 99.97 | 196.43 | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/SwinTransformer_large_patch4_window12_384_22kto1k_pretrained.pdparams) |
 
-[1]：基于ImageNet22k数据集预训练，然后在ImageNet1k数据集迁移学习得到。
+[1]：基于 ImageNet22k 数据集预训练，然后在 ImageNet1k 数据集迁移学习得到。
 
-<a name="LeViT系列"></a>
-### LeViT系列
+<a name="17"></a>
 
-关于LeViT系列模型的精度、速度指标如下表所示，更多介绍可以参考：[LeViT系列模型文档](../models/LeViT.md)。
+## 17. LeViT 系列
+
+关于 LeViT 系列模型的精度、速度指标如下表所示，更多介绍可以参考：[LeViT 系列模型文档](../models/LeViT.md)。
 
 | 模型       | Top-1 Acc | Top-5 Acc | time(ms)<br>bs=1 | time(ms)<br>bs=4 | FLOPs(M) | Params(M) | 下载地址                                                     |
 | ---------- | --------- | --------- | ---------------- | ---------------- | -------- | --------- | ------------------------------------------------------------ |
@@ -424,12 +436,13 @@ ViT（Vision Transformer）与DeiT（Data-efficient Image Transformers）系列�
 | LeViT_256 | 0.8085    | 0.9497    |                  |                  | 1049    | 18.45    | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/LeViT_256_pretrained.pdparams) |
 | LeViT_384 | 0.8191   | 0.9551    |                  |                  | 2234    | 38.45    | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/LeViT_384_pretrained.pdparams) |
 
-**注**：与Reference的精度差异源于数据预处理不同及未使用蒸馏的head作为输出。
+**注**：与 Reference 的精度差异源于数据预处理不同及未使用蒸馏的 head 作为输出。
 
-<a name="Twins系列"></a>
-### Twins系列
+<a name="18"></a>
 
-关于Twins系列模型的精度、速度指标如下表所示，更多介绍可以参考：[Twins系列模型文档](../models/Twins.md)。
+## 18. Twins 系列
+
+关于 Twins 系列模型的精度、速度指标如下表所示，更多介绍可以参考：[Twins 系列模型文档](../models/Twins.md)。
 
 | 模型       | Top-1 Acc | Top-5 Acc | time(ms)<br>bs=1 | time(ms)<br>bs=4 | FLOPs(G) | Params(M) | 下载地址                                                     |
 | ---------- | --------- | --------- | ---------------- | ---------------- | -------- | --------- | ------------------------------------------------------------ |
@@ -440,12 +453,13 @@ ViT（Vision Transformer）与DeiT（Data-efficient Image Transformers）系列�
 | alt_gvt_base | 0.8294   | 0.9621    |                  |                  | 8.34   | 56.07   | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/alt_gvt_base_pretrained.pdparams) |
 | alt_gvt_large | 0.8331   | 0.9642    |                  |                  | 14.81   | 99.27    | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/alt_gvt_large_pretrained.pdparams) |
 
-**注**：与Reference的精度差异源于数据预处理不同。
+**注**：与 Reference 的精度差异源于数据预处理不同。
 
-<a name="HarDNet系列"></a>
-### HarDNet系列
+<a name="19"></a>
 
-关于HarDNet系列模型的精度、速度指标如下表所示，更多介绍可以参考：[HarDNet系列模型文档](../models/HarDNet.md)。
+## 19. HarDNet 系列
+
+关于 HarDNet 系列模型的精度、速度指标如下表所示，更多介绍可以参考：[HarDNet 系列模型文档](../models/HarDNet.md)。
 
 | 模型       | Top-1 Acc | Top-5 Acc | time(ms)<br>bs=1 | time(ms)<br>bs=4 | FLOPs(G) | Params(M) | 下载地址                                                     |
 | ---------- | --------- | --------- | ---------------- | ---------------- | -------- | --------- | ------------------------------------------------------------ |
@@ -454,10 +468,11 @@ ViT（Vision Transformer）与DeiT（Data-efficient Image Transformers）系列�
 | HarDNet68| 0.7546   | 0.9265   |                  |                  | 4.26   | 17.58    | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/HarDNet68_pretrained.pdparams) |
 | HarDNet85 | 0.7744   | 0.9355   |                  |                  | 9.09   | 36.69  | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/HarDNet85_pretrained.pdparams) |
 
-<a name="DLA系列"></a>
-### DLA系列
+<a name="20"></a>
 
-关于 DLA系列模型的精度、速度指标如下表所示，更多介绍可以参考：[DLA系列模型文档](../models/DLA.md)。
+## 20. DLA 系列
+
+关于 DLA 系列模型的精度、速度指标如下表所示，更多介绍可以参考：[DLA 系列模型文档](../models/DLA.md)。
 
 | 模型       | Top-1 Acc | Top-5 Acc | time(ms)<br>bs=1 | time(ms)<br>bs=4 | FLOPs(G) | Params(M) | 下载地址                                                     |
 | ---------- | --------- | --------- | ---------------- | ---------------- | -------- | --------- | ------------------------------------------------------------ |
@@ -471,10 +486,11 @@ ViT（Vision Transformer）与DeiT（Data-efficient Image Transformers）系列�
 | DLA60x_c | 0.6645   | 0.8754   |                  |                  | 0.59   | 1.33  | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DLA60x_c_pretrained.pdparams) |
 | DLA60x | 0.7753  | 0.9378  |                  |                  | 3.54   | 17.41  | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DLA60x_pretrained.pdparams) |
 
-<a name="RedNet系列"></a>
-### RedNet系列
+<a name="21"></a>
 
-关于RedNet系列模型的精度、速度指标如下表所示，更多介绍可以参考：[RedNet系列模型文档](../models/RedNet.md)。
+## 21. RedNet 系列
+
+关于 RedNet 系列模型的精度、速度指标如下表所示，更多介绍可以参考：[RedNet 系列模型文档](../models/RedNet.md)。
 
 | 模型       | Top-1 Acc | Top-5 Acc | time(ms)<br>bs=1 | time(ms)<br>bs=4 | FLOPs(G) | Params(M) | 下载地址                                                     |
 | ---------- | --------- | --------- | ---------------- | ---------------- | -------- | --------- | ------------------------------------------------------------ |
@@ -484,21 +500,23 @@ ViT（Vision Transformer）与DeiT（Data-efficient Image Transformers）系列�
 | RedNet101 | 0.7894  | 0.9436   |                  |                  | 4.59  | 25.76 | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/RedNet101_pretrained.pdparams) |
 | RedNet152 | 0.7917  | 0.9440   |                  |                  | 6.57  | 34.14  | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/RedNet152_pretrained.pdparams) |
 
-<a name="TNT系列"></a>
-### TNT系列
+<a name="22"></a>
 
-关于TNT系列模型的精度、速度指标如下表所示，更多介绍可以参考：[TNT系列模型文档](../models/TNT.md)。
+## 22. TNT 系列
+
+关于 TNT 系列模型的精度、速度指标如下表所示，更多介绍可以参考：[TNT 系列模型文档](../models/TNT.md)。
 
 | 模型       | Top-1 Acc | Top-5 Acc | time(ms)<br>bs=1 | time(ms)<br>bs=4 | FLOPs(G) | Params(M) | 下载地址                                                     |
 | ---------- | --------- | --------- | ---------------- | ---------------- | -------- | --------- | ------------------------------------------------------------ |
 | TNT_small | 0.8121   |0.9563  |                  |                  | 4.83   |  23.68    | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/TNT_small_pretrained.pdparams) |               |  
 
-**注**：TNT模型的数据预处理部分`NormalizeImage`中的`mean`与`std`均为0.5。
+**注**：TNT 模型的数据预处理部分`NormalizeImage`中的`mean`与`std`均为 0.5。
 
-<a name="其他模型"></a>
-### 其他模型
+<a name="23"></a>
 
-关于AlexNet、SqueezeNet系列、VGG系列、DarkNet53等模型的精度、速度指标如下表所示，更多介绍可以参考：[其他模型文档](../models/Others.md)。
+## 23. 其他模型
+
+关于 AlexNet、SqueezeNet 系列、VGG 系列、DarkNet53 等模型的精度、速度指标如下表所示，更多介绍可以参考：[其他模型文档](../models/Others.md)。
 
 
 | 模型                     | Top-1 Acc | Top-5 Acc | time(ms)<br>bs=1 | time(ms)<br>bs=4 | FLOPs(G) | Params(M) | 下载地址 |

@@ -1,20 +1,20 @@
-# 服务器端C++预测
+# 服务器端 C++ 预测
 
-本教程将介绍在服务器端部署PaddleClas分类模型的详细步骤，识别模型部署方式将在近期支持，敬请期待。
+本教程将介绍在服务器端部署 PaddleClas 分类模型的详细步骤，识别模型部署方式将在近期支持，敬请期待。
 
 ---
 
 ## 目录
 
-- [准备环境](#1)
-    - [1.1编译opencv库](#1.1)
-    - [1.2准备环境](#1.2)
+- [1. 准备环境](#1)
+    - [1.1 编译 opencv 库](#1.1)
+    - [1.2 准备环境](#1.2)
         - [1.2.1 预测库源码编译](#1.2.1)
         - [1.2.2 直接下载安装](#1.2.2)
-- [编译](#2)
+- [2. 编译](#2)
     - [2.1 编译 PaddleClas C++ 预测 demo](#2.1)
     - [2.2 编译 config lib 预测库与 cls lib 预测库](#2.2)
-- [运行](#3)
+- [3. 运行](#3)
     - [3.1 准备 inference model](#3.1)
     - [3.2 运行 demo](#3.2)
 
@@ -23,12 +23,12 @@
 ## 1. 准备环境
 
 - Linux 环境，推荐使用 docker。
-- Windows 环境，目前支持基于 `Visual Studio 2019 Community` 进行编译；此外，如果您希望通过生成 `sln解决方案` 的方式进行编译，可以参考该文档：[https://zhuanlan.zhihu.com/p/145446681](https://zhuanlan.zhihu.com/p/145446681)
+- Windows 环境，目前支持基于 `Visual Studio 2019 Community` 进行编译；此外，如果您希望通过生成 `sln 解决方案` 的方式进行编译，可以参考该文档：[https://zhuanlan.zhihu.com/p/145446681](https://zhuanlan.zhihu.com/p/145446681)
 
-* 该文档主要介绍基于 Linux 环境下的 PaddleClas C++ 预测流程，如果需要在 Windows 环境下使用预测库进行 C++ 预测，具体编译方法请参考 [Windows下编译教程](./cpp_deploy_on_windows.md)。
+* 该文档主要介绍基于 Linux 环境下的 PaddleClas C++ 预测流程，如果需要在 Windows 环境下使用预测库进行 C++ 预测，具体编译方法请参考 [Windows 下编译教程](./cpp_deploy_on_windows.md)。
 
 <a name="1.1"></a>
-### 1.1 编译opencv库
+### 1.1 编译 opencv 库
 
 * 首先需要从 opencv 官网上下载在 Linux 环境下源码编译的包，以 3.4.7 版本为例，下载及解压缩命令如下：
 
@@ -95,9 +95,9 @@ opencv3/
 
 <a name="1.2.1"></a>
 #### 1.2.1 预测库源码编译
-如果希望获取最新预测库特性，可以从 GitHub 上克隆 Paddle 最新代码，从源码编译预测库。对于不同平台的编译流程，请参考 [Paddle预测库官网](https://paddleinference.paddlepaddle.org.cn/v2.1/user_guides/source_compile.html) 的说明。编译示例如下：
+如果希望获取最新预测库特性，可以从 GitHub 上克隆 Paddle 最新代码，从源码编译预测库。对于不同平台的编译流程，请参考 [Paddle 预测库官网](https://paddleinference.paddlepaddle.org.cn/v2.1/user_guides/source_compile.html) 的说明。编译示例如下：
 
-1. 使用Git获取源代码：
+1. 使用 Git 获取源代码：
 
 ```shell
 git clone https://github.com/PaddlePaddle/Paddle.git
@@ -140,7 +140,7 @@ build/paddle_inference_install_dir/
 <a name="1.2.2"></a>
 #### 1.2.2 直接下载安装
 
-[Paddle预测库官网](https://paddleinference.paddlepaddle.org.cn/v2.1/user_guides/download_lib.html#c) 上提供了不同版本的 Paddle 预测库，包括多个操作系统平台和GPU、CPU等多个硬件平台的预编译库，可以在官网查找并选择合适的预测库版本进行下载，建议选择 `2.1.1` 版本。
+[Paddle 预测库官网](https://paddleinference.paddlepaddle.org.cn/v2.1/user_guides/download_lib.html#c) 上提供了不同版本的 Paddle 预测库，包括多个操作系统平台和 GPU、CPU 等多个硬件平台的预编译库，可以在官网查找并选择合适的预测库版本进行下载，建议选择 `2.1.1` 版本。
 
 **注意**：在选择预测库时，所选预测库版本需要与后续编译选项一致：
 * CPU 预测库仅可用于 GPU 预测，具体又分为 `mkl` 和 `openblas`，分别对应其低层实现基于 `MKL` 数学运算库 和 `OpenBLAS` 数学运算库；
@@ -269,13 +269,13 @@ inference/
 ### 3.2 运行 demo
 
 首先修改 `tools/config.txt` 中对应字段：
-* use_gpu：是否使用GPU；
-* gpu_id：使用的GPU卡号；
+* use_gpu：是否使用 GPU；
+* gpu_id：使用的 GPU 卡号；
 * gpu_mem：显存；
 * cpu_math_library_num_threads：底层科学计算库所用线程的数量；
-* use_mkldnn：是否使用MKLDNN加速；
-* use_tensorrt: 是否使用tensorRT进行加速；
-* use_fp16：是否使用半精度浮点数进行计算，该选项仅在use_tensorrt为true时有效；
+* use_mkldnn：是否使用 MKLDNN 加速；
+* use_tensorrt: 是否使用 tensorRT 进行加速；
+* use_fp16：是否使用半精度浮点数进行计算，该选项仅在 use_tensorrt 为 true 时有效；
 * cls_model_path：预测模型结构文件路径；
 * cls_params_path：预测模型参数文件路径；
 * resize_short_size：预处理时图像缩放大小；

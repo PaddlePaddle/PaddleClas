@@ -3,7 +3,7 @@
 
 ## 目录
 
-- [如何贡献代码](#1)
+- [1. 如何贡献代码](#1)
     - [1.1 PaddleClas 分支说明](#1.1)
     - [1.2 PaddleClas 代码提交流程与规范](#1.2)
         - [1.2.1 fork 和 clone 代码](#1.2.1)
@@ -17,11 +17,11 @@
         - [1.2.9 签署 CLA 协议和通过单元测试](#1.2.9)
         - [1.2.10 删除分支](#1.2.10)
         - [1.2.11 提交代码的一些约定](#1.2.11)
-- [总结](#2)
-- [参考文献](#3)
+- [2. 总结](#2)
+- [3. 参考文献](#3)
 
 <a name="1"></a>
-## 一、如何贡献代码
+## 1. 如何贡献代码
 
 <a name="1.1"></a>
 ### 1.1 PaddleClas 分支说明
@@ -45,7 +45,7 @@ PaddleClas 欢迎大家向 repo 中积极贡献代码，下面给出一些贡献
 <a name="1.2.1"></a>
 #### 1.2.1 fork 和 clone 代码
 
-* 跳转到 [PaddleClas GitHub首页](https://github.com/PaddlePaddle/PaddleClas) ，然后单击 Fork 按钮，生成自己目录下的仓库，比如 `https://github.com/USERNAME/PaddleClas` 。
+* 跳转到 [PaddleClas GitHub 首页](https://github.com/PaddlePaddle/PaddleClas) ，然后单击 Fork 按钮，生成自己目录下的仓库，比如 `https://github.com/USERNAME/PaddleClas` 。
 
 
 <div align="center">
@@ -123,7 +123,7 @@ Switched to a new branch 'new_branch'
 <a name="1.2.4"></a>
 #### 1.2.4 使用 pre-commit 勾子
 
-Paddle 开发人员使用 pre-commit 工具来管理 Git 预提交钩子。 它可以帮助我们格式化源代码（C++，Python），在提交（commit）前自动检查一些基本事宜（如每个文件只有一个 EOL，Git 中不要添加大文件等）。
+Paddle 开发人员使用 pre-commit 工具来管理 Git 预提交钩子。 它可以帮助我们格式化源代码(C++，Python)，在提交(commit)前自动检查一些基本事宜（如每个文件只有一个 EOL，Git 中不要添加大文件等）。
 
 pre-commit 测试是 Travis-CI 中单元测试的一部分，不满足钩子的 PR 不能被提交到 PaddleClas ，首先安装并在当前目录运行它：
 
@@ -192,7 +192,7 @@ git push origin new_branch
 #### 1.2.9 签署 CLA 协议和通过单元测试
 
 * 签署 CLA
-在首次向 PaddlePaddle 提交 Pull Request 时，您需要您签署一次 CLA (Contributor License Agreement) 协议，以保证您的代码可以被合入，具体签署方式如下：
+在首次向 PaddlePaddle 提交 Pull Request 时，您需要您签署一次 CLA (Contributor License Agreement)协议，以保证您的代码可以被合入，具体签署方式如下：
 
 1. 请您查看 PR 中的 Check 部分，找到 license/cla ，并点击右侧 detail ，进入 CLA 网站
 2. 点击 CLA 网站中的 `Sign in with GitHub to agree` , 点击完成后将会跳转回您的 Pull Request 页面
@@ -228,7 +228,7 @@ git branch -D new_branch
 
 1）请保证 Travis-CI 中单元测试能顺利通过。如果没过，说明提交的代码存在问题，官方维护人员一般不做评审。
 
-2）提交 Pull Request前：
+2）提交 Pull Reques t前：
 
 请注意 commit 的数量。
 
@@ -253,11 +253,11 @@ git branch -D new_branch
 - 请采用 `start a review` 进行回复，而非直接回复的方式。原因是每个回复都会发送一封邮件，会造成邮件灾难。
 
 <a name="2"></a>
-## 二、总结
+## 2. 总结
 
 * 开源社区依赖于众多开发者与用户的贡献和反馈，在这里感谢与期待大家向 PaddleClas 提出宝贵的意见与 Pull Request ，希望我们可以一起打造一个领先实用全面的图像识别代码仓库！
 
 <a name="3"></a>
-## 三、参考文献
-1. [PaddlePaddle本地开发指南](https://www.paddlepaddle.org.cn/documentation/docs/zh/develop/guides/08_contribution/index_cn.html)
-2. [向开源框架提交pr的过程](https://blog.csdn.net/vim_wj/article/details/78300239)
+## 3. 参考文献
+1. [PaddlePaddle 本地开发指南](https://www.paddlepaddle.org.cn/documentation/docs/zh/develop/guides/08_contribution/index_cn.html)
+2. [向开源框架提交 pr 的过程](https://blog.csdn.net/vim_wj/article/details/78300239)
