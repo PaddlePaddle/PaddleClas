@@ -22,7 +22,7 @@
 
 ## 1. 环境配置
 
-* 安装：请先参考[Paddle安装教程](../installation/install_paddle.md) 以及 [PaddleClas安装教程](../installation/install_paddleclas.md) 配置 PaddleClas 运行环境。
+* 安装：请先参考 [Paddle安装教程](../installation/install_paddle.md) 以及 [PaddleClas安装教程](../installation/install_paddleclas.md) 配置 PaddleClas 运行环境。
 
 * 进入 `deploy` 运行目录。本部分所有内容与命令均需要在 `deploy` 目录下运行，可以通过下面的命令进入 `deploy` 目录。
 
@@ -172,9 +172,9 @@ python3.7 python/predict_system.py -c configs/inference_general.yaml -o Global.u
 [{'bbox': [244, 49, 509, 964], 'rec_docs': '农夫山泉-饮用天然水', 'rec_scores': 0.7585664}]
 ```
 
-其中bbox表示检测出的主体所在位置，rec_docs表示索引库中与检测框最为相似的类别，rec_scores表示对应的置信度。
+其中 `bbox` 表示检测出的主体所在位置，`rec_docs` 表示索引库中与检测框最为相似的类别，`rec_scores` 表示对应的置信度。
 
-检测的可视化结果也保存在`output`文件夹下，对于本张图像，识别结果可视化如下所示。
+检测的可视化结果也保存在 `output` 文件夹下，对于本张图像，识别结果可视化如下所示。
 
 <div align="center">
 <img src="../../images/recognition/drink_data_demo/output/nongfu_spring.jpeg"  width = "400" />
@@ -209,7 +209,7 @@ Inference: 150.06470680236816 ms per batch image
 ...
 ```
 
-所有图像的识别结果可视化图像也保存在 `output`文件夹内。
+所有图像的识别结果可视化图像也保存在 `output` 文件夹内。
 
 
 更多地，可以通过修改 `Global.rec_inference_model_dir` 字段来更改识别 inference 模型的路径，通过修改 `IndexProcess.index_dir` 字段来更改索引库索引的路径。

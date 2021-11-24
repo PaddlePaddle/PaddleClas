@@ -90,7 +90,7 @@ inference model 的路径默认在当前路径下 `./inference`
 <a name="5.2"></a>
 ### 5.2 基于预测引擎预测
 
-首先进入 deploy 目录下：
+首先进入 `deploy` 目录下：
 
 ```bash
 cd ./deploy
