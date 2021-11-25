@@ -50,6 +50,8 @@ if [[ $FILENAME == *GeneralRecognition* ]];then
    cd tipc_shitu_demo_data
    ln -s demo_test.txt val_list.txt
    cd ../../
+   eval "wget -nc $model_url_value"
+   mv general_PPLCNet_x2_5_pretrained_v1.0.pdparams GeneralRecognition_PPLCNet_x2_5_pretrained.pdparams
    exit 0
 fi
 
