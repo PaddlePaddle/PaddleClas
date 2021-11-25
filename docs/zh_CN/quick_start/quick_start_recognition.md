@@ -354,7 +354,7 @@ wget {识别模型下载链接地址} && tar -xf {压缩包的名称}
 使用如下命令下载各方向识别模型的测试数据：
 
 ```shell
-# 回到deploy目录下
+# 回到 deploy 目录下
 cd ..
 # 下载测试数据并解压
 wget https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/data/recognition_demo_data_en_v1.1.tar && tar -xf recognition_demo_data_en_v1.1.tar

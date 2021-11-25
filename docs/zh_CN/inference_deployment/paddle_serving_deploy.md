@@ -47,7 +47,6 @@ pip3 install paddle-serving-server-gpu==0.7.0.post112 # GPU with CUDA11.2 + Tens
 pip install paddle-serving-server
 ```
 <a name="3"></a>
-
 ## 3. 图像分类服务部署
 <a name="3.1"></a>
 ### 3.1 模型转换

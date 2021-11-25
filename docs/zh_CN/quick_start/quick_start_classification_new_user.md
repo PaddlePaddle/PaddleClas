@@ -128,15 +128,15 @@ python tools/train.py -c ./ppcls/configs/quick_start/new_user/ShuffleNetV2_x0_25
 
 - 对于 Linux 用户
 
-  ```shell
-  export CUDA_VISIBLE_DEVICES=0
-  ```
+```shell
+export CUDA_VISIBLE_DEVICES=0
+```
 
 - 对于 Windows 用户
 
-  ```shell
-  set CUDA_VISIBLE_DEVICES=0
-  ```
+```shell
+set CUDA_VISIBLE_DEVICES=0
+```
 
 <a name="4.2.1"></a>
 #### 4.2.1 不使用预训练模型进行训练
