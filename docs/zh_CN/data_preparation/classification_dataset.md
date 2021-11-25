@@ -22,11 +22,11 @@ PaddleClas 使用 `txt` 格式文件指定训练集和测试集，以 `ImageNet1
 ```shell
 # 每一行采用"空格"分隔图像路径与标注
 
-# 下面是train_list.txt中的格式样例
+# 下面是 train_list.txt 中的格式样例
 train/n01440764/n01440764_10026.JPEG 0
 ...
 
-# 下面是val_list.txt中的格式样例
+# 下面是 val_list.txt 中的格式样例
 val/ILSVRC2012_val_00000001.JPEG 65
 ...
 ```

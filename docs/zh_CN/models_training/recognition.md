@@ -22,7 +22,7 @@
 - [1. 主体检测](#1)
 - [2. 特征模型训练](#2)
   - [2.1. 特征模型数据准备与处理](#2.1)
-  - [2. 2特征模型基于单卡 GPU 上的训练与评估](#2.2)
+  - [2. 2 特征模型基于单卡 GPU 上的训练与评估](#2.2)
     - [2.2.1 特征模型训练](#2.2.2)
     - [2.2.2 特征模型恢复训练](#2.2.2)
     - [2.2.3 特征模型评估](#2.2.3)
@@ -55,11 +55,11 @@
 * 进入 `PaddleClas` 目录。
 
 ```bash
-## linux or mac， $path_to_PaddleClas表示PaddleClas的根目录，用户需要根据自己的真实目录修改
+## linux or mac， $path_to_PaddleClas 表示 PaddleClas 的根目录，用户需要根据自己的真实目录修改
 cd $path_to_PaddleClas
 ```
 
-* 进入 `dataset` 目录，为了快速体验PaddleClas图像检索模块，此处使用的数据集为 [CUB_200_2011](http://vision.ucsd.edu/sites/default/files/WelinderEtal10_CUB-200.pdf)，其是一个包含200类鸟的细粒度鸟类数据集。首先，下载 CUB_200_2011 数据集，下载方式请参考[官网](http://www.vision.caltech.edu/visipedia/CUB-200-2011.html)。
+* 进入 `dataset` 目录，为了快速体验 PaddleClas 图像检索模块，此处使用的数据集为 [CUB_200_2011](http://vision.ucsd.edu/sites/default/files/WelinderEtal10_CUB-200.pdf)，其是一个包含 200 类鸟的细粒度鸟类数据集。首先，下载 CUB_200_2011 数据集，下载方式请参考[官网](http://www.vision.caltech.edu/visipedia/CUB-200-2011.html)。
 
 ```shell
 # linux or mac
@@ -71,21 +71,21 @@ cp {数据存放的路径}/CUB_200_2011.tgz .
 # 解压
 tar -xzvf CUB_200_2011.tgz
 
-#进入CUB_200_2011目录
+#进入 CUB_200_2011 目录
 cd CUB_200_2011
 ```
 
 该数据集在用作图像检索任务时，通常将前 100 类当做训练集，后 100 类当做测试集，所以此处需要将下载的数据集做一些后处理，来更好的适应 PaddleClas 的图像检索训练。
 
 ```shell
-#新建train和test目录
+#新建 train 和 test 目录
 mkdir train && mkdir test
 
-#将数据分成训练集和测试集，前100类作为训练集，后100类作为测试集
+#将数据分成训练集和测试集，前 100 类作为训练集，后 100 类作为测试集
 ls images | awk -F "." '{if(int($1)<101)print "mv images/"$0" train/"int($1)}' | sh
 ls images | awk -F "." '{if(int($1)>100)print "mv images/"$0" test/"int($1)}' | sh
 
-#生成train_list和test_list
+#生成 train_list 和 test_list
 tree -r -i -f train | grep jpg | awk -F "/" '{print $0" "int($2) " "NR}' > train_list.txt
 tree -r -i -f test | grep jpg | awk -F "/" '{print $0" "int($2) " "NR}' > test_list.txt
 ```
@@ -143,12 +143,12 @@ cd ../../
 准备好配置文件之后，可以使用下面的方式启动图像检索任务的训练。PaddleClas 训练图像检索任务的方法是度量学习，关于度量学习的解析请参考[度量学习](#度量学习)。
 
 ```shell
-# 单卡GPU
+# 单卡 GPU
 python3 tools/train.py \
     -c ./ppcls/configs/quick_start/MobileNetV1_retrieval.yaml \
     -o Arch.Backbone.pretrained=True \
     -o Global.device=gpu
-# 多卡GPU
+# 多卡 GPU
 export CUDA_VISIBLE_DEVICES=0,1,2,3
 python3 -m paddle.distributed.launch tools/train.py \
     -c ./ppcls/configs/quick_start/MobileNetV1_retrieval.yaml \
@@ -169,7 +169,7 @@ python3 -m paddle.distributed.launch tools/train.py \
     [Eval][Epoch 1][Avg]recall1: 0.46962, recall5: 0.75608, mAP: 0.21238
     ...
     ```
-此处配置文件的 Backbone 是 MobileNetV1，如果想使用其他 Backbone，可以重写参数 `Arch.Backbone.name`，比如命令中增加 `-o Arch.Backbone.name={其他Backbone}`。此外，由于不同模型`Neck`部分的输入维度不同，更换 Backbone 后可能需要改写此处的输入大小，改写方式类似替换 Backbone 的名字。
+此处配置文件的 Backbone 是 MobileNetV1，如果想使用其他 Backbone，可以重写参数 `Arch.Backbone.name`，比如命令中增加 `-o Arch.Backbone.name={其他 Backbone}`。此外，由于不同模型`Neck`部分的输入维度不同，更换 Backbone 后可能需要改写此处的输入大小，改写方式类似替换 Backbone 的名字。
 
 在训练 Loss 部分，此处使用了 [CELoss](../../../ppcls/loss/celoss.py) 和 [TripletLossV2](../../../ppcls/loss/triplet.py)，配置文件如下：
 
@@ -252,7 +252,7 @@ python3 -m paddle.distributed.launch tools/eval.py \
 
 **注意：**
 
-* 在加载待评估模型时，需要指定模型文件的路径，但无需包含文件后缀名，PaddleClas会自动补齐 `.pdparams` 的后缀，如 [2.2.2 特征模型恢复训练](#2.2.2)。
+* 在加载待评估模型时，需要指定模型文件的路径，但无需包含文件后缀名，PaddleClas 会自动补齐 `.pdparams` 的后缀，如 [2.2.2 特征模型恢复训练](#2.2.2)。
 
 * Metric learning 任务一般不评测 TopkAcc。
 
@@ -271,7 +271,7 @@ python3 tools/export_model.py \
 
 其中，`Global.pretrained_model` 用于指定模型文件路径，该路径仍无需包含模型文件后缀名（如[2.2.2 特征模型恢复训练](#2.2.2)）。当执行后，会在当前目录下生成 `./inference` 目录，目录下包含 `inference.pdiparams`、`inference.pdiparams.info`、`inference.pdmodel` 文件。`Global.save_inference_dir` 可以指定导出 inference 模型的路径。此处保存的 inference 模型在 embedding 特征层做了截断，即模型最终的输出为 n 维 embedding 特征。
 
-上述命令将生成模型结构文件(`inference.pdmodel`)和模型权重文件(`inference.pdiparams`)，然后可以使用预测引擎进行推理。使用 inference 模型推理的流程可以参考[基于Python预测引擎预测推理](../inference_deployment/python_deploy.md)。
+上述命令将生成模型结构文件(`inference.pdmodel`)和模型权重文件(`inference.pdiparams`)，然后可以使用预测引擎进行推理。使用 inference 模型推理的流程可以参考[基于 Python 预测引擎预测推理](../inference_deployment/python_deploy.md)。
 
 <a name="3"></a>  
 
@@ -280,7 +280,7 @@ python3 tools/export_model.py \
 PaddleClas 图像检索部分目前支持的环境如下：
 
 ```shell
-└── CPU/单卡GPU
+└── CPU/单卡 GPU
     ├── Linux
     ├── MacOS
     └── Windows

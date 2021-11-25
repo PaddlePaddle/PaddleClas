@@ -1,4 +1,4 @@
-# 多标签分类quick start
+# 多标签分类 quick start
 
 基于 [NUS-WIDE-SCENE](https://lms.comp.nus.edu.sg/wp-content/uploads/2019/research/nuswide/NUS-WIDE.html) 数据集，体验多标签分类的训练、评估、预测的过程，该数据集是 NUS-WIDE 数据集的一个子集。请首先安装 PaddlePaddle 和 PaddleClas，具体安装步骤可详看 [Paddle 安装文档](../installation/install_paddle.md)，[PaddleClas 安装文档](../installation/install_paddleclas.md)。
 
@@ -10,7 +10,7 @@
 * [3. 模型评估](#3)
 * [4. 模型预测](#4)
 * [5. 基于预测引擎预测](#5)
-  * [5.1 导出inference model](#5.1)
+  * [5.1 导出 inference model](#5.1)
   * [5.2 基于预测引擎预测](#5.2)
 
 <a name="1"></a>
@@ -78,7 +78,7 @@ python3 tools/infer.py \
 ## 5. 基于预测引擎预测
 
 <a name="5.1"></a>
-### 5.1 导出inference model
+### 5.1 导出 inference model
 
 ```bash
 python3 tools/export_model.py \

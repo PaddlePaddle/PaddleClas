@@ -17,10 +17,10 @@
   - [1.2 结构(Arch)](#1.2)
   - [1.3 损失函数(Loss)](#1.3)
   - [1.4 优化器(Optimizer)](#1.4)
-  - [1.5数据读取模块(DataLoader)](#1.5)
+  - [1.5 数据读取模块(DataLoader)](#1.5)
       - [1.5.1 dataset](#1.5.1)
-      - [1.5.1 sampler](#1.5.2)
-      - [1.5.1 loader](#1.5.3)
+      - [1.5.2 sampler](#1.5.2)
+      - [1.5.3 loader](#1.5.3)
   - [1.6 评估指标(Metric)](#1.6)
 - [2. 蒸馏模型](#2)
   - [2.1 结构(Arch)](#2.1)
@@ -47,7 +47,7 @@
 | save_interval | 每隔多少个 epoch 保存模型 | 1 | int |
 | eval_during_train| 是否在训练时进行评估 | True | bool |
 | eval_interval | 每隔多少个 epoch 进行模型评估 | 1 | int |
-| epochs | 训练总epoch数 |  | int |
+| epochs | 训练总 epoch 数 |  | int |
 | print_batch_step | 每隔多少个 mini-batch 打印输出 | 10 | int |
 | use_visualdl | 是否是用 visualdl 可视化训练过程 | False | bool |
 | image_shape | 图片大小 | [3, 224, 224] | list, shape: (3,) |
@@ -67,7 +67,7 @@
 | class_num | 分类数 | 1000 | int |
 | pretrained | 预训练模型 | False | bool,  str |
 
-**注**：此处的pretrained可以设置为 `True` 或者 `False`，也可以设置权重的路径。另外当 `Global.pretrained_model` 也设置相应路径时，此处的 `pretrained` 失效。
+**注**：此处的 pretrained 可以设置为 `True` 或者 `False`，也可以设置权重的路径。另外当 `Global.pretrained_model` 也设置相应路径时，此处的 `pretrained` 失效。
 
 <a name="1.3"></a>
 #### 1.3 损失函数（Loss）
@@ -87,7 +87,7 @@
 | momentum | momentum 值 | 0.9 | float |
 | lr.name | 学习率下降方式 | "Cosine" | "Linear"、"Piecewise"等其他下降方式 |
 | lr.learning_rate | 学习率初始值 | 0.1 | float |
-| lr.warmup_epoch | warmup 轮数 | 0 | int，如5 |
+| lr.warmup_epoch | warmup 轮数 | 0 | int，如 5 |
 | regularizer.name | 正则化方法名 | "L2" | ["L1", "L2"] |
 | regularizer.coeff | 正则化系数 | 0.00007 | float |
 
@@ -104,7 +104,7 @@
 添加方法及参数请查看 [learning_rate.py](../../../ppcls/optimizer/learning_rate.py)。
 
 <a name="1.5"></a>
-#### 1.5数据读取模块(DataLoader)
+#### 1.5 数据读取模块(DataLoader)
 
 <a name="1.5.1"></a>
 ##### 1.5.1 dataset
@@ -245,9 +245,9 @@ batch_transform_ops 中参数的含义：
 | infer_add_softmax |  infercne 是否添加 softmax  |    False   |                        [True, False]                         |
 |     Backbone.name      |    Backbone 的名字    |      ResNet50_last_stage_stride1     | PaddleClas 提供的其他 backbone |
 |     Backbone.pretrained      |   Backbone 预训练模型   |      True      | 布尔值或者预训练模型路径 |
-| BackboneStopLayer.name | Backbone 中的输出层名字 |     True       | Backbone中的特征输出层的 `full_name` |
+| BackboneStopLayer.name | Backbone 中的输出层名字 |     True       | Backbone 中的特征输出层的 `full_name` |
 |       Neck.name        |    网络 Neck 部分名字    |      VehicleNeck      |           需传入字典结构，Neck 网络层的具体输入参数           |
-|       Neck.in_channels        |    输入 Neck 部分的维度大小    |      2048      |        与BackboneStopLayer.name层的大小相同           |
+|       Neck.in_channels        |    输入 Neck 部分的维度大小    |      2048      |        与 BackboneStopLayer.name 层的大小相同           |
 |       Neck.out_channels        |    输出 Neck 部分的维度大小，即特征维度大小    |      512     |        int           |
 |       Head.name        |    网络 Head 部分名字    |      CircleMargin      |           Arcmargin 等           |
 |       Head.embedding_size        |    特征维度大小      |      512      |           与 Neck.out_channels 保持一致           |

@@ -1,6 +1,6 @@
 # 向量检索
 
-向量检索技术在图像识别、图像检索中应用比较广泛。其主要目标是，对于给定的查询向量，在已经建立好的向量库中，与库中所有的待查询向量，进行特征向量的相似度或距离计算，得到相似度排序。在图像识别系统中，我们使用 [Faiss](https://github.com/facebookresearch/faiss) 对此部分进行支持，具体信息请详查 [Faiss官网](https://github.com/facebookresearch/faiss)。`Faiss` 主要有以下优势
+向量检索技术在图像识别、图像检索中应用比较广泛。其主要目标是，对于给定的查询向量，在已经建立好的向量库中，与库中所有的待查询向量，进行特征向量的相似度或距离计算，得到相似度排序。在图像识别系统中，我们使用 [Faiss](https://github.com/facebookresearch/faiss) 对此部分进行支持，具体信息请详查 [Faiss 官网](https://github.com/facebookresearch/faiss)。`Faiss` 主要有以下优势
 
 - 适配性好：支持 Windos、Linux、MacOS 系统
 - 安装方便： 支持 `python` 接口，直接使用 `pip` 安装
@@ -67,9 +67,9 @@ pip install faiss-cpu==1.7.1post2
 建库的具体操作如下：
 
 ```shell
-# 进入deploy目录
+# 进入 deploy 目录
 cd deploy
-# yaml文件根据需要改成自己所需的具体yaml文件
+# yaml 文件根据需要改成自己所需的具体 yaml 文件
 python python/build_gallery.py -c configs/build_***.yaml
 ```
 
@@ -105,7 +105,7 @@ IndexProcess:
 
 ### 3.2 检索配置文件参数
 
-将检索的过程融合到 `PP-ShiTu` 的整体流程中，请参考 [README](../../../README_ch.md) 中 `PP-ShiTu图像识别系统介绍` 部分。检索具体使用操作请参考[识别快速开始文档](../quick_start/quick_start_recognition.md)。
+将检索的过程融合到 `PP-ShiTu` 的整体流程中，请参考 [README](../../../README_ch.md) 中 `PP-ShiTu 图像识别系统介绍` 部分。检索具体使用操作请参考[识别快速开始文档](../quick_start/quick_start_recognition.md)。
 
 其中，检索部分配置如下，整体检索配置文件，请参考 `deploy/configs/inference_*.yaml` 文件。
 

@@ -1,6 +1,13 @@
 # MixNet系列
+---
+## 目录
 
-## 概述
+* [1. 概述](#1)
+* [2. 精度、FLOPS 和参数量](#2)
+
+<a name='1'></a>
+
+## 1. 概述
 
 MixNet是谷歌出的一篇关于轻量级网络的文章，主要工作就在于探索不同大小的卷积核的组合。作者发现目前网络有以下两个问题：
 
@@ -9,8 +16,9 @@ MixNet是谷歌出的一篇关于轻量级网络的文章，主要工作就在�
 
 为了解决上面两个问题，文中提出一种新的混合深度分离卷积(MDConv)(mixed depthwise convolution)，将不同的核大小混合在一个卷积运算中，并且基于AutoML的搜索空间，提出了一系列的网络叫做MixNets，在ImageNet上取得了较好的效果。[论文地址](https://arxiv.org/pdf/1907.09595.pdf)
 
+<a name='2'></a>
 
-## 精度、FLOPS和参数量
+## 2. 精度、FLOPS和参数量
 
 | Models | Top1 | Top5 | Reference<br>top1| FLOPS<br>(M) | Params<br/>(M) |
 |:--:|:--:|:--:|:--:|:--:|----|
