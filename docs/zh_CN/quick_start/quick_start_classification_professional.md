@@ -1,4 +1,4 @@
-# 30分钟玩转PaddleClas（进阶版）
+# 30 分钟玩转 PaddleClas（进阶版）
 
 此处提供了专业用户在 linux 操作系统上使用 PaddleClas 的快速上手教程，主要内容基于 CIFAR-100 数据集，快速体验不同模型的训练、加载不同预训练模型、SSLD 知识蒸馏方案和数据增广的效果。请事先参考[安装指南](../installation/install_paddleclas.md)配置运行环境和克隆 PaddleClas 代码。
 
@@ -8,7 +8,7 @@
 
 - [1. 数据和模型准备](#1)
   - [1.1 数据准备](#1.1)
-    - [1.1.1 准备CIFAR100](#1.1.1)
+    - [1.1.1 准备 CIFAR100](#1.1.1)
 - [2. 模型训练](#2)
   - [2.1 单标签训练](#2.1)
     - [2.1.1 零基础训练：不加载预训练模型的训练](#2.1.1)
@@ -20,7 +20,7 @@
   - [5.1 单标签分类模型评估与推理](#5.1)
     - [5.1.1 单标签分类模型评估](#5.1.1)
     - [5.1.2 单标签分类模型预测](#5.1.2)
-    - [5.1.3 单标签分类使用inference模型进行模型推理](#5.1.3)
+    - [5.1.3 单标签分类使用 inference 模型进行模型推理](#5.1.3)
 
 <a name="1"></a>
 
@@ -37,9 +37,9 @@
 cd path_to_PaddleClas
 ```
 
-<a name="1.1.1"></a> 
+<a name="1.1.1"></a>
 
-#### 1.1.1 准备CIFAR100
+#### 1.1.1 准备 CIFAR100
 
 * 进入 `dataset/` 目录，下载并解压 CIFAR100 数据集。
 
@@ -54,11 +54,11 @@ cd ../
 
 ## 2.  模型训练
 
-<a name="2.1"></a> 
+<a name="2.1"></a>
 
 ### 2.1 单标签训练
 
-<a name="2.1.1"></a> 
+<a name="2.1.1"></a>
 
 #### 2.1.1 零基础训练：不加载预训练模型的训练
 
@@ -75,7 +75,7 @@ python3 -m paddle.distributed.launch \
 
 验证集的最高准确率为 0.415 左右。
 
-<a name="2.1.2"></a> 
+<a name="2.1.2"></a>
 
 
 #### 2.1.2 迁移学习
@@ -94,7 +94,7 @@ python3 -m paddle.distributed.launch \
 
 验证集最高准确率为 0.718 左右，加载预训练模型之后，CIFAR100 数据集精度大幅提升，绝对精度涨幅 30%。
 
-* 基于 ImageNet1k 分类预训练模型 ResNet50_vd_ssld_pretrained （准确率82.39%）进行微调，训练脚本如下所示。
+* 基于 ImageNet1k 分类预训练模型 ResNet50_vd_ssld_pretrained （准确率 82.39%）进行微调，训练脚本如下所示。
 
 ```shell
 export CUDA_VISIBLE_DEVICES=0,1,2,3
@@ -130,11 +130,11 @@ python3 -m paddle.distributed.launch \
 
 PaddleClas 包含了很多数据增广的方法，如 Mixup、Cutout、RandomErasing 等，具体的方法可以参考[数据增广的章节](../algorithm_introduction/DataAugmentation.md)。
 
-<a name="3.1"></a> 
+<a name="3.1"></a>
 
 ### 3.1 数据增广的尝试-Mixup
 
-基于[数据增广的章节](../algorithm_introduction/DataAugmentation.md) `3.3节` 中的训练方法，结合 Mixup 的数据增广方式进行训练，具体的训练脚本如下所示。
+基于[数据增广的章节](../algorithm_introduction/DataAugmentation.md) `3.3 节` 中的训练方法，结合 Mixup 的数据增广方式进行训练，具体的训练脚本如下所示。
 
 ```shell
 export CUDA_VISIBLE_DEVICES=0,1,2,3
@@ -146,7 +146,7 @@ python3 -m paddle.distributed.launch \
 
 ```
 
-最终CIFAR100验证集上的精度为 0.73，使用数据增广可以使得模型精度再次提升约 1.2%。
+最终 CIFAR100 验证集上的精度为 0.73，使用数据增广可以使得模型精度再次提升约 1.2%。
 
 
 
@@ -161,7 +161,7 @@ python3 -m paddle.distributed.launch \
 ## 4. 知识蒸馏
 
 
-PaddleClas 包含了自研的 SSLD 知识蒸馏方案，具体的内容可以参考[知识蒸馏章节](../algorithm_introduction/knowledge_distillation.md), 本小节将尝试使用知识蒸馏技术对 MobileNetV3_large_x1_0 模型进行训练，使用 `2.1.2小节` 训练得到的 ResNet50_vd 模型作为蒸馏所用的教师模型，首先将 `2.1.2小节` 训练得到的 ResNet50_vd 模型保存到指定目录，脚本如下。
+PaddleClas 包含了自研的 SSLD 知识蒸馏方案，具体的内容可以参考[知识蒸馏章节](../algorithm_introduction/knowledge_distillation.md), 本小节将尝试使用知识蒸馏技术对 MobileNetV3_large_x1_0 模型进行训练，使用 `2.1.2 小节` 训练得到的 ResNet50_vd 模型作为蒸馏所用的教师模型，首先将 `2.1.2 小节` 训练得到的 ResNet50_vd 模型保存到指定目录，脚本如下。
 
 ```shell
 mkdir pretrained
@@ -226,11 +226,11 @@ python3 -m paddle.distributed.launch \
 
 ## 5. 模型评估与推理
 
-<a name="5.1"></a> 
+<a name="5.1"></a>
 
 ### 5.1 单标签分类模型评估与推理
 
-<a name="5.1.1"></a> 
+<a name="5.1.1"></a>
 
 #### 5.1.1 单标签分类模型评估。
 
@@ -242,7 +242,7 @@ python3 tools/eval.py \
     -o Global.pretrained_model="output_CIFAR/ResNet50_vd/best_model"
 ```
 
-<a name="5.1.2"></a> 
+<a name="5.1.2"></a>
 
 #### 5.1.2 单标签分类模型预测
 
@@ -255,9 +255,9 @@ python3 tools/infer.py \
     -o Global.pretrained_model=output_CIFAR/ResNet50_vd/best_model
 ```
 
-<a name="5.1.3"></a> 
+<a name="5.1.3"></a>
 
-#### 5.1.3 单标签分类使用inference模型进行模型推理
+#### 5.1.3 单标签分类使用 inference 模型进行模型推理
 
 通过导出 inference 模型，PaddlePaddle 支持使用预测引擎进行预测推理。接下来介绍如何用预测引擎进行推理：
 首先，对训练好的模型进行转换：
@@ -272,7 +272,7 @@ python3 tools/export_model.py \
 
 使用预测引擎进行推理：
 
-进入deploy目录下：
+进入 deploy 目录下：
 
 ```bash
 cd deploy

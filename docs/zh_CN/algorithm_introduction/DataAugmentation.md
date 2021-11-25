@@ -61,7 +61,7 @@
 | **Process**     | (N, 3, 224, 224)<br>float32 | (N, 3, 224, 224)<br>float32 | \-               | \-               | \-          | \-               | \-               | \-            | Y          | Y |
 
 
-PaddleClas中集成了上述所有的数据增强策略，每种数据增强策略的参考论文与参考开源代码均在下面的介绍中列出。下文将介绍这些策略的原理与使用方法，并以下图为例，对变换后的效果进行可视化。为了说明问题，本章节中将 `RandCrop` 替换为 `Resize`。
+PaddleClas 中集成了上述所有的数据增强策略，每种数据增强策略的参考论文与参考开源代码均在下面的介绍中列出。下文将介绍这些策略的原理与使用方法，并以下图为例，对变换后的效果进行可视化。为了说明问题，本章节中将 `RandCrop` 替换为 `Resize`。
 
 ![][test_baseline]
 <a name="3"></a>
@@ -143,7 +143,7 @@ Cutout 可以理解为 Dropout 的一种扩展操作，不同的是 Dropout 是�
 `RandomErasing` 与 `Cutout` 方法类似，同样是为了解决训练出的模型在有遮挡数据上泛化能力较差的问题，作者在论文中也指出，随机裁剪的方式与随机水平翻转具有一定的互补性。作者也在行人再识别(REID)上验证了该方法的有效性。与 `Cutout` 不同的是，在 `RandomErasing` 中，图片以一定的概率接受该种预处理方法，生成掩码的尺寸大小与长宽比也是根据预设的超参数随机生成。
 
 
-PaddleClas中 `RandomErasing` 的使用方法如下所示。
+PaddleClas 中 `RandomErasing` 的使用方法如下所示。
 
 经过 RandomErasing 数据增强后结果如下图所示。
 
@@ -163,10 +163,10 @@ PaddleClas中 `RandomErasing` 的使用方法如下所示。
 ![][hide_and_seek_mask_expanation]
 
 
-PaddleClas中 `HideAndSeek` 的使用方法如下所示。
+PaddleClas 中 `HideAndSeek` 的使用方法如下所示。
 
 
-经过 HideAndSeek数据增强后结果如下图所示。
+经过 HideAndSeek 数据增强后结果如下图所示。
 
 ![][test_hideandseek]
 

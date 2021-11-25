@@ -1,6 +1,12 @@
 # 安装 PaddleClas
 
 ---
+## 目录
+
+* [1. 克隆 PaddleClas](#1)
+* [2. 安装 Python 依赖库](#2)
+
+<a name='1'></a>
 
 ## 1. 克隆 PaddleClas
 
@@ -15,6 +21,7 @@ git clone https://github.com/PaddlePaddle/PaddleClas.git -b release/2.3
 ```shell
 git clone https://gitee.com/paddlepaddle/PaddleClas.git -b release/2.3
 ```
+<a name='2'></a>
 
 ## 2. 安装 Python 依赖库
 

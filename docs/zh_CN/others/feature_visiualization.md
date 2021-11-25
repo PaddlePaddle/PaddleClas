@@ -1,12 +1,23 @@
 # 特征图可视化指南
+-----
+## 目录
 
-## 一、概述
+* [1. 概述](#1)
+* [2. 准备工作](#2)
+* [3. 修改模型](#3)
+* [4. 结果](#4)
+
+<a name='1'></a>
+
+## 1. 概述
 
 特征图是输入图片在卷积网络中的特征表达，对特征图的研究可以有利于我们对于模型的理解与设计，所以基于动态图我们使用本工具来可视化特征图。
 
-## 二、准备工作
+<a name='2'></a>
 
-首先需要选定研究的模型，本文设定ResNet50作为研究模型，将模型组网代码[resnet.py](../../../ppcls/arch/backbone/legendary_models/resnet.py)拷贝到[目录](../../../ppcls/utils/feature_maps_visualization/)下，并下载[ResNet50预训练模型](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ResNet50_pretrained.pdparams)，或使用以下命令下载。
+## 2. 准备工作
+
+首先需要选定研究的模型，本文设定 ResNet50 作为研究模型，将模型组网代码[resnet.py](../../../ppcls/arch/backbone/legendary_models/resnet.py)拷贝到[目录](../../../ppcls/utils/feature_maps_visualization/)下，并下载[ResNet50 预训练模型](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ResNet50_pretrained.pdparams)，或使用以下命令下载。
 
 ```bash
 wget https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ResNet50_pretrained.pdparams
@@ -14,11 +25,13 @@ wget https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ResNet50_pretrain
 
 其他模型网络结构代码及预训练模型请自行下载：[模型库](../../../ppcls/arch/backbone/)，[预训练模型](../models/models_intro.md)。
 
-## 三、修改模型
+ <a name='3'></a>
 
-找到我们所需要的特征图位置，设置self.fm将其fetch出来，本文以resnet50中的stem层之后的特征图为例。
+## 3. 修改模型
 
-在ResNet50的forward函数中指定要可视化的特征图
+找到我们所需要的特征图位置，设置 self.fm 将其 fetch 出来，本文以 resnet50 中的 stem 层之后的特征图为例。
+
+在 ResNet50 的 forward 函数中指定要可视化的特征图
 
 ```python
     def forward(self, x):
@@ -63,7 +76,9 @@ python tools/feature_maps_visualization/fm_vis.py \
 + `--save_path`：保存路径，如：`./tools/`
 + `--use_gpu`：是否使用 GPU 预测，默认值：True
 
-## 四、结果
+<a name='4'></a>
+
+## 4. 结果
 
 * 输入图片：  
 

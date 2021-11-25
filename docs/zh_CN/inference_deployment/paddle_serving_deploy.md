@@ -46,7 +46,6 @@ pip3 install paddle-serving-server-gpu==0.7.0.post112 # GPU with CUDA11.2 + Tens
 ```shell
 pip install paddle-serving-server
 ```
-<a name="3"></a>
 
 ## 3. 图像分类服务部署
 <a name="3.1"></a>
@@ -81,7 +80,7 @@ ResNet50_vd 推理模型转换完成后，会在当前文件夹多出 `ResNet50_
   |- serving_client_conf.prototxt  
   |- serving_client_conf.stream.prototxt
 ```
-得到模型文件之后，需要修改 `ResNet50_vd_server` 下文件 `serving_server_conf.prototxt` 中的 alias 名字：将 `fetch_var` 中的 `alias_name` 改为 `prediction`
+得到模型文件之后，需要修改 serving_server_conf.prototxt 中的 alias 名字： 将`feed_var`中的`alias_name`改为`image`, 将`fetch_var`中的`alias_name`改为`prediction`
 
 **备注**:  Serving 为了兼容不同模型的部署，提供了输入输出重命名的功能。这样，不同的模型在推理部署时，只需要修改配置文件的 alias_name 即可，无需修改代码即可完成推理部署。
 修改后的 serving_server_conf.prototxt 如下所示:
@@ -155,7 +154,7 @@ python3 -m paddle_serving_client.convert --dirname ./general_PPLCNet_x2_5_lite_v
                                          --serving_server ./general_PPLCNet_x2_5_lite_v1.0_serving/ \
                                          --serving_client ./general_PPLCNet_x2_5_lite_v1.0_client/
 ```
-识别推理模型转换完成后，会在当前文件夹多出 `general_PPLCNet_x2_5_lite_v1.0_serving/` 和 `general_PPLCNet_x2_5_lite_v1.0_serving/` 的文件夹。修改 `general_PPLCNet_x2_5_lite_v1.0_serving/` 目录下的 serving_server_conf.prototxt 中的 alias 名字： 将 `fetch_var` 中的 `alias_name` 改为 `features`。
+识别推理模型转换完成后，会在当前文件夹多出`general_PPLCNet_x2_5_lite_v1.0_serving/` 和`general_PPLCNet_x2_5_lite_v1.0_serving/`的文件夹。修改`general_PPLCNet_x2_5_lite_v1.0_serving/`目录下的 serving_server_conf.prototxt 中的 alias 名字： 将`fetch_var`中的`alias_name`改为`features`。
 修改后的 serving_server_conf.prototxt 内容如下：
 ```
 feed_var {
@@ -184,9 +183,9 @@ python3 -m paddle_serving_client.convert --dirname ./picodet_PPLCNet_x2_5_mainbo
                                          --serving_server ./picodet_PPLCNet_x2_5_mainbody_lite_v1.0_serving/ \
                                          --serving_client ./picodet_PPLCNet_x2_5_mainbody_lite_v1.0_client/
 ```
-检测 inference 模型转换完成后，会在当前文件夹多出 `picodet_PPLCNet_x2_5_mainbody_lite_v1.0_serving/` 和 `picodet_PPLCNet_x2_5_mainbody_lite_v1.0_client/` 的文件夹。
+检测 inference 模型转换完成后，会在当前文件夹多出`picodet_PPLCNet_x2_5_mainbody_lite_v1.0_serving/` 和`picodet_PPLCNet_x2_5_mainbody_lite_v1.0_client/`的文件夹。
 
-**注意:** 此处不需要修改 `picodet_PPLCNet_x2_5_mainbody_lite_v1.0_serving/` 目录下的 serving_server_conf.prototxt 中的 alias 名字。
+**注意:** 此处不需要修改`picodet_PPLCNet_x2_5_mainbody_lite_v1.0_serving/`目录下的 serving_server_conf.prototxt 中的 alias 名字。
 
 - 下载并解压已经构建后的检索库 index
 ```
@@ -195,7 +194,7 @@ wget https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/data/drink_da
 ```
 <a name="4.2"></a>
 ## 4.2 服务部署和请求
-**注意:** 识别服务涉及到多个模型，出于性能考虑采用 PipeLine 部署方式。Pipeline 部署方式当前不支持 windows 平台。
+**注意:**  识别服务涉及到多个模型，出于性能考虑采用 PipeLine 部署方式。Pipeline 部署方式当前不支持 windows 平台。
 - 进入到工作目录
 ```shell
 cd ./deploy/paddleserving/recognition
@@ -233,4 +232,4 @@ unset https_proxy
 unset http_proxy
 ```
 
-更多的服务部署类型，如 `RPC 预测服务` 等，可以参考 Serving 的[github 官网](https://github.com/PaddlePaddle/Serving/tree/v0.7.0/examples)
+更多的服务部署类型，如 `RPC 预测服务` 等，可以参考 Serving 的[github 官网](https://github.com/PaddlePaddle/Serving/tree/develop/python/examples/imagenet)
