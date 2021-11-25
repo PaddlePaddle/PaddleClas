@@ -35,6 +35,24 @@ class RecPredictor(Predictor):
         self.preprocess_ops = create_operators(config["RecPreProcess"][
             "transform_ops"])
         self.postprocess = build_postprocess(config["RecPostProcess"])
+        self.benchmark = config["Global"].get("benchmark", False)
+
+        import auto_log
+        pid = os.getpid()
+        self.auto_logger = auto_log.AutoLogger(
+            model_name=config["Global"].get("model_name", "rec"),
+            model_precision='fp16' if config["Global"]["use_fp16"] else 'fp32',
+            batch_size=config["Global"].get("batch_size", 1),
+            data_shape=[3, 224, 224],
+            save_path=config["Global"].get("save_log_path", "./auto_log.log"),
+            inference_config=self.config,
+            pids=pid,
+            process_name=None,
+            gpu_ids=None,
+            time_keys=[
+                'preprocess_time', 'inference_time', 'postprocess_time'
+            ],
+            warmup=2)
 
     def predict(self, images, feature_normalize=True):
         input_names = self.paddle_predictor.get_input_names()
@@ -44,16 +62,22 @@ class RecPredictor(Predictor):
         output_tensor = self.paddle_predictor.get_output_handle(output_names[
             0])
 
+        if self.benchmark:
+            self.auto_logger.times.start()
         if not isinstance(images, (list, )):
             images = [images]
         for idx in range(len(images)):
             for ops in self.preprocess_ops:
                 images[idx] = ops(images[idx])
         image = np.array(images)
+        if self.benchmark:
+            self.auto_logger.times.stamp()
 
         input_tensor.copy_from_cpu(image)
         self.paddle_predictor.run()
         batch_output = output_tensor.copy_to_cpu()
+        if self.benchmark:
+            self.auto_logger.times.stamp()
 
         if feature_normalize:
             feas_norm = np.sqrt(
@@ -62,6 +86,9 @@ class RecPredictor(Predictor):
 
         if self.postprocess is not None:
             batch_output = self.postprocess(batch_output)
+
+        if self.benchmark:
+            self.auto_logger.times.end(stamp=True)
         return batch_output
 
 
@@ -85,16 +112,19 @@ def main(config):
             batch_names.append(img_name)
             cnt += 1
 
-        if cnt % config["Global"]["batch_size"] == 0 or (idx + 1) == len(image_list):
-            if len(batch_imgs) == 0: 
+        if cnt % config["Global"]["batch_size"] == 0 or (idx + 1
+                                                         ) == len(image_list):
+            if len(batch_imgs) == 0:
                 continue
-                
+
             batch_results = rec_predictor.predict(batch_imgs)
             for number, result_dict in enumerate(batch_results):
                 filename = batch_names[number]
                 print("{}:\t{}".format(filename, result_dict))
             batch_imgs = []
             batch_names = []
+    if rec_predictor.benchmark:
+        rec_predictor.auto_logger.report()
 
     return
 
