@@ -1,10 +1,18 @@
 # SwinTransformer
+---
+## 目录
 
-## 概述
-Swin Transformer 是一种新的视觉Transformer网络，可以用作计算机视觉领域的通用骨干网路。SwinTransformer由移动窗口（shifted windows）表示的层次Transformer结构组成。移动窗口将自注意计算限制在非重叠的局部窗口上，同时允许跨窗口连接，从而提高了网络性能。[论文地址](https://arxiv.org/abs/2103.14030)。
+* [1. 概述](#1)
+* [2. 精度、FLOPS 和参数量](#2)
 
+<a name='1'></a>
 
-## 精度、FLOPS和参数量
+## 1. 概述
+Swin Transformer 是一种新的视觉 Transformer 网络，可以用作计算机视觉领域的通用骨干网路。SwinTransformer 由移动窗口（shifted windows）表示的层次 Transformer 结构组成。移动窗口将自注意计算限制在非重叠的局部窗口上，同时允许跨窗口连接，从而提高了网络性能。[论文地址](https://arxiv.org/abs/2103.14030)。
+
+<a name='2'></a>
+
+## 2. 精度、FLOPS 和参数量
 
 | Models           | Top1 | Top5 | Reference<br>top1 | Reference<br>top5 | FLOPS<br>(G) | Params<br>(M) |
 |:--:|:--:|:--:|:--:|:--:|:--:|:--:|
@@ -17,6 +25,6 @@ Swin Transformer 是一种新的视觉Transformer网络，可以用作计算机�
 | SwinTransformer_large_patch4_window7_224<sup>[1]</sup>   | 0.8596 | 0.9783 | 0.863 | 0.979 | 34.5 | 197 |
 | SwinTransformer_large_patch4_window12_384<sup>[1]</sup>  | 0.8719 | 0.9823 | 0.873 | 0.982 | 103.9 | 197 |
 
-[1]：基于ImageNet22k数据集预训练，然后在ImageNet1k数据集迁移学习得到。
+[1]：基于 ImageNet22k 数据集预训练，然后在 ImageNet1k 数据集迁移学习得到。
 
-**注**：与Reference的精度差异源于数据预处理不同。
+**注**：与 Reference 的精度差异源于数据预处理不同。

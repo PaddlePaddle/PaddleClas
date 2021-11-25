@@ -2,16 +2,16 @@
 
 ---
 
-首先请参考文档[安装PaddlePaddle](../installation/install_paddle.md)和文档[安装PaddleClas](../installation/install_paddleclas.md)配置运行环境。
+首先请参考文档[安装 PaddlePaddle](../installation/install_paddle.md)和文档[安装 PaddleClas](../installation/install_paddleclas.md)配置运行环境。
 
 ## 目录
 
-- [图像分类推理](#图像分类推理)
-- [主体检测模型推理](#主体检测模型推理)
-- [特征提取模型推理](#特征提取模型推理)
-- [主体检测、特征提取和向量检索串联](#主体检测、特征提取和向量检索串联)
+- [1. 图像分类推理](#1)
+- [2. 主体检测模型推理](#2)
+- [3. 特征提取模型推理](#3)
+- [4. 主体检测、特征提取和向量检索串联](#4)
 
-<a name="图像分类推理"></a>
+<a name="1"></a>
 ## 1. 图像分类推理
 
 首先请参考文档[模型导出](./export_model.md)准备 inference 模型，然后进入 PaddleClas 的 `deploy` 目录下：
@@ -39,9 +39,9 @@ python python/predict_cls.py -c configs/inference_cls.yaml
 
 **注意**:
 * 如果使用 VisionTransformer 系列模型，如 `DeiT_***_384`, `ViT_***_384` 等，请注意模型的输入数据尺寸，部分模型需要修改参数： `PreProcess.resize_short=384`, `PreProcess.resize=384`。
-* 如果你希望提升评测模型速度，使用gpu评测时，建议开启TensorRT加速预测，使用cpu评测时，建议开启MKL-DNN加速预测。
+* 如果你希望提升评测模型速度，使用 GPU 评测时，建议开启 TensorRT 加速预测，使用 CPU 评测时，建议开启 MKL-DNN 加速预测。
 
-<a name="主体检测模型推理"></a>
+<a name="2"></a>
 ## 2. 主体检测模型推理
 
 进入 PaddleClas 的 `deploy` 目录下：
@@ -70,7 +70,7 @@ python python/predict_det.py -c configs/inference_det.yaml
 * `Global.use_gpu`： 是否使用 GPU 预测，默认为 `True`。
 
 
-<a name="特征提取模型推理"></a>
+<a name="3"></a>
 ## 3. 特征提取模型推理
 
 下面以商品特征提取为例，介绍特征提取模型推理。首先进入 PaddleClas 的 `deploy` 目录下：
@@ -90,7 +90,7 @@ tar -xf ./models/product_ResNet50_vd_aliproduct_v1.0_infer.tar -C ./models/
 
 上述预测命令可以得到一个 512 维的特征向量，直接输出在在命令行中。
 
-<a name="主体检测、特征提取和向量检索串联"></a>
+<a name="4"></a>
 ## 4. 主体检测、特征提取和向量检索串联
 
 主体检测、特征提取和向量检索的串联预测，可以参考图像识别[快速体验](../quick_start/quick_start_recognition.md)。

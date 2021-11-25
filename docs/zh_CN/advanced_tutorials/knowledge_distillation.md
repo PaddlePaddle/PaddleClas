@@ -16,7 +16,7 @@
     - [4.1 使用方法](#4.1)
     - [4.2 迁移学习 finetune](#4.2)
     - [4.3 目标检测](#4.3)
-  - [5. SSLD实战](#5)
+  - [5. SSLD 实战](#5)
     - [5.1 参数配置](#5.1)
     - [5.2 启动命令](#5.2)
     - [5.3 注意事项](#5.3)
@@ -204,9 +204,9 @@ SSLD 的流程图如下图所示。
 在这里可以看出，对于未蒸馏模型，过度调整中间层学习率反而降低最终检测模型的性能指标。基于该蒸馏模型，我们也提供了领先的服务端实用目标检测方案，详细的配置与训练代码均已开源，可以参考 [PaddleDetection](https://github.com/PaddlePaddle/PaddleDetection/tree/master/configs/rcnn_enhance)。
 
 <a name="5"></a>
-## 5. SSLD实战
+## 5. SSLD 实战
 
-本节将基于 ImageNet-1K 的数据集详细介绍 SSLD 蒸馏实验，如果想快速体验此方法，可以参考 [**30分钟玩转 PaddleClas（进阶版）**](../quick_start/quick_start_classification_professional.md) 中基于 CIFAR100 的 SSLD 蒸馏实验。
+本节将基于 ImageNet-1K 的数据集详细介绍 SSLD 蒸馏实验，如果想快速体验此方法，可以参考 [**30 分钟玩转 PaddleClas（进阶版）**](../quick_start/quick_start_classification_professional.md) 中基于 CIFAR100 的 SSLD 蒸馏实验。
 
 <a name="5.1"></a>
 ### 5.1 参数配置

@@ -1,13 +1,24 @@
 # 模型库概览
+---
+## 目录
 
-## 概述
+* [1. 概述](#1)
+* [2. 评估环境](#2)
+* [3. 预训练模型列表及下载地址](#3)
+* [4. 参考文献](#4)
 
-基于ImageNet1k分类数据集，PaddleClas支持的36种系列分类网络结构以及对应的175个图像分类预训练模型如下所示，训练技巧、每个系列网络结构的简单介绍和性能评估将在相应章节展现。
+<a name='1'></a>
 
-## 评估环境
-* CPU的评估环境基于骁龙855（SD855）。
-* Intel CPU的评估环境基于Intel(R) Xeon(R) Gold 6148。
-* GPU评估环境基于V100和TensorRT。
+## 1. 概述
+
+基于 ImageNet1k 分类数据集，PaddleClas 支持的 36 种系列分类网络结构以及对应的 175 个图像分类预训练模型如下所示，训练技巧、每个系列网络结构的简单介绍和性能评估将在相应章节展现。
+
+ <a name='2'></a>
+
+## 2. 评估环境
+* CPU 的评估环境基于骁龙 855（SD855）。
+* Intel CPU 的评估环境基于 Intel(R) Xeon(R) Gold 6148。
+* GPU 评估环境基于 V100 和 TensorRT。
 
 
 ![](../../images/models/T4_benchmark/t4.fp32.bs4.main_fps_top1.png)
@@ -17,19 +28,20 @@
 ![](../../images/models/mobile_arm_top1.png)
 
 
-> 如果您觉得此文档对您有帮助，欢迎star我们的项目：[https://github.com/PaddlePaddle/PaddleClas](https://github.com/PaddlePaddle/PaddleClas)
+> 如果您觉得此文档对您有帮助，欢迎 star 我们的项目：[https://github.com/PaddlePaddle/PaddleClas](https://github.com/PaddlePaddle/PaddleClas)
 
+<a name='3'></a>
 
-## 预训练模型列表及下载地址
+## 3. 预训练模型列表及下载地址
 
-- ResNet及其Vd系列
-  - ResNet系列<sup>[[1](#ref1)]</sup>([论文地址](http://openaccess.thecvf.com/content_cvpr_2016/html/He_Deep_Residual_Learning_CVPR_2016_paper.html))
+- ResNet 及其 Vd 系列
+  - ResNet 系列<sup>[[1](#ref1)]</sup>([论文地址](http://openaccess.thecvf.com/content_cvpr_2016/html/He_Deep_Residual_Learning_CVPR_2016_paper.html))
     - [ResNet18](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ResNet18_pretrained.pdparams)
     - [ResNet34](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ResNet34_pretrained.pdparams)
     - [ResNet50](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ResNet50_pretrained.pdparams)
     - [ResNet101](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ResNet101_pretrained.pdparams)
     - [ResNet152](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ResNet152_pretrained.pdparams)
-  - ResNet_vc、ResNet_vd系列<sup>[[2](#ref2)]</sup>([论文地址](https://arxiv.org/abs/1812.01187))
+  - ResNet_vc、ResNet_vd 系列<sup>[[2](#ref2)]</sup>([论文地址](https://arxiv.org/abs/1812.01187))
     - [ResNet50_vc](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ResNet50_vc_pretrained.pdparams)
     - [ResNet18_vd](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ResNet18_vd_pretrained.pdparams)
     - [ResNet34_vd](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ResNet34_vd_pretrained.pdparams)
@@ -45,7 +57,7 @@
 
 
 - 轻量级模型系列
-  - PP-LCNet系列<sup>[[28](#ref28)]</sup>([论文地址](https://arxiv.org/pdf/2109.15099.pdf))
+  - PP-LCNet 系列<sup>[[28](#ref28)]</sup>([论文地址](https://arxiv.org/pdf/2109.15099.pdf))
     - [PPLCNet_x0_25](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/PPLCNet_x0_25_pretrained.pdparams)
      - [PPLCNet_x0_35](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/PPLCNet_x0_35_pretrained.pdparams)
     - [PPLCNet_x0_5](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/PPLCNet_x0_5_pretrained.pdparams)
@@ -57,7 +69,7 @@
     - [PPLCNet_x0_5_ssld](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/PPLCNet_x0_5_ssld_pretrained.pdparams)
     - [PPLCNet_x1_0_ssld](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/PPLCNet_x1_0_ssld_pretrained.pdparams)
     - [PPLCNet_x2_5_ssld](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/PPLCNet_x2_5_ssld_pretrained.pdparams)
-  - MobileNetV3系列<sup>[[3](#ref3)]</sup>([论文地址](https://arxiv.org/abs/1905.02244))
+  - MobileNetV3 系列<sup>[[3](#ref3)]</sup>([论文地址](https://arxiv.org/abs/1905.02244))
     - [MobileNetV3_large_x0_35](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/MobileNetV3_large_x0_35_pretrained.pdparams)
     - [MobileNetV3_large_x0_5](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/MobileNetV3_large_x0_5_pretrained.pdparams)
     - [MobileNetV3_large_x0_75](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/MobileNetV3_large_x0_75_pretrained.pdparams)
@@ -71,7 +83,7 @@
     - [MobileNetV3_large_x1_0_ssld](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/MobileNetV3_large_x1_0_ssld_pretrained.pdparams)
     - [MobileNetV3_large_x1_0_ssld_int8]()(coming soon)
     - [MobileNetV3_small_x1_0_ssld](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/MobileNetV3_small_x1_0_ssld_pretrained.pdparams)
-  - MobileNetV2系列<sup>[[4](#ref4)]</sup>([论文地址](https://arxiv.org/abs/1801.04381))
+  - MobileNetV2 系列<sup>[[4](#ref4)]</sup>([论文地址](https://arxiv.org/abs/1801.04381))
     - [MobileNetV2_x0_25](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/MobileNetV2_x0_25_pretrained.pdparams)
     - [MobileNetV2_x0_5](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/MobileNetV2_x0_5_pretrained.pdparams)
     - [MobileNetV2_x0_75](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/MobileNetV2_x0_75_pretrained.pdparams)
@@ -79,13 +91,13 @@
     - [MobileNetV2_x1_5](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/MobileNetV2_x1_5_pretrained.pdparams)
     - [MobileNetV2_x2_0](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/MobileNetV2_x2_0_pretrained.pdparams)
     - [MobileNetV2_ssld](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/MobileNetV2_ssld_pretrained.pdparams)
-  - MobileNetV1系列<sup>[[5](#ref5)]</sup>([论文地址](https://arxiv.org/abs/1704.04861))
+  - MobileNetV1 系列<sup>[[5](#ref5)]</sup>([论文地址](https://arxiv.org/abs/1704.04861))
     - [MobileNetV1_x0_25](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/MobileNetV1_x0_25_pretrained.pdparams)
     - [MobileNetV1_x0_5](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/MobileNetV1_x0_5_pretrained.pdparams)
     - [MobileNetV1_x0_75](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/MobileNetV1_x0_75_pretrained.pdparams)
     - [MobileNetV1](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/MobileNetV1_pretrained.pdparams)
     - [MobileNetV1_ssld](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/MobileNetV1_ssld_pretrained.pdparams)
-  - ShuffleNetV2系列<sup>[[6](#ref6)]</sup>([论文地址](https://arxiv.org/abs/1807.11164))
+  - ShuffleNetV2 系列<sup>[[6](#ref6)]</sup>([论文地址](https://arxiv.org/abs/1807.11164))
     - [ShuffleNetV2_x0_25](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ShuffleNetV2_x0_25_pretrained.pdparams)
     - [ShuffleNetV2_x0_33](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ShuffleNetV2_x0_33_pretrained.pdparams)
     - [ShuffleNetV2_x0_5](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ShuffleNetV2_x0_5_pretrained.pdparams)
@@ -93,16 +105,16 @@
     - [ShuffleNetV2_x1_5](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ShuffleNetV2_x1_5_pretrained.pdparams)
     - [ShuffleNetV2_x2_0](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ShuffleNetV2_x2_0_pretrained.pdparams)
     - [ShuffleNetV2_swish](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ShuffleNetV2_swish_pretrained.pdparams)
-  - GhostNet系列<sup>[[23](#ref23)]</sup>([论文地址](https://arxiv.org/pdf/1911.11907.pdf))
+  - GhostNet 系列<sup>[[23](#ref23)]</sup>([论文地址](https://arxiv.org/pdf/1911.11907.pdf))
     - [GhostNet_x0_5](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/GhostNet_x0_5_pretrained.pdparams)
     - [GhostNet_x1_0](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/GhostNet_x1_0_pretrained.pdparams)
     - [GhostNet_x1_3](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/GhostNet_x1_3_pretrained.pdparams)
     - [GhostNet_x1_3_ssld](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/GhostNet_x1_3_ssld_pretrained.pdparams)
-  - MixNet系列<sup>[[29](#ref29)]</sup>([论文地址](https://arxiv.org/pdf/1907.09595.pdf))
+  - MixNet 系列<sup>[[29](#ref29)]</sup>([论文地址](https://arxiv.org/pdf/1907.09595.pdf))
     - [MixNet_S](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/MixNet_S_pretrained.pdparams)
     - [MixNet_M](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/MixNet_M_pretrained.pdparams)
     - [MixNet_L](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/MixNet_L_pretrained.pdparams)
-  - ReXNet系列<sup>[[30](#ref30)]</sup>([论文地址](https://arxiv.org/pdf/2007.00992.pdf))
+  - ReXNet 系列<sup>[[30](#ref30)]</sup>([论文地址](https://arxiv.org/pdf/2007.00992.pdf))
     - [ReXNet_1_0](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ReXNet_1_0_pretrained.pdparams)
     - [ReXNet_1_3](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ReXNet_1_3_pretrained.pdparams)
     - [ReXNet_1_5](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ReXNet_1_5_pretrained.pdparams)
@@ -110,32 +122,32 @@
     - [ReXNet_3_0](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ReXNet_3_0_pretrained.pdparams)
 
 
-- SEResNeXt与Res2Net系列
-  - ResNeXt系列<sup>[[7](#ref7)]</sup>([论文地址](https://arxiv.org/abs/1611.05431))
+- SEResNeXt 与 Res2Net 系列
+  - ResNeXt 系列<sup>[[7](#ref7)]</sup>([论文地址](https://arxiv.org/abs/1611.05431))
     - [ResNeXt50_32x4d](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ResNeXt50_32x4d_pretrained.pdparams)
     - [ResNeXt50_64x4d](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ResNeXt50_64x4d_pretrained.pdparams)
     - [ResNeXt101_32x4d](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ResNeXt101_32x4d_pretrained.pdparams)
     - [ResNeXt101_64x4d](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ResNeXt101_64x4d_pretrained.pdparams)
     - [ResNeXt152_32x4d](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ResNeXt152_32x4d_pretrained.pdparams)
     - [ResNeXt152_64x4d](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ResNeXt152_64x4d_pretrained.pdparams)
-  - ResNeXt_vd系列
+  - ResNeXt_vd 系列
     - [ResNeXt50_vd_32x4d](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ResNeXt50_vd_32x4d_pretrained.pdparams)
     - [ResNeXt50_vd_64x4d](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ResNeXt50_vd_64x4d_pretrained.pdparams)
     - [ResNeXt101_vd_32x4d](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ResNeXt101_vd_32x4d_pretrained.pdparams)
     - [ResNeXt101_vd_64x4d](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ResNeXt101_vd_64x4d_pretrained.pdparams)
     - [ResNeXt152_vd_32x4d](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ResNeXt152_vd_32x4d_pretrained.pdparams)
     - [ResNeXt152_vd_64x4d](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ResNeXt152_vd_64x4d_pretrained.pdparams)
-  - SE_ResNet_vd系列<sup>[[8](#ref8)]</sup>([论文地址](https://arxiv.org/abs/1709.01507))
+  - SE_ResNet_vd 系列<sup>[[8](#ref8)]</sup>([论文地址](https://arxiv.org/abs/1709.01507))
     - [SE_ResNet18_vd](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/SE_ResNet18_vd_pretrained.pdparams)
     - [SE_ResNet34_vd](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/SE_ResNet34_vd_pretrained.pdparams)
     - [SE_ResNet50_vd](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/SE_ResNet50_vd_pretrained.pdparams)
-  - SE_ResNeXt系列
+  - SE_ResNeXt 系列
     - [SE_ResNeXt50_32x4d](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/SE_ResNeXt50_32x4d_pretrained.pdparams)
     - [SE_ResNeXt101_32x4d](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/SE_ResNeXt101_32x4d_pretrained.pdparams)
-  - SE_ResNeXt_vd系列
+  - SE_ResNeXt_vd 系列
     - [SE_ResNeXt50_vd_32x4d](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/SE_ResNeXt50_vd_32x4d_pretrained.pdparams)
     - [SENet154_vd](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/SENet154_vd_pretrained.pdparams)
-  - Res2Net系列<sup>[[9](#ref9)]</sup>([论文地址](https://arxiv.org/abs/1904.01169))
+  - Res2Net 系列<sup>[[9](#ref9)]</sup>([论文地址](https://arxiv.org/abs/1904.01169))
     - [Res2Net50_26w_4s](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/Res2Net50_26w_4s_pretrained.pdparams)
     - [Res2Net50_vd_26w_4s](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/Res2Net50_vd_26w_4s_pretrained.pdparams)
     - [Res2Net50_vd_26w_4s_ssld](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/Res2Net50_vd_26w_4s_ssld_pretrained.pdparams)
@@ -146,14 +158,14 @@
     - [Res2Net200_vd_26w_4s_ssld](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/Res2Net200_vd_26w_4s_ssld_pretrained.pdparams)
 
 
-- Inception系列
-  - GoogLeNet系列<sup>[[10](#ref10)]</sup>([论文地址](https://arxiv.org/pdf/1409.4842.pdf))
+- Inception 系列
+  - GoogLeNet 系列<sup>[[10](#ref10)]</sup>([论文地址](https://arxiv.org/pdf/1409.4842.pdf))
     - [GoogLeNet](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/GoogLeNet_pretrained.pdparams)
-  - InceptionV3系列<sup>[[26](#ref26)]</sup>([论文地址](https://arxiv.org/abs/1512.00567))
+  - InceptionV3 系列<sup>[[26](#ref26)]</sup>([论文地址](https://arxiv.org/abs/1512.00567))
     - [InceptionV3](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/InceptionV3_pretrained.pdparams)
-  - InceptionV4系列<sup>[[11](#ref11)]</sup>([论文地址](https://arxiv.org/abs/1602.07261))
+  - InceptionV4 系列<sup>[[11](#ref11)]</sup>([论文地址](https://arxiv.org/abs/1602.07261))
     - [InceptionV4](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/InceptionV4_pretrained.pdparams)
-  - Xception系列<sup>[[12](#ref12)]</sup>([论文地址](http://openaccess.thecvf.com/content_cvpr_2017/html/Chollet_Xception_Deep_Learning_CVPR_2017_paper.html))
+  - Xception 系列<sup>[[12](#ref12)]</sup>([论文地址](http://openaccess.thecvf.com/content_cvpr_2017/html/Chollet_Xception_Deep_Learning_CVPR_2017_paper.html))
     - [Xception41](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/Xception41_pretrained.pdparams)
     - [Xception41_deeplab](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/Xception41_deeplab_pretrained.pdparams)
     - [Xception65](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/Xception65_pretrained.pdparams)
@@ -161,8 +173,8 @@
     - [Xception71](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/Xception71_pretrained.pdparams)
 
 
-- HRNet系列
-  - HRNet系列<sup>[[13](#ref13)]</sup>([论文地址](https://arxiv.org/abs/1908.07919))
+- HRNet 系列
+  - HRNet 系列<sup>[[13](#ref13)]</sup>([论文地址](https://arxiv.org/abs/1908.07919))
     - [HRNet_W18_C](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/HRNet_W18_C_pretrained.pdparams)
     - [HRNet_W18_C_ssld](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/HRNet_W18_C_ssld_pretrained.pdparams)
     - [HRNet_W30_C](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/HRNet_W30_C_pretrained.pdparams)
@@ -174,14 +186,14 @@
     - [HRNet_W64_C](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/HRNet_W64_C_pretrained.pdparams)
     - [SE_HRNet_W64_C_ssld](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/SE_HRNet_W64_C_ssld_pretrained.pdparams)
 
-- DPN与DenseNet系列
-  - DPN系列<sup>[[14](#ref14)]</sup>([论文地址](https://arxiv.org/abs/1707.01629))
+- DPN 与 DenseNet 系列
+  - DPN 系列<sup>[[14](#ref14)]</sup>([论文地址](https://arxiv.org/abs/1707.01629))
     - [DPN68](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DPN68_pretrained.pdparams)
     - [DPN92](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DPN92_pretrained.pdparams)
     - [DPN98](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DPN98_pretrained.pdparams)
     - [DPN107](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DPN107_pretrained.pdparams)
     - [DPN131](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DPN131_pretrained.pdparams)
-  - DenseNet系列<sup>[[15](#ref15)]</sup>([论文地址](https://arxiv.org/abs/1608.06993))
+  - DenseNet 系列<sup>[[15](#ref15)]</sup>([论文地址](https://arxiv.org/abs/1608.06993))
     - [DenseNet121](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DenseNet121_pretrained.pdparams)
     - [DenseNet161](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DenseNet161_pretrained.pdparams)
     - [DenseNet169](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DenseNet169_pretrained.pdparams)
@@ -189,8 +201,8 @@
     - [DenseNet264](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DenseNet264_pretrained.pdparams)
 
 
-- EfficientNet与ResNeXt101_wsl系列
-  - EfficientNet系列<sup>[[16](#ref16)]</sup>([论文地址](https://arxiv.org/abs/1905.11946))
+- EfficientNet 与 ResNeXt101_wsl 系列
+  - EfficientNet 系列<sup>[[16](#ref16)]</sup>([论文地址](https://arxiv.org/abs/1905.11946))
     - [EfficientNetB0_small](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/EfficientNetB0_small_pretrained.pdparams)
     - [EfficientNetB0](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/EfficientNetB0_pretrained.pdparams)
     - [EfficientNetB1](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/EfficientNetB1_pretrained.pdparams)
@@ -200,22 +212,22 @@
     - [EfficientNetB5](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/EfficientNetB5_pretrained.pdparams)
     - [EfficientNetB6](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/EfficientNetB6_pretrained.pdparams)
     - [EfficientNetB7](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/EfficientNetB7_pretrained.pdparams)
-  - ResNeXt101_wsl系列<sup>[[17](#ref17)]</sup>([论文地址](https://arxiv.org/abs/1805.00932))
+  - ResNeXt101_wsl 系列<sup>[[17](#ref17)]</sup>([论文地址](https://arxiv.org/abs/1805.00932))
     - [ResNeXt101_32x8d_wsl](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ResNeXt101_32x8d_wsl_pretrained.pdparams)
     - [ResNeXt101_32x16d_wsl](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ResNeXt101_32x16d_wsl_pretrained.pdparams)
     - [ResNeXt101_32x32d_wsl](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ResNeXt101_32x32d_wsl_pretrained.pdparams)
     - [ResNeXt101_32x48d_wsl](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ResNeXt101_32x48d_wsl_pretrained.pdparams)
     - [Fix_ResNeXt101_32x48d_wsl](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/Fix_ResNeXt101_32x48d_wsl_pretrained.pdparams)
 
-- ResNeSt与RegNet系列
-  - ResNeSt系列<sup>[[24](#ref24)]</sup>([论文地址](https://arxiv.org/abs/2004.08955))
+- ResNeSt 与 RegNet 系列
+  - ResNeSt 系列<sup>[[24](#ref24)]</sup>([论文地址](https://arxiv.org/abs/2004.08955))
     - [ResNeSt50_fast_1s1x64d](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ResNeSt50_fast_1s1x64d_pretrained.pdparams)
     - [ResNeSt50](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ResNeSt50_pretrained.pdparams)
-  - RegNet系列<sup>[[25](#ref25)]</sup>([paper link](https://arxiv.org/abs/2003.13678))
+  - RegNet 系列<sup>[[25](#ref25)]</sup>([paper link](https://arxiv.org/abs/2003.13678))
     - [RegNetX_4GF](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/RegNetX_4GF_pretrained.pdparams)
 
-- Transformer系列
-  - Swin-transformer系列<sup>[[27](#ref27)]</sup>([论文地址](https://arxiv.org/pdf/2103.14030.pdf))
+- Transformer 系列
+  - Swin-transformer 系列<sup>[[27](#ref27)]</sup>([论文地址](https://arxiv.org/pdf/2103.14030.pdf))
     - [SwinTransformer_tiny_patch4_window7_224](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/SwinTransformer_tiny_patch4_window7_224_pretrained.pdparams)
     - [SwinTransformer_small_patch4_window7_224](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/SwinTransformer_small_patch4_window7_224_pretrained.pdparams)
     - [SwinTransformer_base_patch4_window7_224](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/SwinTransformer_base_patch4_window7_224_pretrained.pdparams)
@@ -226,7 +238,7 @@
     - [SwinTransformer_large_patch4_window12_384_22kto1k](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/SwinTransformer_large_patch4_window12_384_22kto1k_pretrained.pdparams)
     - [SwinTransformer_large_patch4_window7_224_22k](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/SwinTransformer_large_patch4_window7_224_22k_pretrained.pdparams)
     - [SwinTransformer_large_patch4_window7_224_22kto1k](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/SwinTransformer_large_patch4_window7_224_22kto1k_pretrained.pdparams)
-  - ViT系列<sup>[[31](#ref31)]</sup>([论文地址](https://arxiv.org/pdf/2010.11929.pdf))
+  - ViT 系列<sup>[[31](#ref31)]</sup>([论文地址](https://arxiv.org/pdf/2010.11929.pdf))
       - [ViT_small_patch16_224](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ViT_small_patch16_224_pretrained.pdparams)
       - [ViT_base_patch16_224](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ViT_base_patch16_224_pretrained.pdparams)
       - [ViT_base_patch16_384](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ViT_base_patch16_384_pretrained.pdparams)
@@ -234,7 +246,7 @@
       - [ViT_large_patch16_224](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ViT_large_patch16_224_pretrained.pdparams)
       - [ViT_large_patch16_384](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ViT_large_patch16_384_pretrained.pdparams)
       - [ViT_large_patch32_384](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ViT_large_patch32_384_pretrained.pdparams)
-  - DeiT系列<sup>[[32](#ref32)]</sup>([论文地址](https://arxiv.org/pdf/2012.12877.pdf))
+  - DeiT 系列<sup>[[32](#ref32)]</sup>([论文地址](https://arxiv.org/pdf/2012.12877.pdf))
       - [DeiT_tiny_patch16_224](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DeiT_tiny_patch16_224_pretrained.pdparams)
       - [DeiT_small_patch16_224](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DeiT_small_patch16_224_pretrained.pdparams)
       - [DeiT_base_patch16_224](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DeiT_base_patch16_224_pretrained.pdparams)
@@ -243,36 +255,36 @@
       - [DeiT_small_distilled_patch16_224](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DeiT_small_distilled_patch16_224_pretrained.pdparams)
       - [DeiT_base_distilled_patch16_224](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DeiT_base_distilled_patch16_224_pretrained.pdparams)
       - [DeiT_base_distilled_patch16_384](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DeiT_base_distilled_patch16_384_pretrained.pdparams)
-  - LeViT系列<sup>[[33](#ref33)]</sup>([论文地址](https://arxiv.org/pdf/2104.01136.pdf))
+  - LeViT 系列<sup>[[33](#ref33)]</sup>([论文地址](https://arxiv.org/pdf/2104.01136.pdf))
       - [LeViT_128S](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/LeViT_128S_pretrained.pdparams)
       - [LeViT_128](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/LeViT_128_pretrained.pdparams)
       - [LeViT_192](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/LeViT_192_pretrained.pdparams)
       - [LeViT_256](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/LeViT_256_pretrained.pdparams)
       - [LeViT_384](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/LeViT_384_pretrained.pdparams)
-  - Twins系列<sup>[[34](#ref34)]</sup>([论文地址](https://arxiv.org/pdf/2104.13840.pdf))
+  - Twins 系列<sup>[[34](#ref34)]</sup>([论文地址](https://arxiv.org/pdf/2104.13840.pdf))
       - [pcpvt_small](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/pcpvt_small_pretrained.pdparams)
       - [pcpvt_base](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/pcpvt_base_pretrained.pdparams)
       - [pcpvt_large](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/pcpvt_large_pretrained.pdparams)
       - [alt_gvt_small](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/alt_gvt_small_pretrained.pdparams)
       - [alt_gvt_base](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/alt_gvt_base_pretrained.pdparams)
       - [alt_gvt_large](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/alt_gvt_large_pretrained.pdparams)
-  - TNT系列<sup>[[35](#ref35)]</sup>([论文地址](https://arxiv.org/pdf/2103.00112.pdf))
+  - TNT 系列<sup>[[35](#ref35)]</sup>([论文地址](https://arxiv.org/pdf/2103.00112.pdf))
       - [TNT_small](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/TNT_small_pretrained.pdparams)
 
 - 其他模型
-  - AlexNet系列<sup>[[18](#ref18)]</sup>([论文地址](https://papers.nips.cc/paper/4824-imagenet-classification-with-deep-convolutional-neural-networks.pdf))
+  - AlexNet 系列<sup>[[18](#ref18)]</sup>([论文地址](https://papers.nips.cc/paper/4824-imagenet-classification-with-deep-convolutional-neural-networks.pdf))
     - [AlexNet](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/AlexNet_pretrained.pdparams)
-  - SqueezeNet系列<sup>[[19](#ref19)]</sup>([论文地址](https://arxiv.org/abs/1602.07360))
+  - SqueezeNet 系列<sup>[[19](#ref19)]</sup>([论文地址](https://arxiv.org/abs/1602.07360))
     - [SqueezeNet1_0](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/SqueezeNet1_0_pretrained.pdparams)
     - [SqueezeNet1_1](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/SqueezeNet1_1_pretrained.pdparams)
-  - VGG系列<sup>[[20](#ref20)]</sup>([论文地址](https://arxiv.org/abs/1409.1556))
+  - VGG 系列<sup>[[20](#ref20)]</sup>([论文地址](https://arxiv.org/abs/1409.1556))
     - [VGG11](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/VGG11_pretrained.pdparams)
     - [VGG13](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/VGG13_pretrained.pdparams)
     - [VGG16](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/VGG16_pretrained.pdparams)
     - [VGG19](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/VGG19_pretrained.pdparams)
-  - DarkNet系列<sup>[[21](#ref21)]</sup>([论文地址](https://arxiv.org/abs/1506.02640))
+  - DarkNet 系列<sup>[[21](#ref21)]</sup>([论文地址](https://arxiv.org/abs/1506.02640))
     - [DarkNet53](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DarkNet53_pretrained.pdparams)
-  - RepVGG系列<sup>[[36](#ref36)]</sup>([论文地址](https://arxiv.org/pdf/2101.03697.pdf))
+  - RepVGG 系列<sup>[[36](#ref36)]</sup>([论文地址](https://arxiv.org/pdf/2101.03697.pdf))
       - [RepVGG_A0](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/RepVGG_A0_pretrained.pdparams)
       - [RepVGG_A1](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/RepVGG_A1_pretrained.pdparams)
       - [RepVGG_A2](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/RepVGG_A2_pretrained.pdparams)
@@ -283,12 +295,12 @@
       - [RepVGG_B1g4](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/RepVGG_B1g4_pretrained.pdparams)
       - [RepVGG_B2g4](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/RepVGG_B2g4_pretrained.pdparams)
       - [RepVGG_B3g4](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/RepVGG_B3g4_pretrained.pdparams)
-   - HarDNet系列<sup>[[37](#ref37)]</sup>([论文地址](https://arxiv.org/pdf/1909.00948.pdf))
+   - HarDNet 系列<sup>[[37](#ref37)]</sup>([论文地址](https://arxiv.org/pdf/1909.00948.pdf))
       - [HarDNet39_ds](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/HarDNet39_ds_pretrained.pdparams)
       - [HarDNet68_ds](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/HarDNet68_ds_pretrained.pdparams)
       - [HarDNet68](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/HarDNet68_pretrained.pdparams)
       - [HarDNet85](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/HarDNet85_pretrained.pdparams)
-   - DLA系列<sup>[[38](#ref38)]</sup>([论文地址](https://arxiv.org/pdf/1707.06484.pdf))
+   - DLA 系列<sup>[[38](#ref38)]</sup>([论文地址](https://arxiv.org/pdf/1707.06484.pdf))
       - [DLA102](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DLA102_pretrained.pdparams)
       - [DLA102x2](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DLA102x2_pretrained.pdparams)
       - [DLA102x](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DLA102x_pretrained.pdparams)
@@ -298,7 +310,7 @@
       - [DLA60](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DLA60_pretrained.pdparams)
       - [DLA60x_c](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DLA60x_c_pretrained.pdparams)
       - [DLA60x](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DLA60x_pretrained.pdparams)
-   - RedNet系列<sup>[[39](#ref39)]</sup>([论文地址](https://arxiv.org/pdf/2103.06255.pdf))
+   - RedNet 系列<sup>[[39](#ref39)]</sup>([论文地址](https://arxiv.org/pdf/2103.06255.pdf))
       - [RedNet26](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/RedNet26_pretrained.pdparams)
       - [RedNet38](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/RedNet38_pretrained.pdparams)
       - [RedNet50](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/RedNet50_pretrained.pdparams)
@@ -307,9 +319,11 @@
 
 
 
-**注意**：以上模型中EfficientNetB1-B7的预训练模型转自[pytorch版EfficientNet](https://github.com/lukemelas/EfficientNet-PyTorch)，ResNeXt101_wsl系列预训练模型转自[官方repo](https://github.com/facebookresearch/WSL-Images)，剩余预训练模型均基于飞桨训练得到的，并在configs里给出了相应的训练超参数。
+**注意**：以上模型中 EfficientNetB1-B7 的预训练模型转自[pytorch版 EfficientNet](https://github.com/lukemelas/EfficientNet-PyTorch)，ResNeXt101_wsl 系列预训练模型转自[官方 repo](https://github.com/facebookresearch/WSL-Images)，剩余预训练模型均基于飞桨训练得到的，并在 configs 里给出了相应的训练超参数。
 
-## 参考文献
+<a name='4'></a>
+
+##  4. 参考文献
 
 
 <a name="ref1">[1]</a> He K, Zhang X, Ren S, et al. Deep residual learning for image recognition[C]//Proceedings of the IEEE conference on computer vision and pattern recognition. 2016: 770-778.

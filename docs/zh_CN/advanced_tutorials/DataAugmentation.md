@@ -1,7 +1,7 @@
 # 数据增强分类实战
 ---
 
-本节将基于 ImageNet-1K 的数据集详细介绍数据增强实验，如果想快速体验此方法，可以参考 [**30分钟玩转PaddleClas（进阶版）**](../quick_start/quick_start_classification_professional.md)中基于 CIFAR100 的数据增强实验。如果想了解相关算法的内容，请参考[数据增强算法介绍](../algorithm_introduction/DataAugmentation.md)。
+本节将基于 ImageNet-1K 的数据集详细介绍数据增强实验，如果想快速体验此方法，可以参考 [**30 分钟玩转 PaddleClas（进阶版）**](../quick_start/quick_start_classification_professional.md)中基于 CIFAR100 的数据增强实验。如果想了解相关算法的内容，请参考[数据增强算法介绍](../algorithm_introduction/DataAugmentation.md)。
 
 
 ## 目录
@@ -249,7 +249,7 @@
 ```
 
 <a name="1.10"></a>
-### 1.10 Mixup与Cutmix同时使用
+### 1.10 Mixup 与 Cutmix 同时使用
 
 `Mixup` 与 `Cutmix`同时使用的配置如下，其中用户需要指定额外的参数 `prob`，该参数控制不同数据增强的概率，默认为 `0.5`。
 

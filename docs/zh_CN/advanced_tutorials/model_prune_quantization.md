@@ -11,7 +11,7 @@
 本教程将介绍如何使用飞桨模型压缩库 PaddleSlim 做 PaddleClas 模型的压缩，即裁剪、量化功能。
 [PaddleSlim](https://github.com/PaddlePaddle/PaddleSlim) 集成了模型剪枝、量化（包括量化训练和离线量化）、蒸馏和神经网络搜索等多种业界常用且领先的模型压缩功能，如果您感兴趣，可以关注并了解。
 
-在开始本教程之前，建议先了解 [PaddleClas模型的训练方法](../models_training/classification.md) 以及 [PaddleSlim](https://paddleslim.readthedocs.io/zh_CN/latest/index.html)，相关裁剪、量化方法可以参考[模型裁剪量化算法介绍文档](../algorithm_introduction/model_prune_quantization.md)。
+在开始本教程之前，建议先了解 [PaddleClas 模型的训练方法](../models_training/classification.md) 以及 [PaddleSlim](https://paddleslim.readthedocs.io/zh_CN/latest/index.html)，相关裁剪、量化方法可以参考[模型裁剪量化算法介绍文档](../algorithm_introduction/model_prune_quantization.md)。
 
 -----------
 
@@ -160,7 +160,7 @@ python3.7 tools/export.py \
 <a name="4"></a>
 ## 4. 模型部署
 
-上述步骤导出的模型可以直接使用 inferecne 进行部署，参考 [inference部署](../inference_deployment/)。
+上述步骤导出的模型可以直接使用 inferecne 进行部署，参考 [inference 部署](../inference_deployment/)。
 
 也通过 PaddleLite 的 opt 模型转换工具，完成 inference 模型到移动端模型转换，用于移动端的模型部署。
 移动端模型部署的可参考 [移动端模型部署](../inference_deployment/paddle_lite_deploy.md)。

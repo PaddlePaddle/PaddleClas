@@ -45,14 +45,14 @@
 
 基于上述研究，PaddleClas 中提供了 2 个通用主体检测模型，为轻量级与服务端主体检测模型，分别适用于端侧场景以及服务端场景。下面的表格中给出了在上述 5 个数据集上的平均 mAP 以及它们的模型大小、预测速度对比信息。
 
-| 模型      | 模型结构   | 预训练模型下载地址   | inference模型下载地址  | mAP | inference模型大小(MB) | 单张图片预测耗时(不包含预处理)(ms) |
+| 模型      | 模型结构   | 预训练模型下载地址   | inference 模型下载地址  | mAP | inference 模型大小(MB) | 单张图片预测耗时(不包含预处理)(ms) |
 | :------------:  | :-------------: | :------: | :-------: | :--------: | :-------: | :--------: |
 | 轻量级主体检测模型 | PicoDet | [地址](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/pretrain/picodet_PPLCNet_x2_5_mainbody_lite_v1.0_pretrained.pdparams) | [tar 格式文件地址](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/inference/picodet_PPLCNet_x2_5_mainbody_lite_v1.0_infer.tar) [zip 格式文件地址](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/inference/picodet_PPLCNet_x2_5_mainbody_lite_v1.0_infer.zip) | 40.1% | 30.1 | 29.8  |
 | 服务端主体检测模型 | PP-YOLOv2 | [地址](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/pretrain/ppyolov2_r50vd_dcn_mainbody_v1.0_pretrained.pdparams) | [tar 格式文件地址](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/inference/ppyolov2_r50vd_dcn_mainbody_v1.0_infer.tar) [zip 格式文件地址](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/inference/ppyolov2_r50vd_dcn_mainbody_v1.0_infer.zip) | 42.5% | 210.5 | 466.6  |
 
 * 注意
   * 由于部分解压缩软件在解压上述 `tar` 格式文件时存在问题，建议非命令行用户下载 `zip` 格式文件并解压。`tar` 格式文件建议使用命令 `tar xf xxx.tar` 解压。
-  * 速度评测机器的CPU具体信息为：`Intel(R) Xeon(R) Gold 6148 CPU @ 2.40GHz`，速度指标为开启 mkldnn ，线程数设置为 10 测试得到。
+  * 速度评测机器的 CPU 具体信息为：`Intel(R) Xeon(R) Gold 6148 CPU @ 2.40GHz`，速度指标为开启 mkldnn ，线程数设置为 10 测试得到。
   * 主体检测的预处理过程较为耗时，平均每张图在上述机器上的时间在 40~55 ms 左右，没有包含在上述的预测耗时统计中。
 
 <a name="2.1"></a> 
@@ -143,13 +143,13 @@ pip install -r requirements.txt
 ```
 coco_detection.yml：主要说明了训练数据和验证数据的路径
 
-runtime.yml：主要说明了公共的运行参数，比如是否使用GPU、每多少个 epoch 存储 checkpoint 等
+runtime.yml：主要说明了公共的运行参数，比如是否使用 GPU、每多少个 epoch 存储 checkpoint 等
 
 optimizer_365e.yml：主要说明了学习率和优化器的配置
 
 ppyolov2_r50vd_dcn.yml：主要说明模型和主干网络的情况
 
-ppyolov2_reader.yml：主要说明数据读取器配置，如 batch size，并发加载子进程数等，同时包含读取后预处理操作，如resize、数据增强等等
+ppyolov2_reader.yml：主要说明数据读取器配置，如 batch size，并发加载子进程数等，同时包含读取后预处理操作，如 resize、数据增强等等
 ```
 
 在主体检测任务中，需要将 `datasets/coco_detection.yml` 中的 `num_classes` 参数修改为 1 （只有 1 个前景类别），同时将训练集和测试集的路径修改为自定义数据集的路径。
@@ -165,7 +165,7 @@ PaddleDetection 提供了单卡/多卡训练模式，满足用户多种训练需
 * GPU 单卡训练
 
 ```bash
-# windows和Mac下不需要执行该命令
+# windows 和 Mac 下不需要执行该命令
 export CUDA_VISIBLE_DEVICES=0
 python tools/train.py -c configs/ppyolo/ppyolov2_r50vd_dcn_365e_coco.yml
 ```
@@ -185,7 +185,7 @@ python -m paddle.distributed.launch --gpus 0,1,2,3 tools/train.py -c configs/ppy
 
 ```bash
 export CUDA_VISIBLE_DEVICES=0
-# 指定pretrain_weights参数，加载通用的主体检测预训练模型
+# 指定 pretrain_weights 参数，加载通用的主体检测预训练模型
 python tools/train.py -c configs/ppyolo/ppyolov2_r50vd_dcn_365e_coco.yml -o pretrain_weights=https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/pretrain/ppyolov2_r50vd_dcn_mainbody_v1.0_pretrained.pdparams
 ```
 

@@ -1,6 +1,6 @@
 # 向量检索
 
-向量检索技术在图像识别、图像检索中应用比较广泛。其主要目标是，对于给定的查询向量，在已经建立好的向量库中，与库中所有的待查询向量，进行特征向量的相似度或距离计算，得到相似度排序。在图像识别系统中，我们使用 [Faiss](https://github.com/facebookresearch/faiss) 对此部分进行支持，具体信息请详查 [Faiss官网](https://github.com/facebookresearch/faiss)。`Faiss` 主要有以下优势
+向量检索技术在图像识别、图像检索中应用比较广泛。其主要目标是，对于给定的查询向量，在已经建立好的向量库中，与库中所有的待查询向量，进行特征向量的相似度或距离计算，得到相似度排序。在图像识别系统中，我们使用 [Faiss](https://github.com/facebookresearch/faiss) 对此部分进行支持，具体信息请详查 [Faiss 官网](https://github.com/facebookresearch/faiss)。`Faiss` 主要有以下优势
 
 - 适配性好：支持 Windos、Linux、MacOS 系统
 - 安装方便： 支持 `python` 接口，直接使用 `pip` 安装
@@ -56,29 +56,20 @@ pip install faiss-cpu==1.7.1post2
 
 <a name="3"></a> 
 
-<<<<<<< HEAD
-## 三、相关配置文档参数介绍
-=======
 ## 3. 使用及配置文档介绍
->>>>>>> 6f9196b6... add menue to documentations
 
 涉及检索模块配置文件位于：`deploy/configs/` 下，其中 `build_*.yaml` 是建立特征库的相关配置文件，`inference_*.yaml` 是检索或者分类的推理配置文件。
 
 <a name="3.1"></a> 
 
-<<<<<<< HEAD
-### 3.1 建库配置文件参数
-
-示例建库的配置如下
-=======
 ### 3.1 建库及配置文件参数
 
 建库的具体操作如下：
 
 ```shell
-# 进入deploy目录
+# 进入 deploy 目录
 cd deploy
-# yaml文件根据需要改成自己所需的具体yaml文件
+# yaml 文件根据需要改成自己所需的具体 yaml 文件
 python python/build_gallery.py -c configs/build_***.yaml
 ```
 
@@ -87,7 +78,6 @@ python python/build_gallery.py -c configs/build_***.yaml
 其中 `data_file` 文件存储的是图像文件的路径和标签，每一行的格式为：`image_path  label`。中间间隔以 `yaml` 文件中 `delimiter` 参数作为间隔。
 
 关于特征提取的具体模型参数，可查看 `yaml` 文件。
->>>>>>> 6f9196b6... add menue to documentations
 
 ```yaml
 # indexing engine config
@@ -115,13 +105,10 @@ IndexProcess:
 
 ### 3.2 检索配置文件参数
 
-<<<<<<< HEAD
-=======
-将检索的过程融合到 `PP-ShiTu` 的整体流程中，请参考 [README](../../../README_ch.md) 中 `PP-ShiTu图像识别系统介绍` 部分。检索具体使用操作请参考[识别快速开始文档](../quick_start/quick_start_recognition.md)。
+将检索的过程融合到 `PP-ShiTu` 的整体流程中，请参考 [README](../../../README_ch.md) 中 `PP-ShiTu 图像识别系统介绍` 部分。检索具体使用操作请参考[识别快速开始文档](../quick_start/quick_start_recognition.md)。
 
 其中，检索部分配置如下，整体检索配置文件，请参考 `deploy/configs/inference_*.yaml` 文件。
 
->>>>>>> 6f9196b6... add menue to documentations
 ```yaml
 IndexProcess:
   index_dir: "./recognition_demo_data_v1.1/gallery_logo/index/"

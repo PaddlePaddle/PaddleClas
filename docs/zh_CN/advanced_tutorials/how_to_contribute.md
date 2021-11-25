@@ -12,8 +12,8 @@
         - [1.2.4 使用 pre-commit 勾子](#1.2.4)
         - [1.2.5 修改与提交代码](#1.2.5)
         - [1.2.6 保持本地仓库最新](#1.2.6)
-        - [1.2.7 push到远程仓库](#1.2.7)
-        - [1.2.8 提交Pull Request](#1.2.8)
+        - [1.2.7 push 到远程仓库](#1.2.7)
+        - [1.2.8 提交 Pull Request](#1.2.8)
         - [1.2.9 签署 CLA 协议和通过单元测试](#1.2.9)
         - [1.2.10 删除分支](#1.2.10)
         - [1.2.11 提交代码的一些约定](#1.2.11)
@@ -56,7 +56,7 @@ PaddleClas 欢迎大家向 repo 中积极贡献代码，下面给出一些贡献
 * 将远程仓库 clone 到本地
 
 ```shell
-# 拉取develop分支的代码
+# 拉取 develop 分支的代码
 git clone https://github.com/USERNAME/PaddleClas.git -b develop
 cd PaddleClas
 ```
@@ -106,10 +106,10 @@ git checkout -b new_branch
 也可以基于远程或者上游的分支创建新的分支，命令如下。
 
 ```shell
-# 基于用户远程仓库(origin)的develop创建new_branch分支
+# 基于用户远程仓库(origin)的 develop 创建 new_branch 分支
 git checkout -b new_branch origin/develop
-# 基于上游远程仓库(upstream)的develop创建new_branch分支
-# 如果需要从upstream创建新的分支，需要首先使用git fetch upstream获取上游代码
+# 基于上游远程仓库(upstream)的 develop 创建 new_branch 分支
+# 如果需要从 upstream 创建新的分支，需要首先使用 git fetch upstream 获取上游代码
 git checkout -b new_branch upstream/develop
 ```
 
@@ -168,19 +168,19 @@ git commit -m "your commit info"
 
 ```shell
 git fetch upstream
-# 如果是希望提交到其他分支，则需要从upstream的其他分支pull代码，这里是develop
+# 如果是希望提交到其他分支，则需要从 upstream 的其他分支 pull 代码，这里是 develop
 git pull upstream develop
 ```
 
 <a name="1.2.7"></a>
-#### 1.2.7 push到远程仓库
+#### 1.2.7 push 到远程仓库
 
 ```shell
 git push origin new_branch
 ```
 
 <a name="1.2.8"></a>
-#### 1.2.8 提交Pull Request
+#### 1.2.8 提交 Pull Request
 
 点击 new pull request，选择本地分支和目标分支，如下图所示。在 PR 的描述说明中，填写该 PR 所完成的功能。接下来等待 review ，如果有需要修改的地方，参照上述步骤更新 origin 中的对应分支即可。
 
@@ -214,10 +214,10 @@ git push origin :new_branch
 * 删除本地分支
 
 ```shell
-# 切换到develop分支，否则无法删除当前分支
+# 切换到 develop 分支，否则无法删除当前分支
 git checkout develop
 
-# 删除new_branch分支
+# 删除 new_branch 分支
 git branch -D new_branch
 ```
 
@@ -228,7 +228,7 @@ git branch -D new_branch
 
 1）请保证 Travis-CI 中单元测试能顺利通过。如果没过，说明提交的代码存在问题，官方维护人员一般不做评审。
 
-2）提交 Pull Reques t前：
+2）提交 Pull Request 前：
 
 请注意 commit 的数量。
 

@@ -8,7 +8,7 @@
 
 * [1. 环境配置](#环境配置)
 * [2. 图像识别体验](#图像识别体验)
-  * [2.1 下载、解压inference 模型与demo数据](#2.1)
+  * [2.1 下载、解压 inference 模型与 demo 数据](#2.1)
   * [2.2 瓶装饮料识别与检索](#瓶装饮料识别与检索)
     * [2.2.1 识别单张图像](#识别单张图像)
     * [2.2.2 基于文件夹的批量识别](#基于文件夹的批量识别)
@@ -22,7 +22,7 @@
 
 ## 1. 环境配置
 
-* 安装：请先参考 [Paddle安装教程](../installation/install_paddle.md) 以及 [PaddleClas安装教程](../installation/install_paddleclas.md) 配置 PaddleClas 运行环境。
+* 安装：请先参考 [Paddle 安装教程](../installation/install_paddle.md) 以及 [PaddleClas 安装教程](../installation/install_paddleclas.md) 配置 PaddleClas 运行环境。
 
 * 进入 `deploy` 运行目录。本部分所有内容与命令均需要在 `deploy` 目录下运行，可以通过下面的命令进入 `deploy` 目录。
 
@@ -38,7 +38,7 @@
 
 <a name="轻量级通用主体检测模型与轻量级通用识别模型"></a>
 
-| 模型简介       | 推荐场景   | inference模型  | 预测配置文件  | 构建索引库的配置文件 |
+| 模型简介       | 推荐场景   | inference 模型  | 预测配置文件  | 构建索引库的配置文件 |
 | ------------  | ------------- | -------- | ------- | -------- |
 | 轻量级通用主体检测模型 | 通用场景  |[tar 格式文件下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/inference/picodet_PPLCNet_x2_5_mainbody_lite_v1.0_infer.tar) [zip 格式文件下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/inference/picodet_PPLCNet_x2_5_mainbody_lite_v1.0_infer.zip) | - | - |
 | 轻量级通用识别模型 | 通用场景  | [tar 格式下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/inference/general_PPLCNet_x2_5_lite_v1.0_infer.tar) [zip 格式文件下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/inference/general_PPLCNet_x2_5_lite_v1.0_infer.zip) | [inference_general.yaml](../../../deploy/configs/inference_general.yaml) | [build_general.yaml](../../../deploy/configs/build_general.yaml) |
@@ -58,7 +58,7 @@
 ```shell
 # 安装 homebrew
 ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)";
-# 安装wget
+# 安装 wget
 brew install wget
 ```
 
@@ -70,11 +70,11 @@ brew install wget
 ```shell
 mkdir models
 cd models
-# 下载识别inference模型并解压
+# 下载识别 inference 模型并解压
 wget {模型下载链接地址} && tar -xf {压缩包的名称}
 cd ..
 
-# 下载demo数据并解压
+# 下载 demo 数据并解压
 wget {数据下载链接地址} && tar -xf {压缩包的名称}
 ```
 
@@ -153,9 +153,9 @@ pip install faiss-cpu==1.7.1post2
 运行下面的命令，对图像 `./drink_dataset_v1.0/test_images/nongfu_spring.jpeg` 进行识别与检索
 
 ```shell
-# 使用下面的命令使用GPU进行预测
+# 使用下面的命令使用 GPU 进行预测
 python3.7 python/predict_system.py -c configs/inference_general.yaml
-# 使用下面的命令使用CPU进行预测
+# 使用下面的命令使用 CPU 进行预测
 python3.7 python/predict_system.py -c configs/inference_general.yaml -o Global.use_gpu=False
 ```
 
@@ -187,7 +187,7 @@ python3.7 python/predict_system.py -c configs/inference_general.yaml -o Global.u
 如果希望预测文件夹内的图像，可以直接修改配置文件中的 `Global.infer_imgs` 字段，也可以通过下面的 `-o` 参数修改对应的配置。
 
 ```shell
-# 使用下面的命令使用GPU进行预测，如果希望使用CPU预测，可以在命令后面添加 -o Global.use_gpu=False
+# 使用下面的命令使用 GPU 进行预测，如果希望使用 CPU 预测，可以在命令后面添加 -o Global.use_gpu=False
 python3.7 python/predict_system.py -c configs/inference_general.yaml -o Global.infer_imgs="./drink_dataset_v1.0/test_images/"
 ```
 
@@ -290,14 +290,14 @@ python3.7 python/predict_system.py -c configs/inference_general.yaml -o Global.i
 
 目前，我们更推荐您使用[轻量级通用主体检测模型与轻量级通用识别模型](#轻量级通用主体检测模型与轻量级通用识别模型)，以获得更好的测试结果。但是如果您希望体验服务端识别模型，服务器端通用主体检测模型与各方向识别模型、测试数据下载地址以及对应的配置文件地址如下。
 
-| 模型简介       | 推荐场景   | inference模型  | 预测配置文件  | 构建索引库的配置文件 |
+| 模型简介       | 推荐场景   | inference 模型  | 预测配置文件  | 构建索引库的配置文件 |
 | ------------  | ------------- | -------- | ------- | -------- |
 | 通用主体检测模型 | 通用场景  |[模型下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/inference/ppyolov2_r50vd_dcn_mainbody_v1.0_infer.tar) | - | - |
-| Logo 识别模型 | Logo场景  | [模型下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/inference/logo_rec_ResNet50_Logo3K_v1.0_infer.tar) | [inference_logo.yaml](../../../deploy/configs/inference_logo.yaml) | [build_logo.yaml](../../../deploy/configs/build_logo.yaml) |
+| Logo 识别模型 | Logo 场景  | [模型下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/inference/logo_rec_ResNet50_Logo3K_v1.0_infer.tar) | [inference_logo.yaml](../../../deploy/configs/inference_logo.yaml) | [build_logo.yaml](../../../deploy/configs/build_logo.yaml) |
 | 动漫人物识别模型 | 动漫人物场景  | [模型下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/inference/cartoon_rec_ResNet50_iCartoon_v1.0_infer.tar) | [inference_cartoon.yaml](../../../deploy/configs/inference_cartoon.yaml) | [build_cartoon.yaml](../../../deploy/configs/build_cartoon.yaml) |
 | 车辆细分类模型 | 车辆场景  |  [模型下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/inference/vehicle_cls_ResNet50_CompCars_v1.0_infer.tar) | [inference_vehicle.yaml](../../../deploy/configs/inference_vehicle.yaml) | [build_vehicle.yaml](../../../deploy/configs/build_vehicle.yaml) |
 | 商品识别模型 | 商品场景  |  [模型下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/inference/product_ResNet50_vd_aliproduct_v1.0_infer.tar) | [inference_product.yaml](../../../deploy/configs/inference_product.yaml) | [build_product.yaml](../../../deploy/configs/build_product.yaml) |
-| 车辆ReID模型 | 车辆ReID场景 | [模型下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/inference/vehicle_reid_ResNet50_VERIWild_v1.0_infer.tar) | - | - |
+| 车辆 ReID 模型 | 车辆 ReID 场景 | [模型下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/inference/vehicle_reid_ResNet50_VERIWild_v1.0_infer.tar) | - | - |
 
 ```shell
 cd PaddleClas/deploy/
@@ -315,7 +315,7 @@ wget {识别模型下载链接地址} && tar -xf {压缩包的名称}
 使用如下命令下载各方向识别模型的测试数据：
 
 ```shell
-# 回到deploy目录下
+# 回到 deploy 目录下
 cd ..
 # 下载测试数据并解压
 wget https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/data/recognition_demo_data_en_v1.1.tar && tar -xf recognition_demo_data_en_v1.1.tar
