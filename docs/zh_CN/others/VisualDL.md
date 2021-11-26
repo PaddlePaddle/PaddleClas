@@ -43,7 +43,7 @@ python3 tools/train.py -c config.yaml
  visualdl --logdir ./output/vdl/
  ```
 
-上述命令中，参数`--logdir`用于指定保存 VisualDL 日志的目录，VisualDL 将遍历并且迭代寻找指定目录的子目录，将所有实验结果进行可视化。也同样可以使用下述参数设定 VisualDL 服务的 ip 及端口号：
+上述命令中，参数`--logdir` 用于指定保存 VisualDL 日志的目录，VisualDL 将遍历并且迭代寻找指定目录的子目录，将所有实验结果进行可视化。也同样可以使用下述参数设定 VisualDL 服务的 ip 及端口号：
 * `--host`：设定 IP，默认为 127.0.0.1
 * `--port`：设定端口，默认为 8040
 

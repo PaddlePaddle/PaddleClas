@@ -37,7 +37,7 @@ train/99/Ovenbird_0128_93366.jpg 99 6
 ...
 ```
 
-验证数据集(`CUB_200_2011`中既是 gallery dataset，也是 query dataset) `test_list.txt` 文件内容格式如下所示：
+验证数据集(`CUB_200_2011` 中既是 gallery dataset，也是 query dataset)`test_list.txt` 文件内容格式如下所示：
 
 ```shell
 # 采用"空格"作为分隔符号
@@ -52,9 +52,9 @@ test/200/Common_Yellowthroat_0114_190501.jpg 200 6
 
 **注意**：
 
-1.当 gallery dataset 和 query dataset 相同时，为了去掉检索得到的第一个数据（检索图片本身无须评估），每个数据需要对应一个 unique id（每张图片的 id 不同即可，可以用行号来表示 unique id），用于后续评测 mAP、recall@1 等指标。yaml 配置文件的数据集选用`VeriWild`。
+1.当 gallery dataset 和 query dataset 相同时，为了去掉检索得到的第一个数据（检索图片本身无须评估），每个数据需要对应一个 unique id（每张图片的 id 不同即可，可以用行号来表示 unique id），用于后续评测 mAP、recall@1 等指标。yaml 配置文件的数据集选用 `VeriWild`。
 
-2.当 gallery dataset 和 query dataset 不同时，无需增加 unique id，`query_list.txt` 和`gallery_list.txt` 均为两列，分别是训练数据的路径、训练数据的 label 信息。yaml 配置文件的数据集选用`ImageNetDataset`。
+2.当 gallery dataset 和 query dataset 不同时，无需增加 unique id，`query_list.txt` 和 `gallery_list.txt` 均为两列，分别是训练数据的路径、训练数据的 label 信息。yaml 配置文件的数据集选用 `ImageNetDataset`。
 
 <a name="2"></a>
 ## 2. 图像识别任务常见数据集介绍
@@ -88,7 +88,7 @@ Cars 数据集包含了 196 类汽车的 16185 张图像。数据被分成 8144 
 
     地址： http://challenge.ai.iqiyi.com/detail?raceId=5def69ace9fcf68aef76a75d
 
-+ Manga109： Manga109 是 2020.5 月发布的一个用于研究卡通人物检测和识别的数据集，其包含 21142 张图片，官方不允许用于商用。该数据集旗下的子集 Manga109-s，可以供工业使用， 主要用于文本检测、基于线稿的任务检索、角色图像生成等任务。
++ Manga109： Manga109 是 2020.5 月发布的一个用于研究卡通人物检测和识别的数据集，其包含 21142 张图片，官方不允许用于商用。该数据集旗下的子集 Manga109-s，可以供工业使用，主要用于文本检测、基于线稿的任务检索、角色图像生成等任务。
 
     地址：http://www.manga109.org/en/
 
@@ -98,7 +98,7 @@ Cars 数据集包含了 196 类汽车的 16185 张图像。数据被分成 8144 
 
 <a name="2.2.2"></a>
 #### 2.2.2 商品识别
-+ AliProduct: AliProduct 数据集是目前开源最大的商品数据集，它是一个 SKU 级别的图像分类数据集， 包含 5 万类别、300 万张商品图像，商品图像的类别和总量均为业界之最。此数据集中涵盖了大量的生活用品、食物等，数据集中没有人工标注，数据较脏，数据分布较不均衡，且有很多相似的商品图片。
++ AliProduct: AliProduct 数据集是目前开源最大的商品数据集，它是一个 SKU 级别的图像分类数据集，包含 5 万类别、300 万张商品图像，商品图像的类别和总量均为业界之最。此数据集中涵盖了大量的生活用品、食物等，数据集中没有人工标注，数据较脏，数据分布较不均衡，且有很多相似的商品图片。
 
     地址:  https://retailvisionworkshop.github.io/recognition_challenge_2020/
 
@@ -114,7 +114,7 @@ Cars 数据集包含了 196 类汽车的 16185 张图像。数据被分成 8144 
 
     地址： https://github.com/msn199959/Logo-2k-plus-Dataset
 
-+ Tsinghua-Tencent 100K： 该数据集是从 10 万张腾讯街景全景图中创建的一个大型交通标志基准数据集。它提供包含 30000 个交通标志实例的 100000 张图像。这些图像涵盖了照度和天气条件的巨大变化。基准测试中的每个交通标志都标注了类别标签、边界框和像素掩码。 它总共包含 222 个类别 (0 background + 221 traffic signs)
++ Tsinghua-Tencent 100K： 该数据集是从 10 万张腾讯街景全景图中创建的一个大型交通标志基准数据集。它提供包含 30000 个交通标志实例的 100000 张图像。这些图像涵盖了照度和天气条件的巨大变化。基准测试中的每个交通标志都标注了类别标签、边界框和像素掩码。 它总共包含 222 个类别(0 background + 221 traffic signs)
 
     地址： https://cg.cs.tsinghua.edu.cn/traffic-sign/
 <a name="2.2.4"></a>

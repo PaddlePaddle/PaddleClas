@@ -18,7 +18,7 @@
 - [8. HRNet 系列](#8)
 - [9. Inception 系列](#9)
 - [10. EfficientNet 与 ResNeXt101_wsl 系列](#10)
-- [11. ResNeSt 与 RegNet系列](#11)
+- [11. ResNeSt 与 RegNet 系列](#11)
 - [12. ViT_and_DeiT 系列](#12)
 - [13. RepVGG 系列](#13)
 - [14. MixNet 系列](#14)
@@ -100,7 +100,7 @@
 
 
 
-* 注: `Reference Top-1 Acc`表示 PaddleClas 基于 ImageNet1k 数据集训练得到的预训练模型精度。
+* 注: `Reference Top-1 Acc` 表示 PaddleClas 基于 ImageNet1k 数据集训练得到的预训练模型精度。
 
 <a name="3"></a>
 
@@ -312,7 +312,7 @@ EfficientNet 与 ResNeXt101_wsl 系列模型的精度、速度指标如下表所
 
 <a name="11"></a>
 
-## 11. ResNeSt 与 RegNet系列
+## 11. ResNeSt 与 RegNet 系列
 
 ResNeSt 与 RegNet 系列模型的精度、速度指标如下表所示，更多关于该系列的模型介绍可以参考：[ResNeSt 与 RegNet 系列模型文档](../models/ResNeSt_RegNet.md)。
 
@@ -506,7 +506,7 @@ ViT(Vision Transformer) 与 DeiT（Data-efficient Image Transformers）系列模
 | ---------- | --------- | --------- | ---------------- | ---------------- | -------- | --------- | ------------------------------------------------------------ |
 | TNT_small | 0.8121   |0.9563  |                  |                  | 5.2   |  23.8    | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/TNT_small_pretrained.pdparams) |               |  
 
-**注**：TNT 模型的数据预处理部分`NormalizeImage`中的`mean`与`std`均为 0.5。
+**注**：TNT 模型的数据预处理部分 `NormalizeImage` 中的 `mean` 与 `std` 均为 0.5。
 
 <a name="23"></a>
 

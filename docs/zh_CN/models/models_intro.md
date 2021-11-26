@@ -319,7 +319,7 @@
 
 
 
-**注意**：以上模型中 EfficientNetB1-B7 的预训练模型转自[pytorch版 EfficientNet](https://github.com/lukemelas/EfficientNet-PyTorch)，ResNeXt101_wsl 系列预训练模型转自[官方 repo](https://github.com/facebookresearch/WSL-Images)，剩余预训练模型均基于飞桨训练得到的，并在 configs 里给出了相应的训练超参数。
+**注意**：以上模型中 EfficientNetB1-B7 的预训练模型转自[pytorch 版 EfficientNet](https://github.com/lukemelas/EfficientNet-PyTorch)，ResNeXt101_wsl 系列预训练模型转自[官方 repo](https://github.com/facebookresearch/WSL-Images)，剩余预训练模型均基于飞桨训练得到的，并在 configs 里给出了相应的训练超参数。
 
 <a name='4'></a>
 

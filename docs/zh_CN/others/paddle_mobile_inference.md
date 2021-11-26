@@ -15,7 +15,7 @@
 
 [Paddle-Lite](https://github.com/PaddlePaddle/Paddle-Lite) 是飞桨推出的一套功能完善、易用性强且性能卓越的轻量化推理引擎。
 轻量化体现在使用较少比特数用于表示神经网络的权重和激活，能够大大降低模型的体积，解决终端设备存储空间有限的问题，推理性能也整体优于其他框架。
-[PaddleClas](https://github.com/PaddlePaddle/PaddleClas) 使用 Paddle-Lite 进行了[移动端模型的性能评估](../models/Mobile.md)，本部分以`ImageNet1k`数据集的`MobileNetV1`模型为例，介绍怎样使用`Paddle-Lite`，在移动端(基于骁龙855 的安卓开发平台)对进行模型速度评估。
+[PaddleClas](https://github.com/PaddlePaddle/PaddleClas) 使用 Paddle-Lite 进行了[移动端模型的性能评估](../models/Mobile.md)，本部分以 `ImageNet1k` 数据集的 `MobileNetV1` 模型为例，介绍怎样使用 `Paddle-Lite`，在移动端(基于骁龙855的安卓开发平台)对进行模型速度评估。
 
  <a name='2'></a>
 
@@ -25,7 +25,7 @@
 
 ### 2.1 导出 inference 模型
 
-* 首先需要将训练过程中保存的模型存储为用于预测部署的固化模型，可以使用`tools/export_model.py`导出 inference 模型，具体使用方法如下。
+* 首先需要将训练过程中保存的模型存储为用于预测部署的固化模型，可以使用 `tools/export_model.py` 导出 inference 模型，具体使用方法如下。
 
 ```shell
 python tools/export_model.py \
@@ -70,7 +70,7 @@ PC 端和手机连接成功后，使用下面的命令开始模型评估。
 sh deploy/lite/benchmark/benchmark.sh ./benchmark_bin_v8 ./inference result_armv8.txt true
 ```
 
-其中 `./benchmark_bin_v8` 为 benchmark 二进制文件路径，`./inference` 为所有需要评测的模型的路径，`result_armv8.txt`为保存的结果文件，最后的参数`true`表示在评估之后会首先进行模型优化。最终在当前文件夹下会输出`result_armv8.txt`的评估结果文件，具体信息如下。
+其中 `./benchmark_bin_v8` 为 benchmark 二进制文件路径，`./inference` 为所有需要评测的模型的路径，`result_armv8.txt` 为保存的结果文件，最后的参数 `true` 表示在评估之后会首先进行模型优化。最终在当前文件夹下会输出 `result_armv8.txt` 的评估结果文件，具体信息如下。
 
 ```
 PaddleLite Benchmark
@@ -84,7 +84,7 @@ Threads=4 Warmup=10 Repeats=30
 MobileNetV1                           min = 10.03200    max = 9.94300     average = 9.97627
 ```
 
-这里给出了不同线程数下的模型预测速度，单位为 FPS，以线程数为 1 为例，MobileNetV1 在骁龙855 上的平均速度为 `30.79750FPS`。
+这里给出了不同线程数下的模型预测速度，单位为 FPS，以线程数为 1 为例，MobileNetV1 在骁龙855上的平均速度为 `30.79750FPS`。
 
 <a name='2.4'></a>
 
@@ -132,6 +132,6 @@ Threads=4 Warmup=10 Repeats=30
 MobileNetV1_lite              min = 10.00600    max = 9.90000     average = 9.96177
 ```
 
-以线程数为 1 为例，MobileNetV1 在骁龙855 上的平均速度为`30.84173 ms`。
+以线程数为 1 为例，MobileNetV1 在骁龙855上的平均速度为 `30.84173 ms`。
 
 更加具体的参数解释与 Paddle-Lite 使用方法可以参考 [Paddle-Lite 文档](https://paddle-lite.readthedocs.io/zh/latest/)。
