@@ -215,8 +215,6 @@ python tools/infer.py -c configs/ppyolo/ppyolov2_r50vd_dcn_365e_coco.yml --infer
 
 <a name="3.6"></a> 
 
-<a name="3.6"></a> 
-
 ### 3.6 模型导出与预测部署。
 
 执行导出模型脚本：

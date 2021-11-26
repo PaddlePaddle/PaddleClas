@@ -97,9 +97,9 @@ paddle_inference_install_dir
 * `CMAKE_BACKWARDS_COMPATIBILITY` 的值请根据自己 `cmake` 版本设置，`cmake` 版本可以通过命令：`cmake --version` 查询；
 * `CUDA_LIB` 、 `CUDNN_LIB` 的值仅需在使用 **GPU 版本**预测库时指定，其中 CUDA 库版本尽量对齐，**使用 9.0、10.0 版本，不使用 9.2、10.1 等版本 CUDA 库**；
 * 在设置 `CUDA_LIB`、`CUDNN_LIB`、`OPENCV_DIR`、`PADDLE_LIB` 时，点击 `浏览`，分别设置相应的路径；
-   * `CUDA_LIB`和`CUDNN_LIB`：该路径取决于 CUDA 与 CUDNN 的安装位置。
-   * `OpenCV_DIR`：该路径下需要有`.cmake`文件，一般为`opencv/build/`；
-   * `PADDLE_LIB`：该路径下需要有`CMakeCache.txt`文件，一般为`paddle_inference_install_dir/`。
+   * `CUDA_LIB` 和 `CUDNN_LIB`：该路径取决于 CUDA 与 CUDNN 的安装位置。
+   * `OpenCV_DIR`：该路径下需要有`.cmake` 文件，一般为 `opencv/build/`；
+   * `PADDLE_LIB`：该路径下需要有 `CMakeCache.txt` 文件，一般为 `paddle_inference_install_dir/`。
 * 在使用 `CPU` 版预测库时，请不要勾选 `WITH_GPU` - `保存到 JSON`。
 
 ![step4](../../images/inference_deployment/vs2019_step5.png)

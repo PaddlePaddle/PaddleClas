@@ -19,10 +19,14 @@
   - [2.3 模型训练](#2.3)
   - [2.4 模型评估](#2.4)
 <<<<<<< HEAD
+<<<<<<< HEAD
 - [3. 使用方法介绍](#3)
 =======
 - [3. 使用方法介绍](#3)  
 >>>>>>> add menu and modify documentation
+=======
+- [3. 使用方法介绍](#3)
+>>>>>>> fix some missing space between characters, remove extra space
   - [3.1 基于 CPU /单卡 GPU 上的训练与评估](#3.1)
       - [3.1.1 模型训练](#3.1.1)
       - [3.1.2 模型微调](#3.1.2)
