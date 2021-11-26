@@ -194,7 +194,7 @@ wget https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/data/drink_da
 ```
 <a name="4.2"></a>
 ## 4.2 服务部署和请求
-**注意:**  识别服务涉及到多个模型，出于性能考虑采用 PipeLine 部署方式。Pipeline 部署方式当前不支持 windows 平台。
+**注意:** 识别服务涉及到多个模型，出于性能考虑采用 PipeLine 部署方式。Pipeline 部署方式当前不支持 windows 平台。
 - 进入到工作目录
 ```shell
 cd ./deploy/paddleserving/recognition
