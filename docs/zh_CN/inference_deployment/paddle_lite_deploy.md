@@ -4,8 +4,8 @@
 本教程将介绍基于[Paddle Lite](https://github.com/PaddlePaddle/Paddle-Lite)在移动端部署 PaddleClas 分类模型的详细步骤。识别模型的部署将在近期支持，敬请期待。
 
 Paddle Lite是飞桨轻量化推理引擎，为手机、IOT端提供高效推理能力，并广泛整合跨平台硬件，为端侧部署及应用落地问题提供轻量化的部署方案。
-<!-- TODO(gaotingquan): 下述 benchmark 文档在新文档结构中缺失 -->
-<!-- 如果希望直接测试速度，可以参考[Paddle-Lite移动端benchmark测试教程](../../docs/zh_CN/extension/paddle_mobile_inference.md)。 -->
+
+如果希望直接测试速度，可以参考[Paddle-Lite移动端benchmark测试教程](../others/paddle_mobile_inference.md)。
 
 ---
 
@@ -58,9 +58,7 @@ cd Paddle-Lite
 git checkout develop
 ./lite/tools/build_android.sh  --arch=armv8  --with_cv=ON --with_extra=ON
 ```
-<!-- TODO(gaotingquan): 需要与lite同学确认，该编译选项是否需要更新：with_cv with_extra， -->
-<!-- https://paddle-lite.readthedocs.io/zh/latest/source_compile/compile_options.html -->
-**注意**：编译Paddle-Lite获得预测库时，需要打开`--with_cv=ON --with_extra=ON`两个选项，`--arch`表示`arm`版本，这里指定为armv8，更多编译命令介绍请参考[链接](https://paddle-lite.readthedocs.io/zh/latest/user_guides/Compile/Android.html#id2)。
+**注意**：编译Paddle-Lite获得预测库时，需要打开`--with_cv=ON --with_extra=ON`两个选项，`--arch`表示`arm`版本，这里指定为armv8，更多编译命令介绍请参考[Linux x86 环境下编译适用于 Android 的库](https://paddle-lite.readthedocs.io/zh/latest/source_compile/linux_x86_compile_android.html)，关于其他平台的编译操作，具体请参考[PaddleLite](https://paddle-lite.readthedocs.io/zh/latest/)中`源码编译`部分。
 
 直接下载预测库并解压后，可以得到`inference_lite_lib.android.armv8/`文件夹，通过编译Paddle-Lite得到的预测库位于`Paddle-Lite/build.lite.android.armv8.gcc/inference_lite_lib.android.armv8/`文件夹下。
 预测库的文件目录如下：

@@ -29,11 +29,11 @@
 
 | 模型      | 模型结构   | 预训练模型下载地址   | inference模型下载地址  | mAP | inference模型大小(MB) | 单张图片预测耗时(不包含预处理)(ms) |
 | :------------:  | :-------------: | :------: | :-------: | :--------: | :-------: | :--------: |
-| 轻量级主体检测模型 | PicoDet | [地址](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/pretrain/picodet_PPLCNet_x2_5_mainbody_lite_v1.0_pretrained.pdparams) | [地址](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/inference/picodet_PPLCNet_x2_5_mainbody_lite_v1.0_infer.tar) | 40.1% | 30.1 | 29.8  |
-| 服务端主体检测模型 | PP-YOLOv2 | [地址](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/pretrain/ppyolov2_r50vd_dcn_mainbody_v1.0_pretrained.pdparams) | [地址](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/inference/ppyolov2_r50vd_dcn_mainbody_v1.0_infer.tar) | 42.5% | 210.5 | 466.6  |
-
+| 轻量级主体检测模型 | PicoDet | [地址](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/pretrain/picodet_PPLCNet_x2_5_mainbody_lite_v1.0_pretrained.pdparams) | [tar 格式文件地址](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/inference/picodet_PPLCNet_x2_5_mainbody_lite_v1.0_infer.tar) [zip 格式文件地址](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/inference/picodet_PPLCNet_x2_5_mainbody_lite_v1.0_infer.zip) | 40.1% | 30.1 | 29.8  |
+| 服务端主体检测模型 | PP-YOLOv2 | [地址](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/pretrain/ppyolov2_r50vd_dcn_mainbody_v1.0_pretrained.pdparams) | [tar 格式文件地址](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/inference/ppyolov2_r50vd_dcn_mainbody_v1.0_infer.tar) [zip 格式文件地址](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/inference/ppyolov2_r50vd_dcn_mainbody_v1.0_infer.zip) | 42.5% | 210.5 | 466.6  |
 
 * 注意
+  * 由于部分解压缩软件在解压上述 `tar` 格式文件时存在问题，建议非命令行用户下载 `zip` 格式文件并解压。`tar` 格式文件建议使用命令 `tar xf xxx.tar` 解压。
   * 速度评测机器的CPU具体信息为：`Intel(R) Xeon(R) Gold 6148 CPU @ 2.40GHz`，速度指标为开启 mkldnn ，线程数设置为 10 测试得到。
   * 主体检测的预处理过程较为耗时，平均每张图在上述机器上的时间在 40~55 ms 左右，没有包含在上述的预测耗时统计中。
 
@@ -51,7 +51,7 @@ PicoDet 由 [PaddleDetection](https://github.com/PaddlePaddle/PaddleDetection) �
 
 更多关于 PicoDet 的优化细节与 benchmark 可以参考 [PicoDet 系列模型介绍](https://github.com/PaddlePaddle/PaddleDetection/blob/develop/configs/picodet/README.md)。
 
-在轻量级主体检测任务中，为了更好地兼顾检测速度与效果，我们使用 PPLCNet_x2_5 作为主体检测模型的骨干网络，同时将训练与预测的图像尺度修改为了 640x640，其余配置与 [picodet_m_shufflenetv2_416_coco.yml](https://github.com/PaddlePaddle/PaddleDetection/blob/develop/configs/picodet/picodet_m_shufflenetv2_416_coco.yml)完全一致。将数据集更换为自定义的主体检测数据集，进行训练，最终得到检测模型。
+在轻量级主体检测任务中，为了更好地兼顾检测速度与效果，我们使用 PPLCNet_x2_5 作为主体检测模型的骨干网络，同时将训练与预测的图像尺度修改为了 640x640，其余配置与 [picodet_lcnet_1_5x_416_coco.yml](https://github.com/PaddlePaddle/PaddleDetection/blob/develop/configs/picodet/more_config/picodet_lcnet_1_5x_416_coco.yml)完全一致。将数据集更换为自定义的主体检测数据集，进行训练，最终得到检测模型。
 
 
 ### 2.2 服务端主体检测模型
@@ -203,7 +203,7 @@ python tools/export_model.py -c configs/ppyolo/ppyolov2_r50vd_dcn_365e_coco.yml 
 
 导出模型之后，在主体检测与识别任务中，就可以将检测模型的路径更改为该 inference 模型路径，完成预测。
 
-以商品识别为例，其配置文件为 [inference_product.yaml](../../../deploy/configs/inference_product.yaml) ，修改其中的 `Global.det_inference_model_dir` 字段为导出的主体检测 inference 模型目录，参考[图像识别快速开始教程](../tutorials/quick_start_recognition.md) ，即可完成商品检测与识别过程。
+以商品识别为例，其配置文件为 [inference_product.yaml](../../../deploy/configs/inference_product.yaml) ，修改其中的 `Global.det_inference_model_dir` 字段为导出的主体检测 inference 模型目录，参考[图像识别快速开始教程](../quick_start/quick_start_recognition.md) ，即可完成商品检测与识别过程。
 
 
 ### FAQ
