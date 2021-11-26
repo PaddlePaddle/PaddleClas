@@ -1,9 +1,9 @@
-# ESNet系列
+# ESNet 系列
 ---
 ## 目录
 
 * [1. 概述](#)
-* [2. 精度、FLOPs和参数量](#FLOPs)
+* [2. 精度、FLOPs 和参数量](#FLOPs)
 
 <a name='1'></a>
 
@@ -13,7 +13,7 @@ ESNet(Enhanced ShuffleNet)是百度自研的一个轻量级网络，该网络在
 
 <a name='2'></a>
 
-## 2.精度、FLOPs和参数量
+## 2.精度、FLOPs 和参数量
 
 | Models | Top1 | Top5 | FLOPs<br>(M) | Params<br/>(M) |
 |:--:|:--:|:--:|:--:|:--:|

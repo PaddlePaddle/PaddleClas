@@ -261,7 +261,7 @@ batch_transform_ops 中参数的含义：
 
 2.`BackboneStopLayer.name` 的获取方式可以通过将模型可视化后获取，可视化方式可以参考 [Netron](https://github.com/lutzroeder/netron) 或者 [visualdl](https://github.com/PaddlePaddle/VisualDL)。
 
-3.调用 `tools/export_model.py` 会将模型的权重转为 inference model，其中 `infer_add_softmax` 参数会控制是否在其后增加 `Softmax` 激活函数，代码中默认为 `True`（分类任务中最后的输出层会接`Softmax`激活函数），识别任务中特征层无须接激活函数，此处要设置为 `False`。
+3.调用 `tools/export_model.py` 会将模型的权重转为 inference model，其中 `infer_add_softmax` 参数会控制是否在其后增加 `Softmax` 激活函数，代码中默认为 `True`（分类任务中最后的输出层会接 `Softmax` 激活函数），识别任务中特征层无须接激活函数，此处要设置为 `False`。
 
 <a name="3.2"></a>
 #### 3.2 评估指标(Metric)

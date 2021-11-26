@@ -13,7 +13,7 @@
 
 ResNet 系列模型是在 2015 年提出的，一举在 ILSVRC2015 比赛中取得冠军，top5 错误率为 3.57%。该网络创新性的提出了残差结构，通过堆叠多个残差结构从而构建了 ResNet 网络。实验表明使用残差块可以有效地提升收敛速度和精度。
 
-斯坦福大学的 Joyce Xu 将 ResNet 称为「真正重新定义了我们看待神经网络的方式」的三大架构之一。由于 ResNet 卓越的性能，越来越多的来自学术界和工业界学者和工程师对其结构进行了改进，比较出名的有 Wide-ResNet, ResNet-vc ,ResNet-vd, Res2Net 等，其中 ResNet-vc 与 ResNet-vd 的参数量和计算量与 ResNet 几乎一致，所以在此我们将其与 ResNet 统一归为 ResNet 系列。
+斯坦福大学的 Joyce Xu 将 ResNet 称为「真正重新定义了我们看待神经网络的方式」的三大架构之一。由于 ResNet 卓越的性能，越来越多的来自学术界和工业界学者和工程师对其结构进行了改进，比较出名的有 Wide-ResNet, ResNet-vc,ResNet-vd, Res2Net 等，其中 ResNet-vc 与 ResNet-vd 的参数量和计算量与 ResNet 几乎一致，所以在此我们将其与 ResNet 统一归为 ResNet 系列。
 
 本次发布 ResNet 系列的模型包括 ResNet50，ResNet50_vd，ResNet50_vd_ssld，ResNet200_vd 等 14 个预训练模型。在训练层面上，ResNet 的模型采用了训练 ImageNet 的标准训练流程，而其余改进版模型采用了更多的训练策略，如 learning rate 的下降方式采用了 cosine decay，引入了 label smoothing 的标签正则方式，在数据预处理加入了 mixup 的操作，迭代总轮数从 120 个 epoch 增加到 200 个 epoch。
 
@@ -56,7 +56,7 @@ ResNet 系列模型是在 2015 年提出的，一举在 ILSVRC2015 比赛中取�
 | Fix_ResNet50_vd_ssld_v2 | 0.840           | 0.970           |                          |                          | 17.696     | 25.580    |
 | ResNet101_vd_ssld | 0.837           | 0.967           |                          |                          | 16.100    | 44.570     |
 
-* 注：`ResNet50_vd_ssld_v2`是在`ResNet50_vd_ssld`训练策略的基础上加上 AutoAugment 训练得到，`Fix_ResNet50_vd_ssld_v2`是固定`ResNet50_vd_ssld_v2`除 FC 层外所有的网络参数，在 320x320 的图像输入分辨率下，基于 ImageNet1k 数据集微调得到。
+* 注：`ResNet50_vd_ssld_v2` 是在 `ResNet50_vd_ssld` 训练策略的基础上加上 AutoAugment 训练得到，`Fix_ResNet50_vd_ssld_v2` 是固定 `ResNet50_vd_ssld_v2` 除 FC 层外所有的网络参数，在 320x320 的图像输入分辨率下，基于 ImageNet1k 数据集微调得到。
 
 
 <a name='3'></a>

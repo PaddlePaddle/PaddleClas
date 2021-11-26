@@ -17,7 +17,7 @@
 
 ## 1. 简介
 
-特征提取是图像识别中的关键一环，它的作用是将输入的图片转化为固定维度的特征向量，用于后续的[向量检索](./vector_search.md)。好的特征需要具备相似度保持性，即在特征空间中，相似度高的图片对其特征相似度要比较高（距离比较近），相似度低的图片对，其特征相似度要比较小（距离比较远）。[Deep Metric Learning](../algorithm_introduction/metric_learning.md) 用以研究如何通过深度学习的方法获得具有强表征能力的特征。
+特征提取是图像识别中的关键一环，它的作用是将输入的图片转化为固定维度的特征向量，用于后续的[向量检索](./vector_search.md)。好的特征需要具备相似度保持性，即在特征空间中，相似度高的图片对其特征相似度要比较高（距离比较近），相似度低的图片对，其特征相似度要比较小（距离比较远）。[Deep Metric Learning](../algorithm_introduction/metric_learning.md)用以研究如何通过深度学习的方法获得具有强表征能力的特征。
 
 <a name="2"></a> 
 
@@ -26,16 +26,16 @@
 ![](../../images/feature_extraction_framework.png)
 图中各个模块的功能为:
 
-- **Backbone**:   指定所使用的骨干网络。 值得注意的是，PaddleClas 提供的基于 ImageNet 的预训练模型，最后一层的输出为 1000， 我们需要依据所需的特征维度定制最后一层的输出。
+- **Backbone**:   指定所使用的骨干网络。 值得注意的是，PaddleClas 提供的基于 ImageNet 的预训练模型，最后一层的输出为 1000，我们需要依据所需的特征维度定制最后一层的输出。
 - **Neck**:  用以特征增强及特征维度变换。  这儿的 Neck，可以是一个简单的 Linear Layer，用来做特征维度变换；也可以是较复杂的 FPN 结构，用以做特征增强。
 - **Head**:  用来将 feature 转化为 logits。 除了常用的 Fc Layer 外，还可以替换为 cosmargin, arcmargin, circlemargin 等模块。
-- **Loss**:  指定所使用的 Loss 函数。  我们将 Loss 设计为组合 loss 的形式， 可以方便得将 Classification Loss 和 Pair_wise Loss 组合在一起。
+- **Loss**:  指定所使用的 Loss 函数。  我们将 Loss 设计为组合 loss 的形式，可以方便得将 Classification Loss 和 Pair_wise Loss 组合在一起。
 
 <a name="3"></a> 
 
 ## 3. 通用识别模型
 
-在 PP-Shitu 中, 我们采用 [PP_LCNet_x2_5](../models/PP-LCNet.md) 作为骨干网络， Neck 部分选用 Linear Layer, Head 部分选用 [ArcMargin](../../../ppcls/arch/gears/arcmargin.py)， Loss 部分选用 CELoss，详细的配置文件见[通用识别配置文件](../../../ppcls/configs/GeneralRecognition/GeneralRecognition_PPLCNet_x2_5.yaml)。其中，训练数据为如下 7 个公开数据集的汇总：
+在 PP-Shitu 中, 我们采用 [PP_LCNet_x2_5](../models/PP-LCNet.md) 作为骨干网络 Neck 部分选用 Linear Layer, Head 部分选用 [ArcMargin](../../../ppcls/arch/gears/arcmargin.py)，Loss 部分选用 CELoss，详细的配置文件见[通用识别配置文件](../../../ppcls/configs/GeneralRecognition/GeneralRecognition_PPLCNet_x2_5.yaml)。其中，训练数据为如下 7 个公开数据集的汇总：
 | 数据集       | 数据量   | 类别数   | 场景  | 数据集地址 |
 | :------------:  | :-------------: | :-------: | :-------: | :--------: |
 | Aliproduct | 2498771 | 50030 | 商品 | [地址](https://retailvisionworkshop.github.io/recognition_challenge_2020/) |

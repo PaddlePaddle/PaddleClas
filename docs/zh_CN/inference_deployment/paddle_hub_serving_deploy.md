@@ -54,7 +54,7 @@ pip3 install paddlehub==2.1.0 --upgrade -i https://pypi.tuna.tsinghua.edu.cn/sim
   "inference_model_dir": "../inference/"
   ```
 需要注意，
-  * 模型文件（包括 `.pdmodel` 与 `.pdiparams`）名称必须为`inference`。
+  * 模型文件（包括 `.pdmodel` 与 `.pdiparams`）名称必须为 `inference`。
   * 我们也提供了大量基于 ImageNet-1k 数据集的预训练模型，模型列表及下载地址详见[模型库概览](../models/models_intro.md)，也可以使用自己训练转换好的模型。
 
 
@@ -101,7 +101,7 @@ $ hub serving start --modules Module1==Version1 \
 |--modules/-m| [**必选**] PaddleHub Serving 预安装模型，以多个 Module==Version 键值对的形式列出<br>*`当不指定 Version 时，默认选择最新版本`*|  
 |--port/-p| [**可选**] 服务端口，默认为 8866|  
 |--use_multiprocess| [**可选**] 是否启用并发方式，默认为单进程方式，推荐多核 CPU 机器使用此方式<br>*`Windows 操作系统只支持单进程方式`*|
-|--workers| [**可选**] 在并发方式下指定的并发任务数，默认为`2*cpu_count-1`，其中`cpu_count`为 CPU 核数|  
+|--workers| [**可选**] 在并发方式下指定的并发任务数，默认为 `2*cpu_count-1`，其中 `cpu_count` 为 CPU 核数|  
 
 如按默认参数启动服务：```hub serving start -m clas_system```  
 
@@ -115,7 +115,7 @@ $ hub serving start --modules Module1==Version1 \
 
 ```hub serving start -c config.json```  
 
-其中，`config.json`格式如下：
+其中，`config.json` 格式如下：
 
 ```json
 {
@@ -137,14 +137,14 @@ $ hub serving start --modules Module1==Version1 \
 ```
 
 **参数说明**：
-* `init_args`中的可配参数与`module.py`中的`_initialize`函数接口一致。其中，
-  - 当`use_gpu`为`true`时，表示使用 GPU 启动服务。
-  - 当`enable_mkldnn`为`true`时，表示使用 MKL-DNN 加速。
-* `predict_args`中的可配参数与`module.py`中的`predict`函数接口一致。
+* `init_args` 中的可配参数与 `module.py` 中的 `_initialize` 函数接口一致。其中，
+  - 当 `use_gpu` 为 `true` 时，表示使用 GPU 启动服务。
+  - 当 `enable_mkldnn` 为 `true` 时，表示使用 MKL-DNN 加速。
+* `predict_args` 中的可配参数与 `module.py` 中的 `predict` 函数接口一致。
 
 **注意**：
 * 使用配置文件启动服务时，将使用配置文件中的参数设置，其他命令行参数将被忽略；
-* 如果使用 GPU 预测(即，`use_gpu`置为`true`)，则需要在启动服务之前，设置 `CUDA_VISIBLE_DEVICES` 环境变量来指定所使用的 GPU 卡号，如：`export CUDA_VISIBLE_DEVICES=0`；
+* 如果使用 GPU 预测(即，`use_gpu` 置为 `true`)，则需要在启动服务之前，设置 `CUDA_VISIBLE_DEVICES` 环境变量来指定所使用的 GPU 卡号，如：`export CUDA_VISIBLE_DEVICES=0`；
 * **`use_gpu` 不可与 `use_multiprocess` 同时为 `true`**；
 * **`use_gpu` 与 `enable_mkldnn` 同时为 `true` 时，将忽略 `enable_mkldnn`，而使用 GPU**。
 
@@ -170,13 +170,13 @@ python hubserving/test_hubserving.py server_url image_path
 * **server_url**：服务地址，格式为  
 `http://[ip_address]:[port]/predict/[module_name]`  
 * **image_path**：测试图像路径，可以是单张图片路径，也可以是图像集合目录路径。
-* **batch_size**：[**可选**] 以`batch_size`大小为单位进行预测，默认为`1`。
-* **resize_short**：[**可选**] 预处理时，按短边调整大小，默认为`256`。
-* **crop_size**：[**可选**] 预处理时，居中裁剪的大小，默认为`224`。
-* **normalize**：[**可选**] 预处理时，是否进行`normalize`，默认为`True`。
-* **to_chw**：[**可选**] 预处理时，是否调整为`CHW`顺序，默认为`True`。
+* **batch_size**：[**可选**] 以 `batch_size` 大小为单位进行预测，默认为 `1`。
+* **resize_short**：[**可选**] 预处理时，按短边调整大小，默认为 `256`。
+* **crop_size**：[**可选**] 预处理时，居中裁剪的大小，默认为 `224`。
+* **normalize**：[**可选**] 预处理时，是否进行 `normalize`，默认为 `True`。
+* **to_chw**：[**可选**] 预处理时，是否调整为 `CHW` 顺序，默认为 `True`。
 
-**注意**：如果使用`Transformer`系列模型，如`DeiT_***_384`, `ViT_***_384`等，请注意模型的输入数据尺寸，需要指定`--resize_short=384 --crop_size=384`。
+**注意**：如果使用 `Transformer` 系列模型，如 `DeiT_***_384`, `ViT_***_384` 等，请注意模型的输入数据尺寸，需要指定`--resize_short=384 --crop_size=384`。
 
 访问示例：
 
@@ -203,7 +203,7 @@ list: 返回结果
 1. 停止服务  
 ```hub serving stop --port/-p XXXX```  
 
-2. 到相应的`module.py`和`params.py`等文件中根据实际需求修改代码。`module.py`修改后需要重新安装（`hub install hubserving/clas/`）并部署。在进行部署前，可通过`python hubserving/clas/module.py`测试已安装服务模块。
+2. 到相应的 `module.py` 和 `params.py` 等文件中根据实际需求修改代码。`module.py` 修改后需要重新安装（`hub install hubserving/clas/`）并部署。在进行部署前，可通过 `python hubserving/clas/module.py` 测试已安装服务模块。
 
 3. 卸载旧服务包  
 ```hub uninstall clas_system```  
@@ -220,7 +220,7 @@ list: 返回结果
     ```python
     "inference_model_dir":
     ```
-  * 更改后处理时返回的`top-k`结果数量：
+  * 更改后处理时返回的 `top-k` 结果数量：
     ```python
     'topk':
     ```
@@ -229,4 +229,4 @@ list: 返回结果
     'class_id_map_file':
     ```
 
-为了避免不必要的延时以及能够以 batch_size 进行预测，数据预处理逻辑（包括 `resize`、`crop` 等操作）均在客户端完成，因此需要在 `PaddleClas/deploy/hubserving/test_hubserving.py#L35-L52`中修改。
+为了避免不必要的延时以及能够以 batch_size 进行预测，数据预处理逻辑（包括 `resize`、`crop` 等操作）均在客户端完成，因此需要在 `PaddleClas/deploy/hubserving/test_hubserving.py#L35-L52` 中修改。

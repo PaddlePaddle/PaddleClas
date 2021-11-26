@@ -52,7 +52,7 @@
 
 * 注意
   * 由于部分解压缩软件在解压上述 `tar` 格式文件时存在问题，建议非命令行用户下载 `zip` 格式文件并解压。`tar` 格式文件建议使用命令 `tar xf xxx.tar` 解压。
-  * 速度评测机器的 CPU 具体信息为：`Intel(R) Xeon(R) Gold 6148 CPU @ 2.40GHz`，速度指标为开启 mkldnn ，线程数设置为 10 测试得到。
+  * 速度评测机器的 CPU 具体信息为：`Intel(R) Xeon(R) Gold 6148 CPU @ 2.40GHz`，速度指标为开启 mkldnn，线程数设置为 10 测试得到。
   * 主体检测的预处理过程较为耗时，平均每张图在上述机器上的时间在 40~55 ms 左右，没有包含在上述的预测耗时统计中。
 
 <a name="2.1"></a> 
@@ -91,7 +91,7 @@ PP-YOLO 由 [PaddleDetection](https://github.com/PaddlePaddle/PaddleDetection) �
 
 更多关于 PP-YOLO 的详细介绍可以参考：[PP-YOLO 模型](https://github.com/PaddlePaddle/PaddleDetection/blob/release%2F2.1/configs/ppyolo/README_cn.md)。
 
-在服务端主体检测任务中，为了保证检测效果，我们使用 ResNet50vd-DCN 作为检测模型的骨干网络，使用配置文件 [ppyolov2_r50vd_dcn_365e_coco.yml](https://github.com/PaddlePaddle/PaddleDetection/blob/release/2.1/configs/ppyolo/ppyolov2_r50vd_dcn_365e_coco.yml) ，更换为自定义的主体检测数据集，进行训练，最终得到检测模型。
+在服务端主体检测任务中，为了保证检测效果，我们使用 ResNet50vd-DCN 作为检测模型的骨干网络，使用配置文件 [ppyolov2_r50vd_dcn_365e_coco.yml](https://github.com/PaddlePaddle/PaddleDetection/blob/release/2.1/configs/ppyolo/ppyolov2_r50vd_dcn_365e_coco.yml)，更换为自定义的主体检测数据集，进行训练，最终得到检测模型。
 
 <a name="3"></a> 
 
@@ -152,7 +152,7 @@ ppyolov2_r50vd_dcn.yml：主要说明模型和主干网络的情况
 ppyolov2_reader.yml：主要说明数据读取器配置，如 batch size，并发加载子进程数等，同时包含读取后预处理操作，如 resize、数据增强等等
 ```
 
-在主体检测任务中，需要将 `datasets/coco_detection.yml` 中的 `num_classes` 参数修改为 1 （只有 1 个前景类别），同时将训练集和测试集的路径修改为自定义数据集的路径。
+在主体检测任务中，需要将 `datasets/coco_detection.yml` 中的 `num_classes` 参数修改为 1（只有 1 个前景类别），同时将训练集和测试集的路径修改为自定义数据集的路径。
 
 此外，也可以根据实际情况，修改上述文件，比如，如果显存溢出，可以将 batch size 和学习率等比缩小等。
 
@@ -211,7 +211,7 @@ export CUDA_VISIBLE_DEVICES=0
 python tools/infer.py -c configs/ppyolo/ppyolov2_r50vd_dcn_365e_coco.yml --infer_img=your_image_path.jpg --output_dir=infer_output/ --draw_threshold=0.5 -o weights=output/ppyolov2_r50vd_dcn_365e_coco/model_final
 ```
 
-`--draw_threshold` 是个可选参数. 根据 [NMS](https://ieeexplore.ieee.org/document/1699659) 的计算，不同阈值会产生不同的结果 `keep_top_k` 表示设置输出目标的最大数量，默认值为 100 ，用户可以根据自己的实际情况进行设定。
+`--draw_threshold` 是个可选参数. 根据 [NMS](https://ieeexplore.ieee.org/document/1699659) 的计算，不同阈值会产生不同的结果 `keep_top_k` 表示设置输出目标的最大数量，默认值为 100，用户可以根据自己的实际情况进行设定。
 
 <a name="3.6"></a> 
 
@@ -229,12 +229,12 @@ python tools/export_model.py -c configs/ppyolo/ppyolov2_r50vd_dcn_365e_coco.yml 
 
 更多模型导出教程，请参考： [EXPORT_MODEL](https://github.com/PaddlePaddle/PaddleDetection/blob/release/2.1/deploy/EXPORT_MODEL.md)
 
-最终，目录 `inference/ppyolov2_r50vd_dcn_365e_coco` 中包含 `inference.pdiparams`, `inference.pdiparams.info` 以及 `inference.pdmodel` 文件，其中 `inference.pdiparams` 为保存的 inference 模型权重文件， `inference.pdmodel` 为保存的 inference 模型结构文件。
+最终，目录 `inference/ppyolov2_r50vd_dcn_365e_coco` 中包含 `inference.pdiparams`, `inference.pdiparams.info` 以及 `inference.pdmodel` 文件，其中 `inference.pdiparams` 为保存的 inference 模型权重文件，`inference.pdmodel` 为保存的 inference 模型结构文件。
 
 
 导出模型之后，在主体检测与识别任务中，就可以将检测模型的路径更改为该 inference 模型路径，完成预测。
 
-以商品识别为例，其配置文件为 [inference_product.yaml](../../../deploy/configs/inference_product.yaml) ，修改其中的 `Global.det_inference_model_dir` 字段为导出的主体检测 inference 模型目录，参考[图像识别快速开始教程](../quick_start/quick_start_recognition.md) ，即可完成商品检测与识别过程。
+以商品识别为例，其配置文件为 [inference_product.yaml](../../../deploy/configs/inference_product.yaml)，修改其中的 `Global.det_inference_model_dir` 字段为导出的主体检测 inference 模型目录，参考[图像识别快速开始教程](../quick_start/quick_start_recognition.md)，即可完成商品检测与识别过程。
 
 
 ### FAQ

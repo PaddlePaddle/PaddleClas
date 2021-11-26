@@ -169,7 +169,7 @@ python3 -m paddle.distributed.launch tools/train.py \
     [Eval][Epoch 1][Avg]recall1: 0.46962, recall5: 0.75608, mAP: 0.21238
     ...
     ```
-此处配置文件的 Backbone 是 MobileNetV1，如果想使用其他 Backbone，可以重写参数 `Arch.Backbone.name`，比如命令中增加 `-o Arch.Backbone.name={其他 Backbone}`。此外，由于不同模型`Neck`部分的输入维度不同，更换 Backbone 后可能需要改写此处的输入大小，改写方式类似替换 Backbone 的名字。
+此处配置文件的 Backbone 是 MobileNetV1，如果想使用其他 Backbone，可以重写参数 `Arch.Backbone.name`，比如命令中增加 `-o Arch.Backbone.name={其他 Backbone}`。此外，由于不同模型 `Neck` 部分的输入维度不同，更换 Backbone 后可能需要改写此处的输入大小，改写方式类似替换 Backbone 的名字。
 
 在训练 Loss 部分，此处使用了 [CELoss](../../../ppcls/loss/celoss.py) 和 [TripletLossV2](../../../ppcls/loss/triplet.py)，配置文件如下：
 
@@ -209,7 +209,7 @@ python3 -m paddle.distributed.launch tools/train.py \
 
 **注意**：
 
-* `-o Global.checkpoints` 参数无需包含断点权重文件的后缀名，上述训练命令会在训练过程中生成如下所示的断点权重文件，若想从断点 `5` 继续训练，则 `Global.checkpoints` 参数只需设置为 `"./output/RecModel/epoch_5"` ，PaddleClas 会自动补充后缀名。
+* `-o Global.checkpoints` 参数无需包含断点权重文件的后缀名，上述训练命令会在训练过程中生成如下所示的断点权重文件，若想从断点 `5` 继续训练，则 `Global.checkpoints` 参数只需设置为 `"./output/RecModel/epoch_5"`，PaddleClas 会自动补充后缀名。
 
     ```shell
     output/
@@ -311,7 +311,7 @@ pip install faiss-cpu==1.7.1post2
 <a name="度量学习"></a>
 - 度量学习（Metric Learning）
 
-度量学习研究如何在一个特定的任务上学习一个距离函数，使得该距离函数能够帮助基于近邻的算法 (kNN、k-means 等) 取得较好的性能。深度度量学习(Deep Metric Learning)是度量学习的一种方法，它的目标是学习一个从原始特征到低维稠密的向量空间（嵌入空间，embedding space）的映射，使得同类对象在嵌入空间上使用常用的距离函数（欧氏距离、cosine 距离等）计算的距离比较近，而不同类的对象之间的距离则比较远。深度度量学习在计算机视觉领域取得了非常多的成功的应用，比如人脸识别、商品识别、图像检索、行人重识别等。更详细的介绍请参考[此文档](../algorithm_introduction/metric_learning.md)。
+度量学习研究如何在一个特定的任务上学习一个距离函数，使得该距离函数能够帮助基于近邻的算法（kNN、k-means 等）取得较好的性能。深度度量学习(Deep Metric Learning)是度量学习的一种方法，它的目标是学习一个从原始特征到低维稠密的向量空间（嵌入空间，embedding space）的映射，使得同类对象在嵌入空间上使用常用的距离函数（欧氏距离、cosine 距离等）计算的距离比较近，而不同类的对象之间的距离则比较远。深度度量学习在计算机视觉领域取得了非常多的成功的应用，比如人脸识别、商品识别、图像检索、行人重识别等。更详细的介绍请参考[此文档](../algorithm_introduction/metric_learning.md)。
 
 <a name="图像检索数据集介绍"></a>
 

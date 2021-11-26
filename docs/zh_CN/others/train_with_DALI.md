@@ -31,7 +31,7 @@
  <a name='3'></a>
 
 ## 3. 使用 DALI
-PaddleClas 支持在静态图训练方式中使用 DALI 加速，由于 DALI 仅支持 GPU 训练，因此需要设置 GPU，且 DALI 需要占用 GPU 显存，需要为 DALI 预留显存。使用 DALI 训练只需在训练配置文件中设置字段`use_dali=True`，或通过以下命令启动训练即可：
+PaddleClas 支持在静态图训练方式中使用 DALI 加速，由于 DALI 仅支持 GPU 训练，因此需要设置 GPU，且 DALI 需要占用 GPU 显存，需要为 DALI 预留显存。使用 DALI 训练只需在训练配置文件中设置字段 `use_dali=True`，或通过以下命令启动训练即可：
 
 ```shell
 # 设置用于训练的 GPU 卡号

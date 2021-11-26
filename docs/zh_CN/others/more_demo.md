@@ -36,7 +36,7 @@
 <img src="../../images/recognition/more_demo_images/output_cartoon/zhangchulan-007.jpeg"  width = "400" />
 </div>
 
-- logo识别
+- logo 识别
 <div align="center">
 <img src="../images/recognition/more_demo_images/output_logo/cctv_4.jpg"  width = "400" />
 </div>

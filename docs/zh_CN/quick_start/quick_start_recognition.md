@@ -52,7 +52,7 @@
 
 **注意**
 
-1. windows 环境下如果没有安装 wget , 可以按照下面的步骤安装 wget 与 tar 命令，也可以在下载模型时将链接复制到浏览器中下载，并解压放置在相应目录下； linux 或者 macOS 用户可以右键点击，然后复制下载链接，即可通过 `wget` 命令下载。
+1. windows 环境下如果没有安装 wget, 可以按照下面的步骤安装 wget 与 tar 命令，也可以在下载模型时将链接复制到浏览器中下载，并解压放置在相应目录下； linux 或者 macOS 用户可以右键点击，然后复制下载链接，即可通过 `wget` 命令下载。
 2. 如果 macOS 环境下没有安装 `wget` 命令，可以运行下面的命令进行安装。
 
 ```shell
@@ -62,7 +62,7 @@ ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/
 brew install wget
 ```
 
-4. 如果希望在 windows 环境下安装 wget ，可以参考：[链接](https://www.cnblogs.com/jeshy/p/10518062.html)；如果希望在 windows 环境中安装 tar 命令，可以参考：[链接](https://www.cnblogs.com/chooperman/p/14190107.html)。
+4. 如果希望在 windows 环境下安装 wget，可以参考：[链接](https://www.cnblogs.com/jeshy/p/10518062.html)；如果希望在 windows 环境中安装 tar 命令，可以参考：[链接](https://www.cnblogs.com/chooperman/p/14190107.html)。
 
 
 * 可以按照下面的命令下载并解压数据与模型
@@ -107,7 +107,7 @@ wget https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/data/drink_da
 ├── ...
 ```
 
-其中 `gallery` 文件夹中存放的是用于构建索引库的原始图像，`index` 表示基于原始图像构建得到的索引库信息， `test_images` 文件夹中存放的是用于测试识别效果的图像列表。
+其中 `gallery` 文件夹中存放的是用于构建索引库的原始图像，`index` 表示基于原始图像构建得到的索引库信息，`test_images` 文件夹中存放的是用于测试识别效果的图像列表。
 
 
 `models` 文件夹下应有如下文件结构：
@@ -125,7 +125,7 @@ wget https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/data/drink_da
 
 **注意**
 
-如果使用服务端通用识别模型， Demo 数据需要重新提取特征、够建索引，方式如下：
+如果使用服务端通用识别模型，Demo 数据需要重新提取特征、够建索引，方式如下：
 
 ```shell
 # 下面是使用下载的服务端商品识别模型进行索引库构建
@@ -144,7 +144,7 @@ python3.7 python/build_gallery.py -c configs/build_general.yaml -o Global.rec_in
 pip install faiss-cpu==1.7.1post2
 ```
 
-若使用时，不能正常引用，则 `uninstall` 之后，重新 `install` ，尤其是 windows 下。
+若使用时，不能正常引用，则 `uninstall` 之后，重新 `install`，尤其是 windows 下。
 
 <a name="识别单张图像"></a>
 
@@ -247,7 +247,7 @@ python3.7 python/predict_system.py -c configs/inference_general.yaml -o Global.i
 然后需要编辑记录了图像路径和标签信息的文本文件，这里 PaddleClas 将更正后的标签信息文件放在了 `drink_dataset_v1.0/gallery/drink_label_all.txt` 文件中。可以与默认的 `drink_dataset_v1.0/gallery/drink_label.txt` 标签文件进行对比，添加了光明和三元系列牛奶的索引图像。
 
 
-每一行的文本中，第一个字段表示图像的相对路径，第二个字段表示图像对应的标签信息，中间用 `\t` 键分隔开（注意：有些编辑器会将 `tab` 自动转换为 `空格` ，这种情况下会导致文件解析报错）。
+每一行的文本中，第一个字段表示图像的相对路径，第二个字段表示图像对应的标签信息，中间用 `\t` 键分隔开（注意：有些编辑器会将 `tab` 自动转换为 `空格`，这种情况下会导致文件解析报错）。
 
 <a name="建立新的索引库"></a>
 
@@ -259,7 +259,7 @@ python3.7 python/predict_system.py -c configs/inference_general.yaml -o Global.i
 python3.7 python/build_gallery.py -c configs/build_general.yaml -o IndexProcess.data_file="./drink_dataset_v1.0/gallery/drink_label_all.txt" -o IndexProcess.index_dir="./drink_dataset_v1.0/index_all"
 ```
 
-最终新的索引信息保存在文件夹 `./drink_dataset_v1.0/index_all` 中。
+最终新的索引信息保存在文件夹 `./drink_dataset_v1.0/index_all` 中。具体 `yaml` 请参考[向量检索文档](../image_recognition_pipeline/vector_search.md)。
 
 <a name="基于新的索引库的图像识别"></a>
 

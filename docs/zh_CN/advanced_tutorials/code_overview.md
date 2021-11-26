@@ -86,7 +86,7 @@ Arch:
   use_ssld: False
 ```
 
-`Arch.name` 表示模型名称， `Arch.pretrained` 表示是否添加预训练模型，`use_ssld` 表示是否使用基于 `SSLD` 知识蒸馏得到的预训练模型。所有的模型名称均在 `ppcls/arch/backbone/__init__.py` 中定义。
+`Arch.name` 表示模型名称，`Arch.pretrained` 表示是否添加预训练模型，`use_ssld` 表示是否使用基于 `SSLD` 知识蒸馏得到的预训练模型。所有的模型名称均在 `ppcls/arch/backbone/__init__.py` 中定义。
 
 对应的，在 `ppcls/arch/__init__.py` 中，通过 `build_model` 方法创建模型对象。
 
@@ -102,7 +102,7 @@ def build_model(config):
 <a name="2.3"></a>
 ### 2.3 损失函数
 
-PaddleClas 中，包含了 `CELoss` , `JSDivLoss`, `TripletLoss`, `CenterLoss` 等损失函数，均定义在 `ppcls/loss` 中。
+PaddleClas 中，包含了 `CELoss`, `JSDivLoss`, `TripletLoss`, `CenterLoss` 等损失函数，均定义在 `ppcls/loss` 中。
 
 在 `ppcls/loss/__init__.py` 文件中，使用 `CombinedLoss` 来构建及合并损失函数，不同训练策略中所需要的损失函数与计算方法不同，PaddleClas 在构建损失函数过程中，主要考虑了以下几个因素。
 
@@ -112,7 +112,7 @@ PaddleClas 中，包含了 `CELoss` , `JSDivLoss`, `TripletLoss`, `CenterLoss` �
 4. 是否是训练 metric learning
 
 
-用户可以在配置文件中指定损失函数的类型及权重，如在训练中添加 TripletLossV2 ，配置文件如下：
+用户可以在配置文件中指定损失函数的类型及权重，如在训练中添加 TripletLossV2，配置文件如下：
 
 ```yaml
 Loss:
@@ -127,11 +127,11 @@ Loss:
 <a name="2.4"></a>
 ### 2.4 优化器和学习率衰减、权重衰减策略
 
-图像分类任务中，`Momentum` 是一种比较常用的优化器， PaddleClas 中提供了 `Momentum` 、 `RMSProp`、`Adam`及`AdamW`等几种优化器策略。
+图像分类任务中，`Momentum` 是一种比较常用的优化器，PaddleClas 中提供了 `Momentum` 、 `RMSProp`、`Adam` 及 `AdamW` 等几种优化器策略。
 
 权重衰减策略是一种比较常用的正则化方法，主要用于防止模型过拟合。 PaddleClas 中提供了 `L1Decay` 和 `L2Decay` 两种权重衰减策略。
 
-学习率衰减是图像分类任务中必不可少的精度提升训练方法， PaddleClas 目前支持 `Cosine` , `Piecewise`, `Linear` 等学习率衰减策略。
+学习率衰减是图像分类任务中必不可少的精度提升训练方法，PaddleClas 目前支持 `Cosine`, `Piecewise`, `Linear` 等学习率衰减策略。
 
 在配置文件中，优化器、权重衰减策略、学习率衰减策略可以通过以下的字段进行配置。
 
@@ -180,7 +180,7 @@ def build_optimizer(config, epochs, step_each_epoch, parameters):
     return optim, lr
 ```
 
- 不同优化器和权重衰减策略均以类的形式实现，具体实现可以参考文件 `ppcls/optimizer/optimizer.py` ；不同的学习率衰减策略可以参考文件 `ppcls/optimizer/learning_rate.py` 。
+ 不同优化器和权重衰减策略均以类的形式实现，具体实现可以参考文件 `ppcls/optimizer/optimizer.py`；不同的学习率衰减策略可以参考文件 `ppcls/optimizer/learning_rate.py` 。
 
 <a name="2.5"></a>
 ### 2.5 训练时评估
@@ -236,14 +236,14 @@ Slim:
     name: pact
 ```
 
-训练方法详见模型[裁剪量化使用介绍](../advanced_tutorials/model_prune_quantization.md)， 算法介绍详见[裁剪量化算法介绍](../algorithm_introduction/model_prune_quantization.md)。
+训练方法详见模型[裁剪量化使用介绍](../advanced_tutorials/model_prune_quantization.md)，算法介绍详见[裁剪量化算法介绍](../algorithm_introduction/model_prune_quantization.md)。
 
 <a name="3"></a>
 ## 3. 预测部署代码和方式
 
 * 如果希望将对分类模型进行离线量化，可以参考 [模型量化裁剪教程](../advanced_tutorials/model_prune_quantization.md) 中离线量化部分。
-* 如果希望在服务端使用 python 进行部署，可以参考 [python inference 预测教程](../inference_deployment/python_deploy.md) 。
-* 如果希望在服务端使用 cpp 进行部署，可以参考 [cpp inference 预测教程](../inference_deployment/cpp_deploy.md) 。
-* 如果希望将分类模型部署为服务，可以参考 [hub serving 预测部署教程](../inference_deployment/paddle_hub_serving_deploy.md) 。
-* 如果希望在移动端使用分类模型进行预测，可以参考 [PaddleLite 预测部署教程](../inference_deployment/paddle_lite_deploy.md) 。
-* 如果希望使用 whl 包对分类模型进行预测，可以参考 [whl 包预测](../inference_deployment/whl_deploy.md) 。
+* 如果希望在服务端使用 python 进行部署，可以参考 [python inference 预测教程](../inference_deployment/python_deploy.md)。
+* 如果希望在服务端使用 cpp 进行部署，可以参考 [cpp inference 预测教程](../inference_deployment/cpp_deploy.md)。
+* 如果希望将分类模型部署为服务，可以参考 [hub serving 预测部署教程](../inference_deployment/paddle_hub_serving_deploy.md)。
+* 如果希望在移动端使用分类模型进行预测，可以参考 [PaddleLite 预测部署教程](../inference_deployment/paddle_lite_deploy.md)。
+* 如果希望使用 whl 包对分类模型进行预测，可以参考 [whl 包预测](../inference_deployment/whl_deploy.md)。
