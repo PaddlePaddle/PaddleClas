@@ -26,6 +26,9 @@ import math
 from ppcls.arch.backbone.base.theseus_layer import TheseusLayer
 from ppcls.utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
 
+from paddle.incubate.operators.resnet_unit import ResNetUnit
+from .initializer import get_param_attr
+
 MODEL_URLS = {
     "ResNet18":
     "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/ResNet18_pretrained.pdparams",
@@ -105,6 +108,7 @@ class ConvBNLayer(TheseusLayer):
                  is_vd_mode=False,
                  act=None,
                  lr_mult=1.0,
+                 name=None,
                  data_format="NCHW"):
         super().__init__()
         self.is_vd_mode = is_vd_mode
@@ -125,6 +129,60 @@ class ConvBNLayer(TheseusLayer):
             num_filters,
             param_attr=ParamAttr(learning_rate=lr_mult),
             bias_attr=ParamAttr(learning_rate=lr_mult),
+            data_layout=data_format,
+            act="relu" if self.act else None)
+        # self.relu = nn.ReLU()
+
+    def forward(self, x):
+        if self.is_vd_mode:
+            x = self.avg_pool(x)
+        x = self.conv(x)
+        x = self.bn(x)
+        #if self.act:
+        #    x = self.relu(x)
+        return x
+
+
+class ConvBNLayer_new(TheseusLayer):
+    def __init__(self,
+                 num_channels,
+                 num_filters,
+                 filter_size,
+                 stride=1,
+                 groups=1,
+                 is_vd_mode=False,
+                 act=None,
+                 lr_mult=1.0,
+                 name=None,
+                 data_format="NCHW"):
+        super().__init__()
+        self.is_vd_mode = is_vd_mode
+        self.act = act
+        self.avg_pool = AvgPool2D(
+            kernel_size=2, stride=2, padding=0, ceil_mode=True)
+        self.conv = Conv2D(
+            in_channels=num_channels,
+            out_channels=num_filters,
+            kernel_size=filter_size,
+            stride=stride,
+            padding=(filter_size - 1) // 2,
+            groups=groups,
+            #weight_attr=ParamAttr(learning_rate=lr_mult),
+            weight_attr=get_param_attr(name + '_weights', 'conv_weight'),
+            bias_attr=False,
+            data_format=data_format)
+        if name == 'conv1':
+            bn_name = 'bn_' + name
+        else:
+            bn_name = 'bn' + name[3:]
+        self.bn = BatchNorm(
+            num_filters,
+            #param_attr=ParamAttr(learning_rate=lr_mult),
+            #bias_attr=ParamAttr(learning_rate=lr_mult),
+            param_attr=get_param_attr(bn_name + '_scale', 'scale'),
+            bias_attr=get_param_attr(bn_name + '_offset', 'bias'),
+            moving_mean_name=bn_name + '_mean',
+            moving_variance_name=bn_name + '_variance',
             data_layout=data_format)
         self.relu = nn.ReLU()
 
@@ -144,6 +202,7 @@ class BottleneckBlock(TheseusLayer):
                  num_filters,
                  stride,
                  shortcut=True,
+                 name=None,
                  if_first=False,
                  lr_mult=1.0,
                  data_format="NCHW"):
@@ -197,6 +256,105 @@ class BottleneckBlock(TheseusLayer):
         x = paddle.add(x=x, y=short)
         x = self.relu(x)
         return x
+
+
+class BottleneckBlock_new(TheseusLayer):
+    def __init__(self,
+                 num_channels,
+                 num_filters,
+                 stride,
+                 shortcut=True,
+                 name=None,
+                 if_first=False,
+                 lr_mult=1.0,
+                 data_format='NCHW'):
+        super(BottleneckBlock_new, self).__init__()
+
+        conv_name_a = name + '_branch2a'
+        bn_name_a = 'bn' + conv_name_a[3:]
+        self.conv0 = ResNetUnit(
+            num_channels_x=num_channels,
+            num_filters=num_filters,
+            filter_size=1,
+            data_format=data_format,
+            act='relu',
+            filter_x_attr=get_param_attr(conv_name_a + '_weights',
+                                         'conv_weight'),
+            scale_x_attr=get_param_attr(bn_name_a + '_scale', 'scale'),
+            bias_x_attr=get_param_attr(bn_name_a + '_offset', 'bias'),
+            moving_mean_x_name=bn_name_a + '_mean',
+            moving_var_x_name=bn_name_a + '_variance')
+
+        conv_name_b = name + '_branch2b'
+        bn_name_b = 'bn' + conv_name_b[3:]
+        self.conv1 = ResNetUnit(
+            num_channels_x=num_filters,
+            num_filters=num_filters,
+            filter_size=3,
+            stride=stride,
+            data_format=data_format,
+            act='relu',
+            filter_x_attr=get_param_attr(conv_name_b + '_weights',
+                                         'conv_weight'),
+            scale_x_attr=get_param_attr(bn_name_b + '_scale', 'scale'),
+            bias_x_attr=get_param_attr(bn_name_b + '_offset', 'bias'),
+            moving_mean_x_name=bn_name_b + '_mean',
+            moving_var_x_name=bn_name_b + '_variance')
+
+        conv_name_c = name + '_branch2c'
+        bn_name_c = 'bn' + conv_name_c[3:]
+        self.shortcut = shortcut
+        if not shortcut:
+            conv_z_name = name + '_branch1'
+            bn_z_name = 'bn' + conv_z_name[3:]
+            self.conv2 = ResNetUnit(
+                num_channels_x=num_filters,
+                num_filters=num_filters * 4,
+                filter_size=1,
+                data_format=data_format,
+                act='relu',
+                fuse_add=True,
+                has_shortcut=True,
+                filter_x_attr=get_param_attr(conv_name_c + '_weights',
+                                             'conv_weight'),
+                scale_x_attr=get_param_attr(bn_name_c + '_scale', 'scale'),
+                bias_x_attr=get_param_attr(bn_name_c + '_offset', 'bias'),
+                moving_mean_x_name=bn_name_c + '_mean',
+                moving_var_x_name=bn_name_c + '_variance',
+                num_channels_z=num_channels,
+                stride_z=stride,
+                filter_z_attr=get_param_attr(conv_z_name + '_weights',
+                                             'conv_weight'),
+                scale_z_attr=get_param_attr(bn_z_name + '_scale', 'scale'),
+                bias_z_attr=get_param_attr(bn_z_name + '_offset', 'bias'),
+                moving_mean_z_name=bn_z_name + '_mean',
+                moving_var_z_name=bn_z_name + '_variance')
+        else:
+            self.conv2 = ResNetUnit(
+                num_channels_x=num_filters,
+                num_filters=num_filters * 4,
+                filter_size=1,
+                data_format=data_format,
+                act='relu',
+                fuse_add=True,
+                has_shortcut=False,
+                filter_x_attr=get_param_attr(conv_name_c + '_weights',
+                                             'conv_weight'),
+                scale_x_attr=get_param_attr(bn_name_c + '_scale', 'scale'),
+                bias_x_attr=get_param_attr(bn_name_c + '_offset', 'bias'),
+                moving_mean_x_name=bn_name_c + '_mean',
+                moving_var_x_name=bn_name_c + '_variance')
+
+    def forward(self, inputs):
+        conv0 = self.conv0(inputs)
+        conv1 = self.conv1(conv0)
+        y = self.conv2(conv1, inputs)
+
+        return y
+
+
+BottleneckBlock = BottleneckBlock_new
+ConvBNLayer = ConvBNLayer_new
 
 
 class BasicBlock(TheseusLayer):
@@ -272,7 +430,7 @@ class ResNet(TheseusLayer):
                  input_image_channel=3,
                  return_patterns=None):
         super().__init__()
-
+        #data_format="NHWC"
         self.cfg = config
         self.lr_mult_list = lr_mult_list
         self.is_vd_mode = version == "vd"
@@ -306,6 +464,7 @@ class ResNet(TheseusLayer):
                 stride=s,
                 act="relu",
                 lr_mult=self.lr_mult_list[0],
+                name='conv1',
                 data_format=data_format)
             for in_c, out_c, k, s in self.stem_cfg[version]
         ])
@@ -316,6 +475,7 @@ class ResNet(TheseusLayer):
         for block_idx in range(len(self.block_depth)):
             shortcut = False
             for i in range(self.block_depth[block_idx]):
+                conv_name = 'res' + str(block_idx + 2) + chr(97 + i)
                 block_list.append(globals()[self.block_type](
                     num_channels=self.num_channels[block_idx] if i == 0 else
                     self.num_filters[block_idx] * self.channels_mult,
@@ -324,6 +484,7 @@ class ResNet(TheseusLayer):
                     shortcut=shortcut,
                     if_first=block_idx == i == 0 if version == "vd" else True,
                     lr_mult=self.lr_mult_list[block_idx + 1],
+                    name=conv_name,
                     data_format=data_format))
                 shortcut = True
         self.blocks = nn.Sequential(*block_list)
@@ -344,9 +505,9 @@ class ResNet(TheseusLayer):
 
     def forward(self, x):
         with paddle.static.amp.fp16_guard():
-            if self.data_format == "NHWC":
-                x = paddle.transpose(x, [0, 2, 3, 1])
-                x.stop_gradient = True
+            #if self.data_format == "NHWC":
+            #     x = paddle.transpose(x, [0, 2, 3, 1])
+            #     x.stop_gradient = True
             x = self.stem(x)
             x = self.max_pool(x)
             x = self.blocks(x)
