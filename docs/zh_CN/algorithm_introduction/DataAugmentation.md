@@ -231,7 +231,7 @@ Mixup 是最先提出的图像混叠增广方案，其原理简单、方便实�
 
 开源代码 github 地址：[https://github.com/clovaai/CutMix-PyTorch](https://github.com/clovaai/CutMix-PyTorch)
 
-与  `Mixup` 直接对两幅图进行相加不一样，`Cutmix` 是从一幅图中随机裁剪出一个 `ROI`，然后覆盖当前图像中对应的区域，代码实现如下所示：
+与 `Mixup` 直接对两幅图进行相加不一样，`Cutmix` 是从一幅图中随机裁剪出一个 `ROI`，然后覆盖当前图像中对应的区域，代码实现如下所示：
 
 经过 Cutmix 数据增强后结果如下图所示。
 

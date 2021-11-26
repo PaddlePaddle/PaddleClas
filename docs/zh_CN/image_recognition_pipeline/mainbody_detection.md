@@ -225,7 +225,7 @@ python tools/export_model.py -c configs/ppyolo/ppyolov2_r50vd_dcn_365e_coco.yml 
 
 预测模型会导出到 `inference/ppyolov2_r50vd_dcn_365e_coco` 目录下，分别为 `infer_cfg.yml` (预测不需要), `model.pdiparams`, `model.pdiparams.info`, `model.pdmodel` 。
 
-注意： `PaddleDetection` 导出的 inference 模型的文件格式为 `model.xxx`，这里如果希望与 PaddleClas  的 inference 模型文件格式保持一致，需要将其 `model.xxx` 文件修改为 `inference.xxx` 文件，用于后续主体检测的预测部署。
+注意： `PaddleDetection` 导出的 inference 模型的文件格式为 `model.xxx`，这里如果希望与 PaddleClas 的 inference 模型文件格式保持一致，需要将其 `model.xxx` 文件修改为 `inference.xxx` 文件，用于后续主体检测的预测部署。
 
 更多模型导出教程，请参考： [EXPORT_MODEL](https://github.com/PaddlePaddle/PaddleDetection/blob/release/2.1/deploy/EXPORT_MODEL.md)
 
