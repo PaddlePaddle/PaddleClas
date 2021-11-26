@@ -9,7 +9,16 @@
 
 值得注意的是，为了更好是适配性，目前版本，`PaddleClas`中暂时**只使用CPU进行向量检索**。
 
-本文档主要主要介绍PaddleClas中检索模块的安装、使用的检索算法，及使用过程中的相关配置文件中参数介绍。
+<div align="center">
+<img src="../../images/structure.jpg"  width = "800" />
+</div>
+
+如上图中所示，向量检索部分，在整个`PP-ShiTu`系统中有两部分内容
+
+- 图中绿色部分：建立检索库，供检索时查询使用，同时提供增、删等功能
+- 图中蓝色部分：检索功能，即给定一张图的特征向量，返回库中相似图像的label
+
+本文档主要主要介绍PaddleClas中检索模块的安装、使用的检索算法、建库流程的及相关配置文件中参数介绍。
 
 ## 一、检索库安装
 
@@ -31,13 +40,26 @@ pip install faiss-cpu==1.7.1post2
 
 每种检索算法，满足不同场景。其中`HNSW32`为默认方法，此方法的检索精度、检索速度可以取得一个较好的平衡，具体算法介绍可以查看[官方文档](https://github.com/facebookresearch/faiss/wiki)。
 
-## 三、相关配置文档参数介绍
+## 三、使用及配置文档介绍
 
 涉及检索模块配置文件位于：`deploy/configs/`下，其中`build_*.yaml`是建立特征库的相关配置文件，`inference_*.yaml`是检索或者分类的推理配置文件。
 
-### 3.1 建库配置文件参数
+### 3.1 建库及配置文件参数
 
-示例建库的配置如下
+建库的具体操作如下：
+
+```shell
+# 进入deploy目录
+cd deploy
+# yaml文件根据需要改成自己所需的具体yaml文件
+python python/build_gallery.py -c configs/build_***.yaml
+```
+
+其中`yaml`文件的建库的配置如下，在运行时，请根据实际情况进行修改。建库操作会将根据`data_file`的图像列表，将`image_root`下的图像进行特征提取，并在`index_dir`下进行存储，以待后续检索使用。
+
+其中`data_file`文件存储的是图像文件的路径和标签，每一行的格式为：`image_path  label`。中间间隔以`yaml`文件中`delimiter`参数作为间隔。
+
+关于特征提取的具体模型参数，可查看`yaml`文件。
 
 ```yaml
 # indexing engine config
@@ -62,6 +84,10 @@ IndexProcess:
 - **embedding_size**：特征维度
 
 ### 3.2 检索配置文件参数
+
+检索的过程，融合到`PP-ShiTu`的整体流程中，请参考[README](../../../README_ch.md)中`PP-ShiTu图像识别系统介绍`部分。检索具体使用操作请参考[识别快速开始文档](../quick_start/quick_start_recognition.md)。
+
+其中，检索部分配置如下，整体检索配置文件，请参考`deploy/configs/inference_*.yaml`文件。
 
 ```yaml
 IndexProcess:

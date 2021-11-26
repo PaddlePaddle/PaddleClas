@@ -3,7 +3,21 @@
 此教程主要针对初级用户，即深度学习相关理论知识处于入门阶段，具有一定的 Python 基础，能够阅读简单代码的用户。此内容主要包括使用 PaddleClas 进行图像分类网络训练及模型预测。
 
 ---
+## 目录
 
+- [1. 基础知识](#1)
+- [2. 环境安装与配置](#2)
+- [3. 数据的准备与处理](#3)
+- [4. 模型训练](#4)
+  - [4.1 使用CPU进行模型训练](#4.1)
+    - [4.1.1 不使用预训练模型进行训练](#4.1.1)
+    - [4.1.2 不使用预训练模型进行训练](#4.1.2)
+  - [4.2 使用GPU进行模型训练](#4.2)
+    - [4.2.1 不使用预训练模型进行训练](#4.2.1)
+    - [4.2.2 不使用预训练模型进行训练](#4.2.2)
+- [5. 模型预测](#5)
+
+<a name="1"></a>
 ## 1. 基础知识
 
 图像分类顾名思义就是一个模式分类问题，是计算机视觉中最基础的任务，它的目标是将不同的图像，划分到不同的类别。以下会对整个模型训练过程中需要了解到的一些概念做简单的解释，希望能够对初次体验 PaddleClas 的你有所帮助：
@@ -30,10 +44,12 @@
   - Top1 Acc：预测结果中概率最大的所在分类正确，则判定为正确；
   - Top5 Acc：预测结果中概率排名前 5 中有分类正确，则判定为正确；
 
+<a name="2"></a>
 ## 2. 环境安装与配置
 
 具体安装步骤可详看[Paddle 安装文档](../installation/install_paddle.md)，[PaddleClas 安装文档](../installation/install_paddleclas.md)。
 
+<a name="3"></a>
 ## 3. 数据的准备与处理
 
 进入PaddleClas目录：
@@ -72,15 +88,16 @@ cd ../../
 # windoes直接打开PaddleClas根目录即可
 ```
 
+<a name="4"></a>
 ## 4. 模型训练
 
 <a name="4.1"></a>
-
 ### 4.1 使用CPU进行模型训练
 
 由于使用CPU来进行模型训练，计算速度较慢，因此，此处以 ShuffleNetV2_x0_25 为例。此模型计算量较小，在 CPU 上计算速度较快。但是也因为模型较小，训练好的模型精度也不会太高。
 
-#### 4.1.1 不使用预训练模型
+<a name="4.1.1"></a>
+#### 4.1.1 不使用预训练模型进行训练
 
 ```shell
 # windows在cmd中进入PaddleClas根目录，执行此命令
@@ -91,7 +108,8 @@ python tools/train.py -c ./ppcls/configs/quick_start/new_user/ShuffleNetV2_x0_25
 - `yaml`文`Global.device` 参数设置为`cpu`，即使用CPU进行训练（若不设置，此参数默认为`True`）
 - `yaml`文件中`epochs`参数设置为20，说明对整个数据集进行20个epoch迭代，预计训练20分钟左右（不同CPU，训练时间略有不同），此时训练模型不充分。若提高训练模型精度，请将此参数设大，如**40**，训练时间也会相应延长
 
-#### 4.1.2 使用预训练模型
+<a name="4.1.2"></a>
+#### 4.1.2 使用预训练模型进行训练
 
 ```shell
 python tools/train.py -c ./ppcls/configs/quick_start/new_user/ShuffleNetV2_x0_25.yaml  -o Arch.pretrained=True
@@ -101,6 +119,7 @@ python tools/train.py -c ./ppcls/configs/quick_start/new_user/ShuffleNetV2_x0_25
 
 可以使用将使用与不使用预训练模型训练进行对比，观察 loss 的下降情况。
 
+<a name="4.2"></a>
 ### 4.2 使用GPU进行模型训练
 
 由于 GPU 训练速度更快，可以使用更复杂模型，因此以 ResNet50_vd 为例。与 ShuffleNetV2_x0_25 相比，此模型计算量较大，训练好的模型精度也会更高。
@@ -119,7 +138,8 @@ python tools/train.py -c ./ppcls/configs/quick_start/new_user/ShuffleNetV2_x0_25
   set CUDA_VISIBLE_DEVICES=0
   ```
 
-#### 不使用预训练模型
+<a name="4.2.1"></a>
+#### 4.2.1 不使用预训练模型进行训练
 
 ```shell
 python tools/train.py -c ./ppcls/configs/quick_start/ResNet50_vd.yaml
@@ -131,6 +151,7 @@ python tools/train.py -c ./ppcls/configs/quick_start/ResNet50_vd.yaml
 <img src="../../images/quick_start/r50_vd_acc.png"  width = "800" />
 </div>
 
+<a name="4.2.1"></a>
 #### 4.2.1 使用预训练模型进行训练
 
 基于 ImageNet1k 分类预训练模型进行微调，训练脚本如下所示
@@ -147,6 +168,7 @@ python tools/train.py -c ./ppcls/configs/quick_start/ResNet50_vd.yaml -o Arch.pr
 <img src="../../images/quick_start/r50_vd_pretrained_acc.png"  width = "800" />
 </div>
 
+<a name="5"></a>
 ## 5. 模型预测
 
 训练完成后，可以使用训练好的模型进行预测，以训练的 ResNet50_vd 模型为例，预测代码如下：

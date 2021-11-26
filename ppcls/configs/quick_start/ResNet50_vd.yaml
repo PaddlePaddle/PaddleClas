@@ -16,9 +16,9 @@ Global:
 
 # model architecture
 Arch:
-  name: ResNet50_vd
+  name: ResNet50_vd 
   class_num: 102
- 
+
 # loss function config for traing/eval process
 Loss:
   Train:

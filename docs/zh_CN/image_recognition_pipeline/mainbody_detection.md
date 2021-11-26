@@ -29,11 +29,11 @@
 
 | 模型      | 模型结构   | 预训练模型下载地址   | inference模型下载地址  | mAP | inference模型大小(MB) | 单张图片预测耗时(不包含预处理)(ms) |
 | :------------:  | :-------------: | :------: | :-------: | :--------: | :-------: | :--------: |
-| 轻量级主体检测模型 | PicoDet | [地址](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/pretrain/picodet_PPLCNet_x2_5_mainbody_lite_v1.0_pretrained.pdparams) | [地址](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/inference/picodet_PPLCNet_x2_5_mainbody_lite_v1.0_infer.tar) | 40.1% | 30.1 | 29.8  |
-| 服务端主体检测模型 | PP-YOLOv2 | [地址](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/pretrain/ppyolov2_r50vd_dcn_mainbody_v1.0_pretrained.pdparams) | [地址](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/inference/ppyolov2_r50vd_dcn_mainbody_v1.0_infer.tar) | 42.5% | 210.5 | 466.6  |
-
+| 轻量级主体检测模型 | PicoDet | [地址](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/pretrain/picodet_PPLCNet_x2_5_mainbody_lite_v1.0_pretrained.pdparams) | [tar 格式文件地址](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/inference/picodet_PPLCNet_x2_5_mainbody_lite_v1.0_infer.tar) [zip 格式文件地址](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/inference/picodet_PPLCNet_x2_5_mainbody_lite_v1.0_infer.zip) | 40.1% | 30.1 | 29.8  |
+| 服务端主体检测模型 | PP-YOLOv2 | [地址](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/pretrain/ppyolov2_r50vd_dcn_mainbody_v1.0_pretrained.pdparams) | [tar 格式文件地址](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/inference/ppyolov2_r50vd_dcn_mainbody_v1.0_infer.tar) [zip 格式文件地址](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/inference/ppyolov2_r50vd_dcn_mainbody_v1.0_infer.zip) | 42.5% | 210.5 | 466.6  |
 
 * 注意
+  * 由于部分解压缩软件在解压上述 `tar` 格式文件时存在问题，建议非命令行用户下载 `zip` 格式文件并解压。`tar` 格式文件建议使用命令 `tar xf xxx.tar` 解压。
   * 速度评测机器的CPU具体信息为：`Intel(R) Xeon(R) Gold 6148 CPU @ 2.40GHz`，速度指标为开启 mkldnn ，线程数设置为 10 测试得到。
   * 主体检测的预处理过程较为耗时，平均每张图在上述机器上的时间在 40~55 ms 左右，没有包含在上述的预测耗时统计中。
 
