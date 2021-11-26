@@ -8,7 +8,7 @@
 - [3. 通过 pip 安装 PaddlePaddle](#3)
 - [4. 验证安装](#4)
 
-目前， **PaddleClas** 要求 **PaddlePaddle** 版本 `>=2.0`。建议使用我们提供的 Docker 运行 PaddleClas，有关 Docker、nvidia-docker 的相关使用教程可以参考[链接](https://www.runoob.com/Docker/Docker-tutorial.html)。如果不使用 Docker，可以直接跳过 [2.（建议）使用 Docker 环境](#2) 部分内容，从 [3. 通过 pip 安装 PaddlePaddle](#3) 部分开始。
+目前，**PaddleClas** 要求 **PaddlePaddle** 版本 `>=2.0`。建议使用我们提供的 Docker 运行 PaddleClas，有关 Docker、nvidia-docker 的相关使用教程可以参考[链接](https://www.runoob.com/Docker/Docker-tutorial.html)。如果不使用 Docker，可以直接跳过 [2.（建议）使用 Docker 环境](#2) 部分内容，从 [3. 通过 pip 安装 PaddlePaddle](#3) 部分开始。
 
 <a name='1'></a>
 
@@ -16,9 +16,9 @@
 
 **版本要求**：
 - python 3.x
-- CUDA >= 10.1 (如果使用 `paddlepaddle-gpu`)
-- cuDNN >= 7.6.4 (如果使用 `paddlepaddle-gpu`)
-- nccl >= 2.1.2 (如果使用分布式训练/评估)
+- CUDA >= 10.1（如果使用 `paddlepaddle-gpu`）
+- cuDNN >= 7.6.4（如果使用 `paddlepaddle-gpu`）
+- nccl >= 2.1.2（如果使用分布式训练/评估）
 - gcc >= 8.2
 
 **建议**：

@@ -34,7 +34,7 @@
 
 ## 1. 检索库安装
 
-`Faiss`具体安装方法如下：
+`Faiss` 具体安装方法如下：
 
 ```python
 pip install faiss-cpu==1.7.1post2

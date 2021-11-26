@@ -38,7 +38,7 @@
 相比于上述标准的图像增广方法，研究者也提出了很多改进的图像增广策略，这些策略均是在标准增广方法的不同阶段插入一定的操作，基于这些策略操作所处的不同阶段，我们将其分为了三类：
 
 1. 对 `RandCrop` 后的 224 的图像进行一些变换: AutoAugment，RandAugment
-2. 对`Transpose` 后的 224 的图像进行一些裁剪: CutOut，RandErasing，HideAndSeek，GridMask
+2. 对 `Transpose` 后的 224 的图像进行一些裁剪: CutOut，RandErasing，HideAndSeek，GridMask
 3. 对 `Batch` 后的数据进行混合: Mixup，Cutmix
 
 增广后的可视化效果如下所示。
@@ -105,12 +105,12 @@ PaddleClas 中集成了上述所有的数据增强策略，每种数据增强策
 
 开源代码 github 地址：[https://github.com/rwightman/pytorch-image-models/blob/master/timm/data/auto_augment.py](https://github.com/rwightman/pytorch-image-models/blob/master/timm/data/auto_augment.py)
 
-`TimmAutoAugment`是开源作者对 AutoAugment 和 RandAugment 的改进，事实证明，其在很多视觉任务上有更好的表现，目前绝大多数 VisionTransformer 模型都是基于 TimmAutoAugment 去实现的。
+`TimmAutoAugment` 是开源作者对 AutoAugment 和 RandAugment 的改进，事实证明，其在很多视觉任务上有更好的表现，目前绝大多数 VisionTransformer 模型都是基于 TimmAutoAugment 去实现的。
 
 <a name="4"></a>
 ## 4. 图像裁剪类
 
-图像裁剪类主要是对`Transpose` 后的 224 的图像进行一些裁剪，并将裁剪区域的像素值置为特定的常数（默认为 0），主要包括：
+图像裁剪类主要是对 `Transpose` 后的 224 的图像进行一些裁剪，并将裁剪区域的像素值置为特定的常数（默认为 0），主要包括：
 
 + CutOut
 + RandErasing
@@ -127,7 +127,7 @@ PaddleClas 中集成了上述所有的数据增强策略，每种数据增强策
 
 开源代码 github 地址：[https://github.com/uoguelph-mlrg/Cutout](https://github.com/uoguelph-mlrg/Cutout)
 
-Cutout 可以理解为 Dropout 的一种扩展操作，不同的是 Dropout 是对图像经过网络后生成的特征进行遮挡，而 Cutout 是直接对输入的图像进行遮挡，相对于 Dropout 对噪声的鲁棒性更好。作者在论文中也进行了说明，这样做法有以下两点优势：(1) 通过 Cutout 可以模拟真实场景中主体被部分遮挡时的分类场景；(2) 可以促进模型充分利用图像中更多的内容来进行分类，防止网络只关注显著性的图像区域，从而发生过拟合。
+Cutout 可以理解为 Dropout 的一种扩展操作，不同的是 Dropout 是对图像经过网络后生成的特征进行遮挡，而 Cutout 是直接对输入的图像进行遮挡，相对于 Dropout 对噪声的鲁棒性更好。作者在论文中也进行了说明，这样做法有以下两点优势：(1)通过 Cutout 可以模拟真实场景中主体被部分遮挡时的分类场景；(2)可以促进模型充分利用图像中更多的内容来进行分类，防止网络只关注显著性的图像区域，从而发生过拟合。
 
 
 经过 RandAugment 数据增强后结果如下图所示。

@@ -167,7 +167,7 @@ tar -xf paddle_inference.tgz
 sh tools/build_demo.sh
 ```
 
-具体地，`tools/build_demo.sh`中内容如下：
+具体地，`tools/build_demo.sh` 中内容如下：
 
 ```shell
 OpenCV_DIR=path/to/opencv
@@ -224,7 +224,7 @@ make -j
 sh tools/build_lib.sh
 ```
 
-具体地，`tools/build_lib.sh`中内容如下：
+具体地，`tools/build_lib.sh` 中内容如下：
 
 ```shell
 OpenCV_DIR=path/to/opencv
@@ -281,7 +281,7 @@ inference/
 * resize_short_size：预处理时图像缩放大小；
 * crop_size：预处理时图像裁剪后的大小。
 
-然后修改`tools/run.sh`：
+然后修改 `tools/run.sh`：
   * `./build/clas_system ./tools/config.txt ./docs/imgs/ILSVRC2012_val_00000666.JPEG`
   * 上述命令中分别为：编译得到的可执行文件 `clas_system`；运行时的配置文件 `config.txt`；待预测的图像。
 

@@ -105,8 +105,8 @@ python tools/train.py -c ./ppcls/configs/quick_start/new_user/ShuffleNetV2_x0_25
 ```
 
 - `-c` 参数是指定训练的配置文件路径，训练的具体超参数可查看 `yaml` 文件
-- `yaml`文`Global.device` 参数设置为`cpu`，即使用 CPU 进行训练（若不设置，此参数默认为`True`）
-- `yaml`文件中`epochs`参数设置为 20，说明对整个数据集进行 20 个 epoch 迭代，预计训练 20 分钟左右（不同 CPU，训练时间略有不同），此时训练模型不充分。若提高训练模型精度，请将此参数设大，如**40**，训练时间也会相应延长
+- `yaml` 文件中 `Global.device` 参数设置为 `cpu`，即使用 CPU 进行训练（若不设置，此参数默认为 `True`）
+- `yaml` 文件中 `epochs` 参数设置为 20，说明对整个数据集进行 20 个 epoch 迭代，预计训练 20 分钟左右（不同 CPU，训练时间略有不同），此时训练模型不充分。若提高训练模型精度，请将此参数设大，如**40**，训练时间也会相应延长
 
 <a name="4.1.2"></a>
 #### 4.1.2 使用预训练模型进行训练
@@ -145,7 +145,7 @@ python tools/train.py -c ./ppcls/configs/quick_start/new_user/ShuffleNetV2_x0_25
 python tools/train.py -c ./ppcls/configs/quick_start/ResNet50_vd.yaml
 ```
 
-训练完成后，验证集的`Top1 Acc`曲线如下所示，最高准确率为 0.2735。训练精度曲线下图所示
+训练完成后，验证集的 `Top1 Acc` 曲线如下所示，最高准确率为 0.2735。训练精度曲线下图所示
 
 <div align="center">
 <img src="../../images/quick_start/r50_vd_acc.png"  width = "800" />

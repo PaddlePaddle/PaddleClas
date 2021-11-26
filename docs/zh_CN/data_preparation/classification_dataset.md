@@ -118,6 +118,6 @@ MMNIST 是一个非常有名的手写体数字识别数据集，在很多资料�
 <a name="2.5"></a>
 ### 2.5 NUS-WIDE
 
-NUS-WIDE 是一个多分类数据集。该数据集包含 269648 张图片, 81 个类别， 每张图片被标记为该 81 个类别中的某一类或某几类。
+NUS-WIDE 是一个多分类数据集。该数据集包含 269648 张图片, 81 个类别，每张图片被标记为该 81 个类别中的某一类或某几类。
 
 数据集地址：https://lms.comp.nus.edu.sg/wp-content/uploads/2019/research/nuswide/NUS-WIDE.html

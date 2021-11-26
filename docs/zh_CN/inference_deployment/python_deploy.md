@@ -32,7 +32,7 @@ python python/predict_cls.py -c configs/inference_cls.yaml
 * `Global.use_tensorrt`：是否使用 TesorRT 预测引擎，默认为 `False`；
 * `Global.use_gpu`：是否使用 GPU 预测，默认为 `True`；
 * `Global.enable_mkldnn`：是否启用 `MKL-DNN` 加速库，默认为 `False`。注意 `enable_mkldnn` 与 `use_gpu` 同时为 `True` 时，将忽略 `enable_mkldnn`，而使用 GPU 预测；
-* `Global.use_fp16`：是否启用 `FP16` ，默认为 `False`；
+* `Global.use_fp16`：是否启用 `FP16`，默认为 `False`；
 * `PreProcess`：用于数据预处理配置；
 * `PostProcess`：由于后处理配置；
 * `PostProcess.Topk.class_id_map_file`：数据集 label 的映射文件，默认为 `./utils/imagenet1k_label_list.txt`，该文件为 PaddleClas 所使用的 ImageNet 数据集 label 映射文件。

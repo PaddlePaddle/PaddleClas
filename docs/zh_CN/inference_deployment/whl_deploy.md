@@ -15,7 +15,7 @@ PaddleClas 支持 Python Whl 包方式进行预测，目前 Whl 包方式仅支�
    - [4.3 使用本地模型文件预测](#4.3)
    - [4.4 批量预测](#4.4)
    - [4.5 对网络图片进行预测](#4.5)
-   - [4.6 对`NumPy.ndarray`格式数据进行预测](#4.6)
+   - [4.6 对 `NumPy.ndarray` 格式数据进行预测](#4.6)
    - [4.7 保存预测结果](#4.7)
    - [4.8 指定 label name](#4.8)
    
@@ -38,7 +38,7 @@ pip3 install dist/*
 
 <a name="2"></a>
 ## 2. 快速开始
-* 使用`ResNet50`模型，以下图（`PaddleClas/docs/images/inference_deployment/whl_demo.jpg`）为例进行说明。
+* 使用 `ResNet50` 模型，以下图（`PaddleClas/docs/images/inference_deployment/whl_demo.jpg`）为例进行说明。
 
 <div align="center">
 <img src="../../images/inference_deployment/whl_demo.jpg"  width = "400" />
@@ -90,7 +90,7 @@ Predict complete!
 * class_id_map_file(str): `class id` 与 `label` 的映射关系文件。默认使用 `ImageNet1K` 数据集的映射关系。
 * save_dir(str): 将预测结果作为预标注数据保存的路径，默认为 `None`，即不保存。
 
-**注意**: 如果使用`Transformer`系列模型，如`DeiT_***_384`, `ViT_***_384`等，请注意模型的输入数据尺寸，需要设置参数`resize_short=384`, `crop_size=384`，如下所示。
+**注意**: 如果使用 `Transformer` 系列模型，如 `DeiT_***_384`, `ViT_***_384` 等，请注意模型的输入数据尺寸，需要设置参数 `resize_short=384`, `crop_size=384`，如下所示。
 
 * 命令行中
 ```bash
@@ -121,7 +121,7 @@ paddleclas -h
 
 <a name="4.2"></a>
 ### 4.2 使用 PaddleClas 提供的预训练模型进行预测
-可以使用 PaddleClas 提供的预训练模型来预测，并通过参数`model_name`指定。此时 PaddleClas 会根据`model_name`自动下载指定模型，并保存在目录`~/.paddleclas/`下。
+可以使用 PaddleClas 提供的预训练模型来预测，并通过参数 `model_name` 指定。此时 PaddleClas 会根据 `model_name` 自动下载指定模型，并保存在目录`~/.paddleclas/`下。
 
 * Python
 ```python
@@ -139,7 +139,7 @@ paddleclas --model_name='ResNet50' --infer_imgs='docs/images/inference_deploymen
 
 <a name="4.3"></a>
 ### 4.3 使用本地模型文件预测
-可以使用本地的模型文件进行预测，通过参数`inference_model_dir`指定模型文件目录即可。需要注意，模型文件目录下必须包含`inference.pdmodel`和`inference.pdiparams`两个文件。
+可以使用本地的模型文件进行预测，通过参数 `inference_model_dir` 指定模型文件目录即可。需要注意，模型文件目录下必须包含 `inference.pdmodel` 和 `inference.pdiparams` 两个文件。
 
 * Python
 ```python
@@ -176,7 +176,7 @@ paddleclas --model_name='ResNet50' --infer_imgs='docs/images/' --batch_size 2
 
 <a name="4.5"></a>
 ### 4.5 对网络图片进行预测
-可以对网络图片进行预测，只需通过参数`infer_imgs`指定图片`url`。此时图片会下载并保存在`~/.paddleclas/images/`目录下。
+可以对网络图片进行预测，只需通过参数 `infer_imgs` 指定图片 `url`。此时图片会下载并保存在`~/.paddleclas/images/`目录下。
 
 * Python
 ```python
@@ -193,8 +193,8 @@ paddleclas --model_name='ResNet50' --infer_imgs='https://raw.githubusercontent.c
 ```
 
 <a name="4.6"></a>
-### 4.6 对`NumPy.ndarray`格式数据进行预测
-在 Python 中，可以对`Numpy.ndarray`格式的图像数据进行预测，只需通过参数`infer_imgs`指定即可。注意该图像数据必须为三通道图像数据。
+### 4.6 对 `NumPy.ndarray` 格式数据进行预测
+在 Python 中，可以对 `Numpy.ndarray` 格式的图像数据进行预测，只需通过参数 `infer_imgs` 指定即可。注意该图像数据必须为三通道图像数据。
 
 * python
 ```python
@@ -208,7 +208,7 @@ print(next(result))
 
 <a name="4.7"></a>
 ### 4.7 保存预测结果
-可以指定参数`pre_label_out_dir='./output_pre_label/'`，将图片按其 top1 预测结果保存到`pre_label_out_dir`目录下对应类别的文件夹中。
+可以指定参数 `pre_label_out_dir='./output_pre_label/'`，将图片按其 top1 预测结果保存到 `pre_label_out_dir` 目录下对应类别的文件夹中。
 
 * python
 ```python
@@ -226,9 +226,9 @@ paddleclas --model_name='ResNet50' --infer_imgs='docs/images/whl/' --save_dir='.
 
 <a name="4.8"></a>
 ### 4.8 指定 label name
-可以通过参数`class_id_map_file`指定`class id`与`lable`的对应关系。PaddleClas 默认使用 ImageNet1K 的 label_name（`ppcls/utils/imagenet1k_label_list.txt`）。
+可以通过参数 `class_id_map_file` 指定 `class id` 与 `lable` 的对应关系。PaddleClas 默认使用 ImageNet1K 的 label_name（`ppcls/utils/imagenet1k_label_list.txt`）。
 
-`class_id_map_file`文件内容格式应为：
+`class_id_map_file` 文件内容格式应为：
 
 ```
 class_id<space>class_name<\n>

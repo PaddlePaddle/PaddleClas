@@ -94,7 +94,7 @@ python3 -m paddle.distributed.launch \
 
 验证集最高准确率为 0.718 左右，加载预训练模型之后，CIFAR100 数据集精度大幅提升，绝对精度涨幅 30%。
 
-* 基于 ImageNet1k 分类预训练模型 ResNet50_vd_ssld_pretrained （准确率 82.39%）进行微调，训练脚本如下所示。
+* 基于 ImageNet1k 分类预训练模型 ResNet50_vd_ssld_pretrained（准确率 82.39%）进行微调，训练脚本如下所示。
 
 ```shell
 export CUDA_VISIBLE_DEVICES=0,1,2,3
@@ -220,7 +220,7 @@ python3 -m paddle.distributed.launch \
 * **注意**
 
   * 蒸馏过程中，教师模型使用的预训练模型为 CIFAR100 数据集上的训练结果，学生模型使用的是 ImageNet1k 数据集上精度为 75.32% 的 MobileNetV3_large_x1_0 预训练模型。
-  * 该蒸馏过程无须使用真实标签，所以可以使用更多的无标签数据，在使用过程中，可以将无标签数据生成假的 `train_list.txt` ，然后与真实的 `train_list.txt` 进行合并, 用户可以根据自己的数据自行体验。
+  * 该蒸馏过程无须使用真实标签，所以可以使用更多的无标签数据，在使用过程中，可以将无标签数据生成假的 `train_list.txt`，然后与真实的 `train_list.txt` 进行合并, 用户可以根据自己的数据自行体验。
 
 <a name="5"></a>
 
@@ -268,7 +268,7 @@ python3 tools/export_model.py \
     -o Global.pretrained_model=output_CIFAR/ResNet50_vd/best_model
 ```
 
-* 默认会在 `inference` 文件夹下生成 `inference.pdiparams`、`inference.pdmodel`和 `inference.pdiparams.info` 文件。
+* 默认会在 `inference` 文件夹下生成 `inference.pdiparams`、`inference.pdmodel` 和 `inference.pdiparams.info` 文件。
 
 使用预测引擎进行推理：
 

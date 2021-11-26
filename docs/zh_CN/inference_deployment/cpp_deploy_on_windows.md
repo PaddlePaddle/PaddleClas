@@ -16,7 +16,7 @@ PaddleClas 在 Windows 平台下基于 `Visual Studio 2019 Community` 进行了�
 <a name='1'></a>
 ##  1. 前置条件
 * Visual Studio 2019
-* CUDA 9.0 / CUDA 10.0，cudnn 7.6+ （仅在使用 GPU 版本的预测库时需要）
+* CUDA 9.0 / CUDA 10.0，cudnn 7.6+（仅在使用 GPU 版本的预测库时需要）
 * CMake 3.0+
 
 请确保系统已经正确安装并配置好上述基本软件，其中：
@@ -49,7 +49,7 @@ paddle_inference_install_dir
 <a name='1.2'></a>
 ### 1.2 安装配置 OpenCV
 
-1. 在 OpenCV 官网下载适用于 Windows 平台的 3.4.6 版本，[下载地址](https://sourceforge.net/projects/opencvlibrary/files/3.4.6/opencv-3.4.6-vc14_vc15.exe/download) ；
+1. 在 OpenCV 官网下载适用于 Windows 平台的 3.4.6 版本，[下载地址](https://sourceforge.net/projects/opencvlibrary/files/3.4.6/opencv-3.4.6-vc14_vc15.exe/download)；
 2. 运行下载的可执行文件，将 OpenCV 解压至指定目录，如 `D:\projects\opencv`；
 3. 配置环境变量，如下流程所示：
   * 此电脑（我的电脑）-> 属性 -> 高级系统设置 -> 环境变量；
@@ -67,7 +67,7 @@ paddle_inference_install_dir
 
 ![step2.1](../../images/inference_deployment/vs2019_step2.png)
 
-选择项目代码所在路径，并打开`CMakeList.txt`：
+选择项目代码所在路径，并打开 `CMakeList.txt`：
 
 ![step2.2](../../images/inference_deployment/vs2019_step3.png)
 
@@ -97,9 +97,9 @@ paddle_inference_install_dir
 * `CMAKE_BACKWARDS_COMPATIBILITY` 的值请根据自己 `cmake` 版本设置，`cmake` 版本可以通过命令：`cmake --version` 查询；
 * `CUDA_LIB` 、 `CUDNN_LIB` 的值仅需在使用 **GPU 版本**预测库时指定，其中 CUDA 库版本尽量对齐，**使用 9.0、10.0 版本，不使用 9.2、10.1 等版本 CUDA 库**；
 * 在设置 `CUDA_LIB`、`CUDNN_LIB`、`OPENCV_DIR`、`PADDLE_LIB` 时，点击 `浏览`，分别设置相应的路径；
-   * `CUDA_LIB`和`CUDNN_LIB`：该路径取决于 CUDA 与 CUDNN 的安装位置。
-   * `OpenCV_DIR`：该路径下需要有`.cmake`文件，一般为`opencv/build/`；
-   * `PADDLE_LIB`：该路径下需要有`CMakeCache.txt`文件，一般为`paddle_inference_install_dir/`。
+   * `CUDA_LIB` 和 `CUDNN_LIB`：该路径取决于 CUDA 与 CUDNN 的安装位置。
+   * `OpenCV_DIR`：该路径下需要有`.cmake` 文件，一般为 `opencv/build/`；
+   * `PADDLE_LIB`：该路径下需要有 `CMakeCache.txt` 文件，一般为 `paddle_inference_install_dir/`。
 * 在使用 `CPU` 版预测库时，请不要勾选 `WITH_GPU` - `保存到 JSON`。
 
 ![step4](../../images/inference_deployment/vs2019_step5.png)

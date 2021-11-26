@@ -72,7 +72,7 @@ python tools/feature_maps_visualization/fm_vis.py \
 + `-i`：待预测的图片文件路径，如 `./test.jpeg`
 + `-c`：特征图维度，如 `5`
 + `-p`：权重文件路径，如 `./ResNet50_pretrained`
-+ `--interpolation`: 图像插值方式， 默认值 1
++ `--interpolation`: 图像插值方式，默认值 1
 + `--save_path`：保存路径，如：`./tools/`
 + `--use_gpu`：是否使用 GPU 预测，默认值：True
 
@@ -97,6 +97,6 @@ python tools/feature_maps_visualization/fm_vis.py \
     --use_gpu=False
 ```
 
-* 输出特征图保存为`output.png`，如下所示。
+* 输出特征图保存为 `output.png`，如下所示。
 
 ![](../../images/feature_maps/feature_visualization_output.jpg)
