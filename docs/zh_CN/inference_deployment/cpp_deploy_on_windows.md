@@ -159,7 +159,7 @@ cd D:\projects\PaddleClas\deploy\cpp\out\build\x64-Release
 
 注意，需要在配置文件中正确设置预测参数，包括所用模型文件的路径（`cls_model_path` 和 `cls_params_path`）。
 <a name='3.3'></a>
-### 3.3  注意事项
+### 3.3 注意事项
 * 在 Windows 下的终端中执行文件 exe 时，可能会发生乱码的现象，此时需要在终端中输入 `CHCP 65001`，将终端的编码方式由 GBK 编码(默认)改为 UTF-8 编码，更加具体的解释可以参考这篇博客：[https://blog.csdn.net/qq_35038153/article/details/78430359](https://blog.csdn.net/qq_35038153/article/details/78430359)；
 * 如果需要使用 CPU 预测，PaddlePaddle 在 Windows 上仅支持 avx 的 CPU 预测，目前不支持 noavx 的 CPU 预测；
 * 在使用生成的 `clas_system.exe` 进行预测时，如提示 `由于找不到 paddle_fluid.dll，无法继续执行代码。重新安装程序可能会解决此问题`，请检查是否将 Paddle 预测库路径添加到系统环境变量，详见[1.1 下载 PaddlePaddle C++ 预测库 paddle_inference_install_dir](#1.1)。
