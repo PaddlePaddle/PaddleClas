@@ -21,6 +21,7 @@ import logging
 import numpy as np
 import base64, cv2
 
+
 class ImagenetOp(Op):
     def init_op(self):
         self.seq = Sequential([
@@ -36,6 +37,7 @@ class ImagenetOp(Op):
                 label_idx += 1
 
     def preprocess(self, input_dicts, data_id, log_id):
+        print("111111")
         (_, input_dict), = input_dicts.items()
         batch_size = len(input_dict.keys())
         imgs = []
@@ -46,9 +48,11 @@ class ImagenetOp(Op):
             img = self.seq(im)
             imgs.append(img[np.newaxis, :].copy())
         input_imgs = np.concatenate(imgs, axis=0)
-        return {"image": input_imgs}, False, None, ""
+        print("2222222")
+        return {"inputs": input_imgs}, False, None, ""
 
-    def postprocess(self, input_dicts, fetch_dict, log_id):
+    def postprocess(self, input_dicts, fetch_dict, data_id, log_id):
+        print("3333333")
         score_list = fetch_dict["prediction"]
         result = {"label": [], "prob": []}
         for score in score_list:
@@ -59,6 +63,7 @@ class ImagenetOp(Op):
             result["prob"].append(max_score)
         result["label"] = str(result["label"])
         result["prob"] = str(result["prob"])
+        print("444444444")
         return result, None, ""
 
 

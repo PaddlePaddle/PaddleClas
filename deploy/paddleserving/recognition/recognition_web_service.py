@@ -83,7 +83,7 @@ class DetOp(Op):
         }
         return feed_dict, False, None, ""
 
-    def postprocess(self, input_dicts, fetch_dict, log_id):
+    def postprocess(self, input_dicts, fetch_dict, data_id, log_id):
         boxes = self.img_postprocess(fetch_dict, visualize=False)
         boxes.sort(key=lambda x: x["score"], reverse=True)
         boxes = filter(lambda x: x["score"] >= self.threshold,
@@ -173,7 +173,7 @@ class RecOp(Op):
             filtered_results.append(results[i])
         return filtered_results
 
-    def postprocess(self, input_dicts, fetch_dict, log_id):
+    def postprocess(self, input_dicts, fetch_dict, data_id, log_id):
         batch_features = fetch_dict["features"]
 
         if self.feature_normalize:
