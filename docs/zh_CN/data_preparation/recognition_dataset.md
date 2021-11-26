@@ -106,7 +106,7 @@ Cars 数据集包含了 196 类汽车的 16185 张图像。数据被分成 8144 
 
     地址：https://www.kaggle.com/c/products-10k/data?select=train.csv
 
-+ DeepFashion-Inshop:  同通用图像识别数据集中的 In-shop Clothes
++ DeepFashion-Inshop: 同通用图像识别数据集中的 In-shop Clothes
 
 <a name="2.2.3"></a>
 ### 2.2.3 Logo 识别

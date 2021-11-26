@@ -26,10 +26,10 @@
 ![](../../images/feature_extraction_framework.png)
 图中各个模块的功能为:
 
-- **Backbone**:   指定所使用的骨干网络。 值得注意的是，PaddleClas 提供的基于 ImageNet 的预训练模型，最后一层的输出为 1000，我们需要依据所需的特征维度定制最后一层的输出。
-- **Neck**:  用以特征增强及特征维度变换。  这儿的 Neck，可以是一个简单的 Linear Layer，用来做特征维度变换；也可以是较复杂的 FPN 结构，用以做特征增强。
-- **Head**:  用来将 feature 转化为 logits。 除了常用的 Fc Layer 外，还可以替换为 cosmargin, arcmargin, circlemargin 等模块。
-- **Loss**:  指定所使用的 Loss 函数。  我们将 Loss 设计为组合 loss 的形式，可以方便得将 Classification Loss 和 Pair_wise Loss 组合在一起。
+- **Backbone**: 指定所使用的骨干网络。 值得注意的是，PaddleClas 提供的基于 ImageNet 的预训练模型，最后一层的输出为 1000，我们需要依据所需的特征维度定制最后一层的输出。
+- **Neck**: 用以特征增强及特征维度变换。这儿的 Neck，可以是一个简单的 Linear Layer，用来做特征维度变换；也可以是较复杂的 FPN 结构，用以做特征增强。
+- **Head**: 用来将 feature 转化为 logits。除了常用的 Fc Layer 外，还可以替换为 cosmargin, arcmargin, circlemargin 等模块。
+- **Loss**: 指定所使用的 Loss 函数。我们将 Loss 设计为组合 loss 的形式，可以方便得将 Classification Loss 和 Pair_wise Loss 组合在一起。
 
 <a name="3"></a> 
 
@@ -161,7 +161,7 @@ python tools/export_model \
 -o Global.pretrained_model="output/RecModel/best_model"
 ```
 生成的推理模型位于 `inference` 目录，里面包含三个文件，分别为 `inference.pdmodel`、`inference.pdiparams`、`inference.pdiparams.info`。
-其中:  `inference.pdmodel` 用来存储推理模型的结构, `inference.pdiparams` 和 `inference.pdiparams.info` 用来存储推理模型相关的参数信息。
+其中: `inference.pdmodel` 用来存储推理模型的结构, `inference.pdiparams` 和 `inference.pdiparams.info` 用来存储推理模型相关的参数信息。
 
 <a name="4.4.2"></a> 
 

@@ -300,9 +300,9 @@ PaddleClas 图像检索部分目前支持的环境如下：
 pip install faiss-cpu==1.7.1post2
 ```
 
-若使用时，不能正常引用，则 `uninstall`  之后，重新 `install`，尤其是 `windows` 下。
+若使用时，不能正常引用，则 `uninstall` 之后，重新 `install`，尤其是 `windows` 下。
 
-<a name="4"></a>  
+<a name="4"></a>
 
 ## 4. 基础知识
 

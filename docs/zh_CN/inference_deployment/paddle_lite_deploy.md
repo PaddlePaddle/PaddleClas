@@ -235,7 +235,7 @@ demo/cxx/clas/
 #### 注意：
 * 上述文件中，`imagenet1k_label_list.txt` 是 ImageNet1k 数据集的类别映射文件，如果使用自定义的类别，需要更换该类别映射文件。
 
-*  `config.txt` 包含了分类器的超参数，如下：
+* `config.txt` 包含了分类器的超参数，如下：
 
 ```shell
 clas_model_file ./MobileNetV3_large_x1_0.nb # 模型文件地址
