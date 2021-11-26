@@ -37,22 +37,25 @@ class RecPredictor(Predictor):
         self.postprocess = build_postprocess(config["RecPostProcess"])
         self.benchmark = config["Global"].get("benchmark", False)
 
-        import auto_log
-        pid = os.getpid()
-        self.auto_logger = auto_log.AutoLogger(
-            model_name=config["Global"].get("model_name", "rec"),
-            model_precision='fp16' if config["Global"]["use_fp16"] else 'fp32',
-            batch_size=config["Global"].get("batch_size", 1),
-            data_shape=[3, 224, 224],
-            save_path=config["Global"].get("save_log_path", "./auto_log.log"),
-            inference_config=self.config,
-            pids=pid,
-            process_name=None,
-            gpu_ids=None,
-            time_keys=[
-                'preprocess_time', 'inference_time', 'postprocess_time'
-            ],
-            warmup=2)
+        if self.benchmark:
+            import auto_log
+            pid = os.getpid()
+            self.auto_logger = auto_log.AutoLogger(
+                model_name=config["Global"].get("model_name", "rec"),
+                model_precision='fp16'
+                if config["Global"]["use_fp16"] else 'fp32',
+                batch_size=config["Global"].get("batch_size", 1),
+                data_shape=[3, 224, 224],
+                save_path=config["Global"].get("save_log_path",
+                                               "./auto_log.log"),
+                inference_config=self.config,
+                pids=pid,
+                process_name=None,
+                gpu_ids=None,
+                time_keys=[
+                    'preprocess_time', 'inference_time', 'postprocess_time'
+                ],
+                warmup=2)
 
     def predict(self, images, feature_normalize=True):
         input_names = self.paddle_predictor.get_input_names()
