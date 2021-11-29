@@ -33,11 +33,11 @@ fpgm_export:null
 distill_export:null
 kl_quant:null
 export2:null
-pretrained_model_url:https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/SwinTransformer_large_patch4_window12_384_pretrained.pdparams
+pretrained_model_url:https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/SwinTransformer_large_patch4_window12_384_22kto1k_pretrained.pdparams
 infer_model:../inference/
 infer_export:True
 infer_quant:Fasle
-inference:python/predict_cls.py -c configs/inference_cls.yaml
+inference:python/predict_cls.py -c configs/inference_cls.yaml -o PreProcess.transform_ops.0.ResizeImage.resize_short=384 -o PreProcess.transform_ops.1.CropImage.size=384
 -o Global.use_gpu:True|False
 -o Global.enable_mkldnn:True|False
 -o Global.cpu_num_threads:1|6

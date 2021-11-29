@@ -33,7 +33,7 @@ fpgm_export:null
 distill_export:null
 kl_quant:null
 export2:null
-pretrained_model_url:https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/SwinTransformer_large_patch4_window7_224_pretrained.pdparams
+pretrained_model_url:https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/SwinTransformer_large_patch4_window7_224_22kto1k_pretrained.pdparams
 infer_model:../inference/
 infer_export:True
 infer_quant:Fasle
