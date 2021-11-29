@@ -27,6 +27,7 @@
 #include <numeric>
 
 #include <auto_log/autolog.h>
+#include <gflags/gflags.h>
 #include <include/cls.h>
 #include <include/cls_config.h>
 
@@ -34,18 +35,27 @@ using namespace std;
 using namespace cv;
 using namespace PaddleClas;
 
+DEFINE_string(config, "", "Path of yaml file");
+DEFINE_string(c, "", "Path of yaml file");
+
 int main(int argc, char **argv) {
-  if (argc < 3) {
-    std::cerr << "[ERROR] usage: " << argv[0]
-              << " configure_filepath image_path\n";
+  google::ParseCommandLineFlags(&argc, &argv, true);
+  std::string yaml_path = "";
+  if (FLAGS_config == "" && FLAGS_c == "") {
+    std::cerr << "[ERROR] usage: " << std::endl
+              << argv[0] << " -c $yaml_path" << std::endl
+              << "or:" << std::endl
+              << argv[0] << " -config $yaml_path" << std::endl;
     exit(1);
+  } else if (FLAGS_config != "") {
+    yaml_path = FLAGS_config;
+  } else {
+    yaml_path = FLAGS_c;
   }
-
-  ClsConfig config(argv[1]);
-
+  ClsConfig config(yaml_path);
   config.PrintConfigInfo();
 
-  std::string path(argv[2]);
+  std::string path(config.infer_imgs);
 
   std::vector<std::string> img_files_list;
   if (cv::utils::fs::isDirectory(path)) {
@@ -60,11 +70,7 @@ int main(int argc, char **argv) {
 
   std::cout << "img_file_list length: " << img_files_list.size() << std::endl;
 
-  Classifier classifier(config.cls_model_path, config.cls_params_path,
-                        config.use_gpu, config.gpu_id, config.gpu_mem,
-                        config.cpu_threads, config.use_mkldnn,
-                        config.use_tensorrt, config.use_fp16,
-                        config.resize_short_size, config.crop_size);
+  Classifier classifier(config);
 
   double elapsed_time = 0.0;
   std::vector<double> cls_times;

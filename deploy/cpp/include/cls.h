@@ -28,6 +28,7 @@
 #include <fstream>
 #include <numeric>
 
+#include "include/cls_config.h"
 #include <include/preprocess_op.h>
 
 using namespace paddle_infer;
@@ -36,25 +37,21 @@ namespace PaddleClas {
 
 class Classifier {
 public:
-  explicit Classifier(const std::string &model_path,
-                      const std::string &params_path, const bool &use_gpu,
-                      const int &gpu_id, const int &gpu_mem,
-                      const int &cpu_math_library_num_threads,
-                      const bool &use_mkldnn, const bool &use_tensorrt,
-                      const bool &use_fp16, const int &resize_short_size,
-                      const int &crop_size) {
-    this->use_gpu_ = use_gpu;
-    this->gpu_id_ = gpu_id;
-    this->gpu_mem_ = gpu_mem;
-    this->cpu_math_library_num_threads_ = cpu_math_library_num_threads;
-    this->use_mkldnn_ = use_mkldnn;
-    this->use_tensorrt_ = use_tensorrt;
-    this->use_fp16_ = use_fp16;
-
-    this->resize_short_size_ = resize_short_size;
-    this->crop_size_ = crop_size;
-
-    LoadModel(model_path, params_path);
+  explicit Classifier(const ClsConfig &config) {
+    this->use_gpu_ = config.use_gpu;
+    this->gpu_id_ = config.gpu_id;
+    this->gpu_mem_ = config.gpu_mem;
+    this->cpu_math_library_num_threads_ = config.cpu_threads;
+    this->use_fp16_ = config.use_fp16;
+    this->use_mkldnn_ = config.use_mkldnn;
+    this->use_tensorrt_ = config.use_tensorrt;
+    this->mean_ = config.mean;
+    this->std_ = config.std;
+    this->resize_short_size_ = config.resize_short_size;
+    this->scale_ = config.scale;
+    this->crop_size_ = config.crop_size;
+    this->ir_optim_ = config.ir_optim;
+    LoadModel(config.cls_model_path, config.cls_params_path);
   }
 
   // Load Paddle inference model
@@ -73,10 +70,11 @@ private:
   bool use_mkldnn_ = false;
   bool use_tensorrt_ = false;
   bool use_fp16_ = false;
+  bool ir_optim_ = true;
 
   std::vector<float> mean_ = {0.485f, 0.456f, 0.406f};
-  std::vector<float> scale_ = {1 / 0.229f, 1 / 0.224f, 1 / 0.225f};
-  bool is_scale_ = true;
+  std::vector<float> std_ = {0.229f, 0.224f, 0.225f};
+  float scale_ = 0.00392157;
 
   int resize_short_size_ = 256;
   int crop_size_ = 224;

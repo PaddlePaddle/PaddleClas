@@ -16,49 +16,20 @@
 
 namespace PaddleClas {
 
-std::vector<std::string> ClsConfig::split(const std::string &str,
-                                          const std::string &delim) {
-  std::vector<std::string> res;
-  if ("" == str)
-    return res;
-  char *strs = new char[str.length() + 1];
-  std::strcpy(strs, str.c_str());
-
-  char *d = new char[delim.length() + 1];
-  std::strcpy(d, delim.c_str());
-
-  char *p = std::strtok(strs, d);
-  while (p) {
-    std::string s = p;
-    res.push_back(s);
-    p = std::strtok(NULL, d);
-  }
-
-  return res;
-}
-
-std::map<std::string, std::string>
-ClsConfig::LoadConfig(const std::string &config_path) {
-  auto config = Utility::ReadDict(config_path);
-
-  std::map<std::string, std::string> dict;
-  for (int i = 0; i < config.size(); i++) {
-    // pass for empty line or comment
-    if (config[i].size() <= 1 || config[i][0] == '#') {
-      continue;
-    }
-    std::vector<std::string> res = split(config[i], " ");
-    dict[res[0]] = res[1];
-  }
-  return dict;
-}
-
 void ClsConfig::PrintConfigInfo() {
   std::cout << "=======Paddle Class inference config======" << std::endl;
-  for (auto iter = config_map_.begin(); iter != config_map_.end(); iter++) {
-    std::cout << iter->first << " : " << iter->second << std::endl;
-  }
+  std::cout << this->config_file << std::endl;
   std::cout << "=======End of Paddle Class inference config======" << std::endl;
 }
 
-} // namespace PaddleClas
+void ClsConfig::ReadYamlConfig(const std::string &path) {
+
+  try {
+    this->config_file = YAML::LoadFile(path);
+  } catch (YAML::BadFile &e) {
+    std::cout << "Something wrong in yaml file, please check yaml file"
+              << std::endl;
+    exit(1);
+  }
+}
+}; // namespace PaddleClas

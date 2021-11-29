@@ -44,7 +44,7 @@ void Classifier::LoadModel(const std::string &model_path,
   // true for multiple input
   config.SwitchSpecifyInputNames(true);
 
-  config.SwitchIrOptim(true);
+  config.SwitchIrOptim(this->ir_optim_);
 
   config.EnableMemoryOptim();
   config.DisableGlogInfo();
@@ -62,8 +62,7 @@ double Classifier::Run(cv::Mat &img, std::vector<double> *times) {
 
   this->crop_op_.Run(resize_img, this->crop_size_);
 
-  this->normalize_op_.Run(&resize_img, this->mean_, this->scale_,
-                          this->is_scale_);
+  this->normalize_op_.Run(&resize_img, this->mean_, this->std_, this->scale_);
   std::vector<float> input(1 * 3 * resize_img.rows * resize_img.cols, 0.0f);
   this->permute_op_.Run(&resize_img, input.data());
 
