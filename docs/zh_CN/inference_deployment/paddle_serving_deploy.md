@@ -81,14 +81,14 @@ ResNet50_vd 推理模型转换完成后，会在当前文件夹多出 `ResNet50_
   |- serving_client_conf.prototxt  
   |- serving_client_conf.stream.prototxt
 ```
-得到模型文件之后，需要修改 serving_server_conf.prototxt 中的 alias 名字： 将 `feed_var` 中的 `alias_name` 改为 `image`, 将 `fetch_var` 中的 `alias_name` 改为 `prediction`
+得到模型文件之后，需要修改 serving_server_conf.prototxt 中的 alias 名字：将 `fetch_var` 中的 `alias_name` 改为 `prediction`
 
 **备注**:  Serving 为了兼容不同模型的部署，提供了输入输出重命名的功能。这样，不同的模型在推理部署时，只需要修改配置文件的 alias_name 即可，无需修改代码即可完成推理部署。
 修改后的 serving_server_conf.prototxt 如下所示:
 ```
 feed_var {
   name: "inputs"
-  alias_name: "image"
+  alias_name: "inputs"
   is_lod_tensor: false
   feed_type: 1
   shape: 3
