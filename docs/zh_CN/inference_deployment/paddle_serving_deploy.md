@@ -21,21 +21,25 @@
 Serving 官网推荐使用 docker 安装并部署 Serving 环境。首先需要拉取 docker 环境并创建基于 Serving 的 docker。
 
 ```shell
-nvidia-docker pull hub.baidubce.com/paddlepaddle/serving:0.2.0-gpu
-nvidia-docker run -p 9292:9292 --name test -dit hub.baidubce.com/paddlepaddle/serving:0.2.0-gpu
+docker pull paddlepaddle/serving:0.7.0-cuda10.2-cudnn7-devel
+nvidia-docker run -p 9292:9292 --name test -dit paddlepaddle/serving:0.7.0-cuda10.2-cudnn7-devel bash
 nvidia-docker exec -it test bash
 ```
 
 进入 docker 后，需要安装 Serving 相关的 python 包。
 
 ```shell
-pip install paddlepaddle-gpu
-pip install paddle-serving-client
-pip install paddle-serving-server-gpu
-pip install paddle-serving-app
+pip3 install paddle-serving-client==0.7.0
+pip3 install paddle-serving-server==0.7.0 # CPU
+pip3 install paddle-serving-app==0.7.0
+pip3 install paddle-serving-server-gpu==0.7.0.post102 #GPU with CUDA10.2 + TensorRT6
+# 其他GPU环境需要确认环境再选择执行哪一条
+pip3 install paddle-serving-server-gpu==0.7.0.post101 # GPU with CUDA10.1 + TensorRT6
+pip3 install paddle-serving-server-gpu==0.7.0.post112 # GPU with CUDA11.2 + TensorRT8
 ```
 
 * 如果安装速度太慢，可以通过 `-i https://pypi.tuna.tsinghua.edu.cn/simple` 更换源，加速安装过程。
+* 其他环境配置安装请参考: [使用Docker安装Paddle Serving](https://github.com/PaddlePaddle/Serving/blob/v0.7.0/doc/Install_CN.md)
 
 * 如果希望部署 CPU 服务，可以安装 serving-server 的 cpu 版本，安装命令如下。
 
@@ -43,6 +47,7 @@ pip install paddle-serving-app
 pip install paddle-serving-server
 ```
 <a name="3"></a>
+
 ## 3. 图像分类服务部署
 <a name="3.1"></a>
 ### 3.1 模型转换
