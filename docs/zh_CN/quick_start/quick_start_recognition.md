@@ -338,5 +338,44 @@ wget https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/data/recognit
 
 按照上述步骤下载模型和测试数据后，您可以进行相关方向识别模型的测试。
 
+```shell
+cd PaddleClas/deploy/
+mkdir -p models
+```
+
+```shell
+cd ./models
+# 下载通用主体检测模型并解压
+wget https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/inference/ppyolov2_r50vd_dcn_mainbody_v1.0_infer.tar && tar -xf ppyolov2_r50vd_dcn_mainbody_v1.0_infer.tar
+# 下载识别模型并解压
+wget {识别模型下载链接地址} && tar -xf {压缩包的名称}
+```
+
+使用如下命令下载各方向识别模型的测试数据：
+
+```shell
+# 回到deploy目录下
+cd ..
+# 下载测试数据并解压
+wget https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/data/recognition_demo_data_en_v1.1.tar && tar -xf recognition_demo_data_en_v1.1.tar
+```
+
+解压完毕后，`recognition_demo_data_v1.1` 文件夹下应有如下文件结构：
+
+```
+├── recognition_demo_data_v1.1
+│   ├── gallery_cartoon
+│   ├── gallery_logo
+│   ├── gallery_product
+│   ├── gallery_vehicle
+│   ├── test_cartoon
+│   ├── test_logo
+│   ├── test_product
+│   └── test_vehicle
+├── ...
+```
+
+按照上述步骤下载模型和测试数据后，您可以进行相关方向识别模型的测试。
+
 * 更多关于主体检测的介绍可以参考：[主体检测教程文档](../image_recognition_pipeline/mainbody_detection.md)；关于特征提取的介绍可以参考：[特征提取教程文档](../image_recognition_pipeline/feature_extraction.md)；关于向量检索的介绍可以参考：[向量检索教程文档](../image_recognition_pipeline/vector_search.md)。
 
