@@ -35,79 +35,81 @@ using namespace std;
 using namespace cv;
 using namespace PaddleClas;
 
-DEFINE_string(config, "", "Path of yaml file");
-DEFINE_string(c, "", "Path of yaml file");
+DEFINE_string(config,
+"", "Path of yaml file");
+DEFINE_string(c,
+"", "Path of yaml file");
 
 int main(int argc, char **argv) {
-  google::ParseCommandLineFlags(&argc, &argv, true);
-  std::string yaml_path = "";
-  if (FLAGS_config == "" && FLAGS_c == "") {
-    std::cerr << "[ERROR] usage: " << std::endl
-              << argv[0] << " -c $yaml_path" << std::endl
-              << "or:" << std::endl
-              << argv[0] << " -config $yaml_path" << std::endl;
-    exit(1);
-  } else if (FLAGS_config != "") {
-    yaml_path = FLAGS_config;
-  } else {
-    yaml_path = FLAGS_c;
-  }
-  ClsConfig config(yaml_path);
-  config.PrintConfigInfo();
-
-  std::string path(config.infer_imgs);
-
-  std::vector<std::string> img_files_list;
-  if (cv::utils::fs::isDirectory(path)) {
-    std::vector<cv::String> filenames;
-    cv::glob(path, filenames);
-    for (auto f : filenames) {
-      img_files_list.push_back(f);
-    }
-  } else {
-    img_files_list.push_back(path);
-  }
-
-  std::cout << "img_file_list length: " << img_files_list.size() << std::endl;
-
-  Classifier classifier(config);
-
-  double elapsed_time = 0.0;
-  std::vector<double> cls_times;
-  int warmup_iter = img_files_list.size() > 5 ? 5 : 0;
-  for (int idx = 0; idx < img_files_list.size(); ++idx) {
-    std::string img_path = img_files_list[idx];
-    cv::Mat srcimg = cv::imread(img_path, cv::IMREAD_COLOR);
-    if (!srcimg.data) {
-      std::cerr << "[ERROR] image read failed! image path: " << img_path
-                << "\n";
-      exit(-1);
-    }
-
-    cv::cvtColor(srcimg, srcimg, cv::COLOR_BGR2RGB);
-
-    double run_time = classifier.Run(srcimg, &cls_times);
-    if (idx >= warmup_iter) {
-      elapsed_time += run_time;
-      std::cout << "Current image path: " << img_path << std::endl;
-      std::cout << "Current time cost: " << run_time << " s, "
-                << "average time cost in all: "
-                << elapsed_time / (idx + 1 - warmup_iter) << " s." << std::endl;
+    google::ParseCommandLineFlags(&argc, &argv, true);
+    std::string yaml_path = "";
+    if (FLAGS_config == "" && FLAGS_c == "") {
+        std::cerr << "[ERROR] usage: " << std::endl
+                  << argv[0] << " -c $yaml_path" << std::endl
+                  << "or:" << std::endl
+                  << argv[0] << " -config $yaml_path" << std::endl;
+        exit(1);
+    } else if (FLAGS_config != "") {
+        yaml_path = FLAGS_config;
     } else {
-      std::cout << "Current time cost: " << run_time << " s." << std::endl;
+        yaml_path = FLAGS_c;
     }
-  }
+    ClsConfig config(yaml_path);
+    config.PrintConfigInfo();
 
-  std::string presion = "fp32";
+    std::string path(config.infer_imgs);
 
-  if (config.use_fp16)
-    presion = "fp16";
-  if (config.benchmark) {
-    AutoLogger autolog("Classification", config.use_gpu, config.use_tensorrt,
-                       config.use_mkldnn, config.cpu_threads, 1,
-                       "1, 3, 224, 224", presion, cls_times,
-                       img_files_list.size());
-    autolog.report();
-  }
-  return 0;
+    std::vector <std::string> img_files_list;
+    if (cv::utils::fs::isDirectory(path)) {
+        std::vector <cv::String> filenames;
+        cv::glob(path, filenames);
+        for (auto f : filenames) {
+            img_files_list.push_back(f);
+        }
+    } else {
+        img_files_list.push_back(path);
+    }
+
+    std::cout << "img_file_list length: " << img_files_list.size() << std::endl;
+
+    Classifier classifier(config);
+
+    double elapsed_time = 0.0;
+    std::vector<double> cls_times;
+    int warmup_iter = img_files_list.size() > 5 ? 5 : 0;
+    for (int idx = 0; idx < img_files_list.size(); ++idx) {
+        std::string img_path = img_files_list[idx];
+        cv::Mat srcimg = cv::imread(img_path, cv::IMREAD_COLOR);
+        if (!srcimg.data) {
+            std::cerr << "[ERROR] image read failed! image path: " << img_path
+                      << "\n";
+            exit(-1);
+        }
+
+        cv::cvtColor(srcimg, srcimg, cv::COLOR_BGR2RGB);
+
+        double run_time = classifier.Run(srcimg, &cls_times);
+        if (idx >= warmup_iter) {
+            elapsed_time += run_time;
+            std::cout << "Current image path: " << img_path << std::endl;
+            std::cout << "Current time cost: " << run_time << " s, "
+                      << "average time cost in all: "
+                      << elapsed_time / (idx + 1 - warmup_iter) << " s." << std::endl;
+        } else {
+            std::cout << "Current time cost: " << run_time << " s." << std::endl;
+        }
+    }
+
+    std::string presion = "fp32";
+
+    if (config.use_fp16)
+        presion = "fp16";
+    if (config.benchmark) {
+        AutoLogger autolog("Classification", config.use_gpu, config.use_tensorrt,
+                           config.use_mkldnn, config.cpu_threads, 1,
+                           "1, 3, 224, 224", presion, cls_times,
+                           img_files_list.size());
+        autolog.report();
+    }
+    return 0;
 }

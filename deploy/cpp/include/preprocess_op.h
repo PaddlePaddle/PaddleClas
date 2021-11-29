@@ -31,26 +31,26 @@ using namespace std;
 
 namespace PaddleClas {
 
-class Normalize {
-public:
-  virtual void Run(cv::Mat *im, const std::vector<float> &mean,
-                   const std::vector<float> &std, float &scale);
-};
+    class Normalize {
+    public:
+        virtual void Run(cv::Mat *im, const std::vector<float> &mean,
+                         const std::vector<float> &std, float &scale);
+    };
 
 // RGB -> CHW
-class Permute {
-public:
-  virtual void Run(const cv::Mat *im, float *data);
-};
+    class Permute {
+    public:
+        virtual void Run(const cv::Mat *im, float *data);
+    };
 
-class CenterCropImg {
-public:
-  virtual void Run(cv::Mat &im, const int crop_size = 224);
-};
+    class CenterCropImg {
+    public:
+        virtual void Run(cv::Mat &im, const int crop_size = 224);
+    };
 
-class ResizeImg {
-public:
-  virtual void Run(const cv::Mat &img, cv::Mat &resize_img, int max_size_len);
-};
+    class ResizeImg {
+    public:
+        virtual void Run(const cv::Mat &img, cv::Mat &resize_img, int max_size_len);
+    };
 
 } // namespace PaddleClas

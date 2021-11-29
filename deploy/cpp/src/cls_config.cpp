@@ -16,20 +16,20 @@
 
 namespace PaddleClas {
 
-void ClsConfig::PrintConfigInfo() {
-  std::cout << "=======Paddle Class inference config======" << std::endl;
-  std::cout << this->config_file << std::endl;
-  std::cout << "=======End of Paddle Class inference config======" << std::endl;
-}
+    void ClsConfig::PrintConfigInfo() {
+        std::cout << "=======Paddle Class inference config======" << std::endl;
+        std::cout << this->config_file << std::endl;
+        std::cout << "=======End of Paddle Class inference config======" << std::endl;
+    }
 
-void ClsConfig::ReadYamlConfig(const std::string &path) {
+    void ClsConfig::ReadYamlConfig(const std::string &path) {
 
-  try {
-    this->config_file = YAML::LoadFile(path);
-  } catch (YAML::BadFile &e) {
-    std::cout << "Something wrong in yaml file, please check yaml file"
-              << std::endl;
-    exit(1);
-  }
-}
+        try {
+            this->config_file = YAML::LoadFile(path);
+        } catch (YAML::BadFile &e) {
+            std::cout << "Something wrong in yaml file, please check yaml file"
+                      << std::endl;
+            exit(1);
+        }
+    }
 }; // namespace PaddleClas

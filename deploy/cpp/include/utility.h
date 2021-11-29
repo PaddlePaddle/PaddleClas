@@ -32,15 +32,15 @@
 
 namespace PaddleClas {
 
-class Utility {
-public:
-  static std::vector<std::string> ReadDict(const std::string &path);
+    class Utility {
+    public:
+        static std::vector <std::string> ReadDict(const std::string &path);
 
-  //   template <class ForwardIterator>
-  //   inline static size_t argmax(ForwardIterator first, ForwardIterator last)
-  //   {
-  //     return std::distance(first, std::max_element(first, last));
-  //   }
-};
+        //   template <class ForwardIterator>
+        //   inline static size_t argmax(ForwardIterator first, ForwardIterator last)
+        //   {
+        //     return std::distance(first, std::max_element(first, last));
+        //   }
+    };
 
 } // namespace PaddleClas
