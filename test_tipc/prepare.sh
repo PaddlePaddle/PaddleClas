@@ -86,6 +86,11 @@ elif [ ${MODE} = "whole_infer" ] || [ ${MODE} = "klquant_whole_infer" ];then
 	rm -rf inference
 	tar xf "${model_name}_inference.tar"
     fi
+    if [[ $model_name == "SwinTransformer_large_patch4_window7_224" || $model_name == "SwinTransformer_large_patch4_window12_384" ]];then
+	cmd="mv ${model_name}_22kto1k_pretrained.pdparams ${model_name}_pretrained.pdparams"
+	eval $cmd
+    fi
+
 elif [ ${MODE} = "whole_train_whole_infer" ];then
     cd dataset
     rm -rf ILSVRC2012
