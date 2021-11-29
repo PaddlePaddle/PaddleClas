@@ -1,32 +1,32 @@
-# PaddleLite推理部署
+# PaddleLite 推理部署
 ---
 
 本教程将介绍基于[Paddle Lite](https://github.com/PaddlePaddle/Paddle-Lite)在移动端部署 PaddleClas 分类模型的详细步骤。识别模型的部署将在近期支持，敬请期待。
 
-Paddle Lite是飞桨轻量化推理引擎，为手机、IOT端提供高效推理能力，并广泛整合跨平台硬件，为端侧部署及应用落地问题提供轻量化的部署方案。
-<!-- TODO(gaotingquan): 下述 benchmark 文档在新文档结构中缺失 -->
-<!-- 如果希望直接测试速度，可以参考[Paddle-Lite移动端benchmark测试教程](../../docs/zh_CN/extension/paddle_mobile_inference.md)。 -->
+Paddle Lite 是飞桨轻量化推理引擎，为手机、IOT 端提供高效推理能力，并广泛整合跨平台硬件，为端侧部署及应用落地问题提供轻量化的部署方案。
+
+如果希望直接测试速度，可以参考[Paddle-Lite 移动端 benchmark 测试教程](../others/paddle_mobile_inference.md)。
 
 ---
 
 ## 目录
-- [准备环境](#1)
+- [1. 准备环境](#1)
     - [1.1 准备交叉编译环境](#1.1)
     - [1.2 准备预测库](#1.2)
-- [开始运行](#2)
-    - [2.1模型优化](#2.1)
-        - [2.1.1 pip安装paddlelite并进行转换](#2.1.1)
-        - [2.1.2 源码编译Paddle-Lite生成opt工具](#2.1.2)
+- [2. 开始运行](#2)
+    - [2.1 模型优化](#2.1)
+        - [2.1.1 pip 安装 paddlelite 并进行转换](#2.1.1)
+        - [2.1.2 源码编译 Paddle-Lite 生成 opt 工具](#2.1.2)
         - [2.1.3 转换示例](#2.1.3)
-    - [2.2与手机联调](#2.2)
-- [FAQ](#3)
+    - [2.2 与手机联调](#2.2)
+- [3. FAQ](#3)
 
 <a name="1"></a>
-## 一、准备环境
+## 1. 准备环境
 
 Paddle Lite 目前支持以下平台部署：
-* 电脑（编译Paddle Lite）
-* 安卓手机（armv7或armv8）
+* 电脑（编译 Paddle Lite）
+* 安卓手机（armv7 或 armv8）
 
 <a name="1.1"></a>
 ### 1.1 准备交叉编译环境
@@ -54,15 +54,13 @@ Paddle Lite 目前支持以下平台部署：
 ```shell
 git clone https://github.com/PaddlePaddle/Paddle-Lite.git
 cd Paddle-Lite
-# 如果使用编译方式，建议使用develop分支编译预测库
+# 如果使用编译方式，建议使用 develop 分支编译预测库
 git checkout develop
 ./lite/tools/build_android.sh  --arch=armv8  --with_cv=ON --with_extra=ON
 ```
-<!-- TODO(gaotingquan): 需要与lite同学确认，该编译选项是否需要更新：with_cv with_extra， -->
-<!-- https://paddle-lite.readthedocs.io/zh/latest/source_compile/compile_options.html -->
-<!-- **注意**：编译Paddle-Lite获得预测库时，需要打开`--with_cv=ON --with_extra=ON`两个选项，`--arch`表示`arm`版本，这里指定为armv8，更多编译命令介绍请参考[链接](https://paddle-lite.readthedocs.io/zh/latest/user_guides/Compile/Android.html#id2)。 -->
+**注意**：编译 Paddle-Lite 获得预测库时，需要打开`--with_cv=ON --with_extra=ON` 两个选项，`--arch` 表示 `arm` 版本，这里指定为 armv8，更多编译命令介绍请参考[Linux x86 环境下编译适用于 Android 的库](https://paddle-lite.readthedocs.io/zh/latest/source_compile/linux_x86_compile_android.html)，关于其他平台的编译操作，具体请参考[PaddleLite](https://paddle-lite.readthedocs.io/zh/latest/)中`源码编译`部分。
 
-直接下载预测库并解压后，可以得到`inference_lite_lib.android.armv8/`文件夹，通过编译Paddle-Lite得到的预测库位于`Paddle-Lite/build.lite.android.armv8.gcc/inference_lite_lib.android.armv8/`文件夹下。
+直接下载预测库并解压后，可以得到 `inference_lite_lib.android.armv8/`文件夹，通过编译 Paddle-Lite 得到的预测库位于 `Paddle-Lite/build.lite.android.armv8.gcc/inference_lite_lib.android.armv8/`文件夹下。
 预测库的文件目录如下：
 
 ```
@@ -79,7 +77,7 @@ inference_lite_lib.android.armv8/
 |   `-- lib                                           C++预测库
 |       |-- libpaddle_api_light_bundled.a             C++静态库
 |       `-- libpaddle_light_api_shared.so             C++动态库
-|-- java                                     Java预测库
+|-- java                                     Java 预测库
 |   |-- jar
 |   |   `-- PaddlePredictor.jar
 |   |-- so
@@ -91,7 +89,7 @@ inference_lite_lib.android.armv8/
 ```
 
 <a name="2"></a>
-## 二、开始运行
+## 2. 开始运行
 
 <a name="2.1"></a>
 ### 2.1 模型优化
@@ -101,10 +99,10 @@ Paddle-Lite 提供了多种策略来自动优化原始的模型，其中包括�
 **注意**：如果已经准备好了 `.nb` 结尾的模型文件，可以跳过此步骤。
 
 <a name="2.1.1"></a>
-#### 2.1.1 [建议]pip安装paddlelite并进行转换
+#### 2.1.1 [建议]pip 安装 paddlelite 并进行转换
 
-Python下安装 `paddlelite`，目前最高支持 `Python3.7`。
-**注意**：`paddlelite` whl包版本必须和预测库版本对应。
+Python 下安装 `paddlelite`，目前最高支持 `Python3.7`。
+**注意**：`paddlelite` whl 包版本必须和预测库版本对应。
 
 ```shell
 pip install paddlelite==2.8
@@ -114,23 +112,23 @@ pip install paddlelite==2.8
 
 |选项|说明|
 |-|-|
-|--model_dir|待优化的PaddlePaddle模型（非combined形式）的路径|
-|--model_file|待优化的PaddlePaddle模型（combined形式）的网络结构文件路径|
-|--param_file|待优化的PaddlePaddle模型（combined形式）的权重文件路径|
-|--optimize_out_type|输出模型类型，目前支持两种类型：protobuf和naive_buffer，其中naive_buffer是一种更轻量级的序列化/反序列化实现。若您需要在mobile端执行模型预测，请将此选项设置为naive_buffer。默认为protobuf|
+|--model_dir|待优化的 PaddlePaddle 模型（非 combined 形式）的路径|
+|--model_file|待优化的 PaddlePaddle 模型（combined 形式）的网络结构文件路径|
+|--param_file|待优化的 PaddlePaddle 模型（combined 形式）的权重文件路径|
+|--optimize_out_type|输出模型类型，目前支持两种类型：protobuf 和 naive_buffer，其中 naive_buffer 是一种更轻量级的序列化/反序列化实现。若您需要在 mobile 端执行模型预测，请将此选项设置为 naive_buffer。默认为 protobuf|
 |--optimize_out|优化模型的输出路径|
-|--valid_targets|指定模型可执行的backend，默认为arm。目前可支持x86、arm、opencl、npu、xpu，可以同时指定多个backend(以空格分隔)，Model Optimize Tool将会自动选择最佳方式。如果需要支持华为NPU（Kirin 810/990 Soc搭载的达芬奇架构NPU），应当设置为npu, arm|
-|--record_tailoring_info|当使用 根据模型裁剪库文件 功能时，则设置该选项为true，以记录优化后模型含有的kernel和OP信息，默认为false|
+|--valid_targets|指定模型可执行的 backend，默认为 arm。目前可支持 x86、arm、opencl、npu、xpu，可以同时指定多个 backend（以空格分隔），Model Optimize Tool 将会自动选择最佳方式。如果需要支持华为 NPU（Kirin 810/990 Soc 搭载的达芬奇架构 NPU），应当设置为 npu, arm|
+|--record_tailoring_info|当使用 根据模型裁剪库文件 功能时，则设置该选项为 true，以记录优化后模型含有的 kernel 和 OP 信息，默认为 false|
 
 `--model_file` 表示 inference 模型的 model 文件地址，`--param_file` 表示 inference 模型的 param 文件地址；`optimize_out` 用于指定输出文件的名称（不需要添加 `.nb` 的后缀）。直接在命令行中运行 `paddle_lite_opt`，也可以查看所有参数及其说明。
 
 <a name="2.1.2"></a>
-#### 2.1.2 源码编译Paddle-Lite生成opt工具
+#### 2.1.2 源码编译 Paddle-Lite 生成 opt 工具
 
 模型优化需要 Paddle-Lite 的 `opt` 可执行文件，可以通过编译 Paddle-Lite 源码获得，编译步骤如下：
 
 ```shell
-# 如果准备环境时已经clone了Paddle-Lite，则不用重新clone Paddle-Lite
+# 如果准备环境时已经 clone 了 Paddle-Lite，则不用重新 clone Paddle-Lite
 git clone https://github.com/PaddlePaddle/Paddle-Lite.git
 cd Paddle-Lite
 git checkout develop
@@ -150,17 +148,17 @@ cd build.opt/lite/api/
 <a name="2.1.3"></a>
 #### 2.1.3 转换示例
 
-下面以PaddleClas的 `MobileNetV3_large_x1_0` 模型为例，介绍使用 `paddle_lite_opt` 完成预训练模型到inference模型，再到 Paddle-Lite 优化模型的转换。
+下面以 PaddleClas 的 `MobileNetV3_large_x1_0` 模型为例，介绍使用 `paddle_lite_opt` 完成预训练模型到 inference 模型，再到 Paddle-Lite 优化模型的转换。
 
 ```shell
-# 进入PaddleClas根目录
+# 进入 PaddleClas 根目录
 cd PaddleClas_root_path
 
-# 下载并解压inference模型
+# 下载并解压 inference 模型
 wget https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/MobileNetV3_large_x1_0_infer.tar
 tar -xf MobileNetV3_large_x1_0_infer.tar
 
-# 将inference模型转化为Paddle-Lite优化模型
+# 将 inference 模型转化为 Paddle-Lite 优化模型
 paddle_lite_opt --model_file=./MobileNetV3_large_x1_0_infer/inference.pdmodel --param_file=./MobileNetV3_large_x1_0_infer/inference.pdiparams --optimize_out=./MobileNetV3_large_x1_0
 ```
 
@@ -173,21 +171,21 @@ paddle_lite_opt --model_file=./MobileNetV3_large_x1_0_infer/inference.pdmodel --
 
 首先需要进行一些准备工作。
 1. 准备一台 arm8 的安卓手机，如果编译的预测库和 opt 文件是 armv7，则需要 arm7 的手机，并修改 Makefile 中 `ARM_ABI = arm7`。
-2. 电脑上安装 ADB 工具，用于调试。 ADB安装方式如下：
+2. 电脑上安装 ADB 工具，用于调试。 ADB 安装方式如下：
 
-    * MAC电脑安装ADB:
+    * MAC 电脑安装 ADB:
     ```shell
     brew cask install android-platform-tools
     ```
-    * Linux安装ADB
+    * Linux 安装 ADB
     ```shell
     sudo apt update
     sudo apt install -y wget adb
     ```
-    * Window安装ADB
-    win上安装需要去谷歌的安卓平台下载ADB软件包进行安装：[链接](https://developer.android.com/studio)
+    * Window 安装 ADB
+    win 上安装需要去谷歌的安卓平台下载 ADB 软件包进行安装：[链接](https://developer.android.com/studio)
 
-3. 手机连接电脑后，开启手机 `USB调试` 选项，选择 `文件传输` 模式，在电脑终端中输入：
+3. 手机连接电脑后，开启手机 `USB 调试` 选项，选择 `文件传输` 模式，在电脑终端中输入：
 
 ```shell
 adb devices
@@ -204,15 +202,15 @@ List of devices attached
 cd PaddleClas_root_path
 cd deploy/lite/
 
-# 运行prepare.sh
-# prepare.sh 会将预测库文件、测试图像和使用的字典文件放置在预测库中的demo/cxx/clas文件夹下
+# 运行 prepare.sh
+# prepare.sh 会将预测库文件、测试图像和使用的字典文件放置在预测库中的 demo/cxx/clas 文件夹下
 sh prepare.sh /{lite prediction library path}/inference_lite_lib.android.armv8
 
-# 进入lite demo的工作目录
+# 进入 lite demo 的工作目录
 cd /{lite prediction library path}/inference_lite_lib.android.armv8/
 cd demo/cxx/clas/
 
-# 将C++预测动态库so文件复制到debug文件夹中
+# 将 C++ 预测动态库 so 文件复制到 debug 文件夹中
 cp ../../../cxx/lib/libpaddle_light_api_shared.so ./debug/
 ```
 
@@ -237,33 +235,33 @@ demo/cxx/clas/
 #### 注意：
 * 上述文件中，`imagenet1k_label_list.txt` 是 ImageNet1k 数据集的类别映射文件，如果使用自定义的类别，需要更换该类别映射文件。
 
-*  `config.txt` 包含了分类器的超参数，如下：
+* `config.txt` 包含了分类器的超参数，如下：
 
 ```shell
 clas_model_file ./MobileNetV3_large_x1_0.nb # 模型文件地址
 label_path ./imagenet1k_label_list.txt         # 类别映射文本文件
-resize_short_size 256                       # resize之后的短边边长
-crop_size 224                                 # 裁剪后用于预测的边长
-visualize 0       # 是否进行可视化，如果选择的话，会在当前文件夹下生成名为clas_result.png的图像文件。
+resize_short_size 256                       # resize 之后的短边边长
+crop_size 224                                 # 裁剪后用于预测的边长 
+visualize 0       # 是否进行可视化，如果选择的话，会在当前文件夹下生成名为 clas_result.png 的图像文件。
 ```
 
-5. 启动调试，上述步骤完成后就可以使用ADB将文件夹 `debug/` push 到手机上运行，步骤如下：
+5. 启动调试，上述步骤完成后就可以使用 ADB 将文件夹 `debug/` push 到手机上运行，步骤如下：
 
 ```shell
-# 执行编译，得到可执行文件clas_system
+# 执行编译，得到可执行文件 clas_system
 make -j
 
-# 将编译得到的可执行文件移动到debug文件夹中
+# 将编译得到的可执行文件移动到 debug 文件夹中
 mv clas_system ./debug/
 
-# 将上述debug文件夹push到手机上
+# 将上述 debug 文件夹 push 到手机上
 adb push debug /data/local/tmp/
 
 adb shell
 cd /data/local/tmp/debug
 export LD_LIBRARY_PATH=/data/local/tmp/debug:$LD_LIBRARY_PATH
 
-# clas_system可执行文件的使用方式为:
+# clas_system 可执行文件的使用方式为:
 # ./clas_system 配置文件路径  测试图像路径
 ./clas_system ./config.txt ./tabby_cat.jpg
 ```
@@ -277,7 +275,7 @@ export LD_LIBRARY_PATH=/data/local/tmp/debug:$LD_LIBRARY_PATH
 </div>
 
 <a name="3"></a>
-## 三、FAQ
+## 3. FAQ
 Q1：如果想更换模型怎么办，需要重新按照流程走一遍吗？  
 A1：如果已经走通了上述步骤，更换模型只需要替换 `.nb` 模型文件即可，同时要注意修改下配置文件中的 `.nb` 文件路径以及类别映射文件（如有必要）。
 

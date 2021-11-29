@@ -24,15 +24,15 @@
 | :--- | :--- |  :----:  | :--------: |  :----  |   :----  |   :----  |
 | ResNet     |ResNet50_vd | 分类  | 支持 | 多机多卡 <br> 混合精度 | FPGM裁剪 <br> PACT量化|  |
 | MobileNetV3     |MobileNetV3_large_x1_0 | 分类  | 支持 | 多机多卡 <br> 混合精度 | FPGM裁剪 <br> PACT量化|  |
-| PPLCNet     |PPLCNet_x2_5 | 分类  | 支持 | 多机多卡 <br> 混合精度 | FPGM裁剪 <br> PACT量化|  |
+| PPLCNet     |PPLCNet_x2_5 | 分类  | 支持 | 多机多卡 <br> 混合精度 | - |  |
 
-## 3. 一键测试工具使用
+## 3. 测试工具简介
 ### 目录介绍
 ```
 ./test_tipc/
 ├── common_func.sh                      #test_*.sh会调用到的公共函数
 ├── config     # 配置文件目录
-│   ├── MobileNetV3_large_x1_0   # MobileNetV3系列模型测试配置文件目录
+│   ├── MobileNetV3         # MobileNetV3系列模型测试配置文件目录
 │   │   ├── MobileNetV3_large_x1_0_train_infer_python.txt                                    #基础训练预测配置文件
 │   │   ├── MobileNetV3_large_x1_0_train_linux_gpu_fleet_amp_infer_python_linux_gpu_cpu.txt  #多机多卡训练预测配置文件
 │   │   └── MobileNetV3_large_x1_0_train_linux_gpu_normal_amp_infer_python_linux_gpu_cpu.txt #混合精度训练预测配置文件
@@ -50,7 +50,7 @@
 └── test_train_inference_python.sh      # 测试python训练预测的主程序
 ```
 
-### 测试流程
+### 测试流程概述
 使用本工具，可以测试不同功能的支持情况，以及预测结果是否对齐，测试流程如下：
 <div align="center">
     <img src="docs/test.png" width="800">
@@ -60,16 +60,49 @@
 2. 运行要测试的功能对应的测试脚本`test_*.sh`，产出log，由log可以看到不同配置是否运行成功；
 3. 用`compare_results.py`对比log中的预测结果和预存在results目录下的结果，判断预测精度是否符合预期（在误差范围内）。
 
-其中，有4个测试主程序，功能如下：
-- `test_train_inference_python.sh`：测试基于Python的模型训练、评估、推理等基本功能，包括裁剪、量化、蒸馏。
-- `test_inference_cpp.sh`：测试基于C++的模型推理。待支持
-- `test_serving.sh`：测试基于Paddle Serving的服务化部署功能。待支持
-- `test_lite.sh`：测试基于Paddle-Lite的端侧预测部署功能。待支持
+测试单项功能仅需两行命令，**如需测试不同模型/功能，替换配置文件即可**，命令格式如下：
+
+```shell
+# 功能：准备数据
+# 格式：bash + 运行脚本 + 参数1: 配置文件选择 + 参数2: 模式选择
+bash test_tipc/prepare.sh  configs/[model_name]/[params_file_name]  [Mode]
+
+# 功能：运行测试
+# 格式：bash + 运行脚本 + 参数1: 配置文件选择 + 参数2: 模式选择
+bash test_tipc/test_train_inference_python.sh configs/[model_name]/[params_file_name]  [Mode]
+
+```
+
+例如，测试基本训练预测功能的`lite_train_lite_infer`模式，运行：
+
+```shell
+# 准备数据
+bash test_tipc/prepare.sh ./test_tipc/configs/MobileNetV3/MobileNetV3_large_x1_0_train_infer_python.txt 'lite_train_lite_infer'
+# 运行测试
+bash test_tipc/test_train_inference_python.sh ./test_tipc/configs/MobileNetV3/MobileNetV3_large_x1_0_train_infer_python.txt 'lite_train_lite_infer'
+
+```
+
+关于本示例命令的更多信息可查看[基础训练预测使用文档](docs/test_train_inference_python.md)。
+
+### 配置文件命名规范
+
+在`configs`目录下，**按模型系列划分为子目录**，子目录中存放所有该模型系列测试需要用到的配置文件，如`MobileNetV3`文件夹下存放了所有`MobileNetV3`系列模型的配置文件。配置文件的命名遵循如下规范：
+
+1. 基础训练预测配置简单命名为：`ModelName_train_infer_python.txt`，表示**Linux环境下单机、不使用混合精度训练+python预测**，其完整命名对应`ModelName_train_linux_gpu_normal_normal_infer_python_linux_gpu_cpu.txt`，由于本配置文件使用频率较高，这里进行了名称简化。其中`ModelName`指具体模型名称
+2. 其他带训练配置命名格式为：`ModelName_train_训练硬件环境(linux_gpu/linux_dcu/…)_是否多机(fleet/normal)_是否混合精度(amp/normal)_预测模式(infer/lite/serving/js)_语言(cpp/python/java)_预测硬件环境(ModelName_linux_gpu/mac/jetson/opencl_arm_gpu/...).txt`。如，linux gpu下多机多卡+混合精度链条测试对应配置 `ModelName_train_linux_gpu_fleet_amp_infer_python_linux_gpu_cpu.txt`，linux dcu下基础训练预测对应配置 `ModelName_train_linux_dcu_normal_normal_infer_python_linux_dcu.txt`。
+3. 仅预测的配置（如serving、lite等）命名格式：`ModelName_model_训练硬件环境(ModelName_linux_gpu/linux_dcu/…)_是否多机(fleet/normal)_是否混合精度(amp/normal)_(infer/lite/serving/js)_语言(cpp/python/java)_预测硬件环境(ModelName_linux_gpu/mac/jetson/opencl_arm_gpu/...).txt`，即，与2相比，仅第二个字段从train换为model，测试时模型直接下载获取，这里的“训练硬件环境”表示所测试的模型是在哪种环境下训练得到的。
+
+**根据上述命名规范，可以直接从子目录名称和配置文件名找到需要测试的场景和功能对应的配置文件。**
 
 <a name="more"></a>
-#### 更多教程
+
+## 4 开始测试
+
 各功能测试中涉及混合精度、裁剪、量化等训练相关，及mkldnn、Tensorrt等多种预测相关参数配置，请点击下方相应链接了解更多细节和使用教程：  
-[test_train_inference_python 使用](docs/test_train_inference_python.md)  
-[test_inference_cpp 使用](docs/test_inference_cpp.md)  
-[test_serving 使用](docs/test_serving.md)  
-[test_lite 使用](docs/test_lite.md)
+
+- [test_train_inference_python 使用](docs/test_train_inference_python.md)：测试基于Python的模型训练、评估、推理等基本功能，包括裁剪、量化、蒸馏。
+- [test_inference_cpp 使用](docs/test_inference_cpp.md) ：测试基于C++的模型推理。
+- [test_serving 使用](docs/test_serving.md) ：测试基于Paddle Serving的服务化部署功能。
+- [test_lite_arm_cpu_cpp 使用](docs/test_lite_arm_cpu_cpp.md): 测试基于Paddle-Lite的ARM CPU端c++预测部署功能.
+- [test_paddle2onnx 使用](docs/test_paddle2onnx.md)：测试Paddle2ONNX的模型转化功能，并验证正确性。
