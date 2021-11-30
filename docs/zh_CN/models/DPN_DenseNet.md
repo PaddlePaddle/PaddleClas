@@ -1,10 +1,19 @@
-# DPN与DenseNet系列
+# DPN 与 DenseNet 系列
+---
+## 目录
 
-## 概述
-DenseNet是2017年CVPR best paper提出的一种新的网络结构，该网络设计了一种新的跨层连接的block，即dense-block。相比ResNet中的bottleneck，dense-block设计了一个更激进的密集连接机制，即互相连接所有的层，每个层都会接受其前面所有层作为其额外的输入。DenseNet将所有的dense-block堆叠，组合成了一个密集连接型网络。密集的连接方式使得DenseNe更容易进行梯度的反向传播，使得网络更容易训练。
-DPN的全称是Dual Path Networks，即双通道网络。该网络是由DenseNet和ResNeXt结合的一个网络，其证明了DenseNet能从靠前的层级中提取到新的特征，而ResNeXt本质上是对之前层级中已提取特征的复用。作者进一步分析发现，ResNeXt对特征有高复用率，但冗余度低，DenseNet能创造新特征，但冗余度高。结合二者结构的优势，作者设计了DPN网络。最终DPN网络在同样FLOPS和参数量下，取得了比ResNeXt与DenseNet更好的结果。
+* [1. 概述](#1)
+* [2. 精度、FLOPS 和参数量](#2)
+* [3. 基于 V100 GPU 的预测速度](#3)
+* [4. 基于 T4 GPU 的预测速度](#4)
 
-该系列模型的FLOPS、参数量以及T4 GPU上的预测耗时如下图所示。
+ <a name='1'></a>
+
+## 1. 概述
+DenseNet 是 2017 年 CVPR best paper 提出的一种新的网络结构，该网络设计了一种新的跨层连接的 block，即 dense-block。相比 ResNet 中的 bottleneck，dense-block 设计了一个更激进的密集连接机制，即互相连接所有的层，每个层都会接受其前面所有层作为其额外的输入。DenseNet 将所有的 dense-block 堆叠，组合成了一个密集连接型网络。密集的连接方式使得 DenseNe 更容易进行梯度的反向传播，使得网络更容易训练。
+DPN 的全称是 Dual Path Networks，即双通道网络。该网络是由 DenseNet 和 ResNeXt 结合的一个网络，其证明了 DenseNet 能从靠前的层级中提取到新的特征，而 ResNeXt 本质上是对之前层级中已提取特征的复用。作者进一步分析发现，ResNeXt 对特征有高复用率，但冗余度低，DenseNet 能创造新特征，但冗余度高。结合二者结构的优势，作者设计了 DPN 网络。最终 DPN 网络在同样 FLOPS 和参数量下，取得了比 ResNeXt 与 DenseNet 更好的结果。
+ 
+该系列模型的 FLOPS、参数量以及 T4 GPU 上的预测耗时如下图所示。
 
 ![](../../images/models/T4_benchmark/t4.fp32.bs4.DPN.flops.png)
 
@@ -14,11 +23,12 @@ DPN的全称是Dual Path Networks，即双通道网络。该网络是由DenseNet
 
 ![](../../images/models/T4_benchmark/t4.fp16.bs4.DPN.png)
 
-目前PaddleClas开源的这两类模型的预训练模型一共有10个，其指标如上图所示，可以看到，在相同的FLOPS和参数量下，相比DenseNet，DPN拥有更高的精度。但是由于DPN有更多的分支，所以其推理速度要慢于DenseNet。由于DenseNet264的网络层数最深，所以该网络是DenseNet系列模型中参数量最大的网络，DenseNet161的网络的宽度最大，导致其是该系列中网络中计算量最大、精度最高的网络。从推理速度来看，计算量大且精度高的的DenseNet161比DenseNet264具有更快的速度，所以其比DenseNet264具有更大的优势。
+目前 PaddleClas 开源的这两类模型的预训练模型一共有 10 个，其指标如上图所示，可以看到，在相同的 FLOPS 和参数量下，相比 DenseNet，DPN 拥有更高的精度。但是由于 DPN 有更多的分支，所以其推理速度要慢于 DenseNet。由于 DenseNet264 的网络层数最深，所以该网络是 DenseNet 系列模型中参数量最大的网络，DenseNet161 的网络的宽度最大，导致其是该系列中网络中计算量最大、精度最高的网络。从推理速度来看，计算量大且精度高的的 DenseNet161 比 DenseNet264 具有更快的速度，所以其比 DenseNet264 具有更大的优势。
 
-对于DPN系列网络，模型的FLOPS和参数量越大，模型的精度越高。其中，由于DPN107的网络宽度最大，所以其是该系列网络中参数量与计算量最大的网络。
+对于 DPN 系列网络，模型的 FLOPS 和参数量越大，模型的精度越高。其中，由于 DPN107 的网络宽度最大，所以其是该系列网络中参数量与计算量最大的网络。
 
-## 精度、FLOPS和参数量
+<a name='2'></a>
+## 2. 精度、FLOPS 和参数量
 
 | Models      | Top1   | Top5   | Reference<br>top1 | Reference<br>top5 | FLOPS<br>(G) | Parameters<br>(M) |
 |:--:|:--:|:--:|:--:|:--:|:--:|:--:|
@@ -35,8 +45,8 @@ DPN的全称是Dual Path Networks，即双通道网络。该网络是由DenseNet
 
 
 
-
-## 基于V100 GPU的预测速度
+ <a name='3'></a>
+## 3. 基于 V100 GPU 的预测速度
 
 | Models                               | Crop Size | Resize Short Size | FP32<br>Batch Size=1<br>(ms) |
 |-------------|-----------|-------------------|--------------------------|
@@ -52,8 +62,8 @@ DPN的全称是Dual Path Networks，即双通道网络。该网络是由DenseNet
 | DPN131      | 224       | 256               | 28.083                   |
 
 
-
-## 基于T4 GPU的预测速度
+<a name='4'></a>
+## 4. 基于 T4 GPU 的预测速度
 
 | Models      | Crop Size | Resize Short Size | FP16<br>Batch Size=1<br>(ms) | FP16<br>Batch Size=4<br>(ms) | FP16<br>Batch Size=8<br>(ms) | FP32<br>Batch Size=1<br>(ms) | FP32<br>Batch Size=4<br>(ms) | FP32<br>Batch Size=8<br>(ms) |
 |-------------|-----------|-------------------|------------------------------|------------------------------|------------------------------|------------------------------|------------------------------|------------------------------|

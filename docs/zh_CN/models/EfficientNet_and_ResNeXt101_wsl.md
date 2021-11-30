@@ -1,12 +1,20 @@
-# EfficientNet与ResNeXt101_wsl系列
+# EfficientNet 与 ResNeXt101_wsl 系列
+-----
+## 目录
 
-## 概述
-EfficientNet是Google于2019年发布的一个基于NAS的轻量级网络，其中EfficientNetB7刷新了当时ImageNet-1k的分类准确率。在该文章中，作者指出，传统的提升神经网络性能的方法主要是从网络的宽度、网络的深度、以及输入图片的分辨率入手，但是作者通过实验发现，平衡这三个维度对精度和效率的提升至关重要，于是，作者通过一系列的实验中总结出了如何同时平衡这三个维度的放缩，与此同时，基于这种放缩方法，作者在EfficientNet_B0的基础上，构建了EfficientNet系列中B1-B7共7个网络，并在同样FLOPS与参数量的情况下，精度达到了state-of-the-art的效果。
+* [1. 概述](#1)
+* [2. 精度、FLOPS 和参数量](#2)
+* [3. 基于 V100 GPU 的预测速度](#3)
+* [4. 基于 T4 GPU 的预测速度](#4)
 
-ResNeXt是facebook于2016年提出的一种对ResNet的改进版网络。在2019年，facebook通过弱监督学习研究了该系列网络在ImageNet上的精度上限，为了区别之前的ResNeXt网络，该系列网络的后缀为wsl，其中wsl是弱监督学习（weakly-supervised-learning）的简称。为了能有更强的特征提取能力，研究者将其网络宽度进一步放大，其中最大的ResNeXt101_32x48d_wsl拥有8亿个参数，将其在9.4亿的弱标签图片下训练并在ImageNet-1k上做finetune，最终在ImageNet-1k的top-1达到了85.4%，这也是迄今为止在ImageNet-1k的数据集上以224x224的分辨率下精度最高的网络。Fix-ResNeXt中，作者使用了更大的图像分辨率，针对训练图片和验证图片数据预处理不一致的情况下做了专门的Fix策略，并使得ResNeXt101_32x48d_wsl拥有了更高的精度，由于其用到了Fix策略，故命名为Fix-ResNeXt101_32x48d_wsl。
+ <a name='1'></a>
+## 1. 概述
+EfficientNet 是 Google 于 2019 年发布的一个基于 NAS 的轻量级网络，其中 EfficientNetB7 刷新了当时 ImageNet-1k 的分类准确率。在该文章中，作者指出，传统的提升神经网络性能的方法主要是从网络的宽度、网络的深度、以及输入图片的分辨率入手，但是作者通过实验发现，平衡这三个维度对精度和效率的提升至关重要，于是，作者通过一系列的实验中总结出了如何同时平衡这三个维度的放缩，与此同时，基于这种放缩方法，作者在 EfficientNet_B0 的基础上，构建了 EfficientNet 系列中 B1-B7 共 7 个网络，并在同样 FLOPS 与参数量的情况下，精度达到了 state-of-the-art 的效果。
+
+ResNeXt 是 facebook 于 2016 年提出的一种对 ResNet 的改进版网络。在 2019 年，facebook 通过弱监督学习研究了该系列网络在 ImageNet 上的精度上限，为了区别之前的 ResNeXt 网络，该系列网络的后缀为 wsl，其中 wsl 是弱监督学习（weakly-supervised-learning）的简称。为了能有更强的特征提取能力，研究者将其网络宽度进一步放大，其中最大的 ResNeXt101_32x48d_wsl 拥有 8 亿个参数，将其在 9.4 亿的弱标签图片下训练并在 ImageNet-1k 上做 finetune，最终在 ImageNet-1k 的 top-1 达到了 85.4%，这也是迄今为止在 ImageNet-1k 的数据集上以 224x224 的分辨率下精度最高的网络。Fix-ResNeXt 中，作者使用了更大的图像分辨率，针对训练图片和验证图片数据预处理不一致的情况下做了专门的 Fix 策略，并使得 ResNeXt101_32x48d_wsl 拥有了更高的精度，由于其用到了 Fix 策略，故命名为 Fix-ResNeXt101_32x48d_wsl。
 
 
-该系列模型的FLOPS、参数量以及T4 GPU上的预测耗时如下图所示。
+该系列模型的 FLOPS、参数量以及 T4 GPU 上的预测耗时如下图所示。
 
 ![](../../images/models/T4_benchmark/t4.fp32.bs4.EfficientNet.flops.png)
 
@@ -16,9 +24,10 @@ ResNeXt是facebook于2016年提出的一种对ResNet的改进版网络。在2019
 
 ![](../../images/models/T4_benchmark/t4.fp16.bs1.EfficientNet.png)
 
-目前PaddleClas开源的这两类模型的预训练模型一共有14个。从上图中可以看出EfficientNet系列网络优势非常明显，ResNeXt101_wsl系列模型由于用到了更多的数据，最终的精度也更高。EfficientNet_B0_Small是去掉了SE_block的EfficientNet_B0，其具有更快的推理速度。
+目前 PaddleClas 开源的这两类模型的预训练模型一共有 14 个。从上图中可以看出 EfficientNet 系列网络优势非常明显，ResNeXt101_wsl 系列模型由于用到了更多的数据，最终的精度也更高。EfficientNet_B0_Small 是去掉了 SE_block 的 EfficientNet_B0，其具有更快的推理速度。
 
-## 精度、FLOPS和参数量
+ <a name='2'></a>
+## 2. 精度、FLOPS 和参数量
 
 | Models                        | Top1   | Top5   | Reference<br>top1 | Reference<br>top5 | FLOPS<br>(G) | Parameters<br>(M) |
 |:--:|:--:|:--:|:--:|:--:|:--:|:--:|
@@ -37,8 +46,9 @@ ResNeXt是facebook于2016年提出的一种对ResNet的改进版网络。在2019
 | EfficientNetB7                | 0.843  | 0.969  | 0.844             | 0.971             | 72.350       | 64.920            |
 | EfficientNetB0_<br>small      | 0.758  | 0.926  |                   |                   | 0.720        | 4.650             |
 
+<a name='3'></a>
 
-## 基于V100 GPU的预测速度
+## 3. 基于 V100 GPU 的预测速度
 
 | Models                               | Crop Size | Resize Short Size | FP32<br>Batch Size=1<br>(ms) |
 |-------------------------------|-----------|-------------------|--------------------------|
@@ -58,8 +68,9 @@ ResNeXt是facebook于2016年提出的一种对ResNet的改进版网络。在2019
 | EfficientNetB0_<br>small      | 224       | 256               | 1.692                    |
 
 
+<a name='4'></a>
 
-## 基于T4 GPU的预测速度
+## 4. 基于 T4 GPU 的预测速度
 
 | Models                    | Crop Size | Resize Short Size | FP16<br>Batch Size=1<br>(ms) | FP16<br>Batch Size=4<br>(ms) | FP16<br>Batch Size=8<br>(ms) | FP32<br>Batch Size=1<br>(ms) | FP32<br>Batch Size=4<br>(ms) | FP32<br>Batch Size=8<br>(ms) |
 |---------------------------|-----------|-------------------|------------------------------|------------------------------|------------------------------|------------------------------|------------------------------|------------------------------|

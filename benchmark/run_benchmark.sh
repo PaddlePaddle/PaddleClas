@@ -8,7 +8,7 @@ function _set_params(){
     fp_item=${3:-"fp32"}        # fp32|fp16
     epochs=${4:-"2"}       # 可选，如果需要修改代码提前中断
     model_name=${5:-"model_name"}
-    run_log_path="${TRAIN_LOG_DIR:-$(pwd)}/benchmark"  # TRAIN_LOG_DIR 后续QA设置该参数
+    run_log_path=${TRAIN_LOG_DIR:-$(pwd)}  # TRAIN_LOG_DIR 后续QA设置该参数
 
     index=1
     mission_name="图像分类"           # 模型所属任务名称，具体可参考scripts/config.ini                                （必填）
