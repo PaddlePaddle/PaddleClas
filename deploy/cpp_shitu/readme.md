@@ -239,7 +239,7 @@ make -j
 * `CUDNN_LIB_DIR`为cudnn库文件地址，在docker中为`/usr/lib/x86_64-linux-gnu/`。
 * `TENSORRT_DIR`是tensorrt库文件地址，在dokcer中为`/usr/local/TensorRT6-cuda10.0-cudnn7/`，TensorRT需要结合GPU使用。
 * `FAISS_DIR`是faiss的安装地址
-  * `FAISS_WITH_MKL`是指在编译faiss的过程中，是否使用了mkldnn，本文档中编译faiss，没有使用，而使用了openblas，故设置为`OFF`，若使用了mkldnn，则为`ON`.
+* `FAISS_WITH_MKL`是指在编译faiss的过程中，是否使用了mkldnn，本文档中编译faiss，没有使用，而使用了openblas，故设置为`OFF`，若使用了mkldnn，则为`ON`.
 
 
 在执行上述命令，编译完成之后，会在当前路径下生成`build`文件夹，其中生成一个名为`pp_shitu`的可执行文件。
@@ -264,7 +264,7 @@ make -j
   cd ..
   ```
 
-- 将相应的yaml文件拷到`test`文件夹下
+- 将相应的yaml文件拷到当前文件夹下
 
   ```shell
   cp ../configs/inference_drink.yaml .

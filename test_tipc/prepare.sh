@@ -37,6 +37,24 @@ model_name=$(func_parser_value "${lines[1]}")
 model_url_value=$(func_parser_value "${lines[35]}")
 model_url_key=$(func_parser_key "${lines[35]}")
 
+if [[ $FILENAME == *GeneralRecognition* ]];then
+   cd dataset
+   rm -rf Aliproduct
+   rm -rf train_reg_all_data.txt
+   rm -rf demo_train
+   wget -nc https://paddle-imagenet-models-name.bj.bcebos.com/data/whole_chain/tipc_shitu_demo_data.tar
+   tar -xf tipc_shitu_demo_data.tar
+   ln -s tipc_shitu_demo_data Aliproduct
+   ln -s tipc_shitu_demo_data/demo_train.txt train_reg_all_data.txt
+   ln -s tipc_shitu_demo_data/demo_train demo_train
+   cd tipc_shitu_demo_data
+   ln -s demo_test.txt val_list.txt
+   cd ../../
+   eval "wget -nc $model_url_value"
+   mv general_PPLCNet_x2_5_pretrained_v1.0.pdparams GeneralRecognition_PPLCNet_x2_5_pretrained.pdparams
+   exit 0
+fi
+
 if [ ${MODE} = "lite_train_lite_infer" ] || [ ${MODE} = "lite_train_whole_infer" ];then
     # pretrain lite train data
     cd dataset
@@ -68,6 +86,11 @@ elif [ ${MODE} = "whole_infer" ] || [ ${MODE} = "klquant_whole_infer" ];then
 	rm -rf inference
 	tar xf "${model_name}_inference.tar"
     fi
+    if [[ $model_name == "SwinTransformer_large_patch4_window7_224" || $model_name == "SwinTransformer_large_patch4_window12_384" ]];then
+	cmd="mv ${model_name}_22kto1k_pretrained.pdparams ${model_name}_pretrained.pdparams"
+	eval $cmd
+    fi
+
 elif [ ${MODE} = "whole_train_whole_infer" ];then
     cd dataset
     rm -rf ILSVRC2012

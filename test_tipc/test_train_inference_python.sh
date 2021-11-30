@@ -291,8 +291,12 @@ else
 		export FLAGS_cudnn_deterministic=True
                 eval $cmd
                 status_check $? "${cmd}" "${status_log}"
-
-                set_eval_pretrain=$(func_set_params "${pretrain_model_key}" "${save_log}/${$model_name}/${train_model_name}")
+		
+		if [[ $FILENAME == *GeneralRecognition* ]]; then
+		    set_eval_pretrain=$(func_set_params "${pretrain_model_key}" "${save_log}/RecModel/${train_model_name}")
+		else
+                    set_eval_pretrain=$(func_set_params "${pretrain_model_key}" "${save_log}/${model_name}/${train_model_name}")
+		fi
                 # save norm trained models to set pretrain for pact training and fpgm training 
                 if [ ${trainer} = ${trainer_norm} ]; then
                     load_norm_train_model=${set_eval_pretrain}
@@ -308,7 +312,11 @@ else
                 if [ ${run_export} != "null" ]; then 
                     # run export model
                     save_infer_path="${save_log}"
-                    set_export_weight=$(func_set_params "${export_weight}" "${save_log}/${model_name}/${train_model_name}")
+		    if [[ $FILENAME == *GeneralRecognition* ]]; then
+		        set_eval_pretrain=$(func_set_params "${pretrain_model_key}" "${save_log}/RecModel/${train_model_name}")
+		    else
+		        set_export_weight=$(func_set_params "${export_weight}" "${save_log}/${model_name}/${train_model_name}")
+		    fi
                     set_save_infer_key=$(func_set_params "${save_infer_key}" "${save_infer_path}")
                     export_cmd="${python} ${run_export} ${set_export_weight} ${set_save_infer_key}"
                     eval $export_cmd
