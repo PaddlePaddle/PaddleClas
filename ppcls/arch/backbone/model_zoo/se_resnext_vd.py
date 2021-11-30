@@ -32,8 +32,6 @@ from ppcls.utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_f
 MODEL_URLS = {
     "SE_ResNeXt50_vd_32x4d":
     "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/SE_ResNeXt50_vd_32x4d_pretrained.pdparams",
-    "SE_ResNeXt50_vd_32x4d":
-    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/SE_ResNeXt50_vd_32x4d_pretrained.pdparams",
     "SENet154_vd":
     "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/SENet154_vd_pretrained.pdparams",
 }
@@ -300,16 +298,6 @@ def SE_ResNeXt50_vd_32x4d(pretrained=False, use_ssld=False, **kwargs):
         pretrained,
         model,
         MODEL_URLS["SE_ResNeXt50_vd_32x4d"],
-        use_ssld=use_ssld)
-    return model
-
-
-def SE_ResNeXt101_vd_32x4d(pretrained=False, use_ssld=False, **kwargs):
-    model = ResNeXt(layers=101, cardinality=32, **kwargs)
-    _load_pretrained(
-        pretrained,
-        model,
-        MODEL_URLS["SE_ResNeXt101_vd_32x4d"],
         use_ssld=use_ssld)
     return model
 
