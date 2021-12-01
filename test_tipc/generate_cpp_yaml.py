@@ -20,6 +20,7 @@ def parse_args():
     parser.add_argument('--tensorrt', type=str2bool, default=False)
     parser.add_argument('--precision', type=str, choices=["fp32", "fp16"])
     parser.add_argument('--benchmark', type=str2bool, default=True)
+    parser.add_argument('--gpu_id', type=int, default=0)
     parser.add_argument(
         '--cls_yaml_path',
         type=str,
@@ -55,6 +56,7 @@ def main():
     config["Global"]["benchmark"] = args.benchmark
     config["Global"]["use_tensorrt"] = args.tensorrt
     config["Global"]["use_fp16"] = True if args.precision == "fp16" else False
+    config["Global"]["gpu_id"] = args.gpu_id
     if args.type == "cls":
         config["Global"]["infer_imgs"] = args.data_dir
         assert args.cls_model_dir

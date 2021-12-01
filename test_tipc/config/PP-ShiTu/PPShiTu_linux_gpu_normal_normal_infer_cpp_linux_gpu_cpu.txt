@@ -15,3 +15,5 @@ use_tensorrt:False|True
 precision:fp32|fp16
 data_dir:./dataset/drink_dataset_v1.0
 benchmark:True
+generate_yaml_cmd:python3 test_tipc/generate_cpp_yaml.py
+transform_index_cmd:python3 deploy/cpp_shitu/tools/transform_id_map.py -c inference_drink.yaml

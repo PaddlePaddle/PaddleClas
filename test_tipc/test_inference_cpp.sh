@@ -2,6 +2,10 @@
 source test_tipc/common_func.sh
 
 FILENAME=$1
+GPUID=$2
+if [[ ! $GPUID ]];then
+   GPUID=0
+fi
 dataline=$(awk 'NR==1, NR==16{print}'  $FILENAME)
 
 # parser params
@@ -24,11 +28,13 @@ cpp_use_trt_list=$(func_parser_value "${lines[13]}")
 cpp_precision_list=$(func_parser_value "${lines[14]}")
 cpp_image_dir_value=$(func_parser_value "${lines[15]}")
 cpp_benchmark_value=$(func_parser_value "${lines[16]}")
+generate_yaml_cmd=$(func_parser_value "${lines[17]}")
+transform_index_cmd=$(func_parser_value "${lines[18]}")
 
 LOG_PATH="./test_tipc/output"
 mkdir -p ${LOG_PATH}
 status_log="${LOG_PATH}/results_cpp.log"
-generate_yaml_cmd="python3 test_tipc/generate_cpp_yaml.py"
+# generate_yaml_cmd="python3 test_tipc/generate_cpp_yaml.py"
 
 function func_shitu_cpp_inference(){
     IFS='|'
@@ -53,8 +59,9 @@ function func_shitu_cpp_inference(){
                         fi
                         _save_log_path="${_log_path}/shitu_cpp_infer_cpu_usemkldnn_${use_mkldnn}_threads_${threads}_precision_${precision}_batchsize_${batch_size}.log"
 
-			command="${generate_yaml_cmd} --type shitu --batch_size ${batch_size} --mkldnn ${use_mkldnn} --gpu ${use_gpu} --cpu_thread ${threads} --tensorrt False --precision ${precision} --data_dir ${_img_dir} --benchmark True --cls_model_dir ${cpp_infer_model_dir} --det_model_dir ${cpp_det_infer_model_dir}"
+			command="${generate_yaml_cmd} --type shitu --batch_size ${batch_size} --mkldnn ${use_mkldnn} --gpu ${use_gpu} --cpu_thread ${threads} --tensorrt False --precision ${precision} --data_dir ${_img_dir} --benchmark True --cls_model_dir ${cpp_infer_model_dir} --det_model_dir ${cpp_det_infer_model_dir} --gpu_id ${GPUID}"
 			eval $command
+			eval $transform_index_cmd
 			command="${_script} 2>&1|tee ${_save_log_path}"
 			eval $command
                         last_status=${PIPESTATUS[0]}
@@ -76,8 +83,9 @@ function func_shitu_cpp_inference(){
                     fi
                     for batch_size in ${cpp_batch_size_list[*]}; do
                         _save_log_path="${_log_path}/shitu_cpp_infer_gpu_usetrt_${use_trt}_precision_${precision}_batchsize_${batch_size}.log"
-			command="${generate_yaml_cmd} --type shitu --batch_size ${batch_size} --mkldnn False --gpu ${use_gpu} --cpu_thread 1 --tensorrt ${use_trt} --precision ${precision} --data_dir ${_img_dir} --benchmark True --cls_model_dir ${cpp_infer_model_dir} --det_model_dir ${cpp_det_infer_model_dir}"
+			command="${generate_yaml_cmd} --type shitu --batch_size ${batch_size} --mkldnn False --gpu ${use_gpu} --cpu_thread 1 --tensorrt ${use_trt} --precision ${precision} --data_dir ${_img_dir} --benchmark True --cls_model_dir ${cpp_infer_model_dir} --det_model_dir ${cpp_det_infer_model_dir} --gpu_id ${GPUID}"
                         eval $command
+			eval $transform_index_cmd
 			command="${_script} 2>&1|tee ${_save_log_path}"
 			eval $command
                         last_status=${PIPESTATUS[0]}
@@ -114,7 +122,7 @@ function func_cls_cpp_inference(){
                         fi
                         _save_log_path="${_log_path}/cls_cpp_infer_cpu_usemkldnn_${use_mkldnn}_threads_${threads}_precision_${precision}_batchsize_${batch_size}.log"
 
-			command="${generate_yaml_cmd} --type cls --batch_size ${batch_size} --mkldnn ${use_mkldnn} --gpu ${use_gpu} --cpu_thread ${threads} --tensorrt False --precision ${precision} --data_dir ${_img_dir} --benchmark True --cls_model_dir ${cpp_infer_model_dir}"
+			command="${generate_yaml_cmd} --type cls --batch_size ${batch_size} --mkldnn ${use_mkldnn} --gpu ${use_gpu} --cpu_thread ${threads} --tensorrt False --precision ${precision} --data_dir ${_img_dir} --benchmark True --cls_model_dir ${cpp_infer_model_dir} --gpu_id ${GPUID}"
 			eval $command
 			command1="${_script} 2>&1|tee ${_save_log_path}"
 			eval ${command1}
@@ -137,7 +145,7 @@ function func_cls_cpp_inference(){
                     fi
                     for batch_size in ${cpp_batch_size_list[*]}; do
                         _save_log_path="${_log_path}/cls_cpp_infer_gpu_usetrt_${use_trt}_precision_${precision}_batchsize_${batch_size}.log"
-			command="${generate_yaml_cmd} --type cls --batch_size ${batch_size} --mkldnn False --gpu ${use_gpu} --cpu_thread 1 --tensorrt ${use_trt} --precision ${precision} --data_dir ${_img_dir} --benchmark True --cls_model_dir ${cpp_infer_model_dir}"
+			command="${generate_yaml_cmd} --type cls --batch_size ${batch_size} --mkldnn False --gpu ${use_gpu} --cpu_thread 1 --tensorrt ${use_trt} --precision ${precision} --data_dir ${_img_dir} --benchmark True --cls_model_dir ${cpp_infer_model_dir} --gpu_id ${GPUID}"
                         eval $command
 			command="${_script} 2>&1|tee ${_save_log_path}"
 			eval $command
@@ -151,6 +159,7 @@ function func_cls_cpp_inference(){
         fi
     done
 }
+
 
 if [[ $cpp_infer_type == "cls" ]]; then
    cd deploy/cpp
@@ -183,6 +192,7 @@ if [[ $cpp_infer_type == "shitu" ]]; then
     eval "cmake -B build . -DFAISS_ENABLE_PYTHON=OFF  -DCMAKE_INSTALL_PREFIX=${faiss_install_path}"
     make -C build -j faiss
     make -C build install
+    cd ..
 fi
 
 if [ -d "opencv-3.4.7/opencv3/" ] && [ $(md5sum opencv-3.4.7.tar.gz | awk -F ' ' '{print $1}') = "faa2b5950f8bee3f03118e600c74746a" ];then
@@ -220,15 +230,14 @@ else
 
     make -j
     make install
-    cd ../
+    cd ../../
     echo "################### build opencv finished ###################"
 fi
 
-
 echo "################### build PaddleClas demo ####################"
 OPENCV_DIR=$(pwd)/opencv-3.4.7/opencv3/
-LIB_DIR=/work/project/project/test/paddle_inference/
-# LIB_DIR=$(pwd)/Paddle/build/paddle_inference_install_dir/
+# LIB_DIR=/work/project/project/test/paddle_inference/
+LIB_DIR=$(pwd)/Paddle/build/paddle_inference_install_dir/
 CUDA_LIB_DIR=$(dirname `find /usr -name libcudart.so`)
 CUDNN_LIB_DIR=$(dirname `find /usr -name libcudnn.so`)
 
@@ -247,7 +256,6 @@ if [[ $cpp_infer_type == cls ]]; then
 	-DCUDNN_LIB=${CUDNN_LIB_DIR} \
 	-DCUDA_LIB=${CUDA_LIB_DIR} \
 	-DTENSORRT_DIR=${TENSORRT_DIR}
-	echo "---------------------------"
 else
     cmake ..\
 	-DPADDLE_LIB=${LIB_DIR} \
@@ -259,7 +267,7 @@ else
 	-DCUDNN_LIB=${CUDNN_LIB_DIR} \
 	-DCUDA_LIB=${CUDA_LIB_DIR} \
 	-DTENSORRT_DIR=${TENSORRT_DIR} \
-	-DFAISS_DIR=${FAISS_DIR} \
+	-DFAISS_DIR=${faiss_install_path} \
 	-DFAISS_WITH_MKL=OFF
 fi
 make -j
@@ -269,14 +277,14 @@ echo "################### build PaddleClas demo finished ###################"
 
 
 # set cuda device
-GPUID=$2
-if [ ${#GPUID} -le 0 ];then
-    env=" "
-else
-    env="export CUDA_VISIBLE_DEVICES=${GPUID}"
-fi
-set CUDA_VISIBLE_DEVICES
-eval $env
+# GPUID=$2
+# if [ ${#GPUID} -le 0 ];then
+#     env="export CUDA_VISIBLE_DEVICES=0"
+# else
+#     env="export CUDA_VISIBLE_DEVICES=${GPUID}"
+# fi
+# set CUDA_VISIBLE_DEVICES
+# eval $env
 
 
 echo "################### run test ###################"
@@ -287,9 +295,9 @@ for infer_model in ${cpp_infer_model_dir[*]}; do
     #run inference
     is_quant=${infer_quant_flag[Count]}
     if [[ $cpp_infer_type == "cls" ]]; then
-    	func_cls_cpp_inference "${inference_cmd}" "${infer_model}" "${LOG_PATH}" "${cpp_image_dir_value}" ${is_quant}
+	func_cls_cpp_inference "${inference_cmd}" "${infer_model}" "${LOG_PATH}" "${cpp_image_dir_value}" ${is_quant}
     else
-    	func_shitu_cpp_inference "${inference_cmd}" "${infer_model}" "${LOG_PATH}" "${cpp_image_dir_value}" ${is_quant}
+	func_shitu_cpp_inference "${inference_cmd}" "${infer_model}" "${LOG_PATH}" "${cpp_image_dir_value}" ${is_quant}
     fi
     Count=$(($Count + 1))
 done
