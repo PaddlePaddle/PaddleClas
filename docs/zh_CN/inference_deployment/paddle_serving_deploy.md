@@ -38,12 +38,6 @@ pip3 install paddle-serving-server-gpu==0.7.0.post101 # GPU with CUDA10.1 + Tens
 pip3 install paddle-serving-server-gpu==0.7.0.post112 # GPU with CUDA11.2 + TensorRT8
 ```
 
-Paddle官方后续不再维护python3.5，此处建议修改python3的版本，以使用python3.7为例:
-```
-rm -rf /usr/local/bin/python3
-ln -s /usr/local/bin/python3.7 /usr/local/bin/python3
-```
-
 * 如果安装速度太慢，可以通过 `-i https://pypi.tuna.tsinghua.edu.cn/simple` 更换源，加速安装过程。
 * 其他环境配置安装请参考: [使用Docker安装Paddle Serving](https://github.com/PaddlePaddle/Serving/blob/v0.7.0/doc/Install_CN.md)
 
