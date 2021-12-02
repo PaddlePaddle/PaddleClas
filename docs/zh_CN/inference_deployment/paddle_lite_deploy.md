@@ -58,6 +58,7 @@ cd Paddle-Lite
 git checkout develop
 ./lite/tools/build_android.sh  --arch=armv8  --with_cv=ON --with_extra=ON
 ```
+
 **注意**：编译 Paddle-Lite 获得预测库时，需要打开`--with_cv=ON --with_extra=ON` 两个选项，`--arch` 表示 `arm` 版本，这里指定为 armv8，更多编译命令介绍请参考[Linux x86 环境下编译适用于 Android 的库](https://paddle-lite.readthedocs.io/zh/latest/source_compile/linux_x86_compile_android.html)，关于其他平台的编译操作，具体请参考[PaddleLite](https://paddle-lite.readthedocs.io/zh/latest/)中`源码编译`部分。
 
 直接下载预测库并解压后，可以得到 `inference_lite_lib.android.armv8/`文件夹，通过编译 Paddle-Lite 得到的预测库位于 `Paddle-Lite/build.lite.android.armv8.gcc/inference_lite_lib.android.armv8/`文件夹下。

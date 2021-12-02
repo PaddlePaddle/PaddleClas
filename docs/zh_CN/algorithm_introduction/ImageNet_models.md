@@ -1,47 +1,5 @@
 <!-- 简体中文 | [English](../../en/algorithm_introduction/ImageNet_models.md) -->
 
-
-<<<<<<< HEAD
-## ImageNet预训练模型库
-
-### 目录
-
-- [模型库概览图](#模型库概览图)
-- [SSLD知识蒸馏预训练模型](#模型库概览图)
-    - [服务器端知识蒸馏模型](#服务器端知识蒸馏模型)
-    - [移动端知识蒸馏模型](#移动端知识蒸馏模型)
-    - [Intel CPU端知识蒸馏模型](#Intel-CPU端知识蒸馏模型)
-- [PP-LCNet系列](#PP-LCNet系列)
-- [ResNet系列](#ResNet系列)
-- [移动端系列](#移动端系列)
-- [SEResNeXt与Res2Net系列](#SEResNeXt与Res2Net系列)
-- [DPN与DenseNet系列](#DPN与DenseNet系列)
-- [HRNet系列](#HRNet系列)
-- [Inception系列](#Inception系列)
-- [EfficientNet与ResNeXt101_wsl系列](#EfficientNet与ResNeXt101_wsl系列)
-- [ResNeSt与RegNet系列](#ResNeSt与RegNet系列)
-- [ViT_and_DeiT系列](#ViT_and_DeiT系列)
-- [RepVGG系列](#RepVGG系列)
-- [MixNet系列](#MixNet系列)
-- [SwinTransformer系列](#SwinTransformer系列)
-- [LeViT系列](#LeViT系列)
-- [HarDNet系列](#HarDNet系列)
-- [DLA系列](#DLA系列)
-- [RedNet系列](#RedNet系列)
-- [TNT系列](#TNT系列)
-- [其他模型](#其他模型)
-
-
-<a name="模型库概览图"></a>
-### 模型库概览图
-
-基于ImageNet1k分类数据集，PaddleClas支持37个系列分类网络结构以及对应的217个图像分类预训练模型，训练技巧、每个系列网络结构的简单介绍和性能评估将在相应章节展现，下面所有的速度指标评估环境如下：
-* Arm CPU的评估环境基于骁龙855（SD855）。
-* Intel CPU的评估环境基于Intel(R) Xeon(R) Gold 6148。
-* GPU评估环境基于T4机器，在FP32+TensorRT配置下运行500次测得（去除前10次的warmup时间）。
-* FLOPs与Params通过`paddle.flops()`计算得到（PaddlePaddle版本为2.2）
-# ImageNet 预训练模型库
-
 ## 目录
 
 - [1. 模型库概览图](#1)
@@ -125,6 +83,7 @@
 | MobileNetV3_large_x1_0_ssld      | 0.790    | 0.753  | 0.036  | 19.308           | 229.66     | 5.50      | 21      | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/MobileNetV3_large_x1_0_ssld_pretrained.pdparams)      |
 | MobileNetV3_small_x1_0_ssld      | 0.713    | 0.682  |  0.031  | 6.546                 | 63.67    | 2.95      | 12      | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/MobileNetV3_small_x1_0_ssld_pretrained.pdparams)      |
 | GhostNet_x1_3_ssld                    | 0.794    | 0.757   | 0.037 | 19.983                | 236.89     | 7.38       | 29      | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/GhostNet_x1_3_ssld_pretrained.pdparams)               |
+
 
 
 <a name="Intel-CPU端知识蒸馏模型"></a>
@@ -240,8 +199,7 @@ ResNet 及其 Vd 系列模型的精度、速度指标如下表所示，更多关
 
 SEResNeXt 与 Res2Net 系列模型的精度、速度指标如下表所示，更多关于该系列的模型介绍可以参考：[SEResNeXt 与 Res2Net 系列模型文档](../models/SEResNext_and_Res2Net.md)。
 
-
-| 模型                  | Top-1 Acc | Top-5 Acc | time(ms)<br>bs=1 | time(ms)<br>bs=4 | FLOPs(G) | Params(M) | 下载地址                                                                                         |
+| 模型                  | Top-1 Acc | Top-5 Acc | time(ms)<br>bs=1 | time(ms)<br>bs=4 | Flops(G) | Params(M) | 下载地址                                                                                         |
 |---------------------------|-----------|-----------|-----------------------|----------------------|----------|-----------|----------------------------------------------------------------------------------------------------|
 | Res2Net50_<br>26w_4s          | 0.7933    | 0.9457    | 4.47188               | 9.65722              | 4.28     | 25.76      | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/Res2Net50_26w_4s_pretrained.pdparams)          |
 | Res2Net50_vd_<br>26w_4s       | 0.7975    | 0.9491    | 4.52712               | 9.93247              | 4.52     | 25.78     | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/Res2Net50_vd_26w_4s_pretrained.pdparams)       |

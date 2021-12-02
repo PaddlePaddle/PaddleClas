@@ -90,11 +90,9 @@ MobileNetV1                           min = 10.03200    max = 9.94300     averag
 
 ### 2.4 模型优化与速度评估
 
-
 * 在 2.3 节中提到了在模型评估之前对其进行优化，在这里也可以首先对模型进行优化，再直接加载优化后的模型进行速度评估。
 
 * Paddle-Lite 提供了多种策略来自动优化原始的训练模型，其中包括量化、子图融合、混合调度、Kernel 优选等等方法。为了使优化过程更加方便易用，Paddle-Lite 提供了 opt 工具来自动完成优化步骤，输出一个轻量的、最优的可执行模型。可以在[Paddle-Lite 模型优化工具页面](https://paddle-lite.readthedocs.io/zh/latest/user_guides/model_optimize_tool.html)下载。在这里以 `macOS` 开发环境为例，下载[opt_mac](https://paddlelite-data.bj.bcebos.com/model_optimize_tool/opt_mac)模型优化工具，并使用下面的命令对模型进行优化。
-
 
 
 ```shell
