@@ -96,7 +96,6 @@ python3 -m paddle.distributed.launch \
 ## 三、数据增广
 
 PaddleClas 包含了很多数据增广的方法，如 Mixup、Cutout、RandomErasing 等，具体的方法可以参考[数据增广的章节](../algorithm_introduction/DataAugmentation.md)。
->>>>>>> fa066acb... modify space in documentation
 
 ### 数据增广的尝试-Mixup
 
