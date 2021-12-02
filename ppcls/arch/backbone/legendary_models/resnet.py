@@ -167,8 +167,8 @@ class ConvBNLayer_new(TheseusLayer):
             stride=stride,
             padding=(filter_size - 1) // 2,
             groups=groups,
-            #weight_attr=ParamAttr(learning_rate=lr_mult),
-            weight_attr=get_param_attr(name + '_weights', 'conv_weight'),
+            weight_attr=ParamAttr(learning_rate=lr_mult),
+            #weight_attr=get_param_attr(name + '_weights', 'conv_weight'),
             bias_attr=False,
             data_format=data_format)
         if name == 'conv1':
@@ -177,10 +177,10 @@ class ConvBNLayer_new(TheseusLayer):
             bn_name = 'bn' + name[3:]
         self.bn = BatchNorm(
             num_filters,
-            #param_attr=ParamAttr(learning_rate=lr_mult),
-            #bias_attr=ParamAttr(learning_rate=lr_mult),
-            param_attr=get_param_attr(bn_name + '_scale', 'scale'),
-            bias_attr=get_param_attr(bn_name + '_offset', 'bias'),
+            param_attr=ParamAttr(learning_rate=lr_mult),
+            bias_attr=ParamAttr(learning_rate=lr_mult),
+            #param_attr=get_param_attr(bn_name + '_scale', 'scale'),
+            #bias_attr=get_param_attr(bn_name + '_offset', 'bias'),
             moving_mean_name=bn_name + '_mean',
             moving_variance_name=bn_name + '_variance',
             data_layout=data_format)
