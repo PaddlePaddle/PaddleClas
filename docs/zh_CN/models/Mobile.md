@@ -1,15 +1,24 @@
 # 移动端系列
+---
+## 目录
 
-## 概述
-MobileNetV1是Google于2017年发布的用于移动设备或嵌入式设备中的网络。该网络将传统的卷积操作替换深度可分离卷积，即Depthwise卷积和Pointwise卷积的组合，相比传统的卷积操作，该组合可以大大节省参数量和计算量。与此同时，MobileNetV1也可以用于目标检测、图像分割等其他视觉任务中。
+* [1. 概述](#1)
+* [2. 精度、FLOPS 和参数量](#2)
+* [3. 基于 SD855 的预测速度和存储大小](#3)
+* [4. 基于 T4 GPU 的预测速度](#4)
 
-MobileNetV2是Google继MobileNetV1提出的一种轻量级网络。相比MobileNetV1，MobileNetV2提出了Linear bottlenecks与Inverted residual block作为网络基本结构，通过大量地堆叠这些基本模块，构成了MobileNetV2的网络结构。最终，在FLOPS只有MobileNetV1的一半的情况下取得了更高的分类精度。
+ <a name='1'></a>
 
-ShuffleNet系列网络是旷视提出的轻量化网络结构，到目前为止，该系列网络一共有两种典型的结构，即ShuffleNetV1与ShuffleNetV2。ShuffleNet中的Channel Shuffle操作可以将组间的信息进行交换，并且可以实现端到端的训练。在ShuffleNetV2的论文中，作者提出了设计轻量级网络的四大准则，并且根据四大准则与ShuffleNetV1的不足，设计了ShuffleNetV2网络。
+## 1. 概述
+MobileNetV1 是 Google 于 2017 年发布的用于移动设备或嵌入式设备中的网络。该网络将传统的卷积操作替换深度可分离卷积，即 Depthwise 卷积和 Pointwise 卷积的组合，相比传统的卷积操作，该组合可以大大节省参数量和计算量。与此同时，MobileNetV1 也可以用于目标检测、图像分割等其他视觉任务中。
 
-MobileNetV3是Google于2019年提出的一种基于NAS的新的轻量级网络，为了进一步提升效果，将relu和sigmoid激活函数分别替换为hard_swish与hard_sigmoid激活函数，同时引入了一些专门减小网络计算量的改进策略。
+MobileNetV2 是 Google 继 MobileNetV1 提出的一种轻量级网络。相比 MobileNetV1，MobileNetV2 提出了 Linear bottlenecks 与 Inverted residual block 作为网络基本结构，通过大量地堆叠这些基本模块，构成了 MobileNetV2 的网络结构。最终，在 FLOPS 只有 MobileNetV1 的一半的情况下取得了更高的分类精度。
 
-GhostNet是华为于2020年提出的一种全新的轻量化网络结构，通过引入ghost module，大大减缓了传统深度网络中特征的冗余计算问题，使得网络的参数量和计算量大大降低。
+ShuffleNet 系列网络是旷视提出的轻量化网络结构，到目前为止，该系列网络一共有两种典型的结构，即 ShuffleNetV1 与 ShuffleNetV2。ShuffleNet 中的 Channel Shuffle 操作可以将组间的信息进行交换，并且可以实现端到端的训练。在 ShuffleNetV2 的论文中，作者提出了设计轻量级网络的四大准则，并且根据四大准则与 ShuffleNetV1 的不足，设计了 ShuffleNetV2 网络。
+
+MobileNetV3 是 Google 于 2019 年提出的一种基于 NAS 的新的轻量级网络，为了进一步提升效果，将 relu 和 sigmoid 激活函数分别替换为 hard_swish 与 hard_sigmoid 激活函数，同时引入了一些专门减小网络计算量的改进策略。
+
+GhostNet 是华为于 2020 年提出的一种全新的轻量化网络结构，通过引入 ghost module，大大减缓了传统深度网络中特征的冗余计算问题，使得网络的参数量和计算量大大降低。
 
 ![](../../images/models/mobile_arm_top1.png)
 
@@ -20,10 +29,11 @@ GhostNet是华为于2020年提出的一种全新的轻量化网络结构，通�
 ![](../../images/models/T4_benchmark/t4.fp32.bs4.mobile_trt.params.png)
 
 
-目前PaddleClas开源的的移动端系列的预训练模型一共有35个，其指标如图所示。从图片可以看出，越新的轻量级模型往往有更优的表现，MobileNetV3代表了目前主流的轻量级神经网络结构。在MobileNetV3中，作者为了获得更高的精度，在global-avg-pooling后使用了1x1的卷积。该操作大幅提升了参数量但对计算量影响不大，所以如果从存储角度评价模型的优异程度，MobileNetV3优势不是很大，但由于其更小的计算量，使得其有更快的推理速度。此外，我们模型库中的ssld蒸馏模型表现优异，从各个考量角度下，都刷新了当前轻量级模型的精度。由于MobileNetV3模型结构复杂，分支较多，对GPU并不友好，GPU预测速度不如MobileNetV1。GhostNet于2020年提出，通过引入ghost的网络设计理念，大大降低了计算量和参数量，同时在精度上也超过前期最高的MobileNetV3网络结构。
+目前 PaddleClas 开源的的移动端系列的预训练模型一共有 35 个，其指标如图所示。从图片可以看出，越新的轻量级模型往往有更优的表现，MobileNetV3 代表了目前主流的轻量级神经网络结构。在 MobileNetV3 中，作者为了获得更高的精度，在 global-avg-pooling 后使用了 1x1 的卷积。该操作大幅提升了参数量但对计算量影响不大，所以如果从存储角度评价模型的优异程度，MobileNetV3 优势不是很大，但由于其更小的计算量，使得其有更快的推理速度。此外，我们模型库中的 ssld 蒸馏模型表现优异，从各个考量角度下，都刷新了当前轻量级模型的精度。由于 MobileNetV3 模型结构复杂，分支较多，对 GPU 并不友好，GPU 预测速度不如 MobileNetV1。GhostNet 于 2020 年提出，通过引入 ghost 的网络设计理念，大大降低了计算量和参数量，同时在精度上也超过前期最高的 MobileNetV3 网络结构。
 
+<a name='2'></a>
 
-## 精度、FLOPS和参数量
+## 2. 精度、FLOPS 和参数量
 
 | Models                               | Top1    | Top5    | Reference<br>top1 | Reference<br>top5 | FLOPS<br>(G) | Parameters<br>(M) |
 |:--:|:--:|:--:|:--:|:--:|:--:|:--:|
@@ -65,8 +75,9 @@ GhostNet是华为于2020年提出的一种全新的轻量化网络结构，通�
 | GhostNet_x1_3                        | 0.757   | 0.925   | 0.757             | 0.927             | 0.440        | 7.300             |
 | GhostNet_x1_3_ssld                        | 0.794   | 0.945   | 0.757             | 0.927             | 0.440        | 7.300             |
 
+<a name='3'></a>
 
-## 基于SD855的预测速度和存储大小
+## 3. 基于 SD855 的预测速度和存储大小
 
 | Models                               | Batch Size=1(ms) | Storage Size(M) |
 |:--:|:--:|:--:|
@@ -108,8 +119,9 @@ GhostNet是华为于2020年提出的一种全新的轻量化网络结构，通�
 | GhostNet_x1_3                   | 19.982           | 29.000           |
 | GhostNet_x1_3_ssld                   | 19.982           | 29.000           |
 
+<a name='4'></a>
 
-## 基于T4 GPU的预测速度
+## 4. 基于 T4 GPU 的预测速度
 
 | Models            | FP16<br>Batch Size=1<br>(ms) | FP16<br>Batch Size=4<br>(ms) | FP16<br>Batch Size=8<br>(ms) | FP32<br>Batch Size=1<br>(ms) | FP32<br>Batch Size=4<br>(ms) | FP32<br>Batch Size=8<br>(ms) |
 |-----------------------------|-----------------------|-----------------------|-----------------------|-----------------------|-----------------------|-----------------------|

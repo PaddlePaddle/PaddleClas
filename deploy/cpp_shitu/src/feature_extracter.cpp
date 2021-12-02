@@ -59,7 +59,7 @@ namespace Feature {
         cv::Mat resize_img;
         std::vector<double> time;
 
-        auto preprocess_start = std::chrono::system_clock::now();
+        auto preprocess_start = std::chrono::steady_clock::now();
         this->resize_op_.Run(img, resize_img, this->resize_short_,
                              this->resize_size_);
 
@@ -70,9 +70,9 @@ namespace Feature {
         auto input_names = this->predictor_->GetInputNames();
         auto input_t = this->predictor_->GetInputHandle(input_names[0]);
         input_t->Reshape({1, 3, resize_img.rows, resize_img.cols});
-        auto preprocess_end = std::chrono::system_clock::now();
+        auto preprocess_end = std::chrono::steady_clock::now();
 
-        auto infer_start = std::chrono::system_clock::now();
+        auto infer_start = std::chrono::steady_clock::now();
         input_t->CopyFromCpu(input.data());
         this->predictor_->Run();
 
@@ -84,18 +84,18 @@ namespace Feature {
 
         out_data.resize(out_num);
         output_t->CopyToCpu(out_data.data());
-        auto infer_end = std::chrono::system_clock::now();
+        auto infer_end = std::chrono::steady_clock::now();
 
-        auto postprocess_start = std::chrono::system_clock::now();
+        auto postprocess_start = std::chrono::steady_clock::now();
         if (this->feature_norm)
             FeatureNorm(out_data);
-        auto postprocess_end = std::chrono::system_clock::now();
+        auto postprocess_end = std::chrono::steady_clock::now();
 
         std::chrono::duration<float> preprocess_diff =
                 preprocess_end - preprocess_start;
-        time.push_back(double(preprocess_diff.count()));
+        time.push_back(double(preprocess_diff.count()) * 1000);
         std::chrono::duration<float> inference_diff = infer_end - infer_start;
-        double inference_cost_time = double(inference_diff.count());
+        double inference_cost_time = double(inference_diff.count() * 1000);
         time.push_back(inference_cost_time);
         // std::chrono::duration<float> postprocess_diff =
         //     postprocess_end - postprocess_start;

@@ -143,10 +143,10 @@ tar -xvf paddle_inference.tgz
 
 ```
 inference/
-|--cls_infer.pdmodel
-|--cls_infer.pdiparams
+|--inference.pdmodel
+|--inference.pdiparams
 ```
-**注意**：上述文件中，`cls_infer.pdmodel`文件存储了模型结构信息，`cls_infer.pdiparams`文件存储了模型参数信息。注意两个文件的路径需要与配置文件`tools/config.txt`中的`cls_model_path`和`cls_params_path`参数对应一致。
+**注意**：上述文件中，`inference.pdmodel`文件存储了模型结构信息，`inference.pdiparams`文件存储了模型参数信息。模型目录可以随意设置，但是模型名字不能修改。
 
 ### 2.2 编译PaddleClas C++预测demo
 
@@ -183,6 +183,7 @@ cmake .. \
     -DCUDA_LIB=${CUDA_LIB_DIR} \
 
 make -j
+cd ..
 ```
 
 上述命令中，
@@ -200,31 +201,26 @@ make -j
 在执行上述命令，编译完成之后，会在当前路径下生成`build`文件夹，其中生成一个名为`clas_system`的可执行文件。
 
 
-### 运行demo
-* 首先修改`tools/config.txt`中对应字段：
-  * use_gpu：是否使用GPU；
-  * gpu_id：使用的GPU卡号；
-  * gpu_mem：显存；
-  * cpu_math_library_num_threads：底层科学计算库所用线程的数量；
-  * use_mkldnn：是否使用MKLDNN加速；
-  * use_tensorrt: 是否使用tensorRT进行加速；
-  * use_fp16：是否使用半精度浮点数进行计算，该选项仅在use_tensorrt为true时有效；
-  * cls_model_path：预测模型结构文件路径；
-  * cls_params_path：预测模型参数文件路径；
-  * resize_short_size：预处理时图像缩放大小；
-  * crop_size：预处理时图像裁剪后的大小。
-
-* 然后修改`tools/run.sh`：
-  * `./build/clas_system ./tools/config.txt ./docs/imgs/ILSVRC2012_val_00000666.JPEG`
-  * 上述命令中分别为：编译得到的可执行文件`clas_system`；运行时的配置文件`config.txt`；待预测的图像。
-
-* 最后执行以下命令，完成对一幅图像的分类。
+### 2.3 运行demo
+#### 2.3.1 设置配置文件
 
 ```shell
-sh tools/run.sh
+cp ../configs/inference_cls.yaml tools/
 ```
 
-* 最终屏幕上会输出结果，如下图所示。
+根据[python预测推理](../../docs/zh_CN/inference_deployment/python_deploy.md)的`图像分类推理`部分修改好`tools`目录下`inference_cls.yaml`文件。`yaml`文件的参数说明详见[python预测推理](../../docs/zh_CN/inference_deployment/python_deploy.md)。
+
+请根据实际存放文件，修改好`Global.infer_imgs`、`Global.inference_model_dir`等参数。
+
+#### 2.3.2 执行
+
+```shell
+./build/clas_system -c tools/inference_cls.yaml
+# or
+./build/clas_system -config tools/inference_cls.yaml
+```
+
+最终屏幕上会输出结果，如下图所示。
 
 <div align="center">
     <img src="./docs/imgs/cpp_infer_result.png" width="600">
