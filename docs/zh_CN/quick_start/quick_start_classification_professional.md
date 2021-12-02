@@ -152,7 +152,7 @@ python3 -m paddle.distributed.launch \
 
 * **注意**
 
-  * 其他数据增广的配置文件可以参考 `ppcls/configs/DataAugment` 中的配置文件。
+  * 其他数据增广的配置文件可以参考 `ppcls/configs/ImageNet/DataAugment/` 中的配置文件。
 * 训练 CIFAR100 的迭代轮数较少，因此进行训练时，验证集的精度指标可能会有 1% 左右的波动。
 
 <a name="4"></a>
