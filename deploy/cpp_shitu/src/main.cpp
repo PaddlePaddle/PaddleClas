@@ -179,9 +179,9 @@ int main(int argc, char **argv) {
     if (config.config_file["Global"]["visual_det"].IsDefined()) {
         visual_det = config.config_file["Global"]["visual_det"].as<bool>();
     }
-    bool run_benchmark = false;
+    bool benchmark = false;
     if (config.config_file["Global"]["benchmark"].IsDefined()) {
-        run_benchmark = config.config_file["Global"]["benchmark"].as<bool>();
+        benchmark = config.config_file["Global"]["benchmark"].as<bool>();
     }
     int max_det_results = 5;
     if (config.config_file["Global"]["max_det_results"].IsDefined()) {
@@ -210,6 +210,8 @@ int main(int argc, char **argv) {
     // for time log
     std::vector<double> cls_times = {0, 0, 0};
     std::vector<double> det_times = {0, 0, 0};
+    std::vector<double> search_times = {0, 0, 0};
+    int instance_num = 0;
     // for read images
     std::vector <cv::Mat> batch_imgs;
     std::vector <std::string> img_paths;
@@ -222,7 +224,12 @@ int main(int argc, char **argv) {
     // for nms
     std::vector<int> indeices;
 
-    int warmup_iter = img_files_list.size() > 5 ? 5 : 0;
+    int warmup_iter = img_files_list.size() > 5 ? 5 : img_files_list.size();
+    if (benchmark) {
+        img_files_list.insert(img_files_list.begin(), img_files_list.begin(),
+                              img_files_list.begin() + warmup_iter);
+    }
+
     for (int idx = 0; idx < img_files_list.size(); ++idx) {
         std::string img_path = img_files_list[idx];
         cv::Mat srcimg = cv::imread(img_path, cv::IMREAD_COLOR);
@@ -238,12 +245,14 @@ int main(int argc, char **argv) {
 
         // step1: get all detection results
         DetPredictImage(batch_imgs, img_paths, batch_size, &detector, det_result,
-                        det_bbox_num, det_times, visual_det, run_benchmark);
+                        det_bbox_num, det_times, visual_det, false);
 
         // select max_det_results bbox
         if (det_result.size() > max_det_results) {
             det_result.resize(max_det_results);
         }
+        instance_num += det_result.size();
+
         // step2: add the whole image for recognition to improve recall
         Detection::ObjectResult result_whole_img = {
                 {0, 0, srcimg.cols - 1, srcimg.rows - 1}, 0, 1.0};
@@ -262,16 +271,25 @@ int main(int argc, char **argv) {
         }
 
         // step4: get search result
+        auto search_start = std::chrono::steady_clock::now();
         search_result = searcher.Search(features.data(), det_result.size());
+        auto search_end = std::chrono::steady_clock::now();
 
         // nms for search result
         for (int i = 0; i < det_result.size(); ++i) {
             det_result[i].confidence = search_result.D[search_result.return_k * i];
         }
         NMSBoxes(det_result, searcher.GetThreshold(), rec_nms_thresold, indeices);
+        auto nms_end = std::chrono::steady_clock::now();
+        std::chrono::duration<float> search_diff = search_end - search_start;
+        search_times[1] += double(search_diff.count() * 1000);
+
+        std::chrono::duration<float> nms_diff = nms_end - search_end;
+        search_times[2] += double(nms_diff.count() * 1000);
 
         // print result
-        PrintResult(img_path, det_result, indeices, searcher, search_result);
+        if (not benchmark or (benchmark and idx >= warmup_iter))
+            PrintResult(img_path, det_result, indeices, searcher, search_result);
 
         // for postprocess
         batch_imgs.clear();
@@ -281,18 +299,44 @@ int main(int argc, char **argv) {
         feature.clear();
         features.clear();
         indeices.clear();
+        if (benchmark and warmup_iter == idx + 1) {
+            det_times = {0, 0, 0};
+            cls_times = {0, 0, 0};
+            search_times = {0, 0, 0};
+            instance_num = 0;
+        }
     }
 
-    std::string presion = "fp32";
+    if (benchmark) {
+        std::string presion = "fp32";
+        if (config.config_file["Global"]["use_fp16"].IsDefined() and
+            config.config_file["Global"]["use_fp16"].as<bool>())
+            presion = "fp16";
+        bool use_gpu = config.config_file["Global"]["use_gpu"].as<bool>();
+        bool use_tensorrt = config.config_file["Global"]["use_tensorrt"].as<bool>();
+        bool enable_mkldnn =
+                config.config_file["Global"]["enable_mkldnn"].as<bool>();
+        int cpu_num_threads =
+                config.config_file["Global"]["cpu_num_threads"].as<int>();
+        int batch_size = config.config_file["Global"]["batch_size"].as<int>();
+        std::vector<int> shape =
+                config.config_file["Global"]["image_shape"].as < std::vector < int >> ();
+        std::string det_shape = std::to_string(shape[0]);
+        for (int i = 1; i < shape.size(); ++i)
+            det_shape = det_shape + ", " + std::to_string(shape[i]);
 
-    // if (config.use_fp16)
-    //   presion = "fp16";
-    // if (config.benchmark) {
-    //   AutoLogger autolog("Classification", config.use_gpu, config.use_tensorrt,
-    //                      config.use_mkldnn, config.cpu_threads, 1,
-    //                      "1, 3, 224, 224", presion, cls_times,
-    //                      img_files_list.size());
-    //   autolog.report();
-    // }
+        AutoLogger autolog_det("Det", use_gpu, use_tensorrt, enable_mkldnn,
+                               cpu_num_threads, batch_size, det_shape, presion,
+                               det_times, img_files_list.size() - warmup_iter);
+        autolog_det.report();
+        AutoLogger autolog_rec("Rec", use_gpu, use_tensorrt, enable_mkldnn,
+                               cpu_num_threads, batch_size, "3, 224, 224", presion,
+                               cls_times, instance_num);
+        autolog_rec.report();
+        AutoLogger autolog_search("Search", false, use_tensorrt, enable_mkldnn,
+                                  cpu_num_threads, batch_size, "dynamic", presion,
+                                  search_times, instance_num);
+        autolog_search.report();
+    }
     return 0;
 }
