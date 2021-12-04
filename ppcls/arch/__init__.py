@@ -115,7 +115,7 @@ class DistillationModel(nn.Layer):
             for idx, pretrained in enumerate(pretrained_list):
                 if pretrained is not None:
                     load_dygraph_pretrain(
-                        self.model_name_list[idx], path=pretrained)
+                        self.model_list[idx], path=pretrained)
 
     def forward(self, x, label=None):
         result_dict = dict()
