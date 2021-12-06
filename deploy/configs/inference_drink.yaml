@@ -1,9 +1,9 @@
 Global:
-  infer_imgs: "./recognition_demo_data_v1.2/test_drinks/hongniu_1.jpg"
+  infer_imgs: "./drink_dataset_v1.0/test_images/hongniu_1.jpg"
   det_inference_model_dir: "./models/picodet_PPLCNet_x2_5_mainbody_lite_v1.0_infer"
   rec_inference_model_dir: "./models/general_PPLCNet_x2_5_lite_v1.0_infer"
   rec_nms_thresold: 0.05
-  
+
   batch_size: 1
   image_shape: [3, 640, 640]
   threshold: 0.2
@@ -11,11 +11,10 @@ Global:
   labe_list:
   - foreground
 
-  # inference engine config
   use_gpu: True
   enable_mkldnn: False
   cpu_num_threads: 10
-  enable_benchmark: True
+  enable_benchmark: False
   use_fp16: False
   ir_optim: True
   use_tensorrt: False
@@ -33,6 +32,7 @@ DetPreProcess:
         mean: [0.485, 0.456, 0.406]
         std: [0.229, 0.224, 0.225]
     - DetPermute: {}
+
 DetPostProcess: {}
 
 RecPreProcess:
@@ -50,6 +50,15 @@ RecPostProcess: null
 
 # indexing engine config
 IndexProcess:
-  index_dir: "./drink_dataset/index"
+  index_method: "HNSW32" # supported: HNSW32, IVF, Flat
+  index_dir: "./drink_dataset_v1.0/gallery"
+  image_root: "./drink_dataset_v1.0/index"
+  data_file:  "./drink_dataset_v1.0/gallery/drink_label.txt"
+  index_operation: "new" # suported: "append", "remove", "new"
+  delimiter: " "
+  dist_type: "IP"
+  embedding_size: 512
+  batch_size: 32
   return_k: 5
   score_thres: 0.4
+

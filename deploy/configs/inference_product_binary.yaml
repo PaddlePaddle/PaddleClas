@@ -53,8 +53,16 @@ RecPostProcess:
 
 # indexing engine config
 IndexProcess:
-  binary_index: true
+  index_method: "Flat"    # supported: HNSW32, Flat
   index_dir: "./recognition_demo_data_v1.1/gallery_product/index_binary"
+  image_root: "./recognition_demo_data_v1.1/gallery_product/"
+  data_file:  "./recognition_demo_data_v1.1/gallery_product/data_file.txt"
+  index_operation: "new"  # suported: "append", "remove", "new"
+  delimiter: "\t"
+  dist_type: "hamming"
+  embedding_size: 512
+  batch_size: 32
+  binary_index: true
   return_k: 5
   score_thres: 0
   
