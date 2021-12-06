@@ -215,9 +215,9 @@ cp ../configs/inference_cls.yaml tools/
 #### 2.3.2 执行
 
 ```shell
-./build/clas_system -c inference_cls.yaml
+./build/clas_system -c tools/inference_cls.yaml
 # or
-./build/clas_system -config inference_cls.yaml
+./build/clas_system -config tools/inference_cls.yaml
 ```
 
 最终屏幕上会输出结果，如下图所示。
