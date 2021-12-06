@@ -61,4 +61,3 @@ IndexProcess:
   batch_size: 32
   return_k: 5
   score_thres: 0.5
-

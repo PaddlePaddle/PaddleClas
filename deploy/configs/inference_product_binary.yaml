@@ -65,4 +65,3 @@ IndexProcess:
   binary_index: true
   return_k: 5
   score_thres: 0
-  
