@@ -13,7 +13,7 @@
 ## 1. 简介
 [Paddle Serving](https://github.com/PaddlePaddle/Serving) 旨在帮助深度学习开发者轻松部署在线预测服务，支持一键部署工业级的服务能力、客户端和服务端之间高并发和高效通信、并支持多种编程语言开发客户端。
 
-该部分以 HTTP 预测服务部署为例，介绍怎样在 PaddleClas 中使用 PaddleServing 部署模型服务。
+该部分以 HTTP 预测服务部署为例，介绍怎样在 PaddleClas 中使用 PaddleServing 部署模型服务。目前只支持 Linux 平台部署，暂不支持 Windows 平台。
 
 <a name="2"></a>
 ## 2. Serving 安装
@@ -21,21 +21,25 @@
 Serving 官网推荐使用 docker 安装并部署 Serving 环境。首先需要拉取 docker 环境并创建基于 Serving 的 docker。
 
 ```shell
-nvidia-docker pull hub.baidubce.com/paddlepaddle/serving:0.2.0-gpu
-nvidia-docker run -p 9292:9292 --name test -dit hub.baidubce.com/paddlepaddle/serving:0.2.0-gpu
+docker pull paddlepaddle/serving:0.7.0-cuda10.2-cudnn7-devel
+nvidia-docker run -p 9292:9292 --name test -dit paddlepaddle/serving:0.7.0-cuda10.2-cudnn7-devel bash
 nvidia-docker exec -it test bash
 ```
 
 进入 docker 后，需要安装 Serving 相关的 python 包。
 
 ```shell
-pip install paddlepaddle-gpu
-pip install paddle-serving-client
-pip install paddle-serving-server-gpu
-pip install paddle-serving-app
+pip3 install paddle-serving-client==0.7.0
+pip3 install paddle-serving-server==0.7.0 # CPU
+pip3 install paddle-serving-app==0.7.0
+pip3 install paddle-serving-server-gpu==0.7.0.post102 #GPU with CUDA10.2 + TensorRT6
+# 其他GPU环境需要确认环境再选择执行哪一条
+pip3 install paddle-serving-server-gpu==0.7.0.post101 # GPU with CUDA10.1 + TensorRT6
+pip3 install paddle-serving-server-gpu==0.7.0.post112 # GPU with CUDA11.2 + TensorRT8
 ```
 
 * 如果安装速度太慢，可以通过 `-i https://pypi.tuna.tsinghua.edu.cn/simple` 更换源，加速安装过程。
+* 其他环境配置安装请参考: [使用Docker安装Paddle Serving](https://github.com/PaddlePaddle/Serving/blob/v0.7.0/doc/Install_CN.md)
 
 * 如果希望部署 CPU 服务，可以安装 serving-server 的 cpu 版本，安装命令如下。
 
@@ -43,6 +47,7 @@ pip install paddle-serving-app
 pip install paddle-serving-server
 ```
 <a name="3"></a>
+
 ## 3. 图像分类服务部署
 <a name="3.1"></a>
 ### 3.1 模型转换
@@ -67,7 +72,7 @@ python3 -m paddle_serving_client.convert --dirname ./ResNet50_vd_infer/ \
 ```
 ResNet50_vd 推理模型转换完成后，会在当前文件夹多出 `ResNet50_vd_serving` 和 `ResNet50_vd_client` 的文件夹，具备如下格式：
 ```
-|- ResNet50_vd_client/
+|- ResNet50_vd_server/
   |- __model__  
   |- __params__
   |- serving_server_conf.prototxt  
@@ -76,14 +81,15 @@ ResNet50_vd 推理模型转换完成后，会在当前文件夹多出 `ResNet50_
   |- serving_client_conf.prototxt  
   |- serving_client_conf.stream.prototxt
 ```
-得到模型文件之后，需要修改 serving_server_conf.prototxt 中的 alias 名字： 将 `feed_var` 中的 `alias_name` 改为 `image`, 将 `fetch_var` 中的 `alias_name` 改为 `prediction`
+
+得到模型文件之后，需要修改 `ResNet50_vd_server` 下文件 `serving_server_conf.prototxt` 中的 alias 名字：将 `fetch_var` 中的 `alias_name` 改为 `prediction`
 
 **备注**:  Serving 为了兼容不同模型的部署，提供了输入输出重命名的功能。这样，不同的模型在推理部署时，只需要修改配置文件的 alias_name 即可，无需修改代码即可完成推理部署。
 修改后的 serving_server_conf.prototxt 如下所示:
 ```
 feed_var {
   name: "inputs"
-  alias_name: "image"
+  alias_name: "inputs"
   is_lod_tensor: false
   feed_type: 1
   shape: 3
@@ -228,4 +234,4 @@ unset https_proxy
 unset http_proxy
 ```
 
-更多的服务部署类型，如 `RPC 预测服务` 等，可以参考 Serving 的[github 官网](https://github.com/PaddlePaddle/Serving/tree/develop/python/examples/imagenet)
+更多的服务部署类型，如 `RPC 预测服务` 等，可以参考 Serving 的[github 官网](https://github.com/PaddlePaddle/Serving/tree/v0.7.0/examples)

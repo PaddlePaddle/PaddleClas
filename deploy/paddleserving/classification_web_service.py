@@ -21,6 +21,7 @@ import logging
 import numpy as np
 import base64, cv2
 
+
 class ImagenetOp(Op):
     def init_op(self):
         self.seq = Sequential([
@@ -46,7 +47,7 @@ class ImagenetOp(Op):
             img = self.seq(im)
             imgs.append(img[np.newaxis, :].copy())
         input_imgs = np.concatenate(imgs, axis=0)
-        return {"image": input_imgs}, False, None, ""
+        return {"inputs": input_imgs}, False, None, ""
 
     def postprocess(self, input_dicts, fetch_dict, log_id):
         score_list = fetch_dict["prediction"]
