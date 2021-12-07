@@ -36,7 +36,7 @@ class Momentum(object):
                  momentum,
                  weight_decay=None,
                  grad_clip=None,
-                 multi_precision=True,
+                 multi_precision=False,
                  use_multi_tensor=True):
         super().__init__()
         self.learning_rate = learning_rate
