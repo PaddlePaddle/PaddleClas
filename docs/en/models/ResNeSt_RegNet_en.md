@@ -3,7 +3,7 @@
 ## Catalogue
 
 * [1. Overview](#1)
-* [2. Accuracy, FLOPS and Parameters](#2)
+* [2. Accuracy, FLOPs and Parameters](#2)
 * [3. Inference speed based on T4 GPU](#3)
 
 <a name='1'></a>
@@ -16,7 +16,7 @@ RegNet was proposed in 2020 by Facebook to deepen the concept of design space. B
 <a name='2'></a>
 ## 2. Accuracy, FLOPs and Parameters
 
-| Models           | Top1 | Top5 | Reference<br>top1 | Reference<br>top5 | FLOPS<br>(G) | Parameters<br>(M) |
+| Models           | Top1 | Top5 | Reference<br>top1 | Reference<br>top5 | FLOPs<br>(G) | Parameters<br>(M) |
 |:--:|:--:|:--:|:--:|:--:|:--:|:--:|
 | ResNeSt50_fast_1s1x64d        | 0.8035 | 0.9528|  0.8035 |            -| 8.68     | 26.3   |
 | ResNeSt50        | 0.8083 | 0.9542|  0.8113 |            -| 10.78     | 27.5   |

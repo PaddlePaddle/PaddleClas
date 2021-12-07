@@ -3,7 +3,7 @@
 ## Catalogue
 
 * [1. Overview](#1)
-* [2. Accuracy, FLOPS and Parameters](#2)
+* [2. Accuracy, FLOPs and Parameters](#2)
 
 <a name='1'></a>
 ## Overview
@@ -11,7 +11,7 @@
 DLA (Deep Layer Aggregation). Visual recognition requires rich representations that span levels from low to high, scales from small to large, and resolutions from fine to coarse. Even with the depth of features in a convolutional network, a layer in isolation is not enough: compounding and aggregating these representations improves inference of what and where. Although skip connections have been incorporated to combine layers, these connections have been "shallow" themselves, and only fuse by simple, one-step operations. The authors augment standard architectures with deeper aggregation to better fuse information across layers. Deep layer aggregation structures iteratively and hierarchically merge the feature hierarchy to make networks with better accuracy and fewer parameters. Experiments across architectures and tasks show that deep layer aggregation improves recognition and resolution compared to existing branching and merging schemes.  [paper](https://arxiv.org/abs/1707.06484)
 
 <a name='2'></a>
-## 2. Accuracy, FLOPS and Parameters
+## 2. Accuracy, FLOPs and Parameters
 
 |         Model         | Params (M) | FLOPs (G) | Top-1 (%) | Top-5 (%) |
 |:-----------------:|:----------:|:---------:|:---------:|:---------:|

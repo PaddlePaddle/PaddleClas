@@ -3,7 +3,7 @@
 ## Catalogue
 
 * [1. Overview](#1)
-* [2. Accuracy, FLOPS and Parameters](#2)
+* [2. Accuracy, FLOPs and Parameters](#2)
 * [3. Inference speed and storage size based on SD855](#3)
 * [4. Inference speed based on T4 GPU](#4)
 
@@ -20,9 +20,9 @@ DarkNet53 is designed for object detection by YOLO author in the paper. The netw
 
 
 <a name='2'></a>
-## 2. Accuracy, FLOPS and Parameters
+## 2. Accuracy, FLOPs and Parameters
 
-| Models                    | Top1   | Top5   | Reference<br>top1 | Reference<br>top5 | FLOPS<br>(G) | Parameters<br>(M) |
+| Models                    | Top1   | Top5   | Reference<br>top1 | Reference<br>top5 | FLOPs<br>(G) | Parameters<br>(M) |
 |:--:|:--:|:--:|:--:|:--:|:--:|:--:|
 | AlexNet                   | 0.567  | 0.792  | 0.5720            |                   | 1.370        | 61.090            |
 | SqueezeNet1_0             | 0.596  | 0.817  | 0.575             |                   | 1.550        | 1.240             |

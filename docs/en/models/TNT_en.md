@@ -3,7 +3,7 @@
 ## Catalogue
 
 * [1. Overview](#1)
-* [2. Accuracy, FLOPS and Parameters](#2)
+* [2. Accuracy, FLOPs and Parameters](#2)
 
 <a name='1'></a>
 ## 1. Overview
@@ -12,7 +12,7 @@ TNT(Transformer-iN-Transformer) series models were proposed by Huawei-Noah in 20
 
 
 <a name='2'></a>
-## 2. Accuracy, FLOPS and Parameters
+## 2. Accuracy, FLOPs and Parameters
 
 |         Model        | Params (M) | FLOPs (G) | Top-1 (%) | Top-5 (%) |
 |:---------------------:|:----------:|:---------:|:---------:|:---------:|

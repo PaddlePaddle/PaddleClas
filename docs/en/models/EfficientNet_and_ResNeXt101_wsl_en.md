@@ -3,7 +3,7 @@
 ## Catalogue
 
 * [1. Overview](#1)
-* [2. Accuracy, FLOPS and Parameters](#2)
+* [2. Accuracy, FLOPs and Parameters](#2)
 * [3. Inference speed based on V100 GPU](#3)
 * [4. Inference speed based on T4 GPU](#4)
 
@@ -13,11 +13,11 @@
 EfficientNet is a lightweight NAS-based network released by Google in 2019. EfficientNetB7 refreshed the classification accuracy of ImageNet-1k at that time. In this paper, the author points out that the traditional methods to improve the performance of neural networks mainly start with the width of the network, the depth of the network, and the resolution of the input picture.
 However, the author found that balancing these three dimensions is essential for improving accuracy and efficiency through experiments.
 Therefore, the author summarized how to balance the three dimensions at the same time through a series of experiments.
-At the same time, based on this scaling method, the author built a total of 7 networks B1-B7 in the EfficientNet series on the basis of EfficientNetB0, and with the same FLOPS and parameters, the accuracy reached state-of-the-art effect.
+At the same time, based on this scaling method, the author built a total of 7 networks B1-B7 in the EfficientNet series on the basis of EfficientNetB0, and with the same FLOPs and parameters, the accuracy reached state-of-the-art effect.
 
 ResNeXt is an improved version of ResNet that proposed by Facebook in 2016. In 2019, Facebook researchers studied the accuracy limit of the series network on ImageNet through weakly-supervised-learning. In order to distinguish the previous ResNeXt network, the suffix of this series network is WSL, where WSL is the abbreviation of weakly-supervised-learning. In order to have stronger feature extraction capability, the researchers further enlarged the network width, among which the largest ResNeXt101_32x48d_wsl has 800 million parameters. It was trained under 940 million weak-labeled images, and the results were finetune trained on imagenet-1k. Finally, the acc-1 of imagenet-1k reaches 85.4%, which is also the network with the highest precision under the resolution of 224x224 on imagenet-1k so far. In Fix-ResNeXt, the author used a larger image resolution, made a special Fix strategy for the inconsistency of image data preprocessing in training and testing, and made ResNeXt101_32x48d_wsl have a higher accuracy. Since it used the Fix strategy, it was named Fix-ResNeXt101_32x48d_wsl.
 
-The FLOPS, parameters, and inference time on the T4 GPU of this series of models are shown in the figure below.
+The FLOPs, parameters, and inference time on the T4 GPU of this series of models are shown in the figure below.
 
 ![](../../images/models/T4_benchmark/t4.fp32.bs4.EfficientNet.flops.png)
 
@@ -30,9 +30,9 @@ The FLOPS, parameters, and inference time on the T4 GPU of this series of models
 At present, there are a total of 14 pretrained models of the two types of models that PaddleClas open source. It can be seen from the above figure that the advantages of the EfficientNet series network are very obvious. The ResNeXt101_wsl series model uses more data, and the final accuracy is also higher. EfficientNet_B0_small removes SE_block based on EfficientNet_B0, which has faster inference speed.
 
 <a name='2'></a>
-## 2. Accuracy, FLOPS and Parameters
+## 2. Accuracy, FLOPs and Parameters
 
-| Models                        | Top1   | Top5   | Reference<br>top1 | Reference<br>top5 | FLOPS<br>(G) | Parameters<br>(M) |
+| Models                        | Top1   | Top5   | Reference<br>top1 | Reference<br>top5 | FLOPs<br>(G) | Parameters<br>(M) |
 |:--:|:--:|:--:|:--:|:--:|:--:|:--:|
 | ResNeXt101_<br>32x8d_wsl      | 0.826  | 0.967  | 0.822             | 0.964             | 29.140       | 78.440            |
 | ResNeXt101_<br>32x16d_wsl     | 0.842  | 0.973  | 0.842             | 0.972             | 57.550       | 152.660           |

@@ -3,7 +3,7 @@
 ## Catalogue
 
 * [1. Overview](#1)
-* [2. Accuracy, FLOPS and Parameters](#2)
+* [2. Accuracy, FLOPs and Parameters](#2)
 
 <a name='1'></a>
 ## 1. Overview
@@ -11,7 +11,7 @@
 In the backbone of ResNet and in all bottleneck positions of backbone, the convolution is replaced by Involution, but all convolutions are reserved for channel mapping and fusion. These carefully redesigned entities combine to form a new efficient backbone network, called Rednet. [paper](https://arxiv.org/abs/2103.06255).
 
 <a name='2'></a>
-## 2. Accuracy, FLOPS and Parameters
+## 2. Accuracy, FLOPs and Parameters
 
 |         Model         | Params (M) | FLOPs (G) | Top-1 (%) | Top-5 (%) |
 |:---------------------:|:----------:|:---------:|:---------:|:---------:|

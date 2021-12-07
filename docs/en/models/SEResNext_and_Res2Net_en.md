@@ -3,7 +3,7 @@
 ## Catalogue
 
 * [1. Overview](#1)
-* [2. Accuracy, FLOPS and Parameters](#2)
+* [2. Accuracy, FLOPs and Parameters](#2)
 * [3. Inference speed based on V100 GPU](#3)
 * [4. Inference speed based on T4 GPU](#4)
 
@@ -16,7 +16,7 @@ SENet is the winner of the 2017 ImageNet classification competition. It proposes
 
 Res2Net is a brand-new improvement of ResNet proposed in 2019. The solution can be easily integrated with other excellent modules. Without increasing the amount of calculation, the performance on ImageNet, CIFAR-100 and other data sets exceeds ResNet. Res2Net, with its simple structure and superior performance, further explores the multi-scale representation capability of CNN at a more fine-grained level. Res2Net reveals a new dimension to improve model accuracy, called scale, which is an essential and more effective factor in addition to the existing dimensions of depth, width, and cardinality. The network also performs well in other visual tasks such as object detection and image segmentation.
 
-The FLOPS, parameters, and inference time on the T4 GPU of this series of models are shown in the figure below.
+The FLOPs, parameters, and inference time on the T4 GPU of this series of models are shown in the figure below.
 
 
 ![](../../images/models/T4_benchmark/t4.fp32.bs4.SeResNeXt.flops.png)
@@ -32,9 +32,9 @@ At present, there are a total of 24 pretrained models of the three categories op
 
 
 <a name='2'></a>
-## 2. Accuracy, FLOPS and Parameters
+## 2. Accuracy, FLOPs and Parameters
 
-| Models                | Top1   | Top5   | Reference<br>top1 | Reference<br>top5 | FLOPS<br>(G) | Parameters<br>(M) |
+| Models                | Top1   | Top5   | Reference<br>top1 | Reference<br>top5 | FLOPs<br>(G) | Parameters<br>(M) |
 |:--:|:--:|:--:|:--:|:--:|:--:|:--:|
 | Res2Net50_26w_4s      | 0.793  | 0.946  | 0.780             | 0.936             | 8.520        | 25.700            |
 | Res2Net50_vd_26w_4s   | 0.798  | 0.949  |                   |                   | 8.370        | 25.060            |

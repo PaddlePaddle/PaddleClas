@@ -3,7 +3,7 @@
 ## Catalogue
 
 * [1. Overview](#1)
-* [2. Accuracy, FLOPS and Parameters](#2)
+* [2. Accuracy, FLOPs and Parameters](#2)
 * [3. Inference speed based on V100 GPU](#3)
 * [4. Inference speed based on T4 GPU](#4)
 
@@ -12,7 +12,7 @@
 
 HRNet is a brand new neural network proposed by Microsoft research Asia in 2019. Different from the previous convolutional neural network, this network can still maintain high resolution in the deep layer of the network, so the heat map of the key points predicted is more accurate, and it is also more accurate in space. In addition, the network performs particularly well in other visual tasks sensitive to resolution, such as detection and segmentation.
 
-The FLOPS, parameters, and inference time on the T4 GPU of this series of models are shown in the figure below.
+The FLOPs, parameters, and inference time on the T4 GPU of this series of models are shown in the figure below.
 
 ![](../../images/models/T4_benchmark/t4.fp32.bs4.HRNet.flops.png)
 
@@ -25,9 +25,9 @@ The FLOPS, parameters, and inference time on the T4 GPU of this series of models
 At present, there are 7 pretrained models of such models open-sourced by PaddleClas, and their indicators are shown in the figure. Among them, the reason why the accuracy of the HRNet_W48_C indicator is abnormal may be due to fluctuations in training.
 
 <a name='2'></a>
-## 2. Accuracy, FLOPS and Parameters
+## 2. Accuracy, FLOPs and Parameters
 
-| Models      | Top1   | Top5   | Reference<br>top1 | Reference<br>top5 | FLOPS<br>(G) | Parameters<br>(M) |
+| Models      | Top1   | Top5   | Reference<br>top1 | Reference<br>top5 | FLOPs<br>(G) | Parameters<br>(M) |
 |:--:|:--:|:--:|:--:|:--:|:--:|:--:|
 | HRNet_W18_C | 0.769  | 0.934  | 0.768             | 0.934             | 4.140        | 21.290            |
 | HRNet_W18_C_ssld | 0.816  | 0.958  | 0.768             | 0.934             | 4.140        | 21.290            |
