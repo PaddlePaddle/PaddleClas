@@ -1,7 +1,7 @@
 // Copyright (c) 2020 PaddlePaddle Authors. All Rights Reserved.
 //
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
+// Licensed under the Apache License, Version 2.0 (the "License"); you may not
+// use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
 //     http://www.apache.org/licenses/LICENSE-2.0
@@ -31,26 +31,26 @@ using namespace std;
 
 namespace PaddleClas {
 
-class Normalize {
-public:
-  virtual void Run(cv::Mat *im, const std::vector<float> &mean,
-                   const std::vector<float> &scale, const bool is_scale = true);
-};
+    class Normalize {
+    public:
+        virtual void Run(cv::Mat *im, const std::vector<float> &mean,
+                         const std::vector<float> &std, float &scale);
+    };
 
 // RGB -> CHW
-class Permute {
-public:
-  virtual void Run(const cv::Mat *im, float *data);
-};
+    class Permute {
+    public:
+        virtual void Run(const cv::Mat *im, float *data);
+    };
 
-class CenterCropImg {
-public:
-  virtual void Run(cv::Mat &im, const int crop_size = 224);
-};
+    class CenterCropImg {
+    public:
+        virtual void Run(cv::Mat &im, const int crop_size = 224);
+    };
 
-class ResizeImg {
-public:
-  virtual void Run(const cv::Mat &img, cv::Mat &resize_img, int max_size_len);
-};
+    class ResizeImg {
+    public:
+        virtual void Run(const cv::Mat &img, cv::Mat &resize_img, int max_size_len);
+    };
 
 } // namespace PaddleClas
