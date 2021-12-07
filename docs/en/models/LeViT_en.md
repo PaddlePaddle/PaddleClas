@@ -1,9 +1,16 @@
 # LeViT series
+---
+## Catalogue
 
-## Overview
+* [1. Overview](#1)
+* [2. Accuracy, FLOPS and Parameters](#2)
+
+<a name='1'></a>
+## 1. Overview
 LeViT is a fast inference hybrid neural network for image classification tasks. Its design considers the performance of the network model on different hardware platforms, so it can better reflect the real scenarios of common applications. Through a large number of experiments, the author found a better way to combine the convolutional neural network and the Transformer system, and proposed an attention-based method to integrate the position information encoding in the Transformer. [Paper](https://arxiv.org/abs/2104.01136)。
 
-## Accuracy, FLOPS and Parameters
+<a name='2'></a>
+## 2. Accuracy, FLOPS and Parameters
 
 | Models           | Top1 | Top5 | Reference<br>top1 | Reference<br>top5 | FLOPS<br>(M) | Params<br>(M) |
 |:--:|:--:|:--:|:--:|:--:|:--:|:--:|

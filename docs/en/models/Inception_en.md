@@ -1,6 +1,14 @@
 # Inception series
+---
+## Catalogue
 
-## Overview
+* [1. Overview](#1)
+* [2. Accuracy, FLOPS and Parameters](#2)
+* [3. Inference speed based on V100 GPU](#3)
+* [4. Inference speed based on T4 GPU](#4)
+
+<a name='1'></a>
+## 1. Overview
 
 GoogLeNet is a new neural network structure designed by Google in 2014, which, together with VGG network, became the twin champions of the ImageNet challenge that year. GoogLeNet introduces the Inception structure for the first time, and stacks the Inception structure in the network so that the number of network layers reaches 22, which is also the mark of the convolutional network exceeding 20 layers for the first time. Since 1x1 convolution is used in the Inception structure to reduce the dimension of channel number, and Global pooling is used to replace the traditional method of processing features in multiple fc layers, the final GoogLeNet network has much less FLOPS and parameters than VGG network, which has become a beautiful scenery of neural network design at that time.
 
@@ -22,8 +30,8 @@ The FLOPS, parameters, and inference time on the T4 GPU of this series of models
 
 The figure above reflects the relationship between the accuracy of Xception series and InceptionV4 and other indicators. Among them, Xception_deeplab is consistent with the structure of the paper, and Xception is an improved model developed by PaddleClas, which improves the accuracy by about 0.6% when the inference speed is basically unchanged. Details of the improved model are being updated, so stay tuned.
 
-
-## Accuracy, FLOPS and Parameters
+<a name='2'></a>
+## 2. Accuracy, FLOPS and Parameters
 
 | Models             | Top1   | Top5   | Reference<br>top1 | Reference<br>top5 | FLOPS<br>(G) | Parameters<br>(M) |
 |:--:|:--:|:--:|:--:|:--:|:--:|:--:|
@@ -37,8 +45,8 @@ The figure above reflects the relationship between the accuracy of Xception seri
 | InceptionV4        | 0.808  | 0.953  | 0.800             | 0.950             | 24.570       | 42.680            |
 
 
-
-## Inference speed based on V100 GPU
+<a name='3'></a>
+## 3. Inference speed based on V100 GPU
 
 | Models                 | Crop Size | Resize Short Size | FP32<br>Batch Size=1<br>(ms) |
 |------------------------|-----------|-------------------|--------------------------|
@@ -51,8 +59,8 @@ The figure above reflects the relationship between the accuracy of Xception seri
 | InceptionV4            | 299       | 320               | 11.141                   |
 
 
-
-## Inference speed based on T4 GPU
+<a name='4'></a>
+## 4. Inference speed based on T4 GPU
 
 | Models             | Crop Size | Resize Short Size | FP16<br>Batch Size=1<br>(ms) | FP16<br>Batch Size=4<br>(ms) | FP16<br>Batch Size=8<br>(ms) | FP32<br>Batch Size=1<br>(ms) | FP32<br>Batch Size=4<br>(ms) | FP32<br>Batch Size=8<br>(ms) |
 |--------------------|-----------|-------------------|------------------------------|------------------------------|------------------------------|------------------------------|------------------------------|------------------------------|

@@ -1,6 +1,14 @@
 # DPN and DenseNet series
+---
+## Catalogue
 
-## Overview
+* [1. Overview](#1)
+* [2. Accuracy, FLOPs and Parameters](#2)
+* [3. Inference speed based on V100 GPU](#3)
+* [4. Inference speed based on T4 GPU](#4)
+
+<a name='1'></a>
+## 1. Overview
 
 DenseNet is a new network structure proposed in 2017 and was the best paper of CVPR. The network has designed a new cross-layer connected block called dense-block. Compared to the bottleneck in ResNet, dense-block has designed a more aggressive dense connection module, that is, connecting all the layers to each other, and each layer will accept all the layers in front of it as its additional input. DenseNet stacks all dense-blocks into a densely connected network. The dense connection makes DenseNet easier to backpropagate, making the network easier to train and converge.  The full name of DPN is Dual Path Networks, which is a network composed of DenseNet and ResNeXt, which proves that DenseNet can extract new features from the previous level, and ResNeXt essentially reuses the extracted features . The author further analyzes and finds that ResNeXt has high reuse rate for features, but low redundancy, while DenseNet can create new features, but with high redundancy. Combining the advantages of the two structures, the author designed the DPN network. In the end, the DPN network achieved better results than ResNeXt and DenseNet under the same FLOPS and parameters.
 
@@ -18,10 +26,10 @@ The pretrained models of these two types of models (a total of 10) are open sour
 
 For DPN series networks, the larger the model's FLOPs and parameters, the higher the model's accuracy. Among them, since the width of DPN107 is the largest, it has the largest number of parameters and FLOPs in this series of networks.
 
+<a name='2'></a>
+## 2. Accuracy, FLOPs and Parameters
 
-## Accuracy, FLOPS and Parameters
-
-| Models      | Top1   | Top5   | Reference<br>top1 | Reference<br>top5 | FLOPS<br>(G) | Parameters<br>(M) |
+| Models      | Top1   | Top5   | Reference<br>top1 | Reference<br>top5 | FLOPs<br>(G) | Parameters<br>(M) |
 |:--:|:--:|:--:|:--:|:--:|:--:|:--:|
 | DenseNet121 | 0.757  | 0.926  | 0.750             |                   | 5.690        | 7.980             |
 | DenseNet161 | 0.786  | 0.941  | 0.778             |                   | 15.490       | 28.680            |
@@ -36,8 +44,8 @@ For DPN series networks, the larger the model's FLOPs and parameters, the higher
 
 
 
-
-## Inference speed based on V100 GPU
+<a name='3'></a>
+## 3. Inference speed based on V100 GPU
 
 | Models                               | Crop Size | Resize Short Size | FP32<br>Batch Size=1<br>(ms) |
 |-------------|-----------|-------------------|--------------------------|
@@ -53,8 +61,8 @@ For DPN series networks, the larger the model's FLOPs and parameters, the higher
 | DPN131      | 224       | 256               | 28.083                   |
 
 
-
-## Inference speed based on T4 GPU
+<a name='4'></a>
+## 4. Inference speed based on T4 GPU
 
 | Models      | Crop Size | Resize Short Size | FP16<br>Batch Size=1<br>(ms) | FP16<br>Batch Size=4<br>(ms) | FP16<br>Batch Size=8<br>(ms) | FP32<br>Batch Size=1<br>(ms) | FP32<br>Batch Size=4<br>(ms) | FP32<br>Batch Size=8<br>(ms) |
 |-------------|-----------|-------------------|------------------------------|------------------------------|------------------------------|------------------------------|------------------------------|------------------------------|

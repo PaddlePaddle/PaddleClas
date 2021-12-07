@@ -1,10 +1,16 @@
 # SwinTransformer
+---
+## Catalogue
 
-## Overview
+* [1. Overview](#1)
+* [2. Accuracy, FLOPS and Parameters](#2)
+
+<a name='1'></a>
+## 1. Overview
 Swin Transformer a new vision Transformer, that capably serves as a general-purpose backbone for computer vision. It is a hierarchical Transformer whose representation is computed with shifted windows. The shifted windowing scheme brings greater efficiency by limiting self-attention computation to non-overlapping local windows while also allowing for cross-window connection. [Paper](https://arxiv.org/abs/2103.14030)。
 
-
-## Accuracy, FLOPS and Parameters
+<a name='2'></a>
+## 2. Accuracy, FLOPS and Parameters
 
 | Models           | Top1 | Top5 | Reference<br>top1 | Reference<br>top5 | FLOPS<br>(G) | Params<br>(M) |
 |:--:|:--:|:--:|:--:|:--:|:--:|:--:|

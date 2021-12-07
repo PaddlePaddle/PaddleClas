@@ -1,6 +1,14 @@
 # SEResNeXt and Res2Net series
+---
+## Catalogue
 
-## Overview
+* [1. Overview](#1)
+* [2. Accuracy, FLOPS and Parameters](#2)
+* [3. Inference speed based on V100 GPU](#3)
+* [4. Inference speed based on T4 GPU](#4)
+
+<a name='1'></a>
+## 1. Overview
 
 ResNeXt, one of the typical variants of ResNet, was presented at the CVPR conference in 2017. Prior to this, the methods to improve the model accuracy mainly focused on deepening or widening the network, which increased the number of parameters and calculation, and slowed down the inference speed accordingly. The concept of cardinality was proposed in ResNeXt structure. The author found that increasing the number of channel groups was more effective than increasing the depth and width through experiments. It can improve the accuracy without increasing the parameter complexity and reduce the number of parameters at the same time, so it is a more successful variant of ResNet.
 
@@ -23,8 +31,8 @@ The FLOPS, parameters, and inference time on the T4 GPU of this series of models
 At present, there are a total of 24 pretrained models of the three categories open sourced by PaddleClas, and the indicators are shown in the figure. It can be seen from the diagram that under the same Flops and Params, the improved model tends to have higher accuracy, but the inference speed is often inferior to the ResNet series. On the other hand, Res2Net performed better. Compared with group operation in ResNeXt and SE structure operation in SEResNet, Res2Net tended to have better accuracy in the same Flops, Params and inference speed.
 
 
-
-## Accuracy, FLOPS and Parameters
+<a name='2'></a>
+## 2. Accuracy, FLOPS and Parameters
 
 | Models                | Top1   | Top5   | Reference<br>top1 | Reference<br>top5 | FLOPS<br>(G) | Parameters<br>(M) |
 |:--:|:--:|:--:|:--:|:--:|:--:|:--:|
@@ -57,8 +65,8 @@ At present, there are a total of 24 pretrained models of the three categories op
 | SENet154_vd           | 0.814  | 0.955  |                   |                   | 45.830       | 114.290           |
 
 
-
-## Inference speed based on V100 GPU
+<a name='3'></a>
+## 3. Inference speed based on V100 GPU
 
 | Models                 | Crop Size | Resize Short Size | FP32<br>Batch Size=1<br>(ms) |
 |-----------------------|-----------|-------------------|--------------------------|
@@ -87,8 +95,8 @@ At present, there are a total of 24 pretrained models of the three categories op
 | SE_ResNeXt101_32x4d   | 224       | 256               | 19.204                   |
 | SENet154_vd           | 224       | 256               | 50.406                   |
 
-
-## Inference speed based on T4 GPU
+<a name='4'></a>
+## 4. Inference speed based on T4 GPU
 
 | Models                | Crop Size | Resize Short Size | FP16<br>Batch Size=1<br>(ms) | FP16<br>Batch Size=4<br>(ms) | FP16<br>Batch Size=8<br>(ms) | FP32<br>Batch Size=1<br>(ms) | FP32<br>Batch Size=4<br>(ms) | FP32<br>Batch Size=8<br>(ms) |
 |-----------------------|-----------|-------------------|------------------------------|------------------------------|------------------------------|------------------------------|------------------------------|------------------------------|

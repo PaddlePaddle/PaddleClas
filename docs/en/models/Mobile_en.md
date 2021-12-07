@@ -1,6 +1,14 @@
 # Mobile and Embedded Vision Applications Network series
+---
+## Catalogue
 
-## Overview
+* [1. Overview](#1)
+* [2. Accuracy, FLOPS and Parameters](#2)
+* [3. Inference speed and storage size based on SD855](#3)
+* [4. Inference speed based on T4 GPU](#4)
+
+<a name='1'></a>
+## 1. Overview
 
 MobileNetV1 is a network launched by Google in 2017 for use on mobile devices or embedded devices. The network replaces the depthwise separable convolution with the traditional convolution operation, that is, the combination of depthwise convolution and pointwise convolution. Compared with the traditional convolution operation, this combination can greatly save the number of parameters and computation. At the same time, MobileNetV1 can also be used for object detection, image segmentation and other visual tasks.
 
@@ -22,7 +30,8 @@ GhosttNet is a brand-new lightweight network structure proposed by Huawei in 202
 
 Currently there are 32 pretrained models of the mobile series open source by PaddleClas, and their indicators are shown in the figure below. As you can see from the picture, newer lightweight models tend to perform better, and MobileNetV3 represents the latest lightweight neural network architecture. In MobileNetV3, the author used 1x1 convolution after global-avg-pooling in order to obtain higher accuracy,this operation significantly increases the number of parameters but has little impact on the amount of computation, so if the model is evaluated from a storage perspective of excellence, MobileNetV3 does not have much advantage, but because of its smaller computation, it has a faster inference speed. In addition, the SSLD distillation model in our model library performs excellently, refreshing the accuracy of the current lightweight model from various perspectives. Due to the complex structure and many branches of the MobileNetV3 model, which is not GPU friendly, the GPU inference speed is not as good as that of MobileNetV1.
 
-## Accuracy, FLOPS and Parameters
+<a name='2'></a>
+## 2. Accuracy, FLOPS and Parameters
 
 | Models                               | Top1    | Top5    | Reference<br>top1 | Reference<br>top5 | FLOPS<br>(G) | Parameters<br>(M) |
 |:--:|:--:|:--:|:--:|:--:|:--:|:--:|
@@ -64,8 +73,8 @@ Currently there are 32 pretrained models of the mobile series open source by Pad
 | GhostNet_x1_3                        | 0.757   | 0.925   | 0.757             | 0.927             | 0.440        | 7.300             |
 | GhostNet_x1_3_ssld                        | 0.794   | 0.945   | 0.757             | 0.927             | 0.440        | 7.300             |
 
-
-## Inference speed and storage size based on SD855
+<a name='3'></a>
+## 3. Inference speed and storage size based on SD855
 
 | Models                               | Batch Size=1(ms) | Storage Size(M) |
 |:--:|:--:|:--:|
@@ -107,8 +116,8 @@ Currently there are 32 pretrained models of the mobile series open source by Pad
 | GhostNet_x1_3                   | 19.982           | 29.000           |
 | GhostNet_x1_3_ssld                   | 19.982           | 29.000           |
 
-
-## Inference speed based on T4 GPU
+<a name='4'></a>
+## 4. Inference speed based on T4 GPU
 
 | Models            | FP16<br>Batch Size=1<br>(ms) | FP16<br>Batch Size=4<br>(ms) | FP16<br>Batch Size=8<br>(ms) | FP32<br>Batch Size=1<br>(ms) | FP32<br>Batch Size=4<br>(ms) | FP32<br>Batch Size=8<br>(ms) |
 |-----------------------------|-----------------------|-----------------------|-----------------------|-----------------------|-----------------------|-----------------------|

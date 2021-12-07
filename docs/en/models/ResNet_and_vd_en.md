@@ -1,6 +1,14 @@
 # ResNet and ResNet_vd series
+---
+## Catalogue
 
-## Overview
+* [1. Overview](#1)
+* [2. Accuracy, FLOPS and Parameters](#2)
+* [3. Inference speed based on V100 GPU](#3)
+* [4. Inference speed based on T4 GPU](#4)
+
+<a name='1'></a>
+## 1. Overview
 
 The ResNet series model was proposed in 2015 and won the championship in the ILSVRC2015 competition with a top5 error rate of 3.57%. The network innovatively proposed the residual structure, and built the ResNet network by stacking multiple residual structures. Experiments show that using residual blocks can improve the convergence speed and accuracy effectively.
 
@@ -23,8 +31,8 @@ The FLOPS, parameters, and inference time on the T4 GPU of this series of models
 
 As can be seen from the above curves, the higher the number of layers, the higher the accuracy, but the corresponding number of parameters, calculation and latency will increase. ResNet50_vd_ssld further improves the accuracy of top-1 of the ImageNet-1k validation set by using stronger teachers and more data, reaching 82.39%, refreshing the accuracy of ResNet50 series models.
 
-
-## Accuracy, FLOPS and Parameters
+<a name='2'></a>
+## 2. Accuracy, FLOPS and Parameters
 
 | Models           | Top1 | Top5 | Reference<br>top1 | Reference<br>top5 | FLOPS<br>(G) | Parameters<br>(M) |
 |:--:|:--:|:--:|:--:|:--:|:--:|:--:|
@@ -49,8 +57,8 @@ As can be seen from the above curves, the higher the number of layers, the highe
 
 * Note: `ResNet50_vd_ssld_v2` is obtained by adding AutoAugment in training process on the basis of `ResNet50_vd_ssld` training strategy.`Fix_ResNet50_vd_ssld_v2` stopped all parameter updates of `ResNet50_vd_ssld_v2` except the FC layer,and fine-tuned on ImageNet1k dataset, the resolution is 320x320.
 
-
-## Inference speed based on V100 GPU
+<a name='3'></a>
+## 3. Inference speed based on V100 GPU
 
 | Models                 | Crop Size | Resize Short Size | FP32<br>Batch Size=1<br>(ms) |
 |------------------|-----------|-------------------|--------------------------|
@@ -71,8 +79,8 @@ As can be seen from the above curves, the higher the number of layers, the highe
 | ResNet50_vd_ssld | 224       | 256               | 3.165                    |
 | ResNet101_vd_ssld  | 224       | 256             | 5.252                  |
 
-
-## Inference speed based on T4 GPU
+<a name='4'></a>
+## 4. Inference speed based on T4 GPU
 
 | Models            | Crop Size | Resize Short Size | FP16<br>Batch Size=1<br>(ms) | FP16<br>Batch Size=4<br>(ms) | FP16<br>Batch Size=8<br>(ms) | FP32<br>Batch Size=1<br>(ms) | FP32<br>Batch Size=4<br>(ms) | FP32<br>Batch Size=8<br>(ms) |
 |-------------------|-----------|-------------------|------------------------------|------------------------------|------------------------------|------------------------------|------------------------------|------------------------------|

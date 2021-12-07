@@ -1,6 +1,12 @@
 # MixNet series
+---
+## Catalogue
 
-## Overview
+* [1. Overview](#1)
+* [2. Accuracy, FLOPS and Parameters](#2)
+
+<a name='1'></a>
+## 1. Overview
 
 MixNet is a lightweight network proposed by Google. The main idea of MixNet is to explore the combination of different size of kernels. The author found that the current network has the following two problems:
 
@@ -9,7 +15,8 @@ MixNet is a lightweight network proposed by Google. The main idea of MixNet is t
 
  In order to solve the above two problems, MDConv(mixed depthwise convolution) is proposed.  In this method, different size of kernels  are mixed in a convolution operation block. And based on AutoML,  a series of networks called MixNets are proposed, which have achieved good results on Imagenet. [paper](https://arxiv.org/pdf/1907.09595.pdf)
 
-## Accuracy, FLOPS and Parameters
+<a name='2'></a>
+## 2. Accuracy, FLOPS and Parameters
 
 |  Models  | Top1  | Top5  | Reference<br>top1 | FLOPS<br>(M) | Params<br/>(G |
 | :------: | :---: | :---: | :---------------: | :----------: | ------------- |

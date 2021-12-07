@@ -1,13 +1,19 @@
 # ViT and DeiT series
+---
+## Catalogue
 
-## Overview
+* [1. Overview](#1)
+* [2. Accuracy, FLOPS and Parameters](#2)
+
+<a name='1'></a>
+## 1. Overview
 
 ViT(Vision Transformer) series models were proposed by Google in 2020. These models only use the standard transformer structure, completely abandon the convolution structure, splits the image into multiple patches and then inputs them into the transformer, showing the potential of transformer in the CV field.。[Paper](https://arxiv.org/abs/2010.11929)。
 
 DeiT(Data-efficient Image Transformers) series models were proposed by Facebook at the end of 2020. Aiming at the problem that the ViT models need large-scale dataset training, the DeiT improved them, and finally achieved 83.1% Top1 accuracy on ImageNet. More importantly, using convolution model as teacher model, and performing knowledge distillation on these models, the Top1 accuracy of 85.2% can be achieved on the ImageNet dataset.
 
-
-## Accuracy, FLOPS and Parameters
+<a name='2'></a>
+## 2. Accuracy, FLOPS and Parameters
 
 | Models           | Top1 | Top5 | Reference<br>top1 | Reference<br>top5 | FLOPS<br>(G) | Params<br>(M) |
 |:--:|:--:|:--:|:--:|:--:|:--:|:--:|

@@ -1,6 +1,14 @@
 # EfficientNet and ResNeXt101_wsl series
+---
+## Catalogue
 
-## Overview
+* [1. Overview](#1)
+* [2. Accuracy, FLOPS and Parameters](#2)
+* [3. Inference speed based on V100 GPU](#3)
+* [4. Inference speed based on T4 GPU](#4)
+
+<a name='1'></a>
+## 1. Overview
 
 EfficientNet is a lightweight NAS-based network released by Google in 2019. EfficientNetB7 refreshed the classification accuracy of ImageNet-1k at that time. In this paper, the author points out that the traditional methods to improve the performance of neural networks mainly start with the width of the network, the depth of the network, and the resolution of the input picture.
 However, the author found that balancing these three dimensions is essential for improving accuracy and efficiency through experiments.
@@ -21,7 +29,8 @@ The FLOPS, parameters, and inference time on the T4 GPU of this series of models
 
 At present, there are a total of 14 pretrained models of the two types of models that PaddleClas open source. It can be seen from the above figure that the advantages of the EfficientNet series network are very obvious. The ResNeXt101_wsl series model uses more data, and the final accuracy is also higher. EfficientNet_B0_small removes SE_block based on EfficientNet_B0, which has faster inference speed.
 
-## Accuracy, FLOPS and Parameters
+<a name='2'></a>
+## 2. Accuracy, FLOPS and Parameters
 
 | Models                        | Top1   | Top5   | Reference<br>top1 | Reference<br>top5 | FLOPS<br>(G) | Parameters<br>(M) |
 |:--:|:--:|:--:|:--:|:--:|:--:|:--:|
@@ -40,8 +49,8 @@ At present, there are a total of 14 pretrained models of the two types of models
 | EfficientNetB7                | 0.843  | 0.969  | 0.844             | 0.971             | 72.350       | 64.920            |
 | EfficientNetB0_<br>small      | 0.758  | 0.926  |                   |                   | 0.720        | 4.650             |
 
-
-## Inference speed based on V100 GPU
+<a name='3'></a>
+## 3. Inference speed based on V100 GPU
 
 | Models                               | Crop Size | Resize Short Size | FP32<br>Batch Size=1<br>(ms) |
 |-------------------------------|-----------|-------------------|--------------------------|
@@ -61,8 +70,8 @@ At present, there are a total of 14 pretrained models of the two types of models
 | EfficientNetB0_<br>small      | 224       | 256               | 1.692                    |
 
 
-
-## Inference speed based on T4 GPU
+<a name='4'></a>
+## 4. Inference speed based on T4 GPU
 
 | Models                    | Crop Size | Resize Short Size | FP16<br>Batch Size=1<br>(ms) | FP16<br>Batch Size=4<br>(ms) | FP16<br>Batch Size=8<br>(ms) | FP32<br>Batch Size=1<br>(ms) | FP32<br>Batch Size=4<br>(ms) | FP32<br>Batch Size=8<br>(ms) |
 |---------------------------|-----------|-------------------|------------------------------|------------------------------|------------------------------|------------------------------|------------------------------|------------------------------|
