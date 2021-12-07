@@ -229,6 +229,7 @@ cmake .. \
     -DFAISS_WITH_MKL=${FAISS_WITH_MKL}
 
 make -j
+cd ..
 ```
 
 上述命令中，
