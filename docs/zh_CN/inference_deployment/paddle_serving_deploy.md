@@ -13,7 +13,7 @@
 ## 1. 简介
 [Paddle Serving](https://github.com/PaddlePaddle/Serving) 旨在帮助深度学习开发者轻松部署在线预测服务，支持一键部署工业级的服务能力、客户端和服务端之间高并发和高效通信、并支持多种编程语言开发客户端。
 
-该部分以 HTTP 预测服务部署为例，介绍怎样在 PaddleClas 中使用 PaddleServing 部署模型服务。
+该部分以 HTTP 预测服务部署为例，介绍怎样在 PaddleClas 中使用 PaddleServing 部署模型服务。目前只支持 Linux 平台部署，暂不支持 Windows 平台。
 
 <a name="2"></a>
 ## 2. Serving 安装
@@ -72,7 +72,7 @@ python3 -m paddle_serving_client.convert --dirname ./ResNet50_vd_infer/ \
 ```
 ResNet50_vd 推理模型转换完成后，会在当前文件夹多出 `ResNet50_vd_serving` 和 `ResNet50_vd_client` 的文件夹，具备如下格式：
 ```
-|- ResNet50_vd_client/
+|- ResNet50_vd_server/
   |- __model__  
   |- __params__
   |- serving_server_conf.prototxt  
@@ -81,7 +81,7 @@ ResNet50_vd 推理模型转换完成后，会在当前文件夹多出 `ResNet50_
   |- serving_client_conf.prototxt  
   |- serving_client_conf.stream.prototxt
 ```
-得到模型文件之后，需要修改 serving_server_conf.prototxt 中的 alias 名字：将 `fetch_var` 中的 `alias_name` 改为 `prediction`
+得到模型文件之后，需要修改 `ResNet50_vd_server` 下文件 `serving_server_conf.prototxt` 中的 alias 名字：将 `fetch_var` 中的 `alias_name` 改为 `prediction`
 
 **备注**:  Serving 为了兼容不同模型的部署，提供了输入输出重命名的功能。这样，不同的模型在推理部署时，只需要修改配置文件的 alias_name 即可，无需修改代码即可完成推理部署。
 修改后的 serving_server_conf.prototxt 如下所示:
@@ -233,4 +233,4 @@ unset https_proxy
 unset http_proxy
 ```
 
-更多的服务部署类型，如 `RPC 预测服务` 等，可以参考 Serving 的[github 官网](https://github.com/PaddlePaddle/Serving/tree/develop/python/examples/imagenet)
+更多的服务部署类型，如 `RPC 预测服务` 等，可以参考 Serving 的[github 官网](https://github.com/PaddlePaddle/Serving/tree/v0.7.0/examples)

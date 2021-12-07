@@ -33,6 +33,59 @@ function func_parser_value(){
     fi
 }
 
+function func_get_url_file_name(){
+    strs=$1
+    IFS="/"
+    array=(${strs})
+    tmp=${array[${#array[@]}-1]}
+    echo ${tmp}
+}
+
+model_name=$(func_parser_value "${lines[1]}")
+
+if [ ${MODE} = "cpp_infer" ];then
+   if [[ $FILENAME == *infer_cpp_linux_gpu_cpu.txt ]];then
+	cpp_type=$(func_parser_value "${lines[2]}")
+	cls_inference_model_dir=$(func_parser_value "${lines[3]}")
+	det_inference_model_dir=$(func_parser_value "${lines[4]}")
+	cls_inference_url=$(func_parser_value "${lines[5]}")
+	det_inference_url=$(func_parser_value "${lines[6]}")
+
+	if [[ $cpp_type == "cls" ]];then
+	    eval "wget -nc $cls_inference_url"
+	    tar xf "${model_name}_inference.tar"
+	    eval "mv inference $cls_inference_model_dir"
+	    cd dataset
+    	    rm -rf ILSVRC2012
+    	    wget -nc https://paddle-imagenet-models-name.bj.bcebos.com/data/whole_chain/whole_chain_infer.tar
+    	    tar xf whole_chain_infer.tar
+    	    ln -s whole_chain_infer ILSVRC2012
+	    cd ..
+	elif [[ $cpp_type == "shitu" ]];then
+	    eval "wget -nc $cls_inference_url"
+	    tar_name=$(func_get_url_file_name "$cls_inference_url")
+	    model_dir=${tar_name%.*}
+	    eval "tar xf ${tar_name}"
+	    eval "mv ${model_dir} ${cls_inference_model_dir}"
+	    
+	    eval "wget -nc $det_inference_url"
+	    tar_name=$(func_get_url_file_name "$det_inference_url") 
+	    model_dir=${tar_name%.*}
+	    eval "tar xf ${tar_name}"
+	    eval "mv ${model_dir} ${det_inference_model_dir}"
+	    cd dataset
+	    wget -nc https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/data/drink_dataset_v1.0.tar
+	    tar -xf drink_dataset_v1.0.tar
+	else
+	    echo "Wrong cpp type in config file in line 3. only support cls, shitu"
+	fi
+	exit 0
+   else
+	echo "use wrong config file"
+	exit 1
+   fi
+fi
+
 model_name=$(func_parser_value "${lines[1]}")
 model_url_value=$(func_parser_value "${lines[35]}")
 model_url_key=$(func_parser_key "${lines[35]}")
@@ -113,64 +166,4 @@ if [ ${MODE} = "serving_infer" ];then
     unset https_proxy
     cd ./deploy/paddleserving
     wget -nc https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/ResNet50_vd_infer.tar && tar xf ResNet50_vd_infer.tar
-fi
-
-if [ ${MODE} = "cpp_infer" ];then
-    cd deploy/cpp
-    echo "################### build opencv ###################"
-    rm -rf 3.4.7.tar.gz opencv-3.4.7/
-    wget https://github.com/opencv/opencv/archive/3.4.7.tar.gz
-    tar -xf 3.4.7.tar.gz
-    install_path=$(pwd)/opencv-3.4.7/opencv3
-    cd opencv-3.4.7/
-
-    rm -rf build
-    mkdir build
-    cd build
-    cmake .. \
-	-DCMAKE_INSTALL_PREFIX=${install_path} \
-	-DCMAKE_BUILD_TYPE=Release \
-	-DBUILD_SHARED_LIBS=OFF \
-	-DWITH_IPP=OFF \
-	-DBUILD_IPP_IW=OFF \
-	-DWITH_LAPACK=OFF \
-	-DWITH_EIGEN=OFF \
-	-DCMAKE_INSTALL_LIBDIR=lib64 \
-	-DWITH_ZLIB=ON \
-	-DBUILD_ZLIB=ON \
-	-DWITH_JPEG=ON \
-	-DBUILD_JPEG=ON \
-	-DWITH_PNG=ON \
-	-DBUILD_PNG=ON \
-	-DWITH_TIFF=ON \
-	-DBUILD_TIFF=ON
-     make -j
-     make install
-     cd ../../
-     echo "################### build opencv finished ###################"
-
-     echo "################### build PaddleClas demo ####################"
-     OPENCV_DIR=$(pwd)/opencv-3.4.7/opencv3/
-     LIB_DIR=$(pwd)/Paddle/build/paddle_inference_install_dir/
-     CUDA_LIB_DIR=$(dirname `find /usr -name libcudart.so`)
-     CUDNN_LIB_DIR=$(dirname `find /usr -name libcudnn.so`)
-
-     BUILD_DIR=build
-     rm -rf ${BUILD_DIR}
-     mkdir ${BUILD_DIR}
-     cd ${BUILD_DIR}
-     cmake .. \
-        -DPADDLE_LIB=${LIB_DIR} \
-        -DWITH_MKL=ON \
-        -DDEMO_NAME=clas_system \
-        -DWITH_GPU=OFF \
-        -DWITH_STATIC_LIB=OFF \
-        -DWITH_TENSORRT=OFF \
-        -DTENSORRT_DIR=${TENSORRT_DIR} \
-        -DOPENCV_DIR=${OPENCV_DIR} \
-        -DCUDNN_LIB=${CUDNN_LIB_DIR} \
-        -DCUDA_LIB=${CUDA_LIB_DIR} \
-
-     make -j
-     echo "################### build PaddleClas demo finished ###################"
 fi
