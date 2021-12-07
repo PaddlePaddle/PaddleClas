@@ -1,0 +1,16 @@
+
+Variables:
+  pipeline: Paddle_inference
+  batchsize: 1
+  cpu_thread_nums: 1
+  paddle_use_GPU: True
+  paddle_use_TensorRT: False
+  paddle_use_mkldnn: True
+  warmup_iters: 100
+  test_iters: 1000
+
+Data:
+  method: NumpyGenerator
+  gen_method: uniform
+  data_shape: [3, 224, 224]
+  random_seed: 1

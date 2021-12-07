@@ -1,0 +1,24 @@
+pipeline:
+  - Paddle_inference
+  - ONNX_runtime
+  - OpenVINO
+  - TensorRT_Runtime
+batch_size:
+  - 1
+  - 16
+cpu_thread_nums:
+  - 1
+  - 6
+  - 10
+paddle_use_gpu:
+  - True
+  - False
+paddle_use_tensorrt:
+  - True
+  - False
+paddle_use_mkldnn:
+  - True
+  - False
+model_list_file: configs/model_list.yml
+model_home_dir: infer_models
+config_file: configs/inference.yml
