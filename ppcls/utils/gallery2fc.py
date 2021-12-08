@@ -1,10 +1,6 @@
 import paddle
 from ppcls.arch import build_model
-from deploy.utils.config import parse_config, parse_args
-
-
-def load_feature_extractor(configs):
-    pass
+from ppcls.utils.config import parse_config, parse_args
 
 
 def build_gallery_feature(feature_extractor):
@@ -18,7 +14,7 @@ def save_fuse_model(fuse_model):
 class FuseModel(paddle.nn.Layer):
     def __init__(self, configs):
         super().__init__()
-        self.feature_extractor = load_feature_extractor(configs)
+        self.feature_extractor = build_model(configs)
         self.gallery_layer = build_gallery_feature(self.feature_extractor)
 
     def forward(self, x):
