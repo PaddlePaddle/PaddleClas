@@ -1,4 +1,5 @@
 import paddle
+from ppcls.arch import build_model
 from deploy.utils.config import parse_config, parse_args
 
 
