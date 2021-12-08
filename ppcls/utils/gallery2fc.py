@@ -2,6 +2,7 @@ import paddle
 from ppcls.arch import build_model
 from ppcls.utils.config import parse_config, parse_args
 from ppcls.utils.save_load import load_dygraph_pretrain
+from ppcls.utils.logger import init_logger
 
 
 def load_feature_extractor(configs):
@@ -32,6 +33,7 @@ class FuseModel(paddle.nn.Layer):
 def main():
     args = parse_args()
     configs = parse_config(args.config)
+    init_logger(name='gallery2fc')
     fuse_model = FuseModel(configs)
     save_fuse_model(fuse_model)
 
