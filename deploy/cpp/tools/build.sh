@@ -18,3 +18,4 @@ cmake .. \
     -DCUDA_LIB=${CUDA_LIB_DIR} \
 
 make -j
+cd ..

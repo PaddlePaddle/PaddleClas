@@ -373,7 +373,7 @@ class Engine(object):
                                  "inference")
         if self.quanter:
             self.quanter.save_quantized_model(
-                model,
+                model.base_model,
                 save_path,
                 input_spec=[
                     paddle.static.InputSpec(
