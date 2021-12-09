@@ -186,8 +186,6 @@ class Engine(object):
 
         # build model
         self.model = build_model(self.config)
-        self.quanted = self.config.get("Slim", {}).get("quant", False)
-        self.pruned = self.config.get("Slim", {}).get("prune", False)
         # set @to_static for benchmark, skip this by default.
         apply_to_static(self.config, self.model)
 
@@ -368,7 +366,7 @@ class Engine(object):
         model.eval()
         save_path = os.path.join(self.config["Global"]["save_inference_dir"],
                                  "inference")
-        if self.quanted:
+        if model.quanter:
             model.quanter.save_quantized_model(
                 model.base_model,
                 save_path,

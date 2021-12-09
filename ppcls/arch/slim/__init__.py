@@ -12,5 +12,4 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from ppcls.engine.slim.prune import prune_model
-from ppcls.engine.slim.quant import quantize_model
+from ppcls.arch.slim.prune import prune_model
