@@ -41,7 +41,7 @@ train/n01440764/n01440764_10026.JPEG 0
 train/n01440764/n01440764_10027.JPEG 0
 ```
 
-在代码`ppcls/data/dataloader/common_dataset.py`中，包含`CommonDataset`类，继承自`paddle.io.Dataset`，该数据集类可以通过一个键值进行索引并获取指定样本。`ImageNetDataset`, `LogoDataset`, `CommonDataset` 等数据集类都对这个类别
+在代码`ppcls/data/dataloader/common_dataset.py`中，包含`CommonDataset`类，继承自`paddle.io.Dataset`，该数据集类可以通过一个键值进行索引并获取指定样本。`ImageNetDataset`, `LogoDataset`, `CommonDataset` 等数据集类都继承自这个类别
 
 对于读入的数据，需要通过数据转换，将原始的图像数据进行转换。训练时，标准的数据预处理包含：`DecodeImage`, `RandCropImage`, `RandFlipImage`, `NormalizeImage`, `ToCHWImage`。在配置文件中体现如下，数据预处理主要包含在`transforms`字段中，以列表形式呈现，会按照顺序对数据依次做这些转换。
 
