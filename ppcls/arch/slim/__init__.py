@@ -13,3 +13,4 @@
 # limitations under the License.
 
 from ppcls.arch.slim.prune import prune_model
+from ppcls.arch.slim.quant import quantize_model
