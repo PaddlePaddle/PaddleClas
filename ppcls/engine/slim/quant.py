@@ -46,10 +46,10 @@ def quantize_model(config, model):
         assert config["Slim"]["quant"]["name"].lower(
         ) == 'pact', 'Only PACT quantization method is supported now'
         QUANT_CONFIG["activation_preprocess_type"] = "PACT"
-        model.quanted = QAT(config=QUANT_CONFIG)
-        model.quanted.quantize_model(model)
+        model.quanter = QAT(config=QUANT_CONFIG)
+        model.quanter.quantize(model)
         logger.info("QAT model summary:")
         paddle.summary(model, (1, 3, 224, 224))
     else:
-        model.quanted = None
-    return model.quanted
+        model.quanter = None
+    return
