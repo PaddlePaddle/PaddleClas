@@ -40,16 +40,16 @@ QUANT_CONFIG = {
 }
 
 
-def get_quaner(config, model):
+def quantize_model(config, model):
     if config.get("Slim", False) and config["Slim"].get("quant", False):
         from paddleslim.dygraph.quant import QAT
         assert config["Slim"]["quant"]["name"].lower(
         ) == 'pact', 'Only PACT quantization method is supported now'
         QUANT_CONFIG["activation_preprocess_type"] = "PACT"
-        quanter = QAT(config=QUANT_CONFIG)
-        quanter.quantize(model)
+        model.quanted = QAT(config=QUANT_CONFIG)
+        model.quanted.quantize_model(model)
         logger.info("QAT model summary:")
         paddle.summary(model, (1, 3, 224, 224))
     else:
-        quanter = None
-    return quanter
+        model.quanted = None
+    return model.quanted
