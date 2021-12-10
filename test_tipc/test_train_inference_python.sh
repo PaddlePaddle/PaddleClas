@@ -23,7 +23,7 @@ epoch_key=$(func_parser_key "${lines[6]}")
 epoch_num=$(func_parser_params "${lines[6]}")
 save_model_key=$(func_parser_key "${lines[7]}")
 train_batch_key=$(func_parser_key "${lines[8]}")
-train_batch_value=$(func_parser_params "${lines[8]}")
+train_batch_value=$(func_parser_value "${lines[8]}")
 pretrain_model_key=$(func_parser_key "${lines[9]}")
 pretrain_model_value=$(func_parser_value "${lines[9]}")
 train_model_name=$(func_parser_value "${lines[10]}")
@@ -274,9 +274,9 @@ else
                 fi
                 
                 # load pretrain from norm training if current trainer is pact or fpgm trainer
-                if [ ${trainer} = ${pact_key} ] || [ ${trainer} = ${fpgm_key} ]; then
-                    set_pretrain="${load_norm_train_model}"
-                fi
+                # if [ ${trainer} = ${pact_key} ] || [ ${trainer} = ${fpgm_key} ]; then
+                #    set_pretrain="${load_norm_train_model}"
+                # fi
 
                 set_save_model=$(func_set_params "${save_model_key}" "${save_log}")
                 if [ ${#gpu} -le 2 ];then  # train with cpu or single gpu
