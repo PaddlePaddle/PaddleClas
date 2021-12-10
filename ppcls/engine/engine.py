@@ -29,7 +29,7 @@ from ppcls.utils import logger
 from ppcls.utils.logger import init_logger
 from ppcls.utils.config import print_config
 from ppcls.data import build_dataloader
-from ppcls.arch import build_model, RecModel, DistillationModel
+from ppcls.arch import build_model, RecModel, DistillationModel, TheseusLayer
 from ppcls.arch import apply_to_static
 from ppcls.loss import build_loss
 from ppcls.metric import build_metrics
@@ -386,7 +386,7 @@ class Engine(object):
             paddle.jit.save(model, save_path)
 
 
-class ExportModel(nn.Layer):
+class ExportModel(TheseusLayer):
     """
     ExportModel: add softmax onto the model
     """
