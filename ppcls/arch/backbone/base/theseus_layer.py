@@ -16,6 +16,8 @@ class TheseusLayer(nn.Layer):
         super(TheseusLayer, self).__init__()
         self.res_dict = {}
         self.res_name = self.full_name()
+        self.pruner = None
+        self.quanter = None
 
     # stop doesn't work when stop layer has a parallel branch.
     def stop_after(self, stop_layer_name: str):

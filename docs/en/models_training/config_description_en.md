@@ -8,11 +8,35 @@ The parameters in the PaddleClas configuration file(`ppcls/configs/*.yaml`)are d
 
 ## Details
 
+### Catalogue
+
+- [1. Classification model](#1)
+  - [1.1 Global Configuration](#1.1)
+  - [1.2 Architecture](#1.2)
+  - [1.3 Loss function](#1.3)
+  - [1.4 Optimizer](#1.4)
+  - [1.5 Data reading module(DataLoader)](#1.5)
+      - [1.5.1 dataset](#1.5.1)
+      - [1.5.2 sampler](#1.5.2)
+      - [1.5.3 loader](#1.5.3)
+  - [1.6 Evaluation metric](#1.6)
+  - [1.7 Inference](#1.7)
+- [2. Distillation model](#2)
+  - [2.1 Architecture](#2.1)
+  - [2.2 Loss function](#2.2)
+  - [2.3 Evaluation metric](#2.3)
+- [3. Recognition model](#3)
+  - [3.1 Architechture](#3.1)
+  - [3.2 Evaluation metric](#3.2)
+  
+  
+<a name="1"></a>
 ### 1. Classification model
 
 Here the configuration of `ResNet50_vd` on`ImageNet-1k`is used as an example to explain the each parameter in detail. [Configure Path](https://github.com/PaddlePaddle/PaddleClas/blob/develop/ppcls/configs/ImageNet/ResNet/ResNet50_vd.yaml).
 
-#### 1.1Global Configuration
+<a name="1.1"></a>
+#### 1.1 Global Configuration
 
 | Parameter name     | Specific meaning                                        | Defult value     | Optional value    |
 | ------------------ | ------------------------------------------------------- | ---------------- | ----------------- |
@@ -31,6 +55,7 @@ Here the configuration of `ResNet50_vd` on`ImageNet-1k`is used as an example to 
 
 **Note**：The http address of pre-trained model can be filled in the `pretrained_model`
 
+<a name="1.2"></a>
 #### 1.2 Architecture
 
 | Parameter name | Specific meaning  | Defult value | Optional value        |
@@ -41,6 +66,7 @@ Here the configuration of `ResNet50_vd` on`ImageNet-1k`is used as an example to 
 
 **Note**: Here pretrained can be set to True or False, so does the path of the weights. In addition, the pretrained is disabled when Global.pretrained_model is also set to the corresponding path.
 
+<a name="1.3"></a>
 #### 1.3 Loss function
 
 | Parameter name | Specific meaning                            | Defult value | Optional value         |
@@ -49,6 +75,7 @@ Here the configuration of `ResNet50_vd` on`ImageNet-1k`is used as an example to 
 | CELoss.weight  | The weight of CELoss in the whole Loss      | 1.0          | float                  |
 | CELoss.epsilon | The epsilon value of label_smooth in CELoss | 0.1          | float，between 0 and 1 |
 
+<a name="1.4"></a>
 #### 1.4 Optimizer
 
 | Parameter name    | Specific meaning                 | Defult value | Optional value                                     |
@@ -73,8 +100,10 @@ Here the configuration of `ResNet50_vd` on`ImageNet-1k`is used as an example to 
 
 Referring to [learning_rate.py](https://github.com/PaddlePaddle/PaddleClas/blob/develop/ppcls/optimizer/learning_rate.py) for adding method and parameters.
 
-#### 1.5 Data reading module（DataLoader）
+<a name="1.5"></a>
+#### 1.5 Data reading module(DataLoader)
 
+<a name="1.5.1"></a>
 ##### 1.5.1 dataset
 
 | Parameter name      | Specific meaning                     | Defult value                        | Optional value                 |
@@ -106,6 +135,7 @@ The parameter meaning of batch_transform_ops:
 | ------------- | -------------- | --------------------------------------- |
 | MixupOperator | alpha          | Mixup parameter value，the larger the value, the stronger the augment |
 
+<a name="1.5.2"></a>
 ##### 1.5.2 sampler
 
 | Parameter name | Specific meaning                                             | Default value           | Optional value                                     |
@@ -114,7 +144,7 @@ The parameter meaning of batch_transform_ops:
 | batch_size     | batch size                                                   | 64                      | int                                                |
 | drop_last      | Whether to drop the last data that does reach the batch-size | False                   | bool                                               |
 | shuffle        | whether to shuffle the data                                  | True                    | bool                                               |
-
+<a name="1.5.3"></a>
 ##### 1.5.3 loader
 
 | Parameter name    | Specific meaning             | Default meaning | Optional meaning |
@@ -122,12 +152,14 @@ The parameter meaning of batch_transform_ops:
 | num_workers       | Number of data read threads  | 4               | int              |
 | use_shared_memory | Whether to use shared memory | True            | bool             |
 
+<a name="1.6"></a>
 #### 1.6 Evaluation metric
 
 | Parameter name | Specific meaning | Default meaning | Optional meaning |
 | -------------- | ---------------- | --------------- | ---------------- |
 | TopkAcc        | TopkAcc          | [1, 5]          | list, int        |
 
+<a name="1.7"></a>
 #### 1.7 Inference
 
 | Parameter name                | Specific meaning                  | Default meaning                       | Optional meaning |
@@ -140,10 +172,12 @@ The parameter meaning of batch_transform_ops:
 
 **Note**：The interpretation of `transforms` in the Infer module refers to the interpretation of`transform_ops`in the dataset in the data reading module.
 
-### 2.Distillation model
+<a name="2"></a>
+### 2. Distillation model
 
 **Note**：Here the training configuration of `MobileNetV3_large_x1_0` on `ImageNet-1k` distilled MobileNetV3_small_x1_0 is used as an example to explain the meaning of each parameter in detail. [Configure path](https://github.com/PaddlePaddle/PaddleClas/blob/develop/ppcls/configs/ImageNet/Distillation/mv3_large_x1_0_distill_mv3_small_x1_0.yaml). Only parameters that are distinct from the classification model are introduced here.
 
+<a name="2.1"></a>
 #### 2.1 Architecture
 
 | Parameter name     | Specific meaning                                          | Default meaning        | Optional meaning                   |
@@ -169,6 +203,7 @@ The parameter meaning of batch_transform_ops:
 
 2.Student's parameters are similar and will not be repeated.
 
+<a name="2.2"></a>
 #### 2.2  Loss function
 
 | Parameter name                      | Specific meaning                                             | Default meaning | Optional meaning |
@@ -180,6 +215,7 @@ The parameter meaning of batch_transform_ops:
 | DistillationGTCELos.weight          | Loss weight                                                  | 1.0             | float            |
 | DistillationCELoss.model_names      | Model names with real label for cross-entropy                | ["Student"]     | ——               |
 
+<a name="2.3"></a>
 #### 2.3 Evaluation metric
 
 | Parameter name                | Specific meaning    | Default meaning              | Optional meaning |
@@ -190,10 +226,12 @@ The parameter meaning of batch_transform_ops:
 
 **Note**： `DistillationTopkAcc` has the same meaning as `TopkAcc`, except that it is only used in distillation tasks.
 
+<a name="3"></a>
 ### 3. Recognition model
 
 **Note**：The training configuration of`ResNet50` on`LogoDet-3k` is used here as an example to explain the meaning of each parameter in detail. [configure path](https://github.com/PaddlePaddle/PaddleClas/blob/develop/ppcls/configs/Logo/ResNet50_ReID.yaml). Only parameters that are distinct from the classification model are presented here.
 
+<a name="3.1"></a>
 #### 3.1 Architechture
 
 | Parameter name         | Specific meaning                                             | Default meaning             | Optional meaning                                             |
@@ -223,7 +261,7 @@ The parameter meaning of batch_transform_ops:
 
 
 
-
+<a name="3.2"></a>
 #### 3.2 Evaluation metric
 
 | Parameter name | Specific meaning            | Default meaning | Optional meaning |

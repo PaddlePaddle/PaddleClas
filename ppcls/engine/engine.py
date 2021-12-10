@@ -29,7 +29,7 @@ from ppcls.utils import logger
 from ppcls.utils.logger import init_logger
 from ppcls.utils.config import print_config
 from ppcls.data import build_dataloader
-from ppcls.arch import build_model, RecModel, DistillationModel
+from ppcls.arch import build_model, RecModel, DistillationModel, TheseusLayer
 from ppcls.arch import apply_to_static
 from ppcls.loss import build_loss
 from ppcls.metric import build_metrics
@@ -44,7 +44,6 @@ from ppcls.data import create_operators
 from ppcls.engine.train import train_epoch
 from ppcls.engine import evaluation
 from ppcls.arch.gears.identity_head import IdentityHead
-from ppcls.engine.slim import get_pruner, get_quaner
 
 
 class Engine(object):
@@ -186,13 +185,9 @@ class Engine(object):
             self.eval_metric_func = None
 
         # build model
-        self.model = build_model(self.config["Arch"])
+        self.model = build_model(self.config)
         # set @to_static for benchmark, skip this by default.
         apply_to_static(self.config, self.model)
-
-        # for slim
-        self.pruner = get_pruner(self.config, self.model)
-        self.quanter = get_quaner(self.config, self.model)
 
         # load_pretrain
         if self.config["Global"]["pretrained_model"] is not None:
@@ -371,8 +366,8 @@ class Engine(object):
         model.eval()
         save_path = os.path.join(self.config["Global"]["save_inference_dir"],
                                  "inference")
-        if self.quanter:
-            self.quanter.save_quantized_model(
+        if model.quanter:
+            model.quanter.save_quantized_model(
                 model.base_model,
                 save_path,
                 input_spec=[
@@ -391,7 +386,7 @@ class Engine(object):
             paddle.jit.save(model, save_path)
 
 
-class ExportModel(nn.Layer):
+class ExportModel(TheseusLayer):
     """
     ExportModel: add softmax onto the model
     """

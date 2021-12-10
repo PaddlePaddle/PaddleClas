@@ -1,6 +1,14 @@
 # Other networks
+---
+## Catalogue
 
-## Overview
+* [1. Overview](#1)
+* [2. Accuracy, FLOPs and Parameters](#2)
+* [3. Inference speed and storage size based on SD855](#3)
+* [4. Inference speed based on T4 GPU](#4)
+
+<a name='1'></a>
+## 1. Overview
 
 In 2012, AlexNet network proposed by Alex et al. won the ImageNet competition by far surpassing the second place, and the convolutional neural network and even deep learning attracted wide attention. AlexNet used relu as the activation function of CNN to solve the gradient dispersion problem of sigmoid when the network is deep. During the training, Dropout was used to randomly lose a part of the neurons, avoiding the overfitting of the model. In the network, overlapping maximum pooling is used to replace the average pooling commonly used in CNN, which avoids the fuzzy effect of average pooling and improves the feature richness. In a sense, AlexNet has exploded the research and application of neural networks.
 
@@ -11,10 +19,10 @@ VGG is a convolutional neural network developed by researchers at Oxford Univers
 DarkNet53 is designed for object detection by YOLO author in the paper. The network is basically composed of 1x1 and 3x3 kernel, with a total of 53 layers, named DarkNet53.
 
 
+<a name='2'></a>
+## 2. Accuracy, FLOPs and Parameters
 
-## Accuracy, FLOPS and Parameters
-
-| Models                    | Top1   | Top5   | Reference<br>top1 | Reference<br>top5 | FLOPS<br>(G) | Parameters<br>(M) |
+| Models                    | Top1   | Top5   | Reference<br>top1 | Reference<br>top5 | FLOPs<br>(G) | Parameters<br>(M) |
 |:--:|:--:|:--:|:--:|:--:|:--:|:--:|
 | AlexNet                   | 0.567  | 0.792  | 0.5720            |                   | 1.370        | 61.090            |
 | SqueezeNet1_0             | 0.596  | 0.817  | 0.575             |                   | 1.550        | 1.240             |
@@ -26,8 +34,8 @@ DarkNet53 is designed for object detection by YOLO author in the paper. The netw
 | DarkNet53                 | 0.780  | 0.941  | 0.772             | 0.938             | 18.580       | 41.600            |
 
 
-
-## Inference speed based on V100 GPU
+<a name='3'></a>
+## 3. Inference speed based on V100 GPU
 
 
 | Models                 | Crop Size | Resize Short Size | FP32<br>Batch Size=1<br>(ms) |
@@ -41,7 +49,8 @@ DarkNet53 is designed for object detection by YOLO author in the paper. The netw
 | VGG19                     | 224       | 256               | 3.076                |
 | DarkNet53                 | 256       | 256               | 3.139                |
 
-## Inference speed based on T4 GPU
+<a name='4'></a>
+## 4. Inference speed based on T4 GPU
 
 | Models                | Crop Size | Resize Short Size | FP16<br>Batch Size=1<br>(ms) | FP16<br>Batch Size=4<br>(ms) | FP16<br>Batch Size=8<br>(ms) | FP32<br>Batch Size=1<br>(ms) | FP32<br>Batch Size=4<br>(ms) | FP32<br>Batch Size=8<br>(ms) |
 |-----------------------|-----------|-------------------|------------------------------|------------------------------|------------------------------|------------------------------|------------------------------|------------------------------|

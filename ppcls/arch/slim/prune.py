@@ -17,7 +17,7 @@ import paddle
 from ppcls.utils import logger
 
 
-def get_pruner(config, model):
+def prune_model(config, model):
     if config.get("Slim", False) and config["Slim"].get("prune", False):
         import paddleslim
         prune_method_name = config["Slim"]["prune"]["name"].lower()
@@ -25,21 +25,20 @@ def get_pruner(config, model):
             "fpgm", "l1_norm"
         ], "The prune methods only support 'fpgm' and 'l1_norm'"
         if prune_method_name == "fpgm":
-            pruner = paddleslim.dygraph.FPGMFilterPruner(
+            model.pruner = paddleslim.dygraph.FPGMFilterPruner(
                 model, [1] + config["Global"]["image_shape"])
         else:
-            pruner = paddleslim.dygraph.L1NormFilterPruner(
+            model.pruner = paddleslim.dygraph.L1NormFilterPruner(
                 model, [1] + config["Global"]["image_shape"])
 
         # prune model
-        _prune_model(pruner, config, model)
+        _prune_model(config, model)
     else:
-        pruner = None
-
-    return pruner
+        model.pruner = None
 
 
-def _prune_model(pruner, config, model):
+
+def _prune_model(config, model):
     from paddleslim.analysis import dygraph_flops as flops
     logger.info("FLOPs before pruning: {}GFLOPs".format(
         flops(model, [1] + config["Global"]["image_shape"]) / 1e9))
@@ -53,7 +52,7 @@ def _prune_model(pruner, config, model):
     ratios = {}
     for param in params:
         ratios[param] = config["Slim"]["prune"]["pruned_ratio"]
-    plan = pruner.prune_vars(ratios, [0])
+    plan = model.pruner.prune_vars(ratios, [0])
 
     logger.info("FLOPs after pruning: {}GFLOPs; pruned ratio: {}".format(
         flops(model, [1] + config["Global"]["image_shape"]) / 1e9,
