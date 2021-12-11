@@ -91,14 +91,17 @@ def main(args):
             os.environ[k] = AMP_RELATED_FLAGS_SETTING[k]
 
     use_xpu = global_config.get("use_xpu", False)
+    use_npu = global_config.get("use_npu", False)
     assert (
-        use_gpu and use_xpu
-    ) is not True, "gpu and xpu can not be true in the same time in static mode!"
+        use_gpu and use_xpu and use_npu
+    ) is not True, "gpu, xpu and npu can not be true in the same time in static mode!"
 
     if use_gpu:
         device = paddle.set_device('gpu')
     elif use_xpu:
         device = paddle.set_device('xpu')
+    elif use_npu:
+        device = paddle.set_device('npu')
     else:
         device = paddle.set_device('cpu')
 
@@ -112,6 +115,8 @@ def main(args):
     eval_dataloader = None
     use_dali = global_config.get('use_dali', False)
 
+    class_num = config["Arch"].get("class_num", None)
+    config["DataLoader"].update({"class_num": class_num})
     train_dataloader = build_dataloader(
         config["DataLoader"], "Train", device=device, use_dali=use_dali)
     if global_config["eval_during_train"]:
@@ -131,6 +136,7 @@ def main(args):
         config,
         train_prog,
         startup_prog,
+        class_num,
         step_each_epoch=step_each_epoch,
         is_train=True,
         is_distributed=global_config.get("is_distributed", True))

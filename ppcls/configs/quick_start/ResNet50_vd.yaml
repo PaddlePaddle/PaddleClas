@@ -4,7 +4,6 @@ Global:
   pretrained_model: null
   output_dir: ./output/
   device: gpu
-  class_num: 102
   save_interval: 1
   eval_during_train: True
   eval_interval: 1
@@ -17,8 +16,9 @@ Global:
 
 # model architecture
 Arch:
-  name: ResNet50_vd
- 
+  name: ResNet50_vd 
+  class_num: 102
+
 # loss function config for traing/eval process
 Loss:
   Train:
@@ -118,7 +118,7 @@ Infer:
   PostProcess:
     name: Topk
     topk: 5
-    class_id_map_file: ppcls/utils/imagenet1k_label_list.txt
+    class_id_map_file: ./dataset/flowers102/flowers102_label_list.txt
 
 Metric:
   Train:

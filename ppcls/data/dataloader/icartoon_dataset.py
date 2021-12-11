@@ -32,5 +32,5 @@ class ICartoonDataset(CommonDataset):
             for l in lines:
                 l = l.strip().split("\t")
                 self.images.append(os.path.join(self._img_root, l[0]))
-                self.labels.append(int(l[1]))
+                self.labels.append(np.int64(l[1]))
                 assert os.path.exists(self.images[-1])

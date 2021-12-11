@@ -29,7 +29,7 @@ from ppcls.utils import logger
 from ppcls.utils.logger import init_logger
 from ppcls.utils.config import print_config
 from ppcls.data import build_dataloader
-from ppcls.arch import build_model, RecModel, DistillationModel
+from ppcls.arch import build_model, RecModel, DistillationModel, TheseusLayer
 from ppcls.arch import apply_to_static
 from ppcls.loss import build_loss
 from ppcls.metric import build_metrics
@@ -44,7 +44,6 @@ from ppcls.data import create_operators
 from ppcls.engine.train import train_epoch
 from ppcls.engine import evaluation
 from ppcls.arch.gears.identity_head import IdentityHead
-from ppcls.engine.slim import get_pruner, get_quaner
 
 
 class Engine(object):
@@ -62,7 +61,7 @@ class Engine(object):
 
         # set seed
         seed = self.config["Global"].get("seed", False)
-        if seed:
+        if seed or seed == 0:
             assert isinstance(seed, int), "The 'seed' must be a integer!"
             paddle.seed(seed)
             np.random.seed(seed)
@@ -92,7 +91,7 @@ class Engine(object):
             self.vdl_writer = LogWriter(logdir=vdl_writer_path)
 
         # set device
-        assert self.config["Global"]["device"] in ["cpu", "gpu", "xpu"]
+        assert self.config["Global"]["device"] in ["cpu", "gpu", "xpu", "npu"]
         self.device = paddle.set_device(self.config["Global"]["device"])
         logger.info('train with paddle {} and device {}'.format(
             paddle.__version__, self.device))
@@ -113,6 +112,9 @@ class Engine(object):
             }
             paddle.fluid.set_flags(AMP_RELATED_FLAGS_SETTING)
 
+        #TODO(gaotingquan): support rec
+        class_num = config["Arch"].get("class_num", None)
+        self.config["DataLoader"].update({"class_num": class_num})
         # build dataloader
         if self.mode == 'train':
             self.train_dataloader = build_dataloader(
@@ -142,7 +144,8 @@ class Engine(object):
         if self.mode == "train":
             loss_info = self.config["Loss"]["Train"]
             self.train_loss_func = build_loss(loss_info)
-        if self.mode in ["train", "eval"]:
+        if self.mode == "eval" or (self.mode == "train" and
+                                   self.config["Global"]["eval_during_train"]):
             loss_config = self.config.get("Loss", None)
             if loss_config is not None:
                 loss_config = loss_config.get("Eval")
@@ -165,7 +168,8 @@ class Engine(object):
         else:
             self.train_metric_func = None
 
-        if self.mode in ["train", "eval"]:
+        if self.mode == "eval" or (self.mode == "train" and
+                                   self.config["Global"]["eval_during_train"]):
             metric_config = self.config.get("Metric")
             if self.eval_mode == "classification":
                 if metric_config is not None:
@@ -182,9 +186,10 @@ class Engine(object):
             self.eval_metric_func = None
 
         # build model
-        self.model = build_model(self.config["Arch"])
+        self.model = build_model(self.config)
         # set @to_static for benchmark, skip this by default.
         apply_to_static(self.config, self.model)
+
         # load_pretrain
         if self.config["Global"]["pretrained_model"] is not None:
             if self.config["Global"]["pretrained_model"].startswith("http"):
@@ -193,10 +198,6 @@ class Engine(object):
             else:
                 load_dygraph_pretrain(
                     self.model, self.config["Global"]["pretrained_model"])
-
-        # for slim
-        self.pruner = get_pruner(self.config, self.model)
-        self.quanter = get_quaner(self.config, self.model)
 
         # build optimizer
         if self.mode == 'train':
@@ -366,9 +367,9 @@ class Engine(object):
         model.eval()
         save_path = os.path.join(self.config["Global"]["save_inference_dir"],
                                  "inference")
-        if self.quanter:
-            self.quanter.save_quantized_model(
-                model,
+        if model.quanter:
+            model.quanter.save_quantized_model(
+                model.base_model,
                 save_path,
                 input_spec=[
                     paddle.static.InputSpec(
@@ -386,7 +387,7 @@ class Engine(object):
             paddle.jit.save(model, save_path)
 
 
-class ExportModel(nn.Layer):
+class ExportModel(TheseusLayer):
     """
     ExportModel: add softmax onto the model
     """

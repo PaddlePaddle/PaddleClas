@@ -12,7 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from collections import Callable
+# Code was based on https://github.com/rwightman/pytorch-image-models/blob/master/timm/models/vision_transformer.py
+
+from collections.abc import Callable
 
 import numpy as np
 import paddle
@@ -331,9 +333,7 @@ def _load_pretrained(pretrained, model, model_url, use_ssld=False):
         )
 
 
-def ViT_small_patch16_224(pretrained=False,
-                          use_ssld=False,
-                          **kwargs):
+def ViT_small_patch16_224(pretrained=False, use_ssld=False, **kwargs):
     model = VisionTransformer(
         patch_size=16,
         embed_dim=768,
@@ -350,9 +350,7 @@ def ViT_small_patch16_224(pretrained=False,
     return model
 
 
-def ViT_base_patch16_224(pretrained=False,
-                         use_ssld=False,
-                         **kwargs):
+def ViT_base_patch16_224(pretrained=False, use_ssld=False, **kwargs):
     model = VisionTransformer(
         patch_size=16,
         embed_dim=768,
@@ -370,9 +368,7 @@ def ViT_base_patch16_224(pretrained=False,
     return model
 
 
-def ViT_base_patch16_384(pretrained=False,
-                         use_ssld=False,
-                         **kwargs):
+def ViT_base_patch16_384(pretrained=False, use_ssld=False, **kwargs):
     model = VisionTransformer(
         img_size=384,
         patch_size=16,
@@ -391,9 +387,7 @@ def ViT_base_patch16_384(pretrained=False,
     return model
 
 
-def ViT_base_patch32_384(pretrained=False,
-                         use_ssld=False,
-                         **kwargs):
+def ViT_base_patch32_384(pretrained=False, use_ssld=False, **kwargs):
     model = VisionTransformer(
         img_size=384,
         patch_size=32,
@@ -412,9 +406,7 @@ def ViT_base_patch32_384(pretrained=False,
     return model
 
 
-def ViT_large_patch16_224(pretrained=False,
-                          use_ssld=False,
-                          **kwargs):
+def ViT_large_patch16_224(pretrained=False, use_ssld=False, **kwargs):
     model = VisionTransformer(
         patch_size=16,
         embed_dim=1024,
@@ -432,9 +424,7 @@ def ViT_large_patch16_224(pretrained=False,
     return model
 
 
-def ViT_large_patch16_384(pretrained=False,
-                          use_ssld=False,
-                          **kwargs):
+def ViT_large_patch16_384(pretrained=False, use_ssld=False, **kwargs):
     model = VisionTransformer(
         img_size=384,
         patch_size=16,
@@ -453,9 +443,7 @@ def ViT_large_patch16_384(pretrained=False,
     return model
 
 
-def ViT_large_patch32_384(pretrained=False,
-                          use_ssld=False,
-                          **kwargs):
+def ViT_large_patch32_384(pretrained=False, use_ssld=False, **kwargs):
     model = VisionTransformer(
         img_size=384,
         patch_size=32,
@@ -474,9 +462,7 @@ def ViT_large_patch32_384(pretrained=False,
     return model
 
 
-def ViT_huge_patch16_224(pretrained=False,
-                         use_ssld=False,
-                         **kwargs):
+def ViT_huge_patch16_224(pretrained=False, use_ssld=False, **kwargs):
     model = VisionTransformer(
         patch_size=16,
         embed_dim=1280,
@@ -492,9 +478,7 @@ def ViT_huge_patch16_224(pretrained=False,
     return model
 
 
-def ViT_huge_patch32_384(pretrained=False,
-                         use_ssld=False,
-                         **kwargs):
+def ViT_huge_patch32_384(pretrained=False, use_ssld=False, **kwargs):
     model = VisionTransformer(
         img_size=384,
         patch_size=32,

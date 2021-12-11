@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# Code was based on https://github.com/Meituan-AutoML/Twins
+
 from functools import partial
 
 import paddle

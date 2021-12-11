@@ -19,7 +19,7 @@ import os
 import sys
 __dir__ = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(__dir__)
-sys.path.append(os.path.abspath(os.path.join(__dir__, '../..')))
+sys.path.append(os.path.abspath(os.path.join(__dir__, '../../..')))
 
 import paddle
 from paddle.distributed import ParallelEnv
@@ -33,18 +33,13 @@ def parse_args():
         return v.lower() in ("true", "t", "1")
 
     parser = argparse.ArgumentParser()
-    parser.add_argument("-i", "--image_file", type=str)
+    parser.add_argument("-i", "--image_file", required=True, type=str)
     parser.add_argument("-c", "--channel_num", type=int)
     parser.add_argument("-p", "--pretrained_model", type=str)
     parser.add_argument("--show", type=str2bool, default=False)
     parser.add_argument("--interpolation", type=int, default=1)
     parser.add_argument("--save_path", type=str, default=None)
     parser.add_argument("--use_gpu", type=str2bool, default=True)
-    parser.add_argument(
-        "--load_static_weights",
-        type=str2bool,
-        default=False,
-        help='Whether to load the pretrained weights saved in static mode')
 
     return parser.parse_args()
 
@@ -79,7 +74,7 @@ def main():
     place = paddle.set_device(place)
 
     net = ResNet50()
-    load_dygraph_pretrain(net, args.pretrained_model, args.load_static_weights)
+    load_dygraph_pretrain(net, args.pretrained_model)
 
     img = cv2.imread(args.image_file, cv2.IMREAD_COLOR)
     data = preprocess(img, operators)
