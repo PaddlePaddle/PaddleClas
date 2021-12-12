@@ -31,12 +31,10 @@ Arch:
         pretrained: True
         use_ssld: True
         dropout_prob: null
-        return_patterns: ["blocks[5].expand_conv"]
     - Student:
         name: MobileNetV3_small_x1_0
         pretrained: False
         dropout_prob: null
-        return_patterns: ["blocks[2].expand_conv"]
   infer_model_name: "Student"
 
 

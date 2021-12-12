@@ -72,34 +72,14 @@ def classification_eval(engine, epoch_id=0):
 
         # calc metric
         if engine.eval_metric_func is not None:
+            metric_dict = engine.eval_metric_func(out, batch[1])
             if paddle.distributed.get_world_size() > 1:
-                label_list = []
-                paddle.distributed.all_gather(label_list, batch[1])
-                labels = paddle.concat(label_list, 0)
+                for key in metric_dict:
+                    paddle.distributed.all_reduce(
+                        metric_dict[key], op=paddle.distributed.ReduceOp.SUM)
+                    metric_dict[key] = metric_dict[
+                        key] / paddle.distributed.get_world_size()
 
-                if isinstance(out, dict):
-                    out = out["logits"]
-                if isinstance(out, list):
-                    pred = []
-                    for x in out:
-                        pred_list = []
-                        paddle.distributed.all_gather(pred_list, x)
-                        pred_x = paddle.concat(pred_list, 0)
-                        pred.append(pred_x)
-                else:
-                    pred_list = []
-                    paddle.distributed.all_gather(pred_list, out)
-                    pred = paddle.concat(pred_list, 0)
-
-                if accum_samples > total_samples and not engine.use_dali:
-                    pred = pred[:total_samples + current_samples -
-                                accum_samples]
-                    labels = labels[:total_samples + current_samples -
-                                    accum_samples]
-                    current_samples = total_samples + current_samples - accum_samples
-                metric_dict = engine.eval_metric_func(pred, labels)
-            else:
-                metric_dict = engine.eval_metric_func(out, batch[1])
             for key in metric_dict:
                 if metric_key is None:
                     metric_key = key
