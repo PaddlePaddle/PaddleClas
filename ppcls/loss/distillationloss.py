@@ -144,7 +144,7 @@ class DistillationDistanceLoss(DistanceLoss):
 
 class DistillationRKDLoss(nn.Layer):
     def __init__(self,
-                 avgpool=False,
+                 target_size=None,
                  model_name_pairs=(["Student", "Teacher"], ),
                  student_keepkeys=[],
                  teacher_keepkeys=[]):
@@ -154,8 +154,8 @@ class DistillationRKDLoss(nn.Layer):
         self.model_name_pairs = model_name_pairs
         assert len(self.student_keepkeys) == len(self.teacher_keepkeys)
 
-        self.rkd_angle_loss = RKdAngle(avgpool=avgpool)
-        self.rkd_dist_loss = RkdDistance(avgpool=avgpool)
+        self.rkd_angle_loss = RKdAngle(target_size=target_size)
+        self.rkd_dist_loss = RkdDistance(target_size=target_size)
 
     def __call__(self, predicts, batch):
         loss_dict = {}

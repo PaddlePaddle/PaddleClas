@@ -30,10 +30,10 @@ def pdist(e, squared=False, eps=1e-12):
 
 class RKdAngle(nn.Layer):
     # reference: https://github.com/lenscloth/RKD/blob/master/metric/loss.py
-    def __init__(self, avgpool=False):
+    def __init__(self, target_size=None):
         super().__init__()
-        if avgpool is True:
-            self.avgpool = paddle.nn.AdaptiveAvgPool2D(1)
+        if target_size is not None:
+            self.avgpool = paddle.nn.AdaptiveAvgPool2D(target_size)
         else:
             self.avgpool = None
 
@@ -65,11 +65,11 @@ class RKdAngle(nn.Layer):
 
 class RkdDistance(nn.Layer):
     # reference: https://github.com/lenscloth/RKD/blob/master/metric/loss.py
-    def __init__(self, eps=1e-12, avgpool=False):
+    def __init__(self, eps=1e-12, target_size=1):
         super().__init__()
         self.eps = eps
-        if avgpool is True:
-            self.avgpool = paddle.nn.AdaptiveAvgPool2D(1)
+        if target_size is not None:
+            self.avgpool = paddle.nn.AdaptiveAvgPool2D(target_size)
         else:
             self.avgpool = None
 
