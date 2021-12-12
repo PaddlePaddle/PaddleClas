@@ -2,7 +2,7 @@
 Global:
   checkpoints: null
   pretrained_model: null
-  output_dir: "./output/"
+  output_dir: "./output_ssld/"
   device: "gpu"
   save_interval: 1
   eval_during_train: True
@@ -31,26 +31,28 @@ Arch:
         pretrained: True
         use_ssld: True
         dropout_prob: null
+        return_patterns: ["blocks[5].expand_conv"]
     - Student:
         name: MobileNetV3_small_x1_0
         pretrained: False
         dropout_prob: null
-
+        return_patterns: ["blocks[2].expand_conv"]
   infer_model_name: "Student"
 
 
 # loss function config for traing/eval process
 Loss:
   Train:
-    - DistillationCELoss:
+    - DistillationDMLLoss:
         weight: 1.0
+        key: "logits"
         model_name_pairs:
         - ["Student", "Teacher"]
   Eval:
     - DistillationGTCELoss:
         weight: 1.0
+        key: "logits"
         model_names: ["Student"]
-        
 
 Optimizer:
   name: Momentum

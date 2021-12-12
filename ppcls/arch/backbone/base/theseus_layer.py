@@ -44,11 +44,13 @@ class TheseusLayer(nn.Layer):
             while len(pattern_list) > 1:
                 if '[' in pattern_list[0]:
                     sub_layer_name = pattern_list[0].split('[')[0]
-                    sub_layer_index = pattern_list[0].split('[')[1].split(']')[0]
-                    sub_layer_parent = getattr(sub_layer_parent, sub_layer_name)[sub_layer_index]
+                    sub_layer_index = pattern_list[0].split('[')[1].split(']')[
+                        0]
+                    sub_layer_parent = getattr(sub_layer_parent,
+                                               sub_layer_name)[sub_layer_index]
                 else:
-                    sub_layer_parent = getattr(sub_layer_parent, pattern_list[0],
-                                               None)
+                    sub_layer_parent = getattr(sub_layer_parent,
+                                               pattern_list[0], None)
                     if sub_layer_parent is None:
                         break
                 if isinstance(sub_layer_parent, WrapLayer):
@@ -59,10 +61,12 @@ class TheseusLayer(nn.Layer):
             if '[' in pattern_list[0]:
                 sub_layer_name = pattern_list[0].split('[')[0]
                 sub_layer_index = pattern_list[0].split('[')[1].split(']')[0]
-                sub_layer = getattr(sub_layer_parent, sub_layer_name)[sub_layer_index]
+                sub_layer = getattr(sub_layer_parent,
+                                    sub_layer_name)[sub_layer_index]
                 if not isinstance(sub_layer, TheseusLayer):
                     sub_layer = wrap_theseus(sub_layer)
-                getattr(sub_layer_parent, sub_layer_name)[sub_layer_index] = sub_layer
+                getattr(sub_layer_parent,
+                        sub_layer_name)[sub_layer_index] = sub_layer
             else:
                 sub_layer = getattr(sub_layer_parent, pattern_list[0])
                 if not isinstance(sub_layer, TheseusLayer):
@@ -77,7 +81,7 @@ class TheseusLayer(nn.Layer):
         self.res_dict[self.res_name] = output
 
     def _return_dict_hook(self, layer, input, output):
-        res_dict = {"output": output}
+        res_dict = {"logits": output}
         for res_key in list(self.res_dict):
             res_dict[res_key] = self.res_dict.pop(res_key)
         return res_dict
