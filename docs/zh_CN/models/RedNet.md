@@ -1,11 +1,17 @@
-# RedNet系列
+# RedNet 系列
+---
+## 目录
 
-## 概述
+* [1. 概述](#1)
+* [2. 精度、FLOPS 和参数量](#2)
+
+<a name='1'></a>
+## 1. 概述
 
 在 ResNet 的 Backbone 和 Backbone 的所有 Bottleneck 位置上使用 Involution 替换掉了卷积，但保留了所有的卷积用于通道映射和融合。这些精心重新设计的实体联合起来，形成了一种新的高效 Backbone 网络，称为 RedNet。[论文地址](https://arxiv.org/abs/2103.06255)。
 
-
-## 精度、FLOPS和参数量
+<a name='2'></a>
+## 2. 精度、FLOPS 和参数量
 
 |         Model         | Params (M) | FLOPs (G) | Top-1 (%) | Top-5 (%) |
 |:---------------------:|:----------:|:---------:|:---------:|:---------:|
