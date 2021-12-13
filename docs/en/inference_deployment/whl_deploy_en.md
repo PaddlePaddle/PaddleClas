@@ -1,5 +1,25 @@
 # PaddleClas wheel package
 
+Paddleclas supports Python WHL package for prediction. At present, WHL package only supports image classification, but does not support subject detection, feature extraction and vector retrieval.
+
+---
+
+## Contents
+
+- [1. Installation](#1)
+- [2. Quick Start](#2)
+- [3. Definition of Parameters](#3)
+- [4. Usage](#4)
+   - [4.1 View help information](#4.1)
+   - [4.2 Prediction using inference model provide by PaddleClas](#4.2)
+   - [4.3 Prediction using local model files](#4.3)
+   - [4.4 Prediction by batch](#4.4)
+   - [4.5 Prediction of Internet image](#4.5)
+   - [4.6 Prediction of `NumPy.array` format image](#4.6)
+   - [4.7 Save the prediction result(s)](#4.7)
+   - [4.8 Specify the mapping between class id and label name](#4.8)
+
+<a name="1"></a>
 ## 1. Installation
 
 * installing from pypi
@@ -15,7 +35,7 @@ python3 setup.py bdist_wheel
 pip3 install dist/*
 ```
 
-
+<a name="2"></a>
 ## 2. Quick Start
 * Using the `ResNet50` model provided by PaddleClas, the following image(`'docs/images/whl/demo.jpg'`) as an example.
 
@@ -50,9 +70,7 @@ filename: docs/images/whl/demo.jpg, top-5, class_ids: [8, 7, 136, 80, 84], score
 Predict complete!
 ```
 
-
-
-
+<a name="3"></a>
 ## 3. Definition of Parameters
 
 The following parameters can be specified in Command Line or used as parameters of the constructor when instantiating the PaddleClas object in Python.
@@ -86,12 +104,14 @@ from paddleclas import PaddleClas
 clas = PaddleClas(model_name='ViT_base_patch16_384', resize_short=384, crop_size=384)
 ```
 
+<a name="4"></a>
 ## 4. Usage
 
 PaddleClas provides two ways to use:
 1. Python interative programming;
 2. Bash command line programming.
 
+<a name="4.1"></a>
 ### 4.1 View help information
 
 * CLI
@@ -99,6 +119,7 @@ PaddleClas provides two ways to use:
 paddleclas -h
 ```
 
+<a name="4.2"></a>
 ### 4.2 Prediction using inference model provide by PaddleClas
 You can use the inference model provided by PaddleClas to predict, and only need to specify `model_name`. In this case, PaddleClas will automatically download files of specified model and save them in the directory `~/.paddleclas/`.
 
@@ -116,7 +137,7 @@ print(next(result))
 paddleclas --model_name='ResNet50' --infer_imgs='docs/images/whl/demo.jpg'
 ```
 
-
+<a name="4.3"></a>
 ### 4.3 Prediction using local model files
 You can use the local model files trained by yourself to predict, and only need to specify `inference_model_dir`. Note that the directory must contain `inference.pdmodel` and `inference.pdiparams`.
 
@@ -134,6 +155,7 @@ print(next(result))
 paddleclas --inference_model_dir='./inference/' --infer_imgs='docs/images/whl/demo.jpg'
 ```
 
+<a name="4.4"></a>
 ### 4.4 Prediction by batch
 You can predict by batch, only need to specify `batch_size` when `infer_imgs` is direcotry contain image files.
 
@@ -152,7 +174,7 @@ for r in result:
 paddleclas --model_name='ResNet50' --infer_imgs='docs/images/' --batch_size 2
 ```
 
-
+<a name="4.5"></a>
 ### 4.5 Prediction of Internet image
 You can predict the Internet image, only need to specify URL of Internet image by `infer_imgs`. In this case, the image file will be downloaded and saved in the directory `~/.paddleclas/images/`.
 
@@ -170,7 +192,7 @@ print(next(result))
 paddleclas --model_name='ResNet50' --infer_imgs='https://raw.githubusercontent.com/paddlepaddle/paddleclas/release/2.2/docs/images/whl/demo.jpg'
 ```
 
-
+<a name="4.6"></a>
 ### 4.6 Prediction of NumPy.array format image
 In Python code, you can predict the NumPy.array format image, only need to use the `infer_imgs` to transfer variable of image data. Note that the image data must be 3 channels.
 
@@ -184,6 +206,7 @@ result=clas.predict(infer_imgs)
 print(next(result))
 ```
 
+<a name="4.7"></a>
 ### 4.7 Save the prediction result(s)
 You can save the prediction result(s) as pre-label, only need to use `pre_label_out_dir` to specify the directory to save.
 
@@ -201,7 +224,7 @@ print(next(result))
 paddleclas --model_name='ResNet50' --infer_imgs='docs/images/whl/' --save_dir='./output_pre_label/'
 ```
 
-
+<a name="4.8"></a>
 ### 4.8 Specify the mapping between class id and label name
 You can specify the mapping between class id and label name, only need to use `class_id_map_file` to specify the mapping file. PaddleClas uses ImageNet1K's mapping by default.
 
