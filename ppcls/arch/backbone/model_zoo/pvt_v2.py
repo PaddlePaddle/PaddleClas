@@ -45,6 +45,7 @@ MODEL_URLS = {
 __all__ = list(MODEL_URLS.keys())
 
 
+@paddle.jit.not_to_static
 def swapdim(x, dim1, dim2):
     a = list(range(len(x.shape)))
     a[dim1], a[dim2] = a[dim2], a[dim1]
