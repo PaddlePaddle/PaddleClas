@@ -69,10 +69,10 @@ sudo docker run --name ppcls -v $PWD:/paddle --shm-size=8G --network=host -it pa
 
 ```bash
 # 对于 CPU 用户
-pip3 install paddlepaddle --upgrade -i https://mirror.baidu.com/pypi/simple
+pip install paddlepaddle --upgrade -i https://mirror.baidu.com/pypi/simple
 
 # 对于 GPU 用户
-pip3 install paddlepaddle-gpu --upgrade -i https://mirror.baidu.com/pypi/simple
+pip install paddlepaddle-gpu --upgrade -i https://mirror.baidu.com/pypi/simple
 ```
 
 **注意：**
@@ -98,4 +98,4 @@ python -c "import paddle; print(paddle.__version__)"
 **注意**：
 - 从源码编译的 PaddlePaddle 版本号为 `0.0.0`，请确保使用 PaddlePaddle 2.0 及之后的源码进行编译；
 - PaddleClas 基于 PaddlePaddle 高性能的分布式训练能力，若您从源码编译，请确保打开编译选项 `WITH_DISTRIBUTE=ON`。具体编译选项参考 [编译选项表](https://www.paddlepaddle.org.cn/documentation/docs/zh/develop/install/Tables.html#bianyixuanxiangbiao)；
-- 在 Docker 中运行时，为保证 Docker 容器有足够的共享内存用于 Paddle 的数据读取加速，在创建 Docker 容器时，请设置参数 `--shm_size=8g`，条件允许的话可以设置为更大的值。
+- 在 Docker 中运行时，为保证 Docker 容器有足够的共享内存用于 Paddle 的数据读取加速，在创建 Docker 容器时，请设置参数 `--shm-size=8g`，条件允许的话可以设置为更大的值。
