@@ -36,7 +36,7 @@ Currently, knowledge distillation methods can be roughly divided into the follow
 Knowledge distillation algorithm is widely used in lightweight tasks. For tasks that need to meet specific accuracy, by using the knowledge distillation method, we can achieve the required accuracy with a smaller model, thereby reducing model deployment cost.
 
 
-What's more, for the same model structure, pre-trained models obtained by knowledge distillation often performs better, and these pre-trained models can also improve performance of the downstream tasks. For example, in , a pre-trained image classification model with higher accuracy can also help other tasks obtain significant accuracy gains such as target detection, image segmentation, OCR, and video classification.
+What's more, for the same model structure, pre-trained models obtained by knowledge distillation often performs better, and these pre-trained models can also improve performance of the downstream tasks. For example, a pre-trained image classification model with higher accuracy can also help other tasks obtain significant accuracy gains such as target detection, image segmentation, OCR, and video classification.
 
 <a name='3'></a>
 
@@ -47,7 +47,7 @@ What's more, for the same model structure, pre-trained models obtained by knowle
 ### 3.1 Response based distillation
 
 
-Knowledge distillation algorithm is firstly proposed by Hinton, which is called KD. In addition to base cross entropy loss, KL divergence loss between output of student model and teacher model is also added onto the total training loss. It's noted that a larger teacher model is needed to guide the training process of the student model.
+Knowledge distillation algorithm is firstly proposed by Hinton, which is called KD. In addition to base cross entropy loss, KL divergence loss between output of student model and teacher model is also added into the total training loss. It's noted that a larger teacher model is needed to guide the training process of the student model.
 
 PaddleClas proposed a simple but useful knowledge distillation algorithm canlled SSLD [6], Labels are not needed for SSLD, so unlabeled data can also be used for training. Accuracy of 15 models has more than 3% improvement using SSLD.
 
