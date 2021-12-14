@@ -17,36 +17,36 @@
 
 namespace PaddleClas {
 
-void ClsConfig::PrintConfigInfo() {
-  std::cout << "=======Paddle Class inference config======" << std::endl;
-  std::cout << this->config_file << std::endl;
-  std::cout << "=======End of Paddle Class inference config======" << std::endl;
-}
-
-void ClsConfig::ReadYamlConfig(const std::string &path) {
-
-  try {
-    this->config_file = YAML::LoadFile(path);
-  } catch (YAML::BadFile &e) {
-    std::cout << "Something wrong in yaml file, please check yaml file"
-              << std::endl;
-    exit(1);
-  }
-}
-
-void ClsConfig::ReadLabelMap() {
-  if (this->class_id_map_path.empty()) {
-    std::cout << "The Class Label file dose not input" << std::endl;
-    return;
-  }
-  std::ifstream in(this->class_id_map_path);
-  std::string line;
-  if (in) {
-    while (getline(in, line)) {
-      int split_flag = line.find_first_of(" ");
-      this->id_map[std::stoi(line.substr(0, split_flag))] =
-          line.substr(split_flag + 1, line.size());
+    void ClsConfig::PrintConfigInfo() {
+        std::cout << "=======Paddle Class inference config======" << std::endl;
+        std::cout << this->config_file << std::endl;
+        std::cout << "=======End of Paddle Class inference config======" << std::endl;
     }
-  }
-}
+
+    void ClsConfig::ReadYamlConfig(const std::string &path) {
+
+        try {
+            this->config_file = YAML::LoadFile(path);
+        } catch (YAML::BadFile &e) {
+            std::cout << "Something wrong in yaml file, please check yaml file"
+                      << std::endl;
+            exit(1);
+        }
+    }
+
+    void ClsConfig::ReadLabelMap() {
+        if (this->class_id_map_path.empty()) {
+            std::cout << "The Class Label file dose not input" << std::endl;
+            return;
+        }
+        std::ifstream in(this->class_id_map_path);
+        std::string line;
+        if (in) {
+            while (getline(in, line)) {
+                int split_flag = line.find_first_of(" ");
+                this->id_map[std::stoi(line.substr(0, split_flag))] =
+                        line.substr(split_flag + 1, line.size());
+            }
+        }
+    }
 }; // namespace PaddleClas
