@@ -288,6 +288,7 @@ else
                 # run train
 		eval "unset CUDA_VISIBLE_DEVICES"
 		export FLAGS_cudnn_deterministic=True
+		sleep 5
                 eval $cmd
                 status_check $? "${cmd}" "${status_log}"
                 sleep 5
