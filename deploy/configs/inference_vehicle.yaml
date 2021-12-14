@@ -11,7 +11,6 @@ Global:
   labe_list:
   - foreground
 
-  # inference engine config
   use_gpu: True
   enable_mkldnn: True
   cpu_num_threads: 10
@@ -36,7 +35,6 @@ DetPreProcess:
 
 DetPostProcess: {}
 
-
 RecPreProcess:
   transform_ops:
     - ResizeImage:
@@ -52,6 +50,14 @@ RecPostProcess: null
 
 # indexing engine config
 IndexProcess:
-    index_dir: "./recognition_demo_data_v1.1/gallery_vehicle/index/"
-    return_k: 5
-    score_thres: 0.5
+  index_method: "HNSW32" # supported: HNSW32, IVF, Flat
+  index_dir: "./recognition_demo_data_v1.1/gallery_vehicle/index/"
+  image_root: "./recognition_demo_data_v1.1/gallery_vehicle/"
+  data_file:  "./recognition_demo_data_v1.1/gallery_vehicle/data_file.txt"
+  index_operation: "new" # suported: "append", "remove", "new"
+  delimiter: "\t"
+  dist_type: "IP"
+  embedding_size: 512
+  batch_size: 32
+  return_k: 5
+  score_thres: 0.5

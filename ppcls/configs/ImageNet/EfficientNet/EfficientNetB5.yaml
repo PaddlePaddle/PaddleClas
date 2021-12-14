@@ -110,7 +110,7 @@ Infer:
         to_rgb: True
         channel_first: False
     - ResizeImage:
-        resize_short: 448
+        resize_short: 488
     - CropImage:
         size: 456
     - NormalizeImage:
