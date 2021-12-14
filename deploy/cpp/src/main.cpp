@@ -103,7 +103,8 @@ int main(int argc, char **argv) {
     std::cout << "Current total inferen time cost: " << infer_time << " ms."
               << std::endl;
     for (int i = 0; i < max_len; ++i) {
-      printf("\tTop%d: score: %.4f, ", i + 1, out_data[result_index[i]]);
+      printf("\tTop%d: class_id: %d, score: %.4f, ", i + 1, result_index[i],
+             out_data[result_index[i]]);
       if (label_output_equal_flag)
         printf("label: %s\n", config.id_map[result_index[i]].c_str());
     }
