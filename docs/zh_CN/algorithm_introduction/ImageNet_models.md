@@ -62,7 +62,7 @@
 x
 ### 2.1 服务器端知识蒸馏模型
 
-| 模型                  | Top-1 Acc | Reference<br>Top-1 Acc | Acc gain | time(ms)<br>bs=1 | time(ms)<br>bs=4 | time(ms)<br/>bs=8 | FLOPs(G) | Params(M) | <span style="white-space:nowrap;">预训练模型<br/>下载地址&emsp;</span> | <span style="white-space:nowrap;">inference模型<br/>下载地址&emsp;</span> |
+| 模型                  | Top-1 Acc | Reference<br>Top-1 Acc | Acc gain | time(ms)<br>bs=1 | time(ms)<br>bs=4 | time(ms)<br/>bs=8 | FLOPs(G) | Params(M) | <span style="white-space:nowrap;">预训练模型下载地址&emsp;</span> | <span style="white-space:nowrap;">inference模型下载地址&emsp;</span> |
 |---------------------|-----------|-----------|---------------|----------------|-----------|----------|-----------|-----------------------------------|-----------------------------------|-----------------------------------|
 | ResNet34_vd_ssld         | 0.797    | 0.760  | 0.037  | 2.00             | 3.26             | 5.85         | 3.93     | 21.84     | <span style="white-space:nowrap;">[下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/ResNet34_vd_ssld_pretrained.pdparams)&emsp;&emsp;</span> | <span style="white-space:nowrap;">[下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/ResNet34_vd_ssld.tar)&emsp;&emsp;</span> |
 | ResNet50_vd_ssld | 0.830    | 0.792    | 0.039 | 2.59             | 4.87             | 7.62         | 4.35     | 25.63     | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/ResNet50_vd_ssld_pretrained.pdparams) | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/ResNet50_vd_ssld_infer.tar) |
