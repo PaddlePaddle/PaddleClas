@@ -27,6 +27,7 @@
    ```
 
 <<<<<<< HEAD
+<<<<<<< HEAD
    5.2 添加markdown支持和markdown表格支持
 
    首先需要安装recommonmark和sphinx_markdown_tables
@@ -36,12 +37,19 @@
    pip install sphinx_markdown_tables
 =======
    5.2 添加markdown支持
+=======
+   5.2 添加markdown支持和markdown表格支持
+>>>>>>> d1322021 (modify doc)
 
-   首先需要安装recommonmark
+   首先需要安装recommonmark和sphinx_markdown_tables
 
    ```shell
    pip install recommonmark
+<<<<<<< HEAD
 >>>>>>> 1d9a33e1 (add read the doc)
+=======
+   pip install sphinx_markdown_tables
+>>>>>>> d1322021 (modify doc)
    ```
 
    在source/conf.py中更改或添加如下代码
@@ -53,12 +61,18 @@
    }
    source_suffix = ['.rst', '.md']
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> d1322021 (modify doc)
    extensions = [
         'recommonmark',
         'sphinx_markdown_tables'
     ]
+<<<<<<< HEAD
 =======
 >>>>>>> 1d9a33e1 (add read the doc)
+=======
+>>>>>>> d1322021 (modify doc)
    ```
 
    以上五步具体效果可以参考https://www.jianshu.com/p/d1d59d0cd58c
