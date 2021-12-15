@@ -4,5 +4,9 @@
 .. toctree::
    :maxdepth: 2
 
-   function_intro.md
-   more_demo/index
+   cartoon.md
+   logo.md
+   more_demo.md
+   product.md
+   vehicle.md
+
