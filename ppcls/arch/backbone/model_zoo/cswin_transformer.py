@@ -617,6 +617,3 @@ def CSWinTansformer_large_384(pretrained=False, use_ssld=False, **kwargs):
         use_ssld=use_ssld)
     return model
 
-if __name__ == "__main__":
-    model = CSWinTansformer_tiny_224()
-    flops = paddle.flops(model, [1,3,224,224], print_detail=True)
