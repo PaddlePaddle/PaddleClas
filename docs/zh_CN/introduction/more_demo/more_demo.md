@@ -28,7 +28,7 @@
 <div align="center"> <img src="https://user-images.githubusercontent.com/12560511/140096767-e8f701eb-d0e8-4304-b031-e2bff8c199f3.jpeg" width = "400" /> </div>
 
 
-[更多效果图](../../images/recognition/more_demo_images/logo.md)
+[更多效果图](logo.md)
 
 
 - 车辆识别
