@@ -129,9 +129,9 @@ def windows2img(img_splits, h_split, w_split, img_h, img_w):
         img: tensor, original tensor
     """
     B = int(img_splits.shape[0] / (img_h / h_split * img_w / w_split))
-    img = img_splits.reshape([B, img_h // h_split, img_w // w_split, h_split, w_split, -1])
+    img = img_splits.reshape([B, img_h // h_split, img_w // w_split, h_split, w_split, img_splits.shape[-1]])
     img = img.transpose([0, 1, 3, 2, 4, 5]) #[B,img_h//h_split, h_split, img_w//w_split, w_split,C]
-    img = img.reshape([B, img_h, img_w, -1]) # [B, img_h, img_w, C]
+    img = img.reshape([B, img_h, img_w, img_splits.shape[-1]]) # [B, img_h, img_w, C]
     return img
 
 
@@ -312,9 +312,12 @@ class CSwinBlock(nn.Layer):
         h = x
         x = self.norm1(x)
         qkv = self.qkv(x).chunk(3, axis=-1) # qkv is a tuple of [q, k, v]
-        chunks = 2 if self.split_heads else 1
-        # qkv[0].shape = [B, H * W, embd_dim]
-        q, k, v = map(self.chunk_qkv, qkv, (chunks,) * 3) # map requries list/tuple inputs
+
+        if self.split_heads:
+            q, k, v = map(self.chunk_qkv, qkv, (2, 2, 2)) # map requries list/tuple inputs
+        else:
+            q, k, v = map(lambda x: [x], qkv)
+        
         if self.split_heads: # first 3 stages
             h_attn = self.attns[0](q[0], k[0], v[0])
             w_attn = self.attns[1](q[1], k[1], v[1])
@@ -614,3 +617,6 @@ def CSWinTansformer_large_384(pretrained=False, use_ssld=False, **kwargs):
         use_ssld=use_ssld)
     return model
 
+if __name__ == "__main__":
+    model = CSWinTansformer_tiny_224()
+    flops = paddle.flops(model, [1,3,224,224], print_detail=True)
