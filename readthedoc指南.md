@@ -26,6 +26,7 @@
    html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
    ```
 
+<<<<<<< HEAD
    5.2 添加markdown支持和markdown表格支持
 
    首先需要安装recommonmark和sphinx_markdown_tables
@@ -33,6 +34,14 @@
    ```shell
    pip install recommonmark
    pip install sphinx_markdown_tables
+=======
+   5.2 添加markdown支持
+
+   首先需要安装recommonmark
+
+   ```shell
+   pip install recommonmark
+>>>>>>> 1d9a33e1 (add read the doc)
    ```
 
    在source/conf.py中更改或添加如下代码
@@ -43,10 +52,13 @@
        '.md': CommonMarkParser,
    }
    source_suffix = ['.rst', '.md']
+<<<<<<< HEAD
    extensions = [
         'recommonmark',
         'sphinx_markdown_tables'
     ]
+=======
+>>>>>>> 1d9a33e1 (add read the doc)
    ```
 
    以上五步具体效果可以参考https://www.jianshu.com/p/d1d59d0cd58c
