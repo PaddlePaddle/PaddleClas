@@ -128,7 +128,7 @@ def windows2img(img_splits, h_split, w_split, img_h, img_w):
     Returns:
         img: tensor, original tensor
     """
-    B = int(img_splits.shape[0] / (img_h / h_split * img_w / w_split))
+    B = paddle.cast(img_splits.shape[0] / (img_h / h_split * img_w / w_split), "int32")
     img = img_splits.reshape([B, img_h // h_split, img_w // w_split, h_split, w_split, img_splits.shape[-1]])
     img = img.transpose([0, 1, 3, 2, 4, 5]) #[B,img_h//h_split, h_split, img_w//w_split, w_split,C]
     img = img.reshape([B, img_h, img_w, img_splits.shape[-1]]) # [B, img_h, img_w, C]
