@@ -27,8 +27,8 @@ def file_name(file_dir):
     for dir in temp:
        for root, dirs, files in os.walk(dir):
         print(root) #当前目录路径
-        
-        files.remove('index.rst')
+        if 'index.rst' in files:
+            files.remove('index.rst')
         print(files) #当前路径下所有非目录子文件
         curDir = os.path.join(file_dir, dir)
         filename = curDir + '/index.rst'
@@ -61,5 +61,5 @@ def readfile(filename):
 
 
 file_name('./')
-# filename = './index.rst'
-# readfile(filename)
+#filename = './index.rst'
+#readfile(filename)

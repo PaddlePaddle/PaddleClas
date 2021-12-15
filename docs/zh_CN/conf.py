@@ -1,6 +1,4 @@
 # Configuration file for the Sphinx documentation builder.
-from recommonmark.parser import CommonMarkParser
-import sphinx_rtd_theme
 #
 # This file only contains a selection of the most common options. For a full
 # list see the documentation:
@@ -15,16 +13,27 @@ import sphinx_rtd_theme
 # import os
 # import sys
 # sys.path.insert(0, os.path.abspath('.'))
-extensions = ['recommonmark']
-
+import sphinx_rtd_theme
+import sphinx_markdown_tables
+import recommonmark
+html_theme = "sphinx_rtd_theme"
+html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
+from recommonmark.parser import CommonMarkParser
 # -- Project information -----------------------------------------------------
-
+source_parsers = {
+    '.md': CommonMarkParser,
+}
+source_suffix = ['.rst', '.md']
+extensions = [
+     'recommonmark',
+     'sphinx_markdown_tables'
+ ]
 project = 'paddleclas'
 copyright = '2021, paddleclas'
 author = 'paddleclas'
 
 # The full version, including alpha/beta/rc tags
-release = '2.3'
+release = '2.3.0'
 
 
 # -- General configuration ---------------------------------------------------
@@ -32,7 +41,6 @@ release = '2.3'
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
-extensions = ['recommonmark']
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -43,14 +51,11 @@ templates_path = ['_templates']
 # This is also used if you do content translation via gettext catalogs.
 # Usually you set "language" from the command line for these cases.
 language = 'zh_CN'
-source_parsers = {
-    '.md': CommonMarkParser,
-}
-source_suffix = ['.rst', '.md']
+
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
 # This pattern also affects html_static_path and html_extra_path.
-exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
+exclude_patterns = []
 
 
 # -- Options for HTML output -------------------------------------------------
@@ -58,7 +63,6 @@ exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = 'sphinx_rtd_theme'
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,

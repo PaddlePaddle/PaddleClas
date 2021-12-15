@@ -10,7 +10,6 @@
    VisualDL.md
    versions.md
    update_history.md
-   more_demo.md
    train_on_xpu.md
    transfer_learning.md
    train_with_DALI.md
