@@ -1,12 +1,19 @@
 # RepVGG series
+---
+## Catalogue
 
-## Overview
+* [1. Overview](#1)
+* [2. Accuracy, FLOPs and Parameters](#2)
+
+<a name='1'></a>
+## 1. Overview
 
 RepVGG (Making VGG-style ConvNets Great Again) series model is a simple but powerful convolutional neural network architecture proposed by Tsinghua University (Guiguang Ding's team), MEGVII Technology (Jian Sun et al.), HKUST and Aberystwyth University in 2021. The architecture has an inference time agent similar to VGG. The main body is composed of 3x3 convolution and relu stack, while the training time model has multi branch topology. The decoupling of training time and inference time is realized by re-parameterization technology, so the model is called repvgg. [paper](https://arxiv.org/abs/2101.03697).
 
-## Accuracy, FLOPS and Parameters
+<a name='2'></a>
+## 2. Accuracy, FLOPs and Parameters
 
-| Models | Top1 | Top5 | Reference<br>top1| FLOPS<br>(G) |
+| Models | Top1 | Top5 | Reference<br>top1| FLOPs<br>(G) |
 |:--:|:--:|:--:|:--:|:--:|
 | RepVGG_A0 | 0.7131 | 0.9016 | 0.7241 |     |
 | RepVGG_A1 | 0.7380 | 0.9146 | 0.7446 |     |

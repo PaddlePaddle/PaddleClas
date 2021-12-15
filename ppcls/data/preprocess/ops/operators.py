@@ -1,4 +1,3 @@
-"""
 # Copyright (c) 2021 PaddlePaddle Authors. All Rights Reserved
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,7 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""
 
 from __future__ import absolute_import
 from __future__ import division
@@ -354,7 +352,7 @@ class AugMix(object):
             np.random.beta(self.aug_prob_coeff, self.aug_prob_coeff))
 
         # image = Image.fromarray(image)
-        mix = np.zeros([image.shape[1], image.shape[0], 3])
+        mix = np.zeros(image.shape)
         for i in range(self.mixture_width):
             image_aug = image.copy()
             image_aug = Image.fromarray(image_aug)

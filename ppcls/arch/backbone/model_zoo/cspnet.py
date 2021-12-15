@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# Code was heavily based on https://github.com/rwightman/pytorch-image-models
+
 import paddle
 import paddle.nn as nn
 import paddle.nn.functional as F

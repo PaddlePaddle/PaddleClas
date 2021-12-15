@@ -2,13 +2,6 @@ Global:
   infer_imgs: "./images/wangzai.jpg"
   rec_inference_model_dir: "./models/product_ResNet50_vd_aliproduct_v1.0_infer"
   batch_size: 1
-  image_shape: [3, 640, 640]
-  threshold: 0.5
-  max_det_results: 1
-  labe_list:
-  - foreground
-
-  # inference engine config
   use_gpu: False
   enable_mkldnn: True
   cpu_num_threads: 10
