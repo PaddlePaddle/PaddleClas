@@ -4,6 +4,7 @@
 
 * [1. 概述](#1)
 * [2. 精度、FLOPS 和参数量](#2)
+* [3. 基于V100 GPU 的预测速度](#3)
 
 <a name='1'></a>
 
@@ -41,3 +42,29 @@ DeiT（Data-efficient Image Transformers）系列模型是由 FaceBook 在 2020 
 | DeiT_base_distilled_patch16_384  | 0.851 | 0.973 | 0.852 | 0.972 |      |      |
 
 关于 Params、FLOPs、Inference speed 等信息，敬请期待。
+
+<a name='3'></a>
+
+## 3. 基于 V100 GPU 的预测速度
+
+| Models                     | Crop Size | Resize Short Size | FP32<br/>Batch Size=1<br/>(ms) | FP32<br/>Batch Size=4<br/>(ms) | FP32<br/>Batch Size=8<br/>(ms) |
+| -------------------------- | --------- | ----------------- | ------------------------------ | ------------------------------ | ------------------------------ |
+| ViT_small_<br/>patch16_224 | 256       | 224               | 3.71                           | 9.05                           | 16.72                          |
+| ViT_base_<br/>patch16_224  | 256       | 224               | 6.12                           | 14.84                          | 28.51                          |
+| ViT_base_<br/>patch16_384  | 384       | 384               | 14.15                          | 48.38                          | 95.06                          |
+| ViT_base_<br/>patch32_384  | 384       | 384               | 4.94                           | 13.43                          | 24.08                          |
+| ViT_large_<br/>patch16_224 | 256       | 224               | 15.53                          | 49.50                          | 94.09                          |
+| ViT_large_<br/>patch16_384 | 384       | 384               | 39.51                          | 152.46                         | 304.06                         |
+| ViT_large_<br/>patch32_384 | 384       | 384               | 11.44                          | 36.09                          | 70.63                          |
+
+| Models                               | Crop Size | Resize Short Size | FP32<br/>Batch Size=1<br/>(ms) | FP32<br/>Batch Size=4<br/>(ms) | FP32<br/>Batch Size=8<br/>(ms) |
+| ------------------------------------ | --------- | ----------------- | ------------------------------ | ------------------------------ | ------------------------------ |
+| DeiT_tiny_<br>patch16_224            | 256       | 224               | 3.61                           | 3.94                           | 6.10                           |
+| DeiT_small_<br>patch16_224           | 256       | 224               | 3.61                           | 6.24                           | 10.49                          |
+| DeiT_base_<br>patch16_224            | 256       | 224               | 6.13                           | 14.87                          | 28.50                          |
+| DeiT_base_<br>patch16_384            | 384       | 384               | 14.12                          | 48.80                          | 97.60                          |
+| DeiT_tiny_<br>distilled_patch16_224  | 256       | 224               | 3.51                           | 4.05                           | 6.03                           |
+| DeiT_small_<br>distilled_patch16_224 | 256       | 224               | 3.70                           | 6.20                           | 10.53                          |
+| DeiT_base_<br>distilled_patch16_224  | 256       | 224               | 6.17                           | 14.94                          | 28.58                          |
+| DeiT_base_<br>distilled_patch16_384  | 384       | 384               | 14.12                          | 48.76                          | 97.09                          |
+
