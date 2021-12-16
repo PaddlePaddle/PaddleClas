@@ -23,11 +23,17 @@ python tools/infer/predict.py \
     --batch_size=1
 ```
 
-![](../../images/models/V100_benchmark/v100.fp32.bs1.main_fps_top1_s.png)
+<div align="center">
+    <img src="../../images/models/V100_benchmark/v100.fp32.bs1.main_fps_top1_s.png" width="800">
+</div>
 
-![](../../images/models/mobile_arm_top1.png)
+<div align="center">
+    <img src="../../images/models/mobile_arm_top1.png" width="800">
+</div>
 
-![](../../images/models/V100_benchmark/v100.fp32.bs1.visiontransformer.png)
+<div align="center">
+    <img src="../../images/models/V100_benchmark/v100.fp32.bs1.visiontransformer.png" width="800">
+</div>
 
 > If you think this document is helpful to you, welcome to give a star to our project:[https://github.com/PaddlePaddle/PaddleClas](https://github.com/PaddlePaddle/PaddleClas)
 
