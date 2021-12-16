@@ -8,17 +8,21 @@ Based on the ImageNet-1k classification dataset, the 35 classification network s
 
 Curves of accuracy to the inference time of common server-side models are shown as follows.
 
-![](../../images/models/V100_benchmark/v100.fp32.bs1.main_fps_top1_s.png)
+<div align="center">
+    <img src="../../images/models/V100_benchmark/v100.fp32.bs1.main_fps_top1_s.png" width="800">
+</div>
 
-Curves of accuracy to the inference time and storage size of common mobile-side models are shown as follows.
+Curves of accuracy to the inference time of common mobile-side models are shown as follows.
 
-![](../../images/models/mobile_arm_storage.png)
-
-![](../../images/models/mobile_arm_top1.png)
+<div align="center">
+    <img src="../../images/models/mobile_arm_top1.png" width="800">
+</div>
 
 Curves of accuracy to the inference time of some VisionTransformer models are shown as follows.
 
-![](../../images/models/V100_benchmark/v100.fp32.bs1.visiontransformer.png)
+<div align="center">
+    <img src="../../images/models/V100_benchmark/v100.fp32.bs1.visiontransformer.png" width="800">
+</div>
 
 <a name="SSLD_pretrained_series"></a>
 ### SSLD pretrained models
