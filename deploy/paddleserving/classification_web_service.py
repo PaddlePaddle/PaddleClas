@@ -49,7 +49,7 @@ class ImagenetOp(Op):
         input_imgs = np.concatenate(imgs, axis=0)
         return {"inputs": input_imgs}, False, None, ""
 
-    def postprocess(self, input_dicts, fetch_dict, log_id):
+    def postprocess(self, input_dicts, fetch_dict, data_id, log_id):
         score_list = fetch_dict["prediction"]
         result = {"label": [], "prob": []}
         for score in score_list:
