@@ -15,12 +15,11 @@ Global:
   save_inference_dir: ./inference
   # training model under @to_static
   to_static: False
-  use_dali: True
 
 # model architecture
 Arch:
   name: MobileNetV1
-  class_num: 100
+  class_num: 1000
  
 # loss function config for traing/eval process
 Loss:
@@ -68,8 +67,8 @@ DataLoader:
 
     sampler:
       name: MultiScaleSamplerDDP
-      scales: [224, 256]
-      first_bs: 4
+      scales: [160, 192, 256, 288, 320]
+      first_bs: 64
       is_training: True
 
     loader:
