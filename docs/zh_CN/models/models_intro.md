@@ -16,17 +16,16 @@
  <a name='2'></a>
 
 ## 2. 评估环境
-* CPU 的评估环境基于骁龙 855（SD855）。
+* Arm 的评估环境基于骁龙 855（SD855）。
 * Intel CPU 的评估环境基于 Intel(R) Xeon(R) Gold 6148。
 * GPU 评估环境基于 V100 和 TensorRT。
 
 
-![](../../images/models/T4_benchmark/t4.fp32.bs4.main_fps_top1.png)
-
-![](../../images/models/V100_benchmark/v100.fp32.bs1.main_fps_top1_s.jpg)
+![](../../images/models/V100_benchmark/v100.fp32.bs1.main_fps_top1_s.png)
 
 ![](../../images/models/mobile_arm_top1.png)
 
+![](../../images/models/V100_benchmark/v100.fp32.bs1.visiontransformer.png)
 
 > 如果您觉得此文档对您有帮助，欢迎 star 我们的项目：[https://github.com/PaddlePaddle/PaddleClas](https://github.com/PaddlePaddle/PaddleClas)
 
