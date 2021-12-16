@@ -16,4 +16,3 @@
    advanced_tutorials/index
    others/index
    faq_series/index
-
