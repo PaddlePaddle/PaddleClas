@@ -44,7 +44,7 @@ Optimizer:
   one_dim_param_no_weight_decay: True
   lr:
     name: Cosine
-    learning_rate: 1e-3
+    learning_rate: 5e-4
     eta_min: 1e-5
     warmup_epoch: 20
     warmup_start_lr: 1e-6
