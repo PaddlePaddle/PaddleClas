@@ -95,7 +95,7 @@ class Attention(nn.Layer):
                  sr_ratio=1,
                  linear=False):
         super().__init__()
-        assert dim % num_heads == 0, f"dim {dim} should be divided by num_heads {num_heads}."
+        assert dim % num_heads == 0
 
         self.dim = dim
         self.num_heads = num_heads
@@ -195,7 +195,6 @@ class Block(nn.Layer):
             proj_drop=drop,
             sr_ratio=sr_ratio,
             linear=linear)
-        # NOTE: drop path for stochastic depth, we shall see if this is better than dropout here
         self.drop_path = DropPath(drop_path) if drop_path > 0. else Identity()
         self.norm2 = norm_layer(dim)
         mlp_hidden_dim = int(dim * mlp_ratio)
