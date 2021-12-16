@@ -5,7 +5,7 @@
 Based on the ImageNet1k classification dataset, the 29 classification network structures supported by PaddleClas and the corresponding 134 image classification pretrained models are shown below. Training trick, a brief introduction to each series of network structures, and performance evaluation will be shown in the corresponding chapters.
 
 ## Evaluation environment
-* CPU evaluation environment is based on Snapdragon 855 (SD855).
+* Arm evaluation environment is based on Snapdragon 855 (SD855).
 * The GPU evaluation environment is based on V100 and TensorRT, and the evaluation script is as follows.
 
 ```shell
@@ -23,12 +23,11 @@ python tools/infer/predict.py \
     --batch_size=1
 ```
 
-![](../../images/models/T4_benchmark/t4.fp32.bs4.main_fps_top1.png)
-
-![](../../images/models/V100_benchmark/v100.fp32.bs1.main_fps_top1_s.jpg)
+![](../../images/models/V100_benchmark/v100.fp32.bs1.main_fps_top1_s.png)
 
 ![](../../images/models/mobile_arm_top1.png)
 
+![](../../images/models/V100_benchmark/v100.fp32.bs1.visiontransformer.png)
 
 > If you think this document is helpful to you, welcome to give a star to our project:[https://github.com/PaddlePaddle/PaddleClas](https://github.com/PaddlePaddle/PaddleClas)
 
