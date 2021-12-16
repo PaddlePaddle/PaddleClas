@@ -119,7 +119,7 @@ classification_web_service.py    # 启动pipeline服务端的脚本
 python3 classification_web_service.py &>log.txt &
 ```
 成功启动服务后，log.txt 中会打印类似如下日志
-![](https://github.com/Intsigstephon/PaddleClas/tree/release/2.3/deploy/paddleserving/imgs/start_server.png)
+![](../../../deploy/paddleserving/imgs/start_server.png)
 
 - 发送请求：
 ```shell
@@ -127,7 +127,7 @@ python3 classification_web_service.py &>log.txt &
 python3 pipeline_http_client.py
 ```
 成功运行后，模型预测的结果会打印在 cmd 窗口中，结果示例为：
-![](https://github.com/Intsigstephon/PaddleClas/tree/release/2.3/deploy/paddleserving/imgs/results.png)
+![](../../../deploy/paddleserving/imgs/results.png)
 
 <a name="4"></a>
 ## 4.图像识别服务部署
@@ -213,14 +213,14 @@ recognition_web_service.py    # 启动pipeline服务端的脚本
 python3 recognition_web_service.py &>log.txt &
 ```
 成功启动服务后，log.txt 中会打印类似如下日志
-![](https://github.com/Intsigstephon/PaddleClas/tree/release/2.3/deploy/paddleserving/imgs/start_server_shitu.png)
+![](../../../deploy/paddleserving/imgs/start_server_shitu.png)
 
 - 发送请求：
 ```
 python3 pipeline_http_client.py
 ```
 成功运行后，模型预测的结果会打印在 cmd 窗口中，结果示例为：
-![](https://github.com/Intsigstephon/PaddleClas/tree/release/2.3/deploy/paddleserving/imgs/results_shitu.png)
+![](../../../deploy/paddleserving/imgs/results_shitu.png)
 
 <a name="5"></a>
 ## 5.FAQ
