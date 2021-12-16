@@ -44,17 +44,21 @@
 
 常见服务器端模型的精度指标与其预测耗时的变化曲线如下图所示。
 
-![](../../images/models/V100_benchmark/v100.fp32.bs1.main_fps_top1_s.png)
+<div align="center">
+    <img src="../../images/models/V100_benchmark/v100.fp32.bs1.main_fps_top1_s.png" width="800">
+</div>
 
-常见移动端模型的精度指标与其预测耗时、模型存储大小的变化曲线如下图所示。
+常见移动端模型的精度指标与其预测耗时的变化曲线如下图所示。
 
-![](../../images/models/mobile_arm_storage.png)
-
-![](../../images/models/mobile_arm_top1.png)
+<div align="center">
+    <img src="../../images/models/mobile_arm_top1.png" width="800">
+</div>
 
 部分VisionTransformer模型的精度指标与其预测耗时的变化曲线如下图所示。
 
-![](../../images/models/V100_benchmark/v100.fp32.bs1.visiontransformer.png)
+<div align="center">
+    <img src="../../images/models/V100_benchmark/v100.fp32.bs1.visiontransformer.png" width="800">
+</div>
 
 <a name="2"></a>
 
