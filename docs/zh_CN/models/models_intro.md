@@ -20,11 +20,9 @@
 * Intel CPU 的评估环境基于 Intel(R) Xeon(R) Gold 6148。
 * GPU 评估环境基于 V100 和 TensorRT。
 
-<img src="../../images/models/V100_benchmark/v100.fp32.bs1.main_fps_top1_s.png" width="800">
+![](../../images/models/V100_benchmark/v100.fp32.bs1.main_fps_top1_s.png)
 
-<img src="../../images/models/mobile_arm_top1.png" width="800">
-
-<img src="../../images/models/V100_benchmark/v100.fp32.bs1.visiontransformer.png" width="800">
+![](../../images/models/V100_benchmark/v100.fp32.bs1.visiontransformer.png)
 
 > 如果您觉得此文档对您有帮助，欢迎 star 我们的项目：[https://github.com/PaddlePaddle/PaddleClas](https://github.com/PaddlePaddle/PaddleClas)
 

@@ -29,14 +29,13 @@
 ## 2. 介绍
 
 近年来，有很多轻量级的骨干网络问世，尤其最近两年，各种 NAS 搜索出的网络层出不穷，这些网络要么主打 FLOPs 或者 Params 上的优势，要么主打 ARM 设备上的推理速度的优势，很少有网络专门针对 Intel CPU 做特定的优化，导致这些网络在 Intel CPU 端的推理速度并不是很完美。基于此，我们针对 Intel CPU 设备以及其加速库 MKLDNN 设计了特定的骨干网络 PP-LCNet，比起其他的轻量级的 SOTA 模型，该骨干网络可以在不增加推理时间的情况下，进一步提升模型的性能，最终大幅度超越现有的 SOTA 模型。与其他模型的对比图如下。
-<img src="../../images/PP-LCNet/PP-LCNet-Acc.png" width="500" height="400"/>
+![](../../images/PP-LCNet/PP-LCNet-Acc.png)
 
 <a name="3"></a>
 ## 3. 方法
 
 网络结构整体如下图所示。
-<img src="../../images/PP-LCNet/PP-LCNet.png" width="700" height="400"/>
-
+![](../../images/PP-LCNet/PP-LCNet.png)
 我们经过大量的实验发现，在基于 Intel CPU 设备上，尤其当启用 MKLDNN 加速库后，很多看似不太耗时的操作反而会增加延时，比如 elementwise-add 操作、split-concat 结构等。所以最终我们选用了结构尽可能精简、速度尽可能快的 block 组成我们的 BaseNet（类似 MobileNetV1）。基于 BaseNet，我们通过实验，总结了四条几乎不增加延时但是可以提升模型精度的方法，融合这四条策略，我们组合成了 PP-LCNet。下面对这四条策略一一介绍：
 
 <a name="3.1"></a>

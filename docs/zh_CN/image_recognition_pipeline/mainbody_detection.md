@@ -134,7 +134,7 @@ pip install -r requirements.txt
 
 我们使用 `configs/ppyolo/ppyolov2_r50vd_dcn_365e_coco.yml` 配置进行训练，配置文件摘要如下：
 
-<img src='../../images/det/PaddleDetection_config.png' width='400'/>
+![](../../images/det/PaddleDetection_config.png)
 
 从上图看到 `ppyolov2_r50vd_dcn_365e_coco.yml` 配置需要依赖其他的配置文件，这些配置文件的含义如下:
 

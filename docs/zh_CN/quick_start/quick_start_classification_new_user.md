@@ -78,7 +78,7 @@ unzip flowers102.zip
 
 flowers102数据集的图像文件存放在 `dataset/flowers102/jpg` 目录中，图像示例如下：
 
-<img src="../../images/quick_start/Examples-Flower-102.png" width = "800" />
+![](../../images/quick_start/Examples-Flower-102.png)
 
 返回 `PaddleClas` 根目录：
 
@@ -151,7 +151,7 @@ python tools/train.py -c ./ppcls/configs/quick_start/ResNet50_vd.yaml
 
 训练完成后，验证集的`Top1 Acc`曲线如下所示，最高准确率为0.2735。训练精度曲线下图所示
 
-<img src="../../images/quick_start/r50_vd_acc.png"  width = "800" />
+![](../../images/quick_start/r50_vd_acc.png)
 
 <a name='4.2.2'></a>
 
@@ -167,7 +167,7 @@ python tools/train.py -c ./ppcls/configs/quick_start/ResNet50_vd.yaml -o Arch.pr
 
 验证集的 `Top1 Acc` 曲线如下所示，最高准确率为 `0.9402`，加载预训练模型之后，flowers102 数据集精度大幅提升，绝对精度涨幅超过 65%。
 
-<img src="../../images/quick_start/r50_vd_pretrained_acc.png"  width = "800" />
+![](../../images/quick_start/r50_vd_pretrained_acc.png)
 
 <a name='5'></a>
 

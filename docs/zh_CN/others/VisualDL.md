@@ -51,4 +51,4 @@ python3 tools/train.py -c config.yaml
 
 在启动 VisualDL 后，即可在浏览器中查看训练过程，输入地址 `127.0.0.1:8840`：
 
-<img src="../../images/VisualDL/train_loss.png" width="400">
+![](../../images/VisualDL/train_loss.png)

@@ -9,7 +9,7 @@
 
 值得注意的是，为了更好是适配性，目前版本，`PaddleClas` 中暂时**只使用 CPU 进行向量检索**。
 
-<img src="../../images/structure.jpg"  width = "800" />
+![](../../images/structure.jpg)
 
 如上图中所示，向量检索部分，在整个 `PP-ShiTu` 系统中有两部分内容
 
