@@ -270,9 +270,7 @@ export LD_LIBRARY_PATH=/data/local/tmp/debug:$LD_LIBRARY_PATH
 
 运行效果如下：
 
-<div align="center">
-    <img src="../../images/inference_deployment/lite_demo_result.png" width="600">
-</div>
+<img src="../../images/inference_deployment/lite_demo_result.png" width="600">
 
 <a name="3"></a>
 ## 3. FAQ

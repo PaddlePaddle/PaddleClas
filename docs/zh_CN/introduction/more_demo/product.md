@@ -1,4 +1,4 @@
-# 更多关于商品图片识别的效果图请见下
+## 商品图片识别效果图
 
 <div align="center"> <img src="https://user-images.githubusercontent.com/12560511/140277277-7b29f596-35f6-4f00-8d2b-0ef0be57a090.jpg" width = "400" /> </div>
 

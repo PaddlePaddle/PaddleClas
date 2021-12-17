@@ -161,9 +161,7 @@ python3.7 python/predict_system.py -c configs/inference_general.yaml -o Global.u
 
 待检索图像如下所示。
 
-<div align="center">
 <img src="../../images/recognition/drink_data_demo/test_images/nongfu_spring.jpeg"  width = "400" />
-</div>
 
 
 最终输出结果如下。
@@ -176,9 +174,7 @@ python3.7 python/predict_system.py -c configs/inference_general.yaml -o Global.u
 
 检测的可视化结果也保存在 `output` 文件夹下，对于本张图像，识别结果可视化如下所示。
 
-<div align="center">
 <img src="../../images/recognition/drink_data_demo/output/nongfu_spring.jpeg"  width = "400" />
-</div>
 
 
 <a name="基于文件夹的批量识别"></a>
@@ -227,9 +223,7 @@ python3.7 python/predict_system.py -c configs/inference_general.yaml -o Global.i
 
 待检索图像如下所示。
 
-<div align="center">
 <img src="../../images/recognition/drink_data_demo/test_images/mosilian.jpeg"  width = "400" />
-</div>
 
 
 输出结果为空。
@@ -280,9 +274,7 @@ python3.7 python/predict_system.py -c configs/inference_general.yaml -o Global.i
 
 最终识别结果为`光明_莫斯利安`，识别正确，识别结果可视化如下所示。
 
-<div align="center">
 <img src="../../images/recognition/drink_data_demo/output/mosilian.jpeg"  width = "400" />
-</div>
 
 
 <a name="4"></a>

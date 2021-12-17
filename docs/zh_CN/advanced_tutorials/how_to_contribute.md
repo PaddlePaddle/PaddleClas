@@ -48,9 +48,7 @@ PaddleClas 欢迎大家向 repo 中积极贡献代码，下面给出一些贡献
 * 跳转到 [PaddleClas GitHub 首页](https://github.com/PaddlePaddle/PaddleClas)，然后单击 Fork 按钮，生成自己目录下的仓库，比如 `https://github.com/USERNAME/PaddleClas` 。
 
 
-<div align="center">
 <img src="../../images/quick_start/community/001_fork.png"  width = "600" />
-</div>
 
 
 * 将远程仓库 clone 到本地
@@ -63,9 +61,7 @@ cd PaddleClas
 
 clone 的地址可以从下面获取
 
-<div align="center">
 <img src="../../images/quick_start/community/002_clone.png"  width = "600" />
-</div>
 
 <a name="1.2.2"></a>
 #### 1.2.2 和远程仓库建立连接
@@ -150,9 +146,7 @@ pre-commit
 
 重复上述步骤，直到 pre-comit 格式检查不报错。如下所示。
 
-<div align="center">
 <img src="../../images/quick_start/community/003_precommit_pass.png"  width = "600" />
-</div>
 
 
 使用下面的命令完成提交。
