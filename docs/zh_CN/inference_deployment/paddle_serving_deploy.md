@@ -97,9 +97,9 @@ feed_var {
 fetch_var {
   name: "save_infer_model/scale_0.tmp_1"
   alias_name: "prediction"
-  is_lod_tensor: true
+  is_lod_tensor: false
   fetch_type: 1
-  shape: -1
+  shape: 1000
 }
 ```
 <a name="3.2"></a>
@@ -169,9 +169,9 @@ feed_var {
 fetch_var {
   name: "save_infer_model/scale_0.tmp_1"
   alias_name: "features"
-  is_lod_tensor: true
+  is_lod_tensor: false
   fetch_type: 1
-  shape: -1
+  shape: 512
 }
 ```
 - 转换通用检测 inference 模型为 Serving 模型：
