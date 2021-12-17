@@ -64,11 +64,14 @@ DataLoader:
             mean: [0.485, 0.456, 0.406]
             std: [0.229, 0.224, 0.225]
             order: ''
-
+            
+    # support to specify width and height respectively:
+    # scales: [(160,160), (192,192), (256,256) (288,288) (320,320)]
     sampler:
       name: MultiScaleSamplerDDP
       scales: [160, 192, 256, 288, 320]
       first_bs: 64
+      down_sample: 32
       is_training: True
 
     loader:

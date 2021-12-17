@@ -26,25 +26,7 @@ from ppcls.data import preprocess
 from ppcls.data.preprocess import transform
 from ppcls.data.preprocess.ops.operators import DecodeImage
 from ppcls.utils import logger
-
-
-def create_operators(params):
-    """
-    create operators based on the config
-    Args:
-        params(list): a dict list, used to create some operators
-    """
-    assert isinstance(params, list), ('operator config should be a list')
-    ops = []
-    for operator in params:
-        assert isinstance(operator,
-                          dict) and len(operator) == 1, "yaml format error"
-        op_name = list(operator)[0]
-        param = {} if operator[op_name] is None else operator[op_name]
-        op = getattr(preprocess, op_name)(**param)
-        ops.append(op)
-
-    return ops
+from ppcls.data.dataloader.common_dataset import create_operators
 
 
 class MultiScaleDataset(Dataset):
@@ -56,9 +38,6 @@ class MultiScaleDataset(Dataset):
         self._img_root = image_root
         self._cls_path = cls_label_path
         self.transform_ops = transform_ops
-        # if transform_ops:
-        #     self._transform_ops = create_operators(transform_ops)
-
         self.images = []
         self.labels = []
         self._load_anno()
@@ -79,7 +58,6 @@ class MultiScaleDataset(Dataset):
                 self.labels.append(np.int64(l[1]))
                 assert os.path.exists(self.images[-1])
 
-
     def __getitem__(self, properties):
         # properites is a tuple, contains (width, height, index)
         img_width = properties[0]
@@ -89,11 +67,14 @@ class MultiScaleDataset(Dataset):
         if self.transform_ops:
             for i in range(len(self.transform_ops)):
                 op = self.transform_ops[i]
-                if 'RandCropImage' in op:
-                    warnings.warn("Multi scale dataset will crop image according to the multi scale resolution")
-                    self.transform_ops[i]['RandCropImage'] = {'size': img_width}
-                    has_crop = True
+                resize_op = ['RandCropImage', 'ResizeImage', 'CropImage']
+                for resize in resize_op:
+                    if resize in op:
+                        logger.error("Multi scale dataset will crop image according to the multi scale resolution")
+                        self.transform_ops[i][resize] = {'size': (img_height, img_width)}
+                        has_crop = True
         if has_crop == False:
+            logger.error("Multi scale dateset requests RandCropImage")
             raise RuntimeError("Multi scale dateset requests RandCropImage")
         self._transform_ops = create_operators(self.transform_ops)
 
