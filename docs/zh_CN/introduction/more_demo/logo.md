@@ -1,4 +1,4 @@
-# 更多关于商标图片识别的效果图请见下
+## 商标图片识别效果图
 
 <div align="center"> <img src="https://user-images.githubusercontent.com/12560511/140096687-5b562e2d-0653-4be6-861d-1936a4440df2.jpeg" width = "400" /> </div>
 

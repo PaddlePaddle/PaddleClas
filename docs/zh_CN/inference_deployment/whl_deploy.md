@@ -40,9 +40,7 @@ pip3 install dist/*
 ## 2. 快速开始
 * 使用 `ResNet50` 模型，以下图（`PaddleClas/docs/images/inference_deployment/whl_demo.jpg`）为例进行说明。
 
-<div align="center">
 <img src="../../images/inference_deployment/whl_demo.jpg"  width = "400" />
-</div>
 
 
 * 在 Python 代码中使用

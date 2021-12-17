@@ -1,4 +1,4 @@
-# 更多关于车辆图片识别的效果图请见下
+## 车辆图片识别效果图
 
 <div align="center"> <img src="https://user-images.githubusercontent.com/12560511/140243899-c60f0a51-db9b-438a-9f2d-0d2893c200bb.jpeg" width = "400" /> </div>
 

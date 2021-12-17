@@ -19,24 +19,18 @@
 
 **PACT 量化（PArameterized Clipping acTivation**是一种新的量化方法，该方法通过在量化激活值之前去掉一些离群点，将模型量化带来的精度损失降到最低，甚至比原模型准确率更高。提出方法的背景是作者发现：“在运用权重量化方案来量化 activation 时，激活值的量化结果和全精度结果相差较大”。作者发现，activation 的量化可能引起的误差很大(相较于 weight 基本在 0 到 1 范围内，activation 的值的范围是无限大的，这是 RELU 的结果)，所以提出**截断式 RELU** 的激活函数。该截断的上界，即$α$ 是可学习的参数，这保证了每层能够通过训练学习到不一样的量化范围，最大程度降低量化带来的舍入误差。其中量化的示意图如下图所示，**PACT** 解决问题的方法是，不断裁剪激活值范围，使得激活值分布收窄，从而降低量化映射损失。**PACT** 通过对激活数值做裁剪，从而减少激活分布中的离群点，使量化模型能够得到一个更合理的量化 scale，降低量化损失。
 
-<div align="center">
 <img src="../../images/algorithm_introduction/quantization.jpg"  width = "600" />
-</div>
 
 
 **PACT** 量化公式如下：
 
-<div align="center">
 <img src="../../images/algorithm_introduction/quantization_formula.png"  width = "800" height="100"/>
-</div>
 
 
 
 可以看出 PACT 思想是用上述量化代替 *ReLU* 函数，对大于零的部分进行一个截断操作，截断阈值为$a$。但是在*PaddleSlim*中对上述公式做了进一步的改进，其改进如下：
 
-<div align="center">
 <img src="../../images/algorithm_introduction/quantization_formula_slim.png"  width = "550" height="120"/>
-</div>
 
 
 
@@ -54,9 +48,7 @@
 
 基于此，**FPGM**利用层中 filter 的几何中心特性，由于那些靠近中心的 filter 可以被其它的表达，因而可以将其剔除，从而避免了上面提到的两点剪枝条件，从信息的冗余度出发，而不是选择范数少的进行剪枝。下图展示了 **FPGM** 方法与之前方法的不同，具体细节请详看[论文](https://openaccess.thecvf.com/content_CVPR_2019/papers/He_Filter_Pruning_via_Geometric_Median_for_Deep_Convolutional_Neural_Networks_CVPR_2019_paper.pdf)。
 
-<div align="center">
 <img src="../../images/algorithm_introduction/fpgm.png"  width = "600" />
-</div>
 
 
 
