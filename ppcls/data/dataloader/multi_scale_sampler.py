@@ -8,8 +8,16 @@ import numpy as np
 from ppcls import data
 
 class MultiScaleSamplerDDP(Sampler):
-    def __init__(self, data_source, scales, first_bs, g):
-        print(scales)
+    def __init__(self, data_source, scales, first_bs, divided_factor=32, is_training = True, seed=None):
+        """
+            multi scale samper
+            Args:
+                data_source(dataset)
+                scales(list): several scales for image resolution
+                first_bs(int): batch size for the first scale in scales
+                divided_factor(int): ImageNet models down-sample images by a factor, ensure that width and height dimensions are multiples are multiple of devided_factor.
+                is_training(boolean): mode 
+        """
         # min. and max. spatial dimensions
         self.data_source = data_source
         self.n_data_samples = len(self.data_source)
@@ -36,8 +44,8 @@ class MultiScaleSamplerDDP(Sampler):
             # compute the spatial dimensions and corresponding batch size
             # ImageNet models down-sample images by a factor of 32.
             # Ensure that width and height dimensions are multiples are multiple of 32.
-            width_dims = [int((w // 32) * 32) for w in width_dims]
-            height_dims = [int((h // 32) * 32) for h in height_dims]
+            width_dims = [int((w // divided_factor) * divided_factor) for w in width_dims]
+            height_dims = [int((h // divided_factor) * divided_factor) for h in height_dims]
 
             img_batch_pairs = list()
             base_elements = base_im_w * base_im_h * base_batch_size
@@ -54,7 +62,7 @@ class MultiScaleSamplerDDP(Sampler):
         self.epoch = 0
         self.rank = rank
         self.num_replicas = num_replicas
-        
+        self.seed = seed
         self.batch_list = []
         self.current = 0
         indices_rank_i = self.img_indices[self.rank : len(self.img_indices) : self.num_replicas]
@@ -76,7 +84,10 @@ class MultiScaleSamplerDDP(Sampler):
 
     def __iter__(self):
         if self.shuffle:
-            random.seed(self.epoch)
+            if self.seed is not None:
+                random.seed(self.seed)
+            else:
+                random.seed(self.epoch)
             random.shuffle(self.img_indices)
             random.shuffle(self.img_batch_pairs)
             indices_rank_i = self.img_indices[self.rank : len(self.img_indices) : self.num_replicas]

@@ -50,17 +50,22 @@ class UnifiedResize(object):
         }
 
         def _pil_resize(src, size, resample):
+            # to be accordance with opencv, the input size is (h,w)
             pil_img = Image.fromarray(src)
             pil_img = pil_img.resize(size, resample)
             return np.asarray(pil_img)
 
+        def _cv2_resize(src, size, interpolation):
+            cv_img = cv2.resize(src, size[::-1], interpolation)
+            return cv_img
+            
         if backend.lower() == "cv2":
             if isinstance(interpolation, str):
                 interpolation = _cv2_interp_from_str[interpolation.lower()]
             # compatible with opencv < version 4.4.0
             elif interpolation is None:
                 interpolation = cv2.INTER_LINEAR
-            self.resize_func = partial(cv2.resize, interpolation=interpolation)
+            self.resize_func = partial(_cv2_resize, interpolation=interpolation)
         elif backend.lower() == "pil":
             if isinstance(interpolation, str):
                 interpolation = _pil_interp_from_str[interpolation.lower()]
@@ -123,8 +128,8 @@ class ResizeImage(object):
             self.h = None
         elif size is not None:
             self.resize_short = None
-            self.w = size if type(size) is int else size[0]
-            self.h = size if type(size) is int else size[1]
+            self.h = size if type(size) is int else size[0]
+            self.w = size if type(size) is int else size[1]
         else:
             raise OperatorParamError("invalid params for ReisizeImage for '\
                 'both 'size' and 'resize_short' are None")
@@ -141,7 +146,7 @@ class ResizeImage(object):
         else:
             w = self.w
             h = self.h
-        return self._resize_func(img, (w, h))
+        return self._resize_func(img, (h, w))
 
 
 class CropImage(object):
