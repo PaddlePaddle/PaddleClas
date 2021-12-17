@@ -28,6 +28,7 @@ from ppcls.utils.misc import AverageMeter
 from ppcls.utils import logger
 from ppcls.utils.logger import init_logger
 from ppcls.utils.config import print_config
+from ppcls.utils.ema import ExponentialMovingAverage
 from ppcls.data import build_dataloader
 from ppcls.arch import build_model, RecModel, DistillationModel, TheseusLayer
 from ppcls.arch import apply_to_static
@@ -187,6 +188,7 @@ class Engine(object):
         if self.mode == "eval" or (self.mode == "train" and
                                    self.config["Global"]["eval_during_train"]):
             metric_config = self.config.get("Metric")
+
             if self.eval_mode == "classification":
                 if metric_config is not None:
                     metric_config = metric_config.get("Eval")
@@ -205,6 +207,13 @@ class Engine(object):
         self.model = build_model(self.config)
         # set @to_static for benchmark, skip this by default.
         apply_to_static(self.config, self.model)
+
+        self.ema = self.config['Global'].get("use_ema", False)
+        if self.ema and mode == "train":
+            self.ema = ExponentialMovingAverage(self.model, 0.999)
+            self.ema.register()
+        else:
+            self.ema = None
 
         # load_pretrain
         if self.config["Global"]["pretrained_model"] is not None:
@@ -348,9 +357,20 @@ class Engine(object):
     @paddle.no_grad()
     def eval(self, epoch_id=0):
         assert self.mode in ["train", "eval"]
+        if self.ema is not None:
+            self.ema.apply()
         self.model.eval()
         eval_result = self.eval_func(self, epoch_id)
         self.model.train()
+        if self.ema is not None:
+            save_load.save_model(
+                    self.model,
+                    self.optimizer, {"metric": eval_result,
+                                     "epoch": epoch_id},
+                    self.output_dir,
+                    model_name=self.config["Arch"]["name"],
+                    prefix="ema_epoch_{}".format(epoch_id))
+            self.ema.restore()
         return eval_result
 
     @paddle.no_grad()
