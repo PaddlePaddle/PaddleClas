@@ -57,9 +57,12 @@ def train_epoch(engine, epoch_id, print_batch_step):
             scaled = engine.scaler.scale(loss_dict["loss"])
             scaled.backward()
             engine.scaler.minimize(engine.optimizer, scaled)
+        #TODO(wusibo): implement ema in amp mode
         else:
             loss_dict["loss"].backward()
             engine.optimizer.step()
+            if engine.ema is not None:
+                engine.ema.update()
         engine.optimizer.clear_grad()
         engine.lr_sch.step()
 
