@@ -209,7 +209,7 @@ cp ../configs/inference_cls.yaml tools/
 
 根据[python预测推理](../../docs/zh_CN/inference_deployment/python_deploy.md)的`图像分类推理`部分修改好`tools`目录下`inference_cls.yaml`文件。`yaml`文件的参数说明详见[python预测推理](../../docs/zh_CN/inference_deployment/python_deploy.md)。
 
-请根据实际存放文件，修改好`Global.infer_imgs`、`Global.inference_model_dir`等参数。
+请根据实际存放文件，修改好`Global.infer_imgs`、`Global.inference_model_dir`、`PostProcess.Topk.topk`、`PostProcess.Topk.class_id_map_file`等参数。
 
 #### 2.3.2 执行
 

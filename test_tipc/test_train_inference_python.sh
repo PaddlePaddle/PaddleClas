@@ -146,7 +146,6 @@ function func_inference(){
                         last_status=${PIPESTATUS[0]}
                         eval "cat ${_save_log_path}"
                         status_check $last_status "${command}" "../${status_log}"
-                        
                     done
                 done
             done
@@ -289,8 +288,10 @@ else
                 # run train
 		eval "unset CUDA_VISIBLE_DEVICES"
 		export FLAGS_cudnn_deterministic=True
+		sleep 5
                 eval $cmd
                 status_check $? "${cmd}" "${status_log}"
+                sleep 5
 		
 		if [[ $FILENAME == *GeneralRecognition* ]]; then
 		    set_eval_pretrain=$(func_set_params "${pretrain_model_key}" "${save_log}/RecModel/${train_model_name}")
@@ -307,6 +308,7 @@ else
                     eval_cmd="${python} ${eval_py} ${set_eval_pretrain} ${set_use_gpu} ${set_eval_params1}" 
                     eval $eval_cmd
                     status_check $? "${eval_cmd}" "${status_log}"
+                    sleep 5
                 fi
                 # run export model
                 if [ ${run_export} != "null" ]; then 
