@@ -73,6 +73,7 @@ DataLoader:
       first_bs: 64
       down_sample: 32
       is_training: True
+      seed: None
 
     loader:
       num_workers: 4
