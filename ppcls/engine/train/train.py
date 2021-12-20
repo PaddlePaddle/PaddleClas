@@ -63,7 +63,7 @@ def train_epoch(engine, epoch_id, print_batch_step):
             engine.optimizer.step()
             if engine.ema is not None:
                 engine.ema.update()
-        engine.optimizer.clear_grad()
+        engine.optimizer.clear_grad(set_to_zero=True)
         engine.lr_sch.step()
 
         # below code just for logging
