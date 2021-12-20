@@ -84,8 +84,7 @@ def main(args):
             'FLAGS_cudnn_exhaustive_search': "1",
             'FLAGS_conv_workspace_size_limit': "1500",
             'FLAGS_cudnn_batchnorm_spatial_persistent': "1",
-            'FLAGS_max_indevice_grad_add': "8",
-            "FLAGS_cudnn_batchnorm_spatial_persistent": "1",
+            'FLAGS_max_inplace_grad_add': "8"
         }
         for k in AMP_RELATED_FLAGS_SETTING:
             os.environ[k] = AMP_RELATED_FLAGS_SETTING[k]
