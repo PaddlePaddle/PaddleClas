@@ -86,7 +86,7 @@ def train_epoch(engine, epoch_id, print_batch_step):
         else:
             loss_dict["loss"].backward()
             engine.optimizer.step()
-        engine.optimizer.clear_grads()
+        engine.optimizer.clear_grad(set_to_zero=True)
         engine.lr_sch.step()
 
         # below code just for logging
