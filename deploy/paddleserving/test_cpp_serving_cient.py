@@ -21,7 +21,7 @@ from paddle_serving_app.reader import CenterCrop, RGB2BGR, Transpose, Div, Norma
 import time
 
 client = Client()
-client.load_client_config(sys.argv[1])
+client.load_client_config("./ResNet50_vd_serving/serving_server_conf.prototxt")
 client.connect(["127.0.0.1:9292"])
 
 label_dict = {}
@@ -39,11 +39,8 @@ seq = Sequential([
 
 start = time.time()
 image_file = "https://paddle-serving.bj.bcebos.com/imagenet-example/daisy.jpg"
-for i in range(10):
+for i in range(1):
     img = seq(image_file)
-
-    #core service.
-    #1. decode package;  2. do inference   3. encode package
     fetch_map = client.predict(
         feed={"inputs": img}, fetch=["prediction"], batch=False)
 

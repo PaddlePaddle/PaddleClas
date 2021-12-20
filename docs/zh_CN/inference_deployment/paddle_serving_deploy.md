@@ -4,6 +4,8 @@
 - [3. 图像分类服务部署](#3)
     - [3.1 模型转换](#3.1)
     - [3.2 服务部署和请求](#3.2)
+        - [3.2.1 Python Serving](#3.2.1)
+        - [3.2.2 C++ Serving](#3.2.2)
 - [4. 图像识别服务部署](#4)
   - [4.1 模型转换](#4.1)
   - [4.2 服务部署和请求](#4.2)
@@ -81,7 +83,7 @@ ResNet50_vd 推理模型转换完成后，会在当前文件夹多出 `ResNet50_
   |- serving_client_conf.prototxt  
   |- serving_client_conf.stream.prototxt
 ```
-得到模型文件之后，需要修改 `ResNet50_vd_server` 下文件 `serving_server_conf.prototxt` 中的 alias 名字：将 `fetch_var` 中的 `alias_name` 改为 `prediction`
+得到模型文件之后，需要分别修改 `ResNet50_vd_server` 和 `ResNet50_vd_client` 下文件 `serving_server_conf.prototxt` 中的 alias 名字：将 `fetch_var` 中的 `alias_name` 改为 `prediction`
 
 **备注**:  Serving 为了兼容不同模型的部署，提供了输入输出重命名的功能。这样，不同的模型在推理部署时，只需要修改配置文件的 alias_name 即可，无需修改代码即可完成推理部署。
 修改后的 serving_server_conf.prototxt 如下所示:
@@ -108,12 +110,15 @@ fetch_var {
 paddleserving 目录包含了启动 pipeline 服务和发送预测请求的代码，包括：
 ```shell
 __init__.py
-config.yml                 # 启动服务的配置文件
+config.yml                 # 启动pipeline服务的配置文件
 pipeline_http_client.py    # http方式发送pipeline预测请求的脚本
 pipeline_rpc_client.py     # rpc方式发送pipeline预测请求的脚本
 classification_web_service.py    # 启动pipeline服务端的脚本
+run_cpp_serving.sh         # 启动C++ Serving部署的脚本
+test_cpp_serving_client.py # rpc方式发送C++ serving预测请求的脚本
 ```
-
+<a name="3.2.1"></a>
+#### 3.2.1 Python Serving
 - 启动服务：
 ```shell
 # 启动服务，运行日志保存在 log.txt
@@ -129,6 +134,22 @@ python3 pipeline_http_client.py
 ```
 成功运行后，模型预测的结果会打印在 cmd 窗口中，结果示例为：
 ![](../../../deploy/paddleserving/imgs/results.png)
+
+<a name="3.2.2"></a>
+#### 3.2.2 C++ Serving
+- 启动服务：
+```shell
+# 启动服务， 服务在后台运行，运行日志保存在 nohup.txt
+sh run_cpp_serving.sh
+```
+
+- 发送请求：
+```shell
+# 发送服务请求
+python3 test_cpp_serving_client.py
+```
+成功运行后，模型预测的结果会打印在 cmd 窗口中，结果示例为：
+![](../../../deploy/paddleserving/imgs/results_cpp.png)
 
 <a name="4"></a>
 ## 4.图像识别服务部署
