@@ -29,21 +29,26 @@ PaddleClas 主要代码和目录结构如下
 <a name="2"></a>
 ## 2. 训练模块定义
 
-深度学习模型训练过程中，主要包含数据、模型结构、损失函数、优化器和学习率衰减、权重衰减策略等，以下一一解读。
+深度学习模型训练模块，主要包含数据、模型结构、损失函数、优化器和学习率衰减、权重衰减策略等，以下一一解读。
 
 <a name="2.1"></a>
 ### 2.1 数据
 
-对于有监督任务来说，训练数据一般包含原始数据及其标注。在基于单标签的图像分类任务中，原始数据指的是图像数据，而标注则是该图像数据所属的类比。PaddleClas 中，训练时需要提供标签文件，形式如下，每一行包含一条训练样本，分别表示图片路径和类别标签，用分隔符隔开（默认为空格）。
+对于有监督任务来说，训练数据一般包含原始数据及其标注。
+在基于单标签的图像分类任务中，原始数据指的是图像数据，而标注则是该图像数据所属的类别。
+PaddleClas 中，训练时需要提供标签文件，形式如下，每一行包含一条训练样本，分别表示图片路径和类别标签，用分隔符隔开（默认为空格）。
 
 ```
 train/n01440764/n01440764_10026.JPEG 0
 train/n01440764/n01440764_10027.JPEG 0
 ```
 
-在代码 `ppcls/data/dataloader/common_dataset.py` 中，包含 `CommonDataset` 类，继承自 `paddle.io.Dataset`，该数据集类可以通过一个键值进行索引并获取指定样本。`ImageNetDataset`, `LogoDataset`, `CommonDataset` 等数据集类都继承自这个类别
+在代码 `ppcls/data/dataloader/common_dataset.py` 中，包含 `CommonDataset` 类，继承自 `paddle.io.Dataset`，
+该数据集类可以通过一个键值进行索引并获取指定样本。`ImageNetDataset`, `LogoDataset`, `CommonDataset` 等数据集类都继承自这个类别
 
-对于读入的数据，需要通过数据转换，将原始的图像数据进行转换。训练时，标准的数据预处理包含：`DecodeImage`, `RandCropImage`, `RandFlipImage`, `NormalizeImage`, `ToCHWImage`。在配置文件中体现如下，数据预处理主要包含在 `transforms` 字段中，以列表形式呈现，会按照顺序对数据依次做这些转换。
+对于读入的数据，需要通过数据转换，将原始的图像数据进行转换。训练时，标准的数据预处理包含：`DecodeImage`, `RandCropImage`,
+`RandFlipImage`, `NormalizeImage`, `ToCHWImage`。
+在配置文件中体现如下，数据预处理主要包含在 `transforms` 字段中，以列表形式呈现，会按照顺序对数据依次做这些转换。
 
 ```yaml
 DataLoader:
@@ -67,9 +72,12 @@ DataLoader:
             order: ''
 ```
 
-PaddleClas 中也包含了 `AutoAugment`, `RandAugment` 等数据增广方法，也可以通过在配置文件中配置，从而添加到训练过程的数据预处理中。每个数据转换的方法均以类实现，方便迁移和复用，更多的数据处理具体实现过程可以参考 `ppcls/data/preprocess/ops/` 下的代码。
+PaddleClas 中也包含了 `AutoAugment`, `RandAugment` 等数据增广方法，也可以通过在配置文件中配置，从而添加到训练过程的数据预处理中。
+每个数据转换的方法均以类实现，方便迁移和复用，更多的数据处理具体实现过程可以参考 `ppcls/data/preprocess/ops/` 下的代码。
 
-对于组成一个 batch 的数据，也可以使用 mixup 或者 cutmix 等方法进行数据增广。 PaddleClas 中集成了 `MixupOperator`, `CutmixOperator`, `FmixOperator` 等基于 batch 的数据增广方法，可以在配置文件中配置 mix 参数进行配置，更加具体的实现可以参考 `ppcls/data/preprocess/batch_ops/batch_operators.py` 。
+对于组成一个 batch 的数据，也可以使用 mixup 或者 cutmix 等方法进行数据增广。
+PaddleClas 中集成了 `MixupOperator`, `CutmixOperator`, `FmixOperator` 等基于 batch 的数据增广方法，
+可以在配置文件中配置 mix 参数进行配置，更加具体的实现可以参考 `ppcls/data/preprocess/batch_ops/batch_operators.py` 。
 
 图像分类中，数据后处理主要为 `argmax` 操作，在此不再赘述。
 
@@ -86,7 +94,8 @@ Arch:
   use_ssld: False
 ```
 
-`Arch.name` 表示模型名称，`Arch.pretrained` 表示是否添加预训练模型，`use_ssld` 表示是否使用基于 `SSLD` 知识蒸馏得到的预训练模型。所有的模型名称均在 `ppcls/arch/backbone/__init__.py` 中定义。
+`Arch.name` 表示模型名称，`Arch.pretrained` 表示是否添加预训练模型，`Arch.use_ssld` 表示是否使用基于 `SSLD` 知识蒸馏得到的预训练模型。
+所有的模型名称均在 `ppcls/arch/backbone/__init__.py` 中定义。
 
 对应的，在 `ppcls/arch/__init__.py` 中，通过 `build_model` 方法创建模型对象。
 
@@ -180,12 +189,14 @@ def build_optimizer(config, epochs, step_each_epoch, parameters):
     return optim, lr
 ```
 
- 不同优化器和权重衰减策略均以类的形式实现，具体实现可以参考文件 `ppcls/optimizer/optimizer.py`；不同的学习率衰减策略可以参考文件 `ppcls/optimizer/learning_rate.py` 。
+ 不同优化器和权重衰减策略均以类的形式实现，具体实现可以参考文件 `ppcls/optimizer/optimizer.py`.
+ 不同的学习率衰减策略可以参考文件 `ppcls/optimizer/learning_rate.py` 。
 
 <a name="2.5"></a>
 ### 2.5 训练时评估
 
-模型在训练的时候，可以设置模型保存的间隔，也可以选择每隔若干个 epoch 对验证集进行评估，从而可以保存在验证集上精度最佳的模型。配置文件中，可以通过下面的字段进行配置。
+模型在训练的时候，可以设置模型保存的间隔，也可以选择每隔若干个 epoch 对验证集进行评估，
+从而可以保存在验证集上精度最佳的模型。配置文件中，可以通过下面的字段进行配置。
 
 ```yaml
 Global:
@@ -209,16 +220,14 @@ def save_model(program, model_path, epoch_id, prefix='ppcls'):
 ```
 
 在保存的时候有两点需要注意：
-1. 只在 0 号节点上保存模型。否则多卡训练的时候，如果所有节点都保存模型到相同的路径，则多个节点写文件时可能会发生写文件冲突，导致最终保存的模型无法被正确加载。
-2. 优化器参数也需要存储，方便后续的加载断点进行训练。
+1. 只在 0 号节点上保存模型。否则多卡训练的时候，如果所有节点都保存模型到相同的路径，
+2. 则多个节点写文件时可能会发生写文件冲突，导致最终保存的模型无法被正确加载。
+3. 优化器参数也需要存储，方便后续的加载断点进行训练。
 
-* 模型裁剪、量化训练
-
-如果想对模型进行压缩训练，则通过下面字段进行配置
 
 <a name="2.7"></a>
 ### 2.7 模型裁剪与量化
-
+如果想对模型进行压缩训练，则通过下面字段进行配置
 1.模型裁剪：
 
 ```yaml
@@ -236,7 +245,8 @@ Slim:
     name: pact
 ```
 
-训练方法详见模型[裁剪量化使用介绍](../advanced_tutorials/model_prune_quantization.md)，算法介绍详见[裁剪量化算法介绍](../algorithm_introduction/model_prune_quantization.md)。
+训练方法详见模型[裁剪量化使用介绍](../advanced_tutorials/model_prune_quantization.md)，
+算法介绍详见[裁剪量化算法介绍](../algorithm_introduction/model_prune_quantization.md)。
 
 <a name="3"></a>
 ## 3. 预测部署代码和方式
