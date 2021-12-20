@@ -36,7 +36,7 @@ strategies such as optimizer, learning rate decay, and weight decay strategy, et
 
 
 <a name="2.1"></a>
-## 2.1 Data
+### 2.1 Data
 
 For supervised tasks, the training data generally contains the raw data and its annotation.
 In a single-label-based image classification task, the raw data refers to the image data,
@@ -96,7 +96,7 @@ In image classification, the data post-processing is mainly `argmax` operation, 
 
 
 <a name="2.2"></a>
-## 2.2 Model Structure
+### 2.2 Model Structure
 
 The model in the configuration file is structured as follows:
 
@@ -129,7 +129,7 @@ def build_model(config):
 
 
 <a name="2.3"></a>
-## 2.3 Loss Function
+### 2.3 Loss Function
 
 PaddleClas implement `CELoss` , `JSDivLoss`, `TripletLoss`, `CenterLoss` and other loss functions, all defined in `ppcls/loss`.
 
@@ -157,7 +157,7 @@ Loss:
 
 
 <a name="2.4"></a>
-## 2.4 Optimizer, Learning Rate Decay, and Weight Decay
+### 2.4 Optimizer, Learning Rate Decay, and Weight Decay
 
 In image classification tasks, `Momentum` is a commonly used optimizer,
 and several optimizer strategies such as `Momentum`, `RMSProp`, `Adam`, and `AdamW` are provided in PaddleClas.
@@ -222,7 +222,7 @@ Different learning rate decay strategies can be found in the file `ppcls/optimiz
 
 
 <a name="2.5"></a>
-## 2.5 Evaluation During Training
+### 2.5 Evaluation During Training
 
 When training the model, you can set the interval of model saving,
 or you can evaluate the validation set every several epochs so that the model with the best accuracy can be saved.
@@ -237,7 +237,7 @@ Global:
 
 
 <a name="2.6"></a>
-## 2.6 Model Saving
+### 2.6 Model Saving
 
 The model is saved through the `paddle.save()` function of the Paddle framework.
 The dynamic graph version of the model is saved in the form of a dictionary to facilitate further training.
@@ -262,7 +262,7 @@ preventing the final saved model from being loaded correctly.
 
 
 <a name="2.7"></a>
-## 2.7 Model Pruning and Quantification
+### 2.7 Model Pruning and Quantification
 
 If you want to conduct compression training, please configure with the following fields.
 
