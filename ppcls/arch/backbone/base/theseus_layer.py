@@ -119,8 +119,8 @@ class TheseusLayer(nn.Layer):
         """use 'replace_function' to modify the 'layer_name_pattern'.
 
         Args:
-            layer_name_pattern (str): The name of target layer variable.
-            replace_function (FunctionType): The function to modify target layer,
+            layer_name_pattern (Union[str, List[str]]): The name of layer to be modified by 'replace_function'.
+            replace_function (FunctionType): The function to modify target layer specified by 'layer_name_pattern'.
 
         Returns:
             bool: 'True' if successful, 'False' otherwise.
@@ -156,7 +156,7 @@ class TheseusLayer(nn.Layer):
         """stop forward and backward after 'stop_layer_name'.
 
         Args:
-            stop_layer_name (str): The name of target layer variable.
+            stop_layer_name (str): The name of layer that stop forward and backward after this layer.
 
         Returns:
             bool: 'True' if successful, 'False' otherwise.
@@ -193,13 +193,13 @@ class TheseusLayer(nn.Layer):
 
     def update_res(self,
                    return_patterns: Union[str, List[str]]) -> Dict[str, bool]:
-        """update the results needed returned.
+        """update the results to be returned.
 
         Args:
-            return_patterns (Union[str, List[str]]): [description]
+            return_patterns (Union[str, List[str]]): The name of layer to return output.
 
         Returns:
-            Dict[str, bool]: The pattern(str) is be set successfully if True(bool), failed otherwise.
+            Dict[str, bool]: The pattern(str) is be set successfully if 'True'(bool), failed if 'False'(bool).
         """
 
         class Handler(object):
