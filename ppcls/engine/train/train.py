@@ -41,14 +41,15 @@ def train_epoch(engine, epoch_id, print_batch_step):
 
         # image input
         if engine.amp:
-            with paddle.amp.auto_cast(custom_black_list={
-                    "flatten_contiguous_range", "greater_than"
-            }):
+            amp_level = 'O1'
+            if engine.config['AMP']['use_pure_fp16'] is True:
+                amp_level = 'O2'
+            with paddle.amp.auto_cast(custom_black_list={"flatten_contiguous_range", "greater_than"}, level=amp_level):
                 out = forward(engine, batch)
+                loss_dict = engine.train_loss_func(out, batch[1])
         else:
             out = forward(engine, batch)
-
-        loss_dict = engine.train_loss_func(out, batch[1])
+            loss_dict = engine.train_loss_func(out, batch[1])
 
         # step opt and lr
         if engine.amp:
@@ -58,7 +59,7 @@ def train_epoch(engine, epoch_id, print_batch_step):
         else:
             loss_dict["loss"].backward()
             engine.optimizer.step()
-        engine.optimizer.clear_grad()
+        engine.optimizer.clear_grad(set_to_zero=True)
         engine.lr_sch.step()
 
         # below code just for logging
