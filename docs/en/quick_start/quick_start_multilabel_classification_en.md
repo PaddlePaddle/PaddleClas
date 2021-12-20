@@ -2,7 +2,7 @@
 
 Experience the training, evaluation, and prediction of multi-label classification based on the [NUS-WIDE-SCENE](https://lms.comp.nus.edu.sg/wp-content/uploads/2019/research/nuswide/NUS-WIDE.html) dataset, which is a subset of the NUS-WIDE dataset. Please first install PaddlePaddle and PaddleClas, see [Paddle Installation](https://github.com/PaddlePaddle/PaddleClas/blob/develop/docs/zh_CN/installation) and [PaddleClas installation](https://github.com/PaddlePaddle/PaddleClas/blob/develop/docs/zh_CN/installation/install_ paddleclas.md) for more details.
 
-## Contents
+## Catalogue
 
 - [1. Data and Model Preparation](#1)
 - [2. Model Training](#2)
