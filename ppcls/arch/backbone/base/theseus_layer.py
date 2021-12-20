@@ -30,11 +30,13 @@ class TheseusLayer(nn.Layer):
         self.res_dict[self.res_name] = output
 
     def _find_layers_handle(self, patterns, handle_func):
-        sub_layers_dict = {}
+        handle_res_dict = {}
         for pattern in patterns:
             pattern_list = pattern.split(".")
             if not pattern_list:
                 continue
+
+            # find parent layer of sub-layer specified by pattern
             sub_layer_parent = self
             while len(pattern_list) > 1:
                 if '[' in pattern_list[0]:
@@ -52,7 +54,11 @@ class TheseusLayer(nn.Layer):
                     sub_layer_parent = sub_layer_parent.sub_layer
                 pattern_list = pattern_list[1:]
             if sub_layer_parent is None:
+                msg = f"Not found layer by name({pattern_list[0]}) specifed in pattern({pattern})."
+                logger.warning(msg)
                 continue
+
+            # find sub-layer specified by pattern
             if '[' in pattern_list[0]:
                 sub_layer_name = pattern_list[0].split('[')[0]
                 sub_layer_index = pattern_list[0].split('[')[1].split(']')[0]
@@ -68,45 +74,9 @@ class TheseusLayer(nn.Layer):
                     sub_layer = wrap_theseus(sub_layer)
                 setattr(sub_layer_parent, pattern_list[0], sub_layer)
 
-            sub_layers_dict[pattern] = sub_layer
             handle_res = handle_func(sub_layer, pattern)
-        return sub_layers_dict, handle_res
-
-    def replace_sub(self,
-                    layer_name_pattern: Union[str, List[str]],
-                    replace_function: Callable[[nn.Layer, str], Any]) -> bool:
-        """use 'replace_function' to modify the 'layer_name_pattern'.
-
-        Args:
-            layer_name_pattern (str): The name of target layer variable.
-            replace_function (FunctionType): The function to modify target layer,
-
-        Returns:
-            bool: 'True' if successful, 'False' otherwise.
-        
-        Examples:
-
-            import paddleclas
-
-            def replace_conv(origin_conv: nn.Conv2D):
-                new_conv = nn.Conv2D(
-                    in_channels=origin_conv._in_channels,
-                    out_channels=origin_conv._out_channels,
-                    kernel_size=origin_conv._kernel_size,
-                    stride=2
-                )
-                return new_conv
-
-            net = paddleclas.MobileNetV1()
-            tag = net.replace_sub(layer_name_pattern="conv", replace_function=replace_conv)
-            print(tag)
-            # True
-        """
-
-        if not isinstance(layer_name_pattern, list):
-            layer_name_pattern = [layer_name_pattern]
-        return self._find_layers_handle(
-            layer_name_pattern, handle_func=replace_function)
+            handle_res_dict[pattern] = handle_res
+        return handle_res_dict
 
     def _set_identity(self, layer, layer_name, layer_index=None):
         stop_after = False
@@ -127,6 +97,44 @@ class TheseusLayer(nn.Layer):
                     stop_after = True
 
         return stop_after
+
+    def replace_sub(self,
+                    layer_name_pattern: Union[str, List[str]],
+                    replace_function: Callable[[nn.Layer, str], Any]) -> Any:
+        """use 'replace_function' to modify the 'layer_name_pattern'.
+
+        Args:
+            layer_name_pattern (str): The name of target layer variable.
+            replace_function (FunctionType): The function to modify target layer,
+
+        Returns:
+            bool: 'True' if successful, 'False' otherwise.
+
+        Examples:
+
+            from paddle import nn
+            import paddleclas
+
+            def rep_func(warp_layer: nn.Layer, pattern: str):
+                sub_layer = warp_layer.sub_layer
+                new_layer = nn.Conv2D(
+                    in_channels=sub_layer._in_channels,
+                    out_channels=sub_layer._out_channels,
+                    kernel_size=5
+                )
+                warp_layer.sub_layer = new_layer
+                return True
+
+            net = paddleclas.MobileNetV1()
+            res = net.replace_sub(layer_name_pattern=["blocks[11].depthwise_conv.conv", "blocks[12].depthwise_conv.conv"], replace_function=rep_func)
+            print(res)
+            # {'blocks[11].depthwise_conv.conv': True, 'blocks[12].depthwise_conv.conv': True}
+        """
+
+        if not isinstance(layer_name_pattern, list):
+            layer_name_pattern = [layer_name_pattern]
+        return self._find_layers_handle(
+            layer_name_pattern, handle_func=replace_function)
 
     # stop doesn't work when stop layer has a parallel branch.
     def stop_after(self, stop_layer_name: str) -> bool:
@@ -153,7 +161,7 @@ class TheseusLayer(nn.Layer):
                 sub_layer_index = None
                 layer = getattr(layer, sub_layer_name, None)
             if layer is None:
-                msg = f"Not found layer by name({pattern_list[0]}) in stop_layer_name({stop_layer_name})."
+                msg = f"Not found layer by name({pattern_list[0]}) specifed in stop_layer_name({stop_layer_name})."
                 logger.warning(msg)
                 return False
 
