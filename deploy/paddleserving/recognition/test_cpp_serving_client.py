@@ -65,8 +65,12 @@ class MainbodyDetect():
 
     def postprocess(self, fetch_map, imgpath):
         #1. get top max_det_result
-        boxes_reserved = fetch_map[
-            "save_infer_model/scale_0.tmp_1"][:self.max_det_result]
+        det_results = fetch_map["save_infer_model/scale_0.tmp_1"]
+        if len(det_results) > self.max_det_result:
+            boxes_reserved = fetch_map[
+                "save_infer_model/scale_0.tmp_1"][:self.max_det_result]
+        else:
+            boxes_reserved = det_results
 
         #2. do conf threshold
         boxes_list = []

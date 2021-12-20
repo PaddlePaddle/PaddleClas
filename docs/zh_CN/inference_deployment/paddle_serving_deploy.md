@@ -9,6 +9,8 @@
 - [4. 图像识别服务部署](#4)
   - [4.1 模型转换](#4.1)
   - [4.2 服务部署和请求](#4.2)
+        - [4.2.1 Python Serving](#4.2.1)
+        - [4.2.2 C++ Serving](#4.2.2)
 - [5. FAQ](#5)
 
 <a name="1"></a>
@@ -107,7 +109,7 @@ fetch_var {
 ```
 <a name="3.2"></a>
 ### 3.2 服务部署和请求
-paddleserving 目录包含了启动 pipeline 服务和发送预测请求的代码，包括：
+paddleserving 目录包含了启动 pipeline 服务、C++ serving服务和发送预测请求的代码，包括：
 ```shell
 __init__.py
 config.yml                 # 启动pipeline服务的配置文件
@@ -176,7 +178,7 @@ python3 -m paddle_serving_client.convert --dirname ./general_PPLCNet_x2_5_lite_v
                                          --serving_server ./general_PPLCNet_x2_5_lite_v1.0_serving/ \
                                          --serving_client ./general_PPLCNet_x2_5_lite_v1.0_client/
 ```
-识别推理模型转换完成后，会在当前文件夹多出 `general_PPLCNet_x2_5_lite_v1.0_serving/` 和 `general_PPLCNet_x2_5_lite_v1.0_serving/` 的文件夹。修改 `general_PPLCNet_x2_5_lite_v1.0_serving/` 目录下的 serving_server_conf.prototxt 中的 alias 名字： 将 `fetch_var` 中的 `alias_name` 改为 `features`。
+识别推理模型转换完成后，会在当前文件夹多出 `general_PPLCNet_x2_5_lite_v1.0_serving/` 和 `general_PPLCNet_x2_5_lite_v1.0_serving/` 的文件夹。分别修改 `general_PPLCNet_x2_5_lite_v1.0_serving/` 和 `general_PPLCNet_x2_5_lite_v1.0_client/` 目录下的 serving_server_conf.prototxt 中的 alias 名字： 将 `fetch_var` 中的 `alias_name` 改为 `features`。
 修改后的 serving_server_conf.prototxt 内容如下：
 ```
 feed_var {
@@ -221,14 +223,19 @@ wget https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/data/drink_da
 ```shell
 cd ./deploy/paddleserving/recognition
 ```
-paddleserving 目录包含启动 pipeline 服务和发送预测请求的代码，包括：
+paddleserving 目录包含启动 Python Pipeline 服务、C++ Serving 服务和发送预测请求的代码，包括：
 ```
 __init__.py
-config.yml                    # 启动服务的配置文件
+config.yml                    # 启动python pipeline服务的配置文件
 pipeline_http_client.py       # http方式发送pipeline预测请求的脚本
 pipeline_rpc_client.py        # rpc方式发送pipeline预测请求的脚本
 recognition_web_service.py    # 启动pipeline服务端的脚本
+run_cpp_serving.sh            # 启动C++ Serving部署的脚本
+test_cpp_serving_client.py    # rpc方式发送C++ serving预测请求的脚本
 ```
+
+<a name="4.2.1"></a>
+#### 4.2.1 Python Serving
 - 启动服务：
 ```
 # 启动服务，运行日志保存在 log.txt
@@ -243,6 +250,23 @@ python3 pipeline_http_client.py
 ```
 成功运行后，模型预测的结果会打印在 cmd 窗口中，结果示例为：
 ![](../../../deploy/paddleserving/imgs/results_shitu.png)
+
+<a name="4.2.2"></a>
+#### 4.2.2 C++ Serving
+- 启动服务：
+```shell
+# 启动服务： 此处会在后台同时启动主体检测和特征提取服务，端口号分别为9293和9294；
+# 运行日志分别保存在 log_mainbody_detection.txt 和 log_feature_extraction.txt中
+sh run_cpp_serving.sh
+```
+
+- 发送请求：
+```shell
+# 发送服务请求
+python3 test_cpp_serving_client.py
+```
+成功运行后，模型预测的结果会打印在 cmd 窗口中，结果示例为：
+![](../../../deploy/paddleserving/imgs/results_shitu_cpp.png)
 
 <a name="5"></a>
 ## 5.FAQ
