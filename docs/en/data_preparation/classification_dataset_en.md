@@ -6,21 +6,21 @@ This document elaborates on the dataset format adopted by PaddleClas for image c
 
 ## Contents
 
-- [Dataset Format](https://github.com/paddlepaddle/paddleclas/blob/release%2F2.3/docs/zh_CN/data_preparation/classification_dataset.md#数据集格式说明)
-- [Common Datasets for Image Classification](https://github.com/paddlepaddle/paddleclas/blob/release%2F2.3/docs/zh_CN/data_preparation/classification_dataset.md#图像分类任务常见数据集介绍)
-  - [2.1 ImageNet1k](https://github.com/paddlepaddle/paddleclas/blob/release%2F2.3/docs/zh_CN/data_preparation/classification_dataset.md#ImageNet1k)
-  - [2.2 Flowers102](https://github.com/paddlepaddle/paddleclas/blob/release%2F2.3/docs/zh_CN/data_preparation/classification_dataset.md#Flowers102)
-  - [2.3 CIFAR10 / CIFAR100](https://github.com/paddlepaddle/paddleclas/blob/release%2F2.3/docs/zh_CN/data_preparation/classification_dataset.md#CIFAR10/CIFAR100)
-  - [2.4 MNIST](https://github.com/paddlepaddle/paddleclas/blob/release%2F2.3/docs/zh_CN/data_preparation/classification_dataset.md#MNIST)
-  - [2.5 NUS-WIDE](https://github.com/paddlepaddle/paddleclas/blob/release%2F2.3/docs/zh_CN/data_preparation/classification_dataset.md#NUS-WIDE)
+- [1. Dataset Format](#1)
+- [2. Common Datasets for Image Classification](#2)
+  - [2.1 ImageNet1k](#2.1)
+  - [2.2 Flowers102](#2.2)
+  - [2.3 CIFAR10 / CIFAR100](#2.3)
+  - [2.4 MNIST](#2.4)
+  - [2.5 NUS-WIDE](#2.5)
 
+<a name="1"></a>
 
-
-## 1 Dataset Format
+## 1. Dataset Format
 
 PaddleClas adopts `txt` files to assign the training and test sets. Taking the `ImageNet1k` dataset as an example, where `train_list.txt` and `val_list.txt` have the following formats:
 
-```
+```shell
 # Separate the image path and annotation with "space" for each line
 
 # train_list.txt has the following format
@@ -32,11 +32,13 @@ val/ILSVRC2012_val_00000001.JPEG 65
 ...
 ```
 
+<a name="2"></a>
 
-
-## 2 Common Datasets for Image Classification
+## 2. Common Datasets for Image Classification
 
 Here we present a compilation of commonly used image classification datasets, which is continuously updated and expects your supplement.
+
+<a name="2.1"></a>
 
 ### 2.1 ImageNet1k
 
@@ -67,7 +69,7 @@ PaddleClas/dataset/ILSVRC2012/
 |_ val_list.txt
 ```
 
-
+<a name="2.2"></a>
 
 ### 2.2 Flowers102
 
@@ -104,7 +106,7 @@ PaddleClas/dataset/flowers102/
 |_ val_list.txt
 ```
 
-
+<a name="2.3"></a>
 
 ### 2.3 CIFAR10 / CIFAR100
 
@@ -112,7 +114,7 @@ The CIFAR-10 dataset comprises 60,000 color images of 10 classes with 32x32 imag
 
 Website：http://www.cs.toronto.edu/~kriz/cifar.html
 
-
+<a name="2.4"></a>
 
 ### 2.4 MNIST
 
@@ -120,7 +122,7 @@ MMNIST is a renowned dataset for handwritten digit recognition and is used as an
 
 Website：http://yann.lecun.com/exdb/mnist/
 
-
+<a name="2.5"></a>
 
 ### 2.5 NUS-WIDE
 

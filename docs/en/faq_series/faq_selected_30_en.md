@@ -5,21 +5,19 @@
 - We collect some frequently asked questions in issues and user groups since PaddleClas is open-sourced and provide brief answers, aiming to give some reference for the majority to save you from twists and turns.
 - There are many talents in the field of image classification, recognition and retrieval with quickly updated models and papers, and the answers here mainly rely on our limited project practice, so it is not possible to cover all facets. We sincerely hope that the man of insight will help to supplement and correct the content, thanks a lot.
 
-## PaddleClas FAQ Summary
+## Contents
 
-- [1. 30 Questions About Image Classification](https://github.com/PaddlePaddle/PaddleClas/blob/release/2.3/docs/zh_CN/faq_series/faq_selected_30.md#1)
-  - [1.1 Basic Knowledge](https://github.com/PaddlePaddle/PaddleClas/blob/release/2.3/docs/zh_CN/faq_series/faq_selected_30.md#1.1)
-  - [1.2 Model Training](https://github.com/PaddlePaddle/PaddleClas/blob/release/2.3/docs/zh_CN/faq_series/faq_selected_30.md#1.2)
-  - [1.3 Data](https://github.com/PaddlePaddle/PaddleClas/blob/release/2.3/docs/zh_CN/faq_series/faq_selected_30.md#1.3)
-  - [1.4 Model Inference and Prediction](https://github.com/PaddlePaddle/PaddleClas/blob/release/2.3/docs/zh_CN/faq_series/faq_selected_30.md#1.4)
-- [2. Application of PaddleClas](https://github.com/PaddlePaddle/PaddleClas/blob/release/2.3/docs/zh_CN/faq_series/faq_selected_30.md#2)
+- [1. 30 Questions About Image Classification](#1)
+  - [1.1 Basic Knowledge](#1.1)
+  - [1.2 Model Training](#1.2)
+  - [1.3 Data](#1.3)
+  - [1.4 Model Inference and Prediction](#1.4)
+- [2. Application of PaddleClas](#2)
 
-
-
+<a name="1"></a>
 ## 1. 30 Questions About Image Classification
 
-
-
+<a name="1.1"></a>
 ### 1.1 Basic Knowledge
 
 - Q: How many classification metrics are commonly used in the field of image classification?
@@ -30,7 +28,7 @@
 > >
 
 - Q: 怎样根据自己的任务选择合适的模型进行训练？How to choose the right training model?
-- A: If you want to deploy on the server with a high requirement for accuracy but not model storage size or prediction speed, then it is recommended to use ResNet_vd, Res2Net_vd, DenseNet, Xception, etc., which are suitable for server-side models. If you want to deploy on the mobile side, then it is recommended to use MobileNetV3 and GhostNet. Meanwhile, we suggest you refer to the speed-accuracy metrics chart in [Model Library](https://github.com/PaddlePaddle/PaddleClas/blob/release/2.3/docs/zh_CN/models/models_intro.md) when choosing models.
+- A: If you want to deploy on the server with a high requirement for accuracy but not model storage size or prediction speed, then it is recommended to use ResNet_vd, Res2Net_vd, DenseNet, Xception, etc., which are suitable for server-side models. If you want to deploy on the mobile side, then it is recommended to use MobileNetV3 and GhostNet. Meanwhile, we suggest you refer to the speed-accuracy metrics chart in [Model Library](../models/models_intro_en.md) when choosing models.
 
 > >
 
@@ -56,7 +54,7 @@
 - A: The Attention Mechanism (AM) originated from the study of human vision. Using the mechanism on computer vision tasks can effectively capture the useful regions in the images and thus improve the overall network performance. Currently, the most commonly used ones are [SE block](https://arxiv.org/abs/1709.01507), [SK-block](https://arxiv.org/abs/1903.06586), [Non-local block](https://arxiv. org/abs/1711.07971), [GC block](https://arxiv.org/abs/1904.11492), [CBAM](https://arxiv.org/abs/1807.06521), etc. The core idea is to learn the importance of feature maps in different regions or different channels, so that the network can pay more attention to the regions of salience.
 
 
-
+<a name="1.2"></a>
 ### 1.2 Model Training
 
 > >
@@ -67,7 +65,7 @@
 > >
 
 - Q: What are the possible reasons if the model converges poorly during the training process?
-- A: There are several points that can be investigated: (1) The data annotation should be checked to ensure that there are no problems with the labeling of the training and validation sets. (2) Try to adjust the learning rate (initially by a factor of 10). A learning rate that is too large (training oscillation) or too small (slow convergence) may lead to poor convergence. (3) Huge amount of data and an overly small model may prevent it from learning all the features of the data. (4) See if normalization is used in the data preprocessing process. It may be slower without normalization operation. (5) If the amount of data is relatively small, you can try to load the pre-trained model based on ImageNet-1k dataset provided in PaddleClas, which can greatly improve the training convergence speed. (6) There is a long tail problem in the dataset, you can refer to the [solution to the long tail problem of data](https://github.com/PaddlePaddle/PaddleClas/blob/release/2.3/docs/zh_CN/faq_series/faq_selected_30.md #long_tail).
+- A: There are several points that can be investigated: (1) The data annotation should be checked to ensure that there are no problems with the labeling of the training and validation sets. (2) Try to adjust the learning rate (initially by a factor of 10). A learning rate that is too large (training oscillation) or too small (slow convergence) may lead to poor convergence. (3) Huge amount of data and an overly small model may prevent it from learning all the features of the data. (4) See if normalization is used in the data preprocessing process. It may be slower without normalization operation. (5) If the amount of data is relatively small, you can try to load the pre-trained model based on ImageNet-1k dataset provided in PaddleClas, which can greatly improve the training convergence speed. (6) There is a long tail problem in the dataset, you can refer to the [solution to the long tail problem of data](#long_tail).
 
 > >
 
@@ -75,7 +73,9 @@
 - A: Since the emergence of deep learning, there has been a lot of research on optimizers, which aim to minimize the loss function to find the right weights for a given task. Currently, the main optimizers used in the industry are SGD, RMSProp, Adam, AdaDelt, etc. Among them, since the SGD optimizer with momentum is widely used in academia and industry (only for classification tasks), most of the models we published also adopt this optimizer to achieve gradient descent of the loss function. It has two disadvantages, one is the slow convergence speed, and the other is the reliance on experiences of the initial learning rate setting. However, if the initial learning rate is set properly with a sufficient number of iterations, the optimizer will also stand out among many other optimizers, obtaining higher accuracy on the validation set. Some optimizers with adaptive learning rates, such as Adam and RMSProp, tend to converge fast, but the final convergence accuracy will be slightly worse. If you pursue faster convergence speed, we recommend using these adaptive learning rate optimizers, and SGD optimizers with momentum for higher convergence accuracy.
 
 - Q: What are the current mainstream learning rate decay strategies? How to choose?
-- A: The learning rate is the speed at which the hyperparameters of the network weights are adjusted by the gradient of the loss function. The lower the learning rate, the slower the loss function will change. While using a low learning rate ensures that no local minimal values are missed, it also means that it takes longer to converge, especially if trapped in a plateau region. Throughout the whole training process, we cannot adopt the same learning rate to update the weights, otherwise, the optimal point cannot be reached, So we need to adjust the learning rate during the training. In the initial stage of training, since the weights are in a random initialization state and the loss function decreases fast, a larger learning rate can be set. And in the later stage of training, since the weights are close to the optimal value, a larger learning rate cannot further find the optimal value, so a smaller learning rate needs is a better choice. As for the learning rate decay strategy, many researchers or practitioners use piecewise_decay (step_decay), which is a stepwise decay learning rate. In addition, there are also other methods proposed by researchers, such as polynomial_decay, exponential_ decay, cosine_decay, etc. Among them, cosine_decay requires no adjustment of hyperparameters and has higher robustness, thus emerging as the preferred learning rate decay method to improve model accuracy. The learning rates of cosine_decay and piecewise_decay are shown in the following figure. It is easy to observe that cosine_decay keeps a large learning rate throughout the training, so it is slow in convergence, but its final effect is better than peicewise_decay.[![img](https://github.com/PaddlePaddle/PaddleClas/raw/release/2.3/docs/images/models/lr_decay.jpeg)](https://github.com/PaddlePaddle/PaddleClas/blob/release/2.3/docs/images/models/lr_decay.jpeg)
+- A: The learning rate is the speed at which the hyperparameters of the network weights are adjusted by the gradient of the loss function. The lower the learning rate, the slower the loss function will change. While using a low learning rate ensures that no local minimal values are missed, it also means that it takes longer to converge, especially if trapped in a plateau region. Throughout the whole training process, we cannot adopt the same learning rate to update the weights, otherwise, the optimal point cannot be reached, So we need to adjust the learning rate during the training. In the initial stage of training, since the weights are in a random initialization state and the loss function decreases fast, a larger learning rate can be set. And in the later stage of training, since the weights are close to the optimal value, a larger learning rate cannot further find the optimal value, so a smaller learning rate needs is a better choice. As for the learning rate decay strategy, many researchers or practitioners use piecewise_decay (step_decay), which is a stepwise decay learning rate. In addition, there are also other methods proposed by researchers, such as polynomial_decay, exponential_ decay, cosine_decay, etc. Among them, cosine_decay requires no adjustment of hyperparameters and has higher robustness, thus emerging as the preferred learning rate decay method to improve model accuracy. The learning rates of cosine_decay and piecewise_decay are shown in the following figure. It is easy to observe that cosine_decay keeps a large learning rate throughout the training, so it is slow in convergence, but its final effect is better than peicewise_decay.
+
+![](../../images/models/lr_decay.jpeg)
 
 > >
 
@@ -119,6 +119,7 @@
 - Q: How to improve the accuracy of my own dataset by pre-training the model?
 - A: At this stage, it has become a common practice in the image recognition field to load pre-trained models to train their own tasks, which can often improve the accuracy of a particular task compared to training from random initialization. In general, the pre-training model widely used in the industry is obtained by training the ImageNet-1k dataset of 1.28 million images of 1000 classes. The fc layer weights of this pre-training model are a matrix of k*1000, where k is the number of neurons before the fc layer, and it is not necessary to load the fc layer weights when loading the pre-training weights. In terms of the learning rate, if your dataset is particularly small (e.g., less than 1,000), we recommend you to adopt a small initial learning rate, e.g., 0.001 (batch_size:256, the same below), so as not to corrupt the pre-training weights with a larger learning rate. If your training dataset is relatively large (>100,000), we suggest you try a larger initial learning rate, such as 0.01 or above.
 
+<a name="1.3"></a>
 ### 1.3 Data
 
 > >
@@ -139,7 +140,7 @@
 > >
 
 - Q: What are the common data augmentation methods currently available to increase the richness of training samples when the amount of data is insufficient?
-- A: PaddleClas classifies data augmentation methods into three categories, which are image transformation, image cropping and image aliasing. Image transformation mainly includes AutoAugment and RandAugment, image cropping contains CutOut, RandErasing, HideAndSeek and GridMask, and image aliasing comprises Mixup and Cutmix. More detailed introduction to data augmentation can be found in the chapter of [Data Augmentation ](https://github.com/PaddlePaddle/PaddleClas/blob/release/2.3/docs/zh_CN/ algorithm_introduction/DataAugmentation.md).
+- A: PaddleClas classifies data augmentation methods into three categories, which are image transformation, image cropping and image aliasing. Image transformation mainly includes AutoAugment and RandAugment, image cropping contains CutOut, RandErasing, HideAndSeek and GridMask, and image aliasing comprises Mixup and Cutmix. More detailed introduction to data augmentation can be found in the chapter of [Data Augmentation ](../algorithm_introduction/DataAugmentation_en.md).
 
 > >
 
@@ -164,12 +165,12 @@
 
 
 > >
-
+<a name="long_tail"></a>
 - Q: What are the common methods currently used for datasets with long-tailed distributions?
 - A:(1) the categories with fewer data can be resampled to increase the probability of their occurrence; (2) the loss can be modified to increase the loss weight of images in categories corresponding to fewer images; (3) the method of transfer learning can be borrowed to learn generic knowledge from common categories and then migrate to the categories with fewer samples.
 
 
-
+<a name="1.4"></a>
 ### 1.4 Model Inference and Prediction
 
 > >
@@ -198,7 +199,7 @@
 - A: (1) Using a GPU with better performance; (2) increasing the batch size; (3) using TenorRT and FP16 half-precision floating-point methods.
 
 
-
+<a name="2"></a>
 ## 2. Application of PaddleClas
 
 > >
