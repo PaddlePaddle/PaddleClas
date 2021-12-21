@@ -81,13 +81,13 @@ def main(args):
     # amp related config
     if 'AMP' in config:
         AMP_RELATED_FLAGS_SETTING = {
-            'FLAGS_cudnn_exhaustive_search': "1",
-            'FLAGS_conv_workspace_size_limit': "1500",
-            'FLAGS_cudnn_batchnorm_spatial_persistent': "1",
-            'FLAGS_max_inplace_grad_add': "8"
+            'FLAGS_cudnn_exhaustive_search': 1,
+            'FLAGS_conv_workspace_size_limit': 1500,
+            'FLAGS_cudnn_batchnorm_spatial_persistent': 1,
+            'FLAGS_max_inplace_grad_add': 8,
         }
-        for k in AMP_RELATED_FLAGS_SETTING:
-            os.environ[k] = AMP_RELATED_FLAGS_SETTING[k]
+        os.environ['FLAGS_cudnn_batchnorm_spatial_persistent'] = '1'
+        paddle.fluid.set_flags(AMP_RELATED_FLAGS_SETTING)
 
     use_xpu = global_config.get("use_xpu", False)
     use_npu = global_config.get("use_npu", False)
