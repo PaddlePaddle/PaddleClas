@@ -15,7 +15,7 @@
 # sys.path.insert(0, os.path.abspath('.'))
 import sphinx_rtd_theme
 from recommonmark.parser import CommonMarkParser
-#import sphinx-markdown-tables
+import sphinx-markdown-tables
 # -- Project information -----------------------------------------------------
 
 project = 'PaddleClas'
