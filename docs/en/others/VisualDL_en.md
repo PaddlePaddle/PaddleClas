@@ -2,7 +2,8 @@
 
 ---
 
-## Contents
+## Catalogue
+
 * [1. Preface](#1)
 * [2. Use VisualDL in PaddleClas](#2)
     * [2.1 Set config and start training](#2.1)

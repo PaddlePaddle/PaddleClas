@@ -4,7 +4,7 @@ Transfer learning is an important part of machine learning, which is widely used
 
 ---
 
-## Contents
+## Catalogue
 
 * [1. Hyperparameter search](#1)
   * [1.1 Grid search](#1.1)
