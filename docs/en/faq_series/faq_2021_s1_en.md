@@ -2,13 +2,13 @@
 
 ## Contents
 
-- [1. Issue 1](https://github.com/PaddlePaddle/PaddleClas/blob/release/2.3/docs/zh_CN/faq_series/faq_2021_s1.md#1)(2021.01.05)
-- [2. Issue 2](https://github.com/PaddlePaddle/PaddleClas/blob/release/2.3/docs/zh_CN/faq_series/faq_2021_s1.md#2)(2021.01.14)
-- [3. Issue 3](https://github.com/PaddlePaddle/PaddleClas/blob/release/2.3/docs/zh_CN/faq_series/faq_2021_s1.md#3)(2020.01.21)
-- [4. Issue 4](https://github.com/PaddlePaddle/PaddleClas/blob/release/2.3/docs/zh_CN/faq_series/faq_2021_s1.md#4)(2021.01.28)
-- [5. Issue 5](https://github.com/PaddlePaddle/PaddleClas/blob/release/2.3/docs/zh_CN/faq_series/faq_2021_s1.md#5)(2021.02.03)
+- [1. Issue 1](#1)(2021.01.05)
+- [2. Issue 2](#2)(2021.01.14)
+- [3. Issue 3](#3)(2020.01.21)
+- [4. Issue 4](#4)(2021.01.28)
+- [5. Issue 5](#5)(2021.02.03)
 
-
+<a name="1"></a>
 
 ## Issue 1
 
@@ -26,10 +26,10 @@
 
 - From the perspective of sampling
   - The samples can be sampled dynamically according to the categories, with different sampling probabilities for each category and ensure that the number of training samples in different categories is basically the same or in the desired proportion in the same minibatch or epoch.
-    - You can use the oversampling method to oversample the categories with a small number of images.
+  - You can use the oversampling method to oversample the categories with a small number of images.
 - From the perspective of loss function
   - The OHEM (online hard example miniing) method can be used to filter the hard example based on the loss of the samples for gradient backpropagation and parameter update of the model.
-    - The Focal loss method can be used to assign a smaller weight to the loss of some easy samples and a larger weight to the loss of hard samples, so that the loss of easy samples contributes to the overall loss of the network without dominating the loss.
+  - The Focal loss method can be used to assign a smaller weight to the loss of some easy samples and a larger weight to the loss of hard samples, so that the loss of easy samples contributes to the overall loss of the network without dominating the loss.
 
 ### Q1.3 When training in docker, the data path and configuration are fine, but it keeps reporting `SystemError: (Fatal) Blocking queue is killed because the data reader raises an exception`, why is this?
 
@@ -54,7 +54,7 @@ Based on ResNet50_vd, Baidu open-sourced its own large-scale classification pre-
 
 You are welcomed to add more tips on inference deployment acceleration.
 
-
+<a name="2"></a>
 
 ## Issue 2
 
@@ -76,13 +76,13 @@ First, it is necessary to ensure that the accuracy of the Teacher model. Second,
 
 ### Q2.4: Which networks have advantages on mobile or embedded side?
 
-It is recommended to use the Mobile Series network, and the details can be found in [Introduction to Mobile Series Network Structure](https://github.com/PaddlePaddle/PaddleClas/blob/release/2.3/docs/zh_CN/models/Mobile.md). If the speed of the task is the priority, MobileNetV3 series can be considered, and if the model size is more important, the specific structure can be determined based on the StorageSize - Accuracy in the Introduction to the Mobile Series Network Structure.
+It is recommended to use the Mobile Series network, and the details can be found in [Introduction to Mobile Series Network Structure](../models/Mobile_en.md). If the speed of the task is the priority, MobileNetV3 series can be considered, and if the model size is more important, the specific structure can be determined based on the StorageSize - Accuracy in the Introduction to the Mobile Series Network Structure.
 
 ### Q2.5: Why use a network with large number of parameters and computation such as ResNet when the mobile network is so fast?
 
 Different network structures have various speed advantages running on disparate devices. On the mobile side, mobile series networks run faster than server-side networks, but on the server side, networks with specific optimizations such as ResNet have greater advantages for the same accuracy. So the specific network structure needs to be decided on a case-by-case basis.
 
-
+<a name="3"></a>
 
 ## Issue 3
 
@@ -104,16 +104,16 @@ The size of the square convolution kernel is assumed to be `d*d`, i.e., the widt
 
 During the training, the network width of the model is improved by the ACB structure, and more features are extracted using the two asymmetric convolution kernels of `1*d` and `d*1` to enrich the information of the feature maps extracted by the `d*d` convolution kernels. In the inference stage, this design idea does not bring additional parameters and computational overhead. The following figure shows the form of convolutional kernels for the training phase and the inference deployment phase, respectively.
 
-[![img](https://github.com/PaddlePaddle/PaddleClas/raw/release/2.3/docs/images/faq/TrainingtimeACNet.png)](https://github.com/PaddlePaddle/PaddleClas/blob/release/2.3/docs/images/faq/TrainingtimeACNet.png)
+![](../../images/faq/TrainingtimeACNet.png)
 
-[![img](https://github.com/PaddlePaddle/PaddleClas/raw/release/2.3/docs/images/faq/DeployedACNet.png)](https://github.com/PaddlePaddle/PaddleClas/blob/release/2.3/docs/images/faq/DeployedACNet.png)
+![](../../images/faq/DeployedACNet.png)
 
 Experiments by the authors of the article show that the model capability can be significantly improved by using ACNet structures in the training of the original network model, as explained by the original authors as follows.
 
 1. Experiments show that for a `d*d` convolution kernel, the parameters of the skeleton position (e.g., the `skeleton` position of the convolution kernel in the above figure) have a greater impact on the model accuracy than the parameters of the corner position (e.g., the `corners` position of the convolution kernel in the above figure) of the eliminated convolution kernel, so the parameters of the skeleton position of the convolution kernel are essential. And the two asymmetric convolution kernels in the ACB structure enhance the weight of the square convolution kernel skeleton position parameter, making it more significant. About whether this summation will weaken the role of the skeleton position parameter due to the offsetting effect of positive and negative numbers, the authors found through experiments that the training of the network always goes in the direction of increasing the role of the skeleton position parameter, and there is no weakening due to the offsetting effect.
 2. The asymmetric convolution kernel is more robust for flipped images, as shown in the following figure, the horizontal asymmetric convolution kernel is more robust for flipped images up and down. The feature maps extracted by the asymmetric convolution kernel are the same for semantically the same position in the image before and after the flip, which is better than the square convolution kernel.
 
-[![img](https://github.com/PaddlePaddle/PaddleClas/raw/release/2.3/docs/images/faq/HorizontalKernel.png)](https://github.com/PaddlePaddle/PaddleClas/blob/release/2.3/docs/images/faq/HorizontalKernel.png)
+![](../../images/faq/HorizontalKernel.png)
 
 ### Q3.3: What are the main innovations of RepVGG?
 
@@ -121,7 +121,7 @@ Experiments by the authors of the article show that the model capability can be 
 
 Through Q3.1 and Q3.2, it may occur to us to decouple the training phase and inference phase by ACNet, and use multi-branch structure in the training phase and Plain structure in inference phase, which is the innovation of RepVGG. The following figure shows the comparison of the network structures of ResNet and RepVGG in the training and inference phases.
 
-[![img](https://github.com/PaddlePaddle/PaddleClas/raw/release/2.3/docs/images/faq/RepVGG.png)](https://github.com/PaddlePaddle/PaddleClas/blob/release/2.3/docs/images/faq/RepVGG.png)
+![](../../images/faq/RepVGG.png)
 
 First, the RepVGG in the training phase adopts a multi-branch structure, which can be regarded as a residual structure with `1*1` convolution and constant mapping on top of the traditional VGG network, while the RepVGG in the inference phase degenerates to a VGG structure. The transformation of the network structure from RepVGG in the training phase to RepVGG in the inference phase is implemented using the "structural reparameterization" technique.
 
@@ -133,7 +133,7 @@ The constant mapping can be regarded as the output of the `1*1` convolution kern
 
 From the above, it can be simply understood that RepVGG is the extreme version of ACNet. Re-parameters operation in ACNet is shown in the following figure.
 
-[![img](https://github.com/PaddlePaddle/PaddleClas/raw/release/2.3/docs/images/faq/ACNetReParams.png)](https://github.com/PaddlePaddle/PaddleClas/blob/release/2.3/docs/images/faq/ACNetReParams.png)
+![](../../images/faq/ACNetReParams.png)
 
 Take `conv2` as an example, the asymmetric convolution can be regarded as a square convolution kernel of `3*3`, except that the upper and lower six parameters of the square convolution kernel are `0`, and it is the same for `conv3`. On top of that, the sum of the results of `conv1`, `conv2`, and `conv3` is equivalent to the sum of three convolution kernels followed by convolution. With `Conv` denoting the convolution operation and `+` denoting the addition operation of the matrix, then: `Conv1(A)+Conv2(A)+Conv3(A) == Convk(A)`, where `Conv1`, ` Conv2`, `Conv3` have convolution kernels `Kernel1`, `kernel2`, `kernel3`, and `Convk` has convolution kernels `Kernel1 + kernel2 + kernel3`, respectively.
 
@@ -147,20 +147,20 @@ There are many factors that affect the computation speed of the model, and the n
 
 1. Number of parameters: the number of parameters used to measure the model, the larger the number of parameters of the model, the higher the memory (video memory) requirements of the model during computation. However, the size of the memory (video memory) footprint does not depend entirely on the number of parameters. In the figure below, assuming that the input feature map memory footprint size is `1` unit, for the residual structure on the left, the peak memory footprint during computation is twice as large as that of the Plain structure on the right, because the results of the two branches need to be recorded and then added together.
 
-[![img](https://github.com/PaddlePaddle/PaddleClas/raw/release/2.3/docs/images/faq/MemoryOccupation.png)](https://github.com/PaddlePaddle/PaddleClas/blob/release/2.3/docs/images/faq/MemoryOccupation.png)
+![](../../images/faq/MemoryOccupation.png)
 
-1.
 2. FLOPs: Note that FLOPs are distinguished from floating point operations per second (FLOPS), which can be simply understood as the amount of computation and is usually adopted to measure the computational complexity of a model. Taking the common convolution operation as an example, considering no batch size, activation function, stride operation, and bias, assuming that the input future map size is `Min*Min` and the number of channels is `Cin`, the output future map size is `Mout*Mout` and the number of channels is `Cout`, and the conv kernel size is `K*K`, the FLOPs for a single convolution can be calculated as follows.
-
    1. The number of feature points contained in the output feature map is: `Cout * Mout * Mout`.
-   2. For the convolution operation for each feature point in the output feature map: the number of multiplication calculations is: `Cin * K * K`; the number of addition calculations is: `Cin * K * K - 1`.
-   3. So the total number of computations is: `Cout * Mout * Mout * (Cin * K * K + Cin * K * K - 1)`, i.e. `Cout * Mout * Mout * (2Cin * K * K - 1)`.
+   1. For the convolution operation for each feature point in the output feature map: the number of multiplication calculations is: `Cin * K * K`; the number of addition calculations is: `Cin * K * K - 1`.
+   1. So the total number of computations is: `Cout * Mout * Mout * (Cin * K * K + Cin * K * K - 1)`, i.e. `Cout * Mout * Mout * (2Cin * K * K - 1)`.
+
 3. Memory Access Cost (MAC): The computer needs to read the data from memory (general memory, including video memory) to the operator's Cache before performing operations on data (such as multiplication and addition), and the memory access is very time-consuming. Take grouped convolution as an example, suppose it is divided into `g` groups, although the number of parameters and FLOPs of the model remain unchanged after grouping, the number of memory accesses for grouped convolution becomes `g` times of the previous one (this is a simple calculation without considering multi-level Cache), so the MAC increases significantly and the computation speed of the model slows down accordingly.
+
 4. Parallelism: The term parallelism often includes data parallelism and model parallelism, in this case, model parallelism. Take convolutional operation as an example, the number of parameters in a convolutional layer is usually very large, so if the matrix in the convolutional layer is chunked and then handed over to multiple GPUs separately, the purpose of acceleration can be achieved. Even some network layers with too many parameters for a single GPU memory may be divided into multiple GPUs, but whether they can be divided into multiple GPUs in parallel depends not only on hardware conditions, but also on the specific form of operation. Of course, the higher the degree of parallelism, the faster the model can run.
 
 
 
-
+<a name="4"></a>
 
 ## Issue 4
 
@@ -179,7 +179,7 @@ Paper address: [AN IMAGE IS WORTH 16X16 WORDS: TRANSFORMERS FOR IMAGE RECOGNITIO
 **A**:
 
 1. The dependence of images on CNNs is unnecessary, and the computational efficiency and scalability of the Transformer allow for training very large models without saturation as the model and dataset grow. Inspired by the Transformer for NLP, when being used in image classification tasks, images are divided into sequential patches that are fed into a linear unit embedding as input to the transformer.
-2. In medium-sized datasets such as ImageNet1k, ImageNet21k, the visual Transformer model is several percentage points lower than ResNet of the same size. It is speculated that this is because the transformer lacks the Locality and Spatial Invariance that CNNs have, and it is difficult to outperform convolutional networks when the amount of data is not large enough. But for this problem, the data augmentation adopted by [DeiT](https://arxiv.org/abs/ 2012.12877) to some extent addresses the reliance of Vision Transformer on very large datasets for training.
+2. In medium-sized datasets such as ImageNet1k, ImageNet21k, the visual Transformer model is several percentage points lower than ResNet of the same size. It is speculated that this is because the transformer lacks the Locality and Spatial Invariance that CNNs have, and it is difficult to outperform convolutional networks when the amount of data is not large enough. But for this problem, the data augmentation adopted by [DeiT](https://arxiv.org/abs/2012.12877) to some extent addresses the reliance of Vision Transformer on very large datasets for training.
 3. This approach can go beyond local information and model more long-range dependencies when training on super large-scale datasets 14M-300M, while CNN can better focus on local information but is weak in capturing global information.
 4. Transformer once reigned in the field of NLP, but was also questioned as not applicable to the CV field. The current several pieces of visual field articles also deliver competitive performance as the SOTA of CNN. We believe that a joint Vision-Language or multimodal model will be proposed that can solve both visual and linguistic problems.
 
@@ -192,19 +192,19 @@ Paper address: [AN IMAGE IS WORTH 16X16 WORDS: TRANSFORMERS FOR IMAGE RECOGNITIO
    - (1) variable-length sequential input, because it is RNN structure with various amounts of words in one sentence. If it is an NLP scene, the change of word order affects little of the semantics, but the position of the image means a lot since great misunderstanding can be caused when different regions are connected in a different order.
    - (2) Single patch position is transformed into a vector with fixed dimension. Encoder input is patch pixel information embedding, combined with some fixed position vector concate to synthesize a vector with fixed dimension and position information in it.
 
-[![img](https://github.com/PaddlePaddle/PaddleClas/raw/release/2.3/docs/images/faq/Transformer_input.png)](https://github.com/PaddlePaddle/PaddleClas/blob/release/2.3/docs/images/faq/Transformer_input.png)
+![](../../images/faq/Transformer_input.png)
 
-1. Consider the following question: How to pass an image to an encoder?
+3. Consider the following question: How to pass an image to an encoder?
 
 - As the following figure shows. Suppose the input image is [224,224,3], which is cut into many patches in order from left to right and top to bottom, and the patch size can be [p,p,3] (p can be 16, 32). Convert it into a feature vector using the Linear Projection of Flattened Patches module and concat a position vector into the Encoder.
 
-[![img](https://github.com/PaddlePaddle/PaddleClas/raw/release/2.3/docs/images/faq/ViT_structure.png)](https://github.com/PaddlePaddle/PaddleClas/blob/release/2.3/docs/images/faq/ViT_structure.png)
+![](../../images/faq/ViT_structure.png)
 
-1. As shown above, given an image of `H×W×C` and a block size P, the image can be divided into `N` blocks of `P×P×C`, `N=H×W/(P×P)`. After getting the blocks, we have to use linear transformation to convert them into D-dimensional feature vectors, and then add the position encoding vectors. Similar to BERT, ViT also adds a classification flag bit before the sequence, denoted as `[CLS]`. The ViT input sequence `z` is shown in the following equation, where `x` represents an image block.
+4. As shown above, given an image of `H×W×C` and a block size P, the image can be divided into `N` blocks of `P×P×C`, `N=H×W/(P×P)`. After getting the blocks, we have to use linear transformation to convert them into D-dimensional feature vectors, and then add the position encoding vectors. Similar to BERT, ViT also adds a classification flag bit before the sequence, denoted as `[CLS]`. The ViT input sequence `z` is shown in the following equation, where `x` represents an image block.
 
-[![img](https://github.com/PaddlePaddle/PaddleClas/raw/release/2.3/docs/images/faq/ViT.png)](https://github.com/PaddlePaddle/PaddleClas/blob/release/2.3/docs/images/faq/ViT.png)
+![](../../images/faq/ViT.png)
 
-1. ViT model is basically the same as Transformer, where the input sequence is passed into ViT and then the final output features are classified using the `[CLS]` flags. viT consists mainly of MSA (multiheaded self-attentive) and MLP (two-layer fully connected network using GELU activation function), with LayerNorm and residual connections before MSA and MLP
+5. ViT model is basically the same as Transformer, where the input sequence is passed into ViT and then the final output features are classified using the `[CLS]` flags. viT consists mainly of MSA (multiheaded self-attentive) and MLP (two-layer fully connected network using GELU activation function), with LayerNorm and residual connections before MSA and MLP
 
 ### Q4.4: How to understand Inductive Bias?
 
@@ -220,7 +220,7 @@ Paper address: [AN IMAGE IS WORTH 16X16 WORDS: TRANSFORMERS FOR IMAGE RECOGNITIO
 1. Similar to BERT, ViT adds a `[CLS]` flag bit before the first patch, and the vector corresponding to the last end flag bit can be used as a semantic representation of the whole image, and thus for downstream classification tasks, etc. Therefore, the whole embedding group can characterize the features of the image at different locations.
 2. The vector corresponding to the `[CLS]` flag bit is used as the semantic representation of the whole image because this symbol with no obvious semantic information will "fairly" integrate the semantic information of each patch in the image compared with other patches, and thus better represent the semantic of the whole image.
 
-
+<a name="5"></a>
 
 ## Issue 5
 

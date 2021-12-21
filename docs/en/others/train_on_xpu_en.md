@@ -4,26 +4,26 @@
 
 ## Contents
 
-- [1. Foreword](https://github.com/PaddlePaddle/PaddleClas/blob/release%2F2.3/docs/zh_CN/others/train_on_xpu.md#1)
-- [2. Training of Kunlun](https://github.com/PaddlePaddle/PaddleClas/blob/release%2F2.3/docs/zh_CN/others/train_on_xpu.md#2)
-  - [2.1 ResNet50](https://github.com/PaddlePaddle/PaddleClas/blob/release%2F2.3/docs/zh_CN/others/train_on_xpu.md#2.1)
-  - [2.2 MobileNetV3](https://github.com/PaddlePaddle/PaddleClas/blob/release%2F2.3/docs/zh_CN/others/train_on_xpu.md#2.2)
-  - [2.3 HRNet](https://github.com/PaddlePaddle/PaddleClas/blob/release%2F2.3/docs/zh_CN/others/train_on_xpu.md#2.3)
-  - [2.4 VGG16/19](https://github.com/PaddlePaddle/PaddleClas/blob/release%2F2.3/docs/zh_CN/others/train_on_xpu.md#2.4)
+- [1. Foreword](#1)
+- [2. Training of Kunlun](#2)
+  - [2.1 ResNet50](#2.1)
+  - [2.2 MobileNetV3](#2.2)
+  - [2.3 HRNet](#2.3)
+  - [2.4 VGG16/19](#2.4)
 
-
+<a name='1'></a>
 
 ## 1. Forword
 
-- This document describes the models currently supported by Kunlun and how to train these models on Kunlun devices. To install PaddlePaddle that supports Kunlun, please refer to install_kunlun(https://github.com/PaddlePaddle/FluidDoc/blob/develop/doc/paddle/install/install_Kunlun_zh.md)
+- This document describes the models currently supported by Kunlun and how to train these models on Kunlun devices. To install PaddlePaddle that supports Kunlun, please refer to [install_kunlun](https://www.paddlepaddle.org.cn/documentation/docs/zh/develop/guides/09_hardware_support/xpu_docs/paddle_install_cn.html)
 
-
+<a name='2'></a>
 
 ## 2. Training of Kunlun
 
-- See [quick_start](https://github.com/PaddlePaddle/PaddleClas/blob/release/2.3/docs/zh_CN/quick_start/quick_start_ classification_new_user.md) for data sources and pre-trained models. The training effect of Kunlun is aligned with CPU/GPU.
+- See [quick_start](../quick_start/quick_start_classification_new_user_en.md)for data sources and pre-trained models. The training effect of Kunlun is aligned with CPU/GPU.
 
-
+<a name='2.1'></a>
 
 ### 2.1 ResNet50
 
@@ -39,7 +39,7 @@ python3.7 ppcls/static/train.py \
 
 The difference with cpu/gpu training lies in the addition of -o use_xpu=True, indicating that the execution is on a Kunlun device.
 
-
+<a name='2.2'></a>
 
 ### 2.2 MobileNetV3
 
@@ -53,7 +53,7 @@ python3.7 ppcls/static/train.py \
     -o is_distributed=False
 ```
 
-
+<a name='2.3'></a>
 
 ### 2.3 HRNet
 
@@ -67,7 +67,7 @@ python3.7 ppcls/static/train.py \
     -o use_gpu=False
 ```
 
-
+<a name='2.4'></a>
 
 ### 2.4 VGG16/19
 
