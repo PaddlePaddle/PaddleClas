@@ -64,7 +64,7 @@ class Momentum(object):
                 grad_clip=self.grad_clip,
                 multi_precision=self.multi_precision,
                 parameters=parameters,
-                use_multi_tensor=False)
+                use_multi_tensor=True)
         return opt
 
 
