@@ -2,7 +2,7 @@
 
 ------
 
-## Contents
+## Catalogue
 
 - [1. Foreword](#1)
 - [2. Training of Kunlun](#2)

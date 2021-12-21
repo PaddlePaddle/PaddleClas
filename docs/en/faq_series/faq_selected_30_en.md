@@ -5,7 +5,7 @@
 - We collect some frequently asked questions in issues and user groups since PaddleClas is open-sourced and provide brief answers, aiming to give some reference for the majority to save you from twists and turns.
 - There are many talents in the field of image classification, recognition and retrieval with quickly updated models and papers, and the answers here mainly rely on our limited project practice, so it is not possible to cover all facets. We sincerely hope that the man of insight will help to supplement and correct the content, thanks a lot.
 
-## Contents
+## Catalogue
 
 - [1. 30 Questions About Image Classification](#1)
   - [1.1 Basic Knowledge](#1.1)
