@@ -21,6 +21,7 @@ from ppcls.utils import profiler
 
 def train_epoch(engine, epoch_id, print_batch_step):
     tic = time.time()
+    v_current = [int(i) for i in paddle.__version__.split(".")]
     for iter_id, batch in enumerate(engine.train_dataloader):
         if iter_id >= engine.max_iter:
             break
@@ -59,7 +60,7 @@ def train_epoch(engine, epoch_id, print_batch_step):
         else:
             loss_dict["loss"].backward()
             engine.optimizer.step()
-        engine.optimizer.clear_grad(set_to_zero=True)
+        engine.optimizer.clear_grad()
         engine.lr_sch.step()
 
         # below code just for logging
