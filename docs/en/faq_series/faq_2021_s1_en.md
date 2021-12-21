@@ -1,6 +1,6 @@
 # Image Classification FAQ Summary - 2021 Season 1
 
-## Contents
+## Catalogue
 
 - [1. Issue 1](#1)(2021.01.05)
 - [2. Issue 2](#2)(2021.01.14)
