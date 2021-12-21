@@ -8,7 +8,8 @@ If you only want to test speed, please refer to [The tutorial of Paddle-Lite mob
 
 ---
 
-## Contents
+## Catalogue
+
 - [1. Preparation](#1)
     - [1.1 Build Paddle-Lite library](#1.1)
     - [1.2 Download inference library for Android or iOS](#1.2)

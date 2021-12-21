@@ -2,7 +2,7 @@
 
 ---
 
-## Contents
+## Catalogue
 
 * [1. Clone PaddleClas source code](#1)
 * [2. Install requirements](#2)
