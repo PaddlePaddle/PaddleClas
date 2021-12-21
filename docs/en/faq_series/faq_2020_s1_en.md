@@ -2,14 +2,14 @@
 
 ## Contents
 
-- [1. Issue 1](https://github.com/PaddlePaddle/PaddleClas/blob/release/2.3/docs/zh_CN/faq_series/faq_2020_s1.md#1)(2020.11.03)
-- [2. Issue 2](https://github.com/PaddlePaddle/PaddleClas/blob/release/2.3/docs/zh_CN/faq_series/faq_2020_s1.md#2)(2020.11.11)
-- [3. Issue 3](https://github.com/PaddlePaddle/PaddleClas/blob/release/2.3/docs/zh_CN/faq_series/faq_2020_s1.md#3)(2020.11.18)
-- [4. Issue 4](https://github.com/PaddlePaddle/PaddleClas/blob/release/2.3/docs/zh_CN/faq_series/faq_2020_s1.md#4)(2020.12.07)
-- [5. Issue 5](https://github.com/PaddlePaddle/PaddleClas/blob/release/2.3/docs/zh_CN/faq_series/faq_2020_s1.md#5)(2020.12.17)
-- [6. Issue 6](https://github.com/PaddlePaddle/PaddleClas/blob/release/2.3/docs/zh_CN/faq_series/faq_2020_s1.md#6)(2020.12.30)
+- [1. Issue 1](#1)(2020.11.03)
+- [2. Issue 2](#2)(2020.11.11)
+- [3. Issue 3](#3)(2020.11.18)
+- [4. Issue 4](#4)(2020.12.07)
+- [5. Issue 5](#5)(2020.12.17)
+- [6. Issue 6](#6)(2020.12.30)
 
-
+<a name="1"></a>
 
 ## Issue 1
 
@@ -33,25 +33,25 @@ It provides the whole process of model training, evaluation, inference, and depl
 
 **A**: The structure of ResNet_va to vd is shown in the figure below. ResNet was first proposed as va structure, in the left feature transformation path (Path A) of the downsampling residual module, the first 1x1 convolution is downsampled, which leads to information loss (the kernel size of the convolution is 1, stride is 2, some features in the input feature graph are not involved in the calculation of convolution). In the vb structure, the downsampling step is adjusted from the first 1x1 convolution at the beginning to the 3x3 convolution in the middle, thus avoiding the loss of information, and the default ResNet model in PaddleClas is ResNet_vb. The vc structure turns the initial 7x7 convolution into 3 3x3 convolutions with almost the same computation and storage size and improved accuracy when the perceptual field remains unchanged. The vd structure is a modification of the feature path (Path B) on the right side of the downsampling residual module, replacing the downsampling with average pooling. This collection of improvements (va->vd), with little extra inference time, and combined with appropriate training strategies, such as label smoothing and mixup data augmentation, can improve the accuracy by up to 2.7%.
 
-[![img](https://github.com/PaddlePaddle/PaddleClas/raw/release/2.3/docs/images/faq/ResNet_vabcd_structure.png)](https://github.com/PaddlePaddle/PaddleClas/blob/release/2.3/docs/images/faq/ResNet_vabcd_structure.png)
+![](../../images/faq/ResNet_vabcd_structure.png)
 
 ### Q1.4 How to choose appropriate ResNet models for the actual scenario?
 
 **A**:
 
-Among the ResNet series model, the ResNet_vd model is recommended for it has a significant improvement in accuracy with almost constant inference speed compared to other models. When the batch size=4, the variation of inference time, FLOPs, Params and accuracy for different models on T4 GPU are demonstrated in the [ResNet and its vd series models](https://github.com/PaddlePaddle/PaddleClas/blob/release/2.3/docs/zh_CN/models/ResNet_and_vd.md). If you want the smallest possible model storage or the fastest inference speed, please use ResNet18_vd model, and if you want to get the highest possible accuracy, we recommend the ResNet152_vd or ResNet200_vd models. For more information about the ResNet series model, please refer to [ResNet and its vd series models](https://github.com/PaddlePaddle/PaddleClas/blob/release/2.3/docs/zh_CN/models/ResNet_ and_vd.md)
+Among the ResNet series model, the ResNet_vd model is recommended for it has a significant improvement in accuracy with almost constant inference speed compared to other models. When the batch size=4, the variation of inference time, FLOPs, Params and accuracy for different models on T4 GPU are demonstrated in the [ResNet and its vd series models](../models/ResNet_and_vd_en.md). If you want the smallest possible model storage or the fastest inference speed, please use ResNet18_vd model, and if you want to get the highest possible accuracy, we recommend the ResNet152_vd or ResNet200_vd models. For more information about the ResNet series model, please refer to [ResNet and its vd series models](../models/ResNet_and_vd_en.md)
 
 - Variation of precision-inference speed
 
-[![img](https://github.com/PaddlePaddle/PaddleClas/raw/release/2.3/docs/images/models/T4_benchmark/t4.fp32.bs4.ResNet.png)](https://github.com/PaddlePaddle/PaddleClas/blob/release/2.3/docs/images/models/T4_benchmark/t4.fp32.bs4.ResNet.png)
+![](../../images/models/T4_benchmark/t4.fp32.bs4.ResNet.png)
 
 - Variation of precision-params
 
-[![img](https://github.com/PaddlePaddle/PaddleClas/raw/release/2.3/docs/images/models/T4_benchmark/t4.fp32.bs4.ResNet.params.png)](https://github.com/PaddlePaddle/PaddleClas/blob/release/2.3/docs/images/models/T4_benchmark/t4.fp32.bs4.ResNet.params.png)
+![](../../images/models/T4_benchmark/t4.fp32.bs4.ResNet.params.png)
 
 - Variation of precision-flops
 
-[![img](https://github.com/PaddlePaddle/PaddleClas/raw/release/2.3/docs/images/models/T4_benchmark/t4.fp32.bs4.ResNet.flops.png)](https://github.com/PaddlePaddle/PaddleClas/blob/release/2.3/docs/images/models/T4_benchmark/t4.fp32.bs4.ResNet.flops.png)
+![](../../images/models/T4_benchmark/t4.fp32.bs4.ResNet.flops.png)
 
 ### Q1.5 Is conv-bn-relu a fixed form in a block of the network?
 
@@ -69,9 +69,9 @@ There are two different kinds of blocks in the ResNet series, basic-block and bo
 
 **A**:
 
-Not really, increasing all the convolutional kernels in the network may not lead to performance improvement or even the opposite. In the paper [MixConv: Mixed Depthwise Convolutional Kernels](https://arxiv.org/abs/1907.09595), it is pointed out that increasing the size of the convolutional kernels within a certain range plays a positive role in the accuracy improvement, but a size beyond may lead to accuracy loss. Therefore, considering the size of the model and the computation, large convolutional kernels are generally abandoned to design the network. Also, there are experiments on large convolution kernels in the article [PP-LCNet](https://github.com/PaddlePaddle/PaddleClas/blob/release/2.3/docs/zh_CN/models/PP-LCNet.md).
+Not really, increasing all the convolutional kernels in the network may not lead to performance improvement or even the opposite. In the paper [MixConv: Mixed Depthwise Convolutional Kernels](https://arxiv.org/abs/1907.09595), it is pointed out that increasing the size of the convolutional kernels within a certain range plays a positive role in the accuracy improvement, but a size beyond may lead to accuracy loss. Therefore, considering the size of the model and the computation, large convolutional kernels are generally abandoned to design the network. Also, there are experiments on large convolution kernels in the article [PP-LCNet](../models/PP-LCNet_en.md).
 
-
+<a name="2"></a>
 
 ## Issue 2
 
@@ -80,7 +80,7 @@ Not really, increasing all the convolutional kernels in the network may not lead
 **A**：The process is as follows:
 
 - First, create a new model structure file under the folder ppcls/arch/backbone/model_zoo/, i.e. your own backbone. You can refer to resnet.py for model construction;
-- Then add your own backbone class in ppcls/arch/backbone/__init__.py;
+- Then add your own backbone class in ppcls/arch/backbone/\__init__.py;
 - Next, configure the yaml file for training, here you can refer to ppcls/configs/ImageNet/ResNet/ResNet50.yaml;
 - Now you can start the training.
 
@@ -108,9 +108,9 @@ PaddleClas strictly follows the resolution used by the authors of the paper. Sin
 
 **A**:
 
-There are many ssld pre-training models available in PaddleClas, which obtain better pre-training weights by semi-supervised knowledge distillation, so that the accuracy can be improved by replacing the ssld pre-training models with higher accuracy in transfer tasks or downstream vision tasks without replacing the structure files. For example, in PaddleSeg, [HRNet](https://github.com/PaddlePaddle/PaddleSeg/blob/release/v0.7.0/docs/model_zoo.md), with the weight of the ssld pre-training model, achieves much better accuracy than other same models in the industry; In PaddleDetection, [PP- YOLO](https://github.com/PaddlePaddle/PaddleDetection/blob/release/0.4/configs/ppyolo/README_cn.md) with ssld pre-training weights has further improvement in the already high baseline. The transfer of classification with ssld pre-training weights also yields impressive results, and the benefits of knowledge distillation for the transfer of classification task is detailed in  [SSLD Distillation Strategy](https://github.com/PaddlePaddle/PaddleClas/blob/release/2.3/docs/zh_CN/advanced_tutorials/knowledge_distillation.md)  
+There are many ssld pre-training models available in PaddleClas, which obtain better pre-training weights by semi-supervised knowledge distillation, so that the accuracy can be improved by replacing the ssld pre-training models with higher accuracy in transfer tasks or downstream vision tasks without replacing the structure files. For example, in PaddleSeg, [HRNet](../models/HRNet_en.md) , with the weight of the ssld pre-training model, achieves much better accuracy than other same models in the industry; In PaddleDetection, [PP- YOLO](https://github.com/PaddlePaddle/PaddleDetection/blob/release/0.4/configs/ppyolo/README_cn.md)with ssld pre-training weights has further improvement in the already high baseline. The transfer of classification with ssld pre-training weights also yields impressive results, and the benefits of knowledge distillation for the transfer of classification task is detailed in  [SSLD Distillation Strategy](../advanced_tutorials/knowledge_distillation_en.md)  
 
-
+<a name="3"></a>
 
 ## Issue 3
 
@@ -118,32 +118,32 @@ There are many ssld pre-training models available in PaddleClas, which obtain be
 
 **A**:
 
-DenseNet is designed with a more aggressive dense connectivity mechanism compared to ResNet, which further reduces the number of parameters by considering feature reuse and bypass settings, and mitigates the gradient dispersion problem to some extent. What's more, the model is easier to train and equipped with some regularization effect due to the introduction of dense connectivity. DenseNet is a good choice in image classification scenarios where the amount of data is limited. More information about DenseNet and this series can be found in [DenseNet Models](https://github.com/PaddlePaddle/PaddleClas/blob/release/2.3/docs/zh_CN/models/DPN_DenseNet. md).
+DenseNet is designed with a more aggressive dense connectivity mechanism compared to ResNet, which further reduces the number of parameters by considering feature reuse and bypass settings, and mitigates the gradient dispersion problem to some extent. What's more, the model is easier to train and equipped with some regularization effect due to the introduction of dense connectivity. DenseNet is a good choice in image classification scenarios where the amount of data is limited. More information about DenseNet and this series can be found in [DenseNet Models](../models/DPN_DenseNet_en.md).
 
 ### Q3.2: What are the improvements of the DPN network over DenseNet?
 
 **A**：
 
-The full name of DPN is Dual Path Networks, or Dual Channel Networks. It is a combination of DenseNet and ResNeXt, which demonstrates that DenseNet can extract new features from the previous layers, while ResNeXt is essentially reuse of features already extracted from the previous layers. The authors further analyze and find that ResNeXt has a high reuse rate for features but low redundancy, while DenseNet can create new features but has high redundancy. Combining the advantages of both structures, the DPN network is designed. Finally, the DPN network achieves better results than ResNeXt and DenseNet with the same FLOPS and number of parameters. More introduction and series models of DPN can be found in [DPN Models](https://github.com/PaddlePaddle/PaddleClas/blob/release/2.3/docs/zh_CN/models/DPN_DenseNet.md).
+The full name of DPN is Dual Path Networks, or Dual Channel Networks. It is a combination of DenseNet and ResNeXt, which demonstrates that DenseNet can extract new features from the previous layers, while ResNeXt is essentially reuse of features already extracted from the previous layers. The authors further analyze and find that ResNeXt has a high reuse rate for features but low redundancy, while DenseNet can create new features but has high redundancy. Combining the advantages of both structures, the DPN network is designed. Finally, the DPN network achieves better results than ResNeXt and DenseNet with the same FLOPS and number of parameters. More introduction and series models of DPN can be found in [DPN Models](../models/DPN_DenseNet_en.md).
 
 ### Q3.3: How to use multiple models for inference fusion?
 
 **A**:
 
-When adopting multiple models for inference, it is recommended to first export the pre-training model as an inference model to get rid of the dependence on the network structure definition, you can refer to [model export script](https://github.com/PaddlePaddle/PaddleClas/blob/release/2.3/ tools/export_model.py) for model exporting, and then see [inference script for the inference model](https://github.com/PaddlePaddle/PaddleClas/blob/release/2.3/deploy/python/), where you need to create multiple predictors according to the number of employed models.
+When adopting multiple models for inference, it is recommended to first export the pre-training model as an inference model to get rid of the dependence on the network structure definition, you can refer to [model export script](../../../tools/export_model.py) for model exporting, and then see [inference script for the inference model](../../../deploy/python/predict_cls.py), where you need to create multiple predictors according to the number of employed models.
 
 ### Q3.4: How to add your own data augmentation methods in PaddleClas?
 
 **A**：
 
-- For single-image augmentation, you can refer to [Single-image based data augmentation script](https://github.com/PaddlePaddle/PaddleClas/blob/release/2.3/ppcls/data/preprocess/ops). Learning from the data operator  ` ResizeImage ` or `CropImage` to create a new class, and then implement the corresponding augmentation method in `__call__`.
-- For a batch image, you can refer to the [batch data-based data augmentation script](https://github.com/PaddlePaddle/PaddleClas/blob/release/2.3/ppcls/data/preprocess/batch_ops ). Learning from the data operator `MixupOperator` or `CutmixOperator` to create a new class, and then implement the corresponding augmentation method in `__call__`.
+- For single-image augmentation, you can refer to [Single-image based data augmentation script](../../../ppcls/data/preprocess/ops). Learning from the data operator  ` ResizeImage ` or `CropImage` to create a new class, and then implement the corresponding augmentation method in `__call__`.
+- For a batch image, you can refer to the [batch data-based data augmentation script](../../../ppcls/data/preprocess/batch_ops). Learning from the data operator `MixupOperator` or `CutmixOperator` to create a new class, and then implement the corresponding augmentation method in `__call__`.
 
 ## Q3.5: How to further accelerate the model training?
 
 **A**：
 
-- You can adopt auto-mixed precision training, which can gain a significantly faster speed with almost zero precision loss. Take ResNet50 as an example, the configuration file of auto-mixed precision training in PaddleClas can be found at: [ResNet50_fp16.yml](https://github.com/ PaddlePaddle/PaddleClas/blob/release/2.3/ppcls/configs/ImageNet/ResNet/ResNet50_fp16.yaml). The main step is to add the following lines to the standard configuration file.
+- You can adopt auto-mixed precision training, which can gain a significantly faster speed with almost zero precision loss. Take ResNet50 as an example, the configuration file of auto-mixed precision training in PaddleClas can be found at: [ResNet50_fp16.yml](../../../ppcls/configs/ImageNet/ResNet/ResNet50_fp16.yaml). The main step is to add the following lines to the standard configuration file.
 
 ```
 # mixed precision training
@@ -155,7 +155,7 @@ AMP:
 
 - You can turn on dali to run the data preprocessing method on GPU. When the model is relatively small (reader accounts for a higher percentage of time consumption), an obviously faster speed can be obtained with dali on, which could be employed by adding  `-o Global.use_dali=True` during training. You can refer to [dali installation tutorial](https://docs.nvidia.com/deeplearning/dali/user-guide/docs/installation.html#nightly-builds) for more details.
 
-
+<a name="4"></a>
 
 ## Issue 4
 
@@ -176,7 +176,7 @@ AMP:
 - However, the authors of *HRNet* believe that the idea of gradually decreasing spatial resolution is not suitable for scenarios such as target detection (classification task of image region-level) and semantic segmentation (classification task of image pixel-level), because a lot of information is lost in this process and the final learned features can hardly represent the information of the original image at the high spatial resolution, while both the task of region-level and pixel-level classification are very sensitive to spatial accuracy.
 - Therefore, the authors of *HRNet* propose the idea of paralleling feature graphs with different spatial resolutions, while in contrast, neural networks such as *VGG* cascade feature graphs with different spatial resolutions by different convolutional pooling layers. Moreover, *HRNet* connects feature graphs of equal depth and disparate spatial resolutions, so that the information can be fully exchanged. The specific network structure is shown in the figure below.
 
-[![img](https://github.com/PaddlePaddle/PaddleClas/raw/release/2.3/docs/images/faq/HRNet.png)](https://github.com/PaddlePaddle/PaddleClas/blob/release/2.3/docs/images/faq/HRNet.png)
+![](../../images/faq/HRNet.png)
 
 ### Q4.3: In HRNet, how are connections made between feature graphs with different spatial resolutions?
 
@@ -184,7 +184,7 @@ AMP:
 
 - First, in *HRNet*, the *3 × 3* convolution with *stride* of *2* can be used to obtain a feature graph with low spatial resolution but higher dimension; and for those with low spatial resolution, the *1 × 1* convolution is first used to match the number of channels, and then the nearest neighbor interpolation is used for upsampling to obtain a feature graph with the same spatial resolution and number of channels as the high spatial resolution graph. And for the feature map with the same spatial resolution, the constant mapping can be performed directly. The details are shown in the following figure.
 
-[![img](https://github.com/PaddlePaddle/PaddleClas/raw/release/2.3/docs/images/faq/HRNet_block.png)](https://github.com/PaddlePaddle/PaddleClas/blob/release/2.3/docs/images/faq/HRNet_block.png)
+![](../../images/faq/HRNet_block.png)
 
 ### Q4.4: What does "SE" in the model stand for?
 
@@ -194,7 +194,7 @@ AMP:
 
 ### Q4.5: How does the SE structure implemented?
 
-[![img](https://github.com/PaddlePaddle/PaddleClas/raw/release/2.3/docs/images/faq/SE_structure.png)](https://github.com/PaddlePaddle/PaddleClas/blob/release/2.3/docs/images/faq/SE_structure.png)
+![](../../images/faq/SE_structure.png)
 
 **A**:
 
@@ -204,7 +204,7 @@ AMP:
 - For *Fsq*, the key is to obtain the vector of *C* dimension, so it is not limited to the *Global Average Pooling*. The *SENet* authors believe that the final *scale* is applied to *U* separately by channel, so it is necessary to calculate the corresponding *scale* based on the information of the corresponding channel, so the simplest *Global Average Pooling* is adopted, and the final *scale* vector represents the distribution between different channels, ignoring the situation in the same channel.
 - For *Fex*, its role is to find the distribution based on all the training data through training on each *mini batch*. Since our training is performed on *mini batches* and the *scale* based on all training data is the best, we can adopt the *Fex* to train on each *mini batch* to obtain a more reliable *scale*.
 
-
+<a name="5"></a>
 
 ## Issue 5
 
@@ -227,7 +227,7 @@ Throughout the whole training process, we cannot adopt the same learning rate to
 
 The learning rates of cosine_decay and piecewise_decay are shown in the following figure. It is easy to observe that cosine_decay keeps a large learning rate throughout the training, so it is slow in convergence, but its final effect is better than peicewise_decay.
 
-[![img](https://github.com/PaddlePaddle/PaddleClas/raw/release/2.3/docs/images/models/lr_decay.jpeg)](https://github.com/PaddlePaddle/PaddleClas/blob/release/2.3/docs/images/models/lr_decay.jpeg)
+![](../../images/models/lr_decay.jpeg)
 
 In addition, it is also observed that only a few rounds in cosine_decay use a small learning rate, which affects the final accuracy. So it is recommended to iterate more rounds for better results.
 
@@ -312,7 +312,7 @@ In the standard preprocessing of ImageNet-1k data, the random_crop function defi
 
 In general, the size of the dataset is crucial to the performance, but the annotation of images is often expensive, hence there are rare annotated images, which highlight the importance of data augmentation. In the standard data augmentation for training ImageNet-1k, two methods, Random_Crop and Random_Flip, are mainly adopted. However, in recent years, an increasing number of data augmentation methods have been proposed, such as cutout, mixup, cutmix, AutoAugment, etc. Experiments show that these methods can effectively improve the accuracy of the model. The specific information of the dataset is as follows:
 
-- ImageNet-1k: The following table lists the performance of ResNet50 adopting 8 different data augmentation methods. It can be seen that all of them are beneficial compared to baseline, with cutmix being the most effective data augmentation so far. For more information about data augmentation, please refer to the chapter of [**Data Augmentation**](https://github.com/PaddlePaddle/PaddleClas/blob/release/2.3/docs/zh_CN/advanced_tutorials/DataAugmentation.md).
+- ImageNet-1k: The following table lists the performance of ResNet50 adopting 8 different data augmentation methods. It can be seen that all of them are beneficial compared to baseline, with cutmix being the most effective data augmentation so far. For more information about data augmentation, please refer to the chapter of [**Data Augmentation**](../advanced_tutorials/DataAugmentation_en.md).
 
 | Model    | Date Augmentation Method | Test top-1 |
 | -------- | ------------------------ | ---------- |
@@ -351,9 +351,9 @@ At this stage, it has become a common practice in the image recognition field to
 **A**: If the existing strategy cannot further improve the accuracy of the model, it means that the model has almost reached saturation with the existing dataset and strategy, and two methods are provided here.
 
 - Mining relevant data: Use the model trained on the existing dataset to make predictions on the relevant data, label the data with higher confidence and add it to the training set for further training. Repeat the steps above to further improve the accuracy of the model.
-- Knowledge distillation: You can use a larger model to train a teacher model with higher accuracy on the dataset, and then adopt the teacher model to teach a Student model, where the Student model is the target model. PaddleClas provides Baidu's own SSLD knowledge distillation scheme, which can steadily improve by more than 3% even on such a challenging classification task as ImageNet-1k. For the chapter on SSLD knowledge distillation, please refer to [**SSLD Knowledge Distillation**](https://github.com/PaddlePaddle/PaddleClas/blob/release/2.3 /docs/zh_CN/advanced_tutorials/knowledge_distillation.md).
+- Knowledge distillation: You can use a larger model to train a teacher model with higher accuracy on the dataset, and then adopt the teacher model to teach a Student model, where the Student model is the target model. PaddleClas provides Baidu's own SSLD knowledge distillation scheme, which can steadily improve by more than 3% even on such a challenging classification task as ImageNet-1k. For the chapter on SSLD knowledge distillation, please refer to [**SSLD Knowledge Distillation**](../advanced_tutorials/knowledge_distillation_en.md).
 
-
+<a name="6"></a>
 
 ## Issue 6
 

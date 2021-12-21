@@ -4,10 +4,10 @@
 
 ## Contents
 
-- [1. v2.3](https://github.com/PaddlePaddle/PaddleClas/blob/release%2F2.3/docs/zh_CN/others/versions.md#1)
-- [2. v2.2](https://github.com/PaddlePaddle/PaddleClas/blob/release%2F2.3/docs/zh_CN/others/versions.md#2)
+- [1. v2.3](#1)
+- [2. v2.2](#2)
 
-
+<a name='1'></a>
 
 ## 1. v2.3
 
@@ -30,7 +30,7 @@
   - PaddleSlim: 2.2.0
   - PaddleServing: 0.6.1
 
-
+<a name='2'></a>
 
 ## 2. v2.2
 
