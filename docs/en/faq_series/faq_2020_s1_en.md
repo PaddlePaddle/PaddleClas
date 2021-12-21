@@ -1,6 +1,6 @@
 # Image Classification FAQ Summary - 2020 Season 1
 
-## Contents
+## Catalogue
 
 - [1. Issue 1](#1)(2020.11.03)
 - [2. Issue 2](#2)(2020.11.11)
