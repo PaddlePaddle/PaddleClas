@@ -6,19 +6,21 @@ PaddlePaddle supports exporting inference model for deployment. Compared with tr
 
 ## Contents
 
-- [1. 环境准备](#1)
-- [2. 分类模型导出](#2)
-- [3. 主体检测模型导出](#3)
-- [4. 识别模型导出](#4)
-- [5. 命令参数说明](#5)
+- [1. Environmental preparation](#1)
+- [2. Export classification model](#2)
+- [3. Export mainbody detection model](#3)
+- [4. Export recognition model](#4)
+- [5. Parameter description](#5)
 
 
 <a name="1"></a>
+
 ## 1. Environmental preparation
 
 First, refer to the [Installing PaddlePaddle](../installation/install_paddle_en.md) and the [Installing PaddleClas](../installation/install_paddleclas_en.md) to prepare environment.
 
 <a name="2"></a>
+
 ## 2. Export classification model
 
 Change the working directory to PaddleClas:
@@ -43,11 +45,13 @@ python tools/export_model.py
 ```
 
 <a name="3"></a>
+
 ## 3. Export mainbody detection model
 
 About exporting mainbody detection model in details, please refer[mainbody detection](../image_recognition_pipeline/mainbody_detection_en.md).
 
 <a name="4"></a>
+
 ## 4. Export recognition model
 
 Change the working directory to PaddleClas:
@@ -74,6 +78,7 @@ python3 tools/export_model.py \
 Notice, the inference model exported by above command is truncated on embedding layer, so the output of the model is n-dimensional embedding feature.
 
 <a name="5"></a>
+
 ## 5. Parameter description
 
 In the above model export command, the configuration file used must be the same as the training configuration file. The following fields in the configuration file are used to configure exporting model parameters.
