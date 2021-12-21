@@ -2,7 +2,7 @@
 
 ---
 
-## Contents
+## Catalogue
 
 * [1. Introduction](#1)
 * [2. Evaluation Steps](#2)

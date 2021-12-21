@@ -4,7 +4,7 @@ This tutorial will introduce the detailed steps of deploying the PaddleClas clas
 
 ---
 
-## Contents
+## Catalogue
 
 - [1. Prepare the environment](#1)
     - [1.1 Compile OpenCV](#1.1)
