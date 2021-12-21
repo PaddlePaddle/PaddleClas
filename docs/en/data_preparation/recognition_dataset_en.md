@@ -6,18 +6,18 @@ This document elaborates on the dataset format adopted by PaddleClas for image r
 
 ## Contents
 
-- [Dataset Format](https://github.com/paddlepaddle/paddleclas/blob/release%2F2.3/docs/zh_CN/data_preparation/recognition_dataset.md#数据集格式说明)
-- [Common Datasets for Image Recognition](https://github.com/paddlepaddle/paddleclas/blob/release%2F2.3/docs/zh_CN/data_preparation/recognition_dataset.md#图像识别任务常见数据集介绍)
-  - [2.1 General Datasets](https://github.com/paddlepaddle/paddleclas/blob/release%2F2.3/docs/zh_CN/data_preparation/recognition_dataset.md#通用图像识别数据集)
-  - [2.2 Vertical Datasets](https://github.com/paddlepaddle/paddleclas/blob/release%2F2.3/docs/zh_CN/data_preparation/recognition_dataset.md#垂类图像识别数据集)
-    - [2.2.1 Animation Character Recognition](https://github.com/paddlepaddle/paddleclas/blob/release%2F2.3/docs/zh_CN/data_preparation/recognition_dataset.md#动漫人物识别)
-    - [2.2.2 Product Recognition](https://github.com/paddlepaddle/paddleclas/blob/release%2F2.3/docs/zh_CN/data_preparation/recognition_dataset.md#商品识别)
-    - [2.2.3 Logo Recognition](https://github.com/paddlepaddle/paddleclas/blob/release%2F2.3/docs/zh_CN/data_preparation/recognition_dataset.md#Logo识别)
-    - [2.2.4 Vehicle Recognition](https://github.com/paddlepaddle/paddleclas/blob/release%2F2.3/docs/zh_CN/data_preparation/recognition_dataset.md#车辆识别)
+- [1. Dataset Format](#1)
+- [2. Common Datasets for Image Recognition](#2)
+  - [2.1 General Datasets](#2.1)
+  - [2.2 Vertical Datasets](#2.2)
+    - [2.2.1 Animation Character Recognition](#2.2.1)
+    - [2.2.2 Product Recognition](#2.2.2)
+    - [2.2.3 Logo Recognition](#2.2.3)
+    - [2.2.4 Vehicle Recognition](#2.2.4)
 
+<a name="1"></a>
 
-
-## 1 Dataset Format
+## 1. Dataset Format
 
 The dataset for the vector search, unlike those for classification tasks, is divided into the following three parts:
 
@@ -27,7 +27,7 @@ The dataset for the vector search, unlike those for classification tasks, is div
 
 The above three datasets all adopt  `txt` files for assignment. Taking the `CUB_200_2011` dataset as an example, the `train_list.txt` of the train dataset has the following format：
 
-```
+```shell
 # Use "space" as the separator
 ...
 train/99/Ovenbird_0136_92859.jpg 99 2
@@ -38,7 +38,7 @@ train/99/Ovenbird_0128_93366.jpg 99 6
 
 The `test_list.txt` of the query dataset (both gallery dataset and query dataset in`CUB_200_2011`) has the following format：
 
-```
+```shell
 # Use "space" as the separator
 ...
 test/200/Common_Yellowthroat_0126_190407.jpg 200 1
@@ -55,11 +55,13 @@ Each row of data is separated by "space", and the three columns of data stand fo
 
 2. When the gallery dataset and query dataset are different, there is no need to add a unique id. Both `query_list.txt` and `gallery_list.txt` contain two columns, which are the path and label information of the training data. The dataset of yaml configuration file is ` ImageNetDataset`.
 
-
+<a name="2"></a>
 
 ## 2. Common Datasets for Image Recognition
 
 Here we present a compilation of commonly used image recognition datasets, which is continuously updated and expects your supplement.
+
+<a name="2.1"></a>
 
 ### 2.1 General Datasets
 
@@ -77,11 +79,11 @@ Here we present a compilation of commonly used image recognition datasets, which
 
   Website： http://mmlab.ie.cuhk.edu.hk/projects/DeepFashion.html
 
-
+<a name="2.2"></a>
 
 ### 2.2 Vertical Datasets
 
-
+<a name="2.2.1"></a>
 
 #### 2.2.1 Animation Character Recognition
 
@@ -97,7 +99,7 @@ Here we present a compilation of commonly used image recognition datasets, which
 
   Website： http://cvit.iiit.ac.in/research/projects/cvit-projects/cartoonfaces
 
-
+<a name="2.2.2"></a>
 
 #### 2.2.2 Product Recognition
 
@@ -111,7 +113,7 @@ Here we present a compilation of commonly used image recognition datasets, which
 
 - DeepFashion-Inshop: The same as the common datasets In-shop Clothes.
 
-
+<a name="2.2.3"></a>
 
 ### 2.2.3 Logo Recognition
 
@@ -122,6 +124,8 @@ Here we present a compilation of commonly used image recognition datasets, which
 - Tsinghua-Tencent 100K: This dataset is a large traffic sign benchmark dataset based on 100,000 Tencent Street View panoramas. 30,000 traffic sign instances included, it provides 100,000 images covering a wide range of illumination, and weather conditions. Each traffic sign in the benchmark test is labeled with the category, bounding box and pixel mask. A total of 222 categories (0 background + 221 traffic signs) are incorporated.
 
   Website： https://cg.cs.tsinghua.edu.cn/traffic-sign/
+
+<a name="2.2.4"></a>
 
 ### 2.2.4 Vehicle Recognition
 

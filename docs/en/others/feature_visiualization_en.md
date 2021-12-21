@@ -4,26 +4,32 @@
 
 ## Contents
 
-- [1. Overview](https://github.com/PaddlePaddle/PaddleClas/blob/release%2F2.3/docs/zh_CN/others/feature_visiualization.md#1)
-- [2. Prepare Work](https://github.com/PaddlePaddle/PaddleClas/blob/release%2F2.3/docs/zh_CN/others/feature_visiualization.md#2)
-- [3. Model Modification](https://github.com/PaddlePaddle/PaddleClas/blob/release%2F2.3/docs/zh_CN/others/feature_visiualization.md#3)
-- [4. Results](https://github.com/PaddlePaddle/PaddleClas/blob/release%2F2.3/docs/zh_CN/others/feature_visiualization.md#4)
+- [1. Overview](#1)
+- [2. Prepare Work](#2)
+- [3. Model Modification](#3)
+- [4. Results](#4)
 
 
+
+<a name='1'></a>
 
 ## 1. Overview
 
 The feature graph is the feature representation of the input image in the convolutional network, and the study of which can be beneficial to our understanding and design of the model. Therefore, we employ this tool to visualize the feature graph based on the dynamic graph.
 
+<a name='2'></a>
+
 ## 2. Prepare Work
 
-The first step is to select the model to be studied, here we choose ResNet50. Copy the model networking code [resnet.py](https://github.com/PaddlePaddle/PaddleClas/blob/release/2.3/ppcls/arch/backbone/) to [directory](https://github.com/PaddlePaddle/PaddleClas/blob/release/2.3/ppcls/utils/feature_maps_ visualization) and download the [ResNet50 pre-training model](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ResNet50_pretrained.pdparams) or follow the command below.
+The first step is to select the model to be studied, here we choose ResNet50. Copy the model networking code [resnet.py](../../../ppcls/arch/backbone/legendary_models/resnet.py) to [directory](../../../ppcls/utils/feature_maps_visualization/) and download the [ResNet50 pre-training model](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ResNet50_pretrained.pdparams) or follow the command below.
 
-```
+```bash
 wget https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ResNet50_pretrained.pdparams
 ```
 
-For other pre-training models and codes of network structure, please download [model library](https://github.com/PaddlePaddle/PaddleClas/blob/release/2.3/ppcls/arch/backbone) and [pre-training models](https:// github.com/PaddlePaddle/PaddleClas/blob/release/2.3/docs/zh_CN/models/models_intro.md).
+For other pre-training models and codes of network structure, please download [model library](../../../ppcls/arch/backbone/) and [pre-training models](../models/models_intro_en.md).
+
+<a name='3'></a>
 
 ## 3. Model Modification
 
@@ -31,7 +37,7 @@ Having found the location of the needed feature graph, set self.fm to fetch it o
 
 Specify the feature graph to be visualized in the forward function of ResNet50
 
-```
+```python
     def forward(self, x):
         with paddle.static.amp.fp16_guard():
             if self.data_format == "NHWC":
@@ -47,7 +53,7 @@ Specify the feature graph to be visualized in the forward function of ResNet50
         return x, fm
 ```
 
-Then modify the code [fm_vis.py](https://github.com/PaddlePaddle/PaddleClas/blob/release/2.3/ppcls/utils/feature_maps_visualization/fm_vis.py) to import `ResNet50`，instantiating the  `net` object:
+Then modify the code [fm_vis.py](../../../ppcls/utils/feature_maps_visualization/fm_vis.py) to import `ResNet50`，instantiating the  `net` object:
 
 ```
 from resnet import ResNet50
@@ -75,13 +81,13 @@ Parameters：
 - `--save_path`: save path, such as `./tools/`
 - `--use_gpu`: whether to enable GPU inference, default value: True
 
-
+<a name='4'></a>
 
 ## 4. Results
 
 - Import the Image：
 
-[![img](https://github.com/PaddlePaddle/PaddleClas/raw/release/2.3/docs/images/feature_maps/feature_visualization_input.jpg)](https://github.com/PaddlePaddle/PaddleClas/blob/release/2.3/docs/images/feature_maps/feature_visualization_input.jpg)
+![](../../images/feature_maps/feature_visualization_input.jpg)
 
 - Run the following script of feature graph visualization
 
@@ -97,3 +103,5 @@ python tools/feature_maps_visualization/fm_vis.py \
 ```
 
 - Save the output feature graph as `output.png`, as shown below.
+
+![](../../images/feature_maps/feature_visualization_output.jpg)

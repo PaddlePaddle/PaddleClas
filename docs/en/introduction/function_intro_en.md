@@ -8,6 +8,6 @@ PaddleClas is an image recognition toolset for industry and academia, helping us
 - SSLD knowledge distillation: The 14 classification pre-training models generally improved their accuracy by more than 3%; among them, the ResNet50_vd model achieved a Top-1 accuracy of 84.0% on the Image-Net-1k dataset and the Res2Net200_vd pre-training model achieved a Top-1 accuracy of 85.1%.
 - Data augmentation: Provide 8 data augmentation algorithms such as AutoAugment, Cutout, Cutmix, etc. with the detailed introduction, code replication, and evaluation of effectiveness in a unified experimental environment.
 
-[![img](https://github.com/PaddlePaddle/PaddleClas/raw/release/2.3/docs/images/recognition.gif)](https://github.com/PaddlePaddle/PaddleClas/blob/release/2.3/docs/images/recognition.gif)
+![](../../images/recognition.gif)
 
-For more information about the quick start of image recognition, algorithm details, model training and evaluation, and prediction and deployment methods, please refer to the [README Tutorial](https://github.com/PaddlePaddle/PaddleClas/blob/release/2.3/README_ch.md) on home page.
+For more information about the quick start of image recognition, algorithm details, model training and evaluation, and prediction and deployment methods, please refer to the [README Tutorial](../../../README_ch.md) on home page.
