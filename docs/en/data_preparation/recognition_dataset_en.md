@@ -9,7 +9,7 @@ This document elaborates on the dataset format adopted by PaddleClas for image r
 - [1.Dataset Format](#1)
 - [2.Common Datasets for Image Recognition](#2)
   - [2.1 General Datasets](#2.1)
-  - [2.2 Vertical Datasets](#2.2)
+  - [2.2 Vertical Class Datasets](#2.2)
     - [2.2.1 Animation Character Recognition](#2.2.1)
     - [2.2.2 Product Recognition](#2.2.2)
     - [2.2.3 Logo Recognition](#2.2.3)
@@ -80,7 +80,7 @@ Here we present a compilation of commonly used image recognition datasets, which
 
 
 <a name="2.2"></a>
-### 2.2 Vertical Datasets
+### 2.2 Vertical Class Datasets
 
 
 <a name="2.2.1"></a>
