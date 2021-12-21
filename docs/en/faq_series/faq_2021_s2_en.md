@@ -7,113 +7,26 @@
 
 ## Contents
 
-- [Recent Updates](https://github.com/PaddlePaddle/PaddleClas/blob/release/2.3/docs/zh_CN/faq_series/faq_2021_s2.md#近期更新)(2021.09.08)
-- [Selection](https://github.com/PaddlePaddle/PaddleClas/blob/release/2.3/docs/zh_CN/faq_series/faq_2021_s2.md#精选)
-- [1. Theory](https://github.com/PaddlePaddle/PaddleClas/blob/release/2.3/docs/zh_CN/faq_series/faq_2021_s2.md#1)
-  - [1.1 Basic Knowledge of PaddleClas](https://github.com/PaddlePaddle/PaddleClas/blob/release/2.3/docs/zh_CN/faq_series/faq_2021_s2.md#1.1)
-  - [1.2 Backbone Network and Pre-trained Model Library](https://github.com/PaddlePaddle/PaddleClas/blob/release/2.3/docs/zh_CN/faq_series/faq_2021_s2.md#1.2)
-  - [1.3 Image Classification](https://github.com/PaddlePaddle/PaddleClas/blob/release/2.3/docs/zh_CN/faq_series/faq_2021_s2.md#1.3)
-  - [1.4 General Detection](https://github.com/PaddlePaddle/PaddleClas/blob/release/2.3/docs/zh_CN/faq_series/faq_2021_s2.md#1.4)
-  - [1.5 Image Recognition](https://github.com/PaddlePaddle/PaddleClas/blob/release/2.3/docs/zh_CN/faq_series/faq_2021_s2.md#1.5)
-  - [1.6 Vector Search](https://github.com/PaddlePaddle/PaddleClas/blob/release/2.3/docs/zh_CN/faq_series/faq_2021_s2.md#1.6)
-- [2. Practice](https://github.com/PaddlePaddle/PaddleClas/blob/release/2.3/docs/zh_CN/faq_series/faq_2021_s2.md#2)
-  - [2.1 Common Problems in Training and Evaluation](https://github.com/PaddlePaddle/PaddleClas/blob/release/2.3/docs/zh_CN/faq_series/faq_2021_s2.md#2.1)
-  - [2.2 Image Classification](https://github.com/PaddlePaddle/PaddleClas/blob/release/2.3/docs/zh_CN/faq_series/faq_2021_s2.md#2.2)
-  - [2.3 General Detection](https://github.com/PaddlePaddle/PaddleClas/blob/release/2.3/docs/zh_CN/faq_series/faq_2021_s2.md#2.3)
-  - [2.4 Image Recognition](https://github.com/PaddlePaddle/PaddleClas/blob/release/2.3/docs/zh_CN/faq_series/faq_2021_s2.md#2.4)
-  - [2.5 Vector Search](https://github.com/PaddlePaddle/PaddleClas/blob/release/2.3/docs/zh_CN/faq_series/faq_2021_s2.md#2.5)
-  - [2.6 Model Inference Deployment](https://github.com/PaddlePaddle/PaddleClas/blob/release/2.3/docs/zh_CN/faq_series/faq_2021_s2.md#2.6)
+- [1. Theory](#1)
+  - [1.1 Basic Knowledge of PaddleClas](#1.1)
+  - [1.2 Backbone Network and Pre-trained Model Library](#1.2)
+  - [1.3 Image Classification](#1.3)
+  - [1.4 General Detection](#1.4)
+  - [1.5 Image Recognition](#1.5)
+  - [1.6 Vector Search](#1.6)
+- [2. Practice](#2)
+  - [2.1 Common Problems in Training and Evaluation](#2.1)
+  - [2.2 Image Classification](#2.2)
+  - [2.3 General Detection](#2.3)
+  - [2.4 Image Recognition](#2.4)
+  - [2.5 Vector Search](#2.5)
+  - [2.6 Model Inference Deployment](#2.6)
 
-
-
-## Recent Updates
-
-#### Q2.1.7: How to tackle the reported error `ERROR: Unexpected segmentation fault encountered in DataLoader workers.` during training?
-
-**A**：
-
-Try setting the field `num_workers` in the training configuration file to `0`; try making the field `batch_size` in the file smaller; ensure that the dataset format and the dataset path in the profile are correct.
-
-#### Q2.1.8: How to use `Mixup` and `Cutmix` during training?
-
-**A**：
-
-- For `Mixup`, please refer to [Mixup](https://github.com/PaddlePaddle/PaddleClas/blob/release/2.3/ppcls/configs/ImageNet/DataAugment/ResNet50_ Mixup.yaml#L63-L65); and `Cuxmix`, please refer to [Cuxmix](https://github.com/PaddlePaddle/PaddleClas/blob/release/2.3/ppcls/configs/ImageNet/ DataAugment/ResNet50_Cutmix.yaml#L63-L65).
-- The training accuracy (Acc) metric cannot be calculated when using `Mixup` or `Cutmix` for training, so you need to remove the field  `Metric.Train.TopkAcc` in the configuration file, please refer to [Metric.Train.TopkAcc](https://github.com/PaddlePaddle/PaddleClas/blob/release/2.3/ppcls/configs/ImageNet/DataAugment/ResNet50_Cutmix.yaml#L125-L128) for more details.
-
-#### Q2.1.9: What are the fields `Global.pretrain_model` and `Global.checkpoints` used for in the training configuration file yaml?
-
-**A**：
-
-- When `fine-tune` is required, the path of the file of pre-training model weights can be configured via the field `Global.pretrain_model`, which usually has the suffix `.pdparams`.
-- During training, the training program automatically saves the breakpoint information at the end of each epoch, including the optimizer information `.pdopt` and model weights information `.pdparams`. In the event that the training process is unexpectedly interrupted and needs to be resumed, the breakpoint information file saved during training can be configured via the field `Global.checkpoints`, for example by configuring `checkpoints: . /output/ResNet18/epoch_18` to restore the breakpoint information at the end of 18 epoch training. PaddleClas will automatically load `epoch_18.pdopt` and `epoch_18.pdparams` to continue training from 19 epoch.
-
-#### Q2.6.3: How to convert the model to `ONNX` format?
-
-**A**：Paddle supports two ways and relies on the `paddle2onnx` tool, which first requires the installation of `paddle2onnx`.
-
-```
-pip install paddle2onnx
-```
-
-- From inference model to ONNX format model.
-
-  Take the `combined` format inference model (containing `.pdmodel` and `.pdiparams` files) exported from the dynamic graph as an example, run the following command to convert the model format:
-
-  ```
-  paddle2onnx --model_dir ${model_path}  --model_filename  ${model_path}/inference.pdmodel --params_filename ${model_path}/inference.pdiparams --save_file ${save_path}/model.onnx --enable_onnx_checker True
-  ```
-
-  In the above commands：
-
-  - `model_dir`: this parameter needs to contain `.pdmodel` and `.pdiparams` files.
-  - `model_filename`: this parameter is used to specify the path of the `.pdmodel` file under the parameter `model_dir`.
-  - `params_filename`: this parameter is used to specify the path of the `.pdiparams` file under the parameter `model_dir`.
-  - `save_file`: this parameter is used to specify the path to the directory where the converted model is saved.
-
-  For the conversion of a non-`combined` format inference model exported from a static diagram (usually containing the file `__model__` and multiple parameter files), and more parameter descriptions, please refer to the official documentation of [paddle2onnx](https://github.com/ PaddlePaddle/Paddle2ONNX/blob/develop/README_zh.md#Parameter options).
-
-- Exporting ONNX format models directly from the model networking code.
-
-  Take the model networking code of dynamic graphs as an example, the model class is a subclass that inherits from `paddle.nn.Layer` and the code is shown below.
-
-  ```
-  import paddle
-  from paddle.static import InputSpec
-
-  class SimpleNet(paddle.nn.Layer):
-      def __init__(self):
-          pass
-      def forward(self, x):
-          pass
-
-  net = SimpleNet()
-  x_spec = InputSpec(shape=[None, 3, 224, 224], dtype='float32', name='x')
-  paddle.onnx.export(layer=net, path="./SimpleNet", input_spec=[x_spec])
-  ```
-
-  Among them：
-
-  - `InputSpec()` function is used to describe the signature information of the model input, including the `shape`, `type` and `name` of the input data (can be omitted).
-  - The `paddle.onnx.export()` function needs to specify the model grouping object `net`, the save path of the exported model `save_path`, and the description of the model's input data `input_spec`.
-
-  Note that the `paddlepaddle`  `2.0.0` or above should be adopted.See [paddle.onnx.export](https://www.paddlepaddle.org.cn/documentation/docs/zh/api/paddle/onnx/) for more details on the parameters of the  `paddle.onnx.export()` function.
-
-#### Q2.5.4: How to set the parameter `pq_size` when build searches the base library?
-
-**A**：
-
-`pq_size` is a parameter of the PQ search algorithm, which can be simply understood as a "tiered" search algorithm. And `pq_size` is the "capacity" of each tier, so the setting of this parameter will affect the performance. However, in the case that the total data volume of the base library is not too large (less than 10,000), this parameter has little impact on the performance. So for most application scenarios, there is no need to modify this parameter when building the base library. For more details on the PQ search algorithm, see the related [paper](https://lear.inrialpes.fr/pubs/2011/JDS11/jegou_searching_with_quantization.pdf).
-
-
-
-## Selection
-
-
+<a name="1"></a>
 
 ## 1. Theory
 
-
+<a name="1.1"></a>
 
 ### 1.1 Basic Knowledge of PaddleClas
 
@@ -148,11 +61,11 @@ By introducing the concept of momentum, the effect of historical updates is take
 
 **A**: Currently, it is not implemented. If needed, you can try to modify the code yourself. In brief, the idea proposed in this paper is to fine-tune the final FC layer of the trained model using a larger resolution as input. Specifically, train the model network on a lower resolution dataset first, then set the parameter `stop_gradient=True ` for the weights of all layers of the network except the final FC layer, and at last fine-tune the network with a larger resolution input.
 
-
+<a name="1.2"></a>
 
 ### 1.2 Backbone Network and Pre-trained Model Library
 
-
+<a name="1.3"></a>
 
 ### 1.3 Image Classification
 
@@ -168,7 +81,7 @@ PaddleClas provides a variety of data augmentation methods, which can be divided
 
 Among them, RandAngment provides a variety of random combinations of data augmentation methods, which can meet the needs of brightness, contrast, saturation, hue and other aspects.
 
-
+<a name="1.4"></a>
 
 ### 1.4 General Detection
 
@@ -186,7 +99,7 @@ The training data is a randomly selected subset of publicly available datasets s
 
 **A**：The current mainbody detection model is trained using publicly available datasets such as COCO, Object365, RPC, LogoDet, etc. If the data to be detected is similar to industrial quality inspection and other data with large differences from common categories, it is necessary to fine-tune the training based on the current detection model again.
 
-
+<a name="1.5"></a>
 
 ### 1.5 Image Recognition
 
@@ -208,7 +121,7 @@ The product recognition model is recommended. For one, the range of products is 
 
 Vectors with small dimensions should be adopted. 128 or even smaller are practically used to speed up the computation. In general, a dimension of 512 is large enough to adequately represent the features.
 
-
+<a name="1.6"></a>
 
 ### 1.6 Vector Search
 
@@ -222,11 +135,11 @@ Vectors with small dimensions should be adopted. 128 or even smaller are practic
 
  Both `Query` and `Gallery` are data set configurations, where `Gallery` is used to configure the base library data and `Query` is used to configure the validation set. When performing Eval, the model is first used to forward compute feature vectors on the `Gallery` base library data, which are used to construct the base library, and then the model forward computes feature vectors on the data in the `Query` validation set, and then computes metrics such as recall rate in the base library.
 
-
+<a name="2"></a>
 
 ## 2. Practice
 
-
+<a name="2.1"></a>
 
 ### 2.1 Common Problems in Training and Evaluation
 
@@ -293,7 +206,7 @@ PaddleClas saves/updates the following three types of models during training.
 - When `fine-tune` is required, the path of the file of pre-training model weights can be configured via the field `Global.pretrain_model`, which usually has the suffix `.pdparams`.
 - During training, the training program automatically saves the breakpoint information at the end of each epoch, including the optimizer information `.pdopt` and model weights information `.pdparams`. In the event that the training process is unexpectedly interrupted and needs to be resumed, the breakpoint information file saved during training can be configured via the field `Global.checkpoints`, for example by configuring `checkpoints: . /output/ResNet18/epoch_18` to restore the breakpoint information at the end of 18 epoch training. PaddleClas will automatically load `epoch_18.pdopt` and `epoch_18.pdparams` to continue training from 19 epoch.
 
-
+<a name="2.2"></a>
 
 ### 2.2 Image Classification
 
@@ -309,7 +222,7 @@ PaddleClas saves/updates the following three types of models during training.
 
 **A**：When training SwinTransformer, please use `Paddle` `2.1.1` or above, and load the pre-trained model we provide. Also, the learning rate should be kept at an appropriate level.
 
-
+<a name="2.3"></a>
 
 ### 2.3 General Detection
 
@@ -317,7 +230,7 @@ PaddleClas saves/updates the following three types of models during training.
 
 **A**：The mainbody detection model returns the detection frame, but in fact, in order to make the subsequent recognition model more accurate, the original image is also returned along with the detection frame. Subsequently, the original image or the detection frame will be sorted according to its similarity with the images in the library, and the label of the image in the library with the highest similarity will be the label of the recognized image.
 
-#### Q2.3.2：在直播场景中，需要提供一个直播即时识别画面，能够在延迟几秒内找到特征目标物并用框圈起，这个可以实现吗？In a live broadcast scenario, is it possible to provide a live instant recognition screen that can find the target object of the feature and circle it with a delay of a few seconds?
+#### Q2.3.2：
 
 **A**：A real-time detection presents high requirements for the detection speed; PP-YOLO is a lightweight target detection model provided by Paddle team, which strikes a good balance of detection speed and accuracy, you can try PP-YOLO for detection. For the use of PP-YOLO, you can refer to [PaddleDetection](https://github.com/PaddlePaddle/PaddleDetection/blob/release/2.1/configs/ppyolo/README_cn.md).
 
@@ -325,7 +238,7 @@ PaddleClas saves/updates the following three types of models during training.
 
 **A**：If the detection model does not perform well on your own dataset, you need to finetune it again on your own detection dataset.
 
-
+<a name="2.4"></a>
 
 ### 2.4 Image Recognition
 
@@ -345,7 +258,7 @@ PaddleClas saves/updates the following three types of models during training.
 
 **A**：In the configuration file (e.g. inference_product.yaml), `IndexProcess.score_thres` controls the minimum value of cosine similarity of the recognized image to the image in the library. When the cosine similarity is less than this value, the result will not be printed. You can adjust this value according to your actual data.
 
-
+<a name="2.5"></a>
 
 ### 2.5 Vector Search
 
@@ -368,6 +281,8 @@ If you are using the release/2.2 branch, it is recommended to update it to the r
 **A**：
 
 `pq_size` is a parameter of the PQ search algorithm, which can be simply understood as a "tiered" search algorithm. And `pq_size` is the "capacity" of each tier, so the setting of this parameter will affect the performance. However, in the case that the total data volume of the base library is not too large (less than 10,000), this parameter has little impact on the performance. So for most application scenarios, there is no need to modify this parameter when building the base library. For more details on the PQ search algorithm, see the related [paper](https://lear.inrialpes.fr/pubs/2011/JDS11/jegou_searching_with_quantization.pdf).
+
+<a name="2.6"></a>
 
 ### 2.6 Model Inference Deployment
 

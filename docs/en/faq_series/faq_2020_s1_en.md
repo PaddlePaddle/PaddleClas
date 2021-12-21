@@ -247,7 +247,7 @@ Batch_size is an important hyperparameter in neural networks training, whose val
 
 ### Q5.4 What is weight_decay? How to set it?
 
-**A**:过拟合是机器学习中常见的一个名词，简单理解即为模型在训练数据上表现很好，但在测试数据上表现较差，在图像分类问题中，同样存在过拟合的问题，为了避免过拟合，很多正则方式被提出，其中，weight_decay 是其中一个广泛使用的避免过拟合的方式。当使用 SGD 优化器时，weight_decay 等价于在最终的损失函数后添加 L2 正则化，L2 正则化使得网络的权重倾向于选择更小的值，最终整个网络中的参数值更趋向于 0，模型的泛化性能相应提高。在各大深度学习框架的实现中，该值表达的含义是 L2 正则前的系数，在飞桨框架中，该值的名称是 L2Decay，所以以下都称其为 L2Decay。该系数越大，表示加入的正则越强，模型越趋于欠拟合状态。具体到数据集来说：
+**A**:
 
 Overfitting is a common term in machine learning, which is simply understood as a model that performs well on training data but less satisfactory on test data. In image classification, there is also the problem of overfitting, and many regularization methods are proposed to avoid it, among which weight_decay is one of the widely used ways. When using SGD optimizer, weight_decay is equivalent to adding L2 regularization after the final loss function, which makes the weights of the network tend to choose smaller values, so eventually, the parameter values in the whole network tend to be more towards 0, and the generalization performance of the model is improved accordingly. In the implementation of major deep learning frameworks, this value means the coefficient before the L2 regularization, which is called L2Decay in the PaddlePaddle framework. The larger the coefficient is, the stronger the added regularization is, and the more the model tends to be underfitted. The specific information of the dataset is as follows:
 
