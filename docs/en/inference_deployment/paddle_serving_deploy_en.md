@@ -254,7 +254,7 @@ recognition_web_service.py    # Script for starting the pipeline server
 python3 recognition_web_service.py &>log.txt &
 ```
 
-Once the service is successfully started, a log will be printed in log.txt similar to the following  ![img](../imgs/start_server_shitu.png)
+Once the service is successfully started, a log will be printed in log.txt similar to the following  ![img](../../imgs/start_server_shitu.png)
 
 - Send request：
 
@@ -262,7 +262,7 @@ Once the service is successfully started, a log will be printed in log.txt simil
 python3 pipeline_http_client.py
 ```
 
-Once the service is successfully started, the prediction results will be printed in the cmd window, see the following example: ![img](../imgs/results_shitu.png)
+Once the service is successfully started, the prediction results will be printed in the cmd window, see the following example: ![img](../../imgs/results_shitu.png)
 
 
 <a name="5"></a>
