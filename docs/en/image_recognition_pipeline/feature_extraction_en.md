@@ -1,14 +1,27 @@
 # Feature Extraction
 
-## 1. Introduction
+## Content
 
-Feature extraction plays a key role in image recognition, which serves to transform the input image into a fixed dimensional feature vector for subsequent [vector search](https://github.com/PaddlePaddle/PaddleClas/blob/release/2.3/docs/zh_CN/image_recognition_pipeline/vector_search.md). Good features boast great similarity preservation, i.e., in the feature space, pairs of images with high similarity should have higher feature similarity (closer together), and pairs of images with low similarity should have less feature similarity (further apart). [Deep Metric Learning](https://github.com/PaddlePaddle/PaddleClas/blob/release/2.3/docs/zh_CN/algorithm_introduction/metric_learning.md) is applied to explore how to obtain features with high representational power through deep learning.
+- [1.Introduction](#1)
+- [2.Network Structure](#2)
+- [3.General Recognition Models](#3)
+- [4.Customized Feature Extraction](#4)
+    - [4.1 Data Preparation](#4.1)
+    - [4.2 Model Training](#4.2)
+    - [4.3 Model Evaluation](#4.3)
+    - [4.4 Model Inference](#4.4)
 
-## 2. Network Structure
+<a name="1"></a>
+## 1.Introduction
+
+Feature extraction plays a key role in image recognition, which serves to transform the input image into a fixed dimensional feature vector for subsequent [vector search](./vector_search_en.md). Good features boast great similarity preservation, i.e., in the feature space, pairs of images with high similarity should have higher feature similarity (closer together), and pairs of images with low similarity should have less feature similarity (further apart). [Deep Metric Learning](../algorithm_introduction/metric_learning_en.md) is applied to explore how to obtain features with high representational power through deep learning.
+
+<a name="2"></a>
+## 2.Network Structure
 
 In order to customize the image recognition task flexibly, the whole network is divided into Backbone, Neck, Head, and Loss. The figure below illustrates the overall structure:
 
-[![img](https://github.com/PaddlePaddle/PaddleClas/raw/release/2.3/docs/images/feature_extraction_framework.png)](https://github.com/PaddlePaddle/PaddleClas/blob/release/2.3/docs/images/feature_extraction_framework.png)
+![img](../../images/feature_extraction_framework.png)
 
 Functions of the above modules :
 
@@ -17,9 +30,10 @@ Functions of the above modules :
 - **Head**: Used to transform features into logits. In addition to the common Fc Layer, cosmargin, arcmargin, circlemargin and other modules are all available choices.
 - **Loss**: Specifies the Loss function to be used. It is designed as a combined form to facilitate the combination of Classification Loss and Pair_wise Loss.
 
-## 3. General Recognition Models
+<a name="3"></a>
+## 3.General Recognition Models
 
-In PP-Shitu, we have [PP_LCNet_x2_5](https://github.com/PaddlePaddle/PaddleClas/blob/release/2.3/docs/zh_CN/models/PP-LCNet.md) as the backbone network, Linear Layer for Neck, [ArcMargin](https://github.com/PaddlePaddle/PaddleClas/blob/release/2.3/ppcls/arch/gears/arcmargin.py) for Head, and CELoss for Loss. See the details in  [General Recognition_configuration files](https://github.com/PaddlePaddle/PaddleClas/blob/release/2.3/ppcls/configs/GeneralRecognition/). The involved training data covers the following seven public datasets:
+In PP-Shitu, we have [PP_LCNet_x2_5](../models/PP-LCNet.md) as the backbone network, Linear Layer for Neck, [ArcMargin](../../../ppcls/arch/gears/arcmargin.py) for Head, and CELoss for Loss. See the details in  [General Recognition_configuration files](../.././ppcls/configs/GeneralRecognition/). The involved training data covers the following seven public datasets:
 
 | Datasets     | Data Size | Class Number | Scenarios          | URL                                                          |
 | ------------ | --------- | ------------ | ------------------ | ------------------------------------------------------------ |
@@ -43,13 +57,15 @@ The results are shown in the table below:
 - Evaluation conditions for the speed metric: MKLDNN enabled, number of threads set to 10
 - Address of the pre-training model: [General recognition pre-training model](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/pretrain/general_PPLCNet_x2_5_pretrained_v1.0.pdparams)
 
-# 4. Customized Feature Extraction
+<a name="4"></a>
+# 4.Customized Feature Extraction
 
 Customized feature extraction refers to retraining the feature extraction model based on one's own task. It consists of four main steps: 1) data preparation, 2) model training, 3) model evaluation, and 4) model inference.
 
+<a name="4.1"></a>
 ## 4.1 Data Preparation
 
-To start with, customize your dataset based on the task (See [Format description](https://github.com/PaddlePaddle/PaddleClas/blob/develop/docs/zh_CN/data_preparation/recognition_dataset.md#数据集格式说明) for the dataset format). Before initiating the model training, modify the data-related content in the configuration files, including the address of the dataset and the class number. The corresponding locations in configuration files are shown below:
+To start with, customize your dataset based on the task (See [Format description](../data_preparation/recognition_dataset_en.md#1) for the dataset format). Before initiating the model training, modify the data-related content in the configuration files, including the address of the dataset and the class number. The corresponding locations in configuration files are shown below:
 
 ```
  Head:
@@ -82,6 +98,7 @@ Train:
         cls_label_path: ./dataset/Aliproduct/val_list.txt.   #The address of label file for gallery dataset
 ```
 
+<a name="4.2"></a>
 ## 4.2 Model Training
 
 - Single machine single card training
@@ -112,6 +129,7 @@ python -m paddle.distributed.launch \
     -o Global.checkpoint="output/RecModel/latest"
 ```
 
+<a name="4.3"></a>
 ## 4.3 Model Evaluation
 
 - Single Card Evaluation
@@ -135,6 +153,7 @@ python -m paddle.distributed.launch \
 
 **Recommendation:** It is suggested to employ multi-card evaluation, which can quickly obtain the feature set of the overall dataset using multi-card parallel computing, accelerating the evaluation process.
 
+<a name="4.4"></a>
 ## 4.4 Model Inference
 
 Two steps are included in the inference: 1)exporting the inference model; 2)obtaining the feature vector.
@@ -158,6 +177,6 @@ python python/predict_rec.py \
 -o Global.rec_inference_model_dir="../inference"
 ```
 
-The output format of the obtained features is shown in the figure below:[![img](https://github.com/PaddlePaddle/PaddleClas/raw/release/2.3/docs/images/feature_extraction_output.png)](https://github.com/PaddlePaddle/PaddleClas/blob/release/2.3/docs/images/feature_extraction_output.png)
+The output format of the obtained features is shown in the figure below:![img](../../images/feature_extraction_output.png)
 
-In practical use, however, business operations require more than simply obtaining features. To further perform image recognition by feature retrieval, please refer to the document [vector search](https://github.com/PaddlePaddle/PaddleClas/blob/release/2.3/docs/zh_CN/image_recognition_pipeline/vector_search.md).
+In practical use, however, business operations require more than simply obtaining features. To further perform image recognition by feature retrieval, please refer to the document [vector search](./vector_search_en.md).
