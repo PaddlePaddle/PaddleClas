@@ -1,23 +1,25 @@
 # Model Service Deployment
 
-- [1. Introduction](https://github.com/PaddlePaddle/PaddleClas/blob/develop/docs/zh_CN/inference_deployment/paddle_serving_deploy.md#1)
-- [2. Installation of Serving ](https://github.com/PaddlePaddle/PaddleClas/blob/develop/docs/zh_CN/inference_deployment/paddle_serving_deploy.md#2)
-- [3. Service Deployment for Image Classification](https://github.com/PaddlePaddle/PaddleClas/blob/develop/docs/zh_CN/inference_deployment/paddle_serving_deploy.md#3)
-  - [3.1 Model Transformation](https://github.com/PaddlePaddle/PaddleClas/blob/develop/docs/zh_CN/inference_deployment/paddle_serving_deploy.md#3.1)
-  - [3.2 Service Deployment and Request](https://github.com/PaddlePaddle/PaddleClas/blob/develop/docs/zh_CN/inference_deployment/paddle_serving_deploy.md#3.2)
-- [4. Service Deployment for Image Recognition](https://github.com/PaddlePaddle/PaddleClas/blob/develop/docs/zh_CN/inference_deployment/paddle_serving_deploy.md#4)
-  - [4.1 Model Transformation](https://github.com/PaddlePaddle/PaddleClas/blob/develop/docs/zh_CN/inference_deployment/paddle_serving_deploy.md#4.1)
-  - [4.2 Service Deployment and Request](https://github.com/PaddlePaddle/PaddleClas/blob/develop/docs/zh_CN/inference_deployment/paddle_serving_deploy.md#4.2)
-- [5. FAQ](https://github.com/PaddlePaddle/PaddleClas/blob/develop/docs/zh_CN/inference_deployment/paddle_serving_deploy.md#5)
+## Content
 
+- [1. Introduction](#1)
+- [2. Installation of Serving](#2)
+- [3. Service Deployment for Image Classification](#3)
+  - [3.1 Model Transformation](#3.1)
+  - [3.2 Service Deployment and Request](#3.2)
+- [4. Service Deployment for Image Recognition](#4)
+  - [4.1 Model Transformation](#4.1)
+  - [4.2 Service Deployment and Request](#4.2)
+- [5. FAQ](#5)
 
-
+<a name="1"></a>
 ## 1. Introduction
 
 [Paddle Serving](https://github.com/PaddlePaddle/Serving) is designed to provide easy deployment of on-line prediction services for deep learning developers, it supports one-click deployment of industrial-grade services, highly concurrent and efficient communication between client and server, and multiple programming languages for client development.
 
 This section, exemplified by HTTP deployment of prediction service, describes how to deploy model services in PaddleClas with PaddleServing. Currently, only deployment on Linux platform is supported. Windows platform is not supported.
 
+<a name="2"></a>
 ## 2. Installation of Serving
 
 It is officially recommended to use docker for the installation and environment deployment of Serving. First, pull the docker and create a Serving-based one.
@@ -41,19 +43,17 @@ pip3 install paddle-serving-server-gpu==0.7.0.post112 # GPU with CUDA11.2 + Tens
 ```
 
 - Speed up the installation process by replacing the source with `-i https://pypi.tuna.tsinghua.edu.cn/simple`.
-- For other environment configuration and installation, please refer to [Install Paddle Serving using docker](https://github.com/PaddlePaddle/Serving/blob/v0.7.0/doc/Install_CN.md)
+- For other environment configuration and installation, please refer to [Install Paddle Serving using docker](https://github.com/PaddlePaddle/Serving/blob/v0.7.0/doc/Install_EN.md)
 - To deploy CPU services, please install the CPU version of serving-server with the following command.
 
 ```
 pip install paddle-serving-server
 ```
 
-
-
+<a name="3"></a>
 ## 3. Service Deployment for Image Classification
 
-
-
+<a name="3.1"></a>
 ### 3.1 Model Transformation
 
 When adopting PaddleServing for service deployment, the saved inference model needs to be converted to a Serving model. The following part takes the classic ResNet50_vd model as an example to introduce the deployment of image classification service.
@@ -118,8 +118,7 @@ fetch_var {
 }
 ```
 
-
-
+<a name="3.2"></a>
 ### 3.2 Service Deployment and Request
 
 Paddleserving's directory contains the code to start the pipeline service and send prediction requests, including:
@@ -139,7 +138,7 @@ classification_web_service.py    # Script for starting the pipeline server
 python3 classification_web_service.py &>log.txt &
 ```
 
-Once the service is successfully started, a log will be printed in log.txt similar to the following [![img](https://github.com/PaddlePaddle/PaddleClas/raw/develop/deploy/paddleserving/imgs/start_server.png)](https://github.com/PaddlePaddle/PaddleClas/blob/develop/deploy/paddleserving/imgs/start_server.png)
+Once the service is successfully started, a log will be printed in log.txt similar to the following ![img](../imgs/start_server.png)
 
 - Send request：
 
@@ -148,14 +147,16 @@ Once the service is successfully started, a log will be printed in log.txt simil
 python3 pipeline_http_client.py
 ```
 
-Once the service is successfully started, the prediction results will be printed in the cmd window, see the following example:[![img](https://github.com/PaddlePaddle/PaddleClas/raw/develop/deploy/paddleserving/imgs/results.png)](https://github.com/PaddlePaddle/PaddleClas/blob/develop/deploy/paddleserving/imgs/results.png)
+Once the service is successfully started, the prediction results will be printed in the cmd window, see the following example:![img](../imgs/results.png)
 
 
-
+<a name="4"></a>
 ## 4. Service Deployment for Image Recognition
 
 When using PaddleServing for service deployment, the saved inference model needs to be converted to a Serving model. The following part, exemplified by the ultra-lightweight model for image recognition in PP-ShiTu, details the deployment of image recognition service.
 
+
+<a name="4.1"></a>
 ## 4.1 Model Transformation
 
 - Download inference models for general detection and general recognition
@@ -225,8 +226,7 @@ cd ../
 wget https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/data/drink_dataset_v1.0.tar && tar -xf drink_dataset_v1.0.tar
 ```
 
-
-
+<a name="4.2"></a>
 ## 4.2 Service Deployment and Request
 
 **Note:** Since the recognition service involves multiple models, PipeLine is adopted for better performance. This deployment method does not support the windows platform for now.
@@ -254,7 +254,7 @@ recognition_web_service.py    # Script for starting the pipeline server
 python3 recognition_web_service.py &>log.txt &
 ```
 
-Once the service is successfully started, a log will be printed in log.txt similar to the following  [![img](https://github.com/PaddlePaddle/PaddleClas/raw/develop/deploy/paddleserving/imgs/start_server_shitu.png)](https://github.com/PaddlePaddle/PaddleClas/blob/develop/deploy/paddleserving/imgs/start_server_shitu.png)
+Once the service is successfully started, a log will be printed in log.txt similar to the following  ![img](../imgs/start_server_shitu.png)
 
 - Send request：
 
@@ -262,10 +262,10 @@ Once the service is successfully started, a log will be printed in log.txt simil
 python3 pipeline_http_client.py
 ```
 
-Once the service is successfully started, the prediction results will be printed in the cmd window, see the following example: [![img](https://github.com/PaddlePaddle/PaddleClas/raw/develop/deploy/paddleserving/imgs/results_shitu.png)](https://github.com/PaddlePaddle/PaddleClas/blob/develop/deploy/paddleserving/imgs/results_shitu.png)
+Once the service is successfully started, the prediction results will be printed in the cmd window, see the following example: ![img](../imgs/results_shitu.png)
 
 
-
+<a name="5"></a>
 ## 5.FAQ
 
 **Q1**： After sending a request, no result is returned or the output is prompted with a decoding error.

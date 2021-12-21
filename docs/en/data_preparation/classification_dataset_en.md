@@ -6,7 +6,7 @@ This document elaborates on the dataset format adopted by PaddleClas for image c
 
 ## Contents
 
-- [Dataset Format](#1)
+- [1.Dataset Format](#1)
 - [Common Datasets for Image Classification](#2)
   - [2.1 ImageNet1k](#2.1)
   - [2.2 Flowers102](#2.2)
@@ -16,7 +16,7 @@ This document elaborates on the dataset format adopted by PaddleClas for image c
 
 
 <a name="1"></a>
-## 1 Dataset Format
+## 1. Dataset Format
 
 PaddleClas adopts `txt` files to assign the training and test sets. Taking the `ImageNet1k` dataset as an example, where `train_list.txt` and `val_list.txt` have the following formats:
 
@@ -34,7 +34,7 @@ val/ILSVRC2012_val_00000001.JPEG 65
 
 
 <a name="2"></a>
-## 2 Common Datasets for Image Classification
+## 2. Common Datasets for Image Classification
 
 Here we present a compilation of commonly used image classification datasets, which is continuously updated and expects your supplement.
 
