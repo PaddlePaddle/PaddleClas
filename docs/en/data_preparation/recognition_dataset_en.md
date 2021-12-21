@@ -6,8 +6,8 @@ This document elaborates on the dataset format adopted by PaddleClas for image r
 
 ## Contents
 
-- [Dataset Format](#1)
-- [Common Datasets for Image Recognition](#2)
+- [1.Dataset Format](#1)
+- [2.Common Datasets for Image Recognition](#2)
   - [2.1 General Datasets](#2.1)
   - [2.2 Vertical Datasets](#2.2)
     - [2.2.1 Animation Character Recognition](#2.2.1)
@@ -17,7 +17,7 @@ This document elaborates on the dataset format adopted by PaddleClas for image r
 
 
 <a name="1"></a>
-## 1 Dataset Format
+## 1.Dataset Format
 
 The dataset for the vector search, unlike those for classification tasks, is divided into the following three parts:
 
@@ -57,7 +57,7 @@ Each row of data is separated by "space", and the three columns of data stand fo
 
 
 <a name="2"></a>
-## 2. Common Datasets for Image Recognition
+## 2.Common Datasets for Image Recognition
 
 Here we present a compilation of commonly used image recognition datasets, which is continuously updated and expects your supplement.
 
