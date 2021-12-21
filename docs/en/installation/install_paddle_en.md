@@ -2,7 +2,7 @@
 
 ---
 
-## Contents
+## Catalogue
 
 - [1. Environment requirements](#1)
 - [2.(Recommended) Prepare a docker environment](#2)

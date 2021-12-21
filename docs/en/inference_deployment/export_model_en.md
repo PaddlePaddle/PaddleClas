@@ -4,7 +4,7 @@ PaddlePaddle supports exporting inference model for deployment. Compared with tr
 
 ---
 
-## Contents
+## Catalogue
 
 - [1. Environmental preparation](#1)
 - [2. Export classification model](#2)

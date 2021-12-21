@@ -10,7 +10,7 @@ Please refer to the document [install paddle](../installation/install_paddle_en.
 
 ---
 
-## Contents
+## Catalogue
 
 - [1. Image classification inference](#1)
 - [2. Mainbody detection model inference](#2)

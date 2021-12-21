@@ -4,7 +4,8 @@ PaddleClas supports rapid service deployment through Paddlehub. At present, it s
 
 ---
 
-## Contents
+## Catalogue
+
 - [1. Introduction](#1)
 - [2. Prepare the environment](#2)
 - [3. Download inference model](#3)

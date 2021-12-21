@@ -4,7 +4,7 @@ Paddleclas supports Python WHL package for prediction. At present, WHL package o
 
 ---
 
-## Contents
+## Catalogue
 
 - [1. Installation](#1)
 - [2. Quick Start](#2)

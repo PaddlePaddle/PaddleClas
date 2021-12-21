@@ -2,7 +2,8 @@
 
 ---
 
-## Contents
+## Catalogue
+
 * [1. Preface](#1)
 * [2. Installing DALI](#2)
 * [3. Using DALI](#3)
