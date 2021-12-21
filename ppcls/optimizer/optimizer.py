@@ -44,7 +44,6 @@ class Momentum(object):
         self.weight_decay = weight_decay
         self.grad_clip = grad_clip
         self.multi_precision = multi_precision
-        self.use_multi_tensor = use_multi_tensor
 
     def __call__(self, model_list):
         # model_list is None in static graph
@@ -56,7 +55,6 @@ class Momentum(object):
             weight_decay=self.weight_decay,
             grad_clip=self.grad_clip,
             multi_precision=self.multi_precision,
-            use_multi_tensor=self.use_multi_tensor,
             parameters=parameters)
         if hasattr(opt, '_use_multi_tensor'):
             opt = optim.Momentum(
