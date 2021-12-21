@@ -21,7 +21,7 @@ Feature extraction plays a key role in image recognition, which serves to transf
 
 In order to customize the image recognition task flexibly, the whole network is divided into Backbone, Neck, Head, and Loss. The figure below illustrates the overall structure:
 
-![img](../../images/feature_extraction_framework.png)
+![img](../../images/feature_extraction_framework_en.png)
 
 Functions of the above modules :
 
