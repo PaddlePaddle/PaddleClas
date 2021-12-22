@@ -9,7 +9,7 @@ Vector search finds wide applications in image recognition and image retrieval. 
 
 It is worth noting that the current version of `PaddleClas` **only uses CPU for vector retrieval** for the moment in pursuit of better adaptability.
 
-[![img](https://github.com/PaddlePaddle/PaddleClas/raw/develop/docs/images/structure.jpg)](https://github.com/PaddlePaddle/PaddleClas/blob/develop/docs/images/structure.jpg)
+[![img](../../images/structure.jpg)](https://github.com/PaddlePaddle/PaddleClas/blob/develop/docs/images/structure.jpg)
 
 As shown in the figure above, two parts constitute the vector search in the whole `PP-ShiTu` system.
 
@@ -20,15 +20,15 @@ This document mainly introduces the installation of the search module in PaddleC
 
 ------
 
-## Contents
+## Catalogue
 
-- [1. Installation of the Search Library](https://github.com/PaddlePaddle/PaddleClas/blob/develop/docs/zh_CN/image_recognition_pipeline/vector_search.md#1)
-- [2. Search Algorithms](https://github.com/PaddlePaddle/PaddleClas/blob/develop/docs/zh_CN/image_recognition_pipeline/vector_search.md#2)
-- [3. Introduction of and Configuration Files](https://github.com/PaddlePaddle/PaddleClas/blob/develop/docs/zh_CN/image_recognition_pipeline/vector_search.md#3)
-  - [3.1 Parameters of Library Building and Configuration Files](https://github.com/PaddlePaddle/PaddleClas/blob/develop/docs/zh_CN/image_recognition_pipeline/vector_search.md#3.1)
-  - [3.2 Parameters of Search Configuration Files](https://github.com/PaddlePaddle/PaddleClas/blob/develop/docs/zh_CN/image_recognition_pipeline/vector_search.md#3.2)
+- [1. Installation of the Search Library](#1)
+- [2. Search Algorithms](#2)
+- [3. Introduction of and Configuration Files](#3)
+  - [3.1 Parameters of Library Building and Configuration Files](#3.1)
+  - [3.2 Parameters of Search Configuration Files](#3.2)
 
-
+<a name="1"></a>
 
 ## 1. Installation of the Search Library
 
@@ -40,6 +40,8 @@ pip install faiss-cpu==1.7.1post2
 
 If the above cannot be properly used, please `uninstall` and then  `install` again, especially when you are using`windows`.
 
+<a name="2"></a>
+
 ## 2. Search Algorithms
 
 Currently, the search module in `PaddleClas` supports the following three search algorithms:
@@ -50,9 +52,13 @@ Currently, the search module in `PaddleClas` supports the following three search
 
 Each search algorithm can find its right place in different scenarios. `HNSW32`, as the default method, strikes a balance between accuracy and  speed, see its detailed introduction in the [official document](https://github.com/facebookresearch/faiss/wiki).
 
+<a name="3"></a>
+
 ## 3. Introduction of Configuration Files
 
 Configuration files involving the search module are under `deploy/configs/`, where `build_*.yaml` is related to building the feature library, and `inference_*.yaml` is the inference file for retrieval or classification.
+
+<a name="3.1"></a>
 
 ### 3.1 Parameters of Library Building and Configuration Files
 
@@ -93,11 +99,11 @@ IndexProcess:
 - **dist_type**: the method of similarity calculation adopted in feature matching. For example, Inner Product(`IP`) and Euclidean distance(`L2`).
 - **embedding_size**: feature dimensionality
 
-
+<a name="3.2"></a>
 
 ### 3.2 Parameters of Search Configuration Files
 
-To integrate the search into the overall `PP-ShiTu` process, please refer to `The Introduction of PP-ShiTu Image Recognition System` in [README](https://github.com/PaddlePaddle/PaddleClas/blob/develop/README_ch.md). Please check the [Quick Start for Image Recognition](https://github.com/PaddlePaddle/PaddleClas/blob/develop/docs/zh_CN/quick_start/quick_start_recognition.md) for the specific operation of the search.
+To integrate the search into the overall `PP-ShiTu` process, please refer to `The Introduction of PP-ShiTu Image Recognition System` in [README](../../../README_en.md). Please check the [Quick Start for Image Recognition](../quick_start/quick_start_recognition_en.md) for the specific operation of the search.
 
 The search part is configured as follows. Please refer to `deploy/configs/inference_*.yaml` for the complete version.
 
