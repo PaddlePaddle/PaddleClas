@@ -166,7 +166,7 @@ def main(args):
             test_program=eval_prog
             if global_config["eval_during_train"] else None)
 
-    if not global_config.get("is_distributed", True):
+    if global_config.get("is_distributed", True):
         compiled_train_prog = program.compile(
             config, train_prog, loss_name=train_fetchs["loss"][0].name)
     else:
