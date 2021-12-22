@@ -8,67 +8,83 @@ Generally speaking, Image Classification attempts to comprehend an entire image 
 
 Image Classification is a very basic but important field in the subject of computer vision. Its research results have always influenced the development of computer vision and even deep learning. Image classification has many sub-fields, such as multi-label image classification and fine-grained image classification. Here is only a brief description of single-label image classification.
 
-See [here](https://github.com/PaddlePaddle/PaddleClas/blob/develop/docs/zh_CN/algorithm_introduction/image_classification.md) for the detailed introduction of image classification algorithms.
+See [here](../algorithm_introduction/image_classification_en.md) for the detailed introduction of image classification algorithms.
 
 ## Contents
 
-- [1. Dataset Introduction](https://github.com/PaddlePaddle/PaddleClas/blob/develop/docs/zh_CN/models_training/classification.md#1)
-  - [1.1 ImageNet-1k](https://github.com/PaddlePaddle/PaddleClas/blob/develop/docs/zh_CN/models_training/classification.md#1.1)
-  - [1.2 CIFAR-10/CIFAR-100](https://github.com/PaddlePaddle/PaddleClas/blob/develop/docs/zh_CN/models_training/classification.md#1.2)
-- [2. Image Classification Process](https://github.com/PaddlePaddle/PaddleClas/blob/develop/docs/zh_CN/models_training/classification.md#2)
-  - [2.1 Data and Its Preprocessing](https://github.com/PaddlePaddle/PaddleClas/blob/develop/docs/zh_CN/models_training/classification.md#2.1)
-  - [2.2 Prepare the Model](https://github.com/PaddlePaddle/PaddleClas/blob/develop/docs/zh_CN/models_training/classification.md#2.2)
-  - [2.3 Train the Model](https://github.com/PaddlePaddle/PaddleClas/blob/develop/docs/zh_CN/models_training/classification.md#2.3)
-  - [2.4 Evaluate the Model](https://github.com/PaddlePaddle/PaddleClas/blob/develop/docs/zh_CN/models_training/classification.md#2.4)
-- [3. Application Methods](https://github.com/PaddlePaddle/PaddleClas/blob/develop/docs/zh_CN/models_training/classification.md#3)
-  - [3.1 Training and Evaluation on CPU or Single GPU](https://github.com/PaddlePaddle/PaddleClas/blob/develop/docs/zh_CN/models_training/classification.md#3.1)
-    - [3.1.1 Model Training](https://github.com/PaddlePaddle/PaddleClas/blob/develop/docs/zh_CN/models_training/classification.md#3.1.1)
-    - [3.1.2 Model Finetuning](https://github.com/PaddlePaddle/PaddleClas/blob/develop/docs/zh_CN/models_training/classification.md#3.1.2)
-    - [3.1.3 Resume Training](https://github.com/PaddlePaddle/PaddleClas/blob/develop/docs/zh_CN/models_training/classification.md#3.1.3)
-    - [3.1.4 Model Evaluation](https://github.com/PaddlePaddle/PaddleClas/blob/develop/docs/zh_CN/models_training/classification.md#3.1.4)
-  - [3.2 Training and Evaluation on Linux+ Multi-GPU](https://github.com/PaddlePaddle/PaddleClas/blob/develop/docs/zh_CN/models_training/classification.md#3.2)
-    - [3.2.1 Model Training](https://github.com/PaddlePaddle/PaddleClas/blob/develop/docs/zh_CN/models_training/classification.md#3.2.1)
-    - [3.2.2 Model Finetuning](https://github.com/PaddlePaddle/PaddleClas/blob/develop/docs/zh_CN/models_training/classification.md#3.2.2)
-    - [3.2.3 Resume Training](https://github.com/PaddlePaddle/PaddleClas/blob/develop/docs/zh_CN/models_training/classification.md#3.2.3)
-    - [3.2.4 Model Evaluation](https://github.com/PaddlePaddle/PaddleClas/blob/develop/docs/zh_CN/models_training/classification.md#3.2.4)
-  - [3.3 Use the Pre-trained Model to Predict](https://github.com/PaddlePaddle/PaddleClas/blob/develop/docs/zh_CN/models_training/classification.md#3.3)
-  - [3.4 Use the Inference Model to Predict](https://github.com/PaddlePaddle/PaddleClas/blob/develop/docs/zh_CN/models_training/classification.md#3.4)
+- [1. Dataset Introduction](#1)
+  - [1.1 ImageNet-1k](#1.1)
+  - [1.2 CIFAR-10/CIFAR-100](#1.2)
+- [2. Image Classification Process](#2)
+  - [2.1 Data and Its Preprocessing](#2.1)
+  - [2.2 Prepare the Model](#2.2)
+  - [2.3 Train the Model](#2.3)
+  - [2.4 Evaluate the Model](#2.4)
+- [3. Application Methods](#3)
+  - [3.1 Training and Evaluation on CPU or Single GPU](#3.1)
+    - [3.1.1 Model Training](#3.1.1)
+    - [3.1.2 Model Finetuning](#3.1.2)
+    - [3.1.3 Resume Training](#3.1.3)
+    - [3.1.4 Model Evaluation](#3.1.4)
+  - [3.2 Training and Evaluation on Linux+ Multi-GPU](#3.2)
+    - [3.2.1 Model Training](#3.2.1)
+    - [3.2.2 Model Finetuning](#3.2.2)
+    - [3.2.3 Resume Training](#3.2.3)
+    - [3.2.4 Model Evaluation](#3.2.4)
+  - [3.3 Use the Pre-trained Model to Predict](#3.3)
+  - [3.4 Use the Inference Model to Predict](#3.4)
 
-
+<a name="1"></a>
 
 ## 1. Dataset Introduction
+
+<a name="1.1"></a>
 
 ### 1.1 ImageNet-1k
 
 The ImageNet is a large-scale visual database for the research of visual object recognition. More than 14 million images have been annotated manually to point out objects in the picture in this project, and at least more than 1 million images provide bounding box. ImageNet-1k is a subset of the ImageNet dataset, which contains 1000 categories. The training set contains 1281167 image data, and the validation set contains 50,000 image data. Since 2010, the ImageNet project has held an image classification competition every year, which is the ImageNet Large-scale Visual Recognition Challenge (ILSVRC). The dataset used in the challenge is ImageNet-1k. So far, ImageNet-1k has become one of the most important data sets for the development of computer vision, and it promotes the development of the entire computer vision. The initialization models of many computer vision downstream tasks are based on the weights trained on this dataset.
 
+<a name="1.2"></a>
+
 ### 1.2 CIFAR-10/CIFAR-100
 
 The CIFAR-10 dataset consists of 60,000 color images in 10 categories, with an image resolution of 32x32, and each category has 6000 images, including 5000 in the training set and 1000 in the validation set. 10 different classes represent airplanes, cars, birds, cats, deer, dogs, frogs, horses, ships and trucks. The CIFAR-100 data set is an extension of CIFAR-10. It consists of 60,000 color images in 100 classes, with an image resolution of 32x32, and each class has 600 images, including 500 in the training set and 100 in the validation set. Researchers can try different algorithms quickly because these two data sets are small in scale. These two datasets are also commonly used data sets for testing the quality of models in the image classification field.
+
+<a name="2"></a>
 
 ## 2. Image Classification Process
 
 The prepared training data is preprocessed and then passed through the image classification model. The output of the model and the real label are used in a cross-entropy loss function. This loss function describes the convergence direction of the model.  Then the corresponding gradient descent for the final loss function is calculated and returned to the model,  which update the weight of the model by optimizers. Finally, an image classification model can be obtained.
 
+<a name="2.1"></a>
+
 ### 2.1 Data Preprocessing
 
-The quality and quantity of data often determine the performance of a model. In the field of image classification, data includes images and labels. In most cases, labeled data is scarce, so the amount of data is difficult to reach the level of saturation of the model. In order to enable the model to learn more image features, a lot of image transformation or data augmentation is required before the image enters the model, so as to ensure the diversity of input image data and ensure that the model has better generalization capabilities. PaddleClas provides standard image transformation for training ImageNet-1k, and also provides 8 data augmentation methods. For related codes, please refer to [data preprocess](https://github.com/PaddlePaddle/PaddleClas/blob/release/2.2/ppcls/data/preprocess)，The configuration file refer to [Data Augmentation Configuration File](https://github.com/PaddlePaddle/PaddleClas/blob/release/2.2/ppcls/configs/ImageNet/DataAugment).
+The quality and quantity of data often determine the performance of a model. In the field of image classification, data includes images and labels. In most cases, labeled data is scarce, so the amount of data is difficult to reach the level of saturation of the model. In order to enable the model to learn more image features, a lot of image transformation or data augmentation is required before the image enters the model, so as to ensure the diversity of input image data and ensure that the model has better generalization capabilities. PaddleClas provides standard image transformation for training ImageNet-1k, and also provides 8 data augmentation methods. For related codes, please refer to [data preprocess](../../../ppcls/data/preprocess)，The configuration file refer to [Data Augmentation Configuration File](../../../ppcls/configs/ImageNet/DataAugment). For related algorithms, please refer to [data augment algorithms](../algorithm_introduction/DataAugmentation_en.md).
+
+<a name="2.2"></a>
 
 ### 2.2 Prepare the Model
 
-After the data is determined, the model often determines the upper limit of the final accuracy. In the field of image classification, classic models emerge in an endless stream. PaddleClas provides 35 series and a total of 164 ImageNet pre-trained models. For specific accuracy, speed and other indicators, please refer to [Backbone Network Introduction](https://github.com/PaddlePaddle/PaddleClas/blob/release/2.2/docs/en/models).
+After the data is determined, the model often determines the upper limit of the final accuracy. In the field of image classification, classic models emerge in an endless stream. PaddleClas provides 35 series and a total of 164 ImageNet pre-trained models. For specific accuracy, speed and other indicators, please refer to [Backbone Network Introduction](../algorithm_introduction/ImageNet_models_en.md).
+
+<a name="2.3"></a>
 
 ### 2.3 Train
 
-After preparing the data and model, you can start training the model and update the parameters of the model. After many iterations, a trained model can finally be obtained for image classification tasks. The training process of image classification requires a lot of experience and involves the setting of many hyperparameters. PaddleClas provides a series of [training tuning methods](https://github.com/PaddlePaddle/PaddleClas/blob/release/2.2/docs/en/models/Tricks_en.md), which can quickly help you obtain a high-precision model.
+After preparing the data and model, you can start training the model and update the parameters of the model. After many iterations, a trained model can finally be obtained for image classification tasks. The training process of image classification requires a lot of experience and involves the setting of many hyperparameters. PaddleClas provides a series of [training tuning methods](./train_strategy_en.md), which can quickly help you obtain a high-precision model.
+
+<a name="2.4"></a>
 
 ### 2.4 Evaluation
 
 After a model is trained, the evaluation results of the model on the validation set can determine the performance of the model. The evaluation index is generally Top1-Acc or Top5-Acc. The higher the index, the better the model performance.
 
+<a name="3"></a>
+
 ## 3. Application Methods
 
-Please refer to [Installation](https://github.com/PaddlePaddle/PaddleClas/blob/release/2.2/docs/en/tutorials/install_en.md) to setup environment at first, and prepare flower102 dataset by following the instruction mentioned in the [Quick Start](https://github.com/PaddlePaddle/PaddleClas/blob/release/2.2/docs/en/tutorials/quick_start_en.md).
+Please refer to [Installation](../installation/install_paddleclas_en.md) to setup environment at first, and prepare flower102 dataset by following the instruction mentioned in the [Quick Start](../quick_start/quick_start_classification_new_user_en.md).
 
 So far, PaddleClas supports the following training/evaluation environments:
 
@@ -81,9 +97,13 @@ So far, PaddleClas supports the following training/evaluation environments:
     └── Linux
 ```
 
+<a name="3.1"></a>
+
 ### 3.1 Training and Evaluation on CPU or Single GPU
 
-If training and evaluation are performed on CPU or single GPU, it is recommended to use the `tools/train.py` and `tools/eval.py`. For training and evaluation in multi-GPU environment on Linux, please refer to [3.2 Training and evaluation on Linux+GPU](https://github.com/PaddlePaddle/PaddleClas/blob/release/2.2/docs/en/tutorials/getting_started_en.md#2-training-and-evaluation-on-linuxgpu).
+If training and evaluation are performed on CPU or single GPU, it is recommended to use the `tools/train.py` and `tools/eval.py`. For training and evaluation in multi-GPU environment on Linux, please refer to [3.2 Training and evaluation on Linux+GPU](#3.2).
+
+<a name="3.1.1"></a>
 
 #### 3.1.1 Model Training
 
@@ -98,7 +118,7 @@ python3 tools/train.py \
 
 Among them, `-c` is used to specify the path of the configuration file, `-o` is used to specify the parameters needed to be modified or added, `-o Arch.pretrained=False` means to not using pre-trained models. `-o Global.device=gpu` means to use GPU for training. If you want to use the CPU for training, you need to set `Global.device` to `cpu`.
 
-Of course, you can also directly modify the configuration file to update the configuration. For specific configuration parameters, please refer to [Configuration Document](https://github.com/PaddlePaddle/PaddleClas/blob/release/2.2/docs/en/tutorials/config_description_en.md).
+Of course, you can also directly modify the configuration file to update the configuration. For specific configuration parameters, please refer to [Configuration Document](config_description_en.md).
 
 The output log examples are as follows:
 
@@ -124,6 +144,8 @@ The output log examples are as follows:
 
 During training, you can view loss changes in real time through `VisualDL`, see [VisualDL](https://github.com/PaddlePaddle/PaddleClas/blob/release/2.2/docs/en/extension/VisualDL_en.md) for details.
 
+<a name="3.1.2"></a>
+
 #### 3.1.2 Model Finetuning
 
 After correcting config file, you can load pretrained model  weight to finetune. The command is as follows:
@@ -137,7 +159,9 @@ python3 tools/train.py \
 
 Among them,`Arch.pretrained` is used to set the address to load the pretrained weights. When using it, you need to replace it with your own pretrained weights' path, or you can modify the path directly in the configuration file. You can also set it into `True` to use pretrained weights that trained in ImageNet1k.
 
-We also provide a lot of pre-trained models trained on the ImageNet-1k dataset. For the model list and download address, please refer to the [model library overview](https://github.com/PaddlePaddle/PaddleClas/blob/release/2.2/docs/en/models/models_intro_en.md).
+We also provide a lot of pre-trained models trained on the ImageNet-1k dataset. For the model list and download address, please refer to the [model library overview](../algorithm_introduction/ImageNet_models_en.md).
+
+<a name="3.1.3"></a>
 
 #### 3.1.3 Resume Training
 
@@ -170,6 +194,8 @@ The configuration file does not need to be modified. You only need to add the `G
       .
   ```
 
+<a name="3.1.4"></a>
+
 #### 3.1.4 Model Evaluation
 
 The model evaluation process can be started as follows.
@@ -187,13 +213,17 @@ Some of the configurable evaluation parameters are described as follows:
 - `Arch.name`：Model name
 - `Global.pretrained_model`：The path of the model file to be evaluated
 
-**Note：** When loading the model to be evaluated, you only need to specify the path of the model file stead of the suffix. PaddleClas will automatically add the `.pdparams` suffix, such as [3.1.3 Resume Training](https://github.com/PaddlePaddle/PaddleClas/blob/ develop/docs/zh_CN/models_training/classification.md#3.1.3).
+**Note：** When loading the model to be evaluated, you only need to specify the path of the model file stead of the suffix. PaddleClas will automatically add the `.pdparams` suffix, such as [3.1.3 Resume Training](#3.1.3).
 
 When loading the model to be evaluated, you only need to specify the path of the model file stead of the suffix. PaddleClas will automatically add the `.pdparams` suffix, such as [3.1.3 Resume Training](https://github.com/PaddlePaddle/PaddleClas/blob/ develop/docs/zh_CN/models_training/classification.md#3.1.3).
+
+<a name="3.2"></a>
 
 ### 3.2 Training and Evaluation on Linux+ Multi-GPU
 
 If you want to run PaddleClas on Linux with GPU, it is highly recommended to use `paddle.distributed.launch` to start the model training script(`tools/train.py`) and evaluation script(`tools/eval.py`), which can start on multi-GPU environment more conveniently.
+
+<a name="3.2.1"></a>
 
 #### 3.2.1 Model Training
 
@@ -209,7 +239,9 @@ python3 -m paddle.distributed.launch \
         -c ./ppcls/configs/quick_start/MobileNetV3_large_x1_0.yaml
 ```
 
-The format of output log information is the same as above, see [3.1.1 Model training](https://github.com/PaddlePaddle/PaddleClas/blob/release/2.2/docs/en/tutorials/getting_started_en.md#11-model-training) for details.
+The format of output log information is the same as above, see [3.1.1 Model training](#3.1.1) for details.
+
+<a name="3.2.2"></a>
 
 #### 3.2.2 Model Finetuning
 
@@ -226,7 +258,9 @@ python3 -m paddle.distributed.launch \
 
 Among them, `Arch.pretrained` is set to `True` or `False`. It also can be used to set the address to load the pretrained weights. When using it, you need to replace it with your own pretrained weights' path, or you can modify the path directly in the configuration file.
 
-There contains a lot of examples of model finetuning in the [new user version](https://github.com/PaddlePaddle/PaddleClas/blob/develop/docs/zh_CN/quick_start/quick_start_classification_new_user.md) and [professional version](https://github.com/PaddlePaddle/PaddleClas/blob/develop/docs/zh_CN/quick_start/quick_start_classification_professional.md) of PaddleClas Trial in 30 mins. You can refer to this tutorial to finetune the model on a specific dataset.
+There contains a lot of examples of model finetuning in the [new user version](../quick_start/quick_start_classification_new_user_en.md) and [professional version](../quick_start/quick_start_classification_professional_en.md) of PaddleClas Trial in 30 mins. You can refer to this tutorial to finetune the model on a specific dataset.
+
+<a name="3.2.3"></a>
 
 #### 3.2.3 Resume Training
 
@@ -242,7 +276,9 @@ python3 -m paddle.distributed.launch \
         -o Global.device=gpu
 ```
 
-The configuration file does not need to be modified. You only need to add the `Global.checkpoints` parameter during training, which represents the path of the checkpoints. The parameter weights, learning rate, optimizer and other information will be loaded using this parameter as described in [3.1.3 Resume training](https://github.com/PaddlePaddle/PaddleClas/blob/release/2.2/docs/en/tutorials/getting_started_en.md#13-resume-training).
+The configuration file does not need to be modified. You only need to add the `Global.checkpoints` parameter during training, which represents the path of the checkpoints. The parameter weights, learning rate, optimizer and other information will be loaded using this parameter as described in [3.1.3 Resume training](#3.1.3).
+
+<a name="3.2.4"></a>
 
 #### 3.2.4 Model Evaluation
 
@@ -256,7 +292,9 @@ python3 -m paddle.distributed.launch \
         -o Global.pretrained_model=./output/MobileNetV3_large_x1_0/best_model
 ```
 
-About parameter description, see [3.1.4 Model evaluation](https://github.com/PaddlePaddle/PaddleClas/blob/release/2.2/docs/en/tutorials/getting_started_en.md#14-model-evaluation) for details.
+About parameter description, see [3.1.4 Model evaluation](#3.1.4) for details.
+
+<a name="3.3"></a>
 
 ### 3.3 Use the Pre-trained Model to Predict
 
@@ -274,6 +312,8 @@ Parameters：
 - `Infer.infer_imgs`：The path of the image file or folder to be predicted.
 - `Global.pretrained_model`：Weight file path, such as`./output/MobileNetV3_large_x1_0/best_model`
 
+<a name="3.4"></a>
+
 ### 3.4 Use the Inference Model to Predict
 
 By exporting the inference model，PaddlePaddle supports inference using prediction engines, which will be introduced next. Firstly, you should export inference model using `tools/export_model.py`.
@@ -284,7 +324,7 @@ python3 tools/export_model.py \
     -o Global.pretrained_model=output/MobileNetV3_large_x1_0/best_model
 ```
 
-Among them, `Global.pretrained_model` parameter is used to specify the model file path that does not need to include the file suffix name.（such as [3.1.3 Resume Training](https://github.com/PaddlePaddle/PaddleClas/blob/develop/docs/zh_CN/models_training/classification.md#3.1.3)）。
+Among them, `Global.pretrained_model` parameter is used to specify the model file path that does not need to include the file suffix name.（such as [3.1.3 Resume Training](#3.1.3)）。
 
 The above command will generate the model structure file (`inference.pdmodel`) and the model weight file (`inference.pdiparams`), and then the inference engine can be used for inference:
 

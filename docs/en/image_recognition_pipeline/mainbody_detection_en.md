@@ -4,7 +4,23 @@ The mainbody detection technology is currently a widely used detection technolog
 
 This tutorial will introduce the technology from three aspects, namely, the datasets, model selection and model training.
 
-## Dataset
+## Catalogue
+
+- [1. Dataset](#1)
+- [2. Model Selection](#2)
+  - [2.1 Lightweight Mainbody Detection Model](#2.1)
+  - [2.2 Server-side Mainbody Detection Model](#2.2)
+- [3. Model Training](#3)
+  - [3.1 Prepare For the Environment](#3.1)
+  - [3.2 Prepare For the Dataset](#3.2)
+  - [3.3 Configuration Files](#3.3)
+  - [3.4 Begin the Training Process](#3.4)
+  - [3.5 Model Prediction](#3.5)
+  - [3.6 Model Export and Inference Deployment](#3.6)
+
+<a name="1"></a>
+
+## 1. Dataset
 
 The datasets we used for mainbody detection tasks are shown in the following table.
 
@@ -18,7 +34,9 @@ The datasets we used for mainbody detection tasks are shown in the following tab
 
 In the actual training process, all datasets are mixed together. Categories of all the labeled boxes are modified as `foreground`, and the detection model we trained only contains one category (`foreground`).
 
-## Model Selection
+<a name="2"></a>
+
+## 2. Model Selection
 
 There are a wide variety of object detection methods, such as the commonly used two-stage detectors (FasterRCNN series, etc.), single-stage detectors (YOLO, SSD, etc.), anchor-free detectors (FCOS, etc.) and so on. PaddleDetection has its self-developed PP-YOLO models for server-side scenarios and PicoDet models for end-side scenarios (CPU and mobile), which all take the lead in the area.
 
@@ -34,7 +52,9 @@ Notes:
 - Detailed information of the CPU of the speed evaluation machine：`Intel(R) Xeon(R) Gold 6148 CPU @ 2.40GHz`.The speed indicator is the testing result when mkldnn is on and the number of threads is set to 10.
 - Mainbody detection has a time-consuming preprocessing procedure, with an average time of about 40 to 55 ms per image in the above machine. Therefore, it is not included in the inference time.
 
-### Lightweight Mainbody Detection Model
+<a name="2.1"></a>
+
+### 2.1 Lightweight Mainbody Detection Model
 
 PicoDet, introduced by  [PaddleDetection](https://github.com/PaddlePaddle/PaddleDetection), is an object detection algorithm applied to CPU or mobile-side scenarios. It integrates the following optimization algorithm.
 
@@ -48,7 +68,9 @@ For more details of optimized PicoDet and benchmark,  you can refer to [Tutorial
 
 To balance the detection speed and effects in lightweight mainbody detection tasks, we adopt PPLCNet_x2_5 as the backbone of the model and revise the image scale for training and inference to 640x640, with the rest configured the same as [picodet_m_shufflenetv2_416_coco.yml](https://github.com/PaddlePaddle/PaddleDetection/blob/develop/configs/picodet/picodet_m_shufflenetv2_416_coco.yml). The final detection model is obtained after the training of customized mainbody detection datasets.
 
-### Server-side Mainbody Detection Model
+<a name="2.2"></a>
+
+### 2.2 Server-side Mainbody Detection Model
 
 PP-YOLO is proposed by [PaddleDetection](https://github.com/PaddlePaddle/PaddleDetection). It greatly optimizes the yolov3 model from multiple perspectives such as backbone, data augmentation, regularization strategy, loss function, and post-processing. It reaches the state of the art in terms of "speed-precision". The optimization strategy is as follows.
 
@@ -67,11 +89,15 @@ For more information about PP-YOLO, you can refer to [PP-YOLO tutorial](https://
 
 In the mainbody detection task, we use `ResNet50vd-DCN` as our backbone for better performance. The config file is [ppyolov2_r50vd_dcn_365e_coco.yml](https://github.com/PaddlePaddle/PaddleDetection/blob/release/2.1/configs/ppyolo/ppyolov2_r50vd_dcn_365e_coco.yml), in which the dataset path is modified to the customized mainbody detection dataset. The final detection model can be downloaded [here](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/inference/ppyolov2_r50vd_dcn_mainbody_v1.0_infer.tar).
 
-## Model Training
+<a name="3"></a>
+
+## 3 Model Training
 
 This section mainly talks about how to train your own mainbody detection model using PaddleDetection on your own datasets.
 
-###  Prepare For the Environment
+<a name="3.1"></a>
+
+###  3.1 Prepare For the Environment
 
 Download PaddleDetection and install requirements.
 
@@ -86,7 +112,9 @@ pip install -r requirements.txt
 
 For more installation tutorials, please refer to [Installation Tutorial](https://github.com/PaddlePaddle/PaddleDetection/blob/release/2.1/docs/tutorials/INSTALL.md)
 
-### Prepare For the Dataset
+<a name="3.2"></a>
+
+### 3.2 Prepare For the Dataset
 
 For customized dataset, you should convert it to COCO format. Please refer to [Customized Dataset Tutorial](https://github.com/PaddlePaddle/PaddleDetection/blob/release/2.1/static/docs/tutorials/Custom_DataSet.md) to build your own datasets with COCO format.
 
@@ -96,11 +124,13 @@ In mainbody detection task, all the objects belong to foregroud. Therefore, `cat
 [{u'id': 1, u'name': u'foreground', u'supercategory': u'foreground'}]
 ```
 
-### Configuration Files
+<a name="3.3"></a>
+
+### 3.3 Configuration Files
 
 We use `configs/ppyolo/ppyolov2_r50vd_dcn_365e_coco.yml` to train the model, mode details are as follows.
 
-  [![img](https://github.com/PaddlePaddle/PaddleClas/raw/develop/docs/images/det/PaddleDetection_config.png)](https://github.com/PaddlePaddle/PaddleClas/blob/develop/docs/images/det/PaddleDetection_config.png)
+  [![img](../../images/det/PaddleDetection_config.png)](https://github.com/PaddlePaddle/PaddleClas/blob/develop/docs/images/det/PaddleDetection_config.png)
 
 
 
@@ -122,7 +152,9 @@ In mainbody detection task, you need to modify `num_classes` in `datasets/coco_d
 
 In addition, the above files can also be modified according to real situations, for example, if the video memory is overflowing, the batch size and learning rate can be reduced in equal proportion.
 
-### Begin the Training Process
+<a name="3.4"></a>
+
+### 3.4 Begin the Training Process
 
 PaddleDetection supports many ways of training process.
 
@@ -162,7 +194,9 @@ python -m paddle.distributed.launch --gpus 0,1,2,3 tools/train.py -c configs/ppy
 
 Note: If `Out of memory error` occurs, you can try to decrease `batch_size` in `ppyolov2_reader.yml` while reducing learning rate in equal proportion.
 
-### Model Prediction
+<a name="3.5"></a>
+
+### 3.5 Model Prediction
 
 Use the following command to finish the prediction process.
 
@@ -173,7 +207,9 @@ python tools/infer.py -c configs/ppyolo/ppyolov2_r50vd_dcn_365e_coco.yml --infer
 
 `--draw_threshold` is an optional parameter. According to NMS calculation, different thresholds will produce different results.  `keep_top_k`  indicates the maximum number of output targets, with a default value of 100 that can be modified according to their actual situation.
 
-### Model Export and Inference Deployment
+<a name="3.6"></a>
+
+### 3.6 Model Export and Inference Deployment
 
 Use the following to export the inference model：
 
@@ -191,7 +227,7 @@ The final directory contains `inference/ppyolov2_r50vd_dcn_365e_coco`,  `inferen
 
 After exporting the model, the path of the detection model can be changed to the inference model path to complete the prediction task.
 
-Take product recognition as an example，you can modify the field `Global.det_inference_model_dir` in its config file [inference_product.yaml](https://github.com/PaddlePaddle/PaddleClas/blob/develop/deploy/configs/inference_product.yaml) to the directory of exported inference model, and then finish the detection and recognition of the product with reference to  [Quick Start for Image Recognition](https://github.com/PaddlePaddle/PaddleClas/blob/develop/docs/zh_CN_tmp/tutorials/quick_start_recognition.md).
+Take product recognition as an example，you can modify the field `Global.det_inference_model_dir` in its config file [inference_product.yaml](../../../deploy/configs/inference_product.yaml) to the directory of exported inference model, and then finish the detection and recognition of the product with reference to  [Quick Start for Image Recognition](./quick_start/quick_start_recognition_en.md).
 
 ## FAQ
 

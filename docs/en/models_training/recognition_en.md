@@ -12,26 +12,26 @@ For an image to be queried, the image recognition process in PaddleClas is divid
 
 The feature gallery is built in advance using the labeled image datasets. The complete image recognition system is shown in the figure below.
 
-[![img](https://github.com/PaddlePaddle/PaddleClas/raw/develop/docs/images/structure.jpg)](https://github.com/PaddlePaddle/PaddleClas/blob/develop/docs/images/structure.jpg)
+[![img](../../images/structure.jpg)
 
-To experience the whole image recognition system, or learn  how to build a feature gallery, please refer to [Quick Start of Image Recognition](. /quick_start/quick_start_recognition.md), which explains the overall application process. The following parts expound on the training part of the above three steps.
+To experience the whole image recognition system, or learn  how to build a feature gallery, please refer to [Quick Start of Image Recognition](../quick_start/quick_start_recognition_en.md), which explains the overall application process. The following parts expound on the training part of the above three steps.
 
-Please first refer to the [Installation Guide](https://github.com/PaddlePaddle/PaddleClas/blob/develop/docs/zh_CN/installation/install_paddleclas.md) to configure the runtime environment.
+Please first refer to the [Installation Guide](../installation/install_paddleclas_en.md) to configure the runtime environment.
 
-## Contents
+## Catalogue
 
-- [1. Mainbody Detection](https://github.com/PaddlePaddle/PaddleClas/blob/develop/docs/zh_CN/models_training/recognition.md#1)
-- [2. Feature Model Training](https://github.com/PaddlePaddle/PaddleClas/blob/develop/docs/zh_CN/models_training/recognition.md#2)
-  - [2.1. Data Preparation](https://github.com/PaddlePaddle/PaddleClas/blob/develop/docs/zh_CN/models_training/recognition.md#2.1)
-  - [2. 2 Single GPU-based Training and Evaluation](https://github.com/PaddlePaddle/PaddleClas/blob/develop/docs/zh_CN/models_training/recognition.md#2.2)
-    - [2.2.1 Model Training](https://github.com/PaddlePaddle/PaddleClas/blob/develop/docs/zh_CN/models_training/recognition.md#2.2.2)
-    - [2.2.2 Resume Training](https://github.com/PaddlePaddle/PaddleClas/blob/develop/docs/zh_CN/models_training/recognition.md#2.2.2)
-    - [2.2.3 Model Evaluation](https://github.com/PaddlePaddle/PaddleClas/blob/develop/docs/zh_CN/models_training/recognition.md#2.2.3)
-  - [2.3 Export Inference Model](https://github.com/PaddlePaddle/PaddleClas/blob/develop/docs/zh_CN/models_training/recognition.md#2.3)
-- [3.  Vector Search](https://github.com/PaddlePaddle/PaddleClas/blob/develop/docs/zh_CN/models_training/recognition.md#3)
-- [4. Basic Knowledge](https://github.com/PaddlePaddle/PaddleClas/blob/develop/docs/zh_CN/models_training/recognition.md#4)
+- [1. Mainbody Detection](#1)
+- [2. Feature Model Training](#2)
+  - [2.1. Data Preparation](h#2.1)
+  - [2. 2 Single GPU-based Training and Evaluation](#2.2)
+    - [2.2.1 Model Training](#2.2.2)
+    - [2.2.2 Resume Training](#2.2.2)
+    - [2.2.3 Model Evaluation](#2.2.3)
+  - [2.3 Export Inference Model](#2.3)
+- [3.  Vector Search](#3)
+- [4. Basic Knowledge](#4)
 
-
+<a name="1"></a>  
 
 ## 1. Mainbody Detection
 
@@ -45,11 +45,11 @@ For more information about the training method of mainbody detection, please ref
 
 For more information on the introduction and download of the model provided in PaddleClas for body detection, please refer to: [PaddleDetection Tutorial](https://github.com/PaddlePaddle/PaddleClas/blob/develop/docs/zh_CN/image_recognition_pipeline/mainbody_detection.md).
 
-
+<a name="2"></a>  
 
 ## 2. Feature Model Training
 
-
+<a name="2.1"></a>  
 
 ### 2.1 Data Preparation
 
@@ -123,7 +123,7 @@ The format of testing set is the same as the one of training set.
 
 **Note**：
 
-- When the gallery dataset and query dataset are the same, in order to remove the first data retrieved (the retrieved images themselves do not need to be evaluated), each data needs to correspond to a unique id for subsequent evaluation of metrics such as mAP, recall@1, etc. Please refer to [Introduction to image retrieval datasets](https://github.com/PaddlePaddle/PaddleClas/blob/develop/docs/zh_CN/models_training/recognition.md#图像检索数据集介绍) for the analysis of gallery datasets and query datasets, and [Image retrieval evaluation metrics](https://github.com/PaddlePaddle/PaddleClas/blob/develop/docs/zh_CN/models_training/recognition.md#图像检索评价指标) for the evaluation of mAP, recall@1, etc.
+- When the gallery dataset and query dataset are the same, in order to remove the first data retrieved (the retrieved images themselves do not need to be evaluated), each data needs to correspond to a unique id for subsequent evaluation of metrics such as mAP, recall@1, etc. Please refer to [Introduction to image retrieval datasets](#Introduction to Image Retrieval Datasets) for the analysis of gallery datasets and query datasets, and [Image retrieval evaluation metrics](#Image Retrieval Evaluation Metrics) for the evaluation of mAP, recall@1, etc.
 
 Back to `PaddleClas` root directory.
 
@@ -132,13 +132,15 @@ Back to `PaddleClas` root directory.
 cd ../../
 ```
 
+<a name="2.2"></a>  
+
 ### 2.2 Single GPU-based Training and Evaluation
 
 For training and evaluation on a single GPU, the `tools/train.py` and `tools/eval.py` scripts are recommended.
 
 #### 2.2.1 Model Training
 
-Once you have prepared the configuration file, you can start training the image retrieval task in the following way. the method used by PaddleClas to train the image retrieval is metric learning, referring to [metric learning](https://github.com/PaddlePaddle/PaddleClas/blob/release/2.2/docs/en/tutorials/getting_started_retrieval_en.md#Metric-Learning) for more explanations.
+Once you have prepared the configuration file, you can start training the image retrieval task in the following way. the method used by PaddleClas to train the image retrieval is metric learning, referring to [metric learning](#metric learning) for more explanations.
 
 ```shell
 # Single GPU
@@ -156,7 +158,7 @@ python3 -m paddle.distributed.launch tools/train.py \
 
 `-c` is used to specify the path to the configuration file, and `-o` is used to specify the parameters that need to be modified or added, where `-o Arch.Backbone.pretrained=True` indicates that the Backbone part uses the pre-trained model. In addtion,`Arch.Backbone.pretrained`  can also specify the address of a specific model weight file, which needs to be replaced with the path to your own pre-trained model weight file when using it. `-o Global.device=gpu` indicates that the GPU is used for training. If you want to use a CPU for training, you need to set `Global.device` to `cpu`.
 
-For more detailed training configuration, you can also modify the corresponding configuration file of the model directly. Refer to the [configuration document](https://github.com/PaddlePaddle/PaddleClas/blob/release/2.2/docs/en/tutorials/config_description_en.md) for specific configuration parameters.
+For more detailed training configuration, you can also modify the corresponding configuration file of the model directly. Refer to the [configuration document](config_description_en.md) for specific configuration parameters.
 
 Run the above commands to check the output log, an example is as follows:
 
@@ -172,7 +174,7 @@ Run the above commands to check the output log, an example is as follows:
 
 The Backbone here is MobileNetV1, if you want to use other backbone, you can rewrite the parameter `Arch.Backbone.name`, for example by adding `-o Arch.Backbone.name={other Backbone}` to the command. In addition, as the input dimension of the `Neck` section differs between models, replacing a Backbone may require rewriting the input size here in a similar way to replacing the Backbone's name.
 
-In the Training Loss section, [CELoss](https://github.com/PaddlePaddle/PaddleClas/blob/release/2.2/ppcls/loss/celoss.py) and [TripletLossV2](https://github.com/PaddlePaddle/PaddleClas/blob/release/2.2/ppcls/loss/triplet.py) are used here with the following configuration files:
+In the Training Loss section, [CELoss](../../../ppcls/loss/celoss.py) and [TripletLossV2](../../../ppcls/loss/triplet.py) are used here with the following configuration files:
 
 ```
 Loss:
@@ -184,7 +186,7 @@ Loss:
         margin: 0.5
 ```
 
-The final total Loss is a weighted sum of all Losses, where weight defines the weight of a particular Loss in the final total. If you want to replace other Losses, you can also change the Loss field in the configuration file, for the currently supported Losses please refer to [Loss](https://github.com/PaddlePaddle/PaddleClas/blob/release/2.2/ppcls/loss).
+The final total Loss is a weighted sum of all Losses, where weight defines the weight of a particular Loss in the final total. If you want to replace other Losses, you can also change the Loss field in the configuration file, for the currently supported Losses please refer to [Loss](../../../ppcls/loss).
 
 #### 2.2.2 Resume Training
 
@@ -246,12 +248,14 @@ Some of the configurable evaluation parameters are introduced as follows.
 
 - `Arch.name`：the name of the model
 - `Global.pretrained_model`：path to the pre-trained model file of the model to be evaluated, unlike `Global.Backbone.pretrained`,  the pre-trained model is the weight of the whole model instead of the Backbone only. When it is time to do model evaluation, the weights of the whole model need to be loaded.
-- `Metric.Eval`：the metric to be evaluated, by default evaluates recall@1, recall@5, mAP. when you are not going to evaluate a metric, you can remove the corresponding trial marker from the configuration file; when you want to add a certain evaluation metric, you can also refer to [Metric](https://github.com/PaddlePaddle/PaddleClas/blob/release/2.2/ppcls/metric/metrics.py) section to add the relevant metric to the configuration file `Metric.Eval`.
+- `Metric.Eval`：the metric to be evaluated, by default evaluates recall@1, recall@5, mAP. when you are not going to evaluate a metric, you can remove the corresponding trial marker from the configuration file; when you want to add a certain evaluation metric, you can also refer to [Metric](../../../ppcls/metric/metrics.py) section to add the relevant metric to the configuration file `Metric.Eval`.
 
 **Note：**
 
-- When loading the model to be evaluated, the path to the model file needs to be specified, but it is not necessary to include the file suffix, PaddleClas will automatically complete the `.pdparams` suffix, e.g. [2.2.2 Resume Training](https://github.com/PaddlePaddle/PaddleClas/blob/release/2.2/docs/en/tutorials/getting_started_retrieval_en.md#Resume-Training).
+- When loading the model to be evaluated, the path to the model file needs to be specified, but it is not necessary to include the file suffix, PaddleClas will automatically complete the `.pdparams` suffix, e.g. [2.2.2 Resume Training](#2.2.2).
 - Metric learning are generally not evaluated for TopkAcc.
+
+<a name="2.3"></a>
 
 ### 2.3 Export Inference Model
 
@@ -264,9 +268,11 @@ python3 tools/export_model.py \
     -o Global.save_inference_dir=./inference
 ```
 
-`Global.pretrained_model` is used to specify the model file path, which still does not need to contain the model file suffix (e.g.[2.2.2 Model Recovery Training](https://github.com/PaddlePaddle/PaddleClas/blob/develop/docs/zh_CN/models_training/recognition.md#2.2.2)). When executed, it will generate the `./inference` directory, which contains the `inference.pdiparams`,`inference.pdiparams.info`, and`inference.pdmodel` files.`Global.save_inference_dir` allows you to specify the path to export the inference model. The inference model saved here is truncated at the embedding feature level, i.e. the final output of the model is n-dimensional embedding features.
+`Global.pretrained_model` is used to specify the model file path, which still does not need to contain the model file suffix (e.g.[2.2.2 Model Recovery Training](#2.2.2)). When executed, it will generate the `./inference` directory, which contains the `inference.pdiparams`,`inference.pdiparams.info`, and`inference.pdmodel` files.`Global.save_inference_dir` allows you to specify the path to export the inference model. The inference model saved here is truncated at the embedding feature level, i.e. the final output of the model is n-dimensional embedding features.
 
-The above command will generate the model structure file (`inference.pdmodel`) and the model weights file (`inference.pdiparams`), which can then be used for inference using the inference engine. The process of inference using the inference model can be found in [Predictive inference based on the Python prediction engine](https://github.com/PaddlePaddle/PaddleClas/blob/release/2.2/docs/en/tutorials/@shengyu).
+The above command will generate the model structure file (`inference.pdmodel`) and the model weights file (`inference.pdiparams`), which can then be used for inference using the inference engine. The process of inference using the inference model can be found in [Predictive inference based on the Python prediction engine](../inference_deployment/python_deploy_en.md).
+
+<a name="3"></a>
 
 ## 3. Vector Search
 
@@ -295,18 +301,26 @@ pip install faiss-cpu==1.7.1post2
 
 If the above cannot be properly referenced, please `uninstall` and then  `install` again, especially when you are using`windows`.
 
+<a name="4"></a>
+
 ## 4. Basic Knowledge
 
 Image retrieval refers to a query image given a specific instance (e.g. a specific target, scene, item, etc.) that contains the same instance from a database image. Unlike image classification, image retrieval solves an open set problem where the training set may not contain the class of the image being recognised. The overall process of image retrieval is: firstly, the images are represented in a suitable feature vector, secondly, a nearest neighbour search is performed on these image feature vectors using Euclidean or Cosine distances to find similar images in the base, and finally, some post-processing techniques can be used to fine-tune the retrieval results and determine information such as the category of the image being recognised. Therefore, the key to determining the performance of an image retrieval algorithm lies in the goodness of the feature vectors corresponding to the images.
 
+<a name="metric learning"></a>
+
 - Metric Learning
 
-Metric learning studies how to learn a distance function on a particular task so that the distance function can help nearest-neighbour based algorithms (kNN, k-means, etc.) to achieve better performance. Deep Metric Learning is a method of metric learning that aims to learn a mapping from the original features to a low-dimensional dense vector space (embedding space) such that similar objects on the embedding space are closer together using commonly used distance functions (Euclidean distance, cosine distance, etc.) ) on the embedding space, while the distances between objects of different classes are not close to each other. Deep metric learning has achieved very successful applications in the field of computer vision, such as face recognition, commodity recognition, image retrieval, pedestrian re-identification, etc. See [HERE](https://github.com/PaddlePaddle/PaddleClas/blob/develop/docs/zh_CN/algorithm_introduction/metric_learning.md) for detailed information.
+Metric learning studies how to learn a distance function on a particular task so that the distance function can help nearest-neighbour based algorithms (kNN, k-means, etc.) to achieve better performance. Deep Metric Learning is a method of metric learning that aims to learn a mapping from the original features to a low-dimensional dense vector space (embedding space) such that similar objects on the embedding space are closer together using commonly used distance functions (Euclidean distance, cosine distance, etc.) ) on the embedding space, while the distances between objects of different classes are not close to each other. Deep metric learning has achieved very successful applications in the field of computer vision, such as face recognition, commodity recognition, image retrieval, pedestrian re-identification, etc. See [HERE](../algorithm_introduction/metric_learning_em.md) for detailed information.
+
+<a name="Introduction to Image Retrieval Datasets"></a>
 
 - Introduction to Image Retrieval Datasets
   - Training Dataset: used to train the model so that it can learn the image features of the collection.
   - Gallery Dataset: used to provide the gallery data for the image retrieval task. The gallery dataset can be the same as the training set or the test set, or different.
   - Test Set (Query Dataset): used to test the goodness of the model, usually each test image in the test set is extracted with features, and then matched with the features of the underlying data to obtain recognition results, and then the metrics of the whole test set are calculated based on the recognition results.
+
+<a name="Image Retrieval Evaluation Metrics"></a>
 
 - Image Retrieval Evaluation Metrics
 
