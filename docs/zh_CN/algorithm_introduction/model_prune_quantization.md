@@ -45,7 +45,8 @@
 算法具体参数请参考 PaddleSlim 中[参数介绍](https://github.com/PaddlePaddle/PaddleSlim/blob/release/2.0.0/docs/zh_cn/api_cn/dygraph/quanter/qat.rst#qat)。
 
 <a name='2'></a>
-## FPGM 裁剪
+
+## 2. FPGM 裁剪
 
 模型剪枝是减小模型大小，提升预测效率的一种非常重要的手段。在之前的网络剪枝文章中一般将网络 filter 的范数作为其重要性度量，**范数值较小的代表的 filter 越不重要**，将其从网络中裁剪掉，反之也就越重要。而**FPGM**认为之前的方法要依赖如下两点
 

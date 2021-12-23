@@ -8,23 +8,25 @@ Model pruning decreases the number of model parameters by cutting out the unimpo
 
 This tutorial explains how to use PaddleSlim, PaddlePaddle's model compression library, for PaddleClas compression, i.e., pruning and quantization. [PaddleSlim](https://github.com/PaddlePaddle/PaddleSlim) integrates a variety of common and leading model compression functions such as model pruning, quantization (including quantization training and offline quantization), distillation, and neural network search. If you are interested, please follow us and learn more.
 
-To start with, you are recommended to learn [PaddleClas Training](https://github.com/PaddlePaddle/PaddleClas/blob/develop/docs/zh_CN/models_training/classification.md) and [PaddleSlim](https://paddleslim.readthedocs.io/zh_CN/latest/index.html), see [Model Pruning and Quantization Algorithms](https://github.com/PaddlePaddle/PaddleClas/blob/develop/docs/zh_CN/algorithm_introduction/model_prune_quantization.md) for related pruning and quantization methods.
+To start with, you are recommended to learn [PaddleClas Training](../models_training/classification_en.md) and [PaddleSlim](https://paddleslim.readthedocs.io/zh_CN/latest/index.html), see [Model Pruning and Quantization Algorithms](../algorithm_introduction/model_prune_quantization_en.md) for related pruning and quantization methods.
 
 ------
 
-## Contents
+## Catalogue
 
-- [1. Prepare the Environment](https://github.com/PaddlePaddle/PaddleClas/blob/develop/docs/zh_CN/advanced_tutorials/model_prune_quantization.md#1)
-  - [1.1 Install PaddleSlim](https://github.com/PaddlePaddle/PaddleClas/blob/develop/docs/zh_CN/advanced_tutorials/model_prune_quantization.md#1.1)
-  - [1.2 Prepare the Trained Model](https://github.com/PaddlePaddle/PaddleClas/blob/develop/docs/zh_CN/advanced_tutorials/model_prune_quantization.md#1.2)
-- [2. Quick Start](https://github.com/PaddlePaddle/PaddleClas/blob/develop/docs/zh_CN/advanced_tutorials/model_prune_quantization.md#2)
-  - [2.1 Model Quantization](https://github.com/PaddlePaddle/PaddleClas/blob/develop/docs/zh_CN/advanced_tutorials/model_prune_quantization.md#2.1)
-    - [2.1.1 Online Quantization Training](https://github.com/PaddlePaddle/PaddleClas/blob/develop/docs/zh_CN/advanced_tutorials/model_prune_quantization.md#2.1.1)
-    - [2.1.2 Offline Quantization](https://github.com/PaddlePaddle/PaddleClas/blob/develop/docs/zh_CN/advanced_tutorials/model_prune_quantization.md#2.1.2)
-  - [2.2 Model Pruning](https://github.com/PaddlePaddle/PaddleClas/blob/develop/docs/zh_CN/advanced_tutorials/model_prune_quantization.md#2.2)
-- [3. Export the Model](https://github.com/PaddlePaddle/PaddleClas/blob/develop/docs/zh_CN/advanced_tutorials/model_prune_quantization.md#3)
-- [4. Deploy the Model](https://github.com/PaddlePaddle/PaddleClas/blob/develop/docs/zh_CN/advanced_tutorials/model_prune_quantization.md#4)
-- [5. Hyperparameter Training](https://github.com/PaddlePaddle/PaddleClas/blob/develop/docs/zh_CN/advanced_tutorials/model_prune_quantization.md#5)
+- [1. Prepare the Environment](#1)
+  - [1.1 Install PaddleSlim](#1.1)
+  - [1.2 Prepare the Trained Model](#1.2)
+- [2. Quick Start](#2)
+  - [2.1 Model Quantization](#2.1)
+    - [2.1.1 Online Quantization Training](#2.1.1)
+    - [2.1.2 Offline Quantization](#2.1.2)
+  - [2.2 Model Pruning](#2.2)
+- [3. Export the Model](#3)
+- [4. Deploy the Model](#4)
+- [5. Hyperparameter Training](#5)
+
+<a name="1"></a>
 
 ## 1. Prepare the Environment
 
@@ -37,6 +39,8 @@ Five steps are included：
 3. Compress the model
 4. Export quantized inference model
 5. Inference and deployment of the quantized model
+
+<a name="1.1"></a>
 
 ### 1.1 Install PaddleSlim
 
@@ -54,9 +58,13 @@ cd Paddleslim
 python3.7 setup.py install
 ```
 
+<a name="1.2"></a>
+
 ### 1.2 Prepare the Trained Model
 
-PaddleClas offers a list of trained [models](https://github.com/PaddlePaddle/PaddleClas/blob/develop/docs/zh_CN/models/models_intro.md). If the model to be quantized is not in the list, you need to follow the [regular training](https://github.com/PaddlePaddle/PaddleClas/blob/develop/docs/zh_CN/models_training/classification.md) method to get the trained model.
+PaddleClas offers a list of trained [models](../models/models_intro_en.md). If the model to be quantized is not in the list, you need to follow the [regular training](../models_training/classification_en.md) method to get the trained model.
+
+<a name="2"></a>
 
 ## 2. Quick Start
 
@@ -68,9 +76,13 @@ cd PaddleClas
 
 Related code for `slim` training has been integrated under `ppcls/engine/`, and the offline quantization code can be found in `deploy/slim/quant_post_static.py`.
 
+<a name="2.1"></a>
+
 ### 2.1 Model Quantization
 
 Quantization training includes offline and online training. Online quantitative training, the more effective one, requires loading a pre-trained model, which can be quantized after defining the strategy.
+
+<a name="2.1.1"></a>
 
 #### 2.1.1 Online Quantization Training
 
@@ -84,7 +96,7 @@ Take CPU for example, if you use GPU, change the `cpu` to `gpu`.
 python3.7 tools/train.py -c ppcls/configs/slim/ResNet50_vd_quantization.yaml -o Global.device=cpu
 ```
 
-The parsing of the `yaml` file is described in [reference document](https://github.com/PaddlePaddle/PaddleClas/blob/develop/docs/zh_CN/models_training/config_description.md). For accuracy, the `pretrained model` has already been adopted by the `yaml` file.
+The parsing of the `yaml` file is described in [reference document](../models_training/config_description_en.md). For accuracy, the `pretrained model` has already been adopted by the `yaml` file.
 
 - Launch in single-machine multi-card/ multi-machine multi-card mode
 
@@ -96,9 +108,11 @@ python3.7 -m paddle.distributed.launch \
       -c ppcls/configs/slim/ResNet50_vd_quantization.yaml
 ```
 
+<a name="2.1.2"></a>
+
 #### 2.1.2 Offline Quantization
 
-**Note**: Currently, the `inference model` exported from the trained model is a must for offline quantization. See the [tutorial](https://github.com/PaddlePaddle/PaddleClas/blob/develop/docs/zh_CN/inference_deployment/export_model .md) for general export of the  `inference model`.
+**Note**: Currently, the `inference model` exported from the trained model is a must for offline quantization. See the [tutorial](../inference_deployment/export_model_en.md) for general export of the  `inference model`.
 
 Normally, offline quantization may lose more accuracy.
 
@@ -111,6 +125,8 @@ python3.7 deploy/slim/quant_post_static.py -c ppcls/configs/ImageNet/ResNet/ResN
 The `inference model` is stored in`Global.save_inference_dir`.
 
 Successfully executed, the `quant_post_static_model` folder is created in the `Global.save_inference_dir`, where the generated offline quantization models are stored and can be deployed directly without re-exporting the models.
+
+<a name="2.2"></a>
 
 ### 2.2 Model Pruning
 
@@ -134,6 +150,8 @@ python3.7 -m paddle.distributed.launch \
       -c ppcls/configs/slim/ResNet50_vd_prune.yaml
 ```
 
+<a name="3"></a>
+
 ## 3. Export the Model
 
 Having obtained the saved model after online quantization training and pruning, it can be exported as an inference model for inference deployment. Here we take model pruning as an example:
@@ -145,11 +163,15 @@ python3.7 tools/export.py \
     -o Global.save_inference_dir=./inference
 ```
 
+<a name="4"></a>
+
 ## 4. Deploy the Model
 
-The exported model can be deployed directly using inference, please refer to [inference deployment](https://github.com/PaddlePaddle/PaddleClas/blob/develop/docs/zh_CN/inference_ deployment).
+The exported model can be deployed directly using inference, please refer to [inference deployment](../inference_deployment/).
 
-You can also use PaddleLite's opt tool to convert the inference model to a mobile model for its mobile deployment. Please refer to [Mobile Model Deployment](https://github.com/PaddlePaddle/PaddleClas/blob/develop/docs/zh_CN/inference_deployment/paddle_lite_deploy.md ) for more details.
+You can also use PaddleLite's opt tool to convert the inference model to a mobile model for its mobile deployment. Please refer to [Mobile Model Deployment](../inference_deployment/paddle_lite_deploy_en.md ) for more details.
+
+<a name="5"></a>
 
 ## 5. Hyperparameter Training
 
