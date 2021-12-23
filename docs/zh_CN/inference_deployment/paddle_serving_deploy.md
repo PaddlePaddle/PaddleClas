@@ -35,6 +35,7 @@ docker exec -it test bash
 ```shell
 pip3 install paddle-serving-client==0.7.0
 pip3 install paddle-serving-app==0.7.0
+pip3 install faiss-cpu==1.7.1post2
 
 #若为CPU部署环境:
 pip3 install paddle-serving-server==0.7.0 # CPU
