@@ -7,12 +7,12 @@ Deep learning limits the deployment of corresponding models in some scenarios an
 
 See [PaddeSlim](https://github.com/PaddlePaddle/PaddleSlim/) for detailed parameters.
 
-## Contents
+## Catlogue
 
 - [1. PACT](https://github.com/PaddlePaddle/PaddleClas/blob/develop/docs/zh_CN/algorithm_introduction/model_prune_quantization.md#1)
 - [2. FPGM](https://github.com/PaddlePaddle/PaddleClas/blob/develop/docs/zh_CN/algorithm_introduction/model_prune_quantization.md#2)
 
-
+<a name='1'></a>
 
 ## 1. PACT
 
@@ -36,7 +36,9 @@ After the above improvement, *PACT* preprocessing is inserted between the activa
 
 For specific algorithm parameters, please refer to [Introduction to Parameters](https://github.com/PaddlePaddle/PaddleSlim/blob/release/2.0.0/docs/zh_cn/api_cn/dygraph/quanter/qat.rst#qat) in PaddleSlim.
 
-## FPGM
+<a name='2'></a>
+
+## 2. FPGM
 
 Model pruning is an essential practice to reduce the model size and improve inference efficiency. In previous articles on network pruning, the norm of the network filter is generally adopted to measure its importance, **the smaller the norm value, the less important the filter is** and the more significant it will be to clip it from the network. **FPGM** believes that the previous approach relies on the following two points:
 
