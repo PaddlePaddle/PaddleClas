@@ -128,7 +128,7 @@ class MobileNet(TheseusLayer):
                     [int(512 * scale), 512, 1024, 512, 2],
                     [int(1024 * scale), 1024, 1024, 1024, 1]]
 
-        self.blocks = nn.Sequential(*[
+        self.blocks = nn.Sequential(* [
             DepthwiseSeparable(
                 num_channels=params[0],
                 num_filters1=params[1],
@@ -147,7 +147,6 @@ class MobileNet(TheseusLayer):
             weight_attr=ParamAttr(initializer=KaimingNormal()))
         if return_patterns is not None:
             self.update_res(return_patterns)
-            self.register_forward_post_hook(self._return_dict_hook)
 
     def forward(self, x):
         x = self.conv(x)
