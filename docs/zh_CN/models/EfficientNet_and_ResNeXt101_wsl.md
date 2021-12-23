@@ -50,22 +50,22 @@ ResNeXt 是 facebook 于 2016 年提出的一种对 ResNet 的改进版网络。
 
 ## 3. 基于 V100 GPU 的预测速度
 
-| Models                               | Crop Size | Resize Short Size | FP32<br>Batch Size=1<br>(ms) |
-|-------------------------------|-----------|-------------------|--------------------------|
-| ResNeXt101_<br>32x8d_wsl      | 224       | 256               | 19.127                   |
-| ResNeXt101_<br>32x16d_wsl     | 224       | 256               | 23.629                   |
-| ResNeXt101_<br>32x32d_wsl     | 224       | 256               | 40.214                   |
-| ResNeXt101_<br>32x48d_wsl     | 224       | 256               | 59.714                   |
-| Fix_ResNeXt101_<br>32x48d_wsl | 320       | 320               | 82.431                   |
-| EfficientNetB0                | 224       | 256               | 2.449                    |
-| EfficientNetB1                | 240       | 272               | 3.547                    |
-| EfficientNetB2                | 260       | 292               | 3.908                    |
-| EfficientNetB3                | 300       | 332               | 5.145                    |
-| EfficientNetB4                | 380       | 412               | 7.609                    |
-| EfficientNetB5                | 456       | 488               | 12.078                   |
-| EfficientNetB6                | 528       | 560               | 18.381                   |
-| EfficientNetB7                | 600       | 632               | 27.817                   |
-| EfficientNetB0_<br>small      | 224       | 256               | 1.692                    |
+| Models                               | Crop Size | Resize Short Size | FP32<br/>Batch Size=1<br/>(ms) | FP32<br/>Batch Size=4<br/>(ms) | FP32<br/>Batch Size=8<br/>(ms) |
+|-------------------------------|-----------|-------------------|-------------------------------|-------------------------------|-------------------------------|
+| ResNeXt101_<br>32x8d_wsl      | 224       | 256               | 13.55 | 23.39 | 36.18 |
+| ResNeXt101_<br>32x16d_wsl     | 224       | 256               | 21.96 | 38.35 | 63.29 |
+| ResNeXt101_<br>32x32d_wsl     | 224       | 256               | 37.28 | 76.50 | 121.56 |
+| ResNeXt101_<br>32x48d_wsl     | 224       | 256               | 55.07 | 124.39 | 205.01 |
+| Fix_ResNeXt101_<br>32x48d_wsl | 320       | 320               | 55.01 | 122.63 | 204.66 |
+| EfficientNetB0                | 224       | 256               | 1.96 | 3.71 | 5.56 |
+| EfficientNetB1                | 240       | 272               | 2.88 | 5.40 | 7.63 |
+| EfficientNetB2                | 260       | 292               | 3.26 | 6.20 | 9.17 |
+| EfficientNetB3                | 300       | 332               | 4.52 | 8.85 | 13.54 |
+| EfficientNetB4                | 380       | 412               | 6.78 | 15.47 | 24.95 |
+| EfficientNetB5                | 456       | 488               | 10.97 | 27.24 | 45.93 |
+| EfficientNetB6                | 528       | 560               | 17.09 | 43.32 | 76.90 |
+| EfficientNetB7                | 600       | 632               | 25.91 | 71.23 | 128.20 |
+| EfficientNetB0_<br>small      | 224       | 256               | 1.24 | 2.59 | 3.92 |
 
 
 <a name='4'></a>

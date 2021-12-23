@@ -80,6 +80,20 @@ namespace PaddleClas {
                 this->benchmark = this->config_file["Global"]["benchmark"].as<bool>();
             else
                 this->benchmark = false;
+
+            if (this->config_file["PostProcess"]["Topk"]["topk"].IsDefined())
+                this->topk = this->config_file["PostProcess"]["Topk"]["topk"].as<int>();
+            if (this->config_file["PostProcess"]["Topk"]["class_id_map_file"]
+                    .IsDefined())
+                this->class_id_map_path =
+                        this->config_file["PostProcess"]["Topk"]["class_id_map_file"]
+                                .as<std::string>();
+            if (this->config_file["PostProcess"]["SavePreLabel"]["save_dir"]
+                    .IsDefined())
+                this->label_save_dir =
+                        this->config_file["PostProcess"]["SavePreLabel"]["save_dir"]
+                                .as<std::string>();
+            ReadLabelMap();
         }
 
         YAML::Node config_file;
@@ -105,8 +119,14 @@ namespace PaddleClas {
         float scale = 0.00392157;
         std::vector<float> mean = {0.485, 0.456, 0.406};
         std::vector<float> std = {0.229, 0.224, 0.225};
+        int topk = 5;
+        std::string class_id_map_path;
+        std::map<int, std::string> id_map;
+        std::string label_save_dir;
 
         void PrintConfigInfo();
+
+        void ReadLabelMap();
 
         void ReadYamlConfig(const std::string &path);
     };

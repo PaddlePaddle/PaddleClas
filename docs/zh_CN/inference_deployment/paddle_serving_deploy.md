@@ -73,8 +73,8 @@ python3 -m paddle_serving_client.convert --dirname ./ResNet50_vd_infer/ \
 ResNet50_vd 推理模型转换完成后，会在当前文件夹多出 `ResNet50_vd_serving` 和 `ResNet50_vd_client` 的文件夹，具备如下格式：
 ```
 |- ResNet50_vd_server/
-  |- __model__  
-  |- __params__
+  |- inference.pdiparams
+  |- inference.pdmodel
   |- serving_server_conf.prototxt  
   |- serving_server_conf.stream.prototxt
 |- ResNet50_vd_client
@@ -98,9 +98,9 @@ feed_var {
 fetch_var {
   name: "save_infer_model/scale_0.tmp_1"
   alias_name: "prediction"
-  is_lod_tensor: true
+  is_lod_tensor: false
   fetch_type: 1
-  shape: -1
+  shape: 1000
 }
 ```
 <a name="3.2"></a>
@@ -155,7 +155,7 @@ python3 -m paddle_serving_client.convert --dirname ./general_PPLCNet_x2_5_lite_v
                                          --serving_server ./general_PPLCNet_x2_5_lite_v1.0_serving/ \
                                          --serving_client ./general_PPLCNet_x2_5_lite_v1.0_client/
 ```
-识别推理模型转换完成后，会在当前文件夹多出 `general_PPLCNet_x2_5_lite_v1.0_serving/` 和 `general_PPLCNet_x2_5_lite_v1.0_serving/` 的文件夹。修改 `general_PPLCNet_x2_5_lite_v1.0_serving/` 目录下的 serving_server_conf.prototxt 中的 alias 名字： 将 `fetch_var` 中的 `alias_name` 改为 `features`。
+识别推理模型转换完成后，会在当前文件夹多出 `general_PPLCNet_x2_5_lite_v1.0_serving/` 和 `general_PPLCNet_x2_5_lite_v1.0_client/` 的文件夹。修改 `general_PPLCNet_x2_5_lite_v1.0_serving/` 目录下的 serving_server_conf.prototxt 中的 alias 名字： 将 `fetch_var` 中的 `alias_name` 改为 `features`。
 修改后的 serving_server_conf.prototxt 内容如下：
 ```
 feed_var {
@@ -170,9 +170,9 @@ feed_var {
 fetch_var {
   name: "save_infer_model/scale_0.tmp_1"
   alias_name: "features"
-  is_lod_tensor: true
+  is_lod_tensor: false
   fetch_type: 1
-  shape: -1
+  shape: 512
 }
 ```
 - 转换通用检测 inference 模型为 Serving 模型：

@@ -222,7 +222,8 @@ class DistillationTopkAcc(TopkAcc):
         self.feature_key = feature_key
 
     def forward(self, x, label):
-        x = x[self.model_key]
+        if isinstance(x, dict):
+            x = x[self.model_key]
         if self.feature_key is not None:
             x = x[self.feature_key]
         return super().forward(x, label)
