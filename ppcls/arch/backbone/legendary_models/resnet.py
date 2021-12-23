@@ -340,7 +340,6 @@ class ResNet(TheseusLayer):
         self.data_format = data_format
         if return_patterns is not None:
             self.update_res(return_patterns)
-            self.register_forward_post_hook(self._return_dict_hook)
 
     def forward(self, x):
         with paddle.static.amp.fp16_guard():

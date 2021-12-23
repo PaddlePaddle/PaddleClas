@@ -202,7 +202,6 @@ class MobileNetV3(TheseusLayer):
         self.fc = Linear(self.class_expand, class_num)
         if return_patterns is not None:
             self.update_res(return_patterns)
-            self.register_forward_post_hook(self._return_dict_hook)
 
     def forward(self, x):
         x = self.conv(x)
