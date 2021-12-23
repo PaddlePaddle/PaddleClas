@@ -243,7 +243,7 @@ A `build` folder will be created in the current path after the compilation, whic
 
 ## 3 Run the demo
 
-- Please refer to the [Quick Start of Recognition](https://github.com/PaddlePaddle/PaddleClas/blob/develop/docs/zh_CN/quick_start/quick_start_recognition.md), download the corresponding Lightweight Generic Mainbody Detection Model, Lightweight Generic Recognition Model, and the beverage test data and unzip them.
+- Please refer to the [Quick Start of Recognition](../../docs/en/quick_start/quick_start_recognition_en.md), download the corresponding Lightweight Generic Mainbody Detection Model, Lightweight Generic Recognition Model, and the beverage test data and unzip them.
 
   ```shell
   mkdir models
@@ -300,6 +300,6 @@ A `build` folder will be created in the current path after the compilation, whic
 
 ## 4 Use Your Own Model
 
-You can also use your self-trained models. Please refer to [model export](https://github.com/PaddlePaddle/PaddleClas/blob/develop/docs/zh_CN/inference_deployment/export_model.md) to export ` inference model` for model inference.
+You can also use your self-trained models. Please refer to [model export](../../docs/en/inference_deployment/export_model_en.md) to export ` inference model` for model inference.
 
 Mind modifying the specific parameters in the `yaml` file.
