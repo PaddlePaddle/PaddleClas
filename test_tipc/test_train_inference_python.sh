@@ -87,7 +87,9 @@ benchmark_key=$(func_parser_key "${lines[49]}")
 benchmark_value=$(func_parser_value "${lines[49]}")
 infer_key1=$(func_parser_key "${lines[50]}")
 infer_value1=$(func_parser_value "${lines[50]}")
-
+if [ ! $epoch_num ]; then
+  epoch_num=2
+fi
 LOG_PATH="./test_tipc/output"
 mkdir -p ${LOG_PATH}
 status_log="${LOG_PATH}/results_python.log"
