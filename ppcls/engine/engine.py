@@ -161,6 +161,13 @@ class Engine(object):
             if metric_config is not None:
                 metric_config = metric_config.get("Train")
                 if metric_config is not None:
+                    if self.train_dataloader.collate_fn:
+                        for m_idx, m in enumerate(metric_config):
+                            if "TopkAcc" in m:
+                                msg = f"'TopkAcc' metric can not be used when setting 'batch_transform_ops' in config. The 'TopkAcc' metric has been removed."
+                                logger.warning(msg)
+                                break
+                        metric_config.pop(m_idx)
                     self.train_metric_func = build_metrics(metric_config)
                 else:
                     self.train_metric_func = None
