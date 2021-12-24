@@ -53,6 +53,7 @@ PP-ShiTu图像识别快速体验：[点击这里](./docs/zh_CN/quick_start/quick
   - 图像分类快速体验
     - [尝鲜版](./docs/zh_CN/quick_start/quick_start_classification_new_user.md)
     - [进阶版](./docs/zh_CN/quick_start/quick_start_classification_professional.md)
+    - [多标签分类](./docs/zh_CN/quick_start/quick_start_multilabel_classification.md)
 - [PP-ShiTu图像识别系统介绍](#图像识别系统介绍)
     - [主体检测](./docs/zh_CN/image_recognition_pipeline/mainbody_detection.md)
     - [特征提取](./docs/zh_CN/image_recognition_pipeline/feature_extraction.md)
