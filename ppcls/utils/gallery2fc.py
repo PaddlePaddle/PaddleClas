@@ -40,7 +40,7 @@ class GalleryLayer(paddle.nn.Layer):
                 gallery_labels.append(line[1].strip())
         self.gallery_layer = paddle.nn.Linear(embedding_size, len(self.gallery_images), bias_attr=False)
 
-    def forward(self, x):
+    def forward(self, x, label=None):
         x = paddle.nn.functional.normalize(x)
         x = self.gallery_layer(x)
         return x
@@ -72,7 +72,7 @@ def export_fuse_model(configs):
     configs["Slim"] = None
     fuse_model = build_model(configs)
     fuse_model.head = GalleryLayer(configs)
-    configs["slim"] = slim_config
+    configs["Slim"] = slim_config
     quantize_model(configs, fuse_model)
     load_dygraph_pretrain(fuse_model, configs["Global"]["pretrained_model"])
     fuse_model.eval()
