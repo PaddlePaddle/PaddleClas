@@ -4,7 +4,7 @@ This document elaborates on the dataset format adopted by PaddleClas for image r
 
 ------
 
-## Contents
+## Catalogue
 
 - [1.Dataset Format](#1)
 - [2.Common Datasets for Image Recognition](#2)
