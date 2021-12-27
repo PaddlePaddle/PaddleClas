@@ -45,15 +45,14 @@ class TheseusLayer(nn.Layer):
         self.res_dict[self.res_name] = output
 
     def replace_sub(self, *args, **kwargs) -> None:
-        msg = "The function 'replace_sub()' is deprecated, please use 'layer_wrench()' instead."
+        msg = "The function 'replace_sub()' is deprecated, please use 'upgrade_sublayer()' instead."
         logger.error(DeprecationWarning(msg))
         raise DeprecationWarning(msg)
 
-    # TODO(gaotingquan): what is a good name?
-    def layer_wrench(self,
-                     layer_name_pattern: Union[str, List[str]],
-                     handle_func: Callable[[nn.Layer, str], nn.Layer]) -> Dict[
-                         str, nn.Layer]:
+    def upgrade_sublayer(self,
+                         layer_name_pattern: Union[str, List[str]],
+                         handle_func: Callable[[nn.Layer, str], nn.Layer]
+                         ) -> Dict[str, nn.Layer]:
         """use 'handle_func' to modify the sub-layer(s) specified by 'layer_name_pattern'.
 
         Args:
@@ -88,7 +87,7 @@ class TheseusLayer(nn.Layer):
 
         handle_res_dict = {}
         for pattern in layer_name_pattern:
-            # parse pattern to find target layer and its parent 
+            # parse pattern to find target layer and its parent
             layer_list = parse_pattern_str(pattern=pattern, parent_layer=self)
             if not layer_list:
                 continue
@@ -166,7 +165,8 @@ class TheseusLayer(nn.Layer):
 
         handle_func = Handler(self.res_dict)
 
-        res_dict = self.layer_wrench(return_patterns, handle_func=handle_func)
+        res_dict = self.upgrade_sublayer(
+            return_patterns, handle_func=handle_func)
 
         if hasattr(self, "hook_remove_helper"):
             self.hook_remove_helper.remove()
@@ -221,10 +221,10 @@ def parse_pattern_str(pattern: str, parent_layer: nn.Layer) -> Union[
         parent_layer (nn.Layer): The root layer relative to the pattern.
 
     Returns:
-        Union[None, List[Dict[str, Union[nn.Layer, str, None]]]]: None if failed. If successfully, the members are layers parsed in order: 
-                                                                [   
-                                                                    {"layer": first layer, "name": first layer's name parsed, "index": first layer's index parsed if exist}, 
-                                                                    {"layer": second layer, "name": second layer's name parsed, "index": second layer's index parsed if exist}, 
+        Union[None, List[Dict[str, Union[nn.Layer, str, None]]]]: None if failed. If successfully, the members are layers parsed in order:
+                                                                [
+                                                                    {"layer": first layer, "name": first layer's name parsed, "index": first layer's index parsed if exist},
+                                                                    {"layer": second layer, "name": second layer's name parsed, "index": second layer's index parsed if exist},
                                                                     ...
                                                                 ]
     """
