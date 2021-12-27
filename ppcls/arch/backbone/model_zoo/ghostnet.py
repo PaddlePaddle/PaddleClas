@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# Code was based on https://github.com/huawei-noah/CV-Backbones/tree/master/ghostnet_pytorch
+
 import math
 import paddle
 from paddle import ParamAttr

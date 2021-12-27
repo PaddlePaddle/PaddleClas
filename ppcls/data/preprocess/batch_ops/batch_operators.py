@@ -57,7 +57,10 @@ class BatchOperator(object):
 
 
 class MixupOperator(BatchOperator):
-    """ Mixup operator """
+    """ Mixup operator 
+    reference: https://arxiv.org/abs/1710.09412
+
+    """
 
     def __init__(self, class_num, alpha: float=1.):
         """Build Mixup operator
@@ -90,7 +93,10 @@ class MixupOperator(BatchOperator):
 
 
 class CutmixOperator(BatchOperator):
-    """ Cutmix operator """
+    """ Cutmix operator
+    reference: https://arxiv.org/abs/1905.04899
+
+    """
 
     def __init__(self, class_num, alpha=0.2):
         """Build Cutmix operator
@@ -146,7 +152,10 @@ class CutmixOperator(BatchOperator):
 
 
 class FmixOperator(BatchOperator):
-    """ Fmix operator """
+    """ Fmix operator 
+    reference: https://arxiv.org/abs/2002.12047
+    
+    """
 
     def __init__(self,
                  class_num,

@@ -60,6 +60,7 @@ class Predictor(object):
                 precision_mode=Config.Precision.Half
                 if args.use_fp16 else Config.Precision.Float32,
                 max_batch_size=args.batch_size,
+                workspace_size=1 << 30,
                 min_subgraph_size=30)
 
         config.enable_memory_optim()

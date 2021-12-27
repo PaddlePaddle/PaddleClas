@@ -7,19 +7,19 @@ PaddlePaddle 支持导出 inference 模型用于部署推理场景，相比于�
 
 ## 目录
 
-- [环境准备](#环境准备)
-- [分类模型导出](#分类模型导出)
-- [主体检测模型导出](#主体检测模型导出)
-- [识别模型导出](#识别模型导出)
-- [命令参数说明](#命令参数说明])
+- [1. 环境准备](#1)
+- [2. 分类模型导出](#2)
+- [3. 主体检测模型导出](#3)
+- [4. 识别模型导出](#4)
+- [5. 命令参数说明](#5)
 
 
-<a name="环境准备"></a>
+<a name="1"></a>
 ## 1. 环境准备
 
-首先请参考文档[安装PaddlePaddle](../installation/install_paddle.md)和文档[安装PaddleClas](../installation/install_paddleclas.md)配置运行环境。
+首先请参考文档[安装 PaddlePaddle](../installation/install_paddle.md)和文档[安装 PaddleClas](../installation/install_paddleclas.md)配置运行环境。
 
-<a name="分类模型导出"></a>
+<a name="2"></a>
 ## 2. 分类模型导出
 
 进入 PaddleClas 目录下：
@@ -43,12 +43,12 @@ python tools/export_model.py \
     -o Global.save_inference_dir=./deploy/models/class_ResNet50_vd_ImageNet_infer
 ```
 
-<a name="主体检测模型导出"></a>
+<a name="3"></a>
 ## 3. 主体检测模型导出
 
 主体检测模型的导出，可以参考[主题检测介绍](../image_recognition_pipeline/mainbody_detection.md)。
 
-<a name="识别模型导出"></a>
+<a name="4"></a>
 ## 4. 识别模型导出
 
 进入 PaddleClas 目录下：
@@ -74,7 +74,7 @@ python3 tools/export_model.py \
 
 注意，此处保存的 inference 模型在 embedding 特征层做了截断，即导出后模型最终的输出为 n 维 embedding 特征。
 
-<a name="命令参数说明"></a>
+<a name="5"></a>
 ## 5. 命令参数说明
 
 在上述模型导出命令中，所使用的配置文件需要与该模型的训练文件相同，在配置文件中有以下字段用于配置模型导出参数：

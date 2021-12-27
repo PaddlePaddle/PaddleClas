@@ -17,6 +17,11 @@ import numpy as np
 
 
 class ExponentialMovingAverage():
+    """
+    Exponential Moving Average
+    Code was heavily based on https://github.com/Wanger-SJTU/SegToolbox.Pytorch/blob/master/lib/utils/ema.py
+    """
+
     def __init__(self, model, decay, thres_steps=True):
         self._model = model
         self._decay = decay

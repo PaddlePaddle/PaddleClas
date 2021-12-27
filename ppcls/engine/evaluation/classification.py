@@ -78,7 +78,13 @@ def classification_eval(engine, epoch_id=0):
                 labels = paddle.concat(label_list, 0)
 
                 if isinstance(out, dict):
-                    out = out["logits"]
+                    if "logits" in out:
+                        out = out["logits"]
+                    elif "Student" in out:
+                        out = out["Student"]
+                    else:
+                        msg = "Error: Wrong key in out!"
+                        raise Exception(msg)
                 if isinstance(out, list):
                     pred = []
                     for x in out:
@@ -91,7 +97,7 @@ def classification_eval(engine, epoch_id=0):
                     paddle.distributed.all_gather(pred_list, out)
                     pred = paddle.concat(pred_list, 0)
 
-                if accum_samples > total_samples:
+                if accum_samples > total_samples and not engine.use_dali:
                     pred = pred[:total_samples + current_samples -
                                 accum_samples]
                     labels = labels[:total_samples + current_samples -

@@ -30,7 +30,7 @@ MODEL_URLS = {
     "ReXNet_1_3":
     "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ReXNet_1_3_pretrained.pdparams",
     "ReXNet_1_5":
-    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ReXNet_1_5_32x4d_pretrained.pdparams",
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ReXNet_1_5_pretrained.pdparams",
     "ReXNet_2_0":
     "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ReXNet_2_0_pretrained.pdparams",
     "ReXNet_3_0":

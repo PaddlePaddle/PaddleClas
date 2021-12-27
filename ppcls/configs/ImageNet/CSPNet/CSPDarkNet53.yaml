@@ -11,7 +11,7 @@ Global:
   print_batch_step: 10
   use_visualdl: False
   # used for static mode and model export
-  image_shape: [3, 224, 224]
+  image_shape: [3, 256, 256]
   save_inference_dir: ./inference
   # training model under @to_static
   to_static: False

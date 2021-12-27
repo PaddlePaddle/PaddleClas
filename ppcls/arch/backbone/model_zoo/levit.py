@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# Code was based on https://github.com/facebookresearch/LeViT
+
 import itertools
 import math
 import warnings

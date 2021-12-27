@@ -13,52 +13,40 @@
 // limitations under the License.
 
 #include <include/cls_config.h>
+#include <ostream>
 
 namespace PaddleClas {
 
-std::vector<std::string> ClsConfig::split(const std::string &str,
-                                          const std::string &delim) {
-  std::vector<std::string> res;
-  if ("" == str)
-    return res;
-  char *strs = new char[str.length() + 1];
-  std::strcpy(strs, str.c_str());
-
-  char *d = new char[delim.length() + 1];
-  std::strcpy(d, delim.c_str());
-
-  char *p = std::strtok(strs, d);
-  while (p) {
-    std::string s = p;
-    res.push_back(s);
-    p = std::strtok(NULL, d);
-  }
-
-  return res;
-}
-
-std::map<std::string, std::string>
-ClsConfig::LoadConfig(const std::string &config_path) {
-  auto config = Utility::ReadDict(config_path);
-
-  std::map<std::string, std::string> dict;
-  for (int i = 0; i < config.size(); i++) {
-    // pass for empty line or comment
-    if (config[i].size() <= 1 || config[i][0] == '#') {
-      continue;
+    void ClsConfig::PrintConfigInfo() {
+        std::cout << "=======Paddle Class inference config======" << std::endl;
+        std::cout << this->config_file << std::endl;
+        std::cout << "=======End of Paddle Class inference config======" << std::endl;
     }
-    std::vector<std::string> res = split(config[i], " ");
-    dict[res[0]] = res[1];
-  }
-  return dict;
-}
 
-void ClsConfig::PrintConfigInfo() {
-  std::cout << "=======Paddle Class inference config======" << std::endl;
-  for (auto iter = config_map_.begin(); iter != config_map_.end(); iter++) {
-    std::cout << iter->first << " : " << iter->second << std::endl;
-  }
-  std::cout << "=======End of Paddle Class inference config======" << std::endl;
-}
+    void ClsConfig::ReadYamlConfig(const std::string &path) {
 
-} // namespace PaddleClas
+        try {
+            this->config_file = YAML::LoadFile(path);
+        } catch (YAML::BadFile &e) {
+            std::cout << "Something wrong in yaml file, please check yaml file"
+                      << std::endl;
+            exit(1);
+        }
+    }
+
+    void ClsConfig::ReadLabelMap() {
+        if (this->class_id_map_path.empty()) {
+            std::cout << "The Class Label file dose not input" << std::endl;
+            return;
+        }
+        std::ifstream in(this->class_id_map_path);
+        std::string line;
+        if (in) {
+            while (getline(in, line)) {
+                int split_flag = line.find_first_of(" ");
+                this->id_map[std::stoi(line.substr(0, split_flag))] =
+                        line.substr(split_flag + 1, line.size());
+            }
+        }
+    }
+}; // namespace PaddleClas

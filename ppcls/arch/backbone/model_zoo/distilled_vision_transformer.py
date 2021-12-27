@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# Code was heavily based on https://github.com/facebookresearch/deit
+
 import paddle
 import paddle.nn as nn
 from .vision_transformer import VisionTransformer, Identity, trunc_normal_, zeros_
