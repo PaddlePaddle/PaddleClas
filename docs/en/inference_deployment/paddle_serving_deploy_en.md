@@ -1,6 +1,6 @@
 # Model Service Deployment
 
-## Content
+## Catalogue
 
 - [1. Introduction](#1)
 - [2. Installation of Serving](#2)
