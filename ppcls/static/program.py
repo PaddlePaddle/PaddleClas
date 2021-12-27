@@ -259,7 +259,7 @@ def build(config,
             # data_format should be assigned in arch-dict
             input_image_channel = config["Global"]["image_shape"][
                 0]  # default as [3, 224, 224]
-            model = build_model(config["Arch"])
+            model = build_model(config)
             out = model(feeds["data"])
             # end of build model
 

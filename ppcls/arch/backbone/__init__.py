@@ -48,7 +48,7 @@ from ppcls.arch.backbone.model_zoo.resnext101_wsl import ResNeXt101_32x8d_wsl, R
 from ppcls.arch.backbone.model_zoo.squeezenet import SqueezeNet1_0, SqueezeNet1_1
 from ppcls.arch.backbone.model_zoo.darknet import DarkNet53
 from ppcls.arch.backbone.model_zoo.regnet import RegNetX_200MF, RegNetX_4GF, RegNetX_32GF, RegNetY_200MF, RegNetY_4GF, RegNetY_32GF
-from ppcls.arch.backbone.model_zoo.vision_transformer import ViT_small_patch16_224, ViT_base_patch16_224, ViT_base_patch16_384, ViT_base_patch32_384, ViT_large_patch16_224, ViT_large_patch16_384
+from ppcls.arch.backbone.model_zoo.vision_transformer import ViT_small_patch16_224, ViT_base_patch16_224, ViT_base_patch16_384, ViT_base_patch32_384, ViT_large_patch16_224, ViT_large_patch16_384, ViT_large_patch32_384
 from ppcls.arch.backbone.model_zoo.distilled_vision_transformer import DeiT_tiny_patch16_224, DeiT_small_patch16_224, DeiT_base_patch16_224, DeiT_tiny_distilled_patch16_224, DeiT_small_distilled_patch16_224, DeiT_base_distilled_patch16_224, DeiT_base_patch16_384, DeiT_base_distilled_patch16_384
 from ppcls.arch.backbone.model_zoo.swin_transformer import SwinTransformer_tiny_patch4_window7_224, SwinTransformer_small_patch4_window7_224, SwinTransformer_base_patch4_window7_224, SwinTransformer_base_patch4_window12_384, SwinTransformer_large_patch4_window7_224, SwinTransformer_large_patch4_window12_384
 from ppcls.arch.backbone.model_zoo.cswin_transformer import CSWinTansformer_tiny_224, CSWinTansformer_small_224, CSWinTansformer_base_224, CSWinTansformer_large_224, CSWinTansformer_base_384, CSWinTansformer_large_384
@@ -66,6 +66,7 @@ from ppcls.arch.backbone.variant_models.vgg_variant import VGG19Sigmoid
 from ppcls.arch.backbone.variant_models.pp_lcnet_variant import PPLCNet_x2_5_Tanh
 
 
+# help whl get all the models' api (class type) and components' api (func type)
 def get_apis():
     current_func = sys._getframe().f_code.co_name
     current_module = sys.modules[__name__]

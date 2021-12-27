@@ -40,13 +40,11 @@ Arch:
 # loss function config for traing/eval process
 Loss:
   Train:
-    - DSHSDLoss:
+    - CELoss:
         weight: 1.0
-        alpha: 0.1
   Eval:
-    - DSHSDLoss:
+    - CELoss:
         weight: 1.0
-        alpha: 0.1
 
 Optimizer:
   name: Momentum
