@@ -1,6 +1,7 @@
 # Metric Learning
 
-## Contents
+## Catalogue
+
 - [1.Introduction](#1)
 - [2.Applications](#2)
 - [3.Algorithms](#3)
