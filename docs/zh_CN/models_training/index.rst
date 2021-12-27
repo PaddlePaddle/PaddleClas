@@ -7,3 +7,4 @@
    config_description.md
    classification.md
    recognition.md
+   train_strategy.md
