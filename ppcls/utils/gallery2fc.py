@@ -67,7 +67,7 @@ class GalleryLayer(paddle.nn.Layer):
         input_tensor = paddle.zeros(self.image_shape)
         gallery_feature = paddle.zeros((len(self.gallery_images), embedding_size))
         for i, image_path in enumerate(self.gallery_images):
-            image = cv2.imread(image_path)
+            image = cv2.imread(image_path)[:, :, ::-1]
             for op in preprocess_ops:
                 image = op(image)
             input_tensor[batch_index] = image
