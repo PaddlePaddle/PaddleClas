@@ -308,14 +308,14 @@ class Engine(object):
                     self.output_dir,
                     model_name=self.config["Arch"]["name"],
                     prefix="epoch_{}".format(epoch_id))
-                # save the latest model
-                save_load.save_model(
-                    self.model,
-                    self.optimizer, {"metric": acc,
-                                     "epoch": epoch_id},
-                    self.output_dir,
-                    model_name=self.config["Arch"]["name"],
-                    prefix="latest")
+            # save the latest model
+            save_load.save_model(
+                self.model,
+                self.optimizer, {"metric": acc,
+                                 "epoch": epoch_id},
+                self.output_dir,
+                model_name=self.config["Arch"]["name"],
+                prefix="latest")
 
         if self.vdl_writer is not None:
             self.vdl_writer.close()
