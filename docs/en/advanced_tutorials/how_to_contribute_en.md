@@ -2,7 +2,7 @@
 
 ------
 
-## Contents
+## Catalogue
 
 - [1. How to Contribute Code](#1)
   - [1.1 Branches of PaddleClas](#1.1)
@@ -22,11 +22,11 @@
 - [3. Inferences](#3)
 
 
-
+<a name="1"></a>
 ## 1. How to Contribute Code
 
 
-
+<a name="1.1"></a>
 ### 1.1 Branches of PaddleClas
 
 PaddleClas maintains the following two branches:
@@ -55,11 +55,11 @@ Please transfer to the develop branch as soon as possible.
 PaddleClas welcomes code contributions to the repo, and the basic process is detailed in the next part.
 
 
-
+<a name="1.2"></a>
 ### 1.2 Commit the Code to PaddleClas
 
 
-
+<a name="1.2.1"></a>
 #### 1.2.1 Codes of Fork and Clone
 
 - Skip to the home page of [PaddleClas GitHub](https://github.com/PaddlePaddle/PaddleClas) and click the
@@ -80,7 +80,7 @@ Obtain the address below
 ![img](../../images/quick_start/community/002_clone.png)
 
 
-
+<a name="1.2.2"></a>
 #### 1.2.2 Connect to the Remote Repository
 
 First check the current information of the remote repository with `git remote -v`.
@@ -110,7 +110,7 @@ upstream    https://github.com/PaddlePaddle/PaddleClas.git (push)
 This is mainly to keep the local repository updated when committing a pull request (PR).
 
 
-
+<a name="1.2.3"></a>
 #### 1.2.3 Create the Local Branch
 
 Run the following command to create a new local branch based on the current one.
@@ -138,7 +138,7 @@ Switched to a new branch 'new_branch'
 ```
 
 
-
+<a name="1.2.4"></a>
 #### 1.2.4 Employ Pre-commit Hook
 
 Paddle developers adopt the pre-commit tool to manage Git pre-commit hooks.
@@ -161,7 +161,7 @@ pre-commit install
 and the former one is chosen by PaddleClas developers.
 
 
-
+<a name="1.2.5"></a>
 #### 1.2.5 Modify and Commit Code
 
 You can check the changed files via `git status`. Follow the steps below to commit the `README.md` of PaddleClas after modification:
@@ -182,7 +182,7 @@ git commit -m "your commit info"
 ```
 
 
-
+<a name="1.2.6"></a>
 #### 1.2.6 Keep the Local Repository Updated
 
 Get the latest code for upstream and update the current branch.
@@ -195,7 +195,7 @@ git pull upstream develop
 ```
 
 
-
+<a name="1.2.7"></a>
 #### 1.2.7 Push to Remote Repository
 
 ```
@@ -203,7 +203,7 @@ git push origin new_branch
 ```
 
 
-
+<a name="1.2.8"></a>
 #### 1.2.8 Commit Pull Request
 
 Click new pull request and select the local branch and the target branch,
@@ -214,7 +214,7 @@ update the corresponding branch in origin by referring to the above steps.
 [img](../../images/quick_start/community/004_create_pr.png)
 
 
-
+<a name="1.2.9"></a>
 #### 1.2.9 CLA and Unit Test
 
 - When you first commit a Pull Request to PaddlePaddle,
@@ -227,7 +227,7 @@ and click the detail on the right side to enter the CLA website
 and you will be redirected back to your Pull Request page when you are done.
 
 
-
+<a name="1.2.10"></a>
 #### 1.2.10 Delete Branch
 
 - Delete remote branch
@@ -251,7 +251,7 @@ git branch -D new_branch
 ```
 
 
-
+<a name="1.2.11"></a>
 #### 1.2.11 Conventions
 
 To help official maintainers focus on the code itself when reviewing it,
@@ -291,14 +291,14 @@ which will better enhance the contribution of the open source community.
 - Please reply with `start a review` instead of a direct approach, for it may be overwhelming to receive the email of every reply.
 
 
-
+<a name="2"></a>
 ## 2. Summary
 
 - The open source community relies on the contributions and feedback of developers and users.
 We highly appreciate that and look forward to your valuable comments and Pull Requests to PaddleClas in the hope that together we can build a leading practical and comprehensive code repository for image recognition!
 
 
-
+<a name="3"></a>
 ## 3. References
 
 1. [Guide to PaddlePaddle Local Development](https://www.paddlepaddle.org.cn/documentation/docs/zh/develop/guides/08_contribution/index_en.html)

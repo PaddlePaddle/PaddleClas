@@ -1,6 +1,6 @@
 # Code Overview
 
-## Contents
+## Catalogue
 
 - [Overview of Code and Content](#1)
 - [Training Module](#2)
