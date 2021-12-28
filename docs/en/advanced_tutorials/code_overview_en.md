@@ -22,7 +22,7 @@ The main code and content structure of PaddleClas are as follows:
 - benchmark: shell scripts to test the speed metrics of different models in PaddleClas, such as single-card training speed metrics, multi-card training speed metrics, etc.
 - dataset: datasets and the scripts used to process datasets. The scripts are responsible for processing the dataset into a suitable format for Dataloader.
 - deploy: code for deployment, including deployment tools, which support python/cpp inference, Hub Serveing, Paddle Lite, Slim offline quantification and other deployment methods.
-- ppcls: code for training and evaluation which is  the main body of the PaddleClas framework. It also contains configuration files, and specific code of model training, evaluation, inference, dynamic to static export, etc.
+- ppcls: code for training and evaluation which is the main body of the PaddleClas framework. It also contains configuration files, and specific code of model training, evaluation, inference, dynamic to static export, etc.
 - tools: entry functions and scripts for training, evaluation, inference, and dynamic to static export.
 - The requirements.txt file is adopted to install the dependencies for PaddleClas. Use pip for upgrading, installation, and application.
 - test_tipc: TIPC tests of PaddleClas models from training to prediction to verify that whether each function works properly.
