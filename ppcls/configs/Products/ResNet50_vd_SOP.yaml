@@ -22,7 +22,7 @@ Arch:
     name: ResNet50_vd
     pretrained: False
   BackboneStopLayer:
-    name: flatten_0
+    name: "flatten"
   Neck:
     name: FC
     embedding_size: 2048

@@ -24,7 +24,7 @@ Arch:
     name: "ResNet50_last_stage_stride1"
     pretrained: True
   BackboneStopLayer:
-    name: "adaptive_avg_pool2d_0"
+    name: "avg_pool"
   Neck:
     name: "VehicleNeck"
     in_channels: 2048
