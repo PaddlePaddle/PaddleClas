@@ -135,16 +135,16 @@ test_cpp_serving_client.py # rpc方式发送C++ serving预测请求的脚本
 # 启动服务，运行日志保存在 log.txt
 python3 classification_web_service.py &>log.txt &
 ```
-成功启动服务后，log.txt 中会打印类似如下日志
-![](../../../deploy/paddleserving/imgs/start_server.png)
 
 - 发送请求：
 ```shell
 # 发送服务请求
 python3 pipeline_http_client.py
 ```
-成功运行后，模型预测的结果会打印在 cmd 窗口中，结果示例为：
-![](../../../deploy/paddleserving/imgs/results.png)
+成功运行后，模型预测的结果会打印在 cmd 窗口中，结果如下：
+```
+{'err_no': 0, 'err_msg': '', 'key': ['label', 'prob'], 'value': ["['daisy']", '[0.9341402053833008]'], 'tensors': []}
+```
 
 <a name="3.2.2"></a>
 #### 3.2.2 C++ Serving
@@ -159,8 +159,10 @@ sh run_cpp_serving.sh
 # 发送服务请求
 python3 test_cpp_serving_client.py
 ```
-成功运行后，模型预测的结果会打印在 cmd 窗口中，结果示例为：
-![](../../../deploy/paddleserving/imgs/results_cpp.png)
+成功运行后，模型预测的结果会打印在 cmd 窗口中，结果如下：
+```
+prediction: daisy, probability: 0.9341399073600769
+```
 
 <a name="4"></a>
 ## 4.图像识别服务部署
@@ -187,11 +189,7 @@ python3 -m paddle_serving_client.convert --dirname ./general_PPLCNet_x2_5_lite_v
                                          --serving_server ./general_PPLCNet_x2_5_lite_v1.0_serving/ \
                                          --serving_client ./general_PPLCNet_x2_5_lite_v1.0_client/
 ```
-<<<<<<< HEAD
 识别推理模型转换完成后，会在当前文件夹多出 `general_PPLCNet_x2_5_lite_v1.0_serving/` 和 `general_PPLCNet_x2_5_lite_v1.0_serving/` 的文件夹。分别修改 `general_PPLCNet_x2_5_lite_v1.0_serving/` 和 `general_PPLCNet_x2_5_lite_v1.0_client/` 目录下的 serving_server_conf.prototxt 中的 alias 名字： 将 `fetch_var` 中的 `alias_name` 改为 `features`。
-=======
-识别推理模型转换完成后，会在当前文件夹多出 `general_PPLCNet_x2_5_lite_v1.0_serving/` 和 `general_PPLCNet_x2_5_lite_v1.0_client/` 的文件夹。修改 `general_PPLCNet_x2_5_lite_v1.0_serving/` 目录下的 serving_server_conf.prototxt 中的 alias 名字： 将 `fetch_var` 中的 `alias_name` 改为 `features`。
->>>>>>> d69a6e8f242cd894b41e9608bbca23172bcd3193
 修改后的 serving_server_conf.prototxt 内容如下：
 ```
 feed_var {
@@ -243,8 +241,8 @@ config.yml                    # 启动python pipeline服务的配置文件
 pipeline_http_client.py       # http方式发送pipeline预测请求的脚本
 pipeline_rpc_client.py        # rpc方式发送pipeline预测请求的脚本
 recognition_web_service.py    # 启动pipeline服务端的脚本
-run_cpp_serving.sh            # 启动C++ Serving部署的脚本
-test_cpp_serving_client.py    # rpc方式发送C++ serving预测请求的脚本
+run_cpp_serving.sh            # 启动C++ Pipeline Serving部署的脚本
+test_cpp_serving_client.py    # rpc方式发送C++ Pipeline serving预测请求的脚本
 ```
 
 <a name="4.2.1"></a>
@@ -254,15 +252,15 @@ test_cpp_serving_client.py    # rpc方式发送C++ serving预测请求的脚本
 # 启动服务，运行日志保存在 log.txt
 python3 recognition_web_service.py &>log.txt &
 ```
-成功启动服务后，log.txt 中会打印类似如下日志
-![](../../../deploy/paddleserving/imgs/start_server_shitu.png)
 
 - 发送请求：
 ```
 python3 pipeline_http_client.py
 ```
-成功运行后，模型预测的结果会打印在 cmd 窗口中，结果示例为：
-![](../../../deploy/paddleserving/imgs/results_shitu.png)
+成功运行后，模型预测的结果会打印在 cmd 窗口中，结果如下：
+```
+{'err_no': 0, 'err_msg': '', 'key': ['result'], 'value': ["[{'bbox': [345, 95, 524, 576], 'rec_docs': '红牛-强化型', 'rec_scores': 0.79903316}]"], 'tensors': []}
+```
 
 <a name="4.2.2"></a>
 #### 4.2.2 C++ Serving
@@ -278,8 +276,10 @@ sh run_cpp_serving.sh
 # 发送服务请求
 python3 test_cpp_serving_client.py
 ```
-成功运行后，模型预测的结果会打印在 cmd 窗口中，结果示例为：
-![](../../../deploy/paddleserving/imgs/results_shitu_cpp.png)
+成功运行后，模型预测的结果会打印在 cmd 窗口中，结果如下所示：
+```
+[{'bbox': [345, 95, 524, 586], 'rec_docs': '红牛-强化型', 'rec_scores': 0.8016462}]
+```
 
 <a name="5"></a>
 ## 5.FAQ

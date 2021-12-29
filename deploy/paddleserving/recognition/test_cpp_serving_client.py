@@ -42,7 +42,7 @@ class MainbodyDetect():
 
         self.client = Client()
         self.client.load_client_config(
-            "picodet_PPLCNet_x2_5_mainbody_lite_v1.0_client/serving_client_conf.prototxt"
+            "../../models/picodet_PPLCNet_x2_5_mainbody_lite_v1.0_client/serving_client_conf.prototxt"
         )
         self.client.connect(['127.0.0.1:9293'])
 
@@ -50,9 +50,10 @@ class MainbodyDetect():
         self.conf_threshold = 0.2
 
     def predict(self, imgpath):
-        im, im_info = self.preprocess(sys.argv[1])
+        im, im_info = self.preprocess(imgpath)
         im_shape = np.array(im.shape[1:]).reshape(-1)
         scale_factor = np.array(list(im_info['scale_factor'])).reshape(-1)
+
         fetch_map = self.client.predict(
             feed={
                 "image": im,
@@ -97,7 +98,7 @@ class ObjectRecognition():
     def __init__(self):
         self.client = Client()
         self.client.load_client_config(
-            "general_PPLCNet_x2_5_lite_v1.0_client/serving_client_conf.prototxt"
+            "../../models/general_PPLCNet_x2_5_lite_v1.0_client/serving_client_conf.prototxt"
         )
         self.client.connect(["127.0.0.1:9294"])
 
@@ -192,9 +193,9 @@ if __name__ == "__main__":
     det = MainbodyDetect()
     rec = ObjectRecognition()
 
-    #1. get det_results
-    det_results = det.predict(sys.argv[1])
-    print(det_results)
+    #1. get det_results    
+    imgpath = "../../drink_dataset_v1.0/test_images/001.jpeg"
+    det_results = det.predict(imgpath)
 
     #2. get rec_results
     rec_results = rec.predict(det_results, sys.argv[1])
