@@ -198,5 +198,5 @@ if __name__ == "__main__":
     det_results = det.predict(imgpath)
 
     #2. get rec_results
-    rec_results = rec.predict(det_results, sys.argv[1])
+    rec_results = rec.predict(det_results, imgpath)
     print(rec_results)
