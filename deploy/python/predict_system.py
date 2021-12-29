@@ -102,7 +102,6 @@ class SystemPredictor(object):
 
         # st2: add the whole image for recognition to improve recall
         results = self.append_self(results, img.shape)
-        #print(results)
 
         # st3: recognition process, use score_thres to ensure accuracy
         for result in results:
