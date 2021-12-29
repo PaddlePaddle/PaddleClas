@@ -63,4 +63,3 @@ IndexProcess:
   batch_size: 32
   return_k: 5
   hamming_radius: 100
-  
