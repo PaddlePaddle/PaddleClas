@@ -26,15 +26,20 @@ from .utils import *
 from ppcls.arch.backbone.base.theseus_layer import TheseusLayer
 from ppcls.utils import logger
 from ppcls.utils.save_load import load_dygraph_pretrain
+from ppcls.arch.slim import prune_model, quantize_model
+
 
 __all__ = ["build_model", "RecModel", "DistillationModel"]
 
 
 def build_model(config):
-    config = copy.deepcopy(config)
-    model_type = config.pop("name")
+    arch_config = copy.deepcopy(config["Arch"])
+    model_type = arch_config.pop("name")
     mod = importlib.import_module(__name__)
-    arch = getattr(mod, model_type)(**config)
+    arch = getattr(mod, model_type)(**arch_config)
+    if isinstance(arch, TheseusLayer):
+        prune_model(config, arch)
+        quantize_model(config, arch)
     return arch
 
 
@@ -51,7 +56,7 @@ def apply_to_static(config, model):
     return model
 
 
-class RecModel(nn.Layer):
+class RecModel(TheseusLayer):
     def __init__(self, **config):
         super().__init__()
         backbone_config = config["Backbone"]

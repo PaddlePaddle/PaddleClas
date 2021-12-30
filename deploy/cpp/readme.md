@@ -122,12 +122,11 @@ build/paddle_inference_install_dir/
 
 * [Paddle预测库官网](https://www.paddlepaddle.org.cn/documentation/docs/zh/develop/guides/05_inference_deployment/inference/build_and_install_lib_cn.html#id1)上提供了不同cuda版本的Linux预测库，可以在官网查看并选择合适的预测库版本，注意必须选择`develop`版本。
 
-  以`ubuntu14.04_cuda9.0_cudnn7_avx_mkl`的`develop`版本为例，使用下述命令下载并解压：
+  以`2.1.1-gpu-cuda10.2-cudnn8.1-mkl-gcc8.2`的`develop`版本为例，使用下述命令下载并解压：
 
 
 ```shell
-wget https://paddle-inference-lib.bj.bcebos.com/latest-gpu-cuda9-cudnn7-avx-mkl/paddle_inference.tgz
-
+wget https://paddle-inference-lib.bj.bcebos.com/2.1.1-gpu-cuda10.2-cudnn8.1-mkl-gcc8.2/paddle_inference.tgz
 tar -xvf paddle_inference.tgz
 ```
 
@@ -210,7 +209,7 @@ cp ../configs/inference_cls.yaml tools/
 
 根据[python预测推理](../../docs/zh_CN/inference_deployment/python_deploy.md)的`图像分类推理`部分修改好`tools`目录下`inference_cls.yaml`文件。`yaml`文件的参数说明详见[python预测推理](../../docs/zh_CN/inference_deployment/python_deploy.md)。
 
-请根据实际存放文件，修改好`Global.infer_imgs`、`Global.inference_model_dir`等参数。
+请根据实际存放文件，修改好`Global.infer_imgs`、`Global.inference_model_dir`、`PostProcess.Topk.topk`、`PostProcess.Topk.class_id_map_file`等参数。
 
 #### 2.3.2 执行
 

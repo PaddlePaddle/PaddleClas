@@ -12,7 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <algorithm>
 #include <include/cls.h>
+#include <numeric>
 
 namespace PaddleClas {
 
@@ -52,7 +54,8 @@ namespace PaddleClas {
         this->predictor_ = CreatePredictor(config);
     }
 
-    double Classifier::Run(cv::Mat &img, std::vector<double> *times) {
+    void Classifier::Run(cv::Mat &img, std::vector<float> &out_data,
+                         std::vector<int> &idx, std::vector<double> &times) {
         cv::Mat srcimg;
         cv::Mat resize_img;
         img.copyTo(srcimg);
@@ -75,7 +78,6 @@ namespace PaddleClas {
         input_t->CopyFromCpu(input.data());
         this->predictor_->Run();
 
-        std::vector<float> out_data;
         auto output_names = this->predictor_->GetOutputNames();
         auto output_t = this->predictor_->GetOutputHandle(output_names[0]);
         std::vector<int> output_shape = output_t->shape();
@@ -83,30 +85,32 @@ namespace PaddleClas {
                                       std::multiplies<int>());
 
         out_data.resize(out_num);
+        idx.resize(out_num);
         output_t->CopyToCpu(out_data.data());
         auto infer_end = std::chrono::system_clock::now();
 
         auto postprocess_start = std::chrono::system_clock::now();
-        int maxPosition =
-                max_element(out_data.begin(), out_data.end()) - out_data.begin();
+        // int maxPosition =
+        //       max_element(out_data.begin(), out_data.end()) - out_data.begin();
+        iota(idx.begin(), idx.end(), 0);
+        stable_sort(idx.begin(), idx.end(), [&out_data](int i1, int i2) {
+            return out_data[i1] > out_data[i2];
+        });
         auto postprocess_end = std::chrono::system_clock::now();
 
         std::chrono::duration<float> preprocess_diff =
                 preprocess_end - preprocess_start;
-        times->push_back(double(preprocess_diff.count() * 1000));
+        times[0] = double(preprocess_diff.count() * 1000);
         std::chrono::duration<float> inference_diff = infer_end - infer_start;
         double inference_cost_time = double(inference_diff.count() * 1000);
-        times->push_back(inference_cost_time);
+        times[1] = inference_cost_time;
         std::chrono::duration<float> postprocess_diff =
                 postprocess_end - postprocess_start;
-        times->push_back(double(postprocess_diff.count() * 1000));
+        times[2] = double(postprocess_diff.count() * 1000);
 
-        std::cout << "result: " << std::endl;
-        std::cout << "\tclass id: " << maxPosition << std::endl;
-        std::cout << std::fixed << std::setprecision(10)
-                  << "\tscore: " << double(out_data[maxPosition]) << std::endl;
-
-        return inference_cost_time;
+        /* std::cout << "result: " << std::endl; */
+        /* std::cout << "\tclass id: " << maxPosition << std::endl; */
+        /* std::cout << std::fixed << std::setprecision(10) */
+        /* << "\tscore: " << double(out_data[maxPosition]) << std::endl; */
     }
-
 } // namespace PaddleClas

@@ -6,7 +6,7 @@ gpu_list:0|0,1
 -o Global.auto_cast:null
 -o Global.epochs:lite_train_lite_infer=2|whole_train_whole_infer=120
 -o Global.output_dir:./output/
--o DataLoader.Train.sampler.batch_size:8
+-o DataLoader.Train.sampler.batch_size:2
 -o Global.pretrained_model:null
 train_model_name:latest
 train_infer_img_dir:./dataset/ILSVRC2012/val
@@ -37,7 +37,7 @@ pretrained_model_url:https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/E
 infer_model:../inference/
 infer_export:True
 infer_quant:Fasle
-inference:python/predict_cls.py -c configs/inference_cls.yaml
+inference:python/predict_cls.py -c configs/inference_cls.yaml  -o PreProcess.transform_ops.0.ResizeImage.resize_short=632 -o PreProcess.transform_ops.1.CropImage.size=600
 -o Global.use_gpu:True|False
 -o Global.enable_mkldnn:True|False
 -o Global.cpu_num_threads:1|6

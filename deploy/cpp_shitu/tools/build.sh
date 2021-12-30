@@ -22,3 +22,4 @@ cmake .. \
     -DFAISS_WITH_MKL=${FAISS_WITH_MKL}
 
 make -j
+cd ..

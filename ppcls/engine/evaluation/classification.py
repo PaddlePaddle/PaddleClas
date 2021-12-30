@@ -78,7 +78,13 @@ def classification_eval(engine, epoch_id=0):
                 labels = paddle.concat(label_list, 0)
 
                 if isinstance(out, dict):
-                    out = out["logits"]
+                    if "logits" in out:
+                        out = out["logits"]
+                    elif "Student" in out:
+                        out = out["Student"]
+                    else:
+                        msg = "Error: Wrong key in out!"
+                        raise Exception(msg)
                 if isinstance(out, list):
                     pred = []
                     for x in out:
