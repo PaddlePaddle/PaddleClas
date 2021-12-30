@@ -43,10 +43,10 @@ Optimizer:
   one_dim_param_no_weight_decay: True
   lr:
     name: Cosine
-    learning_rate: 2.5e-4
-    eta_min: 2.5e-6
+    learning_rate: 3.125e-5
+    eta_min: 3.125e-7
     warmup_epoch: 20
-    warmup_start_lr: 2.5e-7
+    warmup_start_lr: 3.125e-8
 
 
 # data loader for train and eval
@@ -94,7 +94,7 @@ DataLoader:
 
     sampler:
       name: DistributedBatchSampler
-      batch_size: 64
+      batch_size: 8
       drop_last: False
       shuffle: True
     loader:
