@@ -19,7 +19,7 @@ Global:
 
 # model architecture
 Arch:
-  name: CSWinTansformer_base_224
+  name: CSWinTransformer_large_224
   class_num: 1000
  
 # loss function config for traing/eval process
@@ -43,10 +43,10 @@ Optimizer:
   one_dim_param_no_weight_decay: True
   lr:
     name: Cosine
-    learning_rate: 1e-3
-    eta_min: 1e-5
+    learning_rate: 5e-4
+    eta_min: 5e-6
     warmup_epoch: 20
-    warmup_start_lr: 1e-6
+    warmup_start_lr: 5e-7
 
 
 # data loader for train and eval

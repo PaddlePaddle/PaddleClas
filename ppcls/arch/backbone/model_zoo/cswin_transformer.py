@@ -23,18 +23,18 @@ from .vision_transformer import trunc_normal_, zeros_, ones_, to_2tuple, DropPat
 from ppcls.utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
 
 MODEL_URLS = {
-    "CSWinTansformer_tiny_224":
-    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/CSWinTansformer_tiny_224_pretrained.pdparams",
-    "CSWinTansformer_small_224":
-    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/CSWinTansformer_small_224_pretrained.pdparams",
-    "CSWinTansformer_base_224":
-    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/CSWinTansformer_base_224_pretrained.pdparams",
-    "CSWinTansformer_large_224":
-    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/CSWinTansformer_large_224_pretrained.pdparams",
-    "CSWinTansformer_base_384":
-    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/CSWinTansformer_base_384_pretrained.pdparams",
-    "CSWinTansformer_large_384":
-    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/CSWinTansformer_large_384_pretrained.pdparams",
+    "CSWinTransformer_tiny_224":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/CSWinTransformer_tiny_224_pretrained.pdparams",
+    "CSWinTransformer_small_224":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/CSWinTransformer_small_224_pretrained.pdparams",
+    "CSWinTransformer_base_224":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/CSWinTransformer_base_224_pretrained.pdparams",
+    "CSWinTransformer_large_224":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/CSWinTransformer_large_224_pretrained.pdparams",
+    "CSWinTransformer_base_384":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/CSWinTransformer_base_384_pretrained.pdparams",
+    "CSWinTransformer_large_384":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/CSWinTransformer_large_384_pretrained.pdparams",
 }
 
 __all__ = list(MODEL_URLS.keys())
@@ -128,7 +128,7 @@ def windows2img(img_splits, h_split, w_split, img_h, img_w):
     Returns:
         img: tensor, original tensor
     """
-    B = paddle.cast(img_splits.shape[0] / (img_h / h_split * img_w / w_split), "int32")
+    B = paddle.to_tensor(img_splits.shape[0] / (img_h / h_split * img_w / w_split), "int32")
     img = img_splits.reshape([B, img_h // h_split, img_w // w_split, h_split, w_split, img_splits.shape[-1]])
     img = img.transpose([0, 1, 3, 2, 4, 5]) #[B,img_h//h_split, h_split, img_w//w_split, w_split,C]
     img = img.reshape([B, img_h, img_w, img_splits.shape[-1]]) # [B, img_h, img_w, C]
@@ -522,7 +522,7 @@ def _load_pretrained(pretrained, model, model_url, use_ssld=False):
         )
 
 
-def CSWinTansformer_tiny_224(pretrained=False, use_ssld=False, **kwargs):
+def CSWinTransformer_tiny_224(pretrained=False, use_ssld=False, **kwargs):
     model = CSwinTransformer(image_size=224,
                              embed_dim=64,
                              depths=[1, 2, 21, 1],
@@ -533,12 +533,12 @@ def CSWinTansformer_tiny_224(pretrained=False, use_ssld=False, **kwargs):
     _load_pretrained(
         pretrained,
         model,
-        MODEL_URLS["CSWinTansformer_tiny_224"],
+        MODEL_URLS["CSWinTransformer_tiny_224"],
         use_ssld=use_ssld)
     return model
 
 
-def CSWinTansformer_small_224(pretrained=False, use_ssld=False, **kwargs):
+def CSWinTransformer_small_224(pretrained=False, use_ssld=False, **kwargs):
     model = CSwinTransformer(image_size=224,
                              embed_dim=64,
                              depths=[2, 4, 32, 2],
@@ -549,12 +549,12 @@ def CSWinTansformer_small_224(pretrained=False, use_ssld=False, **kwargs):
     _load_pretrained(
         pretrained,
         model,
-        MODEL_URLS["CSWinTansformer_small_224"],
+        MODEL_URLS["CSWinTransformer_small_224"],
         use_ssld=use_ssld)
     return model
 
 
-def CSWinTansformer_base_224(pretrained=False, use_ssld=False, **kwargs):
+def CSWinTransformer_base_224(pretrained=False, use_ssld=False, **kwargs):
     model = CSwinTransformer(image_size=224,
                              embed_dim=96,
                              depths=[2, 4, 32, 2],
@@ -565,12 +565,12 @@ def CSWinTansformer_base_224(pretrained=False, use_ssld=False, **kwargs):
     _load_pretrained(
         pretrained,
         model,
-        MODEL_URLS["CSWinTansformer_base_224"],
+        MODEL_URLS["CSWinTransformer_base_224"],
         use_ssld=use_ssld)
     return model
 
 
-def CSWinTansformer_base_384(pretrained=False, use_ssld=False, **kwargs):
+def CSWinTransformer_base_384(pretrained=False, use_ssld=False, **kwargs):
     model = CSwinTransformer(image_size=384,
                              embed_dim=96,
                              depths=[2, 4, 32, 2],
@@ -581,12 +581,12 @@ def CSWinTansformer_base_384(pretrained=False, use_ssld=False, **kwargs):
     _load_pretrained(
         pretrained,
         model,
-        MODEL_URLS["CSWinTansformer_base_384"],
+        MODEL_URLS["CSWinTransformer_base_384"],
         use_ssld=use_ssld)
     return model
 
 
-def CSWinTansformer_large_224(pretrained=False, use_ssld=False, **kwargs):
+def CSWinTransformer_large_224(pretrained=False, use_ssld=False, **kwargs):
     model = CSwinTransformer(image_size=224,
                              embed_dim=144,
                              depths=[2, 4, 32, 2],
@@ -597,12 +597,12 @@ def CSWinTansformer_large_224(pretrained=False, use_ssld=False, **kwargs):
     _load_pretrained(
         pretrained,
         model,
-        MODEL_URLS["CSWinTansformer_large_224"],
+        MODEL_URLS["CSWinTransformer_large_224"],
         use_ssld=use_ssld)
     return model
 
 
-def CSWinTansformer_large_384(pretrained=False, use_ssld=False, **kwargs):
+def CSWinTransformer_large_384(pretrained=False, use_ssld=False, **kwargs):
     model = CSwinTransformer(image_size=384,
                              embed_dim=144,
                              depths=[2, 4, 32, 2],
@@ -613,7 +613,6 @@ def CSWinTansformer_large_384(pretrained=False, use_ssld=False, **kwargs):
     _load_pretrained(
         pretrained,
         model,
-        MODEL_URLS["CSWinTansformer_large_384"],
+        MODEL_URLS["CSWinTransformer_large_384"],
         use_ssld=use_ssld)
     return model
-

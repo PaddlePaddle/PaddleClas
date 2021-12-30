@@ -12,14 +12,14 @@ Global:
   use_visualdl: False
   # used for static mode and model export
 
-  image_shape: [3, 384, 384]
+  image_shape: [3, 224, 224]
   save_inference_dir: ./inference
   # training model under @to_static
   to_static: False
 
 # model architecture
 Arch:
-  name: CSWinTansformer_base_384
+  name: CSWinTransformer_base_224
   class_num: 1000
  
 # loss function config for traing/eval process
@@ -43,10 +43,10 @@ Optimizer:
   one_dim_param_no_weight_decay: True
   lr:
     name: Cosine
-    learning_rate: 5e-4
-    eta_min: 5e-6
+    learning_rate: 1e-3
+    eta_min: 1e-5
     warmup_epoch: 20
-    warmup_start_lr: 5e-7
+    warmup_start_lr: 1e-6
 
 
 # data loader for train and eval
@@ -61,7 +61,7 @@ DataLoader:
             to_rgb: True
             channel_first: False
         - RandCropImage:
-            size: 384
+            size: 224
             interpolation: bicubic
             backend: pil
         - RandFlipImage:
@@ -69,7 +69,7 @@ DataLoader:
         - TimmAutoAugment:
             config_str: rand-m9-mstd0.5-inc1
             interpolation: bicubic
-            img_size: 384
+            img_size: 224
         - NormalizeImage:
             scale: 1.0/255.0
             mean: [0.485, 0.456, 0.406]
@@ -94,7 +94,7 @@ DataLoader:
 
     sampler:
       name: DistributedBatchSampler
-      batch_size: 64
+      batch_size: 256
       drop_last: False
       shuffle: True
     loader:
@@ -111,11 +111,11 @@ DataLoader:
             to_rgb: True
             channel_first: False
         - ResizeImage:
-            resize_short: 384
+            resize_short: 248
             interpolation: bicubic
             backend: pil
         - CropImage:
-            size: 384
+            size: 224
         - NormalizeImage:
             scale: 1.0/255.0
             mean: [0.485, 0.456, 0.406]
@@ -123,7 +123,7 @@ DataLoader:
             order: ''
     sampler:
       name: DistributedBatchSampler
-      batch_size: 64
+      batch_size: 128
       drop_last: False
       shuffle: False
     loader:
@@ -138,11 +138,11 @@ Infer:
         to_rgb: True
         channel_first: False
     - ResizeImage:
-        resize_short: 384
+        resize_short: 256
         interpolation: bicubic
         backend: pil
     - CropImage:
-        size: 384
+        size: 224
     - NormalizeImage:
         scale: 1.0/255.0
         mean: [0.485, 0.456, 0.406]
