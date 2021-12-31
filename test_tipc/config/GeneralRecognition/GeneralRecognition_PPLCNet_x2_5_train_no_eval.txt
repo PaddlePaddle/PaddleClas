@@ -1,0 +1,26 @@
+===========================train_params===========================
+model_name:GeneralRecognition_PPLCNet_x2_5
+python:python3.7
+gpu_list:0|0,1
+-o Global.device:gpu
+-o Global.auto_cast:null
+-o Global.epochs:lite_train_lite_infer=2|whole_train_whole_infer=120
+-o Global.output_dir:./output/
+-o DataLoader.Train.sampler.batch_size:8
+-o Global.pretrained_model:null
+train_model_name:latest
+train_infer_img_dir:./dataset/ILSVRC2012/val
+null:null
+##
+trainer:norm_train
+norm_train:tools/train.py -c ppcls/configs/GeneralRecognition/GeneralRecognition_PPLCNet_x2_5.yaml -o Global.seed=1234 -o DataLoader.Train.sampler.shuffle=False -o DataLoader.Train.loader.num_workers=0 -o DataLoader.Train.loader.use_shared_memory=False -o Global.eval_during_train=False
+pact_train:null
+fpgm_train:null
+distill_train:null
+null:null
+null:null
+##
+===========================eval_params=========================== 
+eval:null
+null:null
+##
