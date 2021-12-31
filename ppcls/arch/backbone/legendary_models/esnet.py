@@ -217,7 +217,8 @@ class ESNet(TheseusLayer):
                  class_num=1000,
                  scale=1.0,
                  dropout_prob=0.2,
-                 class_expand=1280):
+                 class_expand=1280,
+                 return_patterns=None):
         super().__init__()
         self.scale = scale
         self.class_num = class_num
@@ -267,6 +268,9 @@ class ESNet(TheseusLayer):
         self.dropout = Dropout(p=dropout_prob, mode="downscale_in_infer")
         self.flatten = nn.Flatten(start_axis=1, stop_axis=-1)
         self.fc = Linear(self.class_expand, self.class_num)
+
+        if return_patterns is not None:
+            self.update_res(return_patterns)
 
     def forward(self, x):
         x = self.conv1(x)
