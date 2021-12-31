@@ -45,9 +45,9 @@ Optimizer:
   lr:
     name: Cosine
     learning_rate: 5e-4
-    eta_min: 1e-5
+    eta_min: 5e-6
     warmup_epoch: 20
-    warmup_start_lr: 1e-6
+    warmup_start_lr: 5e-7
 
 
 # data loader for train and eval
