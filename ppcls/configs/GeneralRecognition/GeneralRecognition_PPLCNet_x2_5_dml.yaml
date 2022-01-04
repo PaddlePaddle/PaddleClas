@@ -24,6 +24,7 @@ Arch:
   infer_output_key: features
   infer_add_softmax: False
   is_rec: True
+  infer_model_name: "Student"
   # if not null, its lengths should be same as models
   pretrained_list:
   # if not null, its lengths should be same as models

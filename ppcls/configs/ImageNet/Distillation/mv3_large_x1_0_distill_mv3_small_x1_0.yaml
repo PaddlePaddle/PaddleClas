@@ -13,7 +13,7 @@ Global:
   # used for static mode and model export
   image_shape: [3, 224, 224]
   save_inference_dir: "./inference"
-  use_dali: True
+  use_dali: false
 
 # model architecture
 Arch:
