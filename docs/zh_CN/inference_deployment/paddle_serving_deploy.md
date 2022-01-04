@@ -17,23 +17,35 @@
 
 <a name="2"></a>
 ## 2. Serving 安装
-
 Serving 官网推荐使用 docker 安装并部署 Serving 环境。首先需要拉取 docker 环境并创建基于 Serving 的 docker。
 
 ```shell
+# 启动GPU docker
 docker pull paddlepaddle/serving:0.7.0-cuda10.2-cudnn7-devel
 nvidia-docker run -p 9292:9292 --name test -dit paddlepaddle/serving:0.7.0-cuda10.2-cudnn7-devel bash
 nvidia-docker exec -it test bash
+
+# 启动CPU docker
+docker pull paddlepaddle/serving:0.7.0-devel
+docker run -p 9292:9292 --name test -dit paddlepaddle/serving:0.7.0-devel bash
+docker exec -it test bash
 ```
 
 进入 docker 后，需要安装 Serving 相关的 python 包。
-
 ```shell
 pip3 install paddle-serving-client==0.7.0
-pip3 install paddle-serving-server==0.7.0 # CPU
 pip3 install paddle-serving-app==0.7.0
-pip3 install paddle-serving-server-gpu==0.7.0.post102 #GPU with CUDA10.2 + TensorRT6
-# 其他GPU环境需要确认环境再选择执行哪一条
+pip3 install faiss-cpu==1.7.1post2
+
+#若为CPU部署环境:
+pip3 install paddle-serving-server==0.7.0 # CPU
+pip3 install paddlepaddle==2.2.0          # CPU
+
+#若为GPU部署环境
+pip3 install paddle-serving-server-gpu==0.7.0.post102 # GPU with CUDA10.2 + TensorRT6
+pip3 install paddlepaddle-gpu==2.2.0     # GPU with CUDA10.2
+
+#其他GPU环境需要确认环境再选择执行哪一条
 pip3 install paddle-serving-server-gpu==0.7.0.post101 # GPU with CUDA10.1 + TensorRT6
 pip3 install paddle-serving-server-gpu==0.7.0.post112 # GPU with CUDA11.2 + TensorRT8
 ```
@@ -41,11 +53,6 @@ pip3 install paddle-serving-server-gpu==0.7.0.post112 # GPU with CUDA11.2 + Tens
 * 如果安装速度太慢，可以通过 `-i https://pypi.tuna.tsinghua.edu.cn/simple` 更换源，加速安装过程。
 * 其他环境配置安装请参考: [使用Docker安装Paddle Serving](https://github.com/PaddlePaddle/Serving/blob/v0.7.0/doc/Install_CN.md)
 
-* 如果希望部署 CPU 服务，可以安装 serving-server 的 cpu 版本，安装命令如下。
-
-```shell
-pip install paddle-serving-server
-```
 <a name="3"></a>
 
 ## 3. 图像分类服务部署
@@ -73,8 +80,8 @@ python3 -m paddle_serving_client.convert --dirname ./ResNet50_vd_infer/ \
 ResNet50_vd 推理模型转换完成后，会在当前文件夹多出 `ResNet50_vd_serving` 和 `ResNet50_vd_client` 的文件夹，具备如下格式：
 ```
 |- ResNet50_vd_server/
-  |- __model__  
-  |- __params__
+  |- inference.pdiparams
+  |- inference.pdmodel
   |- serving_server_conf.prototxt  
   |- serving_server_conf.stream.prototxt
 |- ResNet50_vd_client
@@ -98,9 +105,9 @@ feed_var {
 fetch_var {
   name: "save_infer_model/scale_0.tmp_1"
   alias_name: "prediction"
-  is_lod_tensor: true
+  is_lod_tensor: false
   fetch_type: 1
-  shape: -1
+  shape: 1000
 }
 ```
 <a name="3.2"></a>
@@ -155,7 +162,7 @@ python3 -m paddle_serving_client.convert --dirname ./general_PPLCNet_x2_5_lite_v
                                          --serving_server ./general_PPLCNet_x2_5_lite_v1.0_serving/ \
                                          --serving_client ./general_PPLCNet_x2_5_lite_v1.0_client/
 ```
-识别推理模型转换完成后，会在当前文件夹多出 `general_PPLCNet_x2_5_lite_v1.0_serving/` 和 `general_PPLCNet_x2_5_lite_v1.0_serving/` 的文件夹。修改 `general_PPLCNet_x2_5_lite_v1.0_serving/` 目录下的 serving_server_conf.prototxt 中的 alias 名字： 将 `fetch_var` 中的 `alias_name` 改为 `features`。
+识别推理模型转换完成后，会在当前文件夹多出 `general_PPLCNet_x2_5_lite_v1.0_serving/` 和 `general_PPLCNet_x2_5_lite_v1.0_client/` 的文件夹。修改 `general_PPLCNet_x2_5_lite_v1.0_serving/` 目录下的 serving_server_conf.prototxt 中的 alias 名字： 将 `fetch_var` 中的 `alias_name` 改为 `features`。
 修改后的 serving_server_conf.prototxt 内容如下：
 ```
 feed_var {
@@ -170,9 +177,9 @@ feed_var {
 fetch_var {
   name: "save_infer_model/scale_0.tmp_1"
   alias_name: "features"
-  is_lod_tensor: true
+  is_lod_tensor: false
   fetch_type: 1
-  shape: -1
+  shape: 512
 }
 ```
 - 转换通用检测 inference 模型为 Serving 模型：

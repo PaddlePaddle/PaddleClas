@@ -244,7 +244,7 @@ class HighResolutionModule(TheseusLayer):
 
         for i in range(len(num_filters)):
             self.basic_block_list.append(
-                nn.Sequential(*[
+                nn.Sequential(* [
                     BasicBlock(
                         num_channels=num_filters[i],
                         num_filters=num_filters[i],
@@ -367,7 +367,11 @@ class HRNet(TheseusLayer):
         model: nn.Layer. Specific HRNet model depends on args.
     """
 
-    def __init__(self, width=18, has_se=False, class_num=1000, return_patterns=None):
+    def __init__(self,
+                 width=18,
+                 has_se=False,
+                 class_num=1000,
+                 return_patterns=None):
         super().__init__()
 
         self.width = width
@@ -394,7 +398,7 @@ class HRNet(TheseusLayer):
             stride=2,
             act="relu")
 
-        self.layer1 = nn.Sequential(*[
+        self.layer1 = nn.Sequential(* [
             BottleneckBlock(
                 num_channels=64 if i == 0 else 256,
                 num_filters=64,
@@ -458,7 +462,6 @@ class HRNet(TheseusLayer):
             weight_attr=ParamAttr(initializer=Uniform(-stdv, stdv)))
         if return_patterns is not None:
             self.update_res(return_patterns)
-            self.register_forward_post_hook(self._return_dict_hook)
 
     def forward(self, x):
         x = self.conv_layer1_1(x)

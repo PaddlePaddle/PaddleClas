@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include <include/cls_config.h>
+#include <ostream>
 
 namespace PaddleClas {
 
@@ -30,6 +31,22 @@ namespace PaddleClas {
             std::cout << "Something wrong in yaml file, please check yaml file"
                       << std::endl;
             exit(1);
+        }
+    }
+
+    void ClsConfig::ReadLabelMap() {
+        if (this->class_id_map_path.empty()) {
+            std::cout << "The Class Label file dose not input" << std::endl;
+            return;
+        }
+        std::ifstream in(this->class_id_map_path);
+        std::string line;
+        if (in) {
+            while (getline(in, line)) {
+                int split_flag = line.find_first_of(" ");
+                this->id_map[std::stoi(line.substr(0, split_flag))] =
+                        line.substr(split_flag + 1, line.size());
+            }
         }
     }
 }; // namespace PaddleClas

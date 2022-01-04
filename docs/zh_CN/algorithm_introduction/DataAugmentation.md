@@ -1,26 +1,29 @@
+# 数据增强
+------
 ## 目录
 
-  - [1. 数据增强](#1)
+  - [1. 数据增强简介](#1)
   - [2. 常用数据增强方法](#2)
-  - [3. 图像变换类](#3)
-    - [3.1 AutoAugment](#3.1)
-    - [3.2 RandAugment](#3.2)
-    - [3.3 TimmAutoAugment](#3.3)
-  - [4. 图像裁剪类](#4)
-    - [4.1 Cutout](#4.1)
-    - [4.2 RandomErasing](#4.2)
-    - [4.3 HideAndSeek](#4.3)
-    - [4.4 GridMask](#4.4)
-  - [5. 图像混叠](#5)
-    - [5.1 Mixup](#5.1)
-    - [5.2 Cutmix](#5.2)
+    - [2.1 图像变换类](#2.1)
+      - [2.1.1 AutoAugment](#2.1.1)
+      - [2.1.2 RandAugment](#2.1.2)
+      - [2.1.3 TimmAutoAugment](#2.1.3)
+    - [2.2 图像裁剪类](#2.2)
+      - [2.2.1 Cutout](#2.2.1)
+      - [2.2.2 RandomErasing](#2.2.2)
+      - [2.2.3 HideAndSeek](#2.2.3)
+      - [2.2.4 GridMask](#2.2.4)
+    - [2.3 图像混叠类](#2.3)
+      - [2.3.1 Mixup](#2.3.1)
+      - [2.3.2 Cutmix](#3.2.2)
 
 <a name="1"></a>
-## 1. 数据增强
+## 1. 数据增强简介
 
 在图像分类任务中，图像数据的增广是一种常用的正则化方法，常用于数据量不足或者模型参数较多的场景。在本章节中，我们将对除 ImageNet 分类任务标准数据增强外的 8 种数据增强方式进行简单的介绍和对比，用户也可以将这些增广方法应用到自己的任务中，以获得模型精度的提升。这 8 种数据增强方式在 ImageNet 上的精度指标如下所示。
 
 ![](../../images/image_aug/main_image_aug.png)
+
 <a name="2"></a>
 ## 2. 常用数据增强方法
 
@@ -64,16 +67,16 @@
 PaddleClas 中集成了上述所有的数据增强策略，每种数据增强策略的参考论文与参考开源代码均在下面的介绍中列出。下文将介绍这些策略的原理与使用方法，并以下图为例，对变换后的效果进行可视化。为了说明问题，本章节中将 `RandCrop` 替换为 `Resize`。
 
 ![][test_baseline]
-<a name="3"></a>
-## 3. 图像变换类
+<a name="2.1"></a>
+### 2.1 图像变换类
 
 图像变换类指的是对 `RandCrop` 后的 224 的图像进行一些变换，主要包括
 
 + AutoAugment
 + RandAugment
 + TimmAutoAugment
-<a name="3.1"></a>
-### 3.1 AutoAugment
+<a name="2.1.1"></a>
+#### 2.1.1 AutoAugment
 
 论文地址：[https://arxiv.org/abs/1805.09501v1](https://arxiv.org/abs/1805.09501v1)
 
@@ -84,8 +87,8 @@ PaddleClas 中集成了上述所有的数据增强策略，每种数据增强策
 经过 AutoAugment 数据增强后结果如下图所示。
 
 ![][test_autoaugment]
-<a name="3.2"></a>
-### 3.2 RandAugment
+<a name="2.1.2"></a>
+#### 2.1.2 RandAugment
 
 论文地址：[https://arxiv.org/pdf/1909.13719.pdf](https://arxiv.org/pdf/1909.13719.pdf)
 
@@ -100,15 +103,15 @@ PaddleClas 中集成了上述所有的数据增强策略，每种数据增强策
 经过 RandAugment 数据增强后结果如下图所示。
 
 ![][test_randaugment]
-<a name="3.3"></a>
-### 3.3 TimmAutoAugment
+<a name="2.1.3"></a>
+#### 2.1.3 TimmAutoAugment
 
 开源代码 github 地址：[https://github.com/rwightman/pytorch-image-models/blob/master/timm/data/auto_augment.py](https://github.com/rwightman/pytorch-image-models/blob/master/timm/data/auto_augment.py)
 
 `TimmAutoAugment` 是开源作者对 AutoAugment 和 RandAugment 的改进，事实证明，其在很多视觉任务上有更好的表现，目前绝大多数 VisionTransformer 模型都是基于 TimmAutoAugment 去实现的。
 
-<a name="4"></a>
-## 4. 图像裁剪类
+<a name="2.2"></a>
+### 2.2 图像裁剪类
 
 图像裁剪类主要是对 `Transpose` 后的 224 的图像进行一些裁剪，并将裁剪区域的像素值置为特定的常数（默认为 0），主要包括：
 
@@ -120,8 +123,8 @@ PaddleClas 中集成了上述所有的数据增强策略，每种数据增强策
 图像裁剪的这些增广并非一定要放在归一化之后，也有不少实现是放在归一化之前的，也就是直接对 uint8 的图像进行操作，两种方式的差别是：如果直接对 uint8 的图像进行操作，那么再经过归一化之后被裁剪的区域将不再是纯黑或纯白（减均值除方差之后像素值不为 0）。而对归一后之后的数据进行操作，裁剪的区域会是纯黑或纯白。
 
 上述的裁剪变换思路是相同的，都是为了解决训练出的模型在有遮挡数据上泛化能力较差的问题，不同的是他们的裁剪方式、区域不太一样。
-<a name="4.1"></a>
-### 4.1 Cutout
+<a name="2.2.1"></a>
+#### 2.2.1 Cutout
 
 论文地址：[https://arxiv.org/abs/1708.04552](https://arxiv.org/abs/1708.04552)
 
@@ -133,8 +136,8 @@ Cutout 可以理解为 Dropout 的一种扩展操作，不同的是 Dropout 是�
 经过 RandAugment 数据增强后结果如下图所示。
 
 ![][test_cutout]
-<a name="4.2"></a>
-### 4.2 RandomErasing
+<a name="2.2.2"></a>
+#### 2.2.2 RandomErasing
 
 论文地址：[https://arxiv.org/pdf/1708.04896.pdf](https://arxiv.org/pdf/1708.04896.pdf)
 
@@ -149,8 +152,8 @@ PaddleClas 中 `RandomErasing` 的使用方法如下所示。
 
 ![][test_randomerassing]
 
-<a name="4.3"></a>
-### 4.3 HideAndSeek
+<a name="2.2.3"></a>
+#### 2.2.3 HideAndSeek
 
 论文地址：[https://arxiv.org/pdf/1811.02545.pdf](https://arxiv.org/pdf/1811.02545.pdf)
 
@@ -170,8 +173,8 @@ PaddleClas 中 `HideAndSeek` 的使用方法如下所示。
 
 ![][test_hideandseek]
 
-<a name="4.4"></a>
-### 4.4 GridMask
+<a name="2.2.4"></a>
+#### 2.2.4 GridMask
 论文地址：[https://arxiv.org/abs/2001.04086](https://arxiv.org/abs/2001.04086)
 
 开源代码 github 地址：[https://github.com/akuxcw/GridMask](https://github.com/akuxcw/GridMask)
@@ -200,8 +203,8 @@ PaddleClas 中 `HideAndSeek` 的使用方法如下所示。
 
 ![][test_gridmask]
 
-<a name="5"></a>
-## 5. 图像混叠
+<a name="2.3"></a>
+### 2.3 图像混叠类
 
 图像混叠主要对 `Batch` 后的数据进行混合，包括：
 
@@ -209,8 +212,8 @@ PaddleClas 中 `HideAndSeek` 的使用方法如下所示。
 + Cutmix
 
 前文所述的图像变换与图像裁剪都是针对单幅图像进行的操作，而图像混叠是对两幅图像进行融合，生成一幅图像，两种方法的主要区别为混叠的方式不太一样。
-<a name="5.1"></a>
-### 5.1 Mixup
+<a name="2.3.1"></a>
+#### 2.3.1 Mixup
 
 论文地址：[https://arxiv.org/pdf/1710.09412.pdf](https://arxiv.org/pdf/1710.09412.pdf)
 
@@ -224,8 +227,8 @@ Mixup 是最先提出的图像混叠增广方案，其原理简单、方便实�
 经过 Mixup 数据增强结果如下图所示。
 
 ![][test_mixup]
-<a name="5.2"></a>
-### 5.2 Cutmix
+<a name="2.3.2"></a>
+#### 2.3.2 Cutmix
 
 论文地址：[https://arxiv.org/pdf/1905.04899v2.pdf](https://arxiv.org/pdf/1905.04899v2.pdf)
 

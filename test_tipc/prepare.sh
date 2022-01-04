@@ -118,9 +118,7 @@ if [ ${MODE} = "lite_train_lite_infer" ] || [ ${MODE} = "lite_train_whole_infer"
     cd ILSVRC2012 
     mv train.txt train_list.txt
     mv val.txt val_list.txt
-    if [ ${MODE} = "lite_train_lite_infer" ];then
-	cp -r train/* val/
-    fi
+    cp -r train/* val/
     cd ../../
 elif [ ${MODE} = "whole_infer" ] || [ ${MODE} = "klquant_whole_infer" ];then
     # download data

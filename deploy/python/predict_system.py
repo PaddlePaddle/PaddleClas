@@ -47,14 +47,14 @@ class SystemPredictor(object):
             index_dir, "vector.index")), "vector.index not found ..."
         assert os.path.exists(os.path.join(
             index_dir, "id_map.pkl")), "id_map.pkl not found ... "
-        
-        if config['IndexProcess'].get("binary_index", False):
+
+        if config['IndexProcess'].get("dist_type") == "hamming":
             self.Searcher = faiss.read_index_binary(
                 os.path.join(index_dir, "vector.index"))
         else:
             self.Searcher = faiss.read_index(
                 os.path.join(index_dir, "vector.index"))
-                
+
         with open(os.path.join(index_dir, "id_map.pkl"), "rb") as fd:
             self.id_map = pickle.load(fd)
 
@@ -111,12 +111,19 @@ class SystemPredictor(object):
             rec_results = self.rec_predictor.predict(crop_img)
             preds["bbox"] = [xmin, ymin, xmax, ymax]
             scores, docs = self.Searcher.search(rec_results, self.return_k)
-            
+
             # just top-1 result will be returned for the final
-            if scores[0][0] >= self.config["IndexProcess"]["score_thres"]:
-                preds["rec_docs"] = self.id_map[docs[0][0]].split()[1]
-                preds["rec_scores"] = scores[0][0]
-                output.append(preds)
+            if self.config["IndexProcess"]["dist_type"] == "hamming":
+                if scores[0][0] <= self.config["IndexProcess"][
+                        "hamming_radius"]:
+                    preds["rec_docs"] = self.id_map[docs[0][0]].split()[1]
+                    preds["rec_scores"] = scores[0][0]
+                    output.append(preds)
+            else:
+                if scores[0][0] >= self.config["IndexProcess"]["score_thres"]:
+                    preds["rec_docs"] = self.id_map[docs[0][0]].split()[1]
+                    preds["rec_scores"] = scores[0][0]
+                    output.append(preds)
 
         # st5: nms to the final results to avoid fetching duplicate results
         output = self.nms_to_rec_results(

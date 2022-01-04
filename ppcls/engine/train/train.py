@@ -21,6 +21,7 @@ from ppcls.utils import profiler
 
 def train_epoch(engine, epoch_id, print_batch_step):
     tic = time.time()
+    v_current = [int(i) for i in paddle.__version__.split(".")]
     for iter_id, batch in enumerate(engine.train_dataloader):
         if iter_id >= engine.max_iter:
             break
@@ -41,14 +42,15 @@ def train_epoch(engine, epoch_id, print_batch_step):
 
         # image input
         if engine.amp:
-            with paddle.amp.auto_cast(custom_black_list={
-                    "flatten_contiguous_range", "greater_than"
-            }):
+            amp_level = 'O1'
+            if engine.config['AMP']['use_pure_fp16'] is True:
+                amp_level = 'O2'
+            with paddle.amp.auto_cast(custom_black_list={"flatten_contiguous_range", "greater_than"}, level=amp_level):
                 out = forward(engine, batch)
+                loss_dict = engine.train_loss_func(out, batch[1])
         else:
             out = forward(engine, batch)
-
-        loss_dict = engine.train_loss_func(out, batch[1])
+            loss_dict = engine.train_loss_func(out, batch[1])
 
         # step opt and lr
         if engine.amp:

@@ -162,6 +162,13 @@ class Engine(object):
             if metric_config is not None:
                 metric_config = metric_config.get("Train")
                 if metric_config is not None:
+                    if hasattr(self.train_dataloader, "collate_fn"):
+                        for m_idx, m in enumerate(metric_config):
+                            if "TopkAcc" in m:
+                                msg = f"'TopkAcc' metric can not be used when setting 'batch_transform_ops' in config. The 'TopkAcc' metric has been removed."
+                                logger.warning(msg)
+                                break
+                        metric_config.pop(m_idx)
                     self.train_metric_func = build_metrics(metric_config)
                 else:
                     self.train_metric_func = None
@@ -251,6 +258,8 @@ class Engine(object):
             self.scaler = paddle.amp.GradScaler(
                 init_loss_scaling=self.scale_loss,
                 use_dynamic_loss_scaling=self.use_dynamic_loss_scaling)
+            if self.config['AMP']['use_pure_fp16'] is True:
+                self.model = paddle.amp.decorate(models=self.model, level='O2')
 
         self.max_iter = len(self.train_dataloader) - 1 if platform.system(
         ) == "Windows" else len(self.train_dataloader)
@@ -304,14 +313,14 @@ class Engine(object):
                     self.output_dir,
                     model_name=self.config["Arch"]["name"],
                     prefix="epoch_{}".format(epoch_id))
-                # save the latest model
-                save_load.save_model(
-                    self.model,
-                    self.optimizer, {"metric": acc,
-                                     "epoch": epoch_id},
-                    self.output_dir,
-                    model_name=self.config["Arch"]["name"],
-                    prefix="latest")
+            # save the latest model
+            save_load.save_model(
+                self.model,
+                self.optimizer, {"metric": acc,
+                                 "epoch": epoch_id},
+                self.output_dir,
+                model_name=self.config["Arch"]["name"],
+                prefix="latest")
 
         if self.vdl_writer is not None:
             self.vdl_writer.close()
