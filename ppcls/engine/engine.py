@@ -204,7 +204,7 @@ class Engine(object):
         else:
             self.ema = False
         if self.ema and mode == "train":
-            self.ema = ExponentialMovingAverage(self.model, self.config['Global']['ema'].get("momentum", 0.8))
+            self.ema = ExponentialMovingAverage(self.model, self.config['Global']['ema'].get("dacay", 0.8))
             self.ema.register()
         else:
             self.ema = None
@@ -344,7 +344,6 @@ class Engine(object):
             self.ema.apply()
         self.model.eval()
         eval_result = self.eval_func(self, epoch_id)
-        self.model.train()
         if self.ema is not None:
             save_load.save_model(
                     self.model,
@@ -354,6 +353,7 @@ class Engine(object):
                     model_name=self.config["Arch"]["name"],
                     prefix="ema_epoch_{}".format(epoch_id))
             self.ema.restore()
+        self.model.train()
         return eval_result
 
     @paddle.no_grad()
