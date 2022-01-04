@@ -22,6 +22,7 @@ import cv2
 import numpy as np
 import faiss
 import pickle
+import json
 
 from python.predict_rec import RecPredictor
 from python.predict_det import DetPredictor
@@ -32,7 +33,7 @@ from utils.get_image_list import get_image_list
 from utils.draw_bbox import draw_bbox_results
 from pycocotools.coco import COCO
 from pycocotools.cocoeval import COCOeval
-from functools import itertools
+import itertools
 
 
 def draw_pr_curve(precision,
@@ -59,7 +60,7 @@ def draw_pr_curve(precision,
     plt.savefig(output_path)
 
 
-def cocoapi_eval(coco_dt,
+def cocoapi_eval(jsonfile,
                  coco_gt,
                  style='bbox',
                  max_dets=(100, 300, 1000),
@@ -81,7 +82,7 @@ def cocoapi_eval(coco_dt,
     """
 
     logger.info("Start evaluate...")
-    #  coco_dt = coco_gt.loadRes(jsonfile)
+    coco_dt = coco_gt.loadRes(jsonfile)
 
     coco_eval = COCOeval(coco_gt, coco_dt, style)
     coco_eval.evaluate()
@@ -234,10 +235,10 @@ def transform2coco(output, img_id, label_map):
     coco_results = []
     for o in output:
         coco_result = {}
-        coco_result['bbox'] = o['bbox']
-        coco_result['category_id'] = label_map[o['rec_docs']]
-        coco_result['image_id'] = img_id
-        coco_result['score'] = o['rec_scores']
+        coco_result['bbox'] = [float(x) for x in o['bbox']]
+        coco_result['category_id'] = int(label_map[o['rec_docs']])
+        coco_result['image_id'] = int(img_id)
+        coco_result['score'] = float(o['rec_scores'])
         coco_results.append(coco_result)
     return coco_results
 
@@ -261,10 +262,17 @@ def main(config):
         output = system_predictor.predict(img)
         #  draw_bbox_results(img, output, image_file)
         pred.extend(transform2coco(output, img_id, label_map))
-        cocoapi_eval(pred, coco)
+    with open('result.json', 'w') as fd:
+        json.dump(pred, fd)
+    cocoapi_eval('result.json', coco)
     return
 
 
+# usage:
+# python python/eval_shitu.py -c configs/inference_drink.yaml \
+#           -o Global.infer_imgs=/work/project/ppshit_test_data/query.json \ # coco format json file path
+#           -o Global.image_root_dir=/work/dataset/ppshitu_test_data/ \  # test data root path
+#           -o IndexProcess.score_thres=0
 if __name__ == "__main__":
     args = config.parse_args()
     config = config.get_config(args.config, overrides=args.override, show=True)

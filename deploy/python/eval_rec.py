@@ -143,6 +143,10 @@ def main(config):
     print("macro f1: {:.3f}".format(macro))
 
 
+# python python/eval_shitu.py -c configs/inference_drink.yaml \
+#           -o Global.infer_imgs=/work/project/ppshit_test_data/query.json \ # coco format json file path
+#           -o Global.image_root_dir=/work/dataset/ppshitu_test_data/ \  # test data root path
+#           -o IndexProcess.score_thres=0
 if __name__ == "__main__":
     args = config.parse_args()
     config = config.get_config(args.config, overrides=args.override, show=True)
