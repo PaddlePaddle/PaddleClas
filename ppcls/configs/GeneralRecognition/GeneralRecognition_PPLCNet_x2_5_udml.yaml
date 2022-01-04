@@ -83,9 +83,9 @@ Loss:
         key: "logits"
         model_name_pairs:
         - ["Student", "Teacher"]
-    - DistillationDMLLoss:
+    - DistillationDistanceLoss:
         weight: 1.0
-        key: "logits"
+        key: "backbone"
         model_name_pairs:
         - ["Student", "Teacher"]
   Eval:
@@ -111,8 +111,7 @@ DataLoader:
     dataset:
       name: ImageNetDataset
       image_root: ./dataset/Aliproduct
-      # cls_label_path: ./dataset/train_reg_all_data.txt
-      cls_label_path: ./dataset/Aliproduct/train_list.txt
+      cls_label_path: ./dataset/train_reg_all_data.txt
       transform_ops:
         - DecodeImage:
             to_rgb: True

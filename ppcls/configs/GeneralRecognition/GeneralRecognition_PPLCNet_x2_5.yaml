@@ -66,8 +66,9 @@ DataLoader:
   Train:
     dataset:
       name: ImageNetDataset
-      image_root: ./dataset/
-      cls_label_path: ./dataset/train_reg_all_data.txt
+      image_root: ./dataset/Aliproduct
+      # cls_label_path: ./dataset/train_reg_all_data.txt
+      cls_label_path: ./dataset/Aliproduct/train_list.txt
       transform_ops:
         - DecodeImage:
             to_rgb: True
