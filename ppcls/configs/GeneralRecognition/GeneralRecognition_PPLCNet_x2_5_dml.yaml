@@ -1,4 +1,5 @@
 # global configs
+# global configs
 Global:
   checkpoints: null
   pretrained_model: null
@@ -111,8 +112,7 @@ DataLoader:
     dataset:
       name: ImageNetDataset
       image_root: ./dataset/Aliproduct
-      # cls_label_path: ./dataset/train_reg_all_data.txt
-      cls_label_path: ./dataset/Aliproduct/train_list.txt
+      cls_label_path: ./dataset/train_reg_all_data.txt
       transform_ops:
         - DecodeImage:
             to_rgb: True
