@@ -34,7 +34,7 @@ Arch:
     pretrained: False
     use_ssld: True
   BackboneStopLayer:
-    name: flatten_0
+    name: "flatten"
   Neck:
     name: FC
     embedding_size: 1280

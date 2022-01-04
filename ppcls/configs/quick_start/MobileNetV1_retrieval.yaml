@@ -25,7 +25,7 @@ Arch:
     name: MobileNetV1
     pretrained: False
   BackboneStopLayer:
-    name: flatten_0
+    name: "flatten"
   Neck:
     name: FC
     embedding_size: 1024
