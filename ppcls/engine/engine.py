@@ -208,9 +208,13 @@ class Engine(object):
         # set @to_static for benchmark, skip this by default.
         apply_to_static(self.config, self.model)
 
-        self.ema = self.config['Global'].get("use_ema", False)
+        self.has_ema = self.config['Global'].get("ema", None)
+        if self.has_ema is not None:
+            self.ema = self.config['Global']['ema'].get("enable", False)
+        else:
+            self.ema = False
         if self.ema and mode == "train":
-            self.ema = ExponentialMovingAverage(self.model, 0.999)
+            self.ema = ExponentialMovingAverage(self.model, self.config['Global']['ema'].get("momentum", 0.8))
             self.ema.register()
         else:
             self.ema = None
