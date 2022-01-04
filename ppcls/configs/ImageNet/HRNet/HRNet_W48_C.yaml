@@ -1,3 +1,6 @@
+# CudnnConv config 
+export FLAGS_cudnn_exhaustive_search=1
+
 # global configs
 Global:
   checkpoints: null
