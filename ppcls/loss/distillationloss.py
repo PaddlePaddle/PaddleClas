@@ -69,7 +69,7 @@ class DistillationGTCELoss(CELoss):
 
     def forward(self, predicts, batch):
         loss_dict = dict()
-        for idx, name in enumerate(self.model_names):
+        for _, name in enumerate(self.model_names):
             out = predicts[name]
             if self.key is not None:
                 out = out[self.key]
