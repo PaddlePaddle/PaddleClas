@@ -36,6 +36,7 @@
 ## 3. 通用识别模型
 
 在 PP-Shitu 中, 我们采用 [PP_LCNet_x2_5](../models/PP-LCNet.md) 作为骨干网络 Neck 部分选用 Linear Layer, Head 部分选用 [ArcMargin](../../../ppcls/arch/gears/arcmargin.py)，Loss 部分选用 CELoss，详细的配置文件见[通用识别配置文件](../../../ppcls/configs/GeneralRecognition/GeneralRecognition_PPLCNet_x2_5.yaml)。其中，训练数据为如下 7 个公开数据集的汇总：
+
 | 数据集       | 数据量   | 类别数   | 场景  | 数据集地址 |
 | :------------:  | :-------------: | :-------: | :-------: | :--------: |
 | Aliproduct | 2498771 | 50030 | 商品 | [地址](https://retailvisionworkshop.github.io/recognition_challenge_2020/) |
@@ -48,9 +49,11 @@
 | **Total** | **5M** | **185K**  | ---- | ---- |
 
 最终的模型效果如下表所示:
+
 | 模型       | Aliproduct  | VeRI-Wild  |  LogoDet-3K |  iCartoonFace | SOP | Inshop | Latency(ms) |
 | :----------:  | :---------: | :-------: | :-------: | :--------: | :--------: | :--------: | :--------: |
-PP-LCNet-2.5x | 0.839 | 0.888 | 0.861 | 0.841 | 0.793 | 0.892 | 5.0
+PP-LCNet-2.5x | 0.839 | 0.888 | 0.861 | 0.841 | 0.793 | 0.892 | 5.0 
+
 * 采用的评测指标为：`Recall@1`
 * 速度评测机器的 CPU 具体信息为：`Intel(R) Xeon(R) Gold 6148 CPU @ 2.40GHz`
 * 速度指标的评测条件为： 开启 MKLDNN, 线程数设置为 10
@@ -58,13 +61,13 @@ PP-LCNet-2.5x | 0.839 | 0.888 | 0.861 | 0.841 | 0.793 | 0.892 | 5.0
 
 <a name="4"></a>
 
-# 4. 自定义特征提取
+## 4. 自定义特征提取
 
 自定义特征提取，是指依据自己的任务，重新训练特征提取模型。主要包含四个步骤：1）数据准备；2）模型训练；3）模型评估；4）模型推理。
 
 <a name="4.1"></a>
 
-## 4.1 数据准备
+### 4.1 数据准备
 
 首先，需要基于任务定制自己的数据集。数据集格式参见[格式说明](https://github.com/PaddlePaddle/PaddleClas/blob/develop/docs/zh_CN/data_preparation/recognition_dataset.md#%E6%95%B0%E6%8D%AE%E9%9B%86%E6%A0%BC%E5%BC%8F%E8%AF%B4%E6%98%8E)。在启动模型训练之前，需要在配置文件中修改数据配置相关的内容, 主要包括数据集的地址以及类别数量。对应到配置文件中的位置如下所示：
 ```
@@ -97,7 +100,7 @@ PP-LCNet-2.5x | 0.839 | 0.888 | 0.861 | 0.841 | 0.793 | 0.892 | 5.0
 
 <a name="4.2"></a>
 
-## 4.2 模型训练
+### 4.2 模型训练
 
 - 单机单卡训练
 ```shell
@@ -125,7 +128,7 @@ python -m paddle.distributed.launch \
 
 <a name="4.3"></a>
 
-## 4.3 模型评估
+### 4.3 模型评估
 
 - 单卡评估
 ```shell
@@ -147,13 +150,13 @@ python -m paddle.distributed.launch \
 
 <a name="4.4"></a>
 
-## 4.4 模型推理
+### 4.4 模型推理
 
 推理过程包括两个步骤： 1)导出推理模型; 2)获取特征向量
 
 <a name="4.4.1"></a>
 
-### 4.4.1 导出推理模型
+#### 4.4.1 导出推理模型
 
 ```
 python tools/export_model \
@@ -165,7 +168,7 @@ python tools/export_model \
 
 <a name="4.4.2"></a>
 
-### 4.4.2 获取特征向量
+#### 4.4.2 获取特征向量
 
 ```
 cd deploy

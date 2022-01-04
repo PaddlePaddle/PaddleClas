@@ -1,5 +1,5 @@
 # PaddleClas 社区贡献指南
----
+------
 
 ## 目录
 
@@ -48,10 +48,7 @@ PaddleClas 欢迎大家向 repo 中积极贡献代码，下面给出一些贡献
 * 跳转到 [PaddleClas GitHub 首页](https://github.com/PaddlePaddle/PaddleClas)，然后单击 Fork 按钮，生成自己目录下的仓库，比如 `https://github.com/USERNAME/PaddleClas` 。
 
 
-<div align="center">
-<img src="../../images/quick_start/community/001_fork.png"  width = "600" />
-</div>
-
+![](../../images/quick_start/community/001_fork.png)
 
 * 将远程仓库 clone 到本地
 
@@ -63,9 +60,7 @@ cd PaddleClas
 
 clone 的地址可以从下面获取
 
-<div align="center">
-<img src="../../images/quick_start/community/002_clone.png"  width = "600" />
-</div>
+![](../../images/quick_start/community/002_clone.png)
 
 <a name="1.2.2"></a>
 #### 1.2.2 和远程仓库建立连接
@@ -150,10 +145,7 @@ pre-commit
 
 重复上述步骤，直到 pre-comit 格式检查不报错。如下所示。
 
-<div align="center">
-<img src="../../images/quick_start/community/003_precommit_pass.png"  width = "600" />
-</div>
-
+![](../../images/quick_start/community/003_precommit_pass.png)
 
 使用下面的命令完成提交。
 
@@ -184,10 +176,7 @@ git push origin new_branch
 
 点击 new pull request，选择本地分支和目标分支，如下图所示。在 PR 的描述说明中，填写该 PR 所完成的功能。接下来等待 review，如果有需要修改的地方，参照上述步骤更新 origin 中的对应分支即可。
 
-<div align="center">
-<img src="../../images/quick_start/community/004_create_pr.png"  width = "600" />
-</div>
-
+![](../../images/quick_start/community/004_create_pr.png)
 <a name="1.2.9"></a>
 #### 1.2.9 签署 CLA 协议和通过单元测试
 

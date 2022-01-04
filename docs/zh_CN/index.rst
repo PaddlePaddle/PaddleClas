@@ -4,15 +4,15 @@
 .. toctree::
    :maxdepth: 1
 
-   models_training/index
    introduction/index
+   installation/index
+   quick_start/index
    image_recognition_pipeline/index
+   data_preparation/index
+   models_training/index
+   inference_deployment/index
+   models/index
+   algorithm_introduction/index
+   advanced_tutorials/index
    others/index
    faq_series/index
-   data_preparation/index
-   installation/index
-   models/index
-   advanced_tutorials/index
-   algorithm_introduction/index
-   inference_deployment/index
-   quick_start/index
