@@ -1,5 +1,4 @@
 # global configs
-# global configs
 Global:
   checkpoints: null
   pretrained_model: null
@@ -80,11 +79,6 @@ Loss:
         weight: 1.0
         key: "logits"
         model_names: ["Student", "Teacher"]
-    - DistillationDMLLoss:
-        weight: 1.0
-        key: "logits"
-        model_name_pairs:
-        - ["Student", "Teacher"]
     - DistillationDMLLoss:
         weight: 1.0
         key: "logits"
