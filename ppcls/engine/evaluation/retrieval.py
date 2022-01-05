@@ -123,6 +123,8 @@ def cal_feature(engine, name='gallery'):
             has_unique_id = True
             batch[2] = batch[2].reshape([-1, 1]).astype("int64")
         out = engine.model(batch[0], batch[1])
+        if "Student" in out:
+            out = out["Student"]
         batch_feas = out["features"]
 
         # do norm
