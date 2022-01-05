@@ -208,16 +208,14 @@ class Engine(object):
         # set @to_static for benchmark, skip this by default.
         apply_to_static(self.config, self.model)
 
-        self.has_ema = self.config['Global'].get("ema", None)
-        if self.has_ema is not None:
-            self.ema = self.config['Global']['ema'].get("enable", False)
-        else:
-            self.ema = False
-        if self.ema and mode == "train":
-            self.ema = ExponentialMovingAverage(self.model, self.config['Global']['ema'].get("dacay", 0.8))
-            self.ema.register()
+        if self.config['Global'].get("ema", None) is not None:
+            self.ema = self.config['Global']['ema'].get("enable", None)
         else:
             self.ema = None
+
+        if self.ema and mode == "train":
+            self.ema = ExponentialMovingAverage(self.model, self.config['Global']['ema'].get("dacay", 0.999))
+            self.ema.register()
 
         # load_pretrain
         if self.config["Global"]["pretrained_model"] is not None:
@@ -361,11 +359,11 @@ class Engine(object):
     @paddle.no_grad()
     def eval(self, epoch_id=0):
         assert self.mode in ["train", "eval"]
-        if self.ema is not None:
+        if self.ema:
             self.ema.apply()
         self.model.eval()
         eval_result = self.eval_func(self, epoch_id)
-        if self.ema is not None:
+        if self.ema:
             save_load.save_model(
                     self.model,
                     self.optimizer, {"metric": eval_result,
