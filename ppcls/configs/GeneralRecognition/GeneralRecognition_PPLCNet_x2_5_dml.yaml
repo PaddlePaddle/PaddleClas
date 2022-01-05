@@ -100,7 +100,7 @@ Optimizer:
   momentum: 0.9
   lr:
     name: Cosine
-    learning_rate: 0.04
+    learning_rate: 0.02
     warmup_epoch: 5
   regularizer:
     name: 'L2'
@@ -130,7 +130,7 @@ DataLoader:
 
     sampler:
       name: DistributedBatchSampler
-      batch_size: 128
+      batch_size: 64
       drop_last: False
       shuffle: True
     loader:
