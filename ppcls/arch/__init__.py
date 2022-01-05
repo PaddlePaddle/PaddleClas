@@ -85,7 +85,7 @@ class RecModel(TheseusLayer):
         out["features"] = x
         if self.head is not None:
             y = self.head(x, label)
-            out["logits"] = x
+            out["logits"] = y
         else:
             y = None
         return out
