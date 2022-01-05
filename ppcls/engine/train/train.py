@@ -61,7 +61,7 @@ def train_epoch(engine, epoch_id, print_batch_step):
         else:
             loss_dict["loss"].backward()
             engine.optimizer.step()
-            if engine.ema is not None:
+            if engine.ema:
                 engine.ema.update()
         engine.optimizer.clear_grad()
         engine.lr_sch.step()
