@@ -86,8 +86,6 @@ class RecModel(TheseusLayer):
         if self.head is not None:
             y = self.head(x, label)
             out["logits"] = y
-        else:
-            y = None
         return out
 
 
