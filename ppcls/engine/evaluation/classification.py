@@ -78,10 +78,10 @@ def classification_eval(engine, epoch_id=0):
                 labels = paddle.concat(label_list, 0)
 
                 if isinstance(out, dict):
-                    if "logits" in out:
-                        out = out["logits"]
-                    elif "Student" in out:
+                    if "Student" in out:
                         out = out["Student"]
+                    elif "logits" in out:
+                        out = out["logits"]
                     else:
                         msg = "Error: Wrong key in out!"
                         raise Exception(msg)
@@ -106,6 +106,7 @@ def classification_eval(engine, epoch_id=0):
                 metric_dict = engine.eval_metric_func(pred, labels)
             else:
                 metric_dict = engine.eval_metric_func(out, batch[1])
+
             for key in metric_dict:
                 if metric_key is None:
                     metric_key = key
