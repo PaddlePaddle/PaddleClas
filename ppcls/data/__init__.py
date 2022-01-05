@@ -34,7 +34,7 @@ from ppcls.data.dataloader.multi_scale_dataset import MultiScaleDataset
 from ppcls.data.dataloader.DistributedRandomIdentitySampler import DistributedRandomIdentitySampler
 from ppcls.data.dataloader.pk_sampler import PKSampler
 from ppcls.data.dataloader.mix_sampler import MixSampler
-from ppcls.data.dataloader.multi_scale_sampler import MultiScaleSamplerDDP
+from ppcls.data.dataloader.multi_scale_sampler import MultiScaleSampler
 from ppcls.data import preprocess
 from ppcls.data.preprocess import transform
 

@@ -41,6 +41,7 @@ class MultiScaleDataset(Dataset):
         self.images = []
         self.labels = []
         self._load_anno()
+        self.has_crop_flag = 1
 
     def _load_anno(self, seed=None):
         assert os.path.exists(self._cls_path)
@@ -70,9 +71,15 @@ class MultiScaleDataset(Dataset):
                 resize_op = ['RandCropImage', 'ResizeImage', 'CropImage']
                 for resize in resize_op:
                     if resize in op:
-                        logger.error("Multi scale dataset will crop image according to the multi scale resolution")
-                        self.transform_ops[i][resize] = {'size': (img_height, img_width)}
+                        if self.has_crop_flag:
+                            logger.error(
+                                "Multi scale dataset will crop image according to the multi scale resolution"
+                            )
+                        self.transform_ops[i][resize] = {
+                            'size': (img_height, img_width)
+                        }
                         has_crop = True
+                        self.has_crop_flag = 0
         if has_crop == False:
             logger.error("Multi scale dateset requests RandCropImage")
             raise RuntimeError("Multi scale dateset requests RandCropImage")
@@ -82,7 +89,7 @@ class MultiScaleDataset(Dataset):
             with open(self.images[index], 'rb') as f:
                 img = f.read()
             if self._transform_ops:
-                img = transform(img, self._transform_ops) 
+                img = transform(img, self._transform_ops)
             img = img.transpose((2, 0, 1))
             return (img, self.labels[index])
 
