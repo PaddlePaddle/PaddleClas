@@ -66,12 +66,14 @@ DataLoader:
             order: ''
             
     # support to specify width and height respectively:
-    # scales: [(160,160), (192,192), (256,256) (288,288) (320,320)]
+    # scales: [(160,160), (192,192), (224,225) (288,288) (320,320)]
     sampler:
-      name: MultiScaleSamplerDDP
-      scales: [160, 192, 256, 288, 320]
+      name: MultiScaleSampler
+      scales: [160, 192, 224, 288, 320]
+      # first_bs: batch size for the first image resolution in the scales list
+      # divide_factor: to ensure the width and height dimensions can be devided by downsampling multiple
       first_bs: 64
-      down_sample: 32
+      divided_factor: 32
       is_training: True
       seed: None
 
