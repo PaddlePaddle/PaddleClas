@@ -111,7 +111,7 @@ DataLoader:
   Train:
     dataset:
       name: ImageNetDataset
-      image_root: ./dataset/Aliproduct
+      image_root: ./dataset/
       cls_label_path: ./dataset/train_reg_all_data.txt
       transform_ops:
         - DecodeImage:
