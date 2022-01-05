@@ -1,4 +1,4 @@
-# 往期课程链接：
+# 往期课程链接
 ---
 
 - [**【AI快车道PaddleClas系列直播课】**](https://aistudio.baidu.com/aistudio/course/introduce/24519)
