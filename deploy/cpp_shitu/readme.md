@@ -2,11 +2,27 @@
 
 本教程将介绍在服务器端部署PP-ShiTU的详细步骤。
 
+## 目录
+
+- [1.准备环境](#1)
+  - [1.1 升级cmake](#1.1)
+  - [1.2 编译opencv库](#1.2)
+  - [1.3 下载或者编译Paddle预测库](#1.3)
+    - [1.3.1 预测库源码编译](#1.3.1)
+    - [1.3.2 直接下载安装](#1.3.2)
+  - [1.4 安装faiss库](#1.4)
+- [2.代码编译](#2)
+- [3.运行demo](#3)
+- [4.使用自己模型](#4)
+
+<a name="1"></a>
 
 ## 1. 准备环境
 
 ### 运行准备
 - Linux环境，推荐使用ubuntu docker。
+
+<a name="1.1"></a>
 
 ### 1.1 升级cmake
 
@@ -47,6 +63,8 @@ cmake --version
 ```
 
 此时，cmake就可以使用了
+
+<a name="1.2"></a>
 
 ### 1.2 编译opencv库
 
@@ -108,11 +126,16 @@ opencv3/
 |-- share
 ```
 
+<a name="1.3"></a>
+
 ### 1.3 下载或者编译Paddle预测库
 
 * 有2种方式获取Paddle预测库，下面进行详细介绍。
 
+<a name="1.3.1"></a>
+
 #### 1.3.1 预测库源码编译
+
 * 如果希望获取最新预测库特性，可以从Paddle github上克隆最新代码，源码编译预测库。
 * 可以参考[Paddle预测库官网](https://www.paddlepaddle.org.cn/documentation/docs/zh/develop/guides/05_inference_deployment/inference/build_and_install_lib_cn.html#id16)的说明，从github上获取Paddle代码，然后进行编译，生成最新的预测库。使用git获取代码方法如下。
 
@@ -155,6 +178,8 @@ build/paddle_inference_install_dir/
 
 其中`paddle`就是之后进行C++预测时所需的Paddle库，`version.txt`中包含当前预测库的版本信息。
 
+<a name="1.3.2"></a>
+
 #### 1.3.2 直接下载安装
 
 * [Paddle预测库官网](https://paddle-inference.readthedocs.io/en/latest/user_guides/download_lib.html)上提供了不同cuda版本的Linux预测库，可以在官网查看并选择合适的预测库版本，注意必须选择`develop`版本。
@@ -170,6 +195,8 @@ tar -xvf paddle_inference.tgz
 
 
 最终会在当前的文件夹中生成`paddle_inference/`的子文件夹。
+
+<a name="1.4"></a>
 
 ### 1.4 安装faiss库
 
@@ -191,9 +218,9 @@ apt-get install libopenblas-dev
 
 注意本教程以安装faiss cpu版本为例，安装时请参考[faiss](https://github.com/facebookresearch/faiss)官网文档，根据需求自行安装。
 
-## 2 代码编译
+<a name="2"></a>
 
-### 2.2 编译PaddleClas C++预测demo
+## 2. 代码编译
 
 编译命令如下，其中Paddle C++预测库、opencv等其他依赖库的地址需要换成自己机器上的实际地址。同时，编译过程中需要下载编译`yaml-cpp`等C++库，请保持联网环境。
 
@@ -245,7 +272,9 @@ cd ..
 
 在执行上述命令，编译完成之后，会在当前路径下生成`build`文件夹，其中生成一个名为`pp_shitu`的可执行文件。
 
-## 3 运行demo
+<a name="3"></a>
+
+## 3. 运行demo
 
 - 请参考[识别快速开始文档](../../docs/zh_CN/quick_start/quick_start_recognition.md)，下载好相应的 轻量级通用主体检测模型、轻量级通用识别模型及瓶装饮料测试数据并解压。
 
@@ -302,7 +331,9 @@ cd ..
 
   ![](../../docs/images/quick_start/shitu_c++_result.png)
 
-## 4  使用自己模型
+<a name="4"></a>
+
+## 4.  使用自己模型
 
 使用自己训练的模型，可以参考[模型导出](../../docs/zh_CN/inference_deployment/export_model.md)，导出`inference model`，用于模型预测。
 

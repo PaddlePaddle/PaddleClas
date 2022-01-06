@@ -2,11 +2,28 @@
 
 This tutorial details the steps to deploy PP-ShiTU on the server side.
 
+## Catalogue
+
+- [1.Prepare the Environment](#1)
+  - [1.1 Update cmake](#1.1)
+  - [1.2 Compile opencv Library](#1.2)
+  - [1.3 Download or Compile Paddle Inference Library](#1.3)
+    - [1.3.1 Compile the Source of Inference Library](#1.3.1)
+    - [1.3.2 Direct Download and Installation](#1.3.2)
+  - [1.4 Install faiss Library](#1.4)
+- [2.Code Compilation](#2)
+- [3.Run the demo](#3)
+- [4.Use Your Own Model](#4)
+
+<a name="1"></a>
+
 ## 1. Prepare the Environment
 
 ### Environment Preparation
 
 - Linux environment, ubuntu docker recommended.
+
+<a name="1.1"></a>
 
 ### 1.1 Update cmake
 
@@ -47,6 +64,8 @@ cmake --version
 ```
 
 cmake is now ready for use.
+
+<a name="1.2"></a>
 
 ### 1.2 Compile opencv Library
 
@@ -108,9 +127,13 @@ opencv3/
 |-- share
 ```
 
+<a name="1.3"></a>
+
 ### 1.3 Download or Compile Paddle Inference Library
 
 - Here we detail 2 ways to obtain Paddle inference library.
+
+<a name="1.3.1"></a>
 
 #### 1.3.1 Compile the Source of Inference Library
 
@@ -155,6 +178,8 @@ build/paddle_inference_install_dir/
 
  `paddle` is the Paddle library needed for later C++ inference, and `version.txt` contains the version information of the current inference library.
 
+<a name="1.3.2"></a>
+
 #### 1.3.2 Direct Download and Installation
 
 - The Linux inference library of different cuda versions are available on the official website of [Paddle Inference Library ](https://paddle-inference.readthedocs.io/en/latest/user_guides/download_lib.html), where you can choose the appropriate version. Note that you must select the `develop` version.
@@ -168,6 +193,8 @@ tar -xvf paddle_inference.tgz
 ```
 
 The subfolder `paddle_inference/` will finally be created in the current folder.
+
+<a name="1.4"></a>
 
 ### 1.4 Install faiss Library
 
@@ -189,9 +216,9 @@ apt-get install libopenblas-dev
 
 Note that this tutorial installs the cpu version of faiss as an example, please install it as your need by referring to the official documents of [faiss](https://github.com/facebookresearch/faiss).
 
-## 2 Code Compilation
+<a name="2"></a>
 
-### 2.2 Compile the C++ Inference Demo of PP-ShiTu
+## 2. Code Compilation
 
 The command is as follows, where the address of Paddle C++ inference library, opencv and other dependency libraries need to be replaced with the actual address on your own machine. Also, you need to download and compile `yaml-cpp` and other C++ libraries during the compilation, so please keep the network unblocked.
 
@@ -241,7 +268,9 @@ In the above commands:
 
 A `build` folder will be created in the current path after the compilation, which generates an executable file named `pp_shitu`.
 
-## 3 Run the demo
+<a name="3"></a>
+
+## 3. Run the demo
 
 - Please refer to the [Quick Start of Recognition](../../docs/en/quick_start/quick_start_recognition_en.md), download the corresponding Lightweight Generic Mainbody Detection Model, Lightweight Generic Recognition Model, and the beverage test data and unzip them.
 
@@ -298,7 +327,9 @@ A `build` folder will be created in the current path after the compilation, whic
 
   [![img](https://github.com/PaddlePaddle/PaddleClas/raw/develop/docs/images/quick_start/shitu_c++_result.png)](https://github.com/PaddlePaddle/PaddleClas/blob/develop/docs/images/quick_start/shitu_c++_result.png)
 
-## 4 Use Your Own Model
+<a name="4"></a>
+
+## 4. Use Your Own Model
 
 You can also use your self-trained models. Please refer to [model export](../../docs/en/inference_deployment/export_model_en.md) to export ` inference model` for model inference.
 
