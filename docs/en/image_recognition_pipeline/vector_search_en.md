@@ -1,6 +1,6 @@
 # Vector Search
 
-Vector search finds wide applications in image recognition and image retrieval. It aims to obtain the similarity ranking for a given query vector by performing a similarity or distance calculation of feature vectors with all the vectors to be queried in an established vector library. In the image recognition system, [Faiss](https://github.com/facebookresearch/faiss) is adopted for corresponding support, please check [the official website of Faiss](https://github.com/facebookresearch/faiss for more information ) for more details. The main advantages of `Faiss` can be generalized as the following:
+Vector search finds wide applications in image recognition and image retrieval. It aims to obtain the similarity ranking for a given query vector by performing a similarity or distance calculation of feature vectors with all the vectors to be queried in an established vector library. In the image recognition system, [Faiss](https://github.com/facebookresearch/faiss) is adopted for corresponding support, please check [the official website of Faiss](https://github.com/facebookresearch/faiss) for more details. The main advantages of `Faiss` can be generalized as the following:
 
 - Great adaptability: support Windows, Linux, and MacOS systems
 - Easy installation: support `python` interface and direct installation with `pip`
