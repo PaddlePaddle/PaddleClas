@@ -28,7 +28,6 @@ from ppcls.utils import logger
 from ppcls.utils.save_load import load_dygraph_pretrain
 from ppcls.arch.slim import prune_model, quantize_model
 
-
 __all__ = ["build_model", "RecModel", "DistillationModel"]
 
 
@@ -82,13 +81,11 @@ class RecModel(TheseusLayer):
         out["backbone"] = x
         if self.neck is not None:
             x = self.neck(x)
+            out["neck"] = x
         out["features"] = x
         if self.head is not None:
             y = self.head(x, label)
-            out["neck"] = x
-        else:
-            y = None
-        out["logits"] = y
+            out["logits"] = y
         return out
 
 
