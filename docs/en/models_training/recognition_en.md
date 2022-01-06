@@ -12,7 +12,7 @@ For an image to be queried, the image recognition process in PaddleClas is divid
 
 The feature gallery is built in advance using the labeled image datasets. The complete image recognition system is shown in the figure below.
 
-[![img](../../images/structure.jpg)
+![img](../../images/structure.jpg)
 
 To experience the whole image recognition system, or learn  how to build a feature gallery, please refer to [Quick Start of Image Recognition](../quick_start/quick_start_recognition_en.md), which explains the overall application process. The following parts expound on the training part of the above three steps.
 
@@ -311,7 +311,7 @@ Image retrieval refers to a query image given a specific instance (e.g. a specif
 
 - Metric Learning
 
-Metric learning studies how to learn a distance function on a particular task so that the distance function can help nearest-neighbour based algorithms (kNN, k-means, etc.) to achieve better performance. Deep Metric Learning is a method of metric learning that aims to learn a mapping from the original features to a low-dimensional dense vector space (embedding space) such that similar objects on the embedding space are closer together using commonly used distance functions (Euclidean distance, cosine distance, etc.) ) on the embedding space, while the distances between objects of different classes are not close to each other. Deep metric learning has achieved very successful applications in the field of computer vision, such as face recognition, commodity recognition, image retrieval, pedestrian re-identification, etc. See [HERE](../algorithm_introduction/metric_learning_em.md) for detailed information.
+Metric learning studies how to learn a distance function on a particular task so that the distance function can help nearest-neighbour based algorithms (kNN, k-means, etc.) to achieve better performance. Deep Metric Learning is a method of metric learning that aims to learn a mapping from the original features to a low-dimensional dense vector space (embedding space) such that similar objects on the embedding space are closer together using commonly used distance functions (Euclidean distance, cosine distance, etc.) ) on the embedding space, while the distances between objects of different classes are not close to each other. Deep metric learning has achieved very successful applications in the field of computer vision, such as face recognition, commodity recognition, image retrieval, pedestrian re-identification, etc. See [HERE](../algorithm_introduction/metric_learning_en.md) for detailed information.
 
 <a name="Introduction to Image Retrieval Datasets"></a>
 

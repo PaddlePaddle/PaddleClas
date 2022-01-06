@@ -91,7 +91,7 @@ In the mainbody detection task, we use `ResNet50vd-DCN` as our backbone for bett
 
 <a name="3"></a>
 
-## 3 Model Training
+## 3. Model Training
 
 This section mainly talks about how to train your own mainbody detection model using PaddleDetection on your own datasets.
 
