@@ -1,4 +1,4 @@
-# 更多关于动漫人物图片识别的效果图请见下
+## 动漫人物图片识别效果图
 
 <div align="center"> <img src="https://user-images.githubusercontent.com/12560511/140069080-a821e0b7-8a10-4946-bf05-ff093cc16064.jpeg" width = "400" /> </div>
 

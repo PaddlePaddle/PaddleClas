@@ -8,7 +8,6 @@ def file_name(file_dir):
         break
     
     # 删除不需要的子目录
-    temp.remove('images')
     temp.remove('_templates')
     temp.remove('_build')
     temp.remove('_static')

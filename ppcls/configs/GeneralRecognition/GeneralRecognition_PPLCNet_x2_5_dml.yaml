@@ -5,7 +5,7 @@ Global:
   output_dir: ./output/
   device: gpu
   save_interval: 1
-  eval_during_train: True
+  eval_during_train: true
   eval_interval: 1
   epochs: 100
   print_batch_step: 10
@@ -19,42 +19,82 @@ Global:
 
 # model architecture
 Arch:
-  name: RecModel
+  name: "DistillationModel"
   infer_output_key: features
   infer_add_softmax: False
-
-  Backbone: 
-    name: PPLCNet_x2_5
-    pretrained: True
-    use_ssld: True
-  BackboneStopLayer:
-    name: "flatten"
-  Neck:
-    name: FC
-    embedding_size: 1280
-    class_num: 512
-  Head:
-    name: ArcMargin 
-    embedding_size: 512
-    class_num: 185341
-    margin: 0.2
-    scale: 30
+  is_rec: True
+  infer_model_name: "Student"
+  # if not null, its lengths should be same as models
+  pretrained_list:
+  # if not null, its lengths should be same as models
+  freeze_params_list:
+  - False
+  - False
+  models:
+    - Teacher:
+        name: RecModel
+        infer_output_key: features
+        infer_add_softmax: False
+        Backbone: 
+          name: PPLCNet_x2_5
+          pretrained: True
+          use_ssld: True
+        BackboneStopLayer:
+          name: "flatten"
+        Neck:
+          name: FC
+          embedding_size: 1280
+          class_num: 512
+        Head:
+          name: ArcMargin 
+          embedding_size: 512
+          class_num: 185341
+          margin: 0.2
+          scale: 30
+    - Student:
+        name: RecModel
+        infer_output_key: features
+        infer_add_softmax: False
+        Backbone: 
+          name: PPLCNet_x2_5
+          pretrained: True
+          use_ssld: True
+        BackboneStopLayer:
+          name: "flatten"
+        Neck:
+          name: FC
+          embedding_size: 1280
+          class_num: 512
+        Head:
+          name: ArcMargin 
+          embedding_size: 512
+          class_num: 185341
+          margin: 0.2
+          scale: 30
 
 # loss function config for traing/eval process
 Loss:
   Train:
-    - CELoss:
+    - DistillationGTCELoss:
         weight: 1.0
+        key: "logits"
+        model_names: ["Student", "Teacher"]
+    - DistillationDMLLoss:
+        weight: 1.0
+        key: "logits"
+        model_name_pairs:
+        - ["Student", "Teacher"]
   Eval:
-    - CELoss:
+    - DistillationGTCELoss:
         weight: 1.0
+        model_names: ["Student"]
 
 Optimizer:
   name: Momentum
   momentum: 0.9
   lr:
     name: Cosine
-    learning_rate: 0.04
+    learning_rate: 0.02
     warmup_epoch: 5
   regularizer:
     name: 'L2'
@@ -84,7 +124,7 @@ DataLoader:
 
     sampler:
       name: DistributedBatchSampler
-      batch_size: 256
+      batch_size: 64
       drop_last: False
       shuffle: True
     loader:

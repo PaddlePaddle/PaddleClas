@@ -53,7 +53,8 @@ class Engine(object):
         self.config = config
         self.eval_mode = self.config["Global"].get("eval_mode",
                                                    "classification")
-        if "Head" in self.config["Arch"]:
+        if "Head" in self.config["Arch"] or self.config["Arch"].get("is_rec",
+                                                                    False):
             self.is_rec = True
         else:
             self.is_rec = False
@@ -161,7 +162,7 @@ class Engine(object):
             if metric_config is not None:
                 metric_config = metric_config.get("Train")
                 if metric_config is not None:
-                    if self.train_dataloader.collate_fn:
+                    if hasattr(self.train_dataloader, "collate_fn"):
                         for m_idx, m in enumerate(metric_config):
                             if "TopkAcc" in m:
                                 msg = f"'TopkAcc' metric can not be used when setting 'batch_transform_ops' in config. The 'TopkAcc' metric has been removed."
@@ -312,14 +313,14 @@ class Engine(object):
                     self.output_dir,
                     model_name=self.config["Arch"]["name"],
                     prefix="epoch_{}".format(epoch_id))
-                # save the latest model
-                save_load.save_model(
-                    self.model,
-                    self.optimizer, {"metric": acc,
-                                     "epoch": epoch_id},
-                    self.output_dir,
-                    model_name=self.config["Arch"]["name"],
-                    prefix="latest")
+            # save the latest model
+            save_load.save_model(
+                self.model,
+                self.optimizer, {"metric": acc,
+                                 "epoch": epoch_id},
+                self.output_dir,
+                model_name=self.config["Arch"]["name"],
+                prefix="latest")
 
         if self.vdl_writer is not None:
             self.vdl_writer.close()
@@ -357,7 +358,9 @@ class Engine(object):
                 out = self.model(batch_tensor)
                 if isinstance(out, list):
                     out = out[0]
-                if isinstance(out, dict):
+                if isinstance(out, dict) and "logits" in out:
+                    out = out["logits"]
+                if isinstance(out, dict) and "output" in out:
                     out = out["output"]
                 result = self.postprocess_func(out, image_file_list)
                 print(result)

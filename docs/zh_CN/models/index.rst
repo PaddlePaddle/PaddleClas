@@ -10,7 +10,6 @@
    EfficientNet_and_ResNeXt101_wsl.md
    ViT_and_DeiT.md
    SwinTransformer.md
-   Tricks.md
    Others.md
    SEResNext_and_Res2Net.md
    ESNet.md

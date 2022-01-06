@@ -196,13 +196,15 @@ class MobileNetV3(TheseusLayer):
             bias_attr=False)
 
         self.hardswish = nn.Hardswish()
-        self.dropout = Dropout(p=dropout_prob, mode="downscale_in_infer")
+        if dropout_prob is not None:
+            self.dropout = Dropout(p=dropout_prob, mode="downscale_in_infer")
+        else:
+            self.dropout = None
         self.flatten = nn.Flatten(start_axis=1, stop_axis=-1)
 
         self.fc = Linear(self.class_expand, class_num)
         if return_patterns is not None:
             self.update_res(return_patterns)
-            self.register_forward_post_hook(self._return_dict_hook)
 
     def forward(self, x):
         x = self.conv(x)
@@ -211,7 +213,8 @@ class MobileNetV3(TheseusLayer):
         x = self.avg_pool(x)
         x = self.last_conv(x)
         x = self.hardswish(x)
-        x = self.dropout(x)
+        if self.dropout is not None:
+            x = self.dropout(x)
         x = self.flatten(x)
         x = self.fc(x)
 
