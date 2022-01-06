@@ -10,7 +10,7 @@ Image Classification is a very basic but important field in the subject of compu
 
 See [here](../algorithm_introduction/image_classification_en.md) for the detailed introduction of image classification algorithms.
 
-## Contents
+## Catalogue
 
 - [1. Dataset Introduction](#1)
   - [1.1 ImageNet-1k](#1.1)
