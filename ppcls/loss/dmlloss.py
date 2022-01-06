@@ -42,8 +42,8 @@ class DMLLoss(nn.Layer):
 
     def forward(self, x, target):
         if self.act is not None:
-            x = F.softmax(x)
-            target = F.softmax(target)
+            x = self.act(x)
+            target = self.act(target)
         loss = self._kldiv(x, target) + self._kldiv(target, x)
         loss = loss / 2
         loss = paddle.mean(loss)
