@@ -44,6 +44,33 @@ class TheseusLayer(nn.Layer):
     def _save_sub_res_hook(self, layer, input, output):
         self.res_dict[self.res_name] = output
 
+    def init_res(self,
+                 stages_pattern,
+                 return_patterns=None,
+                 return_stages=None):
+        if return_patterns and return_stages:
+            msg = f"The 'return_patterns' would be ignored when 'return_stages' is set."
+            logger.warning(msg)
+            return_stages = None
+
+        if return_stages is True:
+            return_patterns = stages_pattern
+        if isinstance(return_stages, int):
+            return_stages = [return_stages]
+        if isinstance(return_stages, list):
+            if max(return_stages) > len(stages_pattern) or min(
+                    return_stages) < 0:
+                msg = f"The 'return_stages' set error. Illegal value(s) have been ignored. The stages' pattern list is {stages_pattern}."
+                logger.warning(msg)
+                return_stages = [
+                    val for val in return_stages
+                    if val >= 0 and val < len(stages_pattern)
+                ]
+            return_patterns = [stages_pattern[i] for i in return_stages]
+
+        if return_patterns:
+            self.update_res(return_patterns)
+
     def replace_sub(self, *args, **kwargs) -> None:
         msg = "The function 'replace_sub()' is deprecated, please use 'upgrade_sublayer()' instead."
         logger.error(DeprecationWarning(msg))

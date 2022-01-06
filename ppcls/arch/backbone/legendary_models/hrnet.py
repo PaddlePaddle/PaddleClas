@@ -43,6 +43,8 @@ MODEL_URLS = {
     "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/HRNet_W64_C_pretrained.pdparams"
 }
 
+MODEL_STAGES_PATTERN = {"HRNet": ["st4"]}
+
 __all__ = list(MODEL_URLS.keys())
 
 
@@ -368,10 +370,12 @@ class HRNet(TheseusLayer):
     """
 
     def __init__(self,
+                 stages_pattern,
                  width=18,
                  has_se=False,
                  class_num=1000,
-                 return_patterns=None):
+                 return_patterns=None,
+                 return_stages=None):
         super().__init__()
 
         self.width = width
@@ -460,8 +464,11 @@ class HRNet(TheseusLayer):
             2048,
             class_num,
             weight_attr=ParamAttr(initializer=Uniform(-stdv, stdv)))
-        if return_patterns is not None:
-            self.update_res(return_patterns)
+
+        super().init_res(
+            stages_pattern,
+            return_patterns=return_patterns,
+            return_stages=return_stages)
 
     def forward(self, x):
         x = self.conv_layer1_1(x)
@@ -517,7 +524,8 @@ def HRNet_W18_C(pretrained=False, use_ssld=False, **kwargs):
     Returns:
         model: nn.Layer. Specific `HRNet_W18_C` model depends on args.
     """
-    model = HRNet(width=18, **kwargs)
+    model = HRNet(
+        width=18, stages_pattern=MODEL_STAGES_PATTERN["HRNet"], **kwargs)
     _load_pretrained(pretrained, model, MODEL_URLS["HRNet_W18_C"], use_ssld)
     return model
 
@@ -532,7 +540,8 @@ def HRNet_W30_C(pretrained=False, use_ssld=False, **kwargs):
     Returns:
         model: nn.Layer. Specific `HRNet_W30_C` model depends on args.
     """
-    model = HRNet(width=30, **kwargs)
+    model = HRNet(
+        width=30, stages_pattern=MODEL_STAGES_PATTERN["HRNet"], **kwargs)
     _load_pretrained(pretrained, model, MODEL_URLS["HRNet_W30_C"], use_ssld)
     return model
 
@@ -547,7 +556,8 @@ def HRNet_W32_C(pretrained=False, use_ssld=False, **kwargs):
     Returns:
         model: nn.Layer. Specific `HRNet_W32_C` model depends on args.
     """
-    model = HRNet(width=32, **kwargs)
+    model = HRNet(
+        width=32, stages_pattern=MODEL_STAGES_PATTERN["HRNet"], **kwargs)
     _load_pretrained(pretrained, model, MODEL_URLS["HRNet_W32_C"], use_ssld)
     return model
 
@@ -562,7 +572,8 @@ def HRNet_W40_C(pretrained=False, use_ssld=False, **kwargs):
     Returns:
         model: nn.Layer. Specific `HRNet_W40_C` model depends on args.
     """
-    model = HRNet(width=40, **kwargs)
+    model = HRNet(
+        width=40, stages_pattern=MODEL_STAGES_PATTERN["HRNet"], **kwargs)
     _load_pretrained(pretrained, model, MODEL_URLS["HRNet_W40_C"], use_ssld)
     return model
 
@@ -577,7 +588,8 @@ def HRNet_W44_C(pretrained=False, use_ssld=False, **kwargs):
     Returns:
         model: nn.Layer. Specific `HRNet_W44_C` model depends on args.
     """
-    model = HRNet(width=44, **kwargs)
+    model = HRNet(
+        width=44, stages_pattern=MODEL_STAGES_PATTERN["HRNet"], **kwargs)
     _load_pretrained(pretrained, model, MODEL_URLS["HRNet_W44_C"], use_ssld)
     return model
 
@@ -592,7 +604,8 @@ def HRNet_W48_C(pretrained=False, use_ssld=False, **kwargs):
     Returns:
         model: nn.Layer. Specific `HRNet_W48_C` model depends on args.
     """
-    model = HRNet(width=48, **kwargs)
+    model = HRNet(
+        width=48, stages_pattern=MODEL_STAGES_PATTERN["HRNet"], **kwargs)
     _load_pretrained(pretrained, model, MODEL_URLS["HRNet_W48_C"], use_ssld)
     return model
 
@@ -607,7 +620,8 @@ def HRNet_W60_C(pretrained=False, use_ssld=False, **kwargs):
     Returns:
         model: nn.Layer. Specific `HRNet_W60_C` model depends on args.
     """
-    model = HRNet(width=60, **kwargs)
+    model = HRNet(
+        width=60, stages_pattern=MODEL_STAGES_PATTERN["HRNet"], **kwargs)
     _load_pretrained(pretrained, model, MODEL_URLS["HRNet_W60_C"], use_ssld)
     return model
 
@@ -622,7 +636,8 @@ def HRNet_W64_C(pretrained=False, use_ssld=False, **kwargs):
     Returns:
         model: nn.Layer. Specific `HRNet_W64_C` model depends on args.
     """
-    model = HRNet(width=64, **kwargs)
+    model = HRNet(
+        width=64, stages_pattern=MODEL_STAGES_PATTERN["HRNet"], **kwargs)
     _load_pretrained(pretrained, model, MODEL_URLS["HRNet_W64_C"], use_ssld)
     return model
 
@@ -637,7 +652,11 @@ def SE_HRNet_W18_C(pretrained=False, use_ssld=False, **kwargs):
     Returns:
         model: nn.Layer. Specific `SE_HRNet_W18_C` model depends on args.
     """
-    model = HRNet(width=18, has_se=True, **kwargs)
+    model = HRNet(
+        width=18,
+        stages_pattern=MODEL_STAGES_PATTERN["HRNet"],
+        has_se=True,
+        **kwargs)
     _load_pretrained(pretrained, model, MODEL_URLS["SE_HRNet_W18_C"], use_ssld)
     return model
 
@@ -652,7 +671,11 @@ def SE_HRNet_W30_C(pretrained=False, use_ssld=False, **kwargs):
     Returns:
         model: nn.Layer. Specific `SE_HRNet_W30_C` model depends on args.
     """
-    model = HRNet(width=30, has_se=True, **kwargs)
+    model = HRNet(
+        width=30,
+        stages_pattern=MODEL_STAGES_PATTERN["HRNet"],
+        has_se=True,
+        **kwargs)
     _load_pretrained(pretrained, model, MODEL_URLS["SE_HRNet_W30_C"], use_ssld)
     return model
 
@@ -667,7 +690,11 @@ def SE_HRNet_W32_C(pretrained=False, use_ssld=False, **kwargs):
     Returns:
         model: nn.Layer. Specific `SE_HRNet_W32_C` model depends on args.
     """
-    model = HRNet(width=32, has_se=True, **kwargs)
+    model = HRNet(
+        width=32,
+        stages_pattern=MODEL_STAGES_PATTERN["HRNet"],
+        has_se=True,
+        **kwargs)
     _load_pretrained(pretrained, model, MODEL_URLS["SE_HRNet_W32_C"], use_ssld)
     return model
 
@@ -682,7 +709,11 @@ def SE_HRNet_W40_C(pretrained=False, use_ssld=False, **kwargs):
     Returns:
         model: nn.Layer. Specific `SE_HRNet_W40_C` model depends on args.
     """
-    model = HRNet(width=40, has_se=True, **kwargs)
+    model = HRNet(
+        width=40,
+        stages_pattern=MODEL_STAGES_PATTERN["HRNet"],
+        has_se=True,
+        **kwargs)
     _load_pretrained(pretrained, model, MODEL_URLS["SE_HRNet_W40_C"], use_ssld)
     return model
 
@@ -697,7 +728,11 @@ def SE_HRNet_W44_C(pretrained=False, use_ssld=False, **kwargs):
     Returns:
         model: nn.Layer. Specific `SE_HRNet_W44_C` model depends on args.
     """
-    model = HRNet(width=44, has_se=True, **kwargs)
+    model = HRNet(
+        width=44,
+        stages_pattern=MODEL_STAGES_PATTERN["HRNet"],
+        has_se=True,
+        **kwargs)
     _load_pretrained(pretrained, model, MODEL_URLS["SE_HRNet_W44_C"], use_ssld)
     return model
 
@@ -712,7 +747,11 @@ def SE_HRNet_W48_C(pretrained=False, use_ssld=False, **kwargs):
     Returns:
         model: nn.Layer. Specific `SE_HRNet_W48_C` model depends on args.
     """
-    model = HRNet(width=48, has_se=True, **kwargs)
+    model = HRNet(
+        width=48,
+        stages_pattern=MODEL_STAGES_PATTERN["HRNet"],
+        has_se=True,
+        **kwargs)
     _load_pretrained(pretrained, model, MODEL_URLS["SE_HRNet_W48_C"], use_ssld)
     return model
 
@@ -727,7 +766,11 @@ def SE_HRNet_W60_C(pretrained=False, use_ssld=False, **kwargs):
     Returns:
         model: nn.Layer. Specific `SE_HRNet_W60_C` model depends on args.
     """
-    model = HRNet(width=60, has_se=True, **kwargs)
+    model = HRNet(
+        width=60,
+        stages_pattern=MODEL_STAGES_PATTERN["HRNet"],
+        has_se=True,
+        **kwargs)
     _load_pretrained(pretrained, model, MODEL_URLS["SE_HRNet_W60_C"], use_ssld)
     return model
 
@@ -742,6 +785,10 @@ def SE_HRNet_W64_C(pretrained=False, use_ssld=False, **kwargs):
     Returns:
         model: nn.Layer. Specific `SE_HRNet_W64_C` model depends on args.
     """
-    model = HRNet(width=64, has_se=True, **kwargs)
+    model = HRNet(
+        width=64,
+        stages_pattern=MODEL_STAGES_PATTERN["HRNet"],
+        has_se=True,
+        **kwargs)
     _load_pretrained(pretrained, model, MODEL_URLS["SE_HRNet_W64_C"], use_ssld)
     return model
