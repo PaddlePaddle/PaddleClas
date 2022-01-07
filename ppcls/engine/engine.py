@@ -211,6 +211,14 @@ class Engine(object):
             self.optimizer, self.lr_sch = build_optimizer(
                 self.config["Optimizer"], self.config["Global"]["epochs"],
                 len(self.train_dataloader), [self.model])
+        
+        # for amp training
+        if self.amp:
+            self.scaler = paddle.amp.GradScaler(
+                init_loss_scaling=self.scale_loss,
+                use_dynamic_loss_scaling=self.use_dynamic_loss_scaling)
+            if self.config['AMP']['use_pure_fp16'] is True:
+                self.model = paddle.amp.decorate(models=self.model, level='O2')
 
         # for distributed
         self.config["Global"][
