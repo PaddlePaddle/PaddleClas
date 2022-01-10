@@ -229,7 +229,7 @@ class Engine(object):
                 init_loss_scaling=self.scale_loss,
                 use_dynamic_loss_scaling=self.use_dynamic_loss_scaling)
             if self.config['AMP']['use_pure_fp16'] is True:
-                self.model = paddle.amp.decorate(models=self.model, level='O2')
+                self.model = paddle.amp.decorate(models=self.model, level='O2', save_dtype='float32')
 
         # for distributed
         self.config["Global"][
