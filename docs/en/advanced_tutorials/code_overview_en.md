@@ -2,8 +2,8 @@
 
 ## Catalogue
 
-- [Overview of Code and Content](#1)
-- [Training Module](#2)
+- [1. Overview of Code and Content](#1)
+- [2. Training Module](#2)
   - [2.1 Data](#2.1)
   - [2.2 Model Structure](#2.2)
   - [2.3 Loss Function](#2.3)
@@ -11,11 +11,11 @@
   - [2.5 Evaluation During Training](#2.5)
   - [2.6 Model Saving](#2.6)
   - [2.7 Model Pruning and Quantification](#2.7)
-- [Codes and Methods for Inference and Deployment](#3)
+- [3. Codes and Methods for Inference and Deployment](#3)
 
 
 <a name="1"></a>
-## 1 Overview of Code and Content
+## 1. Overview of Code and Content
 
 The main code and content structure of PaddleClas are as follows:
 
@@ -29,7 +29,7 @@ The main code and content structure of PaddleClas are as follows:
 
 
 <a name="2"></a>
-## 2 Training Module
+## 2. Training Module
 
 Modules of training deep learning model mainly contains data, model structure, loss function,
 strategies such as optimizer, learning rate decay, and weight decay strategy, etc., which are explained below.
@@ -287,7 +287,7 @@ and the algorithm is described in [Pruning and Quantification algorithms](model_
 
 
 <a name="3"></a>
-## 3 Codes and Methods for Inference and Deployment
+## 3. Codes and Methods for Inference and Deployment
 
 - If you wish to quantify the classification model offline, please refer to
 [Model Pruning and Quantification Tutorial](model_prune_quantization_en.md) for offline quantification.
