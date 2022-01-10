@@ -467,7 +467,7 @@ class Inception_V3(TheseusLayer):
                  stages_pattern,
                  class_num=1000,
                  return_patterns=None,
-                 stages_pattern=None):
+                 return_stages=None):
         super().__init__()
 
         self.inception_a_list = config["inception_a"]
@@ -547,7 +547,7 @@ def InceptionV3(pretrained=False, use_ssld=False, **kwargs):
                     if str, means the path of the pretrained model.
         use_ssld: bool=False. Whether using distillation pretrained model when pretrained=True.
     Returns:
-        model: nn.Layer. Specific `InceptionV3` model 
+        model: nn.Layer. Specific `InceptionV3` model
     """
     model = Inception_V3(
         NET_CONFIG,
