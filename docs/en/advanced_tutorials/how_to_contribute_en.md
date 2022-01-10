@@ -65,7 +65,7 @@ PaddleClas welcomes code contributions to the repo, and the basic process is det
 - Skip to the home page of [PaddleClas GitHub](https://github.com/PaddlePaddle/PaddleClas) and click the
 Fork button to generate a repository in your own directory, such as `https://github.com/USERNAME/PaddleClas`.
 
-![img](../../images/quick_start/community/001_fork.png)
+[](../../images/quick_start/community/001_fork.png)
 
 - Clone the remote repository to local
 
@@ -77,7 +77,7 @@ cd PaddleClas
 
 Obtain the address below
 
-![img](../../images/quick_start/community/002_clone.png)
+[](../../images/quick_start/community/002_clone.png)
 
 
 <a name="1.2.2"></a>
@@ -173,7 +173,7 @@ pre-commit
 
 Repeat the above steps until the pre-commit format check does not report an error, as shown below.
 
-![img](../../images/quick_start/community/003_precommit_pass.png)
+[](../../images/quick_start/community/003_precommit_pass.png)
 
 Run the following command to commit.
 
@@ -211,7 +211,7 @@ as shown in the following figure. In the description of the PR, fill out what th
 Next, wait for the review, and if any changes are required,
 update the corresponding branch in origin by referring to the above steps.
 
-[img](../../images/quick_start/community/004_create_pr.png)
+[](../../images/quick_start/community/004_create_pr.png)
 
 
 <a name="1.2.9"></a>
@@ -260,7 +260,6 @@ please adhere to the following conventions each time you commit code:
 1. Please pass the unit test in Travis-CI first.
 Otherwise, the submitted code may have problems and usually receive no official review.
 2. Before committing a Pull Request:
-3.
 Note the number of commits.
 
 Reason: If only one file is modified but more than a dozen commits are committed with a few changes for each,
