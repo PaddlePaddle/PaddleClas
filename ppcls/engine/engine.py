@@ -98,7 +98,7 @@ class Engine(object):
             paddle.__version__, self.device))
 
         # AMP training
-        self.amp = True if "AMP" in self.config else False
+        self.amp = True if "AMP" in self.config and self.mode == "train" else False
         if self.amp and self.config["AMP"] is not None:
             self.scale_loss = self.config["AMP"].get("scale_loss", 1.0)
             self.use_dynamic_loss_scaling = self.config["AMP"].get(
@@ -234,8 +234,11 @@ class Engine(object):
                 logger.warning(msg)
                 self.config['AMP']["level"] = "O1"
                 amp_level = "O1"
-            self.model = paddle.amp.decorate(
-                models=self.model, level=amp_level, save_dtype='float32')
+            self.model, self.optimizer = paddle.amp.decorate(
+                models=self.model,
+                optimizers=self.optimizer,
+                level=amp_level,
+                save_dtype='float32')
 
         # for distributed
         self.config["Global"][
