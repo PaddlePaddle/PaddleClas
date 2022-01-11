@@ -122,6 +122,7 @@ def stop_after(self, stop_layer_name: str) -> bool:
 以 `MobileNetV1` 网络为例，参数 `stop_layer_name` 为 `"blocks[0].depthwise_conv.conv"`，具体效果可以参考下方代码案例进行尝试。
 
 ```python
+# cd <root-path-to-PaddleClas> or pip install paddleclas to import paddleclas
 import paddleclas
 
 net = paddleclas.MobileNetV1()
@@ -166,6 +167,8 @@ def update_res(
 ```python
 import numpy as np
 import paddle
+
+# cd <root-path-to-PaddleClas> or pip install paddleclas to import paddleclas
 import paddleclas
 
 np_input = np.zeros((1, 3, 224, 224))
@@ -237,6 +240,8 @@ def upgrade_sublayer(self,
 
 ```python
 from paddle import nn
+
+# cd <root-path-to-PaddleClas> or pip install paddleclas to import paddleclas
 import paddleclas
 
 # 该函数必须有两个形参
