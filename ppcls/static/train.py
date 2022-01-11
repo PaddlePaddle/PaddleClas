@@ -158,7 +158,7 @@ def main(args):
     # load pretrained models or checkpoints
     init_model(global_config, train_prog, exe)
 
-    if 'AMP' in config and config.AMP.get("use_pure_fp16", False):
+    if 'AMP' in config and config.AMP.get("level", "O1") == "O2":
         optimizer.amp_init(
             device,
             scope=paddle.static.global_scope(),

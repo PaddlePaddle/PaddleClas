@@ -222,14 +222,20 @@ class Engine(object):
             self.optimizer, self.lr_sch = build_optimizer(
                 self.config["Optimizer"], self.config["Global"]["epochs"],
                 len(self.train_dataloader), [self.model])
-        
+
         # for amp training
         if self.amp:
             self.scaler = paddle.amp.GradScaler(
                 init_loss_scaling=self.scale_loss,
                 use_dynamic_loss_scaling=self.use_dynamic_loss_scaling)
-            if self.config['AMP']['use_pure_fp16'] is True:
-                self.model = paddle.amp.decorate(models=self.model, level='O2', save_dtype='float32')
+            amp_level = self.config['AMP'].get("level", "O1")
+            if amp_level not in ["O1", "O2"]:
+                msg = "[Parameter Error]: The optimize level of AMP only support 'O1' and 'O2'. The level has been set 'O1'."
+                logger.warning(msg)
+                self.config['AMP']["level"] = "O1"
+                amp_level = "O1"
+            self.model = paddle.amp.decorate(
+                models=self.model, level=amp_level, save_dtype='float32')
 
         # for distributed
         self.config["Global"][
