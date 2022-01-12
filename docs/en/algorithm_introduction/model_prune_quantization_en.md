@@ -20,15 +20,15 @@ The model quantization comprises two main parts, the quantization of the Weight 
 
 **PACT (PArameterized Clipping acTivation)** is a new quantization method that minimizes the loss of accuracy, or even achieves great accuracy by removing some outliers before the quantization of activation. The method was proposed when the author found that "the quantized activation differed significantly from the full accuracy results when the weight quantization is adopted". The author also found that the quantization of activation can cause a great error (as a result of RELU, the range of activation is infinite compared to the weight which is basically within 0 to 1), so the activation function **clipped RELU** was introduced. The clipping ceiling, i.e., $α$, is a learnable parameter, which ensures that each layer can learn a different quantization range through training and minimizes the rounding error caused by quantization. The schematic diagram of quantization is shown below. **PACT** solves the problem by continuously trimming the activation range so that the activation distribution is narrowed, thus reducing the quantization mapping loss. It can acquire a more reasonable quantization scale and cut the quantization loss by clipping the activation, thus reducing the outliers in the activation distribution.
 
-[![img](../../images/algorithm_introduction/quantization.jpg)](https://github.com/PaddlePaddle/PaddleClas/blob/develop/docs/images/algorithm_introduction/quantization.jpg)
+![img](../../images/algorithm_introduction/quantization.jpg)
 
 The quantization formula of **PACT** is as follows:
 
-[![img](../../images/algorithm_introduction/quantization_formula.png)](https://github.com/PaddlePaddle/PaddleClas/blob/develop/docs/images/algorithm_introduction/quantization_formula.png)
+![img](../../images/algorithm_introduction/quantization_formula.png)
 
 It is shown that PACT is about adopting the above quantization as a substitute for the *ReLU* function to clip the part greater than zero with a threshold of $a$. However, the above formula is further improved in *PaddleSlim* as follows:
 
-[![img](../../images/algorithm_introduction/quantization_formula_slim.png)](https://github.com/PaddlePaddle/PaddleClas/blob/develop/docs/images/algorithm_introduction/quantization_formula_slim.png)
+![img](../../images/algorithm_introduction/quantization_formula_slim.png)
 
 
 
@@ -47,6 +47,6 @@ Model pruning is an essential practice to reduce the model size and improve infe
 
 Based on this, **FPGM** takes advantage of the geometric center property of the filter. Since filters near the center can be expressed by others, they can be eliminated, thus avoiding the above two pruning conditions. As a result, the pruning is conducted in consideration of the redundancy of information instead of a small norm. The following figure shows how the **FPGM** differs from the previous method, see [paper](https://openaccess.thecvf.com/content_CVPR_2019/papers/He_Filter_Pruning_via_Geometric_Median_) for more details.
 
-[![img](../../images/algorithm_introduction/fpgm.png)](https://github.com/PaddlePaddle/PaddleClas/blob/develop/docs/images/algorithm_introduction/fpgm.png)
+![img](../../images/algorithm_introduction/fpgm.png)
 
 For specific algorithm parameters, please refer to [Introduction to Parameters](https://github.com/PaddlePaddle/PaddleSlim/blob/release/2.0.0/docs/zh_cn/api_cn/dygraph/pruners/fpgm_filter_pruner.rst#fpgmfilterpruner) in PaddleSlim.
