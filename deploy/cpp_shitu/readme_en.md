@@ -325,7 +325,7 @@ A `build` folder will be created in the current path after the compilation, whic
 
   At the same time, it should be noticed that a slight difference may occur during the pre-processing of the image due to the version of opencv, resulting in a minor discrepancy in python and c++ results, such as a few pixels for bbox, 3 decimal places for retrieval results, etc. But it has no impact on the final search label.
 
-  [![img](https://github.com/PaddlePaddle/PaddleClas/raw/develop/docs/images/quick_start/shitu_c++_result.png)](https://github.com/PaddlePaddle/PaddleClas/blob/develop/docs/images/quick_start/shitu_c++_result.png)
+  [![img](../../docs/images/quick_start/shitu_c++_result.png)](https://github.com/PaddlePaddle/PaddleClas/blob/develop/docs/images/quick_start/shitu_c++_result.png)
 
 <a name="4"></a>
 
