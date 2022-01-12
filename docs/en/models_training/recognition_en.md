@@ -22,9 +22,9 @@ Please first refer to the [Installation Guide](../installation/install_paddlecla
 
 - [1. Mainbody Detection](#1)
 - [2. Feature Model Training](#2)
-  - [2.1. Data Preparation](h#2.1)
+  - [2.1. Data Preparation](#2.1)
   - [2. 2 Single GPU-based Training and Evaluation](#2.2)
-    - [2.2.1 Model Training](#2.2.2)
+    - [2.2.1 Model Training](#2.2.1)
     - [2.2.2 Resume Training](#2.2.2)
     - [2.2.3 Model Evaluation](#2.2.3)
   - [2.3 Export Inference Model](#2.3)
