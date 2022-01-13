@@ -30,7 +30,7 @@ Two learning paradigms are adopted in Metric Learning:
 <a name="3.1"></a>
 ### 3.1 Classification based:
 
-This refers to methods based on classification labels. They learn the effective feature representation by classifying each sample into the correct category and require the participation of  the explicit labels of each sample in the Loss calculation during the learning process. Common algorithms include [L2-Softmax](https://arxiv.org/abs/1703.09507), [Large-margin Softmax](https://arxiv.org/abs/1612.02295), [Angular Softmax]( https://arxiv.org/pdf/1704.08063.pdf), [NormFace](https://arxiv.org/abs/1704.06369), [AM-Softmax](https://arxiv.org/abs/1801.05599), [CosFace](https://arxiv.org/abs/1801.09414), [ArcFace](https://arxiv.org/abs/1801.07698), etc. These methods are also called proxy-based, because what they optimize is essentially the similarity between a sample and a set of proxies.
+This refers to methods based on classification labels. They learn the effective feature representation by classifying each sample into the correct category and require the participation of  the explicit labels of each sample in the Loss calculation during the learning process. Common algorithms include [L2-Softmax](https://arxiv.org/abs/1703.09507), [Large-margin Softmax](https://arxiv.org/abs/1612.02295), [Angular Softmax](https://arxiv.org/pdf/1704.08063.pdf), [NormFace](https://arxiv.org/abs/1704.06369), [AM-Softmax](https://arxiv.org/abs/1801.05599), [CosFace](https://arxiv.org/abs/1801.09414), [ArcFace](https://arxiv.org/abs/1801.07698), etc. These methods are also called proxy-based, because what they optimize is essentially the similarity between a sample and a set of proxies.
 
 <a name="3.2"></a>
 ### 3.2 Pairwise based:

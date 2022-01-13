@@ -138,6 +138,8 @@ cd ../../
 
 For training and evaluation on a single GPU, the `tools/train.py` and `tools/eval.py` scripts are recommended.
 
+<a name="2.2.1"></a>  
+
 #### 2.2.1 Model Training
 
 Once you have prepared the configuration file, you can start training the image retrieval task in the following way. the method used by PaddleClas to train the image retrieval is metric learning, referring to [metric learning](#metric learning) for more explanations.
@@ -188,6 +190,8 @@ Loss:
 
 The final total Loss is a weighted sum of all Losses, where weight defines the weight of a particular Loss in the final total. If you want to replace other Losses, you can also change the Loss field in the configuration file, for the currently supported Losses please refer to [Loss](../../../ppcls/loss).
 
+<a name="2.2.2"></a>  
+
 #### 2.2.2 Resume Training
 
 If the training task is terminated for some reasons, it can be recovered by loading the checkpoints weights file and continue training:
@@ -225,6 +229,8 @@ There is no need to modify the configuration file, just set the `Global.checkpoi
       .
       .
   ```
+
+<a name="2.2.3"></a>  
 
 #### 2.2.3 Model Evaluation
 

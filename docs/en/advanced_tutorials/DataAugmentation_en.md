@@ -309,7 +309,7 @@ sh tools/train.sh
 
 * After the use of data augmentation, the model may tend to be underfitting. It is recommended to reduce `l2_decay` for better performance on validation set.
 
-* hyperparameters exist in almost all agmenatation methods. Here we provide hyperparameters for ImageNet1k dataset. User may need to finetune the hyperparameters on specified dataset. More training tricks can be referred to [**Tricks**](../../../zh_CN/models/Tricks.md).
+* hyperparameters exist in almost all agmenatation methods. Here we provide hyperparameters for ImageNet1k dataset. User may need to finetune the hyperparameters on specified dataset. More training tricks can be referred to [Tricks](../models_training/train_strategy_en.md).
 
 
 > If this document is helpful to you, welcome to star our project: [https://github.com/PaddlePaddle/PaddleClas](https://github.com/PaddlePaddle/PaddleClas)

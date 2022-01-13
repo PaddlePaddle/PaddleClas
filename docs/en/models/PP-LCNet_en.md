@@ -56,7 +56,7 @@ The SE module is a channel attention mechanism proposed by SENet, which can effe
 
 The option in the third row of the table was chosen for the location of the SE module in PP-LCNet.
 
-<a name="3.3 "></a>
+<a name="3.3"></a>
 ### 3.3 Larger Convolution Kernels
 
 In the paper of MixNet, the author analyzes the effect of convolutional kernel size on model performance and concludes that larger convolutional kernels within a certain range can improve the performance of the model, but beyond this range will be detrimental to the model’s performance. So the author forms MixConv with split-concat paradigm combined, which can improve the performance of the model but is not conducive to inference. We experimentally summarize the role of some larger convolutional kernels at different positions that are similar to those of the SE module, and find that larger convolutional kernels display more prominent roles in the middle and tail of the network. The following table shows the effect of the position of the 5x5 convolutional kernels on the accuracy：

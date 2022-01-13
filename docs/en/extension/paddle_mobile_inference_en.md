@@ -4,7 +4,7 @@
 
 [Paddle-Lite](https://github.com/PaddlePaddle/Paddle-Lite) is a set of lightweight inference engine which is fully functional, easy to use and then performs well. Lightweighting is reflected in the use of fewer bits to represent the weight and activation of the neural network, which can greatly reduce the size of the model, solve the problem of limited storage space of the mobile device, and the inference speed is better than other frameworks on the whole.
 
-In [PaddleClas](https://github.com/PaddlePaddle/PaddleClas), we uses Paddle-Lite to [evaluate the performance on the mobile device](../models/Mobile.md), in this section we uses the `MobileNetV1` model trained on the `ImageNet1k` dataset as an example to introduce how to use `Paddle-Lite` to evaluate the model speed on the mobile terminal (evaluated on SD855)
+In [PaddleClas](https://github.com/PaddlePaddle/PaddleClas), we uses Paddle-Lite to [evaluate the performance on the mobile device](../models/Mobile_en.md), in this section we uses the `MobileNetV1` model trained on the `ImageNet1k` dataset as an example to introduce how to use `Paddle-Lite` to evaluate the model speed on the mobile terminal (evaluated on SD855)
 
 ## Evaluation Steps
 
