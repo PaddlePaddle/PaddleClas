@@ -1,6 +1,6 @@
 # Multilabel classification quick start
 
-Based on the [NUS-WIDE-SCENE](https://lms.comp.nus.edu.sg/wp-content/uploads/2019/research/nuswide/NUS-WIDE.html) dataset which is a subset of NUS-WIDE dataset, you can experience multilabel of PaddleClas, include training, evaluation and prediction. Please refer to [Installation](install.md) to install at first.
+Based on the [NUS-WIDE-SCENE](https://lms.comp.nus.edu.sg/wp-content/uploads/2019/research/nuswide/NUS-WIDE.html) dataset which is a subset of NUS-WIDE dataset, you can experience multilabel of PaddleClas, include training, evaluation and prediction. Please refer to [Installation](../../installation/) to install at first.
 
 ## Preparation
 

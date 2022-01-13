@@ -11,6 +11,8 @@
 
 At present, **PaddleClas** requires **PaddlePaddle** version **>=2.0**. Docker is recomended to run Paddleclas, for more detailed information about docker and nvidia-docker, you can refer to the [tutorial](https://docs.docker.com/get-started/). If you do not want to use docker, you can skip section [2. (Recommended) Prepare a docker environment](#2), and go into section [3. Install PaddlePaddle using pip](#3).
 
+<a name="1"></a>
+
 ## 1. Environment requirements
 
 - python 3.x

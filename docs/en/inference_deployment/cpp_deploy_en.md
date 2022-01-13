@@ -26,8 +26,6 @@ This tutorial will introduce the detailed steps of deploying the PaddleClas clas
 - Linux, docker is recommended.
 - Windows, compilation based on `Visual Studio 2019 Community` is supported. In addition, you can refer to [How to use PaddleDetection to make a complete project](https://zhuanlan.zhihu.com/p/145446681) to compile by generating the `sln solution`.
 - This document mainly introduces the compilation and inference of PaddleClas using C++ in Linux environment.
-- If you need to use the Inference Library in Windows environment, please refer to [The compilation tutorial in Windows](./docs/windows_vs2019_build.md) for detailed information.
-
 
 <a name="1.1"></a>
 ### 1.1 Compile opencv
@@ -254,7 +252,7 @@ After executing the above commands, the dynamic link libraries (`libcls.so` and 
 <a name="3.1"></a>
 ### 3.1 Prepare the inference model
 
-* You can refer to [Model inference](../../tools/export_model.py)，export the inference model. After the model is exported, assuming it is placed in the `inference` directory, the directory structure is as follows.
+* You can refer to [Model inference](../../../tools/export_model.py)，export the inference model. After the model is exported, assuming it is placed in the `inference` directory, the directory structure is as follows.
 
 ```
 inference/

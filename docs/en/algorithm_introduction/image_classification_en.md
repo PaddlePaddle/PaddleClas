@@ -3,7 +3,7 @@
 - [1. Dataset Introduction](#1)
   - [1.1 ImageNet-1k](#1.1)
   - [1.2 CIFAR-10/CIFAR-100](#1.2)
-- [2. Image Classification Process](2)
+- [2. Image Classification Process](#2)
   - [2.1 Data and its Preprocessing](#2.1)
   - [2.2 Prepare the model](#2.2)
   - [2.3 Train the model](#2.3)

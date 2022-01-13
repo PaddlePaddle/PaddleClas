@@ -37,17 +37,17 @@ pip3 install dist/*
 
 <a name="2"></a>
 ## 2. Quick Start
-* Using the `ResNet50` model provided by PaddleClas, the following image(`'docs/images/whl/demo.jpg'`) as an example.
+* Using the `ResNet50` model provided by PaddleClas, the following image(`'docs/images/inference_deployment/whl_demo.jpg'`) as an example.
 
 <div align="center">
-<img src="../images/whl/demo.jpg"  width = "400" />
+<img src="../images/inference_deployment/whl_demo.jpg"  width = "400" />
 </div>
 
 * Python
 ```python
 from paddleclas import PaddleClas
 clas = PaddleClas(model_name='ResNet50')
-infer_imgs='docs/images/whl/demo.jpg'
+infer_imgs='docs/images/inference_deployment/whl_demo.jpg'
 result=clas.predict(infer_imgs)
 print(next(result))
 ```
@@ -61,12 +61,12 @@ print(next(result))
 
 * CLI
 ```bash
-paddleclas --model_name=ResNet50  --infer_imgs="docs/images/whl/demo.jpg"
+paddleclas --model_name=ResNet50  --infer_imgs="docs/images/inference_deployment/whl_demo.jpg"
 ```
 
 ```
 >>> result
-filename: docs/images/whl/demo.jpg, top-5, class_ids: [8, 7, 136, 80, 84], scores: [0.79368, 0.16329, 0.01853, 0.00959, 0.00239], label_names: ['hen', 'cock', 'European gallinule, Porphyrio porphyrio', 'black grouse', 'peacock']
+filename: docs/images/inference_deployment/whl_demo.jpg, top-5, class_ids: [8, 7, 136, 80, 84], scores: [0.79368, 0.16329, 0.01853, 0.00959, 0.00239], label_names: ['hen', 'cock', 'European gallinule, Porphyrio porphyrio', 'black grouse', 'peacock']
 Predict complete!
 ```
 
@@ -95,7 +95,7 @@ The following parameters can be specified in Command Line or used as parameters 
 * CLI:
 ```bash
 from paddleclas import PaddleClas, get_default_confg
-paddleclas --model_name=ViT_base_patch16_384 --infer_imgs='docs/images/whl/demo.jpg' --resize_short=384 --crop_size=384
+paddleclas --model_name=ViT_base_patch16_384 --infer_imgs='docs/images/inference_deployment/whl_demo.jpg' --resize_short=384 --crop_size=384
 ```
 
 * Python:
@@ -127,14 +127,14 @@ You can use the inference model provided by PaddleClas to predict, and only need
 ```python
 from paddleclas import PaddleClas
 clas = PaddleClas(model_name='ResNet50')
-infer_imgs = 'docs/images/whl/demo.jpg'
+infer_imgs = 'docs/images/inference_deployment/whl_demo.jpg'
 result=clas.predict(infer_imgs)
 print(next(result))
 ```
 
 * CLI
 ```bash
-paddleclas --model_name='ResNet50' --infer_imgs='docs/images/whl/demo.jpg'
+paddleclas --model_name='ResNet50' --infer_imgs='docs/images/inference_deployment/whl_demo.jpg'
 ```
 
 <a name="4.3"></a>
@@ -145,14 +145,14 @@ You can use the local model files trained by yourself to predict, and only need 
 ```python
 from paddleclas import PaddleClas
 clas = PaddleClas(inference_model_dir='./inference/')
-infer_imgs = 'docs/images/whl/demo.jpg'
+infer_imgs = 'docs/images/inference_deployment/whl_demo.jpg'
 result=clas.predict(infer_imgs)
 print(next(result))
 ```
 
 * CLI
 ```bash
-paddleclas --inference_model_dir='./inference/' --infer_imgs='docs/images/whl/demo.jpg'
+paddleclas --inference_model_dir='./inference/' --infer_imgs='docs/images/inference_deployment/whl_demo.jpg'
 ```
 
 <a name="4.4"></a>
@@ -182,26 +182,26 @@ You can predict the Internet image, only need to specify URL of Internet image b
 ```python
 from paddleclas import PaddleClas
 clas = PaddleClas(model_name='ResNet50')
-infer_imgs = 'https://raw.githubusercontent.com/paddlepaddle/paddleclas/release/2.2/docs/images/whl/demo.jpg'
+infer_imgs = 'https://raw.githubusercontent.com/paddlepaddle/paddleclas/release/2.2/docs/images/inference_deployment/whl_demo.jpg'
 result=clas.predict(infer_imgs)
 print(next(result))
 ```
 
 * CLI
 ```bash
-paddleclas --model_name='ResNet50' --infer_imgs='https://raw.githubusercontent.com/paddlepaddle/paddleclas/release/2.2/docs/images/whl/demo.jpg'
+paddleclas --model_name='ResNet50' --infer_imgs='https://raw.githubusercontent.com/paddlepaddle/paddleclas/release/2.2/docs/images/inference_deployment/whl_demo.jpg'
 ```
 
 <a name="4.6"></a>
 ### 4.6 Prediction of NumPy.array format image
-In Python code, you can predict the NumPy.array format image, only need to use the `infer_imgs` to transfer variable of image data. Note that the image data must be 3 channels.
+In Python code, you can predict the `NumPy.array` format image, only need to use the `infer_imgs` to transfer variable of image data. Note that the models in PaddleClas only support to predict 3 channels image data, and channels order is `RGB`.
 
 * python
 ```python
 import cv2
 from paddleclas import PaddleClas
 clas = PaddleClas(model_name='ResNet50')
-infer_imgs = cv2.imread("docs/images/whl/demo.jpg")
+infer_imgs = cv2.imread("docs/en/inference_deployment/whl_deploy_en.md")[:, :, ::-1]
 result=clas.predict(infer_imgs)
 print(next(result))
 ```
@@ -214,14 +214,14 @@ You can save the prediction result(s) as pre-label, only need to use `pre_label_
 ```python
 from paddleclas import PaddleClas
 clas = PaddleClas(model_name='ResNet50', save_dir='./output_pre_label/')
-infer_imgs = 'docs/images/whl/' # it can be infer_imgs folder path which contains all of images you want to predict.
+infer_imgs = 'docs/images/inference_deployment/whl_' # it can be infer_imgs folder path which contains all of images you want to predict.
 result=clas.predict(infer_imgs)
 print(next(result))
 ```
 
 * CLI
 ```bash
-paddleclas --model_name='ResNet50' --infer_imgs='docs/images/whl/' --save_dir='./output_pre_label/'
+paddleclas --model_name='ResNet50' --infer_imgs='docs/images/inference_deployment/whl_' --save_dir='./output_pre_label/'
 ```
 
 <a name="4.8"></a>
@@ -247,12 +247,12 @@ For example:
 ```python
 from paddleclas import PaddleClas
 clas = PaddleClas(model_name='ResNet50', class_id_map_file='./ppcls/utils/imagenet1k_label_list.txt')
-infer_imgs = 'docs/images/whl/demo.jpg'
+infer_imgs = 'docs/images/inference_deployment/whl_demo.jpg'
 result=clas.predict(infer_imgs)
 print(next(result))
 ```
 
 * CLI
 ```bash
-paddleclas --model_name='ResNet50' --infer_imgs='docs/images/whl/demo.jpg' --class_id_map_file='./ppcls/utils/imagenet1k_label_list.txt'
+paddleclas --model_name='ResNet50' --infer_imgs='docs/images/inference_deployment/whl_demo.jpg' --class_id_map_file='./ppcls/utils/imagenet1k_label_list.txt'
 ```
