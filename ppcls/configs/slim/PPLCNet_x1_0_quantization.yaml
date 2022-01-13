@@ -108,7 +108,7 @@ DataLoader:
       use_shared_memory: True
 
 Infer:
-  infer_imgs: docs/images/whl/demo.jpg
+  infer_imgs: docs/images/inference_deployment/whl_demo.jpg
   batch_size: 10
   transforms:
     - DecodeImage:

@@ -169,7 +169,7 @@ python3.7 tools/export.py \
 
 The exported model can be deployed directly using inference, please refer to [inference deployment](../inference_deployment/).
 
-You can also use PaddleLite's opt tool to convert the inference model to a mobile model for its mobile deployment. Please refer to [Mobile Model Deployment](../inference_deployment/paddle_lite_deploy_en.md ) for more details.
+You can also use PaddleLite's opt tool to convert the inference model to a mobile model for its mobile deployment. Please refer to [Mobile Model Deployment](../inference_deployment/paddle_lite_deploy_en.md) for more details.
 
 <a name="5"></a>
 

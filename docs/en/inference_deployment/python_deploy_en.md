@@ -139,4 +139,4 @@ python python/predict_rec.py -c configs/inference_rec.yaml  -o Global.use_gpu=Fa
 
 <a name="4"></a>
 ## 4. Concatenation of mainbody detection, feature extraction and vector search
- Please refer to [Quick Start of Recognition](./tutorials/quick_start_recognition_en.md)
+ Please refer to [Quick Start of Recognition](../quick_start/quick_start_recognition_en.md)
