@@ -237,7 +237,7 @@
 > >
 
 - Q: Why `TypeError: __init__() missing 1 required positional argument: 'sync_cycle'` is reported when using visualdl under python2？
-- A: Currently visualdl only supports running under python3 with a required version of 2.0 or higher. If visualdl is not the right version, you can install it as follows: `pip3 install visualdl -i https://mirror.baidu.com/pypi/ simple`
+- A: Currently visualdl only supports running under python3 with a required version of 2.0 or higher. If visualdl is not the right version, you can install it as follows: `pip3 install visualdl -i https://mirror.baidu.com/pypi/simple`
 
 > >
 
@@ -252,7 +252,7 @@
 > >
 
 - Q: How to train the model on windows or cpu?
-- A: You can refer to [Getting Started Tutorial](https://github.com/PaddlePaddle/PaddleClas/blob/release/2.3/docs/zh_CN/models_training/classification.md) for detailed tutorials on model training, evaluation and inference in Linux , Windows, CPU, and other environments.
+- A: You can refer to [Getting Started Tutorial](../models_training/classification_en.md) for detailed tutorials on model training, evaluation and inference in Linux , Windows, CPU, and other environments.
 
 > >
 
@@ -275,12 +275,12 @@ Loss:
 > >
 
 - Q: Why is `Error: Pass tensorrt_subgraph_pass has not been registered` reported  When using `deploy/python/predict_cls.py` for model prediction?
-- A: If you want to use TensorRT for model prediction and inference, you need to install or compile PaddlePaddle with TensorRT by yourself.  For Linux, Windows, macOS users, you can refer to [download inference library](https://paddleinference. paddlepaddle.org.cn/user_guides/download_lib.html). If there is no required version, you need to compile and install it locally, which is detailed in [source code compilation](https://paddleinference.paddlepaddle.org .cn/user_guides/source_compile.html).
+- A: If you want to use TensorRT for model prediction and inference, you need to install or compile PaddlePaddle with TensorRT by yourself.  For Linux, Windows, macOS users, you can refer to [download inference library](https://paddleinference.paddlepaddle.org.cn/user_guides/download_lib.html). If there is no required version, you need to compile and install it locally, which is detailed in [source code compilation](https://paddleinference.paddlepaddle.org.cn/user_guides/source_compile.html).
 
 > >
 
 - Q: How to train with Automatic Mixed Precision (AMP) during training?
-- A: You can refer to [ResNet50_fp16.yaml](https://github.com/PaddlePaddle/PaddleClas/blob/release/2.3/ppcls/configs/ImageNet/ResNet/ResNet50_fp16. yaml). Specifically, if you want your configuration file to support automatic mixed precision during model training, you can add the following information to the file.
+- A: You can refer to [ResNet50_fp16.yaml](../../../ppcls/configs/ImageNet/ResNet/ResNet50_fp16.yaml). Specifically, if you want your configuration file to support automatic mixed precision during model training, you can add the following information to the file.
 
 ```
 # mixed precision training

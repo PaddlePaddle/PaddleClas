@@ -79,9 +79,9 @@ Not really, increasing all the convolutional kernels in the network may not lead
 
 **A**：The process is as follows:
 
-- First, create a new model structure file under the folder ppcls/arch/backbone/model_zoo/, i.e. your own backbone. You can refer to resnet.py for model construction;
-- Then add your own backbone class in ppcls/arch/backbone/\__init__.py;
-- Next, configure the yaml file for training, here you can refer to ppcls/configs/ImageNet/ResNet/ResNet50.yaml;
+- First, create a new model structure file under the folder `ppcls/arch/backbone/model_zoo/`, i.e. your own backbone. You can refer to resnet.py for model construction;
+- Then add your own backbone class in `ppcls/arch/backbone/__init__.py`;
+- Next, configure the yaml file for training, here you can refer to `ppcls/configs/ImageNet/ResNet/ResNet50.yaml`;
 - Now you can start the training.
 
 ### Q2.2: How to transfer the existing models and weights to your own classification tasks?
@@ -96,7 +96,7 @@ Not really, increasing all the convolutional kernels in the network may not lead
 
 **A**:
 
-The default parameter of the configuration file under ppcls/configs/ImageNet/ in PaddleClas is the training parameter of ImageNet-1k, which is not suitable for all datasets, and the specific datasets need to be further debugged on this basis.
+The default parameter of the configuration file under `ppcls/configs/ImageNet/` in PaddleClas is the training parameter of ImageNet-1k, which is not suitable for all datasets, and the specific datasets need to be further debugged on this basis.
 
 ### Q2.4 The resolution varies for different models in PaddleClas, so what is the standard?
 

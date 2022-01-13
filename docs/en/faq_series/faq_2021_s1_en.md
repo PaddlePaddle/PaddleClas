@@ -41,7 +41,7 @@ This may be caused by the small shared memory in docker. When creating docker, t
 
 **A**：
 
-Based on ResNet50_vd, Baidu open-sourced its own large-scale classification pre-training model with 100,000 categories and 43 million images. The former is available for download at [download address](https://paddle-imagenet-models-name.bj.bcebos.com/ ResNet50_vd_10w_pretrained.tar), where it should be noted that the pre-training model does not provide the final FC layer parameters and thus cannot be used directly for inference; however, it can be used as a pre-training model to fine-tune it on your own dataset. It is verified that this pre-training model has a more significant accuracy gain of up to 30% on different datasets than the ResNet50_vd pre-training model based on the ImageNet1k dataset.
+Based on ResNet50_vd, Baidu open-sourced its own large-scale classification pre-training model with 100,000 categories and 43 million images. The former is available for download at [download address](https://paddle-imagenet-models-name.bj.bcebos.com/ResNet50_vd_10w_pretrained.tar), where it should be noted that the pre-training model does not provide the final FC layer parameters and thus cannot be used directly for inference; however, it can be used as a pre-training model to fine-tune it on your own dataset. It is verified that this pre-training model has a more significant accuracy gain of up to 30% on different datasets than the ResNet50_vd pre-training model based on the ImageNet1k dataset.
 
 ### Q1.5 How to accelerate when using C++ for inference deployment?
 
