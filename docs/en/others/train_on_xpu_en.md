@@ -75,12 +75,12 @@ python3.7 ppcls/static/train.py \
 
 ```
 python3.7 ppcls/static/train.py \
-    -c ppcls/configs/quick_start/VGG16_finetune_kunlun.yaml \
+    -c ppcls/configs/quick_start/kunlun/VGG16_finetune_kunlun.yaml \
     -o use_gpu=False \
     -o use_xpu=True \
     -o is_distributed=False
 python3.7 ppcls/static/train.py \
-    -c ppcls/configs/quick_start/VGG19_finetune_kunlun.yaml \
+    -c ppcls/configs/quick_start/kunlun/VGG19_finetune_kunlun.yaml \
     -o use_gpu=False \
     -o use_xpu=True \
     -o is_distributed=False
