@@ -53,7 +53,7 @@ w_t+1 = w_t - v_t+1
 
 Here `m` is the `momentum`, which is the weighted value of the cumulative momentum, generally taken as `0.9`. And when the value is less than `1`, the earlier the gradient is, the smaller the impact on the current. For example, when the momentum parameter `m` takes `0.9`, the weighted value of the gradient of `t-5` is `0.9 ^ 5 = 0.59049` at time `t`, while the value at time `t-2` is `0.9 ^ 2 = 0.81`. Therefore, it is intuitive that gradient information that is too "far away" is of little significance for the current reference, while "recent" historical gradient information matters more.
 
-[![img](https://github.com/PaddlePaddle/PaddleClas/raw/release/2.3/docs/images/faq/momentum.jpeg)](https://github.com/PaddlePaddle/PaddleClas/blob/release/2.3/docs/images/faq/momentum.jpeg)
+[](../../images/faq/momentum.jpeg)
 
 By introducing the concept of momentum, the effect of historical updates is taken into account in parameter updates, thus speeding up the convergence and improving the loss (cost, loss) oscillation caused by the `SGD` optimizer.
 
@@ -93,7 +93,7 @@ Among them, RandAngment provides a variety of random combinations of data augmen
 
 **A**：
 
-The training data is a randomly selected subset of publicly available datasets such as COCO, Object365, RPC, and LogoDet. We are currently introducing an ultra-lightweight mainbody detection model in version 2.3, which can be found in [Mainbody Detection](https://github.com/PaddlePaddle/PaddleClas/blob/release/2.3/docs/zh_CN/image_recognition_ pipeline/mainbody_detection.md#2-Model Selection).
+The training data is a randomly selected subset of publicly available datasets such as COCO, Object365, RPC, and LogoDet. We are currently introducing an ultra-lightweight mainbody detection model in version 2.3, which can be found in [Mainbody Detection](../../en/image_recognition_pipeline/mainbody_detection_en.md#2-model-selection).
 
 #### Q1.4.3: Is there any false detections in some scenarios with the current mainbody detection model?
 
@@ -109,7 +109,7 @@ The training data is a randomly selected subset of publicly available datasets s
 
 `circle loss` is a unified form of sample pair learning and classification learning, and `triplet loss` can be added if it is a classification learning.
 
-#### Q1.5.2 如果不是识别开源的四个方向的图片，该使用哪个识别模型？Which recognition model is better if not to recognize open source images in all four directions?
+#### Q1.5.2 Which recognition model is better if not to recognize open source images in all four directions?
 
 **A**：
 
@@ -196,8 +196,8 @@ PaddleClas saves/updates the following three types of models during training.
 
 **A**：
 
-- For `Mixup`, please refer to [Mixup](https://github.com/PaddlePaddle/PaddleClas/blob/release/2.3/ppcls/configs/ImageNet/DataAugment/ResNet50_ Mixup.yaml#L63-L65); and`Cuxmix`, please refer to [Cuxmix](https://github.com/PaddlePaddle/PaddleClas/blob/release/2.3/ppcls/configs/ImageNet/ DataAugment/ResNet50_Cutmix.yaml#L63-L65).
-- The training accuracy (Acc) metric cannot be calculated when using `Mixup` or `Cutmix` for training, so you need to remove the `Metric.Train.TopkAcc` field in the configuration file, please refer to [Metric.Train.TopkAcc](https://github.com/ PaddlePaddle/PaddleClas/blob/release/2.3/ppcls/configs/ImageNet/DataAugment/ResNet50_Cutmix.yaml#L125-L128).
+- For `Mixup`, please refer to [Mixup](../../../ppcls/configs/ImageNet/DataAugment/ResNet50_ Mixup.yaml#L63-L65); and`Cuxmix`, please refer to [Cuxmix](../../../ppcls/configs/ImageNet/DataAugment/ResNet50_Cutmix.yaml#L63-L65).
+- The training accuracy (Acc) metric cannot be calculated when using `Mixup` or `Cutmix` for training, so you need to remove the `Metric.Train.TopkAcc` field in the configuration file, please refer to [Metric.Train.TopkAcc](../../../ppcls/configs/ImageNet/DataAugment/ResNet50_Cutmix.yaml#L125-L128).
 
 #### Q2.1.9: What are the fields `Global.pretrain_model` and `Global.checkpoints` used for in the training configuration file yaml?
 
@@ -244,11 +244,11 @@ PaddleClas saves/updates the following three types of models during training.
 
 #### Q2.4.1: Why is `Illegal instruction` reported during the recognition inference?
 
-**A**：If you are using the release/2.2 branch, it is recommended to update it to the release/2.3 branch, where we replaced the Möbius search model with the faiss search module, as described in [Vector Search Tutorial](https://github.com/PaddlePaddle/ PaddleClas/blob/release/2.3/deploy/vector_search/README.md). If you still have problems, you can contact us in the WeChat group or raise an issue on GitHub.
+**A**：If you are using the release/2.2 branch, it is recommended to update it to the release/2.3 branch, where we replaced the Möbius search model with the faiss search module, as described in [Vector Search Tutorial](../image_recognition_pipeline/vector_search_en.md). If you still have problems, you can contact us in the WeChat group or raise an issue on GitHub.
 
 #### Q2.4.2: How can recognition models be fine-tuned to train on the basis of pre-trained models?
 
-**A**：The fine-tuning training of the recognition model is similar to that of the classification model. The recognition model can be loaded with a pre-trained model of the product, and the training process can be found in [recognition model training](https://github.com/PaddlePaddle/PaddleClas/blob/release/2.3/docs/zh_CN/ models_training/recognition.md), and we will continue to refine the documentation.
+**A**：The fine-tuning training of the recognition model is similar to that of the classification model. The recognition model can be loaded with a pre-trained model of the product, and the training process can be found in [recognition model training](../../models_training/recognition_en.md), and we will continue to refine the documentation.
 
 #### Q2.4.3: Why does it fail to run all mini-batches in each epoch when training metric learning?
 
@@ -268,13 +268,13 @@ PaddleClas saves/updates the following three types of models during training.
 
 #### Q2.5.2: Do I need to rebuild the index to add new base data?
 
-**A**：Starting from release/2.3 branch, we have replaced the Möbius search model with the faiss search module, which already supports the addition of base data without building the base library, as described in [Vector Search Tutorial](https://github.com/PaddlePaddle/PaddleClas/blob/ release/2.3/deploy/vector_search/README.md).
+**A**：Starting from release/2.3 branch, we have replaced the Möbius search model with the faiss search module, which already supports the addition of base data without building the base library, as described in [Vector Search Tutorial](../image_recognition_pipeline/vector_search_en.md).
 
 #### Q2.5.3: How to deal with the reported error clang: error: unsupported option '-fopenmp' when recompiling index.so in Mac?
 
 **A**：
 
-If you are using the release/2.2 branch, it is recommended to update it to the release/2.3 branch, where we replaced the Möbius search model with the faiss search module, as described in [Vector Search Tutorial](https://github.com/PaddlePaddle/ PaddleClas/blob/release/2.3/deploy/vector_search/README.md). If you still have problems, you can contact us in the user WeChat group or raise an issue on GitHub.
+If you are using the release/2.2 branch, it is recommended to update it to the release/2.3 branch, where we replaced the Möbius search model with the faiss search module, as described in [Vector Search Tutorial](../image_recognition_pipeline/vector_search_en.md). If you still have problems, you can contact us in the user WeChat group or raise an issue on GitHub.
 
 #### Q2.5.4: How to set the parameter `pq_size` when build searches the base library?
 
@@ -288,7 +288,7 @@ If you are using the release/2.2 branch, it is recommended to update it to the r
 
 #### Q2.6.1: How to add the parameter of a module that is enabled by hub serving?
 
-**A**：See [hub serving parameters](https://github.com/PaddlePaddle/PaddleClas/blob/release/2.3/deploy/hubserving/clas/params.py) for more details.
+**A**：See [hub serving parameters](../../../deploy/hubserving/clas/params.py) for more details.
 
 #### Q2.6.2: Why is the result not accurate enough when exporting the inference model for inference deployment?
 
@@ -327,13 +327,13 @@ pip install paddle2onnx
   - `params_filename`: this parameter is used to specify the path of the `.pdiparams` file under the parameter `model_dir`.
   - `save_file`: this parameter is used to specify the path to the directory where the converted model is saved.
 
-  For the conversion of a non-`combined` format inference model exported from a static diagram (usually containing the file `__model__` and multiple parameter files), and more parameter descriptions, please refer to the official documentation of [paddle2onnx](https://github.com/ PaddlePaddle/Paddle2ONNX/blob/develop/README_zh.md#Parameter options).
+  For the conversion of a non-`combined` format inference model exported from a static diagram (usually containing the file `__model__` and multiple parameter files), and more parameter descriptions, please refer to the official documentation of [paddle2onnx](https://github.com/PaddlePaddle/Paddle2ONNX/blob/develop/README.md#parameters).
 
 - Exporting ONNX format models directly from the model networking code.
 
   Take the model networking code of dynamic graphs as an example, the model class is a subclass that inherits from `paddle.nn.Layer` and the code is shown below:
 
-  ```
+  ```python
   import paddle
   from paddle.static import InputSpec
 
