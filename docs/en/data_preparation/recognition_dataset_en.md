@@ -6,18 +6,18 @@ This document elaborates on the dataset format adopted by PaddleClas for image r
 
 ## Catalogue
 
-- [1. Dataset Format](#1)
-- [2. Common Datasets for Image Recognition](#2)
+- [1.Dataset Format](#1)
+- [2.Common Datasets for Image Recognition](#2)
   - [2.1 General Datasets](#2.1)
-  - [2.2 Vertical Datasets](#2.2)
+  - [2.2 Vertical Class Datasets](#2.2)
     - [2.2.1 Animation Character Recognition](#2.2.1)
     - [2.2.2 Product Recognition](#2.2.2)
     - [2.2.3 Logo Recognition](#2.2.3)
     - [2.2.4 Vehicle Recognition](#2.2.4)
 
-<a name="1"></a>
 
-## 1. Dataset Format
+<a name="1"></a>
+## 1.Dataset Format
 
 The dataset for the vector search, unlike those for classification tasks, is divided into the following three parts:
 
@@ -27,7 +27,7 @@ The dataset for the vector search, unlike those for classification tasks, is div
 
 The above three datasets all adopt  `txt` files for assignment. Taking the `CUB_200_2011` dataset as an example, the `train_list.txt` of the train dataset has the following format：
 
-```shell
+```
 # Use "space" as the separator
 ...
 train/99/Ovenbird_0136_92859.jpg 99 2
@@ -38,7 +38,7 @@ train/99/Ovenbird_0128_93366.jpg 99 6
 
 The `test_list.txt` of the query dataset (both gallery dataset and query dataset in`CUB_200_2011`) has the following format：
 
-```shell
+```
 # Use "space" as the separator
 ...
 test/200/Common_Yellowthroat_0126_190407.jpg 200 1
@@ -55,14 +55,13 @@ Each row of data is separated by "space", and the three columns of data stand fo
 
 2. When the gallery dataset and query dataset are different, there is no need to add a unique id. Both `query_list.txt` and `gallery_list.txt` contain two columns, which are the path and label information of the training data. The dataset of yaml configuration file is ` ImageNetDataset`.
 
-<a name="2"></a>
 
-## 2. Common Datasets for Image Recognition
+<a name="2"></a>
+## 2.Common Datasets for Image Recognition
 
 Here we present a compilation of commonly used image recognition datasets, which is continuously updated and expects your supplement.
 
 <a name="2.1"></a>
-
 ### 2.1 General Datasets
 
 - SOP: The SOP dataset is a common product dataset in general recognition research and MetricLearning technology research, which contains 120,053 images of 22,634 products downloaded from eBay.com. There are 59,551 images of 11,318 in the training set and 60,502 images of 11,316 categories in the validation set.
@@ -79,12 +78,12 @@ Here we present a compilation of commonly used image recognition datasets, which
 
   Website： http://mmlab.ie.cuhk.edu.hk/projects/DeepFashion.html
 
-<a name="2.2"></a>
 
-### 2.2 Vertical Datasets
+<a name="2.2"></a>
+### 2.2 Vertical Class Datasets
+
 
 <a name="2.2.1"></a>
-
 #### 2.2.1 Animation Character Recognition
 
 - iCartoonFace: iCartoonFace, developed by iQiyi (an online video platform), is the world's largest manual labeled detection and recognition dataset for cartoon characters, which contains more than 5013 cartoon characters and 389,678 high-quality live images. Compared with other datasets, it boasts features of large scale, high quality, rich diversity, and challenging difficulty, making it one of the most commonly used datasets to study cartoon character recognition.
@@ -99,8 +98,8 @@ Here we present a compilation of commonly used image recognition datasets, which
 
   Website： http://cvit.iiit.ac.in/research/projects/cvit-projects/cartoonfaces
 
-<a name="2.2.2"></a>
 
+<a name="2.2.2"></a>
 #### 2.2.2 Product Recognition
 
 - AliProduct: The AliProduct dataset is the largest open source product dataset. As an SKU-level image classification dataset, it contains 50,000 categories and 3 million images, ranking the first in both aspects in the industry. This dataset covers a large number of household goods, food, etc. Due to its lack of manual annotation, the data is messy and unevenly distributed with many similar product images.
@@ -113,8 +112,8 @@ Here we present a compilation of commonly used image recognition datasets, which
 
 - DeepFashion-Inshop: The same as the common datasets In-shop Clothes.
 
-<a name="2.2.3"></a>
 
+<a name="2.2.3"></a>
 ### 2.2.3 Logo Recognition
 
 - Logo-2K+: Logo-2K+ is a dataset exclusively for logo image recognition, which contains 10 major categories, 2341 minor categories, and 167,140 images.
@@ -125,8 +124,8 @@ Here we present a compilation of commonly used image recognition datasets, which
 
   Website： https://cg.cs.tsinghua.edu.cn/traffic-sign/
 
-<a name="2.2.4"></a>
 
+<a name="2.2.4"></a>
 ### 2.2.4 Vehicle Recognition
 
 - CompCars: The images, 136,726 images of the whole car and 27,618 partial ones, are mainly from network and surveillance data. The network data contains 163 vehicle manufacturers and 1,716 vehicle models and includes the bounding box, viewing angle, and 5 attributes (maximum speed, displacement, number of doors, number of seats, and vehicle type). And the surveillance data comprises 50,000 front view images.
