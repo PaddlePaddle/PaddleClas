@@ -227,7 +227,7 @@ The final directory contains `inference/ppyolov2_r50vd_dcn_365e_coco`,  `inferen
 
 After exporting the model, the path of the detection model can be changed to the inference model path to complete the prediction task.
 
-Take product recognition as an example，you can modify the field `Global.det_inference_model_dir` in its config file [inference_product.yaml](../../../deploy/configs/inference_product.yaml) to the directory of exported inference model, and then finish the detection and recognition of the product with reference to  [Quick Start for Image Recognition](./quick_start/quick_start_recognition_en.md).
+Take product recognition as an example，you can modify the field `Global.det_inference_model_dir` in its config file [inference_product.yaml](../../../deploy/configs/inference_product.yaml) to the directory of exported inference model, and then finish the detection and recognition of the product with reference to  [Quick Start for Image Recognition](../quick_start/quick_start_recognition_en.md).
 
 ## FAQ
 

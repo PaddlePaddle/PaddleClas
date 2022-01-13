@@ -95,9 +95,9 @@ The exporting model command will generate the following three files:
 
 The inference model exported is used to deployment by using prediction engine. You can refer the following docs according to different deployment modes / platforms
 
-* [Python inference](./python_deploy.md)
-* [C++ inference](./cpp_deploy.md)(Only support classification)
-* [Python Whl inference](./whl_deploy.md)(Only support classification)
-* [PaddleHub Serving inference](./paddle_hub_serving_deploy.md)(Only support classification)
-* [PaddleServing inference](./paddle_serving_deploy.md)
-* [PaddleLite inference](./paddle_lite_deploy.md)(Only support classification)
+* [Python inference](./python_deploy_en.md)
+* [C++ inference](./cpp_deploy_en.md)(Only support classification)
+* [Python Whl inference](./whl_deploy_en.md)(Only support classification)
+* [PaddleHub Serving inference](./paddle_hub_serving_deploy_en.md)(Only support classification)
+* [PaddleServing inference](./paddle_serving_deploy_en.md)
+* [PaddleLite inference](./paddle_lite_deploy_en.md)(Only support classification)

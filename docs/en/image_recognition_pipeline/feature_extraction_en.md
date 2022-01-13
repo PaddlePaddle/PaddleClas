@@ -33,7 +33,7 @@ Functions of the above modules :
 <a name="3"></a>
 ## 3.General Recognition Models
 
-In PP-Shitu, we have [PP_LCNet_x2_5](../models/PP-LCNet.md) as the backbone network, Linear Layer for Neck, [ArcMargin](../../../ppcls/arch/gears/arcmargin.py) for Head, and CELoss for Loss. See the details in  [General Recognition_configuration files](../.././ppcls/configs/GeneralRecognition/). The involved training data covers the following seven public datasets:
+In PP-Shitu, we have [PP_LCNet_x2_5](../models/PP-LCNet.md) as the backbone network, Linear Layer for Neck, [ArcMargin](../../../ppcls/arch/gears/arcmargin.py) for Head, and CELoss for Loss. See the details in  [General Recognition_configuration files](../../../ppcls/configs/GeneralRecognition/). The involved training data covers the following seven public datasets:
 
 | Datasets     | Data Size | Class Number | Scenarios          | URL                                                          |
 | ------------ | --------- | ------------ | ------------------ | ------------------------------------------------------------ |

@@ -16,7 +16,7 @@
       - [2.2.4 GridMask](#2.2.4)
     - [2.3 Image mix](#2.3)
       - [2.3.1 Mixup](#2.3.1)
-      - [2.3.2 Cutmix](#3.2.2)
+      - [2.3.2 Cutmix](#2.3.2)
     
 <a name="1"></a>
 ## 1. Introduction to data augmentation

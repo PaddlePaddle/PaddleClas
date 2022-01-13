@@ -16,6 +16,9 @@ PaddleClas supports rapid service deployment through Paddlehub. At present, it s
 - [6. Send prediction requests](#6)
 - [7. User defined service module modification](#7)
 
+<a name="1"></a>
+## 1. Introduction
+
 HubServing service pack contains 3 files, the directory is as follows:  
 
 ```
@@ -45,7 +48,7 @@ Before installing the service module, you need to prepare the inference model an
 **Notice**:
 * The model file path can be viewed and modified in `PaddleClas/deploy/hubserving/clas/params.py`.
 * It should be noted that the prefix of model structure file and model parameters file must be `inference`.
-* More models provided by PaddleClas can be obtained from the [model library](../../docs/en/models/models_intro_en.md). You can also use models trained by yourself.
+* More models provided by PaddleClas can be obtained from the [model library](../models/models_intro_en.md). You can also use models trained by yourself.
 
 <a name="4"></a>
 ## 4. Install Service Module
@@ -230,4 +233,4 @@ Common parameters can be modified in params.py:
     'class_id_map_file':
     ```
 
-In order to avoid unnecessary delay and be able to predict in batch, the preprocessing (include resize, crop and other) is completed in the client, so modify [test_hubserving.py](../../deploy/hubserving/test_hubserving.py#L35-L52) if necessary.
+In order to avoid unnecessary delay and be able to predict in batch, the preprocessing (include resize, crop and other) is completed in the client, so modify [test_hubserving.py](../../../deploy/hubserving/test_hubserving.py#L35-L52) if necessary.

@@ -2,26 +2,26 @@
 
 This tutorial contains 3 parts: Environment Preparation, Image Recognition Experience, and Unknown Category Image Recognition Experience.
 
-If the image category already exists in the image index database, then you can take a reference to chapter [Image Recognition Experience](#image_recognition_experience)，to complete the progress of image recognition；If you wish to recognize unknow category image, which is not included in the index database，you can take a reference to chapter [Unknown Category Image Recognition Experience](#unkonw_category_image_recognition_experience)，to complete the process of creating an index to recognize it。
+If the image category already exists in the image index database, then you can take a reference to chapter [Image Recognition Experience](#2)，to complete the progress of image recognition；If you wish to recognize unknow category image, which is not included in the index database，you can take a reference to chapter [Unknown Category Image Recognition Experience](#3)，to complete the process of creating an index to recognize it。
 
 ## Catalogue
 
-* [1. Enviroment Preparation](#enviroment_preperation )
-* [2. Image Recognition Experience](#image_recognition_experience)
-  * [2.1 Download and Unzip the Inference Model and Demo Data](#download_and_unzip_the_inference_model_and_demo_data)
-  * [2.2 Product Recognition and Retrieval](#Product_recognition_and_retrival)
-    * [2.2.1 Single Image Recognition](#recognition_of_single_image)
-    * [2.2.2 Folder-based Batch Recognition](#folder_based_batch_recognition)
-* [3. Unknown Category Image Recognition Experience](#unkonw_category_image_recognition_experience)
+* [1. Enviroment Preparation](#1)
+* [2. Image Recognition Experience](#2)
+  * [2.1 Download and Unzip the Inference Model and Demo Data](#2.1)
+  * [2.2 Product Recognition and Retrieval](#2.2)
+    * [2.2.1 Single Image Recognition](#2.2.1)
+    * [2.2.2 Folder-based Batch Recognition](#2.2.2)
+* [3. Unknown Category Image Recognition Experience](#3)
   * [3.1 Prepare for the new images and labels](#3.1)
-  * [3.2 Build a new Index Library](#build_a_new_index_library)
-  * [3.3 Recognize the Unknown Category Images](#Image_differentiation_based_on_the_new_index_library)
+  * [3.2 Build a new Index Library](#3.2)
+  * [3.3 Recognize the Unknown Category Images](#3.3)
 
 
-<a name="enviroment_preparation"></a>
+<a name="1"></a>
 ## 1. Enviroment Preparation
 
-* Installation：Please take a reference to [Quick Installation ](./install_en.md)to configure the PaddleClas environment.
+* Installation：Please take a reference to [Quick Installation ](../installation/)to configure the PaddleClas environment.
 
 * Using the following command to enter Folder `deploy`. All content and commands in this section need to be run in folder `deploy`.
 
@@ -29,7 +29,7 @@ If the image category already exists in the image index database, then you can t
   cd deploy
   ```
 
-<a name="image_recognition_experience"></a>
+<a name="2"></a>
 ## 2. Image Recognition Experience
 
 The detection model with the recognition inference model for the 4 directions (Logo, Cartoon Face, Vehicle, Product), the address for downloading the test data and the address of the corresponding configuration file are as follows.
@@ -81,7 +81,7 @@ wget {Data download link} && tar -xf {Name of the tar archive}
 ```
 
 
-<a name="download_and_unzip_the_inference_model_and_demo_data"></a>
+<a name="2.1"></a>
 ### 2.1 Download and Unzip the Inference Model and Demo Data
 
 Take the product recognition as an example, download the detection model, recognition model and product recognition demo data with the following commands.
@@ -136,7 +136,7 @@ If you want to use the lightweight generic recognition model, you need to re-ext
 python3.7 python/build_gallery.py -c configs/build_product.yaml -o Global.rec_inference_model_dir=./models/general_PPLCNet_x2_5_lite_v1.0_infer
 ```
 
-<a name="Product_recognition_and_retrival"></a>
+<a name="2.2"></a>
 ### 2.2 Product Recognition and Retrieval
 
 Take the product recognition demo as an example to show the recognition and retrieval process (if you wish to try other scenarios of recognition and retrieval, replace the corresponding configuration file after downloading and unzipping the corresponding demo data and model to complete the prediction).
@@ -149,7 +149,7 @@ pip install faiss-cpu==1.7.1post2
 
 If error happens when using `import faiss`, please uninstall `faiss` and reinstall it, especially on `Windows`.
 
-<a name="recognition_of_single_image"></a>
+<a name="2.2.1"></a>
 
 #### 2.2.1 Single Image Recognition
 
@@ -187,7 +187,7 @@ The detection result is also saved in the folder `output`, for this image, the v
 </div>
 
 
-<a name="folder_based_batch_recognition"></a>
+<a name="2.2.2"></a>
 #### 2.2.2 Folder-based Batch Recognition
 
 If you want to predict the images in the folder, you can directly modify the `Global.infer_imgs` field in the configuration file, or you can also modify the corresponding configuration through the following `-o` parameter.
@@ -217,7 +217,7 @@ All the visualization results are also saved in folder `output`.
 Furthermore, the recognition inference model path can be changed by modifying the `Global.rec_inference_model_dir` field, and the path of the index to the index databass can be changed by modifying the `IndexProcess.index_dir` field.
 
 
-<a name="unkonw_category_image_recognition_experience"></a>
+<a name="3"></a>
 ## 3. Recognize Images of Unknown Category
 
 To recognize the image `./recognition_demo_data_v1.1/test_product/anmuxi.jpg`, run the command as follows:
@@ -268,7 +268,7 @@ gallery/anmuxi/006.jpg	Anmuxi Ambrosial Yogurt
 Each line can be splited into two fields. The first field denotes the relative image path, and the second field denotes its label. The `delimiter` is `tab` here.
 
 
-<a name="build_a_new_index_library"></a>
+<a name="3.2"></a>
 ### 3.2 Build a new Index Base Library
 
 Use the following command to build the index to accelerate the retrieval process after recognition.
@@ -280,8 +280,8 @@ python3.7 python/build_gallery.py -c configs/build_product.yaml -o IndexProcess.
 Finally, the new index information is stored in the folder`./recognition_demo_data_v1.1/gallery_product/index_update`. Use the new index database for the above index.
 
 
-<a name="Image_differentiation_based_on_the_new_index_library"></a>
-### 3.2 Recognize the Unknown Category Images
+<a name="3.3"></a>
+### 3.3 Recognize the Unknown Category Images
 
 To recognize the image `./recognition_demo_data_v1.1/test_product/anmuxi.jpg`, run the command as follows.
 

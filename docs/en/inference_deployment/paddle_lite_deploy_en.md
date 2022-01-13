@@ -4,7 +4,7 @@ This tutorial will introduce how to use [Paddle-Lite](https://github.com/PaddleP
 
 Paddle-Lite is a lightweight inference engine for PaddlePaddle. It provides efficient inference capabilities for mobile phones and IoTs,  and extensively integrates cross-platform hardware to provide lightweight deployment solutions for mobile-side deployment issues.
 
-If you only want to test speed, please refer to [The tutorial of Paddle-Lite mobile-side benchmark test](../../docs/zh_CN/extension/paddle_mobile_inference.md).
+If you only want to test speed, please refer to [The tutorial of Paddle-Lite mobile-side benchmark test](../extension/paddle_mobile_inference_en.md).
 
 ---
 
@@ -127,7 +127,7 @@ git checkout develop
 
 After the compilation is complete, the `opt` file is located under `build.opt/lite/api/`.
 
-`opt` tool is used in the same way as `paddle_lite_opt` , please refer to [4.1](#4.1).
+`opt` tool is used in the same way as `paddle_lite_opt` , please refer to [2.1.1](#2.1.1).
 
 <a name="2.1.3"></a>
 ### 2.1.3 Demo of get the optimized model
@@ -202,7 +202,7 @@ cp ../../../cxx/lib/libpaddle_light_api_shared.so ./debug/
 
 The `prepare.sh` take `PaddleClas/deploy/lite/imgs/tabby_cat.jpg` as the test image, and copy it to the `demo/cxx/clas/debug/` directory.
 
-You should put the model that optimized by `paddle_lite_opt` under the `demo/cxx/clas/debug/` directory. In this example, use `MobileNetV3_large_x1_0.nb` model file generated in [2.1.3](#4.3).
+You should put the model that optimized by `paddle_lite_opt` under the `demo/cxx/clas/debug/` directory. In this example, use `MobileNetV3_large_x1_0.nb` model file generated in [2.1.3](#2.1.3).
 
 The structure of the clas demo is as follows after the above command is completed:
 
