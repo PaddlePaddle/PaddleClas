@@ -11,3 +11,8 @@ _build/
 build/
 log/
 nohup.out
+.idea/inspectionProfiles/profiles_settings.xml
+.idea/modules.xml
+.idea/other.xml
+.idea/vcs.xml
+.idea/workspace.xml
