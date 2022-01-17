@@ -74,6 +74,8 @@ After the data is determined, the model often determines the upper limit of the 
 
 After preparing the data and model, you can start training the model and update the parameters of the model. After many iterations, a trained model can finally be obtained for image classification tasks. The training process of image classification requires a lot of experience and involves the setting of many hyperparameters. PaddleClas provides a series of [training tuning methods](./train_strategy_en.md), which can quickly help you obtain a high-precision model.
 
+PaddleClas support training with VisualDL to visualize the metric. VisualDL is a visualization analysis tool of PaddlePaddle, provides a variety of charts to show the trends of parameters, and visualizes model structures, data samples, histograms of tensors, PR curves , ROC curves and high-dimensional data distributions. It enables users to understand the training process and the model structure more clearly and intuitively so as to optimize models efficiently. For more information, please refer to [VisualDL](../others/VisualDL_en.md).
+
 <a name="2.4"></a>
 
 ### 2.4 Evaluation
