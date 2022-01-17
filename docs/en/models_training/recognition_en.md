@@ -138,6 +138,8 @@ cd ../../
 
 For training and evaluation on a single GPU, the `tools/train.py` and `tools/eval.py` scripts are recommended.
 
+PaddleClas support training with VisualDL to visualize the metric. VisualDL is a visualization analysis tool of PaddlePaddle, provides a variety of charts to show the trends of parameters, and visualizes model structures, data samples, histograms of tensors, PR curves , ROC curves and high-dimensional data distributions. It enables users to understand the training process and the model structure more clearly and intuitively so as to optimize models efficiently. For more information, please refer to [VisualDL](../others/VisualDL_en.md).
+
 <a name="2.2.1"></a>  
 
 #### 2.2.1 Model Training
