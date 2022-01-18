@@ -4,12 +4,17 @@
 .. toctree::
    :maxdepth: 2
 
-   competition_support.md
-   paddle_mobile_inference.md
-   feature_visiualization.md
-   VisualDL.md
-   versions.md
-   update_history.md
-   train_on_xpu.md
    transfer_learning.md
    train_with_DALI.md
+   VisualDL.md
+   train_on_xpu.md
+   feature_visiualization.md
+   paddle_mobile_inference.md
+   course_link.md
+   competition_support.md
+   update_history.md
+   versions.md
+   
+   
+   
+   

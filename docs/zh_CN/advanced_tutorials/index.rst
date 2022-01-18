@@ -4,8 +4,10 @@
 .. toctree::
    :maxdepth: 2
 
-   model_prune_quantization.md
-   knowledge_distillation.md
-   how_to_contribute.md
-   code_overview.md
    DataAugmentation.md
+   knowledge_distillation.md
+   model_prune_quantization.md
+   code_overview.md
+   how_to_contribute.md
+   
+   
