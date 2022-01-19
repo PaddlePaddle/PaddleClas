@@ -85,7 +85,8 @@ class Engine(object):
 
         # for visualdl
         self.vdl_writer = None
-        if self.config['Global']['use_visualdl'] and mode == "train":
+        if self.config['Global'][
+                'use_visualdl'] and mode == "train" and dist.get_rank() == 0:
             vdl_writer_path = os.path.join(self.output_dir, "vdl")
             if not os.path.exists(vdl_writer_path):
                 os.makedirs(vdl_writer_path)
