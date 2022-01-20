@@ -34,7 +34,7 @@ cd ..
 
 - 模型转换
 
-使用 Paddle2ONNX 将Paddle静态图模型转换为ONNX模型格式：
+使用 Paddle2ONNX 将 Paddle 静态图模型转换为 ONNX 模型格式：
 ```
 paddle2onnx --model_dir=./models/ResNet50_vd_infer/ \
 --model_filename=inference.pdmodel \
