@@ -11,7 +11,7 @@ python=$(func_parser_value "${lines[2]}")
 
 
 # parser params
-dataline=$(awk 'NR==1, NR==15{print}'  $FILENAME)
+dataline=$(awk 'NR==1, NR==14{print}'  $FILENAME)
 IFS=$'\n'
 lines=(${dataline})
 
@@ -39,8 +39,6 @@ inference_model_dir_key=$(func_parser_key "${lines[12]}")
 inference_model_dir_value=$(func_parser_value "${lines[12]}")
 inference_hardware_key=$(func_parser_key "${lines[13]}")
 inference_hardware_value=$(func_parser_value "${lines[13]}")
-inference_imgs_key=$(func_parser_key "${lines[14]}")
-inference_imgs_value=$(func_parser_value "${lines[14]}")
 
 LOG_PATH="./test_tipc/output"
 mkdir -p ./test_tipc/output
@@ -67,8 +65,7 @@ function func_paddle2onnx(){
     set_model_dir=$(func_set_params "${inference_model_dir_key}" "${inference_model_dir_value}")
     set_use_onnx=$(func_set_params "${use_onnx_key}" "${use_onnx_value}")
     set_hardware=$(func_set_params "${inference_hardware_key}" "${inference_hardware_value}")
-    set_infer_imgs=$(func_set_params "${inference_imgs_key}" "${inference_imgs_value}")
-    infer_model_cmd="cd deploy && ${python} ${inference_py} -o ${set_model_dir} -o ${set_use_onnx} -o ${set_hardware} -o ${set_infer_imgs} >${_save_log_path} 2>&1 && cd ../"
+    infer_model_cmd="cd deploy && ${python} ${inference_py} -o ${set_model_dir} -o ${set_use_onnx} -o ${set_hardware} >${_save_log_path} 2>&1 && cd ../"
     eval $infer_model_cmd
     status_check $last_status "${infer_model_cmd}" "${status_log}"
 }
