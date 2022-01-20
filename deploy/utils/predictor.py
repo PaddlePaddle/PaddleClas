@@ -28,8 +28,12 @@ class Predictor(object):
         if args.use_fp16 is True:
             assert args.use_tensorrt is True
         self.args = args
-        self.paddle_predictor, self.config = self.create_paddle_predictor(
-            args, inference_model_dir)
+        if self.args.get("use_onnx", False):
+            self.predictor, self.config = self.create_onnx_predictor(
+                args, inference_model_dir)
+        else:
+            self.predictor, self.config = self.create_paddle_predictor(
+                args, inference_model_dir)
 
     def predict(self, image):
         raise NotImplementedError
@@ -68,4 +72,21 @@ class Predictor(object):
         config.switch_use_feed_fetch_ops(False)
         predictor = create_predictor(config)
 
+        return predictor, config
+
+    def create_onnx_predictor(self, args, inference_model_dir=None):
+        import onnxruntime as ort
+        if inference_model_dir is None:
+            inference_model_dir = args.inference_model_dir
+        model_file = os.path.join(inference_model_dir, "inference.onnx")
+        config = ort.SessionOptions()
+        if args.use_gpu:
+            raise ValueError(
+                "onnx inference now only supports cpu! please specify use_gpu false."
+            )
+        else:
+            config.intra_op_num_threads = args.cpu_num_threads
+            if args.ir_optim:
+                config.graph_optimization_level = ort.GraphOptimizationLevel.ORT_ENABLE_ALL
+        predictor = ort.InferenceSession(model_file, sess_options=config)
         return predictor, config
