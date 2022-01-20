@@ -4,11 +4,7 @@
 
 ## 1. 环境准备
 
-需要准备 Paddle2ONNX 模型转化环境，和 ONNX 模型预测环境
-
-###  Paddle2ONNX
-
-Paddle2ONNX 支持将 PaddlePaddle 模型格式转化到 ONNX 模型格式，算子目前稳定支持导出 ONNX Opset 9~11，部分Paddle算子支持更低的ONNX Opset转换。
+需要准备 Paddle2ONNX 模型转化环境，和 ONNX 模型预测环境。Paddle2ONNX 支持将 PaddlePaddle 模型格式转化到 ONNX 模型格式，算子目前稳定支持导出 ONNX Opset 9~11，部分Paddle算子支持更低的ONNX Opset转换。
 更多细节可参考 [Paddle2ONNX](https://github.com/PaddlePaddle/Paddle2ONNX/blob/develop/README_zh.md)
 
 - 安装 Paddle2ONNX
