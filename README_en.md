@@ -8,7 +8,7 @@ PaddleClas is an image recognition toolset for industry and academia, helping us
 
 **Recent updates**
 
-- 2021.09.17 Add PP-LCNet series model developed by PaddleClas, these models show strong competitiveness on Intel CPUs. 
+- 2021.09.17 Add PP-LCNet series model developed by PaddleClas, these models show strong competitiveness on Intel CPUs.
 For the introduction of PP-LCNet, please refer to [paper](https://arxiv.org/pdf/2109.15099.pdf) or [PP-LCNet model introduction](docs/en/models/PP-LCNet_en.md). The metrics and pretrained model are available [here](docs/en/ImageNet_models_en.md).
 
 - 2021.06.29 Add Swin-transformer series model，Highest top1 acc on ImageNet1k dataset reaches 87.2%, training, evaluation and inference are all supported. Pretrained models can be downloaded [here](docs/en/models/models_intro_en.md).
@@ -41,7 +41,7 @@ Four sample solutions are provided, including product recognition, vehicle recog
 * You can also scan the QR code below to join the PaddleClas WeChat group to get more efficient answers to your questions and to communicate with developers from all walks of life. We look forward to hearing from you.
 
 <div align="center">
-<img src="./docs/images/wx_group.png"  width = "200" />
+<img src="https://user-images.githubusercontent.com/12560511/150500411-fdb27d17-0c50-4ac1-a484-fb4a9c2454b3.jpg"  width = "200" />
 </div>
 
 ## Quick Start
