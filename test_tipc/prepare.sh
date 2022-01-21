@@ -108,6 +108,11 @@ if [[ $FILENAME == *GeneralRecognition* ]];then
    exit 0
 fi
 
+if [[ $FILENAME == *use_dali* ]];then
+    python_name=$(func_parser_value "${lines[2]}")
+    ${python_name} -m pip install --extra-index-url https://developer.download.nvidia.com/compute/redist/nightly --upgrade nvidia-dali-nightly-cuda102
+fi
+
 if [ ${MODE} = "lite_train_lite_infer" ] || [ ${MODE} = "lite_train_whole_infer" ];then
     # pretrain lite train data
     cd dataset
