@@ -19,6 +19,7 @@
 #include <string>
 #include <utility>
 #include <vector>
+#include <stdlib.h>
 
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
@@ -58,7 +59,7 @@ class ObjectDetector {
     printf("before object detector\n");
     if(config["Global"]["det_model_path"].as<std::string>().empty()){
 	std::cout << "Please set [det_model_path] in config file" << std::endl;
-	return -1;
+	exit(-1);
     }
     LoadModel(config["Global"]["det_model_path"].as<std::string>(), cpu_threads);
     printf("create object detector\n"); }
@@ -68,7 +69,6 @@ class ObjectDetector {
 
   // Run predictor
   void Predict(const std::vector<cv::Mat>& imgs,
-               const double threshold = 0.5,
                const int warmup = 0,
                const int repeats = 1,
                std::vector<PPShiTu::ObjectResult>* result = nullptr,

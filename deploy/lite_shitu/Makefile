@@ -53,8 +53,8 @@ LOCAL_OBJS=$(patsubst %.cpp, %.o, $(patsubst %.cc, %.o, $(LOCAL_SRCS)))
 
 JSON_OBJS = json_reader.o json_value.o json_writer.o
 
-main: $(LOCAL_OBJS) $(JSON_OBJS) fetch_opencv
-	$(CC) $(SYSROOT_LINK) $(CXXFLAGS_LINK) $(LOCAL_OBJS) $(JSON_OBJS) -o main $(CXX_LIBS) $(LDFLAGS)
+pp_shitu: $(LOCAL_OBJS) $(JSON_OBJS) fetch_opencv
+	$(CC) $(SYSROOT_LINK) $(CXXFLAGS_LINK) $(LOCAL_OBJS) $(JSON_OBJS) -o pp_shitu $(CXX_LIBS) $(LDFLAGS)
 
 fetch_opencv:
 	@ test -d ${THIRD_PARTY_DIR} ||  mkdir ${THIRD_PARTY_DIR}
@@ -87,4 +87,4 @@ $(JSON_OBJS): %.o: ${THIRD_PARTY_DIR}/jsoncpp_code/%.cpp fetch_json_code
 .PHONY: clean fetch_opencv fetch_json_code
 clean:
 	rm -rf $(LOCAL_OBJS) $(JSON_OBJS)
-	rm -f main
+	rm -f pp_shitu
