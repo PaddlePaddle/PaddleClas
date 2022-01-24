@@ -16,6 +16,7 @@
 // https://github.com/RangiLyu/nanodet/blob/main/demo_mnn/nanodet_mnn.cpp
 
 #include "include/picodet_postprocess.h"
+#include <cmath>
 
 namespace PPShiTu {
 
