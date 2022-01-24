@@ -58,12 +58,16 @@ class RecPredictor(Predictor):
                 warmup=2)
 
     def predict(self, images, feature_normalize=True):
-        input_names = self.paddle_predictor.get_input_names()
-        input_tensor = self.paddle_predictor.get_input_handle(input_names[0])
+        use_onnx = self.args.get("use_onnx", False)
+        if not use_onnx:
+            input_names = self.predictor.get_input_names()
+            input_tensor = self.predictor.get_input_handle(input_names[0])
 
-        output_names = self.paddle_predictor.get_output_names()
-        output_tensor = self.paddle_predictor.get_output_handle(output_names[
-            0])
+            output_names = self.predictor.get_output_names()
+            output_tensor = self.predictor.get_output_handle(output_names[0])
+        else:
+            input_names = self.predictor.get_inputs()[0].name
+            output_names = self.predictor.get_outputs()[0].name
 
         if self.benchmark:
             self.auto_logger.times.start()
@@ -76,9 +80,15 @@ class RecPredictor(Predictor):
         if self.benchmark:
             self.auto_logger.times.stamp()
 
-        input_tensor.copy_from_cpu(image)
-        self.paddle_predictor.run()
-        batch_output = output_tensor.copy_to_cpu()
+        if not use_onnx:
+            input_tensor.copy_from_cpu(image)
+            self.predictor.run()
+            batch_output = output_tensor.copy_to_cpu()
+        else:
+            batch_output = self.predictor.run(
+                output_names=[output_names],
+                input_feed={input_names: image})[0]
+
         if self.benchmark:
             self.auto_logger.times.stamp()
 

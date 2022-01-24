@@ -170,3 +170,15 @@ if [ ${MODE} = "serving_infer" ];then
     cd ./deploy/paddleserving
     wget -nc https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/ResNet50_vd_infer.tar && tar xf ResNet50_vd_infer.tar
 fi
+
+if [ ${MODE} = "paddle2onnx_infer" ];then
+    # prepare paddle2onnx env
+    python_name=$(func_parser_value "${lines[2]}")
+    ${python_name} -m pip install install paddle2onnx
+    ${python_name} -m pip install onnxruntime
+
+    # wget model
+    cd deploy && mkdir models && cd models
+    wget -nc https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/ResNet50_vd_infer.tar  && tar xf ResNet50_vd_infer.tar
+    cd ../../
+fi
