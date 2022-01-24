@@ -16,7 +16,7 @@
 
 namespace PPShiTu {
 std::vector<RESULT> Recognition::RunRecModel(const cv::Mat &img,
-                                             double &const_time) {
+                                             double &cost_time) {
 
   // Read img
   cv::Mat resize_image = ResizeImage(img);
@@ -25,7 +25,7 @@ std::vector<RESULT> Recognition::RunRecModel(const cv::Mat &img,
   resize_image.convertTo(img_fp, CV_32FC3, scale);
 
   // Prepare input data from image
-  std::unique_ptr<Tensor> input_tensor(std::move(predictor->GetInput(0)));
+  std::unique_ptr<Tensor> input_tensor(std::move(this->predictor->GetInput(0)));
   input_tensor->Resize({1, 3, img_fp.rows, img_fp.cols});
   auto *data0 = input_tensor->mutable_data<float>();
 
@@ -34,11 +34,11 @@ std::vector<RESULT> Recognition::RunRecModel(const cv::Mat &img,
 
   auto start = std::chrono::system_clock::now();
   // Run predictor
-  predictor->Run();
+  this->predictor->Run();
 
   // Get output and post process
   std::unique_ptr<const Tensor> output_tensor(
-      std::move(predictor->GetOutput(0)));
+      std::move(this->predictor->GetOutput(0)));
   auto *output_data = output_tensor->data<float>();
   auto end = std::chrono::system_clock::now();
   auto duration =
@@ -59,7 +59,7 @@ std::vector<RESULT> Recognition::RunRecModel(const cv::Mat &img,
 
 void Recognition::NeonMeanScale(const float *din, float *dout, int size) {
 
-  if (mean.size() != 3 || scale.size() != 3) {
+  if (this->mean.size() != 3 || this->std.size() != 3) {
     std::cerr << "[ERROR] mean or scale size must equal to 3\n";
     exit(1);
   }
@@ -93,31 +93,31 @@ void Recognition::NeonMeanScale(const float *din, float *dout, int size) {
     dout_c2 += 4;
   }
   for (; i < size; i++) {
-    *(dout_c0++) = (*(din++) - mean[0]) * std[0];
-    *(dout_c1++) = (*(din++) - mean[1]) * std[1];
-    *(dout_c2++) = (*(din++) - mean[2]) * std[2];
+    *(dout_c0++) = (*(din++) - this->mean[0]) * this->std[0];
+    *(dout_c1++) = (*(din++) - this->mean[1]) * this->std[1];
+    *(dout_c2++) = (*(din++) - this->mean[2]) * this->std[2];
   }
 }
 
 cv::Mat Recognition::ResizeImage(const cv::Mat &img) {
   cv::Mat resize_img;
-  cv::resize(img, resize_img, cv::Size(size, size));
+  cv::resize(img, resize_img, cv::Size(this->size, this->size));
   return resize_img;
 }
 std::vector<RESULT> Recognition::PostProcess(const float *output_data,
                                              int output_size,
                                              cv::Mat &output_image) {
 
-  int max_indices[topk];
-  double max_scores[topk];
-  for (int i = 0; i < topk; i++) {
+  int max_indices[this->topk];
+  double max_scores[this->topk];
+  for (int i = 0; i < this->topk; i++) {
     max_indices[i] = 0;
     max_scores[i] = 0;
   }
   for (int i = 0; i < output_size; i++) {
     float score = output_data[i];
     int index = i;
-    for (int j = 0; j < topk; j++) {
+    for (int j = 0; j < this->topk; j++) {
       if (score > max_scores[j]) {
         index += max_indices[j];
         max_indices[j] = index - max_indices[j];
@@ -129,11 +129,11 @@ std::vector<RESULT> Recognition::PostProcess(const float *output_data,
     }
   }
 
-  std::vector<RESULT> results(topk);
+  std::vector<RESULT> results(this->topk);
   for (int i = 0; i < results.size(); i++) {
     results[i].class_name = "Unknown";
-    if (max_indices[i] >= 0 && max_indices[i] < label_list.size()) {
-      results[i].class_name = label_list[max_indices[i]];
+    if (max_indices[i] >= 0 && max_indices[i] < this->label_list.size()) {
+      results[i].class_name = this->label_list[max_indices[i]];
     }
     results[i].score = max_scores[i];
     results[i].class_id = max_indices[i];

@@ -20,6 +20,7 @@
 #include <iostream>
 #include <math.h>
 #include <opencv2/opencv.hpp>
+#include <stdlib.h>
 #include <sys/time.h>
 #include <vector>
 
@@ -37,24 +38,24 @@ struct RESULT {
 class Recognition {
 
 public:
-  void Recognition(const Json::Value &config_file) {
+  explicit Recognition(const Json::Value &config_file) {
     MobileConfig config;
     if (config_file["Global"]["rec_model_path"].as<std::string>().empty()) {
       std::cout << "Please set [rec_model_path] in config file" << std::endl;
-      return -1;
+      exit(-1);
     }
     config.set_model_from_file(
         config_file["Global"]["rec_model_path"].as<std::string>());
-    predictor = CreatePaddlePredictor<MobileConfig>(config);
+    this->predictor = CreatePaddlePredictor<MobileConfig>(config);
 
     if (config_file["Global"]["rec_label_path"].as<std::string>().empty()) {
       std::cout << "Please set [rec_label_path] in config file" << std::endl;
-      return -1;
+      exit(-1);
     }
     LoadLabel(config_file["Global"]["rec_label_path"].as<std::string>());
     SetPreProcessParam(config_file["RecPreProcess"]["transform_ops"]);
-    if (!config_file["Global"]["return_k"].as<int>().empty())
-      topk = config_file["Global"]["return_k"].as<int>();
+    if (!config_file["Global"].isMember("return_k"))
+      this->topk = config_file["Global"]["return_k"].as<int>();
   }
 
   void LoadLabel(std::string path) {
@@ -68,7 +69,7 @@ public:
       if (pos != std::string::npos) {
         line = line.substr(pos);
       }
-      label_list.push_back(line);
+      this->label_list.push_back(line);
     }
     file.clear();
     file.close();
@@ -78,33 +79,34 @@ public:
     for (const auto &item : config_file) {
       auto op_name = item["type"].as<std::string>();
       if (op_name == "ResizeImage") {
-        size = item["size"].as<int>();
+        this->size = item["size"].as<int>();
       } else if (op_name == "NormalizeImage") {
-        mean.clear();
-        std.clear();
+        this->mean.clear();
+        this->std.clear();
         for (auto tmp : item["mean"]) {
-          mean.emplace_back(tmp.as<float>());
+          this->mean.emplace_back(tmp.as<float>());
         }
         for (auto tmp : item["std"]) {
-          std.emplace_back(1 / tmp.as<float>());
+          this->std.emplace_back(1 / tmp.as<float>());
         }
-        scale = item["scale"].as<double>();
+        this->scale = item["scale"].as<double>();
       }
     }
-
-    std::vector<RESULT> RunRecModel(const cv::Mat &img, double &const_time);
-    std::vector<RESULT> PostProcess(const float *output_data, int output_size,
-                                    cv::Mat &output_image);
-    cv::Mat ResizeImage(const cv::Mat &img);
-    void NeonMeanScale(const float *din, float *dout, int size);
-
-  private:
-    std::shared_ptr<PaddlePredictor> predictor;
-    std::vector<std::string> label_list;
-    std::vector<float> mean = {0.485f, 0.456f, 0.406f};
-    std::vector<float> std = {1 / 0.229f, 1 / 0.224f, 1 / 0.225f};
-    double scale = 0.00392157;
-    float size = 224;
-    int topk = 5;
   }
-}
+
+  std::vector<RESULT> RunRecModel(const cv::Mat &img, double &cost_time);
+  std::vector<RESULT> PostProcess(const float *output_data, int output_size,
+                                  cv::Mat &output_image);
+  cv::Mat ResizeImage(const cv::Mat &img);
+  void NeonMeanScale(const float *din, float *dout, int size);
+
+private:
+  std::shared_ptr<PaddlePredictor> predictor;
+  std::vector<std::string> label_list;
+  std::vector<float> mean = {0.485f, 0.456f, 0.406f};
+  std::vector<float> std = {1 / 0.229f, 1 / 0.224f, 1 / 0.225f};
+  double scale = 0.00392157;
+  float size = 224;
+  int topk = 5;
+};
+} // namespace PPShiTu

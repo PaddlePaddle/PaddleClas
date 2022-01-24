@@ -146,12 +146,12 @@ void DetPredictImage(const std::vector<cv::Mat> &batch_imgs,
 void PrintResult(const std::string &image_path,
                  std::vector<PPShiTu::ObjectResult> &det_result,
                  std::vector<std::vector<PPShiTu::RESULT>> &rec_results) {
-  printf("%s:\n", img_path.c_str());
+  printf("%s:\n", image_path.c_str());
   for (int i = 0; i < det_result.size(); ++i) {
     printf("\tresult%d: bbox[%d, %d, %d, %d], score: %f, label: %s\n", i,
            det_result[i].rect[0], det_result[i].rect[1], det_result[i].rect[2],
-           det_result[t].rect[3], rec_results[i].score,
-           rec_results[i].class_name.c_str());
+           det_result[i].rect[3], rec_results[i][0].score,
+           rec_results[i][0].class_name.c_str());
   }
 }
 
@@ -207,7 +207,7 @@ int main(int argc, char **argv) {
   if (!RT_Config["Global"]["infer_imgs"].as<std::string>().empty() ||
       !RT_Config["Global"]["infer_imgs_dir"].as<std::string>().empty()) {
     std::vector<std::string> all_img_paths;
-    std::vector<cv::string> cv_all_img_paths;
+    std::vector<cv::String> cv_all_img_paths;
     if (!RT_Config["Global"]["infer_imgs"].as<std::string>().empty()) {
       all_img_paths.push_back(
           RT_Config["Global"]["infer_imgs"].as<std::string>());
@@ -224,7 +224,7 @@ int main(int argc, char **argv) {
       }
     }
     for (int i = 0; i < all_img_paths.size(); ++i) {
-      std::string img_path = img_files_list[idx];
+      std::string img_path = all_img_paths[i];
       cv::Mat srcimg = cv::imread(img_path, cv::IMREAD_COLOR);
       if (!srcimg.data) {
         std::cerr << "[ERROR] image read failed! image path: " << img_path
