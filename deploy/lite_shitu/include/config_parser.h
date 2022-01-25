@@ -60,7 +60,7 @@ class ConfigPaser {
     // Get label_list for visualization
     if (config["Global"].isMember("label_list")) {
       label_list_.clear();
-      for (auto item : config["label_list"]) {
+      for (auto item : config["Global"]["label_list"]) {
         label_list_.emplace_back(item.as<std::string>());
       }
     } else {

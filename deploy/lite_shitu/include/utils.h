@@ -14,13 +14,14 @@
 
 #pragma once
 
-#include <string>
-#include <vector>
-#include <memory>
-#include <utility>
-#include <ctime>
-#include <numeric>
 #include <algorithm>
+#include <ctime>
+#include <include/recognition.h>
+#include <memory>
+#include <numeric>
+#include <string>
+#include <utility>
+#include <vector>
 
 namespace PPShiTu {
 
@@ -32,8 +33,11 @@ struct ObjectResult {
   int class_id;
   // Confidence of detected object
   float confidence;
+
+  // RecModel result
+  std::vector<RESULT> rec_result;
 };
 
-void nms(std::vector<ObjectResult> &input_boxes, float nms_threshold);
+void nms(std::vector<ObjectResult> &input_boxes, float nms_threshold, bool rec_nms=false);
 
-}  // namespace PPShiTu
+} // namespace PPShiTu

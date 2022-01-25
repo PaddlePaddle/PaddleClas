@@ -73,17 +73,10 @@ void DetPredictImage(const std::vector<cv::Mat> &batch_imgs,
   std::vector<double> det_t = {0, 0, 0};
   int steps = ceil(float(batch_imgs.size()) / batch_size_det);
   for (int idx = 0; idx < steps; idx++) {
-    std::vector<cv::Mat> batch_imgs;
     int left_image_cnt = batch_imgs.size() - idx * batch_size_det;
     if (left_image_cnt > batch_size_det) {
       left_image_cnt = batch_size_det;
     }
-    /* for (int bs = 0; bs < left_image_cnt; bs++) { */
-    /* std::string image_file_path = all_img_paths.at(idx * batch_size_det +
-     * bs); */
-    /* cv::Mat im = cv::imread(image_file_path, 1); */
-    /* batch_imgs.insert(batch_imgs.end(), im); */
-    /* } */
     // Store all detected result
     std::vector<PPShiTu::ObjectResult> result;
     std::vector<int> bbox_num;
@@ -108,32 +101,7 @@ void DetPredictImage(const std::vector<cv::Mat> &batch_imgs,
         }
         detect_num += 1;
         im_result.push_back(item);
-        /* if (item.rect.size() > 6) { */
-        /*   is_rbox = true; */
-        /*   printf("class=%d confidence=%.4f rect=[%d %d %d %d %d %d %d %d]\n",
-         */
-        /*          item.class_id, */
-        /*          item.confidence, */
-        /*          item.rect[0], */
-        /*          item.rect[1], */
-        /*          item.rect[2], */
-        /*          item.rect[3], */
-        /*          item.rect[4], */
-        /*          item.rect[5], */
-        /*          item.rect[6], */
-        /*          item.rect[7]); */
-        /* } else { */
-        /*   printf("class=%d confidence=%.4f rect=[%d %d %d %d]\n", */
-        /*          item.class_id, */
-        /*          item.confidence, */
-        /*          item.rect[0], */
-        /*          item.rect[1], */
-        /*          item.rect[2], */
-        /*          item.rect[3]); */
-        /* } */
       }
-      /* std::cout << all_img_paths.at(idx * batch_size_det + i) */
-      /* << " The number of detected box: " << detect_num << std::endl; */
       item_start_idx = item_start_idx + bbox_num[i];
     }
 
@@ -144,14 +112,13 @@ void DetPredictImage(const std::vector<cv::Mat> &batch_imgs,
 }
 
 void PrintResult(const std::string &image_path,
-                 std::vector<PPShiTu::ObjectResult> &det_result,
-                 std::vector<std::vector<PPShiTu::RESULT>> &rec_results) {
+                 std::vector<PPShiTu::ObjectResult> &det_result) {
   printf("%s:\n", image_path.c_str());
   for (int i = 0; i < det_result.size(); ++i) {
     printf("\tresult%d: bbox[%d, %d, %d, %d], score: %f, label: %s\n", i,
            det_result[i].rect[0], det_result[i].rect[1], det_result[i].rect[2],
-           det_result[i].rect[3], rec_results[i][0].score,
-           rec_results[i][0].class_name.c_str());
+           det_result[i].rect[3], det_result[i].rec_result[0].score,
+           det_result[i].rec_result[0].class_name.c_str());
   }
 }
 
@@ -163,37 +130,33 @@ int main(int argc, char **argv) {
     return -1;
   }
   std::string config_path = argv[1];
-  std::string img_path = "";
+  std::string img_dir = "";
 
   if (argc >= 3) {
-    img_path = argv[2];
+    img_dir = argv[2];
   }
   // Parsing command-line
   PPShiTu::load_jsonf(config_path, RT_Config);
-  if (RT_Config["Global"]["det_inference_model_dir"]
-          .as<std::string>()
-          .empty()) {
-    std::cout << "Please set [det_inference_model_dir] in " << config_path
-              << std::endl;
+  if (RT_Config["Global"]["det_model_path"].as<std::string>().empty()) {
+    std::cout << "Please set [det_model_path] in " << config_path << std::endl;
     return -1;
   }
   if (RT_Config["Global"]["infer_imgs"].as<std::string>().empty() &&
-      img_path.empty()) {
+      img_dir.empty()) {
     std::cout << "Please set [infer_imgs] in " << config_path
               << " Or use command: <" << argv[0] << " [shitu_config]"
               << " [image_dir]>" << std::endl;
     return -1;
   }
-  if (!img_path.empty()) {
+  if (!img_dir.empty()) {
     std::cout << "Use image_dir in command line overide the path in config file"
               << std::endl;
-    RT_Config["Global"]["infer_imgs_dir"] = img_path;
+    RT_Config["Global"]["infer_imgs_dir"] = img_dir;
     RT_Config["Global"]["infer_imgs"] = "";
   }
   // Load model and create a object detector
   PPShiTu::ObjectDetector det(
-      RT_Config,
-      RT_Config["Global"]["det_inference_model_dir"].as<std::string>(),
+      RT_Config, RT_Config["Global"]["det_model_path"].as<std::string>(),
       RT_Config["Global"]["cpu_num_threads"].as<int>(),
       RT_Config["Global"]["batch_size"].as<int>());
   // create rec model
@@ -202,7 +165,6 @@ int main(int argc, char **argv) {
 
   std::vector<PPShiTu::ObjectResult> det_result;
   std::vector<cv::Mat> batch_imgs;
-  std::vector<std::vector<PPShiTu::RESULT>> rec_results;
   double rec_time;
   if (!RT_Config["Global"]["infer_imgs"].as<std::string>().empty() ||
       !RT_Config["Global"]["infer_imgs_dir"].as<std::string>().empty()) {
@@ -239,7 +201,7 @@ int main(int argc, char **argv) {
 
       // add the whole image for recognition to improve recall
       PPShiTu::ObjectResult result_whole_img = {
-          {0, 0, srcimg.cols - 1, srcimg.rows - 1}, 0, 1.0};
+          {0, 0, srcimg.cols, srcimg.rows}, 0, 1.0};
       det_result.push_back(result_whole_img);
 
       // get rec result
@@ -250,13 +212,14 @@ int main(int argc, char **argv) {
         cv::Mat crop_img = srcimg(rect);
         std::vector<PPShiTu::RESULT> result =
             rec.RunRecModel(crop_img, rec_time);
-        rec_results.push_back(result);
+        det_result[j].rec_result.assign(result.begin(), result.end());
       }
-      PrintResult(img_path, det_result, rec_results);
-
+      // rec nms
+      PPShiTu::nms(det_result,
+                   RT_Config["Global"]["rec_nms_thresold"].as<float>(), true);
+      PrintResult(img_path, det_result);
       batch_imgs.clear();
       det_result.clear();
-      rec_results.clear();
     }
   }
   return 0;

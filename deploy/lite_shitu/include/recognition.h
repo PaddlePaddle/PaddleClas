@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#pragma once
 #include "paddle_api.h" // NOLINT
 #include "json/json.h"
 #include <arm_neon.h>
@@ -54,8 +55,10 @@ public:
     }
     LoadLabel(config_file["Global"]["rec_label_path"].as<std::string>());
     SetPreProcessParam(config_file["RecPreProcess"]["transform_ops"]);
-    if (!config_file["Global"].isMember("return_k"))
+    if (!config_file["Global"].isMember("return_k")){
       this->topk = config_file["Global"]["return_k"].as<int>();
+    }
+    printf("rec model create!\n");
   }
 
   void LoadLabel(std::string path) {
