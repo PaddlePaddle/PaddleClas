@@ -68,7 +68,7 @@ Quick experience of image recognition：[Link](./docs/en/tutorials/quick_start_r
     - [Feature Learning](./docs/en/tutorials/getting_started_retrieval_en.md)
 - Inference Model Prediction
     - [Python Inference](./docs/en/inference.md)
-    - [C++ Inference](./deploy/cpp/readme_en.md)(only support classification for now, recognition coming soon)
+    - [C++ Classfication Inference](./deploy/cpp/readme_en.md)， [C++ PP-ShiTu Inference](deploy/cpp_shitu/readme_en.md)
 - Model Deploy (only support classification for now, recognition coming soon)
     - [Hub Serving Deployment](./deploy/hubserving/readme_en.md)
     - [Mobile Deployment](./deploy/lite/readme_en.md)
