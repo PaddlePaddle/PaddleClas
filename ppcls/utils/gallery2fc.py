@@ -53,6 +53,12 @@ class GalleryLayer(paddle.nn.Layer):
                 gallery_labels.append(line[1].strip())
         self.gallery_layer = paddle.nn.Linear(embedding_size, len(self.gallery_images), bias_attr=False)
         self.gallery_layer.skip_quant = True
+        output_label_str = ""
+        for i, label_i in enumerate(gallery_labels):
+            output_label_str += "{} {}\n".format(i, label_i)
+        output_path = configs["Global"]["save_inference_dir"] + "_label.txt"
+        with open(output_path, "w") as f:
+            f.write(output_label_str)
 
     def forward(self, x, label=None):
         x = paddle.nn.functional.normalize(x)
