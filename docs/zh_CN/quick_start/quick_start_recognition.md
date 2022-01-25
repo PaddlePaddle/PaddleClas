@@ -178,7 +178,7 @@ python3.7 python/predict_system.py -c configs/inference_general.yaml -o Global.u
 
 <div align="center">
 <img src="../../images/recognition/drink_data_demo/output/nongfu_spring.jpeg" width = "400" />
-<div align="center">
+</div>
 
 
 <a name="基于文件夹的批量识别"></a>
