@@ -16,14 +16,23 @@
 
 namespace PPShiTu {
 
-void nms(std::vector<ObjectResult> &input_boxes, float nms_threshold) {
-  std::sort(input_boxes.begin(),
-  input_boxes.end(), 
-  [](ObjectResult a, ObjectResult b) { return a.confidence > b.confidence; });
+void nms(std::vector<ObjectResult> &input_boxes, float nms_threshold,
+         bool rec_nms) {
+  if (!rec_nms) {
+    std::sort(input_boxes.begin(), input_boxes.end(),
+              [](ObjectResult a, ObjectResult b) {
+                return a.confidence > b.confidence;
+              });
+  } else {
+    std::sort(input_boxes.begin(), input_boxes.end(),
+              [](ObjectResult a, ObjectResult b) {
+                return a.rec_result[0].score > b.rec_result[0].score;
+              });
+  }
   std::vector<float> vArea(input_boxes.size());
   for (int i = 0; i < int(input_boxes.size()); ++i) {
-    vArea[i] = (input_boxes.at(i).rect[2] - input_boxes.at(i).rect[0] + 1) 
-            * (input_boxes.at(i).rect[3] - input_boxes.at(i).rect[1] + 1);
+    vArea[i] = (input_boxes.at(i).rect[2] - input_boxes.at(i).rect[0] + 1) *
+               (input_boxes.at(i).rect[3] - input_boxes.at(i).rect[1] + 1);
   }
   for (int i = 0; i < int(input_boxes.size()); ++i) {
     for (int j = i + 1; j < int(input_boxes.size());) {
@@ -36,14 +45,13 @@ void nms(std::vector<ObjectResult> &input_boxes, float nms_threshold) {
       float inter = w * h;
       float ovr = inter / (vArea[i] + vArea[j] - inter);
       if (ovr >= nms_threshold) {
-          input_boxes.erase(input_boxes.begin() + j);
-          vArea.erase(vArea.begin() + j);
-      }
-      else {
-          j++;
+        input_boxes.erase(input_boxes.begin() + j);
+        vArea.erase(vArea.begin() + j);
+      } else {
+        j++;
       }
     }
   }
 }
 
-}  // namespace PPShiTu
+} // namespace PPShiTu

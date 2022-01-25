@@ -38,7 +38,7 @@ std::vector<RESULT> Recognition::RunRecModel(const cv::Mat &img,
 
   // Get output and post process
   std::unique_ptr<const Tensor> output_tensor(
-      std::move(this->predictor->GetOutput(0)));
+      std::move(this->predictor->GetOutput(1)));
   auto *output_data = output_tensor->data<float>();
   auto end = std::chrono::system_clock::now();
   auto duration =

@@ -1,4 +1,4 @@
-# Paddle-Lite端侧部署
+# PP-ShiTu在Paddle-Lite端侧部署
 
 本教程将介绍基于[Paddle Lite](https://github.com/PaddlePaddle/Paddle-Lite) 在移动端部署PaddleDetection模型的详细步骤。
 
@@ -125,29 +125,70 @@ Paddle-Lite 提供了多种策略来自动优化原始的模型，其中包括�
 
 #### 2.1.3 转换示例
 
-下面以PaddleDetection中的 `PicoDet` 模型为例，介绍使用`paddle_lite_opt`完成预训练模型到inference模型，再到Paddle-Lite优化模型的转换。
+下面介绍使用`paddle_lite_opt`完成主体检测模型和识别模型的预训练模型，转成inference模型，最终转换成Paddle-Lite的优化模型的过程。
+
+##### 2.1.3.1 转换主体检测模型
 
 ```shell
+# 当前目录为 $PaddleClas/deploy/lite_shitu
+# $code_path需替换成相应的运行目录,可以根据需要，将$code_path设置成需要的目录
+export $code_path=~
+cd $code_path
+git clone https://github.com/PaddlePaddle/PaddleDetection.git
 # 进入PaddleDetection根目录
-cd PaddleDetection_root_path
+cd PaddleDetection
 
 # 将预训练模型导出为inference模型
-python tools/export_model.py -c configs/picodet/picodet_s_320_coco.yml \
-              -o weights=https://paddledet.bj.bcebos.com/models/picodet_s_320_coco.pdparams --output_dir=output_inference
+python tools/export_model.py -c configs/picodet/application/mainbody_detection/picodet_lcnet_x2_5_640_mainbody.yml -o weights=https://paddledet.bj.bcebos.com/models/picodet_lcnet_x2_5_640_mainbody.pdparams  --output_dir=inference
 
 # 将inference模型转化为Paddle-Lite优化模型
-# FP32
-paddle_lite_opt  --valid_targets=arm --model_file=output_inference/picodet_s_320_coco/model.pdmodel --param_file=output_inference/picodet_s_320_coco/model.pdiparams --optimize_out=output_inference/picodet_s_320_coco/model
-# FP16
-paddle_lite_opt  --valid_targets=arm --model_file=output_inference/picodet_s_320_coco/model.pdmodel --param_file=output_inference/picodet_s_320_coco/model.pdiparams --optimize_out=output_inference/picodet_s_320_coco/model --enable_fp16=true
+paddle_lite_opt --model_file=inference/picodet_lcnet_x2_5_640_mainbody/model.pdmodel --param_file=inference/picodet_lcnet_x2_5_640_mainbody/model.pdiparams --optimize_out=inference/picodet_lcnet_x2_5_640_mainbody/mainbody_det
 
-# 将inference模型配置转化为json格式
-python deploy/lite/convert_yml_to_json.py output_inference/picodet_s_320_coco/infer_cfg.yml
+# 将转好的模型复制到lite_shitu目录下
+cd $PaddleClas/deploy/lite_shitu
+mkdir models
+cp $code_path/PaddleDetection/inference/picodet_lcnet_x2_5_640_mainbody/mainbody_det.nb $PaddleClas/deploy/lite_shitu/models
 ```
 
-最终在output_inference/picodet_s_320_coco/文件夹下生成`model.nb` 和 `infer_cfg.json`的文件。
+##### 2.1.3.2 转换识别模型
+
+```shell
+# 转换inference model
+待补充,生成的inference model存储在PaddleClas/inference下，同时生成label.txt，也存在此文件夹下
+
+# 转换为Paddle-Lite模型
+paddle_lite_opt --model_file=inference/inference.pdmodel --param_file=inference/inference.pdiparams --optimize_out=inference/rec
+
+# 将模型、label文件拷贝到lite_shitu下
+cp inference/rec.nb deploy/lite_shitu/models/
+cp inference/label.txt deploy/lite_shitu/models/
+cd deploy/lite_shitu
+```
 
 **注意**：`--optimize_out` 参数为优化后模型的保存路径，无需加后缀`.nb`；`--model_file` 参数为模型结构信息文件的路径，`--param_file` 参数为模型权重信息文件的路径，请注意文件名。
+
+##### 2.1.3.3 准备测试图像
+
+```shell
+mkdir images
+# 根据需要准备测试图像，可以在images文件夹中存放多张图像
+cp ../images/wangzai.jpg images/
+```
+
+
+
+##### 2.1.3.4 将yaml文件转换成json文件
+
+```shell
+# 如果测试单张图像
+python generate_json_config.py --det_model_path models/mainbody_det.nb  --rec_model_path models/rec.nb --rec_label_path models/label.txt --img_path images/wangzai.jpg
+# or
+# 如果测试多张图像
+python generate_json_config.py --det_model_path models/mainbody_det.nb  --rec_model_path models/rec.nb --rec_label_path models/label.txt --img_dir images
+
+# 执行完成后，会在lit_shitu下生成shitu_config.json配置文件
+
+```
 
 ### 2.2 与手机联调
 
@@ -183,41 +224,28 @@ List of devices attached
 4. 编译lite部署代码生成移动端可执行文件
 
 ```shell
-cd {PadddleDetection_Root}
-cd deploy/lite/
+cd $PaddleClas/deploy/lite_shitu
 
 inference_lite_path=/{lite prediction library path}/inference_lite_lib.android.armv8.gcc.c++_static.with_extra.with_cv/
-mkdir $inference_lite_path/demo/cxx/lite
+mkdir $inference_lite_path/demo/cxx/ppshitu_lite
 
-cp -r Makefile src/ include/ *runtime_config.json $inference_lite_path/demo/cxx/lite
+cp -r Makefile src/ include/ *.json models/ images/ $inference_lite_path/demo/cxx/ppshitu_lite
 
-cd $inference_lite_path/demo/cxx/lite
+cd $inference_lite_path/demo/cxx/ppshitu_lite
 
 # 执行编译，等待完成后得到可执行文件main
 make ARM_ABI=arm8
 #如果是arm7，则执行 make ARM_ABI = arm7 (或者在Makefile中修改该项)
-
 ```
 
 5. 准备优化后的模型、预测库文件、测试图像。
 
 ```shell
 mkdir deploy
-cp main *runtime_config.json deploy/
+mv models deploy/
+mv images deploy/
+cp pp_shitu deploy/
 cd deploy
-mkdir model_det
-mkdir model_keypoint
-
-# 将优化后的模型、预测库文件、测试图像放置在预测库中的demo/cxx/detection文件夹下
-cp {PadddleDetection_Root}/output_inference/picodet_s_320_coco/model.nb ./model_det/
-cp {PadddleDetection_Root}/output_inference/picodet_s_320_coco/infer_cfg.json ./model_det/
-
-# 如果需要关键点模型，则只需操作：
-cp {PadddleDetection_Root}/output_inference/hrnet_w32_256x192/model.nb ./model_keypoint/
-cp {PadddleDetection_Root}/output_inference/hrnet_w32_256x192/infer_cfg.json ./model_keypoint/
-
-# 将测试图像复制到deploy文件夹中
-cp [your_test_img].jpg ./demo.jpg
 
 # 将C++预测动态库so文件复制到deploy文件夹中
 cp ../../../cxx/lib/libpaddle_light_api_shared.so ./
@@ -227,45 +255,19 @@ cp ../../../cxx/lib/libpaddle_light_api_shared.so ./
 
 ```
 deploy/
-|-- model_det/
-|   |--model.nb                    优化后的检测模型文件
-|   |--infer_cfg.json              检测器模型配置文件
-|-- model_keypoint/
-|   |--model.nb                    优化后的关键点模型文件
-|   |--infer_cfg.json              关键点模型配置文件
-|-- main                           生成的移动端执行文件
-|-- det_runtime_config.json        目标检测执行时参数配置文件
-|-- keypoint_runtime_config.json   关键点检测执行时参数配置文件
+|-- models/
+|   |--mainbody_det.nb             优化后的主体检测模型文件
+|   |--rec.nb             				 优化后的识别模型文件
+|   |--label.txt                   识别模型的label文件
+|-- images/
+|   ...                            图片文件
+|-- pp_shitu                       生成的移动端执行文件
+|-- shitu_config.json              执行时参数配置文件
 |-- libpaddle_light_api_shared.so  Paddle-Lite库文件
 ```
 
 **注意：**
-*  `det_runtime_config.json` 包含了目标检测的超参数，请按需进行修改：
-
-```shell
-{
-  "model_dir_det": "./model_det/",              #检测器模型路径
-  "batch_size_det": 1,                          #检测预测时batchsize
-  "threshold_det": 0.5,                         #检测器输出阈值
-  "image_file": "demo.jpg",                     #测试图片
-  "image_dir": "",                              #测试图片文件夹
-  "run_benchmark": true,                       #性能测试开关
-  "cpu_threads": 4                              #线程数
-}
-```
-
-*  `keypoint_runtime_config.json` 包含了关键点检测的超参数，请按需进行修改：
-```shell
-{
-  "model_dir_keypoint": "./model_keypoint/",    #关键点模型路径（不使用需为空字符）
-  "batch_size_keypoint": 8,                     #关键点预测时batchsize
-  "threshold_keypoint": 0.5,                    #关键点输出阈值
-  "image_file": "demo.jpg",                     #测试图片
-  "image_dir": "",                              #测试图片文件夹
-  "run_benchmark": true,                       #性能测试开关
-  "cpu_threads": 4                              #线程数
-}
-```
+*  `shitu_config.json` 包含了目标检测的超参数，请按需进行修改
 
 6. 启动调试，上述步骤完成后就可以使用ADB将文件夹 `deploy/` push到手机上运行，步骤如下：
 
@@ -278,23 +280,20 @@ cd /data/local/tmp/deploy
 export LD_LIBRARY_PATH=/data/local/tmp/deploy:$LD_LIBRARY_PATH
 
 # 修改权限为可执行
-chmod 777 main
-# 以检测为例，执行程序
-./main det_runtime_config.json
+chmod 777 pp_shitu
+# 执行程序
+./pp_shitu shitu_config.json
 ```
 
 如果对代码做了修改，则需要重新编译并push到手机上。
 
 运行效果如下：
 
-<div align="center">
-    <img src="../../docs/images/lite_demo.jpg" width="600">
-</div>
-
+![](../../docs/images/ppshitu_lite_demo.png)
 
 ## FAQ
-Q1：如果想更换模型怎么办，需要重新按照流程走一遍吗？  
+Q1：如果想更换模型怎么办，需要重新按照流程走一遍吗？
 A1：如果已经走通了上述步骤，更换模型只需要替换 `.nb` 模型文件即可，同时要注意修改下配置文件中的 `.nb` 文件路径以及类别映射文件（如有必要）。
 
-Q2：换一个图测试怎么做？  
-A2：替换 deploy 下的测试图像为你想要测试的图像，使用 ADB 再次 push 到手机上即可。
+Q2：换一个图测试怎么做？
+A2：替换 deploy 下的测试图像为你想要测试的图像，并重新生成json配置文件（或者直接修改图像路径），使用 ADB 再次 push 到手机上即可。

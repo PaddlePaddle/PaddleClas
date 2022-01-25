@@ -127,11 +127,11 @@ void TopDownEvalAffine::Run(cv::Mat* im, ImageBlob* data) {
 
 // Preprocessor op running order
 const std::vector<std::string> Preprocessor::RUN_ORDER = {"InitInfo",
-                                                          "TopDownEvalAffine",
-                                                          "Resize",
-                                                          "NormalizeImage",
-                                                          "PadStride",
-                                                          "Permute"};
+                                                          "DetTopDownEvalAffine",
+                                                          "DetResize",
+                                                          "DetNormalizeImage",
+                                                          "DetPadStride",
+                                                          "DetPermute"};
 
 void Preprocessor::Run(cv::Mat* im, ImageBlob* data) {
   for (const auto& name : RUN_ORDER) {
