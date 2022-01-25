@@ -71,7 +71,7 @@ PP-ShiTu图像识别快速体验：[点击这里](./docs/zh_CN/quick_start/quick
     - [模型导出](./docs/zh_CN/inference_deployment/export_model.md)
     - Python/C++ 预测引擎
       - [基于Python预测引擎预测推理](./docs/zh_CN/inference_deployment/python_deploy.md)
-      - [基于C++预测引擎预测推理](./docs/zh_CN/inference_deployment/cpp_deploy.md)(当前只支持图像分类任务，图像识别更新中)
+      - [基于C++分类预测引擎预测推理](./docs/zh_CN/inference_deployment/cpp_deploy.md)、[基于C++的PP-ShiTu预测引擎预测推理](deploy/cpp_shitu/readme.md)
     - 服务化部署
       - [Paddle Serving服务化部署(推荐)](./docs/zh_CN/inference_deployment/paddle_serving_deploy.md)
       - [Hub serving服务化部署](./docs/zh_CN/inference_deployment/paddle_hub_serving_deploy.md)
