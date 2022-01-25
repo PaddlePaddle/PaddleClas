@@ -95,7 +95,7 @@ cv::Mat VisualizeResult(const cv::Mat& img,
 void ObjectDetector::Preprocess(const cv::Mat& ori_im) {
   // Clone the image : keep the original mat for postprocess
   cv::Mat im = ori_im.clone();
-  cv::cvtColor(im, im, cv::COLOR_BGR2RGB);
+  // cv::cvtColor(im, im, cv::COLOR_BGR2RGB);
   preprocessor_.Run(&im, &inputs_);
 }
 
@@ -235,7 +235,7 @@ void ObjectDetector::Predict(const std::vector<cv::Mat>& imgs,
   auto postprocess_start = std::chrono::steady_clock::now();
   // Get output tensor
   output_data_list_.clear();
-  int num_class = 80;
+  int num_class = 1;
   int reg_max = 7;
   auto output_names = predictor_->GetOutputNames();
   // TODO: Unified model output.
@@ -281,6 +281,7 @@ void ObjectDetector::Predict(const std::vector<cv::Mat>& imgs,
                 out_bbox_num_data_.data());
   }
   // Postprocessing result
+
   result->clear();
   if (config_.arch_ == "PicoDet") {
     PPShiTu::PicoDetPostProcess(
