@@ -37,7 +37,7 @@ Res2Net200_vd预训练模型Top-1精度高达85.1%。
 * 您可以扫描下面的微信群二维码， 加入PaddleClas 微信交流群。获得更高效的问题答疑，与各行各业开发者充分交流，期待您的加入。
 
 <div align="center">
-<img src="./docs/images/wx_group.png"  width = "200" />
+<img src="https://user-images.githubusercontent.com/12560511/150500411-fdb27d17-0c50-4ac1-a484-fb4a9c2454b3.jpg"  width = "200" />
 </div>
 
 ## 快速体验
@@ -71,7 +71,7 @@ PP-ShiTu图像识别快速体验：[点击这里](./docs/zh_CN/quick_start/quick
     - [模型导出](./docs/zh_CN/inference_deployment/export_model.md)
     - Python/C++ 预测引擎
       - [基于Python预测引擎预测推理](./docs/zh_CN/inference_deployment/python_deploy.md)
-      - [基于C++预测引擎预测推理](./docs/zh_CN/inference_deployment/cpp_deploy.md)(当前只支持图像分类任务，图像识别更新中)
+      - [基于C++分类预测引擎预测推理](./docs/zh_CN/inference_deployment/cpp_deploy.md)、[基于C++的PP-ShiTu预测引擎预测推理](deploy/cpp_shitu/readme.md)
     - 服务化部署
       - [Paddle Serving服务化部署(推荐)](./docs/zh_CN/inference_deployment/paddle_serving_deploy.md)
       - [Hub serving服务化部署](./docs/zh_CN/inference_deployment/paddle_hub_serving_deploy.md)

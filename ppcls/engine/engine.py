@@ -84,7 +84,8 @@ class Engine(object):
 
         # for visualdl
         self.vdl_writer = None
-        if self.config['Global']['use_visualdl'] and mode == "train":
+        if self.config['Global'][
+                'use_visualdl'] and mode == "train" and dist.get_rank() == 0:
             vdl_writer_path = os.path.join(self.output_dir, "vdl")
             if not os.path.exists(vdl_writer_path):
                 os.makedirs(vdl_writer_path)
@@ -97,7 +98,7 @@ class Engine(object):
             paddle.__version__, self.device))
 
         # AMP training
-        self.amp = True if "AMP" in self.config else False
+        self.amp = True if "AMP" in self.config and self.mode == "train" else False
         if self.amp and self.config["AMP"] is not None:
             self.scale_loss = self.config["AMP"].get("scale_loss", 1.0)
             self.use_dynamic_loss_scaling = self.config["AMP"].get(
@@ -112,6 +113,14 @@ class Engine(object):
             }
             paddle.fluid.set_flags(AMP_RELATED_FLAGS_SETTING)
 
+        if "class_num" in config["Global"]:
+            global_class_num = config["Global"]["class_num"]
+            if "class_num" not in config["Arch"]:
+                config["Arch"]["class_num"] = global_class_num
+                msg = f"The Global.class_num will be deprecated. Please use Arch.class_num instead. Arch.class_num has been set to {global_class_num}."
+            else:
+                msg = "The Global.class_num will be deprecated. Please use Arch.class_num instead. The Global.class_num has been ignored."
+            logger.warning(msg)
         #TODO(gaotingquan): support rec
         class_num = config["Arch"].get("class_num", None)
         self.config["DataLoader"].update({"class_num": class_num})
@@ -211,21 +220,32 @@ class Engine(object):
             self.optimizer, self.lr_sch = build_optimizer(
                 self.config["Optimizer"], self.config["Global"]["epochs"],
                 len(self.train_dataloader), [self.model])
-        
+
         # for amp training
         if self.amp:
             self.scaler = paddle.amp.GradScaler(
                 init_loss_scaling=self.scale_loss,
                 use_dynamic_loss_scaling=self.use_dynamic_loss_scaling)
-            if self.config['AMP']['use_pure_fp16'] is True:
-                self.model = paddle.amp.decorate(models=self.model, level='O2', save_dtype='float32')
+            amp_level = self.config['AMP'].get("level", "O1")
+            if amp_level not in ["O1", "O2"]:
+                msg = "[Parameter Error]: The optimize level of AMP only support 'O1' and 'O2'. The level has been set 'O1'."
+                logger.warning(msg)
+                self.config['AMP']["level"] = "O1"
+                amp_level = "O1"
+            self.model, self.optimizer = paddle.amp.decorate(
+                models=self.model,
+                optimizers=self.optimizer,
+                level=amp_level,
+                save_dtype='float32')
 
         # for distributed
-        self.config["Global"][
-            "distributed"] = paddle.distributed.get_world_size() != 1
+        world_size = dist.get_world_size()
+        self.config["Global"]["distributed"] = world_size != 1
+        if world_size != 4 and self.mode == "train":
+            msg = f"The training strategy in config files provided by PaddleClas is based on 4 gpus. But the number of gpus is {world_size} in current training. Please modify the stategy (learning rate, batch size and so on) if use config files in PaddleClas to train."
+            logger.warning(msg)
         if self.config["Global"]["distributed"]:
             dist.init_parallel_env()
-        if self.config["Global"]["distributed"]:
             self.model = paddle.DataParallel(self.model)
 
         # build postprocess for infer
@@ -336,8 +356,8 @@ class Engine(object):
     @paddle.no_grad()
     def infer(self):
         assert self.mode == "infer" and self.eval_mode == "classification"
-        total_trainer = paddle.distributed.get_world_size()
-        local_rank = paddle.distributed.get_rank()
+        total_trainer = dist.get_world_size()
+        local_rank = dist.get_rank()
         image_list = get_image_list(self.config["Infer"]["infer_imgs"])
         # data split
         image_list = image_list[local_rank::total_trainer]

@@ -42,10 +42,12 @@ def train_epoch(engine, epoch_id, print_batch_step):
 
         # image input
         if engine.amp:
-            amp_level = 'O1'
-            if engine.config['AMP']['use_pure_fp16'] is True:
-                amp_level = 'O2'
-            with paddle.amp.auto_cast(custom_black_list={"flatten_contiguous_range", "greater_than"}, level=amp_level):
+            amp_level = engine.config['AMP'].get("level", "O1").upper()
+            with paddle.amp.auto_cast(
+                    custom_black_list={
+                        "flatten_contiguous_range", "greater_than"
+                    },
+                    level=amp_level):
                 out = forward(engine, batch)
                 loss_dict = engine.train_loss_func(out, batch[1])
         else:
