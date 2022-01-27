@@ -36,6 +36,8 @@ MODEL_URLS = {
     "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/ESNet_x1_0_pretrained.pdparams",
 }
 
+MODEL_STAGES_PATTERN = {"ESNet": ["blocks[2]", "blocks[9]", "blocks[12]"]}
+
 __all__ = list(MODEL_URLS.keys())
 
 
@@ -214,10 +216,13 @@ class ESBlock2(TheseusLayer):
 
 class ESNet(TheseusLayer):
     def __init__(self,
+                 stages_pattern,
                  class_num=1000,
                  scale=1.0,
                  dropout_prob=0.2,
-                 class_expand=1280):
+                 class_expand=1280,
+                 return_patterns=None,
+                 return_stages=None):
         super().__init__()
         self.scale = scale
         self.class_num = class_num
@@ -268,6 +273,11 @@ class ESNet(TheseusLayer):
         self.flatten = nn.Flatten(start_axis=1, stop_axis=-1)
         self.fc = Linear(self.class_expand, self.class_num)
 
+        super().init_res(
+            stages_pattern,
+            return_patterns=return_patterns,
+            return_stages=return_stages)
+
     def forward(self, x):
         x = self.conv1(x)
         x = self.max_pool(x)
@@ -305,7 +315,8 @@ def ESNet_x0_25(pretrained=False, use_ssld=False, **kwargs):
     Returns:
         model: nn.Layer. Specific `ESNet_x0_25` model depends on args.
     """
-    model = ESNet(scale=0.25, **kwargs)
+    model = ESNet(
+        scale=0.25, stages_pattern=MODEL_STAGES_PATTERN["ESNet"], **kwargs)
     _load_pretrained(pretrained, model, MODEL_URLS["ESNet_x0_25"], use_ssld)
     return model
 
@@ -320,7 +331,8 @@ def ESNet_x0_5(pretrained=False, use_ssld=False, **kwargs):
     Returns:
         model: nn.Layer. Specific `ESNet_x0_5` model depends on args.
     """
-    model = ESNet(scale=0.5, **kwargs)
+    model = ESNet(
+        scale=0.5, stages_pattern=MODEL_STAGES_PATTERN["ESNet"], **kwargs)
     _load_pretrained(pretrained, model, MODEL_URLS["ESNet_x0_5"], use_ssld)
     return model
 
@@ -335,7 +347,8 @@ def ESNet_x0_75(pretrained=False, use_ssld=False, **kwargs):
     Returns:
         model: nn.Layer. Specific `ESNet_x0_75` model depends on args.
     """
-    model = ESNet(scale=0.75, **kwargs)
+    model = ESNet(
+        scale=0.75, stages_pattern=MODEL_STAGES_PATTERN["ESNet"], **kwargs)
     _load_pretrained(pretrained, model, MODEL_URLS["ESNet_x0_75"], use_ssld)
     return model
 
@@ -350,6 +363,7 @@ def ESNet_x1_0(pretrained=False, use_ssld=False, **kwargs):
     Returns:
         model: nn.Layer. Specific `ESNet_x1_0` model depends on args.
     """
-    model = ESNet(scale=1.0, **kwargs)
+    model = ESNet(
+        scale=1.0, stages_pattern=MODEL_STAGES_PATTERN["ESNet"], **kwargs)
     _load_pretrained(pretrained, model, MODEL_URLS["ESNet_x1_0"], use_ssld)
     return model

@@ -18,6 +18,7 @@ import paddle.nn as nn
 from .celoss import CELoss
 from .dmlloss import DMLLoss
 from .distanceloss import DistanceLoss
+from .rkdloss import RKdAngle, RkdDistance
 
 
 class DistillationCELoss(CELoss):
@@ -68,7 +69,7 @@ class DistillationGTCELoss(CELoss):
 
     def forward(self, predicts, batch):
         loss_dict = dict()
-        for idx, name in enumerate(self.model_names):
+        for name in self.model_names:
             out = predicts[name]
             if self.key is not None:
                 out = out[self.key]
@@ -84,7 +85,7 @@ class DistillationDMLLoss(DMLLoss):
 
     def __init__(self,
                  model_name_pairs=[],
-                 act=None,
+                 act="softmax",
                  key=None,
                  name="loss_dml"):
         super().__init__(act=act)
@@ -125,7 +126,7 @@ class DistillationDistanceLoss(DistanceLoss):
         assert isinstance(model_name_pairs, list)
         self.key = key
         self.model_name_pairs = model_name_pairs
-        self.name = name + "_l2"
+        self.name = name + mode
 
     def forward(self, predicts, batch):
         loss_dict = dict()
@@ -138,4 +139,36 @@ class DistillationDistanceLoss(DistanceLoss):
             loss = super().forward(out1, out2)
             for key in loss:
                 loss_dict["{}_{}_{}".format(self.name, key, idx)] = loss[key]
+        return loss_dict
+
+
+class DistillationRKDLoss(nn.Layer):
+    def __init__(self,
+                 target_size=None,
+                 model_name_pairs=(["Student", "Teacher"], ),
+                 student_keepkeys=[],
+                 teacher_keepkeys=[]):
+        super().__init__()
+        self.student_keepkeys = student_keepkeys
+        self.teacher_keepkeys = teacher_keepkeys
+        self.model_name_pairs = model_name_pairs
+        assert len(self.student_keepkeys) == len(self.teacher_keepkeys)
+
+        self.rkd_angle_loss = RKdAngle(target_size=target_size)
+        self.rkd_dist_loss = RkdDistance(target_size=target_size)
+
+    def __call__(self, predicts, batch):
+        loss_dict = {}
+        for m1, m2 in self.model_name_pairs:
+            for idx, (
+                    student_name, teacher_name
+            ) in enumerate(zip(self.student_keepkeys, self.teacher_keepkeys)):
+                student_out = predicts[m1][student_name]
+                teacher_out = predicts[m2][teacher_name]
+
+                loss_dict[f"loss_angle_{idx}_{m1}_{m2}"] = self.rkd_angle_loss(
+                    student_out, teacher_out)
+                loss_dict[f"loss_dist_{idx}_{m1}_{m2}"] = self.rkd_dist_loss(
+                    student_out, teacher_out)
+
         return loss_dict

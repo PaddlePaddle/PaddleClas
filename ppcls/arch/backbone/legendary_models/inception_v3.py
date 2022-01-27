@@ -29,6 +29,14 @@ MODEL_URLS = {
     "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/InceptionV3_pretrained.pdparams"
 }
 
+MODEL_STAGES_PATTERN = {
+    "InceptionV3": [
+        "inception_block_list[2]", "inception_block_list[3]",
+        "inception_block_list[7]", "inception_block_list[8]",
+        "inception_block_list[10]"
+    ]
+}
+
 __all__ = MODEL_URLS.keys()
 '''
 InceptionV3 config: dict.
@@ -454,7 +462,12 @@ class Inception_V3(TheseusLayer):
         model: nn.Layer. Specific Inception_V3 model depends on args.
     """
 
-    def __init__(self, config, class_num=1000, return_patterns=None):
+    def __init__(self,
+                 config,
+                 stages_pattern,
+                 class_num=1000,
+                 return_patterns=None,
+                 return_stages=None):
         super().__init__()
 
         self.inception_a_list = config["inception_a"]
@@ -496,9 +509,11 @@ class Inception_V3(TheseusLayer):
             class_num,
             weight_attr=ParamAttr(initializer=Uniform(-stdv, stdv)),
             bias_attr=ParamAttr())
-        if return_patterns is not None:
-            self.update_res(return_patterns)
-            self.register_forward_post_hook(self._return_dict_hook)
+
+        super().init_res(
+            stages_pattern,
+            return_patterns=return_patterns,
+            return_stages=return_stages)
 
     def forward(self, x):
         x = self.inception_stem(x)
@@ -532,8 +547,11 @@ def InceptionV3(pretrained=False, use_ssld=False, **kwargs):
                     if str, means the path of the pretrained model.
         use_ssld: bool=False. Whether using distillation pretrained model when pretrained=True.
     Returns:
-        model: nn.Layer. Specific `InceptionV3` model 
+        model: nn.Layer. Specific `InceptionV3` model
     """
-    model = Inception_V3(NET_CONFIG, **kwargs)
+    model = Inception_V3(
+        NET_CONFIG,
+        stages_pattern=MODEL_STAGES_PATTERN["InceptionV3"],
+        **kwargs)
     _load_pretrained(pretrained, model, MODEL_URLS["InceptionV3"], use_ssld)
     return model

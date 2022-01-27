@@ -4,6 +4,7 @@
 
 * [1. 概述](#1)
 * [2. 精度、FLOPS 和参数量](#2)
+* [3. 基于V100 GPU 的预测速度](#3)
 
 <a name='1'></a>
 
@@ -28,3 +29,20 @@ Swin Transformer 是一种新的视觉 Transformer 网络，可以用作计算�
 [1]：基于 ImageNet22k 数据集预训练，然后在 ImageNet1k 数据集迁移学习得到。
 
 **注**：与 Reference 的精度差异源于数据预处理不同。
+
+<a name='3'></a>
+
+## 3. 基于 V100 GPU 的预测速度
+
+| Models                                                  | Crop Size | Resize Short Size | FP32<br/>Batch Size=1<br/>(ms) | FP32<br/>Batch Size=4<br/>(ms) | FP32<br/>Batch Size=8<br/>(ms) |
+| ------------------------------------------------------- | --------- | ----------------- | ------------------------------ | ------------------------------ | ------------------------------ |
+| SwinTransformer_tiny_patch4_window7_224                 | 224       | 256               | 6.59                           | 9.68                           | 16.32                          |
+| SwinTransformer_small_patch4_window7_224                | 224       | 256               | 12.54                          | 17.07                          | 28.08                          |
+| SwinTransformer_base_patch4_window7_224                 | 224       | 256               | 13.37                          | 23.53                          | 39.11                          |
+| SwinTransformer_base_patch4_window12_384                | 384       | 384               | 19.52                          | 64.56                          | 123.30                         |
+| SwinTransformer_base_patch4_window7_224<sup>[1]</sup>   | 224       | 256               | 13.53                          | 23.46                          | 39.13                          |
+| SwinTransformer_base_patch4_window12_384<sup>[1]</sup>  | 384       | 384               | 19.65                          | 64.72                          | 123.42                         |
+| SwinTransformer_large_patch4_window7_224<sup>[1]</sup>  | 224       | 256               | 15.74                          | 38.57                          | 71.49                          |
+| SwinTransformer_large_patch4_window12_384<sup>[1]</sup> | 384       | 384               | 32.61                          | 116.59                         | 223.23                         |
+
+[1]：基于 ImageNet22k 数据集预训练，然后在 ImageNet1k 数据集迁移学习得到。

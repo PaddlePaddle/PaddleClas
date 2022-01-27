@@ -29,7 +29,7 @@ from ppcls.utils import logger
 from ppcls.utils.logger import init_logger
 from ppcls.utils.config import print_config
 from ppcls.data import build_dataloader
-from ppcls.arch import build_model, RecModel, DistillationModel
+from ppcls.arch import build_model, RecModel, DistillationModel, TheseusLayer
 from ppcls.arch import apply_to_static
 from ppcls.loss import build_loss
 from ppcls.metric import build_metrics
@@ -44,7 +44,6 @@ from ppcls.data import create_operators
 from ppcls.engine.train import train_epoch
 from ppcls.engine import evaluation
 from ppcls.arch.gears.identity_head import IdentityHead
-from ppcls.engine.slim import get_pruner, get_quaner
 
 
 class Engine(object):
@@ -54,7 +53,8 @@ class Engine(object):
         self.config = config
         self.eval_mode = self.config["Global"].get("eval_mode",
                                                    "classification")
-        if "Head" in self.config["Arch"]:
+        if "Head" in self.config["Arch"] or self.config["Arch"].get("is_rec",
+                                                                    False):
             self.is_rec = True
         else:
             self.is_rec = False
@@ -84,7 +84,8 @@ class Engine(object):
 
         # for visualdl
         self.vdl_writer = None
-        if self.config['Global']['use_visualdl'] and mode == "train":
+        if self.config['Global'][
+                'use_visualdl'] and mode == "train" and dist.get_rank() == 0:
             vdl_writer_path = os.path.join(self.output_dir, "vdl")
             if not os.path.exists(vdl_writer_path):
                 os.makedirs(vdl_writer_path)
@@ -97,7 +98,7 @@ class Engine(object):
             paddle.__version__, self.device))
 
         # AMP training
-        self.amp = True if "AMP" in self.config else False
+        self.amp = True if "AMP" in self.config and self.mode == "train" else False
         if self.amp and self.config["AMP"] is not None:
             self.scale_loss = self.config["AMP"].get("scale_loss", 1.0)
             self.use_dynamic_loss_scaling = self.config["AMP"].get(
@@ -112,6 +113,14 @@ class Engine(object):
             }
             paddle.fluid.set_flags(AMP_RELATED_FLAGS_SETTING)
 
+        if "class_num" in config["Global"]:
+            global_class_num = config["Global"]["class_num"]
+            if "class_num" not in config["Arch"]:
+                config["Arch"]["class_num"] = global_class_num
+                msg = f"The Global.class_num will be deprecated. Please use Arch.class_num instead. Arch.class_num has been set to {global_class_num}."
+            else:
+                msg = "The Global.class_num will be deprecated. Please use Arch.class_num instead. The Global.class_num has been ignored."
+            logger.warning(msg)
         #TODO(gaotingquan): support rec
         class_num = config["Arch"].get("class_num", None)
         self.config["DataLoader"].update({"class_num": class_num})
@@ -162,6 +171,13 @@ class Engine(object):
             if metric_config is not None:
                 metric_config = metric_config.get("Train")
                 if metric_config is not None:
+                    if hasattr(self.train_dataloader, "collate_fn"):
+                        for m_idx, m in enumerate(metric_config):
+                            if "TopkAcc" in m:
+                                msg = f"'TopkAcc' metric can not be used when setting 'batch_transform_ops' in config. The 'TopkAcc' metric has been removed."
+                                logger.warning(msg)
+                                break
+                        metric_config.pop(m_idx)
                     self.train_metric_func = build_metrics(metric_config)
                 else:
                     self.train_metric_func = None
@@ -186,13 +202,9 @@ class Engine(object):
             self.eval_metric_func = None
 
         # build model
-        self.model = build_model(self.config["Arch"])
+        self.model = build_model(self.config)
         # set @to_static for benchmark, skip this by default.
         apply_to_static(self.config, self.model)
-
-        # for slim
-        self.pruner = get_pruner(self.config, self.model)
-        self.quanter = get_quaner(self.config, self.model)
 
         # load_pretrain
         if self.config["Global"]["pretrained_model"] is not None:
@@ -209,12 +221,31 @@ class Engine(object):
                 self.config["Optimizer"], self.config["Global"]["epochs"],
                 len(self.train_dataloader), [self.model])
 
+        # for amp training
+        if self.amp:
+            self.scaler = paddle.amp.GradScaler(
+                init_loss_scaling=self.scale_loss,
+                use_dynamic_loss_scaling=self.use_dynamic_loss_scaling)
+            amp_level = self.config['AMP'].get("level", "O1")
+            if amp_level not in ["O1", "O2"]:
+                msg = "[Parameter Error]: The optimize level of AMP only support 'O1' and 'O2'. The level has been set 'O1'."
+                logger.warning(msg)
+                self.config['AMP']["level"] = "O1"
+                amp_level = "O1"
+            self.model, self.optimizer = paddle.amp.decorate(
+                models=self.model,
+                optimizers=self.optimizer,
+                level=amp_level,
+                save_dtype='float32')
+
         # for distributed
-        self.config["Global"][
-            "distributed"] = paddle.distributed.get_world_size() != 1
+        world_size = dist.get_world_size()
+        self.config["Global"]["distributed"] = world_size != 1
+        if world_size != 4 and self.mode == "train":
+            msg = f"The training strategy in config files provided by PaddleClas is based on 4 gpus. But the number of gpus is {world_size} in current training. Please modify the stategy (learning rate, batch size and so on) if use config files in PaddleClas to train."
+            logger.warning(msg)
         if self.config["Global"]["distributed"]:
             dist.init_parallel_env()
-        if self.config["Global"]["distributed"]:
             self.model = paddle.DataParallel(self.model)
 
         # build postprocess for infer
@@ -249,12 +280,6 @@ class Engine(object):
                                      self.optimizer)
             if metric_info is not None:
                 best_metric.update(metric_info)
-
-        # for amp training
-        if self.amp:
-            self.scaler = paddle.amp.GradScaler(
-                init_loss_scaling=self.scale_loss,
-                use_dynamic_loss_scaling=self.use_dynamic_loss_scaling)
 
         self.max_iter = len(self.train_dataloader) - 1 if platform.system(
         ) == "Windows" else len(self.train_dataloader)
@@ -331,8 +356,8 @@ class Engine(object):
     @paddle.no_grad()
     def infer(self):
         assert self.mode == "infer" and self.eval_mode == "classification"
-        total_trainer = paddle.distributed.get_world_size()
-        local_rank = paddle.distributed.get_rank()
+        total_trainer = dist.get_world_size()
+        local_rank = dist.get_rank()
         image_list = get_image_list(self.config["Infer"]["infer_imgs"])
         # data split
         image_list = image_list[local_rank::total_trainer]
@@ -353,7 +378,9 @@ class Engine(object):
                 out = self.model(batch_tensor)
                 if isinstance(out, list):
                     out = out[0]
-                if isinstance(out, dict):
+                if isinstance(out, dict) and "logits" in out:
+                    out = out["logits"]
+                if isinstance(out, dict) and "output" in out:
                     out = out["output"]
                 result = self.postprocess_func(out, image_file_list)
                 print(result)
@@ -371,8 +398,8 @@ class Engine(object):
         model.eval()
         save_path = os.path.join(self.config["Global"]["save_inference_dir"],
                                  "inference")
-        if self.quanter:
-            self.quanter.save_quantized_model(
+        if model.quanter:
+            model.quanter.save_quantized_model(
                 model.base_model,
                 save_path,
                 input_spec=[
@@ -391,7 +418,7 @@ class Engine(object):
             paddle.jit.save(model, save_path)
 
 
-class ExportModel(nn.Layer):
+class ExportModel(TheseusLayer):
     """
     ExportModel: add softmax onto the model
     """

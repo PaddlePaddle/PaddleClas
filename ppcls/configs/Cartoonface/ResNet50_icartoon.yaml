@@ -22,7 +22,7 @@ Arch:
     name: "ResNet50"
     pretrained: True
   BackboneStopLayer: 
-    name: "flatten_0"
+    name: "flatten"
     output_dim: 2048
   Head:
     name: "FC"

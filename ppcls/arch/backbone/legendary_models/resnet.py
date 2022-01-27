@@ -51,6 +51,15 @@ MODEL_URLS = {
     "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/ResNet200_vd_pretrained.pdparams",
 }
 
+MODEL_STAGES_PATTERN = {
+    "ResNet18": ["blocks[1]", "blocks[3]", "blocks[5]", "blocks[7]"],
+    "ResNet34": ["blocks[2]", "blocks[6]", "blocks[12]", "blocks[15]"],
+    "ResNet50": ["blocks[2]", "blocks[6]", "blocks[12]", "blocks[15]"],
+    "ResNet101": ["blocks[2]", "blocks[6]", "blocks[29]", "blocks[32]"],
+    "ResNet152": ["blocks[2]", "blocks[10]", "blocks[46]", "blocks[49]"],
+    "ResNet200": ["blocks[2]", "blocks[14]", "blocks[62]", "blocks[65]"]
+}
+
 __all__ = MODEL_URLS.keys()
 '''
 ResNet config: dict.
@@ -265,12 +274,14 @@ class ResNet(TheseusLayer):
 
     def __init__(self,
                  config,
+                 stages_pattern,
                  version="vb",
                  class_num=1000,
                  lr_mult_list=[1.0, 1.0, 1.0, 1.0, 1.0],
                  data_format="NCHW",
                  input_image_channel=3,
-                 return_patterns=None):
+                 return_patterns=None,
+                 return_stages=None):
         super().__init__()
 
         self.cfg = config
@@ -338,9 +349,11 @@ class ResNet(TheseusLayer):
             weight_attr=ParamAttr(initializer=Uniform(-stdv, stdv)))
 
         self.data_format = data_format
-        if return_patterns is not None:
-            self.update_res(return_patterns)
-            self.register_forward_post_hook(self._return_dict_hook)
+
+        super().init_res(
+            stages_pattern,
+            return_patterns=return_patterns,
+            return_stages=return_stages)
 
     def forward(self, x):
         with paddle.static.amp.fp16_guard():
@@ -379,7 +392,11 @@ def ResNet18(pretrained=False, use_ssld=False, **kwargs):
     Returns:
         model: nn.Layer. Specific `ResNet18` model depends on args.
     """
-    model = ResNet(config=NET_CONFIG["18"], version="vb", **kwargs)
+    model = ResNet(
+        config=NET_CONFIG["18"],
+        stages_pattern=MODEL_STAGES_PATTERN["ResNet18"],
+        version="vb",
+        **kwargs)
     _load_pretrained(pretrained, model, MODEL_URLS["ResNet18"], use_ssld)
     return model
 
@@ -394,7 +411,11 @@ def ResNet18_vd(pretrained=False, use_ssld=False, **kwargs):
     Returns:
         model: nn.Layer. Specific `ResNet18_vd` model depends on args.
     """
-    model = ResNet(config=NET_CONFIG["18"], version="vd", **kwargs)
+    model = ResNet(
+        config=NET_CONFIG["18"],
+        stages_pattern=MODEL_STAGES_PATTERN["ResNet18"],
+        version="vd",
+        **kwargs)
     _load_pretrained(pretrained, model, MODEL_URLS["ResNet18_vd"], use_ssld)
     return model
 
@@ -409,7 +430,11 @@ def ResNet34(pretrained=False, use_ssld=False, **kwargs):
     Returns:
         model: nn.Layer. Specific `ResNet34` model depends on args.
     """
-    model = ResNet(config=NET_CONFIG["34"], version="vb", **kwargs)
+    model = ResNet(
+        config=NET_CONFIG["34"],
+        stages_pattern=MODEL_STAGES_PATTERN["ResNet34"],
+        version="vb",
+        **kwargs)
     _load_pretrained(pretrained, model, MODEL_URLS["ResNet34"], use_ssld)
     return model
 
@@ -424,7 +449,11 @@ def ResNet34_vd(pretrained=False, use_ssld=False, **kwargs):
     Returns:
         model: nn.Layer. Specific `ResNet34_vd` model depends on args.
     """
-    model = ResNet(config=NET_CONFIG["34"], version="vd", **kwargs)
+    model = ResNet(
+        config=NET_CONFIG["34"],
+        stages_pattern=MODEL_STAGES_PATTERN["ResNet34"],
+        version="vd",
+        **kwargs)
     _load_pretrained(pretrained, model, MODEL_URLS["ResNet34_vd"], use_ssld)
     return model
 
@@ -439,7 +468,11 @@ def ResNet50(pretrained=False, use_ssld=False, **kwargs):
     Returns:
         model: nn.Layer. Specific `ResNet50` model depends on args.
     """
-    model = ResNet(config=NET_CONFIG["50"], version="vb", **kwargs)
+    model = ResNet(
+        config=NET_CONFIG["50"],
+        stages_pattern=MODEL_STAGES_PATTERN["ResNet50"],
+        version="vb",
+        **kwargs)
     _load_pretrained(pretrained, model, MODEL_URLS["ResNet50"], use_ssld)
     return model
 
@@ -454,7 +487,11 @@ def ResNet50_vd(pretrained=False, use_ssld=False, **kwargs):
     Returns:
         model: nn.Layer. Specific `ResNet50_vd` model depends on args.
     """
-    model = ResNet(config=NET_CONFIG["50"], version="vd", **kwargs)
+    model = ResNet(
+        config=NET_CONFIG["50"],
+        stages_pattern=MODEL_STAGES_PATTERN["ResNet50"],
+        version="vd",
+        **kwargs)
     _load_pretrained(pretrained, model, MODEL_URLS["ResNet50_vd"], use_ssld)
     return model
 
@@ -469,7 +506,11 @@ def ResNet101(pretrained=False, use_ssld=False, **kwargs):
     Returns:
         model: nn.Layer. Specific `ResNet101` model depends on args.
     """
-    model = ResNet(config=NET_CONFIG["101"], version="vb", **kwargs)
+    model = ResNet(
+        config=NET_CONFIG["101"],
+        stages_pattern=MODEL_STAGES_PATTERN["ResNet101"],
+        version="vb",
+        **kwargs)
     _load_pretrained(pretrained, model, MODEL_URLS["ResNet101"], use_ssld)
     return model
 
@@ -484,7 +525,11 @@ def ResNet101_vd(pretrained=False, use_ssld=False, **kwargs):
     Returns:
         model: nn.Layer. Specific `ResNet101_vd` model depends on args.
     """
-    model = ResNet(config=NET_CONFIG["101"], version="vd", **kwargs)
+    model = ResNet(
+        config=NET_CONFIG["101"],
+        stages_pattern=MODEL_STAGES_PATTERN["ResNet101"],
+        version="vd",
+        **kwargs)
     _load_pretrained(pretrained, model, MODEL_URLS["ResNet101_vd"], use_ssld)
     return model
 
@@ -499,7 +544,11 @@ def ResNet152(pretrained=False, use_ssld=False, **kwargs):
     Returns:
         model: nn.Layer. Specific `ResNet152` model depends on args.
     """
-    model = ResNet(config=NET_CONFIG["152"], version="vb", **kwargs)
+    model = ResNet(
+        config=NET_CONFIG["152"],
+        stages_pattern=MODEL_STAGES_PATTERN["ResNet152"],
+        version="vb",
+        **kwargs)
     _load_pretrained(pretrained, model, MODEL_URLS["ResNet152"], use_ssld)
     return model
 
@@ -514,7 +563,11 @@ def ResNet152_vd(pretrained=False, use_ssld=False, **kwargs):
     Returns:
         model: nn.Layer. Specific `ResNet152_vd` model depends on args.
     """
-    model = ResNet(config=NET_CONFIG["152"], version="vd", **kwargs)
+    model = ResNet(
+        config=NET_CONFIG["152"],
+        stages_pattern=MODEL_STAGES_PATTERN["ResNet152"],
+        version="vd",
+        **kwargs)
     _load_pretrained(pretrained, model, MODEL_URLS["ResNet152_vd"], use_ssld)
     return model
 
@@ -529,6 +582,10 @@ def ResNet200_vd(pretrained=False, use_ssld=False, **kwargs):
     Returns:
         model: nn.Layer. Specific `ResNet200_vd` model depends on args.
     """
-    model = ResNet(config=NET_CONFIG["200"], version="vd", **kwargs)
+    model = ResNet(
+        config=NET_CONFIG["200"],
+        stages_pattern=MODEL_STAGES_PATTERN["ResNet200"],
+        version="vd",
+        **kwargs)
     _load_pretrained(pretrained, model, MODEL_URLS["ResNet200_vd"], use_ssld)
     return model

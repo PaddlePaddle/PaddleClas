@@ -42,6 +42,10 @@ MODEL_URLS = {
     "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/PPLCNet_x2_5_pretrained.pdparams"
 }
 
+MODEL_STAGES_PATTERN = {
+    "PPLCNet": ["blocks2", "blocks3", "blocks4", "blocks5", "blocks6"]
+}
+
 __all__ = list(MODEL_URLS.keys())
 
 # Each element(list) represents a depthwise block, which is composed of k, in_c, out_c, s, use_se.
@@ -168,10 +172,13 @@ class SEModule(TheseusLayer):
 
 class PPLCNet(TheseusLayer):
     def __init__(self,
+                 stages_pattern,
                  scale=1.0,
                  class_num=1000,
                  dropout_prob=0.2,
-                 class_expand=1280):
+                 class_expand=1280,
+                 return_patterns=None,
+                 return_stages=None):
         super().__init__()
         self.scale = scale
         self.class_expand = class_expand
@@ -182,7 +189,7 @@ class PPLCNet(TheseusLayer):
             num_filters=make_divisible(16 * scale),
             stride=2)
 
-        self.blocks2 = nn.Sequential(*[
+        self.blocks2 = nn.Sequential(* [
             DepthwiseSeparable(
                 num_channels=make_divisible(in_c * scale),
                 num_filters=make_divisible(out_c * scale),
@@ -192,7 +199,7 @@ class PPLCNet(TheseusLayer):
             for i, (k, in_c, out_c, s, se) in enumerate(NET_CONFIG["blocks2"])
         ])
 
-        self.blocks3 = nn.Sequential(*[
+        self.blocks3 = nn.Sequential(* [
             DepthwiseSeparable(
                 num_channels=make_divisible(in_c * scale),
                 num_filters=make_divisible(out_c * scale),
@@ -202,7 +209,7 @@ class PPLCNet(TheseusLayer):
             for i, (k, in_c, out_c, s, se) in enumerate(NET_CONFIG["blocks3"])
         ])
 
-        self.blocks4 = nn.Sequential(*[
+        self.blocks4 = nn.Sequential(* [
             DepthwiseSeparable(
                 num_channels=make_divisible(in_c * scale),
                 num_filters=make_divisible(out_c * scale),
@@ -212,7 +219,7 @@ class PPLCNet(TheseusLayer):
             for i, (k, in_c, out_c, s, se) in enumerate(NET_CONFIG["blocks4"])
         ])
 
-        self.blocks5 = nn.Sequential(*[
+        self.blocks5 = nn.Sequential(* [
             DepthwiseSeparable(
                 num_channels=make_divisible(in_c * scale),
                 num_filters=make_divisible(out_c * scale),
@@ -222,7 +229,7 @@ class PPLCNet(TheseusLayer):
             for i, (k, in_c, out_c, s, se) in enumerate(NET_CONFIG["blocks5"])
         ])
 
-        self.blocks6 = nn.Sequential(*[
+        self.blocks6 = nn.Sequential(* [
             DepthwiseSeparable(
                 num_channels=make_divisible(in_c * scale),
                 num_filters=make_divisible(out_c * scale),
@@ -247,6 +254,11 @@ class PPLCNet(TheseusLayer):
         self.flatten = nn.Flatten(start_axis=1, stop_axis=-1)
 
         self.fc = Linear(self.class_expand, class_num)
+
+        super().init_res(
+            stages_pattern,
+            return_patterns=return_patterns,
+            return_stages=return_stages)
 
     def forward(self, x):
         x = self.conv1(x)
@@ -289,7 +301,8 @@ def PPLCNet_x0_25(pretrained=False, use_ssld=False, **kwargs):
     Returns:
         model: nn.Layer. Specific `PPLCNet_x0_25` model depends on args.
     """
-    model = PPLCNet(scale=0.25, **kwargs)
+    model = PPLCNet(
+        scale=0.25, stages_pattern=MODEL_STAGES_PATTERN["PPLCNet"], **kwargs)
     _load_pretrained(pretrained, model, MODEL_URLS["PPLCNet_x0_25"], use_ssld)
     return model
 
@@ -304,7 +317,8 @@ def PPLCNet_x0_35(pretrained=False, use_ssld=False, **kwargs):
     Returns:
         model: nn.Layer. Specific `PPLCNet_x0_35` model depends on args.
     """
-    model = PPLCNet(scale=0.35, **kwargs)
+    model = PPLCNet(
+        scale=0.35, stages_pattern=MODEL_STAGES_PATTERN["PPLCNet"], **kwargs)
     _load_pretrained(pretrained, model, MODEL_URLS["PPLCNet_x0_35"], use_ssld)
     return model
 
@@ -319,7 +333,8 @@ def PPLCNet_x0_5(pretrained=False, use_ssld=False, **kwargs):
     Returns:
         model: nn.Layer. Specific `PPLCNet_x0_5` model depends on args.
     """
-    model = PPLCNet(scale=0.5, **kwargs)
+    model = PPLCNet(
+        scale=0.5, stages_pattern=MODEL_STAGES_PATTERN["PPLCNet"], **kwargs)
     _load_pretrained(pretrained, model, MODEL_URLS["PPLCNet_x0_5"], use_ssld)
     return model
 
@@ -334,7 +349,8 @@ def PPLCNet_x0_75(pretrained=False, use_ssld=False, **kwargs):
     Returns:
         model: nn.Layer. Specific `PPLCNet_x0_75` model depends on args.
     """
-    model = PPLCNet(scale=0.75, **kwargs)
+    model = PPLCNet(
+        scale=0.75, stages_pattern=MODEL_STAGES_PATTERN["PPLCNet"], **kwargs)
     _load_pretrained(pretrained, model, MODEL_URLS["PPLCNet_x0_75"], use_ssld)
     return model
 
@@ -349,7 +365,8 @@ def PPLCNet_x1_0(pretrained=False, use_ssld=False, **kwargs):
     Returns:
         model: nn.Layer. Specific `PPLCNet_x1_0` model depends on args.
     """
-    model = PPLCNet(scale=1.0, **kwargs)
+    model = PPLCNet(
+        scale=1.0, stages_pattern=MODEL_STAGES_PATTERN["PPLCNet"], **kwargs)
     _load_pretrained(pretrained, model, MODEL_URLS["PPLCNet_x1_0"], use_ssld)
     return model
 
@@ -364,7 +381,8 @@ def PPLCNet_x1_5(pretrained=False, use_ssld=False, **kwargs):
     Returns:
         model: nn.Layer. Specific `PPLCNet_x1_5` model depends on args.
     """
-    model = PPLCNet(scale=1.5, **kwargs)
+    model = PPLCNet(
+        scale=1.5, stages_pattern=MODEL_STAGES_PATTERN["PPLCNet"], **kwargs)
     _load_pretrained(pretrained, model, MODEL_URLS["PPLCNet_x1_5"], use_ssld)
     return model
 
@@ -379,7 +397,8 @@ def PPLCNet_x2_0(pretrained=False, use_ssld=False, **kwargs):
     Returns:
         model: nn.Layer. Specific `PPLCNet_x2_0` model depends on args.
     """
-    model = PPLCNet(scale=2.0, **kwargs)
+    model = PPLCNet(
+        scale=2.0, stages_pattern=MODEL_STAGES_PATTERN["PPLCNet"], **kwargs)
     _load_pretrained(pretrained, model, MODEL_URLS["PPLCNet_x2_0"], use_ssld)
     return model
 
@@ -394,6 +413,7 @@ def PPLCNet_x2_5(pretrained=False, use_ssld=False, **kwargs):
     Returns:
         model: nn.Layer. Specific `PPLCNet_x2_5` model depends on args.
     """
-    model = PPLCNet(scale=2.5, **kwargs)
+    model = PPLCNet(
+        scale=2.5, stages_pattern=MODEL_STAGES_PATTERN["PPLCNet"], **kwargs)
     _load_pretrained(pretrained, model, MODEL_URLS["PPLCNet_x2_5"], use_ssld)
     return model

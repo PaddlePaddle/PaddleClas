@@ -21,23 +21,23 @@
   - [3.5 模型预测与调试](#3.5)
   - [3.6 模型导出与预测部署](#3.6)
 
-<a name="1"></a>
+<a name="1"></a> 
 
 ## 1. 数据集
 
 在 PaddleClas 的识别任务中，训练主体检测模型时主要用到了以下几个数据集。
 
-| 数据集       | 数据量   | 主体检测任务中使用的数据量   | 场景  | 数据集地址 |
-| :------------:  | :-------------: | :-------: | :-------: | :--------: |
-| Objects365 | 170W | 6k | 通用场景 | [地址](https://www.objects365.org/overview.html) |
-| COCO2017 | 12W | 5k  | 通用场景 | [地址](https://cocodataset.org/) |
-| iCartoonFace | 2k | 2k | 动漫人脸检测 | [地址](https://github.com/luxiangju-PersonAI/iCartoonFace) |
-| LogoDet-3k | 3k | 2k | Logo 检测 | [地址](https://github.com/Wangjing1551/LogoDet-3K-Dataset) |
-| RPC | 3k | 3k  | 商品检测 | [地址](https://rpc-dataset.github.io/) |
+| 数据集       | 数据量 | 主体检测任务中使用的数据量 | 场景         | 数据集地址                                                 |
+| ------------ | ------ | -------------------------- | ------------ | ---------------------------------------------------------- |
+| Objects365   | 170W   | 6k                         | 通用场景     | [地址](https://www.objects365.org/overview.html)           |
+| COCO2017     | 12W    | 5k                         | 通用场景     | [地址](https://cocodataset.org/)                           |
+| iCartoonFace | 2k     | 2k                         | 动漫人脸检测 | [地址](https://github.com/luxiangju-PersonAI/iCartoonFace) |
+| LogoDet-3k   | 3k     | 2k                         | Logo 检测    | [地址](https://github.com/Wangjing1551/LogoDet-3K-Dataset) |
+| RPC          | 3k     | 3k                         | 商品检测     | [地址](https://rpc-dataset.github.io/)                     |
 
 在实际训练的过程中，将所有数据集混合在一起。由于是主体检测，这里将所有标注出的检测框对应的类别都修改为 `前景` 的类别，最终融合的数据集中只包含 1 个类别，即前景。
 
-<a name="2"></a>
+<a name="2"></a> 
 
 ## 2. 模型选择
 
@@ -45,17 +45,17 @@
 
 基于上述研究，PaddleClas 中提供了 2 个通用主体检测模型，为轻量级与服务端主体检测模型，分别适用于端侧场景以及服务端场景。下面的表格中给出了在上述 5 个数据集上的平均 mAP 以及它们的模型大小、预测速度对比信息。
 
-| 模型      | 模型结构   | 预训练模型下载地址   | inference 模型下载地址  | mAP | inference 模型大小(MB) | 单张图片预测耗时(不包含预处理)(ms) |
-| :------------:  | :-------------: | :------: | :-------: | :--------: | :-------: | :--------: |
-| 轻量级主体检测模型 | PicoDet | [地址](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/pretrain/picodet_PPLCNet_x2_5_mainbody_lite_v1.0_pretrained.pdparams) | [tar 格式文件地址](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/inference/picodet_PPLCNet_x2_5_mainbody_lite_v1.0_infer.tar) [zip 格式文件地址](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/inference/picodet_PPLCNet_x2_5_mainbody_lite_v1.0_infer.zip) | 40.1% | 30.1 | 29.8  |
-| 服务端主体检测模型 | PP-YOLOv2 | [地址](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/pretrain/ppyolov2_r50vd_dcn_mainbody_v1.0_pretrained.pdparams) | [tar 格式文件地址](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/inference/ppyolov2_r50vd_dcn_mainbody_v1.0_infer.tar) [zip 格式文件地址](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/inference/ppyolov2_r50vd_dcn_mainbody_v1.0_infer.zip) | 42.5% | 210.5 | 466.6  |
+| 模型               | 模型结构  | 预训练模型下载地址                                           | inference 模型下载地址                                       | mAP   | inference 模型大小(MB) | 单张图片预测耗时(不包含预处理)(ms) |
+| ------------------ | --------- | ------------------------------------------------------------ | ------------------------------------------------------------ | ----- | ---------------------- | ---------------------------------- |
+| 轻量级主体检测模型 | PicoDet   | [地址](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/pretrain/picodet_PPLCNet_x2_5_mainbody_lite_v1.0_pretrained.pdparams) | [tar 格式文件地址](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/inference/picodet_PPLCNet_x2_5_mainbody_lite_v1.0_infer.tar) [zip 格式文件地址](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/inference/picodet_PPLCNet_x2_5_mainbody_lite_v1.0_infer.zip) | 40.1% | 30.1                   | 29.8                               |
+| 服务端主体检测模型 | PP-YOLOv2 | [地址](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/pretrain/ppyolov2_r50vd_dcn_mainbody_v1.0_pretrained.pdparams) | [tar 格式文件地址](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/inference/ppyolov2_r50vd_dcn_mainbody_v1.0_infer.tar) [zip 格式文件地址](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/inference/ppyolov2_r50vd_dcn_mainbody_v1.0_infer.zip) | 42.5% | 210.5                  | 466.6                              |
 
 * 注意
   * 由于部分解压缩软件在解压上述 `tar` 格式文件时存在问题，建议非命令行用户下载 `zip` 格式文件并解压。`tar` 格式文件建议使用命令 `tar xf xxx.tar` 解压。
   * 速度评测机器的 CPU 具体信息为：`Intel(R) Xeon(R) Gold 6148 CPU @ 2.40GHz`，速度指标为开启 mkldnn，线程数设置为 10 测试得到。
   * 主体检测的预处理过程较为耗时，平均每张图在上述机器上的时间在 40~55 ms 左右，没有包含在上述的预测耗时统计中。
 
-<a name="2.1"></a>
+<a name="2.1"></a> 
 
 ### 2.1 轻量级主体检测模型
 
@@ -72,7 +72,7 @@ PicoDet 由 [PaddleDetection](https://github.com/PaddlePaddle/PaddleDetection) �
 
 在轻量级主体检测任务中，为了更好地兼顾检测速度与效果，我们使用 PPLCNet_x2_5 作为主体检测模型的骨干网络，同时将训练与预测的图像尺度修改为了 640x640，其余配置与 [picodet_lcnet_1_5x_416_coco.yml](https://github.com/PaddlePaddle/PaddleDetection/blob/develop/configs/picodet/more_config/picodet_lcnet_1_5x_416_coco.yml) 完全一致。将数据集更换为自定义的主体检测数据集，进行训练，最终得到检测模型。
 
-<a name="2.2"></a>
+<a name="2.2"></a> 
 
 ### 2.2 服务端主体检测模型
 
@@ -93,13 +93,13 @@ PP-YOLO 由 [PaddleDetection](https://github.com/PaddlePaddle/PaddleDetection) �
 
 在服务端主体检测任务中，为了保证检测效果，我们使用 ResNet50vd-DCN 作为检测模型的骨干网络，使用配置文件 [ppyolov2_r50vd_dcn_365e_coco.yml](https://github.com/PaddlePaddle/PaddleDetection/blob/release/2.1/configs/ppyolo/ppyolov2_r50vd_dcn_365e_coco.yml)，更换为自定义的主体检测数据集，进行训练，最终得到检测模型。
 
-<a name="3"></a>
+<a name="3"></a> 
 
 ## 3. 模型训练
 
 本节主要介绍怎样基于 PaddleDetection，基于自己的数据集，训练主体检测模型。
 
-<a name="3.1"></a>
+<a name="3.1"></a> 
 
 ### 3.1 环境准备
 
@@ -116,7 +116,7 @@ pip install -r requirements.txt
 
 更多安装教程，请参考: [安装文档](https://github.com/PaddlePaddle/PaddleDetection/blob/release/2.1/docs/tutorials/INSTALL_cn.md)
 
-<a name="3.2"></a>
+<a name="3.2"></a> 
 
 ### 3.2 数据准备
 
@@ -128,15 +128,13 @@ pip install -r requirements.txt
 [{u'id': 1, u'name': u'foreground', u'supercategory': u'foreground'}]
 ```
 
-<a name="3.3"></a>
+<a name="3.3"></a> 
 
 ### 3.3 配置文件改动和说明
 
 我们使用 `configs/ppyolo/ppyolov2_r50vd_dcn_365e_coco.yml` 配置进行训练，配置文件摘要如下：
 
-<div align='center'>
-  <img src='../../images/det/PaddleDetection_config.png' width='400'/>
-</div>
+![](../../images/det/PaddleDetection_config.png)
 
 从上图看到 `ppyolov2_r50vd_dcn_365e_coco.yml` 配置需要依赖其他的配置文件，这些配置文件的含义如下:
 
@@ -156,7 +154,7 @@ ppyolov2_reader.yml：主要说明数据读取器配置，如 batch size，并�
 
 此外，也可以根据实际情况，修改上述文件，比如，如果显存溢出，可以将 batch size 和学习率等比缩小等。
 
-<a name="3.4"></a>
+<a name="3.4"></a> 
 
 ### 3.4 启动训练
 
@@ -200,7 +198,7 @@ python -m paddle.distributed.launch --gpus 0,1,2,3 tools/train.py -c configs/ppy
 
 注意：如果遇到 "`Out of memory error`" 问题, 尝试在 `ppyolov2_reader.yml` 文件中调小 `batch_size`，同时等比例调小学习率。
 
-<a name="3.5"></a>
+<a name="3.5"></a> 
 
 ### 3.5 模型预测与调试
 
@@ -213,7 +211,7 @@ python tools/infer.py -c configs/ppyolo/ppyolov2_r50vd_dcn_365e_coco.yml --infer
 
 `--draw_threshold` 是个可选参数. 根据 [NMS](https://ieeexplore.ieee.org/document/1699659) 的计算，不同阈值会产生不同的结果 `keep_top_k` 表示设置输出目标的最大数量，默认值为 100，用户可以根据自己的实际情况进行设定。
 
-<a name="3.6"></a>
+<a name="3.6"></a> 
 
 ### 3.6 模型导出与预测部署。
 

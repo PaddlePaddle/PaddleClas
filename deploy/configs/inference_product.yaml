@@ -33,6 +33,7 @@ DetPreProcess:
         mean: [0.485, 0.456, 0.406]
         std: [0.229, 0.224, 0.225]
     - DetPermute: {}
+
 DetPostProcess: {}
 
 RecPreProcess:
@@ -50,6 +51,14 @@ RecPostProcess: null
 
 # indexing engine config
 IndexProcess:
+  index_method: "HNSW32" # supported: HNSW32, IVF, Flat
   index_dir: "./recognition_demo_data_v1.1/gallery_product/index"
+  image_root: "./recognition_demo_data_v1.1/gallery_product/"
+  data_file:  "./recognition_demo_data_v1.1/gallery_product/data_file.txt"
+  index_operation: "new" # suported: "append", "remove", "new"
+  delimiter: "\t"
+  dist_type: "IP"
+  embedding_size: 512
+  batch_size: 32
   return_k: 5
   score_thres: 0.5

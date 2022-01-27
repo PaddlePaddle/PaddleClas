@@ -38,10 +38,6 @@ MODEL_URLS = {
     "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ViT_large_patch16_384_pretrained.pdparams",
     "ViT_large_patch32_384":
     "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ViT_large_patch32_384_pretrained.pdparams",
-    "ViT_huge_patch16_224":
-    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ViT_huge_patch16_224_pretrained.pdparams",
-    "ViT_huge_patch32_384":
-    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ViT_huge_patch32_384_pretrained.pdparams"
 }
 
 __all__ = list(MODEL_URLS.keys())
@@ -458,38 +454,5 @@ def ViT_large_patch32_384(pretrained=False, use_ssld=False, **kwargs):
         pretrained,
         model,
         MODEL_URLS["ViT_large_patch32_384"],
-        use_ssld=use_ssld)
-    return model
-
-
-def ViT_huge_patch16_224(pretrained=False, use_ssld=False, **kwargs):
-    model = VisionTransformer(
-        patch_size=16,
-        embed_dim=1280,
-        depth=32,
-        num_heads=16,
-        mlp_ratio=4,
-        **kwargs)
-    _load_pretrained(
-        pretrained,
-        model,
-        MODEL_URLS["ViT_huge_patch16_224"],
-        use_ssld=use_ssld)
-    return model
-
-
-def ViT_huge_patch32_384(pretrained=False, use_ssld=False, **kwargs):
-    model = VisionTransformer(
-        img_size=384,
-        patch_size=32,
-        embed_dim=1280,
-        depth=32,
-        num_heads=16,
-        mlp_ratio=4,
-        **kwargs)
-    _load_pretrained(
-        pretrained,
-        model,
-        MODEL_URLS["ViT_huge_patch32_384"],
         use_ssld=use_ssld)
     return model

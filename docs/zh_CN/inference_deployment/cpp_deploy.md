@@ -293,8 +293,6 @@ sh tools/run.sh
 
 * 最终屏幕上会输出结果，如下图所示。
 
-<div align="center">
-    <img src="../../images/inference_deployment/cpp_infer_result.png" width="600">
-</div>
+![](../../images/inference_deployment/cpp_infer_result.png)
 
 其中 `class id` 表示置信度最高的类别对应的 id，score 表示图片属于该类别的概率。

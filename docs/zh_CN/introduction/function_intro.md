@@ -15,8 +15,6 @@
 - 数据增广：支持 AutoAugment 、 Cutout 、 Cutmix 等 8 种数据增广算法详细介绍、代码复现和在统一实验环境下的效果评估。
 
 
-<div align="center">
-<img src="../../images/recognition.gif"  width = "400" />
-</div>
+![](../../images/recognition.gif)
 
 更多关于图像识别快速体验、算法详解、模型训练评估与预测部署方法，请参考[首页 README 文档教程](../../../README_ch.md)。

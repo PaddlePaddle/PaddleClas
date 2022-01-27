@@ -31,6 +31,14 @@ MODEL_URLS = {
     "VGG19":
     "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/VGG19_pretrained.pdparams",
 }
+
+MODEL_STAGES_PATTERN = {
+    "VGG": [
+        "conv_block_1", "conv_block_2", "conv_block_3", "conv_block_4",
+        "conv_block_5"
+    ]
+}
+
 __all__ = MODEL_URLS.keys()
 
 # VGG config
@@ -111,7 +119,13 @@ class VGGNet(TheseusLayer):
         model: nn.Layer. Specific VGG model depends on args.
     """
 
-    def __init__(self, config, stop_grad_layers=0, class_num=1000, return_patterns=None):
+    def __init__(self,
+                 config,
+                 stages_pattern,
+                 stop_grad_layers=0,
+                 class_num=1000,
+                 return_patterns=None,
+                 return_stages=None):
         super().__init__()
 
         self.stop_grad_layers = stop_grad_layers
@@ -137,9 +151,11 @@ class VGGNet(TheseusLayer):
         self.fc1 = Linear(7 * 7 * 512, 4096)
         self.fc2 = Linear(4096, 4096)
         self.fc3 = Linear(4096, class_num)
-        if return_patterns is not None:
-            self.update_res(return_patterns)
-            self.register_forward_post_hook(self._return_dict_hook)
+
+        super().init_res(
+            stages_pattern,
+            return_patterns=return_patterns,
+            return_stages=return_stages)
 
     def forward(self, inputs):
         x = self.conv_block_1(inputs)
@@ -181,7 +197,10 @@ def VGG11(pretrained=False, use_ssld=False, **kwargs):
     Returns:
         model: nn.Layer. Specific `VGG11` model depends on args.
     """
-    model = VGGNet(config=NET_CONFIG[11], **kwargs)
+    model = VGGNet(
+        config=NET_CONFIG[11],
+        stages_pattern=MODEL_STAGES_PATTERN["VGG"],
+        **kwargs)
     _load_pretrained(pretrained, model, MODEL_URLS["VGG11"], use_ssld)
     return model
 
@@ -196,7 +215,10 @@ def VGG13(pretrained=False, use_ssld=False, **kwargs):
     Returns:
         model: nn.Layer. Specific `VGG13` model depends on args.
     """
-    model = VGGNet(config=NET_CONFIG[13], **kwargs)
+    model = VGGNet(
+        config=NET_CONFIG[13],
+        stages_pattern=MODEL_STAGES_PATTERN["VGG"],
+        **kwargs)
     _load_pretrained(pretrained, model, MODEL_URLS["VGG13"], use_ssld)
     return model
 
@@ -211,7 +233,10 @@ def VGG16(pretrained=False, use_ssld=False, **kwargs):
     Returns:
         model: nn.Layer. Specific `VGG16` model depends on args.
     """
-    model = VGGNet(config=NET_CONFIG[16], **kwargs)
+    model = VGGNet(
+        config=NET_CONFIG[16],
+        stages_pattern=MODEL_STAGES_PATTERN["VGG"],
+        **kwargs)
     _load_pretrained(pretrained, model, MODEL_URLS["VGG16"], use_ssld)
     return model
 
@@ -226,6 +251,9 @@ def VGG19(pretrained=False, use_ssld=False, **kwargs):
     Returns:
         model: nn.Layer. Specific `VGG19` model depends on args.
     """
-    model = VGGNet(config=NET_CONFIG[19], **kwargs)
+    model = VGGNet(
+        config=NET_CONFIG[19],
+        stages_pattern=MODEL_STAGES_PATTERN["VGG"],
+        **kwargs)
     _load_pretrained(pretrained, model, MODEL_URLS["VGG19"], use_ssld)
     return model
