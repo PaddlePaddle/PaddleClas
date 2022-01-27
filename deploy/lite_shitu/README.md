@@ -19,8 +19,11 @@ Paddle Lite是飞桨轻量化推理引擎，为手机、IOT端提供高效推理
 3. [MAC OS](https://paddle-lite.readthedocs.io/zh/latest/source_compile/compile_env.html#mac-os)
 
 ```shell
-# 配置完成交叉编译环境后
+# 配置完成交叉编译环境后，更新环境变量
+# for docker、Linux
 source ~/.bashrc
+# for Mac OS
+source ~/.bash_profile
 ```
 
 ### 1.2 准备预测库
