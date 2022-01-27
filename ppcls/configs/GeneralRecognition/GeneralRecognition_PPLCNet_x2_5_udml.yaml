@@ -1,0 +1,193 @@
+# global configs
+Global:
+  checkpoints: null
+  pretrained_model: null
+  output_dir: ./output/
+  device: gpu
+  save_interval: 1
+  eval_during_train: true
+  eval_interval: 1
+  epochs: 100
+  print_batch_step: 10
+  use_visualdl: False
+  # used for static mode and model export
+  image_shape: [3, 224, 224]
+  save_inference_dir: ./inference
+  eval_mode: retrieval
+  use_dali: False
+  to_static: False
+
+# model architecture
+Arch:
+  name: "DistillationModel"
+  infer_output_key: features
+  infer_add_softmax: False
+  is_rec: True
+  infer_model_name: "Student"
+  # if not null, its lengths should be same as models
+  pretrained_list:
+  # if not null, its lengths should be same as models
+  freeze_params_list:
+  - False
+  - False
+  models:
+    - Teacher:
+        name: RecModel
+        infer_output_key: features
+        infer_add_softmax: False
+        Backbone: 
+          name: PPLCNet_x2_5
+          pretrained: True
+          use_ssld: True
+        BackboneStopLayer:
+          name: "flatten"
+        Neck:
+          name: FC
+          embedding_size: 1280
+          class_num: 512
+        Head:
+          name: ArcMargin 
+          embedding_size: 512
+          class_num: 185341
+          margin: 0.2
+          scale: 30
+    - Student:
+        name: RecModel
+        infer_output_key: features
+        infer_add_softmax: False
+        Backbone: 
+          name: PPLCNet_x2_5
+          pretrained: True
+          use_ssld: True
+        BackboneStopLayer:
+          name: "flatten"
+        Neck:
+          name: FC
+          embedding_size: 1280
+          class_num: 512
+        Head:
+          name: ArcMargin 
+          embedding_size: 512
+          class_num: 185341
+          margin: 0.2
+          scale: 30
+
+# loss function config for traing/eval process
+Loss:
+  Train:
+    - DistillationGTCELoss:
+        weight: 1.0
+        key: "logits"
+        model_names: ["Student", "Teacher"]
+    - DistillationDMLLoss:
+        weight: 1.0
+        key: "logits"
+        model_name_pairs:
+        - ["Student", "Teacher"]
+    - DistillationDistanceLoss:
+        weight: 1.0
+        key: "backbone"
+        model_name_pairs:
+        - ["Student", "Teacher"]
+  Eval:
+    - DistillationGTCELoss:
+        weight: 1.0
+        model_names: ["Student"]
+
+Optimizer:
+  name: Momentum
+  momentum: 0.9
+  lr:
+    name: Cosine
+    learning_rate: 0.02
+    warmup_epoch: 5
+  regularizer:
+    name: 'L2'
+    coeff: 0.00001
+
+
+# data loader for train and eval
+DataLoader:
+  Train:
+    dataset:
+      name: ImageNetDataset
+      image_root: ./dataset/
+      cls_label_path: ./dataset/train_reg_all_data.txt
+      transform_ops:
+        - DecodeImage:
+            to_rgb: True
+            channel_first: False
+        - RandCropImage:
+            size: 224
+        - RandFlipImage:
+            flip_code: 1
+        - NormalizeImage:
+            scale: 1.0/255.0
+            mean: [0.485, 0.456, 0.406]
+            std: [0.229, 0.224, 0.225]
+            order: ''
+
+    sampler:
+      name: DistributedBatchSampler
+      batch_size: 64
+      drop_last: False
+      shuffle: True
+    loader:
+      num_workers: 4
+      use_shared_memory: True
+
+  Eval:
+    Query:
+      dataset: 
+        name: VeriWild
+        image_root: ./dataset/Aliproduct/
+        cls_label_path: ./dataset/Aliproduct/val_list.txt
+        transform_ops:
+          - DecodeImage:
+              to_rgb: True
+              channel_first: False
+          - ResizeImage:
+              size: 224
+          - NormalizeImage:
+              scale: 0.00392157
+              mean: [0.485, 0.456, 0.406]
+              std: [0.229, 0.224, 0.225]
+              order: ''
+      sampler:
+        name: DistributedBatchSampler
+        batch_size: 64
+        drop_last: False
+        shuffle: False
+      loader:
+        num_workers: 4
+        use_shared_memory: True
+
+    Gallery:
+      dataset: 
+        name: VeriWild
+        image_root: ./dataset/Aliproduct/
+        cls_label_path: ./dataset/Aliproduct/val_list.txt
+        transform_ops:
+          - DecodeImage:
+              to_rgb: True
+              channel_first: False
+          - ResizeImage:
+              size: 224
+          - NormalizeImage:
+              scale: 0.00392157
+              mean: [0.485, 0.456, 0.406]
+              std: [0.229, 0.224, 0.225]
+              order: ''
+      sampler:
+        name: DistributedBatchSampler
+        batch_size: 64
+        drop_last: False
+        shuffle: False
+      loader:
+        num_workers: 4
+        use_shared_memory: True
+
+Metric:
+  Eval:
+    - Recallk:
+        topk: [1, 5]

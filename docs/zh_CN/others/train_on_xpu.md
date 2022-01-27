@@ -3,10 +3,10 @@
 ## 目录
 * [1. 前言](#1)
 * [2. 昆仑训练](#2)
-    * [2.1 ResNet50](#2.1)
-    * [2.2 MobileNetV3](#2.2)
-    * [2.3 HRNet](#2.3)
-    * [2.4 VGG16/19](#2.4)
+	* [2.1 ResNet50](#2.1)
+	* [2.2 MobileNetV3](#2.2)
+	* [2.3 HRNet](#2.3)
+	* [2.4 VGG16/19](#2.4)
 
  <a name='1'></a>
 
@@ -67,14 +67,14 @@ python3.7 ppcls/static/train.py \
 
 ```shell
 python3.7 ppcls/static/train.py \
-    -c ppcls/configs/quick_start/VGG16_finetune_kunlun.yaml \
+    -c ppcls/configs/quick_start/kunlun/VGG16_finetune_kunlun.yaml \
     -o use_gpu=False \
     -o use_xpu=True \
     -o is_distributed=False
 ```
 ```shell
 python3.7 ppcls/static/train.py \
-    -c ppcls/configs/quick_start/VGG19_finetune_kunlun.yaml \
+    -c ppcls/configs/quick_start/kunlun/VGG19_finetune_kunlun.yaml \
     -o use_gpu=False \
     -o use_xpu=True \
     -o is_distributed=False

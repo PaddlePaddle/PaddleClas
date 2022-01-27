@@ -14,10 +14,13 @@
    - [4.1 图像分类](#4.1)
    - [4.2 目标检测](#4.2)
    - [4.3 语义分割](#4.3)
-- [5. 总结](#5)
-- [6. 引用](#6)
+- [5. 基于 V100 GPU 的预测速度](#5)
+- [6. 基于 SD855 的预测速度](#6)
+- [7. 总结](#7)
+- [8. 引用](#8)
 
 <a name="1"></a>
+
 ## 1. 摘要
 
 在计算机视觉领域中，骨干网络的好坏直接影响到整个视觉任务的结果。在之前的一些工作中，相关的研究者普遍将 FLOPs 或者 Params 作为优化目的，但是在工业界真实落地的场景中，推理速度才是考量模型好坏的重要指标，然而，推理速度和准确性很难兼得。考虑到工业界有很多基于 Intel CPU 的应用，所以我们本次的工作旨在使骨干网络更好的适应 Intel CPU，从而得到一个速度更快、准确率更高的轻量级骨干网络，与此同时，目标检测、语义分割等下游视觉任务的性能也同样得到提升。
@@ -26,14 +29,13 @@
 ## 2. 介绍
 
 近年来，有很多轻量级的骨干网络问世，尤其最近两年，各种 NAS 搜索出的网络层出不穷，这些网络要么主打 FLOPs 或者 Params 上的优势，要么主打 ARM 设备上的推理速度的优势，很少有网络专门针对 Intel CPU 做特定的优化，导致这些网络在 Intel CPU 端的推理速度并不是很完美。基于此，我们针对 Intel CPU 设备以及其加速库 MKLDNN 设计了特定的骨干网络 PP-LCNet，比起其他的轻量级的 SOTA 模型，该骨干网络可以在不增加推理时间的情况下，进一步提升模型的性能，最终大幅度超越现有的 SOTA 模型。与其他模型的对比图如下。
-<div align=center><img src="../../images/PP-LCNet/PP-LCNet-Acc.png" width="500" height="400"/></div>
+![](../../images/PP-LCNet/PP-LCNet-Acc.png)
 
 <a name="3"></a>
 ## 3. 方法
 
 网络结构整体如下图所示。
-<div align=center><img src="../../images/PP-LCNet/PP-LCNet.png" width="700" height="400"/></div>
-
+![](../../images/PP-LCNet/PP-LCNet.png)
 我们经过大量的实验发现，在基于 Intel CPU 设备上，尤其当启用 MKLDNN 加速库后，很多看似不太耗时的操作反而会增加延时，比如 elementwise-add 操作、split-concat 结构等。所以最终我们选用了结构尽可能精简、速度尽可能快的 block 组成我们的 BaseNet（类似 MobileNetV1）。基于 BaseNet，我们通过实验，总结了四条几乎不增加延时但是可以提升模型精度的方法，融合这四条策略，我们组合成了 PP-LCNet。下面对这四条策略一一介绍：
 
 <a name="3.1"></a>
@@ -70,7 +72,7 @@ SE 模块是 SENet 提出的一种通道注意力机制，可以有效提升模�
 
 
 实验表明，更大的卷积核放在网络的中后部即可达到放在所有位置的精度，与此同时，获得更快的推理速度。PP-LCNet 最终选用了表格中第三行的方案。
-
+    
 <a name="3.4"></a>
 ### 3.4 GAP 后使用更大的 1x1 卷积层
 
@@ -93,7 +95,7 @@ BaseNet 经过以上四个方面的改进，得到了 PP-LCNet。下表进一步
 
 图像分类我们选用了 ImageNet 数据集，相比目前主流的轻量级网络，PP-LCNet 在相同精度下可以获得更快的推理速度。当使用百度自研的 SSLD 蒸馏策略后，精度进一步提升，在 Intel cpu 端约 5ms 的推理速度下 ImageNet 的 Top-1 Acc 超过了 80%。
 
-| Model | Params(M) | FLOPs(M) | Top-1 Acc(\%) | Top-5 Acc(\%) | Latency(ms) |
+| Model | Params(M) | FLOPs(M) | Top-1 Acc(\%) | Top-5 Acc(\%) | Latency(ms) | 
 |-------|-----------|----------|---------------|---------------|-------------|
 | PP-LCNet-0.25x  | 1.5 | 18  | 51.86 | 75.65 | 1.74 |
 | PP-LCNet-0.35x  | 1.6 | 29  | 58.09 | 80.83 | 1.92 |
@@ -136,7 +138,7 @@ BaseNet 经过以上四个方面的改进，得到了 PP-LCNet。下表进一步
 MobileNetV3-large-0.35x | 19.2 | 8.1 |
 <b>PP-LCNet-0.5x<b> | <b>20.3<b> | <b>6.0<b> |
 MobileNetV3-large-0.75x | 25.8 | 11.1 |
-<b>PP-LCNet-1x<b> | <b>26.9<b> | <b>7.9<b> |
+<b>PP-LCNet-1x<b> | <b>26.9<b> | <b>7.9<b> | 
 
 <a name="4.3"></a>
 ### 4.3 语义分割
@@ -145,23 +147,54 @@ MobileNetV3-large-0.75x | 25.8 | 11.1 |
 
 | Backbone | mIoU(%) | Latency(ms) |
 |-------|-----------|----------|
-MobileNetV3-large-0.5x | 55.42 | 135 |
-<b>PP-LCNet-0.5x<b> | <b>58.36<b> | <b>82<b> |
-MobileNetV3-large-0.75x | 64.53 | 151 |
-<b>PP-LCNet-1x<b> | <b>66.03<b> | <b>96<b> |
+|MobileNetV3-large-0.5x | 55.42 | 135 |
+|<b>PP-LCNet-0.5x<b> | <b>58.36<b> | <b>82<b> |
+|MobileNetV3-large-0.75x | 64.53 | 151 |
+|<b>PP-LCNet-1x<b> | <b>66.03<b> | <b>96<b> |
 
 <a name="5"></a>
-## 5. 总结
+
+## 5. 基于 V100 GPU 的预测速度
+
+| Models        | Crop Size | Resize Short Size | FP32<br>Batch Size=1<br>(ms) | FP32<br/>Batch Size=1\4<br/>(ms) | FP32<br/>Batch Size=8<br/>(ms) |
+| ------------- | --------- | ----------------- | ---------------------------- | -------------------------------- | ------------------------------ |
+| PPLCNet_x0_25 | 224       | 256               | 0.72                         | 1.17                             | 1.71                           |
+| PPLCNet_x0_35 | 224       | 256               | 0.69                         | 1.21                             | 1.82                           |
+| PPLCNet_x0_5  | 224       | 256               | 0.70                         | 1.32                             | 1.94                           |
+| PPLCNet_x0_75 | 224       | 256               | 0.71                         | 1.49                             | 2.19                           |
+| PPLCNet_x1_0  | 224       | 256               | 0.73                         | 1.64                             | 2.53                           |
+| PPLCNet_x1_5  | 224       | 256               | 0.82                         | 2.06                             | 3.12                           |
+| PPLCNet_x2_0  | 224       | 256               | 0.94                         | 2.58                             | 4.08                           |
+
+<a name="6"></a>
+
+## 6. 基于 SD855 的预测速度
+
+| Models        | SD855 time(ms)<br>bs=1, thread=1 | SD855 time(ms)<br/>bs=1, thread=2 | SD855 time(ms)<br/>bs=1, thread=4 |
+| ------------- | -------------------------------- | --------------------------------- | --------------------------------- |
+| PPLCNet_x0_25 | 2.30                             | 1.62                              | 1.32                              |
+| PPLCNet_x0_35 | 3.15                             | 2.11                              | 1.64                              |
+| PPLCNet_x0_5  | 4.27                             | 2.73                              | 1.92                              |
+| PPLCNet_x0_75 | 7.38                             | 4.51                              | 2.91                              |
+| PPLCNet_x1_0  | 10.78                            | 6.49                              | 3.98                              |
+| PPLCNet_x1_5  | 20.55                            | 12.26                             | 7.54                              |
+| PPLCNet_x2_0  | 33.79                            | 20.17                             | 12.10                             |
+| PPLCNet_x2_5  | 49.89                            | 29.60                             | 17.82                             |
+
+<a name="7"></a>
+
+## 7. 总结
 
 PP-LCNet 没有像学术界那样死扣极致的 FLOPs 与 Params，而是着眼于分析如何添加对 Intel CPU 友好的模块来提升模型的性能，这样可以更好的平衡准确率和推理时间，其中的实验结论也很适合其他网络结构设计的研究者，同时也为 NAS 搜索研究者提供了更小的搜索空间和一般结论。最终的 PP-LCNet 在产业界也可以更好的落地和应用。
 
-<a name="6"></a>
-## 6. 引用
+<a name="8"></a>
+
+## 8. 引用
 
 如果你的论文用到了 PP-LCNet 的方法，请添加如下 cite：
 ```
 @misc{cui2021pplcnet,
-      title={PP-LCNet: A Lightweight CPU Convolutional Neural Network},
+      title={PP-LCNet: A Lightweight CPU Convolutional Neural Network}, 
       author={Cheng Cui and Tingquan Gao and Shengyu Wei and Yuning Du and Ruoyu Guo and Shuilong Dong and Bin Lu and Ying Zhou and Xueying Lv and Qiwen Liu and Xiaoguang Hu and Dianhai Yu and Yanjun Ma},
       year={2021},
       eprint={2109.15099},

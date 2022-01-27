@@ -241,7 +241,7 @@ demo/cxx/clas/
 clas_model_file ./MobileNetV3_large_x1_0.nb # 模型文件地址
 label_path ./imagenet1k_label_list.txt         # 类别映射文本文件
 resize_short_size 256                       # resize 之后的短边边长
-crop_size 224                                 # 裁剪后用于预测的边长
+crop_size 224                                 # 裁剪后用于预测的边长 
 visualize 0       # 是否进行可视化，如果选择的话，会在当前文件夹下生成名为 clas_result.png 的图像文件。
 ```
 
@@ -270,9 +270,7 @@ export LD_LIBRARY_PATH=/data/local/tmp/debug:$LD_LIBRARY_PATH
 
 运行效果如下：
 
-<div align="center">
-    <img src="../../images/inference_deployment/lite_demo_result.png" width="600">
-</div>
+![](../../images/inference_deployment/lite_demo_result.png)
 
 <a name="3"></a>
 ## 3. FAQ

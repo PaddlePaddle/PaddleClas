@@ -7,6 +7,10 @@
 - 2021.06.29 添加Swin-transformer系列模型，ImageNet1k数据集上Top1 acc最高精度可达87.2%；支持训练预测评估与whl包部署，预训练模型可以从[这里](../models/models_intro.md)下载。
 - 2021.06.22,23,24 PaddleClas官方研发团队带来技术深入解读三日直播课。课程回放：[https://aistudio.baidu.com/aistudio/course/introduce/24519](https://aistudio.baidu.com/aistudio/course/introduce/24519)
 - 2021.06.16 PaddleClas v2.2版本升级，集成Metric learning，向量检索等组件。新增商品识别、动漫人物识别、车辆识别和logo识别等4个图像识别应用。新增LeViT、Twins、TNT、DLA、HarDNet、RedNet系列30个预训练模型。
+- 2021.08.11 更新 7 个[FAQ](../faq_series/faq_2021_s2.md)。
+- 2021.06.29 添加 Swin-transformer 系列模型，ImageNet1k 数据集上 Top1 acc 最高精度可达 87.2%；支持训练预测评估与 whl 包部署，预训练模型可以从[这里](../models/models_intro.md)下载。
+- 2021.06.22,23,24 PaddleClas 官方研发团队带来技术深入解读三日直播课。课程回放：[https://aistudio.baidu.com/aistudio/course/introduce/24519](https://aistudio.baidu.com/aistudio/course/introduce/24519)
+- 2021.06.16 PaddleClas v2.2 版本升级，集成 Metric learning，向量检索等组件。新增商品识别、动漫人物识别、车辆识别和 logo 识别等 4 个图像识别应用。新增 LeViT、Twins、TNT、DLA、HarDNet、RedNet 系列 30 个预训练模型。
 - 2021.04.15
    - 添加 `MixNet_L` 和 `ReXNet_3_0` 系列模型，在 ImageNet-1k 上 `MixNet` 模型 Top1 Acc 可达 78.6%，`ReXNet` 模型可达 82.09%
 - 2021.01.27

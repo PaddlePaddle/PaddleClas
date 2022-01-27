@@ -18,7 +18,7 @@ PaddleClas 支持 Python Whl 包方式进行预测，目前 Whl 包方式仅支�
    - [4.6 对 `NumPy.ndarray` 格式数据进行预测](#4.6)
    - [4.7 保存预测结果](#4.7)
    - [4.8 指定 label name](#4.8)
-
+   
 
 <a name="1"></a>
 ## 1. 安装 paddleclas
@@ -40,9 +40,7 @@ pip3 install dist/*
 ## 2. 快速开始
 * 使用 `ResNet50` 模型，以下图（`PaddleClas/docs/images/inference_deployment/whl_demo.jpg`）为例进行说明。
 
-<div align="center">
-<img src="../../images/inference_deployment/whl_demo.jpg"  width = "400" />
-</div>
+![](../../images/inference_deployment/whl_demo.jpg)
 
 
 * 在 Python 代码中使用
@@ -194,14 +192,14 @@ paddleclas --model_name='ResNet50' --infer_imgs='https://raw.githubusercontent.c
 
 <a name="4.6"></a>
 ### 4.6 对 `NumPy.ndarray` 格式数据进行预测
-在 Python 中，可以对 `Numpy.ndarray` 格式的图像数据进行预测，只需通过参数 `infer_imgs` 指定即可。注意该图像数据必须为三通道图像数据。
+在 Python 中，可以对 `Numpy.ndarray` 格式的图像数据进行预测，只需通过参数 `infer_imgs` 指定即可。注意，PaddleClas 所提供的模型仅支持 3 通道图像数据，且通道顺序为 `RGB`。
 
 * python
 ```python
 import cv2
 from paddleclas import PaddleClas
 clas = PaddleClas(model_name='ResNet50')
-infer_imgs = cv2.imread("docs/images/inference_deployment/whl_demo.jpg")
+infer_imgs = cv2.imread("docs/images/inference_deployment/whl_demo.jpg")[:, :, ::-1]
 result=clas.predict(infer_imgs)
 print(next(result))
 ```

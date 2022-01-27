@@ -31,7 +31,7 @@
 
 `AotoAugment` 的图像增广方式的配置如下。`AutoAugment` 是在 uint8 的数据格式上转换的，所以其处理过程应该放在归一化操作(`NormalizeImage`)之前。
 
-```yaml  
+```yaml        
       transform_ops:
         - DecodeImage:
             to_rgb: True
@@ -53,7 +53,7 @@
 
 `RandAugment` 的图像增广方式的配置如下，其中用户需要指定其中的参数 `num_layers` 与 `magnitude`，默认的数值分别是 `2` 和 `5`。`RandAugment` 是在 uint8 的数据格式上转换的，所以其处理过程应该放在归一化操作(`NormalizeImage`)之前。
 
-```yaml  
+```yaml        
       transform_ops:
         - DecodeImage:
             to_rgb: True
@@ -77,7 +77,7 @@
 
 `TimmAutoAugment` 的图像增广方式的配置如下，其中用户需要指定其中的参数 `config_str`、`interpolation`、`img_size`，默认的数值分别是 `rand-m9-mstd0.5-inc1`、`bicubic`、`224`。`TimmAutoAugment` 是在 uint8 的数据格式上转换的，所以其处理过程应该放在归一化操作(`NormalizeImage`)之前。
 
-```yaml  
+```yaml        
       transform_ops:
         - DecodeImage:
             to_rgb: True
@@ -307,7 +307,7 @@ sh tools/train.sh
 
 * 在使用数据增强后，模型可能会趋于欠拟合状态，建议可以适当的调小 `l2_decay` 的值来获得更高的验证集准确率。
 
-* 几乎每一类图像增强均含有超参数，我们只提供了基于 ImageNet-1k 的超参数，其他数据集需要用户自己调试超参数，具体超参数的含义用户可以阅读相关的论文，调试方法也可以参考训练技巧的章节。
+* 几乎每一类图像增强均含有超参数，我们只提供了基于 ImageNet-1k 的超参数，其他数据集需要用户自己调试超参数，具体超参数的含义用户可以阅读相关的论文，调试方法也可以参考[训练技巧](../models_training/train_strategy.md)。
 
 <a name="4"></a>
 ## 4. 实验结果

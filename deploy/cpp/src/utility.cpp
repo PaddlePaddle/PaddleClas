@@ -20,20 +20,20 @@
 
 namespace PaddleClas {
 
-std::vector<std::string> Utility::ReadDict(const std::string &path) {
-  std::ifstream in(path);
-  std::string line;
-  std::vector<std::string> m_vec;
-  if (in) {
-    while (getline(in, line)) {
-      m_vec.push_back(line);
+    std::vector <std::string> Utility::ReadDict(const std::string &path) {
+        std::ifstream in(path);
+        std::string line;
+        std::vector <std::string> m_vec;
+        if (in) {
+            while (getline(in, line)) {
+                m_vec.push_back(line);
+            }
+        } else {
+            std::cout << "no such label file: " << path << ", exit the program..."
+                      << std::endl;
+            exit(1);
+        }
+        return m_vec;
     }
-  } else {
-    std::cout << "no such label file: " << path << ", exit the program..."
-              << std::endl;
-    exit(1);
-  }
-  return m_vec;
-}
 
 } // namespace PaddleClas

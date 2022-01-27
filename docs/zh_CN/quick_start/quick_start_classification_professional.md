@@ -37,7 +37,7 @@
 cd path_to_PaddleClas
 ```
 
-<a name="1.1.1"></a>
+<a name="1.1.1"></a> 
 
 #### 1.1.1 准备 CIFAR100
 
@@ -54,11 +54,11 @@ cd ../
 
 ## 2. 模型训练
 
-<a name="2.1"></a>
+<a name="2.1"></a> 
 
 ### 2.1 单标签训练
 
-<a name="2.1.1"></a>
+<a name="2.1.1"></a> 
 
 #### 2.1.1 零基础训练：不加载预训练模型的训练
 
@@ -75,7 +75,7 @@ python3 -m paddle.distributed.launch \
 
 验证集的最高准确率为 0.415 左右。
 
-<a name="2.1.2"></a>
+<a name="2.1.2"></a> 
 
 
 #### 2.1.2 迁移学习
@@ -130,7 +130,7 @@ python3 -m paddle.distributed.launch \
 
 PaddleClas 包含了很多数据增广的方法，如 Mixup、Cutout、RandomErasing 等，具体的方法可以参考[数据增广的章节](../algorithm_introduction/DataAugmentation.md)。
 
-<a name="3.1"></a>
+<a name="3.1"></a> 
 
 ### 3.1 数据增广的尝试-Mixup
 
@@ -226,11 +226,11 @@ python3 -m paddle.distributed.launch \
 
 ## 5. 模型评估与推理
 
-<a name="5.1"></a>
+<a name="5.1"></a> 
 
 ### 5.1 单标签分类模型评估与推理
 
-<a name="5.1.1"></a>
+<a name="5.1.1"></a> 
 
 #### 5.1.1 单标签分类模型评估。
 
@@ -242,7 +242,7 @@ python3 tools/eval.py \
     -o Global.pretrained_model="output_CIFAR/ResNet50_vd/best_model"
 ```
 
-<a name="5.1.2"></a>
+<a name="5.1.2"></a> 
 
 #### 5.1.2 单标签分类模型预测
 
@@ -255,7 +255,7 @@ python3 tools/infer.py \
     -o Global.pretrained_model=output_CIFAR/ResNet50_vd/best_model
 ```
 
-<a name="5.1.3"></a>
+<a name="5.1.3"></a> 
 
 #### 5.1.3 单标签分类使用 inference 模型进行模型推理
 

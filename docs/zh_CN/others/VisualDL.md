@@ -1,5 +1,7 @@
 # 使用 VisualDL 可视化训练过程
---------
+
+---
+
 ## 目录
 * [1. 前言](#1)
 * [2. 在 PaddleClas 中使用 VisualDL](#2)
@@ -51,6 +53,4 @@ python3 tools/train.py -c config.yaml
 
 在启动 VisualDL 后，即可在浏览器中查看训练过程，输入地址 `127.0.0.1:8840`：
 
-<div align="center">
-    <img src="../../images/VisualDL/train_loss.png" width="400">
-</div>
+![](../../images/VisualDL/train_loss.png)

@@ -9,9 +9,7 @@
 
 值得注意的是，为了更好是适配性，目前版本，`PaddleClas` 中暂时**只使用 CPU 进行向量检索**。
 
-<div align="center">
-<img src="../../images/structure.jpg"  width = "800" />
-</div>
+![](../../images/structure.jpg)
 
 如上图中所示，向量检索部分，在整个 `PP-ShiTu` 系统中有两部分内容
 
@@ -30,7 +28,7 @@
   - [3.1 建库及配置文件参数](#3.1)
   - [3.2 检索配置文件参数](#3.2)
 
-<a name="1"></a>
+<a name="1"></a> 
 
 ## 1. 检索库安装
 
@@ -42,7 +40,7 @@ pip install faiss-cpu==1.7.1post2
 
 若使用时，不能正常引用，则 `uninstall` 之后，重新 `install`，尤其是 `windows` 下。
 
-<a name="2"></a>
+<a name="2"></a> 
 
 ## 2. 使用的检索算法
 
@@ -54,13 +52,13 @@ pip install faiss-cpu==1.7.1post2
 
 每种检索算法，满足不同场景。其中 `HNSW32` 为默认方法，此方法的检索精度、检索速度可以取得一个较好的平衡，具体算法介绍可以查看[官方文档](https://github.com/facebookresearch/faiss/wiki)。
 
-<a name="3"></a>
+<a name="3"></a> 
 
 ## 3. 使用及配置文档介绍
 
 涉及检索模块配置文件位于：`deploy/configs/` 下，其中 `build_*.yaml` 是建立特征库的相关配置文件，`inference_*.yaml` 是检索或者分类的推理配置文件。
 
-<a name="3.1"></a>
+<a name="3.1"></a> 
 
 ### 3.1 建库及配置文件参数
 
@@ -101,7 +99,7 @@ IndexProcess:
 - **dist_type**: 特征匹配过程中使用的相似度计算方式。例如 `IP` 内积相似度计算方式，`L2` 欧式距离计算方法
 - **embedding_size**：特征维度
 
-<a name="3.2"></a>
+<a name="3.2"></a> 
 
 ### 3.2 检索配置文件参数
 

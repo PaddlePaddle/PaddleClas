@@ -14,6 +14,11 @@ SET(TENSORRT_DIR "" CACHE PATH "Compile demo with TensorRT")
 
 set(DEMO_NAME "clas_system")
 
+include(external-cmake/yaml-cpp.cmake)
+include_directories("${CMAKE_SOURCE_DIR}/")
+include_directories("${CMAKE_CURRENT_BINARY_DIR}/ext/yaml-cpp/src/ext-yaml-cpp/include")
+link_directories("${CMAKE_CURRENT_BINARY_DIR}/ext/yaml-cpp/lib")
+
 macro(safe_set_static_flag)
     foreach(flag_var
         CMAKE_CXX_FLAGS CMAKE_CXX_FLAGS_DEBUG CMAKE_CXX_FLAGS_RELEASE
@@ -61,7 +66,7 @@ if (WIN32)
         add_definitions(-DSTATIC_LIB)
     endif()
 else()
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -o3 -std=c++11")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -O3 -std=c++11")
     set(CMAKE_STATIC_LIBRARY_PREFIX "")
 endif()
 message("flags" ${CMAKE_CXX_FLAGS})
@@ -153,7 +158,7 @@ endif(WITH_STATIC_LIB)
 if (NOT WIN32)
     set(DEPS ${DEPS}
         ${MATH_LIB} ${MKLDNN_LIB}
-        glog gflags protobuf z xxhash
+        glog gflags protobuf z xxhash yaml-cpp
         )
     if(EXISTS "${PADDLE_LIB}/third_party/install/snappystream/lib")
         set(DEPS ${DEPS} snappystream)
@@ -164,7 +169,7 @@ if (NOT WIN32)
 else()
     set(DEPS ${DEPS}
         ${MATH_LIB} ${MKLDNN_LIB}
-        glog gflags_static libprotobuf xxhash)
+        glog gflags_static libprotobuf xxhash libyaml-cppmt)
     set(DEPS ${DEPS} libcmt shlwapi)
     if (EXISTS "${PADDLE_LIB}/third_party/install/snappy/lib")
         set(DEPS ${DEPS} snappy)
@@ -204,6 +209,7 @@ include_directories(${FETCHCONTENT_BASE_DIR}/extern_autolog-src)
 
 AUX_SOURCE_DIRECTORY(./src SRCS)
 add_executable(${DEMO_NAME} ${SRCS})
+ADD_DEPENDENCIES(${DEMO_NAME} ext-yaml-cpp)
 
 target_link_libraries(${DEMO_NAME} ${DEPS})
 

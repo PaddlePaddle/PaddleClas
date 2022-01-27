@@ -45,6 +45,13 @@ MODEL_URLS = {
     "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/MobileNetV3_large_x1_25_pretrained.pdparams",
 }
 
+MODEL_STAGES_PATTERN = {
+    "MobileNetV3_small":
+    ["blocks[0]", "blocks[2]", "blocks[7]", "blocks[10]"],
+    "MobileNetV3_large":
+    ["blocks[0]", "blocks[2]", "blocks[5]", "blocks[11]", "blocks[14]"]
+}
+
 __all__ = MODEL_URLS.keys()
 
 # "large", "small" is just for MobinetV3_large, MobileNetV3_small respectively.
@@ -137,13 +144,15 @@ class MobileNetV3(TheseusLayer):
 
     def __init__(self,
                  config,
+                 stages_pattern,
                  scale=1.0,
                  class_num=1000,
                  inplanes=STEM_CONV_NUMBER,
                  class_squeeze=LAST_SECOND_CONV_LARGE,
                  class_expand=LAST_CONV,
                  dropout_prob=0.2,
-                 return_patterns=None):
+                 return_patterns=None,
+                 return_stages=None):
         super().__init__()
 
         self.cfg = config
@@ -196,13 +205,18 @@ class MobileNetV3(TheseusLayer):
             bias_attr=False)
 
         self.hardswish = nn.Hardswish()
-        self.dropout = Dropout(p=dropout_prob, mode="downscale_in_infer")
+        if dropout_prob is not None:
+            self.dropout = Dropout(p=dropout_prob, mode="downscale_in_infer")
+        else:
+            self.dropout = None
         self.flatten = nn.Flatten(start_axis=1, stop_axis=-1)
 
         self.fc = Linear(self.class_expand, class_num)
-        if return_patterns is not None:
-            self.update_res(return_patterns)
-            self.register_forward_post_hook(self._return_dict_hook)
+
+        super().init_res(
+            stages_pattern,
+            return_patterns=return_patterns,
+            return_stages=return_stages)
 
     def forward(self, x):
         x = self.conv(x)
@@ -211,7 +225,8 @@ class MobileNetV3(TheseusLayer):
         x = self.avg_pool(x)
         x = self.last_conv(x)
         x = self.hardswish(x)
-        x = self.dropout(x)
+        if self.dropout is not None:
+            x = self.dropout(x)
         x = self.flatten(x)
         x = self.fc(x)
 
@@ -374,6 +389,7 @@ def MobileNetV3_small_x0_35(pretrained=False, use_ssld=False, **kwargs):
     model = MobileNetV3(
         config=NET_CONFIG["small"],
         scale=0.35,
+        stages_pattern=MODEL_STAGES_PATTERN["MobileNetV3_small"],
         class_squeeze=LAST_SECOND_CONV_SMALL,
         **kwargs)
     _load_pretrained(pretrained, model, MODEL_URLS["MobileNetV3_small_x0_35"],
@@ -394,6 +410,7 @@ def MobileNetV3_small_x0_5(pretrained=False, use_ssld=False, **kwargs):
     model = MobileNetV3(
         config=NET_CONFIG["small"],
         scale=0.5,
+        stages_pattern=MODEL_STAGES_PATTERN["MobileNetV3_small"],
         class_squeeze=LAST_SECOND_CONV_SMALL,
         **kwargs)
     _load_pretrained(pretrained, model, MODEL_URLS["MobileNetV3_small_x0_5"],
@@ -414,6 +431,7 @@ def MobileNetV3_small_x0_75(pretrained=False, use_ssld=False, **kwargs):
     model = MobileNetV3(
         config=NET_CONFIG["small"],
         scale=0.75,
+        stages_pattern=MODEL_STAGES_PATTERN["MobileNetV3_small"],
         class_squeeze=LAST_SECOND_CONV_SMALL,
         **kwargs)
     _load_pretrained(pretrained, model, MODEL_URLS["MobileNetV3_small_x0_75"],
@@ -434,6 +452,7 @@ def MobileNetV3_small_x1_0(pretrained=False, use_ssld=False, **kwargs):
     model = MobileNetV3(
         config=NET_CONFIG["small"],
         scale=1.0,
+        stages_pattern=MODEL_STAGES_PATTERN["MobileNetV3_small"],
         class_squeeze=LAST_SECOND_CONV_SMALL,
         **kwargs)
     _load_pretrained(pretrained, model, MODEL_URLS["MobileNetV3_small_x1_0"],
@@ -454,6 +473,7 @@ def MobileNetV3_small_x1_25(pretrained=False, use_ssld=False, **kwargs):
     model = MobileNetV3(
         config=NET_CONFIG["small"],
         scale=1.25,
+        stages_pattern=MODEL_STAGES_PATTERN["MobileNetV3_small"],
         class_squeeze=LAST_SECOND_CONV_SMALL,
         **kwargs)
     _load_pretrained(pretrained, model, MODEL_URLS["MobileNetV3_small_x1_25"],
@@ -474,6 +494,7 @@ def MobileNetV3_large_x0_35(pretrained=False, use_ssld=False, **kwargs):
     model = MobileNetV3(
         config=NET_CONFIG["large"],
         scale=0.35,
+        stages_pattern=MODEL_STAGES_PATTERN["MobileNetV3_small"],
         class_squeeze=LAST_SECOND_CONV_LARGE,
         **kwargs)
     _load_pretrained(pretrained, model, MODEL_URLS["MobileNetV3_large_x0_35"],
@@ -494,6 +515,7 @@ def MobileNetV3_large_x0_5(pretrained=False, use_ssld=False, **kwargs):
     model = MobileNetV3(
         config=NET_CONFIG["large"],
         scale=0.5,
+        stages_pattern=MODEL_STAGES_PATTERN["MobileNetV3_large"],
         class_squeeze=LAST_SECOND_CONV_LARGE,
         **kwargs)
     _load_pretrained(pretrained, model, MODEL_URLS["MobileNetV3_large_x0_5"],
@@ -514,6 +536,7 @@ def MobileNetV3_large_x0_75(pretrained=False, use_ssld=False, **kwargs):
     model = MobileNetV3(
         config=NET_CONFIG["large"],
         scale=0.75,
+        stages_pattern=MODEL_STAGES_PATTERN["MobileNetV3_large"],
         class_squeeze=LAST_SECOND_CONV_LARGE,
         **kwargs)
     _load_pretrained(pretrained, model, MODEL_URLS["MobileNetV3_large_x0_75"],
@@ -534,6 +557,7 @@ def MobileNetV3_large_x1_0(pretrained=False, use_ssld=False, **kwargs):
     model = MobileNetV3(
         config=NET_CONFIG["large"],
         scale=1.0,
+        stages_pattern=MODEL_STAGES_PATTERN["MobileNetV3_large"],
         class_squeeze=LAST_SECOND_CONV_LARGE,
         **kwargs)
     _load_pretrained(pretrained, model, MODEL_URLS["MobileNetV3_large_x1_0"],
@@ -554,6 +578,7 @@ def MobileNetV3_large_x1_25(pretrained=False, use_ssld=False, **kwargs):
     model = MobileNetV3(
         config=NET_CONFIG["large"],
         scale=1.25,
+        stages_pattern=MODEL_STAGES_PATTERN["MobileNetV3_large"],
         class_squeeze=LAST_SECOND_CONV_LARGE,
         **kwargs)
     _load_pretrained(pretrained, model, MODEL_URLS["MobileNetV3_large_x1_25"],

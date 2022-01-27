@@ -158,7 +158,7 @@ def create_strategy(config):
     exec_strategy.num_threads = 1
     exec_strategy.num_iteration_per_drop_scope = (
         10000
-        if 'AMP' in config and config.AMP.get("use_pure_fp16", False) else 10)
+        if 'AMP' in config and config.AMP.get("level", "O1") == "O2" else 10)
 
     fuse_op = True if 'AMP' in config else False
 
@@ -206,7 +206,7 @@ def mixed_precision_optimizer(config, optimizer):
         scale_loss = amp_cfg.get('scale_loss', 1.0)
         use_dynamic_loss_scaling = amp_cfg.get('use_dynamic_loss_scaling',
                                                False)
-        use_pure_fp16 = amp_cfg.get('use_pure_fp16', False)
+        use_pure_fp16 = amp_cfg.get("level", "O1") == "O2"
         optimizer = paddle.static.amp.decorate(
             optimizer,
             init_loss_scaling=scale_loss,
@@ -259,7 +259,7 @@ def build(config,
             # data_format should be assigned in arch-dict
             input_image_channel = config["Global"]["image_shape"][
                 0]  # default as [3, 224, 224]
-            model = build_model(config["Arch"])
+            model = build_model(config)
             out = model(feeds["data"])
             # end of build model
 

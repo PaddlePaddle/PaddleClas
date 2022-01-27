@@ -14,3 +14,4 @@
 
 __all__ = ['PaddleClas']
 from .paddleclas import PaddleClas
+from ppcls.arch.backbone import *

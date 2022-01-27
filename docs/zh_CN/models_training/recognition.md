@@ -10,9 +10,7 @@
 
 其中特征库，需要利用已经标注好的图像数据集提前建立。完整的图像识别系统，如下图所示
 
-<div align="center">
-<img src="../../images/structure.jpg"  width = "600" />
-</div>
+![](../../images/structure.jpg)
 体验整体图像识别系统，或查看特征库建立方法，详见[图像识别快速开始文档](../quick_start/quick_start_recognition.md)。其中，图像识别快速开始文档主要讲解整体流程的使用过程。以下内容，主要对上述三个步骤的训练部分进行介绍。
 
 首先，请参考[安装指南](../installation/install_paddleclas.md)配置运行环境。
@@ -135,6 +133,8 @@ cd ../../
 ### 2.2 特征模型 GPU 上的训练与评估
 
 在基于单卡 GPU 上训练与评估，推荐使用 `tools/train.py` 与 `tools/eval.py` 脚本。
+
+PaddleClas 支持使用 VisualDL 可视化训练过程。VisualDL 是飞桨可视化分析工具，以丰富的图表呈现训练参数变化趋势、模型结构、数据样本、高维数据分布等。可帮助用户更清晰直观地理解深度学习模型训练过程及模型结构，进而实现高效的模型优化。更多细节请查看[VisualDL](../others/VisualDL.md)。
 
 <a name="2.2.1"></a>
 
