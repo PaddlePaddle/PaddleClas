@@ -141,18 +141,17 @@ int main(int argc, char **argv) {
     std::cout << "Please set [det_model_path] in " << config_path << std::endl;
     return -1;
   }
+
+  if (!RT_Config["Global"]["infer_imgs_dir"].as<std::string>().empty() &&
+      img_dir.empty()) {
+    img_dir = RT_Config["Global"]["infer_imgs_dir"].as<std::string>();
+  }
   if (RT_Config["Global"]["infer_imgs"].as<std::string>().empty() &&
       img_dir.empty()) {
     std::cout << "Please set [infer_imgs] in " << config_path
               << " Or use command: <" << argv[0] << " [shitu_config]"
               << " [image_dir]>" << std::endl;
     return -1;
-  }
-  if (!img_dir.empty()) {
-    std::cout << "Use image_dir in command line overide the path in config file"
-              << std::endl;
-    RT_Config["Global"]["infer_imgs_dir"] = img_dir;
-    RT_Config["Global"]["infer_imgs"] = "";
   }
   // Load model and create a object detector
   PPShiTu::ObjectDetector det(
@@ -167,7 +166,7 @@ int main(int argc, char **argv) {
   std::vector<cv::Mat> batch_imgs;
   double rec_time;
   if (!RT_Config["Global"]["infer_imgs"].as<std::string>().empty() ||
-      !RT_Config["Global"]["infer_imgs_dir"].as<std::string>().empty()) {
+      !img_dir.empty()) {
     std::vector<std::string> all_img_paths;
     std::vector<cv::String> cv_all_img_paths;
     if (!RT_Config["Global"]["infer_imgs"].as<std::string>().empty()) {
@@ -179,7 +178,7 @@ int main(int argc, char **argv) {
         return -1;
       }
     } else {
-      cv::glob(RT_Config["Global"]["infer_imgs_dir"].as<std::string>(),
+      cv::glob(img_dir,
                cv_all_img_paths);
       for (const auto &img_path : cv_all_img_paths) {
         all_img_paths.push_back(img_path);
