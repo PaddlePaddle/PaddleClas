@@ -100,10 +100,10 @@ rm -f ppshitu_lite_models_v1.0.tar
 
 ```shell
 # 如果测试单张图像
-python generate_json_config.py --det_model_path ppshitu_lite_models_v1.0/mainbody_PPLCNet_x2_5_640_v1.0_lite.nb  --rec_model_path ppshitu_lite_models_v1.0/general_PPLCNet_x2_5_quant_v1.0_lite.nb --rec_label_path ppshitu_lite_models_v1.0/label.txt --img_path images/demo.jpg
+python generate_json_config.py --det_model_path ppshitu_lite_models_v1.0/mainbody_PPLCNet_x2_5_640_quant_v1.0_lite.nb  --rec_model_path ppshitu_lite_models_v1.0/general_PPLCNet_x2_5_quant_v1.0_lite.nb --rec_label_path ppshitu_lite_models_v1.0/label.txt --img_path images/demo.jpg
 # or
 # 如果测试多张图像
-python generate_json_config.py --det_model_path models/mainbody_det.nb  --rec_model_path models/rec.nb --rec_label_path models/label.txt --img_dir images
+python generate_json_config.py --det_model_path ppshitu_lite_models_v1.0/mainbody_PPLCNet_x2_5_640_quant_v1.0_lite.nb  --rec_model_path ppshitu_lite_models_v1.0/general_PPLCNet_x2_5_quant_v1.0_lite.nb --rec_label_path ppshitu_lite_models_v1.0/label.txt --img_dir images
 
 # 执行完成后，会在lit_shitu下生成shitu_config.json配置文件
 
