@@ -52,7 +52,7 @@ python3.7 python/predict_cls.py \
 -c configs/inference_cls.yaml \
 -o Global.use_onnx=True \
 -o Global.use_gpu=False \
--o Global.inference_model_dir=./models/ResNet50_vd_infer \
+-o Global.inference_model_dir=./models/ResNet50_vd_infer
 ```
 
 结果如下：
