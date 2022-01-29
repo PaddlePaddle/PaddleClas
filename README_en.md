@@ -41,7 +41,7 @@ Four sample solutions are provided, including product recognition, vehicle recog
 * You can also scan the QR code below to join the PaddleClas WeChat group to get more efficient answers to your questions and to communicate with developers from all walks of life. We look forward to hearing from you.
 
 <div align="center">
-<img src="https://user-images.githubusercontent.com/12560511/151518108-69d7831e-3bca-4b75-967e-9403be27b09f.jpeg"  width = "200" />
+<img src="https://user-images.githubusercontent.com/12560511/151663044-165cf03e-5a9d-4d5d-bd5a-9dbac2ab5b30.jpeg"  width = "200" />
 </div>
 
 ## Quick Start
