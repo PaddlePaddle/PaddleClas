@@ -90,6 +90,10 @@ infer_value1=$(func_parser_value "${lines[50]}")
 if [ ! $epoch_num ]; then
   epoch_num=2
 fi
+if [ $MODE = 'benchmark_train' ]; then
+  epoch_num=1
+fi
+
 LOG_PATH="./test_tipc/output"
 mkdir -p ${LOG_PATH}
 status_log="${LOG_PATH}/results_python.log"
