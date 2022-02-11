@@ -101,6 +101,8 @@ def classification_eval(engine, epoch_id=0):
                         out = out["Student"]
                     elif "logits" in out:
                         out = out["logits"]
+                        if isinstance(out, dict):
+                            out = out["logits"]
                     else:
                         msg = "Error: Wrong key in out!"
                         raise Exception(msg)
