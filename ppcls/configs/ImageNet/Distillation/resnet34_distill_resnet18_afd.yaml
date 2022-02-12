@@ -92,8 +92,8 @@ DataLoader:
   Train:
     dataset:
         name: ImageNetDataset
-        image_root: "./dataset/ILSVRC2012_w/"
-        cls_label_path: "./dataset/ILSVRC2012_w/train_list.txt"
+        image_root: "./dataset/ILSVRC2012/"
+        cls_label_path: "./dataset/ILSVRC2012/train_list.txt"
         transform_ops:
           - DecodeImage:
               to_rgb: True
@@ -121,8 +121,8 @@ DataLoader:
   Eval:
     dataset: 
         name: ImageNetDataset
-        image_root: "./dataset/ILSVRC2012_w/"
-        cls_label_path: "./dataset/ILSVRC2012_w/val_list.txt"
+        image_root: "./dataset/ILSVRC2012/"
+        cls_label_path: "./dataset/ILSVRC2012/val_list.txt"
         transform_ops:
           - DecodeImage:
               to_rgb: True

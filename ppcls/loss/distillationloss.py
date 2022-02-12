@@ -19,6 +19,7 @@ from .celoss import CELoss
 from .dmlloss import DMLLoss
 from .distanceloss import DistanceLoss
 from .rkdloss import RKdAngle, RkdDistance
+from .kldivloss import KLDivLoss
 
 
 class DistillationCELoss(CELoss):
