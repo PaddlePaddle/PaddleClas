@@ -46,6 +46,8 @@ class Topk(object):
         return class_id_map
 
     def __call__(self, x, file_names=None, multilabel=False):
+        if isinstance(x, dict):
+            x = x['logits']
         assert isinstance(x, paddle.Tensor)
         if file_names is not None:
             assert x.shape[0] == len(file_names)
