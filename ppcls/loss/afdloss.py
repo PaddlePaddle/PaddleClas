@@ -22,7 +22,7 @@ import warnings
 warnings.filterwarnings('ignore')
 
 
-class nn_bn_relu(nn.Layer):
+class LinearBNReLU(nn.Layer):
     def __init__(self, nin, nout):
         super().__init__()
         self.linear = nn.Linear(nin, nout)
@@ -50,6 +50,8 @@ def unique_shape(s_shapes):
 class AFDLoss(nn.Layer):
     """
     AFDLoss
+    https://www.aaai.org/AAAI21Papers/AAAI-9785.JiM.pdf
+    https://github.com/clovaai/attention-feature-distillation
     """
     def __init__(self,
                  model_name_pair=["Student", "Teacher"],
@@ -139,7 +141,7 @@ class Attention(nn.Layer):
 class LinearTransformTeacher(nn.Layer):
     def __init__(self, qk_dim, t_shapes):
         super().__init__()
-        self.query_layer = nn.LayerList([nn_bn_relu(t_shape[1], qk_dim) for t_shape in t_shapes])
+        self.query_layer = nn.LayerList([LinearBNReLU(t_shape[1], qk_dim) for t_shape in t_shapes])
 
     def forward(self, g_t):
         bs = g_t[0].shape[0]
@@ -159,8 +161,8 @@ class LinearTransformStudent(nn.Layer):
         self.qk_dim = qk_dim
         self.relu = nn.ReLU()
         self.samplers = nn.LayerList([Sample(t_shape) for t_shape in unique_t_shapes])
-        self.key_layer = nn.LayerList([nn_bn_relu(s_shape[1], self.qk_dim) for s_shape in s_shapes])
-        self.bilinear = nn_bn_relu(qk_dim, qk_dim * len(t_shapes))
+        self.key_layer = nn.LayerList([LinearBNReLU(s_shape[1], self.qk_dim) for s_shape in s_shapes])
+        self.bilinear = LinearBNReLU(qk_dim, qk_dim * len(t_shapes))
 
     def forward(self, g_s):
         bs = g_s[0].shape[0]
