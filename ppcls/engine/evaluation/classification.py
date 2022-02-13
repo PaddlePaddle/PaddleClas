@@ -95,14 +95,14 @@ def classification_eval(engine, epoch_id=0):
                 label_list = []
                 paddle.distributed.all_gather(label_list, batch[1])
                 labels = paddle.concat(label_list, 0)
-
+                
                 if isinstance(out, dict):
                     if "Student" in out:
                         out = out["Student"]
-                    elif "logits" in out:
-                        out = out["logits"]
                         if isinstance(out, dict):
                             out = out["logits"]
+                    elif "logits" in out:
+                        out = out["logits"]
                     else:
                         msg = "Error: Wrong key in out!"
                         raise Exception(msg)
