@@ -2,7 +2,7 @@ algorithm_introduction
 ================================
 
 .. toctree::
-   :maxdepth: 1
+   :maxdepth: 2
 
    image_classification_en.md
    metric_learning_en.md
