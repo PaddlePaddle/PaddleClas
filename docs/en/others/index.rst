@@ -2,7 +2,7 @@ others
 ================================
 
 .. toctree::
-   :maxdepth: 1
+   :maxdepth: 2
 
    transfer_learning_en.md
    train_with_DALI_en.md
