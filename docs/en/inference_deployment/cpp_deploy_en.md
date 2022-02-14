@@ -293,8 +293,6 @@ sh tools/run.sh
 
 * The prediction results will be shown on the screen, which is as follows.
 
-<div align="center">
-    <img src="./docs/imgs/cpp_infer_result.png" width="600">
-</div>
+![](../../images/inference_deployment/cpp_infer_result.png)
 
 * In the above results,`class id` represents the id corresponding to the category with the highest confidence, and `score` represents the probability that the image belongs to that category.
