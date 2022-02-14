@@ -39,9 +39,7 @@ pip3 install dist/*
 ## 2. Quick Start
 * Using the `ResNet50` model provided by PaddleClas, the following image(`'docs/images/inference_deployment/whl_demo.jpg'`) as an example.
 
-<div align="center">
-<img src="../images/inference_deployment/whl_demo.jpg"  width = "400" />
-</div>
+![](../../images/inference_deployment/whl_demo.jpg)
 
 * Python
 ```python
