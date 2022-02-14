@@ -2,7 +2,7 @@ quick_start
 ================================
 
 .. toctree::
-   :maxdepth: 1
+   :maxdepth: 2
 
    quick_start_classification_new_user_en.md
    quick_start_classification_professional_en.md

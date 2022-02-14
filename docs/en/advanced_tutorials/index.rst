@@ -2,7 +2,7 @@ advanced_tutorials
 ================================
 
 .. toctree::
-   :maxdepth: 1
+   :maxdepth: 2
 
    DataAugmentation_en.md
    distillation/index

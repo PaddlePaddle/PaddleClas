@@ -15,7 +15,6 @@ Welcome to PaddleClas！
    algorithm_introduction/index
    advanced_tutorials/index
    others/index
-   extension/index
    faq_series/index
    
    
