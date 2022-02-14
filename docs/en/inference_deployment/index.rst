@@ -2,7 +2,7 @@ inference_deployment
 ================================
 
 .. toctree::
-   :maxdepth: 1
+   :maxdepth: 2
 
    export_model_en.md
    python_deploy_en.md

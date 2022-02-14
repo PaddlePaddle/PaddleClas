@@ -2,7 +2,7 @@ models_training
 ================================
 
 .. toctree::
-   :maxdepth: 1
+   :maxdepth: 2
 
    config_description_en.md
    recognition_en.md

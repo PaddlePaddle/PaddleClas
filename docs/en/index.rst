@@ -5,7 +5,6 @@
    :maxdepth: 2
 
    models_training/index
-   extension/index
    introduction/index
    image_recognition_pipeline/index
    others/index
