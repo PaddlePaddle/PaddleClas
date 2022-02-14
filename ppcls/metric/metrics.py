@@ -69,16 +69,19 @@ class mAP(nn.Layer):
         equal_flag = paddle.cast(equal_flag, 'float32')
 
         num_rel = paddle.sum(equal_flag, axis=1)
-        num_rel = paddle.greater_than(num_rel, paddle.to_tensor(0.))
-        num_rel_index = paddle.nonzero(num_rel.astype("int"))
-        num_rel_index = paddle.reshape(num_rel_index, [num_rel_index.shape[0]])
-        equal_flag = paddle.index_select(equal_flag, num_rel_index, axis=0)
-
-        acc_sum = paddle.cumsum(equal_flag, axis=1)
+        if paddle.sum(num_rel) > 0:
+            num_rel = paddle.greater_than(num_rel, paddle.to_tensor(0.))
+            num_rel_index = paddle.nonzero(num_rel.astype("int"))
+            num_rel_index = paddle.reshape(num_rel_index,
+                                           [num_rel_index.shape[0]])
+            equal_flag = paddle.index_select(equal_flag, num_rel_index, axis=0)
+            acc_sum = paddle.cumsum(equal_flag, axis=1)
+        else:
+            acc_sum = equal_flag
         div = paddle.arange(acc_sum.shape[1]).astype("float32") + 1
         precision = paddle.divide(acc_sum, div)
 
-        #calc map
+        # calc map
         precision_mask = paddle.multiply(equal_flag, precision)
         ap = paddle.sum(precision_mask, axis=1) / paddle.sum(equal_flag,
                                                              axis=1)
