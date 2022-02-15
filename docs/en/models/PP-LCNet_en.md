@@ -29,13 +29,13 @@ In the field of computer vision, the quality of backbone network determines the 
 ## 2. Introduction
 
 Recent years witnessed the emergence of many lightweight backbone networks. In past two years, in particular, there were abundant networks searched by NAS that either enjoy advantages on FLOPs or Params, or have an edge in terms of inference speed on ARM devices. However, few of them dedicated to specified optimization of Intel CPU, resulting their imperfect inference speed on the intel CPU side. Based on this, we specially design the backbone network PP-LCNet for Intel CPU devices with its acceleration library MKLDNN. Compared with other lightweight SOTA models, this backbone network can further improve the performance of the model without increasing the inference time, significantly outperforming the existing SOTA models. A comparison chart with other models is shown below.
-<div align=center><img src="../../images/PP-LCNet/PP-LCNet-Acc.png" width="500" height="400"/></div>
+![](../../images/PP-LCNet/PP-LCNet-Acc.png)
 
 <a name="3"></a>
 ## 3. Method
 
 The overall structure of the network is shown in the figure below.
-<div align=center><img src="../../images/PP-LCNet/PP-LCNet.png" width="700" height="400"/></div>
+![](../../images/PP-LCNet/PP-LCNet.png)
 
 Build on extensive experiments, we found that many seemingly less time-consuming operations will increase the latency  on Intel CPU-based devices, especially when the MKLDNN acceleration library is enabled. Therefore, we finally chose a block with the leanest possible structure and the fastest possible speed to form our BaseNet (similar to MobileNetV1). Based on BaseNet, we summarized four strategies that can improve the accuracy of the model without increasing the latency, and we combined these four strategies to form PP-LCNet. Each of these four strategies is introduced as below:
 

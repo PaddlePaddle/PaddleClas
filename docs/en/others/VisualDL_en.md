@@ -52,6 +52,6 @@ More information about the command，please refer to [VisualDL](https://github.c
 
 Then you can enter the address `127.0.0.1:8840` and view the training process in the browser:
 
-<div align="center">
-    <img src="../../images/VisualDL/train_loss.png" width="400">
-</div>
+
+![](../../images/VisualDL/train_loss.png)
+

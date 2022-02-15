@@ -165,9 +165,7 @@ python3.7 python/predict_system.py -c configs/inference_product.yaml -o Global.u
 
 The image to be retrieved is shown below.
 
-<div align="center">
-<img src="../../images/recognition/product_demo/query/daoxiangcunjinzhubing_6.jpg"  width = "400" />
-</div>
+![](../../images/recognition/product_demo/query/daoxiangcunjinzhubing_6.jpg)
 
 
 The final output is shown below.
@@ -182,9 +180,7 @@ where bbox indicates the location of the detected object, rec_docs indicates the
 
 The detection result is also saved in the folder `output`, for this image, the visualization result is as follows.
 
-<div align="center">
-<img src="../../images/recognition/product_demo/result/daoxiangcunjinzhubing_6_en.jpg"  width = "400" />
-</div>
+![](../../images/recognition/product_demo/result/daoxiangcunjinzhubing_6_en.jpg)
 
 
 <a name="2.2.2"></a>
@@ -228,9 +224,7 @@ python3.7 python/predict_system.py -c configs/inference_product.yaml -o Global.i
 
 The image to be retrieved is shown below.
 
-<div align="center">
-<img src="../../images/recognition/product_demo/query/anmuxi.jpg"  width = "400" />
-</div>
+![](../../images/recognition/product_demo/query/anmuxi.jpg)
 
 The output is empty.
 
@@ -298,6 +292,5 @@ The output is as follows:
 
 The final recognition result is `Anmuxi Ambrosial Yogurt`, which is corrrect, the visualization result is as follows.
 
-<div align="center">
-<img src="../../images/recognition/product_demo/result/anmuxi_en.jpg"  width = "400" />
+![](../../images/recognition/product_demo/result/anmuxi_en.jpg)
 </div>
