@@ -8,7 +8,7 @@
 
 **近期更新**
 
-- 2022.1.27 全面升级文档；新增[PaddleServing C++ pipeline部署方式](./deploy/paddleserving)和[18M图像识别安卓部署Demo](./deploy/lite_shitu/README.md)。
+- 2022.1.27 全面升级文档；新增[PaddleServing C++ pipeline部署方式](./deploy/paddleserving)和[18M图像识别安卓部署Demo](./deploy/lite_shitu)。
 - 2021.11.1 发布[PP-ShiTu技术报告](https://arxiv.org/pdf/2111.00775.pdf)，新增饮料识别demo
 - 2021.10.23 发布轻量级图像识别系统PP-ShiTu，CPU上0.2s即可完成在10w+库的图像识别。
 [点击这里](./docs/zh_CN/quick_start/quick_start_recognition.md)立即体验
