@@ -150,6 +150,7 @@ MobileNetV3_large_x0_5 | 55.42 | 135 |
 MobileNetV3_large_x0_75 | 64.53 | 151 |
 <b>PPLCNet_x1_0<b> | <b>66.03<b> | <b>96<b> |
 
+<a name="5"></a>
 ## 5. Inference speed based on V100 GPU
 
 | Models        | Crop Size | Resize Short Size | FP32<br>Batch Size=1<br>(ms) | FP32<br/>Batch Size=1\4<br/>(ms) | FP32<br/>Batch Size=8<br/>(ms) |
