@@ -159,7 +159,7 @@ python -m paddle.distributed.launch \
 #### 4.4.1 导出推理模型
 
 ```
-python tools/export_model \
+python tools/export_model.py \
 -c ppcls/configs/GeneralRecognition/GeneralRecognition_PPLCNet_x2_5.yaml \
 -o Global.pretrained_model="output/RecModel/best_model"
 ```
