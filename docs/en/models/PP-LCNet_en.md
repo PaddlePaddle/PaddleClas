@@ -15,9 +15,10 @@
    - [4.1 Image Classification](#4.1)
    - [4.2 Object Detection](#4.2)
    - [4.3 Semantic Segmentation](#4.3)
-
-- [5. Conclusion](#5)
-- [6. Reference](#6)
+- [5. Inference speed based on V100 GPU](#5)
+- [6. Inference speed based on SD855](#6)
+- [7. Conclusion](#7)
+- [8. Reference](#8)
 
 <a name="1"></a>
 ## 1. Abstract
