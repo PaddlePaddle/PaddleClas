@@ -161,7 +161,7 @@ Two steps are included in the inference: 1)exporting the inference model; 2)obta
 ### 4.4.1 Export Inference Model
 
 ```
-python tools/export_model \
+python tools/export_model.py \
 -c ppcls/configs/GeneralRecognition/GeneralRecognition_PPLCNet_x2_5.yaml \
 -o Global.pretrained_model="output/RecModel/best_model"
 ```
