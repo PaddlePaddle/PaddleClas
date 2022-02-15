@@ -15,8 +15,10 @@
    - [4.1 Image Classification](#4.1)
    - [4.2 Object Detection](#4.2)
    - [4.3 Semantic Segmentation](#4.3)
-- [5. Conclusion](#5)
-- [6. Reference](#6)
+- [5. Inference speed based on V100 GPU](#5)
+- [6. Inference speed based on SD855](#6)
+- [7. Conclusion](#7)
+- [8. Reference](#8)
 
 <a name="1"></a>
 ## 1. Abstract
@@ -91,38 +93,38 @@ Since the introduction of GoogLeNet, GAP (Global-Average-Pooling) is often direc
 
 For image classification, ImageNet dataset is adopted. Compared with the current mainstream lightweight network, PP-LCNet can obtain faster inference speed with the same accuracy. When using Baidu’s self-developed SSLD distillation strategy, the accuracy is further improved, with the Top-1 Acc of ImageNet exceeding 80% at an inference speed of about 5ms on the Intel CPU side.
 
-| Model | Params(M) | FLOPs(M) | Top-1 Acc(\%) | Top-5 Acc(\%) | Latency(ms) | 
+| Model | Params(M) | FLOPs(M) | Top-1 Acc(\%) | Top-5 Acc(\%) | Latency(ms) |
 |-------|-----------|----------|---------------|---------------|-------------|
-| PP-LCNet-0.25x  | 1.5 | 18  | 51.86 | 75.65 | 1.74 |
-| PP-LCNet-0.35x  | 1.6 | 29  | 58.09 | 80.83 | 1.92 |
-| PP-LCNet-0.5x   | 1.9 | 47  | 63.14 | 84.66 | 2.05 |
-| PP-LCNet-0.75x  | 2.4 | 99  | 68.18 | 88.30 | 2.29 |
-| PP-LCNet-1x     | 3.0 | 161 | 71.32 | 90.03 | 2.46 |
-| PP-LCNet-1.5x   | 4.5 | 342 | 73.71 | 91.53 | 3.19 |
-| PP-LCNet-2x     | 6.5 | 590 | 75.18 | 92.27 | 4.27 |
-| PP-LCNet-2.5x   | 9.0 | 906 | 76.60 | 93.00 | 5.39 |
-| PP-LCNet-0.5x\* | 1.9 | 47  | 66.10 | 86.46 | 2.05 |
-| PP-LCNet-1.0x\* | 3.0 | 161 | 74.39 | 92.09 | 2.46 |
-| PP-LCNet-2.5x\* | 9.0 | 906 | 80.82 | 95.33 | 5.39 |
-    
-\* denotes the model after using SSLD distillation.
+| PPLCNet_x0_25  | 1.5 | 18  | 51.86 | 75.65 | 1.74 |
+| PPLCNet_x0_35  | 1.6 | 29  | 58.09 | 80.83 | 1.92 |
+| PPLCNet_x0_5   | 1.9 | 47  | 63.14 | 84.66 | 2.05 |
+| PPLCNet_x0_75  | 2.4 | 99  | 68.18 | 88.30 | 2.29 |
+| PPLCNet_x1_0     | 3.0 | 161 | 71.32 | 90.03 | 2.46 |
+| PPLCNet_x1_5   | 4.5 | 342 | 73.71 | 91.53 | 3.19 |
+| PPLCNet_x2_0     | 6.5 | 590 | 75.18 | 92.27 | 4.27 |
+| PPLCNet_x2_5   | 9.0 | 906 | 76.60 | 93.00 | 5.39 |
+| PPLCNet_x0_5_ssld | 1.9 | 47  | 66.10 | 86.46 | 2.05 |
+| PPLCNet_x1_0_ssld | 3.0 | 161 | 74.39 | 92.09 | 2.46 |
+| PPLCNet_x2_5_ssld | 9.0 | 906 | 80.82 | 95.33 | 5.39 |
+
+where `_ssld` represents the model after using `SSLD distillation`. For details about `SSLD distillation`, see [SSLD distillation](../advanced_tutorials/knowledge_distillation_en.md).
 
 Performance comparison with other lightweight networks:
 
 | Model | Params(M) | FLOPs(M) | Top-1 Acc(\%) | Top-5 Acc(\%) | Latency(ms) |
 |-------|-----------|----------|---------------|---------------|-------------|
-| MobileNetV2-0.25x  | 1.5 | 34  | 53.21 | 76.52 | 2.47 |
-| MobileNetV3-small-0.35x  | 1.7 | 15  | 53.03 | 76.37 | 3.02 |
-| ShuffleNetV2-0.33x  | 0.6 | 24  | 53.73 | 77.05 | 4.30 |
-| <b>PP-LCNet-0.25x<b>  | <b>1.5<b> | <b>18<b>  | <b>51.86<b> | <b>75.65<b> | <b>1.74<b> |
-| MobileNetV2-0.5x  | 2.0 | 99  | 65.03 | 85.72 | 2.85 |
-| MobileNetV3-large-0.35x  | 2.1 | 41  | 64.32 | 85.46 | 3.68 |
-| ShuffleNetV2-0.5x  | 1.4 | 43  | 60.32 | 82.26 | 4.65 |
-| <b>PP-LCNet-0.5x<b>   | <b>1.9<b> | <b>47<b>  | <b>63.14<b> | <b>84.66<b> | <b>2.05<b> |
-| MobileNetV1-1x  | 4.3 | 578  | 70.99 | 89.68 | 3.38 |
-| MobileNetV2-1x  | 3.5 | 327  | 72.15 | 90.65 | 4.26 |
-| MobileNetV3-small-1.25x  | 3.6 | 100  | 70.67 | 89.51 | 3.95 |
-| <b>PP-LCNet-1x<b>     |<b> 3.0<b> | <b>161<b> | <b>71.32<b> | <b>90.03<b> | <b>2.46<b> |
+| MobileNetV2_x0_25  | 1.5 | 34  | 53.21 | 76.52 | 2.47 |
+| MobileNetV3_small_x0_35  | 1.7 | 15  | 53.03 | 76.37 | 3.02 |
+| ShuffleNetV2_x0_33  | 0.6 | 24  | 53.73 | 77.05 | 4.30 |
+| <b>PPLCNet_x0_25<b>  | <b>1.5<b> | <b>18<b>  | <b>51.86<b> | <b>75.65<b> | <b>1.74<b> |
+| MobileNetV2_x0_5  | 2.0 | 99  | 65.03 | 85.72 | 2.85 |
+| MobileNetV3_large_x0_35  | 2.1 | 41  | 64.32 | 85.46 | 3.68 |
+| ShuffleNetV2_x0_5  | 1.4 | 43  | 60.32 | 82.26 | 4.65 |
+| <b>PPLCNet_x0_5<b>   | <b>1.9<b> | <b>47<b>  | <b>63.14<b> | <b>84.66<b> | <b>2.05<b> |
+| MobileNetV1_x1_0 | 4.3 | 578  | 70.99 | 89.68 | 3.38 |
+| MobileNetV2_x1_0 | 3.5 | 327  | 72.15 | 90.65 | 4.26 |
+| MobileNetV3_small_x1_25  | 3.6 | 100  | 70.67 | 89.51 | 3.95 |
+| <b>PPLCNet_x1_0<b>     |<b> 3.0<b> | <b>161<b> | <b>71.32<b> | <b>90.03<b> | <b>2.46<b> |
 
 <a name="4.2"></a>
 ### 4.2 Object Detection
@@ -131,10 +133,10 @@ For object detection, we adopt Baidu’s self-developed PicoDet, which focuses o
 
 | Backbone | mAP(%) | Latency(ms) |
 |-------|-----------|----------|
-MobileNetV3-large-0.35x | 19.2 | 8.1 |
-<b>PP-LCNet-0.5x<b> | <b>20.3<b> | <b>6.0<b> |
-MobileNetV3-large-0.75x | 25.8 | 11.1 |
-<b>PP-LCNet-1x<b> | <b>26.9<b> | <b>7.9<b> | 
+MobileNetV3_large_x0_35 | 19.2 | 8.1 |
+<b>PPLCNet_x0_5<b> | <b>20.3<b> | <b>6.0<b> |
+MobileNetV3_large_x0_75 | 25.8 | 11.1 |
+<b>PPLCNet_x1_0<b> | <b>26.9<b> | <b>7.9<b> |
 
 <a name="4.3"></a>
 ### 4.3 Semantic Segmentation
@@ -143,18 +145,47 @@ For semantic segmentation, DeeplabV3+ is adopted. The following table presents t
 
 | Backbone | mIoU(%) | Latency(ms) |
 |-------|-----------|----------|
-MobileNetV3-large-0.5x | 55.42 | 135 |
-<b>PP-LCNet-0.5x<b> | <b>58.36<b> | <b>82<b> |
-MobileNetV3-large-0.75x | 64.53 | 151 |
-<b>PP-LCNet-1x<b> | <b>66.03<b> | <b>96<b> |
+MobileNetV3_large_x0_5 | 55.42 | 135 |
+<b>PPLCNet_x0_5<b> | <b>58.36<b> | <b>82<b> |
+MobileNetV3_large_x0_75 | 64.53 | 151 |
+<b>PPLCNet_x1_0<b> | <b>66.03<b> | <b>96<b> |
 
 <a name="5"></a>
-## 5. Conclusion
+## 5. Inference speed based on V100 GPU
+
+| Models        | Crop Size | Resize Short Size | FP32<br>Batch Size=1<br>(ms) | FP32<br/>Batch Size=1\4<br/>(ms) | FP32<br/>Batch Size=8<br/>(ms) |
+| ------------- | --------- | ----------------- | ---------------------------- | -------------------------------- | ------------------------------ |
+| PPLCNet_x0_25 | 224       | 256               | 0.72                         | 1.17                             | 1.71                           |
+| PPLCNet_x0_35 | 224       | 256               | 0.69                         | 1.21                             | 1.82                           |
+| PPLCNet_x0_5  | 224       | 256               | 0.70                         | 1.32                             | 1.94                           |
+| PPLCNet_x0_75 | 224       | 256               | 0.71                         | 1.49                             | 2.19                           |
+| PPLCNet_x1_0  | 224       | 256               | 0.73                         | 1.64                             | 2.53                           |
+| PPLCNet_x1_5  | 224       | 256               | 0.82                         | 2.06                             | 3.12                           |
+| PPLCNet_x2_0  | 224       | 256               | 0.94                         | 2.58                             | 4.08                           |
+
+<a name="6"></a>
+
+## 6. Inference speed based on SD855
+
+| Models        | SD855 time(ms)<br>bs=1, thread=1 | SD855 time(ms)<br/>bs=1, thread=2 | SD855 time(ms)<br/>bs=1, thread=4 |
+| ------------- | -------------------------------- | --------------------------------- | --------------------------------- |
+| PPLCNet_x0_25 | 2.30                             | 1.62                              | 1.32                              |
+| PPLCNet_x0_35 | 3.15                             | 2.11                              | 1.64                              |
+| PPLCNet_x0_5  | 4.27                             | 2.73                              | 1.92                              |
+| PPLCNet_x0_75 | 7.38                             | 4.51                              | 2.91                              |
+| PPLCNet_x1_0  | 10.78                            | 6.49                              | 3.98                              |
+| PPLCNet_x1_5  | 20.55                            | 12.26                             | 7.54                              |
+| PPLCNet_x2_0  | 33.79                            | 20.17                             | 12.10                             |
+| PPLCNet_x2_5  | 49.89                            | 29.60                             | 17.82                             |
+
+
+<a name="7"></a>
+## 7. Conclusion
 
 Rather than holding on to perfect FLOPs and Params as academics do, PP-LCNet focuses on analyzing how to add Intel CPU-friendly modules to improve the performance of the model, which can better balance accuracy and inference time. The experimental conclusions therein are available to other researchers in network structure design, while providing NAS search researchers with a smaller search space and general conclusions. The finished PP-LCNet can also be better accepted and applied in industry.
 
-<a name="6"></a>
-## 6. Reference
+<a name="8"></a>
+## 8. Reference
 
 Reference to cite when you use PP-LCNet in a paper:
 ```
