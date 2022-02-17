@@ -1,4 +1,4 @@
-# Installation PaddlePaddle
+# Install PaddlePaddle
 
 ---
 
@@ -9,7 +9,7 @@
 - [3. Install PaddlePaddle using pip](#3)
 - [4. Verify installation](#4)
 
-At present, **PaddleClas** requires **PaddlePaddle** version **>=2.0**. Docker is recomended to run Paddleclas, for more detailed information about docker and nvidia-docker, you can refer to the [tutorial](https://docs.docker.com/get-started/). If you do not want to use docker, you can skip section [2. (Recommended) Prepare a docker environment](#2), and go into section [3. Install PaddlePaddle using pip](#3).
+At present, **PaddleClas** requires **PaddlePaddle** version `>=2.0`. Docker is recomended to run Paddleclas, for more detailed information about docker and nvidia-docker, you can refer to the [tutorial](https://docs.docker.com/get-started/). If you do not want to use docker, you can skip section [2. (Recommended) Prepare a docker environment](#2), and go into section [3. Install PaddlePaddle using pip](#3).
 
 <a name="1"></a>
 
@@ -96,5 +96,5 @@ python -c "import paddle; print(paddle.__version__)"
 
 Note:
 * Make sure the compiled source code is later than PaddlePaddle2.0.
-* Indicate **WITH_DISTRIBUTE=ON** when compiling, Please refer to [Instruction](https://www.paddlepaddle.org.cn/documentation/docs/zh/develop/install/Tables.html#id3) for more details.
+* Indicate `WITH_DISTRIBUTE=ON` when compiling, Please refer to [Instruction](https://www.paddlepaddle.org.cn/documentation/docs/zh/develop/install/Tables.html#id3) for more details.
 * When running in docker, in order to ensure that the container has enough shared memory for dataloader acceleration of Paddle, please set the parameter `--shm-size=8g` at creating a docker container, if conditions permit, you can set it to a larger value.

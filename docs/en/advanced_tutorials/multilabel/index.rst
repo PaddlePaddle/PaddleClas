@@ -4,4 +4,4 @@ Multilabel Classification
 .. toctree::
    :maxdepth: 3
 
-   multilabel.md
+   multilabel_en.md
