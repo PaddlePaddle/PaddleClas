@@ -48,9 +48,9 @@ inference:python/predict_cls.py -c configs/inference_cls.yaml
 -o Global.infer_imgs:../dataset/ILSVRC2012/val
 -o Global.save_log_path:null
 -o Global.benchmark:True
+null:null
+null:null
 infer_shapes:[3,224,224]
-null:null
-null:null
 ===========================train_benchmark_params==========================
 batch_size:64|104
 fp_items:fp32

@@ -165,7 +165,7 @@ if [ ${MODE} = "whole_infer" ] || [ ${MODE} = "klquant_whole_infer" ]; then
    IFS="|"
    infer_export_flag=(${infer_export_flag})
    if [ ${infer_export_flag} != "null" ]  && [ ${infer_export_flag} != "False" ]; then
-	rm -rf ${infer_model_dir_list/..\//}
+#	rm -rf ${infer_model_dir_list/..\//}
 	export_cmd="${python} ${norm_export} -o Global.pretrained_model=${model_name}_pretrained -o Global.save_inference_dir=${infer_model_dir_list/..\//}"
 	eval $export_cmd
    fi
