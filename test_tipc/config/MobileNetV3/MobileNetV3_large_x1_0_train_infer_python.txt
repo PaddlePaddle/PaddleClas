@@ -31,7 +31,7 @@ norm_export:tools/export_model.py -c ppcls/configs/ImageNet/MobileNetV3/MobileNe
 quant_export:tools/export_model.py -c ppcls/configs/slim/MobileNetV3_large_x1_0_quantization.yaml
 fpgm_export:tools/export_model.py -c ppcls/configs/slim/MobileNetV3_large_x1_0_prune.yaml
 distill_export:null
-kl_quant:deploy/slim/quant_post_static.py -c ppcls/configs/ImageNet/MobileNetV3/MobileNetV3_large_x1_0.yaml -o Global.save_inference_dir=./test_tipc/output/infer_models/MobileNetV3_large_x1_0
+kl_quant:deploy/slim/quant_post_static.py -c ppcls/configs/ImageNet/MobileNetV3/MobileNetV3_large_x1_0.yaml -o Global.save_inference_dir=./test_tipc/output/infer_models/MobileNetV3_large_x1_0_kl_quant
 export2:null
 pretrained_model_url:https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/MobileNetV3_large_x1_0_pretrained.pdparams
 infer_model:../test_tipc/output/infer_models/MobileNetV3_large_x1_0
