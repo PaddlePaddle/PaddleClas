@@ -253,9 +253,3 @@ for batch_size in ${batch_size_list[*]}; do
         done
     done
 done
-
-mkdir train_log
-mv Paddle* train_log/
-cd ..
-mv index train_log/
-mv profiling_log train_log/
