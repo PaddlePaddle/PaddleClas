@@ -24,7 +24,9 @@ from .distillationloss import DistillationDistanceLoss
 from .distillationloss import DistillationRKDLoss
 from .multilabelloss import MultiLabelLoss
 
-from .deephashloss import DSHSDLoss, LCDSHLoss
+from .deephashloss import DSHSDLoss
+from .deephashloss import LCDSHLoss
+from .deephashloss import DCHLoss
 
 
 class CombinedLoss(nn.Layer):
