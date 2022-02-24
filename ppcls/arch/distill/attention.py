@@ -57,7 +57,7 @@ class LinearTransformTeacher(nn.Layer):
         spatial_mean = []
         for i in range(len(g_t)):
             c, h, w = g_t[i].shape[1:]
-            spatial_mean.append(g_t[i].pow(2).mean(1).reshape([bs, h, w]))
+            spatial_mean.append(g_t[i].pow(2).mean(1).reshape([bs, h*w]))
         query = paddle.stack([query_layer(f_t, relu=False) for f_t, query_layer in zip(channel_mean, self.query_layer)],
                             axis=1)
         value = [F.normalize(f_s, axis=1) for f_s in spatial_mean]
