@@ -17,26 +17,60 @@ Global:
 # model architecture
 Arch:
   name: "DistillationModel"
-  class_num: 1000
   # if not null, its lengths should be same as models
   pretrained_list:
   # if not null, its lengths should be same as models
   freeze_params_list:
-  - True
-  - False
   models:
     - Teacher:
-        name: ResNet34
-        pretrained: True
-        return_patterns: ["blocks[0]", "blocks[1]", "blocks[2]", "blocks[3]", 
-                          "blocks[4]", "blocks[5]", "blocks[6]", "blocks[7]", 
-                          "blocks[8]", "blocks[9]", "blocks[10]", "blocks[11]",  
-                          "blocks[12]", "blocks[13]", "blocks[14]", "blocks[15]", ]
+        name: AttentionDistillationModel
+        pretrained_list:
+        freeze_params_list:
+          - True
+          - False
+        models:
+          - ResNet34:
+              name: ResNet34
+              pretrained: True
+              return_patterns: ["blocks[0]", "blocks[1]", "blocks[2]", "blocks[3]",
+                                "blocks[4]", "blocks[5]", "blocks[6]", "blocks[7]",
+                                "blocks[8]", "blocks[9]", "blocks[10]", "blocks[11]",
+                                "blocks[12]", "blocks[13]", "blocks[14]", "blocks[15]"]
+          - LinearTransformTeacher:
+              name: LinearTransformTeacher
+              qk_dim: 128
+              keys: ["blocks[0]", "blocks[1]", "blocks[2]", "blocks[3]",
+                     "blocks[4]", "blocks[5]", "blocks[6]", "blocks[7]",
+                     "blocks[8]", "blocks[9]", "blocks[10]", "blocks[11]",
+                     "blocks[12]", "blocks[13]", "blocks[14]", "blocks[15]"]
+              t_shapes: [[64, 56, 56], [64, 56, 56], [64, 56, 56], [128, 28, 28],
+                         [128, 28, 28], [128, 28, 28], [128, 28, 28], [256, 14, 14],
+                         [256, 14, 14], [256, 14, 14], [256, 14, 14], [256, 14, 14],
+                         [256, 14, 14], [512, 7, 7], [512, 7, 7], [512, 7, 7]]
+
     - Student:
-        name: ResNet18
-        pretrained: False
-        return_patterns: ["blocks[0]", "blocks[1]", "blocks[2]", "blocks[3]",                                                                          
-                          "blocks[4]", "blocks[5]", "blocks[6]", "blocks[7]", ]
+        name: AttentionDistillationModel
+        pretrained_list:
+        freeze_params_list:
+          - False
+          - False
+        models:
+          - ResNet18:
+              name: ResNet18
+              pretrained: False
+              return_patterns: ["blocks[0]", "blocks[1]", "blocks[2]", "blocks[3]",
+                                "blocks[4]", "blocks[5]", "blocks[6]", "blocks[7]"]
+          - LinearTransformStudent:
+              name: LinearTransformStudent
+              qk_dim: 128
+              keys: ["blocks[0]", "blocks[1]", "blocks[2]", "blocks[3]",
+                     "blocks[4]", "blocks[5]", "blocks[6]", "blocks[7]"]
+              s_shapes: [[64, 56, 56], [64, 56, 56], [128, 28, 28], [128, 28, 28],
+                         [256, 14, 14], [256, 14, 14], [512, 7, 7], [512, 7, 7]]
+              t_shapes: [[64, 56, 56], [64, 56, 56], [64, 56, 56], [128, 28, 28],
+                         [128, 28, 28], [128, 28, 28], [128, 28, 28], [256, 14, 14],
+                         [256, 14, 14], [256, 14, 14], [256, 14, 14], [256, 14, 14],
+                         [256, 14, 14], [512, 7, 7], [512, 7, 7], [512, 7, 7]]
 
   infer_model_name: "Student"
 
@@ -55,14 +89,9 @@ Loss:
         key: logits
     - AFDLoss:
         weight: 50.0
-        qk_dim: 128
         model_name_pair: ["Student", "Teacher"]
-        student_keys: ["blocks[0]", "blocks[1]", "blocks[2]", "blocks[3]",                                                                             
-                       "blocks[4]", "blocks[5]", "blocks[6]", "blocks[7]", ] 
-        teacher_keys: ["blocks[0]", "blocks[1]", "blocks[2]", "blocks[3]",                                                                          
-                       "blocks[4]", "blocks[5]", "blocks[6]", "blocks[7]",                                                                          
-                       "blocks[8]", "blocks[9]", "blocks[10]", "blocks[11]",                                                                        
-                       "blocks[12]", "blocks[13]", "blocks[14]", "blocks[15]", ]
+        student_keys: ["bilinear_key", "value"]
+        teacher_keys: ["query", "value"]
         s_shapes: [[64, 56, 56], [64, 56, 56], [128, 28, 28], [128, 28, 28], 
                    [256, 14, 14], [256, 14, 14], [512, 7, 7], [512, 7, 7]]
         t_shapes: [[64, 56, 56], [64, 56, 56], [64, 56, 56], [128, 28, 28], 
@@ -100,9 +129,10 @@ DataLoader:
               channel_first: False
           - RandCropImage:
               size: 224
+              interpolation: bicubic
+              backend: pil
           - RandFlipImage:
               flip_code: 1
-          - AutoAugment:
           - NormalizeImage:
               scale: 0.00392157
               mean: [0.485, 0.456, 0.406]
@@ -129,6 +159,8 @@ DataLoader:
               channel_first: False
           - ResizeImage:
               resize_short: 256
+              interpolation: bicubic
+              backend: pil
           - CropImage:
               size: 224
           - NormalizeImage:
@@ -154,6 +186,8 @@ Infer:
           channel_first: False
       - ResizeImage:
           resize_short: 256
+          interpolation: bicubic
+          backend: pil
       - CropImage:
           size: 224
       - NormalizeImage:

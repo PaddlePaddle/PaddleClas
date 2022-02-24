@@ -55,19 +55,14 @@ class AFDLoss(nn.Layer):
     """
     def __init__(self,
                  model_name_pair=["Student", "Teacher"],
-                 student_keys=["stage2", "stage3", "stage4", "stage5"],
-                 teacher_keys=["stage3", "stage4", "stage5"],
+                 student_keys=["bilinear_key", "value"],
+                 teacher_keys=["query", "value"],
                  s_shapes=[[64, 16, 160], [128, 8, 160], [256, 4, 160], [512, 2, 160]],
                  t_shapes=[[640, 48], [320, 96], [160, 192]],
                  qk_dim=128,
-                 use_log=False,
-                 key=None,
-                 maps_name=None,
                  name="afd"):
         super().__init__()
-
         assert isinstance(model_name_pair, list)
-        self.key = key
         self.model_name_pair = model_name_pair
         self.student_keys = student_keys
         self.teacher_keys = teacher_keys
@@ -86,9 +81,6 @@ class AFDLoss(nn.Layer):
         g_s = [s_features_dict[key] for key in self.student_keys]
         g_t = [t_features_dict[key] for key in self.teacher_keys]
 
-        s_shape = [s_i.shape for s_i in g_s]
-        t_shape = [t_i.shape for t_i in g_t]
-
         loss = self.attention(g_s, g_t)
         sum_loss = sum(loss)
 
@@ -103,8 +95,8 @@ class Attention(nn.Layer):
         super().__init__()
         self.qk_dim = qk_dim
         self.n_t = n_t
-        self.linear_trans_s = LinearTransformStudent(qk_dim, t_shapes, s_shapes, unique_t_shapes)
-        self.linear_trans_t = LinearTransformTeacher(qk_dim, t_shapes)
+        # self.linear_trans_s = LinearTransformStudent(qk_dim, t_shapes, s_shapes, unique_t_shapes)
+        # self.linear_trans_t = LinearTransformTeacher(qk_dim, t_shapes)
 
         self.p_t = self.create_parameter(
             shape=[len(t_shapes), qk_dim], 
@@ -112,12 +104,10 @@ class Attention(nn.Layer):
         self.p_s = self.create_parameter(
             shape=[len(s_shapes), qk_dim], 
             default_initializer=nn.initializer.XavierNormal())
-        self.iter = 0
-        self.epoch = -1
 
     def forward(self, g_s, g_t):
-        bilinear_key, h_hat_s_all = self.linear_trans_s(g_s)
-        query, h_t_all = self.linear_trans_t(g_t)
+        bilinear_key, h_hat_s_all = g_s
+        query, h_t_all = g_t
 
         p_logit = paddle.matmul(self.p_t, self.p_s.t())
 
@@ -137,51 +127,3 @@ class Attention(nn.Layer):
         diff = paddle.multiply(diff, att).sum(1).mean()
         return diff
 
-
-class LinearTransformTeacher(nn.Layer):
-    def __init__(self, qk_dim, t_shapes):
-        super().__init__()
-        self.query_layer = nn.LayerList([LinearBNReLU(t_shape[1], qk_dim) for t_shape in t_shapes])
-
-    def forward(self, g_t):
-        bs = g_t[0].shape[0]
-        channel_mean = [f_t.mean(3).mean(2) for f_t in g_t]
-        spatial_mean = [f_t.pow(2).mean(1).reshape([bs, -1]) for f_t in g_t]
-        query = paddle.stack([query_layer(f_t, relu=False) for f_t, query_layer in zip(channel_mean, self.query_layer)],
-                            axis=1)
-        value = [F.normalize(f_s, axis=1) for f_s in spatial_mean]
-        return query, value
-
-
-class LinearTransformStudent(nn.Layer):
-    def __init__(self, qk_dim, t_shapes, s_shapes, unique_t_shapes):
-        super().__init__()
-        self.t = len(t_shapes)
-        self.s = len(s_shapes)
-        self.qk_dim = qk_dim
-        self.relu = nn.ReLU()
-        self.samplers = nn.LayerList([Sample(t_shape) for t_shape in unique_t_shapes])
-        self.key_layer = nn.LayerList([LinearBNReLU(s_shape[1], self.qk_dim) for s_shape in s_shapes])
-        self.bilinear = LinearBNReLU(qk_dim, qk_dim * len(t_shapes))
-
-    def forward(self, g_s):
-        bs = g_s[0].shape[0]
-        channel_mean = [f_s.mean(3).mean(2) for f_s in g_s]
-        spatial_mean = [sampler(g_s, bs) for sampler in self.samplers]
-
-        key = paddle.stack([key_layer(f_s) for key_layer, f_s in zip(self.key_layer, channel_mean)],
-                                     axis=1).reshape([bs * self.s, -1])  # Bs x h
-        bilinear_key = self.bilinear(key, relu=False).reshape([bs, self.s, self.t, -1])
-        value = [F.normalize(s_m, axis=2) for s_m in spatial_mean]
-        return bilinear_key, value
-
-
-class Sample(nn.Layer):
-    def __init__(self, t_shape):
-        super().__init__()
-        t_N, t_C, t_H, t_W = t_shape
-        self.sample = nn.AdaptiveAvgPool2D((t_H, t_W))
-
-    def forward(self, g_s, bs):
-        g_s = paddle.stack([self.sample(f_s.pow(2).mean(1, keepdim=True)).reshape([bs, -1]) for f_s in g_s], axis=1)
-        return g_s

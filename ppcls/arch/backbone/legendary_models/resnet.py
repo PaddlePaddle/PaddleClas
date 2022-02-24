@@ -276,6 +276,7 @@ class ResNet(TheseusLayer):
                  config,
                  stages_pattern,
                  version="vb",
+                 no_first_short=False,
                  class_num=1000,
                  lr_mult_list=[1.0, 1.0, 1.0, 1.0, 1.0],
                  data_format="NCHW",
@@ -326,6 +327,8 @@ class ResNet(TheseusLayer):
         block_list = []
         for block_idx in range(len(self.block_depth)):
             shortcut = False
+            if block_idx == 0 and no_first_short:
+                shortcut = True
             for i in range(self.block_depth[block_idx]):
                 block_list.append(globals()[self.block_type](
                     num_channels=self.num_channels[block_idx] if i == 0 else
