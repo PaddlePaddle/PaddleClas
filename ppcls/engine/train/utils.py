@@ -48,7 +48,7 @@ def log_info(trainer, batch_size, epoch_id, iter_id):
         for key in trainer.time_info
     ])
 
-    ips_msg = "ips: {:.5f} images/sec".format(
+    ips_msg = "ips: {:.5f} samples/s".format(
         batch_size / trainer.time_info["batch_cost"].avg)
     eta_sec = ((trainer.config["Global"]["epochs"] - epoch_id + 1
                 ) * len(trainer.train_dataloader) - iter_id

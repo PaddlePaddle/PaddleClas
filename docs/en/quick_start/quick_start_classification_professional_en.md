@@ -75,6 +75,10 @@ python3 -m paddle.distributed.launch \
 
 The highest accuracy of the validation set is around 0.415.
 
+* ** Note** 
+
+  * If the number of GPU cards is not 4, the accuracy of the validation set may be different from 0.415. To maintain a comparable accuracy, you need to change the learning rate in the configuration file to `the current learning rate / 4 \* current card number`. The same below.
+
 <a name="2.1.2"></a> 
 
 

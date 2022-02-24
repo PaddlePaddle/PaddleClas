@@ -78,7 +78,7 @@ After the unzip operation is completed, there are three `.txt` files for trainin
 The image files of the flowers102 dataset are stored in the `dataset/flowers102/jpg` directory. The image examples are as follows:
 
 <div align="center">
-<img src="../../images/quick_start/Examples-Flower-102.png" width = "800" />
+![](../../images/quick_start/Examples-Flower-102.png)
 </div>
 
 Return to the root directory of `PaddleClas`:
@@ -148,9 +148,7 @@ python tools/train.py -c ./ppcls/configs/quick_start/ResNet50_vd.yaml
 
 After the training is completed, the `Top1 Acc` curve of the validation set is shown below, and the highest accuracy rate is 0.2735.
 
-<div align="center">
-<img src="../../images/quick_start/r50_vd_acc.png"  width = "800" />
-</div>
+![](../../images/quick_start/r50_vd_acc.png)
 
 <a name="4.2.2"></a>
 #### 4.2.2 Use pre-trained models for training
@@ -165,9 +163,7 @@ python tools/train.py -c ./ppcls/configs/quick_start/ResNet50_vd.yaml -o Arch.pr
 
 The `Top1 Acc` curve of the validation set is shown below. The highest accuracy rate is `0.9402`. After loading the pre-trained model, the accuracy of the flowers102 data set has been greatly improved, and the absolute accuracy has increased by more than 65%.
 
-<div align="center">
-<img src="../../images/quick_start/r50_vd_pretrained_acc.png"  width = "800" />
-</div>
+![](../../images/quick_start/r50_vd_pretrained_acc.png)
 
 <a name="5"></a>
 ## 5. Model prediction

@@ -23,7 +23,7 @@
 
 Data augmentation is a commonly used regularization method in image classification task, which is often used in scenarios with insufficient data or large model. In this chapter, we mainly introduce 8 image augmentation methods besides standard augmentation methods. Users can apply these methods in their own tasks for better model performance. Under the same conditions, these augmentation methods' performance on ImageNet1k dataset is shown as follows.
 
-![](../../../images/image_aug/main_image_aug.png)
+![](../../images/image_aug/main_image_aug.png)
 
 
 <a name="2"></a>
@@ -50,7 +50,7 @@ Compared with the above standard image augmentation methods, the researchers hav
 
 Visualization results of some images after augmentation are shown as follows.
 
-![](../../../images/image_aug/image_aug_samples_s_en.jpg)
+![](../../images/image_aug/image_aug_samples_s_en.jpg)
 
 
 The following table shows more detailed information of the transformations.
@@ -72,7 +72,7 @@ The following table shows more detailed information of the transformations.
 
 PaddleClas integrates all the above data augmentation strategies. More details including principles and usage of the strategies are introduced in the following chapters. For better visualization, we use the following figure to show the changes after the transformations. And `RandCrop` is replaced with` Resize` for simplification.
 
-![](../../../images/image_aug/test_baseline.jpeg)
+![](../../images/image_aug/test_baseline.jpeg)
 
 <a name="2.1"></a>
 ### 2.1 Image Transformation
@@ -91,7 +91,7 @@ Unlike conventional artificially designed image augmentation methods, AutoAugmen
 
 The images after `AutoAugment` are as follows.
 
-![][test_autoaugment]
+![](../../images/image_aug/test_autoaugment.jpeg)
 
 <a name="2.1.2"></a>
 #### 2.1.2 RandAugment
@@ -107,7 +107,7 @@ In `RandAugment`, the author proposes a random augmentation method. Instead of u
 
 The images after `RandAugment` are as follows.
 
-![][test_randaugment]
+![](../../images/image_aug/test_randaugment.jpeg)
 
 <a name="2.1.3"></a>
 #### 2.1.3 TimmAutoAugment
@@ -137,7 +137,7 @@ Cutout is a kind of dropout, but occludes input image rather than feature map. I
 
 The images after `Cutout` are as follows.
 
-![][test_cutout]
+![](../../images/image_aug/test_cutout.jpeg)
 
 <a name="2.2.2"></a>
 #### 2.2.2 RandomErasing
@@ -150,7 +150,7 @@ RandomErasing is similar to the Cutout. It is also to solve the problem of poor 
 
 The images after `RandomErasing` are as follows.
 
-![][test_randomerassing]
+![](../../images/image_aug/test_randomerassing.jpeg)
 
 <a name="2.2.3"></a>
 #### 2.2.3 HideAndSeek
@@ -162,11 +162,11 @@ Github repo: [https://github.com/kkanshul/Hide-and-Seek](https://github.com/kkan
 
 Images are divided into some patches for `HideAndSeek` and masks are generated with certain probability for each patch. The meaning of the masks in different areas is shown in the figure below.
 
-![][hide_and_seek_mask_expanation]
+![](../../images/image_aug/hide-and-seek-visual.png)
 
 The images after `HideAndSeek` are as follows.
 
-![][test_hideandseek]
+![](../../images/image_aug/gridmask-0.png)
 
 <a name="2.2.4"></a>
 #### 2.2.4 GridMask
@@ -180,7 +180,7 @@ The author points out that the previous method based on image cropping has two p
 1. Excessive deletion of the area may cause most or all of the target subject to be deleted, or cause the context information loss, resulting in the images after enhancement becoming noisy data.
 2. Reserving too much area has little effect on the object and context.
 
-![][gridmask-0]
+![](../../images/image_aug/hide-and-seek-visual.png)
 
 Therefore, it is the core problem to be solved how to
 if you avoid over-deletion or over-retention becomes the core problem to be solved.
@@ -195,7 +195,7 @@ It shows that the second method is better.
 
 The images after `GridMask` are as follows.
 
-![][test_gridmask]
+![](../../images/image_aug/test_gridmask.jpeg)
 
 <a name="2.3"></a>
 ### 2.3 Image mix
@@ -215,7 +215,7 @@ Mixup is the first solution for image aliasing, it is easy to realize and perfor
 
 The images after `Mixup` are as follows.
 
-![][test_mixup]
+![](../../images/image_aug/test_mixup.png)
 
 <a name="2.3.2"></a>
 #### 2.3.2 Cutmix
@@ -229,7 +229,7 @@ Cutmix randomly cuts out an `ROI` from one image, and then covered onto the corr
 
 The images after `Cutmix` are as follows.
 
-![][test_cutmix]
+![](../../images/image_aug/test_cutmix.png)
 
 For the practical part of data augmentation, please refer to [Data Augmentation Practice](../advanced_tutorials/DataAugmentation_en.md).
 
