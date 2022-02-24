@@ -54,7 +54,10 @@ class LinearTransformTeacher(nn.Layer):
         g_t = [t_features_dict[key] for key in self.teacher_keys]
         bs = g_t[0].shape[0]
         channel_mean = [f_t.mean(3).mean(2) for f_t in g_t]
-        spatial_mean = [f_t.pow(2).mean(1).reshape([bs, -1]) for f_t in g_t]
+        spatial_mean = []
+        for i in range(len(g_t)):
+            c, h, w = g_t[i].shape[1:]
+            spatial_mean.append(g_t[i].pow(2).mean(1).reshape([bs, h, w]))
         query = paddle.stack([query_layer(f_t, relu=False) for f_t, query_layer in zip(channel_mean, self.query_layer)],
                             axis=1)
         value = [F.normalize(f_s, axis=1) for f_s in spatial_mean]
@@ -83,8 +86,8 @@ class LinearTransformStudent(nn.Layer):
         spatial_mean = [sampler(g_s, bs) for sampler in self.samplers]
 
         key = paddle.stack([key_layer(f_s) for key_layer, f_s in zip(self.key_layer, channel_mean)],
-                                     axis=1).reshape([bs * self.s, -1])  # Bs x h
-        bilinear_key = self.bilinear(key, relu=False).reshape([bs, self.s, self.t, -1])
+                                     axis=1).reshape([-1, self.qk_dim])  # Bs x h
+        bilinear_key = self.bilinear(key, relu=False).reshape([bs, self.s, self.t, self.qk_dim])
         value = [F.normalize(s_m, axis=2) for s_m in spatial_mean]
         return {"bilinear_key": bilinear_key, "value": value}
 
@@ -92,9 +95,10 @@ class LinearTransformStudent(nn.Layer):
 class Sample(nn.Layer):
     def __init__(self, t_shape):
         super().__init__()
-        t_N, t_C, t_H, t_W = t_shape
-        self.sample = nn.AdaptiveAvgPool2D((t_H, t_W))
+        self.t_N, self.t_C, self.t_H, self.t_W = t_shape
+        self.sample = nn.AdaptiveAvgPool2D((self.t_H, self.t_W))
 
     def forward(self, g_s, bs):
-        g_s = paddle.stack([self.sample(f_s.pow(2).mean(1, keepdim=True)).reshape([bs, -1]) for f_s in g_s], axis=1)
+        g_s = paddle.stack([self.sample(f_s.pow(2).mean(1, keepdim=True))
+                            .reshape([bs, self.t_H*self.t_W]) for f_s in g_s], axis=1)
         return g_s
