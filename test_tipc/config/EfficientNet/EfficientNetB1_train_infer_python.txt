@@ -50,3 +50,4 @@ inference:python/predict_cls.py -c configs/inference_cls.yaml -o PreProcess.tran
 -o Global.benchmark:True
 null:null
 null:null
+random_infer_input:[{float,[3,224,224]}]
