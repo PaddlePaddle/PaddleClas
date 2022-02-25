@@ -12,9 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import os
 import paddle
 import cv2
+
+import os
+import sys
+__dir__ = os.path.dirname(os.path.abspath(__file__))
+sys.path.append(os.path.abspath(os.path.join(__dir__, '../../')))
 
 from ppcls.arch import build_model
 from ppcls.utils.config import parse_config, parse_args
@@ -51,12 +55,17 @@ class GalleryLayer(paddle.nn.Layer):
                 self.gallery_images.append(image_file)
                 gallery_docs.append(ori_line.strip())
                 gallery_labels.append(line[1].strip())
-        self.gallery_layer = paddle.nn.Linear(embedding_size, len(self.gallery_images), bias_attr=False)
+        self.gallery_layer = paddle.nn.Linear(
+            embedding_size, len(self.gallery_images), bias_attr=False)
         self.gallery_layer.skip_quant = True
         output_label_str = ""
         for i, label_i in enumerate(gallery_labels):
             output_label_str += "{} {}\n".format(i, label_i)
         output_path = configs["Global"]["save_inference_dir"] + "_label.txt"
+
+        save_dir = os.path.dirname(configs["Global"]["save_inference_dir"])
+        if not os.path.exists(save_dir):
+            os.makedirs(save_dir)
         with open(output_path, "w") as f:
             f.write(output_label_str)
 
@@ -71,19 +80,23 @@ class GalleryLayer(paddle.nn.Layer):
         embedding_size = self.configs["Arch"]["Head"]["embedding_size"]
         batch_index = 0
         input_tensor = paddle.zeros(self.image_shape)
-        gallery_feature = paddle.zeros((len(self.gallery_images), embedding_size))
+        gallery_feature = paddle.zeros(
+            (len(self.gallery_images), embedding_size))
         for i, image_path in enumerate(self.gallery_images):
             image = cv2.imread(image_path)[:, :, ::-1]
             for op in preprocess_ops:
                 image = op(image)
             input_tensor[batch_index] = image
             batch_index += 1
-            if batch_index == self.batch_size or i == len(self.gallery_images) - 1:
+            if batch_index == self.batch_size or i == len(
+                    self.gallery_images) - 1:
                 batch_feature = feature_extractor(input_tensor)["features"]
                 for j in range(batch_index):
                     feature = batch_feature[j]
-                    norm_feature = paddle.nn.functional.normalize(feature, axis=0)
+                    norm_feature = paddle.nn.functional.normalize(
+                        feature, axis=0)
                     gallery_feature[i - batch_index + j + 1] = norm_feature
+                batch_index = 0
         self.gallery_layer.set_state_dict({"_layer.weight": gallery_feature.T})
 
 
