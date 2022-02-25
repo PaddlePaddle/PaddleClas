@@ -372,7 +372,7 @@ def _load_pretrained(pretrained, model, model_url, use_ssld=False):
         )
 
 
-def TNT_small(pretrained=False, **kwargs):
+def TNT_small(pretrained=False, use_ssld=False, **kwargs):
     model = TNT(patch_size=16,
                 embed_dim=384,
                 in_dim=24,
@@ -381,5 +381,6 @@ def TNT_small(pretrained=False, **kwargs):
                 in_num_head=4,
                 qkv_bias=False,
                 **kwargs)
-    _load_pretrained(pretrained, model, MODEL_URLS["TNT_small"])
+    _load_pretrained(
+        pretrained, model, MODEL_URLS["TNT_small"], use_ssld=use_ssld)
     return model
