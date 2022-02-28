@@ -135,40 +135,13 @@ class DistillationModel(nn.Layer):
         return result_dict
 
 
-class AttentionModel(nn.Layer):
+class AttentionModel(DistillationModel):
     def __init__(self,
                  models=None,
                  pretrained_list=None,
                  freeze_params_list=None,
                  **kargs):
-        super().__init__()
-        assert isinstance(models, list)
-        self.model_list = []
-        self.model_name_list = []
-        if pretrained_list is not None:
-            assert len(pretrained_list) == len(models)
-
-        if freeze_params_list is None:
-            freeze_params_list = [False] * len(models)
-        assert len(freeze_params_list) == len(models)
-        for idx, model_config in enumerate(models):
-            assert len(model_config) == 1
-            key = list(model_config.keys())[0]
-            model_config = model_config[key]
-            model_name = model_config.pop("name")
-            model = eval(model_name)(**model_config)
-
-            if freeze_params_list[idx]:
-                for param in model.parameters():
-                    param.trainable = False
-            self.model_list.append(self.add_sublayer(key, model))
-            self.model_name_list.append(key)
-
-        if pretrained_list is not None:
-            for idx, pretrained in enumerate(pretrained_list):
-                if pretrained is not None:
-                    load_dygraph_pretrain(
-                        self.model_name_list[idx], path=pretrained)
+        super().__init__(models, pretrained_list, freeze_params_list, **kargs)
 
     def forward(self, x, label=None):
         result_dict = dict()
