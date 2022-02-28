@@ -99,6 +99,8 @@ def classification_eval(engine, epoch_id=0):
                 if isinstance(out, dict):
                     if "Student" in out:
                         out = out["Student"]
+                        if isinstance(out, dict):
+                            out = out["logits"]
                     elif "logits" in out:
                         out = out["logits"]
                     else:

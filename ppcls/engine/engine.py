@@ -459,5 +459,7 @@ class ExportModel(TheseusLayer):
         if self.infer_output_key is not None:
             x = x[self.infer_output_key]
         if self.out_act is not None:
+            if isinstance(x, dict):
+                x = x["logits"]
             x = self.out_act(x)
         return x

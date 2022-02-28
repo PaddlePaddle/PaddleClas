@@ -35,7 +35,7 @@ class TheseusLayer(nn.Layer):
         self.quanter = None
 
     def _return_dict_hook(self, layer, input, output):
-        res_dict = {"output": output}
+        res_dict = {"logits": output}
         # 'list' is needed to avoid error raised by popping self.res_dict
         for res_key in list(self.res_dict):
             # clear the res_dict because the forward process may change according to input

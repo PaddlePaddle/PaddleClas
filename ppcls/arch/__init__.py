@@ -27,8 +27,9 @@ from ppcls.arch.backbone.base.theseus_layer import TheseusLayer
 from ppcls.utils import logger
 from ppcls.utils.save_load import load_dygraph_pretrain
 from ppcls.arch.slim import prune_model, quantize_model
+from ppcls.arch.distill.afd_attention import LinearTransformStudent, LinearTransformTeacher
 
-__all__ = ["build_model", "RecModel", "DistillationModel"]
+__all__ = ["build_model", "RecModel", "DistillationModel", "AttentionModel"]
 
 
 def build_model(config):
@@ -131,4 +132,25 @@ class DistillationModel(nn.Layer):
                 result_dict[model_name] = self.model_list[idx](x)
             else:
                 result_dict[model_name] = self.model_list[idx](x, label)
+        return result_dict
+
+
+class AttentionModel(DistillationModel):
+    def __init__(self,
+                 models=None,
+                 pretrained_list=None,
+                 freeze_params_list=None,
+                 **kargs):
+        super().__init__(models, pretrained_list, freeze_params_list, **kargs)
+
+    def forward(self, x, label=None):
+        result_dict = dict()
+        out = x
+        for idx, model_name in enumerate(self.model_name_list):
+            if label is None:
+                out = self.model_list[idx](out)
+                result_dict.update(out)
+            else:
+                out = self.model_list[idx](out, label)
+                result_dict.update(out)
         return result_dict
