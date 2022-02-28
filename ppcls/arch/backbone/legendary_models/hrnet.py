@@ -459,6 +459,7 @@ class HRNet(TheseusLayer):
         self.avg_pool = nn.AdaptiveAvgPool2D(1)
 
         stdv = 1.0 / math.sqrt(2048 * 1.0)
+        self.flatten = nn.Flatten(start_axis=1, stop_axis=-1)
 
         self.fc = nn.Linear(
             2048,
@@ -496,7 +497,7 @@ class HRNet(TheseusLayer):
 
         y = self.conv_last(y)
         y = self.avg_pool(y)
-        y = paddle.reshape(y, shape=[-1, y.shape[1]])
+        y = self.flatten(y)
         y = self.fc(y)
         return y
 
