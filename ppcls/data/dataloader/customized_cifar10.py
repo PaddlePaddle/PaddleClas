@@ -28,8 +28,8 @@ class CustomizedCifar10(Cifar10):
                  mode='train',
                  download=True,
                  backend=None):
-        assert mode.lower() in ['train', 'test', 'train', 'test'], \
-            "mode should be 'train10', 'test10', 'train100' or 'test100', but got {}".format(mode)
+        assert mode.lower() in ['train', 'test'], \
+            "mode should be 'train', 'test', but got {}".format(mode)
         self.mode = mode.lower()
 
         if backend is None:

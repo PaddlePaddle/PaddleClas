@@ -20,9 +20,6 @@ class DSHSDLoss(nn.Layer):
     """
     # DSHSD(IEEE ACCESS 2019)
     # paper [Deep Supervised Hashing Based on Stable Distribution](https://ieeexplore.ieee.org/document/8648432/)
-    # [DSHSD] epoch:70,  bit:48,  dataset:cifar10-1,  MAP:0.809, Best MAP: 0.809
-    # [DSHSD] epoch:250, bit:48,  dataset:nuswide_21, MAP:0.809, Best MAP: 0.815
-    # [DSHSD] epoch:135, bit:48,  dataset:imagenet,   MAP:0.647, Best MAP: 0.647
     """
 
     def __init__(self, alpha, multi_label=False):
@@ -64,8 +61,6 @@ class DSHSDLoss(nn.Layer):
 class LCDSHLoss(nn.Layer):
     """
     # paper [Locality-Constrained Deep Supervised Hashing for Image Retrieval](https://www.ijcai.org/Proceedings/2017/0499.pdf)
-    # [LCDSH] epoch:145, bit:48, dataset:cifar10-1,  MAP:0.798, Best MAP: 0.798
-    # [LCDSH] epoch:183, bit:48, dataset:nuswide_21, MAP:0.833, Best MAP: 0.834
     """
 
     def __init__(self, n_class, _lambda):
@@ -98,11 +93,6 @@ class DCHLoss(paddle.nn.Layer):
     """
     # paper [Deep Cauchy Hashing for Hamming Space Retrieval]
     URL:(http://ise.thss.tsinghua.edu.cn/~mlong/doc/deep-cauchy-hashing-cvpr18.pdf)
-
-    # [DCH] epoch:150, bit:48, dataset:cifar10-1, MAP:0.768, Best MAP: 0.810
-    # [DCH] epoch:150, bit:48, dataset:coco, MAP:0.665, Best MAP: 0.670
-    # [DCH] epoch:150, bit:48, dataset:imagenet, MAP:0.586, Best MAP: 0.586
-    # [DCH] epoch:150, bit:48, dataset:nuswide_21, MAP:0.778, Best MAP: 0.794
     """
 
     def __init__(self, gamma, _lambda, n_class):
@@ -111,14 +101,14 @@ class DCHLoss(paddle.nn.Layer):
         self._lambda = _lambda
         self.n_class = n_class
 
-    def d(self, hi, hj):
-        assert hi.shape[1] == hj.shape[
-            1], "feature len of hi and hj is different, please check whether the featurs are right"
-        K = hi.shape[1]
-        inner_product = paddle.matmul(hi, hj, transpose_y=True)
+    def distance(self, feature_i, feature_j):
+        assert feature_i.shape[1] == feature_j.shape[
+            1], "feature len of feature_i and feature_j is different, please check whether the featurs are right"
+        K = feature_i.shape[1]
+        inner_product = paddle.matmul(feature_i, feature_j, transpose_y=True)
 
-        len_i = hi.pow(2).sum(axis=1, keepdim=True).pow(0.5)
-        len_j = hj.pow(2).sum(axis=1, keepdim=True).pow(0.5)
+        len_i = feature_i.pow(2).sum(axis=1, keepdim=True).pow(0.5)
+        len_j = feature_j.pow(2).sum(axis=1, keepdim=True).pow(0.5)
         norm = paddle.matmul(len_i, len_j, transpose_y=True)
         cos = inner_product / norm.clip(min=0.0001)
         return (1 - cos.clip(max=0.99)) * K / 2
@@ -136,7 +126,7 @@ class DCHLoss(paddle.nn.Layer):
         else:
             w = 1
 
-        d_hi_hj = self.d(u, u)
+        d_hi_hj = self.distance(u, u)
 
         cauchy_loss = w * (s * paddle.log(d_hi_hj / self.gamma) +
                            paddle.log(1 + self.gamma / d_hi_hj))

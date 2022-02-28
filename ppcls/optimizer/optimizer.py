@@ -47,15 +47,15 @@ class SGD(object):
 
     def __init__(self,
                  learning_rate=0.001,
-                 parameters=None,
                  weight_decay=None,
                  grad_clip=None,
-                 name=None):
+                 name=None,
+                 multi_precision=False):
         self.learning_rate = learning_rate
-        self.parameters = parameters
         self.weight_decay = weight_decay
         self.grad_clip = grad_clip
         self.name = name
+        self.multi_precision = multi_precision
 
     def __call__(self, model_list):
         # model_list is None in static graph
@@ -65,7 +65,8 @@ class SGD(object):
                         parameters=parameters,
                         weight_decay=self.weight_decay,
                         grad_clip=self.grad_clip,
-                        name=self.name)
+                        name=self.name,
+                        multi_precision=self.multi_precision)
         return opt
 
 
