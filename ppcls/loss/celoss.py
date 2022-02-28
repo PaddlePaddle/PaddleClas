@@ -57,7 +57,7 @@ class CELoss(nn.Layer):
                 soft_label = False
             loss = F.cross_entropy(x, label=label, soft_label=soft_label)
         loss = loss.mean()
-        return {"CELoss": loss}
+        return {"loss_celoss": loss}
 
 
 class MixCELoss(object):

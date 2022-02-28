@@ -204,38 +204,3 @@ class DistillationKLDivLoss(KLDivLoss):
             for key in loss:
                 loss_dict["{}_{}_{}".format(key, pair[0], pair[1])] = loss[key]
         return loss_dict
-
-
-class DistillationGuidedKLDivLoss(nn.Layer):
-    """
-    DistillationKLDivLoss
-    """
-
-    def __init__(self,
-                 model_name_pairs=[],
-                 temperature=4,
-                 key=None,
-                 name="loss_kl"):
-        super().__init__(temperature=temperature)
-        assert isinstance(model_name_pairs, list)
-        self.key = key
-        self.model_name_pairs = model_name_pairs
-        self.temperature = temperature
-        self.name = name
-
-    def forward(self, predicts, batch):
-        loss_dict = dict()
-        for idx, pair in enumerate(self.model_name_pairs):
-            feat_s = F.log_softmax(out1 / self.temperature, axis=1)
-            feat_t = F.softmax(out2 / self.temperature, axis=1)
-            t_argmax = paddle.argmax(t, dim=1)
-            mask = paddle.equal(batch[0], t_argmax).astype('float32')
-            count = (mask[mask == 1]).shape[0]
-            mask = mask.unsqueeze(-1)
-            correct_s = feat_s.multiply(mask)
-            correct_t = feat_t.multiply(mask)
-            correct_t[correct_t == 0.0] = 1.0
-            loss = F.kl_div(correct_s, correct_t, reduction='sum') * (self.t**2) / count
-
-            loss_dict["GKD_{}_{}".format(pair[0], pair[1])] = loss
-        return loss_dict

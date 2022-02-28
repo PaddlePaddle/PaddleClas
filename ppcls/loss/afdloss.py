@@ -53,14 +53,16 @@ class AFDLoss(nn.Layer):
     https://www.aaai.org/AAAI21Papers/AAAI-9785.JiM.pdf
     https://github.com/clovaai/attention-feature-distillation
     """
+
     def __init__(self,
                  model_name_pair=["Student", "Teacher"],
                  student_keys=["bilinear_key", "value"],
                  teacher_keys=["query", "value"],
-                 s_shapes=[[64, 16, 160], [128, 8, 160], [256, 4, 160], [512, 2, 160]],
+                 s_shapes=[[64, 16, 160], [128, 8, 160], [256, 4, 160],
+                           [512, 2, 160]],
                  t_shapes=[[640, 48], [320, 96], [160, 192]],
                  qk_dim=128,
-                 name="afd"):
+                 name="loss_afd"):
         super().__init__()
         assert isinstance(model_name_pair, list)
         self.model_name_pair = model_name_pair
@@ -70,8 +72,8 @@ class AFDLoss(nn.Layer):
         self.t_shapes = [[1] + t_i for t_i in t_shapes]
         self.qk_dim = qk_dim
         self.n_t, self.unique_t_shapes = unique_shape(self.t_shapes)
-        self.attention = Attention(
-            self.qk_dim, self.t_shapes, self.s_shapes, self.n_t, self.unique_t_shapes)
+        self.attention = Attention(self.qk_dim, self.t_shapes, self.s_shapes,
+                                   self.n_t, self.unique_t_shapes)
         self.name = name
 
     def forward(self, predicts, batch):
@@ -99,10 +101,10 @@ class Attention(nn.Layer):
         # self.linear_trans_t = LinearTransformTeacher(qk_dim, t_shapes)
 
         self.p_t = self.create_parameter(
-            shape=[len(t_shapes), qk_dim], 
+            shape=[len(t_shapes), qk_dim],
             default_initializer=nn.initializer.XavierNormal())
         self.p_s = self.create_parameter(
-            shape=[len(s_shapes), qk_dim], 
+            shape=[len(s_shapes), qk_dim],
             default_initializer=nn.initializer.XavierNormal())
 
     def forward(self, g_s, g_t):
@@ -111,7 +113,9 @@ class Attention(nn.Layer):
 
         p_logit = paddle.matmul(self.p_t, self.p_s.t())
 
-        logit = paddle.add(paddle.einsum('bstq,btq->bts', bilinear_key, query), p_logit) / np.sqrt(self.qk_dim)
+        logit = paddle.add(
+            paddle.einsum('bstq,btq->bts', bilinear_key, query),
+            p_logit) / np.sqrt(self.qk_dim)
         atts = F.softmax(logit, axis=2)  # b x t x s
 
         loss = []
@@ -126,4 +130,3 @@ class Attention(nn.Layer):
         diff = (v_s - v_t.unsqueeze(1)).pow(2).mean(2)
         diff = paddle.multiply(diff, att).sum(1).mean()
         return diff
-
