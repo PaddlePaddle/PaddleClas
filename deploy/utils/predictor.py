@@ -50,8 +50,6 @@ class Predictor(object):
         else:
             config.disable_gpu()
             if args.enable_mkldnn:
-                # cache 10 different shapes for mkldnn to avoid memory leak
-                config.set_mkldnn_cache_capacity(10)
                 config.enable_mkldnn()
         config.set_cpu_math_library_num_threads(args.cpu_num_threads)
 
