@@ -28,7 +28,6 @@ from ppcls.data.dataloader.vehicle_dataset import CompCars, VeriWild
 from ppcls.data.dataloader.logo_dataset import LogoDataset
 from ppcls.data.dataloader.icartoon_dataset import ICartoonDataset
 from ppcls.data.dataloader.mix_dataset import MixDataset
-from ppcls.data.dataloader.customized_cifar10 import CustomizedCifar10
 
 # sampler
 from ppcls.data.dataloader.DistributedRandomIdentitySampler import DistributedRandomIdentitySampler

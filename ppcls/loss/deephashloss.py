@@ -132,7 +132,7 @@ class DCHLoss(paddle.nn.Layer):
                            paddle.log(1 + self.gamma / d_hi_hj))
 
         all_one = paddle.ones_like(u, dtype="float32")
-        quantization_loss = paddle.log(1 + self.d(u.abs(), all_one) /
+        quantization_loss = paddle.log(1 + self.distance(u.abs(), all_one) /
                                        self.gamma)
 
         loss = cauchy_loss.mean() + self._lambda * quantization_loss.mean()

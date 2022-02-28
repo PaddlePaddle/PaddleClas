@@ -59,8 +59,20 @@ Optimizer:
 DataLoader:
   Train:
     dataset:
-      name: CustomizedCifar10
-      mode: 'train'
+      name: ImageNetDataset
+      image_root: ./dataset/
+      cls_label_path: ./dataset/cifar10-2/train.txt
+      transform_ops:
+        - DecodeImage:
+            to_rgb: True
+            channel_first: False
+        - ResizeImage:
+            size: 224
+        - NormalizeImage:
+            scale: 1.0/255.0
+            mean: [0.485, 0.456, 0.406]
+            std: [0.229, 0.224, 0.225]
+            order: ''
     sampler:
       batch_size: 128
       drop_last: False
@@ -71,9 +83,21 @@ DataLoader:
 
   Eval:
     Query:
-      dataset: 
-        name: CustomizedCifar10
-        mode: 'test'
+      dataset:
+        name: ImageNetDataset
+        image_root: ./dataset/
+        cls_label_path: ./dataset/cifar10-2/test.txt
+        transform_ops:
+          - DecodeImage:
+              to_rgb: True
+              channel_first: False
+          - ResizeImage:
+              size: 224
+          - NormalizeImage:
+              scale: 1.0/255.0
+              mean: [0.485, 0.456, 0.406]
+              std: [0.229, 0.224, 0.225]
+              order: ''
       sampler:
         batch_size: 128
         drop_last: False
@@ -83,9 +107,21 @@ DataLoader:
         use_shared_memory: True
 
     Gallery:
-      dataset: 
-        name: CustomizedCifar10
-        mode: 'train'
+      dataset:
+        name: ImageNetDataset
+        image_root: ./dataset/
+        cls_label_path: ./dataset/cifar10-2/database.txt
+        transform_ops:
+          - DecodeImage:
+              to_rgb: True
+              channel_first: False
+          - ResizeImage:
+              size: 224
+          - NormalizeImage:
+              scale: 1.0/255.0
+              mean: [0.485, 0.456, 0.406]
+              std: [0.229, 0.224, 0.225]
+              order: ''
       sampler:
         batch_size: 128
         drop_last: False
