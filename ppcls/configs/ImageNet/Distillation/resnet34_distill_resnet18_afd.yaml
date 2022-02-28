@@ -23,7 +23,7 @@ Arch:
   freeze_params_list:
   models:
     - Teacher:
-        name: AttentionDistillationModel
+        name: AttentionModel
         pretrained_list:
         freeze_params_list:
           - True
@@ -32,24 +32,21 @@ Arch:
           - ResNet34:
               name: ResNet34
               pretrained: True
-              return_patterns: ["blocks[0]", "blocks[1]", "blocks[2]", "blocks[3]",
-                                "blocks[4]", "blocks[5]", "blocks[6]", "blocks[7]",
-                                "blocks[8]", "blocks[9]", "blocks[10]", "blocks[11]",
-                                "blocks[12]", "blocks[13]", "blocks[14]", "blocks[15]"]
+              return_patterns: &t_keys ["blocks[0]", "blocks[1]", "blocks[2]", "blocks[3]",
+                                        "blocks[4]", "blocks[5]", "blocks[6]", "blocks[7]",
+                                        "blocks[8]", "blocks[9]", "blocks[10]", "blocks[11]",
+                                        "blocks[12]", "blocks[13]", "blocks[14]", "blocks[15]"]
           - LinearTransformTeacher:
               name: LinearTransformTeacher
               qk_dim: 128
-              keys: ["blocks[0]", "blocks[1]", "blocks[2]", "blocks[3]",
-                     "blocks[4]", "blocks[5]", "blocks[6]", "blocks[7]",
-                     "blocks[8]", "blocks[9]", "blocks[10]", "blocks[11]",
-                     "blocks[12]", "blocks[13]", "blocks[14]", "blocks[15]"]
-              t_shapes: [[64, 56, 56], [64, 56, 56], [64, 56, 56], [128, 28, 28],
-                         [128, 28, 28], [128, 28, 28], [128, 28, 28], [256, 14, 14],
-                         [256, 14, 14], [256, 14, 14], [256, 14, 14], [256, 14, 14],
-                         [256, 14, 14], [512, 7, 7], [512, 7, 7], [512, 7, 7]]
+              keys: *t_keys
+              t_shapes: &t_shapes [[64, 56, 56], [64, 56, 56], [64, 56, 56], [128, 28, 28],
+                                   [128, 28, 28], [128, 28, 28], [128, 28, 28], [256, 14, 14],
+                                   [256, 14, 14], [256, 14, 14], [256, 14, 14], [256, 14, 14],
+                                   [256, 14, 14], [512, 7, 7], [512, 7, 7], [512, 7, 7]]
 
     - Student:
-        name: AttentionDistillationModel
+        name: AttentionModel
         pretrained_list:
         freeze_params_list:
           - False
@@ -58,19 +55,15 @@ Arch:
           - ResNet18:
               name: ResNet18
               pretrained: False
-              return_patterns: ["blocks[0]", "blocks[1]", "blocks[2]", "blocks[3]",
-                                "blocks[4]", "blocks[5]", "blocks[6]", "blocks[7]"]
+              return_patterns: &s_keys ["blocks[0]", "blocks[1]", "blocks[2]", "blocks[3]",
+                                        "blocks[4]", "blocks[5]", "blocks[6]", "blocks[7]"]
           - LinearTransformStudent:
               name: LinearTransformStudent
               qk_dim: 128
-              keys: ["blocks[0]", "blocks[1]", "blocks[2]", "blocks[3]",
-                     "blocks[4]", "blocks[5]", "blocks[6]", "blocks[7]"]
-              s_shapes: [[64, 56, 56], [64, 56, 56], [128, 28, 28], [128, 28, 28],
-                         [256, 14, 14], [256, 14, 14], [512, 7, 7], [512, 7, 7]]
-              t_shapes: [[64, 56, 56], [64, 56, 56], [64, 56, 56], [128, 28, 28],
-                         [128, 28, 28], [128, 28, 28], [128, 28, 28], [256, 14, 14],
-                         [256, 14, 14], [256, 14, 14], [256, 14, 14], [256, 14, 14],
-                         [256, 14, 14], [512, 7, 7], [512, 7, 7], [512, 7, 7]]
+              keys: *s_keys
+              s_shapes: &s_shapes [[64, 56, 56], [64, 56, 56], [128, 28, 28], [128, 28, 28],
+                                   [256, 14, 14], [256, 14, 14], [512, 7, 7], [512, 7, 7]]
+              t_shapes: *t_shapes
 
   infer_model_name: "Student"
 
@@ -92,12 +85,8 @@ Loss:
         model_name_pair: ["Student", "Teacher"]
         student_keys: ["bilinear_key", "value"]
         teacher_keys: ["query", "value"]
-        s_shapes: [[64, 56, 56], [64, 56, 56], [128, 28, 28], [128, 28, 28], 
-                   [256, 14, 14], [256, 14, 14], [512, 7, 7], [512, 7, 7]]
-        t_shapes: [[64, 56, 56], [64, 56, 56], [64, 56, 56], [128, 28, 28], 
-                   [128, 28, 28], [128, 28, 28], [128, 28, 28], [256, 14, 14], 
-                   [256, 14, 14], [256, 14, 14], [256, 14, 14], [256, 14, 14], 
-                   [256, 14, 14], [512, 7, 7], [512, 7, 7], [512, 7, 7]]
+        s_shapes: *s_shapes
+        t_shapes: *t_shapes
   Eval:
     - DistillationGTCELoss:
         weight: 1.0

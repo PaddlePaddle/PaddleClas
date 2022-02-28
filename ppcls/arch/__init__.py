@@ -27,9 +27,9 @@ from ppcls.arch.backbone.base.theseus_layer import TheseusLayer
 from ppcls.utils import logger
 from ppcls.utils.save_load import load_dygraph_pretrain
 from ppcls.arch.slim import prune_model, quantize_model
-from .distill.attention import LinearTransformStudent, LinearTransformTeacher
+from ppcls.arch.distill.afd_attention import LinearTransformStudent, LinearTransformTeacher
 
-__all__ = ["build_model", "RecModel", "DistillationModel", "AttentionDistillationModel"]
+__all__ = ["build_model", "RecModel", "DistillationModel", "AttentionModel"]
 
 
 def build_model(config):
@@ -135,7 +135,7 @@ class DistillationModel(nn.Layer):
         return result_dict
 
 
-class AttentionDistillationModel(nn.Layer):
+class AttentionModel(nn.Layer):
     def __init__(self,
                  models=None,
                  pretrained_list=None,
