@@ -1,6 +1,8 @@
 # 识别模型转分类模型
 
-PaddleClas 提供了 `gallery2fc.py` 工具，帮助大家将识别模型转为分类模型。
+PaddleClas 提供了 `gallery2fc.py` 工具，帮助大家将识别模型转为分类模型。目前该工具仅支持转换量化后模型，因此建议使用 PaddleClas 提供的 `general_PPLCNet_x2_5_pretrained_v1.0_quant` 预训练模型，该模型为量化后的通用识别模型，backbone 为 PPLCNet_x2_5。
+
+如需使用其他模型，关于量化的具体操作请参考文档 [模型量化](./model_prune_quantization.md)。
 
 ## 一、模型转换说明
 
@@ -8,7 +10,7 @@ PaddleClas 提供了 `gallery2fc.py` 工具，帮助大家将识别模型转为�
 
 #### 1. 底库数据集
 
-首先需要准备好底库数据，下面以 PaddleClas 提供饮料数据集（drink_dataset_v1.0）为例进行说明，饮料数据集获取方法：
+首先需要准备好底库数据，下面以 PaddleClas 提供的饮料数据集（drink_dataset_v1.0）为例进行说明，饮料数据集获取方法：
 
 ```shell
 cd PaddleClas/
@@ -40,7 +42,7 @@ wget https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/pretra
     * image_root: 底库数据集路径；
     * data_file: 底库数据集列表文件路径；
 
-### 1.3 转换特征提取模型
+### 1.3 模型转换
 
 在完成上述准备工作后，即可进行模型转换，命令如下所示：
 
