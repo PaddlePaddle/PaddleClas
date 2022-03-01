@@ -86,6 +86,8 @@ class RepVGGBlock(nn.Layer):
                  groups=1,
                  padding_mode='zeros'):
         super(RepVGGBlock, self).__init__()
+        self.is_repped = False
+
         self.in_channels = in_channels
         self.out_channels = out_channels
         self.kernel_size = kernel_size
@@ -121,6 +123,12 @@ class RepVGGBlock(nn.Layer):
             groups=groups)
 
     def forward(self, inputs):
+        if not self.training and not self.is_repped:
+            self.rep()
+            self.is_repped = True
+        if self.training and self.is_repped:
+            self.is_repped = False
+
         if not self.training:
             return self.nonlinearity(self.rbr_reparam(inputs))
 
@@ -131,7 +139,7 @@ class RepVGGBlock(nn.Layer):
         return self.nonlinearity(
             self.rbr_dense(inputs) + self.rbr_1x1(inputs) + id_out)
 
-    def eval(self):
+    def rep(self):
         if not hasattr(self, 'rbr_reparam'):
             self.rbr_reparam = nn.Conv2D(
                 in_channels=self.in_channels,
@@ -142,12 +150,9 @@ class RepVGGBlock(nn.Layer):
                 dilation=self.dilation,
                 groups=self.groups,
                 padding_mode=self.padding_mode)
-        self.training = False
         kernel, bias = self.get_equivalent_kernel_bias()
         self.rbr_reparam.weight.set_value(kernel)
         self.rbr_reparam.bias.set_value(bias)
-        for layer in self.sublayers():
-            layer.eval()
 
     def get_equivalent_kernel_bias(self):
         kernel3x3, bias3x3 = self._fuse_bn_tensor(self.rbr_dense)
@@ -241,12 +246,6 @@ class RepVGG(nn.Layer):
             self.in_planes = planes
             self.cur_layer_idx += 1
         return nn.Sequential(*blocks)
-
-    def eval(self):
-        self.training = False
-        for layer in self.sublayers():
-            layer.training = False
-            layer.eval()
 
     def forward(self, x):
         out = self.stage0(x)
