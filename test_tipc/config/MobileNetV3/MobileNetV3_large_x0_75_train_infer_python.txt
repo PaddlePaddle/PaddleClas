@@ -49,3 +49,5 @@ inference:python/predict_cls.py -c configs/inference_cls.yaml
 -o Global.save_log_path:null
 -o Global.benchmark:True
 null:null
+===========================infer_benchmark_params==========================
+random_infer_input:[{float32,[3,224,224]}]

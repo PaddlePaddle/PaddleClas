@@ -50,3 +50,5 @@ inference:python/predict_rec.py -c configs/inference_rec.yaml
 -o Global.benchmark:True
 null:null
 null:null
+===========================infer_benchmark_params==========================
+random_infer_input:[{float32,[3,224,224]}]
