@@ -14,10 +14,7 @@
 
 from __future__ import absolute_import
 from __future__ import division
-from collections import defaultdict
 import numpy as np
-import copy
-import random
 import math
 from paddle.io import DistributedBatchSampler
 
@@ -51,12 +48,16 @@ class RepeatedAugSampler(DistributedBatchSampler):
                  drop_last=False,
                  num_repeats=3,
                  selected_round=256):
-        super().__init__(dataset, batch_size, num_replicas, rank, shuffle, drop_last)
+        super().__init__(dataset, batch_size, num_replicas, rank, shuffle,
+                         drop_last)
+        self.num_repeats = num_repeats
         self.num_samples = int(
             math.ceil(len(self.dataset) * num_repeats / self.nranks))
         self.total_size = self.num_samples * self.nranks
         self.num_selected_samples = int(
-            math.floor(len(self.dataset) // selected_round * selected_round / self.nranks))
+            math.floor(
+                len(self.dataset) // selected_round * selected_round /
+                self.nranks))
 
     def __iter__(self):
         num_samples = len(self.dataset)
@@ -64,7 +65,7 @@ class RepeatedAugSampler(DistributedBatchSampler):
         if self.shuffle:
             np.random.RandomState(self.epoch).shuffle(indices)
             self.epoch += 1
-        indices = [ele for ele in indices for i in range(3)]
+        indices = [ele for ele in indices for i in range(self.num_repeats)]
         indices += indices[:(self.total_size - len(indices))]
         assert len(indices) == self.total_size
         # subsample
