@@ -18,6 +18,7 @@ from __future__ import print_function
 
 from paddle import optimizer as optim
 import paddle
+import paddle.nn as nn
 
 from ppcls.utils import logger
 
@@ -215,3 +216,63 @@ class AdamW(object):
 
     def _apply_decay_param_fun(self, name):
         return name not in self.no_weight_decay_param_name_list
+
+
+class Lamb(object):
+    def __init__(self,
+                 learning_rate=0.001,
+                 beta1=0.9,
+                 beta2=0.999,
+                 epsilon=1e-6,
+                 weight_decay=None,
+                 grad_clip=nn.ClipGradByGlobalNorm(clip_norm=1.0),
+                 no_weight_decay_name=None,
+                 one_dim_param_no_weight_decay=False,
+                 **args):
+        super().__init__()
+        self.learning_rate = learning_rate
+        self.beta1 = beta1
+        self.beta2 = beta2
+        self.epsilon = epsilon
+        self.grad_clip = grad_clip
+        self.weight_decay = weight_decay
+        self.no_weight_decay_name_list = no_weight_decay_name.split(
+        ) if no_weight_decay_name else []
+        self.one_dim_param_no_weight_decay = one_dim_param_no_weight_decay
+
+    def __call__(self, model_list):
+        # model_list is None in static graph
+        parameters = sum([m.parameters() for m in model_list],
+                         []) if model_list else None
+
+        if model_list is None:
+            if self.one_dim_param_no_weight_decay or len(
+                    self.no_weight_decay_name_list) != 0:
+                msg = "\"Lamb optimizer\" does not support setting \"no_weight_decay\" in static graph. Please use dynamic graph."
+                logger.error(Exception(msg))
+                raise Exception(msg)
+
+        self.no_weight_decay_param_name_list = [
+            p.name for model in model_list for n, p in model.named_parameters()
+            if any(nd in n for nd in self.no_weight_decay_name_list)
+        ] if model_list else []
+
+        if self.one_dim_param_no_weight_decay:
+            self.no_weight_decay_param_name_list += [
+                p.name for model in model_list
+                for n, p in model.named_parameters() if len(p.shape) == 1
+            ] if model_list else []
+
+        opt = optim.Lamb(
+            learning_rate=self.learning_rate,
+            beta1=self.beta1,
+            beta2=self.beta2,
+            epsilon=self.epsilon,
+            parameters=parameters,
+            lamb_weight_decay=self.weight_decay,
+            grad_clip=self.grad_clip,
+            exclude_from_weight_decay_fn=self._exclude_from_weight_decay_fn)
+        return opt
+
+    def _exclude_from_weight_decay_fn(self, name):
+        return  name.name in self.no_weight_decay_param_name_list
