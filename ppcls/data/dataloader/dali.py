@@ -74,7 +74,7 @@ class HybridTrainPipe(Pipeline):
         self.cmnp = ops.CropMirrorNormalize(
             device="gpu",
             dtype=output_dtype,
-            output_layout='CHW',
+            output_layout='HWC',
             crop=(crop, crop),
             mean=mean,
             std=std,
@@ -126,7 +126,7 @@ class HybridValPipe(Pipeline):
         self.cmnp = ops.CropMirrorNormalize(
             device="gpu",
             dtype=output_dtype,
-            output_layout='CHW',
+            output_layout='HWC',
             crop=(crop, crop),
             mean=mean,
             std=std,

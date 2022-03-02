@@ -60,8 +60,8 @@ DataLoader:
   Train:
     dataset:
       name: ImageNetDataset
-      image_root: ./dataset/ILSVRC2012/
-      cls_label_path: ./dataset/ILSVRC2012/train_list.txt
+      image_root: ./data/
+      cls_label_path: ./data/train_list.txt
       transform_ops:
         - DecodeImage:
             to_rgb: True
@@ -80,7 +80,7 @@ DataLoader:
 
     sampler:
       name: DistributedBatchSampler
-      batch_size: 64
+      batch_size: 128
       drop_last: False
       shuffle: True
     loader:
@@ -90,8 +90,8 @@ DataLoader:
   Eval:
     dataset: 
       name: ImageNetDataset
-      image_root: ./dataset/ILSVRC2012/
-      cls_label_path: ./dataset/ILSVRC2012/val_list.txt
+      image_root: ./data/
+      cls_label_path: ./data/val_list.txt
       transform_ops:
         - DecodeImage:
             to_rgb: True
@@ -109,7 +109,7 @@ DataLoader:
             channel_num: *image_channel
     sampler:
       name: DistributedBatchSampler
-      batch_size: 64
+      batch_size: 128
       drop_last: False
       shuffle: False
     loader:
