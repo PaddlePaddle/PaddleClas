@@ -16,23 +16,6 @@ import paddle.nn as nn
 import paddle.nn.functional as F
 import paddle
 import numpy as np
-import matplotlib.pyplot as plt
-import cv2
-import warnings
-warnings.filterwarnings('ignore')
-
-
-class LinearBNReLU(nn.Layer):
-    def __init__(self, nin, nout):
-        super().__init__()
-        self.linear = nn.Linear(nin, nout)
-        self.bn = nn.BatchNorm1D(nout)
-        self.relu = nn.ReLU()
-
-    def forward(self, x, relu=True):
-        if relu:
-            return self.relu(self.bn(self.linear(x)))
-        return self.bn(self.linear(x))
 
 
 def unique_shape(s_shapes):
@@ -97,8 +80,6 @@ class Attention(nn.Layer):
         super().__init__()
         self.qk_dim = qk_dim
         self.n_t = n_t
-        # self.linear_trans_s = LinearTransformStudent(qk_dim, t_shapes, s_shapes, unique_t_shapes)
-        # self.linear_trans_t = LinearTransformTeacher(qk_dim, t_shapes)
 
         self.p_t = self.create_parameter(
             shape=[len(t_shapes), qk_dim],
