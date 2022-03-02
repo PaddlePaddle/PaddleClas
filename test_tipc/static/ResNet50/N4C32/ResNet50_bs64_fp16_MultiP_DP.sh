@@ -3,7 +3,7 @@ bs_item=64
 fp_item=fp16
 run_process_type=MultiP
 run_mode=DP
-device_num=N4C8
+device_num=N4C32
 max_epochs=1
 num_workers=4
 
