@@ -65,7 +65,7 @@ DataLoader:
     dataset:
       name: ImageNetDataset
       image_root: ./dataset/
-      cls_label_path: ./dataset/cifar10-2/train.txt
+      cls_label_path: ./dataset/train.txt
       transform_ops:
         - DecodeImage:
             to_rgb: True
@@ -90,7 +90,7 @@ DataLoader:
       dataset:
         name: ImageNetDataset
         image_root: ./dataset/
-        cls_label_path: ./dataset/cifar10-2/test.txt
+        cls_label_path: ./dataset/test.txt
         transform_ops:
           - DecodeImage:
               to_rgb: True
@@ -114,7 +114,7 @@ DataLoader:
       dataset:
         name: ImageNetDataset
         image_root: ./dataset/
-        cls_label_path: ./dataset/cifar10-2/database.txt
+        cls_label_path: ./dataset/database.txt
         transform_ops:
           - DecodeImage:
               to_rgb: True
