@@ -28,34 +28,35 @@ class DSHSDLoss(nn.Layer):
         self.multi_label = multi_label
 
     def forward(self, input, label):
-        feature = input["features"]
+        features = input["features"]
         logits = input["logits"]
 
-        dist = paddle.sum(paddle.square(
-            (paddle.unsqueeze(feature, 1) - paddle.unsqueeze(feature, 0))),
-                          axis=2)
+        features_temp1 = paddle.unsqueeze(features, 1)
+        features_temp2 = paddle.unsqueeze(features, 0)
+        dist = features_temp1 - features_temp2
+        dist = paddle.square(dist)
+        dist = paddle.sum(dist, axis=2)
 
-        # label to ont-hot
         n_class = logits.shape[1]
-        label = paddle.nn.functional.one_hot(
-            label, n_class).astype("float32").squeeze()
+        labels = paddle.nn.functional.one_hot(label, n_class)
+        labels = labels.squeeze().astype("float32")
 
-        s = (paddle.matmul(
-            label, label, transpose_y=True) == 0).astype("float32")
-        margin = 2 * feature.shape[1]
+        s = paddle.matmul(labels, labels, transpose_y=True)
+        s = (s == 0).astype("float32")
+        margin = 2 * features.shape[1]
         Ld = (1 - s) / 2 * dist + s / 2 * (margin - dist).clip(min=0)
         Ld = Ld.mean()
 
         if self.multi_label:
-            # multiple labels classification loss
-            Lc = (logits - label * logits + (
-                (1 + (-logits).exp()).log())).sum(axis=1).mean()
+            Lc_temp = (1 + (-logits).exp()).log()
+            Lc = (logits - labels * logits + Lc_temp).sum(axis=1)
         else:
-            # single labels classification loss
-            Lc = (-paddle.nn.functional.softmax(logits).log() * label).sum(
-                axis=1).mean()
+            probs = paddle.nn.functional.softmax(logits)
+            Lc = (-probs.log() * labels).sum(axis=1)
+        Lc = Lc.mean()
 
-        return {"dshsdloss": Lc + Ld * self.alpha}
+        loss = Lc + Ld * self.alpha
+        return {"dshsdloss": loss}
 
 
 class LCDSHLoss(nn.Layer):
@@ -69,24 +70,30 @@ class LCDSHLoss(nn.Layer):
         self.n_class = n_class
 
     def forward(self, input, label):
-        feature = input["features"]
+        features = input["features"]
+        labels = paddle.nn.functional.one_hot(label, self.n_class)
+        labels = labels.squeeze().astype("float32")
 
-        label = paddle.nn.functional.one_hot(
-            label, self.n_class).astype("float32").squeeze()
+        s = paddle.matmul(labels, labels, transpose_y=True)
+        s = 2 * (s > 0).astype("float32") - 1
 
-        s = 2 * (paddle.matmul(
-            label, label, transpose_y=True) > 0).astype("float32") - 1
-        inner_product = paddle.matmul(feature, feature, transpose_y=True) * 0.5
-
+        inner_product = paddle.matmul(features, features, transpose_y=True)
+        inner_product = inner_product * 0.5
         inner_product = inner_product.clip(min=-50, max=50)
-        L1 = paddle.log(1 + paddle.exp(-s * inner_product)).mean()
+        L1 = paddle.log(1 + paddle.exp(-s * inner_product))
+        L1 = L1.mean()
 
-        b = feature.sign()
-        inner_product_ = paddle.matmul(b, b, transpose_y=True) * 0.5
+        binary_features = features.sign()
+
+        inner_product_ = paddle.matmul(
+            binary_features, binary_features, transpose_y=True)
+        inner_product_ = inner_product_ * 0.5
         sigmoid = paddle.nn.Sigmoid()
-        L2 = (sigmoid(inner_product) - sigmoid(inner_product_)).pow(2).mean()
+        L2 = (sigmoid(inner_product) - sigmoid(inner_product_)).pow(2)
+        L2 = L2.mean()
 
-        return {"lcdshloss": L1 + self._lambda * L2}
+        loss = L1 + self._lambda * L2
+        return {"lcdshloss": loss}
 
 
 class DCHLoss(paddle.nn.Layer):
@@ -111,14 +118,15 @@ class DCHLoss(paddle.nn.Layer):
         len_j = feature_j.pow(2).sum(axis=1, keepdim=True).pow(0.5)
         norm = paddle.matmul(len_i, len_j, transpose_y=True)
         cos = inner_product / norm.clip(min=0.0001)
-        return (1 - cos.clip(max=0.99)) * K / 2
+        dist = (1 - cos.clip(max=0.99)) * K / 2
+        return dist
 
     def forward(self, input, label):
-        u = input["features"]
-        y = paddle.nn.functional.one_hot(
-            label, self.n_class).astype("float32").squeeze()
+        features = input["features"]
+        labels = paddle.nn.functional.one_hot(label, self.n_class)
+        labels = labels.squeeze().astype("float32")
 
-        s = paddle.matmul(y, y, transpose_y=True).astype("float32")
+        s = paddle.matmul(labels, labels, transpose_y=True).astype("float32")
         if (1 - s).sum() != 0 and s.sum() != 0:
             positive_w = s * s.numel() / s.sum()
             negative_w = (1 - s) * s.numel() / (1 - s).sum()
@@ -126,15 +134,13 @@ class DCHLoss(paddle.nn.Layer):
         else:
             w = 1
 
-        d_hi_hj = self.distance(u, u)
+        dist_matric = self.distance(features, features)
+        cauchy_loss = w * (s * paddle.log(dist_matric / self.gamma) +
+                           paddle.log(1 + self.gamma / dist_matric))
 
-        cauchy_loss = w * (s * paddle.log(d_hi_hj / self.gamma) +
-                           paddle.log(1 + self.gamma / d_hi_hj))
-
-        all_one = paddle.ones_like(u, dtype="float32")
-        quantization_loss = paddle.log(1 + self.distance(u.abs(), all_one) /
-                                       self.gamma)
+        all_one = paddle.ones_like(features, dtype="float32")
+        dist_to_one = self.distance(features.abs(), all_one)
+        quantization_loss = paddle.log(1 + dist_to_one / self.gamma)
 
         loss = cauchy_loss.mean() + self._lambda * quantization_loss.mean()
-
         return {"dchloss": loss}

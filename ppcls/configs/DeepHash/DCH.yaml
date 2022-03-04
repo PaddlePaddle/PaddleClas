@@ -63,8 +63,8 @@ DataLoader:
   Train:
     dataset:
       name: ImageNetDataset
-      image_root: ./dataset/
-      cls_label_path: ./dataset/train.txt
+      image_root: ./dataset/CIFAR10/
+      cls_label_path: ./dataset/CIFAR10/train_list.txt
       transform_ops:
         - DecodeImage:
             to_rgb: True
@@ -88,8 +88,8 @@ DataLoader:
     Query:
       dataset:
         name: ImageNetDataset
-        image_root: ./dataset/
-        cls_label_path: ./dataset/test.txt
+        image_root: ./dataset/CIFAR10/
+        cls_label_path: ./dataset/CIFAR10/test_list.txt
         transform_ops:
           - DecodeImage:
               to_rgb: True
@@ -112,8 +112,8 @@ DataLoader:
     Gallery:
       dataset:
         name: ImageNetDataset
-        image_root: ./dataset/
-        cls_label_path: ./dataset/database.txt
+        image_root: ./dataset/CIFAR10/
+        cls_label_path: ./dataset/CIFAR10/train_list.txt
         transform_ops:
           - DecodeImage:
               to_rgb: True
