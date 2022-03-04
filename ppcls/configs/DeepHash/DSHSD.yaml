@@ -38,7 +38,7 @@ Arch:
     class_num: 10
     embedding_size: 48
 
-# loss function config for traing/eval process
+# loss function config for train/eval process
 Loss:
   Train:
     - DSHSDLoss:
