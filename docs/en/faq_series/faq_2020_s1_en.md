@@ -108,7 +108,7 @@ PaddleClas strictly follows the resolution used by the authors of the paper. Sin
 
 **A**:
 
-There are many ssld pre-training models available in PaddleClas, which obtain better pre-training weights by semi-supervised knowledge distillation, so that the accuracy can be improved by replacing the ssld pre-training models with higher accuracy in transfer tasks or downstream vision tasks without replacing the structure files. For example, in PaddleSeg, [HRNet](../models/HRNet_en.md) , with the weight of the ssld pre-training model, achieves much better accuracy than other same models in the industry; In PaddleDetection, [PP- YOLO](https://github.com/PaddlePaddle/PaddleDetection/blob/release/0.4/configs/ppyolo/README_cn.md)with ssld pre-training weights has further improvement in the already high baseline. The transfer of classification with ssld pre-training weights also yields impressive results, and the benefits of knowledge distillation for the transfer of classification task is detailed in  [SSLD Distillation Strategy](../advanced_tutorials/knowledge_distillation_en.md)  
+There are many ssld pre-training models available in PaddleClas, which obtain better pre-training weights by semi-supervised knowledge distillation, so that the accuracy can be improved by replacing the ssld pre-training models with higher accuracy in transfer tasks or downstream vision tasks without replacing the structure files. For example, in PaddleSeg, [HRNet](../models/HRNet_en.md) , with the weight of the ssld pre-training model, achieves much better accuracy than other same models in the industry; In PaddleDetection, [PP- YOLO](https://github.com/PaddlePaddle/PaddleDetection/blob/release/0.4/configs/ppyolo/README_cn.md)with ssld pre-training weights has further improvement in the already high baseline. The transfer of classification with ssld pre-training weights also yields impressive results, and the benefits of knowledge distillation for the transfer of classification task is detailed in  [SSLD Distillation Strategy](../advanced_tutorials/distillation/distillation_en.md)  
 
 <a name="3"></a>
 
@@ -143,7 +143,7 @@ When adopting multiple models for inference, it is recommended to first export t
 
 **A**：
 
-- You can adopt auto-mixed precision training, which can gain a significantly faster speed with almost zero precision loss. Take ResNet50 as an example, the configuration file of auto-mixed precision training in PaddleClas can be found at: [ResNet50_fp16.yml](../../../ppcls/configs/ImageNet/ResNet/ResNet50_fp16.yaml). The main step is to add the following lines to the standard configuration file.
+- You can adopt auto-mixed precision training, which can gain a significantly faster speed with almost zero precision loss. Take ResNet50 as an example, the configuration file of auto-mixed precision training in PaddleClas can be found at: [ResNet50_amp_O1.yml](../../../ppcls/configs/ImageNet/ResNet/ResNet50_amp_O1.yaml). The main step is to add the following lines to the standard configuration file.
 
 ```
 # mixed precision training
@@ -351,7 +351,7 @@ At this stage, it has become a common practice in the image recognition field to
 **A**: If the existing strategy cannot further improve the accuracy of the model, it means that the model has almost reached saturation with the existing dataset and strategy, and two methods are provided here.
 
 - Mining relevant data: Use the model trained on the existing dataset to make predictions on the relevant data, label the data with higher confidence and add it to the training set for further training. Repeat the steps above to further improve the accuracy of the model.
-- Knowledge distillation: You can use a larger model to train a teacher model with higher accuracy on the dataset, and then adopt the teacher model to teach a Student model, where the Student model is the target model. PaddleClas provides Baidu's own SSLD knowledge distillation scheme, which can steadily improve by more than 3% even on such a challenging classification task as ImageNet-1k. For the chapter on SSLD knowledge distillation, please refer to [**SSLD Knowledge Distillation**](../advanced_tutorials/knowledge_distillation_en.md).
+- Knowledge distillation: You can use a larger model to train a teacher model with higher accuracy on the dataset, and then adopt the teacher model to teach a Student model, where the Student model is the target model. PaddleClas provides Baidu's own SSLD knowledge distillation scheme, which can steadily improve by more than 3% even on such a challenging classification task as ImageNet-1k. For the chapter on SSLD knowledge distillation, please refer to [**SSLD Knowledge Distillation**](../advanced_tutorials/distillation/distillation_en.md).
 
 <a name="6"></a>
 

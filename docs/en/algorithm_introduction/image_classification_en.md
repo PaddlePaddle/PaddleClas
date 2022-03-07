@@ -55,7 +55,7 @@ After the data is settled, the model often determines the upper limit of the fin
 <a name="2.3"></a>
 ### 2.3 Train the Model
 
-After preparing the data and model, you can start training the model and updating the parameters of the model. After many iterations, a trained model can finally be obtained for image classification tasks. The training process of image classification requires a lot of experience and involves the setting of many hyperparameters. PaddleClas provides a series of [training tuning methods](https://github.com/PaddlePaddle/PaddleClas/blob/develop/docs/en/models/Tricks_en.md), which can help you quickly obtain a high-precision model.
+After preparing the data and model, you can start training the model and updating the parameters of the model. After many iterations, a trained model can finally be obtained for image classification tasks. The training process of image classification requires a lot of experience and involves the setting of many hyperparameters. PaddleClas provides a series of [training tuning methods](https://github.com/PaddlePaddle/PaddleClas/blob/develop/docs/en/models_training/train_strategy_en.md), which can help you quickly obtain a high-precision model.
 
 
 <a name="2.4"></a>

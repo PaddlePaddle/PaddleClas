@@ -4,7 +4,7 @@ This tutorial will introduce how to use [Paddle-Lite](https://github.com/PaddleP
 
 Paddle-Lite is a lightweight inference engine for PaddlePaddle. It provides efficient inference capabilities for mobile phones and IoTs,  and extensively integrates cross-platform hardware to provide lightweight deployment solutions for mobile-side deployment issues.
 
-If you only want to test speed, please refer to [The tutorial of Paddle-Lite mobile-side benchmark test](../extension/paddle_mobile_inference_en.md).
+If you only want to test speed, please refer to [The tutorial of Paddle-Lite mobile-side benchmark test](../others/paddle_mobile_inference_en.md).
 
 ---
 
@@ -47,7 +47,7 @@ For the detailed compilation directions of different development environments, p
 
 1. If you download the inference library from [Paddle-Lite official document](https://paddle-lite.readthedocs.io/zh/latest/quick_start/release_lib.html#android-toolchain-gcc), please choose `with_extra=ON` , `with_cv=ON` .
 
-2. It is recommended to build inference library using [Paddle-Lite](https://github.com/PaddlePaddle/Paddle-Lite) develop branch if you want to deploy the [quantitative](https://github.com/PaddlePaddle/PaddleOCR/blob/develop/deploy/slim/quantization/README_en.md) model to mobile phones. Please refer to the [link](https://paddle-lite.readthedocs.io/zh/latest/user_guides/Compile/Android.html#id2) for more detailed information about compiling.
+2. It is recommended to build inference library using [Paddle-Lite](https://github.com/PaddlePaddle/Paddle-Lite) develop branch if you want to deploy the [quantitative](https://github.com/PaddlePaddle/PaddleOCR/blob/develop/deploy/slim/quantization/README_en.md) model to mobile phones. Please refer to the [link](https://paddle-lite.readthedocs.io/) for more detailed information about compiling.
 
 
 The structure of the inference library is as follows:
