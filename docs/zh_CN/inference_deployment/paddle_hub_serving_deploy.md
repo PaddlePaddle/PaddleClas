@@ -15,8 +15,8 @@ PaddleClas 支持通过 PaddleHub 快速进行服务化部署。目前支持图�
     - [5.2 配置文件启动](#5.2)
 - [6. 发送预测请求](#6)
 - [7. 自定义修改服务模块](#7)
-    
-   
+
+
 <a name="1"></a>
 ## 1. 简介
 
@@ -55,7 +55,7 @@ pip3 install paddlehub==2.1.0 --upgrade -i https://pypi.tuna.tsinghua.edu.cn/sim
   ```
 需要注意，
   * 模型文件（包括 `.pdmodel` 与 `.pdiparams`）名称必须为 `inference`。
-  * 我们也提供了大量基于 ImageNet-1k 数据集的预训练模型，模型列表及下载地址详见[模型库概览](../models/models_intro.md)，也可以使用自己训练转换好的模型。
+  * 我们也提供了大量基于 ImageNet-1k 数据集的预训练模型，模型列表及下载地址详见[模型库概览](../algorithm_introduction/ImageNet_models.md)，也可以使用自己训练转换好的模型。
 
 
 <a name="4"></a>

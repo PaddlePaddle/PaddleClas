@@ -23,7 +23,7 @@
 wget https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ResNet50_pretrained.pdparams
 ```
 
-其他模型网络结构代码及预训练模型请自行下载：[模型库](../../../ppcls/arch/backbone/)，[预训练模型](../models/models_intro.md)。
+其他模型网络结构代码及预训练模型请自行下载：[模型库](../../../ppcls/arch/backbone/)，[预训练模型](../algorithm_introduction/ImageNet_models.md)。
 
  <a name='3'></a>
 

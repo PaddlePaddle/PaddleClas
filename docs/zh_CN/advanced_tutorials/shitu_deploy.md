@@ -80,7 +80,7 @@
 因为要对模型进行训练，所以收集自己的数据集。数据准备及相应格式请参考：[特征提取文档](../image_recognition_pipeline/feature_extraction.md)中 `4.1数据准备`部分、[识别数据集说明](../data_preparation/recognition_dataset.md)。值得注意的是，此部分需要准备大量的数据，以保证识别模型效果。训练配置文件参考：[通用识别模型配置文件](../../../ppcls/configs/GeneralRecognition/GeneralRecognition_PPLCNet_x2_5.yaml)，训练方法参考：[识别模型训练](../models_training/recognition.md)
 
 - 数据增强：根据实际情况选择不同数据增强方法。如：实际应用中数据遮挡比较严重，建议添加`RandomErasing`增强方法。详见[数据增强文档](./DataAugmentation.md)
-- 换不同的`backbone`，一般来说，越大的模型，特征提取能力更强。不同`backbone`详见[模型介绍](../models/models_intro.md)
+- 换不同的`backbone`，一般来说，越大的模型，特征提取能力更强。不同`backbone`详见[模型介绍](../algorithm_introduction/ImageNet_models.md)
 - 选择不同的`Metric Learning`方法。不同的`Metric Learning`方法，对不同的数据集效果可能不太一样，建议尝试其他`Loss`,详见[Metric Learning](../algorithm_introduction/metric_learning.md)
 - 采用蒸馏方法，对小模型进行模型能力提升，详见[模型蒸馏](../algorithm_introduction/knowledge_distillation.md)
 - 增补数据集。针对错误样本，添加badcase数据

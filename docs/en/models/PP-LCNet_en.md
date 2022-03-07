@@ -107,7 +107,7 @@ For image classification, ImageNet dataset is adopted. Compared with the current
 | PPLCNet_x1_0_ssld | 3.0 | 161 | 74.39 | 92.09 | 2.46 |
 | PPLCNet_x2_5_ssld | 9.0 | 906 | 80.82 | 95.33 | 5.39 |
 
-where `_ssld` represents the model after using `SSLD distillation`. For details about `SSLD distillation`, see [SSLD distillation](../advanced_tutorials/knowledge_distillation_en.md).
+where `_ssld` represents the model after using `SSLD distillation`. For details about `SSLD distillation`, see [SSLD distillation](../advanced_tutorials/distillation/distillation_en.md).
 
 Performance comparison with other lightweight networks:
 
@@ -190,7 +190,7 @@ Rather than holding on to perfect FLOPs and Params as academics do, PP-LCNet foc
 Reference to cite when you use PP-LCNet in a paper:
 ```
 @misc{cui2021pplcnet,
-      title={PP-LCNet: A Lightweight CPU Convolutional Neural Network}, 
+      title={PP-LCNet: A Lightweight CPU Convolutional Neural Network},
       author={Cheng Cui and Tingquan Gao and Shengyu Wei and Yuning Du and Ruoyu Guo and Shuilong Dong and Bin Lu and Ying Zhou and Xueying Lv and Qiwen Liu and Xiaoguang Hu and Dianhai Yu and Yanjun Ma},
       year={2021},
       eprint={2109.15099},

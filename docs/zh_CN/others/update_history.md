@@ -3,12 +3,8 @@
 - 2021.11.1 发布[PP-ShiTu技术报告](https://arxiv.org/pdf/2111.00775.pdf)，新增饮料识别demo。
 - 2021.10.23 发布轻量级图像识别系统PP-ShiTu，CPU上0.2s即可完成在10w+库的图像识别。[点击这里](../quick_start/quick_start_recognition.md)立即体验。
 - 2021.09.17 发布PP-LCNet系列超轻量骨干网络模型, 在Intel CPU上，单张图像预测速度约5ms，ImageNet-1K数据集上Top1识别准确率达到80.82%，超越ResNet152的模型效果。PP-LCNet的介绍可以参考[论文](https://arxiv.org/pdf/2109.15099.pdf), 或者[PP-LCNet模型介绍](../models/PP-LCNet.md)，相关指标和预训练权重可以从 [这里](../algorithm_introduction/ImageNet_models.md)下载。
-- 2021.08.11 更新7个[FAQ](../faq_series/faq_2021_s2.md)。
-- 2021.06.29 添加Swin-transformer系列模型，ImageNet1k数据集上Top1 acc最高精度可达87.2%；支持训练预测评估与whl包部署，预训练模型可以从[这里](../models/models_intro.md)下载。
-- 2021.06.22,23,24 PaddleClas官方研发团队带来技术深入解读三日直播课。课程回放：[https://aistudio.baidu.com/aistudio/course/introduce/24519](https://aistudio.baidu.com/aistudio/course/introduce/24519)
-- 2021.06.16 PaddleClas v2.2版本升级，集成Metric learning，向量检索等组件。新增商品识别、动漫人物识别、车辆识别和logo识别等4个图像识别应用。新增LeViT、Twins、TNT、DLA、HarDNet、RedNet系列30个预训练模型。
 - 2021.08.11 更新 7 个[FAQ](../faq_series/faq_2021_s2.md)。
-- 2021.06.29 添加 Swin-transformer 系列模型，ImageNet1k 数据集上 Top1 acc 最高精度可达 87.2%；支持训练预测评估与 whl 包部署，预训练模型可以从[这里](../models/models_intro.md)下载。
+- 2021.06.29 添加 Swin-transformer 系列模型，ImageNet1k 数据集上 Top1 acc 最高精度可达 87.2%；支持训练预测评估与 whl 包部署，预训练模型可以从[这里](../algorithm_introduction/ImageNet_models.md)下载。
 - 2021.06.22,23,24 PaddleClas 官方研发团队带来技术深入解读三日直播课。课程回放：[https://aistudio.baidu.com/aistudio/course/introduce/24519](https://aistudio.baidu.com/aistudio/course/introduce/24519)
 - 2021.06.16 PaddleClas v2.2 版本升级，集成 Metric learning，向量检索等组件。新增商品识别、动漫人物识别、车辆识别和 logo 识别等 4 个图像识别应用。新增 LeViT、Twins、TNT、DLA、HarDNet、RedNet 系列 30 个预训练模型。
 - 2021.04.15

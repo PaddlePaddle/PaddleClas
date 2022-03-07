@@ -217,7 +217,7 @@ Some of the configurable evaluation parameters are described as follows:
 
 **Note：** When loading the model to be evaluated, you only need to specify the path of the model file stead of the suffix. PaddleClas will automatically add the `.pdparams` suffix, such as [3.1.3 Resume Training](#3.1.3).
 
-When loading the model to be evaluated, you only need to specify the path of the model file stead of the suffix. PaddleClas will automatically add the `.pdparams` suffix, such as [3.1.3 Resume Training](https://github.com/PaddlePaddle/PaddleClas/blob/ develop/docs/zh_CN/models_training/classification.md#3.1.3).
+When loading the model to be evaluated, you only need to specify the path of the model file stead of the suffix. PaddleClas will automatically add the `.pdparams` suffix, such as [3.1.3 Resume Training](../models_training/classification_en.md#3.1.3).
 
 <a name="3.2"></a>
 

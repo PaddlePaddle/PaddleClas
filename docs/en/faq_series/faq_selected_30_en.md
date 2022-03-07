@@ -27,8 +27,8 @@
 
 > >
 
-- Q: 怎样根据自己的任务选择合适的模型进行训练？How to choose the right training model?
-- A: If you want to deploy on the server with a high requirement for accuracy but not model storage size or prediction speed, then it is recommended to use ResNet_vd, Res2Net_vd, DenseNet, Xception, etc., which are suitable for server-side models. If you want to deploy on the mobile side, then it is recommended to use MobileNetV3 and GhostNet. Meanwhile, we suggest you refer to the speed-accuracy metrics chart in [Model Library](../models/models_intro_en.md) when choosing models.
+- Q: How to choose the right training model?
+- A: If you want to deploy on the server with a high requirement for accuracy but not model storage size or prediction speed, then it is recommended to use ResNet_vd, Res2Net_vd, DenseNet, Xception, etc., which are suitable for server-side models. If you want to deploy on the mobile side, then it is recommended to use MobileNetV3 and GhostNet. Meanwhile, we suggest you refer to the speed-accuracy metrics chart in [Model Library](../algorithm_introduction/ImageNet_models_en.md) when choosing models.
 
 > >
 
@@ -280,7 +280,7 @@ Loss:
 > >
 
 - Q: How to train with Automatic Mixed Precision (AMP) during training?
-- A: You can refer to [ResNet50_fp16.yaml](../../../ppcls/configs/ImageNet/ResNet/ResNet50_fp16.yaml). Specifically, if you want your configuration file to support automatic mixed precision during model training, you can add the following information to the file.
+- A: You can refer to [ResNet50_amp_O1.yaml](../../../ppcls/configs/ImageNet/ResNet/ResNet50_amp_O1.yaml). Specifically, if you want your configuration file to support automatic mixed precision during model training, you can add the following information to the file.
 
 ```
 # mixed precision training

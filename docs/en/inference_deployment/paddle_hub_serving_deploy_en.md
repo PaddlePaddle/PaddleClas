@@ -48,7 +48,7 @@ Before installing the service module, you need to prepare the inference model an
 **Notice**:
 * The model file path can be viewed and modified in `PaddleClas/deploy/hubserving/clas/params.py`.
 * It should be noted that the prefix of model structure file and model parameters file must be `inference`.
-* More models provided by PaddleClas can be obtained from the [model library](../models/models_intro_en.md). You can also use models trained by yourself.
+* More models provided by PaddleClas can be obtained from the [model library](../algorithm_introduction/ImageNet_models_en.md). You can also use models trained by yourself.
 
 <a name="4"></a>
 ## 4. Install Service Module
