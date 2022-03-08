@@ -69,7 +69,7 @@ PARAMS=$3
 IFS=$'\n'
 # parser params from train_benchmark.txt
 sed -i 's/ -o DataLoader.Train.sampler.shuffle=False//g' $FILENAME
-sed -i 's/ -o DataLoader.Train.loader.num_workers=0//g' $FILENAME
+sed -i 's/ -o DataLoader.Train.loader.num_workers=0/-o Global.print_batch_step=1/g' $FILENAME
 sed -i 's/-o DataLoader.Train.loader.use_shared_memory=False/-o Global.eval_during_train=False/g' $FILENAME
 dataline=`cat $FILENAME`
 # parser params
@@ -117,10 +117,14 @@ line_profile=13
 line_eval_py=24
 line_export_py=30
 line_norm_train=16
+line_pact_train=17
+line_fgpm_train=18
 
 func_sed_params "$FILENAME" "${line_eval_py}" "null"
 func_sed_params "$FILENAME" "${line_export_py}" "null"
 func_sed_params "$FILENAME" "${line_python}"  "$python"
+func_sed_params "$FILENAME" "${line_pact_train}" "null"
+func_sed_params "$FILENAME" "${line_fgpm_train}" "null"
 
 # if params
 if  [ ! -n "$PARAMS" ] ;then

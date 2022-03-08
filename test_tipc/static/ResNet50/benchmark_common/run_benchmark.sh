@@ -46,7 +46,7 @@ function _train(){
 	log_file=${profiling_log_file}
     fi
 
-    train_cmd="${config_file} -o DataLoader.Train.sampler.batch_size=${base_batch_size} -o Global.epochs=${max_epochs} -o DataLoader.Train.loader.num_workers=${num_workers} ${profiling_config}"
+    train_cmd="${config_file} -o DataLoader.Train.sampler.batch_size=${base_batch_size} -o Global.epochs=${max_epochs} -o DataLoader.Train.loader.num_workers=${num_workers} ${profiling_config} -o Global.eval_during_train=False"
 #   以下为通用执行命令，无特殊可不用修改
     case ${run_process_type} in
     SingleP) 
@@ -69,7 +69,19 @@ function _train(){
     fi
     cd ../
 }
+
+function _set_env(){
+    #开启gc
+    export FLAGS_eager_delete_tensor_gb=0.0
+    export FLAGS_fraction_of_gpu_memory_to_use=0.98
+    ####
+    export FLAGS_cudnn_exhaustive_search=1
+    export FLAGS_conv_workspace_size_limit=4000 #MB
+}
+
+
 source ${BENCHMARK_ROOT}/scripts/run_model.sh   # 在该脚本中会对符合benchmark规范的log使用analysis.py 脚本进行性能数据解析;如果不联调只想要产出训练log可以注掉本行,提交时需打开
 _set_params $@
 # _train       # 如果只产出训练log,不解析,可取消注释
+_set_env
 _run     # 该函数在run_model.sh中,执行时会调用_train; 如果不联调只产出训练log可以注掉本行,提交时需打开
