@@ -26,7 +26,7 @@
 #include "include/config_parser.h"
 #include "include/object_detector.h"
 #include "include/preprocess_op.h"
-#include "include/recognition.h"
+#include "include/feature_extractor.h"
 #include "json/json.h"
 
 Json::Value RT_Config;
@@ -159,11 +159,15 @@ int main(int argc, char **argv) {
       RT_Config["Global"]["cpu_num_threads"].as<int>(),
       RT_Config["Global"]["batch_size"].as<int>());
   // create rec model
-  PPShiTu::Recognition rec(RT_Config);
+  PPShiTu::FeatureExtract rec(RT_Config);
   // Do inference on input image
 
   std::vector<PPShiTu::ObjectResult> det_result;
   std::vector<cv::Mat> batch_imgs;
+
+  //for vector search
+  std::vector<float> feature;
+  std::vector<float> features;
   double rec_time;
   if (!RT_Config["Global"]["infer_imgs"].as<std::string>().empty() ||
       !img_dir.empty()) {
@@ -209,14 +213,15 @@ int main(int argc, char **argv) {
         int h = det_result[j].rect[3] - det_result[j].rect[1];
         cv::Rect rect(det_result[j].rect[0], det_result[j].rect[1], w, h);
         cv::Mat crop_img = srcimg(rect);
-        std::vector<PPShiTu::RESULT> result =
-            rec.RunRecModel(crop_img, rec_time);
-        det_result[j].rec_result.assign(result.begin(), result.end());
+        rec.RunRecModel(crop_img, rec_time, feature);
+        features.insert(features.end(), feature.begin(), feature.end());
       }
+
+      std::cout << "feature len is:  " << features.size() << std::endl;
       // rec nms
-      PPShiTu::nms(det_result,
-                   RT_Config["Global"]["rec_nms_thresold"].as<float>(), true);
-      PrintResult(img_path, det_result);
+      // PPShiTu::nms(det_result,
+      //              RT_Config["Global"]["rec_nms_thresold"].as<float>(), true);
+      // PrintResult(img_path, det_result);
       batch_imgs.clear();
       det_result.clear();
     }

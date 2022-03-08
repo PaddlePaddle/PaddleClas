@@ -9,14 +9,12 @@ endif
 ${info ARM_ABI: ${ARM_ABI}}
 ${info ARM_PLAT: ${ARM_PLAT}; option[arm7/arm8]}
 
-include ../Makefile.def
-
-LITE_ROOT=../../../
+LITE_ROOT=libs/inference_lite_lib.android.armv8
+include ${LITE_ROOT}/demo/cxx/Makefile.def
 ${info LITE_ROOT: $(abspath ${LITE_ROOT})}
 
 THIRD_PARTY_DIR=third_party
 ${info THIRD_PARTY_DIR: $(abspath ${THIRD_PARTY_DIR})}
-
 
 OPENCV_VERSION=opencv4.1.0
 OPENCV_LIBS = ${THIRD_PARTY_DIR}/${OPENCV_VERSION}/${ARM_PLAT}/libs/libopencv_imgcodecs.a \
