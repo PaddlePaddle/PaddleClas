@@ -5,7 +5,7 @@ run_process_type=MultiP
 run_mode=DP
 device_num=N1C8
 max_epochs=1
-num_workers=4
+num_workers=8
 
 # get data
 bash test_tipc/static/${model_item}/benchmark_common/prepare.sh

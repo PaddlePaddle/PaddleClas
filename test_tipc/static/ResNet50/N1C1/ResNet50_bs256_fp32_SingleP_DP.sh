@@ -1,5 +1,5 @@
 model_item=ResNet50
-bs_item=64
+bs_item=256
 fp_item=fp32
 run_process_type=SingleP
 run_mode=DP
