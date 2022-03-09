@@ -69,8 +69,8 @@ PARAMS=$3
 IFS=$'\n'
 # parser params from train_benchmark.txt
 sed -i 's/ -o DataLoader.Train.sampler.shuffle=False//g' $FILENAME
-sed -i 's/ -o DataLoader.Train.loader.num_workers=0/-o Global.print_batch_step=1/g' $FILENAME
-sed -i 's/-o DataLoader.Train.loader.use_shared_memory=False/-o Global.eval_during_train=False/g' $FILENAME
+sed -i 's/ -o DataLoader.Train.loader.num_workers=0/ -o Global.print_batch_step=1/g' $FILENAME
+sed -i 's/-o DataLoader.Train.loader.use_shared_memory=False/ -o Global.eval_during_train=False/g' $FILENAME
 dataline=`cat $FILENAME`
 # parser params
 IFS=$'\n'
