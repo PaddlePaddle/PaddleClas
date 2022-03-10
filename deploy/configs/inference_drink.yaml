@@ -51,8 +51,8 @@ RecPostProcess: null
 # indexing engine config
 IndexProcess:
   index_method: "HNSW32" # supported: HNSW32, IVF, Flat
-  index_dir: "./drink_dataset_v1.0/gallery"
-  image_root: "./drink_dataset_v1.0/index"
+  image_root: "./drink_dataset_v1.0/gallery"
+  index_dir:  "./drink_dataset_v1.0/index"
   data_file:  "./drink_dataset_v1.0/gallery/drink_label.txt"
   index_operation: "new" # suported: "append", "remove", "new"
   delimiter: " "
