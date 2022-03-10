@@ -1,16 +1,16 @@
-from ..processor import build_processor
+from processor.algo_mod import AlgoMod
 
 
 class POPEngine:
     def __init__(self, config):
-        self.processor_list = []
-        last_algo_type = "start"
-        for processor_config in config["Processors"]:
-            processor_config["last_algo_type"] = last_algo_type
-            self.processor_list.append(build_processor(processor_config))
-            last_algo_type = processor_config["type"]
+        self.algo_list = []
+        # last_algo_type = "start"
+        for algo_config in config["AlgoModule"]:
+            # algo_config["last_algo_type"] = last_algo_type
+            self.algo_list.append(AlgoMod(algo_config["Module"]))
+            # last_algo_type = algo_config["type"]
 
     def process(self, x):
-        for processor in self.processor_list:
-            x = processor.process(x)
+        for algo_module in self.algo_list:
+            x = algo_module.process(x)
         return x

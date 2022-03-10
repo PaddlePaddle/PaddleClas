@@ -1,4 +1,4 @@
-from processor import BaseProcessor
+from processor.algo_mod.data_processor.image_processor import BaseProcessor
 
 
 class BBoxCropper(BaseProcessor):

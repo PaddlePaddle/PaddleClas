@@ -6,16 +6,29 @@ from PIL import Image
 import paddle
 
 from utils import logger
-from processor import BaseProcessor
+# from processor import BaseProcessor
+
+from abc import ABC, abstractmethod
 
 
-class ImageProcessor(BaseProcessor):
+class BaseProcessor(ABC):
+    @abstractmethod
+    def __init__(self, *args, **kwargs):
+        pass
+
+    @abstractmethod
+    def process(self, input_data):
+        pass
+
+
+class ImageProcessor(object):
     def __init__(self, config):
         self.processors = []
-        for processor_config in config.get("image_processors"):
+        for processor_config in config.get("processors"):
             name = list(processor_config)[0]
-            param = {} if processor_config[name] is None else processor_config[name]
-            op = locals()[name](**param)
+            param = {} if processor_config[name] is None else processor_config[
+                name]
+            op = eval(name)(**param)
             self.processors.append(op)
 
     def process(self, input_data):
@@ -30,25 +43,53 @@ class ImageProcessor(BaseProcessor):
 
 
 class GetShapeInfo(BaseProcessor):
-    def __init__(self):
-        pass
+    def __init__(self, order="hwc"):
+        super().__init__()
+        self.order = order
 
     def process(self, input_data):
         input_image = input_data["input_image"]
         image = input_data["image"]
-        input_data['im_shape'] = np.array(input_image.shape[:2], dtype=np.float32)
+        if self.order == "hwc":
+            input_data['im_shape'] = np.array(
+                (image.shape[:2], ), dtype=np.float32)
+            input_data['scale_factor'] = np.array(
+                [
+                    image.shape[0] / input_image.shape[0],
+                    image.shape[1] / input_image.shape[1]
+                ],
+                dtype=np.float32)
+        else:
+            input_data['im_shape'] = np.array(
+                (image.shape[1:], ), dtype=np.float32)
+            input_data['scale_factor'] = np.array(
+                [
+                    image.shape[2] / input_image.shape[0],
+                    image.shape[1] / input_image.shape[1]
+                ],
+                dtype=np.float32)
         input_data['input_shape'] = np.array(image.shape[:2], dtype=np.float32)
-        input_data['scale_factor'] = np.array([image.shape[0] / input_image.shape[0],
-                                               image.shape[1] / input_image.shape[1]], dtype=np.float32)
+        print(image.shape[0])
+        return input_data
 
 
-class ToTensor(BaseProcessor):
-    def __init__(self, config):
-        pass
+# class ToTensor(BaseProcessor):
+#     def __init__(self):
+#         super().__init__()
+
+#     def process(self, input_data):
+#         image = input_data["image"]
+#         input_data["input_tensor"] = paddle.to_tensor(image)
+#         return input_data
+
+
+class ToBatch(BaseProcessor):
+    def __init__(self):
+        super().__init__()
 
     def process(self, input_data):
         image = input_data["image"]
-        input_data["input_tensor"] = paddle.to_tensor(image)
+        input_data["image"] = image[np.newaxis, :, :, :]
         return input_data
 
 
@@ -123,8 +164,7 @@ class ResizeImage:
         else:
             logger.warning(
                 f"The backend of Resize only support \"cv2\" or \"PIL\". \"f{backend}\" is unavailable. "
-                f"Use \"cv2\" instead."
-            )
+                f"Use \"cv2\" instead.")
             self.resize_func = cv2.resize
 
     def __call__(self, img):
@@ -191,7 +231,8 @@ class NormalizeImage:
         self.std = np.array(std).reshape(shape).astype('float32')
 
     def __call__(self, img):
-        assert isinstance(img, np.ndarray), "invalid input 'img' in NormalizeImage"
+        assert isinstance(img,
+                          np.ndarray), "invalid input 'img' in NormalizeImage"
 
         img = (img.astype('float32') * self.scale - self.mean) / self.std
 
