@@ -1,4 +1,4 @@
-from .. import BaseProcessor
+from processor import BaseProcessor
 
 
 class FakeClassifier(BaseProcessor):
