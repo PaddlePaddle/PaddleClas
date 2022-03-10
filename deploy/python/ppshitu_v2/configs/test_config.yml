@@ -1,0 +1,13 @@
+AlgoModule:
+  - preprocess:
+    - processor_type: data_processor
+      processor_name: image_processor
+      image_processors:
+        - ResizeImage:
+            size: [640, 640]
+            interpolation: 2
+        - NormalizeImage:
+            scale: 0.00392157
+            mean: [0.485, 0.456, 0.406]
+            std: [0.229, 0.224, 0.225]
+        - ToRGB
