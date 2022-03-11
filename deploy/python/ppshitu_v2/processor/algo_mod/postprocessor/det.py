@@ -5,7 +5,7 @@ from utils import logger
 from ...base_processor import BaseProcessor
 
 
-class PPYOLOv2PostPro(BaseProcessor):
+class DetPostPro(BaseProcessor):
     def __init__(self, config):
         self.threshold = config["threshold"]
         self.label_list = config["label_list"]

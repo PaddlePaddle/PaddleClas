@@ -23,7 +23,7 @@ Modules:
         inference_model_dir: ./models/ppyolov2_r50vd_dcn_mainbody_v1.0_infer/
         input_names:
         output_names:
-      - name: PPYOLOv2PostPro
+      - name: DetPostPro
         type: postprocessor
         threshold: 0.2
         max_det_results: 1

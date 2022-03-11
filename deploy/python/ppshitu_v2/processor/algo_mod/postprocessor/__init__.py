@@ -1,6 +1,6 @@
 import importlib
 
-from .det import PPYOLOv2PostPro
+from .det import DetPostPro
 
 
 def build_postprocessor(config):
