@@ -3,32 +3,20 @@ import cv2
 import numpy as np
 import importlib
 from PIL import Image
-import paddle
 
 from utils import logger
-# from processor import BaseProcessor
-
-from abc import ABC, abstractmethod
+from processor.base_processor import BaseProcessor
 
 
-class BaseProcessor(ABC):
-    @abstractmethod
-    def __init__(self, *args, **kwargs):
-        pass
-
-    @abstractmethod
-    def process(self, input_data):
-        pass
-
-
-class ImageProcessor(object):
+class ImageProcessor(BaseProcessor):
     def __init__(self, config):
         self.processors = []
-        for processor_config in config.get("processors"):
+        mod = importlib.import_module(__name__)
+        for processor_config in config.get("ops"):
             name = list(processor_config)[0]
             param = {} if processor_config[name] is None else processor_config[
                 name]
-            op = eval(name)(**param)
+            op = getattr(mod, name)(**param)
             self.processors.append(op)
 
     def process(self, input_data):
@@ -39,13 +27,13 @@ class ImageProcessor(object):
                 input_data = processor.process(input_data)
             else:
                 image = processor(image)
+        input_data["image"] = image
         return input_data
 
 
 class GetShapeInfo(BaseProcessor):
-    def __init__(self, order="hwc"):
-        super().__init__()
-        self.order = order
+    def __init__(self, configs):
+        self.order = configs.get("order")
 
     def process(self, input_data):
         input_image = input_data["input_image"]
@@ -69,43 +57,22 @@ class GetShapeInfo(BaseProcessor):
                 ],
                 dtype=np.float32)
         input_data['input_shape'] = np.array(image.shape[:2], dtype=np.float32)
-        print(image.shape[0])
         return input_data
 
 
-# class ToTensor(BaseProcessor):
-#     def __init__(self):
-#         super().__init__()
-
-#     def process(self, input_data):
-#         image = input_data["image"]
-#         input_data["input_tensor"] = paddle.to_tensor(image)
-#         return input_data
-
-
-class ToBatch(BaseProcessor):
-    def __init__(self):
-        super().__init__()
-
-    def process(self, input_data):
-        image = input_data["image"]
-        input_data["image"] = image[np.newaxis, :, :, :]
-        return input_data
+class ToBatch:
+    def __call__(self, img):
+        img = img[np.newaxis, :, :, :]
+        return img
 
 
 class ToRGB:
-    def __init__(self):
-        pass
-
     def __call__(self, img):
         img = img[:, :, ::-1]
         return img
 
 
 class ToCHWImage:
-    def __init__(self):
-        pass
-
     def __call__(self, img, img_info=None):
         img = img.transpose((2, 0, 1))
         return img

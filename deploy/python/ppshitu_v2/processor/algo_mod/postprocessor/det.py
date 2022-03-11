@@ -1,19 +1,21 @@
 from functools import reduce
-
 import numpy as np
 
+from utils import logger
+from ...base_processor import BaseProcessor
 
-class DetPostProcessor(object):
+
+class PPYOLOv2PostPro(BaseProcessor):
     def __init__(self, config):
-        super().__init__()
         self.threshold = config["threshold"]
         self.label_list = config["label_list"]
         self.max_det_results = config["max_det_results"]
 
-    def process(self, pred):
-        np_boxes = pred["save_infer_model/scale_0.tmp_1"]
+    def process(self, input_data):
+        pred = input_data["pred"]
+        np_boxes = pred[list(pred.keys())[0]]
         if reduce(lambda x, y: x * y, np_boxes.shape) < 6:
-            print('[WARNNING] No object detected.')
+            logger.warning('[Detector] No object detected.')
             np_boxes = np.array([])
 
         keep_indexes = np_boxes[:, 1].argsort()[::-1][:self.max_det_results]
