@@ -1,12 +1,10 @@
-Global:
-  Engine: POPEngine
-  infer_imgs: "../../images/wangzai.jpg"
-
-AlgoModule:
-  - Module:
-      preprocess:
-        name: ImageProcessor
-        processors:
+Modules:
+  - name: Detector
+    type: AlgoMod
+    processors:
+      - name: ImageProcessor
+        type: preprocessor
+        ops:
           - ResizeImage:
               size: [640, 640]
               interpolation: 2
@@ -17,14 +15,16 @@ AlgoModule:
               order: hwc
           - ToCHWImage:
           - GetShapeInfo:
-              order: chw
+              configs:
+                order: chw
           - ToBatch:
-      predictor:
+      - name: PaddlePredictor
+        type: predictor
         inference_model_dir: ./models/ppyolov2_r50vd_dcn_mainbody_v1.0_infer/
-        input_names: 
+        input_names:
         output_names:
-      postprocess:
-        name: DetPostProcessor
+      - name: DetPostPro
+        type: postprocessor
         threshold: 0.2
         max_det_results: 1
         label_list:

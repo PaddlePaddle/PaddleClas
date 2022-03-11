@@ -1,14 +1,13 @@
 import os
 import platform
-
 from paddle.inference import create_predictor
 from paddle.inference import Config as PaddleConfig
 
+from ...base_processor import BaseProcessor
 
-class Predictor(object):
+
+class PaddlePredictor(BaseProcessor):
     def __init__(self, config):
-        super().__init__()
-        # HALF precission predict only work when using tensorrt
         if config.get("use_fp16", False):
             assert config.get("use_tensorrt", False) is True
 
@@ -61,5 +60,5 @@ class Predictor(object):
         for output_name in output_names:
             output = self.predictor.get_output_handle(output_name)
             output_data[output_name] = output.copy_to_cpu()
-
-        return output_data
+        input_data["pred"] = output_data
+        return input_data

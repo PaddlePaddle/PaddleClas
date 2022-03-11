@@ -1,16 +1,18 @@
+import importlib
+
 from processor.algo_mod import AlgoMod
 
 
 class POPEngine:
     def __init__(self, config):
         self.algo_list = []
-        # last_algo_type = "start"
-        for algo_config in config["AlgoModule"]:
-            # algo_config["last_algo_type"] = last_algo_type
-            self.algo_list.append(AlgoMod(algo_config["Module"]))
-            # last_algo_type = algo_config["type"]
+        current_mod = importlib.import_module(__name__)
+        for mod_config in config["Modules"]:
+            mod_type = mod_config.get("type")
+            mod = getattr(current_mod, mod_type)(mod_config)
+            self.algo_list.append(mod)
 
-    def process(self, x):
+    def process(self, input_data):
         for algo_module in self.algo_list:
-            x = algo_module.process(x)
-        return x
+            input_data = algo_module.process(input_data)
+        return input_data

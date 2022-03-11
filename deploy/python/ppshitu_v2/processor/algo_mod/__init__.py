@@ -1,23 +1,26 @@
-from processor.algo_mod.data_processor import ImageProcessor
-from processor.algo_mod.post_processor.det import DetPostProcessor
-from processor.algo_mod.predictors import build_predictor
+from .postprocessor import build_postprocessor
+from .preprocessor import build_preprocessor
+from .predictor import build_predictor
+
+from ..base_processor import BaseProcessor
 
 
-def build_processor(config):
-    # processor_type = config.get("processor_type")
-    # processor_mod = locals()[processor_type]
-    processor_name = config.get("name")
-    return eval(processor_name)(config)
-
-
-class AlgoMod(object):
+class AlgoMod(BaseProcessor):
     def __init__(self, config):
-        self.pre_processor = build_processor(config["preprocess"])
-        self.predictor = build_predictor(config["predictor"])
-        self.post_processor = build_processor(config["postprocess"])
+        self.processors = []
+        for processor_config in config["processors"]:
+            processor_type = processor_config.get("type")
+            if processor_type == "preprocessor":
+                processor = build_preprocessor(processor_config)
+            elif processor_type == "predictor":
+                processor = build_predictor(processor_config)
+            elif processor_type == "postprocessor":
+                processor = build_postprocessor(processor_config)
+            else:
+                raise NotImplemented("processor type {} unknown.".format(processor_type))
+            self.processors.append(processor)
 
     def process(self, input_data):
-        input_data = self.pre_processor.process(input_data)
-        input_data = self.predictor.process(input_data)
-        input_data = self.post_processor.process(input_data)
+        for processor in self.processors:
+            input_data = processor.process(input_data)
         return input_data
