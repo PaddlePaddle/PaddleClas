@@ -48,17 +48,30 @@ class PaddlePredictor(BaseProcessor):
         paddle_config.switch_use_feed_fetch_ops(False)
         self.predictor = create_predictor(paddle_config)
 
-    def process(self, input_data):
+        if "input_names" in config and config["input_names"]:
+            self.input_name_mapping = config["input_names"]
+        else:
+            self.input_name_mapping = []
+        if "output_names" in config and config["output_names"]:
+            self.output_name_mapping = config["output_names"]
+        else:
+            self.output_name_mapping = []
+
+    def process(self, data):
         input_names = self.predictor.get_input_names()
         for input_name in input_names:
             input_tensor = self.predictor.get_input_handle(input_name)
-            input_tensor.copy_from_cpu(input_data[input_name])
+            name = self.input_name_mapping[
+                input_name] if input_name in self.input_name_mapping else input_name
+            input_tensor.copy_from_cpu(data[name])
         self.predictor.run()
 
         output_data = {}
         output_names = self.predictor.get_output_names()
         for output_name in output_names:
             output = self.predictor.get_output_handle(output_name)
-            output_data[output_name] = output.copy_to_cpu()
-        input_data["pred"] = output_data
-        return input_data
+            name = self.output_name_mapping[
+                output_name] if output_name in self.output_name_mapping else output_name
+            output_data[name] = output.copy_to_cpu()
+        data["pred"] = output_data
+        return data

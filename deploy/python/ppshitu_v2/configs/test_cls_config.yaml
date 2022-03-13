@@ -1,0 +1,38 @@
+Global:
+  Engine: POPEngine
+  infer_imgs: "../../images/wangzai.jpg"
+
+
+Modules:
+  - name:
+    type: AlgoMod
+    processors:
+      - name: ImageProcessor
+        type: preprocessor
+        ops:
+          - ResizeImage:
+              resize_short: 256
+          - CropImage:
+              size: 224
+          - NormalizeImage:
+              scale: 0.00392157
+              mean: [0.485, 0.456, 0.406]
+              std: [0.229, 0.224, 0.225]
+              order: hwc
+          - ToCHWImage:
+          - GetShapeInfo:
+              configs:
+                order: chw
+          - ToBatch:
+      - name: PaddlePredictor
+        type: predictor
+        inference_model_dir: "./MobileNetV2_infer"
+        input_names:
+          inputs: image
+        output_names:
+          save_infer_model/scale_0.tmp_1: logits
+      - name: TopK
+        type: postprocessor
+        k: 10
+        class_id_map_file: "../ppcls/utils/imagenet1k_label_list.txt"
+        save_dir: None

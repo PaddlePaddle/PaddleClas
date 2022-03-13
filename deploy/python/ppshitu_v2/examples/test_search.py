@@ -7,6 +7,13 @@ import cv2
 
 from engine import build_engine
 from utils import config
+from utils.get_image_list import get_image_list
+
+import numpy as np
+
+
+def load_vector(path):
+    return np.load(path)
 
 
 def main():
@@ -15,19 +22,9 @@ def main():
         args.config, overrides=args.override, show=False)
     config_dict.profiler_options = args.profiler_options
     engine = build_engine(config_dict)
-    image_file = "../../images/wangzai.jpg"
-    img = cv2.imread(image_file)[:, :, ::-1]
-    input_data = {"input_image": img}
-    data = engine.process(input_data)
-
-    # for det, cls
-    # print(data)
-
-    # for rec
-    # features = data["pred"]["features"]
-    # print(features)
-    # print(features.shape)
-    # print(type(features))
+    vector = load_vector(config_dict["Global"]["infer_imgs"])
+    output = engine.process({"features": vector})
+    print(output["search_res"])
 
 
 if __name__ == '__main__':
