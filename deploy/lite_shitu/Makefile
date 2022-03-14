@@ -9,8 +9,9 @@ endif
 ${info ARM_ABI: ${ARM_ABI}}
 ${info ARM_PLAT: ${ARM_PLAT}; option[arm7/arm8]}
 
-LITE_ROOT=libs/inference_lite_lib.android.armv8
-include ${LITE_ROOT}/demo/cxx/Makefile.def
+include ../Makefile.def
+
+LITE_ROOT=../../../
 ${info LITE_ROOT: $(abspath ${LITE_ROOT})}
 
 THIRD_PARTY_DIR=third_party

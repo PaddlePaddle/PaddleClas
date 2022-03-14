@@ -208,9 +208,9 @@ int main(int argc, char **argv) {
           RT_Config["Global"]["max_det_results"].as<int>(), false, &det);
 
       // add the whole image for recognition to improve recall
-      PPShiTu::ObjectResult result_whole_img = {
-          {0, 0, srcimg.cols, srcimg.rows}, 0, 1.0};
-      det_result.push_back(result_whole_img);
+//      PPShiTu::ObjectResult result_whole_img = {
+//          {0, 0, srcimg.cols, srcimg.rows}, 0, 1.0};
+//      det_result.push_back(result_whole_img);
 
       // get rec result
       PPShiTu::SearchResult search_result;

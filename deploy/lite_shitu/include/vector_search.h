@@ -45,6 +45,7 @@ public:
     LoadIndexFile();
     this->I.resize(this->return_k * this->max_query_number);
     this->D.resize(this->return_k * this->max_query_number);
+    printf("faiss index load success!\n");
   };
 
   void LoadIdMap();

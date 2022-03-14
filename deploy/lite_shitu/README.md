@@ -92,9 +92,9 @@ PaddleClas 提供了转换并优化后的推理模型，可以直接参考下方
 ```shell
 # 进入lite_ppshitu目录
 cd $PaddleClas/deploy/lite_shitu
-wget https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/lite/ppshitu_lite_models_v1.0.tar.gz
-tar -xf ppshitu_lite_models_v1.0.tar.gz
-rm -f ppshitu_lite_models_v1.0.tar.gz
+wget https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/lite/ppshitu_lite_models_v1.0.tar
+tar -xf ppshitu_lite_models_v1.0.tar
+rm -f ppshitu_lite_models_v1.0.tar
 ```
 
 #### 2.1.2 使用其他模型
@@ -312,7 +312,9 @@ chmod 777 pp_shitu
 
 运行效果如下：
 ```
-````
+images/demo.jpg:
+        result0: bbox[253, 275, 1146, 872], score: 0.974196, label: 伊藤园_果蔬汁
+```
 
 ## FAQ
 Q1：如果想更换模型怎么办，需要重新按照流程走一遍吗？

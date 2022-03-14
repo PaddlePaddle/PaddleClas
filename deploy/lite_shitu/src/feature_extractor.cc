@@ -51,7 +51,6 @@ void FeatureExtract::RunRecModel(const cv::Mat &img,
   for (auto dim : output_tensor->shape()) {
     output_size *= dim;
   }
-  std::cout << "output len is:  " << output_size << std::endl;
   feature.resize(output_size);
   output_tensor->CopyToCpu(feature.data());
 
