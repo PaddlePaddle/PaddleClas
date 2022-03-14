@@ -282,7 +282,7 @@ deploy/
 |   |--general_PPLCNet_x2_5_quant_v1.0_lite.nb         优化后的识别模型文件
 |-- images/
 |   |--demo.jpg                                      图片文件
-|-- drink_dataset_v1/                                瓶装饮料demo数据
+|-- drink_dataset_v1.0/                                瓶装饮料demo数据
 |   |--index                                         检索index目录
 |-- pp_shitu                                         生成的移动端执行文件
 |-- shitu_config.json                                执行时参数配置文件
