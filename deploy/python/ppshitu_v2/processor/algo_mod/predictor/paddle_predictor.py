@@ -48,30 +48,40 @@ class PaddlePredictor(BaseProcessor):
         paddle_config.switch_use_feed_fetch_ops(False)
         self.predictor = create_predictor(paddle_config)
 
-        if "input_names" in config and config["input_names"]:
-            self.input_name_mapping = config["input_names"]
+        if "to_model_names" in config and config["to_model_names"]:
+            self.input_name_map = {
+                v: k
+                for k, v in config["to_model_names"].items()
+            }
         else:
-            self.input_name_mapping = []
-        if "output_names" in config and config["output_names"]:
-            self.output_name_mapping = config["output_names"]
+            self.input_name_map = {}
+        if "from_model_names" in config and config["from_model_names"]:
+            self.output_name_map = config["from_model_names"]
         else:
-            self.output_name_mapping = []
+            self.output_name_map = {}
 
     def process(self, data):
         input_names = self.predictor.get_input_names()
         for input_name in input_names:
             input_tensor = self.predictor.get_input_handle(input_name)
-            name = self.input_name_mapping[
-                input_name] if input_name in self.input_name_mapping else input_name
+            name = self.input_name_map[
+                input_name] if input_name in self.input_name_map else input_name
             input_tensor.copy_from_cpu(data[name])
         self.predictor.run()
 
-        output_data = {}
+        model_output = []
         output_names = self.predictor.get_output_names()
         for output_name in output_names:
             output = self.predictor.get_output_handle(output_name)
-            name = self.output_name_mapping[
-                output_name] if output_name in self.output_name_mapping else output_name
-            output_data[name] = output.copy_to_cpu()
+            model_output.append((output_name, output.copy_to_cpu()))
+
+        if self.output_name_map:
+            output_data = {}
+            for name in self.output_name_map:
+                idx = self.output_name_map[name]
+                output_data[name] = model_output[idx][1]
+        else:
+            output_data = dict(model_output)
+
         data["pred"] = output_data
         return data

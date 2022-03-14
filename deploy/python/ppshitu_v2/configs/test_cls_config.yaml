@@ -27,10 +27,10 @@ Modules:
       - name: PaddlePredictor
         type: predictor
         inference_model_dir: "./MobileNetV2_infer"
-        input_names:
-          inputs: image
-        output_names:
-          save_infer_model/scale_0.tmp_1: logits
+        to_model_names:
+          image: inputs
+        from_model_names:
+          logits: 0
       - name: TopK
         type: postprocessor
         k: 10

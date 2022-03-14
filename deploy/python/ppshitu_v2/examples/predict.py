@@ -20,14 +20,20 @@ def main():
     input_data = {"input_image": img}
     data = engine.process(input_data)
 
-    # for det, cls
-    # print(data)
-
+    # for cls
+    if "classification_res" in data:
+        print(data["classification_res"])
+    # for det
+    elif "detection_res" in data:
+        print(data["detection_res"])
     # for rec
-    # features = data["pred"]["features"]
-    # print(features)
-    # print(features.shape)
-    # print(type(features))
+    elif "features" in data["pred"]:
+        features = data["pred"]["features"]
+        print(features)
+        print(features.shape)
+        print(type(features))
+    else:
+        print("ERROR")
 
 
 if __name__ == '__main__':
