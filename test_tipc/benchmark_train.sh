@@ -65,7 +65,20 @@ FILENAME=$new_filename
 # MODE must be one of ['benchmark_train']
 MODE=$2
 PARAMS=$3
-# bash test_tipc/benchmark_train.sh test_tipc/configs/det_mv3_db_v2_0/train_benchmark.txt  benchmark_train dynamic_bs8_null_DP_N1C1
+REST_ARGS=$4
+# bash test_tipc/benchmark_train.sh test_tipc/configs/det_mv3_db_v2_0/train_benchmark.txt  benchmark_train
+# bash test_tipc/benchmark_train.sh test_tipc/configs/det_mv3_db_v2_0/train_benchmark.txt  benchmark_train to_static
+# bash test_tipc/benchmark_train.sh test_tipc/configs/det_mv3_db_v2_0/train_benchmark.txt  benchmark_train dynamic_bs8_null_DP_N1C1 to_static
+
+# parse "to_static" options and modify trainer into "to_static_trainer"
+if [ $REST_ARGS = "to_static" ] || [ $PARAMS = "to_static" ] ;then
+   sed -i 's/trainer:norm_train/trainer:to_static_train/g' $FILENAME
+   # clear PARAM contents
+   if [ $PARAMS = "to_static" ] ;then
+    PARAMS=""
+   fi
+fi
+
 IFS=$'\n'
 # parser params from train_benchmark.txt
 sed -i 's/ -o DataLoader.Train.sampler.shuffle=False//g' $FILENAME
