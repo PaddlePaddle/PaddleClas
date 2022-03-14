@@ -91,9 +91,10 @@ def main(args):
 
     use_xpu = global_config.get("use_xpu", False)
     use_npu = global_config.get("use_npu", False)
+    use_mlu = global_config.get("use_mlu", False)
     assert (
-        use_gpu and use_xpu and use_npu
-    ) is not True, "gpu, xpu and npu can not be true in the same time in static mode!"
+        use_gpu and use_xpu and use_npu and use_mlu
+    ) is not True, "gpu, xpu, npu and mlu can not be true in the same time in static mode!"
 
     if use_gpu:
         device = paddle.set_device('gpu')
@@ -101,6 +102,8 @@ def main(args):
         device = paddle.set_device('xpu')
     elif use_npu:
         device = paddle.set_device('npu')
+    elif use_mlu:
+        device = paddle.set_device('mlu')
     else:
         device = paddle.set_device('cpu')
 
