@@ -1,6 +1,6 @@
 model_item=ResNet50
-bs_item=256
-fp_item=fp16
+bs_item=64
+fp_item=pure_fp16
 run_process_type=SingleP
 run_mode=DP
 device_num=N1C1
