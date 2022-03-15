@@ -39,26 +39,28 @@ class TopK(BaseProcessor):
         return class_id_map
 
     def process(self, data):
-        # TODO(gaotingquan): only support bs==1 when 'connector' is not implemented.
-        probs = data["pred"]["logits"][0]
-        index = probs.argsort(axis=0)[-self.topk:][::-1].astype(
-            "int32") if not self.multilabel else np.where(
-                probs >= 0.5)[0].astype("int32")
-        clas_id_list = []
-        score_list = []
-        label_name_list = []
-        for i in index:
-            clas_id_list.append(i.item())
-            score_list.append(probs[i].item())
-            if self.class_id_map is not None:
-                label_name_list.append(self.class_id_map[i.item()])
-        result = {
-            "class_ids": clas_id_list,
-            "scores": np.around(
-                score_list, decimals=5).tolist(),
-        }
-        if label_name_list is not None:
-            result["label_names"] = label_name_list
+        logits = data["pred"]["logits"]
+        all_results = []
+        for probs in logits:
+            index = probs.argsort(axis=0)[-self.topk:][::-1].astype(
+                "int32") if not self.multilabel else np.where(
+                    probs >= 0.5)[0].astype("int32")
+            clas_id_list = []
+            score_list = []
+            label_name_list = []
+            for i in index:
+                clas_id_list.append(i.item())
+                score_list.append(probs[i].item())
+                if self.class_id_map is not None:
+                    label_name_list.append(self.class_id_map[i.item()])
+            result = {
+                "class_ids": clas_id_list,
+                "scores": np.around(
+                    score_list, decimals=5).tolist(),
+            }
+            if label_name_list is not None:
+                result["label_names"] = label_name_list
+            all_results.append(result)
 
-        data["classification_res"] = result
+        data["classification_res"] = all_results
         return data

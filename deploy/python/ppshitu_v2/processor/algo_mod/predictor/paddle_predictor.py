@@ -55,10 +55,8 @@ class PaddlePredictor(BaseProcessor):
             }
         else:
             self.input_name_map = {}
-        if "from_model_names" in config and config["from_model_names"]:
-            self.output_name_map = config["from_model_names"]
-        else:
-            self.output_name_map = {}
+
+        self.output_name_map = config["from_model_indexes"]
 
     def process(self, data):
         input_names = self.predictor.get_input_names()
@@ -73,15 +71,12 @@ class PaddlePredictor(BaseProcessor):
         output_names = self.predictor.get_output_names()
         for output_name in output_names:
             output = self.predictor.get_output_handle(output_name)
-            model_output.append((output_name, output.copy_to_cpu()))
+            model_output.append(output.copy_to_cpu())
 
-        if self.output_name_map:
-            output_data = {}
-            for name in self.output_name_map:
-                idx = self.output_name_map[name]
-                output_data[name] = model_output[idx][1]
-        else:
-            output_data = dict(model_output)
+        output_data = {}
+        for name in self.output_name_map:
+            idx = self.output_name_map[name]
+            output_data[name] = model_output[idx]
 
         data["pred"] = output_data
         return data

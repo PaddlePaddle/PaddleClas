@@ -25,6 +25,8 @@ Modules:
       - name: PaddlePredictor
         type: predictor
         inference_model_dir: ./models/ppyolov2_r50vd_dcn_mainbody_v1.0_infer/
+        from_model_indexes:
+          boxes: 0
       - name: DetPostPro
         type: postprocessor
         threshold: 0.2

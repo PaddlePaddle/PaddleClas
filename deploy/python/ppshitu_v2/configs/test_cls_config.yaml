@@ -29,10 +29,10 @@ Modules:
         inference_model_dir: "./MobileNetV2_infer"
         to_model_names:
           image: inputs
-        from_model_names:
+        from_model_indexes:
           logits: 0
       - name: TopK
         type: postprocessor
         k: 10
-        class_id_map_file: "../ppcls/utils/imagenet1k_label_list.txt"
+        class_id_map_file: "../../../ppcls/utils/imagenet1k_label_list.txt"
         save_dir: None
