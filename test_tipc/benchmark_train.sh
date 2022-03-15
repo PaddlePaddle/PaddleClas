@@ -183,7 +183,7 @@ for batch_size in ${batch_size_list[*]}; do
             if [ ${#gpu_id} -le 1 ];then
                 log_path="$SAVE_LOG/profiling_log"
                 mkdir -p $log_path
-                log_name="${repo_name}_${model_name}_bs${batch_size}_${precision}_${run_mode}_${device_num}_${to_static}profiling"
+                log_name="${repo_name}_${model_name}_bs${batch_size}_${precision}_${run_mode}_${device_num}_${to_static}_profiling"
                 func_sed_params "$FILENAME" "${line_gpuid}" "0"  # sed used gpu_id 
                 # set profile_option params
                 tmp=`sed -i "${line_profile}s/.*/${profile_option}/" "${FILENAME}"`
