@@ -16,7 +16,7 @@
 
 #include <algorithm>
 #include <ctime>
-#include <include/recognition.h>
+#include <include/feature_extractor.h>
 #include <memory>
 #include <numeric>
 #include <string>

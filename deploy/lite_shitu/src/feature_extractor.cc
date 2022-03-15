@@ -12,12 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "include/recognition.h"
+#include "include/feature_extractor.h"
 
 namespace PPShiTu {
-std::vector<RESULT> Recognition::RunRecModel(const cv::Mat &img,
-                                             double &cost_time) {
-
+void FeatureExtract::RunRecModel(const cv::Mat &img,
+                                 double &cost_time,
+                                 std::vector<float> &feature) {
   // Read img
   cv::Mat resize_image = ResizeImage(img);
 
@@ -38,8 +38,7 @@ std::vector<RESULT> Recognition::RunRecModel(const cv::Mat &img,
 
   // Get output and post process
   std::unique_ptr<const Tensor> output_tensor(
-      std::move(this->predictor->GetOutput(1)));
-  auto *output_data = output_tensor->data<float>();
+      std::move(this->predictor->GetOutput(0)));  //only one output
   auto end = std::chrono::system_clock::now();
   auto duration =
       std::chrono::duration_cast<std::chrono::microseconds>(end - start);
@@ -47,17 +46,27 @@ std::vector<RESULT> Recognition::RunRecModel(const cv::Mat &img,
               std::chrono::microseconds::period::num /
               std::chrono::microseconds::period::den;
 
+  //do postprocess
   int output_size = 1;
   for (auto dim : output_tensor->shape()) {
     output_size *= dim;
   }
+  feature.resize(output_size);
+  output_tensor->CopyToCpu(feature.data());
 
-  cv::Mat output_image;
-  auto results = PostProcess(output_data, output_size, output_image);
-  return results;
+  //postprocess include sqrt or binarize.
+  //PostProcess(feature);
+  return;
 }
 
-void Recognition::NeonMeanScale(const float *din, float *dout, int size) {
+// void FeatureExtract::PostProcess(std::vector<float> &feature){
+//     float feature_sqrt = std::sqrt(std::inner_product(
+//             feature.begin(), feature.end(), feature.begin(), 0.0f));
+//     for (int i = 0; i < feature.size(); ++i)
+//         feature[i] /= feature_sqrt;
+// }
+
+void FeatureExtract::NeonMeanScale(const float *din, float *dout, int size) {
 
   if (this->mean.size() != 3 || this->std.size() != 3) {
     std::cerr << "[ERROR] mean or scale size must equal to 3\n";
@@ -99,45 +108,9 @@ void Recognition::NeonMeanScale(const float *din, float *dout, int size) {
   }
 }
 
-cv::Mat Recognition::ResizeImage(const cv::Mat &img) {
+cv::Mat FeatureExtract::ResizeImage(const cv::Mat &img) {
   cv::Mat resize_img;
   cv::resize(img, resize_img, cv::Size(this->size, this->size));
   return resize_img;
-}
-std::vector<RESULT> Recognition::PostProcess(const float *output_data,
-                                             int output_size,
-                                             cv::Mat &output_image) {
-
-  int max_indices[this->topk];
-  double max_scores[this->topk];
-  for (int i = 0; i < this->topk; i++) {
-    max_indices[i] = 0;
-    max_scores[i] = 0;
-  }
-  for (int i = 0; i < output_size; i++) {
-    float score = output_data[i];
-    int index = i;
-    for (int j = 0; j < this->topk; j++) {
-      if (score > max_scores[j]) {
-        index += max_indices[j];
-        max_indices[j] = index - max_indices[j];
-        index -= max_indices[j];
-        score += max_scores[j];
-        max_scores[j] = score - max_scores[j];
-        score -= max_scores[j];
-      }
-    }
-  }
-
-  std::vector<RESULT> results(this->topk);
-  for (int i = 0; i < results.size(); i++) {
-    results[i].class_name = "Unknown";
-    if (max_indices[i] >= 0 && max_indices[i] < this->label_list.size()) {
-      results[i].class_name = this->label_list[max_indices[i]];
-    }
-    results[i].score = max_scores[i];
-    results[i].class_id = max_indices[i];
-  }
-  return results;
 }
 }

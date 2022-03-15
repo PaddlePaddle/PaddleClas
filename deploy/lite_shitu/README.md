@@ -191,16 +191,28 @@ cd deploy/lite_shitu
 
 ```shell
 # 如果测试单张图像
-python generate_json_config.py --det_model_path ppshitu_lite_models_v1.0/mainbody_PPLCNet_x2_5_640_quant_v1.0_lite.nb  --rec_model_path ppshitu_lite_models_v1.0/general_PPLCNet_x2_5_quant_v1.0_lite.nb --rec_label_path ppshitu_lite_models_v1.0/label.txt --img_path images/demo.jpg
+python generate_json_config.py --det_model_path ppshitu_lite_models_v1.0/mainbody_PPLCNet_x2_5_640_quant_v1.0_lite.nb  --rec_model_path ppshitu_lite_models_v1.0/general_PPLCNet_x2_5_lite_v1.0_infer.nb --img_path images/demo.jpg
 # or
 # 如果测试多张图像
-python generate_json_config.py --det_model_path ppshitu_lite_models_v1.0/mainbody_PPLCNet_x2_5_640_quant_v1.0_lite.nb  --rec_model_path ppshitu_lite_models_v1.0/general_PPLCNet_x2_5_quant_v1.0_lite.nb --rec_label_path ppshitu_lite_models_v1.0/label.txt --img_dir images
-
+python generate_json_config.py --det_model_path ppshitu_lite_models_v1.0/mainbody_PPLCNet_x2_5_640_quant_v1.0_lite.nb  --rec_model_path ppshitu_lite_models_v1.0/general_PPLCNet_x2_5_lite_v1.0_infer.nb --img_dir images
 # 执行完成后，会在lit_shitu下生成shitu_config.json配置文件
-
 ```
 
-### 2.3 与手机联调
+### 2.3 index字典转换
+由于python的检索库字典，使用`pickle`进行的序列化存储，导致C++不方便读取，因此需要进行转换
+
+```shell
+# 下载瓶装饮料数据集
+wget https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/data/drink_dataset_v1.0.tar && tar -xf drink_dataset_v1.0.tar
+rm -rf drink_dataset_v1.0.tar
+
+# 转化id_map.pkl为id_map.txt
+python transform_id_map.py -c ../configs/inference_drink.yaml
+```
+转换成功后，会在`IndexProcess.index_dir`目录下生成`id_map.txt`。
+
+
+### 2.4 与手机联调
 
 首先需要进行一些准备工作。
 1. 准备一台arm8的安卓手机，如果编译的预测库是armv7，则需要arm7的手机，并修改Makefile中`ARM_ABI=arm7`。
@@ -252,6 +264,7 @@ make ARM_ABI=arm8
 ```shell
 mkdir deploy
 mv ppshitu_lite_models_v1.0 deploy/
+mv drink_dataset_v1.0 deploy/
 mv images deploy/
 mv shitu_config.json deploy/
 cp pp_shitu deploy/
@@ -265,12 +278,12 @@ cp ../../../cxx/lib/libpaddle_light_api_shared.so deploy/
 ```shell
 deploy/
 |-- ppshitu_lite_models_v1.0/
-|   |--mainbody_PPLCNet_x2_5_640_v1.0_lite.nb        优化后的主体检测模型文件
-|   |--general_PPLCNet_x2_5_quant_v1.0_lite.nb       优化后的识别模型文件
-|   |--label.txt                                     识别模型的label文件
+|   |--mainbody_PPLCNet_x2_5_lite_v1.0_infer.nb        优化后的主体检测模型文件
+|   |--general_PPLCNet_x2_5_quant_v1.0_lite.nb         优化后的识别模型文件
 |-- images/
 |   |--demo.jpg                                      图片文件
-|   ...                                              图片文件
+|-- drink_dataset_v1.0/                                瓶装饮料demo数据
+|   |--index                                         检索index目录
 |-- pp_shitu                                         生成的移动端执行文件
 |-- shitu_config.json                                执行时参数配置文件
 |-- libpaddle_light_api_shared.so                    Paddle-Lite库文件
@@ -298,8 +311,10 @@ chmod 777 pp_shitu
 如果对代码做了修改，则需要重新编译并push到手机上。
 
 运行效果如下：
-
-![](../../docs/images/ppshitu_lite_demo.png)
+```
+images/demo.jpg:
+        result0: bbox[253, 275, 1146, 872], score: 0.974196, label: 伊藤园_果蔬汁
+```
 
 ## FAQ
 Q1：如果想更换模型怎么办，需要重新按照流程走一遍吗？
