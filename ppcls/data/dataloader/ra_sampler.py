@@ -21,8 +21,8 @@ from paddle.io import DistributedBatchSampler
 
 class RepeatedAugSampler(DistributedBatchSampler):
     """
-    It ensures that different each augmented version of a sample will be visible to a
-    different process (GPU). Heavily based on torch.utils.data.DistributedSampler
+    It ensures that different each augmented version of a sample will be visible to a 
+    different process (GPU).
     Code was based on https://github.com/facebookresearch/deit/blob/0c4b8f60/samplers.py
     and https://github.com/rwightman/pytorch-image-models/blob/master/timm/data/distributed_sampler.py
     Args:

@@ -26,7 +26,12 @@ class BCELoss(nn.Layer):
     Binary Cross entropy loss
     """
 
-    def __init__(self, epsilon=0.0, target_threshold=0.2, weight=None, reduction="mean", pos_weight=None):
+    def __init__(self,
+                 epsilon=0.0,
+                 target_threshold=0.2,
+                 weight=None,
+                 reduction="mean",
+                 pos_weight=None):
         super().__init__()
         assert 0. <= epsilon < 1.0
         self.epsilon = epsilon
@@ -50,8 +55,11 @@ class BCELoss(nn.Layer):
         class_num = x.shape[-1]
         target = self._labelsmoothing(label, class_num)
         target = target.__gt__(self.target_threshold).astype("float32")
-        loss = F.binary_cross_entropy_with_logits(x, target, self.weight, pos_weight=self.pos_weight, reduction=self.reduction)
+        loss = F.binary_cross_entropy_with_logits(
+            x,
+            target,
+            self.weight,
+            pos_weight=self.pos_weight,
+            reduction=self.reduction)
         loss = loss.mean()
         return {"BCELoss": loss}
-
-
