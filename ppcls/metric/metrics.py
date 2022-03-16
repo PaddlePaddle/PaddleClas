@@ -302,8 +302,5 @@ class AccuracyScore(MutiLabelMetric):
             fps = mcm[:, 0, 1]
             accuracy = (sum(tps) + sum(tns)) / (
                 sum(tps) + sum(tns) + sum(fns) + sum(fps))
-            precision = sum(tps) / (sum(tps) + sum(fps))
-            recall = sum(tps) / (sum(tps) + sum(fns))
-            F1 = 2 * (accuracy * recall) / (accuracy + recall)
         metric_dict["AccuracyScore"] = paddle.to_tensor(accuracy)
         return metric_dict
