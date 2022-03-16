@@ -1,0 +1,34 @@
+Global:
+  Engine: POPEngine
+  infer_imgs: "../../images/wangzai.jpg"
+
+Modules:
+  - name:
+    type: AlgoMod
+    processors:
+      - name: ImageProcessor
+        type: preprocessor
+        ops:
+          - ResizeImage:
+              resize_short: 256
+          - CropImage:
+              size: 224
+          - NormalizeImage:
+              scale: 0.00392157
+              mean: [0.485, 0.456, 0.406]
+              std: [0.229, 0.224, 0.225]
+              order: hwc
+          - ToCHWImage:
+          - GetShapeInfo:
+              configs:
+                order: chw
+          - ToBatch:
+      - name: PaddlePredictor
+        type: predictor
+        inference_model_dir: models/product_ResNet50_vd_aliproduct_v1.0_infer
+        to_model_names:
+          image: x
+        from_model_indexes:
+          features: 0
+      - name: FeatureNormalizer
+        type: postprocessor

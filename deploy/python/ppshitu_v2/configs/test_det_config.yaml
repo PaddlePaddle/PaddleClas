@@ -1,0 +1,35 @@
+Global:
+  Engine: POPEngine
+  infer_imgs: "../../images/wangzai.jpg"
+
+Modules:
+  - name:
+    type: AlgoMod
+    processors:
+      - name: ImageProcessor
+        type: preprocessor
+        ops:
+          - ResizeImage:
+              size: [640, 640]
+              interpolation: 2
+          - NormalizeImage:
+              scale: 0.00392157
+              mean: [0.485, 0.456, 0.406]
+              std: [0.229, 0.224, 0.225]
+              order: hwc
+          - ToCHWImage:
+          - GetShapeInfo:
+              configs:
+                order: chw
+          - ToBatch:
+      - name: PaddlePredictor
+        type: predictor
+        inference_model_dir: ./models/ppyolov2_r50vd_dcn_mainbody_v1.0_infer/
+        from_model_indexes:
+          boxes: 0
+      - name: DetPostPro
+        type: postprocessor
+        threshold: 0.2
+        max_det_results: 1
+        label_list:
+        - foreground

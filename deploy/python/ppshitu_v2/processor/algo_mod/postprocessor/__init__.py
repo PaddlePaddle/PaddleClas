@@ -1,6 +1,8 @@
 import importlib
 
+from .classification import TopK
 from .det import DetPostPro
+from .rec import FeatureNormalizer
 
 
 def build_postprocessor(config):

@@ -1,0 +1,16 @@
+Global:
+  Engine: POPEngine
+  infer_imgs: "./vector.npy"
+
+Modules:
+  - name:
+    type: AlgoMod
+    processors:
+      - name: Searcher
+        type: searcher
+        index_dir: "./index"
+        dist_type: "IP"
+        embedding_size: 512
+        batch_size: 32
+        return_k: 5
+        score_thres: 0.5

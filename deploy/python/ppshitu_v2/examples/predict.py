@@ -18,8 +18,22 @@ def main():
     image_file = "../../images/wangzai.jpg"
     img = cv2.imread(image_file)[:, :, ::-1]
     input_data = {"input_image": img}
-    output = engine.process(input_data)
-    print(output)
+    data = engine.process(input_data)
+
+    # for cls
+    if "classification_res" in data:
+        print(data["classification_res"])
+    # for det
+    elif "detection_res" in data:
+        print(data["detection_res"])
+    # for rec
+    elif "features" in data["pred"]:
+        features = data["pred"]["features"]
+        print(features)
+        print(features.shape)
+        print(type(features))
+    else:
+        print("ERROR")
 
 
 if __name__ == '__main__':
