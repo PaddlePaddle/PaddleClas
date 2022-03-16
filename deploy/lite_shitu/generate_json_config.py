@@ -130,6 +130,8 @@ def main():
             y["type"] = k
             config_json["RecPreProcess"]["transform_ops"].append(y)
 
+    # set IndexProces
+    config_json["IndexProcess"] = config_yaml["IndexProcess"]
     with open('shitu_config.json', 'w') as fd:
         json.dump(config_json, fd, indent=4)
 

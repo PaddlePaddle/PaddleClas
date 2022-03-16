@@ -248,7 +248,7 @@ PaddleClas saves/updates the following three types of models during training.
 
 #### Q2.4.2: How can recognition models be fine-tuned to train on the basis of pre-trained models?
 
-**A**：The fine-tuning training of the recognition model is similar to that of the classification model. The recognition model can be loaded with a pre-trained model of the product, and the training process can be found in [recognition model training](../../models_training/recognition_en.md), and we will continue to refine the documentation.
+**A**：The fine-tuning training of the recognition model is similar to that of the classification model. The recognition model can be loaded with a pre-trained model of the product, and the training process can be found in [recognition model training](../models_training/recognition_en.md), and we will continue to refine the documentation.
 
 #### Q2.4.3: Why does it fail to run all mini-batches in each epoch when training metric learning?
 
@@ -353,4 +353,4 @@ pip install paddle2onnx
   - `InputSpec()` function is used to describe the signature information of the model input, including the `shape`, `type` and `name` of the input data (can be omitted).
   - The `paddle.onnx.export()` function needs to specify the model grouping object `net`, the save path of the exported model `save_path`, and the description of the model's input data `input_spec`.
 
-  Note that the `paddlepaddle`  `2.0.0` or above should be adopted.See [paddle.onnx.export](https://www.paddlepaddle.org.cn/documentation/docs/zh/api/paddle/onnx/) for more details on the parameters of the  `paddle.onnx.export()` function.
+  Note that the `paddlepaddle`  `2.0.0` or above should be adopted.See [paddle.onnx.export](https://www.paddlepaddle.org.cn/documentation/docs/en/api/paddle/onnx/export_en.html) for more details on the parameters of the  `paddle.onnx.export()` function.

@@ -31,7 +31,8 @@
 
 >>
 * Q: 怎样根据自己的任务选择合适的模型进行训练？
-* A: 如果希望在服务器部署，或者希望精度尽可能地高，对模型存储大小或者预测速度的要求不是很高，那么推荐使用 ResNet_vd、Res2Net_vd、DenseNet、Xception 等适合于服务器端的系列模型；如果希望在移动端侧部署，则推荐使用 MobileNetV3、GhostNet 等适合于移动端的系列模型。同时，我们推荐在选择模型的时候可以参考[模型库](../models/models_intro.md)中的速度-精度指标图。
+* A: 如果希望在服务器部署，或者希望精度尽可能地高，对模型存储大小或者预测速度的要求不是很高，那么推荐使用 ResNet_vd、Res2Net_vd、DenseNet、Xception 等适合于服务器端的系列模型；如果希望在移动端侧部署，则推荐使用 MobileNetV3、GhostNet
+    等适合于移动端的系列模型。同时，我们推荐在选择模型的时候可以参考[模型库](../algorithm_introduction/ImageNet_models.md)中的速度-精度指标图。
 
 >>
 * Q: 如何进行参数初始化，什么样的初始化可以加快模型收敛？
@@ -232,11 +233,13 @@ Loss:
 * A: 如果希望使用 TensorRT 进行模型预测推理的话，需要安装或是自己编译带 TensorRT 的 PaddlePaddle，Linux、Windows、macOS 系统的用户下载安装可以参考参考[下载预测库](https://paddleinference.paddlepaddle.org.cn/user_guides/download_lib.html)，如果没有符合您所需要的版本，则需要本地编译安装，编译方法可以参考[源码编译](https://paddleinference.paddlepaddle.org.cn/user_guides/source_compile.html)。
 >>
 * Q: 怎样在训练的时候使用自动混合精度(Automatic Mixed Precision, AMP)训练呢？
-* A: 可以参考 [ResNet50_fp16.yaml](../../../ppcls/configs/ImageNet/ResNet/ResNet50_fp16.yaml) 这个配置文件；具体地，如果希望自己的配置文件在模型训练的时候也支持自动混合精度，可以在配置文件中添加下面的配置信息。
-```
+* A: 可以参考 [ResNet50_amp_O1.yaml](../../../ppcls/configs/ImageNet/ResNet/ResNet50_amp_O1.yaml) 这个配置文件；具体地，如果希望自己的配置文件在模型训练的时候也支持自动混合精度，可以在配置文件中添加下面的配置信息。
+
+```yaml
 # mixed precision training
 AMP:
   scale_loss: 128.0
   use_dynamic_loss_scaling: True
-  use_pure_fp16: &use_pure_fp16 True
+  # O1: mixed fp16
+  level: O1
 ```

@@ -65,7 +65,22 @@ FILENAME=$new_filename
 # MODE must be one of ['benchmark_train']
 MODE=$2
 PARAMS=$3
-# bash test_tipc/benchmark_train.sh test_tipc/configs/det_mv3_db_v2_0/train_benchmark.txt  benchmark_train dynamic_bs8_null_DP_N1C1
+REST_ARGS=$4
+# bash test_tipc/benchmark_train.sh test_tipc/configs/det_mv3_db_v2_0/train_benchmark.txt  benchmark_train
+# bash test_tipc/benchmark_train.sh test_tipc/configs/det_mv3_db_v2_0/train_benchmark.txt  benchmark_train to_static
+# bash test_tipc/benchmark_train.sh test_tipc/configs/det_mv3_db_v2_0/train_benchmark.txt  benchmark_train dynamic_bs8_null_DP_N1C1 to_static
+
+to_static="d2sF"
+# parse "to_static" options and modify trainer into "to_static_trainer"
+if [ $REST_ARGS = "to_static" ] || [ $PARAMS = "to_static" ] ;then
+   to_static="d2sT"
+   sed -i 's/trainer:norm_train/trainer:to_static_train/g' $FILENAME
+   # clear PARAM contents
+   if [ $PARAMS = "to_static" ] ;then
+    PARAMS=""
+   fi
+fi
+
 IFS=$'\n'
 # parser params from train_benchmark.txt
 sed -i 's/ -o DataLoader.Train.sampler.shuffle=False//g' $FILENAME
@@ -142,7 +157,6 @@ else
     batch_size=${params_list[1]}
     batch_size=`echo  ${batch_size} | tr -cd "[0-9]" `
     precision=${params_list[2]}
-    # run_process_type=${params_list[3]}
     run_mode=${params_list[3]}
     device_num=${params_list[4]}
     IFS=";"
@@ -167,10 +181,9 @@ for batch_size in ${batch_size_list[*]}; do
             gpu_id=$(set_gpu_id $device_num)
 
             if [ ${#gpu_id} -le 1 ];then
-                run_process_type="SingleP"
                 log_path="$SAVE_LOG/profiling_log"
                 mkdir -p $log_path
-                log_name="${repo_name}_${model_name}_bs${batch_size}_${precision}_${run_process_type}_${run_mode}_${device_num}_profiling"
+                log_name="${repo_name}_${model_name}_bs${batch_size}_${precision}_${run_mode}_${device_num}_${to_static}_profiling"
                 func_sed_params "$FILENAME" "${line_gpuid}" "0"  # sed used gpu_id 
                 # set profile_option params
                 tmp=`sed -i "${line_profile}s/.*/${profile_option}/" "${FILENAME}"`
@@ -186,8 +199,8 @@ for batch_size in ${batch_size_list[*]}; do
                 speed_log_path="$SAVE_LOG/index"
                 mkdir -p $log_path
                 mkdir -p $speed_log_path
-                log_name="${repo_name}_${model_name}_bs${batch_size}_${precision}_${run_process_type}_${run_mode}_${device_num}_log"
-                speed_log_name="${repo_name}_${model_name}_bs${batch_size}_${precision}_${run_process_type}_${run_mode}_${device_num}_speed"
+                log_name="${repo_name}_${model_name}_bs${batch_size}_${precision}_${run_mode}_${device_num}_${to_static}_log"
+                speed_log_name="${repo_name}_${model_name}_bs${batch_size}_${precision}_${run_mode}_${device_num}_${to_static}_speed"
                 func_sed_params "$FILENAME" "${line_profile}" "null"  # sed profile_id as null
                 cmd="bash test_tipc/test_train_inference_python.sh ${FILENAME} benchmark_train > ${log_path}/${log_name} 2>&1 "
                 echo $cmd
@@ -198,13 +211,12 @@ for batch_size in ${batch_size_list[*]}; do
                 eval "cat ${log_path}/${log_name}"
 
                 # parser log
-                _model_name="${model_name}_bs${batch_size}_${precision}_${run_process_type}_${run_mode}"
+                _model_name="${model_name}_bs${batch_size}_${precision}_${run_mode}"
                 cmd="${python} ${BENCHMARK_ROOT}/scripts/analysis.py --filename ${log_path}/${log_name} \
                         --speed_log_file '${speed_log_path}/${speed_log_name}' \
                         --model_name ${_model_name} \
                         --base_batch_size ${batch_size} \
                         --run_mode ${run_mode} \
-                        --run_process_type ${run_process_type} \
                         --fp_item ${precision} \
                         --keyword ips: \
                         --skip_steps 2 \
@@ -218,13 +230,12 @@ for batch_size in ${batch_size_list[*]}; do
             else
                 IFS=";"
                 unset_env=`unset CUDA_VISIBLE_DEVICES`
-                run_process_type="MultiP"
                 log_path="$SAVE_LOG/train_log"
                 speed_log_path="$SAVE_LOG/index"
                 mkdir -p $log_path
                 mkdir -p $speed_log_path
-                log_name="${repo_name}_${model_name}_bs${batch_size}_${precision}_${run_process_type}_${run_mode}_${device_num}_log"
-                speed_log_name="${repo_name}_${model_name}_bs${batch_size}_${precision}_${run_process_type}_${run_mode}_${device_num}_speed"
+                log_name="${repo_name}_${model_name}_bs${batch_size}_${precision}_${run_mode}_${device_num}_${to_static}_log"
+                speed_log_name="${repo_name}_${model_name}_bs${batch_size}_${precision}_${run_mode}_${device_num}_${to_static}_speed"
                 func_sed_params "$FILENAME" "${line_gpuid}" "$gpu_id"  # sed used gpu_id 
                 func_sed_params "$FILENAME" "${line_profile}" "null"  # sed --profile_option as null
                 cmd="bash test_tipc/test_train_inference_python.sh ${FILENAME} benchmark_train > ${log_path}/${log_name} 2>&1 "
@@ -235,14 +246,13 @@ for batch_size in ${batch_size_list[*]}; do
                 export model_run_time=$((${job_et}-${job_bt}))
                 eval "cat ${log_path}/${log_name}"
                 # parser log
-                _model_name="${model_name}_bs${batch_size}_${precision}_${run_process_type}_${run_mode}"
+                _model_name="${model_name}_bs${batch_size}_${precision}_${run_mode}"
                 
                 cmd="${python} ${BENCHMARK_ROOT}/scripts/analysis.py --filename ${log_path}/${log_name} \
                         --speed_log_file '${speed_log_path}/${speed_log_name}' \
                         --model_name ${_model_name} \
                         --base_batch_size ${batch_size} \
                         --run_mode ${run_mode} \
-                        --run_process_type ${run_process_type} \
                         --fp_item ${precision} \
                         --keyword ips: \
                         --skip_steps 2 \
