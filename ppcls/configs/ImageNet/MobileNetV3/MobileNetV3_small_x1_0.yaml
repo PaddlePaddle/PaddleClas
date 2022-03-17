@@ -17,7 +17,7 @@ Global:
 # model architecture
 Arch:
   name: MobileNetV3_small_x1_0
-  class_num: 1000
+  class_num: 100
  
 # loss function config for traing/eval process
 Loss:
