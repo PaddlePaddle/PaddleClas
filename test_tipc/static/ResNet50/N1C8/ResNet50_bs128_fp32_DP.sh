@@ -1,5 +1,5 @@
 model_item=ResNet50
-bs_item=256
+bs_item=128
 fp_item=fp32
 run_mode=DP
 device_num=N1C8

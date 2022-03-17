@@ -1,9 +1,9 @@
 model_item=ResNet50
-bs_item=256
-fp_item=fp32
+bs_item=128
+fp_item=amp_fp16
 run_mode=DP
-device_num=N1C8
-max_epochs=8
+device_num=N4C32
+max_epochs=32
 num_workers=8
 
 # get data

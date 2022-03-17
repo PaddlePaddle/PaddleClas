@@ -1,6 +1,6 @@
 model_item=ResNet50
-bs_item=256
-fp_item=fp32
+bs_item=128
+fp_item=amp_fp16
 run_mode=DP
 device_num=N1C8
 max_epochs=8
