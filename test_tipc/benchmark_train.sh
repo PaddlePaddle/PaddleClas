@@ -65,21 +65,11 @@ FILENAME=$new_filename
 # MODE must be one of ['benchmark_train']
 MODE=$2
 PARAMS=$3
-REST_ARGS=$4
+model_type=$4
 # bash test_tipc/benchmark_train.sh test_tipc/configs/det_mv3_db_v2_0/train_benchmark.txt  benchmark_train
-# bash test_tipc/benchmark_train.sh test_tipc/configs/det_mv3_db_v2_0/train_benchmark.txt  benchmark_train to_static
-# bash test_tipc/benchmark_train.sh test_tipc/configs/det_mv3_db_v2_0/train_benchmark.txt  benchmark_train dynamic_bs8_null_DP_N1C1 to_static
-
-to_static=""
-# parse "to_static" options and modify trainer into "to_static_trainer"
-if [ $REST_ARGS = "to_static" ] || [ $PARAMS = "to_static" ] ;then
-   to_static="d2s_"
-   sed -i 's/trainer:norm_train/trainer:to_static_train/g' $FILENAME
-   # clear PARAM contents
-   if [ $PARAMS = "to_static" ] ;then
-    PARAMS=""
-   fi
-fi
+# bash test_tipc/benchmark_train.sh test_tipc/configs/det_mv3_db_v2_0/train_benchmark.txt  benchmark_train dy2stat
+# bash test_tipc/benchmark_train.sh test_tipc/configs/det_mv3_db_v2_0/train_benchmark.txt  benchmark_train dynamic_bs8_null_DP_N1C1
+# bash test_tipc/benchmark_train.sh test_tipc/configs/det_mv3_db_v2_0/train_benchmark.txt  benchmark_train dy2stat_bs8_null_DP_N1C1
 
 IFS=$'\n'
 # parser params from train_benchmark.txt
@@ -169,6 +159,15 @@ else
     batch_size_list=($batch_size)
     device_num_list=($device_num)
 fi
+
+# for log name
+to_static=""
+# parse "to_static" options and modify trainer into "to_static_trainer"
+if [ $model_type = "dy2stat" ] ;then
+   to_static="dy2stat_"
+   sed -i 's/trainer:norm_train/trainer:to_static_train/g' $FILENAME
+fi
+
 
 IFS="|"
 for batch_size in ${batch_size_list[*]}; do 
