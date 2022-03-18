@@ -92,7 +92,7 @@ class Engine(object):
             self.vdl_writer = LogWriter(logdir=vdl_writer_path)
 
         # set device
-        assert self.config["Global"]["device"] in ["cpu", "gpu", "xpu", "npu"]
+        assert self.config["Global"]["device"] in ["cpu", "gpu", "xpu", "npu", "mlu"]
         self.device = paddle.set_device(self.config["Global"]["device"])
         logger.info('train with paddle {} and device {}'.format(
             paddle.__version__, self.device))
@@ -108,9 +108,12 @@ class Engine(object):
             self.use_dynamic_loss_scaling = False
         if self.amp:
             AMP_RELATED_FLAGS_SETTING = {
-                'FLAGS_cudnn_batchnorm_spatial_persistent': 1,
                 'FLAGS_max_inplace_grad_add': 8,
             }
+            if paddle.is_compiled_with_cuda():
+                AMP_RELATED_FLAGS_SETTING.update({
+                    'FLAGS_cudnn_batchnorm_spatial_persistent': 1
+                })
             paddle.fluid.set_flags(AMP_RELATED_FLAGS_SETTING)
 
         if "class_num" in config["Global"]:
