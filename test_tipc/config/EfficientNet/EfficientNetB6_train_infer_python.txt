@@ -51,4 +51,4 @@ inference:python/predict_cls.py -c configs/inference_cls.yaml -o PreProcess.tran
 null:null
 null:null
 ===========================infer_benchmark_params==========================
-random_infer_input:[{float32,[3,224,224]}]
+random_infer_input:[{float32,[3,528,528]}]
