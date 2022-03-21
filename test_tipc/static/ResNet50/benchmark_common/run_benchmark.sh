@@ -45,7 +45,7 @@ function _train(){
 	log_file=${profiling_log_file}
     fi
 
-    train_cmd="${config_file} -o DataLoader.Train.sampler.batch_size=${base_batch_size} -o Global.epochs=${max_epochs} -o DataLoader.Train.loader.num_workers=${num_workers} ${profiling_config} -o Global.eval_during_train=False"
+    train_cmd="${config_file} -o DataLoader.Train.sampler.batch_size=${base_batch_size} -o Global.epochs=${max_epochs} -o DataLoader.Train.loader.num_workers=${num_workers} ${profiling_config} -o Global.eval_during_train=False -o fuse_elewise_add_act_ops=True -o enable_addto=True"
 #   以下为通用执行命令，无特殊可不用修改
     case ${run_mode} in
     DP) if [[ ${device_num} = "N1C1" ]];then
@@ -76,12 +76,12 @@ function _train(){
 }
 
 function _set_env(){
-    #开启gc
-    export FLAGS_eager_delete_tensor_gb=0.0
-    export FLAGS_fraction_of_gpu_memory_to_use=0.98
-    ####
+    export FLAGS_fraction_of_gpu_memory_to_use=0.80
+    export FLAGS_cudnn_batchnorm_spatial_persistent=1
+    export FLAGS_max_inplace_grad_add=8
     export FLAGS_cudnn_exhaustive_search=1
-    export FLAGS_conv_workspace_size_limit=4000 #MB
+    export FLAGS_eager_delete_tensor_gb=0.0
+    export FLAGS_conv_workspace_size_limit=4000
 }
 
 
