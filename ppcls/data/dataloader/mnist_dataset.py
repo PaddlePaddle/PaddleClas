@@ -8,7 +8,7 @@ from ppcls.utils import logger
 from .common_dataset import create_operators
 
 
-class Mnist_Dataset(MNIST):
+class MnistDataset(MNIST):
     def __init__(self, transform_ops=None, **kwargs):
         super(MnistDataset, self).__init__(**kwargs)
         if transform_ops:

@@ -67,7 +67,7 @@ Optimizer_metric:
 DataLoader:
   Train:
     dataset:
-      name: Mnist_Dataset
+      name: MnistDataset
       mode: train
       backend: pil
       transform_ops:
@@ -89,7 +89,7 @@ DataLoader:
 
   Eval:
     dataset:
-      name: Mnist_Dataset
+      name: MnistDataset
       mode: test
       backend: pil
       transform_ops:

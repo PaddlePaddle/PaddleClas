@@ -1,5 +1,5 @@
 from ppcls.data.dataloader.imagenet_dataset import ImageNetDataset
-from ppcls.data.dataloader.mnist_dataset import Mnist_Dataset
+from ppcls.data.dataloader.mnist_dataset import MnistDataset
 from ppcls.data.dataloader.multilabel_dataset import MultiLabelDataset
 from ppcls.data.dataloader.common_dataset import create_operators
 from ppcls.data.dataloader.vehicle_dataset import CompCars, VeriWild

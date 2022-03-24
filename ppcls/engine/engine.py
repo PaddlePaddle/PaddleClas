@@ -46,7 +46,7 @@ from ppcls.engine import evaluation
 from ppcls.arch.gears.identity_head import IdentityHead
 
 
-class Engine(model):
+class Engine(object):
     def __init__(self, config, mode="train"):
         assert mode in ["train", "eval", "infer", "export"]
         self.mode = mode
