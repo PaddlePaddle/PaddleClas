@@ -22,6 +22,7 @@ from ppcls.utils import logger
 from ppcls.data import dataloader
 # dataset
 from ppcls.data.dataloader.imagenet_dataset import ImageNetDataset
+from ppcls.data.dataloader.mnist_dataset import Mnist
 from ppcls.data.dataloader.multilabel_dataset import MultiLabelDataset
 from ppcls.data.dataloader.common_dataset import create_operators
 from ppcls.data.dataloader.vehicle_dataset import CompCars, VeriWild

@@ -92,7 +92,8 @@ class Engine(object):
             self.vdl_writer = LogWriter(logdir=vdl_writer_path)
 
         # set device
-        assert self.config["Global"]["device"] in ["cpu", "gpu", "xpu", "npu", "mlu"]
+        assert self.config["Global"][
+            "device"] in ["cpu", "gpu", "xpu", "npu", "mlu"]
         self.device = paddle.set_device(self.config["Global"]["device"])
         logger.info('train with paddle {} and device {}'.format(
             paddle.__version__, self.device))
@@ -107,9 +108,7 @@ class Engine(object):
             self.scale_loss = 1.0
             self.use_dynamic_loss_scaling = False
         if self.amp:
-            AMP_RELATED_FLAGS_SETTING = {
-                'FLAGS_max_inplace_grad_add': 8,
-            }
+            AMP_RELATED_FLAGS_SETTING = {'FLAGS_max_inplace_grad_add': 8, }
             if paddle.is_compiled_with_cuda():
                 AMP_RELATED_FLAGS_SETTING.update({
                     'FLAGS_cudnn_batchnorm_spatial_persistent': 1
@@ -225,6 +224,15 @@ class Engine(object):
             self.optimizer, self.lr_sch = build_optimizer(
                 self.config["Optimizer"], self.config["Global"]["epochs"],
                 len(self.train_dataloader), [self.model])
+            self.optimizer_metric, self.lr_sch_dummy = build_optimizer(
+                self.config["Optimizer_metric"],
+                self.config["Global"]["epochs"],
+                len(self.train_dataloader),
+                [self.train_loss_func.loss_func[-1]])
+            self.optimizer = {
+                'main': self.optimizer,
+                'metric': self.optimizer_metric
+            }
 
         # for amp training
         if self.amp:
@@ -237,9 +245,9 @@ class Engine(object):
                 logger.warning(msg)
                 self.config['AMP']["level"] = "O1"
                 amp_level = "O1"
-            self.model, self.optimizer = paddle.amp.decorate(
+            self.model, self.optimizer['main'] = paddle.amp.decorate(
                 models=self.model,
-                optimizers=self.optimizer,
+                optimizers=self.optimizer['main'],
                 level=amp_level,
                 save_dtype='float32')
 
@@ -282,7 +290,7 @@ class Engine(object):
 
         if self.config["Global"]["checkpoints"] is not None:
             metric_info = init_model(self.config["Global"], self.model,
-                                     self.optimizer)
+                                     self.optimizer['main'])
             if metric_info is not None:
                 best_metric.update(metric_info)
 
@@ -314,7 +322,7 @@ class Engine(object):
                     best_metric["epoch"] = epoch_id
                     save_load.save_model(
                         self.model,
-                        self.optimizer,
+                        self.optimizer['main'],
                         best_metric,
                         self.output_dir,
                         model_name=self.config["Arch"]["name"],
@@ -333,16 +341,17 @@ class Engine(object):
             if epoch_id % save_interval == 0:
                 save_load.save_model(
                     self.model,
-                    self.optimizer, {"metric": acc,
-                                     "epoch": epoch_id},
+                    self.optimizer['main'],
+                    {"metric": acc,
+                     "epoch": epoch_id},
                     self.output_dir,
                     model_name=self.config["Arch"]["name"],
                     prefix="epoch_{}".format(epoch_id))
             # save the latest model
             save_load.save_model(
                 self.model,
-                self.optimizer, {"metric": acc,
-                                 "epoch": epoch_id},
+                self.optimizer['main'], {"metric": acc,
+                                         "epoch": epoch_id},
                 self.output_dir,
                 model_name=self.config["Arch"]["name"],
                 prefix="latest")

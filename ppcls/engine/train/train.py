@@ -56,13 +56,23 @@ def train_epoch(engine, epoch_id, print_batch_step):
 
         # step opt and lr
         if engine.amp:
+            # TODO(sensen): support multi-optimizers for AMP
             scaled = engine.scaler.scale(loss_dict["loss"])
             scaled.backward()
             engine.scaler.minimize(engine.optimizer, scaled)
         else:
             loss_dict["loss"].backward()
-            engine.optimizer.step()
-        engine.optimizer.clear_grad()
+            if isinstance(engine.optimizer, dict):
+                for opt in engine.optimizer.values():
+                    opt.step()
+            else:
+                engine.optimizer.step()
+        if isinstance(engine.optimizer, dict):
+            for opt in engine.optimizer.values():
+                opt.clear_grad()
+        else:
+            engine.optimizer.clear_grad()
+
         engine.lr_sch.step()
 
         # below code just for logging

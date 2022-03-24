@@ -259,8 +259,8 @@ class NormalizeImage(object):
         if isinstance(scale, str):
             scale = eval(scale)
         assert channel_num in [
-            3, 4
-        ], "channel number of input image should be set to 3 or 4."
+            1, 3, 4
+        ], "channel number of input image should be set to 1, 3 or 4."
         self.channel_num = channel_num
         self.output_dtype = 'float16' if output_fp16 else 'float32'
         self.scale = np.float32(scale if scale is not None else 1.0 / 255.0)
@@ -268,7 +268,8 @@ class NormalizeImage(object):
         mean = mean if mean is not None else [0.485, 0.456, 0.406]
         std = std if std is not None else [0.229, 0.224, 0.225]
 
-        shape = (3, 1, 1) if self.order == 'chw' else (1, 1, 3)
+        shape = (channel_num, 1, 1) if self.order == 'chw' else (1, 1,
+                                                                 channel_num)
         self.mean = np.array(mean).reshape(shape).astype('float32')
         self.std = np.array(std).reshape(shape).astype('float32')
 

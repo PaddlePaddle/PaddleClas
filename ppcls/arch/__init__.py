@@ -16,9 +16,9 @@ import copy
 import importlib
 
 import paddle.nn as nn
+from paddle import Tensor
 from paddle.jit import to_static
 from paddle.static import InputSpec
-
 from . import backbone, gears
 from .backbone import *
 from .gears import build_gear
@@ -78,15 +78,35 @@ class RecModel(TheseusLayer):
 
     def forward(self, x, label=None):
         out = dict()
+        # backbone
         x = self.backbone(x)
-        out["backbone"] = x
+        if isinstance(x, Tensor):
+            out["backbone"] = x
+        elif isinstance(x, dict):
+            out.update(x)
+        else:
+            raise NotImplementedError(
+                f"backbone must return dict or Tensor, but got ({type(out)})")
+        # neck
         if self.neck is not None:
             x = self.neck(x)
-            out["neck"] = x
-        out["features"] = x
+            if isinstance(x, Tensor):
+                out["features"] = x
+            elif isinstance(x, dict):
+                out.update(x)
+            else:
+                raise NotImplementedError(
+                    f"neck must return dict or Tensor, but got ({type(out)})")
+        # head
         if self.head is not None:
             y = self.head(x, label)
-            out["logits"] = y
+            if isinstance(y, Tensor):
+                out["logits"] = y
+            elif isinstance(y, dict):
+                out.update(y)
+            else:
+                raise NotImplementedError(
+                    f"head must return dict or Tensor, but got ({type(out)})")
         return out
 
 
