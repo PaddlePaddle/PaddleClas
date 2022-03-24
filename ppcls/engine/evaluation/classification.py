@@ -40,6 +40,7 @@ def classification_eval(engine, epoch_id=0):
         dataset) if not engine.use_dali else engine.eval_dataloader.size
     max_iter = len(engine.eval_dataloader) - 1 if platform.system(
     ) == "Windows" else len(engine.eval_dataloader)
+
     visualize = engine.config["Global"].get("visualize", False)
     if visualize:
         all_features = []
@@ -71,6 +72,9 @@ def classification_eval(engine, epoch_id=0):
                     },
                     level=amp_level):
                 out = engine.model(batch[0])
+                if visualize:
+                    all_features.append(out['features'].numpy())
+                    all_labels.append(batch[1].numpy())
                 # calc loss
                 if engine.eval_loss_func is not None:
                     loss_dict = engine.eval_loss_func(out, batch[1])
@@ -81,8 +85,9 @@ def classification_eval(engine, epoch_id=0):
                                                 batch_size)
         else:
             out = engine.model(batch[0])
-            all_features.append(out['features'].numpy())
-            all_labels.append(batch[1].numpy())
+            if visualize:
+                all_features.append(out['features'].numpy())
+                all_labels.append(batch[1].numpy())
             # calc loss
             if engine.eval_loss_func is not None:
                 loss_dict = engine.eval_loss_func(out, batch[1])
@@ -172,7 +177,7 @@ def classification_eval(engine, epoch_id=0):
     logger.info("[Eval][Epoch {}][Avg]{}".format(epoch_id, metric_msg))
 
     # visualize
-    if visualize is True:
+    if visualize:
         from matplotlib import pyplot as plt
         import numpy as np
         import os
