@@ -15,7 +15,7 @@ Global:
   save_inference_dir: ./inference
   # training model under @to_static
   to_static: False
-
+  visualize: True
 # model architecture
 Arch:
   name: RecModel

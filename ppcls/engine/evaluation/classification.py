@@ -40,6 +40,11 @@ def classification_eval(engine, epoch_id=0):
         dataset) if not engine.use_dali else engine.eval_dataloader.size
     max_iter = len(engine.eval_dataloader) - 1 if platform.system(
     ) == "Windows" else len(engine.eval_dataloader)
+    visualize = engine.config["Global"].get("visualize", False)
+    if visualize:
+        all_features = []
+        all_labels = []
+
     for iter_id, batch in enumerate(engine.eval_dataloader):
         if iter_id >= max_iter:
             break
@@ -76,6 +81,8 @@ def classification_eval(engine, epoch_id=0):
                                                 batch_size)
         else:
             out = engine.model(batch[0])
+            all_features.append(out['features'].numpy())
+            all_labels.append(batch[1].numpy())
             # calc loss
             if engine.eval_loss_func is not None:
                 loss_dict = engine.eval_loss_func(out, batch[1])
@@ -163,6 +170,33 @@ def classification_eval(engine, epoch_id=0):
         "{}: {:.5f}".format(key, output_info[key].avg) for key in output_info
     ])
     logger.info("[Eval][Epoch {}][Avg]{}".format(epoch_id, metric_msg))
+
+    # visualize
+    if visualize is True:
+        from matplotlib import pyplot as plt
+        import numpy as np
+        import os
+        all_features = np.concatenate(all_features, 0)
+        all_labels = np.concatenate(all_labels, 0)
+        if all_labels.ndim >= 2 and all_labels.shape[-1] == 1:
+            all_labels = np.squeeze(all_labels, axis=-1)
+
+        num_classes = engine.eval_dataloader.dataset.class_num
+        colors = [f'C{i}' for i in range(num_classes)]
+        for label_idx in range(num_classes):
+            plt.scatter(
+                all_features[all_labels == label_idx, 0],
+                all_features[all_labels == label_idx, 1],
+                c=colors[label_idx],
+                s=1, )
+        plt.legend([str(i) for i in range(num_classes)], loc='upper right')
+        dirname = f"./output/{engine.config['Arch']['name']}/vis/"
+        if not os.path.exists(dirname):
+            os.mkdir(dirname)
+        save_path = os.path.join(dirname, 'vis.png')
+        plt.savefig(save_path, bbox_inches='tight')
+        plt.close()
+        logger.info(f"visualized result has been saved to {save_path}")
 
     # do not try to save best eval.model
     if engine.eval_metric_func is None:

@@ -239,6 +239,9 @@ class Engine(object):
                     self.config["Global"]["epochs"],
                     len(self.train_dataloader), [self.model_metric])
                 use_metric_optimizer = True
+                logger.info(
+                    f"Using metric learning module ({type(self.model_metric).__name__}) with ({type(self.optimizer_metric).__name__})"
+                )
 
         # for amp training
         if self.amp:
