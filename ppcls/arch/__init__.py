@@ -86,7 +86,7 @@ class RecModel(TheseusLayer):
             out.update(x)
         else:
             raise NotImplementedError(
-                f"backbone must return dict or Tensor, but got ({type(out)})")
+                f"backbone must return dict or Tensor, but got ({type(x)})")
         # neck
         if self.neck is not None:
             x = self.neck(x)
@@ -96,7 +96,7 @@ class RecModel(TheseusLayer):
                 out.update(x)
             else:
                 raise NotImplementedError(
-                    f"neck must return dict or Tensor, but got ({type(out)})")
+                    f"neck must return dict or Tensor, but got ({type(x)})")
         # head
         if self.head is not None:
             y = self.head(x, label)
@@ -106,7 +106,7 @@ class RecModel(TheseusLayer):
                 out.update(y)
             else:
                 raise NotImplementedError(
-                    f"head must return dict or Tensor, but got ({type(out)})")
+                    f"head must return dict or Tensor, but got ({type(y)})")
         return out
 
 
