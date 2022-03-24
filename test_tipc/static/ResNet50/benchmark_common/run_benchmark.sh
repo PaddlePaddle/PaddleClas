@@ -35,9 +35,9 @@ function _train(){
     if [ ${fp_item} = "fp32" ]; then
         config_file="-c ppcls/configs/ImageNet/ResNet/ResNet50.yaml"
     elif [ ${fp_item} = "amp_fp16" ]; then
-        config_file="-c ppcls/configs/ImageNet/ResNet/ResNet50_amp_O1.yaml"
+        config_file="-c ppcls/configs/ImageNet/ResNet/ResNet50_amp_O1_ultra.yaml"
     elif [ ${fp_item} = "pure_fp16" ]; then
-    	config_file="-c ppcls/configs/ImageNet/ResNet/ResNet50_amp_O2.yaml"
+    	config_file="-c ppcls/configs/ImageNet/ResNet/ResNet50_amp_O2_ultra.yaml"
     fi
     if [ ${profiling} = "false" ]; then
 	profiling_config=""
