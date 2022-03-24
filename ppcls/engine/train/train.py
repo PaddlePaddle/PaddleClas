@@ -60,18 +60,15 @@ def train_epoch(engine, epoch_id, print_batch_step):
             scaled = engine.scaler.scale(loss_dict["loss"])
             scaled.backward()
             engine.scaler.minimize(engine.optimizer, scaled)
+            if hasattr(engine, 'optimizer_metric'):
+                engine.scaler.minimize(engine.optimizer_metric, scaled)
         else:
             loss_dict["loss"].backward()
-            if isinstance(engine.optimizer, dict):
-                for opt in engine.optimizer.values():
-                    opt.step()
-            else:
-                engine.optimizer.step()
-        if isinstance(engine.optimizer, dict):
-            for opt in engine.optimizer.values():
-                opt.clear_grad()
-        else:
+            engine.optimizer.step()
             engine.optimizer.clear_grad()
+            if hasattr(engine, 'optimizer_metric'):
+                engine.optimizer_metric.step()
+                engine.optimizer_metric.clear_grad()
 
         engine.lr_sch.step()
 

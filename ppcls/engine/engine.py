@@ -46,7 +46,7 @@ from ppcls.engine import evaluation
 from ppcls.arch.gears.identity_head import IdentityHead
 
 
-class Engine(object):
+class Engine(model):
     def __init__(self, config, mode="train"):
         assert mode in ["train", "eval", "infer", "export"]
         self.mode = mode
@@ -220,19 +220,25 @@ class Engine(object):
                     self.model, self.config["Global"]["pretrained_model"])
 
         # build optimizer
+        use_metric_optimizer = False
         if self.mode == 'train':
             self.optimizer, self.lr_sch = build_optimizer(
                 self.config["Optimizer"], self.config["Global"]["epochs"],
                 len(self.train_dataloader), [self.model])
-            self.optimizer_metric, self.lr_sch_dummy = build_optimizer(
-                self.config["Optimizer_metric"],
-                self.config["Global"]["epochs"],
-                len(self.train_dataloader),
-                [self.train_loss_func.loss_func[-1]])
-            self.optimizer = {
-                'main': self.optimizer,
-                'metric': self.optimizer_metric
-            }
+            # build optimizer for metric learning(if used and metric has params)
+            if self.config.get("Optimizer_metric") is not None:
+                metric_name = self.config["Optimizer_metric"].pop(
+                    "metric_loss_name")
+                self.model_metric = None
+                for loss in self.train_loss_func.loss_func:
+                    if type(loss).__name__ == metric_name:
+                        self.model_metric = loss
+                        break
+                self.optimizer_metric, self.lr_sch_dummy = build_optimizer(
+                    self.config["Optimizer_metric"],
+                    self.config["Global"]["epochs"],
+                    len(self.train_dataloader), [self.model_metric])
+                use_metric_optimizer = True
 
         # for amp training
         if self.amp:
@@ -245,11 +251,17 @@ class Engine(object):
                 logger.warning(msg)
                 self.config['AMP']["level"] = "O1"
                 amp_level = "O1"
-            self.model, self.optimizer['main'] = paddle.amp.decorate(
+            self.model, self.optimizer = paddle.amp.decorate(
                 models=self.model,
-                optimizers=self.optimizer['main'],
+                optimizers=self.optimizer,
                 level=amp_level,
                 save_dtype='float32')
+            if use_metric_optimizer:
+                self.model_metric, self.optimizer_metric = paddle.amp.decorate(
+                    models=self.model_metric,
+                    optimizers=self.optimizer_metric,
+                    level=amp_level,
+                    save_dtype='float32')
 
         # for distributed
         world_size = dist.get_world_size()
@@ -260,6 +272,8 @@ class Engine(object):
         if self.config["Global"]["distributed"]:
             dist.init_parallel_env()
             self.model = paddle.DataParallel(self.model)
+            if use_metric_optimizer:
+                self.model_metric = paddle.DataParallel(self.model_metric)
 
         # build postprocess for infer
         if self.mode == 'infer':
@@ -290,7 +304,7 @@ class Engine(object):
 
         if self.config["Global"]["checkpoints"] is not None:
             metric_info = init_model(self.config["Global"], self.model,
-                                     self.optimizer['main'])
+                                     self.optimizer)
             if metric_info is not None:
                 best_metric.update(metric_info)
 
@@ -322,7 +336,7 @@ class Engine(object):
                     best_metric["epoch"] = epoch_id
                     save_load.save_model(
                         self.model,
-                        self.optimizer['main'],
+                        self.optimizer,
                         best_metric,
                         self.output_dir,
                         model_name=self.config["Arch"]["name"],
@@ -341,17 +355,16 @@ class Engine(object):
             if epoch_id % save_interval == 0:
                 save_load.save_model(
                     self.model,
-                    self.optimizer['main'],
-                    {"metric": acc,
-                     "epoch": epoch_id},
+                    self.optimizer, {"metric": acc,
+                                     "epoch": epoch_id},
                     self.output_dir,
                     model_name=self.config["Arch"]["name"],
                     prefix="epoch_{}".format(epoch_id))
             # save the latest model
             save_load.save_model(
                 self.model,
-                self.optimizer['main'], {"metric": acc,
-                                         "epoch": epoch_id},
+                self.optimizer, {"metric": acc,
+                                 "epoch": epoch_id},
                 self.output_dir,
                 model_name=self.config["Arch"]["name"],
                 prefix="latest")

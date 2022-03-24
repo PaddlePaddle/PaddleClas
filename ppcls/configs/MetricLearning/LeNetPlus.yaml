@@ -1,0 +1,119 @@
+# global configs
+Global:
+  checkpoints: null
+  pretrained_model: null
+  output_dir: ./output/
+  device: gpu
+  save_interval: 5
+  eval_during_train: True
+  eval_interval: 1
+  epochs: 100
+  print_batch_step: 50
+  use_visualdl: False
+  # used for static mode and model export
+  image_shape: [1, 224, 224]
+  save_inference_dir: ./inference
+  # training model under @to_static
+  to_static: False
+
+# model architecture
+Arch:
+  name: RecModel
+  Backbone:
+    name: LeNetPlus
+    num_classes: 10
+
+# loss function config for traing/eval process
+Loss:
+  Train:
+    - CELoss:
+        weight: 1.0
+    - &metric_loss CenterLoss:
+        weight: 1.0
+        num_classes: 10
+        feat_dim: 2
+  Eval:
+    - CELoss:
+        weight: 1.0
+    - CenterLoss:
+        weight: 1.0
+        num_classes: 10
+        feat_dim: 2
+
+
+Optimizer:
+  name: Momentum
+  momentum: 0.9
+  lr:
+    name: Step
+    learning_rate: 0.001
+    step_size: 20
+    gamma: 0.5
+  regularizer:
+    name: 'L2'
+    coeff: 0.0005
+
+Optimizer_metric:
+  metric_loss_name: *metric_loss
+  name: SGD
+  lr:
+    learning_rate: 0.5
+  regularizer:
+    name: 'L2'
+    coeff: 0.0005
+
+
+# data loader for train and eval
+DataLoader:
+  Train:
+    dataset:
+      name: Mnist_Dataset
+      mode: train
+      backend: pil
+      transform_ops:
+        - NormalizeImage:
+            scale: 1.0/255.0
+            mean: [0.1307, ]
+            std: [0.3081, ]
+            order: ''
+            channel_num: 1
+
+    sampler:
+      name: DistributedBatchSampler
+      batch_size: 128
+      drop_last: False
+      shuffle: True
+    loader:
+      num_workers: 4
+      use_shared_memory: True
+
+  Eval:
+    dataset:
+      name: Mnist_Dataset
+      mode: test
+      backend: pil
+      transform_ops:
+        - NormalizeImage:
+            scale: 1.0/255.0
+            mean: [0.1307, ]
+            std: [0.3081, ]
+            order: ''
+            channel_num: 1
+
+    sampler:
+      name: DistributedBatchSampler
+      batch_size: 128
+      drop_last: False
+      shuffle: False
+    loader:
+      num_workers: 4
+      use_shared_memory: True
+
+
+Metric:
+  Train:
+    - TopkAcc:
+        topk: [1, ]
+  Eval:
+    - TopkAcc:
+        topk: [1, ]
