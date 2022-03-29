@@ -128,8 +128,8 @@ def windows2img(img_splits, h_split, w_split, img_h, img_w):
     Returns:
         img: tensor, original tensor
     """
-    B = paddle.to_tensor(img_splits.shape[0] /
-                         (img_h / h_split * img_w / w_split), "int32")
+    B = paddle.to_tensor(img_splits.shape[0] //
+                         (img_h // h_split * img_w // w_split), "int32")
     img = img_splits.reshape([
         B, img_h // h_split, img_w // w_split, h_split, w_split,
         img_splits.shape[-1]
