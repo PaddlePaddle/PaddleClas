@@ -25,6 +25,13 @@ from ppcls.arch.utils import _calculate_fan_in_and_fan_out, kaiming_uniform_
 
 
 class CenterLossHead(nn.Layer):
+    """Center loss Head
+
+    Args:
+        input_dims (int): input feature dims.
+        class_num (int): number of output classes.
+    """
+
     def __init__(self, input_dims: int, class_num: int):
         super(CenterLossHead, self).__init__()
         self.input_dims = input_dims
@@ -37,6 +44,6 @@ class CenterLossHead(nn.Layer):
             bound = 1 / math.sqrt(fan_in) if fan_in > 0 else 0
             nn.initializer.Uniform(-bound, bound)(self.fc.bias)
 
-    def forward(self, input: Tensor) -> Tensor:
+    def forward(self, input: Tensor, label: Tensor=None) -> Tensor:
         out = self.fc(input)
         return out

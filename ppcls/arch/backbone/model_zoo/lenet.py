@@ -53,15 +53,15 @@ class LeNet(nn.Layer):
     def forward(self, x: Tensor) -> Tensor:
         x = self.prelu1_1(self.conv1_1(x))
         x = self.prelu1_2(self.conv1_2(x))
-        x = self.max_pool2d(x, 2)
+        x = self.max_pool2d(x)
 
         x = self.prelu2_1(self.conv2_1(x))
         x = self.prelu2_2(self.conv2_2(x))
-        x = self.max_pool2d(x, 2)
+        x = self.max_pool2d(x)
 
         x = self.prelu3_1(self.conv3_1(x))
         x = self.prelu3_2(self.conv3_2(x))
-        x = self.max_pool2d(x, 2)
+        x = self.max_pool2d(x)
 
         return x
 

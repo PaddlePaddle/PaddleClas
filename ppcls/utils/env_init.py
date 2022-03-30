@@ -8,7 +8,7 @@ from ppcls.arch import build_model
 from ppcls.data import build_dataloader
 from ppcls.loss import build_loss
 from ppcls.metric import build_metrics
-from ppcls.optimizer import build_optimizer
+from ppcls.optimizer.__init__ import build_optimizer
 from ppcls.utils import logger
 from ppcls.utils.save_load import (load_dygraph_pretrain,
                                    load_dygraph_pretrain_from_url)
@@ -126,10 +126,16 @@ def set_model(engine: object) -> None:
     """
     engine.model = build_model(engine.config)
     engine.extra_model = []
-    for loss_func in engine.train_loss_func.loss_func:
-        # for components with independent parameters
-        if len(loss_func.parameters()) > 0:
-            engine.extra_model.append(loss_func)
+    if engine.mode == "train" and hasattr(engine, 'train_loss_func'):
+        for loss_func in engine.train_loss_func.loss_func:
+            # for components with independent parameters
+            if len(loss_func.parameters()) > 0:
+                engine.extra_model.append(loss_func)
+    elif engine.mode == "eval" and hasattr(engine, 'eval_loss_func'):
+        for loss_func in engine.eval_loss_func.loss_func:
+            # for components with independent parameters
+            if len(loss_func.parameters()) > 0:
+                engine.extra_model.append(loss_func)
 
 
 def load_pretrain(engine: object) -> None:
@@ -143,7 +149,8 @@ def load_pretrain(engine: object) -> None:
                                        engine.config.Global.pretrained_model)
     else:
         load_dygraph_pretrain(engine.model,
-                              engine.config.Global.pretrained_model)
+                              engine.config.Global.pretrained_model,
+                              engine.extra_model)
 
 
 def set_amp(engine: object) -> None:
@@ -221,8 +228,10 @@ def set_optimizers(engine: object) -> None:
                 len(engine.train_dataloader), [engine.model])
         elif isinstance(engine.config.Optimizer, list):
             # build main optimizer
+            model_name = type(engine.model).__name__
             engine.optimizer, engine.lr_sch = build_optimizer(
-                engine.config.Optimizer[0], engine.config.Global.epochs,
+                engine.config.Optimizer[0].get(model_name),
+                engine.config.Global.epochs,
                 len(engine.train_dataloader), [engine.model])
             # build extra optimizer(s)
             for optim_cfg in engine.config.Optimizer[1:]:
@@ -231,13 +240,14 @@ def set_optimizers(engine: object) -> None:
                     assert len(optim_cfg.keys()) == 1, \
                         f"A model can only correspond to one optimizer configuration" \
                         f"but got multiple model names({optim_cfg.keys()})"
-                    if type(model).__name__ == optim_cfg.keys()[0]:
-                        # Build an optimizer to manage a model
-                        optimizer, lr_sch = build_optimizer(
-                            optim_cfg, engine.config.Global.epochs,
-                            len(engine.train_dataloader), [model])
-                        engine.extra_optimizer.append(optimizer)
-                        engine.extra_lr_sch.append(lr_sch)
+                    # Build an optimizer to manage a model
+                    extra_model_name = type(model).__name__
+                    optimizer, lr_sch = build_optimizer(
+                        optim_cfg.get(extra_model_name),
+                        engine.config.Global.epochs,
+                        len(engine.train_dataloader), [model])
+                    engine.extra_optimizer.append(optimizer)
+                    engine.extra_lr_sch.append(lr_sch)
         else:
             raise NotImplementedError(
                 f"Optimizer config must be a single dict or list of dict, but got {type(engine.config.Optimizer)}"
@@ -252,7 +262,8 @@ def set_metrics(engine: object) -> None:
         if metric_config is not None:
             metric_config = metric_config.get("Train", None)
             if metric_config is not None:
-                if engine.train_dataloader.get('collate_fn', None) is not None:
+                if getattr(engine.train_dataloader, 'collate_fn',
+                           None) is not None:
                     for m_idx, m in enumerate(metric_config):
                         if "TopkAcc" in m:
                             msg = f"'TopkAcc' metric can not be used when setting 'batch_transform_ops' in config. The 'TopkAcc' metric has been removed."

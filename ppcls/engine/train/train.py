@@ -41,7 +41,7 @@ def train_epoch(engine, epoch_id, print_batch_step):
         engine.global_step += 1
 
         # image input
-        if engine.amp:
+        if engine.use_amp:
             amp_level = engine.config['AMP'].get("level", "O1").upper()
             with paddle.amp.auto_cast(
                     custom_black_list={
@@ -55,20 +55,21 @@ def train_epoch(engine, epoch_id, print_batch_step):
             loss_dict = engine.train_loss_func(out, batch[1])
 
         # step opt and lr
-        if engine.amp:
-            # TODO(sensen): support multi-optimizers for AMP
+        if engine.use_amp:
             scaled = engine.scaler.scale(loss_dict["loss"])
             scaled.backward()
             engine.scaler.minimize(engine.optimizer, scaled)
-            if hasattr(engine, 'optimizer_metric'):
-                engine.scaler.minimize(engine.optimizer_metric, scaled)
+            if len(engine.extra_optimizer) > 0:
+                for opt in engine.extra_optimizer:
+                    engine.scaler.minimize(opt, scaled)
         else:
             loss_dict["loss"].backward()
             engine.optimizer.step()
             engine.optimizer.clear_grad()
-            if hasattr(engine, 'optimizer_metric'):
-                engine.optimizer_metric.step()
-                engine.optimizer_metric.clear_grad()
+            if len(engine.extra_optimizer) > 0:
+                for opt in engine.extra_optimizer:
+                    opt.step()
+                    opt.clear_grad()
 
         engine.lr_sch.step()
 

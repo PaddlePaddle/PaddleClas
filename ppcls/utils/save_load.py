@@ -49,13 +49,13 @@ def _mkdir_if_not_exist(path):
 
 
 def load_dygraph_pretrain(model: nn.Layer,
-                          extra_model: List[nn.Layer],
-                          path=None) -> None:
+                          path=None,
+                          extra_model: List[nn.Layer]=None) -> None:
     if not (os.path.isdir(path) or os.path.exists(path + '.pdparams')):
         raise ValueError("Model pretrain path {} does not "
                          "exists.".format(path))
     param_state_dict = paddle.load(path + ".pdparams")
-    if isinstance(param_state_dict, list):
+    if isinstance(param_state_dict, list) and extra_model is not None:
         model.set_dict(param_state_dict[0])
         for i, psd in enumerate(param_state_dict[1:]):
             extra_model[i].set_dict(psd)
@@ -128,7 +128,7 @@ def init_model(config, net, optimizer=None, extra_net=[], extra_optimizer=[]):
             load_distillation_model(net, pretrained_model)
         else:  # common load
             load_dygraph_pretrain(
-                net, extra_model=extra_net, path=pretrained_model)
+                net, path=pretrained_model, extra_model=extra_net)
             logger.info(
                 logger.coloring("Finish load pretrained model from {}".format(
                     pretrained_model), "HEADER"))
