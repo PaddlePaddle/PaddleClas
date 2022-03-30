@@ -27,7 +27,9 @@
 - [20. DLA series](#20)
 - [21. RedNet series](#21)
 - [22. TNT series](#22)
-- [23. Other models](#23)
+- [23. CSwinTransformer series](#23)
+- [24. PVTV2 series](#24)
+- [25. Other models](#25)
 - [Reference](#reference)
 
 <a name="1"></a>
@@ -500,7 +502,40 @@ The accuracy and speed indicators of TNT series models are shown in the followin
 
 <a name="23"></a>
 
-## 23. Other models
+## 23. CSWinTransformer series  <sup>[[40](#ref40)]</sup>
+
+The accuracy and speed indicators of CSWinTransformer series models are shown in the following table. For more introduction, please refer to: [CSWinTransformer series model documents](../models/CSWinTransformer_en.md)。
+
+| Model       | Top-1 Acc | Top-5 Acc | time(ms)<br>bs=1 | time(ms)<br>bs=4 | time(ms)<br/>bs=8 | FLOPs(G) | Params(M) | Pretrained Model Download Address                                               | Inference Model Download Address                                      |
+| ---------- | --------- | --------- | ---------------- | ---------------- | -------- | --------- | ------------------------------------------------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ |
+| CSWinTransformer_tiny_224    | 0.8281 | 0.9628 | - | - | - | 4.1  | 22   | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/CSWinTransformer_tiny_224_pretrained.pdparams) | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/CSWinTransformer_tiny_224_infer.tar) |
+| CSWinTransformer_small_224   | 0.8358 | 0.9658 | - | - | - | 6.4 | 35  | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/CSWinTransformer_small_224_pretrained.pdparams) | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/CSWinTransformer_small_224_infer.tar) |
+| CSWinTransformer_base_224    | 0.8420 | 0.9692 | - | - | - | 14.3 | 77   | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/CSWinTransformer_base_224_pretrained.pdparams) | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/CSWinTransformer_base_224_infer.tar) |
+| CSWinTransformer_large_224   | 0.8643 | 0.9799 | - | - | - | 32.2 | 173.3   | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/CSWinTransformer_large_224_pretrained.pdparams) | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/CSWinTransformer_large_224_infer.tar) |
+| CSWinTransformer_base_384     | 0.8550 | 0.9749 | - | - |- | 42.2 | 77   | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/CSWinTransformer_base_384_pretrained.pdparams) | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/CSWinTransformer_base_384_infer.tar) |
+| CSWinTransformer_large_384    | 0.8748 | 0.9833 | - | - | - | 94.7 | 173.3 | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/CSWinTransformer_large_384_pretrained.pdparams) | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/CSWinTransformer_large_384_infer.tar) |
+
+
+<a name="24"></a>
+
+## 24. PVTV2 series  <sup>[[41](#ref41)]</sup>
+
+The accuracy and speed indicators of PVTV2 series models are shown in the following table. For more introduction, please refer to: [PVTV2 series model documents](../models/PVTV2_en.md)。
+
+| Model       | Top-1 Acc | Top-5 Acc | time(ms)<br>bs=1 | time(ms)<br>bs=4 | time(ms)<br/>bs=8 | FLOPs(G) | Params(M) | Pretrained Model Download Address                                               | Inference Model Download Address                                      |
+| ---------- | --------- | --------- | ---------------- | ---------------- | -------- | --------- | ------------------------------------------------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ |
+| PVT_V2_B0    | 0.705 | 0.902 | - | - | - | 0.53  | 3.7   | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/PVT_V2_B0_pretrained.pdparams) | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/PVT_V2_B0_infer.tar) |
+| PVT_V2_B1   |  0.787 | 0.945 | - | - | - | 2.0 | 14.0  | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/PVT_V2_B1_pretrained.pdparams) | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/PVT_V2_B1_infer.tar) |
+| PVT_V2_B2    | 0.821 | 0.960 | - | - | - | 3.9 | 25.4   | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/PVT_V2_B2_pretrained.pdparams) | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/PVT_V2_B2_infer.tar) |
+| PVT_V2_B2_Linear   | 0.821 | 0.961 | - | - | - | 3.8 | 22.6   | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/PVT_V2_B2_Linear_pretrained.pdparams) | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/PVT_V2_B2_Linear_infer.tar) |
+| PVT_V2_B3     | 0.831 | 0.965 | - | - |- | 6.7 | 45.2   | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/PVT_V2_B3_pretrained.pdparams) | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/PVT_V2_B3_infer.tar) |
+| PVT_V2_B4    | 0.836 | 0.967 | - | - | - | 9.8 | 62.6 | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/PVT_V2_B4_pretrained.pdparams) | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/PVT_V2_B4_infer.tar) |
+| PVT_V2_B5    | 0.837 | 0.966 | - | - | - | 11.4 | 82.0 | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/PVT_V2_B5_pretrained.pdparams) | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/PVT_V2_B5_infer.tar) |
+
+
+<a name="25"></a>
+
+## 25. Other models
 
 The accuracy and speed indicators of AlexNet <sup>[[18](#ref18)]</sup>, SqueezeNet series <sup>[[19](#ref19)]</sup>, VGG series <sup>[[20](#ref20)]</sup>, DarkNet53 <sup>[[21](#ref21)]</sup> and other models are shown in the following table. For more information, please refer to: [Other model documents](../models/Others_en.md).
 
@@ -597,3 +632,8 @@ TRANSFORMERS FOR IMAGE RECOGNITION AT SCALE.
 <a name="ref38">[38]</a>Fisher Yu, Dequan Wang, Evan Shelhamer, Trevor Darrell. Deep Layer Aggregation.
 
 <a name="ref39">[39]</a>Duo Lim Jie Hu, Changhu Wang, Xiangtai Li, Qi She, Lei Zhu, Tong Zhang, Qifeng Chen. Involution: Inverting the Inherence of Convolution for Visual Recognition.
+
+
+<a name="ref40">[40]</a>Xiaoyi Dong, Jianmin Bao, Dongdong Chen, Weiming Zhang, Nenghai Yu, Lu Yuan, Dong Chen, Baining Guo. CSWin Transformer: A General Vision Transformer Backbone with Cross-Shaped Windows.
+
+<a name="ref41">[41]</a>Wenhai Wang, Enze Xie, Xiang Li, Deng-Ping Fan, Kaitao Song, Ding Liang, Tong Lu, Ping Luo, Ling Shao. PVTv2: Improved Baselines with Pyramid Vision Transformer.
