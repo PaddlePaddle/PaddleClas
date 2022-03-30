@@ -22,7 +22,7 @@ import paddle.distributed as dist
 _logger = None
 
 
-def init_logger(name='root', log_file=None, log_level=logging.INFO):
+def init_logger(name='ppcls', log_file=None, log_level=logging.INFO):
     """Initialize and get a logger by name.
     If the logger has not been initialized, this method will initialize the
     logger by adding one or two handlers, otherwise the initialized logger will
@@ -59,6 +59,7 @@ def init_logger(name='root', log_file=None, log_level=logging.INFO):
         _logger.setLevel(log_level)
     else:
         _logger.setLevel(logging.ERROR)
+    _logger.propagate = False
 
 
 def log_at_trainer0(log):
