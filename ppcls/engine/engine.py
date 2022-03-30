@@ -71,7 +71,7 @@ class Engine(object):
         self.output_dir = self.config['Global']['output_dir']
         log_file = os.path.join(self.output_dir, self.config["Arch"]["name"],
                                 f"{mode}.log")
-        init_logger(name='root', log_file=log_file)
+        init_logger(log_file=log_file)
         print_config(config)
 
         # init train_func and eval_func
@@ -107,10 +107,11 @@ class Engine(object):
             self.scale_loss = 1.0
             self.use_dynamic_loss_scaling = False
         if self.amp:
-            AMP_RELATED_FLAGS_SETTING = {
-                'FLAGS_cudnn_batchnorm_spatial_persistent': 1,
-                'FLAGS_max_inplace_grad_add': 8,
-            }
+            AMP_RELATED_FLAGS_SETTING = {'FLAGS_max_inplace_grad_add': 8, }
+            if paddle.is_compiled_with_cuda():
+                AMP_RELATED_FLAGS_SETTING.update({
+                    'FLAGS_cudnn_batchnorm_spatial_persistent': 1
+                })
             paddle.fluid.set_flags(AMP_RELATED_FLAGS_SETTING)
 
         if "class_num" in config["Global"]:

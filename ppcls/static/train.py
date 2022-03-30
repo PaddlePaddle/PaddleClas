@@ -71,7 +71,7 @@ def main(args):
 
     log_file = os.path.join(global_config['output_dir'],
                             config["Arch"]["name"], f"{mode}.log")
-    init_logger(name='root', log_file=log_file)
+    init_logger(log_file=log_file)
     print_config(config)
 
     if global_config.get("is_distributed", True):
