@@ -17,7 +17,9 @@ import copy
 import paddle
 import numpy as np
 from paddle.io import DistributedBatchSampler, BatchSampler, DataLoader
+from zmq import device
 from ppcls.utils import logger
+from ppcls.utils.config import AttrDict
 
 from ppcls.data import dataloader
 # dataset
@@ -61,11 +63,16 @@ def create_operators(params, class_num=None):
     return ops
 
 
-def build_dataloader(config, mode, device, use_dali=False, seed=None):
+def build_dataloader(config: AttrDict,
+                     mode: str,
+                     device,
+                     use_dali: bool=False,
+                     seed: int=None) -> DataLoader:
     assert mode in [
         'Train', 'Eval', 'Test', 'Gallery', 'Query'
-    ], "Dataset mode should be Train, Eval, Test, Gallery, Query"
+    ], f"Dataset mode should in ['Train', 'Eval', 'Test', 'Gallery', 'Query'], but got {mode}"
     # build dataset
+
     if use_dali:
         from ppcls.data.dataloader.dali import dali_dataloader
         return dali_dataloader(config, mode, paddle.device.get_device(), seed)
@@ -87,9 +94,9 @@ def build_dataloader(config, mode, device, use_dali=False, seed=None):
     config_sampler = config[mode]['sampler']
     if "name" not in config_sampler:
         batch_sampler = None
-        batch_size = config_sampler["batch_size"]
-        drop_last = config_sampler["drop_last"]
-        shuffle = config_sampler["shuffle"]
+        batch_size = config_sampler.batch_size
+        drop_last = config_sampler.drop_last
+        shuffle = config_sampler.shuffle
     else:
         sampler_name = config_sampler.pop("name")
         batch_sampler = eval(sampler_name)(dataset, **config_sampler)

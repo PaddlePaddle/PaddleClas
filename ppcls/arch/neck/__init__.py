@@ -12,20 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from .arcmargin import ArcMargin
-from .cosmargin import CosMargin
-from .circlemargin import CircleMargin
-from .fc import FC
 from .vehicle_neck import VehicleNeck
-from paddle.nn import Tanh
+from .fc import FC
+from .centerloss_neck import CenterLossNeck
 
-__all__ = ['build_gear']
+__all__ = ['build_neck']
 
 
-def build_gear(config):
-    support_dict = [
-        'ArcMargin', 'CosMargin', 'CircleMargin', 'FC', 'VehicleNeck', 'Tanh'
-    ]
+def build_neck(config):
+    support_dict = ['VehicleNeck', 'FC', 'CenterLossNeck']
     module_name = config.pop('name')
     assert module_name in support_dict, Exception(
         'head only support {}'.format(support_dict))

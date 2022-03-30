@@ -23,8 +23,11 @@ import shutil
 import tempfile
 
 import paddle
+from simplejson import OrderedDict
 from ppcls.utils import logger
 from .download import get_weights_path_from_url
+from typing import List
+import paddle.nn as nn
 
 __all__ = ['init_model', 'save_model', 'load_dygraph_pretrain']
 
@@ -45,16 +48,24 @@ def _mkdir_if_not_exist(path):
                 raise OSError('Failed to mkdir {}'.format(path))
 
 
-def load_dygraph_pretrain(model, path=None):
+def load_dygraph_pretrain(model: nn.Layer,
+                          extra_model: List[nn.Layer],
+                          path=None) -> None:
     if not (os.path.isdir(path) or os.path.exists(path + '.pdparams')):
         raise ValueError("Model pretrain path {} does not "
                          "exists.".format(path))
     param_state_dict = paddle.load(path + ".pdparams")
-    model.set_dict(param_state_dict)
+    if isinstance(param_state_dict, list):
+        model.set_dict(param_state_dict[0])
+        for i, psd in enumerate(param_state_dict[1:]):
+            extra_model[i].set_dict(psd)
+    else:
+        model.set_dict(param_state_dict)
     return
 
 
-def load_dygraph_pretrain_from_url(model, pretrained_url, use_ssld=False):
+def load_dygraph_pretrain_from_url(model, pretrained_url,
+                                   use_ssld=False) -> None:
     if use_ssld:
         pretrained_url = pretrained_url.replace("_pretrained",
                                                 "_ssld_pretrained")
@@ -85,7 +96,7 @@ def load_distillation_model(model, pretrained_model):
             pretrained_model))
 
 
-def init_model(config, net, optimizer=None):
+def init_model(config, net, optimizer=None, extra_net=[], extra_optimizer=[]):
     """
     load model from checkpoint or pretrained_model
     """
@@ -98,8 +109,15 @@ def init_model(config, net, optimizer=None):
         para_dict = paddle.load(checkpoints + ".pdparams")
         opti_dict = paddle.load(checkpoints + ".pdopt")
         metric_dict = paddle.load(checkpoints + ".pdstates")
-        net.set_dict(para_dict)
-        optimizer.set_state_dict(opti_dict)
+        if isinstance(para_dict, dict):
+            net.set_dict(para_dict)
+            optimizer.set_state_dict(opti_dict)
+        else:
+            net.set_dict(para_dict[0])
+            optimizer.set_state_dict(opti_dict[0])
+            for i in range(len(extra_net)):
+                extra_net.set_dict(para_dict[1 + i])
+                extra_optimizer.set_state_dict(opti_dict[1 + i])
         logger.info("Finish load checkpoints from {}".format(checkpoints))
         return metric_dict
 
@@ -109,14 +127,17 @@ def init_model(config, net, optimizer=None):
         if use_distillation:
             load_distillation_model(net, pretrained_model)
         else:  # common load
-            load_dygraph_pretrain(net, path=pretrained_model)
+            load_dygraph_pretrain(
+                net, extra_model=extra_net, path=pretrained_model)
             logger.info(
                 logger.coloring("Finish load pretrained model from {}".format(
                     pretrained_model), "HEADER"))
 
 
 def save_model(net,
+               extra_net,
                optimizer,
+               extra_optimizer,
                metric_info,
                model_path,
                model_name="",
@@ -129,8 +150,17 @@ def save_model(net,
     model_path = os.path.join(model_path, model_name)
     _mkdir_if_not_exist(model_path)
     model_path = os.path.join(model_path, prefix)
+    if len(extra_net) == 0:
+        paddle.save(net.state_dict(), model_path + ".pdparams")
+        paddle.save(optimizer.state_dict(), model_path + ".pdopt")
+    else:
+        paddle.save([
+            net.state_dict(), * [_net.state_dict() for _net in extra_net]
+        ], model_path + ".pdparams")
+        paddle.save([
+            optimizer.state_dict(),
+            * [_optimizer.state_dict() for _optimizer in extra_optimizer]
+        ], model_path + ".pdopt")
 
-    paddle.save(net.state_dict(), model_path + ".pdparams")
-    paddle.save(optimizer.state_dict(), model_path + ".pdopt")
     paddle.save(metric_info, model_path + ".pdstates")
     logger.info("Already save model in {}".format(model_path))

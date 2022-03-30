@@ -12,12 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import os
-import copy
 import argparse
+import copy
+import os
+from typing import List
+
 import yaml
-from ppcls.utils import logger
-from ppcls.utils import check
+from ppcls.utils import check, logger
+
 __all__ = ['get_config']
 
 
@@ -143,7 +145,7 @@ def override(dl, ks, v):
             override(dl[ks[0]], ks[1:], v)
 
 
-def override_config(config, options=None):
+def override_config(config: AttrDict, options: List[str]=None) -> AttrDict:
     """
     Recursively override the config
     Args:
@@ -171,7 +173,8 @@ def override_config(config, options=None):
     return config
 
 
-def get_config(fname, overrides=None, show=False):
+def get_config(fname: str, overrides: List[str]=None,
+               show: bool=False) -> AttrDict:
     """
     Read config from file
     """

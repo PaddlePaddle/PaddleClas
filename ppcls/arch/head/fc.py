@@ -18,10 +18,11 @@ from __future__ import print_function
 
 import paddle
 import paddle.nn as nn
+from paddle import Tensor
 
 
 class FC(nn.Layer):
-    def __init__(self, embedding_size, class_num):
+    def __init__(self, embedding_size: int, class_num: int):
         super(FC, self).__init__()
         self.embedding_size = embedding_size
         self.class_num = class_num
@@ -30,6 +31,6 @@ class FC(nn.Layer):
         self.fc = paddle.nn.Linear(
             self.embedding_size, self.class_num, weight_attr=weight_attr)
 
-    def forward(self, input, label=None):
+    def forward(self, input: Tensor) -> Tensor:
         out = self.fc(input)
         return out

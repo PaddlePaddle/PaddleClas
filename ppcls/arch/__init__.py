@@ -16,18 +16,21 @@ import copy
 import importlib
 
 import paddle.nn as nn
-from paddle import Tensor
 from paddle.jit import to_static
 from paddle.static import InputSpec
-from . import backbone, gears
+
+from . import backbone, head, neck
 from .backbone import *
-from .gears import build_gear
+from .neck import build_neck
+from .head import build_head
 from .utils import *
 from ppcls.arch.backbone.base.theseus_layer import TheseusLayer
 from ppcls.utils import logger
 from ppcls.utils.save_load import load_dygraph_pretrain
+from ppcls.utils.config import AttrDict
 from ppcls.arch.slim import prune_model, quantize_model
 from ppcls.arch.distill.afd_attention import LinearTransformStudent, LinearTransformTeacher
+from typing import List, Union
 
 __all__ = ["build_model", "RecModel", "DistillationModel", "AttentionModel"]
 
@@ -43,17 +46,19 @@ def build_model(config):
     return arch
 
 
-def apply_to_static(config, model):
-    support_to_static = config['Global'].get('to_static', False)
+def apply_to_static(config: AttrDict,
+                    model: nn.Layer,
+                    extra_model: List[nn.Layer]) -> None:
+    specs = None
+    if 'image_shape' in config.Global:
+        specs = [InputSpec([None] + config.Global.image_shape)]
 
-    if support_to_static:
-        specs = None
-        if 'image_shape' in config['Global']:
-            specs = [InputSpec([None] + config['Global']['image_shape'])]
-        model = to_static(model, input_spec=specs)
-        logger.info("Successfully to apply @to_static with specs: {}".format(
-            specs))
-    return model
+    model = to_static(model, input_spec=specs)
+    for i in range(0, len(extra_model)):
+        extra_model[i] = to_static(extra_model[i], input_spec=None)
+
+    logger.info("Successfully to apply @to_static with specs: {}".format(
+        specs))
 
 
 class RecModel(TheseusLayer):
@@ -67,46 +72,26 @@ class RecModel(TheseusLayer):
             self.backbone.stop_after(backbone_stop_layer)
 
         if "Neck" in config:
-            self.neck = build_gear(config["Neck"])
+            self.neck = build_neck(config["Neck"])
         else:
             self.neck = None
 
         if "Head" in config:
-            self.head = build_gear(config["Head"])
+            self.head = build_head(config["Head"])
         else:
             self.head = None
 
     def forward(self, x, label=None):
         out = dict()
-        # backbone
         x = self.backbone(x)
-        if isinstance(x, Tensor):
-            out["backbone"] = x
-        elif isinstance(x, dict):
-            out.update(x)
-        else:
-            raise NotImplementedError(
-                f"backbone must return dict or Tensor, but got ({type(x)})")
-        # neck
+        out["backbone"] = x
         if self.neck is not None:
             x = self.neck(x)
-            if isinstance(x, Tensor):
-                out["features"] = x
-            elif isinstance(x, dict):
-                out.update(x)
-            else:
-                raise NotImplementedError(
-                    f"neck must return dict or Tensor, but got ({type(x)})")
-        # head
+            out["neck"] = x
+        out["features"] = x
         if self.head is not None:
             y = self.head(x, label)
-            if isinstance(y, Tensor):
-                out["logits"] = y
-            elif isinstance(y, dict):
-                out.update(y)
-            else:
-                raise NotImplementedError(
-                    f"head must return dict or Tensor, but got ({type(y)})")
+            out["logits"] = y
         return out
 
 

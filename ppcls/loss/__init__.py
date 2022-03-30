@@ -3,7 +3,7 @@ import copy
 import paddle
 import paddle.nn as nn
 from ppcls.utils import logger
-
+from ppcls.utils.config import AttrDict
 from .celoss import CELoss, MixCELoss
 from .googlenetloss import GoogLeNetLoss
 from .centerloss import CenterLoss
@@ -65,7 +65,7 @@ class CombinedLoss(nn.Layer):
         return loss_dict
 
 
-def build_loss(config):
+def build_loss(config: AttrDict) -> CombinedLoss:
     module_class = CombinedLoss(copy.deepcopy(config))
     logger.debug("build loss {} success.".format(module_class))
     return module_class
