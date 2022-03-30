@@ -28,6 +28,7 @@ from ppcls.utils import logger
 from ppcls.utils.save_load import load_dygraph_pretrain
 from ppcls.arch.slim import prune_model, quantize_model
 from ppcls.arch.distill.afd_attention import LinearTransformStudent, LinearTransformTeacher
+from ppcls.arch.distill.frskd_bifpn import BiFPN, BiFPNc
 
 __all__ = ["build_model", "RecModel", "DistillationModel", "AttentionModel"]
 
@@ -149,8 +150,12 @@ class AttentionModel(DistillationModel):
         for idx, model_name in enumerate(self.model_name_list):
             if label is None:
                 out = self.model_list[idx](out)
+                if not isinstance(out, dict):
+                    out = {"logits": out}
                 result_dict.update(out)
             else:
                 out = self.model_list[idx](out, label)
+                if not isinstance(out, dict):
+                    out = {"logits": out}
                 result_dict.update(out)
         return result_dict
