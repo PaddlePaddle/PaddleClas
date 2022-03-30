@@ -140,6 +140,9 @@ def override(dl, ks, v):
                 print('A new filed ({}) detected!'.format(ks[0], dl))
             dl[ks[0]] = str2num(v)
         else:
+            if ks[0] not in dl.keys():
+                dl[ks[0]] = {}
+                print("A new Series filed ({}) detected!".format(ks[0], dl))
             override(dl[ks[0]], ks[1:], v)
 
 
