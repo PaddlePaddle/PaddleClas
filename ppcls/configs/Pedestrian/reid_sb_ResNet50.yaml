@@ -45,8 +45,8 @@ Optimizer:
   name: Adam
   lr:
     name: Piecewise
-    boundaries: 30, 60
-    values: 0.00035, 0.000035, 0.0000035
+    decay_epochs: [30, 60]
+    values: [0.00035, 0.000035, 0.0000035]
     warmup_epoch: 10
     warmup_start_lr: 0.0000035
   regularizer:
