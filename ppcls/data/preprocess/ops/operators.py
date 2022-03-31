@@ -25,6 +25,7 @@ import cv2
 import numpy as np
 from PIL import Image
 from paddle.vision.transforms import ColorJitter as RawColorJitter
+from paddle.vision.transforms import Pad
 
 from .autoaugment import ImageNetPolicy
 from .functional import augmentations
