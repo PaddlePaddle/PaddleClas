@@ -12,7 +12,7 @@ Global:
   use_visualdl: False
   image_channel: 3
   # used for static mode and model export
-  image_shape: [*image_channel, 224, 224]
+  image_shape: [3, 224, 224]
   save_inference_dir: ./inference
   # training model under @to_static
   to_static: False
