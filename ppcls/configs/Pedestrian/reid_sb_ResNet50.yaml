@@ -58,8 +58,8 @@ DataLoader:
   Train:
     dataset:
         name: "VeriWild"
-        image_root: "./dataset/VeRI-Wild/images/"
-        cls_label_path: "./dataset/VeRI-Wild/train_test_split/train_list_start0.txt"
+        image_root: "./dataset/market1501"
+        cls_label_path: "./dataset/market1501/bounding_box_train.txt"
         transform_ops:
           - DecodeImage:
               to_rgb: True
@@ -70,7 +70,7 @@ DataLoader:
               flip_code: 1
           - Pad: 10
           - RandCropImage:
-              size: （256， 128）
+              size: (256， 128)
           - NormalizeImage:
               scale: 0.00392157
               mean: [0.485, 0.456, 0.406]
@@ -95,8 +95,8 @@ DataLoader:
     Query:
       dataset:
         name: "VeriWild"
-        image_root: "./dataset/VeRI-Wild/images"
-        cls_label_path: "./dataset/VeRI-Wild/train_test_split/test_3000_id_query.txt"
+        image_root: "./dataset/market1501"
+        cls_label_path: "./dataset/market1501/query.txt"
         transform_ops:
           - DecodeImage:
               to_rgb: True
@@ -120,8 +120,8 @@ DataLoader:
     Gallery:
       dataset:
         name: "VeriWild"
-        image_root: "./dataset/VeRI-Wild/images"
-        cls_label_path: "./dataset/VeRI-Wild/train_test_split/test_3000_id.txt"
+        image_root: "./dataset/market1501"
+        cls_label_path: "./dataset/market1501/bounding_box_test.txt"
         transform_ops:
           - DecodeImage:
               to_rgb: True
