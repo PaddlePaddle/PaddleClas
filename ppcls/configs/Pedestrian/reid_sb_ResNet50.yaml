@@ -68,7 +68,8 @@ DataLoader:
               size: (256, 128)
           - RandFlipImage:
               flip_code: 1
-          - Pad: 10
+          - Pad:
+              padding: 10
           - RandCropImage:
               size: (256， 128)
           - NormalizeImage:
