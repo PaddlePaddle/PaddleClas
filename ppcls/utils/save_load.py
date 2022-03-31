@@ -12,21 +12,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
+from __future__ import absolute_import, division, print_function
 
 import errno
 import os
 import re
 import shutil
 import tempfile
+from typing import List
 
 import paddle
-from ppcls.utils import logger
-from .download import get_weights_path_from_url
-from typing import List
 import paddle.nn as nn
+from ppcls.utils import logger
+
+from .download import get_weights_path_from_url
 
 __all__ = ['init_model', 'save_model', 'load_dygraph_pretrain']
 
