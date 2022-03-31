@@ -65,13 +65,13 @@ DataLoader:
               to_rgb: True
               channel_first: False
           - ResizeImage:
-              size: (256, 128)
+              size: [256, 128]
           - RandFlipImage:
               flip_code: 1
           - Pad:
               padding: 10
           - RandCropImage:
-              size: (256， 128)
+              size: [256, 128]
           - NormalizeImage:
               scale: 0.00392157
               mean: [0.485, 0.456, 0.406]
@@ -103,7 +103,7 @@ DataLoader:
               to_rgb: True
               channel_first: False
           - ResizeImage:
-              size: (256, 128)
+              size: [256, 128]
           - NormalizeImage:
               scale: 0.00392157
               mean: [0.485, 0.456, 0.406]
@@ -128,7 +128,7 @@ DataLoader:
               to_rgb: True
               channel_first: False
           - ResizeImage:
-              size: (256, 128)
+              size: [256, 128]
           - NormalizeImage:
               scale: 0.00392157
               mean: [0.485, 0.456, 0.406]
