@@ -96,8 +96,6 @@ def set_dataloaders(engine: object) -> None:
         engine.train_dataloader = build_dataloader(
             engine.config.DataLoader, "Train", engine.device, engine.use_dali)
     if engine.mode == "eval" or engine.config.Global.eval_during_train:
-        engine.eval_dataloader = build_dataloader(
-            engine.config.DataLoader, "Eval", engine.device, engine.use_dali)
         if engine.eval_mode == "classification":
             engine.eval_dataloader = build_dataloader(engine.config.DataLoader,
                                                       "Eval", engine.device,
