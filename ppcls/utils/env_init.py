@@ -1,3 +1,4 @@
+import os
 import os.path as osp
 import random
 
@@ -13,7 +14,6 @@ from ppcls.utils import logger
 from ppcls.utils.save_load import (load_dygraph_pretrain,
                                    load_dygraph_pretrain_from_url)
 from visualdl import LogWriter
-
 from .config import print_config
 from .logger import init_logger
 
@@ -58,11 +58,8 @@ def set_visualDL(engine: object) -> None:
     Args:
         engine (object): Engine object.
     """
-    rank = dist.get_rank()
-    if rank == 0:
-        engine.vdl_writer = None
-        assert isinstance(engine.output_dir, str), \
-            f"engine.output_dir must be str, but got {type(engine.output_dir)}"
+    engine.vdl_writer = None
+    if dist.get_rank() == 0:
         if engine.config.Global.get('use_visualdl',
                                     False) and engine.mode == "train":
             vdl_writer_path = os.path.join(engine.output_dir, "vdl")
