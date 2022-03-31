@@ -23,7 +23,6 @@ import shutil
 import tempfile
 
 import paddle
-from simplejson import OrderedDict
 from ppcls.utils import logger
 from .download import get_weights_path_from_url
 from typing import List
