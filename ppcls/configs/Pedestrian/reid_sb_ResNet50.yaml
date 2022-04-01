@@ -24,7 +24,7 @@ Arch:
     name: "ResNet50"
     pretrained: True
   BackboneStopLayer:
-    name: "avg_pool"
+    name: "flatten"
   Head:
     name: "FC"
     embedding_size: 2048
@@ -36,7 +36,7 @@ Loss:
     - CELoss:
         weight: 1.0
         epsilon: 0.1
-    - TripletLoss:
+    - TripletLossV2:
         weight: 1.0
         margin: 0.3
         normalize_feature: false
