@@ -73,6 +73,8 @@ class UnifiedResize(object):
             self.resize_func = cv2.resize
 
     def __call__(self, src, size):
+        if isinstance(size, list):
+            size = tuple(size)
         return self.resize_func(src, size)
 
 
