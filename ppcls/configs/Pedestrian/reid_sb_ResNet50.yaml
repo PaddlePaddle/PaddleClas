@@ -35,8 +35,11 @@ Loss:
   Train:
     - CELoss:
         weight: 1.0
+        epsilon: 0.1
     - TripletLoss:
         weight: 1.0
+        margin: 0.3
+        normalize_feature: false
   Eval:
     - CELoss:
         weight: 1.0
