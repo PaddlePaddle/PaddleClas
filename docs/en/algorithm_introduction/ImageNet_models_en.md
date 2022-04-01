@@ -29,7 +29,8 @@
 - [22. TNT series](#22)
 - [23. CSwinTransformer series](#23)
 - [24. PVTV2 series](#24)
-- [25. Other models](#25)
+- [25. MobileViT series](#25)
+- [26. Other models](#26)
 - [Reference](#reference)
 
 <a name="1"></a>
@@ -532,10 +533,21 @@ The accuracy and speed indicators of PVTV2 series models are shown in the follow
 | PVT_V2_B4    | 0.836 | 0.967 | - | - | - | 9.8 | 62.6 | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/PVT_V2_B4_pretrained.pdparams) | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/PVT_V2_B4_infer.tar) |
 | PVT_V2_B5    | 0.837 | 0.966 | - | - | - | 11.4 | 82.0 | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/PVT_V2_B5_pretrained.pdparams) | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/PVT_V2_B5_infer.tar) |
 
-
 <a name="25"></a>
 
-## 25. Other models
+## 25. MobileViT series <sup>[[42](#ref42)]</sup>
+
+The accuracy and speed indicators of MobileViT series models are shown in the following table. For more introduction, please refer to:[MobileViT series model documents](../models/MobileViT_en.md)
+
+| Model       | Top-1 Acc | Top-5 Acc | time(ms)<br>bs=1 | time(ms)<br>bs=4 | time(ms)<br/>bs=8 | FLOPs(M) | Params(M) | Pretrained Model Download Address                                               | Inference Model Download Address                                      |
+| ---------- | --------- | --------- | ---------------- | ---------------- | -------- | --------- | ------------------------------------------------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ |
+|  MobileViT_XXS    | 0.6867 | 0.8878 | - | - | - | 1849.35  |  5.59   | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/MobileViT_XXS_pretrained.pdparams) | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/MobileViT_XXS_infer.tar) |
+|  MobileViT_XS    | 0.7454 | 0.9227 | - | - | - | 930.75  |  2.33   | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/MobileViT_XS_pretrained.pdparams) | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/MobileViT_XS_infer.tar) |
+|  MobileViT_S    | 0.7814 | 0.9413 | - | - | - | 337.24  |   1.28   | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/MobileViT_S_pretrained.pdparams) | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/MobileViT_S_infer.tar) |
+
+<a name="26"></a>
+
+## 26. Other models
 
 The accuracy and speed indicators of AlexNet <sup>[[18](#ref18)]</sup>, SqueezeNet series <sup>[[19](#ref19)]</sup>, VGG series <sup>[[20](#ref20)]</sup>, DarkNet53 <sup>[[21](#ref21)]</sup> and other models are shown in the following table. For more information, please refer to: [Other model documents](../models/Others_en.md).
 
@@ -637,3 +649,5 @@ TRANSFORMERS FOR IMAGE RECOGNITION AT SCALE.
 <a name="ref40">[40]</a>Xiaoyi Dong, Jianmin Bao, Dongdong Chen, Weiming Zhang, Nenghai Yu, Lu Yuan, Dong Chen, Baining Guo. CSWin Transformer: A General Vision Transformer Backbone with Cross-Shaped Windows.
 
 <a name="ref41">[41]</a>Wenhai Wang, Enze Xie, Xiang Li, Deng-Ping Fan, Kaitao Song, Ding Liang, Tong Lu, Ping Luo, Ling Shao. PVTv2: Improved Baselines with Pyramid Vision Transformer.
+
+<a name="ref42">[42]</a>Sachin Mehta, Mohammad Rastegari. MobileViT: Light-weight, General-purpose, and Mobile-friendly Vision Transformer.
