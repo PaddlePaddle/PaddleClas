@@ -1,3 +1,20 @@
+# copyright (c) 2022 PaddlePaddle Authors. All Rights Reserve.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#    http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+# Code was based on https://github.com/BR-IDL/PaddleViT/blob/develop/image_classification/MobileViT/mobilevit.py
+# and https://github.com/apple/ml-cvnets/blob/main/cvnets/models/classification/mobilevit.py
+
 import paddle
 from paddle import ParamAttr
 import paddle.nn as nn
@@ -459,8 +476,3 @@ def MobileViT_S(pretrained=False, use_ssld=False, **kwargs):
     _load_pretrained(
         pretrained, model, MODEL_URLS["MobileViT_S"], use_ssld=use_ssld)
     return model
-
-
-if __name__ == "__main__":
-    model = MobileViT_XXS()
-    paddle.flops(model, [1, 3, 256, 256])
