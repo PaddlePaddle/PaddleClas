@@ -63,7 +63,7 @@ def set_logger(engine: object, print_cfg: bool=True) -> None:
     engine.output_dir = engine.config.Global.output_dir
     log_file = osp.join(engine.output_dir, engine.config.Arch.name,
                         f"{engine.mode}.log")
-    init_logger(name='root', log_file=log_file)
+    init_logger(log_file=log_file)
     if print_cfg:
         print_config(engine.config)
 
@@ -229,12 +229,14 @@ def set_optimizers(engine: object) -> None:
             optimizer, lr_sch = build_optimizer(
                 engine.config.Optimizer, engine.config.Global.epochs,
                 len(engine.train_dataloader), [engine.models[0]])
+            engine.optimizers.append(optimizer)
+            engine.lr_schs.append(lr_sch)
         elif isinstance(engine.config.Optimizer, list):
             # build multiple optimizers
             for opt_ind, opt_cfg in enumerate(engine.config.Optimizer):
                 assert len(opt_cfg.keys()) == 1, \
                     f"opt_cfg can only has one scope, but got ({opt_cfg.keys()})"
-                opt_scope = opt_cfg.keys()[0]
+                opt_scope = list(opt_cfg.keys())[0]
                 for model_ind, model in enumerate(engine.models):
                     model_name = type(model).__name__
                     if model_name == opt_scope:

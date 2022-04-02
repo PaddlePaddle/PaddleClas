@@ -58,23 +58,18 @@ def train_epoch(engine, epoch_id, print_batch_step):
         if engine.use_amp:
             scaled = engine.scaler.scale(loss_dict["loss"])
             scaled.backward()
-            engine.scaler.minimize(engine.optimizers[0], scaled)
-            if len(engine.optimizers) > 1:
-                for opt in engine.optimizers:
-                    engine.scaler.minimize(opt, scaled)
+            for opt in engine.optimizers:
+                engine.scaler.minimize(opt, scaled)
         else:
             loss_dict["loss"].backward()
-            engine.optimizers.step()
-            engine.optimizers.clear_grad()
-            if len(engine.optimizers) > 0:
-                for opt in engine.optimizers:
-                    opt.step()
-                    opt.clear_grad()
+            for opt in engine.optimizers:
+                opt.step()
+                opt.clear_grad()
 
         # step lr
         for lr_sch in engine.lr_schs:
             if hasattr(lr_sch, 'step'):
-                engine.lr_schs.step()
+                lr_sch.step()
 
         # below code just for logging
         # update metric_for_logger

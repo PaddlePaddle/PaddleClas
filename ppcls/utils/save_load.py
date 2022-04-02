@@ -15,7 +15,6 @@
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
-from ctypes import Union
 
 import errno
 import os
@@ -25,7 +24,6 @@ import paddle
 import paddle.nn as nn
 from ppcls.utils import logger
 from ppcls.utils.dist_utils import main_only
-from ppcls.utils.config import AttrDict
 from paddle.optimizer import Optimizer
 from .download import get_weights_path_from_url
 
@@ -104,7 +102,7 @@ def load_distillation_model(model, pretrained_model):
             pretrained_model))
 
 
-def init_model(config: AttrDict,
+def init_model(config: dict,
                models: nn.LayerList,
                optimizers: List[Optimizer]=None) -> Dict[str, Any]:
     """init model with given model and optimizer's parameters.

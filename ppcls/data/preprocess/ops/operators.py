@@ -268,7 +268,7 @@ class NormalizeImage(object):
         mean = mean if mean is not None else [0.485, 0.456, 0.406]
         std = std if std is not None else [0.229, 0.224, 0.225]
 
-        shape = (3, 1, 1) if self.order == 'chw' else (1, 1, 3)
+        shape = (len(mean), 1, 1) if self.order == 'chw' else (1, 1, len(mean))
         self.mean = np.array(mean).reshape(shape).astype('float32')
         self.std = np.array(std).reshape(shape).astype('float32')
 
