@@ -1,0 +1,139 @@
+# global configs
+Global:
+  checkpoints: null
+  pretrained_model: null
+  output_dir: ./output/
+  device: gpu
+  save_interval: 1
+  eval_during_train: True
+  eval_interval: 1
+  epochs: 300
+  print_batch_step: 10
+  use_visualdl: False
+  # used for static mode and model export
+  image_shape: [3, 256, 256]
+  save_inference_dir: ./inference
+  use_dali: False
+# model architecture
+Arch:
+  name: MobileViT_S
+  class_num: 1000
+ 
+# loss function config for traing/eval process
+Loss:
+  Train:
+    - CELoss:
+        weight: 1.0
+        epsilon: 0.1
+  Eval:
+    - CELoss:
+        weight: 1.0
+
+
+Optimizer:
+  name: AdamW
+  beta1: 0.9
+  beta2: 0.999
+  epsilon: 1e-8
+  weight_decay: 0.01
+  no_weight_decay_name: .bias norm
+  one_dim_param_no_weight_decay: True
+  lr:
+    # for 8 cards
+    name: Cosine
+    learning_rate: 0.002
+    eta_min: 0.0002
+    warmup_epoch: 5
+    warmup_start_lr: 0.0002
+
+
+# data loader for train and eval
+DataLoader:
+  Train:
+    dataset:
+      name: ImageNetDataset
+      image_root: ./dataset/ILSVRC2012/
+      cls_label_path: ./dataset/ILSVRC2012/train_list.txt
+      transform_ops:
+        - DecodeImage:
+            to_rgb: True
+            channel_first: False
+        - RandCropImage:
+            size: 256
+            interpolation: bilinear
+            backend: pil
+        - RandFlipImage:
+            flip_code: 1
+        - NormalizeImage:
+            scale: 1.0/255.0
+            mean: [0.0, 0.0, 0.0]
+            std: [1.0, 1.0, 1.0]
+            order: ''
+
+    sampler:
+      name: DistributedBatchSampler
+      batch_size: 128
+      drop_last: False
+      shuffle: True
+    loader:
+      num_workers: 8
+      use_shared_memory: True
+
+  Eval:
+    dataset: 
+      name: ImageNetDataset
+      image_root: ./dataset/ILSVRC2012/
+      cls_label_path: ./dataset/ILSVRC2012/val_list.txt
+      transform_ops:
+        - DecodeImage:
+            to_rgb: False
+            channel_first: False
+        - ResizeImage:
+            resize_short: 292
+            interpolation: bilinear
+            backend: pil
+        - CropImage:
+            size: 256
+        - NormalizeImage:
+            scale: 1.0/255.0
+            mean: [0.0, 0.0, 0.0]
+            std: [1.0, 1.0, 1.0]
+            order: ''
+    sampler:
+      name: DistributedBatchSampler
+      batch_size: 64
+      drop_last: False
+      shuffle: False
+    loader:
+      num_workers: 4
+      use_shared_memory: True
+
+Infer:
+  infer_imgs: docs/images/inference_deployment/whl_demo.jpg
+  batch_size: 10
+  transforms:
+    - DecodeImage:
+        to_rgb: True
+        channel_first: False
+    - ResizeImage:
+        resize_short: 292
+    - CropImage:
+        size: 256
+    - NormalizeImage:
+        scale: 1.0/255.0
+        mean: [0.0, 0.0, 0.0]
+        std: [1.0, 1.0, 1.0]
+        order: ''
+    - ToCHWImage:
+  PostProcess:
+    name: Topk
+    topk: 5
+    class_id_map_file: ppcls/utils/imagenet1k_label_list.txt
+
+Metric:
+  Train:
+    - TopkAcc:
+        topk: [1, 5]
+  Eval:
+    - TopkAcc:
+        topk: [1, 5]
