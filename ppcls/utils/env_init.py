@@ -1,3 +1,17 @@
+# copyright (c) 2020 PaddlePaddle Authors. All Rights Reserve.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#    http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 import os
 import os.path as osp
 import random
@@ -5,6 +19,7 @@ import random
 import numpy as np
 import paddle
 import paddle.distributed as dist
+import paddle.nn as nn
 from ppcls.arch import build_model
 from ppcls.data import build_dataloader
 from ppcls.loss import build_loss
@@ -14,6 +29,7 @@ from ppcls.utils import logger
 from ppcls.utils.save_load import (load_dygraph_pretrain,
                                    load_dygraph_pretrain_from_url)
 from visualdl import LogWriter
+
 from .config import print_config
 from .logger import init_logger
 
@@ -113,24 +129,43 @@ def set_dataloaders(engine: object) -> None:
                     engine.use_dali)
 
 
-def set_model(engine: object) -> None:
+def set_losses(engine: object) -> None:
+    """Set the losses used at runtime.
+    """
+    if engine.mode == "train":
+        loss_info = engine.config.Loss.Train
+        engine.train_loss_func = build_loss(loss_info)
+    if engine.mode == "eval" or (engine.mode == "train" and
+                                 engine.config.Global.eval_during_train):
+        loss_config = engine.config.get("Loss", None)
+        if loss_config is not None:
+            loss_config = loss_config.get("Eval")
+            if loss_config is not None:
+                engine.eval_loss_func = build_loss(loss_config)
+            else:
+                engine.eval_loss_func = None
+        else:
+            engine.eval_loss_func = None
+
+
+def set_models(engine: object) -> None:
     """Set up the model.
 
     Args:
         engine (object): Engine object.
     """
-    engine.model = build_model(engine.config)
-    engine.extra_model = []
+    engine.models = nn.LayerList()
+    engine.models.append(build_model(engine.config))
     if engine.mode == "train" and hasattr(engine, 'train_loss_func'):
         for loss_func in engine.train_loss_func.loss_func:
             # for components with independent parameters
             if len(loss_func.parameters()) > 0:
-                engine.extra_model.append(loss_func)
+                engine.models.append(loss_func)
     elif engine.mode == "eval" and hasattr(engine, 'eval_loss_func'):
         for loss_func in engine.eval_loss_func.loss_func:
             # for components with independent parameters
             if len(loss_func.parameters()) > 0:
-                engine.extra_model.append(loss_func)
+                engine.models.append(loss_func)
 
 
 def load_pretrain(engine: object) -> None:
@@ -140,12 +175,11 @@ def load_pretrain(engine: object) -> None:
         engine (object): Engine object.
     """
     if engine.config.Global.pretrained_model.startswith("http"):
-        load_dygraph_pretrain_from_url(engine.model,
+        load_dygraph_pretrain_from_url(engine.models,
                                        engine.config.Global.pretrained_model)
     else:
-        load_dygraph_pretrain(engine.model,
-                              engine.config.Global.pretrained_model,
-                              engine.extra_model)
+        load_dygraph_pretrain(engine.models,
+                              engine.config.Global.pretrained_model)
 
 
 def set_amp(engine: object) -> None:
@@ -177,72 +211,39 @@ def set_amp(engine: object) -> None:
             logger.warning(msg)
             engine.config.AMP.level = "O1"
             amp_level = "O1"
-        engine.model, engine.optimizer = paddle.amp.decorate(
-            models=engine.model,
-            optimizers=engine.optimizer,
+        engine.models, engine.optimizers = paddle.amp.decorate(
+            models=engine.models,
+            optimizers=engine.optimizers,
             level=amp_level,
             save_dtype='float32')
-        for i in range(len(engine.extra_model)):
-            engine.extra_model[i], engine.extra_optimizer[
-                i] = paddle.amp.decorate(
-                    models=engine.extra_model[i],
-                    optimizers=engine.extra_optimizer[i],
-                    level=amp_level,
-                    save_dtype='float32')
-
-
-def set_losses(engine: object) -> None:
-    """Set the losses used at runtime.
-    """
-    if engine.mode == "train":
-        loss_info = engine.config.Loss.Train
-        engine.train_loss_func = build_loss(loss_info)
-    if engine.mode == "eval" or (engine.mode == "train" and
-                                 engine.config.Global.eval_during_train):
-        loss_config = engine.config.get("Loss", None)
-        if loss_config is not None:
-            loss_config = loss_config.get("Eval")
-            if loss_config is not None:
-                engine.eval_loss_func = build_loss(loss_config)
-            else:
-                engine.eval_loss_func = None
-        else:
-            engine.eval_loss_func = None
 
 
 def set_optimizers(engine: object) -> None:
-    """set optimizers
+    """set optimizer(s)
     """
-    engine.extra_optimizer = []
-    engine.extra_lr_sch = []
+    engine.optimizers = []
+    engine.lr_schs = []
     if engine.mode == 'train':
         if isinstance(engine.config.Optimizer, dict):
-            # build main optimizer
-            engine.optimizer, engine.lr_sch = build_optimizer(
+            # build single optimizer
+            optimizer, lr_sch = build_optimizer(
                 engine.config.Optimizer, engine.config.Global.epochs,
-                len(engine.train_dataloader), [engine.model])
+                len(engine.train_dataloader), [engine.models[0]])
         elif isinstance(engine.config.Optimizer, list):
-            # build main optimizer
-            model_name = type(engine.model).__name__
-            engine.optimizer, engine.lr_sch = build_optimizer(
-                engine.config.Optimizer[0].get(model_name),
-                engine.config.Global.epochs,
-                len(engine.train_dataloader), [engine.model])
-            # build extra optimizer(s)
-            for optim_cfg in engine.config.Optimizer[1:]:
-                # parse each optimizer config item
-                for model in engine.extra_model:
-                    assert len(optim_cfg.keys()) == 1, \
-                        f"A model can only correspond to one optimizer configuration" \
-                        f"but got multiple model names({optim_cfg.keys()})"
-                    # Build an optimizer to manage a model
-                    extra_model_name = type(model).__name__
-                    optimizer, lr_sch = build_optimizer(
-                        optim_cfg.get(extra_model_name),
-                        engine.config.Global.epochs,
-                        len(engine.train_dataloader), [model])
-                    engine.extra_optimizer.append(optimizer)
-                    engine.extra_lr_sch.append(lr_sch)
+            # build multiple optimizers
+            for opt_ind, opt_cfg in enumerate(engine.config.Optimizer):
+                assert len(opt_cfg.keys()) == 1, \
+                    f"opt_cfg can only has one scope, but got ({opt_cfg.keys()})"
+                opt_scope = opt_cfg.keys()[0]
+                for model_ind, model in enumerate(engine.models):
+                    model_name = type(model).__name__
+                    if model_name == opt_scope:
+                        optimizer, lr_sch = build_optimizer(
+                            opt_cfg.get(opt_scope),
+                            engine.config.Global.epochs,
+                            len(engine.train_dataloader), [model])
+                        engine.optimizers.append(optimizer)
+                        engine.lr_schs.append(lr_sch)
         else:
             raise NotImplementedError(
                 f"Optimizer config must be a single dict or list of dict, but got {type(engine.config.Optimizer)}"
@@ -299,9 +300,7 @@ def set_distributed(engine: object):
     engine.config.Global.distributed = world_size != 1
     if engine.config.Global.distributed:
         dist.init_parallel_env()
-        engine.model = paddle.DataParallel(engine.model)
-        for i in range(len(engine.extra_model)):
-            engine.extra_model[i] = paddle.DataParallel(engine.extra_model[i])
+        engine.models = paddle.DataParallel(engine.models)
 
     if world_size != 4 and engine.mode == "train":
         msg = f"The training strategy in config files provided by PaddleClas is based on 4 gpus. But the number of gpus is {world_size} in current training. Please modify the stategy (learning rate, batch size and so on) if use config files in PaddleClas to train."

@@ -71,7 +71,7 @@ def classification_eval(engine, epoch_id=0):
                         "flatten_contiguous_range", "greater_than"
                     },
                     level=amp_level):
-                out = engine.model(batch[0])
+                out = engine.models[0](batch[0])
                 if visualize:
                     all_features.append(out['features'].numpy())
                     all_labels.append(batch[1].numpy())
@@ -84,7 +84,7 @@ def classification_eval(engine, epoch_id=0):
                         output_info[key].update(loss_dict[key].numpy()[0],
                                                 batch_size)
         else:
-            out = engine.model(batch[0])
+            out = engine.models[0](batch[0])
             if visualize:
                 all_features.append(out['features'].numpy())
                 all_labels.append(batch[1].numpy())

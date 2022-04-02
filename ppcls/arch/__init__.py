@@ -47,15 +47,12 @@ def build_model(config):
 
 
 def apply_to_static(config: AttrDict,
-                    model: nn.Layer,
-                    extra_model: List[nn.Layer]) -> None:
+                    models: Union[nn.Layer, nn.LayerList]) -> None:
     specs = None
     if 'image_shape' in config.Global:
         specs = [InputSpec([None] + config.Global.image_shape)]
 
-    model = to_static(model, input_spec=specs)
-    for i in range(0, len(extra_model)):
-        extra_model[i] = to_static(extra_model[i], input_spec=None)
+    models = to_static(models, input_spec=specs)
 
     logger.info("Successfully to apply @to_static with specs: {}".format(
         specs))

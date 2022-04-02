@@ -12,9 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
+from __future__ import absolute_import, division, print_function
 
 import errno
 import os
@@ -23,8 +21,8 @@ import shutil
 import tempfile
 
 import paddle
-
 from ppcls.utils import logger
+from ppcls.utils.dist_utils import main_only
 
 __all__ = ['init_model', 'save_model']
 
@@ -126,12 +124,11 @@ def init_model(config, program, exe):
         logger.info("Finish initing model from {}".format(pretrained_model))
 
 
+@main_only
 def save_model(program, model_path, epoch_id, prefix='ppcls'):
     """
     save model to the target path
     """
-    if paddle.distributed.get_rank() != 0:
-        return
     model_path = os.path.join(model_path, str(epoch_id))
     _mkdir_if_not_exist(model_path)
     model_prefix = os.path.join(model_path, prefix)

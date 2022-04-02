@@ -40,7 +40,7 @@ from ppcls.engine.train import train_epoch
 from ppcls.engine import evaluation
 from ppcls.arch.head.identity_head import IdentityHead
 from ppcls.utils import (set_logger, set_seed, set_visualDL, set_device,
-                         set_dataloaders, set_model, load_pretrain, set_amp,
+                         set_dataloaders, set_models, load_pretrain, set_amp,
                          set_losses, set_optimizers, set_metrics,
                          set_distributed)
 
@@ -85,12 +85,12 @@ class Engine(object):
 
         ## 4 build model(s)
         # 4.1 initialize model(s)
-        set_model(self)
+        set_models(self)
 
         # 4.2 convert dynamic model(s) to static model(s), if specified
         if config.Global.get('to_static', False) is True:
             # set @to_static for benchmark, skip this by default.
-            apply_to_static(self.config, self.model, self.extra_model)
+            apply_to_static(self.config, self.models)
 
         # 4.3 load_pretrain
         if self.config.Global.pretrained_model is not None:
@@ -136,9 +136,8 @@ class Engine(object):
         self.global_step = 0
 
         if self.config.Global.checkpoints is not None:
-            metric_info = init_model(self.config.Global, self.model,
-                                     self.optimizer, self.extra_model,
-                                     self.extra_optimizer)
+            metric_info = init_model(self.config.Global, self.models,
+                                     self.optimizers)
             if metric_info is not None:
                 best_metric.update(metric_info)
 
@@ -160,18 +159,16 @@ class Engine(object):
                 epoch_id, self.config.Global.epochs, metric_msg))
             self.output_info.clear()
 
-            current_acc = 0.0
+            current_metric = 0.0
             # eval model and save model if possible
             if self.config.Global.eval_during_train and epoch_id % self.config.Global.eval_interval == 0:
-                current_acc = self.eval(epoch_id)
-                if current_acc > best_metric["metric"]:
-                    best_metric["metric"] = current_acc
+                current_metric = self.eval(epoch_id)
+                if current_metric > best_metric["metric"]:
+                    best_metric["metric"] = current_metric
                     best_metric["epoch"] = epoch_id
                     save_load.save_model(
-                        self.model,
-                        self.extra_model,
-                        self.optimizer,
-                        self.extra_optimizer,
+                        self.models,
+                        self.optimizers,
                         best_metric,
                         self.output_dir,
                         model_name=self.config.Arch.name,
@@ -180,18 +177,16 @@ class Engine(object):
                     epoch_id, best_metric["metric"]))
                 logger.scaler(
                     name="eval_acc",
-                    value=current_acc,
+                    value=current_metric,
                     step=epoch_id,
                     writer=self.vdl_writer)
 
             # save model every save_interval epoch
             if epoch_id % save_interval == 0:
                 save_load.save_model(
-                    self.model,
-                    self.extra_model,
-                    self.optimizer,
-                    self.extra_optimizer,
-                    {"metric": current_acc,
+                    self.models,
+                    self.optimizers,
+                    {"metric": current_metric,
                      "epoch": epoch_id},
                     self.output_dir,
                     model_name=self.config.Arch.name,
@@ -199,11 +194,9 @@ class Engine(object):
 
             # save the latest model
             save_load.save_model(
-                self.model,
-                self.extra_model,
-                self.optimizer,
-                self.extra_optimizer,
-                {"metric": current_acc,
+                self.models,
+                self.optimizers,
+                {"metric": current_metric,
                  "epoch": epoch_id},
                 self.output_dir,
                 model_name=self.config.Arch.name,
@@ -215,9 +208,9 @@ class Engine(object):
     @paddle.no_grad()
     def eval(self, epoch_id=0):
         assert self.mode in ["train", "eval"]
-        self.model.eval()
+        self.models.eval()
         eval_result = self.eval_func(self, epoch_id)
-        self.model.train()
+        self.models.train()
         return eval_result
 
     @paddle.no_grad()
@@ -230,7 +223,7 @@ class Engine(object):
         image_list = image_list[local_rank::total_trainer]
 
         batch_size = self.config["Infer"]["batch_size"]
-        self.model.eval()
+        self.models.eval()
         batch_data = []
         image_file_list = []
         for idx, image_file in enumerate(image_list):
@@ -242,7 +235,7 @@ class Engine(object):
             image_file_list.append(image_file)
             if len(batch_data) >= batch_size or idx == len(image_list) - 1:
                 batch_tensor = paddle.to_tensor(batch_data)
-                out = self.model(batch_tensor)
+                out = self.models(batch_tensor)
                 if isinstance(out, list):
                     out = out[0]
                 if isinstance(out, dict) and "logits" in out:
@@ -257,7 +250,7 @@ class Engine(object):
     def export(self):
         assert self.mode == "export"
         use_multilabel = self.config.Global.get("use_multilabel", False)
-        model = ExportModel(self.config.Arch, self.model, use_multilabel)
+        model = ExportModel(self.config.Arch, self.models, use_multilabel)
         if self.config.Global.pretrained_model is not None:
             load_dygraph_pretrain(model.base_model,
                                   self.config.Global.pretrained_model)

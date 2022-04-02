@@ -54,24 +54,27 @@ def train_epoch(engine, epoch_id, print_batch_step):
             out = forward(engine, batch)
             loss_dict = engine.train_loss_func(out, batch[1])
 
-        # step opt and lr
+        # step opt
         if engine.use_amp:
             scaled = engine.scaler.scale(loss_dict["loss"])
             scaled.backward()
-            engine.scaler.minimize(engine.optimizer, scaled)
-            if len(engine.extra_optimizer) > 0:
-                for opt in engine.extra_optimizer:
+            engine.scaler.minimize(engine.optimizers[0], scaled)
+            if len(engine.optimizers) > 1:
+                for opt in engine.optimizers:
                     engine.scaler.minimize(opt, scaled)
         else:
             loss_dict["loss"].backward()
-            engine.optimizer.step()
-            engine.optimizer.clear_grad()
-            if len(engine.extra_optimizer) > 0:
-                for opt in engine.extra_optimizer:
+            engine.optimizers.step()
+            engine.optimizers.clear_grad()
+            if len(engine.optimizers) > 0:
+                for opt in engine.optimizers:
                     opt.step()
                     opt.clear_grad()
 
-        engine.lr_sch.step()
+        # step lr
+        for lr_sch in engine.lr_schs:
+            if hasattr(lr_sch, 'step'):
+                engine.lr_schs.step()
 
         # below code just for logging
         # update metric_for_logger
@@ -86,6 +89,6 @@ def train_epoch(engine, epoch_id, print_batch_step):
 
 def forward(engine, batch):
     if not engine.is_rec:
-        return engine.model(batch[0])
+        return engine.models[0](batch[0])
     else:
-        return engine.model(batch[0], batch[1])
+        return engine.models[0](batch[0], batch[1])

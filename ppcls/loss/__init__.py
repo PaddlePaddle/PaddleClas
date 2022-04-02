@@ -1,7 +1,9 @@
 import copy
+from typing import Dict
 
 import paddle
 import paddle.nn as nn
+from paddle import Tensor
 from ppcls.utils import logger
 from ppcls.utils.config import AttrDict
 from .celoss import CELoss, MixCELoss
@@ -34,7 +36,7 @@ from .deephashloss import DCHLoss
 class CombinedLoss(nn.Layer):
     def __init__(self, config_list):
         super().__init__()
-        self.loss_func = []
+        self.loss_func = nn.LayerList()
         self.loss_weight = []
         assert isinstance(config_list, list), (
             'operator config should be a list')
@@ -48,7 +50,17 @@ class CombinedLoss(nn.Layer):
             self.loss_weight.append(param.pop("weight"))
             self.loss_func.append(eval(name)(**param))
 
-    def __call__(self, input, batch):
+    def __call__(self, input: Dict[str, Tensor],
+                 batch: Tensor) -> Dict[str, Tensor]:
+        """compute 
+
+        Args:
+            input (Dict[str, Tensor]): input data.
+            batch (Tensor): label related data.
+
+        Returns:
+            Dict[str, Tensor]: loss dict.
+        """
         loss_dict = {}
         # just for accelerate classification traing speed
         if len(self.loss_func) == 1:
