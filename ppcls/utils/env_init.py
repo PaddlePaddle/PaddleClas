@@ -230,7 +230,7 @@ def set_optimizers(engine: object) -> None:
                 engine.config.Optimizer, engine.config.Global.epochs,
                 len(engine.train_dataloader), [
                     engine.models._layers[0]
-                    if isinstance(engine.models, nn.Parallel) else
+                    if isinstance(engine.models, paddle.DataParallel) else
                     engine.models[0]
                 ])
             engine.optimizers.append(optimizer)
