@@ -96,16 +96,16 @@ class Engine(object):
         if self.config.Global.pretrained_model is not None:
             load_pretrain(self)
 
-        # 4.3 distributed
-        set_distributed(self)
-
         ## 5 optimizers
         set_optimizers(self)
 
         ## 6 amp configurations
         set_amp(self)
 
-        ## 7 metric(s)
+        ## 7 distributed
+        set_distributed(self)
+
+        ## 8 metric(s)
         set_metrics(self)
 
         # build postprocess for infer

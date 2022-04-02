@@ -228,7 +228,11 @@ def set_optimizers(engine: object) -> None:
             # build single optimizer
             optimizer, lr_sch = build_optimizer(
                 engine.config.Optimizer, engine.config.Global.epochs,
-                len(engine.train_dataloader), [engine.models[0]])
+                len(engine.train_dataloader), [
+                    engine.models._layers[0]
+                    if isinstance(engine.models, nn.Parallel) else
+                    engine.models[0]
+                ])
             engine.optimizers.append(optimizer)
             engine.lr_schs.append(lr_sch)
         elif isinstance(engine.config.Optimizer, list):
