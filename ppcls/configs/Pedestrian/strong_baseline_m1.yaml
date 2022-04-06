@@ -4,7 +4,7 @@ Global:
   pretrained_model: null
   output_dir: "./output/"
   device: "gpu"
-  save_interval: 1
+  save_interval: 10
   eval_during_train: True
   eval_interval: 10
   epochs: 120

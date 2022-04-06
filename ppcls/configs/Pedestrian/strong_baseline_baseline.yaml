@@ -4,7 +4,7 @@ Global:
   pretrained_model: null
   output_dir: "./output/"
   device: "gpu"
-  save_interval: 1
+  save_interval: 10
   eval_during_train: True
   eval_interval: 10
   epochs: 120
@@ -85,9 +85,9 @@ DataLoader:
               r1: 0.3
               mean: [0.4914, 0.4822, 0.4465]
     sampler:
-        name: PKSampler
+        name: DistributedRandomIdentitySampler
         batch_size: 64
-        sample_per_id: 4
+        num_instances: 4
         drop_last: True
         shuffle: True
     loader:
