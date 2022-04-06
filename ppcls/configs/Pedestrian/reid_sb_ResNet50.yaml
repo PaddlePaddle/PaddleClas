@@ -23,6 +23,7 @@ Arch:
   Backbone:
     name: "ResNet50"
     pretrained: True
+    stem_act: null
   BackboneStopLayer:
     name: "flatten"
   Head:
@@ -68,13 +69,13 @@ DataLoader:
               to_rgb: True
               channel_first: False
           - ResizeImage:
-              size: [256, 128]
+              size: [128, 256]
           - RandFlipImage:
               flip_code: 1
           - Pad:
               padding: 10
           - RandCropImage:
-              size: [256, 128]
+              size: [128, 256]
           - NormalizeImage:
               scale: 0.00392157
               mean: [0.485, 0.456, 0.406]
@@ -88,7 +89,7 @@ DataLoader:
               mean: [0.4914, 0.4822, 0.4465]
     sampler:
         name: PKSampler
-        batch_size: 128
+        batch_size: 64
         sample_per_id: 4
         drop_last: True
         shuffle: True
@@ -106,7 +107,7 @@ DataLoader:
               to_rgb: True
               channel_first: False
           - ResizeImage:
-              size: [256, 128]
+              size: [128, 256]
           - NormalizeImage:
               scale: 0.00392157
               mean: [0.485, 0.456, 0.406]
@@ -114,7 +115,7 @@ DataLoader:
               order: ''
       sampler:
         name: DistributedBatchSampler
-        batch_size: 64
+        batch_size: 128
         drop_last: False
         shuffle: False
       loader:
@@ -131,7 +132,7 @@ DataLoader:
               to_rgb: True
               channel_first: False
           - ResizeImage:
-              size: [256, 128]
+              size: [128, 256]
           - NormalizeImage:
               scale: 0.00392157
               mean: [0.485, 0.456, 0.406]
@@ -139,7 +140,7 @@ DataLoader:
               order: ''
       sampler:
         name: DistributedBatchSampler
-        batch_size: 64
+        batch_size: 128
         drop_last: False
         shuffle: False
       loader:

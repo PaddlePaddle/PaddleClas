@@ -280,6 +280,7 @@ class ResNet(TheseusLayer):
                  lr_mult_list=[1.0, 1.0, 1.0, 1.0, 1.0],
                  data_format="NCHW",
                  input_image_channel=3,
+                 stem_act="relu",
                  return_patterns=None,
                  return_stages=None):
         super().__init__()
@@ -315,7 +316,7 @@ class ResNet(TheseusLayer):
                 num_filters=out_c,
                 filter_size=k,
                 stride=s,
-                act="relu",
+                act=stem_act,
                 lr_mult=self.lr_mult_list[0],
                 data_format=data_format)
             for in_c, out_c, k, s in self.stem_cfg[version]
