@@ -6,7 +6,7 @@ Global:
   device: "gpu"
   save_interval: 1
   eval_during_train: True
-  eval_interval: 1
+  eval_interval: 10
   epochs: 120
   print_batch_step: 10
   use_visualdl: False
@@ -29,7 +29,7 @@ Arch:
   Head:
     name: "FC"
     embedding_size: 2048
-    class_num: 1501
+    class_num: 751
 
 # loss function config for traing/eval process
 Loss:
