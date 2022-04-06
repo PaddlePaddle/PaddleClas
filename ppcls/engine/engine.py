@@ -283,9 +283,9 @@ class ExportModel(TheseusLayer):
     ExportModel: add softmax onto the model
     """
 
-    def __init__(self, config, model, use_multilabel):
+    def __init__(self, config, models, use_multilabel):
         super().__init__()
-        self.base_model = model
+        self.base_model = models[0]
         # we should choose a final model to export
         if isinstance(self.base_model, DistillationModel):
             self.infer_model_name = config["infer_model_name"]

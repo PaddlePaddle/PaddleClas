@@ -306,7 +306,8 @@ def set_distributed(engine: object):
     engine.config.Global.distributed = world_size != 1
     if engine.config.Global.distributed:
         dist.init_parallel_env()
-        engine.models = paddle.DataParallel(engine.models)
+        for i in range(len(engine.models)):
+            engine.models[i] = paddle.DataParallel(engine.models[i])
 
     if world_size != 4 and engine.mode == "train":
         msg = f"The training strategy in config files provided by PaddleClas is based on 4 gpus. But the number of gpus is {world_size} in current training. Please modify the stategy (learning rate, batch size and so on) if use config files in PaddleClas to train."
