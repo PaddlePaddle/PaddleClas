@@ -230,7 +230,7 @@ class Engine(object):
             image_file_list.append(image_file)
             if len(batch_data) >= batch_size or idx == len(image_list) - 1:
                 batch_tensor = paddle.to_tensor(batch_data)
-                out = self.models(batch_tensor)
+                out = self.models[0](batch_tensor)
                 if isinstance(out, list):
                     out = out[0]
                 if isinstance(out, dict) and "logits" in out:
