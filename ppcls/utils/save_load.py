@@ -18,18 +18,19 @@ from __future__ import print_function
 
 import errno
 import os
-import re
-import shutil
-import tempfile
+from typing import Any, Dict, List
 
 import paddle
+import paddle.nn as nn
+from paddle.optimizer import Optimizer
 from ppcls.utils import logger
+
 from .download import get_weights_path_from_url
 
 __all__ = ['init_model', 'save_model', 'load_dygraph_pretrain']
 
 
-def _mkdir_if_not_exist(path):
+def _mkdir_if_not_exist(path: str) -> None:
     """
     mkdir if not exists, ignore the exception when multiprocess mkdir together
     """
@@ -45,22 +46,38 @@ def _mkdir_if_not_exist(path):
                 raise OSError('Failed to mkdir {}'.format(path))
 
 
-def load_dygraph_pretrain(model, path=None):
+def load_dygraph_pretrain(models: nn.LayerList, path: str=None) -> None:
+    """load pretrained parameters file to models
+
+    Args:
+        models (nn.LayerList): models which pretrained parameters loaded to.
+        path (str, optional): pretrained parameters file path. Defaults to None.
+
+    """
     if not (os.path.isdir(path) or os.path.exists(path + '.pdparams')):
         raise ValueError("Model pretrain path {} does not "
                          "exists.".format(path))
     param_state_dict = paddle.load(path + ".pdparams")
-    model.set_dict(param_state_dict)
+    models.set_dict(param_state_dict)
     return
 
 
-def load_dygraph_pretrain_from_url(model, pretrained_url, use_ssld=False):
+def load_dygraph_pretrain_from_url(models: nn.LayerList,
+                                   pretrained_url: str,
+                                   use_ssld: bool=False) -> None:
+    """load pretrained parameters from online url to models
+
+    Args:
+        models (nn.LayerList): models which pretrained parameters loaded to.
+        pretrained_url (str): pretrained weight's url.
+        use_ssld (bool, optional): if download ssld parameters. Defaults to False.
+    """
     if use_ssld:
         pretrained_url = pretrained_url.replace("_pretrained",
                                                 "_ssld_pretrained")
     local_weight_path = get_weights_path_from_url(pretrained_url).replace(
         ".pdparams", "")
-    load_dygraph_pretrain(model, path=local_weight_path)
+    load_dygraph_pretrain(models, path=local_weight_path)
     return
 
 
@@ -85,21 +102,32 @@ def load_distillation_model(model, pretrained_model):
             pretrained_model))
 
 
-def init_model(config, net, optimizer=None):
-    """
-    load model from checkpoint or pretrained_model
+def init_model(config: dict,
+               models: nn.LayerList,
+               optimizers: List[Optimizer]=None) -> Dict[str, Any]:
+    """init model with given model and optimizer's parameters.
+
+    Args:
+        config (AttrDict): config dict.
+        models (nn.LayerList): models
+        optimizers (List[Optimizer], optional): optimizers. Defaults to None.
+
     """
     checkpoints = config.get('checkpoints')
-    if checkpoints and optimizer is not None:
+    if checkpoints and optimizers is not None:
         assert os.path.exists(checkpoints + ".pdparams"), \
             "Given dir {}.pdparams not exist.".format(checkpoints)
         assert os.path.exists(checkpoints + ".pdopt"), \
             "Given dir {}.pdopt not exist.".format(checkpoints)
         para_dict = paddle.load(checkpoints + ".pdparams")
-        opti_dict = paddle.load(checkpoints + ".pdopt")
+        opt_dict = paddle.load(checkpoints + ".pdopt")
         metric_dict = paddle.load(checkpoints + ".pdstates")
-        net.set_dict(para_dict)
-        optimizer.set_state_dict(opti_dict)
+        models.set_dict(para_dict)
+        if isinstance(opt_dict, list):
+            for opt_ind, sub_opt_dict in enumerate(opt_dict):
+                optimizers[opt_ind].set_state_dict(sub_opt_dict)
+        else:
+            optimizers.set_state_dict(opt_dict)
         logger.info("Finish load checkpoints from {}".format(checkpoints))
         return metric_dict
 
@@ -107,16 +135,16 @@ def init_model(config, net, optimizer=None):
     use_distillation = config.get('use_distillation', False)
     if pretrained_model:
         if use_distillation:
-            load_distillation_model(net, pretrained_model)
+            load_distillation_model(models, pretrained_model)
         else:  # common load
-            load_dygraph_pretrain(net, path=pretrained_model)
+            load_dygraph_pretrain(models, path=pretrained_model)
             logger.info(
                 logger.coloring("Finish load pretrained model from {}".format(
                     pretrained_model), "HEADER"))
 
 
-def save_model(net,
-               optimizer,
+def save_model(nets,
+               optimizers,
                metric_info,
                model_path,
                model_name="",
@@ -124,13 +152,12 @@ def save_model(net,
     """
     save model to the target path
     """
-    if paddle.distributed.get_rank() != 0:
-        return
     model_path = os.path.join(model_path, model_name)
     _mkdir_if_not_exist(model_path)
     model_path = os.path.join(model_path, prefix)
+    paddle.save(nets.state_dict(), model_path + ".pdparams")
+    paddle.save([opt.state_dict() for opt in optimizers],
+                model_path + ".pdopt")
 
-    paddle.save(net.state_dict(), model_path + ".pdparams")
-    paddle.save(optimizer.state_dict(), model_path + ".pdopt")
     paddle.save(metric_info, model_path + ".pdstates")
     logger.info("Already save model in {}".format(model_path))

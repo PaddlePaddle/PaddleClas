@@ -58,14 +58,14 @@ def classification_eval(engine, epoch_id=0):
             batch[1] = batch[1].reshape([-1, 1]).astype("int64")
 
         # image input
-        if engine.amp and engine.config["AMP"].get("use_fp16_test", False):
+        if engine.use_amp and engine.config["AMP"].get("use_fp16_test", False):
             amp_level = engine.config['AMP'].get("level", "O1").upper()
             with paddle.amp.auto_cast(
                     custom_black_list={
                         "flatten_contiguous_range", "greater_than"
                     },
                     level=amp_level):
-                out = engine.model(batch[0])
+                out = engine.models[0](batch[0])
                 # calc loss
                 if engine.eval_loss_func is not None:
                     loss_dict = engine.eval_loss_func(out, batch[1])
@@ -75,7 +75,7 @@ def classification_eval(engine, epoch_id=0):
                         output_info[key].update(loss_dict[key].numpy()[0],
                                                 batch_size)
         else:
-            out = engine.model(batch[0])
+            out = engine.models[0](batch[0])
             # calc loss
             if engine.eval_loss_func is not None:
                 loss_dict = engine.eval_loss_func(out, batch[1])
