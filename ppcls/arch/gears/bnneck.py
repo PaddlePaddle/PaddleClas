@@ -1,4 +1,7 @@
-class BNNeck(nn.Layer):
+import paddle
+
+
+class BNNeck(paddle.nn.Layer):
     def __init__(self, num_filters, trainable=False):
         super(BNNeck, self).__init__()
         self.num_filters = num_filters
