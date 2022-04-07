@@ -29,7 +29,7 @@ Arch:
   Neck:
     name: BNNeck
     num_filters: 2048
-    trainale: false
+    trainable: false
   Head:
     name: "FC"
     embedding_size: 2048
