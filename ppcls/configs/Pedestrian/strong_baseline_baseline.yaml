@@ -36,6 +36,7 @@ Loss:
   Train:
     - CELoss:
         weight: 1.0
+        epsilon: 0.1
     - TripletLossV2:
         weight: 1.0
         margin: 0.3
@@ -48,8 +49,10 @@ Optimizer:
   name: Adam
   lr:
     name: Piecewise
-    decay_epochs: [40, 70]
+    decay_epochs: [30, 60]
     values: [0.00035, 0.000035, 0.0000035]
+    warmup_epoch: 10
+    warmup_start_lr: 0.0000035
   regularizer:
     name: 'L2'
     coeff: 0.0005
@@ -73,17 +76,13 @@ DataLoader:
               padding: 10
           - RandCropImage:
               size: [128, 256]
+              scale: [0.8022, 0.8022]
+              ratio: [0.5, 0.5]
           - NormalizeImage:
               scale: 0.00392157
               mean: [0.485, 0.456, 0.406]
               std: [0.229, 0.224, 0.225]
               order: ''
-          - RandomErasing:
-              EPSILON: 0.5
-              sl: 0.02
-              sh: 0.4
-              r1: 0.3
-              mean: [0.4914, 0.4822, 0.4465]
     sampler:
         name: DistributedRandomIdentitySampler
         batch_size: 64

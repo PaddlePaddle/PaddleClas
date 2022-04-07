@@ -18,13 +18,14 @@ from .circlemargin import CircleMargin
 from .fc import FC
 from .vehicle_neck import VehicleNeck
 from paddle.nn import Tanh
+from .bnneck import BNNeck
 
 __all__ = ['build_gear']
 
 
 def build_gear(config):
     support_dict = [
-        'ArcMargin', 'CosMargin', 'CircleMargin', 'FC', 'VehicleNeck', 'Tanh'
+        'ArcMargin', 'CosMargin', 'CircleMargin', 'FC', 'VehicleNeck', 'Tanh', "BNNeck"
     ]
     module_name = config.pop('name')
     assert module_name in support_dict, Exception(

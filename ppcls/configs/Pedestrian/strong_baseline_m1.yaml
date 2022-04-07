@@ -21,11 +21,15 @@ Arch:
   infer_output_key: "features"
   infer_add_softmax: False
   Backbone:
-    name: "ResNet50"
+    name: "ResNet50_last_stage_stride1"
     pretrained: True
     stem_act: null
   BackboneStopLayer:
     name: "flatten"
+  Neck:
+    name: BNNeck
+    num_filters: 2048
+    trainale: false
   Head:
     name: "FC"
     embedding_size: 2048
@@ -76,6 +80,8 @@ DataLoader:
               padding: 10
           - RandCropImage:
               size: [128, 256]
+              scale: [ 0.8022, 0.8022 ]
+              ratio: [ 0.5, 0.5 ]
           - NormalizeImage:
               scale: 0.00392157
               mean: [0.485, 0.456, 0.406]
@@ -88,9 +94,9 @@ DataLoader:
               r1: 0.3
               mean: [0.4914, 0.4822, 0.4465]
     sampler:
-        name: PKSampler
+        name: DistributedRandomIdentitySampler
         batch_size: 64
-        sample_per_id: 4
+        num_instances: 4
         drop_last: True
         shuffle: True
     loader:
