@@ -26,10 +26,10 @@ Arch:
     stem_act: null
   BackboneStopLayer:
     name: "flatten"
-  Neck:
-    name: BNNeck
-    num_filters: 2048
-    trainable: false
+  #Neck:
+  #  name: BNNeck
+  #  num_filters: 2048
+  #  trainable: false
   Head:
     name: "FC"
     embedding_size: 2048

@@ -6,7 +6,7 @@ class BNNeck(paddle.nn.Layer):
         super(BNNeck, self).__init__()
         self.num_filters = num_filters
 
-        self.bn = paddle.nn.BatchNorm(
+        self.bn = paddle.nn.BatchNorm1D(
             self.num_filters)
         if not trainable:
             self.bn.weight.trainable = False
