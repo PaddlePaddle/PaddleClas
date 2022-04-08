@@ -27,3 +27,4 @@
    Mobile.md
    MixNet.md
    Twins.md
+   MixFormer.md

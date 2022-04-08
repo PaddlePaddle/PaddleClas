@@ -28,3 +28,4 @@ models
    MixNet_en.md
    Twins_en.md
    PVTV2_en.md
+   MixFormer_en.md
