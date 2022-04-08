@@ -24,7 +24,7 @@ class TripletLossV2(nn.Layer):
             inputs: feature matrix with shape (batch_size, feat_dim)
             target: ground truth labels with shape (num_classes)
         """
-        inputs = input["features"]
+        inputs = input["backbone"]
 
         if self.normalize_feature:
             inputs = 1. * inputs / (paddle.expand_as(

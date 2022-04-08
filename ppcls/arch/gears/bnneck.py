@@ -8,8 +8,8 @@ class BNNeck(paddle.nn.Layer):
 
         self.bn = paddle.nn.BatchNorm1D(
             self.num_filters)
-        if not trainable:
-            self.bn.bias.trainable = False
+        # if not trainable:
+        #     self.bn.bias.trainable = False
 
     def forward(self, input, label=None):
         out = self.bn(input)

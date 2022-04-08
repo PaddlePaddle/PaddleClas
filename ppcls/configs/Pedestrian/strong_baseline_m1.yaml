@@ -26,14 +26,14 @@ Arch:
     stem_act: null
   BackboneStopLayer:
     name: "flatten"
-  #Neck:
-  #  name: BNNeck
-  #  num_filters: 2048
-  #  trainable: false
+  Neck:
+    name: BNNeck
+    num_filters: 2048
   Head:
     name: "FC"
     embedding_size: 2048
     class_num: 751
+    bias_attr: false
 
 # loss function config for traing/eval process
 Loss:
