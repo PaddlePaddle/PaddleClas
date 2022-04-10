@@ -38,6 +38,8 @@ AMP:
     use_dynamic_loss_scaling: True
     # O2: pure fp16
     level: O2
+    # only FP16 evaluation is supported when AMP O2 is enabled
+    use_fp16_test: True
 
 Optimizer:
   name: Momentum
