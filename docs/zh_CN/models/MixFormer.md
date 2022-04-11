@@ -16,8 +16,10 @@
 
 MixFormer是一个高效、通用的骨干网路（Vision Transformer）。在MixFormer中，主要有两个创新的设计：（1）通过平行分支的设计，将局部窗口自注意力（local-window self-attention）与Depthwise卷积进行组合，解决局部窗口自注意力的感受野受限的问题，（2）在平行分支之间提出双向交互模块，使得两个分支可以在channel和spatial两个维度都能实现信息互补，增强整体的建模能力。上述两个设计的组合使得MixFormer可以融合不同局部窗口与不同维度的特征信息，从而在图像分类以及5个重要的下游任务中取得比其他vision transformer骨干网络更好的结果。
 
-> [**MixFormer: Mixing Features across Windows and Dimensions**](https://arxiv.org/abs/2204.02557),            
+> [**MixFormer: Mixing Features across Windows and Dimensions**](https://arxiv.org/abs/2204.02557)
+      
 > Qiang Chen, Qiman Wu, Jian Wang, Qinghao Hu, Tao Hu, Errui Ding, Jian Cheng, Jingdong Wang
+
 > CVPR2022, **Oral** presentation
 
 ![image](../../images/MixFormer/MixingBlock.png)
