@@ -172,7 +172,7 @@ git clone https://github.com/LDOUBLEV/AutoLog.git
 ```
 
 ```shell
-# 克隆 Autolog 代码库，以便获取自动化日志
+# 编译
 make -j
 ```
 
