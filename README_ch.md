@@ -38,7 +38,7 @@ Res2Net200_vd预训练模型Top-1精度高达85.1%。
 * 您可以扫描下面的微信群二维码， 加入PaddleClas 微信交流群。获得更高效的问题答疑，与各行各业开发者充分交流，期待您的加入。
 
 <div align="center">
-<img src="https://user-images.githubusercontent.com/12560511/160273340-831de8c3-f31d-44d1-9437-fcd4765a6851.jpg" width="200"/>
+<img src="https://user-images.githubusercontent.com/12560511/162710270-8a249aca-4fa9-46f9-95e5-66d906fe6d66.jpg" width="200"/>
 </div>
 
 ## 快速体验
