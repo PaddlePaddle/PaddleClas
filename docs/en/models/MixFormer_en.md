@@ -16,10 +16,8 @@
 
 MixFormer is an efficient and general-purpose hybrid vision transformer. There are two main designs in MixFormer: (1) combining local-window self-attention and depth-wise convolution in a parallel design, (2) proposing bi-directional interactions across branches to provide complementary clues in channel and spatial dimensions. These two designs are integrated to achieve efficient feature mixing among windows and dimensions. MixFormer provides superior performance than other vision transformer variants on image classification and 5 dense prediction tasks.
 
-> [**MixFormer: Mixing Features across Windows and Dimensions**](https://arxiv.org/abs/2204.02557)
-      
-> Qiang Chen, Qiman Wu, Jian Wang, Qinghao Hu, Tao Hu, Errui Ding, Jian Cheng, Jingdong Wang
-
+> [**MixFormer: Mixing Features across Windows and Dimensions**](https://arxiv.org/abs/2204.02557)<br> 
+> Qiang Chen, Qiman Wu, Jian Wang, Qinghao Hu, Tao Hu, Errui Ding, Jian Cheng, Jingdong Wang<br>
 > CVPR2022, **Oral** presentation
 
 ![image](../../images/MixFormer/MixingBlock.png)
