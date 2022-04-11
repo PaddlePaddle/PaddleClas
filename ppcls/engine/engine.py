@@ -30,7 +30,7 @@ from ppcls.engine import evaluation
 from ppcls.engine.train import train_epoch
 from ppcls.utils import (load_pretrain, logger, save_load, set_amp,
                          set_dataloaders, set_device, set_distributed,
-                         set_logger, set_losses, set_metrics, set_models,
+                         set_logger, set_losses, set_metrics, set_model,
                          set_optimizers, set_seed, set_visualDL)
 from ppcls.utils.check import check_gpu
 from ppcls.utils.config import AttrDict
@@ -79,9 +79,9 @@ class Engine(object):
 
         ## 4 build model(s)
         # 4.1 initialize model(s)
-        set_models(self)
+        set_model(self)
 
-        # 4.3 load_pretrain
+        # 4.2 load_pretrain
         if self.config.Global.pretrained_model is not None:
             load_pretrain(self)
 
@@ -125,7 +125,7 @@ class Engine(object):
         self.global_step = 0
 
         if self.config.Global.checkpoints is not None:
-            metric_info = init_model(self.config.Global, self.models,
+            metric_info = init_model(self.config.Global, self.model,
                                      self.optimizers)
             if metric_info is not None:
                 best_metric.update(metric_info)
@@ -156,7 +156,7 @@ class Engine(object):
                     best_metric["metric"] = current_metric
                     best_metric["epoch"] = epoch_id
                     save_load.save_model(
-                        self.models,
+                        self.model,
                         self.optimizers,
                         best_metric,
                         self.output_dir,
@@ -173,7 +173,7 @@ class Engine(object):
             # save model every save_interval epoch
             if epoch_id % save_interval == 0:
                 save_load.save_model(
-                    self.models,
+                    self.model,
                     self.optimizers,
                     {"metric": current_metric,
                      "epoch": epoch_id},
@@ -183,7 +183,7 @@ class Engine(object):
 
             # save the latest model
             save_load.save_model(
-                self.models,
+                self.model,
                 self.optimizers,
                 {"metric": current_metric,
                  "epoch": epoch_id},
@@ -197,9 +197,9 @@ class Engine(object):
     @paddle.no_grad()
     def eval(self, epoch_id=0):
         assert self.mode in ["train", "eval"]
-        self.models.eval()
+        self.model.eval()
         eval_result = self.eval_func(self, epoch_id)
-        self.models.train()
+        self.model.train()
         return eval_result
 
     @paddle.no_grad()
@@ -212,7 +212,7 @@ class Engine(object):
         image_list = image_list[local_rank::total_trainer]
 
         batch_size = self.config["Infer"]["batch_size"]
-        self.models.eval()
+        self.model.eval()
         batch_data = []
         image_file_list = []
         for idx, image_file in enumerate(image_list):
@@ -224,7 +224,7 @@ class Engine(object):
             image_file_list.append(image_file)
             if len(batch_data) >= batch_size or idx == len(image_list) - 1:
                 batch_tensor = paddle.to_tensor(batch_data)
-                out = self.models[0](batch_tensor)
+                out = self.model(batch_tensor)
                 if isinstance(out, list):
                     out = out[0]
                 if isinstance(out, dict) and "logits" in out:
@@ -239,7 +239,7 @@ class Engine(object):
     def export(self):
         assert self.mode == "export"
         use_multilabel = self.config.Global.get("use_multilabel", False)
-        model = ExportModel(self.config.Arch, self.models, use_multilabel)
+        model = ExportModel(self.config.Arch, self.model, use_multilabel)
         if self.config.Global.pretrained_model is not None:
             load_dygraph_pretrain(model.base_model,
                                   self.config.Global.pretrained_model)

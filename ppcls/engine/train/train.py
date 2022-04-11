@@ -88,6 +88,6 @@ def train_epoch(engine, epoch_id, print_batch_step):
 
 def forward(engine, batch):
     if not engine.is_rec:
-        return engine.models[0](batch[0])
+        return engine.model(batch[0])
     else:
-        return engine.models[0](batch[0], batch[1])
+        return engine.model(batch[0], batch[1])

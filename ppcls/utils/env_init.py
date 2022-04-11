@@ -54,7 +54,7 @@ def set_seed(seed: int=None) -> None:
 
 
 def set_logger(engine: object, print_cfg: bool=True) -> None:
-    """Set the save path for models and records.
+    """Set the save path for model and records.
 
     Args:
         engine (object): Engine object.
@@ -148,29 +148,17 @@ def set_losses(engine: object) -> None:
             engine.eval_loss_func = None
 
 
-def set_models(engine: object) -> None:
+def set_model(engine: object) -> None:
     """Set up the model.
 
     Args:
         engine (object): Engine object.
     """
-    engine.models = nn.LayerList()
-    engine.models.append(build_model(engine.config))
-    if engine.mode == "train" and hasattr(engine, 'train_loss_func'):
-        for loss_func in engine.train_loss_func.loss_func:
-            # for components with independent parameters
-            if len(loss_func.parameters()) > 0:
-                engine.models.append(loss_func)
-    elif engine.mode == "eval" and hasattr(engine, 'eval_loss_func'):
-        for loss_func in engine.eval_loss_func.loss_func:
-            # for components with independent parameters
-            if len(loss_func.parameters()) > 0:
-                engine.models.append(loss_func)
-
+    engine.model = build_model(engine.config)
     # convert dynamic model(s) to static model(s), if specified
     if engine.config.Global.get('to_static', False) is True:
         # set @to_static for benchmark, skip this by default.
-        apply_to_static(engine.config, engine.models)
+        apply_to_static(engine.config, engine.model)
 
 
 def load_pretrain(engine: object) -> None:
@@ -180,11 +168,18 @@ def load_pretrain(engine: object) -> None:
         engine (object): Engine object.
     """
     if engine.config.Global.pretrained_model.startswith("http"):
-        load_dygraph_pretrain_from_url(engine.models,
+        load_dygraph_pretrain_from_url(engine.model,
                                        engine.config.Global.pretrained_model)
     else:
-        load_dygraph_pretrain(engine.models,
+        load_dygraph_pretrain(engine.model,
                               engine.config.Global.pretrained_model)
+        # NOTE: load for loss which has parameters, such as center loss
+        if len([
+                m for m in engine.train_loss_func.loss_func
+                if len(m.parameters()) > 0
+        ]) > 0:
+            load_dygraph_pretrain(engine.engine.train_loss_func.loss_func,
+                                  engine.config.Global.pretrained_model)
 
 
 def set_amp(engine: object) -> None:
@@ -216,8 +211,8 @@ def set_amp(engine: object) -> None:
             logger.warning(msg)
             engine.config.AMP.level = "O1"
             amp_level = "O1"
-        engine.models, engine.optimizers = paddle.amp.decorate(
-            models=engine.models,
+        engine.model, engine.optimizers = paddle.amp.decorate(
+            models=engine.model,
             optimizers=engine.optimizers,
             level=amp_level,
             save_dtype='float32')
@@ -290,6 +285,7 @@ def set_distributed(engine: object):
     if engine.config["Global"]["distributed"]:
         dist.init_parallel_env()
         engine.model = paddle.DataParallel(engine.model)
+        # NOTE: loss which has parameters also need parallelization, such as center loss.
         for i in range(len(engine.train_loss_func.loss_func)):
             if len(engine.train_loss_func.loss_func[i].parameters()) > 0:
                 engine.train_loss_func.loss_func[i] = paddle.DataParallel(

@@ -18,11 +18,9 @@ from __future__ import print_function
 
 import errno
 import os
-from typing import Any, Dict, List
 
 import paddle
 import paddle.nn as nn
-from paddle.optimizer import Optimizer
 from ppcls.utils import logger
 
 from .download import get_weights_path_from_url
@@ -55,13 +53,13 @@ def load_dygraph_pretrain(model, path=None):
     return
 
 
-def load_dygraph_pretrain_from_url(models: nn.LayerList,
+def load_dygraph_pretrain_from_url(models: nn.Layer,
                                    pretrained_url: str,
                                    use_ssld: bool=False) -> None:
     """load pretrained parameters from online url to models
 
     Args:
-        models (nn.LayerList): models which pretrained parameters loaded to.
+        models (nn.Layer): models which pretrained parameters loaded to.
         pretrained_url (str): pretrained weight's url.
         use_ssld (bool, optional): if download ssld parameters. Defaults to False.
     """

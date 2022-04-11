@@ -102,11 +102,11 @@ def build_optimizer(config, epochs, step_each_epoch, model_list=None):
             learning_rate=lr_model, grad_clip=grad_clip,
             **config_model)(model_list=model_list[0:1])
 
-        # step1 build lr
+        # step1 build lr for loss
         lr_loss = build_lr_scheduler(
             config_loss.pop('lr'), epochs, step_each_epoch)
         logger.debug("build lr ({}) success..".format(lr_loss))
-        # step2 build regularization
+        # step2 build regularization for loss
         if 'regularizer' in config_loss and config_loss[
                 'regularizer'] is not None:
             if 'weight_decay' in config_loss:
@@ -118,7 +118,7 @@ def build_optimizer(config, epochs, step_each_epoch, model_list=None):
             reg = getattr(paddle.regularizer, reg_name)(**reg_config)
             config_loss["weight_decay"] = reg
             logger.debug("build model regularizer ({}) success..".format(reg))
-        # step3 build optimizer
+        # step3 build optimizer for loss
         optim_name = config_loss.pop('name')
         if 'clip_norm' in config_loss:
             clip_norm = config_loss.pop('clip_norm')

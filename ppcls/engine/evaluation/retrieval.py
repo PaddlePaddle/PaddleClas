@@ -21,7 +21,7 @@ from ppcls.utils import logger
 
 
 def retrieval_eval(engine, epoch_id=0):
-    engine.models.eval()
+    engine.model.eval()
     # step1. build gallery
     if engine.gallery_query_dataloader is not None:
         gallery_feas, gallery_img_id, gallery_unique_id = cal_feature(
@@ -122,7 +122,7 @@ def cal_feature(engine, name='gallery'):
         if len(batch) == 3:
             has_unique_id = True
             batch[2] = batch[2].reshape([-1, 1]).astype("int64")
-        out = engine.models[0](batch[0], batch[1])
+        out = engine.model(batch[0], batch[1])
         if "Student" in out:
             out = out["Student"]
         batch_feas = out["features"]

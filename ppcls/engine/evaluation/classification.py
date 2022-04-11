@@ -65,7 +65,7 @@ def classification_eval(engine, epoch_id=0):
                         "flatten_contiguous_range", "greater_than"
                     },
                     level=amp_level):
-                out = engine.models[0](batch[0])
+                out = engine.model(batch[0])
                 # calc loss
                 if engine.eval_loss_func is not None:
                     loss_dict = engine.eval_loss_func(out, batch[1])
@@ -75,7 +75,7 @@ def classification_eval(engine, epoch_id=0):
                         output_info[key].update(loss_dict[key].numpy()[0],
                                                 batch_size)
         else:
-            out = engine.models[0](batch[0])
+            out = engine.model(batch[0])
             # calc loss
             if engine.eval_loss_func is not None:
                 loss_dict = engine.eval_loss_func(out, batch[1])
