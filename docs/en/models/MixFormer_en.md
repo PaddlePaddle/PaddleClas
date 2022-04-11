@@ -46,9 +46,8 @@ The models are coming soon.
 All results are trained with a multi-scale 3x schedule.
 
 | Backbone | Params (M) | FLOPs (G) | schedule | mAP_box| mAP_mask |
-|:--:|:--:|:--:|:--:|:--:| --:|
+|:--:|:--:|:--:|:--:|:--:| :--:|
 | Swin-T | 48 | 264 | 3x | 46.0| 41.6 |
-|:--:|:--:|:--:|:--:|:--:| --:|
 | MixFormer-B1 | 26 | 183 | 3x | 43.9 | 40.0 |
 | MixFormer-B2 | 28 | 187 | 3x | 45.1 | 40.8 |
 | MixFormer-B3 | 35 | 207 | 3x | 46.2 | 41.9 |
@@ -58,9 +57,8 @@ All results are trained with a multi-scale 3x schedule.
 ### Results on ADE20K with UperNet
 
 | Backbone | Params (M) | FLOPs (G) | iterations | mIoU_ss | mIoU_ms |
-|:--:|:--:|:--:|:--:|:--:| --:|
+|:--:|:--:|:--:|:--:|:--:| :--:|
 | Swin-T | 60 | 945 | 160k | 44.5| 45.8 |
-|:--:|:--:|:--:|:--:|:--:| --:|
 | MixFormer-B1 | 35 | 854 | 160k | 42.0 | 43.5 |
 | MixFormer-B2 | 37 | 859 | 160k | 43.1 | 43.9 |
 | MixFormer-B3 | 44 | 880 | 160k | 44.5 | 45.5 |
@@ -74,7 +72,6 @@ All results are trained with a multi-scale 3x schedule.
 | ResNet50 | 71.8 | 89.8 | 79.5 |
 | Swin-T | 74.2 | 92.5 | 82.5 |
 | HRFormer-S | 74.5 | 92.3 | 82.1 |
-|:--:|:--:|:--:|:--:|
 | MixFormer-B4 | **75.3** | **93.5** | **83.5** |
 
 <a name='2.5'></a>
@@ -84,7 +81,6 @@ All results are trained with a multi-scale 3x schedule.
 |:--:|:--:|:--:|:--:|
 | ResNet50 | 21.7 | 34.3 | 23.0 |
 | Swin-T | 27.6 | 43.0 | 29.3 |
-|:--:|:--:|:--:|:--:|
 | MixFormer-B4 | **28.6** | **43.4** | **30.5** |
 
 <a name="3"></a>
