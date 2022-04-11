@@ -25,8 +25,10 @@ def draw_bbox_results(image,
                       save_dir=None):
     if isinstance(image, np.ndarray):
         image = Image.fromarray(image)
+    width, height = image.size[0], image.size[1]
+    thickness = max((width + height) // 800, 1)
     draw = ImageDraw.Draw(image)
-    font_size = 18
+    font_size = np.floor(2e-2 * height + 0.5).astype('int32')
     font = ImageFont.truetype(font_path, font_size, encoding="utf-8")
 
     color = (0, 102, 255)
@@ -39,17 +41,22 @@ def draw_bbox_results(image,
         xmin, ymin, xmax, ymax = result["bbox"]
         text = "{}, {:.2f}".format(result["rec_docs"], result["rec_scores"])
         th = font_size
-        tw = font.getsize(text)[0]
+        # 左右两端预留与线宽相同的填充
+        tw = font.getsize(text)[0] + 2*thickness
         # tw = int(len(result["rec_docs"]) * font_size) + 60
-        start_y = max(0, ymin - th)
 
+        if ymin - th > 0:
+            start_y = ymin - th
+        else:
+            start_y = ymin + thickness
+        # 画标签框
         draw.rectangle(
-            [(xmin + 1, start_y), (xmin + tw + 1, start_y + th)], fill=color)
-
-        draw.text((xmin + 1, start_y), text, fill=(255, 255, 255), font=font)
-
+            [(xmin, start_y), (xmin + tw, start_y + th)], fill=color)
+        # 文字左侧空出线宽大小的填充
+        draw.text((xmin + thickness, start_y), text, fill=(255, 255, 255), font=font)
+        # 画目标框，线条宽度为thickness
         draw.rectangle(
-            [(xmin, ymin), (xmax, ymax)], outline=(255, 0, 0), width=2)
+            [(xmin, ymin), (xmax, ymax)], outline=(255, 0, 0), width=thickness)
 
     image_name = os.path.basename(input_path)
     if save_dir is None:
