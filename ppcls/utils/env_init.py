@@ -20,7 +20,7 @@ import numpy as np
 import paddle
 import paddle.distributed as dist
 import paddle.nn as nn
-from ppcls.arch import build_model
+from ppcls.arch import apply_to_static, build_model
 from ppcls.data import build_dataloader
 from ppcls.loss import build_loss
 from ppcls.metric import build_metrics
@@ -167,6 +167,11 @@ def set_models(engine: object) -> None:
             if len(loss_func.parameters()) > 0:
                 engine.models.append(loss_func)
 
+    # convert dynamic model(s) to static model(s), if specified
+    if engine.config.Global.get('to_static', False) is True:
+        # set @to_static for benchmark, skip this by default.
+        apply_to_static(engine.config, engine.models)
+
 
 def load_pretrain(engine: object) -> None:
     """load pretrained model parameters.
@@ -221,39 +226,14 @@ def set_amp(engine: object) -> None:
 def set_optimizers(engine: object) -> None:
     """set optimizer(s)
     """
-    engine.optimizers = []
-    engine.lr_schs = []
-    if engine.mode == 'train':
-        if isinstance(engine.config.Optimizer, dict):
-            # build single optimizer
-            optimizer, lr_sch = build_optimizer(
-                engine.config.Optimizer, engine.config.Global.epochs,
-                len(engine.train_dataloader), [
-                    engine.models._layers[0]
-                    if isinstance(engine.models, paddle.DataParallel) else
-                    engine.models[0]
-                ])
-            engine.optimizers.append(optimizer)
-            engine.lr_schs.append(lr_sch)
-        elif isinstance(engine.config.Optimizer, list):
-            # build multiple optimizers
-            for opt_ind, opt_cfg in enumerate(engine.config.Optimizer):
-                assert len(opt_cfg.keys()) == 1, \
-                    f"opt_cfg can only has one scope, but got ({opt_cfg.keys()})"
-                opt_scope = list(opt_cfg.keys())[0]
-                for model_ind, model in enumerate(engine.models):
-                    model_name = type(model).__name__
-                    if model_name == opt_scope:
-                        optimizer, lr_sch = build_optimizer(
-                            opt_cfg.get(opt_scope),
-                            engine.config.Global.epochs,
-                            len(engine.train_dataloader), [model])
-                        engine.optimizers.append(optimizer)
-                        engine.lr_schs.append(lr_sch)
-        else:
-            raise NotImplementedError(
-                f"Optimizer config must be a single dict or list of dict, but got {type(engine.config.Optimizer)}"
-            )
+    engine.optimizer, engine.lr_sch = build_optimizer(
+        engine.config["Optimizer"], engine.config["Global"]["epochs"],
+        len(engine.train_dataloader), [
+            engine.model, * [
+                m for m in engine.train_loss_func.loss_func
+                if len(m.parameters()) > 0
+            ]
+        ])
 
 
 def set_metrics(engine: object) -> None:
@@ -303,12 +283,14 @@ def set_distributed(engine: object):
         engine (object): Engine object.
     """
     world_size = dist.get_world_size()
-    engine.config.Global.distributed = world_size != 1
-    if engine.config.Global.distributed:
-        dist.init_parallel_env()
-        for i in range(len(engine.models)):
-            engine.models[i] = paddle.DataParallel(engine.models[i])
-
+    engine.config["Global"]["distributed"] = world_size != 1
     if world_size != 4 and engine.mode == "train":
         msg = f"The training strategy in config files provided by PaddleClas is based on 4 gpus. But the number of gpus is {world_size} in current training. Please modify the stategy (learning rate, batch size and so on) if use config files in PaddleClas to train."
         logger.warning(msg)
+    if engine.config["Global"]["distributed"]:
+        dist.init_parallel_env()
+        engine.model = paddle.DataParallel(engine.model)
+        for i in range(len(engine.train_loss_func.loss_func)):
+            if len(engine.train_loss_func.loss_func[i].parameters()) > 0:
+                engine.train_loss_func.loss_func[i] = paddle.DataParallel(
+                    engine.train_loss_func.loss_func[i])

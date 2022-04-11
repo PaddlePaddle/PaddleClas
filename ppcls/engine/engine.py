@@ -21,8 +21,7 @@ from typing import Callable
 import paddle
 import paddle.distributed as dist
 from paddle import nn
-from ppcls.arch import (DistillationModel, RecModel, TheseusLayer,
-                        apply_to_static)
+from ppcls.arch import (DistillationModel, RecModel, TheseusLayer)
 from ppcls.arch.gears.identity_head import IdentityHead
 from ppcls.data import create_operators
 from ppcls.data.postprocess import build_postprocess
@@ -81,11 +80,6 @@ class Engine(object):
         ## 4 build model(s)
         # 4.1 initialize model(s)
         set_models(self)
-
-        # 4.2 convert dynamic model(s) to static model(s), if specified
-        if config.Global.get('to_static', False) is True:
-            # set @to_static for benchmark, skip this by default.
-            apply_to_static(self.config, self.models)
 
         # 4.3 load_pretrain
         if self.config.Global.pretrained_model is not None:
