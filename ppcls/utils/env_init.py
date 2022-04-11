@@ -35,7 +35,7 @@ from .logger import init_logger
 
 __all__ = [
     'set_seed', 'set_logger', 'set_visualDL', 'set_device', 'set_dataloaders',
-    'load_pretrain', 'set_amp', 'set_losses', 'set_optimizers', 'set_metrics',
+    'load_pretrain', 'set_amp', 'set_losses', 'set_optimizer', 'set_metrics',
     'set_distributed'
 ]
 
@@ -174,7 +174,7 @@ def load_pretrain(engine: object) -> None:
         load_dygraph_pretrain(engine.model,
                               engine.config.Global.pretrained_model)
         # NOTE: load for loss which has parameters, such as center loss
-        if len([
+        if hasattr(engine, 'train_loss_func') and len([
                 m for m in engine.train_loss_func.loss_func
                 if len(m.parameters()) > 0
         ]) > 0:
@@ -211,24 +211,25 @@ def set_amp(engine: object) -> None:
             logger.warning(msg)
             engine.config.AMP.level = "O1"
             amp_level = "O1"
-        engine.model, engine.optimizers = paddle.amp.decorate(
+        engine.model, engine.optimizer = paddle.amp.decorate(
             models=engine.model,
-            optimizers=engine.optimizers,
+            optimizers=engine.optimizer,
             level=amp_level,
             save_dtype='float32')
 
 
-def set_optimizers(engine: object) -> None:
+def set_optimizer(engine: object) -> None:
     """set optimizer(s)
     """
-    engine.optimizer, engine.lr_sch = build_optimizer(
-        engine.config["Optimizer"], engine.config["Global"]["epochs"],
-        len(engine.train_dataloader), [
-            engine.model, * [
-                m for m in engine.train_loss_func.loss_func
-                if len(m.parameters()) > 0
-            ]
-        ])
+    if engine.mode == 'train':
+        engine.optimizer, engine.lr_sch = build_optimizer(
+            engine.config["Optimizer"], engine.config["Global"]["epochs"],
+            len(engine.train_dataloader), [
+                engine.model, * [
+                    m for m in engine.train_loss_func.loss_func
+                    if len(m.parameters()) > 0
+                ]
+            ])
 
 
 def set_metrics(engine: object) -> None:

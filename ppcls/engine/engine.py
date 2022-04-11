@@ -31,7 +31,7 @@ from ppcls.engine.train import train_epoch
 from ppcls.utils import (load_pretrain, logger, save_load, set_amp,
                          set_dataloaders, set_device, set_distributed,
                          set_logger, set_losses, set_metrics, set_model,
-                         set_optimizers, set_seed, set_visualDL)
+                         set_optimizer, set_seed, set_visualDL)
 from ppcls.utils.check import check_gpu
 from ppcls.utils.config import AttrDict
 from ppcls.utils.env_init import set_amp
@@ -85,8 +85,8 @@ class Engine(object):
         if self.config.Global.pretrained_model is not None:
             load_pretrain(self)
 
-        ## 5 optimizers
-        set_optimizers(self)
+        ## 5 optimizer
+        set_optimizer(self)
 
         ## 6 amp configurations
         set_amp(self)
@@ -126,7 +126,7 @@ class Engine(object):
 
         if self.config.Global.checkpoints is not None:
             metric_info = init_model(self.config.Global, self.model,
-                                     self.optimizers)
+                                     self.optimizer)
             if metric_info is not None:
                 best_metric.update(metric_info)
 
@@ -157,7 +157,7 @@ class Engine(object):
                     best_metric["epoch"] = epoch_id
                     save_load.save_model(
                         self.model,
-                        self.optimizers,
+                        self.optimizer,
                         best_metric,
                         self.output_dir,
                         model_name=self.config.Arch.name,
@@ -174,7 +174,7 @@ class Engine(object):
             if epoch_id % save_interval == 0:
                 save_load.save_model(
                     self.model,
-                    self.optimizers,
+                    self.optimizer,
                     {"metric": current_metric,
                      "epoch": epoch_id},
                     self.output_dir,
@@ -184,9 +184,8 @@ class Engine(object):
             # save the latest model
             save_load.save_model(
                 self.model,
-                self.optimizers,
-                {"metric": current_metric,
-                 "epoch": epoch_id},
+                self.optimizer, {"metric": current_metric,
+                                 "epoch": epoch_id},
                 self.output_dir,
                 model_name=self.config.Arch.name,
                 prefix="latest")
@@ -274,7 +273,7 @@ class ExportModel(TheseusLayer):
 
     def __init__(self, config, models, use_multilabel):
         super().__init__()
-        self.base_model = models[0]
+        self.base_model = models
         # we should choose a final model to export
         if isinstance(self.base_model, DistillationModel):
             self.infer_model_name = config["infer_model_name"]
