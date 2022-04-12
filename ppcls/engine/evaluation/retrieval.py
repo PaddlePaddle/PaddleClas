@@ -125,7 +125,14 @@ def cal_feature(engine, name='gallery'):
         out = engine.model(batch[0], batch[1])
         if "Student" in out:
             out = out["Student"]
-        batch_feas = out["backbone"]
+
+        # get features
+        if engine.config["Global"].get("feat_from", 'backbone') == 'backbone':
+            # use backbone's output as features
+            batch_feas = out["backbone"]
+        else:
+            # use neck's output as features
+            batch_feas = out["neck"]
 
         # do norm
         if engine.config["Global"].get("feature_normalize", True):

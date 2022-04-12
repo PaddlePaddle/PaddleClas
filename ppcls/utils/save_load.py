@@ -48,7 +48,7 @@ def _mkdir_if_not_exist(path):
 def load_dygraph_pretrain(model, path=None):
     if not (os.path.isdir(path) or os.path.exists(path + '.pdparams')):
         raise ValueError("Model pretrain path {} does not "
-                         "exists.".format(path))
+                         "exists.".format(path + '.pdparams'))
     param_state_dict = paddle.load(path + ".pdparams")
     model.set_dict(param_state_dict)
     return
@@ -99,7 +99,8 @@ def init_model(config, net, optimizer=None):
         opti_dict = paddle.load(checkpoints + ".pdopt")
         metric_dict = paddle.load(checkpoints + ".pdstates")
         net.set_dict(para_dict)
-        optimizer.set_state_dict(opti_dict)
+        for i in range(len(optimizer)):
+            optimizer[i].set_state_dict(opti_dict)
         logger.info("Finish load checkpoints from {}".format(checkpoints))
         return metric_dict
 
@@ -131,6 +132,6 @@ def save_model(net,
     model_path = os.path.join(model_path, prefix)
 
     paddle.save(net.state_dict(), model_path + ".pdparams")
-    paddle.save(optimizer.state_dict(), model_path + ".pdopt")
+    paddle.save([opt.state_dict() for opt in optimizer], model_path + ".pdopt")
     paddle.save(metric_info, model_path + ".pdstates")
     logger.info("Already save model in {}".format(model_path))

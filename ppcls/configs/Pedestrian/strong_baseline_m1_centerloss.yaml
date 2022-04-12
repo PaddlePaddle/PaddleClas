@@ -47,21 +47,31 @@ Loss:
         weight: 1.0
         margin: 0.3
         normalize_feature: false
+    - CenterLoss:
+        weight: 0.0005
+        num_classes: 751
+        feat_dim: 2048
   Eval:
     - CELoss:
         weight: 1.0
 
 Optimizer:
-  name: Adam
-  lr:
-    name: Piecewise
-    decay_epochs: [30, 60]
-    values: [0.00035, 0.000035, 0.0000035]
-    warmup_epoch: 10
-    warmup_start_lr: 0.0000035
-  regularizer:
-    name: 'L2'
-    coeff: 0.0005
+  model:
+    name: Adam
+    lr:
+      name: Piecewise
+      decay_epochs: [30, 60]
+      values: [0.00035, 0.000035, 0.0000035]
+      warmup_epoch: 10
+      warmup_start_lr: 0.0000035
+    regularizer:
+      name: 'L2'
+      coeff: 0.0005
+  loss:
+    name: SGD
+    lr:
+      name: Constant
+      learning_rate: 0.5
 
 # data loader for train and eval
 DataLoader:

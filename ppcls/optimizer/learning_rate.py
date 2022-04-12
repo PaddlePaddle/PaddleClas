@@ -75,6 +75,23 @@ class Linear(object):
         return learning_rate
 
 
+class Constant(LRScheduler):
+    """
+    Constant learning rate
+    Args:
+        lr (float): The initial learning rate. It is a python float number.
+        last_epoch (int, optional):  The index of last epoch. Can be set to restart training. Default: -1, means initial learning rate.
+    """
+
+    def __init__(self, learning_rate, last_epoch=-1, **kwargs):
+        self.learning_rate = learning_rate
+        self.last_epoch = last_epoch
+        super().__init__()
+
+    def get_lr(self):
+        return self.learning_rate
+
+
 class Cosine(object):
     """
     Cosine learning rate decay

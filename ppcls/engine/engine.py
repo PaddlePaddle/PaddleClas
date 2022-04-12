@@ -223,7 +223,12 @@ class Engine(object):
         if self.mode == 'train':
             self.optimizer, self.lr_sch = build_optimizer(
                 self.config["Optimizer"], self.config["Global"]["epochs"],
-                len(self.train_dataloader), [self.model])
+                len(self.train_dataloader), [
+                    self.model, * [
+                        m for m in self.train_loss_func.loss_func
+                        if len(m.parameters()) > 0
+                    ]
+                ])
 
         # for amp training
         if self.amp:
@@ -251,6 +256,11 @@ class Engine(object):
         if self.config["Global"]["distributed"]:
             dist.init_parallel_env()
             self.model = paddle.DataParallel(self.model)
+            # NOTE: parallelize loss which has parameters, such as CenterLoss
+            for i in range(len(self.train_loss_func.loss_func)):
+                if len(self.train_loss_func.loss_func[i].parameters()) > 0:
+                    self.train_loss_func.loss_func[i] = paddle.DataParallel(
+                        self.train_loss_func.loss_func[i])
 
         # build postprocess for infer
         if self.mode == 'infer':

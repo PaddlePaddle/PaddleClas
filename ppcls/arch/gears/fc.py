@@ -25,10 +25,14 @@ class FC(nn.Layer):
         super(FC, self).__init__()
         self.embedding_size = embedding_size
         self.class_num = class_num
+        # TODO: hard code for initializer
         weight_attr = paddle.ParamAttr(
-            initializer=paddle.nn.initializer.XavierNormal())
+            initializer=paddle.nn.initializer.Normal(std=0.001))
         self.fc = paddle.nn.Linear(
-            self.embedding_size, self.class_num, weight_attr=weight_attr, bias_attr=bias_attr)
+            self.embedding_size,
+            self.class_num,
+            weight_attr=weight_attr,
+            bias_attr=bias_attr)
 
     def forward(self, input, label=None):
         out = self.fc(input)
