@@ -25,8 +25,8 @@ Paddle Lite是飞桨轻量化推理引擎，为手机、IOT端提供高效推理
 1. [建议]直接下载，预测库下载链接如下：
       |平台|预测库下载链接|
       |-|-|
-      |Android|[arm7](https://paddlelite-data.bj.bcebos.com/Release/2.8-rc/Android/gcc/inference_lite_lib.android.armv7.gcc.c++_static.with_extra.with_cv.tar.gz) / [arm8](https://paddlelite-data.bj.bcebos.com/Release/2.8-rc/Android/gcc/inference_lite_lib.android.armv8.gcc.c++_static.with_extra.with_cv.tar.gz)|
-      |iOS|[arm7](https://paddlelite-data.bj.bcebos.com/Release/2.8-rc/iOS/inference_lite_lib.ios.armv7.with_cv.with_extra.tiny_publish.tar.gz) / [arm8](https://paddlelite-data.bj.bcebos.com/Release/2.8-rc/iOS/inference_lite_lib.ios.armv8.with_cv.with_extra.tiny_publish.tar.gz)|
+      |Android|[arm7](https://github.com/PaddlePaddle/Paddle-Lite/releases/download/v2.10/inference_lite_lib.android.armv7.clang.c++_static.with_extra.with_cv.tar.gz) / [arm8](https://github.com/PaddlePaddle/Paddle-Lite/releases/download/v2.10/inference_lite_lib.android.armv8.clang.c++_static.with_extra.with_cv.tar.gz)|
+      |iOS|[arm7](https://github.com/PaddlePaddle/Paddle-Lite/releases/download/v2.10/inference_lite_lib.ios.armv7.with_cv.with_extra.tiny_publish.tar.gz) / [arm8](https://github.com/PaddlePaddle/Paddle-Lite/releases/download/v2.10/inference_lite_lib.ios.armv8.with_cv.with_extra.tiny_publish.tar.gz)|
 
       **注**：
       1. 如果是从 Paddle-Lite [官方文档](https://paddle-lite.readthedocs.io/zh/latest/quick_start/release_lib.html#android-toolchain-gcc)下载的预测库，
@@ -44,11 +44,11 @@ git checkout develop
 
 **注意**：编译Paddle-Lite获得预测库时，需要打开`--with_cv=ON --with_extra=ON`两个选项，`--arch`表示`arm`版本，这里指定为armv8，更多编译命令介绍请参考[链接](https://paddle-lite.readthedocs.io/zh/latest/user_guides/Compile/Android.html#id2)。
 
-直接下载预测库并解压后，可以得到`inference_lite_lib.android.armv8/`文件夹，通过编译Paddle-Lite得到的预测库位于`Paddle-Lite/build.lite.android.armv8.gcc/inference_lite_lib.android.armv8/`文件夹下。
+直接下载预测库并解压后，可以得到`inference_lite_lib.android.armv8.clang.c++_static.with_extra.with_cv/`文件夹，通过编译Paddle-Lite得到的预测库位于`Paddle-Lite/build.lite.android.armv8.gcc/inference_lite_lib.android.armv8/`文件夹下。
 预测库的文件目录如下：
 
 ```
-inference_lite_lib.android.armv8/
+inference_lite_lib.android.armv8.clang.c++_static.with_extra.with_cv/
 |-- cxx                                        C++ 预测库和头文件
 |   |-- include                                C++ 头文件
 |   |   |-- paddle_api.h
@@ -86,7 +86,7 @@ Python下安装 `paddlelite`，目前最高支持`Python3.7`。
 **注意**：`paddlelite`whl包版本必须和预测库版本对应。
 
 ```shell
-pip install paddlelite==2.8
+pip install paddlelite==2.10
 ```
 
 之后使用`paddle_lite_opt`工具可以进行inference模型的转换。`paddle_lite_opt`的部分参数如下
@@ -146,6 +146,24 @@ paddle_lite_opt --model_file=./MobileNetV3_large_x1_0_infer/inference.pdmodel --
 
 **注意**：`--optimize_out` 参数为优化后模型的保存路径，无需加后缀`.nb`；`--model_file` 参数为模型结构信息文件的路径，`--param_file` 参数为模型权重信息文件的路径，请注意文件名。
 
+<a name="2.1.4"></a>
+
+#### 2.1.4 执行编译，得到可执行文件clas_system
+
+```shell
+# 克隆 Autolog 代码库，以便获取自动化日志
+cd PaddleClas_root_path
+cd deploy/lite/
+git clone https://github.com/LDOUBLEV/AutoLog.git
+```
+
+```shell
+# 编译
+make -j
+```
+
+执行 `make` 命令后，会在当前目录生成 `clas_system` 可执行文件，该文件用于 Lite 预测。
+
 <a name="2.2与手机联调"></a>
 ### 2.2 与手机联调
 
@@ -167,7 +185,7 @@ paddle_lite_opt --model_file=./MobileNetV3_large_x1_0_infer/inference.pdmodel --
 
     win上安装需要去谷歌的安卓平台下载ADB软件包进行安装：[链接](https://developer.android.com/studio)
 
-4. 手机连接电脑后，开启手机`USB调试`选项，选择`文件传输`模式，在电脑终端中输入：
+3. 手机连接电脑后，开启手机`USB调试`选项，选择`文件传输`模式，在电脑终端中输入：
 
 ```shell
 adb devices
@@ -178,40 +196,18 @@ List of devices attached
 744be294    device
 ```
 
-5. 准备优化后的模型、预测库文件、测试图像和类别映射文件。
+
+4. 将优化后的模型、预测库文件、测试图像和类别映射文件push到手机上。
 
 ```shell
-cd PaddleClas_root_path
-cd deploy/lite/
-
-# 运行prepare.sh
-# prepare.sh 会将预测库文件、测试图像和使用的字典文件放置在预测库中的demo/cxx/clas文件夹下
-sh prepare.sh /{lite prediction library path}/inference_lite_lib.android.armv8
-
-# 进入lite demo的工作目录
-cd /{lite prediction library path}/inference_lite_lib.android.armv8/
-cd demo/cxx/clas/
-
-# 将C++预测动态库so文件复制到debug文件夹中
-cp ../../../cxx/lib/libpaddle_light_api_shared.so ./debug/
-```
-
-`prepare.sh` 以 `PaddleClas/deploy/lite/imgs/tabby_cat.jpg` 作为测试图像，将测试图像复制到`demo/cxx/clas/debug/` 文件夹下。
-将 `paddle_lite_opt` 工具优化后的模型文件放置到 `/{lite prediction library path}/inference_lite_lib.android.armv8/demo/cxx/clas/debug/` 文件夹下。本例中，使用[2.1.3](#2.1.3)生成的 `MobileNetV3_large_x1_0.nb` 模型文件。
-
-执行完成后，clas文件夹下将有如下文件格式：
-
-```
-demo/cxx/clas/
-|-- debug/
-|   |--MobileNetV3_large_x1_0.nb                优化后的分类器模型文件
-|   |--tabby_cat.jpg                           	待测试图像
-|   |--imagenet1k_label_list.txt                类别映射文件
-|   |--libpaddle_light_api_shared.so    C++预测库文件
-|   |--config.txt                       分类预测超参数配置
-|-- config.txt                  				分类预测超参数配置
-|-- image_classfication.cpp            	图像分类代码文件
-|-- Makefile                    				编译文件
+adb shell mkdir -p /data/local/tmp/arm_cpu/
+adb push clas_system /data/local/tmp/arm_cpu/
+adb shell chmod +x /data/local/tmp/arm_cpu//clas_system
+adb push inference_lite_lib.android.armv8.clang.c++_static.with_extra.with_cv/cxx/lib/libpaddle_light_api_shared.so /data/local/tmp/arm_cpu/
+adb push MobileNetV3_large_x1_0.nb /data/local/tmp/arm_cpu/
+adb push config.txt /data/local/tmp/arm_cpu/
+adb push ../../ppcls/utils/imagenet1k_label_list.txt /data/local/tmp/arm_cpu/
+adb push imgs/tabby_cat.jpg /data/local/tmp/arm_cpu/
 ```
 
 #### 注意：
@@ -224,31 +220,21 @@ clas_model_file ./MobileNetV3_large_x1_0.nb # 模型文件地址
 label_path ./imagenet1k_label_list.txt 			# 类别映射文本文件
 resize_short_size 256 # resize之后的短边边长
 crop_size 224 				# 裁剪后用于预测的边长
-visualize 0 # 是否进行可视化，如果选择的话，会在当前文件夹下生成名为clas_result.png的图像文件。
+visualize 0 # 是否进行可视化，如果选择的话，会在当前文件夹下生成名为clas_result.png的图像文件
+num_threads 1 # 线程数，默认是1。
+precision FP32 # 精度类型，可以选择 FP32 或者 INT8，默认是 FP32。
+runtime_device arm_cpu # 设备类型，默认是 arm_cpu
+enable_benchmark 0 # 是否开启benchmark， 默认是 0
+tipc_benchmark 0 # 是否开启tipc_benchmark，默认是 0
 ```
 
-5. 启动调试，上述步骤完成后就可以使用ADB将文件夹 `debug/` push到手机上运行，步骤如下：
+5. 执行预测命令
+
+执行以下命令，可完成在手机上的预测。
 
 ```shell
-# 执行编译，得到可执行文件clas_system
-make -j
-
-# 将编译得到的可执行文件移动到debug文件夹中
-mv clas_system ./debug/
-
-# 将上述debug文件夹push到手机上
-adb push debug /data/local/tmp/
-
-adb shell
-cd /data/local/tmp/debug
-export LD_LIBRARY_PATH=/data/local/tmp/debug:$LD_LIBRARY_PATH
-
-# clas_system可执行文件的使用方式为:
-# ./clas_system 配置文件路径  测试图像路径
-./clas_system ./config.txt ./tabby_cat.jpg
+adb shell 'export LD_LIBRARY_PATH=/data/local/tmp/arm_cpu/; /data/local/tmp/arm_cpu/clas_system /data/local/tmp/arm_cpu/config.txt /data/local/tmp/arm_cpu/tabby_cat.jpg'
 ```
-
-如果对代码做了修改，则需要重新编译并push到手机上。
 
 运行效果如下：
 
@@ -263,3 +249,4 @@ A1：如果已经走通了上述步骤，更换模型只需要替换 `.nb` 模�
 
 Q2：换一个图测试怎么做？  
 A2：替换 debug 下的测试图像为你想要测试的图像，使用 ADB 再次 push 到手机上即可。
+
