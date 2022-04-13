@@ -38,11 +38,11 @@ def update_loss(trainer, loss_dict, batch_size):
 
 
 def log_info(trainer, batch_size, epoch_id, iter_id):
-    if len(trainer.lr_sch) <= 1:
-        lr_msg = "lr: {:.8f}".format(trainer.lr_sch[0].get_lr())
-    else:
-        lr_msg = "lr_model: {:.8f}".format(trainer.lr_sch[0].get_lr())
-        lr_msg += ", lr_loss: {:.8f}".format(trainer.lr_sch[1].get_lr())
+    lr_msg_list = []
+    for i in range(len(trainer.lr_sch)):
+        lr_msg_list.append("lr_{}: {:.8f}".format(i + 1, trainer.lr_sch[i]
+                                                  .get_lr()))
+    lr_msg = ", ".join(lr_msg_list)
 
     metric_msg = ", ".join([
         "{}: {:.5f}".format(key, trainer.output_info[key].avg)
@@ -64,21 +64,10 @@ def log_info(trainer, batch_size, epoch_id, iter_id):
         len(trainer.train_dataloader), lr_msg, metric_msg, time_msg, ips_msg,
         eta_msg))
 
-    if len(trainer.lr_sch) <= 1:
+    for i in range(len(trainer.lr_sch)):
         logger.scaler(
-            name="lr",
-            value=trainer.lr_sch[0].get_lr(),
-            step=trainer.global_step,
-            writer=trainer.vdl_writer)
-    else:
-        logger.scaler(
-            name="lr_model",
-            value=trainer.lr_sch[0].get_lr(),
-            step=trainer.global_step,
-            writer=trainer.vdl_writer)
-        logger.scaler(
-            name="lr_loss",
-            value=trainer.lr_sch[1].get_lr(),
+            name="lr_{}".format(i + 1),
+            value=trainer.lr_sch[i].get_lr(),
             step=trainer.global_step,
             writer=trainer.vdl_writer)
 

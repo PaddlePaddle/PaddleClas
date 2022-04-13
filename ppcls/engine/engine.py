@@ -126,7 +126,7 @@ class Engine(object):
 
         if self.config.Global.checkpoints is not None:
             metric_info = init_model(self.config.Global, self.model,
-                                     self.optimizer)
+                                     self.optimizer, self.train_loss_func)
             if metric_info is not None:
                 best_metric.update(metric_info)
 
@@ -161,7 +161,8 @@ class Engine(object):
                         best_metric,
                         self.output_dir,
                         model_name=self.config.Arch.name,
-                        prefix="best_model")
+                        prefix="best_model",
+                        loss=self.train_loss_func)
                 logger.info("[Eval][Epoch {}][best metric: {}]".format(
                     epoch_id, best_metric["metric"]))
                 logger.scaler(
@@ -179,7 +180,8 @@ class Engine(object):
                      "epoch": epoch_id},
                     self.output_dir,
                     model_name=self.config.Arch.name,
-                    prefix="epoch_{}".format(epoch_id))
+                    prefix="epoch_{}".format(epoch_id),
+                    loss=self.train_loss_func)
 
             # save the latest model
             save_load.save_model(
@@ -188,7 +190,8 @@ class Engine(object):
                                  "epoch": epoch_id},
                 self.output_dir,
                 model_name=self.config.Arch.name,
-                prefix="latest")
+                prefix="latest",
+                loss=self.train_loss_func)
 
         if self.vdl_writer is not None:
             self.vdl_writer.close()

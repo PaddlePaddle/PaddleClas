@@ -44,92 +44,43 @@ def build_lr_scheduler(lr_config, epochs, step_each_epoch):
 # model_list is None in static graph
 def build_optimizer(config, epochs, step_each_epoch, model_list=None):
     config = copy.deepcopy(config)
+    optim = []
+    lr = []
+
     if 'name' in config:
-        # step1 build lr
-        lr = build_lr_scheduler(config.pop('lr'), epochs, step_each_epoch)
-        logger.debug("build lr ({}) success..".format(lr))
-        # step2 build regularization
-        if 'regularizer' in config and config['regularizer'] is not None:
-            if 'weight_decay' in config:
-                logger.warning(
-                    "ConfigError: Only one of regularizer and weight_decay can be set in Optimizer Config. \"weight_decay\" has been ignored."
-                )
-            reg_config = config.pop('regularizer')
-            reg_name = reg_config.pop('name') + 'Decay'
-            reg = getattr(paddle.regularizer, reg_name)(**reg_config)
-            config["weight_decay"] = reg
-            logger.debug("build regularizer ({}) success..".format(reg))
-        # step3 build optimizer
-        optim_name = config.pop('name')
-        if 'clip_norm' in config:
-            clip_norm = config.pop('clip_norm')
-            grad_clip = paddle.nn.ClipGradByNorm(clip_norm=clip_norm)
-        else:
-            grad_clip = None
-        optim = getattr(optimizer, optim_name)(
-            learning_rate=lr, grad_clip=grad_clip,
-            **config)(model_list=model_list[0:1])
-        optim = [optim, ]
-        lr = [lr, ]
-        logger.debug("build model optimizer ({}) success..".format(optim))
-    else:
-        config_model = config['model']
-        config_loss = config['loss']
-        # step1 build lr
-        lr_model = build_lr_scheduler(
-            config_model.pop('lr'), epochs, step_each_epoch)
-        logger.debug("build lr ({}) success..".format(lr_model))
-        # step2 build regularization
-        if 'regularizer' in config_model and config_model[
-                'regularizer'] is not None:
-            if 'weight_decay' in config_model:
-                logger.warning(
-                    "ConfigError: Only one of regularizer and weight_decay can be set in Optimizer Config. \"weight_decay\" has been ignored."
-                )
-            reg_config = config_model.pop('regularizer')
-            reg_name = reg_config.pop('name') + 'Decay'
-            reg = getattr(paddle.regularizer, reg_name)(**reg_config)
-            config_model["weight_decay"] = reg
-            logger.debug("build regularizer ({}) success..".format(reg))
-        # step3 build optimizer
-        optim_name = config_model.pop('name')
-        if 'clip_norm' in config_model:
-            clip_norm = config_model.pop('clip_norm')
-            grad_clip = paddle.nn.ClipGradByNorm(clip_norm=clip_norm)
-        else:
-            grad_clip = None
-        optim_model = getattr(optimizer, optim_name)(
-            learning_rate=lr_model, grad_clip=grad_clip,
-            **config_model)(model_list=model_list[0:1])
+        config = {'model': config}  # only one config for model
 
-        # step1 build lr for loss
-        lr_loss = build_lr_scheduler(
-            config_loss.pop('lr'), epochs, step_each_epoch)
-        logger.debug("build lr ({}) success..".format(lr_loss))
-        # step2 build regularization for loss
-        if 'regularizer' in config_loss and config_loss[
+    for cfg_idx, (cfg_name, cfg_content) in enumerate(config.items()):
+        # step1 build lr
+        lr_ = build_lr_scheduler(
+            cfg_content.pop('lr'), epochs, step_each_epoch)
+        logger.debug("build {} lr ({}) success..".format(cfg_name, lr_))
+        # step2 build regularization
+        if 'regularizer' in cfg_content and cfg_content[
                 'regularizer'] is not None:
-            if 'weight_decay' in config_loss:
+            if 'weight_decay' in cfg_content:
                 logger.warning(
                     "ConfigError: Only one of regularizer and weight_decay can be set in Optimizer Config. \"weight_decay\" has been ignored."
                 )
-            reg_config = config_loss.pop('regularizer')
+            reg_config = cfg_content.pop('regularizer')
             reg_name = reg_config.pop('name') + 'Decay'
             reg = getattr(paddle.regularizer, reg_name)(**reg_config)
-            config_loss["weight_decay"] = reg
-            logger.debug("build model regularizer ({}) success..".format(reg))
-        # step3 build optimizer for loss
-        optim_name = config_loss.pop('name')
-        if 'clip_norm' in config_loss:
-            clip_norm = config_loss.pop('clip_norm')
+            cfg_content["weight_decay"] = reg
+            logger.debug("build {} regularizer ({}) success..".format(cfg_name,
+                                                                      reg))
+        # step3 build optimizer
+        optim_name = cfg_content.pop('name')
+        if 'clip_norm' in cfg_content:
+            clip_norm = cfg_content.pop('clip_norm')
             grad_clip = paddle.nn.ClipGradByNorm(clip_norm=clip_norm)
         else:
             grad_clip = None
-        optim_loss = getattr(optimizer, optim_name)(
-            learning_rate=lr_loss, grad_clip=grad_clip,
-            **config_loss)(model_list=model_list[1:2])
+        optim_ = getattr(optimizer, optim_name)(
+            learning_rate=lr_, grad_clip=grad_clip,
+            **cfg_content)(model_list=model_list[cfg_idx:cfg_idx + 1])
 
-        optim = [optim_model, optim_loss]
-        lr = [lr_model, lr_loss]
-        logger.debug("build loss optimizer ({}) success..".format(optim))
+        optim.append(optim_)
+        lr.append(lr_)
+        logger.debug("build {} optimizer ({}) success..".format(cfg_name,
+                                                                optim))
     return optim, lr

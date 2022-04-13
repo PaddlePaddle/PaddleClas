@@ -18,6 +18,7 @@ from __future__ import print_function
 
 import errno
 import os
+from typing import List
 
 import paddle
 import paddle.nn as nn
@@ -93,7 +94,7 @@ def load_distillation_model(model, pretrained_model):
             pretrained_model))
 
 
-def init_model(config, net, optimizer=None):
+def init_model(config, net, optimizer=None, loss: nn.Layer=None):
     """
     load model from checkpoint or pretrained_model
     """
@@ -107,6 +108,8 @@ def init_model(config, net, optimizer=None):
         opti_dict = paddle.load(checkpoints + ".pdopt")
         metric_dict = paddle.load(checkpoints + ".pdstates")
         net.set_dict(para_dict)
+        for i in range(len(loss.loss_func)):
+            loss.loss_func[i].set_dict(para_dict)
         for i in range(len(optimizer)):
             optimizer[i].set_state_dict(opti_dict)
         logger.info("Finish load checkpoints from {}".format(checkpoints))
@@ -129,7 +132,8 @@ def save_model(net,
                metric_info,
                model_path,
                model_name="",
-               prefix='ppcls'):
+               prefix='ppcls',
+               loss: nn.Layer=None):
     """
     save model to the target path
     """
@@ -138,8 +142,18 @@ def save_model(net,
     model_path = os.path.join(model_path, model_name)
     _mkdir_if_not_exist(model_path)
     model_path = os.path.join(model_path, prefix)
+    params_state_dict = net.state_dict()
 
-    paddle.save(net.state_dict(), model_path + ".pdparams")
+    if loss is not None:
+        for i in range(len(loss.loss_func)):
+            loss_state_dict = loss.loss_func[i].state_dict()
+            keys_inter = set(params_state_dict.keys()) & set(
+                loss_state_dict.keys())
+            assert len(keys_inter) == 0, \
+                f"keys in model and loss must be unique, but got intersection {keys_inter}"
+            params_state_dict.update(loss_state_dict)
+
+    paddle.save(params_state_dict, model_path + ".pdparams")
     paddle.save([opt.state_dict() for opt in optimizer], model_path + ".pdopt")
     paddle.save(metric_info, model_path + ".pdstates")
     logger.info("Already save model in {}".format(model_path))
