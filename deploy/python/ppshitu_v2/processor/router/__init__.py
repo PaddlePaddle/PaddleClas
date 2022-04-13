@@ -1,6 +1,6 @@
 import importlib
 
-from .loop_router import LoopRouter
+from processor.router.loop_router import LoopRouter
 
 
 def build_router(config, processors):

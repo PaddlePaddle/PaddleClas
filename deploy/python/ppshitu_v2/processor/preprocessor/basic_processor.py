@@ -1,4 +1,4 @@
-from ..base_processor import BaseProcessor
+from processor import BaseProcessor
 
 
 class GetData(BaseProcessor):

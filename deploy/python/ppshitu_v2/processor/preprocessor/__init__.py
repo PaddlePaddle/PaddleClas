@@ -1,6 +1,6 @@
 import importlib
 
-from .image_processor import ImageProcessor
+from processor.preprocessor.image_processor import ImageProcessor
 
 
 def build_preprocessor(config):

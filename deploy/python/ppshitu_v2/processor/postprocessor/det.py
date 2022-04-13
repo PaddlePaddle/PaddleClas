@@ -1,8 +1,8 @@
 from functools import reduce
 import numpy as np
 
-from ...utils import logger
-from ..base_processor import BaseProcessor
+from utils import logger
+from processor import BaseProcessor
 
 
 class DetPostPro(BaseProcessor):

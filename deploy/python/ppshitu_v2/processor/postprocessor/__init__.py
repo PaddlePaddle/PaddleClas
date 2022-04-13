@@ -1,8 +1,8 @@
 import importlib
 
-from .cls import TopK
-from .det import DetPostPro
-from .rec import FeatureNormalizer
+from processor.postprocessor.cls import TopK
+from processor.postprocessor.det import DetPostPro
+from processor.postprocessor.rec import FeatureNormalizer
 
 
 def build_postprocessor(config):

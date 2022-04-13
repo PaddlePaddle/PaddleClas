@@ -1,6 +1,6 @@
 import importlib
 
-from processor.algo_mod import AlgoMod
+from processor import AlgoMod
 
 
 class POPEngine:

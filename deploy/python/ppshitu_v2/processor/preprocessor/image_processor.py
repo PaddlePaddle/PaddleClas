@@ -4,8 +4,8 @@ import numpy as np
 import importlib
 from PIL import Image
 
-from ...utils import logger
-from ..base_processor import BaseProcessor
+from utils import logger
+from processor import BaseProcessor
 
 
 class ImageProcessor(BaseProcessor):
