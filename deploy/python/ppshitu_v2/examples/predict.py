@@ -19,10 +19,10 @@ def main():
     data = engine.process(input_data)
 
     # for cls
-    if "classification_res" in data:
+    if "cls_result" in data:
         print(data["cls_result"])
     # for det
-    elif "detection_res" in data:
+    elif "det_result" in data:
         print(data["det_result"])
     # for rec
     elif "features" in data["pred"]:
