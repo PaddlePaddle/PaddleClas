@@ -3,8 +3,7 @@ Global:
   infer_imgs: "../../images/wangzai.jpg"
 
 Modules:
-  - name:
-    type: AlgoMod
+  - name: Recognizer
     processors:
       - name: ImageProcessor
         type: preprocessor
