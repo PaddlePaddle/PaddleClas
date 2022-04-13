@@ -36,7 +36,7 @@ Modules:
     router:
       name: LoopRouter
       input_keys: [ "det_result" ]
-      output_keys: [ "cls_result" ]
+      output_keys: [ "features" ]
     processors:
       - name: GetData
         type: preprocessor
