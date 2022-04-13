@@ -27,7 +27,7 @@ class AlgoMod:
             self.processors.append(processor)
 
         if config.get("router", None) is not None:
-            router_processor = build_router(config["router_config"], self.processors)
+            router_processor = build_router(config["router"], self.processors)
             self.processors = [router_processor]
 
     def process(self, input_data):

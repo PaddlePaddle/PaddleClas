@@ -5,5 +5,5 @@ from processor.router.loop_router import LoopRouter
 
 def build_router(config, processors):
     processor_mod = importlib.import_module(__name__)
-    processor_name = config.pop("router")
+    processor_name = config.get("name")
     return getattr(processor_mod, processor_name)(config, processors)
