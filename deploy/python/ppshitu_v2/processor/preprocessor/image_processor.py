@@ -32,7 +32,7 @@ class BoxCrop(BaseProcessor):
         if self.input_keys is None:
             self.input_keys = ["box", "input_image"]
         if self.output_keys is None:
-            self.ouput_keys = ["image"]
+            self.output_keys = ["image"]
 
     def process(self, input_data):
         xmin, ymin, xmax, ymax = input_data[self.input_keys[0]].astype("int")
