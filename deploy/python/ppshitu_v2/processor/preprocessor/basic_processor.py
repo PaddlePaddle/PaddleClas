@@ -8,5 +8,5 @@ class GetData(BaseProcessor):
 
     def process(self, input_data):
         for i, data_key in enumerate(self.data_keys):
-            self.input_keys[self.output_keys[i]] = input_data[self.input_keys[i]][data_key]
+            input_data[self.output_keys[i]] = input_data[self.input_keys[i]][data_key]
         return input_data
