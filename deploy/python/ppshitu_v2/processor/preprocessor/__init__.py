@@ -1,6 +1,7 @@
 import importlib
 
 from processor.preprocessor.image_processor import ImageProcessor
+from processor.preprocessor.basic_processor import GetData
 
 
 def build_preprocessor(config):
