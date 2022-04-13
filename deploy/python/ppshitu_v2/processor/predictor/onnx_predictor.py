@@ -1,4 +1,4 @@
-from processor import BaseProcessor
+from processor.base_processor import BaseProcessor
 
 
 class ONNXPredictor(BaseProcessor):

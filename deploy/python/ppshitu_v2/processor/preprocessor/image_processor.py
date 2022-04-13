@@ -5,7 +5,7 @@ import importlib
 from PIL import Image
 
 from utils import logger
-from processor import BaseProcessor
+from processor.base_processor import BaseProcessor
 
 
 class ImageProcessor(BaseProcessor):

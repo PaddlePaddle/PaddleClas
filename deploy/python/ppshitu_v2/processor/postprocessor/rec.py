@@ -1,6 +1,6 @@
 import numpy as np
 
-from processor import BaseProcessor
+from processor.base_processor import BaseProcessor
 
 
 class FeatureNormalizer(BaseProcessor):

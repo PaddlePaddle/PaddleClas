@@ -3,7 +3,7 @@ import platform
 from paddle.inference import create_predictor
 from paddle.inference import Config as PaddleConfig
 
-from processor import BaseProcessor
+from processor.base_processor import BaseProcessor
 
 
 class PaddlePredictor(BaseProcessor):
