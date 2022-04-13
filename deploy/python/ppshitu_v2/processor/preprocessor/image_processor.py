@@ -4,12 +4,13 @@ import numpy as np
 import importlib
 from PIL import Image
 
-from utils import logger
-from processor.base_processor import BaseProcessor
+from ...utils import logger
+from ..base_processor import BaseProcessor
 
 
 class ImageProcessor(BaseProcessor):
     def __init__(self, config):
+        super().__init__(config)
         self.processors = []
         mod = importlib.import_module(__name__)
         for processor_config in config.get("ops"):
@@ -20,70 +21,102 @@ class ImageProcessor(BaseProcessor):
             self.processors.append(op)
 
     def process(self, input_data):
-        image = input_data["input_image"]
         for processor in self.processors:
-            if isinstance(processor, BaseProcessor):
-                input_data["image"] = image
-                input_data = processor.process(input_data)
-            else:
-                image = processor(image)
-        input_data["image"] = image
+            input_data = processor.process(input_data)
         return input_data
 
 
-class GetShapeInfo(BaseProcessor):
-    def __init__(self, configs):
-        self.order = configs.get("order")
+class BoxCrop(BaseProcessor):
+    def __init__(self, config=None):
+        super().__init__(config)
+        if self.input_keys is None:
+            self.input_keys = ["box", "input_image"]
+        if self.output_keys is None:
+            self.ouput_keys = ["image"]
 
     def process(self, input_data):
-        input_image = input_data["input_image"]
-        image = input_data["image"]
+        box = input_data[self.input_keys[0]]
+        image = input_data[self.input_keys[1]]
+
+
+class GetShapeInfo(BaseProcessor):
+    def __init__(self, config=None, order="chw"):
+        super().__init__(config)
+        self.order = order
+        if self.input_keys is None:
+            self.input_keys = ["input_image", "image"]
+        if self.output_keys is None:
+            self.output_keys = ["im_shape", "scale_factor", "input_shape"]
+
+    def process(self, input_data):
+        input_image = input_data[self.input_keys[0]]
+        image = input_data[self.input_keys[1]]
         if self.order == "hwc":
-            input_data['im_shape'] = np.array(
+            input_data[self.input_keys[0]] = np.array(
                 (image.shape[:2], ), dtype=np.float32)
-            input_data['scale_factor'] = np.array(
+            input_data[self.input_keys[1]] = np.array(
                 [
                     image.shape[0] / input_image.shape[0],
                     image.shape[1] / input_image.shape[1]
                 ],
                 dtype=np.float32)
         else:
-            input_data['im_shape'] = np.array(
+            input_data[self.input_keys[0]] = np.array(
                 (image.shape[1:], ), dtype=np.float32)
-            input_data['scale_factor'] = np.array(
+            input_data[self.input_keys[1]] = np.array(
                 [
                     image.shape[2] / input_image.shape[0],
                     image.shape[1] / input_image.shape[1]
                 ],
                 dtype=np.float32)
-        input_data['input_shape'] = np.array(image.shape[:2], dtype=np.float32)
+        input_data[self.input_keys[2]] = np.array(image.shape[:2], dtype=np.float32)
         return input_data
 
 
-class ToBatch:
+class ProxyProcessor(BaseProcessor):
+    def __init__(self, config=None):
+        super().__init__(config)
+        if self.input_keys is None:
+            self.input_keys = ["image"]
+        if self.output_keys is None:
+            self.output_keys = ["image"]
+
+    def process(self, input_data):
+        img = input_data[self.input_keys[0]]
+        output = self(img)
+        input_data[self.output_keys[0]] = output
+        return input_data
+
+    def __call__(self, img):
+        return img
+
+
+class ToBatch(ProxyProcessor):
     def __call__(self, img):
         img = img[np.newaxis, :, :, :]
         return img
 
 
-class ToRGB:
+class ToRGB(ProxyProcessor):
     def __call__(self, img):
         img = img[:, :, ::-1]
         return img
 
 
-class ToCHWImage:
+class ToCHWImage(ProxyProcessor):
     def __call__(self, img, img_info=None):
         img = img.transpose((2, 0, 1))
         return img
 
 
-class ResizeImage:
+class ResizeImage(ProxyProcessor):
     def __init__(self,
+                 config=None,
                  size=None,
                  resize_short=None,
                  interpolation=None,
                  backend="cv2"):
+        super().__init__(config)
         if resize_short is not None and resize_short > 0:
             self.resize_short = resize_short
             self.w = None
@@ -147,10 +180,13 @@ class ResizeImage:
         return img
 
 
-class CropImage:
+class CropImage(ProxyProcessor):
     """ crop image """
 
-    def __init__(self, size):
+    def __init__(self, config=None, size=0):
+        super().__init__(config)
+        if size == 0:
+            raise KeyError("CropImage config size is wrong")
         if type(size) is int:
             self.size = (size, size)
         else:
@@ -174,14 +210,16 @@ class CropImage:
         return img
 
 
-class NormalizeImage:
+class NormalizeImage(ProxyProcessor):
     def __init__(self,
+                 config=None,
                  scale=None,
                  mean=None,
                  std=None,
                  order='chw',
                  output_fp16=False,
                  channel_num=3):
+        super().__init__(config)
         if isinstance(scale, str):
             scale = eval(scale)
         assert channel_num in [3, 4], \

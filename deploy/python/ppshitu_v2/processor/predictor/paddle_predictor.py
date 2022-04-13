@@ -3,19 +3,50 @@ import platform
 from paddle.inference import create_predictor
 from paddle.inference import Config as PaddleConfig
 
-from ...base_processor import BaseProcessor
+from ..base_processor import BaseProcessor
 
 
 class PaddlePredictor(BaseProcessor):
     def __init__(self, config):
-        if config.get("use_fp16", False):
-            assert config.get("use_tensorrt", False) is True
+        super(PaddlePredictor, self).__init__(config)
+        paddle_config = self.init_env(config)
+
+        self.predictor = create_predictor(paddle_config)
+        self.input_names = self.predictor.get_input_names()
+
+        if self.input_keys is None:
+            self.input_keys = self.input_names
+        if self.output_keys is None:
+            self.output_keys = ["pred"]
+
+    def process(self, input_data):
+        for i, input_name in enumerate(self.input_names):
+            input_tensor = self.predictor.get_input_handle(input_name)
+            input_key = self.input_keys[i]
+            input_tensor.copy_from_cpu(input_data[input_key])
+        self.predictor.run()
+
+        model_output = []
+        output_names = self.predictor.get_output_names()
+        for output_name in output_names:
+            output = self.predictor.get_output_handle(output_name)
+            model_output.append(output.copy_to_cpu())
+
+        for i, output_key in enumerate(self.output_keys):
+            if output_key is None:
+                continue
+            input_data[output_key] = model_output[i]
+        return input_data
+
+    @staticmethod
+    def init_env(config):
 
         inference_model_dir = config["inference_model_dir"]
         params_file = os.path.join(inference_model_dir, "inference.pdiparams")
         model_file = os.path.join(inference_model_dir, "inference.pdmodel")
         paddle_config = PaddleConfig(model_file, params_file)
-
+        if config.get("use_fp16", False):
+            assert config.get("use_tensorrt", False) is True
         if config.get("use_gpu", False):
             paddle_config.enable_use_gpu(config.get("gpu_mem", 8000), 0)
         else:
@@ -46,37 +77,4 @@ class PaddlePredictor(BaseProcessor):
         paddle_config.enable_memory_optim()
         # use zero copy
         paddle_config.switch_use_feed_fetch_ops(False)
-        self.predictor = create_predictor(paddle_config)
-
-        if "to_model_names" in config and config["to_model_names"]:
-            self.input_name_map = {
-                v: k
-                for k, v in config["to_model_names"].items()
-            }
-        else:
-            self.input_name_map = {}
-
-        self.output_name_map = config["from_model_indexes"]
-
-    def process(self, data):
-        input_names = self.predictor.get_input_names()
-        for input_name in input_names:
-            input_tensor = self.predictor.get_input_handle(input_name)
-            name = self.input_name_map[
-                input_name] if input_name in self.input_name_map else input_name
-            input_tensor.copy_from_cpu(data[name])
-        self.predictor.run()
-
-        model_output = []
-        output_names = self.predictor.get_output_names()
-        for output_name in output_names:
-            output = self.predictor.get_output_handle(output_name)
-            model_output.append(output.copy_to_cpu())
-
-        output_data = {}
-        for name in self.output_name_map:
-            idx = self.output_name_map[name]
-            output_data[name] = model_output[idx]
-
-        data["pred"] = output_data
-        return data
+        return paddle_config

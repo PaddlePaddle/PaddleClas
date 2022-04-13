@@ -1,11 +1,11 @@
 import numpy as np
 
-from ...base_processor import BaseProcessor
+from ..base_processor import BaseProcessor
 
 
 class FeatureNormalizer(BaseProcessor):
     def __init__(self, config=None):
-        pass
+        super().__init__(config)
 
     def process(self, data):
         batch_output = data["pred"]["features"]

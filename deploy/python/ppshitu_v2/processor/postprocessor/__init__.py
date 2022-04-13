@@ -1,6 +1,6 @@
 import importlib
 
-from .classification import TopK
+from .cls import TopK
 from .det import DetPostPro
 from .rec import FeatureNormalizer
 

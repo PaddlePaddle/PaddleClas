@@ -1,7 +1,7 @@
 import importlib
 
-from processor.algo_mod.predictor.paddle_predictor import PaddlePredictor
-from processor.algo_mod.predictor.onnx_predictor import ONNXPredictor
+from .paddle_predictor import PaddlePredictor
+from .onnx_predictor import ONNXPredictor
 
 
 def build_predictor(config):

@@ -3,11 +3,12 @@ import os
 import numpy as np
 
 from utils import logger
-from ...base_processor import BaseProcessor
+from ..base_processor import BaseProcessor
 
 
 class TopK(BaseProcessor):
     def __init__(self, config):
+        super(PaddlePredictor, self).__init__(config)
         self.topk = config["k"]
         assert isinstance(self.topk, (int, ))
 

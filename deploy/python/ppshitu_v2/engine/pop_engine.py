@@ -8,8 +8,7 @@ class POPEngine:
         self.algo_list = []
         current_mod = importlib.import_module(__name__)
         for mod_config in config["Modules"]:
-            mod_type = mod_config.get("type")
-            mod = getattr(current_mod, mod_type)(mod_config)
+            mod = AlgoMod(mod_config)
             self.algo_list.append(mod)
 
     def process(self, input_data):

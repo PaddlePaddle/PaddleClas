@@ -1,8 +1,9 @@
-from ...base_processor import BaseProcessor
+from ..base_processor import BaseProcessor
 
 
 class ONNXPredictor(BaseProcessor):
     def __init__(self, config):
-        pass
+        super().__init__(config)
+
     def process(self, input_data):
         raise NotImplemented("ONNXPredictor Not supported yet")
