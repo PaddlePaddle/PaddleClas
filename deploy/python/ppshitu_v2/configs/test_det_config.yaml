@@ -9,7 +9,8 @@ Modules:
         type: preprocessor
         ops:
           - ResizeImage:
-              input_keys: ["input_image"]
+              config:
+                input_keys: ["input_image"]
               size: [640, 640]
               interpolation: 2
           - NormalizeImage:
@@ -19,7 +20,7 @@ Modules:
               order: hwc
           - ToCHWImage:
           - GetShapeInfo:
-              configs:
+              config:
                 order: chw
           - ToBatch:
       - name: PaddlePredictor
