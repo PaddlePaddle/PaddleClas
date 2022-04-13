@@ -52,24 +52,24 @@ class GetShapeInfo(BaseProcessor):
         input_image = input_data[self.input_keys[0]]
         image = input_data[self.input_keys[1]]
         if self.order == "hwc":
-            input_data[self.input_keys[0]] = np.array(
+            input_data[self.output_keys[0]] = np.array(
                 (image.shape[:2], ), dtype=np.float32)
-            input_data[self.input_keys[1]] = np.array(
+            input_data[self.output_keys[1]] = np.array(
                 [
                     image.shape[0] / input_image.shape[0],
                     image.shape[1] / input_image.shape[1]
                 ],
                 dtype=np.float32)
         else:
-            input_data[self.input_keys[0]] = np.array(
+            input_data[self.output_keys[0]] = np.array(
                 (image.shape[1:], ), dtype=np.float32)
-            input_data[self.input_keys[1]] = np.array(
+            input_data[self.output_keys[1]] = np.array(
                 [
                     image.shape[2] / input_image.shape[0],
                     image.shape[1] / input_image.shape[1]
                 ],
                 dtype=np.float32)
-        input_data[self.input_keys[2]] = np.array(image.shape[:2], dtype=np.float32)
+        input_data[self.output_keys[2]] = np.array(image.shape[:2], dtype=np.float32)
         return input_data
 
 
