@@ -18,7 +18,18 @@ def main():
     input_data = {"input_image": img}
     data = engine.process(input_data)
 
-    print(data)
+    # for cls
+    if "cls_result" in data:
+        print(data["cls_result"])
+    # for det
+    if "det_result" in data:
+        print(data["det_result"])
+    # for rec
+    if "features" in data:
+        features = data["features"]
+        print(features)
+        print(features.shape)
+        print(type(features))
 
 
 if __name__ == '__main__':
