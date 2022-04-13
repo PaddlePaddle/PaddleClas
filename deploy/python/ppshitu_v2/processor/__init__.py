@@ -1,10 +1,10 @@
-from .postprocessor import build_postprocessor
-from .preprocessor import build_preprocessor
-from .predictor import build_predictor
-from .searcher import build_searcher
-from .router import build_router
+from processor.postprocessor import build_postprocessor
+from processor.preprocessor import build_preprocessor
+from processor.predictor import build_predictor
+from processor.searcher import build_searcher
+from processor.router import build_router
 
-from .base_processor import BaseProcessor
+from processor.base_processor import BaseProcessor
 
 
 class AlgoMod:
