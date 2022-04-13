@@ -20,10 +20,10 @@ def main():
 
     # for cls
     if "classification_res" in data:
-        print(data["classification_res"])
+        print(data["cls_result"])
     # for det
     elif "detection_res" in data:
-        print(data["detection_res"])
+        print(data["det_result"])
     # for rec
     elif "features" in data["pred"]:
         features = data["pred"]["features"]
