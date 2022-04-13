@@ -42,6 +42,7 @@ Modules:
         type: preprocessor
         input_keys: ["det_result"]
         data_keys: ["bbox"]
+        output_keys: ["box"]
       - name: ImageProcessor
         type: preprocessor
         ops:

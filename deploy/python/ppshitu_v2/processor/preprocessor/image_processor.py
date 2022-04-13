@@ -30,7 +30,7 @@ class BoxCrop(BaseProcessor):
     def __init__(self, config=None):
         super().__init__(config)
         if self.input_keys is None:
-            self.input_keys = ["boxes", "input_image"]
+            self.input_keys = ["box", "input_image"]
         if self.output_keys is None:
             self.ouput_keys = ["image"]
 
