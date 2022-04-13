@@ -41,7 +41,7 @@ Modules:
       - name: GetData
         type: preprocessor
         input_keys: ["det_result"]
-        data_key: ["bbox"]
+        data_keys: ["bbox"]
       - name: ImageProcessor
         type: preprocessor
         ops:
