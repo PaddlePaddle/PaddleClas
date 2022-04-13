@@ -26,10 +26,7 @@ def main():
         print(data["det_result"])
     # for rec
     if "features" in data:
-        features = data["features"]
-        print(features)
-        print(features.shape)
-        print(type(features))
+        print(data["features"])
 
 
 if __name__ == '__main__':
