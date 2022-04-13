@@ -126,7 +126,8 @@ def classification_eval(engine, epoch_id=0):
             for key in loss_dict:
                 if key not in output_info:
                     output_info[key] = AverageMeter(key, '7.5f')
-                output_info[key].update(loss_dict[key].numpy()[0], batch_size)
+                output_info[key].update(loss_dict[key].numpy()[0],
+                                        current_samples)
         #  calc metric
         if engine.eval_metric_func is not None:
             metric_dict = engine.eval_metric_func(preds, labels)
