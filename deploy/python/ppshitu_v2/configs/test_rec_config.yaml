@@ -10,6 +10,8 @@ Modules:
         type: preprocessor
         ops:
           - ResizeImage:
+              config:
+                input_keys: [ "input_image" ]
               resize_short: 256
           - CropImage:
               size: 224
@@ -20,7 +22,7 @@ Modules:
               order: hwc
           - ToCHWImage:
           - GetShapeInfo:
-              configs:
+              config:
                 order: chw
           - ToBatch:
       - name: PaddlePredictor
