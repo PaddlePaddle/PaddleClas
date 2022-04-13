@@ -37,20 +37,16 @@ Modules:
       name: LoopRouter
       input_keys: [ "det_result" ]
       output_keys: [ "cls_result" ]
-      processors:
-        - name: GetData
-          type: preprocessor
-          input_keys: [ "det_result" ]
-          data_keys: [ "bbox" ]
-          output_keys: [ "box" ]
-        - name: ImageProcessor
-          type: preprocessor
-          ops:
-            - BoxCrop:
     processors:
+      - name: GetData
+        type: preprocessor
+        input_keys: [ "det_result" ]
+        data_keys: [ "bbox" ]
+        output_keys: [ "box" ]
       - name: ImageProcessor
         type: preprocessor
         ops:
+          - BoxCrop:
           - ResizeImage:
               resize_short: 256
           - CropImage:
