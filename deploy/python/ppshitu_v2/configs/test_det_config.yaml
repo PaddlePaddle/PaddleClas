@@ -31,4 +31,4 @@ Modules:
         threshold: 0.2
         max_det_results: 1
         label_list:
-        - foreground
+          - foreground

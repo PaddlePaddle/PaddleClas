@@ -30,14 +30,16 @@ class BoxCrop(BaseProcessor):
     def __init__(self, config=None):
         super().__init__(config)
         if self.input_keys is None:
-            self.input_keys = ["box", "input_image"]
+            self.input_keys = ["boxes", "input_image"]
         if self.output_keys is None:
             self.ouput_keys = ["image"]
 
     def process(self, input_data):
-        box = input_data[self.input_keys[0]]
+        xmin, ymin, xmax, ymax = input_data[self.input_keys[0]].astype("int")
         image = input_data[self.input_keys[1]]
-
+        crop_img = image[ymin:ymax, xmin:xmax, :].copy()
+        input_data[self.output_keys[0]] = crop_img
+        return input_data
 
 class GetShapeInfo(BaseProcessor):
     def __init__(self, config=None, order="chw"):
