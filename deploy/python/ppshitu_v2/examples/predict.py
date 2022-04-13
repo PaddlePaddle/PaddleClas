@@ -25,8 +25,8 @@ def main():
     elif "det_result" in data:
         print(data["det_result"])
     # for rec
-    elif "features" in data["pred"]:
-        features = data["pred"]["features"]
+    elif "features" in data:
+        features = data["features"]
         print(features)
         print(features.shape)
         print(type(features))
