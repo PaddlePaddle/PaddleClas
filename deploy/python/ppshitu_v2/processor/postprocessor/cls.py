@@ -16,6 +16,10 @@ class TopK(BaseProcessor):
         self.class_id_map = self.parse_class_id_map(class_id_map_file)
 
         self.multilabel = config.get("multilabel", False)
+        if self.input_keys is None:
+            self.input_keys = ["logits"]
+        if self.output_keys is None:
+            self.output_keys = ["cls_result"]
 
     def parse_class_id_map(self, class_id_map_file):
         if class_id_map_file is None:
@@ -39,8 +43,8 @@ class TopK(BaseProcessor):
             class_id_map = None
         return class_id_map
 
-    def process(self, data):
-        logits = data["pred"]["logits"]
+    def process(self, input_data):
+        logits = input_data[self.input_keys[0]]
         all_results = []
         for probs in logits:
             index = probs.argsort(axis=0)[-self.topk:][::-1].astype(
@@ -63,5 +67,5 @@ class TopK(BaseProcessor):
                 result["label_names"] = label_name_list
             all_results.append(result)
 
-        data["classification_res"] = all_results
-        return data
+        input_data[self.output_keys[0]] = all_results
+        return input_data
