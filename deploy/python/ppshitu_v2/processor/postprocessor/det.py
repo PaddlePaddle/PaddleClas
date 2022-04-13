@@ -17,7 +17,7 @@ class DetPostPro(BaseProcessor):
             self.output_keys = ["det_result"]
 
     def process(self, input_data):
-        np_boxes = input_data[self.input_keys[0]]["boxes"]
+        np_boxes = input_data[self.input_keys[0]]
         if reduce(lambda x, y: x * y, np_boxes.shape) >= 6:
             keep_indexes = np_boxes[:, 1].argsort()[::-1][:
                                                           self.max_det_results]
