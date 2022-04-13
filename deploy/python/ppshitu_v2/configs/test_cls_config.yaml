@@ -10,6 +10,8 @@ Modules:
         type: preprocessor
         ops:
           - ResizeImage:
+              config:
+                input_keys: ["input_image"]
               resize_short: 256
           - CropImage:
               size: 224
@@ -24,7 +26,7 @@ Modules:
           - ToBatch:
       - name: PaddlePredictor
         type: predictor
-        inference_model_dir: "./MobileNetV2_infer"
+        inference_model_dir: "./models/MobileNetV2_infer"
         input_keys: ["image"]
         output_keys: ["logits"]
       - name: TopK
