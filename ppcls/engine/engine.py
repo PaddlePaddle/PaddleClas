@@ -242,11 +242,6 @@ class Engine(object):
                 level=amp_level,
                 save_dtype='float32')
 
-        # TODO(gaotingquan): convert_sync_batchnorm is not effective
-        # eval loss in training is inconsistent with the eval only if bn is used,
-        # because the running_mean and running_var of bn are not synced in dist.
-        self.model = nn.SyncBatchNorm.convert_sync_batchnorm(self.model)
-
         # for distributed
         world_size = dist.get_world_size()
         self.config["Global"]["distributed"] = world_size != 1
