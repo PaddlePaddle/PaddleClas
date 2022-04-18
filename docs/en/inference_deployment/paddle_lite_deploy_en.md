@@ -18,6 +18,7 @@ If you only want to test speed, please refer to [The tutorial of Paddle-Lite mob
         - [2.1.1 [RECOMMEND] Use pip to install Paddle-Lite and optimize model](#2.1.1)
         - [2.1.2 Compile Paddle-Lite to generate opt tool](#2.1.2)
         - [2.1.3 Demo of get the optimized model](#2.1.3)
+        - [2.1.4 Compile to get the executable file clas_system](#2.1.4)
     - [2.2 Run optimized model on Phone](#2.2)
 - [3. FAQ](#3)
 
@@ -40,8 +41,8 @@ For the detailed compilation directions of different development environments, p
 
 |Platform|Inference Library Download Link|
 |-|-|
-|Android|[arm7](https://paddlelite-data.bj.bcebos.com/Release/2.8-rc/Android/gcc/inference_lite_lib.android.armv7.gcc.c++_static.with_extra.with_cv.tar.gz) / [arm8](https://paddlelite-data.bj.bcebos.com/Release/2.8-rc/Android/gcc/inference_lite_lib.android.armv8.gcc.c++_static.with_extra.with_cv.tar.gz)|
-|iOS|[arm7](https://paddlelite-data.bj.bcebos.com/Release/2.8-rc/iOS/inference_lite_lib.ios.armv7.with_cv.with_extra.tiny_publish.tar.gz) / [arm8](https://paddlelite-data.bj.bcebos.com/Release/2.8-rc/iOS/inference_lite_lib.ios.armv8.with_cv.with_extra.tiny_publish.tar.gz)|
+|Android|[arm7](https://github.com/PaddlePaddle/Paddle-Lite/releases/download/v2.10/inference_lite_lib.android.armv7.clang.c++_static.with_extra.with_cv.tar.gz) / [arm8](https://github.com/PaddlePaddle/Paddle-Lite/releases/download/v2.10/inference_lite_lib.android.armv8.clang.c++_static.with_extra.with_cv.tar.gz) |
+|iOS|[arm7](https://github.com/PaddlePaddle/Paddle-Lite/releases/download/v2.10/inference_lite_lib.ios.armv7.with_cv.with_extra.tiny_publish.tar.gz) / [arm8](https://github.com/PaddlePaddle/Paddle-Lite/releases/download/v2.10/inference_lite_lib.ios.armv8.with_cv.with_extra.tiny_publish.tar.gz)|
 
 **NOTE**:
 
@@ -53,7 +54,7 @@ For the detailed compilation directions of different development environments, p
 The structure of the inference library is as follows:
 
 ```
-inference_lite_lib.android.armv8/
+inference_lite_lib.android.armv8.clang.c++_static.with_extra.with_cv/
 |-- cxx                                                    C++ inference library and header files
 |   |-- include                                            C++ header files
 |   |   |-- paddle_api.h
@@ -148,6 +149,23 @@ paddle_lite_opt --model_file=./MobileNetV3_large_x1_0_infer/inference.pdmodel --
 ```
 
 When the above code command is completed, there will be ``MobileNetV3_large_x1_0.nb` in the current directory, which is the converted model file.
+<a name="2.1.4"></a>
+
+#### 2.1.4 Compile to get the executable file clas_system
+
+```shell
+# Clone the Autolog repository to get automation logs
+cd PaddleClas_root_path
+cd deploy/lite/
+git clone https://github.com/LDOUBLEV/AutoLog.git
+```
+
+```shell
+# Compile
+make -j
+```
+
+After executing the `make` command, the `clas_system` executable file is generated in the current directory, which is used for Lite prediction.
 
 <a name="2.2"></a>
 ## 2.2 Run optimized model on Phone
@@ -172,7 +190,7 @@ When the above code command is completed, there will be ``MobileNetV3_large_x1_0
     * Install ADB for windows
       If install ADB fo Windows, you need to download from Google's Android platform: [Download Link](https://developer.android.com/studio).
 
-    First, make sure the phone is connected to the computer, turn on the `USB debugging` option of the phone, and select the `file transfer` mode. Verify whether ADB is installed successfully as follows:
+3. First, make sure the phone is connected to the computer, turn on the `USB debugging` option of the phone, and select the `file transfer` mode. Verify whether ADB is installed successfully as follows:
 
     ```shell
     $ adb devices
@@ -183,41 +201,21 @@ When the above code command is completed, there will be ``MobileNetV3_large_x1_0
 
     If there is `device` output like the above, it means the installation was successful.
 
-4. Prepare optimized model, inference library files, test image and dictionary file used.
+4. Push the optimized model, prediction library file, test image and class map file to the phone.
 
 ```shell
-cd PaddleClas_root_path
-cd deploy/lite/
-
-# prepare.sh will put the inference library files, the test image and the dictionary files in demo/cxx/clas
-sh prepare.sh /{lite inference library path}/inference_lite_lib.android.armv8
-
-# enter the working directory of lite demo
-cd /{lite inference library path}/inference_lite_lib.android.armv8/
-cd demo/cxx/clas/
-
-# copy the C++ inference dynamic library file （ie. .so) to the debug folder
-cp ../../../cxx/lib/libpaddle_light_api_shared.so ./debug/
+```shell
+adb shell mkdir -p /data/local/tmp/arm_cpu/
+adb push clas_system /data/local/tmp/arm_cpu/
+adb shell chmod +x /data/local/tmp/arm_cpu//clas_system
+adb push inference_lite_lib.android.armv8.clang.c++_static.with_extra.with_cv/cxx/lib/libpaddle_light_api_shared.so /data/local/tmp/arm_cpu/
+adb push MobileNetV3_large_x1_0.nb /data/local/tmp/arm_cpu/
+adb push config.txt /data/local/tmp/arm_cpu/
+adb push ../../ppcls/utils/imagenet1k_label_list.txt /data/local/tmp/arm_cpu/
+adb push imgs/tabby_cat.jpg /data/local/tmp/arm_cpu/
 ```
-
-The `prepare.sh` take `PaddleClas/deploy/lite/imgs/tabby_cat.jpg` as the test image, and copy it to the `demo/cxx/clas/debug/` directory.
 
 You should put the model that optimized by `paddle_lite_opt` under the `demo/cxx/clas/debug/` directory. In this example, use `MobileNetV3_large_x1_0.nb` model file generated in [2.1.3](#2.1.3).
-
-The structure of the clas demo is as follows after the above command is completed:
-
-```
-demo/cxx/clas/
-|-- debug/
-|   |--MobileNetV3_large_x1_0.nb                    class model
-|   |--tabby_cat.jpg                              test image
-|   |--imagenet1k_label_list.txt                    dictionary file
-|   |--libpaddle_light_api_shared.so              C++ .so file
-|   |--config.txt                                 config file
-|-- config.txt                                    config file
-|-- image_classfication.cpp                       source code
-|-- Makefile                                      compile file
-```
 
 **NOTE**:
 
@@ -229,32 +227,21 @@ clas_model_file ./MobileNetV3_large_x1_0.nb # path of model file
 label_path ./imagenet1k_label_list.txt      # path of category mapping file
 resize_short_size 256                       # the short side length after resize
 crop_size 224                               # side length used for inference after cropping
-
 visualize 0                                 # whether to visualize. If you set it to 1, an image file named 'clas_result.png' will be generated in the current directory.
+num_threads 1 # The number of threads, the default is 1
+precision FP32 # Precision type, you can choose FP32 or INT8, the default is FP32
+runtime_device arm_cpu # Device type, the default is arm_cpu
+enable_benchmark 0 # Whether to enable benchmark, the default is 0
+tipc_benchmark 0 # Whether to enable tipc_benchmark, the default is 0
 ```
 
 5. Run Model on Phone
 
+Execute the following command to complete the prediction on the mobile phone.
+
 ```shell
-# run compile to get the executable file 'clas_system'
-make -j
-
-# move the compiled executable file to the debug folder
-mv clas_system ./debug/
-
-# push the debug folder to Phone
-adb push debug /data/local/tmp/
-
-adb shell
-cd /data/local/tmp/debug
-export LD_LIBRARY_PATH=/data/local/tmp/debug:$LD_LIBRARY_PATH
-
-# the usage of clas_system is as follows:
-# ./clas_system "path of config file" "path of test image"
-./clas_system ./config.txt ./tabby_cat.jpg
+adb shell 'export LD_LIBRARY_PATH=/data/local/tmp/arm_cpu/; /data/local/tmp/arm_cpu/clas_system /data/local/tmp/arm_cpu/config.txt /data/local/tmp/arm_cpu/tabby_cat.jpg'
 ```
-
-**NOTE**: If you make changes to the code, you need to recompile and repush the `debug ` folder to the phone.
 
 The result is as follows:
 

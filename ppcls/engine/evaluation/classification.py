@@ -58,7 +58,7 @@ def classification_eval(engine, epoch_id=0):
             batch[1] = batch[1].reshape([-1, 1]).astype("int64")
 
         # image input
-        if engine.amp:
+        if engine.amp and engine.config["AMP"].get("use_fp16_test", False):
             amp_level = engine.config['AMP'].get("level", "O1").upper()
             with paddle.amp.auto_cast(
                     custom_black_list={
