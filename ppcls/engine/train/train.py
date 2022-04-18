@@ -21,7 +21,6 @@ from ppcls.utils import profiler
 
 def train_epoch(engine, epoch_id, print_batch_step):
     tic = time.time()
-    v_current = [int(i) for i in paddle.__version__.split(".")]
     for iter_id, batch in enumerate(engine.train_dataloader):
         if iter_id >= engine.max_iter:
             break
