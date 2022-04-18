@@ -58,8 +58,15 @@ def classification_eval(engine, epoch_id=0):
             batch[1] = batch[1].reshape([-1, 1]).astype("int64")
 
         # image input
-        if engine.amp and engine.config["AMP"].get("use_fp16_test", False):
+        if engine.amp and (
+                engine.config['AMP'].get("level", "O1").upper() == "O2" or
+                engine.config["AMP"].get("use_fp16_test", False)):
             amp_level = engine.config['AMP'].get("level", "O1").upper()
+
+            if amp_level == "O2":
+                msg = "Only support FP16 evaluation when AMP O2 is enabled."
+                logger.warning(msg)
+
             with paddle.amp.auto_cast(
                     custom_black_list={
                         "flatten_contiguous_range", "greater_than"
