@@ -53,16 +53,22 @@ def train_epoch(engine, epoch_id, print_batch_step):
             out = forward(engine, batch)
             loss_dict = engine.train_loss_func(out, batch[1])
 
-        # step opt and lr
+        # step opt
         if engine.amp:
             scaled = engine.scaler.scale(loss_dict["loss"])
             scaled.backward()
-            engine.scaler.minimize(engine.optimizer, scaled)
+            for i in range(len(engine.optimizer)):
+                engine.scaler.minimize(engine.optimizer[i], scaled)
         else:
             loss_dict["loss"].backward()
-            engine.optimizer.step()
-        engine.optimizer.clear_grad()
-        engine.lr_sch.step()
+            for i in range(len(engine.optimizer)):
+                engine.optimizer[i].step()
+        # clear grad
+        for i in range(len(engine.optimizer)):
+            engine.optimizer[i].clear_grad()
+        # step lr
+        for i in range(len(engine.lr_sch)):
+            engine.lr_sch[i].step()
 
         # below code just for logging
         # update metric_for_logger
