@@ -45,19 +45,20 @@ def build_lr_scheduler(lr_config, epochs, step_each_epoch):
 # model_list is None in static graph
 def build_optimizer(config, epochs, step_each_epoch, model_list=None):
     config = copy.deepcopy(config)
-    if isinstance(config, dict):
-        # convert to [{optim_name1: {scope: xxx, **optim_cfg}}, {optim_name2: {scope: xxx, **optim_cfg}}, ...]
-        optim_name = config.Optimizer.pop('name')
-        config: List[Dict[str, Dict]] = [{
+    optim_config = config["Optimizer"]
+    if isinstance(optim_config, dict):
+        # convert {'name': xxx, **optim_cfg} to [{name: {scope: xxx, **optim_cfg}}]
+        optim_name = optim_config.pop("name")
+        optim_config: List[Dict[str, Dict]] = [{
             optim_name: {
-                'scope': config.Arch.name,
+                'scope': config["Arch"].get("name"),
                 **
-                config.Optimizer
+                optim_config
             }
         }]
     optim_list = []
     lr_list = []
-    for optim_item in config:
+    for optim_item in optim_config:
         # optim_cfg = {optim_name1: {scope: xxx, **optim_cfg}}
         # step1 build lr
         optim_name = optim_item.keys()[0]  # get optim_name1

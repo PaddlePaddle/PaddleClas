@@ -49,7 +49,8 @@ def load_dygraph_pretrain(model, path=None):
     param_state_dict = paddle.load(path + ".pdparams")
     if isinstance(model, list):
         for m in model:
-            m.set_dict(param_state_dict)
+            if hasattr(m, 'set_dict'):
+                m.set_dict(param_state_dict)
     else:
         model.set_dict(param_state_dict)
     return
