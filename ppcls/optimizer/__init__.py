@@ -61,7 +61,7 @@ def build_optimizer(config, epochs, step_each_epoch, model_list=None):
     for optim_item in optim_config:
         # optim_cfg = {optim_name1: {scope: xxx, **optim_cfg}}
         # step1 build lr
-        optim_name = optim_item.keys()[0]  # get optim_name1
+        optim_name = list(optim_item.keys())[0]  # get optim_name1
         optim_scope = optim_item[optim_name].pop('scope')  # get scope
         optim_cfg = optim_item[optim_name]  # get optim_cfg
 

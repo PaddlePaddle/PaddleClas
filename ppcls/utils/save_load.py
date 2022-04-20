@@ -103,7 +103,7 @@ def init_model(config, net, optimizer=None, loss: paddle.nn.Layer=None):
         metric_dict = paddle.load(checkpoints + ".pdstates")
         # set state dict
         net.set_state_dict(para_dict)
-        loss.loss_func[i].set_state_dict(para_dict)
+        loss.set_state_dict(para_dict)
         for i in range(len(optimizer)):
             optimizer[i].set_state_dict(opti_dict)
         logger.info("Finish load checkpoints from {}".format(checkpoints))
