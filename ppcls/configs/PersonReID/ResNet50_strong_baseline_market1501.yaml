@@ -1,0 +1,178 @@
+# global configs
+Global:
+  checkpoints: null
+  pretrained_model: null
+  output_dir: "./output/"
+  device: "gpu"
+  save_interval: 40
+  eval_during_train: True
+  eval_interval: 10
+  epochs: 120
+  print_batch_step: 20
+  use_visualdl: False
+  warmup_epoch_by_epoch: True
+  eval_mode: "retrieval"
+  re_ranking: True
+  # used for static mode and model export
+  image_shape: [3, 256, 128]
+  save_inference_dir: "./inference"
+
+# model architecture
+Arch:
+  name: "RecModel"
+  infer_output_key: "features"
+  infer_add_softmax: False
+  Backbone:
+    name: "ResNet50_last_stage_stride1"
+    pretrained: True
+    stem_act: null
+  BackboneStopLayer:
+    name: "flatten"
+  Neck:
+    name: BNNeck
+    num_features: &feat_dim 2048
+  Head:
+    name: "FC"
+    embedding_size: *feat_dim
+    class_num: &class_num 751
+    weight_attr:
+      initializer:
+        name: Normal
+        std: 0.001
+    bias_attr: False
+
+# loss function config for traing/eval process
+Loss:
+  Train:
+    - CELoss:
+        weight: 1.0
+        epsilon: 0.1
+    - TripletLossV3:
+        weight: 1.0
+        margin: 0.3
+        normalize_feature: false
+    - CenterLoss:
+        weight: 0.0005
+        num_classes: *class_num
+        feat_dim: *feat_dim
+  Eval:
+    - CELoss:
+        weight: 1.0
+
+Optimizer:
+  - Adam:
+    scope: model
+    lr:
+      name: Piecewise
+      decay_epochs: [30, 60]
+      values: [0.00035, 0.000035, 0.0000035]
+      warmup_epoch: 10
+      warmup_start_lr: 0.0000035
+      warmup_epoch_by_epoch: True
+    regularizer:
+      name: 'L2'
+      coeff: 0.0005
+  - SGD:
+    sope: TripletLossV3
+    lr:
+      name: Constant
+      learning_rate: 0.5
+
+# data loader for train and eval
+DataLoader:
+  Train:
+    dataset:
+        name: "VeriWild"
+        image_root: "./dataset/market1501/bounding_box_train"
+        cls_label_path: "./dataset/market1501/bounding_box_train.txt"
+        relabel: True
+        transform_ops:
+          - DecodeImage:
+              to_rgb: True
+              channel_first: False
+          - ResizeImage:
+              size: [128, 256]
+          - RandFlipImage:
+              flip_code: 1
+          - Pad:
+              padding: 10
+          - RandCropImage:
+              size: [128, 256]
+              scale: [ 0.8022, 0.8022 ]
+              ratio: [ 0.5, 0.5 ]
+          - NormalizeImage:
+              scale: 0.00392157
+              mean: [0.485, 0.456, 0.406]
+              std: [0.229, 0.224, 0.225]
+              order: ''
+          - RandomErasing:
+              EPSILON: 0.5
+              sl: 0.02
+              sh: 0.4
+              r1: 0.3
+              mean: [0.4914, 0.4822, 0.4465]
+    sampler:
+        name: DistributedRandomIdentitySampler
+        batch_size: 64
+        num_instances: 4
+        drop_last: True
+        shuffle: True
+    loader:
+        num_workers: 4
+        use_shared_memory: True
+  Eval:
+    Query:
+      dataset:
+        name: "VeriWild"
+        image_root: "./dataset/market1501/query"
+        cls_label_path: "./dataset/market1501/query.txt"
+        transform_ops:
+          - DecodeImage:
+              to_rgb: True
+              channel_first: False
+          - ResizeImage:
+              size: [128, 256]
+          - NormalizeImage:
+              scale: 0.00392157
+              mean: [0.485, 0.456, 0.406]
+              std: [0.229, 0.224, 0.225]
+              order: ''
+      sampler:
+        name: DistributedBatchSampler
+        batch_size: 128
+        drop_last: False
+        shuffle: False
+      loader:
+        num_workers: 4
+        use_shared_memory: True
+
+    Gallery:
+      dataset:
+        name: "VeriWild"
+        image_root: "./dataset/market1501/bounding_box_test"
+        cls_label_path: "./dataset/market1501/bounding_box_test.txt"
+        transform_ops:
+          - DecodeImage:
+              to_rgb: True
+              channel_first: False
+          - ResizeImage:
+              size: [128, 256]
+          - NormalizeImage:
+              scale: 0.00392157
+              mean: [0.485, 0.456, 0.406]
+              std: [0.229, 0.224, 0.225]
+              order: ''
+      sampler:
+        name: DistributedBatchSampler
+        batch_size: 128
+        drop_last: False
+        shuffle: False
+      loader:
+        num_workers: 4
+        use_shared_memory: True
+
+Metric:
+  Eval:
+    - Recallk:
+        topk: [1, 5]
+    - mAP: {}

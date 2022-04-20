@@ -103,8 +103,11 @@ def build_optimizer(config, epochs, step_each_epoch, model_list=None):
                 if optim_scope.endswith("Loss"):
                     # optimizer for loss
                     for m in model_list[i].sublayers(True):
-                        if m.__class_name == optim_scope:
+                        if m.__class__.__name__ == optim_scope:
                             optim_model.append(m)
+                elif optim_scope == "model":
+                    # opmizer for entire model
+                    optim_model.append(model_list[i])
                 else:
                     # opmizer for module in model, such as backbone, neck, head...
                     if hasattr(model_list[i], optim_scope):

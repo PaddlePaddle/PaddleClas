@@ -16,6 +16,8 @@ from __future__ import division
 from __future__ import print_function
 
 import platform
+
+import numpy as np
 import paddle
 from ppcls.utils import logger
 
@@ -49,34 +51,55 @@ def retrieval_eval(engine, epoch_id=0):
         metric_dict = {metric_key: 0.}
     else:
         metric_dict = dict()
-        for block_idx, block_fea in enumerate(fea_blocks):
-            similarity_matrix = paddle.matmul(
-                block_fea, gallery_feas, transpose_y=True)
-            if query_query_id is not None:
-                query_id_block = query_id_blocks[block_idx]
-                query_id_mask = (query_id_block != gallery_unique_id.t())
+        reranking_flag = engine.config['Global'].get('re_ranking', False)
+        logger.info(f"re_ranking={reranking_flag}")
+        if not reranking_flag:
+            for block_idx, block_fea in enumerate(fea_blocks):
+                similarity_matrix = paddle.matmul(
+                    block_fea, gallery_feas, transpose_y=True)
+                if query_query_id is not None:
+                    query_id_block = query_id_blocks[block_idx]
+                    query_id_mask = (query_id_block != gallery_unique_id.t())
 
-                image_id_block = image_id_blocks[block_idx]
-                image_id_mask = (image_id_block != gallery_img_id.t())
+                    image_id_block = image_id_blocks[block_idx]
+                    image_id_mask = (image_id_block != gallery_img_id.t())
 
-                keep_mask = paddle.logical_or(query_id_mask, image_id_mask)
-                similarity_matrix = similarity_matrix * keep_mask.astype(
-                    "float32")
-            else:
-                keep_mask = None
-
-            metric_tmp = engine.eval_metric_func(similarity_matrix,
-                                                 image_id_blocks[block_idx],
-                                                 gallery_img_id, keep_mask)
-
-            for key in metric_tmp:
-                if key not in metric_dict:
-                    metric_dict[key] = metric_tmp[key] * block_fea.shape[
-                        0] / len(query_feas)
+                    keep_mask = paddle.logical_or(query_id_mask, image_id_mask)
+                    similarity_matrix = similarity_matrix * keep_mask.astype(
+                        "float32")
                 else:
-                    metric_dict[key] += metric_tmp[key] * block_fea.shape[
-                        0] / len(query_feas)
+                    keep_mask = None
 
+                metric_tmp = engine.eval_metric_func(
+                    similarity_matrix, image_id_blocks[block_idx],
+                    gallery_img_id, keep_mask)
+
+                for key in metric_tmp:
+                    if key not in metric_dict:
+                        metric_dict[key] = metric_tmp[key] * block_fea.shape[
+                            0] / len(query_feas)
+                    else:
+                        metric_dict[key] += metric_tmp[key] * block_fea.shape[
+                            0] / len(query_feas)
+        else:
+            distmat = re_ranking(
+                query_feas,
+                gallery_feas,
+                query_img_id,
+                query_query_id,
+                gallery_img_id,
+                gallery_unique_id,
+                k1=20,
+                k2=6,
+                lambda_value=0.3)
+            cmc, mAP = eval_func(distmat,
+                                 np.squeeze(query_img_id.numpy()),
+                                 np.squeeze(gallery_img_id.numpy()),
+                                 np.squeeze(query_query_id.numpy()),
+                                 np.squeeze(gallery_unique_id.numpy()))
+            for key in metric_tmp:
+                metric_dict[key] = metric_tmp[key] * block_fea.shape[0] / len(
+                    query_feas)
     metric_info_list = []
     for key in metric_dict:
         if metric_key is None:
@@ -86,6 +109,162 @@ def retrieval_eval(engine, epoch_id=0):
     logger.info("[Eval][Epoch {}][Avg]{}".format(epoch_id, metric_msg))
 
     return metric_dict[metric_key]
+
+
+def re_ranking(queFea,
+               galFea,
+               k1=20,
+               k2=6,
+               lambda_value=0.5,
+               local_distmat=None,
+               only_local=False):
+    # if feature vector is numpy, you should use 'paddle.tensor' transform it to tensor
+    query_num = queFea.shape[0]
+    all_num = query_num + galFea.shape[0]
+    if only_local:
+        original_dist = local_distmat
+    else:
+        feat = paddle.concat([queFea, galFea])
+        logger.info('using GPU to compute original distance')
+
+        # L2 distance
+        distmat = paddle.pow(feat, 2).sum(axis=1, keepdim=True).expand([all_num, all_num]) + \
+                  paddle.pow(feat, 2).sum(axis=1, keepdim=True).expand([all_num, all_num]).t()
+        distmat = distmat.addmm(x=feat, y=feat.t(), alpha=-2.0, beta=1.0)
+        # Cosine distance
+        # distmat = paddle.matmul(queFea, galFea, transpose_y=True)
+        # if query_query_id is not None:
+        #     query_id_mask = (queCid != galCid.t())
+        #     image_id_mask = (queId != galId.t())
+        #     keep_mask = paddle.logical_or(query_id_mask, image_id_mask)
+        #     distmat = distmat * keep_mask.astype("float32")
+
+        original_dist = distmat.cpu().numpy()
+        del feat
+        if local_distmat is not None:
+            original_dist = original_dist + local_distmat
+
+    gallery_num = original_dist.shape[0]
+    original_dist = np.transpose(original_dist / np.max(original_dist, axis=0))
+    V = np.zeros_like(original_dist).astype(np.float16)
+    initial_rank = np.argsort(original_dist).astype(np.int32)
+    logger.info('starting re_ranking')
+    for i in range(all_num):
+        # k-reciprocal neighbors
+        forward_k_neigh_index = initial_rank[i, :k1 + 1]
+        backward_k_neigh_index = initial_rank[forward_k_neigh_index, :k1 + 1]
+        fi = np.where(backward_k_neigh_index == i)[0]
+        k_reciprocal_index = forward_k_neigh_index[fi]
+        k_reciprocal_expansion_index = k_reciprocal_index
+        for j in range(len(k_reciprocal_index)):
+            candidate = k_reciprocal_index[j]
+            candidate_forward_k_neigh_index = initial_rank[candidate, :int(
+                np.around(k1 / 2)) + 1]
+            candidate_backward_k_neigh_index = initial_rank[
+                candidate_forward_k_neigh_index, :int(np.around(k1 / 2)) + 1]
+            fi_candidate = np.where(
+                candidate_backward_k_neigh_index == candidate)[0]
+            candidate_k_reciprocal_index = candidate_forward_k_neigh_index[
+                fi_candidate]
+            if len(
+                    np.intersect1d(candidate_k_reciprocal_index,
+                                   k_reciprocal_index)) > 2 / 3 * len(
+                                       candidate_k_reciprocal_index):
+                k_reciprocal_expansion_index = np.append(
+                    k_reciprocal_expansion_index, candidate_k_reciprocal_index)
+
+        k_reciprocal_expansion_index = np.unique(k_reciprocal_expansion_index)
+        weight = np.exp(-original_dist[i, k_reciprocal_expansion_index])
+        V[i, k_reciprocal_expansion_index] = weight / np.sum(weight)
+    all_num_cost = time.time() - t
+    original_dist = original_dist[:query_num, ]
+    if k2 != 1:
+        V_qe = np.zeros_like(V, dtype=np.float16)
+        for i in range(all_num):
+            V_qe[i, :] = np.mean(V[initial_rank[i, :k2], :], axis=0)
+        V = V_qe
+        del V_qe
+    del initial_rank
+    invIndex = []
+    for i in range(gallery_num):
+        invIndex.append(np.where(V[:, i] != 0)[0])
+
+    jaccard_dist = np.zeros_like(original_dist, dtype=np.float16)
+    gallery_num_cost = time.time() - t
+    for i in range(query_num):
+        temp_min = np.zeros(shape=[1, gallery_num], dtype=np.float16)
+        indNonZero = np.where(V[i, :] != 0)[0]
+        indImages = [invIndex[ind] for ind in indNonZero]
+        for j in range(len(indNonZero)):
+            temp_min[0, indImages[j]] = temp_min[0, indImages[j]] + np.minimum(
+                V[i, indNonZero[j]], V[indImages[j], indNonZero[j]])
+        jaccard_dist[i] = 1 - temp_min / (2 - temp_min)
+
+    final_dist = jaccard_dist * (1 - lambda_value
+                                 ) + original_dist * lambda_value
+    del original_dist
+    del V
+    del jaccard_dist
+    final_dist = final_dist[:query_num, query_num:]
+    query_num_cost = time.time() - t
+    return final_dist
+
+
+def eval_func(distmat, q_pids, g_pids, q_camids, g_camids, max_rank=50):
+    """Evaluation with market1501 metric
+        Key: for each query identity, its gallery images from the same camera view are discarded.
+        """
+    num_q, num_g = distmat.shape
+    if num_g < max_rank:
+        max_rank = num_g
+        print("Note: number of gallery samples is quite small, got {}".format(
+            num_g))
+    indices = np.argsort(distmat, axis=1)
+    matches = (g_pids[indices] == q_pids[:, np.newaxis]).astype(np.int32)
+
+    # compute cmc curve for each query
+    all_cmc = []
+    all_AP = []
+    num_valid_q = 0.  # number of valid query
+    for q_idx in range(num_q):
+        # get query pid and camid
+        q_pid = q_pids[q_idx]
+        q_camid = q_camids[q_idx]
+
+        # remove gallery samples that have the same pid and camid with query
+        order = indices[q_idx]
+        remove = (g_pids[order] == q_pid) & (g_camids[order] == q_camid)
+        keep = np.invert(remove)
+
+        # compute cmc curve
+        # binary vector, positions with value 1 are correct matches
+        orig_cmc = matches[q_idx][keep]
+        if not np.any(orig_cmc):
+            # this condition is true when query identity does not appear in gallery
+            continue
+
+        cmc = orig_cmc.cumsum()
+        cmc[cmc > 1] = 1
+
+        all_cmc.append(cmc[:max_rank])
+        num_valid_q += 1.
+
+        # compute average precision
+        # reference: https://en.wikipedia.org/wiki/Evaluation_measures_(information_retrieval)#Average_precision
+        num_rel = orig_cmc.sum()
+        tmp_cmc = orig_cmc.cumsum()
+        tmp_cmc = [x / (i + 1.) for i, x in enumerate(tmp_cmc)]
+        tmp_cmc = np.asarray(tmp_cmc) * orig_cmc
+        AP = tmp_cmc.sum() / num_rel
+        all_AP.append(AP)
+
+    assert num_valid_q > 0, "Error: all query identities do not appear in gallery"
+
+    all_cmc = np.asarray(all_cmc).astype(np.float32)
+    all_cmc = all_cmc.sum(0) / num_valid_q
+    mAP = np.mean(all_AP)
+
+    return all_cmc, mAP
 
 
 def cal_feature(engine, name='gallery'):

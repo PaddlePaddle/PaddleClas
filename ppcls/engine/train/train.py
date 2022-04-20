@@ -63,9 +63,27 @@ def train_epoch(engine, epoch_id, print_batch_step):
             loss_dict["loss"].backward()
             for i in range(len(engine.optimizer)):
                 engine.optimizer[i].step()
+
+        if hasattr(engine.model.neck, 'bn'):
+            engine.model.neck.bn.bias.grad.set_value(
+                paddle.zeros_like(engine.model.neck.bn.bias.grad))
+
         # clear grad
         for i in range(len(engine.optimizer)):
+            # manually scale up grad of center_loss
+            if i == 1:
+                for j in range(len(engine.train_loss_func.loss_func)):
+                    if len(engine.train_loss_func.loss_func[j].parameters(
+                    )) == 0:
+                        continue
+                    for param in engine.train_loss_func.loss_func[
+                            j].parameters():
+                        if hasattr(param, 'grad') and param.grad is not None:
+                            param.grad.set_value(param.grad * (
+                                1.0 / engine.train_loss_func.loss_weight[j]))
+
             engine.optimizer[i].clear_grad()
+
         # step lr
         for i in range(len(engine.lr_sch)):
             engine.lr_sch[i].step()

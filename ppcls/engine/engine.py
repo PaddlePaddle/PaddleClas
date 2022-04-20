@@ -298,11 +298,23 @@ class Engine(object):
 
         self.max_iter = len(self.train_dataloader) - 1 if platform.system(
         ) == "Windows" else len(self.train_dataloader)
+
+        if self.config["Global"].get("warmup_epoch_by_epoch", False):
+            for i in range(len(self.lr_sch)):
+                self.lr_sch[i].step()
+            logger.info(
+                "lr_sch step once before first epoch, when Global.warmup_epoch_by_epoch=True"
+            )
+
         for epoch_id in range(best_metric["epoch"] + 1,
                               self.config["Global"]["epochs"] + 1):
             acc = 0.0
             # for one epoch train
             self.train_epoch_func(self, epoch_id, print_batch_step)
+
+            if self.config["Global"].get("warmup_epoch_by_epoch", False):
+                for i in range(len(self.lr_sch)):
+                    self.lr_sch[i].step()
 
             if self.use_dali:
                 self.train_dataloader.reset()
