@@ -8,7 +8,7 @@
 
 **近期更新**
 
-- 2022.1.27 全面升级文档；新增[PaddleServing C++ pipeline部署方式](./deploy/paddleserving/readme.md)和[18M图像识别安卓部署Demo](./deploy/lite_shitu/README.md)。
+- 2022.1.27 全面升级文档；新增[PaddleServing C++ pipeline部署方式](./deploy/paddleserving)和[18M图像识别安卓部署Demo](./deploy/lite_shitu)。
 - 2021.11.1 发布[PP-ShiTu技术报告](https://arxiv.org/pdf/2111.00775.pdf)，新增饮料识别demo
 - 2021.10.23 发布轻量级图像识别系统PP-ShiTu，CPU上0.2s即可完成在10w+库的图像识别。
 [点击这里](./docs/zh_CN/quick_start/quick_start_recognition.md)立即体验
@@ -38,7 +38,7 @@ Res2Net200_vd预训练模型Top-1精度高达85.1%。
 * 您可以扫描下面的微信群二维码， 加入PaddleClas 微信交流群。获得更高效的问题答疑，与各行各业开发者充分交流，期待您的加入。
 
 <div align="center">
-<img src="https://user-images.githubusercontent.com/12560511/153565053-d6cbc57b-1610-4a64-87b2-50c948352d87.jpeg"  width = "200" />
+<img src="https://user-images.githubusercontent.com/12560511/162710270-8a249aca-4fa9-46f9-95e5-66d906fe6d66.jpg" width="200"/>
 </div>
 
 ## 快速体验

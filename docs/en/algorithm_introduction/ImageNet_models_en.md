@@ -28,6 +28,7 @@
 - [21. RedNet series](#21)
 - [22. TNT series](#22)
 - [23. Other models](#23)
+- [Reference](#reference)
 
 <a name="1"></a>
 
@@ -42,21 +43,15 @@ Based on the ImageNet-1k classification dataset, the 37 classification network s
 
 Curves of accuracy to the inference time of common server-side models are shown as follows.
 
-<div align="center">
-    <img src="../../images/models/V100_benchmark/v100.fp32.bs1.main_fps_top1_s.png" width="800">
-</div>
+![](../../images/models/V100_benchmark/v100.fp32.bs1.main_fps_top1_s.png)
 
 Curves of accuracy to the inference time of common mobile-side models are shown as follows.
 
-<div align="center">
-    <img src="../../images/models/mobile_arm_top1.png" width="800">
-</div>
+![](../../images/models/mobile_arm_top1.png)
 
 Curves of accuracy to the inference time of some VisionTransformer models are shown as follows.
 
-<div align="center">
-    <img src="../../images/models/V100_benchmark/v100.fp32.bs1.visiontransformer.png" width="800">
-</div>
+![](../../images/models/V100_benchmark/v100.fp32.bs1.visiontransformer.png)
 
 <a name="2"></a>
 
@@ -69,7 +64,7 @@ Accuracy and inference time of the prtrained models based on SSLD distillation a
 
 | Model                  | Top-1 Acc | Reference<br>Top-1 Acc | Acc gain | time(ms)<br>bs=1 | time(ms)<br>bs=4 | time(ms)<br/>bs=8 | FLOPs(G) | Params(M) | Pretrained Model Download Address | Inference Model Download Address |
 |---------------------|-----------|-----------|---------------|----------------|-----------|----------|-----------|-----------------------------------|-----------------------------------|-----------------------------------|
-| ResNet34_vd_ssld         | 0.797    | 0.760  | 0.037  | 2.00             | 3.28             | 5.84              | 3.93     | 21.84     | <span style="white-space:nowrap;">[Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/ResNet34_vd_ssld_pretrained.pdparams)&emsp;&emsp;</span> | <span style="white-space:nowrap;">[Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/ResNet34_vd_ssld.tar)&emsp;&emsp;</span> |
+| ResNet34_vd_ssld         | 0.797    | 0.760  | 0.037  | 2.00             | 3.28             | 5.84              | 3.93     | 21.84     | <span style="white-space:nowrap;">[Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/ResNet34_vd_ssld_pretrained.pdparams)&emsp;&emsp;</span> | <span style="white-space:nowrap;">[Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/ResNet34_vd_ssld_infer.tar)&emsp;&emsp;</span> |
 | ResNet50_vd_ssld | 0.830    | 0.792    | 0.039 | 2.60             | 4.86             | 7.63              | 4.35     | 25.63     | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/ResNet50_vd_ssld_pretrained.pdparams) | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/ResNet50_vd_ssld_infer.tar) |
 | ResNet101_vd_ssld   | 0.837    | 0.802    | 0.035 | 4.43             | 8.25             | 12.60     | 8.08     | 44.67     | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/ResNet101_vd_ssld_pretrained.pdparams)   | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/ResNet101_vd_ssld_infer.tar) |
 | Res2Net50_vd_26w_4s_ssld | 0.831    | 0.798    | 0.033 | 3.59             | 6.35             | 9.50              | 4.28     | 25.76     | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/Res2Net50_vd_26w_4s_ssld_pretrained.pdparams) | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/Res2Net50_vd_26w_4s_ssld_infer.tar) |
@@ -107,7 +102,7 @@ Accuracy and inference time of the prtrained models based on SSLD distillation a
 
 <a name="3"></a>
 
-## 3. PP-LCNet series
+## 3. PP-LCNet series <sup>[[28](#ref28)]</sup>
 
 The accuracy and speed indicators of the PP-LCNet series models are shown in the following table. For more information about this series of models, please refer to: [PP-LCNet series model documents](../models/PP-LCNet_en.md)。
 
@@ -124,7 +119,7 @@ The accuracy and speed indicators of the PP-LCNet series models are shown in the
 
 <a name="4"></a>
 
-## 4. ResNet series
+## 4. ResNet series <sup>[[1](#ref1)]</sup>
 
 The accuracy and speed indicators of ResNet and ResNet_vd series models are shown in the following table. For more information about this series of models, please refer to: [ResNet and ResNet_vd series model documents](../models/ResNet_and_vd_en.md)。
 
@@ -148,7 +143,7 @@ The accuracy and speed indicators of ResNet and ResNet_vd series models are show
 
 <a name="5"></a>
 
-## 5. Mobile series
+## 5. Mobile series <sup>[[3](#ref3)][[4](#ref4)][[5](#ref5)][[6](#ref6)][[23](#ref23)]</sup>
 
 The accuracy and speed indicators of the mobile series models are shown in the following table. For more information about this series, please refer to: [Mobile series model documents](../models/Mobile_en.md)。
 
@@ -197,7 +192,7 @@ The accuracy and speed indicators of the mobile series models are shown in the f
 
 <a name="6"></a>
 
-## 6. SEResNeXt and Res2Net series
+## 6. SEResNeXt and Res2Net series <sup>[[7](#ref7)][[8](#ref8)][[9](#ref9)]</sup>
 
 The accuracy and speed indicators of the SEResNeXt and Res2Net series models are shown in the following table. For more information about the models of this series, please refer to: [SEResNeXt and Res2Net series model documents](../models/SEResNext_and_Res2Net_en.md).
 
@@ -232,7 +227,7 @@ The accuracy and speed indicators of the SEResNeXt and Res2Net series models are
 
 <a name="7"></a>
 
-## 7. DPN and DenseNet series
+## 7. DPN and DenseNet series <sup>[[14](#ref14)][[15](#ref15)]</sup>
 
 The accuracy and speed indicators of the DPN and DenseNet series models are shown in the following table. For more information about the models of this series, please refer to: [DPN and DenseNet series model documents](../models/DPN_DenseNet_en.md).
 
@@ -250,11 +245,9 @@ The accuracy and speed indicators of the DPN and DenseNet series models are show
 | DPN107      | 0.8089    | 0.9532    | 19.46            | 35.62            | 50.22       | 18.38    | 87.13     | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DPN107_pretrained.pdparams)      | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/DPN107_infer.tar) |
 | DPN131      | 0.8070    | 0.9514    | 19.64            | 34.60            | 47.42       | 16.09    | 79.48     | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DPN131_pretrained.pdparams)      | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/DPN131_infer.tar) |
 
-
-
 <a name="8"></a>
 
-## 8. HRNet series
+## 8. HRNet series <sup>[[13](#ref13)]</sup>
 
 The accuracy and speed indicators of the HRNet series models are shown in the following table. For more information about the models of this series, please refer to: [HRNet series model documents](../models/HRNet_en.md).
 
@@ -274,7 +267,7 @@ The accuracy and speed indicators of the HRNet series models are shown in the fo
 
 <a name="9"></a>
 
-## 9. Inception series
+## 9. Inception series <sup>[[10](#ref10)][[11](#ref11)][[12](#ref12)][[26](#ref26)]</sup>
 
 The accuracy and speed indicators of the Inception series models are shown in the following table. For more information about this series of models, please refer to: [Inception series model documents](../models/Inception_en.md).
 
@@ -291,7 +284,7 @@ The accuracy and speed indicators of the Inception series models are shown in th
 
 <a name="10"></a>
 
-## 10. EfficientNet and ResNeXt101_wsl series
+## 10. EfficientNet and ResNeXt101_wsl series <sup>[[16](#ref16)][[17](#ref17)]</sup>
 
 The accuracy and speed indicators of the EfficientNet and ResNeXt101_wsl series models are shown in the following table. For more information about this series of models, please refer to: [EfficientNet and ResNeXt101_wsl series model documents](../models/EfficientNet_and_ResNeXt101_wsl_en.md).
 
@@ -314,7 +307,7 @@ The accuracy and speed indicators of the EfficientNet and ResNeXt101_wsl series 
 
 <a name="11"></a>
 
-## 11. ResNeSt and RegNet series
+## 11. ResNeSt and RegNet series <sup>[[24](#ref24)][[25](#ref25)]</sup>
 
 The accuracy and speed indicators of the ResNeSt and RegNet series models are shown in the following table. For more information about the models of this series, please refer to: [ResNeSt and RegNet series model documents](../models/ResNeSt_RegNet_en.md).
 
@@ -326,10 +319,9 @@ The accuracy and speed indicators of the ResNeSt and RegNet series models are sh
 
 <a name="12"></a>
 
-## 12. ViT and DeiT series
+## 12. ViT and DeiT series <sup>[[31](#ref31)][[32](#ref32)]</sup>
 
 The accuracy and speed indicators of ViT (Vision Transformer) and DeiT (Data-efficient Image Transformers) series models are shown in the following table. For more information about this series of models, please refer to: [ViT_and_DeiT series model documents](../models/ViT_and_DeiT_en.md).
-
 
 | Model                  | Top-1 Acc | Top-5 Acc | time(ms)<br>bs=1 | time(ms)<br>bs=4 | time(ms)<br/>bs=8 | FLOPs(G) | Params(M) | Pretrained Model Download Address | Inference Model Download Address |
 |------------------------|-----------|-----------|------------------|------------------|----------|------------------------|------------------------|------------------------|------------------------|
@@ -340,8 +332,6 @@ The accuracy and speed indicators of ViT (Vision Transformer) and DeiT (Data-eff
 | ViT_large_<br/>patch16_224 | 0.8323  | 0.9650   | 15.53            | 49.50            | 94.09             | 59.65 | 304.12 | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ViT_large_patch16_224_pretrained.pdparams) | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/ViT_large_patch16_224_infer.tar) |
 |ViT_large_<br/>patch16_384| 0.8513 | 0.9736    | 39.51            | 152.46           | 304.06            | 174.70   | 304.12    | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ViT_large_patch16_384_pretrained.pdparams) | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/ViT_large_patch16_384_infer.tar) |
 |ViT_large_<br/>patch32_384| 0.8153 | 0.9608    | 11.44            | 36.09            | 70.63             | 44.24    | 306.48    | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ViT_large_patch32_384_pretrained.pdparams) | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/ViT_large_patch32_384_infer.tar) |
-
-
 
 | Model                  | Top-1 Acc | Top-5 Acc | time(ms)<br>bs=1 | time(ms)<br>bs=4 | time(ms)<br/>bs=8 | FLOPs(G) | Params(M) | Pretrained Model Download Address | Inference Model Download Address |
 |------------------------|-----------|-----------|------------------|------------------|----------|------------------------|------------------------|------------------------|------------------------|
@@ -356,10 +346,9 @@ The accuracy and speed indicators of ViT (Vision Transformer) and DeiT (Data-eff
 
 <a name="13"></a>
 
-## 13. RepVGG series
+## 13. RepVGG series <sup>[[36](#ref36)]</sup>
 
 The accuracy and speed indicators of RepVGG series models are shown in the following table. For more introduction, please refer to: [RepVGG series model documents](../models/RepVGG_en.md).
-
 
 | Model                     | Top-1 Acc | Top-5 Acc | time(ms)<br>bs=1 | time(ms)<br>bs=4 | time(ms)<br/>bs=8 | FLOPs(G) | Params(M) | Pretrained Model Download Address | Inference Model Download Address |
 |------------------------|-----------|-----------|------------------|------------------|----------|-----------|------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------|
@@ -376,7 +365,7 @@ The accuracy and speed indicators of RepVGG series models are shown in the follo
 
 <a name="14"></a>
 
-## 14. MixNet series
+## 14. MixNet series <sup>[[29](#ref29)]</sup>
 
 The accuracy and speed indicators of the MixNet series models are shown in the following table. For more introduction, please refer to: [MixNet series model documents](../models/MixNet_en.md).
 
@@ -388,7 +377,7 @@ The accuracy and speed indicators of the MixNet series models are shown in the f
 
 <a name="15"></a>
 
-## 15. ReXNet series
+## 15. ReXNet series <sup>[[30](#ref30)]</sup>
 
 The accuracy and speed indicators of ReXNet series models are shown in the following table. For more introduction, please refer to: [ReXNet series model documents](../models/ReXNet_en.md).
 
@@ -402,7 +391,7 @@ The accuracy and speed indicators of ReXNet series models are shown in the follo
 
 <a name="16"></a>
 
-## 16. SwinTransformer series
+## 16. SwinTransformer series <sup>[[27](#ref27)]</sup>
 
 The accuracy and speed indicators of SwinTransformer series models are shown in the following table. For more introduction, please refer to: [SwinTransformer series model documents](../models/SwinTransformer_en.md).
 
@@ -414,20 +403,20 @@ The accuracy and speed indicators of SwinTransformer series models are shown in 
 | SwinTransformer_base_patch4_window12_384   | 0.8439 | 0.9693 | 19.52 | 64.56 | 123.30 | 44.45 | 87.70   | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/SwinTransformer_base_patch4_window12_384_pretrained.pdparams) | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/SwinTransformer_base_patch4_window12_384_infer.tar) |
 | SwinTransformer_base_patch4_window7_224<sup>[1]</sup>     | 0.8487 | 0.9746 | 13.53 | 23.46 | 39.13 | 15.13 | 87.70   | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/SwinTransformer_base_patch4_window7_224_22kto1k_pretrained.pdparams) | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/SwinTransformer_base_patch4_window7_224_infer.tar) |
 | SwinTransformer_base_patch4_window12_384<sup>[1]</sup>    | 0.8642 | 0.9807 | 19.65 | 64.72 | 123.42 | 44.45 | 87.70   | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/SwinTransformer_base_patch4_window12_384_22kto1k_pretrained.pdparams) | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/SwinTransformer_base_patch4_window12_384_infer.tar) |
-| SwinTransformer_large_patch4_window7_224<sup>[1]</sup>    | 0.8596 | 0.9783 | 15.74 | 38.57 | 71.49 | 34.02 | 196.43  | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/SwinTransformer_large_patch4_window7_224_22kto1k_pretrained.pdparams) | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/SwinTransformer_large_patch4_window7_224_infer.tar) |
-| SwinTransformer_large_patch4_window12_384<sup>[1]</sup>   | 0.8719 | 0.9823 | 32.61 | 116.59 | 223.23 | 99.97 | 196.43 | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/SwinTransformer_large_patch4_window12_384_22kto1k_pretrained.pdparams) | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/SwinTransformer_large_patch4_window12_384_infer.tar) |
+| SwinTransformer_large_patch4_window7_224<sup>[1]</sup>    | 0.8596 | 0.9783 | 15.74 | 38.57 | 71.49 | 34.02 | 196.43  | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/SwinTransformer_large_patch4_window7_224_22kto1k_pretrained.pdparams) | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/SwinTransformer_large_patch4_window7_224_22kto1k_infer.tar) |
+| SwinTransformer_large_patch4_window12_384<sup>[1]</sup>   | 0.8719 | 0.9823 | 32.61 | 116.59 | 223.23 | 99.97 | 196.43 | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/SwinTransformer_large_patch4_window12_384_22kto1k_pretrained.pdparams) | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/SwinTransformer_large_patch4_window12_384_22kto1k_infer.tar) |
 
 [1]：It is pre-trained based on the ImageNet22k dataset, and then transferred and learned from the ImageNet1k dataset.
 
 <a name="17"></a>
 
-## 17. LeViT series
+## 17. LeViT series <sup>[[33](#ref33)]</sup>
 
 The accuracy and speed indicators of LeViT series models are shown in the following table. For more introduction, please refer to: [LeViT series model documents](../models/LeViT_en.md).
 
 | Model       | Top-1 Acc | Top-5 Acc | time(ms)<br>bs=1 | time(ms)<br>bs=4 | time(ms)<br/>bs=8 | FLOPs(M) | Params(M) | Pretrained Model Download Address                                               | Inference Model Download Address                                      |
 | ---------- | --------- | --------- | ---------------- | ---------------- | -------- | --------- | ------------------------------------------------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ |
-| LeViT_128S | 0.7598    | 0.9269    |                  |                  |                  | 281    | 7.42     | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/LeViT_128S_pretrained.pdparams) | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/eViT_128S_infer.tar) |
+| LeViT_128S | 0.7598    | 0.9269    |                  |                  |                  | 281    | 7.42     | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/LeViT_128S_pretrained.pdparams) | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/LeViT_128S_infer.tar) |
 | LeViT_128 | 0.7810    | 0.9371    |                  |                  |                  | 365    | 8.87     | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/LeViT_128_pretrained.pdparams) | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/LeViT_128_infer.tar) |
 | LeViT_192 | 0.7934    | 0.9446    |                  |                  |                  | 597    | 10.61     | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/LeViT_192_pretrained.pdparams) | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/LeViT_192_infer.tar) |
 | LeViT_256 | 0.8085    | 0.9497    |                  |                  |                  | 1049    | 18.45    | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/LeViT_256_pretrained.pdparams) | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/LeViT_256_infer.tar) |
@@ -437,7 +426,7 @@ The accuracy and speed indicators of LeViT series models are shown in the follow
 
 <a name="18"></a>
 
-## 18. Twins series
+## 18. Twins series <sup>[[34](#ref34)]</sup>
 
 The accuracy and speed indicators of Twins series models are shown in the following table. For more introduction, please refer to: [Twins series model documents](../models/Twins_en.md).
 
@@ -454,7 +443,7 @@ The accuracy and speed indicators of Twins series models are shown in the follow
 
 <a name="19"></a>
 
-## 19. HarDNet series
+## 19. HarDNet series <sup>[[37](#ref37)]</sup>
 
 The accuracy and speed indicators of HarDNet series models are shown in the following table. For more introduction, please refer to: [HarDNet series model documents](../models/HarDNet_en.md).
 
@@ -467,7 +456,7 @@ The accuracy and speed indicators of HarDNet series models are shown in the foll
 
 <a name="20"></a>
 
-## 20. DLA series
+## 20. DLA series <sup>[[38](#ref38)]</sup>
 
 The accuracy and speed indicators of DLA series models are shown in the following table. For more introduction, please refer to: [DLA series model documents](../models/DLA_en.md).
 
@@ -485,7 +474,7 @@ The accuracy and speed indicators of DLA series models are shown in the followin
 
 <a name="21"></a>
 
-## 21. RedNet series
+## 21. RedNet series <sup>[[39](#ref39)]</sup>
 
 The accuracy and speed indicators of RedNet series models are shown in the following table. For more introduction, please refer to: [RedNet series model documents](../models/RedNet_en.md).
 
@@ -499,7 +488,7 @@ The accuracy and speed indicators of RedNet series models are shown in the follo
 
 <a name="22"></a>
 
-## 22. TNT series
+## 22. TNT series <sup>[[35](#ref35)]</sup>
 
 The accuracy and speed indicators of TNT series models are shown in the following table. For more introduction, please refer to: [TNT series model documents](../models/TNT_en.md).
 
@@ -513,7 +502,7 @@ The accuracy and speed indicators of TNT series models are shown in the followin
 
 ## 23. Other models
 
-The accuracy and speed indicators of AlexNet, SqueezeNet series, VGG series, DarkNet53 and other models are shown in the following table. For more information, please refer to: [Other model documents](../models/Others_en.md).
+The accuracy and speed indicators of AlexNet <sup>[[18](#ref18)]</sup>, SqueezeNet series <sup>[[19](#ref19)]</sup>, VGG series <sup>[[20](#ref20)]</sup>, DarkNet53 <sup>[[21](#ref21)]</sup> and other models are shown in the following table. For more information, please refer to: [Other model documents](../models/Others_en.md).
 
 | Model                     | Top-1 Acc | Top-5 Acc | time(ms)<br>bs=1 | time(ms)<br>bs=4 | time(ms)<br/>bs=8 | FLOPs(G) | Params(M) | Pretrained Model Download Address | Inference Model Download Address |
 |------------------------|-----------|-----------|------------------|------------------|----------|-----------|------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------|
@@ -525,3 +514,86 @@ The accuracy and speed indicators of AlexNet, SqueezeNet series, VGG series, Dar
 | VGG16 | 0.720 | 0.907 | 2.48             | 6.79             | 12.33 | 15.470 | 138.35 | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/VGG16_pretrained.pdparams) | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/VGG16_infer.tar) |
 | VGG19 | 0.726 | 0.909 | 2.93             | 8.28             | 15.21 | 19.63 | 143.66 | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/VGG19_pretrained.pdparams) | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/VGG19_infer.tar) |
 | DarkNet53 | 0.780 | 0.941 | 2.79 | 6.42 | 10.89 | 9.31 | 41.65 | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DarkNet53_pretrained.pdparams) | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/DarkNet53_infer.tar) |
+
+<a name='reference'></a>
+
+## Reference
+
+<a name="ref1">[1]</a> He K, Zhang X, Ren S, et al. Deep residual learning for image recognition[C]//Proceedings of the IEEE conference on computer vision and pattern recognition. 2016: 770-778.
+
+<a name="ref2">[2]</a> He T, Zhang Z, Zhang H, et al. Bag of tricks for image classification with convolutional neural networks[C]//Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition. 2019: 558-567.
+
+<a name="ref3">[3]</a> Howard A, Sandler M, Chu G, et al. Searching for mobilenetv3[C]//Proceedings of the IEEE International Conference on Computer Vision. 2019: 1314-1324.
+
+<a name="ref4">[4]</a> Sandler M, Howard A, Zhu M, et al. Mobilenetv2: Inverted residuals and linear bottlenecks[C]//Proceedings of the IEEE conference on computer vision and pattern recognition. 2018: 4510-4520.
+
+<a name="ref5">[5]</a> Howard A G, Zhu M, Chen B, et al. Mobilenets: Efficient convolutional neural networks for mobile vision applications[J]. arXiv preprint arXiv:1704.04861, 2017.
+
+<a name="ref6">[6]</a> Ma N, Zhang X, Zheng H T, et al. Shufflenet v2: Practical guidelines for efficient cnn architecture design[C]//Proceedings of the European Conference on Computer Vision (ECCV). 2018: 116-131.
+
+<a name="ref7">[7]</a> Xie S, Girshick R, Dollár P, et al. Aggregated residual transformations for deep neural networks[C]//Proceedings of the IEEE conference on computer vision and pattern recognition. 2017: 1492-1500.
+
+<a name="ref8">[8]</a> Hu J, Shen L, Sun G. Squeeze-and-excitation networks[C]//Proceedings of the IEEE conference on computer vision and pattern recognition. 2018: 7132-7141.
+
+<a name="ref9">[9]</a> Gao S, Cheng M M, Zhao K, et al. Res2net: A new multi-scale backbone architecture[J]. IEEE transactions on pattern analysis and machine intelligence, 2019.
+
+<a name="ref10">[10]</a> Szegedy C, Liu W, Jia Y, et al. Going deeper with convolutions[C]//Proceedings of the IEEE conference on computer vision and pattern recognition. 2015: 1-9.
+
+<a name="ref11">[11]</a> Szegedy C, Ioffe S, Vanhoucke V, et al. Inception-v4, inception-resnet and the impact of residual connections on learning[C]//Thirty-first AAAI conference on artificial intelligence. 2017.
+
+<a name="ref12">[12]</a> Chollet F. Xception: Deep learning with depthwise separable convolutions[C]//Proceedings of the IEEE conference on computer vision and pattern recognition. 2017: 1251-1258.
+
+<a name="ref13">[13]</a> Wang J, Sun K, Cheng T, et al. Deep high-resolution representation learning for visual recognition[J]. arXiv preprint arXiv:1908.07919, 2019.
+
+<a name="ref14">[14]</a> Chen Y, Li J, Xiao H, et al. Dual path networks[C]//Advances in neural information processing systems. 2017: 4467-4475.
+
+<a name="ref15">[15]</a> Huang G, Liu Z, Van Der Maaten L, et al. Densely connected convolutional networks[C]//Proceedings of the IEEE conference on computer vision and pattern recognition. 2017: 4700-4708.
+
+<a name="ref16">[16]</a> Tan M, Le Q V. Efficientnet: Rethinking model scaling for convolutional neural networks[J]. arXiv preprint arXiv:1905.11946, 2019.
+
+<a name="ref17">[17]</a> Mahajan D, Girshick R, Ramanathan V, et al. Exploring the limits of weakly supervised pretraining[C]//Proceedings of the European Conference on Computer Vision (ECCV). 2018: 181-196.
+
+<a name="ref18">[18]</a> Krizhevsky A, Sutskever I, Hinton G E. Imagenet classification with deep convolutional neural networks[C]//Advances in neural information processing systems. 2012: 1097-1105.
+
+<a name="ref19">[19]</a> Iandola F N, Han S, Moskewicz M W, et al. SqueezeNet: AlexNet-level accuracy with 50x fewer parameters and< 0.5 MB model size[J]. arXiv preprint arXiv:1602.07360, 2016.
+
+<a name="ref20">[20]</a> Simonyan K, Zisserman A. Very deep convolutional networks for large-scale image recognition[J]. arXiv preprint arXiv:1409.1556, 2014.
+
+<a name="ref21">[21]</a> Redmon J, Divvala S, Girshick R, et al. You only look once: Unified, real-time object detection[C]//Proceedings of the IEEE conference on computer vision and pattern recognition. 2016: 779-788.
+
+<a name="ref22">[22]</a> Ding X, Guo Y, Ding G, et al. Acnet: Strengthening the kernel skeletons for powerful cnn via asymmetric convolution blocks[C]//Proceedings of the IEEE International Conference on Computer Vision. 2019: 1911-1920.
+
+<a name="ref23">[23]</a> Han K, Wang Y, Tian Q, et al. GhostNet: More features from cheap operations[C]//Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition. 2020: 1580-1589.
+
+<a name="ref24">[24]</a> Zhang H, Wu C, Zhang Z, et al. Resnest: Split-attention networks[J]. arXiv preprint arXiv:2004.08955, 2020.
+
+<a name="ref25">[25]</a> Radosavovic I, Kosaraju R P, Girshick R, et al. Designing network design spaces[C]//Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition. 2020: 10428-10436.
+
+<a name="ref26">[26]</a> C.Szegedy, V.Vanhoucke, S.Ioffe, J.Shlens, and Z.Wojna. Rethinking the inception architecture for computer vision. arXiv preprint arXiv:1512.00567, 2015.
+
+<a name="ref27">[27]</a> Ze Liu, Yutong Lin, Yue Cao, Han Hu, Yixuan Wei, Zheng Zhang, Stephen Lin and Baining Guo. Swin Transformer: Hierarchical Vision Transformer using Shifted Windows.
+
+<a name="ref28">[28]</a>Cheng Cui, Tingquan Gao, Shengyu Wei, Yuning Du, Ruoyu Guo, Shuilong Dong, Bin Lu, Ying Zhou, Xueying Lv, Qiwen Liu, Xiaoguang Hu, Dianhai Yu, Yanjun Ma. PP-LCNet: A Lightweight CPU Convolutional Neural Network.
+
+<a name="ref29">[29]</a>Mingxing Tan, Quoc V. Le. MixConv: Mixed Depthwise Convolutional Kernels.
+
+<a name="ref30">[30]</a>Dongyoon Han, Sangdoo Yun, Byeongho Heo, YoungJoon Yoo. Rethinking Channel Dimensions for Efficient Model Design.
+
+<a name="ref31">[31]</a>Alexey Dosovitskiy, Lucas Beyer, Alexander Kolesnikov, Dirk Weissenborn, Xiaohua Zhai, Thomas Unterthiner, Mostafa Dehghani, Matthias Minderer, Georg Heigold, Sylvain Gelly, Jakob Uszkoreit, Neil Houlsby. AN IMAGE IS WORTH 16X16 WORDS:
+TRANSFORMERS FOR IMAGE RECOGNITION AT SCALE.
+
+<a name="ref32">[32]</a>Hugo Touvron, Matthieu Cord, Matthijs Douze, Francisco Massa, Alexandre Sablayrolles, Herve Jegou. Training data-efficient image transformers & distillation through attention.
+
+<a name="ref33">[33]</a>Benjamin Graham, Alaaeldin El-Nouby, Hugo Touvron, Pierre Stock, Armand Joulin, Herve Jegou, Matthijs Douze. LeViT: a Vision Transformer in ConvNet’s Clothing for Faster Inference.
+
+<a name="ref34">[34]</a>Xiangxiang Chu, Zhi Tian, Yuqing Wang, Bo Zhang, Haibing Ren, Xiaolin Wei, Huaxia Xia, Chunhua Shen. Twins: Revisiting the Design of Spatial Attention in Vision Transformers.
+
+<a name="ref35">[35]</a>Kai Han, An Xiao, Enhua Wu, Jianyuan Guo, Chunjing Xu, Yunhe Wang. Transformer in Transformer.
+
+<a name="ref36">[36]</a>Xiaohan Ding, Xiangyu Zhang, Ningning Ma, Jungong Han, Guiguang Ding, Jian Sun. RepVGG: Making VGG-style ConvNets Great Again.
+
+<a name="ref37">[37]</a>Ping Chao, Chao-Yang Kao, Yu-Shan Ruan, Chien-Hsiang Huang, Youn-Long Lin. HarDNet: A Low Memory Traffic Network.
+
+<a name="ref38">[38]</a>Fisher Yu, Dequan Wang, Evan Shelhamer, Trevor Darrell. Deep Layer Aggregation.
+
+<a name="ref39">[39]</a>Duo Lim Jie Hu, Changhu Wang, Xiangtai Li, Qi She, Lei Zhu, Tong Zhang, Qifeng Chen. Involution: Inverting the Inherence of Convolution for Visual Recognition.

@@ -92,7 +92,7 @@ class Engine(object):
             self.vdl_writer = LogWriter(logdir=vdl_writer_path)
 
         # set device
-        assert self.config["Global"]["device"] in ["cpu", "gpu", "xpu", "npu"]
+        assert self.config["Global"]["device"] in ["cpu", "gpu", "xpu", "npu", "mlu"]
         self.device = paddle.set_device(self.config["Global"]["device"])
         logger.info('train with paddle {} and device {}'.format(
             paddle.__version__, self.device))
@@ -107,7 +107,9 @@ class Engine(object):
             self.scale_loss = 1.0
             self.use_dynamic_loss_scaling = False
         if self.amp:
-            AMP_RELATED_FLAGS_SETTING = {'FLAGS_max_inplace_grad_add': 8, }
+            AMP_RELATED_FLAGS_SETTING = {
+                'FLAGS_max_inplace_grad_add': 8,
+            }
             if paddle.is_compiled_with_cuda():
                 AMP_RELATED_FLAGS_SETTING.update({
                     'FLAGS_cudnn_batchnorm_spatial_persistent': 1
@@ -172,7 +174,9 @@ class Engine(object):
             if metric_config is not None:
                 metric_config = metric_config.get("Train")
                 if metric_config is not None:
-                    if hasattr(self.train_dataloader, "collate_fn"):
+                    if hasattr(
+                            self.train_dataloader, "collate_fn"
+                    ) and self.train_dataloader.collate_fn is not None:
                         for m_idx, m in enumerate(metric_config):
                             if "TopkAcc" in m:
                                 msg = f"'TopkAcc' metric can not be used when setting 'batch_transform_ops' in config. The 'TopkAcc' metric has been removed."

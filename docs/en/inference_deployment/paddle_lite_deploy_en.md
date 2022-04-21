@@ -258,9 +258,7 @@ export LD_LIBRARY_PATH=/data/local/tmp/debug:$LD_LIBRARY_PATH
 
 The result is as follows:
 
-<div align="center">
-    <img src="./imgs/lite_demo_result.png" width="600">
-</div>
+![](../../images/inference_deployment/lite_demo_result.png)
 
 <a name="3"></a>
 ## 3. FAQ

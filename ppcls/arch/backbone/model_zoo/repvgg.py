@@ -33,18 +33,12 @@ MODEL_URLS = {
     "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/RepVGG_B1_pretrained.pdparams",
     "RepVGG_B2":
     "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/RepVGG_B2_pretrained.pdparams",
-    "RepVGG_B3":
-    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/RepVGG_B3_pretrained.pdparams",
     "RepVGG_B1g2":
     "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/RepVGG_B1g2_pretrained.pdparams",
     "RepVGG_B1g4":
     "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/RepVGG_B1g4_pretrained.pdparams",
-    "RepVGG_B2g2":
-    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/RepVGG_B2g2_pretrained.pdparams",
     "RepVGG_B2g4":
     "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/RepVGG_B2g4_pretrained.pdparams",
-    "RepVGG_B3g2":
-    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/RepVGG_B3g2_pretrained.pdparams",
     "RepVGG_B3g4":
     "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/RepVGG_B3g4_pretrained.pdparams",
 }
@@ -92,6 +86,8 @@ class RepVGGBlock(nn.Layer):
                  groups=1,
                  padding_mode='zeros'):
         super(RepVGGBlock, self).__init__()
+        self.is_repped = False
+
         self.in_channels = in_channels
         self.out_channels = out_channels
         self.kernel_size = kernel_size
@@ -127,6 +123,12 @@ class RepVGGBlock(nn.Layer):
             groups=groups)
 
     def forward(self, inputs):
+        if not self.training and not self.is_repped:
+            self.rep()
+            self.is_repped = True
+        if self.training and self.is_repped:
+            self.is_repped = False
+
         if not self.training:
             return self.nonlinearity(self.rbr_reparam(inputs))
 
@@ -137,7 +139,7 @@ class RepVGGBlock(nn.Layer):
         return self.nonlinearity(
             self.rbr_dense(inputs) + self.rbr_1x1(inputs) + id_out)
 
-    def eval(self):
+    def rep(self):
         if not hasattr(self, 'rbr_reparam'):
             self.rbr_reparam = nn.Conv2D(
                 in_channels=self.in_channels,
@@ -148,12 +150,9 @@ class RepVGGBlock(nn.Layer):
                 dilation=self.dilation,
                 groups=self.groups,
                 padding_mode=self.padding_mode)
-        self.training = False
         kernel, bias = self.get_equivalent_kernel_bias()
         self.rbr_reparam.weight.set_value(kernel)
         self.rbr_reparam.bias.set_value(bias)
-        for layer in self.sublayers():
-            layer.eval()
 
     def get_equivalent_kernel_bias(self):
         kernel3x3, bias3x3 = self._fuse_bn_tensor(self.rbr_dense)
@@ -247,12 +246,6 @@ class RepVGG(nn.Layer):
             self.in_planes = planes
             self.cur_layer_idx += 1
         return nn.Sequential(*blocks)
-
-    def eval(self):
-        self.training = False
-        for layer in self.sublayers():
-            layer.training = False
-            layer.eval()
 
     def forward(self, x):
         out = self.stage0(x)
@@ -367,17 +360,6 @@ def RepVGG_B2(pretrained=False, use_ssld=False, **kwargs):
     return model
 
 
-def RepVGG_B2g2(pretrained=False, use_ssld=False, **kwargs):
-    model = RepVGG(
-        num_blocks=[4, 6, 16, 1],
-        width_multiplier=[2.5, 2.5, 2.5, 5],
-        override_groups_map=g2_map,
-        **kwargs)
-    _load_pretrained(
-        pretrained, model, MODEL_URLS["RepVGG_B2g2"], use_ssld=use_ssld)
-    return model
-
-
 def RepVGG_B2g4(pretrained=False, use_ssld=False, **kwargs):
     model = RepVGG(
         num_blocks=[4, 6, 16, 1],
@@ -386,28 +368,6 @@ def RepVGG_B2g4(pretrained=False, use_ssld=False, **kwargs):
         **kwargs)
     _load_pretrained(
         pretrained, model, MODEL_URLS["RepVGG_B2g4"], use_ssld=use_ssld)
-    return model
-
-
-def RepVGG_B3(pretrained=False, use_ssld=False, **kwargs):
-    model = RepVGG(
-        num_blocks=[4, 6, 16, 1],
-        width_multiplier=[3, 3, 3, 5],
-        override_groups_map=None,
-        **kwargs)
-    _load_pretrained(
-        pretrained, model, MODEL_URLS["RepVGG_B3"], use_ssld=use_ssld)
-    return model
-
-
-def RepVGG_B3g2(pretrained=False, use_ssld=False, **kwargs):
-    model = RepVGG(
-        num_blocks=[4, 6, 16, 1],
-        width_multiplier=[3, 3, 3, 5],
-        override_groups_map=g2_map,
-        **kwargs)
-    _load_pretrained(
-        pretrained, model, MODEL_URLS["RepVGG_B3g2"], use_ssld=use_ssld)
     return model
 
 

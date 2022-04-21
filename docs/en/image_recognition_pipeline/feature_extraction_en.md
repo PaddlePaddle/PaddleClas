@@ -58,12 +58,12 @@ The results are shown in the table below:
 - Address of the pre-training model: [General recognition pre-training model](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/pretrain/general_PPLCNet_x2_5_pretrained_v1.0.pdparams)
 
 <a name="4"></a>
-# 4.Customized Feature Extraction
+## 4.Customized Feature Extraction
 
 Customized feature extraction refers to retraining the feature extraction model based on one's own task. It consists of four main steps: 1) data preparation, 2) model training, 3) model evaluation, and 4) model inference.
 
 <a name="4.1"></a>
-## 4.1 Data Preparation
+### 4.1 Data Preparation
 
 To start with, customize your dataset based on the task (See [Format description](../data_preparation/recognition_dataset_en.md#1) for the dataset format). Before initiating the model training, modify the data-related content in the configuration files, including the address of the dataset and the class number. The corresponding locations in configuration files are shown below:
 
@@ -99,7 +99,7 @@ Train:
 ```
 
 <a name="4.2"></a>
-## 4.2 Model Training
+### 4.2 Model Training
 
 - Single machine single card training
 
@@ -130,7 +130,7 @@ python -m paddle.distributed.launch \
 ```
 
 <a name="4.3"></a>
-## 4.3 Model Evaluation
+### 4.3 Model Evaluation
 
 - Single Card Evaluation
 
@@ -154,21 +154,21 @@ python -m paddle.distributed.launch \
 **Recommendation:** It is suggested to employ multi-card evaluation, which can quickly obtain the feature set of the overall dataset using multi-card parallel computing, accelerating the evaluation process.
 
 <a name="4.4"></a>
-## 4.4 Model Inference
+### 4.4 Model Inference
 
 Two steps are included in the inference: 1)exporting the inference model; 2)obtaining the feature vector.
 
-### 4.4.1 Export Inference Model
+#### 4.4.1 Export Inference Model
 
 ```
-python tools/export_model \
+python tools/export_model.py \
 -c ppcls/configs/GeneralRecognition/GeneralRecognition_PPLCNet_x2_5.yaml \
 -o Global.pretrained_model="output/RecModel/best_model"
 ```
 
 The generated inference models are under the directory `inference`, which comprises three files, namely, `inference.pdmodel`、`inference.pdiparams`、`inference.pdiparams.info`. Among them, `inference.pdmodel` serves to store the structure of inference model while  `inference.pdiparams` and `inference.pdiparams.info` are mobilized to store model-related parameters.
 
-### 4.4.2 Obtain Feature Vector
+#### 4.4.2 Obtain Feature Vector
 
 ```
 cd deploy
