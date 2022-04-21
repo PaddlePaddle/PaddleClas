@@ -75,9 +75,22 @@ python3 -m paddle.distributed.launch \
 
 验证集的最高准确率为 0.415 左右。
 
-* **注意**
+此处的使用了多个 GPU 训练，如果只使用一个 GPU，请将 `CUDA_VISIBLE_DEVICES` 设置指定 GPU，`--gpus`设置指定 GPU，下同。例如，只使用 0 号 GPU 训练：
 
-  * 如果 GPU 卡数不是 4，验证集的准确率可能与 0.415 有差异，若需保持相当的准确率，需要将配置文件中的学习率改为`当前学习率 / 4 \* 当前卡数`。下同。
+```shell
+export CUDA_VISIBLE_DEVICES=0
+python3 -m paddle.distributed.launch \
+    --gpus="0" \
+    tools/train.py \
+        -c ./ppcls/configs/quick_start/professional/ResNet50_vd_CIFAR100.yaml \
+        -o Global.output_dir="output_CIFAR" \
+        -o Optimizer.lr.learning_rate=0.01
+```
+
+* **注意**: 
+
+* `--gpus`中指定的 GPU 可以是 `CUDA_VISIBLE_DEVICES` 指定的 GPU 的子集。
+* 由于初始学习率和 batch-size 需要保持线性关系，所以训练从 4 个 GPU 切换到 1 个 GPU 训练时，总 batch-size 缩减为原来的 1/4，学习率也需要缩减为原来的 1/4，所以改变了默认的学习率从 0.04 到 0.01。
 
 <a name="2.1.2"></a> 
 
@@ -157,7 +170,7 @@ python3 -m paddle.distributed.launch \
 * **注意**
 
   * 其他数据增广的配置文件可以参考 `ppcls/configs/ImageNet/DataAugment/` 中的配置文件。
-  * 训练 CIFAR100 的迭代轮数较少，因此进行训练时，验证集的精度指标可能会有 1% 左右的波动。
+* 训练 CIFAR100 的迭代轮数较少，因此进行训练时，验证集的精度指标可能会有 1% 左右的波动。
 
 <a name="4"></a>
 
