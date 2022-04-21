@@ -72,7 +72,12 @@ def build_dataloader(config, mode, device, use_dali=False, seed=None):
     # build dataset
     if use_dali:
         from ppcls.data.dataloader.dali import dali_dataloader
-        return dali_dataloader(config, mode, paddle.device.get_device(), seed)
+        return dali_dataloader(
+            config,
+            mode,
+            paddle.device.get_device(),
+            num_threads=config[mode]['loader']["num_workers"],
+            seed=seed)
 
     class_num = config.get("class_num", None)
     config_dataset = config[mode]['dataset']

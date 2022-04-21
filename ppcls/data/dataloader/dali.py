@@ -143,7 +143,7 @@ class HybridValPipe(Pipeline):
         return self.epoch_size("Reader")
 
 
-def dali_dataloader(config, mode, device, seed=None):
+def dali_dataloader(config, mode, device, num_threads=4, seed=None):
     assert "gpu" in device, "gpu training is required for DALI"
     device_id = int(device.split(':')[1])
     config_dataloader = config[mode]
@@ -248,6 +248,7 @@ def dali_dataloader(config, mode, device, seed=None):
                 device_id,
                 shard_id,
                 num_shards,
+                num_threads=num_threads,
                 seed=seed + shard_id,
                 pad_output=pad_output,
                 output_dtype=output_dtype)
@@ -270,6 +271,7 @@ def dali_dataloader(config, mode, device, seed=None):
                 device_id=device_id,
                 shard_id=0,
                 num_shards=1,
+                num_threads=num_threads,
                 seed=seed,
                 pad_output=pad_output,
                 output_dtype=output_dtype)
@@ -298,6 +300,7 @@ def dali_dataloader(config, mode, device, seed=None):
                 device_id=device_id,
                 shard_id=shard_id,
                 num_shards=num_shards,
+                num_threads=num_threads,
                 pad_output=pad_output,
                 output_dtype=output_dtype)
         else:
@@ -311,6 +314,7 @@ def dali_dataloader(config, mode, device, seed=None):
                 mean,
                 std,
                 device_id=device_id,
+                num_threads=num_threads,
                 pad_output=pad_output,
                 output_dtype=output_dtype)
         pipe.build()
