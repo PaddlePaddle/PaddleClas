@@ -70,18 +70,6 @@ def train_epoch(engine, epoch_id, print_batch_step):
 
         # clear grad
         for i in range(len(engine.optimizer)):
-            # manually scale up grad of center_loss
-            if i == 1:
-                for j in range(len(engine.train_loss_func.loss_func)):
-                    if len(engine.train_loss_func.loss_func[j].parameters(
-                    )) == 0:
-                        continue
-                    for param in engine.train_loss_func.loss_func[
-                            j].parameters():
-                        if hasattr(param, 'grad') and param.grad is not None:
-                            param.grad.set_value(param.grad * (
-                                1.0 / engine.train_loss_func.loss_weight[j]))
-
             engine.optimizer[i].clear_grad()
 
         # step lr

@@ -25,6 +25,7 @@ import cv2
 import numpy as np
 from PIL import Image
 from paddle.vision.transforms import ColorJitter as RawColorJitter
+from paddle.vision.transforms import Pad
 
 from .autoaugment import ImageNetPolicy
 from .functional import augmentations
@@ -81,6 +82,8 @@ class UnifiedResize(object):
             self.resize_func = cv2.resize
 
     def __call__(self, src, size):
+        if isinstance(size, list):
+            size = tuple(size)
         return self.resize_func(src, size)
 
 
@@ -99,14 +102,15 @@ class DecodeImage(object):
         self.channel_first = channel_first  # only enabled when to_np is True
 
     def __call__(self, img):
-        if six.PY2:
-            assert type(img) is str and len(
-                img) > 0, "invalid input 'img' in DecodeImage"
-        else:
-            assert type(img) is bytes and len(
-                img) > 0, "invalid input 'img' in DecodeImage"
-        data = np.frombuffer(img, dtype='uint8')
-        img = cv2.imdecode(data, 1)
+        if not isinstance(img, np.ndarray):
+            if six.PY2:
+                assert type(img) is str and len(
+                    img) > 0, "invalid input 'img' in DecodeImage"
+            else:
+                assert type(img) is bytes and len(
+                    img) > 0, "invalid input 'img' in DecodeImage"
+            data = np.frombuffer(img, dtype='uint8')
+            img = cv2.imdecode(data, 1)
         if self.to_rgb:
             assert img.shape[2] == 3, 'invalid shape of image[%s]' % (
                 img.shape)

@@ -61,31 +61,30 @@ Loss:
 
 Optimizer:
   - Adam:
-    scope: model
-    lr:
-      name: Piecewise
-      decay_epochs: [30, 60]
-      values: [0.00035, 0.000035, 0.0000035]
-      warmup_epoch: 10
-      warmup_start_lr: 0.0000035
-      warmup_epoch_by_epoch: True
-    regularizer:
-      name: 'L2'
-      coeff: 0.0005
+      scope: model
+      lr:
+        name: Piecewise
+        decay_epochs: [30, 60]
+        values: [0.00035, 0.000035, 0.0000035]
+        warmup_epoch: 10
+        warmup_start_lr: 0.0000035
+        warmup_epoch_by_epoch: True
+      regularizer:
+        name: 'L2'
+        coeff: 0.0005
   - SGD:
-    sope: TripletLossV3
-    lr:
-      name: Constant
-      learning_rate: 0.5
+      scope: CenterLoss
+      lr:
+        name: Constant
+        learning_rate: 1000.0
 
 # data loader for train and eval
 DataLoader:
   Train:
     dataset:
-        name: "VeriWild"
-        image_root: "./dataset/market1501/bounding_box_train"
-        cls_label_path: "./dataset/market1501/bounding_box_train.txt"
-        relabel: True
+        name: "Market1501"
+        image_root: "./dataset/Market-1501-v15.09.15"
+        cls_label_path: "bounding_box_train"
         transform_ops:
           - DecodeImage:
               to_rgb: True
@@ -123,9 +122,9 @@ DataLoader:
   Eval:
     Query:
       dataset:
-        name: "VeriWild"
-        image_root: "./dataset/market1501/query"
-        cls_label_path: "./dataset/market1501/query.txt"
+        name: "Market1501"
+        image_root: "./dataset/Market-1501-v15.09.15"
+        cls_label_path: "query"
         transform_ops:
           - DecodeImage:
               to_rgb: True
@@ -148,9 +147,9 @@ DataLoader:
 
     Gallery:
       dataset:
-        name: "VeriWild"
-        image_root: "./dataset/market1501/bounding_box_test"
-        cls_label_path: "./dataset/market1501/bounding_box_test.txt"
+        name: "Market1501"
+        image_root: "./dataset/Market-1501-v15.09.15"
+        cls_label_path: "bounding_box_test"
         transform_ops:
           - DecodeImage:
               to_rgb: True

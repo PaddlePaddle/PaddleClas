@@ -31,11 +31,11 @@ class FC(nn.Layer):
         weight_attr = paddle.ParamAttr(
             initializer=paddle.nn.initializer.XavierNormal())
         if 'weight_attr' in kwargs:
-            weight_attr = get_param_attr_dict(kwargs['weight_attr'], None)
+            weight_attr = get_param_attr_dict(kwargs['weight_attr'])
 
         bias_attr = None
         if 'bias_attr' in kwargs:
-            bias_attr = get_param_attr_dict(kwargs['bias_attr'], None)
+            bias_attr = get_param_attr_dict(kwargs['bias_attr'])
 
         self.fc = nn.Linear(
             self.embedding_size,

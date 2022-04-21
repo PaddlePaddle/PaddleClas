@@ -32,6 +32,7 @@ class BNNeck(nn.Layer):
             epsilon=1e-05,
             weight_attr=weight_attr,
             bias_attr=bias_attr)
+        # TODO: set bnneck.bias learnable=False
         self.flatten = nn.Flatten()
 
     def forward(self, x):

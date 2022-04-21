@@ -47,7 +47,7 @@ def build_optimizer(config, epochs, step_each_epoch, model_list=None):
     config = copy.deepcopy(config)
     optim_config = config["Optimizer"]
     if isinstance(optim_config, dict):
-        # convert {'name': xxx, **optim_cfg} to [{name: {scope: xxx, **optim_cfg}}]
+        # convert {'name': xxx, **optim_cfg} to [{'name': {'scope': xxx, **optim_cfg}}]
         optim_name = optim_config.pop("name")
         optim_config: List[Dict[str, Dict]] = [{
             optim_name: {
@@ -65,15 +65,15 @@ def build_optimizer(config, epochs, step_each_epoch, model_list=None):
     3. loss which has parameters, such as CenterLoss.
     """
     for optim_item in optim_config:
-        # optim_cfg = {optim_name: {scope: xxx, **optim_cfg}}
+        # optim_cfg = {optim_name: {'scope': xxx, **optim_cfg}}
         # step1 build lr
         optim_name = list(optim_item.keys())[0]  # get optim_name
         optim_scope = optim_item[optim_name].pop('scope')  # get optim_scope
         optim_cfg = optim_item[optim_name]  # get optim_cfg
 
         lr = build_lr_scheduler(optim_cfg.pop('lr'), epochs, step_each_epoch)
-        logger.debug("build lr ({}) for scope ({}) success..".format(
-            lr, optim_scope))
+        logger.info("build lr ({}) for scope ({}) success..".format(
+            lr.__class__.__name__, optim_scope))
         # step2 build regularization
         if 'regularizer' in optim_cfg and optim_cfg['regularizer'] is not None:
             if 'weight_decay' in optim_cfg:
@@ -84,8 +84,8 @@ def build_optimizer(config, epochs, step_each_epoch, model_list=None):
             reg_name = reg_config.pop('name') + 'Decay'
             reg = getattr(paddle.regularizer, reg_name)(**reg_config)
             optim_cfg["weight_decay"] = reg
-            logger.debug("build regularizer ({}) for scope ({}) success..".
-                         format(reg, optim_scope))
+            logger.info("build regularizer ({}) for scope ({}) success..".
+                        format(reg.__class__.__name__, optim_scope))
         # step3 build optimizer
         if 'clip_norm' in optim_cfg:
             clip_norm = optim_cfg.pop('clip_norm')
@@ -100,26 +100,31 @@ def build_optimizer(config, epochs, step_each_epoch, model_list=None):
                 # optimizer for all
                 optim_model.append(model_list[i])
             else:
-                if optim_scope.endswith("Loss"):
+                if "Loss" in optim_scope:
                     # optimizer for loss
-                    for m in model_list[i].sublayers(True):
-                        if m.__class__.__name__ == optim_scope:
-                            optim_model.append(m)
+                    if hasattr(model_list[i], 'loss_func'):
+                        for j in range(len(model_list[i].loss_func)):
+                            if model_list[i].loss_func[
+                                    j].__class__.__name__ == optim_scope:
+                                optim_model.append(model_list[i].loss_func[j])
                 elif optim_scope == "model":
                     # opmizer for entire model
-                    optim_model.append(model_list[i])
+                    if not model_list[i].__class__.__name__.lower().endswith(
+                            "loss"):
+                        optim_model.append(model_list[i])
                 else:
                     # opmizer for module in model, such as backbone, neck, head...
                     if hasattr(model_list[i], optim_scope):
                         optim_model.append(getattr(model_list[i], optim_scope))
 
         assert len(optim_model) == 1, \
-            "Invalid optim model for optim scope({}), number of optim_model={}".format(optim_scope, len(optim_model))
+            "Invalid optim model for optim scope({}), number of optim_model={}".\
+                format(optim_scope, [m.__class__.__name__ for m in optim_model])
         optim = getattr(optimizer, optim_name)(
             learning_rate=lr, grad_clip=grad_clip,
             **optim_cfg)(model_list=optim_model)
-        logger.debug("build optimizer ({}) for scope ({}) success..".format(
-            optim, optim_scope))
+        logger.info("build optimizer ({}) for scope ({}) success..".format(
+            optim.__class__.__name__, optim_scope))
         optim_list.append(optim)
         lr_list.append(lr)
     return optim_list, lr_list
