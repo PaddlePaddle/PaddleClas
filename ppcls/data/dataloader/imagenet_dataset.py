@@ -21,6 +21,15 @@ from .common_dataset import CommonDataset
 
 
 class ImageNetDataset(CommonDataset):
+    def __init__(
+            self,
+            image_root,
+            cls_label_path,
+            transform_ops=None,
+            delimiter=None):
+        self.delimiter = delimiter if delimiter is not None else " "
+        super(ImageNetDataset, self).__init__(image_root, cls_label_path, transform_ops)
+
     def _load_anno(self, seed=None):
         assert os.path.exists(self._cls_path)
         assert os.path.exists(self._img_root)
@@ -32,7 +41,7 @@ class ImageNetDataset(CommonDataset):
             if seed is not None:
                 np.random.RandomState(seed).shuffle(lines)
             for l in lines:
-                l = l.strip().split(" ")
+                l = l.strip().split(self.delimiter)
                 self.images.append(os.path.join(self._img_root, l[0]))
                 self.labels.append(np.int64(l[1]))
                 assert os.path.exists(self.images[-1])
