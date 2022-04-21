@@ -30,7 +30,7 @@ from utils import logger
 from utils import config
 from utils.get_image_list import get_image_list
 from utils.draw_bbox import draw_bbox_results
-from sklearn.metrics import f1_score, precision_score, recall_score
+from sklearn.metrics import f1_score
 
 
 class SystemPredictor(object):
@@ -100,23 +100,12 @@ class SystemPredictor(object):
         rec_result = self.rec_predictor.predict(img)
         scores, docs = self.Searcher.search(rec_result, self.return_k)
 
-        #  if scores[0][0] >= self.config["IndexProcess"]["score_thres"]:
-            #  label = self.id_map[docs[0][0]].split()[1]
-            #  score = scores[0][0]
-        #      output.append([label, score])
-        for x in docs[0]:
-            output.append(self.id_map[x].split()[1])
-        return output
+        if scores[0][0] >= self.config["IndexProcess"]["score_thres"]:
+            label = self.id_map[docs[0][0]].split()[1]
+            score = scores[0][0]
+            output.append([label, score])
 
-def get_recall(gth, pred):
-    assert len(gth) == len(pred)
-    recall_list = [0] * len(pred[0]) 
-    for g, p in zip(gth, pred):
-        for i in range(len(pred[0])):
-            if g in p[:i + 1]:
-                recall_list[i] += 1
-    recall_list = [x / len(pred) for x in recall_list]
-    return recall_list
+        return output
 
 
 def main(config):
@@ -127,21 +116,32 @@ def main(config):
     predict = []
     gth = []
 
-    with open(config["Global"]["infer_imgs"])as fd:
-        query_list = fd.readlines()
-    for line in query_list:
-        line = line.strip().split(config["IndexProcess"]["delimiter"])
-        img_name = os.path.join(img_root_path, line[0])
-        img = cv2.imread(img_name)
+    coco = COCO(config["Global"]["infer_imgs"])
+    img_ids = coco.getImgIds()
+    label_map = {}
+    for k, v in coco.cats.items():
+        label_map[v['name']] = v['id']
+
+    for img_id in img_ids:
+        img_anno = coco.loadImgs(img_id)[0]
+        im_fname = os.path.join(img_root_path, img_anno['file_name'])
+        ins_anno_ids = coco.getAnnIds(imgIds=[img_id], iscrowd=None)
+        instances = coco.loadAnns(ins_anno_ids)
+        img = cv2.imread(im_fname)
         img = img[:, :, ::-1]
-        output = system_predictor.predict(img)
-       
-        predict.append(output)
-        gth.append(line[1])
-    
-    recall_list = get_recall(gth, predict)
-    for i, x in enumerate(recall_list):
-        print("recall_{}: {:.04f}".format(i, x))
+        for inst in instances:
+            cat_id = inst['category_id']
+            bbox = [int(x) for x in inst['bbox']]
+            img_obj = img[bbox[1]:bbox[1] + bbox[3], bbox[0]:bbox[0] + bbox[2]]
+            output = system_predictor.predict(img_obj)
+            gth.append(cat_id)
+            predict.append(label_map[output[0][0]])
+
+    micro = f1_score(gth, predict, average='micro')
+    macro = f1_score(gth, predict, average='macro')
+    print("micro f1: {:.3f}".format(micro))
+    print("macro f1: {:.3f}".format(macro))
+
 
 # python python/eval_shitu.py -c configs/inference_drink.yaml \
 #           -o Global.infer_imgs=/work/project/ppshit_test_data/query.json \ # coco format json file path
