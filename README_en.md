@@ -40,10 +40,11 @@ Four sample solutions are provided, including product recognition, vehicle recog
 
 ## Welcome to Join the Technical Exchange Group
 
-* You can also scan the QR code below to join the PaddleClas WeChat group to get more efficient answers to your questions and to communicate with developers from all walks of life. We look forward to hearing from you.
+* You can also scan the QR code below to join the PaddleClas QQ group and WeChat group (add and replay "C") to get more efficient answers to your questions and to communicate with developers from all walks of life. We look forward to hearing from you.
 
 <div align="center">
-<img src="https://user-images.githubusercontent.com/12560511/162710270-8a249aca-4fa9-46f9-95e5-66d906fe6d66.jpg" width="200"/>
+<img src="https://user-images.githubusercontent.com/80816848/164383225-e375eb86-716e-41b4-a9e0-4b8a3976c1aa.jpg" width="200"/>
+<img src="https://user-images.githubusercontent.com/48054808/160531099-9811bbe6-cfbb-47d5-8bdb-c2b40684d7dd.png" width="200"/>
 </div>
 
 ## Quick Start
