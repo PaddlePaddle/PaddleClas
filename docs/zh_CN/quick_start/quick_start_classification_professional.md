@@ -75,7 +75,7 @@ python3 -m paddle.distributed.launch \
 
 验证集的最高准确率为 0.415 左右。
 
-此处的使用了多个 GPU 训练，如果只使用一个 GPU，请将 `CUDA_VISIBLE_DEVICES` 设置指定 GPU，`--gpus`设置指定 GPU，下同。例如，只使用 0 号 GPU 训练：
+此处使用了多个 GPU 训练，如果只使用一个 GPU，请将 `CUDA_VISIBLE_DEVICES` 设置指定 GPU，`--gpus`设置指定 GPU，下同。例如，只使用 0 号 GPU 训练：
 
 ```shell
 export CUDA_VISIBLE_DEVICES=0
