@@ -83,20 +83,16 @@ def retrieval_eval(engine, epoch_id=0):
                             0] / len(query_feas)
         else:
             distmat = re_ranking(
-                query_feas,
-                gallery_feas,
-                query_img_id,
-                query_query_id,
-                gallery_img_id,
-                gallery_unique_id,
-                k1=20,
-                k2=6,
-                lambda_value=0.3)
+                query_feas, gallery_feas, k1=20, k2=6, lambda_value=0.3)
             cmc, mAP = eval_func(distmat,
                                  np.squeeze(query_img_id.numpy()),
                                  np.squeeze(gallery_img_id.numpy()),
                                  np.squeeze(query_query_id.numpy()),
                                  np.squeeze(gallery_unique_id.numpy()))
+            metric_dict["recall1(RK)"] = cmc[0]
+            metric_dict["recall5(RK)"] = cmc[4]
+            metric_dict["mAP(RK)"] = mAP
+
             for key in metric_tmp:
                 metric_dict[key] = metric_tmp[key] * block_fea.shape[0] / len(
                     query_feas)
@@ -176,7 +172,6 @@ def re_ranking(queFea,
         k_reciprocal_expansion_index = np.unique(k_reciprocal_expansion_index)
         weight = np.exp(-original_dist[i, k_reciprocal_expansion_index])
         V[i, k_reciprocal_expansion_index] = weight / np.sum(weight)
-    all_num_cost = time.time() - t
     original_dist = original_dist[:query_num, ]
     if k2 != 1:
         V_qe = np.zeros_like(V, dtype=np.float16)
@@ -190,7 +185,6 @@ def re_ranking(queFea,
         invIndex.append(np.where(V[:, i] != 0)[0])
 
     jaccard_dist = np.zeros_like(original_dist, dtype=np.float16)
-    gallery_num_cost = time.time() - t
     for i in range(query_num):
         temp_min = np.zeros(shape=[1, gallery_num], dtype=np.float16)
         indNonZero = np.where(V[i, :] != 0)[0]
@@ -206,7 +200,6 @@ def re_ranking(queFea,
     del V
     del jaccard_dist
     final_dist = final_dist[:query_num, query_num:]
-    query_num_cost = time.time() - t
     return final_dist
 
 

@@ -70,14 +70,14 @@ def get_param_attr_dict(ParamAttr_config: Union[None, bool, Dict[str, Dict]]
     if isinstance(ParamAttr_config, bool):
         return ParamAttr_config
     ParamAttr_dict = {}
-    if 'initiliazer' in ParamAttr_config:
-        initiliazer_cfg = ParamAttr_config.get('initiliazer')
-        if 'name' in initiliazer_cfg:
-            initiliazer_name = initiliazer_cfg.pop('name')
-            ParamAttr_dict['initiliazer'] = getattr(
-                paddle.nn.initializer, initiliazer_name)(**initiliazer_cfg)
+    if 'initializer' in ParamAttr_config:
+        initializer_cfg = ParamAttr_config.get('initializer')
+        if 'name' in initializer_cfg:
+            initializer_name = initializer_cfg.pop('name')
+            ParamAttr_dict['initializer'] = getattr(
+                paddle.nn.initializer, initializer_name)(**initializer_cfg)
         else:
-            raise ValueError(f"'name' must specified in initiliazer_cfg")
+            raise ValueError(f"'name' must specified in initializer_cfg")
     if 'learning_rate' in ParamAttr_config:
         # NOTE: only support an single value now
         learning_rate_value = ParamAttr_config.get('learning_rate')

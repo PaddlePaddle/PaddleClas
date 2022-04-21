@@ -10,7 +10,7 @@ Global:
   epochs: 120
   print_batch_step: 20
   use_visualdl: False
-  warmup_epoch_by_epoch: True
+  warmup_by_epoch: True
   eval_mode: "retrieval"
   re_ranking: True
   # used for static mode and model export
@@ -68,7 +68,7 @@ Optimizer:
         values: [0.00035, 0.000035, 0.0000035]
         warmup_epoch: 10
         warmup_start_lr: 0.0000035
-        warmup_epoch_by_epoch: True
+        warmup_by_epoch: True
       regularizer:
         name: 'L2'
         coeff: 0.0005
