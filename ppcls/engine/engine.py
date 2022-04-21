@@ -71,7 +71,7 @@ class Engine(object):
         self.output_dir = self.config['Global']['output_dir']
         log_file = os.path.join(self.output_dir, self.config["Arch"]["name"],
                                 f"{mode}.log")
-        init_logger(name='root', log_file=log_file)
+        init_logger(log_file=log_file)
         print_config(config)
 
         # init train_func and eval_func
