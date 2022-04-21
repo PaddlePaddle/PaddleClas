@@ -75,6 +75,24 @@ python3 -m paddle.distributed.launch \
 
 The highest accuracy of the validation set is around 0.415.
 
+Here, multiple GPUs are used for training. If only one GPU is used, please specify the GPU with the `CUDA_VISIBLE_DEVICES` setting, and specify the GPU with the `--gpus` setting, the same below. For example, to train with only GPU 0:
+
+```shell
+export CUDA_VISIBLE_DEVICES=0
+python3 -m paddle.distributed.launch \
+    --gpus="0" \
+    tools/train.py \
+        -c ./ppcls/configs/quick_start/professional/ResNet50_vd_CIFAR100.yaml \
+        -o Global.output_dir="output_CIFAR" \
+        -o Optimizer.lr.learning_rate=0.01
+```
+
+* **Notice**:
+
+* The GPUs specified in `--gpus` can be a subset of the GPUs specified in `CUDA_VISIBLE_DEVICES`.
+* Since the initial learning rate and batch-size need to maintain a linear relationship, when training is switched from 4 GPUs to 1 GPU, the total batch-size is reduced to 1/4 of the original, and the learning rate also needs to be reduced to 1/4 of the original, so changed the default learning rate from 0.04 to 0.01.
+
+
 <a name="2.1.2"></a> 
 
 
