@@ -27,8 +27,8 @@ class ImageNetDataset(CommonDataset):
             cls_label_path,
             transform_ops=None,
             delimiter=None):
-        super(ImageNetDataset, self).__init__(image_root, cls_label_path, transform_ops)
         self.delimiter = delimiter if delimiter is not None else " "
+        super(ImageNetDataset, self).__init__(image_root, cls_label_path, transform_ops)
 
     def _load_anno(self, seed=None):
         assert os.path.exists(self._cls_path)
