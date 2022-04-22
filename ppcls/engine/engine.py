@@ -224,7 +224,7 @@ class Engine(object):
         # build optimizer
         if self.mode == 'train':
             self.optimizer, self.lr_sch = build_optimizer(
-                self.config, self.config["Global"]["epochs"],
+                self.config["Optimizer"], self.config["Global"]["epochs"],
                 len(self.train_dataloader),
                 [self.model, self.train_loss_func])
 
