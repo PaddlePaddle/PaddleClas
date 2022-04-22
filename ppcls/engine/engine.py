@@ -214,21 +214,19 @@ class Engine(object):
         if self.config["Global"]["pretrained_model"] is not None:
             if self.config["Global"]["pretrained_model"].startswith("http"):
                 load_dygraph_pretrain_from_url(
-                    self.model, self.config["Global"]["pretrained_model"])
+                    [self.model, getattr(self, 'train_loss_func', None)],
+                    self.config["Global"]["pretrained_model"])
             else:
                 load_dygraph_pretrain(
-                    self.model, self.config["Global"]["pretrained_model"])
+                    [self.model, getattr(self, 'train_loss_func', None)],
+                    self.config["Global"]["pretrained_model"])
 
         # build optimizer
         if self.mode == 'train':
             self.optimizer, self.lr_sch = build_optimizer(
-                self.config["Optimizer"], self.config["Global"]["epochs"],
-                len(self.train_dataloader), [
-                    self.model, * [
-                        m for m in self.train_loss_func.loss_func
-                        if len(m.parameters()) > 0
-                    ]
-                ])
+                self.config, self.config["Global"]["epochs"],
+                len(self.train_dataloader),
+                [self.model, self.train_loss_func])
 
         # for amp training
         if self.amp:
@@ -246,6 +244,11 @@ class Engine(object):
                 optimizers=self.optimizer,
                 level=amp_level,
                 save_dtype='float32')
+            if len(self.train_loss_func.parameters()) > 0:
+                self.train_loss_func = paddle.amp.decorate(
+                    models=self.train_loss_func,
+                    level=amp_level,
+                    save_dtype='float32')
 
         # for distributed
         world_size = dist.get_world_size()
@@ -256,12 +259,10 @@ class Engine(object):
         if self.config["Global"]["distributed"]:
             dist.init_parallel_env()
             self.model = paddle.DataParallel(self.model)
-            # NOTE: parallelize loss which has parameters, such as CenterLoss
-            for i in range(len(self.train_loss_func.loss_func)):
-                if len(self.train_loss_func.loss_func[i].parameters()) > 0:
-                    self.train_loss_func.loss_func[i] = paddle.DataParallel(
-                        self.train_loss_func.loss_func[i])
-
+            if self.mode == 'train' and len(self.train_loss_func.parameters(
+            )) > 0:
+                self.train_loss_func = paddle.DataParallel(
+                    self.train_loss_func)
         # build postprocess for infer
         if self.mode == 'infer':
             self.preprocess_func = create_operators(self.config["Infer"][
@@ -289,19 +290,31 @@ class Engine(object):
         # global iter counter
         self.global_step = 0
 
-        if self.config["Global"]["checkpoints"] is not None:
-            metric_info = init_model(self.config["Global"], self.model,
-                                     self.optimizer)
+        if self.config.Global.checkpoints is not None:
+            metric_info = init_model(self.config.Global, self.model,
+                                     self.optimizer, self.train_loss_func)
             if metric_info is not None:
                 best_metric.update(metric_info)
 
         self.max_iter = len(self.train_dataloader) - 1 if platform.system(
         ) == "Windows" else len(self.train_dataloader)
+
+        if self.config["Global"].get("warmup_by_epoch", False):
+            for i in range(len(self.lr_sch)):
+                self.lr_sch[i].step()
+            logger.info(
+                "lr_sch step once before first epoch, when Global.warmup_by_epoch=True"
+            )
+
         for epoch_id in range(best_metric["epoch"] + 1,
                               self.config["Global"]["epochs"] + 1):
             acc = 0.0
             # for one epoch train
             self.train_epoch_func(self, epoch_id, print_batch_step)
+
+            if self.config["Global"].get("warmup_by_epoch", False):
+                for i in range(len(self.lr_sch)):
+                    self.lr_sch[i].step()
 
             if self.use_dali:
                 self.train_dataloader.reset()
@@ -327,7 +340,8 @@ class Engine(object):
                         best_metric,
                         self.output_dir,
                         model_name=self.config["Arch"]["name"],
-                        prefix="best_model")
+                        prefix="best_model",
+                        loss=self.train_loss_func)
                 logger.info("[Eval][Epoch {}][best metric: {}]".format(
                     epoch_id, best_metric["metric"]))
                 logger.scaler(
@@ -346,7 +360,8 @@ class Engine(object):
                                      "epoch": epoch_id},
                     self.output_dir,
                     model_name=self.config["Arch"]["name"],
-                    prefix="epoch_{}".format(epoch_id))
+                    prefix="epoch_{}".format(epoch_id),
+                    loss=self.train_loss_func)
             # save the latest model
             save_load.save_model(
                 self.model,
@@ -354,7 +369,8 @@ class Engine(object):
                                  "epoch": epoch_id},
                 self.output_dir,
                 model_name=self.config["Arch"]["name"],
-                prefix="latest")
+                prefix="latest",
+                loss=self.train_loss_func)
 
         if self.vdl_writer is not None:
             self.vdl_writer.close()

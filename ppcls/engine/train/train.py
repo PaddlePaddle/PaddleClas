@@ -21,7 +21,6 @@ from ppcls.utils import profiler
 
 def train_epoch(engine, epoch_id, print_batch_step):
     tic = time.time()
-    v_current = [int(i) for i in paddle.__version__.split(".")]
     for iter_id, batch in enumerate(engine.train_dataloader):
         if iter_id >= engine.max_iter:
             break
@@ -58,10 +57,16 @@ def train_epoch(engine, epoch_id, print_batch_step):
         if engine.amp:
             scaled = engine.scaler.scale(loss_dict["loss"])
             scaled.backward()
+            # set BNneck.bias grad to zero
+            engine.model.neck.feat_bn.bias.grad.set_value(
+                paddle.zeros_like(engine.model.neck.feat_bn.bias.grad))
             for i in range(len(engine.optimizer)):
                 engine.scaler.minimize(engine.optimizer[i], scaled)
         else:
             loss_dict["loss"].backward()
+            # set BNneck.bias grad to zero
+            engine.model.neck.feat_bn.bias.grad.set_value(
+                paddle.zeros_like(engine.model.neck.feat_bn.bias.grad))
             for i in range(len(engine.optimizer)):
                 engine.optimizer[i].step()
 
@@ -70,8 +75,9 @@ def train_epoch(engine, epoch_id, print_batch_step):
             engine.optimizer[i].clear_grad()
 
         # step lr
-        for i in range(len(engine.lr_sch)):
-            engine.lr_sch[i].step()
+        if engine.config["Global"].get("warmup_by_epoch", False) is False:
+            for i in range(len(engine.lr_sch)):
+                engine.lr_sch[i].step()
 
         # below code just for logging
         # update metric_for_logger

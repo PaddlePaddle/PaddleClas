@@ -161,12 +161,22 @@ def main(args):
     # load pretrained models or checkpoints
     init_model(global_config, train_prog, exe)
 
-    if 'AMP' in config and config.AMP.get("level", "O1") == "O2":
+    if 'AMP' in config:
+        if config["AMP"].get("level", "O1").upper() == "O2":
+            use_fp16_test = True
+            msg = "Only support FP16 evaluation when AMP O2 is enabled."
+            logger.warning(msg)
+        elif "use_fp16_test" in config["AMP"]:
+            use_fp16_test = config["AMP"].get["use_fp16_test"]
+        else:
+            use_fp16_test = False
+
         optimizer.amp_init(
             device,
             scope=paddle.static.global_scope(),
             test_program=eval_prog
-            if global_config["eval_during_train"] else None)
+            if global_config["eval_during_train"] else None,
+            use_fp16_test=use_fp16_test)
 
     if not global_config.get("is_distributed", True):
         compiled_train_prog = program.compile(
@@ -182,7 +192,7 @@ def main(args):
         program.run(train_dataloader, exe, compiled_train_prog, train_feeds,
                     train_fetchs, epoch_id, 'train', config, vdl_writer,
                     lr_scheduler, args.profiler_options)
-        # 2. evaate with eval dataset
+        # 2. evaluate with eval dataset
         if global_config["eval_during_train"] and epoch_id % global_config[
                 "eval_interval"] == 0:
             top1_acc = program.run(eval_dataloader, exe, compiled_eval_prog,

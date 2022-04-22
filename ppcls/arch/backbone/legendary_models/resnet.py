@@ -276,6 +276,7 @@ class ResNet(TheseusLayer):
                  config,
                  stages_pattern,
                  version="vb",
+                 stem_act="relu",
                  class_num=1000,
                  lr_mult_list=[1.0, 1.0, 1.0, 1.0, 1.0],
                  data_format="NCHW",
@@ -310,7 +311,7 @@ class ResNet(TheseusLayer):
             [[input_image_channel, 32, 3, 2], [32, 32, 3, 1], [32, 64, 3, 1]]
         }
 
-        self.stem = nn.Sequential(* [
+        self.stem = nn.Sequential(*[
             ConvBNLayer(
                 num_channels=in_c,
                 num_filters=out_c,

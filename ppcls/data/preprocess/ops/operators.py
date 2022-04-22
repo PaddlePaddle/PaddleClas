@@ -39,7 +39,8 @@ class UnifiedResize(object):
             'bilinear': cv2.INTER_LINEAR,
             'area': cv2.INTER_AREA,
             'bicubic': cv2.INTER_CUBIC,
-            'lanczos': cv2.INTER_LANCZOS4
+            'lanczos': cv2.INTER_LANCZOS4,
+            'random': (cv2.INTER_LINEAR, cv2.INTER_CUBIC)
         }
         _pil_interp_from_str = {
             'nearest': Image.NEAREST,
@@ -47,10 +48,18 @@ class UnifiedResize(object):
             'bicubic': Image.BICUBIC,
             'box': Image.BOX,
             'lanczos': Image.LANCZOS,
-            'hamming': Image.HAMMING
+            'hamming': Image.HAMMING,
+            'random': (Image.BILINEAR, Image.BICUBIC)
         }
 
+        def _cv2_resize(src, size, resample):
+            if isinstance(resample, tuple):
+                resample = random.choice(resample)
+            return cv2.resize(src, size, interpolation=resample)
+
         def _pil_resize(src, size, resample):
+            if isinstance(resample, tuple):
+                resample = random.choice(resample)
             pil_img = Image.fromarray(src)
             pil_img = pil_img.resize(size, resample)
             return np.asarray(pil_img)
@@ -61,7 +70,7 @@ class UnifiedResize(object):
             # compatible with opencv < version 4.4.0
             elif interpolation is None:
                 interpolation = cv2.INTER_LINEAR
-            self.resize_func = partial(cv2.resize, interpolation=interpolation)
+            self.resize_func = partial(_cv2_resize, resample=interpolation)
         elif backend.lower() == "pil":
             if isinstance(interpolation, str):
                 interpolation = _pil_interp_from_str[interpolation.lower()]
@@ -93,14 +102,15 @@ class DecodeImage(object):
         self.channel_first = channel_first  # only enabled when to_np is True
 
     def __call__(self, img):
-        if six.PY2:
-            assert type(img) is str and len(
-                img) > 0, "invalid input 'img' in DecodeImage"
-        else:
-            assert type(img) is bytes and len(
-                img) > 0, "invalid input 'img' in DecodeImage"
-        data = np.frombuffer(img, dtype='uint8')
-        img = cv2.imdecode(data, 1)
+        if not isinstance(img, np.ndarray):
+            if six.PY2:
+                assert type(img) is str and len(
+                    img) > 0, "invalid input 'img' in DecodeImage"
+            else:
+                assert type(img) is bytes and len(
+                    img) > 0, "invalid input 'img' in DecodeImage"
+            data = np.frombuffer(img, dtype='uint8')
+            img = cv2.imdecode(data, 1)
         if self.to_rgb:
             assert img.shape[2] == 3, 'invalid shape of image[%s]' % (
                 img.shape)

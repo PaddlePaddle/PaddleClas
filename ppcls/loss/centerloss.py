@@ -20,7 +20,6 @@ from typing import Dict
 
 import paddle
 import paddle.nn as nn
-from paddle import Tensor
 
 
 class CenterLoss(nn.Layer):
@@ -42,16 +41,16 @@ class CenterLoss(nn.Layer):
             default_initializer=nn.initializer.Assign(random_init_centers))
         self.add_parameter("centers", self.centers)
 
-    def __call__(self, input: Dict[str, Tensor],
-                 target: Tensor) -> Dict[str, Tensor]:
+    def __call__(self, input: Dict[str, paddle.Tensor],
+                 target: paddle.Tensor) -> Dict[str, paddle.Tensor]:
         """compute center loss.
 
         Args:
-            input (Dict[str, Tensor]): {'features': (batch_size, feature_dim), ...}.
-            target (Tensor): ground truth label with shape (batch_size, ).
+            input (Dict[str, paddle.Tensor]): {'features': (batch_size, feature_dim), ...}.
+            target (paddle.Tensor): ground truth label with shape (batch_size, ).
 
         Returns:
-            Dict[str, Tensor]: {'CenterLoss': loss}.
+            Dict[str, paddle.Tensor]: {'CenterLoss': loss}.
         """
         feats = input['backbone']
         labels = target
@@ -61,31 +60,15 @@ class CenterLoss(nn.Layer):
             labels = paddle.squeeze(labels, axis=[-1])
 
         batch_size = feats.shape[0]
-        # calc feat * feat
-        dist1 = paddle.sum(paddle.square(feats), axis=1, keepdim=True)
-        dist1 = paddle.expand(dist1, [batch_size, self.num_classes])
+        distmat = paddle.pow(feats, 2).sum(axis=1, keepdim=True).expand([batch_size, self.num_classes]) + \
+            paddle.pow(self.centers, 2).sum(axis=1, keepdim=True).expand([self.num_classes, batch_size]).t()
+        distmat = distmat.addmm(x=feats, y=self.centers.t(), beta=1, alpha=-2)
 
-        # dist2 of centers
-        dist2 = paddle.sum(paddle.square(self.centers), axis=1,
-                           keepdim=True)  # num_classes
-        dist2 = paddle.expand(dist2, [self.num_classes, batch_size])
-        dist2 = paddle.transpose(dist2, [1, 0])
+        classes = paddle.arange(self.num_classes).astype(labels.dtype)
+        labels = labels.unsqueeze(1).expand([batch_size, self.num_classes])
+        mask = labels.equal(classes.expand([batch_size, self.num_classes]))
 
-        # first x * x + y * y
-        distmat = paddle.add(dist1, dist2)
-
-        tmp = paddle.matmul(feats, paddle.transpose(self.centers, [1, 0]))
-        distmat = distmat - 2.0 * tmp
-
-        # generate the mask
-        classes = paddle.arange(self.num_classes)
-        labels = paddle.expand(
-            paddle.unsqueeze(labels, 1), (batch_size, self.num_classes))
-        mask = paddle.equal(
-            paddle.expand(classes, [batch_size, self.num_classes]),
-            labels).astype("float32")  # get mask
-
-        dist = paddle.multiply(distmat, mask)
-        loss = paddle.sum(paddle.clip(dist, min=1e-12, max=1e+12)) / batch_size
+        dist = distmat * mask.astype(feats.dtype)
+        loss = dist.clip(min=1e-12, max=1e+12).sum() / batch_size
         # return loss
         return {'CenterLoss': loss}

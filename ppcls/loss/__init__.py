@@ -11,7 +11,7 @@ from .emlloss import EmlLoss
 from .msmloss import MSMLoss
 from .npairsloss import NpairsLoss
 from .trihardloss import TriHardLoss
-from .triplet import TripletLoss, TripletLossV2
+from .triplet import TripletLoss, TripletLossV2, TripletLossV3
 from .supconloss import SupConLoss
 from .pairwisecosface import PairwiseCosface
 from .dmlloss import DMLLoss
@@ -47,6 +47,7 @@ class CombinedLoss(nn.Layer):
                 param.keys())
             self.loss_weight.append(param.pop("weight"))
             self.loss_func.append(eval(name)(**param))
+            self.loss_func = nn.LayerList(self.loss_func)
 
     def __call__(self, input, batch):
         loss_dict = {}
