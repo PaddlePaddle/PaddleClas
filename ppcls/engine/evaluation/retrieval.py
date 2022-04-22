@@ -82,6 +82,7 @@ def retrieval_eval(engine, epoch_id=0):
                         metric_dict[key] += metric_tmp[key] * block_fea.shape[
                             0] / len(query_feas)
         else:
+            metric_dict = dict()
             distmat = re_ranking(
                 query_feas, gallery_feas, k1=20, k2=6, lambda_value=0.3)
             cmc, mAP = eval_func(distmat,
@@ -93,9 +94,6 @@ def retrieval_eval(engine, epoch_id=0):
             metric_dict["recall5(RK)"] = cmc[4]
             metric_dict["mAP(RK)"] = mAP
 
-            for key in metric_tmp:
-                metric_dict[key] = metric_tmp[key] * block_fea.shape[0] / len(
-                    query_feas)
     metric_info_list = []
     for key in metric_dict:
         if metric_key is None:

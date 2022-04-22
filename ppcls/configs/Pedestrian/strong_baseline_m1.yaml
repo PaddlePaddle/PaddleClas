@@ -2,36 +2,47 @@
 Global:
   checkpoints: null
   pretrained_model: null
-  # pretrained_model: "./pd_model_trace/ISE/ISE_M_model" # pretrained ISE model for Market1501
-  # pretrained_model: "./pd_model_trace/ISE/ISE_MS_model" # pretrained ISE model for MSMT17
   output_dir: "./output/"
   device: "gpu"
-  save_interval: 10
+  save_interval: 40
   eval_during_train: True
   eval_interval: 10
   epochs: 120
-  print_batch_step: 10
+  print_batch_step: 20
   use_visualdl: False
-  # used for static mode and model export
-  image_shape: [3, 128, 256]
-  save_inference_dir: "./inference"
+  warmup_by_epoch: True
   eval_mode: "retrieval"
+  re_ranking: False
+  feat_from: "neck" # 'backbone' or 'neck'
+  # used for static mode and model export
+  image_shape: [3, 256, 128]
+  save_inference_dir: "./inference"
 
 # model architecture
 Arch:
   name: "RecModel"
   infer_output_key: "features"
   infer_add_softmax: False
-  Backbone: 
+  Backbone:
     name: "ResNet50_last_stage_stride1"
     pretrained: True
     stem_act: null
   BackboneStopLayer:
     name: "flatten"
+  Neck:
+    name: BNNeck
+    num_features: &feat_dim 2048
+    # trainable: False # TODO: freeze bn.bias
   Head:
-    name: "FC"  
-    embedding_size: 2048
-    class_num: 751
+    name: "FC"
+    embedding_size: *feat_dim
+    class_num: &class_num 751
+    weight_attr:
+      initializer:
+        name: Normal
+        std: 0.001
+    bias_attr: False
+
 # loss function config for traing/eval process
 Loss:
   Train:
@@ -47,8 +58,7 @@ Loss:
         weight: 1.0
 
 Optimizer:
-  name: Momentum
-  momentum: 0.9
+  name: Adam
   lr:
     name: Piecewise
     decay_epochs: [30, 60]
@@ -67,6 +77,9 @@ DataLoader:
         image_root: "./dataset/market1501"
         cls_label_path: "./dataset/market1501/bounding_box_train.txt"
         transform_ops:
+          - DecodeImage:
+              to_rgb: True
+              channel_first: False
           - ResizeImage:
               size: [128, 256]
           - RandFlipImage:
@@ -75,12 +88,19 @@ DataLoader:
               padding: 10
           - RandCropImage:
               size: [128, 256]
-              scale: [0.8022, 0.8022]
-              ratio: [0.5, 0.5]
+              scale: [ 0.8022, 0.8022 ]
+              ratio: [ 0.5, 0.5 ]
           - NormalizeImage:
+              scale: 0.00392157
               mean: [0.485, 0.456, 0.406]
               std: [0.229, 0.224, 0.225]
               order: ''
+          - RandomErasing:
+              EPSILON: 0.5
+              sl: 0.02
+              sh: 0.4
+              r1: 0.3
+              mean: [0.4914, 0.4822, 0.4465]
     sampler:
         name: DistributedRandomIdentitySampler
         batch_size: 64
@@ -97,9 +117,13 @@ DataLoader:
         image_root: "./dataset/market1501"
         cls_label_path: "./dataset/market1501/query.txt"
         transform_ops:
+          - DecodeImage:
+              to_rgb: True
+              channel_first: False
           - ResizeImage:
               size: [128, 256]
           - NormalizeImage:
+              scale: 0.00392157
               mean: [0.485, 0.456, 0.406]
               std: [0.229, 0.224, 0.225]
               order: ''
@@ -118,9 +142,13 @@ DataLoader:
         image_root: "./dataset/market1501"
         cls_label_path: "./dataset/market1501/bounding_box_test.txt"
         transform_ops:
+          - DecodeImage:
+              to_rgb: True
+              channel_first: False
           - ResizeImage:
               size: [128, 256]
           - NormalizeImage:
+              scale: 0.00392157
               mean: [0.485, 0.456, 0.406]
               std: [0.229, 0.224, 0.225]
               order: ''
@@ -138,4 +166,3 @@ Metric:
     - Recallk:
         topk: [1, 5]
     - mAP: {}
-

@@ -281,7 +281,6 @@ class ResNet(TheseusLayer):
                  lr_mult_list=[1.0, 1.0, 1.0, 1.0, 1.0],
                  data_format="NCHW",
                  input_image_channel=3,
-                 stem_act="relu",
                  return_patterns=None,
                  return_stages=None):
         super().__init__()

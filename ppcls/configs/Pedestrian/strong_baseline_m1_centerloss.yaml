@@ -4,17 +4,19 @@ Global:
   pretrained_model: null
   output_dir: "./output/"
   device: "gpu"
-  save_interval: 10
+  save_interval: 40
   eval_during_train: True
   eval_interval: 10
   epochs: 120
   print_batch_step: 20
   use_visualdl: False
+  warmup_by_epoch: True
+  eval_mode: "retrieval"
+  re_ranking: False
+  feat_from: "neck" # 'backbone' or 'neck'
   # used for static mode and model export
   image_shape: [3, 256, 128]
   save_inference_dir: "./inference"
-  eval_mode: "retrieval"
-  feat_from: "neck" # 'backbone' or 'neck'
 
 # model architecture
 Arch:
@@ -29,13 +31,17 @@ Arch:
     name: "flatten"
   Neck:
     name: BNNeck
-    num_filters: 2048
-    # trainable: False # TODO: free bn.bias
+    num_features: &feat_dim 2048
+    # trainable: False # TODO: freeze bn.bias
   Head:
     name: "FC"
-    embedding_size: 2048
-    class_num: 751
-    bias_attr: false
+    embedding_size: *feat_dim
+    class_num: &class_num 751
+    weight_attr:
+      initializer:
+        name: Normal
+        std: 0.001
+    bias_attr: False
 
 # loss function config for traing/eval process
 Loss:
@@ -43,25 +49,36 @@ Loss:
     - CELoss:
         weight: 1.0
         epsilon: 0.1
-    - TripletLossV2:
+    - TripletLossV3:
         weight: 1.0
         margin: 0.3
         normalize_feature: false
+    - CenterLoss:
+        weight: 0.0005
+        num_classes: *class_num
+        feat_dim: *feat_dim
   Eval:
     - CELoss:
         weight: 1.0
 
 Optimizer:
-  name: Adam
-  lr:
-    name: Piecewise
-    decay_epochs: [30, 60]
-    values: [0.00035, 0.000035, 0.0000035]
-    warmup_epoch: 10
-    warmup_start_lr: 0.0000035
-  regularizer:
-    name: 'L2'
-    coeff: 0.0005
+  - Adam:
+      scope: model
+      lr:
+        name: Piecewise
+        decay_epochs: [30, 60]
+        values: [0.00035, 0.000035, 0.0000035]
+        warmup_epoch: 10
+        warmup_start_lr: 0.0000035
+        warmup_by_epoch: True
+      regularizer:
+        name: 'L2'
+        coeff: 0.0005
+  - SGD:
+      scope: CenterLoss
+      lr:
+        name: Constant
+        learning_rate: 1000.0 # set to ori_lr*(1/centerloss_weight) to void manually scaling centers' gradidents.
 
 # data loader for train and eval
 DataLoader:
@@ -160,4 +177,3 @@ Metric:
     - Recallk:
         topk: [1, 5]
     - mAP: {}
-
