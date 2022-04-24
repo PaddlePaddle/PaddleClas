@@ -25,14 +25,22 @@ Arch:
   infer_add_softmax: False
   Backbone:
     name: "ResNet50_last_stage_stride1"
-    pretrained: True
+    pretrained: "./dataset/resnet50-19c8e357_for_strong_baseline"
     stem_act: null
   BackboneStopLayer:
     name: "flatten"
   Neck:
     name: BNNeck
     num_features: &feat_dim 2048
-    # trainable: False # TODO: freeze bn.bias
+    weight_attr:
+      initializer:
+        name: Constant
+        value: 1.0
+    bias_attr:
+      initializer:
+        name: Constant
+        value: 0.0
+      learning_rate: 1.0e-20 # TODO: Temporarily set lr small enough to freeze the bias
   Head:
     name: "FC"
     embedding_size: *feat_dim
@@ -78,7 +86,7 @@ Optimizer:
       scope: CenterLoss
       lr:
         name: Constant
-        learning_rate: 1000.0 # set to ori_lr*(1/centerloss_weight) to void manually scaling centers' gradidents.
+        learning_rate: 1000.0 # NOTE: set to ori_lr*(1/centerloss_weight) to avoid manually scaling centers' gradidents.
 
 # data loader for train and eval
 DataLoader:

@@ -2,8 +2,6 @@
 Global:
   checkpoints: null
   pretrained_model: null
-  # pretrained_model: "./pd_model_trace/ISE/ISE_M_model" # pretrained ISE model for Market1501
-  # pretrained_model: "./pd_model_trace/ISE/ISE_MS_model" # pretrained ISE model for MSMT17
   output_dir: "./output/"
   device: "gpu"
   save_interval: 40
@@ -12,10 +10,12 @@ Global:
   epochs: 120
   print_batch_step: 20
   use_visualdl: False
+  eval_mode: "retrieval"
+  re_ranking: False
+  feat_from: "backbone" # 'backbone' or 'neck'
   # used for static mode and model export
   image_shape: [3, 256, 128]
   save_inference_dir: "./inference"
-  eval_mode: "retrieval"
 
 # model architecture
 Arch:
@@ -32,6 +32,12 @@ Arch:
     name: "FC"
     embedding_size: 2048
     class_num: 751
+    weight_attr:
+      initializer:
+        name: Normal
+        std: 0.001
+    bias_attr: False
+
 # loss function config for traing/eval process
 Loss:
   Train:
@@ -63,9 +69,9 @@ Optimizer:
 DataLoader:
   Train:
     dataset:
-        name: "VeriWild"
-        image_root: "./dataset/market1501"
-        cls_label_path: "./dataset/market1501/bounding_box_train.txt"
+        name: "Market1501"
+        image_root: "./dataset/"
+        cls_label_path: "bounding_box_train"
         transform_ops:
           - ResizeImage:
               size: [128, 256]
@@ -88,14 +94,14 @@ DataLoader:
         drop_last: True
         shuffle: True
     loader:
-        num_workers: 6
+        num_workers: 4
         use_shared_memory: True
   Eval:
     Query:
       dataset:
-        name: "VeriWild"
-        image_root: "./dataset/market1501"
-        cls_label_path: "./dataset/market1501/query.txt"
+        name: "Market1501"
+        image_root: "./dataset/"
+        cls_label_path: "query"
         transform_ops:
           - ResizeImage:
               size: [128, 256]
@@ -109,14 +115,14 @@ DataLoader:
         drop_last: False
         shuffle: False
       loader:
-        num_workers: 6
+        num_workers: 4
         use_shared_memory: True
 
     Gallery:
       dataset:
-        name: "VeriWild"
-        image_root: "./dataset/market1501"
-        cls_label_path: "./dataset/market1501/bounding_box_test.txt"
+        name: "Market1501"
+        image_root: "./dataset/"
+        cls_label_path: "bounding_box_test"
         transform_ops:
           - ResizeImage:
               size: [128, 256]
@@ -130,7 +136,7 @@ DataLoader:
         drop_last: False
         shuffle: False
       loader:
-        num_workers: 6
+        num_workers: 4
         use_shared_memory: True
 
 Metric:

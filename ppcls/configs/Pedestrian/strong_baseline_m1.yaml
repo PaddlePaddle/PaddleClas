@@ -32,11 +32,19 @@ Arch:
   Neck:
     name: BNNeck
     num_features: &feat_dim 2048
-    # trainable: False # TODO: freeze bn.bias
+    weight_attr:
+      initializer:
+        name: Constant
+        value: 1.0
+    bias_attr:
+      initializer:
+        name: Constant
+        value: 0.0
+      learning_rate: 1.0e-20 # NOTE: Temporarily set lr small enough to freeze the bias
   Head:
     name: "FC"
     embedding_size: *feat_dim
-    class_num: &class_num 751
+    class_num: 751
     weight_attr:
       initializer:
         name: Normal
@@ -73,9 +81,9 @@ Optimizer:
 DataLoader:
   Train:
     dataset:
-        name: "VeriWild"
-        image_root: "./dataset/market1501"
-        cls_label_path: "./dataset/market1501/bounding_box_train.txt"
+        name: "Market1501"
+        image_root: "./dataset/"
+        cls_label_path: "bounding_box_train"
         transform_ops:
           - DecodeImage:
               to_rgb: True
@@ -108,14 +116,14 @@ DataLoader:
         drop_last: True
         shuffle: True
     loader:
-        num_workers: 6
+        num_workers: 4
         use_shared_memory: True
   Eval:
     Query:
       dataset:
-        name: "VeriWild"
-        image_root: "./dataset/market1501"
-        cls_label_path: "./dataset/market1501/query.txt"
+        name: "Market1501"
+        image_root: "./dataset/"
+        cls_label_path: "query"
         transform_ops:
           - DecodeImage:
               to_rgb: True
@@ -133,14 +141,14 @@ DataLoader:
         drop_last: False
         shuffle: False
       loader:
-        num_workers: 6
+        num_workers: 4
         use_shared_memory: True
 
     Gallery:
       dataset:
-        name: "VeriWild"
-        image_root: "./dataset/market1501"
-        cls_label_path: "./dataset/market1501/bounding_box_test.txt"
+        name: "Market1501"
+        image_root: "./dataset/"
+        cls_label_path: "bounding_box_test"
         transform_ops:
           - DecodeImage:
               to_rgb: True
@@ -158,7 +166,7 @@ DataLoader:
         drop_last: False
         shuffle: False
       loader:
-        num_workers: 6
+        num_workers: 4
         use_shared_memory: True
 
 Metric:

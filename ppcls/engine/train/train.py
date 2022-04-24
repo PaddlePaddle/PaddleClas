@@ -53,20 +53,14 @@ def train_epoch(engine, epoch_id, print_batch_step):
             out = forward(engine, batch)
             loss_dict = engine.train_loss_func(out, batch[1])
 
-        # step opt
+        # backward & step opt
         if engine.amp:
             scaled = engine.scaler.scale(loss_dict["loss"])
             scaled.backward()
-            # set BNneck.bias grad to zero
-            engine.model.neck.feat_bn.bias.grad.set_value(
-                paddle.zeros_like(engine.model.neck.feat_bn.bias.grad))
             for i in range(len(engine.optimizer)):
                 engine.scaler.minimize(engine.optimizer[i], scaled)
         else:
             loss_dict["loss"].backward()
-            # set BNneck.bias grad to zero
-            engine.model.neck.feat_bn.bias.grad.set_value(
-                paddle.zeros_like(engine.model.neck.feat_bn.bias.grad))
             for i in range(len(engine.optimizer)):
                 engine.optimizer[i].step()
 
