@@ -99,8 +99,8 @@ class Engine(object):
             paddle.__version__, self.device))
 
         # AMP training and evaluating
-        self.amp = "AMP" in self.config
-        if self.amp and self.config["AMP"] is not None:
+        self.amp = "AMP" in self.config and self.config["AMP"] is not None
+        if self.amp:
             self.scale_loss = self.config["AMP"].get("scale_loss", 1.0)
             self.use_dynamic_loss_scaling = self.config["AMP"].get(
                 "use_dynamic_loss_scaling", False)
@@ -228,7 +228,7 @@ class Engine(object):
                 len(self.train_dataloader),
                 [self.model, self.train_loss_func])
 
-        # for amp training
+        # for amp
         if self.amp:
             self.scaler = paddle.amp.GradScaler(
                 init_loss_scaling=self.scale_loss,
@@ -239,12 +239,13 @@ class Engine(object):
                 logger.warning(msg)
                 self.config['AMP']["level"] = "O1"
                 amp_level = "O1"
-            self.model, self.optimizer = paddle.amp.decorate(
-                models=self.model,
-                optimizers=self.optimizer,
-                level=amp_level,
-                save_dtype='float32')
-            if len(self.train_loss_func.parameters()) > 0:
+            self.model = paddle.amp.decorate(
+                models=self.model, level=amp_level, save_dtype='float32')
+            # TODO(gaotingquan): to compatible with Paddle develop and 2.2
+            if isinstance(self.model, tuple):
+                self.model = self.model[0]
+            if self.mode == "train" and len(self.train_loss_func.parameters(
+            )) > 0:
                 self.train_loss_func = paddle.amp.decorate(
                     models=self.train_loss_func,
                     level=amp_level,
