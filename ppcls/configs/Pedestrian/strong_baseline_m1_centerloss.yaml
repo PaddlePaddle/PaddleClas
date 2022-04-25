@@ -40,7 +40,7 @@ Arch:
       initializer:
         name: Constant
         value: 0.0
-      learning_rate: 1.0e-20 # TODO: Temporarily set lr small enough to freeze the bias
+      learning_rate: 1.0e-20 # NOTE: Temporarily set lr small enough to freeze the bias
   Head:
     name: "FC"
     embedding_size: *feat_dim
@@ -57,14 +57,16 @@ Loss:
     - CELoss:
         weight: 1.0
         epsilon: 0.1
-    - TripletLossV3:
+    - TripletLossV2:
         weight: 1.0
         margin: 0.3
         normalize_feature: false
+        feat_from: "backbone"
     - CenterLoss:
         weight: 0.0005
         num_classes: *class_num
         feat_dim: *feat_dim
+        feat_from: "backbone"
   Eval:
     - CELoss:
         weight: 1.0
