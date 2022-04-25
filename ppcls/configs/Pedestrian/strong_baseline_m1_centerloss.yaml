@@ -25,7 +25,7 @@ Arch:
   infer_add_softmax: False
   Backbone:
     name: "ResNet50_last_stage_stride1"
-    pretrained: "./dataset/resnet50-19c8e357_for_strong_baseline"
+    pretrained: True
     stem_act: null
   BackboneStopLayer:
     name: "flatten"
@@ -73,7 +73,7 @@ Loss:
 
 Optimizer:
   - Adam:
-      scope: model
+      scope: RecModel
       lr:
         name: Piecewise
         decay_epochs: [30, 60]
