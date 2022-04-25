@@ -11,7 +11,7 @@ from .emlloss import EmlLoss
 from .msmloss import MSMLoss
 from .npairsloss import NpairsLoss
 from .trihardloss import TriHardLoss
-from .triplet import TripletLoss, TripletLossV2, TripletLossV3
+from .triplet import TripletLoss, TripletLossV2
 from .supconloss import SupConLoss
 from .pairwisecosface import PairwiseCosface
 from .dmlloss import DMLLoss
