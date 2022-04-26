@@ -90,6 +90,7 @@ def retrieval_eval(engine, epoch_id=0):
 
 def cal_feature(engine, name='gallery'):
     has_unique_id = False
+    all_unique_id = None
 
     if name == 'gallery':
         dataloader = engine.gallery_dataloader
