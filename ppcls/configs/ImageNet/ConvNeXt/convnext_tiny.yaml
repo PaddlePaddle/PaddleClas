@@ -17,6 +17,11 @@ Global:
   to_static: False
 
 
+# model ema
+EMA:
+  decay: 0.9999
+
+
 # model architecture
 Arch:
   name: ConvNext_tiny

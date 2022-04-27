@@ -69,6 +69,9 @@ def train_epoch(engine, epoch_id, print_batch_step):
         # step lr
         for i in range(len(engine.lr_sch)):
             engine.lr_sch[i].step()
+        # update ema
+        if engine.ema:
+            engine.model_ema.update(engine.model)
 
         # below code just for logging
         # update metric_for_logger
