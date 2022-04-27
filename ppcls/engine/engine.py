@@ -119,6 +119,9 @@ class Engine(object):
         # EMA model
         self.ema = "EMA" in self.config and self.mode == "train"
 
+        # gradient accumulation
+        self.update_freq = self.config["Global"].get("update_freq", 1)
+
         if "class_num" in config["Global"]:
             global_class_num = config["Global"]["class_num"]
             if "class_num" not in config["Arch"]:
@@ -229,7 +232,7 @@ class Engine(object):
         if self.mode == 'train':
             self.optimizer, self.lr_sch = build_optimizer(
                 self.config["Optimizer"], self.config["Global"]["epochs"],
-                len(self.train_dataloader),
+                len(self.train_dataloader) // self.update_freq,
                 [self.model, self.train_loss_func])
 
         # for amp training
@@ -312,6 +315,7 @@ class Engine(object):
 
         self.max_iter = len(self.train_dataloader) - 1 if platform.system(
         ) == "Windows" else len(self.train_dataloader)
+        self.max_iter = self.max_iter // self.update_freq * self.update_freq
         for epoch_id in range(best_metric["epoch"] + 1,
                               self.config["Global"]["epochs"] + 1):
             acc = 0.0

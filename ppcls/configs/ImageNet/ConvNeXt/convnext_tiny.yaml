@@ -15,7 +15,7 @@ Global:
   save_inference_dir: ./inference
   # training model under @to_static
   to_static: False
-
+  update_freq: 8
 
 # model ema
 EMA:
@@ -51,7 +51,7 @@ Optimizer:
   one_dim_param_no_weight_decay: True
   lr:
     name: Cosine
-    learning_rate: 5e-4
+    learning_rate: 4e-3  # lr 4e-3 for total_batch_size 4096
     eta_min: 1e-6
     warmup_epoch: 20
     warmup_start_lr: 0
