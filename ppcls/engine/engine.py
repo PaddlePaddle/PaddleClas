@@ -250,12 +250,17 @@ class Engine(object):
                     level=amp_level,
                     save_dtype='float32')
 
-        # for distributed
+        # check the gpu num
         world_size = dist.get_world_size()
         self.config["Global"]["distributed"] = world_size != 1
-        if world_size != 4 and self.mode == "train":
-            msg = f"The training strategy in config files provided by PaddleClas is based on 4 gpus. But the number of gpus is {world_size} in current training. Please modify the stategy (learning rate, batch size and so on) if use config files in PaddleClas to train."
-            logger.warning(msg)
+        if self.mode == "train":
+            std_gpu_num = 8 if self.config["Optimizer"][
+                "name"] == "AdamW" else 4
+            if world_size != std_gpu_num:
+                msg = f"The training strategy provided by PaddleClas is based on {std_gpu_num} gpus. But the number of gpu is {world_size} in current training. Please modify the stategy (learning rate, batch size and so on) if use this config to train."
+                logger.warning(msg)
+
+        # for distributed
         if self.config["Global"]["distributed"]:
             dist.init_parallel_env()
             self.model = paddle.DataParallel(self.model)
