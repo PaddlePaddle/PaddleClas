@@ -23,6 +23,11 @@ import paddle.nn.functional as F
 
 
 class PairwiseCosface(nn.Layer):
+    """
+    paper: Circle Loss: A Unified Perspective of Pair Similarity Optimization
+    code reference: https://github.com/leoluopy/circle-loss-demonstration/blob/main/circle_loss.py
+    """
+
     def __init__(self, margin, gamma):
         super(PairwiseCosface, self).__init__()
         self.margin = margin
@@ -36,8 +41,10 @@ class PairwiseCosface(nn.Layer):
         dist_mat = paddle.matmul(embedding, embedding, transpose_y=True)
 
         N = dist_mat.shape[0]
-        is_pos = targets.reshape([N,1]).expand([N,N]).equal(paddle.t(targets.reshape([N,1]).expand([N,N]))).astype('float')
-        is_neg = targets.reshape([N,1]).expand([N,N]).not_equal(paddle.t(targets.reshape([N,1]).expand([N,N]))).astype('float')
+        is_pos = targets.reshape([N, 1]).expand([N, N]).equal(
+            paddle.t(targets.reshape([N, 1]).expand([N, N]))).astype('float')
+        is_neg = targets.reshape([N, 1]).expand([N, N]).not_equal(
+            paddle.t(targets.reshape([N, 1]).expand([N, N]))).astype('float')
 
         # Mask scores related to itself
         is_pos = is_pos - paddle.eye(N, N)
@@ -46,10 +53,12 @@ class PairwiseCosface(nn.Layer):
         s_n = dist_mat * is_neg
 
         logit_p = -self.gamma * s_p + (-99999999.) * (1 - is_pos)
-        logit_n = self.gamma * (s_n + self.margin) + (-99999999.) * (1 - is_neg)
+        logit_n = self.gamma * (s_n + self.margin) + (-99999999.) * (1 - is_neg
+                                                                     )
 
-        loss = F.softplus(paddle.logsumexp(logit_p, axis=1) + paddle.logsumexp(logit_n, axis=1)).mean()
-  
+        loss = F.softplus(
+            paddle.logsumexp(
+                logit_p, axis=1) + paddle.logsumexp(
+                    logit_n, axis=1)).mean()
+
         return {"PairwiseCosface": loss}
-
-
