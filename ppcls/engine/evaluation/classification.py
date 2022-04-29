@@ -32,15 +32,6 @@ def classification_eval(engine, epoch_id=0):
     }
     print_batch_step = engine.config["Global"]["print_batch_step"]
 
-    if engine.amp:
-        amp_level = engine.config['AMP'].get("level", "O1").upper()
-        if amp_level == "O2" and engine.config["AMP"].get("use_fp16_test",
-                                                          False):
-            engine.config["AMP"]["use_fp16_test"] = True
-            msg = "Only support FP16 evaluation when AMP O2 is enabled."
-            logger.warning(msg)
-        amp_eval = engine.config["AMP"].get("use_fp16_test", False)
-
     metric_key = None
     tic = time.time()
     accum_samples = 0
@@ -67,12 +58,12 @@ def classification_eval(engine, epoch_id=0):
             batch[1] = batch[1].reshape([-1, 1]).astype("int64")
 
         # image input
-        if engine.amp and amp_eval:
+        if engine.amp and engine.amp_eval:
             with paddle.amp.auto_cast(
                     custom_black_list={
                         "flatten_contiguous_range", "greater_than"
                     },
-                    level=amp_level):
+                    level=engine.amp_level):
                 out = engine.model(batch[0])
         else:
             out = engine.model(batch[0])
@@ -120,12 +111,12 @@ def classification_eval(engine, epoch_id=0):
 
         # calc loss
         if engine.eval_loss_func is not None:
-            if engine.amp and amp_eval:
+            if engine.amp and engine.amp_eval:
                 with paddle.amp.auto_cast(
                         custom_black_list={
                             "flatten_contiguous_range", "greater_than"
                         },
-                        level=amp_level):
+                        level=engine.amp_level):
                     loss_dict = engine.eval_loss_func(preds, labels)
             else:
                 loss_dict = engine.eval_loss_func(preds, labels)
