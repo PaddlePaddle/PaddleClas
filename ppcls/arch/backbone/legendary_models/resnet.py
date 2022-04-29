@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# reference: https://arxiv.org/pdf/1512.03385
+
 from __future__ import absolute_import, division, print_function
 
 import numpy as np

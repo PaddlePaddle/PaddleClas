@@ -13,6 +13,7 @@
 # limitations under the License.
 
 # Code was based on https://github.com/microsoft/Swin-Transformer
+# reference: https://arxiv.org/abs/2103.14030
 
 import numpy as np
 import paddle

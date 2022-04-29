@@ -13,6 +13,7 @@
 # limitations under the License.
 
 # Code was heavily based on https://github.com/whai362/PVT
+# reference: https://arxiv.org/abs/2106.13797
 
 from functools import partial
 import math

@@ -13,6 +13,7 @@
 # limitations under the License.
 
 # Code was based on https://github.com/BR-IDL/PaddleViT/blob/develop/image_classification/CSwin/cswin.py
+# reference: https://arxiv.org/abs/2107.00652
 
 import copy
 import numpy as np

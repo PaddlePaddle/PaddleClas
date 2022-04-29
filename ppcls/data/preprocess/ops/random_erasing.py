@@ -12,7 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-#This code is adapted from https://github.com/zhunzhong07/Random-Erasing, and refer to Timm.
+# This code is adapted from https://github.com/zhunzhong07/Random-Erasing, and refer to Timm(https://github.com/rwightman/pytorch-image-models).
+# reference: https://arxiv.org/abs/1708.04896
 
 from functools import partial
 
