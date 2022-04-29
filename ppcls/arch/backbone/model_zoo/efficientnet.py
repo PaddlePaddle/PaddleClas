@@ -13,6 +13,7 @@
 # limitations under the License.
 
 # Code was based on https://github.com/lukemelas/EfficientNet-PyTorch
+# reference: https://arxiv.org/abs/1905.11946
 
 import paddle
 from paddle import ParamAttr

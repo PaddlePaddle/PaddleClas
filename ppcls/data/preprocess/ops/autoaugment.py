@@ -13,6 +13,7 @@
 # limitations under the License.
 
 # This code is based on https://github.com/DeepVoltaire/AutoAugment/blob/master/autoaugment.py
+# reference: https://arxiv.org/abs/1805.09501
 
 from PIL import Image, ImageEnhance, ImageOps
 import numpy as np
