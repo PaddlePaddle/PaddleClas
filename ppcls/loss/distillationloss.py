@@ -204,3 +204,61 @@ class DistillationKLDivLoss(KLDivLoss):
             for key in loss:
                 loss_dict["{}_{}_{}".format(key, pair[0], pair[1])] = loss[key]
         return loss_dict
+
+
+class DistillationGuidedDMLLoss(nn.Layer):
+    """
+    DistillationGuidedDMLLoss
+    """
+
+    def __init__(self,
+                 model_name_pairs=[],
+                 act="softmax",
+                 eps=1e-12,
+                 key=None,
+                 name="loss_gdml"):
+        super().__init__()
+        assert isinstance(model_name_pairs, list)
+        self.key = key
+        self.model_name_pairs = model_name_pairs
+        self.name = name
+        if act is not None:
+            assert act in ["softmax", "sigmoid"]
+        if act == "softmax":
+            self.act = nn.Softmax(axis=-1)
+        elif act == "sigmoid":
+            self.act = nn.Sigmoid()
+        else:
+            self.act = None
+        self.eps = eps
+
+    def _kldiv(self, x, target):
+        class_num = x.shape[-1]
+        cost = target * paddle.log(
+            (target + self.eps) / (x + self.eps)) * class_num
+        return cost
+
+    def forward(self, predicts, batch):
+        loss_dict = dict()
+        for idx, pair in enumerate(self.model_name_pairs):
+            out1 = predicts[pair[0]]
+            out2 = predicts[pair[1]]
+            if self.key is not None:
+                out1 = out1[self.key]
+                out2 = out2[self.key]
+            feat_s = self.act(out1)
+            feat_t = self.act(out2)
+            t_argmax = paddle.argmax(feat_t, axis=1)
+            mask = paddle.equal(batch.squeeze(), t_argmax).astype('float32')
+            count = (mask[mask == 1]).shape[0]
+            mask = mask.unsqueeze(-1)
+            correct_s = feat_s.multiply(mask)
+            correct_t = feat_t.multiply(mask)
+            # correct_t[correct_t == 0.0] = 1.0
+            loss = self._kldiv(correct_s, correct_t) + self._kldiv(correct_t,
+                                                                   correct_s)
+            loss = loss / 2
+            loss = paddle.mean(loss) * mask.shape[0] / count
+
+            loss_dict["loss_gdml_{}_{}".format(pair[0], pair[1])] = loss
+        return loss_dict
