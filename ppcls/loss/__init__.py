@@ -16,7 +16,6 @@ from .supconloss import SupConLoss
 from .pairwisecosface import PairwiseCosface
 from .dmlloss import DMLLoss
 from .distanceloss import DistanceLoss
-from .dkdloss import DKDLoss
 
 from .distillationloss import DistillationCELoss
 from .distillationloss import DistillationGTCELoss
@@ -24,6 +23,7 @@ from .distillationloss import DistillationDMLLoss
 from .distillationloss import DistillationDistanceLoss
 from .distillationloss import DistillationRKDLoss
 from .distillationloss import DistillationKLDivLoss
+from .distillationloss import DistillationDKDLoss
 from .multilabelloss import MultiLabelLoss
 from .afdloss import AFDLoss
 

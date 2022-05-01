@@ -41,7 +41,7 @@ Loss:
     - DistillationGTCELoss:
         weight: 1.0
         model_names: ["Student"]
-    - DKDLoss:
+    - DistillationDKDLoss:
         weight: 1.0
         model_name_pairs: [["Student", "Teacher"]]
         temperature: 1
