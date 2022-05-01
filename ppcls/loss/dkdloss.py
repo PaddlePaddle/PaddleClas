@@ -76,9 +76,7 @@ def cat_mask(t, mask1, mask2):
 def scatter(x, index, updates):
     i, j = index.shape
     grid_x, grid_y = paddle.meshgrid(paddle.arange(i), paddle.arange(j))
-    # 若 PyTorch 的 dim 取 1
     index = paddle.stack([grid_x.flatten(), index.flatten()], axis=1)
-    # PaddlePaddle updates 的 shape 大小必须与 index 对应
     updates_index = paddle.stack([grid_x.flatten(), grid_y.flatten()], axis=1)
     updates = paddle.gather_nd(updates, index=updates_index)
     return paddle.scatter_nd_add(x, index, updates)
