@@ -48,9 +48,8 @@ Loss:
         alpha: 1.0
         beta: 0.5
   Eval:
-    - DistillationGTCELoss:
+    - CELoss:
         weight: 1.0
-        model_names: ["Student"]
         
 
 Optimizer:
@@ -78,8 +77,6 @@ DataLoader:
               channel_first: False
           - RandCropImage:
               size: 224
-              interpolation: bicubic
-              backend: pil
           - RandFlipImage:
               flip_code: 1
           - NormalizeImage:
@@ -108,8 +105,6 @@ DataLoader:
               channel_first: False
           - ResizeImage:
               resize_short: 256
-              interpolation: bicubic
-              backend: pil
           - CropImage:
               size: 224
           - NormalizeImage:
@@ -135,8 +130,6 @@ Infer:
           channel_first: False
       - ResizeImage:
           resize_short: 256
-          interpolation: bicubic
-          backend: pil
       - CropImage:
           size: 224
       - NormalizeImage:
