@@ -6,8 +6,8 @@ import paddle.nn.functional as F
 class DKDLoss(nn.Layer):
     """
     DKDLoss
-    paper: https://arxiv.org/abs/2203.08679
-    code: https://github.com/megvii-research/mdistiller
+    Reference: https://arxiv.org/abs/2203.08679
+    Code was heavily based on https://github.com/megvii-research/mdistiller
     """
 
     def __init__(self, temperature=1.0, alpha=1.0, beta=1.0):

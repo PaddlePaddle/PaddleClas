@@ -46,7 +46,7 @@ Loss:
         model_name_pairs: [["Student", "Teacher"]]
         temperature: 1
         alpha: 1.0
-        beta: 0.5
+        beta: 1.0
   Eval:
     - CELoss:
         weight: 1.0
