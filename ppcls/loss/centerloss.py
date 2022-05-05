@@ -28,17 +28,17 @@ class CenterLoss(nn.Layer):
     Args:
         num_classes (int): number of classes.
         feat_dim (int): number of feature dimensions.
-        feat_from (str): features from backbone or neck
+        feature_from (str): feature from "backbone" or "features"
     """
 
     def __init__(self,
                  num_classes: int,
                  feat_dim: int,
-                 feat_from: str='backbone'):
+                 feature_from: str="features"):
         super(CenterLoss, self).__init__()
         self.num_classes = num_classes
         self.feat_dim = feat_dim
-        self.feat_from = feat_from
+        self.feature_from = feature_from
         random_init_centers = paddle.randn(
             shape=[self.num_classes, self.feat_dim])
         self.centers = self.create_parameter(
@@ -57,7 +57,7 @@ class CenterLoss(nn.Layer):
         Returns:
             Dict[str, paddle.Tensor]: {'CenterLoss': loss}.
         """
-        feats = input[self.feat_from]
+        feats = input[self.feature_from]
         labels = target
 
         # squeeze labels to shape (batch_size, )

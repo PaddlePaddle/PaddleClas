@@ -205,6 +205,7 @@ class Piecewise(object):
             The type of element in the list is python float.
         warmup_epoch(int): The epoch numbers for LinearWarmup. Default: 0.
         warmup_start_lr(float): Initial learning rate of warm up. Default: 0.0.
+        by_epoch(bool): Whether lr decay by epoch. Default: False.
         last_epoch (int, optional):  The index of last epoch. Can be set to restart training. Default: -1, means initial learning rate.
     """
 
@@ -215,7 +216,7 @@ class Piecewise(object):
                  epochs,
                  warmup_epoch=0,
                  warmup_start_lr=0.0,
-                 warmup_by_epoch=False,
+                 by_epoch=False,
                  last_epoch=-1,
                  **kwargs):
         super().__init__()
@@ -230,22 +231,10 @@ class Piecewise(object):
         self.warmup_steps = round(warmup_epoch * step_each_epoch)
         self.warmup_epoch = warmup_epoch
         self.warmup_start_lr = warmup_start_lr
-        self.warmup_by_epoch = warmup_by_epoch
+        self.by_epoch = by_epoch
 
     def __call__(self):
-        if self.warmup_by_epoch is False:
-            learning_rate = lr.PiecewiseDecay(
-                boundaries=self.boundaries_steps,
-                values=self.values,
-                last_epoch=self.last_epoch)
-            if self.warmup_steps > 0:
-                learning_rate = lr.LinearWarmup(
-                    learning_rate=learning_rate,
-                    warmup_steps=self.warmup_steps,
-                    start_lr=self.warmup_start_lr,
-                    end_lr=self.values[0],
-                    last_epoch=self.last_epoch)
-        else:
+        if self.by_epoch:
             learning_rate = lr.PiecewiseDecay(
                 boundaries=self.boundaries_epoch,
                 values=self.values,
@@ -257,6 +246,19 @@ class Piecewise(object):
                     start_lr=self.warmup_start_lr,
                     end_lr=self.values[0],
                     last_epoch=self.last_epoch)
+        else:
+            learning_rate = lr.PiecewiseDecay(
+                boundaries=self.boundaries_steps,
+                values=self.values,
+                last_epoch=self.last_epoch)
+            if self.warmup_steps > 0:
+                learning_rate = lr.LinearWarmup(
+                    learning_rate=learning_rate,
+                    warmup_steps=self.warmup_steps,
+                    start_lr=self.warmup_start_lr,
+                    end_lr=self.values[0],
+                    last_epoch=self.last_epoch)
+        setattr(learning_rate, "by_epoch", self.by_epoch)
         return learning_rate
 
 

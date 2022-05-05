@@ -11,8 +11,7 @@ Global:
   print_batch_step: 20
   use_visualdl: False
   eval_mode: "retrieval"
-  re_ranking: False
-  feat_from: "backbone" # 'backbone' or 'neck'
+  retrieval_feature_from: "backbone" # 'backbone' or 'neck'
   # used for static mode and model export
   image_shape: [3, 256, 128]
   save_inference_dir: "./inference"
@@ -23,7 +22,7 @@ Arch:
   infer_output_key: "features"
   infer_add_softmax: False
   Backbone:
-    name: "ResNet50_last_stage_stride1"
+    name: "ResNet50"
     pretrained: True
     stem_act: null
   BackboneStopLayer:
@@ -32,36 +31,30 @@ Arch:
     name: "FC"
     embedding_size: 2048
     class_num: 751
-    weight_attr:
-      initializer:
-        name: Normal
-        std: 0.001
-    bias_attr: False
 
 # loss function config for traing/eval process
 Loss:
   Train:
     - CELoss:
         weight: 1.0
-        epsilon: 0.1
     - TripletLossV2:
         weight: 1.0
         margin: 0.3
-        normalize_feature: false
-        feat_from: "backbone"
+        normalize_feature: False
+        feature_from: "backbone"
   Eval:
     - CELoss:
         weight: 1.0
 
 Optimizer:
-  name: Momentum
-  momentum: 0.9
+  name: Adam
   lr:
     name: Piecewise
-    decay_epochs: [30, 60]
+    decay_epochs: [40, 70]
     values: [0.00035, 0.000035, 0.0000035]
     warmup_epoch: 10
-    warmup_start_lr: 0.0000035
+    by_epoch: True
+    last_epoch: 0
   regularizer:
     name: 'L2'
     coeff: 0.0005
@@ -73,26 +66,26 @@ DataLoader:
         name: "Market1501"
         image_root: "./dataset/"
         cls_label_path: "bounding_box_train"
+        backend: "pil"
         transform_ops:
           - ResizeImage:
               size: [128, 256]
+              return_numpy: False
           - RandFlipImage:
               flip_code: 1
           - Pad:
               padding: 10
-          - RandCropImage:
+          - RandCropImageV2:
               size: [128, 256]
-              scale: [0.8022, 0.8022]
-              ratio: [0.5, 0.5]
-          - NormalizeImage:
+          - ToTensor:
+          - Normalize:
               mean: [0.485, 0.456, 0.406]
               std: [0.229, 0.224, 0.225]
-              order: ''
     sampler:
         name: DistributedRandomIdentitySampler
         batch_size: 64
         num_instances: 4
-        drop_last: True
+        drop_last: False
         shuffle: True
     loader:
         num_workers: 4
@@ -103,13 +96,15 @@ DataLoader:
         name: "Market1501"
         image_root: "./dataset/"
         cls_label_path: "query"
+        backend: "pil"
         transform_ops:
           - ResizeImage:
               size: [128, 256]
-          - NormalizeImage:
+              return_numpy: False
+          - ToTensor:
+          - Normalize:
               mean: [0.485, 0.456, 0.406]
               std: [0.229, 0.224, 0.225]
-              order: ''
       sampler:
         name: DistributedBatchSampler
         batch_size: 128
@@ -124,13 +119,15 @@ DataLoader:
         name: "Market1501"
         image_root: "./dataset/"
         cls_label_path: "bounding_box_test"
+        backend: "pil"
         transform_ops:
           - ResizeImage:
               size: [128, 256]
-          - NormalizeImage:
+              return_numpy: False
+          - ToTensor:
+          - Normalize:
               mean: [0.485, 0.456, 0.406]
               std: [0.229, 0.224, 0.225]
-              order: ''
       sampler:
         name: DistributedBatchSampler
         batch_size: 128

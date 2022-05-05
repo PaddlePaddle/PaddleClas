@@ -68,9 +68,9 @@ def train_epoch(engine, epoch_id, print_batch_step):
         for i in range(len(engine.optimizer)):
             engine.optimizer[i].clear_grad()
 
-        # step lr
-        if engine.config["Global"].get("warmup_by_epoch", False) is False:
-            for i in range(len(engine.lr_sch)):
+        # step lr(by step)
+        for i in range(len(engine.lr_sch)):
+            if not getattr(engine.lr_sch[i], "by_epoch", False):
                 engine.lr_sch[i].step()
 
         # below code just for logging
@@ -82,6 +82,11 @@ def train_epoch(engine, epoch_id, print_batch_step):
         if iter_id % print_batch_step == 0:
             log_info(engine, batch_size, epoch_id, iter_id)
         tic = time.time()
+
+    # step lr(by epoch)
+    for i in range(len(engine.lr_sch)):
+        if getattr(engine.lr_sch[i], "by_epoch", False):
+            engine.lr_sch[i].step()
 
 
 def forward(engine, batch):
