@@ -254,8 +254,9 @@ class Engine(object):
         world_size = dist.get_world_size()
         self.config["Global"]["distributed"] = world_size != 1
         if self.mode == "train":
-            std_gpu_num = 8 if self.config["Optimizer"][
-                "name"] == "AdamW" else 4
+            std_gpu_num = 8 if isinstance(
+                self.config["Optimizer"],
+                dict) and self.config["Optimizer"]["name"] == "AdamW" else 4
             if world_size != std_gpu_num:
                 msg = f"The training strategy provided by PaddleClas is based on {std_gpu_num} gpus. But the number of gpu is {world_size} in current training. Please modify the stategy (learning rate, batch size and so on) if use this config to train."
                 logger.warning(msg)

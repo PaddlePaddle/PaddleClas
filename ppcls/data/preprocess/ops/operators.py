@@ -63,6 +63,8 @@ class UnifiedResize(object):
                 resample = random.choice(resample)
             if isinstance(src, np.ndarray):
                 pil_img = Image.fromarray(src)
+            else:
+                pil_img = src
             pil_img = pil_img.resize(size, resample)
             if return_numpy:
                 return np.asarray(pil_img)

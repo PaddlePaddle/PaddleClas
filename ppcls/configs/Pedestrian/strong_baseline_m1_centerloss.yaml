@@ -64,7 +64,7 @@ Loss:
         weight: 0.0005
         num_classes: *class_num
         feat_dim: *feat_dim
-        feat_from: "backbone"
+        feature_from: "backbone"
   Eval:
     - CELoss:
         weight: 1.0
@@ -101,6 +101,7 @@ DataLoader:
           - ResizeImage:
               size: [128, 256]
               return_numpy: False
+              backend: "pil"
           - RandFlipImage:
               flip_code: 1
           - Pad:
@@ -137,6 +138,7 @@ DataLoader:
           - ResizeImage:
               size: [128, 256]
               return_numpy: False
+              backend: "pil"
           - ToTensor:
           - Normalize:
               mean: [0.485, 0.456, 0.406]
@@ -160,6 +162,7 @@ DataLoader:
           - ResizeImage:
               size: [128, 256]
               return_numpy: False
+              backend: "pil"
           - ToTensor:
           - Normalize:
               mean: [0.485, 0.456, 0.406]

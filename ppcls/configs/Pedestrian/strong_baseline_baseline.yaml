@@ -71,6 +71,7 @@ DataLoader:
           - ResizeImage:
               size: [128, 256]
               return_numpy: False
+              backend: "pil"
           - RandFlipImage:
               flip_code: 1
           - Pad:
@@ -101,6 +102,7 @@ DataLoader:
           - ResizeImage:
               size: [128, 256]
               return_numpy: False
+              backend: "pil"
           - ToTensor:
           - Normalize:
               mean: [0.485, 0.456, 0.406]
@@ -124,6 +126,7 @@ DataLoader:
           - ResizeImage:
               size: [128, 256]
               return_numpy: False
+              backend: "pil"
           - ToTensor:
           - Normalize:
               mean: [0.485, 0.456, 0.406]
