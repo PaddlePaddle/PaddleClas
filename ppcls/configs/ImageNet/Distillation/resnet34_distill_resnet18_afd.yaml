@@ -88,10 +88,8 @@ Loss:
         s_shapes: *s_shapes
         t_shapes: *t_shapes
   Eval:
-    - DistillationGTCELoss:
+    - CELoss:
         weight: 1.0
-        model_names: ["Student"]
-        
 
 Optimizer:
   name: Momentum

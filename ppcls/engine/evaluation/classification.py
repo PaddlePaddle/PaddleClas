@@ -80,22 +80,17 @@ def classification_eval(engine, epoch_id=0):
         current_samples = batch_size * paddle.distributed.get_world_size()
         accum_samples += current_samples
 
+        if isinstance(out, dict) and "Student" in out:
+            out = out["Student"]
+        if isinstance(out, dict) and "logits" in out:
+            out = out["logits"]
+
         # gather Tensor when distributed
         if paddle.distributed.get_world_size() > 1:
             label_list = []
             paddle.distributed.all_gather(label_list, batch[1])
             labels = paddle.concat(label_list, 0)
 
-            if isinstance(out, dict):
-                if "Student" in out:
-                    out = out["Student"]
-                    if isinstance(out, dict):
-                        out = out["logits"]
-                elif "logits" in out:
-                    out = out["logits"]
-                else:
-                    msg = "Error: Wrong key in out!"
-                    raise Exception(msg)
             if isinstance(out, list):
                 preds = []
                 for x in out:
