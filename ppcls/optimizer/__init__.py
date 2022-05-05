@@ -71,7 +71,7 @@ def build_optimizer(config, epochs, step_each_epoch, model_list=None):
         optim_cfg = optim_item[optim_name]  # get optim_cfg
 
         lr = build_lr_scheduler(optim_cfg.pop('lr'), epochs, step_each_epoch)
-        logger.info("build lr ({}) for scope ({}) success..".format(
+        logger.debug("build lr ({}) for scope ({}) success..".format(
             lr, optim_scope))
         # step2 build regularization
         if 'regularizer' in optim_cfg and optim_cfg['regularizer'] is not None:
@@ -83,8 +83,8 @@ def build_optimizer(config, epochs, step_each_epoch, model_list=None):
             reg_name = reg_config.pop('name') + 'Decay'
             reg = getattr(paddle.regularizer, reg_name)(**reg_config)
             optim_cfg["weight_decay"] = reg
-            logger.info("build regularizer ({}) for scope ({}) success..".
-                        format(reg, optim_scope))
+            logger.debug("build regularizer ({}) for scope ({}) success..".
+                         format(reg, optim_scope))
         # step3 build optimizer
         if 'clip_norm' in optim_cfg:
             clip_norm = optim_cfg.pop('clip_norm')
@@ -123,7 +123,7 @@ def build_optimizer(config, epochs, step_each_epoch, model_list=None):
         optim = getattr(optimizer, optim_name)(
             learning_rate=lr, grad_clip=grad_clip,
             **optim_cfg)(model_list=optim_model)
-        logger.info("build optimizer ({}) for scope ({}) success..".format(
+        logger.debug("build optimizer ({}) for scope ({}) success..".format(
             optim, optim_scope))
         optim_list.append(optim)
         lr_list.append(lr)

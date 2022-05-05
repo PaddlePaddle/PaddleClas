@@ -33,8 +33,8 @@ def get_architectures():
 
 
 def get_blacklist_model_in_static_mode():
-    from ppcls.arch.backbone import (distilled_vision_transformer,
-                                     vision_transformer)
+    from ppcls.arch.backbone import distilled_vision_transformer
+    from ppcls.arch.backbone import vision_transformer
     blacklist = distilled_vision_transformer.__all__ + vision_transformer.__all__
     return blacklist
 
@@ -60,10 +60,10 @@ def get_param_attr_dict(ParamAttr_config: Union[None, bool, Dict[str, Dict]]
     """parse ParamAttr from an dict
 
     Args:
-        ParamAttr_config (Union[bool, Dict[str, Dict]]): ParamAttr_config
+        ParamAttr_config (Union[None, bool, Dict[str, Dict]]): ParamAttr configure
 
     Returns:
-        Union[bool, paddle.ParamAttr]: Generated ParamAttr
+        Union[None, bool, paddle.ParamAttr]: Generated ParamAttr
     """
     if ParamAttr_config is None:
         return None

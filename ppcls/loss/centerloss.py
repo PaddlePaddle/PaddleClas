@@ -23,8 +23,9 @@ import paddle.nn as nn
 
 
 class CenterLoss(nn.Layer):
-    """Center loss class
-
+    """Center loss
+    paper : [A Discriminative Feature Learning Approach for Deep Face Recognition](https://link.springer.com/content/pdf/10.1007%2F978-3-319-46478-7_31.pdf)
+    code reference: https://github.com/michuanhaohao/reid-strong-baseline/blob/master/layers/center_loss.py#L7
     Args:
         num_classes (int): number of classes.
         feat_dim (int): number of feature dimensions.

@@ -22,7 +22,6 @@ import six
 import math
 import random
 import cv2
-from typing import Sequence
 import numpy as np
 from PIL import Image, ImageOps, __version__ as PILLOW_VERSION
 from paddle.vision.transforms import ColorJitter as RawColorJitter
