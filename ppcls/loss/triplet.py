@@ -1,10 +1,10 @@
-# copyright (c) 2021 PaddlePaddle Authors. All Rights Reserve.
+#   Copyright (c) 2018 PaddlePaddle Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#    http://www.apache.org/licenses/LICENSE-2.0
+#     http://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -22,6 +22,8 @@ import paddle.nn as nn
 
 class TripletLossV2(nn.Layer):
     """Triplet loss with hard positive/negative mining.
+    paper : [Facenet: A unified embedding for face recognition and clustering](https://arxiv.org/pdf/1503.03832.pdf)
+    code reference: https://github.com/okzhili/Cartoon-face-recognition/blob/master/loss/triplet_loss.py
     Args:
         margin (float): margin for triplet.
     """

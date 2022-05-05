@@ -49,9 +49,8 @@ Loss:
         model_name_pairs:
         - ["Student", "Teacher"]
   Eval:
-    - DistillationGTCELoss:
+    - CELoss:
         weight: 1.0
-        model_names: ["Student"]
         
 
 Optimizer:

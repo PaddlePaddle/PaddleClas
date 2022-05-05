@@ -92,9 +92,9 @@ PaddleClas 提供了转换并优化后的推理模型，可以直接参考下方
 ```shell
 # 进入lite_ppshitu目录
 cd $PaddleClas/deploy/lite_shitu
-wget https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/lite/ppshitu_lite_models_v1.0.tar
-tar -xf ppshitu_lite_models_v1.0.tar
-rm -f ppshitu_lite_models_v1.0.tar
+wget https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/lite/ppshitu_lite_models_v1.1.tar
+tar -xf ppshitu_lite_models_v1.1.tar
+rm -f ppshitu_lite_models_v1.1.tar
 ```
 
 #### 2.1.2 使用其他模型
@@ -173,15 +173,11 @@ cp $code_path/PaddleDetection/inference/picodet_lcnet_x2_5_640_mainbody/mainbody
 
 2. 转换识别模型
 
-请先参考 [识别模型转分类模型](../../docs/zh_CN/advanced_tutorials/gallery2fc.md) 完成识别模型到分类模型的转换。
-在得到 inference 推理模型（后缀名为 `.pdmodel`、`.pdiparams`）以及 `label.txt` 后，再使用 PaddleLite opt 工具完成模型优化，命令如下：
-
 ```shell
 # 转换为Paddle-Lite模型
 paddle_lite_opt --model_file=inference/inference.pdmodel --param_file=inference/inference.pdiparams --optimize_out=inference/rec
-# 将模型、label文件拷贝到lite_shitu下
+# 将模型文件拷贝到lite_shitu下
 cp inference/rec.nb deploy/lite_shitu/models/
-cp inference/label.txt deploy/lite_shitu/models/
 cd deploy/lite_shitu
 ```
 
@@ -191,10 +187,10 @@ cd deploy/lite_shitu
 
 ```shell
 # 如果测试单张图像
-python generate_json_config.py --det_model_path ppshitu_lite_models_v1.0/mainbody_PPLCNet_x2_5_640_quant_v1.0_lite.nb  --rec_model_path ppshitu_lite_models_v1.0/general_PPLCNet_x2_5_lite_v1.0_infer.nb --img_path images/demo.jpg
+python generate_json_config.py --det_model_path ppshitu_lite_models_v1.1/mainbody_PPLCNet_x2_5_640_quant_v1.1_lite.nb  --rec_model_path ppshitu_lite_models_v1.1/general_PPLCNet_x2_5_lite_v1.1_infer.nb --img_path images/demo.jpg
 # or
 # 如果测试多张图像
-python generate_json_config.py --det_model_path ppshitu_lite_models_v1.0/mainbody_PPLCNet_x2_5_640_quant_v1.0_lite.nb  --rec_model_path ppshitu_lite_models_v1.0/general_PPLCNet_x2_5_lite_v1.0_infer.nb --img_dir images
+python generate_json_config.py --det_model_path ppshitu_lite_models_v1.1/mainbody_PPLCNet_x2_5_640_quant_v1.1_lite.nb  --rec_model_path ppshitu_lite_models_v1.1/general_PPLCNet_x2_5_lite_v1.1_infer.nb --img_dir images
 # 执行完成后，会在lit_shitu下生成shitu_config.json配置文件
 ```
 
@@ -263,7 +259,7 @@ make ARM_ABI=arm8
 
 ```shell
 mkdir deploy
-mv ppshitu_lite_models_v1.0 deploy/
+mv ppshitu_lite_models_v1.1 deploy/
 mv drink_dataset_v1.0 deploy/
 mv images deploy/
 mv shitu_config.json deploy/
@@ -277,12 +273,12 @@ cp ../../../cxx/lib/libpaddle_light_api_shared.so deploy/
 
 ```shell
 deploy/
-|-- ppshitu_lite_models_v1.0/
-|   |--mainbody_PPLCNet_x2_5_lite_v1.0_infer.nb        优化后的主体检测模型文件
-|   |--general_PPLCNet_x2_5_quant_v1.0_lite.nb         优化后的识别模型文件
+|-- ppshitu_lite_models_v1.1/
+|   |--mainbody_PPLCNet_x2_5_640_quant_v1.1_lite.nb    优化后的主体检测模型文件
+|   |--general_PPLCNet_x2_5_lite_v1.1_infer.nb         优化后的识别模型文件
 |-- images/
 |   |--demo.jpg                                      图片文件
-|-- drink_dataset_v1.0/                                瓶装饮料demo数据
+|-- drink_dataset_v1.0/                              瓶装饮料demo数据
 |   |--index                                         检索index目录
 |-- pp_shitu                                         生成的移动端执行文件
 |-- shitu_config.json                                执行时参数配置文件

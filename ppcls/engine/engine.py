@@ -98,8 +98,8 @@ class Engine(object):
         logger.info('train with paddle {} and device {}'.format(
             paddle.__version__, self.device))
 
-        # AMP training
-        self.amp = True if "AMP" in self.config and self.mode == "train" else False
+        # AMP training and evaluating
+        self.amp = "AMP" in self.config
         if self.amp and self.config["AMP"] is not None:
             self.scale_loss = self.config["AMP"].get("scale_loss", 1.0)
             self.use_dynamic_loss_scaling = self.config["AMP"].get(
@@ -250,12 +250,17 @@ class Engine(object):
                     level=amp_level,
                     save_dtype='float32')
 
-        # for distributed
+        # check the gpu num
         world_size = dist.get_world_size()
         self.config["Global"]["distributed"] = world_size != 1
-        if world_size != 4 and self.mode == "train":
-            msg = f"The training strategy in config files provided by PaddleClas is based on 4 gpus. But the number of gpus is {world_size} in current training. Please modify the stategy (learning rate, batch size and so on) if use config files in PaddleClas to train."
-            logger.warning(msg)
+        if self.mode == "train":
+            std_gpu_num = 8 if self.config["Optimizer"][
+                "name"] == "AdamW" else 4
+            if world_size != std_gpu_num:
+                msg = f"The training strategy provided by PaddleClas is based on {std_gpu_num} gpus. But the number of gpu is {world_size} in current training. Please modify the stategy (learning rate, batch size and so on) if use this config to train."
+                logger.warning(msg)
+
+        # for distributed
         if self.config["Global"]["distributed"]:
             dist.init_parallel_env()
             self.model = paddle.DataParallel(self.model)
