@@ -8,3 +8,4 @@ from ppcls.data.dataloader.mix_dataset import MixDataset
 from ppcls.data.dataloader.mix_sampler import MixSampler
 from ppcls.data.dataloader.pk_sampler import PKSampler
 from ppcls.data.dataloader.person_dataset import Market1501, MSMT17
+from ppcls.data.dataloader.face_dataset import AdaFaceDataset, FiveValidationDataset

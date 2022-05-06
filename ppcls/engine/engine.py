@@ -75,8 +75,9 @@ class Engine(object):
         print_config(config)
 
         # init train_func and eval_func
-        assert self.eval_mode in ["classification", "retrieval"], logger.error(
-            "Invalid eval mode: {}".format(self.eval_mode))
+        assert self.eval_mode in [
+            "classification", "retrieval", "adaface"
+        ], logger.error("Invalid eval mode: {}".format(self.eval_mode))
         self.train_epoch_func = train_epoch
         self.eval_func = getattr(evaluation, self.eval_mode + "_eval")
 
