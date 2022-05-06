@@ -115,7 +115,9 @@ def build_optimizer(config, epochs, step_each_epoch, model_list=None):
                             optim_model.append(m)
                 else:
                     # opmizer for module in model, such as backbone, neck, head...
-                    if hasattr(model_list[i], optim_scope):
+                    if optim_scope == model_list[i].__class__.__name__:
+                        optim_model.append(model_list[i])
+                    elif hasattr(model_list[i], optim_scope):
                         optim_model.append(getattr(model_list[i], optim_scope))
 
         optim = getattr(optimizer, optim_name)(

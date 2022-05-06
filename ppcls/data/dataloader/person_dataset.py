@@ -43,7 +43,11 @@ class Market1501(Dataset):
     """
     _dataset_dir = 'market1501/Market-1501-v15.09.15'
 
-    def __init__(self, image_root, cls_label_path, transform_ops=None):
+    def __init__(self,
+                 image_root,
+                 cls_label_path,
+                 transform_ops=None,
+                 backend="cv2"):
         self._img_root = image_root
         self._cls_path = cls_label_path  # the sub folder in the dataset
         self._dataset_dir = osp.join(image_root, self._dataset_dir,
@@ -51,6 +55,7 @@ class Market1501(Dataset):
         self._check_before_run()
         if transform_ops:
             self._transform_ops = create_operators(transform_ops)
+        self.backend = backend
         self._dtype = paddle.get_default_dtype()
         self._load_anno(relabel=True if 'train' in self._cls_path else False)
 
@@ -92,10 +97,12 @@ class Market1501(Dataset):
     def __getitem__(self, idx):
         try:
             img = Image.open(self.images[idx]).convert('RGB')
-            img = np.array(img, dtype="float32").astype(np.uint8)
+            if self.backend == "cv2":
+                img = np.array(img, dtype="float32").astype(np.uint8)
             if self._transform_ops:
                 img = transform(img, self._transform_ops)
-            img = img.transpose((2, 0, 1))
+            if self.backend == "cv2":
+                img = img.transpose((2, 0, 1))
             return (img, self.labels[idx], self.cameras[idx])
         except Exception as ex:
             logger.error("Exception occured when parse line: {} with msg: {}".
