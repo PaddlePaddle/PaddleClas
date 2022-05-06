@@ -13,6 +13,7 @@
 # limitations under the License.
 
 # Code was based on https://github.com/rwightman/pytorch-image-models/blob/master/timm/models/vision_transformer.py
+# reference: https://arxiv.org/abs/2010.11929
 
 from collections.abc import Callable
 

@@ -21,10 +21,12 @@ from .comfunc import rerange_index
 
 class MSMLoss(paddle.nn.Layer):
     """
-    MSMLoss Loss, based on triplet loss. USE P * K samples.
+    paper : [Margin Sample Mining Loss: A Deep Learning Based Method for Person Re-identification](https://arxiv.org/pdf/1710.00478.pdf)
+    code reference: https://github.com/michuanhaohao/keras_reid/blob/master/reid_tripletcls.py
+    Margin Sample Mining Loss, based on triplet loss. USE P * K samples.
     the batch size is fixed. Batch_size = P * K;  but the K may vary between batches.
     same label gather together
-    
+
             supported_metrics = [
             'euclidean',
             'sqeuclidean',
@@ -41,7 +43,7 @@ class MSMLoss(paddle.nn.Layer):
         self.rerange_index = rerange_index(batch_size, samples_each_class)
 
     def forward(self, input, target=None):
-        #normalization 
+        #normalization
         features = input["features"]
         features = self._nomalize(features)
         samples_each_class = self.samples_each_class
@@ -53,7 +55,7 @@ class MSMLoss(paddle.nn.Layer):
                 features, axis=0)
         similary_matrix = paddle.sum(paddle.square(diffs), axis=-1)
 
-        #rerange 
+        #rerange
         tmp = paddle.reshape(similary_matrix, shape=[-1, 1])
         tmp = paddle.gather(tmp, index=rerange_index)
         similary_matrix = paddle.reshape(tmp, shape=[-1, self.batch_size])

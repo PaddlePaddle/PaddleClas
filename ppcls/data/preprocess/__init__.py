@@ -25,10 +25,14 @@ from ppcls.data.preprocess.ops.operators import DecodeImage
 from ppcls.data.preprocess.ops.operators import ResizeImage
 from ppcls.data.preprocess.ops.operators import CropImage
 from ppcls.data.preprocess.ops.operators import RandCropImage
+from ppcls.data.preprocess.ops.operators import RandCropImageV2
 from ppcls.data.preprocess.ops.operators import RandFlipImage
 from ppcls.data.preprocess.ops.operators import NormalizeImage
 from ppcls.data.preprocess.ops.operators import ToCHWImage
 from ppcls.data.preprocess.ops.operators import AugMix
+from ppcls.data.preprocess.ops.operators import Pad
+from ppcls.data.preprocess.ops.operators import ToTensor
+from ppcls.data.preprocess.ops.operators import Normalize
 
 from ppcls.data.preprocess.batch_ops.batch_operators import MixupOperator, CutmixOperator, OpSampler, FmixOperator
 

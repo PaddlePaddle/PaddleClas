@@ -4,6 +4,7 @@ from paddle import nn
 
 class SupConLoss(nn.Layer):
     """Supervised Contrastive Learning: https://arxiv.org/pdf/2004.11362.pdf.
+    code reference: https://github.com/HobbitLong/SupContrast/blob/master/losses.py
     It also supports the unsupervised contrastive loss in SimCLR"""
 
     def __init__(self,

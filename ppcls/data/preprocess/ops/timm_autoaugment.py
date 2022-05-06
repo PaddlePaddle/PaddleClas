@@ -12,7 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Code was heavily based on  https://github.com/rwightman/pytorch-image-models
+# This code is heavily based on  https://github.com/rwightman/pytorch-image-models
+# reference: https://arxiv.org/abs/1805.09501
 
 import random
 import math

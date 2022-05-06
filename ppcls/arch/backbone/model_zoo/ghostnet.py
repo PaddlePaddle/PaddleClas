@@ -13,6 +13,7 @@
 # limitations under the License.
 
 # Code was based on https://github.com/huawei-noah/CV-Backbones/tree/master/ghostnet_pytorch
+# reference: https://arxiv.org/abs/1911.11907
 
 import math
 import paddle

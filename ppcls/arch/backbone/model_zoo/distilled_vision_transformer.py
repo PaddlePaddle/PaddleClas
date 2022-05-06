@@ -13,6 +13,7 @@
 # limitations under the License.
 
 # Code was heavily based on https://github.com/facebookresearch/deit
+# reference: https://arxiv.org/abs/2012.12877
 
 import paddle
 import paddle.nn as nn

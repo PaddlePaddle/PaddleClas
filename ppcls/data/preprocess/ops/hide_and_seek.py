@@ -13,6 +13,7 @@
 # limitations under the License.
 
 # This code is based on https://github.com/kkanshul/Hide-and-Seek
+# reference: http://krsingh.cs.ucdavis.edu/krishna_files/papers/hide_and_seek/my_files/iccv2017.pdf
 
 import numpy as np
 import random

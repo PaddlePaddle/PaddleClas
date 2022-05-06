@@ -23,8 +23,9 @@ import math
 import random
 import cv2
 import numpy as np
-from PIL import Image
+from PIL import Image, ImageOps, __version__ as PILLOW_VERSION
 from paddle.vision.transforms import ColorJitter as RawColorJitter
+from paddle.vision.transforms import ToTensor, Normalize
 
 from .autoaugment import ImageNetPolicy
 from .functional import augmentations
@@ -32,7 +33,7 @@ from ppcls.utils import logger
 
 
 class UnifiedResize(object):
-    def __init__(self, interpolation=None, backend="cv2"):
+    def __init__(self, interpolation=None, backend="cv2", return_numpy=True):
         _cv2_interp_from_str = {
             'nearest': cv2.INTER_NEAREST,
             'bilinear': cv2.INTER_LINEAR,
@@ -56,12 +57,17 @@ class UnifiedResize(object):
                 resample = random.choice(resample)
             return cv2.resize(src, size, interpolation=resample)
 
-        def _pil_resize(src, size, resample):
+        def _pil_resize(src, size, resample, return_numpy=True):
             if isinstance(resample, tuple):
                 resample = random.choice(resample)
-            pil_img = Image.fromarray(src)
+            if isinstance(src, np.ndarray):
+                pil_img = Image.fromarray(src)
+            else:
+                pil_img = src
             pil_img = pil_img.resize(size, resample)
-            return np.asarray(pil_img)
+            if return_numpy:
+                return np.asarray(pil_img)
+            return pil_img
 
         if backend.lower() == "cv2":
             if isinstance(interpolation, str):
@@ -73,7 +79,8 @@ class UnifiedResize(object):
         elif backend.lower() == "pil":
             if isinstance(interpolation, str):
                 interpolation = _pil_interp_from_str[interpolation.lower()]
-            self.resize_func = partial(_pil_resize, resample=interpolation)
+            self.resize_func = partial(
+                _pil_resize, resample=interpolation, return_numpy=return_numpy)
         else:
             logger.warning(
                 f"The backend of Resize only support \"cv2\" or \"PIL\". \"f{backend}\" is unavailable. Use \"cv2\" instead."
@@ -81,6 +88,8 @@ class UnifiedResize(object):
             self.resize_func = cv2.resize
 
     def __call__(self, src, size):
+        if isinstance(size, list):
+            size = tuple(size)
         return self.resize_func(src, size)
 
 
@@ -99,14 +108,15 @@ class DecodeImage(object):
         self.channel_first = channel_first  # only enabled when to_np is True
 
     def __call__(self, img):
-        if six.PY2:
-            assert type(img) is str and len(
-                img) > 0, "invalid input 'img' in DecodeImage"
-        else:
-            assert type(img) is bytes and len(
-                img) > 0, "invalid input 'img' in DecodeImage"
-        data = np.frombuffer(img, dtype='uint8')
-        img = cv2.imdecode(data, 1)
+        if not isinstance(img, np.ndarray):
+            if six.PY2:
+                assert type(img) is str and len(
+                    img) > 0, "invalid input 'img' in DecodeImage"
+            else:
+                assert type(img) is bytes and len(
+                    img) > 0, "invalid input 'img' in DecodeImage"
+            data = np.frombuffer(img, dtype='uint8')
+            img = cv2.imdecode(data, 1)
         if self.to_rgb:
             assert img.shape[2] == 3, 'invalid shape of image[%s]' % (
                 img.shape)
@@ -125,7 +135,8 @@ class ResizeImage(object):
                  size=None,
                  resize_short=None,
                  interpolation=None,
-                 backend="cv2"):
+                 backend="cv2",
+                 return_numpy=True):
         if resize_short is not None and resize_short > 0:
             self.resize_short = resize_short
             self.w = None
@@ -139,10 +150,16 @@ class ResizeImage(object):
                 'both 'size' and 'resize_short' are None")
 
         self._resize_func = UnifiedResize(
-            interpolation=interpolation, backend=backend)
+            interpolation=interpolation,
+            backend=backend,
+            return_numpy=return_numpy)
 
     def __call__(self, img):
-        img_h, img_w = img.shape[:2]
+        if isinstance(img, np.ndarray):
+            img_h, img_w = img.shape[:2]
+        else:
+            img_w, img_h = img.size
+
         if self.resize_short is not None:
             percent = float(self.resize_short) / min(img_w, img_h)
             w = int(round(img_w * percent))
@@ -222,6 +239,40 @@ class RandCropImage(object):
         return self._resize_func(img, size)
 
 
+class RandCropImageV2(object):
+    """ RandCropImageV2 is different from RandCropImage,
+    it will Select a cutting position randomly in a uniform distribution way,
+    and cut according to the given size without resize at last."""
+
+    def __init__(self, size):
+        if type(size) is int:
+            self.size = (size, size)  # (h, w)
+        else:
+            self.size = size
+
+    def __call__(self, img):
+        if isinstance(img, np.ndarray):
+            img_h, img_w = img.shap[0], img.shap[1]
+        else:
+            img_w, img_h = img.size
+        tw, th = self.size
+
+        if img_h + 1 < th or img_w + 1 < tw:
+            raise ValueError(
+                "Required crop size {} is larger then input image size {}".
+                format((th, tw), (img_h, img_w)))
+
+        if img_w == tw and img_h == th:
+            return img
+
+        top = random.randint(0, img_h - th + 1)
+        left = random.randint(0, img_w - tw + 1)
+        if isinstance(img, np.ndarray):
+            return img[top:top + th, left:left + tw, :]
+        else:
+            return img.crop((left, top, left + tw, top + th))
+
+
 class RandFlipImage(object):
     """ random flip image
         flip_code:
@@ -237,7 +288,10 @@ class RandFlipImage(object):
 
     def __call__(self, img):
         if random.randint(0, 1) == 1:
-            return cv2.flip(img, self.flip_code)
+            if isinstance(img, np.ndarray):
+                return cv2.flip(img, self.flip_code)
+            else:
+                return img.transpose(Image.FLIP_LEFT_RIGHT)
         else:
             return img
 
@@ -391,3 +445,58 @@ class ColorJitter(RawColorJitter):
         if isinstance(img, Image.Image):
             img = np.asarray(img)
         return img
+
+
+class Pad(object):
+    """
+    Pads the given PIL.Image on all sides with specified padding mode and fill value.
+    adapted from: https://pytorch.org/vision/stable/_modules/torchvision/transforms/transforms.html#Pad
+    """
+
+    def __init__(self, padding: int, fill: int=0,
+                 padding_mode: str="constant"):
+        self.padding = padding
+        self.fill = fill
+        self.padding_mode = padding_mode
+
+    def _parse_fill(self, fill, img, min_pil_version, name="fillcolor"):
+        # Process fill color for affine transforms
+        major_found, minor_found = (int(v)
+                                    for v in PILLOW_VERSION.split('.')[:2])
+        major_required, minor_required = (
+            int(v) for v in min_pil_version.split('.')[:2])
+        if major_found < major_required or (major_found == major_required and
+                                            minor_found < minor_required):
+            if fill is None:
+                return {}
+            else:
+                msg = (
+                    "The option to fill background area of the transformed image, "
+                    "requires pillow>={}")
+                raise RuntimeError(msg.format(min_pil_version))
+
+        num_bands = len(img.getbands())
+        if fill is None:
+            fill = 0
+        if isinstance(fill, (int, float)) and num_bands > 1:
+            fill = tuple([fill] * num_bands)
+        if isinstance(fill, (list, tuple)):
+            if len(fill) != num_bands:
+                msg = (
+                    "The number of elements in 'fill' does not match the number of "
+                    "bands of the image ({} != {})")
+                raise ValueError(msg.format(len(fill), num_bands))
+
+            fill = tuple(fill)
+
+        return {name: fill}
+
+    def __call__(self, img):
+        opts = self._parse_fill(self.fill, img, "2.3.0", name="fill")
+        if img.mode == "P":
+            palette = img.getpalette()
+            img = ImageOps.expand(img, border=self.padding, **opts)
+            img.putpalette(palette)
+            return img
+
+        return ImageOps.expand(img, border=self.padding, **opts)

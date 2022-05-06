@@ -13,6 +13,7 @@
 # limitations under the License.
 
 # Code was heavily based on https://github.com/rwightman/pytorch-image-models
+# reference: https://arxiv.org/abs/1911.11929
 
 import paddle
 import paddle.nn as nn
