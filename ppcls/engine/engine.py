@@ -247,13 +247,10 @@ class Engine(object):
                 self.config["AMP"]["use_fp16_test"] = True
                 self.amp_eval = True
 
-            # TODO(gaotingquan): to compatible with Paddle 2.2, 2.3, develop and so on.
-            paddle_version = sum([
-                int(x) * 10**(2 - i)
-                for i, x in enumerate(paddle.__version__.split(".")[:3])
-            ])
+            # TODO(gaotingquan): to compatible with different versions of Paddle
+            paddle_version = paddle.__version__[:3]
             # paddle version < 2.3.0 and not develop
-            if paddle_version < 230 and paddle_version != 0:
+            if paddle_version not in ["2.3", "0.0"]:
                 if self.mode == "train":
                     self.model, self.optimizer = paddle.amp.decorate(
                         models=self.model,
