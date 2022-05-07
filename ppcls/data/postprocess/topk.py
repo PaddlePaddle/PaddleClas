@@ -19,10 +19,11 @@ import paddle.nn.functional as F
 
 
 class Topk(object):
-    def __init__(self, topk=1, class_id_map_file=None):
+    def __init__(self, topk=1, class_id_map_file=None, delimiter=None):
         assert isinstance(topk, (int, ))
         self.class_id_map = self.parse_class_id_map(class_id_map_file)
         self.topk = topk
+        self.delimiter = delimiter if delimiter is not None else " "
 
     def parse_class_id_map(self, class_id_map_file):
         if class_id_map_file is None:
@@ -38,7 +39,7 @@ class Topk(object):
             with open(class_id_map_file, "r") as fin:
                 lines = fin.readlines()
                 for line in lines:
-                    partition = line.split("\n")[0].partition(" ")
+                    partition = line.split("\n")[0].partition(self.delimiter)
                     class_id_map[int(partition[0])] = str(partition[-1])
         except Exception as ex:
             print(ex)
