@@ -17,21 +17,32 @@ from __future__ import absolute_import, division, print_function
 import paddle
 import paddle.nn as nn
 
+from ppcls.arch.utils import get_param_attr_dict
+
 
 class BNNeck(nn.Layer):
-    def __init__(self, num_features):
+    def __init__(self, num_features, **kwargs):
         super().__init__()
         weight_attr = paddle.ParamAttr(
             initializer=paddle.nn.initializer.Constant(value=1.0))
         bias_attr = paddle.ParamAttr(
             initializer=paddle.nn.initializer.Constant(value=0.0),
             trainable=False)
+
+        if 'weight_attr' in kwargs:
+            weight_attr = get_param_attr_dict(kwargs['weight_attr'])
+
+        bias_attr = None
+        if 'bias_attr' in kwargs:
+            bias_attr = get_param_attr_dict(kwargs['bias_attr'])
+
         self.feat_bn = nn.BatchNorm1D(
             num_features,
             momentum=0.9,
             epsilon=1e-05,
             weight_attr=weight_attr,
             bias_attr=bias_attr)
+
         self.flatten = nn.Flatten()
 
     def forward(self, x):

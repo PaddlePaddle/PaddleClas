@@ -39,7 +39,7 @@ def update_loss(trainer, loss_dict, batch_size):
 
 def log_info(trainer, batch_size, epoch_id, iter_id):
     lr_msg = ", ".join([
-        "lr_{}: {:.8f}".format(i + 1, lr.get_lr())
+        "lr({}): {:.8f}".format(lr.__class__.__name__, lr.get_lr())
         for i, lr in enumerate(trainer.lr_sch)
     ])
     metric_msg = ", ".join([
@@ -64,7 +64,7 @@ def log_info(trainer, batch_size, epoch_id, iter_id):
 
     for i, lr in enumerate(trainer.lr_sch):
         logger.scaler(
-            name="lr_{}".format(i + 1),
+            name="lr({})".format(lr.__class__.__name__),
             value=lr.get_lr(),
             step=trainer.global_step,
             writer=trainer.vdl_writer)

@@ -13,6 +13,7 @@
 # limitations under the License.
 
 # This code is based on https://github.com/akuxcw/GridMask
+# reference: https://arxiv.org/abs/2001.04086.
 
 import numpy as np
 from PIL import Image

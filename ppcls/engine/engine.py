@@ -99,26 +99,6 @@ class Engine(object):
         logger.info('train with paddle {} and device {}'.format(
             paddle.__version__, self.device))
 
-        # AMP training and evaluating
-        self.amp = "AMP" in self.config
-        if self.amp and self.config["AMP"] is not None:
-            self.scale_loss = self.config["AMP"].get("scale_loss", 1.0)
-            self.use_dynamic_loss_scaling = self.config["AMP"].get(
-                "use_dynamic_loss_scaling", False)
-        else:
-            self.scale_loss = 1.0
-            self.use_dynamic_loss_scaling = False
-        if self.amp:
-            AMP_RELATED_FLAGS_SETTING = {'FLAGS_max_inplace_grad_add': 8, }
-            if paddle.is_compiled_with_cuda():
-                AMP_RELATED_FLAGS_SETTING.update({
-                    'FLAGS_cudnn_batchnorm_spatial_persistent': 1
-                })
-            paddle.fluid.set_flags(AMP_RELATED_FLAGS_SETTING)
-
-        # EMA model
-        self.ema = "EMA" in self.config and self.mode == "train"
-
         # gradient accumulation
         self.update_freq = self.config["Global"].get("update_freq", 1)
 
@@ -235,29 +215,78 @@ class Engine(object):
                 len(self.train_dataloader) // self.update_freq,
                 [self.model, self.train_loss_func])
 
-        # for amp training
+        # AMP training and evaluating
+        self.amp = "AMP" in self.config and self.config["AMP"] is not None
+        self.amp_eval = False
+        # for amp
         if self.amp:
+            AMP_RELATED_FLAGS_SETTING = {'FLAGS_max_inplace_grad_add': 8, }
+            if paddle.is_compiled_with_cuda():
+                AMP_RELATED_FLAGS_SETTING.update({
+                    'FLAGS_cudnn_batchnorm_spatial_persistent': 1
+                })
+            paddle.fluid.set_flags(AMP_RELATED_FLAGS_SETTING)
+
+            self.scale_loss = self.config["AMP"].get("scale_loss", 1.0)
+            self.use_dynamic_loss_scaling = self.config["AMP"].get(
+                "use_dynamic_loss_scaling", False)
             self.scaler = paddle.amp.GradScaler(
                 init_loss_scaling=self.scale_loss,
                 use_dynamic_loss_scaling=self.use_dynamic_loss_scaling)
-            amp_level = self.config['AMP'].get("level", "O1")
-            if amp_level not in ["O1", "O2"]:
+
+            self.amp_level = self.config['AMP'].get("level", "O1")
+            if self.amp_level not in ["O1", "O2"]:
                 msg = "[Parameter Error]: The optimize level of AMP only support 'O1' and 'O2'. The level has been set 'O1'."
                 logger.warning(msg)
                 self.config['AMP']["level"] = "O1"
-                amp_level = "O1"
-            self.model, self.optimizer = paddle.amp.decorate(
-                models=self.model,
-                optimizers=self.optimizer,
-                level=amp_level,
-                save_dtype='float32')
-            if len(self.train_loss_func.parameters()) > 0:
+                self.amp_level = "O1"
+
+            self.amp_eval = self.config["AMP"].get("use_fp16_test", False)
+            # TODO(gaotingquan): Paddle not yet support FP32 evaluation when training with AMPO2
+            if self.config["Global"].get(
+                    "eval_during_train",
+                    True) and self.amp_level == "O2" and self.amp_eval == False:
+                msg = "PaddlePaddle only support FP16 evaluation when training with AMP O2 now. "
+                logger.warning(msg)
+                self.config["AMP"]["use_fp16_test"] = True
+                self.amp_eval = True
+
+            # TODO(gaotingquan): to compatible with different versions of Paddle
+            paddle_version = paddle.__version__[:3]
+            # paddle version < 2.3.0 and not develop
+            if paddle_version not in ["2.3", "0.0"]:
+                if self.mode == "train":
+                    self.model, self.optimizer = paddle.amp.decorate(
+                        models=self.model,
+                        optimizers=self.optimizer,
+                        level=self.amp_level,
+                        save_dtype='float32')
+                elif self.amp_eval:
+                    if self.amp_level == "O2":
+                        msg = "The PaddlePaddle that installed not support FP16 evaluation in AMP O2. Please use PaddlePaddle version >= 2.3.0. Use FP32 evaluation instead and please notice the Eval Dataset output_fp16 should be 'False'."
+                        logger.warning(msg)
+                        self.amp_eval = False
+                    else:
+                        self.model, self.optimizer = paddle.amp.decorate(
+                            models=self.model,
+                            level=self.amp_level,
+                            save_dtype='float32')
+            # paddle version >= 2.3.0 or develop
+            else:
+                self.model = paddle.amp.decorate(
+                    models=self.model,
+                    level=self.amp_level,
+                    save_dtype='float32')
+
+            if self.mode == "train" and len(self.train_loss_func.parameters(
+            )) > 0:
                 self.train_loss_func = paddle.amp.decorate(
                     models=self.train_loss_func,
-                    level=amp_level,
+                    level=self.amp_level,
                     save_dtype='float32')
 
         # build EMA model
+        self.ema = "EMA" in self.config and self.mode == "train"
         if self.ema:
             self.model_ema = ExponentialMovingAverage(
                 self.model, self.config['EMA'].get("decay", 0.9999))
@@ -266,8 +295,9 @@ class Engine(object):
         world_size = dist.get_world_size()
         self.config["Global"]["distributed"] = world_size != 1
         if self.mode == "train":
-            std_gpu_num = 8 if self.config["Optimizer"][
-                "name"] == "AdamW" else 4
+            std_gpu_num = 8 if isinstance(
+                self.config["Optimizer"],
+                dict) and self.config["Optimizer"]["name"] == "AdamW" else 4
             if world_size != std_gpu_num:
                 msg = f"The training strategy provided by PaddleClas is based on {std_gpu_num} gpus. But the number of gpu is {world_size} in current training. Please modify the stategy (learning rate, batch size and so on) if use this config to train."
                 logger.warning(msg)
@@ -321,6 +351,7 @@ class Engine(object):
         self.max_iter = len(self.train_dataloader) - 1 if platform.system(
         ) == "Windows" else len(self.train_dataloader)
         self.max_iter = self.max_iter // self.update_freq * self.update_freq
+
         for epoch_id in range(best_metric["epoch"] + 1,
                               self.config["Global"]["epochs"] + 1):
             acc = 0.0

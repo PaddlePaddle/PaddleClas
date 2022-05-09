@@ -14,6 +14,7 @@
 
 # Code was based on https://github.com/BR-IDL/PaddleViT/blob/develop/image_classification/MobileViT/mobilevit.py
 # and https://github.com/apple/ml-cvnets/blob/main/cvnets/models/classification/mobilevit.py
+# reference: https://arxiv.org/abs/2110.02178
 
 import paddle
 from paddle import ParamAttr

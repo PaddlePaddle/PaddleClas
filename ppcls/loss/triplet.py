@@ -28,9 +28,13 @@ class TripletLossV2(nn.Layer):
         margin (float): margin for triplet.
     """
 
-    def __init__(self, margin=0.5, normalize_feature=True):
+    def __init__(self,
+                 margin=0.5,
+                 normalize_feature=True,
+                 feature_from="features"):
         super(TripletLossV2, self).__init__()
         self.margin = margin
+        self.feature_from = feature_from
         self.ranking_loss = paddle.nn.loss.MarginRankingLoss(margin=margin)
         self.normalize_feature = normalize_feature
 
@@ -40,7 +44,7 @@ class TripletLossV2(nn.Layer):
             inputs: feature matrix with shape (batch_size, feat_dim)
             target: ground truth labels with shape (num_classes)
         """
-        inputs = input["features"]
+        inputs = input[self.feature_from]
 
         if self.normalize_feature:
             inputs = 1. * inputs / (paddle.expand_as(

@@ -13,6 +13,7 @@
 # limitations under the License.
 
 # Code was based on https://github.com/DingXiaoH/RepVGG
+# reference: https://arxiv.org/abs/2101.03697
 
 import paddle.nn as nn
 import paddle
