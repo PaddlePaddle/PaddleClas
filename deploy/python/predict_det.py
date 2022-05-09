@@ -125,16 +125,15 @@ class DetPredictor(Predictor):
         print("Inference: {} ms per batch image".format((t2 - t1) * 1000.0))
 
         # do not perform postprocess in benchmark mode
-        results = []
         if reduce(lambda x, y: x * y, np_boxes.shape) < 6:
             print('[WARNNING] No object detected.')
-            results = np.array([])
+            results = []
         else:
             results = np_boxes
 
-        results = self.parse_det_results(results,
-                                         self.config["Global"]["threshold"],
-                                         self.config["Global"]["labe_list"])
+            results = self.parse_det_results(results,
+                                             self.config["Global"]["threshold"],
+                                             self.config["Global"]["labe_list"])
         return results
 
 
