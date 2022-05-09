@@ -31,6 +31,14 @@ Arch:
     name: "FC"
     embedding_size: 2048
     class_num: 751
+    weight_attr:
+      initializer:
+        name: KaimingUniform
+        fan_in: 12288 # 6*embedding_size
+    bias_attr:
+      initializer:
+        name: KaimingUniform
+        fan_in: 12288 # 6*embedding_size
 
 # loss function config for traing/eval process
 Loss:
