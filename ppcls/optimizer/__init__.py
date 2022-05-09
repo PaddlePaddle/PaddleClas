@@ -115,11 +115,11 @@ def build_optimizer(config, epochs, step_each_epoch, model_list=None):
                             optim_model.append(m)
                 else:
                     # opmizer for module in model, such as backbone, neck, head...
-                    if hasattr(model_list[i], optim_scope):
+                    if optim_scope == model_list[i].__class__.__name__:
+                        optim_model.append(model_list[i])
+                    elif hasattr(model_list[i], optim_scope):
                         optim_model.append(getattr(model_list[i], optim_scope))
 
-        assert len(optim_model) == 1, \
-            "Invalid optim model for optim scope({}), number of optim_model={}".format(optim_scope, len(optim_model))
         optim = getattr(optimizer, optim_name)(
             learning_rate=lr, grad_clip=grad_clip,
             **optim_cfg)(model_list=optim_model)

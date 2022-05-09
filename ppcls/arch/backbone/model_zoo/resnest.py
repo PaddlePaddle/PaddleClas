@@ -13,6 +13,7 @@
 # limitations under the License.
 
 # Code was based on https://github.com/zhanghang1989/ResNeSt
+# reference: https://arxiv.org/abs/2004.08955
 
 from __future__ import absolute_import
 from __future__ import division

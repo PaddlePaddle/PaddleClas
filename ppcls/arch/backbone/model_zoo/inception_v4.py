@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# reference: https://arxiv.org/abs/1602.07261
+
 import paddle
 from paddle import ParamAttr
 import paddle.nn as nn

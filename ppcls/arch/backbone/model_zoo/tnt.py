@@ -13,6 +13,7 @@
 # limitations under the License.
 
 # Code was based on https://github.com/huawei-noah/CV-Backbones/tree/master/tnt_pytorch
+# reference: https://arxiv.org/abs/2103.00112
 
 import math
 import numpy as np

@@ -13,6 +13,7 @@
 # limitations under the License.
 
 # Code was heavily based on https://github.com/Visual-Attention-Network/VAN-Classification
+# reference: https://arxiv.org/abs/2202.09741
 
 from functools import partial
 import math

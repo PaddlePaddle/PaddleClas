@@ -13,6 +13,7 @@
 # limitations under the License.
 
 # Code was based on https://github.com/Meituan-AutoML/Twins
+# reference: https://arxiv.org/abs/2104.13840
 
 from functools import partial
 
