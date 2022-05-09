@@ -132,9 +132,9 @@ class DetPredictor(Predictor):
         else:
             results = np_boxes
 
-        results = self.parse_det_results(results,
-                                         self.config["Global"]["threshold"],
-                                         self.config["Global"]["labe_list"])
+            results = self.parse_det_results(results,
+                                             self.config["Global"]["threshold"],
+                                             self.config["Global"]["labe_list"])
         return results
 
 
