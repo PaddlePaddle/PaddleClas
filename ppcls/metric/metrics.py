@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import numpy as np
 import paddle
 import paddle.nn as nn
 import paddle.nn.functional as F
@@ -134,8 +135,40 @@ class mINP(nn.Layer):
 
 
 class TprAtFpr(nn.Layer):
-    def __init__(self, fpr=1/1000.):
-        pass
+    def __init__(self, max_fpr=1/1000.):
+        super().__init__()
+        self.gt_pos_score_list = []
+        self.gt_neg_score_list = []
+        self.softmax = nn.Softmax(axis=-1)
+        self.max_fpr = max_fpr
+
+    def forward(self, x, label):
+        x = x["logits"]
+        x = self.softmax(x)
+        x = np.argmax(x)
+        for i, label_i in enumerate(label):
+            if label_i[0] == 0:
+                self.gt_neg_score_list.append(x[i])
+            else:
+                self.gt_pos_score_list.append(x[i])
+
+    def reset(self):
+        self.gt_pos_score_list = []
+        self.gt_neg_score_list = []
+
+    def avg_info(self):
+        max_tpr = 0.
+        result = ""
+        for i in range(0, 10000):
+            threshold = i / 10000
+            gt_pos_score_list = np.array(self.gt_pos_score_list)
+            gt_neg_score_list = np.array(self.gt_neg_score_list)
+            tpr = np.sum(gt_pos_score_list > threshold) / len(gt_pos_score_list)
+            fpr = np.sum(gt_neg_score_list > threshold) / len(gt_neg_score_list)
+            if fpr < self.max_fpr and tpr > max_tpr:
+                max_tpr = tpr
+                result = "threshold: {}, fpr: {}, tpr: {:.5f}".format(threshold, fpr, tpr)
+        return result
 
 
 class Recallk(nn.Layer):

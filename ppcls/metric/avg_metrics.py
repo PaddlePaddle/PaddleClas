@@ -6,6 +6,9 @@ class AvgMetrics(nn.Layer):
         super().__init__()
         self.avg_meters = {}
 
+    def reset(self):
+        self.avg_meters = {}
+
     def avg(self):
         if self.avg_meters:
             for metric_key in self.avg_meters:

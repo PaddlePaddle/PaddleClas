@@ -23,6 +23,8 @@ from ppcls.utils import logger
 
 
 def classification_eval(engine, epoch_id=0):
+    if hasattr(engine.eval_metric_func, "reset"):
+        engine.eval_metric_func.reset()
     output_info = dict()
     time_info = {
         "batch_cost": AverageMeter(
