@@ -31,6 +31,14 @@ Arch:
     name: "FC"
     embedding_size: 2048
     class_num: 751
+    weight_attr:
+      initializer:
+        name: KaimingUniform
+        fan_in: 12288 # 6*embedding_size
+    bias_attr:
+      initializer:
+        name: KaimingUniform
+        fan_in: 12288 # 6*embedding_size
 
 # loss function config for traing/eval process
 Loss:
@@ -52,7 +60,6 @@ Optimizer:
     name: Piecewise
     decay_epochs: [40, 70]
     values: [0.00035, 0.000035, 0.0000035]
-    warmup_epoch: 10
     by_epoch: True
     last_epoch: 0
   regularizer:
