@@ -60,7 +60,6 @@ Optimizer:
     name: Piecewise
     decay_epochs: [40, 70]
     values: [0.00035, 0.000035, 0.0000035]
-    warmup_epoch: 10
     by_epoch: True
     last_epoch: 0
   regularizer:
