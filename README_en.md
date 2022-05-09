@@ -8,6 +8,8 @@ PaddleClas is an image recognition toolset for industry and academia, helping us
 
 **Recent updates**
 
+- 2022.4.21 Added the related [code](https://github.com/PaddlePaddle/PaddleClas/pull/1820/files) of the CVPR2022 oral paper [MixFormer](https://arxiv.org/pdf/2204.02557.pdf).
+
 - 2021.09.17 Add PP-LCNet series model developed by PaddleClas, these models show strong competitiveness on Intel CPUs.
 For the introduction of PP-LCNet, please refer to [paper](https://arxiv.org/pdf/2109.15099.pdf) or [PP-LCNet model introduction](docs/en/models/PP-LCNet_en.md). The metrics and pretrained model are available [here](docs/en/ImageNet_models_en.md).
 
@@ -38,10 +40,11 @@ Four sample solutions are provided, including product recognition, vehicle recog
 
 ## Welcome to Join the Technical Exchange Group
 
-* You can also scan the QR code below to join the PaddleClas WeChat group to get more efficient answers to your questions and to communicate with developers from all walks of life. We look forward to hearing from you.
+* You can also scan the QR code below to join the PaddleClas QQ group and WeChat group (add and replay "C") to get more efficient answers to your questions and to communicate with developers from all walks of life. We look forward to hearing from you.
 
 <div align="center">
-<img src="https://user-images.githubusercontent.com/12560511/160273340-831de8c3-f31d-44d1-9437-fcd4765a6851.jpg" width="200"/>
+<img src="https://user-images.githubusercontent.com/80816848/164383225-e375eb86-716e-41b4-a9e0-4b8a3976c1aa.jpg" width="200"/>
+<img src="https://user-images.githubusercontent.com/48054808/160531099-9811bbe6-cfbb-47d5-8bdb-c2b40684d7dd.png" width="200"/>
 </div>
 
 ## Quick Start

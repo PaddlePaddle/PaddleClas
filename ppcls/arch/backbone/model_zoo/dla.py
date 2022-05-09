@@ -13,6 +13,7 @@
 # limitations under the License.
 
 # Code was based on https://github.com/ucbdrive/dla
+# reference: https://arxiv.org/abs/1707.06484
 
 import math
 

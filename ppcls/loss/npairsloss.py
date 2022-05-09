@@ -5,6 +5,11 @@ import paddle
 
 
 class NpairsLoss(paddle.nn.Layer):
+    """Npair_loss_
+    paper [Improved deep metric learning with multi-class N-pair loss objective](https://dl.acm.org/doi/10.5555/3157096.3157304)
+    code reference: https://www.tensorflow.org/versions/r1.15/api_docs/python/tf/contrib/losses/metric_learning/npairs_loss
+    """
+
     def __init__(self, reg_lambda=0.01):
         super(NpairsLoss, self).__init__()
         self.reg_lambda = reg_lambda

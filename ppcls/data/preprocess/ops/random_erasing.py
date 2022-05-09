@@ -12,7 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-#This code is adapted from https://github.com/zhunzhong07/Random-Erasing, and refer to Timm.
+# This code is adapted from https://github.com/zhunzhong07/Random-Erasing, and refer to Timm(https://github.com/rwightman/pytorch-image-models).
+# reference: https://arxiv.org/abs/1708.04896
 
 from functools import partial
 
@@ -25,15 +26,21 @@ import numpy as np
 class Pixels(object):
     def __init__(self, mode="const", mean=[0., 0., 0.]):
         self._mode = mode
-        self._mean = mean
+        self._mean = np.array(mean)
 
-    def __call__(self, h=224, w=224, c=3):
+    def __call__(self, h=224, w=224, c=3, channel_first=False):
         if self._mode == "rand":
-            return np.random.normal(size=(1, 1, 3))
+            return np.random.normal(size=(
+                1, 1, 3)) if not channel_first else np.random.normal(size=(
+                    3, 1, 1))
         elif self._mode == "pixel":
-            return np.random.normal(size=(h, w, c))
+            return np.random.normal(size=(
+                h, w, c)) if not channel_first else np.random.normal(size=(
+                    c, h, w))
         elif self._mode == "const":
-            return self._mean
+            return np.reshape(self._mean, (
+                1, 1, c)) if not channel_first else np.reshape(self._mean,
+                                                               (c, 1, 1))
         else:
             raise Exception(
                 "Invalid mode in RandomErasing, only support \"const\", \"rand\", \"pixel\""
@@ -68,7 +75,13 @@ class RandomErasing(object):
             return img
 
         for _ in range(self.attempt):
-            area = img.shape[0] * img.shape[1]
+            if isinstance(img, np.ndarray):
+                img_h, img_w, img_c = img.shape
+                channel_first = False
+            else:
+                img_c, img_h, img_w = img.shape
+                channel_first = True
+            area = img_h * img_w
 
             target_area = random.uniform(self.sl, self.sh) * area
             aspect_ratio = random.uniform(*self.r1)
@@ -78,13 +91,19 @@ class RandomErasing(object):
             h = int(round(math.sqrt(target_area * aspect_ratio)))
             w = int(round(math.sqrt(target_area / aspect_ratio)))
 
-            if w < img.shape[1] and h < img.shape[0]:
-                pixels = self.get_pixels(h, w, img.shape[2])
-                x1 = random.randint(0, img.shape[0] - h)
-                y1 = random.randint(0, img.shape[1] - w)
-                if img.shape[2] == 3:
-                    img[x1:x1 + h, y1:y1 + w, :] = pixels
+            if w < img_w and h < img_h:
+                pixels = self.get_pixels(h, w, img_c, channel_first)
+                x1 = random.randint(0, img_h - h)
+                y1 = random.randint(0, img_w - w)
+                if img_c == 3:
+                    if channel_first:
+                        img[:, x1:x1 + h, y1:y1 + w] = pixels
+                    else:
+                        img[x1:x1 + h, y1:y1 + w, :] = pixels
                 else:
-                    img[x1:x1 + h, y1:y1 + w, 0] = pixels[0]
+                    if channel_first:
+                        img[0, x1:x1 + h, y1:y1 + w] = pixels[0]
+                    else:
+                        img[x1:x1 + h, y1:y1 + w, 0] = pixels[:, :, 0]
                 return img
         return img

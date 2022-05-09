@@ -1,9 +1,9 @@
 ARM_ABI = arm8
 export ARM_ABI
 
-include ../Makefile.def
+LITE_ROOT=./inference_lite_lib.android.armv8
 
-LITE_ROOT=../../../
+include ${LITE_ROOT}/demo/cxx/Makefile.def
 
 THIRD_PARTY_DIR=${LITE_ROOT}/third_party
 
@@ -29,7 +29,7 @@ OPENCV_LIBS = ${THIRD_PARTY_DIR}/${OPENCV_VERSION}/${ARM_PATH}/libs/libopencv_im
               ${THIRD_PARTY_DIR}/${OPENCV_VERSION}/${ARM_PATH}/3rdparty/libs/libtbb.a \
               ${THIRD_PARTY_DIR}/${OPENCV_VERSION}/${ARM_PATH}/3rdparty/libs/libcpufeatures.a
 
-OPENCV_INCLUDE = -I../../../third_party/${OPENCV_VERSION}/${ARM_PATH}/include
+OPENCV_INCLUDE = -I${LITE_ROOT}/third_party/${OPENCV_VERSION}/${ARM_PATH}/include
 
 CXX_INCLUDES = $(INCLUDES) ${OPENCV_INCLUDE} -I$(LITE_ROOT)/cxx/include
 

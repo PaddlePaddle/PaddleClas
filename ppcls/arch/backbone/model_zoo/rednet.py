@@ -13,6 +13,7 @@
 # limitations under the License.
 
 # Code was based on https://github.com/d-li14/involution
+# reference: https://arxiv.org/abs/2103.06255
 
 import paddle
 import paddle.nn as nn
