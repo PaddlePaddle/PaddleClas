@@ -12,7 +12,6 @@
 #See the License for the specific language governing permissions and
 #limitations under the License.
 
-from paddle import nn
 import copy
 from collections import OrderedDict
 
@@ -20,19 +19,6 @@ from .metrics import TopkAcc, mAP, mINP, Recallk, Precisionk
 from .metrics import DistillationTopkAcc
 from .metrics import GoogLeNetTopkAcc
 from .metrics import HammingDistance, AccuracyScore
-
-
-class AvgMetrics(nn.Layer):
-    def __init__(self):
-        self.avg_meters = {}
-
-    def avg(self):
-        if self.avg_meters:
-            for metric_key in self.avg_meters:
-                return self.avg_meters[metric_key].avg
-
-    def avg_info(self):
-        return ", ".join([self.avg_meters[key].avg_info for key in self.avg_meters])
 
 
 class CombinedMetrics(AvgMetrics):

@@ -21,7 +21,7 @@ from sklearn.metrics import accuracy_score as accuracy_metric
 from sklearn.metrics import multilabel_confusion_matrix
 from sklearn.preprocessing import binarize
 
-from ppcls.metric import AvgMetrics
+from ppcls.metric.avg_metrics import AvgMetrics
 from ppcls.utils.misc import AverageMeter
 
 
