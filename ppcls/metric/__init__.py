@@ -22,7 +22,20 @@ from .metrics import GoogLeNetTopkAcc
 from .metrics import HammingDistance, AccuracyScore
 
 
-class CombinedMetrics(nn.Layer):
+class AvgMetrics(nn.Layer):
+    def __init__(self):
+        self.avg_meters = {}
+
+    def avg(self):
+        if self.avg_meters:
+            for metric_key in self.avg_meters:
+                return self.avg_meters[metric_key].avg
+
+    def avg_info(self):
+        return ", ".join([self.avg_meters[key].avg_info for key in self.avg_meters])
+
+
+class CombinedMetrics(AvgMetrics):
     def __init__(self, config_list):
         super().__init__()
         self.metric_func_list = []
@@ -39,7 +52,7 @@ class CombinedMetrics(nn.Layer):
             else:
                 self.metric_func_list.append(eval(metric_name)())
 
-    def __call__(self, *args, **kwargs):
+    def forward(self, *args, **kwargs):
         metric_dict = OrderedDict()
         for idx, metric_func in enumerate(self.metric_func_list):
             metric_dict.update(metric_func(*args, **kwargs))

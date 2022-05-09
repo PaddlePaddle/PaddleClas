@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import numpy as np
 import paddle
 import paddle.nn as nn
 import paddle.nn.functional as F
@@ -22,14 +21,18 @@ from sklearn.metrics import accuracy_score as accuracy_metric
 from sklearn.metrics import multilabel_confusion_matrix
 from sklearn.preprocessing import binarize
 
+from ppcls.metric import AvgMetrics
+from ppcls.utils.misc import AverageMeter
 
-class TopkAcc(nn.Layer):
+
+class TopkAcc(AvgMetrics):
     def __init__(self, topk=(1, 5)):
         super().__init__()
         assert isinstance(topk, (int, list, tuple))
         if isinstance(topk, int):
             topk = [topk]
         self.topk = topk
+        self.avg_meters = {"top{}".format(k): AverageMeter("top{}".format(k)) for k in self.topk}
 
     def forward(self, x, label):
         if isinstance(x, dict):
@@ -39,6 +42,7 @@ class TopkAcc(nn.Layer):
         for k in self.topk:
             metric_dict["top{}".format(k)] = paddle.metric.accuracy(
                 x, label, k=k)
+            self.avg_meters["top{}".format(k)].update(metric_dict["top{}".format(k)].numpy()[0], x.shape[0])
         return metric_dict
 
 
@@ -246,20 +250,17 @@ class GoogLeNetTopkAcc(TopkAcc):
         return super().forward(x[0], label)
 
 
-class MutiLabelMetric(object):
-    def __init__(self):
-        pass
+class MultiLabelMetric(AvgMetrics):
+    def __init__(self, bi_threshold=0.5):
+        super().__init__()
+        self.bi_threshold = bi_threshold
 
-    def _multi_hot_encode(self, logits, threshold=0.5):
-        return binarize(logits, threshold=threshold)
-
-    def __call__(self, output):
-        output = F.sigmoid(output)
-        preds = self._multi_hot_encode(logits=output.numpy(), threshold=0.5)
-        return preds
+    def _multi_hot_encode(self, output):
+        logits = F.sigmoid(output).numpy()
+        return binarize(logits, threshold=self.bi_threshold)
 
 
-class HammingDistance(MutiLabelMetric):
+class HammingDistance(MultiLabelMetric):
     """
     Soft metric based label for multilabel classification
     Returns:
@@ -268,16 +269,18 @@ class HammingDistance(MutiLabelMetric):
 
     def __init__(self):
         super().__init__()
+        self.avg_meters = {"HammingDistance": AverageMeter("HammingDistance")}
 
     def __call__(self, output, target):
-        preds = super().__call__(output)
+        preds = super()._multi_hot_encode(output)
         metric_dict = dict()
         metric_dict["HammingDistance"] = paddle.to_tensor(
             hamming_loss(target, preds))
+        self.avg_meters["HammingDistance"].update(metric_dict["HammingDistance"].numpy()[0], output.shape[0])
         return metric_dict
 
 
-class AccuracyScore(MutiLabelMetric):
+class AccuracyScore(MultiLabelMetric):
     """
     Hard metric for multilabel classification
     Args:
@@ -294,8 +297,8 @@ class AccuracyScore(MutiLabelMetric):
                         ], 'must be one of ["sample", "label"]'
         self.base = base
 
-    def __call__(self, output, target):
-        preds = super().__call__(output)
+    def forward(self, output, target):
+        preds = super()._multi_hot_encode(output)
         metric_dict = dict()
         if self.base == "sample":
             accuracy = accuracy_metric(target, preds)
@@ -308,4 +311,5 @@ class AccuracyScore(MutiLabelMetric):
             accuracy = (sum(tps) + sum(tns)) / (
                 sum(tps) + sum(tns) + sum(fns) + sum(fps))
         metric_dict["AccuracyScore"] = paddle.to_tensor(accuracy)
+        self.avg_meters["AccuracyScore"].update(metric_dict["AccuracyScore"].numpy()[0], output.shape[0])
         return metric_dict
