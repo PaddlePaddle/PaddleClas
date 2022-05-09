@@ -15,7 +15,7 @@ Global:
   save_inference_dir: ./inference
   # training model under @to_static
   to_static: False
-  update_freq: 8
+  update_freq: 8  # for 8 cards
 
 # model ema
 EMA:
@@ -50,6 +50,7 @@ Optimizer:
   weight_decay: 0.05
   one_dim_param_no_weight_decay: True
   lr:
+    # for 8 cards
     name: Cosine
     learning_rate: 4e-3  # lr 4e-3 for total_batch_size 4096
     eta_min: 1e-6
