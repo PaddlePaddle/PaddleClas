@@ -233,5 +233,5 @@ class DistillationDKDLoss(DKDLoss):
                 out1 = out1[self.key]
                 out2 = out2[self.key]
             loss = super().forward(out1, out2, batch)
-            loss_dict[self.name] = loss
+            loss_dict[f"{self.name}_{pair[0]}_{pair[1]}"] = loss
         return loss_dict
