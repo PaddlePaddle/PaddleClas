@@ -304,7 +304,7 @@ class HammingDistance(MultiLabelMetric):
         super().__init__()
         self.avg_meters = {"HammingDistance": AverageMeter("HammingDistance")}
 
-    def __call__(self, output, target):
+    def forward(self, output, target):
         preds = super()._multi_hot_encode(output)
         metric_dict = dict()
         metric_dict["HammingDistance"] = paddle.to_tensor(
