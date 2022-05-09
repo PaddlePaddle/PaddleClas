@@ -129,6 +129,11 @@ class mINP(nn.Layer):
         return metric_dict
 
 
+class TprAtFpr(nn.Layer):
+    def __init__(self, fpr=1/1000.):
+        pass
+
+
 class Recallk(nn.Layer):
     def __init__(self, topk=(1, 5)):
         super().__init__()

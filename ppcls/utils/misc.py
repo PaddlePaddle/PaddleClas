@@ -43,6 +43,10 @@ class AverageMeter(object):
         self.avg = self.sum / self.count
 
     @property
+    def avg_info(self):
+        return "{}: {:.5f}".format(self.name, self.avg)
+
+    @property
     def total(self):
         return '{self.name}_sum: {self.sum:{self.fmt}}{self.postfix}'.format(
             self=self)
