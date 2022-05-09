@@ -3,6 +3,7 @@ from paddle import nn
 
 class AvgMetrics(nn.Layer):
     def __init__(self):
+        super().__init__()
         self.avg_meters = {}
 
     def avg(self):
