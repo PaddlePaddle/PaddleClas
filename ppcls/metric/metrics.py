@@ -141,6 +141,7 @@ class TprAtFpr(nn.Layer):
         self.gt_neg_score_list = []
         self.softmax = nn.Softmax(axis=-1)
         self.max_fpr = max_fpr
+        self.max_tpr = 0.
 
     def forward(self, x, label):
         if isinstance(x, dict):
@@ -148,14 +149,15 @@ class TprAtFpr(nn.Layer):
         x = self.softmax(x)
         for i, label_i in enumerate(label):
             if label_i[0] == 0:
-                self.gt_neg_score_list.append(x[i])
+                self.gt_neg_score_list.append(x[i][1].numpy())
             else:
-                self.gt_pos_score_list.append(x[i])
+                self.gt_pos_score_list.append(x[i][1].numpy())
         return {}
 
     def reset(self):
         self.gt_pos_score_list = []
         self.gt_neg_score_list = []
+        self.max_tpr = 0.
 
     @property
     def avg_info(self):
@@ -164,12 +166,18 @@ class TprAtFpr(nn.Layer):
         gt_pos_score_list = np.array(self.gt_pos_score_list)
         gt_neg_score_list = np.array(self.gt_neg_score_list)
         for i in range(0, 10000):
-            threshold = i / 10000
+            threshold = i / 10000.
+            if len(gt_pos_score_list) == 0:
+                continue
             tpr = np.sum(gt_pos_score_list > threshold) / len(gt_pos_score_list)
-            fpr = np.sum(gt_neg_score_list > threshold) / len(gt_neg_score_list)
-            if fpr < self.max_fpr and tpr > max_tpr:
+            if len(gt_neg_score_list) == 0 and tpr > max_tpr:
                 max_tpr = tpr
                 result = "threshold: {}, fpr: {}, tpr: {:.5f}".format(threshold, fpr, tpr)
+            fpr = np.sum(gt_neg_score_list > threshold) / len(gt_neg_score_list)
+            if fpr <= self.max_fpr and tpr > max_tpr:
+                max_tpr = tpr
+                result = "threshold: {}, fpr: {}, tpr: {:.5f}".format(threshold, fpr, tpr)
+        self.max_tpr = max_tpr
         return result
 
 

@@ -50,6 +50,10 @@ class CombinedMetrics(AvgMetrics):
     def avg_info(self):
         return ", ".join([metric.avg_info for metric in self.metric_func_list])
 
+    @property
+    def avg(self):
+        return self.metric_func_list[0].avg
+
 
 def build_metrics(config):
     metrics_list = CombinedMetrics(copy.deepcopy(config))

@@ -159,4 +159,4 @@ def classification_eval(engine, epoch_id=0):
     if engine.eval_metric_func is None:
         return -1
     # return 1st metric in the dict
-    return output_info[metric_key].avg
+    return engine.eval_metric_func.avg
