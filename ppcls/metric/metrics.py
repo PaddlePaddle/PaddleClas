@@ -143,26 +143,28 @@ class TprAtFpr(nn.Layer):
         self.max_fpr = max_fpr
 
     def forward(self, x, label):
-        x = x["logits"]
+        if isinstance(x, dict):
+            x = x["logits"]
         x = self.softmax(x)
-        x = np.argmax(x)
         for i, label_i in enumerate(label):
             if label_i[0] == 0:
                 self.gt_neg_score_list.append(x[i])
             else:
                 self.gt_pos_score_list.append(x[i])
+        return {}
 
     def reset(self):
         self.gt_pos_score_list = []
         self.gt_neg_score_list = []
 
+    @property
     def avg_info(self):
         max_tpr = 0.
         result = ""
+        gt_pos_score_list = np.array(self.gt_pos_score_list)
+        gt_neg_score_list = np.array(self.gt_neg_score_list)
         for i in range(0, 10000):
             threshold = i / 10000
-            gt_pos_score_list = np.array(self.gt_pos_score_list)
-            gt_neg_score_list = np.array(self.gt_neg_score_list)
             tpr = np.sum(gt_pos_score_list > threshold) / len(gt_pos_score_list)
             fpr = np.sum(gt_neg_score_list > threshold) / len(gt_neg_score_list)
             if fpr < self.max_fpr and tpr > max_tpr:

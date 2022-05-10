@@ -125,15 +125,7 @@ def classification_eval(engine, epoch_id=0):
                                         current_samples)
         #  calc metric
         if engine.eval_metric_func is not None:
-            metric_dict = engine.eval_metric_func(preds, labels)
-            for key in metric_dict:
-                if metric_key is None:
-                    metric_key = key
-                if key not in output_info:
-                    output_info[key] = AverageMeter(key, '7.5f')
-
-                output_info[key].update(metric_dict[key].numpy()[0],
-                                        current_samples)
+            engine.eval_metric_func(preds, labels)
 
         time_info["batch_cost"].update(time.time() - tic)
 
@@ -160,6 +152,7 @@ def classification_eval(engine, epoch_id=0):
     metric_msg = ", ".join([
         "{}: {:.5f}".format(key, output_info[key].avg) for key in output_info
     ])
+    metric_msg += ", {}".format(engine.eval_metric_func.avg_info)
     logger.info("[Eval][Epoch {}][Avg]{}".format(epoch_id, metric_msg))
 
     # do not try to save best eval.model
