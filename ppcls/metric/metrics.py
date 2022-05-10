@@ -160,6 +160,10 @@ class TprAtFpr(nn.Layer):
         self.max_tpr = 0.
 
     @property
+    def avg(self):
+        return self.max_tpr
+
+    @property
     def avg_info(self):
         max_tpr = 0.
         result = ""
