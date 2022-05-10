@@ -134,7 +134,7 @@ class DetPredictor(Predictor):
 
         results = self.parse_det_results(results,
                                          self.config["Global"]["threshold"],
-                                         self.config["Global"]["labe_list"])
+                                         self.config["Global"]["label_list"])
         return results
 
 
