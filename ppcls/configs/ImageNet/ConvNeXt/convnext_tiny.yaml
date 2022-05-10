@@ -15,7 +15,7 @@ Global:
   save_inference_dir: ./inference
   # training model under @to_static
   to_static: False
-  update_freq: 8  # for 8 cards
+  update_freq: 4  # for 8 cards
 
 # model ema
 EMA:
