@@ -110,9 +110,8 @@ def init_model(config, net, optimizer=None):
             load_distillation_model(net, pretrained_model)
         else:  # common load
             load_dygraph_pretrain(net, path=pretrained_model)
-            logger.info(
-                logger.coloring("Finish load pretrained model from {}".format(
-                    pretrained_model), "HEADER"))
+            logger.info("Finish load pretrained model from {}".format(
+                    pretrained_model))
 
 
 def save_model(net,
