@@ -58,17 +58,16 @@ def retrieval_eval(engine, epoch_id=0):
             # set the order from small to large
             for i in range(len(engine.eval_metric_func.metric_func_list)):
                 if hasattr(engine.eval_metric_func.metric_func_list[i], 'descending') \
-                    and engine.eval_metric_func.metric_func_list[i].descending is True:
+                        and engine.eval_metric_func.metric_func_list[i].descending is True:
                     engine.eval_metric_func.metric_func_list[
                         i].descending = False
-                    logger.info(
-                        f"set {engine.eval_metric_func.metric_func_list[i].__class__.__name__}.descending to False when re_ranking=True"
+                    logger.warning(
+                        f"re_ranking=True,{engine.eval_metric_func.metric_func_list[i].__class__.__name__}.descending has been set to False"
                     )
 
             # compute distance matrix(The smaller the value, the more similar)
             distmat = re_ranking(
                 query_feas, gallery_feas, k1=20, k2=6, lambda_value=0.3)
-            distmat = paddle.to_tensor(distmat)
 
             # compute keep mask
             query_id_mask = (query_query_id != gallery_unique_id.t())
