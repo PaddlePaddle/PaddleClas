@@ -18,7 +18,7 @@ import paddle
 import paddle.nn as nn
 import paddle.nn.functional as F
 from paddle import ParamAttr
-from paddle.nn import AdaptiveAvgPool2D, BatchNorm, Conv2D, Dropout, Linear
+from paddle.nn import AdaptiveAvgPool2D, BatchNorm2D, Conv2D, Dropout, Linear
 from paddle.regularizer import L2Decay
 from paddle.nn.initializer import KaimingNormal
 from ppcls.arch.backbone.base.theseus_layer import TheseusLayer
@@ -70,9 +70,9 @@ class ConvBNLayer(TheseusLayer):
             weight_attr=ParamAttr(initializer=KaimingNormal()),
             bias_attr=False)
 
-        self.bn = BatchNorm(
+        self.bn = BatchNorm2D(
             out_channels,
-            param_attr=ParamAttr(regularizer=L2Decay(0.0)),
+            weight_attr=ParamAttr(regularizer=L2Decay(0.0)),
             bias_attr=ParamAttr(regularizer=L2Decay(0.0)))
         if self.use_act:
             self.act = nn.ReLU()
