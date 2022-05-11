@@ -22,6 +22,8 @@ from sklearn.metrics import accuracy_score as accuracy_metric
 from sklearn.metrics import multilabel_confusion_matrix
 from sklearn.preprocessing import binarize
 
+from easydict import EasyDict
+
 
 class TopkAcc(nn.Layer):
     def __init__(self, topk=(1, 5)):
@@ -307,4 +309,60 @@ class AccuracyScore(MutiLabelMetric):
             accuracy = (sum(tps) + sum(tns)) / (
                 sum(tps) + sum(tns) + sum(fns) + sum(fps))
         metric_dict["AccuracyScore"] = paddle.to_tensor(accuracy)
+        return metric_dict
+
+
+def get_attr_metrics(gt_label, preds_probs, threshold):
+    """
+    index: evaluated label index
+    """
+    pred_label = (preds_probs > threshold).astype(int)
+
+    eps = 1e-20
+    result = EasyDict()
+
+    has_fuyi = gt_label == -1
+    pred_label[has_fuyi] = -1
+
+    ###############################
+    # label metrics
+    # TP + FN
+    result.gt_pos = np.sum((gt_label == 1), axis=0).astype(float)
+    # TN + FP
+    result.gt_neg = np.sum((gt_label == 0), axis=0).astype(float)
+    # TP
+    result.true_pos = np.sum((gt_label == 1) * (pred_label == 1),
+                             axis=0).astype(float)
+    # TN
+    result.true_neg = np.sum((gt_label == 0) * (pred_label == 0),
+                             axis=0).astype(float)
+    # FP
+    result.false_pos = np.sum(((gt_label == 0) * (pred_label == 1)),
+                              axis=0).astype(float)
+    # FN
+    result.false_neg = np.sum(((gt_label == 1) * (pred_label == 0)),
+                              axis=0).astype(float)
+
+    ################
+    # instance metrics
+    result.gt_pos_ins = np.sum((gt_label == 1), axis=1).astype(float)
+    result.true_pos_ins = np.sum((pred_label == 1), axis=1).astype(float)
+    # true positive
+    result.intersect_pos = np.sum((gt_label == 1) * (pred_label == 1),
+                                  axis=1).astype(float)
+    # IOU
+    result.union_pos = np.sum(((gt_label == 1) + (pred_label == 1)),
+                              axis=1).astype(float)
+
+    return result
+
+
+class ATTRMetric(nn.Layer):
+    def __init__(self, threshold=0.5):
+        super().__init__()
+        self.threshold = threshold
+
+    def __call__(self, output, target):
+        metric_dict = get_attr_metrics(target[0].numpy(),
+                                       output.numpy(), self.threshold)
         return metric_dict
