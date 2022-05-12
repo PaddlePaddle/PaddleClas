@@ -14,7 +14,6 @@ Global:
   image_shape: [3, 256, 192]
   save_inference_dir: "./inference"
   use_multilabel: True
-  metric_attr: True
 
 # model architecture
 Arch:
@@ -26,11 +25,15 @@ Arch:
 # loss function config for traing/eval process
 Loss:
   Train:
-    - BCELoss:
+    - MultiLabelLoss:
         weight: 1.0
+        weight_ratio: True
+        size_sum: True
   Eval:
-    - BCELoss:
+    - MultiLabelLoss:
         weight: 1.0
+        weight_ratio: True
+        size_sum: True
 
 Optimizer:
   name: Adam
@@ -47,10 +50,10 @@ Optimizer:
 DataLoader:
   Train:
     dataset:
-      name: AttrDataset
+      name: MultiLabelDataset
       image_root: "dataset/xingrenfenxi/data/"
-      cls_label_path: "dataset/xingrenfenxi/all_qiye.pkl"
-      split: 'trainval'
+      cls_label_path: "dataset/xingrenfenxi/trainval.txt"
+      label_ratio: True
       transform_ops:
         - DecodeImage:
             to_rgb: True
@@ -80,10 +83,10 @@ DataLoader:
       use_shared_memory: True
   Eval:
     dataset:
-      name: AttrDataset
+      name: MultiLabelDataset
       image_root: "dataset/xingrenfenxi/data/"
-      cls_label_path: "dataset/xingrenfenxi/all_qiye.pkl"
-      split: 'test'
+      cls_label_path: "dataset/xingrenfenxi/test.txt"
+      label_ratio: True
       transform_ops:
         - DecodeImage:
             to_rgb: True
