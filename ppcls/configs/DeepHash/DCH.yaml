@@ -1,0 +1,140 @@
+# global configs
+Global:
+  checkpoints: null
+  pretrained_model: null
+  output_dir: ./output
+  device: gpu
+  save_interval: 15
+  eval_during_train: True
+  eval_interval: 15
+  epochs: 150
+  print_batch_step: 10
+  use_visualdl: False
+  # used for static mode and model export
+  image_shape: [3, 224, 224]
+  save_inference_dir: ./inference
+  eval_mode: retrieval
+  use_dali: False
+  to_static: False
+
+  #feature postprocess
+  feature_normalize: False
+  feature_binarize: "sign"
+
+# model architecture
+Arch:
+  name: RecModel
+  infer_output_key: features
+  infer_add_softmax: False
+
+  Backbone:
+    name: AlexNet
+    pretrained: True
+    class_num: 48
+
+# loss function config for train/eval process
+Loss:
+  Train:
+    - DCHLoss:
+        weight: 1.0
+        gamma:  20.0
+        _lambda: 0.1
+        n_class: 10
+  Eval:
+    - DCHLoss:
+        weight: 1.0
+        gamma:  20.0
+        _lambda: 0.1
+        n_class: 10
+
+Optimizer:
+  name: SGD
+  lr:
+    name: Piecewise
+    learning_rate: 0.005
+    decay_epochs: [200]
+    values: [0.005, 0.0005]
+  regularizer:
+    name: 'L2'
+    coeff: 0.00001
+
+# data loader for train and eval
+DataLoader:
+  Train:
+    dataset:
+      name: ImageNetDataset
+      image_root: ./dataset/CIFAR10/
+      cls_label_path: ./dataset/CIFAR10/train_list.txt
+      transform_ops:
+        - DecodeImage:
+            to_rgb: True
+            channel_first: False
+        - ResizeImage:
+            size: 224
+        - NormalizeImage:
+            scale: 1.0/255.0
+            mean: [0.485, 0.456, 0.406]
+            std: [0.229, 0.224, 0.225]
+            order: ''
+    sampler:
+      batch_size: 128
+      drop_last: False
+      shuffle: True
+    loader:
+      num_workers: 4
+      use_shared_memory: True
+
+  Eval:
+    Query:
+      dataset:
+        name: ImageNetDataset
+        image_root: ./dataset/CIFAR10/
+        cls_label_path: ./dataset/CIFAR10/test_list.txt
+        transform_ops:
+          - DecodeImage:
+              to_rgb: True
+              channel_first: False
+          - ResizeImage:
+              size: 224
+          - NormalizeImage:
+              scale: 1.0/255.0
+              mean: [0.485, 0.456, 0.406]
+              std: [0.229, 0.224, 0.225]
+              order: ''
+      sampler:
+        batch_size: 128
+        drop_last: False
+        shuffle: False
+      loader:
+        num_workers: 4
+        use_shared_memory: True
+
+    Gallery:
+      dataset:
+        name: ImageNetDataset
+        image_root: ./dataset/CIFAR10/
+        cls_label_path: ./dataset/CIFAR10/train_list.txt
+        transform_ops:
+          - DecodeImage:
+              to_rgb: True
+              channel_first: False
+          - ResizeImage:
+              size: 224
+          - NormalizeImage:
+              scale: 1.0/255.0
+              mean: [0.485, 0.456, 0.406]
+              std: [0.229, 0.224, 0.225]
+              order: ''
+      sampler:
+        batch_size: 128
+        drop_last: False
+        shuffle: False
+      loader:
+        num_workers: 4
+        use_shared_memory: True
+
+Metric:
+  Eval:
+    - mAP: {}
+    - Recallk:
+        topk: [1, 5]

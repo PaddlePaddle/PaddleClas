@@ -1,7 +1,7 @@
 #!/bin/bash
 FILENAME=$1
 
-# MODE be one of ['lite_train_lite_infer' 'lite_train_whole_infer' 'whole_train_whole_infer',  
+# MODE be one of ['lite_train_lite_infer' 'lite_train_whole_infer' 'whole_train_whole_infer',
 #                 'whole_infer', 'klquant_whole_infer',
 #                 'cpp_infer', 'serving_infer',  'lite_infer']
 
@@ -67,9 +67,9 @@ if [ ${MODE} = "cpp_infer" ];then
 	    model_dir=${tar_name%.*}
 	    eval "tar xf ${tar_name}"
 	    eval "mv ${model_dir} ${cls_inference_model_dir}"
-	    
+
 	    eval "wget -nc $det_inference_url"
-	    tar_name=$(func_get_url_file_name "$det_inference_url") 
+	    tar_name=$(func_get_url_file_name "$det_inference_url")
 	    model_dir=${tar_name%.*}
 	    eval "tar xf ${tar_name}"
 	    eval "mv ${model_dir} ${det_inference_model_dir}"
@@ -120,7 +120,7 @@ if [ ${MODE} = "lite_train_lite_infer" ] || [ ${MODE} = "lite_train_whole_infer"
     wget -nc https://paddle-imagenet-models-name.bj.bcebos.com/data/whole_chain/whole_chain_little_train.tar
     tar xf whole_chain_little_train.tar
     ln -s whole_chain_little_train ILSVRC2012
-    cd ILSVRC2012 
+    cd ILSVRC2012
     mv train.txt train_list.txt
     mv val.txt val_list.txt
     cp -r train/* val/
@@ -132,7 +132,7 @@ elif [ ${MODE} = "whole_infer" ] || [ ${MODE} = "klquant_whole_infer" ];then
     wget -nc https://paddle-imagenet-models-name.bj.bcebos.com/data/whole_chain/whole_chain_infer.tar
     tar xf whole_chain_infer.tar
     ln -s whole_chain_infer ILSVRC2012
-    cd ILSVRC2012 
+    cd ILSVRC2012
     mv val.txt val_list.txt
     ln -s val_list.txt train_list.txt
     cd ../../
@@ -153,7 +153,7 @@ elif [ ${MODE} = "whole_train_whole_infer" ];then
     wget -nc https://paddle-imagenet-models-name.bj.bcebos.com/data/whole_chain/whole_chain_CIFAR100.tar
     tar xf whole_chain_CIFAR100.tar
     ln -s whole_chain_CIFAR100 ILSVRC2012
-    cd ILSVRC2012 
+    cd ILSVRC2012
     mv train.txt train_list.txt
     mv test.txt val_list.txt
     cd ../../
@@ -180,5 +180,17 @@ if [ ${MODE} = "paddle2onnx_infer" ];then
     # wget model
     cd deploy && mkdir models && cd models
     wget -nc https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/ResNet50_vd_infer.tar  && tar xf ResNet50_vd_infer.tar
+    cd ../../
+fi
+
+if [ ${MODE} = "benchmark_train" ];then
+    pip install -r requirements.txt
+    cd dataset
+    rm -rf ILSVRC2012
+    wget -nc https://paddle-imagenet-models-name.bj.bcebos.com/data/ImageNet1k/ILSVRC2012_val.tar
+    tar xf ILSVRC2012_val.tar
+    ln -s ILSVRC2012_val ILSVRC2012
+    cd ILSVRC2012
+    ln -s val_list.txt  train_list.txt
     cd ../../
 fi

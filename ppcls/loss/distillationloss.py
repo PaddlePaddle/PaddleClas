@@ -14,11 +14,14 @@
 
 import paddle
 import paddle.nn as nn
+import paddle.nn.functional as F
 
 from .celoss import CELoss
 from .dmlloss import DMLLoss
 from .distanceloss import DistanceLoss
 from .rkdloss import RKdAngle, RkdDistance
+from .kldivloss import KLDivLoss
+from .dkdloss import DKDLoss
 
 
 class DistillationCELoss(CELoss):
@@ -171,4 +174,64 @@ class DistillationRKDLoss(nn.Layer):
                 loss_dict[f"loss_dist_{idx}_{m1}_{m2}"] = self.rkd_dist_loss(
                     student_out, teacher_out)
 
+        return loss_dict
+
+
+class DistillationKLDivLoss(KLDivLoss):
+    """
+    DistillationKLDivLoss
+    """
+
+    def __init__(self,
+                 model_name_pairs=[],
+                 temperature=4,
+                 key=None,
+                 name="loss_kl"):
+        super().__init__(temperature=temperature)
+        assert isinstance(model_name_pairs, list)
+        self.key = key
+        self.model_name_pairs = model_name_pairs
+        self.name = name
+
+    def forward(self, predicts, batch):
+        loss_dict = dict()
+        for idx, pair in enumerate(self.model_name_pairs):
+            out1 = predicts[pair[0]]
+            out2 = predicts[pair[1]]
+            if self.key is not None:
+                out1 = out1[self.key]
+                out2 = out2[self.key]
+            loss = super().forward(out1, out2)
+            for key in loss:
+                loss_dict["{}_{}_{}".format(key, pair[0], pair[1])] = loss[key]
+        return loss_dict
+
+
+class DistillationDKDLoss(DKDLoss):
+    """
+    DistillationDKDLoss
+    """
+
+    def __init__(self,
+                 model_name_pairs=[],
+                 key=None,
+                 temperature=1.0,
+                 alpha=1.0,
+                 beta=1.0,
+                 name="loss_dkd"):
+        super().__init__(temperature=temperature, alpha=alpha, beta=beta)
+        self.key = key
+        self.model_name_pairs = model_name_pairs
+        self.name = name
+
+    def forward(self, predicts, batch):
+        loss_dict = dict()
+        for idx, pair in enumerate(self.model_name_pairs):
+            out1 = predicts[pair[0]]
+            out2 = predicts[pair[1]]
+            if self.key is not None:
+                out1 = out1[self.key]
+                out2 = out2[self.key]
+            loss = super().forward(out1, out2, batch)
+            loss_dict[f"{self.name}_{pair[0]}_{pair[1]}"] = loss
         return loss_dict

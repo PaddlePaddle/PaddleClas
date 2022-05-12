@@ -40,8 +40,8 @@ fpgm_key=$(func_parser_key "${lines[17]}")
 fpgm_trainer=$(func_parser_value "${lines[17]}")
 distill_key=$(func_parser_key "${lines[18]}")
 distill_trainer=$(func_parser_value "${lines[18]}")
-trainer_key1=$(func_parser_key "${lines[19]}")
-trainer_value1=$(func_parser_value "${lines[19]}")
+to_static_key=$(func_parser_key "${lines[19]}")
+to_static_trainer=$(func_parser_value "${lines[19]}")
 trainer_key2=$(func_parser_key "${lines[20]}")
 trainer_value2=$(func_parser_value "${lines[20]}")
 
@@ -90,7 +90,11 @@ infer_value1=$(func_parser_value "${lines[50]}")
 if [ ! $epoch_num ]; then
   epoch_num=2
 fi
-LOG_PATH="./test_tipc/output"
+if [ $MODE = 'benchmark_train' ]; then
+  epoch_num=1
+fi
+
+LOG_PATH="./test_tipc/output/${model_name}"
 mkdir -p ${LOG_PATH}
 status_log="${LOG_PATH}/results_python.log"
 
@@ -242,9 +246,12 @@ else
                 elif [ ${trainer} = "${distill_key}" ]; then
                     run_train=${distill_trainer}
                     run_export=${distill_export}
-                elif [ ${trainer} = ${trainer_key1} ]; then
-                    run_train=${trainer_value1}
-                    run_export=${export_value1}
+                # In case of @to_static, we re-used norm_traier,
+                # but append "-o Global.to_static=True" for config
+                # to trigger "apply_to_static" logic in 'engine.py'
+                elif [ ${trainer} = "${to_static_key}" ]; then
+                    run_train="${norm_trainer}  ${to_static_trainer}"
+                    run_export=${norm_export}
                 elif [[ ${trainer} = ${trainer_key2} ]]; then
                     run_train=${trainer_value2}
                     run_export=${export_value2}
@@ -289,7 +296,7 @@ else
                 fi
                 # run train
 		eval "unset CUDA_VISIBLE_DEVICES"
-		export FLAGS_cudnn_deterministic=True
+		# export FLAGS_cudnn_deterministic=True
 		sleep 5
                 eval $cmd
                 status_check $? "${cmd}" "${status_log}"

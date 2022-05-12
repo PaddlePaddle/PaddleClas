@@ -406,7 +406,7 @@ def run(dataloader,
             if "time" in key else str(metric_dict[key].value)
             for key in metric_dict
         ])
-        ips_info = " ips: {:.5f} images/sec.".format(
+        ips_info = " ips: {:.5f} samples/sec.".format(
             batch_size / metric_dict["batch_time"].avg)
         fetchs_str += ips_info
 
@@ -433,8 +433,8 @@ def run(dataloader,
 
     end_str = ' '.join([str(m.mean) for m in metric_dict.values()] +
                        [metric_dict["batch_time"].total])
-    ips_info = "ips: {:.5f} images/sec.".format(batch_size /
-                                                metric_dict["batch_time"].avg)
+    ips_info = "ips: {:.5f} samples/sec.".format(batch_size /
+                                                 metric_dict["batch_time"].avg)
     if mode == 'eval':
         logger.info("END {:s} {:s} {:s}".format(mode, end_str, ips_info))
     else:

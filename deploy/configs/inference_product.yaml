@@ -8,7 +8,7 @@ Global:
   image_shape: [3, 640, 640]
   threshold: 0.2
   max_det_results: 5
-  labe_list:
+  label_list:
   - foreground
 
   # inference engine config

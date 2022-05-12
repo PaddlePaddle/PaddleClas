@@ -22,9 +22,14 @@ from .distillationloss import DistillationGTCELoss
 from .distillationloss import DistillationDMLLoss
 from .distillationloss import DistillationDistanceLoss
 from .distillationloss import DistillationRKDLoss
+from .distillationloss import DistillationKLDivLoss
+from .distillationloss import DistillationDKDLoss
 from .multilabelloss import MultiLabelLoss
+from .afdloss import AFDLoss
 
-from .deephashloss import DSHSDLoss, LCDSHLoss
+from .deephashloss import DSHSDLoss
+from .deephashloss import LCDSHLoss
+from .deephashloss import DCHLoss
 
 
 class CombinedLoss(nn.Layer):
@@ -43,6 +48,7 @@ class CombinedLoss(nn.Layer):
                 param.keys())
             self.loss_weight.append(param.pop("weight"))
             self.loss_func.append(eval(name)(**param))
+            self.loss_func = nn.LayerList(self.loss_func)
 
     def __call__(self, input, batch):
         loss_dict = {}

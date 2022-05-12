@@ -13,6 +13,7 @@
 # limitations under the License.
 
 # Code was based on https://github.com/huawei-noah/CV-Backbones/tree/master/tnt_pytorch
+# reference: https://arxiv.org/abs/2103.00112
 
 import math
 import numpy as np
@@ -372,7 +373,7 @@ def _load_pretrained(pretrained, model, model_url, use_ssld=False):
         )
 
 
-def TNT_small(pretrained=False, **kwargs):
+def TNT_small(pretrained=False, use_ssld=False, **kwargs):
     model = TNT(patch_size=16,
                 embed_dim=384,
                 in_dim=24,
@@ -381,5 +382,6 @@ def TNT_small(pretrained=False, **kwargs):
                 in_num_head=4,
                 qkv_bias=False,
                 **kwargs)
-    _load_pretrained(pretrained, model, MODEL_URLS["TNT_small"])
+    _load_pretrained(
+        pretrained, model, MODEL_URLS["TNT_small"], use_ssld=use_ssld)
     return model

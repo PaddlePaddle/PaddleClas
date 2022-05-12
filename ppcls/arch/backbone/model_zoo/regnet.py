@@ -13,6 +13,7 @@
 # limitations under the License.
 
 # Code was based on https://github.com/facebookresearch/pycls
+# reference: https://arxiv.org/abs/1905.13214
 
 from __future__ import absolute_import
 from __future__ import division

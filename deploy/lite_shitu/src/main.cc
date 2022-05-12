@@ -24,9 +24,10 @@
 #include <vector>
 
 #include "include/config_parser.h"
+#include "include/feature_extractor.h"
 #include "include/object_detector.h"
 #include "include/preprocess_op.h"
-#include "include/recognition.h"
+#include "include/vector_search.h"
 #include "json/json.h"
 
 Json::Value RT_Config;
@@ -111,14 +112,18 @@ void DetPredictImage(const std::vector<cv::Mat> &batch_imgs,
   }
 }
 
-void PrintResult(const std::string &image_path,
-                 std::vector<PPShiTu::ObjectResult> &det_result) {
-  printf("%s:\n", image_path.c_str());
+void PrintResult(std::string &img_path,
+                 std::vector<PPShiTu::ObjectResult> &det_result,
+                 PPShiTu::VectorSearch &vector_search,
+                 PPShiTu::SearchResult &search_result) {
+  printf("%s:\n", img_path.c_str());
   for (int i = 0; i < det_result.size(); ++i) {
+    int t = i;
     printf("\tresult%d: bbox[%d, %d, %d, %d], score: %f, label: %s\n", i,
-           det_result[i].rect[0], det_result[i].rect[1], det_result[i].rect[2],
-           det_result[i].rect[3], det_result[i].rec_result[0].score,
-           det_result[i].rec_result[0].class_name.c_str());
+           det_result[t].rect[0], det_result[t].rect[1], det_result[t].rect[2],
+           det_result[t].rect[3], det_result[t].confidence,
+           vector_search.GetLabel(search_result.I[search_result.return_k * t])
+               .c_str());
   }
 }
 
@@ -159,11 +164,16 @@ int main(int argc, char **argv) {
       RT_Config["Global"]["cpu_num_threads"].as<int>(),
       RT_Config["Global"]["batch_size"].as<int>());
   // create rec model
-  PPShiTu::Recognition rec(RT_Config);
+  PPShiTu::FeatureExtract rec(RT_Config);
+  PPShiTu::VectorSearch searcher(RT_Config);
   // Do inference on input image
 
   std::vector<PPShiTu::ObjectResult> det_result;
   std::vector<cv::Mat> batch_imgs;
+
+  // for vector search
+  std::vector<float> feature;
+  std::vector<float> features;
   double rec_time;
   if (!RT_Config["Global"]["infer_imgs"].as<std::string>().empty() ||
       !img_dir.empty()) {
@@ -178,8 +188,7 @@ int main(int argc, char **argv) {
         return -1;
       }
     } else {
-      cv::glob(img_dir,
-               cv_all_img_paths);
+      cv::glob(img_dir, cv_all_img_paths);
       for (const auto &img_path : cv_all_img_paths) {
         all_img_paths.push_back(img_path);
       }
@@ -199,24 +208,25 @@ int main(int argc, char **argv) {
           RT_Config["Global"]["max_det_results"].as<int>(), false, &det);
 
       // add the whole image for recognition to improve recall
-      PPShiTu::ObjectResult result_whole_img = {
-          {0, 0, srcimg.cols, srcimg.rows}, 0, 1.0};
-      det_result.push_back(result_whole_img);
+//      PPShiTu::ObjectResult result_whole_img = {
+//          {0, 0, srcimg.cols, srcimg.rows}, 0, 1.0};
+//      det_result.push_back(result_whole_img);
 
       // get rec result
+      PPShiTu::SearchResult search_result;
       for (int j = 0; j < det_result.size(); ++j) {
         int w = det_result[j].rect[2] - det_result[j].rect[0];
         int h = det_result[j].rect[3] - det_result[j].rect[1];
         cv::Rect rect(det_result[j].rect[0], det_result[j].rect[1], w, h);
         cv::Mat crop_img = srcimg(rect);
-        std::vector<PPShiTu::RESULT> result =
-            rec.RunRecModel(crop_img, rec_time);
-        det_result[j].rec_result.assign(result.begin(), result.end());
+        rec.RunRecModel(crop_img, rec_time, feature);
+        features.insert(features.end(), feature.begin(), feature.end());
       }
-      // rec nms
-      PPShiTu::nms(det_result,
-                   RT_Config["Global"]["rec_nms_thresold"].as<float>(), true);
-      PrintResult(img_path, det_result);
+
+      // do vectore search
+      search_result = searcher.Search(features.data(), det_result.size());
+      PrintResult(img_path, det_result, searcher, search_result);
+
       batch_imgs.clear();
       det_result.clear();
     }

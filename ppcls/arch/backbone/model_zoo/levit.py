@@ -13,6 +13,7 @@
 # limitations under the License.
 
 # Code was based on https://github.com/facebookresearch/LeViT
+# reference: https://openaccess.thecvf.com/content/ICCV2021/html/Graham_LeViT_A_Vision_Transformer_in_ConvNets_Clothing_for_Faster_Inference_ICCV_2021_paper.html
 
 import itertools
 import math

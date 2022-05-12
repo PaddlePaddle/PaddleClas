@@ -95,7 +95,7 @@ def main():
     config_json["Global"]["det_model_path"] = args.det_model_path
     config_json["Global"]["rec_model_path"] = args.rec_model_path
     config_json["Global"]["rec_label_path"] = args.rec_label_path
-    config_json["Global"]["label_list"] = config_yaml["Global"]["labe_list"]
+    config_json["Global"]["label_list"] = config_yaml["Global"]["label_list"]
     config_json["Global"]["rec_nms_thresold"] = config_yaml["Global"][
         "rec_nms_thresold"]
     config_json["Global"]["max_det_results"] = config_yaml["Global"][
@@ -130,6 +130,8 @@ def main():
             y["type"] = k
             config_json["RecPreProcess"]["transform_ops"].append(y)
 
+    # set IndexProces
+    config_json["IndexProcess"] = config_yaml["IndexProcess"]
     with open('shitu_config.json', 'w') as fd:
         json.dump(config_json, fd, indent=4)
 

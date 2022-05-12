@@ -13,6 +13,7 @@
 # limitations under the License.
 
 # This code is based on https://github.com/uoguelph-mlrg/Cutout
+# reference: https://arxiv.org/abs/1708.04552
 
 import numpy as np
 import random

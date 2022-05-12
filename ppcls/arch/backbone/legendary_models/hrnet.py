@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# reference: https://arxiv.org/abs/1908.07919
+
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
@@ -459,6 +461,7 @@ class HRNet(TheseusLayer):
         self.avg_pool = nn.AdaptiveAvgPool2D(1)
 
         stdv = 1.0 / math.sqrt(2048 * 1.0)
+        self.flatten = nn.Flatten(start_axis=1, stop_axis=-1)
 
         self.fc = nn.Linear(
             2048,
@@ -496,7 +499,7 @@ class HRNet(TheseusLayer):
 
         y = self.conv_last(y)
         y = self.avg_pool(y)
-        y = paddle.reshape(y, shape=[-1, y.shape[1]])
+        y = self.flatten(y)
         y = self.fc(y)
         return y
 

@@ -18,7 +18,7 @@ Global:
 # model architecture
 Arch:
   name: "DistillationModel"
-  class_num: 1000
+  class_num: &class_num 1000
   # if not null, its lengths should be same as models
   pretrained_list:
   # if not null, its lengths should be same as models
@@ -28,11 +28,13 @@ Arch:
   models:
     - Teacher:
         name: MobileNetV3_large_x1_0
+        class_num: *class_num
         pretrained: True
         use_ssld: True
         dropout_prob: null
     - Student:
         name: MobileNetV3_small_x1_0
+        class_num: *class_num
         pretrained: False
         dropout_prob: null
 
@@ -47,9 +49,8 @@ Loss:
         model_name_pairs:
         - ["Student", "Teacher"]
   Eval:
-    - DistillationGTCELoss:
+    - CELoss:
         weight: 1.0
-        model_names: ["Student"]
         
 
 Optimizer:

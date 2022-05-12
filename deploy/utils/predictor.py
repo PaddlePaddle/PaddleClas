@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import platform
 import os
 import argparse
 import base64
@@ -50,8 +51,10 @@ class Predictor(object):
         else:
             config.disable_gpu()
             if args.enable_mkldnn:
-                # cache 10 different shapes for mkldnn to avoid memory leak
-                config.set_mkldnn_cache_capacity(10)
+                # there is no set_mkldnn_cache_capatity() on macOS
+                if platform.system() != "Darwin":
+                    # cache 10 different shapes for mkldnn to avoid memory leak
+                    config.set_mkldnn_cache_capacity(10)
                 config.enable_mkldnn()
         config.set_cpu_math_library_num_threads(args.cpu_num_threads)
 

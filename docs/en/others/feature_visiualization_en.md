@@ -27,7 +27,7 @@ The first step is to select the model to be studied, here we choose ResNet50. Co
 wget https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ResNet50_pretrained.pdparams
 ```
 
-For other pre-training models and codes of network structure, please download [model library](../../../ppcls/arch/backbone/) and [pre-training models](../models/models_intro_en.md).
+For other pre-training models and codes of network structure, please download [model library](../../../ppcls/arch/backbone/) and [pre-training models](../algorithm_introduction/ImageNet_models_en.md).
 
 <a name='3'></a>
 
