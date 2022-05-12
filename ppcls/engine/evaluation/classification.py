@@ -32,8 +32,8 @@ def classification_eval(engine, epoch_id=0):
     }
     print_batch_step = engine.config["Global"]["print_batch_step"]
 
-    if engine.eval_metric_func is not None and engine.config["Arch"][
-            "name"] == "StrongBaselineAttr":
+    if engine.eval_metric_func is not None and "ATTRMetric" in engine.config[
+            "Metric"]["Eval"][0]:
         output_info["attr"] = AttrMeter(threshold=0.5)
 
     metric_key = None
@@ -128,7 +128,7 @@ def classification_eval(engine, epoch_id=0):
 
         #  calc metric
         if engine.eval_metric_func is not None:
-            if engine.config["Arch"]["name"] == "StrongBaselineAttr":
+            if "ATTRMetric" in engine.config["Metric"]["Eval"][0]:
                 metric_dict = engine.eval_metric_func(preds, labels)
                 metric_key = "attr"
                 output_info["attr"].update(metric_dict)
@@ -153,7 +153,7 @@ def classification_eval(engine, epoch_id=0):
             ips_msg = "ips: {:.5f} images/sec".format(
                 batch_size / time_info["batch_cost"].avg)
 
-            if engine.config["Arch"]["name"] == "StrongBaselineAttr":
+            if "ATTRMetric" in engine.config["Metric"]["Eval"][0]:
                 metric_msg = ""
             else:
                 metric_msg = ", ".join([
@@ -168,7 +168,7 @@ def classification_eval(engine, epoch_id=0):
     if engine.use_dali:
         engine.eval_dataloader.reset()
 
-    if engine.config["Arch"]["name"] == "StrongBaselineAttr":
+    if "ATTRMetric" in engine.config["Metric"]["Eval"][0]:
         metric_msg = ", ".join([
             "evalres: ma: {:.5f} label_f1: {:.5f} label_pos_recall: {:.5f} label_neg_recall: {:.5f} instance_f1: {:.5f} instance_acc: {:.5f} instance_prec: {:.5f} instance_recall: {:.5f}".
             format(*output_info["attr"].res())

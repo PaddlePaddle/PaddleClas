@@ -190,7 +190,7 @@ class CropImage(object):
         return img[h_start:h_end, w_start:w_end, :]
 
 
-class Pad(object):
+class Padv2(object):
     def __init__(self,
                  size=None,
                  size_divisor=32,

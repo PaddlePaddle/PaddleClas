@@ -362,7 +362,7 @@ class ATTRMetric(nn.Layer):
         super().__init__()
         self.threshold = threshold
 
-    def __call__(self, output, target):
+    def forward(self, output, target):
         metric_dict = get_attr_metrics(target[0].numpy(),
                                        output.numpy(), self.threshold)
         return metric_dict

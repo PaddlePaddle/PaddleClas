@@ -17,10 +17,10 @@ Global:
 
 # model architecture
 Arch:
-  name: "StrongBaselineAttr"
-  Backbone:
-    name: "ResNet50"
-    class_num: 26
+  name: "ResNet50"
+  pretrained: True
+  class_num: 26
+  norm_decay: 0.0005
 
 # loss function config for traing/eval process
 Loss:
@@ -60,7 +60,7 @@ DataLoader:
             channel_first: False
         - ResizeImage:
             size: [192, 256]
-        - Pad:
+        - Padv2:
             size: [212, 276]
             pad_mode: 1
             fill_value: 0

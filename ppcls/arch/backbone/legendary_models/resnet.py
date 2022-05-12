@@ -114,10 +114,10 @@ class ConvBNLayer(TheseusLayer):
                  filter_size,
                  stride=1,
                  groups=1,
-                 norm_decay=0.0005,
                  is_vd_mode=False,
                  act=None,
                  lr_mult=1.0,
+                 norm_decay=0.,
                  data_format="NCHW"):
         super().__init__()
         self.is_vd_mode = is_vd_mode
@@ -135,7 +135,7 @@ class ConvBNLayer(TheseusLayer):
             bias_attr=False,
             data_format=data_format)
 
-        param_attr = ParamAttr(
+        weight_attr = ParamAttr(
             learning_rate=lr_mult,
             regularizer=L2Decay(norm_decay),
             trainable=True)
@@ -145,7 +145,7 @@ class ConvBNLayer(TheseusLayer):
             trainable=True)
 
         self.bn = BatchNorm2D(
-            num_filters, weight_attr=param_attr, bias_attr=bias_attr)
+            num_filters, weight_attr=weight_attr, bias_attr=bias_attr)
         self.relu = nn.ReLU()
 
     def forward(self, x):
@@ -166,6 +166,7 @@ class BottleneckBlock(TheseusLayer):
                  shortcut=True,
                  if_first=False,
                  lr_mult=1.0,
+                 norm_decay=0.,
                  data_format="NCHW"):
         super().__init__()
 
@@ -175,6 +176,7 @@ class BottleneckBlock(TheseusLayer):
             filter_size=1,
             act="relu",
             lr_mult=lr_mult,
+            norm_decay=norm_decay,
             data_format=data_format)
         self.conv1 = ConvBNLayer(
             num_channels=num_filters,
@@ -183,6 +185,7 @@ class BottleneckBlock(TheseusLayer):
             stride=stride,
             act="relu",
             lr_mult=lr_mult,
+            norm_decay=norm_decay,
             data_format=data_format)
         self.conv2 = ConvBNLayer(
             num_channels=num_filters,
@@ -190,6 +193,7 @@ class BottleneckBlock(TheseusLayer):
             filter_size=1,
             act=None,
             lr_mult=lr_mult,
+            norm_decay=norm_decay,
             data_format=data_format)
 
         if not shortcut:
@@ -200,6 +204,7 @@ class BottleneckBlock(TheseusLayer):
                 stride=stride if if_first else 1,
                 is_vd_mode=False if if_first else True,
                 lr_mult=lr_mult,
+                norm_decay=norm_decay,
                 data_format=data_format)
 
         self.relu = nn.ReLU()
@@ -228,6 +233,7 @@ class BasicBlock(TheseusLayer):
                  shortcut=True,
                  if_first=False,
                  lr_mult=1.0,
+                 norm_decay=0.,
                  data_format="NCHW"):
         super().__init__()
 
@@ -239,6 +245,7 @@ class BasicBlock(TheseusLayer):
             stride=stride,
             act="relu",
             lr_mult=lr_mult,
+            norm_decay=norm_decay,
             data_format=data_format)
         self.conv1 = ConvBNLayer(
             num_channels=num_filters,
@@ -246,6 +253,7 @@ class BasicBlock(TheseusLayer):
             filter_size=3,
             act=None,
             lr_mult=lr_mult,
+            norm_decay=norm_decay,
             data_format=data_format)
         if not shortcut:
             self.short = ConvBNLayer(
@@ -255,6 +263,7 @@ class BasicBlock(TheseusLayer):
                 stride=stride if if_first else 1,
                 is_vd_mode=False if if_first else True,
                 lr_mult=lr_mult,
+                norm_decay=norm_decay,
                 data_format=data_format)
         self.shortcut = shortcut
         self.relu = nn.ReLU()
@@ -291,6 +300,7 @@ class ResNet(TheseusLayer):
                  stem_act="relu",
                  class_num=1000,
                  lr_mult_list=[1.0, 1.0, 1.0, 1.0, 1.0],
+                 norm_decay=0.,
                  data_format="NCHW",
                  input_image_channel=3,
                  return_patterns=None,
@@ -330,6 +340,7 @@ class ResNet(TheseusLayer):
                 stride=s,
                 act=stem_act,
                 lr_mult=self.lr_mult_list[0],
+                norm_decay=norm_decay,
                 data_format=data_format)
             for in_c, out_c, k, s in self.stem_cfg[version]
         ])
@@ -348,6 +359,7 @@ class ResNet(TheseusLayer):
                     shortcut=shortcut,
                     if_first=block_idx == i == 0 if version == "vd" else True,
                     lr_mult=self.lr_mult_list[block_idx + 1],
+                    norm_decay=norm_decay,
                     data_format=data_format))
                 shortcut = True
         self.blocks = nn.Sequential(*block_list)
