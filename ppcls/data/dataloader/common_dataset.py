@@ -44,11 +44,11 @@ def create_operators(params):
 
 
 class CommonDataset(Dataset):
-    def __init__(
-            self,
-            image_root,
-            cls_label_path,
-            transform_ops=None, ):
+    def __init__(self,
+                 image_root,
+                 cls_label_path,
+                 transform_ops=None,
+                 split='trainval'):
         self._img_root = image_root
         self._cls_path = cls_label_path
         if transform_ops:
@@ -56,7 +56,7 @@ class CommonDataset(Dataset):
 
         self.images = []
         self.labels = []
-        self._load_anno()
+        self._load_anno(split=split)
 
     def _load_anno(self):
         pass

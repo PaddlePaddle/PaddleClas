@@ -10,3 +10,4 @@ from ppcls.data.dataloader.mix_sampler import MixSampler
 from ppcls.data.dataloader.multi_scale_sampler import MultiScaleSampler
 from ppcls.data.dataloader.pk_sampler import PKSampler
 from ppcls.data.dataloader.person_dataset import Market1501, MSMT17
+from ppcls.data.dataloader.attr_dataset import AttrDataset

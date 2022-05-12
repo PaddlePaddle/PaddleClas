@@ -55,7 +55,7 @@ class StrongBaselinePAR(nn.Layer):
     def forward(self, x):
         fc_feat = self.backbone(x)
         output = F.sigmoid(fc_feat)
-        return output
+        return fc_feat
 
 
 def _load_pretrained(pretrained, model, model_url, use_ssld):
@@ -95,4 +95,5 @@ def load_pretrained(model, local_weight_path):
 def StrongBaselineAttr(pretrained=True, use_ssld=False, **kwargs):
     model = StrongBaselinePAR(**kwargs)
     _load_pretrained(MODEL_URLS["StrongBaselineAttr"], model, None, None)
+    # load_pretrained(model, MODEL_URLS["StrongBaselineAttr"])
     return model
