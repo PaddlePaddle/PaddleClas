@@ -51,8 +51,8 @@ DataLoader:
   Train:
     dataset:
       name: MultiLabelDataset
-      image_root: "dataset/xingrenfenxi/data/"
-      cls_label_path: "dataset/xingrenfenxi/trainval.txt"
+      image_root: "dataset/attribute/data/"
+      cls_label_path: "dataset/attribute/trainval.txt"
       label_ratio: True
       transform_ops:
         - DecodeImage:
@@ -84,8 +84,8 @@ DataLoader:
   Eval:
     dataset:
       name: MultiLabelDataset
-      image_root: "dataset/xingrenfenxi/data/"
-      cls_label_path: "dataset/xingrenfenxi/test.txt"
+      image_root: "dataset/attribute/data/"
+      cls_label_path: "dataset/attribute/test.txt"
       label_ratio: True
       transform_ops:
         - DecodeImage:
