@@ -64,11 +64,11 @@ class MultiScaleSampler(Sampler):
             base_elements = base_im_w * base_im_h * base_batch_size
             for (h, w) in zip(height_dims, width_dims):
                 batch_size = int(max(1, (base_elements / (h * w))))
-                img_batch_pairs.append((h, w, batch_size))
+                img_batch_pairs.append((w, h, batch_size))
             self.img_batch_pairs = img_batch_pairs
             self.shuffle = True
         else:
-            self.img_batch_pairs = [(base_im_h, base_im_w, base_batch_size)]
+            self.img_batch_pairs = [(base_im_w, base_im_h, base_batch_size)]
 
         self.img_indices = img_indices
         self.n_samples_per_replica = num_samples_per_replica
@@ -81,7 +81,7 @@ class MultiScaleSampler(Sampler):
         indices_rank_i = self.img_indices[self.rank:len(self.img_indices):
                                           self.num_replicas]
         while self.current < self.n_samples_per_replica:
-            curr_h, curr_w, curr_bsz = random.choice(self.img_batch_pairs)
+            curr_w, curr_h, curr_bsz = random.choice(self.img_batch_pairs)
 
             end_index = min(self.current + curr_bsz,
                             self.n_samples_per_replica)
@@ -93,7 +93,7 @@ class MultiScaleSampler(Sampler):
             self.current += curr_bsz
 
             if len(batch_ids) > 0:
-                batch = [curr_h, curr_w, len(batch_ids)]
+                batch = [curr_w, curr_h, len(batch_ids)]
                 self.batch_list.append(batch)
         self.length = len(self.batch_list)
 
@@ -113,7 +113,7 @@ class MultiScaleSampler(Sampler):
 
         start_index = 0
         for batch_tuple in self.batch_list:
-            curr_h, curr_w, curr_bsz = batch_tuple
+            curr_w, curr_h, curr_bsz = batch_tuple
             end_index = min(start_index + curr_bsz, self.n_samples_per_replica)
             batch_ids = indices_rank_i[start_index:end_index]
             n_batch_samples = len(batch_ids)
@@ -122,7 +122,7 @@ class MultiScaleSampler(Sampler):
             start_index += curr_bsz
 
             if len(batch_ids) > 0:
-                batch = [(curr_h, curr_w, b_id) for b_id in batch_ids]
+                batch = [(curr_w, curr_h, b_id) for b_id in batch_ids]
                 yield batch
 
     def set_epoch(self, epoch: int):

@@ -72,11 +72,11 @@ class MultiScaleDataset(Dataset):
                 for resize in resize_op:
                     if resize in op:
                         if self.has_crop_flag:
-                            logger.error(
+                            logger.warning(
                                 "Multi scale dataset will crop image according to the multi scale resolution"
                             )
                         self.transform_ops[i][resize] = {
-                            'size': (img_height, img_width)
+                            'size': (img_width, img_height)
                         }
                         has_crop = True
                         self.has_crop_flag = 0
