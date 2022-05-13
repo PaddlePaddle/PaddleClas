@@ -1,4 +1,4 @@
-#   Copyright (c) 2021 PaddlePaddle Authors. All Rights Reserved.
+#   Copyright (c) 2022 PaddlePaddle Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,21 +12,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from __future__ import print_function
-
-import numpy as np
 import os
 
-from paddle.io import Dataset
-from paddle.vision import transforms
+import numpy as np
 import cv2
-import warnings
 
-from ppcls.data import preprocess
+from paddle.io import Dataset
+
 from ppcls.data.preprocess import transform
-from ppcls.data.preprocess.ops.operators import DecodeImage
-from ppcls.utils import logger
 from ppcls.data.dataloader.common_dataset import create_operators
+from ppcls.utils import logger
 
 
 class MultiScaleDataset(Dataset):
@@ -41,7 +36,7 @@ class MultiScaleDataset(Dataset):
         self.images = []
         self.labels = []
         self._load_anno()
-        self.has_crop_flag = 1
+        self.has_logged = False
 
     def _load_anno(self, seed=None):
         assert os.path.exists(self._cls_path)
@@ -59,43 +54,39 @@ class MultiScaleDataset(Dataset):
                 self.labels.append(np.int64(l[1]))
                 assert os.path.exists(self.images[-1])
 
-    def __getitem__(self, properties):
-        # properites is a tuple, contains (width, height, index)
-        img_width = properties[0]
-        img_height = properties[1]
-        index = properties[2]
-        has_crop = False
+    def __getitem__(self, batch_info):
+        width, height, img_idx = batch_info
         if self.transform_ops:
-            for i in range(len(self.transform_ops)):
-                op = self.transform_ops[i]
-                resize_op = ['RandCropImage', 'ResizeImage', 'CropImage']
-                for resize in resize_op:
-                    if resize in op:
-                        if self.has_crop_flag:
-                            logger.warning(
-                                "Multi scale dataset will crop image according to the multi scale resolution"
-                            )
-                        self.transform_ops[i][resize] = {
-                            'size': (img_width, img_height)
-                        }
-                        has_crop = True
-                        self.has_crop_flag = 0
-        if has_crop == False:
-            logger.error("Multi scale dateset requests RandCropImage")
-            raise RuntimeError("Multi scale dateset requests RandCropImage")
+            # TODO(gaotingquan): unsupport ones of 'RandCropImage', 'ResizeImage', 'CropImage' used together.
+            for op in self.transform_ops:
+                op_name = list(op.keys())[0]
+                resize_ops = ['RandCropImage', 'ResizeImage', 'CropImage']
+                if op_name in resize_ops:
+                    op[op_name].update({"size": (width, height)})
+                    has_changed = True
+                    break
+        # TODO(gaotingquan): repeat log
+        if not self.has_logged:
+            if has_changed == False:
+                msg = "One of 'RandCropImage', 'ResizeImage', 'CropImage' should be use in MultiScale Dataset when MultiScale Sampler used. Otherwise the multi scale resolution strategy is ineffective."
+            else:
+                msg = f"The resize argument of '{op_name}' has been reset to {width}, {height} according to MultiScale Sampler."
+            logger.warning(msg)
+            self.has_logged = True
+
         self._transform_ops = create_operators(self.transform_ops)
 
         try:
-            with open(self.images[index], 'rb') as f:
+            with open(self.images[img_idx], 'rb') as f:
                 img = f.read()
             if self._transform_ops:
                 img = transform(img, self._transform_ops)
             img = img.transpose((2, 0, 1))
-            return (img, self.labels[index])
+            return (img, self.labels[img_idx])
 
         except Exception as ex:
             logger.error("Exception occured when parse line: {} with msg: {}".
-                         format(self.images[index], ex))
+                         format(self.images[img_idx], ex))
             rnd_idx = np.random.randint(self.__len__())
             return self.__getitem__(rnd_idx)
 

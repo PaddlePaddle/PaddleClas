@@ -74,7 +74,7 @@ DataLoader:
       # divide_factor: to ensure the width and height dimensions can be devided by downsampling multiple
       first_bs: 64
       divided_factor: 32
-      is_training: True
+      shuffle: True
 
     loader:
       num_workers: 4
