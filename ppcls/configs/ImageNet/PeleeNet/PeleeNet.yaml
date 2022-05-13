@@ -36,7 +36,7 @@ Optimizer:
   momentum: 0.9
   lr:
     name: Cosine
-    learning_rate: 0.25  # for total batch size 512
+    learning_rate: 0.18  # for total batch size 512
   regularizer:
     name: 'L2'
     coeff: 0.0001
