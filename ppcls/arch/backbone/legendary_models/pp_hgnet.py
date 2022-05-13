@@ -27,7 +27,8 @@ MODEL_URLS = {
     "PPHGNet_tiny":
     "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/PPHGNet_tiny_pretrained.pdparams",
     "PPHGNet_small":
-    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/PPHGNet_small_pretrained.pdparams"
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/PPHGNet_small_pretrained.pdparams",
+    "PPHGNet_base": ""
 }
 
 __all__ = list(MODEL_URLS.keys())
