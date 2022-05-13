@@ -24,6 +24,7 @@ from ppcls.arch.backbone.legendary_models.hrnet import HRNet_W18_C, HRNet_W30_C,
 from ppcls.arch.backbone.legendary_models.pp_lcnet import PPLCNet_x0_25, PPLCNet_x0_35, PPLCNet_x0_5, PPLCNet_x0_75, PPLCNet_x1_0, PPLCNet_x1_5, PPLCNet_x2_0, PPLCNet_x2_5
 from ppcls.arch.backbone.legendary_models.pp_lcnet_v2 import PPLCNetV2_base
 from ppcls.arch.backbone.legendary_models.esnet import ESNet_x0_25, ESNet_x0_5, ESNet_x0_75, ESNet_x1_0
+from ppcls.arch.backbone.legendary_models.pp_hgnet import PPHGNet_tiny, PPHGNet_small, PPHGNet_base
 
 from ppcls.arch.backbone.model_zoo.resnet_vc import ResNet50_vc
 from ppcls.arch.backbone.model_zoo.resnext import ResNeXt50_32x4d, ResNeXt50_64x4d, ResNeXt101_32x4d, ResNeXt101_64x4d, ResNeXt152_32x4d, ResNeXt152_64x4d
