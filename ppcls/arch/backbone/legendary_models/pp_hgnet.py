@@ -90,7 +90,7 @@ class ESEModule(TheseusLayer):
         return paddle.multiply(x=identity, y=x)
 
 
-class _HG_Block(TheseusLayer):
+class HG_Block(TheseusLayer):
     def __init__(
             self,
             in_channels,
@@ -140,7 +140,7 @@ class _HG_Block(TheseusLayer):
         return x
 
 
-class _HG_Stage(TheseusLayer):
+class HG_Stage(TheseusLayer):
     def __init__(self,
                  in_channels,
                  mid_channels,
@@ -161,7 +161,7 @@ class _HG_Stage(TheseusLayer):
 
         blocks_list = []
         blocks_list.append(
-            _HG_Block(
+            HG_Block(
                 in_channels,
                 mid_channels,
                 out_channels,
@@ -169,7 +169,7 @@ class _HG_Stage(TheseusLayer):
                 identity=False))
         for _ in range(block_num - 1):
             blocks_list.append(
-                _HG_Block(
+                HG_Block(
                     out_channels,
                     mid_channels,
                     out_channels,
@@ -228,7 +228,7 @@ class PPHGNet(TheseusLayer):
             in_channels, mid_channels, out_channels, block_num, downsample = stage_config[
                 k]
             self.stages.append(
-                _HG_Stage(in_channels, mid_channels, out_channels, block_num,
+                HG_Stage(in_channels, mid_channels, out_channels, block_num,
                           layer_num, downsample))
 
         self.avg_pool = AdaptiveAvgPool2D(1)
