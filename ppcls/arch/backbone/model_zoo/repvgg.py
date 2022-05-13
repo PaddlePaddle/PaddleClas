@@ -124,13 +124,7 @@ class RepVGGBlock(nn.Layer):
             groups=groups)
 
     def forward(self, inputs):
-        if not self.training and not self.is_repped:
-            self.rep()
-            self.is_repped = True
-        if self.training and self.is_repped:
-            self.is_repped = False
-
-        if not self.training:
+        if self.is_repped:
             return self.nonlinearity(self.rbr_reparam(inputs))
 
         if self.rbr_identity is None:
@@ -154,6 +148,7 @@ class RepVGGBlock(nn.Layer):
         kernel, bias = self.get_equivalent_kernel_bias()
         self.rbr_reparam.weight.set_value(kernel)
         self.rbr_reparam.bias.set_value(bias)
+        self.is_repped = True
 
     def get_equivalent_kernel_bias(self):
         kernel3x3, bias3x3 = self._fuse_bn_tensor(self.rbr_dense)
