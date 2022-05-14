@@ -72,7 +72,7 @@ DataLoader:
     dataset:
       name: ImageNetDataset
       image_root: ./dataset/person/
-      cls_label_path: ./dataset/person/train_list.txt
+      cls_label_path: ./dataset/person/train_list_for_distill.txt
       transform_ops:
         - DecodeImage:
             to_rgb: True
