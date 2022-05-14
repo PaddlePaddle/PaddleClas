@@ -71,8 +71,8 @@ DataLoader:
   Train:
     dataset:
       name: ImageNetDataset
-      image_root: ./dataset/coco/
-      cls_label_path: ./dataset/coco/train_list.txt
+      image_root: ./dataset/person/
+      cls_label_path: ./dataset/person/train_list.txt
       transform_ops:
         - DecodeImage:
             to_rgb: True
@@ -111,8 +111,8 @@ DataLoader:
   Eval:
     dataset: 
       name: ImageNetDataset
-      image_root: ./dataset/coco/
-      cls_label_path: ./dataset/coco/val_list.txt
+      image_root: ./dataset/person/
+      cls_label_path: ./dataset/person/val_list.txt
       transform_ops:
         - DecodeImage:
             to_rgb: True
