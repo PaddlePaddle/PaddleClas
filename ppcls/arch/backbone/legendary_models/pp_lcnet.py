@@ -17,7 +17,7 @@ from __future__ import absolute_import, division, print_function
 import paddle
 import paddle.nn as nn
 from paddle import ParamAttr
-from paddle.nn import AdaptiveAvgPool2D, BatchNorm, Conv2D, Dropout, Linear
+from paddle.nn import AdaptiveAvgPool2D, BatchNorm2D, Conv2D, Dropout, Linear
 from paddle.regularizer import L2Decay
 from paddle.nn.initializer import KaimingNormal
 from ppcls.arch.backbone.base.theseus_layer import TheseusLayer
@@ -83,7 +83,8 @@ class ConvBNLayer(TheseusLayer):
                  filter_size,
                  num_filters,
                  stride,
-                 num_groups=1):
+                 num_groups=1,
+                 lr_mult=1.0):
         super().__init__()
 
         self.conv = Conv2D(
@@ -93,13 +94,13 @@ class ConvBNLayer(TheseusLayer):
             stride=stride,
             padding=(filter_size - 1) // 2,
             groups=num_groups,
-            weight_attr=ParamAttr(initializer=KaimingNormal()),
+            weight_attr=ParamAttr(initializer=KaimingNormal(), learning_rate=lr_mult),
             bias_attr=False)
 
-        self.bn = BatchNorm(
+        self.bn = BatchNorm2D(
             num_filters,
-            param_attr=ParamAttr(regularizer=L2Decay(0.0)),
-            bias_attr=ParamAttr(regularizer=L2Decay(0.0)))
+            weight_attr=ParamAttr(regularizer=L2Decay(0.0), learning_rate=lr_mult),
+            bias_attr=ParamAttr(regularizer=L2Decay(0.0), learning_rate=lr_mult))
         self.hardswish = nn.Hardswish()
 
     def forward(self, x):
@@ -115,7 +116,8 @@ class DepthwiseSeparable(TheseusLayer):
                  num_filters,
                  stride,
                  dw_size=3,
-                 use_se=False):
+                 use_se=False,
+                 lr_mult=1.0):
         super().__init__()
         self.use_se = use_se
         self.dw_conv = ConvBNLayer(
@@ -123,14 +125,17 @@ class DepthwiseSeparable(TheseusLayer):
             num_filters=num_channels,
             filter_size=dw_size,
             stride=stride,
-            num_groups=num_channels)
+            num_groups=num_channels,
+            lr_mult=lr_mult)
         if use_se:
-            self.se = SEModule(num_channels)
+            self.se = SEModule(num_channels,
+                               lr_mult=lr_mult)
         self.pw_conv = ConvBNLayer(
             num_channels=num_channels,
             filter_size=1,
             num_filters=num_filters,
-            stride=1)
+            stride=1,
+            lr_mult=lr_mult)
 
     def forward(self, x):
         x = self.dw_conv(x)
@@ -141,7 +146,7 @@ class DepthwiseSeparable(TheseusLayer):
 
 
 class SEModule(TheseusLayer):
-    def __init__(self, channel, reduction=4):
+    def __init__(self, channel, reduction=4, lr_mult=1.0):
         super().__init__()
         self.avg_pool = AdaptiveAvgPool2D(1)
         self.conv1 = Conv2D(
@@ -149,14 +154,18 @@ class SEModule(TheseusLayer):
             out_channels=channel // reduction,
             kernel_size=1,
             stride=1,
-            padding=0)
+            padding=0,
+            weight_attr=ParamAttr(learning_rate=lr_mult),
+            bias_attr=ParamAttr(learning_rate=lr_mult))
         self.relu = nn.ReLU()
         self.conv2 = Conv2D(
             in_channels=channel // reduction,
             out_channels=channel,
             kernel_size=1,
             stride=1,
-            padding=0)
+            padding=0,
+            weight_attr=ParamAttr(learning_rate=lr_mult),
+            bias_attr=ParamAttr(learning_rate=lr_mult))
         self.hardsigmoid = nn.Hardsigmoid()
 
     def forward(self, x):
@@ -175,19 +184,34 @@ class PPLCNet(TheseusLayer):
                  stages_pattern,
                  scale=1.0,
                  class_num=1000,
-                 dropout_prob=0.2,
+                 dropout_prob=0.0,
                  class_expand=1280,
+                 lr_mult_list=[1.0, 1.0, 1.0, 1.0, 1.0, 1.0],
+                 use_last_conv=True,
                  return_patterns=None,
                  return_stages=None):
         super().__init__()
         self.scale = scale
         self.class_expand = class_expand
+        self.lr_mult_list = lr_mult_list
+        self.use_last_conv = use_last_conv
+        if isinstance(self.lr_mult_list, str):
+            self.lr_mult_list = eval(self.lr_mult_list)
+
+        assert isinstance(self.lr_mult_list, (
+            list, tuple
+        )), "lr_mult_list should be in (list, tuple) but got {}".format(
+            type(self.lr_mult_list))
+        assert len(self.lr_mult_list
+                   ) == 6, "lr_mult_list length should be 5 but got {}".format(
+                       len(self.lr_mult_list))
 
         self.conv1 = ConvBNLayer(
             num_channels=3,
             filter_size=3,
             num_filters=make_divisible(16 * scale),
-            stride=2)
+            stride=2,
+            lr_mult=self.lr_mult_list[0])
 
         self.blocks2 = nn.Sequential(* [
             DepthwiseSeparable(
@@ -195,7 +219,8 @@ class PPLCNet(TheseusLayer):
                 num_filters=make_divisible(out_c * scale),
                 dw_size=k,
                 stride=s,
-                use_se=se)
+                use_se=se,
+                lr_mult=self.lr_mult_list[1])
             for i, (k, in_c, out_c, s, se) in enumerate(NET_CONFIG["blocks2"])
         ])
 
@@ -205,7 +230,8 @@ class PPLCNet(TheseusLayer):
                 num_filters=make_divisible(out_c * scale),
                 dw_size=k,
                 stride=s,
-                use_se=se)
+                use_se=se,
+                lr_mult=self.lr_mult_list[2])
             for i, (k, in_c, out_c, s, se) in enumerate(NET_CONFIG["blocks3"])
         ])
 
@@ -215,7 +241,8 @@ class PPLCNet(TheseusLayer):
                 num_filters=make_divisible(out_c * scale),
                 dw_size=k,
                 stride=s,
-                use_se=se)
+                use_se=se,
+                lr_mult=self.lr_mult_list[3])
             for i, (k, in_c, out_c, s, se) in enumerate(NET_CONFIG["blocks4"])
         ])
 
@@ -225,7 +252,8 @@ class PPLCNet(TheseusLayer):
                 num_filters=make_divisible(out_c * scale),
                 dw_size=k,
                 stride=s,
-                use_se=se)
+                use_se=se,
+                lr_mult=self.lr_mult_list[4])
             for i, (k, in_c, out_c, s, se) in enumerate(NET_CONFIG["blocks5"])
         ])
 
@@ -235,25 +263,26 @@ class PPLCNet(TheseusLayer):
                 num_filters=make_divisible(out_c * scale),
                 dw_size=k,
                 stride=s,
-                use_se=se)
+                use_se=se,
+                lr_mult=self.lr_mult_list[5])
             for i, (k, in_c, out_c, s, se) in enumerate(NET_CONFIG["blocks6"])
         ])
 
         self.avg_pool = AdaptiveAvgPool2D(1)
-
-        self.last_conv = Conv2D(
-            in_channels=make_divisible(NET_CONFIG["blocks6"][-1][2] * scale),
-            out_channels=self.class_expand,
-            kernel_size=1,
-            stride=1,
-            padding=0,
-            bias_attr=False)
-
-        self.hardswish = nn.Hardswish()
-        self.dropout = Dropout(p=dropout_prob, mode="downscale_in_infer")
+        if self.use_last_conv:
+            self.last_conv = Conv2D(
+                in_channels=make_divisible(NET_CONFIG["blocks6"][-1][2] * scale),
+                out_channels=self.class_expand,
+                kernel_size=1,
+                stride=1,
+                padding=0,
+                bias_attr=False)
+            self.hardswish = nn.Hardswish()
+            self.dropout = Dropout(p=dropout_prob, mode="downscale_in_infer")
+        else:
+            self.last_conv = None
         self.flatten = nn.Flatten(start_axis=1, stop_axis=-1)
-
-        self.fc = Linear(self.class_expand, class_num)
+        self.fc = Linear(self.class_expand if self.use_last_conv else NET_CONFIG["blocks6"][-1][2], class_num)
 
         super().init_res(
             stages_pattern,
@@ -270,9 +299,10 @@ class PPLCNet(TheseusLayer):
         x = self.blocks6(x)
 
         x = self.avg_pool(x)
-        x = self.last_conv(x)
-        x = self.hardswish(x)
-        x = self.dropout(x)
+        if self.last_conv is not None:
+            x = self.last_conv(x)
+            x = self.hardswish(x)
+            x = self.dropout(x)
         x = self.flatten(x)
         x = self.fc(x)
         return x
@@ -291,7 +321,7 @@ def _load_pretrained(pretrained, model, model_url, use_ssld):
         )
 
 
-def PPLCNet_x0_25(pretrained=False, use_ssld=False, **kwargs):
+def PPLCNet_x0_25(pretrained=False, use_ssld=False, use_sync_bn=False, **kwargs):
     """
     PPLCNet_x0_25
     Args:
@@ -307,7 +337,7 @@ def PPLCNet_x0_25(pretrained=False, use_ssld=False, **kwargs):
     return model
 
 
-def PPLCNet_x0_35(pretrained=False, use_ssld=False, **kwargs):
+def PPLCNet_x0_35(pretrained=False, use_ssld=False, use_sync_bn=False, **kwargs):
     """
     PPLCNet_x0_35
     Args:
@@ -323,7 +353,7 @@ def PPLCNet_x0_35(pretrained=False, use_ssld=False, **kwargs):
     return model
 
 
-def PPLCNet_x0_5(pretrained=False, use_ssld=False, **kwargs):
+def PPLCNet_x0_5(pretrained=False, use_ssld=False, use_sync_bn=False, **kwargs):
     """
     PPLCNet_x0_5
     Args:
@@ -339,7 +369,7 @@ def PPLCNet_x0_5(pretrained=False, use_ssld=False, **kwargs):
     return model
 
 
-def PPLCNet_x0_75(pretrained=False, use_ssld=False, **kwargs):
+def PPLCNet_x0_75(pretrained=False, use_ssld=False, use_sync_bn=False, **kwargs):
     """
     PPLCNet_x0_75
     Args:
@@ -355,7 +385,7 @@ def PPLCNet_x0_75(pretrained=False, use_ssld=False, **kwargs):
     return model
 
 
-def PPLCNet_x1_0(pretrained=False, use_ssld=False, **kwargs):
+def PPLCNet_x1_0(pretrained=False, use_ssld=False, use_sync_bn=False, **kwargs):
     """
     PPLCNet_x1_0
     Args:
@@ -371,7 +401,7 @@ def PPLCNet_x1_0(pretrained=False, use_ssld=False, **kwargs):
     return model
 
 
-def PPLCNet_x1_5(pretrained=False, use_ssld=False, **kwargs):
+def PPLCNet_x1_5(pretrained=False, use_ssld=False, use_sync_bn=False, **kwargs):
     """
     PPLCNet_x1_5
     Args:
@@ -387,7 +417,7 @@ def PPLCNet_x1_5(pretrained=False, use_ssld=False, **kwargs):
     return model
 
 
-def PPLCNet_x2_0(pretrained=False, use_ssld=False, **kwargs):
+def PPLCNet_x2_0(pretrained=False, use_ssld=False, use_sync_bn=False, **kwargs):
     """
     PPLCNet_x2_0
     Args:
@@ -403,7 +433,7 @@ def PPLCNet_x2_0(pretrained=False, use_ssld=False, **kwargs):
     return model
 
 
-def PPLCNet_x2_5(pretrained=False, use_ssld=False, **kwargs):
+def PPLCNet_x2_5(pretrained=False, use_ssld=False, use_sync_bn=False, **kwargs):
     """
     PPLCNet_x2_5
     Args:
