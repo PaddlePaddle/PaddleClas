@@ -23,13 +23,16 @@ search_dict:
     search_values: [0.0, 0.1, 0.5]
   lr_mult_list:
     replace_config:
-      - Arch.models.1.Student.lr_mult_list
+      - Arch.lr_mult_list
     search_values:
       - [0.0, 0.2, 0.4, 0.6, 0.8, 1.0]
       - [0.0, 0.4, 0.4, 0.8, 0.8, 1.0]
 teacher:
   rm_keys:
-    - Arch.models.1.Student.lr_mult_list
+    - Arch.lr_mult_list
   search_values:
     - ResNet101_vd
     - ResNet50_vd
+final_replace:
+  Arch.lr_mult_list: Arch.models.1.Student.lr_mult_list
+

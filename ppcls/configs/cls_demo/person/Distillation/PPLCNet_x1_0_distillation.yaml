@@ -33,7 +33,6 @@ Arch:
     - Teacher:
         name: ResNet101_vd
         class_num: *class_num
-        pretrained: "./output/TEACHER_ResNet101_vd/ResNet101_vd/best_model"
     - Student:
         name: PPLCNet_x1_0
         class_num: *class_num
