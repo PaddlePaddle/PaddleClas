@@ -321,7 +321,7 @@ def _load_pretrained(pretrained, model, model_url, use_ssld):
         )
 
 
-def PPLCNet_x0_25(pretrained=False, use_ssld=False, use_sync_bn=False, **kwargs):
+def PPLCNet_x0_25(pretrained=False, use_ssld=False, **kwargs):
     """
     PPLCNet_x0_25
     Args:
@@ -337,7 +337,7 @@ def PPLCNet_x0_25(pretrained=False, use_ssld=False, use_sync_bn=False, **kwargs)
     return model
 
 
-def PPLCNet_x0_35(pretrained=False, use_ssld=False, use_sync_bn=False, **kwargs):
+def PPLCNet_x0_35(pretrained=False, use_ssld=False, **kwargs):
     """
     PPLCNet_x0_35
     Args:
@@ -353,7 +353,7 @@ def PPLCNet_x0_35(pretrained=False, use_ssld=False, use_sync_bn=False, **kwargs)
     return model
 
 
-def PPLCNet_x0_5(pretrained=False, use_ssld=False, use_sync_bn=False, **kwargs):
+def PPLCNet_x0_5(pretrained=False, use_ssld=False, **kwargs):
     """
     PPLCNet_x0_5
     Args:
@@ -369,7 +369,7 @@ def PPLCNet_x0_5(pretrained=False, use_ssld=False, use_sync_bn=False, **kwargs):
     return model
 
 
-def PPLCNet_x0_75(pretrained=False, use_ssld=False, use_sync_bn=False, **kwargs):
+def PPLCNet_x0_75(pretrained=False, use_ssld=False, **kwargs):
     """
     PPLCNet_x0_75
     Args:
@@ -385,7 +385,7 @@ def PPLCNet_x0_75(pretrained=False, use_ssld=False, use_sync_bn=False, **kwargs)
     return model
 
 
-def PPLCNet_x1_0(pretrained=False, use_ssld=False, use_sync_bn=False, **kwargs):
+def PPLCNet_x1_0(pretrained=False, use_ssld=False, **kwargs):
     """
     PPLCNet_x1_0
     Args:
@@ -401,7 +401,7 @@ def PPLCNet_x1_0(pretrained=False, use_ssld=False, use_sync_bn=False, **kwargs):
     return model
 
 
-def PPLCNet_x1_5(pretrained=False, use_ssld=False, use_sync_bn=False, **kwargs):
+def PPLCNet_x1_5(pretrained=False, use_ssld=False, **kwargs):
     """
     PPLCNet_x1_5
     Args:
@@ -417,7 +417,7 @@ def PPLCNet_x1_5(pretrained=False, use_ssld=False, use_sync_bn=False, **kwargs):
     return model
 
 
-def PPLCNet_x2_0(pretrained=False, use_ssld=False, use_sync_bn=False, **kwargs):
+def PPLCNet_x2_0(pretrained=False, use_ssld=False, **kwargs):
     """
     PPLCNet_x2_0
     Args:
@@ -433,7 +433,7 @@ def PPLCNet_x2_0(pretrained=False, use_ssld=False, use_sync_bn=False, **kwargs):
     return model
 
 
-def PPLCNet_x2_5(pretrained=False, use_ssld=False, use_sync_bn=False, **kwargs):
+def PPLCNet_x2_5(pretrained=False, use_ssld=False, **kwargs):
     """
     PPLCNet_x2_5
     Args:

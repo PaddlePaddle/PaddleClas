@@ -35,8 +35,11 @@ __all__ = ["build_model", "RecModel", "DistillationModel", "AttentionModel"]
 def build_model(config):
     arch_config = copy.deepcopy(config["Arch"])
     model_type = arch_config.pop("name")
+    use_sync_bn = arch_config.pop("use_sync_bn", False)
     mod = importlib.import_module(__name__)
     arch = getattr(mod, model_type)(**arch_config)
+    if use_sync_bn:
+        arch = nn.SyncBatchNorm.convert_sync_batchnorm(arch)
     if isinstance(arch, TheseusLayer):
         prune_model(config, arch)
         quantize_model(config, arch)
