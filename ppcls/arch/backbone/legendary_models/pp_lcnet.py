@@ -184,7 +184,7 @@ class PPLCNet(TheseusLayer):
                  stages_pattern,
                  scale=1.0,
                  class_num=1000,
-                 dropout_prob=0.0,
+                 dropout_prob=0.2,
                  class_expand=1280,
                  lr_mult_list=[1.0, 1.0, 1.0, 1.0, 1.0, 1.0],
                  use_last_conv=True,
