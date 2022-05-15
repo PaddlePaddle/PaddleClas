@@ -94,9 +94,9 @@ def search_strategy():
         v = final_replace[k]
         base_program[i] = base_program[i].replace(k, v)
 
-    subprocess.Popen(base_program)
-    subprocess.communicate()
     print(all_results, base_program)
+    process = subprocess.Popen(base_program)
+    process.communicate()
 
 
 if __name__ == '__main__':

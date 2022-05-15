@@ -1,7 +1,7 @@
 base_config_file: ppcls/configs/cls_demo/person/PPLCNet/PPLCNet_x1_0.yaml
 distill_config_file: ppcls/configs/cls_demo/person/Distillation/PPLCNet_x1_0_distillation.yaml
 
-gpus: 0,1,2,3,4,5,6,7
+gpus: 0,1,2,3
 output_dir: output/search_person
 search_dict:
   lrs:
