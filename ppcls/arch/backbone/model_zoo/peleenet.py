@@ -134,7 +134,7 @@ class BasicConv2d(nn.Layer):
             return x
 
 
-class PeleeNet(nn.Layer):
+class PeleeNetDY(nn.Layer):
     r"""PeleeNet model class, based on
     `"Densely Connected Convolutional Networks" <https://arxiv.org/pdf/1608.06993.pdf> and
      "Pelee: A Real-Time Object Detection System on Mobile Devices" <https://arxiv.org/pdf/1804.06882.pdf>`
@@ -153,7 +153,7 @@ class PeleeNet(nn.Layer):
                  num_init_features=32, bottleneck_width=[1, 2, 4, 4],
                  drop_rate=0.05, class_num=1000):
 
-        super(PeleeNet, self).__init__()
+        super(PeleeNetDY, self).__init__()
 
         self.features = nn.Sequential(*[
             ('stemblock', _StemBlock(3, num_init_features)),
@@ -233,7 +233,7 @@ def _load_pretrained(pretrained, model, model_url, use_ssld):
         )
 
 
-def peleenet(pretrained=False, use_ssld=False, **kwargs):
-    model = PeleeNet(**kwargs)
+def PeleeNet(pretrained=False, use_ssld=False, **kwargs):
+    model = PeleeNetDY(**kwargs)
     _load_pretrained(pretrained, model, MODEL_URLS["peleenet"], use_ssld)
     return model

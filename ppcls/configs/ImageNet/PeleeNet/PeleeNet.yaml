@@ -65,7 +65,7 @@ DataLoader:
 
     sampler:
       name: DistributedBatchSampler
-      batch_size: 256  # for 2 cards
+      batch_size: 128
       drop_last: False
       shuffle: True
     loader:
