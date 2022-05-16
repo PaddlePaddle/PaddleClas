@@ -39,6 +39,7 @@ class CombinedMetrics(AvgMetrics):
                     eval(metric_name)(**metric_params))
             else:
                 self.metric_func_list.append(eval(metric_name)())
+        self.reset()
 
     def forward(self, *args, **kwargs):
         metric_dict = OrderedDict()
@@ -54,6 +55,10 @@ class CombinedMetrics(AvgMetrics):
     def avg(self):
         return self.metric_func_list[0].avg
 
+    def reset(self):
+        for metric in self.metric_func_list:
+            if hasattr(metric, "reset"):
+                metric.reset()
 
 def build_metrics(config):
     metrics_list = CombinedMetrics(copy.deepcopy(config))

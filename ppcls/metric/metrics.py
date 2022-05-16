@@ -33,6 +33,9 @@ class TopkAcc(AvgMetrics):
         if isinstance(topk, int):
             topk = [topk]
         self.topk = topk
+        self.reset()
+
+    def reset(self):
         self.avg_meters = {"top{}".format(k): AverageMeter("top{}".format(k)) for k in self.topk}
 
     def forward(self, x, label):
@@ -316,6 +319,9 @@ class HammingDistance(MultiLabelMetric):
 
     def __init__(self):
         super().__init__()
+        self.reset()
+
+    def reset(self):
         self.avg_meters = {"HammingDistance": AverageMeter("HammingDistance")}
 
     def forward(self, output, target):
@@ -343,6 +349,10 @@ class AccuracyScore(MultiLabelMetric):
         assert base in ["sample", "label"
                         ], 'must be one of ["sample", "label"]'
         self.base = base
+        self.reset()
+
+    def reset(self):
+        self.avg_meters = {"AccuracyScore": AverageMeter("AccuracyScore")}
 
     def forward(self, output, target):
         preds = super()._multi_hot_encode(output)
