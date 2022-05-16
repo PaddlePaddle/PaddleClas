@@ -1,4 +1,19 @@
+# copyright (c) 2022 PaddlePaddle Authors. All Rights Reserve.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#    http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 # This code is based on AdaFace(https://github.com/mk-minchul/AdaFace)
+# Paper: AdaFace: Quality Adaptive Margin for Face Recognition
 from paddle.nn import Layer
 import math
 import paddle
@@ -21,8 +36,17 @@ class AdaMargin(Layer):
             t_alpha=1.0, ):
         super(AdaMargin, self).__init__()
         self.classnum = class_num
+        kernel_weight = paddle.uniform(
+            [embedding_size, class_num], min=-1, max=1)
+        kernel_weight_norm = paddle.norm(
+            kernel_weight, p=2, axis=0, keepdim=True)
+        kernel_weight_norm = paddle.where(kernel_weight_norm > 1e-5,
+                                          kernel_weight_norm,
+                                          paddle.ones_like(kernel_weight_norm))
+        kernel_weight = kernel_weight / kernel_weight_norm
         self.kernel = self.create_parameter(
-            [embedding_size, class_num], attr=paddle.nn.initializer.Uniform())
+            [embedding_size, class_num],
+            attr=paddle.nn.initializer.Assign(kernel_weight))
 
         # initial kernel
         # self.kernel.data.uniform_(-1, 1).renorm_(2,1,1e-5).mul_(1e5)
@@ -39,14 +63,10 @@ class AdaMargin(Layer):
         self.register_buffer(
             'batch_std', paddle.ones([1]) * 100, persistable=True)
 
-        print('\n\AdaFace with the following property')
-        print('self.m', self.m)
-        print('self.h', self.h)
-        print('self.s', self.s)
-        print('self.t_alpha', self.t_alpha)
+    def forward(self, embbedings, label):
 
-    def forward(self, embbedings, norms, label):
-
+        norms = paddle.norm(embbedings, 2, 1, True)
+        embbedings = paddle.divide(embbedings, norms)
         kernel_norm = l2_norm(self.kernel, axis=0)
         cosine = paddle.mm(embbedings, kernel_norm)
         cosine = paddle.clip(cosine, -1 + self.eps,
@@ -70,7 +90,8 @@ class AdaMargin(Layer):
         margin_scaler = paddle.clip(margin_scaler, -1, 1)
 
         # g_angular
-        m_arc = paddle.nn.functional.one_hot(label, self.classnum)
+        m_arc = paddle.nn.functional.one_hot(
+            label.reshape([-1]), self.classnum)
         g_angular = self.m * margin_scaler * -1
         m_arc = m_arc * g_angular
         theta = paddle.acos(cosine)
@@ -79,7 +100,8 @@ class AdaMargin(Layer):
         cosine = paddle.cos(theta_m)
 
         # g_additive
-        m_cos = paddle.nn.functional.one_hot(label, self.classnum)
+        m_cos = paddle.nn.functional.one_hot(
+            label.reshape([-1]), self.classnum)
         g_add = self.m + (self.m * margin_scaler)
         m_cos = m_cos * g_add
         cosine = cosine - m_cos

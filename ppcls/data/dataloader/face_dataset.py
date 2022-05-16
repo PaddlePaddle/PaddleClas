@@ -10,26 +10,9 @@ from paddle.vision import transforms
 from paddle.vision.transforms import functional as F
 from paddle.io import Dataset
 from .common_dataset import create_operators
+from ppcls.data.preprocess import transform as transform_func
 
 # code is based on AdaFace: https://github.com/mk-minchul/AdaFace
-
-
-def train_dataset(train_dir, label_path, low_res_augmentation_prob,
-                  crop_augmentation_prob, photometric_augmentation_prob):
-
-    # train_dir = os.path.join(data_root, train_data_path)
-    train_dataset = AdaFaceDataset(
-        root_dir=train_dir,
-        label_path=label_path,
-        transform=transforms.Compose([
-            transforms.RandomHorizontalFlip(), transforms.ToTensor(),
-            transforms.Normalize([0.5, 0.5, 0.5], [0.5, 0.5, 0.5])
-        ]),
-        low_res_augmentation_prob=low_res_augmentation_prob,
-        crop_augmentation_prob=crop_augmentation_prob,
-        photometric_augmentation_prob=photometric_augmentation_prob, )
-
-    return train_dataset
 
 
 def _get_image_size(img):
@@ -95,7 +78,7 @@ class AdaFaceDataset(Dataset):
 
         sample, _ = self.augment(sample)
         if self.transform is not None:
-            sample = self.transform(sample)
+            sample = transform_func(sample, self.transform)
 
         return sample, target
 
@@ -125,16 +108,6 @@ class AdaFaceDataset(Dataset):
 
         # photometric augmentation
         if np.random.random() < self.photometric_augmentation_prob:
-            # fn_idx, brightness_factor, contrast_factor, saturation_factor, hue_factor = \
-            # self.photometric._get_params(self.photometric.brightness, self.photometric.contrast,
-            #                                       self.photometric.saturation, self.photometric.hue)
-            # for fn_id in fn_idx:
-            #     if fn_id == 0 and brightness_factor is not None:
-            #         sample = F.adjust_brightness(sample, brightness_factor)
-            #     elif fn_id == 1 and contrast_factor is not None:
-            #         sample = F.adjust_contrast(sample, contrast_factor)
-            #     elif fn_id == 2 and saturation_factor is not None:
-            #         sample = F.adjust_saturation(sample, saturation_factor)
             sample = self.photometric(sample)
         information_score = resize_ratio * crop_ratio
         return sample, information_score
@@ -270,16 +243,3 @@ def get_val_data(data_path):
     cplfw, cplfw_issame = get_val_pair(data_path, 'cplfw')
     calfw, calfw_issame = get_val_pair(data_path, 'calfw')
     return agedb_30, cfp_fp, lfw, agedb_30_issame, cfp_fp_issame, lfw_issame, cplfw, cplfw_issame, calfw, calfw_issame
-
-
-if __name__ == "__main__":
-    t_dataset = train_dataset('/work/dataset/face/',
-                              '/work/dataset/face/train_filter_label.txt', 1,
-                              1, 1)
-    img = t_dataset.__getitem__(100)
-    print(len(t_dataset))
-
-    val = FiveValidationDataset(
-        '/work/dataset/face/faces_emore',
-        '/work/dataset/face/faces_emore/concat_validation_memfile')
-    a = 1

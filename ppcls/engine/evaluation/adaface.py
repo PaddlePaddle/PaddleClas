@@ -30,7 +30,7 @@ def fuse_features_with_norm(stacked_embeddings, stacked_norms):
     assert stacked_embeddings.ndim == 3  # (n_features_to_fuse, batch_size, channel)
     assert stacked_norms.ndim == 3  # (n_features_to_fuse, batch_size, 1)
     pre_norm_embeddings = stacked_embeddings * stacked_norms
-    fused = pre_norm_embeddings.sum(dim=0)
+    fused = pre_norm_embeddings.sum(axis=0)
     norm = paddle.norm(fused, 2, 1, True)
     fused = paddle.divide(fused, norm)
     return fused, norm
@@ -57,12 +57,14 @@ def adaface_eval(engine, epoch_id=0):
         time_info["reader_cost"].update(time.time() - tic)
         batch_size = images.shape[0]
         batch[0] = paddle.to_tensor(images)
-        embeddings = engine.model(images)["features"]
+        embeddings = engine.model(images, labels)['features']
         norms = paddle.divide(embeddings, paddle.norm(embeddings, 2, 1, True))
+        embeddings = paddle.divide(embeddings, norms)
         fliped_images = paddle.flip(images, axis=[3])
-        flipped_embeddings = engine.model(fliped_images)["features"]
+        flipped_embeddings = engine.model(fliped_images, labels)['features']
         flipped_norms = paddle.divide(
             flipped_embeddings, paddle.norm(flipped_embeddings, 2, 1, True))
+        flipped_embeddings = paddle.divide(flipped_embeddings, flipped_norms)
         stacked_embeddings = paddle.stack(
             [embeddings, flipped_embeddings], axis=0)
         stacked_norms = paddle.stack([norms, flipped_norms], axis=0)
@@ -114,20 +116,21 @@ def adaface_eval(engine, epoch_id=0):
     metric_msg = ", ".join([
         "{}: {:.5f}".format(key, output_info[key].avg) for key in output_info
     ])
-    face_msg = ", ".join(
-        ["{}: {:.5f}".format(key, output_info[key]) for key in eval_result])
+    face_msg = ", ".join([
+        "{}: {:.5f}".format(key, eval_result[key])
+        for key in eval_result.keys()
+    ])
     logger.info("[Eval][Epoch {}][Avg]{}".format(epoch_id, metric_msg + ", " +
                                                  face_msg))
 
-    # do not try to save best eval.model
-    if engine.eval_metric_func is None:
-        return -1
     # return 1st metric in the dict
-    return output_info[metric_key].avg
+    return eval_result['all_test_acc']
 
 
 def cal_metric(all_output_tensor, all_norm_tensor, all_target_tensor,
                all_dataname_tensor):
+    all_target_tensor = all_target_tensor.reshape([-1])
+    all_dataname_tensor = all_dataname_tensor.reshape([-1])
     dataname_to_idx = {
         "agedb_30": 0,
         "cfp_fp": 1,

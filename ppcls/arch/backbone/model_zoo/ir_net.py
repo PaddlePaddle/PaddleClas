@@ -1,3 +1,16 @@
+# copyright (c) 2022 PaddlePaddle Authors. All Rights Reserve.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#    http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 # this code is based on AdaFace(https://github.com/mk-minchul/AdaFace)
 from collections import namedtuple
 import paddle
@@ -10,28 +23,8 @@ from paddle.nn import BatchNorm1D, BatchNorm2D
 from paddle.nn import ReLU, Sigmoid
 from paddle.nn import Layer
 from paddle.nn import PReLU
-from ppcls.arch.backbone.legendary_models.resnet import _load_pretrained
-import os
 
-# def initialize_weights(modules):
-#     """ Weight initilize, conv2d and linear is initialized with kaiming_normal
-#     """
-#     for m in modules:
-#         if isinstance(m, nn.Conv2D):
-#             nn.init.kaiming_normal_(m.weight,
-#                                     mode='fan_out',
-#                                     nonlinearity='relu')
-#             if m.bias is not None:
-#                 m.bias.data.zero_()
-#         elif isinstance(m, nn.BatchNorm2D):
-#             m.weight.data.fill_(1)
-#             m.bias.data.zero_()
-#         elif isinstance(m, nn.Linear):
-#             nn.init.kaiming_normal_(m.weight,
-#                                     mode='fan_out',
-#                                     nonlinearity='relu')
-#             if m.bias is not None:
-#                 m.bias.data.zero_()
+# from ppcls.arch.backbone.legendary_models.resnet import _load_pretrained
 
 
 class Flatten(Layer):
@@ -61,8 +54,14 @@ class LinearBlock(Layer):
             stride,
             padding,
             groups=groups,
+            weight_attr=nn.initializer.KaimingNormal(),
             bias_attr=None)
-        self.bn = BatchNorm2D(out_c)
+        weight_attr = paddle.ParamAttr(
+            regularizer=None, initializer=nn.initializer.Constant(value=1.0))
+        bias_attr = paddle.ParamAttr(
+            regularizer=None, initializer=nn.initializer.Constant(value=0.0))
+        self.bn = BatchNorm2D(
+            out_c, weight_attr=weight_attr, bias_attr=bias_attr)
 
     def forward(self, x):
         x = self.conv(x)
@@ -106,7 +105,11 @@ class GDC(Layer):
             stride=(1, 1),
             padding=(0, 0))
         self.conv_6_flatten = Flatten()
-        self.linear = Linear(in_c, embedding_size, bias_attr=False)
+        self.linear = Linear(
+            in_c,
+            embedding_size,
+            weight_attr=nn.initializer.KaimingNormal(),
+            bias_attr=False)
         self.bn = BatchNorm1D(
             embedding_size, weight_attr=False, bias_attr=False)
 
@@ -125,8 +128,7 @@ class SELayer(Layer):
     def __init__(self, channels, reduction):
         super(SELayer, self).__init__()
         self.avg_pool = nn.AdaptiveAvgPool2D(1)
-        weight_attr = paddle.framework.ParamAttr(
-            name="linear_weight",
+        weight_attr = paddle.ParamAttr(
             initializer=paddle.nn.initializer.XavierUniform())
         self.fc1 = Conv2D(
             channels,
@@ -142,6 +144,7 @@ class SELayer(Layer):
             channels,
             kernel_size=1,
             padding=0,
+            weight_attr=nn.initializer.KaimingNormal(),
             bias_attr=False)
 
         self.sigmoid = Sigmoid()
@@ -163,22 +166,44 @@ class BasicBlockIR(Layer):
 
     def __init__(self, in_channel, depth, stride):
         super(BasicBlockIR, self).__init__()
+
+        weight_attr = paddle.ParamAttr(
+            regularizer=None, initializer=nn.initializer.Constant(value=1.0))
+        bias_attr = paddle.ParamAttr(
+            regularizer=None, initializer=nn.initializer.Constant(value=0.0))
         if in_channel == depth:
             self.shortcut_layer = MaxPool2D(1, stride)
         else:
             self.shortcut_layer = Sequential(
                 Conv2D(
-                    in_channel, depth, (1, 1), stride, bias_attr=False),
-                BatchNorm2D(depth))
+                    in_channel,
+                    depth, (1, 1),
+                    stride,
+                    weight_attr=nn.initializer.KaimingNormal(),
+                    bias_attr=False),
+                BatchNorm2D(
+                    depth, weight_attr=weight_attr, bias_attr=bias_attr))
         self.res_layer = Sequential(
-            BatchNorm2D(in_channel),
+            BatchNorm2D(
+                in_channel, weight_attr=weight_attr, bias_attr=bias_attr),
             Conv2D(
-                in_channel, depth, (3, 3), (1, 1), 1, bias_attr=False),
-            BatchNorm2D(depth),
+                in_channel,
+                depth, (3, 3), (1, 1),
+                1,
+                weight_attr=nn.initializer.KaimingNormal(),
+                bias_attr=False),
+            BatchNorm2D(
+                depth, weight_attr=weight_attr, bias_attr=bias_attr),
             PReLU(depth),
             Conv2D(
-                depth, depth, (3, 3), stride, 1, bias_attr=False),
-            BatchNorm2D(depth))
+                depth,
+                depth, (3, 3),
+                stride,
+                1,
+                weight_attr=nn.initializer.KaimingNormal(),
+                bias_attr=False),
+            BatchNorm2D(
+                depth, weight_attr=weight_attr, bias_attr=bias_attr))
 
     def forward(self, x):
         shortcut = self.shortcut_layer(x)
@@ -194,32 +219,56 @@ class BottleneckIR(Layer):
     def __init__(self, in_channel, depth, stride):
         super(BottleneckIR, self).__init__()
         reduction_channel = depth // 4
+        weight_attr = paddle.ParamAttr(
+            regularizer=None, initializer=nn.initializer.Constant(value=1.0))
+        bias_attr = paddle.ParamAttr(
+            regularizer=None, initializer=nn.initializer.Constant(value=0.0))
         if in_channel == depth:
             self.shortcut_layer = MaxPool2D(1, stride)
         else:
             self.shortcut_layer = Sequential(
                 Conv2D(
-                    in_channel, depth, (1, 1), stride, bias_attr=False),
-                BatchNorm2D(depth))
+                    in_channel,
+                    depth, (1, 1),
+                    stride,
+                    weight_attr=nn.initializer.KaimingNormal(),
+                    bias_attr=False),
+                BatchNorm2D(
+                    depth, weight_attr=weight_attr, bias_attr=bias_attr))
         self.res_layer = Sequential(
-            BatchNorm2D(in_channel),
+            BatchNorm2D(
+                in_channel, weight_attr=weight_attr, bias_attr=bias_attr),
             Conv2D(
                 in_channel,
                 reduction_channel, (1, 1), (1, 1),
                 0,
+                weight_attr=nn.initializer.KaimingNormal(),
                 bias_attr=False),
-            BatchNorm2D(reduction_channel),
+            BatchNorm2D(
+                reduction_channel,
+                weight_attr=weight_attr,
+                bias_attr=bias_attr),
             PReLU(reduction_channel),
             Conv2D(
                 reduction_channel,
                 reduction_channel, (3, 3), (1, 1),
                 1,
+                weight_attr=nn.initializer.KaimingNormal(),
                 bias_attr=False),
-            BatchNorm2D(reduction_channel),
+            BatchNorm2D(
+                reduction_channel,
+                weight_attr=weight_attr,
+                bias_attr=bias_attr),
             PReLU(reduction_channel),
             Conv2D(
-                reduction_channel, depth, (1, 1), stride, 0, bias_attr=False),
-            BatchNorm2D(depth))
+                reduction_channel,
+                depth, (1, 1),
+                stride,
+                0,
+                weight_attr=nn.initializer.KaimingNormal(),
+                bias_attr=False),
+            BatchNorm2D(
+                depth, weight_attr=weight_attr, bias_attr=bias_attr))
 
     def forward(self, x):
         shortcut = self.shortcut_layer(x)
@@ -317,10 +366,20 @@ class Backbone(Layer):
             "num_layers should be 18, 34, 50, 100 or 152"
         assert mode in ['ir', 'ir_se'], \
             "mode should be ir or ir_se"
+        weight_attr = paddle.ParamAttr(
+            regularizer=None, initializer=nn.initializer.Constant(value=1.0))
+        bias_attr = paddle.ParamAttr(
+            regularizer=None, initializer=nn.initializer.Constant(value=0.0))
         self.input_layer = Sequential(
             Conv2D(
-                3, 64, (3, 3), 1, 1, bias_attr=False),
-            BatchNorm2D(64),
+                3,
+                64, (3, 3),
+                1,
+                1,
+                weight_attr=nn.initializer.KaimingNormal(),
+                bias_attr=False),
+            BatchNorm2D(
+                64, weight_attr=weight_attr, bias_attr=bias_attr),
             PReLU(64))
         blocks = get_blocks(num_layers)
         if num_layers <= 100:
@@ -338,18 +397,30 @@ class Backbone(Layer):
 
         if input_size[0] == 112:
             self.output_layer = Sequential(
-                BatchNorm2D(output_channel),
+                BatchNorm2D(
+                    output_channel,
+                    weight_attr=weight_attr,
+                    bias_attr=bias_attr),
                 Dropout(0.4),
                 Flatten(),
-                Linear(output_channel * 7 * 7, 512),
+                Linear(
+                    output_channel * 7 * 7,
+                    512,
+                    weight_attr=nn.initializer.KaimingNormal()),
                 BatchNorm1D(
                     512, weight_attr=False, bias_attr=False))
         else:
             self.output_layer = Sequential(
-                BatchNorm2D(output_channel),
+                BatchNorm2D(
+                    output_channel,
+                    weight_attr=weight_attr,
+                    bias_attr=bias_attr),
                 Dropout(0.4),
                 Flatten(),
-                Linear(output_channel * 14 * 14, 512),
+                Linear(
+                    output_channel * 14 * 14,
+                    512,
+                    weight_attr=nn.initializer.KaimingNormal()),
                 BatchNorm1D(
                     512, weight_attr=False, bias_attr=False))
 

@@ -22,14 +22,14 @@ Arch:
   infer_add_softmax: False
   Backbone: 
     name: "IR_18"
-    pretrained: False
+    input_size: [112, 112]
   Head:
     name: "AdaMargin"  
     embedding_size: 512
     class_num: 70722
     m: 0.4
-    scale: 32
-    h: 0.3333
+    s: 64
+    h: 0.333
     t_alpha: 0.01
  
 # loss function config for traing/eval process
@@ -48,15 +48,15 @@ Optimizer:
     values: [0.1, 0.01, 0.001, 0.0001]
   regularizer:
     name: 'L2'
-    coeff: 0.0001
+    coeff: 0.0005
 
 # data loader for train and eval
 DataLoader:
   Train:
     dataset:
         name: "AdaFaceDataset"
-        root_dir: "/work/dataset/face/"
-        label_path: "/work/dataset/face/train_filter_label.txt"
+        root_dir: "dataset/face/"
+        label_path: "dataset/face/train_filter_label.txt"
         low_res_augmentation_prob: 0.2
         crop_augmentation_prob: 0.2
         photometric_augmentation_prob: 0.2
@@ -66,7 +66,6 @@ DataLoader:
           - Normalize:
               mean: [0.5, 0.5, 0.5]
               std: [0.5, 0.5, 0.5]
-
     sampler:
         name: DistributedBatchSampler
         batch_size: 256
@@ -75,16 +74,21 @@ DataLoader:
     loader:
         num_workers: 6
         use_shared_memory: True
+
   Eval:
     dataset:
       name: FiveValidationDataset
-      val_data_path: /work/dataset/face/faces_emore
-      concat_mem_file_name: /work/dataset/face/faces_emore/concat_validation_memfile
+      val_data_path: dataset/face/faces_emore
+      concat_mem_file_name: dataset/face/faces_emore/concat_validation_memfile
     sampler:
-        name: DistributedBatchSampler
+        name: BatchSampler
         batch_size: 256
         drop_last: False
         shuffle: True
     loader:
         num_workers: 6
         use_shared_memory: True
+Metric:
+  Train:
+    - TopkAcc:
+        topk: [1, 5]

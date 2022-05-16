@@ -25,7 +25,7 @@ import cv2
 import numpy as np
 from PIL import Image, ImageOps, __version__ as PILLOW_VERSION
 from paddle.vision.transforms import ColorJitter as RawColorJitter
-from paddle.vision.transforms import ToTensor, Normalize
+from paddle.vision.transforms import ToTensor, Normalize, RandomHorizontalFlip
 
 from .autoaugment import ImageNetPolicy
 from .functional import augmentations
@@ -463,8 +463,8 @@ class Pad(object):
         # Process fill color for affine transforms
         major_found, minor_found = (int(v)
                                     for v in PILLOW_VERSION.split('.')[:2])
-        major_required, minor_required = (
-            int(v) for v in min_pil_version.split('.')[:2])
+        major_required, minor_required = (int(v) for v in
+                                          min_pil_version.split('.')[:2])
         if major_found < major_required or (major_found == major_required and
                                             minor_found < minor_required):
             if fill is None:
