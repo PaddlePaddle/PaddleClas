@@ -452,6 +452,12 @@ class Engine(object):
                                   self.config["Global"]["pretrained_model"])
 
         model.eval()
+
+        # for rep nets
+        for layer in self.model.sublayers():
+            if hasattr(layer, "rep"):
+                layer.rep()
+
         save_path = os.path.join(self.config["Global"]["save_inference_dir"],
                                  "inference")
         if model.quanter:

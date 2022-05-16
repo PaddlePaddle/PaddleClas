@@ -10,7 +10,7 @@
   - [2.1 服务器端知识蒸馏模型](#2.1)
   - [2.2 移动端知识蒸馏模型](#2.2)
   - [2.3 Intel CPU 端知识蒸馏模型](#2.3)
-- [3. PP-LCNet 系列](#3)
+- [3. PP-LCNet & PP-LCNetV2 系列](#3)
 - [4. ResNet 系列](#4)
 - [5. 移动端系列](#5)
 - [6. SEResNeXt 与 Res2Net 系列](#6)
@@ -106,9 +106,9 @@
 
 <a name="3"></a>
 
-## 3. PP-LCNet 系列 <sup>[[28](#ref28)]</sup>
+## 3. PP-LCNet & PP-LCNetV2 系列 <sup>[[28](#ref28)]</sup>
 
-PP-LCNet 系列模型的精度、速度指标如下表所示，更多关于该系列的模型介绍可以参考：[PP-LCNet 系列模型文档](../models/PP-LCNet.md)。
+PP-LCNet 系列模型的精度、速度指标如下表所示，更多关于该系列的模型介绍可以参考：[PP-LCNet 系列模型文档](../models/PP-LCNet.md)，[PP-LCNetV2 系列模型文档](../models/PP-LCNetV2.md)。
 
 | 模型           | Top-1 Acc | Top-5 Acc | Intel-Xeon-Gold-6148 time(ms)<br>bs=1 | FLOPs(M) | Params(M) | 预训练模型下载地址 | inference模型下载地址 |
 |:--:|:--:|:--:|:--:|----|----|----|:--:|
@@ -120,6 +120,10 @@ PP-LCNet 系列模型的精度、速度指标如下表所示，更多关于该�
 | PPLCNet_x1_5         |0.7371           | 0.9153   | 12.2601 | 341.86   | 4.52  | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/PPLCNet_x1_5_pretrained.pdparams) | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/PPLCNet_x1_5_infer.tar) |
 | PPLCNet_x2_0         |0.7518           | 0.9227   | 20.1667 | 590   | 6.54  | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/PPLCNet_x2_0_pretrained.pdparams) | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/PPLCNet_x2_0_infer.tar) |
 | PPLCNet_x2_5         |0.7660           | 0.9300   | 29.595 | 906   | 9.04  | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/PPLCNet_x2_5_pretrained.pdparams) | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/PPLCNet_x2_5_infer.tar) |
+
+| 模型           | Top-1 Acc | Top-5 Acc | Intel-Xeon-Gold-6271C<br>bs=1<br>OpenVINO 2021.4.2<br>time(ms) | FLOPs(M) | Params(M) | 预训练模型下载地址 | inference模型下载地址 |
+|:--:|:--:|:--:|:--:|----|----|----|:--:|
+| PPLCNetV2_base  | 77.04 | 93.27 | 4.32 | 604 | 6.6 | https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/PPLCNetV2_base_pretrained.pdparams | https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/PPLCNetV2_base_infer.tar |
 
 <a name="4"></a>
 
