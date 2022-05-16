@@ -54,9 +54,10 @@ def search_strategy():
     base_output_dir = configs["output_dir"]
     search_dict = configs.get("search_dict")
     all_results = {}
-    for search_key in search_dict:
-        search_values = search_dict[search_key]["search_values"]
-        replace_config = search_dict[search_key]["replace_config"]
+    for search_i in search_dict:
+        search_key = search_i["search_key"]
+        search_values = search_i["search_values"]
+        replace_config = search_i["replace_config"]
         res = search_train(search_values, base_program, base_output_dir, search_key, replace_config, model_name)
         all_results[search_key] = res
         best = res.get("best")
@@ -73,7 +74,6 @@ def search_strategy():
             for ind, ki in enumerate(base_program):
               if rm_k in ki:
                 rm_indices.append(ind)
-        print(rm_indices)
         for rm_index in rm_indices[::-1]:
             teacher_program.pop(rm_index)
             teacher_program.pop(rm_index-1)
@@ -94,9 +94,9 @@ def search_strategy():
         v = final_replace[k]
         base_program[i] = base_program[i].replace(k, v)
 
-    print(all_results, base_program)
     process = subprocess.Popen(base_program)
     process.communicate()
+    print(all_results, base_program)
 
 
 if __name__ == '__main__':
