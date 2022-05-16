@@ -43,15 +43,16 @@ class TopkAcc(nn.Layer):
 
 
 class mAP(nn.Layer):
-    def __init__(self):
+    def __init__(self, descending=True):
         super().__init__()
+        self.descending = descending
 
     def forward(self, similarities_matrix, query_img_id, gallery_img_id,
                 keep_mask):
         metric_dict = dict()
 
         choosen_indices = paddle.argsort(
-            similarities_matrix, axis=1, descending=True)
+            similarities_matrix, axis=1, descending=self.descending)
         gallery_labels_transpose = paddle.transpose(gallery_img_id, [1, 0])
         gallery_labels_transpose = paddle.broadcast_to(
             gallery_labels_transpose,
@@ -87,15 +88,16 @@ class mAP(nn.Layer):
 
 
 class mINP(nn.Layer):
-    def __init__(self):
+    def __init__(self, descending=True):
         super().__init__()
+        self.descending = descending
 
     def forward(self, similarities_matrix, query_img_id, gallery_img_id,
                 keep_mask):
         metric_dict = dict()
 
         choosen_indices = paddle.argsort(
-            similarities_matrix, axis=1, descending=True)
+            similarities_matrix, axis=1, descending=self.descending)
         gallery_labels_transpose = paddle.transpose(gallery_img_id, [1, 0])
         gallery_labels_transpose = paddle.broadcast_to(
             gallery_labels_transpose,
@@ -130,12 +132,13 @@ class mINP(nn.Layer):
 
 
 class Recallk(nn.Layer):
-    def __init__(self, topk=(1, 5)):
+    def __init__(self, topk=(1, 5), descending=True):
         super().__init__()
         assert isinstance(topk, (int, list, tuple))
         if isinstance(topk, int):
             topk = [topk]
         self.topk = topk
+        self.descending = descending
 
     def forward(self, similarities_matrix, query_img_id, gallery_img_id,
                 keep_mask):
@@ -143,7 +146,7 @@ class Recallk(nn.Layer):
 
         #get cmc
         choosen_indices = paddle.argsort(
-            similarities_matrix, axis=1, descending=True)
+            similarities_matrix, axis=1, descending=self.descending)
         gallery_labels_transpose = paddle.transpose(gallery_img_id, [1, 0])
         gallery_labels_transpose = paddle.broadcast_to(
             gallery_labels_transpose,
@@ -175,12 +178,13 @@ class Recallk(nn.Layer):
 
 
 class Precisionk(nn.Layer):
-    def __init__(self, topk=(1, 5)):
+    def __init__(self, topk=(1, 5), descending=True):
         super().__init__()
         assert isinstance(topk, (int, list, tuple))
         if isinstance(topk, int):
             topk = [topk]
         self.topk = topk
+        self.descending = descending
 
     def forward(self, similarities_matrix, query_img_id, gallery_img_id,
                 keep_mask):
@@ -188,7 +192,7 @@ class Precisionk(nn.Layer):
 
         #get cmc
         choosen_indices = paddle.argsort(
-            similarities_matrix, axis=1, descending=True)
+            similarities_matrix, axis=1, descending=self.descending)
         gallery_labels_transpose = paddle.transpose(gallery_img_id, [1, 0])
         gallery_labels_transpose = paddle.broadcast_to(
             gallery_labels_transpose,
