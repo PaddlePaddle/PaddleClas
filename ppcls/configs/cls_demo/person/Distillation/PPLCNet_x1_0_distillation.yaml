@@ -6,7 +6,7 @@ Global:
   device: gpu
   save_interval: 1
   eval_during_train: True
-  start_eval_epoch: 1
+  start_eval_epoch: 10
   eval_interval: 1
   epochs: 20
   print_batch_step: 10
