@@ -7,6 +7,8 @@ __dir__ = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.path.abspath(os.path.join(__dir__, '../')))
 
 import subprocess
+import numpy as np
+
 from ppcls.utils import config
 
 
@@ -18,7 +20,8 @@ def get_result(log_dir):
     return res
 
 
-def search_train(search_list, base_program, base_output_dir, search_key, config_replace_value, model_name):
+def search_train(search_list, base_program, base_output_dir, search_key,
+                 config_replace_value, model_name, search_times=1):
     best_res = 0.
     best = search_list[0]
     all_result = {}
@@ -28,15 +31,19 @@ def search_train(search_list, base_program, base_output_dir, search_key, config_
             program += ["-o", "{}={}".format(v, search_i)]
             if v == "Arch.name":
                 model_name = search_i
-        output_dir = "{}/{}_{}".format(base_output_dir, search_key, search_i).replace(".", "_")
-        program += ["-o", "Global.output_dir={}".format(output_dir)]
-        process = subprocess.Popen(program)
-        process.communicate()
-        res = get_result("{}/{}".format(output_dir, model_name))
-        all_result[str(search_i)] = res
-        if res > best_res:
+        res_list = []
+        for j in range(search_times):
+            output_dir = "{}/{}_{}_{}".format(base_output_dir, search_key, search_i, j).replace(".", "_")
+            program += ["-o", "Global.output_dir={}".format(output_dir)]
+            process = subprocess.Popen(program)
+            process.communicate()
+            res = get_result("{}/{}".format(output_dir, model_name))
+            res_list.append(res)
+        all_result[str(search_i)] = res_list
+
+        if np.mean(res_list) > best_res:
             best = search_i
-            best_res = res
+            best_res = np.mean(res_list)
     all_result["best"] = best
     return all_result
 
@@ -52,12 +59,15 @@ def search_strategy():
     base_program = ["python3.7", "-m", "paddle.distributed.launch", "--gpus={}".format(gpus),
                     "tools/train.py", "-c", base_config_file]
     base_output_dir = configs["output_dir"]
+    search_times = configs["search_times"]
     search_dict = configs.get("search_dict")
     all_results = {}
-    for search_key in search_dict:
-        search_values = search_dict[search_key]["search_values"]
-        replace_config = search_dict[search_key]["replace_config"]
-        res = search_train(search_values, base_program, base_output_dir, search_key, replace_config, model_name)
+    for search_i in search_dict:
+        search_key = search_i["search_key"]
+        search_values = search_i["search_values"]
+        replace_config = search_i["replace_config"]
+        res = search_train(search_values, base_program, base_output_dir,
+                           search_key, replace_config, model_name, search_times)
         all_results[search_key] = res
         best = res.get("best")
         for v in replace_config:
@@ -73,7 +83,6 @@ def search_strategy():
             for ind, ki in enumerate(base_program):
               if rm_k in ki:
                 rm_indices.append(ind)
-        print(rm_indices)
         for rm_index in rm_indices[::-1]:
             teacher_program.pop(rm_index)
             teacher_program.pop(rm_index-1)
@@ -94,9 +103,9 @@ def search_strategy():
         v = final_replace[k]
         base_program[i] = base_program[i].replace(k, v)
 
-    print(all_results, base_program)
     process = subprocess.Popen(base_program)
     process.communicate()
+    print(all_results, base_program)
 
 
 if __name__ == '__main__':
