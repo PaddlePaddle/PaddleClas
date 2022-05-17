@@ -478,6 +478,9 @@ class Engine(object):
                         dtype='float32')
                 ])
             paddle.jit.save(model, save_path)
+        logger.info(
+            f"Export succeeded! The inference model exported has been saved in \"{self.config['Global']['save_inference_dir']}\"."
+        )
 
 
 class ExportModel(TheseusLayer):
