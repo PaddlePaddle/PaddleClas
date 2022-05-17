@@ -1,6 +1,5 @@
 import os
 import json
-import bcolz
 import numpy as np
 from PIL import Image
 import cv2
@@ -215,6 +214,8 @@ def read_memmap(mem_file_name):
 
 
 def get_val_pair(path, name, use_memfile=True):
+    # installing bcolz should set proxy to access internet
+    import bcolz
     if use_memfile:
         mem_file_dir = os.path.join(path, name, 'memfile')
         mem_file_name = os.path.join(mem_file_dir, 'mem_file.dat')
