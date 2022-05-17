@@ -33,11 +33,13 @@ Arch:
     - Teacher:
         name: ResNet101_vd
         class_num: *class_num
+        use_sync_bn: True
     - Student:
         name: PPLCNet_x1_0
         class_num: *class_num
         pretrained: True
         use_ssld: True
+        use_sync_bn: True
 
   infer_model_name: "Student"
  
