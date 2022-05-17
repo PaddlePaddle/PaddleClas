@@ -38,6 +38,20 @@ class MultiScaleDataset(Dataset):
         self._load_anno()
         self.has_logged = False
 
+        op_hit_num = 0
+        for op in self.transform_ops:
+            op_name = list(op.keys())[0]
+            resize_ops = ['RandCropImage', 'ResizeImage', 'CropImage']
+            if op_name in resize_ops:
+                op_hit_num += 1
+
+        if op_hit_num == 0:
+            msg = "One of 'RandCropImage', 'ResizeImage', 'CropImage' should be used in MultiScale Dataset when MultiScale Sampler used. Otherwise the multi scale resolution strategy is ineffective."
+            logger.warning(msg)
+        elif op_hit_num > 1:
+            msg = "Not support ones of 'RandCropImage', 'ResizeImage', 'CropImage' used together when MultiScale Sampler used. The first op of them will be hitted."
+            logger.warning(msg)
+
     def _load_anno(self, seed=None):
         assert os.path.exists(self._cls_path)
         assert os.path.exists(self._img_root)
@@ -65,14 +79,6 @@ class MultiScaleDataset(Dataset):
                     op[op_name].update({"size": (width, height)})
                     has_changed = True
                     break
-        # TODO(gaotingquan): repeat log
-        if not self.has_logged:
-            if has_changed == False:
-                msg = "One of 'RandCropImage', 'ResizeImage', 'CropImage' should be use in MultiScale Dataset when MultiScale Sampler used. Otherwise the multi scale resolution strategy is ineffective."
-            else:
-                msg = f"The resize argument of '{op_name}' has been reset to {width}, {height} according to MultiScale Sampler."
-            logger.warning(msg)
-            self.has_logged = True
 
         self._transform_ops = create_operators(self.transform_ops)
 
