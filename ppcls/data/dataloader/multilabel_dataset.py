@@ -42,7 +42,7 @@ class MultiLabelDataset(CommonDataset):
                 self.labels.append(labels)
                 assert os.path.exists(self.images[-1])
         if label_ratio:
-            return np.array(self.labels).mean(0)
+            return np.array(self.labels).mean(0).astype("float32")
 
     def __getitem__(self, idx):
         try:
@@ -53,7 +53,7 @@ class MultiLabelDataset(CommonDataset):
             img = img.transpose((2, 0, 1))
             label = np.array(self.labels[idx]).astype("float32")
             if self.label_ratio is not None:
-                return (img, [label, self.label_ratio])
+                return (img, np.array([label, self.label_ratio]))
             else:
                 return (img, label)
 

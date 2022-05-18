@@ -84,6 +84,7 @@ def classification_eval(engine, epoch_id=0):
         # gather Tensor when distributed
         if paddle.distributed.get_world_size() > 1:
             label_list = []
+
             paddle.distributed.all_gather(label_list, batch[1])
             labels = paddle.concat(label_list, 0)
 
