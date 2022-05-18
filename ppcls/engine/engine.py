@@ -159,10 +159,9 @@ class Engine(object):
                        ) and self.train_dataloader.collate_fn is not None:
                 for m_idx, m in enumerate(metric_config):
                     if "TopkAcc" in m:
-                        msg = f"'TopkAcc' metric can not be used when setting 'batch_transform_ops' in config. The 'TopkAcc' metric has been removed."
+                        msg = f"Unable to calculate accuracy when using \"batch_transform_ops\". The metric \"{m}\" has been removed."
                         logger.warning(msg)
-                        break
-                metric_config.pop(m_idx)
+                        metric_config.pop(m_idx)
             self.train_metric_func = build_metrics(metric_config)
         else:
             self.train_metric_func = None
