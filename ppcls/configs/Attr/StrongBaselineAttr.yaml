@@ -20,7 +20,6 @@ Arch:
   name: "ResNet50"
   pretrained: True
   class_num: 26
-  norm_decay: 0.0005
 
 # loss function config for traing/eval process
 Loss:
