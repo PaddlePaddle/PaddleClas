@@ -152,39 +152,34 @@ class Engine(object):
                 self.eval_loss_func = None
 
         # build metric
-        if self.mode == 'train':
-            metric_config = self.config.get("Metric")
-            if metric_config is not None:
-                metric_config = metric_config.get("Train")
-                if metric_config is not None:
-                    if hasattr(
-                            self.train_dataloader, "collate_fn"
-                    ) and self.train_dataloader.collate_fn is not None:
-                        for m_idx, m in enumerate(metric_config):
-                            if "TopkAcc" in m:
-                                msg = f"'TopkAcc' metric can not be used when setting 'batch_transform_ops' in config. The 'TopkAcc' metric has been removed."
-                                logger.warning(msg)
-                                break
-                        metric_config.pop(m_idx)
-                    self.train_metric_func = build_metrics(metric_config)
-                else:
-                    self.train_metric_func = None
+        if self.mode == 'train' and "Metric" in self.config and "Train" in self.config[
+                "Metric"]:
+            metric_config = self.config["Metric"]["Train"]
+            if hasattr(self.train_dataloader, "collate_fn"
+                       ) and self.train_dataloader.collate_fn is not None:
+                for m_idx, m in enumerate(metric_config):
+                    if "TopkAcc" in m:
+                        msg = f"'TopkAcc' metric can not be used when setting 'batch_transform_ops' in config. The 'TopkAcc' metric has been removed."
+                        logger.warning(msg)
+                        break
+                metric_config.pop(m_idx)
+            self.train_metric_func = build_metrics(metric_config)
         else:
             self.train_metric_func = None
 
         if self.mode == "eval" or (self.mode == "train" and
                                    self.config["Global"]["eval_during_train"]):
-            metric_config = self.config.get("Metric")
             if self.eval_mode == "classification":
-                if metric_config is not None:
-                    metric_config = metric_config.get("Eval")
-                    if metric_config is not None:
-                        self.eval_metric_func = build_metrics(metric_config)
-            elif self.eval_mode == "retrieval":
-                if metric_config is None:
-                    metric_config = [{"name": "Recallk", "topk": (1, 5)}]
+                if "Metric" in self.config and "Eval" in self.config["Metric"]:
+                    self.eval_metric_func = build_metrics(self.config["Metric"]
+                                                          ["Eval"])
                 else:
-                    metric_config = metric_config["Eval"]
+                    self.eval_metric_func = None
+            elif self.eval_mode == "retrieval":
+                if "Metric" in self.config and "Eval" in self.config["Metric"]:
+                    metric_config = metric_config["Metric"]["Eval"]
+                else:
+                    metric_config = [{"name": "Recallk", "topk": (1, 5)}]
                 self.eval_metric_func = build_metrics(metric_config)
         else:
             self.eval_metric_func = None

@@ -26,6 +26,7 @@ from easydict import EasyDict
 
 from ppcls.metric.avg_metrics import AvgMetrics
 from ppcls.utils.misc import AverageMeter, AttrMeter
+from ppcls.utils import logger
 
 
 class TopkAcc(AvgMetrics):
@@ -47,8 +48,15 @@ class TopkAcc(AvgMetrics):
         if isinstance(x, dict):
             x = x["logits"]
 
+        output_dims = x.shape[-1]
+
         metric_dict = dict()
-        for k in self.topk:
+        for idx, k in enumerate(self.topk):
+            if output_dims < k:
+                msg = f"The output dims({output_dims}) is less than k({k}), and the argument {k} of Topk has been removed."
+                logger.warning(msg)
+                self.topk.pop(idx)
+                continue
             metric_dict["top{}".format(k)] = paddle.metric.accuracy(
                 x, label, k=k)
             self.avg_meters["top{}".format(k)].update(metric_dict["top{}".format(k)], x.shape[0])

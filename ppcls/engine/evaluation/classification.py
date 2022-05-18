@@ -34,7 +34,6 @@ def classification_eval(engine, epoch_id=0):
     }
     print_batch_step = engine.config["Global"]["print_batch_step"]
 
-    metric_key = None
     tic = time.time()
     accum_samples = 0
     total_samples = len(
