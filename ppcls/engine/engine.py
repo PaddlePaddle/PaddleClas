@@ -177,7 +177,7 @@ class Engine(object):
                     self.eval_metric_func = None
             elif self.eval_mode == "retrieval":
                 if "Metric" in self.config and "Eval" in self.config["Metric"]:
-                    metric_config = metric_config["Metric"]["Eval"]
+                    metric_config = self.config["Metric"]["Eval"]
                 else:
                     metric_config = [{"name": "Recallk", "topk": (1, 5)}]
                 self.eval_metric_func = build_metrics(metric_config)
