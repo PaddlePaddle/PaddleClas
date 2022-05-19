@@ -34,6 +34,9 @@ from ppcls.data.preprocess.ops.operators import Pad
 from ppcls.data.preprocess.ops.operators import ToTensor
 from ppcls.data.preprocess.ops.operators import Normalize
 from ppcls.data.preprocess.ops.operators import RandomHorizontalFlip
+from ppcls.data.preprocess.ops.operators import CropWithPadding
+from ppcls.data.preprocess.ops.operators import RandomInterpolationAugment
+from ppcls.data.preprocess.ops.operators import ColorJitter
 
 from ppcls.data.preprocess.batch_ops.batch_operators import MixupOperator, CutmixOperator, OpSampler, FmixOperator
 

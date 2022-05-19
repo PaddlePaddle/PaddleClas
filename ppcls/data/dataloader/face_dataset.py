@@ -14,40 +14,11 @@ from ppcls.data.preprocess import transform as transform_func
 # code is based on AdaFace: https://github.com/mk-minchul/AdaFace
 
 
-def _get_image_size(img):
-    if F._is_pil_image(img):
-        return img.size
-    elif F._is_numpy_image(img):
-        return img.shape[:2][::-1]
-    elif F._is_tensor_image(img):
-        return img.shape[1:][::-1]  # chw
-    else:
-        raise TypeError("Unexpected type {}".format(type(img)))
-
-
 class AdaFaceDataset(Dataset):
-    def __init__(
-            self,
-            root_dir,
-            label_path,
-            transform=None,
-            low_res_augmentation_prob=0.0,
-            crop_augmentation_prob=0.0,
-            photometric_augmentation_prob=0.0, ):
+    def __init__(self, root_dir, label_path, transform=None):
         self.root_dir = root_dir
-        self.low_res_augmentation_prob = low_res_augmentation_prob
-        self.crop_augmentation_prob = crop_augmentation_prob
-        self.photometric_augmentation_prob = photometric_augmentation_prob
-        self.random_resized_crop = transforms.RandomResizedCrop(
-            size=(112, 112),
-            scale=(0.2, 1.0),
-            ratio=(0.75, 1.3333333333333333))
-        self.photometric = transforms.ColorJitter(
-            brightness=0.5, contrast=0.5, saturation=0.5, hue=0)
         self.transform = create_operators(transform)
 
-        self.tot_rot_try = 0
-        self.rot_success = 0
         with open(label_path) as fd:
             lines = fd.readlines()
         self.samples = []
@@ -73,64 +44,10 @@ class AdaFaceDataset(Dataset):
 
         # if 'WebFace' in self.root:
         #     # swap rgb to bgr since image is in rgb for webface
-        #     sample = Image.fromarray(np.asarray(sample)[:, :, ::-1])
-
-        sample, _ = self.augment(sample)
+        #     sample = Image.fromarray(np.asarray(sample)[:, :, ::-1]
         if self.transform is not None:
             sample = transform_func(sample, self.transform)
-
         return sample, target
-
-    def augment(self, sample):
-
-        # crop with zero padding augmentation
-        if np.random.random() < self.crop_augmentation_prob:
-            # RandomResizedCrop augmentation
-            new = np.zeros_like(np.array(sample))
-            #  orig_W, orig_H = F._get_image_size(sample)
-            orig_W, orig_H = _get_image_size(sample)
-            i, j, h, w = self.random_resized_crop._get_param(sample)
-            cropped = F.crop(sample, i, j, h, w)
-            new[i:i + h, j:j + w, :] = np.array(cropped)
-            sample = Image.fromarray(new.astype(np.uint8))
-            crop_ratio = min(h, w) / max(orig_H, orig_W)
-        else:
-            crop_ratio = 1.0
-
-        # low resolution augmentation
-        if np.random.random() < self.low_res_augmentation_prob:
-            # low res augmentation
-            img_np, resize_ratio = low_res_augmentation(np.array(sample))
-            sample = Image.fromarray(img_np.astype(np.uint8))
-        else:
-            resize_ratio = 1
-
-        # photometric augmentation
-        if np.random.random() < self.photometric_augmentation_prob:
-            sample = self.photometric(sample)
-        information_score = resize_ratio * crop_ratio
-        return sample, information_score
-
-
-def low_res_augmentation(img):
-    # resize the image to a small size and enlarge it back
-    img_shape = img.shape
-    side_ratio = np.random.uniform(0.2, 1.0)
-    small_side = int(side_ratio * img_shape[0])
-    interpolation = np.random.choice([
-        cv2.INTER_NEAREST, cv2.INTER_LINEAR, cv2.INTER_AREA, cv2.INTER_CUBIC,
-        cv2.INTER_LANCZOS4
-    ])
-    small_img = cv2.resize(
-        img, (small_side, small_side), interpolation=interpolation)
-    interpolation = np.random.choice([
-        cv2.INTER_NEAREST, cv2.INTER_LINEAR, cv2.INTER_AREA, cv2.INTER_CUBIC,
-        cv2.INTER_LANCZOS4
-    ])
-    aug_img = cv2.resize(
-        small_img, (img_shape[1], img_shape[0]), interpolation=interpolation)
-
-    return aug_img, side_ratio
 
 
 class FiveValidationDataset(Dataset):

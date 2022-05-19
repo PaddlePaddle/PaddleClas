@@ -450,14 +450,14 @@ class Backbone(Layer):
         return x
 
 
-def IR_18(input_size=(112, 112)):
+def AdaFace_IR_18(input_size=(112, 112)):
     """ Constructs a ir-18 model.
     """
     model = Backbone(input_size, 18, 'ir')
     return model
 
 
-def IR_34(input_size=(112, 112)):
+def AdaFace_IR_34(input_size=(112, 112)):
     """ Constructs a ir-34 model.
     """
     model = Backbone(input_size, 34, 'ir')
@@ -465,7 +465,7 @@ def IR_34(input_size=(112, 112)):
     return model
 
 
-def IR_50(input_size=(112, 112)):
+def AdaFace_IR_50(input_size=(112, 112)):
     """ Constructs a ir-50 model.
     """
     model = Backbone(input_size, 50, 'ir')
@@ -473,7 +473,7 @@ def IR_50(input_size=(112, 112)):
     return model
 
 
-def IR_101(input_size=(112, 112)):
+def AdaFace_IR_101(input_size=(112, 112)):
     """ Constructs a ir-101 model.
     """
     model = Backbone(input_size, 100, 'ir')
@@ -481,7 +481,7 @@ def IR_101(input_size=(112, 112)):
     return model
 
 
-def IR_152(input_size=(112, 112)):
+def AdaFace_IR_152(input_size=(112, 112)):
     """ Constructs a ir-152 model.
     """
     model = Backbone(input_size, 152, 'ir')
@@ -489,7 +489,7 @@ def IR_152(input_size=(112, 112)):
     return model
 
 
-def IR_200(input_size=(112, 112)):
+def AdaFace_IR_200(input_size=(112, 112)):
     """ Constructs a ir-200 model.
     """
     model = Backbone(input_size, 200, 'ir')
@@ -497,7 +497,7 @@ def IR_200(input_size=(112, 112)):
     return model
 
 
-def IR_SE_50(input_size=(112, 112)):
+def AdaFace_IR_SE_50(input_size=(112, 112)):
     """ Constructs a ir_se-50 model.
     """
     model = Backbone(input_size, 50, 'ir_se')
@@ -505,7 +505,7 @@ def IR_SE_50(input_size=(112, 112)):
     return model
 
 
-def IR_SE_101(input_size=(112, 112)):
+def AdaFace_IR_SE_101(input_size=(112, 112)):
     """ Constructs a ir_se-101 model.
     """
     model = Backbone(input_size, 100, 'ir_se')
@@ -513,7 +513,7 @@ def IR_SE_101(input_size=(112, 112)):
     return model
 
 
-def IR_SE_152(input_size=(112, 112)):
+def AdaFace_IR_SE_152(input_size=(112, 112)):
     """ Constructs a ir_se-152 model.
     """
     model = Backbone(input_size, 152, 'ir_se')
@@ -521,7 +521,7 @@ def IR_SE_152(input_size=(112, 112)):
     return model
 
 
-def IR_SE_200(input_size=(112, 112)):
+def AdaFace_IR_SE_200(input_size=(112, 112)):
     """ Constructs a ir_se-200 model.
     """
     model = Backbone(input_size, 200, 'ir_se')

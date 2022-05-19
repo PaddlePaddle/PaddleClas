@@ -21,7 +21,7 @@ Arch:
   infer_output_key: "features"
   infer_add_softmax: False
   Backbone: 
-    name: "IR_18"
+    name: "AdaFace_IR_18"
     input_size: [112, 112]
   Head:
     name: "AdaMargin"  
@@ -57,10 +57,21 @@ DataLoader:
         name: "AdaFaceDataset"
         root_dir: "dataset/face/"
         label_path: "dataset/face/train_filter_label.txt"
-        low_res_augmentation_prob: 0.2
-        crop_augmentation_prob: 0.2
-        photometric_augmentation_prob: 0.2
         transform:
+          - CropWithPadding:
+              prob: 0.2
+              padding_num: 0
+              size: [112, 112]
+              scale: [0.2, 1.0]
+              ratio: [0.75, 1.3333333333333333]
+          - RandomInterpolationAugment:
+              prob: 0.2
+          - ColorJitter:
+              prob: 0.2
+              brightness: 0.5
+              contrast: 0.5
+              saturation: 0.5
+              hue: 0
           - RandomHorizontalFlip:
           - ToTensor:
           - Normalize:
