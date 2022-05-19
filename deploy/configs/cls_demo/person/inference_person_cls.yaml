@@ -27,9 +27,10 @@ PreProcess:
     - ToCHWImage:
 
 PostProcess:
-  main_indicator: Topk
-  Topk:
-    topk: 5
-    class_id_map_file: "../ppcls/utils/cls_demo/person_label_list.txt"
+  main_indicator: ThreshOutput
+  ThreshOutput:
+    threshold: 0.9
+    label_0: invalid
+    label_1: valid
   SavePreLabel:
     save_dir: ./pre_label/
