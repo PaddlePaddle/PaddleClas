@@ -33,14 +33,14 @@ from ppcls.arch.distill.afd_attention import LinearTransformStudent, LinearTrans
 __all__ = ["build_model", "RecModel", "DistillationModel", "AttentionModel"]
 
 
-def build_model(config):
+def build_model(config, mode="train"):
     arch_config = copy.deepcopy(config["Arch"])
     model_type = arch_config.pop("name")
     mod = importlib.import_module(__name__)
     arch = getattr(mod, model_type)(**arch_config)
     if isinstance(arch, TheseusLayer):
         prune_model(config, arch)
-        quantize_model(config, arch)
+        quantize_model(config, arch, mode)
 
     logger.info("The FLOPs and Params of Arch:")
     try:

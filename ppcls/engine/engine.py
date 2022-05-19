@@ -189,7 +189,7 @@ class Engine(object):
             self.eval_metric_func = None
 
         # build model
-        self.model = build_model(self.config)
+        self.model = build_model(self.config, self.mode)
         # set @to_static for benchmark, skip this by default.
         apply_to_static(self.config, self.model)
 
@@ -471,23 +471,18 @@ class Engine(object):
 
         save_path = os.path.join(self.config["Global"]["save_inference_dir"],
                                  "inference")
-        if model.quanter:
-            model.quanter.save_quantized_model(
-                model.base_model,
-                save_path,
-                input_spec=[
-                    paddle.static.InputSpec(
-                        shape=[None] + self.config["Global"]["image_shape"],
-                        dtype='float32')
-                ])
+
+        model = paddle.jit.to_static(
+            model,
+            input_spec=[
+                paddle.static.InputSpec(
+                    shape=[None] + self.config["Global"]["image_shape"],
+                    dtype='float32')
+            ])
+        if hasattr(model.base_model,
+                   "quanter") and model.base_model.quanter is not None:
+            model.base_model.quanter.save_quantized_model(model, save_path)
         else:
-            model = paddle.jit.to_static(
-                model,
-                input_spec=[
-                    paddle.static.InputSpec(
-                        shape=[None] + self.config["Global"]["image_shape"],
-                        dtype='float32')
-                ])
             paddle.jit.save(model, save_path)
         logger.info(
             f"Export succeeded! The inference model exported has been saved in \"{self.config['Global']['save_inference_dir']}\"."

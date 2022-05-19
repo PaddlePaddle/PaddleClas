@@ -40,12 +40,14 @@ QUANT_CONFIG = {
 }
 
 
-def quantize_model(config, model):
+def quantize_model(config, model, mode="train"):
     if config.get("Slim", False) and config["Slim"].get("quant", False):
         from paddleslim.dygraph.quant import QAT
         assert config["Slim"]["quant"]["name"].lower(
         ) == 'pact', 'Only PACT quantization method is supported now'
         QUANT_CONFIG["activation_preprocess_type"] = "PACT"
+        if mode not in ["train", "eval"]:
+            QUANT_CONFIG['activation_preprocess_type'] = None
         model.quanter = QAT(config=QUANT_CONFIG)
         model.quanter.quantize(model)
         logger.info("QAT model summary:")
