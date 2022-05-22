@@ -47,7 +47,7 @@
 
 PaddleClas 中提出了一种简单使用的 SSLD 知识蒸馏算法 [6]，在训练的时候去除了对 gt label 的依赖，结合大量无标注数据，最终蒸馏训练得到的预训练模型在 15 个模型上的精度提升平均高达 3%。
 
-上述标准的蒸馏方法是通过一个大模型作为教师模型来指导学生模型提升效果，而后来又发展出 DML(Deep Mutual Learning)互学习蒸馏方法 [7]，即通过两个结构相同的模型互相学习。具体的。相比于 KD 等依赖于大的教师模型的知识蒸馏算法，DML 脱离了对大的教师模型的依赖，蒸馏训练的流程更加简单，模型产出效率也要更高一些。
+上述标准的蒸馏方法是通过一个大模型作为教师模型来指导学生模型提升效果，而后来又发展出 DML(Deep Mutual Learning)互学习蒸馏方法 [7]，即通过两个结构相同的模型互相学习。具体的。相比于 KD 等依赖于大的教师模型的知识蒸馏算法，DML 脱离了对大的教师模型的依赖，蒸馏训练的流程更加简单，模型产出效率也要更高一些。
 
 <a name='3.2'></a>
 
@@ -61,7 +61,6 @@ Heo 等人提出了 OverHaul [8], 计算学生模型与教师模型的 feature m
 
 ### 3.3 Relation based distillation
 
-
 `3.1` 和 `3.2` 章节中的论文中主要是考虑到学生模型与教师模型的输出或者中间层 feature map，这些知识蒸馏算法只关注个体的输出结果，没有考虑到个体之间的输出关系。
 
 Park 等人提出了 RKD [10]，基于关系的知识蒸馏算法，RKD 中进一步考虑个体输出之间的关系，使用 2 种损失函数，二阶的距离损失（distance-wise）和三阶的角度损失（angle-wise）
@@ -82,6 +81,8 @@ Park 等人提出了 RKD [10]，基于关系的知识蒸馏算法，RKD 中进�
 * [DKD](https://arxiv.org/pdf/2203.08679.pdf)
 
 ## 4.1 SSLD
+
+论文信息：
 
 > [Beyond Self-Supervision: A Simple Yet Effective Network Distillation Alternative to Improve Backbones
 ](https://arxiv.org/abs/2103.05959)
