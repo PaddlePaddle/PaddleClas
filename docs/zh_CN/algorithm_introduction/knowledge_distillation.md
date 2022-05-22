@@ -8,7 +8,8 @@
 	* [3.1 Response based distillation](#3.1)
 	* [3.2 Feature based distillation](#3.2)
 	* [3.3 Relation based distillation](#3.3)
-* [4. 参考文献](#4)
+* [4. PaddleClas中的知识蒸馏算法](#4)
+* [5. 参考文献](#5)
 <a name='1'></a>
 ## 1. 模型压缩和知识蒸馏方法简介
 
@@ -25,6 +26,7 @@
 * Relation based distillation：对于不同的样本，使用教师模型和学生模型同时计算样本之间 feature map 的相关性，使得学生模型和教师模型得到的相关性矩阵尽可能一致。
 
 <a name='2'></a>
+
 ## 2. 知识蒸馏应用
 
 
@@ -34,8 +36,11 @@
 
 
 <a name='3'></a>
+
 ## 3. 知识蒸馏算法介绍
+
 <a name='3.1'></a>
+
 ### 3.1 Response based distillation
 
 最早的知识蒸馏算法 KD，由 Hinton 提出，训练的损失函数中除了 gt loss 之外，还引入了学生模型与教师模型输出的 KL 散度，最终精度超过单纯使用 gt loss 训练的精度。这里需要注意的是，在训练的时候，需要首先训练得到一个更大的教师模型，来指导学生模型的训练过程。
@@ -45,6 +50,7 @@ PaddleClas 中提出了一种简单使用的 SSLD 知识蒸馏算法 [6]，在�
 上述标准的蒸馏方法是通过一个大模型作为教师模型来指导学生模型提升效果，而后来又发展出 DML(Deep Mutual Learning)互学习蒸馏方法 [7]，即通过两个结构相同的模型互相学习。具体的。相比于 KD 等依赖于大的教师模型的知识蒸馏算法，DML 脱离了对大的教师模型的依赖，蒸馏训练的流程更加简单，模型产出效率也要更高一些。
 
 <a name='3.2'></a>
+
 ### 3.2 Feature based distillation
 
 Heo 等人提出了 OverHaul [8], 计算学生模型与教师模型的 feature map distance，作为蒸馏的 loss，在这里使用了学生模型、教师模型的转移，来保证二者的 feature map 可以正常地进行 distance 的计算。
@@ -52,6 +58,7 @@ Heo 等人提出了 OverHaul [8], 计算学生模型与教师模型的 feature m
 基于 feature map distance 的知识蒸馏方法也能够和 `3.1 章节` 中的基于 response 的知识蒸馏算法融合在一起，同时对学生模型的输出结果和中间层 feature map 进行监督。而对于 DML 方法来说，这种融合过程更为简单，因为不需要对学生和教师模型的 feature map 进行转换，便可以完成对齐(alignment)过程。PP-OCRv2 系统中便使用了这种方法，最终大幅提升了 OCR 文字识别模型的精度。
 
 <a name='3.3'></a>
+
 ### 3.3 Relation based distillation
 
 
@@ -62,8 +69,84 @@ Park 等人提出了 RKD [10]，基于关系的知识蒸馏算法，RKD 中进�
 
 本论文提出的算法关系知识蒸馏（RKD）迁移教师模型得到的输出结果间的结构化关系给学生模型，不同于之前的只关注个体输出结果，RKD 算法使用两种损失函数：二阶的距离损失(distance-wise)和三阶的角度损失(angle-wise)。在最终计算蒸馏损失函数的时候，同时考虑 KD loss 和 RKD loss。最终精度优于单独使用 KD loss 蒸馏得到的模型精度。
 
+
 <a name='4'></a>
-## 4. 参考文献
+
+# 4. PaddleClas中的知识蒸馏算法
+
+目前PaddleClas支持下面几种知识蒸馏算法。
+
+* [SSLD](https://arxiv.org/abs/2103.05959)
+* [DML](https://arxiv.org/abs/1706.00384)
+* [AFD](https://www.aaai.org/AAAI21Papers/AAAI-9785.JiM.pdf)
+* [DKD](https://arxiv.org/pdf/2203.08679.pdf)
+
+## 4.1 SSLD
+
+> [Beyond Self-Supervision: A Simple Yet Effective Network Distillation Alternative to Improve Backbones
+](https://arxiv.org/abs/2103.05959)
+>
+> Cheng Cui, Ruoyu Guo, Yuning Du, Dongliang He, Fu Li, Zewu Wu, Qiwen Liu, Shilei Wen, Jizhou Huang, Xiaoguang Hu, Dianhai Yu, Errui Ding, Yanjun Ma
+>
+> arxiv, 2021
+
+SSLD是百度于2021年提出的一种简单的半监督知识蒸馏方案，通过设计简单的损失函数以及数据挖掘策略，最终帮助15个骨干网络模型的精度平均提升超过3%。
+
+训练的过程中，使用ImageNet22k中的400W数据作为无标注数据，最终在ImageNet1k公开数据集上，效果如下所示。
+
+
+| 策略 | 骨干网络 | 配置文件 | Top-1 acc | 下载链接 |
+| --- | --- | --- | --- | --- |
+| baseline | ResNet50_vd | [ResNet50_vd.yaml](../../../ppcls/configs/ImageNet/ResNet/ResNet50_vd.yaml) | 79.12% | [链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/ResNet50_vd_pretrained.pdparams) |
+| SSLD | ResNet50_vd | - | 83.00%(**+3.88%**) | [链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/ResNet50_vd_ssld_pretrained.pdparams) |
+| baseline | PPLCNet_x2_5 | [PPLCNet_x2_5.yaml](../../../ppcls/configs/ImageNet/PPLCNet/PPLCNet_x2_5.yaml) | 76.60% | [链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/PPLCNet_x2_5_pretrained.pdparams) |
+| SSLD | PPLCNet_x2_5 | - | 80.80%(**+4.2%**) | [链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/PPLCNet_x2_5_ssld_pretrained.pdparams) |
+| baseline | MobileNetV3_large_x1_0 | [MobileNetV3_large_x1_0.yaml](../../../ppcls/configs/ImageNet/MobileNetV3/MobileNetV3_large_x1_0.yaml) | 75.32% | [链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/MobileNetV3_large_x1_0_pretrained.pdparams) |
+| SSLD | MobileNetV3_large_x1_0 | - | 78.90%(**+3.6%**) | [链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/MobileNetV3_large_x1_0_ssld_pretrained.pdparams) |
+
+
+## 4.2 DML
+
+论文信息：
+
+
+> [Deep Mutual Learning](https://openaccess.thecvf.com/content_cvpr_2018/html/Zhang_Deep_Mutual_Learning_CVPR_2018_paper.html)
+>
+> Ying Zhang, Tao Xiang, Timothy M. Hospedales, Huchuan Lu
+>
+> CVPR, 2018
+
+DML论文中，在蒸馏的过程中，不依赖于教师模型，两个结构相同的模型互相学习，计算彼此输出（logits）的KL散度，最终完成训练过程。
+
+
+在ImageNet1k公开数据集上，效果如下所示。
+
+| 策略 | 骨干网络 | 配置文件 | Top-1 acc | 下载链接 |
+| --- | --- | --- | --- | --- |
+| baseline | PPLCNet_x2_5 | [PPLCNet_x2_5.yaml](../../../ppcls/configs/ImageNet/PPLCNet/PPLCNet_x2_5.yaml) | 74.93% | [链接(coming soon)]() |
+| DML | PPLCNet_x2_5 | [PPLCNet_x2_5_dml.yaml](../../../ppcls/configs/ImageNet/Distillation/PPLCNet_x2_5_dml.yaml) | 76.68%(**+1.75%**) | [链接(coming soon)]() |
+
+
+* 注：完整的PPLCNet_x2_5模型训练了360epoch，这里为了方便对比，baseline和DML均训练了100epoch，因此指标比官网最终开源出来的模型精度（76.60%）低一些。
+
+
+### 4.3 AFD
+
+| 策略 | 骨干网络 | 配置文件 | Top-1 acc | 下载链接 |
+| --- | --- | --- | --- | --- |
+| baseline | ResNet18 | [ResNet18.yaml](../../../ppcls/configs/ImageNet/ResNet/ResNet18.yaml) | 70.8% | [链接(Coming soon)]() |
+| AFD | ResNet18 | [resnet34_distill_resnet18_afd.yaml](../../../ppcls/configs/ImageNet/Distillation/resnet34_distill_resnet18_afd.yaml) | 71.68%(**+0.88%**) | [链接(Coming soon)]() |
+
+注意：这里为了与论文的训练配置保持对齐，设置训练的迭代轮数为100epoch，因此baseline精度低于PaddleClas中开源出的模型精度（71.0%）
+
+### 4.4 DKD
+
+
+
+
+<a name='5'></a>
+
+## 5. 参考文献
 
 [1] Hinton G, Vinyals O, Dean J. Distilling the knowledge in a neural network[J]. arXiv preprint arXiv:1503.02531, 2015.
 
@@ -84,3 +167,7 @@ Park 等人提出了 RKD [10]，基于关系的知识蒸馏算法，RKD 中进�
 [9] Du Y, Li C, Guo R, et al. PP-OCRv2: Bag of Tricks for Ultra Lightweight OCR System[J]. arXiv preprint arXiv:2109.03144, 2021.
 
 [10] Park W, Kim D, Lu Y, et al. Relational knowledge distillation[C]//Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition. 2019: 3967-3976.
+
+[11] Zhao B, Cui Q, Song R, et al. Decoupled Knowledge Distillation[J]. arXiv preprint arXiv:2203.08679, 2022.
+
+[12] Ji M, Heo B, Park S. Show, attend and distill: Knowledge distillation via attention-based feature matching[C]//Proceedings of the AAAI Conference on Artificial Intelligence. 2021, 35(9): 7945-7952.
