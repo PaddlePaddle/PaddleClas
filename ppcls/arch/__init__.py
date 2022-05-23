@@ -15,6 +15,7 @@
 import copy
 import importlib
 
+import paddle
 import paddle.nn as nn
 from paddle.jit import to_static
 from paddle.static import InputSpec
@@ -35,11 +36,24 @@ __all__ = ["build_model", "RecModel", "DistillationModel", "AttentionModel"]
 def build_model(config):
     arch_config = copy.deepcopy(config["Arch"])
     model_type = arch_config.pop("name")
+    use_sync_bn = arch_config.pop("use_sync_bn", False)
     mod = importlib.import_module(__name__)
     arch = getattr(mod, model_type)(**arch_config)
+    if use_sync_bn:
+        arch = nn.SyncBatchNorm.convert_sync_batchnorm(arch)
+
     if isinstance(arch, TheseusLayer):
         prune_model(config, arch)
         quantize_model(config, arch)
+
+    logger.info("The FLOPs and Params of Arch:")
+    try:
+        flops = paddle.flops(arch, [1, *config["Global"]["image_shape"]])
+    except Exception as e:
+        logger.warning(
+            f"An error occurred when calculating FLOPs and Params of Arch. Please check the Global.image_shape in config. The details of error is: {e}"
+        )
+
     return arch
 
 
@@ -50,6 +64,7 @@ def apply_to_static(config, model):
         specs = None
         if 'image_shape' in config['Global']:
             specs = [InputSpec([None] + config['Global']['image_shape'])]
+            specs[0].stop_gradient = True
         model = to_static(model, input_spec=specs)
         logger.info("Successfully to apply @to_static with specs: {}".format(
             specs))

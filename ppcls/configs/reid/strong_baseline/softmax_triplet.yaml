@@ -12,6 +12,7 @@ Global:
   use_visualdl: False
   eval_mode: "retrieval"
   retrieval_feature_from: "features" # 'backbone' or 'features'
+  re_ranking: False
   # used for static mode and model export
   image_shape: [3, 256, 128]
   save_inference_dir: "./inference"

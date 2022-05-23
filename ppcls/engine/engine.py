@@ -239,7 +239,7 @@ class Engine(object):
 
             self.amp_eval = self.config["AMP"].get("use_fp16_test", False)
             # TODO(gaotingquan): Paddle not yet support FP32 evaluation when training with AMPO2
-            if self.config["Global"].get(
+            if self.mode == "train" and self.config["Global"].get(
                     "eval_during_train",
                     True) and self.amp_level == "O2" and self.amp_eval == False:
                 msg = "PaddlePaddle only support FP16 evaluation when training with AMP O2 now. "
@@ -269,10 +269,11 @@ class Engine(object):
                             save_dtype='float32')
             # paddle version >= 2.3.0 or develop
             else:
-                self.model = paddle.amp.decorate(
-                    models=self.model,
-                    level=self.amp_level,
-                    save_dtype='float32')
+                if self.mode == "train" or self.amp_eval:
+                    self.model = paddle.amp.decorate(
+                        models=self.model,
+                        level=self.amp_level,
+                        save_dtype='float32')
 
             if self.mode == "train" and len(self.train_loss_func.parameters(
             )) > 0:
@@ -312,7 +313,7 @@ class Engine(object):
         print_batch_step = self.config['Global']['print_batch_step']
         save_interval = self.config["Global"]["save_interval"]
         best_metric = {
-            "metric": 0.0,
+            "metric": -1.0,
             "epoch": 0,
         }
         # key:
@@ -344,18 +345,18 @@ class Engine(object):
 
             if self.use_dali:
                 self.train_dataloader.reset()
-            metric_msg = ", ".join([
-                "{}: {:.5f}".format(key, self.output_info[key].avg)
-                for key in self.output_info
-            ])
+            metric_msg = ", ".join(
+                [self.output_info[key].avg_info for key in self.output_info])
             logger.info("[Train][Epoch {}/{}][Avg]{}".format(
                 epoch_id, self.config["Global"]["epochs"], metric_msg))
             self.output_info.clear()
 
             # eval model and save model if possible
+            start_eval_epoch = self.config["Global"].get("start_eval_epoch",
+                                                         0) - 1
             if self.config["Global"][
                     "eval_during_train"] and epoch_id % self.config["Global"][
-                        "eval_interval"] == 0:
+                        "eval_interval"] == 0 and epoch_id > start_eval_epoch:
                 acc = self.eval(epoch_id)
                 if acc > best_metric["metric"]:
                     best_metric["metric"] = acc
@@ -367,7 +368,8 @@ class Engine(object):
                         self.output_dir,
                         model_name=self.config["Arch"]["name"],
                         prefix="best_model",
-                        loss=self.train_loss_func)
+                        loss=self.train_loss_func,
+                        save_student_model=True)
                 logger.info("[Eval][Epoch {}][best metric: {}]".format(
                     epoch_id, best_metric["metric"]))
                 logger.scaler(
@@ -431,7 +433,17 @@ class Engine(object):
             image_file_list.append(image_file)
             if len(batch_data) >= batch_size or idx == len(image_list) - 1:
                 batch_tensor = paddle.to_tensor(batch_data)
-                out = self.model(batch_tensor)
+
+                if self.amp and self.amp_eval:
+                    with paddle.amp.auto_cast(
+                            custom_black_list={
+                                "flatten_contiguous_range", "greater_than"
+                            },
+                            level=self.amp_level):
+                        out = self.model(batch_tensor)
+                else:
+                    out = self.model(batch_tensor)
+
                 if isinstance(out, list):
                     out = out[0]
                 if isinstance(out, dict) and "logits" in out:
@@ -452,6 +464,12 @@ class Engine(object):
                                   self.config["Global"]["pretrained_model"])
 
         model.eval()
+
+        # for rep nets
+        for layer in self.model.sublayers():
+            if hasattr(layer, "rep"):
+                layer.rep()
+
         save_path = os.path.join(self.config["Global"]["save_inference_dir"],
                                  "inference")
         if model.quanter:
@@ -472,6 +490,9 @@ class Engine(object):
                         dtype='float32')
                 ])
             paddle.jit.save(model, save_path)
+        logger.info(
+            f"Export succeeded! The inference model exported has been saved in \"{self.config['Global']['save_inference_dir']}\"."
+        )
 
 
 class ExportModel(TheseusLayer):
