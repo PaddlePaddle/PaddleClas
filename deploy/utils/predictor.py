@@ -49,14 +49,14 @@ class Predictor(object):
                                       "inference_int8.pdmodel")
             assert args.get(
                 "use_fp16", False
-            ) is False, "fp16 mode inference is not supported for int8 model inference, please set use_fp16 as False during inference."
+            ) is False, "fp16 mode is not supported for int8 model inference, please set use_fp16 as False during inference."
         else:
             params_file = os.path.join(inference_model_dir,
                                        "inference.pdiparams")
             model_file = os.path.join(inference_model_dir, "inference.pdmodel")
             assert args.get(
                 "use_int8", False
-            ) is False, "int8 mode inference is not supported for fp32 model inference, please set use_int8 as False during inference."
+            ) is False, "int8 mode is not supported for fp32 model inference, please set use_int8 as False during inference."
 
         config = Config(model_file, params_file)
 
