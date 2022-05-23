@@ -165,7 +165,7 @@ cd ../
 └── val_list.txt.debug
 ```
 
-其中`train/`和`val/`分别为训练集和验证集。`train_list.txt`和`val_list.txt`分别为训练集和验证集的标签文件，`train_list.txt.debug`和`val_list.txt.debug`分别为训练集和验证集的`debug`标签文件，其分别是`train_list.txt`和`val_list.txt`的子集，用该文件可以快速体验本案例的流程。`ImageNet_val/`是ImageNet的验证集，该集合和`train`集合的混合数据用于本案例的`KL-JS-UGI知识蒸馏策略`，对应的训练标签文件为`train_list_for_distill.txt`。
+其中`train/`和`val/`分别为训练集和验证集。`train_list.txt`和`val_list.txt`分别为训练集和验证集的标签文件，`train_list.txt.debug`和`val_list.txt.debug`分别为训练集和验证集的`debug`标签文件，其分别是`train_list.txt`和`val_list.txt`的子集，用该文件可以快速体验本案例的流程。`ImageNet_val/`是ImageNet的验证集，该集合和`train`集合的混合数据用于本案例的`SKL-UGI知识蒸馏策略`，对应的训练标签文件为`train_list_for_distill.txt`。
 
 * **注意**: 
 
@@ -233,6 +233,8 @@ python3 -m paddle.distributed.launch \
         -o Arch.models.0.Teacher.pretrained=output/ResNet101_vd/best_model
 ```
 
+验证集的最佳指标为0.95-0.97之间，当前模型最好的权重保存在`output/DistillationModel/best_model_student.pdparams`。
+
 <a name="3.2.2"></a>
 
 #### 3.2.2 超参数搜索训练
@@ -245,7 +247,7 @@ python3 -m paddle.distributed.launch \
 python tools/search_strategy.py -c ppcls/configs/StrategySearch/person.yaml
 ```
 
-在`ppcls/configs/StrategySearch/person.yaml`中指定了具体的 GPU id 号和搜索配置。
+在`ppcls/configs/StrategySearch/person.yaml`中指定了具体的 GPU id 号和搜索配置, 默认搜索的训练日志和模型存放于`output/search_person`中，最终的蒸馏模型存放于`output/search_person/search_res/DistillationModel/best_model_student.pdparams`。
 
 * **注意**: 
 
@@ -270,7 +272,7 @@ python tools/search_strategy.py -c ppcls/configs/StrategySearch/person.yaml
 ```bash
 python3 tools/eval.py \
     -c ./ppcls/configs/PULC/person/PPLCNet/PPLCNet_x1_0.yaml \
-    -o Global.pretrained_model="output/PPLCNet_x1_0/best_model"
+    -o Global.pretrained_model="output/DistillationModel/best_model_student"
 ```
 
 <a name="4.2"></a> 
@@ -283,7 +285,7 @@ python3 tools/eval.py \
 python3 tools/infer.py \
     -c ./ppcls/configs/PULC/person/PPLCNet/PPLCNet_x1_0.yaml \
     -o Infer.infer_imgs=./dataset/person/val/objects365_01780637.jpg  \
-    -o Global.pretrained_model=output/PPLCNet_x1_0/best_model \
+    -o Global.pretrained_model=output/DistillationModel/best_model_student \
     -o Global.pretrained_model=Infer.PostProcess.threshold=0.9794
 ```
 
@@ -309,7 +311,7 @@ python3 tools/infer.py \
 ```bash
 python3 tools/export_model.py \
     -c ./ppcls/configs/cls_demo/PULC/PPLCNet/PPLCNet_x1_0.yaml \
-    -o Global.pretrained_model=output/PPLCNet_x1_0/best_model \
+    -o Global.pretrained_model=output/DistillationModel/best_model_student \
     -o Global.save_inference_dir=deploy/models/PPLCNet_x1_0_person
 ```
 执行完该脚本后会在`deploy/models/`下生成`PPLCNet_x1_0_person`文件夹，该文件夹中的模型与 2.2 节下载的推理预测模型格式一致。
