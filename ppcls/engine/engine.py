@@ -481,7 +481,8 @@ class Engine(object):
             ])
         if hasattr(model.base_model,
                    "quanter") and model.base_model.quanter is not None:
-            model.base_model.quanter.save_quantized_model(model, save_path)
+            model.base_model.quanter.save_quantized_model(model,
+                                                          save_path + "_int8")
         else:
             paddle.jit.save(model, save_path)
         logger.info(
