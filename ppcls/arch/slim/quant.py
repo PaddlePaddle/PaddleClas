@@ -46,7 +46,7 @@ def quantize_model(config, model, mode="train"):
         assert config["Slim"]["quant"]["name"].lower(
         ) == 'pact', 'Only PACT quantization method is supported now'
         QUANT_CONFIG["activation_preprocess_type"] = "PACT"
-        if mode not in ["train", "eval"]:
+        if mode in ["infer", "export"]:
             QUANT_CONFIG['activation_preprocess_type'] = None
         model.quanter = QAT(config=QUANT_CONFIG)
         model.quanter.quantize(model)
