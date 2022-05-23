@@ -14,9 +14,10 @@
 import copy
 import importlib
 
-from . import topk
+from . import topk, threshoutput
 
 from .topk import Topk, MultiLabelTopk
+from .threshoutput import ThreshOutput
 
 
 def build_postprocess(config):
