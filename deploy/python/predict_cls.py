@@ -49,10 +49,15 @@ class ClsPredictor(Predictor):
             pid = os.getpid()
             size = config["PreProcess"]["transform_ops"][1]["CropImage"][
                 "size"]
+            if config["Global"].get("use_int8", False):
+                precision = "int8"
+            elif config["Global"].get("use_fp16", False):
+                precision = "fp16"
+            else:
+                precision = "fp32"
             self.auto_logger = auto_log.AutoLogger(
                 model_name=config["Global"].get("model_name", "cls"),
-                model_precision='fp16'
-                if config["Global"]["use_fp16"] else 'fp32',
+                model_precision=precision,
                 batch_size=config["Global"].get("batch_size", 1),
                 data_shape=[3, size, size],
                 save_path=config["Global"].get("save_log_path",
