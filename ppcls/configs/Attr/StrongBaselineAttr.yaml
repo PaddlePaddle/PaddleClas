@@ -5,7 +5,7 @@ Global:
   output_dir: "./output/"
   device: "gpu"
   save_interval: 5
-  eval_during_train: False
+  eval_during_train: True
   eval_interval: 1
   epochs: 30
   print_batch_step: 20

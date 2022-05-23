@@ -18,7 +18,7 @@ import time
 import platform
 import paddle
 
-from ppcls.utils.misc import AverageMeter, AttrMeter
+from ppcls.utils.misc import AverageMeter
 from ppcls.utils import logger
 
 
@@ -33,10 +33,6 @@ def classification_eval(engine, epoch_id=0):
             "reader_cost", ".5f", postfix=" s,"),
     }
     print_batch_step = engine.config["Global"]["print_batch_step"]
-
-    if engine.eval_metric_func is not None and "ATTRMetric" in engine.config[
-            "Metric"]["Eval"][0]:
-        output_info["attr"] = AttrMeter(threshold=0.5)
 
     metric_key = None
     tic = time.time()
@@ -162,7 +158,7 @@ def classification_eval(engine, epoch_id=0):
     if "ATTRMetric" in engine.config["Metric"]["Eval"][0]:
         metric_msg = ", ".join([
             "evalres: ma: {:.5f} label_f1: {:.5f} label_pos_recall: {:.5f} label_neg_recall: {:.5f} instance_f1: {:.5f} instance_acc: {:.5f} instance_prec: {:.5f} instance_recall: {:.5f}".
-            format(*output_info["attr"].res())
+            format(*engine.eval_metric_func.attr_res())
         ])
         logger.info("[Eval][Epoch {}][Avg]{}".format(epoch_id, metric_msg))
 
@@ -170,7 +166,7 @@ def classification_eval(engine, epoch_id=0):
         if engine.eval_metric_func is None:
             return -1
         # return 1st metric in the dict
-        return output_info["attr"].res()[0]
+        return engine.eval_metric_func.attr_res()[0]
     else:
         metric_msg = ", ".join([
             "{}: {:.5f}".format(key, output_info[key].avg)

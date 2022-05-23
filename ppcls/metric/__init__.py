@@ -56,6 +56,9 @@ class CombinedMetrics(AvgMetrics):
     def avg(self):
         return self.metric_func_list[0].avg
 
+    def attr_res(self):
+        return self.metric_func_list[0].attrmeter.res()
+
     def reset(self):
         for metric in self.metric_func_list:
             if hasattr(metric, "reset"):

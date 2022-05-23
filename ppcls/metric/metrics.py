@@ -25,7 +25,7 @@ from sklearn.preprocessing import binarize
 from easydict import EasyDict
 
 from ppcls.metric.avg_metrics import AvgMetrics
-from ppcls.utils.misc import AverageMeter
+from ppcls.utils.misc import AverageMeter, AttrMeter
 
 
 class TopkAcc(AvgMetrics):
@@ -438,7 +438,11 @@ class ATTRMetric(nn.Layer):
         super().__init__()
         self.threshold = threshold
 
+    def reset(self):
+        self.attrmeter = AttrMeter(threshold=0.5)
+
     def forward(self, output, target):
         metric_dict = get_attr_metrics(target[:, 0, :].numpy(),
                                        output.numpy(), self.threshold)
+        self.attrmeter.update(metric_dict)
         return metric_dict
