@@ -23,6 +23,8 @@ from ppcls.utils import logger
 
 
 def classification_eval(engine, epoch_id=0):
+    if hasattr(engine.eval_metric_func, "reset"):
+        engine.eval_metric_func.reset()
     output_info = dict()
     time_info = {
         "batch_cost": AverageMeter(
@@ -129,20 +131,7 @@ def classification_eval(engine, epoch_id=0):
 
         #  calc metric
         if engine.eval_metric_func is not None:
-            if "ATTRMetric" in engine.config["Metric"]["Eval"][0]:
-                metric_dict = engine.eval_metric_func(preds, labels)
-                metric_key = "attr"
-                output_info["attr"].update(metric_dict)
-            else:
-                metric_dict = engine.eval_metric_func(preds, labels)
-                for key in metric_dict:
-                    if metric_key is None:
-                        metric_key = key
-                    if key not in output_info:
-                        output_info[key] = AverageMeter(key, '7.5f')
-                    output_info[key].update(metric_dict[key].numpy()[0],
-                                            current_samples)
-
+            engine.eval_metric_func(preds, labels)
         time_info["batch_cost"].update(time.time() - tic)
 
         if iter_id % print_batch_step == 0:
@@ -161,6 +150,7 @@ def classification_eval(engine, epoch_id=0):
                     "{}: {:.5f}".format(key, output_info[key].val)
                     for key in output_info
                 ])
+                metric_msg += ", {}".format(engine.eval_metric_func.avg_info)
             logger.info("[Eval][Epoch {}][Iter: {}/{}]{}, {}, {}".format(
                 epoch_id, iter_id,
                 len(engine.eval_dataloader), metric_msg, time_msg, ips_msg))
@@ -186,10 +176,11 @@ def classification_eval(engine, epoch_id=0):
             "{}: {:.5f}".format(key, output_info[key].avg)
             for key in output_info
         ])
+        metric_msg += ", {}".format(engine.eval_metric_func.avg_info)
         logger.info("[Eval][Epoch {}][Avg]{}".format(epoch_id, metric_msg))
 
         # do not try to save best eval.model
         if engine.eval_metric_func is None:
             return -1
         # return 1st metric in the dict
-        return output_info[metric_key].avg
+        return engine.eval_metric_func.avg

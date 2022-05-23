@@ -7,30 +7,25 @@ Global:
   save_interval: 1
   eval_during_train: True
   eval_interval: 1
-  epochs: 120
+  start_eval_epoch: 10
+  epochs: 20
   print_batch_step: 10
   use_visualdl: False
-  image_channel: &image_channel 4
   # used for static mode and model export
-  image_shape: [*image_channel, 224, 224]
+  image_shape: [3, 224, 224]
   save_inference_dir: ./inference
   # training model under @to_static
   to_static: False
-  use_dali: True
+  use_dali: False
 
-# mixed precision training
-AMP:
-  scale_loss: 128.0
-  use_dynamic_loss_scaling: True
-  # O2: pure fp16
-  level: O2
 
 # model architecture
 Arch:
-  name: ResNet50
-  class_num: 1000
-  input_image_channel: *image_channel
-  data_format: "NHWC"
+  name: PPLCNet_x1_0
+  class_num: 2
+  pretrained: True
+  use_ssld: True
+  use_sync_bn: True
  
 # loss function config for traing/eval process
 Loss:
@@ -41,18 +36,17 @@ Loss:
     - CELoss:
         weight: 1.0
 
+
 Optimizer:
   name: Momentum
   momentum: 0.9
-  multi_precision: True
   lr:
-    name: Piecewise
-    learning_rate: 0.1
-    decay_epochs: [30, 60, 90]
-    values: [0.1, 0.01, 0.001, 0.0001]
+    name: Cosine
+    learning_rate: 0.01
+    warmup_epoch: 5
   regularizer:
     name: 'L2'
-    coeff: 0.0001
+    coeff: 0.00004
 
 
 # data loader for train and eval
@@ -60,8 +54,8 @@ DataLoader:
   Train:
     dataset:
       name: ImageNetDataset
-      image_root: ./dataset/ILSVRC2012/
-      cls_label_path: ./dataset/ILSVRC2012/train_list.txt
+      image_root: ./dataset/person/
+      cls_label_path: ./dataset/person/train_list.txt
       transform_ops:
         - DecodeImage:
             to_rgb: True
@@ -70,28 +64,38 @@ DataLoader:
             size: 224
         - RandFlipImage:
             flip_code: 1
+        - TimmAutoAugment:
+            prob: 0.0
+            config_str: rand-m9-mstd0.5-inc1
+            interpolation: bicubic
+            img_size: 224
         - NormalizeImage:
             scale: 1.0/255.0
             mean: [0.485, 0.456, 0.406]
             std: [0.229, 0.224, 0.225]
             order: ''
-            output_fp16: True
-            channel_num: *image_channel
-
+        - RandomErasing:
+            EPSILON: 0.0
+            sl: 0.02
+            sh: 1.0/3.0
+            r1: 0.3
+            attempt: 10
+            use_log_aspect: True
+            mode: pixel
     sampler:
       name: DistributedBatchSampler
       batch_size: 64
       drop_last: False
       shuffle: True
     loader:
-      num_workers: 4
+      num_workers: 8
       use_shared_memory: True
 
   Eval:
     dataset: 
       name: ImageNetDataset
-      image_root: ./dataset/ILSVRC2012/
-      cls_label_path: ./dataset/ILSVRC2012/val_list.txt
+      image_root: ./dataset/person/
+      cls_label_path: ./dataset/person/val_list.txt
       transform_ops:
         - DecodeImage:
             to_rgb: True
@@ -105,7 +109,6 @@ DataLoader:
             mean: [0.485, 0.456, 0.406]
             std: [0.229, 0.224, 0.225]
             order: ''
-            channel_num: *image_channel
     sampler:
       name: DistributedBatchSampler
       batch_size: 64
@@ -131,17 +134,18 @@ Infer:
         mean: [0.485, 0.456, 0.406]
         std: [0.229, 0.224, 0.225]
         order: ''
-        channel_num: *image_channel
     - ToCHWImage:
   PostProcess:
-    name: Topk
-    topk: 5
-    class_id_map_file: ppcls/utils/imagenet1k_label_list.txt
+    name: ThreshOutput
+    threshold: 0.9
+    label_0: nobody
+    label_1: someone
 
 Metric:
   Train:
     - TopkAcc:
-        topk: [1, 5]
+        topk: [1, 2]
   Eval:
+    - TprAtFpr:
     - TopkAcc:
-        topk: [1, 5]
+        topk: [1, 2]

@@ -36,8 +36,12 @@ __all__ = ["build_model", "RecModel", "DistillationModel", "AttentionModel"]
 def build_model(config):
     arch_config = copy.deepcopy(config["Arch"])
     model_type = arch_config.pop("name")
+    use_sync_bn = arch_config.pop("use_sync_bn", False)
     mod = importlib.import_module(__name__)
     arch = getattr(mod, model_type)(**arch_config)
+    if use_sync_bn:
+        arch = nn.SyncBatchNorm.convert_sync_batchnorm(arch)
+
     if isinstance(arch, TheseusLayer):
         prune_model(config, arch)
         quantize_model(config, arch)
@@ -60,6 +64,7 @@ def apply_to_static(config, model):
         specs = None
         if 'image_shape' in config['Global']:
             specs = [InputSpec([None] + config['Global']['image_shape'])]
+            specs[0].stop_gradient = True
         model = to_static(model, input_spec=specs)
         logger.info("Successfully to apply @to_static with specs: {}".format(
             specs))
