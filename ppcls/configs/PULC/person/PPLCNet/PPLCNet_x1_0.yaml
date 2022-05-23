@@ -2,12 +2,12 @@
 Global:
   checkpoints: null
   pretrained_model: null
-  output_dir: ./output
+  output_dir: ./output/
   device: gpu
   save_interval: 1
   eval_during_train: True
-  start_eval_epoch: 10
   eval_interval: 1
+  start_eval_epoch: 10
   epochs: 20
   print_batch_step: 10
   use_visualdl: False
@@ -18,39 +18,20 @@ Global:
   to_static: False
   use_dali: False
 
+
 # model architecture
 Arch:
-  name: "DistillationModel"
-  class_num: &class_num 2
-  # if not null, its lengths should be same as models
-  pretrained_list:
-  # if not null, its lengths should be same as models
-  freeze_params_list:
-  - True
-  - False
+  name: PPLCNet_x1_0
+  class_num: 2
+  pretrained: True
+  use_ssld: True
   use_sync_bn: True
-  models:
-    - Teacher:
-        name: ResNet101_vd
-        class_num: *class_num
-        use_sync_bn: True
-    - Student:
-        name: PPLCNet_x1_0
-        class_num: *class_num
-        pretrained: True
-        use_ssld: True
-        use_sync_bn: True
-        lr_mult_list: [0.0, 0.2, 0.4, 0.6, 0.8, 1.0]
-
-  infer_model_name: "Student"
  
 # loss function config for traing/eval process
 Loss:
   Train:
-    - DistillationDMLLoss:
+    - CELoss:
         weight: 1.0
-        model_name_pairs:
-        - ["Student", "Teacher"]
   Eval:
     - CELoss:
         weight: 1.0
@@ -74,7 +55,7 @@ DataLoader:
     dataset:
       name: ImageNetDataset
       image_root: ./dataset/person/
-      cls_label_path: ./dataset/person/train_list_for_distill.txt
+      cls_label_path: ./dataset/person/train_list.txt
       transform_ops:
         - DecodeImage:
             to_rgb: True
@@ -107,7 +88,7 @@ DataLoader:
       drop_last: False
       shuffle: True
     loader:
-      num_workers: 16
+      num_workers: 8
       use_shared_memory: True
 
   Eval:
@@ -155,16 +136,16 @@ Infer:
         order: ''
     - ToCHWImage:
   PostProcess:
-    name: Topk
-    topk: 5
-    class_id_map_file: ppcls/utils/imagenet1k_label_list.txt
+    name: ThreshOutput
+    threshold: 0.9
+    label_0: nobody
+    label_1: someone
 
 Metric:
-    Train:
-    - DistillationTopkAcc:
-        model_key: "Student"
+  Train:
+    - TopkAcc:
         topk: [1, 2]
-    Eval:
+  Eval:
     - TprAtFpr:
     - TopkAcc:
         topk: [1, 2]

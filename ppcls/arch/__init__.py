@@ -40,6 +40,7 @@ def build_model(config):
     arch = getattr(mod, model_type)(**arch_config)
     if use_sync_bn:
         arch = nn.SyncBatchNorm.convert_sync_batchnorm(arch)
+
     if isinstance(arch, TheseusLayer):
         prune_model(config, arch)
         quantize_model(config, arch)

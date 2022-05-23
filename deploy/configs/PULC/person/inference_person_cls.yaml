@@ -1,9 +1,9 @@
 Global:
-  infer_imgs: "./images/cls_demo/person/objects365_02035329.jpg"
+  infer_imgs: "./images/PULC/person/objects365_02035329.jpg"
   inference_model_dir: "./models/person_cls_infer"
   batch_size: 1
   use_gpu: True
-  enable_mkldnn: True
+  enable_mkldnn: False
   cpu_num_threads: 10
   enable_benchmark: True
   use_fp16: False
@@ -30,7 +30,7 @@ PostProcess:
   main_indicator: ThreshOutput
   ThreshOutput:
     threshold: 0.9
-    label_0: invalid
-    label_1: valid
+    label_0: nobody
+    label_1: someone
   SavePreLabel:
     save_dir: ./pre_label/

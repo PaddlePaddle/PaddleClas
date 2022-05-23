@@ -91,7 +91,7 @@ def search_strategy():
         res = search_train(teacher_list, teacher_program, base_output_dir, "teacher", replace_config, model_name)
         all_results["teacher"] = res
         best = res.get("best")
-        t_pretrained = "{}/{}_{}/{}/best_model".format(base_output_dir, "teacher", best, best)
+        t_pretrained = "{}/{}_{}_0/{}/best_model".format(base_output_dir, "teacher", best, best)
         base_program += ["-o", "Arch.models.0.Teacher.name={}".format(best),
                          "-o", "Arch.models.0.Teacher.pretrained={}".format(t_pretrained)]
     output_dir = "{}/search_res".format(base_output_dir)
