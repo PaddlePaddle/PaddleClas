@@ -345,7 +345,7 @@ def PPHGNet_small(pretrained=False, use_ssld=False, **kwargs):
     return model
 
 
-def PPHGNet_base(pretrained=False, use_ssld=False, **kwargs):
+def PPHGNet_base(pretrained=False, use_ssld=True, **kwargs):
     """
     PPHGNet_base
     Args:
