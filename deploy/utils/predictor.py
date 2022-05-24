@@ -62,6 +62,26 @@ class Predictor(object):
 
         if args.use_gpu:
             config.enable_use_gpu(args.gpu_mem, 0)
+            if args.use_tensorrt:
+                precision = Config.Precision.Float32
+                if args.get("use_int8", False):
+                    precision = Config.Precision.Int8
+                elif args.get("use_fp16", False):
+                    precision = Config.Precision.Half
+
+                config.enable_tensorrt_engine(
+                    precision_mode=precision,
+                    max_batch_size=args.batch_size,
+                    workspace_size=1 << 30,
+                    min_subgraph_size=3,
+                    use_calib_mode=False)
+
+                # collect shape
+                shape_fn = args.get("shape_range_info_filename", None)
+                if args.get("collect_shape", False):
+                    config.collect_shape_range_info(shape_fn)
+                if shape_fn is not None and os.path.exists(shape_fn):
+                    config.enable_tuned_tensorrt_dynamic_shape(shape_fn, True)
         else:
             config.disable_gpu()
             if args.enable_mkldnn:
@@ -76,19 +96,6 @@ class Predictor(object):
             config.enable_profile()
         config.disable_glog_info()
         config.switch_ir_optim(args.ir_optim)  # default true
-        if args.use_tensorrt:
-            precision = Config.Precision.Float32
-            if args.get("use_int8", False):
-                precision = Config.Precision.Int8
-            elif args.get("use_fp16", False):
-                precision = Config.Precision.Half
-
-            config.enable_tensorrt_engine(
-                precision_mode=precision,
-                max_batch_size=args.batch_size,
-                workspace_size=1 << 30,
-                min_subgraph_size=30,
-                use_calib_mode=False)
 
         config.enable_memory_optim()
         # use zero copy
