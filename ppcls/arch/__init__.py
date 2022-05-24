@@ -15,7 +15,6 @@
 import copy
 import importlib
 
-import paddle
 import paddle.nn as nn
 from paddle.jit import to_static
 from paddle.static import InputSpec
@@ -41,14 +40,6 @@ def build_model(config):
     if isinstance(arch, TheseusLayer):
         prune_model(config, arch)
         quantize_model(config, arch)
-
-    logger.info("The FLOPs and Params of Arch:")
-    try:
-        flops = paddle.flops(arch, [1, *config["Global"]["image_shape"]])
-    except Exception as e:
-        logger.warning(
-            f"An error occurred when calculating FLOPs and Params of Arch. Please check the Global.image_shape in config. The details of error is: {e}"
-        )
 
     return arch
 
