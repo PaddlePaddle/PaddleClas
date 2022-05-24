@@ -91,7 +91,9 @@ Park 等人提出了 RKD [10]，基于关系的知识蒸馏算法，RKD 中进�
 >
 > arxiv, 2021
 
-SSLD是百度于2021年提出的一种简单的半监督知识蒸馏方案，通过设计简单的损失函数以及数据挖掘策略，最终帮助15个骨干网络模型的精度平均提升超过3%。
+SSLD是百度于2021年提出的一种简单的半监督知识蒸馏方案，通过设计一种改进的JS散度作为损失函数，结合基于ImageNet22k数据集的数据挖掘策略，最终帮助15个骨干网络模型的精度平均提升超过3%。
+
+更多关于SSLD的原理介绍，请参考：[SSLD知识蒸馏算法介绍](../advanced_tutorials/knowledge_distillation.md)。
 
 训练的过程中，使用ImageNet22k中的400W数据作为无标注数据，最终在ImageNet1k公开数据集上，效果如下所示。
 
@@ -124,8 +126,8 @@ DML论文中，在蒸馏的过程中，不依赖于教师模型，两个结构�
 
 | 策略 | 骨干网络 | 配置文件 | Top-1 acc | 下载链接 |
 | --- | --- | --- | --- | --- |
-| baseline | PPLCNet_x2_5 | [PPLCNet_x2_5.yaml](../../../ppcls/configs/ImageNet/PPLCNet/PPLCNet_x2_5.yaml) | 74.93% | [链接(coming soon)]() |
-| DML | PPLCNet_x2_5 | [PPLCNet_x2_5_dml.yaml](../../../ppcls/configs/ImageNet/Distillation/PPLCNet_x2_5_dml.yaml) | 76.68%(**+1.75%**) | [链接(coming soon)]() |
+| baseline | PPLCNet_x2_5 | [PPLCNet_x2_5.yaml](../../../ppcls/configs/ImageNet/PPLCNet/PPLCNet_x2_5.yaml) | 74.93% | - |
+| DML | PPLCNet_x2_5 | [PPLCNet_x2_5_dml.yaml](../../../ppcls/configs/ImageNet/Distillation/PPLCNet_x2_5_dml.yaml) | 76.68%(**+1.75%**) | - |
 
 
 * 注：完整的PPLCNet_x2_5模型训练了360epoch，这里为了方便对比，baseline和DML均训练了100epoch，因此指标比官网最终开源出来的模型精度（76.60%）低一些。
@@ -133,16 +135,45 @@ DML论文中，在蒸馏的过程中，不依赖于教师模型，两个结构�
 
 ### 4.3 AFD
 
+论文信息：
+
+
+> [Show, attend and distill: Knowledge distillation via attention-based feature matching](https://arxiv.org/abs/2102.02973)
+>
+> Mingi Ji, Byeongho Heo, Sungrae Park
+>
+> AAAI, 2018
+
+AFD提出在蒸馏的过程中，利用基于注意力的元网络学习特征之间的相对相似性，并应用识别的相似关系来控制所有可能的特征图pair的蒸馏强度。
+
+在ImageNet1k公开数据集上，效果如下所示。
+
 | 策略 | 骨干网络 | 配置文件 | Top-1 acc | 下载链接 |
 | --- | --- | --- | --- | --- |
-| baseline | ResNet18 | [ResNet18.yaml](../../../ppcls/configs/ImageNet/ResNet/ResNet18.yaml) | 70.8% | [链接(Coming soon)]() |
-| AFD | ResNet18 | [resnet34_distill_resnet18_afd.yaml](../../../ppcls/configs/ImageNet/Distillation/resnet34_distill_resnet18_afd.yaml) | 71.68%(**+0.88%**) | [链接(Coming soon)]() |
+| baseline | ResNet18 | [ResNet18.yaml](../../../ppcls/configs/ImageNet/ResNet/ResNet18.yaml) | 70.8% | - |
+| AFD | ResNet18 | [resnet34_distill_resnet18_afd.yaml](../../../ppcls/configs/ImageNet/Distillation/resnet34_distill_resnet18_afd.yaml) | 71.68%(**+0.88%**) | - |
 
 注意：这里为了与论文的训练配置保持对齐，设置训练的迭代轮数为100epoch，因此baseline精度低于PaddleClas中开源出的模型精度（71.0%）
 
 ### 4.4 DKD
 
+论文信息：
 
+
+> [Decoupled Knowledge Distillation](https://arxiv.org/abs/2203.08679)
+>
+> Borui Zhao, Quan Cui, Renjie Song, Yiyu Qiu, Jiajun Liang
+>
+> CVPR, 2022
+
+DKD将蒸馏中常用的 KD Loss 进行了解耦成为Target Class Knowledge Distillation(TCKD，目标类知识蒸馏)以及Non-target Class Knowledge Distillation(NCKD，非目标类知识蒸馏)两个部分，对两个部分的作用分别研究，并使它们各自的权重可以独立调节，提升了蒸馏的精度和灵活性。
+
+在ImageNet1k公开数据集上，效果如下所示。
+
+| 策略 | 骨干网络 | 配置文件 | Top-1 acc | 下载链接 |
+| --- | --- | --- | --- | --- |
+| baseline | ResNet18 | [ResNet18.yaml](../../../ppcls/configs/ImageNet/ResNet/ResNet18.yaml) | 70.8% | - |
+| AFD | ResNet18 | [resnet34_distill_resnet18_dkd.yaml](../../../ppcls/configs/ImageNet/Distillation/resnet34_distill_resnet18_dkd.yaml) | 72.59%(**+1.79%**) | - |
 
 
 <a name='5'></a>
