@@ -73,7 +73,7 @@ class Predictor(object):
                     precision_mode=precision,
                     max_batch_size=args.batch_size,
                     workspace_size=1 << 30,
-                    min_subgraph_size=3,
+                    min_subgraph_size=30,
                     use_calib_mode=False)
 
                 # collect shape
