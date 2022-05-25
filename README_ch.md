@@ -10,7 +10,9 @@
 
 - 🔥 2022.5.26 B站[飞桨直播课](https://space.bilibili.com/476867757)，解读**超轻量重点区域人员出入管理方案**，欢迎报名来交流。
 
-  <img src="/Users/zhouying15/Library/Caches/BaiduMacHi/Share/images/d3b526ec0293ea9272406f7adf52a8cd.png" alt="d3b526ec0293ea9272406f7adf52a8cd" style="zoom:50%;" />
+  <div align="center">
+  <img src="https://user-images.githubusercontent.com/80816848/170166458-767a01ca-1429-437f-a628-dd184732ef53.png"  width = "150" />
+  </div>
 
 - 2022.5.23 新增[人员出入管理范例库](https://aistudio.baidu.com/aistudio/projectdetail/4037898)，具体内容可以在 AI Stuio 上体验。
 
