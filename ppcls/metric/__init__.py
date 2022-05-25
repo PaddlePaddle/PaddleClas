@@ -20,6 +20,7 @@ from .metrics import TopkAcc, mAP, mINP, Recallk, Precisionk
 from .metrics import DistillationTopkAcc
 from .metrics import GoogLeNetTopkAcc
 from .metrics import HammingDistance, AccuracyScore
+from .metrics import ATTRMetric
 from .metrics import TprAtFpr
 
 
@@ -55,12 +56,15 @@ class CombinedMetrics(AvgMetrics):
     def avg(self):
         return self.metric_func_list[0].avg
 
+    def attr_res(self):
+        return self.metric_func_list[0].attrmeter.res()
+
     def reset(self):
         for metric in self.metric_func_list:
             if hasattr(metric, "reset"):
                 metric.reset()
 
+
 def build_metrics(config):
     metrics_list = CombinedMetrics(copy.deepcopy(config))
     return metrics_list
-

@@ -113,7 +113,8 @@ def init_model(config, net, optimizer=None, loss: paddle.nn.Layer=None):
         net.set_state_dict(para_dict)
         loss.set_state_dict(para_dict)
         for i in range(len(optimizer)):
-            optimizer[i].set_state_dict(opti_dict)
+            optimizer[i].set_state_dict(opti_dict[i] if isinstance(
+                opti_dict, list) else opti_dict)
         logger.info("Finish load checkpoints from {}".format(checkpoints))
         return metric_dict
 

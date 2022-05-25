@@ -32,7 +32,7 @@ from ppcls.arch.distill.afd_attention import LinearTransformStudent, LinearTrans
 __all__ = ["build_model", "RecModel", "DistillationModel", "AttentionModel"]
 
 
-def build_model(config):
+def build_model(config, mode="train"):
     arch_config = copy.deepcopy(config["Arch"])
     model_type = arch_config.pop("name")
     use_sync_bn = arch_config.pop("use_sync_bn", False)
@@ -43,7 +43,8 @@ def build_model(config):
 
     if isinstance(arch, TheseusLayer):
         prune_model(config, arch)
-        quantize_model(config, arch)
+        quantize_model(config, arch, mode)
+
     return arch
 
 
@@ -54,6 +55,7 @@ def apply_to_static(config, model):
         specs = None
         if 'image_shape' in config['Global']:
             specs = [InputSpec([None] + config['Global']['image_shape'])]
+            specs[0].stop_gradient = True
         model = to_static(model, input_spec=specs)
         logger.info("Successfully to apply @to_static with specs: {}".format(
             specs))

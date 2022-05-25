@@ -22,8 +22,10 @@ from sklearn.metrics import accuracy_score as accuracy_metric
 from sklearn.metrics import multilabel_confusion_matrix
 from sklearn.preprocessing import binarize
 
+from easydict import EasyDict
+
 from ppcls.metric.avg_metrics import AvgMetrics
-from ppcls.utils.misc import AverageMeter
+from ppcls.utils.misc import AverageMeter, AttrMeter
 
 
 class TopkAcc(AvgMetrics):
@@ -36,7 +38,10 @@ class TopkAcc(AvgMetrics):
         self.reset()
 
     def reset(self):
-        self.avg_meters = {"top{}".format(k): AverageMeter("top{}".format(k)) for k in self.topk}
+        self.avg_meters = {
+            "top{}".format(k): AverageMeter("top{}".format(k))
+            for k in self.topk
+        }
 
     def forward(self, x, label):
         if isinstance(x, dict):
@@ -51,15 +56,16 @@ class TopkAcc(AvgMetrics):
 
 
 class mAP(nn.Layer):
-    def __init__(self):
+    def __init__(self, descending=True):
         super().__init__()
+        self.descending = descending
 
     def forward(self, similarities_matrix, query_img_id, gallery_img_id,
                 keep_mask):
         metric_dict = dict()
 
         choosen_indices = paddle.argsort(
-            similarities_matrix, axis=1, descending=True)
+            similarities_matrix, axis=1, descending=self.descending)
         gallery_labels_transpose = paddle.transpose(gallery_img_id, [1, 0])
         gallery_labels_transpose = paddle.broadcast_to(
             gallery_labels_transpose,
@@ -95,15 +101,16 @@ class mAP(nn.Layer):
 
 
 class mINP(nn.Layer):
-    def __init__(self):
+    def __init__(self, descending=True):
         super().__init__()
+        self.descending = descending
 
     def forward(self, similarities_matrix, query_img_id, gallery_img_id,
                 keep_mask):
         metric_dict = dict()
 
         choosen_indices = paddle.argsort(
-            similarities_matrix, axis=1, descending=True)
+            similarities_matrix, axis=1, descending=self.descending)
         gallery_labels_transpose = paddle.transpose(gallery_img_id, [1, 0])
         gallery_labels_transpose = paddle.broadcast_to(
             gallery_labels_transpose,
@@ -114,7 +121,7 @@ class mINP(nn.Layer):
                                             choosen_indices)
         equal_flag = paddle.equal(choosen_label, query_img_id)
         if keep_mask is not None:
-            keep_mask = paddle.index_sample(
+            keep_mask = paddle.indechmx_sample(
                 keep_mask.astype('float32'), choosen_indices)
             equal_flag = paddle.logical_and(equal_flag,
                                             keep_mask.astype('bool'))
@@ -138,7 +145,7 @@ class mINP(nn.Layer):
 
 
 class TprAtFpr(nn.Layer):
-    def __init__(self, max_fpr=1/1000.):
+    def __init__(self, max_fpr=1 / 1000.):
         super().__init__()
         self.gt_pos_score_list = []
         self.gt_neg_score_list = []
@@ -176,25 +183,30 @@ class TprAtFpr(nn.Layer):
             threshold = i / 10000.
             if len(gt_pos_score_list) == 0:
                 continue
-            tpr = np.sum(gt_pos_score_list > threshold) / len(gt_pos_score_list)
+            tpr = np.sum(
+                gt_pos_score_list > threshold) / len(gt_pos_score_list)
             if len(gt_neg_score_list) == 0 and tpr > max_tpr:
                 max_tpr = tpr
-                result = "threshold: {}, fpr: {}, tpr: {:.5f}".format(threshold, fpr, tpr)
-            fpr = np.sum(gt_neg_score_list > threshold) / len(gt_neg_score_list)
+                result = "threshold: {}, fpr: {}, tpr: {:.5f}".format(
+                    threshold, fpr, tpr)
+            fpr = np.sum(
+                gt_neg_score_list > threshold) / len(gt_neg_score_list)
             if fpr <= self.max_fpr and tpr > max_tpr:
                 max_tpr = tpr
-                result = "threshold: {}, fpr: {}, tpr: {:.5f}".format(threshold, fpr, tpr)
+                result = "threshold: {}, fpr: {}, tpr: {:.5f}".format(
+                    threshold, fpr, tpr)
         self.max_tpr = max_tpr
         return result
 
 
 class Recallk(nn.Layer):
-    def __init__(self, topk=(1, 5)):
+    def __init__(self, topk=(1, 5), descending=True):
         super().__init__()
         assert isinstance(topk, (int, list, tuple))
         if isinstance(topk, int):
             topk = [topk]
         self.topk = topk
+        self.descending = descending
 
     def forward(self, similarities_matrix, query_img_id, gallery_img_id,
                 keep_mask):
@@ -202,7 +214,7 @@ class Recallk(nn.Layer):
 
         #get cmc
         choosen_indices = paddle.argsort(
-            similarities_matrix, axis=1, descending=True)
+            similarities_matrix, axis=1, descending=self.descending)
         gallery_labels_transpose = paddle.transpose(gallery_img_id, [1, 0])
         gallery_labels_transpose = paddle.broadcast_to(
             gallery_labels_transpose,
@@ -234,12 +246,13 @@ class Recallk(nn.Layer):
 
 
 class Precisionk(nn.Layer):
-    def __init__(self, topk=(1, 5)):
+    def __init__(self, topk=(1, 5), descending=True):
         super().__init__()
         assert isinstance(topk, (int, list, tuple))
         if isinstance(topk, int):
             topk = [topk]
         self.topk = topk
+        self.descending = descending
 
     def forward(self, similarities_matrix, query_img_id, gallery_img_id,
                 keep_mask):
@@ -247,7 +260,7 @@ class Precisionk(nn.Layer):
 
         #get cmc
         choosen_indices = paddle.argsort(
-            similarities_matrix, axis=1, descending=True)
+            similarities_matrix, axis=1, descending=self.descending)
         gallery_labels_transpose = paddle.transpose(gallery_img_id, [1, 0])
         gallery_labels_transpose = paddle.broadcast_to(
             gallery_labels_transpose,
@@ -329,7 +342,8 @@ class HammingDistance(MultiLabelMetric):
         metric_dict = dict()
         metric_dict["HammingDistance"] = paddle.to_tensor(
             hamming_loss(target, preds))
-        self.avg_meters["HammingDistance"].update(metric_dict["HammingDistance"].numpy()[0], output.shape[0])
+        self.avg_meters["HammingDistance"].update(
+            metric_dict["HammingDistance"].numpy()[0], output.shape[0])
         return metric_dict
 
 
@@ -368,5 +382,66 @@ class AccuracyScore(MultiLabelMetric):
             accuracy = (sum(tps) + sum(tns)) / (
                 sum(tps) + sum(tns) + sum(fns) + sum(fps))
         metric_dict["AccuracyScore"] = paddle.to_tensor(accuracy)
-        self.avg_meters["AccuracyScore"].update(metric_dict["AccuracyScore"].numpy()[0], output.shape[0])
+        self.avg_meters["AccuracyScore"].update(
+            metric_dict["AccuracyScore"].numpy()[0], output.shape[0])
+        return metric_dict
+
+
+def get_attr_metrics(gt_label, preds_probs, threshold):
+    """
+    index: evaluated label index
+    """
+    pred_label = (preds_probs > threshold).astype(int)
+
+    eps = 1e-20
+    result = EasyDict()
+
+    has_fuyi = gt_label == -1
+    pred_label[has_fuyi] = -1
+
+    ###############################
+    # label metrics
+    # TP + FN
+    result.gt_pos = np.sum((gt_label == 1), axis=0).astype(float)
+    # TN + FP
+    result.gt_neg = np.sum((gt_label == 0), axis=0).astype(float)
+    # TP
+    result.true_pos = np.sum((gt_label == 1) * (pred_label == 1),
+                             axis=0).astype(float)
+    # TN
+    result.true_neg = np.sum((gt_label == 0) * (pred_label == 0),
+                             axis=0).astype(float)
+    # FP
+    result.false_pos = np.sum(((gt_label == 0) * (pred_label == 1)),
+                              axis=0).astype(float)
+    # FN
+    result.false_neg = np.sum(((gt_label == 1) * (pred_label == 0)),
+                              axis=0).astype(float)
+
+    ################
+    # instance metrics
+    result.gt_pos_ins = np.sum((gt_label == 1), axis=1).astype(float)
+    result.true_pos_ins = np.sum((pred_label == 1), axis=1).astype(float)
+    # true positive
+    result.intersect_pos = np.sum((gt_label == 1) * (pred_label == 1),
+                                  axis=1).astype(float)
+    # IOU
+    result.union_pos = np.sum(((gt_label == 1) + (pred_label == 1)),
+                              axis=1).astype(float)
+
+    return result
+
+
+class ATTRMetric(nn.Layer):
+    def __init__(self, threshold=0.5):
+        super().__init__()
+        self.threshold = threshold
+
+    def reset(self):
+        self.attrmeter = AttrMeter(threshold=0.5)
+
+    def forward(self, output, target):
+        metric_dict = get_attr_metrics(target[:, 0, :].numpy(),
+                                       output.numpy(), self.threshold)
+        self.attrmeter.update(metric_dict)
         return metric_dict
