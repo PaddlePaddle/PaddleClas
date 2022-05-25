@@ -287,7 +287,8 @@ class ResNet(TheseusLayer):
                  data_format="NCHW",
                  input_image_channel=3,
                  return_patterns=None,
-                 return_stages=None):
+                 return_stages=None,
+                 **kargs):
         super().__init__()
 
         self.cfg = config

@@ -20,6 +20,7 @@ Arch:
   name: "ResNet50"
   pretrained: True
   class_num: 26
+  infer_add_softmax: False
 
 # loss function config for traing/eval process
 Loss:
@@ -110,5 +111,3 @@ DataLoader:
 Metric:
   Eval:
     - ATTRMetric:
-
-
