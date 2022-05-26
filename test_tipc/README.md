@@ -35,11 +35,14 @@
 │   ├── MobileNetV3         # MobileNetV3系列模型测试配置文件目录
 │   │   ├── MobileNetV3_large_x1_0_train_infer_python.txt                                    #基础训练预测配置文件
 │   │   ├── MobileNetV3_large_x1_0_train_linux_gpu_fleet_amp_infer_python_linux_gpu_cpu.txt  #多机多卡训练预测配置文件
-│   │   └── MobileNetV3_large_x1_0_train_linux_gpu_normal_amp_infer_python_linux_gpu_cpu.txt #混合精度训练预测配置文件
+│   │   ├── MobileNetV3_large_x1_0_train_linux_gpu_fleet_amp_infer_python_linux_gpu_cpu.txt  #多机多卡训练预测配置文件
+│   │   └── MobileNetV3_large_x1_0_paddle2onnx_infer_python.txt                              #paddle2onnx推理测试配置文件
 │   └── ResNet              # ResNet系列模型测试配置文件目录
 │       ├── ResNet50_vd_train_infer_python.txt                                        #基础训练预测配置文件
 │       ├── ResNet50_vd_train_linux_gpu_fleet_amp_infer_python_linux_gpu_cpu.txt      #多机多卡训练预测配置文件
-│       └── ResNet50_vd_train_linux_gpu_normal_amp_infer_python_linux_gpu_cpu.txt     #混合精度训练预测配置文件
+│       ├── ResNet50_vd_train_linux_gpu_fleet_amp_infer_python_linux_gpu_cpu.txt      #多机多卡训练预测配置文件
+│       ├── ResNet50_vd_train_linux_gpu_normal_amp_infer_python_linux_gpu_cpu.txt     #混合精度训练预测配置文件
+│       └── ResNet50_vd_paddle2onnx_infer_python.txt                                  #paddle2onnx推理测试配置文件
 |   ......
 ├── docs
 │   ├── guide.png
@@ -47,6 +50,7 @@
 ├── prepare.sh                          # 完成test_*.sh运行所需要的数据和模型下载
 ├── README.md                           # 使用文档
 ├── results                             # 预先保存的预测结果，用于和实际预测结果进行精读比对
+├── test_paddle2onnx.sh                 # 测试paddle2onnx推理预测的主程序
 └── test_train_inference_python.sh      # 测试python训练预测的主程序
 ```
 
