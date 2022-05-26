@@ -33,11 +33,14 @@ from ppcls.data.preprocess.ops.operators import AugMix
 from ppcls.data.preprocess.ops.operators import Pad
 from ppcls.data.preprocess.ops.operators import ToTensor
 from ppcls.data.preprocess.ops.operators import Normalize
+from ppcls.data.preprocess.ops.operators import RandomCropImage
+from ppcls.data.preprocess.ops.operators import Padv2
 
 from ppcls.data.preprocess.batch_ops.batch_operators import MixupOperator, CutmixOperator, OpSampler, FmixOperator
 
 import numpy as np
 from PIL import Image
+import random
 
 
 def transform(data, ops=[]):
@@ -88,16 +91,16 @@ class RandAugment(RawRandAugment):
 class TimmAutoAugment(RawTimmAutoAugment):
     """ TimmAutoAugment wrapper to auto fit different img tyeps. """
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, prob=1.0, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.prob = prob
 
     def __call__(self, img):
         if not isinstance(img, Image.Image):
             img = np.ascontiguousarray(img)
             img = Image.fromarray(img)
-
-        img = super().__call__(img)
-
+        if random.random() < self.prob:
+            img = super().__call__(img)
         if isinstance(img, Image.Image):
             img = np.asarray(img)
 
