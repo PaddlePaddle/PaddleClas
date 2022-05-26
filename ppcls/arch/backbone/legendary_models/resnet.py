@@ -138,7 +138,10 @@ class ConvBNLayer(TheseusLayer):
         bias_attr = ParamAttr(learning_rate=lr_mult, trainable=True)
 
         self.bn = BatchNorm2D(
-            num_filters, weight_attr=weight_attr, bias_attr=bias_attr)
+            num_filters,
+            weight_attr=ParamAttr(learning_rate=lr_mult),
+            bias_attr=ParamAttr(learning_rate=lr_mult),
+            data_format=data_format)
         self.relu = nn.ReLU()
 
     def forward(self, x):
