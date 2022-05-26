@@ -64,9 +64,17 @@ class ThreshOutput(object):
         for idx, probs in enumerate(x):
             score = probs[1]
             if score < self.threshold:
-                result = {"class_ids": [0], "scores":  [1 - score], "label_names": [self.label_0]}
+                result = {
+                    "class_ids": [0],
+                    "scores": [1 - score],
+                    "label_names": [self.label_0]
+                }
             else:
-                result = {"class_ids": [1], "scores": [score], "label_names": [self.label_1]}
+                result = {
+                    "class_ids": [1],
+                    "scores": [score],
+                    "label_names": [self.label_1]
+                }
             if file_names is not None:
                 result["file_name"] = file_names[idx]
             y.append(result)
@@ -264,5 +272,11 @@ class Attribute(object):
             shoe = 'Boots' if res[14] > self.threshold else 'No boots'
             label_res.append(shoe)
 
-            batch_res.append(label_res)
+            threshold_list = [0.5] * len(res)
+            threshold_list[1] = self.glasses_threshold
+            threshold_list[18] = self.hold_threshold
+            pred_res = (np.array(res) > np.array(threshold_list)
+                        ).astype(np.int8).tolist()
+
+            batch_res.append([label_res, pred_res])
         return batch_res

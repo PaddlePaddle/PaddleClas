@@ -27,7 +27,7 @@ PreProcess:
 PostProcess:
   main_indicator: Attribute
   Attribute:
-    threshold: 0.5
-    glasses_threshold: 0.3
-    hold_threshold: 0.6
+    threshold: 0.5  #default threshold
+    glasses_threshold: 0.3  #threshold only for glasses
+    hold_threshold: 0.6 #threshold only for hold
   

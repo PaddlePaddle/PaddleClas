@@ -140,9 +140,10 @@ def main(config):
             for number, result_dict in enumerate(batch_results):
                 if "Attribute" in config["PostProcess"]:
                     filename = batch_names[number]
-                    attr_message = result_dict
-                    print("{}:\tclass id(s): {}".format(filename,
-                                                        attr_message))
+                    attr_message = result_dict[0]
+                    pred_res = result_dict[1]
+                    print("{}:\t attributes: {}, \npredict output: {}".format(
+                        filename, attr_message, pred_res))
                 else:
                     filename = batch_names[number]
                     clas_ids = result_dict["class_ids"]
