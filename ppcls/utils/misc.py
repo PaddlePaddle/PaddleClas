@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import paddle
+
 __all__ = ['AverageMeter']
 
 
@@ -44,6 +46,8 @@ class AverageMeter(object):
 
     @property
     def avg_info(self):
+        if isinstance(self.avg, paddle.Tensor):
+            self.avg = self.avg.numpy()[0]
         return "{}: {:.5f}".format(self.name, self.avg)
 
     @property

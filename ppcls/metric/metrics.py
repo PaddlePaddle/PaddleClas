@@ -51,8 +51,7 @@ class TopkAcc(AvgMetrics):
         for k in self.topk:
             metric_dict["top{}".format(k)] = paddle.metric.accuracy(
                 x, label, k=k)
-            self.avg_meters["top{}".format(k)].update(
-                metric_dict["top{}".format(k)].numpy()[0], x.shape[0])
+            self.avg_meters["top{}".format(k)].update(metric_dict["top{}".format(k)], x.shape[0])
         return metric_dict
 
 
