@@ -390,6 +390,7 @@ class AccuracyScore(MultiLabelMetric):
 def get_attr_metrics(gt_label, preds_probs, threshold):
     """
     index: evaluated label index
+    adapted from "https://github.com/valencebond/Rethinking_of_PAR/blob/master/metrics/pedestrian_metrics.py"
     """
     pred_label = (preds_probs > threshold).astype(int)
 

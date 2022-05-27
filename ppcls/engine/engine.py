@@ -458,7 +458,9 @@ class Engine(object):
 
     def export(self):
         assert self.mode == "export"
-        use_multilabel = self.config["Global"].get("use_multilabel", False)
+        use_multilabel = self.config["Global"].get(
+            "use_multilabel",
+            False) and not "ATTRMetric" in self.config["Metric"]["Eval"][0]
         model = ExportModel(self.config["Arch"], self.model, use_multilabel)
         if self.config["Global"]["pretrained_model"] is not None:
             load_dygraph_pretrain(model.base_model,
