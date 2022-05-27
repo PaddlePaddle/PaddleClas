@@ -21,8 +21,8 @@ import paddle.nn as nn
 import paddle.nn.functional as F
 from paddle.nn.initializer import TruncatedNormal, Constant
 
-from .vision_transformer import trunc_normal_, zeros_, ones_, to_2tuple, DropPath, Identity
-
+from ppcls.arch.backbone.base.theseus_layer import TheseusLayer
+from ppcls.arch.backbone.model_zoo.vision_transformer import trunc_normal_, zeros_, ones_, to_2tuple, DropPath, Identity
 from ppcls.utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
 
 MODEL_URLS = {
@@ -589,7 +589,7 @@ class PatchEmbed(nn.Layer):
         return flops
 
 
-class SwinTransformer(nn.Layer):
+class SwinTransformer(TheseusLayer):
     """ Swin Transformer
         A PaddlePaddle impl of : `Swin Transformer: Hierarchical Vision Transformer using Shifted Windows`  -
           https://arxiv.org/pdf/2103.14030

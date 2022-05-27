@@ -12,6 +12,7 @@ Global:
   use_visualdl: False
   eval_mode: "retrieval"
   retrieval_feature_from: "features" # 'backbone' or 'features'
+  re_ranking: False
   # used for static mode and model export
   image_shape: [3, 256, 128]
   save_inference_dir: "./inference"
@@ -90,6 +91,7 @@ DataLoader:
           - ResizeImage:
               size: [128, 256]
               return_numpy: False
+              interpolation: 'bilinear'
               backend: "pil"
           - RandFlipImage:
               flip_code: 1
@@ -127,6 +129,7 @@ DataLoader:
           - ResizeImage:
               size: [128, 256]
               return_numpy: False
+              interpolation: 'bilinear'
               backend: "pil"
           - ToTensor:
           - Normalize:
@@ -151,6 +154,7 @@ DataLoader:
           - ResizeImage:
               size: [128, 256]
               return_numpy: False
+              interpolation: 'bilinear'
               backend: "pil"
           - ToTensor:
           - Normalize:

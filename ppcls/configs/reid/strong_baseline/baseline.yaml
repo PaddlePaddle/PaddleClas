@@ -12,6 +12,7 @@ Global:
   use_visualdl: False
   eval_mode: "retrieval"
   retrieval_feature_from: "backbone" # 'backbone' or 'neck'
+  re_ranking: False
   # used for static mode and model export
   image_shape: [3, 256, 128]
   save_inference_dir: "./inference"
@@ -31,6 +32,14 @@ Arch:
     name: "FC"
     embedding_size: 2048
     class_num: 751
+    weight_attr:
+      initializer:
+        name: KaimingUniform
+        fan_in: 12288 # 6*embedding_size
+    bias_attr:
+      initializer:
+        name: KaimingUniform
+        fan_in: 12288 # 6*embedding_size
 
 # loss function config for traing/eval process
 Loss:
@@ -52,7 +61,6 @@ Optimizer:
     name: Piecewise
     decay_epochs: [40, 70]
     values: [0.00035, 0.000035, 0.0000035]
-    warmup_epoch: 10
     by_epoch: True
     last_epoch: 0
   regularizer:
@@ -71,6 +79,7 @@ DataLoader:
           - ResizeImage:
               size: [128, 256]
               return_numpy: False
+              interpolation: 'bilinear'
               backend: "pil"
           - RandFlipImage:
               flip_code: 1
@@ -102,6 +111,7 @@ DataLoader:
           - ResizeImage:
               size: [128, 256]
               return_numpy: False
+              interpolation: 'bilinear'
               backend: "pil"
           - ToTensor:
           - Normalize:
@@ -126,6 +136,7 @@ DataLoader:
           - ResizeImage:
               size: [128, 256]
               return_numpy: False
+              interpolation: 'bilinear'
               backend: "pil"
           - ToTensor:
           - Normalize:

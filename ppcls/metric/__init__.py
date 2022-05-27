@@ -12,17 +12,19 @@
 #See the License for the specific language governing permissions and
 #limitations under the License.
 
-from paddle import nn
 import copy
 from collections import OrderedDict
 
+from .avg_metrics import AvgMetrics
 from .metrics import TopkAcc, mAP, mINP, Recallk, Precisionk
 from .metrics import DistillationTopkAcc
 from .metrics import GoogLeNetTopkAcc
 from .metrics import HammingDistance, AccuracyScore
+from .metrics import ATTRMetric
+from .metrics import TprAtFpr
 
 
-class CombinedMetrics(nn.Layer):
+class CombinedMetrics(AvgMetrics):
     def __init__(self, config_list):
         super().__init__()
         self.metric_func_list = []
@@ -38,12 +40,29 @@ class CombinedMetrics(nn.Layer):
                     eval(metric_name)(**metric_params))
             else:
                 self.metric_func_list.append(eval(metric_name)())
+        self.reset()
 
-    def __call__(self, *args, **kwargs):
+    def forward(self, *args, **kwargs):
         metric_dict = OrderedDict()
         for idx, metric_func in enumerate(self.metric_func_list):
             metric_dict.update(metric_func(*args, **kwargs))
         return metric_dict
+
+    @property
+    def avg_info(self):
+        return ", ".join([metric.avg_info for metric in self.metric_func_list])
+
+    @property
+    def avg(self):
+        return self.metric_func_list[0].avg
+
+    def attr_res(self):
+        return self.metric_func_list[0].attrmeter.res()
+
+    def reset(self):
+        for metric in self.metric_func_list:
+            if hasattr(metric, "reset"):
+                metric.reset()
 
 
 def build_metrics(config):
