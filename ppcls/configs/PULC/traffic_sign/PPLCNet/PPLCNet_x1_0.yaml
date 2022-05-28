@@ -93,7 +93,7 @@ DataLoader:
     dataset: 
       name: ImageNetDataset
       image_root: ./dataset/
-      cls_label_path: ./dataset/tt100k_clas_v2/label_list_test.txt
+      cls_label_path: ./dataset/traffic_sign/label_list_test.txt
       delimiter: "\t"
       transform_ops:
         - DecodeImage:
@@ -118,8 +118,7 @@ DataLoader:
       use_shared_memory: True
 
 Infer:
-  # infer_imgs: dataset/traffic_sign_demo/
-  infer_imgs: dataset/tt100k_clas_v2/test/
+  infer_imgs: dataset/traffic_sign/test/
   batch_size: 10
   transforms:
     - DecodeImage:
@@ -138,7 +137,7 @@ Infer:
   PostProcess:
     name: Topk
     topk: 5
-    class_id_map_file: dataset/tt100k_clas_v2/label_name_id.txt
+    class_id_map_file: dataset/traffic_sign/label_name_id.txt
 
 Metric:
   Train:

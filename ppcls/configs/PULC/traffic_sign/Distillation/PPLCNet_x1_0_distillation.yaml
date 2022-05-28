@@ -57,7 +57,6 @@ Loss:
   Eval:
     - CELoss:
         weight: 1.0
-        model_names: ["Student"]
 
 
 Optimizer:
@@ -78,7 +77,7 @@ DataLoader:
     dataset:
       name: ImageNetDataset
       image_root: ./dataset/
-      cls_label_path: ./dataset/tt100k_clas_v2/label_list_train.txt
+      cls_label_path: ./dataset/traffic_sign/label_list_train_for_distillation.txt
       delimiter: "\t"
       transform_ops:
         - DecodeImage:
@@ -117,7 +116,7 @@ DataLoader:
     dataset: 
       name: ImageNetDataset
       image_root: ./dataset/
-      cls_label_path: ./dataset/tt100k_clas_v2/label_list_test.txt
+      cls_label_path: ./dataset/traffic_sign/label_list_test.txt
       delimiter: "\t"
       transform_ops:
         - DecodeImage:
@@ -161,7 +160,7 @@ Infer:
   PostProcess:
     name: Topk
     topk: 5
-    class_id_map_file: ppcls/utils/imagenet1k_label_list.txt
+    class_id_map_file: dataset/traffic_sign/label_name_id.txt
 
 Metric:
     Train:

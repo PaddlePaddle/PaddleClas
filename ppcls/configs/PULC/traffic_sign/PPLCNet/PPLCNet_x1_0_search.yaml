@@ -24,7 +24,7 @@ Arch:
   name: PPLCNet_x1_0
   class_num: 232
   pretrained: True
-  use_ssld: True
+  # use_ssld: True
  
 # loss function config for traing/eval process
 Loss:
@@ -54,7 +54,7 @@ DataLoader:
     dataset:
       name: ImageNetDataset
       image_root: ./dataset/
-      cls_label_path: ./dataset/tt100k_clas_v2/label_list_train.txt
+      cls_label_path: ./dataset/traffic_sign/label_list_train.txt
       delimiter: "\t"
       transform_ops:
         - DecodeImage:
@@ -93,7 +93,7 @@ DataLoader:
     dataset: 
       name: ImageNetDataset
       image_root: ./dataset/
-      cls_label_path: ./dataset/tt100k_clas_v2/label_list_test.txt
+      cls_label_path: ./dataset/traffic_sign/label_list_test.txt
       delimiter: "\t"
       transform_ops:
         - DecodeImage:
@@ -138,7 +138,7 @@ Infer:
   PostProcess:
     name: Topk
     topk: 5
-    class_id_map_file: dataset/tt100k_clas_v2/label_name_id.txt
+    class_id_map_file: dataset/traffic_sign/label_name_id.txt
 
 Metric:
   Train:
