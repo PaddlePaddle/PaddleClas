@@ -94,13 +94,16 @@ class ConvBNLayer(TheseusLayer):
             stride=stride,
             padding=(filter_size - 1) // 2,
             groups=num_groups,
-            weight_attr=ParamAttr(initializer=KaimingNormal(), learning_rate=lr_mult),
+            weight_attr=ParamAttr(
+                initializer=KaimingNormal(), learning_rate=lr_mult),
             bias_attr=False)
 
         self.bn = BatchNorm2D(
             num_filters,
-            weight_attr=ParamAttr(regularizer=L2Decay(0.0), learning_rate=lr_mult),
-            bias_attr=ParamAttr(regularizer=L2Decay(0.0), learning_rate=lr_mult))
+            weight_attr=ParamAttr(
+                regularizer=L2Decay(0.0), learning_rate=lr_mult),
+            bias_attr=ParamAttr(
+                regularizer=L2Decay(0.0), learning_rate=lr_mult))
         self.hardswish = nn.Hardswish()
 
     def forward(self, x):
@@ -128,8 +131,7 @@ class DepthwiseSeparable(TheseusLayer):
             num_groups=num_channels,
             lr_mult=lr_mult)
         if use_se:
-            self.se = SEModule(num_channels,
-                               lr_mult=lr_mult)
+            self.se = SEModule(num_channels, lr_mult=lr_mult)
         self.pw_conv = ConvBNLayer(
             num_channels=num_channels,
             filter_size=1,
@@ -189,7 +191,8 @@ class PPLCNet(TheseusLayer):
                  lr_mult_list=[1.0, 1.0, 1.0, 1.0, 1.0, 1.0],
                  use_last_conv=True,
                  return_patterns=None,
-                 return_stages=None):
+                 return_stages=None,
+                 **kwargs):
         super().__init__()
         self.scale = scale
         self.class_expand = class_expand
@@ -271,7 +274,8 @@ class PPLCNet(TheseusLayer):
         self.avg_pool = AdaptiveAvgPool2D(1)
         if self.use_last_conv:
             self.last_conv = Conv2D(
-                in_channels=make_divisible(NET_CONFIG["blocks6"][-1][2] * scale),
+                in_channels=make_divisible(NET_CONFIG["blocks6"][-1][2] *
+                                           scale),
                 out_channels=self.class_expand,
                 kernel_size=1,
                 stride=1,
@@ -282,7 +286,8 @@ class PPLCNet(TheseusLayer):
         else:
             self.last_conv = None
         self.flatten = nn.Flatten(start_axis=1, stop_axis=-1)
-        self.fc = Linear(self.class_expand if self.use_last_conv else NET_CONFIG["blocks6"][-1][2], class_num)
+        self.fc = Linear(self.class_expand if self.use_last_conv else
+                         NET_CONFIG["blocks6"][-1][2], class_num)
 
         super().init_res(
             stages_pattern,

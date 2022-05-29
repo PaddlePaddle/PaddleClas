@@ -1,6 +1,6 @@
 # PaddleClas构建交通标志分类案例
 
-此处提供了用户使用 PaddleClas 快速构建轻量级、高精度、可落地的，主要基于交通标志场景的数据，融合了轻量级骨干网络PPLCNet、SSLD预训练权重、EDA数据增强策略、SKL-UGI知识蒸馏策略、SHAS超参数搜索策略，得到精度高、速度快、易于部署的交通标志分类模型。
+此处提供了用户使用 PaddleClas 快速构建轻量级、高精度、可落地的交通标志分类模型教程，主要基于交通标志场景的数据，融合了轻量级骨干网络PPLCNet、SSLD预训练权重、EDA数据增强策略、SKL-UGI知识蒸馏策略、SHAS超参数搜索策略，得到精度高、速度快、易于部署的交通标志分类模型。
 
 ------
 
@@ -81,23 +81,22 @@ wget https://paddleclas.bj.bcebos.com/models/PULC/traffic_sign_cls_infer.tar && 
 cd ../
 ```
 
-运行下面的命令，对图像 `./images/PULC/traffic_sign/objects365_02035329.jpg` 进行交通标志分类分类。
+运行下面的命令，对图像 `./images/PULC/traffic_sign/99603_17806.jpg` 进行交通标志分类分类。
 
 ```shell
 # 使用下面的命令使用 GPU 进行预测
-python3.7 python/predict_cls.py -c configs/PULC/traffic_sign/inference_traffic_sign_cls.yaml -o PostProcess.ThreshOutput.threshold=0.9794
+python3.7 python/predict_cls.py -c configs/PULC/traffic_sign/inference_traffic_sign_cls.yaml
 # 使用下面的命令使用 CPU 进行预测
-python3.7 python/predict_cls.py -c configs/PULC/traffic_sign/inference_traffic_sign_cls.yaml -o PostProcess.ThreshOutput.threshold=0.9794 -o Global.use_gpu=False
+python3.7 python/predict_cls.py -c configs/PULC/traffic_sign/inference_traffic_sign_cls.yaml -o Global.use_gpu=False
 ```
 
 输出结果如下。
 
 ```
-objects365_02035329.jpg:    class id(s): [1], score(s): [1.00], label_name(s): ['someone']
+99603_17806.jpg:        class id(s): [216, 145, 49, 207, 169], score(s): [1.00, 0.00, 0.00, 0.00, 0.00], label_name(s): ['pm20', 'pm30', 'pm40', 'pl25', 'pm15']
 ```
 
-
-**备注：** 真实场景中往往需要在假正类率（Fpr）小于某一个指标下求真正类率（Tpr），该场景中的`val`数据集在千分之一Fpr下得到的最佳Tpr所得到的阈值为`0.9794`，故此处的`threshold`为`0.9794`。该阈值的确定方法可以参考[3.2节](#3.2)
+`pm20`表示`限重20t`，结果正确，更多类别名称对应的交通标志图像可以参考[交通标志类别映射体系文档](../dataset/traffic_sign/report.pdf)查看。
 
 <a name="2.2.2"></a>
 
@@ -113,11 +112,8 @@ python3.7 python/predict_cls.py -c configs/PULC/traffic_sign/inference_traffic_s
 终端中会输出该文件夹内所有图像的分类结果，如下所示。
 
 ```
-objects365_01780782.jpg:    class id(s): [0], score(s): [1.00], label_name(s): ['nobody']
-objects365_02035329.jpg:    class id(s): [1], score(s): [1.00], label_name(s): ['someone']
+99603_17806.jpg:        class id(s): [216, 145, 49, 207, 169], score(s): [1.00, 0.00, 0.00, 0.00, 0.00], label_name(s): ['pm20', 'pm30', 'pm40', 'pl25', 'pm15']
 ```
-
-其中，`someone` 表示该图里存在人，`nobody` 表示该图里不存在人。
 
 <a name="3"></a>
 
@@ -168,6 +164,7 @@ traffic_sign
 ├── label_list_test.txt.debug
 ├── label_name_id.txt
 ├── deal.py
+
 ```
 
 其中`train/`和`test/`分别为训练集和验证集。`label_list_train.txt`和`label_list_test.txt`分别为训练集和验证集的标签文件，`label_list_train.txt.debug`和`label_list_test.txt.debug`分别为训练集和验证集的`debug`标签文件，其分别是`label_list_train.txt`和`label_list_test.txt`的子集，用该文件可以快速体验本案例的流程。`train`与`other`的混合数据用于本案例的`SKL-UGI知识蒸馏策略`，对应的训练标签文件为`label_list_train_for_distillation.txt`。
@@ -231,7 +228,7 @@ python3 -m paddle.distributed.launch \
         -o Arch.models.0.Teacher.pretrained=output/ResNet101_vd/best_model
 ```
 
-验证集的最佳指标为0.983左右，当前模型最好的权重保存在`output/DistillationModel/best_model_student.pdparams`。
+验证集的最佳指标为0.9835左右，当前模型最好的权重保存在`output/DistillationModel/best_model_student.pdparams`。
 
 <a name="3.2.2"></a>
 
