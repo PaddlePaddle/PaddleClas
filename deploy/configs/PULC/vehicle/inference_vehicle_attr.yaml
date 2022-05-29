@@ -1,8 +1,8 @@
 Global:
-  infer_imgs: "./images/PULC/traffic_sign/99603_17806.jpg"
-  inference_model_dir: "./models"
+  infer_imgs: "./images/PULC/vehicle/0002_c002_00030670_0.jpg"
+  inference_model_dir: "../inference/"
   batch_size: 1
-  use_gpu: True
+  use_gpu: False
   enable_mkldnn: True
   cpu_num_threads: 10
   enable_benchmark: True
@@ -15,11 +15,9 @@ Global:
 PreProcess:
   transform_ops:
     - ResizeImage:
-        resize_short: 256
-    - CropImage:
-        size: 224
+        size: [192, 256]
     - NormalizeImage:
-        scale: 0.00392157
+        scale: 1.0/255.0
         mean: [0.485, 0.456, 0.406]
         std: [0.229, 0.224, 0.225]
         order: ''
@@ -27,9 +25,8 @@ PreProcess:
     - ToCHWImage:
 
 PostProcess:
-  main_indicator: Topk
-  Topk:
-    topk: 5
-    class_id_map_file: "../dataset/traffic_sign/label_name_id.txt"
-  SavePreLabel:
-    save_dir: ./pre_label/
+  main_indicator: VehicleAttribute
+  VehicleAttribute:
+    color_threshold: 0.5
+    type_threshold: 0.5
+  
