@@ -138,13 +138,21 @@ def main(config):
                 continue
             batch_results = cls_predictor.predict(batch_imgs)
             for number, result_dict in enumerate(batch_results):
-                filename = batch_names[number]
-                clas_ids = result_dict["class_ids"]
-                scores_str = "[{}]".format(", ".join("{:.2f}".format(
-                    r) for r in result_dict["scores"]))
-                label_names = result_dict["label_names"]
-                print("{}:\tclass id(s): {}, score(s): {}, label_name(s): {}".
-                      format(filename, clas_ids, scores_str, label_names))
+                if "Attribute" in config["PostProcess"]:
+                    filename = batch_names[number]
+                    attr_message = result_dict[0]
+                    pred_res = result_dict[1]
+                    print("{}:\t attributes: {}, \npredict output: {}".format(
+                        filename, attr_message, pred_res))
+                else:
+                    filename = batch_names[number]
+                    clas_ids = result_dict["class_ids"]
+                    scores_str = "[{}]".format(", ".join("{:.2f}".format(
+                        r) for r in result_dict["scores"]))
+                    label_names = result_dict["label_names"]
+                    print(
+                        "{}:\tclass id(s): {}, score(s): {}, label_name(s): {}".
+                        format(filename, clas_ids, scores_str, label_names))
             batch_imgs = []
             batch_names = []
     if cls_predictor.benchmark:

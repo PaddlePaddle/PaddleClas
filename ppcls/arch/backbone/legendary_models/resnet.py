@@ -137,8 +137,11 @@ class ConvBNLayer(TheseusLayer):
         weight_attr = ParamAttr(learning_rate=lr_mult, trainable=True)
         bias_attr = ParamAttr(learning_rate=lr_mult, trainable=True)
 
-        self.bn = BatchNorm2D(
-            num_filters, weight_attr=weight_attr, bias_attr=bias_attr)
+        self.bn = BatchNorm(
+            num_filters,
+            param_attr=ParamAttr(learning_rate=lr_mult),
+            bias_attr=ParamAttr(learning_rate=lr_mult),
+            data_layout=data_format)
         self.relu = nn.ReLU()
 
     def forward(self, x):
@@ -287,7 +290,8 @@ class ResNet(TheseusLayer):
                  data_format="NCHW",
                  input_image_channel=3,
                  return_patterns=None,
-                 return_stages=None):
+                 return_stages=None,
+                 **kargs):
         super().__init__()
 
         self.cfg = config
