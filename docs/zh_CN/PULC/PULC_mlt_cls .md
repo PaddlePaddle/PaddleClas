@@ -52,7 +52,7 @@
 cd deploy
 ```
 
-下载整图文字方向分类的模型。
+下载多语言分类的模型。
 
 ```
 mkdir models
@@ -84,7 +84,7 @@ wget https://paddleclas.bj.bcebos.com/models/PULC/mlt_infer.tar && tar -xf mlt_c
 cd ../
 ```
 
-运行下面的命令，对图像 `./images/PULC/mlt/ILSVRC2012_val_00010000_5989.jpg` 进行整图文字方向分类。
+运行下面的命令，对图像 `./images/PULC/mlt/ILSVRC2012_val_00010000_5989.jpg` 进行多语言分类。
 
 ```shell
 # 使用下面的命令使用 GPU 进行预测
