@@ -35,10 +35,12 @@
 │   ├── MobileNetV3         # MobileNetV3系列模型测试配置文件目录
 │   │   ├── MobileNetV3_large_x1_0_train_infer_python.txt                                    #基础训练预测配置文件
 │   │   ├── MobileNetV3_large_x1_0_train_linux_gpu_fleet_amp_infer_python_linux_gpu_cpu.txt  #多机多卡训练预测配置文件
+│   │   ├── MobileNetV3_large_x1_0_linux_gpu_normal_normal_infer_cpp_linux_gpu_cpu.txt       #C++推理测试配置文件
 │   │   └── MobileNetV3_large_x1_0_train_linux_gpu_normal_amp_infer_python_linux_gpu_cpu.txt #混合精度训练预测配置文件
 │   └── ResNet              # ResNet系列模型测试配置文件目录
 │       ├── ResNet50_vd_train_infer_python.txt                                        #基础训练预测配置文件
 │       ├── ResNet50_vd_train_linux_gpu_fleet_amp_infer_python_linux_gpu_cpu.txt      #多机多卡训练预测配置文件
+│       ├── ResNet50_vd_linux_gpu_normal_normal_infer_cpp_linux_gpu_cpu.txt           #C++推理测试配置文件
 │       └── ResNet50_vd_train_linux_gpu_normal_amp_infer_python_linux_gpu_cpu.txt     #混合精度训练预测配置文件
 |   ......
 ├── docs
@@ -99,7 +101,7 @@ bash test_tipc/test_train_inference_python.sh ./test_tipc/configs/MobileNetV3/Mo
 
 ## 4 开始测试
 
-各功能测试中涉及混合精度、裁剪、量化等训练相关，及mkldnn、Tensorrt等多种预测相关参数配置，请点击下方相应链接了解更多细节和使用教程：  
+各功能测试中涉及混合精度、裁剪、量化等训练相关，及mkldnn、Tensorrt等多种预测相关参数配置，请点击下方相应链接了解更多细节和使用教程：
 
 - [test_train_inference_python 使用](docs/test_train_inference_python.md)：测试基于Python的模型训练、评估、推理等基本功能，包括裁剪、量化、蒸馏。
 - [test_inference_cpp 使用](docs/test_inference_cpp.md) ：测试基于C++的模型推理。

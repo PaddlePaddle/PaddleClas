@@ -1,0 +1,12 @@
+# model load config
+model_name:ResNet50
+use_gpu:True|False
+gpu_id:0
+gpu_mem:4000
+cpu_math_library_num_threads:10
+
+# cls config
+cls_model_path:./deploy/models/ResNet50_infer/inference.pdmodel
+cls_params_path:./deploy/models/ResNet50_infer/inference.pdiparams
+resize_short_size:256
+crop_size:224
