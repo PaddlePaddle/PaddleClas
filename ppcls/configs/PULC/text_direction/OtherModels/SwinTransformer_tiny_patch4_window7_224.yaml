@@ -54,7 +54,7 @@ DataLoader:
     dataset:
       name: ImageNetDataset
       image_root: ./dataset/direction/
-      cls_label_path: ./dataset/direction/train_new.txt
+      cls_label_path: ./dataset/direction/train_list.txt
       transform_ops:
         - DecodeImage:
             to_rgb: True
@@ -102,7 +102,7 @@ DataLoader:
     dataset: 
       name: ImageNetDataset
       image_root: ./dataset/direction/
-      cls_label_path: ./dataset/direction/test_new.txt
+      cls_label_path: ./dataset/direction/test_list.txt
       transform_ops:
         - DecodeImage:
             to_rgb: True
