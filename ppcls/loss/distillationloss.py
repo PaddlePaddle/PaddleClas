@@ -123,6 +123,7 @@ class DistillationDistanceLoss(DistanceLoss):
     def __init__(self,
                  mode="l2",
                  model_name_pairs=[],
+                 act=None,
                  key=None,
                  name="loss_",
                  **kargs):
@@ -131,6 +132,13 @@ class DistillationDistanceLoss(DistanceLoss):
         self.key = key
         self.model_name_pairs = model_name_pairs
         self.name = name + mode
+        assert act in [None, "sigmoid", "softmax"]
+        if act == "sigmoid":
+            self.act = nn.Sigmoid()
+        elif act == "softmax":
+            self.act = nn.Softmax(axis=-1)
+        else:
+            self.act = None
 
     def forward(self, predicts, batch):
         loss_dict = dict()
@@ -140,6 +148,9 @@ class DistillationDistanceLoss(DistanceLoss):
             if self.key is not None:
                 out1 = out1[self.key]
                 out2 = out2[self.key]
+            if self.act is not None:
+                out1 = self.act(out1)
+                out2 = self.act(out2)
             loss = super().forward(out1, out2)
             for key in loss:
                 loss_dict["{}_{}_{}".format(self.name, key, idx)] = loss[key]

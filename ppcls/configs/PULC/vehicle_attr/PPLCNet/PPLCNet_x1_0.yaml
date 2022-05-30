@@ -42,10 +42,10 @@ Optimizer:
   lr:
     name: Piecewise
     decay_epochs: [24, 36, 48, 56]
-    values: [0.0002, 0.00002, 0.000002, 0.0000002]
+    values: [0.0004, 0.00004, 0.000004, 0.0000004]
   regularizer:
     name: 'L2'
-    coeff: 0.00003
+    coeff: 0.0005
   clip_norm: 10
 
 # data loader for train and eval
@@ -81,7 +81,7 @@ DataLoader:
             std: [0.229, 0.224, 0.225]
             order: ''
         - RandomErasing:
-            EPSILON: 0.0
+            EPSILON: 0.3
             sl: 0.02
             sh: 1.0/3.0
             r1: 0.3
