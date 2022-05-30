@@ -13,4 +13,4 @@
 
 ![result](./imgs/someone.gif)
 
-**注**: AI Studio在线运行代码请参考[人员出入管理](https://aistudio.baidu.com/aistudio/projectdetail/4037898)
+**注**: AI Studio在线运行代码请参考[人员出入管理](https://aistudio.baidu.com/aistudio/projectdetail/4094475)

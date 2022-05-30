@@ -82,6 +82,7 @@ def classification_eval(engine, epoch_id=0):
         # gather Tensor when distributed
         if paddle.distributed.get_world_size() > 1:
             label_list = []
+
             paddle.distributed.all_gather(label_list, batch[1])
             labels = paddle.concat(label_list, 0)
 
@@ -123,6 +124,7 @@ def classification_eval(engine, epoch_id=0):
                     output_info[key] = AverageMeter(key, '7.5f')
                 output_info[key].update(loss_dict[key].numpy()[0],
                                         current_samples)
+
         #  calc metric
         if engine.eval_metric_func is not None:
             engine.eval_metric_func(preds, labels)
@@ -137,11 +139,14 @@ def classification_eval(engine, epoch_id=0):
             ips_msg = "ips: {:.5f} images/sec".format(
                 batch_size / time_info["batch_cost"].avg)
 
-            metric_msg = ", ".join([
-                "{}: {:.5f}".format(key, output_info[key].val)
-                for key in output_info
-            ])
-            metric_msg += ", {}".format(engine.eval_metric_func.avg_info)
+            if "ATTRMetric" in engine.config["Metric"]["Eval"][0]:
+                metric_msg = ""
+            else:
+                metric_msg = ", ".join([
+                    "{}: {:.5f}".format(key, output_info[key].val)
+                    for key in output_info
+                ])
+                metric_msg += ", {}".format(engine.eval_metric_func.avg_info)
             logger.info("[Eval][Epoch {}][Iter: {}/{}]{}, {}, {}".format(
                 epoch_id, iter_id,
                 len(engine.eval_dataloader), metric_msg, time_msg, ips_msg))
@@ -149,14 +154,29 @@ def classification_eval(engine, epoch_id=0):
         tic = time.time()
     if engine.use_dali:
         engine.eval_dataloader.reset()
-    metric_msg = ", ".join([
-        "{}: {:.5f}".format(key, output_info[key].avg) for key in output_info
-    ])
-    metric_msg += ", {}".format(engine.eval_metric_func.avg_info)
-    logger.info("[Eval][Epoch {}][Avg]{}".format(epoch_id, metric_msg))
 
-    # do not try to save best eval.model
-    if engine.eval_metric_func is None:
-        return -1
-    # return 1st metric in the dict
-    return engine.eval_metric_func.avg
+    if "ATTRMetric" in engine.config["Metric"]["Eval"][0]:
+        metric_msg = ", ".join([
+            "evalres: ma: {:.5f} label_f1: {:.5f} label_pos_recall: {:.5f} label_neg_recall: {:.5f} instance_f1: {:.5f} instance_acc: {:.5f} instance_prec: {:.5f} instance_recall: {:.5f}".
+            format(*engine.eval_metric_func.attr_res())
+        ])
+        logger.info("[Eval][Epoch {}][Avg]{}".format(epoch_id, metric_msg))
+
+        # do not try to save best eval.model
+        if engine.eval_metric_func is None:
+            return -1
+        # return 1st metric in the dict
+        return engine.eval_metric_func.attr_res()[0]
+    else:
+        metric_msg = ", ".join([
+            "{}: {:.5f}".format(key, output_info[key].avg)
+            for key in output_info
+        ])
+        metric_msg += ", {}".format(engine.eval_metric_func.avg_info)
+        logger.info("[Eval][Epoch {}][Avg]{}".format(epoch_id, metric_msg))
+
+        # do not try to save best eval.model
+        if engine.eval_metric_func is None:
+            return -1
+        # return 1st metric in the dict
+        return engine.eval_metric_func.avg
