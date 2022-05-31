@@ -174,161 +174,18 @@ fi
 if [ ${MODE} = "paddle2onnx_infer" ];then
     # prepare paddle2onnx env
     python_name=$(func_parser_value "${lines[2]}")
+    inference_model_url=$(func_parser_value "${lines[10]}")
+    tar_name=${inference_model_url##*/}
+
     ${python_name} -m pip install install paddle2onnx
     ${python_name} -m pip install onnxruntime
-    if [ ${model_name} == "ResNet50" ]; then
-        # wget model
-        cd deploy
-        mkdir models
-        cd models
-        wget -nc https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/ResNet50_infer.tar
-        tar xf ResNet50_infer.tar
-        cd ../../
-    fi
-    if [ ${model_name} == "ResNet50_vd" ]; then
-        # wget model
-        cd deploy
-        mkdir models
-        cd models
-        wget -nc https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/ResNet50_vd_infer.tar
-        tar xf ResNet50_vd_infer.tar
-        cd ../../
-    fi
-    if [ ${model_name} == "MobileNetV3_large_x1_0" ]; then
-        # wget model
-        cd deploy
-        mkdir models
-        cd models
-        wget -nc https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/MobileNetV3_large_x1_0_infer.tar
-        tar xf MobileNetV3_large_x1_0_infer.tar
-        cd ../../
-    fi
-    if [ ${model_name} == "SwinTransformer_tiny_patch4_window7_224" ]; then
-        # wget model
-        cd deploy
-        mkdir models
-        cd models
-        wget -nc https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/SwinTransformer_tiny_patch4_window7_224_infer.tar
-        tar xf SwinTransformer_tiny_patch4_window7_224_infer.tar
-        cd ../../
-    fi
-    if [ ${model_name} == "PPLCNet_x0_25" ]; then
-        # wget model
-        cd deploy
-        mkdir models
-        cd models
-        wget -nc https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/PPLCNet_x0_25_infer.tar
-        tar xf PPLCNet_x0_25_infer.tar
-        cd ../../
-    fi
-    if [ ${model_name} == "PPLCNet_x0_35" ]; then
-        # wget model
-        cd deploy
-        mkdir models
-        cd models
-        wget -nc https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/PPLCNet_x0_35_infer.tar
-        tar xf PPLCNet_x0_35_infer.tar
-        cd ../../
-    fi
-    if [ ${model_name} == "PPLCNet_x0_5" ]; then
-        # wget model
-        cd deploy
-        mkdir models
-        cd models
-        wget -nc https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/PPLCNet_x0_5_infer.tar
-        tar xf PPLCNet_x0_5_infer.tar
-        cd ../../
-    fi
-    if [ ${model_name} == "PPLCNet_x0_75" ]; then
-        # wget model
-        cd deploy
-        mkdir models
-        cd models
-        wget -nc https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/PPLCNet_x0_75_infer.tar
-        tar xf PPLCNet_x0_75_infer.tar
-        cd ../../
-    fi
-    if [ ${model_name} == "PPLCNet_x1_0" ]; then
-        # wget model
-        cd deploy
-        mkdir models
-        cd models
-        wget -nc https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/PPLCNet_x1_0_infer.tar
-        tar xf PPLCNet_x1_0_infer.tar
-        cd ../../
-    fi
-    if [ ${model_name} == "PPLCNet_x1_5" ]; then
-        # wget model
-        cd deploy
-        mkdir models
-        cd models
-        wget -nc https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/PPLCNet_x1_5_infer.tar
-        tar xf PPLCNet_x1_5_infer.tar
-        cd ../../
-    fi
-    if [ ${model_name} == "PPLCNet_x2_0" ]; then
-        # wget model
-        cd deploy
-        mkdir models
-        cd models
-        wget -nc https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/PPLCNet_x2_0_infer.tar
-        tar xf PPLCNet_x2_0_infer.tar
-        cd ../../
-    fi
-    if [ ${model_name} == "PPLCNet_x2_5" ]; then
-        # wget model
-        cd deploy
-        mkdir models
-        cd models
-        wget -nc https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/PPLCNet_x2_5_infer.tar
-        tar xf PPLCNet_x2_5_infer.tar
-        cd ../../
-    fi
-    if [ ${model_name} == "PP-ShiTu_general_rec" ]; then
-        # wget model
-        cd deploy
-        mkdir models
-        cd models
-        wget -nc https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/inference/general_PPLCNet_x2_5_lite_v1.0_infer.tar
-        tar xf general_PPLCNet_x2_5_lite_v1.0_infer.tar
-        cd ../../
-    fi
-    if [ ${model_name} == "PP-ShiTu_mainbody_det" ]; then
-        # wget model
-        cd deploy
-        mkdir models
-        cd models
-        wget -nc https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/inference/picodet_PPLCNet_x2_5_mainbody_lite_v1.0_infer.tar
-        tar xf picodet_PPLCNet_x2_5_mainbody_lite_v1.0_infer.tar
-        cd ../../
-    fi
-    if [ ${model_name} == "PPLCNetV2_base" ]; then
-        # wget model
-        cd deploy
-        mkdir models
-        cd models
-        wget -nc https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/PPLCNetV2_base_infer.tar
-        tar xf PPLCNetV2_base_infer.tar
-        cd ../../
-    fi
-    if [ ${model_name} == "PPHGNet_tiny" ]; then
-        # wget model
-        cd deploy
-        mkdir models
-        cd models
-        wget -nc https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/PPHGNet_tiny_infer.tar
-        tar xf PPHGNet_tiny_infer.tar
-        cd ../../
-    fi
-    if [ ${model_name} == "PPHGNet_small" ]; then
-        # wget model
-        cd deploy
-        mkdir models
-        cd models
-        wget -nc https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/PPHGNet_small_infer.tar
-        tar xf PPHGNet_small_infer.tar
-        cd ../../
-    fi
+    cd deploy
+    mkdir models
+    cd models
+    wget -nc ${inference_model_url}
+    tar xf ${tar_name}
+    cd ../../
+
 
 fi
 

@@ -11,7 +11,7 @@ python=$(func_parser_value "${lines[2]}")
 
 
 # parser params
-dataline=$(awk 'NR==1, NR==15{print}'  $FILENAME)
+dataline=$(awk 'NR==1, NR==16{print}'  $FILENAME)
 IFS=$'\n'
 lines=(${dataline})
 
@@ -32,17 +32,17 @@ opset_version_value=$(func_parser_value "${lines[8]}")
 enable_onnx_checker_key=$(func_parser_key "${lines[9]}")
 enable_onnx_checker_value=$(func_parser_value "${lines[9]}")
 # parser onnx inference
-inference_py=$(func_parser_value "${lines[10]}")
-use_onnx_key=$(func_parser_key "${lines[11]}")
-use_onnx_value=$(func_parser_value "${lines[11]}")
-inference_model_dir_key=$(func_parser_key "${lines[12]}")
-inference_model_dir_value=$(func_parser_value "${lines[12]}")
-inference_hardware_key=$(func_parser_key "${lines[13]}")
-inference_hardware_value=$(func_parser_value "${lines[13]}")
-inference_config_key=$(func_parser_key "${lines[14]}")
-inference_config_value=$(func_parser_value "${lines[14]}")
+inference_py=$(func_parser_value "${lines[11]}")
+use_onnx_key=$(func_parser_key "${lines[12]}")
+use_onnx_value=$(func_parser_value "${lines[12]}")
+inference_model_dir_key=$(func_parser_key "${lines[13]}")
+inference_model_dir_value=$(func_parser_value "${lines[13]}")
+inference_hardware_key=$(func_parser_key "${lines[14]}")
+inference_hardware_value=$(func_parser_value "${lines[14]}")
+inference_config_key=$(func_parser_key "${lines[15]}")
+inference_config_value=$(func_parser_value "${lines[15]}")
 
-LOG_PATH="./test_tipc/output"
+LOG_PATH="./test_tipc/output/${model_name}"
 mkdir -p ./test_tipc/output
 status_log="${LOG_PATH}/results_paddle2onnx.log"
 
