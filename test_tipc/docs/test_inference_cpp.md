@@ -9,8 +9,8 @@ Linux GPU/CPU C++ 推理功能测试的主程序为`test_inference_cpp.sh`，可
 | 算法名称   | 模型名称  | device_CPU          | device_GPU |
 |  :----:   |  :----: |   :----:            |  :----:  |
 |  MobileNetV3   |  MobileNetV3_large_x1_0 |  支持 | 支持 |
-|  PP-ShiTu   |  PPShiTu_general_rec |  支持 | 支持 |
-|  PP-ShiTu   |  PPShiTu_mainbody_det |  暂不支持 | 暂不支持 |
+|  PP-ShiTu   |  PPShiTu_general_rec、PPShiTu_mainbody_det |  支持 | 支持 |
+|  PP-ShiTu   |  PPShiTu_mainbody_det |  支持 | 支持 |
 |  PPHGNet   |  PPHGNet_small |  支持 | 支持 |
 |  PPHGNet   |  PPHGNet_tiny |  支持 | 支持 |
 |  PPLCNet   |  PPLCNet_x0_25 |  支持 | 支持 |
@@ -299,11 +299,11 @@ PostProcess:
 img_file_list length: 1
 Current image path: ./deploy/images/ILSVRC2012_val_00000010.jpeg
 Current total inferen time cost: 5449.39 ms.
-	Top1: class_id: 153, score: 0.4144, label: Maltese dog, Maltese terrier, Maltese
-	Top2: class_id: 332, score: 0.3909, label: Angora, Angora rabbit
-	Top3: class_id: 229, score: 0.0514, label: Old English sheepdog, bobtail
-	Top4: class_id: 204, score: 0.0430, label: Lhasa, Lhasa apso
-	Top5: class_id: 265, score: 0.0420, label: toy poodle
+    Top1: class_id: 153, score: 0.4144, label: Maltese dog, Maltese terrier, Maltese
+    Top2: class_id: 332, score: 0.3909, label: Angora, Angora rabbit
+    Top3: class_id: 229, score: 0.0514, label: Old English sheepdog, bobtail
+    Top4: class_id: 204, score: 0.0430, label: Lhasa, Lhasa apso
+    Top5: class_id: 265, score: 0.0420, label: toy poodle
 
 ```
 详细log位于`./test_tipc/output/ResNet50/cls_cpp_infer_gpu_usetrt_False_precision_fp32_batchsize_1.log`和`./test_tipc/output/ResNet50/cls_cpp_infer_cpu_usemkldnn_False_threads_1_precision_fp32_batchsize_1.log`中。
