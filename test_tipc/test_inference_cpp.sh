@@ -61,7 +61,7 @@ function func_shitu_cpp_inference(){
                         command="${generate_yaml_cmd} --type shitu --batch_size ${batch_size} --mkldnn ${use_mkldnn} --gpu ${use_gpu} --cpu_thread ${threads} --tensorrt False --precision ${precision} --data_dir ${_img_dir} --benchmark True --cls_model_dir ${cpp_infer_model_dir} --det_model_dir ${cpp_det_infer_model_dir} --gpu_id ${GPUID}"
                         eval $command
                         eval $transform_index_cmd
-                        command="${_script} 2>&1|tee ${_save_log_path}"
+                        command="${_script} > ${_save_log_path} 2>&1"
                         eval $command
                         last_status=${PIPESTATUS[0]}
                         status_check $last_status "${command}" "${status_log}"
@@ -85,7 +85,7 @@ function func_shitu_cpp_inference(){
                         command="${generate_yaml_cmd} --type shitu --batch_size ${batch_size} --mkldnn False --gpu ${use_gpu} --cpu_thread 1 --tensorrt ${use_trt} --precision ${precision} --data_dir ${_img_dir} --benchmark True --cls_model_dir ${cpp_infer_model_dir} --det_model_dir ${cpp_det_infer_model_dir} --gpu_id ${GPUID}"
                         eval $command
                         eval $transform_index_cmd
-                        command="${_script} 2>&1|tee ${_save_log_path}"
+                        command="${_script} > ${_save_log_path} 2>&1"
                         eval $command
                         last_status=${PIPESTATUS[0]}
                         status_check $last_status "${_script}" "${status_log}"
@@ -123,7 +123,7 @@ function func_cls_cpp_inference(){
 
                         command="${generate_yaml_cmd} --type cls --batch_size ${batch_size} --mkldnn ${use_mkldnn} --gpu ${use_gpu} --cpu_thread ${threads} --tensorrt False --precision ${precision} --data_dir ${_img_dir} --benchmark True --cls_model_dir ${cpp_infer_model_dir} --gpu_id ${GPUID}"
                         eval $command
-                        command1="${_script} 2>&1|tee ${_save_log_path}"
+                        command1="${_script} > ${_save_log_path} 2>&1"
                         eval ${command1}
                         last_status=${PIPESTATUS[0]}
                         status_check $last_status "${command1}" "${status_log}"
@@ -146,7 +146,7 @@ function func_cls_cpp_inference(){
                         _save_log_path="${_log_path}/cls_cpp_infer_gpu_usetrt_${use_trt}_precision_${precision}_batchsize_${batch_size}.log"
                         command="${generate_yaml_cmd} --type cls --batch_size ${batch_size} --mkldnn False --gpu ${use_gpu} --cpu_thread 1 --tensorrt ${use_trt} --precision ${precision} --data_dir ${_img_dir} --benchmark True --cls_model_dir ${cpp_infer_model_dir} --gpu_id ${GPUID}"
                         eval $command
-                        command="${_script} 2>&1|tee ${_save_log_path}"
+                        command="${_script} > ${_save_log_path} 2>&1"
                         eval $command
                         last_status=${PIPESTATUS[0]}
                         status_check $last_status "${command}" "${status_log}"
@@ -256,9 +256,9 @@ for infer_model in ${cpp_infer_model_dir[*]}; do
     #run inference
     is_quant=${infer_quant_flag[Count]}
     if [[ $cpp_infer_type == "cls" ]]; then
-	func_cls_cpp_inference "${inference_cmd}" "${infer_model}" "${LOG_PATH}" "${cpp_image_dir_value}" ${is_quant}
+        func_cls_cpp_inference "${inference_cmd}" "${infer_model}" "${LOG_PATH}" "${cpp_image_dir_value}" ${is_quant}
     else
-	func_shitu_cpp_inference "${inference_cmd}" "${infer_model}" "${LOG_PATH}" "${cpp_image_dir_value}" ${is_quant}
+        func_shitu_cpp_inference "${inference_cmd}" "${infer_model}" "${LOG_PATH}" "${cpp_image_dir_value}" ${is_quant}
     fi
     Count=$(($Count + 1))
 done

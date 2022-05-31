@@ -93,7 +93,7 @@ if [ ${MODE} = "cpp_infer" ]; then
         if [[ $cpp_type == "cls" ]]; then
             eval "wget -nc $cls_inference_url"
             tar xf "${model_name}_infer.tar"
-            eval "mv ${model_name}_infer $cls_inference_model_dir"
+
             cd dataset
             rm -rf ILSVRC2012
             wget -nc https://paddle-imagenet-models-name.bj.bcebos.com/data/whole_chain/whole_chain_infer.tar
@@ -105,13 +105,12 @@ if [ ${MODE} = "cpp_infer" ]; then
             tar_name=$(func_get_url_file_name "$cls_inference_url")
             model_dir=${tar_name%.*}
             eval "tar xf ${tar_name}"
-            eval "mv ${model_dir}_infer ${cls_inference_model_dir}"
 
             eval "wget -nc $det_inference_url"
             tar_name=$(func_get_url_file_name "$det_inference_url")
             model_dir=${tar_name%.*}
             eval "tar xf ${tar_name}"
-            eval "mv ${model_dir}_infer ${det_inference_model_dir}"
+
             cd dataset
             wget -nc https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/data/drink_dataset_v1.0.tar
             tar -xf drink_dataset_v1.0.tar

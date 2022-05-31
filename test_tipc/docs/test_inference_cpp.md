@@ -254,8 +254,8 @@ bash test_tipc/test_inference_cpp.sh test_tipc/config/ResNet/ResNet50_linux_gpu_
 输出结果如下，表示命令运行成功。
 
 ```shell
-Run successfully with command - ./deploy/cpp/build/clas_system -c ./deploy/config/inference_cls.yaml > ./test_tipc/output/ResNet50/infer_cpp/infer_cpp_use_gpu.log 2>&1 !
-Run successfully with command - ./deploy/cpp/build/clas_system -c ./deploy/config/inference_cls.yaml > ./test_tipc/output/ResNet50/infer_cpp/infer_cpp_use_cpu.log 2>&1 !
+Run successfully with command - ./deploy/cpp/build/clas_system -c inference_cls.yaml > ./test_tipc/output/ResNet50/cls_cpp_infer_gpu_usetrt_False_precision_fp32_batchsize_1.log 2>&1!
+Run successfully with command - ./deploy/cpp/build/clas_system -c inference_cls.yaml > ./test_tipc/output/ResNet50/cls_cpp_infer_cpu_usemkldnn_False_threads_1_precision_fp32_batchsize_1.log 2>&1!
 ```
 
 最终log中会打印出结果，如下所示
@@ -306,6 +306,6 @@ Current total inferen time cost: 5449.39 ms.
 	Top5: class_id: 265, score: 0.0420, label: toy poodle
 
 ```
-详细log位于`./test_tipc/output/ResNet50/infer_cpp/infer_cpp_use_gpu.log`和`./test_tipc/output/ResNet50/infer_cpp/infer_cpp_use_cpu.log`中。
+详细log位于`./test_tipc/output/ResNet50/cls_cpp_infer_gpu_usetrt_False_precision_fp32_batchsize_1.log`和`./test_tipc/output/ResNet50/cls_cpp_infer_cpu_usemkldnn_False_threads_1_precision_fp32_batchsize_1.log`中。
 
 如果运行失败，也会在终端中输出运行失败的日志信息以及对应的运行命令。可以基于该命令，分析运行失败的原因。
