@@ -1,7 +1,7 @@
 ===========================cpp_infer_params===========================
 model_name:PPLCNet_x1_5
 cpp_infer_type:cls
-cls_inference_model_dir:./inference/
+cls_inference_model_dir:./PPLCNet_x1_5_infer/
 det_inference_model_dir:
 cls_inference_url:https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/PPLCNet_x1_5_infer.tar
 det_inference_url:

@@ -1,7 +1,7 @@
 ===========================cpp_infer_params===========================
 model_name:PPHGNet_small
 cpp_infer_type:cls
-cls_inference_model_dir:./inference/
+cls_inference_model_dir:./PPHGNet_small_infer/
 det_inference_model_dir:
 cls_inference_url:https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/PPHGNet_small_infer.tar
 det_inference_url:
