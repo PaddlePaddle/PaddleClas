@@ -20,7 +20,7 @@ import numpy as np
 import paddle
 from paddle import ParamAttr
 import paddle.nn as nn
-from paddle.nn import Conv2D, BatchNorm, Linear, BatchNorm2D
+from paddle.nn import Conv2D, BatchNorm, Linear
 from paddle.nn import AdaptiveAvgPool2D, MaxPool2D, AvgPool2D
 from paddle.nn.initializer import Uniform
 from paddle.regularizer import L2Decay
@@ -133,9 +133,6 @@ class ConvBNLayer(TheseusLayer):
             weight_attr=ParamAttr(learning_rate=lr_mult),
             bias_attr=False,
             data_format=data_format)
-
-        weight_attr = ParamAttr(learning_rate=lr_mult, trainable=True)
-        bias_attr = ParamAttr(learning_rate=lr_mult, trainable=True)
 
         self.bn = BatchNorm(
             num_filters,
@@ -324,11 +321,11 @@ class ResNet(TheseusLayer):
         self.stem_cfg = {
             #num_channels, num_filters, filter_size, stride
             "vb": [[input_image_channel, 64, 7, self.stride_list[0]]],
-            "vd":
-            [[input_image_channel, 32, 3, self.stride_list[0]], [32, 32, 3, 1], [32, 64, 3, 1]]
+            "vd": [[input_image_channel, 32, 3, self.stride_list[0]],
+                   [32, 32, 3, 1], [32, 64, 3, 1]]
         }
 
-        self.stem = nn.Sequential(* [
+        self.stem = nn.Sequential(*[
             ConvBNLayer(
                 num_channels=in_c,
                 num_filters=out_c,
@@ -341,7 +338,10 @@ class ResNet(TheseusLayer):
         ])
 
         self.max_pool = MaxPool2D(
-            kernel_size=3, stride=stride_list[1], padding=1, data_format=data_format)
+            kernel_size=3,
+            stride=stride_list[1],
+            padding=1,
+            data_format=data_format)
         block_list = []
         for block_idx in range(len(self.block_depth)):
             shortcut = False
@@ -350,7 +350,8 @@ class ResNet(TheseusLayer):
                     num_channels=self.num_channels[block_idx] if i == 0 else
                     self.num_filters[block_idx] * self.channels_mult,
                     num_filters=self.num_filters[block_idx],
-                    stride=self.stride_list[block_idx+1] if i == 0 and block_idx != 0 else 1,
+                    stride=self.stride_list[block_idx + 1]
+                    if i == 0 and block_idx != 0 else 1,
                     shortcut=shortcut,
                     if_first=block_idx == i == 0 if version == "vd" else True,
                     lr_mult=self.lr_mult_list[block_idx + 1],
