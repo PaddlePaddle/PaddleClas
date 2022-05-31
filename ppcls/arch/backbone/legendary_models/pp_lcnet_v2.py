@@ -188,7 +188,7 @@ class RepDepthwiseSeparable(TheseusLayer):
     def forward(self, x):
         if self.use_rep:
             input_x = x
-            if not self.training:
+            if self.is_repped:
                 x = self.act(self.dw_conv(x))
             else:
                 y = self.dw_conv_list[0](x)
@@ -209,14 +209,12 @@ class RepDepthwiseSeparable(TheseusLayer):
             x = x + input_x
         return x
 
-    def eval(self):
+    def rep(self):
         if self.use_rep:
+            self.is_repped = True
             kernel, bias = self._get_equivalent_kernel_bias()
             self.dw_conv.weight.set_value(kernel)
             self.dw_conv.bias.set_value(bias)
-        self.training = False
-        for layer in self.sublayers():
-            layer.eval()
 
     def _get_equivalent_kernel_bias(self):
         kernel_sum = 0

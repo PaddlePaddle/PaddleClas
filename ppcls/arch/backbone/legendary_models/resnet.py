@@ -20,7 +20,7 @@ import numpy as np
 import paddle
 from paddle import ParamAttr
 import paddle.nn as nn
-from paddle.nn import Conv2D, BatchNorm, Linear
+from paddle.nn import Conv2D, BatchNorm, Linear, BatchNorm2D
 from paddle.nn import AdaptiveAvgPool2D, MaxPool2D, AvgPool2D
 from paddle.nn.initializer import Uniform
 from paddle.regularizer import L2Decay
@@ -395,7 +395,10 @@ def _load_pretrained(pretrained, model, model_url, use_ssld):
     elif pretrained is True:
         load_dygraph_pretrain_from_url(model, model_url, use_ssld=use_ssld)
     elif isinstance(pretrained, str):
-        load_dygraph_pretrain(model, pretrained)
+        if 'http' in pretrained:
+            load_dygraph_pretrain_from_url(model, pretrained, use_ssld=False)
+        else:
+            load_dygraph_pretrain(model, pretrained)
     else:
         raise RuntimeError(
             "pretrained type is not available. Please use `string` or `boolean` type."

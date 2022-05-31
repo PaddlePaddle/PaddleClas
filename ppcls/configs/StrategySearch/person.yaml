@@ -1,0 +1,40 @@
+base_config_file: ppcls/configs/PULC/person/PPLCNet/PPLCNet_x1_0_search.yaml
+distill_config_file: ppcls/configs/PULC/person/Distillation/PPLCNet_x1_0_distillation.yaml
+
+gpus: 0,1,2,3
+output_dir: output/search_person
+search_times: 1
+search_dict:
+  - search_key: lrs
+    replace_config:
+      - Optimizer.lr.learning_rate
+    search_values: [0.0075, 0.01, 0.0125]
+  - search_key: resolutions
+    replace_config:
+      - DataLoader.Train.dataset.transform_ops.1.RandCropImage.size
+      - DataLoader.Train.dataset.transform_ops.3.TimmAutoAugment.img_size
+    search_values: [176, 192, 224]
+  - search_key: ra_probs
+    replace_config:
+      - DataLoader.Train.dataset.transform_ops.3.TimmAutoAugment.prob
+    search_values: [0.0, 0.1, 0.5]
+  - search_key: re_probs
+    replace_config:
+      - DataLoader.Train.dataset.transform_ops.5.RandomErasing.EPSILON
+    search_values: [0.0, 0.1, 0.5]
+  - search_key: lr_mult_list
+    replace_config:
+      - Arch.lr_mult_list
+    search_values:
+      - [0.0, 0.2, 0.4, 0.6, 0.8, 1.0]
+      - [0.0, 0.4, 0.4, 0.8, 0.8, 1.0]
+      - [1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
+teacher:
+  rm_keys:
+    - Arch.lr_mult_list
+  search_values:
+    - ResNet101_vd
+    - ResNet50_vd
+final_replace:
+  Arch.lr_mult_list: Arch.models.1.Student.lr_mult_list
+

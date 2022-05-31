@@ -132,6 +132,7 @@ class DepthwiseSeparable(TheseusLayer):
             lr_mult=lr_mult)
         if use_se:
             self.se = SEModule(num_channels, lr_mult=lr_mult)
+
         self.pw_conv = ConvBNLayer(
             num_channels=num_channels,
             filter_size=1,
