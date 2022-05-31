@@ -37,6 +37,7 @@ status_log="${LOG_PATH}/results_infer_cpp.log"
 
 line_inference_model_dir=3
 line_use_gpu=5
+line_infer_imgs=2
 function func_infer_cpp(){
     # inference cpp
     IFS='|'
@@ -49,12 +50,19 @@ function func_infer_cpp(){
         # run infer cpp
         inference_cpp_cmd="./deploy/cpp/build/clas_system"
         inference_cpp_cfg="./deploy/configs/inference_cls.yaml"
+
         set_model_name_cmd="sed -i '${line_inference_model_dir}s#: .*#: ./deploy/models/${model_name}_infer#' '${inference_cpp_cfg}'"
-        set_use_gpu_cmd="sed -i '${line_use_gpu}s#: .*#: ${use_gpu}#' '${inference_cpp_cfg}'"
         eval $set_model_name_cmd
+
+        set_infer_imgs_cmd="sed -i '${line_infer_imgs}s#: .*#: ./deploy/images/ILSVRC2012_val_00000010.jpeg#' '${inference_cpp_cfg}'"
+        eval $set_infer_imgs_cmd
+
+        set_use_gpu_cmd="sed -i '${line_use_gpu}s#: .*#: ${use_gpu}#' '${inference_cpp_cfg}'"
         eval $set_use_gpu_cmd
+
         infer_cpp_full_cmd="${inference_cpp_cmd} -c ${inference_cpp_cfg} > ${_save_log_path} 2>&1 "
         eval $infer_cpp_full_cmd
+
         last_status=${PIPESTATUS[0]}
         status_check $last_status "${infer_cpp_full_cmd}" "${status_log}"  "${model_name}"
     done

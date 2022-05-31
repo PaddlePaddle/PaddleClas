@@ -234,7 +234,7 @@ make -j
 
 * 可执行以下命令，自动完成上述准备环境中的所需内容
 ```shell
-bash test_tipc/prepare.sh test_tipc/configs/ResNet50/ResNet50_linux_gpu_normal_normal_infer_cpp_linux_gpu_cpu.txt cpp_infer
+bash test_tipc/prepare.sh test_tipc/config/ResNet/ResNet50_linux_gpu_normal_normal_infer_cpp_linux_gpu_cpu.txt cpp_infer
 ```
 ### 2.3 功能测试
 
@@ -248,14 +248,14 @@ bash test_tipc/test_inference_cpp.sh ${your_params_file}
 以`ResNet50`的`Linux GPU/CPU C++推理测试`为例，命令如下所示。
 
 ```shell
-bash test_tipc/test_inference_cpp.sh test_tipc/configs/ResNet50/ResNet50_linux_gpu_normal_normal_infer_cpp_linux_gpu_cpu.txt
+bash test_tipc/test_inference_cpp.sh test_tipc/config/ResNet/ResNet50_linux_gpu_normal_normal_infer_cpp_linux_gpu_cpu.txt
 ```
 
 输出结果如下，表示命令运行成功。
 
 ```shell
-Run successfully with command - ./deploy/cpp/build/clas_system -c ./deploy/configs/inference_cls.yaml > ./test_tipc/output/ResNet50/infer_cpp/infer_cpp_use_gpu.log 2>&1 !
-Run successfully with command - ./deploy/cpp/build/clas_system -c ./deploy/configs/inference_cls.yaml > ./test_tipc/output/ResNet50/infer_cpp/infer_cpp_use_cpu.log 2>&1 !
+Run successfully with command - ./deploy/cpp/build/clas_system -c ./deploy/config/inference_cls.yaml > ./test_tipc/output/ResNet50/infer_cpp/infer_cpp_use_gpu.log 2>&1 !
+Run successfully with command - ./deploy/cpp/build/clas_system -c ./deploy/config/inference_cls.yaml > ./test_tipc/output/ResNet50/infer_cpp/infer_cpp_use_cpu.log 2>&1 !
 ```
 
 最终log中会打印出结果，如下所示

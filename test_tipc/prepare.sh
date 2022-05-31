@@ -44,46 +44,207 @@ function func_get_url_file_name(){
 model_name=$(func_parser_value "${lines[1]}")
 
 if [ ${MODE} = "cpp_infer" ];then
-   if [[ $FILENAME == *infer_cpp_linux_gpu_cpu.txt ]];then
-	cpp_type=$(func_parser_value "${lines[2]}")
-	cls_inference_model_dir=$(func_parser_value "${lines[3]}")
-	det_inference_model_dir=$(func_parser_value "${lines[4]}")
-	cls_inference_url=$(func_parser_value "${lines[5]}")
-	det_inference_url=$(func_parser_value "${lines[6]}")
+    if [ -d "./deploy/cpp/opencv-3.4.7/opencv3/" ] && [ $(md5sum ./deploy/cpp/opencv-3.4.7.tar.gz | awk -F ' ' '{print $1}') = "faa2b5950f8bee3f03118e600c74746a" ];then
+        echo "################### build opencv skipped ###################"
+    else
+        echo "################### build opencv ###################"
+        rm -rf ./deploy/cpp/opencv-3.4.7.tar.gz ./deploy/cpp/opencv-3.4.7/
+        pushd ./deploy/cpp/
+        wget -nc https://paddleocr.bj.bcebos.com/dygraph_v2.0/test/opencv-3.4.7.tar.gz
+        tar -xf opencv-3.4.7.tar.gz
 
-	if [[ $cpp_type == "cls" ]];then
-	    eval "wget -nc $cls_inference_url"
-	    tar xf "${model_name}_inference.tar"
-	    eval "mv inference $cls_inference_model_dir"
-	    cd dataset
-    	    rm -rf ILSVRC2012
-    	    wget -nc https://paddle-imagenet-models-name.bj.bcebos.com/data/whole_chain/whole_chain_infer.tar
-    	    tar xf whole_chain_infer.tar
-    	    ln -s whole_chain_infer ILSVRC2012
-	    cd ..
-	elif [[ $cpp_type == "shitu" ]];then
-	    eval "wget -nc $cls_inference_url"
-	    tar_name=$(func_get_url_file_name "$cls_inference_url")
-	    model_dir=${tar_name%.*}
-	    eval "tar xf ${tar_name}"
-	    eval "mv ${model_dir} ${cls_inference_model_dir}"
+        cd opencv-3.4.7/
+        install_path=$(pwd)/opencv3
+        rm -rf build
+        mkdir build
+        cd build
 
-	    eval "wget -nc $det_inference_url"
-	    tar_name=$(func_get_url_file_name "$det_inference_url")
-	    model_dir=${tar_name%.*}
-	    eval "tar xf ${tar_name}"
-	    eval "mv ${model_dir} ${det_inference_model_dir}"
-	    cd dataset
-	    wget -nc https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/data/drink_dataset_v1.0.tar
-	    tar -xf drink_dataset_v1.0.tar
-	else
-	    echo "Wrong cpp type in config file in line 3. only support cls, shitu"
-	fi
-	exit 0
-   else
-	echo "use wrong config file"
-	exit 1
-   fi
+        cmake .. \
+                -DCMAKE_INSTALL_PREFIX=${install_path} \
+                -DCMAKE_BUILD_TYPE=Release \
+                -DBUILD_SHARED_LIBS=OFF \
+                -DWITH_IPP=OFF \
+                -DBUILD_IPP_IW=OFF \
+                -DWITH_LAPACK=OFF \
+                -DWITH_EIGEN=OFF \
+                -DCMAKE_INSTALL_LIBDIR=lib64 \
+                -DWITH_ZLIB=ON \
+                -DBUILD_ZLIB=ON \
+                -DWITH_JPEG=ON \
+                -DBUILD_JPEG=ON \
+                -DWITH_PNG=ON \
+                -DBUILD_PNG=ON \
+                -DWITH_TIFF=ON \
+                -DBUILD_TIFF=ON
+
+        make -j
+        make install
+        cd ../../
+        popd
+        echo "################### build opencv finished ###################"
+    fi
+    set_OPENCV_DIR_cmd="sed -i '1s#OPENCV_DIR=.*#OPENCV_DIR=../opencv-3.4.7/opencv3/#' './deploy/cpp/tools/build.sh'"
+    eval ${set_OPENCV_DIR_cmd}
+    if [ -d "./deploy/cpp/paddle_inference/" ]; then
+        echo "################### build paddle inference lib skipped ###################"
+    else
+        pushd ./deploy/cpp/
+        wget https://paddle-inference-lib.bj.bcebos.com/2.1.1-gpu-cuda10.2-cudnn8.1-mkl-gcc8.2/paddle_inference.tgz
+        tar -xvf paddle_inference.tgz
+        echo "################### build paddle inference lib finished ###################"
+    fi
+    set_LIB_DIR_cmd="sed -i '2s#LIB_DIR=.*#LIB_DIR=../paddle_inference/#' './deploy/cpp/tools/build.sh'"
+    # echo ${set_LIB_DIR_cmd}
+    eval ${set_LIB_DIR_cmd}
+    # exit
+    if [ -d "./deploy/cpp/build/" ]; then
+        echo "################### build cpp inference skipped ###################"
+    else
+        pushd ./deploy/cpp/
+        bash tools/build.sh
+        popd
+        echo "################### build cpp inference finished ###################"
+    fi
+
+    if [ ${model_name} == "ResNet50" ]; then
+        # wget model
+        cd deploy
+        mkdir models
+        cd models
+        wget -nc https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/ResNet50_infer.tar
+        tar xf ResNet50_infer.tar
+        cd ../../
+    elif [ ${model_name} == "ResNet50_vd" ]; then
+        # wget model
+        cd deploy
+        mkdir models
+        cd models
+        wget -nc https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/ResNet50_vd_infer.tar
+        tar xf ResNet50_vd_infer.tar
+        cd ../../
+    elif [ ${model_name} == "MobileNetV3_large_x1_0" ]; then
+        # wget model
+        cd deploy
+        mkdir models
+        cd models
+        wget -nc https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/MobileNetV3_large_x1_0_infer.tar
+        tar xf MobileNetV3_large_x1_0_infer.tar
+        cd ../../
+    elif [ ${model_name} == "SwinTransformer_tiny_patch4_window7_224" ]; then
+        # wget model
+        cd deploy
+        mkdir models
+        cd models
+        wget -nc https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/SwinTransformer_tiny_patch4_window7_224_infer.tar
+        tar xf SwinTransformer_tiny_patch4_window7_224_infer.tar
+        cd ../../
+    elif [ ${model_name} == "PPLCNet_x0_25" ]; then
+        # wget model
+        cd deploy
+        mkdir models
+        cd models
+        wget -nc https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/PPLCNet_x0_25_infer.tar
+        tar xf PPLCNet_x0_25_infer.tar
+        cd ../../
+    elif [ ${model_name} == "PPLCNet_x0_35" ]; then
+        # wget model
+        cd deploy
+        mkdir models
+        cd models
+        wget -nc https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/PPLCNet_x0_35_infer.tar
+        tar xf PPLCNet_x0_35_infer.tar
+        cd ../../
+    elif [ ${model_name} == "PPLCNet_x0_5" ]; then
+        # wget model
+        cd deploy
+        mkdir models
+        cd models
+        wget -nc https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/PPLCNet_x0_5_infer.tar
+        tar xf PPLCNet_x0_5_infer.tar
+        cd ../../
+    elif [ ${model_name} == "PPLCNet_x0_75" ]; then
+        # wget model
+        cd deploy
+        mkdir models
+        cd models
+        wget -nc https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/PPLCNet_x0_75_infer.tar
+        tar xf PPLCNet_x0_75_infer.tar
+        cd ../../
+    elif [ ${model_name} == "PPLCNet_x1_0" ]; then
+        # wget model
+        cd deploy
+        mkdir models
+        cd models
+        wget -nc https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/PPLCNet_x1_0_infer.tar
+        tar xf PPLCNet_x1_0_infer.tar
+        cd ../../
+    elif [ ${model_name} == "PPLCNet_x1_5" ]; then
+        # wget model
+        cd deploy
+        mkdir models
+        cd models
+        wget -nc https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/PPLCNet_x1_5_infer.tar
+        tar xf PPLCNet_x1_5_infer.tar
+        cd ../../
+    elif [ ${model_name} == "PPLCNet_x2_0" ]; then
+        # wget model
+        cd deploy
+        mkdir models
+        cd models
+        wget -nc https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/PPLCNet_x2_0_infer.tar
+        tar xf PPLCNet_x2_0_infer.tar
+        cd ../../
+    elif [ ${model_name} == "PPLCNet_x2_5" ]; then
+        # wget model
+        cd deploy
+        mkdir models
+        cd models
+        wget -nc https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/PPLCNet_x2_5_infer.tar
+        tar xf PPLCNet_x2_5_infer.tar
+        cd ../../
+    elif [ ${model_name} == "PP-ShiTu_general_rec" ]; then
+        # wget model
+        cd deploy
+        mkdir models
+        cd models
+        wget -nc https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/inference/general_PPLCNet_x2_5_lite_v1.0_infer.tar
+        tar xf general_PPLCNet_x2_5_lite_v1.0_infer.tar
+        cd ../../
+    elif [ ${model_name} == "PP-ShiTu_mainbody_det" ]; then
+        # wget model
+        cd deploy
+        mkdir models
+        cd models
+        wget -nc https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/inference/picodet_PPLCNet_x2_5_mainbody_lite_v1.0_infer.tar
+        tar xf picodet_PPLCNet_x2_5_mainbody_lite_v1.0_infer.tar
+        cd ../../
+    elif [ ${model_name} == "PPLCNetV2_base" ]; then
+        # wget model
+        cd deploy
+        mkdir models
+        cd models
+        wget -nc https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/PPLCNetV2_base_infer.tar
+        tar xf PPLCNetV2_base_infer.tar
+        cd ../../
+    elif [ ${model_name} == "PPHGNet_tiny" ]; then
+        # wget model
+        cd deploy
+        mkdir models
+        cd models
+        wget -nc https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/PPHGNet_tiny_infer.tar
+        tar xf PPHGNet_tiny_infer.tar
+        cd ../../
+    elif [ ${model_name} == "PPHGNet_small" ]; then
+        # wget model
+        cd deploy
+        mkdir models
+        cd models
+        wget -nc https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/PPHGNet_small_infer.tar
+        tar xf PPHGNet_small_infer.tar
+        cd ../../
+    else
+        echo "Not added into TIPC yet."
+    fi
 fi
 
 model_name=$(func_parser_value "${lines[1]}")
@@ -176,11 +337,145 @@ if [ ${MODE} = "paddle2onnx_infer" ];then
     python_name=$(func_parser_value "${lines[2]}")
     ${python_name} -m pip install install paddle2onnx
     ${python_name} -m pip install onnxruntime
-
-    # wget model
-    cd deploy && mkdir models && cd models
-    wget -nc https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/ResNet50_vd_infer.tar  && tar xf ResNet50_vd_infer.tar
-    cd ../../
+    if [ ${model_name} == "ResNet50" ]; then
+        # wget model
+        cd deploy
+        mkdir models
+        cd models
+        wget -nc https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/ResNet50_infer.tar
+        tar xf ResNet50_infer.tar
+        cd ../../
+    elif [ ${model_name} == "ResNet50_vd" ]; then
+        # wget model
+        cd deploy
+        mkdir models
+        cd models
+        wget -nc https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/ResNet50_vd_infer.tar
+        tar xf ResNet50_vd_infer.tar
+        cd ../../
+    elif [ ${model_name} == "MobileNetV3_large_x1_0" ]; then
+        # wget model
+        cd deploy
+        mkdir models
+        cd models
+        wget -nc https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/MobileNetV3_large_x1_0_infer.tar
+        tar xf MobileNetV3_large_x1_0_infer.tar
+        cd ../../
+    elif [ ${model_name} == "SwinTransformer_tiny_patch4_window7_224" ]; then
+        # wget model
+        cd deploy
+        mkdir models
+        cd models
+        wget -nc https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/SwinTransformer_tiny_patch4_window7_224_infer.tar
+        tar xf SwinTransformer_tiny_patch4_window7_224_infer.tar
+        cd ../../
+    elif [ ${model_name} == "PPLCNet_x0_25" ]; then
+        # wget model
+        cd deploy
+        mkdir models
+        cd models
+        wget -nc https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/PPLCNet_x0_25_infer.tar
+        tar xf PPLCNet_x0_25_infer.tar
+        cd ../../
+    elif [ ${model_name} == "PPLCNet_x0_35" ]; then
+        # wget model
+        cd deploy
+        mkdir models
+        cd models
+        wget -nc https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/PPLCNet_x0_35_infer.tar
+        tar xf PPLCNet_x0_35_infer.tar
+        cd ../../
+    elif [ ${model_name} == "PPLCNet_x0_5" ]; then
+        # wget model
+        cd deploy
+        mkdir models
+        cd models
+        wget -nc https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/PPLCNet_x0_5_infer.tar
+        tar xf PPLCNet_x0_5_infer.tar
+        cd ../../
+    elif [ ${model_name} == "PPLCNet_x0_75" ]; then
+        # wget model
+        cd deploy
+        mkdir models
+        cd models
+        wget -nc https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/PPLCNet_x0_75_infer.tar
+        tar xf PPLCNet_x0_75_infer.tar
+        cd ../../
+    elif [ ${model_name} == "PPLCNet_x1_0" ]; then
+        # wget model
+        cd deploy
+        mkdir models
+        cd models
+        wget -nc https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/PPLCNet_x1_0_infer.tar
+        tar xf PPLCNet_x1_0_infer.tar
+        cd ../../
+    elif [ ${model_name} == "PPLCNet_x1_5" ]; then
+        # wget model
+        cd deploy
+        mkdir models
+        cd models
+        wget -nc https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/PPLCNet_x1_5_infer.tar
+        tar xf PPLCNet_x1_5_infer.tar
+        cd ../../
+    elif [ ${model_name} == "PPLCNet_x2_0" ]; then
+        # wget model
+        cd deploy
+        mkdir models
+        cd models
+        wget -nc https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/PPLCNet_x2_0_infer.tar
+        tar xf PPLCNet_x2_0_infer.tar
+        cd ../../
+    elif [ ${model_name} == "PPLCNet_x2_5" ]; then
+        # wget model
+        cd deploy
+        mkdir models
+        cd models
+        wget -nc https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/PPLCNet_x2_5_infer.tar
+        tar xf PPLCNet_x2_5_infer.tar
+        cd ../../
+    elif [ ${model_name} == "PP-ShiTu_general_rec" ]; then
+        # wget model
+        cd deploy
+        mkdir models
+        cd models
+        wget -nc https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/inference/general_PPLCNet_x2_5_lite_v1.0_infer.tar
+        tar xf general_PPLCNet_x2_5_lite_v1.0_infer.tar
+        cd ../../
+    elif [ ${model_name} == "PP-ShiTu_mainbody_det" ]; then
+        # wget model
+        cd deploy
+        mkdir models
+        cd models
+        wget -nc https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/inference/picodet_PPLCNet_x2_5_mainbody_lite_v1.0_infer.tar
+        tar xf picodet_PPLCNet_x2_5_mainbody_lite_v1.0_infer.tar
+        cd ../../
+    elif [ ${model_name} == "PPLCNetV2_base" ]; then
+        # wget model
+        cd deploy
+        mkdir models
+        cd models
+        wget -nc https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/PPLCNetV2_base_infer.tar
+        tar xf PPLCNetV2_base_infer.tar
+        cd ../../
+    elif [ ${model_name} == "PPHGNet_tiny" ]; then
+        # wget model
+        cd deploy
+        mkdir models
+        cd models
+        wget -nc https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/PPHGNet_tiny_infer.tar
+        tar xf PPHGNet_tiny_infer.tar
+        cd ../../
+    elif [ ${model_name} == "PPHGNet_small" ]; then
+        # wget model
+        cd deploy
+        mkdir models
+        cd models
+        wget -nc https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/PPHGNet_small_infer.tar
+        tar xf PPHGNet_small_infer.tar
+        cd ../../
+    else
+        echo "Not added into TIPC yet."
+    fi
 fi
 
 if [ ${MODE} = "benchmark_train" ];then
