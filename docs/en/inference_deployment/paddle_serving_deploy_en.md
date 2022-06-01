@@ -1,3 +1,4 @@
+English|[Chinese](../../zh_CN/inference_deployment/paddle_serving_deploy.md)
 # Model Service deployment
 --------
 ## Catalogue
@@ -9,10 +10,10 @@
         - [3.2.1 Python Serving](#3.2.1)
         - [3.2.2 C++ Serving](#3.2.2)
 - [4. Service Deployment for  Image Recognition](#4)
-  - [4.1 Model Transformation](#4.1)
-  - [4.2 Service Deployment and Request](#4.2)
-       - [4.2.1 Python Serving](#4.2.1)
-       - [4.2.2 C++ Serving](#4.2.2)
+    - [4.1 Model Transformation](#4.1)
+    - [4.2 Service Deployment and Request](#4.2)
+        - [4.2.1 Python Serving](#4.2.1)
+        - [4.2.2 C++ Serving](#4.2.2)
 - [5. FAQ](#5)
 
 <a name="1"></a>
@@ -22,7 +23,7 @@
 This section takes the HTTP prediction service deployment as an example to introduce how to use PaddleServing to deploy the model service in PaddleClas. Currently, only Linux platform deployment is supported, and Windows platform is not currently supported.
 
 <a name="2"></a>
-## 2. Serving installation
+## 2. Installation of Serving
 The Serving official website recommends using docker to install and deploy the Serving environment. First, you need to pull the docker environment and create a Serving-based docker.
 
 ```shell
@@ -61,12 +62,12 @@ python3.7 -m pip install paddle-serving-server-gpu==0.7.0.post112 # GPU with CUD
 
 <a name="3"></a>
 
-## 3. Image Classification Service Deployment
+## 3. Service Deployment for Image Classification
 
 The following takes the classic ResNet50_vd model as an example to introduce how to deploy the image classification service.
 
 <a name="3.1"></a>
-### 3.1 Model conversion
+### 3.1 Model Transformation
 When using PaddleServing for service deployment, you need to convert the saved inference model into a Serving model.
 - Go to the working directory:
   ```shell
@@ -131,7 +132,7 @@ When using PaddleServing for service deployment, you need to convert the saved i
   }
   ```
 <a name="3.2"></a>
-### 3.2 Service deployment and request
+### 3.2 Service Deployment and Request
 The paddleserving directory contains the code to start the pipeline service, C++ serving service and send prediction requests, including:
 ```shell
 __init__.py
@@ -179,11 +180,11 @@ test_cpp_serving_client.py # Script for sending C++ serving prediction requests 
   ```
 
 <a name="4"></a>
-## 4. Image recognition service deployment
-In addition to the single-model deployment method introduced in [Chapter 3 Image Classification Service Deployment](#3), we will introduce how to use the detection + classification model to complete the multi-model **image recognition service deployment**
+## 4. Service Deployment for Image Recognition
+In addition to the single-model deployment method introduced in [Chapter 3 Service Deployment for Image Classification](#3), we will introduce how to use the detection + classification model to complete the multi-model **image recognition service deployment**
 When using PaddleServing for image recognition service deployment, **need to convert multiple saved inference models to Serving models**. The following takes the ultra-lightweight image recognition model in PP-ShiTu as an example to introduce the deployment of image recognition services.
 <a name="4.1"></a>
-## 4.1 Model conversion
+### 4.1 Model Transformation
 - Go to the working directory:
   ```shell
   cd deploy/
@@ -210,8 +211,8 @@ When using PaddleServing for image recognition service deployment, **need to con
   --serving_server ./general_PPLCNet_x2_5_lite_v1.0_serving/ \
   --serving_client ./general_PPLCNet_x2_5_lite_v1.0_client/
   ```
-  The meaning of the parameters of the above command is the same as [#3.1 Model conversion](#3.1)
-  After the conversion of the general recognition inference model is completed, there will be additional `general_PPLCNet_x2_5_lite_v1.0_serving/` and `general_PPLCNet_x2_5_lite_v1.0_client/` folders in the current folder, with the following structure:
+  The meaning of the parameters of the above command is the same as [#3.1 Model Transformation](#3.1)
+  After the transformation of the general recognition inference model is completed, there will be additional `general_PPLCNet_x2_5_lite_v1.0_serving/` and `general_PPLCNet_x2_5_lite_v1.0_client/` folders in the current folder, with the following structure:
     ```shell
   ├── general_PPLCNet_x2_5_lite_v1.0_serving/
   │ ├── inference.pdiparams
@@ -253,9 +254,9 @@ When using PaddleServing for image recognition service deployment, **need to con
   --serving_server ./picodet_PPLCNet_x2_5_mainbody_lite_v1.0_serving/ \
   --serving_client ./picodet_PPLCNet_x2_5_mainbody_lite_v1.0_client/
   ```
-  The meaning of the parameters of the above command is the same as [#3.1 Model conversion](#3.1)
+  The meaning of the parameters of the above command is the same as [#3.1 Model Transformation](#3.1)
 
-  After the general detection inference model conversion is completed, there will be additional folders `picodet_PPLCNet_x2_5_mainbody_lite_v1.0_serving/` and `picodet_PPLCNet_x2_5_mainbody_lite_v1.0_client/` in the current folder, with the following structure:
+  After the general detection inference model transformation is completed, there will be additional folders `picodet_PPLCNet_x2_5_mainbody_lite_v1.0_serving/` and `picodet_PPLCNet_x2_5_mainbody_lite_v1.0_client/` in the current folder, with the following structure:
     ```shell
   ├── picodet_PPLCNet_x2_5_mainbody_lite_v1.0_serving/
   │   ├── inference.pdiparams
@@ -280,7 +281,7 @@ When using PaddleServing for image recognition service deployment, **need to con
     tar -xf drink_dataset_v1.0.tar
     ```
 <a name="4.2"></a>
-## 4.2 Service deployment and request
+### 4.2 Service Deployment and Request
 **Note:** The identification service involves multiple models, and the PipeLine deployment method is used for performance reasons. The Pipeline deployment method currently does not support the windows platform.
 - go to the working directory
   ```shell

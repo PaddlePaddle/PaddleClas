@@ -1,3 +1,4 @@
+简体中文|[English](../../en/inference_deployment/paddle_serving_deploy_en.md)
 # 模型服务化部署
 --------
 ## 目录
@@ -9,10 +10,10 @@
         - [3.2.1 Python Serving](#3.2.1)
         - [3.2.2 C++ Serving](#3.2.2)
 - [4. 图像识别服务部署](#4)
-  - [4.1 模型转换](#4.1)
-  - [4.2 服务部署和请求](#4.2)
-       - [4.2.1 Python Serving](#4.2.1)
-       - [4.2.2 C++ Serving](#4.2.2)
+    - [4.1 模型转换](#4.1)
+    - [4.2 服务部署和请求](#4.2)
+        - [4.2.1 Python Serving](#4.2.1)
+        - [4.2.2 C++ Serving](#4.2.2)
 - [5. FAQ](#5)
 
 <a name="1"></a>
@@ -183,7 +184,7 @@ test_cpp_serving_client.py    # rpc方式发送C++ serving预测请求的脚本
 除了[第三章图像分类服务部署](#3)介绍的单模型部署方式，接下来会介绍如何使用检测+分类模型来完成多模型串联的**图像识别服务部署**
 使用 PaddleServing 做图像识别服务化部署时，**需要将保存的多个 inference 模型都转换为 Serving 模型**。 下面以 PP-ShiTu 中的超轻量图像识别模型为例，介绍图像识别服务的部署。
 <a name="4.1"></a>
-## 4.1 模型转换
+### 4.1 模型转换
 - 进入工作目录：
   ```shell
   cd deploy/
@@ -280,7 +281,7 @@ test_cpp_serving_client.py    # rpc方式发送C++ serving预测请求的脚本
     tar -xf drink_dataset_v1.0.tar
     ```
 <a name="4.2"></a>
-## 4.2 服务部署和请求
+### 4.2 服务部署和请求
 **注意:** 识别服务涉及到多个模型，出于性能考虑采用 PipeLine 部署方式。Pipeline 部署方式当前不支持 windows 平台。
 - 进入到工作目录
   ```shell
