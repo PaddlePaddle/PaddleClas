@@ -1,6 +1,6 @@
 Global:
-  infer_imgs: "./images/PULC/person/objects365_02035329.jpg"
-  inference_model_dir: "./models/person_cls_infer"
+  infer_imgs: "./images/PULC/person_exists/objects365_02035329.jpg"
+  inference_model_dir: "./models/person_exists_infer"
   batch_size: 1
   use_gpu: True
   enable_mkldnn: False
