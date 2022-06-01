@@ -12,7 +12,7 @@ Global:
   print_batch_step: 10
   use_visualdl: False
   # used for static mode and model export
-  image_shape: [3, 224, 224]
+  image_shape: [3, 256, 192]
   save_inference_dir: ./inference
   # training model under @to_static
   to_static: False
@@ -78,8 +78,8 @@ DataLoader:
   Train:
     dataset:
       name: MultiLabelDataset
-      image_root: "dataset/attribute/data/"
-      cls_label_path: "dataset/attribute/train_list.txt"
+      image_root: "dataset/pa100k/"
+      cls_label_path: "dataset/pa100k/train_val_list.txt"
       label_ratio: True
       transform_ops:
         - DecodeImage:
@@ -88,7 +88,7 @@ DataLoader:
         - ResizeImage:
             size: [192, 256]
         - TimmAutoAugment:
-            prob: 0.0
+            prob: 0.8
             config_str: rand-m9-mstd0.5-inc1
             interpolation: bicubic
             img_size: [192, 256]
@@ -106,7 +106,7 @@ DataLoader:
             std: [0.229, 0.224, 0.225]
             order: ''
         - RandomErasing:
-            EPSILON: 0.0
+            EPSILON: 0.4
             sl: 0.02
             sh: 1.0/3.0
             r1: 0.3
@@ -124,8 +124,8 @@ DataLoader:
   Eval:
     dataset:
       name: MultiLabelDataset
-      image_root: "dataset/attribute/data/"
-      cls_label_path: "dataset/attribute/pa100k_val_list.txt"
+      image_root: "dataset/pa100k/"
+      cls_label_path: "dataset/pa100k/test_list.txt"
       label_ratio: True
       transform_ops:
         - DecodeImage:

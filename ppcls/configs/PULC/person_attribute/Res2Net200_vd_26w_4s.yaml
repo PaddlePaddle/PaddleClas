@@ -51,8 +51,8 @@ DataLoader:
   Train:
     dataset:
       name: MultiLabelDataset
-      image_root: "dataset/attribute/data/"
-      cls_label_path: "dataset/attribute/pa100k_train_list.txt"
+      image_root: "dataset/pa100k/"
+      cls_label_path: "dataset/pa100k/train_val_list.txt"
       label_ratio: True
       transform_ops:
         - DecodeImage:
@@ -84,8 +84,8 @@ DataLoader:
   Eval:
     dataset:
       name: MultiLabelDataset
-      image_root: "dataset/attribute/data/"
-      cls_label_path: "dataset/attribute/pa100k_val_list.txt"
+      image_root: "dataset/pa100k/"
+      cls_label_path: "dataset/pa100k/test_list.txt"
       label_ratio: True
       transform_ops:
         - DecodeImage:
