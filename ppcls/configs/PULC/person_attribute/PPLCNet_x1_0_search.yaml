@@ -7,7 +7,7 @@ Global:
   save_interval: 1
   eval_during_train: True
   eval_interval: 1
-  epochs: 2
+  epochs: 20
   print_batch_step: 10
   use_visualdl: False
   # used for static mode and model export
@@ -53,7 +53,7 @@ DataLoader:
     dataset:
       name: MultiLabelDataset
       image_root: "dataset/pa100k/"
-      cls_label_path: "dataset/pa100k/train_val_list.txt.debug"
+      cls_label_path: "dataset/pa100k/train_val_list.txt"
       label_ratio: True
       transform_ops:
         - DecodeImage:
@@ -99,7 +99,7 @@ DataLoader:
     dataset:
       name: MultiLabelDataset
       image_root: "dataset/pa100k"
-      cls_label_path: "dataset/pa100k/test_list.txt.debug"
+      cls_label_path: "dataset/pa100k/test_list.txt"
       label_ratio: True
       transform_ops:
         - DecodeImage:
