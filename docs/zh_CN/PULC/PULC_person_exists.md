@@ -1,6 +1,6 @@
 # PULC 有人/无人分类模型
 
-此处提供了用户使用 PaddleClas 的 PULC 方法快速构建轻量级、高精度、可落地的有人/无人的分类模型教程，主要基于有人/无人场景的数据，融合了轻量级骨干网络 PPLCNet、SSLD 预训练权重、EDA 数据增强策略、SKL-UGI 知识蒸馏策略、SHAS 超参数搜索策略，得到精度高、速度快、易于部署的二分类模型。
+此处提供了用户使用 PaddleClas 的 超轻量图像分类方案(PULC, Practical Ultra Lightweight Classification) 快速构建轻量级、高精度、可落地的有人/无人的分类模型教程，主要基于有人/无人场景的数据，融合了轻量级骨干网络 PPLCNet、SSLD 预训练权重、EDA 数据增强策略、SKL-UGI 知识蒸馏策略、SHAS 超参数搜索策略，得到精度高、速度快、易于部署的二分类模型。
 
 ------
 
@@ -24,14 +24,17 @@
       - [3.2.1 基于默认超参数训练轻量级模型](#3.2.1)
       - [3.2.2 基于默认超参数训练教师模型](#3.2.2)
       - [3.2.3 基于默认超参数进行蒸馏训练](#3.2.3) 
-- [4. 模型评估与推理](#4)
-  - [4.1 模型评估](#3.1)
-  - [4.2 模型预测](#3.2)
+- [4. 模型评估与推理部署](#4)
+  - [4.1 模型评估](#4.1)
+  - [4.2 模型预测](#4.2)
   - [4.3 使用 inference 模型进行推理](#4.3)
     - [4.3.1 导出 inference 模型](#4.3.1)
-    - [4.3.2 模型推理预测](#4.3.2)
+    - [4.3.2 基于 inference 模型 python 推理预测](#4.3.2)
+    - [4.3.3 基于 inference 模型 C++ 推理预测](#4.3.3)
+  - [4.4 基于 Paddle Serving 完成模型服务化部署](#4.4)
+  - [4.5 基于 Paddle Lite 完成模型端侧部署](#4.5)
     
-    
+
 <a name="1"></a>
 
 ## 1. 应用场景介绍
@@ -56,6 +59,8 @@
 | PPLCNet_x1_0  | <b>92.10<b> | 2.36  | 6.5 | 使用SSLD预训练模型 |
 | PPLCNet_x1_0  | <b>93.43<b> | 2.36  | 6.5 | 使用SSLD预训练模型+EDA策略|
 | <b>PPLCNet_x1_0<b>  | <b>95.60<b> | 2.36  | 6.5 | 使用SSLD预训练模型+EDA策略+SKL-UGI知识蒸馏策略|
+
+**备注：** 关于PPLCNet的介绍可以参考[PPLCNet介绍](../models/PP-LCNet.md)，相关论文可以查阅[PPLCNet paper](https://arxiv.org/abs/2109.15099)。
 
 <a name="2.2"></a>  
 
@@ -162,6 +167,7 @@ objects365_02035329.jpg:	class id(s): [1], score(s): [1.00], label_name(s): ['so
 本案例中所使用的所有数据集均为开源数据，`train` 集合为[MS-COCO 数据](https://cocodataset.org/#overview)的训练集的子集，`val` 集合为[Object365 数据](https://www.objects365.org/overview.html)的训练集的子集，`ImageNet_val` 为[ImageNet-1k 数据](https://www.image-net.org/)的验证集。
 
 <a name="3.1.2"></a>     
+
 #### 3.1.2 数据集获取
 
 在公开数据集的基础上经过后处理即可得到本案例需要的数据，具体处理方法如下：
@@ -286,8 +292,7 @@ python3 -m paddle.distributed.launch \
 
 <a name="4"></a>
 
-## 4. 模型评估与推理
-
+## 4. 模型评估与推理部署
 
 <a name="4.1"></a> 
 
@@ -347,7 +352,8 @@ python3 tools/export_model.py \
 
 <a name="4.3.2"></a> 
 
-### 4.3.2 基于 inference 模型推理预测
+### 4.3.2 基于 inference 模型 python 推理预测
+
 推理预测的脚本为：
 
 ```
@@ -359,3 +365,21 @@ python3.7 python/predict_cls.py -c configs/PULC/person_exists/inference_person_e
 - 此处的 `PostProcess.ThreshOutput.threshold` 由eval时的最佳 `threshold` 来确定。
 - 更多关于推理的细节，可以参考[2.3节](#2.3)。
 
+<a name="4.3.3"></a>
+
+### 4.3.3 基于 inference 模型 C++ 推理预测
+
+PaddleClas 提供了 C++ 推理预测的示例，您可以参考[服务器端 C++ 预测](../inference_deployment/cpp_deploy.md)来完成相应的推理部署。如果您使用的是Windows平台，可以参考[基于 Visual Studio 2019 Community CMake 编译指南](inference_deployment/cpp_deploy_on_windows.md)完成相应的预测库编译和模型预测工作。
+
+<a name="4.4"></a>
+
+### 4.4 基于 Paddle Serving 完成模型服务化部署
+
+PaddleClas 提供了基于 Paddle Serving 来完成模型服务化部署的示例，您可以参考[模型服务化部署](../inference_deployment/paddle_serving_deploy.md)来完成相应的部署工作。
+
+<a name="4.5"></a>
+
+### 4.5 基于 Paddle Lite 完成模型端侧部署
+
+PaddleClas 提供了基于 Paddle Lite 来完成模型端侧部署的示例，您可以参考[端侧部署](../inference_deployment/paddle_lite_deploy.md)来
+完成相应的部署工作。
