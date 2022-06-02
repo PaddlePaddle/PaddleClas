@@ -6,14 +6,16 @@
 
 ## 目录
 
-- [1. 图像分类推理](#1)
-- [2. 主体检测模型推理](#2)
-- [3. 特征提取模型推理](#3)
-- [4. 主体检测、特征提取和向量检索串联](#4)
+- [1. 图像分类及PULC模型推理](#1)
+- [2. PP-ShiTu推理](#2)
+	- [2.1 主体检测模型推理](#2.1)
+	- [2.2 特征提取模型推理](#2.2)
+	- [2.3 主体检测、特征提取和向量检索串联](#2.3)
 
 <a name="1"></a>
-## 1. 图像分类推理
+## 1. 图像分类及PULC模型推理
 
+图像分类模型及PULC模型都是分类模型，因此推理方式一致。
 首先请参考文档[模型导出](./export_model.md)准备 inference 模型，然后进入 PaddleClas 的 `deploy` 目录下：
 
 ```shell
@@ -42,7 +44,12 @@ python python/predict_cls.py -c configs/inference_cls.yaml
 * 如果你希望提升评测模型速度，使用 GPU 评测时，建议开启 TensorRT 加速预测，使用 CPU 评测时，建议开启 MKL-DNN 加速预测。
 
 <a name="2"></a>
-## 2. 主体检测模型推理
+## 2. PP-ShiTu推理
+
+PP-ShiTu主要分为三大部分：主体检测模型、特征提取模型及检索模块。其中主体检测模型和特征提取模型可以单独使用。不同的模块及整体推理方式如下：
+
+<a name="2.1"></a>
+### 2.1 主体检测模型推理
 
 进入 PaddleClas 的 `deploy` 目录下：
 
@@ -70,8 +77,8 @@ python python/predict_det.py -c configs/inference_det.yaml
 * `Global.use_gpu`： 是否使用 GPU 预测，默认为 `True`。
 
 
-<a name="3"></a>
-## 3. 特征提取模型推理
+<a name="2.2"></a>
+### 2.2 特征提取模型推理
 
 下面以商品特征提取为例，介绍特征提取模型推理。首先进入 PaddleClas 的 `deploy` 目录下：
 
@@ -90,7 +97,7 @@ tar -xf ./models/product_ResNet50_vd_aliproduct_v1.0_infer.tar -C ./models/
 
 上述预测命令可以得到一个 512 维的特征向量，直接输出在在命令行中。
 
-<a name="4"></a>
-## 4. 主体检测、特征提取和向量检索串联
+<a name="2.3"></a>
+### 2.3 主体检测、特征提取和向量检索串联
 
-主体检测、特征提取和向量检索的串联预测，可以参考图像识别[快速体验](../quick_start/quick_start_recognition.md)。
+PP-ShiTu(主体检测、特征提取和向量检索的串联预测)，可以参考图像识别[快速体验](../quick_start/quick_start_recognition.md)。

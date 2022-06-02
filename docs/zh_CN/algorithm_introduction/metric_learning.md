@@ -7,6 +7,9 @@
 * [3. 算法](#3)
     * [3.1 Classification based](#3.1)
     * [3.2 Pairwise based](#3.2)
+    * [3.3 快速体验](#3.3)
+* [4. 总结及建议](#4)
+
 
 <a name='1'></a>
 ## 1. 简介
@@ -34,3 +37,19 @@
    这是一类基于样本对的学习范式。他以样本对作为输入，通过直接学习样本对之间的相似度来得到有效的特征表示，常见的算法包括：[Contrastive loss](http://yann.lecun.com/exdb/publis/pdf/hadsell-chopra-lecun-06.pdf), [Triplet loss](https://arxiv.org/abs/1503.03832), [Lifted-Structure loss](https://arxiv.org/abs/1511.06452), [N-pair loss](https://papers.nips.cc/paper/2016/file/6b180037abbebea991d8b1232f8a8ca9-Paper.pdf), [Multi-Similarity loss](https://arxiv.org/pdf/1904.06627.pdf)等
 
 2020 年发表的[CircleLoss](https://arxiv.org/abs/2002.10857)，从一个全新的视角统一了两种学习范式，让研究人员和从业者对 Metric Learning 问题有了更进一步的思考。
+
+<a name='3.3'></a>
+### 3.3 快速体验
+
+具体使用方法请参考配置文件：`ppcls/configs/`下相关`GeneralRecognition，Vehicle, Products, metric_learning`等文件夹下的配置文件。具体训练方法，请参考：[分类模型训练文档](../models_training/classification.md)及[识别模型训练文档](../models_training/recognition.md)。
+
+<a name='4'></a>
+## 4. 总结及建议
+
+一般来说，由于数据分布不一致，不同的metric learning方法可能效果不一致。如果对数据及相关方法不是特别了解，建议先从`ArcMargin`、	`TripletLoss`开始使用。
+
+具体使用方法:
+
+`ArcMargin`请参考：`ppcls/configs/GeneralRecognition/Gallery2FC_PPLCNet_x2_5.yaml`
+
+`TripletLoss`请参考：`ppcls/configs/reid/strong_baseline/softmax_triplet_with_center.yaml`

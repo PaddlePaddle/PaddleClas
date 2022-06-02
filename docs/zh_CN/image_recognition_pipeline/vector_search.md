@@ -56,7 +56,7 @@ pip install faiss-cpu==1.7.1post2
 
 ## 3. 使用及配置文档介绍
 
-涉及检索模块配置文件位于：`deploy/configs/` 下，其中 `build_*.yaml` 是建立特征库的相关配置文件，`inference_*.yaml` 是检索或者分类的推理配置文件。
+涉及检索模块配置文件位于：`deploy/configs/` 下，其中 `inference_*.yaml` 是检索或者分类的推理配置文件,同时也是建立特征库的相关配置文件。
 
 <a name="3.1"></a> 
 
@@ -68,14 +68,14 @@ pip install faiss-cpu==1.7.1post2
 # 进入 deploy 目录
 cd deploy
 # yaml 文件根据需要改成自己所需的具体 yaml 文件
-python python/build_gallery.py -c configs/build_***.yaml
+python python/build_gallery.py -c configs/inference_***.yaml
 ```
 
 其中 `yaml` 文件的建库的配置如下，在运行时，请根据实际情况进行修改。建库操作会将根据 `data_file` 的图像列表，将 `image_root` 下的图像进行特征提取，并在 `index_dir` 下进行存储，以待后续检索使用。
 
 其中 `data_file` 文件存储的是图像文件的路径和标签，每一行的格式为：`image_path  label`。中间间隔以 `yaml` 文件中 `delimiter` 参数作为间隔。
 
-关于特征提取的具体模型参数，可查看 `yaml` 文件。
+关于特征提取的具体模型参数，可查看 `yaml` 文件。注意下面的配置参数只列举了建立索引库相关部分。
 
 ```yaml
 # indexing engine config
@@ -88,6 +88,7 @@ IndexProcess:
   delimiter: "\t"
   dist_type: "IP"
   embedding_size: 512
+  batch_size: 32
 ```
 
 - **index_method**：使用的检索算法。目前支持三种，HNSW32、IVF、Flat
@@ -98,6 +99,7 @@ IndexProcess:
 - **delimiter**：**data_file** 中每一行的间隔符
 - **dist_type**: 特征匹配过程中使用的相似度计算方式。例如 `IP` 内积相似度计算方式，`L2` 欧式距离计算方法
 - **embedding_size**：特征维度
+- **batch_size**：建立特征库时，特征提取的`batch_size`
 
 <a name="3.2"></a> 
 
@@ -107,14 +109,18 @@ IndexProcess:
 
 其中，检索部分配置如下，整体检索配置文件，请参考 `deploy/configs/inference_*.yaml` 文件。
 
+注意：此部分参数只是列举了离线检索相关部分参数。
+
 ```yaml
 IndexProcess:
   index_dir: "./recognition_demo_data_v1.1/gallery_logo/index/"
   return_k: 5
   score_thres: 0.5
+  hamming_radius: 100
 ```
 
 与建库配置文件不同，新参数主要如下：
 
 - `return_k`: 检索结果返回 `k` 个结果
 - `score_thres`: 检索匹配的阈值
+- `hamming_radius`: 汉明距离半径。此参数只有在使用二值特征模型，`dist_type`设置为`hamming`时才能生效。具体二值特征模型使用方法请参考[哈希编码](./deep_hashing.md)
