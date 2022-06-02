@@ -30,7 +30,7 @@
   - [6.3 基于 C++ 预测引擎推理](#6.3)
   - [6.4 服务化部署](#6.4)
   - [6.5 端侧部署](#6.5)
-  - [6.6 Paddle2ONNX模型转换与预测](#6.6)
+  - [6.6 Paddle2ONNX 模型转换与预测](#6.6)
 
 
 <a name="1"></a>
@@ -78,7 +78,7 @@
 
 <a name="3.2"></a> 
 
-### 3.1 数据准备
+### 3.2 数据准备
 
 <a name="3.2.1"></a> 
 
@@ -147,7 +147,7 @@ cd ../
 
 * 关于 `train_list.txt`、`val_list.txt`的格式说明，可以参考[PaddleClas分类数据集格式说明](../data_preparation/classification_dataset.md#1-数据集格式说明) 。
     
-* 关于如何得到蒸馏的标签文件可以参考[知识蒸馏标签获得](@ruoyu)。
+* 关于如何得到蒸馏的标签文件可以参考[知识蒸馏标签获得方法](@ruoyu)。
 
 
 <a name="3.3"></a> 
@@ -223,7 +223,7 @@ python3 tools/infer.py \
 
 ### 4.1 SKL-UGI 知识蒸馏
     
-SKL-UGI 知识蒸馏是 PaddleClas 提出的一种简单有效的知识蒸馏方法，关于该方法的介绍，可以参考[SKL-UGI 知识蒸馏](@ruoyu)
+SKL-UGI 知识蒸馏是 PaddleClas 提出的一种简单有效的知识蒸馏方法，关于该方法的介绍，可以参考[SKL-UGI 知识蒸馏](@ruoyu)。
 
 <a name="4.1.1"></a> 
 
@@ -264,7 +264,7 @@ python3 -m paddle.distributed.launch \
 
 ## 5. 超参搜索
 
-在3.2节和4.1节所使用的超参数是根据PaddleClas提供的 `SHAS超参数搜索策略` 搜索得到的，如果希望在自己的数据集上得到更好的结果，可以参考[SHAS超参数搜索策略](#TODO)来获得更好的训练超参数。
+在 [3.2 节](#3.2)和 [4.1 节](#4.1)所使用的超参数是根据 PaddleClas 提供的 `SHAS 超参数搜索策略` 搜索得到的，如果希望在自己的数据集上得到更好的结果，可以参考[SHAS 超参数搜索策略](#TODO)来获得更好的训练超参数。
 
 **备注：** 此部分内容是可选内容，搜索过程需要较长的时间，您可以根据自己的硬件情况来选择执行。如果没有更换数据集，可以忽略此节内容。
 
@@ -278,7 +278,7 @@ python3 -m paddle.distributed.launch \
 
 Paddle Inference 是飞桨的原生推理库， 作用于服务器端和云端，提供高性能的推理能力。相比于直接基于预训练模型进行预测，Paddle Inference可使用MKLDNN、CUDNN、TensorRT 进行预测加速，从而实现更优的推理性能。更多关于Paddle Inference推理引擎的介绍，可以参考[Paddle Inference官网教程](https://www.paddlepaddle.org.cn/documentation/docs/zh/guides/infer/inference/inference_cn.html)。
     
-当使用 Paddle Inference 推理时，加载的模型为 inference 模型。本案例提供了两种获得 inference 模型的方法，如果希望得到和文档相同的结果，请选择[直接下载 inference 模型](#6.1.2)的方式。
+当使用 Paddle Inference 推理时，加载的模型类型为 inference 模型。本案例提供了两种获得 inference 模型的方法，如果希望得到和文档相同的结果，请选择[直接下载 inference 模型](#6.1.2)的方式。
 
 <a name="6.1.1"></a> 
 
@@ -395,16 +395,14 @@ PaddleClas 提供了基于 Paddle Serving 来完成模型服务化部署的示�
 
 ### 6.5 端侧部署
 
-Paddle Lite 是一个高性能、轻量级、灵活性强且易于扩展的深度学习推理框架，定位于支持包括移动端、嵌入式以及服务器端在内的多硬件平台。更多关于Paddle Lite 的介绍，可以参考[Paddle Lite 代码仓库](https://github.com/PaddlePaddle/Paddle-Lite)。
+Paddle Lite 是一个高性能、轻量级、灵活性强且易于扩展的深度学习推理框架，定位于支持包括移动端、嵌入式以及服务器端在内的多硬件平台。更多关于 Paddle Lite 的介绍，可以参考[Paddle Lite 代码仓库](https://github.com/PaddlePaddle/Paddle-Lite)。
     
-PaddleClas 提供了基于 Paddle Lite 来完成模型端侧部署的示例，您可以参考[端侧部署](../inference_deployment/paddle_lite_deploy.md)来
-完成相应的部署工作。
+PaddleClas 提供了基于 Paddle Lite 来完成模型端侧部署的示例，您可以参考[端侧部署](../inference_deployment/paddle_lite_deploy.md)来完成相应的部署工作。
 
 <a name="6.6"></a> 
 
-### 6.6 Paddle2ONNX模型转换与预测
+### 6.6 Paddle2ONNX 模型转换与预测
     
-Paddle2ONNX 支持将 PaddlePaddle 模型格式转化到 ONNX 模型格式。通过 ONNX 可以完成将 Paddle 模型到多种推理引擎的部署，包括TensorRT/OpenVINO/MNN/TNN/NCNN，以及其它对ONNX开源格式进行支持的推理引擎或硬件。更多关于 Paddle2ONNX 的介绍，可以参考[Paddle2ONNX 代码仓库](https://github.com/PaddlePaddle/Paddle2ONNX)。
+Paddle2ONNX 支持将 PaddlePaddle 模型格式转化到 ONNX 模型格式。通过 ONNX 可以完成将 Paddle 模型到多种推理引擎的部署，包括TensorRT/OpenVINO/MNN/TNN/NCNN，以及其它对 ONNX 开源格式进行支持的推理引擎或硬件。更多关于 Paddle2ONNX 的介绍，可以参考[Paddle2ONNX 代码仓库](https://github.com/PaddlePaddle/Paddle2ONNX)。
 
-PaddleClas 提供了基于 Paddle2ONNX 来完成 inference 模型转换 ONNX 模型并作推理预测的示例，您可以参考[Paddle2ONNX模型转换与预测](@shuilong)来
-完成相应的部署工作。
+PaddleClas 提供了基于 Paddle2ONNX 来完成 inference 模型转换 ONNX 模型并作推理预测的示例，您可以参考[Paddle2ONNX 模型转换与预测](@shuilong)来完成相应的部署工作。
