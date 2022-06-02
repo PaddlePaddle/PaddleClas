@@ -6,7 +6,7 @@ trans_model:-m paddle_serving_client.convert
 --dirname:./deploy/paddleserving/PPLCNetV2_base_infer/
 --model_filename:inference.pdmodel
 --params_filename:inference.pdiparams
---serving_server:./deploy/paddleserving/PPLCNetV2_base_server/
+--serving_server:./deploy/paddleserving/PPLCNetV2_base_serving/
 --serving_client:./deploy/paddleserving/PPLCNetV2_base_client/
 serving_dir:./deploy/paddleserving
 web_service:classification_web_service.py

@@ -6,7 +6,7 @@ trans_model:-m paddle_serving_client.convert
 --dirname:./deploy/paddleserving/SwinTransformer_tiny_patch4_window7_224_infer/
 --model_filename:inference.pdmodel
 --params_filename:inference.pdiparams
---serving_server:./deploy/paddleserving/SwinTransformer_tiny_patch4_window7_224_server/
+--serving_server:./deploy/paddleserving/SwinTransformer_tiny_patch4_window7_224_serving/
 --serving_client:./deploy/paddleserving/SwinTransformer_tiny_patch4_window7_224_client/
 serving_dir:./deploy/paddleserving
 web_service:classification_web_service.py

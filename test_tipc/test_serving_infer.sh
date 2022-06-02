@@ -54,15 +54,25 @@ function func_serving_cls(){
     eval $trans_model_cmd
 
     # modify the alias_name of fetch_var to "outputs"
-    server_fetch_var_line_cmd="sed -i '/fetch_var/,/is_lod_tensor/s/alias_name: .*/alias_name: \"prediction\"/' $serving_server_value/serving_server_conf.prototxt"
+    server_fetch_var_line_cmd="sed -i '/fetch_var/,/is_lod_tensor/s/alias_name: .*/alias_name: \"prediction\"/' ${serving_server_value}/serving_server_conf.prototxt"
     eval ${server_fetch_var_line_cmd}
-    client_fetch_var_line_cmd="sed -i '/fetch_var/,/is_lod_tensor/s/alias_name: .*/alias_name: \"prediction\"/' $serving_client_value/serving_client_conf.prototxt"
+    client_fetch_var_line_cmd="sed -i '/fetch_var/,/is_lod_tensor/s/alias_name: .*/alias_name: \"prediction\"/' ${serving_client_value}/serving_client_conf.prototxt"
     eval ${client_fetch_var_line_cmd}
 
+    prototxt_dataline=$(awk 'NR==1, NR==3{print}'  ${serving_server_value}/serving_server_conf.prototxt)
+    IFS=$'\n'
+    prototxt_lines=(${prototxt_dataline})
+    feed_var_name=$(func_parser_value "${prototxt_lines[2]}")
+    IFS='|'
 
     cd ${serving_dir_value}
     unset https_proxy
     unset http_proxy
+
+    # modify the input_name in "classification_web_service.py" to be consistent with feed_var.name in prototxt
+    set_web_service_feet_var_cmd="sed -i '/preprocess/,/input_imgs}/s/{.*: input_imgs}/{${feed_var_name}: input_imgs}/' ${web_service_py}"
+    eval ${set_web_service_feet_var_cmd}
+
     model_config=21
     serving_server_dir_name=$(func_get_url_file_name "$serving_server_value")
     set_model_config_cmd="sed -i '${model_config}s/model_config: .*/model_config: ${serving_server_dir_name}/' config.yml"
@@ -215,9 +225,20 @@ function func_serving_rec(){
     client_fetch_var_line_cmd="sed -i '/fetch_var/,/is_lod_tensor/s/alias_name: .*/alias_name: \"features\"/' $cls_serving_client_value/serving_client_conf.prototxt"
     eval ${client_fetch_var_line_cmd}
 
+    prototxt_dataline=$(awk 'NR==1, NR==3{print}'  ${cls_serving_server_value}/serving_server_conf.prototxt)
+    IFS=$'\n'
+    prototxt_lines=(${prototxt_dataline})
+    feed_var_name=$(func_parser_value "${prototxt_lines[2]}")
+    IFS='|'
+
     cd ${serving_dir_value}
     unset https_proxy
     unset http_proxy
+
+    # modify the input_name in "recognition_web_service.py" to be consistent with feed_var.name in prototxt
+    set_web_service_feet_var_cmd="sed -i '/preprocess/,/input_imgs}/s/{.*: input_imgs}/{${feed_var_name}: input_imgs}/' ${web_service_py}"
+    eval ${set_web_service_feet_var_cmd}
+
     for python in ${python[*]}; do
         if [[ ${python} = "cpp" ]]; then
             for use_gpu in ${web_use_gpu_list[*]}; do
@@ -257,13 +278,11 @@ function func_serving_rec(){
                     eval $set_devices_cmd
 
                     web_service_cmd="${python} ${web_service_py} &"
-                    echo $PWD - $web_service_cmd
                     eval $web_service_cmd
                     sleep 5s
                     for pipeline in ${pipeline_py[*]}; do
                         _save_log_path="${LOG_PATH}/server_infer_cpu_${pipeline%_client*}_batchsize_1.log"
                         pipeline_cmd="${python} ${pipeline} > ${_save_log_path} 2>&1 "
-                        echo $PWD - $pipeline_cmd
                         eval $pipeline_cmd
                         last_status=${PIPESTATUS[0]}
                         eval "cat ${_save_log_path}"
@@ -291,13 +310,11 @@ function func_serving_rec(){
                     eval $set_devices_cmd
 
                     web_service_cmd="${python} ${web_service_py} & "
-                    echo $PWD - $web_service_cmd
                     eval $web_service_cmd
                     sleep 10s
                     for pipeline in ${pipeline_py[*]}; do
                         _save_log_path="${LOG_PATH}/server_infer_gpu_${pipeline%_client*}_batchsize_1.log"
                         pipeline_cmd="${python} ${pipeline} > ${_save_log_path} 2>&1"
-                        echo $PWD - $pipeline_cmd
                         eval $pipeline_cmd
                         last_status=${PIPESTATUS[0]}
                         eval "cat ${_save_log_path}"

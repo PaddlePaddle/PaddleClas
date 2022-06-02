@@ -13,15 +13,15 @@ Linux GPU/CPU  PYTHON 服务化部署测试的主程序为`test_serving_infer.sh
 |  PP-ShiTu   |  PPShiTu_general_rec、PPShiTu_mainbody_det |  支持 | 支持 |
 |  PPHGNet   |  PPHGNet_small |  支持 | 支持 |
 |  PPHGNet   |  PPHGNet_tiny |  支持 | 支持 |
-|  PPLCNet   |  PPLCNet_x0_25 |  不支持 | 不支持 |
-|  PPLCNet   |  PPLCNet_x0_35 |  不支持 | 不支持 |
-|  PPLCNet   |  PPLCNet_x0_5 |  不支持 | 不支持 |
-|  PPLCNet   |  PPLCNet_x0_75 |  不支持 | 不支持 |
-|  PPLCNet   |  PPLCNet_x1_0 |  不支持 | 不支持 |
-|  PPLCNet   |  PPLCNet_x1_5 |  不支持 | 不支持 |
-|  PPLCNet   |  PPLCNet_x2_0 |  不支持 | 不支持 |
-|  PPLCNet   |  PPLCNet_x2_5 |  不支持 | 不支持 |
-|  PPLCNetV2   |  PPLCNetV2_base |  支持 | 不支持 |
+|  PPLCNet   |  PPLCNet_x0_25 |  支持 | 支持 |
+|  PPLCNet   |  PPLCNet_x0_35 |  支持 | 支持 |
+|  PPLCNet   |  PPLCNet_x0_5 |  支持 | 支持 |
+|  PPLCNet   |  PPLCNet_x0_75 |  支持 | 支持 |
+|  PPLCNet   |  PPLCNet_x1_0 |  支持 | 支持 |
+|  PPLCNet   |  PPLCNet_x1_5 |  支持 | 支持 |
+|  PPLCNet   |  PPLCNet_x2_0 |  支持 | 支持 |
+|  PPLCNet   |  PPLCNet_x2_5 |  支持 | 支持 |
+|  PPLCNetV2   |  PPLCNetV2_base |  支持 | 支持 |
 |  ResNet   |  ResNet50 |  支持 | 支持 |
 |  ResNet   |  ResNet50_vd |  支持 | 支持 |
 |  SwinTransformer   |  SwinTransformer_tiny_patch4_window7_224 |  支持 | 支持 |
@@ -50,7 +50,7 @@ Linux GPU/CPU  PYTHON 服务化部署测试的主程序为`test_serving_infer.sh
     ```shell
     python3.7 -m pip install  -r requirements.txt
     ```
-- 安装 PaddleServing 相关组件，包括serving-server、serving_client、serving-app
+- 安装 PaddleServing 相关组件，包括serving-server、serving_client、serving-app，自动下载并解压推理模型
   ```bash
   bash test_tipc/prepare.sh test_tipc/configs/ResNet50/ResNet50_linux_gpu_normal_normal_serving_python_linux_gpu_cpu.txt serving_infer
   ```

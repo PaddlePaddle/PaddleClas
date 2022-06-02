@@ -165,24 +165,26 @@ if [ ${MODE} = "serving_infer" ];then
     ${python_name} -m pip install install paddle-serving-server-gpu==0.7.0.post102
     ${python_name} -m pip install paddle_serving_client==0.7.0
     ${python_name} -m pip install paddle-serving-app==0.7.0
-    cls_inference_model_url=$(func_parser_value "${lines[3]}")
-    cls_tar_name=$(func_get_url_file_name "${cls_inference_model_url}")
-    det_inference_model_url=$(func_parser_value "${lines[4]}")
-    det_tar_name=$(func_get_url_file_name "${det_inference_model_url}")
-    unset http_proxy
-    unset https_proxy
-    if [[ ${det_inference_model_url} -eq null ]]; then
-        cd ./deploy/paddleserving
-        wget -nc ${cls_inference_model_url} && tar xf ${cls_tar_name}
-        cd ../../
-    else
+    if [[ ${model_name} =~ "ShiTu" ]]; then
+        cls_inference_model_url=$(func_parser_value "${lines[3]}")
+        cls_tar_name=$(func_get_url_file_name "${cls_inference_model_url}")
+        det_inference_model_url=$(func_parser_value "${lines[4]}")
+        det_tar_name=$(func_get_url_file_name "${det_inference_model_url}")
         cd ./deploy
         mkdir models
         cd models
         wget -nc ${cls_inference_model_url} && tar xf ${cls_tar_name}
         wget -nc ${det_inference_model_url} && tar xf ${det_tar_name}
         cd ..
+    else
+        cls_inference_model_url=$(func_parser_value "${lines[3]}")
+        cls_tar_name=$(func_get_url_file_name "${cls_inference_model_url}")
+        cd ./deploy/paddleserving
+        wget -nc ${cls_inference_model_url} && tar xf ${cls_tar_name}
+        cd ../../
     fi
+    unset http_proxy
+    unset https_proxy
 fi
 
 if [ ${MODE} = "paddle2onnx_infer" ];then
