@@ -46,6 +46,11 @@ PP-HGNet 与其他模型的比较如下，其中测试机器为 NVIDIA® Tesla®
 | SwinTransformer_tiny     | 81.2      | 95.5       | 6.59        |
 | <b>PPHGNet_small<b>      | <b>81.51<b>| <b>95.82<b> | <b>2.52<b>  |
 | <b>PPHGNet_small_ssld<b> | <b>83.82<b>| <b>96.81<b> | <b>2.52<b>  |
+| Res2Net200_vd_26w_4s_ssld| 85.13      | 97.42       | 11.45       |
+| ResNeXt101_32x48d_wsl    | 85.37      | 97.69       | 55.07       |
+| SwinTransformer_base     | 85.2       | 97.5        | 13.53       |  
+| <b>PPHGNet_base_ssld<b> | <b>85.00<b>| <b>97.35<b> | <b>5.97<b>   |
+
 
 
 关于更多 PP-HGNet 的介绍以及下游任务的表现，敬请期待。
