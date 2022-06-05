@@ -11,7 +11,7 @@ Global:
   print_batch_step: 20
   use_visualdl: False
   # used for static mode and model export
-  image_shape: [3, 256, 192]
+  image_shape: [3, 192, 256]
   save_inference_dir: "./inference"
   use_multilabel: True
 
@@ -62,7 +62,7 @@ DataLoader:
         - ResizeImage:
             size: [192, 256]
         - Padv2:
-            size: [212, 276]
+            size: [276, 212]
             pad_mode: 1
             fill_value: 0
         - RandomCropImage:

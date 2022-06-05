@@ -11,7 +11,7 @@ Global:
   print_batch_step: 20
   use_visualdl: False
   # used for static mode and model export
-  image_shape: [3, 256, 192]
+  image_shape: [3, 192, 256]
   save_inference_dir: "./inference"
   use_multilabel: True
 
@@ -45,7 +45,9 @@ Loss:
         weight_ratio: True
         size_sum: True
     - DistillationDMLLoss:
-        weight: 0.1
+        weight: 1.0
+        weight_ratio: True
+        sum_across_class_dim: False
         model_name_pairs:
         - ["Student", "Teacher"]
     
@@ -79,18 +81,18 @@ DataLoader:
             to_rgb: True
             channel_first: False
         - ResizeImage:
-            size: [192, 256]
+            size: [256, 192]
         - TimmAutoAugment:
             prob: 0.0
             config_str: rand-m9-mstd0.5-inc1
             interpolation: bicubic
-            img_size: [192, 256]
+            img_size: [256, 192]
         - Padv2:
-            size: [212, 276]
+            size: [276, 212]
             pad_mode: 1
             fill_value: 0
         - RandomCropImage:
-            size: [192, 256]
+            size: [256, 192]
         - RandFlipImage:
             flip_code: 1
         - NormalizeImage:
@@ -125,7 +127,7 @@ DataLoader:
             to_rgb: True
             channel_first: False
         - ResizeImage:
-            size: [192, 256]
+            size: [256, 192]
         - NormalizeImage:
             scale: 1.0/255.0
             mean: [0.485, 0.456, 0.406]
