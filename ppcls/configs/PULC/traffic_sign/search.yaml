@@ -1,5 +1,5 @@
-base_config_file: ppcls/configs/PULC/traffic_sign/PPLCNet/PPLCNet_x1_0_search.yaml
-distill_config_file: ppcls/configs/PULC/traffic_sign/Distillation/PPLCNet_x1_0_distillation.yaml
+base_config_file: ppcls/configs/PULC/traffic_sign/PPLCNet_x1_0_search.yaml
+distill_config_file: ppcls/configs/PULC/traffic_sign/PPLCNet_x1_0_distillation.yaml
 
 gpus: 0,1,2,3
 output_dir: output/search_traffic_sign
