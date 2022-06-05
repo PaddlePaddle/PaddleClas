@@ -50,7 +50,7 @@
 | PPLCNet_x1_0  | 89.19 | 2.56  | 8.2 | 使用ImageNet预训练模型 |
 | PPLCNet_x1_0  | 89.89 | 2.56  | 8.2 | 使用SSLD预训练模型 |
 | PPLCNet_x1_0  | 90.65 | 2.56  | 8.2 | 使用SSLD预训练模型+EDA策略|
-| <b>PPLCNet_x1_0<b>  | <b>90.69<b> | <b>2.56<b>  | <b>8.2<b> | 使用SSLD预训练模型+EDA策略+SKL-UGI知识蒸馏策略|
+| <b>PPLCNet_x1_0<b>  | <b>90.81<b> | <b>2.56<b>  | <b>8.2<b> | 使用SSLD预训练模型+EDA策略+SKL-UGI知识蒸馏策略|
 
 从表中可以看出，backbone 为 Res2Net200_vd_26w_4s 时精度较高，但是推理速度较慢。将 backbone 替换为轻量级模型 MobileNetV3_large_x1_0 后，速度可以大幅提升，但是精度下降明显。将 backbone 替换为 PPLCNet_x1_0 时，精度低0.01%，但是速度提升 2 倍左右。在此基础上，使用 SSLD 预训练模型后，在不改变推理速度的前提下，精度可以提升约 0.06%，进一步地，当融合EDA策略后，精度可以再提升 0.3%，最后，在使用 SKL-UGI 知识蒸馏后，精度可以继续提升 0.21%。此时，PPLCNet_x1_0 的精度超越了SwinTranformer_tiny，速度32倍。关于 PULC 的训练方法和推理部署方法将在下面详细介绍。
 
@@ -220,7 +220,7 @@ python3 -m paddle.distributed.launch \
         -o Arch.name=ResNet101_vd
 ```
 
-验证集的最佳指标为 `90.98%` 左右，当前教师模型最好的权重保存在 `output/ResNet101_vd/best_model.pdparams`。
+验证集的最佳指标为 `91.60%` 左右，当前教师模型最好的权重保存在 `output/ResNet101_vd/best_model.pdparams`。
 
 <a name="4.1.2"></a>
 
@@ -237,7 +237,7 @@ python3 -m paddle.distributed.launch \
         -o Arch.models.0.Teacher.pretrained=output/ResNet101_vd/best_model
 ```
 
-验证集的最佳指标为 `90.35%` 左右，当前模型最好的权重保存在 `output/DistillationModel/best_model_student.pdparams`。
+验证集的最佳指标为 `90.81%` 左右，当前模型最好的权重保存在 `output/DistillationModel/best_model_student.pdparams`。
 
 
 <a name="5"></a>

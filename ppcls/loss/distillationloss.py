@@ -90,13 +90,16 @@ class DistillationDMLLoss(DMLLoss):
     def __init__(self,
                  model_name_pairs=[],
                  act="softmax",
+                 weight_ratio=False,
+                 sum_across_class_dim=False,
                  key=None,
                  name="loss_dml"):
-        super().__init__(act=act)
+        super().__init__(act=act, sum_across_class_dim=sum_across_class_dim)
         assert isinstance(model_name_pairs, list)
         self.key = key
         self.model_name_pairs = model_name_pairs
         self.name = name
+        self.weight_ratio = weight_ratio
 
     def forward(self, predicts, batch):
         loss_dict = dict()
@@ -106,7 +109,10 @@ class DistillationDMLLoss(DMLLoss):
             if self.key is not None:
                 out1 = out1[self.key]
                 out2 = out2[self.key]
-            loss = super().forward(out1, out2)
+            if self.weight_ratio is True:
+                loss = super().forward(out1, out2, batch)
+            else:
+                loss = super().forward(out1, out2)
             if isinstance(loss, dict):
                 for key in loss:
                     loss_dict["{}_{}_{}_{}".format(key, pair[0], pair[1],
