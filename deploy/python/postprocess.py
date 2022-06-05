@@ -303,7 +303,6 @@ class VehicleAttribute(object):
             label_res = []
             color_idx = np.argmax(res[:10])
             type_idx = np.argmax(res[10:])
-            print(color_idx, type_idx)
             if res[color_idx] >= self.color_threshold:
                 color_info = f"Color: ({self.color_list[color_idx]}, prob: {res[color_idx]})"
             else:

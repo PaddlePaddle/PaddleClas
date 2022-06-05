@@ -1,12 +1,11 @@
 Global:
-  # infer_imgs: "./images/PULC/vehicle_attr/0002_c002_00030670_0.jpg"
-  infer_imgs: "./whole_chain_infer/val"
-  inference_model_dir: "../va_lcnet/"
+  infer_imgs: "./images/PULC/vehicle_attr/0002_c002_00030670_0.jpg"
+  inference_model_dir: "./models/vehicle_attr_infer"
   batch_size: 1
-  use_gpu: False
+  use_gpu: True
   enable_mkldnn: True
   cpu_num_threads: 10
-  benchmark: True
+  benchmark: False
   use_fp16: False
   ir_optim: True
   use_tensorrt: False
