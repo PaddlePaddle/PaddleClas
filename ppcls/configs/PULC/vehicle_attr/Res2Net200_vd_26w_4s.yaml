@@ -2,16 +2,16 @@
 Global:
   checkpoints: null
   pretrained_model: null
-  output_dir: "./output/"
+  output_dir: "./output/mo"
   device: "gpu"
   save_interval: 5
   eval_during_train: True
   eval_interval: 1
-  epochs: 60
+  epochs: 30
   print_batch_step: 20
   use_visualdl: False
   # used for static mode and model export
-  image_shape: [3, 192, 256]
+  image_shape: [3, 256, 192]
   save_inference_dir: "./inference"
   use_multilabel: True
 
@@ -43,15 +43,15 @@ Loss:
         size_sum: True
 
 Optimizer:
-  name: Adam
+  name: Momentum
+  momentum: 0.9
   lr:
-    name: Piecewise
-    decay_epochs: [24, 36, 48, 56]
-    values: [0.0001, 0.00001, 0.000001, 0.0000001]
+    name: Cosine
+    learning_rate: 0.01
+    warmup_epoch: 5
   regularizer:
     name: 'L2'
     coeff: 0.0005
-  clip_norm: 10
 
 # data loader for train and eval
 DataLoader:

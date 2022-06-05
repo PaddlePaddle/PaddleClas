@@ -7,17 +7,17 @@ Global:
   save_interval: 5
   eval_during_train: True
   eval_interval: 1
-  epochs: 60
+  epochs: 30
   print_batch_step: 20
   use_visualdl: False
   # used for static mode and model export
-  image_shape: [3, 192, 256]
+  image_shape: [3, 256, 192]
   save_inference_dir: "./inference"
   use_multilabel: True
 
 # model architecture
 Arch:
-  name: "MobileNetV3_small_x1_0"
+  name: "MobileNetV3_large_x1_0"
   pretrained: True
   class_num: 19
   infer_add_softmax: False
@@ -36,15 +36,15 @@ Loss:
         size_sum: True
 
 Optimizer:
-  name: Adam
+  name: Momentum
+  momentum: 0.9
   lr:
-    name: Piecewise
-    decay_epochs: [24, 36, 48, 56]
-    values: [0.0006, 0.00006, 0.000006, 0.0000006]
+    name: Cosine
+    learning_rate: 0.01
+    warmup_epoch: 5
   regularizer:
     name: 'L2'
     coeff: 0.0005
-  clip_norm: 10
 
 # data loader for train and eval
 DataLoader:
