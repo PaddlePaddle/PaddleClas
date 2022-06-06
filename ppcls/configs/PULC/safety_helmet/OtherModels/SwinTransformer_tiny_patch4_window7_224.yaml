@@ -2,7 +2,7 @@
 Global:
   checkpoints: null
   pretrained_model: null
-  output_dir: ./output_003_4/
+  output_dir: ./output/
   device: gpu
   save_interval: 1
   eval_during_train: True
@@ -81,14 +81,6 @@ DataLoader:
             attempt: 10
             use_log_aspect: True
             mode: pixel
-      batch_transform_ops:
-        - OpSampler:
-            MixupOperator:
-              alpha: 0.8
-              prob: 0.5
-            CutmixOperator:
-              alpha: 1.0
-              prob: 0.5
 
     sampler:
       name: DistributedBatchSampler
