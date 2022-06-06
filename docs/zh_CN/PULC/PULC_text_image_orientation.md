@@ -37,13 +37,13 @@
 
 下表列出了判断含文字整图方向分类模型的相关指标，前两行展现了使用 SwinTranformer_tiny 和 MobileNetV3_large_x1_0 作为 backbone 训练得到的模型的相关指标，第三行至第五行依次展现了替换 backbone 为 PPLCNet_x1_0、使用 SSLD 预训练模型、使用 SHAS 超参数搜索策略训练得到的模型的相关指标。
 
-| 模型                  | 精度（%） | 延时（ms） | 存储（M） | 策略                                  |
-| --------------------- | --------- | ---------- | --------- | ------------------------------------- |
-| Swin Transformer Tiny | 99.12     | 163.92     | 107       | 使用ImageNet预训练模型                |
-| MobileNetv3 large x1  | 99.35     | 4.71       | 17        | 使用ImageNet预训练模型                |
-| PPLCNet x1            | 97.85     | 2.29       | 6.5       | 使用ImageNet预训练模型                |
-| PPLCNet x1            | 98.02     | 2.29       | 6.5       | 使用SSLD预训练模型                    |
-| **PPLCNet x1**        | **99.06** | **2.29**   | **6.5**   | 使用SSLD预训练模型+SHAS超参数搜索策略 |
+| 模型                   | 精度（%） | 延时（ms） | 存储（M） | 策略                                  |
+| ---------------------- | --------- | ---------- | --------- | ------------------------------------- |
+| SwinTranformer_tiny    | 99.12     | 163.92     | 107       | 使用ImageNet预训练模型                |
+| MobileNetV3_large_x1_0 | 99.35     | 4.71       | 17        | 使用ImageNet预训练模型                |
+| PPLCNet_x1_0           | 97.85     | 2.29       | 6.5       | 使用ImageNet预训练模型                |
+| PPLCNet_x1_0           | 98.02     | 2.29       | 6.5       | 使用SSLD预训练模型                    |
+| **PPLCNet_x1_0**       | **99.06** | **2.29**   | **6.5**   | 使用SSLD预训练模型+SHAS超参数搜索策略 |
 
 从表中可以看出，backbone 为 SwinTranformer_tiny 时精度比较高，但是推理速度较慢。将 backboone 替换为轻量级模型 MobileNetV3_large_x1_0 后，精度和速度都有了提升，但速度还有一定的提升空间。将 backbone 替换为 PPLCNet_x1_0 时，精度较 MobileNetV3_large_x1_0 低1.5个百分点，但是速度提升 2 倍左右。在此基础上，使用 SSLD 预训练模型后，在不改变推理速度的前提下，精度可以提升 0.17 个百分点，进一步地，当使用SHAS超参数搜索策略搜索最优超参数后，精度可以再提升 1.04 个百分点。此时，PPLCNet_x1_0 与 MobileNetV3_large_x1_0 和 SwinTranformer_tiny 的精度差别不大，但是速度明显变快。关于 PULC 的训练方法和推理部署方法将在下面详细介绍。
 
@@ -197,6 +197,7 @@ python3 tools/infer.py \
 
 - 其中 `-o Global.pretrained_model="output/PPLCNet_x1_0/best_model"` 指定了当前最佳权重所在的路径，如果指定其他权重，只需替换对应的路径即可。
 - 默认是对 `deploy/images/PULC/text_image_orientation/img_rot0_demo.jpg` 进行预测，此处也可以通过增加字段 `-o Infer.infer_imgs=xxx` 对其他图片预测。
+- 输出为top2的预测结果，`0` 表示该图文本方向为0度，`90` 表示该图文本方向为顺时针90度，`180` 表示该图文本方向为顺时针180度，`270` 表示该图文本方向为顺时针270度。
 
 <a name="4"></a>
 
