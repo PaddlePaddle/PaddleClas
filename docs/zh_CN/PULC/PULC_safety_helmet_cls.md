@@ -44,6 +44,7 @@
 
 | 模型 | Tpr（%） | 延时（ms） | 存储（M） | 策略 |
 |-------|-----------|----------|---------------|---------------|
+| Res2Net200_vd_26w_4s  | 98.92 | -  | - | 使用ImageNet预训练模型 |
 | SwinTranformer_tiny  | 93.57 | 175.52  | 107 | 使用ImageNet预训练模型 |
 | MobileNetV3_large_x1_0  | 97.47 | 4.70  | 17 | 使用ImageNet预训练模型 |
 | PPLCNet_x1_0  | 93.29 | 2.36  | 6.5 | 使用ImageNet预训练模型 |
@@ -52,7 +53,9 @@
 | <b>PPLCNet_x1_0<b>  | <b>98.71<b> | <b>2.36<b>  | <b>6.5<b> | 使用SSLD预训练模型+EDA策略+SKL-UGI知识蒸馏策略|
 
 <!-- todo: 上表中数值需要更新并确认，下述解释需要对应更改 -->
-从表中可以看出，backbone 为 SwinTranformer_tiny 时精度较高，但是推理速度较慢。将 backboone 替换为轻量级模型 MobileNetV3_large_x1_0 后，速度可以大幅提升，但是精度下降明显。将 backbone 替换为 PPLCNet_x1_0 时，精度较 MobileNetV3_large_x1_0 低两个多百分点，但是速度提升 2 倍左右。在此基础上，使用 SSLD 预训练模型后，在不改变推理速度的前提下，精度可以提升约 2.6 个百分点，进一步地，当融合EDA策略后，精度可以再提升 1.3 个百分点，最后，在使用 SKL-UGI 知识蒸馏后，精度可以继续提升 2.2 个百分点。此时，PPLCNet_x1_0 达到了 SwinTranformer_tiny 模型的精度，但是速度快 70+ 倍。关于 PULC 的训练方法和推理部署方法将在下面详细介绍。
+从表中可以看出，backbone 为 Res2Net200_vd_26w_4s 时精度较高，但是推理速度较慢。将 backboone 替换为轻量级模型 MobileNetV3_large_x1_0 后，速度可以大幅提升，但是精度下降明显。将 backbone 替换为 PPLCNet_x1_0 时，精度较 MobileNetV3_large_x1_0 低四个多百分点，但是速度提升 2 倍左右。在此基础上，使用 SSLD 预训练模型后，在不改变推理速度的前提下，精度可以提升约 4.8 个百分点，进一步地，当融合EDA策略后，精度可以再提升 0.7 个百分点。此时，PPLCNet_x1_0 已经接近了 Res2Net200_vd_26w_4s 模型的精度，但是速度快 70+ 倍。
+
+<!-- 最后，在使用 SKL-UGI 知识蒸馏后，精度可以继续提升 2.2 个百分点。此时，PPLCNet_x1_0 达到了 SwinTranformer_tiny 模型的精度，但是速度快 70+ 倍。关于 PULC 的训练方法和推理部署方法将在下面详细介绍。 -->
 
 **备注：**
 
@@ -120,16 +123,11 @@ cd ../
 
 执行上述命令后，`dataset/` 下存在 `safety_helmet` 目录，该目录中具有以下数据：
 
-<!-- todo： -->
-
 ```
-├── train
-│   ├── 000000000009.jpg
-│   ├── 000000000025.jpg
-...
-├── val
-│   ├── objects365_01780637.jpg
-│   ├── objects365_01780640.jpg
+├── images
+│   ├── VOC2028_part2_001209_1.jpg
+│   ├── HHD_hard_hat_workers23_1.jpg
+│   ├── CelebA_077809.jpg
 ...
 ├── ImageNet_val
 │   ├── ILSVRC2012_val_00000001.JPEG
