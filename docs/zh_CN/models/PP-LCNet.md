@@ -302,6 +302,7 @@ cd path_to_PaddleClas
 │   ├── ILSVRC2012_val_00000001.JPEG
 │   ├── ILSVRC2012_val_00000002.JPEG
 ├── val_list.txt
+```
 
 其中 `train/` 和 `val/` 分别为训练集和验证集。`train_list.txt` 和 `val_list.txt` 分别为训练集和验证集的标签文件。
     
@@ -443,7 +444,7 @@ wget https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/PPLCNet
 cd ../
 ```
 
-运行下面的命令，对图像 `./images/ImageNet/ILSVRC2012_val_00000010.jpeg` 进行有人/无人分类。
+运行下面的命令，对图像 `./images/ImageNet/ILSVRC2012_val_00000010.jpeg` 进行分类。
 
 ```shell
 # 使用下面的命令使用 GPU 进行预测
