@@ -222,7 +222,7 @@ class Engine(object):
                 AMP_RELATED_FLAGS_SETTING.update({
                     'FLAGS_cudnn_batchnorm_spatial_persistent': 1
                 })
-            paddle.fluid.set_flags(AMP_RELATED_FLAGS_SETTING)
+            paddle.set_flags(AMP_RELATED_FLAGS_SETTING)
 
             self.scale_loss = self.config["AMP"].get("scale_loss", 1.0)
             self.use_dynamic_loss_scaling = self.config["AMP"].get(
