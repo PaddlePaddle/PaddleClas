@@ -1,4 +1,4 @@
-# PULC多语言分类模型
+# PULC语种分类模型
 
 ## 目录
 
@@ -33,9 +33,9 @@
 
 ## 1. 模型和应用场景介绍
 
-该案例提供了用户使用 PaddleClas 的超轻量图像分类方案（PULC，Practical Ultra Lightweight Classification）快速构建轻量级、高精度、可落地的多语言分类模型。使用该方法训练得到的模型可以快速判断图片中的文字语种，该模型可以广泛应用于金融、政务等各种涉及多语言OCR处理的场景中。
+该案例提供了用户使用 PaddleClas 的超轻量图像分类方案（PULC，Practical Ultra Lightweight Classification）快速构建轻量级、高精度、可落地的语种分类模型。使用该方法训练得到的模型可以快速判断图片中的文字语种，该模型可以广泛应用于金融、政务等各种涉及多语种OCR处理的场景中。
 
-下表列出了多语言分类模型的相关指标，前两行展现了使用 SwinTranformer_tiny 和 MobileNetV3_large_x1_0 作为 backbone 训练得到的模型的相关指标，第三行至第六行依次展现了替换 backbone 为 PPLCNet_x1_0、使用 SSLD 预训练模型、使用 SSLD 预训练模型 + EDA 策略、使用 SSLD 预训练模型 + EDA 策略 + SKL-UGI 知识蒸馏策略训练得到的模型的相关指标。其中替换 backbone 为 PPLCNet_x1_0时，将数据预处理时的输入尺寸变为[192,48]，且网络的下采样stride调整为[2, [2, 1], [2, 1], [2, 1], [2, 1]]。
+下表列出了语种分类模型的相关指标，前两行展现了使用 SwinTranformer_tiny 和 MobileNetV3_large_x1_0 作为 backbone 训练得到的模型的相关指标，第三行至第六行依次展现了替换 backbone 为 PPLCNet_x1_0、使用 SSLD 预训练模型、使用 SSLD 预训练模型 + EDA 策略、使用 SSLD 预训练模型 + EDA 策略 + SKL-UGI 知识蒸馏策略训练得到的模型的相关指标。其中替换 backbone 为 PPLCNet_x1_0时，将数据预处理时的输入尺寸变为[192,48]，且网络的下采样stride调整为[2, [2, 1], [2, 1], [2, 1], [2, 1]]。
 
 | 模型                   | 精度      | 延时     | 存储    | 策略                                           |
 | ---------------------- | --------- | -------- | ------- | ---------------------------------------------- |
@@ -74,9 +74,9 @@
 
 #### 3.2.1 数据集来源
 
-[第1节](#1)中提供的模型使用内部数据训练得到，该数据集暂时不方便公开。这里基于 [Multi-lingual scene text detection and recognition](https://rrc.cvc.uab.es/?ch=15&com=downloads) 开源数据集构造了一个多语言demo数据集，用于体验本案例的预测过程。
+[第1节](#1)中提供的模型使用内部数据训练得到，该数据集暂时不方便公开。这里基于 [Multi-lingual scene text detection and recognition](https://rrc.cvc.uab.es/?ch=15&com=downloads) 开源数据集构造了一个多语种demo数据集，用于体验本案例的预测过程。
 
-![](../../images/PULC/docs/multilingual_original_data.png)
+![](../../images/PULC/docs/language_classification_original_data.png)
 
 <a name="3.2.2"></a>
 
@@ -88,9 +88,9 @@
 
 在 Multi-lingual scene text detection and recognition 数据集中，仅包含了阿拉伯语、日语、韩语和拉丁语数据，这里分别将4个语种的数据各抽取100张作为本案例的demo数据，并赋予对应的标签。
 
-如果想要制作自己的多语言数据集，可以按照需求收集并整理自己任务中需要语言的数据，此处提供了经过上述方法处理好的demo数据，可以直接下载得到。
+如果想要制作自己的多语种数据集，可以按照需求收集并整理自己任务中需要语种的数据，此处提供了经过上述方法处理好的demo数据，可以直接下载得到。
 
-**备注：**多语言分类任务中的图片数据需要将整图中的文字区域抠取出来，仅仅使用文本行部分作为图片数据。
+**备注：**语种分类任务中的图片数据需要将整图中的文字区域抠取出来，仅仅使用文本行部分作为图片数据。
 
 进入 PaddleClas 目录。
 
@@ -98,16 +98,16 @@
 cd path_to_PaddleClas
 ```
 
-进入 `dataset/` 目录，下载并解压多语言场景的demo数据。
+进入 `dataset/` 目录，下载并解压多语种场景的demo数据。
 
 ```shell
 cd dataset
-wget https://paddleclas.bj.bcebos.com/data/cls_demo/multilingual_demo.tar
-tar -xf multilingual_demo.tar
+wget https://paddleclas.bj.bcebos.com/data/cls_demo/language_classification_demo.tar
+tar -xf language_classification_demo.tar
 cd ../
 ```
 
-执行上述命令后，`dataset/`下存在`multilingual_demo`目录，该目录中具有以下数据：
+执行上述命令后，`dataset/`下存在`language_classification_demo`目录，该目录中具有以下数据：
 
 ```
 ├── img
@@ -118,25 +118,25 @@ cd ../
 └── label_list.txt
 ```
 
-其中`img/`存放了4种语言的400张测试数据。`label.txt`为图片对应的的标签文件，`label_list.txt`是10类语言分类模型对应的类别列表，用这些图片可以快速体验本案例中模型的预测过程。
+其中`img/`存放了4种语种的400张测试数据。`label.txt`为图片对应的的标签文件，`label_list.txt`是10类语种分类模型对应的类别列表，用这些图片可以快速体验本案例中模型的预测过程。
 
 ***备注：***
 
--  这里的`label_list.txt`是10类语言分类模型对应的类别列表，如果自己构造的数据集语言类别发生变化，需要自行调整。
+-  这里的`label_list.txt`是10类语种分类模型对应的类别列表，如果自己构造的数据集语种类别发生变化，需要自行调整。
 -  如果想要自己构造训练集和验证集，可以参考[PaddleClas分类数据集格式说明](../data_preparation/classification_dataset.md#1-数据集格式说明) 。
 
 <a name="3.3"></a>
 
 ### 3.3 模型训练
 
-在`ppcls/configs/PULC/multilingual/PPLCNet_x1_0.yaml`中提供了基于该场景的训练配置，可以通过如下脚本启动训练：
+在`ppcls/configs/PULC/language_classification/PPLCNet_x1_0.yaml`中提供了基于该场景的训练配置，可以通过如下脚本启动训练：
 
 ```shell
 export CUDA_VISIBLE_DEVICES=0,1,2,3
 python3 -m paddle.distributed.launch \
     --gpus="0,1,2,3" \
     tools/train.py \
-        -c ./ppcls/configs/PULC/multilingual/PPLCNet_x1_0.yaml
+        -c ./ppcls/configs/PULC/language_classification/PPLCNet_x1_0.yaml
 ```
 
 <a name="3.4"></a>
@@ -147,7 +147,7 @@ python3 -m paddle.distributed.launch \
 
 ```bash
 python3 tools/eval.py \
-    -c ./ppcls/configs/PULC/multilingual/PPLCNet_x1_0.yaml \
+    -c ./ppcls/configs/PULC/language_classification/PPLCNet_x1_0.yaml \
     -o Global.pretrained_model="output/PPLCNet_x1_0/best_model"
 ```
 
@@ -161,21 +161,21 @@ python3 tools/eval.py \
 
 ```bash
 python3 tools/infer.py \
-    -c ./ppcls/configs/PULC/multilingual/PPLCNet_x1_0.yaml \
+    -c ./ppcls/configs/PULC/language_classification/PPLCNet_x1_0.yaml \
     -o Global.pretrained_model="output/PPLCNet_x1_0/best_model"
 ```
 
 输出结果如下：
 
 ```
-[{'class_ids': [4, 9], 'scores': [0.96809, 0.01001], 'file_name': 'deploy/images/PULC/multilingual/word_35404.png', 'label_names': ['japan', 'latin']}]
+[{'class_ids': [4, 9], 'scores': [0.96809, 0.01001], 'file_name': 'deploy/images/PULC/language_classification/word_35404.png', 'label_names': ['japan', 'latin']}]
 ```
 
 ***备注：***
 
 - 其中 `-o Global.pretrained_model="output/PPLCNet_x1_0/best_model"` 指定了当前最佳权重所在的路径，如果指定其他权重，只需替换对应的路径即可。
-- 默认是对 `deploy/images/PULC/multilingual/word_35404.png` 进行预测，此处也可以通过增加字段 `-o Infer.infer_imgs=xxx` 对其他图片预测。
-- 预测输出为top2的预测结果，`japan` 表示该图中文字语言识别为日语，`latin` 表示该图中文字语言识别为拉丁语。
+- 默认是对 `deploy/images/PULC/language_classification/word_35404.png` 进行预测，此处也可以通过增加字段 `-o Infer.infer_imgs=xxx` 对其他图片预测。
+- 预测输出为top2的预测结果，`japan` 表示该图中文字语种识别为日语，`latin` 表示该图中文字语种识别为拉丁语。
 
 <a name="4"></a>
 
@@ -191,14 +191,14 @@ SKL-UGI 知识蒸馏是 PaddleClas 提出的一种简单有效的知识蒸馏方
 
 #### 4.1.1 教师模型训练
 
-复用`ppcls/configs/PULC/multilingual/PPLCNet/PPLCNet_x1_0.yaml`中的超参数，训练教师模型，训练脚本如下：
+复用`ppcls/configs/PULC/language_classification/PPLCNet/PPLCNet_x1_0.yaml`中的超参数，训练教师模型，训练脚本如下：
 
 ```shell
 export CUDA_VISIBLE_DEVICES=0,1,2,3
 python3 -m paddle.distributed.launch \
     --gpus="0,1,2,3" \
     tools/train.py \
-        -c ./ppcls/configs/PULC/multilingual/PPLCNet/PPLCNet_x1_0.yaml \
+        -c ./ppcls/configs/PULC/language_classification/PPLCNet/PPLCNet_x1_0.yaml \
         -o Arch.name=ResNet101_vd
 ```
 
@@ -210,14 +210,14 @@ python3 -m paddle.distributed.launch \
 
 #### 4.1.2 蒸馏训练
 
-配置文件`ppcls/configs/PULC/multilingual/PPLCNet_x1_0_distillation.yaml`提供了`SKL-UGI知识蒸馏策略`的配置。该配置将`ResNet101_vd`当作教师模型，`PPLCNet_x1_0`当作学生模型，使用[3.2.2节](#3.2.2)中介绍的蒸馏数据作为新增的无标签数据。训练脚本如下：
+配置文件`ppcls/configs/PULC/language_classification/PPLCNet_x1_0_distillation.yaml`提供了`SKL-UGI知识蒸馏策略`的配置。该配置将`ResNet101_vd`当作教师模型，`PPLCNet_x1_0`当作学生模型，使用[3.2.2节](#3.2.2)中介绍的蒸馏数据作为新增的无标签数据。训练脚本如下：
 
 ```shell
 export CUDA_VISIBLE_DEVICES=0,1,2,3
 python3 -m paddle.distributed.launch \
     --gpus="0,1,2,3" \
     tools/train.py \
-        -c ./ppcls/configs/PULC/multilingual/PPLCNet_x1_0_distillation.yaml \
+        -c ./ppcls/configs/PULC/language_classification/PPLCNet_x1_0_distillation.yaml \
         -o Arch.models.0.Teacher.pretrained=output/ResNet101_vd/best_model
 ```
 
@@ -251,15 +251,15 @@ Paddle Inference 是飞桨的原生推理库， 作用于服务器端和云端�
 
 ```bash
 python3 tools/export_model.py \
-    -c ./ppcls/configs/PULC/multilingual/PPLCNet_x1_0.yaml \
+    -c ./ppcls/configs/PULC/language_classification/PPLCNet_x1_0.yaml \
     -o Global.pretrained_model=output/DistillationModel/best_model_student \
-    -o Global.save_inference_dir=deploy/models/PPLCNet_x1_0_multilingual_infer
+    -o Global.save_inference_dir=deploy/models/PPLCNet_x1_0_language_classification_infer
 ```
 
-执行完该脚本后会在`deploy/models/`下生成`PPLCNet_x1_0_multilingual_infer`文件夹，`models` 文件夹下应有如下文件结构：
+执行完该脚本后会在`deploy/models/`下生成`PPLCNet_x1_0_language_classification_infer`文件夹，`models` 文件夹下应有如下文件结构：
 
 ```
-├── PPLCNet_x1_0_multilingual_infer
+├── PPLCNet_x1_0_language_classification_infer
 │   ├── inference.pdiparams
 │   ├── inference.pdiparams.info
 │   └── inference.pdmodel
@@ -276,13 +276,13 @@ python3 tools/export_model.py \
 ```
 cd deploy/models
 # 下载inference 模型并解压
-wget https://paddleclas.bj.bcebos.com/models/PULC/multilingual_infer.tar && tar -xf multilingual_infer.tar
+wget https://paddleclas.bj.bcebos.com/models/PULC/language_classification_infer.tar && tar -xf language_classification_infer.tar
 ```
 
 解压完毕后，`models` 文件夹下应有如下文件结构：
 
 ```
-├── multilingual_infer
+├── language_classification_infer
 │   ├── inference.pdiparams
 │   ├── inference.pdiparams.info
 │   └── inference.pdmodel
@@ -302,13 +302,13 @@ wget https://paddleclas.bj.bcebos.com/models/PULC/multilingual_infer.tar && tar 
 cd ../
 ```
 
-运行下面的命令，对图像 `./images/PULC/multilingual/word_35404.png` 进行整图文字方向分类。
+运行下面的命令，对图像 `./images/PULC/language_classification/word_35404.png` 进行整图文字方向分类。
 
 ```shell
 # 使用下面的命令使用 GPU 进行预测
-python3.7 python/predict_cls.py -c configs/PULC/multilingual/inference_multilingual.yaml
+python3.7 python/predict_cls.py -c configs/PULC/language_classification/inference_language_classification.yaml
 # 使用下面的命令使用 CPU 进行预测
-python3.7 python/predict_cls.py -c configs/PULC/multilingual/inference_multilingual.yaml -o Global.use_gpu=False
+python3.7 python/predict_cls.py -c configs/PULC/language_classification/inference_language_classification.yaml -o Global.use_gpu=False
 ```
 
 输出结果如下。
@@ -317,7 +317,7 @@ python3.7 python/predict_cls.py -c configs/PULC/multilingual/inference_multiling
 word_35404.png:    class id(s): [4, 6], score(s): [0.89, 0.01], label_name(s): ['japan', 'korean']
 ```
 
-其中，输出为top2的预测结果，`japan` 表示该图中文字语言为日语，`korean` 表示该图中文字语言为韩语。
+其中，输出为top2的预测结果，`japan` 表示该图中文字语种为日语，`korean` 表示该图中文字语种为韩语。
 
 <a name="6.2.2"></a>
 
@@ -327,7 +327,7 @@ word_35404.png:    class id(s): [4, 6], score(s): [0.89, 0.01], label_name(s): [
 
 ```shell
 # 使用下面的命令使用 GPU 进行预测，如果希望使用 CPU 预测，可以在命令后面添加 -o Global.use_gpu=False
-python3.7 python/predict_cls.py -c configs/PULC/multilingual/inference_multilingual.yaml -o Global.infer_imgs="./images/PULC/multilingual/"
+python3.7 python/predict_cls.py -c configs/PULC/language_classification/inference_language_classification.yaml -o Global.infer_imgs="./images/PULC/language_classification/"
 ```
 
 终端中会输出该文件夹内所有图像的分类结果，如下所示。
@@ -338,7 +338,7 @@ word_20.png:    class id(s): [0, 4], score(s): [0.91, 0.02], label_name(s): ['ar
 word_35404.png:    class id(s): [4, 6], score(s): [0.89, 0.01], label_name(s): ['japan', 'korean']
 ```
 
-其中，输出为top2的预测结果，`japan` 表示该图中文字语言为日语，`latin` 表示该图中文字语言为拉丁语，`arabic` 表示该图中文字语言为阿拉伯语，`korean` 表示该图中文字语言为韩语。
+其中，输出为top2的预测结果，`japan` 表示该图中文字语种为日语，`latin` 表示该图中文字语种为拉丁语，`arabic` 表示该图中文字语种为阿拉伯语，`korean` 表示该图中文字语种为韩语。
 
 <a name="6.3"></a>
 

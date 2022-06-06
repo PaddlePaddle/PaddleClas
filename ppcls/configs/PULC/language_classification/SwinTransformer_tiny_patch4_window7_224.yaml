@@ -15,56 +15,38 @@ Global:
   save_inference_dir: ./inference
   # training model under @to_static
   to_static: False
-  use_dali: False
-  use_sync_bn: True
 
 # model architecture
 Arch:
-  name: "DistillationModel"
-  class_num: &class_num 10
-  # if not null, its lengths should be same as models
-  pretrained_list:
-  # if not null, its lengths should be same as models
-  freeze_params_list:
-  - True
-  - False
-  models:
-    - Teacher:
-        name: ResNet101_vd
-        class_num: *class_num
-    - Student:
-        name: PPLCNet_x1_0
-        class_num: *class_num
-        pretrained: True
-        use_ssld: True
-        stride_list: [2, [2, 1], [2, 1], [2, 1], [2, 1]]
-        lr_mult_list : [0.0, 0.4, 0.4, 0.8, 0.8, 1.0]
-        
-
-  infer_model_name: "Student"
+  name: SwinTransformer_tiny_patch4_window7_224
+  class_num: 10
+  pretrained: True
  
 # loss function config for traing/eval process
 Loss:
   Train:
-    - DistillationDMLLoss:
+    - CELoss:
         weight: 1.0
-        model_name_pairs:
-        - ["Student", "Teacher"]
+        epsilon: 0.1
   Eval:
     - CELoss:
         weight: 1.0
 
 
 Optimizer:
-  name: Momentum
-  momentum: 0.9
+  name: AdamW
+  beta1: 0.9
+  beta2: 0.999
+  epsilon: 1e-8
+  weight_decay: 0.05
+  no_weight_decay_name: absolute_pos_embed relative_position_bias_table .bias norm 
+  one_dim_param_no_weight_decay: True
   lr:
     name: Cosine
-    learning_rate: 0.8
+    learning_rate: 5e-4
+    eta_min: 1e-5
     warmup_epoch: 5
-  regularizer:
-    name: 'L2'
-    coeff: 0.00003
+    warmup_start_lr: 1e-6
 
 
 # data loader for train and eval
@@ -72,37 +54,47 @@ DataLoader:
   Train:
     dataset:
       name: ImageNetDataset
-      image_root: ./dataset/multilingual/
-      cls_label_path: ./dataset/multilingual/train_list_for_distill.txt
+      image_root: ./dataset/language_classification/
+      cls_label_path: ./dataset/language_classification/train_list.txt
       transform_ops:
         - DecodeImage:
             to_rgb: True
             channel_first: False
-        - ResizeImage:
-            size: [160, 80]
+        - RandCropImage:
+            size: 224
+            interpolation: bicubic
+            backend: pil
         - RandFlipImage:
             flip_code: 1
         - TimmAutoAugment:
-            prob: 1.0
             config_str: rand-m9-mstd0.5-inc1
             interpolation: bicubic
-            img_size: [160, 80]
+            img_size: 224
         - NormalizeImage:
             scale: 1.0/255.0
             mean: [0.485, 0.456, 0.406]
             std: [0.229, 0.224, 0.225]
             order: ''
         - RandomErasing:
-            EPSILON: 1.0
+            EPSILON: 0.25
             sl: 0.02
             sh: 1.0/3.0
             r1: 0.3
             attempt: 10
             use_log_aspect: True
             mode: pixel
+      batch_transform_ops:
+        - OpSampler:
+            MixupOperator:
+              alpha: 0.8
+              prob: 0.5
+            CutmixOperator:
+              alpha: 1.0
+              prob: 0.5
+
     sampler:
       name: DistributedBatchSampler
-      batch_size: 256
+      batch_size: 128
       drop_last: False
       shuffle: True
     loader:
@@ -112,14 +104,18 @@ DataLoader:
   Eval:
     dataset: 
       name: ImageNetDataset
-      image_root: ./dataset/multilingual/
-      cls_label_path: ./dataset/multilingual/test_list.txt
+      image_root: ./dataset/language_classification/
+      cls_label_path: ./dataset/language_classification/test_list.txt
       transform_ops:
         - DecodeImage:
             to_rgb: True
             channel_first: False
         - ResizeImage:
-            size: [160, 80]
+            resize_short: 256
+            interpolation: bicubic
+            backend: pil
+        - CropImage:
+            size: 224
         - NormalizeImage:
             scale: 1.0/255.0
             mean: [0.485, 0.456, 0.406]
@@ -127,7 +123,7 @@ DataLoader:
             order: ''
     sampler:
       name: DistributedBatchSampler
-      batch_size: 64
+      batch_size: 128
       drop_last: False
       shuffle: False
     loader:
@@ -135,14 +131,18 @@ DataLoader:
       use_shared_memory: True
 
 Infer:
-  infer_imgs: deploy/images/PULC/multilingual/word_35404.png
+  infer_imgs: deploy/images/PULC/language_classification/word_35404.png
   batch_size: 10
   transforms:
     - DecodeImage:
         to_rgb: True
         channel_first: False
     - ResizeImage:
-        size: [160, 80]
+        resize_short: 256
+        interpolation: bicubic
+        backend: pil
+    - CropImage:
+        size: 224
     - NormalizeImage:
         scale: 1.0/255.0
         mean: [0.485, 0.456, 0.406]
@@ -152,13 +152,9 @@ Infer:
   PostProcess:
     name: Topk
     topk: 2
-    class_id_map_file: dataset/multilingual/label_list.txt
+    class_id_map_file: dataset/language_classification/label_list.txt
 
 Metric:
-    Train:
-    - DistillationTopkAcc:
-        model_key: "Student"
-        topk: [1, 2]
-    Eval:
+  Eval:
     - TopkAcc:
         topk: [1, 2]

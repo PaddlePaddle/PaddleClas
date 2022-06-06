@@ -1,6 +1,6 @@
 Global:
-  infer_imgs: "./images/PULC/multilingual/word_35404.png"
-  inference_model_dir: "./models/multilingual_infer"
+  infer_imgs: "./images/PULC/language_classification/word_35404.png"
+  inference_model_dir: "./models/language_classification_infer"
   batch_size: 1
   use_gpu: True
   enable_mkldnn: False
@@ -28,6 +28,6 @@ PostProcess:
   main_indicator: Topk
   Topk:
     topk: 2
-    class_id_map_file: "../dataset/multilingual/label_list.txt"
+    class_id_map_file: "../dataset/language_classification/label_list.txt"
   SavePreLabel:
     save_dir: ./pre_label/

@@ -33,7 +33,7 @@
 
 ## 1. 模型和应用场景介绍
 
-在图片拍摄过程中，有时为了拍摄更清晰，会将拍摄设备进行旋转，导致得到的图片也是不同方向的。此时，标准的OCR流程无法很好地应对这些数据。利用图像分类技术，可以预先判断含文字图像的方向，并将其进行方向调整，从而提高OCR处理的准确性。该案例提供了用户使用 PaddleClas 的超轻量图像分类方案（PULC，Practical Ultra Lightweight Classification）快速构建轻量级、高精度、可落地的含文字图像方向的分类模型。该模型可以广泛应用于金融、政务等行业的旋转图片的OCR处理场景中。
+在诸如文档扫描、证照拍摄等过程中，有时为了拍摄更清晰，会将拍摄设备进行旋转，导致得到的图片也是不同方向的。此时，标准的OCR流程无法很好地应对这些数据。利用图像分类技术，可以预先判断含文字图像的方向，并将其进行方向调整，从而提高OCR处理的准确性。该案例提供了用户使用 PaddleClas 的超轻量图像分类方案（PULC，Practical Ultra Lightweight Classification）快速构建轻量级、高精度、可落地的含文字图像方向的分类模型。该模型可以广泛应用于金融、政务等行业的旋转图片的OCR处理场景中。
 
 下表列出了判断含文字图像方向分类模型的相关指标，前两行展现了使用 SwinTranformer_tiny 和 MobileNetV3_large_x1_0 作为 backbone 训练得到的模型的相关指标，第三行至第五行依次展现了替换 backbone 为 PPLCNet_x1_0、使用 SSLD 预训练模型、使用 SHAS 超参数搜索策略训练得到的模型的相关指标。
 
@@ -73,7 +73,7 @@
 
 #### 3.2.1 数据集来源
 
-[第1节](#1)中提供的模型使用内部数据训练得到，该数据集暂时不方便公开。这里基于 [ICDAR2019 ArT](https://ai.baidu.com/broad/introduction?dataset=art) 和 [ICDAR2015](https://rrc.cvc.uab.es/?ch=4&com=introduction) 两个公开数据集构造了一个小规模含文字图像方向分类数据集，用于体验本案例。
+[第1节](#1)中提供的模型使用内部数据训练得到，该数据集暂时不方便公开。这里基于 [XFUND](https://github.com/doc-analysis/XFUND) 和 [ICDAR2015](https://rrc.cvc.uab.es/?ch=4&com=introduction) 两个公开数据集构造了一个小规模含文字图像方向分类数据集，用于体验本案例。
 
 ![](../../images/PULC/docs/text_image_orientation_original_data.png)
 
@@ -83,7 +83,7 @@
 
 在公开数据集的基础上经过后处理即可得到本案例需要的数据，具体处理方法如下：
 
-考虑到原始图片的分辨率较高，模型训练时间较长，这里将所有数据预先进行了缩放处理，在保持长宽比不变的前提下，将短边缩放到384。然后将数据进行顺时针旋转处理，分别生成90度、180度和270度的合成数据。其中，将 ICDAR2019 ArT 生成的40664张数据按照 9:1 的比例随机划分成了训练集和验证集， ICDAR2015 生成的6000张数据作为`SKL-UGI知识蒸馏策略`实验中的补充数据。
+考虑到原始图片的分辨率较高，模型训练时间较长，这里将所有数据预先进行了缩放处理，在保持长宽比不变的前提下，将短边缩放到384。然后将数据进行顺时针旋转处理，分别生成90度、180度和270度的合成数据。其中，将 XFUND 生成的796张数据按照 9:1 的比例随机划分成了训练集和验证集， ICDAR2015 生成的6000张数据作为`SKL-UGI知识蒸馏策略`实验中的补充数据。
 
 处理后的数据集部分数据可视化如下：
 
@@ -101,12 +101,12 @@ cd path_to_PaddleClas
 
 ```shell
 cd dataset
-wget https://paddleclas.bj.bcebos.com/data/cls_demo/text_image_orientation.tar
-tar -xf text_image_orientation.tar
+wget https://paddleclas.bj.bcebos.com/data/cls_demo/text_image_orientation_demo.tar
+tar -xf text_image_orientation_demo.tar
 cd ../
 ```
 
-执行上述命令后，`dataset/`下存在`text_image_orientation`目录，该目录中具有以下数据：
+执行上述命令后，`dataset/`下存在`text_image_orientation_demo`目录，该目录中具有以下数据：
 
 ```
 ├── img_0
