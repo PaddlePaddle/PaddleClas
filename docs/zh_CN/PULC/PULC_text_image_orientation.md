@@ -1,4 +1,4 @@
-# PULC含文字的整图方向分类模型
+# PULC含文字图像方向分类模型
 
 ## 目录
 
@@ -33,9 +33,9 @@
 
 ## 1. 模型和应用场景介绍
 
-该案例提供了用户使用 PaddleClas 的超轻量图像分类方案（PULC，Practical Ultra Lightweight Classification）快速构建轻量级、高精度、可落地的含文字的整图方向的分类模型。该模型可以广泛应用于金融、政务等行业的旋转图片的OCR处理场景中。
+在图片拍摄过程中，有时为了拍摄更清晰，会将拍摄设备进行旋转，导致得到的图片也是不同方向的。此时，标准的OCR流程无法很好地应对这些数据。利用图像分类技术，可以预先判断含文字图像的方向，并将其进行方向调整，从而提高OCR处理的准确性。该案例提供了用户使用 PaddleClas 的超轻量图像分类方案（PULC，Practical Ultra Lightweight Classification）快速构建轻量级、高精度、可落地的含文字图像方向的分类模型。该模型可以广泛应用于金融、政务等行业的旋转图片的OCR处理场景中。
 
-下表列出了判断含文字整图方向分类模型的相关指标，前两行展现了使用 SwinTranformer_tiny 和 MobileNetV3_large_x1_0 作为 backbone 训练得到的模型的相关指标，第三行至第五行依次展现了替换 backbone 为 PPLCNet_x1_0、使用 SSLD 预训练模型、使用 SHAS 超参数搜索策略训练得到的模型的相关指标。
+下表列出了判断含文字图像方向分类模型的相关指标，前两行展现了使用 SwinTranformer_tiny 和 MobileNetV3_large_x1_0 作为 backbone 训练得到的模型的相关指标，第三行至第五行依次展现了替换 backbone 为 PPLCNet_x1_0、使用 SSLD 预训练模型、使用 SHAS 超参数搜索策略训练得到的模型的相关指标。
 
 | 模型                   | 精度（%） | 延时（ms） | 存储（M） | 策略                                  |
 | ---------------------- | --------- | ---------- | --------- | ------------------------------------- |
@@ -73,7 +73,7 @@
 
 #### 3.2.1 数据集来源
 
-[第1节](#1)中提供的模型使用内部数据训练得到，该数据集暂时不方便公开。这里基于 [ICDAR2019 ArT](https://ai.baidu.com/broad/introduction?dataset=art) 和 [ICDAR2015](https://rrc.cvc.uab.es/?ch=4&com=introduction) 两个公开数据集构造了一个小规模含文字整图方向分类数据集，用于体验本案例。
+[第1节](#1)中提供的模型使用内部数据训练得到，该数据集暂时不方便公开。这里基于 [ICDAR2019 ArT](https://ai.baidu.com/broad/introduction?dataset=art) 和 [ICDAR2015](https://rrc.cvc.uab.es/?ch=4&com=introduction) 两个公开数据集构造了一个小规模含文字图像方向分类数据集，用于体验本案例。
 
 ![](../../images/PULC/docs/text_image_orientation_original_data.png)
 
@@ -97,7 +97,7 @@
 cd path_to_PaddleClas
 ```
 
-进入 `dataset/` 目录，下载并解压含文字的整图方向场景的数据。
+进入 `dataset/` 目录，下载并解压含文字图像方向场景的数据。
 
 ```shell
 cd dataset
@@ -324,7 +324,7 @@ wget https://paddleclas.bj.bcebos.com/models/PULC/text_image_orientation_infer.t
 cd ../
 ```
 
-运行下面的命令，对图像 `./images/PULC/text_image_orientation/img_rot0_demo.png` 进行整图文字方向分类。
+运行下面的命令，对图像 `./images/PULC/text_image_orientation/img_rot0_demo.png` 进行含文字图像方向分类。
 
 ```shell
 # 使用下面的命令使用 GPU 进行预测
