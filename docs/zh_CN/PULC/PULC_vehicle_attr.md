@@ -44,15 +44,15 @@
 
 | 模型 | ma（%） | 延时（ms） | 存储（M） | 策略 |
 |-------|-----------|----------|---------------|---------------|
-| Res2Net200_vd_26w_4s  | 91.12 | 66.58  | 293 | 使用ImageNet预训练模型 |
-| ResNet50  | 89.88 | 12.74  | 92 | 使用ImageNet预训练模型 |
-| MobileNetV3_large_x1_0  | 89.05 | 5.59  | 23 | 使用ImageNet预训练模型 |
-| PPLCNet_x1_0  | 89.19 | 2.56  | 8.2 | 使用ImageNet预训练模型 |
-| PPLCNet_x1_0  | 89.89 | 2.56  | 8.2 | 使用SSLD预训练模型 |
-| PPLCNet_x1_0  | 90.65 | 2.56  | 8.2 | 使用SSLD预训练模型+EDA策略|
+| Res2Net200_vd_26w_4s  | 91.36 | 66.58  | 293 | 使用ImageNet预训练模型 |
+| ResNet50  | 89.98 | 12.74  | 92 | 使用ImageNet预训练模型 |
+| MobileNetV3_large_x1_0  | 89.77 | 5.59  | 23 | 使用ImageNet预训练模型 |
+| PPLCNet_x1_0  | 89.57 | 2.56  | 8.2 | 使用ImageNet预训练模型 |
+| PPLCNet_x1_0  | 90.07 | 2.56  | 8.2 | 使用SSLD预训练模型 |
+| PPLCNet_x1_0  | 90.59 | 2.56  | 8.2 | 使用SSLD预训练模型+EDA策略|
 | <b>PPLCNet_x1_0<b>  | <b>90.81<b> | <b>2.56<b>  | <b>8.2<b> | 使用SSLD预训练模型+EDA策略+SKL-UGI知识蒸馏策略|
 
-从表中可以看出，backbone 为 Res2Net200_vd_26w_4s 时精度较高，但是推理速度较慢。将 backbone 替换为轻量级模型 MobileNetV3_large_x1_0 后，速度可以大幅提升，但是精度下降明显。将 backbone 替换为 PPLCNet_x1_0 时，精度低0.01%，但是速度提升 2 倍左右。在此基础上，使用 SSLD 预训练模型后，在不改变推理速度的前提下，精度可以提升约 0.06%，进一步地，当融合EDA策略后，精度可以再提升 0.3%，最后，在使用 SKL-UGI 知识蒸馏后，精度可以继续提升 0.21%。此时，PPLCNet_x1_0 的精度超越了SwinTranformer_tiny，速度32倍。关于 PULC 的训练方法和推理部署方法将在下面详细介绍。
+从表中可以看出，backbone 为 Res2Net200_vd_26w_4s 时精度较高，但是推理速度较慢。将 backbone 替换为轻量级模型 MobileNetV3_large_x1_0 后，速度可以大幅提升，但是精度下降明显。将 backbone 替换为 PPLCNet_x1_0 时，精度低0.2%，但是速度提升 2 倍左右。在此基础上，使用 SSLD 预训练模型后，在不改变推理速度的前提下，精度可以提升约 0.5%，进一步地，当融合EDA策略后，精度可以再提升 0.52%，最后，在使用 SKL-UGI 知识蒸馏后，精度可以继续提升 0.23%。此时，PPLCNet_x1_0 的精度与 Res2Net200_vd_26w_4s 仅相差0.55%，但是速度快26倍。关于 PULC 的训练方法和推理部署方法将在下面详细介绍。
 
 **备注：**
 
@@ -91,31 +91,59 @@
 
 #### 3.2.2 数据集获取
 
-对原始数据集中的车辆检测框进行裁剪，得到处理后的数据集。部分数据可视化如下。
+部分数据可视化如下所示。
 
 <div align="center">
 <img src="../../images/PULC/docs/vehicle_attr_data_demo.png"  width = "500" />
 </div>
 
-
-此处提供了经过上述方法处理好的数据，可以直接下载得到。
-
-进入 PaddleClas 目录。
-
-```
-cd path_to_PaddleClas
-```
-
-进入 `dataset/` 目录，下载并解压车辆属性识别场景的数据。
+首先从[VeRi数据集官网](https://www.v7labs.com/open-datasets/veri-dataset)中申请并下载数据，放在PaddleClas的`dataset`目录下，数据集目录名为`VeRi`，使用下面的命令进入该文件夹。
 
 ```shell
-cd dataset
-wget https://paddleclas.bj.bcebos.com/data/cls_demo/VeRi.tar
-tar -xf VeRi.tar
-cd ../
+cd PaddleClas/dataset/VeRi/
 ```
 
-执行上述命令后，`dataset/`下存在`VeRi`目录，该目录中具有以下数据：
+然后使用下面的代码转换label（可以在python终端中执行下面的命令，也可以将其写入一个文件，然后使用`python3 convert.py`的方式运行该文件）。
+
+
+```python
+import os
+from xml.dom.minidom import parse
+
+vehicleids = []
+
+def convert_annotation(input_fp, output_fp):
+    in_file = open(input_fp)
+    list_file = open(output_fp, 'w')
+    tree = parse(in_file)
+
+    root = tree.documentElement
+
+    for item in root.getElementsByTagName("Item"):  
+        label = ['0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0']
+        if item.hasAttribute("imageName"):
+            name = item.getAttribute("imageName")
+        if item.hasAttribute("vehicleID"):
+            vehicleid = item.getAttribute("vehicleID")
+            if vehicleid not in vehicleids :
+                vehicleids.append(vehicleid)
+            vid = vehicleids.index(vehicleid)
+        if item.hasAttribute("colorID"):
+            colorid = int (item.getAttribute("colorID"))
+            label[colorid-1] = '1'
+        if item.hasAttribute("typeID"):
+            typeid = int (item.getAttribute("typeID"))
+            label[typeid+9] = '1'
+        label = ','.join(label)
+        list_file.write(os.path.join('image_train', name)  + "\t" + label + "\n")
+
+    list_file.close()
+
+convert_annotation('train_label.xml', 'train_list.txt')  #imagename vehiclenum colorid typeid
+convert_annotation('test_label.xml', 'test_list.txt')
+```
+
+执行上述命令后，`VeRi`目录中具有以下数据：
 
 ```
 VeRi
@@ -132,11 +160,11 @@ VeRi
 ...
 ├── train_list.txt
 ├── test_list.txt
-├── label_list_train.txt.debug
-├── label_list_test.txt.debug
+├── train_label.xml
+├── test_label.xml
 ```
 
-其中`train/`和`test/`分别为训练集和验证集。`train_list.txt`和`test_list.txt`分别为训练集和验证集的标签文件，`train_list.txt.debug`和`test_list.txt.debug`分别为训练集和验证集的`debug`标签文件，其分别是`train_list.txt`和`test_list.txt`的子集，用该文件可以快速体验本案例的流程。
+其中`train/`和`test/`分别为训练集和验证集。`train_list.txt`和`test_list.txt`分别为训练集和验证集的转换后用于训练的标签文件。
 
 
 <a name="3.3"></a>
@@ -154,7 +182,7 @@ python3 -m paddle.distributed.launch \
         -c ./ppcls/configs/PULC/vehicle_attr/PPLCNet_x1_0.yaml
 ```
 
-验证集的最佳指标在 `89.89%` 左右（数据集较小，一般有0.5%左右的波动）。
+验证集的最佳指标在 `90.07%` 左右（数据集较小，一般有0.3%左右的波动）。
 
 
 <a name="3.4"></a>
@@ -186,7 +214,7 @@ python3 tools/infer.py \
 输出结果如下：
 
 ```
-[{'attr': 'Color: (yellow, prob: 0.986522376537323), Type: (hatchback, prob: 0.9965125918388367)', 'pred': [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0], 'file_name': './deploy/images/PULC/vehicle_attr/0002_c002_00030670_0.jpg'}]
+[{'attr': 'Color: (yellow, prob: 0.9893478155136108), Type: (hatchback, prob: 0.9734100103378296)', 'pred': [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0], 'file_name': './deploy/images/PULC/vehicle_attr/0002_c002_00030670_0.jpg'}]
 ```
 
 **备注：**
@@ -331,7 +359,8 @@ python3.7 python/predict_cls.py -c configs/PULC/vehicle_attr/inference_vehicle_a
 输出结果如下。
 
 ```
-0002_c002_00030670_0.jpg:        attributes: Color: (yellow, prob: 0.9995124340057373), Type: (hatchback, prob: 0.933827817440033)
+0002_c002_00030670_0.jpg:        attributes: Color: (yellow, prob: 0.9893478155136108), Type: (hatchback, prob: 0.97340989112854),
+predict output: [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0]
 ```
 
 <a name="6.2.2"></a>  
@@ -348,9 +377,9 @@ python3.7 python/predict_cls.py -c configs/PULC/vehicle_attr/inference_vehicle_a
 终端中会输出该文件夹内所有图像的属性识别结果，如下所示。
 
 ```
-0002_c002_00030670_0.jpg:        attributes: Color: (yellow, prob: 0.9995124340057373), Type: (hatchback, prob: 0.933827817440033)
+0002_c002_00030670_0.jpg:        attributes: Color: (yellow, prob: 0.9893478155136108), Type: (hatchback, prob: 0.97340989112854),
 predict output: [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0]
-0014_c012_00040750_0.jpg:     attributes: Color: (red, prob: 0.9999998807907104), Type: (sedan, prob: 1.0),
+0014_c012_00040750_0.jpg:        attributes: Color: (red, prob: 0.9998721480369568), Type: (sedan, prob: 0.999976634979248),
 predict output: [0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0]
 ```
 

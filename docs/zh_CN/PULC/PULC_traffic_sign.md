@@ -51,7 +51,7 @@
 | PPLCNet_x1_0  | 98.14 | 2.67  | 8.2 | 使用SSLD预训练模型+EDA策略|
 | <b>PPLCNet_x1_0<b>  | <b>98.35<b> | <b>2.67<b>  | <b>8.2<b> | 使用SSLD预训练模型+EDA策略+SKL-UGI知识蒸馏策略|
 
-从表中可以看出，backbone 为 SwinTranformer_tiny 时精度较高，但是推理速度较慢。将 backbone 替换为轻量级模型 MobileNetV3_large_x1_0 后，速度可以大幅提升，但是精度下降明显。将 backbone 替换为 PPLCNet_x1_0 时，精度低0.01%，但是速度提升 2 倍左右。在此基础上，使用 SSLD 预训练模型后，在不改变推理速度的前提下，精度可以提升约 0.06%，进一步地，当融合EDA策略后，精度可以再提升 0.3%，最后，在使用 SKL-UGI 知识蒸馏后，精度可以继续提升 0.21%。此时，PPLCNet_x1_0 的精度超越了SwinTranformer_tiny，速度32倍。关于 PULC 的训练方法和推理部署方法将在下面详细介绍。
+从表中可以看出，backbone 为 SwinTranformer_tiny 时精度较高，但是推理速度较慢。将 backbone 替换为轻量级模型 MobileNetV3_large_x1_0 后，速度可以大幅提升，但是精度下降明显。将 backbone 替换为 PPLCNet_x1_0 时，精度低0.01%，但是速度提升 2 倍左右。在此基础上，使用 SSLD 预训练模型后，在不改变推理速度的前提下，精度可以提升约 0.06%，进一步地，当融合EDA策略后，精度可以再提升 0.3%，最后，在使用 SKL-UGI 知识蒸馏后，精度可以继续提升 0.21%。此时，PPLCNet_x1_0 的精度超越了SwinTranformer_tiny，速度快32倍。关于 PULC 的训练方法和推理部署方法将在下面详细介绍。
 
 **备注：**
 
