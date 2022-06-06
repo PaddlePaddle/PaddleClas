@@ -39,8 +39,8 @@
 
 | 模型                  | 精度（%） | 延时（ms） | 存储（M） | 策略                                  |
 | --------------------- | --------- | ---------- | --------- | ------------------------------------- |
-| Swin Transformer Tiny | 99.12     | 163.92     | 17        | 使用ImageNet预训练模型                |
-| MobileNetv3 large x1  | 99.35     | 4.71       | 107       | 使用ImageNet预训练模型                |
+| Swin Transformer Tiny | 99.12     | 163.92     | 107       | 使用ImageNet预训练模型                |
+| MobileNetv3 large x1  | 99.35     | 4.71       | 17        | 使用ImageNet预训练模型                |
 | PPLCNet x1            | 97.85     | 2.29       | 6.5       | 使用ImageNet预训练模型                |
 | PPLCNet x1            | 98.02     | 2.29       | 6.5       | 使用SSLD预训练模型                    |
 | **PPLCNet x1**        | **99.06** | **2.29**   | **6.5**   | 使用SSLD预训练模型+SHAS超参数搜索策略 |
