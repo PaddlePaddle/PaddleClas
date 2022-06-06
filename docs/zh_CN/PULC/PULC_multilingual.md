@@ -37,14 +37,14 @@
 
 下表列出了多语言分类模型的相关指标，前两行展现了使用 SwinTranformer_tiny 和 MobileNetV3_large_x1_0 作为 backbone 训练得到的模型的相关指标，第三行至第六行依次展现了替换 backbone 为 PPLCNet_x1_0、使用 SSLD 预训练模型、使用 SSLD 预训练模型 + EDA 策略、使用 SSLD 预训练模型 + EDA 策略 + SKL-UGI 知识蒸馏策略训练得到的模型的相关指标。其中替换 backbone 为 PPLCNet_x1_0时，将数据预处理时的输入尺寸变为[192,48]，且网络的下采样stride调整为[2, [2, 1], [2, 1], [2, 1], [2, 1]]。
 
-| 模型                  | 精度  | 延时   | 存储 | 策略                                           |
-| --------------------- | ----- | ------ | ---- | ---------------------------------------------- |
-| Swin Transformer Tiny | 98.12 | 166.64 | 17   | 使用ImageNet预训练模型                         |
-| MobileNetv3 large x1  | 98.3  | 4.78   | 107  | 使用ImageNet预训练模型                         |
-| PPLCNet x1            | 98.35 | 2.56   | 6.5  | 使用ImageNet预训练模型                         |
-| PPLCNet x1            | 98.7  | 2.56   | 6.5  | 使用SSLD预训练模型                             |
-| PPLCNet x1            | 99.12 | 2.56   | 6.5  | 使用SSLD预训练模型+EDA策略                     |
-| PPLCNet x1            | 99.26 | 2.56   | 6.5  | 使用SSLD预训练模型+EDA策略+SKL-UGI知识蒸馏策略 |
+| 模型                  | 精度      | 延时     | 存储    | 策略                                           |
+| --------------------- | --------- | -------- | ------- | ---------------------------------------------- |
+| Swin Transformer Tiny | 98.12     | 166.64   | 17      | 使用ImageNet预训练模型                         |
+| MobileNetv3 large x1  | 98.3      | 4.78     | 107     | 使用ImageNet预训练模型                         |
+| PPLCNet x1            | 98.35     | 2.56     | 6.5     | 使用ImageNet预训练模型                         |
+| PPLCNet x1            | 98.7      | 2.56     | 6.5     | 使用SSLD预训练模型                             |
+| PPLCNet x1            | 99.12     | 2.56     | 6.5     | 使用SSLD预训练模型+EDA策略                     |
+| **PPLCNet x1**        | **99.26** | **2.56** | **6.5** | 使用SSLD预训练模型+EDA策略+SKL-UGI知识蒸馏策略 |
 
 从表中可以看出，backbone 为 SwinTranformer_tiny 时精度比较高，但是推理速度较慢。将 backboone 替换为轻量级模型 MobileNetV3_large_x1_0 后，精度和速度都有了提升。将 backbone 替换为 PPLCNet_x1_0 且调整预处理输入尺寸和网络的下采样stride时，精度较 MobileNetV3_large_x1_0 高0.05个百分点，同时速度提升 2 倍左右。在此基础上，使用 SSLD 预训练模型后，在不改变推理速度的前提下，精度可以提升 0.35 个百分点，进一步地，当融合EDA策略后，精度可以再提升 0.42 个百分点，最后，在使用 SKL-UGI 知识蒸馏后，精度可以继续提升 0.14 个百分点。此时，PPLCNet_x1_0 超过了 MobileNetV3_large_x1_0 和 SwinTranformer_tiny 模型的精度，并且速度有了明显提升。关于 PULC 的训练方法和推理部署方法将在下面详细介绍。
 
