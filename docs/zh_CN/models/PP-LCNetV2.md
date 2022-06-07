@@ -11,7 +11,7 @@
       - [1.2.2 PW 卷积](#1.2.2)
       - [1.2.3 Shortcut](#1.2.3)
       - [1.2.4 激活函数](#1.2.4)
-      - [1.2.5 SE 模块](#1.2.4)     
+      - [1.2.5 SE 模块](#1.2.5)     
     - [1.3 实验结果](#1.3)
 - [2. 模型快速体验](#2)
    - [2.1 安装 paddleclas](#2.1)
@@ -33,7 +33,6 @@
   - [4.4 服务化部署](#4.4)
   - [4.5 端侧部署](#4.5)
   - [4.6 Paddle2ONNX 模型转换与预测](#4.6)
-- [5. 引用](#5)
 
 <a name="1"></a>
 
@@ -93,13 +92,21 @@ PP-LCNetV2 模型的网络整体结构如上图所示。PP-LCNetV2 模型是在 
 
 ## 1.3 实验结果
 
+PPLCNetV2 目前提供的模型的精度、速度指标及预训练权重链接如下：
+
+| Model | Params(M) | FLOPs(M) | Top-1 Acc(\%) | Top-5 Acc(\%) | Latency(ms) | 预训练模型下载地址 | inference模型下载地址 |
+|:--:|:--:|:--:|:--:|:--:|:--:|:--:|:--:|
+| <b>PPLCNetV2_base<b>  | <b>6.6<b> | <b>604<b>  | <b>77.04<b> | <b>93.27<b> | <b>4.32<b> | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/PPLCNetV2_base_pretrained.pdparams) | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/PPLCNetV2_base_infer.tar) |
+| <b>PPLCNetV2_base_ssld<b>  | <b>6.6<b> | <b>604<b>  | <b>80.07<b> | <b>94.87<b> | <b>4.32<b> | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/PPLCNetV2_base_ssld_pretrained.pdparams) | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/PPLCNetV2_base_ssld_infer.tar) |
+
 在不使用额外数据的前提下，PPLCNetV2_base 模型在图像分类 ImageNet 数据集上能够取得超过 77% 的 Top1 Acc，同时在 Intel CPU 平台的推理时间在 4.4 ms 以下，如下表所示，其中推理时间基于 Intel(R) Xeon(R) Gold 6271C CPU @ 2.60GHz 硬件平台，OpenVINO 推理平台。
 
 | Model | Params(M) | FLOPs(M) | Top-1 Acc(\%) | Top-5 Acc(\%) | Latency(ms) |
-|-------|-----------|----------|---------------|---------------|-------------|
+|:--:|:--:|:--:|:--:|:--:|:--:|
 | MobileNetV3_Large_x1_25 | 7.4 | 714  | 76.4 | 93.00 | 5.19 |
 | PPLCNetV2_x2_5  | 9 | 906  | 76.60 | 93.00 | 7.25 |
 | <b>PPLCNetV2_base<b>  | <b>6.6<b> | <b>604<b>  | <b>77.04<b> | <b>93.27<b> | <b>4.32<b> |
+| <b>PPLCNetV2_base_ssld<b>  | <b>6.6<b> | <b>604<b>  | <b>80.07<b> | <b>94.87<b> | <b>4.32<b> |
 
 
 <a name="2"></a>   
@@ -394,20 +401,3 @@ PaddleClas 提供了基于 Paddle Lite 来完成模型端侧部署的示例，�
 Paddle2ONNX 支持将 PaddlePaddle 模型格式转化到 ONNX 模型格式。通过 ONNX 可以完成将 Paddle 模型到多种推理引擎的部署，包括TensorRT/OpenVINO/MNN/TNN/NCNN，以及其它对 ONNX 开源格式进行支持的推理引擎或硬件。更多关于 Paddle2ONNX 的介绍，可以参考[Paddle2ONNX 代码仓库](https://github.com/PaddlePaddle/Paddle2ONNX)。
 
 PaddleClas 提供了基于 Paddle2ONNX 来完成 inference 模型转换 ONNX 模型并作推理预测的示例，您可以参考[Paddle2ONNX 模型转换与预测](@shuilong)来完成相应的部署工作。
-
-  
-<a name="5"></a>
-
-## 5. 引用
-
-如果你的论文用到了 PP-LCNet 的方法，请添加如下 cite：
-```
-@misc{cui2021pplcnet,
-      title={PP-LCNet: A Lightweight CPU Convolutional Neural Network}, 
-      author={Cheng Cui and Tingquan Gao and Shengyu Wei and Yuning Du and Ruoyu Guo and Shuilong Dong and Bin Lu and Ying Zhou and Xueying Lv and Qiwen Liu and Xiaoguang Hu and Dianhai Yu and Yanjun Ma},
-      year={2021},
-      eprint={2109.15099},
-      archivePrefix={arXiv},
-      primaryClass={cs.CV}
-}
-```
