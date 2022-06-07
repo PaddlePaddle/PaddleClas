@@ -131,7 +131,7 @@ cd path_to_PaddleClas
 
 ```shell
 cd dataset
-wget https://paddleclas.bj.bcebos.com/data/cls_demo/traffic_sign.tar
+wget https://paddleclas.bj.bcebos.com/data/PULC/traffic_sign.tar
 tar -xf traffic_sign.tar
 cd ../
 ```

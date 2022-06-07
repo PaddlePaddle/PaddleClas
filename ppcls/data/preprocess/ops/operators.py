@@ -365,9 +365,6 @@ class RandomCropImage(object):
         j = random.randint(0, w - tw)
 
         img = img[i:i + th, j:j + tw, :]
-        if img.shape[0] != 256 or img.shape[1] != 192:
-            raise ValueError('sample: ', h, w, i, j, th, tw, img.shape)
-
         return img
 
 

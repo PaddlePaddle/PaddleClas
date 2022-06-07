@@ -30,6 +30,7 @@ search_dict:
       - [0.0, 0.4, 0.4, 0.8, 0.8, 1.0]
       - [1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
 teacher:
+  algorithm: "skl-ugi"
   rm_keys:
     - Arch.lr_mult_list
   search_values:
