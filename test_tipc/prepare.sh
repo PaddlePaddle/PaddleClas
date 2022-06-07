@@ -133,7 +133,7 @@ if [[ $FILENAME == *GeneralRecognition* ]]; then
     rm -rf Aliproduct
     rm -rf train_reg_all_data.txt
     rm -rf demo_train
-    wget -nc https://paddle-imagenet-models-name.bj.bcebos.com/data/whole_chain/tipc_shitu_demo_data.tar
+    wget -nc https://paddle-imagenet-models-name.bj.bcebos.com/data/whole_chain/tipc_shitu_demo_data.tar --no-check-certificate
     tar -xf tipc_shitu_demo_data.tar
     ln -s tipc_shitu_demo_data Aliproduct
     ln -s tipc_shitu_demo_data/demo_train.txt train_reg_all_data.txt
@@ -141,7 +141,7 @@ if [[ $FILENAME == *GeneralRecognition* ]]; then
     cd tipc_shitu_demo_data
     ln -s demo_test.txt val_list.txt
     cd ../../
-    eval "wget -nc $model_url_value"
+    eval "wget -nc $model_url_value --no-check-certificate"
     mv general_PPLCNet_x2_5_pretrained_v1.0.pdparams GeneralRecognition_PPLCNet_x2_5_pretrained.pdparams
     exit 0
 fi
@@ -155,7 +155,7 @@ if [[ ${MODE} = "lite_train_lite_infer" ]] || [[ ${MODE} = "lite_train_whole_inf
     # pretrain lite train data
     cd dataset
     rm -rf ILSVRC2012
-    wget -nc https://paddle-imagenet-models-name.bj.bcebos.com/data/whole_chain/whole_chain_little_train.tar
+    wget -nc https://paddle-imagenet-models-name.bj.bcebos.com/data/whole_chain/whole_chain_little_train.tar --no-check-certificate
     tar xf whole_chain_little_train.tar
     ln -s whole_chain_little_train ILSVRC2012
     cd ILSVRC2012
