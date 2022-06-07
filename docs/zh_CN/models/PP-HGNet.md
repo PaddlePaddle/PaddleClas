@@ -120,7 +120,7 @@ filename: docs/images/inference_deployment/whl_demo.jpg, top-5, class_ids: [8, 7
 Predict complete!
 ```
     
-**备注**： 更换 PPHGNet 的其他 scale 的模型时，只需替换 `model_name`，如将此时的模型改为 `PPHGNet_x2_0` 时，只需要将 `--model_name=PPHGNet_small` 改为 `--model_name=PPHGNet_x2_0` 即可。   
+**备注**： 更换 PPHGNet 的其他 scale 的模型时，只需替换 `model_name`，如将此时的模型改为 `PPHGNet_tiny` 时，只需要将 `--model_name=PPHGNet_small` 改为 `--model_name=PPHGNet_tiny` 即可。   
 
     
 * 在 Python 代码中预测
