@@ -42,18 +42,7 @@
     - [2.3 模型训练](#2.3)
     - [2.4 模型评估](#2.4)
     - [2.5 模型预测](#2.5)
-- [3. 模型推理部署](#3)
-  - [3.1 推理模型准备](#3.1)
-    - [3.1.1 基于训练得到的权重导出 inference 模型](#3.1.1)
-    - [3.1.2 直接下载 inference 模型](#3.1.2)
-  - [3.2 基于 Python 预测引擎推理](#3.2)
-    - [3.2.1 预测单张图像](#3.2.1)
-    - [3.2.2 基于文件夹的批量预测](#3.2.2)
-  - [3.3 基于 C++ 预测引擎推理](#3.3)
-  - [3.4 服务化部署](#3.4)
-  - [3.5 端侧部署](#3.5)
-  - [3.6 Paddle2ONNX 模型转换与预测](#3.6)
-- [4. 参考文献](#4)
+- [3. 参考文献](#4)
 
 
 <a name="1"></a>
@@ -724,119 +713,10 @@ python3 tools/infer.py \
 * 默认输出的是 Top-5 的值，如果希望输出 Top-k 的值，可以指定`-o Infer.PostProcess.topk=k`，其中，`k` 为您指定的值。
 
 
-    
+
 <a name="3"></a>
 
-## 3. 模型推理部署
-
-<a name="3.1"></a> 
-
-### 3.1 推理模型准备
-
-Paddle Inference 是飞桨的原生推理库， 作用于服务器端和云端，提供高性能的推理能力。相比于直接基于预训练模型进行预测，Paddle Inference可使用MKLDNN、CUDNN、TensorRT 进行预测加速，从而实现更优的推理性能。更多关于Paddle Inference推理引擎的介绍，可以参考[Paddle Inference官网教程](https://www.paddlepaddle.org.cn/documentation/docs/zh/guides/infer/inference/inference_cn.html)。
-    
-当使用 Paddle Inference 推理时，加载的模型类型为 inference 模型。此处，我们提供了将权重和模型转换的脚本，执行该脚本可以得到对应的 inference 模型：
-
-```bash
-python3 tools/export_model.py \
-    -c ppcls/configs/ImageNet/DataAugment/ResNet50_AutoAugment.yaml  \
-    -o Global.pretrained_model=output/ResNet50/best_model \
-    -o Global.save_inference_dir=deploy/models/ResNet50_AutoAugment_infer
-```
-执行完该脚本后会在 `deploy/models/` 下生成 `ResNet50_AutoAugment_infer` 文件夹，`models` 文件夹下应有如下文件结构：
-
-```
-├── ResNet50_AutoAugment_infer
-│   ├── inference.pdiparams
-│   ├── inference.pdiparams.info
-│   └── inference.pdmodel
-```
-
-
-<a name="3.2"></a> 
-
-### 3.2 基于 Python 预测引擎推理
-
-
-<a name="3.2.1"></a>  
-
-#### 3.2.1 预测单张图像
-
-返回 `deploy` 目录：
-
-```
-cd ../
-```
-
-运行下面的命令，对图像 `./images/ImageNet/ILSVRC2012_val_00000010.jpeg` 进行分类。
-
-```shell
-# 使用下面的命令使用 GPU 进行预测
-python3 python/predict_cls.py -c configs/inference_cls.yaml -o Global.inference_model_dir=models/ResNet50_AutoAugment_infer
-# 使用下面的命令使用 CPU 进行预测
-python3 python/predict_cls.py -c configs/inference_cls.yaml -o Global.inference_model_dir=models/ResNet50_AutoAugment_infer -o Global.use_gpu=False
-```
-
-输出结果如下。
-
-```
-ILSVRC2012_val_00000010.jpeg:	class id(s): [153, 265, 204, 283, 229], score(s): [0.61, 0.11, 0.05, 0.03, 0.02], label_name(s): ['Maltese dog, Maltese terrier, Maltese', 'toy poodle', 'Lhasa, Lhasa apso', 'Persian cat', 'Old English sheepdog, bobtail']
-```
-
-<a name="3.2.2"></a>  
-
-#### 3.2.2 基于文件夹的批量预测
-
-如果希望预测文件夹内的图像，可以直接修改配置文件中的 `Global.infer_imgs` 字段，也可以通过下面的 `-o` 参数修改对应的配置。
-
-```shell
-# 使用下面的命令使用 GPU 进行预测，如果希望使用 CPU 预测，可以在命令后面添加 -o Global.use_gpu=False
-python3 python/predict_cls.py -c configs/inference_cls.yaml -o Global.inference_model_dir=models/ResNet50_AutoAugment_infer -o Global.infer_imgs=images/ImageNet/
-```
-
-终端中会输出该文件夹内所有图像的分类结果，如下所示。
-
-```
-ILSVRC2012_val_00000010.jpeg:	class id(s): [153, 265, 204, 283, 229], score(s): [0.61, 0.11, 0.05, 0.03, 0.02], label_name(s): ['Maltese dog, Maltese terrier, Maltese', 'toy poodle', 'Lhasa, Lhasa apso', 'Persian cat', 'Old English sheepdog, bobtail']
-ILSVRC2012_val_00010010.jpeg:	class id(s): [695, 551, 507, 531, 419], score(s): [0.11, 0.06, 0.03, 0.03, 0.03], label_name(s): ['padlock', 'face powder', 'combination lock', 'digital watch', 'Band Aid']
-ILSVRC2012_val_00020010.jpeg:	class id(s): [178, 211, 209, 210, 236], score(s): [0.87, 0.03, 0.01, 0.00, 0.00], label_name(s): ['Weimaraner', 'vizsla, Hungarian pointer', 'Chesapeake Bay retriever', 'German short-haired pointer', 'Doberman, Doberman pinscher']
-ILSVRC2012_val_00030010.jpeg:	class id(s): [80, 23, 93, 81, 99], score(s): [0.87, 0.01, 0.01, 0.01, 0.00], label_name(s): ['black grouse', 'vulture', 'hornbill', 'ptarmigan', 'goose']
-```
-
-
-<a name="3.3"></a> 
-
-### 3.3 基于 C++ 预测引擎推理
-
-PaddleClas 提供了基于 C++ 预测引擎推理的示例，您可以参考[服务器端 C++ 预测](../inference_deployment/cpp_deploy.md)来完成相应的推理部署。如果您使用的是 Windows 平台，可以参考[基于 Visual Studio 2019 Community CMake 编译指南](../inference_deployment/cpp_deploy_on_windows.md)完成相应的预测库编译和模型预测工作。
-
-<a name="3.4"></a> 
-
-### 3.4 服务化部署
-
-Paddle Serving 提供高性能、灵活易用的工业级在线推理服务。Paddle Serving 支持 RESTful、gRPC、bRPC 等多种协议，提供多种异构硬件和多种操作系统环境下推理解决方案。更多关于Paddle Serving 的介绍，可以参考[Paddle Serving 代码仓库](https://github.com/PaddlePaddle/Serving)。
-    
-PaddleClas 提供了基于 Paddle Serving 来完成模型服务化部署的示例，您可以参考[模型服务化部署](../inference_deployment/paddle_serving_deploy.md)来完成相应的部署工作。
-
-<a name="3.5"></a> 
-
-### 3.5 端侧部署
-
-Paddle Lite 是一个高性能、轻量级、灵活性强且易于扩展的深度学习推理框架，定位于支持包括移动端、嵌入式以及服务器端在内的多硬件平台。更多关于 Paddle Lite 的介绍，可以参考[Paddle Lite 代码仓库](https://github.com/PaddlePaddle/Paddle-Lite)。
-    
-PaddleClas 提供了基于 Paddle Lite 来完成模型端侧部署的示例，您可以参考[端侧部署](../inference_deployment/paddle_lite_deploy.md)来完成相应的部署工作。
-
-<a name="3.6"></a> 
-
-### 3.6 Paddle2ONNX 模型转换与预测
-    
-Paddle2ONNX 支持将 PaddlePaddle 模型格式转化到 ONNX 模型格式。通过 ONNX 可以完成将 Paddle 模型到多种推理引擎的部署，包括TensorRT/OpenVINO/MNN/TNN/NCNN，以及其它对 ONNX 开源格式进行支持的推理引擎或硬件。更多关于 Paddle2ONNX 的介绍，可以参考[Paddle2ONNX 代码仓库](https://github.com/PaddlePaddle/Paddle2ONNX)。
-
-PaddleClas 提供了基于 Paddle2ONNX 来完成 inference 模型转换 ONNX 模型并作推理预测的示例，您可以参考[Paddle2ONNX 模型转换与预测](@shuilong)来完成相应的部署工作。
-
-<a name="4"></a>
-
-## 4.参考文献
+## 3.参考文献
 
 [1] Cubuk E D, Zoph B, Mane D, et al. Autoaugment: Learning augmentation strategies from data[C]//Proceedings of the IEEE conference on computer vision and pattern recognition. 2019: 113-123.
 
