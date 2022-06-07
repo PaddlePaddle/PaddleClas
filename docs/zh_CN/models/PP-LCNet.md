@@ -188,7 +188,7 @@ MobileNetV3_large_x0_75 | 64.53 | 151 |
     
 #### 1.4.1 基于Intel Xeon Gold 6148 的预测速度    
 
-| Model | Latency(ms)(ms)<br/>bs=1, thread=10 |
+| Model | Latency(ms)<br/>bs=1, thread=10 |
 |:--:|:--:|
 | PPLCNet_x0_25  | 1.74 |
 | PPLCNet_x0_35  | 1.92 |
@@ -199,7 +199,7 @@ MobileNetV3_large_x0_75 | 64.53 | 151 |
 | PPLCNet_x2_0   | 4.27 |
 | PPLCNet_x2_5   | 5.39 |
     
-**备注：** 精度类型为 FP32，推理过程使用MKLDNN。
+**备注：** 精度类型为 FP32，推理过程使用 MKLDNN。
 
 <a name="1.4.2"></a>
     
