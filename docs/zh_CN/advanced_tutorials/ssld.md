@@ -1,5 +1,5 @@
 
-# 知识蒸馏实战
+# SSLD 知识蒸馏实战
 
 ## 目录
 
@@ -128,9 +128,6 @@ python3 tools/train.py -c ppcls/configs/ImageNet/ResNet/ResNet50_vd.yaml -o Arch
 python3 -m paddle.distributed.launch --gpus="0,1,2,3" tools/train.py -c ppcls/configs/ImageNet/ResNet/ResNet50_vd.yaml -o Arch.pretrained=True -o Arch.use_ssld=True
 ```
 
-PaddleClas中集成了PULC超轻量图像分类实用方案，里面包含SSLD ImageNet预训练模型的使用以及更加通用的无标签数据的知识蒸馏方案，更多详细信息，请参考[PULC超轻量图像分类实用方案使用教程](../PULC/PULC_train.md)。
-
-
 <a name="3.2"></a>
 
 ### 3.2 使用SSLD方案进行知识蒸馏
@@ -144,6 +141,8 @@ cat train_list.txt train_list_unlabel.txt > train_list_all.txt
 ```
 
 更多关于图像分类任务的数据标签说明，请参考：[PaddleClas图像分类数据集格式说明](../data_preparation/classification_dataset.md#1-数据集格式说明)
+
+PaddleClas中集成了PULC超轻量图像分类实用方案，里面包含SSLD ImageNet预训练模型的使用以及更加通用的无标签数据的知识蒸馏方案，更多详细信息，请参考[PULC超轻量图像分类实用方案使用教程](../PULC/PULC_train.md)。
 
 <a name="4"></a>
 
