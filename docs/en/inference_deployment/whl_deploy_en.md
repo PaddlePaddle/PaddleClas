@@ -212,14 +212,14 @@ You can save the prediction result(s) as pre-label, only need to use `pre_label_
 ```python
 from paddleclas import PaddleClas
 clas = PaddleClas(model_name='ResNet50', save_dir='./output_pre_label/')
-infer_imgs = 'docs/images/inference_deployment/whl_' # it can be infer_imgs folder path which contains all of images you want to predict.
+infer_imgs = 'docs/images/' # it can be infer_imgs folder path which contains all of images you want to predict.
 result=clas.predict(infer_imgs)
 print(next(result))
 ```
 
 * CLI
 ```bash
-paddleclas --model_name='ResNet50' --infer_imgs='docs/images/inference_deployment/whl_' --save_dir='./output_pre_label/'
+paddleclas --model_name='ResNet50' --infer_imgs='docs/images/' --save_dir='./output_pre_label/'
 ```
 
 <a name="4.8"></a>
