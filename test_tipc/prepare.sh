@@ -43,7 +43,7 @@ function func_get_url_file_name() {
 
 model_name=$(func_parser_value "${lines[1]}")
 
-if [ ${MODE} = "cpp_infer" ]; then
+if [[ ${MODE} = "cpp_infer" ]]; then
     if [ -d "./deploy/cpp/opencv-3.4.7/opencv3/" ] && [ $(md5sum ./deploy/cpp/opencv-3.4.7.tar.gz | awk -F ' ' '{print $1}') = "faa2b5950f8bee3f03118e600c74746a" ]; then
         echo "################### build opencv skipped ###################"
     else
@@ -151,7 +151,7 @@ if [[ $FILENAME == *use_dali* ]]; then
     ${python_name} -m pip install --extra-index-url https://developer.download.nvidia.com/compute/redist/nightly --upgrade nvidia-dali-nightly-cuda102
 fi
 
-if [ ${MODE} = "lite_train_lite_infer" ] || [ ${MODE} = "lite_train_whole_infer" ]; then
+if [[ ${MODE} = "lite_train_lite_infer" ]] || [[ ${MODE} = "lite_train_whole_infer" ]]; then
     # pretrain lite train data
     cd dataset
     rm -rf ILSVRC2012
@@ -163,7 +163,7 @@ if [ ${MODE} = "lite_train_lite_infer" ] || [ ${MODE} = "lite_train_whole_infer"
     mv val.txt val_list.txt
     cp -r train/* val/
     cd ../../
-elif [ ${MODE} = "whole_infer" ] || [ ${MODE} = "klquant_whole_infer" ]; then
+elif [[ ${MODE} = "whole_infer" ]] || [[ ${MODE} = "klquant_whole_infer" ]]; then
     # download data
     cd dataset
     rm -rf ILSVRC2012
@@ -185,7 +185,7 @@ elif [ ${MODE} = "whole_infer" ] || [ ${MODE} = "klquant_whole_infer" ]; then
         eval $cmd
     fi
 
-elif [ ${MODE} = "whole_train_whole_infer" ]; then
+elif [[ ${MODE} = "whole_train_whole_infer" ]]; then
     cd dataset
     rm -rf ILSVRC2012
     wget -nc https://paddle-imagenet-models-name.bj.bcebos.com/data/whole_chain/whole_chain_CIFAR100.tar
@@ -197,7 +197,7 @@ elif [ ${MODE} = "whole_train_whole_infer" ]; then
     cd ../../
 fi
 
-if [ ${MODE} = "serving_infer" ]; then
+if [[ ${MODE} = "serving_infer" ]]; then
     # prepare serving env
     python_name=$(func_parser_value "${lines[2]}")
     ${python_name} -m pip install install paddle-serving-server-gpu==0.7.0.post102
@@ -225,7 +225,7 @@ if [ ${MODE} = "serving_infer" ]; then
     unset https_proxy
 fi
 
-if [ ${MODE} = "paddle2onnx_infer" ]; then
+if [[ ${MODE} = "paddle2onnx_infer" ]]; then
     # prepare paddle2onnx env
     python_name=$(func_parser_value "${lines[2]}")
     inference_model_url=$(func_parser_value "${lines[10]}")
@@ -241,7 +241,7 @@ if [ ${MODE} = "paddle2onnx_infer" ]; then
     cd ../../
 fi
 
-if [ ${MODE} = "benchmark_train" ]; then
+if [[ ${MODE} = "benchmark_train" ]]; then
     pip install -r requirements.txt
     cd dataset
     rm -rf ILSVRC2012
