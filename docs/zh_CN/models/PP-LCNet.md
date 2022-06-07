@@ -122,7 +122,7 @@ BaseNet 经过以上四个方面的改进，得到了 PP-LCNet。下表进一步
 图像分类我们选用了 ImageNet 数据集，相比目前主流的轻量级网络，PP-LCNet 在相同精度下可以获得更快的推理速度。当使用百度自研的 SSLD 蒸馏策略后，精度进一步提升，在 Intel cpu 端约 5ms 的推理速度下 ImageNet 的 Top-1 Acc 超过了 80%。
 
 | Model | Params(M) | FLOPs(M) | Top-1 Acc(\%) | Top-5 Acc(\%) | Latency(ms) | 预训练模型下载地址 | inference模型下载地址 |
-|-------|-----------|----------|---------------|---------------|-------------| 
+|-------|-----------|----------|---------------|---------------|-------------|---------------|-------------| 
 | PPLCNet_x0_25  | 1.5 | 18  | 51.86 | 75.65 | 1.74 | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/PPLCNet_x0_25_pretrained.pdparams) | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/PPLCNet_x0_25_infer.tar) |
 | PPLCNet_x0_35  | 1.6 | 29  | 58.09 | 80.83 | 1.92 | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/PPLCNet_x0_35_pretrained.pdparams) | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/PPLCNet_x0_35_infer.tar) |
 | PPLCNet_x0_5   | 1.9 | 47  | 63.14 | 84.66 | 2.05 | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/PPLCNet_x0_5_pretrained.pdparams) | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/PPLCNet_x0_5_infer.tar) |
