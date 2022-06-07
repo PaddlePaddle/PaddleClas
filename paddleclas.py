@@ -24,7 +24,6 @@ import shutil
 import textwrap
 import tarfile
 import requests
-import warnings
 from functools import partial
 from difflib import SequenceMatcher
 
@@ -38,10 +37,10 @@ from deploy.utils.get_image_list import get_image_list
 from deploy.utils import config
 
 import ppcls.arch.backbone as backbone
-from ppcls.utils.logger import init_logger
+from ppcls.utils import logger
 
 # for building model with loading pretrained weights from backbone
-init_logger()
+logger.init_logger()
 
 __all__ = ["PaddleClas"]
 
@@ -400,7 +399,7 @@ def check_model_file(model_type, model_name):
     if not os.path.exists(model_file_path) or not os.path.exists(
             params_file_path):
         tmp_path = storage_directory(url.split("/")[-1])
-        print(f"download {url} to {tmp_path}")
+        logger.info(f"download {url} to {tmp_path}")
         os.makedirs(storage_directory(), exist_ok=True)
         download_with_progressbar(url, tmp_path)
         with tarfile.open(tmp_path, "r") as tarObj:
@@ -522,7 +521,7 @@ class PaddleClas(object):
                     os.makedirs(image_storage_dir())
                 image_save_path = image_storage_dir("tmp.jpg")
                 download_with_progressbar(input_data, image_save_path)
-                warnings.warn(
+                logger.info(
                     f"Image to be predicted from Internet: {input_data}, has been saved to: {image_save_path}"
                 )
                 input_data = image_save_path
@@ -536,7 +535,7 @@ class PaddleClas(object):
             for idx_img, img_path in enumerate(image_list):
                 img = cv2.imread(img_path)
                 if img is None:
-                    warnings.warn(
+                    logger.warning(
                         f"Image file failed to read and has been skipped. The path: {img_path}"
                     )
                     continue
@@ -552,7 +551,7 @@ class PaddleClas(object):
                         for idx_pred, pred in enumerate(preds):
                             pred["filename"] = img_path_list[idx_pred]
                             if print_pred:
-                                print(", ".join(
+                                logger.info(", ".join(
                                     [f"{k}: {pred[k]}" for k in pred]))
 
                     img_list = []
@@ -573,7 +572,7 @@ def main():
     res = clas_engine.predict(cfg["infer_imgs"], print_pred=True)
     for _ in res:
         pass
-    print("Predict complete!")
+    logger.info("Predict complete!")
     return
 
 
