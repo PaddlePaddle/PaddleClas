@@ -3,7 +3,7 @@
 
 ## 目录
 
-- [1. 模型和应用场景介绍](#1)
+- [1. 模型介绍](#1)
     - [1.1 模型简介](#1.1)
     - [1.2 模型细节](#1.2)
       - [1.2.1 更好的激活函数](#1.2.1)
@@ -41,9 +41,9 @@
 
 <a name="1"></a>
 
-## 1. 模型和应用场景介绍
+## 1. 模型介绍
 
-### 1.1 模型和应用场景简介
+### 1.1 模型简介
 
 在计算机视觉领域中，骨干网络的好坏直接影响到整个视觉任务的结果。在之前的一些工作中，相关的研究者普遍将 FLOPs 或者 Params 作为优化目的，但是在工业界真实落地的场景中，推理速度才是考量模型好坏的重要指标，然而，推理速度和准确性很难兼得。考虑到工业界有很多基于 Intel CPU 的应用，所以我们本次的工作旨在使骨干网络更好的适应 Intel CPU，从而得到一个速度更快、准确率更高的轻量级骨干网络，与此同时，目标检测、语义分割等下游视觉任务的性能也同样得到提升。
 
@@ -121,19 +121,19 @@ BaseNet 经过以上四个方面的改进，得到了 PP-LCNet。下表进一步
 
 图像分类我们选用了 ImageNet 数据集，相比目前主流的轻量级网络，PP-LCNet 在相同精度下可以获得更快的推理速度。当使用百度自研的 SSLD 蒸馏策略后，精度进一步提升，在 Intel cpu 端约 5ms 的推理速度下 ImageNet 的 Top-1 Acc 超过了 80%。
 
-| Model | Params(M) | FLOPs(M) | Top-1 Acc(\%) | Top-5 Acc(\%) | Latency(ms) |
-|-------|-----------|----------|---------------|---------------|-------------|
-| PPLCNet_x0_25  | 1.5 | 18  | 51.86 | 75.65 | 1.74 |
-| PPLCNet_x0_35  | 1.6 | 29  | 58.09 | 80.83 | 1.92 |
-| PPLCNet_x0_5   | 1.9 | 47  | 63.14 | 84.66 | 2.05 |
-| PPLCNet_x0_75  | 2.4 | 99  | 68.18 | 88.30 | 2.29 |
-| PPLCNet_x1_0     | 3.0 | 161 | 71.32 | 90.03 | 2.46 |
-| PPLCNet_x1_5   | 4.5 | 342 | 73.71 | 91.53 | 3.19 |
-| PPLCNet_x2_0     | 6.5 | 590 | 75.18 | 92.27 | 4.27 |
-| PPLCNet_x2_5   | 9.0 | 906 | 76.60 | 93.00 | 5.39 |
-| PPLCNet_x0_5_ssld | 1.9 | 47  | 66.10 | 86.46 | 2.05 |
-| PPLCNet_x1_0_ssld | 3.0 | 161 | 74.39 | 92.09 | 2.46 |
-| PPLCNet_x2_5_ssld | 9.0 | 906 | 80.82 | 95.33 | 5.39 |
+| Model | Params(M) | FLOPs(M) | Top-1 Acc(\%) | Top-5 Acc(\%) | Latency(ms) | 预训练模型下载地址 | inference模型下载地址 |
+|-------|-----------|----------|---------------|---------------|-------------| 
+| PPLCNet_x0_25  | 1.5 | 18  | 51.86 | 75.65 | 1.74 | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/PPLCNet_x0_25_pretrained.pdparams) | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/PPLCNet_x0_25_infer.tar) |
+| PPLCNet_x0_35  | 1.6 | 29  | 58.09 | 80.83 | 1.92 | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/PPLCNet_x0_35_pretrained.pdparams) | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/PPLCNet_x0_35_infer.tar) |
+| PPLCNet_x0_5   | 1.9 | 47  | 63.14 | 84.66 | 2.05 | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/PPLCNet_x0_5_pretrained.pdparams) | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/PPLCNet_x0_5_infer.tar) |
+| PPLCNet_x0_75  | 2.4 | 99  | 68.18 | 88.30 | 2.29 | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/PPLCNet_x0_75_pretrained.pdparams) | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/PPLCNet_x0_75_infer.tar) |
+| PPLCNet_x1_0     | 3.0 | 161 | 71.32 | 90.03 | 2.46 | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/PPLCNet_x1_0_pretrained.pdparams) | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/PPLCNet_x1_0_infer.tar) |
+| PPLCNet_x1_5   | 4.5 | 342 | 73.71 | 91.53 | 3.19 | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/PPLCNet_x1_5_pretrained.pdparams) | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/PPLCNet_x1_5_infer.tar) |
+| PPLCNet_x2_0     | 6.5 | 590 | 75.18 | 92.27 | 4.27 | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/PPLCNet_x2_0_pretrained.pdparams) | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/PPLCNet_x2_0_infer.tar) |
+| PPLCNet_x2_5   | 9.0 | 906 | 76.60 | 93.00 | 5.39 | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/PPLCNet_x2_5_pretrained.pdparams) | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/PPLCNet_x2_5_infer.tar) |
+| PPLCNet_x0_5_ssld | 1.9 | 47  | 66.10 | 86.46 | 2.05 | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/PPLCNet_x0_5_ssld_pretrained.pdparams) | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/PPLCNet_x0_5_ssld_infer.tar) |
+| PPLCNet_x1_0_ssld | 3.0 | 161 | 74.39 | 92.09 | 2.46 | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/PPLCNet_x1_0_ssld_pretrained.pdparams) | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/PPLCNet_x1_0_ssld_infer.tar) |
+| PPLCNet_x2_5_ssld | 9.0 | 906 | 80.82 | 95.33 | 5.39 | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/PPLCNet_x2_5_ssld_pretrained.pdparams) | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/PPLCNet_x2_5_ssld_infer.tar) |
 
 其中 `_ssld` 表示使用 `SSLD 蒸馏`后的模型。关于 `SSLD蒸馏` 的内容，详情 [SSLD 蒸馏](../advanced_tutorials/knowledge_distillation.md)。
 
@@ -249,7 +249,7 @@ pip3 install paddleclas
     
 ### 2.2 预测
 
-使用 PPLCNet_x1_0 的权重快速预测
+* 在命令行中使用 PPLCNet_x1_0 的权重快速预测
     
 ```bash
 paddleclas --model_name=PPLCNet_x1_0  --infer_imgs="docs/images/inference_deployment/whl_demo.jpg"
@@ -262,10 +262,31 @@ filename: docs/images/inference_deployment/whl_demo.jpg, top-5, class_ids: [8, 7
 Predict complete!
 ```
     
-**备注：** 
+**备注**： 
     
 * 更换 PPLCNet 的其他 scale 的模型时，只需替换 `model_name`，如将此时的模型改为 `PPLCNet_x2_0` 时，只需要将 `--model_name=PPLCNet_x1_0` 改为 `--model_name=PPLCNet_x2_0` 即可。   
 
+    
+* 在 Python 代码中使用
+```python
+from paddleclas import PaddleClas
+clas = PaddleClas(model_name='PPLCNet_x1_0')
+infer_imgs='docs/images/inference_deployment/whl_demo.jpg'
+result=clas.predict(infer_imgs)
+print(next(result))
+```
+
+**备注**：
+
+* `PaddleClas.predict()` 为可迭代对象（`generator`），因此需要使用 `next()` 函数或 `for` 循环对其迭
+代调用。每次调用将以 `batch_size` 为单位进行一次预测，并返回预测结果。返回结果示例如下：
+
+```
+>>> result
+filename: docs/images/inference_deployment/whl_demo.jpg, top-5, class_ids: [8, 7, 86, 81, 85], scores: [0.91347, 0.03779, 0.0036, 0.00117, 0.00112], label_names: ['hen', 'cock', 'partridge', 'ptarmigan', 'quail']
+```
+    
+    
 <a name="3"></a> 
     
 ## 3. 模型训练、评估和预测
