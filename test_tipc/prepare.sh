@@ -162,13 +162,29 @@ fi
 if [ ${MODE} = "serving_infer" ];then
     # prepare serving env
     python_name=$(func_parser_value "${lines[2]}")
-    ${python_name} -m pip install install paddle-serving-server-gpu==0.6.1.post101
-    ${python_name} -m pip install paddle_serving_client==0.6.1
-    ${python_name} -m pip install paddle-serving-app==0.6.1
+    ${python_name} -m pip install install paddle-serving-server-gpu==0.7.0.post102
+    ${python_name} -m pip install paddle_serving_client==0.7.0
+    ${python_name} -m pip install paddle-serving-app==0.7.0
+    if [[ ${model_name} =~ "ShiTu" ]]; then
+        cls_inference_model_url=$(func_parser_value "${lines[3]}")
+        cls_tar_name=$(func_get_url_file_name "${cls_inference_model_url}")
+        det_inference_model_url=$(func_parser_value "${lines[4]}")
+        det_tar_name=$(func_get_url_file_name "${det_inference_model_url}")
+        cd ./deploy
+        mkdir models
+        cd models
+        wget -nc ${cls_inference_model_url} && tar xf ${cls_tar_name}
+        wget -nc ${det_inference_model_url} && tar xf ${det_tar_name}
+        cd ..
+    else
+        cls_inference_model_url=$(func_parser_value "${lines[3]}")
+        cls_tar_name=$(func_get_url_file_name "${cls_inference_model_url}")
+        cd ./deploy/paddleserving
+        wget -nc ${cls_inference_model_url} && tar xf ${cls_tar_name}
+        cd ../../
+    fi
     unset http_proxy
     unset https_proxy
-    cd ./deploy/paddleserving
-    wget -nc https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/ResNet50_vd_infer.tar && tar xf ResNet50_vd_infer.tar
 fi
 
 if [ ${MODE} = "paddle2onnx_infer" ];then
