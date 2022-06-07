@@ -120,7 +120,7 @@ PaddleClas 提供的 ResNet 系列的模型包括 ResNet50，ResNet50_vd，ResNe
 | ResNet152_vd      | 224       | 7.29127                      | 10.86137                     | 15.32444                     | 8.54376                      | 19.52157                     | 36.64445                     |
 | ResNet200_vd      | 224       | 9.36026                      | 13.5474                      | 19.0725                      | 10.80619                     | 25.01731                     | 48.81399                     |
 | ResNet50_vd_ssld  | 224       | 2.65164                      | 4.84109                      | 7.46225                      | 3.53131                      | 8.09057                      | 14.45965                     |
-| Fix_ResNet50_vd_ssld_v2  | 320       | 3.42818                      | 7.51534                      | 13.19370                      | 5.07696                      | 14.64218                      | 27.01453                     |
+| Fix_ResNet50_vd_ssld  | 320       | 3.42818                      | 7.51534                      | 13.19370                      | 5.07696                      | 14.64218                      | 27.01453                     |
 | ResNet101_vd_ssld | 224       | 5.05972                      | 7.83685                      | 11.34235                     | 6.11704                      | 13.76222                     | 25.11071                     |
 
 **备注：** 推理过程使用 TensorRT。
@@ -155,7 +155,7 @@ filename: docs/images/inference_deployment/whl_demo.jpg, top-1, class_ids: [8, 7
 Predict complete!
 ```
     
-**备注**： 更换 ResNet 的其他 scale 的模型时，只需替换 `model_name`，如将此时的模型改为 `ResNet_x2_0` 时，只需要将 `--model_name=ResNet50` 改为 `--model_name=ResNet_x2_0` 即可。   
+**备注**： 更换 ResNet 的其他 scale 的模型时，只需替换 `model_name`，如将此时的模型改为 `ResNet18` 时，只需要将 `--model_name=ResNet50` 改为 `--model_name=ResNet18` 即可。   
 
     
 * 在 Python 代码中预测
