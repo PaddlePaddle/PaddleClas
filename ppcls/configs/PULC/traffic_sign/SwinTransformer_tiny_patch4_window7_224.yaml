@@ -7,8 +7,8 @@ Global:
   save_interval: 1
   eval_during_train: True
   eval_interval: 1
-  start_eval_epoch: 10
-  epochs: 20
+  start_eval_epoch: 0
+  epochs: 10
   print_batch_step: 10
   use_visualdl: False
   # used for static mode and model export
@@ -18,35 +18,43 @@ Global:
   to_static: False
   use_dali: False
 
+# mixed precision training
+AMP:
+  scale_loss: 128.0
+  use_dynamic_loss_scaling: True
+  # O1: mixed fp16
+  level: O1
 
 # model architecture
 Arch:
-  name: PPLCNet_x1_0
-  class_num: 2
+  name: SwinTransformer_tiny_patch4_window7_224
+  class_num: 232
   pretrained: True
-  use_ssld: True
-  use_sync_bn: True
  
 # loss function config for traing/eval process
 Loss:
   Train:
     - CELoss:
         weight: 1.0
+        epsilon: 0.1
   Eval:
     - CELoss:
         weight: 1.0
 
-
 Optimizer:
-  name: Momentum
-  momentum: 0.9
+  name: AdamW
+  beta1: 0.9
+  beta2: 0.999
+  epsilon: 1e-8
+  weight_decay: 0.05
+  no_weight_decay_name: absolute_pos_embed relative_position_bias_table .bias norm
+  one_dim_param_no_weight_decay: True
   lr:
     name: Cosine
-    learning_rate: 0.01
+    learning_rate: 2e-4
+    eta_min: 2e-6
     warmup_epoch: 5
-  regularizer:
-    name: 'L2'
-    coeff: 0.00004
+    warmup_start_lr: 2e-7
 
 
 # data loader for train and eval
@@ -54,18 +62,20 @@ DataLoader:
   Train:
     dataset:
       name: ImageNetDataset
-      image_root: ./dataset/person/
-      cls_label_path: ./dataset/person/train_list.txt
+      image_root: ./dataset/
+      cls_label_path: ./dataset/traffic_sign/label_list_train.txt
+      delimiter: "\t"
       transform_ops:
         - DecodeImage:
             to_rgb: True
             channel_first: False
         - RandCropImage:
             size: 224
+            interpolation: bicubic
+            backend: pil
         - RandFlipImage:
             flip_code: 1
         - TimmAutoAugment:
-            prob: 0.0
             config_str: rand-m9-mstd0.5-inc1
             interpolation: bicubic
             img_size: 224
@@ -75,16 +85,24 @@ DataLoader:
             std: [0.229, 0.224, 0.225]
             order: ''
         - RandomErasing:
-            EPSILON: 0.0
+            EPSILON: 0.25
             sl: 0.02
             sh: 1.0/3.0
             r1: 0.3
             attempt: 10
             use_log_aspect: True
             mode: pixel
+      batch_transform_ops:
+        - OpSampler:
+            MixupOperator:
+              alpha: 0.8
+              prob: 0.5
+            CutmixOperator:
+              alpha: 1.0
+              prob: 0.5
     sampler:
       name: DistributedBatchSampler
-      batch_size: 64
+      batch_size: 128
       drop_last: False
       shuffle: True
     loader:
@@ -94,8 +112,9 @@ DataLoader:
   Eval:
     dataset: 
       name: ImageNetDataset
-      image_root: ./dataset/person/
-      cls_label_path: ./dataset/person/val_list.txt
+      image_root: ./dataset/
+      cls_label_path: ./dataset/tt100k_clas_v2/label_list_test.txt
+      delimiter: "\t"
       transform_ops:
         - DecodeImage:
             to_rgb: True
@@ -115,7 +134,7 @@ DataLoader:
       drop_last: False
       shuffle: False
     loader:
-      num_workers: 4
+      num_workers: 8
       use_shared_memory: True
 
 Infer:
@@ -136,16 +155,16 @@ Infer:
         order: ''
     - ToCHWImage:
   PostProcess:
-    name: ThreshOutput
-    threshold: 0.9
-    label_0: nobody
-    label_1: someone
+    name: Topk
+    topk: 5
+    class_id_map_file: dataset/traffic_sign/label_name_id.txt
 
 Metric:
   Train:
     - TopkAcc:
-        topk: [1, 2]
+        topk: [1, 5]
   Eval:
-    - TprAtFpr:
     - TopkAcc:
-        topk: [1, 2]
+        topk: [1, 5]
+
+

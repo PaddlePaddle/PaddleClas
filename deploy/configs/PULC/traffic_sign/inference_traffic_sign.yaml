@@ -1,11 +1,11 @@
 Global:
-  infer_imgs: "./images/PULC/person/objects365_02035329.jpg"
-  inference_model_dir: "./models/person_cls_infer"
+  infer_imgs: "./images/PULC/traffic_sign/99603_17806.jpg"
+  inference_model_dir: "./models/traffic_sign_infer"
   batch_size: 1
   use_gpu: True
-  enable_mkldnn: False
+  enable_mkldnn: True
   cpu_num_threads: 10
-  enable_benchmark: True
+  benchmark: False
   use_fp16: False
   ir_optim: True
   use_tensorrt: False
@@ -27,10 +27,9 @@ PreProcess:
     - ToCHWImage:
 
 PostProcess:
-  main_indicator: ThreshOutput
-  ThreshOutput:
-    threshold: 0.9
-    label_0: nobody
-    label_1: someone
+  main_indicator: Topk
+  Topk:
+    topk: 5
+    class_id_map_file: "../dataset/traffic_sign/label_name_id.txt"
   SavePreLabel:
     save_dir: ./pre_label/
