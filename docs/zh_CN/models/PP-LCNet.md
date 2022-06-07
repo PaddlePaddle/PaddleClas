@@ -215,7 +215,7 @@ MobileNetV3_large_x0_75 | 64.53 | 151 |
 | PPLCNet_x1_5  | 0.82                         | 2.06                             | 3.12                           |
 | PPLCNet_x2_0  | 0.94                         | 2.58                             | 4.08                           |
     
-**备注：** 精度类型为 FP32，推理过程使用 TensorRT，。
+**备注：** 精度类型为 FP32，推理过程使用 TensorRT。
 
 <a name="1.4.3"></a>
 
@@ -264,9 +264,7 @@ filename: docs/images/inference_deployment/whl_demo.jpg, top-5, class_ids: [8, 7
 Predict complete!
 ```
     
-**备注**： 
-    
-* 更换 PPLCNet 的其他 scale 的模型时，只需替换 `model_name`，如将此时的模型改为 `PPLCNet_x2_0` 时，只需要将 `--model_name=PPLCNet_x1_0` 改为 `--model_name=PPLCNet_x2_0` 即可。   
+**备注**： 更换 PPLCNet 的其他 scale 的模型时，只需替换 `model_name`，如将此时的模型改为 `PPLCNet_x2_0` 时，只需要将 `--model_name=PPLCNet_x1_0` 改为 `--model_name=PPLCNet_x2_0` 即可。   
 
     
 * 在 Python 代码中使用
@@ -278,9 +276,7 @@ result=clas.predict(infer_imgs)
 print(next(result))
 ```
 
-**备注**：
-
-* `PaddleClas.predict()` 为可迭代对象（`generator`），因此需要使用 `next()` 函数或 `for` 循环对其迭
+**备注**：`PaddleClas.predict()` 为可迭代对象（`generator`），因此需要使用 `next()` 函数或 `for` 循环对其迭
 代调用。每次调用将以 `batch_size` 为单位进行一次预测，并返回预测结果。返回结果示例如下：
 
 ```
