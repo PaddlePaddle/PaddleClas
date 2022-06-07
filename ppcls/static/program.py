@@ -371,6 +371,11 @@ def run(dataloader,
                 "Except RuntimeError when reading data from dataloader, try to read once again..."
             )
             continue
+        except IndexError:
+            logger.warning(
+                "Except IndexError when reading data from dataloader, try to read once again..."
+            )
+            continue
         idx += 1
         # ignore the warmup iters
         if idx == 5:
