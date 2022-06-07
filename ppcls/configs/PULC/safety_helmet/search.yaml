@@ -30,11 +30,7 @@ search_dict:
       - [0.0, 0.4, 0.4, 0.8, 0.8, 1.0]
       - [1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
 teacher:
-  rm_keys:
-    - Arch.lr_mult_list
-  search_values:
-    - ResNet101_vd
-    - ResNet50_vd
+  algorithm: "udml"
 final_replace:
   Arch.lr_mult_list: Arch.models.1.Student.lr_mult_list
 
