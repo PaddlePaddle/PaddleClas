@@ -188,7 +188,7 @@ MobileNetV3_large_x0_75 | 64.53 | 151 |
     
 #### 1.4.1 基于Intel Xeon Gold 6148 的预测速度    
 
-| Model | Intel Xeon Gold 6148 time(ms)<br/>bs=1, thread=10 |
+| Model | Latency(ms)(ms)<br/>bs=1, thread=10 |
 |:--:|:--:|
 | PPLCNet_x0_25  | 1.74 |
 | PPLCNet_x0_35  | 1.92 |
@@ -199,13 +199,13 @@ MobileNetV3_large_x0_75 | 64.53 | 151 |
 | PPLCNet_x2_0   | 4.27 |
 | PPLCNet_x2_5   | 5.39 |
     
-**备注：** 推理过程使用MKLDNN。
+**备注：** 精度类型为 FP32，推理过程使用MKLDNN。
 
 <a name="1.4.2"></a>
     
 #### 1.4.2 基于 V100 GPU 的预测速度
 
-| Models        | FP32<br>Batch Size=1<br>(ms) | FP32<br/>Batch Size=1\4<br/>(ms) | FP32<br/>Batch Size=8<br/>(ms) |
+| Models        | Latency(ms)<br>bs=1 | Latency(ms)<br/>bs=4 | Latency(ms)<br/>bs=8 |
 | :--: | :--:| :--: | :--: |
 | PPLCNet_x0_25 | 0.72                         | 1.17                             | 1.71                           |
 | PPLCNet_x0_35 | 0.69                         | 1.21                             | 1.82                           |
@@ -215,13 +215,13 @@ MobileNetV3_large_x0_75 | 64.53 | 151 |
 | PPLCNet_x1_5  | 0.82                         | 2.06                             | 3.12                           |
 | PPLCNet_x2_0  | 0.94                         | 2.58                             | 4.08                           |
     
-**备注：** 推理过程使用 TensorRT。
+**备注：** 精度类型为 FP32，推理过程使用 TensorRT，。
 
 <a name="1.4.3"></a>
 
 #### 1.4.3 基于 SD855 的预测速度
 
-| Models        | SD855 time(ms)<br>bs=1, thread=1 | SD855 time(ms)<br/>bs=1, thread=2 | SD855 time(ms)<br/>bs=1, thread=4 |
+| Models        | Latency(ms)<br>bs=1, thread=1 | Latency(ms)<br/>bs=1, thread=2 | Latency(ms)<br/>bs=1, thread=4 |
 | :--: | :--: | :--: | :--: |
 | PPLCNet_x0_25 | 2.30                             | 1.62                              | 1.32                              |
 | PPLCNet_x0_35 | 3.15                             | 2.11                              | 1.64                              |
@@ -231,6 +231,8 @@ MobileNetV3_large_x0_75 | 64.53 | 151 |
 | PPLCNet_x1_5  | 20.55                            | 12.26                             | 7.54                              |
 | PPLCNet_x2_0  | 33.79                            | 20.17                             | 12.10                             |
 | PPLCNet_x2_5  | 49.89                            | 29.60                             | 17.82                             |
+    
+**备注：** 精度类型为 FP32。
 
 <a name="2"></a>   
     
