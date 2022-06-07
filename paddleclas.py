@@ -1,4 +1,4 @@
-# Copyright (c) 2021 PaddlePaddle Authors. All Rights Reserved.
+# Copyright (c) 2022 PaddlePaddle Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -170,7 +170,8 @@ IMN_MODEL_SERIES = {
 PULC_MODEL_BASE_DOWNLOAD_URL = "https://paddleclas.bj.bcebos.com/models/PULC/{}_infer.tar"
 PULC_MODELS = [
     "person_exists", "person_attribute", "safety_helmet", "traffic_sign",
-    "car_exists", "car_attribute", "text_line", "multilingual"
+    "vehicle_exists", "vehicle_attr", "textline_orientation",
+    "text_image_orientation", "language_classification"
 ]
 
 
