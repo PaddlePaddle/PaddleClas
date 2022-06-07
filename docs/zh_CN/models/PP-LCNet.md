@@ -12,7 +12,7 @@
       - [1.2.4 GAP 后使用更大的 1x1 卷积层](#1.2.4)
     - [1.3 实验结果](#1.3)
     - [1.4 Benchmark](#1.4)
-      - [1.4.1 基于Intel Xeon Gold 6148 的预测速度](#1.4.1)
+      - [1.4.1 基于 Intel Xeon Gold 6148 的预测速度](#1.4.1)
       - [1.4.2 基于 V100 GPU 的预测速度](#1.4.2)
       - [1.4.3 基于 SD855 的预测速度](#1.4.3)
 - [2. 模型快速体验](#2)
@@ -186,7 +186,7 @@ MobileNetV3_large_x0_75 | 64.53 | 151 |
 
 <a name="1.4.1"></a>
     
-#### 1.4.1 基于Intel Xeon Gold 6148 的预测速度    
+#### 1.4.1 基于 Intel Xeon Gold 6148 的预测速度    
 
 | Model | Latency(ms)<br/>bs=1, thread=10 |
 |:--:|:--:|
@@ -267,7 +267,7 @@ Predict complete!
 **备注**： 更换 PPLCNet 的其他 scale 的模型时，只需替换 `model_name`，如将此时的模型改为 `PPLCNet_x2_0` 时，只需要将 `--model_name=PPLCNet_x1_0` 改为 `--model_name=PPLCNet_x2_0` 即可。   
 
     
-* 在 Python 代码中使用
+* 在 Python 代码中预测
 ```python
 from paddleclas import PaddleClas
 clas = PaddleClas(model_name='PPLCNet_x1_0')
