@@ -441,6 +441,8 @@ class Engine(object):
 
                 if isinstance(out, list):
                     out = out[0]
+                if isinstance(out, dict) and "Student" in out:
+                    out = out["Student"]
                 if isinstance(out, dict) and "logits" in out:
                     out = out["logits"]
                 if isinstance(out, dict) and "output" in out:
