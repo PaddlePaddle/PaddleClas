@@ -1,9 +1,9 @@
 ===========================cpp_infer_params===========================
-model_name:ResNet50_vd
+model_name:PPLCNet_x2_0
 cpp_infer_type:cls
-cls_inference_model_dir:./ResNet50_vd_infer/
+cls_inference_model_dir:./PPLCNet_x2_0_infer/
 det_inference_model_dir:
-cls_inference_url:https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/ResNet50_vd_infer.tar
+cls_inference_url:https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/PPLCNet_x2_0_infer.tar
 det_inference_url:
 infer_quant:False
 inference_cmd:./deploy/cpp/build/clas_system -c inference_cls.yaml

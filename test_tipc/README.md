@@ -35,15 +35,16 @@
 │   ├── MobileNetV3         # MobileNetV3系列模型测试配置文件目录
 │   │   ├── MobileNetV3_large_x1_0_train_infer_python.txt                                    #基础训练预测配置文件
 │   │   ├── MobileNetV3_large_x1_0_train_linux_gpu_fleet_amp_infer_python_linux_gpu_cpu.txt  #多机多卡训练预测配置文件
-│   │   ├── MobileNetV3_large_x1_0_train_linux_gpu_fleet_amp_infer_python_linux_gpu_cpu.txt  #多机多卡训练预测配置文件
-│   │   └── MobileNetV3_large_x1_0_paddle2onnx_infer_python.txt                              #paddle2onnx推理测试配置文件
-│   └── ResNet              # ResNet系列模型测试配置文件目录
-│       ├── ResNet50_vd_train_infer_python.txt                                        #基础训练预测配置文件
-│       ├── ResNet50_vd_train_linux_gpu_fleet_amp_infer_python_linux_gpu_cpu.txt      #多机多卡训练预测配置文件
-│       ├── ResNet50_vd_train_linux_gpu_fleet_amp_infer_python_linux_gpu_cpu.txt      #多机多卡训练预测配置文件
-│       ├── ResNet50_vd_train_linux_gpu_normal_amp_infer_python_linux_gpu_cpu.txt     #混合精度训练预测配置文件
-│       └── ResNet50_vd_paddle2onnx_infer_python.txt                                  #paddle2onnx推理测试配置文件
-|   ......
+│   │   ├── MobileNetV3_large_x1_0_train_linux_gpu_normal_amp_infer_python_linux_gpu_cpu.txt #混合精度训练预测配置文件
+│   │   ├── MobileNetV3_large_x1_0_paddle2onnx_infer_python.txt                              #paddle2onnx推理测试配置文件
+│   │   └── ......
+│   ├──ResNet              # ResNet系列模型测试配置文件目录
+│   │   ├── ResNet50_vd_train_infer_python.txt                                        #基础训练预测配置文件
+│   │   ├── ResNet50_vd_train_linux_gpu_fleet_amp_infer_python_linux_gpu_cpu.txt      #多机多卡训练预测配置文件
+│   │   ├── ResNet50_vd_train_linux_gpu_normal_amp_infer_python_linux_gpu_cpu.txt     #混合精度训练预测配置文件
+│   │   ├── ResNet50_vd_paddle2onnx_infer_python.txt                                  #paddle2onnx推理测试配置文件
+│   │   └── ......
+│   └── ......
 ├── docs
 │   ├── guide.png
 │   └── test.png
