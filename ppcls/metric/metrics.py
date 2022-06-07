@@ -61,7 +61,7 @@ class TopkAcc(AvgMetrics):
             self.avg_meters[f"top{k}"].update(metric_dict[f"top{k}"],
                                               x.shape[0])
 
-        self.topk = filter(lambda k: k <= output_dims, self.topk)
+        self.topk = list(filter(lambda k: k <= output_dims, self.topk))
 
         return metric_dict
 

@@ -153,7 +153,7 @@ class Engine(object):
 
         # build metric
         if self.mode == 'train' and "Metric" in self.config and "Train" in self.config[
-                "Metric"]:
+                "Metric"] and self.config["Metric"]["Train"]:
             metric_config = self.config["Metric"]["Train"]
             if hasattr(self.train_dataloader, "collate_fn"
                        ) and self.train_dataloader.collate_fn is not None:
