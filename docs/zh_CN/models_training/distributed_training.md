@@ -1,0 +1,52 @@
+
+# 分布式训练
+
+## 1. 简介
+
+* 分布式训练的高性能，是飞桨的核心优势技术之一，在分类任务上，分布式训练可以达到几乎线性的加速比。图像分类训练任务中往往包含大量训练数据，以ImageNet为例，ImageNet22k数据集中包含1400W张图像，如果使用单机训练，会非常耗时。因此PaddleClas中使用分布式训练接口完成训练任务，同时支持单机训练与多机训练。更多关于分布式训练的方法与文档可以参考：[分布式训练快速开始教程](https://fleet-x.readthedocs.io/en/latest/paddle_fleet_rst/parameter_server/ps_quick_start.html)。
+
+## 2. 使用方法
+
+### 单机训练
+
+* 以识别为例，本地准备好数据之后，使用`paddle.distributed.launch`的接口启动训练任务即可。下面为运行代码示例。
+
+```shell
+python3 -m paddle.distributed.launch \
+    --log_dir=./log/ \
+    --gpus "0,1,2,3" \
+    tools/train.py \
+    -c ./ppcls/configs/ImageNet/ResNet/ResNet50.yaml
+```
+
+### 多机训练
+
+* 相比单机训练，多机训练时，只需要添加`--ips`的参数，该参数表示需要参与分布式训练的机器的ip列表，不同机器的ip用逗号隔开。下面为运行代码示例。
+
+```shell
+ip_list="192.168.0.1,192.168.0.2"
+python3 -m paddle.distributed.launch \
+    --log_dir=./log/ \
+    --ips="${ip_list}" \
+    --gpus="0,1,2,3" \
+    tools/train.py \
+    -c ./ppcls/configs/ImageNet/ResNet/ResNet50.yaml
+```
+
+**注：**
+* 不同机器的ip信息需要用逗号隔开，可以通过`ifconfig`或者`ipconfig`查看。
+* 不同机器之间需要做免密设置，且可以直接ping通，否则无法完成通信。
+* 不同机器之间的代码、数据与运行命令或脚本需要保持一致，且所有的机器上都需要运行设置好的训练命令或者脚本。最终`ip_list`中的第一台机器的第一块设备是trainer0，以此类推。
+* 不同机器的起始端口可能不同，建议在启动多机任务前，在不同的机器中设置相同的多机运行起始端口，命令为`export FLAGS_START_PORT=17000`，端口值建议在`10000~20000`之间。
+
+
+## 性能效果测试
+
+* 在4机8卡V100的机器上，基于[SSLD知识蒸馏训练策略](../advanced_tutorials/knowledge_distillation.md)（数据量500W）进行模型训练，不同模型的训练耗时以及多机加速比情况如下所示。
+
+
+| 模型    | 精度     | 单机8卡耗时 | 4机8卡耗时 | 加速比  |
+|:---------:|:--------:|:--------:|:--------:|:------:|
+| PPHGNet-base_ssld   | 85.00% | 15.74d | 4.86d  | **3.23** |
+| PPLCNetv2-base_ssld | 80.10% | 6.4d   | 1.67d  | **3.83** |
+| PPLCNet_x0_25_ssld  | 53.43% | 6.2d   | 1.78d  | **3.48** |
