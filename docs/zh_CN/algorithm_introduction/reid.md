@@ -3,20 +3,25 @@
 
 ## 目录
 
-  - [1. 算法/应用场景简介](#1-算法应用场景简介)
-  - [2. ReID算法](#2-reid算法)
-    - [2.1 ReID strong-baseline](#21-reid-strong-baseline)
-      - [2.1.1 原理介绍](#211-原理介绍)
-      - [2.1.1 数据准备](#211-数据准备)
-      - [2.1.2 模型训练](#212-模型训练)
-      - [2.1.3 模型评估](#213-模型评估)
-      - [2.1.3 模型推理](#213-模型推理)
-        - [2.1.3.1 模型导出](#2131-模型导出)
-        - [2.1.3.2 模型推理](#2132-模型推理)
-  - [3. 总结](#3-总结)
-    - [3.1 方法总结与对比](#31-方法总结与对比)
-    - [3.2 使用建议/FAQ](#32-使用建议faq)
-  - [4 参考资料](#4-参考资料)
+- [1. 算法/应用场景简介](#1-算法应用场景简介)
+- [2. ReID算法](#2-reid算法)
+  - [2.1 ReID strong-baseline](#21-reid-strong-baseline)
+    - [2.1.1 原理介绍](#211-原理介绍)
+    - [2.1.2 精度指标](#212-精度指标)
+    - [2.1.3 数据准备](#213-数据准备)
+    - [2.1.4 模型训练](#214-模型训练)
+    - [2.1.5 模型评估](#215-模型评估)
+    - [2.1.6 模型推理部署](#216-模型推理部署)
+      - [2.1.6.1 推理模型准备](#2161-推理模型准备)
+      - [2.1.6.2 基于 Python 预测引擎推理](#2162-基于-python-预测引擎推理)
+      - [2.1.6.3 基于 C++ 预测引擎推理](#2163-基于-c-预测引擎推理)
+    - [2.1.7 服务化部署](#217-服务化部署)
+    - [2.1.8 端侧部署](#218-端侧部署)
+    - [2.1.9 Paddle2ONNX 模型转换与预测](#219-paddle2onnx-模型转换与预测)
+- [3. 总结](#3-总结)
+  - [3.1 方法总结与对比](#31-方法总结与对比)
+  - [3.2 使用建议/FAQ](#32-使用建议faq)
+- [4. 参考资料](#4-参考资料)
 
 ### 1. 算法/应用场景简介
 
@@ -45,6 +50,8 @@
 6. Center loss：给每个类别一个可学习的聚类中心，训练时让类内特征靠近聚类中心，减少类内差异，增大类间差异。
 7. Reranking：在检索时考虑查询图像的近邻候选对象，根据候选对象的近邻图像的是否也含有查询图像的情况来优化距离矩阵，最终提升检索精度。
 
+##### 2.1.2 精度指标
+
 以下表格总结了复现的ReID strong-baseline的3种配置在 Market1501 数据集上的精度指标，
 
 | 配置文件                 | recall@1 | mAP   | 参考recall@1 | 参考mAP |
@@ -57,7 +64,7 @@
 
 接下来主要以`softmax_triplet_with_center.yaml`配置和训练好的模型文件为例，展示在 Market1501 数据集上进行训练、测试、推理的过程。
 
-##### 2.1.2 数据准备
+##### 2.1.3 数据准备
 
 下载 [Market-1501-v15.09.15.zip](https://pan.baidu.com/s/1ntIi2Op?_at_=1654142245770) 数据集，解压到`PaddleClas/dataset/`下，并组织成以下文件结构：
 
@@ -76,7 +83,7 @@
       └── readme.txt
   ```
 
-##### 2.1.3 模型训练
+##### 2.1.4 模型训练
 
 1. 执行以下命令开始训练
 
@@ -88,9 +95,9 @@
 
 2. 查看训练日志和保存的模型参数文件
 
-  训练过程中会在屏幕上实时打印loss等指标信息，同时会保存日志文件`train.log`、模型参数文件`*.pdparams`、优化器参数文件`*.pdopt`等内容到`Global.output_dir`指定的文件夹下，默认在`PaddleClas/output/RecModel/`文件夹下
+    训练过程中会在屏幕上实时打印loss等指标信息，同时会保存日志文件`train.log`、模型参数文件`*.pdparams`、优化器参数文件`*.pdopt`等内容到`Global.output_dir`指定的文件夹下，默认在`PaddleClas/output/RecModel/`文件夹下
 
-##### 2.1.4 模型评估
+##### 2.1.5 模型评估
 
 准备用于评估的`*.pdparams`模型参数文件，可以使用训练好的模型，也可以使用[2.2 模型训练](#22-模型训练)中保存的模型。
 
@@ -138,9 +145,9 @@
   ```
   默认评估日志保存在`PaddleClas/output/RecModel/eval.log`中，可以看到我们提供的 `reid_strong_baseline_softmax_with_center.epoch_120.pdparams` 模型在 Market1501 数据集上的评估指标为recall@1=0.94270，recall@5=0.98189，mAP=0.85799
 
-##### 2.1.5 模型推理
+##### 2.1.6 模型推理部署
 
-###### 2.1.5.1 模型导出
+###### 2.1.6.1 推理模型准备
 可以选择使用训练过程中保存的模型文件转换成 inference 模型并推理，或者使用我们提供的转换好的 inference 模型直接进行推理
   - 将训练过程中保存的模型文件转换成 inference 模型，同样以`latest.pdparams`为例，执行以下命令进行转换
     ```shell
@@ -158,7 +165,7 @@
     cd ../
     ```
 
-###### 2.1.5.2 模型推理
+###### 2.1.6.2 基于 Python 预测引擎推理
 
   1. 修改 `PaddleClas/deploy/configs/inference_rec.yaml`。将 `infer_imgs:` 后的字段改为 Market1501 中 query 文件夹下的任意一张图片路径（下方代码使用的是`0294_c1s1_066631_00.jpg`图片路径）；将 `rec_inference_model_dir:` 后的字段改为解压出来的 reid_srong_baseline_softmax_with_center 文件夹路径；将 `transform_ops` 字段下的预处理配置改为 `softmax_triplet_with_center.yaml` 中`Eval.Query.dataset` 下的预处理配置。如下所示
 
@@ -194,18 +201,43 @@
 
   2. 执行推理命令
 
-     ```shell
-     cd PaddleClas/deploy/
-     python3.7 python/predict_rec.py -c ./configs/inference_rec.yaml
-     ```
+       ```shell
+       cd PaddleClas/deploy/
+       python3.7 python/predict_rec.py -c ./configs/inference_rec.yaml
+       ```
 
   3. 查看输出结果，实际结果为一个长度2048的向量，表示输入图片经过模型转换后得到的特征向量
 
-     ```shell
-     0294_c1s1_066631_00.jpg:        [ 0.01806974  0.00476423 -0.00508293 ...  0.03925538  0.00377574
-      -0.00849029]
-     ```
-     推理时的输出向量储存在[predict_rec.py](../../../deploy/python/predict_rec.py#L134-L135)的`result_dict`变量中。
+       ```shell
+       0294_c1s1_066631_00.jpg:        [ 0.01806974  0.00476423 -0.00508293 ...  0.03925538  0.00377574
+        -0.00849029]
+       ```
+        推理时的输出向量储存在[predict_rec.py](../../../deploy/python/predict_rec.py#L134-L135)的`result_dict`变量中。
+
+  4. 批量预测
+    将配置文件中`infer_imgs:`后的路径改为为文件夹即可，如`../dataset/market1501/Market-1501-v15.09.15/query`，则会预测并输出出query下所有图片的特征向量。
+
+###### 2.1.6.3 基于 C++ 预测引擎推理
+
+PaddleClas 提供了基于 C++ 预测引擎推理的示例，您可以参考[服务器端 C++ 预测](../inference_deployment/cpp_deploy.md)来完成相应的推理部署。如果您使用的是 Windows 平台，可以参考基于 Visual Studio 2019 Community CMake 编译指南完成相应的预测库编译和模型预测工作。
+
+##### 2.1.7 服务化部署
+
+Paddle Serving 提供高性能、灵活易用的工业级在线推理服务。Paddle Serving 支持 RESTful、gRPC、bRPC 等多种协议，提供多种异构硬件和多种操作系统环境下推理解决方案。更多关于Paddle Serving 的介绍，可以参考Paddle Serving 代码仓库。
+
+PaddleClas 提供了基于 Paddle Serving 来完成模型服务化部署的示例，您可以参考[模型服务化部署](../inference_deployment/paddle_serving_deploy.md)来完成相应的部署工作。
+
+##### 2.1.8 端侧部署
+
+Paddle Lite 是一个高性能、轻量级、灵活性强且易于扩展的深度学习推理框架，定位于支持包括移动端、嵌入式以及服务器端在内的多硬件平台。更多关于 Paddle Lite 的介绍，可以参考Paddle Lite 代码仓库。
+
+PaddleClas 提供了基于 Paddle Lite 来完成模型端侧部署的示例，您可以参考[端侧部署](../inference_deployment/paddle_lite_deploy.md)来完成相应的部署工作。
+
+##### 2.1.9 Paddle2ONNX 模型转换与预测
+
+Paddle2ONNX 支持将 PaddlePaddle 模型格式转化到 ONNX 模型格式。通过 ONNX 可以完成将 Paddle 模型到多种推理引擎的部署，包括TensorRT/OpenVINO/MNN/TNN/NCNN，以及其它对 ONNX 开源格式进行支持的推理引擎或硬件。更多关于 Paddle2ONNX 的介绍，可以参考Paddle2ONNX 代码仓库。
+
+PaddleClas 提供了基于 Paddle2ONNX 来完成 inference 模型转换 ONNX 模型并作推理预测的示例，您可以参考[Paddle2ONNX 模型转换与预测](../../../deploy/paddle2onnx/readme.md)来完成相应的部署工作。
 
 ### 3. 总结
 
@@ -217,7 +249,7 @@
 
 Market1501 数据集比较小，可以尝试训练多次取最高精度。
 
-### 4 参考资料
+### 4. 参考资料
 
 1. [Bag of Tricks and A Strong Baseline for Deep Person Re-identification](https://openaccess.thecvf.com/content_CVPRW_2019/papers/TRMTMCT/Luo_Bag_of_Tricks_and_a_Strong_Baseline_for_Deep_Person_CVPRW_2019_paper.pdf)
 2. [michuanhaohao/reid-strong-baseline](https://github.com/michuanhaohao/reid-strong-baseline)
