@@ -100,10 +100,17 @@ IMN_MODEL_SERIES = {
         "MobileNetV3_large_x1_0", "MobileNetV3_large_x1_25",
         "MobileNetV3_small_x1_0_ssld", "MobileNetV3_large_x1_0_ssld"
     ],
+    "PPHGNet": [
+        "PPHGNet_tiny",
+        "PPHGNet_small",
+        "PPHGNet_tiny_ssld",
+        "PPHGNet_small_ssld",
+    ],
     "PPLCNet": [
         "PPLCNet_x0_25", "PPLCNet_x0_35", "PPLCNet_x0_5", "PPLCNet_x0_75",
         "PPLCNet_x1_0", "PPLCNet_x1_5", "PPLCNet_x2_0", "PPLCNet_x2_5"
     ],
+    "PPLCNetV2": ["PPLCNetV2_base"],
     "RedNet": ["RedNet26", "RedNet38", "RedNet50", "RedNet101", "RedNet152"],
     "RegNet": ["RegNetX_4GF"],
     "Res2Net": [
