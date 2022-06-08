@@ -16,7 +16,7 @@
     - [3.4 模型评估](#3.4)
     - [3.5 模型预测](#3.5)
 - [4. 模型压缩](#4)
-  - [4.1 SKL-UGI 知识蒸馏](#4.1)
+  - [4.1 UDML 知识蒸馏](#4.1)
     - [4.1.1 教师模型训练](#4.1.1)
     - [4.1.2 蒸馏训练](#4.1.2)
 - [5. 超参搜索](#5)
@@ -39,23 +39,20 @@
 
 该案例提供了用户使用 PaddleClas 的超轻量图像分类方案（PULC，Practical Ultra Lightweight Classification）快速构建轻量级、高精度、可落地的佩戴安全帽的分类模型。该模型可以广泛应用于如建筑施工场景、工厂车间场景、交通场景等。
 
-下表列出了判断图片中是否佩戴安全帽的二分类模型的相关指标，前两行展现了使用 SwinTranformer_tiny 和 MobileNetV3_large_x1_0 作为 backbone 训练得到的模型的相关指标，第三行至第六行依次展现了替换 backbone 为 PPLCNet_x1_0、使用 SSLD 预训练模型、使用 SSLD 预训练模型 + EDA 策略、使用 SSLD 预训练模型 + EDA 策略 + SKL-UGI 知识蒸馏策略训练得到的模型的相关指标。
-
+下表列出了判断图片中是否佩戴安全帽的二分类模型的相关指标，前两行展现了使用 SwinTranformer_tiny 和 MobileNetV3_large_x1_0 作为 backbone 训练得到的模型的相关指标，第三行至第六行依次展现了替换 backbone 为 PPLCNet_x1_0、使用 SSLD 预训练模型、使用 SSLD 预训练模型 + EDA 策略、使用 SSLD 预训练模型 + EDA 策略 + UDML 知识蒸馏策略训练得到的模型的相关指标。
 
 | 模型 | Tpr（%） | 延时（ms） | 存储（M） | 策略 |
 |-------|-----------|----------|---------------|---------------|
-| Res2Net200_vd_26w_4s  | 98.92 | -  | - | 使用ImageNet预训练模型 |
-| SwinTranformer_tiny  | 93.57 | 175.52  | 107 | 使用ImageNet预训练模型 |
-| MobileNetV3_large_x1_0  | 97.47 | 4.70  | 17 | 使用ImageNet预训练模型 |
-| PPLCNet_x1_0  | 93.29 | 2.36  | 6.5 | 使用ImageNet预训练模型 |
-| PPLCNet_x1_0  | 98.16 | 2.36  | 6.5 | 使用SSLD预训练模型 |
-| PPLCNet_x1_0  | 98.82 | 2.36  | 6.5 | 使用SSLD预训练模型+EDA策略|
-| <b>PPLCNet_x1_0<b>  | <b>98.71<b> | <b>2.36<b>  | <b>6.5<b> | 使用SSLD预训练模型+EDA策略+SKL-UGI知识蒸馏策略|
+| Res2Net200_vd_26w_4s  | 98.92 | 80.99 | 284 | 使用ImageNet预训练模型 |
+| SwinTranformer_tiny  | 93.57 | 91.32  | 107 | 使用ImageNet预训练模型 |
+| MobileNetV3_large_x1_0  | 97.47 | 4.83  | 17 | 使用ImageNet预训练模型 |
+| PPLCNet_x1_0  | 93.29 | 2.03  | 6.5 | 使用ImageNet预训练模型 |
+| PPLCNet_x1_0  | 98.16 | 2.03  | 6.5 | 使用SSLD预训练模型 |
+| PPLCNet_x1_0  | 98.82 | 2.03  | 6.5 | 使用SSLD预训练模型+EDA策略|
+| <b>PPLCNet_x1_0<b>  | <b>98.71<b> | <b>2.03<b>  | <b>6.5<b> | 使用SSLD预训练模型+EDA策略+UDML知识蒸馏策略|
 
 <!-- todo: 上表中数值需要更新并确认，下述解释需要对应更改 -->
-从表中可以看出，backbone 为 Res2Net200_vd_26w_4s 时精度较高，但是推理速度较慢。将 backboone 替换为轻量级模型 MobileNetV3_large_x1_0 后，速度可以大幅提升，但是精度下降明显。将 backbone 替换为 PPLCNet_x1_0 时，精度较 MobileNetV3_large_x1_0 低四个多百分点，但是速度提升 2 倍左右。在此基础上，使用 SSLD 预训练模型后，在不改变推理速度的前提下，精度可以提升约 4.8 个百分点，进一步地，当融合EDA策略后，精度可以再提升 0.7 个百分点。此时，PPLCNet_x1_0 已经接近了 Res2Net200_vd_26w_4s 模型的精度，但是速度快 70+ 倍。
-
-<!-- 最后，在使用 SKL-UGI 知识蒸馏后，精度可以继续提升 2.2 个百分点。此时，PPLCNet_x1_0 达到了 SwinTranformer_tiny 模型的精度，但是速度快 70+ 倍。关于 PULC 的训练方法和推理部署方法将在下面详细介绍。 -->
+从表中可以看出，backbone 为 Res2Net200_vd_26w_4s 时精度较高，但是推理速度较慢。将 backboone 替换为轻量级模型 MobileNetV3_large_x1_0 后，速度可以大幅提升，但是精度下降明显。将 backbone 替换为 PPLCNet_x1_0 时，精度较 MobileNetV3_large_x1_0 低四个多百分点，但是速度提升 2 倍左右。在此基础上，使用 SSLD 预训练模型后，在不改变推理速度的前提下，精度可以提升约 4.8 个百分点，进一步地，当融合EDA策略后，精度可以再提升 0.7 个百分点。此时，PPLCNet_x1_0 已经接近了 Res2Net200_vd_26w_4s 模型的精度，但是速度快 70+ 倍。最后，在使用 UDML 知识蒸馏后，精度可以继续提升 todo 个百分点。此时，PPLCNet_x1_0 达到了 SwinTranformer_tiny 模型的精度，但是速度快 70+ 倍。关于 PULC 的训练方法和推理部署方法将在下面详细介绍。
 
 **备注：**
 
@@ -128,25 +125,19 @@ cd ../
 │   ├── VOC2028_part2_001209_1.jpg
 │   ├── HHD_hard_hat_workers23_1.jpg
 │   ├── CelebA_077809.jpg
-...
-├── ImageNet_val
-│   ├── ILSVRC2012_val_00000001.JPEG
-│   ├── ILSVRC2012_val_00000002.JPEG
-...
+│   ├── ...
+│   └──
 ├── train_list.txt
 ├── train_list.txt.debug
-├── train_list_for_distill.txt
 ├── val_list.txt
 └── val_list.txt.debug
 ```
 <!-- todo：imagenet是什么？ -->
-其中 `train/` 和 `val/` 分别为训练集和验证集。`train_list.txt` 和 `val_list.txt` 分别为训练集和验证集的标签文件，`train_list.txt.debug` 和 `val_list.txt.debug` 分别为训练集和验证集的 `debug` 标签文件，其分别是 `train_list.txt` 和 `val_list.txt` 的子集，用该文件可以快速体验本案例的流程。`ImageNet_val/` 是 ImageNet-1k 的验证集，该集合和 `train` 集合的混合数据用于本案例的 `SKL-UGI知识蒸馏策略`，对应的训练标签文件为 `train_list_for_distill.txt` 。
+其中 `train/` 和 `val/` 分别为训练集和验证集。`train_list.txt` 和 `val_list.txt` 分别为训练集和验证集的标签文件，`train_list.txt.debug` 和 `val_list.txt.debug` 分别为训练集和验证集的 `debug` 标签文件，其分别是 `train_list.txt` 和 `val_list.txt` 的子集，用该文件可以快速体验本案例的流程。
 
 **备注：**
 
 * 关于 `train_list.txt`、`val_list.txt`的格式说明，可以参考[PaddleClas分类数据集格式说明](../data_preparation/classification_dataset.md#1-数据集格式说明) 。
-
-* 关于如何得到蒸馏的标签文件可以参考[知识蒸馏标签获得方法](@ruoyu)。
 
 <a name="3.3"></a>
 
@@ -221,44 +212,26 @@ python3 tools/infer.py \
 
 <a name="4.1"></a>
 
-### 4.1 SKL-UGI 知识蒸馏
+### 4.1 UDML 知识蒸馏
 
-SKL-UGI 知识蒸馏是 PaddleClas 提出的一种简单有效的知识蒸馏方法，关于该方法的介绍，可以参考[SKL-UGI 知识蒸馏](@ruoyu)。
+UDML 知识蒸馏是一种简单有效的知识蒸馏方法，关于该方法的介绍，可以参考[UDML 知识蒸馏](@ruoyu)。
 
 <a name="4.1.1"></a>
 
-#### 4.1.1 教师模型训练
+#### 4.1.1 蒸馏训练
 
-复用 `ppcls/configs/PULC/safety_helmet/PPLCNet/PPLCNet_x1_0.yaml` 中的超参数，训练教师模型，训练脚本如下：
-
-```shell
-export CUDA_VISIBLE_DEVICES=0,1,2,3
-python3 -m paddle.distributed.launch \
-    --gpus="0,1,2,3" \
-    tools/train.py \
-    -c ./ppcls/configs/PULC/safety_helmet/PPLCNet/PPLCNet_x1_0.yaml \
-    -o Arch.name=ResNet101_vd
-```
-<!-- todo: 指标需要等蒸馏策略确定后更新 -->
-验证集的最佳指标为 `0.96-0.98` 之间，当前教师模型最好的权重保存在 `output/ResNet101_vd/best_model.pdparams`。
-
-<a name="4.1.2"></a>
-
-####  4.1.2 蒸馏训练
-
-配置文件`ppcls/configs/PULC/safety_helmet/PPLCNet_x1_0_distillation.yaml`提供了`SKL-UGI知识蒸馏策略`的配置。该配置将`ResNet101_vd`当作教师模型，`PPLCNet_x1_0`当作学生模型，使用ImageNet数据集的验证集作为新增的无标签数据。训练脚本如下：
+配置文件 `ppcls/configs/PULC/safety_helmet/PPLCNet_x1_0_distillation.yaml` 提供了 `UDML知识蒸馏策略` 的配置。训练脚本如下：
 
 ```shell
 export CUDA_VISIBLE_DEVICES=0,1,2,3
 python3 -m paddle.distributed.launch \
     --gpus="0,1,2,3" \
     tools/train.py \
-    -c ./ppcls/configs/PULC/safety_helmet/PPLCNet_x1_0_distillation.yaml \
-    -o Arch.models.0.Teacher.pretrained=output/ResNet101_vd/best_model
+    -c ./ppcls/configs/PULC/safety_helmet/PPLCNet_x1_0_distillation.yaml
 ```
 
 <!-- todo: 指标需要等蒸馏策略确定后更新 -->
-验证集的最佳指标为 `0.95-0.97` 之间，当前模型最好的权重保存在 `output/DistillationModel/best_model_student.pdparams`。
+验证集的最佳指标为 `99.0-99.3` 之间，当前模型最好的权重保存在 `output/DistillationModel/best_model_student.pdparams`。
 
 <a name="5"></a>
 
