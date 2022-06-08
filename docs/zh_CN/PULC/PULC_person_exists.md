@@ -69,10 +69,10 @@
 
 ### 2.1 安装 paddleclas
 
-使用如下命令快速安装 paddleclas
+使用如下命令快速安装 paddlepaddle, paddleclas
 
 ```    
-pip3 install paddleclas
+pip3 install paddlepaddle paddleclas
 ```
 <a name="2.2"></a> 
 
