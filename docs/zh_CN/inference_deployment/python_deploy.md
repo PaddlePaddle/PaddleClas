@@ -2,7 +2,7 @@
 
 ---
 
-首先请参考文档[安装 PaddlePaddle](../installation/install_paddle.md)和文档[安装 PaddleClas](../installation/install_paddleclas.md)配置运行环境。
+首先请参考文档[环境准备](../installation/install_paddleclas.md)配置运行环境。
 
 ## 目录
 
