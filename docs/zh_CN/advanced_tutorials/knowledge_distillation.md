@@ -6,8 +6,8 @@
 - [1. 算法介绍](#1)
     - [1.1 知识蒸馏简介](#1.1)
         - [1.1.1 Response based distillation](#1.1.1)
-        - [1.1.1 Feature based distillation](#1.1.1)
-        - [1.1.1 Relation based distillation](#1.1.1)
+        - [1.1.2 Feature based distillation](#1.1.2)
+        - [1.1.3 Relation based distillation](#1.1.3)
     - [1.2 PaddleClas支持的知识蒸馏算法](#1.2)
         - [1.2.1 SSLD](#1.2.1)
         - [1.2.2 DML](#1.2.2)
@@ -62,7 +62,7 @@ Heo 等人提出了 OverHaul [8], 计算学生模型与教师模型的 feature m
 
 #### 1.1.3 Relation based distillation
 
-`1.1.1` 和 `1.1.2` 章节中的论文中主要是考虑到学生模型与教师模型的输出或者中间层 feature map，这些知识蒸馏算法只关注个体的输出结果，没有考虑到个体之间的输出关系。
+[1.1.1](#1.1.1) 和 [1.1.2](#1.1.2) 章节中的论文中主要是考虑到学生模型与教师模型的输出或者中间层 feature map，这些知识蒸馏算法只关注个体的输出结果，没有考虑到个体之间的输出关系。
 
 Park 等人提出了 RKD [10]，基于关系的知识蒸馏算法，RKD 中进一步考虑个体输出之间的关系，使用 2 种损失函数，二阶的距离损失（distance-wise）和三阶的角度损失（angle-wise）
 
@@ -100,34 +100,32 @@ SSLD配置如下所示。在模型构建Arch字段中，需要同时定义学生
 ```yaml
 # model architecture
 Arch:
-  name: "DistillationModel"
-  class_num: &class_num 1000
-  # if not null, its lengths should be same as models
-  pretrained_list:
-  # if not null, its lengths should be same as models
-  freeze_params_list:
+  name: "DistillationModel"    # 模型名称，这里使用的是蒸馏模型，
+  class_num: &class_num 1000   # 类别数量，对于ImageNet1k数据集来说，类别数为1000
+  pretrained_list:             # 预训练模型列表，因为在下面的子网络中指定了预训练模型，这里无需指定
+  freeze_params_list:          # 固定网络参数列表，为True时，表示固定该index对应的网络
   - True
   - False
-  infer_model_name: "Student"
-  models:
-    - Teacher:
-        name: ResNet50_vd
-        class_num: *class_num
-        pretrained: True
-        use_ssld: True
-    - Student:
-        name: PPLCNet_x2_5
-        class_num: *class_num
-        pretrained: False
+  infer_model_name: "Student"  # 在模型导出的时候，会导出Student子网络
+  models:                      # 子网络列表
+    - Teacher:                 # 教师模型
+        name: ResNet50_vd      # 模型名称
+        class_num: *class_num  # 类别数
+        pretrained: True       # 预训练模型路径，如果为True，则会从官网下载默认的预训练模型
+        use_ssld: True         # 是否使用SSLD蒸馏得到的预训练模型，精度会更高一些
+    - Student:                 # 学生模型
+        name: PPLCNet_x2_5     # 模型名称
+        class_num: *class_num  # 类别数
+        pretrained: False      # 预训练模型路径，可以指定为bool值或者字符串，这里为False，表示学生模型默认不加载预训练模型
 
 # loss function config for traing/eval process
-Loss:
-  Train:
-    - DistillationDMLLoss:
-        weight: 1.0
-        model_name_pairs:
+Loss:                           # 定义损失函数
+  Train:                        # 定义训练的损失函数，为列表形式
+    - DistillationDMLLoss:      # 蒸馏的DMLLoss，对DMLLoss进行封装，支持蒸馏结果(dict形式)的损失函数计算
+        weight: 1.0             # loss权重
+        model_name_pairs:       # 用于计算的模型对，这里表示计算Student和Teacher输出的损失函数
         - ["Student", "Teacher"]
-  Eval:
+  Eval:                         # 定义评估时的损失函数
     - CELoss:
         weight: 1.0
 ```
@@ -168,15 +166,13 @@ DML配置如下所示。在模型构建Arch字段中，需要同时定义学生�
 Arch:
   name: "DistillationModel"
   class_num: &class_num 1000
-  # if not null, its lengths should be same as models
   pretrained_list:
-  # if not null, its lengths should be same as models
-  freeze_params_list:
+  freeze_params_list:        # 两个模型互相学习，因此这里两个子网络的参数均不能固定
   - False
   - False
   models:
     - Teacher:
-        name: PPLCNet_x2_5
+        name: PPLCNet_x2_5   # 两个模型互学习，因此均没有加载预训练模型
         class_num: *class_num
         pretrained: False
     - Student:
@@ -184,10 +180,9 @@ Arch:
         class_num: *class_num
         pretrained: False
 
-# loss function config for traing/eval process
 Loss:
   Train:
-    - DistillationGTCELoss:
+    - DistillationGTCELoss:    # 因为2个子网络均没有加载预训练模型，这里需要同时计算不同子网络的输出与真值标签之间的CE loss
         weight: 1.0
         model_names: ["Student", "Teacher"]
     - DistillationDMLLoss:
@@ -232,25 +227,26 @@ AFD配置如下所示。在模型构建Arch字段中，需要同时定义学生�
 ```yaml
 Arch:
   name: "DistillationModel"
-  # if not null, its lengths should be same as models
   pretrained_list:
-  # if not null, its lengths should be same as models
   freeze_params_list:
   models:
     - Teacher:
-        name: AttentionModel
+        name: AttentionModel # 包含若干个串行的网络，后面的网络会将前面的网络输出作为输入并进行处理
         pretrained_list:
         freeze_params_list:
           - True
           - False
         models:
+          # AttentionModel 的基础网络
           - ResNet34:
               name: ResNet34
               pretrained: True
+              # return_patterns表示除了返回输出的logits，也会返回对应名称的中间层feature map
               return_patterns: &t_keys ["blocks[0]", "blocks[1]", "blocks[2]", "blocks[3]",
                                         "blocks[4]", "blocks[5]", "blocks[6]", "blocks[7]",
                                         "blocks[8]", "blocks[9]", "blocks[10]", "blocks[11]",
                                         "blocks[12]", "blocks[13]", "blocks[14]", "blocks[15]"]
+          # AttentionModel的变换网络，会对基础子网络的特征进行变换  
           - LinearTransformTeacher:
               name: LinearTransformTeacher
               qk_dim: 128
@@ -290,12 +286,12 @@ Loss:
         weight: 1.0
         model_names: ["Student"]
         key: logits
-    - DistillationKLDivLoss:
-        weight: 0.9
+    - DistillationKLDivLoss:  # 蒸馏的KL-Div loss，会根据model_name_pairs中的模型名称去提取对应模型的输出特征，计算loss
+        weight: 0.9           # 该loss的权重
         model_name_pairs: [["Student", "Teacher"]]
         temperature: 4
         key: logits
-    - AFDLoss:
+    - AFDLoss:                # AFD loss
         weight: 50.0
         model_name_pair: ["Student", "Teacher"]
         student_keys: ["bilinear_key", "value"]
@@ -306,6 +302,8 @@ Loss:
     - CELoss:
         weight: 1.0
 ```
+
+**注意(：** 上述在网络中指定`return_patterns`，返回中间层特征的功能是基于TheseusLayer，更多关于TheseusLayer的使用说明，请参考：[TheseusLayer 使用说明](./theseus_layer.md)。
 
 <a name='1.2.4'></a>
 

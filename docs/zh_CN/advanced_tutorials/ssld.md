@@ -76,19 +76,19 @@ SSLD 蒸馏方案的一大特色就是无需使用图像的真值标签，因此
 
 移动端预训练模型库列表如下所示。
 
-| 模型                      | Flops(G) | Params(M) | top-1 acc | SSLD top-1 acc | 精度收益   | 下载链接 |
+| 模型                      | Flops(M) | Params(M) | top-1 acc | SSLD top-1 acc | 精度收益   | 下载链接 |
 |-------------------|----------|-----------|----------|---------------|--------|------|
-| PPLCNetV2_base          | 0.59     | 6.6       | 77.04%   | 80.10%        | +3.06% |   [链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/PPLCNetV2_base_ssld_pretrained.pdparams)   |
-| PPLCNet_x2_5            | 0.885    | 9         | 76.60%   | 80.82%        | +4.22% |  [链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/PPLCNet_x2_5_ssld_pretrained.pdparams)    |
-| PPLCNet_x1_0            | 0.157    | 3         | 71.32%   | 74.39%        | +3.07% |   [链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/PPLCNet_x1_0_ssld_pretrained.pdparams)   |
-| PPLCNet_x0_5            | 0.046    | 1.9       | 63.14%   | 66.10%        | +2.96% |   [链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/PPLCNet_x0_5_ssld_pretrained.pdparams)   |
-| PPLCNet_x0_25           | 0.018    | 1.5       | 51.86%   | 53.43%        | +1.57% |   [链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/PPLCNet_x0_25_ssld_pretrained.pdparams)   |
-| MobileNetV1             | 1.11     | 4.19      | 71.00%   | 77.90%        | +6.90% |   [链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/MobileNetV1_ssld_pretrained.pdparams)   |
-| MobileNetV2             | 0.6      | 3.44      | 72.20%   | 76.74%        | +4.54% |   [链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/MobileNetV2_ssld_pretrained.pdparams)   |
-| MobileNetV3_large_x1_0  | 0.45     | 5.47      | 75.30%   | 79.00%        | +3.70% |   [链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/MobileNetV3_large_x1_0_ssld_pretrained.pdparams)   |
-| MobileNetV3_small_x1_0  | 0.123    | 2.94      | 68.20%   | 71.30%        | +3.10% |   [链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/MobileNetV3_small_x1_0_ssld_pretrained.pdparams)   |
-| MobileNetV3_small_x0_35 | 0.026    | 1.66      | 53.00%   | 55.60%        | +2.60% |   [链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/MobileNetV3_small_x0_35_ssld_pretrained.pdparams)   |
-| GhostNet_x1_3_ssld      | 0.44     | 7.3       | 75.70%   | 79.40%        | +3.70% |   [链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/GhostNet_x1_3_ssld_pretrained.pdparams)   |
+| PPLCNetV2_base          | 604.16     | 6.6       | 77.04%   | 80.10%        | +3.06% |   [链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/PPLCNetV2_base_ssld_pretrained.pdparams)   |
+| PPLCNet_x2_5            | 906.49    | 9         | 76.60%   | 80.82%        | +4.22% |  [链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/PPLCNet_x2_5_ssld_pretrained.pdparams)    |
+| PPLCNet_x1_0            | 160.81    | 3         | 71.32%   | 74.39%        | +3.07% |   [链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/PPLCNet_x1_0_ssld_pretrained.pdparams)   |
+| PPLCNet_x0_5            | 47.28    | 1.9       | 63.14%   | 66.10%        | +2.96% |   [链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/PPLCNet_x0_5_ssld_pretrained.pdparams)   |
+| PPLCNet_x0_25           | 18.43    | 1.5       | 51.86%   | 53.43%        | +1.57% |   [链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/PPLCNet_x0_25_ssld_pretrained.pdparams)   |
+| MobileNetV1             | 578.88     | 4.19      | 71.00%   | 77.90%        | +6.90% |   [链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/MobileNetV1_ssld_pretrained.pdparams)   |
+| MobileNetV2             | 327.84      | 3.44      | 72.20%   | 76.74%        | +4.54% |   [链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/MobileNetV2_ssld_pretrained.pdparams)   |
+| MobileNetV3_large_x1_0  | 229.66     | 5.47      | 75.30%   | 79.00%        | +3.70% |   [链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/MobileNetV3_large_x1_0_ssld_pretrained.pdparams)   |
+| MobileNetV3_small_x1_0  | 63.67    | 2.94      | 68.20%   | 71.30%        | +3.10% |   [链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/MobileNetV3_small_x1_0_ssld_pretrained.pdparams)   |
+| MobileNetV3_small_x0_35 | 14.56    | 1.66      | 53.00%   | 55.60%        | +2.60% |   [链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/MobileNetV3_small_x0_35_ssld_pretrained.pdparams)   |
+| GhostNet_x1_3_ssld      | 236.89     | 7.3       | 75.70%   | 79.40%        | +3.70% |   [链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/GhostNet_x1_3_ssld_pretrained.pdparams)   |
 
 * 注：其中的`top-1 acc`表示使用普通训练方式得到的模型精度，`SSLD top-1 acc`表示使用SSLD知识蒸馏训练策略得到的模型精度。
 
@@ -97,7 +97,7 @@ SSLD 蒸馏方案的一大特色就是无需使用图像的真值标签，因此
 
 | 模型                   | Flops(G) | Params(M) | top-1 acc | SSLD top-1 acc | 精度收益   | 下载链接                                                                                      |
 |----------------------|----------|-----------|----------|---------------|--------|-------------------------------------------------------------------------------------------|
-| PPHGNet_base         | 25.14    | 71.62     | 83.50%   | 85.00% | +1.50% | [链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/PPHGNet_base_ssld_pretrained.pdparams) |
+| PPHGNet_base         | 25.14    | 71.62     | -   | 85.00% | - | [链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/PPHGNet_base_ssld_pretrained.pdparams) |
 | PPHGNet_small        | 8.53     | 24.38     | 81.50%   | 83.80% | +2.30% | [链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/PPHGNet_small_ssld_pretrained.pdparams) |
 | PPHGNet_tiny         | 4.54     | 14.75     | 79.83%   | 81.95% | +2.12% | [链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/PPHGNet_tiny_ssld_pretrained.pdparams) |
 | ResNet50_vd          | 8.67     | 25.58     | 79.10%   | 83.00% | +3.90% | [链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ResNet50_vd_ssld_pretrained.pdparams) |
