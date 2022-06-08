@@ -76,7 +76,7 @@ SSLD 蒸馏方案的一大特色就是无需使用图像的真值标签，因此
 
 移动端预训练模型库列表如下所示。
 
-| 模型                      | Flops(M) | Params(M) | top-1 acc | SSLD top-1 acc | 精度收益   | 下载链接 |
+| 模型                      | FLOPs(M) | Params(M) | top-1 acc | SSLD top-1 acc | 精度收益   | 下载链接 |
 |-------------------|----------|-----------|----------|---------------|--------|------|
 | PPLCNetV2_base          | 604.16     | 6.6       | 77.04%   | 80.10%        | +3.06% |   [链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/PPLCNetV2_base_ssld_pretrained.pdparams)   |
 | PPLCNet_x2_5            | 906.49    | 9         | 76.60%   | 80.82%        | +4.22% |  [链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/PPLCNet_x2_5_ssld_pretrained.pdparams)    |
@@ -95,7 +95,7 @@ SSLD 蒸馏方案的一大特色就是无需使用图像的真值标签，因此
 
 服务端预训练模型库列表如下所示。
 
-| 模型                   | Flops(G) | Params(M) | top-1 acc | SSLD top-1 acc | 精度收益   | 下载链接                                                                                      |
+| 模型                   | FLOP(G) | Params(M) | top-1 acc | SSLD top-1 acc | 精度收益   | 下载链接                                                                                      |
 |----------------------|----------|-----------|----------|---------------|--------|-------------------------------------------------------------------------------------------|
 | PPHGNet_base         | 25.14    | 71.62     | -   | 85.00% | - | [链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/PPHGNet_base_ssld_pretrained.pdparams) |
 | PPHGNet_small        | 8.53     | 24.38     | 81.50%   | 83.80% | +2.30% | [链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/PPHGNet_small_ssld_pretrained.pdparams) |

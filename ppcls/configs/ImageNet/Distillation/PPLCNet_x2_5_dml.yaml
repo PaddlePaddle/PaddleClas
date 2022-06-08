@@ -30,6 +30,7 @@ Arch:
   freeze_params_list:
   - False
   - False
+  infer_model_name: "Student"
   models:
     - Teacher:
         name: PPLCNet_x2_5

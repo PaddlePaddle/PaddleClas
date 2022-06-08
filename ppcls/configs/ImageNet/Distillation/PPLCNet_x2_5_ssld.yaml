@@ -31,6 +31,7 @@ Arch:
   freeze_params_list:
   - True
   - False
+  infer_model_name: "Student"
   models:
     - Teacher:
         name: ResNet50_vd
