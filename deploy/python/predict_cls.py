@@ -138,7 +138,9 @@ def main(config):
                 continue
             batch_results = cls_predictor.predict(batch_imgs)
             for number, result_dict in enumerate(batch_results):
-                if "Attribute" in config["PostProcess"]:
+                if "Attribute" in config[
+                        "PostProcess"] or "VehicleAttribute" in config[
+                            "PostProcess"]:
                     filename = batch_names[number]
                     attr_message = result_dict[0]
                     pred_res = result_dict[1]

@@ -53,52 +53,65 @@ Res2Net200_vd预训练模型Top-1精度高达85.1%。
 PP-ShiTu图像识别快速体验：[点击这里](./docs/zh_CN/quick_start/quick_start_recognition.md)
 
 ## 文档教程
-- 安装说明
-  - [安装Paddle](./docs/zh_CN/installation/install_paddle.md)
-  - [安装PaddleClas](./docs/zh_CN/installation/install_paddleclas.md)
-- 快速体验
-  - [PP-ShiTu图像识别快速体验](./docs/zh_CN/quick_start/quick_start_recognition.md)
-  - 图像分类快速体验
-    - [尝鲜版](./docs/zh_CN/quick_start/quick_start_classification_new_user.md)
-    - [进阶版](./docs/zh_CN/quick_start/quick_start_classification_professional.md)
-    - [多标签分类](./docs/zh_CN/quick_start/quick_start_multilabel_classification.md)
-- [PP-ShiTu图像识别系统介绍](#图像识别系统介绍)
-    - [主体检测](./docs/zh_CN/image_recognition_pipeline/mainbody_detection.md)
-    - [特征提取](./docs/zh_CN/image_recognition_pipeline/feature_extraction.md)
-    - [向量检索](./docs/zh_CN/image_recognition_pipeline/vector_search.md)
-- [骨干网络和预训练模型库](./docs/zh_CN/algorithm_introduction/ImageNet_models.md)
-- 数据准备
-  - [图像分类数据集介绍](./docs/zh_CN/data_preparation/classification_dataset.md)
-  - [图像识别数据集介绍](./docs/zh_CN/data_preparation/recognition_dataset.md)
-- 模型训练
-    - [图像分类任务](./docs/zh_CN/models_training/classification.md)
-    - [图像识别任务](./docs/zh_CN/models_training/recognition.md)
-    - [训练参数调整策略](./docs/zh_CN/models_training/train_strategy.md)
-    - [配置文件说明](./docs/zh_CN/models_training/config_description.md)
-- 模型预测部署
-    - [模型导出](./docs/zh_CN/inference_deployment/export_model.md)
-    - Python/C++ 预测引擎
-      - [基于Python预测引擎预测推理](./docs/zh_CN/inference_deployment/python_deploy.md)
-      - [基于C++分类预测引擎预测推理](./docs/zh_CN/inference_deployment/cpp_deploy.md)、[基于C++的PP-ShiTu预测引擎预测推理](deploy/cpp_shitu/readme.md)
+- [环境准备]()
+- [PULC超轻量图像分类实用方案]()
+  - [超轻量图像分类快速体验 (@崔程)]()
+  - [超轻量图像分类模型库]（包含benchmark @崔程）
+    - xx
+  - [方案介绍和模型训练]()
+  - [推理部署](@水龙)
+    - 基于python预测引擎推理
+    - 基于C++预测引擎推理
     - 服务化部署
-      - [Paddle Serving服务化部署(推荐)](./docs/zh_CN/inference_deployment/paddle_serving_deploy.md)
-      - [Hub serving服务化部署](./docs/zh_CN/inference_deployment/paddle_hub_serving_deploy.md)
-    - [端侧部署](./deploy/lite/readme.md)
-    - [whl包预测](./docs/zh_CN/inference_deployment/whl_deploy.md)
-- 算法介绍
-    - [图像分类任务介绍](./docs/zh_CN/algorithm_introduction/image_classification.md)
-    - [度量学习介绍](./docs/zh_CN/algorithm_introduction/metric_learning.md)
-- 高阶使用
-    - [数据增广](./docs/zh_CN/advanced_tutorials/DataAugmentation.md)
-    - [模型量化](./docs/zh_CN/advanced_tutorials/model_prune_quantization.md)
-    - [知识蒸馏](./docs/zh_CN/advanced_tutorials/knowledge_distillation.md)
-    - [PaddleClas结构解析](./docs/zh_CN/advanced_tutorials/code_overview.md)
-    - [社区贡献指南](./docs/zh_CN/advanced_tutorials/how_to_contribute.md)
+    - 端侧部署
+    - Paddle2ONNX模型转化与预测
+  - [模型压缩](@崔程)
+- [PP-ShiTu图像识别系统介绍](#图像识别系统介绍)
+  - 图像识别快速体验 
+  - 模块介绍 
+    - [主体检测](./docs/zh_CN/image_recognition_pipeline/mainbody_detection.md)
+    - [特征提取模型](./docs/zh_CN/image_recognition_pipeline/feature_extraction.md)
+    - [向量检索](./docs/zh_CN/image_recognition_pipeline/vector_search.md)
+    - 哈希编码
+  - 模型训练（包含数据集格式说明等） 
+  - 推理部署 
+    - 基于python预测引擎推理
+    - 基于C++预测引擎推理
+    - 服务化部署
+    - 端侧部署
+    - Paddle2ONNX模型转化与预测
+  - 模型压缩
+    - 模型量化
+    - 模型裁剪
+  - [骨干网络和预训练模型库](./docs/zh_CN/algorithm_introduction/ImageNet_models.md)
+- PP系列骨干网络模型（包括算法介绍，使用，训推一体链接等）（@崔程）
+  - PP-HGNet
+  - PP-LCNet v2
+  - PP-LCNet
+- SSLD半监督知识蒸馏方案 （@若愚）
+  - SSLD算法简介
+  - 预训练模型库
+  - 使用方法（？）
+- 前沿算法
+  - 骨干网络和预训练模型库 （@崔程）
+    - 服务端CNN模型库
+    - 移动端CNN模型库
+    - Vision Transformer模型库
+  - 度量学习（arcmargin等算法）（@水龙）
+  - ReID （@水龙）
+  - 向量检索 （@水龙）
+  - 哈希特征 （@水龙）
+  - 模型蒸馏 （@若愚）
+  - 数据增强 （@崔程）
+- 产业实用范例库 （@胜禹）
+- 30分钟快速体验图像分类（原尝鲜版）（@崔程）
 - FAQ
-    - [图像识别精选问题](docs/zh_CN/faq_series/faq_2021_s2.md)
-    - [图像分类精选问题](docs/zh_CN/faq_series/faq_selected_30.md)
-    - [图像分类FAQ第一季](docs/zh_CN/faq_series/faq_2020_s1.md)
-    - [图像分类FAQ第二季](docs/zh_CN/faq_series/faq_2021_s1.md)
+  - [图像识别精选问题](docs/zh_CN/faq_series/faq_2021_s2.md)
+  - [图像分类精选问题](docs/zh_CN/faq_series/faq_selected_30.md)
+  - [图像分类FAQ第一季](docs/zh_CN/faq_series/faq_2020_s1.md)
+  - [图像分类FAQ第二季](docs/zh_CN/faq_series/faq_2021_s1.md)
+- [PaddleClas结构解析](./docs/zh_CN/advanced_tutorials/code_overview.md)
+- [社区贡献指南](./docs/zh_CN/advanced_tutorials/how_to_contribute.md)
 - [许可证书](#许可证书)
 - [贡献代码](#贡献代码)
 

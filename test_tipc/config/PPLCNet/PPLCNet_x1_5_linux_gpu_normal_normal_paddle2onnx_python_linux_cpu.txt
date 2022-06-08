@@ -1,0 +1,16 @@
+===========================paddle2onnx_params===========================
+model_name:PPLCNet_x1_5
+python:python3.7
+2onnx: paddle2onnx
+--model_dir:./deploy/models/PPLCNet_x1_5_infer/
+--model_filename:inference.pdmodel
+--params_filename:inference.pdiparams
+--save_file:./deploy/models/PPLCNet_x1_5_infer/inference.onnx
+--opset_version:10
+--enable_onnx_checker:True
+inference_model_url:https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/PPLCNet_x1_5_infer.tar
+inference:./python/predict_cls.py
+Global.use_onnx:True
+Global.inference_model_dir:./models/PPLCNet_x1_5_infer
+Global.use_gpu:False
+-c:configs/inference_cls.yaml

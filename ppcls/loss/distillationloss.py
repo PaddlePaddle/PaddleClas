@@ -22,6 +22,7 @@ from .distanceloss import DistanceLoss
 from .rkdloss import RKdAngle, RkdDistance
 from .kldivloss import KLDivLoss
 from .dkdloss import DKDLoss
+from .multilabelloss import MultiLabelLoss
 
 
 class DistillationCELoss(CELoss):
@@ -89,13 +90,16 @@ class DistillationDMLLoss(DMLLoss):
     def __init__(self,
                  model_name_pairs=[],
                  act="softmax",
+                 weight_ratio=False,
+                 sum_across_class_dim=False,
                  key=None,
                  name="loss_dml"):
-        super().__init__(act=act)
+        super().__init__(act=act, sum_across_class_dim=sum_across_class_dim)
         assert isinstance(model_name_pairs, list)
         self.key = key
         self.model_name_pairs = model_name_pairs
         self.name = name
+        self.weight_ratio = weight_ratio
 
     def forward(self, predicts, batch):
         loss_dict = dict()
@@ -105,7 +109,10 @@ class DistillationDMLLoss(DMLLoss):
             if self.key is not None:
                 out1 = out1[self.key]
                 out2 = out2[self.key]
-            loss = super().forward(out1, out2)
+            if self.weight_ratio is True:
+                loss = super().forward(out1, out2, batch)
+            else:
+                loss = super().forward(out1, out2)
             if isinstance(loss, dict):
                 for key in loss:
                     loss_dict["{}_{}_{}_{}".format(key, pair[0], pair[1],
@@ -122,6 +129,7 @@ class DistillationDistanceLoss(DistanceLoss):
     def __init__(self,
                  mode="l2",
                  model_name_pairs=[],
+                 act=None,
                  key=None,
                  name="loss_",
                  **kargs):
@@ -130,6 +138,13 @@ class DistillationDistanceLoss(DistanceLoss):
         self.key = key
         self.model_name_pairs = model_name_pairs
         self.name = name + mode
+        assert act in [None, "sigmoid", "softmax"]
+        if act == "sigmoid":
+            self.act = nn.Sigmoid()
+        elif act == "softmax":
+            self.act = nn.Softmax(axis=-1)
+        else:
+            self.act = None
 
     def forward(self, predicts, batch):
         loss_dict = dict()
@@ -139,6 +154,9 @@ class DistillationDistanceLoss(DistanceLoss):
             if self.key is not None:
                 out1 = out1[self.key]
                 out2 = out2[self.key]
+            if self.act is not None:
+                out1 = self.act(out1)
+                out2 = self.act(out2)
             loss = super().forward(out1, out2)
             for key in loss:
                 loss_dict["{}_{}_{}".format(self.name, key, idx)] = loss[key]
@@ -234,4 +252,35 @@ class DistillationDKDLoss(DKDLoss):
                 out2 = out2[self.key]
             loss = super().forward(out1, out2, batch)
             loss_dict[f"{self.name}_{pair[0]}_{pair[1]}"] = loss
+        return loss_dict
+
+
+class DistillationMultiLabelLoss(MultiLabelLoss):
+    """
+    DistillationMultiLabelLoss
+    """
+
+    def __init__(self,
+                 model_names=[],
+                 epsilon=None,
+                 size_sum=False,
+                 weight_ratio=False,
+                 key=None,
+                 name="loss_mll"):
+        super().__init__(
+            epsilon=epsilon, size_sum=size_sum, weight_ratio=weight_ratio)
+        assert isinstance(model_names, list)
+        self.key = key
+        self.model_names = model_names
+        self.name = name
+
+    def forward(self, predicts, batch):
+        loss_dict = dict()
+        for name in self.model_names:
+            out = predicts[name]
+            if self.key is not None:
+                out = out[self.key]
+            loss = super().forward(out, batch)
+            for key in loss:
+                loss_dict["{}_{}".format(key, name)] = loss[key]
         return loss_dict
