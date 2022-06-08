@@ -41,7 +41,7 @@ Optimizer:
   momentum: 0.9
   lr:
     name: Cosine
-    learning_rate: 0.13
+    learning_rate: 0.05
     warmup_epoch: 5
   regularizer:
     name: 'L2'
