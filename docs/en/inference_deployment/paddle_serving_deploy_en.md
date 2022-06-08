@@ -1,6 +1,6 @@
 English|[Chinese](../../zh_CN/inference_deployment/paddle_serving_deploy.md)
 # Model Service deployment
---------
+
 ## Catalogue
 - [1. Introduction](#1)
 - [2. Installation of Serving](#2)
@@ -181,7 +181,7 @@ test_cpp_serving_client.py # Script for sending C++ serving prediction requests 
 
 <a name="4"></a>
 ## 4. Service Deployment for Image Recognition
-In addition to the single-model deployment method introduced in [Chapter 3 Service Deployment for Image Classification](#3), we will introduce how to use the detection + classification model to complete the multi-model **image recognition service deployment**
+In addition to the single-model deployment method introduced in [Chapter 3 Service Deployment for Image Classification](#3), we will introduce how to use multiple models to complete the multi-model **image recognition service deployment**
 When using PaddleServing for image recognition service deployment, **need to convert multiple saved inference models to Serving models**. The following takes the ultra-lightweight image recognition model in PP-ShiTu as an example to introduce the deployment of image recognition services.
 <a name="4.1"></a>
 ### 4.1 Model Transformation
@@ -215,10 +215,10 @@ When using PaddleServing for image recognition service deployment, **need to con
   After the transformation of the general recognition inference model is completed, there will be additional `general_PPLCNet_x2_5_lite_v1.0_serving/` and `general_PPLCNet_x2_5_lite_v1.0_client/` folders in the current folder, with the following structure:
     ```shell
   ├── general_PPLCNet_x2_5_lite_v1.0_serving/
-  │ ├── inference.pdiparams
-  │ ├── inference.pdmodel
-  │ ├── serving_server_conf.prototxt
-  │ └── serving_server_conf.stream.prototxt
+  │   ├── inference.pdiparams
+  │   ├── inference.pdmodel
+  │   ├── serving_server_conf.prototxt
+  │   └── serving_server_conf.stream.prototxt
   │
   └── general_PPLCNet_x2_5_lite_v1.0_client/
         ├── serving_client_conf.prototxt

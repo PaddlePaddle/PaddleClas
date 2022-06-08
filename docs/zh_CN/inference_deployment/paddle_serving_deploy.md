@@ -1,6 +1,6 @@
 简体中文|[English](../../en/inference_deployment/paddle_serving_deploy_en.md)
 # 模型服务化部署
---------
+
 ## 目录
 - [1. 简介](#1)
 - [2. Serving 安装](#2)
@@ -58,7 +58,7 @@ python3.7 -m pip install paddle-serving-server-gpu==0.7.0.post112 # GPU with CUD
 ```
 
 * 如果安装速度太慢，可以通过 `-i https://pypi.tuna.tsinghua.edu.cn/simple` 更换源，加速安装过程。
-* 其他环境配置安装请参考: [使用Docker安装Paddle Serving](https://github.com/PaddlePaddle/Serving/blob/v0.7.0/doc/Install_CN.md)
+* 其他环境配置安装请参考：[使用Docker安装Paddle Serving](https://github.com/PaddlePaddle/Serving/blob/v0.7.0/doc/Install_CN.md)
 
 <a name="3"></a>
 
@@ -181,7 +181,8 @@ test_cpp_serving_client.py    # rpc方式发送C++ serving预测请求的脚本
 
 <a name="4"></a>
 ## 4.图像识别服务部署
-除了[第三章图像分类服务部署](#3)介绍的单模型部署方式，接下来会介绍如何使用检测+分类模型来完成多模型串联的**图像识别服务部署**
+除了[第三章图像分类服务部署](#3)介绍的单模型部署方式，接下来会介绍如何使用多个模型来完成多模型串联的**图像识别服务部署**
+
 使用 PaddleServing 做图像识别服务化部署时，**需要将保存的多个 inference 模型都转换为 Serving 模型**。 下面以 PP-ShiTu 中的超轻量图像识别模型为例，介绍图像识别服务的部署。
 <a name="4.1"></a>
 ### 4.1 模型转换
@@ -271,18 +272,18 @@ test_cpp_serving_client.py    # rpc方式发送C++ serving预测请求的脚本
 
   **注意:** 此处不需要修改 `picodet_PPLCNet_x2_5_mainbody_lite_v1.0_serving/` 目录下的 serving_server_conf.prototxt 中的 alias 名字。
 
-- 下载并解压已经构建后的检索库 index
+- 下载并解压已经构建后完成的检索库 index
     ```shell
     # 回到deploy目录
     cd ../
-    # 下载构建后的检索库 index
+    # 下载构建完成的检索库 index
     wget https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/data/drink_dataset_v1.0.tar
-    # 解压构建后的检索库 index
+    # 解压构建完成的检索库 index
     tar -xf drink_dataset_v1.0.tar
     ```
 <a name="4.2"></a>
 ### 4.2 服务部署和请求
-**注意:** 识别服务涉及到多个模型，出于性能考虑采用 PipeLine 部署方式。Pipeline 部署方式当前不支持 windows 平台。
+**注意：** 识别服务涉及到多个模型，出于性能考虑采用 PipeLine 部署方式。Pipeline 部署方式当前不支持 windows 平台。
 - 进入到工作目录
   ```shell
   cd ./deploy/paddleserving/recognition
