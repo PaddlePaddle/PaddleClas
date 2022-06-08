@@ -194,6 +194,7 @@ class InputModelError(Exception):
 def init_config(model_type, model_name, inference_model_dir, **kwargs):
 
     cfg_path = f"deploy/configs/PULC/{model_name}/inference_{model_name}.yaml" if model_type == "pulc" else "deploy/configs/inference_cls.yaml"
+    cfg_path = os.path.join(__dir__, cfg_path)
     cfg = config.get_config(cfg_path, show=False)
 
     cfg.Global.inference_model_dir = inference_model_dir
