@@ -18,16 +18,9 @@ Global:
   to_static: False
   use_dali: False
 
-# mixed precision training
-AMP:
-  scale_loss: 128.0
-  use_dynamic_loss_scaling: True
-  # O1: mixed fp16
-  level: O1
-
 # model architecture
 Arch:
-  name: MobileNetV3_large_x1_0
+  name: MobileNetV3_small_x0_35
   class_num: 2
   pretrained: True
   use_sync_bn: True
@@ -52,7 +45,7 @@ Optimizer:
     warmup_epoch: 5
   regularizer:
     name: 'L2'
-    coeff: 0.00002
+    coeff: 0.00001
 
 
 # data loader for train and eval
@@ -60,8 +53,8 @@ DataLoader:
   Train:
     dataset:
       name: ImageNetDataset
-      image_root: ./dataset/person/
-      cls_label_path: ./dataset/person/train_list.txt
+      image_root: ./dataset/person_exists/
+      cls_label_path: ./dataset/person_exists/train_list.txt
       transform_ops:
         - DecodeImage:
             to_rgb: True
@@ -88,8 +81,8 @@ DataLoader:
   Eval:
     dataset: 
       name: ImageNetDataset
-      image_root: ./dataset/person/
-      cls_label_path: ./dataset/person/val_list.txt
+      image_root: ./dataset/person_exists/
+      cls_label_path: ./dataset/person_exists/val_list.txt
       transform_ops:
         - DecodeImage:
             to_rgb: True
@@ -131,7 +124,7 @@ Infer:
     - ToCHWImage:
   PostProcess:
     name: ThreshOutput
-    threshold: 0.9
+    threshold: 0.5
     label_0: nobody
     label_1: someone
 

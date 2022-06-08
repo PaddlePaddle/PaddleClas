@@ -29,7 +29,7 @@ PreProcess:
 PostProcess:
   main_indicator: ThreshOutput
   ThreshOutput:
-    threshold: 0.9
+    threshold: 0.5
     label_0: nobody
     label_1: someone
   SavePreLabel:
