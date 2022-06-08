@@ -61,7 +61,49 @@
 
 ## 2. 模型快速体验
 
-todo
+<a name="2.1"></a>  
+
+### 2.1 安装 paddleclas
+
+使用如下命令快速安装 paddleclas
+
+```  
+pip3 install paddlepaddle paddleclas
+```
+
+<a name="2.2"></a>
+
+### 2.2 预测
+
+* 使用命令行快速预测
+
+```bash
+paddleclas --model_name=safety_helmet --infer_imgs=PaddleClas/deploy/images/PULC/safety_helmet/safety_helmet_test_1.png
+```
+
+结果如下：
+```
+>>> result
+class_ids: [0], scores: [todo 0.9955421453341842], label_names: ['unwearing_helmet'], filename: PaddleClas/deploy/images/PULC/safety_helmet/safety_helmet_test_1.png
+Predict complete!
+```
+
+**备注**： 更换其他预测的数据时，只需要改变 `--infer_imgs=xxx` 中的字段即可，支持传入整个文件夹。
+
+* 在 Python 代码中预测
+```python
+import paddleclas
+model = paddleclas.PaddleClas(model_name="safety_helmet")
+result = model.predict(input_data="deploy/images/PULC/safety_helmet/safety_helmet_test_1.png")
+print(next(result))
+```
+
+**备注**：`model.predict()` 为可迭代对象（`generator`），因此需要使用 `next()` 函数或 `for` 循环对其迭代调用。每次调用将以 `batch_size` 为单位进行一次预测，并返回预测结果, 默认 `batch_size` 为 1，如果需要更改 `batch_size`，实例化模型时，需要指定 `batch_size`，如 `model = paddleclas.PaddleClas(model_name="safety_helmet",  batch_size=2)`, 使用上述测试代码返回结果示例如下：
+
+```
+>>> result
+[{'class_ids': [0], 'scores': [todo 0.9955421453341842], 'label_names': ['unwearing_helmet'], 'filename': 'PaddleClas/deploy/images/PULC/safety_helmet/safety_helmet_test_1.png'}]
+```
 
 <a name="3"></a>
 
