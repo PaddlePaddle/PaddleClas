@@ -1,31 +1,45 @@
 简体中文|[English](../../en/algorithm_introduction/reid.md)
 # ReID行人重识别
 
+## 目录
+
+- [ReID行人重识别](#reid行人重识别)
+  - [1. 算法/应用场景简介](#1-算法应用场景简介)
+  - [2. ReID算法](#2-reid算法)
+    - [2.1 ReID strong-baseline算法](#21-reid-strong-baseline算法)
+    - [2.2a 快速体验](#22a-快速体验)
+    - [2.2b 模型训练/推理等](#22b-模型训练推理等)
+  - [3. 总结](#3-总结)
+    - [3.1 方法总结、对比等](#31-方法总结对比等)
+    - [3.2 使用建议/FAQ](#32-使用建议faq)
+    - [4 参考资料](#4-参考资料)
+
 ### 1. 算法/应用场景简介
 
 行人重识别（Person re-identification）也称行人再识别，是利用[计算机视觉](https://baike.baidu.com/item/计算机视觉/2803351)技术判断[图像](https://baike.baidu.com/item/图像/773234)或者视频序列中是否存在特定行人的[技术](https://baike.baidu.com/item/技术/13014499)。广泛被认为是一个[图像检索](https://baike.baidu.com/item/图像检索/1150910)的子问题。给定一个监控行人图像，检索跨设备下的该行人图像。旨在弥补固定的摄像头的视觉局限，并可与[行人检测](https://baike.baidu.com/item/行人检测/20590256)/行人跟踪技术相结合，可广泛应用于[智能视频监控](https://baike.baidu.com/item/智能视频监控/10717227)、智能安保等领域。
 
-### 2. ReID strong-baseline算法介绍
+常见的行人重识别方法通过特征提取模块来提取输入图片的局部/全局、单粒度/多粒度特征，再经过融合模块得到一个高维的特征向量。在训练时使用分类头将该特征向量转换成属于每个类别的概率从而以分类任务的方式来优化特征提取模型；在测试或推理时直接将高维的特征向量作为图片描述向量在检索向量库中进行检索，以得到检索结果。而ReID strong-baseline算法则是提出了多个有效优化训练与检索的方法来提升整体模型性能。
+<img src="../../images/reid/reid_overview.jpg" align="middle">
 
-以往的行人重识别方法通过特征提取模块来提取图片的全局或多粒度特征，再经过融合模块得到一个高维的特征向量。在训练时使用分类头将该特征向量映射成属于每个类别的概率从而以分类任务的方式来优化整个模型；在测试或推理时直接将高维的特征向量作为图片描述子在检索库中进行检索，以得到检索结果。而ReID strong-baseline算法则是提出了多个有效优化训练与检索的方法来提升整体模型性能。
+### 2. ReID算法
 
-#### 2.1 ReID strong-baseline算法原理
+#### 2.1a ReID strong-baseline算法
 
 论文出处：[Bag of Tricks and A Strong Baseline for Deep Person Re-identification](https://openaccess.thecvf.com/content_CVPRW_2019/papers/TRMTMCT/Luo_Bag_of_Tricks_and_a_Strong_Baseline_for_Deep_Person_CVPRW_2019_paper.pdf)
 
 <img src="../../images/reid/strong-baseline.jpg" width="50%">
 
-原理介绍：作者主要使用了以下优化方法
+原理介绍：作者以普遍使用的基于 ResNet50 的行人重识别方法为基础，探索并总结了以下几种有效且适用性较强的优化方法，大幅度提高了在多个行人重识别数据集上的指标。
 
-1. Warmup，在训练一开始让学习率逐渐升高后再开始下降，有利于梯度下降时找到更优的参数。
-2. Random erasing augmentation，随机区域擦除，增强模型的泛化性。
-3. Label smoothing，标签平滑，增强模型的泛化性。
-4. Last stride=1，取消特征提取模块的最后一个stage的下采样，增大输出特征图的分辨率来保留更多细节，增强模型的分类能力。
-5. BNNeck，特征向量输入分类头之前先经过BNNeck，让特征向量变成正态分布形式，减少了同时优化ID Loss和TripLetLoss的难度。
-6. Center loss，给每个类别一个可学习的聚类中心特征，训练时让类内特征靠近聚类中心，减少类内差异，增大类间差异。
-7. Reranking，在检索时考虑检索图像的近邻候选对象是否同时含有检索目标，以此来优化距离矩阵，最终提升检索精度。
+1. Warmup：在训练一开始让学习率从一个较小值逐渐升高后再开始下降，有利于梯度下降优化时的稳定性，从而找到更优的参数模型。
+2. Random erasing augmentation：随机区域擦除，通过数据增强来提升模型的泛化能力。
+3. Label smoothing：标签平滑，提升模型的泛化能力。
+4. Last stride=1：设定特征提取模块的最后一个stage的下采样为1，增大输出特征图的分辨率来保留更多细节，提升模型的分类能力。
+5. BNNeck：特征向量输入分类头之前先经过BNNeck，让特征在超球体表面服从正态分布，减少了同时优化IDLoss和TripLetLoss的难度。
+6. Center loss：给每个类别一个可学习的聚类中心，训练时让类内特征靠近聚类中心，减少类内差异，增大类间差异。
+7. Reranking：在检索时考虑查询图像的近邻候选对象，根据候选对象的近邻图像的是否也含有查询图像的情况来优化距离矩阵，最终提升检索精度。
 
-#### 2.2a 快速体验
+#### 2.1b 快速体验
 
 快速体验章节主要以`softmax_triplet_with_center.yaml`配置和训练好的模型文件为例，在 Market1501 数据集上进行测试。
 
@@ -34,16 +48,16 @@
    ```shell
    PaddleClas/dataset/market1501
    └── Market-1501-v15.09.15/
-   	├── bounding_box_test/
-   	├── bounding_box_train/
-   	├── gt_bbox/
-   	├── gt_query/
-   	├── query/
-   	├── generate_anno.py
-   	├── bounding_box_test.txt
-   	├── bounding_box_train.txt
-   	├── query.txt
-   	└── readme.txt
+       ├── bounding_box_test/
+       ├── bounding_box_train/
+       ├── gt_bbox/
+       ├── gt_query/
+       ├── query/
+       ├── generate_anno.py
+       ├── bounding_box_test.txt
+       ├── bounding_box_train.txt
+       ├── query.txt
+       └── readme.txt
    ```
 
 2. 下载 [reid_strong_baseline_softmax_with_center.epoch_120.pdparams](reid_strong_baseline_softmax_with_center.epoch_120.pdparams) 到 `PaddleClas/pretrained_models` 文件夹中
@@ -60,7 +74,7 @@
 
    ```shell
    python3.7 tools/eval.py \
-   -c ppcls/configs/reid/strong_baseline/baseline.yaml \
+   -c ppcls/configs/reid/strong_baseline/softmax_triplet_with_center.yaml \
    -o Global.pretrained_model="pretrained_models/reid_strong_baseline_softmax_with_center.epoch_120"
    ```
 
@@ -85,7 +99,7 @@
 
    可以看到我们提供的 `reid_strong_baseline_softmax_with_center.epoch_120.pdparams` 模型在 Market1501 数据集上的指标为recall@1=0.94270，recall@5=0.98189，mAP=0.85799
 
-#### 2.2b 模型训练/推理等
+#### 2.2c 模型训练/推理等
 
 - 模型训练
 
@@ -94,16 +108,16 @@
      ```shell
      PaddleClas/dataset/market1501
      └── Market-1501-v15.09.15/
-     	├── bounding_box_test/
-     	├── bounding_box_train/
-     	├── gt_bbox/
-     	├── gt_query/
-     	├── query/
-     	├── generate_anno.py
-     	├── bounding_box_test.txt
-     	├── bounding_box_train.txt
-     	├── query.txt
-     	└── readme.txt
+         ├── bounding_box_test/
+         ├── bounding_box_train/
+         ├── gt_bbox/
+         ├── gt_query/
+         ├── query/
+         ├── generate_anno.py
+         ├── bounding_box_test.txt
+         ├── bounding_box_train.txt
+         ├── query.txt
+         └── readme.txt
      ```
 
   2. 执行以下命令开始训练
@@ -136,7 +150,7 @@
      tar xf reid_srong_baseline_softmax_with_center.tar
      ```
 
-  2. 修改 `PaddleClas/deploy/configs/inference_rec.yaml`。将 `infer_imgs:` 后的字段改为 Market1501 中 query 文件夹下的任意一张图片；将 `rec_inference_model_dir:` 后的字段改为解压出来的 reid_srong_baseline_softmax_with_center 文件夹路径；将 `transform_ops` 字段下的预处理配置改为 `softmax_triplet_with_center.yaml` 中`Eval.Query.dataset` 下的预处理配置。如下所示
+  2. 修改 `PaddleClas/deploy/configs/inference_rec.yaml`。将 `infer_imgs:` 后的字段改为 Market1501 中 query 文件夹下的任意一张图片路径（下方代码使用的是`0294_c1s1_066631_00.jpg`图片路径）；将 `rec_inference_model_dir:` 后的字段改为解压出来的 reid_srong_baseline_softmax_with_center 文件夹路径；将 `transform_ops` 字段下的预处理配置改为 `softmax_triplet_with_center.yaml` 中`Eval.Query.dataset` 下的预处理配置。如下所示
 
      ```yaml
      Global:
@@ -180,6 +194,7 @@
      0294_c1s1_066631_00.jpg:        [ 0.01806974  0.00476423 -0.00508293 ...  0.03925538  0.00377574
       -0.00849029]
      ```
+     推理时的输出向量储存在[predict_rec.py](../../../deploy/python/predict_rec.py#L134-L135)的`result_dict`变量中。
 
 ### 3. 总结
 
@@ -204,3 +219,4 @@ Market1501 数据集比较小，可以尝试训练多次取最高精度。
 1. [Bag of Tricks and A Strong Baseline for Deep Person Re-identification](https://openaccess.thecvf.com/content_CVPRW_2019/papers/TRMTMCT/Luo_Bag_of_Tricks_and_a_Strong_Baseline_for_Deep_Person_CVPRW_2019_paper.pdf)
 2. [michuanhaohao/reid-strong-baseline: Bag of Tricks and A Strong Baseline for Deep Person Re-identification (github.com)](https://github.com/michuanhaohao/reid-strong-baseline)
 3. [行人重识别数据集之 Market1501 数据集_star_function的博客-CSDN博客_market1501数据集](https://blog.csdn.net/qq_39220334/article/details/121470106)
+4. [Deep Learning for Person Re-identification:A Survey and Outlook](https://arxiv.org/abs/2001.04193)
