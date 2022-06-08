@@ -1,5 +1,5 @@
 Global:
-  infer_imgs: "./images/PULC/safety_helmet/"
+  infer_imgs: "./images/PULC/safety_helmet/safety_helmet_test_1.png"
   inference_model_dir: "./models/safety_helmet_infer"
   batch_size: 1
   use_gpu: True
@@ -30,7 +30,7 @@ PostProcess:
   main_indicator: ThreshOutput
   ThreshOutput:
     threshold: 0.9
-    label_0: wearing
-    label_1: unwearing
+    label_0: wearing_helmet
+    label_1: unwearing_helmet
   SavePreLabel:
     save_dir: ./pre_label/

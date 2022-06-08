@@ -2,12 +2,12 @@
 Global:
   checkpoints: null
   pretrained_model: null
-  output_dir: ./output/
+  output_dir: ./output
   device: gpu
   save_interval: 1
   eval_during_train: True
   eval_interval: 1
-  epochs: 40
+  epochs: 60
   print_batch_step: 10
   use_visualdl: False
   # used for static mode and model export
@@ -16,9 +16,9 @@ Global:
 
 # model architecture
 Arch:
-  name: MobileNetV3_large_x1_0
-  pretrained: True
+  name: Res2Net200_vd_26w_4s
   class_num: 2
+  pretrained: True
  
 # loss function config for traing/eval process
 Loss:
@@ -36,11 +36,10 @@ Optimizer:
   momentum: 0.9
   lr:
     name: Cosine
-    learning_rate: 0.050
-    warmup_epoch: 5
+    learning_rate: 0.005
   regularizer:
     name: 'L2'
-    coeff: 0.00002
+    coeff: 0.0001
 
 
 # data loader for train and eval
@@ -58,16 +57,18 @@ DataLoader:
             size: 224
         - RandFlipImage:
             flip_code: 1
-        - AutoAugment:
         - NormalizeImage:
             scale: 1.0/255.0
             mean: [0.485, 0.456, 0.406]
             std: [0.229, 0.224, 0.225]
             order: ''
+      batch_transform_ops:
+        - MixupOperator:
+            alpha: 0.2
 
     sampler:
       name: DistributedBatchSampler
-      batch_size: 256
+      batch_size: 32
       drop_last: False
       shuffle: True
     loader:
@@ -102,7 +103,7 @@ DataLoader:
       use_shared_memory: True
 
 Infer:
-  infer_imgs: docs/images/inference_deployment/whl_demo.jpg
+  infer_imgs: deploy/images/PULC/safety_helmet/safety_helmet_test_1.png
   batch_size: 1
   transforms:
     - DecodeImage:
@@ -121,8 +122,8 @@ Infer:
   PostProcess:
     name: ThreshOutput
     threshold: 0.9235
-    label_0: wearing
-    label_1: unwearing
+    label_0: wearing_helmet
+    label_1: unwearing_helmet
 
 Metric:
   Train:

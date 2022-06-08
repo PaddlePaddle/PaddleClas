@@ -2,7 +2,6 @@
 
 ------
 
-
 ## 目录
 
 - [1. 模型和应用场景介绍](#1)
@@ -39,20 +38,19 @@
 
 该案例提供了用户使用 PaddleClas 的超轻量图像分类方案（PULC，Practical Ultra Lightweight Classification）快速构建轻量级、高精度、可落地的佩戴安全帽的分类模型。该模型可以广泛应用于如建筑施工场景、工厂车间场景、交通场景等。
 
-下表列出了判断图片中是否佩戴安全帽的二分类模型的相关指标，前两行展现了使用 SwinTranformer_tiny 和 MobileNetV3_large_x1_0 作为 backbone 训练得到的模型的相关指标，第三行至第六行依次展现了替换 backbone 为 PPLCNet_x1_0、使用 SSLD 预训练模型、使用 SSLD 预训练模型 + EDA 策略、使用 SSLD 预训练模型 + EDA 策略 + UDML 知识蒸馏策略训练得到的模型的相关指标。
+下表列出了判断图片中是否佩戴安全帽的二分类模型的相关指标，展现了使用 Res2Net200_vd_26w_4s，SwinTranformer_tiny 和 MobileNetV3_large_x1_0 作为 backbone 训练得到的模型的相关指标，第三行至第六行依次展现了替换 backbone 为 PPLCNet_x1_0、使用 SSLD 预训练模型、使用 SSLD 预训练模型 + EDA 策略、使用 SSLD 预训练模型 + EDA 策略 + UDML 知识蒸馏策略训练得到的模型的相关指标。
 
 | 模型 | Tpr（%） | 延时（ms） | 存储（M） | 策略 |
 |-------|-----------|----------|---------------|---------------|
 | Res2Net200_vd_26w_4s  | 98.92 | 80.99 | 284 | 使用ImageNet预训练模型 |
 | SwinTranformer_tiny  | 93.57 | 91.32  | 107 | 使用ImageNet预训练模型 |
-| MobileNetV3_large_x1_0  | 97.47 | 4.83  | 17 | 使用ImageNet预训练模型 |
+| MobileNetV3_large_x0_35  | 97.47 | 4.83  | 17 | 使用ImageNet预训练模型 |
 | PPLCNet_x1_0  | 93.29 | 2.03  | 6.5 | 使用ImageNet预训练模型 |
 | PPLCNet_x1_0  | 98.16 | 2.03  | 6.5 | 使用SSLD预训练模型 |
 | PPLCNet_x1_0  | 98.82 | 2.03  | 6.5 | 使用SSLD预训练模型+EDA策略|
 | <b>PPLCNet_x1_0<b>  | <b>98.71<b> | <b>2.03<b>  | <b>6.5<b> | 使用SSLD预训练模型+EDA策略+UDML知识蒸馏策略|
 
-<!-- todo: 上表中数值需要更新并确认，下述解释需要对应更改 -->
-从表中可以看出，backbone 为 Res2Net200_vd_26w_4s 时精度较高，但是推理速度较慢。将 backboone 替换为轻量级模型 MobileNetV3_large_x1_0 后，速度可以大幅提升，但是精度下降明显。将 backbone 替换为 PPLCNet_x1_0 时，精度较 MobileNetV3_large_x1_0 低四个多百分点，但是速度提升 2 倍左右。在此基础上，使用 SSLD 预训练模型后，在不改变推理速度的前提下，精度可以提升约 4.8 个百分点，进一步地，当融合EDA策略后，精度可以再提升 0.7 个百分点。此时，PPLCNet_x1_0 已经接近了 Res2Net200_vd_26w_4s 模型的精度，但是速度快 70+ 倍。最后，在使用 UDML 知识蒸馏后，精度可以继续提升 todo 个百分点。此时，PPLCNet_x1_0 达到了 SwinTranformer_tiny 模型的精度，但是速度快 70+ 倍。关于 PULC 的训练方法和推理部署方法将在下面详细介绍。
+从表中可以看出，backbone 为 Res2Net200_vd_26w_4s 时精度较高，但是推理速度较慢。将 backboone 替换为轻量级模型 MobileNetV3_large_x1_0 后，速度可以大幅提升，但是精度下降明显。将 backbone 替换为 PPLCNet_x1_0 时，精度较 MobileNetV3_large_x1_0 低 4 个多百分点，但是速度提升了 2 倍。在此基础上，替换为 SSLD 预训练模型后，在对推理速度无影响的前提下，精度提升约 4.8 个百分点，进一步地，当融合 EDA 策略后，精度可以再提升 0.7 个百分点。此时，PPLCNet_x1_0 已经接近了 Res2Net200_vd_26w_4s 模型的精度，但是速度快 70+ 倍。最后，在使用 UDML 知识蒸馏后，精度可以继续提升 todo 个百分点。此时，PPLCNet_x1_0 已经超过了 Res2Net200_vd_26w_4s 模型的精度，但速度快 70+ 倍。关于 PULC 的训练方法和推理部署方法将在下面详细介绍。
 
 **备注：**
 
@@ -63,7 +61,7 @@
 
 ## 2. 模型快速体验
 
-    （pip方式，待补充）
+todo
 
 <a name="3"></a>
 
@@ -95,7 +93,7 @@
 * 对于 hard-hat-detection 数据集：仅使用其中类别标签为 “hat” 的图像，并使用 bbox 标签进行裁剪，图像类别为0；
 * 对于 CelebA 数据集：仅使用其中类别标签为 “Wearing_Hat” 的图像，并使用 bbox 标签进行裁剪，图像类别为0。
 
-在整合上述数据后，可得到共约 15 万数据，其中戴安全帽与不戴安全帽分别约为 2.8 万与 12.1 万，然后在两个类别上分别随机选取 0.56 万张图像作为测试集，共约 1.12 万张图像，其他约 13.8 万张图像作为训练集。
+在整合上述数据后，可得到共约 15 万数据，其中戴安全帽与不戴安全帽的图像数量分别约为 2.8 万与 12.1 万，然后在两个类别上分别随机选取 0.56 万张图像作为测试集，共约 1.12 万张图像，其他约 13.8 万张图像作为训练集。
 
 处理后的数据集部分数据可视化如下：
 
@@ -126,14 +124,12 @@ cd ../
 │   ├── HHD_hard_hat_workers23_1.jpg
 │   ├── CelebA_077809.jpg
 │   ├── ...
-│   └──
+│   └── ...
 ├── train_list.txt
-├── train_list.txt.debug
-├── val_list.txt
-└── val_list.txt.debug
+└── val_list.txt
 ```
-<!-- todo：imagenet是什么？ -->
-其中 `train/` 和 `val/` 分别为训练集和验证集。`train_list.txt` 和 `val_list.txt` 分别为训练集和验证集的标签文件，`train_list.txt.debug` 和 `val_list.txt.debug` 分别为训练集和验证集的 `debug` 标签文件，其分别是 `train_list.txt` 和 `val_list.txt` 的子集，用该文件可以快速体验本案例的流程。
+
+其中，`train_list.txt` 和 `val_list.txt` 分别为训练集和验证集的标签文件，所有的图像数据在 `images/` 目录下。
 
 **备注：**
 
@@ -153,7 +149,7 @@ python3 -m paddle.distributed.launch \
     -c ./ppcls/configs/PULC/safety_helmet/PPLCNet_x1_0.yaml
 ```
 
-验证集的最佳指标在 `0.975-0.985` 之间（数据集较小，容易造成波动）。
+验证集的最佳指标在 `todo 0.975-0.985` 之间（数据集较小，容易造成波动）。
 
 **备注：**
 
@@ -170,10 +166,10 @@ python3 -m paddle.distributed.launch \
 ```bash
 python3 tools/eval.py \
     -c ./ppcls/configs/PULC/safety_helmet/PPLCNet_x1_0.yaml \
-    -o Global.pretrained_model="output/PPLCNet_x1_0/best_model"
+    -o Global.pretrained_model=output/PPLCNet_x1_0/best_model
 ```
 
-其中 `-o Global.pretrained_model="output/PPLCNet_x1_0/best_model"` 指定了当前最佳权重所在的路径，如果指定其他权重，只需替换对应的路径即可。
+其中 `-o Global.pretrained_model="output/PPLCNet_x1_0/best_model"` 指定了训练过程中的最佳参数权重文件所在的路径，如需指定其他权重文件，只需替换对应的路径即可。
 
 <a name="3.5"></a>
 
@@ -181,30 +177,26 @@ python3 tools/eval.py \
 
 模型训练完成之后，可以加载训练得到的预训练模型，进行模型预测。在模型库的 `tools/infer.py` 中提供了完整的示例，只需执行下述命令即可完成模型预测：
 
-
 ```python
 python3 tools/infer.py \
     -c ./ppcls/configs/PULC/safety_helmet/PPLCNet_x1_0.yaml \
-    -o Global.pretrained_model=output/DistillationModel/best_model_student \
-    -o Global.pretrained_model=Infer.PostProcess.threshold=0.9232
+    -o Global.pretrained_model=output/PPLCNet_x1_0/best_model \
+    -o Global.pretrained_model=Infer.PostProcess.threshold=todo 0.9232
 ```
 
 输出结果如下：
 
-<!-- todo: 补充demo图测试结果 -->
 ```
-[{'class_ids': [0], 'scores': [0.9878496769815683], 'label_names': ['nobody'], 'file_name': './dataset/safety_helmet/val/objects365_01780637.jpg'}]
+[{'class_ids': [0], 'scores': [ todo 0.], 'label_names': ['unwearing_helmet'], 'file_name': 'deploy/images/PULC/safety_helmet/safety_helmet_test_1.png'}]
 ```
 
 **备注：**
 
 * 这里`-o Global.pretrained_model="output/PPLCNet_x1_0/best_model"` 指定了当前最佳权重所在的路径，如果指定其他权重，只需替换对应的路径即可。
 
-<!-- todo: 补充demo图 -->
-* 默认是对 `deploy/images/PULC/safety_helmet/objects365_02035329.jpg` 进行预测，此处也可以通过增加字段 `-o Infer.infer_imgs=xxx` 对其他图片预测。
+* 默认是对 `deploy/images/PULC/safety_helmet/safety_helmet_test_1.png` 进行预测，此处也可以通过增加字段 `-o Infer.infer_imgs=xxx` 对其他图片预测。
 
 * 这里的 `Infer.PostProcess.threshold` 的值需要根据实际场景来确定，此处的 `0.9232` 是在该场景中的 `val` 数据集在万分之一 Fpr 下得到的最佳 Tpr 所得到的。
-
 
 <a name="4"></a>
 
@@ -230,8 +222,7 @@ python3 -m paddle.distributed.launch \
     -c ./ppcls/configs/PULC/safety_helmet/PPLCNet_x1_0_distillation.yaml
 ```
 
-<!-- todo: 指标需要等蒸馏策略确定后更新 -->
-验证集的最佳指标为 `99.0-99.3` 之间，当前模型最好的权重保存在 `output/DistillationModel/best_model_student.pdparams`。
+验证集的最佳指标为 ` todo 99.0-99.3` 之间，当前模型最好的权重保存在 `output/DistillationModel/best_model_student.pdparams`。
 
 <a name="5"></a>
 
@@ -239,7 +230,7 @@ python3 -m paddle.distributed.launch \
 
 在 [3.2 节](#3.2)和 [4.1 节](#4.1)所使用的超参数是根据 PaddleClas 提供的 `SHAS 超参数搜索策略` 搜索得到的，如果希望在自己的数据集上得到更好的结果，可以参考[SHAS 超参数搜索策略](#TODO)来获得更好的训练超参数。
 
-**备注：** 此部分内容是可选内容，搜索过程需要较长的时间，您可以根据自己的硬件情况来选择执行。如果没有更换数据集，可以忽略此节内容。
+**备注**：此部分内容是可选内容，搜索过程需要较长的时间，您可以根据自己的硬件情况来选择执行。如果没有更换数据集，可以忽略此节内容。
 
 <a name="6"></a>
 
@@ -249,7 +240,7 @@ python3 -m paddle.distributed.launch \
 
 ### 6.1 推理模型准备
 
-Paddle Inference 是飞桨的原生推理库， 作用于服务器端和云端，提供高性能的推理能力。相比于直接基于预训练模型进行预测，Paddle Inference可使用MKLDNN、CUDNN、TensorRT 进行预测加速，从而实现更优的推理性能。更多关于Paddle Inference推理引擎的介绍，可以参考[Paddle Inference官网教程](https://www.paddlepaddle.org.cn/documentation/docs/zh/guides/infer/inference/inference_cn.html)。
+Paddle Inference 是飞桨的原生推理库， 作用于服务器端和云端，提供高性能的推理能力。相比于直接基于预训练模型进行预测，Paddle Inference 可使用 MKLDNN、CUDNN、TensorRT 进行预测加速，从而实现更优的推理性能。更多关于 Paddle Inference 推理引擎的介绍，可以参考[Paddle Inference官网教程](https://www.paddlepaddle.org.cn/documentation/docs/zh/guides/infer/inference/inference_cn.html)。
 
 当使用 Paddle Inference 推理时，加载的模型类型为 inference 模型。本案例提供了两种获得 inference 模型的方法，如果希望得到和文档相同的结果，请选择[直接下载 inference 模型](#6.1.2)的方式。
 
@@ -265,7 +256,8 @@ python3 tools/export_model.py \
     -o Global.pretrained_model=output/DistillationModel/best_model_student \
     -o Global.save_inference_dir=deploy/models/PPLCNet_x1_0_safety_helmet_infer
 ```
-执行完该脚本后会在 `deploy/models/` 下生成 `PPLCNet_x1_0_safety_helmet_infer` 文件夹，`models` 文件夹下应有如下文件结构：
+
+执行完该脚本后会在 `deploy/models/` 下生成 `PPLCNet_x1_0_safety_helmet_infer` 目录，该目录下有如下文件结构：
 
 ```
 ├── PPLCNet_x1_0_safety_helmet_infer
@@ -274,7 +266,7 @@ python3 tools/export_model.py \
 │   └── inference.pdmodel
 ```
 
-**备注：** 此处的最佳权重是经过知识蒸馏后的权重路径，如果没有执行知识蒸馏的步骤，最佳模型保存在`output/PPLCNet_x1_0/best_model.pdparams`中。
+**备注：** 此处的最佳权重是经过知识蒸馏后的权重路径，如果没有执行知识蒸馏的步骤，最佳模型保存在 `output/PPLCNet_x1_0/best_model.pdparams` 中。
 
 <a name="6.1.2"></a>
 
@@ -310,43 +302,43 @@ wget https://paddleclas.bj.bcebos.com/models/PULC/safety_helmet_infer.tar && tar
 ```
 cd ../
 ```
-<!-- todo: demo图，阈值 -->
-运行下面的命令，对图像 `./images/PULC/safety_helmet/objects365_02035329.jpg` 进行是否佩戴安全帽分类。
+
+运行下面的命令，对图像 `./images/PULC/safety_helmet/safety_helmet_test_1.png` 进行是否佩戴安全帽分类。
 
 ```shell
 # 使用下面的命令使用 GPU 进行预测
-python3.7 python/predict_cls.py -c configs/PULC/safety_helmet/inference_safety_helmet.yaml -o PostProcess.ThreshOutput.threshold=0.9032
+python3.7 python/predict_cls.py -c configs/PULC/safety_helmet/inference_safety_helmet.yaml -o PostProcess.ThreshOutput.threshold=todo 0.9032
 # 使用下面的命令使用 CPU 进行预测
-python3.7 python/predict_cls.py -c configs/PULC/safety_helmet/inference_safety_helmet.yaml -o PostProcess.ThreshOutput.threshold=0.9032 -o Global.use_gpu=False
+python3.7 python/predict_cls.py -c configs/PULC/safety_helmet/inference_safety_helmet.yaml -o PostProcess.ThreshOutput.threshold=todo 0.9032 -o Global.use_gpu=False
 ```
 
 输出结果如下。
-<!-- todo: demo图 -->
+
 ```
-objects365_02035329.jpg:    class id(s): [1], score(s): [1.00], label_name(s): ['someone']
+safety_helmet_test_1.png:       class id(s): [1], score(s): [1.00], label_name(s): ['unwearing']
 ```
 
-**备注：** 真实场景中往往需要在假正类率（Fpr）小于某一个指标下求真正类率（Tpr），该场景中的 `val` 数据集在万分之一 Fpr 下得到的最佳 Tpr 所得到的阈值为 `0.9794`，故此处的 `threshold` 为 `0.9794`。该阈值的确定方法可以参考[3.2节](#3.2)备注部分。
+**备注：** 真实场景中往往需要在假正类率（Fpr）小于某一个指标下求真正类率（Tpr），该场景中的 `val` 数据集在万分之一 Fpr 下得到的最佳 Tpr 所得到的阈值为 `todo 0.9794`，故此处的 `threshold` 为 `0.9794`。该阈值的确定方法可以参考[3.2节](#3.2)备注部分。
 
 <a name="6.2.2"></a>  
 
 #### 6.2.2 基于文件夹的批量预测
 
 如果希望预测文件夹内的图像，可以直接修改配置文件中的 `Global.infer_imgs` 字段，也可以通过下面的 `-o` 参数修改对应的配置。
-<!-- todo: demo图，阈值-->
+
 ```shell
 # 使用下面的命令使用 GPU 进行预测，如果希望使用 CPU 预测，可以在命令后面添加 -o Global.use_gpu=False
-python3.7 python/predict_cls.py -c configs/PULC/safety_helmet/inference_safety_helmet.yaml -o Global.infer_imgs="./images/PULC/safety_helmet/" -o PostProcess.ThreshOutput.threshold=0.9032
+python3.7 python/predict_cls.py -c configs/PULC/safety_helmet/inference_safety_helmet.yaml -o Global.infer_imgs="./images/PULC/safety_helmet/" -o PostProcess.ThreshOutput.threshold=todo 0.9032
 ```
 
 终端中会输出该文件夹内所有图像的分类结果，如下所示。
-<!-- todo: demo图 -->
+
 ```
-objects365_01780782.jpg:    class id(s): [0], score(s): [1.00], label_name(s): ['nobody']
-objects365_02035329.jpg:    class id(s): [1], score(s): [1.00], label_name(s): ['someone']
+safety_helmet_test_1.png:       class id(s): [1], score(s): [1.00], label_name(s): ['unwearing_helmet']
+safety_helmet_test_2.png:       class id(s): [0], score(s): [1.00], label_name(s): ['wearing_helmet']
 ```
-<!-- todo: label 值需要确定 -->
-其中，`` 表示该图中人（均）佩戴了安全帽，`` 表示该图中存在未佩戴安全帽的人。
+
+其中，`wearing_helmet` 表示该图中人（均）佩戴了安全帽，`unwearing_helmet` 表示该图中存在未佩戴安全帽的人。
 
 <a name="6.3"></a>
 
