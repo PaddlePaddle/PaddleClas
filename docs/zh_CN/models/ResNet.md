@@ -133,10 +133,10 @@ PaddleClas 提供的 ResNet 系列的模型包括 ResNet50，ResNet50_vd，ResNe
     
 ### 2.1 安装 paddleclas
     
-使用如下命令快速安装 paddleclas
+使用如下命令快速安装 paddlepaddle, paddleclas
     
 ```    
-pip3 install paddleclas
+pip3 install paddlepaddle paddleclas
 ```
 <a name="2.2"></a> 
     
@@ -151,7 +151,7 @@ paddleclas --model_name=ResNet50  --infer_imgs="docs/images/inference_deployment
 结果如下：
 ```
 >>> result
-filename: docs/images/inference_deployment/whl_demo.jpg, top-1, class_ids: [8, 7, 86, 82, 80], scores: [0.97968, 0.02028, 3e-05, 1e-05, 0.0], label_names: ['hen', 'cock', 'partridge', 'ruffed grouse, partridge, Bonasa umbellus', 'black grouse']
+class_ids: [8, 7, 86, 82, 80], scores: [0.97968, 0.02028, 3e-05, 1e-05, 0.0], label_names: ['hen', 'cock', 'partridge', 'ruffed grouse, partridge, Bonasa umbellus', 'black grouse'], filename: docs/images/inference_deployment/whl_demo.jpg
 Predict complete!
 ```
     
@@ -172,10 +172,10 @@ print(next(result))
 
 ```
 >>> result
-filename: docs/images/inference_deployment/whl_demo.jpg, top-1, class_ids: [8, 7, 86, 82, 80], scores: [0.97968, 0.02028, 3e-05, 1e-05, 0.0], label_names: ['hen', 'cock', 'partridge', 'ruffed grouse, partridge, Bonasa umbellus', 'black grouse']
+[{'class_ids': [8, 7, 86, 82, 80], 'scores': [0.97968, 0.02028, 3e-05, 1e-05, 0.0], 'label_names': ['hen', 'cock', 'partridge', 'ruffed grouse, partridge, Bonasa umbellus', 'black grouse'], 'filename': 'docs/images/inference_deployment/whl_demo.jpg'}]
 ```
-    
-    
+
+
 <a name="3"></a> 
     
 ## 3. 模型训练、评估和预测
