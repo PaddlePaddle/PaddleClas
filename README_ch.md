@@ -17,11 +17,11 @@ PULC实用图像分类模型效果展示
 <div align="center">
 <img src="./docs/images/recognition.gif"  width = "400" />
 
-PP-ShiTU图像识别系统效果展示
+PP-ShiTu图像识别系统效果展示
 </div>
 
 
-**近期更新**
+## 近期更新
 - 🔥️ 2022.6.15 发布PULC超轻量图像分类方案，CPU推理3ms，精度比肩SwinTransformer，覆盖人、车、OCR场景九大常见任务
 - 2022.5.26 [飞桨产业实践范例直播课](http://aglc.cn/v-c4FAR)，解读**超轻量重点区域人员出入管理方案**。
 - 2022.5.23 新增[人员出入管理范例库](https://aistudio.baidu.com/aistudio/projectdetail/4094475)，具体内容可以在 AI Stuio 上体验。
@@ -36,8 +36,9 @@ PP-ShiTU图像识别系统效果展示
 
 ## 特性
 
+支持多种图像分类、识别相关算法，在此基础上打造[PULC超轻量图像分类方案](./docs/zh_CN/PULC/PULC_train.md)和[PP-ShiTu图像识别系统](./docs/zh_CN/quick_start/quick_start_recognition.md)
 ![](https://user-images.githubusercontent.com/19523330/172844483-60391f39-f045-4e13-b5a6-ed65182f429e.png)
-支持多种图像分类、识别相关算法，在此基础上打造[PULC超轻量图像分类方案](./docs/zh_CN/PULC/PULC_train.md))和[PP-ShiTu图像识别系统](./docs/zh_CN/quick_start/quick_start_recognition.md)
+
 
 ## 欢迎加入技术交流群
 
@@ -126,7 +127,7 @@ PULC融合了骨干网络、数据增广、蒸馏等多种前沿算法，可以�
 PaddleClas提供了覆盖人、车、OCR场景九大常见任务的分类模型，CPU推理3ms，精度比肩SwinTransformer。
 
 <a name="分类效果展示"></a>
-## PULC产业应用图像分类模型效果展示
+## PULC实用图像分类模型效果展示
 <div align="center">
 <img src="docs/images/classification.gif">
 </div>
