@@ -122,10 +122,10 @@ PPLCNetV2 目前提供的模型的精度、速度指标及预训练权重链接�
     
 ### 2.1 安装 paddleclas
     
-使用如下命令快速安装 paddleclas
+使用如下命令快速安装 paddlepaddle, paddleclas
     
 ```    
-pip3 install paddleclas
+pip3 install paddlepaddle paddleclas
 ```
 <a name="2.2"></a> 
     
@@ -140,10 +140,10 @@ paddleclas --model_name=PPLCNetV2_base  --infer_imgs="docs/images/inference_depl
 结果如下：
 ```
 >>> result
-filename: docs/images/inference_deployment/whl_demo.jpg, top-5, class_ids: [8, 7, 86, 82, 83], scores: [0.8859, 0.07156, 0.00588, 0.00047, 0.00034], label_names: ['hen', 'cock', 'partridge', 'ruffed grouse, partridge, Bonasa umbellus', 'prairie chicken, prairie grouse, prairie fowl']
-Predict complete!
+class_ids: [8, 7, 86, 82, 83], scores: [0.8859, 0.07156, 0.00588, 0.00047, 0.00034], label_names: ['hen', 'cock', 'partridge', 'ruffed grouse, partridge, Bonasa umbellus', 'prairie chicken, prairie grouse, prairie fowl'], filename: docs/images/inference_deployment/whl_demo.jpg
+Predict complete
 ``` 
-
+    
     
 * 在 Python 代码中预测
 ```python
@@ -159,7 +159,7 @@ print(next(result))
 
 ```
 >>> result
-filename: docs/images/inference_deployment/whl_demo.jpg, top-5, class_ids: [8, 7, 86, 82, 83], scores: [0.8859, 0.07156, 0.00588, 0.00047, 0.00034], label_names: ['hen', 'cock', 'partridge', 'ruffed grouse, partridge, Bonasa umbellus', 'prairie chicken, prairie grouse, prairie fowl']
+[{'class_ids': [8, 7, 86, 82, 83], 'scores': [0.8859, 0.07156, 0.00588, 0.00047, 0.00034], 'label_names': ['hen', 'cock', 'partridge', 'ruffed grouse, partridge, Bonasa umbellus', 'prairie chicken, prairie grouse, prairie fowl'], 'filename': 'docs/images/inference_deployment/whl_demo.jpg'}]
 ```
 
     
