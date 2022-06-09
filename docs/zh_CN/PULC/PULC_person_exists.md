@@ -397,7 +397,7 @@ objects365_02035329.jpg:	class id(s): [1], score(s): [1.00], label_name(s): ['so
 ```
 
 
-**备注：** 二分类默认的阈值为0.5， 如果需要指定阈值，可以重写 `Infer.PostProcess.threshold` ，如`-o Infer.PostProcess.threshold=0.9794`，该值需要根据实际场景来确定，此处的 `0.9794` 是在该场景中的 `val` 数据集在千分之一 Fpr 下得到的最佳 Tpr 所得到的。该阈值的确定方法可以参考[3.2节](#3.2)备注部分。
+**备注：** 二分类默认的阈值为0.5， 如果需要指定阈值，可以重写 `Infer.PostProcess.threshold` ，如`-o Infer.PostProcess.threshold=0.9794`，该值需要根据实际场景来确定，此处的 `0.9794` 是在该场景中的 `val` 数据集在千分之一 Fpr 下得到的最佳 Tpr 所得到的。该阈值的确定方法可以参考[3.3节](#3.3)备注部分。
 
 <a name="6.2.2"></a>  
 
