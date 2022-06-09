@@ -165,7 +165,8 @@ class BottleneckBlock(nn.Layer):
 
 
 class Res2Net_vd(nn.Layer):
-    def __init__(self, layers=50, scales=4, width=26, class_num=1000):
+    def __init__(self, layers=50, scales=4, width=26, class_num=1000,
+                 **kwargs):
         super(Res2Net_vd, self).__init__()
 
         self.layers = layers

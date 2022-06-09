@@ -132,7 +132,6 @@ class DepthwiseSeparable(TheseusLayer):
             lr_mult=lr_mult)
         if use_se:
             self.se = SEModule(num_channels, lr_mult=lr_mult)
-
         self.pw_conv = ConvBNLayer(
             num_channels=num_channels,
             filter_size=1,
@@ -193,7 +192,8 @@ class PPLCNet(TheseusLayer):
                  stride_list=[2, 2, 2, 2, 2],
                  use_last_conv=True,
                  return_patterns=None,
-                 return_stages=None):
+                 return_stages=None,
+                 **kwargs):
         super().__init__()
         self.scale = scale
         self.class_expand = class_expand

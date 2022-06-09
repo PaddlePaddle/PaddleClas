@@ -154,7 +154,8 @@ class MobileNetV3(TheseusLayer):
                  class_expand=LAST_CONV,
                  dropout_prob=0.2,
                  return_patterns=None,
-                 return_stages=None):
+                 return_stages=None,
+                 **kwargs):
         super().__init__()
 
         self.cfg = config
