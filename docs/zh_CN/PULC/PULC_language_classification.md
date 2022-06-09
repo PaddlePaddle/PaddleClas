@@ -132,7 +132,11 @@ print(next(result))
 
 `0` 表示阿拉伯语（arabic）；`1` 表示中文繁体（chinese_cht）；`2` 表示斯拉夫语（cyrillic）；`3` 表示梵文（devanagari）；`4` 表示日语（japan）；`5` 表示卡纳达文（ka）；`6` 表示韩语（korean）；`7` 表示泰米尔文（ta）；`8` 表示泰卢固文（te）；`9` 表示拉丁语（latin）。
 
-在 Multi-lingual scene text detection and recognition 数据集中，仅包含了阿拉伯语、日语、韩语和拉丁语数据，这里分别将4个语种的数据各抽取100张作为本案例的demo数据，并赋予对应的标签。
+在 Multi-lingual scene text detection and recognition 数据集中，仅包含了阿拉伯语、日语、韩语和拉丁语数据，这里分别将4个语种的数据各抽取120张作为本案例的训练数据，50张作为测试数据，以及30张作为补充数据和训练数据混合用于本案例的`SKL-UGI知识蒸馏策略`实验。
+
+因此，对于本案例中的demo数据集，类别为：
+
+`0` 表示阿拉伯语（arabic）；`1` 表示日语（japan）；`2` 表示韩语（korean）；`3` 表示拉丁语（latin）。
 
 如果想要制作自己的多语种数据集，可以按照需求收集并整理自己任务中需要语种的数据，此处提供了经过上述方法处理好的demo数据，可以直接下载得到。
 
@@ -148,28 +152,31 @@ cd path_to_PaddleClas
 
 ```shell
 cd dataset
-wget https://paddleclas.bj.bcebos.com/data/cls_demo/language_classification_demo.tar
-tar -xf language_classification_demo.tar
+wget https://paddleclas.bj.bcebos.com/data/cls_demo/language_classification.tar
+tar -xf language_classification.tar
 cd ../
 ```
 
-执行上述命令后，`dataset/`下存在`language_classification_demo`目录，该目录中具有以下数据：
+执行上述命令后，`dataset/`下存在`language_classification`目录，该目录中具有以下数据：
 
 ```
 ├── img
 │   ├── word_1.png
 │   ├── word_2.png
 ...
-├── label.txt
+├── train_list.txt
+├── train_list_for_distill.txt
+├── test_list.txt
 └── label_list.txt
 ```
 
-其中`img/`存放了4种语种的400张测试数据。`label.txt`为图片对应的的标签文件，`label_list.txt`是10类语种分类模型对应的类别列表，用这些图片可以快速体验本案例中模型的预测过程。
+其中`img/`存放了4种语言总计800张数据。`train_list.txt`和`test_list.txt`分别为训练集和验证集的标签文件，`label_list.txt`是4类语言分类模型对应的类别列表，`SKL-UGI知识蒸馏策略`对应的训练标签文件为`train_list_for_distill.txt`。用这些图片可以快速体验本案例中模型的训练预测过程。
 
 ***备注：***
 
--  这里的`label_list.txt`是10类语种分类模型对应的类别列表，如果自己构造的数据集语种类别发生变化，需要自行调整。
+-  这里的`label_list.txt`是4类语种分类模型对应的类别列表，如果自己构造的数据集语种类别发生变化，需要自行调整。
 -  如果想要自己构造训练集和验证集，可以参考[PaddleClas分类数据集格式说明](../data_preparation/classification_dataset.md#1-数据集格式说明) 。
+-  当使用本文档中的demo数据集时，需要添加`-o Arch.class_num=4`来将模型的类别书指定为4。
 
 <a name="3.3"></a>
 

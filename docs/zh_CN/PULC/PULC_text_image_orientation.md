@@ -43,12 +43,12 @@
 | 模型                    | 精度（%） | 延时（ms） | 存储（M） | 策略                                  |
 | ----------------------- | --------- | ---------- | --------- | ------------------------------------- |
 | SwinTranformer_tiny     | 99.12     | 89.65      | 107       | 使用ImageNet预训练模型                |
-| MobileNetV3_small_x0_35 | 83.72     | 2.95       | 17        | 使用ImageNet预训练模型                |
+| MobileNetV3_small_x0_35 | 83.61     | 2.95       | 17        | 使用ImageNet预训练模型                |
 | PPLCNet_x1_0            | 97.85     | 2.16       | 6.5       | 使用ImageNet预训练模型                |
 | PPLCNet_x1_0            | 98.02     | 2.16       | 6.5       | 使用SSLD预训练模型                    |
 | **PPLCNet_x1_0**        | **99.06** | **2.16**   | **6.5**   | 使用SSLD预训练模型+SHAS超参数搜索策略 |
 
-从表中可以看出，backbone 为 SwinTranformer_tiny 时精度比较高，但是推理速度较慢。将 backboone 替换为轻量级模型 MobileNetV3_large_x1_0 后，精度和速度都有了提升，但速度还有一定的提升空间。将 backbone 替换为 PPLCNet_x1_0 时，精度较 MobileNetV3_large_x1_0 低1.5个百分点，但是速度提升 2 倍左右。在此基础上，使用 SSLD 预训练模型后，在不改变推理速度的前提下，精度可以提升 0.17 个百分点，进一步地，当使用SHAS超参数搜索策略搜索最优超参数后，精度可以再提升 1.04 个百分点。此时，PPLCNet_x1_0 与 MobileNetV3_large_x1_0 和 SwinTranformer_tiny 的精度差别不大，但是速度明显变快。关于 PULC 的训练方法和推理部署方法将在下面详细介绍。
+从表中可以看出，backbone 为 SwinTranformer_tiny 时精度比较高，但是推理速度较慢。将 backboone 替换为轻量级模型 MobileNetV3_small_x0_35 后，速度提升明显，但精度有了大幅下降。将 backbone 替换为 PPLCNet_x1_0 时，速度略为提升，同时精度较 MobileNetV3_small_x0_35 高了 14.24 个百分点。在此基础上，使用 SSLD 预训练模型后，在不改变推理速度的前提下，精度可以提升 0.17 个百分点，进一步地，当使用SHAS超参数搜索策略搜索最优超参数后，精度可以再提升 1.04 个百分点。此时，PPLCNet_x1_0 与 SwinTranformer_tiny 的精度差别不大，但是速度明显变快。关于 PULC 的训练方法和推理部署方法将在下面详细介绍。
 
 **备注：**关于PPLCNet的介绍可以参考[PPLCNet介绍](../models/PP-LCNet.md)，相关论文可以查阅[PPLCNet paper](https://arxiv.org/abs/2109.15099)。
 
@@ -148,12 +148,12 @@ cd path_to_PaddleClas
 
 ```shell
 cd dataset
-wget https://paddleclas.bj.bcebos.com/data/cls_demo/text_image_orientation_demo.tar
-tar -xf text_image_orientation_demo.tar
+wget https://paddleclas.bj.bcebos.com/data/cls_demo/text_image_orientation.tar
+tar -xf text_image_orientation.tar
 cd ../
 ```
 
-执行上述命令后，`dataset/`下存在`text_image_orientation_demo`目录，该目录中具有以下数据：
+执行上述命令后，`dataset/`下存在`text_image_orientation`目录，该目录中具有以下数据：
 
 ```
 ├── img_0
