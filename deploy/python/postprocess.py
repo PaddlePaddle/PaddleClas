@@ -319,6 +319,5 @@ class VehicleAttribute(object):
                               ] * 10 + [self.type_threshold] * 9
             pred_res = (np.array(res) > np.array(threshold_list)
                         ).astype(np.int8).tolist()
-
-            batch_res.append([label_res, pred_res])
+            batch_res.append({"attributes": label_res, "output": pred_res})
         return batch_res

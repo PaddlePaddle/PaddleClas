@@ -142,10 +142,7 @@ def main(config):
                         "PostProcess"] or "VehicleAttribute" in config[
                             "PostProcess"]:
                     filename = batch_names[number]
-                    attr_message = result_dict[0]
-                    pred_res = result_dict[1]
-                    print("{}:\t attributes: {}, \npredict output: {}".format(
-                        filename, attr_message, pred_res))
+                    print("{}:\t {}".format(filename, result_dict))
                 else:
                     filename = batch_names[number]
                     clas_ids = result_dict["class_ids"]
