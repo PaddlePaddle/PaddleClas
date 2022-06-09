@@ -44,10 +44,10 @@
 |-------|-----------|----------|---------------|---------------|
 | SwinTranformer_tiny  | 93.57 | 91.32  | 107 | 使用ImageNet预训练模型 |
 | Res2Net200_vd_26w_4s  | 98.92 | 80.99 | 284 | 使用ImageNet预训练模型 |
-| MobileNetV3_small_x0_35  | 62.91 | 2.85 | 1.6 | 使用ImageNet预训练模型 |
+| MobileNetV3_small_x0_35  | 96.50 | 2.85 | 1.6 | 使用ImageNet预训练模型 |
 | PPLCNet_x1_0  | 93.29 | 2.03  | 6.5 | 使用ImageNet预训练模型 |
 | PPLCNet_x1_0  | 98.07 | 2.03  | 6.5 | 使用SSLD预训练模型 |
-| PPLCNet_x1_0  | 98.82 | 2.03  | 6.5 | 使用SSLD预训练模型+EDA策略|
+| PPLCNet_x1_0  | 99.30 | 2.03  | 6.5 | 使用SSLD预训练模型+EDA策略|
 | <b>PPLCNet_x1_0<b>  | <b>99.38<b> | <b>2.03<b>  | <b>6.5<b> | 使用SSLD预训练模型+EDA策略+UDML知识蒸馏策略|
 
 从表中可以看出，在使用服务器端大模型作为 backbone 时，SwinTranformer_tiny 精度较低，Res2Net200_vd_26w_4s 精度较高，但服务器端大模型推理速度普遍较慢。将 backboone 替换为轻量级模型 MobileNetV3_small_x0_35 后，速度可以大幅提升，但是精度显著降低。在将 backbone 替换为 PPLCNet_x1_0，精度较 MobileNetV3_small_x0_35 提高约 30 个百分点，与此同时速度快 20% 以上。在此基础上，将 PPLCNet_x1_0 的预训练模型替换为 SSLD 预训练模型后，在对推理速度无影响的前提下，精度提升约 4.8 个百分点，进一步地使用 EDA 策略后，精度可以再提升 0.7 个百分点。此时，PPLCNet_x1_0 已经接近了 Res2Net200_vd_26w_4s 模型的精度，但是速度快 70+ 倍。最后，在使用 UDML 知识蒸馏后，精度可以再提升 0.5 个百分点。此时，PPLCNet_x1_0 已经超过了 Res2Net200_vd_26w_4s 模型的精度，但速度是其 70 余倍。下面详细介绍关于 PULC 安全帽模型的训练方法和推理部署方法。
@@ -379,7 +379,7 @@ safety_helmet_test_1.png:       class id(s): [1], score(s): [1.00], label_name(s
 safety_helmet_test_2.png:       class id(s): [0], score(s): [1.00], label_name(s): ['wearing_helmet']
 ```
 
-其中，`wearing_helmet` 表示该图中人（均）佩戴了安全帽，`unwearing_helmet` 表示该图中存在未佩戴安全帽的人。
+其中，`wearing_helmet` 表示该图中的人佩戴了安全帽，`unwearing_helmet` 表示该图中的人未佩戴安全帽。
 
 <a name="6.3"></a>
 
