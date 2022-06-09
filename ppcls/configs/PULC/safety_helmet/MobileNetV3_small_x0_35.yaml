@@ -40,7 +40,7 @@ Optimizer:
     warmup_epoch: 5
   regularizer:
     name: 'L2'
-    coeff: 0.00002
+    coeff: 0.00001
 
 
 # data loader for train and eval
@@ -58,7 +58,6 @@ DataLoader:
             size: 224
         - RandFlipImage:
             flip_code: 1
-        - AutoAugment:
         - NormalizeImage:
             scale: 1.0/255.0
             mean: [0.485, 0.456, 0.406]
@@ -71,7 +70,7 @@ DataLoader:
       drop_last: False
       shuffle: True
     loader:
-      num_workers: 8
+      num_workers: 4
       use_shared_memory: True
 
   Eval:
