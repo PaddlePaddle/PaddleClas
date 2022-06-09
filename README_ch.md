@@ -36,7 +36,8 @@ PP-ShiTU图像识别系统效果展示
 
 ## 特性
 
-![](https://user-images.githubusercontent.com/19523330/172841637-f9b3c36c-f7ae-4f7c-98a9-430f7a448ef7.png)
+![](https://user-images.githubusercontent.com/19523330/172844483-60391f39-f045-4e13-b5a6-ed65182f429e.png)
+支持多种图像分类、识别相关算法，在此基础上打造[PULC超轻量图像分类方案](./docs/zh_CN/PULC/PULC_train.md))和[PP-ShiTu图像识别系统](./docs/zh_CN/quick_start/quick_start_recognition.md)
 
 ## 欢迎加入技术交流群
 
@@ -49,6 +50,7 @@ PP-ShiTU图像识别系统效果展示
 
 ## 快速体验
 
+PULC超轻量图像分类方案快速体验：[点击这里](./docs/zh_CN/PULC/PULC_train.md))
 PP-ShiTu图像识别快速体验：[点击这里](./docs/zh_CN/quick_start/quick_start_recognition.md)
 
 ## 文档教程
@@ -113,6 +115,21 @@ PP-ShiTu图像识别快速体验：[点击这里](./docs/zh_CN/quick_start/quick
 - [社区贡献指南](./docs/zh_CN/advanced_tutorials/how_to_contribute.md)
 - [许可证书](#许可证书)
 - [贡献代码](#贡献代码)
+
+
+<a name="PULC超轻量图像分类方案"></a>
+## PULC超轻量图像分类方案
+<div align="center">
+<img src="https://user-images.githubusercontent.com/19523330/172848493-5cf14ec3-3285-4d26-b476-391c5653972f.png"  width = "800" />
+</div>
+PULC融合了骨干网络、数据增广、蒸馏等多种前沿算法，可以自动训练得到轻量且高精度的图像分类模型。
+PaddleClas提供了覆盖人、车、OCR场景九大常见任务的分类模型，CPU推理3ms，精度比肩SwinTransformer。
+
+<a name="分类效果展示"></a>
+## PULC产业应用图像分类模型效果展示
+<div align="center">
+<img src="docs/images/classification.gif">
+</div>
 
 <a name="图像识别系统介绍"></a>
 ## PP-ShiTu图像识别系统介绍
