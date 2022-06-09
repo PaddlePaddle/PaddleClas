@@ -51,7 +51,7 @@ PP-ShiTu图像识别系统效果展示
 
 ## 快速体验
 
-PULC超轻量图像分类方案快速体验：[点击这里](./docs/zh_CN/PULC/PULC_train.md))
+PULC超轻量图像分类方案快速体验：[点击这里](./docs/zh_CN/PULC/PULC_train.md)
 PP-ShiTu图像识别快速体验：[点击这里](./docs/zh_CN/quick_start/quick_start_recognition.md)
 
 ## 文档教程
