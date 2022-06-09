@@ -116,9 +116,9 @@ paddleclas --model_name=PPHGNet_small  --infer_imgs="docs/images/inference_deplo
 结果如下：
 ```
 >>> result
-filename: docs/images/inference_deployment/whl_demo.jpg, top-5, class_ids: [8, 7, 86, 82, 81], scores: [0.71479, 0.08682, 0.00806, 0.0023, 0.00121], label_names: ['hen', 'cock', 'partridge', 'ruffed grouse, partridge, Bonasa umbellus', 'ptarmigan']
+class_ids: [8, 7, 86, 82, 81], scores: [0.71479, 0.08682, 0.00806, 0.0023, 0.00121], label_names: ['hen', 'cock', 'partridge', 'ruffed grouse, partridge, Bonasa umbellus', 'ptarmigan'], filename: docs/images/inference_deployment/whl_demo.jpg
 Predict complete!
-```
+```  
     
 **备注**： 更换 PPHGNet 的其他 scale 的模型时，只需替换 `model_name`，如将此时的模型改为 `PPHGNet_tiny` 时，只需要将 `--model_name=PPHGNet_small` 改为 `--model_name=PPHGNet_tiny` 即可。   
 
@@ -137,8 +137,9 @@ print(next(result))
 
 ```
 >>> result
-filename: docs/images/inference_deployment/whl_demo.jpg, top-5, class_ids: [8, 7, 86, 82, 81], scores: [0.71479, 0.08682, 0.00806, 0.0023, 0.00121], label_names: ['hen', 'cock', 'partridge', 'ruffed grouse, partridge, Bonasa umbellus', 'ptarmigan']
+[{'class_ids': [8, 7, 86, 82, 81], 'scores': [0.71479, 0.08682, 0.00806, 0.0023, 0.00121], 'label_names': ['hen', 'cock', 'partridge', 'ruffed grouse, partridge, Bonasa umbellus', 'ptarmigan'], 'filename': 'docs/images/inference_deployment/whl_demo.jpg'}]
 ```
+    
     
 <a name="3"></a> 
     
