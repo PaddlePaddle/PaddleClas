@@ -6,7 +6,9 @@
 ## 目录
 
 - [1. 模型和应用场景介绍](#1)
-- [2. 模型快速体验](#2) 
+- [2. 模型快速体验](#2)
+    - [2.1 安装 paddleclas](#2.1)
+    - [2.2 预测](#2.2)
 - [3. 模型训练、评估和预测](#3)
     - [3.1 环境配置](#3.1)
     - [3.2 数据准备](#3.2)
@@ -39,33 +41,74 @@
 
 该案例提供了用户使用 PaddleClas 的超轻量图像分类方案（PULC，Practical Ultra Lightweight Classification）快速构建轻量级、高精度、可落地的有人/无人的分类模型。该模型可以广泛应用于如监控场景、人员进出管控场景、海量数据过滤场景等。
 
-下表列出了判断图片中是否有人的二分类模型的相关指标，前两行展现了使用 SwinTranformer_tiny 和 MobileNetV3_large_x1_0 作为 backbone 训练得到的模型的相关指标，第三行至第六行依次展现了替换 backbone 为 PPLCNet_x1_0、使用 SSLD 预训练模型、使用 SSLD 预训练模型 + EDA 策略、使用 SSLD 预训练模型 + EDA 策略 + SKL-UGI 知识蒸馏策略训练得到的模型的相关指标。
+下表列出了判断图片中是否有人的二分类模型的相关指标，前两行展现了使用 SwinTranformer_tiny 和 MobileNetV3_small_x0_35 作为 backbone 训练得到的模型的相关指标，第三行至第六行依次展现了替换 backbone 为 PPLCNet_x1_0、使用 SSLD 预训练模型、使用 SSLD 预训练模型 + EDA 策略、使用 SSLD 预训练模型 + EDA 策略 + SKL-UGI 知识蒸馏策略训练得到的模型的相关指标。
 
 
 | 模型 | Tpr（%） | 延时（ms） | 存储（M） | 策略 |
 |-------|-----------|----------|---------------|---------------|
-| SwinTranformer_tiny  | 95.69 | 175.52  | 107 | 使用ImageNet预训练模型 |
-| MobileNetV3_large_x1_0  | 91.97 | 4.70  | 17 | 使用ImageNet预训练模型 |
-| PPLCNet_x1_0  | 89.57 | 2.36  | 6.5 | 使用ImageNet预训练模型 |
-| PPLCNet_x1_0  | 92.10 | 2.36  | 6.5 | 使用SSLD预训练模型 |
-| PPLCNet_x1_0  | 93.43 | 2.36  | 6.5 | 使用SSLD预训练模型+EDA策略|
-| <b>PPLCNet_x1_0<b>  | <b>95.60<b> | <b>2.36<b>  | <b>6.5<b> | 使用SSLD预训练模型+EDA策略+SKL-UGI知识蒸馏策略|
+| SwinTranformer_tiny  | 95.69 | 95.30  | 107 | 使用 ImageNet 预训练模型 |
+| MobileNetV3_small_x0_35  | 68.25 | 2.85  | 1.6 | 使用 ImageNet 预训练模型 |
+| PPLCNet_x1_0  | 89.57 | 2.12  | 6.5 | 使用 ImageNet 预训练模型 |
+| PPLCNet_x1_0  | 92.10 | 2.12  | 6.5 | 使用 SSLD 预训练模型 |
+| PPLCNet_x1_0  | 93.43 | 2.12  | 6.5 | 使用 SSLD 预训练模型+EDA 策略|
+| <b>PPLCNet_x1_0<b>  | <b>95.60<b> | <b>2.12<b>  | <b>6.5<b> | 使用 SSLD 预训练模型+EDA 策略+SKL-UGI 知识蒸馏策略|
      
-从表中可以看出，backbone 为 SwinTranformer_tiny 时精度较高，但是推理速度较慢。将 backboone 替换为轻量级模型 MobileNetV3_large_x1_0 后，速度可以大幅提升，但是精度下降明显。将 backbone 替换为 PPLCNet_x1_0 时，精度较 MobileNetV3_large_x1_0 低两个多百分点，但是速度提升 2 倍左右。在此基础上，使用 SSLD 预训练模型后，在不改变推理速度的前提下，精度可以提升约 2.6 个百分点，进一步地，当融合EDA策略后，精度可以再提升 1.3 个百分点，最后，在使用 SKL-UGI 知识蒸馏后，精度可以继续提升 2.2 个百分点。此时，PPLCNet_x1_0 达到了 SwinTranformer_tiny 模型的精度，但是速度快 70+ 倍。关于 PULC 的训练方法和推理部署方法将在下面详细介绍。
+从表中可以看出，backbone 为 SwinTranformer_tiny 时精度较高，但是推理速度较慢。将 backboone 替换为轻量级模型 MobileNetV3_small_x0_35 后，速度可以大幅提升，但是会导致精度大幅下降。将 backbone 替换为速度更快的 PPLCNet_x1_0 时，精度较 MobileNetV3_small_x0_35 高 20 多个百分点，与此同时速度依旧可以快 20% 以上。在此基础上，使用 SSLD 预训练模型后，在不改变推理速度的前提下，精度可以提升约 2.6 个百分点，进一步地，当融合EDA策略后，精度可以再提升 1.3 个百分点，最后，在使用 SKL-UGI 知识蒸馏后，精度可以继续提升 2.2 个百分点。此时，PPLCNet_x1_0 达到了 SwinTranformer_tiny 模型的精度，但是速度快 40 多倍。关于 PULC 的训练方法和推理部署方法将在下面详细介绍。
     
 **备注：** 
     
-* `Tpr`指标的介绍可以参考 [3.2 小节](#3.2)的备注部分，延时是基于 Intel(R) Xeon(R) Gold 6148 CPU @ 2.40GHz 测试得到，开启MKLDNN加速策略，线程数为10。
-* 关于PPLCNet的介绍可以参考[PPLCNet介绍](../models/PP-LCNet.md)，相关论文可以查阅[PPLCNet paper](https://arxiv.org/abs/2109.15099)。
+* `Tpr`指标的介绍可以参考 [3.2 小节](#3.2)的备注部分，延时是基于 Intel(R) Xeon(R) Gold 6148 CPU @ 2.40GHz 测试得到，开启 MKLDNN 加速策略，线程数为10。
+* 关于 PPLCNet 的介绍可以参考 [PPLCNet 介绍](../models/PP-LCNet.md)，相关论文可以查阅[PPLCNet paper](https://arxiv.org/abs/2109.15099)。
 
 
 <a name="2"></a>
 
 ## 2. 模型快速体验
   
-    （pip方式，待补充）
-    
-    
+<a name="2.1"></a>   
+
+### 2.1 安装 paddleclas
+
+使用如下命令快速安装 paddlepaddle, paddleclas
+
+```    
+pip3 install paddlepaddle paddleclas
+```
+<a name="2.2"></a> 
+
+### 2.2 预测
+
+* 使用命令行快速预测
+
+```bash
+paddleclas --model_name=person_exists --infer_imgs=deploy/images/PULC/person_exists/objects365_01780782.jpg
+```
+
+结果如下：
+```
+>>> result
+class_ids: [0], scores: [0.9955421453341842], label_names: ['nobody'], filename: deploy/images/PULC/person_exists/objects365_01780782.jpg
+Predict complete!
+```
+
+**备注**： 更换其他预测的数据时，只需要改变 `--infer_imgs=xx` 中的字段即可，支持传入整个文件夹。
+
+
+* 在 Python 代码中预测
+```python
+import paddleclas
+model = paddleclas.PaddleClas(model_name="person_exists")
+result = model.predict(input_data="deploy/images/PULC/person_exists/objects365_01780782.jpg")
+print(next(result))
+```
+
+**备注**：`model.predict()` 为可迭代对象（`generator`），因此需要使用 `next()` 函数或 `for` 循环对其迭代调用。每次调用将以 `batch_size` 为单位进行一次预测，并返回预测结果, 默认 `batch_size` 为 1，如果需要更改 `batch_size`，实例化模型时，需要指定 `batch_size`，如 `model = paddleclas.PaddleClas(model_name="person_exists",  batch_size=2)`, 使用默认的代码返回结果示例如下：
+
+```
+>>> result
+[{'class_ids': [0], 'scores': [0.9955421453341842], 'label_names': ['nobody'], 'filename': 'PaddleClas/deploy/images/PULC/person_exists/objects365_01780782.jpg'}]
+```
+
 <a name="3"></a> 
 
 ## 3. 模型训练、评估和预测
@@ -145,7 +188,7 @@ cd ../
     
 **备注：** 
 
-* 关于 `train_list.txt`、`val_list.txt`的格式说明，可以参考[PaddleClas分类数据集格式说明](../data_preparation/classification_dataset.md#1-数据集格式说明) 。
+* 关于 `train_list.txt`、`val_list.txt`的格式说明，可以参考 [PaddleClas 分类数据集格式说明](../data_preparation/classification_dataset.md#1-数据集格式说明) 。
     
 * 关于如何得到蒸馏的标签文件可以参考[知识蒸馏标签获得方法](@ruoyu)。
 
@@ -182,7 +225,7 @@ python3 -m paddle.distributed.launch \
 ```bash
 python3 tools/eval.py \
     -c ./ppcls/configs/PULC/person_exists/PPLCNet_x1_0.yaml \
-    -o Global.pretrained_model="output/DPPLCNet_x1_0/best_model"
+    -o Global.pretrained_model="output/PPLCNet_x1_0/best_model"
 ```
 
 其中 `-o Global.pretrained_model="output/PPLCNet_x1_0/best_model"` 指定了当前最佳权重所在的路径，如果指定其他权重，只需替换对应的路径即可。
@@ -196,8 +239,7 @@ python3 tools/eval.py \
 ```python
 python3 tools/infer.py \
     -c ./ppcls/configs/PULC/person_exists/PPLCNet_x1_0.yaml \
-    -o Global.pretrained_model=output/DistillationModel/best_model_student \
-    -o Global.pretrained_model=Infer.PostProcess.threshold=0.9794
+    -o Global.pretrained_model=output/PPLCNet_x1_0/best_model \
 ```
 
 输出结果如下：
@@ -212,7 +254,7 @@ python3 tools/infer.py \
     
 * 默认是对 `deploy/images/PULC/person_exists/objects365_02035329.jpg` 进行预测，此处也可以通过增加字段 `-o Infer.infer_imgs=xxx` 对其他图片预测。
     
-* 这里的 `Infer.PostProcess.threshold` 的值需要根据实际场景来确定，此处的 `0.9794` 是在该场景中的 `val` 数据集在千分之一 Fpr 下得到的最佳 Tpr 所得到的。
+* 二分类默认的阈值为0.5， 如果需要指定阈值，可以重写 `Infer.PostProcess.threshold` ，如`-o Infer.PostProcess.threshold=0.9794`，该值需要根据实际场景来确定，此处的 `0.9794` 是在该场景中的 `val` 数据集在千分之一 Fpr 下得到的最佳 Tpr 所得到的。
 
 
 <a name="4"></a>
@@ -276,7 +318,7 @@ python3 -m paddle.distributed.launch \
 
 ### 6.1 推理模型准备
 
-Paddle Inference 是飞桨的原生推理库， 作用于服务器端和云端，提供高性能的推理能力。相比于直接基于预训练模型进行预测，Paddle Inference可使用MKLDNN、CUDNN、TensorRT 进行预测加速，从而实现更优的推理性能。更多关于Paddle Inference推理引擎的介绍，可以参考[Paddle Inference官网教程](https://www.paddlepaddle.org.cn/documentation/docs/zh/guides/infer/inference/inference_cn.html)。
+Paddle Inference 是飞桨的原生推理库， 作用于服务器端和云端，提供高性能的推理能力。相比于直接基于预训练模型进行预测，Paddle Inference可使用 MKLDNN、CUDNN、TensorRT 进行预测加速，从而实现更优的推理性能。更多关于 Paddle Inference 推理引擎的介绍，可以参考 [Paddle Inference官网教程](https://www.paddlepaddle.org.cn/documentation/docs/zh/guides/infer/inference/inference_cn.html)。
     
 当使用 Paddle Inference 推理时，加载的模型类型为 inference 模型。本案例提供了两种获得 inference 模型的方法，如果希望得到和文档相同的结果，请选择[直接下载 inference 模型](#6.1.2)的方式。
 
@@ -343,9 +385,9 @@ cd ../
 
 ```shell
 # 使用下面的命令使用 GPU 进行预测
-python3.7 python/predict_cls.py -c configs/PULC/person_exists/inference_person_exists.yaml -o PostProcess.ThreshOutput.threshold=0.9794
+python3.7 python/predict_cls.py -c configs/PULC/person_exists/inference_person_exists.yaml
 # 使用下面的命令使用 CPU 进行预测
-python3.7 python/predict_cls.py -c configs/PULC/person_exists/inference_person_exists.yaml -o PostProcess.ThreshOutput.threshold=0.9794 -o Global.use_gpu=False
+python3.7 python/predict_cls.py -c configs/PULC/person_exists/inference_person_exists.yaml -o Global.use_gpu=False
 ```
 
 输出结果如下。
@@ -355,7 +397,7 @@ objects365_02035329.jpg:	class id(s): [1], score(s): [1.00], label_name(s): ['so
 ```
 
 
-**备注：** 真实场景中往往需要在假正类率（Fpr）小于某一个指标下求真正类率（Tpr），该场景中的 `val` 数据集在千分之一 Fpr 下得到的最佳 Tpr 所得到的阈值为 `0.9794`，故此处的 `threshold` 为 `0.9794`。该阈值的确定方法可以参考[3.2节](#3.2)备注部分。
+**备注：** 二分类默认的阈值为0.5， 如果需要指定阈值，可以重写 `Infer.PostProcess.threshold` ，如`-o Infer.PostProcess.threshold=0.9794`，该值需要根据实际场景来确定，此处的 `0.9794` 是在该场景中的 `val` 数据集在千分之一 Fpr 下得到的最佳 Tpr 所得到的。该阈值的确定方法可以参考[3.3节](#3.3)备注部分。
 
 <a name="6.2.2"></a>  
 

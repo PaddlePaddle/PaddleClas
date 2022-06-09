@@ -70,8 +70,8 @@ DataLoader:
   Train:
     dataset:
       name: ImageNetDataset
-      image_root: ./dataset/person/
-      cls_label_path: ./dataset/person/train_list_for_distill.txt
+      image_root: ./dataset/person_exists/
+      cls_label_path: ./dataset/person_exists/train_list_for_distill.txt
       transform_ops:
         - DecodeImage:
             to_rgb: True
@@ -110,8 +110,8 @@ DataLoader:
   Eval:
     dataset: 
       name: ImageNetDataset
-      image_root: ./dataset/person/
-      cls_label_path: ./dataset/person/val_list.txt
+      image_root: ./dataset/person_exists/
+      cls_label_path: ./dataset/person_exists/val_list.txt
       transform_ops:
         - DecodeImage:
             to_rgb: True
@@ -153,7 +153,7 @@ Infer:
     - ToCHWImage:
   PostProcess:
     name: ThreshOutput
-    threshold: 0.9
+    threshold: 0.5
     label_0: nobody
     label_1: someone
 
