@@ -122,20 +122,17 @@ class ConvBNLayer(TheseusLayer):
         self.is_vd_mode = is_vd_mode
         self.act = act
         self.avg_pool = AvgPool2D(
-            kernel_size=2, stride=2, padding=0, ceil_mode=True)
+            kernel_size=2, stride=stride, padding="SAME", ceil_mode=True)
         self.conv = Conv2D(
             in_channels=num_channels,
             out_channels=num_filters,
             kernel_size=filter_size,
-            stride=stride,
+            stride=1 if is_vd_mode else stride,
             padding=(filter_size - 1) // 2,
             groups=groups,
             weight_attr=ParamAttr(learning_rate=lr_mult),
             bias_attr=False,
             data_format=data_format)
-
-        weight_attr = ParamAttr(learning_rate=lr_mult, trainable=True)
-        bias_attr = ParamAttr(learning_rate=lr_mult, trainable=True)
 
         self.bn = BatchNorm(
             num_filters,
@@ -164,7 +161,6 @@ class BottleneckBlock(TheseusLayer):
                  lr_mult=1.0,
                  data_format="NCHW"):
         super().__init__()
-
         self.conv0 = ConvBNLayer(
             num_channels=num_channels,
             num_filters=num_filters,
@@ -193,7 +189,7 @@ class BottleneckBlock(TheseusLayer):
                 num_channels=num_channels,
                 num_filters=num_filters * 4,
                 filter_size=1,
-                stride=stride if if_first else 1,
+                stride=stride,
                 is_vd_mode=False if if_first else True,
                 lr_mult=lr_mult,
                 data_format=data_format)
@@ -248,7 +244,7 @@ class BasicBlock(TheseusLayer):
                 num_channels=num_channels,
                 num_filters=num_filters,
                 filter_size=1,
-                stride=stride if if_first else 1,
+                stride=stride,
                 is_vd_mode=False if if_first else True,
                 lr_mult=lr_mult,
                 data_format=data_format)
@@ -287,6 +283,7 @@ class ResNet(TheseusLayer):
                  stem_act="relu",
                  class_num=1000,
                  lr_mult_list=[1.0, 1.0, 1.0, 1.0, 1.0],
+                 stride_list=[2, 2, 2, 2, 2],
                  data_format="NCHW",
                  input_image_channel=3,
                  return_patterns=None,
@@ -296,6 +293,7 @@ class ResNet(TheseusLayer):
 
         self.cfg = config
         self.lr_mult_list = lr_mult_list
+        self.stride_list = stride_list
         self.is_vd_mode = version == "vd"
         self.class_num = class_num
         self.num_filters = [64, 128, 256, 512]
@@ -312,11 +310,19 @@ class ResNet(TheseusLayer):
                    ) == 5, "lr_mult_list length should be 5 but got {}".format(
                        len(self.lr_mult_list))
 
+        assert isinstance(self.stride_list, (
+            list, tuple
+        )), "stride_list should be in (list, tuple) but got {}".format(
+            type(self.stride_list))
+        assert len(self.stride_list
+                   ) == 5, "stride_list length should be 5 but got {}".format(
+                       len(self.stride_list))
+
         self.stem_cfg = {
             #num_channels, num_filters, filter_size, stride
-            "vb": [[input_image_channel, 64, 7, 2]],
-            "vd":
-            [[input_image_channel, 32, 3, 2], [32, 32, 3, 1], [32, 64, 3, 1]]
+            "vb": [[input_image_channel, 64, 7, self.stride_list[0]]],
+            "vd": [[input_image_channel, 32, 3, self.stride_list[0]],
+                   [32, 32, 3, 1], [32, 64, 3, 1]]
         }
 
         self.stem = nn.Sequential(*[
@@ -332,7 +338,10 @@ class ResNet(TheseusLayer):
         ])
 
         self.max_pool = MaxPool2D(
-            kernel_size=3, stride=2, padding=1, data_format=data_format)
+            kernel_size=3,
+            stride=stride_list[1],
+            padding=1,
+            data_format=data_format)
         block_list = []
         for block_idx in range(len(self.block_depth)):
             shortcut = False
@@ -341,7 +350,8 @@ class ResNet(TheseusLayer):
                     num_channels=self.num_channels[block_idx] if i == 0 else
                     self.num_filters[block_idx] * self.channels_mult,
                     num_filters=self.num_filters[block_idx],
-                    stride=2 if i == 0 and block_idx != 0 else 1,
+                    stride=self.stride_list[block_idx + 1]
+                    if i == 0 and block_idx != 0 else 1,
                     shortcut=shortcut,
                     if_first=block_idx == i == 0 if version == "vd" else True,
                     lr_mult=self.lr_mult_list[block_idx + 1],
