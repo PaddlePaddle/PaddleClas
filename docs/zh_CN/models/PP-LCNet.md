@@ -242,10 +242,10 @@ MobileNetV3_large_x0_75 | 64.53 | 151 |
     
 ### 2.1 安装 paddleclas
     
-使用如下命令快速安装 paddleclas
+使用如下命令快速安装 paddlepaddle, paddleclas
     
 ```    
-pip3 install paddleclas
+pip3 install paddlepaddle paddleclas
 ```
 <a name="2.2"></a> 
     
@@ -260,9 +260,9 @@ paddleclas --model_name=PPLCNet_x1_0  --infer_imgs="docs/images/inference_deploy
 结果如下：
 ```
 >>> result
-filename: docs/images/inference_deployment/whl_demo.jpg, top-5, class_ids: [8, 7, 86, 81, 85], scores: [0.91347, 0.03779, 0.0036, 0.00117, 0.00112], label_names: ['hen', 'cock', 'partridge', 'ptarmigan', 'quail']
+class_ids: [8, 7, 86, 81, 85], scores: [0.91347, 0.03779, 0.0036, 0.00117, 0.00112], label_names: ['hen', 'cock', 'partridge', 'ptarmigan', 'quail'], filename: docs/images/inference_deployment/whl_demo.jpg
 Predict complete!
-```
+```   
     
 **备注**： 更换 PPLCNet 的其他 scale 的模型时，只需替换 `model_name`，如将此时的模型改为 `PPLCNet_x2_0` 时，只需要将 `--model_name=PPLCNet_x1_0` 改为 `--model_name=PPLCNet_x2_0` 即可。   
 
@@ -281,10 +281,9 @@ print(next(result))
 
 ```
 >>> result
-filename: docs/images/inference_deployment/whl_demo.jpg, top-5, class_ids: [8, 7, 86, 81, 85], scores: [0.91347, 0.03779, 0.0036, 0.00117, 0.00112], label_names: ['hen', 'cock', 'partridge', 'ptarmigan', 'quail']
+[{'class_ids': [8, 7, 86, 81, 85], 'scores': [0.91347, 0.03779, 0.0036, 0.00117, 0.00112], 'label_names': ['hen', 'cock', 'partridge', 'ptarmigan', 'quail'], 'filename': 'docs/images/inference_deployment/whl_demo.jpg'}]
 ```
-    
-    
+        
 <a name="3"></a> 
     
 ## 3. 模型训练、评估和预测
