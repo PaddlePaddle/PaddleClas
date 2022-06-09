@@ -29,7 +29,7 @@ PreProcess:
 PostProcess:
   main_indicator: ThreshOutput
   ThreshOutput:
-    threshold: 0.9
+    threshold: 0.5
     label_0: wearing_helmet
     label_1: unwearing_helmet
   SavePreLabel:

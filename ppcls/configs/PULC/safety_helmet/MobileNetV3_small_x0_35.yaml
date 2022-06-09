@@ -16,7 +16,7 @@ Global:
 
 # model architecture
 Arch:
-  name: MobileNetV3_large_x0_35
+  name: MobileNetV3_small_x0_35
   pretrained: True
   class_num: 2
  
@@ -36,7 +36,7 @@ Optimizer:
   momentum: 0.9
   lr:
     name: Cosine
-    learning_rate: 0.050
+    learning_rate: 0.015
     warmup_epoch: 5
   regularizer:
     name: 'L2'
@@ -67,7 +67,7 @@ DataLoader:
 
     sampler:
       name: DistributedBatchSampler
-      batch_size: 256
+      batch_size: 64
       drop_last: False
       shuffle: True
     loader:
@@ -120,16 +120,16 @@ Infer:
     - ToCHWImage:
   PostProcess:
     name: ThreshOutput
-    threshold: 0.9235
+    threshold: 0.5
     label_0: wearing_helmet
     label_1: unwearing_helmet
 
 Metric:
   Train:
     - TopkAcc:
-        topk: [1, 2]
+        topk: [1]
   Eval:
     - TprAtFpr:
         max_fpr: 0.0001
     - TopkAcc:
-        topk: [1, 2]
+        topk: [1]

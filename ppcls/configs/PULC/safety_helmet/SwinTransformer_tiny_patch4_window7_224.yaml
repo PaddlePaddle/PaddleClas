@@ -139,7 +139,7 @@ Infer:
     - ToCHWImage:
   PostProcess:
     name: ThreshOutput
-    threshold: 0.9235
+    threshold: 0.5
     label_0: wearing_helmet
     label_1: unwearing_helmet
 
@@ -148,4 +148,4 @@ Metric:
     - TprAtFpr:
         max_fpr: 0.0001
     - TopkAcc:
-        topk: [1, 2]
+        topk: [1]
