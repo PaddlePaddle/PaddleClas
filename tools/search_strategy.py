@@ -59,7 +59,7 @@ def search_strategy():
     configs = config.get_config(
         args.config, overrides=args.override, show=False)
     base_config_file = configs["base_config_file"]
-    distill_config_file = configs["distill_config_file"]
+    distill_config_file = configs.get("distill_config_file", None)
     model_name = config.get_config(base_config_file)["Arch"]["name"]
     gpus = configs["gpus"]
     gpus = ",".join([str(i) for i in gpus])
