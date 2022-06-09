@@ -7,7 +7,7 @@ Global:
   save_interval: 1
   eval_during_train: True
   eval_interval: 1
-  epochs: 60
+  epochs: 40
   print_batch_step: 10
   use_visualdl: False
   # used for static mode and model export
@@ -47,8 +47,8 @@ DataLoader:
   Train:
     dataset:
       name: ImageNetDataset
-      image_root: ./dataset/SafetyHelmetV3/
-      cls_label_path: ./dataset/SafetyHelmetV3/train_list.txt
+      image_root: ./dataset/safety_helmet/
+      cls_label_path: ./dataset/safety_helmet/train_list.txt
       transform_ops:
         - DecodeImage:
             to_rgb: True
@@ -78,8 +78,8 @@ DataLoader:
   Eval:
     dataset: 
       name: ImageNetDataset
-      image_root: ./dataset/SafetyHelmetV3/
-      cls_label_path: ./dataset/SafetyHelmetV3/eval_list.txt
+      image_root: ./dataset/safety_helmet/
+      cls_label_path: ./dataset/safety_helmet/val_list.txt
       transform_ops:
         - DecodeImage:
             to_rgb: True
