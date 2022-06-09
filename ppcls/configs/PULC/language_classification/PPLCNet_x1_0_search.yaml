@@ -22,7 +22,6 @@ Arch:
   pretrained: True
   use_ssld: True
   stride_list: [2, [2, 1], [2, 1], [2, 1], [2, 1]]
-  lr_mult_list : [0.0, 0.4, 0.4, 0.8, 0.8, 1.0]
  
 # loss function config for traing/eval process
 Loss:
@@ -132,7 +131,7 @@ Infer:
   PostProcess:
     name: Topk
     topk: 2
-    class_id_map_file: dataset/language_classification/label_list.txt
+    class_id_map_file: ppcls/utils/PULC/language_classification_label_list.txt
 
 Metric:
   Train:

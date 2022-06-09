@@ -13,10 +13,11 @@ Global:
   # used for static mode and model export
   image_shape: [3, 224, 224]
   save_inference_dir: ./inference
+  start_eval_epoch: 40
 
 # model architecture
 Arch:
-  name: MobileNetV3_large_x1_0
+  name: MobileNetV3_small_x0_35
   class_num: 4
   pretrained: True
  
@@ -36,11 +37,11 @@ Optimizer:
   momentum: 0.9
   lr:
     name: Cosine
-    learning_rate: 0.8
+    learning_rate: 1.5
     warmup_epoch: 5
   regularizer:
     name: 'L2'
-    coeff: 0.00002
+    coeff: 0.00001
 
 
 # data loader for train and eval
@@ -56,7 +57,8 @@ DataLoader:
             channel_first: False
         - RandCropImage:
             size: 224
-        - AutoAugment:
+        - RandFlipImage:
+            flip_code: 1
         - NormalizeImage:
             scale: 1.0/255.0
             mean: [0.485, 0.456, 0.406]
@@ -69,7 +71,7 @@ DataLoader:
       drop_last: False
       shuffle: True
     loader:
-      num_workers: 8
+      num_workers: 16
       use_shared_memory: True
 
   Eval:
@@ -96,11 +98,11 @@ DataLoader:
       drop_last: False
       shuffle: False
     loader:
-      num_workers: 8
+      num_workers: 16
       use_shared_memory: True
 
 Infer:
-  infer_imgs: deploy/images/PULC/text_image_orientation/img_rot0_demo.jpg
+  infer_imgs: ddeploy/images/PULC/text_image_orientation/img_rot0_demo.jpg
   batch_size: 10
   transforms:
     - DecodeImage:
@@ -119,7 +121,7 @@ Infer:
   PostProcess:
     name: Topk
     topk: 2
-    class_id_map_file: dataset/text_image_orientation/label_list.txt
+    class_id_map_file: ppcls/utils/PULC/text_image_orientation_label_list.txt
 
 Metric:
   Train:

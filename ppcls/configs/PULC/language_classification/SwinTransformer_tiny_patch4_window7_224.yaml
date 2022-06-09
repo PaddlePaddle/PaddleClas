@@ -152,7 +152,7 @@ Infer:
   PostProcess:
     name: Topk
     topk: 2
-    class_id_map_file: dataset/language_classification/label_list.txt
+    class_id_map_file: ppcls/utils/PULC/language_classification_label_list.txt
 
 Metric:
   Eval:

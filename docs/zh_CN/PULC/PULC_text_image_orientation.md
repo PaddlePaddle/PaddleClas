@@ -4,6 +4,9 @@
 
 - [1.  模型和应用场景介绍](#1)
 - [2.  模型快速体验](#2)
+  - [2.1 安装 paddleclas](#2.1)  
+  - [2.2 预测](#2.2)
+
 - [3.  模型训练、评估和预测](#3)
   - [3.1 环境配置](#3.1)  
   - [3.2 数据准备](#3.2)
@@ -35,15 +38,15 @@
 
 在诸如文档扫描、证照拍摄等过程中，有时为了拍摄更清晰，会将拍摄设备进行旋转，导致得到的图片也是不同方向的。此时，标准的OCR流程无法很好地应对这些数据。利用图像分类技术，可以预先判断含文字图像的方向，并将其进行方向调整，从而提高OCR处理的准确性。该案例提供了用户使用 PaddleClas 的超轻量图像分类方案（PULC，Practical Ultra Lightweight Classification）快速构建轻量级、高精度、可落地的含文字图像方向的分类模型。该模型可以广泛应用于金融、政务等行业的旋转图片的OCR处理场景中。
 
-下表列出了判断含文字图像方向分类模型的相关指标，前两行展现了使用 SwinTranformer_tiny 和 MobileNetV3_large_x1_0 作为 backbone 训练得到的模型的相关指标，第三行至第五行依次展现了替换 backbone 为 PPLCNet_x1_0、使用 SSLD 预训练模型、使用 SHAS 超参数搜索策略训练得到的模型的相关指标。
+下表列出了判断含文字图像方向分类模型的相关指标，前两行展现了使用 SwinTranformer_tiny 和 MobileNetV3_small_x0_35 作为 backbone 训练得到的模型的相关指标，第三行至第五行依次展现了替换 backbone 为 PPLCNet_x1_0、使用 SSLD 预训练模型、使用 SHAS 超参数搜索策略训练得到的模型的相关指标。
 
-| 模型                   | 精度（%） | 延时（ms） | 存储（M） | 策略                                  |
-| ---------------------- | --------- | ---------- | --------- | ------------------------------------- |
-| SwinTranformer_tiny    | 99.12     | 163.92     | 107       | 使用ImageNet预训练模型                |
-| MobileNetV3_large_x1_0 | 99.35     | 4.71       | 17        | 使用ImageNet预训练模型                |
-| PPLCNet_x1_0           | 97.85     | 2.29       | 6.5       | 使用ImageNet预训练模型                |
-| PPLCNet_x1_0           | 98.02     | 2.29       | 6.5       | 使用SSLD预训练模型                    |
-| **PPLCNet_x1_0**       | **99.06** | **2.29**   | **6.5**   | 使用SSLD预训练模型+SHAS超参数搜索策略 |
+| 模型                    | 精度（%） | 延时（ms） | 存储（M） | 策略                                  |
+| ----------------------- | --------- | ---------- | --------- | ------------------------------------- |
+| SwinTranformer_tiny     | 99.12     | 89.65      | 107       | 使用ImageNet预训练模型                |
+| MobileNetV3_small_x0_35 | 83.72     | 2.95       | 17        | 使用ImageNet预训练模型                |
+| PPLCNet_x1_0            | 97.85     | 2.16       | 6.5       | 使用ImageNet预训练模型                |
+| PPLCNet_x1_0            | 98.02     | 2.16       | 6.5       | 使用SSLD预训练模型                    |
+| **PPLCNet_x1_0**        | **99.06** | **2.16**   | **6.5**   | 使用SSLD预训练模型+SHAS超参数搜索策略 |
 
 从表中可以看出，backbone 为 SwinTranformer_tiny 时精度比较高，但是推理速度较慢。将 backboone 替换为轻量级模型 MobileNetV3_large_x1_0 后，精度和速度都有了提升，但速度还有一定的提升空间。将 backbone 替换为 PPLCNet_x1_0 时，精度较 MobileNetV3_large_x1_0 低1.5个百分点，但是速度提升 2 倍左右。在此基础上，使用 SSLD 预训练模型后，在不改变推理速度的前提下，精度可以提升 0.17 个百分点，进一步地，当使用SHAS超参数搜索策略搜索最优超参数后，精度可以再提升 1.04 个百分点。此时，PPLCNet_x1_0 与 MobileNetV3_large_x1_0 和 SwinTranformer_tiny 的精度差别不大，但是速度明显变快。关于 PULC 的训练方法和推理部署方法将在下面详细介绍。
 
@@ -53,7 +56,51 @@
 
 ## 2. 模型快速体验
 
-​    （pip方式，待补充）
+<a name="2.1"></a>
+
+### 2.1 安装 paddleclas
+
+使用如下命令快速安装 paddleclas
+
+```
+pip3 install paddleclas
+```
+
+<a name="2.2"></a>
+
+### 2.2 预测
+
+- 使用命令行快速预测
+
+```
+paddleclas --model_name=text_image_orientation --infer_imgs=deploy/images/PULC/text_image_orientation/img_rot0_demo.jpg
+```
+
+结果如下：
+
+```
+>>> result
+class_ids: [0, 2], scores: [0.85615, 0.05046], label_names: ['0', '180'], filename: deploy/images/PULC/text_image_orientation/img_rot0_demo.jpg
+Predict complete!
+```
+
+**备注**： 更换其他预测的数据时，只需要改变 `--infer_imgs=xx` 中的字段即可，支持传入整个文件夹。
+
+- 在 Python 代码中预测
+
+```
+import paddleclas
+model = paddleclas.PaddleClas(model_name="text_image_orientation")
+result = model.predict(input_data="deploy/images/PULC/text_image_orientation/img_rot0_demo.jpg")
+print(next(result))
+```
+
+**备注**：`model.predict()` 为可迭代对象（`generator`），因此需要使用 `next()` 函数或 `for` 循环对其迭代调用。每次调用将以 `batch_size` 为单位进行一次预测，并返回预测结果, 默认 `batch_size` 为 1，如果需要更改 `batch_size`，实例化模型时，需要指定 `batch_size`，如 `model = paddleclas.PaddleClas(model_name="text_image_orientation", batch_size=2)`, 使用默认的代码返回结果示例如下：
+
+```
+>>> result
+[{'class_ids': [0, 2], 'scores': [0.85615, 0.05046], 'label_names': ['0', '180'], 'filename': 'deploy/images/PULC/text_image_orientation/img_rot0_demo.jpg'}]
+```
 
 <a name="3"></a>
 
@@ -160,6 +207,8 @@ python3 -m paddle.distributed.launch \
 ```
 
 验证集的最佳指标在0.99左右。
+
+**备注**：本文档中提到的训练指标均为在大规模内部数据上的训练指标，使用demo数据训练时，由于数据集规模较小且分布与大规模内部数据不同，无法达到该指标。可以进一步扩充自己的数据并且使用本案例中介绍的优化方法进行调优，从而达到更高的精度。
 
 <a name="3.4"></a>
 
@@ -336,7 +385,7 @@ python3.7 python/predict_cls.py -c configs/PULC/text_image_orientation/inference
 输出结果如下。
 
 ```
-img_rot0_demo.jpg:	class id(s): [0, 2], score(s): [0.86, 0.05], label_name(s): ['0', '180']
+img_rot0_demo.jpg:    class id(s): [0, 2], score(s): [0.86, 0.05], label_name(s): ['0', '180']
 ```
 
 其中，输出为top2的预测结果，`0` 表示该图文本方向为0度，`90` 表示该图文本方向为顺时针90度，`180` 表示该图文本方向为顺时针180度，`270` 表示该图文本方向为顺时针270度。
@@ -355,8 +404,8 @@ python3.7 python/predict_cls.py -c configs/PULC/text_image_orientation/inference
 终端中会输出该文件夹内所有图像的分类结果，如下所示。
 
 ```
-img_rot0_demo.jpg:	class id(s): [0, 2], score(s): [0.86, 0.05], label_name(s): ['0', '180']
-img_rot180_demo.jpg:	class id(s): [2, 1], score(s): [0.88, 0.04], label_name(s): ['180', '90']
+img_rot0_demo.jpg:    class id(s): [0, 2], score(s): [0.86, 0.05], label_name(s): ['0', '180']
+img_rot180_demo.jpg:    class id(s): [2, 1], score(s): [0.88, 0.04], label_name(s): ['180', '90']
 ```
 
 <a name="6.3"></a>

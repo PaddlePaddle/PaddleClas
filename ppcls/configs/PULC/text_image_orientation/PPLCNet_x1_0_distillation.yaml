@@ -16,7 +16,6 @@ Global:
   # training model under @to_static
   to_static: False
   use_dali: False
-  use_sync_bn: True
 
 # model architecture
 Arch:
@@ -28,6 +27,7 @@ Arch:
   freeze_params_list:
   - True
   - False
+  use_sync_bn: True
   models:
     - Teacher:
         name: ResNet101_vd
@@ -152,7 +152,7 @@ Infer:
   PostProcess:
     name: Topk
     topk: 2
-    class_id_map_file: dataset/text_image_orientation/label_list.txt
+    class_id_map_file: ppcls/utils/PULC/text_image_orientation_label_list.txt
 
 Metric:
     Train:

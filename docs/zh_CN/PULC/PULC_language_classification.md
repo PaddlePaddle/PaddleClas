@@ -4,6 +4,8 @@
 
 - [1.  模型和应用场景介绍](#1)
 - [2.  模型快速体验](#2)
+  - [2.1 安装 paddleclas](#2.1)  
+  - [2.2 预测](#2.2)
 - [3.  模型训练、评估和预测](#3)
   - [3.1 环境配置](#3.1)  
   - [3.2 数据准备](#3.2)
@@ -39,12 +41,12 @@
 
 | 模型                   | 精度      | 延时     | 存储    | 策略                                           |
 | ---------------------- | --------- | -------- | ------- | ---------------------------------------------- |
-| SwinTranformer_tiny    | 98.12     | 166.64   | 107     | 使用ImageNet预训练模型                         |
+| SwinTranformer_tiny    | 98.12     | 89.09    | 107     | 使用ImageNet预训练模型                         |
 | MobileNetV3_large_x1_0 | 98.3      | 4.78     | 17      | 使用ImageNet预训练模型                         |
-| PPLCNet_x1_0           | 98.35     | 2.56     | 6.5     | 使用ImageNet预训练模型                         |
-| PPLCNet_x1_0           | 98.7      | 2.56     | 6.5     | 使用SSLD预训练模型                             |
-| PPLCNet_x1_0           | 99.12     | 2.56     | 6.5     | 使用SSLD预训练模型+EDA策略                     |
-| **PPLCNet_x1_0**       | **99.26** | **2.56** | **6.5** | 使用SSLD预训练模型+EDA策略+SKL-UGI知识蒸馏策略 |
+| PPLCNet_x1_0           | 98.35     | 2.58     | 6.5     | 使用ImageNet预训练模型                         |
+| PPLCNet_x1_0           | 98.7      | 2.58     | 6.5     | 使用SSLD预训练模型                             |
+| PPLCNet_x1_0           | 99.12     | 2.58     | 6.5     | 使用SSLD预训练模型+EDA策略                     |
+| **PPLCNet_x1_0**       | **99.26** | **2.58** | **6.5** | 使用SSLD预训练模型+EDA策略+SKL-UGI知识蒸馏策略 |
 
 从表中可以看出，backbone 为 SwinTranformer_tiny 时精度比较高，但是推理速度较慢。将 backboone 替换为轻量级模型 MobileNetV3_large_x1_0 后，精度和速度都有了提升。将 backbone 替换为 PPLCNet_x1_0 且调整预处理输入尺寸和网络的下采样stride时，精度较 MobileNetV3_large_x1_0 高0.05个百分点，同时速度提升 2 倍左右。在此基础上，使用 SSLD 预训练模型后，在不改变推理速度的前提下，精度可以提升 0.35 个百分点，进一步地，当融合EDA策略后，精度可以再提升 0.42 个百分点，最后，在使用 SKL-UGI 知识蒸馏后，精度可以继续提升 0.14 个百分点。此时，PPLCNet_x1_0 超过了 MobileNetV3_large_x1_0 和 SwinTranformer_tiny 模型的精度，并且速度有了明显提升。关于 PULC 的训练方法和推理部署方法将在下面详细介绍。
 
@@ -54,7 +56,51 @@
 
 ## 2. 模型快速体验
 
-​    （pip方式，待补充）
+<a name="2.1"></a>
+
+### 2.1 安装 paddleclas
+
+使用如下命令快速安装 paddleclas
+
+```
+pip3 install paddleclas
+```
+
+<a name="2.2"></a>
+
+### 2.2 预测
+
+- 使用命令行快速预测
+
+```
+paddleclas --model_name=language_classification --infer_imgs=deploy/images/PULC/language_classification/img_rot0_demo.jpg
+```
+
+结果如下：
+
+```
+>>> result
+class_ids: [4, 9], scores: [0.96809, 0.01001], label_names: ['japan', 'latin'], filename: deploy/images/PULC/language_classification/word_35404.png
+Predict complete!
+```
+
+**备注**： 更换其他预测的数据时，只需要改变 `--infer_imgs=xx` 中的字段即可，支持传入整个文件夹。
+
+- 在 Python 代码中预测
+
+```
+import paddleclas
+model = paddleclas.PaddleClas(model_name="language_classification")
+result = model.predict(input_data="deploy/images/PULC/language_classification/word_35404.png")
+print(next(result))
+```
+
+**备注**：`model.predict()` 为可迭代对象（`generator`），因此需要使用 `next()` 函数或 `for` 循环对其迭代调用。每次调用将以 `batch_size` 为单位进行一次预测，并返回预测结果, 默认 `batch_size` 为 1，如果需要更改 `batch_size`，实例化模型时，需要指定 `batch_size`，如 `model = paddleclas.PaddleClas(model_name="language_classification", batch_size=2)`, 使用默认的代码返回结果示例如下：
+
+```
+>>> result
+[{'class_ids': [4, 9], 'scores': [0.96809, 0.01001], 'label_names': ['japan', 'latin'], 'filename': 'deploy/images/PULC/language_classification/word_35404.png'}]
+```
 
 <a name="3"></a>
 
