@@ -6,11 +6,24 @@
 
 飞桨图像识别套件PaddleClas是飞桨为工业界和学术界所准备的一个图像识别任务的工具集，助力使用者训练出更好的视觉模型和应用落地。
 
+<div align="center">
+<img src="./docs/images/class_simple.gif"  width = "600" />
+
+PULC实用图像分类模型效果展示
+</div>
+&nbsp;
+
+
+<div align="center">
+<img src="./docs/images/recognition.gif"  width = "400" />
+
+PP-ShiTU图像识别系统效果展示
+</div>
+
+
 **近期更新**
-- 🔥️ 2022.5.26 [飞桨产业实践范例直播课](http://aglc.cn/v-c4FAR)，解读**超轻量重点区域人员出入管理方案**，欢迎报名来交流。
-  <div align="center">
-    <img src="https://user-images.githubusercontent.com/80816848/170166458-767a01ca-1429-437f-a628-dd184732ef53.png"  width = "150" />
-  </div>
+- 🔥️ 2022.6.15 发布PULC超轻量图像分类方案，CPU推理3ms，精度比肩SwinTransformer，覆盖人、车、OCR场景九大常见任务
+- 2022.5.26 [飞桨产业实践范例直播课](http://aglc.cn/v-c4FAR)，解读**超轻量重点区域人员出入管理方案**。
 - 2022.5.23 新增[人员出入管理范例库](https://aistudio.baidu.com/aistudio/projectdetail/4094475)，具体内容可以在 AI Stuio 上体验。
 - 2022.5.20 上线[PP-HGNet](./docs/zh_CN/models/PP-HGNet.md), [PP-LCNet v2](./docs/zh_CN/models/PP-LCNetV2.md)
 - 2022.4.21 新增 CVPR2022 oral论文 [MixFormer](https://arxiv.org/pdf/2204.02557.pdf) 相关[代码](https://github.com/PaddlePaddle/PaddleClas/pull/1820/files)。
@@ -23,21 +36,7 @@
 
 ## 特性
 
-- PP-ShiTu轻量图像识别系统：集成了目标检测、特征学习、图像检索等模块，广泛适用于各类图像识别任务。cpu上0.2s即可完成在10w+库的图像识别。
-
-- PP-LCNet轻量级CPU骨干网络：专门为CPU设备打造轻量级骨干网络，速度、精度均远超竞品。
-
-- 丰富的预训练模型库：提供了36个系列共175个ImageNet预训练模型，其中7个精选系列模型支持结构快速修改。
-
-- 全面易用的特征学习组件：集成arcmargin, triplet loss等12度量学习方法，通过配置文件即可随意组合切换。
-
-- SSLD知识蒸馏：14个分类预训练模型，精度普遍提升3%以上；其中ResNet50_vd模型在ImageNet-1k数据集上的Top-1精度达到了84.0%，
-Res2Net200_vd预训练模型Top-1精度高达85.1%。
-
-<div align="center">
-<img src="./docs/images/recognition.gif"  width = "400" />
-</div>
-
+![](https://user-images.githubusercontent.com/19523330/172841637-f9b3c36c-f7ae-4f7c-98a9-430f7a448ef7.png)
 
 ## 欢迎加入技术交流群
 
