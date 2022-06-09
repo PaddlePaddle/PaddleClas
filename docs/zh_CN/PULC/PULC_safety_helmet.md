@@ -36,25 +36,25 @@
 
 ## 1. 模型和应用场景介绍
 
-该案例提供了用户使用 PaddleClas 的超轻量图像分类方案（PULC，Practical Ultra Lightweight Classification）快速构建轻量级、高精度、可落地的佩戴安全帽的分类模型。该模型可以广泛应用于如建筑施工场景、工厂车间场景、交通场景等。
+该案例提供了用户使用 PaddleClas 的超轻量图像分类方案（PULC，Practical Ultra Lightweight Classification）快速构建轻量级、高精度、可落地的“是否佩戴安全帽”的二分类模型。该模型可以广泛应用于如建筑施工场景、工厂车间场景、交通场景等。
 
 下表列出了判断图片中是否佩戴安全帽的二分类模型的相关指标，展现了使用 Res2Net200_vd_26w_4s，SwinTranformer_tiny 和 MobileNetV3_large_x1_0 作为 backbone 训练得到的模型的相关指标，第三行至第六行依次展现了替换 backbone 为 PPLCNet_x1_0、使用 SSLD 预训练模型、使用 SSLD 预训练模型 + EDA 策略、使用 SSLD 预训练模型 + EDA 策略 + UDML 知识蒸馏策略训练得到的模型的相关指标。
 
 | 模型 | Tpr（%） | 延时（ms） | 存储（M） | 策略 |
 |-------|-----------|----------|---------------|---------------|
-| Res2Net200_vd_26w_4s  | 98.92 | 80.99 | 284 | 使用ImageNet预训练模型 |
 | SwinTranformer_tiny  | 93.57 | 91.32  | 107 | 使用ImageNet预训练模型 |
-| MobileNetV3_large_x0_35  | 97.47 | 4.83  | 17 | 使用ImageNet预训练模型 |
+| Res2Net200_vd_26w_4s  | 98.92 | 80.99 | 284 | 使用ImageNet预训练模型 |
+| MobileNetV3_small_x0_35  | 62.91 | 2.85 | 1.6 | 使用ImageNet预训练模型 |
 | PPLCNet_x1_0  | 93.29 | 2.03  | 6.5 | 使用ImageNet预训练模型 |
-| PPLCNet_x1_0  | 98.16 | 2.03  | 6.5 | 使用SSLD预训练模型 |
+| PPLCNet_x1_0  | 98.07 | 2.03  | 6.5 | 使用SSLD预训练模型 |
 | PPLCNet_x1_0  | 98.82 | 2.03  | 6.5 | 使用SSLD预训练模型+EDA策略|
-| <b>PPLCNet_x1_0<b>  | <b>98.71<b> | <b>2.03<b>  | <b>6.5<b> | 使用SSLD预训练模型+EDA策略+UDML知识蒸馏策略|
+| <b>PPLCNet_x1_0<b>  | <b>99.38<b> | <b>2.03<b>  | <b>6.5<b> | 使用SSLD预训练模型+EDA策略+UDML知识蒸馏策略|
 
-从表中可以看出，backbone 为 Res2Net200_vd_26w_4s 时精度较高，但是推理速度较慢。将 backboone 替换为轻量级模型 MobileNetV3_large_x1_0 后，速度可以大幅提升，但是精度下降明显。将 backbone 替换为 PPLCNet_x1_0 时，精度较 MobileNetV3_large_x1_0 低 4 个多百分点，但是速度提升了 2 倍。在此基础上，替换为 SSLD 预训练模型后，在对推理速度无影响的前提下，精度提升约 4.8 个百分点，进一步地，当融合 EDA 策略后，精度可以再提升 0.7 个百分点。此时，PPLCNet_x1_0 已经接近了 Res2Net200_vd_26w_4s 模型的精度，但是速度快 70+ 倍。最后，在使用 UDML 知识蒸馏后，精度可以继续提升 todo 个百分点。此时，PPLCNet_x1_0 已经超过了 Res2Net200_vd_26w_4s 模型的精度，但速度快 70+ 倍。关于 PULC 的训练方法和推理部署方法将在下面详细介绍。
+从表中可以看出，在使用服务器端大模型作为 backbone 时，SwinTranformer_tiny 精度较低，Res2Net200_vd_26w_4s 精度较高，但服务器端大模型推理速度普遍较慢。将 backboone 替换为轻量级模型 MobileNetV3_small_x0_35 后，速度可以大幅提升，但是精度显著降低。在将 backbone 替换为 PPLCNet_x1_0，精度较 MobileNetV3_small_x0_35 提高约 30 个百分点，与此同时速度快 20% 以上。在此基础上，将 PPLCNet_x1_0 的预训练模型替换为 SSLD 预训练模型后，在对推理速度无影响的前提下，精度提升约 4.8 个百分点，进一步地使用 EDA 策略后，精度可以再提升 0.7 个百分点。此时，PPLCNet_x1_0 已经接近了 Res2Net200_vd_26w_4s 模型的精度，但是速度快 70+ 倍。最后，在使用 UDML 知识蒸馏后，精度可以再提升 0.5 个百分点。此时，PPLCNet_x1_0 已经超过了 Res2Net200_vd_26w_4s 模型的精度，但速度是其 70 余倍。下面详细介绍关于 PULC 安全帽模型的训练方法和推理部署方法。
 
 **备注：**
 
-* `Tpr`指标的介绍可以参考 [3.2 小节](#3.2)的备注部分，延时是基于 Intel(R) Xeon(R) Gold 6148 CPU @ 2.40GHz 测试得到，开启MKLDNN加速策略，线程数为10。
+* `Tpr`指标的介绍可以参考 [3.3小节](#3.3)的备注部分，延时是基于 Intel(R) Xeon(R) Gold 6148 CPU @ 2.40GHz 测试得到，开启MKLDNN加速策略，线程数为10。
 * 关于PPLCNet的介绍可以参考[PPLCNet介绍](../models/PP-LCNet.md)，相关论文可以查阅[PPLCNet paper](https://arxiv.org/abs/2109.15099)。
 
 <a name="2"></a>
@@ -78,13 +78,13 @@ pip3 install paddlepaddle paddleclas
 * 使用命令行快速预测
 
 ```bash
-paddleclas --model_name=safety_helmet --infer_imgs=PaddleClas/deploy/images/PULC/safety_helmet/safety_helmet_test_1.png
+paddleclas --model_name=safety_helmet --infer_imgs=deploy/images/PULC/safety_helmet/safety_helmet_test_1.png
 ```
 
 结果如下：
 ```
 >>> result
-class_ids: [0], scores: [todo 0.9955421453341842], label_names: ['unwearing_helmet'], filename: PaddleClas/deploy/images/PULC/safety_helmet/safety_helmet_test_1.png
+class_ids: [1], scores: [0.9986255], label_names: ['unwearing_helmet'], filename: deploy/images/PULC/safety_helmet/safety_helmet_test_1.png
 Predict complete!
 ```
 
@@ -102,7 +102,7 @@ print(next(result))
 
 ```
 >>> result
-[{'class_ids': [0], 'scores': [todo 0.9955421453341842], 'label_names': ['unwearing_helmet'], 'filename': 'PaddleClas/deploy/images/PULC/safety_helmet/safety_helmet_test_1.png'}]
+[{'class_ids': [1], 'scores': [0.9986255], 'label_names': ['unwearing_helmet'], 'filename': 'deploy/images/PULC/safety_helmet/safety_helmet_test_1.png'}]
 ```
 
 <a name="3"></a>
@@ -191,7 +191,7 @@ python3 -m paddle.distributed.launch \
     -c ./ppcls/configs/PULC/safety_helmet/PPLCNet_x1_0.yaml
 ```
 
-验证集的最佳指标在 `todo 0.975-0.985` 之间（数据集较小，容易造成波动）。
+验证集的最佳指标在 `0.975-0.985` 之间（数据集较小，容易造成波动）。
 
 **备注：**
 
@@ -222,14 +222,13 @@ python3 tools/eval.py \
 ```python
 python3 tools/infer.py \
     -c ./ppcls/configs/PULC/safety_helmet/PPLCNet_x1_0.yaml \
-    -o Global.pretrained_model=output/PPLCNet_x1_0/best_model \
-    -o Global.pretrained_model=Infer.PostProcess.threshold=todo 0.9232
+    -o Global.pretrained_model=output/PPLCNet_x1_0/best_model
 ```
 
 输出结果如下：
 
 ```
-[{'class_ids': [0], 'scores': [ todo 0.], 'label_names': ['unwearing_helmet'], 'file_name': 'deploy/images/PULC/safety_helmet/safety_helmet_test_1.png'}]
+[{'class_ids': [1], 'scores': [0.9524797], 'label_names': ['unwearing_helmet'], 'file_name': 'deploy/images/PULC/safety_helmet/safety_helmet_test_1.png'}]
 ```
 
 **备注：**
@@ -238,7 +237,7 @@ python3 tools/infer.py \
 
 * 默认是对 `deploy/images/PULC/safety_helmet/safety_helmet_test_1.png` 进行预测，此处也可以通过增加字段 `-o Infer.infer_imgs=xxx` 对其他图片预测。
 
-* 这里的 `Infer.PostProcess.threshold` 的值需要根据实际场景来确定，此处的 `0.9232` 是在该场景中的 `val` 数据集在万分之一 Fpr 下得到的最佳 Tpr 所得到的。
+* 二分类默认的阈值为0.5， 如果需要指定阈值，可以重写 `Infer.PostProcess.threshold` ，如 `-o Infer.PostProcess.threshold=0.9167`，该值需要根据实际应用场景来确定，在 safety_helmet 数据集的 val 验证集上，在万分之一 Fpr 下得到的最佳 Tpr 时，该值为 0.9167。
 
 <a name="4"></a>
 
@@ -264,7 +263,7 @@ python3 -m paddle.distributed.launch \
     -c ./ppcls/configs/PULC/safety_helmet/PPLCNet_x1_0_distillation.yaml
 ```
 
-验证集的最佳指标为 ` todo 99.0-99.3` 之间，当前模型最好的权重保存在 `output/DistillationModel/best_model_student.pdparams`。
+验证集的最佳指标为 `0.990-0.993` 之间，当前模型最好的权重保存在 `output/DistillationModel/best_model_student.pdparams`。
 
 <a name="5"></a>
 
@@ -349,18 +348,18 @@ cd ../
 
 ```shell
 # 使用下面的命令使用 GPU 进行预测
-python3.7 python/predict_cls.py -c configs/PULC/safety_helmet/inference_safety_helmet.yaml -o PostProcess.ThreshOutput.threshold=todo 0.9032
+python3.7 python/predict_cls.py -c configs/PULC/safety_helmet/inference_safety_helmet.yaml
 # 使用下面的命令使用 CPU 进行预测
-python3.7 python/predict_cls.py -c configs/PULC/safety_helmet/inference_safety_helmet.yaml -o PostProcess.ThreshOutput.threshold=todo 0.9032 -o Global.use_gpu=False
+python3.7 python/predict_cls.py -c configs/PULC/safety_helmet/inference_safety_helmet.yaml -o Global.use_gpu=False
 ```
 
 输出结果如下。
 
 ```
-safety_helmet_test_1.png:       class id(s): [1], score(s): [1.00], label_name(s): ['unwearing']
+safety_helmet_test_1.png:       class id(s): [1], score(s): [1.00], label_name(s): ['unwearing_helmet']
 ```
 
-**备注：** 真实场景中往往需要在假正类率（Fpr）小于某一个指标下求真正类率（Tpr），该场景中的 `val` 数据集在万分之一 Fpr 下得到的最佳 Tpr 所得到的阈值为 `todo 0.9794`，故此处的 `threshold` 为 `0.9794`。该阈值的确定方法可以参考[3.2节](#3.2)备注部分。
+**备注：** 二分类默认的阈值为0.5， 如果需要指定阈值，可以重写 `Infer.PostProcess.threshold` ，如 `-o Infer.PostProcess.threshold=0.9167`，该值需要根据实际应用场景来确定，在 safety_helmet 数据集的 val 验证集上，在万分之一 Fpr 下得到的最佳 Tpr 时，该值为 0.9167。该阈值的确定方法可以参考[3.3节](#3.3)备注部分。
 
 <a name="6.2.2"></a>  
 
@@ -370,7 +369,7 @@ safety_helmet_test_1.png:       class id(s): [1], score(s): [1.00], label_name(s
 
 ```shell
 # 使用下面的命令使用 GPU 进行预测，如果希望使用 CPU 预测，可以在命令后面添加 -o Global.use_gpu=False
-python3.7 python/predict_cls.py -c configs/PULC/safety_helmet/inference_safety_helmet.yaml -o Global.infer_imgs="./images/PULC/safety_helmet/" -o PostProcess.ThreshOutput.threshold=todo 0.9032
+python3.7 python/predict_cls.py -c configs/PULC/safety_helmet/inference_safety_helmet.yaml -o Global.infer_imgs="./images/PULC/safety_helmet/"
 ```
 
 终端中会输出该文件夹内所有图像的分类结果，如下所示。
