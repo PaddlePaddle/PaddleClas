@@ -34,7 +34,7 @@ RegNet 是由 facebook 于 2020 年提出，旨在深化设计空间理念的概
 
 ### 1.2 模型指标
 
-| Models           | Top1 | Top5 | Reference<br>top1 | Reference<br>top5 | FLOPS<br>(G) | Parameters<br>(M) |
+| Models           | Top1 | Top5 | Reference<br>top1 | Reference<br>top5 | FLOPs<br>(G) | Params<br>(M) |
 |:--:|:--:|:--:|:--:|:--:|:--:|:--:|
 | ResNeSt50_fast_1s1x64d        | 0.8035 | 0.9528|  0.8035 |            -| 8.68     | 26.3   |
 | ResNeSt50        | 0.8083 | 0.9542|  0.8113 |            -| 10.78     | 27.5   |

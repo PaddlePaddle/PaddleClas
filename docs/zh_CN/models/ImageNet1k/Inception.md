@@ -50,7 +50,7 @@ InceptionV4 是 2016 年由 Google 设计的新的神经网络，当时残差结
 
 ### 1.2 模型指标
 
-| Models             | Top1   | Top5   | Reference<br>top1 | Reference<br>top5 | FLOPS<br>(G) | Parameters<br>(M) |
+| Models             | Top1   | Top5   | Reference<br>top1 | Reference<br>top5 | FLOPS<br>(G) | Params<br>(M) |
 |:--:|:--:|:--:|:--:|:--:|:--:|:--:|
 | GoogLeNet          | 0.707  | 0.897  | 0.698             |                   | 2.880        | 8.460             |
 | Xception41         | 0.793  | 0.945  | 0.790             | 0.945             | 16.740       | 22.690            |
