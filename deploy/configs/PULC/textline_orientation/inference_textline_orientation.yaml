@@ -28,6 +28,6 @@ PostProcess:
   main_indicator: Topk
   Topk:
     topk: 1
-    class_id_map_file: "../ppcls/utils/PULC/textline_orientation_label_list.txt"
+    class_id_map_file: "../ppcls/utils/PULC_label_list/textline_orientation_label_list.txt"
   SavePreLabel:
     save_dir: ./pre_label/
