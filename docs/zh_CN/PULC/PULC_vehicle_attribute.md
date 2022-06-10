@@ -137,7 +137,7 @@ result
 <img src="../../images/PULC/docs/vehicle_attribute_data_demo.png"  width = "500" />
 </div>
 
-首先从[VeRi数据集官网](https://www.v7labs.com/open-datasets/veri-dataset)中申请并下载数据，放在PaddleClas的`dataset`目录下，数据集目录名为`VeRi`，使用下面的命令进入该文件夹。
+首先从[VeRi数据集官网](https://www.v7labs.com/open-datasets/veri-dataset)中申请并下载数据，放在PaddleClas的`dataset`目录下，数据集目录名为`VeRi`，使用下面的命令进入该文件夹。
 
 ```shell
 cd PaddleClas/dataset/VeRi/
