@@ -80,7 +80,7 @@ paddleclas --model_name=language_classification --infer_imgs=deploy/images/PULC/
 
 ```
 >>> result
-class_ids: [4, 9], scores: [0.96809, 0.01001], label_names: ['japan', 'latin'], filename: deploy/images/PULC/language_classification/word_35404.png
+class_ids: [4, 6], scores: [0.88672, 0.01434], label_names: ['japan', 'korean'], filename: deploy/images/PULC/language_classification/word_35404.png
 Predict complete!
 ```
 
@@ -99,7 +99,7 @@ print(next(result))
 
 ```
 >>> result
-[{'class_ids': [4, 9], 'scores': [0.96809, 0.01001], 'label_names': ['japan', 'latin'], 'filename': 'deploy/images/PULC/language_classification/word_35404.png'}]
+[{'class_ids': [4, 6], 'scores': [0.88672, 0.01434], 'label_names': ['japan', 'korean'], 'filename': '/deploy/images/PULC/language_classification/word_35404.png'}]
 ```
 
 <a name="3"></a>
