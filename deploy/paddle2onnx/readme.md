@@ -11,7 +11,7 @@
 
 需要准备 Paddle2ONNX 模型转化环境，和 ONNX 模型预测环境。
 
-Paddle2ONNX 支持将 PaddlePaddle 模型格式转化到 ONNX 模型格式，算子目前稳定支持导出 ONNX Opset 9~11，部分Paddle算子支持更低的ONNX Opset转换。
+Paddle2ONNX 支持将 PaddlePaddle inference 模型格式转化到 ONNX 模型格式，算子目前稳定支持导出 ONNX Opset 9~11。
 更多细节可参考 [Paddle2ONNX](https://github.com/PaddlePaddle/Paddle2ONNX#paddle2onnx)
 
 - 安装 Paddle2ONNX
@@ -19,11 +19,11 @@ Paddle2ONNX 支持将 PaddlePaddle 模型格式转化到 ONNX 模型格式，算
     python3.7 -m pip install paddle2onnx
     ```
 
-- 安装 ONNX 运行时
+- 安装 ONNX 推理引擎
     ```shell
     python3.7 -m pip install onnxruntime
     ```
-下面以 ResNet50_vd 为例，介绍如何将 inference 模型转换为 ONNX 模型，并基于 ONNX 引擎预测。
+下面以 ResNet50_vd 为例，介绍如何将 PaddlePaddle inference 模型转换为 ONNX 模型，并基于 ONNX 引擎预测。
 
 ## 2. 模型转换
 
