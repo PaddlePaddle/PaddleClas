@@ -51,16 +51,16 @@ PP-ShiTu图像识别系统效果展示
 
 ## 快速体验
 
-PULC超轻量图像分类方案快速体验：[点击这里](docs/zh_CN/PULC/PULC_person_exists.md)。
+PULC超轻量图像分类方案快速体验：[点击这里](docs/zh_CN/PULC/PULC_quickstart.md)。
 
 PP-ShiTu图像识别快速体验：[点击这里](./docs/zh_CN/quick_start/quick_start_recognition.md)。
 
 ## 文档教程
 - [环境准备](docs/zh_CN/installation/install_paddleclas.md)
 - PULC超轻量图像分类实用方案 文档更新中
-  - 超轻量图像分类模型库 文档更新中
+  - [超轻量图像分类模型库](docs/zh_CN/installation/PULC_model_list.md)
     - [PULC有人/无人分类模型](docs/zh_CN/PULC/PULC_person_exists.md)
-    - PULC人体属性识别模型 文档更新中
+    - [PULC人体属性识别模型](docs/zh_CN/PULC/PULC_person_attribute.md)
     - [PULC佩戴安全帽分类模型](docs/zh_CN/PULC/PULC_safety_helmet.md)
     - [PULC交通标志分类模型](docs/zh_CN/PULC/PULC_traffic_sign.md)
     - [PULC车辆属性识别模型](docs/zh_CN/PULC/PULC_vehicle_attribute.md)
