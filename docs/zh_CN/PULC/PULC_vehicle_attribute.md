@@ -39,20 +39,20 @@
 
 该案例提供了用户使用 PaddleClas 的超轻量图像分类方案（PULC，Practical Ultra Lightweight Classification）快速构建轻量级、高精度、可落地的车辆属性识别模型。该模型可以广泛应用于车辆识别、道路监控等场景。
 
-下表列出了不同车辆属性识别模型的相关指标，前两行展现了使用 Res2Net200_vd_26w_4s 和 MobileNetV3_large_x1_0 作为 backbone 训练得到的模型的相关指标，第三行至第六行依次展现了替换 backbone 为 PPLCNet_x1_0、使用 SSLD 预训练模型、使用 SSLD 预训练模型 + EDA 策略、使用 SSLD 预训练模型 + EDA 策略 + SKL-UGI 知识蒸馏策略训练得到的模型的相关指标。
+下表列出了不同车辆属性识别模型的相关指标，前两行展现了使用 Res2Net200_vd_26w_4s 和 MobileNetV3_small_x0_35 作为 backbone 训练得到的模型的相关指标，第三行至第六行依次展现了替换 backbone 为 PPLCNet_x1_0、使用 SSLD 预训练模型、使用 SSLD 预训练模型 + EDA 策略、使用 SSLD 预训练模型 + EDA 策略 + SKL-UGI 知识蒸馏策略训练得到的模型的相关指标。
 
 
 | 模型 | ma（%） | 延时（ms） | 存储（M） | 策略 |
 |-------|-----------|----------|---------------|---------------|
 | Res2Net200_vd_26w_4s  | 91.36 | 79.46  | 293 | 使用ImageNet预训练模型 |
 | ResNet50  | 89.98 | 12.83  | 92 | 使用ImageNet预训练模型 |
-| MobileNetV3_large_x1_0  | 89.77 | 5.09  | 23 | 使用ImageNet预训练模型 |
+| MobileNetV3_small_x0_35  | 87.41 | -  | 2.8 | 使用ImageNet预训练模型 |
 | PPLCNet_x1_0  | 89.57 | 2.36  | 8.2 | 使用ImageNet预训练模型 |
 | PPLCNet_x1_0  | 90.07 | 2.36  | 8.2 | 使用SSLD预训练模型 |
 | PPLCNet_x1_0  | 90.59 | 2.36  | 8.2 | 使用SSLD预训练模型+EDA策略|
 | <b>PPLCNet_x1_0<b>  | <b>90.81<b> | <b>2.36<b>  | <b>8.2<b> | 使用SSLD预训练模型+EDA策略+SKL-UGI知识蒸馏策略|
 
-从表中可以看出，backbone 为 Res2Net200_vd_26w_4s 时精度较高，但是推理速度较慢。将 backbone 替换为轻量级模型 MobileNetV3_large_x1_0 后，速度可以大幅提升，但是精度下降明显。将 backbone 替换为 PPLCNet_x1_0 时，精度低0.2%，但是速度提升 1 倍左右。在此基础上，使用 SSLD 预训练模型后，在不改变推理速度的前提下，精度可以提升约 0.5%，进一步地，当融合EDA策略后，精度可以再提升 0.52%，最后，在使用 SKL-UGI 知识蒸馏后，精度可以继续提升 0.23%。此时，PPLCNet_x1_0 的精度与 Res2Net200_vd_26w_4s 仅相差0.55%，但是速度快32倍。关于 PULC 的训练方法和推理部署方法将在下面详细介绍。
+从表中可以看出，backbone 为 Res2Net200_vd_26w_4s 时精度较高，但是推理速度较慢。将 backbone 替换为轻量级模型 MobileNetV3_small_x0_35 后，速度可以大幅提升，但是精度下降明显。将 backbone 替换为 PPLCNet_x1_0 时，精度提升 2.16%，同时速度也提升 1 倍左右。在此基础上，使用 SSLD 预训练模型后，在不改变推理速度的前提下，精度可以提升约 0.5%，进一步地，当融合EDA策略后，精度可以再提升 0.52%，最后，在使用 SKL-UGI 知识蒸馏后，精度可以继续提升 0.23%。此时，PPLCNet_x1_0 的精度与 Res2Net200_vd_26w_4s 仅相差0.55%，但是速度快32倍。关于 PULC 的训练方法和推理部署方法将在下面详细介绍。
 
 **备注：**
 
@@ -63,8 +63,48 @@
 
 ## 2. 模型快速体验
 
+<a name="2.1"></a>  
+
+### 2.1 安装 paddleclas
+
+使用如下命令快速安装 paddlepaddle, paddleclas
+
+```bash
+pip3 install paddlepaddle paddleclas
 ```
-（pip方式，待补充）
+<a name="2.2"></a>
+
+### 2.2 预测
+
+* 使用命令行快速预测
+
+```bash
+paddleclas --model_name vehicle_attribute --infer_imgs PaddleClas/deploy/images/PULC/vehicle_attribute/0002_c002_00030670_0.jpg
+```
+
+结果如下：
+```
+>>> result
+attributes: Color: (yellow, prob: 0.9893476963043213), Type: (hatchback, prob: 0.9734097719192505), output: [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0], filename: PaddleClas/deploy/images/PULC/vehicle_attribute/0002_c002_00030670_0.jpg
+ppcls INFO: Predict complete!
+```
+
+**备注**： 更换其他预测的数据时，只需要改变 `--infer_imgs=xx` 中的字段即可，支持传入整个文件夹。
+
+
+* 在 Python 代码中预测
+```python
+import paddleclas
+model = paddleclas.PaddleClas(model_name="vehicle_attribute")
+result = model.predict(input_data="PaddleClas/deploy/images/PULC/vehicle_attribute/0002_c002_00030670_0.jpg")
+print(next(result))
+```
+
+**备注**：`model.predict()` 为可迭代对象（`generator`），因此需要使用 `next()` 函数或 `for` 循环对其迭代调用。每次调用将以 `batch_size` 为单位进行一次预测，并返回预测结果, 默认 `batch_size` 为 1，如果需要更改 `batch_size`，实例化模型时，需要指定 `batch_size`，如 `model = paddleclas.PaddleClas(model_name="person_exists",  batch_size=2)`, 使用默认的代码返回结果示例如下：
+
+```
+result
+[{'attributes': 'Color: (yellow, prob: 0.9893476963043213), Type: (hatchback, prob: 0.9734097719192505)', 'output': [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0], 'filename': 'PaddleClas/deploy/images/PULC/vehicle_attribute/0002_c002_00030670_0.jpg'}]
 ```
 
 <a name="3"></a>
@@ -94,7 +134,7 @@
 部分数据可视化如下所示。
 
 <div align="center">
-<img src="../../images/PULC/docs/vehicle_attr_data_demo.png"  width = "500" />
+<img src="../../images/PULC/docs/vehicle_attribute_data_demo.png"  width = "500" />
 </div>
 
 首先从[VeRi数据集官网](https://www.v7labs.com/open-datasets/veri-dataset)中申请并下载数据，放在PaddleClas的`dataset`目录下，数据集目录名为`VeRi`，使用下面的命令进入该文件夹。
@@ -172,17 +212,17 @@ VeRi
 ### 3.3 模型训练
 
 
-在 `ppcls/configs/PULC/vehicle_attr/PPLCNet_x1_0.yaml` 中提供了基于该场景的训练配置，可以通过如下脚本启动训练：
+在 `ppcls/configs/PULC/vehicle_attribute/PPLCNet_x1_0.yaml` 中提供了基于该场景的训练配置，可以通过如下脚本启动训练：
 
 ```shell
 export CUDA_VISIBLE_DEVICES=0,1,2,3
 python3 -m paddle.distributed.launch \
     --gpus="0,1,2,3" \
     tools/train.py \
-        -c ./ppcls/configs/PULC/vehicle_attr/PPLCNet_x1_0.yaml
+        -c ./ppcls/configs/PULC/vehicle_attribute/PPLCNet_x1_0.yaml
 ```
 
-验证集的最佳指标在 `90.07%` 左右（数据集较小，一般有0.3%左右的波动）。
+验证集的最佳指标在 `90.59%` 左右（数据集较小，一般有0.3%左右的波动）。
 
 
 <a name="3.4"></a>
@@ -193,7 +233,7 @@ python3 -m paddle.distributed.launch \
 
 ```bash
 python3 tools/eval.py \
-    -c ./ppcls/configs/PULC/vehicle_attr/PPLCNet_x1_0.yaml \
+    -c ./ppcls/configs/PULC/vehicle_attribute/PPLCNet_x1_0.yaml \
     -o Global.pretrained_model="output/PPLCNet_x1_0/best_model"
 ```
 
@@ -207,21 +247,21 @@ python3 tools/eval.py \
 
 ```bash
 python3 tools/infer.py \
-    -c ./ppcls/configs/PULC/vehicle_attr/PPLCNet_x1_0.yaml \
+    -c ./ppcls/configs/PULC/vehicle_attribute/PPLCNet_x1_0.yaml \
     -o Global.pretrained_model=output/DistillationModel/best_model
 ```
 
 输出结果如下：
 
 ```
-[{'attr': 'Color: (yellow, prob: 0.9893478155136108), Type: (hatchback, prob: 0.9734100103378296)', 'pred': [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0], 'file_name': './deploy/images/PULC/vehicle_attr/0002_c002_00030670_0.jpg'}]
+[{'attr': 'Color: (yellow, prob: 0.9893478155136108), Type: (hatchback, prob: 0.9734100103378296)', 'pred': [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0], 'file_name': './deploy/images/PULC/vehicle_attribute/0002_c002_00030670_0.jpg'}]
 ```
 
 **备注：**
 
 * 这里`-o Global.pretrained_model="output/PPLCNet_x1_0/best_model"` 指定了当前最佳权重所在的路径，如果指定其他权重，只需替换对应的路径即可。
 
-* 默认是对 `./deploy/images/PULC/vehicle_attr/0002_c002_00030670_0.jpg` 进行预测，此处也可以通过增加字段 `-o Infer.infer_imgs=xxx` 对其他图片预测。
+* 默认是对 `./deploy/images/PULC/vehicle_attribute/0002_c002_00030670_0.jpg` 进行预测，此处也可以通过增加字段 `-o Infer.infer_imgs=xxx` 对其他图片预测。
 
 <a name="4"></a>
 
@@ -237,14 +277,14 @@ SKL-UGI 知识蒸馏是 PaddleClas 提出的一种简单有效的知识蒸馏方
 
 #### 4.1.1 教师模型训练
 
-复用 `ppcls/configs/PULC/vehicle_attr/PPLCNet_x1_0.yaml` 中的超参数，训练教师模型，训练脚本如下：
+复用 `ppcls/configs/PULC/vehicle_attribute/PPLCNet_x1_0.yaml` 中的超参数，训练教师模型，训练脚本如下：
 
 ```shell
 export CUDA_VISIBLE_DEVICES=0,1,2,3
 python3 -m paddle.distributed.launch \
     --gpus="0,1,2,3" \
     tools/train.py \
-        -c ./ppcls/configs/PULC/vehicle_attr/PPLCNet_x1_0.yaml \
+        -c ./ppcls/configs/PULC/vehicle_attribute/PPLCNet_x1_0.yaml \
         -o Arch.name=ResNet101_vd
 ```
 
@@ -254,14 +294,14 @@ python3 -m paddle.distributed.launch \
 
 ####  4.1.2 蒸馏训练
 
-配置文件`ppcls/configs/PULC/vehicle_attr/PPLCNet_x1_0_distillation.yaml`提供了`SKL-UGI知识蒸馏策略`的配置。该配置将`ResNet101_vd`当作教师模型，`PPLCNet_x1_0`当作学生模型。训练脚本如下：
+配置文件`ppcls/configs/PULC/vehicle_attribute/PPLCNet_x1_0_distillation.yaml`提供了`SKL-UGI知识蒸馏策略`的配置。该配置将`ResNet101_vd`当作教师模型，`PPLCNet_x1_0`当作学生模型。训练脚本如下：
 
 ```shell
 export CUDA_VISIBLE_DEVICES=0,1,2,3
 python3 -m paddle.distributed.launch \
     --gpus="0,1,2,3" \
     tools/train.py \
-        -c ./ppcls/configs/PULC/vehicle_attr/PPLCNet_x1_0_distillation.yaml \
+        -c ./ppcls/configs/PULC/vehicle_attribute/PPLCNet_x1_0_distillation.yaml \
         -o Arch.models.0.Teacher.pretrained=output/ResNet101_vd/best_model
 ```
 
@@ -296,14 +336,14 @@ Paddle Inference 是飞桨的原生推理库， 作用于服务器端和云端�
 
 ```bash
 python3 tools/export_model.py \
-    -c ./ppcls/configs/PULC/vehicle_attr/PPLCNet_x1_0.yaml \
+    -c ./ppcls/configs/PULC/vehicle_attribute/PPLCNet_x1_0.yaml \
     -o Global.pretrained_model=output/DistillationModel/best_model_student \
-    -o Global.save_inference_dir=deploy/models/PPLCNet_x1_0_vehicle_attr_infer
+    -o Global.save_inference_dir=deploy/models/PPLCNet_x1_0_vehicle_attribute_infer
 ```
-执行完该脚本后会在 `deploy/models/` 下生成 `PPLCNet_x1_0_vehicle_attr_infer` 文件夹，`models` 文件夹下应有如下文件结构：
+执行完该脚本后会在 `deploy/models/` 下生成 `PPLCNet_x1_0_vehicle_attributeibute_infer` 文件夹，`models` 文件夹下应有如下文件结构：
 
 ```
-├── PPLCNet_x1_0_vehicle_attr_infer
+├── PPLCNet_x1_0_vehicle_attribute_infer
 │   ├── inference.pdiparams
 │   ├── inference.pdiparams.info
 │   └── inference.pdmodel
@@ -320,13 +360,13 @@ python3 tools/export_model.py \
 ```
 cd deploy/models
 # 下载 inference 模型并解压
-wget https://paddleclas.bj.bcebos.com/models/PULC/vehicle_attr_infer.tar && tar -xf vehicle_attr_infer.tar
+wget https://paddleclas.bj.bcebos.com/models/PULC/vehicle_attribute_infer.tar && tar -xf vehicle_attribute_infer.tar
 ```
 
 解压完毕后，`models` 文件夹下应有如下文件结构：
 
 ```
-├── vehicle_attr_infer
+├── vehicle_attribute_infer
 │   ├── inference.pdiparams
 │   ├── inference.pdiparams.info
 │   └── inference.pdmodel
@@ -347,13 +387,13 @@ wget https://paddleclas.bj.bcebos.com/models/PULC/vehicle_attr_infer.tar && tar 
 cd ../
 ```
 
-运行下面的命令，对图像 `./images/PULC/vehicle_attr/0002_c002_00030670_0.jpg` 进行车辆属性识别。
+运行下面的命令，对图像 `./images/PULC/vehicle_attribute/0002_c002_00030670_0.jpg` 进行车辆属性识别。
 
 ```shell
 # 使用下面的命令使用 GPU 进行预测
-python3.7 python/predict_cls.py -c configs/PULC/vehicle_attr/inference_vehicle_attr.yaml -o Global.use_gpu=True
+python3.7 python/predict_cls.py -c configs/PULC/vehicle_attribute/inference_vehicle_attribute.yaml -o Global.use_gpu=True
 # 使用下面的命令使用 CPU 进行预测
-python3.7 python/predict_cls.py -c configs/PULC/vehicle_attr/inference_vehicle_attr.yaml -o Global.use_gpu=False
+python3.7 python/predict_cls.py -c configs/PULC/vehicle_attribute/inference_vehicle_attribute.yaml -o Global.use_gpu=False
 ```
 
 输出结果如下。
@@ -371,7 +411,7 @@ predict output: [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0]
 
 ```shell
 # 使用下面的命令使用 GPU 进行预测，如果希望使用 CPU 预测，可以在命令后面添加 -o Global.use_gpu=False
-python3.7 python/predict_cls.py -c configs/PULC/vehicle_attr/inference_vehicle_attr.yaml -o Global.infer_imgs="./images/PULC/vehicle_attr/"
+python3.7 python/predict_cls.py -c configs/PULC/vehicle_attribute/inference_vehicle_attribute.yaml -o Global.infer_imgs="./images/PULC/vehicle_attribute/"
 ```
 
 终端中会输出该文件夹内所有图像的属性识别结果，如下所示。
