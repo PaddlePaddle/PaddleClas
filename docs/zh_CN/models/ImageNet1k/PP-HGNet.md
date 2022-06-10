@@ -90,7 +90,6 @@ PP-HGNet 与其他模型的比较如下，其中测试机器为 NVIDIA® Tesla®
 | SwinTransformer_base     | 85.2       | 97.5        | 13.53       |  
 | <b>PPHGNet_base_ssld<b> | <b>85.00<b>| <b>97.35<b> | <b>5.97<b>   |
 
-
 <a name="2"></a>
 
 ## 2. 模型快速体验
@@ -159,7 +158,6 @@ print(next(result))
 >>> result
 [{'class_ids': [8, 7, 86, 82, 81], 'scores': [0.71479, 0.08682, 0.00806, 0.0023, 0.00121], 'label_names': ['hen', 'cock', 'partridge', 'ruffed grouse, partridge, Bonasa umbellus', 'ptarmigan'], 'filename': 'docs/images/inference_deployment/whl_demo.jpg'}]
 ```
-
 
 <a name="3"></a>
 
@@ -351,7 +349,7 @@ python3 python/predict_cls.py -c configs/inference_cls.yaml -o Global.inference_
 输出结果如下。
 
 ```
-ILSVRC2012_val_00000010.jpeg:	class id(s): [332, 153, 283, 338, 204], score(s): [0.50, 0.05, 0.02, 0.01, 0.01], label_name(s): ['Angora, Angora rabbit', 'Maltese dog, Maltese terrier, Maltese', 'Persian cat', 'guinea pig, Cavia cobaya', 'Lhasa, Lhasa apso']
+ILSVRC2012_val_00000010.jpeg:    class id(s): [332, 153, 283, 338, 204], score(s): [0.50, 0.05, 0.02, 0.01, 0.01], label_name(s): ['Angora, Angora rabbit', 'Maltese dog, Maltese terrier, Maltese', 'Persian cat', 'guinea pig, Cavia cobaya', 'Lhasa, Lhasa apso']
 ```
 
 <a name="4.2.2"></a>  
@@ -368,12 +366,11 @@ python3 python/predict_cls.py -c configs/inference_cls.yaml -o Global.inference_
 终端中会输出该文件夹内所有图像的分类结果，如下所示。
 
 ```
-ILSVRC2012_val_00000010.jpeg:	class id(s): [332, 153, 283, 338, 204], score(s): [0.50, 0.05, 0.02, 0.01, 0.01], label_name(s): ['Angora, Angora rabbit', 'Maltese dog, Maltese terrier, Maltese', 'Persian cat', 'guinea pig, Cavia cobaya', 'Lhasa, Lhasa apso']
-ILSVRC2012_val_00010010.jpeg:	class id(s): [626, 622, 531, 487, 633], score(s): [0.68, 0.02, 0.02, 0.02, 0.02], label_name(s): ['lighter, light, igniter, ignitor', 'lens cap, lens cover', 'digital watch', 'cellular telephone, cellular phone, cellphone, cell, mobile phone', "loupe, jeweler's loupe"]
-ILSVRC2012_val_00020010.jpeg:	class id(s): [178, 211, 171, 246, 741], score(s): [0.82, 0.00, 0.00, 0.00, 0.00], label_name(s): ['Weimaraner', 'vizsla, Hungarian pointer', 'Italian greyhound', 'Great Dane', 'prayer rug, prayer mat']
-ILSVRC2012_val_00030010.jpeg:	class id(s): [80, 83, 136, 23, 93], score(s): [0.84, 0.00, 0.00, 0.00, 0.00], label_name(s): ['black grouse', 'prairie chicken, prairie grouse, prairie fowl', 'European gallinule, Porphyrio porphyrio', 'vulture', 'hornbill']
+ILSVRC2012_val_00000010.jpeg:    class id(s): [332, 153, 283, 338, 204], score(s): [0.50, 0.05, 0.02, 0.01, 0.01], label_name(s): ['Angora, Angora rabbit', 'Maltese dog, Maltese terrier, Maltese', 'Persian cat', 'guinea pig, Cavia cobaya', 'Lhasa, Lhasa apso']
+ILSVRC2012_val_00010010.jpeg:    class id(s): [626, 622, 531, 487, 633], score(s): [0.68, 0.02, 0.02, 0.02, 0.02], label_name(s): ['lighter, light, igniter, ignitor', 'lens cap, lens cover', 'digital watch', 'cellular telephone, cellular phone, cellphone, cell, mobile phone', "loupe, jeweler's loupe"]
+ILSVRC2012_val_00020010.jpeg:    class id(s): [178, 211, 171, 246, 741], score(s): [0.82, 0.00, 0.00, 0.00, 0.00], label_name(s): ['Weimaraner', 'vizsla, Hungarian pointer', 'Italian greyhound', 'Great Dane', 'prayer rug, prayer mat']
+ILSVRC2012_val_00030010.jpeg:    class id(s): [80, 83, 136, 23, 93], score(s): [0.84, 0.00, 0.00, 0.00, 0.00], label_name(s): ['black grouse', 'prairie chicken, prairie grouse, prairie fowl', 'European gallinule, Porphyrio porphyrio', 'vulture', 'hornbill']
 ```
-
 
 <a name="4.3"></a>
 
