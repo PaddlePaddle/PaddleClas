@@ -1,5 +1,5 @@
 Global:
-  infer_imgs: "./images/PULC/vehicle_attr/0002_c002_00030670_0.jpg"
+  infer_imgs: "./images/PULC/vehicle_attribute/0002_c002_00030670_0.jpg"
   inference_model_dir: "./models/vehicle_attribute_infer"
   batch_size: 1
   use_gpu: True
