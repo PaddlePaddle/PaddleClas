@@ -8,6 +8,7 @@
     - [1.2 模型指标](#1.2)
     - [1.3 Benchmark](#1.3)
       - [1.3.1 基于 V100 GPU 的预测速度](#1.3.1)
+      - [1.3.2 基于 T4 GPU 的预测速度](#1.3.2)
 - [2. 模型快速体验](#2)
 - [3. 模型训练、评估和预测](#3)
 - [4. 模型推理部署](#4)
@@ -96,7 +97,6 @@ DPN 的全称是 Dual Path Networks，即双通道网络。该网络是由 Dense
 | DPN107      | 224       | 256               | 27.84462                     | 34.83217                     | 60.67903                     | 27.62046                     | 52.65353                     | 100.11721                    |
 | DPN131      | 224       | 256               | 28.58941                     | 33.01078                     | 55.65146                     | 28.33119                     | 46.19439                     | 89.24904                     |
 
-
 <a name="2"></a>  
 
 ## 2. 模型快速体验
@@ -107,11 +107,9 @@ DPN 的全称是 Dual Path Networks，即双通道网络。该网络是由 Dense
 
 ## 3. 模型训练、评估和预测
 
-
 此部分内容包括训练环境配置、ImageNet数据的准备、SwinTransformer 在 ImageNet 上的训练、评估、预测等内容。在 `ppcls/configs/ImageNet/SwinTransformer/` 中提供了 SwinTransformer 的训练配置，可以通过如下脚本启动训练：此部分内容可以参考[ResNet50 模型训练、评估和预测](./ResNet.md#3-模型训练评估和预测)。
 
 **备注：** 由于 SwinTransformer 系列模型默认使用的 GPU 数量为 8 个，所以在训练时，需要指定8个GPU，如`python3 -m paddle.distributed.launch --gpus="0,1,2,3,4,5,6,7" tools/train.py -c xxx.yaml`, 如果使用 4 个 GPU 训练，默认学习率需要减小一半，精度可能有损。
-
 
 <a name="4"></a>
 

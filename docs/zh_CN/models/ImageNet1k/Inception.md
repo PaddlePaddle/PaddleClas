@@ -8,6 +8,7 @@
     - [1.2 模型指标](#1.2)
     - [1.3 Benchmark](#1.3)
       - [1.3.1 基于 V100 GPU 的预测速度](#1.3.1)
+      - [1.3.2 基于 T4 GPU 的预测速度](#1.3.2)
 - [2. 模型快速体验](#2)
 - [3. 模型训练、评估和预测](#3)
 - [4. 模型推理部署](#4)
@@ -92,7 +93,6 @@ InceptionV4 是 2016 年由 Google 设计的新的神经网络，当时残差结
 | InceptionV3        | 299       | 320               | 3.67502                      | 6.36071                     | 9.82645                     | 6.64054                     | 13.53630                     | 22.17355                     |
 | InceptionV4        | 299       | 320               | 9.50821                      | 13.72104                     | 20.27447                     | 12.99342                     | 25.23416                     | 43.56121                     |
 
-
 <a name="2"></a>  
 
 ## 2. 模型快速体验
@@ -103,11 +103,9 @@ InceptionV4 是 2016 年由 Google 设计的新的神经网络，当时残差结
 
 ## 3. 模型训练、评估和预测
 
-
 此部分内容包括训练环境配置、ImageNet数据的准备、SwinTransformer 在 ImageNet 上的训练、评估、预测等内容。在 `ppcls/configs/ImageNet/SwinTransformer/` 中提供了 SwinTransformer 的训练配置，可以通过如下脚本启动训练：此部分内容可以参考[ResNet50 模型训练、评估和预测](./ResNet.md#3-模型训练评估和预测)。
 
 **备注：** 由于 SwinTransformer 系列模型默认使用的 GPU 数量为 8 个，所以在训练时，需要指定8个GPU，如`python3 -m paddle.distributed.launch --gpus="0,1,2,3,4,5,6,7" tools/train.py -c xxx.yaml`, 如果使用 4 个 GPU 训练，默认学习率需要减小一半，精度可能有损。
-
 
 <a name="4"></a>
 
