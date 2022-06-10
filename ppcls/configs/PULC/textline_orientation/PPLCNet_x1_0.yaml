@@ -53,8 +53,8 @@ DataLoader:
   Train:
     dataset:
       name: ImageNetDataset
-      image_root: ./dataset/text_direction/
-      cls_label_path: ./dataset/text_direction/train_list.txt
+      image_root: ./dataset/textline_orientation/
+      cls_label_path: ./dataset/textline_orientation/train_list.txt
       transform_ops:
         - DecodeImage:
             to_rgb: True
@@ -92,8 +92,8 @@ DataLoader:
   Eval:
     dataset: 
       name: ImageNetDataset
-      image_root: ./dataset/text_direction/
-      cls_label_path: ./dataset/text_direction/val_list.txt
+      image_root: ./dataset/textline_orientation/
+      cls_label_path: ./dataset/textline_orientation/val_list.txt
       transform_ops:
         - DecodeImage:
             to_rgb: True
@@ -115,7 +115,7 @@ DataLoader:
       use_shared_memory: True
 
 Infer:
-  infer_imgs: docs/images/inference_deployment/whl_demo.jpg
+  infer_imgs: deploy/images/PULC/textline_orientation/textline_orientation_test_0_0.png
   batch_size: 10
   transforms:
     - DecodeImage:
@@ -131,8 +131,8 @@ Infer:
     - ToCHWImage:
   PostProcess:
     name: Topk
-    topk: 5
-    class_id_map_file: ppcls/utils/imagenet1k_label_list.txt
+    topk: 1
+    class_id_map_file: ppcls/utils/PULC/textline_orientation_label_list.txt
 
 Metric:
   Train:
