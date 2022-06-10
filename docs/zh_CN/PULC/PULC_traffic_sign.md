@@ -78,13 +78,13 @@ pip3 install paddlepaddle paddleclas
 * 使用命令行快速预测
 
 ```bash
-paddleclas --model_name traffic_sign  --infer_imgs PaddleClas/deploy/images/PULC/traffic_sign/100999_83928.jpg
+paddleclas --model_name traffic_sign  --infer_imgs deploy/images/PULC/traffic_sign/100999_83928.jpg
 ```
 
 结果如下：
 ```
 >>> result
-class_ids: [182, 179, 162, 128, 24], scores: [0.98623, 0.01255, 0.00022, 0.00021, 0.00012], label_names: ['pl110', 'pl100', 'pl120', 'p26', 'pm10'], filename: PaddleClas/deploy/images/PULC/traffic_sign/100999_83928.jpg
+class_ids: [182, 179, 162, 128, 24], scores: [0.98623, 0.01255, 0.00022, 0.00021, 0.00012], label_names: ['pl110', 'pl100', 'pl120', 'p26', 'pm10'], filename: deploy/images/PULC/traffic_sign/100999_83928.jpg
 ```
 
 **备注**： 更换其他预测的数据时，只需要改变 `--infer_imgs=xx` 中的字段即可，支持传入整个文件夹。
@@ -94,7 +94,7 @@ class_ids: [182, 179, 162, 128, 24], scores: [0.98623, 0.01255, 0.00022, 0.00021
 ```python
 import paddleclas
 model = paddleclas.PaddleClas(model_name="traffic_sign")
-result = model.predict(input_data="PaddleClas/deploy/images/PULC/traffic_sign/100999_83928.jpg")
+result = model.predict(input_data="deploy/images/PULC/traffic_sign/100999_83928.jpg")
 print(next(result))
 ```
 
@@ -102,7 +102,7 @@ print(next(result))
 
 ```
 result
-[{'class_ids': [182, 179, 162, 128, 24], 'scores': [0.98623, 0.01255, 0.00022, 0.00021, 0.00012], 'label_names': ['pl110', 'pl100', 'pl120', 'p26', 'pm10'], 'filename': 'PaddleClas/deploy/images/PULC/traffic_sign/100999_83928.jpg'}]
+[{'class_ids': [182, 179, 162, 128, 24], 'scores': [0.98623, 0.01255, 0.00022, 0.00021, 0.00012], 'label_names': ['pl110', 'pl100', 'pl120', 'p26', 'pm10'], 'filename': 'deploy/images/PULC/traffic_sign/100999_83928.jpg'}]
 ```
 
 <a name="3"></a>

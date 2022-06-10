@@ -1,6 +1,6 @@
 Global:
-  infer_imgs: "./images/PULC/car_exists/objects365_00001507.jpeg"
-  inference_model_dir: "./models/car_exists_infer"
+  infer_imgs: "./images/PULC/vehicle_exists/objects365_00001507.jpeg"
+  inference_model_dir: "./models/vehicle_exists_infer"
   batch_size: 1
   use_gpu: True
   enable_mkldnn: False
@@ -30,7 +30,7 @@ PostProcess:
   main_indicator: ThreshOutput
   ThreshOutput:
     threshold: 0.5
-    label_0: nocar
-    label_1: contains_car
+    label_0: no_vehicle
+    label_1: contains_vehicle
   SavePreLabel:
     save_dir: ./pre_label/

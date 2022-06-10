@@ -28,6 +28,6 @@ PostProcess:
   main_indicator: Topk
   Topk:
     topk: 2
-    class_id_map_file: "../dataset/language_classification/label_list.txt"
+    class_id_map_file: "../ppcls/utils/PULC_label_list/language_classification_label_list.txt"
   SavePreLabel:
     save_dir: ./pre_label/

@@ -178,7 +178,7 @@ IMN_MODEL_SERIES = {
 PULC_MODEL_BASE_DOWNLOAD_URL = "https://paddleclas.bj.bcebos.com/models/PULC/{}_infer.tar"
 PULC_MODELS = [
     "person_exists", "person_attribute", "safety_helmet", "traffic_sign",
-    "vehicle_exists", "vehicle_attr", "textline_orientation",
+    "vehicle_exists", "vehicle_attribute", "textline_orientation",
     "text_image_orientation", "language_classification"
 ]
 
@@ -247,8 +247,10 @@ def init_config(model_type, model_name, inference_model_dir, **kwargs):
             cfg.PostProcess.Topk.class_id_map_file = kwargs[
                 "class_id_map_file"]
         else:
-            cfg.PostProcess.Topk.class_id_map_file = os.path.relpath(
+            class_id_map_file_path = os.path.relpath(
                 cfg.PostProcess.Topk.class_id_map_file, "../")
+            cfg.PostProcess.Topk.class_id_map_file = os.path.join(
+                __dir__, class_id_map_file_path)
     if "VehicleAttribute" in cfg.PostProcess:
         if "color_threshold" in kwargs and kwargs["color_threshold"]:
             cfg.PostProcess.VehicleAttribute.color_threshold = kwargs[

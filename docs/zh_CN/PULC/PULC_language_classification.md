@@ -1,12 +1,12 @@
-# PULC语种分类模型
+# PULC 语种分类模型
 
 ## 目录
 
-- [1.  模型和应用场景介绍](#1)
-- [2.  模型快速体验](#2)
+- [1. 模型和应用场景介绍](#1)
+- [2. 模型快速体验](#2)
   - [2.1 安装 paddleclas](#2.1)  
   - [2.2 预测](#2.2)
-- [3.  模型训练、评估和预测](#3)
+- [3. 模型训练、评估和预测](#3)
   - [3.1 环境配置](#3.1)  
   - [3.2 数据准备](#3.2)
     - [3.2.1 数据集来源](#3.2.1)
@@ -73,14 +73,14 @@ pip3 install paddleclas
 - 使用命令行快速预测
 
 ```
-paddleclas --model_name=language_classification --infer_imgs=deploy/images/PULC/language_classification/img_rot0_demo.jpg
+paddleclas --model_name=language_classification --infer_imgs=deploy/images/PULC/language_classification/word_35404.png
 ```
 
 结果如下：
 
 ```
 >>> result
-class_ids: [4, 9], scores: [0.96809, 0.01001], label_names: ['japan', 'latin'], filename: deploy/images/PULC/language_classification/word_35404.png
+class_ids: [4, 6], scores: [0.88672, 0.01434], label_names: ['japan', 'korean'], filename: deploy/images/PULC/language_classification/word_35404.png
 Predict complete!
 ```
 
@@ -99,7 +99,7 @@ print(next(result))
 
 ```
 >>> result
-[{'class_ids': [4, 9], 'scores': [0.96809, 0.01001], 'label_names': ['japan', 'latin'], 'filename': 'deploy/images/PULC/language_classification/word_35404.png'}]
+[{'class_ids': [4, 6], 'scores': [0.88672, 0.01434], 'label_names': ['japan', 'korean'], 'filename': '/deploy/images/PULC/language_classification/word_35404.png'}]
 ```
 
 <a name="3"></a>
