@@ -120,7 +120,7 @@ print(next(result))
 
 #### 3.2.1 数据集来源
 
-[第1节](#1)中提供的模型使用内部数据训练得到，该数据集暂时不方便公开。这里基于 [ICDAR2019-ArT](https://ai.baidu.com/broad/introduction?dataset=art)、 [XFUND](https://github.com/doc-analysis/XFUND) 和 [ICDAR2015](https://rrc.cvc.uab.es/?ch=4&com=introduction) 两个公开数据集构造了一个小规模含文字图像方向分类数据集，用于体验本案例。
+[第1节](#1)中提供的模型使用内部数据训练得到，该数据集暂时不方便公开。这里基于 [ICDAR2019-ArT](https://ai.baidu.com/broad/introduction?dataset=art)、 [XFUND](https://github.com/doc-analysis/XFUND) 和 [ICDAR2015](https://rrc.cvc.uab.es/?ch=4&com=introduction) 三个公开数据集构造了一个小规模含文字图像方向分类数据集，用于体验本案例。
 
 ![](../../images/PULC/docs/text_image_orientation_original_data.png)
 
