@@ -39,19 +39,19 @@
 
 该案例提供了用户使用 PaddleClas 的超轻量图像分类方案（PULC，Practical Ultra Lightweight Classification）快速构建轻量级、高精度、可落地的交通标志分类模型。该模型可以广泛应用于自动驾驶、道路监控等场景。
 
-下表列出了不同交通标志分类模型的相关指标，前两行展现了使用 SwinTranformer_tiny 和 MobileNetV3_large_x1_0 作为 backbone 训练得到的模型的相关指标，第三行至第六行依次展现了替换 backbone 为 PPLCNet_x1_0、使用 SSLD 预训练模型、使用 SSLD 预训练模型 + EDA 策略、使用 SSLD 预训练模型 + EDA 策略 + SKL-UGI 知识蒸馏策略训练得到的模型的相关指标。
+下表列出了不同交通标志分类模型的相关指标，前两行展现了使用 SwinTranformer_tiny 和 MobileNetV3_small_x0_35 作为 backbone 训练得到的模型的相关指标，第三行至第六行依次展现了替换 backbone 为 PPLCNet_x1_0、使用 SSLD 预训练模型、使用 SSLD 预训练模型 + EDA 策略、使用 SSLD 预训练模型 + EDA 策略 + SKL-UGI 知识蒸馏策略训练得到的模型的相关指标。
 
 
 | 模型 | Top-1 Acc（%） | 延时（ms） | 存储（M） | 策略 |
 |-------|-----------|----------|---------------|---------------|
 | SwinTranformer_tiny  | 98.11 | 89.45  | 111 | 使用ImageNet预训练模型 |
-| MobileNetV3_large_x1_0  | 97.79 | 4.81  | 23 | 使用ImageNet预训练模型 |
+| MobileNetV3_small_x0_35  | 93.88 | 3.01  | 3.9 | 使用ImageNet预训练模型 |
 | PPLCNet_x1_0  | 97.78 | 2.10  | 8.2 | 使用ImageNet预训练模型 |
 | PPLCNet_x1_0  | 97.84 | 2.10  | 8.2 | 使用SSLD预训练模型 |
 | PPLCNet_x1_0  | 98.14 | 2.10  | 8.2 | 使用SSLD预训练模型+EDA策略|
 | <b>PPLCNet_x1_0<b>  | <b>98.35<b> | <b>2.10<b>  | <b>8.2<b> | 使用SSLD预训练模型+EDA策略+SKL-UGI知识蒸馏策略|
 
-从表中可以看出，backbone 为 SwinTranformer_tiny 时精度较高，但是推理速度较慢。将 backbone 替换为轻量级模型 MobileNetV3_large_x1_0 后，速度可以大幅提升，但是精度下降明显。将 backbone 替换为 PPLCNet_x1_0 时，精度低0.01%，但是速度提升 1 倍左右。在此基础上，使用 SSLD 预训练模型后，在不改变推理速度的前提下，精度可以提升约 0.06%，进一步地，当融合EDA策略后，精度可以再提升 0.3%，最后，在使用 SKL-UGI 知识蒸馏后，精度可以继续提升 0.21%。此时，PPLCNet_x1_0 的精度超越了SwinTranformer_tiny，速度快 41 倍。关于 PULC 的训练方法和推理部署方法将在下面详细介绍。
+从表中可以看出，backbone 为 SwinTranformer_tiny 时精度较高，但是推理速度较慢。将 backbone 替换为轻量级模型 MobileNetV3_small_x0_35 后，速度可以大幅提升，但是精度下降明显。将 backbone 替换为 PPLCNet_x1_0 时，精度低3.9%，同时速度提升 43% 左右。在此基础上，使用 SSLD 预训练模型后，在不改变推理速度的前提下，精度可以提升约 0.06%，进一步地，当融合EDA策略后，精度可以再提升 0.3%，最后，在使用 SKL-UGI 知识蒸馏后，精度可以继续提升 0.21%。此时，PPLCNet_x1_0 的精度超越了 SwinTranformer_tiny，速度快 41 倍。关于 PULC 的训练方法和推理部署方法将在下面详细介绍。
 
 **备注：**
 
@@ -62,8 +62,48 @@
 
 ## 2. 模型快速体验
 
-    （pip方式，待补充）
+<a name="2.1"></a>  
 
+### 2.1 安装 paddleclas
+
+使用如下命令快速安装 paddlepaddle, paddleclas
+
+```bash
+pip3 install paddlepaddle paddleclas
+```
+<a name="2.2"></a>
+
+### 2.2 预测
+
+* 使用命令行快速预测
+
+```bash
+paddleclas --model_name traffic_sign  --infer_imgs PaddleClas/deploy/images/PULC/traffic_sign/100999_83928.jpg
+```
+
+结果如下：
+```
+>>> result
+class_ids: [182, 179, 162, 128, 24], scores: [0.98623, 0.01255, 0.00022, 0.00021, 0.00012], label_names: ['pl110', 'pl100', 'pl120', 'p26', 'pm10'], filename: PaddleClas/deploy/images/PULC/traffic_sign/100999_83928.jpg
+```
+
+**备注**： 更换其他预测的数据时，只需要改变 `--infer_imgs=xx` 中的字段即可，支持传入整个文件夹。
+
+
+* 在 Python 代码中预测
+```python
+import paddleclas
+model = paddleclas.PaddleClas(model_name="traffic_sign")
+result = model.predict(input_data="PaddleClas/deploy/images/PULC/traffic_sign/100999_83928.jpg")
+print(next(result))
+```
+
+**备注**：`model.predict()` 为可迭代对象（`generator`），因此需要使用 `next()` 函数或 `for` 循环对其迭代调用。每次调用将以 `batch_size` 为单位进行一次预测，并返回预测结果, 默认 `batch_size` 为 1，如果需要更改 `batch_size`，实例化模型时，需要指定 `batch_size`，如 `model = paddleclas.PaddleClas(model_name="person_exists",  batch_size=2)`, 使用默认的代码返回结果示例如下：
+
+```
+result
+[{'class_ids': [182, 179, 162, 128, 24], 'scores': [0.98623, 0.01255, 0.00022, 0.00021, 0.00012], 'label_names': ['pl110', 'pl100', 'pl120', 'p26', 'pm10'], 'filename': 'PaddleClas/deploy/images/PULC/traffic_sign/100999_83928.jpg'}]
+```
 
 <a name="3"></a>
 
