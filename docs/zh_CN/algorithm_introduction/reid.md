@@ -1,4 +1,5 @@
-简体中文|[English](../../en/algorithm_introduction/reid.md)
+简体中文 | [English](../../en/algorithm_introduction/reid.md)
+
 # ReID行人重识别
 
 ## 目录
@@ -25,7 +26,7 @@
 
 ### 1. 算法/应用场景简介
 
-行人重识别（Person re-identification）也称行人再识别，是利用[计算机视觉](https://baike.baidu.com/item/计算机视觉/2803351)技术判断[图像](https://baike.baidu.com/item/图像/773234)或者视频序列中是否存在特定行人的[技术](https://baike.baidu.com/item/技术/13014499)。广泛被认为是一个[图像检索](https://baike.baidu.com/item/图像检索/1150910)的子问题。给定一个监控行人图像，检索跨设备下的该行人图像。旨在弥补固定的摄像头的视觉局限，并可与[行人检测](https://baike.baidu.com/item/行人检测/20590256)/行人跟踪技术相结合，可广泛应用于[智能视频监控](https://baike.baidu.com/item/智能视频监控/10717227)、智能安保等领域。
+行人重识别（Person re-identification）也称行人再识别，是利用[计算机视觉](https://baike.baidu.com/item/计算机视觉/2803351)技术判断[图像](https://baike.baidu.com/item/图像/773234)或者视频序列中是否存在特定行人的技术。广泛被认为是一个[图像检索](https://baike.baidu.com/item/图像检索/1150910)的子问题。给定一个监控行人图像，检索跨设备下的该行人图像。旨在弥补固定的摄像头的视觉局限，并可与[行人检测](https://baike.baidu.com/item/行人检测/20590256)/行人跟踪技术相结合，可广泛应用于[智能视频监控](https://baike.baidu.com/item/智能视频监控/10717227)、智能安保等领域。
 
 常见的行人重识别方法通过特征提取模块来提取输入图片的局部/全局、单粒度/多粒度特征，再经过融合模块得到一个高维的特征向量。在训练时使用分类头将该特征向量转换成属于每个类别的概率从而以分类任务的方式来优化特征提取模型；在测试或推理时直接将高维的特征向量作为图片描述向量在检索向量库中进行检索，以得到检索结果。而ReID strong-baseline算法则是提出了多个有效优化训练与检索的方法来提升整体模型性能。
 <img src="../../images/reid/reid_overview.jpg" align="middle">
@@ -36,7 +37,7 @@
 
 论文出处：[Bag of Tricks and A Strong Baseline for Deep Person Re-identification](https://openaccess.thecvf.com/content_CVPRW_2019/papers/TRMTMCT/Luo_Bag_of_Tricks_and_a_Strong_Baseline_for_Deep_Person_CVPRW_2019_paper.pdf)
 
-<img src="../../images/reid/strong-baseline.jpg" width="50%">
+<img src="../../images/reid/strong-baseline.jpg" width="80%">
 
 ##### 2.1.1 原理介绍
 
@@ -95,11 +96,11 @@
 
 2. 查看训练日志和保存的模型参数文件
 
-    训练过程中会在屏幕上实时打印loss等指标信息，同时会保存日志文件`train.log`、模型参数文件`*.pdparams`、优化器参数文件`*.pdopt`等内容到`Global.output_dir`指定的文件夹下，默认在`PaddleClas/output/RecModel/`文件夹下
+    训练过程中会在屏幕上实时打印loss等指标信息，同时会保存日志文件`train.log`、模型参数文件`*.pdparams`、优化器参数文件`*.pdopt`等内容到`Global.output_dir`指定的文件夹下，默认在`PaddleClas/output/RecModel/`文件夹下。
 
 ##### 2.1.5 模型评估
 
-准备用于评估的`*.pdparams`模型参数文件，可以使用训练好的模型，也可以使用[2.2 模型训练](#22-模型训练)中保存的模型。
+准备用于评估的`*.pdparams`模型参数文件，可以使用训练好的模型，也可以使用[2.1.4 模型训练](#214-模型训练)中保存的模型。
 
 - 以训练过程中保存的`latest.pdparams`为例，执行如下命令即可进行评估。
 
@@ -167,7 +168,7 @@
 
 ###### 2.1.6.2 基于 Python 预测引擎推理
 
-  1. 修改 `PaddleClas/deploy/configs/inference_rec.yaml`。将 `infer_imgs:` 后的字段改为 Market1501 中 query 文件夹下的任意一张图片路径（下方代码使用的是`0294_c1s1_066631_00.jpg`图片路径）；将 `rec_inference_model_dir:` 后的字段改为解压出来的 reid_srong_baseline_softmax_with_center 文件夹路径；将 `transform_ops` 字段下的预处理配置改为 `softmax_triplet_with_center.yaml` 中`Eval.Query.dataset` 下的预处理配置。如下所示
+  1. 修改 `PaddleClas/deploy/configs/inference_rec.yaml`。将 `infer_imgs:` 后的字段改为 Market1501 中 query 文件夹下的任意一张图片路径（下方配置使用的是`0294_c1s1_066631_00.jpg`图片的路径）；将 `rec_inference_model_dir:` 后的字段改为解压出来的 reid_srong_baseline_softmax_with_center 文件夹路径；将 `transform_ops` 字段下的预处理配置改为 `softmax_triplet_with_center.yaml` 中`Eval.Query.dataset` 下的预处理配置。如下所示
 
       ```yaml
       Global:
@@ -214,8 +215,7 @@
        ```
         推理时的输出向量储存在[predict_rec.py](../../../deploy/python/predict_rec.py#L134-L135)的`result_dict`变量中。
 
-  4. 批量预测
-    将配置文件中`infer_imgs:`后的路径改为为文件夹即可，如`../dataset/market1501/Market-1501-v15.09.15/query`，则会预测并输出出query下所有图片的特征向量。
+  4. 批量预测，将配置文件中`infer_imgs:`后的路径改为为文件夹即可，如`../dataset/market1501/Market-1501-v15.09.15/query`，则会预测并输出出query下所有图片的特征向量。
 
 ###### 2.1.6.3 基于 C++ 预测引擎推理
 
