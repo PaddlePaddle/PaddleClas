@@ -1,4 +1,4 @@
-# PULC 交通标志分类模型
+# PULC 车辆属性识别模型
 
 ------
 
@@ -37,21 +37,22 @@
 
 ## 1. 模型和应用场景介绍
 
-该案例提供了用户使用 PaddleClas 的超轻量图像分类方案（PULC，Practical Ultra Lightweight Classification）快速构建轻量级、高精度、可落地的交通标志分类模型。该模型可以广泛应用于自动驾驶、道路监控等场景。
+该案例提供了用户使用 PaddleClas 的超轻量图像分类方案（PULC，Practical Ultra Lightweight Classification）快速构建轻量级、高精度、可落地的车辆属性识别模型。该模型可以广泛应用于车辆识别、道路监控等场景。
 
-下表列出了不同交通标志分类模型的相关指标，前两行展现了使用 SwinTranformer_tiny 和 MobileNetV3_small_x0_35 作为 backbone 训练得到的模型的相关指标，第三行至第六行依次展现了替换 backbone 为 PPLCNet_x1_0、使用 SSLD 预训练模型、使用 SSLD 预训练模型 + EDA 策略、使用 SSLD 预训练模型 + EDA 策略 + SKL-UGI 知识蒸馏策略训练得到的模型的相关指标。
+下表列出了不同车辆属性识别模型的相关指标，前两行展现了使用 Res2Net200_vd_26w_4s 和 MobileNetV3_small_x0_35 作为 backbone 训练得到的模型的相关指标，第三行至第六行依次展现了替换 backbone 为 PPLCNet_x1_0、使用 SSLD 预训练模型、使用 SSLD 预训练模型 + EDA 策略、使用 SSLD 预训练模型 + EDA 策略 + SKL-UGI 知识蒸馏策略训练得到的模型的相关指标。
 
 
-| 模型 | Top-1 Acc（%） | 延时（ms） | 存储（M） | 策略 |
+| 模型 | ma（%） | 延时（ms） | 存储（M） | 策略 |
 |-------|-----------|----------|---------------|---------------|
-| SwinTranformer_tiny  | 98.11 | 89.45  | 111 | 使用ImageNet预训练模型 |
-| MobileNetV3_small_x0_35  | 93.88 | 3.01  | 3.9 | 使用ImageNet预训练模型 |
-| PPLCNet_x1_0  | 97.78 | 2.10  | 8.2 | 使用ImageNet预训练模型 |
-| PPLCNet_x1_0  | 97.84 | 2.10  | 8.2 | 使用SSLD预训练模型 |
-| PPLCNet_x1_0  | 98.14 | 2.10  | 8.2 | 使用SSLD预训练模型+EDA策略|
-| <b>PPLCNet_x1_0<b>  | <b>98.35<b> | <b>2.10<b>  | <b>8.2<b> | 使用SSLD预训练模型+EDA策略+SKL-UGI知识蒸馏策略|
+| Res2Net200_vd_26w_4s  | 91.36 | 79.46  | 293 | 使用ImageNet预训练模型 |
+| ResNet50  | 89.98 | 12.83  | 92 | 使用ImageNet预训练模型 |
+| MobileNetV3_small_x0_35  | 87.41 | 2.91  | 2.8 | 使用ImageNet预训练模型 |
+| PPLCNet_x1_0  | 89.57 | 2.36  | 8.2 | 使用ImageNet预训练模型 |
+| PPLCNet_x1_0  | 90.07 | 2.36  | 8.2 | 使用SSLD预训练模型 |
+| PPLCNet_x1_0  | 90.59 | 2.36  | 8.2 | 使用SSLD预训练模型+EDA策略|
+| <b>PPLCNet_x1_0<b>  | <b>90.81<b> | <b>2.36<b>  | <b>8.2<b> | 使用SSLD预训练模型+EDA策略+SKL-UGI知识蒸馏策略|
 
-从表中可以看出，backbone 为 SwinTranformer_tiny 时精度较高，但是推理速度较慢。将 backbone 替换为轻量级模型 MobileNetV3_small_x0_35 后，速度可以大幅提升，但是精度下降明显。将 backbone 替换为 PPLCNet_x1_0 时，精度低3.9%，同时速度提升 43% 左右。在此基础上，使用 SSLD 预训练模型后，在不改变推理速度的前提下，精度可以提升约 0.06%，进一步地，当融合EDA策略后，精度可以再提升 0.3%，最后，在使用 SKL-UGI 知识蒸馏后，精度可以继续提升 0.21%。此时，PPLCNet_x1_0 的精度超越了 SwinTranformer_tiny，速度快 41 倍。关于 PULC 的训练方法和推理部署方法将在下面详细介绍。
+从表中可以看出，backbone 为 Res2Net200_vd_26w_4s 时精度较高，但是推理速度较慢。将 backbone 替换为轻量级模型 MobileNetV3_small_x0_35 后，速度可以大幅提升，但是精度下降明显。将 backbone 替换为 PPLCNet_x1_0 时，精度提升 2.16%，同时速度也提升 23% 左右。在此基础上，使用 SSLD 预训练模型后，在不改变推理速度的前提下，精度可以提升约 0.5%，进一步地，当融合EDA策略后，精度可以再提升 0.52%，最后，在使用 SKL-UGI 知识蒸馏后，精度可以继续提升 0.23%。此时，PPLCNet_x1_0 的精度与 Res2Net200_vd_26w_4s 仅相差0.55%，但是速度快32倍。关于 PULC 的训练方法和推理部署方法将在下面详细介绍。
 
 **备注：**
 
@@ -78,13 +79,14 @@ pip3 install paddlepaddle paddleclas
 * 使用命令行快速预测
 
 ```bash
-paddleclas --model_name traffic_sign  --infer_imgs PaddleClas/deploy/images/PULC/traffic_sign/100999_83928.jpg
+paddleclas --model_name vehicle_attribute --infer_imgs PaddleClas/deploy/images/PULC/vehicle_attribute/0002_c002_00030670_0.jpg
 ```
 
 结果如下：
 ```
 >>> result
-class_ids: [182, 179, 162, 128, 24], scores: [0.98623, 0.01255, 0.00022, 0.00021, 0.00012], label_names: ['pl110', 'pl100', 'pl120', 'p26', 'pm10'], filename: PaddleClas/deploy/images/PULC/traffic_sign/100999_83928.jpg
+attributes: Color: (yellow, prob: 0.9893476963043213), Type: (hatchback, prob: 0.9734097719192505), output: [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0], filename: PaddleClas/deploy/images/PULC/vehicle_attribute/0002_c002_00030670_0.jpg
+ppcls INFO: Predict complete!
 ```
 
 **备注**： 更换其他预测的数据时，只需要改变 `--infer_imgs=xx` 中的字段即可，支持传入整个文件夹。
@@ -93,8 +95,8 @@ class_ids: [182, 179, 162, 128, 24], scores: [0.98623, 0.01255, 0.00022, 0.00021
 * 在 Python 代码中预测
 ```python
 import paddleclas
-model = paddleclas.PaddleClas(model_name="traffic_sign")
-result = model.predict(input_data="PaddleClas/deploy/images/PULC/traffic_sign/100999_83928.jpg")
+model = paddleclas.PaddleClas(model_name="vehicle_attribute")
+result = model.predict(input_data="PaddleClas/deploy/images/PULC/vehicle_attribute/0002_c002_00030670_0.jpg")
 print(next(result))
 ```
 
@@ -102,7 +104,7 @@ print(next(result))
 
 ```
 result
-[{'class_ids': [182, 179, 162, 128, 24], 'scores': [0.98623, 0.01255, 0.00022, 0.00021, 0.00012], 'label_names': ['pl110', 'pl100', 'pl120', 'p26', 'pm10'], 'filename': 'PaddleClas/deploy/images/PULC/traffic_sign/100999_83928.jpg'}]
+[{'attributes': 'Color: (yellow, prob: 0.9893476963043213), Type: (hatchback, prob: 0.9734097719192505)', 'output': [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0], 'filename': 'PaddleClas/deploy/images/PULC/vehicle_attribute/0002_c002_00030670_0.jpg'}]
 ```
 
 <a name="3"></a>
@@ -123,95 +125,86 @@ result
 
 #### 3.2.1 数据集来源
 
-本案例中所使用的数据为[Tsinghua-Tencent 100K dataset (CC-BY-NC license)](https://cg.cs.tsinghua.edu.cn/traffic-sign/)，在使用的过程中，对交通标志检测框进行随机扩充与裁剪，从而得到用于训练与测试的图像，下面简称该数据集为`TT100K`数据集。
+本案例中所使用的数据为[VeRi 数据集](https://www.v7labs.com/open-datasets/veri-dataset)。
 
 <a name="3.2.2"></a>  
 
 #### 3.2.2 数据集获取
 
-在TT00K数据集上，对交通标志检测框进行随机扩充与裁剪，从而得到用于训练与测试的图像。随机扩充检测框的逻辑如下所示。
-
-```python
-def get_random_crop_box(xmin, ymin, xmax, ymax, img_height, img_width, ratio=1.0):
-    h = ymax - ymin
-    w = ymax - ymin
-
-    xmin_diff = random.random() * ratio * min(w, xmin/ratio)
-    ymin_diff = random.random() * ratio * min(h, ymin/ratio)
-    xmax_diff = random.random() * ratio * min(w, (img_width-xmin-1)/ratio)
-    ymax_diff = random.random() * ratio * min(h, (img_height-ymin-1)/ratio)
-
-    new_xmin = round(xmin - xmin_diff)
-    new_ymin = round(ymin - ymin_diff)
-    new_xmax = round(xmax + xmax_diff)
-    new_ymax = round(ymax + ymax_diff)
-
-    return new_xmin, new_ymin, new_xmax, new_ymax
-```
-
-完整的预处理逻辑，可以参考下载好的数据集文件夹中的`deal.py`文件。
-
-
-处理后的数据集部分数据可视化如下。
+部分数据可视化如下所示。
 
 <div align="center">
-<img src="../../images/PULC/docs/traffic_sign_data_demo.png"  width = "500" />
+<img src="../../images/PULC/docs/vehicle_attribute_data_demo.png"  width = "500" />
 </div>
 
-
-此处提供了经过上述方法处理好的数据，可以直接下载得到。
-
-进入 PaddleClas 目录。
-
-```
-cd path_to_PaddleClas
-```
-
-进入 `dataset/` 目录，下载并解压交通标志分类场景的数据。
+首先从[VeRi数据集官网](https://www.v7labs.com/open-datasets/veri-dataset)中申请并下载数据，放在PaddleClas的`dataset`目录下，数据集目录名为`VeRi`，使用下面的命令进入该文件夹。
 
 ```shell
-cd dataset
-wget https://paddleclas.bj.bcebos.com/data/PULC/traffic_sign.tar
-tar -xf traffic_sign.tar
-cd ../
+cd PaddleClas/dataset/VeRi/
 ```
 
-执行上述命令后，`dataset/`下存在`traffic_sign`目录，该目录中具有以下数据：
+然后使用下面的代码转换label（可以在python终端中执行下面的命令，也可以将其写入一个文件，然后使用`python3 convert.py`的方式运行该文件）。
+
+
+```python
+import os
+from xml.dom.minidom import parse
+
+vehicleids = []
+
+def convert_annotation(input_fp, output_fp):
+    in_file = open(input_fp)
+    list_file = open(output_fp, 'w')
+    tree = parse(in_file)
+
+    root = tree.documentElement
+
+    for item in root.getElementsByTagName("Item"):  
+        label = ['0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0']
+        if item.hasAttribute("imageName"):
+            name = item.getAttribute("imageName")
+        if item.hasAttribute("vehicleID"):
+            vehicleid = item.getAttribute("vehicleID")
+            if vehicleid not in vehicleids :
+                vehicleids.append(vehicleid)
+            vid = vehicleids.index(vehicleid)
+        if item.hasAttribute("colorID"):
+            colorid = int (item.getAttribute("colorID"))
+            label[colorid-1] = '1'
+        if item.hasAttribute("typeID"):
+            typeid = int (item.getAttribute("typeID"))
+            label[typeid+9] = '1'
+        label = ','.join(label)
+        list_file.write(os.path.join('image_train', name)  + "\t" + label + "\n")
+
+    list_file.close()
+
+convert_annotation('train_label.xml', 'train_list.txt')  #imagename vehiclenum colorid typeid
+convert_annotation('test_label.xml', 'test_list.txt')
+```
+
+执行上述命令后，`VeRi`目录中具有以下数据：
 
 ```
-traffic_sign
-├── train
-│   ├── 0_62627.jpg
-│   ├── 100000_89031.jpg
-│   ├── 100001_89031.jpg
+VeRi
+├── image_train
+│   ├── 0001_c001_00016450_0.jpg
+│   ├── 0001_c001_00016460_0.jpg
+│   ├── 0001_c001_00016470_0.jpg
 ...
-├── test
-│   ├── 100423_2315.jpg
-│   ├── 100424_2315.jpg
-│   ├── 100425_2315.jpg
+├── image_test
+│   ├── 0002_c002_00030600_0.jpg
+│   ├── 0002_c002_00030605_1.jpg
+│   ├── 0002_c002_00030615_1.jpg
 ...
-├── other
-│   ├── 100603_3422.jpg
-│   ├── 100604_3422.jpg
 ...
-├── label_list_train.txt
-├── label_list_test.txt
-├── label_list_other.txt
-├── label_list_train_for_distillation.txt
-├── label_list_train.txt.debug
-├── label_list_test.txt.debug
-├── label_name_id.txt
-├── deal.py
+├── train_list.txt
+├── test_list.txt
+├── train_label.xml
+├── test_label.xml
 ```
 
-其中`train/`和`test/`分别为训练集和验证集。`label_list_train.txt`和`label_list_test.txt`分别为训练集和验证集的标签文件，`label_list_train.txt.debug`和`label_list_test.txt.debug`分别为训练集和验证集的`debug`标签文件，其分别是`label_list_train.txt`和`label_list_test.txt`的子集，用该文件可以快速体验本案例的流程。`train`与`other`的混合数据用于本案例的`SKL-UGI知识蒸馏策略`，对应的训练标签文件为`label_list_train_for_distillation.txt`。
-
-
-**备注：**
-
-* 关于 `label_list_train.txt`、`label_list_test.txt`的格式说明，可以参考[PaddleClas分类数据集格式说明](../data_preparation/classification_dataset.md#1-数据集格式说明) 。
-
-* 关于如何得到蒸馏的标签文件可以参考[知识蒸馏标签获得方法](@ruoyu)。
+其中`train/`和`test/`分别为训练集和验证集。`train_list.txt`和`test_list.txt`分别为训练集和验证集的转换后用于训练的标签文件。
 
 
 <a name="3.3"></a>
@@ -219,17 +212,17 @@ traffic_sign
 ### 3.3 模型训练
 
 
-在 `ppcls/configs/PULC/traffic_sign/PPLCNet_x1_0.yaml` 中提供了基于该场景的训练配置，可以通过如下脚本启动训练：
+在 `ppcls/configs/PULC/vehicle_attribute/PPLCNet_x1_0.yaml` 中提供了基于该场景的训练配置，可以通过如下脚本启动训练：
 
 ```shell
 export CUDA_VISIBLE_DEVICES=0,1,2,3
 python3 -m paddle.distributed.launch \
     --gpus="0,1,2,3" \
     tools/train.py \
-        -c ./ppcls/configs/PULC/traffic_sign/PPLCNet_x1_0.yaml
+        -c ./ppcls/configs/PULC/vehicle_attribute/PPLCNet_x1_0.yaml
 ```
 
-验证集的最佳指标在 `98.14%` 左右（数据集较小，一般有0.1%左右的波动）。
+验证集的最佳指标在 `90.59%` 左右（数据集较小，一般有0.3%左右的波动）。
 
 
 <a name="3.4"></a>
@@ -240,7 +233,7 @@ python3 -m paddle.distributed.launch \
 
 ```bash
 python3 tools/eval.py \
-    -c ./ppcls/configs/PULC/traffic_sign/PPLCNet_x1_0.yaml \
+    -c ./ppcls/configs/PULC/vehicle_attribute/PPLCNet_x1_0.yaml \
     -o Global.pretrained_model="output/PPLCNet_x1_0/best_model"
 ```
 
@@ -254,21 +247,21 @@ python3 tools/eval.py \
 
 ```bash
 python3 tools/infer.py \
-    -c ./ppcls/configs/PULC/traffic_sign/PPLCNet_x1_0.yaml \
+    -c ./ppcls/configs/PULC/vehicle_attribute/PPLCNet_x1_0.yaml \
     -o Global.pretrained_model=output/DistillationModel/best_model
 ```
 
 输出结果如下：
 
 ```
-99603_17806.jpg:        class id(s): [216, 145, 49, 207, 169], score(s): [1.00, 0.00, 0.00, 0.00, 0.00], label_name(s): ['pm20', 'pm30', 'pm40', 'pl25', 'pm15']
+[{'attr': 'Color: (yellow, prob: 0.9893478155136108), Type: (hatchback, prob: 0.9734100103378296)', 'pred': [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0], 'file_name': './deploy/images/PULC/vehicle_attribute/0002_c002_00030670_0.jpg'}]
 ```
 
 **备注：**
 
 * 这里`-o Global.pretrained_model="output/PPLCNet_x1_0/best_model"` 指定了当前最佳权重所在的路径，如果指定其他权重，只需替换对应的路径即可。
 
-* 默认是对 `deploy/images/PULC/traffic_sign/99603_17806.jpg` 进行预测，此处也可以通过增加字段 `-o Infer.infer_imgs=xxx` 对其他图片预测。
+* 默认是对 `./deploy/images/PULC/vehicle_attribute/0002_c002_00030670_0.jpg` 进行预测，此处也可以通过增加字段 `-o Infer.infer_imgs=xxx` 对其他图片预测。
 
 <a name="4"></a>
 
@@ -284,35 +277,35 @@ SKL-UGI 知识蒸馏是 PaddleClas 提出的一种简单有效的知识蒸馏方
 
 #### 4.1.1 教师模型训练
 
-复用 `ppcls/configs/PULC/traffic_sign/PPLCNet_x1_0.yaml` 中的超参数，训练教师模型，训练脚本如下：
+复用 `ppcls/configs/PULC/vehicle_attribute/PPLCNet_x1_0.yaml` 中的超参数，训练教师模型，训练脚本如下：
 
 ```shell
 export CUDA_VISIBLE_DEVICES=0,1,2,3
 python3 -m paddle.distributed.launch \
     --gpus="0,1,2,3" \
     tools/train.py \
-        -c ./ppcls/configs/PULC/traffic_sign/PPLCNet_x1_0.yaml \
+        -c ./ppcls/configs/PULC/vehicle_attribute/PPLCNet_x1_0.yaml \
         -o Arch.name=ResNet101_vd
 ```
 
-验证集的最佳指标为 `98.59%` 左右，当前教师模型最好的权重保存在 `output/ResNet101_vd/best_model.pdparams`。
+验证集的最佳指标为 `91.60%` 左右，当前教师模型最好的权重保存在 `output/ResNet101_vd/best_model.pdparams`。
 
 <a name="4.1.2"></a>
 
 ####  4.1.2 蒸馏训练
 
-配置文件`ppcls/configs/PULC/traffic_sign/PPLCNet_x1_0_distillation.yaml`提供了`SKL-UGI知识蒸馏策略`的配置。该配置将`ResNet101_vd`当作教师模型，`PPLCNet_x1_0`当作学生模型，使用ImageNet数据集的验证集作为新增的无标签数据。训练脚本如下：
+配置文件`ppcls/configs/PULC/vehicle_attribute/PPLCNet_x1_0_distillation.yaml`提供了`SKL-UGI知识蒸馏策略`的配置。该配置将`ResNet101_vd`当作教师模型，`PPLCNet_x1_0`当作学生模型。训练脚本如下：
 
 ```shell
 export CUDA_VISIBLE_DEVICES=0,1,2,3
 python3 -m paddle.distributed.launch \
     --gpus="0,1,2,3" \
     tools/train.py \
-        -c ./ppcls/configs/PULC/traffic_sign/PPLCNet_x1_0_distillation.yaml \
+        -c ./ppcls/configs/PULC/vehicle_attribute/PPLCNet_x1_0_distillation.yaml \
         -o Arch.models.0.Teacher.pretrained=output/ResNet101_vd/best_model
 ```
 
-验证集的最佳指标为 `98.35%` 左右，当前模型最好的权重保存在 `output/DistillationModel/best_model_student.pdparams`。
+验证集的最佳指标为 `90.81%` 左右，当前模型最好的权重保存在 `output/DistillationModel/best_model_student.pdparams`。
 
 
 <a name="5"></a>
@@ -343,14 +336,14 @@ Paddle Inference 是飞桨的原生推理库， 作用于服务器端和云端�
 
 ```bash
 python3 tools/export_model.py \
-    -c ./ppcls/configs/PULC/traffic_sign/PPLCNet_x1_0.yaml \
+    -c ./ppcls/configs/PULC/vehicle_attribute/PPLCNet_x1_0.yaml \
     -o Global.pretrained_model=output/DistillationModel/best_model_student \
-    -o Global.save_inference_dir=deploy/models/PPLCNet_x1_0_traffic_sign_infer
+    -o Global.save_inference_dir=deploy/models/PPLCNet_x1_0_vehicle_attribute_infer
 ```
-执行完该脚本后会在 `deploy/models/` 下生成 `PPLCNet_x1_0_traffic_sign_infer` 文件夹，`models` 文件夹下应有如下文件结构：
+执行完该脚本后会在 `deploy/models/` 下生成 `PPLCNet_x1_0_vehicle_attributeibute_infer` 文件夹，`models` 文件夹下应有如下文件结构：
 
 ```
-├── PPLCNet_x1_0_traffic_sign_infer
+├── PPLCNet_x1_0_vehicle_attribute_infer
 │   ├── inference.pdiparams
 │   ├── inference.pdiparams.info
 │   └── inference.pdmodel
@@ -367,13 +360,13 @@ python3 tools/export_model.py \
 ```
 cd deploy/models
 # 下载 inference 模型并解压
-wget https://paddleclas.bj.bcebos.com/models/PULC/traffic_sign_infer.tar && tar -xf traffic_sign_infer.tar
+wget https://paddleclas.bj.bcebos.com/models/PULC/vehicle_attribute_infer.tar && tar -xf vehicle_attribute_infer.tar
 ```
 
 解压完毕后，`models` 文件夹下应有如下文件结构：
 
 ```
-├── traffic_sign_infer
+├── vehicle_attribute_infer
 │   ├── inference.pdiparams
 │   ├── inference.pdiparams.info
 │   └── inference.pdmodel
@@ -394,19 +387,20 @@ wget https://paddleclas.bj.bcebos.com/models/PULC/traffic_sign_infer.tar && tar 
 cd ../
 ```
 
-运行下面的命令，对图像 `./images/PULC/traffic_sign/99603_17806.jpg` 进行交通标志分类。
+运行下面的命令，对图像 `./images/PULC/vehicle_attribute/0002_c002_00030670_0.jpg` 进行车辆属性识别。
 
 ```shell
 # 使用下面的命令使用 GPU 进行预测
-python3.7 python/predict_cls.py -c configs/PULC/traffic_sign/inference_traffic_sign.yaml
+python3.7 python/predict_cls.py -c configs/PULC/vehicle_attribute/inference_vehicle_attribute.yaml -o Global.use_gpu=True
 # 使用下面的命令使用 CPU 进行预测
-python3.7 python/predict_cls.py -c configs/PULC/traffic_sign/inference_traffic_sign.yaml -o Global.use_gpu=False
+python3.7 python/predict_cls.py -c configs/PULC/vehicle_attribute/inference_vehicle_attribute.yaml -o Global.use_gpu=False
 ```
 
 输出结果如下。
 
 ```
-99603_17806.jpg:        class id(s): [216, 145, 49, 207, 169], score(s): [1.00, 0.00, 0.00, 0.00, 0.00], label_name(s): ['pm20', 'pm30', 'pm40', 'pl25', 'pm15']
+0002_c002_00030670_0.jpg:        attributes: Color: (yellow, prob: 0.9893478155136108), Type: (hatchback, prob: 0.97340989112854),
+predict output: [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0]
 ```
 
 <a name="6.2.2"></a>  
@@ -417,17 +411,17 @@ python3.7 python/predict_cls.py -c configs/PULC/traffic_sign/inference_traffic_s
 
 ```shell
 # 使用下面的命令使用 GPU 进行预测，如果希望使用 CPU 预测，可以在命令后面添加 -o Global.use_gpu=False
-python3.7 python/predict_cls.py -c configs/PULC/traffic_sign/inference_traffic_sign.yaml -o Global.infer_imgs="./images/PULC/traffic_sign/"
+python3.7 python/predict_cls.py -c configs/PULC/vehicle_attribute/inference_vehicle_attribute.yaml -o Global.infer_imgs="./images/PULC/vehicle_attribute/"
 ```
 
-终端中会输出该文件夹内所有图像的分类结果，如下所示。
+终端中会输出该文件夹内所有图像的属性识别结果，如下所示。
 
 ```
-100999_83928.jpg:    class id(s): [182, 179, 162, 128, 24], score(s): [0.99, 0.01, 0.00, 0.00, 0.00], label_name(s): ['pl110', 'pl100', 'pl120', 'p26', 'pm10']
-99603_17806.jpg:    class id(s): [216, 145, 49, 24, 169], score(s): [1.00, 0.00, 0.00, 0.00, 0.00], label_name(s): ['pm20', 'pm30', 'pm40', 'pm10', 'pm15']
+0002_c002_00030670_0.jpg:        attributes: Color: (yellow, prob: 0.9893478155136108), Type: (hatchback, prob: 0.97340989112854),
+predict output: [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0]
+0014_c012_00040750_0.jpg:        attributes: Color: (red, prob: 0.9998721480369568), Type: (sedan, prob: 0.999976634979248),
+predict output: [0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0]
 ```
-
-输出的 `label_name`可以从`dataset/traffic_sign/report.pdf`文件中查阅对应的图片。
 
 <a name="6.3"></a>
 

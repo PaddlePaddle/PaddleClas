@@ -1,11 +1,11 @@
 Global:
-  infer_imgs: "./images/PULC/traffic_sign/99603_17806.jpg"
-  inference_model_dir: "./models/traffic_sign_infer"
+  infer_imgs: "./images/PULC/text_image_orientation/img_rot0_demo.jpg"
+  inference_model_dir: "./models/text_image_orientation_infer"
   batch_size: 1
   use_gpu: True
-  enable_mkldnn: True
+  enable_mkldnn: False
   cpu_num_threads: 10
-  benchmark: False
+  enable_benchmark: True
   use_fp16: False
   ir_optim: True
   use_tensorrt: False
@@ -29,7 +29,7 @@ PreProcess:
 PostProcess:
   main_indicator: Topk
   Topk:
-    topk: 5
-    class_id_map_file: "../ppcls/utils/PULC_label_list/traffic_sign_label_list.txt"
+    topk: 2
+    class_id_map_file: "../dataset/text_image_orientation/label_list.txt"
   SavePreLabel:
     save_dir: ./pre_label/

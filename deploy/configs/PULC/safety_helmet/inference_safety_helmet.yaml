@@ -1,11 +1,11 @@
 Global:
-  infer_imgs: "./images/PULC/traffic_sign/99603_17806.jpg"
-  inference_model_dir: "./models/traffic_sign_infer"
+  infer_imgs: "./images/PULC/safety_helmet/safety_helmet_test_1.png"
+  inference_model_dir: "./models/safety_helmet_infer"
   batch_size: 1
   use_gpu: True
-  enable_mkldnn: True
+  enable_mkldnn: False
   cpu_num_threads: 10
-  benchmark: False
+  enable_benchmark: True
   use_fp16: False
   ir_optim: True
   use_tensorrt: False
@@ -27,9 +27,10 @@ PreProcess:
     - ToCHWImage:
 
 PostProcess:
-  main_indicator: Topk
-  Topk:
-    topk: 5
-    class_id_map_file: "../ppcls/utils/PULC_label_list/traffic_sign_label_list.txt"
+  main_indicator: ThreshOutput
+  ThreshOutput:
+    threshold: 0.5
+    label_0: wearing_helmet
+    label_1: unwearing_helmet
   SavePreLabel:
     save_dir: ./pre_label/
