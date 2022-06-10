@@ -131,7 +131,7 @@ Infer:
   PostProcess:
     name: Topk
     topk: 2
-    class_id_map_file: ppcls/utils/PULC/language_classification_label_list.txt
+    class_id_map_file: ppcls/utils/PULC_label_list/language_classification_label_list.txt
 
 Metric:
   Train:
