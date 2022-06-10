@@ -79,13 +79,13 @@ pip3 install paddlepaddle paddleclas
 * 使用命令行快速预测
 
 ```bash
-paddleclas --model_name vehicle_attribute --infer_imgs PaddleClas/deploy/images/PULC/vehicle_attribute/0002_c002_00030670_0.jpg
+paddleclas --model_name vehicle_attribute --infer_imgs deploy/images/PULC/vehicle_attribute/0002_c002_00030670_0.jpg
 ```
 
 结果如下：
 ```
 >>> result
-attributes: Color: (yellow, prob: 0.9893476963043213), Type: (hatchback, prob: 0.9734097719192505), output: [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0], filename: PaddleClas/deploy/images/PULC/vehicle_attribute/0002_c002_00030670_0.jpg
+attributes: Color: (yellow, prob: 0.9893476963043213), Type: (hatchback, prob: 0.9734097719192505), output: [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0], filename: deploy/images/PULC/vehicle_attribute/0002_c002_00030670_0.jpg
 ppcls INFO: Predict complete!
 ```
 
@@ -96,7 +96,7 @@ ppcls INFO: Predict complete!
 ```python
 import paddleclas
 model = paddleclas.PaddleClas(model_name="vehicle_attribute")
-result = model.predict(input_data="PaddleClas/deploy/images/PULC/vehicle_attribute/0002_c002_00030670_0.jpg")
+result = model.predict(input_data="deploy/images/PULC/vehicle_attribute/0002_c002_00030670_0.jpg")
 print(next(result))
 ```
 
@@ -104,7 +104,7 @@ print(next(result))
 
 ```
 result
-[{'attributes': 'Color: (yellow, prob: 0.9893476963043213), Type: (hatchback, prob: 0.9734097719192505)', 'output': [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0], 'filename': 'PaddleClas/deploy/images/PULC/vehicle_attribute/0002_c002_00030670_0.jpg'}]
+[{'attributes': 'Color: (yellow, prob: 0.9893476963043213), Type: (hatchback, prob: 0.9734097719192505)', 'output': [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0], 'filename': 'deploy/images/PULC/vehicle_attribute/0002_c002_00030670_0.jpg'}]
 ```
 
 <a name="3"></a>
