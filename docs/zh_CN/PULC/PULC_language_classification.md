@@ -73,7 +73,7 @@ pip3 install paddleclas
 - 使用命令行快速预测
 
 ```
-paddleclas --model_name=language_classification --infer_imgs=deploy/images/PULC/language_classification/img_rot0_demo.jpg
+paddleclas --model_name=language_classification --infer_imgs=deploy/images/PULC/language_classification/word_35404.png
 ```
 
 结果如下：
