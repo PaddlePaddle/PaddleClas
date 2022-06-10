@@ -13,12 +13,14 @@ Global:
   # used for static mode and model export
   image_shape: [3, 224, 224]
   save_inference_dir: ./inference
+
 # model architecture
 Arch:
   name: PPLCNet_x1_0
   pretrained: True
   use_ssld: True
   class_num: 2
+  use_sync_bn : True
  
 # loss function config for traing/eval process
 Loss:
@@ -36,7 +38,7 @@ Optimizer:
   momentum: 0.9
   lr:
     name: Cosine
-    learning_rate: 0.01
+    learning_rate: 0.025
     warmup_epoch: 5
   regularizer:
     name: 'L2'
@@ -55,15 +57,27 @@ DataLoader:
             to_rgb: True
             channel_first: False
         - RandCropImage:
-            size: 224
+            size: 176
         - RandFlipImage:
             flip_code: 1
+        - TimmAutoAugment:
+            prob : 0.5
+            config_str: rand-m9-mstd0.5-inc1
+            interpolation: bicubic
+            img_size : 176
         - NormalizeImage:
             scale: 1.0/255.0
             mean: [0.485, 0.456, 0.406]
             std: [0.229, 0.224, 0.225]
             order: ''
-
+        - RandomErasing:
+            EPSILON : 0.1
+            r1 : 0.3
+            sh : 1.0/3.0
+            sl : 0.02
+            attempt : 10
+            use_log_aspect : True
+            mode : pixel
     sampler:
       name: DistributedBatchSampler
       batch_size: 64

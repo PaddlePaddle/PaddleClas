@@ -8,7 +8,7 @@ search_dict:
   - search_key: lrs
     replace_config:
       - Optimizer.lr.learning_rate
-    search_values: [0.01, 0.015, 0.025]
+    search_values: [0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.10, 0.11, 0.11, 0.12]
   - search_key: resolutions
     replace_config:
       - DataLoader.Train.dataset.transform_ops.1.RandCropImage.size

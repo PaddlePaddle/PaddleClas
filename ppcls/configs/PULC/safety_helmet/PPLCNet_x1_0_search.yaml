@@ -37,7 +37,7 @@ Optimizer:
   momentum: 0.9
   lr:
     name: Cosine
-    learning_rate: 0.015
+    learning_rate: 0.10
     warmup_epoch: 5
   regularizer:
     name: 'L2'
@@ -60,7 +60,7 @@ DataLoader:
         - RandFlipImage:
             flip_code: 1
         - TimmAutoAugment:
-            prob: 0.5
+            prob: 0
             config_str: rand-m9-mstd0.5-inc1
             interpolation: bicubic
             img_size: 192
@@ -70,7 +70,7 @@ DataLoader:
             std: [0.229, 0.224, 0.225]
             order: ''
         - RandomErasing:
-            EPSILON: 0.5
+            EPSILON: 0
             sl: 0.02
             sh: 1.0/3.0
             r1: 0.3
