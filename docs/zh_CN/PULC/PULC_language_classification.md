@@ -152,7 +152,7 @@ cd path_to_PaddleClas
 
 ```shell
 cd dataset
-wget https://paddleclas.bj.bcebos.com/data/cls_demo/language_classification.tar
+wget https://paddleclas.bj.bcebos.com/data/PULC/language_classification.tar
 tar -xf language_classification.tar
 cd ../
 ```

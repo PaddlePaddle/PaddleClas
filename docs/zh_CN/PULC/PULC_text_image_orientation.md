@@ -148,7 +148,7 @@ cd path_to_PaddleClas
 
 ```shell
 cd dataset
-wget https://paddleclas.bj.bcebos.com/data/cls_demo/text_image_orientation.tar
+wget https://paddleclas.bj.bcebos.com/data/PULC/text_image_orientation.tar
 tar -xf text_image_orientation.tar
 cd ../
 ```
