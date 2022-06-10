@@ -103,7 +103,7 @@ result = model.predict(input_data="deploy/images/PULC/person_attribute/090004.jp
 print(next(result))
 ```
 
-**备注**：`model.predict()` 为可迭代对象（`generator`），因此需要使用 `next()` 函数或 `for` 循环对其迭代调用。每次调用将以 `batch_size` 为单位进行一次预测，并返回预测结果, 默认 `batch_size` 为 1，如果需要更改 `batch_size`，实例化模型时，需要指定 `batch_size`，如 `model = paddleclas.PaddleClas(model_name="person_exists",  batch_size=2)`, 使用默认的代码返回结果示例如下：
+**备注**：`model.predict()` 为可迭代对象（`generator`），因此需要使用 `next()` 函数或 `for` 循环对其迭代调用。每次调用将以 `batch_size` 为单位进行一次预测，并返回预测结果, 默认 `batch_size` 为 1，如果需要更改 `batch_size`，实例化模型时，需要指定 `batch_size`，如 `model = paddleclas.PaddleClas(model_name="person_attribute",  batch_size=2)`, 使用默认的代码返回结果示例如下：
 
 ```
 >>> result
@@ -141,7 +141,7 @@ print(next(result))
 </div>
 
 
-我们将原始数据转换成了 PaddleClas 多标签可读的数据格式，可以从[这里]()下载。 
+我们将原始数据转换成了 PaddleClas 多标签可读的数据格式，可以直接下载。 
     
 进入 PaddleClas 目录。
 
