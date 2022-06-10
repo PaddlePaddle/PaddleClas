@@ -1,9 +1,8 @@
-简体中文|[English](../../en/inference_deployment/paddle_hub_serving_deploy_en.md)
+简体中文 | [English](../../en/inference_deployment/paddle_hub_serving_deploy_en.md)
+
 # 基于 PaddleHub Serving 的服务部署
 
 PaddleClas 支持通过 PaddleHub 快速进行服务化部署。目前支持图像分类的部署，图像识别的部署敬请期待。
-
----
 
 
 ## 目录
@@ -35,7 +34,7 @@ deploy/hubserving/clas/
 <a name="2"></a>
 ## 2. 准备环境
 ```shell
-# 安装 paddlehub,请安装 2.0 版本
+# 安装 paddlehub，建议安装 2.1.0 版本
 python3.7 -m pip install paddlehub==2.1.0 --upgrade -i https://pypi.tuna.tsinghua.edu.cn/simple
 ```
 
@@ -237,4 +236,4 @@ list: 返回结果
     'class_id_map_file':
     ```
 
-为了避免不必要的延时以及能够以 batch_size 进行预测，数据预处理逻辑（包括 `resize`、`crop` 等操作）均在客户端完成，因此需要在 [PaddleClas/deploy/hubserving/test_hubserving.py#L35-L52](../../../deploy/hubserving/test_hubserving.py) 中修改数据预处理逻辑相关代码。
+为了避免不必要的延时以及能够以 batch_size 进行预测，数据预处理逻辑（包括 `resize`、`crop` 等操作）均在客户端完成，因此需要在 [PaddleClas/deploy/hubserving/test_hubserving.py#L41-L47](../../../deploy/hubserving/test_hubserving.py#L41-L47) 以及 [PaddleClas/deploy/hubserving/test_hubserving.py#L51-L76](../../../deploy/hubserving/test_hubserving.py#L51-L76) 中修改数据预处理逻辑相关代码。

@@ -1,9 +1,8 @@
-English|[Chinese](../../zh_CN/inference_deployment/paddle_hub_serving_deploy.md)
+English | [简体中文](../../zh_CN/inference_deployment/paddle_hub_serving_deploy.md)
+
 # Service deployment based on PaddleHub Serving
 
 PaddleClas supports rapid service deployment through PaddleHub. Currently, the deployment of image classification is supported. Please look forward to the deployment of image recognition.
-
----
 
 ## Catalogue
 - [1. Introduction](#1)
@@ -34,7 +33,7 @@ deploy/hubserving/clas/
 <a name="2"></a>
 ## 2. Prepare the environment
 ```shell
-# Install paddlehub, please install version 2.0
+# Install paddlehub, version 2.1.0 is recommended
 python3.7 -m pip install paddlehub==2.1.0 --upgrade -i https://pypi.tuna.tsinghua.edu.cn/simple
 ```
 
@@ -236,4 +235,4 @@ Common parameters can be modified in `PaddleClas/deploy/hubserving/clas/params.p
      'class_id_map_file':
      ```
 
-In order to avoid unnecessary delay and be able to predict with batch_size, data preprocessing logic (including `resize`, `crop` and other operations) is completed on the client side, so it needs to be in [PaddleClas/deploy/hubserving/test_hubserving.py# Modify the code related to data preprocessing logic in L35-L52](../../../deploy/hubserving/test_hubserving.py).
+In order to avoid unnecessary delay and be able to predict with batch_size, data preprocessing logic (including `resize`, `crop` and other operations) is completed on the client side, so it needs to be in [PaddleClas/deploy/hubserving/test_hubserving.py# L41-L47](../../../deploy/hubserving/test_hubserving.py#L41-L47) and [PaddleClas/deploy/hubserving/test_hubserving.py#L51-L76](../../../deploy/hubserving/test_hubserving.py#L51-L76) Modify the data preprocessing logic related code.
