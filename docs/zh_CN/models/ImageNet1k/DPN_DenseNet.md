@@ -47,7 +47,7 @@ DPN 的全称是 Dual Path Networks，即双通道网络。该网络是由 Dense
 
 ### 1.2 模型指标
 
-| Models      | Top1   | Top5   | Reference<br>top1 | Reference<br>top5 | FLOPS<br>(G) | Parameters<br>(M) |
+| Models      | Top1   | Top5   | Reference<br>top1 | Reference<br>top5 | FLOPS<br>(G) | Params<br>(M) |
 |:--:|:--:|:--:|:--:|:--:|:--:|:--:|
 | DenseNet121 | 0.757  | 0.926  | 0.750             |                   | 5.690        | 7.980             |
 | DenseNet161 | 0.786  | 0.941  | 0.778             |                   | 15.490       | 28.680            |
