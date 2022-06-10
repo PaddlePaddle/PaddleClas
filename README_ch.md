@@ -86,7 +86,7 @@ PP-ShiTu图像识别快速体验：[点击这里](./docs/zh_CN/quick_start/quick
   - [模型训练](docs/zh_CN/models_training/recognition.md)
   - 推理部署
     - [基于python预测引擎推理](docs/zh_CN/inference_deployment/python_deploy.md#2)
-    - [基于C++预测引擎推理](deploy/cpp_shitu/readme.md))
+    - [基于C++预测引擎推理](deploy/cpp_shitu/readme.md)
     - [服务化部署](docs/zh_CN/inference_deployment/paddle_serving_deploy.md)
     - [端侧部署](deploy/lite_shitu/README.md)
   - 模型压缩 文档更新中
