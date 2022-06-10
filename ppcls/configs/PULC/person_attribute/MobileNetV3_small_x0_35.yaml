@@ -17,7 +17,7 @@ Global:
 
 # model architecture
 Arch:
-  name: "Res2Net200_vd_26w_4s"
+  name: "MobileNetV3_small_x0_35"
   pretrained: True
   class_num: 26
 
@@ -44,6 +44,7 @@ Optimizer:
   regularizer:
     name: 'L2'
     coeff: 0.0005
+  #clip_norm: 10
 
 # data loader for train and eval
 DataLoader:

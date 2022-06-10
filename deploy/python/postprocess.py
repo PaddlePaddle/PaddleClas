@@ -189,7 +189,7 @@ class Binarize(object):
         return byte
 
 
-class Attribute(object):
+class PersonAttribute(object):
     def __init__(self,
                  threshold=0.5,
                  glasses_threshold=0.3,
@@ -277,8 +277,7 @@ class Attribute(object):
             threshold_list[18] = self.hold_threshold
             pred_res = (np.array(res) > np.array(threshold_list)
                         ).astype(np.int8).tolist()
-
-            batch_res.append([label_res, pred_res])
+            batch_res.append({"attributes": label_res, "output": pred_res})
         return batch_res
 
 
