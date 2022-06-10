@@ -36,7 +36,7 @@ PP-ShiTu图像识别系统效果展示
 
 ## 特性
 
-支持多种图像分类、识别相关算法，在此基础上打造[PULC超轻量图像分类方案](./docs/zh_CN/PULC/PULC_train.md)和[PP-ShiTu图像识别系统](./docs/zh_CN/quick_start/quick_start_recognition.md)。
+支持多种图像分类、识别相关算法，在此基础上打造[PULC超轻量图像分类方案](docs/zh_CN/PULC/PULC_person_exists.md)和[PP-ShiTu图像识别系统](./docs/zh_CN/quick_start/quick_start_recognition.md)。
 ![](https://user-images.githubusercontent.com/19523330/172844483-60391f39-f045-4e13-b5a6-ed65182f429e.png)
 
 
@@ -51,7 +51,7 @@ PP-ShiTu图像识别系统效果展示
 
 ## 快速体验
 
-PULC超轻量图像分类方案快速体验：[点击这里](./docs/zh_CN/PULC/PULC_train.md)。
+PULC超轻量图像分类方案快速体验：[点击这里](docs/zh_CN/PULC/PULC_person_exists.md)。
 
 PP-ShiTu图像识别快速体验：[点击这里](./docs/zh_CN/quick_start/quick_start_recognition.md)。
 
