@@ -44,7 +44,7 @@ HRNet 是 2019 年由微软亚洲研究院提出的一种全新的神经网络�
 
 ### 1.2 模型指标
 
-| Models      | Top1   | Top5   | Reference<br>top1 | Reference<br>top5 | FLOPS<br>(G) | Parameters<br>(M) |
+| Models      | Top1   | Top5   | Reference<br>top1 | Reference<br>top5 | FLOPS<br>(G) | Params<br>(M) |
 |:--:|:--:|:--:|:--:|:--:|:--:|:--:|
 | HRNet_W18_C | 0.769  | 0.934  | 0.768             | 0.934             | 4.140        | 21.290            |
 | HRNet_W18_C_ssld | 0.816  | 0.958  | 0.768             | 0.934             | 4.140        | 21.290            |

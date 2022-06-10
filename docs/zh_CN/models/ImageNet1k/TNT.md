@@ -30,9 +30,9 @@ TNT(Transformer-iN-Transformer)系列模型由华为诺亚于 2021 年提出，�
 
 ### 1.2 模型指标
 
-|         Model        | Params (M) | FLOPs (G) | Top-1 (%) | Top-5 (%) |
-|:---------------------:|:----------:|:---------:|:---------:|:---------:|
-|        TNT_small        | 23.8       | 5.2       | 81.21     |   95.63   |
+| Models           | Top1 | Top5 | Reference<br>top1 | Reference<br>top5 | FLOPs<br>(G) | Params<br>(M) |
+|:--:|:--:|:--:|:--:|:--:|:--:|:--:|
+| TNT_small | 0.8121 | 0.9563 | - | - | 5.2  | 23.8 |
 
 <a name="2"></a>  
 

@@ -38,7 +38,7 @@ DarkNet53 是 YOLO 作者在论文设计的用于目标检测的 backbone，该�
 
 ### 1.2 模型指标
 
-| Models                    | Top1   | Top5   | Reference<br>top1 | Reference<br>top5 | FLOPS<br>(G) | Parameters<br>(M) |
+| Models                    | Top1   | Top5   | Reference<br>top1 | Reference<br>top5 | FLOPs<br>(G) | Params<br>(M) |
 |:--:|:--:|:--:|:--:|:--:|:--:|:--:|
 | AlexNet                   | 0.567  | 0.792  | 0.5720            |                   | 1.370        | 61.090            |
 | SqueezeNet1_0             | 0.596  | 0.817  | 0.575             |                   | 1.550        | 1.240             |
