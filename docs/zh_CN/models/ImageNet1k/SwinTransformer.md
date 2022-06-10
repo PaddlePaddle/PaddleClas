@@ -101,7 +101,7 @@ Inference 的获取可以参考 [ResNet50 推理模型准备](./ResNet.md#4.1) �
 
 ### 4.2 基于 Python 预测引擎推理
 
-PaddleClas 提供了基于 python 预测引擎推理的示例。您可以参考[ResNet50 基于 Python 预测引擎推理](./ResNet.md#4.2) 对 SwinTransformer 完成推理预测。
+PaddleClas 提供了基于 python 预测引擎推理的示例。您可以参考[ResNet50 基于 Python 预测引擎推理](./ResNet.md#42-基于-python-预测引擎推理) 。
 
 <a name="4.3"></a>
 
