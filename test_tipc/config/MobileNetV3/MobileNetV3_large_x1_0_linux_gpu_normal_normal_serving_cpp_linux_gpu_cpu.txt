@@ -1,0 +1,14 @@
+===========================serving_params===========================
+model_name:MobileNetV3_large_x1_0
+python:python3.7
+inference_model_url:https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/MobileNetV3_large_x1_0_infer.tar
+trans_model:-m paddle_serving_client.convert
+--dirname:./deploy/paddleserving/MobileNetV3_large_x1_0_infer/
+--model_filename:inference.pdmodel
+--params_filename:inference.pdiparams
+--serving_server:./deploy/paddleserving/MobileNetV3_large_x1_0_serving/
+--serving_client:./deploy/paddleserving/MobileNetV3_large_x1_0_client/
+serving_dir:./deploy/paddleserving
+web_service:null
+--use_gpu:0|null
+pipline:test_cpp_serving_client.py

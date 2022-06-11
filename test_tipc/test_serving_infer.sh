@@ -50,8 +50,13 @@ function func_serving_cls(){
     set_serving_server=$(func_set_params "${serving_server_key}" "${serving_server_value}")
     set_serving_client=$(func_set_params "${serving_client_key}" "${serving_client_value}")
 
-    trans_model_cmd="${python} ${trans_model_py} ${set_dirname} ${set_model_filename} ${set_params_filename} ${set_serving_server} ${set_serving_client}"
-    eval $trans_model_cmd
+    for python_ in ${python[*]}; do
+        if [[ ${python_} =~ "python" ]]; then
+            trans_model_cmd="${python_} ${trans_model_py} ${set_dirname} ${set_model_filename} ${set_params_filename} ${set_serving_server} ${set_serving_client}"
+            eval $trans_model_cmd
+            break
+        fi
+    done
 
     # modify the alias_name of fetch_var to "outputs"
     server_fetch_var_line_cmd="sed -i '/fetch_var/,/is_lod_tensor/s/alias_name: .*/alias_name: \"prediction\"/' ${serving_server_value}/serving_server_conf.prototxt"
@@ -69,103 +74,124 @@ function func_serving_cls(){
     unset https_proxy
     unset http_proxy
 
-    # modify the input_name in "classification_web_service.py" to be consistent with feed_var.name in prototxt
-    set_web_service_feet_var_cmd="sed -i '/preprocess/,/input_imgs}/s/{.*: input_imgs}/{${feed_var_name}: input_imgs}/' ${web_service_py}"
-    eval ${set_web_service_feet_var_cmd}
+    if [[ ${FILENAME} =~ "cpp" ]]; then
+        for item in ${python[*]}; do
+            if [[ ${item} =~ "python" ]]; then
+                python_=${item}
+                break
+            fi
+        done
+        set_pipeline_py_feed_var_cmd="sed -i '/feed/,/img}/s/{.*: img}/{${feed_var_name}: img}/' ${pipeline_py}"
+        echo $PWD - $set_pipeline_py_feed_var_cmd
+        eval ${set_pipeline_py_feed_var_cmd}
+        serving_server_dir_name=$(func_get_url_file_name "$serving_server_value")
+        set_client_config_line_cmd="sed -i '/client/,/serving_server_conf.prototxt/s/.\/.*\/serving_server_conf.prototxt/.\/${serving_server_dir_name}\/serving_server_conf.prototxt/' ${pipeline_py}"
+        echo $PWD - $set_client_config_line_cmd
+        eval ${set_client_config_line_cmd}
+        for use_gpu in ${web_use_gpu_list[*]}; do
+            if [ ${use_gpu} = "null" ]; then
+                web_service_cpp_cmd="${python_} -m paddle_serving_server.serve --model ${serving_server_dir_name} --port 9292 &"
+                echo $PWD - $web_service_cpp_cmd
+                eval ${web_service_cpp_cmd}
+                sleep 5s
+                _save_log_path="${LOG_PATH}/server_infer_cpp_cpu_pipeline_batchsize_1.log"
+                pipeline_cmd="${python_} test_cpp_serving_client.py > ${_save_log_path} 2>&1 "
+                echo ${pipeline_cmd}
+                eval ${pipeline_cmd}
+                last_status=${PIPESTATUS[0]}
+                eval "cat ${_save_log_path}"
+                status_check ${last_status} "${pipeline_cmd}" "${status_log}" "${model_name}"
+                ps ux | grep -E 'serving_server|pipeline' | awk '{print $2}' | xargs kill -s 9
+                sleep 5s
+            else
+                web_service_cpp_cmd="${python_} -m paddle_serving_server.serve --model ${serving_server_dir_name} --port 9292 --gpu_id=${use_gpu} &"
+                echo $PWD - $web_service_cpp_cmd
+                eval ${web_service_cpp_cmd}
+                sleep 5s
 
-    model_config=21
-    serving_server_dir_name=$(func_get_url_file_name "$serving_server_value")
-    set_model_config_cmd="sed -i '${model_config}s/model_config: .*/model_config: ${serving_server_dir_name}/' config.yml"
-    eval ${set_model_config_cmd}
+                _save_log_path="${LOG_PATH}/server_infer_cpp_gpu_pipeline_batchsize_1.log"
+                pipeline_cmd="${python_} test_cpp_serving_client.py > ${_save_log_path} 2>&1 "
 
-    for python in ${python[*]}; do
-        if [[ ${python} = "cpp" ]]; then
-            for use_gpu in ${web_use_gpu_list[*]}; do
-                if [ ${use_gpu} = "null" ]; then
-                    web_service_cpp_cmd="${python} -m paddle_serving_server.serve --model ppocr_det_mobile_2.0_serving/ ppocr_rec_mobile_2.0_serving/ --port 9293"
-                    eval $web_service_cmd
-                    sleep 5s
-                    _save_log_path="${LOG_PATH}/server_infer_cpp_cpu_pipeline_usemkldnn_False_threads_4_batchsize_1.log"
-                    pipeline_cmd="${python} ocr_cpp_client.py ppocr_det_mobile_2.0_client/ ppocr_rec_mobile_2.0_client/"
+                echo $PWD - $pipeline_cmd
+                eval $pipeline_cmd
+                last_status=${PIPESTATUS[0]}
+                eval "cat ${_save_log_path}"
+                status_check ${last_status} "${pipeline_cmd}" "${status_log}" "${model_name}"
+                ps ux | grep -E 'serving_server|pipeline' | awk '{print $2}' | xargs kill -s 9
+                sleep 5s
+            fi
+        done
+    else
+        # python serving
+        # modify the input_name in "classification_web_service.py" to be consistent with feed_var.name in prototxt
+        set_web_service_feed_var_cmd="sed -i '/preprocess/,/input_imgs}/s/{.*: input_imgs}/{${feed_var_name}: input_imgs}/' ${web_service_py}"
+        eval ${set_web_service_feed_var_cmd}
+
+        model_config=21
+        serving_server_dir_name=$(func_get_url_file_name "$serving_server_value")
+        set_model_config_cmd="sed -i '${model_config}s/model_config: .*/model_config: ${serving_server_dir_name}/' config.yml"
+        eval ${set_model_config_cmd}
+
+        for use_gpu in ${web_use_gpu_list[*]}; do
+            if [[ ${use_gpu} = "null" ]]; then
+                device_type_line=24
+                set_device_type_cmd="sed -i '${device_type_line}s/device_type: .*/device_type: 0/' config.yml"
+                eval $set_device_type_cmd
+
+                devices_line=27
+                set_devices_cmd="sed -i '${devices_line}s/devices: .*/devices: \"\"/' config.yml"
+                eval $set_devices_cmd
+
+                web_service_cmd="${python_} ${web_service_py} &"
+                eval $web_service_cmd
+                sleep 5s
+                for pipeline in ${pipeline_py[*]}; do
+                    _save_log_path="${LOG_PATH}/server_infer_cpu_${pipeline%_client*}_batchsize_1.log"
+                    pipeline_cmd="${python_} ${pipeline} > ${_save_log_path} 2>&1 "
                     eval $pipeline_cmd
-                    status_check $last_status "${pipeline_cmd}" "${status_log}"
+                    last_status=${PIPESTATUS[0]}
+                    eval "cat ${_save_log_path}"
+                    status_check $last_status "${pipeline_cmd}" "${status_log}" "${model_name}"
                     sleep 5s
-                    ps ux | grep -E 'web_service|pipeline' | awk '{print $2}' | xargs kill -s 9
-                else
-                    web_service_cpp_cmd="${python} -m paddle_serving_server.serve --model ppocr_det_mobile_2.0_serving/ ppocr_rec_mobile_2.0_serving/ --port 9293 --gpu_id=0"
-                    eval $web_service_cmd
-                    sleep 5s
-                    _save_log_path="${LOG_PATH}/server_infer_cpp_cpu_pipeline_usemkldnn_False_threads_4_batchsize_1.log"
-                    pipeline_cmd="${python} ocr_cpp_client.py ppocr_det_mobile_2.0_client/ ppocr_rec_mobile_2.0_client/"
+                done
+                ps ux | grep -E 'web_service|pipeline' | awk '{print $2}' | xargs kill -s 9
+            elif [ ${use_gpu} -eq 0 ]; then
+                if [[ ${_flag_quant} = "False" ]] && [[ ${precision} =~ "int8" ]]; then
+                    continue
+                fi
+                if [[ ${precision} =~ "fp16" || ${precision} =~ "int8" ]] && [ ${use_trt} = "False" ]; then
+                    continue
+                fi
+                if [[ ${use_trt} = "False" || ${precision} =~ "int8" ]] && [[ ${_flag_quant} = "True" ]]; then
+                    continue
+                fi
+
+                device_type_line=24
+                set_device_type_cmd="sed -i '${device_type_line}s/device_type: .*/device_type: 1/' config.yml"
+                eval $set_device_type_cmd
+
+                devices_line=27
+                set_devices_cmd="sed -i '${devices_line}s/devices: .*/devices: \"${use_gpu}\"/' config.yml"
+                eval $set_devices_cmd
+
+                web_service_cmd="${python_} ${web_service_py} & "
+                eval $web_service_cmd
+                sleep 5s
+                for pipeline in ${pipeline_py[*]}; do
+                    _save_log_path="${LOG_PATH}/server_infer_gpu_${pipeline%_client*}_batchsize_1.log"
+                    pipeline_cmd="${python_} ${pipeline} > ${_save_log_path} 2>&1"
                     eval $pipeline_cmd
-                    status_check $last_status "${pipeline_cmd}" "${status_log}"
+                    last_status=${PIPESTATUS[0]}
+                    eval "cat ${_save_log_path}"
+                    status_check $last_status "${pipeline_cmd}" "${status_log}" "${model_name}"
                     sleep 5s
-                    ps ux | grep -E 'web_service|pipeline' | awk '{print $2}' | xargs kill -s 9
-                fi
-            done
-        else
-            # python serving
-            for use_gpu in ${web_use_gpu_list[*]}; do
-                if [[ ${use_gpu} = "null" ]]; then
-                    device_type_line=24
-                    set_device_type_cmd="sed -i '${device_type_line}s/device_type: .*/device_type: 0/' config.yml"
-                    eval $set_device_type_cmd
-
-                    devices_line=27
-                    set_devices_cmd="sed -i '${devices_line}s/devices: .*/devices: \"\"/' config.yml"
-                    eval $set_devices_cmd
-
-                    web_service_cmd="${python} ${web_service_py} &"
-                    eval $web_service_cmd
-                    sleep 5s
-                    for pipeline in ${pipeline_py[*]}; do
-                        _save_log_path="${LOG_PATH}/server_infer_cpu_${pipeline%_client*}_batchsize_1.log"
-                        pipeline_cmd="${python} ${pipeline} > ${_save_log_path} 2>&1 "
-                        eval $pipeline_cmd
-                        last_status=${PIPESTATUS[0]}
-                        eval "cat ${_save_log_path}"
-                        status_check $last_status "${pipeline_cmd}" "${status_log}"
-                        sleep 5s
-                    done
-                    ps ux | grep -E 'web_service|pipeline' | awk '{print $2}' | xargs kill -s 9
-                elif [ ${use_gpu} -eq 0 ]; then
-                    if [[ ${_flag_quant} = "False" ]] && [[ ${precision} =~ "int8" ]]; then
-                        continue
-                    fi
-                    if [[ ${precision} =~ "fp16" || ${precision} =~ "int8" ]] && [ ${use_trt} = "False" ]; then
-                        continue
-                    fi
-                    if [[ ${use_trt} = "False" || ${precision} =~ "int8" ]] && [[ ${_flag_quant} = "True" ]]; then
-                        continue
-                    fi
-
-                    device_type_line=24
-                    set_device_type_cmd="sed -i '${device_type_line}s/device_type: .*/device_type: 1/' config.yml"
-                    eval $set_device_type_cmd
-
-                    devices_line=27
-                    set_devices_cmd="sed -i '${devices_line}s/devices: .*/devices: \"${use_gpu}\"/' config.yml"
-                    eval $set_devices_cmd
-
-                    web_service_cmd="${python} ${web_service_py} & "
-                    eval $web_service_cmd
-                    sleep 5s
-                    for pipeline in ${pipeline_py[*]}; do
-                        _save_log_path="${LOG_PATH}/server_infer_gpu_${pipeline%_client*}_batchsize_1.log"
-                        pipeline_cmd="${python} ${pipeline} > ${_save_log_path} 2>&1"
-                        eval $pipeline_cmd
-                        last_status=${PIPESTATUS[0]}
-                        eval "cat ${_save_log_path}"
-                        status_check $last_status "${pipeline_cmd}" "${status_log}"
-                        sleep 5s
-                    done
-                    ps ux | grep -E 'web_service|pipeline' | awk '{print $2}' | xargs kill -s 9
-                else
-                    echo "Does not support hardware [${use_gpu}] other than CPU and GPU Currently!"
-                fi
-            done
-        fi
-    done
+                done
+                ps ux | grep -E 'web_service|pipeline' | awk '{print $2}' | xargs kill -s 9
+            else
+                echo "Does not support hardware [${use_gpu}] other than CPU and GPU Currently!"
+            fi
+        done
+    fi
 }
 
 
@@ -200,6 +226,12 @@ function func_serving_rec(){
     pipeline_py=$(func_parser_value "${lines[17]}")
 
     IFS='|'
+    for python_ in ${python[*]}; do
+        if [[ ${python_} =~ "python" ]]; then
+            python_interp=${python_}
+            break
+        fi
+    done
 
     # pdserving
     cd ./deploy
@@ -208,7 +240,7 @@ function func_serving_rec(){
     set_params_filename=$(func_set_params "${params_filename_key}" "${params_filename_value}")
     set_serving_server=$(func_set_params "${cls_serving_server_key}" "${cls_serving_server_value}")
     set_serving_client=$(func_set_params "${cls_serving_client_key}" "${cls_serving_client_value}")
-    cls_trans_model_cmd="${python} ${trans_model_py} ${set_dirname} ${set_model_filename} ${set_params_filename} ${set_serving_server} ${set_serving_client}"
+    cls_trans_model_cmd="${python_interp} ${trans_model_py} ${set_dirname} ${set_model_filename} ${set_params_filename} ${set_serving_server} ${set_serving_client}"
     eval $cls_trans_model_cmd
 
     set_dirname=$(func_set_params "${det_infer_model_dir_key}" "${det_infer_model_dir_value}")
@@ -216,7 +248,7 @@ function func_serving_rec(){
     set_params_filename=$(func_set_params "${params_filename_key}" "${params_filename_value}")
     set_serving_server=$(func_set_params "${det_serving_server_key}" "${det_serving_server_value}")
     set_serving_client=$(func_set_params "${det_serving_client_key}" "${det_serving_client_value}")
-    det_trans_model_cmd="${python} ${trans_model_py} ${set_dirname} ${set_model_filename} ${set_params_filename} ${set_serving_server} ${set_serving_client}"
+    det_trans_model_cmd="${python_interp} ${trans_model_py} ${set_dirname} ${set_model_filename} ${set_params_filename} ${set_serving_server} ${set_serving_client}"
     eval $det_trans_model_cmd
 
     # modify the alias_name of fetch_var to "outputs"
@@ -235,99 +267,130 @@ function func_serving_rec(){
     unset https_proxy
     unset http_proxy
 
-    # modify the input_name in "recognition_web_service.py" to be consistent with feed_var.name in prototxt
-    set_web_service_feet_var_cmd="sed -i '/preprocess/,/input_imgs}/s/{.*: input_imgs}/{${feed_var_name}: input_imgs}/' ${web_service_py}"
-    eval ${set_web_service_feet_var_cmd}
+    if [[ ${FILENAME} =~ "cpp" ]]; then
+        det_serving_client_dir_name=$(func_get_url_file_name "$det_serving_client_value")
+        set_det_client_config_line_cmd="sed -i '/MainbodyDetect/,/serving_client_conf.prototxt/s/models\/.*\/serving_client_conf.prototxt/models\/${det_serving_client_dir_name}\/serving_client_conf.prototxt/' ${pipeline_py}"
+        echo $PWD - $set_det_client_config_line_cmd
+        eval ${set_det_client_config_line_cmd}
 
-    for python in ${python[*]}; do
-        if [[ ${python} = "cpp" ]]; then
-            for use_gpu in ${web_use_gpu_list[*]}; do
-                if [ ${use_gpu} = "null" ]; then
-                    web_service_cpp_cmd="${python} web_service_py"
+        cls_serving_client_dir_name=$(func_get_url_file_name "$cls_serving_client_value")
+        set_cls_client_config_line_cmd="sed -i '/ObjectRecognition/,/serving_client_conf.prototxt/s/models\/.*\/serving_client_conf.prototxt/models\/${cls_serving_client_dir_name}\/serving_client_conf.prototxt/' ${pipeline_py}"
+        echo $PWD - $set_cls_client_config_line_cmd
+        eval ${set_cls_client_config_line_cmd}
 
-                    eval $web_service_cmd
-                    sleep 5s
-                    _save_log_path="${LOG_PATH}/server_infer_cpp_cpu_pipeline_usemkldnn_False_threads_4_batchsize_1.log"
-                    pipeline_cmd="${python} ocr_cpp_client.py ppocr_det_mobile_2.0_client/ ppocr_rec_mobile_2.0_client/"
+        set_pipeline_py_feed_var_cmd="sed -i '/ObjectRecognition/,/feed={\"x\": batch_imgs}/s/{.*: batch_imgs}/{${feed_var_name}: batch_imgs}/' ${pipeline_py}"
+        echo $PWD - $set_pipeline_py_feed_var_cmd
+        eval ${set_pipeline_py_feed_var_cmd}
+
+        for use_gpu in ${web_use_gpu_list[*]}; do
+            if [ ${use_gpu} = "null" ]; then
+
+                det_serving_server_dir_name=$(func_get_url_file_name "$det_serving_server_value")
+                web_service_cpp_cmd="${python_interp} -m paddle_serving_server.serve --model ../../models/${det_serving_server_dir_name} --port 9293 >>log_mainbody_detection.txt &"
+
+                cls_serving_server_dir_name=$(func_get_url_file_name "$cls_serving_server_value")
+                web_service_cpp_cmd2="${python_interp} -m paddle_serving_server.serve --model ../../models/${cls_serving_server_dir_name} --port 9294 >>log_feature_extraction.txt &"
+                echo $PWD - $web_service_cpp_cmd
+                eval $web_service_cpp_cmd
+                echo $PWD - $web_service_cpp_cmd2
+                eval $web_service_cpp_cmd2
+                sleep 5s
+                _save_log_path="${LOG_PATH}/server_infer_cpp_cpu_batchsize_1.log"
+                pipeline_cmd="${python_interp} test_cpp_serving_client.py > ${_save_log_path} 2>&1 "
+                echo ${pipeline_cmd}
+                eval ${pipeline_cmd}
+                last_status=${PIPESTATUS[0]}
+                eval "cat ${_save_log_path}"
+                status_check ${last_status} "${pipeline_cmd}" "${status_log}" "${model_name}"
+                ps ux | grep -E 'serving_server|pipeline' | awk '{print $2}' | xargs kill -s 9
+                sleep 5s
+            else
+                det_serving_server_dir_name=$(func_get_url_file_name "$det_serving_server_value")
+                web_service_cpp_cmd="${python_interp} -m paddle_serving_server.serve --model ../../models/${det_serving_server_dir_name} --port 9293 --gpu_id=${use_gpu} >>log_mainbody_detection.txt &"
+
+                cls_serving_server_dir_name=$(func_get_url_file_name "$cls_serving_server_value")
+                web_service_cpp_cmd2="${python_interp} -m paddle_serving_server.serve --model ../../models/${cls_serving_server_dir_name} --port 9294 --gpu_id=${use_gpu} >>log_feature_extraction.txt &"
+                echo $PWD - $web_service_cpp_cmd
+                eval $web_service_cpp_cmd
+                echo $PWD - $web_service_cpp_cmd2
+                eval $web_service_cpp_cmd2
+                sleep 5s
+                _save_log_path="${LOG_PATH}/server_infer_cpp_gpu_batchsize_1.log"
+                pipeline_cmd="${python_interp} test_cpp_serving_client.py > ${_save_log_path} 2>&1 "
+                echo ${pipeline_cmd}
+                eval ${pipeline_cmd}
+                last_status=${PIPESTATUS[0]}
+                eval "cat ${_save_log_path}"
+                status_check ${last_status} "${pipeline_cmd}" "${status_log}" "${model_name}"
+                ps ux | grep -E 'serving_server|pipeline' | awk '{print $2}' | xargs kill -s 9
+                sleep 5s
+            fi
+        done
+    else
+        # modify the input_name in "recognition_web_service.py" to be consistent with feed_var.name in prototxt
+        set_web_service_feed_var_cmd="sed -i '/preprocess/,/input_imgs}/s/{.*: input_imgs}/{${feed_var_name}: input_imgs}/' ${web_service_py}"
+        eval ${set_web_service_feed_var_cmd}
+        # python serving
+        for use_gpu in ${web_use_gpu_list[*]}; do
+            if [[ ${use_gpu} = "null" ]]; then
+                device_type_line=24
+                set_device_type_cmd="sed -i '${device_type_line}s/device_type: .*/device_type: 0/' config.yml"
+                eval $set_device_type_cmd
+
+                devices_line=27
+                set_devices_cmd="sed -i '${devices_line}s/devices: .*/devices: \"\"/' config.yml"
+                eval $set_devices_cmd
+
+                web_service_cmd="${python} ${web_service_py} &"
+                eval $web_service_cmd
+                sleep 5s
+                for pipeline in ${pipeline_py[*]}; do
+                    _save_log_path="${LOG_PATH}/server_infer_cpu_${pipeline%_client*}_batchsize_1.log"
+                    pipeline_cmd="${python} ${pipeline} > ${_save_log_path} 2>&1 "
                     eval $pipeline_cmd
-                    status_check $last_status "${pipeline_cmd}" "${status_log}"
+                    last_status=${PIPESTATUS[0]}
+                    eval "cat ${_save_log_path}"
+                    status_check $last_status "${pipeline_cmd}" "${status_log}" "${model_name}"
                     sleep 5s
-                    ps ux | grep -E 'web_service|pipeline' | awk '{print $2}' | xargs kill -s 9
-                else
-                    web_service_cpp_cmd="${python} web_service_py"
-                    eval $web_service_cmd
-                    sleep 5s
-                    _save_log_path="${LOG_PATH}/server_infer_cpp_cpu_pipeline_usemkldnn_False_threads_4_batchsize_1.log"
-                    pipeline_cmd="${python} ocr_cpp_client.py ppocr_det_mobile_2.0_client/ ppocr_rec_mobile_2.0_client/"
-                    eval $pipeline_cmd
-                    status_check $last_status "${pipeline_cmd}" "${status_log}"
-                    sleep 5s
-                    ps ux | grep -E 'web_service|pipeline' | awk '{print $2}' | xargs kill -s 9
+                done
+                ps ux | grep -E 'web_service|pipeline' | awk '{print $2}' | xargs kill -s 9
+            elif [ ${use_gpu} -eq 0 ]; then
+                if [[ ${_flag_quant} = "False" ]] && [[ ${precision} =~ "int8" ]]; then
+                    continue
                 fi
-            done
-        else
-            # python serving
-            for use_gpu in ${web_use_gpu_list[*]}; do
-                if [[ ${use_gpu} = "null" ]]; then
-                    device_type_line=24
-                    set_device_type_cmd="sed -i '${device_type_line}s/device_type: .*/device_type: 0/' config.yml"
-                    eval $set_device_type_cmd
+                if [[ ${precision} =~ "fp16" || ${precision} =~ "int8" ]] && [ ${use_trt} = "False" ]; then
+                    continue
+                fi
+                if [[ ${use_trt} = "False" || ${precision} =~ "int8" ]] && [[ ${_flag_quant} = "True" ]]; then
+                    continue
+                fi
 
-                    devices_line=27
-                    set_devices_cmd="sed -i '${devices_line}s/devices: .*/devices: \"\"/' config.yml"
-                    eval $set_devices_cmd
+                device_type_line=24
+                set_device_type_cmd="sed -i '${device_type_line}s/device_type: .*/device_type: 1/' config.yml"
+                eval $set_device_type_cmd
 
-                    web_service_cmd="${python} ${web_service_py} &"
-                    eval $web_service_cmd
-                    sleep 5s
-                    for pipeline in ${pipeline_py[*]}; do
-                        _save_log_path="${LOG_PATH}/server_infer_cpu_${pipeline%_client*}_batchsize_1.log"
-                        pipeline_cmd="${python} ${pipeline} > ${_save_log_path} 2>&1 "
-                        eval $pipeline_cmd
-                        last_status=${PIPESTATUS[0]}
-                        eval "cat ${_save_log_path}"
-                        status_check $last_status "${pipeline_cmd}" "${status_log}"
-                        sleep 5s
-                    done
-                    ps ux | grep -E 'web_service|pipeline' | awk '{print $2}' | xargs kill -s 9
-                elif [ ${use_gpu} -eq 0 ]; then
-                    if [[ ${_flag_quant} = "False" ]] && [[ ${precision} =~ "int8" ]]; then
-                        continue
-                    fi
-                    if [[ ${precision} =~ "fp16" || ${precision} =~ "int8" ]] && [ ${use_trt} = "False" ]; then
-                        continue
-                    fi
-                    if [[ ${use_trt} = "False" || ${precision} =~ "int8" ]] && [[ ${_flag_quant} = "True" ]]; then
-                        continue
-                    fi
+                devices_line=27
+                set_devices_cmd="sed -i '${devices_line}s/devices: .*/devices: \"${use_gpu}\"/' config.yml"
+                eval $set_devices_cmd
 
-                    device_type_line=24
-                    set_device_type_cmd="sed -i '${device_type_line}s/device_type: .*/device_type: 1/' config.yml"
-                    eval $set_device_type_cmd
-
-                    devices_line=27
-                    set_devices_cmd="sed -i '${devices_line}s/devices: .*/devices: \"${use_gpu}\"/' config.yml"
-                    eval $set_devices_cmd
-
-                    web_service_cmd="${python} ${web_service_py} & "
-                    eval $web_service_cmd
+                web_service_cmd="${python} ${web_service_py} & "
+                eval $web_service_cmd
+                sleep 10s
+                for pipeline in ${pipeline_py[*]}; do
+                    _save_log_path="${LOG_PATH}/server_infer_gpu_${pipeline%_client*}_batchsize_1.log"
+                    pipeline_cmd="${python} ${pipeline} > ${_save_log_path} 2>&1"
+                    eval $pipeline_cmd
+                    last_status=${PIPESTATUS[0]}
+                    eval "cat ${_save_log_path}"
+                    status_check $last_status "${pipeline_cmd}" "${status_log}" "${model_name}"
                     sleep 10s
-                    for pipeline in ${pipeline_py[*]}; do
-                        _save_log_path="${LOG_PATH}/server_infer_gpu_${pipeline%_client*}_batchsize_1.log"
-                        pipeline_cmd="${python} ${pipeline} > ${_save_log_path} 2>&1"
-                        eval $pipeline_cmd
-                        last_status=${PIPESTATUS[0]}
-                        eval "cat ${_save_log_path}"
-                        status_check $last_status "${pipeline_cmd}" "${status_log}"
-                        sleep 10s
-                    done
-                    ps ux | grep -E 'web_service|pipeline' | awk '{print $2}' | xargs kill -s 9
-                else
-                    echo "Does not support hardware [${use_gpu}] other than CPU and GPU Currently!"
-                fi
-            done
-        fi
-    done
+                done
+                ps ux | grep -E 'web_service|pipeline' | awk '{print $2}' | xargs kill -s 9
+            else
+                echo "Does not support hardware [${use_gpu}] other than CPU and GPU Currently!"
+            fi
+        done
+    fi
 }
 
 

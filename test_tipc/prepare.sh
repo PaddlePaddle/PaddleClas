@@ -199,10 +199,16 @@ fi
 
 if [[ ${MODE} = "serving_infer" ]]; then
     # prepare serving env
+    ${python_name} -m pip install paddle_serving_client==0.9.0
+    ${python_name} -m pip install paddle-serving-app==0.9.0
     python_name=$(func_parser_value "${lines[2]}")
-    ${python_name} -m pip install install paddle-serving-server-gpu==0.7.0.post102
-    ${python_name} -m pip install paddle_serving_client==0.7.0
-    ${python_name} -m pip install paddle-serving-app==0.7.0
+    if [[ ${FILENAME} =~ "cpp" ]]; then
+        pushd ./deploy/paddleserving
+        bash build_server.sh
+        popd
+    else
+        ${python_name} -m pip install install paddle-serving-server-gpu==0.9.0.post102
+    fi
     if [[ ${model_name} =~ "ShiTu" ]]; then
         cls_inference_model_url=$(func_parser_value "${lines[3]}")
         cls_tar_name=$(func_get_url_file_name "${cls_inference_model_url}")
