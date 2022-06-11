@@ -15,20 +15,21 @@
 import paddle
 import paddle.nn as nn
 import paddle.nn.functional as F
-from paddle.nn.initializer import KaimingNormal, Constant
-from paddle.nn import Conv2D, BatchNorm2D, ReLU, AdaptiveAvgPool2D, MaxPool2D
-from paddle.regularizer import L2Decay
 from paddle import ParamAttr
-
+from paddle.nn import AdaptiveAvgPool2D, BatchNorm2D, Conv2D, MaxPool2D, ReLU
+from paddle.nn.initializer import Constant, KaimingNormal
+from paddle.regularizer import L2Decay
 from ppcls.arch.backbone.base.theseus_layer import TheseusLayer
-from ppcls.utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
+from ppcls.utils.save_load import (load_dygraph_pretrain,
+                                   load_dygraph_pretrain_from_url)
 
 MODEL_URLS = {
     "PPHGNet_tiny":
     "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/PPHGNet_tiny_pretrained.pdparams",
     "PPHGNet_small":
     "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/PPHGNet_small_pretrained.pdparams",
-    "PPHGNet_base": ""
+    "PPHGNet_base": 
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/PPHGNet_base_pretrained.pdparams"
 }
 
 __all__ = list(MODEL_URLS.keys())
