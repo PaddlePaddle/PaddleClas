@@ -1,7 +1,8 @@
 include LICENSE.txt
 include README.md
 include docs/en/whl_en.md
-recursive-include deploy/python predict_cls.py preprocess.py postprocess.py det_preprocess.py
+recursive-include deploy/python *.py
+recursive-include deploy/configs *.yaml
 recursive-include deploy/utils get_image_list.py config.py logger.py predictor.py
 
 recursive-include ppcls/ *.py *.txt
