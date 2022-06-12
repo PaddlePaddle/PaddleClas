@@ -63,7 +63,7 @@ PP-ShiTu图像识别快速体验：[点击这里](./docs/zh_CN/quick_start/quick
     - [PULC含文字图像方向分类模型](docs/zh_CN/PULC/PULC_text_image_orientation.md)
     - [PULC文本行方向分类模型](docs/zh_CN/PULC/PULC_textline_orientation.md)
     - [PULC语种分类模型](docs/zh_CN/PULC/PULC_language_classification.md)
-  - 模型训练 文档更新中
+  - 模型训练
   - 推理部署
     - [基于python预测引擎推理](docs/zh_CN/inference_deployment/python_deploy.md#1)
     - [基于C++预测引擎推理](docs/zh_CN/inference_deployment/cpp_deploy.md)
