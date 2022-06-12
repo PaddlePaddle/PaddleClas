@@ -25,15 +25,15 @@
 
 - 您的机器安装的是 CUDA9 或 CUDA10，请运行以下命令安装
 
-  ```bash
-  python3 -m pip install paddlepaddle-gpu -i https://mirror.baidu.com/pypi/simple
-  ```
+```bash
+python3 -m pip install paddlepaddle-gpu -i https://mirror.baidu.com/pypi/simple
+```
 
 - 您的机器是CPU，请运行以下命令安装
 
-  ```bash
-  python3 -m pip install paddlepaddle -i https://mirror.baidu.com/pypi/simple
-  ```
+```bash
+python3 -m pip install paddlepaddle -i https://mirror.baidu.com/pypi/simple
+```
 
 更多的版本需求，请参照[飞桨官网安装文档](https://www.paddlepaddle.org.cn/install/quick)中的说明进行操作。
 
@@ -42,7 +42,7 @@
 ### 1.2 安装 PaddleClas whl 包
 
 ```bash
-pip install paddleclas
+pip3 install paddleclas
 ```
 
 <a name="2"></a>
@@ -124,7 +124,7 @@ PULC 系列模型的名称和简介如下：
 
 通过本节内容，相信您已经熟练掌握 PaddleClas whl 包的 PULC 模型使用方法并获得了初步效果。
 
-PULC 方法产出的系列模型在人、车、OCR等方向的多个场景中均验证有效，用超轻量模型就可实现与 SwinTransformer 模型接近的精度，预测速度提高 40+ 倍。并且打通数据、模型训练、压缩和推理部署全流程，具体地，您可以参考[PULC有人/无人分类模型](PULC_person_exists.md)、[PULC人体属性识别模型](PULC_person_attribute.md)、[PULC佩戴安全帽分类模型](PULC_safety_helmet.md)、[PULC交通标志分类模型](PULC_traffic_sign.md)、[PULC车辆属性识别模型](PULC_vehicle_attribute.md)、[PULC含文字图像方向分类模型](PULC_text_image_orientation.md)、[PULC文本行方向分类模型](PULC_textline_orientation.md)、[PULC语种分类模型](PULC_language_classification.md)，正式开启 PULC 的体验之旅。
+PULC 方法产出的系列模型在人、车、OCR等方向的多个场景中均验证有效，用超轻量模型就可实现与 SwinTransformer 模型接近的精度，预测速度提高 40+ 倍。并且打通数据、模型训练、压缩和推理部署全流程，具体地，您可以参考[PULC有人/无人分类模型](PULC_person_exists.md)、[PULC人体属性识别模型](PULC_person_attribute.md)、[PULC佩戴安全帽分类模型](PULC_safety_helmet.md)、[PULC交通标志分类模型](PULC_traffic_sign.md)、[PULC车辆属性识别模型](PULC_vehicle_attribute.md)、[PULC含文字图像方向分类模型](PULC_text_image_orientation.md)、[PULC文本行方向分类模型](PULC_textline_orientation.md)、[PULC语种分类模型](PULC_language_classification.md)。
 
 
 
