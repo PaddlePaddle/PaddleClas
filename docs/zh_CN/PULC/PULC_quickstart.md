@@ -48,7 +48,7 @@ pip install paddleclas
 
 ## 2. 快速体验
 
-PaddleClas 提供了一系列测试图片，里边包含人、车、OCR等方向的多个场景大的demo数据。点击[这里](https://paddleclas.bj.bcebos.com/data/PULC/pulc_demo_imgs.zip) 下载并解压，然后在终端中切换到相应目录。
+PaddleClas 提供了一系列测试图片，里边包含人、车、OCR等方向的多个场景大的demo数据。点击[这里](https://paddleclas.bj.bcebos.com/data/PULC/pulc_demo_imgs.zip)下载并解压，然后在终端中切换到相应目录。
 
 <a name="2.1"></a>
 
