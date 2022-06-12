@@ -27,11 +27,6 @@ PP-ShiTu图像识别系统效果展示
 - 2022.5.23 新增[人员出入管理范例库](https://aistudio.baidu.com/aistudio/projectdetail/4094475)，具体内容可以在 AI Stuio 上体验。
 - 2022.5.20 上线[PP-HGNet](./docs/zh_CN/models/PP-HGNet.md), [PP-LCNet v2](./docs/zh_CN/models/PP-LCNetV2.md)。
 - 2022.4.21 新增 CVPR2022 oral论文 [MixFormer](https://arxiv.org/pdf/2204.02557.pdf) 相关[代码](https://github.com/PaddlePaddle/PaddleClas/pull/1820/files)。
-- 2022.1.27 全面升级文档；新增[PaddleServing C++ pipeline部署方式](./deploy/paddleserving)和[18M图像识别安卓部署Demo](./deploy/lite_shitu)。
-- 2021.11.1 发布[PP-ShiTu技术报告](https://arxiv.org/pdf/2111.00775.pdf)，新增饮料识别demo。
-- 2021.10.23 发布轻量级图像识别系统PP-ShiTu，CPU上0.2s即可完成在10w+库的图像识别。
-[点击这里](./docs/zh_CN/quick_start/quick_start_recognition.md)立即体验。
-- 2021.09.17 发布PP-LCNet系列超轻量骨干网络模型, 在Intel CPU上，单张图像预测速度约5ms，ImageNet-1K数据集上Top1识别准确率达到80.82%，超越ResNet152的模型效果。PP-LCNet的介绍可以参考[论文](https://arxiv.org/pdf/2109.15099.pdf), 或者[PP-LCNet模型介绍](docs/zh_CN/models/PP-LCNet.md)，相关指标和预训练权重可以从 [这里](docs/zh_CN/algorithm_introduction/ImageNet_models.md)下载。
 - [more](./docs/zh_CN/others/update_history.md)
 
 ## 特性
@@ -51,9 +46,9 @@ PP-ShiTu图像识别系统效果展示
 
 ## 快速体验
 
-PULC超轻量图像分类方案快速体验：[点击这里](docs/zh_CN/PULC/PULC_quickstart.md)。
+PULC超轻量图像分类方案快速体验：[点击这里](docs/zh_CN/PULC/PULC_quickstart.md)
 
-PP-ShiTu图像识别快速体验：[点击这里](./docs/zh_CN/quick_start/quick_start_recognition.md)。
+PP-ShiTu图像识别快速体验：[点击这里](./docs/zh_CN/quick_start/quick_start_recognition.md)
 
 ## 文档教程
 - [环境准备](docs/zh_CN/installation/install_paddleclas.md)
