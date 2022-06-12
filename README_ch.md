@@ -25,7 +25,7 @@ PP-ShiTu图像识别系统效果展示
 - 🔥️ 2022.6.15 发布PULC超轻量图像分类方案，CPU推理3ms，精度比肩SwinTransformer，覆盖人、车、OCR场景九大常见任务。
 - 2022.5.26 [飞桨产业实践范例直播课](http://aglc.cn/v-c4FAR)，解读**超轻量重点区域人员出入管理方案**。
 - 2022.5.23 新增[人员出入管理范例库](https://aistudio.baidu.com/aistudio/projectdetail/4094475)，具体内容可以在 AI Stuio 上体验。
-- 2022.5.20 上线[PP-HGNet](./docs/zh_CN/models/PP-HGNet.md), [PP-LCNet v2](./docs/zh_CN/models/PP-LCNetV2.md)。
+- 2022.5.20 上线[PP-HGNet](./docs/zh_CN/models/PP-HGNet.md), [PP-LCNetv2](./docs/zh_CN/models/PP-LCNetV2.md)。
 - 2022.4.21 新增 CVPR2022 oral论文 [MixFormer](https://arxiv.org/pdf/2204.02557.pdf) 相关[代码](https://github.com/PaddlePaddle/PaddleClas/pull/1820/files)。
 - [more](./docs/zh_CN/others/update_history.md)
 
@@ -87,7 +87,7 @@ PP-ShiTu图像识别快速体验：[点击这里](./docs/zh_CN/quick_start/quick
   - 模型压缩 文档更新中
 - PP系列骨干网络模型
   - [PP-HGNet](docs/zh_CN/models/PP-HGNet.md)
-  - [PP-LCNet v2](docs/zh_CN/models/PP-LCNetV2.md)
+  - [PP-LCNetv2](docs/zh_CN/models/PP-LCNetV2.md)
   - [PP-LCNet](docs/zh_CN/models/PP-LCNet.md)
 - [SSLD半监督知识蒸馏方案](docs/zh_CN/advanced_tutorials/ssld.md)
 - 前沿算法
