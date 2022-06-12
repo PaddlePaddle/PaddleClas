@@ -48,12 +48,12 @@
 |-------|----------------|----------|---------------|---------------|
 | SwinTranformer_tiny  | 97.71          | 95.30  | 107 | 使用 ImageNet 预训练模型 |
 | MobileNetV3_small_x0_35  | 81.23          | 2.85  | 1.6 | 使用 ImageNet 预训练模型 |
-| PPLCNet_x1_0  | 81.23          | 2.12  | 6.5 | 使用 ImageNet 预训练模型 |
+| PPLCNet_x1_0  | 94.72          | 2.12  | 6.5 | 使用 ImageNet 预训练模型 |
 | PPLCNet_x1_0  | 95.48          | 2.12  | 6.5 | 使用 SSLD 预训练模型 |
 | PPLCNet_x1_0  | 95.48          | 2.12  | 6.5 | 使用 SSLD 预训练模型+EDA 策略|
 | <b>PPLCNet_x1_0<b>  | <b>95.72<b>    | <b>2.12<b>  | <b>6.5<b> | 使用 SSLD 预训练模型+EDA 策略+SKL-UGI 知识蒸馏策略|
      
-从表中可以看出，backbone 为 SwinTranformer_tiny 时精度较高，但是推理速度较慢。将 backboone 替换为轻量级模型 MobileNetV3_small_x0_35 后，速度可以大幅提升，但是会导致精度大幅下降。将 backbone 替换为速度更快的 PPLCNet_x1_0 时，精度较 MobileNetV3_small_x0_35 高 20 多个百分点，与此同时速度依旧可以快 20% 以上。在此基础上，使用 SSLD 预训练模型后，在不改变推理速度的前提下，精度可以提升约 2.6 个百分点，进一步地，在使用 SKL-UGI 知识蒸馏后，精度可以继续提升 0.24 个百分点。此时，PPLCNet_x1_0 达到了 SwinTranformer_tiny 模型的精度，但是速度快 40 多倍。关于 PULC 的训练方法和推理部署方法将在下面详细介绍。
+从表中可以看出，backbone 为 SwinTranformer_tiny 时精度较高，但是推理速度较慢。将 backboone 替换为轻量级模型 MobileNetV3_small_x0_35 后，速度可以大幅提升，但是会导致精度大幅下降。将 backbone 替换为速度更快的 PPLCNet_x1_0 时，精度较 MobileNetV3_small_x0_35 高 13 个百分点，与此同时速度依旧可以快 20% 以上。在此基础上，使用 SSLD 预训练模型后，在不改变推理速度的前提下，精度可以提升约 0.7 个百分点，进一步地，在使用 SKL-UGI 知识蒸馏后，精度可以继续提升 0.24 个百分点。此时，PPLCNet_x1_0 达到了接近 SwinTranformer_tiny 模型的精度，但是速度快 40 多倍。关于 PULC 的训练方法和推理部署方法将在下面详细介绍。
     
 **备注：** 
     
@@ -275,7 +275,7 @@ export CUDA_VISIBLE_DEVICES=0,1,2,3
 python3 -m paddle.distributed.launch \
     --gpus="0,1,2,3" \
     tools/train.py \
-        -c ./ppcls/configs/PULC/car_exists/PPLCNet/PPLCNet_x1_0.yaml \
+        -c ./ppcls/configs/PULC/car_exists/PPLCNet_x1_0.yaml \
         -o Arch.name=ResNet101_vd
 ```
 
