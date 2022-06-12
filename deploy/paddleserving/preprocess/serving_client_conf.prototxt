@@ -1,0 +1,14 @@
+feed_var {
+  name: "inputs"
+  alias_name: "inputs"
+  is_lod_tensor: false
+  feed_type: 20
+  shape: 1
+}
+fetch_var {
+  name: "save_infer_model/scale_0.tmp_1"
+  alias_name: "prediction"
+  is_lod_tensor: false
+  fetch_type: 1
+  shape: 1000
+}

@@ -38,8 +38,9 @@ pipeline_py=$(func_parser_value "${lines[13]}")
 
 
 function func_serving_cls(){
-    LOG_PATH="../../test_tipc/output/${model_name}"
+    LOG_PATH="test_tipc/output/${model_name}"
     mkdir -p ${LOG_PATH}
+    LOG_PATH="../../${LOG_PATH}"
     status_log="${LOG_PATH}/results_serving.log"
     IFS='|'
 
@@ -54,6 +55,7 @@ function func_serving_cls(){
         if [[ ${python_} =~ "python" ]]; then
             trans_model_cmd="${python_} ${trans_model_py} ${set_dirname} ${set_model_filename} ${set_params_filename} ${set_serving_server} ${set_serving_client}"
             eval $trans_model_cmd
+            # echo $PWD - $trans_model_cmd
             break
         fi
     done
@@ -61,6 +63,7 @@ function func_serving_cls(){
     # modify the alias_name of fetch_var to "outputs"
     server_fetch_var_line_cmd="sed -i '/fetch_var/,/is_lod_tensor/s/alias_name: .*/alias_name: \"prediction\"/' ${serving_server_value}/serving_server_conf.prototxt"
     eval ${server_fetch_var_line_cmd}
+
     client_fetch_var_line_cmd="sed -i '/fetch_var/,/is_lod_tensor/s/alias_name: .*/alias_name: \"prediction\"/' ${serving_client_value}/serving_client_conf.prototxt"
     eval ${client_fetch_var_line_cmd}
 
@@ -81,44 +84,51 @@ function func_serving_cls(){
                 break
             fi
         done
-        set_pipeline_py_feed_var_cmd="sed -i '/feed/,/img}/s/{.*: img}/{${feed_var_name}: img}/' ${pipeline_py}"
-        echo $PWD - $set_pipeline_py_feed_var_cmd
-        eval ${set_pipeline_py_feed_var_cmd}
+        set_client_feed_type_cmd="sed -i '/feed_type/,/: .*/s/feed_type: .*/feed_type: 20/' ${serving_client_value}/serving_client_conf.prototxt"
+        eval ${set_client_feed_type_cmd}
+        set_client_shape_cmd="sed -i '/shape: 3/,/shape: 3/s/shape: 3/shape: 1/' ${serving_client_value}/serving_client_conf.prototxt"
+        eval ${set_client_shape_cmd}
+        set_client_shape224_cmd="sed -i '/shape: 224/,/shape: 224/s/shape: 224//' ${serving_client_value}/serving_client_conf.prototxt"
+        eval ${set_client_shape224_cmd}
+        set_client_shape224_cmd="sed -i '/shape: 224/,/shape: 224/s/shape: 224//' ${serving_client_value}/serving_client_conf.prototxt"
+        eval ${set_client_shape224_cmd}
+
+        serving_client_dir_name=$(func_get_url_file_name "$serving_client_value")
+        set_pipeline_load_config_cmd="sed -i '/load_client_config/,/.prototxt/s/.\/.*\/serving_client_conf.prototxt/.\/${serving_client_dir_name}\/serving_client_conf.prototxt/' ${pipeline_py}"
+        eval ${set_pipeline_load_config_cmd}
+
+        set_pipeline_feed_var_cmd="sed -i '/feed=/,/: image}/s/feed={.*: image}/feed={${feed_var_name}: image}/' ${pipeline_py}"
+        eval ${set_pipeline_feed_var_cmd}
+
         serving_server_dir_name=$(func_get_url_file_name "$serving_server_value")
-        set_client_config_line_cmd="sed -i '/client/,/serving_server_conf.prototxt/s/.\/.*\/serving_server_conf.prototxt/.\/${serving_server_dir_name}\/serving_server_conf.prototxt/' ${pipeline_py}"
-        echo $PWD - $set_client_config_line_cmd
-        eval ${set_client_config_line_cmd}
+
         for use_gpu in ${web_use_gpu_list[*]}; do
-            if [ ${use_gpu} = "null" ]; then
-                web_service_cpp_cmd="${python_} -m paddle_serving_server.serve --model ${serving_server_dir_name} --port 9292 &"
-                echo $PWD - $web_service_cpp_cmd
+            if [[ ${use_gpu} = "null" ]]; then
+                web_service_cpp_cmd="${python_} -m paddle_serving_server.serve --model ${serving_server_dir_name} --op GeneralClasOp --port 9292 &"
                 eval ${web_service_cpp_cmd}
                 sleep 5s
                 _save_log_path="${LOG_PATH}/server_infer_cpp_cpu_pipeline_batchsize_1.log"
                 pipeline_cmd="${python_} test_cpp_serving_client.py > ${_save_log_path} 2>&1 "
-                echo ${pipeline_cmd}
                 eval ${pipeline_cmd}
                 last_status=${PIPESTATUS[0]}
                 eval "cat ${_save_log_path}"
                 status_check ${last_status} "${pipeline_cmd}" "${status_log}" "${model_name}"
-                ps ux | grep -E 'serving_server|pipeline' | awk '{print $2}' | xargs kill -s 9
+                eval "${python_} -m paddle_serving_server.serve stop"
                 sleep 5s
             else
-                web_service_cpp_cmd="${python_} -m paddle_serving_server.serve --model ${serving_server_dir_name} --port 9292 --gpu_id=${use_gpu} &"
-                echo $PWD - $web_service_cpp_cmd
+                web_service_cpp_cmd="${python_} -m paddle_serving_server.serve --model ${serving_server_dir_name} --op GeneralClasOp --port 9292 --gpu_id=${use_gpu} &"
                 eval ${web_service_cpp_cmd}
-                sleep 5s
+                sleep 8s
 
                 _save_log_path="${LOG_PATH}/server_infer_cpp_gpu_pipeline_batchsize_1.log"
                 pipeline_cmd="${python_} test_cpp_serving_client.py > ${_save_log_path} 2>&1 "
 
-                echo $PWD - $pipeline_cmd
                 eval $pipeline_cmd
                 last_status=${PIPESTATUS[0]}
                 eval "cat ${_save_log_path}"
                 status_check ${last_status} "${pipeline_cmd}" "${status_log}" "${model_name}"
-                ps ux | grep -E 'serving_server|pipeline' | awk '{print $2}' | xargs kill -s 9
                 sleep 5s
+                eval "${python_} -m paddle_serving_server.serve stop"
             fi
         done
     else
@@ -154,7 +164,7 @@ function func_serving_cls(){
                     status_check $last_status "${pipeline_cmd}" "${status_log}" "${model_name}"
                     sleep 5s
                 done
-                ps ux | grep -E 'web_service|pipeline' | awk '{print $2}' | xargs kill -s 9
+                eval "${python_} -m paddle_serving_server.serve stop"
             elif [ ${use_gpu} -eq 0 ]; then
                 if [[ ${_flag_quant} = "False" ]] && [[ ${precision} =~ "int8" ]]; then
                     continue
@@ -186,7 +196,7 @@ function func_serving_cls(){
                     status_check $last_status "${pipeline_cmd}" "${status_log}" "${model_name}"
                     sleep 5s
                 done
-                ps ux | grep -E 'web_service|pipeline' | awk '{print $2}' | xargs kill -s 9
+                eval "${python_} -m paddle_serving_server.serve stop"
             else
                 echo "Does not support hardware [${use_gpu}] other than CPU and GPU Currently!"
             fi
@@ -270,16 +280,13 @@ function func_serving_rec(){
     if [[ ${FILENAME} =~ "cpp" ]]; then
         det_serving_client_dir_name=$(func_get_url_file_name "$det_serving_client_value")
         set_det_client_config_line_cmd="sed -i '/MainbodyDetect/,/serving_client_conf.prototxt/s/models\/.*\/serving_client_conf.prototxt/models\/${det_serving_client_dir_name}\/serving_client_conf.prototxt/' ${pipeline_py}"
-        echo $PWD - $set_det_client_config_line_cmd
         eval ${set_det_client_config_line_cmd}
 
         cls_serving_client_dir_name=$(func_get_url_file_name "$cls_serving_client_value")
         set_cls_client_config_line_cmd="sed -i '/ObjectRecognition/,/serving_client_conf.prototxt/s/models\/.*\/serving_client_conf.prototxt/models\/${cls_serving_client_dir_name}\/serving_client_conf.prototxt/' ${pipeline_py}"
-        echo $PWD - $set_cls_client_config_line_cmd
         eval ${set_cls_client_config_line_cmd}
 
         set_pipeline_py_feed_var_cmd="sed -i '/ObjectRecognition/,/feed={\"x\": batch_imgs}/s/{.*: batch_imgs}/{${feed_var_name}: batch_imgs}/' ${pipeline_py}"
-        echo $PWD - $set_pipeline_py_feed_var_cmd
         eval ${set_pipeline_py_feed_var_cmd}
 
         for use_gpu in ${web_use_gpu_list[*]}; do
@@ -290,19 +297,16 @@ function func_serving_rec(){
 
                 cls_serving_server_dir_name=$(func_get_url_file_name "$cls_serving_server_value")
                 web_service_cpp_cmd2="${python_interp} -m paddle_serving_server.serve --model ../../models/${cls_serving_server_dir_name} --port 9294 >>log_feature_extraction.txt &"
-                echo $PWD - $web_service_cpp_cmd
                 eval $web_service_cpp_cmd
-                echo $PWD - $web_service_cpp_cmd2
                 eval $web_service_cpp_cmd2
                 sleep 5s
                 _save_log_path="${LOG_PATH}/server_infer_cpp_cpu_batchsize_1.log"
                 pipeline_cmd="${python_interp} test_cpp_serving_client.py > ${_save_log_path} 2>&1 "
-                echo ${pipeline_cmd}
                 eval ${pipeline_cmd}
                 last_status=${PIPESTATUS[0]}
                 eval "cat ${_save_log_path}"
                 status_check ${last_status} "${pipeline_cmd}" "${status_log}" "${model_name}"
-                ps ux | grep -E 'serving_server|pipeline' | awk '{print $2}' | xargs kill -s 9
+                eval "${python_} -m paddle_serving_server.serve stop"
                 sleep 5s
             else
                 det_serving_server_dir_name=$(func_get_url_file_name "$det_serving_server_value")
@@ -310,19 +314,16 @@ function func_serving_rec(){
 
                 cls_serving_server_dir_name=$(func_get_url_file_name "$cls_serving_server_value")
                 web_service_cpp_cmd2="${python_interp} -m paddle_serving_server.serve --model ../../models/${cls_serving_server_dir_name} --port 9294 --gpu_id=${use_gpu} >>log_feature_extraction.txt &"
-                echo $PWD - $web_service_cpp_cmd
                 eval $web_service_cpp_cmd
-                echo $PWD - $web_service_cpp_cmd2
                 eval $web_service_cpp_cmd2
                 sleep 5s
                 _save_log_path="${LOG_PATH}/server_infer_cpp_gpu_batchsize_1.log"
                 pipeline_cmd="${python_interp} test_cpp_serving_client.py > ${_save_log_path} 2>&1 "
-                echo ${pipeline_cmd}
                 eval ${pipeline_cmd}
                 last_status=${PIPESTATUS[0]}
                 eval "cat ${_save_log_path}"
                 status_check ${last_status} "${pipeline_cmd}" "${status_log}" "${model_name}"
-                ps ux | grep -E 'serving_server|pipeline' | awk '{print $2}' | xargs kill -s 9
+                eval "${python_} -m paddle_serving_server.serve stop"
                 sleep 5s
             fi
         done
@@ -353,7 +354,7 @@ function func_serving_rec(){
                     status_check $last_status "${pipeline_cmd}" "${status_log}" "${model_name}"
                     sleep 5s
                 done
-                ps ux | grep -E 'web_service|pipeline' | awk '{print $2}' | xargs kill -s 9
+                eval "${python_} -m paddle_serving_server.serve stop"
             elif [ ${use_gpu} -eq 0 ]; then
                 if [[ ${_flag_quant} = "False" ]] && [[ ${precision} =~ "int8" ]]; then
                     continue
@@ -385,7 +386,7 @@ function func_serving_rec(){
                     status_check $last_status "${pipeline_cmd}" "${status_log}" "${model_name}"
                     sleep 10s
                 done
-                ps ux | grep -E 'web_service|pipeline' | awk '{print $2}' | xargs kill -s 9
+                eval "${python_} -m paddle_serving_server.serve stop"
             else
                 echo "Does not support hardware [${use_gpu}] other than CPU and GPU Currently!"
             fi
