@@ -51,9 +51,9 @@
 | PPLCNet_x1_0  | 94.72          | 2.12  | 6.5 | 使用 ImageNet 预训练模型 |
 | PPLCNet_x1_0  | 95.48          | 2.12  | 6.5 | 使用 SSLD 预训练模型 |
 | PPLCNet_x1_0  | 95.48          | 2.12  | 6.5 | 使用 SSLD 预训练模型+EDA 策略|
-| <b>PPLCNet_x1_0<b>  | <b>95.72<b>    | <b>2.12<b>  | <b>6.5<b> | 使用 SSLD 预训练模型+EDA 策略+SKL-UGI 知识蒸馏策略|
+| <b>PPLCNet_x1_0<b>  | <b>95.92<b>    | <b>2.12<b>  | <b>6.5<b> | 使用 SSLD 预训练模型+EDA 策略+SKL-UGI 知识蒸馏策略|
      
-从表中可以看出，backbone 为 SwinTranformer_tiny 时精度较高，但是推理速度较慢。将 backboone 替换为轻量级模型 MobileNetV3_small_x0_35 后，速度可以大幅提升，但是会导致精度大幅下降。将 backbone 替换为速度更快的 PPLCNet_x1_0 时，精度较 MobileNetV3_small_x0_35 高 13 个百分点，与此同时速度依旧可以快 20% 以上。在此基础上，使用 SSLD 预训练模型后，在不改变推理速度的前提下，精度可以提升约 0.7 个百分点，进一步地，在使用 SKL-UGI 知识蒸馏后，精度可以继续提升 0.24 个百分点。此时，PPLCNet_x1_0 达到了接近 SwinTranformer_tiny 模型的精度，但是速度快 40 多倍。关于 PULC 的训练方法和推理部署方法将在下面详细介绍。
+从表中可以看出，backbone 为 SwinTranformer_tiny 时精度较高，但是推理速度较慢。将 backboone 替换为轻量级模型 MobileNetV3_small_x0_35 后，速度可以大幅提升，但是会导致精度大幅下降。将 backbone 替换为速度更快的 PPLCNet_x1_0 时，精度较 MobileNetV3_small_x0_35 高 13 个百分点，与此同时速度依旧可以快 20% 以上。在此基础上，使用 SSLD 预训练模型后，在不改变推理速度的前提下，精度可以提升约 0.7 个百分点，进一步地，在使用 SKL-UGI 知识蒸馏后，精度可以继续提升 0.44 个百分点。此时，PPLCNet_x1_0 达到了接近 SwinTranformer_tiny 模型的精度，但是速度快 40 多倍。关于 PULC 的训练方法和推理部署方法将在下面详细介绍。
     
 **备注：** 
     
@@ -87,7 +87,7 @@ paddleclas --model_name=car_exists --infer_imgs=deploy/images/PULC/car_exists/ob
 结果如下：
 ```
 >>> result
-class_ids: [1], scores: [0.9740616], label_names: ['contains_vehicle'], filename: deploy/images/PULC/car_exists/objects365_00001507.jpeg
+class_ids: [1], scores: [0.9871138], label_names: ['contains_vehicle'], filename: deploy/images/PULC/car_exists/objects365_00001507.jpeg
 Predict complete!
 ```
 
@@ -102,11 +102,11 @@ result = model.predict(input_data="deploy/images/PULC/car_exists/objects365_0000
 print(next(result))
 ```
 
-**备注**：`model.predict()` 为可迭代对象（`generator`），因此需要使用 `next()` 函数或 `for` 循环对其迭代调用。每次调用将以 `batch_size` 为单位进行一次预测，并返回预测结果, 默认 `batch_size` 为 1，如果需要更改 `batch_size`，实例化模型时，需要指定 `batch_size`，如 `model = paddleclas.PaddleClas(model_name="person_exists",  batch_size=2)`, 使用默认的代码返回结果示例如下：
+**备注**：`model.predict()` 为可迭代对象（`generator`），因此需要使用 `next()` 函数或 `for` 循环对其迭代调用。每次调用将以 `batch_size` 为单位进行一次预测，并返回预测结果, 默认 `batch_size` 为 1，如果需要更改 `batch_size`，实例化模型时，需要指定 `batch_size`，如 `model = paddleclas.PaddleClas(model_name="car_exists",  batch_size=2)`, 使用默认的代码返回结果示例如下：
 
 ```
 >>> result
-[{'class_ids': [1], 'scores': [0.9740616], 'label_names': ['contains_vehicle'], 'filename': 'deploy/images/PULC/car_exists/objects365_00001507.jpeg'}]
+[{'class_ids': [1], 'scores': [0.9871138], 'label_names': ['contains_vehicle'], 'filename': 'deploy/images/PULC/car_exists/objects365_00001507.jpeg'}]
 ```
 
 <a name="3"></a> 
@@ -236,13 +236,13 @@ python3 tools/eval.py \
 ```python
 python3 tools/infer.py \
     -c ./ppcls/configs/PULC/car_exists/PPLCNet_x1_0.yaml \
-    -o Global.pretrained_model=output/PPLCNet_x1_0/best_model \
+    -o Global.pretrained_model=output/PPLCNet_x1_0/best_model
 ```
 
 输出结果如下：
 
 ```
-[{'class_ids': [1], 'scores': [0.9740616], 'label_names': ['contains_vehicle'], 'filename': 'deploy/images/PULC/car_exists/objects365_00001507.jpeg'}]
+[{'class_ids': [1], 'scores': [0.9871138], 'label_names': ['contains_vehicle'], 'filename': 'deploy/images/PULC/car_exists/objects365_00001507.jpeg'}]
 ```
 
 **备注：** 
@@ -268,7 +268,7 @@ SKL-UGI 知识蒸馏是 PaddleClas 提出的一种简单有效的知识蒸馏方
 
 #### 4.1.1 教师模型训练
 
-复用 `ppcls/configs/PULC/person_exists/PPLCNet/PPLCNet_x1_0.yaml` 中的超参数，训练教师模型，训练脚本如下：
+复用 `ppcls/configs/PULC/car_exists/PPLCNet/PPLCNet_x1_0.yaml` 中的超参数，训练教师模型，训练脚本如下：
 
 ```shell
 export CUDA_VISIBLE_DEVICES=0,1,2,3
@@ -285,7 +285,7 @@ python3 -m paddle.distributed.launch \
 
 ####  4.1.2 蒸馏训练
 
-配置文件`ppcls/configs/PULC/person_exists/PPLCNet_x1_0_distillation.yaml`提供了`SKL-UGI知识蒸馏策略`的配置。该配置将`ResNet101_vd`当作教师模型，`PPLCNet_x1_0`当作学生模型，使用ImageNet数据集的验证集作为新增的无标签数据。训练脚本如下：
+配置文件`ppcls/configs/PULC/car_exists/PPLCNet_x1_0_distillation.yaml`提供了`SKL-UGI知识蒸馏策略`的配置。该配置将`ResNet101_vd`当作教师模型，`PPLCNet_x1_0`当作学生模型，使用ImageNet数据集的验证集作为新增的无标签数据。训练脚本如下：
 
 ```shell
 export CUDA_VISIBLE_DEVICES=0,1,2,3
@@ -390,7 +390,7 @@ python3.7 python/predict_cls.py -c configs/PULC/car_exists/inference_car_exists.
 输出结果如下。
 
 ```
-objects365_02035329.jpg:	class id(s): [1], score(s): [1.00], label_name(s): ['someone']
+objects365_00001507.jpeg:       class id(s): [1], score(s): [0.99], label_name(s): ['contains_car']
 ```
 
 
@@ -410,8 +410,8 @@ python3.7 python/predict_cls.py -c configs/PULC/car_exists/inference_car_exists.
 终端中会输出该文件夹内所有图像的分类结果，如下所示。
 
 ```
-objects365_01780782.jpg:	class id(s): [0], score(s): [1.00], label_name(s): ['nobody']
-objects365_02035329.jpg:	class id(s): [1], score(s): [1.00], label_name(s): ['someone']
+objects365_00001507.jpeg:       class id(s): [1], score(s): [0.99], label_name(s): ['contains_car']
+objects365_00001521.jpeg:       class id(s): [0], score(s): [0.99], label_name(s): ['nocar']
 ```
 
 其中，`contains_car` 表示该图里存在车，`nocar` 表示该图里不存在车。
