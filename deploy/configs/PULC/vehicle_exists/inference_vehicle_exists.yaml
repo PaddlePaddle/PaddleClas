@@ -1,9 +1,9 @@
 Global:
-  infer_imgs: "./images/PULC/textline_orientation/textline_orientation_test_0_0.png"
-  inference_model_dir: "./models/textline_orientation_infer"
+  infer_imgs: "./images/PULC/vehicle_exists/objects365_00001507.jpeg"
+  inference_model_dir: "./models/vehicle_exists_infer"
   batch_size: 1
   use_gpu: True
-  enable_mkldnn: True
+  enable_mkldnn: False
   cpu_num_threads: 10
   enable_benchmark: True
   use_fp16: False
@@ -15,7 +15,9 @@ Global:
 PreProcess:
   transform_ops:
     - ResizeImage:
-        size: [160, 80]
+        resize_short: 256
+    - CropImage:
+        size: 224
     - NormalizeImage:
         scale: 0.00392157
         mean: [0.485, 0.456, 0.406]
@@ -25,9 +27,10 @@ PreProcess:
     - ToCHWImage:
 
 PostProcess:
-  main_indicator: Topk
-  Topk:
-    topk: 1
-    class_id_map_file: "../ppcls/utils/PULC_label_list/textline_orientation_label_list.txt"
+  main_indicator: ThreshOutput
+  ThreshOutput:
+    threshold: 0.5
+    label_0: no_vehicle
+    label_1: contains_vehicle
   SavePreLabel:
     save_dir: ./pre_label/

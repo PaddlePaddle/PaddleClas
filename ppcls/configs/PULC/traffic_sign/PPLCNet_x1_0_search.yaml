@@ -138,7 +138,7 @@ Infer:
   PostProcess:
     name: Topk
     topk: 5
-    class_id_map_file: dataset/traffic_sign/label_name_id.txt
+    class_id_map_file: ppcls/utils/PULC_label_list/traffic_sign_label_list.txt
 
 Metric:
   Train:
