@@ -55,11 +55,11 @@
 | <b>PPLCNet_x1_0**<b>  | <b>96.01<b> | <b>2.72<b>  | <b>6.5<b> | 使用 SSLD 预训练模型+EDA 策略|
 | PPLCNet_x1_0**  | 95.86 | 2.72  | 6.5 | 使用 SSLD 预训练模型+EDA 策略+SKL-UGI 知识蒸馏策略|
 
-从表中可以看出，backbone 为 SwinTranformer_tiny 时精度较高，但是推理速度较慢。将 backboone 替换为轻量级模型 MobileNetV3_small_x0_35 后，速度可以大幅提升，精度下降也比较明显。将 backbone 替换为 PPLCNet_x1_0 时，精度较 MobileNetV3_small_x0_35 高 8.6 个百分点，速度快10%左右。在此基础上，更改分辨率和stride， 速度变慢 27%，但是精度可以提升 4.5%（采用[PaddleOCR](https://github.com/PaddlePaddle/PaddleOCR)的方案），使用 SSLD 预训练模型后，精度可以继续提升约 0.05% ，进一步地，当融合EDA策略后，精度可以再提升 1.9 个百分点。最后，融合SKL-UGI 知识蒸馏策略后，在该场景无效。关于 PULC 的训练方法和推理部署方法将在下面详细介绍。
+从表中可以看出，backbone 为 SwinTranformer_tiny 时精度较高，但是推理速度较慢。将 backboone 替换为轻量级模型 MobileNetV3_small_x0_35 后，速度可以大幅提升，精度下降也比较明显。将 backbone 替换为 PPLCNet_x1_0 时，精度较 MobileNetV3_small_x0_35 高 8.6 个百分点，速度快10%左右。在此基础上，更改分辨率和stride， 速度变慢 27%，但是精度可以提升 4.5 个百分点（采用[PaddleOCR](https://github.com/PaddlePaddle/PaddleOCR)的方案），使用 SSLD 预训练模型后，精度可以继续提升约 0.05 个百分点 ，进一步地，当融合EDA策略后，精度可以再提升 1.9 个百分点。最后，融合SKL-UGI 知识蒸馏策略后，在该场景无效。关于 PULC 的训练方法和推理部署方法将在下面详细介绍。
 
 **备注：**
 
-* 其中不带\*的模型表示分辨率为224x224，带\*的模型表示分辨率为48x192（h*w）,数据增强从网络中的 stride 改为 `[2, [2, 1], [2, 1], [2, 1], [2, 1]]`，其中，外层列表中的每一个元素代表网络结构下采样层的stride，该策略为 [PaddleOCR](https://github.com/PaddlePaddle/PaddleOCR) 提供的文本行方向分类器方案。带\*\*的模型表示分辨率为80x160（h*w）, 网络中的 stride 改为 `[2, [2, 1], [2, 1], [2, 1], [2, 1]]`，其中，外层列表中的每一个元素代表网络结构下采样层的stride，此分辨率是经过[SHAS 超参数搜索策略](#TODO)搜索得到的。
+* 其中不带\*的模型表示分辨率为224x224，带\*的模型表示分辨率为48x192（h\*w）,数据增强从网络中的 stride 改为 `[2, [2, 1], [2, 1], [2, 1], [2, 1]]`，其中，外层列表中的每一个元素代表网络结构下采样层的stride，该策略为 [PaddleOCR](https://github.com/PaddlePaddle/PaddleOCR) 提供的文本行方向分类器方案。带\*\*的模型表示分辨率为80x160（h\*w）, 网络中的 stride 改为 `[2, [2, 1], [2, 1], [2, 1], [2, 1]]`，其中，外层列表中的每一个元素代表网络结构下采样层的stride，此分辨率是经过[SHAS 超参数搜索策略](PULC_train.md#4-超参搜索)搜索得到的。
 * 延时是基于 Intel(R) Xeon(R) Gold 6148 CPU @ 2.40GHz 测试得到，开启 MKLDNN 加速策略，线程数为10。
 * 关于PP-LCNet的介绍可以参考[PP-LCNet介绍](../models/PP-LCNet.md)，相关论文可以查阅[PP-LCNet paper](https://arxiv.org/abs/2109.15099)。
 
@@ -116,7 +116,6 @@ Predict complete!
 
 **备注**： 更换其他预测的数据时，只需要改变 `--infer_imgs=xx` 中的字段即可，支持传入整个文件夹。
 
-
 * 在 Python 代码中预测
 ```python
 import paddleclas
@@ -140,7 +139,7 @@ print(next(result))
 
 ### 3.1 环境配置
 
-* 安装：请先参考 [Paddle 安装教程](../installation/install_paddle.md) 以及 [PaddleClas 安装教程](../installation/install_paddleclas.md) 配置 PaddleClas 运行环境。
+* 安装：请先参考文档 [环境准备](../installation/install_paddleclas.md) 配置 PaddleClas 运行环境。
 
 <a name="3.2"></a>
 
@@ -168,9 +167,7 @@ print(next(result))
 
 ![](../../images/PULC/docs/textline_orientation_data_demo.png)
 
-
 此处提供了经过上述方法处理好的数据，可以直接下载得到。
-
 
 进入 PaddleClas 目录。
 
@@ -178,7 +175,7 @@ print(next(result))
 cd path_to_PaddleClas
 ```
 
-进入 `dataset/` 目录，下载并解压有人/无人场景的数据。
+进入 `dataset/` 目录，下载并解压文本行方向分类场景的数据。
 
 ```shell
 cd dataset
@@ -190,7 +187,6 @@ cd ../
 执行上述命令后，`dataset/` 下存在 `textline_orientation` 目录，该目录中具有以下数据：
 
 ```
-
 ├── 0
 │   ├── img_0.jpg
 │   ├── img_1.jpg
@@ -253,7 +249,7 @@ python3 tools/eval.py \
 ```python
 python3 tools/infer.py \
     -c ./ppcls/configs/PULC/textline_orientation/PPLCNet_x1_0.yaml \
-    -o Global.pretrained_model=output/PPLCNet_x1_0/best_model \
+    -o Global.pretrained_model=output/PPLCNet_x1_0/best_model
 ```
 
 输出结果如下：
@@ -318,7 +314,7 @@ python3 -m paddle.distributed.launch \
 
 ## 5. 超参搜索
 
-在 [3.2 节](#3.2)和 [4.1 节](#4.1)所使用的超参数是根据 PaddleClas 提供的 `SHAS 超参数搜索策略` 搜索得到的，如果希望在自己的数据集上得到更好的结果，可以参考[SHAS 超参数搜索策略](PULC_train.md#4-超参搜索)来获得更好的训练超参数。
+在 [3.3 节](#3.3)和 [4.1 节](#4.1)所使用的超参数是根据 PaddleClas 提供的 `SHAS 超参数搜索策略` 搜索得到的，如果希望在自己的数据集上得到更好的结果，可以参考[SHAS 超参数搜索策略](PULC_train.md#4-超参搜索)来获得更好的训练超参数。
 
 **备注：** 此部分内容是可选内容，搜索过程需要较长的时间，您可以根据自己的硬件情况来选择执行。
 
