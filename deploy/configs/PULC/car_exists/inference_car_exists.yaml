@@ -30,7 +30,7 @@ PostProcess:
   main_indicator: ThreshOutput
   ThreshOutput:
     threshold: 0.5
-    label_0: nocar
+    label_0: no_car
     label_1: contains_car
   SavePreLabel:
     save_dir: ./pre_label/
