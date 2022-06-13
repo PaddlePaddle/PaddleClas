@@ -22,7 +22,7 @@ PP-ShiTu图像识别系统效果展示
 
 
 ## 近期更新
-- 🔥️ 2022.6.15 发布PULC超轻量图像分类方案，CPU推理3ms，精度比肩SwinTransformer，覆盖人、车、OCR场景九大常见任务。
+- 🔥️ 2022.6.15 发布[PULC超轻量图像分类实用方案](docs/zh_CN/PULC/PULC_train.md)，CPU推理3ms，精度比肩SwinTransformer，覆盖人、车、OCR场景九大常见任务。
 - 2022.5.26 [飞桨产业实践范例直播课](http://aglc.cn/v-c4FAR)，解读**超轻量重点区域人员出入管理方案**。
 - 2022.5.23 新增[人员出入管理范例库](https://aistudio.baidu.com/aistudio/projectdetail/4094475)，具体内容可以在 AI Stuio 上体验。
 - 2022.5.20 上线[PP-HGNet](./docs/zh_CN/models/PP-HGNet.md), [PP-LCNetv2](./docs/zh_CN/models/PP-LCNetV2.md)。
