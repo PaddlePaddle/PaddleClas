@@ -216,7 +216,7 @@ In the above training process, we adjusted parameters such as learning rate, dat
 
 #### 4.1 Search based on default configuration
 
-The configuration file [search.yaml](../../ppcls/configs/PULC/person_exists/search.yaml) defines the configuration of hyperparameter search in person exists or not scenarios. Use the following commands to complete hyperparameter search.
+The configuration file [search.yaml](../../../ppcls/configs/PULC/person_exists/search.yaml) defines the configuration of hyperparameter search in person exists or not scenarios. Use the following commands to complete hyperparameter search.
 
 ```bash
 python3 tools/search_strategy.py -c ppcls/configs/PULC/person_exists/search.yaml
