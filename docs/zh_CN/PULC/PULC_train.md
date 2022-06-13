@@ -24,7 +24,7 @@
 
 图像分类是计算机视觉的基础算法之一，是企业应用中最常见的算法，也是许多 CV 应用的重要组成部分。近年来，骨干网络模型发展迅速，ImageNet 的精度纪录被不断刷新。然而，这些模型在实用场景的表现有时却不尽如人意。一方面，精度高的模型往往体积大，运算慢，常常难以满足实际部署需求；另一方面，选择了合适的模型之后，往往还需要经验丰富的工程师进行调参，费时费力。PaddleClas 为了解决企业应用难题，让分类模型的训练和调参更加容易，总结推出了实用轻量图像分类解决方案（PULC, Practical Ultra Lightweight Classification）。PULC融合了骨干网络、数据增广、蒸馏等多种前沿算法，可以自动训练得到轻量且高精度的图像分类模型。
 
-PULC 方案在人、车、OCR等方向的多个场景中均验证有效，用超轻量模型就可实现与SwinTransformer模型接近的精度，预测速度提高 40+ 倍。
+PULC 方案在人、车、OCR等方向的多个场景中均验证有效，用超轻量模型就可实现与 SwinTransformer 模型接近的精度，预测速度提高 40+ 倍。
 
 <div align="center">
 <img src="https://user-images.githubusercontent.com/19523330/173011854-b10fcd7a-b799-4dfd-a1cf-9504952a3c44.png"  width = "800" />
@@ -78,7 +78,7 @@ train
 tree -r -i -f train | grep -E "jpg|JPG|jpeg|JPEG|png|PNG" | awk -F "/" '{print $0" "$2}' > train_list.txt
 ```
 
-其中，如果需要传入更多的数据类型，可以增加 `grep -E`后的内容， `$2`中的`2`为类别号文件夹的层级。
+其中，如果涉及更多的图片名称尾缀，可以增加 `grep -E`后的内容， `$2` 中的 `2` 为类别号文件夹的层级。
 
 **备注：** 以上为数据集获取和生成的方法介绍，这里您可以直接下载有人/无人场景数据快速开始体验。
 
@@ -105,20 +105,20 @@ cd ../
 
 #### 3.1 骨干网络PP-LCNet
 
-PULC采用了轻量骨干网络PP-LCNet，相比同精度竞品速度快50%，您可以在[PP-LCNet介绍](../models/PP-LCNet.md)查阅该骨干网络的详细介绍。
-直接使用PP-LCNet训练的命令为：
+PULC 采用了轻量骨干网络 PP-LCNet，相比同精度竞品速度快 50%，您可以在[PP-LCNet介绍](../models/PP-LCNet.md)查阅该骨干网络的详细介绍。
+直接使用 PP-LCNet 训练的命令为：
 
 ```shell
 export CUDA_VISIBLE_DEVICES=0,1,2,3
 python3 -m paddle.distributed.launch \
     --gpus="0,1,2,3" \
     tools/train.py \
-        -c ./ppcls/configs/PULC/person_exists/PPLCNet_x1_0.yaml
+        -c ./ppcls/configs/PULC/person_exists/PPLCNet_x1_0_search.yaml
 ```
 
-为了方便性能对比，我们也提供了大模型 SwinTransformer 和轻量模型 MobileNetV3 的配置文件，您可以使用命令训练：
+为了方便性能对比，我们也提供了大模型 SwinTransformer_tiny 和轻量模型 MobileNetV3_small_x0_35 的配置文件，您可以使用命令训练：
 
-SwinTransformer：
+SwinTransformer_tiny：
 
 ```shell
 export CUDA_VISIBLE_DEVICES=0,1,2,3
@@ -128,7 +128,7 @@ python3 -m paddle.distributed.launch \
         -c ./ppcls/configs/PULC/person_exists/SwinTransformer_tiny_patch4_window7_224.yaml
 ```
 
-MobileNetV3：
+MobileNetV3_small_x0_35：
 
 ```shell
 export CUDA_VISIBLE_DEVICES=0,1,2,3
