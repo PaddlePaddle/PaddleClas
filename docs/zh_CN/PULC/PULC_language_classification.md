@@ -4,8 +4,9 @@
 
 - [1. 模型和应用场景介绍](#1)
 - [2. 模型快速体验](#2)
-  - [2.1 安装 paddleclas](#2.1)  
-  - [2.2 预测](#2.2)
+    - [2.1 安装 paddlepaddle](#2.1)
+    - [2.2 安装 paddleclas](#2.2)
+    - [2.3 预测](#2.3)
 - [3. 模型训练、评估和预测](#3)
   - [3.1 环境配置](#3.1)  
   - [3.2 数据准备](#3.2)
@@ -58,51 +59,71 @@
 
 ## 2. 模型快速体验
 
-<a name="2.1"></a>
+<a name="2.1"></a>  
+    
+### 2.1 安装 paddlepaddle
+    
+- 您的机器安装的是 CUDA9 或 CUDA10，请运行以下命令安装
 
-### 2.1 安装 paddleclas
+```bash
+python3 -m pip install paddlepaddle-gpu -i https://mirror.baidu.com/pypi/simple
+```
+
+- 您的机器是CPU，请运行以下命令安装
+
+```bash
+python3 -m pip install paddlepaddle -i https://mirror.baidu.com/pypi/simple
+```
+    
+更多的版本需求，请参照[飞桨官网安装文档](https://www.paddlepaddle.org.cn/install/quick)中的说明进行操作。
+    
+<a name="2.2"></a>  
+    
+### 2.2 安装 paddleclas
 
 使用如下命令快速安装 paddleclas
 
-```
+```  
 pip3 install paddleclas
-```
+``` 
+    
+<a name="2.3"></a>
 
-<a name="2.2"></a>
+### 2.3 预测
+    
+点击[这里](https://paddleclas.bj.bcebos.com/data/PULC/pulc_demo_imgs.zip)下载 demo 数据并解压，然后在终端中切换到相应目录。
 
-### 2.2 预测
+* 使用命令行快速预测
 
-- 使用命令行快速预测
-
-```
-paddleclas --model_name=language_classification --infer_imgs=deploy/images/PULC/language_classification/word_35404.png
+```bash
+paddleclas --model_name=person_exists --infer_imgs=pulc_demo_imgs/language_classification/word_35404.png
 ```
 
 结果如下：
-
 ```
 >>> result
-class_ids: [4, 6], scores: [0.88672, 0.01434], label_names: ['japan', 'korean'], filename: deploy/images/PULC/language_classification/word_35404.png
+class_ids: [4, 6], scores: [0.88672, 0.01434], label_names: ['japan', 'korean'], filename: pulc_demo_imgs/language_classification/word_35404.png
 Predict complete!
 ```
 
 **备注**： 更换其他预测的数据时，只需要改变 `--infer_imgs=xx` 中的字段即可，支持传入整个文件夹。
 
-- 在 Python 代码中预测
 
-```
+* 在 Python 代码中预测
+```python
 import paddleclas
-model = paddleclas.PaddleClas(model_name="language_classification")
-result = model.predict(input_data="deploy/images/PULC/language_classification/word_35404.png")
+model = paddleclas.PaddleClas(model_name="person_exists")
+result = model.predict(input_data="pulc_demo_imgs/language_classification/word_35404.png")
 print(next(result))
 ```
 
-**备注**：`model.predict()` 为可迭代对象（`generator`），因此需要使用 `next()` 函数或 `for` 循环对其迭代调用。每次调用将以 `batch_size` 为单位进行一次预测，并返回预测结果, 默认 `batch_size` 为 1，如果需要更改 `batch_size`，实例化模型时，需要指定 `batch_size`，如 `model = paddleclas.PaddleClas(model_name="language_classification", batch_size=2)`, 使用默认的代码返回结果示例如下：
+**备注**：`model.predict()` 为可迭代对象（`generator`），因此需要使用 `next()` 函数或 `for` 循环对其迭代调用。每次调用将以 `batch_size` 为单位进行一次预测，并返回预测结果, 默认 `batch_size` 为 1，如果需要更改 `batch_size`，实例化模型时，需要指定 `batch_size`，如 `model = paddleclas.PaddleClas(model_name="person_exists",  batch_size=2)`, 使用默认的代码返回结果示例如下：
 
 ```
 >>> result
-[{'class_ids': [4, 6], 'scores': [0.88672, 0.01434], 'label_names': ['japan', 'korean'], 'filename': '/deploy/images/PULC/language_classification/word_35404.png'}]
+[{'class_ids': [4, 6], 'scores': [0.88672, 0.01434], 'label_names': ['japan', 'korean'], 'filename': 'pulc_demo_imgs/language_classification/word_35404.png'}]
 ```
+
 
 <a name="3"></a>
 
@@ -134,7 +155,7 @@ print(next(result))
 
 `0` 表示阿拉伯语（arabic）；`1` 表示中文繁体（chinese_cht）；`2` 表示斯拉夫语（cyrillic）；`3` 表示梵文（devanagari）；`4` 表示日语（japan）；`5` 表示卡纳达文（ka）；`6` 表示韩语（korean）；`7` 表示泰米尔文（ta）；`8` 表示泰卢固文（te）；`9` 表示拉丁语（latin）。
 
-在 Multi-lingual scene text detection and recognition 数据集中，仅包含了阿拉伯语、日语、韩语和拉丁语数据，这里分别将4个语种的数据各抽取120张作为本案例的训练数据，50张作为测试数据，以及30张作为补充数据和训练数据混合用于本案例的`SKL-UGI知识蒸馏策略`实验。
+在 Multi-lingual scene text detection and recognition 数据集中，仅包含了阿拉伯语、日语、韩语和拉丁语数据，这里分别将 4 个语种的数据各抽取 1600 张作为本案例的训练数据，300 张作为测试数据，以及 400 张作为补充数据和训练数据混合用于本案例的`SKL-UGI知识蒸馏策略`实验。
 
 因此，对于本案例中的demo数据集，类别为：
 
@@ -172,7 +193,7 @@ cd ../
 └── label_list.txt
 ```
 
-其中`img/`存放了4种语言总计800张数据。`train_list.txt`和`test_list.txt`分别为训练集和验证集的标签文件，`label_list.txt`是4类语言分类模型对应的类别列表，`SKL-UGI知识蒸馏策略`对应的训练标签文件为`train_list_for_distill.txt`。用这些图片可以快速体验本案例中模型的训练预测过程。
+其中`img/`存放了 4 种语言总计 9200 张数据。`train_list.txt`和`test_list.txt`分别为训练集和验证集的标签文件，`label_list.txt`是 4 类语言分类模型对应的类别列表，`SKL-UGI 知识蒸馏策略`对应的训练标签文件为`train_list_for_distill.txt`。用这些图片可以快速体验本案例中模型的训练预测过程。
 
 ***备注：***
 

@@ -4,8 +4,9 @@
 
 - [1. 模型和应用场景介绍](#1)
 - [2. 模型快速体验](#2)
-  - [2.1 安装 paddleclas](#2.1)  
-  - [2.2 预测](#2.2)
+    - [2.1 安装 paddlepaddle](#2.1)
+    - [2.2 安装 paddleclas](#2.2)
+    - [2.3 预测](#2.3)
 - [3. 模型训练、评估和预测](#3)
   - [3.1 环境配置](#3.1)  
   - [3.2 数据准备](#3.2)
@@ -57,50 +58,69 @@
 
 ## 2. 模型快速体验
 
-<a name="2.1"></a>
+<a name="2.1"></a>  
+    
+### 2.1 安装 paddlepaddle
+    
+- 您的机器安装的是 CUDA9 或 CUDA10，请运行以下命令安装
 
-### 2.1 安装 paddleclas
+```bash
+python3 -m pip install paddlepaddle-gpu -i https://mirror.baidu.com/pypi/simple
+```
+
+- 您的机器是CPU，请运行以下命令安装
+
+```bash
+python3 -m pip install paddlepaddle -i https://mirror.baidu.com/pypi/simple
+```
+    
+更多的版本需求，请参照[飞桨官网安装文档](https://www.paddlepaddle.org.cn/install/quick)中的说明进行操作。
+    
+<a name="2.2"></a>  
+    
+### 2.2 安装 paddleclas
 
 使用如下命令快速安装 paddleclas
 
-```
+```  
 pip3 install paddleclas
-```
+``` 
+    
+<a name="2.3"></a>
 
-<a name="2.2"></a>
+### 2.3 预测
+    
+点击[这里](https://paddleclas.bj.bcebos.com/data/PULC/pulc_demo_imgs.zip)下载 demo 数据并解压，然后在终端中切换到相应目录。
 
-### 2.2 预测
+* 使用命令行快速预测
 
-- 使用命令行快速预测
-
-```
-paddleclas --model_name=text_image_orientation --infer_imgs=deploy/images/PULC/text_image_orientation/img_rot0_demo.jpg
+```bash
+paddleclas --model_name=text_image_orientation --infer_imgs=pulc_demo_imgs/text_image_orientation/img_rot0_demo.jpg
 ```
 
 结果如下：
-
 ```
 >>> result
-class_ids: [0, 2], scores: [0.85615, 0.05046], label_names: ['0', '180'], filename: deploy/images/PULC/text_image_orientation/img_rot0_demo.jpg
+class_ids: [0, 2], scores: [0.85615, 0.05046], label_names: ['0', '180'], filename: pulc_demo_imgs/text_image_orientation/img_rot0_demo.jpg
 Predict complete!
 ```
 
 **备注**： 更换其他预测的数据时，只需要改变 `--infer_imgs=xx` 中的字段即可，支持传入整个文件夹。
 
-- 在 Python 代码中预测
 
-```
+* 在 Python 代码中预测
+```python
 import paddleclas
 model = paddleclas.PaddleClas(model_name="text_image_orientation")
-result = model.predict(input_data="deploy/images/PULC/text_image_orientation/img_rot0_demo.jpg")
+result = model.predict(input_data="pulc_demo_imgs/text_image_orientation/img_rot0_demo.jpg")
 print(next(result))
 ```
 
-**备注**：`model.predict()` 为可迭代对象（`generator`），因此需要使用 `next()` 函数或 `for` 循环对其迭代调用。每次调用将以 `batch_size` 为单位进行一次预测，并返回预测结果, 默认 `batch_size` 为 1，如果需要更改 `batch_size`，实例化模型时，需要指定 `batch_size`，如 `model = paddleclas.PaddleClas(model_name="text_image_orientation", batch_size=2)`, 使用默认的代码返回结果示例如下：
+**备注**：`model.predict()` 为可迭代对象（`generator`），因此需要使用 `next()` 函数或 `for` 循环对其迭代调用。每次调用将以 `batch_size` 为单位进行一次预测，并返回预测结果, 默认 `batch_size` 为 1，如果需要更改 `batch_size`，实例化模型时，需要指定 `batch_size`，如 `model = paddleclas.PaddleClas(model_name="person_exists",  batch_size=2)`, 使用默认的代码返回结果示例如下：
 
 ```
 >>> result
-[{'class_ids': [0, 2], 'scores': [0.85615, 0.05046], 'label_names': ['0', '180'], 'filename': 'deploy/images/PULC/text_image_orientation/img_rot0_demo.jpg'}]
+[{'class_ids': [0, 2], 'scores': [0.85615, 0.05046], 'label_names': ['0', '180'], 'filename': 'pulc_demo_imgs/text_image_orientation/img_rot0_demo.jpg'}]
 ```
 
 <a name="3"></a>

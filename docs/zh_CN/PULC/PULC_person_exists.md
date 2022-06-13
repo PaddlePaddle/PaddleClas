@@ -84,15 +84,17 @@ python3 -m pip install paddlepaddle -i https://mirror.baidu.com/pypi/simple
     
 更多的版本需求，请参照[飞桨官网安装文档](https://www.paddlepaddle.org.cn/install/quick)中的说明进行操作。
     
+<a name="2.2"></a>  
+    
 ### 2.2 安装 paddleclas
 
 使用如下命令快速安装 paddleclas
 
 ```  
 pip3 install paddleclas
-```
+``` 
     
-<a name="2.2"></a>
+<a name="2.3"></a>
 
 ### 2.3 预测
     

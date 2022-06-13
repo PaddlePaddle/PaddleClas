@@ -7,6 +7,9 @@
 
 - [1. 模型和应用场景介绍](#1)
 - [2. 模型快速体验](#2)
+    - [2.1 安装 paddlepaddle](#2.1)
+    - [2.2 安装 paddleclas](#2.2)
+    - [2.3 预测](#2.3)
 - [3. 模型训练、评估和预测](#3)
     - [3.1 环境配置](#3.1)
     - [3.2 数据准备](#3.2)
@@ -64,30 +67,50 @@
 
 ## 2. 模型快速体验
 
-
 <a name="2.1"></a>  
+    
+### 2.1 安装 paddlepaddle
+    
+- 您的机器安装的是 CUDA9 或 CUDA10，请运行以下命令安装
 
-### 2.1 安装 paddleclas
+```bash
+python3 -m pip install paddlepaddle-gpu -i https://mirror.baidu.com/pypi/simple
+```
 
-使用如下命令快速安装 paddlepaddle, paddleclas
+- 您的机器是CPU，请运行以下命令安装
+
+```bash
+python3 -m pip install paddlepaddle -i https://mirror.baidu.com/pypi/simple
+```
+    
+更多的版本需求，请参照[飞桨官网安装文档](https://www.paddlepaddle.org.cn/install/quick)中的说明进行操作。
+    
+<a name="2.2"></a>  
+    
+### 2.2 安装 paddleclas
+
+使用如下命令快速安装 paddleclas
 
 ```  
-pip3 install paddlepaddle paddleclas
-```
-<a name="2.2"></a>
+pip3 install paddleclas
+``` 
+    
+<a name="2.3"></a>
 
-### 2.2 预测
+### 2.3 预测
+    
+点击[这里](https://paddleclas.bj.bcebos.com/data/PULC/pulc_demo_imgs.zip)下载 demo 数据并解压，然后在终端中切换到相应目录。
 
 * 使用命令行快速预测
 
 ```bash
-paddleclas --model_name=textline_orientation --infer_imgs=deploy/images/PULC/textline_orientation/textline_orientation_test_0_0.png
+paddleclas --model_name=textline_orientation --infer_imgs=pulc_demo_imgs/textline_orientation/textline_orientation_test_0_0.png
 ```
 
 结果如下：
 ```
 >>> result
-class_ids: [0], scores: [1.00], label_names: ['0_degree'], filename: deploy/images/PULC/textline_orientation/textline_orientation_test_0_0.png
+class_ids: [0], scores: [1.0], label_names: ['0_degree'], filename: pulc_demo_imgs/textline_orientation/textline_orientation_test_0_0.png
 Predict complete!
 ```
 
@@ -98,7 +121,7 @@ Predict complete!
 ```python
 import paddleclas
 model = paddleclas.PaddleClas(model_name="textline_orientation")
-result = model.predict(input_data="deploy/images/PULC/textline_orientation/textline_orientation_test_0_0.png")
+result = model.predict(input_data="pulc_demo_imgs/textline_orientation/textline_orientation_test_0_0.png")
 print(next(result))
 ```
 
@@ -106,9 +129,8 @@ print(next(result))
 
 ```
 >>> result
-[{'class_ids': [0], 'scores': [1.00], 'label_names': ['0_degree'], 'filename': 'deploy/images/PULC/textline_orientation/textline_orientation_test_0_0.png'}]
+[{'class_ids': [0], 'scores': [1.0], 'label_names': ['0_degree'], 'filename': 'pulc_demo_imgs/textline_orientation/textline_orientation_test_0_0.png'}]
 ```
-
 
 <a name="3"></a>
 
