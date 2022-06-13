@@ -2,12 +2,12 @@
 Global:
   checkpoints: null
   pretrained_model: null
-  output_dir: ./output/
+  output_dir: ./output
   device: gpu
   save_interval: 1
   eval_during_train: True
+  start_eval_epoch: 1
   eval_interval: 1
-  start_eval_epoch: 10
   epochs: 20
   print_batch_step: 10
   use_visualdl: False
@@ -18,20 +18,36 @@ Global:
   to_static: False
   use_dali: False
 
-
 # model architecture
 Arch:
-  name: PPLCNet_x1_0
-  class_num: 2
-  pretrained: True
-  use_ssld: True
+  name: "DistillationModel"
+  class_num: &class_num 2
+  # if not null, its lengths should be same as models
+  pretrained_list:
+  # if not null, its lengths should be same as models
+  freeze_params_list:
+  - True
+  - False
   use_sync_bn: True
+  models:
+    - Teacher:
+        name: ResNet101_vd
+        class_num: *class_num
+    - Student:
+        name: PPLCNet_x1_0
+        class_num: *class_num
+        pretrained: True
+        use_ssld: True
+
+  infer_model_name: "Student"
  
 # loss function config for traing/eval process
 Loss:
   Train:
-    - CELoss:
+    - DistillationDMLLoss:
         weight: 1.0
+        model_name_pairs:
+        - ["Student", "Teacher"]
   Eval:
     - CELoss:
         weight: 1.0
@@ -54,8 +70,8 @@ DataLoader:
   Train:
     dataset:
       name: ImageNetDataset
-      image_root: ./dataset/person_exists/
-      cls_label_path: ./dataset/person_exists/train_list.txt
+      image_root: ./dataset/car_exists/
+      cls_label_path: ./dataset/car_exists/train_list_for_distill.txt
       transform_ops:
         - DecodeImage:
             to_rgb: True
@@ -88,14 +104,14 @@ DataLoader:
       drop_last: False
       shuffle: True
     loader:
-      num_workers: 8
+      num_workers: 16
       use_shared_memory: True
 
   Eval:
     dataset: 
       name: ImageNetDataset
-      image_root: ./dataset/person_exists/
-      cls_label_path: ./dataset/person_exists/val_list.txt
+      image_root: ./dataset/car_exists/
+      cls_label_path: ./dataset/car_exists/val_list.txt
       transform_ops:
         - DecodeImage:
             to_rgb: True
@@ -119,7 +135,7 @@ DataLoader:
       use_shared_memory: True
 
 Infer:
-  infer_imgs: deploy/images/PULC/person_exists/objects365_02035329.jpg
+  infer_imgs: deploy/images/PULC/car_exists/objects365_00001507.jpeg
   batch_size: 10
   transforms:
     - DecodeImage:
@@ -137,15 +153,17 @@ Infer:
     - ToCHWImage:
   PostProcess:
     name: ThreshOutput
-    threshold: 0.9
+    threshold: 0.5
     label_0: nobody
     label_1: someone
 
 Metric:
-  Train:
-    - TopkAcc:
+    Train:
+    - DistillationTopkAcc:
+        model_key: "Student"
         topk: [1, 2]
-  Eval:
+    Eval:
     - TprAtFpr:
+        max_fpr: 0.01
     - TopkAcc:
         topk: [1, 2]

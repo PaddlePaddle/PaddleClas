@@ -18,13 +18,11 @@ Global:
   to_static: False
   use_dali: False
 
-
 # model architecture
 Arch:
-  name: PPLCNet_x1_0
+  name: MobileNetV3_small_x0_35
   class_num: 2
   pretrained: True
-  use_ssld: True
   use_sync_bn: True
  
 # loss function config for traing/eval process
@@ -32,6 +30,7 @@ Loss:
   Train:
     - CELoss:
         weight: 1.0
+        epsilon: 0.1
   Eval:
     - CELoss:
         weight: 1.0
@@ -42,11 +41,11 @@ Optimizer:
   momentum: 0.9
   lr:
     name: Cosine
-    learning_rate: 0.01
+    learning_rate: 0.05
     warmup_epoch: 5
   regularizer:
     name: 'L2'
-    coeff: 0.00004
+    coeff: 0.00001
 
 
 # data loader for train and eval
@@ -54,37 +53,25 @@ DataLoader:
   Train:
     dataset:
       name: ImageNetDataset
-      image_root: ./dataset/person_exists/
-      cls_label_path: ./dataset/person_exists/train_list.txt
+      image_root: ./dataset/car_exists/
+      cls_label_path: ./dataset/car_exists/train_list.txt
       transform_ops:
         - DecodeImage:
             to_rgb: True
             channel_first: False
         - RandCropImage:
-            size: 192
+            size: 224
         - RandFlipImage:
             flip_code: 1
-        - TimmAutoAugment:
-            prob: 0.0
-            config_str: rand-m9-mstd0.5-inc1
-            interpolation: bicubic
-            img_size: 192
         - NormalizeImage:
             scale: 1.0/255.0
             mean: [0.485, 0.456, 0.406]
             std: [0.229, 0.224, 0.225]
             order: ''
-        - RandomErasing:
-            EPSILON: 0.1
-            sl: 0.02
-            sh: 1.0/3.0
-            r1: 0.3
-            attempt: 10
-            use_log_aspect: True
-            mode: pixel
+
     sampler:
       name: DistributedBatchSampler
-      batch_size: 64
+      batch_size: 512
       drop_last: False
       shuffle: True
     loader:
@@ -94,8 +81,8 @@ DataLoader:
   Eval:
     dataset: 
       name: ImageNetDataset
-      image_root: ./dataset/person_exists/
-      cls_label_path: ./dataset/person_exists/val_list.txt
+      image_root: ./dataset/car_exists/
+      cls_label_path: ./dataset/car_exists/val_list.txt
       transform_ops:
         - DecodeImage:
             to_rgb: True
@@ -119,7 +106,7 @@ DataLoader:
       use_shared_memory: True
 
 Infer:
-  infer_imgs: deploy/images/PULC/person_exists/objects365_02035329.jpg
+  infer_imgs: deploy/images/PULC/car_exists/objects365_00001507.jpeg
   batch_size: 10
   transforms:
     - DecodeImage:
@@ -137,7 +124,7 @@ Infer:
     - ToCHWImage:
   PostProcess:
     name: ThreshOutput
-    threshold: 0.9
+    threshold: 0.5
     label_0: nobody
     label_1: someone
 
@@ -147,5 +134,6 @@ Metric:
         topk: [1, 2]
   Eval:
     - TprAtFpr:
+        max_fpr: 0.01
     - TopkAcc:
         topk: [1, 2]
