@@ -139,7 +139,7 @@ print(next(result))
 
 处理后的数据集部分数据可视化如下：
 
-![](../../images/PULC/docs/safety_helmet_data_demo.png)
+![](../../images/PULC/docs/safety_helmet_data_demo.jpg)
 
 此处提供了经过上述方法处理好的数据，可以直接下载得到。
 
@@ -191,7 +191,7 @@ python3 -m paddle.distributed.launch \
     -c ./ppcls/configs/PULC/safety_helmet/PPLCNet_x1_0.yaml
 ```
 
-验证集的最佳指标在 `0.975-0.985` 之间（数据集较小，容易造成波动）。
+验证集的最佳指标在 `0.985-0.993` 之间（数据集较小，容易造成波动）。
 
 **备注：**
 
