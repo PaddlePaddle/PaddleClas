@@ -54,7 +54,7 @@ function func_serving_cls(){
     for python_ in ${python[*]}; do
         if [[ ${python_} =~ "python" ]]; then
             trans_model_cmd="${python_} ${trans_model_py} ${set_dirname} ${set_model_filename} ${set_params_filename} ${set_serving_server} ${set_serving_client}"
-            eval $trans_model_cmd
+            eval ${trans_model_cmd}
             break
         fi
     done
@@ -144,19 +144,19 @@ function func_serving_cls(){
             if [[ ${use_gpu} = "null" ]]; then
                 device_type_line=24
                 set_device_type_cmd="sed -i '${device_type_line}s/device_type: .*/device_type: 0/' config.yml"
-                eval $set_device_type_cmd
+                eval ${set_device_type_cmd}
 
                 devices_line=27
                 set_devices_cmd="sed -i '${devices_line}s/devices: .*/devices: \"\"/' config.yml"
-                eval $set_devices_cmd
+                eval ${set_devices_cmd}
 
                 web_service_cmd="${python_} ${web_service_py} &"
-                eval $web_service_cmd
+                eval ${web_service_cmd}
                 sleep 5s
                 for pipeline in ${pipeline_py[*]}; do
                     _save_log_path="${LOG_PATH}/server_infer_cpu_${pipeline%_client*}_batchsize_1.log"
                     pipeline_cmd="${python_} ${pipeline} > ${_save_log_path} 2>&1 "
-                    eval $pipeline_cmd
+                    eval ${pipeline_cmd}
                     last_status=${PIPESTATUS[0]}
                     eval "cat ${_save_log_path}"
                     status_check $last_status "${pipeline_cmd}" "${status_log}" "${model_name}"
@@ -176,19 +176,19 @@ function func_serving_cls(){
 
                 device_type_line=24
                 set_device_type_cmd="sed -i '${device_type_line}s/device_type: .*/device_type: 1/' config.yml"
-                eval $set_device_type_cmd
+                eval ${set_device_type_cmd}
 
                 devices_line=27
                 set_devices_cmd="sed -i '${devices_line}s/devices: .*/devices: \"${use_gpu}\"/' config.yml"
-                eval $set_devices_cmd
+                eval ${set_devices_cmd}
 
                 web_service_cmd="${python_} ${web_service_py} & "
-                eval $web_service_cmd
+                eval ${web_service_cmd}
                 sleep 5s
                 for pipeline in ${pipeline_py[*]}; do
                     _save_log_path="${LOG_PATH}/server_infer_gpu_${pipeline%_client*}_batchsize_1.log"
                     pipeline_cmd="${python_} ${pipeline} > ${_save_log_path} 2>&1"
-                    eval $pipeline_cmd
+                    eval ${pipeline_cmd}
                     last_status=${PIPESTATUS[0]}
                     eval "cat ${_save_log_path}"
                     status_check $last_status "${pipeline_cmd}" "${status_log}" "${model_name}"
@@ -250,7 +250,7 @@ function func_serving_rec(){
     set_serving_server=$(func_set_params "${cls_serving_server_key}" "${cls_serving_server_value}")
     set_serving_client=$(func_set_params "${cls_serving_client_key}" "${cls_serving_client_value}")
     cls_trans_model_cmd="${python_interp} ${trans_model_py} ${set_dirname} ${set_model_filename} ${set_params_filename} ${set_serving_server} ${set_serving_client}"
-    eval $cls_trans_model_cmd
+    eval ${cls_trans_model_cmd}
 
     set_dirname=$(func_set_params "${det_infer_model_dir_key}" "${det_infer_model_dir_value}")
     set_model_filename=$(func_set_params "${model_filename_key}" "${model_filename_value}")
@@ -258,7 +258,7 @@ function func_serving_rec(){
     set_serving_server=$(func_set_params "${det_serving_server_key}" "${det_serving_server_value}")
     set_serving_client=$(func_set_params "${det_serving_client_key}" "${det_serving_client_value}")
     det_trans_model_cmd="${python_interp} ${trans_model_py} ${set_dirname} ${set_model_filename} ${set_params_filename} ${set_serving_server} ${set_serving_client}"
-    eval $det_trans_model_cmd
+    eval ${det_trans_model_cmd}
 
     if [[ ${FILENAME} =~ "cpp" ]]; then
         cp_prototxt_cmd="cp ./paddleserving/recognition/preprocess/general_PPLCNet_x2_5_lite_v1.0_serving/*.prototxt ${cls_serving_server_value}"
@@ -292,7 +292,7 @@ function func_serving_rec(){
             if [ ${use_gpu} = "null" ]; then
                 det_serving_server_dir_name=$(func_get_url_file_name "$det_serving_server_value")
                 web_service_cpp_cmd="${python_interp} -m paddle_serving_server.serve --model ../../${det_serving_server_value} ../../${cls_serving_server_value} --op GeneralPicodetOp GeneralFeatureExtractOp --port 9400 &"
-                eval $web_service_cpp_cmd
+                eval ${web_service_cpp_cmd}
                 sleep 5s
                 _save_log_path="${LOG_PATH}/server_infer_cpp_cpu_batchsize_1.log"
                 pipeline_cmd="${python_interp} ${pipeline_py} > ${_save_log_path} 2>&1 "
@@ -305,7 +305,7 @@ function func_serving_rec(){
             else
                 det_serving_server_dir_name=$(func_get_url_file_name "$det_serving_server_value")
                 web_service_cpp_cmd="${python_interp} -m paddle_serving_server.serve --model ../../${det_serving_server_value} ../../${cls_serving_server_value} --op GeneralPicodetOp GeneralFeatureExtractOp --port 9400 --gpu_id=${use_gpu} &"
-                eval $web_service_cpp_cmd
+                eval ${web_service_cpp_cmd}
                 sleep 5s
                 _save_log_path="${LOG_PATH}/server_infer_cpp_gpu_batchsize_1.log"
                 pipeline_cmd="${python_interp} ${pipeline_py} > ${_save_log_path} 2>&1 "
@@ -326,19 +326,19 @@ function func_serving_rec(){
             if [[ ${use_gpu} = "null" ]]; then
                 device_type_line=24
                 set_device_type_cmd="sed -i '${device_type_line}s/device_type: .*/device_type: 0/' config.yml"
-                eval $set_device_type_cmd
+                eval ${set_device_type_cmd}
 
                 devices_line=27
                 set_devices_cmd="sed -i '${devices_line}s/devices: .*/devices: \"\"/' config.yml"
-                eval $set_devices_cmd
+                eval ${set_devices_cmd}
 
                 web_service_cmd="${python} ${web_service_py} &"
-                eval $web_service_cmd
+                eval ${web_service_cmd}
                 sleep 5s
                 for pipeline in ${pipeline_py[*]}; do
                     _save_log_path="${LOG_PATH}/server_infer_cpu_${pipeline%_client*}_batchsize_1.log"
                     pipeline_cmd="${python} ${pipeline} > ${_save_log_path} 2>&1 "
-                    eval $pipeline_cmd
+                    eval ${pipeline_cmd}
                     last_status=${PIPESTATUS[0]}
                     eval "cat ${_save_log_path}"
                     status_check $last_status "${pipeline_cmd}" "${status_log}" "${model_name}"
@@ -358,19 +358,19 @@ function func_serving_rec(){
 
                 device_type_line=24
                 set_device_type_cmd="sed -i '${device_type_line}s/device_type: .*/device_type: 1/' config.yml"
-                eval $set_device_type_cmd
+                eval ${set_device_type_cmd}
 
                 devices_line=27
                 set_devices_cmd="sed -i '${devices_line}s/devices: .*/devices: \"${use_gpu}\"/' config.yml"
-                eval $set_devices_cmd
+                eval ${set_devices_cmd}
 
                 web_service_cmd="${python} ${web_service_py} & "
-                eval $web_service_cmd
+                eval ${web_service_cmd}
                 sleep 10s
                 for pipeline in ${pipeline_py[*]}; do
                     _save_log_path="${LOG_PATH}/server_infer_gpu_${pipeline%_client*}_batchsize_1.log"
                     pipeline_cmd="${python} ${pipeline} > ${_save_log_path} 2>&1"
-                    eval $pipeline_cmd
+                    eval ${pipeline_cmd}
                     last_status=${PIPESTATUS[0]}
                     eval "cat ${_save_log_path}"
                     status_check $last_status "${pipeline_cmd}" "${status_log}" "${model_name}"
@@ -393,7 +393,7 @@ else
     env="export CUDA_VISIBLE_DEVICES=${GPUID}"
 fi
 set CUDA_VISIBLE_DEVICES
-eval $env
+eval ${env}
 
 
 echo "################### run test ###################"

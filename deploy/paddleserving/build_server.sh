@@ -1,19 +1,27 @@
-#使用镜像：
-#registry.baidubce.com/paddlepaddle/paddle:latest-dev-cuda10.1-cudnn7-gcc82
+# 使用镜像：
+# registry.baidubce.com/paddlepaddle/paddle:latest-dev-cuda10.1-cudnn7-gcc82
 
-#编译Serving Server：
+# 编译Serving Server：
 
-#client和app可以直接使用release版本
+# client和app可以直接使用release版本
 
-#server因为加入了自定义OP，需要重新编译
+# server因为加入了自定义OP，需要重新编译
 
-#默认编译时的${PWD}=PaddleClas/deploy/paddleserving/
+# 默认编译时的${PWD}=PaddleClas/deploy/paddleserving/
 
 python_name=${1:-'python'}
 
 apt-get update
 apt install -y libcurl4-openssl-dev libbz2-dev
-wget https://paddle-serving.bj.bcebos.com/others/centos_ssl.tar && tar xf centos_ssl.tar && rm -rf centos_ssl.tar && mv libcrypto.so.1.0.2k /usr/lib/libcrypto.so.1.0.2k && mv libssl.so.1.0.2k /usr/lib/libssl.so.1.0.2k && ln -sf /usr/lib/libcrypto.so.1.0.2k /usr/lib/libcrypto.so.10 && ln -sf /usr/lib/libssl.so.1.0.2k /usr/lib/libssl.so.10 && ln -sf /usr/lib/libcrypto.so.10 /usr/lib/libcrypto.so && ln -sf /usr/lib/libssl.so.10 /usr/lib/libssl.so
+wget -nc https://paddle-serving.bj.bcebos.com/others/centos_ssl.tar
+tar xf centos_ssl.tar
+rm -rf centos_ssl.tar
+mv libcrypto.so.1.0.2k /usr/lib/libcrypto.so.1.0.2k
+mv libssl.so.1.0.2k /usr/lib/libssl.so.1.0.2k
+ln -sf /usr/lib/libcrypto.so.1.0.2k /usr/lib/libcrypto.so.10
+ln -sf /usr/lib/libssl.so.1.0.2k /usr/lib/libssl.so.10
+ln -sf /usr/lib/libcrypto.so.10 /usr/lib/libcrypto.so
+ln -sf /usr/lib/libssl.so.10 /usr/lib/libssl.so
 
 # 安装go依赖
 rm -rf /usr/local/go
@@ -30,11 +38,14 @@ go install google.golang.org/grpc@v1.33.0
 go env -w GO111MODULE=auto
 
 # 下载opencv库
-wget https://paddle-qa.bj.bcebos.com/PaddleServing/opencv3.tar.gz && tar -xvf opencv3.tar.gz && rm -rf opencv3.tar.gz
+wget https://paddle-qa.bj.bcebos.com/PaddleServing/opencv3.tar.gz
+tar -xvf opencv3.tar.gz
+rm -rf opencv3.tar.gz
 export OPENCV_DIR=$PWD/opencv3
 
 # clone Serving
 git clone https://github.com/PaddlePaddle/Serving.git -b develop --depth=1
+
 cd Serving # PaddleClas/deploy/paddleserving/Serving
 export Serving_repo_path=$PWD
 git submodule update --init --recursive
@@ -54,21 +65,24 @@ export TENSORRT_LIBRARY_PATH='/usr/local/TensorRT6-cuda10.1-cudnn7/targets/x86_6
 \cp ../preprocess/general_clas_op.* ${Serving_repo_path}/core/general-server/op
 \cp ../preprocess/preprocess_op.* ${Serving_repo_path}/core/predictor/tools/pp_shitu_tools
 
-# 编译Server, export SERVING_BIN
-mkdir server-build-gpu-opencv && cd server-build-gpu-opencv
+# 编译Server
+mkdir server-build-gpu-opencv
+cd server-build-gpu-opencv
 cmake -DPYTHON_INCLUDE_DIR=$PYTHON_INCLUDE_DIR \
-            -DPYTHON_LIBRARIES=$PYTHON_LIBRARIES \
-            -DPYTHON_EXECUTABLE=$PYTHON_EXECUTABLE \
-            -DCUDA_TOOLKIT_ROOT_DIR=${CUDA_PATH} \
-            -DCUDNN_LIBRARY=${CUDNN_LIBRARY} \
-            -DCUDA_CUDART_LIBRARY=${CUDA_CUDART_LIBRARY} \
-            -DTENSORRT_ROOT=${TENSORRT_LIBRARY_PATH} \
-            -DOPENCV_DIR=${OPENCV_DIR} \
-            -DWITH_OPENCV=ON \
-            -DSERVER=ON \
-            -DWITH_GPU=ON ..
+-DPYTHON_LIBRARIES=$PYTHON_LIBRARIES \
+-DPYTHON_EXECUTABLE=$PYTHON_EXECUTABLE \
+-DCUDA_TOOLKIT_ROOT_DIR=${CUDA_PATH} \
+-DCUDNN_LIBRARY=${CUDNN_LIBRARY} \
+-DCUDA_CUDART_LIBRARY=${CUDA_CUDART_LIBRARY} \
+-DTENSORRT_ROOT=${TENSORRT_LIBRARY_PATH} \
+-DOPENCV_DIR=${OPENCV_DIR} \
+-DWITH_OPENCV=ON \
+-DSERVER=ON \
+-DWITH_GPU=ON ..
 make -j32
 
 ${python_name} -m pip install python/dist/paddle*
+
+# export SERVING_BIN
 export SERVING_BIN=$PWD/core/general-server/serving
 cd ../../
