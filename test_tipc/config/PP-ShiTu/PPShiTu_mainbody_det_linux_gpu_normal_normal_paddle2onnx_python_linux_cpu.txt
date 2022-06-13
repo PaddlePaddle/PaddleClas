@@ -6,7 +6,7 @@ python:python3.7
 --model_filename:inference.pdmodel
 --params_filename:inference.pdiparams
 --save_file:./deploy/models/picodet_PPLCNet_x2_5_mainbody_lite_v1.0_infer/inference.onnx
---opset_version:10
+--opset_version:11
 --enable_onnx_checker:True
 inference_model_url:https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/inference/picodet_PPLCNet_x2_5_mainbody_lite_v1.0_infer.tar
 inference:./python/predict_cls.py

@@ -240,7 +240,7 @@ if [[ ${MODE} = "paddle2onnx_infer" ]]; then
     inference_model_url=$(func_parser_value "${lines[10]}")
     tar_name=${inference_model_url##*/}
 
-    ${python_name} -m pip install install paddle2onnx
+    ${python_name} -m pip install paddle2onnx
     ${python_name} -m pip install onnxruntime
     cd deploy
     mkdir models

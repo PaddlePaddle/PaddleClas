@@ -4,8 +4,9 @@
 
 - [1. 模型和应用场景介绍](#1)
 - [2. 模型快速体验](#2)
-  - [2.1 安装 paddleclas](#2.1)  
-  - [2.2 预测](#2.2)
+    - [2.1 安装 paddlepaddle](#2.1)
+    - [2.2 安装 paddleclas](#2.2)
+    - [2.3 预测](#2.3)
 - [3. 模型训练、评估和预测](#3)
   - [3.1 环境配置](#3.1)  
   - [3.2 数据准备](#3.2)
@@ -57,50 +58,69 @@
 
 ## 2. 模型快速体验
 
-<a name="2.1"></a>
+<a name="2.1"></a>  
+    
+### 2.1 安装 paddlepaddle
+    
+- 您的机器安装的是 CUDA9 或 CUDA10，请运行以下命令安装
 
-### 2.1 安装 paddleclas
+```bash
+python3 -m pip install paddlepaddle-gpu -i https://mirror.baidu.com/pypi/simple
+```
+
+- 您的机器是CPU，请运行以下命令安装
+
+```bash
+python3 -m pip install paddlepaddle -i https://mirror.baidu.com/pypi/simple
+```
+    
+更多的版本需求，请参照[飞桨官网安装文档](https://www.paddlepaddle.org.cn/install/quick)中的说明进行操作。
+    
+<a name="2.2"></a>  
+    
+### 2.2 安装 paddleclas
 
 使用如下命令快速安装 paddleclas
 
-```
+```  
 pip3 install paddleclas
-```
+``` 
+    
+<a name="2.3"></a>
 
-<a name="2.2"></a>
+### 2.3 预测
+    
+点击[这里](https://paddleclas.bj.bcebos.com/data/PULC/pulc_demo_imgs.zip)下载 demo 数据并解压，然后在终端中切换到相应目录。
 
-### 2.2 预测
+* 使用命令行快速预测
 
-- 使用命令行快速预测
-
-```
-paddleclas --model_name=text_image_orientation --infer_imgs=deploy/images/PULC/text_image_orientation/img_rot0_demo.jpg
+```bash
+paddleclas --model_name=text_image_orientation --infer_imgs=pulc_demo_imgs/text_image_orientation/img_rot0_demo.jpg
 ```
 
 结果如下：
-
 ```
 >>> result
-class_ids: [0, 2], scores: [0.85615, 0.05046], label_names: ['0', '180'], filename: deploy/images/PULC/text_image_orientation/img_rot0_demo.jpg
+class_ids: [0, 2], scores: [0.85615, 0.05046], label_names: ['0', '180'], filename: pulc_demo_imgs/text_image_orientation/img_rot0_demo.jpg
 Predict complete!
 ```
 
 **备注**： 更换其他预测的数据时，只需要改变 `--infer_imgs=xx` 中的字段即可，支持传入整个文件夹。
 
-- 在 Python 代码中预测
 
-```
+* 在 Python 代码中预测
+```python
 import paddleclas
 model = paddleclas.PaddleClas(model_name="text_image_orientation")
-result = model.predict(input_data="deploy/images/PULC/text_image_orientation/img_rot0_demo.jpg")
+result = model.predict(input_data="pulc_demo_imgs/text_image_orientation/img_rot0_demo.jpg")
 print(next(result))
 ```
 
-**备注**：`model.predict()` 为可迭代对象（`generator`），因此需要使用 `next()` 函数或 `for` 循环对其迭代调用。每次调用将以 `batch_size` 为单位进行一次预测，并返回预测结果, 默认 `batch_size` 为 1，如果需要更改 `batch_size`，实例化模型时，需要指定 `batch_size`，如 `model = paddleclas.PaddleClas(model_name="text_image_orientation", batch_size=2)`, 使用默认的代码返回结果示例如下：
+**备注**：`model.predict()` 为可迭代对象（`generator`），因此需要使用 `next()` 函数或 `for` 循环对其迭代调用。每次调用将以 `batch_size` 为单位进行一次预测，并返回预测结果, 默认 `batch_size` 为 1，如果需要更改 `batch_size`，实例化模型时，需要指定 `batch_size`，如 `model = paddleclas.PaddleClas(model_name="text_image_orientation",  batch_size=2)`, 使用默认的代码返回结果示例如下：
 
 ```
 >>> result
-[{'class_ids': [0, 2], 'scores': [0.85615, 0.05046], 'label_names': ['0', '180'], 'filename': 'deploy/images/PULC/text_image_orientation/img_rot0_demo.jpg'}]
+[{'class_ids': [0, 2], 'scores': [0.85615, 0.05046], 'label_names': ['0', '180'], 'filename': 'pulc_demo_imgs/text_image_orientation/img_rot0_demo.jpg'}]
 ```
 
 <a name="3"></a>
@@ -111,7 +131,7 @@ print(next(result))
 
 ### 3.1 环境配置
 
-- 安装：请先参考 [Paddle 安装教程](../installation/install_paddle.md) 以及 [PaddleClas 安装教程](../installation/install_paddleclas.md) 配置 PaddleClas 运行环境。
+* 安装：请先参考文档 [环境准备](../installation/install_paddleclas.md) 配置 PaddleClas 运行环境。
 
 <a name="3.2"></a>
 
@@ -209,7 +229,7 @@ python3 -m paddle.distributed.launch \
 
 验证集的最佳指标在0.99左右。
 
-**备注**：本文档中提到的训练指标均为在大规模内部数据上的训练指标，使用demo数据训练时，由于数据集规模较小且分布与大规模内部数据不同，无法达到该指标。可以进一步扩充自己的数据并且使用本案例中介绍的优化方法进行调优，从而达到更高的精度。
+**备注**：本文档中提到的训练指标均为在大规模内部数据上的训练指标，使用 demo 数据训练时，由于数据集规模较小且分布与大规模内部数据不同，无法达到该指标。可以进一步扩充自己的数据并且使用本案例中介绍的优化方法进行调优，从而达到更高的精度。
 
 <a name="3.4"></a>
 
@@ -274,15 +294,15 @@ python3 -m paddle.distributed.launch \
         -o Arch.name=ResNet101_vd
 ```
 
-验证集的最佳指标为0.996左右，当前教师模型最好的权重保存在`output/ResNet101_vd/best_model.pdparams`。
+验证集的最佳指标为 0.996 左右，当前教师模型最好的权重保存在`output/ResNet101_vd/best_model.pdparams`。
 
-**备注：** 训练ResNet101_vd模型需要的显存较多，如果机器显存不够，可以将学习率和 batch size 同时缩小一定的倍数进行训练。
+**备注：** 训练 ResNet101_vd 模型需要的显存较多，如果机器显存不够，可以将学习率和 batch size 同时缩小一定的倍数进行训练。如在命令后添加以下参数 `-o DataLoader.Train.sampler.batch_size=64`, `Optimizer.lr.learning_rate=0.1`。
 
 <a name="4.1.2"></a>
 
 #### 4.1.2 蒸馏训练
 
-配置文件`ppcls/configs/PULC/text_image_orientation/PPLCNet_x1_0_distillation.yaml`提供了`SKL-UGI知识蒸馏策略`的配置。该配置将`ResNet101_vd`当作教师模型，`PPLCNet_x1_0`当作学生模型，使用[3.2.2节](#3.2.2)中介绍的蒸馏数据作为新增的无标签数据。训练脚本如下：
+配置文件`ppcls/configs/PULC/text_image_orientation/PPLCNet_x1_0_distillation.yaml`提供了`SKL-UGI 知识蒸馏策略`的配置。该配置将 `ResNet101_vd` 当作教师模型，`PPLCNet_x1_0` 当作学生模型，使用[3.2.2节](#3.2.2)中介绍的蒸馏数据作为新增的无标签数据。训练脚本如下：
 
 ```shell
 export CUDA_VISIBLE_DEVICES=0,1,2,3
