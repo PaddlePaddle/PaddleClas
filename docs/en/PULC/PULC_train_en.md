@@ -29,7 +29,7 @@ The PULC solution has been verified to be effective in many scenarios, such as h
 
 <div align="center">
 <img src="https://user-images.githubusercontent.com/19523330/173011854-b10fcd7a-b799-4dfd-a1cf-9504952a3c44.png"  width = "800" />
-</div>Person exists or not
+</div>
 
 The  solution mainly includes 4 parts, namely: PP-LCNet lightweight backbone network, SSLD pre-trained model, Ensemble Data Augmentation (EDA) and SKL-UGI knowledge distillation algorithm. In addition, we also adopt the method of hyperparameter search to efficiently optimize the hyperparameters in training. Below, we take the person exists or not scene as an example to illustrate the solution.
 
