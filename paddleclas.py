@@ -298,7 +298,7 @@ def args_cfg():
     parser.add_argument(
         "--use_tensorrt",
         type=str2bool,
-        help="Whether use TensorRT to accelerate. ")
+        help="Whether use TensorRT to accelerate.")
     parser.add_argument(
         "--use_fp16", type=str2bool, help="Whether use FP16 to predict.")
     parser.add_argument("--batch_size", type=int, help="Batch size.")

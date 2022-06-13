@@ -4,11 +4,11 @@
 
 This document introduces the prediction using PULC series model based on PaddleClas wheel.
 
-## 目录
+## Catalogue
 
 - [1. Installation](#1)
   - [1.1 PaddlePaddle Installation](#11)
-  - [1.2 PaddleClas Wheel Installation](#12)
+  - [1.2 PaddleClas wheel Installation](#12)
 - [2. Quick Start](#2)
   - [2.1 Predicion with Command Line](#2.1)
   - [2.2 Predicion with Python](#2.2)
@@ -39,7 +39,7 @@ Please refer to [PaddlePaddle Installation](https://www.paddlepaddle.org.cn/inst
 
 <a name="1.2"></a>
 
-### 1.2 PaddleClas Wheel Installation
+### 1.2 PaddleClas wheel Installation
 
 ```bash
 pip3 install paddleclas
