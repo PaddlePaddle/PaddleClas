@@ -204,7 +204,9 @@ if [[ ${MODE} = "serving_infer" ]]; then
     ${python_name} -m pip install paddle-serving-app==0.9.0 -i https://pypi.tuna.tsinghua.edu.cn/simple
     python_name=$(func_parser_value "${lines[2]}")
     if [[ ${FILENAME} =~ "cpp" ] && [ ${model_name} =~ "ShiTu" ]]; then
+        pushd ./deploy/paddleserving
         bash build_server.sh ${python_name}
+        popd
     else
         ${python_name} -m pip install install paddle-serving-server-gpu==0.9.0.post101 -i https://pypi.tuna.tsinghua.edu.cn/simple
     fi
