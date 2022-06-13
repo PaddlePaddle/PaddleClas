@@ -66,17 +66,17 @@
 <a name="2"></a>
 
 ## 2. 模型快速体验
-  
-<a name="2.1"></a>   
+
+<a name="2.1"></a>  
 
 ### 2.1 安装 paddleclas
 
 使用如下命令快速安装 paddlepaddle, paddleclas
 
-```    
+```  
 pip3 install paddlepaddle paddleclas
 ```
-<a name="2.2"></a> 
+<a name="2.2"></a>
 
 ### 2.2 预测
 
@@ -141,8 +141,8 @@ print(next(result))
 </div>
 
 
-我们将原始数据转换成了 PaddleClas 多标签可读的数据格式，可以直接下载。 
-    
+我们将原始数据转换成了 PaddleClas 多标签可读的数据格式，可以直接下载。
+
 进入 PaddleClas 目录。
 
 ```
@@ -159,7 +159,7 @@ cd ../
 ```
 
 执行上述命令后，`dataset/` 下存在 `pa100k` 目录，该目录中具有以下数据：
-    
+
 
 执行上述命令后，`pa100k`目录中具有以下数据：
 
@@ -172,7 +172,7 @@ pa100k
 ├── val
 │   ├── 080001.jpg
 │   ├── 080002.jpg
-...    
+...  
 ├── test
 │   ├── 090001.jpg
 │   ├── 090002.jpg
@@ -251,7 +251,7 @@ python3 tools/infer.py \
 
 ### 4.1 SKL-UGI 知识蒸馏
 
-SKL-UGI 知识蒸馏是 PaddleClas 提出的一种简单有效的知识蒸馏方法，关于该方法的介绍，可以参考[SKL-UGI 知识蒸馏](@ruoyu)。
+SKL-UGI 知识蒸馏是 PaddleClas 提出的一种简单有效的知识蒸馏方法，关于该方法的介绍，可以参考[SKL-UGI 知识蒸馏](../advanced_tutorials/ssld.md)。
 
 <a name="4.1.1"></a>
 
@@ -379,7 +379,7 @@ python3.7 python/predict_cls.py -c configs/PULC/person_attribute/inference_perso
 输出结果如下。
 
 ```
-090004.jpg:	 {'attributes': ['Male', 'Age18-60', 'Back', 'Glasses: False', 'Hat: False', 'HoldObjectsInFront: False', 'Backpack', 'Upper: LongSleeve UpperPlaid', 'Lower:  Trousers', 'No boots'], 'output': [0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 1]}
+090004.jpg:     {'attributes': ['Male', 'Age18-60', 'Back', 'Glasses: False', 'Hat: False', 'HoldObjectsInFront: False', 'Backpack', 'Upper: LongSleeve UpperPlaid', 'Lower:  Trousers', 'No boots'], 'output': [0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 1]}
 ```
 
 <a name="6.2.2"></a>  
@@ -396,8 +396,8 @@ python3.7 python/predict_cls.py -c configs/PULC/person_attribute/inference_perso
 终端中会输出该文件夹内所有图像的属性识别结果，如下所示。
 
 ```
-090004.jpg:	 {'attributes': ['Male', 'Age18-60', 'Back', 'Glasses: False', 'Hat: False', 'HoldObjectsInFront: False', 'Backpack', 'Upper: LongSleeve UpperPlaid', 'Lower:  Trousers', 'No boots'], 'output': [0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 1]}
-090007.jpg:	 {'attributes': ['Female', 'Age18-60', 'Side', 'Glasses: False', 'Hat: False', 'HoldObjectsInFront: False', 'No bag', 'Upper: ShortSleeve', 'Lower:  Skirt&Dress', 'No boots'], 'output': [0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0]}
+090004.jpg:     {'attributes': ['Male', 'Age18-60', 'Back', 'Glasses: False', 'Hat: False', 'HoldObjectsInFront: False', 'Backpack', 'Upper: LongSleeve UpperPlaid', 'Lower:  Trousers', 'No boots'], 'output': [0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 1]}
+090007.jpg:     {'attributes': ['Female', 'Age18-60', 'Side', 'Glasses: False', 'Hat: False', 'HoldObjectsInFront: False', 'No bag', 'Upper: ShortSleeve', 'Lower:  Skirt&Dress', 'No boots'], 'output': [0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0]}
 ```
 
 <a name="6.3"></a>
