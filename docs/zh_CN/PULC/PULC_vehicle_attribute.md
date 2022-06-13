@@ -67,9 +67,9 @@
 ## 2. 模型快速体验
 
 <a name="2.1"></a>  
-    
+
 ### 2.1 安装 paddlepaddle
-    
+
 - 您的机器安装的是 CUDA9 或 CUDA10，请运行以下命令安装
 
 ```bash
@@ -81,23 +81,23 @@ python3 -m pip install paddlepaddle-gpu -i https://mirror.baidu.com/pypi/simple
 ```bash
 python3 -m pip install paddlepaddle -i https://mirror.baidu.com/pypi/simple
 ```
-    
+
 更多的版本需求，请参照[飞桨官网安装文档](https://www.paddlepaddle.org.cn/install/quick)中的说明进行操作。
-    
+
 <a name="2.2"></a>  
-    
+
 ### 2.2 安装 paddleclas
 
 使用如下命令快速安装 paddleclas
 
 ```  
 pip3 install paddleclas
-``` 
-    
+```
+
 <a name="2.3"></a>
 
 ### 2.3 预测
-    
+
 点击[这里](https://paddleclas.bj.bcebos.com/data/PULC/pulc_demo_imgs.zip)下载 demo 数据并解压，然后在终端中切换到相应目录。
 
 * 使用命令行快速预测
@@ -310,8 +310,7 @@ python3 -m paddle.distributed.launch \
     --gpus="0,1,2,3" \
     tools/train.py \
         -c ./ppcls/configs/PULC/vehicle_attribute/PPLCNet_x1_0.yaml \
-        -o Arch.name=ResNet101_vd \
-        -o Arch.lr_mult_list="[1.0, 1.0, 1.0, 1.0, 1.0]"
+        -o Arch.name=ResNet101_vd
 ```
 
 验证集的最佳指标为 `91.60%` 左右，当前教师模型最好的权重保存在 `output/ResNet101_vd/best_model.pdparams`。
