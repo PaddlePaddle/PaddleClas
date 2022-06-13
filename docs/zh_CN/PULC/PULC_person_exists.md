@@ -239,13 +239,13 @@ python3 tools/eval.py \
 ```python
 python3 tools/infer.py \
     -c ./ppcls/configs/PULC/person_exists/PPLCNet_x1_0.yaml \
-    -o Global.pretrained_model=output/PPLCNet_x1_0/best_model \
+    -o Global.pretrained_model=output/PPLCNet_x1_0/best_model 
 ```
 
 输出结果如下：
 
 ```
-[{'class_ids': [0], 'scores': [0.9878496769815683], 'label_names': ['nobody'], 'file_name': './dataset/person_exists/val/objects365_01780637.jpg'}]
+[{'class_ids': [1], 'scores': [0.9999976], 'label_names': ['someone'], 'file_name': 'deploy/images/PULC/person_exists/objects365_02035329.jpg'}]
 ```
 
 **备注：** 
@@ -278,7 +278,7 @@ export CUDA_VISIBLE_DEVICES=0,1,2,3
 python3 -m paddle.distributed.launch \
     --gpus="0,1,2,3" \
     tools/train.py \
-        -c ./ppcls/configs/PULC/person_exists/PPLCNet/PPLCNet_x1_0.yaml \
+        -c ./ppcls/configs/PULC/person_exists/PPLCNet_x1_0.yaml \
         -o Arch.name=ResNet101_vd
 ```
 
