@@ -88,7 +88,7 @@ function func_serving_cls(){
                     _save_log_path="${LOG_PATH}/server_infer_cpp_cpu_pipeline_usemkldnn_False_threads_4_batchsize_1.log"
                     pipeline_cmd="${python} ocr_cpp_client.py ppocr_det_mobile_2.0_client/ ppocr_rec_mobile_2.0_client/"
                     eval $pipeline_cmd
-                    status_check $last_status "${pipeline_cmd}" "${status_log}"
+                    status_check $last_status "${pipeline_cmd}" "${status_log}" "${model_name}"
                     sleep 5s
                     ps ux | grep -E 'web_service|pipeline' | awk '{print $2}' | xargs kill -s 9
                 else
@@ -98,7 +98,7 @@ function func_serving_cls(){
                     _save_log_path="${LOG_PATH}/server_infer_cpp_cpu_pipeline_usemkldnn_False_threads_4_batchsize_1.log"
                     pipeline_cmd="${python} ocr_cpp_client.py ppocr_det_mobile_2.0_client/ ppocr_rec_mobile_2.0_client/"
                     eval $pipeline_cmd
-                    status_check $last_status "${pipeline_cmd}" "${status_log}"
+                    status_check $last_status "${pipeline_cmd}" "${status_log}" "${model_name}"
                     sleep 5s
                     ps ux | grep -E 'web_service|pipeline' | awk '{print $2}' | xargs kill -s 9
                 fi
@@ -124,7 +124,7 @@ function func_serving_cls(){
                         eval $pipeline_cmd
                         last_status=${PIPESTATUS[0]}
                         eval "cat ${_save_log_path}"
-                        status_check $last_status "${pipeline_cmd}" "${status_log}"
+                        status_check $last_status "${pipeline_cmd}" "${status_log}" "${model_name}"
                         sleep 5s
                     done
                     ps ux | grep -E 'web_service|pipeline' | awk '{print $2}' | xargs kill -s 9
@@ -156,7 +156,7 @@ function func_serving_cls(){
                         eval $pipeline_cmd
                         last_status=${PIPESTATUS[0]}
                         eval "cat ${_save_log_path}"
-                        status_check $last_status "${pipeline_cmd}" "${status_log}"
+                        status_check $last_status "${pipeline_cmd}" "${status_log}" "${model_name}"
                         sleep 5s
                     done
                     ps ux | grep -E 'web_service|pipeline' | awk '{print $2}' | xargs kill -s 9
@@ -250,7 +250,7 @@ function func_serving_rec(){
                     _save_log_path="${LOG_PATH}/server_infer_cpp_cpu_pipeline_usemkldnn_False_threads_4_batchsize_1.log"
                     pipeline_cmd="${python} ocr_cpp_client.py ppocr_det_mobile_2.0_client/ ppocr_rec_mobile_2.0_client/"
                     eval $pipeline_cmd
-                    status_check $last_status "${pipeline_cmd}" "${status_log}"
+                    status_check $last_status "${pipeline_cmd}" "${status_log}" "${model_name}"
                     sleep 5s
                     ps ux | grep -E 'web_service|pipeline' | awk '{print $2}' | xargs kill -s 9
                 else
@@ -260,7 +260,7 @@ function func_serving_rec(){
                     _save_log_path="${LOG_PATH}/server_infer_cpp_cpu_pipeline_usemkldnn_False_threads_4_batchsize_1.log"
                     pipeline_cmd="${python} ocr_cpp_client.py ppocr_det_mobile_2.0_client/ ppocr_rec_mobile_2.0_client/"
                     eval $pipeline_cmd
-                    status_check $last_status "${pipeline_cmd}" "${status_log}"
+                    status_check $last_status "${pipeline_cmd}" "${status_log}" "${model_name}"
                     sleep 5s
                     ps ux | grep -E 'web_service|pipeline' | awk '{print $2}' | xargs kill -s 9
                 fi
@@ -286,7 +286,7 @@ function func_serving_rec(){
                         eval $pipeline_cmd
                         last_status=${PIPESTATUS[0]}
                         eval "cat ${_save_log_path}"
-                        status_check $last_status "${pipeline_cmd}" "${status_log}"
+                        status_check $last_status "${pipeline_cmd}" "${status_log}" "${model_name}"
                         sleep 5s
                     done
                     ps ux | grep -E 'web_service|pipeline' | awk '{print $2}' | xargs kill -s 9
@@ -318,7 +318,7 @@ function func_serving_rec(){
                         eval $pipeline_cmd
                         last_status=${PIPESTATUS[0]}
                         eval "cat ${_save_log_path}"
-                        status_check $last_status "${pipeline_cmd}" "${status_log}"
+                        status_check $last_status "${pipeline_cmd}" "${status_log}" "${model_name}"
                         sleep 10s
                     done
                     ps ux | grep -E 'web_service|pipeline' | awk '{print $2}' | xargs kill -s 9

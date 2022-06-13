@@ -9,8 +9,8 @@ python:python3.7
 --opset_version:10
 --enable_onnx_checker:True
 inference_model_url:https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/ResNet50_vd_infer.tar
-inference: python/predict_cls.py  -c configs/inference_cls.yaml
+inference:./python/predict_cls.py
 Global.use_onnx:True
-Global.inference_model_dir:models/ResNet50_vd_infer/
+Global.inference_model_dir:./models/ResNet50_vd_infer/
 Global.use_gpu:False
 -c:configs/inference_cls.yaml
