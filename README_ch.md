@@ -92,7 +92,8 @@ PP-ShiTu图像识别快速体验：[点击这里](./docs/zh_CN/quick_start/quick
 - 前沿算法
   - [骨干网络和预训练模型库](docs/zh_CN/algorithm_introduction/ImageNet_models.md)
   - [度量学习](docs/zh_CN/algorithm_introduction/metric_learning.md)
-  - [模型蒸馏](docs/zh_CN/algorithm_introduction/model_prune_quantization.md)
+  - [模型压缩](docs/zh_CN/algorithm_introduction/model_prune_quantization.md)
+  - [模型蒸馏](docs/zh_CN/algorithm_introduction/knowledge_distillation.md)
   - [数据增强](docs/zh_CN/advanced_tutorials/DataAugmentation.md)
 - [产业实用范例库](docs/zh_CN/samples)
 - [30分钟快速体验图像分类](docs/zh_CN/quick_start/quick_start_classification_new_user.md)
