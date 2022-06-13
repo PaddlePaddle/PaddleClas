@@ -112,7 +112,7 @@ print(next(result))
 
 ### 3.1 环境配置
 
-- 安装：请先参考 [Paddle 安装教程](../installation/install_paddle.md) 以及 [PaddleClas 安装教程](../installation/install_paddleclas.md) 配置 PaddleClas 运行环境。
+* 安装：请先参考文档 [环境准备](../installation/install_paddleclas.md) 配置 PaddleClas 运行环境。
 
 <a name="3.2"></a>
 
@@ -142,7 +142,7 @@ print(next(result))
 
 如果想要制作自己的多语种数据集，可以按照需求收集并整理自己任务中需要语种的数据，此处提供了经过上述方法处理好的demo数据，可以直接下载得到。
 
-**备注：**语种分类任务中的图片数据需要将整图中的文字区域抠取出来，仅仅使用文本行部分作为图片数据。
+**备注：** 语种分类任务中的图片数据需要将整图中的文字区域抠取出来，仅仅使用文本行部分作为图片数据。
 
 进入 PaddleClas 目录。
 
@@ -178,7 +178,6 @@ cd ../
 
 -  这里的`label_list.txt`是4类语种分类模型对应的类别列表，如果自己构造的数据集语种类别发生变化，需要自行调整。
 -  如果想要自己构造训练集和验证集，可以参考[PaddleClas分类数据集格式说明](../data_preparation/classification_dataset.md#1-数据集格式说明) 。
--  当使用本文档中的demo数据集时，需要添加`-o Arch.class_num=4`来将模型的类别书指定为4。
 
 <a name="3.3"></a>
 
@@ -191,8 +190,11 @@ export CUDA_VISIBLE_DEVICES=0,1,2,3
 python3 -m paddle.distributed.launch \
     --gpus="0,1,2,3" \
     tools/train.py \
-        -c ./ppcls/configs/PULC/language_classification/PPLCNet_x1_0.yaml
+        -c ./ppcls/configs/PULC/language_classification/PPLCNet_x1_0.yaml \
+        -o Arch.class_num=4
 ```
+
+-  由于本文档中的demo数据集的类别数量为 4，所以需要添加`-o Arch.class_num=4`来将模型的类别数量指定为4。
 
 <a name="3.4"></a>
 
@@ -203,7 +205,8 @@ python3 -m paddle.distributed.launch \
 ```bash
 python3 tools/eval.py \
     -c ./ppcls/configs/PULC/language_classification/PPLCNet_x1_0.yaml \
-    -o Global.pretrained_model="output/PPLCNet_x1_0/best_model"
+    -o Global.pretrained_model="output/PPLCNet_x1_0/best_model" \
+    -o Arch.class_num=4
 ```
 
 其中 `-o Global.pretrained_model="output/PPLCNet_x1_0/best_model"` 指定了当前最佳权重所在的路径，如果指定其他权重，只需替换对应的路径即可。
@@ -217,7 +220,8 @@ python3 tools/eval.py \
 ```bash
 python3 tools/infer.py \
     -c ./ppcls/configs/PULC/language_classification/PPLCNet_x1_0.yaml \
-    -o Global.pretrained_model="output/PPLCNet_x1_0/best_model"
+    -o Global.pretrained_model="output/PPLCNet_x1_0/best_model" \
+    -o Arch.class_num=4
 ```
 
 输出结果如下：
@@ -253,8 +257,9 @@ export CUDA_VISIBLE_DEVICES=0,1,2,3
 python3 -m paddle.distributed.launch \
     --gpus="0,1,2,3" \
     tools/train.py \
-        -c ./ppcls/configs/PULC/language_classification/PPLCNet/PPLCNet_x1_0.yaml \
-        -o Arch.name=ResNet101_vd
+        -c ./ppcls/configs/PULC/language_classification/PPLCNet_x1_0.yaml \
+        -o Arch.name=ResNet101_vd \
+        -o Arch.class_num=4
 ```
 
 当前教师模型最好的权重保存在`output/ResNet101_vd/best_model.pdparams`。
@@ -273,7 +278,8 @@ python3 -m paddle.distributed.launch \
     --gpus="0,1,2,3" \
     tools/train.py \
         -c ./ppcls/configs/PULC/language_classification/PPLCNet_x1_0_distillation.yaml \
-        -o Arch.models.0.Teacher.pretrained=output/ResNet101_vd/best_model
+        -o Arch.models.0.Teacher.pretrained=output/ResNet101_vd/best_model \
+        -o Arch.class_num=4
 ```
 
 当前模型最好的权重保存在`output/DistillationModel/best_model_student.pdparams`。

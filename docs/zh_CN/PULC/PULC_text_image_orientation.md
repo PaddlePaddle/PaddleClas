@@ -111,7 +111,7 @@ print(next(result))
 
 ### 3.1 环境配置
 
-- 安装：请先参考 [Paddle 安装教程](../installation/install_paddle.md) 以及 [PaddleClas 安装教程](../installation/install_paddleclas.md) 配置 PaddleClas 运行环境。
+* 安装：请先参考文档 [环境准备](../installation/install_paddleclas.md) 配置 PaddleClas 运行环境。
 
 <a name="3.2"></a>
 
@@ -209,7 +209,7 @@ python3 -m paddle.distributed.launch \
 
 验证集的最佳指标在0.99左右。
 
-**备注**：本文档中提到的训练指标均为在大规模内部数据上的训练指标，使用demo数据训练时，由于数据集规模较小且分布与大规模内部数据不同，无法达到该指标。可以进一步扩充自己的数据并且使用本案例中介绍的优化方法进行调优，从而达到更高的精度。
+**备注**：本文档中提到的训练指标均为在大规模内部数据上的训练指标，使用 demo 数据训练时，由于数据集规模较小且分布与大规模内部数据不同，无法达到该指标。可以进一步扩充自己的数据并且使用本案例中介绍的优化方法进行调优，从而达到更高的精度。
 
 <a name="3.4"></a>
 
@@ -274,15 +274,15 @@ python3 -m paddle.distributed.launch \
         -o Arch.name=ResNet101_vd
 ```
 
-验证集的最佳指标为0.996左右，当前教师模型最好的权重保存在`output/ResNet101_vd/best_model.pdparams`。
+验证集的最佳指标为 0.996 左右，当前教师模型最好的权重保存在`output/ResNet101_vd/best_model.pdparams`。
 
-**备注：** 训练ResNet101_vd模型需要的显存较多，如果机器显存不够，可以将学习率和 batch size 同时缩小一定的倍数进行训练。
+**备注：** 训练 ResNet101_vd 模型需要的显存较多，如果机器显存不够，可以将学习率和 batch size 同时缩小一定的倍数进行训练。如在命令后添加以下参数 `-o DataLoader.Train.sampler.batch_size=64`, `Optimizer.lr.learning_rate=0.1`。
 
 <a name="4.1.2"></a>
 
 #### 4.1.2 蒸馏训练
 
-配置文件`ppcls/configs/PULC/text_image_orientation/PPLCNet_x1_0_distillation.yaml`提供了`SKL-UGI知识蒸馏策略`的配置。该配置将`ResNet101_vd`当作教师模型，`PPLCNet_x1_0`当作学生模型，使用[3.2.2节](#3.2.2)中介绍的蒸馏数据作为新增的无标签数据。训练脚本如下：
+配置文件`ppcls/configs/PULC/text_image_orientation/PPLCNet_x1_0_distillation.yaml`提供了`SKL-UGI 知识蒸馏策略`的配置。该配置将 `ResNet101_vd` 当作教师模型，`PPLCNet_x1_0` 当作学生模型，使用[3.2.2节](#3.2.2)中介绍的蒸馏数据作为新增的无标签数据。训练脚本如下：
 
 ```shell
 export CUDA_VISIBLE_DEVICES=0,1,2,3
