@@ -203,19 +203,19 @@ if [[ ${MODE} = "serving_infer" ]]; then
     ${python_name} -m pip install paddle_serving_client==0.9.0 -i https://pypi.tuna.tsinghua.edu.cn/simple
     ${python_name} -m pip install paddle-serving-app==0.9.0 -i https://pypi.tuna.tsinghua.edu.cn/simple
     python_name=$(func_parser_value "${lines[2]}")
-    if [[ ${FILENAME} =~ "cpp" ]]; then
-        pushd ./deploy/paddleserving
-        # bash build_server.sh ${python_name}
-        popd
+    if [[ ${FILENAME} =~ "cpp" ] && [ ${model_name} =~ "ShiTu" ]]; then
+        bash build_server.sh ${python_name}
     else
         ${python_name} -m pip install install paddle-serving-server-gpu==0.9.0.post101 -i https://pypi.tuna.tsinghua.edu.cn/simple
     fi
     if [[ ${model_name} =~ "ShiTu" ]]; then
+        ${python_name} -m pip install faiss-cpu==1.7.1post2 -i https://pypi.tuna.tsinghua.edu.cn/simple
         cls_inference_model_url=$(func_parser_value "${lines[3]}")
         cls_tar_name=$(func_get_url_file_name "${cls_inference_model_url}")
         det_inference_model_url=$(func_parser_value "${lines[4]}")
         det_tar_name=$(func_get_url_file_name "${det_inference_model_url}")
         cd ./deploy
+        wget -nc https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/data/drink_dataset_v1.0.tar --no-check-certificate && tar -xf drink_dataset_v1.0.tar
         mkdir models
         cd models
         wget -nc ${cls_inference_model_url} && tar xf ${cls_tar_name}

@@ -206,8 +206,9 @@ function func_serving_cls(){
 
 
 function func_serving_rec(){
-    LOG_PATH="../../../test_tipc/output/${model_name}"
+    LOG_PATH="test_tipc/output/${model_name}"
     mkdir -p ${LOG_PATH}
+    LOG_PATH="../../../${LOG_PATH}"
     status_log="${LOG_PATH}/results_serving.log"
     trans_model_py=$(func_parser_value "${lines[5]}")
     cls_infer_model_dir_key=$(func_parser_key "${lines[6]}")
@@ -244,6 +245,7 @@ function func_serving_rec(){
     done
 
     # pdserving
+    export SERVING_BIN=$PWD/Serving/server-build-gpu-opencv/core/general-server/serving
     cd ./deploy
     set_dirname=$(func_set_params "${cls_infer_model_dir_key}" "${cls_infer_model_dir_value}")
     set_model_filename=$(func_set_params "${model_filename_key}" "${model_filename_value}")
@@ -261,11 +263,14 @@ function func_serving_rec(){
     det_trans_model_cmd="${python_interp} ${trans_model_py} ${set_dirname} ${set_model_filename} ${set_params_filename} ${set_serving_server} ${set_serving_client}"
     eval $det_trans_model_cmd
 
-    # modify the alias_name of fetch_var to "outputs"
-    server_fetch_var_line_cmd="sed -i '/fetch_var/,/is_lod_tensor/s/alias_name: .*/alias_name: \"features\"/' $cls_serving_server_value/serving_server_conf.prototxt"
-    eval ${server_fetch_var_line_cmd}
-    client_fetch_var_line_cmd="sed -i '/fetch_var/,/is_lod_tensor/s/alias_name: .*/alias_name: \"features\"/' $cls_serving_client_value/serving_client_conf.prototxt"
-    eval ${client_fetch_var_line_cmd}
+    cp_prototxt_cmd="cp ./paddleserving/preprocess/general_PPLCNet_x2_5_lite_v1.0_serving/*.prototxt ${cls_serving_server_value}"
+    eval ${cp_prototxt_cmd}
+    cp_prototxt_cmd="cp ./paddleserving/preprocess/general_PPLCNet_x2_5_lite_v1.0_client/*.prototxt ${cls_serving_client_value}"
+    eval ${cp_prototxt_cmd}
+    cp_prototxt_cmd="cp ./paddleserving/preprocess/picodet_PPLCNet_x2_5_mainbody_lite_v1.0_client/*.prototxt ${det_serving_client_value}"
+    eval ${cp_prototxt_cmd}
+    cp_prototxt_cmd="cp ./paddleserving/preprocess/picodet_PPLCNet_x2_5_mainbody_lite_v1.0_serving/*.prototxt ${det_serving_server_value}"
+    eval ${cp_prototxt_cmd}
 
     prototxt_dataline=$(awk 'NR==1, NR==3{print}'  ${cls_serving_server_value}/serving_server_conf.prototxt)
     IFS=$'\n'
@@ -278,27 +283,11 @@ function func_serving_rec(){
     unset http_proxy
 
     if [[ ${FILENAME} =~ "cpp" ]]; then
-        det_serving_client_dir_name=$(func_get_url_file_name "$det_serving_client_value")
-        set_det_client_config_line_cmd="sed -i '/MainbodyDetect/,/serving_client_conf.prototxt/s/models\/.*\/serving_client_conf.prototxt/models\/${det_serving_client_dir_name}\/serving_client_conf.prototxt/' ${pipeline_py}"
-        eval ${set_det_client_config_line_cmd}
-
-        cls_serving_client_dir_name=$(func_get_url_file_name "$cls_serving_client_value")
-        set_cls_client_config_line_cmd="sed -i '/ObjectRecognition/,/serving_client_conf.prototxt/s/models\/.*\/serving_client_conf.prototxt/models\/${cls_serving_client_dir_name}\/serving_client_conf.prototxt/' ${pipeline_py}"
-        eval ${set_cls_client_config_line_cmd}
-
-        set_pipeline_py_feed_var_cmd="sed -i '/ObjectRecognition/,/feed={\"x\": batch_imgs}/s/{.*: batch_imgs}/{${feed_var_name}: batch_imgs}/' ${pipeline_py}"
-        eval ${set_pipeline_py_feed_var_cmd}
-
         for use_gpu in ${web_use_gpu_list[*]}; do
             if [ ${use_gpu} = "null" ]; then
-
                 det_serving_server_dir_name=$(func_get_url_file_name "$det_serving_server_value")
-                web_service_cpp_cmd="${python_interp} -m paddle_serving_server.serve --model ../../models/${det_serving_server_dir_name} --port 9293 >>log_mainbody_detection.txt &"
-
-                cls_serving_server_dir_name=$(func_get_url_file_name "$cls_serving_server_value")
-                web_service_cpp_cmd2="${python_interp} -m paddle_serving_server.serve --model ../../models/${cls_serving_server_dir_name} --port 9294 >>log_feature_extraction.txt &"
+                web_service_cpp_cmd="${python_interp} -m paddle_serving_server.serve --model ../../${det_serving_server_value} ../../${cls_serving_server_value} --op GeneralPicodetOp GeneralFeatureExtractOp --port 9400 &"
                 eval $web_service_cpp_cmd
-                eval $web_service_cpp_cmd2
                 sleep 5s
                 _save_log_path="${LOG_PATH}/server_infer_cpp_cpu_batchsize_1.log"
                 pipeline_cmd="${python_interp} test_cpp_serving_client.py > ${_save_log_path} 2>&1 "
@@ -310,12 +299,8 @@ function func_serving_rec(){
                 sleep 5s
             else
                 det_serving_server_dir_name=$(func_get_url_file_name "$det_serving_server_value")
-                web_service_cpp_cmd="${python_interp} -m paddle_serving_server.serve --model ../../models/${det_serving_server_dir_name} --port 9293 --gpu_id=${use_gpu} >>log_mainbody_detection.txt &"
-
-                cls_serving_server_dir_name=$(func_get_url_file_name "$cls_serving_server_value")
-                web_service_cpp_cmd2="${python_interp} -m paddle_serving_server.serve --model ../../models/${cls_serving_server_dir_name} --port 9294 --gpu_id=${use_gpu} >>log_feature_extraction.txt &"
+                web_service_cpp_cmd="${python_interp} -m paddle_serving_server.serve --model ../../${det_serving_server_value} ../../${cls_serving_server_value} --op GeneralPicodetOp GeneralFeatureExtractOp --port 9400 --gpu_id=${use_gpu} &"
                 eval $web_service_cpp_cmd
-                eval $web_service_cpp_cmd2
                 sleep 5s
                 _save_log_path="${LOG_PATH}/server_infer_cpp_gpu_batchsize_1.log"
                 pipeline_cmd="${python_interp} test_cpp_serving_client.py > ${_save_log_path} 2>&1 "
