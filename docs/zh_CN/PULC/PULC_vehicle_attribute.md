@@ -310,7 +310,8 @@ python3 -m paddle.distributed.launch \
     --gpus="0,1,2,3" \
     tools/train.py \
         -c ./ppcls/configs/PULC/vehicle_attribute/PPLCNet_x1_0.yaml \
-        -o Arch.name=ResNet101_vd
+        -o Arch.name=ResNet101_vd \
+        -o Arch.lr_mult_list="[1.0, 1.0, 1.0, 1.0, 1.0]"
 ```
 
 验证集的最佳指标为 `91.60%` 左右，当前教师模型最好的权重保存在 `output/ResNet101_vd/best_model.pdparams`。
@@ -368,10 +369,10 @@ python3 tools/export_model.py \
 执行完该脚本后会在 `deploy/models/` 下生成 `PPLCNet_x1_0_vehicle_attributeibute_infer` 文件夹，`models` 文件夹下应有如下文件结构：
 
 ```
-├── PPLCNet_x1_0_vehicle_attribute_infer
-│   ├── inference.pdiparams
-│   ├── inference.pdiparams.info
-│   └── inference.pdmodel
+└── PPLCNet_x1_0_vehicle_attribute_infer
+    ├── inference.pdiparams
+    ├── inference.pdiparams.info
+    └── inference.pdmodel
 ```
 
 **备注：** 此处的最佳权重是经过知识蒸馏后的权重路径，如果没有执行知识蒸馏的步骤，最佳模型保存在`output/PPLCNet_x1_0/best_model.pdparams`中。
