@@ -113,10 +113,9 @@ if __name__ == "__main__":
               "im_shape": im_shape},
         fetch=["features", "boxes"],
         batch=False)
-    print(fetch_map.keys())
+
     #add retrieval procedure
     det_boxes = fetch_map["boxes"]
-    print(det_boxes)
     searcher, id_map = init_index(index_dir)
     results = postprocess(fetch_map, feature_normalize, det_boxes, searcher,
                           id_map, return_k, rec_score_thres, rec_nms_thresold)

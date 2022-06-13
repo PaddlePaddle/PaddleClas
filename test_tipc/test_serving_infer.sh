@@ -84,16 +84,16 @@ function func_serving_cls(){
                 break
             fi
         done
-        set_client_feed_type_cmd="sed -i '/feed_type/,/: .*/s/feed_type: .*/feed_type: 20/' ${serving_client_value}/serving_client_conf.prototxt"
+        serving_client_dir_name=$(func_get_url_file_name "$serving_client_value")
+        set_client_feed_type_cmd="sed -i '/feed_type/,/: .*/s/feed_type: .*/feed_type: 20/' ${serving_client_dir_name}/serving_client_conf.prototxt"
         eval ${set_client_feed_type_cmd}
-        set_client_shape_cmd="sed -i '/shape: 3/,/shape: 3/s/shape: 3/shape: 1/' ${serving_client_value}/serving_client_conf.prototxt"
+        set_client_shape_cmd="sed -i '/shape: 3/,/shape: 3/s/shape: 3/shape: 1/' ${serving_client_dir_name}/serving_client_conf.prototxt"
         eval ${set_client_shape_cmd}
-        set_client_shape224_cmd="sed -i '/shape: 224/,/shape: 224/s/shape: 224//' ${serving_client_value}/serving_client_conf.prototxt"
+        set_client_shape224_cmd="sed -i '/shape: 224/,/shape: 224/s/shape: 224//' ${serving_client_dir_name}/serving_client_conf.prototxt"
         eval ${set_client_shape224_cmd}
-        set_client_shape224_cmd="sed -i '/shape: 224/,/shape: 224/s/shape: 224//' ${serving_client_value}/serving_client_conf.prototxt"
+        set_client_shape224_cmd="sed -i '/shape: 224/,/shape: 224/s/shape: 224//' ${serving_client_dir_name}/serving_client_conf.prototxt"
         eval ${set_client_shape224_cmd}
 
-        serving_client_dir_name=$(func_get_url_file_name "$serving_client_value")
         set_pipeline_load_config_cmd="sed -i '/load_client_config/,/.prototxt/s/.\/.*\/serving_client_conf.prototxt/.\/${serving_client_dir_name}\/serving_client_conf.prototxt/' ${pipeline_py}"
         eval ${set_pipeline_load_config_cmd}
 
@@ -105,10 +105,12 @@ function func_serving_cls(){
         for use_gpu in ${web_use_gpu_list[*]}; do
             if [[ ${use_gpu} = "null" ]]; then
                 web_service_cpp_cmd="${python_} -m paddle_serving_server.serve --model ${serving_server_dir_name} --op GeneralClasOp --port 9292 &"
+                # echo ${web_service_cpp_cmd}
                 eval ${web_service_cpp_cmd}
                 sleep 5s
                 _save_log_path="${LOG_PATH}/server_infer_cpp_cpu_pipeline_batchsize_1.log"
                 pipeline_cmd="${python_} test_cpp_serving_client.py > ${_save_log_path} 2>&1 "
+                echo {pipeline_cmd}
                 eval ${pipeline_cmd}
                 last_status=${PIPESTATUS[0]}
                 eval "cat ${_save_log_path}"
@@ -122,8 +124,7 @@ function func_serving_cls(){
 
                 _save_log_path="${LOG_PATH}/server_infer_cpp_gpu_pipeline_batchsize_1.log"
                 pipeline_cmd="${python_} test_cpp_serving_client.py > ${_save_log_path} 2>&1 "
-
-                eval $pipeline_cmd
+                eval ${pipeline_cmd}
                 last_status=${PIPESTATUS[0]}
                 eval "cat ${_save_log_path}"
                 status_check ${last_status} "${pipeline_cmd}" "${status_log}" "${model_name}"
@@ -245,7 +246,6 @@ function func_serving_rec(){
     done
 
     # pdserving
-    export SERVING_BIN=$PWD/Serving/server-build-gpu-opencv/core/general-server/serving
     cd ./deploy
     set_dirname=$(func_set_params "${cls_infer_model_dir_key}" "${cls_infer_model_dir_value}")
     set_model_filename=$(func_set_params "${model_filename_key}" "${model_filename_value}")
@@ -263,15 +263,22 @@ function func_serving_rec(){
     det_trans_model_cmd="${python_interp} ${trans_model_py} ${set_dirname} ${set_model_filename} ${set_params_filename} ${set_serving_server} ${set_serving_client}"
     eval $det_trans_model_cmd
 
-    cp_prototxt_cmd="cp ./paddleserving/recognition/preprocess/general_PPLCNet_x2_5_lite_v1.0_serving/*.prototxt ${cls_serving_server_value}"
-    eval ${cp_prototxt_cmd}
-    cp_prototxt_cmd="cp ./paddleserving/recognition/preprocess/general_PPLCNet_x2_5_lite_v1.0_client/*.prototxt ${cls_serving_client_value}"
-    eval ${cp_prototxt_cmd}
-    cp_prototxt_cmd="cp ./paddleserving/recognition/preprocess/picodet_PPLCNet_x2_5_mainbody_lite_v1.0_client/*.prototxt ${det_serving_client_value}"
-    eval ${cp_prototxt_cmd}
-    cp_prototxt_cmd="cp ./paddleserving/recognition/preprocess/picodet_PPLCNet_x2_5_mainbody_lite_v1.0_serving/*.prototxt ${det_serving_server_value}"
-    eval ${cp_prototxt_cmd}
-
+    if [[ ${FILENAME} =~ "cpp" ]]; then
+        cp_prototxt_cmd="cp ./paddleserving/recognition/preprocess/general_PPLCNet_x2_5_lite_v1.0_serving/*.prototxt ${cls_serving_server_value}"
+        eval ${cp_prototxt_cmd}
+        cp_prototxt_cmd="cp ./paddleserving/recognition/preprocess/general_PPLCNet_x2_5_lite_v1.0_client/*.prototxt ${cls_serving_client_value}"
+        eval ${cp_prototxt_cmd}
+        cp_prototxt_cmd="cp ./paddleserving/recognition/preprocess/picodet_PPLCNet_x2_5_mainbody_lite_v1.0_client/*.prototxt ${det_serving_client_value}"
+        eval ${cp_prototxt_cmd}
+        cp_prototxt_cmd="cp ./paddleserving/recognition/preprocess/picodet_PPLCNet_x2_5_mainbody_lite_v1.0_serving/*.prototxt ${det_serving_server_value}"
+        eval ${cp_prototxt_cmd}
+    else
+        # modify the alias_name of fetch_var to "outputs"
+        server_fetch_var_line_cmd="sed -i '/fetch_var/,/is_lod_tensor/s/alias_name: .*/alias_name: \"features\"/' $cls_serving_server_value/serving_server_conf.prototxt"
+        eval ${server_fetch_var_line_cmd}
+        client_fetch_var_line_cmd="sed -i '/fetch_var/,/is_lod_tensor/s/alias_name: .*/alias_name: \"features\"/' $cls_serving_client_value/serving_client_conf.prototxt"
+        eval ${client_fetch_var_line_cmd}
+    fi
     prototxt_dataline=$(awk 'NR==1, NR==3{print}'  ${cls_serving_server_value}/serving_server_conf.prototxt)
     IFS=$'\n'
     prototxt_lines=(${prototxt_dataline})
@@ -283,6 +290,7 @@ function func_serving_rec(){
     unset http_proxy
 
     if [[ ${FILENAME} =~ "cpp" ]]; then
+        export SERVING_BIN=$PWD/../Serving/server-build-gpu-opencv/core/general-server/serving
         for use_gpu in ${web_use_gpu_list[*]}; do
             if [ ${use_gpu} = "null" ]; then
                 det_serving_server_dir_name=$(func_get_url_file_name "$det_serving_server_value")
@@ -290,7 +298,7 @@ function func_serving_rec(){
                 eval $web_service_cpp_cmd
                 sleep 5s
                 _save_log_path="${LOG_PATH}/server_infer_cpp_cpu_batchsize_1.log"
-                pipeline_cmd="${python_interp} test_cpp_serving_client.py > ${_save_log_path} 2>&1 "
+                pipeline_cmd="${python_interp} ${pipeline_py} > ${_save_log_path} 2>&1 "
                 eval ${pipeline_cmd}
                 last_status=${PIPESTATUS[0]}
                 eval "cat ${_save_log_path}"
@@ -303,7 +311,7 @@ function func_serving_rec(){
                 eval $web_service_cpp_cmd
                 sleep 5s
                 _save_log_path="${LOG_PATH}/server_infer_cpp_gpu_batchsize_1.log"
-                pipeline_cmd="${python_interp} test_cpp_serving_client.py > ${_save_log_path} 2>&1 "
+                pipeline_cmd="${python_interp} ${pipeline_py} > ${_save_log_path} 2>&1 "
                 eval ${pipeline_cmd}
                 last_status=${PIPESTATUS[0]}
                 eval "cat ${_save_log_path}"
