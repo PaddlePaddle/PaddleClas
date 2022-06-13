@@ -177,9 +177,9 @@ IMN_MODEL_SERIES = {
 
 PULC_MODEL_BASE_DOWNLOAD_URL = "https://paddleclas.bj.bcebos.com/models/PULC/inference/{}_infer.tar"
 PULC_MODELS = [
-    "person_exists", "person_attribute", "safety_helmet", "traffic_sign",
-    "car_exists", "vehicle_attribute", "textline_orientation",
-    "text_image_orientation", "language_classification"
+    "car_exists", "language_classification", "person_attribute",
+    "person_exists", "safety_helmet", "text_image_orientation",
+    "textline_orientation", "traffic_sign", "vehicle_attribute"
 ]
 
 
