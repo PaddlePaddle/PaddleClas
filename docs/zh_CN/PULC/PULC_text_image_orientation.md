@@ -183,13 +183,13 @@ cd ../
 └── label_list.txt
 ```
 
-其中`img_0/`、`img_90/`、`img_180/`和`img_270/`分别存放了4个角度的训练集和验证集数据。`train_list.txt`和`test_list.txt`分别为训练集和验证集的标签文件，`train_list.txt.debug`和`test_list.txt.debug`分别为训练集和验证集的`debug`标签文件，其分别是`train_list.txt`和`test_list.txt`的子集，用该文件可以快速体验本案例的流程。`distill_data/`是补充文字数据，该集合和`train`集合的混合数据用于本案例的`SKL-UGI知识蒸馏策略`，对应的训练标签文件为`train_list_for_distill.txt`。关于如何得到蒸馏的标签可以参考[知识蒸馏标签获得](@ruoyu)。
+其中`img_0/`、`img_90/`、`img_180/`和`img_270/`分别存放了4个角度的训练集和验证集数据。`train_list.txt`和`test_list.txt`分别为训练集和验证集的标签文件，`train_list.txt.debug`和`test_list.txt.debug`分别为训练集和验证集的`debug`标签文件，其分别是`train_list.txt`和`test_list.txt`的子集，用该文件可以快速体验本案例的流程。`distill_data/`是补充文字数据，该集合和`train`集合的混合数据用于本案例的`SKL-UGI知识蒸馏策略`，对应的训练标签文件为`train_list_for_distill.txt`。关于如何得到蒸馏的标签可以参考[知识蒸馏标签获得](../advanced_tutorials/ssld.md#3.2)。
 
 **备注：**
 
 * 关于 `train_list.txt`、`val_list.txt`的格式说明，可以参考[PaddleClas分类数据集格式说明](../data_preparation/classification_dataset.md#1-数据集格式说明) 。
 
-* 关于如何得到蒸馏的标签文件可以参考[知识蒸馏标签获得方法](@ruoyu)。
+* 关于如何得到蒸馏的标签文件可以参考[知识蒸馏标签获得方法](../advanced_tutorials/ssld.md#3.2)。
 
 <a name="3.3"></a>
 
@@ -255,7 +255,7 @@ python3 tools/infer.py \
 
 ### 4.1 SKL-UGI 知识蒸馏
 
-SKL-UGI 知识蒸馏是 PaddleClas 提出的一种简单有效的知识蒸馏方法，关于该方法的介绍，可以参考[SKL-UGI 知识蒸馏](@ruoyu)。
+SKL-UGI 知识蒸馏是 PaddleClas 提出的一种简单有效的知识蒸馏方法，关于该方法的介绍，可以参考[SKL-UGI 知识蒸馏](../advanced_tutorials/ssld.md)。
 
 <a name="4.1.1"></a>
 

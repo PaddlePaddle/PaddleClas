@@ -247,7 +247,7 @@ python3 tools/infer.py \
 
 ### 4.1 UDML 知识蒸馏
 
-UDML 知识蒸馏是一种简单有效的知识蒸馏方法，关于该方法的介绍，可以参考[UDML 知识蒸馏](@ruoyu)。
+UDML 知识蒸馏是一种简单有效的知识蒸馏方法，关于该方法的介绍，可以参考[UDML 知识蒸馏](../advanced_tutorials/knowledge_distillation.md#1.2.3)。
 
 <a name="4.1.1"></a>
 

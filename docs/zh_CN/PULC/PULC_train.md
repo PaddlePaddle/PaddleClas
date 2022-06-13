@@ -17,7 +17,7 @@
 - [4. 超参搜索](#4)
     - [4.1 基于默认配置搜索](#4.1)
     - [4.2 自定义搜索配置](#4.2)
-    
+
 <a name="1"></a>
 
 ### 1. PULC方案简介
@@ -57,7 +57,7 @@ train/10.jpg 1
 
 #### 2.2 标注文件生成
 
-如果您已经有实际场景中的数据，那么按照上节的格式进行标注即可。这里，我们提供了一个快速生成数据的脚本，您只需要将不同类别的数据分别放在文件夹中，运行脚本即可生成标注文件。 
+如果您已经有实际场景中的数据，那么按照上节的格式进行标注即可。这里，我们提供了一个快速生成数据的脚本，您只需要将不同类别的数据分别放在文件夹中，运行脚本即可生成标注文件。
 
 首先，假设您存放数据的路径为`./train`，`train/` 中包含了每个类别的数据，类别号从 0 开始，每个类别的文件夹中有具体的图像数据。
 
@@ -113,7 +113,7 @@ export CUDA_VISIBLE_DEVICES=0,1,2,3
 python3 -m paddle.distributed.launch \
     --gpus="0,1,2,3" \
     tools/train.py \
-        -c ./ppcls/configs/PULC/person_exists/PPLCNet_x1_0.yaml 
+        -c ./ppcls/configs/PULC/person_exists/PPLCNet_x1_0.yaml
 ```
 
 为了方便性能对比，我们也提供了大模型 SwinTransformer 和轻量模型 MobileNetV3 的配置文件，您可以使用命令训练：
@@ -125,7 +125,7 @@ export CUDA_VISIBLE_DEVICES=0,1,2,3
 python3 -m paddle.distributed.launch \
     --gpus="0,1,2,3" \
     tools/train.py \
-        -c ./ppcls/configs/PULC/person_exists/SwinTransformer_tiny_patch4_window7_224.yaml 
+        -c ./ppcls/configs/PULC/person_exists/SwinTransformer_tiny_patch4_window7_224.yaml
 ```
 
 MobileNetV3：
@@ -167,7 +167,7 @@ SSLD 是百度自研的半监督蒸馏算法，在 ImageNet 数据集上，模�
 
 #### 3.4 SKL-UGI模型蒸馏
 
-模型蒸馏是一种可以有效提升小模型精度的方法，您可以在[知识蒸馏介绍](../advanced_tutorials/knowledge_distillation.md)找到详细介绍。我们选择 ResNet101_vd 作为教师模型进行蒸馏。为了适应蒸馏过程，我们在此也对网络不同 stage 的学习率进行了调整。基于以上改进，我们训练得到模型精度为 95.6%，提升 1.4%。
+模型蒸馏是一种可以有效提升小模型精度的方法，您可以在[知识蒸馏介绍](../advanced_tutorials/ssld.md)找到详细介绍。我们选择 ResNet101_vd 作为教师模型进行蒸馏。为了适应蒸馏过程，我们在此也对网络不同 stage 的学习率进行了调整。基于以上改进，我们训练得到模型精度为 95.6%，提升 1.4%。
 
 <a name="3.5"></a>
 
@@ -183,7 +183,7 @@ SSLD 是百度自研的半监督蒸馏算法，在 ImageNet 数据集上，模�
 | PPLCNet_x1_0  | 92.10 | 2.12  | 6.5 | 使用 SSLD 预训练模型 |
 | PPLCNet_x1_0  | 93.43 | 2.12  | 6.5 | 使用 SSLD 预训练模型+EDA 策略|
 | <b>PPLCNet_x1_0<b>  | <b>95.60<b> | <b>2.12<b>  | <b>6.5<b> | 使用 SSLD 预训练模型+EDA 策略+SKL-UGI 知识蒸馏策略|
-    
+
 我们在其他 8 个场景中也使用了同样的优化策略，得到如下结果：
 
 | 场景 | 大模型 | 大模型精度（%）  | 小模型 | 小模型精度（%） |
@@ -196,12 +196,12 @@ SSLD 是百度自研的半监督蒸馏算法，在 ImageNet 数据集上，模�
 | 含文字图像方向分类 | SwinTransformer_tiny |99.12 | PPLCNet_x1_0 | 99.06 |
 | 文本行方向分类 | SwinTransformer_tiny | 93.61 | PPLCNet_x1_0 | 96.01 |
 | 语种分类 | SwinTransformer_tiny | 98.12 | PPLCNet_x1_0 | 99.26 |
-    
+
 
 从结果可以看出，PULC 方案在多个应用场景中均可提升模型精度。使用 PULC 方案可以大大减少模型优化的工作量，快速得到精度较高的模型。
 
 <a name="4"></a>
-    
+
 ### 4. 超参搜索
 
 在上述训练过程中，我们调节了学习率、数据增广方法开启概率、分阶段学习率倍数等参数。
@@ -209,11 +209,11 @@ SSLD 是百度自研的半监督蒸馏算法，在 ImageNet 数据集上，模�
 这个脚本会遍历搜索值列表中的参数来替代默认配置中的参数，依次训练，最终选择精度最高的模型所对应的参数作为搜索结果。
 
 <a name="4.1"></a>
-    
+
 #### 4.1 基于默认配置搜索
 
 配置文件 [search.yaml](../../ppcls/configs/PULC/person_exists/search.yaml) 定义了有人/无人场景超参搜索的配置，使用如下命令即可完成超参数的搜索。
-    
+
 ```bash
 python3 tools/search_strategy.py -c ppcls/configs/PULC/person_exists/search.yaml
 ```
@@ -221,17 +221,17 @@ python3 tools/search_strategy.py -c ppcls/configs/PULC/person_exists/search.yaml
 **备注**：关于搜索部分，我们也在不断优化，敬请期待。
 
 <a name="4.2"></a>
-    
+
 #### 4.2 自定义搜索配置
 
 您也可以根据训练结果或调参经验，修改超参搜索的配置。
-    
+
 修改 `lrs` 中的`search_values`字段，可以修改学习率搜索值列表；
 
 修改 `resolutions` 中的 `search_values` 字段，可以修改分辨率的搜索值列表；
 
 修改 `ra_probs` 中的 `search_values` 字段，可以修改 RandAugment 开启概率的搜索值列表；
-    
+
 修改 `re_probs` 中的 `search_values` 字段，可以修改 RnadomErasing 开启概率的搜索值列表；
 
 修改 `lr_mult_list` 中的 `search_values` 字段，可以修改 lr_mult 搜索值列表；

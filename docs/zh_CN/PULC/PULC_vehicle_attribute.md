@@ -271,7 +271,7 @@ python3 tools/infer.py \
 
 ### 4.1 SKL-UGI 知识蒸馏
 
-SKL-UGI 知识蒸馏是 PaddleClas 提出的一种简单有效的知识蒸馏方法，关于该方法的介绍，可以参考[SKL-UGI 知识蒸馏](@ruoyu)。
+SKL-UGI 知识蒸馏是 PaddleClas 提出的一种简单有效的知识蒸馏方法，关于该方法的介绍，可以参考[SKL-UGI 知识蒸馏](../advanced_tutorials/ssld.md)。
 
 <a name="4.1.1"></a>
 

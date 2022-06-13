@@ -211,7 +211,7 @@ traffic_sign
 
 * 关于 `label_list_train.txt`、`label_list_test.txt`的格式说明，可以参考[PaddleClas分类数据集格式说明](../data_preparation/classification_dataset.md#1-数据集格式说明) 。
 
-* 关于如何得到蒸馏的标签文件可以参考[知识蒸馏标签获得方法](@ruoyu)。
+* 关于如何得到蒸馏的标签文件可以参考[知识蒸馏标签获得方法](../advanced_tutorials/ssld.md)。
 
 
 <a name="3.3"></a>
@@ -278,7 +278,7 @@ python3 tools/infer.py \
 
 ### 4.1 SKL-UGI 知识蒸馏
 
-SKL-UGI 知识蒸馏是 PaddleClas 提出的一种简单有效的知识蒸馏方法，关于该方法的介绍，可以参考[SKL-UGI 知识蒸馏](@ruoyu)。
+SKL-UGI 知识蒸馏是 PaddleClas 提出的一种简单有效的知识蒸馏方法，关于该方法的介绍，可以参考[SKL-UGI 知识蒸馏](../advanced_tutorials/ssld.md#3.2)。
 
 <a name="4.1.1"></a>
 
