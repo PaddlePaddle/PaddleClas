@@ -52,7 +52,7 @@ PP-ShiTu图像识别快速体验：[点击这里](./docs/zh_CN/quick_start/quick
 
 ## 文档教程
 - [环境准备](docs/zh_CN/installation/install_paddleclas.md)
-- PULC超轻量图像分类实用方案
+- [PULC超轻量图像分类实用方案](docs/zh_CN/PULC/PULC_train.md)
   - [超轻量图像分类模型库](docs/zh_CN/PULC/PULC_model_list.md)
     - [PULC有人/无人分类模型](docs/zh_CN/PULC/PULC_person_exists.md)
     - [PULC人体属性识别模型](docs/zh_CN/PULC/PULC_person_attribute.md)
@@ -63,7 +63,7 @@ PP-ShiTu图像识别快速体验：[点击这里](./docs/zh_CN/quick_start/quick
     - [PULC含文字图像方向分类模型](docs/zh_CN/PULC/PULC_text_image_orientation.md)
     - [PULC文本行方向分类模型](docs/zh_CN/PULC/PULC_textline_orientation.md)
     - [PULC语种分类模型](docs/zh_CN/PULC/PULC_language_classification.md)
-  - 模型训练
+  - [模型训练](docs/zh_CN/PULC/PULC_train.md)
   - 推理部署
     - [基于python预测引擎推理](docs/zh_CN/inference_deployment/python_deploy.md#1)
     - [基于C++预测引擎推理](docs/zh_CN/inference_deployment/cpp_deploy.md)
