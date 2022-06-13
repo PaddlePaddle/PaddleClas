@@ -192,7 +192,7 @@ SSLD 是百度自研的半监督蒸馏算法，在 ImageNet 数据集上，模�
 | 佩戴安全帽分类 | Res2Net200_vd| 98.92 | PPLCNet_x1_0 |99.38 |
 | 交通标志分类 | SwinTransformer_tiny | 98.11 | PPLCNet_x1_0 | 98.35 |
 | 车辆属性识别 | Res2Net200_vd_26w_4s | 91.36 | PPLCNet_x1_0 | 90.81 |
-| 有车/无车分类 | SwinTransformer_tiny | 97.71 | PPLCNet_x1_0 | 90.81 |
+| 有车/无车分类 | SwinTransformer_tiny | 97.71 | PPLCNet_x1_0 | 95.92 |
 | 含文字图像方向分类 | SwinTransformer_tiny |99.12 | PPLCNet_x1_0 | 99.06 |
 | 文本行方向分类 | SwinTransformer_tiny | 93.61 | PPLCNet_x1_0 | 96.01 |
 | 语种分类 | SwinTransformer_tiny | 98.12 | PPLCNet_x1_0 | 99.26 |
