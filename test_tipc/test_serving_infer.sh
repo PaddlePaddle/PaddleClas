@@ -55,7 +55,6 @@ function func_serving_cls(){
         if [[ ${python_} =~ "python" ]]; then
             trans_model_cmd="${python_} ${trans_model_py} ${set_dirname} ${set_model_filename} ${set_params_filename} ${set_serving_server} ${set_serving_client}"
             eval $trans_model_cmd
-            # echo $PWD - $trans_model_cmd
             break
         fi
     done
@@ -105,12 +104,10 @@ function func_serving_cls(){
         for use_gpu in ${web_use_gpu_list[*]}; do
             if [[ ${use_gpu} = "null" ]]; then
                 web_service_cpp_cmd="${python_} -m paddle_serving_server.serve --model ${serving_server_dir_name} --op GeneralClasOp --port 9292 &"
-                # echo ${web_service_cpp_cmd}
                 eval ${web_service_cpp_cmd}
                 sleep 5s
                 _save_log_path="${LOG_PATH}/server_infer_cpp_cpu_pipeline_batchsize_1.log"
                 pipeline_cmd="${python_} test_cpp_serving_client.py > ${_save_log_path} 2>&1 "
-                echo {pipeline_cmd}
                 eval ${pipeline_cmd}
                 last_status=${PIPESTATUS[0]}
                 eval "cat ${_save_log_path}"
