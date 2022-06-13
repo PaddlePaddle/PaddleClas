@@ -113,7 +113,7 @@ PULC 系列模型的名称和简介如下：
 | safety_helmet | PULC佩戴安全帽分类模型 |
 | traffic_sign | PULC交通标志分类模型 |
 | vehicle_attribute | PULC车辆属性识别模型 |
-| vehicle_exists | PULC有车/无车分类模型 |
+| car_exists | PULC有车/无车分类模型 |
 | text_image_orientation | PULC含文字图像方向分类模型 |
 | textline_orientation | PULC文本行方向分类模型 |
 | language_classification | PULC语种分类模型 |
@@ -124,7 +124,7 @@ PULC 系列模型的名称和简介如下：
 
 通过本节内容，相信您已经熟练掌握 PaddleClas whl 包的 PULC 模型使用方法并获得了初步效果。
 
-PULC 方法产出的系列模型在人、车、OCR等方向的多个场景中均验证有效，用超轻量模型就可实现与 SwinTransformer 模型接近的精度，预测速度提高 40+ 倍。并且打通数据、模型训练、压缩和推理部署全流程，具体地，您可以参考[PULC有人/无人分类模型](PULC_person_exists.md)、[PULC人体属性识别模型](PULC_person_attribute.md)、[PULC佩戴安全帽分类模型](PULC_safety_helmet.md)、[PULC交通标志分类模型](PULC_traffic_sign.md)、[PULC车辆属性识别模型](PULC_vehicle_attribute.md)、[PULC含文字图像方向分类模型](PULC_text_image_orientation.md)、[PULC文本行方向分类模型](PULC_textline_orientation.md)、[PULC语种分类模型](PULC_language_classification.md)。
+PULC 方法产出的系列模型在人、车、OCR等方向的多个场景中均验证有效，用超轻量模型就可实现与 SwinTransformer 模型接近的精度，预测速度提高 40+ 倍。并且打通数据、模型训练、压缩和推理部署全流程，具体地，您可以参考[PULC有人/无人分类模型](PULC_person_exists.md)、[PULC人体属性识别模型](PULC_person_attribute.md)、[PULC佩戴安全帽分类模型](PULC_safety_helmet.md)、[PULC交通标志分类模型](PULC_traffic_sign.md)、[PULC车辆属性识别模型](PULC_vehicle_attribute.md)、[PULC有车/无车分类模型](PULC_car_exists.md)、[PULC含文字图像方向分类模型](PULC_text_image_orientation.md)、[PULC文本行方向分类模型](PULC_textline_orientation.md)、[PULC语种分类模型](PULC_language_classification.md)。
 
 
 
