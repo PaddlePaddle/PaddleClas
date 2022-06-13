@@ -7,8 +7,9 @@
 
 - [1. 模型和应用场景介绍](#1)
 - [2. 模型快速体验](#2)
-    - [2.1 安装 paddleclas](#2.1)
-    - [2.2 预测](#2.2)
+    - [2.1 安装 paddlepaddle](#2.1)
+    - [2.2 安装 paddleclas](#2.2)
+    - [2.3 预测](#2.3)
 - [3. 模型训练、评估和预测](#3)
     - [3.1 环境配置](#3.1)
     - [3.2 数据准备](#3.2)
@@ -59,35 +60,56 @@
 
 * `Tpr`指标的介绍可以参考 [3.2 小节](#3.2)的备注部分，延时是基于 Intel(R) Xeon(R) Gold 6148 CPU @ 2.40GHz 测试得到，开启 MKLDNN 加速策略，线程数为10。
 * 关于PP-LCNet的介绍可以参考[PP-LCNet介绍](../models/PP-LCNet.md)，相关论文可以查阅[PP-LCNet paper](https://arxiv.org/abs/2109.15099)。
-
-
+    
+    
 <a name="2"></a>
 
 ## 2. 模型快速体验
 
 <a name="2.1"></a>  
+    
+### 2.1 安装 paddlepaddle
+    
+- 您的机器安装的是 CUDA9 或 CUDA10，请运行以下命令安装
 
-### 2.1 安装 paddleclas
+```bash
+python3 -m pip install paddlepaddle-gpu -i https://mirror.baidu.com/pypi/simple
+```
 
-使用如下命令快速安装 paddlepaddle, paddleclas
+- 您的机器是CPU，请运行以下命令安装
+
+```bash
+python3 -m pip install paddlepaddle -i https://mirror.baidu.com/pypi/simple
+```
+    
+更多的版本需求，请参照[飞桨官网安装文档](https://www.paddlepaddle.org.cn/install/quick)中的说明进行操作。
+    
+<a name="2.2"></a>
+    
+### 2.2 安装 paddleclas
+
+使用如下命令快速安装 paddleclas
 
 ```  
-pip3 install paddlepaddle paddleclas
+pip3 install paddleclas
 ```
-<a name="2.2"></a>
+    
+<a name="2.3"></a>
 
-### 2.2 预测
+### 2.3 预测
+    
+点击[这里](https://paddleclas.bj.bcebos.com/data/PULC/pulc_demo_imgs.zip)下载 demo 数据并解压，然后在终端中切换到相应目录。
 
 * 使用命令行快速预测
 
 ```bash
-paddleclas --model_name=car_exists --infer_imgs=deploy/images/PULC/car_exists/objects365_00001507.jpeg
+paddleclas --model_name=car_exists --infer_imgs=pulc_demo_imgs/car_exists/objects365_00001507.jpeg
 ```
 
 结果如下：
 ```
 >>> result
-class_ids: [1], scores: [0.9871138], label_names: ['contains_vehicle'], filename: deploy/images/PULC/car_exists/objects365_00001507.jpeg
+class_ids: [1], scores: [0.9871138], label_names: ['contains_car'], filename: pulc_demo_imgs/car_exists/objects365_00001507.jpeg
 Predict complete!
 ```
 
@@ -98,7 +120,7 @@ Predict complete!
 ```python
 import paddleclas
 model = paddleclas.PaddleClas(model_name="car_exists")
-result = model.predict(input_data="deploy/images/PULC/car_exists/objects365_00001507.jpeg")
+result = model.predict(input_data="pulc_demo_imgs/car_exists/objects365_00001507.jpeg")
 print(next(result))
 ```
 
@@ -106,8 +128,9 @@ print(next(result))
 
 ```
 >>> result
-[{'class_ids': [1], 'scores': [0.9871138], 'label_names': ['contains_vehicle'], 'filename': 'deploy/images/PULC/car_exists/objects365_00001507.jpeg'}]
+[{'class_ids': [1], 'scores': [0.9871138], 'label_names': ['contains_car'], 'filename': 'pulc_demo_imgs/car_exists/objects365_00001507.jpeg'}]
 ```
+    
 
 <a name="3"></a>
 
@@ -411,10 +434,10 @@ python3.7 python/predict_cls.py -c configs/PULC/car_exists/inference_car_exists.
 
 ```
 objects365_00001507.jpeg:       class id(s): [1], score(s): [0.99], label_name(s): ['contains_car']
-objects365_00001521.jpeg:       class id(s): [0], score(s): [0.99], label_name(s): ['nocar']
+objects365_00001521.jpeg:       class id(s): [0], score(s): [0.99], label_name(s): ['no_car']
 ```
 
-其中，`contains_car` 表示该图里存在车，`nocar` 表示该图里不存在车。
+其中，`contains_car` 表示该图里存在车，`no_car` 表示该图里不存在车。
 
 <a name="6.3"></a>
 
