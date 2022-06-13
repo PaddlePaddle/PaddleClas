@@ -123,7 +123,7 @@ DataLoader:
       use_shared_memory: True
 
 Infer:
-  infer_imgs: ./deploy/images/PULC/vehicle_attr/0002_c002_00030670_0.jpg
+  infer_imgs: ./deploy/images/PULC/vehicle_attribute/0002_c002_00030670_0.jpg
   batch_size: 10
   transforms:
     - DecodeImage:

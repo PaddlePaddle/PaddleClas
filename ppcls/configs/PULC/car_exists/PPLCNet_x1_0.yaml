@@ -138,8 +138,8 @@ Infer:
   PostProcess:
     name: ThreshOutput
     threshold: 0.9
-    label_0: nobody
-    label_1: someone
+    label_0: no_car
+    label_1: contains_car
 
 Metric:
   Train:
