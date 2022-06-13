@@ -308,8 +308,10 @@ class ResNet(TheseusLayer):
         )), "lr_mult_list should be in (list, tuple) but got {}".format(
             type(self.lr_mult_list))
         if len(self.lr_mult_list) != 5:
-            msg = "lr_mult_list length should be 5 but got {}, default lr_mult_list used".format(len(self.lr_mult_list))
+            msg = "lr_mult_list length should be 5 but got {}, default lr_mult_list used".format(
+                len(self.lr_mult_list))
             logger.warning(msg)
+            self.lr_mult_list = [1.0, 1.0, 1.0, 1.0, 1.0]
 
         assert isinstance(self.stride_list, (
             list, tuple
