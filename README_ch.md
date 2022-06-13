@@ -8,7 +8,6 @@
 
 <div align="center">
 <img src="./docs/images/class_simple.gif"  width = "600" />
-
 PULC实用图像分类模型效果展示
 </div>
 &nbsp;
@@ -16,17 +15,25 @@ PULC实用图像分类模型效果展示
 
 <div align="center">
 <img src="./docs/images/recognition.gif"  width = "400" />
-
 PP-ShiTu图像识别系统效果展示
 </div>
 
 
 ## 近期更新
+- 📢将于**<u>6月15-6月17日晚20:30</u>**进行为期三天的课程直播，详细介绍超轻量图像分类方案，对各场景模型优化原理及使用方式进行拆解，之后还有产业案例全流程实操，对各类痛难点解决方案进行手把手教学，加上现场互动答疑，抓紧扫码上车吧！
+
+  <img src="https://user-images.githubusercontent.com/80816848/173404459-9426c0ed-4801-4f75-876f-2e6ec47255f5.png" width = "200" height = "200" div align=center />
+
 - 🔥️ 2022.6.15 发布[PULC超轻量图像分类实用方案](docs/zh_CN/PULC/PULC_train.md)，CPU推理3ms，精度比肩SwinTransformer，覆盖人、车、OCR场景九大常见任务。
+
 - 2022.5.26 [飞桨产业实践范例直播课](http://aglc.cn/v-c4FAR)，解读**超轻量重点区域人员出入管理方案**。
+
 - 2022.5.23 新增[人员出入管理范例库](https://aistudio.baidu.com/aistudio/projectdetail/4094475)，具体内容可以在 AI Stuio 上体验。
+
 - 2022.5.20 上线[PP-HGNet](./docs/zh_CN/models/PP-HGNet.md), [PP-LCNetv2](./docs/zh_CN/models/PP-LCNetV2.md)。
+
 - 2022.4.21 新增 CVPR2022 oral论文 [MixFormer](https://arxiv.org/pdf/2204.02557.pdf) 相关[代码](https://github.com/PaddlePaddle/PaddleClas/pull/1820/files)。
+
 - [more](./docs/zh_CN/others/update_history.md)
 
 ## 特性
