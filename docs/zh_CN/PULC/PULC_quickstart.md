@@ -2,7 +2,7 @@
 
 ------
 
-本文主要介绍PaddleClas whl包对 PULC 系列模型的快速使用。
+本文主要介绍通过 PaddleClas whl 包，使用 PULC 系列模型进行预测。
 
 ## 目录
 
@@ -49,9 +49,7 @@ pip3 install paddleclas
 
 ## 2. 快速体验
 
-PaddleClas 提供了一系列测试图片，里边包含人、车、OCR等方向的多个场景大的demo数据。点击[这里](https://paddleclas.bj.bcebos.com/data/PULC/pulc_demo_imgs.zip)下载并解压，然后在终端中切换到相应目录。
-
-
+PaddleClas 提供了一系列测试图片，里边包含人、车、OCR等方向的多个场景的demo数据。点击[这里](https://paddleclas.bj.bcebos.com/data/PULC/pulc_demo_imgs.zip)下载并解压，然后在终端中切换到相应目录。
 
 <a name="2.1"></a>
 
@@ -125,7 +123,3 @@ PULC 系列模型的名称和简介如下：
 通过本节内容，相信您已经熟练掌握 PaddleClas whl 包的 PULC 模型使用方法并获得了初步效果。
 
 PULC 方法产出的系列模型在人、车、OCR等方向的多个场景中均验证有效，用超轻量模型就可实现与 SwinTransformer 模型接近的精度，预测速度提高 40+ 倍。并且打通数据、模型训练、压缩和推理部署全流程，具体地，您可以参考[PULC有人/无人分类模型](PULC_person_exists.md)、[PULC人体属性识别模型](PULC_person_attribute.md)、[PULC佩戴安全帽分类模型](PULC_safety_helmet.md)、[PULC交通标志分类模型](PULC_traffic_sign.md)、[PULC车辆属性识别模型](PULC_vehicle_attribute.md)、[PULC有车/无车分类模型](PULC_car_exists.md)、[PULC含文字图像方向分类模型](PULC_text_image_orientation.md)、[PULC文本行方向分类模型](PULC_textline_orientation.md)、[PULC语种分类模型](PULC_language_classification.md)。
-
-
-
-
