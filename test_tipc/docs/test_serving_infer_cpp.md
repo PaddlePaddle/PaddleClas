@@ -50,7 +50,7 @@ Linux GPU/CPU  PYTHON 服务化部署测试的主程序为`test_serving_infer.sh
     ```shell
     python3.7 -m pip install  -r requirements.txt
     ```
-- 安装 PaddleServing 相关组件，包括serving_client、serving-app，自动编译带自定义OP的serving_server包（测试PP-ShiTu时），以及自动下载并解压推理模型
+- 安装 PaddleServing 相关组件，包括serving_client、serving-app，自动编译并安装带自定义OP的 serving_server 包，以及自动下载并解压推理模型
   ```bash
   bash test_tipc/prepare.sh test_tipc/configs/PPLCNet/PPLCNet_x1_0_linux_gpu_normal_normal_serving_cpp_linux_gpu_cpu.txt serving_infer
   ```
