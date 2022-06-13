@@ -217,7 +217,8 @@ if [[ ${MODE} = "serving_infer" ]]; then
         det_inference_model_url=$(func_parser_value "${lines[4]}")
         det_tar_name=$(func_get_url_file_name "${det_inference_model_url}")
         cd ./deploy
-        wget -nc https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/data/drink_dataset_v1.0.tar --no-check-certificate && tar -xf drink_dataset_v1.0.tar
+        wget -nc https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/data/drink_dataset_v1.0.tar --no-check-certificate
+        tar -xf drink_dataset_v1.0.tar
         mkdir models
         cd models
         wget -nc ${cls_inference_model_url} && tar xf ${cls_tar_name}
