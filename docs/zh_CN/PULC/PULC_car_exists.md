@@ -124,7 +124,7 @@ result = model.predict(input_data="pulc_demo_imgs/car_exists/objects365_00001507
 print(next(result))
 ```
 
-**备注**：`model.predict()` 为可迭代对象（`generator`），因此需要使用 `next()` 函数或 `for` 循环对其迭代调用。每次调用将以 `batch_size` 为单位进行一次预测，并返回预测结果, 默认 `batch_size` 为 1，如果需要更改 `batch_size`，实例化模型时，需要指定 `batch_size`，如 `model = paddleclas.PaddleClas(model_name="person_exists",  batch_size=2)`, 使用默认的代码返回结果示例如下：
+**备注**：`model.predict()` 为可迭代对象（`generator`），因此需要使用 `next()` 函数或 `for` 循环对其迭代调用。每次调用将以 `batch_size` 为单位进行一次预测，并返回预测结果, 默认 `batch_size` 为 1，如果需要更改 `batch_size`，实例化模型时，需要指定 `batch_size`，如 `model = paddleclas.PaddleClas(model_name="car_exists",  batch_size=2)`, 使用默认的代码返回结果示例如下：
 
 ```
 >>> result
