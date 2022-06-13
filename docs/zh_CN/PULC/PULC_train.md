@@ -212,7 +212,7 @@ SSLD 是百度自研的半监督蒸馏算法，在 ImageNet 数据集上，模�
 
 #### 4.1 基于默认配置搜索
 
-配置文件 [search.yaml](../../ppcls/configs/PULC/person_exists/search.yaml) 定义了有人/无人场景超参搜索的配置，使用如下命令即可完成超参数的搜索。
+配置文件 [search.yaml](../../../ppcls/configs/PULC/person_exists/search.yaml) 定义了有人/无人场景超参搜索的配置，使用如下命令即可完成超参数的搜索。
 
 ```bash
 python3 tools/search_strategy.py -c ppcls/configs/PULC/person_exists/search.yaml
