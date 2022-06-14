@@ -25,11 +25,11 @@ PP-ShiTu demo images
 - 2022.4.21 Added the related [code](https://github.com/PaddlePaddle/PaddleClas/pull/1820/files) of the CVPR2022 oral paper [MixFormer](https://arxiv.org/pdf/2204.02557.pdf).
 
 - 2021.09.17 Add PP-LCNet series model developed by PaddleClas, these models show strong competitiveness on Intel CPUs.
-For the introduction of PP-LCNet, please refer to [paper](https://arxiv.org/pdf/2109.15099.pdf) or [PP-LCNet model introduction](docs/en/models/PP-LCNet_en.md). The metrics and pretrained model are available [here](docs/en/ImageNet_models_en.md).
+For the introduction of PP-LCNet, please refer to [paper](https://arxiv.org/pdf/2109.15099.pdf) or [PP-LCNet model introduction](docs/en/models/PP-LCNet_en.md). The metrics and pretrained model are available [here](docs/en/algorithm_introduction/ImageNet_models_en.md).
 
-- 2021.06.29 Add Swin-transformer series model，Highest top1 acc on ImageNet1k dataset reaches 87.2%, training, evaluation and inference are all supported. Pretrained models can be downloaded [here](docs/en/models/models_intro_en.md).
+- 2021.06.29 Add [Swin-transformer](docs/en/models/SwinTransformer_en.md)) series model，Highest top1 acc on ImageNet1k dataset reaches 87.2%, training, evaluation and inference are all supported. Pretrained models can be downloaded [here](docs/en/algorithm_introduction/ImageNet_models_en.md#16).
 - 2021.06.16 PaddleClas release/2.2. Add metric learning and vector search modules. Add product recognition, animation character recognition, vehicle recognition and logo recognition. Added 30 pretrained models of LeViT, Twins, TNT, DLA, HarDNet, and RedNet, and the accuracy is roughly the same as that of the paper.
-- [more](./docs/en/update_history_en.md)
+- [more](./docs/en/others/update_history_en.md)
 
 ## Features
 
@@ -50,41 +50,35 @@ Based on th algorithms above, PaddleClas release PP-ShiTu image recognition syst
 </div>
 
 ## Quick Start
-Quick experience of PP-ShiTu image recognition system：[Link](./docs/en/tutorials/quick_start_recognition_en.md)
+Quick experience of PP-ShiTu image recognition system：[Link](./docs/en/quick_start/quick_start_recognition_en.md)
 
-Quick experience of **P**ractical **U**ltra **L**ight-weight image **C**lassification models：[Link](docs/en/PULC/PULC_quickstart.md)
+Quick experience of **P**ractical **U**ltra **L**ight-weight image **C**lassification models：[Link](docs/en/PULC/PULC_quickstart_en.md)
 
 ## Tutorials
 
-- [Quick Installation](./docs/en/tutorials/install_en.md)
+- [Install Paddle](./docs/en/installation/install_paddle_en.md)
+- [Install PaddleClas Environment](./docs/en/installation/install_paddleclas_en.md)
 - [Practical Ultra Light-weight image Classification solutions](./docs/en/PULC/PULC_quickstart_en.md)
-- [Quick Start of Recognition](./docs/en/tutorials/quick_start_recognition_en.md)
+- [Quick Start of Recognition](./docs/en/quick_start/quick_start_recognition_en.md)
 - [Introduction to Image Recognition Systems](#Introduction_to_Image_Recognition_Systems)
-- [Demo images](#Demo_images)
+- [Image Recognition Demo images](#Rec_Demo_images)
+- [PULC demo images](#Clas_Demo_images)
 - Algorithms Introduction
-    - [Backbone Network and Pre-trained Model Library](./docs/en/ImageNet_models_en.md)
-    - [Mainbody Detection](./docs/en/application/mainbody_detection_en.md)
-    - [Image Classification](./docs/en/tutorials/image_classification_en.md)
-    - [Feature Learning](./docs/en/application/feature_learning_en.md)
-        - [Product Recognition](./docs/en/application/product_recognition_en.md)
-        - [Vehicle Recognition](./docs/en/application/vehicle_recognition_en.md)
-        - [Logo Recognition](./docs/en/application/logo_recognition_en.md)
-        - [Animation Character Recognition](./docs/en/application/cartoon_character_recognition_en.md)
+    - [Backbone Network and Pre-trained Model Library](./docs/en/algorithm_introduction/ImageNet_models_en.md)
+    - [Mainbody Detection](./docs/en/image_recognition_pipeline/mainbody_detection_en.md)
+    - [Feature Learning](./docs/en/image_recognition_pipeline/feature_extraction_en.md)
     - [Vector Search](./deploy/vector_search/README.md)
-- Models Training/Evaluation
-    - [Image Classification](./docs/en/tutorials/getting_started_en.md)
-    - [Feature Learning](./docs/en/tutorials/getting_started_retrieval_en.md)
 - Inference Model Prediction
-    - [Python Inference](./docs/en/inference.md)
+    - [Python Inference](./docs/en/inference_deployment/python_deploy_en.md)
     - [C++ Classfication Inference](./deploy/cpp/readme_en.md)， [C++ PP-ShiTu Inference](deploy/cpp_shitu/readme_en.md)
 - Model Deploy (only support classification for now, recognition coming soon)
     - [Hub Serving Deployment](./deploy/hubserving/readme_en.md)
     - [Mobile Deployment](./deploy/lite/readme_en.md)
-    - [Inference Using whl](./docs/en/whl_en.md)
+    - [Inference Using whl](./docs/en/inference_deployment/whl_deploy_en.md)
 - Advanced Tutorial
     - [Knowledge Distillation](./docs/en/advanced_tutorials/distillation/distillation_en.md)
-    - [Model Quantization](./docs/en/extension/paddle_quantization_en.md)
-    - [Data Augmentation](./docs/en/advanced_tutorials/image_augmentation/ImageAugment_en.md)
+    - [Model Quantization](./docs/en/algorithm_introduction/model_prune_quantization_en.md)
+    - [Data Augmentation](./docs/en/advanced_tutorials/DataAugmentation_en.md)
 - [License](#License)
 - [Contribution](#Contribution)
 
@@ -110,6 +104,7 @@ Image recognition can be divided into three steps:
 
 For a new unknown category, there is no need to retrain the model, just prepare images of new category, extract features and update retrieval database and the category can be recognised.
 
+<a name="Clas_Demo_images"></a>
 ## PULC demo images
 <div align="center">
 <img src="docs/images/classification_en.gif">
