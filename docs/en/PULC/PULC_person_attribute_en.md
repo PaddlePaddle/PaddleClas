@@ -44,7 +44,7 @@ Pedestrian analysis scenarios, pedestrian tracking scenarios, etc.
 The following table lists the relevant indicators of the model. The first three lines means that using Res2Net200_vd_26w_4s, SwinTransformer_tiny and MobileNetV3_small_x0_35 as the backbone to training. The fourth to seventh lines means that the backbone is replaced by PPLCNet, additional use of EDA strategy and additional use of EDA strategy and SKL-UGI knowledge distillation strategy.
     
     
-| Backbone | ma（%） | Latency(ms)） | Size(M) | Training Strategy |
+| Backbone | ma（%） | Latency(ms) | Size(M) | Training Strategy |
 |-------|-----------|----------|---------------|---------------|
 | Res2Net200_vd_26w_4s  | 81.25 | 77.51  | 293 | using ImageNet pretrained |
 | SwinTransformer_tiny  | 80.17 | 89.51  | 107 | using ImageNet pretrained |
@@ -157,7 +157,7 @@ The data used in this case is the [pa100k dataset](https://www.v7labs.com/open-d
 
 Some image of the processed dataset is as follows:
 
-![](./../images/PULC/docs/person_attribute_data_demo.png)
+![](../../images/PULC/docs/person_attribute_data_demo.png)
 
 
 We converted the data into a PaddleClas multi-label readable data format that can be downloaded directly.

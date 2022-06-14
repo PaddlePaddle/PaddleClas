@@ -40,7 +40,7 @@
 
 ## 1. 模型和应用场景介绍
 
-该案例提供了用户使用 PaddleClas 的超轻量图像分类方案（PULC，Practical Ultra Lightweight Classification）快速构建轻量级、高精度、可落地的车辆属性识别模型。该模型可以广泛应用于车辆识别、道路监控等场景。
+该案例提供了用户使用 PaddleClas 的超轻量图像分类方案（PULC，Practical Ultra Lightweight image Classification）快速构建轻量级、高精度、可落地的车辆属性识别模型。该模型可以广泛应用于车辆识别、道路监控等场景。
 
 下表列出了不同车辆属性识别模型的相关指标，前三行展现了使用 Res2Net200_vd_26w_4s、 ResNet50、MobileNetV3_small_x0_35 作为 backbone 训练得到的模型的相关指标，第四行至第七行依次展现了替换 backbone 为 PPLCNet_x1_0、使用 SSLD 预训练模型、使用 SSLD 预训练模型 + EDA 策略、使用 SSLD 预训练模型 + EDA 策略 + SKL-UGI 知识蒸馏策略训练得到的模型的相关指标。
 

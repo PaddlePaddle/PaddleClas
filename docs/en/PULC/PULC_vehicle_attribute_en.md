@@ -157,6 +157,13 @@ The data used in this case is the [pa100k dataset](https://www.v7labs.com/open-d
 
 #### 3.2.2 Getting Dataset
 
+
+Part of the data visualization is shown below.
+
+<div align="center">
+<img src="../../images/PULC/docs/vehicle_attribute_data_demo.png"  width = "500" />
+</div>
+    
 First, apply for and download data from [VeRi dataset official website](https://www.v7labs.com/open-datasets/veri-dataset), put it in the `dataset` directory of PaddleClas, the dataset directory name is `VeRi `, use the following command to enter the folder.
     
 
