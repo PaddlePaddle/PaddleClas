@@ -51,7 +51,7 @@ Based on th algorithms above, PaddleClas release PP-ShiTu image recognition syst
 
 ## Quick Start
 Quick experience of PP-ShiTu image recognition system：[Link](./docs/en/tutorials/quick_start_recognition_en.md)
-Quick experience of **P**ractical **U**ltra **L**ight-weight image **C**lassification models：[Link](docs/en/PULC/PULC_quickstart.md)
+Quick experience of **P**ractical **U**ltra **L**ight-weight image **C**lassification models：[Link](docs/en/PULC/PULC_quickstart_en.md)
 
 ## Tutorials
 
