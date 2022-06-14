@@ -4,10 +4,24 @@
 
 ## Introduction
 
-PaddleClas is an image recognition toolset for industry and academia, helping users train better computer vision models and apply them in real scenarios.
+PaddleClas is an image classification and image recognition toolset for industry and academia, helping users train better computer vision models and apply them in real scenarios.
+
+<div align="center">
+<img src="./docs/images/class_simple.gif"  width = "600" />
+
+PULC demo images
+</div>
+&nbsp;
+
+
+<div align="center">
+<img src="./docs/images/recognition.gif"  width = "400" />
+
+PP-ShiTu demo images
+</div>
 
 **Recent updates**
-
+- 2022.6.15 Release [**P**ractical **U**ltra **L**ight-weight image **C**lassification solutions](./docs/en/PULC/PULC_quickstart_en.md). PULC models inference within 3ms on CPU devices, with accuracy comparable with SwinTransformer. We also release 9 practical models covering pedestrian, vehicle and OCR.
 - 2022.4.21 Added the related [code](https://github.com/PaddlePaddle/PaddleClas/pull/1820/files) of the CVPR2022 oral paper [MixFormer](https://arxiv.org/pdf/2204.02557.pdf).
 
 - 2021.09.17 Add PP-LCNet series model developed by PaddleClas, these models show strong competitiveness on Intel CPUs.
@@ -19,24 +33,12 @@ For the introduction of PP-LCNet, please refer to [paper](https://arxiv.org/pdf/
 
 ## Features
 
-- A practical image recognition system consist of detection, feature learning and retrieval modules, widely applicable to all types of image recognition tasks.
-Four sample solutions are provided, including product recognition, vehicle recognition, logo recognition and animation character recognition.
-
-- Rich library of pre-trained models: Provide a total of 164 ImageNet pre-trained models in 35 series, among which 6 selected series of models support fast structural modification.
-
-- Comprehensive and easy-to-use feature learning components: 12 metric learning methods are integrated and can be combined and switched at will through configuration files.
-
-- SSLD knowledge distillation: The 14 classification pre-training models generally improved their accuracy by more than 3%; among them, the ResNet50_vd model achieved a Top-1 accuracy of 84.0% on the Image-Net-1k dataset and the Res2Net200_vd pre-training model achieved a Top-1 accuracy of 85.1%.
-
-- Data augmentation: Provide 8 data augmentation algorithms such as AutoAugment, Cutout, Cutmix, etc.  with detailed introduction, code replication and evaluation of effectiveness in a unified experimental environment.
+PaddleClas release PP-HGNet、PP-LCNetv2、 PP-LCNet and **S**imple **S**emi-supervised **L**abel **D**istillation algorithms, and support plenty of 
+image classification and image recognition algorithms. 
+Based on th algorithms above, PaddleClas release PP-ShiTu image recognition system and [**P**ractical **U**ltra **L**ight-weight image **C**lassification solutions](docs/en/PULC/PULC_quickstart_en.md).
 
 
-
-
-<div align="center">
-<img src="./docs/images/recognition_en.gif"  width = "400" />
-</div>
-
+![](https://user-images.githubusercontent.com/19523330/173347904-f2998e00-7b86-4adf-b546-23c684fc67b9.png)
 
 ## Welcome to Join the Technical Exchange Group
 
@@ -48,11 +50,13 @@ Four sample solutions are provided, including product recognition, vehicle recog
 </div>
 
 ## Quick Start
-Quick experience of image recognition：[Link](./docs/en/tutorials/quick_start_recognition_en.md)
+Quick experience of PP-ShiTu image recognition system：[Link](./docs/en/tutorials/quick_start_recognition_en.md)
+Quick experience of **P**ractical **U**ltra **L**ight-weight image **C**lassification models：[Link](docs/en/PULC/PULC_quickstart.md)
 
 ## Tutorials
 
 - [Quick Installation](./docs/en/tutorials/install_en.md)
+- [Practical Ultra Light-weight image Classification solutions](./docs/en/PULC/PULC_quickstart_en.md)
 - [Quick Start of Recognition](./docs/en/tutorials/quick_start_recognition_en.md)
 - [Introduction to Image Recognition Systems](#Introduction_to_Image_Recognition_Systems)
 - [Demo images](#Demo_images)
@@ -83,6 +87,14 @@ Quick experience of image recognition：[Link](./docs/en/tutorials/quick_start_r
 - [License](#License)
 - [Contribution](#Contribution)
 
+<a name="Introduction_to_PULC"></a>
+## Introduction to Practical Ultra Light-weight image Classification solutions
+<div align="center">
+<img src="https://user-images.githubusercontent.com/19523330/173011854-b10fcd7a-b799-4dfd-a1cf-9504952a3c44.png"  width = "800" />
+</div>
+PULC solutions consists of PP-LCNet light-weight backbone, SSLD pretrained models, Ensemble of Data Augmentation strategy and SKL-UGI knowledge distillation.
+PULC models inference within 3ms on CPU devices, with accuracy comparable with SwinTransformer. We also release 9 practical models covering pedestrian, vehicle and OCR.
+
 <a name="Introduction_to_Image_Recognition_Systems"></a>
 ## Introduction to Image Recognition Systems
 
@@ -97,8 +109,13 @@ Image recognition can be divided into three steps:
 
 For a new unknown category, there is no need to retrain the model, just prepare images of new category, extract features and update retrieval database and the category can be recognised.
 
-<a name="Demo_images"></a>
-## Demo images [more](https://github.com/PaddlePaddle/PaddleClas/tree/release/2.2/docs/images/recognition/more_demo_images)
+## PULC demo images
+<div align="center">
+<img src="docs/images/classification.gif">
+</div>
+
+<a name="Rec_Demo_images"></a>
+## Image Recognition Demo images [more](https://github.com/PaddlePaddle/PaddleClas/tree/release/2.2/docs/images/recognition/more_demo_images)
 - Product recognition
 <div align="center">
 <img src="https://user-images.githubusercontent.com/18028216/122769644-51604f80-d2d7-11eb-8290-c53b12a5c1f6.gif"  width = "400" />
