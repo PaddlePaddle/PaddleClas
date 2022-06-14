@@ -53,12 +53,12 @@
 | PPLCNet_x1_0  | 99.30 | 2.03  | 6.5 | 使用SSLD预训练模型+EDA策略|
 | <b>PPLCNet_x1_0<b>  | <b>99.38<b> | <b>2.03<b>  | <b>6.5<b> | 使用SSLD预训练模型+EDA策略+UDML知识蒸馏策略|
 
-从表中可以看出，在使用服务器端大模型作为 backbone 时，SwinTranformer_tiny 精度较低，Res2Net200_vd_26w_4s 精度较高，但服务器端大模型推理速度普遍较慢。将 backboone 替换为轻量级模型 MobileNetV3_small_x0_35 后，速度可以大幅提升，但是精度显著降低。在将 backbone 替换为 PPLCNet_x1_0 后，精度较 MobileNetV3_small_x0_35 提高约 8.5 个百分点，与此同时速度快 20% 以上。在此基础上，将 PPLCNet_x1_0 的预训练模型替换为 SSLD 预训练模型后，在对推理速度无影响的前提下，精度提升约 4.9 个百分点，进一步地使用 EDA 策略后，精度可以再提升 1.1 个百分点。此时，PPLCNet_x1_0 已经超过 Res2Net200_vd_26w_4s 模型的精度，但是速度快 70+ 倍。最后，在使用 UDML 知识蒸馏后，精度可以再提升 0.08 个百分点。下面详细介绍关于 PULC 安全帽模型的训练方法和推理部署方法。
+从表中可以看出，在使用服务器端大模型作为 backbone 时，SwinTranformer_tiny 精度较低，Res2Net200_vd_26w_4s 精度较高，但服务器端大模型推理速度普遍较慢。将 backbone 替换为轻量级模型 MobileNetV3_small_x0_35 后，速度可以大幅提升，但是精度显著降低。在将 backbone 替换为 PPLCNet_x1_0 后，精度较 MobileNetV3_small_x0_35 提高约 8.5 个百分点，与此同时速度快 20% 以上。在此基础上，将 PPLCNet_x1_0 的预训练模型替换为 SSLD 预训练模型后，在对推理速度无影响的前提下，精度提升约 4.9 个百分点，进一步地使用 EDA 策略后，精度可以再提升 1.1 个百分点。此时，PPLCNet_x1_0 已经超过 Res2Net200_vd_26w_4s 模型的精度，但是速度快 70+ 倍。最后，在使用 UDML 知识蒸馏后，精度可以再提升 0.08 个百分点。下面详细介绍关于 PULC 安全帽模型的训练方法和推理部署方法。
 
 **备注：**
 
 * `Tpr`指标的介绍可以参考 [3.3小节](#3.3)的备注部分，延时是基于 Intel(R) Xeon(R) Gold 6148 CPU @ 2.40GHz 测试得到，开启MKLDNN加速策略，线程数为10。
-    
+
 * 关于PP-LCNet的介绍可以参考[PP-LCNet介绍](../models/PP-LCNet.md)，相关论文可以查阅[PP-LCNet paper](https://arxiv.org/abs/2109.15099)。
 
 
@@ -67,9 +67,9 @@
 ## 2. 模型快速体验
 
 <a name="2.1"></a>  
-    
+
 ### 2.1 安装 paddlepaddle
-    
+
 - 您的机器安装的是 CUDA9 或 CUDA10，请运行以下命令安装
 
 ```bash
@@ -81,23 +81,23 @@ python3 -m pip install paddlepaddle-gpu -i https://mirror.baidu.com/pypi/simple
 ```bash
 python3 -m pip install paddlepaddle -i https://mirror.baidu.com/pypi/simple
 ```
-    
+
 更多的版本需求，请参照[飞桨官网安装文档](https://www.paddlepaddle.org.cn/install/quick)中的说明进行操作。
-    
+
 <a name="2.2"></a>  
-    
+
 ### 2.2 安装 paddleclas
 
 使用如下命令快速安装 paddleclas
 
 ```  
 pip3 install paddleclas
-``` 
-    
+```
+
 <a name="2.3"></a>
 
 ### 2.3 预测
-    
+
 点击[这里](https://paddleclas.bj.bcebos.com/data/PULC/pulc_demo_imgs.zip)下载 demo 数据并解压，然后在终端中切换到相应目录。
 
 * 使用命令行快速预测

@@ -49,7 +49,7 @@
 | PPLCNet_x1_0            | 99.12     | 2.58     | 6.5     | 使用SSLD预训练模型+EDA策略                     |
 | **PPLCNet_x1_0**        | **99.26** | **2.58** | **6.5** | 使用SSLD预训练模型+EDA策略+SKL-UGI知识蒸馏策略 |
 
-从表中可以看出，backbone 为 SwinTranformer_tiny 时精度比较高，但是推理速度较慢。将 backboone 替换为轻量级模型 MobileNetV3_small_x0_35 后，速度提升明显，但精度有了大幅下降。将 backbone 替换为 PPLCNet_x1_0 且调整预处理输入尺寸和网络的下采样stride时，速度略为提升，同时精度较 MobileNetV3_large_x1_0 高2.43个百分点。在此基础上，使用 SSLD 预训练模型后，在不改变推理速度的前提下，精度可以提升 0.35 个百分点，进一步地，当融合EDA策略后，精度可以再提升 0.42 个百分点，最后，在使用 SKL-UGI 知识蒸馏后，精度可以继续提升 0.14 个百分点。此时，PPLCNet_x1_0 超过了 SwinTranformer_tiny 模型的精度，并且速度有了明显提升。关于 PULC 的训练方法和推理部署方法将在下面详细介绍。
+从表中可以看出，backbone 为 SwinTranformer_tiny 时精度比较高，但是推理速度较慢。将 backbone 替换为轻量级模型 MobileNetV3_small_x0_35 后，速度提升明显，但精度有了大幅下降。将 backbone 替换为 PPLCNet_x1_0 且调整预处理输入尺寸和网络的下采样stride时，速度略为提升，同时精度较 MobileNetV3_large_x1_0 高2.43个百分点。在此基础上，使用 SSLD 预训练模型后，在不改变推理速度的前提下，精度可以提升 0.35 个百分点，进一步地，当融合EDA策略后，精度可以再提升 0.42 个百分点，最后，在使用 SKL-UGI 知识蒸馏后，精度可以继续提升 0.14 个百分点。此时，PPLCNet_x1_0 超过了 SwinTranformer_tiny 模型的精度，并且速度有了明显提升。关于 PULC 的训练方法和推理部署方法将在下面详细介绍。
 
 **备注：**
 
@@ -60,9 +60,9 @@
 ## 2. 模型快速体验
 
 <a name="2.1"></a>  
-    
+
 ### 2.1 安装 paddlepaddle
-    
+
 - 您的机器安装的是 CUDA9 或 CUDA10，请运行以下命令安装
 
 ```bash
@@ -74,23 +74,23 @@ python3 -m pip install paddlepaddle-gpu -i https://mirror.baidu.com/pypi/simple
 ```bash
 python3 -m pip install paddlepaddle -i https://mirror.baidu.com/pypi/simple
 ```
-    
+
 更多的版本需求，请参照[飞桨官网安装文档](https://www.paddlepaddle.org.cn/install/quick)中的说明进行操作。
-    
+
 <a name="2.2"></a>  
-    
+
 ### 2.2 安装 paddleclas
 
 使用如下命令快速安装 paddleclas
 
 ```  
 pip3 install paddleclas
-``` 
-    
+```
+
 <a name="2.3"></a>
 
 ### 2.3 预测
-    
+
 点击[这里](https://paddleclas.bj.bcebos.com/data/PULC/pulc_demo_imgs.zip)下载 demo 数据并解压，然后在终端中切换到相应目录。
 
 * 使用命令行快速预测

@@ -48,9 +48,9 @@
 | PPLCNet_x1_0            | 98.02     | 2.16       | 6.5       | 使用SSLD预训练模型                    |
 | **PPLCNet_x1_0**        | **99.06** | **2.16**   | **6.5**   | 使用SSLD预训练模型+SHAS超参数搜索策略 |
 
-从表中可以看出，backbone 为 SwinTranformer_tiny 时精度比较高，但是推理速度较慢。将 backboone 替换为轻量级模型 MobileNetV3_small_x0_35 后，速度提升明显，但精度有了大幅下降。将 backbone 替换为 PPLCNet_x1_0 时，速度略为提升，同时精度较 MobileNetV3_small_x0_35 高了 14.24 个百分点。在此基础上，使用 SSLD 预训练模型后，在不改变推理速度的前提下，精度可以提升 0.17 个百分点，进一步地，当使用SHAS超参数搜索策略搜索最优超参数后，精度可以再提升 1.04 个百分点。此时，PPLCNet_x1_0 与 SwinTranformer_tiny 的精度差别不大，但是速度明显变快。关于 PULC 的训练方法和推理部署方法将在下面详细介绍。
+从表中可以看出，backbone 为 SwinTranformer_tiny 时精度比较高，但是推理速度较慢。将 backbone 替换为轻量级模型 MobileNetV3_small_x0_35 后，速度提升明显，但精度有了大幅下降。将 backbone 替换为 PPLCNet_x1_0 时，速度略为提升，同时精度较 MobileNetV3_small_x0_35 高了 14.24 个百分点。在此基础上，使用 SSLD 预训练模型后，在不改变推理速度的前提下，精度可以提升 0.17 个百分点，进一步地，当使用SHAS超参数搜索策略搜索最优超参数后，精度可以再提升 1.04 个百分点。此时，PPLCNet_x1_0 与 SwinTranformer_tiny 的精度差别不大，但是速度明显变快。关于 PULC 的训练方法和推理部署方法将在下面详细介绍。
 
-**备注：** 
+**备注：**
 
 * 关于PP-LCNet的介绍可以参考[PP-LCNet介绍](../models/PP-LCNet.md)，相关论文可以查阅[PP-LCNet paper](https://arxiv.org/abs/2109.15099)。
 
@@ -59,9 +59,9 @@
 ## 2. 模型快速体验
 
 <a name="2.1"></a>  
-    
+
 ### 2.1 安装 paddlepaddle
-    
+
 - 您的机器安装的是 CUDA9 或 CUDA10，请运行以下命令安装
 
 ```bash
@@ -73,23 +73,23 @@ python3 -m pip install paddlepaddle-gpu -i https://mirror.baidu.com/pypi/simple
 ```bash
 python3 -m pip install paddlepaddle -i https://mirror.baidu.com/pypi/simple
 ```
-    
+
 更多的版本需求，请参照[飞桨官网安装文档](https://www.paddlepaddle.org.cn/install/quick)中的说明进行操作。
-    
+
 <a name="2.2"></a>  
-    
+
 ### 2.2 安装 paddleclas
 
 使用如下命令快速安装 paddleclas
 
 ```  
 pip3 install paddleclas
-``` 
-    
+```
+
 <a name="2.3"></a>
 
 ### 2.3 预测
-    
+
 点击[这里](https://paddleclas.bj.bcebos.com/data/PULC/pulc_demo_imgs.zip)下载 demo 数据并解压，然后在终端中切换到相应目录。
 
 * 使用命令行快速预测
