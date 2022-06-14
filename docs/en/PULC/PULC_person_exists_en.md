@@ -32,7 +32,7 @@
   - [6.3 Deployment with C++](#6.3)
   - [6.4 Deployment as Service](#6.4)
   - [6.5 Deployment on Mobile](#6.5)
-  - [6.6 To ONNX and Deployment](#6.6)
+  - [6.6 Converting To ONNX and Deployment](#6.6)
 
 
 <a name="1"></a>
@@ -274,7 +274,7 @@ The results:
 
 ### 4.1 SKL-UGI Knowledge Distillation
 
-SKL-UGI is a simple but effective knowledge distillation algrithem proposed by PaddleClas. Please refer to [SKL-UGI 知识蒸馏](../advanced_tutorials/ssld_en.md) for more details.
+SKL-UGI is a simple but effective knowledge distillation algrithem proposed by PaddleClas. Please refer to [SKL-UGI 知识蒸馏](../advanced_tutorials/distillation/distillation_en.md) for more details.
 
 <a name="4.1.1"></a>
 
@@ -450,7 +450,7 @@ PaddleClas provides an example of how to deploy on mobile by Paddle-Lite. Please
 
 <a name="6.6"></a>
 
-### 6.6 To ONNX and Deployment
+### 6.6 Converting To ONNX and Deployment
 
 Paddle2ONNX support convert Paddle Inference model to ONNX model. And you can deploy with ONNX model on different inference engine, such as TensorRT, OpenVINO, MNN/TNN, NCNN and so on. About Paddle2ONNX details, please refer to [Paddle2ONNX](https://github.com/PaddlePaddle/Paddle2ONNX).
 
