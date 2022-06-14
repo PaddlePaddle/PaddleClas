@@ -33,8 +33,8 @@ For the introduction of PP-LCNet, please refer to [paper](https://arxiv.org/pdf/
 
 ## Features
 
-PaddleClas release PP-HGNet、PP-LCNetv2、 PP-LCNet and **S**imple **S**emi-supervised **L**abel **D**istillation algorithms, and support plenty of 
-image classification and image recognition algorithms. 
+PaddleClas release PP-HGNet、PP-LCNetv2、 PP-LCNet and **S**imple **S**emi-supervised **L**abel **D**istillation algorithms, and support plenty of
+image classification and image recognition algorithms.
 Based on th algorithms above, PaddleClas release PP-ShiTu image recognition system and [**P**ractical **U**ltra **L**ight-weight image **C**lassification solutions](docs/en/PULC/PULC_quickstart_en.md).
 
 
@@ -59,6 +59,10 @@ Quick experience of **P**ractical **U**ltra **L**ight-weight image **C**lassific
 - [Install Paddle](./docs/en/installation/install_paddle_en.md)
 - [Install PaddleClas Environment](./docs/en/installation/install_paddleclas_en.md)
 - [Practical Ultra Light-weight image Classification solutions](./docs/en/PULC/PULC_quickstart_en.md)
+  - [PULC Quick Start](docs/en/PULC/PULC_quickstart_en.md)
+  - [PULC Model Zoo](docs/en/PULC/PULC_model_list_en.md)
+    - [PULC Classification Model of Someone or Nobody](docs/en/PULC/PULC_person_exists_en.md)
+- [Quick Start of Recognition](./docs/en/tutorials/quick_start_recognition_en.md)
 - [Quick Start of Recognition](./docs/en/quick_start/quick_start_recognition_en.md)
 - [Introduction to Image Recognition Systems](#Introduction_to_Image_Recognition_Systems)
 - [Image Recognition Demo images](#Rec_Demo_images)

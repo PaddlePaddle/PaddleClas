@@ -12,16 +12,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import sys
-from paddle_serving_client import Client
-
-#app
-from paddle_serving_app.reader import Sequential, URL2Image, Resize
-from paddle_serving_app.reader import CenterCrop, RGB2BGR, Transpose, Div, Normalize
+import base64
 import time
 
+from paddle_serving_client import Client
+
+
+def bytes_to_base64(image: bytes) -> str:
+    """encode bytes into base64 string
+    """
+    return base64.b64encode(image).decode('utf8')
+
+
 client = Client()
-client.load_client_config("./ResNet50_vd_serving/serving_server_conf.prototxt")
+client.load_client_config("./ResNet50_client/serving_client_conf.prototxt")
 client.connect(["127.0.0.1:9292"])
 
 label_dict = {}
@@ -31,22 +35,17 @@ with open("imagenet.label") as fin:
         label_dict[label_idx] = line.strip()
         label_idx += 1
 
-#preprocess
-seq = Sequential([
-    URL2Image(), Resize(256), CenterCrop(224), RGB2BGR(), Transpose((2, 0, 1)),
-    Div(255), Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225], True)
-])
-
-start = time.time()
-image_file = "https://paddle-serving.bj.bcebos.com/imagenet-example/daisy.jpg"
+image_file = "./daisy.jpg"
 for i in range(1):
-    img = seq(image_file)
-    fetch_map = client.predict(
-        feed={"inputs": img}, fetch=["prediction"], batch=False)
-
-    prob = max(fetch_map["prediction"][0])
-    label = label_dict[fetch_map["prediction"][0].tolist().index(prob)].strip(
-    ).replace(",", "")
-    print("prediction: {}, probability: {}".format(label, prob))
-end = time.time()
-print(end - start)
+    start = time.time()
+    with open(image_file, 'rb') as img_file:
+        image_data = img_file.read()
+        image = bytes_to_base64(image_data)
+        fetch_dict = client.predict(
+            feed={"inputs": image}, fetch=["prediction"], batch=False)
+        prob = max(fetch_dict["prediction"][0])
+        label = label_dict[fetch_dict["prediction"][0].tolist().index(
+            prob)].strip().replace(",", "")
+        print("prediction: {}, probability: {}".format(label, prob))
+    end = time.time()
+    print(end - start)
