@@ -44,14 +44,14 @@ The following table lists the relevant indicators of the model. The first two li
 
 | Backbone | Tpr(%) | Latency(ms) | Size(M)| Training Strategy |
 |-------|-----------|----------|---------------|---------------|
-| SwinTranformer_tiny  | 95.69 | 95.30  | 107 | using ImageNet pretrained |
-| MobileNetV3_small_x0_35  | 68.25 | 2.85  | 1.6 | using ImageNet pretrained |
-| PPLCNet_x1_0  | 89.57 | 2.12  | 6.5 | using ImageNet pretrained |
-| PPLCNet_x1_0  | 92.10 | 2.12  | 6.5 | using SSLD pretrained |
-| PPLCNet_x1_0  | 93.43 | 2.12  | 6.5 | using SSLD pretrained + EDA strategy  |
-| <b>PPLCNet_x1_0<b>  | <b>95.60<b> | <b>2.12<b>  | <b>6.5<b> | using SSLD pretrained + EDA strategy + SKL-UGI knowledge distillation strategy|
+| SwinTranformer_tiny  | 95.69 | 95.30  | 107 | using ImageNet pretrained model |
+| MobileNetV3_small_x0_35  | 68.25 | 2.85  | 1.6 | using ImageNet pretrained model |
+| PPLCNet_x1_0  | 89.57 | 2.12  | 6.5 | using ImageNet pretrained model |
+| PPLCNet_x1_0  | 92.10 | 2.12  | 6.5 | using SSLD pretrained model |
+| PPLCNet_x1_0  | 93.43 | 2.12  | 6.5 | using SSLD pretrained model + EDA strategy  |
+| <b>PPLCNet_x1_0<b>  | <b>95.60<b> | <b>2.12<b>  | <b>6.5<b> | using SSLD pretrained model + EDA strategy + SKL-UGI knowledge distillation strategy|
 
-It can be seen that high Tpr can be getted when backbone is SwinTranformer_tiny, but the speed is slow. Replacing backbone with the lightweight model MobileNetV3_small_x0_35, the speed can be greatly improved, but the Tpr will be greatly reduced. Replacing backbone with faster backbone PPLCNet_x1_0, the Tpr is higher more 20 percentage points higher than MobileNetv3_small_x0_35. At the same time, the speed can be more than 20% faster. After additional using the SSLD pretrained model, the Tpr can be improved by about 2.6 percentage points without affecting the inference speed. Further, additional using the EDA strategy, the Tpr can be increased by 1.3 percentage points. Finally, after additional using the SKL-UGI knowledge distillation, the Tpr can be further improved by 2.2 percentage points. At this point, the Tpr close to that of SwinTranformer_tiny is obtained, but the speed is more than 40 times faster. The training method and deployment instructions of PULC will be introduced in detail below.
+It can be seen that high Tpr can be getted when backbone is SwinTranformer_tiny, but the speed is slow. Replacing backbone with the lightweight model MobileNetV3_small_x0_35, the speed can be greatly improved, but the Tpr will be greatly reduced. Replacing backbone with faster backbone PPLCNet_x1_0, the Tpr is higher more 20 percentage points than MobileNetv3_small_x0_35. At the same time, the speed can be more than 20% faster. After additional using the SSLD pretrained model, the Tpr can be improved by about 2.6 percentage points without affecting the inference speed. Further, additional using the EDA strategy, the Tpr can be increased by 1.3 percentage points. Finally, after additional using the SKL-UGI knowledge distillation, the Tpr can be further improved by 2.2 percentage points. At this point, the Tpr close to that of SwinTranformer_tiny, but the speed is more than 40 times faster. The training method and deployment instructions of PULC will be introduced in detail below.
 
 **Note**:
 
@@ -96,7 +96,6 @@ pip3 install paddleclas
 ### 2.3 Prediction
 
 First, please click [here](https://paddleclas.bj.bcebos.com/data/PULC/pulc_demo_imgs.zip) to download and unzip to get the test demo images.
-
 
 * Prediction with CLI
 
