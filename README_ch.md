@@ -8,7 +8,9 @@
 
 <div align="center">
 <img src="./docs/images/class_simple.gif"  width = "600" />
+<tr>
 PULC实用图像分类模型效果展示
+</tr>
 </div>
 &nbsp;
 
