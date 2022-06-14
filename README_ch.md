@@ -22,7 +22,9 @@
 ## 近期更新
 - 📢将于**<u>6月15-6月17日晚20:30</u>**进行为期三天的课程直播，详细介绍超轻量图像分类方案，对各场景模型优化原理及使用方式进行拆解，之后还有产业案例全流程实操，对各类痛难点解决方案进行手把手教学，加上现场互动答疑，抓紧扫码上车吧！
 
-  <img src="https://user-images.githubusercontent.com/80816848/173404459-9426c0ed-4801-4f75-876f-2e6ec47255f5.png" width = "200" height = "200" div align=center />
+<div align="center">
+<img src="https://user-images.githubusercontent.com/80816848/173404459-9426c0ed-4801-4f75-876f-2e6ec47255f5.png" width = "200" height = "200"/>
+</div>
 
 - 🔥️ 2022.6.15 发布[PULC超轻量图像分类实用方案](docs/zh_CN/PULC/PULC_train.md)，CPU推理3ms，精度比肩SwinTransformer，覆盖人、车、OCR场景九大常见任务。
 
