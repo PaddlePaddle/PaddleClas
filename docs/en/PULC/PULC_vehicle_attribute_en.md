@@ -1,4 +1,4 @@
-# PULC Classification Model of Someone or Nobody
+# PULC Recognition Model of Vehicle Attribute
 
 ------
 
