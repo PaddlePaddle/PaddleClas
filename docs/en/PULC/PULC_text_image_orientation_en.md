@@ -38,19 +38,17 @@
 
 In the process of document scanning, license shooting and so on, sometimes in order to shoot more clearly, the camera device will be rotated, resulting in photo in different directions. At this time, the standard OCR process cannot cope with these issues well. Using the text image orientation classification technology, the direction of the text image can be predicted and adjusted, so as to improve the accuracy of OCR processing. This case provides a way for users to use PaddleClas PULC (Practical Ultra Lightweight Classification) to quickly build a lightweight, high-precision, practical classification model of text image orientation. This model can be widely used in OCR processing scenarios of rotating pictures in financial, government and other industries.
 
-The following table lists the relevant indicators of the model. The first two lines means that using SwinTransformer_tiny and MobileNetV3_small_x0_35 as the backbone to training. The third to fifth lines means that the backbone is replaced by PPLCNet, additional use of SSLD pretrained model and additional use of EDA strategy and SKL-UGI knowledge distillation strategy.
+The following table lists the relevant indicators of the model. The first two lines means that using SwinTransformer_tiny and MobileNetV3_small_x0_35 as the backbone to training. The third to fifth lines means that the backbone is replaced by PPLCNet, additional use of SSLD pretrained model and additional use of hyperparameters searching strategy.
 
-下表列出了判断含文字图像方向分类模型的相关指标，前两行展现了使用 SwinTranformer_tiny 和 MobileNetV3_small_x0_35 作为 backbone 训练得到的模型的相关指标，第三行至第五行依次展现了替换 backbone 为 PPLCNet_x1_0、使用 SSLD 预训练模型、使用 超参数搜索策略训练得到的模型的相关指标。
-
-| 模型                    | 精度（%） | 延时（ms） | 存储（M） | 策略                                  |
+| Backbone | Top1-Acc(%) | Latency(ms) | Size(M)| Training Strategy |
 | ----------------------- | --------- | ---------- | --------- | ------------------------------------- |
-| SwinTranformer_tiny     | 99.12     | 89.65      | 107       | 使用ImageNet预训练模型                |
-| MobileNetV3_small_x0_35 | 83.61     | 2.95       | 17        | 使用ImageNet预训练模型                |
-| PPLCNet_x1_0            | 97.85     | 2.16       | 6.5       | 使用ImageNet预训练模型                |
-| PPLCNet_x1_0            | 98.02     | 2.16       | 6.5       | 使用SSLD预训练模型                    |
-| **PPLCNet_x1_0**        | **99.06** | **2.16**   | **6.5**   | 使用SSLD预训练模型+SHAS超参数搜索策略 |
+| SwinTranformer_tiny     | 99.12     | 89.65      | 107       | using ImageNet pretrained model       |
+| MobileNetV3_small_x0_35 | 83.61     | 2.95       | 17        | using ImageNet pretrained model       |
+| PPLCNet_x1_0            | 97.85     | 2.16       | 6.5       | using ImageNet pretrained model       |
+| PPLCNet_x1_0            | 98.02     | 2.16       | 6.5       | using SSLD pretrained model           |
+| **PPLCNet_x1_0**        | **99.06** | **2.16**   | **6.5**   | using SSLD pretrained model + hyperparameters searching strategy |
 
-从表中可以看出，backbone 为 SwinTranformer_tiny 时精度比较高，但是推理速度较慢。将 backbone 替换为轻量级模型 MobileNetV3_small_x0_35 后，速度提升明显，但精度有了大幅下降。将 backbone 替换为 PPLCNet_x1_0 时，速度略为提升，同时精度较 MobileNetV3_small_x0_35 高了 14.24 个百分点。在此基础上，使用 SSLD 预训练模型后，在不改变推理速度的前提下，精度可以提升 0.17 个百分点，进一步地，当使用SHAS超参数搜索策略搜索最优超参数后，精度可以再提升 1.04 个百分点。此时，PPLCNet_x1_0 与 SwinTranformer_tiny 的精度差别不大，但是速度明显变快。关于 PULC 的训练方法和推理部署方法将在下面详细介绍。
+It can be seen that high Tpr can be getted when backbone is SwinTranformer_tiny, but the speed is slow. Replacing backbone with the lightweight model MobileNetV3_small_x0_35, the speed can be greatly improved, but the Tpr will be greatly reduced. Replacing backbone with faster backbone PPLCNet_x1_0, the Tpr is higher more 14 percentage points than MobileNetv3_small_x0_35. At the same time, the speed can be more faster. After additional using the SSLD pretrained model, the accuracy can be improved by about 0.17 percentage points without affecting the inference speed. Finally, after additional using the hyperparameters searching strategy, the accuracy can be further improved by 1.04 percentage points. At this point, the Tpr close to that of SwinTranformer_tiny, but the speed is more faster. The training method and deployment instructions of PULC will be introduced in detail below.
 
 **Note**:
 
