@@ -1,0 +1,18 @@
+===========================cpp_infer_params===========================
+model_name:PPLCNet_x0_75
+cpp_infer_type:cls
+cls_inference_model_dir:./PPLCNet_x0_75_infer/
+det_inference_model_dir:
+cls_inference_url:https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/PPLCNet_x0_75_infer.tar
+det_inference_url:
+infer_quant:False
+inference_cmd:./deploy/cpp/build/clas_system -c inference_cls.yaml
+use_gpu:True|False
+enable_mkldnn:False
+cpu_threads:1
+batch_size:1
+use_tensorrt:False
+precision:fp32
+image_dir:./dataset/ILSVRC2012/val/ILSVRC2012_val_00000001.JPEG
+benchmark:False
+generate_yaml_cmd:python3.7 test_tipc/generate_cpp_yaml.py

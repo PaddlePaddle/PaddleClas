@@ -1,6 +1,6 @@
 # 多标签分类 quick start
 
-基于 [NUS-WIDE-SCENE](https://lms.comp.nus.edu.sg/wp-content/uploads/2019/research/nuswide/NUS-WIDE.html) 数据集，体验多标签分类的训练、评估、预测的过程，该数据集是 NUS-WIDE 数据集的一个子集。请首先安装 PaddlePaddle 和 PaddleClas，具体安装步骤可详看 [Paddle 安装文档](../installation/install_paddle.md)，[PaddleClas 安装文档](../installation/install_paddleclas.md)。
+基于 [NUS-WIDE-SCENE](https://lms.comp.nus.edu.sg/wp-content/uploads/2019/research/nuswide/NUS-WIDE.html) 数据集，体验多标签分类的训练、评估、预测的过程，该数据集是 NUS-WIDE 数据集的一个子集。请首先安装 PaddlePaddle 和 PaddleClas，具体安装步骤可详看 [环境准备](../installation/install_paddleclas.md)。
 
 
 ## 目录

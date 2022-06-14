@@ -30,5 +30,7 @@ if __name__ == "__main__":
     args = config.parse_args()
     config = config.get_config(
         args.config, overrides=args.override, show=False)
+    if config["Arch"].get("use_sync_bn", False):
+        config["Arch"]["use_sync_bn"] = False
     engine = Engine(config, mode="export")
     engine.export()

@@ -1,5 +1,5 @@
 Global:
-  infer_imgs: "./images/ILSVRC2012_val_00000010.jpeg"
+  infer_imgs: "./images/ImageNet/ILSVRC2012_val_00000010.jpeg"
   inference_model_dir: "./models"
   batch_size: 1
   use_gpu: True

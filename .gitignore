@@ -12,3 +12,4 @@ build/
 log/
 nohup.out
 .DS_Store
+.idea

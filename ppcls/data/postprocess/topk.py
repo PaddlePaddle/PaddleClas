@@ -21,9 +21,9 @@ import paddle.nn.functional as F
 class Topk(object):
     def __init__(self, topk=1, class_id_map_file=None, delimiter=None):
         assert isinstance(topk, (int, ))
-        self.class_id_map = self.parse_class_id_map(class_id_map_file)
         self.topk = topk
         self.delimiter = delimiter if delimiter is not None else " "
+        self.class_id_map = self.parse_class_id_map(class_id_map_file)
 
     def parse_class_id_map(self, class_id_map_file):
         if class_id_map_file is None:
