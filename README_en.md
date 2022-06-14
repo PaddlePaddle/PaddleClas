@@ -7,7 +7,7 @@
 PaddleClas is an image classification and image recognition toolset for industry and academia, helping users train better computer vision models and apply them in real scenarios.
 
 <div align="center">
-<img src="./docs/images/class_simple.gif"  width = "600" />
+<img src="./docs/images/class_simple_en.gif"  width = "600" />
 
 PULC demo images
 </div>
@@ -38,7 +38,7 @@ image classification and image recognition algorithms.
 Based on th algorithms above, PaddleClas release PP-ShiTu image recognition system and [**P**ractical **U**ltra **L**ight-weight image **C**lassification solutions](docs/en/PULC/PULC_quickstart_en.md).
 
 
-![](https://user-images.githubusercontent.com/19523330/173347904-f2998e00-7b86-4adf-b546-23c684fc67b9.png)
+![](https://user-images.githubusercontent.com/19523330/173539361-68cf7ab1-7e3b-4e5e-b00f-1500719bd2a2.png)
 
 ## Welcome to Join the Technical Exchange Group
 
@@ -51,6 +51,7 @@ Based on th algorithms above, PaddleClas release PP-ShiTu image recognition syst
 
 ## Quick Start
 Quick experience of PP-ShiTu image recognition system：[Link](./docs/en/tutorials/quick_start_recognition_en.md)
+
 Quick experience of **P**ractical **U**ltra **L**ight-weight image **C**lassification models：[Link](docs/en/PULC/PULC_quickstart.md)
 
 ## Tutorials
@@ -111,7 +112,7 @@ For a new unknown category, there is no need to retrain the model, just prepare 
 
 ## PULC demo images
 <div align="center">
-<img src="docs/images/classification.gif">
+<img src="docs/images/classification_en.gif">
 </div>
 
 <a name="Rec_Demo_images"></a>
