@@ -55,11 +55,11 @@
 | <b>PPLCNet_x1_0**<b>  | <b>96.01<b> | <b>2.72<b>  | <b>6.5<b> | 使用 SSLD 预训练模型+EDA 策略|
 | PPLCNet_x1_0**  | 95.86 | 2.72  | 6.5 | 使用 SSLD 预训练模型+EDA 策略+SKL-UGI 知识蒸馏策略|
 
-从表中可以看出，backbone 为 SwinTranformer_tiny 时精度较高，但是推理速度较慢。将 backboone 替换为轻量级模型 MobileNetV3_small_x0_35 后，速度可以大幅提升，精度下降也比较明显。将 backbone 替换为 PPLCNet_x1_0 时，精度较 MobileNetV3_small_x0_35 高 8.6 个百分点，速度快10%左右。在此基础上，更改分辨率和stride， 速度变慢 27%，但是精度可以提升 4.5 个百分点（采用[PaddleOCR](https://github.com/PaddlePaddle/PaddleOCR)的方案），使用 SSLD 预训练模型后，精度可以继续提升约 0.05 个百分点 ，进一步地，当融合EDA策略后，精度可以再提升 1.9 个百分点。最后，融合SKL-UGI 知识蒸馏策略后，在该场景无效。关于 PULC 的训练方法和推理部署方法将在下面详细介绍。
+从表中可以看出，backbone 为 SwinTranformer_tiny 时精度较高，但是推理速度较慢。将 backbone 替换为轻量级模型 MobileNetV3_small_x0_35 后，速度可以大幅提升，精度下降也比较明显。将 backbone 替换为 PPLCNet_x1_0 时，精度较 MobileNetV3_small_x0_35 高 8.6 个百分点，速度快10%左右。在此基础上，更改分辨率和stride， 速度变慢 27%，但是精度可以提升 4.5 个百分点（采用[PaddleOCR](https://github.com/PaddlePaddle/PaddleOCR)的方案），使用 SSLD 预训练模型后，精度可以继续提升约 0.05 个百分点 ，进一步地，当融合EDA策略后，精度可以再提升 1.9 个百分点。最后，融合SKL-UGI 知识蒸馏策略后，在该场景无效。关于 PULC 的训练方法和推理部署方法将在下面详细介绍。
 
 **备注：**
 
-* 其中不带\*的模型表示分辨率为224x224，带\*的模型表示分辨率为48x192（h\*w）,数据增强从网络中的 stride 改为 `[2, [2, 1], [2, 1], [2, 1], [2, 1]]`，其中，外层列表中的每一个元素代表网络结构下采样层的stride，该策略为 [PaddleOCR](https://github.com/PaddlePaddle/PaddleOCR) 提供的文本行方向分类器方案。带\*\*的模型表示分辨率为80x160（h\*w）, 网络中的 stride 改为 `[2, [2, 1], [2, 1], [2, 1], [2, 1]]`，其中，外层列表中的每一个元素代表网络结构下采样层的stride，此分辨率是经过[SHAS 超参数搜索策略](PULC_train.md#4-超参搜索)搜索得到的。
+* 其中不带\*的模型表示分辨率为224x224，带\*的模型表示分辨率为48x192（h\*w）,数据增强从网络中的 stride 改为 `[2, [2, 1], [2, 1], [2, 1], [2, 1]]`，其中，外层列表中的每一个元素代表网络结构下采样层的stride，该策略为 [PaddleOCR](https://github.com/PaddlePaddle/PaddleOCR) 提供的文本行方向分类器方案。带\*\*的模型表示分辨率为80x160（h\*w）, 网络中的 stride 改为 `[2, [2, 1], [2, 1], [2, 1], [2, 1]]`，其中，外层列表中的每一个元素代表网络结构下采样层的stride，此分辨率是经过[超参数搜索策略](PULC_train.md#4-超参搜索)搜索得到的。
 * 延时是基于 Intel(R) Xeon(R) Gold 6148 CPU @ 2.40GHz 测试得到，开启 MKLDNN 加速策略，线程数为10。
 * 关于PP-LCNet的介绍可以参考[PP-LCNet介绍](../models/PP-LCNet.md)，相关论文可以查阅[PP-LCNet paper](https://arxiv.org/abs/2109.15099)。
 
@@ -68,9 +68,9 @@
 ## 2. 模型快速体验
 
 <a name="2.1"></a>  
-    
+
 ### 2.1 安装 paddlepaddle
-    
+
 - 您的机器安装的是 CUDA9 或 CUDA10，请运行以下命令安装
 
 ```bash
@@ -82,23 +82,23 @@ python3 -m pip install paddlepaddle-gpu -i https://mirror.baidu.com/pypi/simple
 ```bash
 python3 -m pip install paddlepaddle -i https://mirror.baidu.com/pypi/simple
 ```
-    
+
 更多的版本需求，请参照[飞桨官网安装文档](https://www.paddlepaddle.org.cn/install/quick)中的说明进行操作。
-    
+
 <a name="2.2"></a>  
-    
+
 ### 2.2 安装 paddleclas
 
 使用如下命令快速安装 paddleclas
 
 ```  
 pip3 install paddleclas
-``` 
-    
+```
+
 <a name="2.3"></a>
 
 ### 2.3 预测
-    
+
 点击[这里](https://paddleclas.bj.bcebos.com/data/PULC/pulc_demo_imgs.zip)下载 demo 数据并解压，然后在终端中切换到相应目录。
 
 * 使用命令行快速预测
@@ -314,7 +314,7 @@ python3 -m paddle.distributed.launch \
 
 ## 5. 超参搜索
 
-在 [3.3 节](#3.3)和 [4.1 节](#4.1)所使用的超参数是根据 PaddleClas 提供的 `SHAS 超参数搜索策略` 搜索得到的，如果希望在自己的数据集上得到更好的结果，可以参考[SHAS 超参数搜索策略](PULC_train.md#4-超参搜索)来获得更好的训练超参数。
+在 [3.3 节](#3.3)和 [4.1 节](#4.1)所使用的超参数是根据 PaddleClas 提供的 `超参数搜索策略` 搜索得到的，如果希望在自己的数据集上得到更好的结果，可以参考[超参数搜索策略](PULC_train.md#4-超参搜索)来获得更好的训练超参数。
 
 **备注：** 此部分内容是可选内容，搜索过程需要较长的时间，您可以根据自己的硬件情况来选择执行。
 

@@ -14,7 +14,7 @@
     - [3.3 EDA strategy](#3.3)
     - [3.4 SKL-UGI knowledge distillation](#3.4)
     - [3.5 Summary](#3.5)
-- [4. Hyperparameter Search](#4)
+- [4. Hyperparameters Searching](#4)
     - [4.1 Search based on default configuration](#4.1)
     - [4.2 Custom search configuration](#4.2)
 
@@ -31,7 +31,7 @@ The PULC solution has been verified to be effective in many scenarios, such as h
 <img src="https://user-images.githubusercontent.com/19523330/173011854-b10fcd7a-b799-4dfd-a1cf-9504952a3c44.png"  width = "800" />
 </div>
 
-The  solution mainly includes 4 parts, namely: PP-LCNet lightweight backbone network, SSLD pre-trained model, Ensemble Data Augmentation (EDA) and SKL-UGI knowledge distillation algorithm. In addition, we also adopt the method of hyperparameter search to efficiently optimize the hyperparameters in training. Below, we take the person exists or not scene as an example to illustrate the solution.
+The  solution mainly includes 4 parts, namely: PP-LCNet lightweight backbone network, SSLD pre-trained model, Ensemble Data Augmentation (EDA) and SKL-UGI knowledge distillation algorithm. In addition, we also adopt the method of hyperparameters searching to efficiently optimize the hyperparameters in training. Below, we take the person exists or not scene as an example to illustrate the solution.
 
 **Note**：For some specific scenarios, we provide basic training documents for reference, such as [person exists or not classification model](PULC_person_exists_en.md), etc. You can find these documents [here](./PULC_model_list_en.md). If the methods in these documents do not meet your needs, or if you need a custom training task, you can refer to this document.
 
@@ -201,22 +201,22 @@ We also used the same optimization strategy in the other 8 scenarios and got the
 | Text Image Orientation Classification | SwinTransformer_tiny |99.12 | PPLCNet_x1_0 | 99.06 |
 | Text-line Orientation Classification | SwinTransformer_tiny | 93.61 | PPLCNet_x1_0 | 96.01 |
 | Language Classification | SwinTransformer_tiny | 98.12 | PPLCNet_x1_0 | 99.26 |
-    
+
 
 It can be seen from the results that the PULC scheme can improve the model accuracy in multiple application scenarios. Using the PULC scheme can greatly reduce the workload of model optimization and quickly obtain models with higher accuracy.
-    
+
 
 <a name="4"></a>
 
-### 4. Hyperparameter Search
+### 4. Hyperparameters Searching
 
-In the above training process, we adjusted parameters such as learning rate, data augmentation probability, and stage learning rate mult list. The optimal values of these parameters may not be the same in different scenarios. We provide a quick hyperparameter search script to automate the process of hyperparameter tuning. This script traverses the parameters in the search value list to replace the parameters in the default configuration, then trains in sequence, and finally selects the parameters corresponding to the model with the highest accuracy as the search result.
+In the above training process, we adjusted parameters such as learning rate, data augmentation probability, and stage learning rate mult list. The optimal values of these parameters may not be the same in different scenarios. We provide a quick hyperparameters searching script to automate the process of hyperparameter tuning. This script traverses the parameters in the search value list to replace the parameters in the default configuration, then trains in sequence, and finally selects the parameters corresponding to the model with the highest accuracy as the search result.
 
 <a name="4.1"></a>
 
 #### 4.1 Search based on default configuration
 
-The configuration file [search.yaml](../../../ppcls/configs/PULC/person_exists/search.yaml) defines the configuration of hyperparameter search in person exists or not scenarios. Use the following commands to complete hyperparameter search.
+The configuration file [search.yaml](../../../ppcls/configs/PULC/person_exists/search.yaml) defines the configuration of hyperparameters searching in person exists or not scenarios. Use the following commands to complete hyperparameters searching.
 
 ```bash
 python3 tools/search_strategy.py -c ppcls/configs/PULC/person_exists/search.yaml
@@ -228,8 +228,8 @@ python3 tools/search_strategy.py -c ppcls/configs/PULC/person_exists/search.yaml
 
 #### 4.2 Custom search configuration
 
-    
-You can also modify the configuration of hyperparameter search based on training results or your parameter tuning experience.
+
+You can also modify the configuration of hyperparameters searching based on training results or your parameter tuning experience.
 
 Modify the `search_values` field in `lrs` to modify the list of learning rate search values;
 
