@@ -1,4 +1,4 @@
-# PULC Classification Model of Traffic Sign
+# PULC Classification Model of Containing or Uncontaining Car
 
 ------
 
@@ -38,23 +38,24 @@
 
 ## 1. Introduction
 
-This case provides a way for users to quickly build a lightweight, high-precision and practical classification model of traffic sign using PaddleClas PULC (Practical Ultra Lightweight Classification). The model can be widely used in automatic driving, road monitoring, etc.
+This case provides a way for users to quickly build a lightweight, high-precision and practical classification model of car exists using PaddleClas PULC (Practical Ultra Lightweight Classification). The model can be widely used in monitoring scenarios, massive data filtering scenarios, etc.
 
 The following table lists the relevant indicators of the model. The first two lines means that using SwinTransformer_tiny and MobileNetV3_small_x0_35 as the backbone to training. The third to sixth lines means that the backbone is replaced by PPLCNet, additional use of EDA strategy and additional use of EDA strategy and SKL-UGI knowledge distillation strategy.
 
-| Backbone | Top-1 Acc(%) | Latency(ms) | Size(M)| Training Strategy |
-|-------|-----------|----------|---------------|---------------|
-| SwinTranformer_tiny  | 98.11 | 89.45  | 111 | using ImageNet pretrained model |
-| MobileNetV3_small_x0_35  | 93.88 | 3.01  | 3.9 | using ImageNet pretrained model |
-| PPLCNet_x1_0  | 97.78 | 2.10  | 8.2 | using ImageNet pretrained model |
-| PPLCNet_x1_0  | 97.84 | 2.10  | 8.2 | using SSLD pretrained model |
-| PPLCNet_x1_0  | 98.14 | 2.10  | 8.2 | using SSLD pretrained model + EDA strategy  |
-| <b>PPLCNet_x1_0<b>  | <b>98.35<b> | <b>2.10<b>  | <b>8.2<b> | using SSLD pretrained model + EDA strategy + SKL-UGI knowledge distillation strategy|
+| Backbone | Tpr(%) | Latency(ms) | Size(M)| Training Strategy |
+|-------|----------------|----------|---------------|---------------|
+| SwinTranformer_tiny  | 97.71          | 95.30  | 107 | using ImageNet pretrained model |
+| MobileNetV3_small_x0_35  | 81.23          | 2.85  | 1.6 | using ImageNet pretrained model |
+| PPLCNet_x1_0  | 94.72          | 2.12  | 6.5 | using ImageNet pretrained model |
+| PPLCNet_x1_0  | 95.48          | 2.12  | 6.5 | using SSLD pretrained model |
+| PPLCNet_x1_0  | 95.48          | 2.12  | 6.5 | using SSLD pretrained model + EDA strategy  |
+| <b>PPLCNet_x1_0<b>  | <b>95.92<b>    | <b>2.12<b>  | <b>6.5<b> | using SSLD pretrained model + EDA strategy + SKL-UGI knowledge distillation strategy|
 
-It can be seen that high accuracy can be getted when backbone is SwinTranformer_tiny, but the speed is slow. Replacing backbone with the lightweight model MobileNetV3_small_x0_35, the speed can be greatly improved, but the accuracy will be greatly reduced. Replacing backbone with faster backbone PPLCNet_x1_0, the accuracy is lower 3.9 percentage points than MobileNetv3_small_x0_35. At the same time, the speed can be more than 43% faster. After additional using the SSLD pretrained model, the accuracy can be improved by about 0.06 percentage points without affecting the inference speed. Further, additional using the EDA strategy, the accuracy can be increased by 0.3 percentage points. Finally, after additional using the SKL-UGI knowledge distillation, the accuracy can be further improved by 0.21 percentage points. At this point, the accuracy exceeds that of SwinTranformer_tiny, but the speed is more than 41 times faster. The training method and deployment instructions of PULC will be introduced in detail below.
+It can be seen that high Tpr can be getted when backbone is SwinTranformer_tiny, but the speed is slow. Replacing backbone with the lightweight model MobileNetV3_small_x0_35, the speed can be greatly improved, but the Tpr will be greatly reduced. Replacing backbone with faster backbone PPLCNet_x1_0, the Tpr is higher more 13 percentage points than MobileNetv3_small_x0_35. At the same time, the speed can be more than 20% faster. After additional using the SSLD pretrained model, the Tpr can be improved by about 0.7 percentage points without affecting the inference speed. Finally, after additional using the SKL-UGI knowledge distillation, the Tpr can be further improved by 0.44 percentage points. At this point, the Tpr close to that of SwinTranformer_tiny, but the speed is more than 40 times faster. The training method and deployment instructions of PULC will be introduced in detail below.
 
 **Note**:
 
+* About `Tpr` metric, please refer to [3.2 section](#3.2) for more information .
 * The Latency is tested on Intel(R) Xeon(R) Gold 6148 CPU @ 2.40GHz. The MKLDNN is enabled and the number of threads is 10.
 * About PP-LCNet, please refer to [PP-LCNet Introduction](../models/PP-LCNet_en.md) and [PP-LCNet Paper](https://arxiv.org/abs/2109.15099).
 
@@ -99,14 +100,14 @@ First, please click [here](https://paddleclas.bj.bcebos.com/data/PULC/pulc_demo_
 * Prediction with CLI
 
 ```bash
-paddleclas --model_name=traffic_sign --infer_imgs=pulc_demo_imgs/traffic_sign/100999_83928.jpg
+paddleclas --model_name=car_exists --infer_imgs=pulc_demo_imgs/car_exists/objects365_00001507.jpeg
 ```
 
 Results:
 
 ```
 >>> result
-class_ids: [182, 179, 162, 128, 24], scores: [0.98623, 0.01255, 0.00022, 0.00021, 0.00012], label_names: ['pl110', 'pl100', 'pl120', 'p26', 'pm10'], filename: pulc_demo_imgs/traffic_sign/100999_83928.jpg
+class_ids: [1], scores: [0.9871138], label_names: ['contains_car'], filename: pulc_demo_imgs/car_exists/objects365_00001507.jpeg
 Predict complete!
 ```
 
@@ -116,16 +117,16 @@ Predict complete!
 
 ```python
 import paddleclas
-model = paddleclas.PaddleClas(model_name="traffic_sign")
-result = model.predict(input_data="pulc_demo_imgs/traffic_sign/100999_83928.jpg")
+model = paddleclas.PaddleClas(model_name="car_exists")
+result = model.predict(input_data="pulc_demo_imgs/car_exists/objects365_00001507.jpeg")
 print(next(result))
 ```
 
-**Note**: The `result` returned by `model.predict()` is a generator, so you need to use the `next()` function to call it or `for` loop to loop it. And it will predict with `batch_size` size batch and return the prediction results when called. The default `batch_size` is 1, and you also specify the `batch_size` when instantiating, such as `model = paddleclas.PaddleClas(model_name="traffic_sign",  batch_size=2)`. The result of demo above:
+**Note**: The `result` returned by `model.predict()` is a generator, so you need to use the `next()` function to call it or `for` loop to loop it. And it will predict with `batch_size` size batch and return the prediction results when called. The default `batch_size` is 1, and you also specify the `batch_size` when instantiating, such as `model = paddleclas.PaddleClas(model_name="car_exists",  batch_size=2)`. The result of demo above:
 
 ```
 >>> result
-[{'class_ids': [182, 179, 162, 128, 24], 'scores': [0.98623, 0.01255, 0.00022, 0.00021, 0.00012], 'label_names': ['pl110', 'pl100', 'pl120', 'p26', 'pm10'], 'filename': 'pulc_demo_imgs/traffic_sign/100999_83928.jpg'}]
+[{'class_ids': [1], 'scores': [0.9871138], 'label_names': ['contains_car'], 'filename': 'pulc_demo_imgs/car_exists/objects365_00001507.jpeg'}]
 ```
 
 <a name="3"></a>
@@ -146,41 +147,24 @@ Please refer to [Installation](../installation/install_paddleclas_en.md) to get 
 
 #### 3.2.1 Dataset Introduction
 
-All datasets used in this case are open source data. Train data is the subset of [MS-COCO](https://cocodataset.org/#overview) training data. And the validation data is the subset of [Object365](https://www.objects365.org/overview.html) training data. ImageNet_val is [ImageNet-1k](https://www.image-net.org/) validation data.
-
-The dataset used in this case is based on the [Tsinghua-Tencent 100K dataset (CC-BY-NC license), TT100K](https://cg.cs.tsinghua.edu.cn/traffic-sign/) randomly expanded and cropped according to the bounding box.
+All datasets used in this case are open source data. Train and validation data are the subset of [Object365](https://www.objects365.org/overview.html) data. ImageNet_val is [ImageNet-1k](https://www.image-net.org/) validation data.
 
 <a name="3.2.2"></a>  
 
 #### 3.2.2 Getting Dataset
 
-The processing to `TT00K` includes randomly expansion and cropping, details are shown below.
+The data used in this case can be getted by processing the open source data. The detailed processes are as follows:
 
-```python
-def get_random_crop_box(xmin, ymin, xmax, ymax, img_height, img_width, ratio=1.0):
-    h = ymax - ymin
-    w = ymax - ymin
+- Training data. This case deals with the annotation file of Objects365 data training data. If a certain image contains the label of "car" and the area of this box is greater than 10% in the whole image, it is considered that the image contains car. If there is no label of any vehicle in a certain image, such as car, bus and so on, it is considered that the image does not contain car. After processing, 108629 images were obtained, including 27422 images containing car and 81207 images uncontaining car.
+- Validation data: Same as Training data, but checked manually to remove some labeled wrong images.
 
-    xmin_diff = random.random() * ratio * min(w, xmin/ratio)
-    ymin_diff = random.random() * ratio * min(h, ymin/ratio)
-    xmax_diff = random.random() * ratio * min(w, (img_width-xmin-1)/ratio)
-    ymax_diff = random.random() * ratio * min(h, (img_height-ymin-1)/ratio)
-
-    new_xmin = round(xmin - xmin_diff)
-    new_ymin = round(ymin - ymin_diff)
-    new_xmax = round(xmax + xmax_diff)
-    new_ymax = round(ymax + ymax_diff)
-
-    return new_xmin, new_ymin, new_xmax, new_ymax
-```
+**Note**: the labels of objects365 are not completely mutually exclusive. For example, F1 racing cars may be "F1 formula" or "car". In order to reduce the interference, we only keep the "car" label as containing car, and the figure without any vehicle as uncontaining car.
 
 Some image of the processed dataset is as follows:
 
-<div align="center">
-<img src="../../images/PULC/docs/traffic_sign_data_demo.png"  width = "500" />
-</div>
+![](../../images/PULC/docs/car_exists_data_demo.jpeg)
 
-You can also download the data processed directly. And the process script file `deal.py` is also included.
+And you can also download the data processed directly.
 
 ```
 cd path_to_PaddleClas
@@ -190,61 +174,56 @@ Enter the `dataset/` directory, download and unzip the dataset.
 
 ```shell
 cd dataset
-wget https://paddleclas.bj.bcebos.com/data/PULC/traffic_sign.tar
-tar -xf traffic_sign.tar
+wget https://paddleclas.bj.bcebos.com/data/PULC/car_exists.tar
+tar -xf car_exists.tar
 cd ../
 ```
 
-The datas under `traffic_sign` directory:
+The datas under `car_exists` directory:
 
 ```
-traffic_sign
-├── train
-│   ├── 0_62627.jpg
-│   ├── 100000_89031.jpg
-│   ├── 100001_89031.jpg
+
+├── objects365_car
+│   ├── objects365_00000039.jpg
+│   ├── objects365_00000099.jpg
+├── ImageNet_val
+│   ├── ILSVRC2012_val_00000001.JPEG
+│   ├── ILSVRC2012_val_00000002.JPEG
 ...
-├── test
-│   ├── 100423_2315.jpg
-│   ├── 100424_2315.jpg
-│   ├── 100425_2315.jpg
-...
-├── other
-│   ├── 100603_3422.jpg
-│   ├── 100604_3422.jpg
-...
-├── label_list_train.txt
-├── label_list_test.txt
-├── label_list_other.txt
-├── label_list_train_for_distillation.txt
-├── label_list_train.txt.debug
-├── label_list_test.txt.debug
-├── label_name_id.txt
-├── deal.py
+├── train_list.txt
+├── train_list.txt.debug
+├── train_list_for_distill.txt
+├── val_list.txt
+└── val_list.txt.debug
 ```
 
-Where `train/` and `test/` are training set and validation set respectively. The `label_list_train.txt` and `label_list_test.txt` are label files of training data and validation data respectively. The file `label_list_train.txt.debug` and `label_list_test.txt.debug` are subset of `train_list.txt` and `val_list.txt` respectively. `other` would be used for SKL-UGI knowledge distillation, and its label file is `label_list_train_for_distillation.txt`.
+Where `train/` and `val/` are training set and validation set respectively. The `train_list.txt` and `val_list.txt` are label files of training data and validation data respectively. The file `train_list.txt.debug` and `val_list.txt.debug` are subset of `train_list.txt` and `val_list.txt` respectively. `ImageNet_val/` is the validation data of ImageNet-1k, which will be used for SKL-UGI knowledge distillation, and its label file is `train_list_for_distill.txt`.
 
 **Note**:
 
-* About the contents format of `label_list_train.txt` and `label_list_train.txt`, please refer to [Description about Classification Dataset in PaddleClas](../data_preparation/classification_dataset_en.md).
-* About the `label_list_train_for_distillation.txt`, please refer to [Knowledge Distillation Label](../advanced_tutorials/distillation/distillation_en.md).
+* About the contents format of `train_list.txt` and `val_list.txt`, please refer to [Description about Classification Dataset in PaddleClas](../data_preparation/classification_dataset_en.md).
+* About the `train_list_for_distill.txt`, please refer to [Knowledge Distillation Label](../advanced_tutorials/distillation/distillation_en.md).
 
 <a name="3.3"></a>
 
 ### 3.3 Training
 
-The details of training config in `ppcls/configs/PULC/traffic_sign/PPLCNet_x1_0.yaml`. The command about training as follows:
+The details of training config in `ppcls/configs/PULC/car_exists/PPLCNet_x1_0.yaml`. The command about training as follows:
 
 ```shell
 export CUDA_VISIBLE_DEVICES=0,1,2,3
 python3 -m paddle.distributed.launch \
     --gpus="0,1,2,3" \
     tools/train.py \
-        -c ./ppcls/configs/PULC/traffic_sign/PPLCNet_x1_0.yaml
+        -c ./ppcls/configs/PULC/car_exists/PPLCNet_x1_0.yaml
 ```
 
-The best metric of validation data is between `98.0` and `98.2`. There would be fluctuations because the data size is small.
+The best metric of validation data is between `0.95` and `0.96`. There would be fluctuations because the data size is small.
+
+**Note**:
+
+* The metric Tpr, that describe the True Positive Rate when False Positive Rate is less than a certain threshold(1/100 used in this case), is one of the commonly used metric for binary classification. About the details of Fpr and Tpr, please refer [here](https://en.wikipedia.org/wiki/Receiver_operating_characteristic).
+* When evaluation, the best metric TprAtFpr will be printed that include `Fpr`, `Tpr` and the current `threshold`. The `Tpr` means the Recall rate under the current `Fpr`. The `Tpr` higher, the model better. The `threshold` would be used in deployment, which means the classification threshold under best `Fpr` metric.
 
 <a name="3.4"></a>
 
@@ -254,7 +233,7 @@ After training, you can use the following commands to evaluate the model.
 
 ```bash
 python3 tools/eval.py \
-    -c ./ppcls/configs/PULC/traffic_sign/PPLCNet_x1_0.yaml \
+    -c ./ppcls/configs/PULC/car_exists/PPLCNet_x1_0.yaml \
     -o Global.pretrained_model="output/PPLCNet_x1_0/best_model"
 ```
 
@@ -266,23 +245,23 @@ Among the above command, the argument `-o Global.pretrained_model="output/PPLCNe
 
 After training, you can use the model that trained to infer. Command is as follow:
 
-```bash
+```python
 python3 tools/infer.py \
-    -c ./ppcls/configs/PULC/traffic_sign/PPLCNet_x1_0.yaml \
-    -o Global.pretrained_model=output/DistillationModel/best_model
+    -c ./ppcls/configs/PULC/car_exists/PPLCNet_x1_0.yaml \
+    -o Global.pretrained_model=output/PPLCNet_x1_0/best_model
 ```
 
 The results:
 
 ```
-99603_17806.jpg:        class id(s): [216, 145, 49, 207, 169], score(s): [1.00, 0.00, 0.00, 0.00, 0.00], label_name(s): ['pm20', 'pm30', 'pm40', 'pl25', 'pm15']
+[{'class_ids': [1], 'scores': [0.9871138], 'label_names': ['contains_car'], 'filename': 'deploy/images/PULC/car_exists/objects365_00001507.jpeg'}]
 ```
 
 **Note**:
 
 * Among the above command, argument `-o Global.pretrained_model="output/PPLCNet_x1_0/best_model"` specify the path of the best model weight file. You can specify other path if needed.
-* The default test image is `deploy/images/PULC/traffic_sign/99603_17806.jpg`. And you can test other image, only need to specify the argument `-o Infer.infer_imgs=path_to_test_image`.
-
+* The default test image is `deploy/images/PULC/car_exists/objects365_00001507.jpeg`. And you can test other image, only need to specify the argument `-o Infer.infer_imgs=path_to_test_image`.
+* The default threshold is `0.5`. If needed, you can specify the argument `Infer.PostProcess.threshold`, such as: `-o Infer.PostProcess.threshold=0.9794`. And the argument `threshold` is needed to be specified according by specific case. The `0.9794` is the best threshold when `Fpr` is less than `1/100` in this valuation dataset.
 
 <a name="4"></a>
 
@@ -301,35 +280,35 @@ SKL-UGI is a simple but effective knowledge distillation algrithem proposed by P
 
 #### 4.1.1 Teacher Model Training
 
-Training the teacher model with hyperparameters specified in `ppcls/configs/PULC/traffic_sign/PPLCNet_x1_0.yaml`. The command is as follow:
+Training the teacher model with hyperparameters specified in `ppcls/configs/PULC/car_exists/PPLCNet/PPLCNet_x1_0.yaml`. The command is as follow:
 
 ```shell
 export CUDA_VISIBLE_DEVICES=0,1,2,3
 python3 -m paddle.distributed.launch \
     --gpus="0,1,2,3" \
     tools/train.py \
-        -c ./ppcls/configs/PULC/traffic_sign/PPLCNet_x1_0.yaml \
+        -c ./ppcls/configs/PULC/car_exists/PPLCNet_x1_0.yaml \
         -o Arch.name=ResNet101_vd
 ```
 
-The best metric of validation data is about `98.59%`. The best teacher model weight would be saved in file `output/ResNet101_vd/best_model.pdparams`.
+The best metric of validation data is between `0.96` and `0.98`. The best teacher model weight would be saved in file `output/ResNet101_vd/best_model.pdparams`.
 
 <a name="4.1.2"></a>
 
 #### 4.1.2 Knowledge Distillation Training
 
-The training strategy, specified in training config file `ppcls/configs/PULC/traffic_sign/PPLCNet_x1_0_distillation.yaml`, the teacher model is `ResNet101_vd`, the student model is `PPLCNet_x1_0` and the additional unlabeled training data is validation data of ImageNet1k. The command is as follow:
+The training strategy, specified in training config file `ppcls/configs/PULC/car_exists/PPLCNet_x1_0_distillation.yaml`, the teacher model is `ResNet101_vd`, the student model is `PPLCNet_x1_0` and the additional unlabeled training data is validation data of ImageNet1k. The command is as follow:
 
 ```shell
 export CUDA_VISIBLE_DEVICES=0,1,2,3
 python3 -m paddle.distributed.launch \
     --gpus="0,1,2,3" \
     tools/train.py \
-        -c ./ppcls/configs/PULC/traffic_sign/PPLCNet_x1_0_distillation.yaml \
+        -c ./ppcls/configs/PULC/car_exists/PPLCNet_x1_0_distillation.yaml \
         -o Arch.models.0.Teacher.pretrained=output/ResNet101_vd/best_model
 ```
 
-The best metric is about `98.35%`. The best student model weight would be saved in file `output/DistillationModel/best_model_student.pdparams`.
+The best metric is between `0.95` and `0.97`. The best student model weight would be saved in file `output/DistillationModel/best_model_student.pdparams`.
 
 <a name="5"></a>
 
@@ -350,6 +329,7 @@ The hyperparameters used by [3.2 section](#3.2) and [4.1 section](#4.1) are acco
 Paddle Inference is the original Inference Library of the PaddlePaddle, provides high-performance inference for server deployment. And compared with  directly based on the pretrained model, Paddle Inference can use tools to accelerate prediction, so as to achieve better inference performance. Please refer to [Paddle Inference](https://www.paddlepaddle.org.cn/documentation/docs/zh/guides/infer/inference/inference_cn.html) for more information.
 
 Paddle Inference need Paddle Inference Model to predict. Two process provided to get Paddle Inference Model. If want to use the provided by PaddleClas, you can download directly, click [Downloading Inference Model](#6.1.2).
+
 <a name="6.1.1"></a>
 
 ### 6.1.1 Exporting Paddle Inference Model
@@ -358,15 +338,15 @@ The command about exporting Paddle Inference Model is as follow:
 
 ```bash
 python3 tools/export_model.py \
-    -c ./ppcls/configs/PULC/traffic_sign/PPLCNet_x1_0.yaml \
+    -c ./ppcls/configs/PULC/car_exists/PPLCNet_x1_0.yaml \
     -o Global.pretrained_model=output/DistillationModel/best_model_student \
-    -o Global.save_inference_dir=deploy/models/PPLCNet_x1_0_traffic_sign_infer
+    -o Global.save_inference_dir=deploy/models/PPLCNet_x1_0_car_exists_infer
 ```
 
-After running above command, the inference model files would be saved in `deploy/models/PPLCNet_x1_0_traffic_sign_infer`, as shown below:
+After running above command, the inference model files would be saved in `deploy/models/PPLCNet_x1_0_car_exists_infer`, as shown below:
 
 ```
-├── PPLCNet_x1_0_traffic_sign_infer
+├── PPLCNet_x1_0_car_exists_infer
 │   ├── inference.pdiparams
 │   ├── inference.pdiparams.info
 │   └── inference.pdmodel
@@ -383,13 +363,13 @@ You can also download directly.
 ```
 cd deploy/models
 # download the inference model and decompression
-wget https://paddleclas.bj.bcebos.com/models/PULC/traffic_sign_infer.tar && tar -xf traffic_sign_infer.tar
+wget https://paddleclas.bj.bcebos.com/models/PULC/car_exists_infer.tar && tar -xf car_exists_infer.tar
 ```
 
 After decompression, the directory `models` should be shown below.
 
 ```
-├── traffic_sign_infer
+├── car_exists_infer
 │   ├── inference.pdiparams
 │   ├── inference.pdiparams.info
 │   └── inference.pdmodel
@@ -409,20 +389,22 @@ Return the directory `deploy`:
 cd ../
 ```
 
-Run the following command to classify traffic sign about the image `./images/PULC/traffic_sign/99603_17806.jpg`.
+Run the following command to classify whether there are cars in the image `./images/PULC/car_exists/objects365_00001507.jpeg`.
 
 ```shell
 # Use the following command to predict with GPU.
-python3.7 python/predict_cls.py -c configs/PULC/traffic_sign/inference_traffic_sign.yaml
+python3.7 python/predict_cls.py -c configs/PULC/car_exists/inference_car_exists.yaml
 # Use the following command to predict with CPU.
-python3.7 python/predict_cls.py -c configs/PULC/traffic_sign/inference_traffic_sign.yaml -o Global.use_gpu=False
+python3.7 python/predict_cls.py -c configs/PULC/car_exists/inference_car_exists.yaml -o Global.use_gpu=False
 ```
 
 The prediction results:
 
 ```
-99603_17806.jpg:        class id(s): [216, 145, 49, 207, 169], score(s): [1.00, 0.00, 0.00, 0.00, 0.00], label_name(s): ['pm20', 'pm30', 'pm40', 'pl25', 'pm15']
+objects365_00001507.jpeg:       class id(s): [1], score(s): [0.99], label_name(s): ['contains_car']
 ```
+
+**Note**: The default threshold is `0.5`. If needed, you can specify the argument `Infer.PostProcess.threshold`, such as: `-o Infer.PostProcess.threshold=0.9794`. And the argument `threshold` is needed to be specified according by specific case. The `0.9794` is the best threshold when `Fpr` is less than `1/100` in this valuation dataset. Please refer to [3.3 section](#3.3) for details.
 
 <a name="6.2.2"></a>  
 
@@ -432,17 +414,17 @@ If you want to predict images in directory, please specify the argument `Global.
 
 ```shell
 # Use the following command to predict with GPU. If want to replace with CPU, you can add argument -o Global.use_gpu=False
-python3.7 python/predict_cls.py -c configs/PULC/traffic_sign/inference_traffic_sign.yaml -o Global.infer_imgs="./images/PULC/traffic_sign/"
+python3.7 python/predict_cls.py -c configs/PULC/car_exists/inference_car_exists.yaml -o Global.infer_imgs="./images/PULC/car_exists/"
 ```
 
 All prediction results will be printed, as shown below.
 
 ```
-100999_83928.jpg:    class id(s): [182, 179, 162, 128, 24], score(s): [0.99, 0.01, 0.00, 0.00, 0.00], label_name(s): ['pl110', 'pl100', 'pl120', 'p26', 'pm10']
-99603_17806.jpg:    class id(s): [216, 145, 49, 24, 169], score(s): [1.00, 0.00, 0.00, 0.00, 0.00], label_name(s): ['pm20', 'pm30', 'pm40', 'pm10', 'pm15']
+objects365_00001507.jpeg:       class id(s): [1], score(s): [0.99], label_name(s): ['contains_car']
+objects365_00001521.jpeg:       class id(s): [0], score(s): [0.99], label_name(s): ['no_car']
 ```
 
-About the `label_name` details, please refer to `dataset/traffic_sign/report.pdf`.
+Among the prediction results above, `contains_car` means that there is a car in the image, `no_car` means that there is no car in the image.
 
 <a name="6.3"></a>
 

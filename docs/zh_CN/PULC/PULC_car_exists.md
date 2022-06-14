@@ -150,7 +150,7 @@ print(next(result))
 
 #### 3.2.1 数据集来源
 
-本案例中所使用的所有数据集均为开源数据，`train`和`val` 集合均为[Objects365 数据](https://www.objects365.org/overview.html)的训练集的子集，`ImageNet_val` 为[ImageNet-1k 数据](https://www.image-net.org/)的验证集。
+本案例中所使用的所有数据集均为开源数据，`train`和`val` 集合均为[Objects365 数据](https://www.objects365.org/overview.html)的子集，`ImageNet_val` 为[ImageNet-1k 数据](https://www.image-net.org/)的验证集。
 
 <a name="3.2.2"></a>  
 
