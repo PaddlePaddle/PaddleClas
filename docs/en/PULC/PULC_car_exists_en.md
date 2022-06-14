@@ -1,4 +1,4 @@
-# PULC Classification Model of Someone or Nobody
+# PULC Classification Model of Containing or Uncontaining Car
 
 ------
 
@@ -38,20 +38,20 @@
 
 ## 1. Introduction
 
-This case provides a way for users to quickly build a lightweight, high-precision and practical classification model of human exists using PaddleClas PULC (Practical Ultra Lightweight Classification). The model can be widely used in monitoring scenarios, personnel access control scenarios, massive data filtering scenarios, etc.
+This case provides a way for users to quickly build a lightweight, high-precision and practical classification model of car exists using PaddleClas PULC (Practical Ultra Lightweight Classification). The model can be widely used in monitoring scenarios, massive data filtering scenarios, etc.
 
 The following table lists the relevant indicators of the model. The first two lines means that using SwinTransformer_tiny and MobileNetV3_small_x0_35 as the backbone to training. The third to sixth lines means that the backbone is replaced by PPLCNet, additional use of EDA strategy and additional use of EDA strategy and SKL-UGI knowledge distillation strategy.
 
 | Backbone | Tpr(%) | Latency(ms) | Size(M)| Training Strategy |
-|-------|-----------|----------|---------------|---------------|
-| SwinTranformer_tiny  | 95.69 | 95.30  | 107 | using ImageNet pretrained model |
-| MobileNetV3_small_x0_35  | 68.25 | 2.85  | 1.6 | using ImageNet pretrained model |
-| PPLCNet_x1_0  | 89.57 | 2.12  | 6.5 | using ImageNet pretrained model |
-| PPLCNet_x1_0  | 92.10 | 2.12  | 6.5 | using SSLD pretrained model |
-| PPLCNet_x1_0  | 93.43 | 2.12  | 6.5 | using SSLD pretrained model + EDA strategy  |
-| <b>PPLCNet_x1_0<b>  | <b>95.60<b> | <b>2.12<b>  | <b>6.5<b> | using SSLD pretrained model + EDA strategy + SKL-UGI knowledge distillation strategy|
+|-------|----------------|----------|---------------|---------------|
+| SwinTranformer_tiny  | 97.71          | 95.30  | 107 | using ImageNet pretrained model |
+| MobileNetV3_small_x0_35  | 81.23          | 2.85  | 1.6 | using ImageNet pretrained model |
+| PPLCNet_x1_0  | 94.72          | 2.12  | 6.5 | using ImageNet pretrained model |
+| PPLCNet_x1_0  | 95.48          | 2.12  | 6.5 | using SSLD pretrained model |
+| PPLCNet_x1_0  | 95.48          | 2.12  | 6.5 | using SSLD pretrained model + EDA strategy  |
+| <b>PPLCNet_x1_0<b>  | <b>95.92<b>    | <b>2.12<b>  | <b>6.5<b> | using SSLD pretrained model + EDA strategy + SKL-UGI knowledge distillation strategy|
 
-It can be seen that high Tpr can be getted when backbone is SwinTranformer_tiny, but the speed is slow. Replacing backbone with the lightweight model MobileNetV3_small_x0_35, the speed can be greatly improved, but the Tpr will be greatly reduced. Replacing backbone with faster backbone PPLCNet_x1_0, the Tpr is higher more 20 percentage points than MobileNetv3_small_x0_35. At the same time, the speed can be more than 20% faster. After additional using the SSLD pretrained model, the Tpr can be improved by about 2.6 percentage points without affecting the inference speed. Further, additional using the EDA strategy, the Tpr can be increased by 1.3 percentage points. Finally, after additional using the SKL-UGI knowledge distillation, the Tpr can be further improved by 2.2 percentage points. At this point, the Tpr close to that of SwinTranformer_tiny, but the speed is more than 40 times faster. The training method and deployment instructions of PULC will be introduced in detail below.
+It can be seen that high Tpr can be getted when backbone is SwinTranformer_tiny, but the speed is slow. Replacing backbone with the lightweight model MobileNetV3_small_x0_35, the speed can be greatly improved, but the Tpr will be greatly reduced. Replacing backbone with faster backbone PPLCNet_x1_0, the Tpr is higher more 13 percentage points than MobileNetv3_small_x0_35. At the same time, the speed can be more than 20% faster. After additional using the SSLD pretrained model, the Tpr can be improved by about 0.7 percentage points without affecting the inference speed. Finally, after additional using the SKL-UGI knowledge distillation, the Tpr can be further improved by 0.44 percentage points. At this point, the Tpr close to that of SwinTranformer_tiny, but the speed is more than 40 times faster. The training method and deployment instructions of PULC will be introduced in detail below.
 
 **Note**:
 
@@ -100,13 +100,14 @@ First, please click [here](https://paddleclas.bj.bcebos.com/data/PULC/pulc_demo_
 * Prediction with CLI
 
 ```bash
-paddleclas --model_name=person_exists --infer_imgs=pulc_demo_imgs/person_exists/objects365_01780782.jpg
+paddleclas --model_name=car_exists --infer_imgs=pulc_demo_imgs/car_exists/objects365_00001507.jpeg
 ```
 
 Results:
+
 ```
 >>> result
-class_ids: [0], scores: [0.9955421453341842], label_names: ['nobody'], filename: pulc_demo_imgs/person_exists/objects365_01780782.jpg
+class_ids: [1], scores: [0.9871138], label_names: ['contains_car'], filename: pulc_demo_imgs/car_exists/objects365_00001507.jpeg
 Predict complete!
 ```
 
@@ -116,16 +117,16 @@ Predict complete!
 
 ```python
 import paddleclas
-model = paddleclas.PaddleClas(model_name="person_exists")
-result = model.predict(input_data="pulc_demo_imgs/person_exists/objects365_01780782.jpg")
+model = paddleclas.PaddleClas(model_name="car_exists")
+result = model.predict(input_data="pulc_demo_imgs/car_exists/objects365_00001507.jpeg")
 print(next(result))
 ```
 
-**Note**: The `result` returned by `model.predict()` is a generator, so you need to use the `next()` function to call it or `for` loop to loop it. And it will predict with `batch_size` size batch and return the prediction results when called. The default `batch_size` is 1, and you also specify the `batch_size` when instantiating, such as `model = paddleclas.PaddleClas(model_name="person_exists",  batch_size=2)`. The result of demo above:
+**Note**: The `result` returned by `model.predict()` is a generator, so you need to use the `next()` function to call it or `for` loop to loop it. And it will predict with `batch_size` size batch and return the prediction results when called. The default `batch_size` is 1, and you also specify the `batch_size` when instantiating, such as `model = paddleclas.PaddleClas(model_name="car_exists",  batch_size=2)`. The result of demo above:
 
 ```
 >>> result
-[{'class_ids': [0], 'scores': [0.9955421453341842], 'label_names': ['nobody'], 'filename': 'pulc_demo_imgs/person_exists/objects365_01780782.jpg'}]
+[{'class_ids': [1], 'scores': [0.9871138], 'label_names': ['contains_car'], 'filename': 'pulc_demo_imgs/car_exists/objects365_00001507.jpeg'}]
 ```
 
 <a name="3"></a>
@@ -146,7 +147,7 @@ Please refer to [Installation](../installation/install_paddleclas_en.md) to get 
 
 #### 3.2.1 Dataset Introduction
 
-All datasets used in this case are open source data. Train data is the subset of [MS-COCO](https://cocodataset.org/#overview) training data. And the validation data is the subset of [Object365](https://www.objects365.org/overview.html) training data. ImageNet_val is [ImageNet-1k](https://www.image-net.org/) validation data.
+All datasets used in this case are open source data. Train and validation data are the subset of [Object365](https://www.objects365.org/overview.html) data. ImageNet_val is [ImageNet-1k](https://www.image-net.org/) validation data.
 
 <a name="3.2.2"></a>  
 
@@ -154,12 +155,14 @@ All datasets used in this case are open source data. Train data is the subset of
 
 The data used in this case can be getted by processing the open source data. The detailed processes are as follows:
 
-- Training data. This case deals with the annotation file of MS-COCO data training data. If a certain image contains the label of "person" and the area of this box is greater than 10% in the whole image, it is considered that the image contains human. If there is no label of "person" in a certain image, It is considered that the image does not contain human. After processing, 92964 pieces of available data were obtained, including 39813 images containing human and 53151 images without containing human.
-- Validation data: randomly select a small part of data from object365 data, use the better model trained on MS-COCO to predict these data, take the intersection between the prediction results and the data annotation file, and filter the intersection results into the validation set according to the method of obtaining the training set. After processing, 27820 pieces of available data were obtained. There are 2255 pieces of data with human and 25565 pieces of data without human. The data visualization of the processed dataset is as follows:
+- Training data. This case deals with the annotation file of Objects365 data training data. If a certain image contains the label of "car" and the area of this box is greater than 10% in the whole image, it is considered that the image contains car. If there is no label of any vehicle in a certain image, such as car, bus and so on, it is considered that the image does not contain car. After processing, 108629 images were obtained, including 27422 images containing car and 81207 images uncontaining car.
+- Validation data: Same as Training data, but checked manually to remove some labeled wrong images.
+
+**Note**: the labels of objects365 are not completely mutually exclusive. For example, F1 racing cars may be "F1 formula" or "car". In order to reduce the interference, we only keep the "car" label as containing car, and the figure without any vehicle as uncontaining car.
 
 Some image of the processed dataset is as follows:
 
-![](../../images/PULC/docs/person_exists_data_demo.png)
+![](../../images/PULC/docs/car_exists_data_demo.jpeg)
 
 And you can also download the data processed directly.
 
@@ -171,22 +174,18 @@ Enter the `dataset/` directory, download and unzip the dataset.
 
 ```shell
 cd dataset
-wget https://paddleclas.bj.bcebos.com/data/PULC/person_exists.tar
-tar -xf person_exists.tar
+wget https://paddleclas.bj.bcebos.com/data/PULC/car_exists.tar
+tar -xf car_exists.tar
 cd ../
 ```
 
-The datas under `person_exists` directory:
+The datas under `car_exists` directory:
 
 ```
-├── train
-│   ├── 000000000009.jpg
-│   ├── 000000000025.jpg
-...
-├── val
-│   ├── objects365_01780637.jpg
-│   ├── objects365_01780640.jpg
-...
+
+├── objects365_car
+│   ├── objects365_00000039.jpg
+│   ├── objects365_00000099.jpg
 ├── ImageNet_val
 │   ├── ILSVRC2012_val_00000001.JPEG
 │   ├── ILSVRC2012_val_00000002.JPEG
@@ -209,21 +208,21 @@ Where `train/` and `val/` are training set and validation set respectively. The 
 
 ### 3.3 Training
 
-The details of training config in `ppcls/configs/PULC/person_exists/PPLCNet_x1_0.yaml`. The command about training as follows:
+The details of training config in `ppcls/configs/PULC/car_exists/PPLCNet_x1_0.yaml`. The command about training as follows:
 
 ```shell
 export CUDA_VISIBLE_DEVICES=0,1,2,3
 python3 -m paddle.distributed.launch \
     --gpus="0,1,2,3" \
     tools/train.py \
-        -c ./ppcls/configs/PULC/person_exists/PPLCNet_x1_0.yaml
+        -c ./ppcls/configs/PULC/car_exists/PPLCNet_x1_0.yaml
 ```
 
-The best metric of validation data is between `0.94` and `0.95`. There would be fluctuations because the data size is small.
+The best metric of validation data is between `0.95` and `0.96`. There would be fluctuations because the data size is small.
 
 **Note**:
 
-* The metric Tpr, that describe the True Positive Rate when False Positive Rate is less than a certain threshold(1/1000 used in this case), is one of the commonly used metric for binary classification. About the details of Fpr and Tpr, please refer [here](https://en.wikipedia.org/wiki/Receiver_operating_characteristic).
+* The metric Tpr, that describe the True Positive Rate when False Positive Rate is less than a certain threshold(1/100 used in this case), is one of the commonly used metric for binary classification. About the details of Fpr and Tpr, please refer [here](https://en.wikipedia.org/wiki/Receiver_operating_characteristic).
 * When evaluation, the best metric TprAtFpr will be printed that include `Fpr`, `Tpr` and the current `threshold`. The `Tpr` means the Recall rate under the current `Fpr`. The `Tpr` higher, the model better. The `threshold` would be used in deployment, which means the classification threshold under best `Fpr` metric.
 
 <a name="3.4"></a>
@@ -234,7 +233,7 @@ After training, you can use the following commands to evaluate the model.
 
 ```bash
 python3 tools/eval.py \
-    -c ./ppcls/configs/PULC/person_exists/PPLCNet_x1_0.yaml \
+    -c ./ppcls/configs/PULC/car_exists/PPLCNet_x1_0.yaml \
     -o Global.pretrained_model="output/PPLCNet_x1_0/best_model"
 ```
 
@@ -248,21 +247,21 @@ After training, you can use the model that trained to infer. Command is as follo
 
 ```python
 python3 tools/infer.py \
-    -c ./ppcls/configs/PULC/person_exists/PPLCNet_x1_0.yaml \
+    -c ./ppcls/configs/PULC/car_exists/PPLCNet_x1_0.yaml \
     -o Global.pretrained_model=output/PPLCNet_x1_0/best_model
 ```
 
 The results:
 
 ```
-[{'class_ids': [1], 'scores': [0.9999976], 'label_names': ['someone'], 'file_name': 'deploy/images/PULC/person_exists/objects365_02035329.jpg'}]
+[{'class_ids': [1], 'scores': [0.9871138], 'label_names': ['contains_car'], 'filename': 'deploy/images/PULC/car_exists/objects365_00001507.jpeg'}]
 ```
 
 **Note**:
 
 * Among the above command, argument `-o Global.pretrained_model="output/PPLCNet_x1_0/best_model"` specify the path of the best model weight file. You can specify other path if needed.
-* The default test image is `deploy/images/PULC/person_exists/objects365_02035329.jpg`. And you can test other image, only need to specify the argument `-o Infer.infer_imgs=path_to_test_image`.
-* The default threshold is `0.5`. If needed, you can specify the argument `Infer.PostProcess.threshold`, such as: `-o Infer.PostProcess.threshold=0.9794`. And the argument `threshold` is needed to be specified according by specific case. The `0.9794` is the best threshold when `Fpr` is less than `1/1000` in this valuation dataset.
+* The default test image is `deploy/images/PULC/car_exists/objects365_00001507.jpeg`. And you can test other image, only need to specify the argument `-o Infer.infer_imgs=path_to_test_image`.
+* The default threshold is `0.5`. If needed, you can specify the argument `Infer.PostProcess.threshold`, such as: `-o Infer.PostProcess.threshold=0.9794`. And the argument `threshold` is needed to be specified according by specific case. The `0.9794` is the best threshold when `Fpr` is less than `1/100` in this valuation dataset.
 
 <a name="4"></a>
 
@@ -281,14 +280,14 @@ SKL-UGI is a simple but effective knowledge distillation algrithem proposed by P
 
 #### 4.1.1 Teacher Model Training
 
-Training the teacher model with hyperparameters specified in `ppcls/configs/PULC/person_exists/PPLCNet/PPLCNet_x1_0.yaml`. The command is as follow:
+Training the teacher model with hyperparameters specified in `ppcls/configs/PULC/car_exists/PPLCNet/PPLCNet_x1_0.yaml`. The command is as follow:
 
 ```shell
 export CUDA_VISIBLE_DEVICES=0,1,2,3
 python3 -m paddle.distributed.launch \
     --gpus="0,1,2,3" \
     tools/train.py \
-        -c ./ppcls/configs/PULC/person_exists/PPLCNet_x1_0.yaml \
+        -c ./ppcls/configs/PULC/car_exists/PPLCNet_x1_0.yaml \
         -o Arch.name=ResNet101_vd
 ```
 
@@ -298,14 +297,14 @@ The best metric of validation data is between `0.96` and `0.98`. The best teache
 
 #### 4.1.2 Knowledge Distillation Training
 
-The training strategy, specified in training config file `ppcls/configs/PULC/person_exists/PPLCNet_x1_0_distillation.yaml`, the teacher model is `ResNet101_vd`, the student model is `PPLCNet_x1_0` and the additional unlabeled training data is validation data of ImageNet1k. The command is as follow:
+The training strategy, specified in training config file `ppcls/configs/PULC/car_exists/PPLCNet_x1_0_distillation.yaml`, the teacher model is `ResNet101_vd`, the student model is `PPLCNet_x1_0` and the additional unlabeled training data is validation data of ImageNet1k. The command is as follow:
 
 ```shell
 export CUDA_VISIBLE_DEVICES=0,1,2,3
 python3 -m paddle.distributed.launch \
     --gpus="0,1,2,3" \
     tools/train.py \
-        -c ./ppcls/configs/PULC/person_exists/PPLCNet_x1_0_distillation.yaml \
+        -c ./ppcls/configs/PULC/car_exists/PPLCNet_x1_0_distillation.yaml \
         -o Arch.models.0.Teacher.pretrained=output/ResNet101_vd/best_model
 ```
 
@@ -339,15 +338,15 @@ The command about exporting Paddle Inference Model is as follow:
 
 ```bash
 python3 tools/export_model.py \
-    -c ./ppcls/configs/PULC/person_exists/PPLCNet_x1_0.yaml \
+    -c ./ppcls/configs/PULC/car_exists/PPLCNet_x1_0.yaml \
     -o Global.pretrained_model=output/DistillationModel/best_model_student \
-    -o Global.save_inference_dir=deploy/models/PPLCNet_x1_0_person_exists_infer
+    -o Global.save_inference_dir=deploy/models/PPLCNet_x1_0_car_exists_infer
 ```
 
-After running above command, the inference model files would be saved in `deploy/models/PPLCNet_x1_0_person_exists_infer`, as shown below:
+After running above command, the inference model files would be saved in `deploy/models/PPLCNet_x1_0_car_exists_infer`, as shown below:
 
 ```
-├── PPLCNet_x1_0_person_exists_infer
+├── PPLCNet_x1_0_car_exists_infer
 │   ├── inference.pdiparams
 │   ├── inference.pdiparams.info
 │   └── inference.pdmodel
@@ -364,13 +363,13 @@ You can also download directly.
 ```
 cd deploy/models
 # download the inference model and decompression
-wget https://paddleclas.bj.bcebos.com/models/PULC/person_exists_infer.tar && tar -xf person_exists_infer.tar
+wget https://paddleclas.bj.bcebos.com/models/PULC/car_exists_infer.tar && tar -xf car_exists_infer.tar
 ```
 
 After decompression, the directory `models` should be shown below.
 
 ```
-├── person_exists_infer
+├── car_exists_infer
 │   ├── inference.pdiparams
 │   ├── inference.pdiparams.info
 │   └── inference.pdmodel
@@ -390,22 +389,22 @@ Return the directory `deploy`:
 cd ../
 ```
 
-Run the following command to classify whether there are humans in the image `./images/PULC/person_exists/objects365_02035329.jpg`.
+Run the following command to classify whether there are cars in the image `./images/PULC/car_exists/objects365_00001507.jpeg`.
 
 ```shell
 # Use the following command to predict with GPU.
-python3.7 python/predict_cls.py -c configs/PULC/person_exists/inference_person_exists.yaml
+python3.7 python/predict_cls.py -c configs/PULC/car_exists/inference_car_exists.yaml
 # Use the following command to predict with CPU.
-python3.7 python/predict_cls.py -c configs/PULC/person_exists/inference_person_exists.yaml -o Global.use_gpu=False
+python3.7 python/predict_cls.py -c configs/PULC/car_exists/inference_car_exists.yaml -o Global.use_gpu=False
 ```
 
 The prediction results:
 
 ```
-objects365_02035329.jpg:    class id(s): [1], score(s): [1.00], label_name(s): ['someone']
+objects365_00001507.jpeg:       class id(s): [1], score(s): [0.99], label_name(s): ['contains_car']
 ```
 
-**Note**: The default threshold is `0.5`. If needed, you can specify the argument `Infer.PostProcess.threshold`, such as: `-o Infer.PostProcess.threshold=0.9794`. And the argument `threshold` is needed to be specified according by specific case. The `0.9794` is the best threshold when `Fpr` is less than `1/1000` in this valuation dataset. Please refer to [3.3 section](#3.3) for details.
+**Note**: The default threshold is `0.5`. If needed, you can specify the argument `Infer.PostProcess.threshold`, such as: `-o Infer.PostProcess.threshold=0.9794`. And the argument `threshold` is needed to be specified according by specific case. The `0.9794` is the best threshold when `Fpr` is less than `1/100` in this valuation dataset. Please refer to [3.3 section](#3.3) for details.
 
 <a name="6.2.2"></a>  
 
@@ -415,17 +414,17 @@ If you want to predict images in directory, please specify the argument `Global.
 
 ```shell
 # Use the following command to predict with GPU. If want to replace with CPU, you can add argument -o Global.use_gpu=False
-python3.7 python/predict_cls.py -c configs/PULC/person_exists/inference_person_exists.yaml -o Global.infer_imgs="./images/PULC/person_exists/"
+python3.7 python/predict_cls.py -c configs/PULC/car_exists/inference_car_exists.yaml -o Global.infer_imgs="./images/PULC/car_exists/"
 ```
 
 All prediction results will be printed, as shown below.
 
 ```
-objects365_01780782.jpg:    class id(s): [0], score(s): [1.00], label_name(s): ['nobody']
-objects365_02035329.jpg:    class id(s): [1], score(s): [1.00], label_name(s): ['someone']
+objects365_00001507.jpeg:       class id(s): [1], score(s): [0.99], label_name(s): ['contains_car']
+objects365_00001521.jpeg:       class id(s): [0], score(s): [0.99], label_name(s): ['no_car']
 ```
 
-Among the prediction results above, `someone` means that there is a human in the image, `nobody` means that there is no human in the image.
+Among the prediction results above, `contains_car` means that there is a car in the image, `no_car` means that there is no car in the image.
 
 <a name="6.3"></a>
 
