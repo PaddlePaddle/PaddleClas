@@ -1,4 +1,4 @@
-# PULC 有人/无人分类模型
+# PULC 有车/无车分类模型
 
 ------
 
@@ -40,7 +40,7 @@
 
 ## 1. 模型和应用场景介绍
 
-该案例提供了用户使用 PaddleClas 的超轻量图像分类方案（PULC，Practical Ultra Lightweight Classification）快速构建轻量级、高精度、可落地的有人/无人的分类模型。该模型可以广泛应用于如监控场景、人员进出管控场景、海量数据过滤场景等。
+该案例提供了用户使用 PaddleClas 的超轻量图像分类方案（PULC，Practical Ultra Lightweight Classification）快速构建轻量级、高精度、可落地的有车/无车的分类模型。该模型可以广泛应用于如监控场景、海量数据过滤场景等。
 
 下表列出了判断图片中是否有车的二分类模型的相关指标，前两行展现了使用 SwinTranformer_tiny 和 MobileNetV3_small_x0_35 作为 backbone 训练得到的模型的相关指标，第三行至第六行依次展现了替换 backbone 为 PPLCNet_x1_0、使用 SSLD 预训练模型、使用 SSLD 预训练模型 + EDA 策略、使用 SSLD 预训练模型 + EDA 策略 + SKL-UGI 知识蒸馏策略训练得到的模型的相关指标。
 
@@ -58,7 +58,7 @@
 
 **备注：**
 
-* `Tpr`指标的介绍可以参考 [3.2 小节](#3.2)的备注部分，延时是基于 Intel(R) Xeon(R) Gold 6148 CPU @ 2.40GHz 测试得到，开启 MKLDNN 加速策略，线程数为10。
+* `Tpr`指标的介绍可以参考 [3.3节](#3.3)的备注部分，延时是基于 Intel(R) Xeon(R) Gold 6148 CPU @ 2.40GHz 测试得到，开启 MKLDNN 加速策略，线程数为10。
 * 关于PP-LCNet的介绍可以参考[PP-LCNet介绍](../models/PP-LCNet.md)，相关论文可以查阅[PP-LCNet paper](https://arxiv.org/abs/2109.15099)。
     
     
@@ -160,7 +160,7 @@ print(next(result))
 
 - 训练集合，本案例处理了 Objects365 数据训练集的标注文件，如果某张图含有“car”的标签，且这个框的面积在整张图中的比例大于 10%，即认为该张图中含有车，如果某张图中没有任何与交通工具，例如car、bus等相关的的标签，则认为该张图中不含有车。经过处理后，得到 108629 条可用数据，其中有车的数据有 27422 条，无车的数据 81207 条。
 
-- 验证集合，处理方法与训练集相同，数据来源与 Objects365 数据集的验证集。为了测试结果准确，验证集经过人工校正，去除了一些可能存在标注错误的图像。
+- 验证集合，处理方法与训练集相同，数据来源于 Objects365 数据集的验证集。为了测试结果准确，验证集经过人工校正，去除了一些可能存在标注错误的图像。
 
 * 注：由于objects365的标签并不是完全互斥的，例如F1赛车可能是 "F1 Formula"，也可能被标称"car"。为了减轻干扰，我们仅保留"car"标签作为有车，而将不含任何交通工具的图作为无车。
 
@@ -265,7 +265,7 @@ python3 tools/infer.py \
 输出结果如下：
 
 ```
-[{'class_ids': [1], 'scores': [0.9871138], 'label_names': ['contains_vehicle'], 'filename': 'deploy/images/PULC/car_exists/objects365_00001507.jpeg'}]
+[{'class_ids': [1], 'scores': [0.9871138], 'label_names': ['contains_car'], 'filename': 'deploy/images/PULC/car_exists/objects365_00001507.jpeg'}]
 ```
 
 **备注：**
@@ -274,7 +274,7 @@ python3 tools/infer.py \
 
 * 默认是对 `deploy/images/PULC/car_exists/objects365_00001507.jpeg` 进行预测，此处也可以通过增加字段 `-o Infer.infer_imgs=xxx` 对其他图片预测。
 
-* 二分类默认的阈值为0.5， 如果需要指定阈值，可以重写 `Infer.PostProcess.threshold` ，如`-o Infer.PostProcess.threshold=0.9794`，该值需要根据实际场景来确定，此处的 `0.9794` 是在该场景中的 `val` 数据集在千分之一 Fpr 下得到的最佳 Tpr 所得到的。
+* 二分类默认的阈值为0.5， 如果需要指定阈值，可以重写 `Infer.PostProcess.threshold` ，如`-o Infer.PostProcess.threshold=0.9794`，该值需要根据实际场景来确定，此处的 `0.9794` 是在该场景中的 `val` 数据集在百分之一 Fpr 下得到的最佳 Tpr 所得到的。
 
 
 <a name="4"></a>
@@ -326,7 +326,7 @@ python3 -m paddle.distributed.launch \
 
 ## 5. 超参搜索
 
-在 [3.2 节](#3.2)和 [4.1 节](#4.1)所使用的超参数是根据 PaddleClas 提供的 `SHAS 超参数搜索策略` 搜索得到的，如果希望在自己的数据集上得到更好的结果，可以参考[SHAS 超参数搜索策略](PULC_train.md#4-超参搜索)来获得更好的训练超参数。
+在 [3.3 节](#3.3)和 [4.1 节](#4.1)所使用的超参数是根据 PaddleClas 提供的 `SHAS 超参数搜索策略` 搜索得到的，如果希望在自己的数据集上得到更好的结果，可以参考[SHAS 超参数搜索策略](PULC_train.md#4-超参搜索)来获得更好的训练超参数。
 
 **备注：** 此部分内容是可选内容，搜索过程需要较长的时间，您可以根据自己的硬件情况来选择执行。如果没有更换数据集，可以忽略此节内容。
 
@@ -417,7 +417,7 @@ objects365_00001507.jpeg:       class id(s): [1], score(s): [0.99], label_name(s
 ```
 
 
-**备注：** 二分类默认的阈值为0.5， 如果需要指定阈值，可以重写 `Infer.PostProcess.threshold` ，如`-o Infer.PostProcess.threshold=0.9794`，该值需要根据实际场景来确定，此处的 `0.9794` 是在该场景中的 `val` 数据集在千分之一 Fpr 下得到的最佳 Tpr 所得到的。该阈值的确定方法可以参考[3.3节](#3.3)备注部分。
+**备注：** 二分类默认的阈值为0.5， 如果需要指定阈值，可以重写 `Infer.PostProcess.threshold` ，如`-o Infer.PostProcess.threshold=0.9794`，该值需要根据实际场景来确定，此处的 `0.9794` 是在该场景中的 `val` 数据集在百分之一 Fpr 下得到的最佳 Tpr 所得到的。该阈值的确定方法可以参考[3.3节](#3.3)备注部分。
 
 <a name="6.2.2"></a>  
 

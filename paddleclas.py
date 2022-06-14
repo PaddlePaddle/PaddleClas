@@ -175,11 +175,11 @@ IMN_MODEL_SERIES = {
     ]
 }
 
-PULC_MODEL_BASE_DOWNLOAD_URL = "https://paddleclas.bj.bcebos.com/models/PULC/{}_infer.tar"
+PULC_MODEL_BASE_DOWNLOAD_URL = "https://paddleclas.bj.bcebos.com/models/PULC/inference/{}_infer.tar"
 PULC_MODELS = [
-    "person_exists", "person_attribute", "safety_helmet", "traffic_sign",
-    "vehicle_exists", "vehicle_attribute", "textline_orientation",
-    "text_image_orientation", "language_classification"
+    "car_exists", "language_classification", "person_attribute",
+    "person_exists", "safety_helmet", "text_image_orientation",
+    "textline_orientation", "traffic_sign", "vehicle_attribute"
 ]
 
 
@@ -298,7 +298,7 @@ def args_cfg():
     parser.add_argument(
         "--use_tensorrt",
         type=str2bool,
-        help="Whether use TensorRT to accelerate. ")
+        help="Whether use TensorRT to accelerate.")
     parser.add_argument(
         "--use_fp16", type=str2bool, help="Whether use FP16 to predict.")
     parser.add_argument("--batch_size", type=int, help="Batch size.")

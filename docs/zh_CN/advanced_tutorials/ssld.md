@@ -6,7 +6,7 @@
 - [1. 算法介绍](#1)
     - [1.1 知识蒸馏简介](#1.1)
     - [1.2 SSLD蒸馏策略](#1.2)
-    - [1.2 SKL-UGI蒸馏策略](#1.3)
+    - [1.3 SKL-UGI蒸馏策略](#1.3)
 - [2. SSLD预训练模型库](#2)
 - [3. SSLD使用](#3)
     - [3.1 加载SSLD模型进行微调](#3.1)
@@ -19,6 +19,8 @@
 
 ## 1. 算法介绍
 
+<a name="1.1"></a>
+
 ### 1.1 简介
 
 PaddleClas 融合已有的知识蒸馏方法 [2,3]，提供了一种简单的半监督标签知识蒸馏方案(SSLD，Simple Semi-supervised Label Distillation)，基于 ImageNet1k 分类数据集，在 ResNet_vd 以及 MobileNet 系列上的精度均有超过 3% 的绝对精度提升，具体指标如下图所示。
@@ -26,6 +28,8 @@ PaddleClas 融合已有的知识蒸馏方法 [2,3]，提供了一种简单的半
 <div align="center">
 <img src="../../images/distillation/distillation_perform_s.jpg"  width = "800" />
 </div>
+
+<a name="1.2"></a>
 
 ### 1.2 SSLD蒸馏策略
 
@@ -71,6 +75,8 @@ SSLD 蒸馏方案的一大特色就是无需使用图像的真值标签，因此
 
 
 <a name="1.3"></a>
+
+## 1.3 SKL-UGI蒸馏策略
 
 此外，在无标注数据选择的过程中，我们发现使用更加通用的数据，即使不需要严格的数据筛选过程，也可以帮助知识蒸馏任务获得稳定的精度提升，因而提出了SKL-UGI (Symmetrical-KL Unlabeled General Images distillation)知识蒸馏方案。
 

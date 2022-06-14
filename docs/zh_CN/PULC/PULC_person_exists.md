@@ -261,7 +261,7 @@ python3 tools/eval.py \
 ```python
 python3 tools/infer.py \
     -c ./ppcls/configs/PULC/person_exists/PPLCNet_x1_0.yaml \
-    -o Global.pretrained_model=output/PPLCNet_x1_0/best_model 
+    -o Global.pretrained_model=output/PPLCNet_x1_0/best_model
 ```
 
 输出结果如下：
@@ -328,7 +328,7 @@ python3 -m paddle.distributed.launch \
 
 ## 5. 超参搜索
 
-在 [3.2 节](#3.2)和 [4.1 节](#4.1)所使用的超参数是根据 PaddleClas 提供的 `SHAS 超参数搜索策略` 搜索得到的，如果希望在自己的数据集上得到更好的结果，可以参考[SHAS 超参数搜索策略](PULC_train.md#4-超参搜索)来获得更好的训练超参数。
+在 [3.3 节](#3.3)和 [4.1 节](#4.1)所使用的超参数是根据 PaddleClas 提供的 `SHAS 超参数搜索策略` 搜索得到的，如果希望在自己的数据集上得到更好的结果，可以参考[SHAS 超参数搜索策略](PULC_train.md#4-超参搜索)来获得更好的训练超参数。
 
 **备注：** 此部分内容是可选内容，搜索过程需要较长的时间，您可以根据自己的硬件情况来选择执行。如果没有更换数据集，可以忽略此节内容。
 

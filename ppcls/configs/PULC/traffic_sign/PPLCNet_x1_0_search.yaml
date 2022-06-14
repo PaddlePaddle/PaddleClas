@@ -118,8 +118,7 @@ DataLoader:
       use_shared_memory: True
 
 Infer:
-  # infer_imgs: dataset/traffic_sign_demo/
-  infer_imgs: dataset/tt100k_clas_v2/test/
+  infer_imgs: deploy/images/PULC/traffic_sign/99603_17806.jpg
   batch_size: 10
   transforms:
     - DecodeImage:
