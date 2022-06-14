@@ -54,7 +54,7 @@ DataLoader:
     dataset:
       name: ImageNetDataset
       image_root: ./dataset/
-      cls_label_path: ./dataset/tt100k_clas_v2/label_list_train.txt
+      cls_label_path: ./dataset/traffic_sign/label_list_train.txt
       delimiter: "\t"
       transform_ops:
         - DecodeImage:

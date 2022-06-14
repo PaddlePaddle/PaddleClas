@@ -7,6 +7,9 @@
 
 - [1. 模型和应用场景介绍](#1)
 - [2. 模型快速体验](#2)
+    - [2.1 安装 paddlepaddle](#2.1)
+    - [2.2 安装 paddleclas](#2.2)
+    - [2.3 预测](#2.3)
 - [3. 模型训练、评估和预测](#3)
     - [3.1 环境配置](#3.1)
     - [3.2 数据准备](#3.2)
@@ -52,11 +55,11 @@
 | PPLCNet_x1_0  | 90.59 | 2.36  | 7.2 | 使用SSLD预训练模型+EDA策略|
 | <b>PPLCNet_x1_0<b>  | <b>90.81<b> | <b>2.36<b>  | <b>8.2<b> | 使用SSLD预训练模型+EDA策略+SKL-UGI知识蒸馏策略|
 
-从表中可以看出，backbone 为 Res2Net200_vd_26w_4s 时精度较高，但是推理速度较慢。将 backbone 替换为轻量级模型 MobileNetV3_small_x0_35 后，速度可以大幅提升，但是精度下降明显。将 backbone 替换为 PPLCNet_x1_0 时，精度提升 2.16%，同时速度也提升 23% 左右。在此基础上，使用 SSLD 预训练模型后，在不改变推理速度的前提下，精度可以提升约 0.5%，进一步地，当融合EDA策略后，精度可以再提升 0.52%，最后，在使用 SKL-UGI 知识蒸馏后，精度可以继续提升 0.23%。此时，PPLCNet_x1_0 的精度与 Res2Net200_vd_26w_4s 仅相差0.55%，但是速度快32倍。关于 PULC 的训练方法和推理部署方法将在下面详细介绍。
+从表中可以看出，backbone 为 Res2Net200_vd_26w_4s 时精度较高，但是推理速度较慢。将 backbone 替换为轻量级模型 MobileNetV3_small_x0_35 后，速度可以大幅提升，但是精度下降明显。将 backbone 替换为 PPLCNet_x1_0 时，精度提升 2 个百分点，同时速度也提升 23% 左右。在此基础上，使用 SSLD 预训练模型后，在不改变推理速度的前提下，精度可以提升约 0.5 个百分点，进一步地，当融合EDA策略后，精度可以再提升 0.52 个百分点，最后，在使用 SKL-UGI 知识蒸馏后，精度可以继续提升 0.23 个百分点。此时，PPLCNet_x1_0 的精度与 Res2Net200_vd_26w_4s 仅相差 0.55 个百分点，但是速度快 32 倍。关于 PULC 的训练方法和推理部署方法将在下面详细介绍。
 
 **备注：**
 
-* 关于PPLCNet的介绍可以参考[PPLCNet介绍](../models/PP-LCNet.md)，相关论文可以查阅[PPLCNet paper](https://arxiv.org/abs/2109.15099)。
+* 关于PP-LCNet的介绍可以参考[PP-LCNet介绍](../models/PP-LCNet.md)，相关论文可以查阅[PP-LCNet paper](https://arxiv.org/abs/2109.15099)。
 
 
 <a name="2"></a>
@@ -65,28 +68,49 @@
 
 <a name="2.1"></a>  
 
-### 2.1 安装 paddleclas
+### 2.1 安装 paddlepaddle
 
-使用如下命令快速安装 paddlepaddle, paddleclas
+- 您的机器安装的是 CUDA9 或 CUDA10，请运行以下命令安装
 
 ```bash
-pip3 install paddlepaddle paddleclas
+python3 -m pip install paddlepaddle-gpu -i https://mirror.baidu.com/pypi/simple
 ```
-<a name="2.2"></a>
 
-### 2.2 预测
+- 您的机器是CPU，请运行以下命令安装
+
+```bash
+python3 -m pip install paddlepaddle -i https://mirror.baidu.com/pypi/simple
+```
+
+更多的版本需求，请参照[飞桨官网安装文档](https://www.paddlepaddle.org.cn/install/quick)中的说明进行操作。
+
+<a name="2.2"></a>  
+
+### 2.2 安装 paddleclas
+
+使用如下命令快速安装 paddleclas
+
+```  
+pip3 install paddleclas
+```
+
+<a name="2.3"></a>
+
+### 2.3 预测
+
+点击[这里](https://paddleclas.bj.bcebos.com/data/PULC/pulc_demo_imgs.zip)下载 demo 数据并解压，然后在终端中切换到相应目录。
 
 * 使用命令行快速预测
 
 ```bash
-paddleclas --model_name vehicle_attribute --infer_imgs deploy/images/PULC/vehicle_attribute/0002_c002_00030670_0.jpg
+paddleclas --model_name=vehicle_attribute --infer_imgs=pulc_demo_imgs/vehicle_attribute/0002_c002_00030670_0.jpg
 ```
 
 结果如下：
 ```
 >>> result
-attributes: Color: (yellow, prob: 0.9893476963043213), Type: (hatchback, prob: 0.9734097719192505), output: [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0], filename: deploy/images/PULC/vehicle_attribute/0002_c002_00030670_0.jpg
-ppcls INFO: Predict complete!
+attributes: Color: (yellow, prob: 0.9893476963043213), Type: (hatchback, prob: 0.9734097719192505), output: [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0], filename: pulc_demo_imgs/vehicle_attribute/0002_c002_00030670_0.jpg
+Predict complete!
 ```
 
 **备注**： 更换其他预测的数据时，只需要改变 `--infer_imgs=xx` 中的字段即可，支持传入整个文件夹。
@@ -96,16 +120,17 @@ ppcls INFO: Predict complete!
 ```python
 import paddleclas
 model = paddleclas.PaddleClas(model_name="vehicle_attribute")
-result = model.predict(input_data="deploy/images/PULC/vehicle_attribute/0002_c002_00030670_0.jpg")
+result = model.predict(input_data="pulc_demo_imgs/vehicle_attribute/0002_c002_00030670_0.jpg")
 print(next(result))
 ```
 
-**备注**：`model.predict()` 为可迭代对象（`generator`），因此需要使用 `next()` 函数或 `for` 循环对其迭代调用。每次调用将以 `batch_size` 为单位进行一次预测，并返回预测结果, 默认 `batch_size` 为 1，如果需要更改 `batch_size`，实例化模型时，需要指定 `batch_size`，如 `model = paddleclas.PaddleClas(model_name="person_exists",  batch_size=2)`, 使用默认的代码返回结果示例如下：
+**备注**：`model.predict()` 为可迭代对象（`generator`），因此需要使用 `next()` 函数或 `for` 循环对其迭代调用。每次调用将以 `batch_size` 为单位进行一次预测，并返回预测结果, 默认 `batch_size` 为 1，如果需要更改 `batch_size`，实例化模型时，需要指定 `batch_size`，如 `model = paddleclas.PaddleClas(model_name="vehicle_attribute",  batch_size=2)`, 使用默认的代码返回结果示例如下：
 
 ```
-result
-[{'attributes': 'Color: (yellow, prob: 0.9893476963043213), Type: (hatchback, prob: 0.9734097719192505)', 'output': [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0], 'filename': 'deploy/images/PULC/vehicle_attribute/0002_c002_00030670_0.jpg'}]
+>>> result
+[{'attributes': 'Color: (yellow, prob: 0.9893476963043213), Type: (hatchback, prob: 0.9734097719192505)', 'output': [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0], 'filename': 'pulc_demo_imgs/vehicle_attribute/0002_c002_00030670_0.jpg'}]
 ```
+
 
 <a name="3"></a>
 
@@ -271,7 +296,7 @@ python3 tools/infer.py \
 
 ### 4.1 SKL-UGI 知识蒸馏
 
-SKL-UGI 知识蒸馏是 PaddleClas 提出的一种简单有效的知识蒸馏方法，关于该方法的介绍，可以参考[SKL-UGI 知识蒸馏](@ruoyu)。
+SKL-UGI 知识蒸馏是 PaddleClas 提出的一种简单有效的知识蒸馏方法，关于该方法的介绍，可以参考[SKL-UGI 知识蒸馏](../advanced_tutorials/ssld.md)。
 
 <a name="4.1.1"></a>
 
@@ -312,7 +337,7 @@ python3 -m paddle.distributed.launch \
 
 ## 5. 超参搜索
 
-在 [3.2 节](#3.2)和 [4.1 节](#4.1)所使用的超参数是根据 PaddleClas 提供的 `SHAS 超参数搜索策略` 搜索得到的，如果希望在自己的数据集上得到更好的结果，可以参考[SHAS 超参数搜索策略](#TODO)来获得更好的训练超参数。
+在 [3.3 节](#3.3)和 [4.1 节](#4.1)所使用的超参数是根据 PaddleClas 提供的 `SHAS 超参数搜索策略` 搜索得到的，如果希望在自己的数据集上得到更好的结果，可以参考[SHAS 超参数搜索策略](PULC_train.md#4-超参搜索)来获得更好的训练超参数。
 
 **备注：** 此部分内容是可选内容，搜索过程需要较长的时间，您可以根据自己的硬件情况来选择执行。如果没有更换数据集，可以忽略此节内容。
 
@@ -343,10 +368,10 @@ python3 tools/export_model.py \
 执行完该脚本后会在 `deploy/models/` 下生成 `PPLCNet_x1_0_vehicle_attributeibute_infer` 文件夹，`models` 文件夹下应有如下文件结构：
 
 ```
-├── PPLCNet_x1_0_vehicle_attribute_infer
-│   ├── inference.pdiparams
-│   ├── inference.pdiparams.info
-│   └── inference.pdmodel
+└── PPLCNet_x1_0_vehicle_attribute_infer
+    ├── inference.pdiparams
+    ├── inference.pdiparams.info
+    └── inference.pdmodel
 ```
 
 **备注：** 此处的最佳权重是经过知识蒸馏后的权重路径，如果没有执行知识蒸馏的步骤，最佳模型保存在`output/PPLCNet_x1_0/best_model.pdparams`中。
@@ -451,4 +476,4 @@ PaddleClas 提供了基于 Paddle Lite 来完成模型端侧部署的示例，�
 
 Paddle2ONNX 支持将 PaddlePaddle 模型格式转化到 ONNX 模型格式。通过 ONNX 可以完成将 Paddle 模型到多种推理引擎的部署，包括TensorRT/OpenVINO/MNN/TNN/NCNN，以及其它对 ONNX 开源格式进行支持的推理引擎或硬件。更多关于 Paddle2ONNX 的介绍，可以参考[Paddle2ONNX 代码仓库](https://github.com/PaddlePaddle/Paddle2ONNX)。
 
-PaddleClas 提供了基于 Paddle2ONNX 来完成 inference 模型转换 ONNX 模型并作推理预测的示例，您可以参考[Paddle2ONNX 模型转换与预测](@shuilong)来完成相应的部署工作。
+PaddleClas 提供了基于 Paddle2ONNX 来完成 inference 模型转换 ONNX 模型并作推理预测的示例，您可以参考[Paddle2ONNX 模型转换与预测](../../../deploy/paddle2onnx/readme.md)来完成相应的部署工作。

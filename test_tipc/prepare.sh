@@ -200,7 +200,7 @@ fi
 if [[ ${MODE} = "serving_infer" ]]; then
     # prepare serving env
     python_name=$(func_parser_value "${lines[2]}")
-    ${python_name} -m pip install install paddle-serving-server-gpu==0.7.0.post102
+    ${python_name} -m pip install paddle-serving-server-gpu==0.7.0.post102
     ${python_name} -m pip install paddle_serving_client==0.7.0
     ${python_name} -m pip install paddle-serving-app==0.7.0
     if [[ ${model_name} =~ "ShiTu" ]]; then
@@ -231,7 +231,7 @@ if [[ ${MODE} = "paddle2onnx_infer" ]]; then
     inference_model_url=$(func_parser_value "${lines[10]}")
     tar_name=${inference_model_url##*/}
 
-    ${python_name} -m pip install install paddle2onnx
+    ${python_name} -m pip install paddle2onnx
     ${python_name} -m pip install onnxruntime
     cd deploy
     mkdir models

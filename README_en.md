@@ -21,7 +21,7 @@ PP-ShiTu demo images
 </div>
 
 **Recent updates**
-- 2022.6.15 Release **P**ractical **U**ltra **L**ight-weight image **C**lassification solutions. PULC models inference within 3ms on CPU devices, with accuracy comparable with SwinTransformer. We also release 9 practical models covering pedestrian, vehicle and OCR.
+- 2022.6.15 Release [**P**ractical **U**ltra **L**ight-weight image **C**lassification solutions](./docs/en/PULC/PULC_quickstart_en.md). PULC models inference within 3ms on CPU devices, with accuracy comparable with SwinTransformer. We also release 9 practical models covering pedestrian, vehicle and OCR.
 - 2022.4.21 Added the related [code](https://github.com/PaddlePaddle/PaddleClas/pull/1820/files) of the CVPR2022 oral paper [MixFormer](https://arxiv.org/pdf/2204.02557.pdf).
 
 - 2021.09.17 Add PP-LCNet series model developed by PaddleClas, these models show strong competitiveness on Intel CPUs.
@@ -35,7 +35,7 @@ For the introduction of PP-LCNet, please refer to [paper](https://arxiv.org/pdf/
 
 PaddleClas release PP-HGNet、PP-LCNetv2、 PP-LCNet and **S**imple **S**emi-supervised **L**abel **D**istillation algorithms, and support plenty of 
 image classification and image recognition algorithms. 
-Based on th algorithms above, PaddleClas release PP-ShiTu image recognition system and **P**ractical **U**ltra **L**ight-weight image **C**lassification solutions.
+Based on th algorithms above, PaddleClas release PP-ShiTu image recognition system and [**P**ractical **U**ltra **L**ight-weight image **C**lassification solutions](docs/en/PULC/PULC_quickstart_en.md).
 
 
 ![](https://user-images.githubusercontent.com/19523330/173347904-f2998e00-7b86-4adf-b546-23c684fc67b9.png)
@@ -51,12 +51,12 @@ Based on th algorithms above, PaddleClas release PP-ShiTu image recognition syst
 
 ## Quick Start
 Quick experience of PP-ShiTu image recognition system：[Link](./docs/en/tutorials/quick_start_recognition_en.md)
-Quick experience of **P**ractical **U**ltra **L**ight-weight image **C**lassification models：[Link](docs/zh_CN/PULC/PULC_quickstart.md)
+Quick experience of **P**ractical **U**ltra **L**ight-weight image **C**lassification models：[Link](docs/en/PULC/PULC_quickstart.md)
 
 ## Tutorials
 
 - [Quick Installation](./docs/en/tutorials/install_en.md)
-- [Practical Ultra Light-weight image Classification solutions](./docs/en/)
+- [Practical Ultra Light-weight image Classification solutions](./docs/en/PULC/PULC_quickstart_en.md)
 - [Quick Start of Recognition](./docs/en/tutorials/quick_start_recognition_en.md)
 - [Introduction to Image Recognition Systems](#Introduction_to_Image_Recognition_Systems)
 - [Demo images](#Demo_images)

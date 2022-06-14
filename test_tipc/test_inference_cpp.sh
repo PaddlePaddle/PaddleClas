@@ -63,7 +63,7 @@ function func_shitu_cpp_inference(){
                         command="${_script} > ${_save_log_path} 2>&1"
                         eval $command
                         last_status=${PIPESTATUS[0]}
-                        status_check $last_status "${command}" "${status_log}"
+                        status_check $last_status "${command}" "${status_log}" "${model_name}"
                     done
                 done
             done
@@ -87,7 +87,7 @@ function func_shitu_cpp_inference(){
                         command="${_script} > ${_save_log_path} 2>&1"
                         eval $command
                         last_status=${PIPESTATUS[0]}
-                        status_check $last_status "${command}" "${status_log}"
+                        status_check $last_status "${command}" "${status_log}" "${model_name}"
                     done
                 done
             done
@@ -125,7 +125,7 @@ function func_cls_cpp_inference(){
                         command1="${_script} > ${_save_log_path} 2>&1"
                         eval ${command1}
                         last_status=${PIPESTATUS[0]}
-                        status_check $last_status "${command1}" "${status_log}"
+                        status_check $last_status "${command1}" "${status_log}" "${model_name}"
                     done
                 done
             done
@@ -148,7 +148,7 @@ function func_cls_cpp_inference(){
                         command="${_script} > ${_save_log_path} 2>&1"
                         eval $command
                         last_status=${PIPESTATUS[0]}
-                        status_check $last_status "${command}" "${status_log}"
+                        status_check $last_status "${command}" "${status_log}" "${model_name}"
                     done
                 done
             done

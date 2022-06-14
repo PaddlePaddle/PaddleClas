@@ -6,6 +6,9 @@
 
 - [1. 模型和应用场景介绍](#1)
 - [2. 模型快速体验](#2)
+    - [2.1 安装 paddlepaddle](#2.1)
+    - [2.2 安装 paddleclas](#2.2)
+    - [2.3 预测](#2.3)
 - [3. 模型训练、评估和预测](#3)
     - [3.1 环境配置](#3.1)
     - [3.2 数据准备](#3.2)
@@ -44,65 +47,88 @@
 |-------|-----------|----------|---------------|---------------|
 | SwinTranformer_tiny  | 93.57 | 91.32  | 107 | 使用ImageNet预训练模型 |
 | Res2Net200_vd_26w_4s  | 98.92 | 80.99 | 284 | 使用ImageNet预训练模型 |
-| MobileNetV3_small_x0_35  | 96.50 | 2.85 | 1.6 | 使用ImageNet预训练模型 |
-| PPLCNet_x1_0  | 93.29 | 2.03  | 6.5 | 使用ImageNet预训练模型 |
-| PPLCNet_x1_0  | 98.07 | 2.03  | 6.5 | 使用SSLD预训练模型 |
+| MobileNetV3_small_x0_35  | 84.83 | 2.85 | 1.6 | 使用ImageNet预训练模型 |
+| PPLCNet_x1_0  | 93.27 | 2.03  | 6.5 | 使用ImageNet预训练模型 |
+| PPLCNet_x1_0  | 98.16 | 2.03  | 6.5 | 使用SSLD预训练模型 |
 | PPLCNet_x1_0  | 99.30 | 2.03  | 6.5 | 使用SSLD预训练模型+EDA策略|
 | <b>PPLCNet_x1_0<b>  | <b>99.38<b> | <b>2.03<b>  | <b>6.5<b> | 使用SSLD预训练模型+EDA策略+UDML知识蒸馏策略|
 
-从表中可以看出，在使用服务器端大模型作为 backbone 时，SwinTranformer_tiny 精度较低，Res2Net200_vd_26w_4s 精度较高，但服务器端大模型推理速度普遍较慢。将 backboone 替换为轻量级模型 MobileNetV3_small_x0_35 后，速度可以大幅提升，但是精度显著降低。在将 backbone 替换为 PPLCNet_x1_0，精度较 MobileNetV3_small_x0_35 提高约 30 个百分点，与此同时速度快 20% 以上。在此基础上，将 PPLCNet_x1_0 的预训练模型替换为 SSLD 预训练模型后，在对推理速度无影响的前提下，精度提升约 4.8 个百分点，进一步地使用 EDA 策略后，精度可以再提升 0.7 个百分点。此时，PPLCNet_x1_0 已经接近了 Res2Net200_vd_26w_4s 模型的精度，但是速度快 70+ 倍。最后，在使用 UDML 知识蒸馏后，精度可以再提升 0.5 个百分点。此时，PPLCNet_x1_0 已经超过了 Res2Net200_vd_26w_4s 模型的精度，但速度是其 70 余倍。下面详细介绍关于 PULC 安全帽模型的训练方法和推理部署方法。
+从表中可以看出，在使用服务器端大模型作为 backbone 时，SwinTranformer_tiny 精度较低，Res2Net200_vd_26w_4s 精度较高，但服务器端大模型推理速度普遍较慢。将 backboone 替换为轻量级模型 MobileNetV3_small_x0_35 后，速度可以大幅提升，但是精度显著降低。在将 backbone 替换为 PPLCNet_x1_0 后，精度较 MobileNetV3_small_x0_35 提高约 8.5 个百分点，与此同时速度快 20% 以上。在此基础上，将 PPLCNet_x1_0 的预训练模型替换为 SSLD 预训练模型后，在对推理速度无影响的前提下，精度提升约 4.9 个百分点，进一步地使用 EDA 策略后，精度可以再提升 1.1 个百分点。此时，PPLCNet_x1_0 已经超过 Res2Net200_vd_26w_4s 模型的精度，但是速度快 70+ 倍。最后，在使用 UDML 知识蒸馏后，精度可以再提升 0.08 个百分点。下面详细介绍关于 PULC 安全帽模型的训练方法和推理部署方法。
 
 **备注：**
 
 * `Tpr`指标的介绍可以参考 [3.3小节](#3.3)的备注部分，延时是基于 Intel(R) Xeon(R) Gold 6148 CPU @ 2.40GHz 测试得到，开启MKLDNN加速策略，线程数为10。
-* 关于PPLCNet的介绍可以参考[PPLCNet介绍](../models/PP-LCNet.md)，相关论文可以查阅[PPLCNet paper](https://arxiv.org/abs/2109.15099)。
+    
+* 关于PP-LCNet的介绍可以参考[PP-LCNet介绍](../models/PP-LCNet.md)，相关论文可以查阅[PP-LCNet paper](https://arxiv.org/abs/2109.15099)。
+
 
 <a name="2"></a>
 
 ## 2. 模型快速体验
 
 <a name="2.1"></a>  
+    
+### 2.1 安装 paddlepaddle
+    
+- 您的机器安装的是 CUDA9 或 CUDA10，请运行以下命令安装
 
-### 2.1 安装 paddleclas
+```bash
+python3 -m pip install paddlepaddle-gpu -i https://mirror.baidu.com/pypi/simple
+```
+
+- 您的机器是CPU，请运行以下命令安装
+
+```bash
+python3 -m pip install paddlepaddle -i https://mirror.baidu.com/pypi/simple
+```
+    
+更多的版本需求，请参照[飞桨官网安装文档](https://www.paddlepaddle.org.cn/install/quick)中的说明进行操作。
+    
+<a name="2.2"></a>  
+    
+### 2.2 安装 paddleclas
 
 使用如下命令快速安装 paddleclas
 
 ```  
-pip3 install paddlepaddle paddleclas
-```
+pip3 install paddleclas
+``` 
+    
+<a name="2.3"></a>
 
-<a name="2.2"></a>
-
-### 2.2 预测
+### 2.3 预测
+    
+点击[这里](https://paddleclas.bj.bcebos.com/data/PULC/pulc_demo_imgs.zip)下载 demo 数据并解压，然后在终端中切换到相应目录。
 
 * 使用命令行快速预测
 
 ```bash
-paddleclas --model_name=safety_helmet --infer_imgs=deploy/images/PULC/safety_helmet/safety_helmet_test_1.png
+paddleclas --model_name=safety_helmet --infer_imgs=pulc_demo_imgs/safety_helmet/safety_helmet_test_1.png
 ```
 
 结果如下：
 ```
 >>> result
-class_ids: [1], scores: [0.9986255], label_names: ['unwearing_helmet'], filename: deploy/images/PULC/safety_helmet/safety_helmet_test_1.png
+class_ids: [1], scores: [0.9986255], label_names: ['unwearing_helmet'], filename: pulc_demo_imgs/safety_helmet/safety_helmet_test_1.png
 Predict complete!
 ```
 
-**备注**： 更换其他预测的数据时，只需要改变 `--infer_imgs=xxx` 中的字段即可，支持传入整个文件夹。
+**备注**： 更换其他预测的数据时，只需要改变 `--infer_imgs=xx` 中的字段即可，支持传入整个文件夹。
+
 
 * 在 Python 代码中预测
 ```python
 import paddleclas
 model = paddleclas.PaddleClas(model_name="safety_helmet")
-result = model.predict(input_data="deploy/images/PULC/safety_helmet/safety_helmet_test_1.png")
+result = model.predict(input_data="pulc_demo_imgs/safety_helmet/safety_helmet_test_1.png")
 print(next(result))
 ```
 
-**备注**：`model.predict()` 为可迭代对象（`generator`），因此需要使用 `next()` 函数或 `for` 循环对其迭代调用。每次调用将以 `batch_size` 为单位进行一次预测，并返回预测结果, 默认 `batch_size` 为 1，如果需要更改 `batch_size`，实例化模型时，需要指定 `batch_size`，如 `model = paddleclas.PaddleClas(model_name="safety_helmet",  batch_size=2)`, 使用上述测试代码返回结果示例如下：
+**备注**：`model.predict()` 为可迭代对象（`generator`），因此需要使用 `next()` 函数或 `for` 循环对其迭代调用。每次调用将以 `batch_size` 为单位进行一次预测，并返回预测结果, 默认 `batch_size` 为 1，如果需要更改 `batch_size`，实例化模型时，需要指定 `batch_size`，如 `model = paddleclas.PaddleClas(model_name="safety_helmet",  batch_size=2)`, 使用默认的代码返回结果示例如下：
 
 ```
 >>> result
-[{'class_ids': [1], 'scores': [0.9986255], 'label_names': ['unwearing_helmet'], 'filename': 'deploy/images/PULC/safety_helmet/safety_helmet_test_1.png'}]
+[{'class_ids': [1], 'scores': [0.9986255], 'label_names': ['unwearing_helmet'], 'filename': 'pulc_demo_imgs/safety_helmet/safety_helmet_test_1.png'}]
 ```
 
 <a name="3"></a>
@@ -113,7 +139,7 @@ print(next(result))
 
 ### 3.1 环境配置
 
-* 安装：请先参考 [Paddle 安装教程](../installation/install_paddle.md) 以及 [PaddleClas 安装教程](../installation/install_paddleclas.md) 配置 PaddleClas 运行环境。
+* 安装：请先参考文档 [环境准备](../installation/install_paddleclas.md) 配置 PaddleClas 运行环境。
 
 <a name="3.2"></a>
 
@@ -139,7 +165,7 @@ print(next(result))
 
 处理后的数据集部分数据可视化如下：
 
-![](../../images/PULC/docs/safety_helmet_data_demo.png)
+![](../../images/PULC/docs/safety_helmet_data_demo.jpg)
 
 此处提供了经过上述方法处理好的数据，可以直接下载得到。
 
@@ -191,7 +217,7 @@ python3 -m paddle.distributed.launch \
     -c ./ppcls/configs/PULC/safety_helmet/PPLCNet_x1_0.yaml
 ```
 
-验证集的最佳指标在 `0.975-0.985` 之间（数据集较小，容易造成波动）。
+验证集的最佳指标在 `0.985-0.993` 之间（数据集较小，容易造成波动）。
 
 **备注：**
 
@@ -247,7 +273,7 @@ python3 tools/infer.py \
 
 ### 4.1 UDML 知识蒸馏
 
-UDML 知识蒸馏是一种简单有效的知识蒸馏方法，关于该方法的介绍，可以参考[UDML 知识蒸馏](@ruoyu)。
+UDML 知识蒸馏是一种简单有效的知识蒸馏方法，关于该方法的介绍，可以参考[UDML 知识蒸馏](../advanced_tutorials/knowledge_distillation.md#1.2.3)。
 
 <a name="4.1.1"></a>
 
@@ -269,7 +295,7 @@ python3 -m paddle.distributed.launch \
 
 ## 5. 超参搜索
 
-在 [3.2 节](#3.2)和 [4.1 节](#4.1)所使用的超参数是根据 PaddleClas 提供的 `SHAS 超参数搜索策略` 搜索得到的，如果希望在自己的数据集上得到更好的结果，可以参考[SHAS 超参数搜索策略](#TODO)来获得更好的训练超参数。
+在 [3.2 节](#3.2)和 [4.1 节](#4.1)所使用的超参数是根据 PaddleClas 提供的 `SHAS 超参数搜索策略` 搜索得到的，如果希望在自己的数据集上得到更好的结果，可以参考[SHAS 超参数搜索策略](PULC_train.md#4-超参搜索)来获得更好的训练超参数。
 
 **备注**：此部分内容是可选内容，搜索过程需要较长的时间，您可以根据自己的硬件情况来选择执行。如果没有更换数据集，可以忽略此节内容。
 
@@ -348,7 +374,7 @@ cd ../
 
 ```shell
 # 使用下面的命令使用 GPU 进行预测
-python3.7 python/predict_cls.py -c configs/PULC/safety_helmet/inference_safety_helmet.yaml
+c
 # 使用下面的命令使用 CPU 进行预测
 python3.7 python/predict_cls.py -c configs/PULC/safety_helmet/inference_safety_helmet.yaml -o Global.use_gpu=False
 ```
@@ -409,4 +435,4 @@ PaddleClas 提供了基于 Paddle Lite 来完成模型端侧部署的示例，�
 
 Paddle2ONNX 支持将 PaddlePaddle 模型格式转化到 ONNX 模型格式。通过 ONNX 可以完成将 Paddle 模型到多种推理引擎的部署，包括TensorRT/OpenVINO/MNN/TNN/NCNN，以及其它对 ONNX 开源格式进行支持的推理引擎或硬件。更多关于 Paddle2ONNX 的介绍，可以参考[Paddle2ONNX 代码仓库](https://github.com/PaddlePaddle/Paddle2ONNX)。
 
-PaddleClas 提供了基于 Paddle2ONNX 来完成 inference 模型转换 ONNX 模型并作推理预测的示例，您可以参考[Paddle2ONNX 模型转换与预测](@shuilong)来完成相应的部署工作。
+PaddleClas 提供了基于 Paddle2ONNX 来完成 inference 模型转换 ONNX 模型并作推理预测的示例，您可以参考[Paddle2ONNX 模型转换与预测](../../../deploy/paddle2onnx/readme.md)来完成相应的部署工作。

@@ -126,7 +126,7 @@ function func_inference(){
                         eval $command
                         last_status=${PIPESTATUS[0]}
                         eval "cat ${_save_log_path}"
-                        status_check $last_status "${command}" "../${status_log}"
+                        status_check $last_status "${command}" "../${status_log}" "${model_name}"
                     done
                 done
             done
@@ -151,7 +151,7 @@ function func_inference(){
                         eval $command
                         last_status=${PIPESTATUS[0]}
                         eval "cat ${_save_log_path}"
-                        status_check $last_status "${command}" "../${status_log}"
+                        status_check $last_status "${command}" "../${status_log}" "${model_name}"
                     done
                 done
             done
@@ -198,7 +198,7 @@ elif [[ ${MODE} = "klquant_whole_infer" ]]; then
 	command="${python} ${kl_quant_cmd_value}"
 	eval $command
 	last_status=${PIPESTATUS[0]}
-	status_check $last_status "${command}" "${status_log}"
+	status_check $last_status "${command}" "${status_log}" "${model_name}"
 	cd inference/quant_post_static_model
 	ln -s __model__ inference.pdmodel
 	ln -s __params__ inference.pdiparams
@@ -301,7 +301,7 @@ else
 		# export FLAGS_cudnn_deterministic=True
 		sleep 5
                 eval $cmd
-                status_check $? "${cmd}" "${status_log}"
+                status_check $? "${cmd}" "${status_log}" "${model_name}"
                 sleep 5
 
 		if [[ $FILENAME == *GeneralRecognition* ]]; then
@@ -318,7 +318,7 @@ else
                     set_eval_params1=$(func_set_params "${eval_key1}" "${eval_value1}")
                     eval_cmd="${python} ${eval_py} ${set_eval_pretrain} ${set_use_gpu} ${set_eval_params1}"
                     eval $eval_cmd
-                    status_check $? "${eval_cmd}" "${status_log}"
+                    status_check $? "${eval_cmd}" "${status_log}" "${model_name}"
                     sleep 5
                 fi
                 # run export model
@@ -333,7 +333,7 @@ else
                     set_save_infer_key=$(func_set_params "${save_infer_key}" "${save_infer_path}")
                     export_cmd="${python} ${run_export} ${set_export_weight} ${set_save_infer_key}"
                     eval $export_cmd
-                    status_check $? "${export_cmd}" "${status_log}"
+                    status_check $? "${export_cmd}" "${status_log}" "${model_name}"
 
                     #run inference
                     eval $env

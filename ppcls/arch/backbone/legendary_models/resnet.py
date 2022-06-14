@@ -26,6 +26,7 @@ from paddle.nn.initializer import Uniform
 from paddle.regularizer import L2Decay
 import math
 
+from ppcls.utils import logger
 from ppcls.arch.backbone.base.theseus_layer import TheseusLayer
 from ppcls.utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
 
@@ -306,9 +307,11 @@ class ResNet(TheseusLayer):
             list, tuple
         )), "lr_mult_list should be in (list, tuple) but got {}".format(
             type(self.lr_mult_list))
-        assert len(self.lr_mult_list
-                   ) == 5, "lr_mult_list length should be 5 but got {}".format(
-                       len(self.lr_mult_list))
+        if len(self.lr_mult_list) != 5:
+            msg = "lr_mult_list length should be 5 but got {}, default lr_mult_list used".format(
+                len(self.lr_mult_list))
+            logger.warning(msg)
+            self.lr_mult_list = [1.0, 1.0, 1.0, 1.0, 1.0]
 
         assert isinstance(self.stride_list, (
             list, tuple

@@ -4,8 +4,9 @@
 
 - [1. 模型和应用场景介绍](#1)
 - [2. 模型快速体验](#2)
-  - [2.1 安装 paddleclas](#2.1)  
-  - [2.2 预测](#2.2)
+    - [2.1 安装 paddlepaddle](#2.1)
+    - [2.2 安装 paddleclas](#2.2)
+    - [2.3 预测](#2.3)
 - [3. 模型训练、评估和预测](#3)
   - [3.1 环境配置](#3.1)  
   - [3.2 数据准备](#3.2)
@@ -49,56 +50,77 @@
 
 从表中可以看出，backbone 为 SwinTranformer_tiny 时精度比较高，但是推理速度较慢。将 backboone 替换为轻量级模型 MobileNetV3_small_x0_35 后，速度提升明显，但精度有了大幅下降。将 backbone 替换为 PPLCNet_x1_0 时，速度略为提升，同时精度较 MobileNetV3_small_x0_35 高了 14.24 个百分点。在此基础上，使用 SSLD 预训练模型后，在不改变推理速度的前提下，精度可以提升 0.17 个百分点，进一步地，当使用SHAS超参数搜索策略搜索最优超参数后，精度可以再提升 1.04 个百分点。此时，PPLCNet_x1_0 与 SwinTranformer_tiny 的精度差别不大，但是速度明显变快。关于 PULC 的训练方法和推理部署方法将在下面详细介绍。
 
-**备注：**关于PPLCNet的介绍可以参考[PPLCNet介绍](../models/PP-LCNet.md)，相关论文可以查阅[PPLCNet paper](https://arxiv.org/abs/2109.15099)。
+**备注：** 
+
+* 关于PP-LCNet的介绍可以参考[PP-LCNet介绍](../models/PP-LCNet.md)，相关论文可以查阅[PP-LCNet paper](https://arxiv.org/abs/2109.15099)。
 
 <a name="2"></a>
 
 ## 2. 模型快速体验
 
-<a name="2.1"></a>
+<a name="2.1"></a>  
+    
+### 2.1 安装 paddlepaddle
+    
+- 您的机器安装的是 CUDA9 或 CUDA10，请运行以下命令安装
 
-### 2.1 安装 paddleclas
+```bash
+python3 -m pip install paddlepaddle-gpu -i https://mirror.baidu.com/pypi/simple
+```
+
+- 您的机器是CPU，请运行以下命令安装
+
+```bash
+python3 -m pip install paddlepaddle -i https://mirror.baidu.com/pypi/simple
+```
+    
+更多的版本需求，请参照[飞桨官网安装文档](https://www.paddlepaddle.org.cn/install/quick)中的说明进行操作。
+    
+<a name="2.2"></a>  
+    
+### 2.2 安装 paddleclas
 
 使用如下命令快速安装 paddleclas
 
-```
+```  
 pip3 install paddleclas
-```
+``` 
+    
+<a name="2.3"></a>
 
-<a name="2.2"></a>
+### 2.3 预测
+    
+点击[这里](https://paddleclas.bj.bcebos.com/data/PULC/pulc_demo_imgs.zip)下载 demo 数据并解压，然后在终端中切换到相应目录。
 
-### 2.2 预测
+* 使用命令行快速预测
 
-- 使用命令行快速预测
-
-```
-paddleclas --model_name=text_image_orientation --infer_imgs=deploy/images/PULC/text_image_orientation/img_rot0_demo.jpg
+```bash
+paddleclas --model_name=text_image_orientation --infer_imgs=pulc_demo_imgs/text_image_orientation/img_rot0_demo.jpg
 ```
 
 结果如下：
-
 ```
 >>> result
-class_ids: [0, 2], scores: [0.85615, 0.05046], label_names: ['0', '180'], filename: deploy/images/PULC/text_image_orientation/img_rot0_demo.jpg
+class_ids: [0, 2], scores: [0.85615, 0.05046], label_names: ['0', '180'], filename: pulc_demo_imgs/text_image_orientation/img_rot0_demo.jpg
 Predict complete!
 ```
 
 **备注**： 更换其他预测的数据时，只需要改变 `--infer_imgs=xx` 中的字段即可，支持传入整个文件夹。
 
-- 在 Python 代码中预测
 
-```
+* 在 Python 代码中预测
+```python
 import paddleclas
 model = paddleclas.PaddleClas(model_name="text_image_orientation")
-result = model.predict(input_data="deploy/images/PULC/text_image_orientation/img_rot0_demo.jpg")
+result = model.predict(input_data="pulc_demo_imgs/text_image_orientation/img_rot0_demo.jpg")
 print(next(result))
 ```
 
-**备注**：`model.predict()` 为可迭代对象（`generator`），因此需要使用 `next()` 函数或 `for` 循环对其迭代调用。每次调用将以 `batch_size` 为单位进行一次预测，并返回预测结果, 默认 `batch_size` 为 1，如果需要更改 `batch_size`，实例化模型时，需要指定 `batch_size`，如 `model = paddleclas.PaddleClas(model_name="text_image_orientation", batch_size=2)`, 使用默认的代码返回结果示例如下：
+**备注**：`model.predict()` 为可迭代对象（`generator`），因此需要使用 `next()` 函数或 `for` 循环对其迭代调用。每次调用将以 `batch_size` 为单位进行一次预测，并返回预测结果, 默认 `batch_size` 为 1，如果需要更改 `batch_size`，实例化模型时，需要指定 `batch_size`，如 `model = paddleclas.PaddleClas(model_name="text_image_orientation",  batch_size=2)`, 使用默认的代码返回结果示例如下：
 
 ```
 >>> result
-[{'class_ids': [0, 2], 'scores': [0.85615, 0.05046], 'label_names': ['0', '180'], 'filename': 'deploy/images/PULC/text_image_orientation/img_rot0_demo.jpg'}]
+[{'class_ids': [0, 2], 'scores': [0.85615, 0.05046], 'label_names': ['0', '180'], 'filename': 'pulc_demo_imgs/text_image_orientation/img_rot0_demo.jpg'}]
 ```
 
 <a name="3"></a>
@@ -109,7 +131,7 @@ print(next(result))
 
 ### 3.1 环境配置
 
-- 安装：请先参考 [Paddle 安装教程](../installation/install_paddle.md) 以及 [PaddleClas 安装教程](../installation/install_paddleclas.md) 配置 PaddleClas 运行环境。
+* 安装：请先参考文档 [环境准备](../installation/install_paddleclas.md) 配置 PaddleClas 运行环境。
 
 <a name="3.2"></a>
 
@@ -183,13 +205,13 @@ cd ../
 └── label_list.txt
 ```
 
-其中`img_0/`、`img_90/`、`img_180/`和`img_270/`分别存放了4个角度的训练集和验证集数据。`train_list.txt`和`test_list.txt`分别为训练集和验证集的标签文件，`train_list.txt.debug`和`test_list.txt.debug`分别为训练集和验证集的`debug`标签文件，其分别是`train_list.txt`和`test_list.txt`的子集，用该文件可以快速体验本案例的流程。`distill_data/`是补充文字数据，该集合和`train`集合的混合数据用于本案例的`SKL-UGI知识蒸馏策略`，对应的训练标签文件为`train_list_for_distill.txt`。关于如何得到蒸馏的标签可以参考[知识蒸馏标签获得](@ruoyu)。
+其中`img_0/`、`img_90/`、`img_180/`和`img_270/`分别存放了4个角度的训练集和验证集数据。`train_list.txt`和`test_list.txt`分别为训练集和验证集的标签文件，`train_list.txt.debug`和`test_list.txt.debug`分别为训练集和验证集的`debug`标签文件，其分别是`train_list.txt`和`test_list.txt`的子集，用该文件可以快速体验本案例的流程。`distill_data/`是补充文字数据，该集合和`train`集合的混合数据用于本案例的`SKL-UGI知识蒸馏策略`，对应的训练标签文件为`train_list_for_distill.txt`。关于如何得到蒸馏的标签可以参考[知识蒸馏标签获得](../advanced_tutorials/ssld.md#3.2)。
 
 **备注：**
 
 * 关于 `train_list.txt`、`val_list.txt`的格式说明，可以参考[PaddleClas分类数据集格式说明](../data_preparation/classification_dataset.md#1-数据集格式说明) 。
 
-* 关于如何得到蒸馏的标签文件可以参考[知识蒸馏标签获得方法](@ruoyu)。
+* 关于如何得到蒸馏的标签文件可以参考[知识蒸馏标签获得方法](../advanced_tutorials/ssld.md#3.2)。
 
 <a name="3.3"></a>
 
@@ -207,7 +229,7 @@ python3 -m paddle.distributed.launch \
 
 验证集的最佳指标在0.99左右。
 
-**备注**：本文档中提到的训练指标均为在大规模内部数据上的训练指标，使用demo数据训练时，由于数据集规模较小且分布与大规模内部数据不同，无法达到该指标。可以进一步扩充自己的数据并且使用本案例中介绍的优化方法进行调优，从而达到更高的精度。
+**备注**：本文档中提到的训练指标均为在大规模内部数据上的训练指标，使用 demo 数据训练时，由于数据集规模较小且分布与大规模内部数据不同，无法达到该指标。可以进一步扩充自己的数据并且使用本案例中介绍的优化方法进行调优，从而达到更高的精度。
 
 <a name="3.4"></a>
 
@@ -255,7 +277,7 @@ python3 tools/infer.py \
 
 ### 4.1 SKL-UGI 知识蒸馏
 
-SKL-UGI 知识蒸馏是 PaddleClas 提出的一种简单有效的知识蒸馏方法，关于该方法的介绍，可以参考[SKL-UGI 知识蒸馏](@ruoyu)。
+SKL-UGI 知识蒸馏是 PaddleClas 提出的一种简单有效的知识蒸馏方法，关于该方法的介绍，可以参考[SKL-UGI 知识蒸馏](../advanced_tutorials/ssld.md)。
 
 <a name="4.1.1"></a>
 
@@ -272,15 +294,15 @@ python3 -m paddle.distributed.launch \
         -o Arch.name=ResNet101_vd
 ```
 
-验证集的最佳指标为0.996左右，当前教师模型最好的权重保存在`output/ResNet101_vd/best_model.pdparams`。
+验证集的最佳指标为 0.996 左右，当前教师模型最好的权重保存在`output/ResNet101_vd/best_model.pdparams`。
 
-**备注：** 训练ResNet101_vd模型需要的显存较多，如果机器显存不够，可以将学习率和 batch size 同时缩小一定的倍数进行训练。
+**备注：** 训练 ResNet101_vd 模型需要的显存较多，如果机器显存不够，可以将学习率和 batch size 同时缩小一定的倍数进行训练。如在命令后添加以下参数 `-o DataLoader.Train.sampler.batch_size=64`, `Optimizer.lr.learning_rate=0.1`。
 
 <a name="4.1.2"></a>
 
 #### 4.1.2 蒸馏训练
 
-配置文件`ppcls/configs/PULC/text_image_orientation/PPLCNet_x1_0_distillation.yaml`提供了`SKL-UGI知识蒸馏策略`的配置。该配置将`ResNet101_vd`当作教师模型，`PPLCNet_x1_0`当作学生模型，使用[3.2.2节](#3.2.2)中介绍的蒸馏数据作为新增的无标签数据。训练脚本如下：
+配置文件`ppcls/configs/PULC/text_image_orientation/PPLCNet_x1_0_distillation.yaml`提供了`SKL-UGI 知识蒸馏策略`的配置。该配置将 `ResNet101_vd` 当作教师模型，`PPLCNet_x1_0` 当作学生模型，使用[3.2.2节](#3.2.2)中介绍的蒸馏数据作为新增的无标签数据。训练脚本如下：
 
 ```shell
 export CUDA_VISIBLE_DEVICES=0,1,2,3
@@ -297,7 +319,7 @@ python3 -m paddle.distributed.launch \
 
 ## 5. 超参搜索
 
-在 [3.2 节](#3.2)和 [4.1 节](#4.1)所使用的超参数是根据 PaddleClas 提供的 `SHAS 超参数搜索策略` 搜索得到的，如果希望在自己的数据集上得到更好的结果，可以参考[SHAS 超参数搜索策略](#TODO)来获得更好的训练超参数。
+在 [3.2 节](#3.2)和 [4.1 节](#4.1)所使用的超参数是根据 PaddleClas 提供的 `SHAS 超参数搜索策略` 搜索得到的，如果希望在自己的数据集上得到更好的结果，可以参考[SHAS 超参数搜索策略](PULC_train.md#4-超参搜索)来获得更好的训练超参数。
 
 **备注：** 此部分内容是可选内容，搜索过程需要较长的时间，您可以根据自己的硬件情况来选择执行。如果没有更换数据集，可以忽略此节内容。
 
@@ -435,4 +457,4 @@ PaddleClas 提供了基于 Paddle Lite 来完成模型端侧部署的示例，�
 
 Paddle2ONNX 支持将 PaddlePaddle 模型格式转化到 ONNX 模型格式。通过 ONNX 可以完成将 Paddle 模型到多种推理引擎的部署，包括TensorRT/OpenVINO/MNN/TNN/NCNN，以及其它对 ONNX 开源格式进行支持的推理引擎或硬件。更多关于 Paddle2ONNX 的介绍，可以参考[Paddle2ONNX 代码仓库](https://github.com/PaddlePaddle/Paddle2ONNX)。
 
-PaddleClas 提供了基于 Paddle2ONNX 来完成 inference 模型转换 ONNX 模型并作推理预测的示例，您可以参考[Paddle2ONNX 模型转换与预测](@shuilong)来完成相应的部署工作。
+PaddleClas 提供了基于 Paddle2ONNX 来完成 inference 模型转换 ONNX 模型并作推理预测的示例，您可以参考[Paddle2ONNX 模型转换与预测](../../../deploy/paddle2onnx/readme.md)来完成相应的部署工作。
