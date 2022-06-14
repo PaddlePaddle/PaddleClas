@@ -236,8 +236,8 @@ Different from Python Serving, the C++ Serving client calls C++ OP to predict, s
   [{'bbox': [345, 95, 524, 585], 'rec_docs': 'Red Bull-Enhanced', 'rec_scores': 0.8073724}]
   ```
 
-- turn off the service
-If the service program is running in the foreground, you can press `Ctrl+C` to terminate the server program; if it is running in the background, you can use the kill command to close related processes, or you can execute the following command in the path where the service program is started to terminate the server program:
+- close the service:
+  If the service program is running in the foreground, you can press `Ctrl+C` to terminate the server program; if it is running in the background, you can use the kill command to close related processes, or you can execute the following command in the path where the service program is started to terminate the server program:
   ```bash
   python3.7 -m paddle_serving_server.serve stop
   ```
