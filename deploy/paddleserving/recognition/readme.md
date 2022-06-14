@@ -1,15 +1,17 @@
 简体中文 | [English](./readme_en.md)
+
 # 识别模型服务化部署
 
 ## 目录
 
-- [1. 简介](#1-简介)
-- [2. Serving 安装](#2-serving-安装)
-- [3. 图像识别服务部署](#3-图像识别服务部署)
-  - [3.1 模型转换](#31-模型转换)
-    - [3.2.1 Python Serving](#321-python-serving)
-    - [3.2.2 C++ Serving](#322-c-serving)
-- [4. FAQ](#4-faq)
+  - [1. 简介](#1-简介)
+  - [2. Serving 安装](#2-serving-安装)
+  - [3. 图像识别服务部署](#3-图像识别服务部署)
+    - [3.1 模型转换](#31-模型转换)
+    - [3.2 服务部署和请求](#32-服务部署和请求)
+      - [3.2.1 Python Serving](#321-python-serving)
+      - [3.2.2 C++ Serving](#322-c-serving)
+  - [4. FAQ](#4-faq)
 
 <a name="1"></a>
 ## 1. 简介
@@ -64,6 +66,7 @@ python3.7 -m pip install paddle-serving-server-gpu==0.7.0.post112 # GPU with CUD
 
 使用 PaddleServing 做图像识别服务化部署时，**需要将保存的多个 inference 模型都转换为 Serving 模型**。 下面以 PP-ShiTu 中的超轻量图像识别模型为例，介绍图像识别服务的部署。
 <a name="3.1"></a>
+
 ### 3.1 模型转换
 
 - 进入工作目录：
@@ -95,16 +98,16 @@ python3.7 -m pip install paddle-serving-server-gpu==0.7.0.post112 # GPU with CUD
   上述命令的参数含义与[#3.1 模型转换](#3.1)相同
   通用识别 inference 模型转换完成后，会在当前文件夹多出 `general_PPLCNet_x2_5_lite_v1.0_serving/` 和 `general_PPLCNet_x2_5_lite_v1.0_client/` 的文件夹，具备如下结构：
     ```shell
-  ├── general_PPLCNet_x2_5_lite_v1.0_serving/
-  │   ├── inference.pdiparams
-  │   ├── inference.pdmodel
-  │   ├── serving_server_conf.prototxt
-  │   └── serving_server_conf.stream.prototxt
-  │
-  └── general_PPLCNet_x2_5_lite_v1.0_client/
-        ├── serving_client_conf.prototxt
-        └── serving_client_conf.stream.prototxt
-  ```
+    ├── general_PPLCNet_x2_5_lite_v1.0_serving/
+    │   ├── inference.pdiparams
+    │   ├── inference.pdmodel
+    │   ├── serving_server_conf.prototxt
+    │   └── serving_server_conf.stream.prototxt
+    │
+    └── general_PPLCNet_x2_5_lite_v1.0_client/
+          ├── serving_client_conf.prototxt
+          └── serving_client_conf.stream.prototxt
+    ```
 - 转换通用检测 inference 模型为 Serving 模型：
   ```shell
   # 转换通用检测模型
@@ -118,16 +121,16 @@ python3.7 -m pip install paddle-serving-server-gpu==0.7.0.post112 # GPU with CUD
 
   通用检测 inference 模型转换完成后，会在当前文件夹多出 `picodet_PPLCNet_x2_5_mainbody_lite_v1.0_serving/` 和 `picodet_PPLCNet_x2_5_mainbody_lite_v1.0_client/` 的文件夹，具备如下结构：
     ```shell
-  ├── picodet_PPLCNet_x2_5_mainbody_lite_v1.0_serving/
-  │   ├── inference.pdiparams
-  │   ├── inference.pdmodel
-  │   ├── serving_server_conf.prototxt
-  │   └── serving_server_conf.stream.prototxt
-  │
-  └── picodet_PPLCNet_x2_5_mainbody_lite_v1.0_client/
-        ├── serving_client_conf.prototxt
-        └── serving_client_conf.stream.prototxt
-  ```
+    ├── picodet_PPLCNet_x2_5_mainbody_lite_v1.0_serving/
+    │   ├── inference.pdiparams
+    │   ├── inference.pdmodel
+    │   ├── serving_server_conf.prototxt
+    │   └── serving_server_conf.stream.prototxt
+    │
+    └── picodet_PPLCNet_x2_5_mainbody_lite_v1.0_client/
+          ├── serving_client_conf.prototxt
+          └── serving_client_conf.stream.prototxt
+    ```
   上述命令中参数具体含义如下表所示
     | 参数              | 类型 | 默认值             | 描述                                                         |
   | ----------------- | ---- | ------------------ | ------------------------------------------------------------ |
