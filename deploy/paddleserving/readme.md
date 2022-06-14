@@ -216,8 +216,8 @@ test_cpp_serving_client.py    # rpc方式发送C++ serving预测请求的脚本
   ```log
   prediction: daisy, probability: 0.9341399073600769
   ```
-- 关闭服务
-如果服务程序在前台运行，可以按下`Ctrl+C`来终止服务端程序；如果在后台运行，可以使用kill命令关闭相关进程，也可以在启动服务程序的路径下执行以下命令来终止服务端程序：
+- 关闭服务：
+  如果服务程序在前台运行，可以按下`Ctrl+C`来终止服务端程序；如果在后台运行，可以使用kill命令关闭相关进程，也可以在启动服务程序的路径下执行以下命令来终止服务端程序：
   ```bash
   python3.7 -m paddle_serving_server.serve stop
   ```

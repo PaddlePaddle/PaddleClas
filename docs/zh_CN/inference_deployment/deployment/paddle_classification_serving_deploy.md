@@ -1,1 +1,1 @@
-../../../../deploy/paddleserving/readme.md
+deploy/paddleserving/readme.md
