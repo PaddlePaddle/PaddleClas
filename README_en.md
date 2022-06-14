@@ -62,10 +62,10 @@ Quick experience of **P**ractical **U**ltra **L**ight-weight image **C**lassific
   - [PULC Quick Start](docs/en/PULC/PULC_quickstart_en.md)
   - [PULC Model Zoo](docs/en/PULC/PULC_model_list_en.md)
     - [PULC Classification Model of Someone or Nobody](docs/en/PULC/PULC_person_exists_en.md)
-    - [PULC Classification Model of Person Attribute](docs/en/PULC/PULC_person_attribute_en.md)
+    - [PULC Recognition Model of Person Attribute](docs/en/PULC/PULC_person_attribute_en.md)
     <!-- - [PULC Classification Model of Wearing or Unwearing Safety Helmet](docs/en/PULC/PULC_safety_helmet_en.md) -->
     - [PULC Classification Model of Traffic Sing](docs/en/PULC/PULC_traffic_sign_en.md)
-    - [PULC Classification Model of Vehicle Attribute](docs/en/PULC/PULC_vehicle_attribute_en.md)
+    - [PULC Recognition Model of Vehicle Attribute](docs/en/PULC/PULC_vehicle_attribute_en.md)
     - [PULC Classification Model of Containing or Uncontaining Car](docs/en/PULC/PULC_car_exists_en.md)
     - [PULC Classification Model of Text Image Orientation](docs/en/PULC/PULC_text_image_orientation_en.md)
     <!-- - [PULC Classification Model of Textline Orientation](docs/en/PULC/PULC_textline_orientation_en.md) -->
