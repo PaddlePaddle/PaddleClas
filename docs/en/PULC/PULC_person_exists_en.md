@@ -34,7 +34,6 @@
   - [6.5 Deployment on Mobile](#6.5)
   - [6.6 Converting To ONNX and Deployment](#6.6)
 
-
 <a name="1"></a>
 
 ## 1. Introduction
@@ -52,13 +51,13 @@ The following table lists the relevant indicators of the model. The first two li
 | PPLCNet_x1_0  | 93.43 | 2.12  | 6.5 | using SSLD pretrained + EDA strategy  |
 | <b>PPLCNet_x1_0<b>  | <b>95.60<b> | <b>2.12<b>  | <b>6.5<b> | using SSLD pretrained + EDA strategy + SKL-UGI knowledge distillation strategy|
 
-It can be seen that higt precision can be getted when backbone is SwinTranformer_tiny, but the speed is slow. Replacing backbone with the lightweight model MobileNetV3_small_x0_35, the speed can be greatly improved, but the TPR will be greatly reduced. Replacing backbone with faster backbone PPLCNet_x1_0, the TPR is higher more 20 percentage points higher than MobileNetv3_small_x0_35. At the same time, the speed can be more than 20% faster. After additional using the SSLD pretrained, the TPR can be improved by about 2.6 percentage points without affecting the reasoning speed. Further, additional using the EDA strategy, the TPR can be increased by 1.3 percentage points. Finally, after additional using the SKL-UGI knowledge distillation, the TPR can be further improved by 2.2 percentage points. At this point, the precision close to that of SwinTranformer_tiny is obtained, but the speed is more than 40 times faster. The training method and deployment instructions of PULC will be introduced in detail below.
+It can be seen that high Tpr can be getted when backbone is SwinTranformer_tiny, but the speed is slow. Replacing backbone with the lightweight model MobileNetV3_small_x0_35, the speed can be greatly improved, but the Tpr will be greatly reduced. Replacing backbone with faster backbone PPLCNet_x1_0, the Tpr is higher more 20 percentage points higher than MobileNetv3_small_x0_35. At the same time, the speed can be more than 20% faster. After additional using the SSLD pretrained model, the Tpr can be improved by about 2.6 percentage points without affecting the inference speed. Further, additional using the EDA strategy, the Tpr can be increased by 1.3 percentage points. Finally, after additional using the SKL-UGI knowledge distillation, the Tpr can be further improved by 2.2 percentage points. At this point, the Tpr close to that of SwinTranformer_tiny is obtained, but the speed is more than 40 times faster. The training method and deployment instructions of PULC will be introduced in detail below.
 
-**备注：**
+**Note**:
 
 * About `Tpr` metric, please refer to [3.2 section](#3.2) for more information .
-* The Latency is tested based on Intel(R) Xeon(R) Gold 6148 CPU @ 2.40GHz. The MKLDNN is enabled and the number of threads is 10.
-* About PP-LCNet, please refer to [PP-LCNet Intro](../models/PP-LCNet_en.md) and [PP-LCNet Paper](https://arxiv.org/abs/2109.15099).
+* The Latency is tested on Intel(R) Xeon(R) Gold 6148 CPU @ 2.40GHz. The MKLDNN is enabled and the number of threads is 10.
+* About PP-LCNet, please refer to [PP-LCNet Introduction](../models/PP-LCNet_en.md) and [PP-LCNet Paper](https://arxiv.org/abs/2109.15099).
 
 <a name="2"></a>
 
@@ -123,7 +122,7 @@ result = model.predict(input_data="pulc_demo_imgs/person_exists/objects365_01780
 print(next(result))
 ```
 
-**Note**: The `result` returned by `model.predict()` is an generator, so you need to use the `next()` function or `for` to call it. And it will predict with batch with size of `batch_size` and return the prediction results when called. The `batch_size` default is 1, and you also specify the `batch_size` when instantiating, such as `model = paddleclas.PaddleClas(model_name="person_exists",  batch_size=2)`. The result of demo above:
+**Note**: The `result` returned by `model.predict()` is a generator, so you need to use the `next()` function to call it or `for` loop to loop it. And it will predict with `batch_size` size batch and return the prediction results when called. The default `batch_size` is 1, and you also specify the `batch_size` when instantiating, such as `model = paddleclas.PaddleClas(model_name="person_exists",  batch_size=2)`. The result of demo above:
 
 ```
 >>> result
@@ -156,8 +155,8 @@ All datasets used in this case are open source data. Train data is the subset of
 
 The data used in this case can be getted by processing the open source data. The detailed processes are as follows:
 
-- Training data. This case deals with the annotation file of MS-COCO data training data. If a certain image contains the label of "person" and the area of this box is greater than 10% in the whole image, it is considered that the image contains human. If there is no label of "person" in a certain image, It is considered that the image does not contain human. After processing, 92964 pieces of available data were obtained, including 39813 pieces of human data and 53151 pieces of unmanned data
-- Validation data: randomly select a small part of data from object365 data, use the better model trained on ms-coco to predict these data, take the intersection between the prediction results and the data annotation file, and filter the intersection results into the validation set according to the method of obtaining the training set. After processing, 27820 pieces of available data were obtained. There are 2255 pieces of data with human and 25565 pieces of data without human. The data visualization of the processed dataset is as follows:
+- Training data. This case deals with the annotation file of MS-COCO data training data. If a certain image contains the label of "person" and the area of this box is greater than 10% in the whole image, it is considered that the image contains human. If there is no label of "person" in a certain image, It is considered that the image does not contain human. After processing, 92964 pieces of available data were obtained, including 39813 images containing human and 53151 images without containing human.
+- Validation data: randomly select a small part of data from object365 data, use the better model trained on MS-COCO to predict these data, take the intersection between the prediction results and the data annotation file, and filter the intersection results into the validation set according to the method of obtaining the training set. After processing, 27820 pieces of available data were obtained. There are 2255 pieces of data with human and 25565 pieces of data without human. The data visualization of the processed dataset is as follows:
 
 Some image of the processed dataset is as follows:
 
@@ -169,7 +168,7 @@ And you can also download the data processed directly.
 cd path_to_PaddleClas
 ```
 
-Enter the 'dataset/' directory, download and unzip the dataset.
+Enter the `dataset/` directory, download and unzip the dataset.
 
 ```shell
 cd dataset
@@ -181,7 +180,6 @@ cd ../
 The datas under `person_exists` directory:
 
 ```
-
 ├── train
 │   ├── 000000000009.jpg
 │   ├── 000000000025.jpg
@@ -201,11 +199,12 @@ The datas under `person_exists` directory:
 └── val_list.txt.debug
 ```
 
-Where `train/` and `val/` are training set and validation set respectively. The `train_list.txt` and `val_list.txt` are label files of training data and validation data respectively. The file `train_list.txt.debug` and `val_list.txt.debug` are subset of `train_list.txt` and `val_list.txt` respectively. `ImageNet_val/` is the validation data of ImageNet-1k, which will be used for SKL-UGI konwladeg distillation, and its label file is `train_list_for_distill.txt`.
+Where `train/` and `val/` are training set and validation set respectively. The `train_list.txt` and `val_list.txt` are label files of training data and validation data respectively. The file `train_list.txt.debug` and `val_list.txt.debug` are subset of `train_list.txt` and `val_list.txt` respectively. `ImageNet_val/` is the validation data of ImageNet-1k, which will be used for SKL-UGI knowledge distillation, and its label file is `train_list_for_distill.txt`.
 
 **Note**:
+
 * About the contents format of `train_list.txt` and `val_list.txt`, please refer to [Description about Classification Dataset in PaddleClas](../data_preparation/classification_dataset_en.md).
-* About the `train_list_for_distill.txt`, please refer to [Knowledge Distillation Label] (../advanced_tutorials/ssld_en.md\3.2).
+* About the `train_list_for_distill.txt`, please refer to [Knowledge Distillation Label](../advanced_tutorials/distillation/distillation_en.md).
 
 <a name="3.3"></a>
 
@@ -225,7 +224,7 @@ The best metric of validation data is between `0.94` and `0.95`. There would be 
 
 **Note**:
 
-* The metric Tpr, that describe the True Positive Rate when False Positive Rate is less than a certain threshold(1/1000 used in this case), is one of the commonly used metric for binary classification. About the detaile of Fpr and Tpr, please refer [here](https://en.wikipedia.org/wiki/Receiver_operating_characteristic).
+* The metric Tpr, that describe the True Positive Rate when False Positive Rate is less than a certain threshold(1/1000 used in this case), is one of the commonly used metric for binary classification. About the details of Fpr and Tpr, please refer [here](https://en.wikipedia.org/wiki/Receiver_operating_characteristic).
 * When evaluation, the best metric TprAtFpr will be printed that include `Fpr`, `Tpr` and the current `threshold`. The `Tpr` means the Recall rate under the current `Fpr`. The `Tpr` higher, the model better. The `threshold` would be used in deployment, which means the classification threshold under best `Fpr` metric.
 
 <a name="3.4"></a>
@@ -246,7 +245,7 @@ Among the above command, the argument `-o Global.pretrained_model="output/PPLCNe
 
 ### 3.5 Inference
 
-After training, you can use the model trained to infer. Command is as follow:
+After training, you can use the model that trained to infer. Command is as follow:
 
 ```python
 python3 tools/infer.py \
@@ -274,7 +273,10 @@ The results:
 
 ### 4.1 SKL-UGI Knowledge Distillation
 
-SKL-UGI is a simple but effective knowledge distillation algrithem proposed by PaddleClas. Please refer to [SKL-UGI 知识蒸馏](../advanced_tutorials/distillation/distillation_en.md) for more details.
+SKL-UGI is a simple but effective knowledge distillation algrithem proposed by PaddleClas.
+
+<!-- todo -->
+<!-- Please refer to [SKL-UGI](../advanced_tutorials/distillation/distillation_en.md) for more details. -->
 
 <a name="4.1.1"></a>
 
@@ -308,13 +310,13 @@ python3 -m paddle.distributed.launch \
         -o Arch.models.0.Teacher.pretrained=output/ResNet101_vd/best_model
 ```
 
-The best metri is between `0.95` and `0.97`. The best student model weight would be saved in file `output/DistillationModel/best_model_student.pdparams`.
+The best metric is between `0.95` and `0.97`. The best student model weight would be saved in file `output/DistillationModel/best_model_student.pdparams`.
 
 <a name="5"></a>
 
-## 5. SHAS
+## 5. Hyperparameters Searching
 
-The hyperparameters used by [3.2 section](#3.2) and [4.1 section](#4.1) are according by `SHAS` in PaddleClas. If you want to get better results on your own dataset, you can refer to [SHAS](PULC_train_en.md#4-超参搜索) to get better hyperparameters.
+The hyperparameters used by [3.2 section](#3.2) and [4.1 section](#4.1) are according by `Hyperparameters Searching` in PaddleClas. If you want to get better results on your own dataset, you can refer to [Hyperparameters Searching](PULC_train_en.md#4) to get better hyperparameters.
 
 **Note**: This section is optional. Because the search process will take a long time, you can selectively run according to your specific. If not replace the dataset, you can ignore this section.
 
@@ -326,7 +328,7 @@ The hyperparameters used by [3.2 section](#3.2) and [4.1 section](#4.1) are acco
 
 ### 6.1 Getting Paddle Inference Model
 
-Paddle Inference is the original Inference Library of the PaddlePaddle, provides high-performance inference for server deployment. And compared with  directly based on the pre training model, paddle influence can use tools to accelerate prediction, so as to achieve better reasoning performance. Please refer to [Paddle Inference](https://www.paddlepaddle.org.cn/documentation/docs/zh/guides/infer/inference/inference_cn.html) for more information.
+Paddle Inference is the original Inference Library of the PaddlePaddle, provides high-performance inference for server deployment. And compared with  directly based on the pretrained model, Paddle Inference can use tools to accelerate prediction, so as to achieve better inference performance. Please refer to [Paddle Inference](https://www.paddlepaddle.org.cn/documentation/docs/zh/guides/infer/inference/inference_cn.html) for more information.
 
 Paddle Inference need Paddle Inference Model to predict. Two process provided to get Paddle Inference Model. If want to use the provided by PaddleClas, you can download directly, click [Downloading Inference Model](#6.1.2).
 
@@ -352,13 +354,13 @@ After running above command, the inference model files would be saved in `deploy
 │   └── inference.pdmodel
 ```
 
-**Note**: The best model is from knowledge distillation training. If not knowledge distillation training, the best model would be saved in `output/PPLCNet_x1_0/best_model.pdparams`.
+**Note**: The best model is from knowledge distillation training. If knowledge distillation training is not used, the best model would be saved in `output/PPLCNet_x1_0/best_model.pdparams`.
 
 <a name="6.1.2"></a>
 
 ### 6.1.2 Downloading Inference Model
 
-The process about exporting to Inference Model could be refer in [6.1.1 subsection](#6.1.1). And you also download directly.
+You can also download directly.
 
 ```
 cd deploy/models
@@ -366,7 +368,7 @@ cd deploy/models
 wget https://paddleclas.bj.bcebos.com/models/PULC/person_exists_infer.tar && tar -xf person_exists_infer.tar
 ```
 
-After decompression, the structure of directory `models` should be shown below.
+After decompression, the directory `models` should be shown below.
 
 ```
 ├── person_exists_infer
@@ -389,7 +391,7 @@ Return the directory `deploy`:
 cd ../
 ```
 
-Run the following command to classify whether there are people in the image `./images/PULC/person_exists/objects365_02035329.jpg`.
+Run the following command to classify whether there are human in the image `./images/PULC/person_exists/objects365_02035329.jpg`.
 
 ```shell
 # Use the following command to predict with GPU.
@@ -436,7 +438,7 @@ PaddleClas provides an example about how to deploy with C++. Please refer to [De
 
 ### 6.4 Deployment as Service
 
-Paddle Serving is a flexible, high-performance carrier for machine learning models, and supports different agreement, such as RESTful, gRPC, bRPC and so on, provides different deployment solutions for a variety of heterogeneous hardware and operating system environments. Please refer [Paddle Serving](https://github.com/PaddlePaddle/Serving) for more information.
+Paddle Serving is a flexible, high-performance carrier for machine learning models, and supports different protocol, such as RESTful, gRPC, bRPC and so on, which provides different deployment solutions for a variety of heterogeneous hardware and operating system environments. Please refer [Paddle Serving](https://github.com/PaddlePaddle/Serving) for more information.
 
 PaddleClas provides an example about how to deploy as service by Paddle Serving. Please refer to [Paddle Serving Deployment](../inference_deployment/paddle_serving_deploy_en.md).
 
@@ -444,7 +446,7 @@ PaddleClas provides an example about how to deploy as service by Paddle Serving.
 
 ### 6.5 Deployment on Mobile
 
-Paddle-Lite is an updated version of Paddle-Mobile, an open-open source deep learning framework designed to make it easy to perform inference on mobile, embeded, and IoT devices. It is compatible with PaddlePaddle and pre-trained models from other sources. Please refer to [Paddle-Lite](https://github.com/PaddlePaddle/Paddle-Lite) for more information.
+Paddle-Lite is an open source deep learning framework that designed to make easy to perform inference on mobile, embeded, and IoT devices. Please refer to [Paddle-Lite](https://github.com/PaddlePaddle/Paddle-Lite) for more information.
 
 PaddleClas provides an example of how to deploy on mobile by Paddle-Lite. Please refer to [Paddle-Lite deployment](../inference_deployment/paddle_lite_deploy_en.md).
 
@@ -454,4 +456,4 @@ PaddleClas provides an example of how to deploy on mobile by Paddle-Lite. Please
 
 Paddle2ONNX support convert Paddle Inference model to ONNX model. And you can deploy with ONNX model on different inference engine, such as TensorRT, OpenVINO, MNN/TNN, NCNN and so on. About Paddle2ONNX details, please refer to [Paddle2ONNX](https://github.com/PaddlePaddle/Paddle2ONNX).
 
-PaddleClas provides an example of how to convert Paddle Inference model to ONNX model by paddle2onnx toolkit and predict by ONNX model. You can refer to [paddle2onnx](../../../deploy/paddle2onnx/readme_en.md) for about deployment details.
+PaddleClas provides an example of how to convert Paddle Inference model to ONNX model by paddle2onnx toolkit and predict by ONNX model. You can refer to [paddle2onnx](../../../deploy/paddle2onnx/readme_en.md) for deployment details.
