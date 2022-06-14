@@ -1,6 +1,6 @@
 # Linux GPU/CPU PYTHON 服务化部署测试
 
-Linux GPU/CPU  PYTHON 服务化部署测试的主程序为`test_serving_infer_python.sh`，可以测试基于Python的模型服务化部署功能。
+Linux GPU/CPU  PYTHON 服务化部署测试的主程序为`test_serving_infer_cpp.sh`，可以测试基于Python的模型服务化部署功能。
 
 
 ## 1. 测试结论汇总
@@ -50,9 +50,9 @@ Linux GPU/CPU  PYTHON 服务化部署测试的主程序为`test_serving_infer_py
     ```shell
     python3.7 -m pip install  -r requirements.txt
     ```
-- 安装 PaddleServing 相关组件，包括serving-server、serving_client、serving-app，自动下载并解压推理模型
+- 安装 PaddleServing 相关组件，包括serving_client、serving-app，自动编译并安装带自定义OP的 serving_server 包，以及自动下载并解压推理模型
   ```bash
-  bash test_tipc/prepare.sh test_tipc/configs/ResNet50/ResNet50_linux_gpu_normal_normal_serving_python_linux_gpu_cpu.txt serving_infer
+  bash test_tipc/prepare.sh test_tipc/configs/PPLCNet/PPLCNet_x1_0_linux_gpu_normal_normal_serving_cpp_linux_gpu_cpu.txt serving_infer
   ```
 
 ### 2.3 功能测试
@@ -60,27 +60,31 @@ Linux GPU/CPU  PYTHON 服务化部署测试的主程序为`test_serving_infer_py
 测试方法如下所示，希望测试不同的模型文件，只需更换为自己的参数配置文件，即可完成对应模型的测试。
 
 ```bash
-bash test_tipc/test_serving_infer_python.sh ${your_params_file}
+bash test_tipc/test_serving_infer_cpp.sh ${your_params_file}
 ```
 
-以`ResNet50`的`Linux GPU/CPU PYTHON 服务化部署测试`为例，命令如下所示。
+以`PPLCNet_x1_0`的`Linux GPU/CPU C++ 服务化部署测试`为例，命令如下所示。
 
 
 ```bash
-bash test_tipc/test_serving_infer_python.sh test_tipc/configs/ResNet50/ResNet50_linux_gpu_normal_normal_serving_python_linux_gpu_cpu.txt
+bash test_tipc/test_serving_infer_cpp.sh test_tipc/configs/PPLCNet/PPLCNet_x1_0_linux_gpu_normal_normal_serving_cpp_linux_gpu_cpu.txt
 ```
 
 输出结果如下，表示命令运行成功。
 
 ```
-Run successfully with command - python3.7 pipeline_http_client.py > ../../test_tipc/output/ResNet50/server_infer_gpu_pipeline_http_batchsize_1.log 2>&1!
-Run successfully with command - python3.7 pipeline_http_client.py > ../../test_tipc/output/ResNet50/server_infer_cpu_pipeline_http_batchsize_1.log 2>&1 !
+Run successfully with command - PPLCNet_x1_0 - python3.7 test_cpp_serving_client.py > ../../test_tipc/output/PPLCNet_x1_0/server_infer_cpp_gpu_pipeline_batchsize_1.log 2>&1 !
+Run successfully with command - PPLCNet_x1_0 - python3.7 test_cpp_serving_client.py > ../../test_tipc/output/PPLCNet_x1_0/server_infer_cpp_cpu_pipeline_batchsize_1.log 2>&1 !
 ```
 
-预测结果会自动保存在 `./test_tipc/output/ResNet50/server_infer_gpu_pipeline_http_batchsize_1.log` ，可以看到 PaddleServing 的运行结果：
+预测结果会自动保存在 `./test_tipc/output/PPLCNet_x1_0/server_infer_gpu_pipeline_http_batchsize_1.log` ，可以看到 PaddleServing 的运行结果：
 
 ```
-{'err_no': 0, 'err_msg': '', 'key': ['label', 'prob'], 'value': ["['daisy']", '[0.998314619064331]']}
+WARNING: Logging before InitGoogleLogging() is written to STDERR
+I0612 09:55:16.109890 38303 naming_service_thread.cpp:202] brpc::policy::ListNamingService("127.0.0.1:9292"): added 1
+I0612 09:55:16.172924 38303 general_model.cpp:490] [client]logid=0,client_cost=60.772ms,server_cost=57.6ms.
+prediction: daisy, probability: 0.9099399447441101
+0.06275796890258789
 ```
 
 
