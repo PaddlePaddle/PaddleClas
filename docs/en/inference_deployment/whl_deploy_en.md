@@ -8,6 +8,8 @@ PaddleClas supports Python wheel package for prediction. At present, PaddleClas 
 
 - [1. Installation](#1)
 - [2. Quick Start](#2)
+   - [2.1 ImageNet1k models](#2.1)
+   - [2.2 PULC models](#2.2)
 - [3. Definition of Parameters](#3)
 - [4. More usage](#4)
    - [4.1 View help information](#4.1)
@@ -74,7 +76,6 @@ paddleclas --model_name=ResNet50  --infer_imgs="docs/images/inference_deployment
 filename: docs/images/inference_deployment/whl_demo.jpg, top-5, class_ids: [8, 7, 136, 80, 84], scores: [0.79368, 0.16329, 0.01853, 0.00959, 0.00239], label_names: ['hen', 'cock', 'European gallinule, Porphyrio porphyrio', 'black grouse', 'peacock']
 Predict complete!
 ```
-
 
 <a name="2.2"></a>
 
