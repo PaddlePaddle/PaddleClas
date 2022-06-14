@@ -40,7 +40,7 @@
 
 ## 1. 模型和应用场景介绍
 
-该案例提供了用户使用 PaddleClas 的超轻量图像分类方案（PULC，Practical Ultra Lightweight Classification）快速构建轻量级、高精度、可落地的人体属性识别模型。该模型可以广泛应用于行人分析、行人跟踪等场景。
+该案例提供了用户使用 PaddleClas 的超轻量图像分类方案（PULC，Practical Ultra Lightweight image Classification）快速构建轻量级、高精度、可落地的人体属性识别模型。该模型可以广泛应用于行人分析、行人跟踪等场景。
 
 下表列出了不同人体属性识别模型的相关指标，前两行展现了使用 SwinTransformer_tiny、Res2Net200_vd_26w_4s 和 MobileNetV3_small_x0_35 作为 backbone 训练得到的模型的相关指标，第三行至第六行依次展现了替换 backbone 为 PPLCNet_x1_0、使用 SSLD 预训练模型、使用 SSLD 预训练模型 + EDA 策略、使用 SSLD 预训练模型 + EDA 策略 + SKL-UGI 知识蒸馏策略训练得到的模型的相关指标。
 
@@ -59,6 +59,7 @@
 
 **备注：**
 
+* 延时是基于 Intel(R) Xeon(R) Gold 6148 CPU @ 2.40GHz 测试得到，开启 MKLDNN 加速策略，线程数为10。
 * 关于PP-LCNet的介绍可以参考[PP-LCNet介绍](../models/PP-LCNet.md)，相关论文可以查阅[PP-LCNet paper](https://arxiv.org/abs/2109.15099)。
 
 
@@ -223,7 +224,7 @@ python3 -m paddle.distributed.launch \
         -c ./ppcls/configs/PULC/person_attribute/PPLCNet_x1_0.yaml
 ```
 
-验证集的最佳指标在 `90.07%` 左右（数据集较小，一般有0.3%左右的波动）。
+验证集的最佳指标在 `77.71%` 左右（数据集较小，一般有0.3%左右的波动）。
 
 
 <a name="3.4"></a>
