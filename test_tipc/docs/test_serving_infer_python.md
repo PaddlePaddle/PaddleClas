@@ -1,6 +1,6 @@
 # Linux GPU/CPU PYTHON 服务化部署测试
 
-Linux GPU/CPU  PYTHON 服务化部署测试的主程序为`test_serving_infer.sh`，可以测试基于Python的模型服务化部署功能。
+Linux GPU/CPU  PYTHON 服务化部署测试的主程序为`test_serving_infer_python.sh`，可以测试基于Python的模型服务化部署功能。
 
 
 ## 1. 测试结论汇总
@@ -60,14 +60,14 @@ Linux GPU/CPU  PYTHON 服务化部署测试的主程序为`test_serving_infer.sh
 测试方法如下所示，希望测试不同的模型文件，只需更换为自己的参数配置文件，即可完成对应模型的测试。
 
 ```bash
-bash test_tipc/test_serving_infer.sh ${your_params_file}
+bash test_tipc/test_serving_infer_python.sh ${your_params_file}
 ```
 
 以`ResNet50`的`Linux GPU/CPU PYTHON 服务化部署测试`为例，命令如下所示。
 
 
 ```bash
-bash test_tipc/test_serving_infer.sh test_tipc/configs/ResNet50/ResNet50_linux_gpu_normal_normal_serving_python_linux_gpu_cpu.txt
+bash test_tipc/test_serving_infer_python.sh test_tipc/configs/ResNet50/ResNet50_linux_gpu_normal_normal_serving_python_linux_gpu_cpu.txt
 ```
 
 输出结果如下，表示命令运行成功。
