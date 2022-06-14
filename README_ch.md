@@ -8,16 +8,14 @@
 
 <div align="center">
 <img src="./docs/images/class_simple.gif"  width = "600" />
-<tr>
-PULC实用图像分类模型效果展示
-</tr>
+<p>PULC实用图像分类模型效果展示</p>
 </div>
 &nbsp;
 
 
 <div align="center">
 <img src="./docs/images/recognition.gif"  width = "400" />
-PP-ShiTu图像识别系统效果展示
+<p>PP-ShiTu图像识别系统效果展示</p>
 </div>
 
 
