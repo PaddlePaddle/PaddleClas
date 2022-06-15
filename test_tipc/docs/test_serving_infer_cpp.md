@@ -38,18 +38,25 @@ Linux GPU/CPU C++ 服务化部署测试的主程序为`test_serving_infer_cpp.sh
 
 
 - 安装PaddlePaddle：如果您已经安装了2.2或者以上版本的paddlepaddle，那么无需运行下面的命令安装paddlepaddle。
-    ```shell
-    # 需要安装2.2及以上版本的Paddle
-    # 安装GPU版本的Paddle
-    python3.7 -m pip install paddlepaddle-gpu==2.2.0
-    # 安装CPU版本的Paddle
-    python3.7 -m pip install paddlepaddle==2.2.0
-    ```
+  ```shell
+  # 需要安装2.2及以上版本的Paddle
+  # 安装GPU版本的Paddle
+  python3.7 -m pip install paddlepaddle-gpu==2.2.0
+  # 安装CPU版本的Paddle
+  python3.7 -m pip install paddlepaddle==2.2.0
+  ```
 
 - 安装依赖
-    ```shell
-    python3.7 -m pip install  -r requirements.txt
-    ```
+  ```shell
+  python3.7 -m pip install -r requirements.txt
+  ```
+
+- 安装TensorRT
+  编译 serving-server 的脚本内会设置 `TENSORRT_LIBRARY_PATH` 这一环境变量，因此编译前需要安装TensorRT。
+
+  如果使用`registry.baidubce.com/paddlepaddle/paddle:latest-dev-cuda10.1-cudnn7-gcc82`镜像进测试，则已自带TensorRT无需安装，
+  否则可以参考 [3.2 安装TensorRT](install.md#32-安装tensorrt) 进行安装，并在修改 [build_server.sh](../../deploy/paddleserving/build_server.sh#L62) 的 `TENSORRT_LIBRARY_PATH` 地址为安装后的路径。
+
 - 安装 PaddleServing 相关组件，包括serving_client、serving-app，自动编译并安装带自定义OP的 serving_server 包，以及自动下载并解压推理模型
   ```bash
   # 安装必要依赖包
@@ -73,14 +80,14 @@ Linux GPU/CPU C++ 服务化部署测试的主程序为`test_serving_infer_cpp.sh
 测试方法如下所示，希望测试不同的模型文件，只需更换为自己的参数配置文件，即可完成对应模型的测试。
 
 ```bash
-bash test_tipc/test_serving_infer_cpp.sh ${your_params_file}
+bash test_tipc/test_serving_infer_cpp.sh ${your_params_file} ${mode}
 ```
 
 以`PPLCNet_x1_0`的`Linux GPU/CPU C++ 服务化部署测试`为例，命令如下所示。
 
 
 ```bash
-bash test_tipc/test_serving_infer_cpp.sh test_tipc/configs/PPLCNet/PPLCNet_x1_0_linux_gpu_normal_normal_serving_cpp_linux_gpu_cpu.txt
+bash test_tipc/test_serving_infer_cpp.sh test_tipc/configs/PPLCNet/PPLCNet_x1_0_linux_gpu_normal_normal_serving_cpp_linux_gpu_cpu.txt serving_infer
 ```
 
 输出结果如下，表示命令运行成功。

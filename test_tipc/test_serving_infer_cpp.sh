@@ -211,7 +211,7 @@ function func_serving_rec(){
     unset https_proxy
     unset http_proxy
 
-    export SERVING_BIN=${PWD}/../Serving/server-build-gpu-opencv/core/general-server/serving
+    # export SERVING_BIN=${PWD}/../Serving/server-build-gpu-opencv/core/general-server/serving
     for use_gpu in ${web_use_gpu_list[*]}; do
         if [ ${use_gpu} = "null" ]; then
             det_serving_server_dir_name=$(func_get_url_file_name "$det_serving_server_value")
@@ -249,7 +249,7 @@ function func_serving_rec(){
 
 
 # set cuda device
-GPUID=$2
+GPUID=$3
 if [ ${#GPUID} -le 0 ];then
     env="export CUDA_VISIBLE_DEVICES=0"
 else

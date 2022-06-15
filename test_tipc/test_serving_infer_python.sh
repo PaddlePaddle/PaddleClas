@@ -296,7 +296,7 @@ function func_serving_rec(){
 
 
 # set cuda device
-GPUID=$2
+GPUID=$3
 if [ ${#GPUID} -le 0 ];then
     env="export CUDA_VISIBLE_DEVICES=0"
 else
