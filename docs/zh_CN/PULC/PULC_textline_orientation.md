@@ -42,7 +42,7 @@
 
 该案例提供了用户使用 PaddleClas 的超轻量图像分类方案（PULC，Practical Ultra Lightweight Classification）快速构建轻量级、高精度、可落地的文本行方向分类模型。该模型可以广泛应用于如文字矫正、文字识别等场景。
 
-下表列出了文本行方向分类模型的相关指标，前两行展现了使用 Res2Net200_vd 和 MobileNetV3_large_x1_0 作为 backbone 训练得到的模型的相关指标，第三行至第六行依次展现了替换 backbone 为 PPLCNet_x1_0、使用 SSLD 预训练模型、使用 SSLD 预训练模型 + EDA 策略、使用 SSLD 预训练模型 + EDA 策略 + SKL-UGI 知识蒸馏策略训练得到的模型的相关指标。
+下表列出了文本行方向分类模型的相关指标，前两行展现了使用 Res2Net200_vd 和 MobileNetV3_large_x1_0 作为 backbone 训练得到的模型的相关指标，第三行至第七行依次展现了替换 backbone 为 PPLCNet_x1_0、使用 SSLD 预训练模型、使用 SSLD 预训练模型 + EDA 策略、使用 SSLD 预训练模型 + EDA 策略 + SKL-UGI 知识蒸馏策略训练得到的模型的相关指标。
 
 
 | 模型 | Top-1 Acc（%） | 延时（ms） | 存储（M） | 策略 |

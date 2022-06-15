@@ -1,4 +1,4 @@
-# PULC Classification Model of Someone or Nobody
+# PULC Classification Model of Textline Orientation
 
 ------
 
@@ -38,24 +38,25 @@
 
 ## 1. Introduction
 
-This case provides a way for users to quickly build a lightweight, high-precision and practical classification model of human exists using PaddleClas PULC (Practical Ultra Lightweight Classification). The model can be widely used in monitoring scenarios, personnel access control scenarios, massive data filtering scenarios, etc.
+This case provides a way for users to quickly build a lightweight, high-precision and practical classification model of textline orientation using PaddleClas PULC (Practical Ultra Lightweight Classification). The model can be widely used in character correction, character recognition, etc.
 
-The following table lists the relevant indicators of the model. The first two lines means that using SwinTransformer_tiny and MobileNetV3_small_x0_35 as the backbone to training. The third to sixth lines means that the backbone is replaced by PPLCNet, additional use of EDA strategy and additional use of EDA strategy and SKL-UGI knowledge distillation strategy.
+The following table lists the relevant indicators of the model. The first two lines means that using SwinTransformer_tiny and MobileNetV3_small_x0_35 as the backbone to training. The third to seventh lines means that the backbone is replaced by PPLCNet, additional use of EDA strategy and additional use of EDA strategy and SKL-UGI knowledge distillation strategy.
 
-| Backbone | Tpr(%) | Latency(ms) | Size(M)| Training Strategy |
+| Backbone | Top-1 Acc(%) | Latency(ms) | Size(M)| Training Strategy |
 |-------|-----------|----------|---------------|---------------|
-| SwinTranformer_tiny  | 95.69 | 95.30  | 107 | using ImageNet pretrained model |
-| MobileNetV3_small_x0_35  | 68.25 | 2.85  | 1.6 | using ImageNet pretrained model |
-| PPLCNet_x1_0  | 89.57 | 2.12  | 6.5 | using ImageNet pretrained model |
-| PPLCNet_x1_0  | 92.10 | 2.12  | 6.5 | using SSLD pretrained model |
-| PPLCNet_x1_0  | 93.43 | 2.12  | 6.5 | using SSLD pretrained model + EDA strategy  |
-| <b>PPLCNet_x1_0<b>  | <b>95.60<b> | <b>2.12<b>  | <b>6.5<b> | using SSLD pretrained model + EDA strategy + SKL-UGI knowledge distillation strategy|
+| SwinTranformer_tiny  | 93.61 | 89.64  | 107 |  using ImageNet pretrained model |
+| MobileNetV3_small_x0_35  | 81.40 | 2.96  | 17 |  using ImageNet pretrained model |
+| PPLCNet_x1_0  | 89.99 | 2.11  | 6.5 |  using ImageNet pretrained model |
+| PPLCNet_x1_0*  | 94.06 | 2.68  | 6.5 | using ImageNet pretrained model |
+| PPLCNet_x1_0*  | 94.11 | 2.68  | 6.5 | using SSLD pretrained model |
+| <b>PPLCNet_x1_0**<b>  | <b>96.01<b> | <b>2.72<b>  | <b>6.5<b> | using SSLD pretrained model + EDA strategy  |
+| PPLCNet_x1_0**  | 95.86 | 2.72  | 6.5 | using SSLD pretrained model + EDA strategy + SKL-UGI knowledge distillation strategy|
 
-It can be seen that high Tpr can be getted when backbone is SwinTranformer_tiny, but the speed is slow. Replacing backbone with the lightweight model MobileNetV3_small_x0_35, the speed can be greatly improved, but the Tpr will be greatly reduced. Replacing backbone with faster backbone PPLCNet_x1_0, the Tpr is higher more 20 percentage points than MobileNetv3_small_x0_35. At the same time, the speed can be more than 20% faster. After additional using the SSLD pretrained model, the Tpr can be improved by about 2.6 percentage points without affecting the inference speed. Further, additional using the EDA strategy, the Tpr can be increased by 1.3 percentage points. Finally, after additional using the SKL-UGI knowledge distillation, the Tpr can be further improved by 2.2 percentage points. At this point, the Tpr is close to that of SwinTranformer_tiny, but the speed is more than 40 times faster. The training method and deployment instructions of PULC will be introduced in detail below.
+It can be seen that high accuracy can be getted when backbone is SwinTranformer_tiny, but the speed is slow. Replacing backbone with the lightweight model MobileNetV3_small_x0_35, the speed can be greatly improved, but the accuracy will be greatly reduced. Replacing backbone with faster backbone PPLCNet_x1_0, the accuracy is higher more 8.6 percentage points than MobileNetv3_small_x0_35. At the same time, the speed can be more than 10% faster. On this basis, by changing the resolution and stripe (refer to [PaddleOCR](https://github.com/PaddlePaddle/PaddleOCR)), the speed becomes 27% slower, but the accuracy can be improved by 4.5 percentage points. After additional using the SSLD pretrained model, the accuracy can be improved by about 0.05 percentage points without affecting the inference speed. Finally, additional using the EDA strategy, the accuracy can be increased by 1.9 percentage points. The training method and deployment instructions of PULC will be introduced in detail below.
 
 **Note**:
-
-* About `Tpr` metric, please refer to [3.2 section](#3.2) for more information .
+* Backbone name without \* means the resolution is 224x224, and with \* means the resolution is 48x192 (h\*w). The stride of the network is changed to `[2, [2, 1], [2, 1], [2, 1]`. Please refer to [PaddleOCR]（ https://github.com/PaddlePaddle/PaddleOCR）for more details.
+* Backbone name with \*\* means that the resolution is 80x160 (h\*w), and the stride of the network is changed to `[2, [2, 1], [2, 1], [2, 1]]`. This resolution is searched by [Hyperparameter Searching](pulc_train_en.md#4).
 * The Latency is tested on Intel(R) Xeon(R) Gold 6148 CPU @ 2.40GHz. The MKLDNN is enabled and the number of threads is 10.
 * About PP-LCNet, please refer to [PP-LCNet Introduction](../models/PP-LCNet_en.md) and [PP-LCNet Paper](https://arxiv.org/abs/2109.15099).
 
@@ -100,13 +101,14 @@ First, please click [here](https://paddleclas.bj.bcebos.com/data/PULC/pulc_demo_
 * Prediction with CLI
 
 ```bash
-paddleclas --model_name=person_exists --infer_imgs=pulc_demo_imgs/person_exists/objects365_01780782.jpg
+paddleclas --model_name=textline_orientation --infer_imgs=pulc_demo_imgs/textline_orientation/textline_orientation_test_0_0.png
 ```
 
 Results:
+
 ```
 >>> result
-class_ids: [0], scores: [0.9955421453341842], label_names: ['nobody'], filename: pulc_demo_imgs/person_exists/objects365_01780782.jpg
+class_ids: [0], scores: [1.0], label_names: ['0_degree'], filename: pulc_demo_imgs/textline_orientation/textline_orientation_test_0_0.png
 Predict complete!
 ```
 
@@ -116,16 +118,16 @@ Predict complete!
 
 ```python
 import paddleclas
-model = paddleclas.PaddleClas(model_name="person_exists")
-result = model.predict(input_data="pulc_demo_imgs/person_exists/objects365_01780782.jpg")
+model = paddleclas.PaddleClas(model_name="textline_orientation")
+result = model.predict(input_data="pulc_demo_imgs/textline_orientation/textline_orientation_test_0_0.png")
 print(next(result))
 ```
 
-**Note**: The `result` returned by `model.predict()` is a generator, so you need to use the `next()` function to call it or `for` loop to loop it. And it will predict with `batch_size` size batch and return the prediction results when called. The default `batch_size` is 1, and you also specify the `batch_size` when instantiating, such as `model = paddleclas.PaddleClas(model_name="person_exists",  batch_size=2)`. The result of demo above:
+**Note**: The `result` returned by `model.predict()` is a generator, so you need to use the `next()` function to call it or `for` loop to loop it. And it will predict with `batch_size` size batch and return the prediction results when called. The default `batch_size` is 1, and you also specify the `batch_size` when instantiating, such as `model = paddleclas.PaddleClas(model_name="textline_orientation",  batch_size=2)`. The result of demo above:
 
 ```
 >>> result
-[{'class_ids': [0], 'scores': [0.9955421453341842], 'label_names': ['nobody'], 'filename': 'pulc_demo_imgs/person_exists/objects365_01780782.jpg'}]
+[{'class_ids': [0], 'scores': [1.0], 'label_names': ['0_degree'], 'filename': 'pulc_demo_imgs/textline_orientation/textline_orientation_test_0_0.png'}]
 ```
 
 <a name="3"></a>
@@ -146,20 +148,20 @@ Please refer to [Installation](../installation/install_paddleclas_en.md) to get 
 
 #### 3.2.1 Dataset Introduction
 
-All datasets used in this case are open source data. Train data is the subset of [MS-COCO](https://cocodataset.org/#overview) training data. And the validation data is the subset of [Object365](https://www.objects365.org/overview.html) training data. ImageNet_val is [ImageNet-1k](https://www.image-net.org/) validation data.
+The data used in this case come from internal data. If you want to experience the training process, you can use open source data, such as [ICDAR2019-LSVT](https://aistudio.baidu.com/aistudio/datasetdetail/8429).
 
 <a name="3.2.2"></a>  
 
 #### 3.2.2 Getting Dataset
 
-The data used in this case can be getted by processing the open source data. The detailed processes are as follows:
+Take ICDAR2019-LSVT for example, images with ID numbers from 0 to 1999 would be processed and used. After rotation, it is divided into class 0 or class 1. Class 0 means that the textline rotation angle is 0 degrees, and class 1 means 180 degrees.
 
-- Training data. This case deals with the annotation file of MS-COCO data training data. If a certain image contains the label of "person" and the area of this box is greater than 10% in the whole image, it is considered that the image contains human. If there is no label of "person" in a certain image, It is considered that the image does not contain human. After processing, 92964 pieces of available data were obtained, including 39813 images containing human and 53151 images without containing human.
-- Validation data: randomly select a small part of data from object365 data, use the better model trained on MS-COCO to predict these data, take the intersection between the prediction results and the data annotation file, and filter the intersection results into the validation set according to the method of obtaining the training set. After processing, 27820 pieces of available data were obtained. There are 2255 pieces of data with human and 25565 pieces of data without human. The data visualization of the processed dataset is as follows:
+- Training data: The images with ID number from 0 to 1799 are used as the training set. 3600 images in total.
+- Evaluation data: The images with ID number from 1800 to 1999 are used as the evaluation set. 400 images in total.
 
 Some image of the processed dataset is as follows:
 
-![](../../images/PULC/docs/person_exists_data_demo.png)
+![](../../images/PULC/docs/textline_orientation_data_demo.png)
 
 And you can also download the data processed directly.
 
@@ -171,60 +173,51 @@ Enter the `dataset/` directory, download and unzip the dataset.
 
 ```shell
 cd dataset
-wget https://paddleclas.bj.bcebos.com/data/PULC/person_exists.tar
-tar -xf person_exists.tar
+wget https://paddleclas.bj.bcebos.com/data/PULC/textline_orientation.tar
+tar -xf textline_orientation.tar
 cd ../
 ```
 
-The datas under `person_exists` directory:
+The datas under `textline_orientation` directory:
 
 ```
-├── train
-│   ├── 000000000009.jpg
-│   ├── 000000000025.jpg
+├── 0
+│   ├── img_0.jpg
+│   ├── img_1.jpg
 ...
-├── val
-│   ├── objects365_01780637.jpg
-│   ├── objects365_01780640.jpg
-...
-├── ImageNet_val
-│   ├── ILSVRC2012_val_00000001.JPEG
-│   ├── ILSVRC2012_val_00000002.JPEG
+├── 1
+│   ├── img_0.jpg
+│   ├── img_1.jpg
 ...
 ├── train_list.txt
-├── train_list.txt.debug
-├── train_list_for_distill.txt
-├── val_list.txt
-└── val_list.txt.debug
+└── val_list.txt
 ```
 
-Where `train/` and `val/` are training set and validation set respectively. The `train_list.txt` and `val_list.txt` are label files of training data and validation data respectively. The file `train_list.txt.debug` and `val_list.txt.debug` are subset of `train_list.txt` and `val_list.txt` respectively. `ImageNet_val/` is the validation data of ImageNet-1k, which will be used for SKL-UGI knowledge distillation, and its label file is `train_list_for_distill.txt`.
+其中 `0/` 和 `1/` 分别存放 0 类和 1 类的数据。`train_list.txt` 和 `val_list.txt` 分别为训练集和验证集的标签文件。
+
+Where `0/` and `1/` are class 0 and class 1 data respectively. The `train_list.txt` and `val_list.txt` are label files of training data and validation data respectively.
 
 **Note**:
 
 * About the contents format of `train_list.txt` and `val_list.txt`, please refer to [Description about Classification Dataset in PaddleClas](../data_preparation/classification_dataset_en.md).
-* About the `train_list_for_distill.txt`, please refer to [Knowledge Distillation Label](../advanced_tutorials/distillation/distillation_en.md).
 
 <a name="3.3"></a>
 
 ### 3.3 Training
 
-The details of training config in `ppcls/configs/PULC/person_exists/PPLCNet_x1_0.yaml`. The command about training as follows:
+The details of training config in `ppcls/configs/PULC/textline_orientation/PPLCNet_x1_0.yaml`. The command about training as follows:
 
 ```shell
 export CUDA_VISIBLE_DEVICES=0,1,2,3
 python3 -m paddle.distributed.launch \
     --gpus="0,1,2,3" \
     tools/train.py \
-        -c ./ppcls/configs/PULC/person_exists/PPLCNet_x1_0.yaml
+        -c ./ppcls/configs/PULC/textline_orientation/PPLCNet_x1_0.yaml
 ```
-
-The best metric of validation data is between `0.94` and `0.95`. There would be fluctuations because the data size is small.
 
 **Note**:
 
-* The metric Tpr, that describe the True Positive Rate when False Positive Rate is less than a certain threshold(1/1000 used in this case), is one of the commonly used metric for binary classification. About the details of Fpr and Tpr, please refer [here](https://en.wikipedia.org/wiki/Receiver_operating_characteristic).
-* When evaluation, the best metric TprAtFpr will be printed that include `Fpr`, `Tpr` and the current `threshold`. The `Tpr` means the Recall rate under the current `Fpr`. The `Tpr` higher, the model better. The `threshold` would be used in deployment, which means the classification threshold under best `Fpr` metric.
+* Because the ICDAR2019-LSVT data set is different from the dataset used in the provided pretrained model. If you want to get higher accuracy, you can process [ICDAR2019-LSVT](https://aistudio.baidu.com/aistudio/datasetdetail/8429).
 
 <a name="3.4"></a>
 
@@ -234,7 +227,7 @@ After training, you can use the following commands to evaluate the model.
 
 ```bash
 python3 tools/eval.py \
-    -c ./ppcls/configs/PULC/person_exists/PPLCNet_x1_0.yaml \
+    -c ./ppcls/configs/PULC/textline_orientation/PPLCNet_x1_0.yaml \
     -o Global.pretrained_model="output/PPLCNet_x1_0/best_model"
 ```
 
@@ -248,21 +241,20 @@ After training, you can use the model that trained to infer. Command is as follo
 
 ```python
 python3 tools/infer.py \
-    -c ./ppcls/configs/PULC/person_exists/PPLCNet_x1_0.yaml \
+    -c ./ppcls/configs/PULC/textline_orientation/PPLCNet_x1_0.yaml \
     -o Global.pretrained_model=output/PPLCNet_x1_0/best_model
 ```
 
 The results:
 
 ```
-[{'class_ids': [1], 'scores': [0.9999976], 'label_names': ['someone'], 'file_name': 'deploy/images/PULC/person_exists/objects365_02035329.jpg'}]
+[{'class_ids': [0], 'scores': [1.0], 'file_name': 'deploy/images/PULC/textline_orientation/textline_orientation_test_0_0.png', 'label_names': ['0_degree']}]
 ```
 
 **Note**:
 
 * Among the above command, argument `-o Global.pretrained_model="output/PPLCNet_x1_0/best_model"` specify the path of the best model weight file. You can specify other path if needed.
-* The default test image is `deploy/images/PULC/person_exists/objects365_02035329.jpg`. And you can test other image, only need to specify the argument `-o Infer.infer_imgs=path_to_test_image`.
-* The default threshold is `0.5`. If needed, you can specify the argument `Infer.PostProcess.threshold`, such as: `-o Infer.PostProcess.threshold=0.9794`. And the argument `threshold` is needed to be specified according by specific case. The `0.9794` is the best threshold when `Fpr` is less than `1/1000` in this valuation dataset.
+* The default test image is `deploy/images/PULC/textline_orientation/textline_orientation_test_0_0.png`. And you can test other image, only need to specify the argument `-o Infer.infer_imgs=path_to_test_image`.
 
 <a name="4"></a>
 
@@ -281,14 +273,14 @@ SKL-UGI is a simple but effective knowledge distillation algrithem proposed by P
 
 #### 4.1.1 Teacher Model Training
 
-Training the teacher model with hyperparameters specified in `ppcls/configs/PULC/person_exists/PPLCNet/PPLCNet_x1_0.yaml`. The command is as follow:
+Training the teacher model with hyperparameters specified in `ppcls/configs/PULC/textline_orientation/PPLCNet/PPLCNet_x1_0.yaml`. The command is as follow:
 
 ```shell
 export CUDA_VISIBLE_DEVICES=0,1,2,3
 python3 -m paddle.distributed.launch \
     --gpus="0,1,2,3" \
     tools/train.py \
-        -c ./ppcls/configs/PULC/person_exists/PPLCNet_x1_0.yaml \
+        -c ./ppcls/configs/PULC/textline_orientation/PPLCNet_x1_0.yaml \
         -o Arch.name=ResNet101_vd
 ```
 
@@ -298,14 +290,14 @@ The best metric of validation data is between `0.96` and `0.98`. The best teache
 
 #### 4.1.2 Knowledge Distillation Training
 
-The training strategy, specified in training config file `ppcls/configs/PULC/person_exists/PPLCNet_x1_0_distillation.yaml`, the teacher model is `ResNet101_vd`, the student model is `PPLCNet_x1_0` and the additional unlabeled training data is validation data of ImageNet1k. The command is as follow:
+The training strategy, specified in training config file `ppcls/configs/PULC/textline_orientation/PPLCNet_x1_0_distillation.yaml`, the teacher model is `ResNet101_vd` and the student model is `PPLCNet_x1_0`. The command is as follow:
 
 ```shell
 export CUDA_VISIBLE_DEVICES=0,1,2,3
 python3 -m paddle.distributed.launch \
     --gpus="0,1,2,3" \
     tools/train.py \
-        -c ./ppcls/configs/PULC/person_exists/PPLCNet_x1_0_distillation.yaml \
+        -c ./ppcls/configs/PULC/textline_orientation/PPLCNet_x1_0_distillation.yaml \
         -o Arch.models.0.Teacher.pretrained=output/ResNet101_vd/best_model
 ```
 
@@ -339,15 +331,15 @@ The command about exporting Paddle Inference Model is as follow:
 
 ```bash
 python3 tools/export_model.py \
-    -c ./ppcls/configs/PULC/person_exists/PPLCNet_x1_0.yaml \
-    -o Global.pretrained_model=output/DistillationModel/best_model_student \
-    -o Global.save_inference_dir=deploy/models/PPLCNet_x1_0_person_exists_infer
+    -c ./ppcls/configs/PULC/textline_orientation/PPLCNet_x1_0.yaml \
+    -o Global.pretrained_model=output/PPLCNet_x1_0/best_model \
+    -o Global.save_inference_dir=deploy/models/PPLCNet_x1_0_textline_orientation_infer
 ```
 
-After running above command, the inference model files would be saved in `deploy/models/PPLCNet_x1_0_person_exists_infer`, as shown below:
+After running above command, the inference model files would be saved in `deploy/models/PPLCNet_x1_0_textline_orientation_infer`, as shown below:
 
 ```
-├── PPLCNet_x1_0_person_exists_infer
+├── PPLCNet_x1_0_textline_orientation_infer
 │   ├── inference.pdiparams
 │   ├── inference.pdiparams.info
 │   └── inference.pdmodel
@@ -363,14 +355,14 @@ You can also download directly.
 
 ```
 cd deploy/models
-# download the inference model and decompression
-wget https://paddleclas.bj.bcebos.com/models/PULC/person_exists_infer.tar && tar -xf person_exists_infer.tar
+# 下载 inference 模型并解压
+wget https://paddleclas.bj.bcebos.com/models/PULC/textline_orientation_infer.tar && tar -xf textline_orientation_infer.tar
 ```
 
 After decompression, the directory `models` should be shown below.
 
 ```
-├── person_exists_infer
+├── textline_orientation_infer
 │   ├── inference.pdiparams
 │   ├── inference.pdiparams.info
 │   └── inference.pdmodel
@@ -390,22 +382,20 @@ Return the directory `deploy`:
 cd ../
 ```
 
-Run the following command to classify whether there are humans in the image `./images/PULC/person_exists/objects365_02035329.jpg`.
+Run the following command to classify the rotation of image `./images/PULC/textline_orientation/objects365_02035329.jpg`.
 
 ```shell
 # Use the following command to predict with GPU.
-python3.7 python/predict_cls.py -c configs/PULC/person_exists/inference_person_exists.yaml
+python3.7 python/predict_cls.py -c configs/PULC/textline_orientation/inference_textline_orientation.yaml
 # Use the following command to predict with CPU.
-python3.7 python/predict_cls.py -c configs/PULC/person_exists/inference_person_exists.yaml -o Global.use_gpu=False
+python3.7 python/predict_cls.py -c configs/PULC/textline_orientation/inference_textline_orientation.yaml  -o Global.use_gpu=False
 ```
 
 The prediction results:
 
 ```
-objects365_02035329.jpg:    class id(s): [1], score(s): [1.00], label_name(s): ['someone']
+textline_orientation_test_0_0.png:    class id(s): [0], score(s): [1.00], label_name(s): ['0_degree']
 ```
-
-**Note**: The default threshold is `0.5`. If needed, you can specify the argument `Infer.PostProcess.threshold`, such as: `-o Infer.PostProcess.threshold=0.9794`. And the argument `threshold` is needed to be specified according by specific case. The `0.9794` is the best threshold when `Fpr` is less than `1/1000` in this valuation dataset. Please refer to [3.3 section](#3.3) for details.
 
 <a name="6.2.2"></a>  
 
@@ -415,17 +405,19 @@ If you want to predict images in directory, please specify the argument `Global.
 
 ```shell
 # Use the following command to predict with GPU. If want to replace with CPU, you can add argument -o Global.use_gpu=False
-python3.7 python/predict_cls.py -c configs/PULC/person_exists/inference_person_exists.yaml -o Global.infer_imgs="./images/PULC/person_exists/"
+python3.7 python/predict_cls.py -c configs/PULC/textline_orientation/inference_textline_orientation.yaml -o Global.infer_imgs="./images/PULC/textline_orientation/"
 ```
 
 All prediction results will be printed, as shown below.
 
 ```
-objects365_01780782.jpg:    class id(s): [0], score(s): [1.00], label_name(s): ['nobody']
-objects365_02035329.jpg:    class id(s): [1], score(s): [1.00], label_name(s): ['someone']
+textline_orientation_test_0_0.png:    class id(s): [0], score(s): [1.00], label_name(s): ['0_degree']
+textline_orientation_test_0_1.png:    class id(s): [0], score(s): [1.00], label_name(s): ['0_degree']
+textline_orientation_test_1_0.png:    class id(s): [1], score(s): [1.00], label_name(s): ['180_degree']
+textline_orientation_test_1_1.png:    class id(s): [1], score(s): [1.00], label_name(s): ['180_degree']
 ```
 
-Among the prediction results above, `someone` means that there is a human in the image, `nobody` means that there is no human in the image.
+Among the prediction results above, `0_degree` means that the rotation angle of the textline image is 0, and `180_degree` means that 180.
 
 <a name="6.3"></a>
 
