@@ -205,7 +205,7 @@ if [[ ${MODE} = "serving_infer" ]]; then
     python_name=$(func_parser_value "${lines[2]}")
     if [[ ${FILENAME} =~ "cpp" ]]; then
         pushd ./deploy/paddleserving
-        bash build_server.sh ${python_name}
+        source build_server.sh ${python_name}
         popd
     else
         ${python_name} -m pip install install paddle-serving-server-gpu==0.9.0.post101 -i https://pypi.tuna.tsinghua.edu.cn/simple
