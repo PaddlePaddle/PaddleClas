@@ -48,7 +48,7 @@ The following table lists the relevant indicators of the model. The first two li
 | PPLCNet_x1_0            | 98.02     | 2.16       | 6.5       | using SSLD pretrained model           |
 | **PPLCNet_x1_0**        | **99.06** | **2.16**   | **6.5**   | using SSLD pretrained model + hyperparameters searching strategy |
 
-It can be seen that high Tpr can be getted when backbone is SwinTranformer_tiny, but the speed is slow. Replacing backbone with the lightweight model MobileNetV3_small_x0_35, the speed can be greatly improved, but the Tpr will be greatly reduced. Replacing backbone with faster backbone PPLCNet_x1_0, the Tpr is higher more 14 percentage points than MobileNetv3_small_x0_35. At the same time, the speed can be more faster. After additional using the SSLD pretrained model, the accuracy can be improved by about 0.17 percentage points without affecting the inference speed. Finally, after additional using the hyperparameters searching strategy, the accuracy can be further improved by 1.04 percentage points. At this point, the Tpr close to that of SwinTranformer_tiny, but the speed is more faster. The training method and deployment instructions of PULC will be introduced in detail below.
+It can be seen that high accuracy can be getted when backbone is SwinTranformer_tiny, but the speed is slow. Replacing backbone with the lightweight model MobileNetV3_small_x0_35, the speed can be greatly improved, but the accuracy will be greatly reduced. Replacing backbone with faster backbone PPLCNet_x1_0, the accuracy is higher more 14 percentage points than MobileNetv3_small_x0_35. At the same time, the speed can be more faster. After additional using the SSLD pretrained model, the accuracy can be improved by about 0.17 percentage points without affecting the inference speed. Finally, after additional using the hyperparameters searching strategy, the accuracy can be further improved by 1.04 percentage points. At this point, the accuracy is close to that of SwinTranformer_tiny, but the speed is more faster. The training method and deployment instructions of PULC will be introduced in detail below.
 
 **Note**:
 
@@ -160,7 +160,6 @@ Some image of the processed dataset is as follows:
 ![](../../images/PULC/docs/text_image_orientation_data_demo.png)
 
 And you can also download the data processed directly.
-
 
 ```
 cd path_to_PaddleClas
@@ -307,7 +306,7 @@ The best metric of validation data is about `0.996`. The best teacher model weig
 
 #### 4.1.2 Knowledge Distillation Training
 
-The training strategy, specified in training config file `ppcls/configs/PULC/text_image_orientation/PPLCNet_x1_0_distillation.yaml`, the teacher model is `ResNet101_vd`, the student model is `PPLCNet_x1_0` and the additional unlabeled training data is validation data of ImageNet1k.
+The training strategy, specified in training config file `ppcls/configs/PULC/text_image_orientation/PPLCNet_x1_0_distillation.yaml`, the teacher model is `ResNet101_vd` and the student model is `PPLCNet_x1_0`.
 
 The command is as follow:
 

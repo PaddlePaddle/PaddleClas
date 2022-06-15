@@ -1,6 +1,6 @@
-# PULC Classification Model of Textline Orientation
+# PULC Classification Model of Wheather Wearing Safety Helmet or Not
 
-------
+-----
 
 ## Catalogue
 
@@ -38,25 +38,25 @@
 
 ## 1. Introduction
 
-This case provides a way for users to quickly build a lightweight, high-precision and practical classification model of textline orientation using PaddleClas PULC (Practical Ultra Lightweight Classification). The model can be widely used in character correction, character recognition, etc.
+This case provides a way for users to quickly build a lightweight, high-precision and practical classification model of wheather wearing safety helmet using PaddleClas PULC (Practical Ultra Lightweight Classification). The model can be widely used in construction scenes, factory workshop scenes, traffic scenes and so on.
 
 The following table lists the relevant indicators of the model. The first two lines means that using SwinTransformer_tiny and MobileNetV3_small_x0_35 as the backbone to training. The third to seventh lines means that the backbone is replaced by PPLCNet, additional use of EDA strategy and additional use of EDA strategy and SKL-UGI knowledge distillation strategy.
 
-| Backbone | Top-1 Acc(%) | Latency(ms) | Size(M)| Training Strategy |
+| Backbone | Tpr(%) | Latency(ms) | Size(M)| Training Strategy |
 |-------|-----------|----------|---------------|---------------|
-| SwinTranformer_tiny  | 93.61 | 89.64  | 107 |  using ImageNet pretrained model |
-| MobileNetV3_small_x0_35  | 81.40 | 2.96  | 17 |  using ImageNet pretrained model |
-| PPLCNet_x1_0  | 89.99 | 2.11  | 6.5 |  using ImageNet pretrained model |
-| PPLCNet_x1_0*  | 94.06 | 2.68  | 6.5 | using ImageNet pretrained model |
-| PPLCNet_x1_0*  | 94.11 | 2.68  | 6.5 | using SSLD pretrained model |
-| <b>PPLCNet_x1_0**<b>  | <b>96.01<b> | <b>2.72<b>  | <b>6.5<b> | using SSLD pretrained model + EDA strategy  |
-| PPLCNet_x1_0**  | 95.86 | 2.72  | 6.5 | using SSLD pretrained model + EDA strategy + SKL-UGI knowledge distillation strategy|
+| SwinTranformer_tiny  | 93.57 | 91.32  | 107 | using ImageNet pretrained model |
+| Res2Net200_vd_26w_4s  | 98.92 | 80.99 | 284 | using ImageNet pretrained model |
+| MobileNetV3_small_x0_35  | 84.83 | 2.85 | 1.6 | using ImageNet pretrained model |
+| PPLCNet_x1_0  | 93.27 | 2.03  | 6.5 | using ImageNet pretrained model |
+| PPLCNet_x1_0  | 98.16 | 2.03  | 6.5 | using SSLD pretrained model |
+| PPLCNet_x1_0  | 99.30 | 2.03  | 6.5 | using SSLD pretrained model + EDA strategy  |
+| <b>PPLCNet_x1_0<b>  | <b>99.38<b> | <b>2.03<b>  | <b>6.5<b> | using SSLD pretrained model + EDA strategy + SKL-UGI knowledge distillation strategy|
 
-It can be seen that high accuracy can be getted when backbone is SwinTranformer_tiny, but the speed is slow. Replacing backbone with the lightweight model MobileNetV3_small_x0_35, the speed can be greatly improved, but the accuracy will be greatly reduced. Replacing backbone with faster backbone PPLCNet_x1_0, the accuracy is higher more 8.6 percentage points than MobileNetv3_small_x0_35. At the same time, the speed can be more than 10% faster. On this basis, by changing the resolution and stripe (refer to [PaddleOCR](https://github.com/PaddlePaddle/PaddleOCR)), the speed becomes 27% slower, but the accuracy can be improved by 4.5 percentage points. After additional using the SSLD pretrained model, the accuracy can be improved by about 0.05 percentage points without affecting the inference speed. Finally, additional using the EDA strategy, the accuracy can be increased by 1.9 percentage points. The training method and deployment instructions of PULC will be introduced in detail below.
+It can be seen that high Tpr can be getted when backbone is Res2Net200_vd_26w_4s, but the speed is slow. Replacing backbone with the lightweight model MobileNetV3_small_x0_35, the speed can be greatly improved, but the Tpr will be greatly reduced. Replacing backbone with faster backbone PPLCNet_x1_0, the Tpr is higher more 8.5 percentage points than MobileNetv3_small_x0_35. At the same time, the speed can be more than 20% faster. After additional using the SSLD pretrained model, the Tpr can be improved by about 4.9 percentage points without affecting the inference speed. Further, additional using the EDA strategy, the Tpr can be increased by 1.1 percentage points. Finally, after additional using the UDML knowledge distillation, the Tpr can be further improved by 2.2 percentage points. At this point, the Tpr is higher than that of Res2Net200_vd_26w_4s, but the speed is more than 70 times faster. The training method and deployment instructions of PULC will be introduced in detail below.
 
 **Note**:
-* Backbone name without \* means the resolution is 224x224, and with \* means the resolution is 48x192 (h\*w). The stride of the network is changed to `[2, [2, 1], [2, 1], [2, 1]`. Please refer to [PaddleOCR]（ https://github.com/PaddlePaddle/PaddleOCR）for more details.
-* Backbone name with \*\* means that the resolution is 80x160 (h\*w), and the stride of the network is changed to `[2, [2, 1], [2, 1], [2, 1]]`. This resolution is searched by [Hyperparameter Searching](pulc_train_en.md#4).
+
+* About `Tpr` metric, please refer to [3.2 section](#3.2) for more information .
 * The Latency is tested on Intel(R) Xeon(R) Gold 6148 CPU @ 2.40GHz. The MKLDNN is enabled and the number of threads is 10.
 * About PP-LCNet, please refer to [PP-LCNet Introduction](../models/PP-LCNet_en.md) and [PP-LCNet Paper](https://arxiv.org/abs/2109.15099).
 
@@ -101,33 +101,32 @@ First, please click [here](https://paddleclas.bj.bcebos.com/data/PULC/pulc_demo_
 * Prediction with CLI
 
 ```bash
-paddleclas --model_name=textline_orientation --infer_imgs=pulc_demo_imgs/textline_orientation/textline_orientation_test_0_0.png
+paddleclas --model_name=safety_helmet --infer_imgs=pulc_demo_imgs/safety_helmet/safety_helmet_test_1.png
 ```
 
 Results:
 
 ```
 >>> result
-class_ids: [0], scores: [1.0], label_names: ['0_degree'], filename: pulc_demo_imgs/textline_orientation/textline_orientation_test_0_0.png
+class_ids: [1], scores: [0.9986255], label_names: ['unwearing_helmet'], filename: pulc_demo_imgs/safety_helmet/safety_helmet_test_1.png
 Predict complete!
 ```
-
 **Note**: If you want to test other images, only need to specify the `--infer_imgs` argument, and the directory containing images is also supported.
 
 * Prediction in Python
 
 ```python
 import paddleclas
-model = paddleclas.PaddleClas(model_name="textline_orientation")
-result = model.predict(input_data="pulc_demo_imgs/textline_orientation/textline_orientation_test_0_0.png")
+model = paddleclas.PaddleClas(model_name="safety_helmet")
+result = model.predict(input_data="pulc_demo_imgs/safety_helmet/safety_helmet_test_1.png")
 print(next(result))
 ```
 
-**Note**: The `result` returned by `model.predict()` is a generator, so you need to use the `next()` function to call it or `for` loop to loop it. And it will predict with `batch_size` size batch and return the prediction results when called. The default `batch_size` is 1, and you also specify the `batch_size` when instantiating, such as `model = paddleclas.PaddleClas(model_name="textline_orientation",  batch_size=2)`. The result of demo above:
+**Note**: The `result` returned by `model.predict()` is a generator, so you need to use the `next()` function to call it or `for` loop to loop it. And it will predict with `batch_size` size batch and return the prediction results when called. The default `batch_size` is 1, and you also specify the `batch_size` when instantiating, such as `model = paddleclas.PaddleClas(model_name="safety_helmet",  batch_size=2)`. The result of demo above:
 
 ```
 >>> result
-[{'class_ids': [0], 'scores': [1.0], 'label_names': ['0_degree'], 'filename': 'pulc_demo_imgs/textline_orientation/textline_orientation_test_0_0.png'}]
+[{'class_ids': [1], 'scores': [0.9986255], 'label_names': ['unwearing_helmet'], 'filename': 'pulc_demo_imgs/safety_helmet/safety_helmet_test_1.png'}]
 ```
 
 <a name="3"></a>
@@ -148,20 +147,23 @@ Please refer to [Installation](../installation/install_paddleclas_en.md) to get 
 
 #### 3.2.1 Dataset Introduction
 
-The data used in this case come from internal data. If you want to experience the training process, you can use open source data, such as [ICDAR2019-LSVT](https://aistudio.baidu.com/aistudio/datasetdetail/8429).
+All datasets used in this case are open source data. Train data is the subset of [Safety-Helmet-Wearing-Dataset](https://github.com/njvisionpower/Safety-Helmet-Wearing-Dataset), [hard-hat-detection](https://www.kaggle.com/datasets/andrewmvd/hard-hat-detection) and [Large-scale CelebFaces Attributes (CelebA) Dataset](https://mmlab.ie.cuhk.edu.hk/projects/CelebA.html).
 
 <a name="3.2.2"></a>  
 
 #### 3.2.2 Getting Dataset
 
-Take ICDAR2019-LSVT for example, images with ID numbers from 0 to 1999 would be processed and used. After rotation, it is divided into class 0 or class 1. Class 0 means that the textline rotation angle is 0 degrees, and class 1 means 180 degrees.
+The data used in this case can be getted by processing the open source data. The detailed processes are as follows:
 
-- Training data: The images with ID number from 0 to 1799 are used as the training set. 3600 images in total.
-- Evaluation data: The images with ID number from 1800 to 1999 are used as the evaluation set. 400 images in total.
+* `Safety-Helmet-Wearing-Dataset`: according to the bbox label data, the image is cropped by enlarging width and height of bbox by 3 times. The label is 0 if wearing safety helmet in the image, and the label is 1 if not;
+* `hard-hat-detection`: Only use the image that labeled "hat" and crop it with bbox. The label is 0;
+* `CelebA`: Only use the image labeled "wearing_hat" and crop it with bbox. The label is 0;
+
+After processing, the dataset totals about 150000 images, of which the number of images with and without wearing safety helmet is about 28000 and 121000 respectively. Then 5600 images are randomly selected in the two labels as the valuation data, a total of about 11200 images, and about 138000 other images as the training data.
 
 Some image of the processed dataset is as follows:
 
-![](../../images/PULC/docs/textline_orientation_data_demo.png)
+![](../../images/PULC/docs/safety_helmet_data_demo.jpg)
 
 And you can also download the data processed directly.
 
@@ -173,29 +175,25 @@ Enter the `dataset/` directory, download and unzip the dataset.
 
 ```shell
 cd dataset
-wget https://paddleclas.bj.bcebos.com/data/PULC/textline_orientation.tar
-tar -xf textline_orientation.tar
+wget https://paddleclas.bj.bcebos.com/data/PULC/safety_helmet.tar
+tar -xf safety_helmet.tar
 cd ../
 ```
 
-The datas under `textline_orientation` directory:
+The datas under `safety_helmet` directory:
 
 ```
-├── 0
-│   ├── img_0.jpg
-│   ├── img_1.jpg
-...
-├── 1
-│   ├── img_0.jpg
-│   ├── img_1.jpg
-...
+├── images
+│   ├── VOC2028_part2_001209_1.jpg
+│   ├── HHD_hard_hat_workers23_1.jpg
+│   ├── CelebA_077809.jpg
+│   ├── ...
+│   └── ...
 ├── train_list.txt
 └── val_list.txt
 ```
 
-其中 `0/` 和 `1/` 分别存放 0 类和 1 类的数据。`train_list.txt` 和 `val_list.txt` 分别为训练集和验证集的标签文件。
-
-Where `0/` and `1/` are class 0 and class 1 data respectively. The `train_list.txt` and `val_list.txt` are label files of training data and validation data respectively.
+The `train_list.txt` and `val_list.txt` are label files of training data and validation data respectively. All images in `images/` directory.
 
 **Note**:
 
@@ -205,19 +203,22 @@ Where `0/` and `1/` are class 0 and class 1 data respectively. The `train_list.t
 
 ### 3.3 Training
 
-The details of training config in `ppcls/configs/PULC/textline_orientation/PPLCNet_x1_0.yaml`. The command about training as follows:
+The details of training config in `ppcls/configs/PULC/person_exists/PPLCNet_x1_0.yaml`. The command about training as follows:
 
 ```shell
 export CUDA_VISIBLE_DEVICES=0,1,2,3
 python3 -m paddle.distributed.launch \
     --gpus="0,1,2,3" \
     tools/train.py \
-        -c ./ppcls/configs/PULC/textline_orientation/PPLCNet_x1_0.yaml
+    -c ./ppcls/configs/PULC/safety_helmet/PPLCNet_x1_0.yaml
 ```
+
+The best metric of validation data is between `0.985` and `0.993`. There would be fluctuations because the data size is small.
 
 **Note**:
 
-* Because the ICDAR2019-LSVT data set is different from the dataset used in the provided pretrained model. If you want to get higher accuracy, you can process [ICDAR2019-LSVT](https://aistudio.baidu.com/aistudio/datasetdetail/8429).
+* The metric Tpr, that describe the True Positive Rate when False Positive Rate is less than a certain threshold(1/10000 used in this case), is one of the commonly used metric for binary classification. About the details of Fpr and Tpr, please refer [here](https://en.wikipedia.org/wiki/Receiver_operating_characteristic).
+* When evaluation, the best metric TprAtFpr will be printed that include `Fpr`, `Tpr` and the current `threshold`. The `Tpr` means the Recall rate under the current `Fpr`. The `Tpr` higher, the model better. The `threshold` would be used in deployment, which means the classification threshold under best `Fpr` metric.
 
 <a name="3.4"></a>
 
@@ -225,10 +226,11 @@ python3 -m paddle.distributed.launch \
 
 After training, you can use the following commands to evaluate the model.
 
+
 ```bash
 python3 tools/eval.py \
-    -c ./ppcls/configs/PULC/textline_orientation/PPLCNet_x1_0.yaml \
-    -o Global.pretrained_model="output/PPLCNet_x1_0/best_model"
+    -c ./ppcls/configs/PULC/safety_helmet/PPLCNet_x1_0.yaml \
+    -o Global.pretrained_model=output/PPLCNet_x1_0/best_model
 ```
 
 Among the above command, the argument `-o Global.pretrained_model="output/PPLCNet_x1_0/best_model"` specify the path of the best model weight file. You can specify other path if needed.
@@ -241,20 +243,21 @@ After training, you can use the model that trained to infer. Command is as follo
 
 ```python
 python3 tools/infer.py \
-    -c ./ppcls/configs/PULC/textline_orientation/PPLCNet_x1_0.yaml \
+    -c ./ppcls/configs/PULC/safety_helmet/PPLCNet_x1_0.yaml \
     -o Global.pretrained_model=output/PPLCNet_x1_0/best_model
 ```
 
 The results:
 
 ```
-[{'class_ids': [0], 'scores': [1.0], 'file_name': 'deploy/images/PULC/textline_orientation/textline_orientation_test_0_0.png', 'label_names': ['0_degree']}]
+[{'class_ids': [1], 'scores': [0.9524797], 'label_names': ['unwearing_helmet'], 'file_name': 'deploy/images/PULC/safety_helmet/safety_helmet_test_1.png'}]
 ```
 
-**Note**:
+**备注：**
 
 * Among the above command, argument `-o Global.pretrained_model="output/PPLCNet_x1_0/best_model"` specify the path of the best model weight file. You can specify other path if needed.
-* The default test image is `deploy/images/PULC/textline_orientation/textline_orientation_test_0_0.png`. And you can test other image, only need to specify the argument `-o Infer.infer_imgs=path_to_test_image`.
+* The default test image is `deploy/images/PULC/safety_helmet/safety_helmet_test_1.png`. And you can test other image, only need to specify the argument `-o Infer.infer_imgs=path_to_test_image`.
+* The default threshold is `0.5`. If needed, you can specify the argument `Infer.PostProcess.threshold`, such as: `-o Infer.PostProcess.threshold=0.9167`. And the argument `threshold` is needed to be specified according by specific case. The `0.9167` is the best threshold when `Fpr` is less than `1/10000` in this valuation dataset.
 
 <a name="4"></a>
 
@@ -262,46 +265,25 @@ The results:
 
 <a name="4.1"></a>
 
-### 4.1 SKL-UGI Knowledge Distillation
+### 4.1 UDML  Knowledge Distillation
 
-SKL-UGI is a simple but effective knowledge distillation algrithem proposed by PaddleClas.
-
-<!-- todo -->
-<!-- Please refer to [SKL-UGI](../advanced_tutorials/distillation/distillation_en.md) for more details. -->
+UDML is a simple but effective knowledge distillation algrithem proposed by PaddleClas. Please refer to [UDML 知识蒸馏](../advanced_tutorials/knowledge_distillation_en.md#1.2.3) for more details.
 
 <a name="4.1.1"></a>
 
-#### 4.1.1 Teacher Model Training
+#### 4.1.1  Knowledge Distillation Training
 
-Training the teacher model with hyperparameters specified in `ppcls/configs/PULC/textline_orientation/PPLCNet/PPLCNet_x1_0.yaml`. The command is as follow:
-
-```shell
-export CUDA_VISIBLE_DEVICES=0,1,2,3
-python3 -m paddle.distributed.launch \
-    --gpus="0,1,2,3" \
-    tools/train.py \
-        -c ./ppcls/configs/PULC/textline_orientation/PPLCNet_x1_0.yaml \
-        -o Arch.name=ResNet101_vd
-```
-
-The best metric of validation data is between `0.96` and `0.98`. The best teacher model weight would be saved in file `output/ResNet101_vd/best_model.pdparams`.
-
-<a name="4.1.2"></a>
-
-#### 4.1.2 Knowledge Distillation Training
-
-The training strategy, specified in training config file `ppcls/configs/PULC/textline_orientation/PPLCNet_x1_0_distillation.yaml`, the teacher model is `ResNet101_vd` and the student model is `PPLCNet_x1_0`. The command is as follow:
+Training with hyperparameters specified in `ppcls/configs/PULC/safety_helmet/PPLCNet_x1_0_distillation.yaml`. The command is as follow:
 
 ```shell
 export CUDA_VISIBLE_DEVICES=0,1,2,3
 python3 -m paddle.distributed.launch \
     --gpus="0,1,2,3" \
     tools/train.py \
-        -c ./ppcls/configs/PULC/textline_orientation/PPLCNet_x1_0_distillation.yaml \
-        -o Arch.models.0.Teacher.pretrained=output/ResNet101_vd/best_model
+    -c ./ppcls/configs/PULC/safety_helmet/PPLCNet_x1_0_distillation.yaml
 ```
 
-The best metric is between `0.95` and `0.97`. The best student model weight would be saved in file `output/DistillationModel/best_model_student.pdparams`.
+The best metric is between `0.990` and `0.993`. The best student model weight would be saved in file `output/DistillationModel/best_model_student.pdparams`.
 
 <a name="5"></a>
 
@@ -331,15 +313,15 @@ The command about exporting Paddle Inference Model is as follow:
 
 ```bash
 python3 tools/export_model.py \
-    -c ./ppcls/configs/PULC/textline_orientation/PPLCNet_x1_0.yaml \
-    -o Global.pretrained_model=output/PPLCNet_x1_0/best_model \
-    -o Global.save_inference_dir=deploy/models/PPLCNet_x1_0_textline_orientation_infer
+    -c ./ppcls/configs/PULC/safety_helmet/PPLCNet_x1_0.yaml \
+    -o Global.pretrained_model=output/DistillationModel/best_model_student \
+    -o Global.save_inference_dir=deploy/models/PPLCNet_x1_0_safety_helmet_infer
 ```
 
-After running above command, the inference model files would be saved in `deploy/models/PPLCNet_x1_0_textline_orientation_infer`, as shown below:
+After running above command, the inference model files would be saved in `deploy/models/PPLCNet_x1_0_safety_helmet_infer`, as shown below:
 
 ```
-├── PPLCNet_x1_0_textline_orientation_infer
+├── PPLCNet_x1_0_safety_helmet_infer
 │   ├── inference.pdiparams
 │   ├── inference.pdiparams.info
 │   └── inference.pdmodel
@@ -355,14 +337,14 @@ You can also download directly.
 
 ```
 cd deploy/models
-# 下载 inference 模型并解压
-wget https://paddleclas.bj.bcebos.com/models/PULC/textline_orientation_infer.tar && tar -xf textline_orientation_infer.tar
+# download the inference model and decompression
+wget https://paddleclas.bj.bcebos.com/models/PULC/safety_helmet_infer.tar && tar -xf safety_helmet_infer.tar
 ```
 
 After decompression, the directory `models` should be shown below.
 
 ```
-├── textline_orientation_infer
+├── safety_helmet_infer
 │   ├── inference.pdiparams
 │   ├── inference.pdiparams.info
 │   └── inference.pdmodel
@@ -382,20 +364,22 @@ Return the directory `deploy`:
 cd ../
 ```
 
-Run the following command to classify the rotation of image `./images/PULC/textline_orientation/objects365_02035329.jpg`.
+Run the following command to classify whether wearing safety helmet about the image `./images/PULC/safety_helmet/safety_helmet_test_1.png`.
 
 ```shell
 # Use the following command to predict with GPU.
-python3.7 python/predict_cls.py -c configs/PULC/textline_orientation/inference_textline_orientation.yaml
+python3.7 python/predict_cls.py -c configs/PULC/safety_helmet/inference_safety_helmet.yaml
 # Use the following command to predict with CPU.
-python3.7 python/predict_cls.py -c configs/PULC/textline_orientation/inference_textline_orientation.yaml  -o Global.use_gpu=False
+python3.7 python/predict_cls.py -c configs/PULC/safety_helmet/inference_safety_helmet.yaml -o Global.use_gpu=False
 ```
 
 The prediction results:
 
 ```
-textline_orientation_test_0_0.png:    class id(s): [0], score(s): [1.00], label_name(s): ['0_degree']
+safety_helmet_test_1.png:       class id(s): [1], score(s): [1.00], label_name(s): ['unwearing_helmet']
 ```
+
+**Note**: The default threshold is `0.5`. If needed, you can specify the argument `Infer.PostProcess.threshold`, such as: `-o Infer.PostProcess.threshold=0.9167`. And the argument `threshold` is needed to be specified according by specific case. The `0.9167` is the best threshold when `Fpr` is less than `1/10000` in this valuation dataset. Please refer to [3.3 section](#3.3) for details.
 
 <a name="6.2.2"></a>  
 
@@ -405,19 +389,17 @@ If you want to predict images in directory, please specify the argument `Global.
 
 ```shell
 # Use the following command to predict with GPU. If want to replace with CPU, you can add argument -o Global.use_gpu=False
-python3.7 python/predict_cls.py -c configs/PULC/textline_orientation/inference_textline_orientation.yaml -o Global.infer_imgs="./images/PULC/textline_orientation/"
+python3.7 python/predict_cls.py -c configs/PULC/safety_helmet/inference_safety_helmet.yaml -o Global.infer_imgs="./images/PULC/safety_helmet/"
 ```
 
 All prediction results will be printed, as shown below.
 
 ```
-textline_orientation_test_0_0.png:    class id(s): [0], score(s): [1.00], label_name(s): ['0_degree']
-textline_orientation_test_0_1.png:    class id(s): [0], score(s): [1.00], label_name(s): ['0_degree']
-textline_orientation_test_1_0.png:    class id(s): [1], score(s): [1.00], label_name(s): ['180_degree']
-textline_orientation_test_1_1.png:    class id(s): [1], score(s): [1.00], label_name(s): ['180_degree']
+safety_helmet_test_1.png:       class id(s): [1], score(s): [1.00], label_name(s): ['unwearing_helmet']
+safety_helmet_test_2.png:       class id(s): [0], score(s): [1.00], label_name(s): ['wearing_helmet']
 ```
 
-Among the prediction results above, `0_degree` means that the rotation angle of the textline image is 0, and `180_degree` means that 180.
+Among the prediction results above, `wearing_helmet` means that wearing safety helmet about the image, `unwearing_helmet` means not.
 
 <a name="6.3"></a>
 
