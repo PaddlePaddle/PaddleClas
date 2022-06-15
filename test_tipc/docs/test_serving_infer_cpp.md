@@ -52,6 +52,19 @@ Linux GPU/CPU C++ 服务化部署测试的主程序为`test_serving_infer_cpp.sh
     ```
 - 安装 PaddleServing 相关组件，包括serving_client、serving-app，自动编译并安装带自定义OP的 serving_server 包，以及自动下载并解压推理模型
   ```bash
+  # 安装必要依赖包
+  python3.7 -m pip install paddle_serving_client==0.9.0 -i https://pypi.tuna.tsinghua.edu.cn/simple
+  python3.7 -m pip install paddle-serving-app==0.9.0 -i https://pypi.tuna.tsinghua.edu.cn/simple
+
+  # 安装编译自定义OP的serving-server包
+  pushd ./deploy/paddleserving
+  source build_server.sh python3.7
+  popd
+
+  # 测试PP-ShiTu识别模型时需安装faiss包
+  python3.7-m pip install faiss-cpu==1.7.1post2 -i https://pypi.tuna.tsinghua.edu.cn/simple
+
+  # 下载模型与数据
   bash test_tipc/prepare.sh test_tipc/configs/PPLCNet/PPLCNet_x1_0_linux_gpu_normal_normal_serving_cpp_linux_gpu_cpu.txt serving_infer
   ```
 

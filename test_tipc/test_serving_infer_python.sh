@@ -98,6 +98,8 @@ function func_serving_cls(){
 
             web_service_cmd="${python_} ${web_service_py} &"
             eval ${web_service_cmd}
+            last_status=${PIPESTATUS[0]}
+            status_check $last_status "${web_service_cmd}" "${status_log}" "${model_name}"
             sleep 5s
             for pipeline in ${pipeline_py[*]}; do
                 _save_log_path="${LOG_PATH}/server_infer_cpu_${pipeline%_client*}_batchsize_1.log"
@@ -130,6 +132,8 @@ function func_serving_cls(){
 
             web_service_cmd="${python_} ${web_service_py} & "
             eval ${web_service_cmd}
+            last_status=${PIPESTATUS[0]}
+            status_check $last_status "${web_service_cmd}" "${status_log}" "${model_name}"
             sleep 5s
             for pipeline in ${pipeline_py[*]}; do
                 _save_log_path="${LOG_PATH}/server_infer_gpu_${pipeline%_client*}_batchsize_1.log"
@@ -237,6 +241,8 @@ function func_serving_rec(){
 
             web_service_cmd="${python} ${web_service_py} &"
             eval ${web_service_cmd}
+            last_status=${PIPESTATUS[0]}
+            status_check $last_status "${web_service_cmd}" "${status_log}" "${model_name}"
             sleep 5s
             for pipeline in ${pipeline_py[*]}; do
                 _save_log_path="${LOG_PATH}/server_infer_cpu_${pipeline%_client*}_batchsize_1.log"
@@ -269,6 +275,8 @@ function func_serving_rec(){
 
             web_service_cmd="${python} ${web_service_py} & "
             eval ${web_service_cmd}
+            last_status=${PIPESTATUS[0]}
+            status_check $last_status "${web_service_cmd}" "${status_log}" "${model_name}"
             sleep 10s
             for pipeline in ${pipeline_py[*]}; do
                 _save_log_path="${LOG_PATH}/server_infer_gpu_${pipeline%_client*}_batchsize_1.log"
@@ -290,7 +298,7 @@ function func_serving_rec(){
 # set cuda device
 GPUID=$2
 if [ ${#GPUID} -le 0 ];then
-    env=" "
+    env="export CUDA_VISIBLE_DEVICES=0"
 else
     env="export CUDA_VISIBLE_DEVICES=${GPUID}"
 fi
