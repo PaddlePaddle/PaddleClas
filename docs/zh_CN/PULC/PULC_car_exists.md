@@ -40,19 +40,19 @@
 
 ## 1. 模型和应用场景介绍
 
-该案例提供了用户使用 PaddleClas 的超轻量图像分类方案（PULC，Practical Ultra Lightweight Classification）快速构建轻量级、高精度、可落地的有车/无车的分类模型。该模型可以广泛应用于如监控场景、海量数据过滤场景等。
+该案例提供了用户使用 PaddleClas 的超轻量图像分类方案（PULC，Practical Ultra Lightweight image Classification）快速构建轻量级、高精度、可落地的有车/无车的分类模型。该模型可以广泛应用于如监控场景、海量数据过滤场景等。
 
 下表列出了判断图片中是否有车的二分类模型的相关指标，前两行展现了使用 SwinTranformer_tiny 和 MobileNetV3_small_x0_35 作为 backbone 训练得到的模型的相关指标，第三行至第六行依次展现了替换 backbone 为 PPLCNet_x1_0、使用 SSLD 预训练模型、使用 SSLD 预训练模型 + EDA 策略、使用 SSLD 预训练模型 + EDA 策略 + SKL-UGI 知识蒸馏策略训练得到的模型的相关指标。
 
 
 | 模型 | Tpr（%）@Fpr0.01 | 延时（ms） | 存储（M） | 策略 |
 |-------|----------------|----------|---------------|---------------|
-| SwinTranformer_tiny  | 97.71          | 95.30  | 107 | 使用 ImageNet 预训练模型 |
-| MobileNetV3_small_x0_35  | 81.23          | 2.85  | 1.6 | 使用 ImageNet 预训练模型 |
-| PPLCNet_x1_0  | 94.72          | 2.12  | 6.5 | 使用 ImageNet 预训练模型 |
-| PPLCNet_x1_0  | 95.48          | 2.12  | 6.5 | 使用 SSLD 预训练模型 |
-| PPLCNet_x1_0  | 95.48          | 2.12  | 6.5 | 使用 SSLD 预训练模型+EDA 策略|
-| <b>PPLCNet_x1_0<b>  | <b>95.92<b>    | <b>2.12<b>  | <b>6.5<b> | 使用 SSLD 预训练模型+EDA 策略+SKL-UGI 知识蒸馏策略|
+| SwinTranformer_tiny  | 97.71          | 95.30  | 111 | 使用 ImageNet 预训练模型 |
+| MobileNetV3_small_x0_35  | 81.23          | 2.85  | 2.7 | 使用 ImageNet 预训练模型 |
+| PPLCNet_x1_0  | 94.72          | 2.12  | 7.1 | 使用 ImageNet 预训练模型 |
+| PPLCNet_x1_0  | 95.48          | 2.12  | 7.1 | 使用 SSLD 预训练模型 |
+| PPLCNet_x1_0  | 95.48          | 2.12  | 7.1 | 使用 SSLD 预训练模型+EDA 策略|
+| <b>PPLCNet_x1_0<b>  | <b>95.92<b>    | <b>2.12<b>  | <b>7.1<b> | 使用 SSLD 预训练模型+EDA 策略+SKL-UGI 知识蒸馏策略|
 
 从表中可以看出，backbone 为 SwinTranformer_tiny 时精度较高，但是推理速度较慢。将 backbone 替换为轻量级模型 MobileNetV3_small_x0_35 后，速度可以大幅提升，但是会导致精度大幅下降。将 backbone 替换为速度更快的 PPLCNet_x1_0 时，精度较 MobileNetV3_small_x0_35 高 13 个百分点，与此同时速度依旧可以快 20% 以上。在此基础上，使用 SSLD 预训练模型后，在不改变推理速度的前提下，精度可以提升约 0.7 个百分点，进一步地，在使用 SKL-UGI 知识蒸馏后，精度可以继续提升 0.44 个百分点。此时，PPLCNet_x1_0 达到了接近 SwinTranformer_tiny 模型的精度，但是速度快 40 多倍。关于 PULC 的训练方法和推理部署方法将在下面详细介绍。
 
