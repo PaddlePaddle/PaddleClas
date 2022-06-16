@@ -167,11 +167,11 @@ build/paddle_inference_install_dir/
 
 * [Paddle预测库官网](https://paddleinference.paddlepaddle.org.cn/user_guides/download_lib.html)上提供了不同cuda版本的Linux预测库，可以在官网查看并选择合适的预测库版本。
 
-  以`manylinux_cuda11.1_cudnn8.1_avx_mkl_trt7_gcc8.2`版本为例，使用下述命令下载并解压：
+  以`manylinux_cuda10.1_cudnn7.6_avx_mkl_trt6_gcc8.2`版本为例，使用下述命令下载并解压：
 
 
 ```shell
-wget https://paddle-inference-lib.bj.bcebos.com/2.2.2/cxx_c/Linux/GPU/x86-64_gcc8.2_avx_mkl_cuda11.1_cudnn8.1.1_trt7.2.3.4/paddle_inference.tgz
+wget https://paddle-inference-lib.bj.bcebos.com/2.2.2/cxx_c/Linux/GPU/x86-64_gcc8.2_avx_mkl_cuda10.1_cudnn7.6.5_trt6.0.1.5/paddle_inference.tgz
 
 tar -xvf paddle_inference.tgz
 ```

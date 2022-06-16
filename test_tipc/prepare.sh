@@ -50,6 +50,8 @@ if [[ ${MODE} = "cpp_infer" ]]; then
         echo "################### build opencv ###################"
         rm -rf ./deploy/cpp/opencv-3.4.7.tar.gz ./deploy/cpp/opencv-3.4.7/
         pushd ./deploy/cpp/
+        wget -nc https://paddle-inference-lib.bj.bcebos.com/2.2.2/cxx_c/Linux/GPU/x86-64_gcc8.2_avx_mkl_cuda10.1_cudnn7.6.5_trt6.0.1.5/paddle_inference.tgz
+        tar xf paddle_inference.tgz
         wget -nc https://paddleocr.bj.bcebos.com/dygraph_v2.0/test/opencv-3.4.7.tar.gz
         tar -xf opencv-3.4.7.tar.gz
 
