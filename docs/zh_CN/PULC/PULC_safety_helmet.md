@@ -374,7 +374,7 @@ cd ../
 
 ```shell
 # 使用下面的命令使用 GPU 进行预测
-c
+python3.7 python/predict_cls.py -c configs/PULC/safety_helmet/inference_safety_helmet.yaml
 # 使用下面的命令使用 CPU 进行预测
 python3.7 python/predict_cls.py -c configs/PULC/safety_helmet/inference_safety_helmet.yaml -o Global.use_gpu=False
 ```
