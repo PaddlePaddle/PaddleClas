@@ -7,7 +7,7 @@
 
 |模型名称|模型简介|模型精度 |模型大小|推理耗时|下载地址|
 | --- | --- | --- | --- | --- | --- |
-| person_exists |[PULC有人/无人分类模型](PULC_person_exists.md)| 95.60 |7.0M|2.58ms|[推理模型](https://paddleclas.bj.bcebos.com/models/PULC/inference/person_exists_infer.tar) / [预训练模型](https://paddleclas.bj.bcebos.com/models/PULC/pretrained/person_exists_pretrained.pdparams)|
+| person_exists |[PULC有人/无人分类模型](PULC_person_exists.md)| 96.23 |7.0M|2.58ms|[推理模型](https://paddleclas.bj.bcebos.com/models/PULC/inference/person_exists_infer.tar) / [预训练模型](https://paddleclas.bj.bcebos.com/models/PULC/pretrained/person_exists_pretrained.pdparams)|
 | person_attribute |[PULC人体属性识别模型](PULC_person_attribute.md)| 78.59 |7.2M|2.01ms|[推理模型](https://paddleclas.bj.bcebos.com/models/PULC/inference/person_attribute_infer.tar) / [预训练模型](https://paddleclas.bj.bcebos.com/models/PULC/pretrained/person_attribute_pretrained.pdparams)|
 | safety_helmet |[PULC佩戴安全帽分类模型](PULC_safety_helmet.md)| 99.38 |7.1M|2.03ms|[推理模型](https://paddleclas.bj.bcebos.com/models/PULC/inference/safety_helmet_infer.tar) / [预训练模型](https://paddleclas.bj.bcebos.com/models/PULC/pretrained/safety_helmet_pretrained.pdparams)|
 | traffic_sign |[PULC交通标志分类模型](PULC_traffic_sign.md)| 98.35 |8.2M|2.10ms|[推理模型](https://paddleclas.bj.bcebos.com/models/PULC/inference/traffic_sign_infer.tar) / [预训练模型](https://paddleclas.bj.bcebos.com/models/PULC/pretrained/traffic_sign_pretrained.pdparams)|
