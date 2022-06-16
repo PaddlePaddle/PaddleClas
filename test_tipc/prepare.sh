@@ -83,6 +83,12 @@ if [[ ${MODE} = "cpp_infer" ]]; then
         popd
         echo "################### build opencv finished ###################"
     fi
+    if [[ ! -d "./deploy/cpp/paddle_inference/" ]]; then
+        pushd ./deploy/cpp/
+        wget -nc https://paddle-inference-lib.bj.bcebos.com/2.2.2/cxx_c/Linux/GPU/x86-64_gcc8.2_avx_mkl_cuda10.1_cudnn7.6.5_trt6.0.1.5/paddle_inference.tgz
+        tar xf paddle_inference.tgz
+        popd
+    fi
     if [[ $FILENAME == *infer_cpp_linux_gpu_cpu.txt ]]; then
         cpp_type=$(func_parser_value "${lines[2]}")
         cls_inference_model_dir=$(func_parser_value "${lines[3]}")
