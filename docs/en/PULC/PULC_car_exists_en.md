@@ -38,18 +38,18 @@
 
 ## 1. Introduction
 
-This case provides a way for users to quickly build a lightweight, high-precision and practical classification model of car exists using PaddleClas PULC (Practical Ultra Lightweight Classification). The model can be widely used in monitoring scenarios, massive data filtering scenarios, etc.
+This case provides a way for users to quickly build a lightweight, high-precision and practical classification model of car exists using PaddleClas PULC (Practical Ultra Lightweight image Classification). The model can be widely used in monitoring scenarios, massive data filtering scenarios, etc.
 
 The following table lists the relevant indicators of the model. The first two lines means that using SwinTransformer_tiny and MobileNetV3_small_x0_35 as the backbone to training. The third to sixth lines means that the backbone is replaced by PPLCNet, additional use of EDA strategy and additional use of EDA strategy and SKL-UGI knowledge distillation strategy.
 
 | Backbone | Tpr(%) | Latency(ms) | Size(M)| Training Strategy |
 |-------|----------------|----------|---------------|---------------|
-| SwinTranformer_tiny  | 97.71          | 95.30  | 107 | using ImageNet pretrained model |
-| MobileNetV3_small_x0_35  | 81.23          | 2.85  | 1.6 | using ImageNet pretrained model |
-| PPLCNet_x1_0  | 94.72          | 2.12  | 6.5 | using ImageNet pretrained model |
-| PPLCNet_x1_0  | 95.48          | 2.12  | 6.5 | using SSLD pretrained model |
-| PPLCNet_x1_0  | 95.48          | 2.12  | 6.5 | using SSLD pretrained model + EDA strategy  |
-| <b>PPLCNet_x1_0<b>  | <b>95.92<b>    | <b>2.12<b>  | <b>6.5<b> | using SSLD pretrained model + EDA strategy + SKL-UGI knowledge distillation strategy|
+| SwinTranformer_tiny  | 97.71          | 95.30  | 111 | using ImageNet pretrained model |
+| MobileNetV3_small_x0_35  | 81.23          | 2.85  | 2.7 | using ImageNet pretrained model |
+| PPLCNet_x1_0  | 94.72          | 2.12  | 7.1 | using ImageNet pretrained model |
+| PPLCNet_x1_0  | 95.48          | 2.12  | 7.1 | using SSLD pretrained model |
+| PPLCNet_x1_0  | 95.48          | 2.12  | 7.1 | using SSLD pretrained model + EDA strategy  |
+| <b>PPLCNet_x1_0<b>  | <b>95.92<b>    | <b>2.12<b>  | <b>7.1<b> | using SSLD pretrained model + EDA strategy + SKL-UGI knowledge distillation strategy|
 
 It can be seen that high Tpr can be getted when backbone is SwinTranformer_tiny, but the speed is slow. Replacing backbone with the lightweight model MobileNetV3_small_x0_35, the speed can be greatly improved, but the Tpr will be greatly reduced. Replacing backbone with faster backbone PPLCNet_x1_0, the Tpr is higher more 13 percentage points than MobileNetv3_small_x0_35. At the same time, the speed can be more than 20% faster. After additional using the SSLD pretrained model, the Tpr can be improved by about 0.7 percentage points without affecting the inference speed. Finally, after additional using the SKL-UGI knowledge distillation, the Tpr can be further improved by 0.44 percentage points. At this point, the Tpr is close to that of SwinTranformer_tiny, but the speed is more than 40 times faster. The training method and deployment instructions of PULC will be introduced in detail below.
 
