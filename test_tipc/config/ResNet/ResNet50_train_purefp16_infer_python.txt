@@ -51,6 +51,6 @@ inference:python/predict_cls.py -c configs/inference_cls.yaml
 null:null
 null:null
 ===========================train_benchmark_params==========================
-batch_size:128
-fp_items:pure_fp16
+batch_size:128|256
+fp_items:purefp16
 epoch:1
