@@ -36,17 +36,17 @@
 
 ## 1. Introduction
 
-In the process of document scanning, license shooting and so on, sometimes in order to shoot more clearly, the camera device will be rotated, resulting in photo in different directions. At this time, the standard OCR process cannot cope with these issues well. Using the text image orientation classification technology, the direction of the text image can be predicted and adjusted, so as to improve the accuracy of OCR processing. This case provides a way for users to use PaddleClas PULC (Practical Ultra Lightweight Classification) to quickly build a lightweight, high-precision, practical classification model of text image orientation. This model can be widely used in OCR processing scenarios of rotating pictures in financial, government and other industries.
+In the process of document scanning, license shooting and so on, sometimes in order to shoot more clearly, the camera device will be rotated, resulting in photo in different directions. At this time, the standard OCR process cannot cope with these issues well. Using the text image orientation classification technology, the direction of the text image can be predicted and adjusted, so as to improve the accuracy of OCR processing. This case provides a way for users to use PaddleClas PULC (Practical Ultra Lightweight image Classification) to quickly build a lightweight, high-precision, practical classification model of text image orientation. This model can be widely used in OCR processing scenarios of rotating pictures in financial, government and other industries.
 
 The following table lists the relevant indicators of the model. The first two lines means that using SwinTransformer_tiny and MobileNetV3_small_x0_35 as the backbone to training. The third to fifth lines means that the backbone is replaced by PPLCNet, additional use of SSLD pretrained model and additional use of hyperparameters searching strategy.
 
 | Backbone | Top1-Acc(%) | Latency(ms) | Size(M)| Training Strategy |
 | ----------------------- | --------- | ---------- | --------- | ------------------------------------- |
-| SwinTranformer_tiny     | 99.12     | 89.65      | 107       | using ImageNet pretrained model       |
-| MobileNetV3_small_x0_35 | 83.61     | 2.95       | 17        | using ImageNet pretrained model       |
-| PPLCNet_x1_0            | 97.85     | 2.16       | 6.5       | using ImageNet pretrained model       |
-| PPLCNet_x1_0            | 98.02     | 2.16       | 6.5       | using SSLD pretrained model           |
-| **PPLCNet_x1_0**        | **99.06** | **2.16**   | **6.5**   | using SSLD pretrained model + hyperparameters searching strategy |
+| SwinTranformer_tiny     | 99.12     | 89.65      | 111       | using ImageNet pretrained model       |
+| MobileNetV3_small_x0_35 | 83.61     | 2.95       | 2.6        | using ImageNet pretrained model       |
+| PPLCNet_x1_0            | 97.85     | 2.16       | 7.1       | using ImageNet pretrained model       |
+| PPLCNet_x1_0            | 98.02     | 2.16       | 7.1       | using SSLD pretrained model           |
+| **PPLCNet_x1_0**        | **99.06** | **2.16**   | **7.1**   | using SSLD pretrained model + hyperparameters searching strategy |
 
 It can be seen that high accuracy can be getted when backbone is SwinTranformer_tiny, but the speed is slow. Replacing backbone with the lightweight model MobileNetV3_small_x0_35, the speed can be greatly improved, but the accuracy will be greatly reduced. Replacing backbone with faster backbone PPLCNet_x1_0, the accuracy is higher more 14 percentage points than MobileNetv3_small_x0_35. At the same time, the speed can be more faster. After additional using the SSLD pretrained model, the accuracy can be improved by about 0.17 percentage points without affecting the inference speed. Finally, after additional using the hyperparameters searching strategy, the accuracy can be further improved by 1.04 percentage points. At this point, the accuracy is close to that of SwinTranformer_tiny, but the speed is more faster. The training method and deployment instructions of PULC will be introduced in detail below.
 

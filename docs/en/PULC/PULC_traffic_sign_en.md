@@ -38,7 +38,7 @@
 
 ## 1. Introduction
 
-This case provides a way for users to quickly build a lightweight, high-precision and practical classification model of traffic sign using PaddleClas PULC (Practical Ultra Lightweight Classification). The model can be widely used in automatic driving, road monitoring, etc.
+This case provides a way for users to quickly build a lightweight, high-precision and practical classification model of traffic sign using PaddleClas PULC (Practical Ultra Lightweight image Classification). The model can be widely used in automatic driving, road monitoring, etc.
 
 The following table lists the relevant indicators of the model. The first two lines means that using SwinTransformer_tiny and MobileNetV3_small_x0_35 as the backbone to training. The third to sixth lines means that the backbone is replaced by PPLCNet, additional use of EDA strategy and additional use of EDA strategy and SKL-UGI knowledge distillation strategy.
 

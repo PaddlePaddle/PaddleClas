@@ -38,13 +38,12 @@
 
 ## 1. Introduction
 
-This case provides a way for users to quickly build a lightweight, high-precision and practical classification model of vehicle attribute using PaddleClas PULC (Practical Ultra Lightweight image Classification). The model can be widely used in 
-Vehicle identification, road monitoring and other scenarios.
+This case provides a way for users to quickly build a lightweight, high-precision and practical classification model of vehicle attribute using PaddleClas PULC (Practical Ultra Lightweight image Classification). The model can be widely used in Vehicle identification, road monitoring and other scenarios.
 
 The following table lists the relevant indicators of the model. The first three lines means that using Res2Net200_vd_26w_4s, ResNet50 and MobileNetV3_small_x0_35 as the backbone to training. The fourth to seventh lines means that the backbone is replaced by PPLCNet, additional use of EDA strategy and additional use of EDA strategy and SKL-UGI knowledge distillation strategy.
-    
-    
-| Backbone | ma（%） | Latency(ms) | Size(M) | Training Strategy |
+
+
+| Backbone | mA（%） | Latency(ms) | Size(M) | Training Strategy |
 |-------|-----------|----------|---------------|---------------|
 | Res2Net200_vd_26w_4s  | 91.36 | 79.46  | 293 | using ImageNet pretrained  |
 | ResNet50  | 89.98 | 12.83  | 92 | using ImageNet pretrained |
@@ -52,11 +51,11 @@ The following table lists the relevant indicators of the model. The first three 
 | PPLCNet_x1_0  | 89.57 | 2.36  | 7.2 | using ImageNet pretrained |
 | PPLCNet_x1_0  | 90.07 | 2.36  | 7.2 | using SSLD pretrained  |
 | PPLCNet_x1_0  | 90.59 | 2.36  | 7.2 | using SSLD pretrained + EDA strategy|
-| <b>PPLCNet_x1_0<b>  | <b>90.81<b> | <b>2.36<b>  | <b>8.2<b> | using SSLD pretrained + EDA strategy + SKL-UGI knowledge distillation strategy|
-    
+| <b>PPLCNet_x1_0<b>  | <b>90.81<b> | <b>2.36<b>  | <b>7.2<b> | using SSLD pretrained + EDA strategy + SKL-UGI knowledge distillation strategy|
+
 
 It can be seen from the table that the ma metric is higher when the backbone is Res2Net200_vd_26w_4s, but the inference speed is slower. After replacing the backbone with the lightweight model MobileNetV3_small_x0_35, the speed can be greatly improved, but the ma metric drops significantly. When the backbone is replaced by PPLCNet_x1_0, the ma metric is increased by 2 percentage points, and the speed is also increased by about 23%. On this basis, after using the SSLD pre-training model, the ma metric can be improved by about 0.5 percentage points without changing the inference speed. Further, when the EDA strategy is integrated, the ma metric can be improved by another 0.52 percentage points. Finally, using After SKL-UGI knowledge distillation, the ma metric can continue to improve by 0.23 percentage points. At this time, the ma metric of PPLCNet_x1_0 is only 0.55 percentage points away from Res2Net200_vd_26w_4s, but it is 32 times faster. The training method and deployment instructions of PULC will be introduced in detail below.
-    
+
 
 **Note**:
 
@@ -163,16 +162,16 @@ Part of the data visualization is shown below.
 <div align="center">
 <img src="../../images/PULC/docs/vehicle_attribute_data_demo.png"  width = "500" />
 </div>
-    
+
 First, apply for and download data from [VeRi dataset official website](https://www.v7labs.com/open-datasets/veri-dataset), put it in the `dataset` directory of PaddleClas, the dataset directory name is `VeRi `, use the following command to enter the folder.
-    
+
 
 ```shell
 cd PaddleClas/dataset/VeRi/
 ```
-    
+
 Then use the following code to convert the label (you can execute the following command in the python terminal, or you can write it to a file and run the file using `python3 convert.py`).
-    
+
 ```python
 import os
 from xml.dom.minidom import parse
@@ -209,10 +208,10 @@ def convert_annotation(input_fp, output_fp):
 convert_annotation('train_label.xml', 'train_list.txt')  #imagename vehiclenum colorid typeid
 convert_annotation('test_label.xml', 'test_list.txt')
 ```
-    
- 
+
+
 After executing the above command, the `VeRi` directory has the following data:
-    
+
 ```
 VeRi
 ├── image_train
@@ -231,7 +230,7 @@ VeRi
 ├── train_label.xml
 ├── test_label.xml
 ```
-    
+
 where `train/` and `test/` are the training set and validation set, respectively. `train_list.txt` and `test_list.txt` are the converted label files for training and validation sets, respectively.
 
 
@@ -427,7 +426,7 @@ python3.7 python/predict_cls.py -c configs/PULC/vehicle_attribute/inference_vehi
 The prediction results:
 
 ```
-0002_c002_00030670_0.jpg:	 {'attributes': 'Color: (yellow, prob: 0.9893478155136108), Type: (hatchback, prob: 0.9734099507331848)', 'output': [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0]}
+0002_c002_00030670_0.jpg:     {'attributes': 'Color: (yellow, prob: 0.9893478155136108), Type: (hatchback, prob: 0.9734099507331848)', 'output': [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0]}
 ```
 
 
@@ -445,8 +444,8 @@ python3.7 python/predict_cls.py -c configs/PULC/vehicle_attribute/inference_vehi
 All prediction results will be printed, as shown below.
 
 ```
-0002_c002_00030670_0.jpg:	 {'attributes': 'Color: (yellow, prob: 0.9893476963043213), Type: (hatchback, prob: 0.9734097719192505)', 'output': [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0]}
-0014_c012_00040750_0.jpg:	 {'attributes': 'Color: (red, prob: 0.999872088432312), Type: (sedan, prob: 0.999976634979248)', 'output': [0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0]}
+0002_c002_00030670_0.jpg:     {'attributes': 'Color: (yellow, prob: 0.9893476963043213), Type: (hatchback, prob: 0.9734097719192505)', 'output': [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0]}
+0014_c012_00040750_0.jpg:     {'attributes': 'Color: (red, prob: 0.999872088432312), Type: (sedan, prob: 0.999976634979248)', 'output': [0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0]}
 ```
 
 Among the prediction results above, `someone` means that there is a human in the image, `nobody` means that there is no human in the image.
