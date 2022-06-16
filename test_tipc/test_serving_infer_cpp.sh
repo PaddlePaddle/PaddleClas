@@ -104,6 +104,8 @@ function func_serving_cls(){
         if [[ ${use_gpu} = "null" ]]; then
             web_service_cpp_cmd="${python_} -m paddle_serving_server.serve --model ${serving_server_dir_name} --op GeneralClasOp --port 9292 &"
             eval ${web_service_cpp_cmd}
+            last_status=${PIPESTATUS[0]}
+            status_check $last_status "${web_service_cpp_cmd}" "${status_log}" "${model_name}"
             sleep 5s
             _save_log_path="${LOG_PATH}/server_infer_cpp_cpu_pipeline_batchsize_1.log"
             pipeline_cmd="${python_} test_cpp_serving_client.py > ${_save_log_path} 2>&1 "
@@ -116,6 +118,8 @@ function func_serving_cls(){
         else
             web_service_cpp_cmd="${python_} -m paddle_serving_server.serve --model ${serving_server_dir_name} --op GeneralClasOp --port 9292 --gpu_id=${use_gpu} &"
             eval ${web_service_cpp_cmd}
+            last_status=${PIPESTATUS[0]}
+            status_check $last_status "${web_service_cpp_cmd}" "${status_log}" "${model_name}"
             sleep 8s
 
             _save_log_path="${LOG_PATH}/server_infer_cpp_gpu_pipeline_batchsize_1.log"
@@ -207,12 +211,14 @@ function func_serving_rec(){
     unset https_proxy
     unset http_proxy
 
-    export SERVING_BIN=${PWD}/../Serving/server-build-gpu-opencv/core/general-server/serving
+    # export SERVING_BIN=${PWD}/../Serving/server-build-gpu-opencv/core/general-server/serving
     for use_gpu in ${web_use_gpu_list[*]}; do
         if [ ${use_gpu} = "null" ]; then
             det_serving_server_dir_name=$(func_get_url_file_name "$det_serving_server_value")
             web_service_cpp_cmd="${python_interp} -m paddle_serving_server.serve --model ../../${det_serving_server_value} ../../${cls_serving_server_value} --op GeneralPicodetOp GeneralFeatureExtractOp --port 9400 &"
             eval ${web_service_cpp_cmd}
+            last_status=${PIPESTATUS[0]}
+            status_check $last_status "${web_service_cpp_cmd}" "${status_log}" "${model_name}"
             sleep 5s
             _save_log_path="${LOG_PATH}/server_infer_cpp_cpu_batchsize_1.log"
             pipeline_cmd="${python_interp} ${pipeline_py} > ${_save_log_path} 2>&1 "
@@ -226,6 +232,8 @@ function func_serving_rec(){
             det_serving_server_dir_name=$(func_get_url_file_name "$det_serving_server_value")
             web_service_cpp_cmd="${python_interp} -m paddle_serving_server.serve --model ../../${det_serving_server_value} ../../${cls_serving_server_value} --op GeneralPicodetOp GeneralFeatureExtractOp --port 9400 --gpu_id=${use_gpu} &"
             eval ${web_service_cpp_cmd}
+            last_status=${PIPESTATUS[0]}
+            status_check $last_status "${web_service_cpp_cmd}" "${status_log}" "${model_name}"
             sleep 5s
             _save_log_path="${LOG_PATH}/server_infer_cpp_gpu_batchsize_1.log"
             pipeline_cmd="${python_interp} ${pipeline_py} > ${_save_log_path} 2>&1 "
@@ -241,9 +249,9 @@ function func_serving_rec(){
 
 
 # set cuda device
-GPUID=$2
+GPUID=$3
 if [ ${#GPUID} -le 0 ];then
-    env=" "
+    env="export CUDA_VISIBLE_DEVICES=0"
 else
     env="export CUDA_VISIBLE_DEVICES=${GPUID}"
 fi
