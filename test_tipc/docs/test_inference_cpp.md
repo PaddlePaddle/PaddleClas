@@ -9,7 +9,7 @@ Linux GPU/CPU C++ 推理功能测试的主程序为`test_inference_cpp.sh`，可
 |    算法名称     |                 模型名称                  | device_CPU | device_GPU |
 | :-------------: | :---------------------------------------: | :--------: | :--------: |
 |   MobileNetV3   |          MobileNetV3_large_x1_0           |    支持    |    支持    |
-|   MobileNetV3   |         MobileNetV3_large_x1_0-KL         |    支持    |    支持    |
+|   MobileNetV3   |         MobileNetV3_large_x1_0_KL         |    支持    |    支持    |
 |    PP-ShiTu     | PPShiTu_general_rec、PPShiTu_mainbody_det |    支持    |    支持    |
 |    PP-ShiTu     |           PPShiTu_mainbody_det            |    支持    |    支持    |
 |     PPHGNet     |               PPHGNet_small               |    支持    |    支持    |
@@ -25,7 +25,7 @@ Linux GPU/CPU C++ 推理功能测试的主程序为`test_inference_cpp.sh`，可
 |    PPLCNetV2    |              PPLCNetV2_base               |    支持    |    支持    |
 |     ResNet      |                 ResNet50                  |    支持    |    支持    |
 |     ResNet      |                ResNet50_vd                |    支持    |    支持    |
-|     ResNet      |              ResNet50_vd-KL               |    支持    |    支持    |
+|     ResNet      |              ResNet50_vd_KL               |    支持    |    支持    |
 | SwinTransformer |  SwinTransformer_tiny_patch4_window7_224  |    支持    |    支持    |
 
 ## 2. 测试流程(以**ResNet50**为例)

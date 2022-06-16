@@ -1,5 +1,5 @@
 ===========================serving_params===========================
-model_name:ResNet50_vd_kl_quant
+model_name:ResNet50_vd_KL
 python:python3.7
 inference_model_url:https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/slim_model/ResNet50_vd_kl_quant_infer.tar
 trans_model:-m paddle_serving_client.convert
