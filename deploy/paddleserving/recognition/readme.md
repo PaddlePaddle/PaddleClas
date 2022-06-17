@@ -216,7 +216,7 @@ python3.7 -m pip install paddle-serving-server-gpu==0.7.0.post112 # GPU with CUD
   # 进入工作目录
   cd PaddleClas/deploy/paddleserving
   # 一键编译安装Serving server、设置 SERVING_BIN
-  bash ./build_server.sh python3.7
+  source ./build_server.sh python3.7
   ```
   **注：**[build_server.sh](../build_server.sh#L55-L62)所设定的路径可能需要根据实际机器上的环境如CUDA、python版本等作一定修改，然后再编译。
 

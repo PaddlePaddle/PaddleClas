@@ -195,7 +195,7 @@ Different from Python Serving, the C++ Serving client calls C++ OP to predict, s
   # Enter the working directory
   cd PaddleClas/deploy/paddleserving
   # One-click compile and install Serving server, set SERVING_BIN
-  bash ./build_server.sh python3.7
+  source ./build_server.sh python3.7
   ```
   **Note: The path set by **[build_server.sh](../build_server.sh#L55-L62) may need to be modified according to the actual machine environment such as CUDA, python version, etc., and then compiled.
 
