@@ -1,4 +1,4 @@
-简体中文 | [English](../../../deploy/paddleserving/readme_en.md)
+简体中文 | [English](../../en/inference_deployment/classification_serving_deploy_en.md)
 
 # 分类模型服务化部署
 

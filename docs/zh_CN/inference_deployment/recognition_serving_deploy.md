@@ -1,17 +1,17 @@
-简体中文 | [English](../../../deploy/paddleserving/recognition/readme_en.md)
+简体中文 | [English](../../en/inference_deployment/recognition_serving_deploy_en.md)
 
 # 识别模型服务化部署
 
 ## 目录
 
-  - [1. 简介](#1-简介)
-  - [2. Serving 安装](#2-serving-安装)
-  - [3. 图像识别服务部署](#3-图像识别服务部署)
-    - [3.1 模型转换](#31-模型转换)
-    - [3.2 服务部署和请求](#32-服务部署和请求)
-      - [3.2.1 Python Serving](#321-python-serving)
-      - [3.2.2 C++ Serving](#322-c-serving)
-  - [4. FAQ](#4-faq)
+- [1. 简介](#1-简介)
+- [2. Serving 安装](#2-serving-安装)
+- [3. 图像识别服务部署](#3-图像识别服务部署)
+  - [3.1 模型转换](#31-模型转换)
+  - [3.2 服务部署和请求](#32-服务部署和请求)
+    - [3.2.1 Python Serving](#321-python-serving)
+    - [3.2.2 C++ Serving](#322-c-serving)
+- [4. FAQ](#4-faq)
 
 <a name="1"></a>
 ## 1. 简介
