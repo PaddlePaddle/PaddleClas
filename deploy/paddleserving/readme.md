@@ -112,7 +112,7 @@ python3.7 -m pip install paddle-serving-server-gpu==0.7.0.post112 # GPU with CUD
       └── serving_client_conf.stream.prototxt
   ```
 
-- Serving 为了兼容不同模型的部署，提供了输入输出重命名的功能。让不同的模型在推理部署时，只需要修改配置文件的 `alias_name` 即可，无需修改代码即可完成推理部署。因此在转换完毕后需要分别修改 `ResNet50_vd_serving` 和 `ResNet50_vd_client` 下文件 `serving_server_conf.prototxt` 中的 alias 名字，将 `fetch_var` 中的 `alias_name` 改为 `prediction`，修改后的 serving_server_conf.prototxt 如下所示:
+- Serving 为了兼容不同模型的部署，提供了输入输出重命名的功能。让不同的模型在推理部署时，只需要修改配置文件的 `alias_name` 即可，无需修改代码即可完成推理部署。因此在转换完毕后需要分别修改 `ResNet50_vd_serving` 下的文件 `serving_server_conf.prototxt` 和 `ResNet50_vd_client` 下的文件 `serving_client_conf.prototxt`，将 `fetch_var` 中 `alias_name:` 后的字段改为 `prediction`，修改后的 `serving_server_conf.prototxt` 和 `serving_client_conf.prototxt` 如下所示:
   ```log
   feed_var {
     name: "inputs"
@@ -159,7 +159,7 @@ test_cpp_serving_client.py    # rpc方式发送C++ serving预测请求的脚本
   # 发送服务请求
   python3.7 pipeline_http_client.py
   ```
-  成功运行后，模型预测的结果会打印在 cmd 窗口中，结果如下：
+  成功运行后，模型预测的结果会打印在客户端中，如下所示：
   ```log
   {'err_no': 0, 'err_msg': '', 'key': ['label', 'prob'], 'value': ["['daisy']", '[0.9341402053833008]'], 'tensors': []}
   ```
@@ -180,11 +180,11 @@ test_cpp_serving_client.py    # rpc方式发送C++ serving预测请求的脚本
   # 进入工作目录
   cd PaddleClas/deploy/paddleserving
   # 一键编译安装Serving server、设置 SERVING_BIN
-  bash ./build_server.sh python3.7
+  source ./build_server.sh python3.7
   ```
   **注：**[build_server.sh](./build_server.sh#L55-L62)所设定的路径可能需要根据实际机器上的环境如CUDA、python版本等作一定修改，然后再编译。
 
-- 修改客户端文件 `ResNet50_client/serving_client_conf.prototxt` ，将 `feed_type:` 后的字段改为20，将第一个 `shape:` 后的字段改为1并删掉其余的 `shape` 字段。
+- 修改客户端文件 `ResNet50_vd_client/serving_client_conf.prototxt` ，将 `feed_type:` 后的字段改为20，将第一个 `shape:` 后的字段改为1并删掉其余的 `shape` 字段。
   ```log
   feed_var {
     name: "inputs"
@@ -195,16 +195,16 @@ test_cpp_serving_client.py    # rpc方式发送C++ serving预测请求的脚本
   }
   ```
 - 修改 [`test_cpp_serving_client`](./test_cpp_serving_client.py) 的部分代码
-  1. 修改 [`feed={"inputs": image}`](./test_cpp_serving_client.py#L28) 部分代码，将 `load_client_config` 后的路径改为 `ResNet50_client/serving_client_conf.prototxt` 。
-  2. 修改 [`feed={"inputs": image}`](./test_cpp_serving_client.py#L45) 部分代码，将 `inputs` 改为与 `ResNet50_client/serving_client_conf.prototxt` 中 `feed_var` 字段下面的 `name` 一致。由于部分模型client文件中的 `name` 为 `x` 而不是 `inputs` ，因此使用这些模型进行C++ Serving部署时需要注意这一点。
+  1. 修改 [`load_client_config`](./test_cpp_serving_client.py#L28) 处的代码，将 `load_client_config` 后的路径改为 `ResNet50_vd_client/serving_client_conf.prototxt` 。
+  2. 修改 [`feed={"inputs": image}`](./test_cpp_serving_client.py#L45) 处的代码，将 `inputs` 改为与 `ResNet50_vd_client/serving_client_conf.prototxt` 中 `feed_var` 字段下面的 `name` 一致。由于部分模型client文件中的 `name` 为 `x` 而不是 `inputs` ，因此使用这些模型进行C++ Serving部署时需要注意这一点。
 
 - 启动服务：
   ```shell
   # 启动服务， 服务在后台运行，运行日志保存在 nohup.txt
   # CPU部署
-  sh run_cpp_serving.sh
+  bash run_cpp_serving.sh
   # GPU部署并指定0号卡
-  sh run_cpp_serving.sh 0
+  bash run_cpp_serving.sh 0
   ```
 
 - 发送请求：
@@ -212,7 +212,7 @@ test_cpp_serving_client.py    # rpc方式发送C++ serving预测请求的脚本
   # 发送服务请求
   python3.7 test_cpp_serving_client.py
   ```
-  成功运行后，模型预测的结果会打印在 cmd 窗口中，结果如下：
+  成功运行后，模型预测的结果会打印在客户端中，如下所示：
   ```log
   prediction: daisy, probability: 0.9341399073600769
   ```

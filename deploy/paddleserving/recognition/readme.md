@@ -119,6 +119,26 @@ python3.7 -m pip install paddle-serving-server-gpu==0.7.0.post112 # GPU with CUD
   ```
   上述命令的参数含义与[#3.1 模型转换](#3.1)相同
 
+  识别推理模型转换完成后，会在当前文件夹多出 `general_PPLCNet_x2_5_lite_v1.0_serving/` 和 `general_PPLCNet_x2_5_lite_v1.0_client/` 的文件夹。分别修改 `general_PPLCNet_x2_5_lite_v1.0_serving/` 和 `general_PPLCNet_x2_5_lite_v1.0_client/` 目录下的 `serving_server_conf.prototxt` 中的 `alias` 名字： 将 `fetch_var` 中的 `alias_name` 改为 `features`。 修改后的 `serving_server_conf.prototxt` 内容如下
+
+  ```log
+  feed_var {
+  name: "x"
+  alias_name: "x"
+  is_lod_tensor: false
+  feed_type: 1
+  shape: 3
+  shape: 224
+  shape: 224
+  }
+  fetch_var {
+    name: "save_infer_model/scale_0.tmp_1"
+    alias_name: "features"
+    is_lod_tensor: false
+    fetch_type: 1
+    shape: 512
+  }
+  ```
   通用检测 inference 模型转换完成后，会在当前文件夹多出 `picodet_PPLCNet_x2_5_mainbody_lite_v1.0_serving/` 和 `picodet_PPLCNet_x2_5_mainbody_lite_v1.0_client/` 的文件夹，具备如下结构：
     ```shell
     ├── picodet_PPLCNet_x2_5_mainbody_lite_v1.0_serving/
@@ -182,7 +202,7 @@ python3.7 -m pip install paddle-serving-server-gpu==0.7.0.post112 # GPU with CUD
   ```shell
   python3.7 pipeline_http_client.py
   ```
-  成功运行后，模型预测的结果会打印在 cmd 窗口中，结果如下：
+  成功运行后，模型预测的结果会打印在客户端中，如下所示：
   ```log
   {'err_no': 0, 'err_msg': '', 'key': ['result'], 'value': ["[{'bbox': [345, 95, 524, 576], 'rec_docs': '红牛-强化型', 'rec_scores': 0.79903316}]"], 'tensors': []}
   ```
@@ -219,9 +239,9 @@ python3.7 -m pip install paddle-serving-server-gpu==0.7.0.post112 # GPU with CUD
 
   # 端口号默认为9400；运行日志默认保存在 log_PPShiTu.txt 中
   # CPU部署
-  sh run_cpp_serving.sh
+  bash run_cpp_serving.sh
   # GPU部署，并指定第0号卡
-  sh run_cpp_serving.sh 0
+  bash run_cpp_serving.sh 0
   ```
 
 - 发送请求：
@@ -229,7 +249,7 @@ python3.7 -m pip install paddle-serving-server-gpu==0.7.0.post112 # GPU with CUD
   # 发送服务请求
   python3.7 test_cpp_serving_client.py
   ```
-  成功运行后，模型预测的结果会打印在客户端的终端窗口中，结果如下所示：
+  成功运行后，模型预测的结果会打印在客户端中，如下所示：
   ```log
   WARNING: Logging before InitGoogleLogging() is written to STDERR
   I0614 03:01:36.273097  6084 naming_service_thread.cpp:202] brpc::policy::ListNamingService("127.0.0.1:9400"): added 1

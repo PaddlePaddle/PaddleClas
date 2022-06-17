@@ -1,1 +1,0 @@
-deploy/paddleserving/readme.md
