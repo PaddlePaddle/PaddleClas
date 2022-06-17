@@ -1,6 +1,6 @@
 English | [简体中文](../../zh_CN/inference_deployment/recognition_serving_deploy.md)
 
-# Identify model service deployment
+# Recognition model service deployment
 
 ## Table of contents
 
@@ -185,7 +185,7 @@ When using PaddleServing for image recognition service deployment, **need to con
   pipeline_http_client.py # Script for sending pipeline prediction requests in http mode
   pipeline_rpc_client.py # Script for sending pipeline prediction requests in rpc mode
   recognition_web_service.py # Script to start the pipeline server
-  readme.md # Identify model service deployment documents
+  readme.md # Recognition model service deployment documents
   run_cpp_serving.sh # Script to start C++ Pipeline Serving deployment
   test_cpp_serving_client.py # Script for sending C++ Pipeline serving prediction requests by rpc
   ```
