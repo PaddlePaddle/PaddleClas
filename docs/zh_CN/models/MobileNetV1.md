@@ -45,7 +45,7 @@ MobileNetV1 是 Google 于 2017 年发布的用于移动设备或嵌入式设备
 
 ### 1.2 模型指标
 
-| Models                               | Top1    | Top5    | Reference<br>top1 | Reference<br>top5 | FLOPS<br>(G) | Params<br>(M) |
+| Models                               | Top1    | Top5    | Reference<br>top1 | Reference<br>top5 | FLOPs<br>(G) | Params<br>(M) |
 |:--:|:--:|:--:|:--:|:--:|:--:|:--:|
 | MobileNetV1_x0_25                    | 0.514   | 0.755   | 0.506             |                   | 0.070        | 0.460             |
 | MobileNetV1_x0_5                     | 0.635   | 0.847   | 0.637             |                   | 0.280        | 1.310             |
@@ -65,17 +65,21 @@ MobileNetV1 是 Google 于 2017 年发布的用于移动设备或嵌入式设备
 | MobileNetV1                      | 224       | 256               | 0.64                           | 1.57                           | 2.48                           |
 | MobileNetV1_ssld                 | 224       | 256               | 0.66                           | 1.59                           | 2.58                           |
 
-<a name='1.3.3'></a>
+**备注：** 精度类型为 FP32，推理过程使用 TensorRT。
 
-#### 1.3.3 基于 T4 GPU 的预测速度
+<a name='1.3.2'></a>
 
-| Models            | Crop Size | Resize Short Size | FP32<br>Batch Size=1<br>(ms) | FP32<br>Batch Size=4<br>(ms) | FP32<br>Batch Size=8<br>(ms) |
+#### 1.3.2 基于 T4 GPU 的预测速度
+
+| Models            | Size| Latency(ms)<br>FP32<br>bs=1 | Latency(ms)<br>FP32<br>bs=4 | Latency(ms)<br>FP32<br>bs=8 |
 |-----------------------------|-----------------------|-----------------------|-----------------------|-----------------------|-----------------------|
-| MobileNetV1_x0_25           | 224       | 256               | 0.47                         | 0.93                         | 1.39                         |
-| MobileNetV1_x0_5            | 224       | 256               | 0.48                         | 1.09                         | 1.69                         |
-| MobileNetV1_x0_75           | 224       | 256               | 0.55                         | 1.34                         | 2.03                         |
-| MobileNetV1                 | 224       | 256               | 0.64                         | 1.57                         | 2.48                         |
-| MobileNetV1_ssld            | 224       | 256               | 0.66                         | 1.59                         | 2.58                         |
+| MobileNetV1_x0_25           | 224       | 0.47                         | 0.93                         | 1.39                         |
+| MobileNetV1_x0_5            | 224       | 0.48                         | 1.09                         | 1.69                         |
+| MobileNetV1_x0_75           | 224       | 0.55                         | 1.34                         | 2.03                         |
+| MobileNetV1                 | 224       | 0.64                         | 1.57                         | 2.48                         |
+| MobileNetV1_ssld            | 224       | 0.66                         | 1.59                         | 2.58                         |
+
+**备注：** 推理过程使用 TensorRT。
 
 <a name="2"></a>  
 
@@ -135,4 +139,4 @@ PaddleClas 提供了基于 Paddle Lite 来完成模型端侧部署的示例，�
 
 Paddle2ONNX 支持将 PaddlePaddle 模型格式转化到 ONNX 模型格式。通过 ONNX 可以完成将 Paddle 模型到多种推理引擎的部署，包括TensorRT/OpenVINO/MNN/TNN/NCNN，以及其它对 ONNX 开源格式进行支持的推理引擎或硬件。更多关于 Paddle2ONNX 的介绍，可以参考[Paddle2ONNX 代码仓库](https://github.com/PaddlePaddle/Paddle2ONNX)。
 
-PaddleClas 提供了基于 Paddle2ONNX 来完成 inference 模型转换 ONNX 模型并作推理预测的示例，您可以参考[Paddle2ONNX 模型转换与预测](@shuilong)来完成相应的部署工作。
+PaddleClas 提供了基于 Paddle2ONNX 来完成 inference 模型转换 ONNX 模型并作推理预测的示例，您可以参考[Paddle2ONNX 模型转换与预测](../../../deploy/paddle2onnx/readme.md)来完成相应的部署工作。

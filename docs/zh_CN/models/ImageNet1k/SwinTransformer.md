@@ -56,7 +56,7 @@ Swin Transformer 是一种新的视觉 Transformer 网络，可以用作计算�
 
 #### 1.3.1 基于 V100 GPU 的预测速度
 
-| Models  | Size |  Latency(ms)<br>bs=1 | Latency(ms)<br>bs=4 | Latency(ms)<br>bs=8 |
+| Models      | Size | Latency(ms)<br>bs=1 | Latency(ms)<br>bs=4 | Latency(ms)<br>bs=8 |
 |:--:|:--:|:--:|:--:|:--:|
 | SwinTransformer_tiny_patch4_window7_224                 | 224       | 6.59                           | 9.68                           | 16.32                          |
 | SwinTransformer_small_patch4_window7_224                | 224       | 12.54                          | 17.07                          | 28.08                          |
@@ -131,4 +131,8 @@ PaddleClas 提供了基于 Paddle Lite 来完成模型端侧部署的示例，�
 
 Paddle2ONNX 支持将 PaddlePaddle 模型格式转化到 ONNX 模型格式。通过 ONNX 可以完成将 Paddle 模型到多种推理引擎的部署，包括TensorRT/OpenVINO/MNN/TNN/NCNN，以及其它对 ONNX 开源格式进行支持的推理引擎或硬件。更多关于 Paddle2ONNX 的介绍，可以参考[Paddle2ONNX 代码仓库](https://github.com/PaddlePaddle/Paddle2ONNX)。
 
+<<<<<<< 60cba5adfae34265593069e36ff0d379b8aeba71:docs/zh_CN/models/ImageNet1k/SwinTransformer.md
 PaddleClas 提供了基于 Paddle2ONNX 来完成 inference 模型转换 ONNX 模型并作推理预测的示例，您可以参考[Paddle2ONNX 模型转换与预测](../../deployment/image_classification/paddle2onnx.md)来完成相应的部署工作。
+=======
+PaddleClas 提供了基于 Paddle2ONNX 来完成 inference 模型转换 ONNX 模型并作推理预测的示例，您可以参考[Paddle2ONNX 模型转换与预测](../../../deploy/paddle2onnx/readme.md)来完成相应的部署工作。
+>>>>>>> docs: update:docs/zh_CN/models/SwinTransformer.md

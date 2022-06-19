@@ -32,7 +32,7 @@ ViT（Vision Transformer）系列模型是 Google 在 2020 年提出的，该模
 
 ### 1.2 模型指标
 
-| Models           | Top1 | Top5 | Reference<br>top1 | Reference<br>top5 | FLOPS<br>(G) | Params<br>(M) |
+| Models           | Top1 | Top5 | Reference<br>top1 | Reference<br>top5 | FLOPs<br>(G) | Params<br>(M) |
 |:--:|:--:|:--:|:--:|:--:|:--:|:--:|
 | ViT_small_patch16_224 | 0.7769 | 0.9342 | 0.7785 | 0.9342 | 9.41 | 48.60 |
 | ViT_base_patch16_224  | 0.8195 | 0.9617 | 0.8178 | 0.9613 | 16.85 | 86.42 |
@@ -48,15 +48,17 @@ ViT（Vision Transformer）系列模型是 Google 在 2020 年提出的，该模
 
 #### 1.3.1 基于 V100 GPU 的预测速度
 
-| Models                     | Crop Size | Resize Short Size | FP32<br/>Batch Size=1<br/>(ms) | FP32<br/>Batch Size=4<br/>(ms) | FP32<br/>Batch Size=8<br/>(ms) |
+| Models      | Size | Latency(ms)<br>bs=1 | Latency(ms)<br>bs=4 | Latency(ms)<br>bs=8 |
 | -------------------------- | --------- | ----------------- | ------------------------------ | ------------------------------ | ------------------------------ |
-| ViT_small_<br/>patch16_224 | 256       | 224               | 3.71                           | 9.05                           | 16.72                          |
-| ViT_base_<br/>patch16_224  | 256       | 224               | 6.12                           | 14.84                          | 28.51                          |
-| ViT_base_<br/>patch16_384  | 384       | 384               | 14.15                          | 48.38                          | 95.06                          |
-| ViT_base_<br/>patch32_384  | 384       | 384               | 4.94                           | 13.43                          | 24.08                          |
-| ViT_large_<br/>patch16_224 | 256       | 224               | 15.53                          | 49.50                          | 94.09                          |
-| ViT_large_<br/>patch16_384 | 384       | 384               | 39.51                          | 152.46                         | 304.06                         |
-| ViT_large_<br/>patch32_384 | 384       | 384               | 11.44                          | 36.09                          | 70.63                          |
+| ViT_small_<br/>patch16_224 | 224               | 3.71                           | 9.05                           | 16.72                          |
+| ViT_base_<br/>patch16_224  | 224               | 6.12                           | 14.84                          | 28.51                          |
+| ViT_base_<br/>patch16_384  | 384               | 14.15                          | 48.38                          | 95.06                          |
+| ViT_base_<br/>patch32_384  | 384               | 4.94                           | 13.43                          | 24.08                          |
+| ViT_large_<br/>patch16_224 | 224               | 15.53                          | 49.50                          | 94.09                          |
+| ViT_large_<br/>patch16_384 | 384               | 39.51                          | 152.46                         | 304.06                         |
+| ViT_large_<br/>patch32_384 | 384               | 11.44                          | 36.09                          | 70.63                          |
+
+**备注：** 精度类型为 FP32，推理过程使用 TensorRT。
 
 <a name="2"></a>  
 
@@ -118,4 +120,4 @@ PaddleClas 提供了基于 Paddle Lite 来完成模型端侧部署的示例，�
 
 Paddle2ONNX 支持将 PaddlePaddle 模型格式转化到 ONNX 模型格式。通过 ONNX 可以完成将 Paddle 模型到多种推理引擎的部署，包括TensorRT/OpenVINO/MNN/TNN/NCNN，以及其它对 ONNX 开源格式进行支持的推理引擎或硬件。更多关于 Paddle2ONNX 的介绍，可以参考[Paddle2ONNX 代码仓库](https://github.com/PaddlePaddle/Paddle2ONNX)。
 
-PaddleClas 提供了基于 Paddle2ONNX 来完成 inference 模型转换 ONNX 模型并作推理预测的示例，您可以参考[Paddle2ONNX 模型转换与预测](@shuilong)来完成相应的部署工作。
+PaddleClas 提供了基于 Paddle2ONNX 来完成 inference 模型转换 ONNX 模型并作推理预测的示例，您可以参考[Paddle2ONNX 模型转换与预测](../../../deploy/paddle2onnx/readme.md)来完成相应的部署工作。

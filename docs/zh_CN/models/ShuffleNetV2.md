@@ -45,7 +45,7 @@ ShuffleNet 系列网络是旷视提出的轻量化网络结构，到目前为止
 
 ### 1.2 模型指标
 
-| Models                               | Top1    | Top5    | Reference<br>top1 | Reference<br>top5 | FLOPS<br>(G) | Params<br>(M) |
+| Models                               | Top1    | Top5    | Reference<br>top1 | Reference<br>top5 | FLOPs<br>(G) | Params<br>(M) |
 |:--:|:--:|:--:|:--:|:--:|:--:|:--:|
 | ShuffleNetV2                         | 0.688   | 0.885   | 0.694             |                   | 0.280        | 2.260             |
 | ShuffleNetV2_x0_25                   | 0.499   | 0.738   |                   |                   | 0.030        | 0.600             |
@@ -75,29 +75,33 @@ ShuffleNet 系列网络是旷视提出的轻量化网络结构，到目前为止
 
 #### 1.3.2 基于 V100 GPU 的预测速度
 
-| Models                           | Crop Size | Resize Short Size | FP32<br/>Batch Size=1<br/>(ms) | FP32<br/>Batch Size=4<br/>(ms) | FP32<br/>Batch Size=8<br/>(ms) |
-| -------------------------------- | --------- | ----------------- | ------------------------------ | ------------------------------ | ------------------------------ |
-| ShuffleNetV2                     | 224       | 256               | 1.05                           | 1.76                           | 2.37                           |
-| ShuffleNetV2_x0_25               | 224       | 256               | 0.92                           | 1.27                           | 1.73                           |
-| ShuffleNetV2_x0_33               | 224       | 256               | 0.91                           | 1.29                           | 1.81                           |
-| ShuffleNetV2_x0_5                | 224       | 256               | 0.89                           | 1.43                           | 1.94                           |
-| ShuffleNetV2_x1_5                | 224       | 256               | 0.93                           | 1.99                           | 2.85                           |
-| ShuffleNetV2_x2_0                | 224       | 256               | 1.45                           | 2.70                           | 3.35                           |
-| ShuffleNetV2_swish               | 224       | 256               | 1.43                           | 1.93                           | 2.69                           |
+| Models      | Size | Latency(ms)<br>bs=1 | Latency(ms)<br>bs=4 | Latency(ms)<br>bs=8 |
+| --------------------------------  | ----------------- | ------------------------------ | ------------------------------ | ------------------------------ |
+| ShuffleNetV2                     | 224       | 1.05   | 1.76                           | 2.37                           |
+| ShuffleNetV2_x0_25               | 224       | 0.92   | 1.27                           | 1.73                           |
+| ShuffleNetV2_x0_33               | 224       | 0.91   | 1.29                           | 1.81                           |
+| ShuffleNetV2_x0_5                | 224       | 0.89   | 1.43                           | 1.94                           |
+| ShuffleNetV2_x1_5                | 224       | 0.93   | 1.99                           | 2.85                           |
+| ShuffleNetV2_x2_0                | 224       | 1.45   | 2.70                           | 3.35                           |
+| ShuffleNetV2_swish               | 224       | 1.43   | 1.93                           | 2.69                           |
+
+**备注：** 精度类型为 FP32，推理过程使用 TensorRT。
 
 <a name='1.3.3'></a>
 
 #### 1.3.3 基于 T4 GPU 的预测速度
 
-| Models            | Crop Size | Resize Short Size | FP32<br>Batch Size=1<br>(ms) | FP32<br>Batch Size=4<br>(ms) | FP32<br>Batch Size=8<br>(ms) |
+| Models            | Size  | Latency(ms)<br>FP32<br>bs=1 | Latency(ms)<br>FP32<br>bs=4 | Latency(ms)<br>FP32<br>bs=8 |
 |-----------------------------|-----------------------|-----------------------|-----------------------|-----------------------|-----------------------|
-| ShuffleNetV2_swish          | 224       | 256               | 1.43                         | 1.93                         | 2.69                         |
-| ShuffleNetV2_x0_25          | 224       | 256               | 0.92                         | 1.27                         | 1.73                         |
-| ShuffleNetV2_x0_33          | 224       | 256               | 0.91                         | 1.29                         | 1.81                         |
-| ShuffleNetV2_x0_5           | 224       | 256               | 0.89                         | 1.43                         | 1.94                         |
-| ShuffleNetV2_x1_0           | 224       | 256               | 1.05                         | 1.76                         | 2.37                         |
-| ShuffleNetV2_x1_5           | 224       | 256               | 0.93                         | 1.99                         | 2.85                         |
-| ShuffleNetV2_x2_0           | 224       | 256               | 1.45                         | 2.70                         | 3.35                         |
+| ShuffleNetV2_swish          | 224    | 1.43                         | 1.93                         | 2.69                         |
+| ShuffleNetV2_x0_25          | 224    | 0.92                         | 1.27                         | 1.73                         |
+| ShuffleNetV2_x0_33          | 224    | 0.91                         | 1.29                         | 1.81                         |
+| ShuffleNetV2_x0_5           | 224    | 0.89                         | 1.43                         | 1.94                         |
+| ShuffleNetV2_x1_0           | 224    | 1.05                         | 1.76                         | 2.37                         |
+| ShuffleNetV2_x1_5           | 224    | 0.93                         | 1.99                         | 2.85                         |
+| ShuffleNetV2_x2_0           | 224    | 1.45                         | 2.70                         | 3.35                         |
+
+**备注：** 推理过程使用 TensorRT。
 
 <a name="2"></a>  
 
@@ -157,4 +161,4 @@ PaddleClas 提供了基于 Paddle Lite 来完成模型端侧部署的示例，�
 
 Paddle2ONNX 支持将 PaddlePaddle 模型格式转化到 ONNX 模型格式。通过 ONNX 可以完成将 Paddle 模型到多种推理引擎的部署，包括TensorRT/OpenVINO/MNN/TNN/NCNN，以及其它对 ONNX 开源格式进行支持的推理引擎或硬件。更多关于 Paddle2ONNX 的介绍，可以参考[Paddle2ONNX 代码仓库](https://github.com/PaddlePaddle/Paddle2ONNX)。
 
-PaddleClas 提供了基于 Paddle2ONNX 来完成 inference 模型转换 ONNX 模型并作推理预测的示例，您可以参考[Paddle2ONNX 模型转换与预测](@shuilong)来完成相应的部署工作。
+PaddleClas 提供了基于 Paddle2ONNX 来完成 inference 模型转换 ONNX 模型并作推理预测的示例，您可以参考[Paddle2ONNX 模型转换与预测](../../../deploy/paddle2onnx/readme.md)来完成相应的部署工作。
