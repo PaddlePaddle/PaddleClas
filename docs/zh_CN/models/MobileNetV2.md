@@ -28,7 +28,7 @@
 
 ### 1.1 模型简介
 
-MobileNetV2 是 Google 继 MobileNetV1 提出的一种轻量级网络。相比 MobileNetV1，MobileNetV2 提出了 Linear bottlenecks 与 Inverted residual block 作为网络基本结构，通过大量地堆叠这些基本模块，构成了 MobileNetV2 的网络结构。最终，在 FLOPS 只有 MobileNetV1 的一半的情况下取得了更高的分类精度。
+MobileNetV2 是 Google 继 MobileNetV1 提出的一种轻量级网络。相比 MobileNetV1，MobileNetV2 提出了 Linear bottlenecks 与 Inverted residual block 作为网络基本结构，通过大量地堆叠这些基本模块，构成了 MobileNetV2 的网络结构。最终，在 FLOPs 只有 MobileNetV1 的一半的情况下取得了更高的分类精度。
 
 ![](../../images/models/mobile_arm_top1.png)
 
@@ -45,7 +45,7 @@ MobileNetV2 是 Google 继 MobileNetV1 提出的一种轻量级网络。相比 M
 
 ### 1.2 模型指标
 
-| Models                               | Top1    | Top5    | Reference<br>top1 | Reference<br>top5 | FLOPS<br>(G) | Params<br>(M) |
+| Models                               | Top1    | Top5    | Reference<br>top1 | Reference<br>top5 | FLOPs<br>(G) | Params<br>(M) |
 |:--:|:--:|:--:|:--:|:--:|:--:|:--:|
 | MobileNetV2_x0_25                    | 0.532   | 0.765   |                   |                   | 0.050        | 1.500             |
 | MobileNetV2_x0_5                     | 0.650   | 0.857   | 0.654             | 0.864             | 0.170        | 1.930             |
@@ -75,29 +75,33 @@ MobileNetV2 是 Google 继 MobileNetV1 提出的一种轻量级网络。相比 M
 
 #### 1.3.2 基于 V100 GPU 的预测速度
 
-| Models                           | Crop Size | Resize Short Size | FP32<br/>Batch Size=1<br/>(ms) | FP32<br/>Batch Size=4<br/>(ms) | FP32<br/>Batch Size=8<br/>(ms) |
-| -------------------------------- | --------- | ----------------- | ------------------------------ | ------------------------------ | ------------------------------ |
-| MobileNetV2_x0_25                | 224       | 256               | 0.83                           | 1.17                           | 1.78                           |
-| MobileNetV2_x0_5                 | 224       | 256               | 0.84                           | 1.45                           | 2.04                           |
-| MobileNetV2_x0_75                | 224       | 256               | 0.96                           | 1.62                           | 2.53                           |
-| MobileNetV2                      | 224       | 256               | 1.02                           | 1.93                           | 2.89                           |
-| MobileNetV2_x1_5                 | 224       | 256               | 1.32                           | 2.58                           | 4.14                           |
-| MobileNetV2_x2_0                 | 224       | 256               | 1.57                           | 3.13                           | 4.76                           |
-| MobileNetV2_ssld                 | 224       | 256               | 1.01                           | 1.97                           | 2.84                           |
+| Models      | Size | Latency(ms)<br>bs=1 | Latency(ms)<br>bs=4 | Latency(ms)<br>bs=8 |
+| -------------------------------- | ----------------- | ------------------------------ | ------------------------------ | ------------------------------ |
+| MobileNetV2_x0_25                | 224      | 0.83                           | 1.17                           | 1.78                           |
+| MobileNetV2_x0_5                 | 224      | 0.84                           | 1.45                           | 2.04                           |
+| MobileNetV2_x0_75                | 224      | 0.96                           | 1.62                           | 2.53                           |
+| MobileNetV2                      | 224      | 1.02                           | 1.93                           | 2.89                           |
+| MobileNetV2_x1_5                 | 224      | 1.32                           | 2.58                           | 4.14                           |
+| MobileNetV2_x2_0                 | 224      | 1.57                           | 3.13                           | 4.76                           |
+| MobileNetV2_ssld                 | 224      | 1.01                           | 1.97                           | 2.84                           |
+
+**备注：** 精度类型为 FP32，推理过程使用 TensorRT。
 
 <a name='1.3.3'></a>
 
 #### 1.3.3 基于 T4 GPU 的预测速度
 
-| Models            | Crop Size | Resize Short Size | FP32<br>Batch Size=1<br>(ms) | FP32<br>Batch Size=4<br>(ms) | FP32<br>Batch Size=8<br>(ms) |
-|-----------------------------|-----------------------|-----------------------|-----------------------|-----------------------|-----------------------|
-| MobileNetV2_x0_25           | 224       | 256               | 0.83                         | 1.17                         | 1.78                         |
-| MobileNetV2_x0_5            | 224       | 256               | 0.84                         | 1.45                         | 2.04                         |
-| MobileNetV2_x0_75           | 224       | 256               | 0.96                         | 1.62                         | 2.53                         |
-| MobileNetV2                 | 224       | 256               | 1.02                         | 1.93                         | 2.89                         |
-| MobileNetV2_x1_5            | 224       | 256               | 1.32                         | 2.58                         | 4.14                         |
-| MobileNetV2_x2_0            | 224       | 256               | 1.57                         | 3.13                         | 4.76                         |
-| MobileNetV2_ssld            | 224       | 256               | 1.01                         | 1.97                         | 2.84                         |
+| Models            | Size | Latency(ms)<br>FP32<br>bs=1 | Latency(ms)<br>FP32<br>bs=4 | Latency(ms)<br>FP32<br>bs=8 |
+|----------------------------|-----------------------|-----------------------|-----------------------|-----------------------|
+| MobileNetV2_x0_25           | 224      | 0.83                         | 1.17                         | 1.78                         |
+| MobileNetV2_x0_5            | 224      | 0.84                         | 1.45                         | 2.04                         |
+| MobileNetV2_x0_75           | 224      | 0.96                         | 1.62                         | 2.53                         |
+| MobileNetV2                 | 224      | 1.02                         | 1.93                         | 2.89                         |
+| MobileNetV2_x1_5            | 224      | 1.32                         | 2.58                         | 4.14                         |
+| MobileNetV2_x2_0            | 224      | 1.57                         | 3.13                         | 4.76                         |
+| MobileNetV2_ssld            | 224      | 1.01                         | 1.97                         | 2.84                         |
+
+**备注：** 推理过程使用 TensorRT。
 
 <a name="2"></a>  
 
@@ -157,4 +161,4 @@ PaddleClas 提供了基于 Paddle Lite 来完成模型端侧部署的示例，�
 
 Paddle2ONNX 支持将 PaddlePaddle 模型格式转化到 ONNX 模型格式。通过 ONNX 可以完成将 Paddle 模型到多种推理引擎的部署，包括TensorRT/OpenVINO/MNN/TNN/NCNN，以及其它对 ONNX 开源格式进行支持的推理引擎或硬件。更多关于 Paddle2ONNX 的介绍，可以参考[Paddle2ONNX 代码仓库](https://github.com/PaddlePaddle/Paddle2ONNX)。
 
-PaddleClas 提供了基于 Paddle2ONNX 来完成 inference 模型转换 ONNX 模型并作推理预测的示例，您可以参考[Paddle2ONNX 模型转换与预测](@shuilong)来完成相应的部署工作。
+PaddleClas 提供了基于 Paddle2ONNX 来完成 inference 模型转换 ONNX 模型并作推理预测的示例，您可以参考[Paddle2ONNX 模型转换与预测](../../../deploy/paddle2onnx/readme.md)来完成相应的部署工作。

@@ -26,6 +26,8 @@
 
 TNT(Transformer-iN-Transformer)系列模型由华为诺亚于 2021 年提出，用于对 patch 级别和 pixel 级别的表示进行建模。在每个 TNT 块中，outer transformer block 用于处理 patch 嵌入，inner transformer block 从 pixel 嵌入中提取局部特征。通过线性变换层将 pixel 级特征投影到 patch 嵌入空间，然后加入到 patch 中。通过对 TNT 块的叠加，建立了用于图像识别的 TNT 模型。在 ImageNet 基准测试和下游任务上的实验证明了该 TNT 体系结构的优越性和有效性。例如，在计算量相当的情况下 TNT 能在 ImageNet 上达到 81.3% 的 top-1 精度，比 DeiT 高 1.5%。[论文地址](https://arxiv.org/abs/2103.00112)。
 
+PaddleClas 所提供的该系列模型的预训练模型权重，均是基于其官方提供的权重转得。
+
 <a name='1.2'></a>
 
 ### 1.2 模型指标
@@ -94,4 +96,4 @@ PaddleClas 提供了基于 Paddle Lite 来完成模型端侧部署的示例，�
 
 Paddle2ONNX 支持将 PaddlePaddle 模型格式转化到 ONNX 模型格式。通过 ONNX 可以完成将 Paddle 模型到多种推理引擎的部署，包括TensorRT/OpenVINO/MNN/TNN/NCNN，以及其它对 ONNX 开源格式进行支持的推理引擎或硬件。更多关于 Paddle2ONNX 的介绍，可以参考[Paddle2ONNX 代码仓库](https://github.com/PaddlePaddle/Paddle2ONNX)。
 
-PaddleClas 提供了基于 Paddle2ONNX 来完成 inference 模型转换 ONNX 模型并作推理预测的示例，您可以参考[Paddle2ONNX 模型转换与预测](@shuilong)来完成相应的部署工作。
+PaddleClas 提供了基于 Paddle2ONNX 来完成 inference 模型转换 ONNX 模型并作推理预测的示例，您可以参考[Paddle2ONNX 模型转换与预测](../../../deploy/paddle2onnx/readme.md)来完成相应的部署工作。
