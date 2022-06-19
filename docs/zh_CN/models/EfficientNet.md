@@ -57,6 +57,8 @@ EfficientNet 是 Google 于 2019 年发布的一个基于 NAS 的轻量级网络
 | EfficientNetB7                | 0.843  | 0.969  | 0.844             | 0.971             | 72.350       | 64.920            |
 | EfficientNetB0_<br>small      | 0.758  | 0.926  |                   |                   | 0.720        | 4.650             |
 
+**备注：** PaddleClas 所提供的该系列模型中，EfficientNetB1-B7模型的预训练模型权重，均是基于其官方提供的权重转得。
+
 ### 1.3 Benchmark
 
 <a name='1.3.1'></a>

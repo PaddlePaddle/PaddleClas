@@ -46,7 +46,9 @@ Swin Transformer 是一种新的视觉 Transformer 网络，可以用作计算�
 
 [1]：基于 ImageNet22k 数据集预训练，然后在 ImageNet1k 数据集迁移学习得到。
 
-**注**：与 Reference 的精度差异源于数据预处理不同。
+**备注：**
+1. 与 Reference 的精度差异源于数据预处理不同。
+2. PaddleClas 所提供的该系列模型的预训练模型权重，均是基于其官方提供的权重转得。
 
 <a name='1.3'></a>
 
