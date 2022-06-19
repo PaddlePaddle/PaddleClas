@@ -45,6 +45,8 @@ RepVGG(Making VGG-style ConvNets Great Again)系列模型是由清华大学(丁�
 
 关于 Params、FLOPs、Inference speed 等信息，敬请期待。
 
+**备注：** PaddleClas 所提供的该系列模型的预训练模型权重，均是基于其官方提供的权重转得。
+
 <a name="2"></a>  
 
 ## 2. 模型快速体验

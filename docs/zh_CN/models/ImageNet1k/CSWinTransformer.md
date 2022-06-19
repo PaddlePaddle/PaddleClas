@@ -39,6 +39,8 @@ CSWinTransformer 是一种新的视觉 Transformer 网络，可以用作计算�
 | CSWinTransformer_base_384   | 0.8550 | 0.9749 | 0.855 | - | 42.2 | 77   |
 | CSWinTransformer_large_384   | 0.8748 | 0.9833 | 0.875 | - | 94.7 | 173.3   |
 
+**备注：** PaddleClas 所提供的该系列模型的预训练模型权重，均是基于其官方提供的权重转得。
+
 <a name="2"></a>  
 
 ## 2. 模型快速体验
