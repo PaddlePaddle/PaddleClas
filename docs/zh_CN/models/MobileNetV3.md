@@ -45,7 +45,7 @@ ShuffleNet 系列网络是旷视提出的轻量化网络结构，到目前为止
 
 ### 1.2 模型指标
 
-| Models                               | Top1    | Top5    | Reference<br>top1 | Reference<br>top5 | FLOPS<br>(G) | Params<br>(M) |
+| Models                               | Top1    | Top5    | Reference<br>top1 | Reference<br>top5 | FLOPs<br>(G) | Params<br>(M) |
 |:--:|:--:|:--:|:--:|:--:|:--:|:--:|
 | MobileNetV3_large_<br>x1_25          | 0.764   | 0.930   | 0.766             |                   | 0.714        | 7.440             |
 | MobileNetV3_large_<br>x1_0           | 0.753   | 0.923   | 0.752             |                   | 0.450        | 5.470             |
@@ -89,41 +89,45 @@ ShuffleNet 系列网络是旷视提出的轻量化网络结构，到目前为止
 
 #### 1.3.2 基于 V100 GPU 的预测速度
 
-| Models                           | Crop Size | Resize Short Size | FP32<br/>Batch Size=1<br/>(ms) | FP32<br/>Batch Size=4<br/>(ms) | FP32<br/>Batch Size=8<br/>(ms) |
-| -------------------------------- | --------- | ----------------- | ------------------------------ | ------------------------------ | ------------------------------ |
-| MobileNetV3_large_x1_25          | 224       | 256               | 1.75                           | 2.87                           | 4.23                           |
-| MobileNetV3_large_x1_0           | 224       | 256               | 1.37                           | 2.67                           | 3.46                           |
-| MobileNetV3_large_x0_75          | 224       | 256               | 1.37                           | 2.23                           | 3.17                           |
-| MobileNetV3_large_x0_5           | 224       | 256               | 1.10                           | 1.85                           | 2.69                           |
-| MobileNetV3_large_x0_35          | 224       | 256               | 1.01                           | 1.44                           | 1.92                           |
-| MobileNetV3_small_x1_25          | 224       | 256               | 1.20                           | 2.04                           | 2.64                           |
-| MobileNetV3_small_x1_0           | 224       | 256               | 1.03                           | 1.76                           | 2.50                           |
-| MobileNetV3_small_x0_75          | 224       | 256               | 1.04                           | 1.71                           | 2.37                           |
-| MobileNetV3_small_x0_5           | 224       | 256               | 1.01                           | 1.49                           | 2.01                           |
-| MobileNetV3_small_x0_35          | 224       | 256               | 1.01                           | 1.44                           | 1.92                           |
-| MobileNetV3_small_x0_35_ssld     | 224       | 256               |                                |                                |                                |
-| MobileNetV3_large_x1_0_ssld      | 224       | 256               | 1.35                           | 2.47                           | 3.72                           |
-| MobileNetV3_large_x1_0_ssld_int8 | 224       | 256               |                                |                                |                                |
-| MobileNetV3_small_x1_0_ssld      | 224       | 256               | 1.06                           | 1.89                           | 2.48                           |
+| Models      | Size | Latency(ms)<br>bs=1 | Latency(ms)<br>bs=4 | Latency(ms)<br>bs=8 |
+| -------------------------------- | ----------------- | ------------------------------ | ------------------------------ | ------------------------------ |
+| MobileNetV3_large_x1_25          | 224       | 1.75                           | 2.87                           | 4.23                           |
+| MobileNetV3_large_x1_0           | 224       | 1.37                           | 2.67                           | 3.46                           |
+| MobileNetV3_large_x0_75          | 224       | 1.37                           | 2.23                           | 3.17                           |
+| MobileNetV3_large_x0_5           | 224       | 1.10                           | 1.85                           | 2.69                           |
+| MobileNetV3_large_x0_35          | 224       | 1.01                           | 1.44                           | 1.92                           |
+| MobileNetV3_small_x1_25          | 224       | 1.20                           | 2.04                           | 2.64                           |
+| MobileNetV3_small_x1_0           | 224       | 1.03                           | 1.76                           | 2.50                           |
+| MobileNetV3_small_x0_75          | 224       | 1.04                           | 1.71                           | 2.37                           |
+| MobileNetV3_small_x0_5           | 224       | 1.01                           | 1.49                           | 2.01                           |
+| MobileNetV3_small_x0_35          | 224       | 1.01                           | 1.44                           | 1.92                           |
+| MobileNetV3_small_x0_35_ssld     | 224       |                                |                                |                                |
+| MobileNetV3_large_x1_0_ssld      | 224       | 1.35                           | 2.47                           | 3.72                           |
+| MobileNetV3_large_x1_0_ssld_int8 | 224       |                                |                                |                                |
+| MobileNetV3_small_x1_0_ssld      | 224       | 1.06                           | 1.89                           | 2.48                           |
+
+**备注：** 精度类型为 FP32，推理过程使用 TensorRT。
 
 <a name='1.3.3'></a>
 
 #### 1.3.3 基于 T4 GPU 的预测速度
 
-| Models            | Crop Size | Resize Short Size | FP32<br>Batch Size=1<br>(ms) | FP32<br>Batch Size=4<br>(ms) | FP32<br>Batch Size=8<br>(ms) |
+| Models            | Size | Latency(ms)<br>FP32<br>bs=1 | Latency(ms)<br>FP32<br>bs=4 | Latency(ms)<br>FP32<br>bs=8 |
 |-----------------------------|-----------------------|-----------------------|-----------------------|-----------------------|-----------------------|
-| MobileNetV3_small_x0_35     | 224       | 256               | 1.01                         | 1.44                         | 1.92                         |
-| MobileNetV3_small_x0_5      | 224       | 256               | 1.01                         | 1.49                         | 2.01                         |
-| MobileNetV3_small_x0_75     | 224       | 256               | 1.04                         | 1.71                         | 2.37                         |
-| MobileNetV3_small_x1_0      | 224       | 256               | 1.03                         | 1.76                         | 2.50                         |
-| MobileNetV3_small_x1_25     | 224       | 256               | 1.20                         | 2.04                         | 2.64                         |
-| MobileNetV3_large_x0_35     | 224       | 256               | 1.10                         | 1.74                         | 2.34                         |
-| MobileNetV3_large_x0_5      | 224       | 256               | 1.10                         | 1.85                         | 2.69                         |
-| MobileNetV3_large_x0_75     | 224       | 256               | 1.37                         | 2.23                         | 3.17                         |
-| MobileNetV3_large_x1_0      | 224       | 256               | 1.37                         | 2.67                         | 3.46                         |
-| MobileNetV3_large_x1_25     | 224       | 256               | 1.75                         | 2.87                         | 4.23                         |
-| MobileNetV3_small_x1_0_ssld | 224       | 256               | 1.06                         | 1.89                         | 2.48                         |
-| MobileNetV3_large_x1_0_ssld | 224       | 256               | 1.35                         | 2.47                         | 3.72                         |
+| MobileNetV3_small_x0_35     | 224     | 1.01                         | 1.44                         | 1.92                         |
+| MobileNetV3_small_x0_5      | 224     | 1.01                         | 1.49                         | 2.01                         |
+| MobileNetV3_small_x0_75     | 224     | 1.04                         | 1.71                         | 2.37                         |
+| MobileNetV3_small_x1_0      | 224     | 1.03                         | 1.76                         | 2.50                         |
+| MobileNetV3_small_x1_25     | 224     | 1.20                         | 2.04                         | 2.64                         |
+| MobileNetV3_large_x0_35     | 224     | 1.10                         | 1.74                         | 2.34                         |
+| MobileNetV3_large_x0_5      | 224     | 1.10                         | 1.85                         | 2.69                         |
+| MobileNetV3_large_x0_75     | 224     | 1.37                         | 2.23                         | 3.17                         |
+| MobileNetV3_large_x1_0      | 224     | 1.37                         | 2.67                         | 3.46                         |
+| MobileNetV3_large_x1_25     | 224     | 1.75                         | 2.87                         | 4.23                         |
+| MobileNetV3_small_x1_0_ssld | 224     | 1.06                         | 1.89                         | 2.48                         |
+| MobileNetV3_large_x1_0_ssld | 224     | 1.35                         | 2.47                         | 3.72                         |
+
+**备注：** 推理过程使用 TensorRT。
 
 <a name="2"></a>  
 
@@ -183,4 +187,4 @@ PaddleClas 提供了基于 Paddle Lite 来完成模型端侧部署的示例，�
 
 Paddle2ONNX 支持将 PaddlePaddle 模型格式转化到 ONNX 模型格式。通过 ONNX 可以完成将 Paddle 模型到多种推理引擎的部署，包括TensorRT/OpenVINO/MNN/TNN/NCNN，以及其它对 ONNX 开源格式进行支持的推理引擎或硬件。更多关于 Paddle2ONNX 的介绍，可以参考[Paddle2ONNX 代码仓库](https://github.com/PaddlePaddle/Paddle2ONNX)。
 
-PaddleClas 提供了基于 Paddle2ONNX 来完成 inference 模型转换 ONNX 模型并作推理预测的示例，您可以参考[Paddle2ONNX 模型转换与预测](@shuilong)来完成相应的部署工作。
+PaddleClas 提供了基于 Paddle2ONNX 来完成 inference 模型转换 ONNX 模型并作推理预测的示例，您可以参考[Paddle2ONNX 模型转换与预测](../../../deploy/paddle2onnx/readme.md)来完成相应的部署工作。
