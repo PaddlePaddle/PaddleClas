@@ -430,7 +430,7 @@ class RandCropImageV2(object):
 
     def __call__(self, img):
         if isinstance(img, np.ndarray):
-            img_h, img_w = img.shap[0], img.shap[1]
+            img_h, img_w = img.shape[0], img.shape[1]
         else:
             img_w, img_h = img.size
         tw, th = self.size
