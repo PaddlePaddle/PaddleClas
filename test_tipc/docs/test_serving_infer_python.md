@@ -60,6 +60,9 @@ Linux GPU/CPU PYTHON 服务化部署测试的主程序为`test_serving_infer_pyt
   python3.7 -m pip install paddle-serving-app==0.9.0 -i https://pypi.tuna.tsinghua.edu.cn/simple
   python3.7 -m pip install install paddle-serving-server-gpu==0.9.0.post101 -i https://pypi.tuna.tsinghua.edu.cn/simple
 
+  # 测试PP-ShiTu识别模型时需安装faiss包
+  python3.7-m pip install faiss-cpu==1.7.1post2 -i https://pypi.tuna.tsinghua.edu.cn/simple
+
   # 下载模型与数据
   bash test_tipc/prepare.sh test_tipc/configs/ResNet50/ResNet50_linux_gpu_normal_normal_serving_python_linux_gpu_cpu.txt serving_infer
   ```
