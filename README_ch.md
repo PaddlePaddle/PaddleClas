@@ -4,106 +4,130 @@
 
 ## 简介
 
-飞桨图像识别套件PaddleClas是飞桨为工业界和学术界所准备的一个图像识别任务的工具集，助力使用者训练出更好的视觉模型和应用落地。
+飞桨图像识别套件PaddleClas是飞桨为工业界和学术界所准备的一个图像识别和图像分类任务的工具集，助力使用者训练出更好的视觉模型和应用落地。
 
-**近期更新**
-- 🔥️ 2022.5.26 [飞桨产业实践范例直播课](http://aglc.cn/v-c4FAR)，解读**超轻量重点区域人员出入管理方案**，欢迎报名来交流。
-  <div align="center">
-    <img src="https://user-images.githubusercontent.com/80816848/170166458-767a01ca-1429-437f-a628-dd184732ef53.png"  width = "150" />
-  </div>
+<div align="center">
+<img src="./docs/images/class_simple.gif"  width = "600" />
+<p>PULC实用图像分类模型效果展示</p>
+</div>
+&nbsp;
+
+
+<div align="center">
+<img src="./docs/images/recognition.gif"  width = "400" />
+<p>PP-ShiTu图像识别系统效果展示</p>
+</div>
+
+
+## 近期更新
+- 📢将于**6月15-6月17日晚20:30** 进行为期三天的课程直播，详细介绍超轻量图像分类方案，对各场景模型优化原理及使用方式进行拆解，之后还有产业案例全流程实操，对各类痛难点解决方案进行手把手教学，加上现场互动答疑，抓紧扫码上车吧！
+
+<div align="center">
+<img src="https://user-images.githubusercontent.com/45199522/173483779-2332f990-4941-4f8d-baee-69b62035fc31.png" width = "200" height = "200"/>
+</div>
+
+- 🔥️ 2022.6.15 发布[PULC超轻量图像分类实用方案](docs/zh_CN/PULC/PULC_train.md)，CPU推理3ms，精度比肩SwinTransformer，覆盖人、车、OCR场景九大常见任务。
+
+- 2022.5.26 [飞桨产业实践范例直播课](http://aglc.cn/v-c4FAR)，解读**超轻量重点区域人员出入管理方案**。
+
 - 2022.5.23 新增[人员出入管理范例库](https://aistudio.baidu.com/aistudio/projectdetail/4094475)，具体内容可以在 AI Stuio 上体验。
-- 2022.5.20 上线[PP-HGNet](./docs/zh_CN/models/PP-HGNet.md), [PP-LCNet v2](./docs/zh_CN/models/PP-LCNetV2.md)
+
+- 2022.5.20 上线[PP-HGNet](./docs/zh_CN/models/PP-HGNet.md), [PP-LCNetv2](./docs/zh_CN/models/PP-LCNetV2.md)。
+
 - 2022.4.21 新增 CVPR2022 oral论文 [MixFormer](https://arxiv.org/pdf/2204.02557.pdf) 相关[代码](https://github.com/PaddlePaddle/PaddleClas/pull/1820/files)。
-- 2022.1.27 全面升级文档；新增[PaddleServing C++ pipeline部署方式](./deploy/paddleserving)和[18M图像识别安卓部署Demo](./deploy/lite_shitu)。
-- 2021.11.1 发布[PP-ShiTu技术报告](https://arxiv.org/pdf/2111.00775.pdf)，新增饮料识别demo
-- 2021.10.23 发布轻量级图像识别系统PP-ShiTu，CPU上0.2s即可完成在10w+库的图像识别。
-[点击这里](./docs/zh_CN/quick_start/quick_start_recognition.md)立即体验
-- 2021.09.17 发布PP-LCNet系列超轻量骨干网络模型, 在Intel CPU上，单张图像预测速度约5ms，ImageNet-1K数据集上Top1识别准确率达到80.82%，超越ResNet152的模型效果。PP-LCNet的介绍可以参考[论文](https://arxiv.org/pdf/2109.15099.pdf), 或者[PP-LCNet模型介绍](docs/zh_CN/models/PP-LCNet.md)，相关指标和预训练权重可以从 [这里](docs/zh_CN/algorithm_introduction/ImageNet_models.md)下载。
+
 - [more](./docs/zh_CN/others/update_history.md)
 
 ## 特性
 
-- PP-ShiTu轻量图像识别系统：集成了目标检测、特征学习、图像检索等模块，广泛适用于各类图像识别任务。cpu上0.2s即可完成在10w+库的图像识别。
-
-- PP-LCNet轻量级CPU骨干网络：专门为CPU设备打造轻量级骨干网络，速度、精度均远超竞品。
-
-- 丰富的预训练模型库：提供了36个系列共175个ImageNet预训练模型，其中7个精选系列模型支持结构快速修改。
-
-- 全面易用的特征学习组件：集成arcmargin, triplet loss等12度量学习方法，通过配置文件即可随意组合切换。
-
-- SSLD知识蒸馏：14个分类预训练模型，精度普遍提升3%以上；其中ResNet50_vd模型在ImageNet-1k数据集上的Top-1精度达到了84.0%，
-Res2Net200_vd预训练模型Top-1精度高达85.1%。
-
-<div align="center">
-<img src="./docs/images/recognition.gif"  width = "400" />
-</div>
+PaddleClas发布了[PP-HGNet](docs/zh_CN/models/PP-HGNet.md)、[PP-LCNetv2](docs/zh_CN/models/PP-LCNetV2.md)、 [PP-LCNet](docs/zh_CN/models/PP-LCNet.md)和[SSLD半监督知识蒸馏方案](docs/zh_CN/advanced_tutorials/ssld.md)等算法，
+并支持多种图像分类、识别相关算法，在此基础上打造[PULC超轻量图像分类方案](docs/zh_CN/PULC/PULC_quickstart.md)和[PP-ShiTu图像识别系统](./docs/zh_CN/quick_start/quick_start_recognition.md)。
+![](https://user-images.githubusercontent.com/19523330/173273046-239a42da-c88d-4c2c-94b1-2134557afa49.png)
 
 
 ## 欢迎加入技术交流群
 
-* 您可以扫描下面的QQ/微信二维码（添加小助手微信并回复“C”），加入PaddleClas微信交流群，获得更高效的问题答疑，与各行各业开发者充分交流，期待您的加入。
+* 您可以扫描下面的微信/QQ二维码（添加小助手微信并回复“C”），加入PaddleClas微信交流群，获得更高效的问题答疑，与各行各业开发者充分交流，期待您的加入。
 
 <div align="center">
-<img src="https://user-images.githubusercontent.com/80816848/164383225-e375eb86-716e-41b4-a9e0-4b8a3976c1aa.jpg" width="200"/>
 <img src="https://user-images.githubusercontent.com/48054808/160531099-9811bbe6-cfbb-47d5-8bdb-c2b40684d7dd.png" width="200"/>
+<img src="https://user-images.githubusercontent.com/80816848/164383225-e375eb86-716e-41b4-a9e0-4b8a3976c1aa.jpg" width="200"/>
 </div>
 
 ## 快速体验
 
+PULC超轻量图像分类方案快速体验：[点击这里](docs/zh_CN/PULC/PULC_quickstart.md)
+
 PP-ShiTu图像识别快速体验：[点击这里](./docs/zh_CN/quick_start/quick_start_recognition.md)
 
 ## 文档教程
-- 安装说明
-  - [安装Paddle](./docs/zh_CN/installation/install_paddle.md)
-  - [安装PaddleClas](./docs/zh_CN/installation/install_paddleclas.md)
-- 快速体验
-  - [PP-ShiTu图像识别快速体验](./docs/zh_CN/quick_start/quick_start_recognition.md)
-  - 图像分类快速体验
-    - [尝鲜版](./docs/zh_CN/quick_start/quick_start_classification_new_user.md)
-    - [进阶版](./docs/zh_CN/quick_start/quick_start_classification_professional.md)
-    - [多标签分类](./docs/zh_CN/quick_start/quick_start_multilabel_classification.md)
+- [环境准备](docs/zh_CN/installation/install_paddleclas.md)
+- [PULC超轻量图像分类实用方案](docs/zh_CN/PULC/PULC_train.md)
+  - [超轻量图像分类快速体验](docs/zh_CN/PULC/PULC_quickstart.md)
+  - [超轻量图像分类模型库](docs/zh_CN/PULC/PULC_model_list.md)
+    - [PULC有人/无人分类模型](docs/zh_CN/PULC/PULC_person_exists.md)
+    - [PULC人体属性识别模型](docs/zh_CN/PULC/PULC_person_attribute.md)
+    - [PULC佩戴安全帽分类模型](docs/zh_CN/PULC/PULC_safety_helmet.md)
+    - [PULC交通标志分类模型](docs/zh_CN/PULC/PULC_traffic_sign.md)
+    - [PULC车辆属性识别模型](docs/zh_CN/PULC/PULC_vehicle_attribute.md)
+    - [PULC有车/无车分类模型](docs/zh_CN/PULC/PULC_car_exists.md)
+    - [PULC含文字图像方向分类模型](docs/zh_CN/PULC/PULC_text_image_orientation.md)
+    - [PULC文本行方向分类模型](docs/zh_CN/PULC/PULC_textline_orientation.md)
+    - [PULC语种分类模型](docs/zh_CN/PULC/PULC_language_classification.md)
+  - [模型训练](docs/zh_CN/PULC/PULC_train.md)
+  - 推理部署
+    - [基于python预测引擎推理](docs/zh_CN/inference_deployment/python_deploy.md#1)
+    - [基于C++预测引擎推理](docs/zh_CN/inference_deployment/cpp_deploy.md)
+    - [服务化部署](docs/zh_CN/inference_deployment/paddle_serving_deploy.md)
+    - [端侧部署](docs/zh_CN/inference_deployment/paddle_lite_deploy.md)
+    - [Paddle2ONNX模型转化与预测](deploy/paddle2onnx/readme.md)
+  - [模型压缩](deploy/slim/README.md)
 - [PP-ShiTu图像识别系统介绍](#图像识别系统介绍)
+  - [图像识别快速体验](docs/zh_CN/quick_start/quick_start_recognition.md)
+  - 模块介绍
     - [主体检测](./docs/zh_CN/image_recognition_pipeline/mainbody_detection.md)
-    - [特征提取](./docs/zh_CN/image_recognition_pipeline/feature_extraction.md)
+    - [特征提取模型](./docs/zh_CN/image_recognition_pipeline/feature_extraction.md)
     - [向量检索](./docs/zh_CN/image_recognition_pipeline/vector_search.md)
-- [骨干网络和预训练模型库](./docs/zh_CN/algorithm_introduction/ImageNet_models.md)
-- 数据准备
-  - [图像分类数据集介绍](./docs/zh_CN/data_preparation/classification_dataset.md)
-  - [图像识别数据集介绍](./docs/zh_CN/data_preparation/recognition_dataset.md)
-- 模型训练
-    - [图像分类任务](./docs/zh_CN/models_training/classification.md)
-    - [图像识别任务](./docs/zh_CN/models_training/recognition.md)
-    - [训练参数调整策略](./docs/zh_CN/models_training/train_strategy.md)
-    - [配置文件说明](./docs/zh_CN/models_training/config_description.md)
-- 模型预测部署
-    - [模型导出](./docs/zh_CN/inference_deployment/export_model.md)
-    - Python/C++ 预测引擎
-      - [基于Python预测引擎预测推理](./docs/zh_CN/inference_deployment/python_deploy.md)
-      - [基于C++分类预测引擎预测推理](./docs/zh_CN/inference_deployment/cpp_deploy.md)、[基于C++的PP-ShiTu预测引擎预测推理](deploy/cpp_shitu/readme.md)
-    - 服务化部署
-      - [Paddle Serving服务化部署(推荐)](./docs/zh_CN/inference_deployment/paddle_serving_deploy.md)
-      - [Hub serving服务化部署](./docs/zh_CN/inference_deployment/paddle_hub_serving_deploy.md)
-    - [端侧部署](./deploy/lite/readme.md)
-    - [whl包预测](./docs/zh_CN/inference_deployment/whl_deploy.md)
-- 算法介绍
-    - [图像分类任务介绍](./docs/zh_CN/algorithm_introduction/image_classification.md)
-    - [度量学习介绍](./docs/zh_CN/algorithm_introduction/metric_learning.md)
-- 高阶使用
-    - [数据增广](./docs/zh_CN/advanced_tutorials/DataAugmentation.md)
-    - [模型量化](./docs/zh_CN/advanced_tutorials/model_prune_quantization.md)
-    - [知识蒸馏](./docs/zh_CN/advanced_tutorials/knowledge_distillation.md)
-    - [PaddleClas结构解析](./docs/zh_CN/advanced_tutorials/code_overview.md)
-    - [社区贡献指南](./docs/zh_CN/advanced_tutorials/how_to_contribute.md)
+    - [哈希编码](docs/zh_CN/image_recognition_pipeline/)
+  - [模型训练](docs/zh_CN/models_training/recognition.md)
+  - 推理部署
+    - [基于python预测引擎推理](docs/zh_CN/inference_deployment/python_deploy.md#2)
+    - [基于C++预测引擎推理](deploy/cpp_shitu/readme.md)
+    - [服务化部署](docs/zh_CN/inference_deployment/paddle_serving_deploy.md)
+    - [端侧部署](deploy/lite_shitu/README.md)
+- PP系列骨干网络模型
+  - [PP-HGNet](docs/zh_CN/models/PP-HGNet.md)
+  - [PP-LCNetv2](docs/zh_CN/models/PP-LCNetV2.md)
+  - [PP-LCNet](docs/zh_CN/models/PP-LCNet.md)
+- [SSLD半监督知识蒸馏方案](docs/zh_CN/advanced_tutorials/ssld.md)
+- 前沿算法
+  - [骨干网络和预训练模型库](docs/zh_CN/algorithm_introduction/ImageNet_models.md)
+  - [度量学习](docs/zh_CN/algorithm_introduction/metric_learning.md)
+  - [模型压缩](docs/zh_CN/algorithm_introduction/model_prune_quantization.md)
+  - [模型蒸馏](docs/zh_CN/algorithm_introduction/knowledge_distillation.md)
+  - [数据增强](docs/zh_CN/advanced_tutorials/DataAugmentation.md)
+- [产业实用范例库](docs/zh_CN/samples)
+- [30分钟快速体验图像分类](docs/zh_CN/quick_start/quick_start_classification_new_user.md)
 - FAQ
-    - [图像识别精选问题](docs/zh_CN/faq_series/faq_2021_s2.md)
-    - [图像分类精选问题](docs/zh_CN/faq_series/faq_selected_30.md)
-    - [图像分类FAQ第一季](docs/zh_CN/faq_series/faq_2020_s1.md)
-    - [图像分类FAQ第二季](docs/zh_CN/faq_series/faq_2021_s1.md)
+  - [图像识别精选问题](docs/zh_CN/faq_series/faq_2021_s2.md)
+  - [图像分类精选问题](docs/zh_CN/faq_series/faq_selected_30.md)
+  - [图像分类FAQ第一季](docs/zh_CN/faq_series/faq_2020_s1.md)
+  - [图像分类FAQ第二季](docs/zh_CN/faq_series/faq_2021_s1.md)
+- [社区贡献指南](./docs/zh_CN/advanced_tutorials/how_to_contribute.md)
 - [许可证书](#许可证书)
 - [贡献代码](#贡献代码)
 
+
+<a name="PULC超轻量图像分类方案"></a>
+## PULC超轻量图像分类方案
+<div align="center">
+<img src="https://user-images.githubusercontent.com/19523330/173011854-b10fcd7a-b799-4dfd-a1cf-9504952a3c44.png"  width = "800" />
+</div>
+PULC融合了骨干网络、数据增广、蒸馏等多种前沿算法，可以自动训练得到轻量且高精度的图像分类模型。
+PaddleClas提供了覆盖人、车、OCR场景九大常见任务的分类模型，CPU推理3ms，精度比肩SwinTransformer。
+
 <a name="图像识别系统介绍"></a>
-## PP-ShiTu图像识别系统介绍
+## PP-ShiTu图像识别系统
 
 <div align="center">
 <img src="./docs/images/structure.jpg"  width = "800" />
@@ -111,6 +135,11 @@ PP-ShiTu图像识别快速体验：[点击这里](./docs/zh_CN/quick_start/quick
 
 PP-ShiTu是一个实用的轻量级通用图像识别系统，主要由主体检测、特征学习和向量检索三个模块组成。该系统从骨干网络选择和调整、损失函数的选择、数据增强、学习率变换策略、正则化参数选择、预训练模型使用以及模型裁剪量化8个方面，采用多种策略，对各个模块的模型进行优化，最终得到在CPU上仅0.2s即可完成10w+库的图像识别的系统。更多细节请参考[PP-ShiTu技术方案](https://arxiv.org/pdf/2111.00775.pdf)。
 
+<a name="分类效果展示"></a>
+## PULC实用图像分类模型效果展示
+<div align="center">
+<img src="docs/images/classification.gif">
+</div>
 
 <a name="识别效果展示"></a>
 ## PP-ShiTu图像识别系统效果展示

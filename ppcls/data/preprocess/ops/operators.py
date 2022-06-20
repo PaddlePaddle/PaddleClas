@@ -25,8 +25,8 @@ import cv2
 import numpy as np
 from PIL import Image, ImageOps, __version__ as PILLOW_VERSION
 from paddle.vision.transforms import ColorJitter as RawColorJitter
-from paddle.vision.transforms import ToTensor, Normalize
-
+from paddle.vision.transforms import ToTensor, Normalize, RandomHorizontalFlip, RandomResizedCrop
+from paddle.vision.transforms import functional as F
 from .autoaugment import ImageNetPolicy
 from .functional import augmentations
 from ppcls.utils import logger
@@ -91,6 +91,42 @@ class UnifiedResize(object):
         if isinstance(size, list):
             size = tuple(size)
         return self.resize_func(src, size)
+
+
+class RandomInterpolationAugment(object):
+    def __init__(self, prob):
+        self.prob = prob
+
+    def _aug(self, img):
+        img_shape = img.shape
+        side_ratio = np.random.uniform(0.2, 1.0)
+        small_side = int(side_ratio * img_shape[0])
+        interpolation = np.random.choice([
+            cv2.INTER_NEAREST, cv2.INTER_LINEAR, cv2.INTER_AREA,
+            cv2.INTER_CUBIC, cv2.INTER_LANCZOS4
+        ])
+        small_img = cv2.resize(
+            img, (small_side, small_side), interpolation=interpolation)
+        interpolation = np.random.choice([
+            cv2.INTER_NEAREST, cv2.INTER_LINEAR, cv2.INTER_AREA,
+            cv2.INTER_CUBIC, cv2.INTER_LANCZOS4
+        ])
+        aug_img = cv2.resize(
+            small_img, (img_shape[1], img_shape[0]),
+            interpolation=interpolation)
+        return aug_img
+
+    def __call__(self, img):
+        if np.random.random() < self.prob:
+            if isinstance(img, np.ndarray):
+                return self._aug(img)
+            else:
+                pil_img = np.array(img)
+                aug_img = self._aug(pil_img)
+                img = Image.fromarray(aug_img.astype(np.uint8))
+                return img
+        else:
+            return img
 
 
 class OperatorParamError(ValueError):
@@ -168,6 +204,52 @@ class ResizeImage(object):
             w = self.w
             h = self.h
         return self._resize_func(img, (w, h))
+
+
+class CropWithPadding(RandomResizedCrop):
+    """
+    crop image and padding to original size
+    """
+
+    def __init__(self,
+                 prob=1,
+                 padding_num=0,
+                 size=224,
+                 scale=(0.08, 1.0),
+                 ratio=(3. / 4, 4. / 3),
+                 interpolation='bilinear',
+                 key=None):
+        super().__init__(size, scale, ratio, interpolation, key)
+        self.prob = prob
+        self.padding_num = padding_num
+
+    def __call__(self, img):
+        is_cv2_img = False
+        if isinstance(img, np.ndarray):
+            flag = True
+        if np.random.random() < self.prob:
+            # RandomResizedCrop augmentation
+            new = np.zeros_like(np.array(img)) + self.padding_num
+            #  orig_W, orig_H = F._get_image_size(sample)
+            orig_W, orig_H = self._get_image_size(img)
+            i, j, h, w = self._get_param(img)
+            cropped = F.crop(img, i, j, h, w)
+            new[i:i + h, j:j + w, :] = np.array(cropped)
+            if not isinstance:
+                new = Image.fromarray(new.astype(np.uint8))
+            return new
+        else:
+            return img
+
+    def _get_image_size(self, img):
+        if F._is_pil_image(img):
+            return img.size
+        elif F._is_numpy_image(img):
+            return img.shape[:2][::-1]
+        elif F._is_tensor_image(img):
+            return img.shape[1:][::-1]  # chw
+        else:
+            raise TypeError("Unexpected type {}".format(type(img)))
 
 
 class CropImage(object):
@@ -283,9 +365,6 @@ class RandomCropImage(object):
         j = random.randint(0, w - tw)
 
         img = img[i:i + th, j:j + tw, :]
-        if img.shape[0] != 256 or img.shape[1] != 192:
-            raise ValueError('sample: ', h, w, i, j, th, tw, img.shape)
-
         return img
 
 
@@ -533,16 +612,18 @@ class ColorJitter(RawColorJitter):
     """ColorJitter.
     """
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, prob=2, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.prob = prob
 
     def __call__(self, img):
-        if not isinstance(img, Image.Image):
-            img = np.ascontiguousarray(img)
-            img = Image.fromarray(img)
-        img = super()._apply_image(img)
-        if isinstance(img, Image.Image):
-            img = np.asarray(img)
+        if np.random.random() < self.prob:
+            if not isinstance(img, Image.Image):
+                img = np.ascontiguousarray(img)
+                img = Image.fromarray(img)
+            img = super()._apply_image(img)
+            if isinstance(img, Image.Image):
+                img = np.asarray(img)
         return img
 
 

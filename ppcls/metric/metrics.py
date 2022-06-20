@@ -26,6 +26,7 @@ from easydict import EasyDict
 
 from ppcls.metric.avg_metrics import AvgMetrics
 from ppcls.utils.misc import AverageMeter, AttrMeter
+from ppcls.utils import logger
 
 
 class TopkAcc(AvgMetrics):
@@ -39,7 +40,7 @@ class TopkAcc(AvgMetrics):
 
     def reset(self):
         self.avg_meters = {
-            "top{}".format(k): AverageMeter("top{}".format(k))
+            f"top{k}": AverageMeter(f"top{k}")
             for k in self.topk
         }
 
@@ -47,11 +48,21 @@ class TopkAcc(AvgMetrics):
         if isinstance(x, dict):
             x = x["logits"]
 
+        output_dims = x.shape[-1]
+
         metric_dict = dict()
-        for k in self.topk:
-            metric_dict["top{}".format(k)] = paddle.metric.accuracy(
-                x, label, k=k)
-            self.avg_meters["top{}".format(k)].update(metric_dict["top{}".format(k)], x.shape[0])
+        for idx, k in enumerate(self.topk):
+            if output_dims < k:
+                msg = f"The output dims({output_dims}) is less than k({k}), and the argument {k} of Topk has been removed."
+                logger.warning(msg)
+                self.avg_meters.pop(f"top{k}")
+                continue
+            metric_dict[f"top{k}"] = paddle.metric.accuracy(x, label, k=k)
+            self.avg_meters[f"top{k}"].update(metric_dict[f"top{k}"],
+                                              x.shape[0])
+
+        self.topk = list(filter(lambda k: k <= output_dims, self.topk))
+
         return metric_dict
 
 
@@ -390,6 +401,7 @@ class AccuracyScore(MultiLabelMetric):
 def get_attr_metrics(gt_label, preds_probs, threshold):
     """
     index: evaluated label index
+    adapted from "https://github.com/valencebond/Rethinking_of_PAR/blob/master/metrics/pedestrian_metrics.py"
     """
     pred_label = (preds_probs > threshold).astype(int)
 

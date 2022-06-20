@@ -1,0 +1,18 @@
+===========================serving_params===========================
+model_name:PPShiTu
+python:python3.7
+cls_inference_model_url:https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/inference/general_PPLCNet_x2_5_lite_v1.0_infer.tar
+det_inference_model_url:https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/inference/picodet_PPLCNet_x2_5_mainbody_lite_v1.0_infer.tar
+trans_model:-m paddle_serving_client.convert
+--dirname:./models/general_PPLCNet_x2_5_lite_v1.0_infer/
+--dirname:./models/picodet_PPLCNet_x2_5_mainbody_lite_v1.0_infer/
+--model_filename:inference.pdmodel
+--params_filename:inference.pdiparams
+--serving_server:./models/general_PPLCNet_x2_5_lite_v1.0_serving/
+--serving_client:./models/general_PPLCNet_x2_5_lite_v1.0_client/
+--serving_server:./models/picodet_PPLCNet_x2_5_mainbody_lite_v1.0_serving/
+--serving_client:./models/picodet_PPLCNet_x2_5_mainbody_lite_v1.0_client/
+serving_dir:./paddleserving/recognition
+web_service:recognition_web_service.py
+--use_gpu:0|null
+pipline:pipeline_http_client.py
