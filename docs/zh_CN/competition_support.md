@@ -17,3 +17,7 @@ PaddleClas的建设源于百度实际视觉业务应用的淬炼和视觉前沿�
     * 详细文档与开源的模型可以参考：[2019地标检索和识别github地址](https://github.com/PaddlePaddle/Research/tree/master/CV/landmark)
 
 * 首届多媒体信息识别技术竞赛中印刷文本OCR、人脸识别和地标识别三项任务A级证书
+
+* LPCV比赛Real-time image classification using Pixel 4 CPU赛道（CVPR2020），获得世界冠军 ；
+* Google Landmark Retrieval 2020比赛（ECCV 2020），获得了第二名；
+* Semi-Supervised Recognition Challenge-FGVC7（CVPR2020）鸟类细粒度识别竞赛，第三名
