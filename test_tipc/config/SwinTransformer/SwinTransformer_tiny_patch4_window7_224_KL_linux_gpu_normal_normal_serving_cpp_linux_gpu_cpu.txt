@@ -1,0 +1,14 @@
+===========================serving_params===========================
+model_name:SwinTransformer_tiny_patch4_window7_224_KL
+python:python3.7
+inference_model_url:https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/slim_model/SwinTransformer_tiny_patch4_window7_224_kl_quant_infer.tar
+trans_model:-m paddle_serving_client.convert
+--dirname:./deploy/paddleserving/SwinTransformer_tiny_patch4_window7_224_kl_quant_infer/
+--model_filename:inference.pdmodel
+--params_filename:inference.pdiparams
+--serving_server:./deploy/paddleserving/SwinTransformer_tiny_patch4_window7_224_kl_quant_serving/
+--serving_client:./deploy/paddleserving/SwinTransformer_tiny_patch4_window7_224_kl_quant_client/
+serving_dir:./deploy/paddleserving
+web_service:null
+--use_gpu:0|null
+pipline:test_cpp_serving_client.py
