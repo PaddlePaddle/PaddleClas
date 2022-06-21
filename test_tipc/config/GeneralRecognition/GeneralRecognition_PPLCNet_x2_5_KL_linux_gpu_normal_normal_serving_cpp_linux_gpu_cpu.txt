@@ -1,9 +1,9 @@
 ===========================serving_params===========================
 model_name:GeneralRecognition_PPLCNet_x2_5_KL
 python:python3.7
-inference_model_url:https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/slim_model/GeneralRecognition_PPLCNet_x2_5_kl_quant_infer.tar
+inference_model_url:https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/slim_model/general_PPLCNet_x2_5_lite_v1.0_kl_quant_infer.tar
 trans_model:-m paddle_serving_client.convert
---dirname:./deploy/paddleserving/GeneralRecognition_PPLCNet_x2_5_kl_quant_infer/
+--dirname:./deploy/paddleserving/general_PPLCNet_x2_5_lite_v1.0_kl_quant_infer/
 --model_filename:inference.pdmodel
 --params_filename:inference.pdiparams
 --serving_server:./deploy/paddleserving/GeneralRecognition_PPLCNet_x2_5_kl_quant_serving/
