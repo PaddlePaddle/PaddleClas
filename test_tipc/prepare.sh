@@ -98,7 +98,9 @@ if [[ ${MODE} = "cpp_infer" ]]; then
 
         if [[ $cpp_type == "cls" ]]; then
             eval "wget -nc $cls_inference_url"
-            tar xf "${model_name}_infer.tar"
+            tar_name=$(func_get_url_file_name "$cls_inference_url")
+            model_dir=${tar_name%.*}
+            eval "tar xf ${tar_name}"
 
             cd dataset
             rm -rf ILSVRC2012
