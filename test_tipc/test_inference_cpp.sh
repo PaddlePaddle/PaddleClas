@@ -237,14 +237,14 @@ echo "################### build PaddleClas demo finished ###################"
 
 
 # set cuda device
-# GPUID=$2
-# if [ ${#GPUID} -le 0 ];then
-#     env="export CUDA_VISIBLE_DEVICES=0"
-# else
-#     env="export CUDA_VISIBLE_DEVICES=${GPUID}"
-# fi
-# set CUDA_VISIBLE_DEVICES
-# eval $env
+GPUID=$3
+if [ ${#GPUID} -le 0 ];then
+    env="export CUDA_VISIBLE_DEVICES=0"
+else
+    env="export CUDA_VISIBLE_DEVICES=${GPUID}"
+fi
+set CUDA_VISIBLE_DEVICES
+eval $env
 
 
 echo "################### run test ###################"
