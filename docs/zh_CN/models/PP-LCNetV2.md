@@ -14,8 +14,9 @@
       - [1.2.5 SE 模块](#1.2.5)     
     - [1.3 实验结果](#1.3)
 - [2. 模型快速体验](#2)
-   - [2.1 安装 paddleclas](#2.1)
-   - [2.2 预测](#2.2)
+    - [2.1 安装 paddlepaddle](#2.1)
+    - [2.2 安装 paddleclas](#2.2)
+    - [2.3 预测](#2.3)
 - [3. 模型训练、评估和预测](#3)
     - [3.1 环境配置](#3.1)
     - [3.2 数据准备](#3.2)
@@ -114,22 +115,41 @@ PPLCNetV2 目前提供的模型的精度、速度指标及预训练权重链接�
 | <b>PPLCNetV2_base_ssld<b>  | <b>6.6<b> | <b>604<b>  | <b>80.07<b> | <b>94.87<b> | <b>4.32<b> |
 
 
-<a name="2"></a>   
+<a name="2"></a>    
     
 ## 2. 模型快速体验
 
 <a name="2.1"></a>   
     
-### 2.1 安装 paddleclas
-    
-使用如下命令快速安装 paddlepaddle, paddleclas
-    
-```    
-pip3 install paddlepaddle paddleclas
+### 2.1 安装 paddlepaddle
+
+- 您的机器安装的是 CUDA9 或 CUDA10，请运行以下命令安装
+
+```bash
+python3 -m pip install paddlepaddle-gpu -i https://mirror.baidu.com/pypi/simple
 ```
-<a name="2.2"></a> 
+
+- 您的机器是CPU，请运行以下命令安装
+
+```bash
+python3 -m pip install paddlepaddle -i https://mirror.baidu.com/pypi/simple
+```
+
+更多的版本需求，请参照[飞桨官网安装文档](https://www.paddlepaddle.org.cn/install/quick)中的说明进行操作。
+
+<a name="2.2"></a>  
+
+### 2.2 安装 paddleclas
+
+使用如下命令快速安装 paddleclas
+
+```  
+pip3 install paddleclas
+```
     
-### 2.2 预测
+<a name="2.3"></a> 
+    
+### 2.3 预测
 
 * 在命令行中使用 PPLCNetV2_base 的权重快速预测
     
