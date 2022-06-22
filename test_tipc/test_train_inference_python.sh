@@ -32,6 +32,7 @@ train_param_key1=$(func_parser_key "${lines[12]}")
 train_param_value1=$(func_parser_value "${lines[12]}")
 
 trainer_list=$(func_parser_value "${lines[14]}")
+
 trainer_norm=$(func_parser_key "${lines[15]}")
 norm_trainer=$(func_parser_value "${lines[15]}")
 pact_key=$(func_parser_key "${lines[16]}")
@@ -88,17 +89,17 @@ benchmark_value=$(func_parser_value "${lines[49]}")
 infer_key1=$(func_parser_key "${lines[50]}")
 infer_value1=$(func_parser_value "${lines[50]}")
 if [ ! $epoch_num ]; then
-  epoch_num=2
+    epoch_num=2
 fi
 if [[ $MODE = 'benchmark_train' ]]; then
-  epoch_num=1
+    epoch_num=1
 fi
 
-LOG_PATH="./test_tipc/output/${model_name}"
+LOG_PATH="./test_tipc/output/${model_name}/${MODE}"
 mkdir -p ${LOG_PATH}
 status_log="${LOG_PATH}/results_python.log"
 
-function func_inference(){
+function func_inference() {
     IFS='|'
     _python=$1
     _script=$2
@@ -110,9 +111,9 @@ function func_inference(){
     for use_gpu in ${use_gpu_list[*]}; do
         if [ ${use_gpu} = "False" ] || [ ${use_gpu} = "cpu" ]; then
             for use_mkldnn in ${use_mkldnn_list[*]}; do
-                if [ ${use_mkldnn} = "False" ] && [ ${_flag_quant} = "True" ]; then
-                    continue
-                fi
+                # if [ ${use_mkldnn} = "False" ] && [ ${_flag_quant} = "True" ]; then
+                #     continue
+                # fi
                 for threads in ${cpu_threads_list[*]}; do
                     for batch_size in ${batch_size_list[*]}; do
                         _save_log_path="${_log_path}/infer_cpu_usemkldnn_${use_mkldnn}_threads_${threads}_batchsize_${batch_size}.log"
@@ -136,9 +137,9 @@ function func_inference(){
                     if [ ${precision} = "True" ] && [ ${use_trt} = "False" ]; then
                         continue
                     fi
-                    if [[ ${use_trt} = "False" || ${precision} =~ "int8" ]] && [ ${_flag_quant} = "True" ]; then
-                        continue
-                    fi
+                    # if [[ ${use_trt} = "False" || ${precision} =~ "int8" ]] && [ ${_flag_quant} = "True" ]; then
+                    #     continue
+                    # fi
                     for batch_size in ${batch_size_list[*]}; do
                         _save_log_path="${_log_path}/infer_gpu_usetrt_${use_trt}_precision_${precision}_batchsize_${batch_size}.log"
                         set_infer_data=$(func_set_params "${image_dir_key}" "${_img_dir}")
@@ -162,18 +163,18 @@ function func_inference(){
 }
 
 if [[ ${MODE} = "whole_infer" ]] || [[ ${MODE} = "klquant_whole_infer" ]]; then
-   IFS="|"
-   infer_export_flag=(${infer_export_flag})
-   if [ ${infer_export_flag} != "null" ]  && [ ${infer_export_flag} != "False" ]; then
-	rm -rf ${infer_model_dir_list/..\//}
-	export_cmd="${python} ${norm_export} -o Global.pretrained_model=${model_name}_pretrained -o Global.save_inference_dir=${infer_model_dir_list/..\//}"
-	eval $export_cmd
-   fi
+    IFS="|"
+    infer_export_flag=(${infer_export_flag})
+    if [ ${infer_export_flag} != "null" ] && [ ${infer_export_flag} != "False" ]; then
+        rm -rf ${infer_model_dir_list/..\//}
+        export_cmd="${python} ${norm_export} -o Global.pretrained_model=${model_name}_pretrained -o Global.save_inference_dir=${infer_model_dir_list/..\//}"
+        eval $export_cmd
+    fi
 fi
 
 if [[ ${MODE} = "whole_infer" ]]; then
     GPUID=$3
-    if [ ${#GPUID} -le 0 ];then
+    if [ ${#GPUID} -le 0 ]; then
         env=" "
     else
         env="export CUDA_VISIBLE_DEVICES=${GPUID}"
@@ -194,18 +195,18 @@ if [[ ${MODE} = "whole_infer" ]]; then
 elif [[ ${MODE} = "klquant_whole_infer" ]]; then
     # for kl_quant
     if [ ${kl_quant_cmd_value} != "null" ] && [ ${kl_quant_cmd_value} != "False" ]; then
-	echo "kl_quant"
-	command="${python} ${kl_quant_cmd_value}"
-	eval $command
-	last_status=${PIPESTATUS[0]}
-	status_check $last_status "${command}" "${status_log}" "${model_name}"
-	cd inference/quant_post_static_model
-	ln -s __model__ inference.pdmodel
-	ln -s __params__ inference.pdiparams
-	cd ../../deploy
-	is_quant=True
+        echo "kl_quant"
+        command="${python} ${kl_quant_cmd_value}"
+        eval $command
+        last_status=${PIPESTATUS[0]}
+        status_check $last_status "${command}" "${status_log}" "${model_name}"
+        cd inference/quant_post_static_model
+        ln -s __model__ inference.pdmodel
+        ln -s __params__ inference.pdiparams
+        cd ../../deploy
+        is_quant=True
         func_inference "${python}" "${inference_py}" "${infer_model_dir_list}/quant_post_static_model" "../${LOG_PATH}" "${infer_img_dir}" ${is_quant}
-	cd ..
+        cd ..
     fi
 else
     IFS="|"
@@ -215,12 +216,12 @@ else
         train_use_gpu=${USE_GPU_KEY[Count]}
         Count=$(($Count + 1))
         ips=""
-        if [ ${gpu} = "-1" ];then
+        if [ ${gpu} = "-1" ]; then
             env=""
-        elif [ ${#gpu} -le 1 ];then
+        elif [ ${#gpu} -le 1 ]; then
             env="export CUDA_VISIBLE_DEVICES=${gpu}"
             eval ${env}
-        elif [ ${#gpu} -le 15 ];then
+        elif [ ${#gpu} -le 15 ]; then
             IFS=","
             array=(${gpu})
             env="export CUDA_VISIBLE_DEVICES=${array[0]}"
@@ -270,7 +271,7 @@ else
                 set_batchsize=$(func_set_params "${train_batch_key}" "${train_batch_value}")
                 set_train_params1=$(func_set_params "${train_param_key1}" "${train_param_value1}")
                 set_use_gpu=$(func_set_params "${train_use_gpu_key}" "${train_use_gpu_value}")
-                if [ ${#ips} -le 15 ];then
+                if [ ${#ips} -le 15 ]; then
                     # if length of ips >= 15, then it is seen as multi-machine
                     # 15 is the min length of ips info for multi-machine: 0.0.0.0,0.0.0.0
                     save_log="${LOG_PATH}/${trainer}_gpus_${gpu}_autocast_${autocast}"
@@ -289,28 +290,28 @@ else
                 # fi
 
                 set_save_model=$(func_set_params "${save_model_key}" "${save_log}")
-                if [ ${#gpu} -le 2 ];then  # train with cpu or single gpu
+                if [ ${#gpu} -le 2 ]; then # train with cpu or single gpu
                     cmd="${python} ${run_train} ${set_use_gpu}  ${set_save_model} ${set_epoch} ${set_pretrain} ${set_autocast} ${set_batchsize} ${set_train_params1} "
-                elif [ ${#ips} -le 15 ];then  # train with multi-gpu
+                elif [ ${#ips} -le 15 ]; then # train with multi-gpu
                     cmd="${python} -m paddle.distributed.launch --gpus=${gpu} ${run_train} ${set_use_gpu} ${set_save_model} ${set_epoch} ${set_pretrain} ${set_autocast} ${set_batchsize} ${set_train_params1}"
-                else     # train with multi-machine
+                else # train with multi-machine
                     cmd="${python} -m paddle.distributed.launch --ips=${ips} --gpus=${gpu} ${run_train} ${set_use_gpu} ${set_save_model} ${set_pretrain} ${set_epoch} ${set_autocast} ${set_batchsize} ${set_train_params1}"
                 fi
                 # run train
-		eval "unset CUDA_VISIBLE_DEVICES"
-		# export FLAGS_cudnn_deterministic=True
-		sleep 5
+                eval "unset CUDA_VISIBLE_DEVICES"
+                # export FLAGS_cudnn_deterministic=True
+                sleep 5
                 eval $cmd
                 status_check $? "${cmd}" "${status_log}" "${model_name}"
                 sleep 5
 
-		if [[ $FILENAME == *GeneralRecognition* ]]; then
-		    set_eval_pretrain=$(func_set_params "${pretrain_model_key}" "${save_log}/RecModel/${train_model_name}")
-		else
+                if [[ $FILENAME == *GeneralRecognition* ]]; then
+                    set_eval_pretrain=$(func_set_params "${pretrain_model_key}" "${save_log}/RecModel/${train_model_name}")
+                else
                     set_eval_pretrain=$(func_set_params "${pretrain_model_key}" "${save_log}/${model_name}/${train_model_name}")
-		fi
+                fi
                 # save norm trained models to set pretrain for pact training and fpgm training
-                if [ ${trainer} = ${trainer_norm} ]; then
+                if [[ ${trainer} = ${trainer_norm}  ||  ${trainer} = ${pact_key} ]]; then
                     load_norm_train_model=${set_eval_pretrain}
                 fi
                 # run eval
@@ -325,11 +326,11 @@ else
                 if [ ${run_export} != "null" ]; then
                     # run export model
                     save_infer_path="${save_log}"
-		    if [[ $FILENAME == *GeneralRecognition* ]]; then
-		        set_eval_pretrain=$(func_set_params "${pretrain_model_key}" "${save_log}/RecModel/${train_model_name}")
-		    else
-		        set_export_weight=$(func_set_params "${export_weight}" "${save_log}/${model_name}/${train_model_name}")
-		    fi
+                    if [[ $FILENAME == *GeneralRecognition* ]]; then
+                        set_eval_pretrain=$(func_set_params "${pretrain_model_key}" "${save_log}/RecModel/${train_model_name}")
+                    else
+                        set_export_weight=$(func_set_params "${export_weight}" "${save_log}/${model_name}/${train_model_name}")
+                    fi
                     set_save_infer_key=$(func_set_params "${save_infer_key}" "${save_infer_path}")
                     export_cmd="${python} ${run_export} ${set_export_weight} ${set_save_infer_key}"
                     eval $export_cmd
@@ -338,12 +339,12 @@ else
                     #run inference
                     eval $env
                     save_infer_path="${save_log}"
-		    cd deploy
+                    cd deploy
                     func_inference "${python}" "${inference_py}" "../${save_infer_path}" "../${LOG_PATH}" "${infer_img_dir}" "${flag_quant}"
-		    cd ..
+                    cd ..
                 fi
                 eval "unset CUDA_VISIBLE_DEVICES"
-            done  # done with:    for trainer in ${trainer_list[*]}; do
-        done      # done with:    for autocast in ${autocast_list[*]}; do
-    done          # done with:    for gpu in ${gpu_list[*]}; do
-fi  # end if [ ${MODE} = "infer" ]; then
+            done # done with:    for trainer in ${trainer_list[*]}; do
+        done     # done with:    for autocast in ${autocast_list[*]}; do
+    done         # done with:    for gpu in ${gpu_list[*]}; do
+fi               # end if [ ${MODE} = "infer" ]; then
