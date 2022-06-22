@@ -2,10 +2,17 @@
 source test_tipc/common_func.sh
 
 FILENAME=$1
-GPUID=$2
+MODE=$2
+
+# set cuda device
+GPUID=$3
 if [[ ! $GPUID ]];then
    GPUID=0
 fi
+env="export CUDA_VISIBLE_DEVICES=${GPUID}"
+set CUDA_VISIBLE_DEVICES
+eval $env
+
 dataline=$(awk 'NR==1, NR==19{print}'  $FILENAME)
 
 # parser params
@@ -30,7 +37,7 @@ cpp_benchmark_value=$(func_parser_value "${lines[16]}")
 generate_yaml_cmd=$(func_parser_value "${lines[17]}")
 transform_index_cmd=$(func_parser_value "${lines[18]}")
 
-LOG_PATH="./test_tipc/output/${model_name}"
+LOG_PATH="./test_tipc/output/${model_name}/${MODE}"
 mkdir -p ${LOG_PATH}
 status_log="${LOG_PATH}/results_cpp.log"
 # generate_yaml_cmd="python3 test_tipc/generate_cpp_yaml.py"
@@ -234,18 +241,6 @@ make -j
 cd ../../../
 # cd ../../
 echo "################### build PaddleClas demo finished ###################"
-
-
-# set cuda device
-# GPUID=$2
-# if [ ${#GPUID} -le 0 ];then
-#     env="export CUDA_VISIBLE_DEVICES=0"
-# else
-#     env="export CUDA_VISIBLE_DEVICES=${GPUID}"
-# fi
-# set CUDA_VISIBLE_DEVICES
-# eval $env
-
 
 echo "################### run test ###################"
 export Count=0
