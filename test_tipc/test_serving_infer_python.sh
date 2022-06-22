@@ -310,7 +310,7 @@ echo "################### run test ###################"
 
 export Count=0
 IFS="|"
-if [[ ${model_name} =~ "ShiTu" ]]; then
+if [[ ${model_name} = "PPShiTu" ]]; then
     func_serving_rec
 else
     func_serving_cls

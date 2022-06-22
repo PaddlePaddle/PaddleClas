@@ -41,6 +41,8 @@ def main():
                      'inference.pdmodel')) and os.path.exists(
                          os.path.join(config["Global"]["save_inference_dir"],
                                       'inference.pdiparams'))
+    if "Query" in config["DataLoader"]["Eval"]:
+        config["DataLoader"]["Eval"] = config["DataLoader"]["Eval"]["Query"]
     config["DataLoader"]["Eval"]["sampler"]["batch_size"] = 1
     config["DataLoader"]["Eval"]["loader"]["num_workers"] = 0
 
