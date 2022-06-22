@@ -208,7 +208,7 @@ fi
 if [[ ${MODE} = "serving_infer" ]]; then
     # prepare serving env
     python_name=$(func_parser_value "${lines[2]}")
-    if [[ ${model_name} =~ "ShiTu" ]]; then
+    if [[ ${model_name} = "PPShiTu" ]]; then
         cls_inference_model_url=$(func_parser_value "${lines[3]}")
         cls_tar_name=$(func_get_url_file_name "${cls_inference_model_url}")
         det_inference_model_url=$(func_parser_value "${lines[4]}")
