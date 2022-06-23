@@ -136,7 +136,7 @@ model_name=$(func_parser_value "${lines[1]}")
 model_url_value=$(func_parser_value "${lines[35]}")
 model_url_key=$(func_parser_key "${lines[35]}")
 
-if [[ $FILENAME == *GeneralRecognition* ]]; then
+if [[ $model_name == *ShiTu* ]]; then
     cd dataset
     rm -rf Aliproduct
     rm -rf train_reg_all_data.txt
@@ -184,9 +184,11 @@ elif [[ ${MODE} = "whole_infer" ]] || [[ ${MODE} = "klquant_whole_infer" ]]; the
     cd ../../
     # download inference or pretrained model
     eval "wget -nc $model_url_value"
-    if [[ $model_url_key == *inference* ]]; then
-        rm -rf inference
-        tar xf "${model_name}_infer.tar"
+    if [[ ${model_url_value} =~ ".tar" ]]; then
+        tar_name=$(func_get_url_file_name "${model_url_value}")
+        echo $tar_name
+        rm -rf {tar_name}
+        tar xf ${tar_name}
     fi
     if [[ $model_name == "SwinTransformer_large_patch4_window7_224" || $model_name == "SwinTransformer_large_patch4_window12_384" ]]; then
         cmd="mv ${model_name}_22kto1k_pretrained.pdparams ${model_name}_pretrained.pdparams"
