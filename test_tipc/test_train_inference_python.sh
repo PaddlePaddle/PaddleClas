@@ -94,7 +94,7 @@ if [[ $MODE = 'benchmark_train' ]]; then
   epoch_num=1
 fi
 
-LOG_PATH="./test_tipc/output/${model_name}"
+LOG_PATH="./test_tipc/output/${model_name}/${MODE}"
 mkdir -p ${LOG_PATH}
 status_log="${LOG_PATH}/results_python.log"
 
