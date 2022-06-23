@@ -31,7 +31,7 @@ norm_export:tools/export_model.py -c ppcls/configs/ImageNet/PPLCNetV2/PPLCNetV2_
 quant_export:null
 fpgm_export:null
 distill_export:null
-kl_quant:deploy/slim/quant_post_static.py -c ppcls/configs/ImageNet/PPLCNetV2/PPLCNetV2_base.yaml -o Global.save_inference_dir=./deploy/models/PPLCNetV2_base_kl_quant_infer
+kl_quant:deploy/slim/quant_post_static.py -c ppcls/configs/ImageNet/PPLCNetV2/PPLCNetV2_base.yaml -o Global.save_inference_dir=./PPLCNetV2_base_infer
 export2:null
 pretrained_model_url:https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/PPLCNetV2_base_infer.tar
 infer_model:../inference/

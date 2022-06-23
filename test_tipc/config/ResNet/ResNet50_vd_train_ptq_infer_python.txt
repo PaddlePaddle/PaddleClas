@@ -31,9 +31,9 @@ norm_export:tools/export_model.py -c ppcls/configs/ImageNet/ResNet/ResNet50_vd.y
 quant_export:null
 fpgm_export:null
 distill_export:null
-kl_quant:deploy/slim/quant_post_static.py -c ppcls/configs/ImageNet/ResNet/ResNet50_vd.yaml -o Global.save_inference_dir=./deploy/models/ResNet50_vd_kl_quant_infer
+kl_quant:deploy/slim/quant_post_static.py -c ppcls/configs/ImageNet/ResNet/ResNet50_vd.yaml -o Global.save_inference_dir=./ResNet50_vd_infer
 export2:null
-pretrained_model_url:https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/ResNet50_vd_pretrained.pdparams
+pretrained_model_url:https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/ResNet50_vd_infer.tar
 infer_model:../inference/
 infer_export:True
 infer_quant:Fasle
