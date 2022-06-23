@@ -176,8 +176,10 @@ class ResizeImage(object):
 
     def __call__(self, img):
         if isinstance(img, np.ndarray):
+            # numpy input
             img_h, img_w = img.shape[:2]
         else:
+            # PIL image input
             img_w, img_h = img.size
 
         if self.resize_short is not None:

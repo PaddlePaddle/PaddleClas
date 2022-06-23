@@ -13,13 +13,13 @@
     - [2.1.4 模型训练](#214-模型训练)
 - [3. 模型评估与推理部署](#3-模型评估与推理部署)
   - [3.1 模型评估](#31-模型评估)
-  - [3.1 模型推理与部署](#31-模型推理与部署)
-    - [3.1.1 推理模型准备](#311-推理模型准备)
-    - [3.1.2 基于 Python 预测引擎推理](#312-基于-python-预测引擎推理)
-    - [3.1.3 基于 C++ 预测引擎推理](#313-基于-c-预测引擎推理)
-    - [3.2 服务化部署](#32-服务化部署)
-    - [3.3 端侧部署](#33-端侧部署)
-    - [3.4 Paddle2ONNX 模型转换与预测](#34-paddle2onnx-模型转换与预测)
+  - [3.2 模型推理](#32-模型推理)
+    - [3.2.1 推理模型准备](#321-推理模型准备)
+    - [3.2.2 基于 Python 预测引擎推理](#322-基于-python-预测引擎推理)
+    - [3.2.3 基于 C++ 预测引擎推理](#323-基于-c-预测引擎推理)
+  - [3.3 服务化部署](#33-服务化部署)
+  - [3.4 端侧部署](#34-端侧部署)
+  - [3.5 Paddle2ONNX 模型转换与预测](#35-paddle2onnx-模型转换与预测)
 - [4. 总结](#4-总结)
   - [4.1 方法总结与对比](#41-方法总结与对比)
   - [4.2 使用建议/FAQ](#42-使用建议faq)
@@ -56,11 +56,11 @@
 
 以下表格总结了复现的ReID strong-baseline的3种配置在 Market1501 数据集上的精度指标，
 
-| 配置文件                         | recall@1 | mAP   | 参考recall@1 | 参考mAP | 预训练模型下载地址                                                                                                                      | inference模型下载地址                                                                                                         |
-| -------------------------------- | -------- | ----- | ------------ | ------- | --------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
-| baseline.yaml                    | 88.45    | 74.37 | 87.7         | 74.0    | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/reid/pretrain/baseline_pretrained.pdparams)                    | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/reid/inference/baseline_infer.tar)                    |
-| softmax_triplet.yaml             | 94.29    | 85.57 | 94.1         | 85.7    | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/reid/pretrain/softmax_triplet_pretrained.pdparams)             | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/reid/inference/softmax_triplet_infer.tar)             |
-| softmax_triplet_with_center.yaml | 94.50    | 85.82 | 94.5         | 85.9    | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/reid/pretrain/softmax_triplet_with_center_pretrained.pdparams) | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/reid/inference/softmax_triplet_with_center_infer.tar) |
+| 配置文件                         | recall@1(\%) | mAP(\%) | 参考recall@1(\%) | 参考mAP(\%) | 预训练模型下载地址                                                                                                                      | inference模型下载地址                                                                                                          |
+| -------------------------------- | ------------ | ------- | ---------------- | ----------- | --------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
+| baseline.yaml                    | 88.45        | 74.37   | 87.7             | 74.0        | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/reid/pretrain/baseline_pretrained.pdparams)                    | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/reid/inference/baseline_infer.tar)                    |
+| softmax_triplet.yaml             | 94.29        | 85.57   | 94.1             | 85.7        | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/reid/pretrain/softmax_triplet_pretrained.pdparams)             | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/reid/inference/softmax_triplet_infer.tar)             |
+| softmax_triplet_with_center.yaml | 94.50        | 85.82   | 94.5             | 85.9        | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/reid/pretrain/softmax_triplet_with_center_pretrained.pdparams) | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/reid/inference/softmax_triplet_with_center_infer.tar) |
 
 注：上述参考指标由使用作者开源的代码在我们的设备上训练多次得到，由于系统环境、torch版本、CUDA版本不同等原因，与作者提供的指标可能存在略微差异。
 
@@ -170,9 +170,9 @@
   ```
   默认评估日志保存在`PaddleClas/output/RecModel/eval.log`中，可以看到我们提供的 `softmax_triplet_with_center_pretrained.pdparams` 模型在 Market1501 数据集上的评估指标为recall@1=0.94507，recall@5=0.98248，mAP=0.85827
 
-#### 3.1 模型推理与部署
+#### 3.2 模型推理
 
-##### 3.1.1 推理模型准备
+##### 3.2.1 推理模型准备
 
 可以将训练过程中保存的模型文件转换成 inference 模型并推理，或者使用我们提供的转换好的 inference 模型直接进行推理
   - 将训练过程中保存的模型文件转换成 inference 模型，同样以 `latest.pdparams` 为例，执行以下命令进行转换
@@ -191,7 +191,7 @@
     cd ../
     ```
 
-##### 3.1.2 基于 Python 预测引擎推理
+##### 3.2.2 基于 Python 预测引擎推理
 
   1. 修改 `PaddleClas/deploy/configs/inference_rec.yaml`
       - 将 `infer_imgs:` 后的路径段改为 Market1501 中 query 文件夹下的任意一张图片路径（下方配置使用的是`0294_c1s1_066631_00.jpg`图片的路径）
@@ -245,23 +245,23 @@
 
   4. 批量预测，将配置文件中`infer_imgs:`后的路径改为为文件夹即可，如`../dataset/market1501/Market-1501-v15.09.15/query`，会预测并逐个输出query下所有图片的特征向量。
 
-##### 3.1.3 基于 C++ 预测引擎推理
+##### 3.2.3 基于 C++ 预测引擎推理
 
 PaddleClas 提供了基于 C++ 预测引擎推理的示例，您可以参考[服务器端 C++ 预测](../inference_deployment/cpp_deploy.md)来完成相应的推理部署。如果您使用的是 Windows 平台，可以参考基于 Visual Studio 2019 Community CMake 编译指南完成相应的预测库编译和模型预测工作。
 
-##### 3.2 服务化部署
+#### 3.3 服务化部署
 
 Paddle Serving 提供高性能、灵活易用的工业级在线推理服务。Paddle Serving 支持 RESTful、gRPC、bRPC 等多种协议，提供多种异构硬件和多种操作系统环境下推理解决方案。更多关于Paddle Serving 的介绍，可以参考Paddle Serving 代码仓库。
 
 PaddleClas 提供了基于 Paddle Serving 来完成模型服务化部署的示例，您可以参考[模型服务化部署](../inference_deployment/paddle_serving_deploy.md)来完成相应的部署工作。
 
-##### 3.3 端侧部署
+#### 3.4 端侧部署
 
 Paddle Lite 是一个高性能、轻量级、灵活性强且易于扩展的深度学习推理框架，定位于支持包括移动端、嵌入式以及服务器端在内的多硬件平台。更多关于 Paddle Lite 的介绍，可以参考Paddle Lite 代码仓库。
 
 PaddleClas 提供了基于 Paddle Lite 来完成模型端侧部署的示例，您可以参考[端侧部署](../inference_deployment/paddle_lite_deploy.md)来完成相应的部署工作。
 
-##### 3.4 Paddle2ONNX 模型转换与预测
+#### 3.5 Paddle2ONNX 模型转换与预测
 
 Paddle2ONNX 支持将 PaddlePaddle 模型格式转化到 ONNX 模型格式。通过 ONNX 可以完成将 Paddle 模型到多种推理引擎的部署，包括TensorRT/OpenVINO/MNN/TNN/NCNN，以及其它对 ONNX 开源格式进行支持的推理引擎或硬件。更多关于 Paddle2ONNX 的介绍，可以参考Paddle2ONNX 代码仓库。
 

@@ -13,13 +13,13 @@ English | [简体中文](../../zh_CN/algorithm_introduction/reid.md)
     - [2.1.4 Model training](#214-model-training)
 - [3. Model evaluation and inference deployment](#3-model-evaluation-and-inference-deployment)
   - [3.1 Model Evaluation](#31-model-evaluation)
-  - [3.1 Model Inference and Deployment](#31-model-inference-and-deployment)
-    - [3.1.1 Inference model preparation](#311-inference-model-preparation)
-    - [3.1.2 Inference based on Python prediction engine](#312-inference-based-on-python-prediction-engine)
-    - [3.1.3 Inference based on C++ prediction engine](#313-inference-based-on-c-prediction-engine)
-    - [3.2 Service Deployment](#32-service-deployment)
-    - [3.3 Device side deployment](#33-device-side-deployment)
-    - [3.4 Paddle2ONNX model conversion and prediction](#34-paddle2onnx-model-conversion-and-prediction)
+  - [3.2 Model Inference and Deployment](#32-model-inference-and-deployment)
+    - [3.2.1 Inference model preparation](#321-inference-model-preparation)
+    - [3.2.2 Inference based on Python prediction engine](#322-inference-based-on-python-prediction-engine)
+    - [3.2.3 Inference based on C++ prediction engine](#323-inference-based-on-c-prediction-engine)
+  - [3.3 Service Deployment](#33-service-deployment)
+  - [3.4 Lite deployment](#34-lite-deployment)
+  - [3.5 Paddle2ONNX model conversion and prediction](#35-paddle2onnx-model-conversion-and-prediction)
 - [4. Summary](#4-summary)
   - [4.1 Method summary and comparison](#41-method-summary-and-comparison)
   - [4.2 Usage advice/FAQ](#42-usage-advicefaq)
@@ -56,11 +56,11 @@ Based on the commonly used person re-identification model based on ResNet50, the
 
 The following table summarizes the accuracy metrics of the 3 configurations of the recurring ReID strong-baseline on the Market1501 dataset,
 
-| Configuration file               | recall@1 | mAP   | Refer to recall@1 | Refer to mAP | Pre-trained model download                                                                                                                   | Inference Model Download Address                                                                                                   |
-| -------------------------------- | -------- | ----- | ----------------- | ------------ | -------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
-| baseline.yaml                    | 88.45    | 74.37 | 87.7              | 74.0         | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/reid/pretrain/baseline_pretrained.pdparams)                    | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/reid/inference/baseline_infer.tar)                    |
-| softmax_triplet.yaml             | 94.29    | 85.57 | 94.1              | 85.7         | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/reid/pretrain/softmax_triplet_pretrained.pdparams)             | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/reid/inference/softmax_triplet_infer.tar)             |
-| softmax_triplet_with_center.yaml | 94.50    | 85.82 | 94.5              | 85.9         | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/reid/pretrain/softmax_triplet_with_center_pretrained.pdparams) | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/reid/inference/softmax_triplet_with_center_infer.tar) |
+| Configuration file               | recall@1(\%) | mAP(\%) | Refer to recall@1(\%) | Refer to mAP(\%) | Pre-trained model download                                                                                                                   | Inference Model Download Address                                                                                                    |
+| -------------------------------- | ------------ | ------- | --------------------- | ---------------- | -------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
+| baseline.yaml                    | 88.45        | 74.37   | 87.7                  | 74.0             | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/reid/pretrain/baseline_pretrained.pdparams)                    | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/reid/inference/baseline_infer.tar)                    |
+| softmax_triplet.yaml             | 94.29        | 85.57   | 94.1                  | 85.7             | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/reid/pretrain/softmax_triplet_pretrained.pdparams)             | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/reid/inference/softmax_triplet_infer.tar)             |
+| softmax_triplet_with_center.yaml | 94.50        | 85.82   | 94.5                  | 85.9             | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/reid/pretrain/softmax_triplet_with_center_pretrained.pdparams) | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/reid/inference/softmax_triplet_with_center_infer.tar) |
 
 Note: The above reference indicators are obtained by using the author's open source code to train on our equipment for many times. Due to different system environments, torch versions, and CUDA versions, there may be slight differences with the indicators provided by the author.
 
@@ -170,9 +170,9 @@ Prepare the `*.pdparams` model parameter file for evaluation. You can use the tr
   ```
   The default evaluation log is saved in `PaddleClas/output/RecModel/eval.log`. You can see that the evaluation metrics of the `softmax_triplet_with_center_pretrained.pdparams` model we provided on the Market1501 dataset are recall@1=0.94507, recall@5 =0.98248, mAP=0.85827
 
-#### 3.1 Model Inference and Deployment
+#### 3.2 Model Inference and Deployment
 
-##### 3.1.1 Inference model preparation
+##### 3.2.1 Inference model preparation
 
 You can convert the model file saved during training into an inference model and inference, or use the converted inference model we provide for direct inference
   - Convert the model file saved during the training process to an inference model, also take `latest.pdparams` as an example, execute the following command to convert
@@ -191,7 +191,7 @@ You can convert the model file saved during training into an inference model and
     cd ../
     ```
 
-##### 3.1.2 Inference based on Python prediction engine
+##### 3.2.2 Inference based on Python prediction engine
 
   1. Modify `PaddleClas/deploy/configs/inference_rec.yaml`. Change the field after `infer_imgs:` to any image path under the query folder in Market1501 (the configuration below uses the path of the `0294_c1s1_066631_00.jpg` image); change the field after `rec_inference_model_dir:` to extract it softmax_triplet_with_center_infer folder path; change the preprocessing configuration under the `transform_ops` field to the preprocessing configuration under `Eval.Query.dataset` in `softmax_triplet_with_center.yaml`. As follows
 
@@ -242,23 +242,23 @@ You can convert the model file saved during training into an inference model and
 
   4. For batch prediction, change the path after `infer_imgs:` in the configuration file to a folder, such as `../dataset/market1501/Market-1501-v15.09.15/query`, it will predict and output The feature vector of all images under query.
 
-##### 3.1.3 Inference based on C++ prediction engine
+##### 3.2.3 Inference based on C++ prediction engine
 
 PaddleClas provides an example of inference based on C++ prediction engine, you can refer to [C++ prediction](../inference_deployment/cpp_deploy_en.md) to complete the corresponding inference deployment. If you are using the Windows platform, you can refer to the Visual Studio 2019 Community CMake Compilation Guide to complete the corresponding prediction library compilation and model prediction work.
 
-##### 3.2 Service Deployment
+#### 3.3 Service Deployment
 
 Paddle Serving provides high-performance, flexible and easy-to-use industrial-grade online inference services. Paddle Serving supports RESTful, gRPC, bRPC and other protocols, and provides inference solutions in a variety of heterogeneous hardware and operating system environments. For more introduction to Paddle Serving, please refer to the Paddle Serving code repository.
 
 PaddleClas provides an example of model serving deployment based on Paddle Serving. You can refer to [Model serving deployment](../inference_deployment/paddle_serving_deploy_en.md) to complete the corresponding deployment work.
 
-##### 3.3 Lite deployment
+#### 3.4 Lite deployment
 
 Paddle Lite is a high-performance, lightweight, flexible and easily extensible deep learning inference framework, positioned to support mobileMultiple hardware platforms including client, embedded and server. For more introduction to Paddle Lite, please refer to the Paddle Lite code repository.
 
 PaddleClas provides an example of deploying models based on Paddle Lite. You can refer to [Deployment](../inference_deployment/paddle_lite_deploy_en.md) to complete the corresponding deployment.
 
-##### 3.4 Paddle2ONNX model conversion and prediction
+#### 3.5 Paddle2ONNX model conversion and prediction
 
 Paddle2ONNX supports converting PaddlePaddle model format to ONNX model format. The deployment of Paddle models to various inference engines can be completed through ONNX, including TensorRT/OpenVINO/MNN/TNN/NCNN, as well as other inference engines or hardware that support the ONNX open source format. For more information about Paddle2ONNX, please refer to the Paddle2ONNX code repository.
 
