@@ -85,7 +85,12 @@ if [[ ${MODE} = "cpp_infer" ]]; then
     fi
     if [[ ! -d "./deploy/cpp/paddle_inference/" ]]; then
         pushd ./deploy/cpp/
-        wget -nc https://paddle-inference-lib.bj.bcebos.com/2.2.2/cxx_c/Linux/GPU/x86-64_gcc8.2_avx_mkl_cuda10.1_cudnn7.6.5_trt6.0.1.5/paddle_inference.tgz
+        PADDLEInfer=$3
+        if [ "" = "$PADDLEInfer" ];then
+            wget -nc https://paddle-inference-lib.bj.bcebos.com/2.2.2/cxx_c/Linux/GPU/x86-64_gcc8.2_avx_mkl_cuda10.1_cudnn7.6.5_trt6.0.1.5/paddle_inference.tgz --no-check-certificate
+        else
+            wget -nc ${PADDLEInfer} --no-check-certificate
+        fi
         tar xf paddle_inference.tgz
         popd
     fi
