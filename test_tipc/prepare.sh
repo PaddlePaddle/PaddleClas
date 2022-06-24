@@ -2,8 +2,7 @@
 FILENAME=$1
 
 # MODE be one of ['lite_train_lite_infer' 'lite_train_whole_infer' 'whole_train_whole_infer',
-#                 'whole_infer', 'klquant_whole_infer',
-#                 'cpp_infer', 'serving_infer',  'lite_infer']
+#                 'whole_infer', 'cpp_infer', 'serving_infer',  'lite_infer']
 
 MODE=$2
 
@@ -171,7 +170,7 @@ if [[ ${MODE} = "lite_train_lite_infer" ]] || [[ ${MODE} = "lite_train_whole_inf
     mv val.txt val_list.txt
     cp -r train/* val/
     cd ../../
-elif [[ ${MODE} = "whole_infer" ]] || [[ ${MODE} = "klquant_whole_infer" ]]; then
+elif [[ ${MODE} = "whole_infer" ]]; then
     # download data
     cd dataset
     rm -rf ILSVRC2012
