@@ -236,8 +236,13 @@ class DistillationDKDLoss(DKDLoss):
                  temperature=1.0,
                  alpha=1.0,
                  beta=1.0,
+                 use_target_as_gt=False,
                  name="loss_dkd"):
-        super().__init__(temperature=temperature, alpha=alpha, beta=beta)
+        super().__init__(
+            temperature=temperature,
+            alpha=alpha,
+            beta=beta,
+            use_target_as_gt=use_target_as_gt)
         self.key = key
         self.model_name_pairs = model_name_pairs
         self.name = name
