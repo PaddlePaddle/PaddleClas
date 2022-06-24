@@ -5,8 +5,9 @@
     - [1.2 模型细节](#1.2)
     - [1.3 实验结果](#1.3)
 - [2. 模型快速体验](#2)
-   - [2.1 安装 paddleclas](#2.1)
-   - [2.2 预测](#2.2)
+    - [2.1 安装 paddlepaddle](#2.1)
+    - [2.2 安装 paddleclas](#2.2)
+    - [2.3 预测](#2.3)
 - [3. 模型训练、评估和预测](#3)
     - [3.1 环境配置](#3.1)
     - [3.2 数据准备](#3.2)
@@ -88,24 +89,43 @@ PP-HGNet 与其他模型的比较如下，其中测试机器为 NVIDIA® Tesla®
 | ResNeXt101_32x48d_wsl    | 85.37      | 97.69       | 55.07       |
 | SwinTransformer_base     | 85.2       | 97.5        | 13.53       |  
 | <b>PPHGNet_base_ssld<b> | <b>85.00<b>| <b>97.35<b> | <b>5.97<b>   |
-
- 
-<a name="2"></a>   
     
+    
+<a name="2"></a>
+
 ## 2. 模型快速体验
 
-<a name="2.1"></a>   
-    
-### 2.1 安装 paddleclas
-    
-使用如下命令快速安装 paddlepaddle, paddleclas
-    
-```    
-pip3 install paddlepaddle paddleclas
+<a name="2.1"></a>  
+
+### 2.1 安装 paddlepaddle
+
+- 您的机器安装的是 CUDA9 或 CUDA10，请运行以下命令安装
+
+```bash
+python3 -m pip install paddlepaddle-gpu -i https://mirror.baidu.com/pypi/simple
 ```
-<a name="2.2"></a> 
+
+- 您的机器是CPU，请运行以下命令安装
+
+```bash
+python3 -m pip install paddlepaddle -i https://mirror.baidu.com/pypi/simple
+```
+
+更多的版本需求，请参照[飞桨官网安装文档](https://www.paddlepaddle.org.cn/install/quick)中的说明进行操作。
+
+<a name="2.2"></a>  
+
+### 2.2 安装 paddleclas
+
+使用如下命令快速安装 paddleclas
+
+```  
+pip3 install paddleclas
+```
+
+<a name="2.3"></a> 
     
-### 2.2 预测
+### 2.3 预测
 
 * 在命令行中使用 PPHGNet_small 的权重快速预测
     

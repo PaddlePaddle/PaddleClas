@@ -38,21 +38,21 @@
 
 ## 1. Introduction
 
-This case provides a way for users to quickly build a lightweight, high-precision and practical classification model of person attribute using PaddleClas PULC (Practical Ultra Lightweight image Classification). The model can be widely used in 
+This case provides a way for users to quickly build a lightweight, high-precision and practical classification model of person attribute using PaddleClas PULC (Practical Ultra Lightweight image Classification). The model can be widely used in
 Pedestrian analysis scenarios, pedestrian tracking scenarios, etc.
 
 The following table lists the relevant indicators of the model. The first three lines means that using Res2Net200_vd_26w_4s, SwinTransformer_tiny and MobileNetV3_small_x0_35 as the backbone to training. The fourth to seventh lines means that the backbone is replaced by PPLCNet, additional use of EDA strategy and additional use of EDA strategy and SKL-UGI knowledge distillation strategy.
-    
-    
+
+
 | Backbone | ma（%） | Latency(ms) | Size(M) | Training Strategy |
 |-------|-----------|----------|---------------|---------------|
 | Res2Net200_vd_26w_4s  | 81.25 | 77.51  | 293 | using ImageNet pretrained |
-| SwinTransformer_tiny  | 80.17 | 89.51  | 107 | using ImageNet pretrained |
+| SwinTransformer_tiny  | 80.17 | 89.51  | 111 | using ImageNet pretrained |
 | MobileNetV3_small_x0_35  | 70.79 | 2.90  | 1.7 | using ImageNet pretrained |
-| PPLCNet_x1_0  | 76.31 | 2.01  | 6.6 | using ImageNet pretrained |
-| PPLCNet_x1_0  | 77.31 | 2.01  | 6.6 | using SSLD pretrained |
-| PPLCNet_x1_0  | 77.71 | 2.01  | 6.6 | using SSLD pretrained + EDA strategy|
-| <b>PPLCNet_x1_0<b>  | <b>78.59<b> | <b>2.01<b>  | <b>6.6<b> | using SSLD pretrained + EDA strategy + SKL-UGI knowledge distillation strategy|
+| PPLCNet_x1_0  | 76.31 | 2.01  | 7.1 | using ImageNet pretrained |
+| PPLCNet_x1_0  | 77.31 | 2.01  | 7.1 | using SSLD pretrained |
+| PPLCNet_x1_0  | 77.71 | 2.01  | 7.1 | using SSLD pretrained + EDA strategy|
+| <b>PPLCNet_x1_0<b>  | <b>78.59<b> | <b>2.01<b>  | <b>7.1<b> | using SSLD pretrained + EDA strategy + SKL-UGI knowledge distillation strategy|
 
 It can be seen that high ma metric can be getted when backbone are Res2Net200_vd_26w_4s and SwinTranformer_tiny, but the speed is slow. Replacing backbone with the lightweight model MobileNetV3_small_x0_35, the speed can be greatly improved, but the ma metric will be greatly reduced. Replacing backbone with faster backbone PPLCNet_x1_0, the ma metric is higher more 5.5 percentage points higher than MobileNetv3_small_x0_35. At the same time, the speed can be more than 20% faster. After additional using the SSLD pretrained model, the ma metric can be improved by about 1 percentage points without affecting the inference speed. Further, additional using the EDA strategy, the ma metric can be increased by 0.4 percentage points. Finally, after additional using the SKL-UGI knowledge distillation, the ma matric can be further improved by 0.88 percentage points. At this time, the ma metric of PPLCNet_x1_0 is only 1.58% different from SwinTransformer_tiny, but the speed is more than 44 times faster. The training method and deployment instructions of PULC will be introduced in detail below.
 

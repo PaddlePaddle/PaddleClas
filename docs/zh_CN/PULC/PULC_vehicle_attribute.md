@@ -45,7 +45,7 @@
 下表列出了不同车辆属性识别模型的相关指标，前三行展现了使用 Res2Net200_vd_26w_4s、 ResNet50、MobileNetV3_small_x0_35 作为 backbone 训练得到的模型的相关指标，第四行至第七行依次展现了替换 backbone 为 PPLCNet_x1_0、使用 SSLD 预训练模型、使用 SSLD 预训练模型 + EDA 策略、使用 SSLD 预训练模型 + EDA 策略 + SKL-UGI 知识蒸馏策略训练得到的模型的相关指标。
 
 
-| 模型 | ma（%） | 延时（ms） | 存储（M） | 策略 |
+| 模型 | mA（%） | 延时（ms） | 存储（M） | 策略 |
 |-------|-----------|----------|---------------|---------------|
 | Res2Net200_vd_26w_4s  | 91.36 | 79.46  | 293 | 使用ImageNet预训练模型 |
 | ResNet50  | 89.98 | 12.83  | 92 | 使用ImageNet预训练模型 |
@@ -53,12 +53,12 @@
 | PPLCNet_x1_0  | 89.57 | 2.36  | 7.2 | 使用ImageNet预训练模型 |
 | PPLCNet_x1_0  | 90.07 | 2.36  | 7.2 | 使用SSLD预训练模型 |
 | PPLCNet_x1_0  | 90.59 | 2.36  | 7.2 | 使用SSLD预训练模型+EDA策略|
-| <b>PPLCNet_x1_0<b>  | <b>90.81<b> | <b>2.36<b>  | <b>8.2<b> | 使用SSLD预训练模型+EDA策略+SKL-UGI知识蒸馏策略|
+| <b>PPLCNet_x1_0<b>  | <b>90.81<b> | <b>2.36<b>  | <b>7.2<b> | 使用SSLD预训练模型+EDA策略+SKL-UGI知识蒸馏策略|
 
 从表中可以看出，backbone 为 Res2Net200_vd_26w_4s 时精度较高，但是推理速度较慢。将 backbone 替换为轻量级模型 MobileNetV3_small_x0_35 后，速度可以大幅提升，但是精度下降明显。将 backbone 替换为 PPLCNet_x1_0 时，精度提升 2 个百分点，同时速度也提升 23% 左右。在此基础上，使用 SSLD 预训练模型后，在不改变推理速度的前提下，精度可以提升约 0.5 个百分点，进一步地，当融合EDA策略后，精度可以再提升 0.52 个百分点，最后，在使用 SKL-UGI 知识蒸馏后，精度可以继续提升 0.23 个百分点。此时，PPLCNet_x1_0 的精度与 Res2Net200_vd_26w_4s 仅相差 0.55 个百分点，但是速度快 32 倍。关于 PULC 的训练方法和推理部署方法将在下面详细介绍。
 
 **备注：**
-    
+
 * 延时是基于 Intel(R) Xeon(R) Gold 6148 CPU @ 2.40GHz 测试得到，开启 MKLDNN 加速策略，线程数为10。
 * 关于PP-LCNet的介绍可以参考[PP-LCNet介绍](../models/PP-LCNet.md)，相关论文可以查阅[PP-LCNet paper](https://arxiv.org/abs/2109.15099)。
 
@@ -178,7 +178,7 @@ from xml.dom.minidom import parse
 
 vehicleids = []
 
-def convert_annotation(input_fp, output_fp):
+def convert_annotation(input_fp, output_fp, subdir):
     in_file = open(input_fp)
     list_file = open(output_fp, 'w')
     tree = parse(in_file)
@@ -201,12 +201,12 @@ def convert_annotation(input_fp, output_fp):
             typeid = int (item.getAttribute("typeID"))
             label[typeid+9] = '1'
         label = ','.join(label)
-        list_file.write(os.path.join('image_train', name)  + "\t" + label + "\n")
+        list_file.write(os.path.join(subdir, name)  + "\t" + label + "\n")
 
     list_file.close()
 
-convert_annotation('train_label.xml', 'train_list.txt')  #imagename vehiclenum colorid typeid
-convert_annotation('test_label.xml', 'test_list.txt')
+convert_annotation('train_label.xml', 'train_list.txt', 'image_train')  #imagename vehiclenum colorid typeid
+convert_annotation('test_label.xml', 'test_list.txt', 'image_test')
 ```
 
 执行上述命令后，`VeRi`目录中具有以下数据：

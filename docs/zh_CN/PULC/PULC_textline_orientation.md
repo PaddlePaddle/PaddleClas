@@ -40,20 +40,20 @@
 
 ## 1. 模型和应用场景介绍
 
-该案例提供了用户使用 PaddleClas 的超轻量图像分类方案（PULC，Practical Ultra Lightweight Classification）快速构建轻量级、高精度、可落地的文本行方向分类模型。该模型可以广泛应用于如文字矫正、文字识别等场景。
+该案例提供了用户使用 PaddleClas 的超轻量图像分类方案（PULC，Practical Ultra Lightweight image Classification）快速构建轻量级、高精度、可落地的文本行方向分类模型。该模型可以广泛应用于如文字矫正、文字识别等场景。
 
-下表列出了文本行方向分类模型的相关指标，前两行展现了使用 Res2Net200_vd 和 MobileNetV3_large_x1_0 作为 backbone 训练得到的模型的相关指标，第三行至第七行依次展现了替换 backbone 为 PPLCNet_x1_0、使用 SSLD 预训练模型、使用 SSLD 预训练模型 + EDA 策略、使用 SSLD 预训练模型 + EDA 策略 + SKL-UGI 知识蒸馏策略训练得到的模型的相关指标。
+下表列出了文本行方向分类模型的相关指标，前两行展现了使用 Res2Net200_vd 和 MobileNetV3_small_x0_35 作为 backbone 训练得到的模型的相关指标，第三行至第七行依次展现了替换 backbone 为 PPLCNet_x1_0、使用 SSLD 预训练模型、使用 SSLD 预训练模型 + EDA 策略、使用 SSLD 预训练模型 + EDA 策略 + SKL-UGI 知识蒸馏策略训练得到的模型的相关指标。
 
 
 | 模型 | Top-1 Acc（%） | 延时（ms） | 存储（M） | 策略 |
 |-------|-----------|----------|---------------|---------------|
-| SwinTranformer_tiny  | 93.61 | 89.64  | 107 | 使用 ImageNet 预训练模型 |
-| MobileNetV3_small_x0_35  | 81.40 | 2.96  | 17 | 使用 ImageNet 预训练模型 |
-| PPLCNet_x1_0  | 89.99 | 2.11  | 6.5 | 使用 ImageNet 预训练模型 |
-| PPLCNet_x1_0*  | 94.06 | 2.68  | 6.5 | 使用 ImageNet 预训练模型 |
-| PPLCNet_x1_0*  | 94.11 | 2.68  | 6.5 | 使用 SSLD 预训练模型 |
-| <b>PPLCNet_x1_0**<b>  | <b>96.01<b> | <b>2.72<b>  | <b>6.5<b> | 使用 SSLD 预训练模型+EDA 策略|
-| PPLCNet_x1_0**  | 95.86 | 2.72  | 6.5 | 使用 SSLD 预训练模型+EDA 策略+SKL-UGI 知识蒸馏策略|
+| SwinTranformer_tiny  | 93.61 | 89.64  | 111 | 使用 ImageNet 预训练模型 |
+| MobileNetV3_small_x0_35  | 81.40 | 2.96  | 2.6 | 使用 ImageNet 预训练模型 |
+| PPLCNet_x1_0  | 89.99 | 2.11  | 7.0 | 使用 ImageNet 预训练模型 |
+| PPLCNet_x1_0*  | 94.06 | 2.68  | 7.0 | 使用 ImageNet 预训练模型 |
+| PPLCNet_x1_0*  | 94.11 | 2.68  | 7.0 | 使用 SSLD 预训练模型 |
+| <b>PPLCNet_x1_0**<b>  | <b>96.01<b> | <b>2.72<b>  | <b>7.0<b> | 使用 SSLD 预训练模型+EDA 策略|
+| PPLCNet_x1_0**  | 95.86 | 2.72  | 7.0 | 使用 SSLD 预训练模型+EDA 策略+SKL-UGI 知识蒸馏策略|
 
 从表中可以看出，backbone 为 SwinTranformer_tiny 时精度较高，但是推理速度较慢。将 backbone 替换为轻量级模型 MobileNetV3_small_x0_35 后，速度可以大幅提升，精度下降也比较明显。将 backbone 替换为 PPLCNet_x1_0 时，精度较 MobileNetV3_small_x0_35 高 8.6 个百分点，速度快10%左右。在此基础上，更改分辨率和stride， 速度变慢 27%，但是精度可以提升 4.5 个百分点（采用[PaddleOCR](https://github.com/PaddlePaddle/PaddleOCR)的方案），使用 SSLD 预训练模型后，精度可以继续提升约 0.05 个百分点 ，进一步地，当融合EDA策略后，精度可以再提升 1.9 个百分点。最后，融合SKL-UGI 知识蒸馏策略后，在该场景无效。关于 PULC 的训练方法和推理部署方法将在下面详细介绍。
 

@@ -21,7 +21,7 @@ PP-ShiTu demo images
 </div>
 
 **Recent updates**
-- 2022.6.15 Release [**P**ractical **U**ltra **L**ight-weight image **C**lassification solutions](./docs/en/PULC/PULC_quickstart_en.md). PULC models inference within 3ms on CPU devices, with accuracy comparable with SwinTransformer. We also release 9 practical models covering pedestrian, vehicle and OCR.
+- 2022.6.15 Release [**P**ractical **U**ltra **L**ight-weight image **C**lassification solutions](./docs/en/PULC/PULC_quickstart_en.md). PULC models inference within 3ms on CPU devices, with accuracy on par with SwinTransformer. We also release 9 practical classification models covering pedestrian, vehicle and OCR scenario.
 - 2022.4.21 Added the related [code](https://github.com/PaddlePaddle/PaddleClas/pull/1820/files) of the CVPR2022 oral paper [MixFormer](https://arxiv.org/pdf/2204.02557.pdf).
 
 - 2021.09.17 Add PP-LCNet series model developed by PaddleClas, these models show strong competitiveness on Intel CPUs.
@@ -58,19 +58,18 @@ Quick experience of **P**ractical **U**ltra **L**ight-weight image **C**lassific
 
 - [Install Paddle](./docs/en/installation/install_paddle_en.md)
 - [Install PaddleClas Environment](./docs/en/installation/install_paddleclas_en.md)
-- [Practical Ultra Light-weight image Classification solutions](./docs/en/PULC/PULC_quickstart_en.md)
+- [Practical Ultra Light-weight image Classification solutions](./docs/en/PULC/PULC_train_en.md)
   - [PULC Quick Start](docs/en/PULC/PULC_quickstart_en.md)
   - [PULC Model Zoo](docs/en/PULC/PULC_model_list_en.md)
     - [PULC Classification Model of Someone or Nobody](docs/en/PULC/PULC_person_exists_en.md)
     - [PULC Recognition Model of Person Attribute](docs/en/PULC/PULC_person_attribute_en.md)
     - [PULC Classification Model of Wearing or Unwearing Safety Helmet](docs/en/PULC/PULC_safety_helmet_en.md)
-    - [PULC Classification Model of Traffic Sing](docs/en/PULC/PULC_traffic_sign_en.md)
+    - [PULC Classification Model of Traffic Sign](docs/en/PULC/PULC_traffic_sign_en.md)
     - [PULC Recognition Model of Vehicle Attribute](docs/en/PULC/PULC_vehicle_attribute_en.md)
     - [PULC Classification Model of Containing or Uncontaining Car](docs/en/PULC/PULC_car_exists_en.md)
     - [PULC Classification Model of Text Image Orientation](docs/en/PULC/PULC_text_image_orientation_en.md)
     - [PULC Classification Model of Textline Orientation](docs/en/PULC/PULC_textline_orientation_en.md)
     - [PULC Classification Model of Language](docs/en/PULC/PULC_language_classification_en.md)
-- [Quick Start of Recognition](./docs/en/tutorials/quick_start_recognition_en.md)
 - [Quick Start of Recognition](./docs/en/quick_start/quick_start_recognition_en.md)
 - [Introduction to Image Recognition Systems](#Introduction_to_Image_Recognition_Systems)
 - [Image Recognition Demo images](#Rec_Demo_images)

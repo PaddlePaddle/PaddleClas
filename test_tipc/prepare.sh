@@ -83,6 +83,17 @@ if [[ ${MODE} = "cpp_infer" ]]; then
         popd
         echo "################### build opencv finished ###################"
     fi
+    if [[ ! -d "./deploy/cpp/paddle_inference/" ]]; then
+        pushd ./deploy/cpp/
+        PADDLEInfer=$3
+        if [ "" = "$PADDLEInfer" ];then
+            wget -nc https://paddle-inference-lib.bj.bcebos.com/2.2.2/cxx_c/Linux/GPU/x86-64_gcc8.2_avx_mkl_cuda10.1_cudnn7.6.5_trt6.0.1.5/paddle_inference.tgz --no-check-certificate
+        else
+            wget -nc ${PADDLEInfer} --no-check-certificate
+        fi
+        tar xf paddle_inference.tgz
+        popd
+    fi
     if [[ $FILENAME == *infer_cpp_linux_gpu_cpu.txt ]]; then
         cpp_type=$(func_parser_value "${lines[2]}")
         cls_inference_model_dir=$(func_parser_value "${lines[3]}")
@@ -92,7 +103,9 @@ if [[ ${MODE} = "cpp_infer" ]]; then
 
         if [[ $cpp_type == "cls" ]]; then
             eval "wget -nc $cls_inference_url"
-            tar xf "${model_name}_infer.tar"
+            tar_name=$(func_get_url_file_name "$cls_inference_url")
+            model_dir=${tar_name%.*}
+            eval "tar xf ${tar_name}"
 
             cd dataset
             rm -rf ILSVRC2012
@@ -200,7 +213,7 @@ fi
 if [[ ${MODE} = "serving_infer" ]]; then
     # prepare serving env
     python_name=$(func_parser_value "${lines[2]}")
-    if [[ ${model_name} =~ "ShiTu" ]]; then
+    if [[ ${model_name} = "PPShiTu" ]]; then
         cls_inference_model_url=$(func_parser_value "${lines[3]}")
         cls_tar_name=$(func_get_url_file_name "${cls_inference_model_url}")
         det_inference_model_url=$(func_parser_value "${lines[4]}")

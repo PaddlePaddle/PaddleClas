@@ -38,18 +38,18 @@
 
 ## 1. Introduction
 
-This case provides a way for users to quickly build a lightweight, high-precision and practical classification model of language in the image using PaddleClas PULC (Practical Ultra Lightweight Classification). The model can be widely used in various scenarios involving multilingual OCR processing, such as finance and government affairs.
+This case provides a way for users to quickly build a lightweight, high-precision and practical classification model of language in the image using PaddleClas PULC (Practical Ultra Lightweight image Classification). The model can be widely used in various scenarios involving multilingual OCR processing, such as finance and government affairs.
 
 The following table lists the relevant indicators of the model. The first two lines means that using SwinTransformer_tiny and MobileNetV3_small_x0_35 as the backbone to training. The third to sixth lines means that the backbone is replaced by PPLCNet, additional use of EDA strategy and additional use of EDA strategy and SKL-UGI knowledge distillation strategy. When replacing the backbone with PPLCNet_x1_0, the input shape of model is changed to [192, 48], and the stride of the network is changed to [2, [2, 1], [2, 1], [2, 1]].
 
 | Backbone | Top1-Acc(%) | Latency(ms) | Size(M)| Training Strategy |
 | ----------------------- | --------- | -------- | ------- | ---------------------------------------------- |
-| SwinTranformer_tiny     | 98.12     | 89.09    | 107     | using ImageNet pretrained model |
-| MobileNetV3_small_x0_35 | 95.92     | 2.98     | 17      | using ImageNet pretrained model |
-| PPLCNet_x1_0            | 98.35     | 2.58     | 6.5     | using ImageNet pretrained model |
-| PPLCNet_x1_0            | 98.7      | 2.58     | 6.5     | using SSLD pretrained model |
-| PPLCNet_x1_0            | 99.12     | 2.58     | 6.5     | using SSLD pretrained model + EDA strategy  |
-| **PPLCNet_x1_0**        | **99.26** | **2.58** | **6.5** | using SSLD pretrained model + EDA strategy + SKL-UGI knowledge distillation strategy|
+| SwinTranformer_tiny     | 98.12     | 89.09    | 111     | using ImageNet pretrained model |
+| MobileNetV3_small_x0_35 | 95.92     | 2.98     | 3.7      | using ImageNet pretrained model |
+| PPLCNet_x1_0            | 98.35     | 2.58     | 7.1     | using ImageNet pretrained model |
+| PPLCNet_x1_0            | 98.7      | 2.58     | 7.1     | using SSLD pretrained model |
+| PPLCNet_x1_0            | 99.12     | 2.58     | 7.1     | using SSLD pretrained model + EDA strategy  |
+| **PPLCNet_x1_0**        | **99.26** | **2.58** | **7.1** | using SSLD pretrained model + EDA strategy + SKL-UGI knowledge distillation strategy|
 
 It can be seen that high accuracy can be getted when backbone is SwinTranformer_tiny, but the speed is slow. Replacing backbone with the lightweight model MobileNetV3_small_x0_35, the speed can be greatly improved, but the accuracy will be greatly reduced. Replacing backbone with faster backbone PPLCNet_x1_0 and changing the input shape and stride of network, the accuracy is higher more 2.43 percentage points than MobileNetv3_small_x0_35. At the same time, the speed can be more than 20% faster. After additional using the SSLD pretrained model, the accuracy can be improved by about 0.35 percentage points without affecting the inference speed. Further, additional using the EDA strategy, the accuracy can be increased by 0.42 percentage points. Finally, after additional using the SKL-UGI knowledge distillation, the accuracy can be further improved by 0.14 percentage points. At this point, the accuracy is higher than that of SwinTranformer_tiny, but the speed is more faster. The training method and deployment instructions of PULC will be introduced in detail below.
 
