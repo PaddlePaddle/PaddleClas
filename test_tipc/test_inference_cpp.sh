@@ -2,10 +2,17 @@
 source test_tipc/common_func.sh
 
 FILENAME=$1
-GPUID=$2
+MODE=$2
+
+# set cuda device
+GPUID=$3
 if [[ ! $GPUID ]];then
    GPUID=0
 fi
+env="export CUDA_VISIBLE_DEVICES=${GPUID}"
+set CUDA_VISIBLE_DEVICES
+eval $env
+
 dataline=$(awk 'NR==1, NR==19{print}'  $FILENAME)
 
 # parser params
@@ -30,7 +37,7 @@ cpp_benchmark_value=$(func_parser_value "${lines[16]}")
 generate_yaml_cmd=$(func_parser_value "${lines[17]}")
 transform_index_cmd=$(func_parser_value "${lines[18]}")
 
-LOG_PATH="./test_tipc/output/${model_name}"
+LOG_PATH="./test_tipc/output/${model_name}/${MODE}"
 mkdir -p ${LOG_PATH}
 status_log="${LOG_PATH}/results_cpp.log"
 # generate_yaml_cmd="python3 test_tipc/generate_cpp_yaml.py"
@@ -56,7 +63,7 @@ function func_shitu_cpp_inference(){
                         if [ ${use_mkldnn} = "False" ] && [ ${_flag_quant} = "True" ]; then
                             precison="int8"
                         fi
-                        _save_log_path="${_log_path}/shitu_cpp_infer_cpu_usemkldnn_${use_mkldnn}_threads_${threads}_precision_${precision}_batchsize_${batch_size}.log"
+                        _save_log_path="${_log_path}/cpp_infer_cpu_usemkldnn_${use_mkldnn}_threads_${threads}_precision_${precision}_batchsize_${batch_size}.log"
                         eval $transform_index_cmd
                         command="${generate_yaml_cmd} --type shitu --batch_size ${batch_size} --mkldnn ${use_mkldnn} --gpu ${use_gpu} --cpu_thread ${threads} --tensorrt False --precision ${precision} --data_dir ${_img_dir} --benchmark True --cls_model_dir ${cpp_infer_model_dir} --det_model_dir ${cpp_det_infer_model_dir} --gpu_id ${GPUID}"
                         eval $command
@@ -80,7 +87,7 @@ function func_shitu_cpp_inference(){
                         continue
                     fi
                     for batch_size in ${cpp_batch_size_list[*]}; do
-                        _save_log_path="${_log_path}/shitu_cpp_infer_gpu_usetrt_${use_trt}_precision_${precision}_batchsize_${batch_size}.log"
+                        _save_log_path="${_log_path}/cpp_infer_gpu_usetrt_${use_trt}_precision_${precision}_batchsize_${batch_size}.log"
                         eval $transform_index_cmd
                         command="${generate_yaml_cmd} --type shitu --batch_size ${batch_size} --mkldnn False --gpu ${use_gpu} --cpu_thread 1 --tensorrt ${use_trt} --precision ${precision} --data_dir ${_img_dir} --benchmark True --cls_model_dir ${cpp_infer_model_dir} --det_model_dir ${cpp_det_infer_model_dir} --gpu_id ${GPUID}"
                         eval $command
@@ -118,7 +125,7 @@ function func_cls_cpp_inference(){
                         if [ ${use_mkldnn} = "False" ] && [ ${_flag_quant} = "True" ]; then
                             precison="int8"
                         fi
-                        _save_log_path="${_log_path}/cls_cpp_infer_cpu_usemkldnn_${use_mkldnn}_threads_${threads}_precision_${precision}_batchsize_${batch_size}.log"
+                        _save_log_path="${_log_path}/cpp_infer_cpu_usemkldnn_${use_mkldnn}_threads_${threads}_precision_${precision}_batchsize_${batch_size}.log"
 
                         command="${generate_yaml_cmd} --type cls --batch_size ${batch_size} --mkldnn ${use_mkldnn} --gpu ${use_gpu} --cpu_thread ${threads} --tensorrt False --precision ${precision} --data_dir ${_img_dir} --benchmark True --cls_model_dir ${cpp_infer_model_dir} --gpu_id ${GPUID}"
                         eval $command
@@ -142,7 +149,7 @@ function func_cls_cpp_inference(){
                         continue
                     fi
                     for batch_size in ${cpp_batch_size_list[*]}; do
-                        _save_log_path="${_log_path}/cls_cpp_infer_gpu_usetrt_${use_trt}_precision_${precision}_batchsize_${batch_size}.log"
+                        _save_log_path="${_log_path}/cpp_infer_gpu_usetrt_${use_trt}_precision_${precision}_batchsize_${batch_size}.log"
                         command="${generate_yaml_cmd} --type cls --batch_size ${batch_size} --mkldnn False --gpu ${use_gpu} --cpu_thread 1 --tensorrt ${use_trt} --precision ${precision} --data_dir ${_img_dir} --benchmark True --cls_model_dir ${cpp_infer_model_dir} --gpu_id ${GPUID}"
                         eval $command
                         command="${_script} > ${_save_log_path} 2>&1"
@@ -234,18 +241,6 @@ make -j
 cd ../../../
 # cd ../../
 echo "################### build PaddleClas demo finished ###################"
-
-
-# set cuda device
-GPUID=$3
-if [ ${#GPUID} -le 0 ];then
-    env="export CUDA_VISIBLE_DEVICES=0"
-else
-    env="export CUDA_VISIBLE_DEVICES=${GPUID}"
-fi
-set CUDA_VISIBLE_DEVICES
-eval $env
-
 
 echo "################### run test ###################"
 export Count=0
