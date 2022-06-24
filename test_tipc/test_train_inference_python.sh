@@ -110,9 +110,6 @@ function func_inference() {
     for use_gpu in ${use_gpu_list[*]}; do
         if [ ${use_gpu} = "False" ] || [ ${use_gpu} = "cpu" ]; then
             for use_mkldnn in ${use_mkldnn_list[*]}; do
-                if [ ${use_mkldnn} = "False" ] && [ ${_flag_quant} = "True" ]; then
-                    continue
-                fi
                 for threads in ${cpu_threads_list[*]}; do
                     for batch_size in ${batch_size_list[*]}; do
                         _save_log_path="${_log_path}/infer_cpu_usemkldnn_${use_mkldnn}_threads_${threads}_batchsize_${batch_size}.log"
@@ -134,9 +131,6 @@ function func_inference() {
             for use_trt in ${use_trt_list[*]}; do
                 for precision in ${precision_list[*]}; do
                     if [ ${precision} = "True" ] && [ ${use_trt} = "False" ]; then
-                        continue
-                    fi
-                    if [[ ${use_trt} = "False" || ${precision} =~ "int8" ]] && [ ${_flag_quant} = "True" ]; then
                         continue
                     fi
                     for batch_size in ${batch_size_list[*]}; do
@@ -161,35 +155,6 @@ function func_inference() {
     done
 }
 
-# if [[ ${MODE} = "whole_infer" ]] || [[ ${MODE} = "klquant_whole_infer" ]]; then
-#     IFS="|"
-#     infer_export_flag=(${infer_export_flag})
-#     if [ ${infer_export_flag} != "null" ] && [ ${infer_export_flag} != "False" ]; then
-#         rm -rf ${infer_model_dir_list/..\//}
-#         export_cmd="${python} ${norm_export} -o Global.pretrained_model=${model_name}_pretrained -o Global.save_inference_dir=${infer_model_dir_list/..\//}"
-#         eval $export_cmd
-#     fi
-# fi
-
-# if [[ ${MODE} = "whole_infer" ]]; then
-#     GPUID=$3
-#     if [ ${#GPUID} -le 0 ]; then
-#         env=" "
-#     else
-#         env="export CUDA_VISIBLE_DEVICES=${GPUID}"
-#     fi
-#     # set CUDA_VISIBLE_DEVICES
-#     eval $env
-#     export Count=0
-#     cd deploy
-#     for infer_model in ${infer_model_dir_list[*]}; do
-#         #run inference
-#         is_quant=${infer_quant_flag[Count]}
-#         echo "is_quant: ${is_quant}"
-#         func_inference "${python}" "${inference_py}" "${infer_model}" "../${LOG_PATH}" "${infer_img_dir}" ${is_quant}
-#         Count=$(($Count + 1))
-#     done
-#     cd ..
 
 if [[ ${MODE} = "whole_infer" ]]; then
     # for kl_quant
@@ -200,13 +165,13 @@ if [[ ${MODE} = "whole_infer" ]]; then
         eval $command
         last_status=${PIPESTATUS[0]}
         status_check $last_status "${command}" "${status_log}" "${model_name}"
-        # cd inference/quant_post_static_model
-        # ln -s __model__ inference.pdmodel
-        # ln -s __params__ inference.pdiparams
-        # cd ../../deploy
-        # is_quant=True
-        # func_inference "${python}" "${inference_py}" "${infer_model_dir_list}/quant_post_static_model" "../${LOG_PATH}" "${infer_img_dir}" ${is_quant}
-        # cd ..
+        cd ${infer_model_dir_list}/quant_post_static_model
+        ln -s __model__ inference.pdmodel
+        ln -s __params__ inference.pdiparams
+        cd ../../deploy
+        is_quant=True
+        func_inference "${python}" "${inference_py}" "../${infer_model_dir_list}/quant_post_static_model" "../${LOG_PATH}" "${infer_img_dir}" ${is_quant}
+        cd ..
     fi
 else
     IFS="|"

@@ -34,7 +34,7 @@ distill_export:null
 kl_quant:deploy/slim/quant_post_static.py -c ppcls/configs/GeneralRecognition/GeneralRecognition_PPLCNet_x2_5.yaml -o Global.save_inference_dir=./general_PPLCNet_x2_5_lite_v1.0_infer
 export2:null
 pretrained_model_url:https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/inference/general_PPLCNet_x2_5_lite_v1.0_infer.tar
-infer_model:../inference/
+infer_model:./general_PPLCNet_x2_5_lite_v1.0_infer/
 infer_export:True
 infer_quant:Fasle
 inference:python/predict_rec.py -c configs/inference_rec.yaml
@@ -47,7 +47,7 @@ inference:python/predict_rec.py -c configs/inference_rec.yaml
 -o Global.rec_inference_model_dir:../inference
 -o Global.infer_imgs:../dataset/Aliproduct/demo_test/
 -o Global.save_log_path:null
--o Global.benchmark:True
+-o Global.benchmark:False
 null:null
 null:null
 ===========================infer_benchmark_params==========================

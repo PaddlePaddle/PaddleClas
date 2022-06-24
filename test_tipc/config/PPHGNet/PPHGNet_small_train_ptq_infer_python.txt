@@ -34,20 +34,20 @@ distill_export:null
 kl_quant:deploy/slim/quant_post_static.py -c ppcls/configs/ImageNet/PPHGNet/PPHGNet_small.yaml -o Global.save_inference_dir=./PPHGNet_small_infer
 export2:null
 pretrained_model_url:https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/PPHGNet_small_infer.tar
-infer_model:../inference/
+infer_model:./PPHGNet_small_infer/
 infer_export:True
 infer_quant:Fasle
 inference:python/predict_cls.py -c configs/inference_cls.yaml -o PreProcess.transform_ops.0.ResizeImage.resize_short=236
 -o Global.use_gpu:True|False
--o Global.enable_mkldnn:True|False
--o Global.cpu_num_threads:1|6
--o Global.batch_size:1|16
--o Global.use_tensorrt:True|False
--o Global.use_fp16:True|False
+-o Global.enable_mkldnn:False
+-o Global.cpu_num_threads:1
+-o Global.batch_size:1
+-o Global.use_tensorrt:False
+-o Global.use_fp16:False
 -o Global.inference_model_dir:../inference
--o Global.infer_imgs:../dataset/ILSVRC2012/val
+-o Global.infer_imgs:../deploy/images/ImageNet/ILSVRC2012_val_00000010.jpeg
 -o Global.save_log_path:null
--o Global.benchmark:True
+-o Global.benchmark:False
 null:null
 ===========================infer_benchmark_params==========================
 random_infer_input:[{float32,[3,224,224]}]

@@ -171,17 +171,32 @@ if [[ ${MODE} = "lite_train_lite_infer" ]] || [[ ${MODE} = "lite_train_whole_inf
     mv val.txt val_list.txt
     cp -r train/* val/
     cd ../../
-elif [[ ${MODE} = "whole_infer" ]] || [[ ${MODE} = "klquant_whole_infer" ]]; then
+elif [[ ${MODE} = "whole_infer" ]]; then
     # download data
-    cd dataset
-    rm -rf ILSVRC2012
-    wget -nc https://paddle-imagenet-models-name.bj.bcebos.com/data/whole_chain/whole_chain_infer.tar
-    tar xf whole_chain_infer.tar
-    ln -s whole_chain_infer ILSVRC2012
-    cd ILSVRC2012
-    mv val.txt val_list.txt
-    ln -s val_list.txt train_list.txt
-    cd ../../
+    if [[ ${model_name} =~ "GeneralRecognition" ]]; then
+        cd dataset
+        rm -rf Aliproduct
+        rm -rf train_reg_all_data.txt
+        rm -rf demo_train
+        wget -nc https://paddle-imagenet-models-name.bj.bcebos.com/data/whole_chain/tipc_shitu_demo_data.tar --no-check-certificate
+        tar -xf tipc_shitu_demo_data.tar
+        ln -s tipc_shitu_demo_data Aliproduct
+        ln -s tipc_shitu_demo_data/demo_train.txt train_reg_all_data.txt
+        ln -s tipc_shitu_demo_data/demo_train demo_train
+        cd tipc_shitu_demo_data
+        ln -s demo_test.txt val_list.txt
+        cd ../../
+    else
+        cd dataset
+        rm -rf ILSVRC2012
+        wget -nc https://paddle-imagenet-models-name.bj.bcebos.com/data/whole_chain/whole_chain_infer.tar
+        tar xf whole_chain_infer.tar
+        ln -s whole_chain_infer ILSVRC2012
+        cd ILSVRC2012
+        mv val.txt val_list.txt
+        ln -s val_list.txt train_list.txt
+        cd ../../
+    fi
     # download inference or pretrained model
     eval "wget -nc $model_url_value"
     if [[ ${model_url_value} =~ ".tar" ]]; then
