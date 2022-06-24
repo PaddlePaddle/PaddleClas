@@ -2,6 +2,7 @@
 source test_tipc/common_func.sh
 
 FILENAME=$1
+MODE=$2
 dataline=$(awk 'NR==1, NR==19{print}'  $FILENAME)
 
 # parser params
@@ -38,7 +39,7 @@ pipeline_py=$(func_parser_value "${lines[13]}")
 
 
 function func_serving_cls(){
-    LOG_PATH="test_tipc/output/${model_name}"
+    LOG_PATH="test_tipc/output/${model_name}/${MODE}"
     mkdir -p ${LOG_PATH}
     LOG_PATH="../../${LOG_PATH}"
     status_log="${LOG_PATH}/results_serving.log"
@@ -153,7 +154,7 @@ function func_serving_cls(){
 
 
 function func_serving_rec(){
-    LOG_PATH="test_tipc/output/${model_name}"
+    LOG_PATH="test_tipc/output/${model_name}/${MODE}"
     mkdir -p ${LOG_PATH}
     LOG_PATH="../../../${LOG_PATH}"
     status_log="${LOG_PATH}/results_serving.log"

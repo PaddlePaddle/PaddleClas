@@ -106,6 +106,14 @@ if [[ ${MODE} = "cpp_infer" ]]; then
             model_dir=${tar_name%.*}
             eval "tar xf ${tar_name}"
 
+            # move '_int8' suffix in pact models
+            if [[ ${tar_name} =~ "pact_infer" ]]; then
+                cd ${cls_inference_model_dir}
+                mv inference_int8.pdiparams inference.pdiparams
+                mv inference_int8.pdmodel inference.pdmodel
+                cd ..
+            fi
+
             cd dataset
             rm -rf ILSVRC2012
             wget -nc https://paddle-imagenet-models-name.bj.bcebos.com/data/whole_chain/whole_chain_infer.tar
@@ -229,7 +237,18 @@ if [[ ${MODE} = "serving_infer" ]]; then
         cls_inference_model_url=$(func_parser_value "${lines[3]}")
         cls_tar_name=$(func_get_url_file_name "${cls_inference_model_url}")
         cd ./deploy/paddleserving
-        wget -nc ${cls_inference_model_url} && tar xf ${cls_tar_name}
+        wget -nc ${cls_inference_model_url}
+        tar xf ${cls_tar_name}
+
+        # move '_int8' suffix in pact models
+        if [[ ${cls_tar_name} =~ "pact_infer" ]]; then
+            cls_inference_model_dir=${cls_tar_name%%.tar}
+            cd ${cls_inference_model_dir}
+            mv inference_int8.pdiparams inference.pdiparams
+            mv inference_int8.pdmodel inference.pdmodel
+            cd ..
+        fi
+
         cd ../../
     fi
     unset http_proxy
