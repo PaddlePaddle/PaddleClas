@@ -89,6 +89,9 @@ def build_optimizer(config, epochs, step_each_epoch, model_list=None):
         if 'clip_norm' in optim_cfg:
             clip_norm = optim_cfg.pop('clip_norm')
             grad_clip = paddle.nn.ClipGradByNorm(clip_norm=clip_norm)
+        elif 'clip_value' in optim_cfg:
+            clip_value = optim_cfg.pop('clip_value')
+            grad_clip = paddle.nn.ClipGradByValue(max=abs(clip_value), min= -abs(clip_value))
         else:
             grad_clip = None
         optim_model = []

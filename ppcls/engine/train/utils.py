@@ -20,7 +20,7 @@ from ppcls.utils.misc import AverageMeter
 
 def update_metric(trainer, out, batch, batch_size):
     # calc metric
-    if trainer.train_metric_func is not None:
+    if hasattr(trainer, 'train_metric_func') and trainer.train_metric_func is not None:
         metric_dict = trainer.train_metric_func(out, batch[-1])
         for key in metric_dict:
             if key not in trainer.output_info:

@@ -24,6 +24,13 @@ from ppcls.data import preprocess
 from ppcls.data.preprocess import transform
 from ppcls.utils import logger
 from .common_dataset import create_operators
+from PIL import Image
+from paddle.vision import ToTensor
+from paddle.vision import RandomResizedCrop
+from paddle.vision import RandomHorizontalFlip
+from paddle.vision import Normalize
+from paddle.vision import CenterCrop
+from paddle.vision import Resize
 
 
 class CompCars(Dataset):
@@ -93,12 +100,15 @@ class VeriWild(Dataset):
             self,
             image_root,
             cls_label_path,
-            transform_ops=None, ):
+            transform_ops=None,
+            backend='cv2'):
         self._img_root = image_root
         self._cls_path = cls_label_path
         if transform_ops:
             self._transform_ops = create_operators(transform_ops)
         self._dtype = paddle.get_default_dtype()
+        self.backend = backend.lower()
+        assert backend in ['cv2', 'pil']
         self._load_anno()
 
     def _load_anno(self):
@@ -109,20 +119,29 @@ class VeriWild(Dataset):
         self.cameras = []
         with open(self._cls_path) as fd:
             lines = fd.readlines()
-            for l in lines:
+            for i, l in enumerate(lines):
                 l = l.strip().split()
                 self.images.append(os.path.join(self._img_root, l[0]))
                 self.labels.append(np.int64(l[1]))
-                self.cameras.append(np.int64(l[2]))
+                if len(l) >= 3:
+                    self.cameras.append(np.int64(l[2]))
+                else:
+                    self.cameras.append(np.int64(i + 1))
                 assert os.path.exists(self.images[-1])
 
     def __getitem__(self, idx):
         try:
-            with open(self.images[idx], 'rb') as f:
-                img = f.read()
-            if self._transform_ops:
-                img = transform(img, self._transform_ops)
-            img = img.transpose((2, 0, 1))
+            if self.backend == 'cv2':
+                with open(self.images[idx], 'rb') as f:
+                    img = f.read()
+                if self._transform_ops:
+                    img = transform(img, self._transform_ops)
+                img = img.transpose((2, 0, 1))
+            else:
+                img = Image.open(self.images[idx]).convert('RGB')
+                if self._transform_ops:
+                    img = transform(img, self._transform_ops)
+
             return (img, self.labels[idx], self.cameras[idx])
         except Exception as ex:
             logger.error("Exception occured when parse line: {} with msg: {}".

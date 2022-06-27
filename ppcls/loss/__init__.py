@@ -30,6 +30,7 @@ from .afdloss import AFDLoss
 from .deephashloss import DSHSDLoss
 from .deephashloss import LCDSHLoss
 from .deephashloss import DCHLoss
+from .idml_proxy_anchor import IDMLProxyAnchorLoss
 
 
 class CombinedLoss(nn.Layer):

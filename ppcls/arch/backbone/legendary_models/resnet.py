@@ -117,7 +117,8 @@ class ConvBNLayer(TheseusLayer):
                  is_vd_mode=False,
                  act=None,
                  lr_mult=1.0,
-                 data_format="NCHW"):
+                 data_format="NCHW",
+                 bn_use_global_stats=False):
         super().__init__()
         self.is_vd_mode = is_vd_mode
         self.act = act
@@ -141,7 +142,8 @@ class ConvBNLayer(TheseusLayer):
             num_filters,
             param_attr=ParamAttr(learning_rate=lr_mult),
             bias_attr=ParamAttr(learning_rate=lr_mult),
-            data_layout=data_format)
+            data_layout=data_format,
+            use_global_stats=bn_use_global_stats)
         self.relu = nn.ReLU()
 
     def forward(self, x):
@@ -162,7 +164,8 @@ class BottleneckBlock(TheseusLayer):
                  shortcut=True,
                  if_first=False,
                  lr_mult=1.0,
-                 data_format="NCHW"):
+                 data_format="NCHW",
+                 bn_use_global_stats=False):
         super().__init__()
 
         self.conv0 = ConvBNLayer(
@@ -171,7 +174,8 @@ class BottleneckBlock(TheseusLayer):
             filter_size=1,
             act="relu",
             lr_mult=lr_mult,
-            data_format=data_format)
+            data_format=data_format,
+            bn_use_global_stats=bn_use_global_stats)
         self.conv1 = ConvBNLayer(
             num_channels=num_filters,
             num_filters=num_filters,
@@ -179,14 +183,16 @@ class BottleneckBlock(TheseusLayer):
             stride=stride,
             act="relu",
             lr_mult=lr_mult,
-            data_format=data_format)
+            data_format=data_format,
+            bn_use_global_stats=bn_use_global_stats)
         self.conv2 = ConvBNLayer(
             num_channels=num_filters,
             num_filters=num_filters * 4,
             filter_size=1,
             act=None,
             lr_mult=lr_mult,
-            data_format=data_format)
+            data_format=data_format,
+            bn_use_global_stats=bn_use_global_stats)
 
         if not shortcut:
             self.short = ConvBNLayer(
@@ -196,7 +202,8 @@ class BottleneckBlock(TheseusLayer):
                 stride=stride if if_first else 1,
                 is_vd_mode=False if if_first else True,
                 lr_mult=lr_mult,
-                data_format=data_format)
+                data_format=data_format,
+                bn_use_global_stats=bn_use_global_stats)
 
         self.relu = nn.ReLU()
         self.shortcut = shortcut
@@ -224,7 +231,8 @@ class BasicBlock(TheseusLayer):
                  shortcut=True,
                  if_first=False,
                  lr_mult=1.0,
-                 data_format="NCHW"):
+                 data_format="NCHW",
+                 bn_use_global_stats=False):
         super().__init__()
 
         self.stride = stride
@@ -235,14 +243,16 @@ class BasicBlock(TheseusLayer):
             stride=stride,
             act="relu",
             lr_mult=lr_mult,
-            data_format=data_format)
+            data_format=data_format,
+            bn_use_global_stats=bn_use_global_stats)
         self.conv1 = ConvBNLayer(
             num_channels=num_filters,
             num_filters=num_filters,
             filter_size=3,
             act=None,
             lr_mult=lr_mult,
-            data_format=data_format)
+            data_format=data_format,
+            bn_use_global_stats=bn_use_global_stats)
         if not shortcut:
             self.short = ConvBNLayer(
                 num_channels=num_channels,
@@ -251,7 +261,8 @@ class BasicBlock(TheseusLayer):
                 stride=stride if if_first else 1,
                 is_vd_mode=False if if_first else True,
                 lr_mult=lr_mult,
-                data_format=data_format)
+                data_format=data_format,
+                bn_use_global_stats=bn_use_global_stats)
         self.shortcut = shortcut
         self.relu = nn.ReLU()
 
@@ -291,6 +302,7 @@ class ResNet(TheseusLayer):
                  input_image_channel=3,
                  return_patterns=None,
                  return_stages=None,
+                 bn_use_global_stats=False,
                  **kargs):
         super().__init__()
 
@@ -327,7 +339,8 @@ class ResNet(TheseusLayer):
                 stride=s,
                 act=stem_act,
                 lr_mult=self.lr_mult_list[0],
-                data_format=data_format)
+                data_format=data_format,
+                bn_use_global_stats=bn_use_global_stats)
             for in_c, out_c, k, s in self.stem_cfg[version]
         ])
 
@@ -345,7 +358,8 @@ class ResNet(TheseusLayer):
                     shortcut=shortcut,
                     if_first=block_idx == i == 0 if version == "vd" else True,
                     lr_mult=self.lr_mult_list[block_idx + 1],
-                    data_format=data_format))
+                    data_format=data_format,
+                    bn_use_global_stats=bn_use_global_stats))
                 shortcut = True
         self.blocks = nn.Sequential(*block_list)
 

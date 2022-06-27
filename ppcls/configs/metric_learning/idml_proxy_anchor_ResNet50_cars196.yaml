@@ -1,0 +1,116 @@
+# global configs
+Global:
+  checkpoints: null
+  pretrained_model: null
+  output_dir: ./output/
+  device: gpu
+  save_interval: 20
+  eval_during_train: True
+  eval_interval: 1
+  epochs: 60
+  print_batch_step: 10
+  use_visualdl: False
+  # used for static mode and model export
+  image_shape: [3, 224, 224]
+  save_inference_dir: ./inference
+  eval_mode: idml
+  train_mode: idml
+  warmup_epoch_idml: 5
+  find_unused_parameters: True
+
+# model architecture
+Arch:
+  name: RecModel
+  fix_bn: True
+  Backbone:
+    name: ResNet50_stage4
+    return_stages: False
+    pretrained: https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/others/resnet50-19c8e357_torch2paddle.pdparams
+    # pretrained: True
+    bn_use_global_stats: True
+
+  Neck:
+    name: IDMLNeck
+    in_channel_num: 2048
+    embedding_size: 512
+    is_norm: True
+    bias: True
+
+  infer_output_key: features
+  infer_add_softmax: False
+
+# loss function config for traing/eval process
+Loss:
+  Train:
+    - IDMLProxyAnchorLoss:
+        weight: 1.0
+        nb_classes: 98
+        sz_embed: 512
+        mrg: 0.1
+        alpha: 32
+        lr: 100
+        feature_from: features
+
+Optimizer:
+  name: AdamW
+  beta1: 0.9
+  beta2: 0.999
+  epsilon: 1e-8
+  weight_decay: 0.0001
+  clip_value: 10
+  lr:
+    name: MultiStepDecay
+    learning_rate: 2.5e-4
+    milestones: [10, 20, 30, 40, 50, 60]
+    gamma: 0.5
+    verbose: False
+    last_epoch: -1
+
+# data loader for train and eval
+DataLoader:
+  Train:
+    dataset:
+      name: VeriWild
+      image_root: ./dataset/cars196/
+      cls_label_path: ./dataset/cars196/train_list.txt
+      backend: pil
+      transform_ops:
+        - RandomResizedCrop:
+            size: 224
+        - RandomHorizontalFlip:
+            prob: 0.5
+        - ToTensor:
+        - Normalize:
+            mean: [0.485, 0.456, 0.406]
+            std: [0.229, 0.224, 0.225]
+    sampler:
+      name: DistributedBatchSampler
+      batch_size: 30
+      drop_last: True
+      shuffle: True
+    loader:
+      num_workers: 4
+      use_shared_memory: True
+  Eval:
+    dataset: 
+      name: VeriWild
+      image_root: ./dataset/cars196/
+      cls_label_path: ./dataset/cars196/val_list.txt
+      backend: pil
+      transform_ops:
+        - Resize:
+            size: 256
+        - CenterCrop:
+            size: 224
+        - ToTensor:
+        - Normalize:
+            mean: [0.485, 0.456, 0.406]
+            std: [0.229, 0.224, 0.225]
+    sampler:
+      # name: DistributedBatchSampler
+      batch_size: 32
+      drop_last: False
+      shuffle: False
+    loader:
+      num_workers: 4
+      use_shared_memory: True

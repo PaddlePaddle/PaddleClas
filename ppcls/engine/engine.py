@@ -41,7 +41,7 @@ from ppcls.utils import save_load
 from ppcls.data.utils.get_image_list import get_image_list
 from ppcls.data.postprocess import build_postprocess
 from ppcls.data import create_operators
-from ppcls.engine.train import train_epoch
+from ppcls.engine import train
 from ppcls.engine import evaluation
 from ppcls.arch.gears.identity_head import IdentityHead
 
@@ -76,9 +76,13 @@ class Engine(object):
 
         # init train_func and eval_func
         assert self.eval_mode in [
-            "classification", "retrieval", "adaface"
+            "classification", "retrieval", "adaface", "idml"
         ], logger.error("Invalid eval mode: {}".format(self.eval_mode))
-        self.train_epoch_func = train_epoch
+        train_mode = self.config["Global"].get("train_mode", None)
+        if train_mode is None:
+            self.train_epoch_func = getattr(train, "train_epoch")
+        else:
+            self.train_epoch_func = getattr(train, "train_epoch_" + train_mode)
         self.eval_func = getattr(evaluation, self.eval_mode + "_eval")
 
         self.use_dali = self.config['Global'].get("use_dali", False)
@@ -116,7 +120,7 @@ class Engine(object):
                 self.config["DataLoader"], "Train", self.device, self.use_dali)
         if self.mode == "eval" or (self.mode == "train" and
                                    self.config["Global"]["eval_during_train"]):
-            if self.eval_mode in ["classification", "adaface"]:
+            if self.eval_mode in ["classification", "adaface", "idml"]:
                 self.eval_dataloader = build_dataloader(
                     self.config["DataLoader"], "Eval", self.device,
                     self.use_dali)
@@ -204,6 +208,8 @@ class Engine(object):
                 load_dygraph_pretrain(
                     [self.model, getattr(self, 'train_loss_func', None)],
                     self.config["Global"]["pretrained_model"])
+        self.model.neck.set_state_dict(paddle.load('../../IDML/image_retrieval/data/neck.pdparams'))
+        self.train_loss_func.set_state_dict(paddle.load('../../IDML/image_retrieval/data/loss.pdparams'))
 
         # build optimizer
         if self.mode == 'train':
@@ -295,13 +301,14 @@ class Engine(object):
                 logger.warning(msg)
 
         # for distributed
+        find_unused_parameters = self.config["Global"].get('find_unused_parameters', False)
         if self.config["Global"]["distributed"]:
             dist.init_parallel_env()
-            self.model = paddle.DataParallel(self.model)
+            self.model = paddle.DataParallel(self.model, find_unused_parameters=find_unused_parameters)
             if self.mode == 'train' and len(self.train_loss_func.parameters(
             )) > 0:
                 self.train_loss_func = paddle.DataParallel(
-                    self.train_loss_func)
+                    self.train_loss_func, find_unused_parameters=find_unused_parameters)
         # build postprocess for infer
         if self.mode == 'infer':
             self.preprocess_func = create_operators(self.config["Infer"][
