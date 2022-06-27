@@ -159,7 +159,15 @@ def cal_feature(engine, name='gallery'):
         if len(batch) == 3:
             has_unique_id = True
             batch[2] = batch[2].reshape([-1, 1]).astype("int64")
-        out = engine.model(batch[0], batch[1])
+        if engine.amp and engine.amp_eval:
+            with paddle.amp.auto_cast(
+                    custom_black_list={
+                        "flatten_contiguous_range", "greater_than"
+                    },
+                    level=engine.amp_level):
+                out = engine.model(batch[0], batch[1])
+        else:
+            out = engine.model(batch[0], batch[1])
         if "Student" in out:
             out = out["Student"]
 
