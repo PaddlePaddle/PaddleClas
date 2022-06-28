@@ -518,7 +518,11 @@ class ExportModel(TheseusLayer):
 
         self.normalize = None
         if config.get("normalize_on_gpu", False):
-            self.base_model = nn.Sequential(NormalizeGPU(), self.base_model)
+            self.base_model = nn.Sequential(
+                ResizeGPU(
+                    mode="bicubic", size=[224, 224]),
+                NormalizeGPU(),
+                self.base_model)
 
     def eval(self):
         self.training = False
@@ -557,4 +561,15 @@ class NormalizeGPU(nn.Layer):
 
     def forward(self, x):
         x = (x * self.scale - self.mean) / self.std
+        return x
+
+
+class ResizeGPU(nn.Layer):
+    def __init__(self, mode="bicubic", size=[224, 224]):
+        super().__init__()
+        self.mode = mode
+        self.size = size
+
+    def forward(self, x):
+        x = nn.functional.interpolate(x, size=self.size, mode=self.mode)
         return x

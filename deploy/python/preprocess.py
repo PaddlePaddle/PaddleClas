@@ -334,4 +334,4 @@ class ToCHWImage(object):
         if isinstance(img, Image.Image):
             img = np.array(img)
 
-        return img.transpose((2, 0, 1))
+        return img.transpose((2, 0, 1)).astype("float32")
