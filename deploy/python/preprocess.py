@@ -188,7 +188,7 @@ class CropImage(object):
 
         w_end = w_start + w
         h_end = h_start + h
-        return img[h_start:h_end, w_start:w_end, :]
+        return img[h_start:h_end, w_start:w_end, :].astype("float32")
 
 
 class RandCropImage(object):

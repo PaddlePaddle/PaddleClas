@@ -516,6 +516,10 @@ class ExportModel(TheseusLayer):
             else:
                 self.out_act = None
 
+        self.normalize = None
+        if config.get("normalize_on_gpu", False):
+            self.base_model = nn.Sequential(NormalizeGPU(), self.base_model)
+
     def eval(self):
         self.training = False
         for layer in self.sublayers():
@@ -534,4 +538,23 @@ class ExportModel(TheseusLayer):
             if isinstance(x, dict):
                 x = x["logits"]
             x = self.out_act(x)
+        return x
+
+
+class NormalizeGPU(nn.Layer):
+    def __init__(self, ):
+        super().__init__()
+        mean = np.array(
+            [0.485, 0.456, 0.406], dtype=np.float32).reshape([1, 3, 1, 1])
+        std = np.array(
+            [0.229, 0.224, 0.225], dtype=np.float32).reshape([1, 3, 1, 1])
+        self.scale = np.array([1.0 / 255], dtype=np.float32)
+        self.mean = self.create_parameter(
+            shape=(1, 3, 1, 1),
+            default_initializer=nn.initializer.Assign(mean))
+        self.std = self.create_parameter(
+            shape=(1, 3, 1, 1), default_initializer=nn.initializer.Assign(std))
+
+    def forward(self, x):
+        x = (x * self.scale - self.mean) / self.std
         return x
