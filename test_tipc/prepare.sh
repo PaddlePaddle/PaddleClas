@@ -183,6 +183,14 @@ if [[ ${MODE} = "lite_train_lite_infer" ]] || [[ ${MODE} = "lite_train_whole_inf
     mv val.txt val_list.txt
     cp -r train/* val/
     cd ../../
+    if [[ ${FILENAME} =~ "pact_infer" ]]; then
+        # download pretrained model for PACT training
+        pretrpretrained_model_url=$(func_parser_value "${lines[35]}")
+        mkdir pretrained_model
+        cd pretrained_model
+        wget -nc ${pretrpretrained_model_url} --no-check-certificate
+        cd ..
+    fi
 elif [[ ${MODE} = "whole_infer" ]]; then
     # download data
     if [[ ${model_name} =~ "GeneralRecognition" ]]; then
@@ -232,6 +240,14 @@ elif [[ ${MODE} = "whole_train_whole_infer" ]]; then
     mv train.txt train_list.txt
     mv test.txt val_list.txt
     cd ../../
+    if [[ ${FILENAME} =~ "pact_infer" ]]; then
+        # download pretrained model for PACT training
+        pretrpretrained_model_url=$(func_parser_value "${lines[35]}")
+        mkdir pretrained_model
+        cd pretrained_model
+        wget -nc ${pretrpretrained_model_url} --no-check-certificate
+        cd ..
+    fi
 fi
 
 if [[ ${MODE} = "serving_infer" ]]; then

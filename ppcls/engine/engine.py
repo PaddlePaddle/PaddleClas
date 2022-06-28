@@ -465,9 +465,10 @@ class Engine(object):
         model.eval()
 
         # for rep nets
-        for layer in self.model.sublayers():
-            if hasattr(layer, "rep"):
-                layer.rep()
+        if "Slim" not in self.config or self.config["Slim"]["quant"]["name"] != "pact":
+            for layer in self.model.sublayers():
+                if hasattr(layer, "rep"):
+                    layer.rep()
 
         save_path = os.path.join(self.config["Global"]["save_inference_dir"],
                                  "inference")

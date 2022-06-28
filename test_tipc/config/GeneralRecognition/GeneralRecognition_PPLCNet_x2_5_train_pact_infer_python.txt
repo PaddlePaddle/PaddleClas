@@ -14,13 +14,13 @@ null:null
 ##
 trainer:pact_train
 norm_train:null
-pact_train:tools/train.py -c ppcls/configs/GeneralRecognition/GeneralRecognition_PPLCNet_x2_5.yaml -o Global.seed=1234 -o DataLoader.Train.sampler.shuffle=False -o DataLoader.Train.loader.num_workers=0 -o DataLoader.Train.loader.use_shared_memory=False -o Slim.quant.name=pact -o Arch.pretrained=True -o Optimizer.lr.learning_rate=0.004
+pact_train:tools/train.py -c ppcls/configs/GeneralRecognition/GeneralRecognition_PPLCNet_x2_5.yaml -o Global.seed=1234 -o DataLoader.Train.sampler.shuffle=False -o DataLoader.Train.loader.num_workers=0 -o DataLoader.Train.loader.use_shared_memory=False -o Slim.quant.name=pact -o Optimizer.lr.learning_rate=0.004 -o Global.pretrained_model="pretrained_model/general_PPLCNet_x2_5_pretrained_v1.0"
 fpgm_train:null
 distill_train:null
 null:null
 null:null
 ##
-===========================eval_params=========================== 
+===========================eval_params===========================
 eval:tools/eval.py -c ppcls/configs/GeneralRecognition/GeneralRecognition_PPLCNet_x2_5.yaml -o Slim.quant.name=pact
 null:null
 ##
