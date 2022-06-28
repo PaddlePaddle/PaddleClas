@@ -32,6 +32,7 @@ train_param_key1=$(func_parser_key "${lines[12]}")
 train_param_value1=$(func_parser_value "${lines[12]}")
 
 trainer_list=$(func_parser_value "${lines[14]}")
+
 trainer_norm=$(func_parser_key "${lines[15]}")
 norm_trainer=$(func_parser_value "${lines[15]}")
 pact_key=$(func_parser_key "${lines[16]}")
@@ -276,7 +277,7 @@ else
                     set_eval_pretrain=$(func_set_params "${pretrain_model_key}" "${save_log}/${model_name}/${train_model_name}")
                 fi
                 # save norm trained models to set pretrain for pact training and fpgm training
-                if [ ${trainer} = ${trainer_norm} ]; then
+                if [[ ${trainer} = ${trainer_norm}  ||  ${trainer} = ${pact_key} ]]; then
                     load_norm_train_model=${set_eval_pretrain}
                 fi
                 # run eval

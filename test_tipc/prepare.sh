@@ -2,8 +2,7 @@
 FILENAME=$1
 
 # MODE be one of ['lite_train_lite_infer' 'lite_train_whole_infer' 'whole_train_whole_infer',
-#                 'whole_infer', 'klquant_whole_infer',
-#                 'cpp_infer', 'serving_infer',  'lite_infer']
+#                 'whole_infer', 'cpp_infer', 'serving_infer',  'lite_infer']
 
 MODE=$2
 
@@ -107,6 +106,14 @@ if [[ ${MODE} = "cpp_infer" ]]; then
             model_dir=${tar_name%.*}
             eval "tar xf ${tar_name}"
 
+            # move '_int8' suffix in pact models
+            if [[ ${tar_name} =~ "pact_infer" ]]; then
+                cd ${cls_inference_model_dir}
+                mv inference_int8.pdiparams inference.pdiparams
+                mv inference_int8.pdmodel inference.pdmodel
+                cd ..
+            fi
+
             cd dataset
             rm -rf ILSVRC2012
             wget -nc https://paddle-imagenet-models-name.bj.bcebos.com/data/whole_chain/whole_chain_infer.tar
@@ -176,6 +183,14 @@ if [[ ${MODE} = "lite_train_lite_infer" ]] || [[ ${MODE} = "lite_train_whole_inf
     mv val.txt val_list.txt
     cp -r train/* val/
     cd ../../
+    if [[ ${FILENAME} =~ "pact_infer" ]]; then
+        # download pretrained model for PACT training
+        pretrpretrained_model_url=$(func_parser_value "${lines[35]}")
+        mkdir pretrained_model
+        cd pretrained_model
+        wget -nc ${pretrpretrained_model_url} --no-check-certificate
+        cd ..
+    fi
 elif [[ ${MODE} = "whole_infer" ]]; then
     # download data
     if [[ ${model_name} =~ "GeneralRecognition" ]]; then
@@ -225,6 +240,14 @@ elif [[ ${MODE} = "whole_train_whole_infer" ]]; then
     mv train.txt train_list.txt
     mv test.txt val_list.txt
     cd ../../
+    if [[ ${FILENAME} =~ "pact_infer" ]]; then
+        # download pretrained model for PACT training
+        pretrpretrained_model_url=$(func_parser_value "${lines[35]}")
+        mkdir pretrained_model
+        cd pretrained_model
+        wget -nc ${pretrpretrained_model_url} --no-check-certificate
+        cd ..
+    fi
 fi
 
 if [[ ${MODE} = "serving_infer" ]]; then
@@ -247,7 +270,18 @@ if [[ ${MODE} = "serving_infer" ]]; then
         cls_inference_model_url=$(func_parser_value "${lines[3]}")
         cls_tar_name=$(func_get_url_file_name "${cls_inference_model_url}")
         cd ./deploy/paddleserving
-        wget -nc ${cls_inference_model_url} && tar xf ${cls_tar_name}
+        wget -nc ${cls_inference_model_url}
+        tar xf ${cls_tar_name}
+
+        # move '_int8' suffix in pact models
+        if [[ ${cls_tar_name} =~ "pact_infer" ]]; then
+            cls_inference_model_dir=${cls_tar_name%%.tar}
+            cd ${cls_inference_model_dir}
+            mv inference_int8.pdiparams inference.pdiparams
+            mv inference_int8.pdmodel inference.pdmodel
+            cd ..
+        fi
+
         cd ../../
     fi
     unset http_proxy

@@ -7,31 +7,37 @@ Linux GPU/CPU C++ 服务化部署测试的主程序为`test_serving_infer_cpp.sh
 
 - 推理相关：
 
-|    算法名称     |                  模型名称                  | device_CPU | device_GPU |
-| :-------------: | :----------------------------------------: | :--------: | :--------: |
-|   MobileNetV3   |           MobileNetV3_large_x1_0           |    支持    |    支持    |
-|   MobileNetV3   |         MobileNetV3_large_x1_0_KL          |    支持    |    支持    |
-|    PP-ShiTu     | PPShiTu_general_rec、PPShiTu_mainbody_det  |    支持    |    支持    |
-|    PP-ShiTu     |     GeneralRecognition_PPLCNet_x2_5_KL     |    支持    |    支持    |
-|     PPHGNet     |               PPHGNet_small                |    支持    |    支持    |
-|     PPHGNet     |              PPHGNet_small_KL              |    支持    |    支持    |
-|     PPHGNet     |                PPHGNet_tiny                |    支持    |    支持    |
-|     PPLCNet     |               PPLCNet_x0_25                |    支持    |    支持    |
-|     PPLCNet     |               PPLCNet_x0_35                |    支持    |    支持    |
-|     PPLCNet     |                PPLCNet_x0_5                |    支持    |    支持    |
-|     PPLCNet     |               PPLCNet_x0_75                |    支持    |    支持    |
-|     PPLCNet     |                PPLCNet_x1_0                |    支持    |    支持    |
-|     PPLCNet     |              PPLCNet_x1_0_KL               |    支持    |    支持    |
-|     PPLCNet     |                PPLCNet_x1_5                |    支持    |    支持    |
-|     PPLCNet     |                PPLCNet_x2_0                |    支持    |    支持    |
-|     PPLCNet     |                PPLCNet_x2_5                |    支持    |    支持    |
-|    PPLCNetV2    |               PPLCNetV2_base               |    支持    |    支持    |
-|    PPLCNetV2    |             PPLCNetV2_base_KL              |    支持    |    支持    |
-|     ResNet      |                  ResNet50                  |    支持    |    支持    |
-|     ResNet      |                ResNet50_vd                 |    支持    |    支持    |
-|     ResNet      |               ResNet50_vd_KL               |    支持    |    支持    |
-| SwinTransformer |  SwinTransformer_tiny_patch4_window7_224   |    支持    |    支持    |
-| SwinTransformer | SwinTransformer_tiny_patch4_window7_224_KL |    支持    |    支持    |
+|    算法名称     |                   模型名称                   | device_CPU | device_GPU |
+| :-------------: | :------------------------------------------: | :--------: | :--------: |
+|   MobileNetV3   |            MobileNetV3_large_x1_0            |    支持    |    支持    |
+|   MobileNetV3   |          MobileNetV3_large_x1_0_KL           |    支持    |    支持    |
+|   MobileNetV3   |         MobileNetV3_large_x1_0_PACT          |    支持    |    支持    |
+|    PP-ShiTu     |  PPShiTu_general_rec、PPShiTu_mainbody_det   |    支持    |    支持    |
+|    PP-ShiTu     |      GeneralRecognition_PPLCNet_x2_5_KL      |    支持    |    支持    |
+|    PP-ShiTu     |     GeneralRecognition_PPLCNet_x2_5_PACT     |    支持    |    支持    |
+|     PPHGNet     |                PPHGNet_small                 |    支持    |    支持    |
+|     PPHGNet     |               PPHGNet_small_KL               |    支持    |    支持    |
+|     PPHGNet     |              PPHGNet_small_PACT              |    支持    |    支持    |
+|     PPHGNet     |                 PPHGNet_tiny                 |    支持    |    支持    |
+|     PPLCNet     |                PPLCNet_x0_25                 |    支持    |    支持    |
+|     PPLCNet     |                PPLCNet_x0_35                 |    支持    |    支持    |
+|     PPLCNet     |                 PPLCNet_x0_5                 |    支持    |    支持    |
+|     PPLCNet     |                PPLCNet_x0_75                 |    支持    |    支持    |
+|     PPLCNet     |                 PPLCNet_x1_0                 |    支持    |    支持    |
+|     PPLCNet     |               PPLCNet_x1_0_KL                |    支持    |    支持    |
+|     PPLCNet     |              PPLCNet_x1_0_PACT               |    支持    |    支持    |
+|     PPLCNet     |                 PPLCNet_x1_5                 |    支持    |    支持    |
+|     PPLCNet     |                 PPLCNet_x2_0                 |    支持    |    支持    |
+|     PPLCNet     |                 PPLCNet_x2_5                 |    支持    |    支持    |
+|    PPLCNetV2    |                PPLCNetV2_base                |    支持    |    支持    |
+|    PPLCNetV2    |              PPLCNetV2_base_KL               |    支持    |    支持    |
+|     ResNet      |                   ResNet50                   |    支持    |    支持    |
+|     ResNet      |                 ResNet50_vd                  |    支持    |    支持    |
+|     ResNet      |                ResNet50_vd_KL                |    支持    |    支持    |
+|     ResNet      |               ResNet50_vd_PACT               |    支持    |    支持    |
+| SwinTransformer |   SwinTransformer_tiny_patch4_window7_224    |    支持    |    支持    |
+| SwinTransformer |  SwinTransformer_tiny_patch4_window7_224_KL  |    支持    |    支持    |
+| SwinTransformer | SwinTransformer_tiny_patch4_window7_224_PACT |    支持    |    支持    |
 
 
 ## 2. 测试流程
