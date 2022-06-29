@@ -2,8 +2,7 @@
 FILENAME=$1
 
 # MODE be one of ['lite_train_lite_infer' 'lite_train_whole_infer' 'whole_train_whole_infer',
-#                 'whole_infer', 'klquant_whole_infer',
-#                 'cpp_infer', 'serving_infer',  'lite_infer']
+#                 'whole_infer', 'cpp_infer', 'serving_infer',  'lite_infer']
 
 MODE=$2
 
@@ -85,7 +84,12 @@ if [[ ${MODE} = "cpp_infer" ]]; then
     fi
     if [[ ! -d "./deploy/cpp/paddle_inference/" ]]; then
         pushd ./deploy/cpp/
-        wget -nc https://paddle-inference-lib.bj.bcebos.com/2.2.2/cxx_c/Linux/GPU/x86-64_gcc8.2_avx_mkl_cuda10.1_cudnn7.6.5_trt6.0.1.5/paddle_inference.tgz
+        PADDLEInfer=$3
+        if [ "" = "$PADDLEInfer" ];then
+            wget -nc https://paddle-inference-lib.bj.bcebos.com/2.2.2/cxx_c/Linux/GPU/x86-64_gcc8.2_avx_mkl_cuda10.1_cudnn7.6.5_trt6.0.1.5/paddle_inference.tgz --no-check-certificate
+        else
+            wget -nc ${PADDLEInfer} --no-check-certificate
+        fi
         tar xf paddle_inference.tgz
         popd
     fi
@@ -98,7 +102,17 @@ if [[ ${MODE} = "cpp_infer" ]]; then
 
         if [[ $cpp_type == "cls" ]]; then
             eval "wget -nc $cls_inference_url"
-            tar xf "${model_name}_infer.tar"
+            tar_name=$(func_get_url_file_name "$cls_inference_url")
+            model_dir=${tar_name%.*}
+            eval "tar xf ${tar_name}"
+
+            # move '_int8' suffix in pact models
+            if [[ ${tar_name} =~ "pact_infer" ]]; then
+                cd ${cls_inference_model_dir}
+                mv inference_int8.pdiparams inference.pdiparams
+                mv inference_int8.pdmodel inference.pdmodel
+                cd ..
+            fi
 
             cd dataset
             rm -rf ILSVRC2012
@@ -134,7 +148,7 @@ model_name=$(func_parser_value "${lines[1]}")
 model_url_value=$(func_parser_value "${lines[35]}")
 model_url_key=$(func_parser_key "${lines[35]}")
 
-if [[ $FILENAME == *GeneralRecognition* ]]; then
+if [[ $model_name == *ShiTu* ]]; then
     cd dataset
     rm -rf Aliproduct
     rm -rf train_reg_all_data.txt
@@ -169,22 +183,47 @@ if [[ ${MODE} = "lite_train_lite_infer" ]] || [[ ${MODE} = "lite_train_whole_inf
     mv val.txt val_list.txt
     cp -r train/* val/
     cd ../../
-elif [[ ${MODE} = "whole_infer" ]] || [[ ${MODE} = "klquant_whole_infer" ]]; then
+    if [[ ${FILENAME} =~ "pact_infer" ]]; then
+        # download pretrained model for PACT training
+        pretrpretrained_model_url=$(func_parser_value "${lines[35]}")
+        mkdir pretrained_model
+        cd pretrained_model
+        wget -nc ${pretrpretrained_model_url} --no-check-certificate
+        cd ..
+    fi
+elif [[ ${MODE} = "whole_infer" ]]; then
     # download data
-    cd dataset
-    rm -rf ILSVRC2012
-    wget -nc https://paddle-imagenet-models-name.bj.bcebos.com/data/whole_chain/whole_chain_infer.tar
-    tar xf whole_chain_infer.tar
-    ln -s whole_chain_infer ILSVRC2012
-    cd ILSVRC2012
-    mv val.txt val_list.txt
-    ln -s val_list.txt train_list.txt
-    cd ../../
+    if [[ ${model_name} =~ "GeneralRecognition" ]]; then
+        cd dataset
+        rm -rf Aliproduct
+        rm -rf train_reg_all_data.txt
+        rm -rf demo_train
+        wget -nc https://paddle-imagenet-models-name.bj.bcebos.com/data/whole_chain/tipc_shitu_demo_data.tar --no-check-certificate
+        tar -xf tipc_shitu_demo_data.tar
+        ln -s tipc_shitu_demo_data Aliproduct
+        ln -s tipc_shitu_demo_data/demo_train.txt train_reg_all_data.txt
+        ln -s tipc_shitu_demo_data/demo_train demo_train
+        cd tipc_shitu_demo_data
+        ln -s demo_test.txt val_list.txt
+        cd ../../
+    else
+        cd dataset
+        rm -rf ILSVRC2012
+        wget -nc https://paddle-imagenet-models-name.bj.bcebos.com/data/whole_chain/whole_chain_infer.tar
+        tar xf whole_chain_infer.tar
+        ln -s whole_chain_infer ILSVRC2012
+        cd ILSVRC2012
+        mv val.txt val_list.txt
+        ln -s val_list.txt train_list.txt
+        cd ../../
+    fi
     # download inference or pretrained model
     eval "wget -nc $model_url_value"
-    if [[ $model_url_key == *inference* ]]; then
-        rm -rf inference
-        tar xf "${model_name}_infer.tar"
+    if [[ ${model_url_value} =~ ".tar" ]]; then
+        tar_name=$(func_get_url_file_name "${model_url_value}")
+        echo $tar_name
+        rm -rf {tar_name}
+        tar xf ${tar_name}
     fi
     if [[ $model_name == "SwinTransformer_large_patch4_window7_224" || $model_name == "SwinTransformer_large_patch4_window12_384" ]]; then
         cmd="mv ${model_name}_22kto1k_pretrained.pdparams ${model_name}_pretrained.pdparams"
@@ -201,12 +240,20 @@ elif [[ ${MODE} = "whole_train_whole_infer" ]]; then
     mv train.txt train_list.txt
     mv test.txt val_list.txt
     cd ../../
+    if [[ ${FILENAME} =~ "pact_infer" ]]; then
+        # download pretrained model for PACT training
+        pretrpretrained_model_url=$(func_parser_value "${lines[35]}")
+        mkdir pretrained_model
+        cd pretrained_model
+        wget -nc ${pretrpretrained_model_url} --no-check-certificate
+        cd ..
+    fi
 fi
 
 if [[ ${MODE} = "serving_infer" ]]; then
     # prepare serving env
     python_name=$(func_parser_value "${lines[2]}")
-    if [[ ${model_name} =~ "ShiTu" ]]; then
+    if [[ ${model_name} = "PPShiTu" ]]; then
         cls_inference_model_url=$(func_parser_value "${lines[3]}")
         cls_tar_name=$(func_get_url_file_name "${cls_inference_model_url}")
         det_inference_model_url=$(func_parser_value "${lines[4]}")
@@ -223,7 +270,18 @@ if [[ ${MODE} = "serving_infer" ]]; then
         cls_inference_model_url=$(func_parser_value "${lines[3]}")
         cls_tar_name=$(func_get_url_file_name "${cls_inference_model_url}")
         cd ./deploy/paddleserving
-        wget -nc ${cls_inference_model_url} && tar xf ${cls_tar_name}
+        wget -nc ${cls_inference_model_url}
+        tar xf ${cls_tar_name}
+
+        # move '_int8' suffix in pact models
+        if [[ ${cls_tar_name} =~ "pact_infer" ]]; then
+            cls_inference_model_dir=${cls_tar_name%%.tar}
+            cd ${cls_inference_model_dir}
+            mv inference_int8.pdiparams inference.pdiparams
+            mv inference_int8.pdmodel inference.pdmodel
+            cd ..
+        fi
+
         cd ../../
     fi
     unset http_proxy

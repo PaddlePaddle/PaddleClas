@@ -17,6 +17,6 @@ MobileViT 是一个轻量级的视觉 Transformer 网络，可以用作计算机
 
 | Models           | Top1 | Top5 | Reference<br>top1 | Reference<br>top5 | FLOPs<br>(M) | Params<br>(M) |
 |:--:|:--:|:--:|:--:|:--:|:--:|:--:|
-| MobileViT_XXS    | 0.6867 | 0.8878 | 0.690 | - | 1849.35  | 5.59   |
+| MobileViT_XXS    | 0.6867 | 0.8878 | 0.690 | - | 337.24  | 1.28   |
 | MobileViT_XS    | 0.7454 | 0.9227 | 0.747 | - | 930.75  | 2.33   |
-| MobileViT_S    | 0.7814 | 0.9413 | 0.783 | - | 337.24  | 1.28   |
+| MobileViT_S    | 0.7814 | 0.9413 | 0.783 | - | 1849.35  | 5.59   |

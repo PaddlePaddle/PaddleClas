@@ -466,7 +466,7 @@ class Engine(object):
 
         # for rep nets
         for layer in self.model.sublayers():
-            if hasattr(layer, "rep"):
+            if hasattr(layer, "rep") and not getattr(layer, "is_repped"):
                 layer.rep()
 
         save_path = os.path.join(self.config["Global"]["save_inference_dir"],

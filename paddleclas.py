@@ -340,6 +340,7 @@ def print_info():
         first_width = 30
         second_width = total_width - first_width if total_width > 50 else 10
     except OSError:
+        total_width = 100
         second_width = 100
     for series in IMN_MODEL_SERIES:
         names = textwrap.fill(
@@ -452,7 +453,9 @@ class PaddleClas(object):
     """PaddleClas.
     """
 
-    print_info()
+    if not os.environ.get('ppcls', False):
+        os.environ.setdefault('ppcls', 'True')
+        print_info()
 
     def __init__(self,
                  model_name: str=None,

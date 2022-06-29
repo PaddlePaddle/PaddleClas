@@ -6,27 +6,37 @@ Linux GPU/CPU C++ 推理功能测试的主程序为`test_inference_cpp.sh`，可
 
 - 推理相关：
 
-|    算法名称     |                 模型名称                  | device_CPU | device_GPU |
-| :-------------: | :---------------------------------------: | :--------: | :--------: |
-|   MobileNetV3   |          MobileNetV3_large_x1_0           |    支持    |    支持    |
-|   MobileNetV3   |         MobileNetV3_large_x1_0_KL         |    支持    |    支持    |
-|    PP-ShiTu     | PPShiTu_general_rec、PPShiTu_mainbody_det |    支持    |    支持    |
-|    PP-ShiTu     |           PPShiTu_mainbody_det            |    支持    |    支持    |
-|     PPHGNet     |               PPHGNet_small               |    支持    |    支持    |
-|     PPHGNet     |               PPHGNet_tiny                |    支持    |    支持    |
-|     PPLCNet     |               PPLCNet_x0_25               |    支持    |    支持    |
-|     PPLCNet     |               PPLCNet_x0_35               |    支持    |    支持    |
-|     PPLCNet     |               PPLCNet_x0_5                |    支持    |    支持    |
-|     PPLCNet     |               PPLCNet_x0_75               |    支持    |    支持    |
-|     PPLCNet     |               PPLCNet_x1_0                |    支持    |    支持    |
-|     PPLCNet     |               PPLCNet_x1_5                |    支持    |    支持    |
-|     PPLCNet     |               PPLCNet_x2_0                |    支持    |    支持    |
-|     PPLCNet     |               PPLCNet_x2_5                |    支持    |    支持    |
-|    PPLCNetV2    |              PPLCNetV2_base               |    支持    |    支持    |
-|     ResNet      |                 ResNet50                  |    支持    |    支持    |
-|     ResNet      |                ResNet50_vd                |    支持    |    支持    |
-|     ResNet      |              ResNet50_vd_KL               |    支持    |    支持    |
-| SwinTransformer |  SwinTransformer_tiny_patch4_window7_224  |    支持    |    支持    |
+|    算法名称     |                   模型名称                   | device_CPU | device_GPU |
+| :-------------: | :------------------------------------------: | :--------: | :--------: |
+|   MobileNetV3   |            MobileNetV3_large_x1_0            |    支持    |    支持    |
+|   MobileNetV3   |          MobileNetV3_large_x1_0_KL           |    支持    |    支持    |
+|   MobileNetV3   |         MobileNetV3_large_x1_0_PACT          |    支持    |    支持    |
+|    PP-ShiTu     |  PPShiTu_general_rec、PPShiTu_mainbody_det   |    支持    |    支持    |
+|    PP-ShiTu     |      GeneralRecognition_PPLCNet_x2_5_KL      |    支持    |    支持    |
+|    PP-ShiTu     |     GeneralRecognition_PPLCNet_x2_5_PACT     |    支持    |    支持    |
+|     PPHGNet     |                PPHGNet_small                 |    支持    |    支持    |
+|     PPHGNet     |               PPHGNet_small_KL               |    支持    |    支持    |
+|     PPHGNet     |              PPHGNet_small_PACT              |    支持    |    支持    |
+|     PPHGNet     |                 PPHGNet_tiny                 |    支持    |    支持    |
+|     PPLCNet     |                PPLCNet_x0_25                 |    支持    |    支持    |
+|     PPLCNet     |                PPLCNet_x0_35                 |    支持    |    支持    |
+|     PPLCNet     |                 PPLCNet_x0_5                 |    支持    |    支持    |
+|     PPLCNet     |                PPLCNet_x0_75                 |    支持    |    支持    |
+|     PPLCNet     |                 PPLCNet_x1_0                 |    支持    |    支持    |
+|     PPLCNet     |               PPLCNet_x1_0_KL                |    支持    |    支持    |
+|     PPLCNet     |              PPLCNet_x1_0_PACT               |    支持    |    支持    |
+|     PPLCNet     |                 PPLCNet_x1_5                 |    支持    |    支持    |
+|     PPLCNet     |                 PPLCNet_x2_0                 |    支持    |    支持    |
+|     PPLCNet     |                 PPLCNet_x2_5                 |    支持    |    支持    |
+|    PPLCNetV2    |                PPLCNetV2_base                |    支持    |    支持    |
+|    PPLCNetV2    |              PPLCNetV2_base_KL               |    支持    |    支持    |
+|     ResNet      |                   ResNet50                   |    支持    |    支持    |
+|     ResNet      |                 ResNet50_vd                  |    支持    |    支持    |
+|     ResNet      |                ResNet50_vd_KL                |    支持    |    支持    |
+|     ResNet      |               ResNet50_vd_PACT               |    支持    |    支持    |
+| SwinTransformer |   SwinTransformer_tiny_patch4_window7_224    |    支持    |    支持    |
+| SwinTransformer |  SwinTransformer_tiny_patch4_window7_224_KL  |    支持    |    支持    |
+| SwinTransformer | SwinTransformer_tiny_patch4_window7_224_PACT |    支持    |    支持    |
 
 ## 2. 测试流程(以**ResNet50**为例)
 
@@ -244,20 +254,20 @@ bash test_tipc/prepare.sh test_tipc/config/ResNet/ResNet50_linux_gpu_normal_norm
 测试方法如下所示，希望测试不同的模型文件，只需更换为自己的参数配置文件，即可完成对应模型的测试。
 
 ```shell
-bash test_tipc/test_inference_cpp.sh ${your_params_file}
+bash test_tipc/test_inference_cpp.sh ${your_params_file} cpp_infer
 ```
 
 以`ResNet50`的`Linux GPU/CPU C++推理测试`为例，命令如下所示。
 
 ```shell
-bash test_tipc/test_inference_cpp.sh test_tipc/config/ResNet/ResNet50_linux_gpu_normal_normal_infer_cpp_linux_gpu_cpu.txt
+bash test_tipc/test_inference_cpp.sh test_tipc/config/ResNet/ResNet50_linux_gpu_normal_normal_infer_cpp_linux_gpu_cpu.txt cpp_infer
 ```
 
 输出结果如下，表示命令运行成功。
 
 ```shell
-Run successfully with command - ./deploy/cpp/build/clas_system -c inference_cls.yaml > ./test_tipc/output/ResNet50/cls_cpp_infer_gpu_usetrt_False_precision_fp32_batchsize_1.log 2>&1!
-Run successfully with command - ./deploy/cpp/build/clas_system -c inference_cls.yaml > ./test_tipc/output/ResNet50/cls_cpp_infer_cpu_usemkldnn_False_threads_1_precision_fp32_batchsize_1.log 2>&1!
+Run successfully with command - ResNet50 - ./deploy/cpp/build/clas_system -c inference_cls.yaml > ./test_tipc/output/ResNet50/cpp_infer/cpp_infer_gpu_usetrt_False_precision_fp32_batchsize_1.log 2>&1!
+Run successfully with command - ResNet50 - ./deploy/cpp/build/clas_system -c inference_cls.yaml > ./test_tipc/output/ResNet50/cpp_infer/cpp_infer_cpu_usemkldnn_False_threads_1_precision_fp32_batchsize_1.log 2>&1!
 ```
 
 最终log中会打印出结果，如下所示
@@ -308,6 +318,6 @@ Current total inferen time cost: 5449.39 ms.
     Top5: class_id: 265, score: 0.0420, label: toy poodle
 
 ```
-详细log位于`./test_tipc/output/ResNet50/cls_cpp_infer_gpu_usetrt_False_precision_fp32_batchsize_1.log`和`./test_tipc/output/ResNet50/cls_cpp_infer_cpu_usemkldnn_False_threads_1_precision_fp32_batchsize_1.log`中。
+详细log位于`./test_tipc/output/ResNet50/cpp_infer/cpp_infer_gpu_usetrt_False_precision_fp32_batchsize_1.log`和`./test_tipc/output/ResNet50/cpp_infer_cpu_usemkldnn_False_threads_1_precision_fp32_batchsize_1.log`中。
 
 如果运行失败，也会在终端中输出运行失败的日志信息以及对应的运行命令。可以基于该命令，分析运行失败的原因。
