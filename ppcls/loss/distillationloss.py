@@ -22,6 +22,7 @@ from .distanceloss import DistanceLoss
 from .rkdloss import RKdAngle, RkdDistance
 from .kldivloss import KLDivLoss
 from .dkdloss import DKDLoss
+from .dist_loss import DISTLoss
 from .multilabelloss import MultiLabelLoss
 
 
@@ -288,4 +289,33 @@ class DistillationMultiLabelLoss(MultiLabelLoss):
             loss = super().forward(out, batch)
             for key in loss:
                 loss_dict["{}_{}".format(key, name)] = loss[key]
+        return loss_dict
+
+
+class DistillationDISTLoss(DISTLoss):
+    """
+    DistillationDISTLoss
+    """
+
+    def __init__(self,
+                 model_name_pairs=[],
+                 key=None,
+                 beta=1.0,
+                 gamma=1.0,
+                 name="loss_dist"):
+        super().__init__(beta=beta, gamma=gamma)
+        self.key = key
+        self.model_name_pairs = model_name_pairs
+        self.name = name
+
+    def forward(self, predicts, batch):
+        loss_dict = dict()
+        for idx, pair in enumerate(self.model_name_pairs):
+            out1 = predicts[pair[0]]
+            out2 = predicts[pair[1]]
+            if self.key is not None:
+                out1 = out1[self.key]
+                out2 = out2[self.key]
+            loss = super().forward(out1, out2)
+            loss_dict[f"{self.name}_{pair[0]}_{pair[1]}"] = loss
         return loss_dict
