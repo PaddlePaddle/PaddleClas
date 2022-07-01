@@ -22,6 +22,7 @@ Arch:
   # if not null, its lengths should be same as models
   pretrained_list:
   # if not null, its lengths should be same as models
+  infer_model_name: "Student"
   freeze_params_list:
   - True
   - False
