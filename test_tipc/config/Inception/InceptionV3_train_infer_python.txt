@@ -45,7 +45,7 @@ inference:python/predict_cls.py -c configs/inference_cls.yaml  -o PreProcess.tra
 -o Global.use_tensorrt:False
 -o Global.use_fp16:False
 -o Global.inference_model_dir:../inference
--o Global.infer_imgs:../dataset/ILSVRC2012/val
+-o Global.infer_imgs:../dataset/ILSVRC2012/val/ILSVRC2012_val_00000001.JPEG
 -o Global.save_log_path:null
 -o Global.benchmark:False
 null:null
