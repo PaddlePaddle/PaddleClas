@@ -64,9 +64,9 @@ function func_shitu_cpp_inference(){
                             precison="int8"
                         fi
                         _save_log_path="${_log_path}/cpp_infer_cpu_usemkldnn_${use_mkldnn}_threads_${threads}_precision_${precision}_batchsize_${batch_size}.log"
-                        eval $transform_index_cmd
                         command="${generate_yaml_cmd} --type shitu --batch_size ${batch_size} --mkldnn ${use_mkldnn} --gpu ${use_gpu} --cpu_thread ${threads} --tensorrt False --precision ${precision} --data_dir ${_img_dir} --benchmark True --cls_model_dir ${cpp_infer_model_dir} --det_model_dir ${cpp_det_infer_model_dir} --gpu_id ${GPUID}"
                         eval $command
+                        eval $transform_index_cmd
                         command="${_script} > ${_save_log_path} 2>&1"
                         eval $command
                         last_status=${PIPESTATUS[0]}
@@ -88,9 +88,9 @@ function func_shitu_cpp_inference(){
                     fi
                     for batch_size in ${cpp_batch_size_list[*]}; do
                         _save_log_path="${_log_path}/cpp_infer_gpu_usetrt_${use_trt}_precision_${precision}_batchsize_${batch_size}.log"
-                        eval $transform_index_cmd
                         command="${generate_yaml_cmd} --type shitu --batch_size ${batch_size} --mkldnn False --gpu ${use_gpu} --cpu_thread 1 --tensorrt ${use_trt} --precision ${precision} --data_dir ${_img_dir} --benchmark True --cls_model_dir ${cpp_infer_model_dir} --det_model_dir ${cpp_det_infer_model_dir} --gpu_id ${GPUID}"
                         eval $command
+                        eval $transform_index_cmd
                         command="${_script} > ${_save_log_path} 2>&1"
                         eval $command
                         last_status=${PIPESTATUS[0]}
