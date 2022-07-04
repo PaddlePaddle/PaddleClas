@@ -85,12 +85,18 @@ if [[ ${MODE} = "cpp_infer" ]]; then
     if [[ ! -d "./deploy/cpp/paddle_inference/" ]]; then
         pushd ./deploy/cpp/
         PADDLEInfer=$3
-        if [ "" = "$PADDLEInfer" ];then
+        if [ "" = "$PADDLEInfer" ]; then
             wget -nc https://paddle-inference-lib.bj.bcebos.com/2.2.2/cxx_c/Linux/GPU/x86-64_gcc8.2_avx_mkl_cuda10.1_cudnn7.6.5_trt6.0.1.5/paddle_inference.tgz --no-check-certificate
+            tar xf paddle_inference.tgz
         else
             wget -nc ${PADDLEInfer} --no-check-certificate
+            tar_name=$(func_get_url_file_name "$PADDLEInfer")
+            tar xf ${tar_name}
+            paddle_inference_install_dir=${tar_name%.*}
+            if [ ! -d "paddle_inference" ]; then
+                ln -s ${paddle_inference_install_dir} paddle_inference
+            fi
         fi
-        tar xf paddle_inference.tgz
         popd
     fi
     if [[ $FILENAME == *infer_cpp_linux_gpu_cpu.txt ]]; then
