@@ -23,7 +23,7 @@
 
 #### Q2.1.1 How to freeze the parameters of some layers during training?
 **A**: There are currently three methods available
-1. Manually modify the model code, use `paddle.ParamAttr(learning_rate=0.0)`, and set the learning rate of the frozen layer to 0.0. For details, see [paddle.ParamAttr documentation](https://www.paddlepaddle.org. cn/documentation/docs/en/develop/api/paddle/ParamAttr_cn.html#paramattr). The following code can set the learning rate of the weight parameter of the self.conv layer to 0.0.
+1. Manually modify the model code, use `paddle.ParamAttr(learning_rate=0.0)`, and set the learning rate of the frozen layer to 0.0. For details, see [paddle.ParamAttr documentation](https://www.paddlepaddle.org.cn/documentation/docs/en/develop/api/paddle/ParamAttr_en.html#paramattr). The following code can set the learning rate of the weight parameter of the self.conv layer to 0.0.
    ```python
    self.conv = Conv2D(
         in_channels=num_channels,
