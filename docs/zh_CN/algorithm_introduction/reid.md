@@ -46,15 +46,15 @@
 | :---------- | :----: | :----: | :---: |
 | VIPeR       |  632   |  1264  |   2   |
 | iLIDS       |  119   |  476   |   2   |
-| GRID        |  250   |  1275  |   2   |
+| GRID        |  250   |  1275  |   8   |
 | PRID2011    |  200   |  1134  |   2   |
 | CUHK01      |  971   |  3884  |   2   |
-| CUHK02      |  1816  |  7264  |   2   |
+| CUHK02      |  1816  |  7264  |  10   |
 | CUHK03      |  1467  | 13164  |   2   |
-| Market-1501 |  1501  | 32668  |   2   |
-| DukeMTMC    |  1404  | 36411  |   2   |
-| Airport     | 39902  | 39902  |   2   |
-| MSMT17      | 126441 | 126441 |   2   |
+| Market-1501 |  1501  | 32668  |   6   |
+| DukeMTMC    |  1404  | 36411  |   8   |
+| Airport     | 39902  | 39902  |   6   |
+| MSMT17      | 126441 | 126441 |  15   |
 
 #### 2.2 常用指标
 
@@ -95,8 +95,8 @@
 
 以下表格总结了复现的ReID strong-baseline的3种配置在 Market1501 数据集上的精度指标，
 
-| 配置文件                         | recall@1(\%) | mAP(\%) | 参考recall@1(\%) | 参考mAP(\%) | 预训练模型下载地址  | inference模型下载地址 |
-| -------------------------------- | ------------ | ------- | ---------------- | ----------- | ----- | ---- |
+| 配置文件                         | recall@1(\%) | mAP(\%) | 参考recall@1(\%) | 参考mAP(\%) | 预训练模型下载地址                                                                                                                      | inference模型下载地址                                                                                                          |
+| -------------------------------- | ------------ | ------- | ---------------- | ----------- | --------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
 | baseline.yaml                    | 88.45        | 74.37   | 87.7             | 74.0        | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/reid/pretrain/baseline_pretrained.pdparams)                    | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/reid/inference/baseline_infer.tar)                    |
 | softmax_triplet.yaml             | 94.29        | 85.57   | 94.1             | 85.7        | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/reid/pretrain/softmax_triplet_pretrained.pdparams)             | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/reid/inference/softmax_triplet_infer.tar)             |
 | softmax_triplet_with_center.yaml | 94.50        | 85.82   | 94.5             | 85.9        | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/reid/pretrain/softmax_triplet_with_center_pretrained.pdparams) | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/reid/inference/softmax_triplet_with_center_infer.tar) |
@@ -208,6 +208,44 @@
   ppcls INFO: [Eval][Epoch 0][Avg]recall1: 0.94507, recall5: 0.98248, mAP: 0.85827
   ```
   默认评估日志保存在`PaddleClas/output/RecModel/eval.log`中，可以看到我们提供的 `softmax_triplet_with_center_pretrained.pdparams` 模型在 Market1501 数据集上的评估指标为recall@1=0.94507，recall@5=0.98248，mAP=0.85827
+
+- 使用re-ranking功能提升评估精度
+
+  re-ranking的主要思想是利用检索库之间的相互关系来进一步优化检索结果，比较广泛使用的是k-reciprocal算法。在PaddleClas中在评估时开启re-ranking来提升最终的检索精度。
+  如下所示，在评估命令中加上 `-o Global.re_ranking=True` 即可开启该功能。
+  ```bash
+  python3.7 tools/eval.py \
+  -c ppcls/configs/reid/strong_baseline/softmax_triplet_with_center.yaml \
+  -o Global.pretrained_model="pretrained_models/softmax_triplet_with_center_pretrained" \
+  -o Global.re_ranking=True
+  ```
+  查看输出结果
+  ```log
+  ...
+  ...
+  ppcls INFO: unique_endpoints {''}
+  ppcls INFO: Found /root/.paddleclas/weights/resnet50-19c8e357_torch2paddle.pdparams
+  ppcls INFO: gallery feature calculation process: [0/125]
+  ppcls INFO: gallery feature calculation process: [20/125]
+  ppcls INFO: gallery feature calculation process: [40/125]
+  ppcls INFO: gallery feature calculation process: [60/125]
+  ppcls INFO: gallery feature calculation process: [80/125]
+  ppcls INFO: gallery feature calculation process: [100/125]
+  ppcls INFO: gallery feature calculation process: [120/125]
+  ppcls INFO: Build gallery done, all feat shape: [15913, 2048], begin to eval..
+  ppcls INFO: query feature calculation process: [0/27]
+  ppcls INFO: query feature calculation process: [20/27]
+  ppcls INFO: Build query done, all feat shape: [3368, 2048], begin to eval..
+  ppcls INFO: re_ranking=True
+  ppcls WARNING: re_ranking=True,Recallk.descending has been set to False
+  ppcls WARNING: re_ranking=True,mAP.descending has been set to False
+  ppcls INFO: using GPU to compute original distance
+  ppcls INFO: starting re_ranking
+  ppcls INFO: [Eval][Epoch 0][Avg]recall1: 0.95546, recall5: 0.97743, mAP: 0.94252
+  ```
+  可以看到开启re-ranking后，评估指标为recall@1=0.95546，recall@5=0.97743，mAP=0.94252，可以发现该算法对mAP指标的提升比较明显(0.85827->0.94252)。
+
+  **注**：目前re-ranking的计算复杂度较高，因此默认不启用。
 
 #### 4.2 模型推理
 

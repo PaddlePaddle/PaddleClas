@@ -46,15 +46,15 @@ Early work on person re-identification mainly focused on hand-designed feature e
 | :---------- | :----: | :----: | :---: |
 | VIPeR       |  632   |  1264  |   2   |
 | iLIDS       |  119   |  476   |   2   |
-| GRID        |  250   |  1275  |   2   |
+| GRID        |  250   |  1275  |   8   |
 | PRID2011    |  200   |  1134  |   2   |
 | CUHK01      |  971   |  3884  |   2   |
-| CUHK02      |  1816  |  7264  |   2   |
+| CUHK02      |  1816  |  7264  |  10   |
 | CUHK03      |  1467  | 13164  |   2   |
-| Market-1501 |  1501  | 32668  |   2   |
-| DukeMTMC    |  1404  | 36411  |   2   |
-| Airport     | 39902  | 39902  |   2   |
-| MSMT17      | 126441 | 126441 |   2   |
+| Market-1501 |  1501  | 32668  |   6   |
+| DukeMTMC    |  1404  | 36411  |   8   |
+| Airport     | 39902  | 39902  |   6   |
+| MSMT17      | 126441 | 126441 |  15   |
 
 #### 2.2 Common metric
 
@@ -208,6 +208,45 @@ Prepare the `*.pdparams` model parameter file for evaluation. You can use the tr
   ppcls INFO: [Eval][Epoch 0][Avg]recall1: 0.94507, recall5: 0.98248, mAP: 0.85827
   ```
   The default evaluation log is saved in `PaddleClas/output/RecModel/eval.log`. You can see that the evaluation indicators of the `softmax_triplet_with_center_pretrained.pdparams` model provided by us on the Market1501 dataset are recall@1=0.94507, recall@5=0.98248 , mAP=0.85827
+
+- use the re-ranking option to improve the evaluation metrics
+
+  The main idea of ​​re-ranking is to use the relationship between the retrieval libraries to further optimize the retrieval results, and the k-reciprocal algorithm is widely used. Turn on re-ranking during evaluation in PaddleClas to improve the final retrieval accuracy.
+  This can be enabled by adding `-o Global.re_ranking=True` to the evaluation command as shown below.
+  ```bash
+  python3.7 tools/eval.py \
+  -c ppcls/configs/reid/strong_baseline/softmax_triplet_with_center.yaml \
+  -o Global.pretrained_model="pretrained_models/softmax_triplet_with_center_pretrained" \
+  -o Global.re_ranking=True
+  ```
+
+  View the output
+  ```log
+  ...
+  ...
+  ppcls INFO: unique_endpoints {''}
+  ppcls INFO: Found /root/.paddleclas/weights/resnet50-19c8e357_torch2paddle.pdparams
+  ppcls INFO: gallery feature calculation process: [0/125]
+  ppcls INFO: gallery feature calculation process: [20/125]
+  ppcls INFO: gallery feature calculation process: [40/125]
+  ppcls INFO: gallery feature calculation process: [60/125]
+  ppcls INFO: gallery feature calculation process: [80/125]
+  ppcls INFO: gallery feature calculation process: [100/125]
+  ppcls INFO: gallery feature calculation process: [120/125]
+  ppcls INFO: Build gallery done, all feat shape: [15913, 2048], begin to eval..
+  ppcls INFO: query feature calculation process: [0/27]
+  ppcls INFO: query feature calculation process: [20/27]
+  ppcls INFO: Build query done, all feat shape: [3368, 2048], begin to eval..
+  ppcls INFO: re_ranking=True
+  ppcls WARNING: re_ranking=True, Recallk.descending has been set to False
+  ppcls WARNING: re_ranking=True,mAP.descending has been set to False
+  ppcls INFO: using GPU to compute original distance
+  ppcls INFO: starting re_ranking
+  ppcls INFO: [Eval][Epoch 0][Avg]recall1: 0.95546, recall5: 0.97743, mAP: 0.94252
+  ```
+  It can be seen that after re-ranking is enabled, the evaluation indicators are recall@1=0.95546, recall@5=0.97743, and mAP=0.94252. It can be found that the algorithm improves the mAP indicator significantly (0.85827->0.94252).
+
+  **Note**: The computational complexity of re-ranking is currently high, so it is not enabled by default.
 
 #### 4.2 Model Inference
 
