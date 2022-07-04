@@ -39,15 +39,15 @@ infer_export:True
 infer_quant:Fasle
 inference:python/predict_cls.py -c configs/inference_cls.yaml -o PreProcess.transform_ops.0.ResizeImage.resize_short=248
 -o Global.use_gpu:True|False
--o Global.enable_mkldnn:True|False
--o Global.cpu_num_threads:1|6
--o Global.batch_size:1|16
--o Global.use_tensorrt:True|False
--o Global.use_fp16:True|False
+-o Global.enable_mkldnn:False
+-o Global.cpu_num_threads:1
+-o Global.batch_size:1
+-o Global.use_tensorrt:False
+-o Global.use_fp16:False
 -o Global.inference_model_dir:../inference
--o Global.infer_imgs:../dataset/ILSVRC2012/val
+-o Global.infer_imgs:../dataset/ILSVRC2012/val/ILSVRC2012_val_00000001.JPEG
 -o Global.save_log_path:null
--o Global.benchmark:True
+-o Global.benchmark:False
 null:null
 null:null
 ===========================train_benchmark_params==========================

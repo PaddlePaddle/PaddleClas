@@ -172,17 +172,32 @@ if [[ $FILENAME == *use_dali* ]]; then
 fi
 
 if [[ ${MODE} = "lite_train_lite_infer" ]] || [[ ${MODE} = "lite_train_whole_infer" ]]; then
-    # pretrain lite train data
-    cd dataset
-    rm -rf ILSVRC2012
-    wget -nc https://paddle-imagenet-models-name.bj.bcebos.com/data/whole_chain/whole_chain_little_train.tar --no-check-certificate
-    tar xf whole_chain_little_train.tar
-    ln -s whole_chain_little_train ILSVRC2012
-    cd ILSVRC2012
-    mv train.txt train_list.txt
-    mv val.txt val_list.txt
-    cp -r train/* val/
-    cd ../../
+    if [[ ${model_name} =~ "GeneralRecognition" ]]; then
+        cd dataset
+        rm -rf Aliproduct
+        rm -rf train_reg_all_data.txt
+        rm -rf demo_train
+        wget -nc https://paddle-imagenet-models-name.bj.bcebos.com/data/whole_chain/tipc_shitu_demo_data.tar --no-check-certificate
+        tar -xf tipc_shitu_demo_data.tar
+        ln -s tipc_shitu_demo_data Aliproduct
+        ln -s tipc_shitu_demo_data/demo_train.txt train_reg_all_data.txt
+        ln -s tipc_shitu_demo_data/demo_train demo_train
+        cd tipc_shitu_demo_data
+        ln -s demo_test.txt val_list.txt
+        cd ../../
+    else
+        # pretrain lite train data
+        cd dataset
+        rm -rf ILSVRC2012
+        wget -nc https://paddle-imagenet-models-name.bj.bcebos.com/data/whole_chain/whole_chain_little_train.tar --no-check-certificate
+        tar xf whole_chain_little_train.tar
+        ln -s whole_chain_little_train ILSVRC2012
+        cd ILSVRC2012
+        mv train.txt train_list.txt
+        mv val.txt val_list.txt
+        cp -r train/* val/
+        cd ../../
+    fi
     if [[ ${FILENAME} =~ "pact_infer" ]]; then
         # download pretrained model for PACT training
         pretrpretrained_model_url=$(func_parser_value "${lines[35]}")
