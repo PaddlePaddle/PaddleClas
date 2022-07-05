@@ -21,10 +21,10 @@ PaddleServing预测功能测试的主程序为`test_paddle2onnx.sh`，可以测�
 下方展示以PPHGNet_small为例的测试命令与结果。
 
 ```shell
-bash test_tipc/prepare.sh ./test_tipc/config/ResNet/ResNet50_linux_gpu_normal_normal_paddle2onnx_python_linux_cpu.txt paddle2onnx_infer
+bash test_tipc/prepare.sh ./test_tipc/configs/ResNet/ResNet50_linux_gpu_normal_normal_paddle2onnx_python_linux_cpu.txt paddle2onnx_infer
 
 # 用法:
-bash test_tipc/test_paddle2onnx.sh ./test_tipc/config/ResNet/ResNet50_linux_gpu_normal_normal_paddle2onnx_python_linux_cpu.txt
+bash test_tipc/test_paddle2onnx.sh ./test_tipc/configs/ResNet/ResNet50_linux_gpu_normal_normal_paddle2onnx_python_linux_cpu.txt
 ```
 
 #### 运行结果

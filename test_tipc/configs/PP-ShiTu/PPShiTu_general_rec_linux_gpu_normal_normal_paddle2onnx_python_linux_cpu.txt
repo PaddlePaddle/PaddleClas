@@ -1,5 +1,5 @@
 ===========================paddle2onnx_params===========================
-model_name:PP-ShiTu_general_rec
+model_name:GeneralRecognition_PPLCNet_x2_5
 python:python3.7
 2onnx: paddle2onnx
 --model_dir:./deploy/models/general_PPLCNet_x2_5_lite_v1.0_infer/
@@ -9,8 +9,8 @@ python:python3.7
 --opset_version:10
 --enable_onnx_checker:True
 inference_model_url:https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/inference/general_PPLCNet_x2_5_lite_v1.0_infer.tar
-inference:./python/predict_cls.py
+inference:./python/predict_rec.py
 Global.use_onnx:True
-Global.inference_model_dir:./models/general_PPLCNet_x2_5_lite_v1.0_infer
+Global.rec_inference_model_dir:./models/general_PPLCNet_x2_5_lite_v1.0_infer
 Global.use_gpu:False
--c:configs/inference_cls.yaml
+-c:configs/inference_rec.yaml

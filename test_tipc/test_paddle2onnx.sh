@@ -2,6 +2,7 @@
 source test_tipc/common_func.sh
 
 FILENAME=$1
+MODE=$2
 
 # parser params
 dataline=$(awk 'NR==1, NR==16{print}'  $FILENAME)
@@ -35,7 +36,7 @@ inference_hardware_value=$(func_parser_value "${lines[14]}")
 inference_config_key=$(func_parser_key "${lines[15]}")
 inference_config_value=$(func_parser_value "${lines[15]}")
 
-LOG_PATH="./test_tipc/output/${model_name}"
+LOG_PATH="./test_tipc/output/${model_name}/${MODE}"
 mkdir -p ${LOG_PATH}
 status_log="${LOG_PATH}/results_paddle2onnx.log"
 

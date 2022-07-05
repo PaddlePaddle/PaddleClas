@@ -9,7 +9,7 @@
 
 ```shell
 # 运行格式：bash test_tipc/prepare.sh  train_benchmark.txt  mode
-bash test_tipc/prepare.sh test_tipc/config/MobileNetV2/MobileNetV2_train_infer_python.txt benchmark_train
+bash test_tipc/prepare.sh test_tipc/configs/MobileNetV2/MobileNetV2_train_infer_python.txt benchmark_train
 ```
 
 ## 1.2 功能测试
@@ -17,14 +17,14 @@ bash test_tipc/prepare.sh test_tipc/config/MobileNetV2/MobileNetV2_train_infer_p
 
 ```shell
 # 运行格式：bash test_tipc/benchmark_train.sh train_benchmark.txt mode
-bash test_tipc/benchmark_train.sh test_tipc/config/MobileNetV2/MobileNetV2_train_infer_python.txt benchmark_train
+bash test_tipc/benchmark_train.sh test_tipc/configs/MobileNetV2/MobileNetV2_train_infer_python.txt benchmark_train
 
 ```
 
 `test_tipc/benchmark_train.sh`支持根据传入的第三个参数实现只运行某一个训练配置，如下：
 ```shell
 # 运行格式：bash test_tipc/benchmark_train.sh train_benchmark.txt mode params
-bash test_tipc/benchmark_train.sh test_tipc/config/MobileNetV2/MobileNetV2_train_infer_python.txt benchmark_train  dynamic_bs8_fp32_DP_N1C1
+bash test_tipc/benchmark_train.sh test_tipc/configs/MobileNetV2/MobileNetV2_train_infer_python.txt benchmark_train  dynamic_bs8_fp32_DP_N1C1
 ```
 dynamic_bs8_fp32_DP_N1C1为test_tipc/benchmark_train.sh传入的参数，格式如下：
 `${modeltype}_${batch_size}_${fp_item}_${run_mode}_${device_num}`
@@ -33,7 +33,7 @@ dynamic_bs8_fp32_DP_N1C1为test_tipc/benchmark_train.sh传入的参数，格式�
 
 ## 2. 日志输出
 
-运行后将保存模型的训练日志和解析日志，使用 `test_tipc/config/MobileNetV2/MobileNetV2_train_infer_python.txt` 参数文件的训练日志解析结果是：
+运行后将保存模型的训练日志和解析日志，使用 `test_tipc/configs/MobileNetV2/MobileNetV2_train_infer_python.txt` 参数文件的训练日志解析结果是：
 
 ```
 {"model_branch": "dygaph", "model_commit": "7c39a1996b19087737c05d883fd346d2f39dbcc0", "model_name": "cls_MobileNetV2_bs8_fp32_SingleP_DP", "batch_size": 8, "fp_item": "fp32", "run_process_type": "SingleP", "run_mode": "DP", "convergence_value": "5.413110", "convergence_key": "loss:", "ips": 19.333, "speed_unit": "samples/s", "device_num": "N1C1", "model_run_time": "0", "frame_commit": "8cc09552473b842c651ead3b9848d41827a3dbab", "frame_version": "0.0.0"}
