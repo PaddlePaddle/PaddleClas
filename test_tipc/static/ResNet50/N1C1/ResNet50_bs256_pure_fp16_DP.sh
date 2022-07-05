@@ -3,7 +3,7 @@ bs_item=256
 fp_item=pure_fp16
 run_mode=DP
 device_num=N1C1
-max_epochs=1
+max_epochs=2
 num_workers=8
 
 # get data
