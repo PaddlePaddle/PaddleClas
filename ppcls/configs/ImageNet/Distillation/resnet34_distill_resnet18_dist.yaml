@@ -55,11 +55,10 @@ Optimizer:
   momentum: 0.9
   weight_decay: 1e-4
   lr:
-    name: MultiStepDecay
+    name: Piecewise
     learning_rate: 0.1
-    milestones: [30, 60, 90]
-    step_each_epoch: 1
-    gamma: 0.1
+    decay_epochs: [30, 60, 90]
+    values: [0.1, 0.01, 0.001, 0.0001]
 
 
 # data loader for train and eval

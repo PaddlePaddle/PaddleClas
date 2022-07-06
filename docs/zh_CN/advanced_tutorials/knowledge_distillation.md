@@ -446,6 +446,7 @@ Loss:
         weight: 1.0
 ```
 
+<a name='1.2.6'></a>
 
 #### 1.2.6 DIST
 
@@ -470,7 +471,7 @@ Loss:
 | DIST | ResNet18 | [resnet34_distill_resnet18_dist.yaml](../../../ppcls/configs/ImageNet/Distillation/resnet34_distill_resnet18_dist.yaml) | 71.99%(**+1.19%**) | - |
 
 
-##### 1.2.6.2 DKD 配置
+##### 1.2.6.2 DIST 配置
 
 DIST 配置如下所示。在模型构建Arch字段中，需要同时定义学生模型与教师模型，教师模型固定参数，且需要加载预训练模型。在损失函数Loss字段中，需要定义`DistillationDISTLoss`（学生与教师之间的DIST loss）以及`DistillationGTCELoss`（学生与教师关于真值标签的CE loss），作为训练的损失函数。
 
@@ -669,3 +670,5 @@ python3 tools/export_model.py \
 [11] Zhao B, Cui Q, Song R, et al. Decoupled Knowledge Distillation[J]. arXiv preprint arXiv:2203.08679, 2022.
 
 [12] Ji M, Heo B, Park S. Show, attend and distill: Knowledge distillation via attention-based feature matching[C]//Proceedings of the AAAI Conference on Artificial Intelligence. 2021, 35(9): 7945-7952.
+
+[13] Huang T, You S, Wang F, et al. Knowledge Distillation from A Stronger Teacher[J]. arXiv preprint arXiv:2205.10536, 2022.
