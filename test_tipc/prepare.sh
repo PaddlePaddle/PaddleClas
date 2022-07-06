@@ -92,9 +92,8 @@ if [[ ${MODE} = "cpp_infer" ]]; then
             wget -nc ${PADDLEInfer} --no-check-certificate
             tar_name=$(func_get_url_file_name "$PADDLEInfer")
             tar xf ${tar_name}
-            paddle_inference_install_dir=${tar_name%.*}
             if [ ! -d "paddle_inference" ]; then
-                ln -s ${paddle_inference_install_dir} paddle_inference
+                ln -s paddle_inference_install_dir paddle_inference
             fi
         fi
         popd
@@ -225,6 +224,7 @@ elif [[ ${MODE} = "whole_infer" ]]; then
         ln -s tipc_shitu_demo_data/demo_train.txt train_reg_all_data.txt
         ln -s tipc_shitu_demo_data/demo_train demo_train
         cd tipc_shitu_demo_data
+        rm -rf val_list.txt
         ln -s demo_test.txt val_list.txt
         cd ../../
     else
@@ -235,6 +235,7 @@ elif [[ ${MODE} = "whole_infer" ]]; then
         ln -s whole_chain_infer ILSVRC2012
         cd ILSVRC2012
         mv val.txt val_list.txt
+        rm -rf train_list.txt
         ln -s val_list.txt train_list.txt
         cd ../../
     fi
@@ -328,6 +329,7 @@ if [[ ${MODE} = "paddle2onnx_infer" ]]; then
         ln -s tipc_shitu_demo_data/demo_train.txt train_reg_all_data.txt
         ln -s tipc_shitu_demo_data/demo_train demo_train
         cd tipc_shitu_demo_data
+        rm -rf val_list.txt
         ln -s demo_test.txt val_list.txt
         cd ../../
         eval "wget -nc $model_url_value --no-check-certificate"
@@ -349,6 +351,7 @@ if [[ ${MODE} = "benchmark_train" ]]; then
     tar xf ILSVRC2012_val.tar
     ln -s ILSVRC2012_val ILSVRC2012
     cd ILSVRC2012
+    rm -rf train_list.txt
     ln -s val_list.txt train_list.txt
     cd ../../
 fi
