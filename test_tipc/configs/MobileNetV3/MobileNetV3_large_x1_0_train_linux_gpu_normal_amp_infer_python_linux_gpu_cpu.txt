@@ -13,7 +13,7 @@ train_infer_img_dir:./dataset/ILSVRC2012/val
 null:null
 ##
 trainer:amp_train
-amp_train:tools/train.py -c ppcls/configs/ImageNet/MobileNetV3/MobileNetV3_large_x1_0.yaml -o Global.seed=1234 -o DataLoader.Train.sampler.shuffle=False -o DataLoader.Train.loader.num_workers=0 -o DataLoader.Train.loader.use_shared_memory=False -o AMP.scale_loss=65536 -o AMP.use_dynamic_loss_scaling=True -o AMP.level=O2 -o Optimizer.multi_precision=True
+amp_train:tools/train.py -c ppcls/configs/ImageNet/MobileNetV3/MobileNetV3_large_x1_0.yaml -o Global.seed=1234 -o DataLoader.Train.sampler.shuffle=False -o DataLoader.Train.loader.num_workers=0 -o DataLoader.Train.loader.use_shared_memory=False -o AMP.scale_loss=65536 -o AMP.use_dynamic_loss_scaling=True -o AMP.level=O2 -o Optimizer.multi_precision=True -o Global.eval_during_train=False
 pact_train:null
 fpgm_train:null
 distill_train:null
@@ -21,17 +21,17 @@ null:null
 null:null
 ##
 ===========================eval_params===========================
-eval:tools/eval.py -c ppcls/configs/ImageNet/MobileNetV3/MobileNetV3_large_x1_0.yaml -o AMP.scale_loss=65536 -o AMP.use_dynamic_loss_scaling=True -o AMP.level=O2
+eval:tools/eval.py -c ppcls/configs/ImageNet/MobileNetV3/MobileNetV3_large_x1_0.yaml
 null:null
 ##
 ===========================infer_params==========================
 -o Global.save_inference_dir:./inference
 -o Global.pretrained_model:
 norm_export:tools/export_model.py -c ppcls/configs/ImageNet/MobileNetV3/MobileNetV3_large_x1_0.yaml
-quant_export:tools/export_model.py -c ppcls/configs/slim/MobileNetV3_large_x1_0_quantization.yaml
-fpgm_export:tools/export_model.py -c ppcls/configs/slim/MobileNetV3_large_x1_0_prune.yaml
+quant_export:null
+fpgm_export:null
 distill_export:null
-kl_quant:deploy/slim/quant_post_static.py -c ppcls/configs/ImageNet/MobileNetV3/MobileNetV3_large_x1_0.yaml -o Global.save_inference_dir=./inference
+kl_quant:null
 export2:null
 pretrained_model_url:https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/MobileNetV3_large_x1_0_pretrained.pdparams
 infer_model:../inference/
