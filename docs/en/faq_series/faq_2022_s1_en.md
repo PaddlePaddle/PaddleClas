@@ -37,7 +37,7 @@
         data_format=data_format)
    ```
 
-2. Manually set stop_gradient=True for the frozen layer, please refer to [this link](https://github.com/RainFrost1/PaddleClas/blob/24e968b8d9f7d9e2309e713cbf2afe8fda9deacd/ppcls/engine/train/train_idml.py#L40-L66). After using this method, the layer from loss to stop_gradient stops, that is, the weight of the previous layer is also fixed
+2. Manually set stop_gradient=True for the frozen layer, please refer to [this link](https://github.com/RainFrost1/PaddleClas/blob/24e968b8d9f7d9e2309e713cbf2afe8fda9deacd/ppcls/engine/train/train_idml.py#L40-L66). When using this method, after the gradient is returned to the layer which set strop_gradient=True, the gradient backward is stopped, that is, the weight of the previous layer will be fixed.
 
 3. After loss.backward() and before optimizer.step(), use the clear_gradients() method in nn.Layer. For the layer to be fixed, call this method without affecting the loss return. The following code can clear the gradient of a layer or the gradient of a parameter of a layer
     ```python
