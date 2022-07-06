@@ -389,7 +389,7 @@ wget https://paddleclas.bj.bcebos.com/models/PULC/person_attribute_infer.tar && 
 cd ../
 ```
 
-运行下面的命令，对图像 `./images/PULC/person_attribute/090004.jpg` 进行车辆属性识别。
+运行下面的命令，对图像 `./images/PULC/person_attribute/090004.jpg` 进行行人属性识别。
 
 ```shell
 # 使用下面的命令使用 GPU 进行预测

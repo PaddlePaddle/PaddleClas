@@ -246,7 +246,7 @@ make -j
 
 * 可执行以下命令，自动完成上述准备环境中的所需内容
 ```shell
-bash test_tipc/prepare.sh test_tipc/config/ResNet/ResNet50_linux_gpu_normal_normal_infer_cpp_linux_gpu_cpu.txt cpp_infer
+bash test_tipc/prepare.sh test_tipc/configs/ResNet/ResNet50_linux_gpu_normal_normal_infer_cpp_linux_gpu_cpu.txt cpp_infer
 ```
 ### 2.3 功能测试
 
@@ -260,7 +260,7 @@ bash test_tipc/test_inference_cpp.sh ${your_params_file} cpp_infer
 以`ResNet50`的`Linux GPU/CPU C++推理测试`为例，命令如下所示。
 
 ```shell
-bash test_tipc/test_inference_cpp.sh test_tipc/config/ResNet/ResNet50_linux_gpu_normal_normal_infer_cpp_linux_gpu_cpu.txt cpp_infer
+bash test_tipc/test_inference_cpp.sh test_tipc/configs/ResNet/ResNet50_linux_gpu_normal_normal_infer_cpp_linux_gpu_cpu.txt cpp_infer
 ```
 
 输出结果如下，表示命令运行成功。

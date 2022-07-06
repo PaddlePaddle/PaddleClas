@@ -85,12 +85,17 @@ if [[ ${MODE} = "cpp_infer" ]]; then
     if [[ ! -d "./deploy/cpp/paddle_inference/" ]]; then
         pushd ./deploy/cpp/
         PADDLEInfer=$3
-        if [ "" = "$PADDLEInfer" ];then
+        if [ "" = "$PADDLEInfer" ]; then
             wget -nc https://paddle-inference-lib.bj.bcebos.com/2.2.2/cxx_c/Linux/GPU/x86-64_gcc8.2_avx_mkl_cuda10.1_cudnn7.6.5_trt6.0.1.5/paddle_inference.tgz --no-check-certificate
+            tar xf paddle_inference.tgz
         else
             wget -nc ${PADDLEInfer} --no-check-certificate
+            tar_name=$(func_get_url_file_name "$PADDLEInfer")
+            tar xf ${tar_name}
+            if [ ! -d "paddle_inference" ]; then
+                ln -s paddle_inference_install_dir paddle_inference
+            fi
         fi
-        tar xf paddle_inference.tgz
         popd
     fi
     if [[ $FILENAME == *infer_cpp_linux_gpu_cpu.txt ]]; then
@@ -172,17 +177,32 @@ if [[ $FILENAME == *use_dali* ]]; then
 fi
 
 if [[ ${MODE} = "lite_train_lite_infer" ]] || [[ ${MODE} = "lite_train_whole_infer" ]]; then
-    # pretrain lite train data
-    cd dataset
-    rm -rf ILSVRC2012
-    wget -nc https://paddle-imagenet-models-name.bj.bcebos.com/data/whole_chain/whole_chain_little_train.tar --no-check-certificate
-    tar xf whole_chain_little_train.tar
-    ln -s whole_chain_little_train ILSVRC2012
-    cd ILSVRC2012
-    mv train.txt train_list.txt
-    mv val.txt val_list.txt
-    cp -r train/* val/
-    cd ../../
+    if [[ ${model_name} =~ "GeneralRecognition" ]]; then
+        cd dataset
+        rm -rf Aliproduct
+        rm -rf train_reg_all_data.txt
+        rm -rf demo_train
+        wget -nc https://paddle-imagenet-models-name.bj.bcebos.com/data/whole_chain/tipc_shitu_demo_data.tar --no-check-certificate
+        tar -xf tipc_shitu_demo_data.tar
+        ln -s tipc_shitu_demo_data Aliproduct
+        ln -s tipc_shitu_demo_data/demo_train.txt train_reg_all_data.txt
+        ln -s tipc_shitu_demo_data/demo_train demo_train
+        cd tipc_shitu_demo_data
+        ln -s demo_test.txt val_list.txt
+        cd ../../
+    else
+        # pretrain lite train data
+        cd dataset
+        rm -rf ILSVRC2012
+        wget -nc https://paddle-imagenet-models-name.bj.bcebos.com/data/whole_chain/whole_chain_little_train.tar --no-check-certificate
+        tar xf whole_chain_little_train.tar
+        ln -s whole_chain_little_train ILSVRC2012
+        cd ILSVRC2012
+        mv train.txt train_list.txt
+        mv val.txt val_list.txt
+        cp -r train/* val/
+        cd ../../
+    fi
     if [[ ${FILENAME} =~ "pact_infer" ]]; then
         # download pretrained model for PACT training
         pretrpretrained_model_url=$(func_parser_value "${lines[35]}")
@@ -204,6 +224,7 @@ elif [[ ${MODE} = "whole_infer" ]]; then
         ln -s tipc_shitu_demo_data/demo_train.txt train_reg_all_data.txt
         ln -s tipc_shitu_demo_data/demo_train demo_train
         cd tipc_shitu_demo_data
+        rm -rf val_list.txt
         ln -s demo_test.txt val_list.txt
         cd ../../
     else
@@ -214,6 +235,7 @@ elif [[ ${MODE} = "whole_infer" ]]; then
         ln -s whole_chain_infer ILSVRC2012
         cd ILSVRC2012
         mv val.txt val_list.txt
+        rm -rf train_list.txt
         ln -s val_list.txt train_list.txt
         cd ../../
     fi
@@ -296,6 +318,23 @@ if [[ ${MODE} = "paddle2onnx_infer" ]]; then
 
     ${python_name} -m pip install paddle2onnx
     ${python_name} -m pip install onnxruntime
+    if [[ ${model_name} =~ "GeneralRecognition" ]]; then
+        cd dataset
+        rm -rf Aliproduct
+        rm -rf train_reg_all_data.txt
+        rm -rf demo_train
+        wget -nc https://paddle-imagenet-models-name.bj.bcebos.com/data/whole_chain/tipc_shitu_demo_data.tar --no-check-certificate
+        tar -xf tipc_shitu_demo_data.tar
+        ln -s tipc_shitu_demo_data Aliproduct
+        ln -s tipc_shitu_demo_data/demo_train.txt train_reg_all_data.txt
+        ln -s tipc_shitu_demo_data/demo_train demo_train
+        cd tipc_shitu_demo_data
+        rm -rf val_list.txt
+        ln -s demo_test.txt val_list.txt
+        cd ../../
+        eval "wget -nc $model_url_value --no-check-certificate"
+        mv general_PPLCNet_x2_5_pretrained_v1.0.pdparams GeneralRecognition_PPLCNet_x2_5_pretrained.pdparams
+    fi
     cd deploy
     mkdir models
     cd models
@@ -312,6 +351,7 @@ if [[ ${MODE} = "benchmark_train" ]]; then
     tar xf ILSVRC2012_val.tar
     ln -s ILSVRC2012_val ILSVRC2012
     cd ILSVRC2012
+    rm -rf train_list.txt
     ln -s val_list.txt train_list.txt
     cd ../../
 fi
