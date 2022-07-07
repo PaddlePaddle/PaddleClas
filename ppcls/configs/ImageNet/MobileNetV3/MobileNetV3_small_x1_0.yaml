@@ -3,11 +3,11 @@ Global:
   checkpoints: null
   pretrained_model: null
   output_dir: ./output/
-  device: gpu
+  device: xpu
   save_interval: 1
   eval_during_train: True
   eval_interval: 1
-  epochs: 360
+  epochs: 90
   print_batch_step: 10
   use_visualdl: False
   # used for static mode and model export
@@ -17,7 +17,7 @@ Global:
 # model architecture
 Arch:
   name: MobileNetV3_small_x1_0
-  class_num: 1000
+  class_num: 100
  
 # loss function config for traing/eval process
 Loss:
@@ -35,7 +35,7 @@ Optimizer:
   momentum: 0.9
   lr:
     name: Cosine
-    learning_rate: 1.3
+    learning_rate: 0.919
     warmup_epoch: 5
   regularizer:
     name: 'L2'
@@ -65,7 +65,7 @@ DataLoader:
 
     sampler:
       name: DistributedBatchSampler
-      batch_size: 512
+      batch_size: 128
       drop_last: False
       shuffle: True
     loader:
