@@ -49,7 +49,7 @@ Linux GPU/CPU KL离线量化推理测试的主程序为`test_ptq_inference_pytho
 
 ## 2. 测试流程
 
-一下测试流程以 MobileNetV3_large_x1_0 模型为例。
+以下测试流程以 MobileNetV3_large_x1_0 模型为例。
 
 ### 2.1 准备环境
 
