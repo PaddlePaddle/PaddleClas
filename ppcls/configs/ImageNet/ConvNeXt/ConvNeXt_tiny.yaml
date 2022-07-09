@@ -24,7 +24,7 @@ EMA:
 
 # model architecture
 Arch:
-  name: ConvNext_tiny
+  name: ConvNeXt_tiny
   class_num: 1000
   drop_path_rate: 0.1
   layer_scale_init_value: 1e-6

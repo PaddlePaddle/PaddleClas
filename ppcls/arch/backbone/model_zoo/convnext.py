@@ -29,7 +29,7 @@ from paddle.nn.initializer import TruncatedNormal, Constant
 from ppcls.utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
 
 MODEL_URLS = {
-    "ConvNext_tiny": "",  # TODO
+    "ConvNeXt_tiny": "",  # TODO
 }
 
 __all__ = list(MODEL_URLS.keys())
@@ -233,8 +233,8 @@ def _load_pretrained(pretrained, model, model_url, use_ssld=False):
         )
 
 
-def ConvNext_tiny(pretrained=False, use_ssld=False, **kwargs):
+def ConvNeXt_tiny(pretrained=False, use_ssld=False, **kwargs):
     model = ConvNeXt(depths=[3, 3, 9, 3], dims=[96, 192, 384, 768], **kwargs)
     _load_pretrained(
-        pretrained, model, MODEL_URLS["ConvNext_tiny"], use_ssld=use_ssld)
+        pretrained, model, MODEL_URLS["ConvNeXt_tiny"], use_ssld=use_ssld)
     return model
