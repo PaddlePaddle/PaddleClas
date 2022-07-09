@@ -26,8 +26,8 @@ import cv2
 import numpy as np
 from PIL import Image, ImageOps, __version__ as PILLOW_VERSION
 from paddle.vision.transforms import ColorJitter as RawColorJitter
-from paddle.vision.transforms import ToTensor, Normalize
-
+from paddle.vision.transforms import ToTensor, Normalize, RandomHorizontalFlip, RandomResizedCrop
+from paddle.vision.transforms import functional as F
 from .autoaugment import ImageNetPolicy
 from .functional import augmentations
 from ppcls.utils import logger
@@ -92,6 +92,42 @@ class UnifiedResize(object):
         if isinstance(size, list):
             size = tuple(size)
         return self.resize_func(src, size)
+
+
+class RandomInterpolationAugment(object):
+    def __init__(self, prob):
+        self.prob = prob
+
+    def _aug(self, img):
+        img_shape = img.shape
+        side_ratio = np.random.uniform(0.2, 1.0)
+        small_side = int(side_ratio * img_shape[0])
+        interpolation = np.random.choice([
+            cv2.INTER_NEAREST, cv2.INTER_LINEAR, cv2.INTER_AREA,
+            cv2.INTER_CUBIC, cv2.INTER_LANCZOS4
+        ])
+        small_img = cv2.resize(
+            img, (small_side, small_side), interpolation=interpolation)
+        interpolation = np.random.choice([
+            cv2.INTER_NEAREST, cv2.INTER_LINEAR, cv2.INTER_AREA,
+            cv2.INTER_CUBIC, cv2.INTER_LANCZOS4
+        ])
+        aug_img = cv2.resize(
+            small_img, (img_shape[1], img_shape[0]),
+            interpolation=interpolation)
+        return aug_img
+
+    def __call__(self, img):
+        if np.random.random() < self.prob:
+            if isinstance(img, np.ndarray):
+                return self._aug(img)
+            else:
+                pil_img = np.array(img)
+                aug_img = self._aug(pil_img)
+                img = Image.fromarray(aug_img.astype(np.uint8))
+                return img
+        else:
+            return img
 
 
 class OperatorParamError(ValueError):
@@ -202,6 +238,52 @@ class ResizeImage(object):
         return self._resize_func(img, (w, h))
 
 
+class CropWithPadding(RandomResizedCrop):
+    """
+    crop image and padding to original size
+    """
+
+    def __init__(self,
+                 prob=1,
+                 padding_num=0,
+                 size=224,
+                 scale=(0.08, 1.0),
+                 ratio=(3. / 4, 4. / 3),
+                 interpolation='bilinear',
+                 key=None):
+        super().__init__(size, scale, ratio, interpolation, key)
+        self.prob = prob
+        self.padding_num = padding_num
+
+    def __call__(self, img):
+        is_cv2_img = False
+        if isinstance(img, np.ndarray):
+            flag = True
+        if np.random.random() < self.prob:
+            # RandomResizedCrop augmentation
+            new = np.zeros_like(np.array(img)) + self.padding_num
+            #  orig_W, orig_H = F._get_image_size(sample)
+            orig_W, orig_H = self._get_image_size(img)
+            i, j, h, w = self._get_param(img)
+            cropped = F.crop(img, i, j, h, w)
+            new[i:i + h, j:j + w, :] = np.array(cropped)
+            if not isinstance:
+                new = Image.fromarray(new.astype(np.uint8))
+            return new
+        else:
+            return img
+
+    def _get_image_size(self, img):
+        if F._is_pil_image(img):
+            return img.size
+        elif F._is_numpy_image(img):
+            return img.shape[:2][::-1]
+        elif F._is_tensor_image(img):
+            return img.shape[1:][::-1]  # chw
+        else:
+            raise TypeError("Unexpected type {}".format(type(img)))
+
+
 class CropImage(object):
     """ crop image """
 
@@ -220,6 +302,102 @@ class CropImage(object):
         w_end = w_start + w
         h_end = h_start + h
         return img[h_start:h_end, w_start:w_end, :]
+
+
+class Padv2(object):
+    def __init__(self,
+                 size=None,
+                 size_divisor=32,
+                 pad_mode=0,
+                 offsets=None,
+                 fill_value=(127.5, 127.5, 127.5)):
+        """
+        Pad image to a specified size or multiple of size_divisor.
+        Args:
+            size (int, list): image target size, if None, pad to multiple of size_divisor, default None
+            size_divisor (int): size divisor, default 32
+            pad_mode (int): pad mode, currently only supports four modes [-1, 0, 1, 2]. if -1, use specified offsets
+                if 0, only pad to right and bottom. if 1, pad according to center. if 2, only pad left and top
+            offsets (list): [offset_x, offset_y], specify offset while padding, only supported pad_mode=-1
+            fill_value (bool): rgb value of pad area, default (127.5, 127.5, 127.5)
+        """
+
+        if not isinstance(size, (int, list)):
+            raise TypeError(
+                "Type of target_size is invalid when random_size is True. \
+                            Must be List, now is {}".format(type(size)))
+
+        if isinstance(size, int):
+            size = [size, size]
+
+        assert pad_mode in [
+            -1, 0, 1, 2
+        ], 'currently only supports four modes [-1, 0, 1, 2]'
+        if pad_mode == -1:
+            assert offsets, 'if pad_mode is -1, offsets should not be None'
+
+        self.size = size
+        self.size_divisor = size_divisor
+        self.pad_mode = pad_mode
+        self.fill_value = fill_value
+        self.offsets = offsets
+
+    def apply_image(self, image, offsets, im_size, size):
+        x, y = offsets
+        im_h, im_w = im_size
+        h, w = size
+        canvas = np.ones((h, w, 3), dtype=np.float32)
+        canvas *= np.array(self.fill_value, dtype=np.float32)
+        canvas[y:y + im_h, x:x + im_w, :] = image.astype(np.float32)
+        return canvas
+
+    def __call__(self, img):
+        im_h, im_w = img.shape[:2]
+        if self.size:
+            w, h = self.size
+            assert (
+                im_h <= h and im_w <= w
+            ), '(h, w) of target size should be greater than (im_h, im_w)'
+        else:
+            h = int(np.ceil(im_h / self.size_divisor) * self.size_divisor)
+            w = int(np.ceil(im_w / self.size_divisor) * self.size_divisor)
+
+        if h == im_h and w == im_w:
+            return img.astype(np.float32)
+
+        if self.pad_mode == -1:
+            offset_x, offset_y = self.offsets
+        elif self.pad_mode == 0:
+            offset_y, offset_x = 0, 0
+        elif self.pad_mode == 1:
+            offset_y, offset_x = (h - im_h) // 2, (w - im_w) // 2
+        else:
+            offset_y, offset_x = h - im_h, w - im_w
+
+        offsets, im_size, size = [offset_x, offset_y], [im_h, im_w], [h, w]
+
+        return self.apply_image(img, offsets, im_size, size)
+
+
+class RandomCropImage(object):
+    """Random crop image only
+    """
+
+    def __init__(self, size):
+        super(RandomCropImage, self).__init__()
+        if isinstance(size, int):
+            size = [size, size]
+        self.size = size
+
+    def __call__(self, img):
+
+        h, w = img.shape[:2]
+        tw, th = self.size
+        i = random.randint(0, h - th)
+        j = random.randint(0, w - tw)
+
+        img = img[i:i + th, j:j + tw, :]
+        return img
 
 
 class RandCropImage(object):
@@ -284,7 +462,7 @@ class RandCropImageV2(object):
 
     def __call__(self, img):
         if isinstance(img, np.ndarray):
-            img_h, img_w = img.shap[0], img.shap[1]
+            img_h, img_w = img.shape[0], img.shape[1]
         else:
             img_w, img_h = img.size
         tw, th = self.size
@@ -466,16 +644,18 @@ class ColorJitter(RawColorJitter):
     """ColorJitter.
     """
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, prob=2, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.prob = prob
 
     def __call__(self, img):
-        if not isinstance(img, Image.Image):
-            img = np.ascontiguousarray(img)
-            img = Image.fromarray(img)
-        img = super()._apply_image(img)
-        if isinstance(img, Image.Image):
-            img = np.asarray(img)
+        if np.random.random() < self.prob:
+            if not isinstance(img, Image.Image):
+                img = np.ascontiguousarray(img)
+                img = Image.fromarray(img)
+            img = super()._apply_image(img)
+            if isinstance(img, Image.Image):
+                img = np.asarray(img)
         return img
 
 
@@ -495,8 +675,8 @@ class Pad(object):
         # Process fill color for affine transforms
         major_found, minor_found = (int(v)
                                     for v in PILLOW_VERSION.split('.')[:2])
-        major_required, minor_required = (
-            int(v) for v in min_pil_version.split('.')[:2])
+        major_required, minor_required = (int(v) for v in
+                                          min_pil_version.split('.')[:2])
         if major_found < major_required or (major_found == major_required and
                                             minor_found < minor_required):
             if fill is None:

@@ -40,12 +40,20 @@ QUANT_CONFIG = {
 }
 
 
-def quantize_model(config, model):
+def quantize_model(config, model, mode="train"):
     if config.get("Slim", False) and config["Slim"].get("quant", False):
         from paddleslim.dygraph.quant import QAT
         assert config["Slim"]["quant"]["name"].lower(
         ) == 'pact', 'Only PACT quantization method is supported now'
         QUANT_CONFIG["activation_preprocess_type"] = "PACT"
+        if mode in ["infer", "export"]:
+            QUANT_CONFIG['activation_preprocess_type'] = None
+
+        # for rep nets, convert to reparameterized model first
+        for layer in model.sublayers():
+            if hasattr(layer, "rep"):
+                layer.rep()
+
         model.quanter = QAT(config=QUANT_CONFIG)
         model.quanter.quantize(model)
         logger.info("QAT model summary:")

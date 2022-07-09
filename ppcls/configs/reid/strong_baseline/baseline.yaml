@@ -1,0 +1,158 @@
+# global configs
+Global:
+  checkpoints: null
+  pretrained_model: null
+  output_dir: "./output/"
+  device: "gpu"
+  save_interval: 40
+  eval_during_train: True
+  eval_interval: 10
+  epochs: 120
+  print_batch_step: 20
+  use_visualdl: False
+  eval_mode: "retrieval"
+  retrieval_feature_from: "backbone" # 'backbone' or 'neck'
+  re_ranking: False
+  # used for static mode and model export
+  image_shape: [3, 256, 128]
+  save_inference_dir: "./inference"
+
+# model architecture
+Arch:
+  name: "RecModel"
+  infer_output_key: "features"
+  infer_add_softmax: False
+  Backbone:
+    name: "ResNet50"
+    pretrained: https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/others/resnet50-19c8e357_torch2paddle.pdparams
+    stem_act: null
+  BackboneStopLayer:
+    name: "flatten"
+  Head:
+    name: "FC"
+    embedding_size: 2048
+    class_num: 751
+    weight_attr:
+      initializer:
+        name: KaimingUniform
+        fan_in: 12288 # 6*embedding_size
+    bias_attr:
+      initializer:
+        name: KaimingUniform
+        fan_in: 12288 # 6*embedding_size
+
+# loss function config for traing/eval process
+Loss:
+  Train:
+    - CELoss:
+        weight: 1.0
+    - TripletLossV2:
+        weight: 1.0
+        margin: 0.3
+        normalize_feature: False
+        feature_from: "backbone"
+  Eval:
+    - CELoss:
+        weight: 1.0
+
+Optimizer:
+  name: Adam
+  lr:
+    name: Piecewise
+    decay_epochs: [40, 70]
+    values: [0.00035, 0.000035, 0.0000035]
+    by_epoch: True
+    last_epoch: 0
+  regularizer:
+    name: "L2"
+    coeff: 0.0005
+
+# data loader for train and eval
+DataLoader:
+  Train:
+    dataset:
+      name: "Market1501"
+      image_root: "./dataset/"
+      cls_label_path: "bounding_box_train"
+      backend: "pil"
+      transform_ops:
+        - ResizeImage:
+            size: [128, 256]
+            return_numpy: False
+            interpolation: "bilinear"
+            backend: "pil"
+        - RandFlipImage:
+            flip_code: 1
+        - Pad:
+            padding: 10
+        - RandCropImageV2:
+            size: [128, 256]
+        - ToTensor:
+        - Normalize:
+            mean: [0.485, 0.456, 0.406]
+            std: [0.229, 0.224, 0.225]
+    sampler:
+      name: DistributedRandomIdentitySampler
+      batch_size: 64
+      num_instances: 4
+      drop_last: False
+      shuffle: True
+    loader:
+      num_workers: 4
+      use_shared_memory: True
+  Eval:
+    Query:
+      dataset:
+        name: "Market1501"
+        image_root: "./dataset/"
+        cls_label_path: "query"
+        backend: "pil"
+        transform_ops:
+          - ResizeImage:
+              size: [128, 256]
+              return_numpy: False
+              interpolation: "bilinear"
+              backend: "pil"
+          - ToTensor:
+          - Normalize:
+              mean: [0.485, 0.456, 0.406]
+              std: [0.229, 0.224, 0.225]
+      sampler:
+        name: DistributedBatchSampler
+        batch_size: 128
+        drop_last: False
+        shuffle: False
+      loader:
+        num_workers: 4
+        use_shared_memory: True
+
+    Gallery:
+      dataset:
+        name: "Market1501"
+        image_root: "./dataset/"
+        cls_label_path: "bounding_box_test"
+        backend: "pil"
+        transform_ops:
+          - ResizeImage:
+              size: [128, 256]
+              return_numpy: False
+              interpolation: "bilinear"
+              backend: "pil"
+          - ToTensor:
+          - Normalize:
+              mean: [0.485, 0.456, 0.406]
+              std: [0.229, 0.224, 0.225]
+      sampler:
+        name: DistributedBatchSampler
+        batch_size: 128
+        drop_last: False
+        shuffle: False
+      loader:
+        num_workers: 4
+        use_shared_memory: True
+
+Metric:
+  Eval:
+    - Recallk:
+        topk: [1, 5]
+    - mAP: {}

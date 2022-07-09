@@ -128,13 +128,10 @@ class DetPredictor(Predictor):
         results = []
         if reduce(lambda x, y: x * y, np_boxes.shape) < 6:
             print('[WARNNING] No object detected.')
-            results = np.array([])
         else:
-            results = np_boxes
-
-        results = self.parse_det_results(results,
-                                         self.config["Global"]["threshold"],
-                                         self.config["Global"]["labe_list"])
+            results = self.parse_det_results(
+                np_boxes, self.config["Global"]["threshold"],
+                self.config["Global"]["label_list"])
         return results
 
 

@@ -1,0 +1,10 @@
+0 arabic
+1 chinese_cht
+2 cyrillic
+3 devanagari
+4 japan
+5 ka
+6 korean
+7 ta
+8 te
+9 latin

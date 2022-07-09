@@ -76,8 +76,9 @@ class Engine(object):
         print_config(config)
 
         # init train_func and eval_func
-        assert self.eval_mode in ["classification", "retrieval"], logger.error(
-            "Invalid eval mode: {}".format(self.eval_mode))
+        assert self.eval_mode in [
+            "classification", "retrieval", "adaface"
+        ], logger.error("Invalid eval mode: {}".format(self.eval_mode))
         self.train_epoch_func = train_epoch
         self.eval_func = getattr(evaluation, self.eval_mode + "_eval")
 
@@ -119,7 +120,7 @@ class Engine(object):
                 self.config["DataLoader"], "Train", self.device, self.use_dali)
         if self.mode == "eval" or (self.mode == "train" and
                                    self.config["Global"]["eval_during_train"]):
-            if self.eval_mode == "classification":
+            if self.eval_mode in ["classification", "adaface"]:
                 self.eval_dataloader = build_dataloader(
                     self.config["DataLoader"], "Eval", self.device,
                     self.use_dali)
@@ -155,45 +156,39 @@ class Engine(object):
                 self.eval_loss_func = None
 
         # build metric
-        if self.mode == 'train':
-            metric_config = self.config.get("Metric")
-            if metric_config is not None:
-                metric_config = metric_config.get("Train")
-                if metric_config is not None:
-                    if hasattr(
-                            self.train_dataloader, "collate_fn"
-                    ) and self.train_dataloader.collate_fn is not None:
-                        for m_idx, m in enumerate(metric_config):
-                            if "TopkAcc" in m:
-                                msg = f"'TopkAcc' metric can not be used when setting 'batch_transform_ops' in config. The 'TopkAcc' metric has been removed."
-                                logger.warning(msg)
-                                break
+        if self.mode == 'train' and "Metric" in self.config and "Train" in self.config[
+                "Metric"] and self.config["Metric"]["Train"]:
+            metric_config = self.config["Metric"]["Train"]
+            if hasattr(self.train_dataloader, "collate_fn"
+                       ) and self.train_dataloader.collate_fn is not None:
+                for m_idx, m in enumerate(metric_config):
+                    if "TopkAcc" in m:
+                        msg = f"Unable to calculate accuracy when using \"batch_transform_ops\". The metric \"{m}\" has been removed."
+                        logger.warning(msg)
                         metric_config.pop(m_idx)
-                    self.train_metric_func = build_metrics(metric_config)
-                else:
-                    self.train_metric_func = None
+            self.train_metric_func = build_metrics(metric_config)
         else:
             self.train_metric_func = None
 
         if self.mode == "eval" or (self.mode == "train" and
                                    self.config["Global"]["eval_during_train"]):
-            metric_config = self.config.get("Metric")
             if self.eval_mode == "classification":
-                if metric_config is not None:
-                    metric_config = metric_config.get("Eval")
-                    if metric_config is not None:
-                        self.eval_metric_func = build_metrics(metric_config)
-            elif self.eval_mode == "retrieval":
-                if metric_config is None:
-                    metric_config = [{"name": "Recallk", "topk": (1, 5)}]
+                if "Metric" in self.config and "Eval" in self.config["Metric"]:
+                    self.eval_metric_func = build_metrics(self.config["Metric"]
+                                                          ["Eval"])
                 else:
-                    metric_config = metric_config["Eval"]
+                    self.eval_metric_func = None
+            elif self.eval_mode == "retrieval":
+                if "Metric" in self.config and "Eval" in self.config["Metric"]:
+                    metric_config = self.config["Metric"]["Eval"]
+                else:
+                    metric_config = [{"name": "Recallk", "topk": (1, 5)}]
                 self.eval_metric_func = build_metrics(metric_config)
         else:
             self.eval_metric_func = None
 
         # build model
-        self.model = build_model(self.config)
+        self.model = build_model(self.config, self.mode)
         # set @to_static for benchmark, skip this by default.
         apply_to_static(self.config, self.model)
 
@@ -225,7 +220,7 @@ class Engine(object):
                 AMP_RELATED_FLAGS_SETTING.update({
                     'FLAGS_cudnn_batchnorm_spatial_persistent': 1
                 })
-            paddle.fluid.set_flags(AMP_RELATED_FLAGS_SETTING)
+            paddle.set_flags(AMP_RELATED_FLAGS_SETTING)
 
             self.scale_loss = self.config["AMP"].get("scale_loss", 1.0)
             self.use_dynamic_loss_scaling = self.config["AMP"].get(
@@ -243,7 +238,7 @@ class Engine(object):
 
             self.amp_eval = self.config["AMP"].get("use_fp16_test", False)
             # TODO(gaotingquan): Paddle not yet support FP32 evaluation when training with AMPO2
-            if self.config["Global"].get(
+            if self.mode == "train" and self.config["Global"].get(
                     "eval_during_train",
                     True) and self.amp_level == "O2" and self.amp_eval == False:
                 msg = "PaddlePaddle only support FP16 evaluation when training with AMP O2 now. "
@@ -273,10 +268,11 @@ class Engine(object):
                             save_dtype='float32')
             # paddle version >= 2.3.0 or develop
             else:
-                self.model = paddle.amp.decorate(
-                    models=self.model,
-                    level=self.amp_level,
-                    save_dtype='float32')
+                if self.mode == "train" or self.amp_eval:
+                    self.model = paddle.amp.decorate(
+                        models=self.model,
+                        level=self.amp_level,
+                        save_dtype='float32')
 
             if self.mode == "train" and len(self.train_loss_func.parameters(
             )) > 0:
@@ -322,7 +318,7 @@ class Engine(object):
         print_batch_step = self.config['Global']['print_batch_step']
         save_interval = self.config["Global"]["save_interval"]
         best_metric = {
-            "metric": 0.0,
+            "metric": -1.0,
             "epoch": 0,
         }
         ema_module = None
@@ -360,18 +356,18 @@ class Engine(object):
 
             if self.use_dali:
                 self.train_dataloader.reset()
-            metric_msg = ", ".join([
-                "{}: {:.5f}".format(key, self.output_info[key].avg)
-                for key in self.output_info
-            ])
+            metric_msg = ", ".join(
+                [self.output_info[key].avg_info for key in self.output_info])
             logger.info("[Train][Epoch {}/{}][Avg]{}".format(
                 epoch_id, self.config["Global"]["epochs"], metric_msg))
             self.output_info.clear()
 
             # eval model and save model if possible
+            start_eval_epoch = self.config["Global"].get("start_eval_epoch",
+                                                         0) - 1
             if self.config["Global"][
                     "eval_during_train"] and epoch_id % self.config["Global"][
-                        "eval_interval"] == 0:
+                        "eval_interval"] == 0 and epoch_id > start_eval_epoch:
                 acc = self.eval(epoch_id)
                 if acc > best_metric["metric"]:
                     best_metric["metric"] = acc
@@ -384,7 +380,8 @@ class Engine(object):
                         ema=ema_module,
                         model_name=self.config["Arch"]["name"],
                         prefix="best_model",
-                        loss=self.train_loss_func)
+                        loss=self.train_loss_func,
+                        save_student_model=True)
                 logger.info("[Eval][Epoch {}][best metric: {}]".format(
                     epoch_id, best_metric["metric"]))
                 logger.scaler(
@@ -476,9 +473,21 @@ class Engine(object):
             image_file_list.append(image_file)
             if len(batch_data) >= batch_size or idx == len(image_list) - 1:
                 batch_tensor = paddle.to_tensor(batch_data)
-                out = self.model(batch_tensor)
+
+                if self.amp and self.amp_eval:
+                    with paddle.amp.auto_cast(
+                            custom_black_list={
+                                "flatten_contiguous_range", "greater_than"
+                            },
+                            level=self.amp_level):
+                        out = self.model(batch_tensor)
+                else:
+                    out = self.model(batch_tensor)
+
                 if isinstance(out, list):
                     out = out[0]
+                if isinstance(out, dict) and "Student" in out:
+                    out = out["Student"]
                 if isinstance(out, dict) and "logits" in out:
                     out = out["logits"]
                 if isinstance(out, dict) and "output" in out:
@@ -490,33 +499,40 @@ class Engine(object):
 
     def export(self):
         assert self.mode == "export"
-        use_multilabel = self.config["Global"].get("use_multilabel", False)
+        use_multilabel = self.config["Global"].get(
+            "use_multilabel",
+            False) and "ATTRMetric" in self.config["Metric"]["Eval"][0]
         model = ExportModel(self.config["Arch"], self.model, use_multilabel)
         if self.config["Global"]["pretrained_model"] is not None:
             load_dygraph_pretrain(model.base_model,
                                   self.config["Global"]["pretrained_model"])
 
         model.eval()
+
+        # for rep nets
+        for layer in self.model.sublayers():
+            if hasattr(layer, "rep") and not getattr(layer, "is_repped"):
+                layer.rep()
+
         save_path = os.path.join(self.config["Global"]["save_inference_dir"],
                                  "inference")
-        if model.quanter:
-            model.quanter.save_quantized_model(
-                model.base_model,
-                save_path,
-                input_spec=[
-                    paddle.static.InputSpec(
-                        shape=[None] + self.config["Global"]["image_shape"],
-                        dtype='float32')
-                ])
+
+        model = paddle.jit.to_static(
+            model,
+            input_spec=[
+                paddle.static.InputSpec(
+                    shape=[None] + self.config["Global"]["image_shape"],
+                    dtype='float32')
+            ])
+        if hasattr(model.base_model,
+                   "quanter") and model.base_model.quanter is not None:
+            model.base_model.quanter.save_quantized_model(model,
+                                                          save_path + "_int8")
         else:
-            model = paddle.jit.to_static(
-                model,
-                input_spec=[
-                    paddle.static.InputSpec(
-                        shape=[None] + self.config["Global"]["image_shape"],
-                        dtype='float32')
-                ])
             paddle.jit.save(model, save_path)
+        logger.info(
+            f"Export succeeded! The inference model exported has been saved in \"{self.config['Global']['save_inference_dir']}\"."
+        )
 
 
 class ExportModel(TheseusLayer):

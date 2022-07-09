@@ -42,6 +42,14 @@ def _mkdir_if_not_exist(path):
                 raise OSError('Failed to mkdir {}'.format(path))
 
 
+def _extract_student_weights(all_params, student_prefix="Student."):
+    s_params = {
+        key[len(student_prefix):]: all_params[key]
+        for key in all_params if student_prefix in key
+    }
+    return s_params
+
+
 def load_dygraph_pretrain(model, path=None):
     if not (os.path.isdir(path) or os.path.exists(path + '.pdparams')):
         raise ValueError("Model pretrain path {}.pdparams does not "
@@ -109,7 +117,8 @@ def init_model(config,
         net.set_state_dict(para_dict)
         loss.set_state_dict(para_dict)
         for i in range(len(optimizer)):
-            optimizer[i].set_state_dict(opti_dict[i])
+            optimizer[i].set_state_dict(opti_dict[i] if isinstance(
+                opti_dict, list) else opti_dict)
         if ema is not None:
             assert os.path.exists(checkpoints + ".ema.pdparams"), \
                 "Given dir {}.ema.pdparams not exist.".format(checkpoints)
@@ -126,7 +135,7 @@ def init_model(config,
         else:  # common load
             load_dygraph_pretrain(net, path=pretrained_model)
             logger.info("Finish load pretrained model from {}".format(
-                    pretrained_model))
+                pretrained_model))
 
 
 def save_model(net,
@@ -136,7 +145,8 @@ def save_model(net,
                ema=None,
                model_name="",
                prefix='ppcls',
-               loss: paddle.nn.Layer=None):
+               loss: paddle.nn.Layer=None,
+               save_student_model=False):
     """
     save model to the target path
     """
@@ -147,11 +157,18 @@ def save_model(net,
     model_path = os.path.join(model_path, prefix)
 
     params_state_dict = net.state_dict()
-    loss_state_dict = loss.state_dict()
-    keys_inter = set(params_state_dict.keys()) & set(loss_state_dict.keys())
-    assert len(keys_inter) == 0, \
-        f"keys in model and loss state_dict must be unique, but got intersection {keys_inter}"
-    params_state_dict.update(loss_state_dict)
+    if loss is not None:
+        loss_state_dict = loss.state_dict()
+        keys_inter = set(params_state_dict.keys()) & set(loss_state_dict.keys(
+        ))
+        assert len(keys_inter) == 0, \
+            f"keys in model and loss state_dict must be unique, but got intersection {keys_inter}"
+        params_state_dict.update(loss_state_dict)
+
+    if save_student_model:
+        s_params = _extract_student_weights(params_state_dict)
+        if len(s_params) > 0:
+            paddle.save(s_params, model_path + "_student.pdparams")
 
     paddle.save(params_state_dict, model_path + ".pdparams")
     if ema is not None:
