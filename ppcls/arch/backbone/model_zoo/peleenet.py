@@ -1,6 +1,6 @@
-# MIT License
+# copyright (c) 2022 PaddlePaddle Authors. All Rights Reserve.
 #
-# Copyright (c) Meta Platforms, Inc. and affiliates.
+# MIT License
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -55,16 +55,16 @@ class _DenseLayer(nn.Layer):
             inter_channel = int(num_input_features / 8) * 4
             print('adjust inter_channel to ', inter_channel)
 
-        self.branch1a = BasicConv2d(
+        self.branch1a = BasicConv2D(
             num_input_features, inter_channel, kernel_size=1)
-        self.branch1b = BasicConv2d(
+        self.branch1b = BasicConv2D(
             inter_channel, growth_rate, kernel_size=3, padding=1)
 
-        self.branch2a = BasicConv2d(
+        self.branch2a = BasicConv2D(
             num_input_features, inter_channel, kernel_size=1)
-        self.branch2b = BasicConv2d(
+        self.branch2b = BasicConv2D(
             inter_channel, growth_rate, kernel_size=3, padding=1)
-        self.branch2c = BasicConv2d(
+        self.branch2c = BasicConv2D(
             growth_rate, growth_rate, kernel_size=3, padding=1)
 
     def forward(self, x):
@@ -93,13 +93,13 @@ class _StemBlock(nn.Layer):
 
         num_stem_features = int(num_init_features/2)
 
-        self.stem1 = BasicConv2d(
+        self.stem1 = BasicConv2D(
             num_input_channels, num_init_features, kernel_size=3, stride=2, padding=1)
-        self.stem2a = BasicConv2d(
+        self.stem2a = BasicConv2D(
             num_init_features, num_stem_features, kernel_size=1, stride=1, padding=0)
-        self.stem2b = BasicConv2d(
+        self.stem2b = BasicConv2D(
             num_stem_features, num_init_features, kernel_size=3, stride=2, padding=1)
-        self.stem3 = BasicConv2d(
+        self.stem3 = BasicConv2D(
             2*num_init_features, num_init_features, kernel_size=1, stride=1, padding=0)
         self.pool = nn.MaxPool2D(kernel_size=2, stride=2)
 
@@ -116,10 +116,10 @@ class _StemBlock(nn.Layer):
         return out
 
 
-class BasicConv2d(nn.Layer):
+class BasicConv2D(nn.Layer):
 
     def __init__(self, in_channels, out_channels, activation=True, **kwargs):
-        super(BasicConv2d, self).__init__()
+        super(BasicConv2D, self).__init__()
         self.conv = nn.Conv2D(in_channels, out_channels,
                               bias_attr=False, **kwargs)
         self.norm = nn.BatchNorm2D(out_channels)
@@ -184,7 +184,7 @@ class PeleeNetDY(nn.Layer):
             setattr(self.features, 'denseblock%d' % (i + 1), block)
             num_features = num_features + num_layers * growth_rates[i]
 
-            setattr(self.features, 'transition%d' % (i + 1), BasicConv2d(
+            setattr(self.features, 'transition%d' % (i + 1), BasicConv2D(
                 num_features, num_features, kernel_size=1, stride=1, padding=0))
 
             if i != len(block_config) - 1:
