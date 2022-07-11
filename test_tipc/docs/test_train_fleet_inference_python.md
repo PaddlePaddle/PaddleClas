@@ -6,22 +6,45 @@ Linux GPU/CPU 多机多卡训练推理测试的主程序为`test_train_inference
 
 - 训练相关：
 
-  | 算法名称  |      模型名称       |  多机多卡  |
-  | :-------: | :-----------------: | :--------: |
-  |  PPLCNet  |    PPLCNet_x1_0     | 分布式训练 |
-  | PPLCNetV2 |   PPLCNetV2_base    | 分布式训练 |
-  |  PPHGNet  |    PPHGNet_small    | 分布式训练 |
-  | PP-ShiTu  | PPShiTu_general_rec | 分布式训练 |
-
+  |    算法名称     |                模型名称                 | 多机多卡 |
+  | :-------------: | :-------------------------------------: | :------: |
+  |   MobileNetV3   |         MobileNetV3_large_x1_0          |   支持   |
+  |    PP-ShiTu     |     GeneralRecognition_PPLCNet_x2_5     |   支持   |
+  |     PPHGNet     |              PPHGNet_small              |   支持   |
+  |     PPHGNet     |              PPHGNet_tiny               |   支持   |
+  |     PPLCNet     |              PPLCNet_x0_25              |   支持   |
+  |     PPLCNet     |              PPLCNet_x0_35              |   支持   |
+  |     PPLCNet     |              PPLCNet_x0_5               |   支持   |
+  |     PPLCNet     |              PPLCNet_x0_75              |   支持   |
+  |     PPLCNet     |              PPLCNet_x1_0               |   支持   |
+  |     PPLCNet     |              PPLCNet_x1_5               |   支持   |
+  |     PPLCNet     |              PPLCNet_x2_0               |   支持   |
+  |     PPLCNet     |              PPLCNet_x2_5               |   支持   |
+  |    PPLCNetV2    |             PPLCNetV2_base              |   支持   |
+  |     ResNet      |                ResNet50                 |   支持   |
+  |     ResNet      |               ResNet50_vd               |   支持   |
+  | SwinTransformer | SwinTransformer_tiny_patch4_window7_224 |   支持   |
 
 - 推理相关：
 
-  | 算法名称  |      模型名称       | device_CPU | device_GPU | batchsize |
-  | :-------: | :-----------------: | :--------: | :--------: | :-------: |
-  |  PPLCNet  |    PPLCNet_x1_0     |    支持    |    支持    |     1     |
-  | PPLCNetV2 |   PPLCNetV2_base    |    支持    |    支持    |     1     |
-  |  PPHGNet  |    PPHGNet_small    |    支持    |    支持    |     1     |
-  | PP-ShiTu  | PPShiTu_general_rec |    支持    |    支持    |     1     |
+  |    算法名称     |                模型名称                 | device_CPU | device_GPU | batchsize |
+  | :-------------: | :-------------------------------------: | :--------: | :--------: | :-------: |
+  |   MobileNetV3   |         MobileNetV3_large_x1_0          |    支持    |    支持    |     1     |
+  |    PP-ShiTu     |     GeneralRecognition_PPLCNet_x2_5     |    支持    |    支持    |     1     |
+  |     PPHGNet     |              PPHGNet_small              |    支持    |    支持    |     1     |
+  |     PPHGNet     |              PPHGNet_tiny               |    支持    |    支持    |     1     |
+  |     PPLCNet     |              PPLCNet_x0_25              |    支持    |    支持    |     1     |
+  |     PPLCNet     |              PPLCNet_x0_35              |    支持    |    支持    |     1     |
+  |     PPLCNet     |              PPLCNet_x0_5               |    支持    |    支持    |     1     |
+  |     PPLCNet     |              PPLCNet_x0_75              |    支持    |    支持    |     1     |
+  |     PPLCNet     |              PPLCNet_x1_0               |    支持    |    支持    |     1     |
+  |     PPLCNet     |              PPLCNet_x1_5               |    支持    |    支持    |     1     |
+  |     PPLCNet     |              PPLCNet_x2_0               |    支持    |    支持    |     1     |
+  |     PPLCNet     |              PPLCNet_x2_5               |    支持    |    支持    |     1     |
+  |    PPLCNetV2    |             PPLCNetV2_base              |    支持    |    支持    |     1     |
+  |     ResNet      |                ResNet50                 |    支持    |    支持    |     1     |
+  |     ResNet      |               ResNet50_vd               |    支持    |    支持    |     1     |
+  | SwinTransformer | SwinTransformer_tiny_patch4_window7_224 |    支持    |    支持    |     1     |
 
 
 ## 2. 测试流程
@@ -118,4 +141,4 @@ emkldnn_True_threads_1_batchsize_16.log 2>&1 !
 
 如果运行失败，也会在终端中输出运行失败的日志信息以及对应的运行命令。可以基于该命令，分析运行失败的原因。
 
-**注意：** 由于分布式训练时，仅在`trainer_id=0`所在的节点中保存模型，因此其他的节点中在运行模型导出与推理时会因为找不到保存的模型而报错，为正常现象。
+**注意：** 由于支持时， 支持 | 1仅在`trainer_id=0`所在的节点中保存模型，因此其他的节点中在运行模型导出与推理时会因为找不到保存的模型而报错，为正常现象。
