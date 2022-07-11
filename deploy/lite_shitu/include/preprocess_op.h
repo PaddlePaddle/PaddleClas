@@ -71,6 +71,8 @@ class NormalizeImage : public PreprocessOp {
   }
 
   virtual void Run(cv::Mat* im, ImageBlob* data);
+  void Run_feature(cv::Mat *im, const std::vector<float> &mean,
+		  const std::vector<float> &std, float scale);
 
  private:
   // CHW or HWC
@@ -83,6 +85,7 @@ class Permute : public PreprocessOp {
  public:
   virtual void Init(const Json::Value& item) {}
   virtual void Run(cv::Mat* im, ImageBlob* data);
+  void Run_feature(const cv::Mat *im, float *data);
 };
 
 class Resize : public PreprocessOp {
@@ -101,6 +104,7 @@ class Resize : public PreprocessOp {
   std::pair<float, float> GenerateScale(const cv::Mat& im);
 
   virtual void Run(cv::Mat* im, ImageBlob* data);
+  void Run_feature(const cv::Mat &img, cv::Mat &resize_img, int max_size_len, int size=0);
 
  private:
   int interp_;
