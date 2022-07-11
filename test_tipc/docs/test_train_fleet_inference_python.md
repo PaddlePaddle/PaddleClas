@@ -6,22 +6,45 @@ Linux GPU/CPU 多机多卡训练推理测试的主程序为`test_train_inference
 
 - 训练相关：
 
-  | 算法名称  |      模型名称       |  多机多卡  |
-  | :-------: | :-----------------: | :--------: |
-  |  PPLCNet  |    PPLCNet_x1_0     | 分布式训练 |
-  | PPLCNetV2 |   PPLCNetV2_base    | 分布式训练 |
-  |  PPHGNet  |    PPHGNet_small    | 分布式训练 |
-  | PP-ShiTu  | PPShiTu_general_rec | 分布式训练 |
-
+  |    算法名称     |                模型名称                 | 多机多卡 |
+  | :-------------: | :-------------------------------------: | :------: |
+  |   MobileNetV3   |         MobileNetV3_large_x1_0          |   支持   |
+  |    PP-ShiTu     |     GeneralRecognition_PPLCNet_x2_5     |   支持   |
+  |     PPHGNet     |              PPHGNet_small              |   支持   |
+  |     PPHGNet     |              PPHGNet_tiny               |   支持   |
+  |     PPLCNet     |              PPLCNet_x0_25              |   支持   |
+  |     PPLCNet     |              PPLCNet_x0_35              |   支持   |
+  |     PPLCNet     |              PPLCNet_x0_5               |   支持   |
+  |     PPLCNet     |              PPLCNet_x0_75              |   支持   |
+  |     PPLCNet     |              PPLCNet_x1_0               |   支持   |
+  |     PPLCNet     |              PPLCNet_x1_5               |   支持   |
+  |     PPLCNet     |              PPLCNet_x2_0               |   支持   |
+  |     PPLCNet     |              PPLCNet_x2_5               |   支持   |
+  |    PPLCNetV2    |             PPLCNetV2_base              |   支持   |
+  |     ResNet      |                ResNet50                 |   支持   |
+  |     ResNet      |               ResNet50_vd               |   支持   |
+  | SwinTransformer | SwinTransformer_tiny_patch4_window7_224 |   支持   |
 
 - 推理相关：
 
-  | 算法名称  |      模型名称       | device_CPU | device_GPU | batchsize |
-  | :-------: | :-----------------: | :--------: | :--------: | :-------: |
-  |  PPLCNet  |    PPLCNet_x1_0     |    支持    |    支持    |     1     |
-  | PPLCNetV2 |   PPLCNetV2_base    |    支持    |    支持    |     1     |
-  |  PPHGNet  |    PPHGNet_small    |    支持    |    支持    |     1     |
-  | PP-ShiTu  | PPShiTu_general_rec |    支持    |    支持    |     1     |
+  |    算法名称     |                模型名称                 | device_CPU | device_GPU | batchsize |
+  | :-------------: | :-------------------------------------: | :--------: | :--------: | :-------: |
+  |   MobileNetV3   |         MobileNetV3_large_x1_0          |    支持    |    支持    |     1     |
+  |    PP-ShiTu     |     GeneralRecognition_PPLCNet_x2_5     |    支持    |    支持    |     1     |
+  |     PPHGNet     |              PPHGNet_small              |    支持    |    支持    |     1     |
+  |     PPHGNet     |              PPHGNet_tiny               |    支持    |    支持    |     1     |
+  |     PPLCNet     |              PPLCNet_x0_25              |    支持    |    支持    |     1     |
+  |     PPLCNet     |              PPLCNet_x0_35              |    支持    |    支持    |     1     |
+  |     PPLCNet     |              PPLCNet_x0_5               |    支持    |    支持    |     1     |
+  |     PPLCNet     |              PPLCNet_x0_75              |    支持    |    支持    |     1     |
+  |     PPLCNet     |              PPLCNet_x1_0               |    支持    |    支持    |     1     |
+  |     PPLCNet     |              PPLCNet_x1_5               |    支持    |    支持    |     1     |
+  |     PPLCNet     |              PPLCNet_x2_0               |    支持    |    支持    |     1     |
+  |     PPLCNet     |              PPLCNet_x2_5               |    支持    |    支持    |     1     |
+  |    PPLCNetV2    |             PPLCNetV2_base              |    支持    |    支持    |     1     |
+  |     ResNet      |                ResNet50                 |    支持    |    支持    |     1     |
+  |     ResNet      |               ResNet50_vd               |    支持    |    支持    |     1     |
+  | SwinTransformer | SwinTransformer_tiny_patch4_window7_224 |    支持    |    支持    |     1     |
 
 
 ## 2. 测试流程
@@ -81,7 +104,7 @@ est_tipc/output/PPLCNet_x1_0/norm_train_gpus_0,1_autocast_null_nodes_2 -o Global
 emkldnn_True_threads_1_batchsize_16.log 2>&1 !
 ```
 
-在配置文件中默认设置`-o Global.benchmark:True`表示开启benchmark选项，此时可以得到测试的详细数据，包含运行环境信息（系统版本、CUDA版本、CUDNN版本、驱动版本），Paddle版本信息，参数设置信息（运行设备、线程数、是否开启内存优化等），模型信息（模型名称、精度），数据信息（batchsize、是否为动态shape等），性能信息（CPU,GPU的占用、运行耗时、预处理耗时、推理耗时、后处理耗时），内容如下所示：
+可以在配置文件中设置`-o Global.benchmark:True`，表示开启benchmark选项，此时就能得到测试的详细数据，包含运行环境信息（系统版本、CUDA版本、CUDNN版本、驱动版本），Paddle版本信息，参数设置信息（运行设备、线程数、是否开启内存优化等），模型信息（模型名称、精度），数据信息（batchsize、是否为动态shape等），性能信息（CPU,GPU的占用、运行耗时、预处理耗时、推理耗时、后处理耗时），内容如下所示：
 
 ```log
 [2022/06/07 17:01:41] root INFO: ---------------------- Env info ----------------------
