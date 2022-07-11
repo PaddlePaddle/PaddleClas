@@ -104,7 +104,7 @@ est_tipc/output/PPLCNet_x1_0/norm_train_gpus_0,1_autocast_null_nodes_2 -o Global
 emkldnn_True_threads_1_batchsize_16.log 2>&1 !
 ```
 
-在配置文件中默认设置`-o Global.benchmark:True`表示开启benchmark选项，此时可以得到测试的详细数据，包含运行环境信息（系统版本、CUDA版本、CUDNN版本、驱动版本），Paddle版本信息，参数设置信息（运行设备、线程数、是否开启内存优化等），模型信息（模型名称、精度），数据信息（batchsize、是否为动态shape等），性能信息（CPU,GPU的占用、运行耗时、预处理耗时、推理耗时、后处理耗时），内容如下所示：
+可以在配置文件中设置`-o Global.benchmark:True`，表示开启benchmark选项，此时就能得到测试的详细数据，包含运行环境信息（系统版本、CUDA版本、CUDNN版本、驱动版本），Paddle版本信息，参数设置信息（运行设备、线程数、是否开启内存优化等），模型信息（模型名称、精度），数据信息（batchsize、是否为动态shape等），性能信息（CPU,GPU的占用、运行耗时、预处理耗时、推理耗时、后处理耗时），内容如下所示：
 
 ```log
 [2022/06/07 17:01:41] root INFO: ---------------------- Env info ----------------------
