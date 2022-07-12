@@ -5,8 +5,9 @@
     - [1.2 模型细节](#1.2)
     - [1.3 实验结果](#1.3)
 - [2. 模型快速体验](#2)
-   - [2.1 安装 paddleclas](#2.1)
-   - [2.2 预测](#2.2)
+    - [2.1 安装 paddlepaddle](#2.1)
+    - [2.2 安装 paddleclas](#2.2)
+    - [2.3 预测](#2.3)
 - [3. 模型训练、评估和预测](#3)
     - [3.1 环境配置](#3.1)
     - [3.2 数据准备](#3.2)
@@ -88,24 +89,43 @@ PP-HGNet 与其他模型的比较如下，其中测试机器为 NVIDIA® Tesla®
 | ResNeXt101_32x48d_wsl    | 85.37      | 97.69       | 55.07       |
 | SwinTransformer_base     | 85.2       | 97.5        | 13.53       |  
 | <b>PPHGNet_base_ssld<b> | <b>85.00<b>| <b>97.35<b> | <b>5.97<b>   |
-
- 
-<a name="2"></a>   
     
+    
+<a name="2"></a>
+
 ## 2. 模型快速体验
 
-<a name="2.1"></a>   
-    
-### 2.1 安装 paddleclas
-    
-使用如下命令快速安装 paddlepaddle, paddleclas
-    
-```    
-pip3 install paddlepaddle paddleclas
+<a name="2.1"></a>  
+
+### 2.1 安装 paddlepaddle
+
+- 您的机器安装的是 CUDA9 或 CUDA10，请运行以下命令安装
+
+```bash
+python3 -m pip install paddlepaddle-gpu -i https://mirror.baidu.com/pypi/simple
 ```
-<a name="2.2"></a> 
+
+- 您的机器是CPU，请运行以下命令安装
+
+```bash
+python3 -m pip install paddlepaddle -i https://mirror.baidu.com/pypi/simple
+```
+
+更多的版本需求，请参照[飞桨官网安装文档](https://www.paddlepaddle.org.cn/install/quick)中的说明进行操作。
+
+<a name="2.2"></a>  
+
+### 2.2 安装 paddleclas
+
+使用如下命令快速安装 paddleclas
+
+```  
+pip3 install paddleclas
+```
+
+<a name="2.3"></a> 
     
-### 2.2 预测
+### 2.3 预测
 
 * 在命令行中使用 PPHGNet_small 的权重快速预测
     
@@ -149,7 +169,7 @@ print(next(result))
 
 ### 3.1 环境配置
 
-* 安装：请先参考 [Paddle 安装教程](../installation/install_paddle.md) 以及 [PaddleClas 安装教程](../installation/install_paddleclas.md) 配置 PaddleClas 运行环境。
+* 安装：请先参考文档[环境准备](../installation/install_paddleclas.md) 配置 PaddleClas 运行环境。
 
 <a name="3.2"></a> 
 
@@ -383,5 +403,5 @@ PaddleClas 提供了基于 Paddle Lite 来完成模型端侧部署的示例，�
     
 Paddle2ONNX 支持将 PaddlePaddle 模型格式转化到 ONNX 模型格式。通过 ONNX 可以完成将 Paddle 模型到多种推理引擎的部署，包括TensorRT/OpenVINO/MNN/TNN/NCNN，以及其它对 ONNX 开源格式进行支持的推理引擎或硬件。更多关于 Paddle2ONNX 的介绍，可以参考[Paddle2ONNX 代码仓库](https://github.com/PaddlePaddle/Paddle2ONNX)。
 
-PaddleClas 提供了基于 Paddle2ONNX 来完成 inference 模型转换 ONNX 模型并作推理预测的示例，您可以参考[Paddle2ONNX 模型转换与预测](@shuilong)来完成相应的部署工作。
+PaddleClas 提供了基于 Paddle2ONNX 来完成 inference 模型转换 ONNX 模型并作推理预测的示例，您可以参考[Paddle2ONNX 模型转换与预测](../../../deploy/paddle2onnx/readme.md)来完成相应的部署工作。
 

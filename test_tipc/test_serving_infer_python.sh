@@ -2,6 +2,7 @@
 source test_tipc/common_func.sh
 
 FILENAME=$1
+MODE=$2
 dataline=$(awk 'NR==1, NR==19{print}'  $FILENAME)
 
 # parser params
@@ -38,7 +39,7 @@ pipeline_py=$(func_parser_value "${lines[13]}")
 
 
 function func_serving_cls(){
-    LOG_PATH="test_tipc/output/${model_name}"
+    LOG_PATH="test_tipc/output/${model_name}/${MODE}"
     mkdir -p ${LOG_PATH}
     LOG_PATH="../../${LOG_PATH}"
     status_log="${LOG_PATH}/results_serving.log"
@@ -98,6 +99,8 @@ function func_serving_cls(){
 
             web_service_cmd="${python_} ${web_service_py} &"
             eval ${web_service_cmd}
+            last_status=${PIPESTATUS[0]}
+            status_check $last_status "${web_service_cmd}" "${status_log}" "${model_name}"
             sleep 5s
             for pipeline in ${pipeline_py[*]}; do
                 _save_log_path="${LOG_PATH}/server_infer_cpu_${pipeline%_client*}_batchsize_1.log"
@@ -130,6 +133,8 @@ function func_serving_cls(){
 
             web_service_cmd="${python_} ${web_service_py} & "
             eval ${web_service_cmd}
+            last_status=${PIPESTATUS[0]}
+            status_check $last_status "${web_service_cmd}" "${status_log}" "${model_name}"
             sleep 5s
             for pipeline in ${pipeline_py[*]}; do
                 _save_log_path="${LOG_PATH}/server_infer_gpu_${pipeline%_client*}_batchsize_1.log"
@@ -149,7 +154,7 @@ function func_serving_cls(){
 
 
 function func_serving_rec(){
-    LOG_PATH="test_tipc/output/${model_name}"
+    LOG_PATH="test_tipc/output/${model_name}/${MODE}"
     mkdir -p ${LOG_PATH}
     LOG_PATH="../../../${LOG_PATH}"
     status_log="${LOG_PATH}/results_serving.log"
@@ -237,6 +242,8 @@ function func_serving_rec(){
 
             web_service_cmd="${python} ${web_service_py} &"
             eval ${web_service_cmd}
+            last_status=${PIPESTATUS[0]}
+            status_check $last_status "${web_service_cmd}" "${status_log}" "${model_name}"
             sleep 5s
             for pipeline in ${pipeline_py[*]}; do
                 _save_log_path="${LOG_PATH}/server_infer_cpu_${pipeline%_client*}_batchsize_1.log"
@@ -269,6 +276,8 @@ function func_serving_rec(){
 
             web_service_cmd="${python} ${web_service_py} & "
             eval ${web_service_cmd}
+            last_status=${PIPESTATUS[0]}
+            status_check $last_status "${web_service_cmd}" "${status_log}" "${model_name}"
             sleep 10s
             for pipeline in ${pipeline_py[*]}; do
                 _save_log_path="${LOG_PATH}/server_infer_gpu_${pipeline%_client*}_batchsize_1.log"
@@ -288,9 +297,9 @@ function func_serving_rec(){
 
 
 # set cuda device
-GPUID=$2
+GPUID=$3
 if [ ${#GPUID} -le 0 ];then
-    env=" "
+    env="export CUDA_VISIBLE_DEVICES=0"
 else
     env="export CUDA_VISIBLE_DEVICES=${GPUID}"
 fi
@@ -302,7 +311,7 @@ echo "################### run test ###################"
 
 export Count=0
 IFS="|"
-if [[ ${model_name} =~ "ShiTu" ]]; then
+if [[ ${model_name} = "PPShiTu" ]]; then
     func_serving_rec
 else
     func_serving_cls

@@ -40,7 +40,7 @@
 
 ## 1. 模型和应用场景介绍
 
-该案例提供了用户使用 PaddleClas 的超轻量图像分类方案（PULC，Practical Ultra Lightweight Classification）快速构建轻量级、高精度、可落地的交通标志分类模型。该模型可以广泛应用于自动驾驶、道路监控等场景。
+该案例提供了用户使用 PaddleClas 的超轻量图像分类方案（PULC，Practical Ultra Lightweight image Classification）快速构建轻量级、高精度、可落地的交通标志分类模型。该模型可以广泛应用于自动驾驶、道路监控等场景。
 
 下表列出了不同交通标志分类模型的相关指标，前两行展现了使用 SwinTranformer_tiny 和 MobileNetV3_small_x0_35 作为 backbone 训练得到的模型的相关指标，第三行至第六行依次展现了替换 backbone 为 PPLCNet_x1_0、使用 SSLD 预训练模型、使用 SSLD 预训练模型 + EDA 策略、使用 SSLD 预训练模型 + EDA 策略 + SKL-UGI 知识蒸馏策略训练得到的模型的相关指标。
 
@@ -66,9 +66,9 @@
 ## 2. 模型快速体验
 
 <a name="2.1"></a>  
-    
+
 ### 2.1 安装 paddlepaddle
-    
+
 - 您的机器安装的是 CUDA9 或 CUDA10，请运行以下命令安装
 
 ```bash
@@ -80,23 +80,23 @@ python3 -m pip install paddlepaddle-gpu -i https://mirror.baidu.com/pypi/simple
 ```bash
 python3 -m pip install paddlepaddle -i https://mirror.baidu.com/pypi/simple
 ```
-    
+
 更多的版本需求，请参照[飞桨官网安装文档](https://www.paddlepaddle.org.cn/install/quick)中的说明进行操作。
-    
+
 <a name="2.2"></a>  
-    
+
 ### 2.2 安装 paddleclas
 
 使用如下命令快速安装 paddleclas
 
 ```  
 pip3 install paddleclas
-``` 
-    
+```
+
 <a name="2.3"></a>
 
 ### 2.3 预测
-    
+
 点击[这里](https://paddleclas.bj.bcebos.com/data/PULC/pulc_demo_imgs.zip)下载 demo 数据并解压，然后在终端中切换到相应目录。
 
 * 使用命令行快速预测
@@ -344,7 +344,7 @@ python3 -m paddle.distributed.launch \
 
 ## 5. 超参搜索
 
-在 [3.2 节](#3.2)和 [4.1 节](#4.1)所使用的超参数是根据 PaddleClas 提供的 `SHAS 超参数搜索策略` 搜索得到的，如果希望在自己的数据集上得到更好的结果，可以参考[SHAS 超参数搜索策略](PULC_train.md#4-超参搜索)来获得更好的训练超参数。
+在 [3.2 节](#3.2)和 [4.1 节](#4.1)所使用的超参数是根据 PaddleClas 提供的 `超参数搜索策略` 搜索得到的，如果希望在自己的数据集上得到更好的结果，可以参考[超参数搜索策略](PULC_train.md#4-超参搜索)来获得更好的训练超参数。
 
 **备注：** 此部分内容是可选内容，搜索过程需要较长的时间，您可以根据自己的硬件情况来选择执行。如果没有更换数据集，可以忽略此节内容。
 

@@ -39,26 +39,26 @@
 
 ## 1. 模型和应用场景介绍
 
-该案例提供了用户使用 PaddleClas 的超轻量图像分类方案（PULC，Practical Ultra Lightweight Classification）快速构建轻量级、高精度、可落地的“是否佩戴安全帽”的二分类模型。该模型可以广泛应用于如建筑施工场景、工厂车间场景、交通场景等。
+该案例提供了用户使用 PaddleClas 的超轻量图像分类方案（PULC，Practical Ultra Lightweight image Classification）快速构建轻量级、高精度、可落地的“是否佩戴安全帽”的二分类模型。该模型可以广泛应用于如建筑施工场景、工厂车间场景、交通场景等。
 
-下表列出了判断图片中是否佩戴安全帽的二分类模型的相关指标，展现了使用 Res2Net200_vd_26w_4s，SwinTranformer_tiny 和 MobileNetV3_large_x1_0 作为 backbone 训练得到的模型的相关指标，第三行至第六行依次展现了替换 backbone 为 PPLCNet_x1_0、使用 SSLD 预训练模型、使用 SSLD 预训练模型 + EDA 策略、使用 SSLD 预训练模型 + EDA 策略 + UDML 知识蒸馏策略训练得到的模型的相关指标。
+下表列出了判断图片中是否佩戴安全帽的二分类模型的相关指标，前三行展现了使用 Res2Net200_vd_26w_4s，SwinTranformer_tiny 和 MobileNetV3_small_x0_35 作为 backbone 训练得到的模型的相关指标，第四行至第七行依次展现了替换 backbone 为 PPLCNet_x1_0、使用 SSLD 预训练模型、使用 SSLD 预训练模型 + EDA 策略、使用 SSLD 预训练模型 + EDA 策略 + UDML 知识蒸馏策略训练得到的模型的相关指标。
 
 | 模型 | Tpr（%） | 延时（ms） | 存储（M） | 策略 |
 |-------|-----------|----------|---------------|---------------|
-| SwinTranformer_tiny  | 93.57 | 91.32  | 107 | 使用ImageNet预训练模型 |
+| SwinTranformer_tiny  | 93.57 | 91.32  | 111 | 使用ImageNet预训练模型 |
 | Res2Net200_vd_26w_4s  | 98.92 | 80.99 | 284 | 使用ImageNet预训练模型 |
-| MobileNetV3_small_x0_35  | 84.83 | 2.85 | 1.6 | 使用ImageNet预训练模型 |
-| PPLCNet_x1_0  | 93.27 | 2.03  | 6.5 | 使用ImageNet预训练模型 |
-| PPLCNet_x1_0  | 98.16 | 2.03  | 6.5 | 使用SSLD预训练模型 |
-| PPLCNet_x1_0  | 99.30 | 2.03  | 6.5 | 使用SSLD预训练模型+EDA策略|
-| <b>PPLCNet_x1_0<b>  | <b>99.38<b> | <b>2.03<b>  | <b>6.5<b> | 使用SSLD预训练模型+EDA策略+UDML知识蒸馏策略|
+| MobileNetV3_small_x0_35  | 84.83 | 2.85 | 2.6 | 使用ImageNet预训练模型 |
+| PPLCNet_x1_0  | 93.27 | 2.03  | 7.1 | 使用ImageNet预训练模型 |
+| PPLCNet_x1_0  | 98.16 | 2.03  | 7.1 | 使用SSLD预训练模型 |
+| PPLCNet_x1_0  | 99.30 | 2.03  | 7.1 | 使用SSLD预训练模型+EDA策略|
+| <b>PPLCNet_x1_0<b>  | <b>99.38<b> | <b>2.03<b>  | <b>7.1<b> | 使用SSLD预训练模型+EDA策略+UDML知识蒸馏策略|
 
-从表中可以看出，在使用服务器端大模型作为 backbone 时，SwinTranformer_tiny 精度较低，Res2Net200_vd_26w_4s 精度较高，但服务器端大模型推理速度普遍较慢。将 backboone 替换为轻量级模型 MobileNetV3_small_x0_35 后，速度可以大幅提升，但是精度显著降低。在将 backbone 替换为 PPLCNet_x1_0 后，精度较 MobileNetV3_small_x0_35 提高约 8.5 个百分点，与此同时速度快 20% 以上。在此基础上，将 PPLCNet_x1_0 的预训练模型替换为 SSLD 预训练模型后，在对推理速度无影响的前提下，精度提升约 4.9 个百分点，进一步地使用 EDA 策略后，精度可以再提升 1.1 个百分点。此时，PPLCNet_x1_0 已经超过 Res2Net200_vd_26w_4s 模型的精度，但是速度快 70+ 倍。最后，在使用 UDML 知识蒸馏后，精度可以再提升 0.08 个百分点。下面详细介绍关于 PULC 安全帽模型的训练方法和推理部署方法。
+从表中可以看出，在使用服务器端大模型作为 backbone 时，SwinTranformer_tiny 精度较低，Res2Net200_vd_26w_4s 精度较高，但服务器端大模型推理速度普遍较慢。将 backbone 替换为轻量级模型 MobileNetV3_small_x0_35 后，速度可以大幅提升，但是精度显著降低。在将 backbone 替换为 PPLCNet_x1_0 后，精度较 MobileNetV3_small_x0_35 提高约 8.5 个百分点，与此同时速度快 20% 以上。在此基础上，将 PPLCNet_x1_0 的预训练模型替换为 SSLD 预训练模型后，在对推理速度无影响的前提下，精度提升约 4.9 个百分点，进一步地使用 EDA 策略后，精度可以再提升 1.1 个百分点。此时，PPLCNet_x1_0 已经超过 Res2Net200_vd_26w_4s 模型的精度，但是速度快 70+ 倍。最后，在使用 UDML 知识蒸馏后，精度可以再提升 0.08 个百分点。下面详细介绍关于 PULC 安全帽模型的训练方法和推理部署方法。
 
 **备注：**
 
 * `Tpr`指标的介绍可以参考 [3.3小节](#3.3)的备注部分，延时是基于 Intel(R) Xeon(R) Gold 6148 CPU @ 2.40GHz 测试得到，开启MKLDNN加速策略，线程数为10。
-    
+
 * 关于PP-LCNet的介绍可以参考[PP-LCNet介绍](../models/PP-LCNet.md)，相关论文可以查阅[PP-LCNet paper](https://arxiv.org/abs/2109.15099)。
 
 
@@ -67,9 +67,9 @@
 ## 2. 模型快速体验
 
 <a name="2.1"></a>  
-    
+
 ### 2.1 安装 paddlepaddle
-    
+
 - 您的机器安装的是 CUDA9 或 CUDA10，请运行以下命令安装
 
 ```bash
@@ -81,23 +81,23 @@ python3 -m pip install paddlepaddle-gpu -i https://mirror.baidu.com/pypi/simple
 ```bash
 python3 -m pip install paddlepaddle -i https://mirror.baidu.com/pypi/simple
 ```
-    
+
 更多的版本需求，请参照[飞桨官网安装文档](https://www.paddlepaddle.org.cn/install/quick)中的说明进行操作。
-    
+
 <a name="2.2"></a>  
-    
+
 ### 2.2 安装 paddleclas
 
 使用如下命令快速安装 paddleclas
 
 ```  
 pip3 install paddleclas
-``` 
-    
+```
+
 <a name="2.3"></a>
 
 ### 2.3 预测
-    
+
 点击[这里](https://paddleclas.bj.bcebos.com/data/PULC/pulc_demo_imgs.zip)下载 demo 数据并解压，然后在终端中切换到相应目录。
 
 * 使用命令行快速预测
@@ -295,7 +295,7 @@ python3 -m paddle.distributed.launch \
 
 ## 5. 超参搜索
 
-在 [3.2 节](#3.2)和 [4.1 节](#4.1)所使用的超参数是根据 PaddleClas 提供的 `SHAS 超参数搜索策略` 搜索得到的，如果希望在自己的数据集上得到更好的结果，可以参考[SHAS 超参数搜索策略](PULC_train.md#4-超参搜索)来获得更好的训练超参数。
+在 [3.2 节](#3.2)和 [4.1 节](#4.1)所使用的超参数是根据 PaddleClas 提供的 `超参数搜索策略` 搜索得到的，如果希望在自己的数据集上得到更好的结果，可以参考[超参数搜索策略](PULC_train.md#4-超参搜索)来获得更好的训练超参数。
 
 **备注**：此部分内容是可选内容，搜索过程需要较长的时间，您可以根据自己的硬件情况来选择执行。如果没有更换数据集，可以忽略此节内容。
 
@@ -374,7 +374,7 @@ cd ../
 
 ```shell
 # 使用下面的命令使用 GPU 进行预测
-c
+python3.7 python/predict_cls.py -c configs/PULC/safety_helmet/inference_safety_helmet.yaml
 # 使用下面的命令使用 CPU 进行预测
 python3.7 python/predict_cls.py -c configs/PULC/safety_helmet/inference_safety_helmet.yaml -o Global.use_gpu=False
 ```

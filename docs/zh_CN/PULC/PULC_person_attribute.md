@@ -40,25 +40,26 @@
 
 ## 1. 模型和应用场景介绍
 
-该案例提供了用户使用 PaddleClas 的超轻量图像分类方案（PULC，Practical Ultra Lightweight Classification）快速构建轻量级、高精度、可落地的人体属性识别模型。该模型可以广泛应用于行人分析、行人跟踪等场景。
+该案例提供了用户使用 PaddleClas 的超轻量图像分类方案（PULC，Practical Ultra Lightweight image Classification）快速构建轻量级、高精度、可落地的人体属性识别模型。该模型可以广泛应用于行人分析、行人跟踪等场景。
 
-下表列出了不同人体属性识别模型的相关指标，前两行展现了使用 SwinTransformer_tiny、Res2Net200_vd_26w_4s 和 MobileNetV3_small_x0_35 作为 backbone 训练得到的模型的相关指标，第三行至第六行依次展现了替换 backbone 为 PPLCNet_x1_0、使用 SSLD 预训练模型、使用 SSLD 预训练模型 + EDA 策略、使用 SSLD 预训练模型 + EDA 策略 + SKL-UGI 知识蒸馏策略训练得到的模型的相关指标。
+下表列出了不同人体属性识别模型的相关指标，前三行展现了使用 SwinTransformer_tiny、Res2Net200_vd_26w_4s 和 MobileNetV3_small_x0_35 作为 backbone 训练得到的模型的相关指标，第四行至第七行依次展现了替换 backbone 为 PPLCNet_x1_0、使用 SSLD 预训练模型、使用 SSLD 预训练模型 + EDA 策略、使用 SSLD 预训练模型 + EDA 策略 + SKL-UGI 知识蒸馏策略训练得到的模型的相关指标。
 
 
-| 模型 | ma（%） | 延时（ms） | 存储（M） | 策略 |
+| 模型 | mA（%） | 延时（ms） | 存储（M） | 策略 |
 |-------|-----------|----------|---------------|---------------|
 | Res2Net200_vd_26w_4s  | 81.25 | 77.51  | 293 | 使用ImageNet预训练模型 |
-| SwinTransformer_tiny  | 80.17 | 89.51  | 107 | 使用ImageNet预训练模型 |
+| SwinTransformer_tiny  | 80.17 | 89.51  | 111 | 使用ImageNet预训练模型 |
 | MobileNetV3_small_x0_35  | 70.79 | 2.90  | 1.7 | 使用ImageNet预训练模型 |
-| PPLCNet_x1_0  | 76.31 | 2.01  | 6.6 | 使用ImageNet预训练模型 |
-| PPLCNet_x1_0  | 77.31 | 2.01  | 6.6 | 使用SSLD预训练模型 |
-| PPLCNet_x1_0  | 77.71 | 2.01  | 6.6 | 使用SSLD预训练模型+EDA策略|
-| <b>PPLCNet_x1_0<b>  | <b>78.59<b> | <b>2.01<b>  | <b>6.6<b> | 使用SSLD预训练模型+EDA策略+SKL-UGI知识蒸馏策略|
+| PPLCNet_x1_0  | 76.31 | 2.01  | 7.1 | 使用ImageNet预训练模型 |
+| PPLCNet_x1_0  | 77.31 | 2.01  | 7.1 | 使用SSLD预训练模型 |
+| PPLCNet_x1_0  | 77.71 | 2.01  | 7.1 | 使用SSLD预训练模型+EDA策略|
+| <b>PPLCNet_x1_0<b>  | <b>78.59<b> | <b>2.01<b>  | <b>7.1<b> | 使用SSLD预训练模型+EDA策略+SKL-UGI知识蒸馏策略|
 
 从表中可以看出，backbone 为 Res2Net200_vd_26w_4s 和 SwinTransformer_tiny 时精度较高，但是推理速度较慢。将 backbone 替换为轻量级模型 MobileNetV3_small_x0_35 后，速度可以大幅提升，但是精度也大幅下降。将 backbone 替换为 PPLCNet_x1_0 时，精度较 MobileNetV3_small_x0_35 高 5.5%，于此同时，速度更快。在此基础上，使用 SSLD 预训练模型后，在不改变推理速度的前提下，精度可以提升 1%，进一步地，当融合EDA策略后，精度可以再提升 0.4%，最后，在使用 SKL-UGI 知识蒸馏后，精度可以继续提升 0.88%。此时，PPLCNet_x1_0 的精度与 SwinTransformer_tiny 仅相差1.58%，但是速度快 44 倍。关于 PULC 的训练方法和推理部署方法将在下面详细介绍。
 
 **备注：**
 
+* 延时是基于 Intel(R) Xeon(R) Gold 6148 CPU @ 2.40GHz 测试得到，开启 MKLDNN 加速策略，线程数为10。
 * 关于PP-LCNet的介绍可以参考[PP-LCNet介绍](../models/PP-LCNet.md)，相关论文可以查阅[PP-LCNet paper](https://arxiv.org/abs/2109.15099)。
 
 
@@ -67,9 +68,9 @@
 ## 2. 模型快速体验
 
 <a name="2.1"></a>  
-    
+
 ### 2.1 安装 paddlepaddle
-    
+
 - 您的机器安装的是 CUDA9 或 CUDA10，请运行以下命令安装
 
 ```bash
@@ -81,23 +82,23 @@ python3 -m pip install paddlepaddle-gpu -i https://mirror.baidu.com/pypi/simple
 ```bash
 python3 -m pip install paddlepaddle -i https://mirror.baidu.com/pypi/simple
 ```
-    
+
 更多的版本需求，请参照[飞桨官网安装文档](https://www.paddlepaddle.org.cn/install/quick)中的说明进行操作。
-    
+
 <a name="2.2"></a>  
-    
+
 ### 2.2 安装 paddleclas
 
 使用如下命令快速安装 paddleclas
 
 ```  
 pip3 install paddleclas
-``` 
-    
+```
+
 <a name="2.3"></a>
 
 ### 2.3 预测
-    
+
 点击[这里](https://paddleclas.bj.bcebos.com/data/PULC/pulc_demo_imgs.zip)下载 demo 数据并解压，然后在终端中切换到相应目录。
 
 * 使用命令行快速预测
@@ -223,7 +224,7 @@ python3 -m paddle.distributed.launch \
         -c ./ppcls/configs/PULC/person_attribute/PPLCNet_x1_0.yaml
 ```
 
-验证集的最佳指标在 `90.07%` 左右（数据集较小，一般有0.3%左右的波动）。
+验证集的最佳指标在 `77.71%` 左右（数据集较小，一般有0.3%左右的波动）。
 
 
 <a name="3.4"></a>
@@ -313,7 +314,7 @@ python3 -m paddle.distributed.launch \
 
 ## 5. 超参搜索
 
-在 [3.2 节](#3.2)和 [4.1 节](#4.1)所使用的超参数是根据 PaddleClas 提供的 `SHAS 超参数搜索策略` 搜索得到的，如果希望在自己的数据集上得到更好的结果，可以参考[SHAS 超参数搜索策略](PULC_train.md#4-超参搜索)来获得更好的训练超参数。
+在 [3.2 节](#3.2)和 [4.1 节](#4.1)所使用的超参数是根据 PaddleClas 提供的 `超参数搜索策略` 搜索得到的，如果希望在自己的数据集上得到更好的结果，可以参考[超参数搜索策略](PULC_train.md#4-超参搜索)来获得更好的训练超参数。
 
 **备注：** 此部分内容是可选内容，搜索过程需要较长的时间，您可以根据自己的硬件情况来选择执行。如果没有更换数据集，可以忽略此节内容。
 
