@@ -17,8 +17,7 @@
 #include <numeric>
 
 namespace PPShiTu {
-void FeatureExtract::RunRecModel(const cv::Mat &img,
-                                 double &cost_time,
+void FeatureExtract::RunRecModel(const cv::Mat &img, double &cost_time,
                                  std::vector<float> &feature) {
   // Read img
   cv::Mat img_fp;
@@ -34,7 +33,7 @@ void FeatureExtract::RunRecModel(const cv::Mat &img,
 
   // const float *dimg = reinterpret_cast<const float *>(img_fp.data);
   // NeonMeanScale(dimg, data0, img_fp.rows * img_fp.cols);
-  for(int i=0; i < input.size(); ++i){
+  for (int i = 0; i < input.size(); ++i) {
     data0[i] = input[i];
   }
 
@@ -44,7 +43,7 @@ void FeatureExtract::RunRecModel(const cv::Mat &img,
 
   // Get output and post process
   std::unique_ptr<const Tensor> output_tensor(
-      std::move(this->predictor->GetOutput(0)));  //only one output
+      std::move(this->predictor->GetOutput(0))); // only one output
   auto end = std::chrono::system_clock::now();
   auto duration =
       std::chrono::duration_cast<std::chrono::microseconds>(end - start);
@@ -52,7 +51,7 @@ void FeatureExtract::RunRecModel(const cv::Mat &img,
               std::chrono::microseconds::period::num /
               std::chrono::microseconds::period::den;
 
-  //do postprocess
+  // do postprocess
   int output_size = 1;
   for (auto dim : output_tensor->shape()) {
     output_size *= dim;
@@ -60,15 +59,15 @@ void FeatureExtract::RunRecModel(const cv::Mat &img,
   feature.resize(output_size);
   output_tensor->CopyToCpu(feature.data());
 
-  //postprocess include sqrt or binarize.
+  // postprocess include sqrt or binarize.
   FeatureNorm(feature);
   return;
 }
 
-void FeatureExtract::FeatureNorm(std::vector<float> &feature){
-    float feature_sqrt = std::sqrt(std::inner_product(
-	    feature.begin(), feature.end(), feature.begin(), 0.0f));
-    for (int i = 0; i < feature.size(); ++i)
-	feature[i] /= feature_sqrt;
+void FeatureExtract::FeatureNorm(std::vector<float> &feature) {
+  float feature_sqrt = std::sqrt(std::inner_product(
+      feature.begin(), feature.end(), feature.begin(), 0.0f));
+  for (int i = 0; i < feature.size(); ++i)
+    feature[i] /= feature_sqrt;
 }
-}
+} // namespace PPShiTu

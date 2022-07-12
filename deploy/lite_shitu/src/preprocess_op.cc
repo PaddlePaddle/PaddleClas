@@ -47,7 +47,7 @@ void NormalizeImage::Run(cv::Mat *im, ImageBlob *data) {
 }
 
 void NormalizeImage::Run_feature(cv::Mat *im, const std::vector<float> &mean,
-                         const std::vector<float> &std, float scale) {
+                                 const std::vector<float> &std, float scale) {
   (*im).convertTo(*im, CV_32FC3, scale);
   for (int h = 0; h < im->rows; h++) {
     for (int w = 0; w < im->cols; w++) {
@@ -127,8 +127,8 @@ std::pair<float, float> Resize::GenerateScale(const cv::Mat &im) {
   return resize_scale;
 }
 
-void Resize::Run_feature(const cv::Mat &img, cv::Mat &resize_img, int resize_short_size,
-                 int size) {
+void Resize::Run_feature(const cv::Mat &img, cv::Mat &resize_img,
+                         int resize_short_size, int size) {
   int resize_h = 0;
   int resize_w = 0;
   if (size > 0) {

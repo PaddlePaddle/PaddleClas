@@ -54,9 +54,7 @@ void nms(std::vector<ObjectResult> &input_boxes, float nms_threshold,
   }
 }
 
-
-float RectOverlap(const ObjectResult &a,
-                  const ObjectResult &b) {
+float RectOverlap(const ObjectResult &a, const ObjectResult &b) {
   float Aa = (a.rect[2] - a.rect[0] + 1) * (a.rect[3] - a.rect[1] + 1);
   float Ab = (b.rect[2] - b.rect[0] + 1) * (b.rect[3] - b.rect[1] + 1);
 
