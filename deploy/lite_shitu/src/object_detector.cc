@@ -13,9 +13,9 @@
 // limitations under the License.
 #include <sstream>
 // for setprecision
+#include "include/object_detector.h"
 #include <chrono>
 #include <iomanip>
-#include "include/object_detector.h"
 
 namespace PPShiTu {
 
@@ -30,10 +30,10 @@ void ObjectDetector::LoadModel(std::string model_file, int num_theads) {
 }
 
 // Visualiztion MaskDetector results
-cv::Mat VisualizeResult(const cv::Mat& img,
-                        const std::vector<PPShiTu::ObjectResult>& results,
-                        const std::vector<std::string>& lables,
-                        const std::vector<int>& colormap,
+cv::Mat VisualizeResult(const cv::Mat &img,
+                        const std::vector<PPShiTu::ObjectResult> &results,
+                        const std::vector<std::string> &lables,
+                        const std::vector<int> &colormap,
                         const bool is_rbox = false) {
   cv::Mat vis_img = img.clone();
   for (int i = 0; i < results.size(); ++i) {
@@ -75,24 +75,18 @@ cv::Mat VisualizeResult(const cv::Mat& img,
     origin.y = results[i].rect[1];
 
     // Configure text background
-    cv::Rect text_back = cv::Rect(results[i].rect[0],
-                                  results[i].rect[1] - text_size.height,
-                                  text_size.width,
-                                  text_size.height);
+    cv::Rect text_back =
+        cv::Rect(results[i].rect[0], results[i].rect[1] - text_size.height,
+                 text_size.width, text_size.height);
     // Draw text, and background
     cv::rectangle(vis_img, text_back, roi_color, -1);
-    cv::putText(vis_img,
-                text,
-                origin,
-                font_face,
-                font_scale,
-                cv::Scalar(255, 255, 255),
-                thickness);
+    cv::putText(vis_img, text, origin, font_face, font_scale,
+                cv::Scalar(255, 255, 255), thickness);
   }
   return vis_img;
 }
 
-void ObjectDetector::Preprocess(const cv::Mat& ori_im) {
+void ObjectDetector::Preprocess(const cv::Mat &ori_im) {
   // Clone the image : keep the original mat for postprocess
   cv::Mat im = ori_im.clone();
   // cv::cvtColor(im, im, cv::COLOR_BGR2RGB);
@@ -100,7 +94,7 @@ void ObjectDetector::Preprocess(const cv::Mat& ori_im) {
 }
 
 void ObjectDetector::Postprocess(const std::vector<cv::Mat> mats,
-                                 std::vector<PPShiTu::ObjectResult>* result,
+                                 std::vector<PPShiTu::ObjectResult> *result,
                                  std::vector<int> bbox_num,
                                  bool is_rbox = false) {
   result->clear();
@@ -156,12 +150,11 @@ void ObjectDetector::Postprocess(const std::vector<cv::Mat> mats,
   }
 }
 
-void ObjectDetector::Predict(const std::vector<cv::Mat>& imgs,
-                             const int warmup,
+void ObjectDetector::Predict(const std::vector<cv::Mat> &imgs, const int warmup,
                              const int repeats,
-                             std::vector<PPShiTu::ObjectResult>* result,
-                             std::vector<int>* bbox_num,
-                             std::vector<double>* times) {
+                             std::vector<PPShiTu::ObjectResult> *result,
+                             std::vector<int> *bbox_num,
+                             std::vector<double> *times) {
   auto preprocess_start = std::chrono::steady_clock::now();
   int batch_size = imgs.size();
 
@@ -180,29 +173,29 @@ void ObjectDetector::Predict(const std::vector<cv::Mat>& imgs,
     scale_factor_all[bs_idx * 2 + 1] = inputs_.scale_factor_[1];
 
     // TODO: reduce cost time
-    in_data_all.insert(
-        in_data_all.end(), inputs_.im_data_.begin(), inputs_.im_data_.end());
+    in_data_all.insert(in_data_all.end(), inputs_.im_data_.begin(),
+                       inputs_.im_data_.end());
   }
   auto preprocess_end = std::chrono::steady_clock::now();
   std::vector<const float *> output_data_list_;
   // Prepare input tensor
 
   auto input_names = predictor_->GetInputNames();
-  for (const auto& tensor_name : input_names) {
+  for (const auto &tensor_name : input_names) {
     auto in_tensor = predictor_->GetInputByName(tensor_name);
     if (tensor_name == "image") {
       int rh = inputs_.in_net_shape_[0];
       int rw = inputs_.in_net_shape_[1];
       in_tensor->Resize({batch_size, 3, rh, rw});
-      auto* inptr = in_tensor->mutable_data<float>();
+      auto *inptr = in_tensor->mutable_data<float>();
       std::copy_n(in_data_all.data(), in_data_all.size(), inptr);
     } else if (tensor_name == "im_shape") {
       in_tensor->Resize({batch_size, 2});
-      auto* inptr = in_tensor->mutable_data<float>();
+      auto *inptr = in_tensor->mutable_data<float>();
       std::copy_n(im_shape_all.data(), im_shape_all.size(), inptr);
     } else if (tensor_name == "scale_factor") {
       in_tensor->Resize({batch_size, 2});
-      auto* inptr = in_tensor->mutable_data<float>();
+      auto *inptr = in_tensor->mutable_data<float>();
       std::copy_n(scale_factor_all.data(), scale_factor_all.size(), inptr);
     }
   }
@@ -216,7 +209,7 @@ void ObjectDetector::Predict(const std::vector<cv::Mat>& imgs,
     if (config_.arch_ == "PicoDet") {
       for (int j = 0; j < output_names.size(); j++) {
         auto output_tensor = predictor_->GetTensor(output_names[j]);
-        const float* outptr = output_tensor->data<float>();
+        const float *outptr = output_tensor->data<float>();
         std::vector<int64_t> output_shape = output_tensor->shape();
         output_data_list_.push_back(outptr);
       }
@@ -242,7 +235,7 @@ void ObjectDetector::Predict(const std::vector<cv::Mat>& imgs,
   if (config_.arch_ == "PicoDet") {
     for (int i = 0; i < output_names.size(); i++) {
       auto output_tensor = predictor_->GetTensor(output_names[i]);
-      const float* outptr = output_tensor->data<float>();
+      const float *outptr = output_tensor->data<float>();
       std::vector<int64_t> output_shape = output_tensor->shape();
       if (i == 0) {
         num_class = output_shape[2];
@@ -268,16 +261,15 @@ void ObjectDetector::Predict(const std::vector<cv::Mat>& imgs,
       std::cerr << "[WARNING] No object detected." << std::endl;
     }
     output_data_.resize(output_size);
-    std::copy_n(
-        output_tensor->mutable_data<float>(), output_size, output_data_.data());
+    std::copy_n(output_tensor->mutable_data<float>(), output_size,
+                output_data_.data());
 
     int out_bbox_num_size = 1;
     for (int j = 0; j < out_bbox_num_shape.size(); ++j) {
       out_bbox_num_size *= out_bbox_num_shape[j];
     }
     out_bbox_num_data_.resize(out_bbox_num_size);
-    std::copy_n(out_bbox_num->mutable_data<int>(),
-                out_bbox_num_size,
+    std::copy_n(out_bbox_num->mutable_data<int>(), out_bbox_num_size,
                 out_bbox_num_data_.data());
   }
   // Postprocessing result
@@ -285,9 +277,8 @@ void ObjectDetector::Predict(const std::vector<cv::Mat>& imgs,
   result->clear();
   if (config_.arch_ == "PicoDet") {
     PPShiTu::PicoDetPostProcess(
-        result, output_data_list_, config_.fpn_stride_, 
-        inputs_.im_shape_, inputs_.scale_factor_,
-        config_.nms_info_["score_threshold"].as<float>(), 
+        result, output_data_list_, config_.fpn_stride_, inputs_.im_shape_,
+        inputs_.scale_factor_, config_.nms_info_["score_threshold"].as<float>(),
         config_.nms_info_["nms_threshold"].as<float>(), num_class, reg_max);
     bbox_num->push_back(result->size());
   } else {
@@ -326,4 +317,4 @@ std::vector<int> GenerateColorMap(int num_class) {
   return colormap;
 }
 
-}  // namespace PPShiTu
+} // namespace PPShiTu

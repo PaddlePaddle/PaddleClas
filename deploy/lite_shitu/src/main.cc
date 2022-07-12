@@ -27,8 +27,8 @@
 #include "include/feature_extractor.h"
 #include "include/object_detector.h"
 #include "include/preprocess_op.h"
-#include "include/vector_search.h"
 #include "include/utils.h"
+#include "include/vector_search.h"
 #include "json/json.h"
 
 Json::Value RT_Config;
@@ -216,7 +216,7 @@ int main(int argc, char **argv) {
 
       // add the whole image for recognition to improve recall
       PPShiTu::ObjectResult result_whole_img = {
-	 {0, 0, srcimg.cols, srcimg.rows}, 0, 1.0};
+          {0, 0, srcimg.cols, srcimg.rows}, 0, 1.0};
       det_result.push_back(result_whole_img);
 
       // get rec result
@@ -233,9 +233,10 @@ int main(int argc, char **argv) {
       // do vectore search
       search_result = searcher.Search(features.data(), det_result.size());
       for (int i = 0; i < det_result.size(); ++i) {
-	det_result[i].confidence = search_result.D[search_result.return_k * i];
+        det_result[i].confidence = search_result.D[search_result.return_k * i];
       }
-      NMSBoxes(det_result, searcher.GetThreshold(), rec_nms_threshold, indeices);
+      NMSBoxes(det_result, searcher.GetThreshold(), rec_nms_threshold,
+               indeices);
       PrintResult(img_path, det_result, searcher, search_result);
 
       batch_imgs.clear();
@@ -243,7 +244,6 @@ int main(int argc, char **argv) {
       features.clear();
       feature.clear();
       indeices.clear();
-
     }
   }
   return 0;

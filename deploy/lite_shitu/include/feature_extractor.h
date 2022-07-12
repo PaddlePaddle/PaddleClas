@@ -18,13 +18,13 @@
 #include <arm_neon.h>
 #include <chrono>
 #include <fstream>
+#include <include/preprocess_op.h>
 #include <iostream>
 #include <math.h>
 #include <opencv2/opencv.hpp>
 #include <stdlib.h>
 #include <sys/time.h>
 #include <vector>
-#include <include/preprocess_op.h>
 
 using namespace paddle::lite_api; // NOLINT
 using namespace std;
@@ -72,13 +72,14 @@ public:
     }
   }
 
-  void RunRecModel(const cv::Mat &img, double &cost_time, std::vector<float> &feature);
-  //void PostProcess(std::vector<float> &feature);
+  void RunRecModel(const cv::Mat &img, double &cost_time,
+                   std::vector<float> &feature);
+  // void PostProcess(std::vector<float> &feature);
   void FeatureNorm(std::vector<float> &featuer);
 
 private:
   std::shared_ptr<PaddlePredictor> predictor;
-  //std::vector<std::string> label_list;
+  // std::vector<std::string> label_list;
   std::vector<float> mean = {0.485f, 0.456f, 0.406f};
   std::vector<float> std = {0.229f, 0.224f, 0.225f};
   double scale = 0.00392157;

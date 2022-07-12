@@ -43,12 +43,11 @@ void nms(std::vector<ObjectResult> &input_boxes, float nms_threshold,
 
 template <typename T>
 static inline bool SortScorePairDescend(const std::pair<float, T> &pair1,
-		const std::pair<float, T> &pair2){
+                                        const std::pair<float, T> &pair2) {
   return pair1.first > pair2.first;
 }
 
-float RectOverlap(const ObjectResult &a,
-                  const ObjectResult &b);
+float RectOverlap(const ObjectResult &a, const ObjectResult &b);
 
 inline void
 GetMaxScoreIndex(const std::vector<ObjectResult> &det_result,

@@ -70,4 +70,4 @@ private:
   std::vector<faiss::Index::idx_t> I;
   SearchResult sr;
 };
-}
+} // namespace PPShiTu
