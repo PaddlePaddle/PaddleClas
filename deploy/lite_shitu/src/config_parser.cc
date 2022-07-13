@@ -29,4 +29,4 @@ void load_jsonf(std::string jsonfile, Json::Value &jsondata) {
   }
 }
 
-}  // namespace PPShiTu
+} // namespace PPShiTu

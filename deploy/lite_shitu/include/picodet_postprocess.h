@@ -14,25 +14,23 @@
 
 #pragma once
 
-#include <string>
-#include <vector>
-#include <memory>
-#include <utility>
 #include <ctime>
+#include <memory>
 #include <numeric>
+#include <string>
+#include <utility>
+#include <vector>
 
 #include "include/utils.h"
 
 namespace PPShiTu {
 
-void PicoDetPostProcess(std::vector<PPShiTu::ObjectResult>* results,
-                         std::vector<const float *> outs,
-                         std::vector<int> fpn_stride,
-                         std::vector<float> im_shape,
-                         std::vector<float> scale_factor,
-                         float score_threshold = 0.3,
-                         float nms_threshold = 0.5,
-                         int num_class = 80,
-                         int reg_max = 7);
+void PicoDetPostProcess(std::vector<PPShiTu::ObjectResult> *results,
+                        std::vector<const float *> outs,
+                        std::vector<int> fpn_stride,
+                        std::vector<float> im_shape,
+                        std::vector<float> scale_factor,
+                        float score_threshold = 0.3, float nms_threshold = 0.5,
+                        int num_class = 80, int reg_max = 7);
 
-}  // namespace PPShiTu
+} // namespace PPShiTu
