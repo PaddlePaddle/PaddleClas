@@ -59,13 +59,15 @@ function func_paddle2onnx(){
     status_check $last_status "${trans_model_cmd}" "${status_log}" "${model_name}"
 
     # python inference
-    set_model_dir=$(func_set_params "${inference_model_dir_key}" "${inference_model_dir_value}")
-    set_use_onnx=$(func_set_params "${use_onnx_key}" "${use_onnx_value}")
-    set_hardware=$(func_set_params "${inference_hardware_key}" "${inference_hardware_value}")
-    set_inference_config=$(func_set_params "${inference_config_key}" "${inference_config_value}")
-    infer_model_cmd="cd deploy && ${python} ${inference_py} -o ${set_model_dir} -o ${set_use_onnx} -o ${set_hardware} ${set_inference_config} > ${_save_log_path} 2>&1 && cd ../"
-    eval $infer_model_cmd
-    status_check $last_status "${infer_model_cmd}" "${status_log}" "${model_name}"
+    if [[ ${inference_py} != "null" ]]; then
+        set_model_dir=$(func_set_params "${inference_model_dir_key}" "${inference_model_dir_value}")
+        set_use_onnx=$(func_set_params "${use_onnx_key}" "${use_onnx_value}")
+        set_hardware=$(func_set_params "${inference_hardware_key}" "${inference_hardware_value}")
+        set_inference_config=$(func_set_params "${inference_config_key}" "${inference_config_value}")
+        infer_model_cmd="cd deploy && ${python} ${inference_py} -o ${set_model_dir} -o ${set_use_onnx} -o ${set_hardware} ${set_inference_config} > ${_save_log_path} 2>&1 && cd ../"
+        eval $infer_model_cmd
+        status_check $last_status "${infer_model_cmd}" "${status_log}" "${model_name}"
+    fi
 }
 
 
