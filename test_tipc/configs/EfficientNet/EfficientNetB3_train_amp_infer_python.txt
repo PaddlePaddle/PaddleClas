@@ -13,7 +13,7 @@ train_infer_img_dir:./dataset/ILSVRC2012/val
 null:null
 ##
 trainer:amp_train
-amp_train:tools/train.py -c ppcls/configs/ImageNet/EfficientNet/EfficientNetB3.yaml -o Global.seed=1234 -o DataLoader.Train.sampler.shuffle=False -o DataLoader.Train.loader.num_workers=0 -o DataLoader.Train.loader.use_shared_memory=False -o AMP.scale_loss=128 -o AMP.use_dynamic_loss_scaling=True -o AMP.level=O2
+amp_train:tools/train.py -c ppcls/configs/ImageNet/EfficientNet/EfficientNetB3.yaml -o Global.seed=1234 -o DataLoader.Train.sampler.shuffle=False -o DataLoader.Train.loader.num_workers=0 -o DataLoader.Train.loader.use_shared_memory=False -o AMP.scale_loss=128 -o AMP.use_dynamic_loss_scaling=True -o AMP.level=O2 -o Global.eval_during_train=False -o Global.save_interval=2
 pact_train:null
 fpgm_train:null
 distill_train:null
