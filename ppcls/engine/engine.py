@@ -208,8 +208,6 @@ class Engine(object):
                 load_dygraph_pretrain(
                     [self.model, getattr(self, 'train_loss_func', None)],
                     self.config["Global"]["pretrained_model"])
-        self.model.neck.set_state_dict(paddle.load('../../IDML/image_retrieval/data/neck.pdparams'))
-        self.train_loss_func.set_state_dict(paddle.load('../../IDML/image_retrieval/data/loss.pdparams'))
 
         # build optimizer
         if self.mode == 'train':

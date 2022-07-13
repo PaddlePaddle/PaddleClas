@@ -1,7 +1,7 @@
 # global configs
 Global:
   checkpoints: null
-  pretrained_model: null
+  pretrained_model: https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/others/idml_neck.pdparams
   output_dir: ./output/
   device: gpu
   save_interval: 20

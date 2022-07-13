@@ -18,6 +18,7 @@ import math
 
 import paddle
 import paddle.nn as nn
+from ppcls.utils.initializer import kaiming_normal_
 
 
 # This neck is just for reproduction of  paper(Introspective Deep Metric Learning)
@@ -30,19 +31,11 @@ class IDMLNeck(nn.Layer):
         self.gap = nn.AdaptiveAvgPool2D(1)
         self.gmp = nn.AdaptiveMaxPool2D(1)
         
-        kernel_weight = paddle.uniform(
-            [ self.in_channel_num, self.embedding_size], min=-1, max=1)
-        
-        kernel_weight_norm = paddle.norm(
-            kernel_weight, p=2, axis=0, keepdim=True)
-        kernel_weight_norm = paddle.where(kernel_weight_norm > 1e-5,
-                                          kernel_weight_norm,
-                                          paddle.ones_like(kernel_weight_norm))
-        kernel_weight = kernel_weight / kernel_weight_norm
-        
+        kernel_weight = paddle.empty([self.in_channel_num, self.embedding_size])
+        kernel_weight = kaiming_normal_(kernel_weight, mode='fan_out')
         weight_attr = paddle.ParamAttr(initializer=paddle.nn.initializer.Assign(kernel_weight))
         self.embedding_layer = nn.Linear(self.in_channel_num, self.embedding_size, bias_attr=bias, weight_attr=weight_attr)
-        self.uncertainty_layer = nn.Linear(self.in_channel_num, self.embedding_size, bias_attr=bias)
+        self.uncertainty_layer = nn.Linear(self.in_channel_num, self.embedding_size, bias_attr=bias, weight_attr=weight_attr)
         
     def l2_norm(self, input, axis=1):
         norm = paddle.sqrt(
@@ -66,64 +59,3 @@ class IDMLNeck(nn.Layer):
             return paddle.concat([x_semantic, x_uncertainty], axis=0)
         else:
             return x_semantic
-
-
-def _calculate_fan_in_and_fan_out(tensor):
-    dimensions = tensor.dim()
-    if dimensions < 2:
-        raise ValueError(
-            "Fan in and fan out can not be computed for tensor with fewer than 2 dimensions"
-        )
-
-    num_input_fmaps = tensor.shape[1]
-    num_output_fmaps = tensor.shape[0]
-    receptive_field_size = 1
-    if tensor.dim() > 2:
-        receptive_field_size = tensor[0][0].numel()
-    fan_in = num_input_fmaps * receptive_field_size
-    fan_out = num_output_fmaps * receptive_field_size
-
-    return fan_in, fan_out
-
-def kaiming_normal_(tensor, a=0., mode='fan_in', nonlinearity='leaky_relu'):
-    def _calculate_correct_fan(tensor, mode):
-        mode = mode.lower()
-        valid_modes = ['fan_in', 'fan_out']
-        if mode not in valid_modes:
-            raise ValueError(
-                "Mode {} not supported, please use one of {}".format(
-                    mode, valid_modes))
-
-        fan_in, fan_out = _calculate_fan_in_and_fan_out(tensor)
-        return fan_in if mode == 'fan_in' else fan_out
-
-    def calculate_gain(nonlinearity, param=None):
-        linear_fns = [
-            'linear', 'conv1d', 'conv2d', 'conv3d', 'conv_transpose1d',
-            'conv_transpose2d', 'conv_transpose3d'
-        ]
-        if nonlinearity in linear_fns or nonlinearity == 'sigmoid':
-            return 1
-        elif nonlinearity == 'tanh':
-            return 5.0 / 3
-        elif nonlinearity == 'relu':
-            return math.sqrt(2.0)
-        elif nonlinearity == 'leaky_relu':
-            if param is None:
-                negative_slope = 0.01
-            elif not isinstance(param, bool) and isinstance(
-                    param, int) or isinstance(param, float):
-                negative_slope = param
-            else:
-                raise ValueError(
-                    "negative_slope {} not a valid number".format(param))
-            return math.sqrt(2.0 / (1 + negative_slope**2))
-        else:
-            raise ValueError("Unsupported nonlinearity {}".format(nonlinearity))
-
-    fan = _calculate_correct_fan(tensor, mode)
-    gain = calculate_gain(nonlinearity, a)
-    std = gain / math.sqrt(fan)
-    with paddle.no_grad():
-        paddle.nn.initializer.Normal(0, std)(tensor)
-        return tensor

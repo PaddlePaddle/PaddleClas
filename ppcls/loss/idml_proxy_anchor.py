@@ -19,6 +19,7 @@ import paddle
 import paddle.nn as nn
 import paddle.nn.functional as F
 import sklearn.preprocessing
+from ppcls.utils.initializer import kaiming_normal_
 
 
 def binarize(T, nb_classes):
@@ -41,18 +42,8 @@ class IDMLProxyAnchorLoss(nn.Layer):
         paddle.nn.Layer.__init__(self)
         # Proxy Anchor Initialization
         
-        kernel_weight = paddle.uniform(
-            [nb_classes, sz_embed], min=-1, max=1)
-        kernel_weight_norm = paddle.norm(
-            kernel_weight, p=2, axis=0, keepdim=True)
-        kernel_weight_norm = paddle.where(kernel_weight_norm > 1e-5,
-                                          kernel_weight_norm,
-                                          paddle.ones_like(kernel_weight_norm))
-        kernel_weight = kernel_weight / kernel_weight_norm
-        # self.kernel = self.create_parameter(
-        #     [nb_classes, sz_embed],
-        #     attr=paddle.nn.initializer.Assign(kernel_weight))
-        
+        kernel_weight = paddle.randn([nb_classes, sz_embed])
+        kernel_weight = kaiming_normal_(kernel_weight, mode='fan_out')
         attr = paddle.ParamAttr(initializer=paddle.nn.initializer.Assign(kernel_weight),
                             learning_rate=lr)
         self.proxies = self.create_parameter(
