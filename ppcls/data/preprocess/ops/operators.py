@@ -18,6 +18,7 @@ from __future__ import print_function
 from __future__ import unicode_literals
 
 from functools import partial
+import io
 import six
 import math
 import random
@@ -138,28 +139,53 @@ class OperatorParamError(ValueError):
 class DecodeImage(object):
     """ decode image """
 
-    def __init__(self, to_rgb=True, to_np=False, channel_first=False):
-        self.to_rgb = to_rgb
+    def __init__(self,
+                 to_np=True,
+                 to_rgb=True,
+                 channel_first=False,
+                 backend="cv2"):
         self.to_np = to_np  # to numpy
+        self.to_rgb = to_rgb  # only enabled when to_np is True
         self.channel_first = channel_first  # only enabled when to_np is True
 
-    def __call__(self, img):
-        if not isinstance(img, np.ndarray):
-            if six.PY2:
-                assert type(img) is str and len(
-                    img) > 0, "invalid input 'img' in DecodeImage"
-            else:
-                assert type(img) is bytes and len(
-                    img) > 0, "invalid input 'img' in DecodeImage"
-            data = np.frombuffer(img, dtype='uint8')
-            img = cv2.imdecode(data, 1)
-        if self.to_rgb:
-            assert img.shape[2] == 3, 'invalid shape of image[%s]' % (
-                img.shape)
-            img = img[:, :, ::-1]
+        if backend.lower() not in ["cv2", "pil"]:
+            logger.warning(
+                f"The backend of DecodeImage only support \"cv2\" or \"PIL\". \"f{backend}\" is unavailable. Use \"cv2\" instead."
+            )
+            backend = "cv2"
+        self.backend = backend.lower()
 
-        if self.channel_first:
-            img = img.transpose((2, 0, 1))
+        if not to_np:
+            logger.warning(
+                f"\"to_rgb\" and \"channel_first\" are only enabled when to_np is True. \"to_np\" is now {to_np}."
+            )
+
+    def __call__(self, img):
+        if isinstance(img, Image.Image):
+            assert self.backend == "pil", "invalid input 'img' in DecodeImage"
+        elif isinstance(img, np.ndarray):
+            assert self.backend == "cv2", "invalid input 'img' in DecodeImage"
+        elif isinstance(img, bytes):
+            if self.backend == "pil":
+                data = io.BytesIO(img)
+                img = Image.open(data)
+            else:
+                data = np.frombuffer(img, dtype="uint8")
+                img = cv2.imdecode(data, 1)
+        else:
+            raise ValueError("invalid input 'img' in DecodeImage")
+
+        if self.to_np:
+            if self.backend == "pil":
+                assert img.mode == "RGB", f"invalid shape of image[{img.shape}]"
+                img = np.asarray(img)[:, :, ::-1]  # BRG
+
+            if self.to_rgb:
+                assert img.shape[2] == 3, f"invalid shape of image[{img.shape}]"
+                img = img[:, :, ::-1]
+
+            if self.channel_first:
+                img = img.transpose((2, 0, 1))
 
         return img
 

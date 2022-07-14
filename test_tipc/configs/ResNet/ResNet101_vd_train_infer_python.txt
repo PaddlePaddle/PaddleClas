@@ -13,7 +13,7 @@ train_infer_img_dir:./dataset/ILSVRC2012/val
 null:null
 ##
 trainer:norm_train
-norm_train:tools/train.py -c ppcls/configs/ImageNet/ResNet/ResNet101_vd.yaml -o Global.seed=1234 -o DataLoader.Train.sampler.shuffle=False -o DataLoader.Train.loader.num_workers=0 -o DataLoader.Train.loader.use_shared_memory=False
+norm_train:tools/train.py -c ppcls/configs/ImageNet/ResNet/ResNet101_vd.yaml -o Global.seed=1234 -o DataLoader.Train.sampler.shuffle=False -o DataLoader.Train.loader.num_workers=0 -o DataLoader.Train.loader.use_shared_memory=False -o Global.eval_during_train=False -o Global.save_interval=2
 pact_train:null
 fpgm_train:null
 distill_train:null

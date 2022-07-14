@@ -38,6 +38,23 @@ struct ObjectResult {
   std::vector<RESULT> rec_result;
 };
 
-void nms(std::vector<ObjectResult> &input_boxes, float nms_threshold, bool rec_nms=false);
+void nms(std::vector<ObjectResult> &input_boxes, float nms_threshold,
+         bool rec_nms = false);
 
+template <typename T>
+static inline bool SortScorePairDescend(const std::pair<float, T> &pair1,
+                                        const std::pair<float, T> &pair2) {
+  return pair1.first > pair2.first;
+}
+
+float RectOverlap(const ObjectResult &a, const ObjectResult &b);
+
+inline void
+GetMaxScoreIndex(const std::vector<ObjectResult> &det_result,
+                 const float threshold,
+                 std::vector<std::pair<float, int>> &score_index_vec);
+
+void NMSBoxes(const std::vector<ObjectResult> det_result,
+              const float score_threshold, const float nms_threshold,
+              std::vector<int> &indices);
 } // namespace PPShiTu
