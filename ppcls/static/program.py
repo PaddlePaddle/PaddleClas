@@ -371,6 +371,11 @@ def run(dataloader,
                 "Except RuntimeError when reading data from dataloader, try to read once again..."
             )
             continue
+        except IndexError:
+            logger.warning(
+                "Except IndexError when reading data from dataloader, try to read once again..."
+            )
+            continue
         idx += 1
         # ignore the warmup iters
         if idx == 5:
@@ -439,8 +444,7 @@ def run(dataloader,
         logger.info("END {:s} {:s} {:s}".format(mode, end_str, ips_info))
     else:
         end_epoch_str = "END epoch:{:<3d}".format(epoch)
-        logger.info("{:s} {:s} {:s} {:s}".format(end_epoch_str, mode, end_str,
-                                                 ips_info))
+        logger.info("{:s} {:s} {:s}".format(end_epoch_str, mode, end_str))
     if use_dali:
         dataloader.reset()
 

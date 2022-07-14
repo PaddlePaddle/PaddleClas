@@ -1,0 +1,1 @@
+../../../docs/zh_CN/inference_deployment/recognition_serving_deploy.md

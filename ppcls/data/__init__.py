@@ -28,12 +28,16 @@ from ppcls.data.dataloader.vehicle_dataset import CompCars, VeriWild
 from ppcls.data.dataloader.logo_dataset import LogoDataset
 from ppcls.data.dataloader.icartoon_dataset import ICartoonDataset
 from ppcls.data.dataloader.mix_dataset import MixDataset
+from ppcls.data.dataloader.multi_scale_dataset import MultiScaleDataset
 from ppcls.data.dataloader.person_dataset import Market1501, MSMT17
+from ppcls.data.dataloader.face_dataset import FiveValidationDataset, AdaFaceDataset
+
 
 # sampler
 from ppcls.data.dataloader.DistributedRandomIdentitySampler import DistributedRandomIdentitySampler
 from ppcls.data.dataloader.pk_sampler import PKSampler
 from ppcls.data.dataloader.mix_sampler import MixSampler
+from ppcls.data.dataloader.multi_scale_sampler import MultiScaleSampler
 from ppcls.data import preprocess
 from ppcls.data.preprocess import transform
 
@@ -85,7 +89,7 @@ def build_dataloader(config, mode, device, use_dali=False, seed=None):
 
     # build sampler
     config_sampler = config[mode]['sampler']
-    if "name" not in config_sampler:
+    if config_sampler and "name" not in config_sampler:
         batch_sampler = None
         batch_size = config_sampler["batch_size"]
         drop_last = config_sampler["drop_last"]

@@ -92,9 +92,9 @@ PaddleClas 提供了转换并优化后的推理模型，可以直接参考下方
 ```shell
 # 进入lite_ppshitu目录
 cd $PaddleClas/deploy/lite_shitu
-wget https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/lite/ppshitu_lite_models_v1.1.tar
-tar -xf ppshitu_lite_models_v1.1.tar
-rm -f ppshitu_lite_models_v1.1.tar
+wget https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/lite/ppshitu_lite_models_v1.2.tar
+tar -xf ppshitu_lite_models_v1.2.tar
+rm -f ppshitu_lite_models_v1.2.tar
 ```
 
 #### 2.1.2 使用其他模型
@@ -162,7 +162,7 @@ git clone https://github.com/PaddlePaddle/PaddleDetection.git
 # 进入PaddleDetection根目录
 cd PaddleDetection
 # 将预训练模型导出为inference模型
-python tools/export_model.py -c configs/picodet/application/mainbody_detection/picodet_lcnet_x2_5_640_mainbody.yml -o weights=https://paddledet.bj.bcebos.com/models/picodet_lcnet_x2_5_640_mainbody.pdparams  --output_dir=inference
+python tools/export_model.py -c configs/picodet/application/mainbody_detection/picodet_lcnet_x2_5_640_mainbody.yml -o weights=https://paddledet.bj.bcebos.com/models/picodet_lcnet_x2_5_640_mainbody.pdparams export_post_process=False --output_dir=inference
 # 将inference模型转化为Paddle-Lite优化模型
 paddle_lite_opt --model_file=inference/picodet_lcnet_x2_5_640_mainbody/model.pdmodel --param_file=inference/picodet_lcnet_x2_5_640_mainbody/model.pdiparams --optimize_out=inference/picodet_lcnet_x2_5_640_mainbody/mainbody_det
 # 将转好的模型复制到lite_shitu目录下
@@ -183,24 +183,56 @@ cd deploy/lite_shitu
 
 **注意**：`--optimize_out` 参数为优化后模型的保存路径，无需加后缀`.nb`；`--model_file` 参数为模型结构信息文件的路径，`--param_file` 参数为模型权重信息文件的路径，请注意文件名。
 
-### 2.2 将yaml文件转换成json文件
+### 2.2 生成新的检索库
+
+由于lite 版本的检索库用的是`faiss1.5.3`版本，与新版本不兼容，因此需要重新生成index库
+
+#### 2.2.1 数据及环境配置
 
 ```shell
-# 如果测试单张图像
-python generate_json_config.py --det_model_path ppshitu_lite_models_v1.1/mainbody_PPLCNet_x2_5_640_quant_v1.1_lite.nb  --rec_model_path ppshitu_lite_models_v1.1/general_PPLCNet_x2_5_lite_v1.1_infer.nb --img_path images/demo.jpg
-# or
-# 如果测试多张图像
-python generate_json_config.py --det_model_path ppshitu_lite_models_v1.1/mainbody_PPLCNet_x2_5_640_quant_v1.1_lite.nb  --rec_model_path ppshitu_lite_models_v1.1/general_PPLCNet_x2_5_lite_v1.1_infer.nb --img_dir images
-# 执行完成后，会在lit_shitu下生成shitu_config.json配置文件
-```
-
-### 2.3 index字典转换
-由于python的检索库字典，使用`pickle`进行的序列化存储，导致C++不方便读取，因此需要进行转换
-
-```shell
+# 进入上级目录
+cd ..
 # 下载瓶装饮料数据集
 wget https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/data/drink_dataset_v1.0.tar && tar -xf drink_dataset_v1.0.tar
 rm -rf drink_dataset_v1.0.tar
+rm -rf drink_dataset_v1.0/index
+
+# 安装1.5.3版本的faiss
+pip install faiss-cpu==1.5.3
+
+# 下载通用识别模型，可替换成自己的inference model
+wget https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/inference/general_PPLCNet_x2_5_lite_v1.0_infer.tar
+tar -xf general_PPLCNet_x2_5_lite_v1.0_infer.tar
+rm -rf general_PPLCNet_x2_5_lite_v1.0_infer.tar
+```
+
+#### 2.2.2 生成新的index文件
+
+```shell
+# 生成新的index库，注意指定好识别模型的路径，同时将index_mothod修改成Flat，HNSW32和IVF在此版本中可能存在bug，请慎重使用。
+# 如果使用自己的识别模型，对应的修改inference model的目录
+python python/build_gallery.py -c configs/inference_drink.yaml -o Global.rec_inference_model_dir=general_PPLCNet_x2_5_lite_v1.0_infer -o IndexProcess.index_method=Flat
+
+# 进入到lite_shitu目录
+cd lite_shitu
+mv ../drink_dataset_v1.0 .
+```
+
+### 2.3 将yaml文件转换成json文件
+
+```shell
+# 如果测试单张图像
+python generate_json_config.py --det_model_path ppshitu_lite_models_v1.2/mainbody_PPLCNet_x2_5_640_v1.2_lite.nb  --rec_model_path ppshitu_lite_models_v1.2/general_PPLCNet_x2_5_lite_v1.2_infer.nb --img_path images/demo.jpeg
+# or
+# 如果测试多张图像
+python generate_json_config.py --det_model_path ppshitu_lite_models_v1.2/mainbody_PPLCNet_x2_5_640_v1.2_lite.nb  --rec_model_path ppshitu_lite_models_v1.2/general_PPLCNet_x2_5_lite_v1.2_infer.nb --img_dir images
+# 执行完成后，会在lit_shitu下生成shitu_config.json配置文件
+```
+
+### 2.4 index字典转换
+由于python的检索库字典，使用`pickle`进行的序列化存储，导致C++不方便读取，因此需要进行转换
+
+```shell
 
 # 转化id_map.pkl为id_map.txt
 python transform_id_map.py -c ../configs/inference_drink.yaml
@@ -208,7 +240,7 @@ python transform_id_map.py -c ../configs/inference_drink.yaml
 转换成功后，会在`IndexProcess.index_dir`目录下生成`id_map.txt`。
 
 
-### 2.4 与手机联调
+### 2.5 与手机联调
 
 首先需要进行一些准备工作。
 1. 准备一台arm8的安卓手机，如果编译的预测库是armv7，则需要arm7的手机，并修改Makefile中`ARM_ABI=arm7`。
@@ -308,8 +340,9 @@ chmod 777 pp_shitu
 
 运行效果如下：
 ```
-images/demo.jpg:
-        result0: bbox[253, 275, 1146, 872], score: 0.974196, label: 伊藤园_果蔬汁
+images/demo.jpeg:
+       result0: bbox[344, 98, 527, 593], score: 0.811656, label: 红牛-强化型
+       result1: bbox[0, 0, 600, 600], score: 0.729664, label: 红牛-强化型
 ```
 
 ## FAQ

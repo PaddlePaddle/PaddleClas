@@ -1,0 +1,19 @@
+===========================cpp_infer_params===========================
+model_name:PPShiTu
+cpp_infer_type:shitu
+feature_inference_model_dir:./general_PPLCNet_x2_5_lite_v1.0_infer/
+det_inference_model_dir:./picodet_PPLCNet_x2_5_mainbody_lite_v1.0_infer/
+cls_inference_url:https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/inference/general_PPLCNet_x2_5_lite_v1.0_infer.tar
+det_inference_url:https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/inference/picodet_PPLCNet_x2_5_mainbody_lite_v1.0_infer.tar
+infer_quant:False
+inference_cmd:./deploy/cpp_shitu/build/pp_shitu -c inference_drink.yaml
+use_gpu:True|False
+enable_mkldnn:False
+cpu_threads:1
+batch_size:1
+use_tensorrt:False
+precision:fp32
+data_dir:./dataset/drink_dataset_v1.0
+benchmark:True
+generate_yaml_cmd:python3.7 test_tipc/generate_cpp_yaml.py
+transform_index_cmd:python3.7 deploy/cpp_shitu/tools/transform_id_map.py -c inference_drink.yaml

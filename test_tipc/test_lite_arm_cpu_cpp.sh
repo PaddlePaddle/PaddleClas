@@ -67,7 +67,7 @@ function func_test_tipc(){
                 eval ${command1}
                 command2="adb shell 'export LD_LIBRARY_PATH=${lite_arm_work_path}; ${real_inference_cmd}'  > ${_save_log_path} 2>&1"
                 eval ${command2}
-                status_check $? "${command2}" "${status_log}"
+                status_check $? "${command2}" "${status_log}" "${model_name}"
             done
         done
     done

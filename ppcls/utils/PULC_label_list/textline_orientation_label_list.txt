@@ -1,0 +1,2 @@
+0 0_degree
+1 180_degree

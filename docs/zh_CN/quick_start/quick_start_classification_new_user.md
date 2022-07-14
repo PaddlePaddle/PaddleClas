@@ -48,7 +48,7 @@
 
 ##  2. 环境安装与配置
 
-具体安装步骤可详看[Paddle 安装文档](../installation/install_paddle.md)，[PaddleClas 安装文档](../installation/install_paddleclas.md)。
+具体安装步骤可详看[环境准备](../installation/install_paddleclas.md)。
 
 <a name='3'></a>
 

@@ -1,0 +1,168 @@
+# global configs
+Global:
+  checkpoints: null
+  pretrained_model: null
+  output_dir: ./output
+  device: gpu
+  save_interval: 1
+  eval_during_train: True
+  start_eval_epoch: 1
+  eval_interval: 1
+  epochs: 20
+  print_batch_step: 10
+  use_visualdl: False
+  # used for static mode and model export
+  image_shape: [3, 224, 224]
+  save_inference_dir: ./inference
+  # training model under @to_static
+  to_static: False
+  use_dali: False
+
+# model architecture
+Arch:
+  name: "DistillationModel"
+  class_num: &class_num 2
+  # if not null, its lengths should be same as models
+  pretrained_list:
+  # if not null, its lengths should be same as models
+  freeze_params_list:
+  - True
+  - False
+  use_sync_bn: True
+  models:
+    - Teacher:
+        name: ResNet101_vd
+        class_num: *class_num
+    - Student:
+        name: PPLCNet_x1_0
+        class_num: *class_num
+        pretrained: True
+        use_ssld: True
+
+  infer_model_name: "Student"
+ 
+# loss function config for traing/eval process
+Loss:
+  Train:
+    - DistillationDMLLoss:
+        weight: 1.0
+        model_name_pairs:
+        - ["Student", "Teacher"]
+  Eval:
+    - CELoss:
+        weight: 1.0
+
+
+Optimizer:
+  name: Momentum
+  momentum: 0.9
+  lr:
+    name: Cosine
+    learning_rate: 0.01
+    warmup_epoch: 5
+  regularizer:
+    name: 'L2'
+    coeff: 0.00004
+
+
+# data loader for train and eval
+DataLoader:
+  Train:
+    dataset:
+      name: ImageNetDataset
+      image_root: ./dataset/person_exists/
+      cls_label_path: ./dataset/person_exists/train_list_for_distill.txt
+      transform_ops:
+        - DecodeImage:
+            to_rgb: True
+            channel_first: False
+        - RandCropImage:
+            size: 192
+        - RandFlipImage:
+            flip_code: 1
+        - TimmAutoAugment:
+            prob: 0.0
+            config_str: rand-m9-mstd0.5-inc1
+            interpolation: bicubic
+            img_size: 192
+        - NormalizeImage:
+            scale: 1.0/255.0
+            mean: [0.485, 0.456, 0.406]
+            std: [0.229, 0.224, 0.225]
+            order: ''
+        - RandomErasing:
+            EPSILON: 0.1
+            sl: 0.02
+            sh: 1.0/3.0
+            r1: 0.3
+            attempt: 10
+            use_log_aspect: True
+            mode: pixel
+    sampler:
+      name: DistributedBatchSampler
+      batch_size: 64
+      drop_last: False
+      shuffle: True
+    loader:
+      num_workers: 16
+      use_shared_memory: True
+
+  Eval:
+    dataset: 
+      name: ImageNetDataset
+      image_root: ./dataset/person_exists/
+      cls_label_path: ./dataset/person_exists/val_list.txt
+      transform_ops:
+        - DecodeImage:
+            to_rgb: True
+            channel_first: False
+        - ResizeImage:
+            resize_short: 256
+        - CropImage:
+            size: 224
+        - NormalizeImage:
+            scale: 1.0/255.0
+            mean: [0.485, 0.456, 0.406]
+            std: [0.229, 0.224, 0.225]
+            order: ''
+    sampler:
+      name: DistributedBatchSampler
+      batch_size: 64
+      drop_last: False
+      shuffle: False
+    loader:
+      num_workers: 4
+      use_shared_memory: True
+
+Infer:
+  infer_imgs: deploy/images/PULC/person_exists/objects365_02035329.jpg
+  batch_size: 10
+  transforms:
+    - DecodeImage:
+        to_rgb: True
+        channel_first: False
+    - ResizeImage:
+        resize_short: 256
+    - CropImage:
+        size: 224
+    - NormalizeImage:
+        scale: 1.0/255.0
+        mean: [0.485, 0.456, 0.406]
+        std: [0.229, 0.224, 0.225]
+        order: ''
+    - ToCHWImage:
+  PostProcess:
+    name: ThreshOutput
+    threshold: 0.5
+    label_0: nobody
+    label_1: someone
+
+Metric:
+    Train:
+    - DistillationTopkAcc:
+        model_key: "Student"
+        topk: [1, 2]
+    Eval:
+    - TprAtFpr:
+    - TopkAcc:
+        topk: [1, 2]

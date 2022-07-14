@@ -2,14 +2,15 @@
 
 ---
 
-首先请参考文档[安装 PaddlePaddle](../installation/install_paddle.md)和文档[安装 PaddleClas](../installation/install_paddleclas.md)配置运行环境。
+首先请参考文档[环境准备](../installation/install_paddleclas.md)配置运行环境。
 
 ## 目录
 
-- [1. 图像分类推理](#1)
-- [2. 主体检测模型推理](#2)
-- [3. 特征提取模型推理](#3)
-- [4. 主体检测、特征提取和向量检索串联](#4)
+- [1. 图像分类模型推理](#1)
+- [2. PP-ShiTu模型推理](#2)
+    - [2.1 主体检测模型推理](#2.1)
+    - [2.2 特征提取模型推理](#2.2)
+    - [2.3 PP-ShiTu PipeLine推理](#2.3)
 
 <a name="1"></a>
 ## 1. 图像分类推理
@@ -42,7 +43,12 @@ python python/predict_cls.py -c configs/inference_cls.yaml
 * 如果你希望提升评测模型速度，使用 GPU 评测时，建议开启 TensorRT 加速预测，使用 CPU 评测时，建议开启 MKL-DNN 加速预测。
 
 <a name="2"></a>
-## 2. 主体检测模型推理
+## 2. PP-ShiTu模型推理
+
+PP-ShiTu整个Pipeline包含三部分：主体检测、特提取模型、特征检索。其中主体检测、特征模型可以单独推理使用。单独主体检测详见[2.1](#2.1)，特征提取模型单独推理详见[2.2](#2.2)， PP-ShiTu整体推理详见[2.3](#2.3)。
+
+<a name="2.1"></a>
+### 2.1 主体检测模型推理
 
 进入 PaddleClas 的 `deploy` 目录下：
 
@@ -70,8 +76,8 @@ python python/predict_det.py -c configs/inference_det.yaml
 * `Global.use_gpu`： 是否使用 GPU 预测，默认为 `True`。
 
 
-<a name="3"></a>
-## 3. 特征提取模型推理
+<a name="2.2"></a>
+### 2.2 特征提取模型推理
 
 下面以商品特征提取为例，介绍特征提取模型推理。首先进入 PaddleClas 的 `deploy` 目录下：
 
@@ -90,7 +96,7 @@ tar -xf ./models/product_ResNet50_vd_aliproduct_v1.0_infer.tar -C ./models/
 
 上述预测命令可以得到一个 512 维的特征向量，直接输出在在命令行中。
 
-<a name="4"></a>
-## 4. 主体检测、特征提取和向量检索串联
+<a name="2.3"></a>
+### 2.3. PP-ShiTu PipeLine推理
 
 主体检测、特征提取和向量检索的串联预测，可以参考图像识别[快速体验](../quick_start/quick_start_recognition.md)。

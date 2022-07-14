@@ -27,6 +27,7 @@ import cv2
 import numpy as np
 import importlib
 from PIL import Image
+from paddle.vision.transforms import ToTensor, Normalize
 
 from python.det_preprocess import DetNormalizeImage, DetPadStride, DetPermute, DetResize
 
@@ -53,13 +54,14 @@ def create_operators(params):
 
 
 class UnifiedResize(object):
-    def __init__(self, interpolation=None, backend="cv2"):
+    def __init__(self, interpolation=None, backend="cv2", return_numpy=True):
         _cv2_interp_from_str = {
             'nearest': cv2.INTER_NEAREST,
             'bilinear': cv2.INTER_LINEAR,
             'area': cv2.INTER_AREA,
             'bicubic': cv2.INTER_CUBIC,
-            'lanczos': cv2.INTER_LANCZOS4
+            'lanczos': cv2.INTER_LANCZOS4,
+            'random': (cv2.INTER_LINEAR, cv2.INTER_CUBIC)
         }
         _pil_interp_from_str = {
             'nearest': Image.NEAREST,
@@ -67,13 +69,26 @@ class UnifiedResize(object):
             'bicubic': Image.BICUBIC,
             'box': Image.BOX,
             'lanczos': Image.LANCZOS,
-            'hamming': Image.HAMMING
+            'hamming': Image.HAMMING,
+            'random': (Image.BILINEAR, Image.BICUBIC)
         }
 
-        def _pil_resize(src, size, resample):
-            pil_img = Image.fromarray(src)
+        def _cv2_resize(src, size, resample):
+            if isinstance(resample, tuple):
+                resample = random.choice(resample)
+            return cv2.resize(src, size, interpolation=resample)
+
+        def _pil_resize(src, size, resample, return_numpy=True):
+            if isinstance(resample, tuple):
+                resample = random.choice(resample)
+            if isinstance(src, np.ndarray):
+                pil_img = Image.fromarray(src)
+            else:
+                pil_img = src
             pil_img = pil_img.resize(size, resample)
-            return np.asarray(pil_img)
+            if return_numpy:
+                return np.asarray(pil_img)
+            return pil_img
 
         if backend.lower() == "cv2":
             if isinstance(interpolation, str):
@@ -81,11 +96,12 @@ class UnifiedResize(object):
             # compatible with opencv < version 4.4.0
             elif interpolation is None:
                 interpolation = cv2.INTER_LINEAR
-            self.resize_func = partial(cv2.resize, interpolation=interpolation)
+            self.resize_func = partial(_cv2_resize, resample=interpolation)
         elif backend.lower() == "pil":
             if isinstance(interpolation, str):
                 interpolation = _pil_interp_from_str[interpolation.lower()]
-            self.resize_func = partial(_pil_resize, resample=interpolation)
+            self.resize_func = partial(
+                _pil_resize, resample=interpolation, return_numpy=return_numpy)
         else:
             logger.warning(
                 f"The backend of Resize only support \"cv2\" or \"PIL\". \"f{backend}\" is unavailable. Use \"cv2\" instead."
@@ -93,6 +109,8 @@ class UnifiedResize(object):
             self.resize_func = cv2.resize
 
     def __call__(self, src, size):
+        if isinstance(size, list):
+            size = tuple(size)
         return self.resize_func(src, size)
 
 
@@ -137,7 +155,8 @@ class ResizeImage(object):
                  size=None,
                  resize_short=None,
                  interpolation=None,
-                 backend="cv2"):
+                 backend="cv2",
+                 return_numpy=True):
         if resize_short is not None and resize_short > 0:
             self.resize_short = resize_short
             self.w = None
@@ -151,10 +170,18 @@ class ResizeImage(object):
                 'both 'size' and 'resize_short' are None")
 
         self._resize_func = UnifiedResize(
-            interpolation=interpolation, backend=backend)
+            interpolation=interpolation,
+            backend=backend,
+            return_numpy=return_numpy)
 
     def __call__(self, img):
-        img_h, img_w = img.shape[:2]
+        if isinstance(img, np.ndarray):
+            # numpy input
+            img_h, img_w = img.shape[:2]
+        else:
+            # PIL image input
+            img_w, img_h = img.size
+
         if self.resize_short is not None:
             percent = float(self.resize_short) / min(img_w, img_h)
             w = int(round(img_w * percent))
