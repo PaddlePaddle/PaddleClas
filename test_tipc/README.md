@@ -35,18 +35,23 @@
 │   ├── MobileNetV3         # MobileNetV3系列模型测试配置文件目录
 │   │   ├── MobileNetV3_large_x1_0_train_infer_python.txt                                    #基础训练预测配置文件
 │   │   ├── MobileNetV3_large_x1_0_train_linux_gpu_fleet_amp_infer_python_linux_gpu_cpu.txt  #多机多卡训练预测配置文件
-│   │   └── MobileNetV3_large_x1_0_train_linux_gpu_normal_amp_infer_python_linux_gpu_cpu.txt #混合精度训练预测配置文件
-│   └── ResNet              # ResNet系列模型测试配置文件目录
-│       ├── ResNet50_vd_train_infer_python.txt                                        #基础训练预测配置文件
-│       ├── ResNet50_vd_train_linux_gpu_fleet_amp_infer_python_linux_gpu_cpu.txt      #多机多卡训练预测配置文件
-│       └── ResNet50_vd_train_linux_gpu_normal_amp_infer_python_linux_gpu_cpu.txt     #混合精度训练预测配置文件
-|   ......
+│   │   ├── MobileNetV3_large_x1_0_train_linux_gpu_normal_amp_infer_python_linux_gpu_cpu.txt #混合精度训练预测配置文件
+│   │   ├── MobileNetV3_large_x1_0_paddle2onnx_infer_python.txt                              #paddle2onnx推理测试配置文件
+│   │   └── ......
+│   ├──ResNet              # ResNet系列模型测试配置文件目录
+│   │   ├── ResNet50_vd_train_infer_python.txt                                        #基础训练预测配置文件
+│   │   ├── ResNet50_vd_train_linux_gpu_fleet_amp_infer_python_linux_gpu_cpu.txt      #多机多卡训练预测配置文件
+│   │   ├── ResNet50_vd_train_linux_gpu_normal_amp_infer_python_linux_gpu_cpu.txt     #混合精度训练预测配置文件
+│   │   ├── ResNet50_vd_paddle2onnx_infer_python.txt                                  #paddle2onnx推理测试配置文件
+│   │   └── ......
+│   └── ......
 ├── docs
 │   ├── guide.png
 │   └── test.png
 ├── prepare.sh                          # 完成test_*.sh运行所需要的数据和模型下载
 ├── README.md                           # 使用文档
 ├── results                             # 预先保存的预测结果，用于和实际预测结果进行精读比对
+├── test_paddle2onnx.sh                 # 测试paddle2onnx推理预测的主程序
 └── test_train_inference_python.sh      # 测试python训练预测的主程序
 ```
 
@@ -99,10 +104,15 @@ bash test_tipc/test_train_inference_python.sh ./test_tipc/configs/MobileNetV3/Mo
 
 ## 4 开始测试
 
-各功能测试中涉及混合精度、裁剪、量化等训练相关，及mkldnn、Tensorrt等多种预测相关参数配置，请点击下方相应链接了解更多细节和使用教程：  
+各功能测试中涉及混合精度、裁剪、量化等训练相关，及mkldnn、Tensorrt等多种预测相关参数配置，请点击下方相应链接了解更多细节和使用教程：
 
 - [test_train_inference_python 使用](docs/test_train_inference_python.md)：测试基于Python的模型训练、评估、推理等基本功能，包括裁剪、量化、蒸馏。
+- [test_train_pact_inference_python 使用](docs/test_train_pact_inference_python.md)：测试基于Python的模型PACT在线量化等基本功能。
+- [test_train_ptq_inference_python 使用](docs/test_train_ptq_inference_python.md)：测试基于Python的模型KL离线量化等基本功能。
 - [test_inference_cpp 使用](docs/test_inference_cpp.md) ：测试基于C++的模型推理。
 - [test_serving 使用](docs/test_serving.md) ：测试基于Paddle Serving的服务化部署功能。
 - [test_lite_arm_cpu_cpp 使用](docs/test_lite_arm_cpu_cpp.md): 测试基于Paddle-Lite的ARM CPU端c++预测部署功能.
 - [test_paddle2onnx 使用](docs/test_paddle2onnx.md)：测试Paddle2ONNX的模型转化功能，并验证正确性。
+- [test_serving_infer_python 使用](docs/test_serving_infer_python.md)：测试python serving功能。
+- [test_serving_infer_cpp 使用](docs/test_serving_infer_cpp.md)：测试cpp serving功能。
+- [test_train_fleet_inference_python 使用](./docs/test_train_fleet_inference_python.md)：测试基于Python的多机多卡训练与推理等基本功能。

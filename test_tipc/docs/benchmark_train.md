@@ -17,7 +17,7 @@ bash test_tipc/prepare.sh test_tipc/configs/MobileNetV2/MobileNetV2_train_infer_
 
 ```shell
 # 运行格式：bash test_tipc/benchmark_train.sh train_benchmark.txt mode
-bash test_tipc/benchmark_train.sh test_tipc/config/MobileNetV2/MobileNetV2_train_infer_python.txt benchmark_train
+bash test_tipc/benchmark_train.sh test_tipc/configs/MobileNetV2/MobileNetV2_train_infer_python.txt benchmark_train
 
 ```
 

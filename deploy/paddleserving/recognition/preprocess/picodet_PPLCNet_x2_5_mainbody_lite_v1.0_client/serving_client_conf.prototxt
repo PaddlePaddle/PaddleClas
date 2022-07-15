@@ -1,0 +1,29 @@
+feed_var {
+  name: "im_shape"
+  alias_name: "im_shape"
+  is_lod_tensor: false
+  feed_type: 1
+  shape: 2
+}
+feed_var {
+  name: "image"
+  alias_name: "image"
+  is_lod_tensor: false
+  feed_type: 7
+  shape: -1
+  shape: -1
+  shape: 3
+}
+fetch_var {
+  name: "save_infer_model/scale_0.tmp_1"
+  alias_name: "save_infer_model/scale_0.tmp_1"
+  is_lod_tensor: true
+  fetch_type: 1
+  shape: -1
+}
+fetch_var {
+  name: "save_infer_model/scale_1.tmp_1"
+  alias_name: "save_infer_model/scale_1.tmp_1"
+  is_lod_tensor: false
+  fetch_type: 2
+}

@@ -231,9 +231,9 @@ adb push imgs/tabby_cat.jpg /data/local/tmp/arm_cpu/
 
 ```shell
 clas_model_file ./MobileNetV3_large_x1_0.nb # 模型文件地址
-label_path ./imagenet1k_label_list.txt 			# 类别映射文本文件
+label_path ./imagenet1k_label_list.txt             # 类别映射文本文件
 resize_short_size 256 # resize之后的短边边长
-crop_size 224 				# 裁剪后用于预测的边长
+crop_size 224                 # 裁剪后用于预测的边长
 visualize 0 # 是否进行可视化，如果选择的话，会在当前文件夹下生成名为clas_result.png的图像文件
 num_threads 1 # 线程数，默认是1。
 precision FP32 # 精度类型，可以选择 FP32 或者 INT8，默认是 FP32。
@@ -263,4 +263,3 @@ A1：如果已经走通了上述步骤，更换模型只需要替换 `.nb` 模�
 
 Q2：换一个图测试怎么做？  
 A2：替换 debug 下的测试图像为你想要测试的图像，使用 ADB 再次 push 到手机上即可。
-

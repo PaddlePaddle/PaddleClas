@@ -16,9 +16,9 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-from paddle import optimizer as optim
-import paddle
+import inspect
 
+from paddle import optimizer as optim
 from ppcls.utils import logger
 
 
@@ -49,21 +49,32 @@ class SGD(object):
                  learning_rate=0.001,
                  weight_decay=None,
                  grad_clip=None,
+                 multi_precision=False,
                  name=None):
         self.learning_rate = learning_rate
         self.weight_decay = weight_decay
         self.grad_clip = grad_clip
+        self.multi_precision = multi_precision
         self.name = name
 
     def __call__(self, model_list):
         # model_list is None in static graph
         parameters = sum([m.parameters() for m in model_list],
                          []) if model_list else None
-        opt = optim.SGD(learning_rate=self.learning_rate,
-                        parameters=parameters,
-                        weight_decay=self.weight_decay,
-                        grad_clip=self.grad_clip,
-                        name=self.name)
+        argspec = inspect.getargspec(optim.SGD.__init__).args
+        if 'multi_precision' in argspec:
+            opt = optim.SGD(learning_rate=self.learning_rate,
+                            parameters=parameters,
+                            weight_decay=self.weight_decay,
+                            grad_clip=self.grad_clip,
+                            multi_precision=self.multi_precision,
+                            name=self.name)
+        else:
+            opt = optim.SGD(learning_rate=self.learning_rate,
+                            parameters=parameters,
+                            weight_decay=self.weight_decay,
+                            grad_clip=self.grad_clip,
+                            name=self.name)
         return opt
 
 
@@ -242,8 +253,9 @@ class AdamW(object):
 
         if self.one_dim_param_no_weight_decay:
             self.no_weight_decay_param_name_list += [
-                p.name for model in model_list
-                for n, p in model.named_parameters() if len(p.shape) == 1
+                p.name
+                for model in model_list for n, p in model.named_parameters()
+                if len(p.shape) == 1
             ] if model_list else []
 
         opt = optim.AdamW(

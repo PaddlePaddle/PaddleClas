@@ -23,7 +23,6 @@ import nvidia.dali.types as types
 import paddle
 from nvidia.dali import fn
 from nvidia.dali.pipeline import Pipeline
-from nvidia.dali.plugin.base_iterator import LastBatchPolicy
 from nvidia.dali.plugin.paddle import DALIGenericIterator
 
 

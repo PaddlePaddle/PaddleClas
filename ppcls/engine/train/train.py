@@ -53,25 +53,33 @@ def train_epoch(engine, epoch_id, print_batch_step):
             out = forward(engine, batch)
             loss_dict = engine.train_loss_func(out, batch[1])
 
+        # loss
+        loss = loss_dict["loss"] / engine.update_freq
+
         # backward & step opt
         if engine.amp:
-            scaled = engine.scaler.scale(loss_dict["loss"])
+            scaled = engine.scaler.scale(loss)
             scaled.backward()
-            for i in range(len(engine.optimizer)):
-                engine.scaler.minimize(engine.optimizer[i], scaled)
+            if (iter_id + 1) % engine.update_freq == 0:
+                for i in range(len(engine.optimizer)):
+                    engine.scaler.minimize(engine.optimizer[i], scaled)
         else:
-            loss_dict["loss"].backward()
+            loss.backward()
+            if (iter_id + 1) % engine.update_freq == 0:
+                for i in range(len(engine.optimizer)):
+                    engine.optimizer[i].step()
+
+        if (iter_id + 1) % engine.update_freq == 0:
+            # clear grad
             for i in range(len(engine.optimizer)):
-                engine.optimizer[i].step()
-
-        # clear grad
-        for i in range(len(engine.optimizer)):
-            engine.optimizer[i].clear_grad()
-
-        # step lr(by step)
-        for i in range(len(engine.lr_sch)):
-            if not getattr(engine.lr_sch[i], "by_epoch", False):
-                engine.lr_sch[i].step()
+                engine.optimizer[i].clear_grad()
+            # step lr(by step)
+            for i in range(len(engine.lr_sch)):
+                if not getattr(engine.lr_sch[i], "by_epoch", False):
+                    engine.lr_sch[i].step()
+            # update ema
+            if engine.ema:
+                engine.model_ema.update(engine.model)
 
         # below code just for logging
         # update metric_for_logger

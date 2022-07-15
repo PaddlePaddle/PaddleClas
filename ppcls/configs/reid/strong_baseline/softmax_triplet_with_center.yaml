@@ -82,7 +82,7 @@ Optimizer:
         by_epoch: True
         last_epoch: 0
       regularizer:
-        name: 'L2'
+        name: "L2"
         coeff: 0.0005
   - SGD:
       scope: CenterLoss
@@ -94,41 +94,41 @@ Optimizer:
 DataLoader:
   Train:
     dataset:
-        name: "Market1501"
-        image_root: "./dataset/"
-        cls_label_path: "bounding_box_train"
-        backend: "pil"
-        transform_ops:
-          - ResizeImage:
-              size: [128, 256]
-              return_numpy: False
-              interpolation: 'bilinear'
-              backend: "pil"
-          - RandFlipImage:
-              flip_code: 1
-          - Pad:
-              padding: 10
-          - RandCropImageV2:
-              size: [128, 256]
-          - ToTensor:
-          - Normalize:
-              mean: [0.485, 0.456, 0.406]
-              std: [0.229, 0.224, 0.225]
-          - RandomErasing:
-              EPSILON: 0.5
-              sl: 0.02
-              sh: 0.4
-              r1: 0.3
-              mean: [0.485, 0.456, 0.406]
+      name: "Market1501"
+      image_root: "./dataset/"
+      cls_label_path: "bounding_box_train"
+      backend: "pil"
+      transform_ops:
+        - ResizeImage:
+            size: [128, 256]
+            return_numpy: False
+            interpolation: "bilinear"
+            backend: "pil"
+        - RandFlipImage:
+            flip_code: 1
+        - Pad:
+            padding: 10
+        - RandCropImageV2:
+            size: [128, 256]
+        - ToTensor:
+        - Normalize:
+            mean: [0.485, 0.456, 0.406]
+            std: [0.229, 0.224, 0.225]
+        - RandomErasing:
+            EPSILON: 0.5
+            sl: 0.02
+            sh: 0.4
+            r1: 0.3
+            mean: [0.485, 0.456, 0.406]
     sampler:
-        name: DistributedRandomIdentitySampler
-        batch_size: 64
-        num_instances: 4
-        drop_last: False
-        shuffle: True
+      name: DistributedRandomIdentitySampler
+      batch_size: 64
+      num_instances: 4
+      drop_last: False
+      shuffle: True
     loader:
-        num_workers: 4
-        use_shared_memory: True
+      num_workers: 4
+      use_shared_memory: True
   Eval:
     Query:
       dataset:
@@ -140,7 +140,7 @@ DataLoader:
           - ResizeImage:
               size: [128, 256]
               return_numpy: False
-              interpolation: 'bilinear'
+              interpolation: "bilinear"
               backend: "pil"
           - ToTensor:
           - Normalize:
@@ -165,7 +165,7 @@ DataLoader:
           - ResizeImage:
               size: [128, 256]
               return_numpy: False
-              interpolation: 'bilinear'
+              interpolation: "bilinear"
               backend: "pil"
           - ToTensor:
           - Normalize:

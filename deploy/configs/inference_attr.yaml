@@ -25,8 +25,8 @@ PreProcess:
     - ToCHWImage:
 
 PostProcess:
-  main_indicator: Attribute
-  Attribute:
+  main_indicator: PersonAttribute
+  PersonAttribute:
     threshold: 0.5  #default threshold
     glasses_threshold: 0.3  #threshold only for glasses
     hold_threshold: 0.6 #threshold only for hold

@@ -5,13 +5,13 @@ PaddleClas 在 Windows 平台下基于 `Visual Studio 2019 Community` 进行了�
 -----
 ## 目录
 * [1. 前置条件](#1)
-	* [1.1 下载 PaddlePaddle C++ 预测库 paddle_inference_install_dir](#1.1)
-	* [1.2 安装配置 OpenCV](#1.2)
+    * [1.1 下载 PaddlePaddle C++ 预测库 paddle_inference_install_dir](#1.1)
+    * [1.2 安装配置 OpenCV](#1.2)
 * [2. 使用 Visual Studio 2019 编译](#2)
 * [3. 预测](#3)
-	* [3.1 准备 inference model](#3.1)
-	* [3.2 运行预测](#3.2)
-	* [3.3 注意事项](#3.3)
+    * [3.1 准备 inference model](#3.1)
+    * [3.2 运行预测](#3.2)
+    * [3.3 注意事项](#3.3)
 
 <a name='1'></a>
 ## 1. 前置条件

@@ -34,6 +34,7 @@ from ppcls.arch import apply_to_static
 from ppcls.loss import build_loss
 from ppcls.metric import build_metrics
 from ppcls.optimizer import build_optimizer
+from ppcls.utils.ema import ExponentialMovingAverage
 from ppcls.utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
 from ppcls.utils.save_load import init_model
 from ppcls.utils import save_load
@@ -103,6 +104,9 @@ class Engine(object):
         logger.info('train with paddle {} and device {}'.format(
             paddle.__version__, self.device))
 
+        # gradient accumulation
+        self.update_freq = self.config["Global"].get("update_freq", 1)
+
         if "class_num" in config["Global"]:
             global_class_num = config["Global"]["class_num"]
             if "class_num" not in config["Arch"]:
@@ -156,39 +160,33 @@ class Engine(object):
                 self.eval_loss_func = None
 
         # build metric
-        if self.mode == 'train':
-            metric_config = self.config.get("Metric")
-            if metric_config is not None:
-                metric_config = metric_config.get("Train")
-                if metric_config is not None:
-                    if hasattr(
-                            self.train_dataloader, "collate_fn"
-                    ) and self.train_dataloader.collate_fn is not None:
-                        for m_idx, m in enumerate(metric_config):
-                            if "TopkAcc" in m:
-                                msg = f"'TopkAcc' metric can not be used when setting 'batch_transform_ops' in config. The 'TopkAcc' metric has been removed."
-                                logger.warning(msg)
-                                break
+        if self.mode == 'train' and "Metric" in self.config and "Train" in self.config[
+                "Metric"] and self.config["Metric"]["Train"]:
+            metric_config = self.config["Metric"]["Train"]
+            if hasattr(self.train_dataloader, "collate_fn"
+                       ) and self.train_dataloader.collate_fn is not None:
+                for m_idx, m in enumerate(metric_config):
+                    if "TopkAcc" in m:
+                        msg = f"Unable to calculate accuracy when using \"batch_transform_ops\". The metric \"{m}\" has been removed."
+                        logger.warning(msg)
                         metric_config.pop(m_idx)
-                    self.train_metric_func = build_metrics(metric_config)
-                else:
-                    self.train_metric_func = None
+            self.train_metric_func = build_metrics(metric_config)
         else:
             self.train_metric_func = None
 
         if self.mode == "eval" or (self.mode == "train" and
                                    self.config["Global"]["eval_during_train"]):
-            metric_config = self.config.get("Metric")
             if self.eval_mode == "classification":
-                if metric_config is not None:
-                    metric_config = metric_config.get("Eval")
-                    if metric_config is not None:
-                        self.eval_metric_func = build_metrics(metric_config)
-            elif self.eval_mode == "retrieval":
-                if metric_config is None:
-                    metric_config = [{"name": "Recallk", "topk": (1, 5)}]
+                if "Metric" in self.config and "Eval" in self.config["Metric"]:
+                    self.eval_metric_func = build_metrics(self.config["Metric"]
+                                                          ["Eval"])
                 else:
-                    metric_config = metric_config["Eval"]
+                    self.eval_metric_func = None
+            elif self.eval_mode == "retrieval":
+                if "Metric" in self.config and "Eval" in self.config["Metric"]:
+                    metric_config = self.config["Metric"]["Eval"]
+                else:
+                    metric_config = [{"name": "Recallk", "topk": (1, 5)}]
                 self.eval_metric_func = build_metrics(metric_config)
         else:
             self.eval_metric_func = None
@@ -213,7 +211,7 @@ class Engine(object):
         if self.mode == 'train':
             self.optimizer, self.lr_sch = build_optimizer(
                 self.config["Optimizer"], self.config["Global"]["epochs"],
-                len(self.train_dataloader),
+                len(self.train_dataloader) // self.update_freq,
                 [self.model, self.train_loss_func])
 
         # AMP training and evaluating
@@ -226,7 +224,7 @@ class Engine(object):
                 AMP_RELATED_FLAGS_SETTING.update({
                     'FLAGS_cudnn_batchnorm_spatial_persistent': 1
                 })
-            paddle.fluid.set_flags(AMP_RELATED_FLAGS_SETTING)
+            paddle.set_flags(AMP_RELATED_FLAGS_SETTING)
 
             self.scale_loss = self.config["AMP"].get("scale_loss", 1.0)
             self.use_dynamic_loss_scaling = self.config["AMP"].get(
@@ -287,6 +285,12 @@ class Engine(object):
                     level=self.amp_level,
                     save_dtype='float32')
 
+        # build EMA model
+        self.ema = "EMA" in self.config and self.mode == "train"
+        if self.ema:
+            self.model_ema = ExponentialMovingAverage(
+                self.model, self.config['EMA'].get("decay", 0.9999))
+
         # check the gpu num
         world_size = dist.get_world_size()
         self.config["Global"]["distributed"] = world_size != 1
@@ -322,6 +326,10 @@ class Engine(object):
             "metric": -1.0,
             "epoch": 0,
         }
+        ema_module = None
+        if self.ema:
+            best_metric_ema = 0.0
+            ema_module = self.model_ema.module
         # key:
         # val: metrics list word
         self.output_info = dict()
@@ -336,12 +344,14 @@ class Engine(object):
 
         if self.config.Global.checkpoints is not None:
             metric_info = init_model(self.config.Global, self.model,
-                                     self.optimizer, self.train_loss_func)
+                                     self.optimizer, self.train_loss_func,
+                                     ema_module)
             if metric_info is not None:
                 best_metric.update(metric_info)
 
         self.max_iter = len(self.train_dataloader) - 1 if platform.system(
         ) == "Windows" else len(self.train_dataloader)
+        self.max_iter = self.max_iter // self.update_freq * self.update_freq
 
         for epoch_id in range(best_metric["epoch"] + 1,
                               self.config["Global"]["epochs"] + 1):
@@ -372,6 +382,7 @@ class Engine(object):
                         self.optimizer,
                         best_metric,
                         self.output_dir,
+                        ema=ema_module,
                         model_name=self.config["Arch"]["name"],
                         prefix="best_model",
                         loss=self.train_loss_func,
@@ -386,6 +397,32 @@ class Engine(object):
 
                 self.model.train()
 
+                if self.ema:
+                    ori_model, self.model = self.model, ema_module
+                    acc_ema = self.eval(epoch_id)
+                    self.model = ori_model
+                    ema_module.eval()
+
+                    if acc_ema > best_metric_ema:
+                        best_metric_ema = acc_ema
+                        save_load.save_model(
+                            self.model,
+                            self.optimizer,
+                            {"metric": acc_ema,
+                             "epoch": epoch_id},
+                            self.output_dir,
+                            ema=ema_module,
+                            model_name=self.config["Arch"]["name"],
+                            prefix="best_model_ema",
+                            loss=self.train_loss_func)
+                    logger.info("[Eval][Epoch {}][best metric ema: {}]".format(
+                        epoch_id, best_metric_ema))
+                    logger.scaler(
+                        name="eval_acc_ema",
+                        value=acc_ema,
+                        step=epoch_id,
+                        writer=self.vdl_writer)
+
             # save model
             if epoch_id % save_interval == 0:
                 save_load.save_model(
@@ -393,6 +430,7 @@ class Engine(object):
                     self.optimizer, {"metric": acc,
                                      "epoch": epoch_id},
                     self.output_dir,
+                    ema=ema_module,
                     model_name=self.config["Arch"]["name"],
                     prefix="epoch_{}".format(epoch_id),
                     loss=self.train_loss_func)
@@ -402,6 +440,7 @@ class Engine(object):
                 self.optimizer, {"metric": acc,
                                  "epoch": epoch_id},
                 self.output_dir,
+                ema=ema_module,
                 model_name=self.config["Arch"]["name"],
                 prefix="latest",
                 loss=self.train_loss_func)
@@ -452,6 +491,8 @@ class Engine(object):
 
                 if isinstance(out, list):
                     out = out[0]
+                if isinstance(out, dict) and "Student" in out:
+                    out = out["Student"]
                 if isinstance(out, dict) and "logits" in out:
                     out = out["logits"]
                 if isinstance(out, dict) and "output" in out:
@@ -465,7 +506,7 @@ class Engine(object):
         assert self.mode == "export"
         use_multilabel = self.config["Global"].get(
             "use_multilabel",
-            False) and not "ATTRMetric" in self.config["Metric"]["Eval"][0]
+            False) and "ATTRMetric" in self.config["Metric"]["Eval"][0]
         model = ExportModel(self.config["Arch"], self.model, use_multilabel)
         if self.config["Global"]["pretrained_model"] is not None:
             load_dygraph_pretrain(model.base_model,
@@ -475,7 +516,7 @@ class Engine(object):
 
         # for rep nets
         for layer in self.model.sublayers():
-            if hasattr(layer, "rep"):
+            if hasattr(layer, "rep") and not getattr(layer, "is_repped"):
                 layer.rep()
 
         save_path = os.path.join(self.config["Global"]["save_inference_dir"],

@@ -87,7 +87,7 @@ def main(args):
             'FLAGS_max_inplace_grad_add': 8,
         }
         os.environ['FLAGS_cudnn_batchnorm_spatial_persistent'] = '1'
-        paddle.fluid.set_flags(AMP_RELATED_FLAGS_SETTING)
+        paddle.set_flags(AMP_RELATED_FLAGS_SETTING)
 
     use_xpu = global_config.get("use_xpu", False)
     use_npu = global_config.get("use_npu", False)

@@ -189,7 +189,7 @@ class Binarize(object):
         return byte
 
 
-class Attribute(object):
+class PersonAttribute(object):
     def __init__(self,
                  threshold=0.5,
                  glasses_threshold=0.3,
@@ -277,6 +277,46 @@ class Attribute(object):
             threshold_list[18] = self.hold_threshold
             pred_res = (np.array(res) > np.array(threshold_list)
                         ).astype(np.int8).tolist()
+            batch_res.append({"attributes": label_res, "output": pred_res})
+        return batch_res
 
-            batch_res.append([label_res, pred_res])
+
+class VehicleAttribute(object):
+    def __init__(self, color_threshold=0.5, type_threshold=0.5):
+        self.color_threshold = color_threshold
+        self.type_threshold = type_threshold
+        self.color_list = [
+            "yellow", "orange", "green", "gray", "red", "blue", "white",
+            "golden", "brown", "black"
+        ]
+        self.type_list = [
+            "sedan", "suv", "van", "hatchback", "mpv", "pickup", "bus",
+            "truck", "estate"
+        ]
+
+    def __call__(self, batch_preds, file_names=None):
+        # postprocess output of predictor
+        batch_res = []
+        for res in batch_preds:
+            res = res.tolist()
+            label_res = []
+            color_idx = np.argmax(res[:10])
+            type_idx = np.argmax(res[10:])
+            if res[color_idx] >= self.color_threshold:
+                color_info = f"Color: ({self.color_list[color_idx]}, prob: {res[color_idx]})"
+            else:
+                color_info = "Color unknown"
+
+            if res[type_idx + 10] >= self.type_threshold:
+                type_info = f"Type: ({self.type_list[type_idx]}, prob: {res[type_idx + 10]})"
+            else:
+                type_info = "Type unknown"
+
+            label_res = f"{color_info}, {type_info}"
+
+            threshold_list = [self.color_threshold
+                              ] * 10 + [self.type_threshold] * 9
+            pred_res = (np.array(res) > np.array(threshold_list)
+                        ).astype(np.int8).tolist()
+            batch_res.append({"attributes": label_res, "output": pred_res})
         return batch_res

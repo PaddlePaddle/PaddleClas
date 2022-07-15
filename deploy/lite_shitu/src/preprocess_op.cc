@@ -20,7 +20,7 @@
 
 namespace PPShiTu {
 
-void InitInfo::Run(cv::Mat* im, ImageBlob* data) {
+void InitInfo::Run(cv::Mat *im, ImageBlob *data) {
   data->im_shape_ = {static_cast<float>(im->rows),
                      static_cast<float>(im->cols)};
   data->scale_factor_ = {1., 1.};
@@ -28,10 +28,10 @@ void InitInfo::Run(cv::Mat* im, ImageBlob* data) {
                          static_cast<float>(im->cols)};
 }
 
-void NormalizeImage::Run(cv::Mat* im, ImageBlob* data) {
+void NormalizeImage::Run(cv::Mat *im, ImageBlob *data) {
   double e = 1.0;
   if (is_scale_) {
-    e *= 1./255.0;
+    e *= 1. / 255.0;
   }
   (*im).convertTo(*im, CV_32FC3, e);
   for (int h = 0; h < im->rows; h++) {
@@ -46,35 +46,61 @@ void NormalizeImage::Run(cv::Mat* im, ImageBlob* data) {
   }
 }
 
-void Permute::Run(cv::Mat* im, ImageBlob* data) {
+void NormalizeImage::Run_feature(cv::Mat *im, const std::vector<float> &mean,
+                                 const std::vector<float> &std, float scale) {
+  (*im).convertTo(*im, CV_32FC3, scale);
+  for (int h = 0; h < im->rows; h++) {
+    for (int w = 0; w < im->cols; w++) {
+      im->at<cv::Vec3f>(h, w)[0] =
+          (im->at<cv::Vec3f>(h, w)[0] - mean[0]) / std[0];
+      im->at<cv::Vec3f>(h, w)[1] =
+          (im->at<cv::Vec3f>(h, w)[1] - mean[1]) / std[1];
+      im->at<cv::Vec3f>(h, w)[2] =
+          (im->at<cv::Vec3f>(h, w)[2] - mean[2]) / std[2];
+    }
+  }
+}
+
+void Permute::Run(cv::Mat *im, ImageBlob *data) {
   (*im).convertTo(*im, CV_32FC3);
   int rh = im->rows;
   int rw = im->cols;
   int rc = im->channels();
   (data->im_data_).resize(rc * rh * rw);
-  float* base = (data->im_data_).data();
+  float *base = (data->im_data_).data();
   for (int i = 0; i < rc; ++i) {
     cv::extractChannel(*im, cv::Mat(rh, rw, CV_32FC1, base + i * rh * rw), i);
   }
 }
 
-void Resize::Run(cv::Mat* im, ImageBlob* data) {
+void Permute::Run_feature(const cv::Mat *im, float *data) {
+  int rh = im->rows;
+  int rw = im->cols;
+  int rc = im->channels();
+  for (int i = 0; i < rc; ++i) {
+    cv::extractChannel(*im, cv::Mat(rh, rw, CV_32FC1, data + i * rh * rw), i);
+  }
+}
+
+void Resize::Run(cv::Mat *im, ImageBlob *data) {
   auto resize_scale = GenerateScale(*im);
   data->im_shape_ = {static_cast<float>(im->cols * resize_scale.first),
                      static_cast<float>(im->rows * resize_scale.second)};
   data->in_net_shape_ = {static_cast<float>(im->cols * resize_scale.first),
                          static_cast<float>(im->rows * resize_scale.second)};
-  cv::resize(
-      *im, *im, cv::Size(), resize_scale.first, resize_scale.second, interp_);
+  cv::resize(*im, *im, cv::Size(), resize_scale.first, resize_scale.second,
+             interp_);
   data->im_shape_ = {
-      static_cast<float>(im->rows), static_cast<float>(im->cols),
+      static_cast<float>(im->rows),
+      static_cast<float>(im->cols),
   };
   data->scale_factor_ = {
-      resize_scale.second, resize_scale.first,
+      resize_scale.second,
+      resize_scale.first,
   };
 }
 
-std::pair<float, float> Resize::GenerateScale(const cv::Mat& im) {
+std::pair<float, float> Resize::GenerateScale(const cv::Mat &im) {
   std::pair<float, float> resize_scale;
   int origin_w = im.cols;
   int origin_h = im.rows;
@@ -101,7 +127,30 @@ std::pair<float, float> Resize::GenerateScale(const cv::Mat& im) {
   return resize_scale;
 }
 
-void PadStride::Run(cv::Mat* im, ImageBlob* data) {
+void Resize::Run_feature(const cv::Mat &img, cv::Mat &resize_img,
+                         int resize_short_size, int size) {
+  int resize_h = 0;
+  int resize_w = 0;
+  if (size > 0) {
+    resize_h = size;
+    resize_w = size;
+  } else {
+    int w = img.cols;
+    int h = img.rows;
+
+    float ratio = 1.f;
+    if (h < w) {
+      ratio = float(resize_short_size) / float(h);
+    } else {
+      ratio = float(resize_short_size) / float(w);
+    }
+    resize_h = round(float(h) * ratio);
+    resize_w = round(float(w) * ratio);
+  }
+  cv::resize(img, resize_img, cv::Size(resize_w, resize_h));
+}
+
+void PadStride::Run(cv::Mat *im, ImageBlob *data) {
   if (stride_ <= 0) {
     return;
   }
@@ -110,48 +159,44 @@ void PadStride::Run(cv::Mat* im, ImageBlob* data) {
   int rw = im->cols;
   int nh = (rh / stride_) * stride_ + (rh % stride_ != 0) * stride_;
   int nw = (rw / stride_) * stride_ + (rw % stride_ != 0) * stride_;
-  cv::copyMakeBorder(
-      *im, *im, 0, nh - rh, 0, nw - rw, cv::BORDER_CONSTANT, cv::Scalar(0));
+  cv::copyMakeBorder(*im, *im, 0, nh - rh, 0, nw - rw, cv::BORDER_CONSTANT,
+                     cv::Scalar(0));
   data->in_net_shape_ = {
-      static_cast<float>(im->rows), static_cast<float>(im->cols),
+      static_cast<float>(im->rows),
+      static_cast<float>(im->cols),
   };
 }
 
-void TopDownEvalAffine::Run(cv::Mat* im, ImageBlob* data) {
+void TopDownEvalAffine::Run(cv::Mat *im, ImageBlob *data) {
   cv::resize(*im, *im, cv::Size(trainsize_[0], trainsize_[1]), 0, 0, interp_);
   // todo: Simd::ResizeBilinear();
   data->in_net_shape_ = {
-      static_cast<float>(trainsize_[1]), static_cast<float>(trainsize_[0]),
+      static_cast<float>(trainsize_[1]),
+      static_cast<float>(trainsize_[0]),
   };
 }
 
 // Preprocessor op running order
-const std::vector<std::string> Preprocessor::RUN_ORDER = {"InitInfo",
-                                                          "DetTopDownEvalAffine",
-                                                          "DetResize",
-                                                          "DetNormalizeImage",
-                                                          "DetPadStride",
-                                                          "DetPermute"};
+const std::vector<std::string> Preprocessor::RUN_ORDER = {
+    "InitInfo",          "DetTopDownEvalAffine", "DetResize",
+    "DetNormalizeImage", "DetPadStride",         "DetPermute"};
 
-void Preprocessor::Run(cv::Mat* im, ImageBlob* data) {
-  for (const auto& name : RUN_ORDER) {
+void Preprocessor::Run(cv::Mat *im, ImageBlob *data) {
+  for (const auto &name : RUN_ORDER) {
     if (ops_.find(name) != ops_.end()) {
       ops_[name]->Run(im, data);
     }
   }
 }
 
-void CropImg(cv::Mat& img,
-             cv::Mat& crop_img,
-             std::vector<int>& area,
-             std::vector<float>& center,
-             std::vector<float>& scale,
+void CropImg(cv::Mat &img, cv::Mat &crop_img, std::vector<int> &area,
+             std::vector<float> &center, std::vector<float> &scale,
              float expandratio) {
   int crop_x1 = std::max(0, area[0]);
   int crop_y1 = std::max(0, area[1]);
   int crop_x2 = std::min(img.cols - 1, area[2]);
   int crop_y2 = std::min(img.rows - 1, area[3]);
-  
+
   int center_x = (crop_x1 + crop_x2) / 2.;
   int center_y = (crop_y1 + crop_y2) / 2.;
   int half_h = (crop_y2 - crop_y1) / 2.;
@@ -182,4 +227,4 @@ void CropImg(cv::Mat& img,
   scale.emplace_back((crop_y2 - crop_y1));
 }
 
-}  // namespace PPShiTu
+} // namespace PPShiTu

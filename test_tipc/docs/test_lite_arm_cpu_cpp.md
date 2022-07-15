@@ -15,7 +15,7 @@ Lite_arm_cpp_cpu 预测功能测试的主程序为`test_lite_arm_cpu_cpp.sh`，�
 先运行 `prepare_lite_arm_cpu_cpp.sh` 准备数据和模型，然后运行 `test_lite_arm_cpu_cpp.sh` 进行测试，最终在 `./output` 目录下生成 `lite_*.log` 后缀的日志文件。
 
 ```shell
-bash test_tipc/prepare_lite_arm_cpu_cpp.sh test_tipc/config/MobileNetV3/MobileNetV3_large_x1_0_lite_arm_cpu_cpp.txt
+bash test_tipc/prepare_lite_arm_cpu_cpp.sh test_tipc/configs/MobileNetV3/MobileNetV3_large_x1_0_lite_arm_cpu_cpp.txt
 ```
 
 运行预测指令后，在`./output`文件夹下自动会保存运行日志，包括以下文件：

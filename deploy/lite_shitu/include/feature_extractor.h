@@ -18,6 +18,7 @@
 #include <arm_neon.h>
 #include <chrono>
 #include <fstream>
+#include <include/preprocess_op.h>
 #include <iostream>
 #include <math.h>
 #include <opencv2/opencv.hpp>
@@ -48,10 +49,6 @@ public:
         config_file["Global"]["rec_model_path"].as<std::string>());
     this->predictor = CreatePaddlePredictor<MobileConfig>(config);
 
-    if (config_file["Global"]["rec_label_path"].as<std::string>().empty()) {
-      std::cout << "Please set [rec_label_path] in config file" << std::endl;
-      exit(-1);
-    }
     SetPreProcessParam(config_file["RecPreProcess"]["transform_ops"]);
     printf("feature extract model create!\n");
   }
@@ -68,24 +65,29 @@ public:
           this->mean.emplace_back(tmp.as<float>());
         }
         for (auto tmp : item["std"]) {
-          this->std.emplace_back(1 / tmp.as<float>());
+          this->std.emplace_back(tmp.as<float>());
         }
         this->scale = item["scale"].as<double>();
       }
     }
   }
 
-  void RunRecModel(const cv::Mat &img, double &cost_time, std::vector<float> &feature);
-  //void PostProcess(std::vector<float> &feature);
-  cv::Mat ResizeImage(const cv::Mat &img);
-  void NeonMeanScale(const float *din, float *dout, int size);
+  void RunRecModel(const cv::Mat &img, double &cost_time,
+                   std::vector<float> &feature);
+  // void PostProcess(std::vector<float> &feature);
+  void FeatureNorm(std::vector<float> &featuer);
 
 private:
   std::shared_ptr<PaddlePredictor> predictor;
-  //std::vector<std::string> label_list;
+  // std::vector<std::string> label_list;
   std::vector<float> mean = {0.485f, 0.456f, 0.406f};
-  std::vector<float> std = {1 / 0.229f, 1 / 0.224f, 1 / 0.225f};
+  std::vector<float> std = {0.229f, 0.224f, 0.225f};
   double scale = 0.00392157;
-  float size = 224;
+  int size = 224;
+
+  // pre-process
+  Resize resize_op_;
+  NormalizeImage normalize_op_;
+  Permute permute_op_;
 };
 } // namespace PPShiTu

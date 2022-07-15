@@ -41,8 +41,11 @@ def main():
                      'inference.pdmodel')) and os.path.exists(
                          os.path.join(config["Global"]["save_inference_dir"],
                                       'inference.pdiparams'))
+    if "Query" in config["DataLoader"]["Eval"]:
+        config["DataLoader"]["Eval"] = config["DataLoader"]["Eval"]["Query"]
     config["DataLoader"]["Eval"]["sampler"]["batch_size"] = 1
     config["DataLoader"]["Eval"]["loader"]["num_workers"] = 0
+
     init_logger()
     device = paddle.set_device("cpu")
     train_dataloader = build_dataloader(config["DataLoader"], "Eval", device,
@@ -67,6 +70,7 @@ def main():
         quantize_model_path=os.path.join(
             config["Global"]["save_inference_dir"], "quant_post_static_model"),
         sample_generator=sample_generator(train_dataloader),
+        batch_size=config["DataLoader"]["Eval"]["sampler"]["batch_size"],
         batch_nums=10)
 
 

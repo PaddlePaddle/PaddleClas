@@ -67,6 +67,9 @@ from ppcls.arch.backbone.model_zoo.pvt_v2 import PVT_V2_B0, PVT_V2_B1, PVT_V2_B2
 from ppcls.arch.backbone.model_zoo.mobilevit import MobileViT_XXS, MobileViT_XS, MobileViT_S
 from ppcls.arch.backbone.model_zoo.repvgg import RepVGG_A0, RepVGG_A1, RepVGG_A2, RepVGG_B0, RepVGG_B1, RepVGG_B2, RepVGG_B1g2, RepVGG_B1g4, RepVGG_B2g4, RepVGG_B3g4
 from ppcls.arch.backbone.model_zoo.van import VAN_tiny
+from ppcls.arch.backbone.model_zoo.peleenet import PeleeNet
+from ppcls.arch.backbone.model_zoo.convnext import ConvNeXt_tiny
+
 from ppcls.arch.backbone.variant_models.resnet_variant import ResNet50_last_stage_stride1
 from ppcls.arch.backbone.variant_models.vgg_variant import VGG19Sigmoid
 from ppcls.arch.backbone.variant_models.pp_lcnet_variant import PPLCNet_x2_5_Tanh
