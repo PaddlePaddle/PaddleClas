@@ -24,13 +24,6 @@ from ppcls.data import preprocess
 from ppcls.data.preprocess import transform
 from ppcls.utils import logger
 from .common_dataset import create_operators
-from PIL import Image
-from paddle.vision import ToTensor
-from paddle.vision import RandomResizedCrop
-from paddle.vision import RandomHorizontalFlip
-from paddle.vision import Normalize
-from paddle.vision import CenterCrop
-from paddle.vision import Resize
 
 
 class CompCars(Dataset):
