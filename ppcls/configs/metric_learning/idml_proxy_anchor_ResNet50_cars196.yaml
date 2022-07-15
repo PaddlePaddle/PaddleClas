@@ -23,11 +23,12 @@ Arch:
   name: RecModel
   fix_bn: True
   Backbone:
-    name: ResNet50_stage4
+    name: ResNet50
     return_stages: False
     pretrained: https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/others/resnet50-19c8e357_torch2paddle.pdparams
     # pretrained: True
     bn_use_global_stats: True
+    stop_after: blocks[15]
 
   Neck:
     name: IDMLNeck

@@ -303,6 +303,7 @@ class ResNet(TheseusLayer):
                  return_patterns=None,
                  return_stages=None,
                  bn_use_global_stats=False,
+                 stop_after=None,
                  **kargs):
         super().__init__()
 
@@ -378,6 +379,9 @@ class ResNet(TheseusLayer):
             stages_pattern,
             return_patterns=return_patterns,
             return_stages=return_stages)
+        if stop_after is not None:
+           super().stop_after(stop_after)
+
 
     def forward(self, x):
         with paddle.static.amp.fp16_guard():
