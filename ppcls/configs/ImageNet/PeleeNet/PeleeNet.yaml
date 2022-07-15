@@ -112,8 +112,8 @@ Infer:
         channel_first: False
     - ResizeImage:
         resize_short: 256
-            interpolation: bilinear
-            backend: pil
+        interpolation: bilinear
+        backend: pil
     - CropImage:
         size: 224
     - NormalizeImage:
