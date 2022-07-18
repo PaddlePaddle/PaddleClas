@@ -24,6 +24,7 @@ from .kldivloss import KLDivLoss
 from .dkdloss import DKDLoss
 from .dist_loss import DISTLoss
 from .multilabelloss import MultiLabelLoss
+from .mgd_loss import MGDLoss
 
 
 class DistillationCELoss(CELoss):
@@ -318,4 +319,47 @@ class DistillationDISTLoss(DISTLoss):
                 out2 = out2[self.key]
             loss = super().forward(out1, out2)
             loss_dict[f"{self.name}_{pair[0]}_{pair[1]}"] = loss
+        return loss_dict
+
+
+class DistillationPairLoss(nn.Layer):
+    """
+    DistillationPairLoss
+    """
+
+    def __init__(self,
+                 base_loss_name,
+                 model_name_pairs=[],
+                 s_keys=None,
+                 t_keys=None,
+                 name="loss",
+                 **kwargs):
+        super().__init__()
+        self.loss_func = eval(base_loss_name)(**kwargs)
+        if not isinstance(s_keys, list):
+            s_keys = [s_keys]
+        if not isinstance(t_keys, list):
+            t_keys = [t_keys]
+        self.s_keys = s_keys
+        self.t_keys = t_keys
+        self.model_name_pairs = model_name_pairs
+        self.name = name
+
+    def forward(self, predicts, batch):
+        loss_dict = dict()
+        for idx, pair in enumerate(self.model_name_pairs):
+            out1 = predicts[pair[0]]
+            out2 = predicts[pair[1]]
+            out1 = [out1[k] if k is not None else out1 for k in self.s_keys]
+            out2 = [out2[k] if k is not None else out2 for k in self.t_keys]
+            for feat_idx, (o1, o2) in enumerate(zip(out1, out2)):
+                loss = self.loss_func.forward(o1, o2)
+                if isinstance(loss, dict):
+                    for k in loss:
+                        loss_dict[
+                            f"{self.name}_{idx}_{feat_idx}_{pair[0]}_{pair[1]}_{k}"] = loss[
+                                k]
+                else:
+                    loss_dict[
+                        f"{self.name}_{idx}_{feat_idx}_{pair[0]}_{pair[1]}"] = loss
         return loss_dict
