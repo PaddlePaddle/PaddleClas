@@ -571,13 +571,13 @@ Loss:
         model_names: ["Student"]
     - DistillationPairLoss:
         weight: 1.0
-        model_name_pairs: [["Student", "Teacher"]] # 对Student与Teacher计算MGDLoss
+        model_name_pairs: [["Student", "Teacher"]] # calculate mgdloss for Student and Teacher
         name: "loss_mgd"
-        base_loss_name: MGDLoss # MGD loss，下面为MGD loss的参数
-        s_keys: ["blocks[7]"]   # 学生模型中用于计算MGD loss的特征图
-        t_keys: ["blocks[15]"]  # 教师模型中用于计算MGD loss的特征图
-        student_channels: 512   # 学生模型特征图通道数
-        teacher_channels: 512   # 教师模型特征图通道数
+        base_loss_name: MGDLoss # MGD loss，the following are parameters of 'MGD loss'
+        s_keys: ["blocks[7]"]   # feature map used to calculate MGD loss in student model
+        t_keys: ["blocks[15]"]  # feature map used to calculate MGD loss in teacher model
+        student_channels: 512   # channel num for stduent feature map
+        teacher_channels: 512   # channel num for teacher feature map
   Eval:
     - CELoss:
         weight: 1.0
