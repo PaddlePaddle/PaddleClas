@@ -55,13 +55,6 @@ PULC超轻量图像分类方案快速体验：[点击这里](docs/zh_CN/PULC/PUL
 
 PP-ShiTu图像识别快速体验：[点击这里](./docs/zh_CN/quick_start/quick_start_recognition.md)
 
-## PaddleClas 产业实践范例
-| 场景 | 亮点 | 在线体验 |
-| --- | --- | --- |
-| [电梯内电瓶车入室检测](docs/zh_CN/samples/Electromobile_In_Elevator_Detection/README.md) | 从源头避免因电瓶车进楼入户而导致火灾事故的发生 | [AI Studio](https://aistudio.baidu.com/aistudio/projectdetail/3497217?contributionType=1) |
-| [商品识别](docs/zh_CN/samples/Goods_Recognition/README.md) | 适用于货架陈列分析、智能结算、仓库管理、以图搜图等场景 | [AI Studio](https://aistudio.baidu.com/aistudio/projectdetail/3460304) |
-| [人员出入管理](docs/zh_CN/samples/Personnel_Access/README.md) | 适用于厂区巡检、家居防盗、景区管理等多个产业 | [AI Studio](https://aistudio.baidu.com/aistudio/projectdetail/4094475) |
-
 ## 文档教程
 - [环境准备](docs/zh_CN/installation/install_paddleclas.md)
 - [PULC超轻量图像分类实用方案](docs/zh_CN/PULC/PULC_train.md)
@@ -102,6 +95,10 @@ PP-ShiTu图像识别快速体验：[点击这里](./docs/zh_CN/quick_start/quick
   - [PP-LCNetv2](docs/zh_CN/models/PP-LCNetV2.md)
   - [PP-LCNet](docs/zh_CN/models/PP-LCNet.md)
 - [SSLD半监督知识蒸馏方案](docs/zh_CN/advanced_tutorials/ssld.md)
+- PaddleClas 产业实践范例
+  - [电梯内电瓶车入室检测](docs/zh_CN/samples/Electromobile_In_Elevator_Detection/README.md)
+  - [商品识别](docs/zh_CN/samples/Goods_Recognition/README.md)
+  - [人员出入管理](docs/zh_CN/samples/Personnel_Access/README.md)
 - 前沿算法
   - [骨干网络和预训练模型库](docs/zh_CN/algorithm_introduction/ImageNet_models.md)
   - [度量学习](docs/zh_CN/algorithm_introduction/metric_learning.md)
