@@ -20,11 +20,6 @@
 
 
 ## 近期更新
-- 📢将于**6月15-6月17日晚20:30** 进行为期三天的课程直播，详细介绍超轻量图像分类方案，对各场景模型优化原理及使用方式进行拆解，之后还有产业案例全流程实操，对各类痛难点解决方案进行手把手教学，加上现场互动答疑，抓紧扫码上车吧！
-
-<div align="center">
-<img src="https://user-images.githubusercontent.com/45199522/173483779-2332f990-4941-4f8d-baee-69b62035fc31.png" width = "200" height = "200"/>
-</div>
 
 - 🔥️ 2022.6.15 发布[PULC超轻量图像分类实用方案](docs/zh_CN/PULC/PULC_train.md)，CPU推理3ms，精度比肩SwinTransformer，覆盖人、车、OCR场景九大常见任务。
 
@@ -59,6 +54,13 @@ PaddleClas发布了[PP-HGNet](docs/zh_CN/models/PP-HGNet.md)、[PP-LCNetv2](docs
 PULC超轻量图像分类方案快速体验：[点击这里](docs/zh_CN/PULC/PULC_quickstart.md)
 
 PP-ShiTu图像识别快速体验：[点击这里](./docs/zh_CN/quick_start/quick_start_recognition.md)
+
+## PaddleClas 产业实践范例
+| 场景 | 亮点 | 在线体验 |
+| --- | --- | --- |
+| [电梯内电瓶车入室检测](docs/zh_CN/samples/Electromobile_In_Elevator_Detection/README.md) | 从源头避免因电瓶车进楼入户而导致火灾事故的发生 | [AI Studio](https://aistudio.baidu.com/aistudio/projectdetail/3497217?contributionType=1) |
+| [商品识别](docs/zh_CN/samples/Goods_Recognition/README.md) | 适用于货架陈列分析、智能结算、仓库管理、以图搜图等场景 | [AI Studio](https://aistudio.baidu.com/aistudio/projectdetail/3460304) |
+| [人员出入管理](docs/zh_CN/samples/Personnel_Access/README.md) | 适用于厂区巡检、家居防盗、景区管理等多个产业 | [AI Studio](https://aistudio.baidu.com/aistudio/projectdetail/4094475) |
 
 ## 文档教程
 - [环境准备](docs/zh_CN/installation/install_paddleclas.md)
