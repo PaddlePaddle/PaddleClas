@@ -2,44 +2,70 @@
 Global:
   checkpoints: null
   pretrained_model: null
-  output_dir: ./output/
+  output_dir: ./output/r34_r18_mgd
   device: gpu
   save_interval: 1
   eval_during_train: True
   eval_interval: 1
-  epochs: 120
+  epochs: 100
   print_batch_step: 10
   use_visualdl: False
   # used for static mode and model export
   image_shape: [3, 224, 224]
   save_inference_dir: ./inference
-  # training model under @to_static
   to_static: False
 
 # model architecture
 Arch:
-  name: PeleeNet
-  class_num: 1000
+  name: "DistillationModel"
+  class_num: &class_num 1000
+  # if not null, its lengths should be same as models
+  pretrained_list:
+  # if not null, its lengths should be same as models
+  freeze_params_list:
+  - True
+  - False
+  infer_model_name: "Student"
+  models:
+    - Teacher:
+        name: ResNet34
+        class_num: *class_num
+        pretrained: True
+        return_patterns: &t_stages ["blocks[2]", "blocks[6]", "blocks[12]", "blocks[15]"]
+    - Student:
+        name: ResNet18
+        class_num: *class_num
+        pretrained: False
+        return_patterns: &s_stages ["blocks[1]", "blocks[3]", "blocks[5]", "blocks[7]"]
  
 # loss function config for traing/eval process
 Loss:
   Train:
-    - CELoss:
+    - DistillationGTCELoss:
         weight: 1.0
+        model_names: ["Student"]
+    - DistillationPairLoss:
+        weight: 1.0
+        base_loss_name: MGDLoss
+        model_name_pairs: [["Student", "Teacher"]]
+        s_keys: ["blocks[7]"]
+        t_keys: ["blocks[15]"]
+        name: "loss_mgd"
+        student_channels: 512
+        teacher_channels: 512
   Eval:
     - CELoss:
         weight: 1.0
 
-
 Optimizer:
   name: Momentum
   momentum: 0.9
+  weight_decay: 1e-4
   lr:
-    name: Cosine
-    learning_rate: 0.18  # for total batch size 512
-  regularizer:
-    name: 'L2'
-    coeff: 0.0001
+    name: Piecewise
+    learning_rate: 0.1
+    decay_epochs: [30, 60, 90]
+    values: [0.1, 0.01, 0.001, 0.0001]
 
 
 # data loader for train and eval
@@ -55,8 +81,6 @@ DataLoader:
             channel_first: False
         - RandCropImage:
             size: 224
-            interpolation: bilinear
-            backend: pil
         - RandFlipImage:
             flip_code: 1
         - NormalizeImage:
@@ -67,11 +91,11 @@ DataLoader:
 
     sampler:
       name: DistributedBatchSampler
-      batch_size: 128
+      batch_size: 64
       drop_last: False
       shuffle: True
     loader:
-      num_workers: 4
+      num_workers: 8
       use_shared_memory: True
 
   Eval:
@@ -85,8 +109,6 @@ DataLoader:
             channel_first: False
         - ResizeImage:
             resize_short: 256
-            interpolation: bilinear
-            backend: pil
         - CropImage:
             size: 224
         - NormalizeImage:
@@ -96,11 +118,11 @@ DataLoader:
             order: ''
     sampler:
       name: DistributedBatchSampler
-      batch_size: 256  # for 2 cards
+      batch_size: 256
       drop_last: False
       shuffle: False
     loader:
-      num_workers: 4
+      num_workers: 8
       use_shared_memory: True
 
 Infer:
@@ -112,8 +134,6 @@ Infer:
         channel_first: False
     - ResizeImage:
         resize_short: 256
-        interpolation: bilinear
-        backend: pil
     - CropImage:
         size: 224
     - NormalizeImage:
@@ -128,9 +148,12 @@ Infer:
     class_id_map_file: ppcls/utils/imagenet1k_label_list.txt
 
 Metric:
-  Train:
-    - TopkAcc:
+    Train:
+    - DistillationTopkAcc:
+        model_key: "Student"
         topk: [1, 5]
-  Eval:
-    - TopkAcc:
+    Eval:
+    - DistillationTopkAcc:
+        model_key: "Student"
         topk: [1, 5]
+

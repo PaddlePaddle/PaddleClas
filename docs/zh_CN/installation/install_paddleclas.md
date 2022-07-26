@@ -2,22 +2,29 @@
 
 ---
 ## 目录
+- [1. 手动配置PaddlePaddle, PaddleClas环境](#1)
+  - [1.1 安装 PaddlePaddle](#1.1)
+    - [1.1.1 使用Paddle官方镜像](#1.1.1)
+    - [1.1.2 在现有环境中安装paddle](#1.1.2)
+    - [1.1.3 安装验证](#1.1.3)
+  - [1.2 克隆 PaddleClas](#1.2)
+  - [1.3 安装 Python 依赖库](#1.3)
+- [2. 快速创建PaddlePaddle, PaddleClas环境](#2)
 
-- [1. 安装 PaddlePaddle](#1)
-  - [1.1 使用Paddle官方镜像](#1.1)
-  - [1.2 在现有环境中安装paddle](#1.2)
-  - [1.3 安装验证](#1.3)
-- [2. 克隆 PaddleClas](#2)
-- [3. 安装 Python 依赖库](#3)
+
+我们提供了两种配置PaddlePaddle、PaddleClas环境的方法，第一种需要基于 docker 手动配置，您可以根据提供的命令更灵活的配置您的环境，详情请见[1. 手动配置PaddlePaddle, PaddleClas环境](#1)。第二种方式是我们将 PaddlePaddle、PaddleClas 相关的环境已配置到一个 docker 镜像中，您可以直接拉取使用，详情请见[2. 快速创建PaddlePaddle, PaddleClas环境](#2)。
 
 <a name='1'></a>
-### 1.安装PaddlePaddle
+## 1. 手动配置PaddlePaddle, PaddleClas环境
+
+<a name='1.1'></a>
+### 1.1 安装PaddlePaddle
 目前，**PaddleClas** 要求 **PaddlePaddle** 版本 `>=2.3`。
 建议使用Paddle官方提供的 Docker 镜像运行 PaddleClas，有关 Docker、nvidia-docker 的相关使用教程可以参考[链接](https://www.runoob.com/Docker/Docker-tutorial.html)。
 
-<a name='1.1'></a>
+<a name='1.1.1'></a>
 
-#### 1.1（建议）使用 Docker 环境
+#### 1.1.1 使用Paddle官方镜像
 
 * 切换到工作目录下，例如工作目录为`/home/Projects`，则运行命令: 
 
@@ -49,11 +56,12 @@ sudo docker run --name ppcls -v $PWD:/paddle --shm-size=8G --network=host -it pa
     ```shell
     sudo Docker exec -it ppcls /bin/bash
     ```
-<a name='1.2'></a>
-#### 1.2 在现有环境中安装paddle
+<a name='1.1.2'></a>
+#### 1.1.2 在现有环境中安装paddle
 您也可以用pip或conda直接安装paddle，详情请参考官方文档中的[快速安装](https://www.paddlepaddle.org.cn/install/quick?docurl=/documentation/docs/zh/install/docker/linux-docker.html)部分。
-<a name='1.3'></a>
-#### 1.3 安装验证
+
+<a name='1.1.3'></a>
+#### 1.1.3 安装验证
 使用以下命令可以验证 PaddlePaddle 是否安装成功。
 ```python
 import paddle
@@ -71,9 +79,9 @@ python -c "import paddle; print(paddle.__version__)"
 - 在 Docker 中运行时，为保证 Docker 容器有足够的共享内存用于 Paddle 的数据读取加速，在创建 Docker 容器时，请设置参数 `--shm-size=8g`，条件允许的话可以设置为更大的值。
 
 
-<a name='2'></a>
+<a name='1.2'></a>
 
-### 2. 克隆 PaddleClas
+### 1.2 克隆 PaddleClas
 
 从 GitHub 下载：
 
@@ -86,12 +94,25 @@ git clone https://github.com/PaddlePaddle/PaddleClas.git -b release/2.4
 ```shell
 git clone https://gitee.com/paddlepaddle/PaddleClas.git -b release/2.4
 ```
-<a name='3'></a>
+<a name='1.3'></a>
 
-### 3. 安装 Python 依赖库
+### 1.3 安装 Python 依赖库
 
 PaddleClas 的 Python 依赖库在 `requirements.txt` 中给出，可通过如下命令安装：
 
 ```shell
 pip install --upgrade -r requirements.txt -i https://mirror.baidu.com/pypi/simple
 ```
+
+<a name='2'></a>
+## 2. 快速创建PaddlePaddle, PaddleClas环境
+
+我们也提供了包含最新 PaddleClas 代码的 docker 镜像，并预先安装好了所有的环境和库依赖，您只需要**拉取并运行docker镜像**，无需其他任何额外操作，即可开始享用 PaddleClas 的所有功能。
+
+在[Docker Hub](https://hub.docker.com/repository/docker/paddlecloud/paddleclas)中获取这些镜像及相应的使用指南，包括CPU、GPU、ROCm 版本。
+
+如果您对自动化制作docker镜像感兴趣，或有自定义需求，请访问[PaddlePaddle/PaddleCloud](https://github.com/PaddlePaddle/PaddleCloud/tree/main/tekton)做进一步了解。
+
+**备注**：当前的镜像中的 PaddleClas 代码默认使用最新的 release/2.4 分支。
+
+
