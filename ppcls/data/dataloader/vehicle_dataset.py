@@ -19,7 +19,7 @@ import paddle
 from paddle.io import Dataset
 import os
 import cv2
-
+from PIL import Image
 from ppcls.data import preprocess
 from ppcls.data.preprocess import transform
 from ppcls.utils import logger
@@ -89,12 +89,11 @@ class CompCars(Dataset):
 
 
 class VeriWild(Dataset):
-    def __init__(
-            self,
-            image_root,
-            cls_label_path,
-            transform_ops=None,
-            backend='cv2'):
+    def __init__(self,
+                 image_root,
+                 cls_label_path,
+                 transform_ops=None,
+                 backend='cv2'):
         self._img_root = image_root
         self._cls_path = cls_label_path
         if transform_ops:

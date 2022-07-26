@@ -124,11 +124,11 @@ class Engine(object):
                 self.config["DataLoader"], "Train", self.device, self.use_dali)
         if self.mode == "eval" or (self.mode == "train" and
                                    self.config["Global"]["eval_during_train"]):
-            if self.eval_mode in ["classification", "adaface", "idml"]:
+            if self.eval_mode in ["classification", "adaface"]:
                 self.eval_dataloader = build_dataloader(
                     self.config["DataLoader"], "Eval", self.device,
                     self.use_dali)
-            elif self.eval_mode == "retrieval":
+            elif self.eval_mode in ["retrieval", "idml"]:
                 self.gallery_query_dataloader = None
                 if len(self.config["DataLoader"]["Eval"].keys()) == 1:
                     key = list(self.config["DataLoader"]["Eval"].keys())[0]
@@ -182,7 +182,7 @@ class Engine(object):
                                                           ["Eval"])
                 else:
                     self.eval_metric_func = None
-            elif self.eval_mode == "retrieval":
+            elif self.eval_mode in ["retrieval", "idml"]:
                 if "Metric" in self.config and "Eval" in self.config["Metric"]:
                     metric_config = self.config["Metric"]["Eval"]
                 else:
@@ -303,14 +303,17 @@ class Engine(object):
                 logger.warning(msg)
 
         # for distributed
-        find_unused_parameters = self.config["Global"].get('find_unused_parameters', False)
+        find_unused_parameters = self.config["Global"].get(
+            'find_unused_parameters', False)
         if self.config["Global"]["distributed"]:
             dist.init_parallel_env()
-            self.model = paddle.DataParallel(self.model, find_unused_parameters=find_unused_parameters)
+            self.model = paddle.DataParallel(
+                self.model, find_unused_parameters=find_unused_parameters)
             if self.mode == 'train' and len(self.train_loss_func.parameters(
             )) > 0:
                 self.train_loss_func = paddle.DataParallel(
-                    self.train_loss_func, find_unused_parameters=find_unused_parameters)
+                    self.train_loss_func,
+                    find_unused_parameters=find_unused_parameters)
         # build postprocess for infer
         if self.mode == 'infer':
             self.preprocess_func = create_operators(self.config["Infer"][

@@ -17,6 +17,7 @@ Global:
   train_mode: idml
   warmup_epoch_idml: 5
   find_unused_parameters: True
+  eval_mode: idml
 
 # model architecture
 Arch:
@@ -93,25 +94,35 @@ DataLoader:
       num_workers: 4
       use_shared_memory: True
   Eval:
-    dataset: 
-      name: VeriWild
-      image_root: ./dataset/cars196/
-      cls_label_path: ./dataset/cars196/val_list.txt
-      backend: pil
-      transform_ops:
-        - Resize:
-            size: 256
-        - CenterCrop:
-            size: 224
-        - ToTensor:
-        - Normalize:
-            mean: [0.485, 0.456, 0.406]
-            std: [0.229, 0.224, 0.225]
-    sampler:
-      # name: DistributedBatchSampler
-      batch_size: 32
-      drop_last: False
-      shuffle: False
-    loader:
-      num_workers: 4
-      use_shared_memory: True
+    Gallery:
+      dataset:
+        name: VeriWild
+        image_root: ./dataset/cars196/
+        cls_label_path: ./dataset/cars196/val_list.txt
+        backend: pil
+        transform_ops:
+          - Resize:
+              size: 256
+          - CenterCrop:
+              size: 224
+          - ToTensor:
+          - Normalize:
+              mean: [0.485, 0.456, 0.406]
+              std: [0.229, 0.224, 0.225]
+      sampler:
+        # name: DistributedBatchSampler
+        batch_size: 32
+        drop_last: False
+        shuffle: False
+      loader:
+        num_workers: 4
+        use_shared_memory: True
+
+Metric:
+  Eval:
+    - Recallk:
+        topk: [1, 2, 4]
+        input_label: True
+    - mAP:
+        input_label: True
+        embeds_same_source: True

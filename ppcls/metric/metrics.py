@@ -16,17 +16,14 @@ import numpy as np
 import paddle
 import paddle.nn as nn
 import paddle.nn.functional as F
-
-from sklearn.metrics import hamming_loss
+from easydict import EasyDict
 from sklearn.metrics import accuracy_score as accuracy_metric
-from sklearn.metrics import multilabel_confusion_matrix
+from sklearn.metrics import hamming_loss, multilabel_confusion_matrix
 from sklearn.preprocessing import binarize
 
-from easydict import EasyDict
-
 from ppcls.metric.avg_metrics import AvgMetrics
-from ppcls.utils.misc import AverageMeter, AttrMeter
 from ppcls.utils import logger
+from ppcls.utils.misc import AttrMeter, AverageMeter
 
 
 class TopkAcc(AvgMetrics):
@@ -67,12 +64,55 @@ class TopkAcc(AvgMetrics):
 
 
 class mAP(nn.Layer):
-    def __init__(self, descending=True):
+    def __init__(self,
+                 descending=True,
+                 input_label=False,
+                 embeds_same_source=True):
         super().__init__()
         self.descending = descending
+        self.input_label = input_label
+        self.embeds_same_source = embeds_same_source
 
-    def forward(self, similarities_matrix, query_img_id, gallery_img_id,
-                keep_mask):
+    def forward(self, *args, **kwargs):
+        if not self.input_label:
+            return self.forward_feature(*args, **kwargs)
+        else:
+            return self.forward_label(*args, **kwargs)
+
+    def forward_label(self, pred_labels, gt_labels, *args, **kwargs):
+        def get_relevance_mask(shape, gt_labels, label_counts):
+            relevance_mask = np.zeros(shape=shape, dtype=np.int)
+            for k, v in label_counts.items():
+                matching_rows = np.where(gt_labels == k)[0]
+                max_column = v - 1 if self.embeds_same_source else v
+                relevance_mask[matching_rows, :max_column] = 1
+            return relevance_mask
+
+        if isinstance(pred_labels, paddle.Tensor):
+            pred_labels = pred_labels.numpy()
+        if isinstance(gt_labels, paddle.Tensor):
+            gt_labels = gt_labels.numpy()
+        unique_labels, label_counts = np.unique(gt_labels, return_counts=True)
+        label_counts = {k: v for k, v in zip(unique_labels, label_counts)}
+
+        metric_dict = dict()
+        gt_labels = gt_labels[:, None]
+        relevance_mask = get_relevance_mask(pred_labels.shape, gt_labels,
+                                            label_counts)
+        num_samples, num_k = pred_labels.shape
+        equality = (pred_labels == gt_labels) * relevance_mask.astype(bool)
+        cumulative_correct = np.cumsum(equality, axis=1)
+        k_idx = np.tile(np.arange(1, num_k + 1), (num_samples, 1))
+        precision_at_ks = (cumulative_correct * equality) / k_idx
+        summed_precision_pre_row = np.sum(precision_at_ks * relevance_mask,
+                                          axis=1)
+        max_possible_matches_per_row = np.sum(relevance_mask, axis=1)
+        accuracy_per_sample = summed_precision_pre_row / max_possible_matches_per_row
+        metric_dict["mAP"] = np.mean(accuracy_per_sample)
+        return metric_dict
+
+    def forward_feature(self, similarities_matrix, query_img_id,
+                        gallery_img_id, keep_mask, *args, **kwargs):
         metric_dict = dict()
 
         choosen_indices = paddle.argsort(
@@ -132,7 +172,7 @@ class mINP(nn.Layer):
                                             choosen_indices)
         equal_flag = paddle.equal(choosen_label, query_img_id)
         if keep_mask is not None:
-            keep_mask = paddle.indechmx_sample(
+            keep_mask = paddle.index_sample(
                 keep_mask.astype('float32'), choosen_indices)
             equal_flag = paddle.logical_and(equal_flag,
                                             keep_mask.astype('bool'))
@@ -211,16 +251,44 @@ class TprAtFpr(nn.Layer):
 
 
 class Recallk(nn.Layer):
-    def __init__(self, topk=(1, 5), descending=True):
+    def __init__(self, topk=(1, 5), descending=True, input_label=False):
         super().__init__()
         assert isinstance(topk, (int, list, tuple))
         if isinstance(topk, int):
             topk = [topk]
         self.topk = topk
         self.descending = descending
+        self.input_label = input_label
 
-    def forward(self, similarities_matrix, query_img_id, gallery_img_id,
-                keep_mask):
+    def forward(self, *args, **kwargs):
+        if not self.input_label:
+            return self.forward_feature(*args, **kwargs)
+        else:
+            return self.forward_label(*args, **kwargs)
+
+    def forward_label(self, pred_label, gt_label, *args, **kwargs):
+        metric_dict = dict()
+        if isinstance(pred_label, paddle.Tensor):
+            pred_label = pred_label.numpy()
+        if isinstance(gt_label, paddle.Tensor):
+            gt_label = gt_label.numpy()
+        assert pred_label.shape[0] == gt_label.shape[0]
+
+        def recall_at_k(pred_label, gt_labels, k):
+            accuracy_per_sample = np.array([
+                float(gt_label in recalled_predictions[:k])
+                for gt_label, recalled_predictions in zip(gt_labels,
+                                                          pred_label)
+            ])
+            return np.mean(accuracy_per_sample)
+
+        for k in self.topk:
+            metric_dict["recall{}".format(k)] = recall_at_k(pred_label,
+                                                            gt_label, k)
+        return metric_dict
+
+    def forward_feature(self, similarities_matrix, query_img_id,
+                        gallery_img_id, keep_mask, *args, **kwargs):
         metric_dict = dict()
 
         #get cmc
