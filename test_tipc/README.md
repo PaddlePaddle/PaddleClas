@@ -31,7 +31,7 @@
 ```
 ./test_tipc/
 ├── common_func.sh                      #test_*.sh会调用到的公共函数
-├── config     # 配置文件目录
+├── configs     # 配置文件目录
 │   ├── MobileNetV3         # MobileNetV3系列模型测试配置文件目录
 │   │   ├── MobileNetV3_large_x1_0_train_infer_python.txt                                    #基础训练预测配置文件
 │   │   ├── MobileNetV3_large_x1_0_train_linux_gpu_fleet_amp_infer_python_linux_gpu_cpu.txt  #多机多卡训练预测配置文件
