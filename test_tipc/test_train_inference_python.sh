@@ -231,7 +231,7 @@ else
                     continue
                 fi
 
-                set_autocast=$(func_set_params "${autocast_key}" "${autocast}")
+                set_autocast=$(func_set_amp_params "${autocast_key}" "${autocast}")
                 set_epoch=$(func_set_params "${epoch_key}" "${epoch_num}")
                 set_pretrain=$(func_set_params "${pretrain_model_key}" "${pretrain_model_value}")
                 set_batchsize=$(func_set_params "${train_batch_key}" "${train_batch_value}")
