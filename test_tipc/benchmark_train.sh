@@ -132,7 +132,7 @@ func_sed_params "$FILENAME" "${line_pact_train}" "null"
 func_sed_params "$FILENAME" "${line_fgpm_train}" "null"
 
 # if params
-if  [ ! -n "$PARAMS" ] ;then
+if [[ ! -n "$PARAMS" ]];then
     # PARAMS input is not a word.
     IFS="|"
     batch_size_list=(${batch_size})
@@ -151,7 +151,7 @@ else
     device_num=${params_list[4]}
     IFS=";"
 
-    if [ ${precision} = "null" ];then
+    if [[ ${precision} = "null" ]];then
         precision="fp32"
     fi
 
@@ -163,9 +163,9 @@ fi
 # for log name
 to_static=""
 # parse "to_static" options and modify trainer into "to_static_trainer"
-if [ $model_type = "dynamicTostatic" ] ;then
-   to_static="d2sT_"
-   sed -i 's/trainer:norm_train/trainer:to_static_train/g' $FILENAME
+if [[ ${model_type} = "dynamicTostatic" ]];then
+    to_static="d2sT_"
+    sed -i 's/trainer:norm_train/trainer:to_static_train/g' $FILENAME
 fi
 
 
@@ -179,23 +179,23 @@ for batch_size in ${batch_size_list[*]}; do
             func_sed_params "$FILENAME" "${line_epoch}" "$epoch"
             gpu_id=$(set_gpu_id $device_num)
 
-	    # if bs is big, then copy train_list.txt to generate more train log
-	    # There are 5w image in train_list. And the train log printed interval is 10 iteration.
-	    # At least 25 log number would be good to calculate ips for benchmark system.
-	    # So the copy number for train_list is as follows:
-	    total_batch_size=`echo $[$batch_size*${device_num:1:1}*${device_num:3:3}]`
-	    copy_num=`echo $[$total_batch_size/200]`
-	    if  [ $copy_num -gt 1 ];then
-		cd dataset/ILSVRC2012
-		rm -rf train_list.txt
-		for ((i=1; i <=$copy_num; i++));do
-		    cat val_list.txt >> train_list.txt
-		done
-		cd ../../
-	    fi
+            # if bs is big, then copy train_list.txt to generate more train log
+            # There are 5w image in train_list. And the train log printed interval is 10 iteration.
+            # At least 25 log number would be good to calculate ips for benchmark system.
+            # So the copy number for train_list is as follows:
+            total_batch_size=`echo $[$batch_size*${device_num:1:1}*${device_num:3:3}]`
+            copy_num=`echo $[$total_batch_size/200]`
+            if [[ $copy_num -gt 1 ]];then
+                cd dataset/ILSVRC2012
+                rm -rf train_list.txt
+                for ((i=1; i <=$copy_num; i++));do
+                    cat val_list.txt >> train_list.txt
+                done
+                cd ../../
+            fi
 
 
-            if [ ${#gpu_id} -le 1 ];then
+            if [[ ${#gpu_id} -le 1 ]];then
                 log_path="$SAVE_LOG/profiling_log"
                 mkdir -p $log_path
                 log_name="${repo_name}_${model_name}_bs${batch_size}_${precision}_${run_mode}_${device_num}_${to_static}profiling"
