@@ -24,6 +24,17 @@ function func_parser_value_lite(){
     echo ${tmp}
 }
 
+function func_set_amp_params(){
+    key=$1
+    value=$2
+
+    if [[ ${value} = "fp16" ]];then
+        echo "-o AMP.scale_loss=128 -o AMP.use_dynamic_loss_scaling=True -o AMP.level=O2"
+    else
+        echo " "
+    fi
+}
+
 function func_set_params(){
     key=$1
     value=$2
