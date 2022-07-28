@@ -7,10 +7,10 @@ export str_tmp=$(echo `pip list|grep paddlepaddle-gpu|awk -F ' ' '{print $2}'`)
 export frame_version=${str_tmp%%.post*}
 export frame_commit=$(echo `${python} -c "import paddle;print(paddle.version.commit)"`)
 
-# run benchmark sh 
+# run benchmark sh
 # Usage:
 # bash run_benchmark_train.sh config.txt params
-# or 
+# or
 # bash run_benchmark_train.sh config.txt
 
 function func_parser_params(){
@@ -73,8 +73,8 @@ model_type=$4
 
 IFS=$'\n'
 # parser params from train_benchmark.txt
-sed -i 's/ -o DataLoader.Train.sampler.shuffle=False//g' $FILENAME
-sed -i 's/ -o DataLoader.Train.loader.num_workers=0/ -o Global.print_batch_step=1/g' $FILENAME
+sed -i 's/ -o DataLoader.Train.sampler.shuffle=False/ -o Global.print_batch_step=1/g' $FILENAME
+sed -i 's/ -o DataLoader.Train.loader.num_workers=0/ -o DataLoader.Train.loader.num_workers=8/g' $FILENAME
 sed -i 's/-o DataLoader.Train.loader.use_shared_memory=False/ -o Global.eval_during_train=False/g' $FILENAME
 dataline=`cat $FILENAME`
 # parser params
@@ -170,7 +170,7 @@ fi
 
 
 IFS="|"
-for batch_size in ${batch_size_list[*]}; do 
+for batch_size in ${batch_size_list[*]}; do
     for precision in ${fp_items_list[*]}; do
         for device_num in ${device_num_list[*]}; do
             # sed batchsize and precision
@@ -199,7 +199,7 @@ for batch_size in ${batch_size_list[*]}; do
                 log_path="$SAVE_LOG/profiling_log"
                 mkdir -p $log_path
                 log_name="${repo_name}_${model_name}_bs${batch_size}_${precision}_${run_mode}_${device_num}_${to_static}profiling"
-                func_sed_params "$FILENAME" "${line_gpuid}" "0"  # sed used gpu_id 
+                func_sed_params "$FILENAME" "${line_gpuid}" "0"  # sed used gpu_id
                 # set profile_option params
                 tmp=`sed -i "${line_profile}s/.*/${profile_option}/" "${FILENAME}"`
 
@@ -251,7 +251,7 @@ for batch_size in ${batch_size_list[*]}; do
                 mkdir -p $speed_log_path
                 log_name="${repo_name}_${model_name}_bs${batch_size}_${precision}_${run_mode}_${device_num}_${to_static}log"
                 speed_log_name="${repo_name}_${model_name}_bs${batch_size}_${precision}_${run_mode}_${device_num}_${to_static}speed"
-                func_sed_params "$FILENAME" "${line_gpuid}" "$gpu_id"  # sed used gpu_id 
+                func_sed_params "$FILENAME" "${line_gpuid}" "$gpu_id"  # sed used gpu_id
                 func_sed_params "$FILENAME" "${line_profile}" "null"  # sed --profile_option as null
                 cmd="bash test_tipc/test_train_inference_python.sh ${FILENAME} benchmark_train > ${log_path}/${log_name} 2>&1 "
                 echo $cmd
@@ -262,7 +262,7 @@ for batch_size in ${batch_size_list[*]}; do
                 eval "cat ${log_path}/${log_name}"
                 # parser log
                 _model_name="${model_name}_bs${batch_size}_${precision}_${run_mode}"
-                
+
                 cmd="${python} ${BENCHMARK_ROOT}/scripts/analysis.py --filename ${log_path}/${log_name} \
                         --speed_log_file '${speed_log_path}/${speed_log_name}' \
                         --model_name ${_model_name} \
