@@ -66,6 +66,8 @@ public:
 
   std::string GetIndexDir(){ return this->index_dir; }
 
+  void ClearFeature();
+
 private:
   std::string index_dir;
   int return_k = 5;

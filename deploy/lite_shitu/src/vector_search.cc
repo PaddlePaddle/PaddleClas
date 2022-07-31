@@ -98,4 +98,10 @@ void VectorSearch::SaveIndex(std::string save_dir) {
   }
   out.close();
 }
+
+void VectorSearch::ClearFeature(){
+  this->index->reset();
+  this->id_map.clear();
+}
+
 } // namespace PPShiTu

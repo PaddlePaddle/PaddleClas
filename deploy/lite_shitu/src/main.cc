@@ -173,8 +173,20 @@ int main(int argc, char **argv) {
   PPShiTu::FeatureExtract rec(RT_Config);
   PPShiTu::VectorSearch searcher(RT_Config);
 
+  bool clear_gallery = false;
+  if (RT_Config["Global"].isMember("clear_gallery")) {
+    clear_gallery = RT_Config["Global"]["clear_gallery"].as<bool>();
+  }
+
+  if(clear_gallery){
+    printf("Gallery feture number: %d\n", searcher.GetIndexLength());
+    searcher.ClearFeature();
+    printf("After clear Gallery, feture number: %d\n", searcher.GetIndexLength());
+    exit(0);
+  }
+
   bool add_gallery = false;
-  std::string save_index_dir = searcher.GetIndexDir + "_new";
+  std::string save_index_dir = searcher.GetIndexDir() + "_new";
   if (RT_Config["Global"].isMember("add_gallery")) {
     add_gallery = RT_Config["Global"]["add_gallery"].as<bool>();
     MkDirs(save_index_dir);
@@ -217,7 +229,7 @@ int main(int argc, char **argv) {
         exit(-1);
       }
       cv::cvtColor(srcimg, srcimg, cv::COLOR_BGR2RGB);
-      if (add_gallery) {
+      if (!add_gallery) {
         batch_imgs.push_back(srcimg);
         DetPredictImage(
             batch_imgs, det_result, RT_Config["Global"]["batch_size"].as<int>(),
