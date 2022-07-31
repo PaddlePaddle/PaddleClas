@@ -1,8 +1,8 @@
-OPENCV_DIR=${opencv_install_dir}
-LIB_DIR=${paddle_inference_dir}
+OPENCV_DIR=/work/project/project/test/opencv-3.4.7/opencv3
+LIB_DIR=/work/project/project/test/paddle_inference/
 CUDA_LIB_DIR=/usr/local/cuda/lib64
 CUDNN_LIB_DIR=/usr/lib/x86_64-linux-gnu/
-FAISS_DIR=${faiss_install_dir}
+FAISS_DIR=/work/project/project/test/faiss/faiss_install
 FAISS_WITH_MKL=OFF
 
 BUILD_DIR=build

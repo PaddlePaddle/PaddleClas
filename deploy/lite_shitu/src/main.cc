@@ -172,6 +172,14 @@ int main(int argc, char **argv) {
   // create rec model
   PPShiTu::FeatureExtract rec(RT_Config);
   PPShiTu::VectorSearch searcher(RT_Config);
+
+  bool add_gallery = false;
+  std::string save_index_dir = searcher.GetIndexDir + "_new";
+  if (RT_Config["Global"].isMember("add_gallery")) {
+    add_gallery = RT_Config["Global"]["add_gallery"].as<bool>();
+    MkDirs(save_index_dir);
+  }
+
   // Do inference on input image
 
   std::vector<PPShiTu::ObjectResult> det_result;
@@ -209,35 +217,51 @@ int main(int argc, char **argv) {
         exit(-1);
       }
       cv::cvtColor(srcimg, srcimg, cv::COLOR_BGR2RGB);
-      batch_imgs.push_back(srcimg);
-      DetPredictImage(
-          batch_imgs, det_result, RT_Config["Global"]["batch_size"].as<int>(),
-          RT_Config["Global"]["max_det_results"].as<int>(), false, &det);
+      if (add_gallery) {
+        batch_imgs.push_back(srcimg);
+        DetPredictImage(
+            batch_imgs, det_result, RT_Config["Global"]["batch_size"].as<int>(),
+            RT_Config["Global"]["max_det_results"].as<int>(), false, &det);
 
-      // add the whole image for recognition to improve recall
-      PPShiTu::ObjectResult result_whole_img = {
-          {0, 0, srcimg.cols, srcimg.rows}, 0, 1.0};
-      det_result.push_back(result_whole_img);
+        // add the whole image for recognition to improve recall
+        PPShiTu::ObjectResult result_whole_img = {
+            {0, 0, srcimg.cols, srcimg.rows}, 0, 1.0};
+        det_result.push_back(result_whole_img);
 
-      // get rec result
-      PPShiTu::SearchResult search_result;
-      for (int j = 0; j < det_result.size(); ++j) {
-        int w = det_result[j].rect[2] - det_result[j].rect[0];
-        int h = det_result[j].rect[3] - det_result[j].rect[1];
-        cv::Rect rect(det_result[j].rect[0], det_result[j].rect[1], w, h);
-        cv::Mat crop_img = srcimg(rect);
-        rec.RunRecModel(crop_img, rec_time, feature);
-        features.insert(features.end(), feature.begin(), feature.end());
+        // get rec result
+        PPShiTu::SearchResult search_result;
+        for (int j = 0; j < det_result.size(); ++j) {
+          int w = det_result[j].rect[2] - det_result[j].rect[0];
+          int h = det_result[j].rect[3] - det_result[j].rect[1];
+          cv::Rect rect(det_result[j].rect[0], det_result[j].rect[1], w, h);
+          cv::Mat crop_img = srcimg(rect);
+          rec.RunRecModel(crop_img, rec_time, feature);
+          features.insert(features.end(), feature.begin(), feature.end());
+        }
+
+        // do vectore search
+        search_result = searcher.Search(features.data(), det_result.size());
+        for (int i = 0; i < det_result.size(); ++i) {
+          det_result[i].confidence =
+              search_result.D[search_result.return_k * i];
+        }
+        NMSBoxes(det_result, searcher.GetThreshold(), rec_nms_threshold,
+                 indeices);
+        PrintResult(img_path, det_result, searcher, search_result);
+      } else {
+        PPShiTu::ObjectResult result_whole_img = {
+            {0, 0, srcimg.cols, srcimg.rows}, 0, 1.0};
+        det_result.push_back(result_whole_img);
+        for (int j = 0; j < det_result.size(); ++j) {
+          int w = det_result[j].rect[2] - det_result[j].rect[0];
+          int h = det_result[j].rect[3] - det_result[j].rect[1];
+          cv::Rect rect(det_result[j].rect[0], det_result[j].rect[1], w, h);
+          cv::Mat crop_img = srcimg(rect);
+          rec.RunRecModel(crop_img, rec_time, feature);
+          features.insert(features.end(), feature.begin(), feature.end());
+        }
+        searcher.AddFeature(features.data());
       }
-
-      // do vectore search
-      search_result = searcher.Search(features.data(), det_result.size());
-      for (int i = 0; i < det_result.size(); ++i) {
-        det_result[i].confidence = search_result.D[search_result.return_k * i];
-      }
-      NMSBoxes(det_result, searcher.GetThreshold(), rec_nms_threshold,
-               indeices);
-      PrintResult(img_path, det_result, searcher, search_result);
 
       batch_imgs.clear();
       det_result.clear();
@@ -245,6 +269,10 @@ int main(int argc, char **argv) {
       feature.clear();
       indeices.clear();
     }
+  }
+  if (add_gallery) {
+    printf("After add gallery, index number: %d\n", searcher.GetIndexLength());
+    searcher.SaveIndex(save_index_dir);
   }
   return 0;
 }

@@ -64,4 +64,38 @@ const SearchResult &VectorSearch::Search(float *feature, int query_number) {
 const std::string &VectorSearch::GetLabel(faiss::Index::idx_t ind) {
   return this->id_map.at(ind);
 }
+
+int VectorSearch::AddFeature(float *feature, std::string label) {
+  this->index->add(1, feature);
+  int id = this->id_map.size();
+  if (label != "")
+    this->id_map.insert(std::pair<long int, std::string>(id, label));
+  else
+    this->id_map.insert(
+        std::pair<long int, std::string>(id, std::to_string(id)));
+  return this->index->ntotal;
+}
+
+void VectorSearch::SaveIndex(std::string save_dir) {
+  std::string file_path_index, file_path_labelmap;
+  if (save_dir == "") {
+    file_path_index = this->index_dir + OS_PATH_SEP + "vector.index";
+    file_path_labelmap = this->index_dir + OS_PATH_SEP + "id_map.txt";
+  } else {
+    file_path_index = save_dir + OS_PATH_SEP + "vector.index";
+    file_path_labelmap = save_dir + OS_PATH_SEP + "id_map.txt";
+  }
+  // save index
+  faiss::write_index(this->index, file_path_index.c_str());
+
+  // save label_map
+  std::ofstream out(file_path_labelmap);
+  std::map<long int, std::string>::iterator iter;
+  for (iter = this->id_map.begin(); iter != this->id_map.end(); iter++) {
+    std::string content = std::to_string(iter->first) + " " + iter->second;
+    out.write(content.c_str(), content.size());
+    out << std::endl;
+  }
+  out.close();
+}
 } // namespace PPShiTu

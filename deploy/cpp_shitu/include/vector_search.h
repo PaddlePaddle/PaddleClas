@@ -57,6 +57,15 @@ public:
 
     const float &GetThreshold() { return this->score_thres; }
 
+    int AddFeature(float *feature, std::string label="");
+
+    const int GetIndexLength(){
+        return this->index->ntotal;
+    }
+    void SaveIndex(std::string save_dir="");
+
+    std::string GetIndexDir() {return this->index_dir;}
+
 private:
     std::string index_dir;
     int return_k = 5;

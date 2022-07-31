@@ -20,43 +20,86 @@
 #include <regex>
 
 void VectorSearch::LoadIndexFile() {
-    std::string file_path = this->index_dir + OS_PATH_SEP + "vector.index";
-    const char *fname = file_path.c_str();
-    this->index = faiss::read_index(fname, 0);
+  std::string file_path = this->index_dir + OS_PATH_SEP + "vector.index";
+  const char *fname = file_path.c_str();
+  this->index = faiss::read_index(fname, 0);
 }
 
 void VectorSearch::LoadIdMap() {
-    std::string file_path = this->index_dir + OS_PATH_SEP + "id_map.txt";
-    std::ifstream in(file_path);
-    std::string line;
-    std::vector <std::string> m_vec;
-    if (in) {
-        while (getline(in, line)) {
-            std::regex ws_re("\\s+");
-            std::vector <std::string> v(
-                    std::sregex_token_iterator(line.begin(), line.end(), ws_re, -1),
-                    std::sregex_token_iterator());
-            if (v.size() != 2) {
-                std::cout << "The number of element for each line in : " << file_path
-                          << "must be 2, exit the program..." << std::endl;
-                exit(1);
-            } else
-                this->id_map.insert(std::pair<long int, std::string>(
-                        std::stol(v[0], nullptr, 10), v[1]));
-        }
+  std::string file_path = this->index_dir + OS_PATH_SEP + "id_map.txt";
+  std::ifstream in(file_path);
+  std::string line;
+  std::vector<std::string> m_vec;
+  if (in) {
+    while (getline(in, line)) {
+      std::regex ws_re("\\s+");
+      std::vector<std::string> v(
+          std::sregex_token_iterator(line.begin(), line.end(), ws_re, -1),
+          std::sregex_token_iterator());
+      if (v.size() != 2) {
+        std::cout << "The number of element for each line in : " << file_path
+                  << "must be 2, exit the program..." << std::endl;
+        exit(1);
+      } else
+        this->id_map.insert(std::pair<long int, std::string>(
+            std::stol(v[0], nullptr, 10), v[1]));
     }
+  }
 }
 
 const SearchResult &VectorSearch::Search(float *feature, int query_number) {
-    this->D.resize(this->return_k * query_number);
-    this->I.resize(this->return_k * query_number);
-    this->index->search(query_number, feature, return_k, D.data(), I.data());
-    this->sr.return_k = this->return_k;
-    this->sr.D = this->D;
-    this->sr.I = this->I;
-    return this->sr;
+  this->D.resize(this->return_k * query_number);
+  this->I.resize(this->return_k * query_number);
+  this->index->search(query_number, feature, return_k, D.data(), I.data());
+  this->sr.return_k = this->return_k;
+  this->sr.D = this->D;
+  this->sr.I = this->I;
+  return this->sr;
 }
 
 const std::string &VectorSearch::GetLabel(faiss::Index::idx_t ind) {
-    return this->id_map.at(ind);
+  return this->id_map.at(ind);
+}
+
+int VectorSearch::AddFeature(float *feature, std::string label) {
+  this->index->add(1, feature);
+  int id = this->id_map.size();
+  if (label != "")
+    this->id_map.insert(std::pair<long int, std::string>(id, label));
+  else
+    this->id_map.insert(
+        std::pair<long int, std::string>(id, std::to_string(id)));
+  return this->index->ntotal;
+}
+
+void VectorSearch::SaveIndex(std::string save_dir) {
+  std::string file_path_index, file_path_labelmap;
+  if (save_dir == "") {
+    file_path_index = this->index_dir + OS_PATH_SEP + "vector.index";
+    file_path_labelmap = this->index_dir + OS_PATH_SEP + "id_map.txt";
+  } else {
+    file_path_index = save_dir + OS_PATH_SEP + "vector.index";
+    file_path_labelmap = save_dir + OS_PATH_SEP + "id_map.txt";
+  }
+  // save index
+  faiss::write_index(this->index, file_path_index.c_str());
+
+  // save label_map
+  std::ofstream out(file_path_labelmap);
+  std::map<long int, std::string>::iterator iter;
+  for(iter=this->id_map.begin(); iter!=this->id_map.end();iter++){
+    // printf("%d,", iter->first);
+    // printf("%s ", iter->second.c_str());
+    std::string content = std::to_string(iter->first) + " " + iter->second;
+    out.write(content.c_str(), content.size());
+    out << std::endl;
+  }
+  /* for (int i = 0; i < id_map.size(); i++) { */
+    /* std::string content = std::to_string(int(id_map[i][0])) + " " + id_map[i][1]; */
+    /* printf("%d,%s ", int(id_map[i]), id_map[i][1].c_str()); */
+    /* out.write(content.c_str(), content.size()); */
+    /* out << std::endl; */
+    /* // out << this->id_map[i][0] << " " << this->id_map[i][1].c_str() << std::endl; */
+  /* } */
+  out.close();
 }
