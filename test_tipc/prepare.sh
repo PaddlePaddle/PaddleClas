@@ -346,12 +346,27 @@ fi
 if [[ ${MODE} = "benchmark_train" ]]; then
     pip install -r requirements.txt
     cd dataset
-    rm -rf ILSVRC2012
-    wget -nc https://paddle-imagenet-models-name.bj.bcebos.com/data/ImageNet1k/ILSVRC2012_val.tar
-    tar xf ILSVRC2012_val.tar
-    ln -s ILSVRC2012_val ILSVRC2012
-    cd ILSVRC2012
-    rm -rf train_list.txt
-    ln -s val_list.txt train_list.txt
+
+    if [[ $model_name == *GeneralRecognition* ]]; then
+        rm -rf Aliproduct
+        rm -rf train_reg_all_data.txt
+        rm -rf demo_train
+        wget -nc https://paddle-imagenet-models-name.bj.bcebos.com/data/whole_chain/tipc_shitu_demo_data.tar --no-check-certificate
+        tar -xf tipc_shitu_demo_data.tar
+        ln -s tipc_shitu_demo_data Aliproduct
+        ln -s tipc_shitu_demo_data/demo_train.txt train_reg_all_data.txt
+        ln -s tipc_shitu_demo_data/demo_train demo_train
+        cd tipc_shitu_demo_data
+        ln -s demo_test.txt val_list.txt
+    else
+        rm -rf ILSVRC2012
+        wget -nc https://paddle-imagenet-models-name.bj.bcebos.com/data/ImageNet1k/ILSVRC2012_val.tar
+        tar xf ILSVRC2012_val.tar
+        ln -s ILSVRC2012_val ILSVRC2012
+        cd ILSVRC2012
+        rm -rf train_list.txt
+        ln -s val_list.txt train_list.txt
+    fi
     cd ../../
+
 fi

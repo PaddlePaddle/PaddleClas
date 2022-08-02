@@ -184,16 +184,29 @@ for batch_size in ${batch_size_list[*]}; do
             # At least 25 log number would be good to calculate ips for benchmark system.
             # So the copy number for train_list is as follows:
             total_batch_size=`echo $[$batch_size*${device_num:1:1}*${device_num:3:3}]`
-            copy_num=`echo $[$total_batch_size/200]`
-            if [[ $copy_num -gt 1 ]];then
+            if [[ $model_name == *GeneralRecognition* ]]; then
+                cd dataset/
+                train_list_length=`cat train_reg_all_data.txt | wc -l`
+                copy_num=`echo $[25*10*$total_batch_size/$train_list_length]`
+                if [[ $copy_num -gt 1 ]];then
+                    rm -rf train_reg_all_data.txt
+                    for ((i=1; i <=$copy_num; i++));do
+                        cat tipc_shitu_demo_data/demo_train.txt >> train_reg_all_data.txt
+                    done
+                fi
+                cd ..
+            else
                 cd dataset/ILSVRC2012
-                rm -rf train_list.txt
-                for ((i=1; i <=$copy_num; i++));do
-                    cat val_list.txt >> train_list.txt
-                done
+                train_list_length=`cat train_list.txt | wc -l`
+                copy_num=`echo $[25*10*$total_batch_size/$train_list_length]`
+                if [[ $copy_num -gt 1 ]];then
+                    rm -rf train_list.txt
+                    for ((i=1; i <=$copy_num; i++));do
+                        cat val_list.txt >> train_list.txt
+                    done
+                fi
                 cd ../../
             fi
-
 
             if [[ ${#gpu_id} -le 1 ]];then
                 log_path="$SAVE_LOG/profiling_log"
