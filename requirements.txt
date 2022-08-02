@@ -1,12 +1,12 @@
 prettytable
 ujson
-opencv-python==4.4.0.46
+opencv-python
 pillow
 tqdm
-PyYAML
+PyYAML>=5.1
 visualdl>=2.2.0
-scipy
-scikit-learn>=0.21.0
+scipy>=1.0.0
+scikit-learn>=1.0.2
 gast==0.3.3
 faiss-cpu==1.7.1.post2
 easydict
