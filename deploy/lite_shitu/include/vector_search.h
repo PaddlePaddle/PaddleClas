@@ -45,6 +45,7 @@ public:
     LoadIndexFile();
     this->I.resize(this->return_k * this->max_query_number);
     this->D.resize(this->return_k * this->max_query_number);
+    index_len = this->index->ntotal;
     printf("faiss index load success!\n");
   };
 
@@ -72,6 +73,7 @@ private:
   std::string index_dir;
   int return_k = 5;
   float score_thres = 0.5;
+  int index_len;
 
   std::map<long int, std::string> id_map;
   faiss::Index *index;

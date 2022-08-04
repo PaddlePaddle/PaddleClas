@@ -178,13 +178,6 @@ int main(int argc, char **argv) {
     clear_gallery = RT_Config["Global"]["clear_gallery"].as<bool>();
   }
 
-  if(clear_gallery){
-    printf("Gallery feture number: %d\n", searcher.GetIndexLength());
-    searcher.ClearFeature();
-    printf("After clear Gallery, feture number: %d\n", searcher.GetIndexLength());
-    exit(0);
-  }
-
   bool add_gallery = false;
   std::string save_index_dir = searcher.GetIndexDir() + "_new";
   if (RT_Config["Global"].isMember("add_gallery")) {
@@ -285,6 +278,11 @@ int main(int argc, char **argv) {
   if (add_gallery) {
     printf("After add gallery, index number: %d\n", searcher.GetIndexLength());
     searcher.SaveIndex(save_index_dir);
+  }
+  if(clear_gallery){
+    printf("Gallery feture number: %d\n", searcher.GetIndexLength());
+    searcher.ClearFeature();
+    printf("After clear Gallery, feture number: %d\n", searcher.GetIndexLength());
   }
   return 0;
 }

@@ -15,6 +15,7 @@
 #include "include/vector_search.h"
 #include <cstdio>
 #include <faiss/index_io.h>
+#include <faiss/AuxIndexStructures.h>
 #include <fstream>
 #include <iostream>
 #include <regex>
@@ -100,8 +101,11 @@ void VectorSearch::SaveIndex(std::string save_dir) {
 }
 
 void VectorSearch::ClearFeature(){
-  this->index->reset();
-  this->id_map.clear();
+  faiss::IDSelectorRange ids(this->index_len, this->index->ntotal);
+  this->index->remove_ids(ids);
+  std::map<long int, std::string>::iterator iter;
+  iter = this->id_map.find(this->index_len);
+  this->id_map.erase(iter, this->id_map.end());
 }
 
 } // namespace PPShiTu
