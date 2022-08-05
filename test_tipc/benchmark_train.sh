@@ -74,6 +74,7 @@ model_type=$4
 IFS=$'\n'
 # parser params from train_benchmark.txt
 sed -i 's/ -o DataLoader.Train.sampler.shuffle=False/ -o Global.print_batch_step=1/g' $FILENAME
+sed -i 's/ -o DataLoader.Train.loader.num_workers=0/ -o DataLoader.Train.loader.num_workers=12/g' $FILENAME
 sed -i 's/-o DataLoader.Train.loader.use_shared_memory=False/ -o Global.eval_during_train=False/g' $FILENAME
 dataline=`cat $FILENAME`
 # parser params
@@ -177,11 +178,6 @@ for batch_size in ${batch_size_list[*]}; do
             func_sed_params "$FILENAME" "${line_batchsize}" "$batch_size"
             func_sed_params "$FILENAME" "${line_epoch}" "$epoch"
             gpu_id=$(set_gpu_id $device_num)
-            
-            sed -i 's/ -o DataLoader.Train.loader.num_workers=0//g' $FILENAME
-            if [[ ${precision} = "fp16" ]];then
-                sed -i 's/ -o Global.print_batch_step=1/ -o Global.print_batch_step=1 -o DataLoader.Train.loader.num_workers=12/g' $FILENAME
-            fi
 
             # if bs is big, then copy train_list.txt to generate more train log
             # At least 25 log number would be good to calculate ips for benchmark system.
