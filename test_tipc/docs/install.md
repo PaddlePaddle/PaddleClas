@@ -96,7 +96,7 @@ git clone https://github.com/LDOUBLEV/AutoLog
 cd AutoLog
 pip3.7 install -r requirements.txt
 python3.7 setup.py bdist_wheel
-pip3.7 install ./dist/auto_log-1.0.0-py3-none-any.whl
+pip3.7 install ./dist/auto_log-*-py3-none-any.whl
 
 # 下载Clas代码
 cd ../
