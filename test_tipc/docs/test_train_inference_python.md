@@ -49,7 +49,16 @@ Linux端基础训练预测功能测试的主程序为`test_train_inference_pytho
    # 如果要测试量化、裁剪等功能，需要安装PaddleSlim
    pip3 install paddleslim
    ```
-
+- 准备昇腾测试代码 (可选)
+  ```
+  # 先执行以下脚本，准备昇腾的测试代码
+  bash test_tipc/prepare_npu_test.sh
+  ```
+- 准备昆仑测试代码 (可选)
+  ```
+  # 先执行以下脚本，准备昆仑的测试代码
+  bash test_tipc/prepare_xpu_test.sh
+  ```
 
 ### 2.2 功能测试
 先运行`prepare.sh`准备数据和模型，然后运行`test_train_inference_python.sh`进行测试，最终在```test_tipc/output```目录下生成`python_infer_*.log`格式的日志文件。
