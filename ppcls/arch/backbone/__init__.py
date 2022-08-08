@@ -70,6 +70,7 @@ from .model_zoo.van import VAN_B0
 from .model_zoo.peleenet import PeleeNet
 from .model_zoo.convnext import ConvNeXt_tiny
 from .model_zoo.cae import cae_base_patch16_224, cae_large_patch16_224
+from .model_zoo.micronet import micronet_m0, micronet_m1, micronet_m2, micronet_m3
 
 from .variant_models.resnet_variant import ResNet50_last_stage_stride1
 from .variant_models.resnet_variant import ResNet50_adaptive_max_pool2d
