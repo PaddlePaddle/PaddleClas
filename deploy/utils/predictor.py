@@ -65,7 +65,8 @@ class Predictor(object):
         elif args.get("use_npu", False):
             config.enable_npu()
         elif args.get("use_xpu", False):
-            config.enalbe_xpu()
+            config.enable_lite_engine()
+            config.enable_xpu(10 * 1024 * 1024)
         else:
             config.disable_gpu()
             if args.enable_mkldnn:
