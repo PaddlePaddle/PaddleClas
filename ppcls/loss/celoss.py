@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import os
 import warnings
 
 import paddle
@@ -26,13 +27,34 @@ class CELoss(nn.Layer):
     Cross entropy loss
     """
 
-    def __init__(self, reduction="mean", epsilon=None):
+    def __init__(self, reduction="mean", epsilon=None, weight_file=None):
         super().__init__()
         if epsilon is not None and (epsilon <= 0 or epsilon >= 1):
             epsilon = None
         self.epsilon = epsilon
         assert reduction in ["mean", "sum", "none"]
         self.reduction = reduction
+        self.weight_data = self._read_weight(
+            weight_file) if weight_file else None
+
+    def _read_weight(self, weight_file):
+        if not os.path.exists(weight_file):
+            msg = f"The file of rescaling weight is not exists. And the setting has been ignored. Please check the file path: {weight_file}."
+            logger.warning(msg)
+            return None
+        else:
+            with open(weight_file, "r") as f:
+                lines = f.readlines()
+
+            try:
+                weight_list = []
+                for line in lines:
+                    weight_list.append(float(line.strip()))
+            except Exception as e:
+                msg = ""
+                logger.warning(msg)
+                return None
+            return paddle.to_tensor(weight_list)
 
     def _labelsmoothing(self, target, class_num):
         if len(target.shape) == 1 or target.shape[-1] != class_num:
@@ -49,27 +71,26 @@ class CELoss(nn.Layer):
         if self.epsilon is not None:
             class_num = x.shape[-1]
             label = self._labelsmoothing(label, class_num)
-            x = -F.log_softmax(x, axis=-1)
-            loss = paddle.sum(x * label, axis=-1)
-            if self.reduction == 'mean':
-                loss = loss.mean()
-            elif self.reduction == 'sum':
-                loss = loss.sum()
+            soft_label = True
         else:
             if label.shape[-1] == x.shape[-1]:
                 soft_label = True
             else:
                 soft_label = False
-            loss = F.cross_entropy(
-                x,
-                label=label,
-                soft_label=soft_label,
-                reduction=self.reduction)
+
+        if self.weight_data is not None:
+            if self.weight_data.shape[0] != class_num:
+                msg = f"The shape of rescaling weight must be [class num]. Please check the rescaling weight file. The setting has been ignored."
+                logger.warning(msg)
+                self.weight_data = None
+
+        loss = F.cross_entropy(
+            x, label=label, soft_label=soft_label, reduction=self.reduction, weight=self.weight_data)
         return {"CELoss": loss}
 
 
 class MixCELoss(object):
     def __init__(self, *args, **kwargs):
-        msg = "\"MixCELos\" is deprecated, please use \"CELoss\" instead."
+        msg = "\"MixCELoss\" is deprecated, please use \"CELoss\" instead."
         logger.error(DeprecationWarning(msg))
         raise DeprecationWarning(msg)
