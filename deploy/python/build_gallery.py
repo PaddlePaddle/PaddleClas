@@ -15,7 +15,7 @@ import os
 import sys
 
 __dir__ = os.path.dirname(os.path.abspath(__file__))
-sys.path.append(os.path.abspath(os.path.join(__dir__, '../')))
+sys.path.append(os.path.abspath(os.path.join(__dir__, '../../')))
 
 import cv2
 import faiss
@@ -23,10 +23,10 @@ import numpy as np
 from tqdm import tqdm
 import pickle
 
-from python.predict_rec import RecPredictor
+from deploy.python.predict_rec import RecPredictor
 
-from utils import logger
-from utils import config
+from deploy.utils import logger
+from deploy.utils import config
 
 
 def split_datafile(data_file, image_root, delimiter="\t"):

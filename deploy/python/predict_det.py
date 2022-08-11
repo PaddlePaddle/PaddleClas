@@ -15,24 +15,23 @@ import os
 import sys
 
 __dir__ = os.path.dirname(os.path.abspath(__file__))
-sys.path.append(os.path.abspath(os.path.join(__dir__, '../')))
+sys.path.append(os.path.abspath(os.path.join(__dir__, '../../')))
 
-from utils import logger
-from utils import config
-from utils.predictor import Predictor
-from utils.get_image_list import get_image_list
-from det_preprocess import det_preprocess
-from preprocess import create_operators
-
-import os
-import argparse
 import time
-import yaml
-import ast
 from functools import reduce
-import cv2
+import argparse
+
+import yaml
 import numpy as np
+import cv2
 import paddle
+
+from deploy.utils import logger
+from deploy.utils import config
+from deploy.utils.predictor import Predictor
+from deploy.utils.get_image_list import get_image_list
+from deploy.python.det_preprocess import det_preprocess
+from deploy.python.preprocess import create_operators
 
 
 class DetPredictor(Predictor):
