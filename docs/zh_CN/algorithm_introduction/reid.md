@@ -191,8 +191,6 @@
   ```log
   ...
   ...
-  ppcls INFO: unique_endpoints {''}
-  ppcls INFO: Found /root/.paddleclas/weights/resnet50-19c8e357_torch2paddle.pdparams
   ppcls INFO: gallery feature calculation process: [0/125]
   ppcls INFO: gallery feature calculation process: [20/125]
   ppcls INFO: gallery feature calculation process: [40/125]
