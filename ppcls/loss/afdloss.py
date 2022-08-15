@@ -97,8 +97,6 @@ class Attention(nn.Layer):
         super().__init__()
         self.qk_dim = qk_dim
         self.n_t = n_t
-        # self.linear_trans_s = LinearTransformStudent(qk_dim, t_shapes, s_shapes, unique_t_shapes)
-        # self.linear_trans_t = LinearTransformTeacher(qk_dim, t_shapes)
 
         self.p_t = self.create_parameter(
             shape=[len(t_shapes), qk_dim],

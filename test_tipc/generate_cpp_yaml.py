@@ -66,6 +66,10 @@ def main():
                                                       "test_images")
         config["IndexProcess"]["index_dir"] = os.path.join(args.data_dir,
                                                            "index")
+        config["IndexProcess"]["image_root"] = os.path.join(args.data_dir,
+                                                            "gallery")
+        config["IndexProcess"]["data_file"] = os.path.join(args.data_dir,
+                                                           "drink_label.txt")
         assert args.cls_model_dir
         assert args.det_model_dir
         config["Global"]["det_inference_model_dir"] = args.det_model_dir

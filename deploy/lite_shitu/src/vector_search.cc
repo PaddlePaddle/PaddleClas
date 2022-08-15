@@ -64,4 +64,4 @@ const SearchResult &VectorSearch::Search(float *feature, int query_number) {
 const std::string &VectorSearch::GetLabel(faiss::Index::idx_t ind) {
   return this->id_map.at(ind);
 }
-}
+} // namespace PPShiTu

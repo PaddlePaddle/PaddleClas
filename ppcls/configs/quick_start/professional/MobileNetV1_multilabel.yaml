@@ -122,8 +122,8 @@ Infer:
 
 Metric:
   Train:
-    - HammingDistance:
     - AccuracyScore:
+    - HammingDistance:
   Eval:
-    - HammingDistance:
     - AccuracyScore:
+    - HammingDistance:

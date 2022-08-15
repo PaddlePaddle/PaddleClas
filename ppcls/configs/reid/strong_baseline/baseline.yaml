@@ -24,7 +24,7 @@ Arch:
   infer_add_softmax: False
   Backbone:
     name: "ResNet50"
-    pretrained: True
+    pretrained: https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/others/resnet50-19c8e357_torch2paddle.pdparams
     stem_act: null
   BackboneStopLayer:
     name: "flatten"
