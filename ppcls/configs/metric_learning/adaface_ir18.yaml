@@ -1,0 +1,105 @@
+# global configs
+Global:
+  checkpoints: null
+  pretrained_model: null
+  output_dir: "./output/"
+  device: "gpu"
+  save_interval: 1
+  eval_during_train: True
+  eval_interval: 1
+  epochs: 26
+  print_batch_step: 10
+  use_visualdl: False
+  # used for static mode and model export
+  image_shape: [3, 112, 112]
+  save_inference_dir: "./inference"
+  eval_mode: "adaface"
+
+# model architecture
+Arch:
+  name: "RecModel"
+  infer_output_key: "features"
+  infer_add_softmax: False
+  Backbone: 
+    name: "AdaFace_IR_18"
+    input_size: [112, 112]
+  Head:
+    name: "AdaMargin"  
+    embedding_size: 512
+    class_num: 70722
+    m: 0.4
+    s: 64
+    h: 0.333
+    t_alpha: 0.01
+ 
+# loss function config for traing/eval process
+Loss:
+  Train:
+    - CELoss:
+        weight: 1.0
+
+Optimizer:
+  name: Momentum
+  momentum: 0.9
+  lr:
+    name: Piecewise
+    learning_rate: 0.1
+    decay_epochs: [12, 20, 24]
+    values: [0.1, 0.01, 0.001, 0.0001]
+  regularizer:
+    name: 'L2'
+    coeff: 0.0005
+
+# data loader for train and eval
+DataLoader:
+  Train:
+    dataset:
+        name: "AdaFaceDataset"
+        root_dir: "dataset/face/"
+        label_path: "dataset/face/train_filter_label.txt"
+        transform:
+          - CropWithPadding:
+              prob: 0.2
+              padding_num: 0
+              size: [112, 112]
+              scale: [0.2, 1.0]
+              ratio: [0.75, 1.3333333333333333]
+          - RandomInterpolationAugment:
+              prob: 0.2
+          - ColorJitter:
+              prob: 0.2
+              brightness: 0.5
+              contrast: 0.5
+              saturation: 0.5
+              hue: 0
+          - RandomHorizontalFlip:
+          - ToTensor:
+          - Normalize:
+              mean: [0.5, 0.5, 0.5]
+              std: [0.5, 0.5, 0.5]
+    sampler:
+        name: DistributedBatchSampler
+        batch_size: 256
+        drop_last: False
+        shuffle: True
+    loader:
+        num_workers: 6
+        use_shared_memory: True
+
+  Eval:
+    dataset:
+      name: FiveValidationDataset
+      val_data_path: dataset/face/faces_emore
+      concat_mem_file_name: dataset/face/faces_emore/concat_validation_memfile
+    sampler:
+        name: BatchSampler
+        batch_size: 256
+        drop_last: False
+        shuffle: True
+    loader:
+        num_workers: 6
+        use_shared_memory: True
+Metric:
+  Train:
+    - TopkAcc:
+        topk: [1, 5]

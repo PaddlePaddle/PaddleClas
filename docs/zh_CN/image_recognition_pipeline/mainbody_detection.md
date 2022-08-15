@@ -19,9 +19,13 @@
   - [3.3 配置文件改动和说明](#3.3)
   - [3.4 启动训练](#3.4)
   - [3.5 模型预测与调试](#3.5)
-  - [3.6 模型导出与预测部署](#3.6)
+- [4. 模型推理部署](#4)
+  - [4.1 推理模型准备](#4.1)
+  - [4.2 基于python预测引擎推理](#4.2)
+  - [4.3 其他推理方式](#4.3)
 
-<a name="1"></a> 
+
+<a name="1"></a>
 
 ## 1. 数据集
 
@@ -37,7 +41,7 @@
 
 在实际训练的过程中，将所有数据集混合在一起。由于是主体检测，这里将所有标注出的检测框对应的类别都修改为 `前景` 的类别，最终融合的数据集中只包含 1 个类别，即前景。
 
-<a name="2"></a> 
+<a name="2"></a>
 
 ## 2. 模型选择
 
@@ -55,7 +59,7 @@
   * 速度评测机器的 CPU 具体信息为：`Intel(R) Xeon(R) Gold 6148 CPU @ 2.40GHz`，速度指标为开启 mkldnn，线程数设置为 10 测试得到。
   * 主体检测的预处理过程较为耗时，平均每张图在上述机器上的时间在 40~55 ms 左右，没有包含在上述的预测耗时统计中。
 
-<a name="2.1"></a> 
+<a name="2.1"></a>
 
 ### 2.1 轻量级主体检测模型
 
@@ -72,7 +76,7 @@ PicoDet 由 [PaddleDetection](https://github.com/PaddlePaddle/PaddleDetection) �
 
 在轻量级主体检测任务中，为了更好地兼顾检测速度与效果，我们使用 PPLCNet_x2_5 作为主体检测模型的骨干网络，同时将训练与预测的图像尺度修改为了 640x640，其余配置与 [picodet_lcnet_1_5x_416_coco.yml](https://github.com/PaddlePaddle/PaddleDetection/blob/develop/configs/picodet/more_config/picodet_lcnet_1_5x_416_coco.yml) 完全一致。将数据集更换为自定义的主体检测数据集，进行训练，最终得到检测模型。
 
-<a name="2.2"></a> 
+<a name="2.2"></a>
 
 ### 2.2 服务端主体检测模型
 
@@ -93,13 +97,13 @@ PP-YOLO 由 [PaddleDetection](https://github.com/PaddlePaddle/PaddleDetection) �
 
 在服务端主体检测任务中，为了保证检测效果，我们使用 ResNet50vd-DCN 作为检测模型的骨干网络，使用配置文件 [ppyolov2_r50vd_dcn_365e_coco.yml](https://github.com/PaddlePaddle/PaddleDetection/blob/release/2.1/configs/ppyolo/ppyolov2_r50vd_dcn_365e_coco.yml)，更换为自定义的主体检测数据集，进行训练，最终得到检测模型。
 
-<a name="3"></a> 
+<a name="3"></a>
 
 ## 3. 模型训练
 
 本节主要介绍怎样基于 PaddleDetection，基于自己的数据集，训练主体检测模型。
 
-<a name="3.1"></a> 
+<a name="3.1"></a>
 
 ### 3.1 环境准备
 
@@ -116,7 +120,7 @@ pip install -r requirements.txt
 
 更多安装教程，请参考: [安装文档](https://github.com/PaddlePaddle/PaddleDetection/blob/release/2.1/docs/tutorials/INSTALL_cn.md)
 
-<a name="3.2"></a> 
+<a name="3.2"></a>
 
 ### 3.2 数据准备
 
@@ -128,7 +132,7 @@ pip install -r requirements.txt
 [{u'id': 1, u'name': u'foreground', u'supercategory': u'foreground'}]
 ```
 
-<a name="3.3"></a> 
+<a name="3.3"></a>
 
 ### 3.3 配置文件改动和说明
 
@@ -154,7 +158,7 @@ ppyolov2_reader.yml：主要说明数据读取器配置，如 batch size，并�
 
 此外，也可以根据实际情况，修改上述文件，比如，如果显存溢出，可以将 batch size 和学习率等比缩小等。
 
-<a name="3.4"></a> 
+<a name="3.4"></a>
 
 ### 3.4 启动训练
 
@@ -198,7 +202,7 @@ python -m paddle.distributed.launch --gpus 0,1,2,3 tools/train.py -c configs/ppy
 
 注意：如果遇到 "`Out of memory error`" 问题, 尝试在 `ppyolov2_reader.yml` 文件中调小 `batch_size`，同时等比例调小学习率。
 
-<a name="3.5"></a> 
+<a name="3.5"></a>
 
 ### 3.5 模型预测与调试
 
@@ -211,9 +215,11 @@ python tools/infer.py -c configs/ppyolo/ppyolov2_r50vd_dcn_365e_coco.yml --infer
 
 `--draw_threshold` 是个可选参数. 根据 [NMS](https://ieeexplore.ieee.org/document/1699659) 的计算，不同阈值会产生不同的结果 `keep_top_k` 表示设置输出目标的最大数量，默认值为 100，用户可以根据自己的实际情况进行设定。
 
-<a name="3.6"></a> 
+<a name="4"></a>
+## 4. 模型推理部署
 
-### 3.6 模型导出与预测部署。
+<a name="4.1"></a>
+### 4.1 推理模型准备
 
 执行导出模型脚本：
 
@@ -225,14 +231,20 @@ python tools/export_model.py -c configs/ppyolo/ppyolov2_r50vd_dcn_365e_coco.yml 
 
 注意： `PaddleDetection` 导出的 inference 模型的文件格式为 `model.xxx`，这里如果希望与 PaddleClas 的 inference 模型文件格式保持一致，需要将其 `model.xxx` 文件修改为 `inference.xxx` 文件，用于后续主体检测的预测部署。
 
-更多模型导出教程，请参考： [EXPORT_MODEL](https://github.com/PaddlePaddle/PaddleDetection/blob/release/2.1/deploy/EXPORT_MODEL.md)
+更多模型导出教程，请参考： [EXPORT_MODEL](https://github.com/PaddlePaddle/PaddleDetection/blob/release/2.4/deploy/EXPORT_MODEL.md)
 
 最终，目录 `inference/ppyolov2_r50vd_dcn_365e_coco` 中包含 `inference.pdiparams`, `inference.pdiparams.info` 以及 `inference.pdmodel` 文件，其中 `inference.pdiparams` 为保存的 inference 模型权重文件，`inference.pdmodel` 为保存的 inference 模型结构文件。
 
+<a name="4.2"></a>
+### 4.2 基于python预测引擎推理
 
 导出模型之后，在主体检测与识别任务中，就可以将检测模型的路径更改为该 inference 模型路径，完成预测。
 
 以商品识别为例，其配置文件为 [inference_product.yaml](../../../deploy/configs/inference_product.yaml)，修改其中的 `Global.det_inference_model_dir` 字段为导出的主体检测 inference 模型目录，参考[图像识别快速开始教程](../quick_start/quick_start_recognition.md)，即可完成商品检测与识别过程。
+
+<a name="4.3"></a>
+### 4.3 其他推理方式
+其他推理方法，如C++推理部署、PaddleServing部署等请参考[检测模型推理部署](https://github.com/PaddlePaddle/PaddleDetection/blob/release/2.4/deploy/README.md)。
 
 
 ### FAQ

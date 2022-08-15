@@ -75,8 +75,9 @@ class Engine(object):
         print_config(config)
 
         # init train_func and eval_func
-        assert self.eval_mode in ["classification", "retrieval"], logger.error(
-            "Invalid eval mode: {}".format(self.eval_mode))
+        assert self.eval_mode in [
+            "classification", "retrieval", "adaface"
+        ], logger.error("Invalid eval mode: {}".format(self.eval_mode))
         self.train_epoch_func = train_epoch
         self.eval_func = getattr(evaluation, self.eval_mode + "_eval")
 
@@ -115,7 +116,7 @@ class Engine(object):
                 self.config["DataLoader"], "Train", self.device, self.use_dali)
         if self.mode == "eval" or (self.mode == "train" and
                                    self.config["Global"]["eval_during_train"]):
-            if self.eval_mode == "classification":
+            if self.eval_mode in ["classification", "adaface"]:
                 self.eval_dataloader = build_dataloader(
                     self.config["DataLoader"], "Eval", self.device,
                     self.use_dali)
@@ -151,39 +152,33 @@ class Engine(object):
                 self.eval_loss_func = None
 
         # build metric
-        if self.mode == 'train':
-            metric_config = self.config.get("Metric")
-            if metric_config is not None:
-                metric_config = metric_config.get("Train")
-                if metric_config is not None:
-                    if hasattr(
-                            self.train_dataloader, "collate_fn"
-                    ) and self.train_dataloader.collate_fn is not None:
-                        for m_idx, m in enumerate(metric_config):
-                            if "TopkAcc" in m:
-                                msg = f"'TopkAcc' metric can not be used when setting 'batch_transform_ops' in config. The 'TopkAcc' metric has been removed."
-                                logger.warning(msg)
-                                break
+        if self.mode == 'train' and "Metric" in self.config and "Train" in self.config[
+                "Metric"] and self.config["Metric"]["Train"]:
+            metric_config = self.config["Metric"]["Train"]
+            if hasattr(self.train_dataloader, "collate_fn"
+                       ) and self.train_dataloader.collate_fn is not None:
+                for m_idx, m in enumerate(metric_config):
+                    if "TopkAcc" in m:
+                        msg = f"Unable to calculate accuracy when using \"batch_transform_ops\". The metric \"{m}\" has been removed."
+                        logger.warning(msg)
                         metric_config.pop(m_idx)
-                    self.train_metric_func = build_metrics(metric_config)
-                else:
-                    self.train_metric_func = None
+            self.train_metric_func = build_metrics(metric_config)
         else:
             self.train_metric_func = None
 
         if self.mode == "eval" or (self.mode == "train" and
                                    self.config["Global"]["eval_during_train"]):
-            metric_config = self.config.get("Metric")
             if self.eval_mode == "classification":
-                if metric_config is not None:
-                    metric_config = metric_config.get("Eval")
-                    if metric_config is not None:
-                        self.eval_metric_func = build_metrics(metric_config)
-            elif self.eval_mode == "retrieval":
-                if metric_config is None:
-                    metric_config = [{"name": "Recallk", "topk": (1, 5)}]
+                if "Metric" in self.config and "Eval" in self.config["Metric"]:
+                    self.eval_metric_func = build_metrics(self.config["Metric"]
+                                                          ["Eval"])
                 else:
-                    metric_config = metric_config["Eval"]
+                    self.eval_metric_func = None
+            elif self.eval_mode == "retrieval":
+                if "Metric" in self.config and "Eval" in self.config["Metric"]:
+                    metric_config = self.config["Metric"]["Eval"]
+                else:
+                    metric_config = [{"name": "Recallk", "topk": (1, 5)}]
                 self.eval_metric_func = build_metrics(metric_config)
         else:
             self.eval_metric_func = None
@@ -446,6 +441,8 @@ class Engine(object):
 
                 if isinstance(out, list):
                     out = out[0]
+                if isinstance(out, dict) and "Student" in out:
+                    out = out["Student"]
                 if isinstance(out, dict) and "logits" in out:
                     out = out["logits"]
                 if isinstance(out, dict) and "output" in out:
@@ -457,7 +454,9 @@ class Engine(object):
 
     def export(self):
         assert self.mode == "export"
-        use_multilabel = self.config["Global"].get("use_multilabel", False)
+        use_multilabel = self.config["Global"].get(
+            "use_multilabel",
+            False) or "ATTRMetric" in self.config["Metric"]["Eval"][0]
         model = ExportModel(self.config["Arch"], self.model, use_multilabel)
         if self.config["Global"]["pretrained_model"] is not None:
             load_dygraph_pretrain(model.base_model,
@@ -467,7 +466,7 @@ class Engine(object):
 
         # for rep nets
         for layer in self.model.sublayers():
-            if hasattr(layer, "rep"):
+            if hasattr(layer, "rep") and not getattr(layer, "is_repped"):
                 layer.rep()
 
         save_path = os.path.join(self.config["Global"]["save_inference_dir"],

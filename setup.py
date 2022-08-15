@@ -38,13 +38,16 @@ setup(
     version='0.0.0',
     install_requires=requirements,
     license='Apache License 2.0',
-    description='Awesome Image Classification toolkits based on PaddlePaddle ',
+    description='A treasure chest for visual recognition powered by PaddlePaddle.',
     long_description=readme(),
     long_description_content_type='text/markdown',
     url='https://github.com/PaddlePaddle/PaddleClas',
     download_url='https://github.com/PaddlePaddle/PaddleClas.git',
     keywords=[
-        'A treasure chest for image classification powered by PaddlePaddle.'
+        'image-classification', 'image-recognition', 'pretrained-models',
+        'knowledge-distillation', 'product-recognition', 'autoaugment',
+        'cutmix', 'randaugment', 'gridmask', 'deit', 'repvgg',
+        'swin-transformer', 'image-retrieval-system'
     ],
     classifiers=[
         'Intended Audience :: Developers',

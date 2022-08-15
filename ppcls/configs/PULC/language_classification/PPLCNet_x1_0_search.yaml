@@ -1,0 +1,142 @@
+# global configs
+Global:
+  checkpoints: null
+  pretrained_model: null
+  output_dir: ./output/
+  device: gpu
+  save_interval: 1
+  eval_during_train: True
+  eval_interval: 1
+  epochs: 30
+  print_batch_step: 10
+  use_visualdl: False
+  # used for static mode and model export
+  image_shape: [3, 48, 192]
+  save_inference_dir: ./inference
+  start_eval_epoch: 20
+  
+# model architecture
+Arch:
+  name: PPLCNet_x1_0
+  class_num: 10
+  pretrained: True
+  use_ssld: True
+  stride_list: [2, [2, 1], [2, 1], [2, 1], [2, 1]]
+ 
+# loss function config for traing/eval process
+Loss:
+  Train:
+    - CELoss:
+        weight: 1.0
+        epsilon: 0.1
+  Eval:
+    - CELoss:
+        weight: 1.0
+
+
+Optimizer:
+  name: Momentum
+  momentum: 0.9
+  lr:
+    name: Cosine
+    learning_rate: 0.4
+    warmup_epoch: 5
+  regularizer:
+    name: 'L2'
+    coeff: 0.00003
+
+
+# data loader for train and eval
+DataLoader:
+  Train:
+    dataset:
+      name: ImageNetDataset
+      image_root: ./dataset/language_classification/
+      cls_label_path: ./dataset/language_classification/train_list.txt
+      transform_ops:
+        - DecodeImage:
+            to_rgb: True
+            channel_first: False
+        - ResizeImage:
+            size: [192, 48]
+        - RandFlipImage:
+            flip_code: 1
+        - TimmAutoAugment:
+            prob: 0.0
+            config_str: rand-m9-mstd0.5-inc1
+            interpolation: bicubic
+            img_size: [192, 48]
+        - NormalizeImage:
+            scale: 1.0/255.0
+            mean: [0.485, 0.456, 0.406]
+            std: [0.229, 0.224, 0.225]
+            order: ''
+        - RandomErasing:
+            EPSILON: 0.0
+            sl: 0.02
+            sh: 1.0/3.0
+            r1: 0.3
+            attempt: 10
+            use_log_aspect: True
+            mode: pixel
+    sampler:
+      name: DistributedBatchSampler
+      batch_size: 256
+      drop_last: False
+      shuffle: True
+    loader:
+      num_workers: 4
+      use_shared_memory: True
+
+  Eval:
+    dataset: 
+      name: ImageNetDataset
+      image_root: ./dataset/language_classification/
+      cls_label_path: ./dataset/language_classification/test_list.txt
+      transform_ops:
+        - DecodeImage:
+            to_rgb: True
+            channel_first: False
+        - ResizeImage:
+            size: [192, 48]
+        - NormalizeImage:
+            scale: 1.0/255.0
+            mean: [0.485, 0.456, 0.406]
+            std: [0.229, 0.224, 0.225]
+            order: ''
+    sampler:
+      name: DistributedBatchSampler
+      batch_size: 128
+      drop_last: False
+      shuffle: False
+    loader:
+      num_workers: 32
+      use_shared_memory: True
+
+Infer:
+  infer_imgs: deploy/images/PULC/language_classification/word_35404.png
+  batch_size: 10
+  transforms:
+    - DecodeImage:
+        to_rgb: True
+        channel_first: False
+    - ResizeImage:
+        size: [192, 48]
+    - NormalizeImage:
+        scale: 1.0/255.0
+        mean: [0.485, 0.456, 0.406]
+        std: [0.229, 0.224, 0.225]
+        order: ''
+    - ToCHWImage:
+  PostProcess:
+    name: Topk
+    topk: 2
+    class_id_map_file: ppcls/utils/PULC_label_list/language_classification_label_list.txt
+
+Metric:
+  Train:
+    - TopkAcc:
+        topk: [1, 2]
+  Eval:
+    - TopkAcc:
+        topk: [1, 2]

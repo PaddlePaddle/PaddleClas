@@ -18,7 +18,7 @@ PaddleClas 支持 Python Whl 包方式进行预测，目前 Whl 包方式仅支�
    - [4.6 对 `NumPy.ndarray` 格式数据进行预测](#4.6)
    - [4.7 保存预测结果](#4.7)
    - [4.8 指定 label name](#4.8)
-   
+
 
 <a name="1"></a>
 ## 1. 安装 paddleclas
@@ -212,14 +212,14 @@ print(next(result))
 ```python
 from paddleclas import PaddleClas
 clas = PaddleClas(model_name='ResNet50', save_dir='./output_pre_label/')
-infer_imgs = 'docs/images/whl/' # it can be infer_imgs folder path which contains all of images you want to predict.
+infer_imgs = 'docs/images/' # it can be infer_imgs folder path which contains all of images you want to predict.
 result=clas.predict(infer_imgs)
 print(next(result))
 ```
 
 * CLI
 ```bash
-paddleclas --model_name='ResNet50' --infer_imgs='docs/images/whl/' --save_dir='./output_pre_label/'
+paddleclas --model_name='ResNet50' --infer_imgs='docs/images/' --save_dir='./output_pre_label/'
 ```
 
 <a name="4.8"></a>

@@ -47,9 +47,9 @@ int activation_function_softmax(const _Tp *src, _Tp *dst, int length) {
 }
 
 // PicoDet decode
-PPShiTu::ObjectResult
-disPred2Bbox(const float *&dfl_det, int label, float score, int x, int y,
-             int stride, std::vector<float> im_shape, int reg_max) {
+PPShiTu::ObjectResult disPred2Bbox(const float *&dfl_det, int label,
+                                   float score, int x, int y, int stride,
+                                   std::vector<float> im_shape, int reg_max) {
   float ct_x = (x + 0.5) * stride;
   float ct_y = (y + 0.5) * stride;
   std::vector<float> dis_pred;

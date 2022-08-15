@@ -48,6 +48,12 @@ def quantize_model(config, model, mode="train"):
         QUANT_CONFIG["activation_preprocess_type"] = "PACT"
         if mode in ["infer", "export"]:
             QUANT_CONFIG['activation_preprocess_type'] = None
+
+        # for rep nets, convert to reparameterized model first
+        for layer in model.sublayers():
+            if hasattr(layer, "rep"):
+                layer.rep()
+
         model.quanter = QAT(config=QUANT_CONFIG)
         model.quanter.quantize(model)
         logger.info("QAT model summary:")

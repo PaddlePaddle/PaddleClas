@@ -1,0 +1,35 @@
+base_config_file: ppcls/configs/PULC/vehicle_attr/PPLCNet_x1_0_search.yaml
+distill_config_file: ppcls/configs/PULC/vehicle_attr/PPLCNet_x1_0_distillation.yaml
+
+gpus: 0,1,2,3
+output_dir: output/search_vehicle_attr
+search_times: 1
+search_dict:
+  - search_key: lrs
+    replace_config:
+      - Optimizer.lr.learning_rate
+    search_values: [0.0075, 0.01, 0.0125]
+  - search_key: ra_probs
+    replace_config:
+      - DataLoader.Train.dataset.transform_ops.2.TimmAutoAugment.prob
+    search_values: [0.0, 0.1, 0.5]
+  - search_key: re_probs
+    replace_config:
+      - DataLoader.Train.dataset.transform_ops.7.RandomErasing.EPSILON
+    search_values: [0.0, 0.1, 0.5]
+  - search_key: lr_mult_list
+    replace_config:
+      - Arch.lr_mult_list
+    search_values:
+      - [0.0, 0.2, 0.4, 0.6, 0.8, 1.0]
+      - [0.0, 0.4, 0.4, 0.8, 0.8, 1.0]
+      - [1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
+teacher:
+  algorithm: "skl-ugi"
+  rm_keys:
+    - Arch.lr_mult_list
+  search_values:
+    - ResNet101_vd
+    - ResNet50_vd
+final_replace:
+  Arch.lr_mult_list: Arch.models.1.Student.lr_mult_list
