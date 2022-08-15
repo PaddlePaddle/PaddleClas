@@ -5,10 +5,10 @@
 - [1. Introduction](#1)
 - [2. Installation of Serving](#2)
 - [3. Service Deployment for Image Classification](#3)
-  - [3.1 Model Transformation](#3.1)
+  - [3.1 Model conversion](#3.1)
   - [3.2 Service Deployment and Request](#3.2)
 - [4. Service Deployment for Image Recognition](#4)
-  - [4.1 Model Transformation](#4.1)
+  - [4.1 Model conversion](#4.1)
   - [4.2 Service Deployment and Request](#4.2)
 - [5. FAQ](#5)
 
@@ -24,7 +24,7 @@ This section, exemplified by HTTP deployment of prediction service, describes ho
 
 It is officially recommended to use docker for the installation and environment deployment of Serving. First, pull the docker and create a Serving-based one.
 
-```
+```shell
 docker pull paddlepaddle/serving:0.7.0-cuda10.2-cudnn7-devel
 nvidia-docker run -p 9292:9292 --name test -dit paddlepaddle/serving:0.7.0-cuda10.2-cudnn7-devel bash
 nvidia-docker exec -it test bash
@@ -32,22 +32,22 @@ nvidia-docker exec -it test bash
 
 Once you are in docker,  install the Serving-related python packages.
 
-```
-pip3 install paddle-serving-client==0.7.0
-pip3 install paddle-serving-server==0.7.0 # CPU
-pip3 install paddle-serving-app==0.7.0
-pip3 install paddle-serving-server-gpu==0.7.0.post102 #GPU with CUDA10.2 + TensorRT6
+```shell
+python3.7 -m pip install paddle-serving-client==0.7.0
+python3.7 -m pip install paddle-serving-server==0.7.0 # CPU
+python3.7 -m pip install paddle-serving-app==0.7.0
+python3.7 -m pip install paddle-serving-server-gpu==0.7.0.post102 #GPU with CUDA10.2 + TensorRT6
 # For other GPU environemnt, confirm the environment before choosing which one to execute
-pip3 install paddle-serving-server-gpu==0.7.0.post101 # GPU with CUDA10.1 + TensorRT6
-pip3 install paddle-serving-server-gpu==0.7.0.post112 # GPU with CUDA11.2 + TensorRT8
+python3.7 -m pip install paddle-serving-server-gpu==0.7.0.post101 # GPU with CUDA10.1 + TensorRT6
+python3.7 -m pip install paddle-serving-server-gpu==0.7.0.post112 # GPU with CUDA11.2 + TensorRT8
 ```
 
 - Speed up the installation process by replacing the source with `-i https://pypi.tuna.tsinghua.edu.cn/simple`.
 - For other environment configuration and installation, please refer to [Install Paddle Serving using docker](https://github.com/PaddlePaddle/Serving/blob/v0.7.0/doc/Install_EN.md)
 - To deploy CPU services, please install the CPU version of serving-server with the following command.
 
-```
-pip install paddle-serving-server
+```shell
+python3.7 -m pip install paddle-serving-server
 ```
 
 <a name="3"></a>
@@ -85,7 +85,7 @@ When using PaddleServing for service deployment, you need to convert the saved i
   ```
   The specific meaning of the parameters in the above command is shown in the following table
     | parameter | type | default value | description |
-    | --------- | ---- | ------------- | ----------- |  |--- |
+    | --------- | ---- | ------------- | ----------- |
   | `dirname` | str | - | The storage path of the model file to be converted. The program structure file and parameter file are saved in this directory. |
   | `model_filename` | str | None | The name of the file storing the model Inference Program structure that needs to be converted. If set to None, use `__model__` as the default filename |
   | `params_filename` | str | None | File name where all parameters of the model to be converted are stored. It needs to be specified if and only if all model parameters are stored in a single binary file. If the model parameters are stored in separate files, set it to None |
@@ -156,6 +156,7 @@ test_cpp_serving_client.py # Script for sending C++ serving prediction requests 
   ```log
   {'err_no': 0, 'err_msg': '', 'key': ['label', 'prob'], 'value': ["['daisy']", '[0.9341402053833008]'], 'tensors ': []}
   ```
+
 - turn off the service
 If the service program is running in the foreground, you can press `Ctrl+C` to terminate the server program; if it is running in the background, you can use the kill command to close related processes, or you can execute the following command in the path where the service program is started to terminate the server program:
   ```bash
@@ -175,7 +176,7 @@ Different from Python Serving, the C++ Serving client calls C++ OP to predict, s
   # One-click compile and install Serving server, set SERVING_BIN
   source ./build_server.sh python3.7
   ```
-  **Note: The path set by **[build_server.sh](../../../deploy/paddleserving/build_server.sh#L55-L62) may need to be modified according to the actual machine environment such as CUDA, python version, etc., and then compiled.
+  **Note: The path set by **[build_server.sh](../../../deploy/paddleserving/build_server.sh#L55-L62) may need to be modified according to the actual machine environment such as CUDA, python version, etc., and then compiled; if you encounter a non-network error during the execution of build_server.sh, you can manually copy the commands in the script to the terminal for execution.
 
 - Modify the client file `ResNet50_client/serving_client_conf.prototxt` , change the field after `feed_type:` to 20, change the field after the first `shape:` to 1 and delete the rest of the `shape` fields.
   ```log
@@ -187,6 +188,7 @@ Different from Python Serving, the C++ Serving client calls C++ OP to predict, s
     shape: 1
   }
   ```
+
 - Modify part of the code of [`test_cpp_serving_client`](../../../deploy/paddleserving/test_cpp_serving_client.py)
   1. Modify the [`feed={"inputs": image}`](../../../deploy/paddleserving/test_cpp_serving_client.py#L28) part of the code, and change the path after `load_client_config` to `ResNet50_client/serving_client_conf.prototxt` .
   2. Modify the [`feed={"inputs": image}`](../../../deploy/paddleserving/test_cpp_serving_client.py#L45) part of the code, and change `inputs` to be the same as the `feed_var` field in `ResNet50_client/serving_client_conf.prototxt` name` is the same. Since `name` in some model client files is `x` instead of `inputs` , you need to pay attention to this when using these models for C++ Serving deployment.
@@ -250,7 +252,7 @@ When using PaddleServing for image recognition service deployment, **need to con
   --serving_server ./general_PPLCNet_x2_5_lite_v1.0_serving/ \
   --serving_client ./general_PPLCNet_x2_5_lite_v1.0_client/
   ```
-  The meaning of the parameters of the above command is the same as [#4.1 Model conversion](#4.1)
+  The meaning of the parameters of the above command is the same as [#3.1 Model conversion](#3.1)
 
   After the recognition inference model is converted, there will be additional folders `general_PPLCNet_x2_5_lite_v1.0_serving/` and `general_PPLCNet_x2_5_lite_v1.0_client/` in the current folder. Modify the name of `alias` in `serving_server_conf.prototxt` in `general_PPLCNet_x2_5_lite_v1.0_serving/` and `general_PPLCNet_x2_5_lite_v1.0_client/` directories respectively: Change `alias_name` in `fetch_var` to `features`. The content of the modified `serving_server_conf.prototxt` is as follows
 
@@ -294,7 +296,7 @@ When using PaddleServing for image recognition service deployment, **need to con
   --serving_server ./picodet_PPLCNet_x2_5_mainbody_lite_v1.0_serving/ \
   --serving_client ./picodet_PPLCNet_x2_5_mainbody_lite_v1.0_client/
   ```
-  The meaning of the parameters of the above command is the same as [#4.1 Model conversion](#4.1)
+  The meaning of the parameters of the above command is the same as [#3.1 Model conversion](#3.1)
 
   After the conversion of the general detection inference model is completed, there will be additional folders `picodet_PPLCNet_x2_5_mainbody_lite_v1.0_serving/` and `picodet_PPLCNet_x2_5_mainbody_lite_v1.0_client/` in the current folder, with the following structure:
     ```shell
@@ -361,7 +363,7 @@ When using PaddleServing for image recognition service deployment, **need to con
   ```
   After a successful run, the results of the model prediction will be printed in the cmd window, and the results are as follows:
   ```log
-  {'err_no': 0, 'err_msg': '', 'key': ['result'], 'value': ["[{'bbox': [345, 95, 524, 576], 'rec_docs': 'Red Bull-Enhanced', 'rec_scores': 0.79903316}]"], 'tensors': []}
+  {'err_no': 0, 'err_msg': '', 'key': ['result'], 'value': ["[{'bbox': [345, 95, 524, 576], 'rec_docs': '红牛-强化型', 'rec_scores': 0.79903316}]"], 'tensors': []}
   ```
 
 <a name="4.2.2"></a>
@@ -411,7 +413,7 @@ Different from Python Serving, the C++ Serving client calls C++ OP to predict, s
   WARNING: Logging before InitGoogleLogging() is written to STDERR
   I0614 03:01:36.273097 6084 naming_service_thread.cpp:202] brpc::policy::ListNamingService("127.0.0.1:9400"): added 1
   I0614 03:01:37.393564 6084 general_model.cpp:490] [client]logid=0,client_cost=1107.82ms,server_cost=1101.75ms.
-  [{'bbox': [345, 95, 524, 585], 'rec_docs': 'Red Bull-Enhanced', 'rec_scores': 0.8073724}]
+  [{'bbox': [345, 95, 524, 585], 'rec_docs': '红牛-强化型', 'rec_scores': 0.8073724}]
   ```
 
 - close the service:

@@ -4,10 +4,10 @@
 - [1. 简介](#1)
 - [2. Serving 安装](#2)
 - [3. 图像分类服务部署](#3)
-    - [3.1 模型转换](#3.1)
-    - [3.2 服务部署和请求](#3.2)
-        - [3.2.1 Python Serving](#3.2.1)
-        - [3.2.2 C++ Serving](#3.2.2)
+  - [3.1 模型转换](#3.1)
+  - [3.2 服务部署和请求](#3.2)
+      - [3.2.1 Python Serving](#3.2.1)
+      - [3.2.2 C++ Serving](#3.2.2)
 - [4. 图像识别服务部署](#4)
   - [4.1 模型转换](#4.1)
   - [4.2 服务部署和请求](#4.2)
@@ -39,21 +39,21 @@ docker exec -it test bash
 
 进入 docker 后，需要安装 Serving 相关的 python 包。
 ```shell
-pip3 install paddle-serving-client==0.7.0
-pip3 install paddle-serving-app==0.7.0
-pip3 install faiss-cpu==1.7.1post2
+python3.7 -m pip install paddle-serving-client==0.7.0
+python3.7 -m pip install paddle-serving-app==0.7.0
+python3.7 -m pip install faiss-cpu==1.7.1post2
 
 #若为CPU部署环境:
-pip3 install paddle-serving-server==0.7.0 # CPU
-pip3 install paddlepaddle==2.2.0          # CPU
+python3.7 -m pip install paddle-serving-server==0.7.0 # CPU
+python3.7 -m pip install paddlepaddle==2.2.0          # CPU
 
 #若为GPU部署环境
-pip3 install paddle-serving-server-gpu==0.7.0.post102 # GPU with CUDA10.2 + TensorRT6
-pip3 install paddlepaddle-gpu==2.2.0     # GPU with CUDA10.2
+python3.7 -m pip install paddle-serving-server-gpu==0.7.0.post102 # GPU with CUDA10.2 + TensorRT6
+python3.7 -m pip install paddlepaddle-gpu==2.2.0     # GPU with CUDA10.2
 
 #其他GPU环境需要确认环境再选择执行哪一条
-pip3 install paddle-serving-server-gpu==0.7.0.post101 # GPU with CUDA10.1 + TensorRT6
-pip3 install paddle-serving-server-gpu==0.7.0.post112 # GPU with CUDA11.2 + TensorRT8
+python3.7 -m pip install paddle-serving-server-gpu==0.7.0.post101 # GPU with CUDA10.1 + TensorRT6
+python3.7 -m pip install paddle-serving-server-gpu==0.7.0.post112 # GPU with CUDA11.2 + TensorRT8
 ```
 
 * 如果安装速度太慢，可以通过 `-i https://pypi.tuna.tsinghua.edu.cn/simple` 更换源，加速安装过程。
@@ -180,7 +180,7 @@ test_cpp_serving_client.py    # rpc方式发送C++ serving预测请求的脚本
   # 一键编译安装Serving server、设置 SERVING_BIN
   source ./build_server.sh python3.7
   ```
-  **注：**[build_server.sh](../../../deploy/paddleserving/build_server.sh#L55-L62)所设定的路径可能需要根据实际机器上的环境如CUDA、python版本等作一定修改，然后再编译。
+  **注：**[build_server.sh](../../../deploy/paddleserving/build_server.sh#L55-L62)所设定的路径可能需要根据实际机器上的环境如CUDA、python版本等作一定修改，然后再编译；如果执行build_server.sh过程中遇到非网络原因的报错，则可以手动将脚本中的命令逐条复制到终端执行。
 
 - 修改客户端文件 `ResNet50_vd_client/serving_client_conf.prototxt` ，将 `feed_type:` 后的字段改为20，将第一个 `shape:` 后的字段改为1并删掉其余的 `shape` 字段。
   ```log
@@ -256,7 +256,7 @@ test_cpp_serving_client.py    # rpc方式发送C++ serving预测请求的脚本
   --serving_server ./general_PPLCNet_x2_5_lite_v1.0_serving/ \
   --serving_client ./general_PPLCNet_x2_5_lite_v1.0_client/
   ```
-  上述命令的参数含义与[#4.1 模型转换](#4.1)相同
+  上述命令的参数含义与[#3.1 模型转换](#3.1)相同
   通用识别 inference 模型转换完成后，会在当前文件夹多出 `general_PPLCNet_x2_5_lite_v1.0_serving/` 和 `general_PPLCNet_x2_5_lite_v1.0_client/` 的文件夹，具备如下结构：
     ```shell
     ├── general_PPLCNet_x2_5_lite_v1.0_serving/
@@ -278,7 +278,7 @@ test_cpp_serving_client.py    # rpc方式发送C++ serving预测请求的脚本
   --serving_server ./picodet_PPLCNet_x2_5_mainbody_lite_v1.0_serving/ \
   --serving_client ./picodet_PPLCNet_x2_5_mainbody_lite_v1.0_client/
   ```
-  上述命令的参数含义与[#4.1 模型转换](#4.1)相同
+  上述命令的参数含义与[#3.1 模型转换](#3.1)相同
 
   识别推理模型转换完成后，会在当前文件夹多出 `general_PPLCNet_x2_5_lite_v1.0_serving/` 和 `general_PPLCNet_x2_5_lite_v1.0_client/` 的文件夹。分别修改 `general_PPLCNet_x2_5_lite_v1.0_serving/` 和 `general_PPLCNet_x2_5_lite_v1.0_client/` 目录下的 `serving_server_conf.prototxt` 中的 `alias` 名字： 将 `fetch_var` 中的 `alias_name` 改为 `features`。 修改后的 `serving_server_conf.prototxt` 内容如下
 
@@ -381,7 +381,7 @@ test_cpp_serving_client.py    # rpc方式发送C++ serving预测请求的脚本
   ```
   **注：**[build_server.sh](../../../deploy/paddleserving/build_server.sh#L55-L62)所设定的路径可能需要根据实际机器上的环境如CUDA、python版本等作一定修改，然后再编译。
 
-- C++ Serving使用的输入输出格式与Python不同，因此需要执行以下命令，将4个文件复制到下的文件覆盖掉[3.1](#31-模型转换)得到文件夹中的对应4个prototxt文件。
+- C++ Serving使用的输入输出格式与Python不同，因此需要执行以下命令，将4个文件复制到下的文件覆盖掉[3.1](#31-模型转换)得到的文件夹中的对应4个prototxt文件。
   ```shell
   # 进入PaddleClas/deploy目录
   cd PaddleClas/deploy/
