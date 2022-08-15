@@ -161,7 +161,7 @@
 
 #### 4.1 模型评估
 
-准备用于评估的`*.pdparams`模型参数文件，可以使用训练好的模型，也可以使用[2.1.4 模型训练](#214-模型训练)中保存的模型。
+准备用于评估的`*.pdparams`模型参数文件，可以使用训练好的模型，也可以使用[3.1.4 模型训练](#314-模型训练)中保存的模型。
 
 - 以训练过程中保存的`latest.pdparams`为例，执行如下命令即可进行评估。
 
@@ -191,8 +191,6 @@
   ```log
   ...
   ...
-  ppcls INFO: unique_endpoints {''}
-  ppcls INFO: Found /root/.paddleclas/weights/resnet50-19c8e357_torch2paddle.pdparams
   ppcls INFO: gallery feature calculation process: [0/125]
   ppcls INFO: gallery feature calculation process: [20/125]
   ppcls INFO: gallery feature calculation process: [40/125]
@@ -223,8 +221,6 @@
   ```log
   ...
   ...
-  ppcls INFO: unique_endpoints {''}
-  ppcls INFO: Found /root/.paddleclas/weights/resnet50-19c8e357_torch2paddle.pdparams
   ppcls INFO: gallery feature calculation process: [0/125]
   ppcls INFO: gallery feature calculation process: [20/125]
   ppcls INFO: gallery feature calculation process: [40/125]
@@ -330,7 +326,7 @@ PaddleClas 提供了基于 C++ 预测引擎推理的示例，您可以参考[服
 
 Paddle Serving 提供高性能、灵活易用的工业级在线推理服务。Paddle Serving 支持 RESTful、gRPC、bRPC 等多种协议，提供多种异构硬件和多种操作系统环境下推理解决方案。更多关于Paddle Serving 的介绍，可以参考Paddle Serving 代码仓库。
 
-PaddleClas 提供了基于 Paddle Serving 来完成模型服务化部署的示例，您可以参考[模型服务化部署](../inference_deployment/paddle_serving_deploy.md)来完成相应的部署工作。
+PaddleClas 提供了基于 Paddle Serving 来完成模型服务化部署的示例，您可以参考[模型服务化部署](../inference_deployment/recognition_serving_deploy.md)来完成相应的部署工作。
 
 #### 4.4 端侧部署
 

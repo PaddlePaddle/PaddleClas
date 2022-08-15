@@ -161,7 +161,7 @@ Download the [Market-1501-v15.09.15.zip](https://pan.baidu.com/s/1ntIi2Op?_at_=1
 
 #### 4.1 Model Evaluation
 
-Prepare the `*.pdparams` model parameter file for evaluation. You can use the trained model or the model saved in [2.1.4 Model training] (#214-model training).
+Prepare the `*.pdparams` model parameter file for evaluation. You can use the trained model or the model saved in [3.1.4 Model training](#314-model-training).
 
 - Take the `latest.pdparams` saved during training as an example, execute the following command to evaluate.
 
@@ -191,8 +191,6 @@ Prepare the `*.pdparams` model parameter file for evaluation. You can use the tr
   ```log
   ...
   ...
-  ppcls INFO: unique_endpoints {''}
-  ppcls INFO: Found /root/.paddleclas/weights/resnet50-19c8e357_torch2paddle.pdparams
   ppcls INFO: gallery feature calculation process: [0/125]
   ppcls INFO: gallery feature calculation process: [20/125]
   ppcls INFO: gallery feature calculation process: [40/125]
@@ -224,8 +222,6 @@ Prepare the `*.pdparams` model parameter file for evaluation. You can use the tr
   ```log
   ...
   ...
-  ppcls INFO: unique_endpoints {''}
-  ppcls INFO: Found /root/.paddleclas/weights/resnet50-19c8e357_torch2paddle.pdparams
   ppcls INFO: gallery feature calculation process: [0/125]
   ppcls INFO: gallery feature calculation process: [20/125]
   ppcls INFO: gallery feature calculation process: [40/125]
@@ -324,25 +320,25 @@ You can convert the model file saved during training into an inference model and
 
 ##### 4.2.3 Inference based on C++ prediction engine
 
-PaddleClas provides an example of inference based on the C++ prediction engine, you can refer to [Server-side C++ prediction](../inference_deployment/cpp_deploy.md) to complete the corresponding inference deployment. If you are using the Windows platform, you can refer to the Visual Studio 2019 Community CMake Compilation Guide to complete the corresponding prediction library compilation and model prediction work.
+PaddleClas provides an example of inference based on the C++ prediction engine, you can refer to [Server-side C++ prediction](../inference_deployment/cpp_deploy_en.md) to complete the corresponding inference deployment. If you are using the Windows platform, you can refer to the Visual Studio 2019 Community CMake Compilation Guide to complete the corresponding prediction library compilation and model prediction work.
 
 #### 4.3 Service deployment
 
 Paddle Serving provides high-performance, flexible and easy-to-use industrial-grade online inference services. Paddle Serving supports RESTful, gRPC, bRPC and other protocols, and provides inference solutions in a variety of heterogeneous hardware and operating system environments. For more introduction to Paddle Serving, please refer to the Paddle Serving code repository.
 
-PaddleClas provides an example of model serving deployment based on Paddle Serving. You can refer to [Model serving deployment](../inference_deployment/paddle_serving_deploy.md) to complete the corresponding deployment.
+PaddleClas provides an example of model serving deployment based on Paddle Serving. You can refer to [Model serving deployment](../inference_deployment/recognition_serving_deploy_en.md) to complete the corresponding deployment.
 
 #### 4.4 Lite deployment
 
 Paddle Lite is a high-performance, lightweight, flexible and easily extensible deep learning inference framework, positioned to support multiple hardware platforms including mobile, embedded and server. For more introduction to Paddle Lite, please refer to the Paddle Lite code repository.
 
-PaddleClas provides an example of deploying models based on Paddle Lite. You can refer to [Deployment](../inference_deployment/paddle_lite_deploy.md) to complete the corresponding deployment.
+PaddleClas provides an example of deploying models based on Paddle Lite. You can refer to [Deployment](../inference_deployment/paddle_lite_deploy_en.md) to complete the corresponding deployment.
 
 #### 4.5 Paddle2ONNX Model Conversion and Prediction
 
 Paddle2ONNX supports converting PaddlePaddle model format to ONNX model format. The deployment of Paddle models to various inference engines can be completed through ONNX, including TensorRT/OpenVINO/MNN/TNN/NCNN, and other inference engines or hardware that support the ONNX open source format. For more information about Paddle2ONNX, please refer to the Paddle2ONNX code repository.
 
-PaddleClas provides an example of converting an inference model to an ONNX model and making inference prediction based on Paddle2ONNX. You can refer to [Paddle2ONNX model conversion and prediction](../../../deploy/paddle2onnx/readme.md) to complete the corresponding deployment work.
+PaddleClas provides an example of converting an inference model to an ONNX model and making inference prediction based on Paddle2ONNX. You can refer to [Paddle2ONNX model conversion and prediction](../../../deploy/paddle2onnx/readme_en.md) to complete the corresponding deployment work.
 
 ### 5. Summary
 

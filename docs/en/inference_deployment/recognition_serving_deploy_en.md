@@ -219,7 +219,7 @@ Different from Python Serving, the C++ Serving client calls C++ OP to predict, s
   # One-click compile and install Serving server, set SERVING_BIN
   source ./build_server.sh python3.7
   ```
-  **Note:** The path set by [build_server.sh](../build_server.sh#L55-L62) may need to be modified according to the actual machine environment such as CUDA, python version, etc., and then compiled.
+  **Note:** The path set by [build_server.sh](../build_server.sh#L55-L62) may need to be modified according to the actual machine environment such as CUDA, python version, etc., and then compiled; If you encounter a non-network error during the execution of `build_server.sh`, you can manually copy the commands in the script to the terminal for execution.
 
 - The input and output format used by C++ Serving is different from that of Python, so you need to execute the following command to overwrite the files below [3.1] (#31-model conversion) by copying the 4 files to get the corresponding 4 prototxt files in the folder.
   ```shell

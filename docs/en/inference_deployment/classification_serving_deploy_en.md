@@ -181,7 +181,7 @@ Different from Python Serving, the C++ Serving client calls C++ OP to predict, s
   # One-click compile and install Serving server, set SERVING_BIN
   source ./build_server.sh python3.7
   ```
-  **Note: The path set by **[build_server.sh](./build_server.sh#L55-L62) may need to be modified according to the actual machine environment such as CUDA, python version, etc., and then compiled.
+  **Note: The path set by **[build_server.sh](../../../deploy/paddleserving/build_server.sh#L55-L62) may need to be modified according to the actual machine environment such as CUDA, python version, etc., and then compiled; If you encounter a non-network error during the execution of `build_server.sh`, you can manually copy the commands in the script to the terminal for execution.
 
 - Modify the client file `ResNet50_client/serving_client_conf.prototxt` , change the field after `feed_type:` to 20, change the field after the first `shape:` to 1 and delete the rest of the `shape` fields.
   ```log
@@ -193,9 +193,9 @@ Different from Python Serving, the C++ Serving client calls C++ OP to predict, s
     shape: 1
   }
   ```
-- Modify part of the code of [`test_cpp_serving_client`](./test_cpp_serving_client.py)
-  1. Modify the [`feed={"inputs": image}`](./test_cpp_serving_client.py#L28) part of the code, and change the path after `load_client_config` to `ResNet50_client/serving_client_conf.prototxt` .
-  2. Modify the [`feed={"inputs": image}`](./test_cpp_serving_client.py#L45) part of the code, and change `inputs` to be the same as the `feed_var` field in `ResNet50_client/serving_client_conf.prototxt` name` is the same. Since `name` in some model client files is `x` instead of `inputs` , you need to pay attention to this when using these models for C++ Serving deployment.
+- Modify part of the code of [`test_cpp_serving_client`](../../../deploy/paddleserving/test_cpp_serving_client.py)
+  1. Modify the [`feed={"inputs": image}`](../../../deploy/paddleserving/test_cpp_serving_client.py#L28) part of the code, and change the path after `load_client_config` to `ResNet50_client/serving_client_conf.prototxt` .
+  2. Modify the [`feed={"inputs": image}`](../../../deploy/paddleserving/test_cpp_serving_client.py#L45) part of the code, and change `inputs` to be the same as the `feed_var` field in `ResNet50_client/serving_client_conf.prototxt` name` is the same. Since `name` in some model client files is `x` instead of `inputs` , you need to pay attention to this when using these models for C++ Serving deployment.
 
 - Start the service:
   ```shell

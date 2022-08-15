@@ -218,7 +218,7 @@ python3.7 -m pip install paddle-serving-server-gpu==0.7.0.post112 # GPU with CUD
   # 一键编译安装Serving server、设置 SERVING_BIN
   source ./build_server.sh python3.7
   ```
-  **注：**[build_server.sh](../build_server.sh#L55-L62)所设定的路径可能需要根据实际机器上的环境如CUDA、python版本等作一定修改，然后再编译。
+  **注：**[build_server.sh](../build_server.sh#L55-L62)所设定的路径可能需要根据实际机器上的环境如CUDA、python版本等作一定修改，然后再编译；如果执行`build_server.sh`过程中遇到非网络原因的报错，则可以手动将脚本中的命令逐条复制到终端执行。
 
 - C++ Serving使用的输入输出格式与Python不同，因此需要执行以下命令，将4个文件复制到下的文件覆盖掉[3.1](#31-模型转换)得到文件夹中的对应4个prototxt文件。
   ```shell

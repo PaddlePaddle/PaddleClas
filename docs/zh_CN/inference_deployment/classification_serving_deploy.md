@@ -182,7 +182,7 @@ test_cpp_serving_client.py    # rpc方式发送C++ serving预测请求的脚本
   # 一键编译安装Serving server、设置 SERVING_BIN
   source ./build_server.sh python3.7
   ```
-  **注：**[build_server.sh](./build_server.sh#L55-L62)所设定的路径可能需要根据实际机器上的环境如CUDA、python版本等作一定修改，然后再编译。
+  **注：**[build_server.sh](../../../deploy/paddleserving/build_server.sh#L55-L62)所设定的路径可能需要根据实际机器上的环境如CUDA、python版本等作一定修改，然后再编译；如果执行`build_server.sh`过程中遇到非网络原因的报错，则可以手动将脚本中的命令逐条复制到终端执行。
 
 - 修改客户端文件 `ResNet50_vd_client/serving_client_conf.prototxt` ，将 `feed_type:` 后的字段改为20，将第一个 `shape:` 后的字段改为1并删掉其余的 `shape` 字段。
   ```log
@@ -194,9 +194,9 @@ test_cpp_serving_client.py    # rpc方式发送C++ serving预测请求的脚本
     shape: 1
   }
   ```
-- 修改 [`test_cpp_serving_client`](./test_cpp_serving_client.py) 的部分代码
-  1. 修改 [`load_client_config`](./test_cpp_serving_client.py#L28) 处的代码，将 `load_client_config` 后的路径改为 `ResNet50_vd_client/serving_client_conf.prototxt` 。
-  2. 修改 [`feed={"inputs": image}`](./test_cpp_serving_client.py#L45) 处的代码，将 `inputs` 改为与 `ResNet50_vd_client/serving_client_conf.prototxt` 中 `feed_var` 字段下面的 `name` 一致。由于部分模型client文件中的 `name` 为 `x` 而不是 `inputs` ，因此使用这些模型进行C++ Serving部署时需要注意这一点。
+- 修改 [`test_cpp_serving_client`](../../../deploy/paddleserving/test_cpp_serving_client.py) 的部分代码
+  1. 修改 [`load_client_config`](../../../deploy/paddleserving/test_cpp_serving_client.py#L28) 处的代码，将 `load_client_config` 后的路径改为 `ResNet50_vd_client/serving_client_conf.prototxt` 。
+  2. 修改 [`feed={"inputs": image}`](../../../deploy/paddleserving/test_cpp_serving_client.py#L45) 处的代码，将 `inputs` 改为与 `ResNet50_vd_client/serving_client_conf.prototxt` 中 `feed_var` 字段下面的 `name` 一致。由于部分模型client文件中的 `name` 为 `x` 而不是 `inputs` ，因此使用这些模型进行C++ Serving部署时需要注意这一点。
 
 - 启动服务：
   ```shell
