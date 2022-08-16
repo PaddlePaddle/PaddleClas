@@ -16,7 +16,6 @@ import os
 import sys
 __dir__ = os.path.dirname(__file__)
 sys.path.append(os.path.join(__dir__, ""))
-sys.path.append(os.path.join(__dir__, "deploy"))
 
 from typing import Union, Generator
 import argparse
@@ -33,12 +32,16 @@ from tqdm import tqdm
 from prettytable import PrettyTable
 import paddle
 
+import ppcls.arch.backbone as backbone
+from ppcls.utils import logger
+
 from deploy.python.predict_cls import ClsPredictor
 from deploy.utils.get_image_list import get_image_list
 from deploy.utils import config
 
-import ppcls.arch.backbone as backbone
-from ppcls.utils import logger
+import deploy
+import ppcls
+#  'deploy.python', 'deploy.utils', 'ppcls.arch', 'ppcls.utils'
 
 # for building model with loading pretrained weights from backbone
 logger.init_logger()
