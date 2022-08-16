@@ -28,7 +28,7 @@ import numpy as np
 import importlib
 from PIL import Image
 
-from python.det_preprocess import DetNormalizeImage, DetPadStride, DetPermute, DetResize
+from .det_preprocess import DetNormalizeImage, DetPadStride, DetPermute, DetResize
 
 
 def create_operators(params):

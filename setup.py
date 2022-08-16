@@ -33,7 +33,7 @@ setup(
     package_dir={'paddleclas': ''},
     include_package_data=True,
     entry_points={
-        "console_scripts": ["paddleclas= paddleclas.paddleclas:main"]
+        "console_scripts": ["paddleclas=paddleclas.paddleclas:main"]
     },
     version='0.0.0',
     install_requires=requirements,
