@@ -92,7 +92,6 @@ Predict complete!
 
 * 命令行中
 ```bash
-from paddleclas import PaddleClas, get_default_confg
 paddleclas --model_name=ViT_base_patch16_384 --infer_imgs='docs/images/inference_deployment/whl_demo.jpg' --resize_short=384 --crop_size=384
 ```
 
