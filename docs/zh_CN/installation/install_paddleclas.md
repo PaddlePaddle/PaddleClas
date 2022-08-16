@@ -19,7 +19,7 @@
 
 #### 1.1（建议）使用 Docker 环境
 
-* 切换到工作目录下，例如工作目录为`/home/Projects`，则运行命令: 
+* 切换到工作目录下，例如工作目录为`/home/Projects`，则运行命令:
 
 ```shell
 cd /home/Projects
@@ -88,7 +88,13 @@ git clone https://gitee.com/paddlepaddle/PaddleClas.git -b release/2.4
 ```
 <a name='3'></a>
 
-### 3. 安装 Python 依赖库
+### 3. 安装 PaddleClas 及其 Python 依赖库
+
+建议直接从 PyPI 安装 PaddleClas：
+
+```shell
+pip install paddleclas
+```
 
 PaddleClas 的 Python 依赖库在 `requirements.txt` 中给出，可通过如下命令安装：
 
