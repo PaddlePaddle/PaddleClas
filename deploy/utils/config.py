@@ -17,7 +17,7 @@ import copy
 import argparse
 import yaml
 
-from utils import logger
+from . import logger
 
 __all__ = ['get_config']
 
