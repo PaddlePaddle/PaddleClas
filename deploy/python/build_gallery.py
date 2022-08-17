@@ -20,7 +20,6 @@ from tqdm import tqdm
 import pickle
 
 from paddleclas.deploy.utils import logger, config
-from paddleclas.deploy.utils.predictor import Predictor
 from paddleclas.deploy.python.predict_rec import RecPredictor
 from paddleclas.deploy.python.predict_rec import RecPredictor
 
