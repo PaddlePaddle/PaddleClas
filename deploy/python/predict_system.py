@@ -12,24 +12,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import os
-import sys
-
-__dir__ = os.path.dirname(os.path.abspath(__file__))
-sys.path.append(os.path.abspath(os.path.join(__dir__, '../')))
-
 import copy
-import cv2
+
 import numpy as np
+import cv2
 import faiss
 import pickle
 
-from python.predict_rec import RecPredictor
-from python.predict_det import DetPredictor
-
-from utils import logger
-from utils import config
-from utils.get_image_list import get_image_list
-from utils.draw_bbox import draw_bbox_results
+from paddleclas.deploy.utils import logger, config
+from paddleclas.deploy.utils.get_image_list import get_image_list
+from paddleclas.deploy.utils.draw_bbox import draw_bbox_results
+from paddleclas.deploy.python.predict_rec import RecPredictor
+from paddleclas.deploy.python.predict_det import DetPredictor
 
 
 class SystemPredictor(object):
