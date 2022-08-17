@@ -12,27 +12,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import os
-import sys
-
-__dir__ = os.path.dirname(os.path.abspath(__file__))
-sys.path.append(os.path.abspath(os.path.join(__dir__, '../')))
-
-from utils import logger
-from utils import config
-from utils.predictor import Predictor
-from utils.get_image_list import get_image_list
-from det_preprocess import det_preprocess
-from preprocess import create_operators
-
-import os
 import argparse
 import time
+from functools import reduce
+
 import yaml
 import ast
-from functools import reduce
-import cv2
 import numpy as np
+import cv2
 import paddle
+
+from paddleclas.deploy.utils import logger, config
+from paddleclas.deploy.utils.predictor import Predictor
+from paddleclas.deploy.utils.get_image_list import get_image_list
+from paddleclas.deploy.python.preprocess import create_operators
+from paddleclas.deploy.python.det_preprocess import det_preprocess
 
 
 class DetPredictor(Predictor):
