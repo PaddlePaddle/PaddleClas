@@ -39,9 +39,9 @@ from deploy.python.predict_cls import ClsPredictor
 from deploy.utils.get_image_list import get_image_list
 from deploy.utils import config
 
+# for the PaddleClas Project to import
 import deploy
 import ppcls
-#  'deploy.python', 'deploy.utils', 'ppcls.arch', 'ppcls.utils'
 
 # for building model with loading pretrained weights from backbone
 logger.init_logger()
