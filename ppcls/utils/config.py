@@ -16,8 +16,9 @@ import os
 import copy
 import argparse
 import yaml
-from ppcls.utils import logger
-from ppcls.utils import check
+from . import logger
+from . import check
+
 __all__ = ['get_config']
 
 

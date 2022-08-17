@@ -14,7 +14,7 @@
 
 from __future__ import absolute_import, division, print_function
 import paddle
-from ppcls.utils import logger
+from ...utils import logger
 
 
 def prune_model(config, model):
@@ -35,7 +35,6 @@ def prune_model(config, model):
         _prune_model(config, model)
     else:
         model.pruner = None
-
 
 
 def _prune_model(config, model):
