@@ -14,7 +14,7 @@
 
 from __future__ import absolute_import, division, print_function
 import paddle
-from ppcls.utils import logger
+from ...utils import logger
 
 QUANT_CONFIG = {
     # weight preprocess type, default is None and no preprocessing is performed.

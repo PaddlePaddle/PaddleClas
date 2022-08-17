@@ -17,7 +17,7 @@ from __future__ import absolute_import, division, print_function
 import paddle
 import paddle.nn as nn
 
-from ppcls.arch.utils import get_param_attr_dict
+from ..utils import get_param_attr_dict
 
 
 class BNNeck(nn.Layer):

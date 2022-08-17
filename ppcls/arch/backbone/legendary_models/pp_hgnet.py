@@ -20,8 +20,8 @@ from paddle.nn import Conv2D, BatchNorm2D, ReLU, AdaptiveAvgPool2D, MaxPool2D
 from paddle.regularizer import L2Decay
 from paddle import ParamAttr
 
-from ppcls.arch.backbone.base.theseus_layer import TheseusLayer
-from ppcls.utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
+from ..base.theseus_layer import TheseusLayer
+from ....utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
 
 MODEL_URLS = {
     "PPHGNet_tiny":
@@ -199,6 +199,7 @@ class PPHGNet(TheseusLayer):
     Returns:
         model: nn.Layer. Specific PPHGNet model depends on args.
     """
+
     def __init__(self,
                  stem_channels,
                  stage_config,
@@ -230,7 +231,7 @@ class PPHGNet(TheseusLayer):
                 k]
             self.stages.append(
                 HG_Stage(in_channels, mid_channels, out_channels, block_num,
-                          layer_num, downsample))
+                         layer_num, downsample))
 
         self.avg_pool = AdaptiveAvgPool2D(1)
         if self.use_last_conv:

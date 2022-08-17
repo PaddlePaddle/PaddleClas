@@ -24,7 +24,7 @@ from paddle.nn.initializer import TruncatedNormal, Constant
 
 from .vision_transformer import trunc_normal_, zeros_, ones_, to_2tuple, DropPath, Identity, drop_path
 
-from ppcls.utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
+from ....utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
 
 MODEL_URLS = {
     "PVT_V2_B0":

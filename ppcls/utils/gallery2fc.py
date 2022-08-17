@@ -20,12 +20,12 @@ import sys
 __dir__ = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.path.abspath(os.path.join(__dir__, '../../')))
 
-from ppcls.arch import build_model
-from ppcls.utils.config import parse_config, parse_args
-from ppcls.utils.save_load import load_dygraph_pretrain
-from ppcls.utils.logger import init_logger
-from ppcls.data import create_operators
-from ppcls.arch.slim import quantize_model
+from ..arch import build_model
+from .config import parse_config, parse_args
+from .save_load import load_dygraph_pretrain
+from .logger import init_logger
+from ..data import create_operators
+from ..arch.slim import quantize_model
 
 
 class GalleryLayer(paddle.nn.Layer):
