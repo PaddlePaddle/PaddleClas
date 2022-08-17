@@ -22,7 +22,7 @@ import paddle.nn as nn
 import paddle.nn.functional as F
 from paddle.nn.initializer import Normal, Constant
 
-from ppcls.utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
+from ....utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
 
 MODEL_URLS = {
     "PeleeNet": ""  # TODO
@@ -37,7 +37,8 @@ ones_ = Constant(value=1.)
 
 
 class _DenseLayer(nn.Layer):
-    def __init__(self, num_input_features, growth_rate, bottleneck_width, drop_rate):
+    def __init__(self, num_input_features, growth_rate, bottleneck_width,
+                 drop_rate):
         super(_DenseLayer, self).__init__()
 
         growth_rate = int(growth_rate / 2)
@@ -71,11 +72,12 @@ class _DenseLayer(nn.Layer):
 
 
 class _DenseBlock(nn.Sequential):
-    def __init__(self, num_layers, num_input_features, bn_size, growth_rate, drop_rate):
+    def __init__(self, num_layers, num_input_features, bn_size, growth_rate,
+                 drop_rate):
         super(_DenseBlock, self).__init__()
         for i in range(num_layers):
-            layer = _DenseLayer(num_input_features + i *
-                                growth_rate, growth_rate, bn_size, drop_rate)
+            layer = _DenseLayer(num_input_features + i * growth_rate,
+                                growth_rate, bn_size, drop_rate)
             setattr(self, 'denselayer%d' % (i + 1), layer)
 
 
@@ -83,16 +85,32 @@ class _StemBlock(nn.Layer):
     def __init__(self, num_input_channels, num_init_features):
         super(_StemBlock, self).__init__()
 
-        num_stem_features = int(num_init_features/2)
+        num_stem_features = int(num_init_features / 2)
 
         self.stem1 = BasicConv2D(
-            num_input_channels, num_init_features, kernel_size=3, stride=2, padding=1)
+            num_input_channels,
+            num_init_features,
+            kernel_size=3,
+            stride=2,
+            padding=1)
         self.stem2a = BasicConv2D(
-            num_init_features, num_stem_features, kernel_size=1, stride=1, padding=0)
+            num_init_features,
+            num_stem_features,
+            kernel_size=1,
+            stride=1,
+            padding=0)
         self.stem2b = BasicConv2D(
-            num_stem_features, num_init_features, kernel_size=3, stride=2, padding=1)
+            num_stem_features,
+            num_init_features,
+            kernel_size=3,
+            stride=2,
+            padding=1)
         self.stem3 = BasicConv2D(
-            2*num_init_features, num_init_features, kernel_size=1, stride=1, padding=0)
+            2 * num_init_features,
+            num_init_features,
+            kernel_size=1,
+            stride=1,
+            padding=0)
         self.pool = nn.MaxPool2D(kernel_size=2, stride=2)
 
     def forward(self, x):
@@ -109,11 +127,10 @@ class _StemBlock(nn.Layer):
 
 
 class BasicConv2D(nn.Layer):
-
     def __init__(self, in_channels, out_channels, activation=True, **kwargs):
         super(BasicConv2D, self).__init__()
-        self.conv = nn.Conv2D(in_channels, out_channels,
-                              bias_attr=False, **kwargs)
+        self.conv = nn.Conv2D(
+            in_channels, out_channels, bias_attr=False, **kwargs)
         self.norm = nn.BatchNorm2D(out_channels)
         self.activation = activation
 
@@ -141,15 +158,18 @@ class PeleeNetDY(nn.Layer):
         class_num (int) - number of classification classes
     """
 
-    def __init__(self, growth_rate=32, block_config=[3, 4, 8, 6],
-                 num_init_features=32, bottleneck_width=[1, 2, 4, 4],
-                 drop_rate=0.05, class_num=1000):
+    def __init__(self,
+                 growth_rate=32,
+                 block_config=[3, 4, 8, 6],
+                 num_init_features=32,
+                 bottleneck_width=[1, 2, 4, 4],
+                 drop_rate=0.05,
+                 class_num=1000):
 
         super(PeleeNetDY, self).__init__()
 
-        self.features = nn.Sequential(*[
-            ('stemblock', _StemBlock(3, num_init_features)),
-        ])
+        self.features = nn.Sequential(* [('stemblock', _StemBlock(
+            3, num_init_features)), ])
 
         if type(growth_rate) is list:
             growth_rates = growth_rate
@@ -168,20 +188,31 @@ class PeleeNetDY(nn.Layer):
         # Each denseblock
         num_features = num_init_features
         for i, num_layers in enumerate(block_config):
-            block = _DenseBlock(num_layers=num_layers,
-                                num_input_features=num_features,
-                                bn_size=bottleneck_widths[i],
-                                growth_rate=growth_rates[i],
-                                drop_rate=drop_rate)
+            block = _DenseBlock(
+                num_layers=num_layers,
+                num_input_features=num_features,
+                bn_size=bottleneck_widths[i],
+                growth_rate=growth_rates[i],
+                drop_rate=drop_rate)
             setattr(self.features, 'denseblock%d' % (i + 1), block)
             num_features = num_features + num_layers * growth_rates[i]
 
-            setattr(self.features, 'transition%d' % (i + 1), BasicConv2D(
-                num_features, num_features, kernel_size=1, stride=1, padding=0))
+            setattr(
+                self.features,
+                'transition%d' % (i + 1),
+                BasicConv2D(
+                    num_features,
+                    num_features,
+                    kernel_size=1,
+                    stride=1,
+                    padding=0))
 
             if i != len(block_config) - 1:
-                setattr(self.features, 'transition%d_pool' %
-                        (i + 1), nn.AvgPool2D(kernel_size=2, stride=2))
+                setattr(
+                    self.features,
+                    'transition%d_pool' % (i + 1),
+                    nn.AvgPool2D(
+                        kernel_size=2, stride=2))
                 num_features = num_features
 
         # Linear layer
@@ -192,7 +223,8 @@ class PeleeNetDY(nn.Layer):
 
     def forward(self, x):
         features = self.features(x)
-        out = F.avg_pool2d(features, kernel_size=features.shape[2:4]).flatten(1)
+        out = F.avg_pool2d(
+            features, kernel_size=features.shape[2:4]).flatten(1)
         if self.drop_rate > 0:
             out = F.dropout(out, p=self.drop_rate, training=self.training)
         out = self.classifier(out)

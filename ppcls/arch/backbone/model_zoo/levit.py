@@ -27,7 +27,7 @@ from paddle.regularizer import L2Decay
 
 from .vision_transformer import trunc_normal_, zeros_, ones_, Identity
 
-from ppcls.utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
+from ....utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
 
 MODEL_URLS = {
     "LeViT_128S":
