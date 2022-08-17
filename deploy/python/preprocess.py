@@ -29,7 +29,7 @@ import importlib
 from PIL import Image
 from paddle.vision.transforms import ToTensor, Normalize
 
-from python.det_preprocess import DetNormalizeImage, DetPadStride, DetPermute, DetResize
+from paddleclas.deploy.python.det_preprocess import DetNormalizeImage, DetPadStride, DetPermute, DetResize
 
 
 def create_operators(params):
