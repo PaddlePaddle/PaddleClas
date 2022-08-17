@@ -24,7 +24,7 @@ from paddle.nn import Layer, Conv2D, MaxPool2D, AdaptiveAvgPool2D, BatchNorm, Li
 from paddle.nn.initializer import KaimingNormal
 from paddle.nn.functional import swish
 
-from ppcls.utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
+from ....utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
 
 MODEL_URLS = {
     "ShuffleNetV2_x0_25":

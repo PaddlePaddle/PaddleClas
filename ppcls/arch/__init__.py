@@ -23,11 +23,11 @@ from . import backbone, gears
 from .backbone import *
 from .gears import build_gear
 from .utils import *
-from ppcls.arch.backbone.base.theseus_layer import TheseusLayer
-from ppcls.utils import logger
-from ppcls.utils.save_load import load_dygraph_pretrain
-from ppcls.arch.slim import prune_model, quantize_model
-from ppcls.arch.distill.afd_attention import LinearTransformStudent, LinearTransformTeacher
+from .backbone.base.theseus_layer import TheseusLayer
+from ..utils import logger
+from ..utils.save_load import load_dygraph_pretrain
+from .slim import prune_model, quantize_model
+from .distill.afd_attention import LinearTransformStudent, LinearTransformTeacher
 
 __all__ = ["build_model", "RecModel", "DistillationModel", "AttentionModel"]
 

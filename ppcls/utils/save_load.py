@@ -20,7 +20,7 @@ import errno
 import os
 
 import paddle
-from ppcls.utils import logger
+from . import logger
 from .download import get_weights_path_from_url
 
 __all__ = ['init_model', 'save_model', 'load_dygraph_pretrain']

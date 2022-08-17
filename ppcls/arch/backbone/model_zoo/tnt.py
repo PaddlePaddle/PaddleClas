@@ -23,8 +23,8 @@ import paddle.nn as nn
 
 from paddle.nn.initializer import TruncatedNormal, Constant
 
-from ppcls.arch.backbone.base.theseus_layer import Identity
-from ppcls.utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
+from ..base.theseus_layer import Identity
+from ....utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
 
 MODEL_URLS = {
     "TNT_small":

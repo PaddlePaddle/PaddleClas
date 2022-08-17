@@ -29,7 +29,7 @@ from paddle.nn.initializer import Uniform
 
 import math
 
-from ppcls.utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
+from ....utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
 
 MODEL_URLS = {
     "SE_ResNeXt50_32x4d":
