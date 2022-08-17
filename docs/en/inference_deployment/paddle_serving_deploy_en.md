@@ -5,10 +5,10 @@
 - [1. Introduction](#1)
 - [2. Installation of Serving](#2)
 - [3. Service Deployment for Image Classification](#3)
-  - [3.1 Model conversion](#3.1)
+  - [3.1 Model Conversion](#3.1)
   - [3.2 Service Deployment and Request](#3.2)
 - [4. Service Deployment for Image Recognition](#4)
-  - [4.1 Model conversion](#4.1)
+  - [4.1 Model Conversion](#4.1)
   - [4.2 Service Deployment and Request](#4.2)
 - [5. FAQ](#5)
 
@@ -59,7 +59,7 @@ python3.7 -m pip install paddle-serving-server
 The following takes the classic ResNet50_vd model as an example to introduce how to deploy the image classification service.
 
 <a name="3.1"></a>
-### 3.1 Model conversion
+### 3.1 Model Conversion
 
 When using PaddleServing for service deployment, you need to convert the saved inference model into a Serving model.
 - Go to the working directory:
@@ -224,7 +224,7 @@ Different from Python Serving, the C++ Serving client calls C++ OP to predict, s
 
 When using PaddleServing for image recognition service deployment, **need to convert multiple saved inference models to Serving models**. The following takes the ultra-lightweight image recognition model in PP-ShiTu as an example to introduce the deployment of image recognition services.
 <a name="4.1"></a>
-### 4.1 Model conversion
+### 4.1 Model Conversion
 
 - Go to the working directory:
   ```shell
@@ -252,7 +252,7 @@ When using PaddleServing for image recognition service deployment, **need to con
   --serving_server ./general_PPLCNet_x2_5_lite_v1.0_serving/ \
   --serving_client ./general_PPLCNet_x2_5_lite_v1.0_client/
   ```
-  The meaning of the parameters of the above command is the same as [#3.1 Model conversion](#3.1)
+  The meaning of the parameters of the above command is the same as [#3.1 Model Conversion](#3.1)
 
   After the recognition inference model is converted, there will be additional folders `general_PPLCNet_x2_5_lite_v1.0_serving/` and `general_PPLCNet_x2_5_lite_v1.0_client/` in the current folder. Modify the name of `alias` in `serving_server_conf.prototxt` in `general_PPLCNet_x2_5_lite_v1.0_serving/` and `general_PPLCNet_x2_5_lite_v1.0_client/` directories respectively: Change `alias_name` in `fetch_var` to `features`. The content of the modified `serving_server_conf.prototxt` is as follows
 
@@ -296,7 +296,7 @@ When using PaddleServing for image recognition service deployment, **need to con
   --serving_server ./picodet_PPLCNet_x2_5_mainbody_lite_v1.0_serving/ \
   --serving_client ./picodet_PPLCNet_x2_5_mainbody_lite_v1.0_client/
   ```
-  The meaning of the parameters of the above command is the same as [#3.1 Model conversion](#3.1)
+  The meaning of the parameters of the above command is the same as [#3.1 Model Conversion](#3.1)
 
   After the conversion of the general detection inference model is completed, there will be additional folders `picodet_PPLCNet_x2_5_mainbody_lite_v1.0_serving/` and `picodet_PPLCNet_x2_5_mainbody_lite_v1.0_client/` in the current folder, with the following structure:
     ```shell
@@ -379,7 +379,7 @@ Different from Python Serving, the C++ Serving client calls C++ OP to predict, s
   ```
   **Note:** The path set by [build_server.sh](../../../deploy/paddleserving/build_server.sh#L55-L62) may need to be modified according to the actual machine environment such as CUDA, python version, etc., and then compiled.
 
-- The input and output format used by C++ Serving is different from that of Python, so you need to execute the following command to overwrite the files below [3.1] (#31-model conversion) by copying the 4 files to get the corresponding 4 prototxt files in the folder.
+- The input and output format used by C++ Serving is different from that of Python, so you need to execute the following command to overwrite the files below [3.1](#31-model-conversion) by copying the 4 files to get the corresponding 4 prototxt files in the folder.
   ```shell
   # Enter PaddleClas/deploy directory
   cd PaddleClas/deploy/
