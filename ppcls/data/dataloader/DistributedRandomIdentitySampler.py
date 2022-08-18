@@ -14,24 +14,27 @@
 
 from __future__ import absolute_import
 from __future__ import division
-from collections import defaultdict
-import numpy as np
+
 import copy
 import random
+from collections import defaultdict
+
+import numpy as np
 from paddle.io import DistributedBatchSampler, Sampler
 
 
 class DistributedRandomIdentitySampler(DistributedBatchSampler):
-    """
-    Randomly sample N identities, then for each identity,
-    randomly sample K instances, therefore batch size is N*K.
+    """Randomly sample N identities, then for each identity,
+       randomly sample K instances, therefore batch size equals to N * K.
     Args:
-    - data_source (list): list of (img_path, pid, camid).
-    - num_instances (int): number of instances per identity in a batch.
-    - batch_size (int): number of examples in a batch.
+        dataset(Dataset): Dataset which contains list of (img_path, pid, camid))
+        batch_size (int): batch size
+        num_instances (int): number of instance(s) within an class
+        drop_last (bool): whether to discard the data at the end
     """
-
     def __init__(self, dataset, batch_size, num_instances, drop_last, **args):
+        assert batch_size % num_instances == 0, \
+            f"batch_size({batch_size}) must be divisible by num_instances({num_instances}) when using DistributedRandomIdentitySampler"
         self.dataset = dataset
         self.batch_size = batch_size
         self.num_instances = num_instances
