@@ -29,8 +29,8 @@ class PKSampler(DistributedBatchSampler):
 
     Args:
         dataset (Dataset): Dataset which contains list of (img_path, pid, camid))
-        batch_size (_type_): batch size
-        sample_per_id (_type_): number of instance(s) within an class
+        batch_size (int): batch size
+        sample_per_id (int): number of instance(s) within an class
         shuffle (bool, optional): _description_. Defaults to True.
         drop_last (bool, optional): whether to discard the data at the end. Defaults to True.
         sample_method (str, optional): sample method when generating prob_list. Defaults to "sample_avg_prob".
