@@ -31,7 +31,7 @@
 - [DLA 系列](#DLA)
 - [RedNet 系列](#RedNet)
 - [TNT 系列](#TNT)
-- [CSwinTransformer 系列](#CSwinTransformer)
+- [CSWinTransformer 系列](#CSWinTransformer)
 - [PVTV2 系列](#PVTV2)
 - [MobileViT 系列](#MobileViT)
 - [其他模型](#Others)
