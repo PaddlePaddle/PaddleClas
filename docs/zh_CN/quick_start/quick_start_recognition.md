@@ -31,7 +31,7 @@
 
 ### 1.1 安装 PP-ShiTu android demo
 
-可以通过扫描二维码或者[点击链接](https://paddle-imagenet-models-name.bj.bcebos.com/demos/PP-ShiTu.apk)下载并安装APP
+可以通过扫描二维码或者[点击链接](https://paddle-imagenet-models-name.bj.bcebos.com/demos/PP-ShiTu.apk)下载并安装APP（**安装完毕之后需为APP开启摄像头权限，否则可能出现APP闪退**）
 
 <img src="../../images/quick_start/android_demo/PPShiTu_qcode.png" height="250" width="250" />
 
