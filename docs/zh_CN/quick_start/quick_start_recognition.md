@@ -31,7 +31,8 @@
 
 ### 1.1 安装 PP-ShiTu android demo
 
-可以通过扫描下方二维码或者[点击链接](https://paddle-imagenet-models-name.bj.bcebos.com/demos/PP-ShiTu.apk)下载并安装APP
+可以通过扫描二维码或者[点击链接](https://paddle-imagenet-models-name.bj.bcebos.com/demos/PP-ShiTu.apk)下载并安装APP
+
 <img src="../../images/quick_start/android_demo/PPShiTu_qcode.png" height="250" width="250" />
 
 <a name="功能体验"></a>
@@ -41,6 +42,15 @@
 目前 PP-ShiTu android demo 具有图像检索、图像加库、库保存、更换检索库、查看检索库内的标签等基本功能，接下来介绍如何体验这几个功能。
 
 1. 图像检索：点击上方的“相机”按钮<img src="../../images/quick_start/android_demo/zhaoxiangji.png" width="25" height="25"/>或者“放大镜”按钮<img src="../../images/quick_start/android_demo/sousuo.png" width="25" height="25"/>，拍摄一张图像或者选中一张图像，然后等待几秒钟，APP便会将图像中的主体框标注出来并且在图像下方给出预测的类别。
+
+    假设待检索的图像如下：
+
+    <img src="../../images/recognition/drink_data_demo/test_images/nongfu_spring.jpeg" width="400" height="600"/>
+
+    得到的检索结果可视化如下：
+
+    <img src="../../images/recognition/drink_data_demo/output/android_nongfu_spring.JPG" width="400" height="800"/>
+
 2. 图像加库：点击上方的“上传”按钮<img src="../../images/quick_start/android_demo/shangchuan.png" width="25" height="25"/>或者“加号”按钮<img src="../../images/quick_start/android_demo/jia.png" width="25" height="25"/>，即可拍摄一张图像或从图库中选择一张图像，然后再输入这张图像的类别名字（比如`keyboard`），点击“确定”按钮，即可完成图片入库。
 3. 库保存：点击上方的“保存“按钮<img src="../../images/quick_start/android_demo/baocun.png" width="25" height="25"/>，再输入希望保存下的检索库与类别标签文件的文件名（如填入`data1`，为了简化逻辑，检索库文件`*.index`与类别标签文件`*.txt`使用相同的文件名），即可将当前库保存到手机内存中。
 4. 更换检索库：点击上方的“齿轮“按钮<img src="../../images/quick_start/android_demo/shezhi.png" width="25" height="25"/>，点击“Label Path”一栏，在弹出的选项中选择需要更换的库，然后再点击“Index Path”，在弹出的选项中选择需要更换的类别标签文件（一般一个库对应一个类别标签文件，因此更换检索库意味着需要同时更换库文件和类别标签文件，否则可能会造成检索结果错误）。
