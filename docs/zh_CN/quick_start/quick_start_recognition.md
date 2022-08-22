@@ -9,7 +9,17 @@
 - [1. PP-ShiTu android端 demo 快速体验](#1-pp-shitu-android端-demo-快速体验)
   - [1.1 安装 PP-ShiTu android demo](#11-安装-pp-shitu-android-demo)
   - [1.2 功能体验](#12-功能体验)
+    - [1.2.1 图像检索](#121-图像检索)
+    - [1.2.2 图像加库](#122-图像加库)
+    - [1.2.3 库保存](#123-库保存)
+    - [1.2.4 更换检索库](#124-更换检索库)
+    - [1.2.5 查看检索库标签](#125-查看检索库标签)
   - [1.3 功能详细介绍](#13-功能详细介绍)
+    - [1.3.1 图像检索](#131-图像检索)
+    - [1.3.2 图像加库](#132-图像加库)
+    - [1.3.3 库保存](#133-库保存)
+    - [1.3.4 更换检索库](#134-更换检索库)
+    - [1.3.5 查看检索库的标签](#135-查看检索库的标签)
 - [2. PP-ShiTu PC端 demo 快速体验](#2-pp-shitu-pc端-demo-快速体验)
   - [2.1 环境配置](#21-环境配置)
   - [2.2 图像识别体验](#22-图像识别体验)
@@ -38,33 +48,49 @@
 <a name="功能体验"></a>
 
 ### 1.2 功能体验
-
 目前 PP-ShiTu android demo 具有图像检索、图像加库、库保存、更换检索库、查看检索库内的标签等基本功能，接下来介绍如何体验这几个功能。
 
-1. 图像检索：点击上方的“相机”按钮<img src="../../images/quick_start/android_demo/zhaoxiangji.png" width="25" height="25"/>或者“放大镜”按钮<img src="../../images/quick_start/android_demo/sousuo.png" width="25" height="25"/>，拍摄一张图像或者选中一张图像，然后等待几秒钟，APP便会将图像中的主体框标注出来并且在图像下方给出预测的类别。
+#### 1.2.1 图像检索
+点击下方的“拍照识别”按钮<img src="../../images/quick_start/android_demo/paizhaoshibie_100.png" width="25" height="25"/>或者“本地识别”按钮<img src="../../images/quick_start/android_demo/bendishibie_100.png" width="25" height="25"/>，即可拍摄一张图像或者选中一张图像，然后等待几秒钟，APP便会将图像中的主体框标注出来并且在图像下方给出预测的类别以及预测时间等信息。
 
-    假设待检索的图像如下：
+假设待检索的图像如下：
 
-    <img src="../../images/recognition/drink_data_demo/test_images/nongfu_spring.jpeg" width="400" height="600"/>
+<img src="../../images/recognition/drink_data_demo/test_images/nongfu_spring.jpeg" width="400" height="600"/>
 
-    得到的检索结果可视化如下：
+得到的检索结果可视化如下：
 
-    <img src="../../images/recognition/drink_data_demo/output/android_nongfu_spring.JPG" width="400" height="800"/>
+<img src="../../images/recognition/drink_data_demo/output/android_nongfu_spring.JPG" width="400" height="800"/>
 
-2. 图像加库：点击上方的“上传”按钮<img src="../../images/quick_start/android_demo/shangchuan.png" width="25" height="25"/>或者“加号”按钮<img src="../../images/quick_start/android_demo/jia.png" width="25" height="25"/>，即可拍摄一张图像或从图库中选择一张图像，然后再输入这张图像的类别名字（比如`keyboard`），点击“确定”按钮，即可完成图片入库。
-3. 库保存：点击上方的“保存“按钮<img src="../../images/quick_start/android_demo/baocun.png" width="25" height="25"/>，再输入希望保存下的检索库与类别标签文件的文件名（如填入`data1`，为了简化逻辑，检索库文件`*.index`与类别标签文件`*.txt`使用相同的文件名），即可将当前库保存到手机内存中。
-4. 更换检索库：点击上方的“齿轮“按钮<img src="../../images/quick_start/android_demo/shezhi.png" width="25" height="25"/>，点击“Label Path”一栏，在弹出的选项中选择需要更换的库，然后再点击“Index Path”，在弹出的选项中选择需要更换的类别标签文件（一般一个库对应一个类别标签文件，因此更换检索库意味着需要同时更换库文件和类别标签文件，否则可能会造成检索结果错误）。
-5. 查看检索库的标签：首先点击上方的“齿轮“按钮，再点击“Label Path”，在弹出的选项中选择想要查看的标签文件，然后点击“查看当前标签库”按钮，在弹出的窗口中即可查看标签文件的内容。
+#### 1.2.2 图像加库
+点击上方的“拍照上传”按钮<img src="../../images/quick_start/android_demo/paizhaoshangchuan_100.png" width="25" height="25"/>或者“本地上传”按钮<img src="../../images/quick_start/android_demo/bendishangchuan_100.png" width="25" height="25"/>，即可拍摄一张图像或从图库中选择一张图像，然后再输入这张图像的类别名字（比如`keyboard`），点击“确定”按钮，即可完成图片入库。
+
+#### 1.2.3 库保存
+点击上方的“保存修改”按钮<img src="../../images/quick_start/android_demo/baocunxiugai_100.png" width="25" height="25"/>，再输希望保存的检索库与类别标签文件的文件名（如填入`data1`，为了简化逻辑，检索库文件`*.index`与类别标签文件`*.txt`使用相同的文件名），即可将当前库保存到手机内存中。
+
+#### 1.2.4 更换检索库
+点击上方的“齿轮”按钮<img src="../../images/quick_start/android_demo/shezhi.png" width="25" height="25"/>，点击“Label Path”一栏，在弹出的选项中选择需要更换的库，然后再点击“Index Path”，在弹出的选项中选择需要更换的类别标签文件（一般一个库对应一个类别标签文件，因此更换检索库意味着需要同时更换库文件和类别标签文件，否则可能会造成检索结果错误）。
+
+#### 1.2.5 查看检索库标签
+点击“类别查询”，即可在弹窗中查看。
 
 <a name="功能介绍"></a>
 
 ### 1.3 功能详细介绍
 
-1. 图像检索：在选择好要检索的图片之后，首先会通过检测模型进行主体检测，得到图像中的物体的区域，然后将这块区域裁剪出来输入到识别模型中，得到对应的特征向量并在检索库中检索，返回并显示最终的检索结果。
-2. 图像加库：在选择好要入库的图片之后，首先会通过检测模型进行主体检测，得到图像中的物体的区域，然后将这块区域裁剪出来输入到识别模型中，得到对应的特征向量，再与用户输入的图像标签一起加入到检索库中。
-3. 库保存：此功能只需输入希望保存的文件名即可，如输入`database_1`，则会将检索向量库保存为`database_1.index`，标签库保存为`database_1.txt`。
-4. 更换检索库：切换好检索向量库后，需要同时切换与之匹配的检索标签库。
-5. 查看检索库的标签：可按照[功能体验-查看检索库的标签](#12-功能体验)中说明进行查看，当标签库过多（如本demo自带的986类标签库）时，可在弹窗中滑动查看。
+#### 1.3.1 图像检索
+在选择好要检索的图片之后，首先会通过检测模型进行主体检测，得到图像中的物体的区域，然后将这块区域裁剪出来输入到识别模型中，得到对应的特征向量并在检索库中检索，返回并显示最终的检索结果。
+
+#### 1.3.2 图像加库
+在选择好要入库的图片之后，首先会通过检测模型进行主体检测，得到图像中的物体的区域，然后将这块区域裁剪出来输入到识别模型中，得到对应的特征向量，再与用户输入的图像标签一起加入到检索库中。
+
+#### 1.3.3 库保存
+此功能只需输入希望保存的文件名即可，如输入`database_1`，则会将检索向量库保存为`database_1.index`，检索标签库保存为`database_1.txt`。
+
+#### 1.3.4 更换检索库
+切换好检索向量库后，需要同时切换与之匹配的检索标签库。
+
+#### 1.3.5 查看检索库的标签
+可按照[功能体验-查看检索库的标签](#12-功能体验)中说明进行查看，当检索标签库过多（如本demo自带的196类检索标签库）时，可在弹窗中滑动查看。
 
 
 
