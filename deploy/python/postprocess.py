@@ -138,12 +138,29 @@ class Topk(object):
         return y
 
 
-class MultiLabelTopk(Topk):
-    def __init__(self, topk=1, class_id_map_file=None):
-        super().__init__()
+class MultiLabelThreshOutput(object):
+    def __init__(self, threshold=0.5):
+        self.threshold = threshold
 
     def __call__(self, x, file_names=None):
-        return super().__call__(x, file_names, multilabel=True)
+        y = []
+        for idx, probs in enumerate(x):
+            index = np.where(probs >= self.threshold)[0].astype("int32")
+            clas_id_list = []
+            score_list = []
+            for i in index:
+                clas_id_list.append(i.item())
+                score_list.append(probs[i].item())
+            result = {
+                "class_ids": clas_id_list,
+                "scores": np.around(
+                    score_list, decimals=5).tolist(),
+                "label_names": []
+            }
+            if file_names is not None:
+                result["file_name"] = file_names[idx]
+            y.append(result)
+        return y
 
 
 class SavePreLabel(object):

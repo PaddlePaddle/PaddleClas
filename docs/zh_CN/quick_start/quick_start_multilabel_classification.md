@@ -100,7 +100,7 @@ cd ./deploy
 
 ```
 python3 python/predict_cls.py \
-     -c configs/inference_multilabel_cls.yaml
+     -c configs/inference_cls_multilabel.yaml
 ```
 
 得到类似下面的输出：

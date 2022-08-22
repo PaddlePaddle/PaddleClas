@@ -107,7 +107,7 @@ Inference and prediction through predictive engines:
 
 ```
 python3 python/predict_cls.py \
-     -c configs/inference_multilabel_cls.yaml
+     -c configs/inference_cls_multilabel.yaml
 ```
 
 Obtain an output silimar to the following:

@@ -79,10 +79,3 @@ class Topk(object):
             y.append(result)
         return y
 
-
-class MultiLabelTopk(Topk):
-    def __init__(self, topk=1, class_id_map_file=None):
-        super().__init__()
-
-    def __call__(self, x, file_names=None):
-        return super().__call__(x, file_names, multilabel=True)
