@@ -681,11 +681,18 @@ class Pad(object):
     adapted from: https://pytorch.org/vision/stable/_modules/torchvision/transforms/transforms.html#Pad
     """
 
-    def __init__(self, padding: int, fill: int=0,
-                 padding_mode: str="constant"):
+    def __init__(self,
+                 padding: int,
+                 fill: int=0,
+                 padding_mode: str="constant",
+                 backend: str="pil"):
         self.padding = padding
         self.fill = fill
         self.padding_mode = padding_mode
+        self.backend = backend
+        assert backend in [
+            "pil", "cv2"
+        ], f"backend must in ['pil', 'cv2'], but got {backend}"
 
     def _parse_fill(self, fill, img, min_pil_version, name="fillcolor"):
         # Process fill color for affine transforms
@@ -720,11 +727,21 @@ class Pad(object):
         return {name: fill}
 
     def __call__(self, img):
-        opts = self._parse_fill(self.fill, img, "2.3.0", name="fill")
-        if img.mode == "P":
-            palette = img.getpalette()
-            img = ImageOps.expand(img, border=self.padding, **opts)
-            img.putpalette(palette)
+        if self.backend == "pil":
+            opts = self._parse_fill(self.fill, img, "2.3.0", name="fill")
+            if img.mode == "P":
+                palette = img.getpalette()
+                img = ImageOps.expand(img, border=self.padding, **opts)
+                img.putpalette(palette)
+                return img
+            return ImageOps.expand(img, border=self.padding, **opts)
+        else:
+            img = cv2.copyMakeBorder(
+                img,
+                self.padding,
+                self.padding,
+                self.padding,
+                self.padding,
+                cv2.BORDER_CONSTANT,
+                value=(self.fill, self.fill, self.fill))
             return img
-
-        return ImageOps.expand(img, border=self.padding, **opts)

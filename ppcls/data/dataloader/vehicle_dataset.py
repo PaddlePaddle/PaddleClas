@@ -98,8 +98,10 @@ class VeriWild(Dataset):
         self._load_anno()
 
     def _load_anno(self):
-        assert os.path.exists(self._cls_path)
-        assert os.path.exists(self._img_root)
+        assert os.path.exists(
+            self._cls_path), f"path {self._cls_path} does not exist."
+        assert os.path.exists(
+            self._img_root), f"path {self._img_root} does not exist."
         self.images = []
         self.labels = []
         self.cameras = []

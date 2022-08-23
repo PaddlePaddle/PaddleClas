@@ -52,7 +52,7 @@ Arch:
   Head:
     name: FC
     embedding_size: *feat_dim
-    class_num: 192612
+    class_num: 100000
     weight_attr:
       initializer:
         name: Normal
@@ -65,14 +65,14 @@ Loss:
     - CELoss:
         weight: 1.0
         epsilon: 0.1
-    - TripletAngleMarinLoss:
+    - TripletAngularMarginLoss:
         weight: 1.0
+        feature_from: features
         margin: 0.5
         reduction: mean
         add_absolute: True
         absolute_loss_weight: 0.1
         normalize_feature: True
-        feature_from: features
         ap_value: 0.8
         an_value: 0.4
   Eval:
@@ -84,7 +84,7 @@ Optimizer:
   momentum: 0.9
   lr:
     name: Cosine
-    learning_rate: 0.04
+    learning_rate: 0.06 # for 8gpu x 256bs
     warmup_epoch: 5
   regularizer:
     name: L2
@@ -97,6 +97,7 @@ DataLoader:
       name: ImageNetDataset
       image_root: ./dataset/
       cls_label_path: ./dataset/train_reg_all_data.txt
+      relabel: True
       transform_ops:
         - DecodeImage:
             to_rgb: True
@@ -108,8 +109,9 @@ DataLoader:
             backend: cv2
         - RandFlipImage:
             flip_code: 1
-        - Pad_cv2:
+        - Pad:
             padding: 10
+            backend: cv2
         - RandCropImageV2:
             size: [224, 224]
         - RandomRotation:
@@ -127,10 +129,14 @@ DataLoader:
             std: [0.229, 0.224, 0.225]
             order: hwc
     sampler:
-      name: DistributedBatchSampler
-      batch_size: 256
+      name: PKSampler
+      batch_size: 8
+      sample_per_id: 4
       drop_last: False
       shuffle: True
+      sample_method: "id_avg_prob"
+      id_list: [50030, 80700, 92019, 96015]
+      ratio: [4, 4]
     loader:
       num_workers: 4
       use_shared_memory: True
@@ -196,3 +202,4 @@ Metric:
   Eval:
     - Recallk:
         topk: [1, 5]
+    - mAP: {}

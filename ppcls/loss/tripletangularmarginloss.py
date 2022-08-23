@@ -43,7 +43,7 @@ class TripletAngularMarginLoss(nn.Layer):
                  ap_value=0.9,
                  an_value=0.5,
                  feature_from="features"):
-        super(TripletAngleMarginLoss, self).__init__()
+        super(TripletAngularMarginLoss, self).__init__()
         self.margin = margin
         self.feature_from = feature_from
         self.ranking_loss = paddle.nn.loss.MarginRankingLoss(
