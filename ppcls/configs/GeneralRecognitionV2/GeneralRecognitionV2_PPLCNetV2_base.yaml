@@ -52,7 +52,7 @@ Arch:
   Head:
     name: FC
     embedding_size: *feat_dim
-    class_num: 100000
+    class_num: 192612
     weight_attr:
       initializer:
         name: Normal
