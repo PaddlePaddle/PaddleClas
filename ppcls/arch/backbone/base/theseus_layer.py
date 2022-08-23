@@ -158,6 +158,8 @@ class TheseusLayer(nn.Layer):
                 return False
             parent_layer = layer_dict["layer"]
 
+        msg = f"Successfully set the layers that after stop_layer_name('{stop_layer_name}') to IdentityLayer."
+        logger.info(msg)
         return True
 
     def update_res(

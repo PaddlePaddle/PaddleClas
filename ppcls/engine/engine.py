@@ -114,6 +114,10 @@ class Engine(object):
         #TODO(gaotingquan): support rec
         class_num = config["Arch"].get("class_num", None)
         self.config["DataLoader"].update({"class_num": class_num})
+        self.model = build_model(self.config, self.mode)
+        # print(*self.model.state_dict().keys(), sep='\n')
+        print(self.model.backbone.stages[3][0].dw_conv_list[0].conv)
+        exit(0)
         # build dataloader
         if self.mode == 'train':
             self.train_dataloader = build_dataloader(

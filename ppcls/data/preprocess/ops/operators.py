@@ -26,6 +26,7 @@ import cv2
 import numpy as np
 from PIL import Image, ImageOps, __version__ as PILLOW_VERSION
 from paddle.vision.transforms import ColorJitter as RawColorJitter
+from paddle.vision.transforms import RandomRotation as RawRandomRotation
 from paddle.vision.transforms import ToTensor, Normalize, RandomHorizontalFlip, RandomResizedCrop
 from paddle.vision.transforms import functional as F
 from .autoaugment import ImageNetPolicy
@@ -181,7 +182,8 @@ class DecodeImage(object):
                 img = np.asarray(img)[:, :, ::-1]  # BRG
 
             if self.to_rgb:
-                assert img.shape[2] == 3, f"invalid shape of image[{img.shape}]"
+                assert img.shape[
+                    2] == 3, f"invalid shape of image[{img.shape}]"
                 img = img[:, :, ::-1]
 
             if self.channel_first:
@@ -495,7 +497,13 @@ class RandFlipImage(object):
             if isinstance(img, np.ndarray):
                 return cv2.flip(img, self.flip_code)
             else:
-                return img.transpose(Image.FLIP_LEFT_RIGHT)
+                if self.flip_code == 1:
+                    return img.transpose(Image.FLIP_LEFT_RIGHT)
+                elif self.flip_code == 0:
+                    return img.transpose(Image.FLIP_TOP_BOTTOM)
+                else:
+                    return img.transpose(Image.FLIP_LEFT_RIGHT).transpose(
+                        Image.FLIP_LEFT_RIGHT)
         else:
             return img
 
@@ -650,6 +658,20 @@ class ColorJitter(RawColorJitter):
             img = super()._apply_image(img)
             if isinstance(img, Image.Image):
                 img = np.asarray(img)
+        return img
+
+
+class RandomRotation(RawRandomRotation):
+    """RandomRotation.
+    """
+
+    def __init__(self, prob=0.5, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.prob = prob
+
+    def __call__(self, img):
+        if np.random.random() < self.prob:
+            img = super()._apply_image(img)
         return img
 
 
