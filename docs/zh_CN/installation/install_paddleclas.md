@@ -26,7 +26,7 @@
 
 #### 1.1.1 使用Paddle官方镜像
 
-* 切换到工作目录下，例如工作目录为`/home/Projects`，则运行命令: 
+* 切换到工作目录下，例如工作目录为`/home/Projects`，则运行命令:
 
 ```shell
 cd /home/Projects
@@ -96,7 +96,13 @@ git clone https://gitee.com/paddlepaddle/PaddleClas.git -b release/2.4
 ```
 <a name='1.3'></a>
 
-### 1.3 安装 Python 依赖库
+### 1.3 安装 PaddleClas 及其 Python 依赖库
+
+建议直接从 PyPI 安装 PaddleClas：
+
+```shell
+pip install paddleclas
+```
 
 PaddleClas 的 Python 依赖库在 `requirements.txt` 中给出，可通过如下命令安装：
 
@@ -114,5 +120,3 @@ pip install --upgrade -r requirements.txt -i https://mirror.baidu.com/pypi/simpl
 如果您对自动化制作docker镜像感兴趣，或有自定义需求，请访问[PaddlePaddle/PaddleCloud](https://github.com/PaddlePaddle/PaddleCloud/tree/main/tekton)做进一步了解。
 
 **备注**：当前的镜像中的 PaddleClas 代码默认使用最新的 release/2.4 分支。
-
-

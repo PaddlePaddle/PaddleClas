@@ -1,6 +1,6 @@
 import paddle
 from paddle.nn import Sigmoid
-from ppcls.arch.backbone.legendary_models.vgg import VGG19
+from ..legendary_models.vgg import VGG19
 
 __all__ = ["VGG19Sigmoid"]
 

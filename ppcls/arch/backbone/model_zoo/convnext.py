@@ -18,7 +18,7 @@ import paddle
 import paddle.nn as nn
 from paddle.nn.initializer import TruncatedNormal, Constant
 
-from ppcls.utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
+from ....utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
 
 MODEL_URLS = {
     "ConvNeXt_tiny": "",  # TODO
@@ -176,7 +176,7 @@ class ConvNeXt(nn.Layer):
         ]
         cur = 0
         for i in range(4):
-            stage = nn.Sequential(*[
+            stage = nn.Sequential(* [
                 Block(
                     dim=dims[i],
                     drop_path=dp_rates[cur + j],

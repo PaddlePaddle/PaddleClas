@@ -22,7 +22,7 @@ import paddle
 import paddle.nn as nn
 from paddle.nn.initializer import TruncatedNormal, Constant, Normal
 
-from ppcls.utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
+from ....utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
 
 MODEL_URLS = {
     "ViT_small_patch16_224":

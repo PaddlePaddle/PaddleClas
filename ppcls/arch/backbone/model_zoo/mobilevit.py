@@ -23,7 +23,7 @@ import paddle.nn.functional as F
 from paddle.nn.initializer import KaimingUniform, TruncatedNormal, Constant
 import math
 
-from ppcls.utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
+from ....utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
 
 MODEL_URLS = {
     "MobileViT_XXS":

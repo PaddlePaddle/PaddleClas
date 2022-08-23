@@ -1,5 +1,5 @@
 from paddle.nn import Conv2D
-from ppcls.arch.backbone.legendary_models.resnet import ResNet50, MODEL_URLS, _load_pretrained
+from ..legendary_models.resnet import ResNet50, MODEL_URLS, _load_pretrained
 
 __all__ = ["ResNet50_last_stage_stride1"]
 
