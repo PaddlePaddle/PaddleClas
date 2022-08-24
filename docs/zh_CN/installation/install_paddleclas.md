@@ -98,16 +98,16 @@ git clone https://gitee.com/paddlepaddle/PaddleClas.git -b release/2.4
 
 ### 1.3 安装 PaddleClas 及其 Python 依赖库
 
-建议直接从 PyPI 安装 PaddleClas：
+* **[建议]** 直接安装 PaddleClas：
 
 ```shell
 pip install paddleclas
 ```
 
-PaddleClas 的 Python 依赖库在 `requirements.txt` 中给出，可通过如下命令安装：
+* 如需使用 PaddleClas develop 分支体验最新功能，或是需要基于 PaddleClas 进行二次开发，请本地构建安装，命令如下：
 
 ```shell
-pip install --upgrade -r requirements.txt -i https://mirror.baidu.com/pypi/simple
+python setup.py install
 ```
 
 <a name='2'></a>
