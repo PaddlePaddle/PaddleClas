@@ -103,7 +103,7 @@ class TheseusLayer(nn.Layer):
                 return new_layer
 
             net = paddleclas.MobileNetV1()
-            res = net.replace_sub(layer_name_pattern=["blocks[11].depthwise_conv.conv", "blocks[12].depthwise_conv.conv"], handle_func=rep_func)
+            res = net.upgrade_sublayer(layer_name_pattern=["blocks[11].depthwise_conv.conv", "blocks[12].depthwise_conv.conv"], handle_func=rep_func)
             print(res)
             # {'blocks[11].depthwise_conv.conv': the corresponding new_layer, 'blocks[12].depthwise_conv.conv': the corresponding new_layer}
         """
@@ -122,13 +122,21 @@ class TheseusLayer(nn.Layer):
 
             sub_layer = layer_list[-1]["layer"]
             sub_layer_name = layer_list[-1]["name"]
-            sub_layer_index = layer_list[-1]["index"]
+            sub_layer_index_list = layer_list[-1]["index_list"]
 
             new_sub_layer = handle_func(sub_layer, pattern)
 
-            if sub_layer_index:
-                getattr(sub_layer_parent,
-                        sub_layer_name)[sub_layer_index] = new_sub_layer
+            if sub_layer_index_list:
+                if len(sub_layer_index_list) > 1:
+                    sub_layer_parent = getattr(
+                        sub_layer_parent,
+                        sub_layer_name)[sub_layer_index_list[0]]
+                    for sub_layer_index in sub_layer_index_list[1:-1]:
+                        sub_layer_parent = sub_layer_parent[sub_layer_index]
+                    sub_layer_parent[sub_layer_index_list[-1]] = new_sub_layer
+                else:
+                    getattr(sub_layer_parent, sub_layer_name)[
+                        sub_layer_index_list[0]] = new_sub_layer
             else:
                 setattr(sub_layer_parent, sub_layer_name, new_sub_layer)
 
@@ -151,15 +159,13 @@ class TheseusLayer(nn.Layer):
 
         parent_layer = self
         for layer_dict in layer_list:
-            name, index = layer_dict["name"], layer_dict["index"]
-            if not set_identity(parent_layer, name, index):
+            name, index_list = layer_dict["name"], layer_dict["index_list"]
+            if not set_identity(parent_layer, name, index_list):
                 msg = f"Failed to set the layers that after stop_layer_name('{stop_layer_name}') to IdentityLayer. The error layer's name is '{name}'."
                 logger.warning(msg)
                 return False
             parent_layer = layer_dict["layer"]
 
-        msg = f"Successfully set the layers that after stop_layer_name('{stop_layer_name}') to IdentityLayer."
-        logger.info(msg)
         return True
 
     def update_res(
@@ -208,15 +214,14 @@ def save_sub_res_hook(layer, input, output):
     layer.res_dict[layer.res_name] = output
 
 
-def set_identity(parent_layer: nn.Layer,
-                 layer_name: str,
-                 layer_index: str=None) -> bool:
-    """set the layer specified by layer_name and layer_index to Indentity.
+def set_identity(parent_layer: nn.Layer, layer_name: str,
+                 index_list: str=None) -> bool:
+    """set the layer specified by layer_name and index_list to Indentity.
 
     Args:
-        parent_layer (nn.Layer): The parent layer of target layer specified by layer_name and layer_index.
+        parent_layer (nn.Layer): The parent layer of target layer specified by layer_name and index_list.
         layer_name (str): The name of target layer to be set to Indentity.
-        layer_index (str, optional): The index of target layer to be set to Indentity in parent_layer. Defaults to None.
+        index_list (str, optional): The index of target layer to be set to Indentity in parent_layer. Defaults to None.
 
     Returns:
         bool: True if successfully, False otherwise.
@@ -230,7 +235,7 @@ def set_identity(parent_layer: nn.Layer,
         if sub_layer_name == layer_name:
             stop_after = True
 
-    if layer_index and stop_after:
+    if index_list and stop_after:
         stop_after = False
         for sub_layer_index in parent_layer._sub_layers[
                 layer_name]._sub_layers:
@@ -271,10 +276,12 @@ def parse_pattern_str(pattern: str, parent_layer: nn.Layer) -> Union[
     while len(pattern_list) > 0:
         if '[' in pattern_list[0]:
             target_layer_name = pattern_list[0].split('[')[0]
-            target_layer_index = pattern_list[0].split('[')[1].split(']')[0]
+            target_layer_index_list = list(
+                index.split(']')[0]
+                for index in pattern_list[0].split('[')[1:])
         else:
             target_layer_name = pattern_list[0]
-            target_layer_index = None
+            target_layer_index_list = None
 
         target_layer = getattr(parent_layer, target_layer_name, None)
 
@@ -283,19 +290,19 @@ def parse_pattern_str(pattern: str, parent_layer: nn.Layer) -> Union[
             logger.warning(msg)
             return None
 
-        if target_layer_index and target_layer:
-            if int(target_layer_index) < 0 or int(target_layer_index) >= len(
-                    target_layer):
-                msg = f"Not found layer by index('{target_layer_index}') specifed in pattern('{pattern}'). The index should < {len(target_layer)} and > 0."
-                logger.warning(msg)
-                return None
-
-            target_layer = target_layer[target_layer_index]
+        if target_layer_index_list:
+            for target_layer_index in target_layer_index_list:
+                if int(target_layer_index) < 0 or int(
+                        target_layer_index) >= len(target_layer):
+                    msg = f"Not found layer by index('{target_layer_index}') specifed in pattern('{pattern}'). The index should < {len(target_layer)} and > 0."
+                    logger.warning(msg)
+                    return None
+                target_layer = target_layer[target_layer_index]
 
         layer_list.append({
             "layer": target_layer,
             "name": target_layer_name,
-            "index": target_layer_index
+            "index_list": target_layer_index_list
         })
 
         pattern_list = pattern_list[1:]

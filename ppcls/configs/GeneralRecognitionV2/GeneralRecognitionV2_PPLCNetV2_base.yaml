@@ -18,11 +18,11 @@ Global:
   image_shape: [3, 224, 224]
   save_inference_dir: ./inference
 
-# AMP:
-#   scale_loss: 65536
-#   use_dynamic_loss_scaling: True
-#   # O1: mixed fp16
-#   level: O1
+AMP:
+  scale_loss: 65536
+  use_dynamic_loss_scaling: True
+  # O1: mixed fp16
+  level: O1
 
 # model architecture
 Arch:
@@ -96,7 +96,7 @@ DataLoader:
     dataset:
       name: ImageNetDataset
       image_root: ./dataset/
-      cls_label_path: ./dataset/train_reg_all_data.txt
+      cls_label_path: ./dataset/train_reg_all_data_v2.txt
       relabel: True
       transform_ops:
         - DecodeImage:
@@ -130,12 +130,12 @@ DataLoader:
             order: hwc
     sampler:
       name: PKSampler
-      batch_size: 8
+      batch_size: 256
       sample_per_id: 4
       drop_last: False
       shuffle: True
       sample_method: "id_avg_prob"
-      id_list: [50030, 80700, 92019, 96015]
+      id_list: [50030, 80700, 92019, 96015] # be careful when set relabel=True
       ratio: [4, 4]
     loader:
       num_workers: 4
