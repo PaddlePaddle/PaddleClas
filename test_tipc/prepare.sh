@@ -42,6 +42,9 @@ function func_get_url_file_name() {
 
 model_name=$(func_parser_value "${lines[1]}")
 
+# install paddleclas whl
+python setup.py install
+
 if [[ ${MODE} = "cpp_infer" ]]; then
     if [ -d "./deploy/cpp/opencv-3.4.7/opencv3/" ] && [ $(md5sum ./deploy/cpp/opencv-3.4.7.tar.gz | awk -F ' ' '{print $1}') = "faa2b5950f8bee3f03118e600c74746a" ]; then
         echo "################### build opencv skipped ###################"
