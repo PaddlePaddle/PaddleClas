@@ -1,38 +1,116 @@
 # 图像识别快速开始
 
-本文档包含 3 个部分：环境配置、图像识别体验、未知类别的图像识别体验。
+本文档包含 2 个部分：PP-ShiTu android端 demo 快速体验与PP-ShiTu PC端 demo 快速体验。
 
 如果图像类别已经存在于图像索引库中，那么可以直接参考[图像识别体验](#图像识别体验)章节，完成图像识别过程；如果希望识别未知类别的图像，即图像类别之前不存在于索引库中，那么可以参考[未知类别的图像识别体验](#未知类别的图像识别体验)章节，完成建立索引并识别的过程。
 
 ## 目录
 
-* [1. 环境配置](#环境配置)
-* [2. 图像识别体验](#图像识别体验)
-  * [2.1 下载、解压 inference 模型与 demo 数据](#2.1)
-  * [2.2 瓶装饮料识别与检索](#瓶装饮料识别与检索)
-    * [2.2.1 识别单张图像](#识别单张图像)
-    * [2.2.2 基于文件夹的批量识别](#基于文件夹的批量识别)
-* [3. 未知类别的图像识别体验](#未知类别的图像识别体验)
-  * [3.1 准备新的数据与标签](#准备新的数据与标签)
-  * [3.2 建立新的索引库](#建立新的索引库)
-  * [3.3 基于新的索引库的图像识别](#基于新的索引库的图像识别)
-* [4. 服务端识别模型列表](#4)
+- [1. PP-ShiTu android端 demo 快速体验](#1-pp-shitu-android端-demo-快速体验)
+  - [1.1 安装 PP-ShiTu android demo](#11-安装-pp-shitu-android-demo)
+  - [1.2 功能体验](#12-功能体验)
+    - [1.2.1 图像检索](#121-图像检索)
+    - [1.2.2 图像加库](#122-图像加库)
+    - [1.2.3 库保存](#123-库保存)
+    - [1.2.4 更换检索库](#124-更换检索库)
+    - [1.2.5 查看检索库标签](#125-查看检索库标签)
+  - [1.3 功能详细介绍](#13-功能详细介绍)
+    - [1.3.1 图像检索](#131-图像检索)
+    - [1.3.2 图像加库](#132-图像加库)
+    - [1.3.3 库保存](#133-库保存)
+    - [1.3.4 更换检索库](#134-更换检索库)
+    - [1.3.5 查看检索库的标签](#135-查看检索库的标签)
+- [2. PP-ShiTu PC端 demo 快速体验](#2-pp-shitu-pc端-demo-快速体验)
+  - [2.1 环境配置](#21-环境配置)
+  - [2.2 图像识别体验](#22-图像识别体验)
+    - [2.2.1 下载、解压 inference 模型与 demo 数据](#221-下载解压-inference-模型与-demo-数据)
+    - [2.2.2 瓶装饮料识别与检索](#222-瓶装饮料识别与检索)
+      - [2.2.2.1 识别单张图像](#2221-识别单张图像)
+      - [2.2.2.2 基于文件夹的批量识别](#2222-基于文件夹的批量识别)
+  - [2.3 未知类别的图像识别体验](#23-未知类别的图像识别体验)
+    - [2.3.1 准备新的数据与标签](#231-准备新的数据与标签)
+    - [2.3.2 建立新的索引库](#232-建立新的索引库)
+    - [2.3.3 基于新的索引库的图像识别](#233-基于新的索引库的图像识别)
+  - [2.4 服务端识别模型列表](#24-服务端识别模型列表)
+
+<a name="PP-ShiTu android端 快速体验"></a>
+
+## 1. PP-ShiTu android端 demo 快速体验
+
+<a name="安装"></a>
+
+### 1.1 安装 PP-ShiTu android demo
+
+可以通过扫描二维码或者[点击链接](https://paddle-imagenet-models-name.bj.bcebos.com/demos/PP-ShiTu.apk)下载并安装APP
+**注：** 华为鸿蒙OS 3.0的系统可能会出现无法调用摄像头的情况，建议更换低版本系统或者使用其它安卓机型进行快速体验。
+
+<img src="../../images/quick_start/android_demo/PPShiTu_qcode.png" height="250" width="250" />
+
+<a name="功能体验"></a>
+
+### 1.2 功能体验
+目前 PP-ShiTu android demo 具有图像检索、图像加库、库保存、更换检索库、查看检索库内的标签等基本功能，接下来介绍如何体验这几个功能。
+
+#### 1.2.1 图像检索
+点击下方的“拍照识别”按钮<img src="../../images/quick_start/android_demo/paizhaoshibie_100.png" width="25" height="25"/>或者“本地识别”按钮<img src="../../images/quick_start/android_demo/bendishibie_100.png" width="25" height="25"/>，即可拍摄一张图像或者选中一张图像，然后等待几秒钟，APP便会将图像中的主体框标注出来并且在图像下方给出预测的类别以及预测时间等信息。
+
+假设待检索的图像如下：
+
+<img src="../../images/recognition/drink_data_demo/test_images/nongfu_spring.jpeg" width="400" height="600"/>
+
+得到的检索结果可视化如下：
+
+<img src="../../images/quick_start/android_demo/android_nongfu_spring.JPG" width="400" height="800"/>
+
+#### 1.2.2 图像加库
+点击上方的“拍照上传”按钮<img src="../../images/quick_start/android_demo/paizhaoshangchuan_100.png" width="25" height="25"/>或者“本地上传”按钮<img src="../../images/quick_start/android_demo/bendishangchuan_100.png" width="25" height="25"/>，即可拍摄一张图像或从图库中选择一张图像，然后再输入这张图像的类别名字（比如`keyboard`），点击“确定”按钮，即可将图片对应的特征向量与标签加入检索库。
+
+#### 1.2.3 库保存
+点击上方的“保存修改”按钮<img src="../../images/quick_start/android_demo/baocunxiugai_100.png" width="25" height="25"/>，再输入希望保存的检索库名字（如填入`database_1`。为了简化体验逻辑，检索向量库文件 `*.index` 与检索标签库文件 `*.txt` 使用相同的文件名），即可将当前库保存到手机内存中。
+
+#### 1.2.4 更换检索库
+点击上方的“齿轮”按钮<img src="../../images/quick_start/android_demo/shezhi.png" width="25" height="25"/>，点击“Label Path”一栏，在弹出的选项中选择需要更换的库，然后再点击“Index Path”，在弹出的选项中选择需要更换的类别标签文件（一般一个库对应一个类别标签文件，因此更换检索库意味着需要同时更换检索向量库文件和检索标签文件，否则可能会造成检索结果错误）。
+
+#### 1.2.5 查看检索库标签
+点击“类别查询”按钮<img src="../../images/quick_start/android_demo/leibiechaxun_100.png" width="25" height="25"/>，即可在弹窗中查看。
+
+<a name="功能介绍"></a>
+
+### 1.3 功能详细介绍
+
+#### 1.3.1 图像检索
+在选择好要检索的图片之后，首先会通过检测模型进行主体检测，得到图像中的物体的区域，然后将这块区域裁剪出来输入到识别模型中，得到对应的特征向量并在检索库中检索，返回并显示最终的检索结果。
+
+#### 1.3.2 图像加库
+在选择好要入库的图片之后，首先会通过检测模型进行主体检测，得到图像中的物体的区域，然后将这块区域裁剪出来输入到识别模型中，得到对应的特征向量，再与用户输入的图像标签一起加入到检索库中。
+
+#### 1.3.3 库保存
+此功能只需输入希望保存的文件名即可，如输入`database_1`，则会将检索向量库保存为`database_1.index`，检索标签库保存为`database_1.txt`。
+
+#### 1.3.4 更换检索库
+切换好检索向量库后，需要同时切换与之匹配的检索标签库。
+
+#### 1.3.5 查看检索库的标签
+可按照[功能体验-查看检索库的标签](#125-查看检索库标签)中说明进行查看，当检索标签库过多（如本demo自带的196类检索标签库）时，可在弹窗中滑动查看。
+
+
+## 2. PP-ShiTu PC端 demo 快速体验
 
 <a name="环境配置"></a>
 
-## 1. 环境配置
+### 2.1 环境配置
 
 * 安装：请先参考文档 [环境准备](../installation/install_paddleclas.md) 配置 PaddleClas 运行环境。
 
 * 进入 `deploy` 运行目录。本部分所有内容与命令均需要在 `deploy` 目录下运行，可以通过下面的命令进入 `deploy` 目录。
 
-  ```
+  ```shell
   cd deploy
   ```
 
 <a name="图像识别体验"></a>
 
-## 2. 图像识别体验
+### 2.2 图像识别体验
 
 轻量级通用主体检测模型与轻量级通用识别模型和配置文件下载方式如下表所示。
 
@@ -49,7 +127,7 @@
 本章节 demo 数据下载地址如下: [瓶装饮料数据下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/data/drink_dataset_v1.0.tar)。
 
 
-如果希望体验服务端主体检测和各垂类方向的识别模型，可以参考[第4章](#4)。
+如果希望体验服务端主体检测和各垂类方向的识别模型，可以参考[2.4 服务端识别模型列表](#24-服务端识别模型列表)
 
 **注意**
 
@@ -79,9 +157,9 @@ cd ..
 wget {数据下载链接地址} && tar -xf {压缩包的名称}
 ```
 
-<a name="2.1"></a>
+<a name="2.2.1"></a>
 
-### 2.1 下载、解压 inference 模型与 demo 数据
+#### 2.2.1 下载、解压 inference 模型与 demo 数据
 
 下载 demo 数据集以及轻量级主体检测、识别模型，命令如下。
 
@@ -100,7 +178,7 @@ wget https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/data/drink_da
 
 解压完毕后，`drink_dataset_v1.0/` 文件夹下应有如下文件结构：
 
-```
+```log
 ├── drink_dataset_v1.0/
 │   ├── gallery/
 │   ├── index/
@@ -113,7 +191,7 @@ wget https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/data/drink_da
 
 `models` 文件夹下应有如下文件结构：
 
-```
+```log
 ├── general_PPLCNet_x2_5_lite_v1.0_infer
 │   ├── inference.pdiparams
 │   ├── inference.pdiparams.info
@@ -135,7 +213,7 @@ python3.7 python/build_gallery.py -c configs/inference_general.yaml -o Global.re
 
 <a name="瓶装饮料识别与检索"></a>
 
-### 2.2 瓶装饮料识别与检索
+#### 2.2.2 瓶装饮料识别与检索
 
 以瓶装饮料识别 demo 为例，展示识别与检索过程（如果希望尝试其他方向的识别与检索效果，在下载解压好对应的 demo 数据与模型之后，替换对应的配置文件即可完成预测）。
 
@@ -149,7 +227,7 @@ pip install faiss-cpu==1.7.1post2
 
 <a name="识别单张图像"></a>
 
-#### 2.2.1 识别单张图像
+##### 2.2.2.1 识别单张图像
 
 运行下面的命令，对图像 `./drink_dataset_v1.0/test_images/nongfu_spring.jpeg` 进行识别与检索
 
@@ -167,7 +245,7 @@ python3.7 python/predict_system.py -c configs/inference_general.yaml -o Global.u
 
 最终输出结果如下。
 
-```
+```log
 [{'bbox': [244, 49, 509, 964], 'rec_docs': '农夫山泉-饮用天然水', 'rec_scores': 0.7585664}]
 ```
 
@@ -179,7 +257,8 @@ python3.7 python/predict_system.py -c configs/inference_general.yaml -o Global.u
 
 
 <a name="基于文件夹的批量识别"></a>
-#### 2.2.2 基于文件夹的批量识别
+
+##### 2.2.2.2 基于文件夹的批量识别
 
 如果希望预测文件夹内的图像，可以直接修改配置文件中的 `Global.infer_imgs` 字段，也可以通过下面的 `-o` 参数修改对应的配置。
 
@@ -190,7 +269,7 @@ python3.7 python/predict_system.py -c configs/inference_general.yaml -o Global.i
 
 终端中会输出该文件夹内所有图像的识别结果，如下所示。
 
-```
+```log
 ...
 [{'bbox': [345, 95, 524, 586], 'rec_docs': '红牛-强化型', 'rec_scores': 0.80164653}]
 Inference: 23.43583106994629 ms per batch image
@@ -213,7 +292,7 @@ Inference: 150.06470680236816 ms per batch image
 
 <a name="未知类别的图像识别体验"></a>
 
-## 3. 未知类别的图像识别体验
+### 2.3 未知类别的图像识别体验
 
 对图像 `./drink_dataset_v1.0/test_images/mosilian.jpeg` 进行识别，命令如下
 
@@ -235,7 +314,7 @@ python3.7 python/predict_system.py -c configs/inference_general.yaml -o Global.i
 
 <a name="准备新的数据与标签"></a>
 
-### 3.1 准备新的数据与标签
+#### 2.3.1 准备新的数据与标签
 
 首先需要将与待检索图像相似的图像列表拷贝到索引库原始图像的文件夹。这里 PaddleClas 已经将所有的图像数据都放在文件夹 `drink_dataset_v1.0/gallery/` 中。
 
@@ -246,7 +325,7 @@ python3.7 python/predict_system.py -c configs/inference_general.yaml -o Global.i
 
 <a name="建立新的索引库"></a>
 
-### 3.2 建立新的索引库
+#### 2.3.2 建立新的索引库
 
 使用下面的命令构建 `index` 索引，加速识别后的检索过程。
 
@@ -258,7 +337,7 @@ python3.7 python/build_gallery.py -c configs/inference_general.yaml -o IndexProc
 
 <a name="基于新的索引库的图像识别"></a>
 
-### 3.3 基于新的索引库的图像识别
+#### 2.3.3 基于新的索引库的图像识别
 
 使用新的索引库，对上述图像进行识别，运行命令如下。
 
@@ -269,7 +348,7 @@ python3.7 python/predict_system.py -c configs/inference_general.yaml -o Global.i
 
 输出结果如下。
 
-```
+```log
 [{'bbox': [396, 553, 508, 621], 'rec_docs': '光明_莫斯利安', 'rec_scores': 0.5921005}]
 ```
 
@@ -278,8 +357,8 @@ python3.7 python/predict_system.py -c configs/inference_general.yaml -o Global.i
 ![](../../images/recognition/drink_data_demo/output/mosilian.jpeg)
 
 
-<a name="4"></a>
-## 4. 服务端识别模型列表
+<a name="5"></a>
+### 2.4 服务端识别模型列表
 
 目前，我们更推荐您使用[轻量级通用主体检测模型与轻量级通用识别模型](#轻量级通用主体检测模型与轻量级通用识别模型)，以获得更好的测试结果。但是如果您希望体验服务端识别模型，服务器端通用主体检测模型与各方向识别模型、测试数据下载地址以及对应的配置文件地址如下。
 
@@ -316,7 +395,7 @@ wget https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/data/recognit
 
 解压完毕后，`recognition_demo_data_v1.1` 文件夹下应有如下文件结构：
 
-```
+```log
 ├── recognition_demo_data_v1.1
 │   ├── gallery_cartoon
 │   ├── gallery_logo
