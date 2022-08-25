@@ -21,21 +21,21 @@ from .common_dataset import CommonDataset
 
 
 class ImageNetDataset(CommonDataset):
+    """ImageNetDataset
+
+    Args:
+        image_root (str): image root, path to `ILSVRC2012`
+        cls_label_path (str): path to annotation file `train_list.txt` or 'val_list.txt`
+        transform_ops (list, optional): list of transform op(s). Defaults to None.
+        delimiter (str, optional): delimiter. Defaults to None.
+        relabel (bool, optional): whether do relabel when original label do not starts from 0 or are discontinuous. Defaults to False.
+    """
     def __init__(self,
                  image_root,
                  cls_label_path,
                  transform_ops=None,
                  delimiter=None,
                  relabel=False):
-        """ImageNetDataset
-
-        Args:
-            image_root (str): _description_
-            cls_label_path (str): _description_
-            transform_ops (list, optional): list of transform op(s). Defaults to None.
-            delimiter (str, optional): delimiter. Defaults to None.
-            relabel (bool, optional): whether do relabel when original label do not starts from 0 or are discontinuous. Defaults to False.
-        """
         self.delimiter = delimiter if delimiter is not None else " "
         self.relabel = relabel
         super(ImageNetDataset, self).__init__(image_root, cls_label_path,
