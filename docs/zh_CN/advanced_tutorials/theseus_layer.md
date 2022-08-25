@@ -94,7 +94,7 @@ MobileNetV1
 
 ## 3. 方法说明
 
-PaddleClas 提供的 backbone 网络均基于图像分类数据集训练得到，因此网络的尾部带有用于分类的全连接层，而在特定任务场景下，需要去掉分类的全连接层。在部分下游任务中，例如目标检测场景，需要获取到网络中间层的输出结果，也可能需要对网络的中间层进行修改，因此 `TheseusLayer` 提供了 3 个接口函数用于实现不同的修改功能。
+PaddleClas 提供的 backbone 网络均基于图像分类数据集训练得到，因此网络的尾部带有用于分类的全连接层，而在特定任务场景下，需要去掉分类的全连接层。在部分下游任务中，例如目标检测场景，需要获取到网络中间层的输出结果，也可能需要对网络的中间层进行修改，因此 `TheseusLayer` 提供了 3 个接口函数用于实现不同的修改功能。下面基于 PaddleClas whl 进行说明，首先需要安装 PaddleClas：`pip install paddleclas`。
 
 <a name="3.1"></a>
 
@@ -122,7 +122,6 @@ def stop_after(self, stop_layer_name: str) -> bool:
 以 `MobileNetV1` 网络为例，参数 `stop_layer_name` 为 `"blocks[0].depthwise_conv.conv"`，具体效果可以参考下方代码案例进行尝试。
 
 ```python
-# cd <root-path-to-PaddleClas> or pip install paddleclas to import paddleclas
 import paddleclas
 
 net = paddleclas.MobileNetV1()
@@ -168,7 +167,6 @@ def update_res(
 import numpy as np
 import paddle
 
-# cd <root-path-to-PaddleClas> or pip install paddleclas to import paddleclas
 import paddleclas
 
 np_input = np.zeros((1, 3, 224, 224))
@@ -241,7 +239,6 @@ def upgrade_sublayer(self,
 ```python
 from paddle import nn
 
-# cd <root-path-to-PaddleClas> or pip install paddleclas to import paddleclas
 import paddleclas
 
 # 该函数必须有两个形参

@@ -117,9 +117,9 @@ class TheseusLayer(nn.Layer):
             layer_list = parse_pattern_str(pattern=pattern, parent_layer=self)
             if not layer_list:
                 continue
+
             sub_layer_parent = layer_list[-2]["layer"] if len(
                 layer_list) > 1 else self
-
             sub_layer = layer_list[-1]["layer"]
             sub_layer_name = layer_list[-1]["name"]
             sub_layer_index_list = layer_list[-1]["index_list"]
@@ -214,14 +214,15 @@ def save_sub_res_hook(layer, input, output):
     layer.res_dict[layer.res_name] = output
 
 
-def set_identity(parent_layer: nn.Layer, layer_name: str,
-                 index_list: str=None) -> bool:
-    """set the layer specified by layer_name and index_list to Indentity.
+def set_identity(parent_layer: nn.Layer,
+                 layer_name: str,
+                 layer_index_list: str=None) -> bool:
+    """set the layer specified by layer_name and layer_index_list to Indentity.
 
     Args:
-        parent_layer (nn.Layer): The parent layer of target layer specified by layer_name and index_list.
+        parent_layer (nn.Layer): The parent layer of target layer specified by layer_name and layer_index_list.
         layer_name (str): The name of target layer to be set to Indentity.
-        index_list (str, optional): The index of target layer to be set to Indentity in parent_layer. Defaults to None.
+        layer_index_list (str, optional): The index of target layer to be set to Indentity in parent_layer. Defaults to None.
 
     Returns:
         bool: True if successfully, False otherwise.
@@ -235,16 +236,19 @@ def set_identity(parent_layer: nn.Layer, layer_name: str,
         if sub_layer_name == layer_name:
             stop_after = True
 
-    if index_list and stop_after:
-        stop_after = False
-        for sub_layer_index in parent_layer._sub_layers[
-                layer_name]._sub_layers:
-            if stop_after:
-                parent_layer._sub_layers[layer_name][
-                    sub_layer_index] = Identity()
-                continue
-            if layer_index == sub_layer_index:
-                stop_after = True
+    if layer_index_list and stop_after:
+        layer_container = parent_layer._sub_layers[layer_name]
+        for num, layer_index in enumerate(layer_index_list):
+            stop_after = False
+            for i in range(num):
+                layer_container = layer_container[layer_index_list[i]]
+            for sub_layer_index in layer_container._sub_layers:
+                if stop_after:
+                    parent_layer._sub_layers[layer_name][
+                        sub_layer_index] = Identity()
+                    continue
+                if layer_index == sub_layer_index:
+                    stop_after = True
 
     return stop_after
 
@@ -307,4 +311,5 @@ def parse_pattern_str(pattern: str, parent_layer: nn.Layer) -> Union[
 
         pattern_list = pattern_list[1:]
         parent_layer = target_layer
+
     return layer_list

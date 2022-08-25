@@ -42,9 +42,10 @@
 ### 1.1 安装 PP-ShiTu android demo
 
 可以通过扫描二维码或者[点击链接](https://paddle-imagenet-models-name.bj.bcebos.com/demos/PP-ShiTu.apk)下载并安装APP
+
 **注：** 华为鸿蒙OS 3.0的系统可能会出现无法调用摄像头的情况，建议更换低版本系统或者使用其它安卓机型进行快速体验。
 
-<img src="../../images/quick_start/android_demo/PPShiTu_qcode.png" height="250" width="250" />
+<div align=center><img src="../../images/quick_start/android_demo/PPShiTu_qcode.png" height="400" width="400"/></div>
 
 <a name="功能体验"></a>
 
