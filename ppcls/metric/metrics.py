@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from cmath import nan
 import numpy as np
 import paddle
 import paddle.nn as nn
@@ -97,6 +98,11 @@ class mAP(nn.Layer):
         num_rel = paddle.greater_than(num_rel, paddle.to_tensor(0.))
         num_rel_index = paddle.nonzero(num_rel.astype("int"))
         num_rel_index = paddle.reshape(num_rel_index, [num_rel_index.shape[0]])
+
+        if paddle.numel(num_rel_index).item() == 0:
+            metric_dict["mAP"] = np.nan
+            return metric_dict
+
         equal_flag = paddle.index_select(equal_flag, num_rel_index, axis=0)
 
         acc_sum = paddle.cumsum(equal_flag, axis=1)

@@ -89,11 +89,7 @@ class CompCars(Dataset):
 
 
 class VeriWild(Dataset):
-    def __init__(
-            self,
-            image_root,
-            cls_label_path,
-            transform_ops=None, ):
+    def __init__(self, image_root, cls_label_path, transform_ops=None):
         self._img_root = image_root
         self._cls_path = cls_label_path
         if transform_ops:
@@ -102,19 +98,23 @@ class VeriWild(Dataset):
         self._load_anno()
 
     def _load_anno(self):
-        assert os.path.exists(self._cls_path)
-        assert os.path.exists(self._img_root)
+        assert os.path.exists(
+            self._cls_path), f"path {self._cls_path} does not exist."
+        assert os.path.exists(
+            self._img_root), f"path {self._img_root} does not exist."
         self.images = []
         self.labels = []
         self.cameras = []
         with open(self._cls_path) as fd:
             lines = fd.readlines()
-            for l in lines:
-                l = l.strip().split()
-                self.images.append(os.path.join(self._img_root, l[0]))
-                self.labels.append(np.int64(l[1]))
-                self.cameras.append(np.int64(l[2]))
+            for line in lines:
+                line = line.strip().split()
+                self.images.append(os.path.join(self._img_root, line[0]))
+                self.labels.append(np.int64(line[1]))
+                if len(line) >= 3:
+                    self.cameras.append(np.int64(line[2]))
                 assert os.path.exists(self.images[-1])
+        self.has_camera = len(self.cameras) > 0
 
     def __getitem__(self, idx):
         try:
@@ -123,7 +123,10 @@ class VeriWild(Dataset):
             if self._transform_ops:
                 img = transform(img, self._transform_ops)
             img = img.transpose((2, 0, 1))
-            return (img, self.labels[idx], self.cameras[idx])
+            if self.has_camera:
+                return (img, self.labels[idx], self.cameras[idx])
+            else:
+                return (img, self.labels[idx])
         except Exception as ex:
             logger.error("Exception occured when parse line: {} with msg: {}".
                          format(self.images[idx], ex))
