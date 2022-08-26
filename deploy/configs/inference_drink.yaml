@@ -55,7 +55,7 @@ IndexProcess:
   index_dir:  "./drink_dataset_v1.0/index"
   data_file:  "./drink_dataset_v1.0/gallery/drink_label.txt"
   index_operation: "new" # suported: "append", "remove", "new"
-  delimiter: " "
+  delimiter: "\t"
   dist_type: "IP"
   embedding_size: 512
   batch_size: 32

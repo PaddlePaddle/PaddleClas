@@ -156,13 +156,13 @@ Paddle-Lite 提供了多种策略来自动优化原始的模型，其中包括�
 ```shell
 # 当前目录为 $PaddleClas/deploy/lite_shitu
 # $code_path需替换成相应的运行目录,可以根据需要，将$code_path设置成需要的目录
-export $code_path=~
+export code_path=~
 cd $code_path
 git clone https://github.com/PaddlePaddle/PaddleDetection.git
 # 进入PaddleDetection根目录
 cd PaddleDetection
 # 将预训练模型导出为inference模型
-python tools/export_model.py -c configs/picodet/application/mainbody_detection/picodet_lcnet_x2_5_640_mainbody.yml -o weights=https://paddledet.bj.bcebos.com/models/picodet_lcnet_x2_5_640_mainbody.pdparams export_post_process=False --output_dir=inference
+python tools/export_model.py -c configs/picodet/legacy_model/application/mainbody_detection/picodet_lcnet_x2_5_640_mainbody.yml -o weights=https://paddledet.bj.bcebos.com/models/picodet_lcnet_x2_5_640_mainbody.pdparams export_post_process=False --output_dir=inference
 # 将inference模型转化为Paddle-Lite优化模型
 paddle_lite_opt --model_file=inference/picodet_lcnet_x2_5_640_mainbody/model.pdmodel --param_file=inference/picodet_lcnet_x2_5_640_mainbody/model.pdiparams --optimize_out=inference/picodet_lcnet_x2_5_640_mainbody/mainbody_det
 # 将转好的模型复制到lite_shitu目录下
@@ -174,11 +174,14 @@ cp $code_path/PaddleDetection/inference/picodet_lcnet_x2_5_640_mainbody/mainbody
 2. 转换识别模型
 
 ```shell
+# 识别模型下载
+wget https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/inference/general_PPLCNet_x2_5_lite_v1.0_infer.tar
+# 解压模型
+tar -xf general_PPLCNet_x2_5_lite_v1.0_infer.tar
 # 转换为Paddle-Lite模型
-paddle_lite_opt --model_file=inference/inference.pdmodel --param_file=inference/inference.pdiparams --optimize_out=inference/rec
+paddle_lite_opt --model_file=general_PPLCNet_x2_5_lite_v1.0_infer/inference.pdmodel --param_file=general_PPLCNet_x2_5_lite_v1.0_infer/inference.pdiparams --optimize_out=general_PPLCNet_x2_5_lite_v1.0_infer/rec
 # 将模型文件拷贝到lite_shitu下
-cp inference/rec.nb deploy/lite_shitu/models/
-cd deploy/lite_shitu
+cp general_PPLCNet_x2_5_lite_v1.0_infer/rec.nb deploy/lite_shitu/models/
 ```
 
 **注意**：`--optimize_out` 参数为优化后模型的保存路径，无需加后缀`.nb`；`--model_file` 参数为模型结构信息文件的路径，`--param_file` 参数为模型权重信息文件的路径，请注意文件名。
@@ -190,8 +193,11 @@ cd deploy/lite_shitu
 #### 2.2.1 数据及环境配置
 
 ```shell
-# 进入上级目录
-cd ..
+# 进入PaddleClas根目录
+cd $PaddleClas
+# 安装PaddleClas
+python setup.py install
+cd deploy
 # 下载瓶装饮料数据集
 wget https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/data/drink_dataset_v1.0.tar && tar -xf drink_dataset_v1.0.tar
 rm -rf drink_dataset_v1.0.tar
