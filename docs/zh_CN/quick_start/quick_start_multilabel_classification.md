@@ -107,6 +107,7 @@ python3 python/predict_cls.py \
      -c configs/inference_cls_multilabel.yaml
 ```
 推理图片如下：
+
 ![](../../images/quick_start/multi_label_demo.png)
 
 得到类似下面的输出：

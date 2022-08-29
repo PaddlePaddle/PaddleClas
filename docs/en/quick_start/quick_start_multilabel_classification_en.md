@@ -113,6 +113,7 @@ python3 python/predict_cls.py \
      -c configs/inference_cls_multilabel.yaml
 ```
 The predicted pictures are as follows:
+
 ![](../../images/quick_start/multi_label_demo.png)
 
 Obtain an output silimar to the following:
