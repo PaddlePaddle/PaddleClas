@@ -116,7 +116,7 @@ The predicted pictures are as follows:
 
 ![](../../images/quick_start/multi_label_demo.png)
 
-Obtain an output silimar to the following:
+After executing the inference command, obtain an output silimar to the following:
 
 ```
 0517_2715693311.jpg:    class id(s): [6, 13, 17, 23, 30], score(s): [0.98, 0.78, 0.64, 0.99, 0.96], label_name(s): ['clouds', 'lake', 'ocean', 'sky', 'water']

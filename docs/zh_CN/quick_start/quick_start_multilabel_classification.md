@@ -110,7 +110,7 @@ python3 python/predict_cls.py \
 
 ![](../../images/quick_start/multi_label_demo.png)
 
-得到类似下面的输出：
+执行推理命令后，得到类似下面的输出：
 ```
 0517_2715693311.jpg:    class id(s): [6, 13, 17, 23, 30], score(s): [0.98, 0.78, 0.64, 0.99, 0.96], label_name(s): ['clouds', 'lake', 'ocean', 'sky', 'water']
 ```
