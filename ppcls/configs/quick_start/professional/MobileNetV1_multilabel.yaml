@@ -118,6 +118,8 @@ Infer:
   PostProcess:
     name: MultiLabelThreshOutput
     threshold: 0.5
+    class_id_map_file: "ppcls/utils/NUS-WIDE-SCENE_label_list.txt"
+    delimiter: " "
 
 Metric:
   Train:
