@@ -51,7 +51,7 @@ class CELoss(nn.Layer):
                 for line in lines:
                     weight_list.append(float(line.strip()))
             except Exception as e:
-                msg = ""
+                msg = f"The setting about scaling weight has been ignored because of an encountered error: {e}"
                 logger.warning(msg)
                 return None
             return paddle.to_tensor(weight_list)
@@ -78,14 +78,18 @@ class CELoss(nn.Layer):
             else:
                 soft_label = False
 
-        if self.weight_data is not None:
-            if self.weight_data.shape[0] != class_num:
-                msg = f"The shape of rescaling weight must be [class num]. Please check the rescaling weight file. The setting has been ignored."
-                logger.warning(msg)
-                self.weight_data = None
+        if self.weight_data is not None and self.weight_data.shape[
+                0] != class_num:
+            msg = f"The shape of rescaling weight must be [class num]. Please check the rescaling weight file. The setting about scaling weight has been ignored."
+            logger.warning(msg)
+            self.weight_data = None
 
         loss = F.cross_entropy(
-            x, label=label, soft_label=soft_label, reduction=self.reduction, weight=self.weight_data)
+            x,
+            label=label,
+            soft_label=soft_label,
+            reduction=self.reduction,
+            weight=self.weight_data)
         return {"CELoss": loss}
 
 
