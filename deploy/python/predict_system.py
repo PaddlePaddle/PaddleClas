@@ -123,7 +123,7 @@ class SystemPredictor(object):
         # st4: if the output is empty, add the whole image to promote recall
         result = []
         if len(output) == 0:
-            result = self.append_self(result, img.shape)
+            result = self.append_self(result, img.shape)[0]
             preds = {}
             xmin, ymin, xmax, ymax = result["bbox"].astype("int")
             rec_results = self.rec_predictor.predict(img)
