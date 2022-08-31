@@ -169,7 +169,7 @@ python3.7 python/predict_system.py -c configs/inference_general.yaml -o Global.u
 其中`bbox`表示检测出的主体所在位置，`rec_docs`表示索引库中与检测框最为相似的类别，`rec_scores`表示对应的置信度。
 检测的可视化结果也保存在`output`文件夹下，对于本张图像，识别结果可视化如下所示。
 
-![](../../images/ppshitu_application_scenarios/6aa06f252d.jpg)
+![](../../images/ppshitu_application_scenarios/rec_result.jpg)
 
 <a name="2.4.2 基于文件夹的批量识别"></a>
 
