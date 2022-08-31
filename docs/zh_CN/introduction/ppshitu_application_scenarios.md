@@ -146,7 +146,7 @@ Global:
   rec_inference_model_dir: './models/inference_model_name'
 ```
 
-并修改配置文件`./configs/inference_general.yaml`中的index库地址`IndexProcess.index_dir`为对应场景index库：
+并修改配置文件`./configs/inference_general.yaml`中的`IndexProcess.index_dir`字段为对应场景index库地址：
 
 ```shell
 IndexProcess:
