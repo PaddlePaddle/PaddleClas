@@ -135,7 +135,7 @@ pip install faiss-cpu==1.7.1post2
 
 假设需要测试`./datasets/AnimalImageDataset/Query/antelope/0a37838e99.jpg`这张图像识别和检索效果。
 
-首先修改配置文件`./configs/inference_general.yaml`中的`Global.det_inference_model_dir`和`Global.rec_inference_model_dir`为对应的检测和识别模型文件夹，以及修改测试图像地址`Global.infer_imgs`示例如下：
+首先分别修改配置文件`./configs/inference_general.yaml`中的`Global.det_inference_model_dir`和`Global.rec_inference_model_dir`字段为对应的检测和识别模型文件夹，以及修改测试图像地址字段`Global.infer_imgs`示例如下：
 
 ```shell
 Global:
@@ -174,3 +174,23 @@ python3.7 python/predict_system.py -c configs/inference_general.yaml -o Global.u
 <a name="2.4.2 基于文件夹的批量识别"></a>
 
 #### 2.4.2 基于文件夹的批量识别
+
+如果希望预测文件夹内的图像，可以直接修改配置文件中`Global.infer_imgs`字段，也可以通过下面的`-o`参数修改对应的配置。
+
+```shell
+# 使用下面的命令使用 GPU 进行预测，如果希望使用 CPU 预测，可以在命令后面添加 -o Global.use_gpu=False
+python3.7 python/predict_system.py -c configs/inference_general.yaml -o Global.infer_imgs="./datasets/AnimalImageDataset/Query/antelope"
+```
+终端中会输出该文件夹内所有图像的识别结果，如下所示。
+```
+...
+[{'bbox': [0, 0, 1200, 675], 'rec_docs': 'antelope', 'rec_scores': 0.6153812}]           │
+[{'bbox': [0, 0, 275, 183], 'rec_docs': 'antelope', 'rec_scores': 0.77218026}]           │
+[{'bbox': [264, 79, 1088, 850], 'rec_docs': 'antelope', 'rec_scores': 0.81452656}]       │
+[{'bbox': [0, 0, 188, 268], 'rec_docs': 'antelope', 'rec_scores': 0.637074}]             │
+[{'bbox': [118, 41, 235, 161], 'rec_docs': 'antelope', 'rec_scores': 0.67315465}]        │
+[{'bbox': [0, 0, 175, 287], 'rec_docs': 'antelope', 'rec_scores': 0.68271667}]           │
+[{'bbox': [0, 0, 310, 163], 'rec_docs': 'antelope', 'rec_scores': 0.6706451}]
+...
+```
+所有图像的识别结果可视化图像也保存在`output`文件夹内。
