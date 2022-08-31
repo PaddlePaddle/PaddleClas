@@ -43,7 +43,8 @@ function func_get_url_file_name() {
 model_name=$(func_parser_value "${lines[1]}")
 
 # install paddleclas whl
-python setup.py install
+python_name=$(func_parser_value "${lines[2]}")
+${python_name} setup.py install
 
 if [[ ${MODE} = "cpp_infer" ]]; then
     if [ -d "./deploy/cpp/opencv-3.4.7/opencv3/" ] && [ $(md5sum ./deploy/cpp/opencv-3.4.7.tar.gz | awk -F ' ' '{print $1}') = "faa2b5950f8bee3f03118e600c74746a" ]; then
@@ -170,8 +171,9 @@ if [[ $model_name == *ShiTu* ]]; then
     ln -s demo_test.txt val_list.txt
     cd ../../
     eval "wget -nc $model_url_value --no-check-certificate"
-    mv general_PPLCNet_x2_5_pretrained_v1.0.pdparams GeneralRecognition_PPLCNet_x2_5_pretrained.pdparams
-    exit 0
+    if [[ -d "./general_PPLCNet_x2_5_pretrained_v1.0.pdparams" ]]; then
+        mv general_PPLCNet_x2_5_pretrained_v1.0.pdparams GeneralRecognition_PPLCNet_x2_5_pretrained.pdparams
+    fi
 fi
 
 if [[ $FILENAME == *use_dali* ]]; then
@@ -278,7 +280,7 @@ fi
 if [[ ${MODE} = "serving_infer" ]]; then
     # prepare serving env
     python_name=$(func_parser_value "${lines[2]}")
-    if [[ ${model_name} = "PPShiTu" ]]; then
+    if [[ ${model_name} =~ "PPShiTu" ]]; then
         cls_inference_model_url=$(func_parser_value "${lines[3]}")
         cls_tar_name=$(func_get_url_file_name "${cls_inference_model_url}")
         det_inference_model_url=$(func_parser_value "${lines[4]}")
