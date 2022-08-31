@@ -186,12 +186,12 @@ python3.7 python/predict_system.py -c configs/inference_general.yaml -o Global.i
 终端中会输出该文件夹内所有图像的识别结果，如下所示。
 ```
 ...
-[{'bbox': [0, 0, 1200, 675], 'rec_docs': 'antelope', 'rec_scores': 0.6153812}]           │
-[{'bbox': [0, 0, 275, 183], 'rec_docs': 'antelope', 'rec_scores': 0.77218026}]           │
-[{'bbox': [264, 79, 1088, 850], 'rec_docs': 'antelope', 'rec_scores': 0.81452656}]       │
-[{'bbox': [0, 0, 188, 268], 'rec_docs': 'antelope', 'rec_scores': 0.637074}]             │
-[{'bbox': [118, 41, 235, 161], 'rec_docs': 'antelope', 'rec_scores': 0.67315465}]        │
-[{'bbox': [0, 0, 175, 287], 'rec_docs': 'antelope', 'rec_scores': 0.68271667}]           │
+[{'bbox': [0, 0, 1200, 675], 'rec_docs': 'antelope', 'rec_scores': 0.6153812}]
+[{'bbox': [0, 0, 275, 183], 'rec_docs': 'antelope', 'rec_scores': 0.77218026}]
+[{'bbox': [264, 79, 1088, 850], 'rec_docs': 'antelope', 'rec_scores': 0.81452656}]
+[{'bbox': [0, 0, 188, 268], 'rec_docs': 'antelope', 'rec_scores': 0.637074}]
+[{'bbox': [118, 41, 235, 161], 'rec_docs': 'antelope', 'rec_scores': 0.67315465}]
+[{'bbox': [0, 0, 175, 287], 'rec_docs': 'antelope', 'rec_scores': 0.68271667}]
 [{'bbox': [0, 0, 310, 163], 'rec_docs': 'antelope', 'rec_scores': 0.6706451}]
 ...
 ```
