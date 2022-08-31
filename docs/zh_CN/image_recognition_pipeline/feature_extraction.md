@@ -6,11 +6,19 @@
 - [1. 摘要](#1-摘要)
 - [2. 介绍](#2-介绍)
 - [3. 方法](#3-方法)
-  - [3.1 Backbone](#31-backbone)
-  - [3.2 Neck](#32-neck)
-  - [3.3 Head](#33-head)
-  - [3.4 Loss](#34-loss)
+  - [3.1 PP-ShiTuV1](#31-pp-shituv1)
+    - [3.1.1 Backbone](#311-backbone)
+    - [3.1.2 Neck](#312-neck)
+    - [3.1.3 Head](#313-head)
+    - [3.1.4 Loss](#314-loss)
+  - [3.2 PP-ShiTuV2](#32-pp-shituv2)
+    - [3.2.1 Backbone](#321-backbone)
+    - [3.2.2 Neck](#322-neck)
+    - [3.2.3 Head](#323-head)
+    - [3.2.4 Loss](#324-loss)
 - [4. 实验部分](#4-实验部分)
+  - [4.1 PP-ShiTuV1](#41-pp-shituv1)
+  - [4.2 PP-ShiTuV2](#42-pp-shituv2)
 - [5. 自定义特征提取](#5-自定义特征提取)
   - [5.1 数据准备](#51-数据准备)
   - [5.2 模型训练](#52-模型训练)
@@ -37,47 +45,69 @@
 
 - **Backbone**: 用于提取输入图像初步特征的骨干网络，一般由配置文件中的 [`Backbone`](../../../ppcls/configs/GeneralRecognition/GeneralRecognition_PPLCNet_x2_5.yaml#L26-L29) 以及 [`BackboneStopLayer`](../../../ppcls/configs/GeneralRecognition/GeneralRecognition_PPLCNet_x2_5.yaml#L30-L31) 字段共同指定。
 - **Neck**: 用以特征增强及特征维度变换。可以是一个简单的 FC Layer，用来做特征维度变换；也可以是较复杂的 FPN 结构，用以做特征增强，一般由配置文件中的 [`Neck`](../../../ppcls/configs/GeneralRecognition/GeneralRecognition_PPLCNet_x2_5.yaml#L32-L35)字段指定。
-- **Head**: 用来将 feature 转化为 logits，让模型在训练阶段能以分类任务的形式进行训练。除了常用的 FC Layer 外，还可以替换为 cosmargin, arcmargin, circlemargin 等模块，一般由配置文件中的 [`Head`](../../../ppcls/configs/GeneralRecognition/GeneralRecognition_PPLCNet_x2_5.yaml#L36-L41)字段指定。
-- **Loss**: 指定所使用的 Loss 函数。我们将 Loss 设计为组合 loss 的形式，可以方便地将 Classification Loss 和 Metric learning Loss 组合在一起，一般由配置文件中的 [`Loss`](../../../ppcls/configs/GeneralRecognition/GeneralRecognition_PPLCNet_x2_5.yaml#L44-L50)字段指定。
+- **Head**: 用来将 `Neck` 的输出 feature 转化为 logits，让模型在训练阶段能以分类任务的形式进行训练。除了常用的 FC Layer 外，还可以替换为 [CosMargin](../../../ppcls/arch/gears/cosmargin.py), [ArcMargin](../../../ppcls/arch/gears/arcmargin.py), [CircleMargin](../../../ppcls/arch/gears/circlemargin.py) 等模块，一般由配置文件中的 [`Head`](../../../ppcls/configs/GeneralRecognition/GeneralRecognition_PPLCNet_x2_5.yaml#L36-L41) 字段指定。
+- **Loss**: 指定所使用的 Loss 函数。我们将 Loss 设计为组合 loss 的形式，可以方便地将 Classification Loss 和 Metric learning Loss 组合在一起，一般由配置文件中的 [`Loss`](../../../ppcls/configs/GeneralRecognition/GeneralRecognition_PPLCNet_x2_5.yaml#L44-L50) 字段指定。
 
 <a name="3"></a>
 
 ## 3. 方法
 
-### 3.1 Backbone
+### 3.1 PP-ShiTuV1
+
+#### 3.1.1 Backbone
 
 Backbone 部分采用了 [PP_LCNet_x2_5](../models/PP-LCNet.md)，其针对Intel CPU端的性能优化探索了多个有效的结构设计方案，最终实现了在不增加推理时间的情况下，进一步提升模型的性能，最终大幅度超越现有的 SOTA 模型。
 
-### 3.2 Neck
+#### 3.1.2 Neck
 
 Neck 部分采用了 [FC Layer](../../../ppcls/arch/gears/fc.py)，对 Backbone 抽取得到的特征进行降维，减少了特征存储的成本与计算量。
 
-### 3.3 Head
+#### 3.1.3 Head
 
 Head 部分选用 [ArcMargin](../../../ppcls/arch/gears/arcmargin.py)，在训练时通过指定margin，增大同类特征之间的角度差异再进行分类，进一步提升抽取特征的表征能力。
 
-### 3.4 Loss
+#### 3.1.4 Loss
 
 Loss 部分选用 [Cross entropy loss](../../../ppcls/loss/celoss.py)，在训练时以分类任务的损失函数来指导网络进行优化。详细的配置文件见[通用识别配置文件](../../../ppcls/configs/GeneralRecognition/GeneralRecognition_PPLCNet_x2_5.yaml)。
+
+### 3.2 PP-ShiTuV2
+
+#### 3.2.1 Backbone
+
+Backbone 部分采用了 [PP-LCNetV2_base](../models/PP-LCNetV2.md)，其针对Intel CPU端的性能优化探索了多个有效的结构设计方案，最终实现了在不增加推理时间的情况下，进一步提升模型的性能，最终大幅度超越现有的 SOTA 模型。
+
+#### 3.2.2 Neck
+
+Neck 部分采用了 [BN Neck](../../../ppcls/arch/gears/bnneck.py)，对 Backbone 抽取得到的特征的每个维度进行标准化操作，减少了同时优化度量学习损失和分类损失的难度。
+
+#### 3.2.3 Head
+
+Head 部分选用 [FC Layer](../../../ppcls/arch/gears/fc.py)，使用分类头将 feature 转换成 logits 供后续计算分类损失。
+
+#### 3.2.4 Loss
+
+Loss 部分选用 [Cross entropy loss](../../../ppcls/loss/celoss.py) 和 [TripletAngularMarginLoss](../../../ppcls/loss/tripletangularmarginloss.py)，在训练时以分类损失和基于角度的三元组损失来指导网络进行优化。详细的配置文件见[GeneralRecognitionV2_PPLCNetV2_base.yaml](../../../ppcls/configs/GeneralRecognitionV2/GeneralRecognitionV2_PPLCNetV2_base.yaml#L63-77)。
 
 <a name="4"></a>
 
 ## 4. 实验部分
 
+### 4.1 PP-ShiTuV1
+
 训练数据为如下 7 个公开数据集的汇总：
 
-|    数据集    | 数据量  |  类别数  |   场景   |                                  数据集地址                                  |
-| :----------: | :-----: | :------: | :------: | :--------------------------------------------------------------------------: |
-|  Aliproduct  | 2498771 |  50030   |   商品   |  [地址](https://retailvisionworkshop.github.io/recognition_challenge_2020/)  |
-|    GLDv2     | 1580470 |  81313   |   地标   |           [地址](https://github.com/cvdfoundation/google-landmark)           |
-|  VeRI-Wild   | 277797  |  30671   |   车辆   |                [地址](https://github.com/PKU-IMRE/VERI-Wild)                 |
-|  LogoDet-3K  | 155427  |   3000   |   Logo   |          [地址](https://github.com/Wangjing1551/LogoDet-3K-Dataset)          |
+| 数据集       | 数据量  |  类别数  |   场景   |                                  数据集地址                                  |
+| :----------- | :-----: | :------: | :------: | :--------------------------------------------------------------------------: |
+| Aliproduct   | 2498771 |  50030   |   商品   |  [地址](https://retailvisionworkshop.github.io/recognition_challenge_2020/)  |
+| GLDv2        | 1580470 |  81313   |   地标   |           [地址](https://github.com/cvdfoundation/google-landmark)           |
+| VeRI-Wild    | 277797  |  30671   |   车辆   |                [地址](https://github.com/PKU-IMRE/VERI-Wild)                 |
+| LogoDet-3K   | 155427  |   3000   |   Logo   |          [地址](https://github.com/Wangjing1551/LogoDet-3K-Dataset)          |
 | iCartoonFace | 389678  |   5013   | 动漫人物 | [地址](http://challenge.ai.iqiyi.com/detail?raceId=5def69ace9fcf68aef76a75d) |
-|     SOP      |  59551  |  11318   |   商品   |          [地址](https://cvgl.stanford.edu/projects/lifted_struct/)           |
-|    Inshop    |  25882  |   3997   |   商品   |        [地址](http://mmlab.ie.cuhk.edu.hk/projects/DeepFashion.html)         |
-|  **Total**   | **5M**  | **185K** |   ----   |                                     ----                                     |
+| SOP          |  59551  |  11318   |   商品   |          [地址](https://cvgl.stanford.edu/projects/lifted_struct/)           |
+| Inshop       |  25882  |   3997   |   商品   |        [地址](http://mmlab.ie.cuhk.edu.hk/projects/DeepFashion.html)         |
+| **Total**    | **5M**  | **185K** |    -     |                                      -                                       |
 
-最终的模型效果如下表所示:
+最终的模型精度指标如下表所示:
 
 |              模型               | Aliproduct | VeRI-Wild | LogoDet-3K | iCartoonFace |  SOP  | Inshop | Latency(ms) |
 | :-----------------------------: | :--------: | :-------: | :--------: | :----------: | :---: | :----: | :---------: |
@@ -88,14 +118,49 @@ Loss 部分选用 [Cross entropy loss](../../../ppcls/loss/celoss.py)，在训�
 * 速度评测机器的 CPU 具体信息为：`Intel(R) Xeon(R) Gold 6148 CPU @ 2.40GHz`
 * 速度指标的评测条件为： 开启 MKLDNN, 线程数设置为 10
 
+### 4.2 PP-ShiTuV2
+
+训练数据为如下 7 个公开数据集的汇总：
+
+| 数据集                 | 数据量  |  类别数  | 场景  |                                      数据集地址                                      |
+| :--------------------- | :-----: | :------: | :---: | :----------------------------------------------------------------------------------: |
+| Aliproduct             | 2498771 |  50030   | 商品  |      [地址](https://retailvisionworkshop.github.io/recognition_challenge_2020/)      |
+| GLDv2                  | 1580470 |  81313   | 地标  |               [地址](https://github.com/cvdfoundation/google-landmark)               |
+| VeRI-Wild              | 277797  |  30671   | 车辆  |                    [地址](https://github.com/PKU-IMRE/VERI-Wild)                     |
+| LogoDet-3K             | 155427  |   3000   | Logo  |              [地址](https://github.com/Wangjing1551/LogoDet-3K-Dataset)              |
+| SOP                    |  59551  |  11318   | 商品  |              [地址](https://cvgl.stanford.edu/projects/lifted_struct/)               |
+| Inshop                 |  25882  |   3997   | 商品  |            [地址](http://mmlab.ie.cuhk.edu.hk/projects/DeepFashion.html)             |
+| bird400                |  58388  |   400    | 商品  |          [地址](https://www.kaggle.com/datasets/gpiosenka/100-bird-species)          |
+| 104flows               |  12753  |   104    | 商品  |              [地址](https://www.robots.ox.ac.uk/~vgg/data/flowers/102/)              |
+| Cars                   |  58315  |   112    | 商品  |            [地址](https://ai.stanford.edu/~jkrause/cars/car_dataset.html)            |
+| Fashion Product Images |  44441  |    47    | 商品  | [地址](https://www.kaggle.com/datasets/paramaggarwal/fashion-product-images-dataset) |
+| flowerrecognition      |  24123  |    59    | 商品  |         [地址](https://www.kaggle.com/datasets/aymenktari/flowerrecognition)         |
+| food-101               | 101000  |   101    | 商品  |         [地址](https://data.vision.ee.ethz.ch/cvl/datasets_extra/food-101/)          |
+| fruits-262             | 225639  |   262    | 商品  |            [地址](https://www.kaggle.com/datasets/aelchimminut/fruits262)            |
+| inaturalist            | 265213  |   1010   | 商品  |           [地址](https://github.com/visipedia/inat_comp/tree/master/2017)            |
+| indoor-scenes          |  15588  |    67    | 商品  |       [地址](https://www.kaggle.com/datasets/itsahmad/indoor-scenes-cvpr-2019)       |
+| Products-10k           | 141931  |   9691   | 商品  |                       [地址](https://products-10k.github.io/)                        |
+| CompCars               |  16016  |   431    | 商品  |     [地址](http://​​​​​​http://ai.stanford.edu/~jkrause/cars/car_dataset.html​)      |
+| **Total**              | **6M**  | **192K** |   -   |                                          -                                           |
+
+最终的模型精度指标如下表所示:
+
+|                模型                 | Aliproduct | VeRI-Wild | LogoDet-3K |  SOP  | Inshop | imdb_face | iNat  | instre | sketch | Latency(ms) |
+| :---------------------------------: | :--------: | :-------: | :--------: | :---: | :----: | :-------: | :---: | :----: | :----: | :---------: |
+| GeneralRecognitionV2_PPLCNetV2_base |   0.842    |   0.878   |   0.880    | 0.776 | 0.908  |   0.359   | 0.386 | 0.877  | 0.393  |     5.0     |
+
+* 预训练模型地址：[general_PPLCNetV2_base_pretrained_v1.0.pdparams](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/pretrain/PPShiTuV2/general_PPLCNetV2_base_pretrained_v1.0.pdparams)
+* 采用的评测指标为：`Recall@1`
+* 速度评测机器的 CPU 具体信息为：`Intel(R) Xeon(R) Gold 6148 CPU @ 2.40GHz`
+* 速度指标的评测条件为： 开启 MKLDNN, 线程数设置为 10
+
 <a name="5"></a>
 
 ## 5. 自定义特征提取
 
 自定义特征提取，是指依据自己的任务，重新训练特征提取模型。
 
-下面基于`GeneralRecognition_PPLCNet_x2_5.yaml`配置文件，介绍主要的四个步骤：1）数据准备；2）模型训练；3）模型评估；4）模型推理
-
+下面基于 `GeneralRecognition_PPLCNet_x2_5.yaml` 配置文件，介绍主要的四个步骤：1）数据准备；2）模型训练；3）模型评估；4）模型推理
 
 <a name="5.1"></a>
 
@@ -107,34 +172,34 @@ Loss 部分选用 [Cross entropy loss](../../../ppcls/loss/celoss.py)，在训�
 
 - 修改类别数：
   ```yaml
-    Head:
-      name: ArcMargin
-      embedding_size: 512
-      class_num: 185341    # 此处表示类别数
+  Head:
+    name: ArcMargin
+    embedding_size: 512
+    class_num: 185341    # 此处表示类别数
   ```
 - 修改训练数据集配置：
   ```yaml
-    Train:
-      dataset:
-        name: ImageNetDataset
-        image_root: ./dataset/     # 此处表示train数据所在的目录
-        cls_label_path: ./dataset/train_reg_all_data.txt  # 此处表示train数据集label文件的地址
+  Train:
+    dataset:
+      name: ImageNetDataset
+      image_root: ./dataset/     # 此处表示train数据所在的目录
+      cls_label_path: ./dataset/train_reg_all_data.txt  # 此处表示train数据集label文件的地址
   ```
 - 修改评估数据集中query数据配置：
   ```yaml
-      Query:
-        dataset:
-          name: VeriWild
-          image_root: ./dataset/Aliproduct/    # 此处表示query数据集所在的目录
-          cls_label_path: ./dataset/Aliproduct/val_list.txt    # 此处表示query数据集label文件的地址
+  Query:
+    dataset:
+      name: VeriWild
+      image_root: ./dataset/Aliproduct/    # 此处表示query数据集所在的目录
+      cls_label_path: ./dataset/Aliproduct/val_list.txt    # 此处表示query数据集label文件的地址
   ```
 - 修改评估数据集中gallery数据配置：
   ```yaml
-      Gallery:
-        dataset:
-          name: VeriWild
-          image_root: ./dataset/Aliproduct/    # 此处表示gallery数据集所在的目录
-          cls_label_path: ./dataset/Aliproduct/val_list.txt   # 此处表示gallery数据集label文件的地址
+  Gallery:
+    dataset:
+      name: VeriWild
+      image_root: ./dataset/Aliproduct/    # 此处表示gallery数据集所在的目录
+      cls_label_path: ./dataset/Aliproduct/val_list.txt   # 此处表示gallery数据集label文件的地址
   ```
 
 <a name="5.2"></a>
