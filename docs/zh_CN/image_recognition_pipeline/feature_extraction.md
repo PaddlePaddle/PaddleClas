@@ -120,7 +120,7 @@ Loss 部分选用 [Cross entropy loss](../../../ppcls/loss/celoss.py) 和 [Tripl
 
 ### 4.2 PP-ShiTuV2
 
-训练数据为如下 16 个公开数据集的汇总：
+我们对原有的训练数据进行了合理扩充与优化，最终使用如下 16 个公开数据集的汇总：
 
 | 数据集                 | 数据量  |  类别数  | 场景  |                                      数据集地址                                      |
 | :--------------------- | :-----: | :------: | :---: | :----------------------------------------------------------------------------------: |
@@ -130,17 +130,17 @@ Loss 部分选用 [Cross entropy loss](../../../ppcls/loss/celoss.py) 和 [Tripl
 | LogoDet-3K             | 155427  |   3000   | Logo  |              [地址](https://github.com/Wangjing1551/LogoDet-3K-Dataset)              |
 | SOP                    |  59551  |  11318   | 商品  |              [地址](https://cvgl.stanford.edu/projects/lifted_struct/)               |
 | Inshop                 |  25882  |   3997   | 商品  |            [地址](http://mmlab.ie.cuhk.edu.hk/projects/DeepFashion.html)             |
-| bird400                |  58388  |   400    | 商品  |          [地址](https://www.kaggle.com/datasets/gpiosenka/100-bird-species)          |
-| 104flows               |  12753  |   104    | 商品  |              [地址](https://www.robots.ox.ac.uk/~vgg/data/flowers/102/)              |
-| Cars                   |  58315  |   112    | 商品  |            [地址](https://ai.stanford.edu/~jkrause/cars/car_dataset.html)            |
+| bird400                |  58388  |   400    | 鸟类  |          [地址](https://www.kaggle.com/datasets/gpiosenka/100-bird-species)          |
+| 104flows               |  12753  |   104    | 花类  |              [地址](https://www.robots.ox.ac.uk/~vgg/data/flowers/102/)              |
+| Cars                   |  58315  |   112    | 车辆  |            [地址](https://ai.stanford.edu/~jkrause/cars/car_dataset.html)            |
 | Fashion Product Images |  44441  |    47    | 商品  | [地址](https://www.kaggle.com/datasets/paramaggarwal/fashion-product-images-dataset) |
-| flowerrecognition      |  24123  |    59    | 商品  |         [地址](https://www.kaggle.com/datasets/aymenktari/flowerrecognition)         |
-| food-101               | 101000  |   101    | 商品  |         [地址](https://data.vision.ee.ethz.ch/cvl/datasets_extra/food-101/)          |
-| fruits-262             | 225639  |   262    | 商品  |            [地址](https://www.kaggle.com/datasets/aelchimminut/fruits262)            |
-| inaturalist            | 265213  |   1010   | 商品  |           [地址](https://github.com/visipedia/inat_comp/tree/master/2017)            |
-| indoor-scenes          |  15588  |    67    | 商品  |       [地址](https://www.kaggle.com/datasets/itsahmad/indoor-scenes-cvpr-2019)       |
+| flowerrecognition      |  24123  |    59    | 花类  |         [地址](https://www.kaggle.com/datasets/aymenktari/flowerrecognition)         |
+| food-101               | 101000  |   101    | 食物  |         [地址](https://data.vision.ee.ethz.ch/cvl/datasets_extra/food-101/)          |
+| fruits-262             | 225639  |   262    | 水果  |            [地址](https://www.kaggle.com/datasets/aelchimminut/fruits262)            |
+| inaturalist            | 265213  |   1010   | 自然  |           [地址](https://github.com/visipedia/inat_comp/tree/master/2017)            |
+| indoor-scenes          |  15588  |    67    | 室内  |       [地址](https://www.kaggle.com/datasets/itsahmad/indoor-scenes-cvpr-2019)       |
 | Products-10k           | 141931  |   9691   | 商品  |                       [地址](https://products-10k.github.io/)                        |
-| CompCars               |  16016  |   431    | 商品  |     [地址](http://​​​​​​http://ai.stanford.edu/~jkrause/cars/car_dataset.html​)      |
+| CompCars               |  16016  |   431    | 车辆  |     [地址](http://​​​​​​http://ai.stanford.edu/~jkrause/cars/car_dataset.html​)      |
 | **Total**              | **6M**  | **192K** |   -   |                                          -                                           |
 
 最终的模型精度指标如下表所示:

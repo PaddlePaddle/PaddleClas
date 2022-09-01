@@ -105,7 +105,7 @@ PULC models inference within 3ms on CPU devices, with accuracy comparable with S
 ## Introduction to Image Recognition Systems
 
 <div align="center">
-<img src="./docs/images/structure.jpg"  width = "800" />
+<img src="./docs/images/structure.png"  width="65%" height="65%" />
 </div>
 
 Image recognition can be divided into three steps:

@@ -127,21 +127,26 @@ PULC融合了骨干网络、数据增广、蒸馏等多种前沿算法，可以�
 PaddleClas提供了覆盖人、车、OCR场景九大常见任务的分类模型，CPU推理3ms，精度比肩SwinTransformer。
 
 <a name="图像识别系统介绍"></a>
-## PP-ShiTu图像识别系统
+
+## PP-ShiTuV2图像识别系统
+
+在 **[PP-ShiTu](https://arxiv.org/pdf/2111.00775.pdf)** 的基础上，我们针对数据集、特征提取模块进行了优化，加入了更多数据集和更为通用的优化策略，使得模型的检索精度在多种常见场景下得到显著提升。更多细节请参考 **[PP-ShiTuV2](./docs/zh_CN/PPShiTu/PPShiTu_introduction.md)**
 
 <div align="center">
-<img src="./docs/images/structure.jpg"  width = "800" />
+<img src="./docs/images/structure.png" width="65%" height="65%" />
 </div>
 
-PP-ShiTu是一个实用的轻量级通用图像识别系统，主要由主体检测、特征学习和向量检索三个模块组成。该系统从骨干网络选择和调整、损失函数的选择、数据增强、学习率变换策略、正则化参数选择、预训练模型使用以及模型裁剪量化8个方面，采用多种策略，对各个模块的模型进行优化，最终得到在CPU上仅0.2s即可完成10w+库的图像识别的系统。更多细节请参考[PP-ShiTu技术方案](https://arxiv.org/pdf/2111.00775.pdf)。
+* PP-ShiTu 是一个实用的轻量级通用图像识别系统，主要由主体检测、特征学习和向量检索三个模块组成。该系统从骨干网络选择和调整、损失函数的选择、数据增强、学习率变换策略、正则化参数选择、预训练模型使用以及模型裁剪量化8个方面，采用多种策略，对各个模块的模型进行优化，最终得到在CPU上仅0.2s即可完成10w+库的图像识别的系统。更多细节请参考 [PP-ShiTu技术方案](https://arxiv.org/pdf/2111.00775.pdf)。
 
 <a name="分类效果展示"></a>
+
 ## PULC实用图像分类模型效果展示
 <div align="center">
 <img src="docs/images/classification.gif">
 </div>
 
 <a name="识别效果展示"></a>
+
 ## PP-ShiTu图像识别系统效果展示
 - 瓶装饮料识别
 <div align="center">
@@ -177,6 +182,7 @@ PP-ShiTu是一个实用的轻量级通用图像识别系统，主要由主体检
 
 
 <a name="贡献代码"></a>
+
 ## 贡献代码
 我们非常欢迎你为PaddleClas贡献代码，也十分感谢你的反馈。
 如果想为PaddleCLas贡献代码，可以参考[贡献指南](./docs/zh_CN/advanced_tutorials/how_to_contribute.md)。
