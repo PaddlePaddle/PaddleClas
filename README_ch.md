@@ -130,7 +130,7 @@ PaddleClas提供了覆盖人、车、OCR场景九大常见任务的分类模型�
 
 ## PP-ShiTuV2图像识别系统
 
-在 **[PP-ShiTu](https://arxiv.org/pdf/2111.00775.pdf)** 的基础上，我们针对数据集、特征提取模块进行了优化，加入了更多数据集和更为通用的优化策略，使得模型的检索精度在多种常见场景下得到显著提升。更多细节请参考 **[PP-ShiTuV2](./docs/zh_CN/PPShiTu/PPShiTu_introduction.md)**
+在 **[PP-ShiTu](https://arxiv.org/pdf/2111.00775.pdf)** 的基础上，我们针对数据集、特征提取模块进行了优化，加入了更多数据集和更为通用的优化策略，使得模型的检索精度在多种常见场景下得到显著提升。更多细节请参考 **[PP-ShiTuV2](./docs/zh_CN/PPShiTu/PPShiTuV2_introduction.md)**
 
 <div align="center">
 <img src="./docs/images/structure.png" width="65%" height="65%" />
