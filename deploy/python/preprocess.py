@@ -100,6 +100,8 @@ class UnifiedResize(object):
         elif backend.lower() == "pil":
             if isinstance(interpolation, str):
                 interpolation = _pil_interp_from_str[interpolation.lower()]
+            elif interpolation is None:
+                interpolation = Image.BILINEAR
             self.resize_func = partial(
                 _pil_resize, resample=interpolation, return_numpy=return_numpy)
         else:
