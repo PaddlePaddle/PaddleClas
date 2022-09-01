@@ -77,6 +77,7 @@ from .model_zoo.nextvit import NextViT_small_224, NextViT_base_224, NextViT_larg
 from .model_zoo.cae import cae_base_patch16_224, cae_large_patch16_224
 from .model_zoo.cvt import CvT_13_224, CvT_13_384, CvT_21_224, CvT_21_384, CvT_W24_384
 from .model_zoo.micronet import MicroNet_M0, MicroNet_M1, MicroNet_M2, MicroNet_M3
+from .model_zoo.mobilenext import MobileNeXt_x0_35, MobileNeXt_x0_5, MobileNeXt_x0_75, MobileNeXt_x1_0, MobileNeXt_x1_4
 
 from .variant_models.resnet_variant import ResNet50_last_stage_stride1
 from .variant_models.resnet_variant import ResNet50_adaptive_max_pool2d

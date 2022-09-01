@@ -96,7 +96,8 @@ class Momentum(object):
                  grad_clip=None,
                  use_nesterov=False,
                  multi_precision=True,
-                 no_weight_decay_name=None):
+                 no_weight_decay_name=None,
+                 one_dim_param_no_weight_decay=False):
         super().__init__()
         self.learning_rate = learning_rate
         self.momentum = momentum
@@ -106,6 +107,7 @@ class Momentum(object):
         self.use_nesterov = use_nesterov
         self.no_weight_decay_name_list = no_weight_decay_name.split(
         ) if no_weight_decay_name else []
+        self.one_dim_param_no_weight_decay = one_dim_param_no_weight_decay
 
     def __call__(self, model_list):
         # model_list is None in static graph
@@ -118,7 +120,7 @@ class Momentum(object):
                           if not any(nd in n for nd in self.no_weight_decay_name_list)]
                 params_with_decay.extend(params)
                 params = [p for n, p in m.named_parameters() \
-                          if any(nd in n for nd in self.no_weight_decay_name_list)]
+                          if any(nd in n for nd in self.no_weight_decay_name_list) or (self.one_dim_param_no_weight_decay and len(p.shape) == 1)]
                 params_without_decay.extend(params)
             parameters = [{
                 "params": params_with_decay,
