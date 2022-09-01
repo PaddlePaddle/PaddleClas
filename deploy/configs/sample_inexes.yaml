@@ -1,8 +1,6 @@
 Global:
-  # det_inference_model_dir: "./models/ppyolov2_r50vd_dcn_mainbody_v1.0_infer"
-  det_inference_model_dir: "/ppshitu/ppshitu/deploy/models/picodet_PPLCNet_x2_5_mainbody_lite_v1.0_infer"
-  # rec_inference_model_dir: "/ppshitu/ppshitu/deploy/models/new_traindata_inference"
-  rec_inference_model_dir: "/ppshitu/ppshitu/deploy/models/inference_taml"
+  det_inference_model_dir: "./models/picodet_PPLCNet_x2_5_mainbody_lite_v1.0_infer"
+  rec_inference_model_dir: "./models/general_PPLCNet_x2_5_lite_v1.0_infer"
   rec_nms_thresold: 0.05
   batch_size: 1
   image_shape: [3, 640, 640]
@@ -24,10 +22,10 @@ Global:
   enable_profile: False
 
 Datasets:
-  # Demo_gallery_query:
-  #   infer_path: "/ppshitu_datasets/Demo/Demo_gallery_query"
-  #   infer_imgs: "/ppshitu_datasets/Demo/Demo_gallery_query/gallery_list.txt"
-  #   output_dir: "/ppshitu_datasets/Demo/Demo_gallery_query/Index"
+  # DatasetName:
+  #   infer_path: "/path/to/Gallery/images"
+  #   infer_imgs: "/path/to/gallery_list.txt"
+  #   output_dir: "/path/to/save/index"
 
 Methods:
   SampleAll:

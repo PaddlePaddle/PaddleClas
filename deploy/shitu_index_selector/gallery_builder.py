@@ -44,9 +44,6 @@ class GalleryBuilder(object):
         '''
         operation_method = config.get("index_operation", "new").lower()
 
-        # gallery_images, gallery_docs = split_datafile(
-        #     config['data_file'], config['image_root'], config['delimiter'])
-
         # when remove data in index, do not need extract fatures
         if operation_method != "remove":
             gallery_features = self._extract_features(gallery_images, config)
@@ -141,8 +138,8 @@ class GalleryBuilder(object):
             faiss.write_index_binary(
                 index, os.path.join(self.index_out_dir, "vector.index"))
         else:
-            faiss.write_index(
-                index, os.path.join(self.index_out_dir, "vector.index"))
+            faiss.write_index(index,
+                              os.path.join(self.index_out_dir, "vector.index"))
 
         with open(os.path.join(self.index_out_dir, "id_map.pkl"), 'wb') as fd:
             pickle.dump(ids, fd)
@@ -180,14 +177,3 @@ class GalleryBuilder(object):
             batch_img = []
 
         return gallery_features
-
-
-# def main(config):
-#     GalleryBuilder(config)
-#     return
-
-
-# if __name__ == "__main__":
-#     args = config.parse_args()
-#     config = config.get_config(args.config, overrides=args.override, show=True)
-#     main(config)

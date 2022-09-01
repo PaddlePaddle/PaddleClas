@@ -1,6 +1,6 @@
 Global:
-  det_inference_model_dir: "/ppshitu/ppshitu/deploy/models/picodet_PPLCNet_x2_5_mainbody_lite_v1.0_infer"
-  rec_inference_model_dir: "/ppshitu/ppshitu/deploy/models/inference_taml"
+  det_inference_model_dir: "./models/picodet_PPLCNet_x2_5_mainbody_lite_v1.0_infer"
+  rec_inference_model_dir: "./models/general_PPLCNet_x2_5_lite_v1.0_infer"
   rec_nms_thresold: 0.05
   
 
@@ -50,9 +50,9 @@ RecPostProcess: null
 
 
 Datasets:
-  DemoDataset:
-    infer_path: "/ppshitu_datasets/Demo/DemoDataset"
-    infer_imgs: "/ppshitu_datasets/Demo/DemoDataset/image_list.txt"
-    output_path: "/ppshitu_datasets/Demo/Demo_gallery_query"
-    gallery_num: 20
-    sim_thred: 0.7
+  # DatasetName:
+  #   infer_path: "/path/to/image"
+  #   infer_imgs: "/path/to/image_list.txt"
+  #   output_path: "/path/to/save/Gallery&Query"
+  #   gallery_num: 20
+  #   sim_thred: 0.88
