@@ -47,7 +47,7 @@ PP-ShiTu应用场景介绍和下载地址如下表所示。
 | 垃圾 | <img src="../../images/ppshitu_application_scenarios/Garbage12.jpg" height = "100"> |12种垃圾分类识别 | 0.9845 | --- | [原数据下载地址](https://www.kaggle.com/datasets/mostafaabla/garbage-classification) |
 | 航拍场景 | <img src="../../images/ppshitu_application_scenarios/AID.jpg" height = "100"> |各种航拍场景识别，如机场、火车站等 | 0.9797 | --- | [原数据下载地址](https://www.kaggle.com/datasets/jiayuanchengala/aid-scene-classification-datasets) |
 | 蔬菜 | <img src="../../images/ppshitu_application_scenarios/Veg200.jpg" height = "100"> |各种蔬菜识别 | 0.8929 | --- | [原数据下载地址](https://www.kaggle.com/datasets/zhaoyj688/vegfru) |
-| 商标 | <img src="../../images/ppshitu_application_scenarios/Logo3k.jpg" height = "100"> |两千多种logo识别 | 0.9313 | --- | [原数据下载地址](https://github.com/Wangjing1551/LogoDet-3K-Dataset) |
+| 商标 | <img src="../../images/ppshitu_application_scenarios/Logo3K.jpg" height = "100"> |两千多种logo识别 | 0.9313 | --- | [原数据下载地址](https://github.com/Wangjing1551/LogoDet-3K-Dataset) |
 
 
 
