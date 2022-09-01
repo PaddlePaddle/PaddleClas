@@ -14,9 +14,9 @@
   - [2.4 场景库识别与检索](#24-场景库识别与检索)
     - [2.4.1 识别单张图像](#241-识别单张图像)
     - [2.4.2 基于文件夹的批量识别](#242-基于文件夹的批量识别)
-  - [3 新增场景库图像识别体验](#3-新增场景库图像识别体验)
-    - [3.1 根据相似度划分Gallery和Query](#31-根据相似度划分gallery和query)
-    - [3.2 根据划分好的Gallery构建index索引](#32-根据划分好的gallery构建index索引)
+- [3 新增场景库图像识别体验](#3-新增场景库图像识别体验)
+  - [3.1 根据相似度划分Gallery和Query](#31-根据相似度划分gallery和query)
+  - [3.2 根据划分好的Gallery构建index索引](#32-根据划分好的gallery构建index索引)
 
 <a name="1. 应用场景介绍"></a>
 
@@ -26,28 +26,28 @@ PP-ShiTu应用场景介绍和下载地址如下表所示。
 
 | 场景 |示例图|场景简介|Recall@1|场景库下载地址|原数据集下载地址|
 |:---:|:---:|:---:|:---:|:---:|:---:|
-| 球类 | --- |各种球类识别 | 0.9769 | --- | [原数据下载地址](https://www.kaggle.com/datasets/gpiosenka/balls-image-classification) |
-| 狗识别 | --- | 狗细分类识别，包括69种狗的图像 | 0.9606 | --- | [原数据下载地址](https://www.kaggle.com/datasets/gpiosenka/70-dog-breedsimage-data-set) |
-| 宝石 | --- | 宝石种类识别 | 0.9653 | --- | [原数据下载地址](https://www.kaggle.com/datasets/lsind18/gemstones-images) |
-| 动物 | --- |各种动物识别 | 0.9078 | --- | [原数据下载地址](https://www.kaggle.com/datasets/iamsouravbanerjee/animal-image-dataset-90-different-animals) |
-| 鸟类 | --- |鸟细分类识别，包括400种鸟类各种姿态 | 0.9673 | --- | [原数据下载地址](https://www.kaggle.com/datasets/gpiosenka/100-bird-species) |
-| 交通工具 | --- |车、船等交通工具粗分类识别 | 0.9307 | --- | [原数据下载地址](https://www.kaggle.com/datasets/rishabkoul1/vechicle-dataset) |
-| 花 | --- |104种花细分类识别 | 0.9788 | --- | [原数据下载地址](https://www.kaggle.com/datasets/msheriey/104-flowers-garden-of-eden) |
-| 运动种类 | --- |100种运动图像识别 | 0.9413 | --- | [原数据下载地址](https://www.kaggle.com/datasets/gpiosenka/sports-classification) |
-| 乐器 | --- |30种不同乐器种类识别 | 0.9467 | --- | [原数据下载地址](https://www.kaggle.com/datasets/gpiosenka/musical-instruments-image-classification) |
-| 宝可梦 | --- |宝可梦神奇宝贝识别 | 0.9236 | --- | [原数据下载地址](https://www.kaggle.com/datasets/lantian773030/pokemonclassification) |
-| 船 | --- |船种类识别 |0.9242 | --- | [原数据下载地址](https://www.kaggle.com/datasets/imsparsh/dockship-boat-type-classification) |
-| 鞋子 | --- |鞋子种类识别，包括靴子、拖鞋等 | 0.9000 | --- | [原数据下载地址](https://www.kaggle.com/datasets/noobyogi0100/shoe-dataset) |
-| 巴黎建筑 | --- |巴黎著名建筑景点识别，如：巴黎铁塔、圣母院等 | 1.000 | --- | [原数据下载地址](https://www.kaggle.com/datasets/skylord/oxbuildings) |
-| 蝴蝶 | --- |75种蝴蝶细分类识别 | 0.9360 | --- | [原数据下载地址](https://www.kaggle.com/datasets/gpiosenka/butterfly-images40-species) |
-| 野外植物 | --- |野外植物识别 | 0.9758 | --- | [原数据下载地址](https://www.kaggle.com/datasets/ryanpartridge01/wild-edible-plants) |
-| 天气 | --- |各种天气场景识别，如：雨天、打雷、下雪等 | 0.9924 | --- | [原数据下载地址](https://www.kaggle.com/datasets/jehanbhathena/weather-dataset) |
-| 坚果 | --- |各种坚果种类识别 | 0.9412 | --- | [原数据下载地址](https://www.kaggle.com/datasets/gpiosenka/tree-nuts-image-classification) |
-| 时装 | --- |首饰、挎包、化妆品等时尚商品识别 | 0.9555 | --- | [原数据下载地址](https://www.kaggle.com/datasets/paramaggarwal/fashion-product-images-small) |
-| 垃圾 | --- |12种垃圾分类识别 | 0.9845 | --- | [原数据下载地址](https://www.kaggle.com/datasets/mostafaabla/garbage-classification) |
-| 航拍场景 | --- |各种航拍场景识别，如机场、火车站等 | 0.9797 | --- | [原数据下载地址](https://www.kaggle.com/datasets/jiayuanchengala/aid-scene-classification-datasets) |
-| 蔬菜 | --- |各种蔬菜识别 | 0.8929 | --- | [原数据下载地址](https://www.kaggle.com/datasets/zhaoyj688/vegfru) |
-| 商标 | --- |两千多种logo识别 | 0.9313 | --- | [原数据下载地址](https://github.com/Wangjing1551/LogoDet-3K-Dataset) |
+| 球类 | <img src="../../images/ppshitu_application_scenarios/Ball.jpg" height = "100"> |各种球类识别 | 0.9769 | --- | [原数据下载地址](https://www.kaggle.com/datasets/gpiosenka/balls-image-classification) |
+| 狗识别 | <img src="../../images/ppshitu_application_scenarios/DogBreeds.jpg" height = "100"> | 狗细分类识别，包括69种狗的图像 | 0.9606 | --- | [原数据下载地址](https://www.kaggle.com/datasets/gpiosenka/70-dog-breedsimage-data-set) |
+| 宝石 | <img src="../../images/ppshitu_application_scenarios/Gemstones.jpg" height = "100"> | 宝石种类识别 | 0.9653 | --- | [原数据下载地址](https://www.kaggle.com/datasets/lsind18/gemstones-images) |
+| 动物 | <img src="../../images/ppshitu_application_scenarios/AnimalImageDataset.jpg" height = "100"> |各种动物识别 | 0.9078 | --- | [原数据下载地址](https://www.kaggle.com/datasets/iamsouravbanerjee/animal-image-dataset-90-different-animals) |
+| 鸟类 | <img src="../../images/ppshitu_application_scenarios/Bird400.jpg" height = "100"> |鸟细分类识别，包括400种鸟类各种姿态 | 0.9673 | --- | [原数据下载地址](https://www.kaggle.com/datasets/gpiosenka/100-bird-species) |
+| 交通工具 | <img src="../../images/ppshitu_application_scenarios/Vechicles.jpg" height = "100"> |车、船等交通工具粗分类识别 | 0.9307 | --- | [原数据下载地址](https://www.kaggle.com/datasets/rishabkoul1/vechicle-dataset) |
+| 花 | <img src="../../images/ppshitu_application_scenarios/104flowers.jpeg" height = "100"> |104种花细分类识别 | 0.9788 | --- | [原数据下载地址](https://www.kaggle.com/datasets/msheriey/104-flowers-garden-of-eden) |
+| 运动种类 | <img src="../../images/ppshitu_application_scenarios/100sports.jpg" height = "100"> |100种运动图像识别 | 0.9413 | --- | [原数据下载地址](https://www.kaggle.com/datasets/gpiosenka/sports-classification) |
+| 乐器 | <img src="../../images/ppshitu_application_scenarios/MusicInstruments.jpg" height = "100"> |30种不同乐器种类识别 | 0.9467 | --- | [原数据下载地址](https://www.kaggle.com/datasets/gpiosenka/musical-instruments-image-classification) |
+| 宝可梦 | <img src="../../images/ppshitu_application_scenarios/Pokemon.png" height = "100"> |宝可梦神奇宝贝识别 | 0.9236 | --- | [原数据下载地址](https://www.kaggle.com/datasets/lantian773030/pokemonclassification) |
+| 船 | <img src="../../images/ppshitu_application_scenarios/Boat.jpg" height = "100"> |船种类识别 |0.9242 | --- | [原数据下载地址](https://www.kaggle.com/datasets/imsparsh/dockship-boat-type-classification) |
+| 鞋子 | <img src="../../images/ppshitu_application_scenarios/Shoes.jpeg" height = "100"> |鞋子种类识别，包括靴子、拖鞋等 | 0.9000 | --- | [原数据下载地址](https://www.kaggle.com/datasets/noobyogi0100/shoe-dataset) |
+| 巴黎建筑 | <img src="../../images/ppshitu_application_scenarios/Paris.jpg" height = "100"> |巴黎著名建筑景点识别，如：巴黎铁塔、圣母院等 | 1.000 | --- | [原数据下载地址](https://www.kaggle.com/datasets/skylord/oxbuildings) |
+| 蝴蝶 | <img src="../../images/ppshitu_application_scenarios/Butterfly.jpg" height = "100"> |75种蝴蝶细分类识别 | 0.9360 | --- | [原数据下载地址](https://www.kaggle.com/datasets/gpiosenka/butterfly-images40-species) |
+| 野外植物 | <img src="../../images/ppshitu_application_scenarios/WildEdiblePlants.jpg" height = "100"> |野外植物识别 | 0.9758 | --- | [原数据下载地址](https://www.kaggle.com/datasets/ryanpartridge01/wild-edible-plants) |
+| 天气 | <img src="../../images/ppshitu_application_scenarios/WeatherImageRecognition.jpg" height = "100"> |各种天气场景识别，如：雨天、打雷、下雪等 | 0.9924 | --- | [原数据下载地址](https://www.kaggle.com/datasets/jehanbhathena/weather-dataset) |
+| 坚果 | <img src="../../images/ppshitu_application_scenarios/TreeNuts.jpg" height = "100"> |各种坚果种类识别 | 0.9412 | --- | [原数据下载地址](https://www.kaggle.com/datasets/gpiosenka/tree-nuts-image-classification) |
+| 时装 | <img src="../../images/ppshitu_application_scenarios/FashionProductsImage.jpg" height = "100"> |首饰、挎包、化妆品等时尚商品识别 | 0.9555 | --- | [原数据下载地址](https://www.kaggle.com/datasets/paramaggarwal/fashion-product-images-small) |
+| 垃圾 | <img src="../../images/ppshitu_application_scenarios/Garbage12.jpg" height = "100"> |12种垃圾分类识别 | 0.9845 | --- | [原数据下载地址](https://www.kaggle.com/datasets/mostafaabla/garbage-classification) |
+| 航拍场景 | <img src="../../images/ppshitu_application_scenarios/AID.jpg" height = "100"> |各种航拍场景识别，如机场、火车站等 | 0.9797 | --- | [原数据下载地址](https://www.kaggle.com/datasets/jiayuanchengala/aid-scene-classification-datasets) |
+| 蔬菜 | <img src="../../images/ppshitu_application_scenarios/Veg200.jpg" height = "100"> |各种蔬菜识别 | 0.8929 | --- | [原数据下载地址](https://www.kaggle.com/datasets/zhaoyj688/vegfru) |
+| 商标 | <img src="../../images/ppshitu_application_scenarios/Logo3k.jpg" height = "100"> |两千多种logo识别 | 0.9313 | --- | [原数据下载地址](https://github.com/Wangjing1551/LogoDet-3K-Dataset) |
 
 
 
