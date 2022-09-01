@@ -321,6 +321,7 @@ if [[ ${MODE} = "paddle2onnx_infer" ]]; then
     inference_model_url=$(func_parser_value "${lines[10]}")
     tar_name=${inference_model_url##*/}
 
+    ${python_name} -m pip install onnx
     ${python_name} -m pip install paddle2onnx
     ${python_name} -m pip install onnxruntime
     if [[ ${model_name} =~ "GeneralRecognition" ]]; then
@@ -337,14 +338,12 @@ if [[ ${MODE} = "paddle2onnx_infer" ]]; then
         rm -rf val_list.txt
         ln -s demo_test.txt val_list.txt
         cd ../../
-        eval "wget -nc $model_url_value --no-check-certificate"
-        mv general_PPLCNet_x2_5_pretrained_v1.0.pdparams GeneralRecognition_PPLCNet_x2_5_pretrained.pdparams
     fi
     cd deploy
     mkdir models
     cd models
     wget -nc ${inference_model_url}
-    tar xf ${tar_name}
+    eval "tar -xf ${tar_name}"
     cd ../../
 fi
 
