@@ -103,6 +103,7 @@ class Cosine(object):
         eta_min(float): Minimum learning rate. Default: 0.0.
         warmup_epoch(int): The epoch numbers for LinearWarmup. Default: 0.
         warmup_start_lr(float): Initial learning rate of warm up. Default: 0.0.
+        by_epoch(bool): Whether lr decay by epoch. Default: False.
         last_epoch (int, optional):  The index of last epoch. Can be set to restart training. Default: -1, means initial learning rate.
     """
 
@@ -113,6 +114,7 @@ class Cosine(object):
                  eta_min=0.0,
                  warmup_epoch=0,
                  warmup_start_lr=0.0,
+                 by_epoch=False,
                  last_epoch=-1,
                  **kwargs):
         super().__init__()
@@ -121,26 +123,45 @@ class Cosine(object):
             logger.warning(msg)
             warmup_epoch = epochs
         self.learning_rate = learning_rate
-        self.T_max = (epochs - warmup_epoch) * step_each_epoch
+        self.T_max_epoch = epochs - warmup_epoch
+        self.T_max_steps = self.T_max_epoch * step_each_epoch
         self.eta_min = eta_min
         self.last_epoch = last_epoch
+        self.warmup_epoch = warmup_epoch
         self.warmup_steps = round(warmup_epoch * step_each_epoch)
         self.warmup_start_lr = warmup_start_lr
+        self.by_epoch = by_epoch
 
     def __call__(self):
-        learning_rate = lr.CosineAnnealingDecay(
-            learning_rate=self.learning_rate,
-            T_max=self.T_max,
-            eta_min=self.eta_min,
-            last_epoch=self.
-            last_epoch) if self.T_max > 0 else self.learning_rate
-        if self.warmup_steps > 0:
-            learning_rate = lr.LinearWarmup(
-                learning_rate=learning_rate,
-                warmup_steps=self.warmup_steps,
-                start_lr=self.warmup_start_lr,
-                end_lr=self.learning_rate,
-                last_epoch=self.last_epoch)
+        if self.by_epoch:
+            learning_rate = lr.CosineAnnealingDecay(
+                learning_rate=self.learning_rate,
+                T_max=self.T_max_epoch,
+                eta_min=self.eta_min,
+                last_epoch=self.
+                last_epoch) if self.T_max_epoch > 0 else self.learning_rate
+            if self.warmup_epoch > 0:
+                learning_rate = lr.LinearWarmup(
+                    learning_rate=learning_rate,
+                    warmup_steps=self.warmup_epoch,
+                    start_lr=self.warmup_start_lr,
+                    end_lr=self.learning_rate,
+                    last_epoch=self.last_epoch)
+        else:
+            learning_rate = lr.CosineAnnealingDecay(
+                learning_rate=self.learning_rate,
+                T_max=self.T_max_steps,
+                eta_min=self.eta_min,
+                last_epoch=self.
+                last_epoch) if self.T_max_steps > 0 else self.learning_rate
+            if self.warmup_steps > 0:
+                learning_rate = lr.LinearWarmup(
+                    learning_rate=learning_rate,
+                    warmup_steps=self.warmup_steps,
+                    start_lr=self.warmup_start_lr,
+                    end_lr=self.learning_rate,
+                    last_epoch=self.last_epoch)
+        setattr(learning_rate, "by_epoch", self.by_epoch)
         return learning_rate
 
 
