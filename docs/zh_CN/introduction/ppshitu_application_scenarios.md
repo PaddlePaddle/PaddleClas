@@ -14,6 +14,8 @@
   - [2.4 场景库识别与检索](#24-场景库识别与检索)
     - [2.4.1 识别单张图像](#241-识别单张图像)
     - [2.4.2 基于文件夹的批量识别](#242-基于文件夹的批量识别)
+  - [3 新增场景库图像识别体验](#3-新增场景库图像识别体验)
+    - [3.1 根据相似度划分Gallery和Query](#31-根据相似度划分gallery和query)
 
 <a name="1. 应用场景介绍"></a>
 
@@ -80,15 +82,15 @@ wget {场景库下载链接} && tar -xf {压缩包的名称}
 以`dataset_name`为例，解压完毕后，`datasets/dataset_name`文件夹下应有如下文件结构：
 ```shel
 ├── dataset_name/
-│   ├── gallery/
-│   ├── index/
-│   ├── query/
+│   ├── Gallery/
+│   ├── Index/
+│   ├── Query/
 │   ├── gallery_list.txt/
 │   ├── query_list.txt/
 │   ├── image_list.txt/
 ├── ...
 ```
-其中，`gallery`文件夹中存放的是用于构建索引库的原始图像，`index`表示基于原始图像构建得到的索引库信息，`query`文件夹存放的是用于检索的图像列表，`gallery_list.txt`和`query_list.txt`分别为索引库和检索图像的标签文件。
+其中，`Gallery`文件夹中存放的是用于构建索引库的原始图像，`Index`表示基于原始图像构建得到的索引库信息，`Query`文件夹存放的是用于检索的图像列表，`gallery_list.txt`和`query_list.txt`分别为索引库和检索图像的标签文件。
 
 <a name="2.3 准备识别模型"></a>
 
@@ -112,10 +114,10 @@ wget {识别模型下载链接} && tar -xf {识别模型压缩包名称}
 │   ├── inference.pdiparams
 │   ├── inference.pdiparams.info
 │   └── inference.pdmodel
-├── det_model_name
-│   ├── inference.pdiparams
-│   ├── inference.pdiparams.info
-│   └── inference.pdmodel
+└── det_model_name
+    ├── inference.pdiparams
+    ├── inference.pdiparams.info
+    └── inference.pdmodel
 ```
 
 <a name="2.4 场景库识别与检索"></a>
@@ -196,3 +198,111 @@ python3.7 python/predict_system.py -c configs/inference_general.yaml -o Global.i
 ...
 ```
 所有图像的识别结果可视化图像也保存在`output`文件夹内。
+
+<a name="3 新增场景库图像识别体验"></a>
+
+### 3 新增场景库图像识别体验
+
+该部分内容介绍根据新数据集创建场景库并进行指标验证和识别检索的方法。
+
+<a name="3.1 根据相似度划分Gallery和Query"></a>
+
+#### 3.1 根据相似度划分Gallery和Query
+
+首先制作需要创建场景库数据集的`image_list.txt`，该文件格式如下：
+```
+# 每一行采用“空格”分割图像路径与标签
+image_path_1 label_1
+image_path_2 label_1
+image_path_3 label_1
+image_path_4 label_2
+...
+```
+
+在配置文件`configs/index_selector.yaml`中的`Datasets`字段中添加新建场景库对应数据集的信息，格式如下：
+```shell
+Datasets:
+  DatasetName:
+    infer_path: "path/to/image"
+    infer_imgs: "path/to/image_list.txt"
+    output_path: "path/to/save/Gallery&Query"
+    gallery_num: 20
+    sim_thred: 0.88
+```
+
+其中，`DatasetName`表示新建场景库的名字，`infer_path`为保存新建场景库对应数据集图像的文件夹路径，`infer_imgs`为`image_list.txt`的路径，`output_path`为划分好gallery和query的保存路径，`gallery_num`为每类gallery图像的最大数量，`sim_thred`为选择query图像时与gallery图像的相似度阈值。
+
+运行如下命令，根据相似度划分gallery和query：
+```shell
+python shitu_index_selector/index_selector.py -c configs/index_selector.yaml
+```
+
+输出结果如下：
+```
+Mean of gallery num: 20
+Mean of query num: 26
+```
+其中`Mean of gallery num`表示划分的gallery库每类图像数均值，`Mean of query num`表示划分的query库每类图像数均值。
+
+划分好的文件结构如下：
+```
+├── Gallery
+│   ├── class1
+│   │      ├──image1.jpg
+│   │      ├──image2.jpg
+│   │      ├──...
+│   ├── class2
+│   └── ...
+├── Query
+│   ├── class1
+│   ├── class2
+│   └── ...
+├── gallery_list.txt
+└── query_list.txt
+```
+其中`Gallery`和`Query`分别为gallery和query库图像，`gallery_list.txt`和`query_list.txt`分别为对应的标签文件。
+
+
+<a name="3.2 根据Gallery生成index"></a>
+
+#### 3.2 根据划分好的Gallery生成index
+首先在配置文件`configs/sample_indexes.yaml`中的`Datasets`字段中添加新建场景库的信息，格式如下：
+```shell
+Datasets:
+  DatasetName:
+    infer_path: "path/to/Gallery/images"
+    infer_imgs: "path/to/gallery_list.txt"
+    output_dir: "path/to/save/index"
+```
+其中，`DatasetName`表示新建场景库的名字，`infer_path`为保存新建场景库划分好的gallery图像路径，`infer_imgs`为`gallery_list.txt`的路径，`output_path`为保存生成index的路径。
+
+然后在配置文件`configs/sample_indexes.yaml`中的`Method`字段中添加生成index的方法，格式如下：
+```shell
+Methods:
+  SampleAll:
+    method_name: SampleAll
+
+  RandomSample_10:
+    method_name: RandomSample
+    gallery_num: 10
+```
+其中PaddleClas提供了两种方法：`SampleAll`为根据提供的所有Gallery图像生成index，`RandomSample`为根据提供的Gallery图像每类随机选取`gallery_num`张图像生成index，可根据需要选择对应的方法。同时，也可以参考`shitu_index_selector/index_random_sample.py`和`shitu_index_selector/index_sample_all.py`实现其他图像选择方式生成index。
+
+生成的index文件结构如下：
+```
+├── RandomSample_10
+│   ├── gallery
+│   │      ├──class1
+│   │      │     ├──image1.jpg
+│   │      │     ├──...
+│   │      ├──class2
+│   │      └──...
+│   └── index
+│          ├──id_map.pkl
+│          └──vector.index
+└──SampleAll
+    └── index
+           ├──id_map.pkl
+           └──vector.index
+```
+其中，`RadomSample`方法生成index后，会保存随机采样的Gallery图像到`gallery`文件夹。
