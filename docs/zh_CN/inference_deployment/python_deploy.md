@@ -1,4 +1,4 @@
-# Python3.7 预测推理
+# Python 预测推理
 
 首先请参考文档[环境准备](../installation/install_paddleclas.md)配置运行环境。
 
