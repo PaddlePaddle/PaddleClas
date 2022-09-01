@@ -45,7 +45,7 @@
 
 **注：** 华为鸿蒙OS 3.0的系统可能会出现无法调用摄像头的情况，建议更换低版本系统或者使用其它安卓机型进行快速体验。
 
-<div align=center><img src="../../images/quick_start/android_demo/PPShiTu_qcode.png" height="400" width="400"/></div>
+<div align=center><img src="../../images/quick_start/android_demo/PPShiTu_qrcode.png" height="400" width="400"/></div>
 
 <a name="功能体验"></a>
 
