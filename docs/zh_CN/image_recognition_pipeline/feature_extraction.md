@@ -120,7 +120,7 @@ Loss 部分选用 [Cross entropy loss](../../../ppcls/loss/celoss.py) 和 [Tripl
 
 ### 4.2 PP-ShiTuV2
 
-训练数据为如下 7 个公开数据集的汇总：
+训练数据为如下 16 个公开数据集的汇总：
 
 | 数据集                 | 数据量  |  类别数  | 场景  |                                      数据集地址                                      |
 | :--------------------- | :-----: | :------: | :---: | :----------------------------------------------------------------------------------: |
@@ -147,10 +147,10 @@ Loss 部分选用 [Cross entropy loss](../../../ppcls/loss/celoss.py) 和 [Tripl
 
 |                模型                 | Aliproduct | VeRI-Wild | LogoDet-3K |  SOP  | Inshop | imdb_face | iNat  | instre | sketch | Latency(ms) |
 | :---------------------------------: | :--------: | :-------: | :--------: | :---: | :----: | :-------: | :---: | :----: | :----: | :---------: |
-| GeneralRecognitionV2_PPLCNetV2_base |   0.842    |   0.878   |   0.880    | 0.776 | 0.908  |   0.359   | 0.386 | 0.877  | 0.393  |     5.0     |
+| GeneralRecognitionV2_PPLCNetV2_base |   0.842    |   0.878   |   0.880    | 0.776 | 0.908  |   0.359   | 0.386 | 0.877  | 0.393  |     TODO     |
 
 * 预训练模型地址：[general_PPLCNetV2_base_pretrained_v1.0.pdparams](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/pretrain/PPShiTuV2/general_PPLCNetV2_base_pretrained_v1.0.pdparams)
-* 采用的评测指标为：`Recall@1`
+* 采用的评测指标为：`Recall@1` 与 `mAP`
 * 速度评测机器的 CPU 具体信息为：`Intel(R) Xeon(R) Gold 6148 CPU @ 2.40GHz`
 * 速度指标的评测条件为： 开启 MKLDNN, 线程数设置为 10
 
