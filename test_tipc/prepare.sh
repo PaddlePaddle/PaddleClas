@@ -245,12 +245,12 @@ elif [[ ${MODE} = "whole_infer" ]]; then
         cd ../../
     fi
     # download inference or pretrained model
-    eval "wget -nc $model_url_value"
+    eval "wget -nc ${model_url_value}"
     if [[ ${model_url_value} =~ ".tar" ]]; then
         tar_name=$(func_get_url_file_name "${model_url_value}")
-        echo $tar_name
+        echo ${tar_name}
+        eval "tar -xf ${tar_name}"
         rm -rf {tar_name}
-        tar xf ${tar_name}
     fi
     if [[ $model_name == "SwinTransformer_large_patch4_window7_224" || $model_name == "SwinTransformer_large_patch4_window12_384" ]]; then
         cmd="mv ${model_name}_22kto1k_pretrained.pdparams ${model_name}_pretrained.pdparams"
