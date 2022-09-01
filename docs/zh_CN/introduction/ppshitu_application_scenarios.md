@@ -16,6 +16,7 @@
     - [2.4.2 基于文件夹的批量识别](#242-基于文件夹的批量识别)
   - [3 新增场景库图像识别体验](#3-新增场景库图像识别体验)
     - [3.1 根据相似度划分Gallery和Query](#31-根据相似度划分gallery和query)
+    - [3.2 根据划分好的Gallery构建index索引](#32-根据划分好的gallery构建index索引)
 
 <a name="1. 应用场景介绍"></a>
 
@@ -263,9 +264,9 @@ Mean of query num: 26
 其中`Gallery`和`Query`分别为gallery和query库图像，`gallery_list.txt`和`query_list.txt`分别为对应的标签文件。
 
 
-<a name="3.2 根据Gallery生成index"></a>
+<a name="3.2 根据Gallery构建index索引"></a>
 
-#### 3.2 根据划分好的Gallery生成index
+#### 3.2 根据划分好的Gallery构建index索引
 首先在配置文件`configs/sample_indexes.yaml`中的`Datasets`字段中添加新建场景库的信息，格式如下：
 ```shell
 Datasets:
@@ -274,9 +275,9 @@ Datasets:
     infer_imgs: "path/to/gallery_list.txt"
     output_dir: "path/to/save/index"
 ```
-其中，`DatasetName`表示新建场景库的名字，`infer_path`为保存新建场景库划分好的gallery图像路径，`infer_imgs`为`gallery_list.txt`的路径，`output_path`为保存生成index的路径。
+其中，`DatasetName`表示新建场景库的名字，`infer_path`为保存新建场景库划分好的gallery图像路径，`infer_imgs`为`gallery_list.txt`的路径，`output_path`为保存构建`index`索引的路径。
 
-然后在配置文件`configs/sample_indexes.yaml`中的`Method`字段中添加生成index的方法，格式如下：
+然后在配置文件`configs/sample_indexes.yaml`中的`Method`字段中添加构建`index`索引的方法，格式如下：
 ```shell
 Methods:
   SampleAll:
@@ -286,9 +287,9 @@ Methods:
     method_name: RandomSample
     gallery_num: 10
 ```
-其中PaddleClas提供了两种方法：`SampleAll`为根据提供的所有Gallery图像生成index，`RandomSample`为根据提供的Gallery图像每类随机选取`gallery_num`张图像生成index，可根据需要选择对应的方法。同时，也可以参考`shitu_index_selector/index_random_sample.py`和`shitu_index_selector/index_sample_all.py`实现其他图像选择方式生成index。
+其中PaddleClas提供了两种方法：`SampleAll`为根据提供的所有Gallery图像构建`index`索引，`RandomSample`为根据提供的Gallery图像每类随机选取`gallery_num`张图像构建`index`索引，可根据需要选择对应的方法。同时，也可以参考`shitu_index_selector/index_random_sample.py`和`shitu_index_selector/index_sample_all.py`实现其他图像选择方式构建`index`索引。
 
-生成的index文件结构如下：
+构建的`index`索引库文件结构如下：
 ```
 ├── RandomSample_10
 │   ├── gallery
@@ -305,4 +306,8 @@ Methods:
            ├──id_map.pkl
            └──vector.index
 ```
-其中，`RadomSample`方法生成index后，会保存随机采样的Gallery图像到`gallery`文件夹。
+其中，`RadomSample`方法构建index索引后，会保存随机采样的Gallery图像到`gallery`文件夹。
+
+使用新的`index`索引库进行图像识别，需要修改配置文件中的`IndexProcess.index_dir`字段来更改索引库的路径。
+
+注意：划分Gallery、构建`index`索引库以及进行图像识别时，应当使用同一个识别模型（即三个步骤配置文件中的`Global.rec_inference_model_dir`字段保持一致）。
