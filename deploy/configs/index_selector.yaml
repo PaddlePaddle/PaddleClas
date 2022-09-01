@@ -50,16 +50,9 @@ RecPostProcess: null
 
 
 Datasets:
-  # DogBreeds: 
-  #   infer_path: "/ppshitu_datasets/Manual/69_DogBreeds"
-  #   infer_imgs: "/ppshitu_datasets/Manual/69_DogBreeds/image_list.txt"
-  #   output_path: "/ppshitu_datasets/Gallery_Select_by_Similarity/69_DogBreeds"
-  #   gallery_num: 20
-  #   sim_thred: 0.88
-
   DemoDataset:
-    infer_path: "/ppshitu_datasets/Demo/6_Shoes"
-    infer_imgs: "/ppshitu_datasets/Demo/6_Shoes/image_list.txt"
+    infer_path: "/ppshitu_datasets/Demo/DemoDataset"
+    infer_imgs: "/ppshitu_datasets/Demo/DemoDataset/image_list.txt"
     output_path: "/ppshitu_datasets/Demo/Demo_gallery_query"
     gallery_num: 20
     sim_thred: 0.7

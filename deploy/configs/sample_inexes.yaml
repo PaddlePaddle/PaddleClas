@@ -24,14 +24,10 @@ Global:
   enable_profile: False
 
 Datasets:
-  # DogBreeds:
-  #   infer_path: "/ppshitu_datasets/Gallery_Select_by_Similarity/69_DogBreeds"
-  #   infer_imgs: "/ppshitu_datasets/Gallery_Select_by_Similarity/69_DogBreeds/gallery_list.txt"
-  #   output_dir: "/ppshitu_datasets/Gallery_Select_by_Similarity/69_DogBreeds/Index"
-  Demo_gallery_query:
-    infer_path: "/ppshitu_datasets/Demo/Demo_gallery_query"
-    infer_imgs: "/ppshitu_datasets/Demo/Demo_gallery_query/gallery_list.txt"
-    output_dir: "/ppshitu_datasets/Demo/Demo_gallery_query/Index"
+  # Demo_gallery_query:
+  #   infer_path: "/ppshitu_datasets/Demo/Demo_gallery_query"
+  #   infer_imgs: "/ppshitu_datasets/Demo/Demo_gallery_query/gallery_list.txt"
+  #   output_dir: "/ppshitu_datasets/Demo/Demo_gallery_query/Index"
 
 Methods:
   SampleAll:
