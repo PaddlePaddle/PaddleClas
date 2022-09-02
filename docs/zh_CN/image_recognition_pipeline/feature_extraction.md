@@ -6,19 +6,13 @@
 - [1. 摘要](#1-摘要)
 - [2. 介绍](#2-介绍)
 - [3. 方法](#3-方法)
-  - [3.1 PP-ShiTuV1](#31-pp-shituv1)
+  - [3.1 PP-ShiTuV2](#31-pp-shituv2)
     - [3.1.1 Backbone](#311-backbone)
     - [3.1.2 Neck](#312-neck)
     - [3.1.3 Head](#313-head)
     - [3.1.4 Loss](#314-loss)
-  - [3.2 PP-ShiTuV2](#32-pp-shituv2)
-    - [3.2.1 Backbone](#321-backbone)
-    - [3.2.2 Neck](#322-neck)
-    - [3.2.3 Head](#323-head)
-    - [3.2.4 Loss](#324-loss)
 - [4. 实验部分](#4-实验部分)
-  - [4.1 PP-ShiTuV1](#41-pp-shituv1)
-  - [4.2 PP-ShiTuV2](#42-pp-shituv2)
+  - [4.1 PP-ShiTuV2](#41-pp-shituv2)
 - [5. 自定义特征提取](#5-自定义特征提取)
   - [5.1 数据准备](#51-数据准备)
   - [5.2 模型训练](#52-模型训练)
@@ -52,39 +46,21 @@
 
 ## 3. 方法
 
-### 3.1 PP-ShiTuV1
+### 3.1 PP-ShiTuV2
 
 #### 3.1.1 Backbone
 
-Backbone 部分采用了 [PP_LCNet_x2_5](../models/PP-LCNet.md)，其针对Intel CPU端的性能优化探索了多个有效的结构设计方案，最终实现了在不增加推理时间的情况下，进一步提升模型的性能，最终大幅度超越现有的 SOTA 模型。
+Backbone 部分采用了 [PP-LCNetV2_base](../models/PP-LCNetV2.md)，其针对Intel CPU端的性能优化探索了多个有效的结构设计方案，最终实现了在不增加推理时间的情况下，进一步提升模型的性能，最终大幅度超越现有的 SOTA 模型。
 
 #### 3.1.2 Neck
 
-Neck 部分采用了 [FC Layer](../../../ppcls/arch/gears/fc.py)，对 Backbone 抽取得到的特征进行降维，减少了特征存储的成本与计算量。
+Neck 部分采用了 [BN Neck](../../../ppcls/arch/gears/bnneck.py)，对 Backbone 抽取得到的特征的每个维度进行标准化操作，减少了同时优化度量学习损失和分类损失的难度。
 
 #### 3.1.3 Head
 
-Head 部分选用 [ArcMargin](../../../ppcls/arch/gears/arcmargin.py)，在训练时通过指定margin，增大同类特征之间的角度差异再进行分类，进一步提升抽取特征的表征能力。
-
-#### 3.1.4 Loss
-
-Loss 部分选用 [Cross entropy loss](../../../ppcls/loss/celoss.py)，在训练时以分类任务的损失函数来指导网络进行优化。详细的配置文件见[通用识别配置文件](../../../ppcls/configs/GeneralRecognition/GeneralRecognition_PPLCNet_x2_5.yaml)。
-
-### 3.2 PP-ShiTuV2
-
-#### 3.2.1 Backbone
-
-Backbone 部分采用了 [PP-LCNetV2_base](../models/PP-LCNetV2.md)，其针对Intel CPU端的性能优化探索了多个有效的结构设计方案，最终实现了在不增加推理时间的情况下，进一步提升模型的性能，最终大幅度超越现有的 SOTA 模型。
-
-#### 3.2.2 Neck
-
-Neck 部分采用了 [BN Neck](../../../ppcls/arch/gears/bnneck.py)，对 Backbone 抽取得到的特征的每个维度进行标准化操作，减少了同时优化度量学习损失和分类损失的难度。
-
-#### 3.2.3 Head
-
 Head 部分选用 [FC Layer](../../../ppcls/arch/gears/fc.py)，使用分类头将 feature 转换成 logits 供后续计算分类损失。
 
-#### 3.2.4 Loss
+#### 3.1.4 Loss
 
 Loss 部分选用 [Cross entropy loss](../../../ppcls/loss/celoss.py) 和 [TripletAngularMarginLoss](../../../ppcls/loss/tripletangularmarginloss.py)，在训练时以分类损失和基于角度的三元组损失来指导网络进行优化。详细的配置文件见[GeneralRecognitionV2_PPLCNetV2_base.yaml](../../../ppcls/configs/GeneralRecognitionV2/GeneralRecognitionV2_PPLCNetV2_base.yaml#L63-77)。
 
@@ -92,33 +68,7 @@ Loss 部分选用 [Cross entropy loss](../../../ppcls/loss/celoss.py) 和 [Tripl
 
 ## 4. 实验部分
 
-### 4.1 PP-ShiTuV1
-
-训练数据为如下 7 个公开数据集的汇总：
-
-| 数据集       | 数据量  |  类别数  |   场景   |                                  数据集地址                                  |
-| :----------- | :-----: | :------: | :------: | :--------------------------------------------------------------------------: |
-| Aliproduct   | 2498771 |  50030   |   商品   |  [地址](https://retailvisionworkshop.github.io/recognition_challenge_2020/)  |
-| GLDv2        | 1580470 |  81313   |   地标   |           [地址](https://github.com/cvdfoundation/google-landmark)           |
-| VeRI-Wild    | 277797  |  30671   |   车辆   |                [地址](https://github.com/PKU-IMRE/VERI-Wild)                 |
-| LogoDet-3K   | 155427  |   3000   |   Logo   |          [地址](https://github.com/Wangjing1551/LogoDet-3K-Dataset)          |
-| iCartoonFace | 389678  |   5013   | 动漫人物 | [地址](http://challenge.ai.iqiyi.com/detail?raceId=5def69ace9fcf68aef76a75d) |
-| SOP          |  59551  |  11318   |   商品   |          [地址](https://cvgl.stanford.edu/projects/lifted_struct/)           |
-| Inshop       |  25882  |   3997   |   商品   |        [地址](http://mmlab.ie.cuhk.edu.hk/projects/DeepFashion.html)         |
-| **Total**    | **5M**  | **185K** |    -     |                                      -                                       |
-
-最终的模型精度指标如下表所示:
-
-|              模型               | Aliproduct | VeRI-Wild | LogoDet-3K | iCartoonFace |  SOP  | Inshop | Latency(ms) |
-| :-----------------------------: | :--------: | :-------: | :--------: | :----------: | :---: | :----: | :---------: |
-| GeneralRecognition_PPLCNet_x2_5 |   0.839    |   0.888   |   0.861    |    0.841     | 0.793 | 0.892  |     5.0     |
-
-* 预训练模型地址：[通用识别预训练模型](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/pretrain/general_PPLCNet_x2_5_pretrained_v1.0.pdparams)
-* 采用的评测指标为：`Recall@1`
-* 速度评测机器的 CPU 具体信息为：`Intel(R) Xeon(R) Gold 6148 CPU @ 2.40GHz`
-* 速度指标的评测条件为： 开启 MKLDNN, 线程数设置为 10
-
-### 4.2 PP-ShiTuV2
+### 4.1 PP-ShiTuV2
 
 我们对原有的训练数据进行了合理扩充与优化，最终使用如下 16 个公开数据集的汇总：
 
@@ -145,9 +95,15 @@ Loss 部分选用 [Cross entropy loss](../../../ppcls/loss/celoss.py) 和 [Tripl
 
 最终的模型精度指标如下表所示:
 
-|                模型                 | Aliproduct | VeRI-Wild | LogoDet-3K |  SOP  | Inshop | imdb_face | iNat  | instre | sketch | Latency(ms) |
-| :---------------------------------: | :--------: | :-------: | :--------: | :---: | :----: | :-------: | :---: | :----: | :----: | :---------: |
-| GeneralRecognitionV2_PPLCNetV2_base |   0.842    |   0.878   |   0.880    | 0.776 | 0.908  |   0.359   | 0.386 | 0.877  | 0.393  |     TODO     |
+  | 模型       | Aliproduct      | VeRI-Wild       | LogoDet-3k      | iCartoonFace    | SOP             | Inshop          |
+  | :--------- | :-------------- | :-------------- | :-------------- | :-------------- | :-------------- | :-------------- |
+  | -          | recall@1%(mAP%) | recall@1%(mAP%) | recall@1%(mAP%) | recall@1%(mAP%) | recall@1%(mAP%) | recall@1%(mAP%) |
+  | PP-ShiTuV2 | 84.2(83.3)      | 87.8(68.8)      | 88.0(63.2)      | 53.6(27.5)      | 77.6(55.3)      | 90.8(74.3)      |
+
+  | 模型       | gldv2           | imdb_face       | iNat            | instre          | sketch          | sop<sup>*</sup> |
+  | :--------- | :-------------- | :-------------- | :-------------- | :-------------- | :-------------- | :-------------- |
+  | -          | recall@1%(mAP%) | recall@1%(mAP%) | recall@1%(mAP%) | recall@1%(mAP%) | recall@1%(mAP%) | recall@1%(mAP%) |
+  | PP-ShiTuV2 | 98.1(90.5)      | 35.9(11.2)      | 38.6(23.9)      | 87.7(71.4)      | 39.3(15.6)      | 98.3(90.9)      |
 
 * 预训练模型地址：[general_PPLCNetV2_base_pretrained_v1.0.pdparams](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/pretrain/PPShiTuV2/general_PPLCNetV2_base_pretrained_v1.0.pdparams)
 * 采用的评测指标为：`Recall@1` 与 `mAP`

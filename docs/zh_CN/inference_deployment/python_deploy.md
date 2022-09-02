@@ -62,8 +62,8 @@ cd PaddleClas/deploy
 ```shell
 mkdir -p models
 # 下载通用检测 inference 模型并解压
-wget -nc -P ./models/ https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/inference/ppyolov2_r50vd_dcn_mainbody_v1.0_infer.tar
-tar -xf ./models/ppyolov2_r50vd_dcn_mainbody_v1.0_infer.tar -C ./models/
+wget -nc -P ./models/ https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/inference/picodet_PPLCNet_x2_5_mainbody_lite_v1.0_infer.tar
+tar -xf ./models/picodet_PPLCNet_x2_5_mainbody_lite_v1.0_infer.tar -C ./models/
 ```
 
 使用以下命令进行预测：
@@ -91,8 +91,8 @@ cd PaddleClas/deploy
 ```shell
 mkdir -p models
 # 下载商品特征提取 inference 模型并解压
-wget -nc -P ./models/ https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/inference/product_ResNet50_vd_aliproduct_v1.0_infer.tar
-tar -xf ./models/product_ResNet50_vd_aliproduct_v1.0_infer.tar -C ./models/
+wget -nc -P ./models/ https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/inference/PP-ShiTuV2/general_PPLCNetV2_base_pretrained_v1.0_infer.tar
+tar -xf ./models/general_PPLCNetV2_base_pretrained_v1.0_infer.tar -C ./models/
 ```
 
 使用以下命令进行预测：
