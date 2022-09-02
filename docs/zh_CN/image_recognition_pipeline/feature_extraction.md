@@ -6,13 +6,11 @@
 - [1. 摘要](#1-摘要)
 - [2. 介绍](#2-介绍)
 - [3. 方法](#3-方法)
-  - [3.1 PP-ShiTuV2](#31-pp-shituv2)
-    - [3.1.1 Backbone](#311-backbone)
-    - [3.1.2 Neck](#312-neck)
-    - [3.1.3 Head](#313-head)
-    - [3.1.4 Loss](#314-loss)
+    - [3.1 Backbone](#31-backbone)
+    - [3.2 Neck](#32-neck)
+    - [3.3 Head](#33-head)
+    - [3.4 Loss](#34-loss)
 - [4. 实验部分](#4-实验部分)
-  - [4.1 PP-ShiTuV2](#41-pp-shituv2)
 - [5. 自定义特征提取](#5-自定义特征提取)
   - [5.1 数据准备](#51-数据准备)
   - [5.2 模型训练](#52-模型训练)
@@ -37,38 +35,34 @@
 ![](../../images/feature_extraction_framework.png)
 图中各个模块的功能为:
 
-- **Backbone**: 用于提取输入图像初步特征的骨干网络，一般由配置文件中的 [`Backbone`](../../../ppcls/configs/GeneralRecognition/GeneralRecognition_PPLCNet_x2_5.yaml#L26-L29) 以及 [`BackboneStopLayer`](../../../ppcls/configs/GeneralRecognition/GeneralRecognition_PPLCNet_x2_5.yaml#L30-L31) 字段共同指定。
-- **Neck**: 用以特征增强及特征维度变换。可以是一个简单的 FC Layer，用来做特征维度变换；也可以是较复杂的 FPN 结构，用以做特征增强，一般由配置文件中的 [`Neck`](../../../ppcls/configs/GeneralRecognition/GeneralRecognition_PPLCNet_x2_5.yaml#L32-L35)字段指定。
-- **Head**: 用来将 `Neck` 的输出 feature 转化为 logits，让模型在训练阶段能以分类任务的形式进行训练。除了常用的 FC Layer 外，还可以替换为 [CosMargin](../../../ppcls/arch/gears/cosmargin.py), [ArcMargin](../../../ppcls/arch/gears/arcmargin.py), [CircleMargin](../../../ppcls/arch/gears/circlemargin.py) 等模块，一般由配置文件中的 [`Head`](../../../ppcls/configs/GeneralRecognition/GeneralRecognition_PPLCNet_x2_5.yaml#L36-L41) 字段指定。
-- **Loss**: 指定所使用的 Loss 函数。我们将 Loss 设计为组合 loss 的形式，可以方便地将 Classification Loss 和 Metric learning Loss 组合在一起，一般由配置文件中的 [`Loss`](../../../ppcls/configs/GeneralRecognition/GeneralRecognition_PPLCNet_x2_5.yaml#L44-L50) 字段指定。
+- **Backbone**: 用于提取输入图像初步特征的骨干网络，一般由配置文件中的 [`B.//ppcls/configs/GeneralRecognitionV2/GeneralRecognitionV2_PPLCNetV2_base.yaml#L26-L29) 以及 [`B.//ppcls/configs/GeneralRecognitionV2/GeneralRecognitionV2_PPLCNetV2_base.yaml#L30-L31) 字段共同指定。
+- **Neck**: 用以特征增强及特征维度变换。可以是一个简单的 FC Layer，用来做特征维度变换；也可以是较复杂的 FPN 结构，用以做特征增强，一般由配置文件中的 [`N.//ppcls/configs/GeneralRecognitionV2/GeneralRecognitionV2_PPLCNetV2_base.yaml#L32-L35)字段指定。
+- **Head**: 用来将 `Neck` 的输出 feature 转化为 logits，让模型在训练阶段能以分类任务的形式进行训练。除了常用的 FC Layer 外，还可以替换为 [CosMargin](../../../ppcls/arch/gears/cosmargin.py), [ArcMargin](../../../ppcls/arch/gears/arcmargin.py), [CircleMargin](../../../ppcls/arch/gears/circlemargin.py) 等模块，一般由配置文件中的 [`H.//ppcls/configs/GeneralRecognitionV2/GeneralRecognitionV2_PPLCNetV2_base.yaml#L36-L41) 字段指定。
+- **Loss**: 指定所使用的 Loss 函数。我们将 Loss 设计为组合 loss 的形式，可以方便地将 Classification Loss 和 Metric learning Loss 组合在一起，一般由配置文件中的 [`L.//ppcls/configs/GeneralRecognitionV2/GeneralRecognitionV2_PPLCNetV2_base.yaml#L44-L50) 字段指定。
 
 <a name="3"></a>
 
 ## 3. 方法
 
-### 3.1 PP-ShiTuV2
-
-#### 3.1.1 Backbone
+#### 3.1 Backbone
 
 Backbone 部分采用了 [PP-LCNetV2_base](../models/PP-LCNetV2.md)，其针对Intel CPU端的性能优化探索了多个有效的结构设计方案，最终实现了在不增加推理时间的情况下，进一步提升模型的性能，最终大幅度超越现有的 SOTA 模型。
 
-#### 3.1.2 Neck
+#### 3.2 Neck
 
 Neck 部分采用了 [BN Neck](../../../ppcls/arch/gears/bnneck.py)，对 Backbone 抽取得到的特征的每个维度进行标准化操作，减少了同时优化度量学习损失和分类损失的难度。
 
-#### 3.1.3 Head
+#### 3.3 Head
 
 Head 部分选用 [FC Layer](../../../ppcls/arch/gears/fc.py)，使用分类头将 feature 转换成 logits 供后续计算分类损失。
 
-#### 3.1.4 Loss
+#### 3.4 Loss
 
 Loss 部分选用 [Cross entropy loss](../../../ppcls/loss/celoss.py) 和 [TripletAngularMarginLoss](../../../ppcls/loss/tripletangularmarginloss.py)，在训练时以分类损失和基于角度的三元组损失来指导网络进行优化。详细的配置文件见[GeneralRecognitionV2_PPLCNetV2_base.yaml](../../../ppcls/configs/GeneralRecognitionV2/GeneralRecognitionV2_PPLCNetV2_base.yaml#L63-77)。
 
 <a name="4"></a>
 
 ## 4. 实验部分
-
-### 4.1 PP-ShiTuV2
 
 我们对原有的训练数据进行了合理扩充与优化，最终使用如下 16 个公开数据集的汇总：
 
@@ -116,7 +110,7 @@ Loss 部分选用 [Cross entropy loss](../../../ppcls/loss/celoss.py) 和 [Tripl
 
 自定义特征提取，是指依据自己的任务，重新训练特征提取模型。
 
-下面基于 `GeneralRecognition_PPLCNet_x2_5.yaml` 配置文件，介绍主要的四个步骤：1）数据准备；2）模型训练；3）模型评估；4）模型推理
+下面基于 `GeneralRecognitionV2_PPLCNetV2_base.yaml` 配置文件，介绍主要的四个步骤：1）数据准备；2）模型训练；3）模型评估；4）模型推理
 
 <a name="5.1"></a>
 
@@ -129,9 +123,14 @@ Loss 部分选用 [Cross entropy loss](../../../ppcls/loss/celoss.py) 和 [Tripl
 - 修改类别数：
   ```yaml
   Head:
-    name: ArcMargin
-    embedding_size: 512
-    class_num: 185341    # 此处表示类别数
+    name: FC
+    embedding_size: *feat_dim
+    class_num: 192612  # 此处表示类别数
+    weight_attr:
+      initializer:
+        name: Normal
+        std: 0.001
+    bias_attr: False
   ```
 - 修改训练数据集配置：
   ```yaml
@@ -140,6 +139,7 @@ Loss 部分选用 [Cross entropy loss](../../../ppcls/loss/celoss.py) 和 [Tripl
       name: ImageNetDataset
       image_root: ./dataset/     # 此处表示train数据所在的目录
       cls_label_path: ./dataset/train_reg_all_data.txt  # 此处表示train数据集label文件的地址
+      relabel: True
   ```
 - 修改评估数据集中query数据配置：
   ```yaml
@@ -168,14 +168,14 @@ Loss 部分选用 [Cross entropy loss](../../../ppcls/loss/celoss.py) 和 [Tripl
   ```shell
   export CUDA_VISIBLE_DEVICES=0
   python3.7 tools/train.py \
-  -c ppcls/configs/GeneralRecognition/GeneralRecognition_PPLCNet_x2_5.yaml
+  -c ./ppcls/configs/GeneralRecognitionV2/GeneralRecognitionV2_PPLCNetV2_base.yaml
   ```
 - 单机多卡训练
   ```shell
   export CUDA_VISIBLE_DEVICES=0,1,2,3
   python3.7 -m paddle.distributed.launch \
   --gpus="0,1,2,3" tools/train.py \
-  -c ppcls/configs/GeneralRecognition/GeneralRecognition_PPLCNet_x2_5.yaml
+  -c ./ppcls/configs/GeneralRecognitionV2/GeneralRecognitionV2_PPLCNetV2_base.yaml
   ```
 **注意：**
 配置文件中默认采用`在线评估`的方式，如果你想加快训练速度，可以关闭`在线评估`功能，只需要在上述命令的后面，增加 `-o Global.eval_during_train=False`。
@@ -186,7 +186,7 @@ Loss 部分选用 [Cross entropy loss](../../../ppcls/loss/celoss.py) 和 [Tripl
   ```shell
   export CUDA_VISIBLE_DEVICES=0
   python3.7 tools/train.py \
-  -c ppcls/configs/GeneralRecognition/GeneralRecognition_PPLCNet_x2_5.yaml \
+  -c ./ppcls/configs/GeneralRecognitionV2/GeneralRecognitionV2_PPLCNetV2_base.yaml \
   -o Global.checkpoint="output/RecModel/latest"
   ```
 - 单机多卡断点恢复训练
@@ -194,7 +194,7 @@ Loss 部分选用 [Cross entropy loss](../../../ppcls/loss/celoss.py) 和 [Tripl
   export CUDA_VISIBLE_DEVICES=0,1,2,3
   python3.7 -m paddle.distributed.launch \
   --gpus="0,1,2,3" tools/train.py \
-  -c ppcls/configs/GeneralRecognition/GeneralRecognition_PPLCNet_x2_5.yaml \
+  -c ./ppcls/configs/GeneralRecognitionV2/GeneralRecognitionV2_PPLCNetV2_base.yaml \
   -o Global.checkpoint="output/RecModel/latest"
   ```
 
@@ -208,7 +208,7 @@ Loss 部分选用 [Cross entropy loss](../../../ppcls/loss/celoss.py) 和 [Tripl
   ```shell
   export CUDA_VISIBLE_DEVICES=0
   python3.7 tools/eval.py \
-  -c ppcls/configs/GeneralRecognition/GeneralRecognition_PPLCNet_x2_5.yaml \
+  -c ./ppcls/configs/GeneralRecognitionV2/GeneralRecognitionV2_PPLCNetV2_base.yaml \
   -o Global.pretrained_model="output/RecModel/best_model"
   ```
 
@@ -217,7 +217,7 @@ Loss 部分选用 [Cross entropy loss](../../../ppcls/loss/celoss.py) 和 [Tripl
   export CUDA_VISIBLE_DEVICES=0,1,2,3
   python3.7 -m paddle.distributed.launch \
   --gpus="0,1,2,3" tools/eval.py \
-  -c  ppcls/configs/GeneralRecognition/GeneralRecognition_PPLCNet_x2_5.yaml \
+  -c ./ppcls/configs/GeneralRecognitionV2/GeneralRecognitionV2_PPLCNetV2_base.yaml \
   -o  Global.pretrained_model="output/RecModel/best_model"
   ```
 **注：** 建议使用多卡评估。该方式可以利用多卡并行计算快速得到全部数据的特征，能够加速评估的过程。
@@ -233,7 +233,7 @@ Loss 部分选用 [Cross entropy loss](../../../ppcls/loss/celoss.py) 和 [Tripl
 首先需要将 `*.pdparams` 模型文件转换成 inference 格式，转换命令如下。
 ```shell
 python3.7 tools/export_model.py \
--c ppcls/configs/GeneralRecognition/GeneralRecognition_PPLCNet_x2_5.yaml \
+-c ./ppcls/configs/GeneralRecognitionV2/GeneralRecognitionV2_PPLCNetV2_base.yaml \
 -o Global.pretrained_model="output/RecModel/best_model"
 ```
 生成的推理模型默认位于 `PaddleClas/inference` 目录，里面包含三个文件，分别为 `inference.pdmodel`、`inference.pdiparams`、`inference.pdiparams.info`。
@@ -265,4 +265,4 @@ python3.7 python/predict_rec.py \
 ## 7. 参考文献
 
 1. [PP-LCNet: A Lightweight CPU Convolutional Neural Network](https://arxiv.org/pdf/2109.15099.pdf)
-2. [ArcFace: Additive Angular Margin Loss for Deep Face Recognition](https://arxiv.org/abs/1801.07698)
+2. [Bag of Tricks and A Strong Baseline for Deep Person Re-identification](https://openaccess.thecvf.com/content_CVPRW_2019/papers/TRMTMCT/Luo_Bag_of_Tricks_and_a_Strong_Baseline_for_Deep_Person_CVPRW_2019_paper.pdf)
