@@ -79,8 +79,8 @@ python3.7 -m pip install paddle-serving-server-gpu==0.7.0.post112 # GPU with CUD
   mkdir models
   cd models
   # 下载并解压通用识别模型
-  wget https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/inference/general_PPLCNet_x2_5_lite_v1.0_infer.tar
-  tar -xf general_PPLCNet_x2_5_lite_v1.0_infer.tar
+  wget https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/inference/PP-ShiTuV2/general_PPLCNetV2_base_pretrained_v1.0_infer.tar
+  tar -xf general_PPLCNetV2_base_pretrained_v1.0_infer.tar
   # 下载并解压通用检测模型
   wget https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/inference/picodet_PPLCNet_x2_5_mainbody_lite_v1.0_infer.tar
   tar -xf picodet_PPLCNet_x2_5_mainbody_lite_v1.0_infer.tar
@@ -89,22 +89,22 @@ python3.7 -m pip install paddle-serving-server-gpu==0.7.0.post112 # GPU with CUD
   ```shell
   # 转换通用识别模型
   python3.7 -m paddle_serving_client.convert \
-  --dirname ./general_PPLCNet_x2_5_lite_v1.0_infer/ \
+  --dirname ./general_PPLCNetV2_base_pretrained_v1.0_infer/ \
   --model_filename inference.pdmodel  \
   --params_filename inference.pdiparams \
-  --serving_server ./general_PPLCNet_x2_5_lite_v1.0_serving/ \
-  --serving_client ./general_PPLCNet_x2_5_lite_v1.0_client/
+  --serving_server ./general_PPLCNetV2_base_pretrained_v1.0_serving/ \
+  --serving_client ./general_PPLCNetV2_base_pretrained_v1.0_client/
   ```
   上述命令的参数含义与[#3.1 模型转换](#3.1)相同
-  通用识别 inference 模型转换完成后，会在当前文件夹多出 `general_PPLCNet_x2_5_lite_v1.0_serving/` 和 `general_PPLCNet_x2_5_lite_v1.0_client/` 的文件夹，具备如下结构：
+  通用识别 inference 模型转换完成后，会在当前文件夹多出 `general_PPLCNetV2_base_pretrained_v1.0_serving/` 和 `general_PPLCNetV2_base_pretrained_v1.0_client/` 的文件夹，具备如下结构：
     ```shell
-    ├── general_PPLCNet_x2_5_lite_v1.0_serving/
+    ├── general_PPLCNetV2_base_pretrained_v1.0_serving/
     │   ├── inference.pdiparams
     │   ├── inference.pdmodel
     │   ├── serving_server_conf.prototxt
     │   └── serving_server_conf.stream.prototxt
     │
-    └── general_PPLCNet_x2_5_lite_v1.0_client/
+    └── general_PPLCNetV2_base_pretrained_v1.0_client/
           ├── serving_client_conf.prototxt
           └── serving_client_conf.stream.prototxt
     ```
@@ -119,7 +119,7 @@ python3.7 -m pip install paddle-serving-server-gpu==0.7.0.post112 # GPU with CUD
   ```
   上述命令的参数含义与[#3.1 模型转换](#3.1)相同
 
-  识别推理模型转换完成后，会在当前文件夹多出 `general_PPLCNet_x2_5_lite_v1.0_serving/` 和 `general_PPLCNet_x2_5_lite_v1.0_client/` 的文件夹。分别修改 `general_PPLCNet_x2_5_lite_v1.0_serving/` 和 `general_PPLCNet_x2_5_lite_v1.0_client/` 目录下的 `serving_server_conf.prototxt` 中的 `alias` 名字： 将 `fetch_var` 中的 `alias_name` 改为 `features`。 修改后的 `serving_server_conf.prototxt` 内容如下
+  识别推理模型转换完成后，会在当前文件夹多出 `general_PPLCNetV2_base_pretrained_v1.0_serving/` 和 `general_PPLCNetV2_base_pretrained_v1.0_client/` 的文件夹。分别修改 `general_PPLCNetV2_base_pretrained_v1.0_serving/` 和 `general_PPLCNetV2_base_pretrained_v1.0_client/` 目录下的 `serving_server_conf.prototxt` 中的 `alias` 名字： 将 `fetch_var` 中的 `alias_name` 改为 `features`。 修改后的 `serving_server_conf.prototxt` 内容如下
 
   ```log
   feed_var {
@@ -132,7 +132,7 @@ python3.7 -m pip install paddle-serving-server-gpu==0.7.0.post112 # GPU with CUD
   shape: 224
   }
   fetch_var {
-    name: "save_infer_model/scale_0.tmp_1"
+    name: "batch_norm_25.tmp_2"
     alias_name: "features"
     is_lod_tensor: false
     fetch_type: 1
@@ -165,7 +165,7 @@ python3.7 -m pip install paddle-serving-server-gpu==0.7.0.post112 # GPU with CUD
     # 回到deploy目录
     cd ../
     # 下载构建完成的检索库 index
-    wget https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/data/drink_dataset_v1.0.tar
+    wget https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/data/drink_dataset_v2.0.tar
     # 解压构建完成的检索库 index
     tar -xf drink_dataset_v1.0.tar
     ```
@@ -175,7 +175,7 @@ python3.7 -m pip install paddle-serving-server-gpu==0.7.0.post112 # GPU with CUD
 **注意：** 识别服务涉及到多个模型，出于性能考虑采用 PipeLine 部署方式。Pipeline 部署方式当前不支持 windows 平台。
 - 进入到工作目录
   ```shell
-  cd ./deploy/paddleserving/recognition
+  cd ./paddleserving/recognition
   ```
   paddleserving 目录包含启动 Python Pipeline 服务、C++ Serving 服务和发送预测请求的代码，包括：
   ```shell
@@ -204,7 +204,7 @@ python3.7 -m pip install paddle-serving-server-gpu==0.7.0.post112 # GPU with CUD
   ```
   成功运行后，模型预测的结果会打印在客户端中，如下所示：
   ```log
-  {'err_no': 0, 'err_msg': '', 'key': ['result'], 'value': ["[{'bbox': [345, 95, 524, 576], 'rec_docs': '红牛-强化型', 'rec_scores': 0.79903316}]"], 'tensors': []}
+  {'err_no': 0, 'err_msg': '', 'key': ['result'], 'value': ["[{'bbox': [0, 0, 600, 600], 'rec_docs': '红牛-强化型', 'rec_scores': 0.7408101}]"], 'tensors': []}
   ```
 
 <a name="3.2.2"></a>
@@ -218,7 +218,7 @@ python3.7 -m pip install paddle-serving-server-gpu==0.7.0.post112 # GPU with CUD
   # 一键编译安装Serving server、设置 SERVING_BIN
   source ./build_server.sh python3.7
   ```
-  **注：**[build_server.sh](../build_server.sh#L55-L62)所设定的路径可能需要根据实际机器上的环境如CUDA、python版本等作一定修改，然后再编译；如果执行`build_server.sh`过程中遇到非网络原因的报错，则可以手动将脚本中的命令逐条复制到终端执行。
+  **注：** [build_server.sh](../build_server.sh#L55-L62) 所设定的路径可能需要根据实际机器上的环境如CUDA、python版本等作一定修改，然后再编译；如果执行 `build_server.sh` 过程中遇到非网络原因的报错，则可以手动将脚本中的命令逐条复制到终端执行。
 
 - C++ Serving使用的输入输出格式与Python不同，因此需要执行以下命令，将4个文件复制到下的文件覆盖掉[3.1](#31-模型转换)得到文件夹中的对应4个prototxt文件。
   ```shell
@@ -226,8 +226,8 @@ python3.7 -m pip install paddle-serving-server-gpu==0.7.0.post112 # GPU with CUD
   cd PaddleClas/deploy/
 
   # 覆盖prototxt文件
-  \cp ./paddleserving/recognition/preprocess/general_PPLCNet_x2_5_lite_v1.0_serving/*.prototxt ./models/general_PPLCNet_x2_5_lite_v1.0_serving/
-  \cp ./paddleserving/recognition/preprocess/general_PPLCNet_x2_5_lite_v1.0_client/*.prototxt ./models/general_PPLCNet_x2_5_lite_v1.0_client/
+  \cp ./paddleserving/recognition/preprocess/general_PPLCNetV2_base_pretrained_v1.0_serving/*.prototxt ./models/general_PPLCNetV2_base_pretrained_v1.0_serving/
+  \cp ./paddleserving/recognition/preprocess/general_PPLCNetV2_base_pretrained_v1.0_client/*.prototxt ./models/general_PPLCNetV2_base_pretrained_v1.0_client/
   \cp ./paddleserving/recognition/preprocess/picodet_PPLCNet_x2_5_mainbody_lite_v1.0_client/*.prototxt ./models/picodet_PPLCNet_x2_5_mainbody_lite_v1.0_client/
   \cp ./paddleserving/recognition/preprocess/picodet_PPLCNet_x2_5_mainbody_lite_v1.0_serving/*.prototxt ./models/picodet_PPLCNet_x2_5_mainbody_lite_v1.0_serving/
   ```
@@ -235,7 +235,7 @@ python3.7 -m pip install paddle-serving-server-gpu==0.7.0.post112 # GPU with CUD
 - 启动服务：
   ```shell
   # 进入工作目录
-  cd PaddleClas/deploy/paddleserving/recognition
+  cd ./paddleserving/recognition
 
   # 端口号默认为9400；运行日志默认保存在 log_PPShiTu.txt 中
   # CPU部署
@@ -254,7 +254,7 @@ python3.7 -m pip install paddle-serving-server-gpu==0.7.0.post112 # GPU with CUD
   WARNING: Logging before InitGoogleLogging() is written to STDERR
   I0614 03:01:36.273097  6084 naming_service_thread.cpp:202] brpc::policy::ListNamingService("127.0.0.1:9400"): added 1
   I0614 03:01:37.393564  6084 general_model.cpp:490] [client]logid=0,client_cost=1107.82ms,server_cost=1101.75ms.
-  [{'bbox': [345, 95, 524, 585], 'rec_docs': '红牛-强化型', 'rec_scores': 0.8073724}]
+  [{'bbox': [0, 0, 600, 600], 'rec_docs': '红牛-强化型', 'rec_scores': 0.7508101}]
   ```
 
 - 关闭服务

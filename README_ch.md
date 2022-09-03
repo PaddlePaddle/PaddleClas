@@ -72,6 +72,7 @@ PP-ShiTu图像识别快速体验：[点击这里](./docs/zh_CN/quick_start/quick
     - [服务化部署](docs/zh_CN/inference_deployment/recognition_serving_deploy.md)
     - [端侧部署](docs/zh_CN/inference_deployment/lite_shitu.md)
     - [库管理工具](docs/zh_CN/inference_deployment/shitu_gallery_manager.md)
+ - [场景库应用](/docs/zh_CN/introduction/ppshitu_application_scenarios.md)
 - [PULC超轻量图像分类实用方案](docs/zh_CN/PULC/PULC_train.md)
   - [超轻量图像分类快速体验](docs/zh_CN/PULC/PULC_quickstart.md)
   - [超轻量图像分类模型库](docs/zh_CN/PULC/PULC_model_list.md)

@@ -1,6 +1,6 @@
 Global:
   infer_imgs: "./images/wangzai.jpg"
-  rec_inference_model_dir: "./models/product_ResNet50_vd_aliproduct_v1.0_infer"
+  rec_inference_model_dir: "./models/general_PPLCNetV2_base_pretrained_v1.0_infer"
   batch_size: 1
   use_gpu: False
   enable_mkldnn: True
@@ -22,7 +22,7 @@ RecPreProcess:
         scale: 0.00392157
         mean: [0.485, 0.456, 0.406]
         std: [0.229, 0.224, 0.225]
-        order: ''
+        order: ""
     - ToCHWImage:
 
 RecPostProcess: null

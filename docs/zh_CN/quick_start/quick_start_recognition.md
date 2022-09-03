@@ -57,7 +57,7 @@
 
 假设待检索的图像如下：
 
-<img src="../../images/recognition/drink_data_demo/test_images/nongfu_spring.jpeg" width="400" height="600"/>
+<img src="../../images/recognition/drink_data_demo/test_images/100.jpeg" width="400" height="600"/>
 
 得到的检索结果可视化如下：
 
@@ -67,10 +67,10 @@
 点击上方的“拍照上传”按钮<img src="../../images/quick_start/android_demo/paizhaoshangchuan_100.png" width="25" height="25"/>或者“本地上传”按钮<img src="../../images/quick_start/android_demo/bendishangchuan_100.png" width="25" height="25"/>，即可拍摄一张图像或从图库中选择一张图像，然后再输入这张图像的类别名字（比如`keyboard`），点击“确定”按钮，即可将图片对应的特征向量与标签加入检索库。
 
 #### 1.2.3 库保存
-点击上方的“保存修改”按钮<img src="../../images/quick_start/android_demo/baocunxiugai_100.png" width="25" height="25"/>，再输入希望保存的检索库名字（如填入`database_1`。为了简化体验逻辑，检索向量库文件 `*.index` 与检索标签库文件 `*.txt` 使用相同的文件名），即可将当前库保存到手机内存中。
+点击上方的“保存修改”按钮<img src="../../images/quick_start/android_demo/baocunxiugai_100.png" width="25" height="25"/>，即可将当前库以 `latest` 的库名保存下来，保存完毕之后也会自动将当前程序中的库覆盖为 `latest`。
 
-#### 1.2.4 更换检索库
-点击上方的“齿轮”按钮<img src="../../images/quick_start/android_demo/shezhi.png" width="25" height="25"/>，点击“Label Path”一栏，在弹出的选项中选择需要更换的库，然后再点击“Index Path”，在弹出的选项中选择需要更换的类别标签文件（一般一个库对应一个类别标签文件，因此更换检索库意味着需要同时更换检索向量库文件和检索标签文件，否则可能会造成检索结果错误）。
+#### 1.2.4 初始化检索库
+点击上方的“初始化 ”按钮<img src="../../images/quick_start/android_demo/reset.png" width="25" height="25"/>，即可将当前库初始化为 `original`（注意这一操作会自动删除 `latest` 库）。
 
 #### 1.2.5 查看检索库标签
 点击“类别查询”按钮<img src="../../images/quick_start/android_demo/leibiechaxun_100.png" width="25" height="25"/>，即可在弹窗中查看。
@@ -88,8 +88,8 @@
 #### 1.3.3 库保存
 此功能只需输入希望保存的文件名即可，如输入`database_1`，则会将检索向量库保存为`database_1.index`，检索标签库保存为`database_1.txt`。
 
-#### 1.3.4 更换检索库
-切换好检索向量库后，需要同时切换与之匹配的检索标签库。
+#### 1.3.4 初始化检索库
+初始化库时会自动将检索库和标签库切换成 `original.index` 和 `original.txt`，并删除手机中的 `latest.index` 和 `latest.txt`。
 
 #### 1.3.5 查看检索库的标签
 可按照[功能体验-查看检索库的标签](#125-查看检索库标签)中说明进行查看，当检索标签库过多（如本demo自带的196类检索标签库）时，可在弹窗中滑动查看。
@@ -117,16 +117,14 @@
 
 <a name="轻量级通用主体检测模型与轻量级通用识别模型"></a>
 
-| 模型简介       | 推荐场景   | inference 模型  | 预测配置文件  |
-| ------------  | ------------- | -------- | ------- |
-| 轻量级通用主体检测模型 | 通用场景  |[tar 格式下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/inference/picodet_PPLCNet_x2_5_mainbody_lite_v1.0_infer.tar) [zip 格式文件下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/inference/picodet_PPLCNet_x2_5_mainbody_lite_v1.0_infer.zip) | - |
-| 轻量级通用识别模型 | 通用场景  | [tar 格式下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/inference/general_PPLCNet_x2_5_lite_v1.0_infer.tar) [zip 格式文件下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/inference/general_PPLCNet_x2_5_lite_v1.0_infer.zip) | [inference_general.yaml](../../../deploy/configs/inference_general.yaml) |
-| 轻量级通用识别二值模型 | 检索库很大， 存储受限场景  | [tar 格式下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/inference/general_PPLCNet_x2_5_lite_binary_v1.0_infer.tar) [zip 格式文件下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/inference/general_PPLCNet_x2_5_lite_binary_v1.0_infer.zip)| [inference_general_binary.yaml](../../../deploy/configs/inference_general_binary.yaml) |
+| 模型简介               | 推荐场景 | inference 模型                                                                                                                                                                                                                                                                                                                    | 预测配置文件                                                             |
+| ---------------------- | -------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------ |
+| 轻量级通用主体检测模型 | 通用场景 | [tar 格式下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/inference/picodet_PPLCNet_x2_5_mainbody_lite_v1.0_infer.tar) [zip 格式文件下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/inference/picodet_PPLCNet_x2_5_mainbody_lite_v1.0_infer.zip)                     | -                                                                        |
+| 轻量级通用识别模型     | 通用场景 | [tar 格式下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/inference/PP-ShiTuV2/general_PPLCNetV2_base_pretrained_v1.0_infer.tar) [zip 格式文件下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/inference/PP-ShiTuV2/general_PPLCNetV2_base_pretrained_v1.0_infer.zip) | [inference_general.yaml](../../../deploy/configs/inference_general.yaml) |
 
-注意：由于部分解压缩软件在解压上述 `tar` 格式文件时存在问题，建议非命令行用户下载 `zip` 格式文件并解压。`tar` 格式文件建议使用命令 `tar xf xxx.tar` 解压。
+注意：由于部分解压缩软件在解压上述 `tar` 格式文件时存在问题，建议非命令行用户下载 `zip` 格式文件并解压。`tar` 格式文件建议使用命令 `tar -xf xxx.tar` 解压。
 
-本章节 demo 数据下载地址如下: [瓶装饮料数据下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/data/drink_dataset_v1.0.tar)。
-
+本章节 demo 数据下载地址如下: [瓶装饮料数据下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/data/drink_dataset_v2.0.tar)。
 
 如果希望体验服务端主体检测和各垂类方向的识别模型，可以参考[2.4 服务端识别模型列表](#24-服务端识别模型列表)
 
@@ -170,17 +168,17 @@ cd models
 # 下载通用检测 inference 模型并解压
 wget https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/inference/picodet_PPLCNet_x2_5_mainbody_lite_v1.0_infer.tar && tar -xf picodet_PPLCNet_x2_5_mainbody_lite_v1.0_infer.tar
 # 下载识别 inference 模型并解压
-wget https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/inference/general_PPLCNet_x2_5_lite_v1.0_infer.tar && tar -xf general_PPLCNet_x2_5_lite_v1.0_infer.tar
+wget https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/inference/PP-ShiTuV2/general_PPLCNetV2_base_pretrained_v1.0_infer.tar && tar -xf general_PPLCNetV2_base_pretrained_v1.0_infer.tar
 
 cd ../
 # 下载 demo 数据并解压
-wget https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/data/drink_dataset_v1.0.tar && tar -xf drink_dataset_v1.0.tar
+wget https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/data/drink_dataset_v2.0.tar && tar -xf drink_dataset_v2.0.tar
 ```
 
-解压完毕后，`drink_dataset_v1.0/` 文件夹下应有如下文件结构：
+解压完毕后，`drink_dataset_v2.0/` 文件夹下应有如下文件结构：
 
 ```log
-├── drink_dataset_v1.0/
+├── drink_dataset_v2.0/
 │   ├── gallery/
 │   ├── index/
 │   ├── test_images/
@@ -193,7 +191,7 @@ wget https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/data/drink_da
 `models` 文件夹下应有如下文件结构：
 
 ```log
-├── general_PPLCNet_x2_5_lite_v1.0_infer
+├── general_PPLCNetV2_base_pretrained_v1.0_infer
 │   ├── inference.pdiparams
 │   ├── inference.pdiparams.info
 │   └── inference.pdmodel
@@ -209,7 +207,7 @@ wget https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/data/drink_da
 
 ```shell
 # 下面是使用下载的服务端商品识别模型进行索引库构建
-python3.7 python/build_gallery.py -c configs/inference_general.yaml -o Global.rec_inference_model_dir=./models/general_PPLCNet_x2_5_lite_v1.0_infer
+python3.7 python/build_gallery.py -c configs/inference_general.yaml -o Global.rec_inference_model_dir=./models/general_PPLCNetV2_base_pretrained_v1.0_infer
 ```
 
 <a name="瓶装饮料识别与检索"></a>
@@ -221,7 +219,7 @@ python3.7 python/build_gallery.py -c configs/inference_general.yaml -o Global.re
 注意，此部分使用了 `faiss` 作为检索库，安装方法如下：
 
 ```python
-pip install faiss-cpu==1.7.1post2
+python3.7 -m pip install faiss-cpu==1.7.1post2
 ```
 
 若使用时，不能正常引用，则 `uninstall` 之后，重新 `install`，尤其是 windows 下。
@@ -230,7 +228,7 @@ pip install faiss-cpu==1.7.1post2
 
 ##### 2.2.2.1 识别单张图像
 
-运行下面的命令，对图像 `./drink_dataset_v1.0/test_images/nongfu_spring.jpeg` 进行识别与检索
+运行下面的命令，对图像 `./drink_dataset_v2.0/test_images/100.jpeg` 进行识别与检索
 
 ```shell
 # 使用下面的命令使用 GPU 进行预测
@@ -241,20 +239,20 @@ python3.7 python/predict_system.py -c configs/inference_general.yaml -o Global.u
 
 待检索图像如下所示。
 
-![](../../images/recognition/drink_data_demo/test_images/nongfu_spring.jpeg)
+![](../../images/recognition/drink_data_demo/test_images/100.jpeg)
 
 
 最终输出结果如下。
 
 ```log
-[{'bbox': [244, 49, 509, 964], 'rec_docs': '农夫山泉-饮用天然水', 'rec_scores': 0.7585664}]
+[{'bbox': [437, 71, 660, 728], 'rec_docs': '元气森林', 'rec_scores': 0.7740249}, {'bbox': [221, 72, 449, 701], 'rec_docs': '元气森林', 'rec_scores': 0.6950992}, {'bbox': [794, 104, 979, 652], 'rec_docs': '元气森林', 'rec_scores': 0.6305153}]
 ```
 
 其中 `bbox` 表示检测出的主体所在位置，`rec_docs` 表示索引库中与检测框最为相似的类别，`rec_scores` 表示对应的置信度。
 
 检测的可视化结果也保存在 `output` 文件夹下，对于本张图像，识别结果可视化如下所示。
 
-![](../../images/recognition/drink_data_demo/output/nongfu_spring.jpeg)
+![](../../images/recognition/drink_data_demo/output/100.jpeg)
 
 
 <a name="基于文件夹的批量识别"></a>
@@ -265,29 +263,28 @@ python3.7 python/predict_system.py -c configs/inference_general.yaml -o Global.u
 
 ```shell
 # 使用下面的命令使用 GPU 进行预测，如果希望使用 CPU 预测，可以在命令后面添加 -o Global.use_gpu=False
-python3.7 python/predict_system.py -c configs/inference_general.yaml -o Global.infer_imgs="./drink_dataset_v1.0/test_images/"
+python3.7 python/predict_system.py -c configs/inference_general.yaml -o Global.infer_imgs="./drink_dataset_v2.0/test_images/"
 ```
 
 终端中会输出该文件夹内所有图像的识别结果，如下所示。
 
 ```log
 ...
-[{'bbox': [345, 95, 524, 586], 'rec_docs': '红牛-强化型', 'rec_scores': 0.80164653}]
-Inference: 23.43583106994629 ms per batch image
-[{'bbox': [233, 0, 372, 436], 'rec_docs': '康师傅矿物质水', 'rec_scores': 0.72513914}]
-Inference: 117.95639991760254 ms per batch image
-[{'bbox': [138, 40, 573, 1198], 'rec_docs': '乐虎功能饮料', 'rec_scores': 0.7855944}]
-Inference: 22.172927856445312 ms per batch image
-[{'bbox': [328, 7, 467, 272], 'rec_docs': '脉动', 'rec_scores': 0.5829516}]
-Inference: 118.08514595031738 ms per batch image
-[{'bbox': [242, 82, 498, 726], 'rec_docs': '味全_每日C', 'rec_scores': 0.75581443}]
-Inference: 150.06470680236816 ms per batch image
-[{'bbox': [437, 71, 660, 728], 'rec_docs': '元气森林', 'rec_scores': 0.8478892}, {'bbox': [221, 72, 449, 701], 'rec_docs': '元气森林', 'rec_scores': 0.6790612}, {'bbox': [794, 104, 979, 652], 'rec_docs': '元气森林', 'rec_scores': 0.6292581}]
+[{'bbox': [0, 0, 600, 600], 'rec_docs': '红牛-强化型', 'rec_scores': 0.74081033}]
+Inference: 120.39852142333984 ms per batch image
+[{'bbox': [0, 0, 514, 436], 'rec_docs': '康师傅矿物质水', 'rec_scores': 0.6918598}]
+Inference: 32.045602798461914 ms per batch image
+[{'bbox': [138, 40, 573, 1198], 'rec_docs': '乐虎功能饮料', 'rec_scores': 0.68214047}]
+Inference: 113.41428756713867 ms per batch image
+[{'bbox': [328, 7, 467, 272], 'rec_docs': '脉动', 'rec_scores': 0.60406065}]
+Inference: 122.04337120056152 ms per batch image
+[{'bbox': [242, 82, 498, 726], 'rec_docs': '味全_每日C', 'rec_scores': 0.5428652}]
+Inference: 37.95266151428223 ms per batch image
+[{'bbox': [437, 71, 660, 728], 'rec_docs': '元气森林', 'rec_scores': 0.7740249}, {'bbox': [221, 72, 449, 701], 'rec_docs': '元气森林', 'rec_scores': 0.6950992}, {'bbox': [794, 104, 979, 652], 'rec_docs': '元气森林', 'rec_scores': 0.6305153}]
 ...
 ```
 
 所有图像的识别结果可视化图像也保存在 `output` 文件夹内。
-
 
 更多地，可以通过修改 `Global.rec_inference_model_dir` 字段来更改识别 inference 模型的路径，通过修改 `IndexProcess.index_dir` 字段来更改索引库索引的路径。
 
@@ -295,11 +292,11 @@ Inference: 150.06470680236816 ms per batch image
 
 ### 2.3 未知类别的图像识别体验
 
-对图像 `./drink_dataset_v1.0/test_images/mosilian.jpeg` 进行识别，命令如下
+对图像 `./drink_dataset_v2.0/test_images/mosilian.jpeg` 进行识别，命令如下
 
 ```shell
 # 使用下面的命令使用 GPU 进行预测，如果希望使用 CPU 预测，可以在命令后面添加 -o Global.use_gpu=False
-python3.7 python/predict_system.py -c configs/inference_general.yaml -o Global.infer_imgs="./drink_dataset_v1.0/test_images/mosilian.jpeg"
+python3.7 python/predict_system.py -c configs/inference_general.yaml -o Global.infer_imgs="./drink_dataset_v2.0/test_images/mosilian.jpeg"
 ```
 
 待检索图像如下所示。
@@ -317,10 +314,9 @@ python3.7 python/predict_system.py -c configs/inference_general.yaml -o Global.i
 
 #### 2.3.1 准备新的数据与标签
 
-首先需要将与待检索图像相似的图像列表拷贝到索引库原始图像的文件夹。这里 PaddleClas 已经将所有的图像数据都放在文件夹 `drink_dataset_v1.0/gallery/` 中。
+首先需要将与待检索图像相似的图像列表拷贝到索引库原始图像的文件夹。这里 PaddleClas 已经将所有的图像数据都放在文件夹 `drink_dataset_v2.0/gallery/` 中。
 
-然后需要编辑记录了图像路径和标签信息的文本文件，这里 PaddleClas 将更正后的标签信息文件放在了 `drink_dataset_v1.0/gallery/drink_label_all.txt` 文件中。可以与默认的 `drink_dataset_v1.0/gallery/drink_label.txt` 标签文件进行对比，添加了光明和三元系列牛奶的索引图像。
-
+然后需要编辑记录了图像路径和标签信息的文本文件，这里 PaddleClas 将更正后的标签信息文件放在了 `drink_dataset_v2.0/gallery/drink_label_all.txt` 文件中。可以与默认的 `drink_dataset_v2.0/gallery/drink_label.txt` 标签文件进行对比，添加了光明和三元系列牛奶的索引图像。
 
 每一行的文本中，第一个字段表示图像的相对路径，第二个字段表示图像对应的标签信息，中间用 `\t` 键分隔开（注意：有些编辑器会将 `tab` 自动转换为 `空格`，这种情况下会导致文件解析报错）。
 
@@ -331,10 +327,10 @@ python3.7 python/predict_system.py -c configs/inference_general.yaml -o Global.i
 使用下面的命令构建 `index` 索引，加速识别后的检索过程。
 
 ```shell
-python3.7 python/build_gallery.py -c configs/inference_general.yaml -o IndexProcess.data_file="./drink_dataset_v1.0/gallery/drink_label_all.txt" -o IndexProcess.index_dir="./drink_dataset_v1.0/index_all"
+python3.7 python/build_gallery.py -c configs/inference_general.yaml -o IndexProcess.data_file="./drink_dataset_v2.0/gallery/drink_label_all.txt" -o IndexProcess.index_dir="./drink_dataset_v2.0/index_all"
 ```
 
-最终新的索引信息保存在文件夹 `./drink_dataset_v1.0/index_all` 中。具体 `yaml` 请参考[向量检索文档](../image_recognition_pipeline/vector_search.md)。
+最终新的索引信息保存在文件夹 `./drink_dataset_v2.0/index_all` 中。具体 `yaml` 请参考[向量检索文档](../image_recognition_pipeline/vector_search.md)。
 
 <a name="基于新的索引库的图像识别"></a>
 
@@ -344,13 +340,13 @@ python3.7 python/build_gallery.py -c configs/inference_general.yaml -o IndexProc
 
 ```shell
 # 使用下面的命令使用 GPU 进行预测，如果希望使用 CPU 预测，可以在命令后面添加 -o Global.use_gpu=False
-python3.7 python/predict_system.py -c configs/inference_general.yaml -o Global.infer_imgs="././drink_dataset_v1.0/test_images/mosilian.jpeg" -o IndexProcess.index_dir="./drink_dataset_v1.0/index_all"
+python3.7 python/predict_system.py -c configs/inference_general.yaml -o Global.infer_imgs="././drink_dataset_v2.0/test_images/mosilian.jpeg" -o IndexProcess.index_dir="./drink_dataset_v2.0/index_all"
 ```
 
 输出结果如下。
 
 ```log
-[{'bbox': [396, 553, 508, 621], 'rec_docs': '光明_莫斯利安', 'rec_scores': 0.5921005}]
+[{'bbox': [290, 297, 564, 919], 'rec_docs': '光明_莫斯利安', 'rec_scores': 0.59137374}]
 ```
 
 最终识别结果为`光明_莫斯利安`，识别正确，识别结果可视化如下所示。
@@ -359,18 +355,19 @@ python3.7 python/predict_system.py -c configs/inference_general.yaml -o Global.i
 
 
 <a name="5"></a>
+
 ### 2.4 服务端识别模型列表
 
 目前，我们更推荐您使用[轻量级通用主体检测模型与轻量级通用识别模型](#轻量级通用主体检测模型与轻量级通用识别模型)，以获得更好的测试结果。但是如果您希望体验服务端识别模型，服务器端通用主体检测模型与各方向识别模型、测试数据下载地址以及对应的配置文件地址如下。
 
-| 模型简介       | 推荐场景   | inference 模型  | 预测配置文件  |
-| ------------  | ------------- | -------- | ------- |
-| 通用主体检测模型 | 通用场景  |[模型下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/inference/ppyolov2_r50vd_dcn_mainbody_v1.0_infer.tar) | - |
-| Logo 识别模型 | Logo 场景  | [模型下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/inference/logo_rec_ResNet50_Logo3K_v1.0_infer.tar) | [inference_logo.yaml](../../../deploy/configs/inference_logo.yaml) |
-| 动漫人物识别模型 | 动漫人物场景  | [模型下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/inference/cartoon_rec_ResNet50_iCartoon_v1.0_infer.tar) | [inference_cartoon.yaml](../../../deploy/configs/inference_cartoon.yaml) |
-| 车辆细分类模型 | 车辆场景  |  [模型下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/inference/vehicle_cls_ResNet50_CompCars_v1.0_infer.tar) | [inference_vehicle.yaml](../../../deploy/configs/inference_vehicle.yaml) |
-| 商品识别模型 | 商品场景  |  [模型下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/inference/product_ResNet50_vd_aliproduct_v1.0_infer.tar) | [inference_product.yaml](../../../deploy/configs/inference_product.yaml) |
-| 车辆 ReID 模型 | 车辆 ReID 场景 | [模型下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/inference/vehicle_reid_ResNet50_VERIWild_v1.0_infer.tar) | [inference_vehicle.yaml](../../../deploy/configs/inference_vehicle.yaml) |
+| 模型简介         | 推荐场景       | inference 模型                                                                                                                               | 预测配置文件                                                             |
+| ---------------- | -------------- | -------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------ |
+| 通用主体检测模型 | 通用场景       | [模型下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/inference/ppyolov2_r50vd_dcn_mainbody_v1.0_infer.tar)    | -                                                                        |
+| Logo 识别模型    | Logo 场景      | [模型下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/inference/logo_rec_ResNet50_Logo3K_v1.0_infer.tar)       | [inference_logo.yaml](../../../deploy/configs/inference_logo.yaml)       |
+| 动漫人物识别模型 | 动漫人物场景   | [模型下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/inference/cartoon_rec_ResNet50_iCartoon_v1.0_infer.tar)  | [inference_cartoon.yaml](../../../deploy/configs/inference_cartoon.yaml) |
+| 车辆细分类模型   | 车辆场景       | [模型下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/inference/vehicle_cls_ResNet50_CompCars_v1.0_infer.tar)  | [inference_vehicle.yaml](../../../deploy/configs/inference_vehicle.yaml) |
+| 商品识别模型     | 商品场景       | [模型下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/inference/product_ResNet50_vd_aliproduct_v1.0_infer.tar) | [inference_product.yaml](../../../deploy/configs/inference_product.yaml) |
+| 车辆 ReID 模型   | 车辆 ReID 场景 | [模型下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/inference/vehicle_reid_ResNet50_VERIWild_v1.0_infer.tar) | [inference_vehicle.yaml](../../../deploy/configs/inference_vehicle.yaml) |
 
 ```shell
 cd PaddleClas/deploy/
