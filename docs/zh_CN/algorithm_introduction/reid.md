@@ -344,7 +344,7 @@ PaddleClas 提供了基于 Paddle2ONNX 来完成 inference 模型转换 ONNX 模
 
 #### 5.1 方法总结与对比
 
-上述算法能快速地迁移至多数的ReID模型中，能进一步提升ReID模型的性能。
+上述算法能快速地迁移至多数的ReID模型中（参考 [PP-ShiTuV2](../PPShiTu/PPShiTuV2_introduction.md) ），能进一步提升ReID模型的性能，
 
 #### 5.2 使用建议/FAQ
 
