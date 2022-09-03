@@ -1,4 +1,4 @@
-简体中文|[English](../../en/image_recognition_pipeline/feature_extraction_en.md)
+简体中文 | [English](../../en/image_recognition_pipeline/feature_extraction_en.md)
 # 特征提取
 
 ## 目录
@@ -58,7 +58,7 @@ Head 部分选用 [FC Layer](../../../ppcls/arch/gears/fc.py)，使用分类头�
 
 #### 3.4 Loss
 
-Loss 部分选用 [Cross entropy loss](../../../ppcls/loss/celoss.py) 和 [TripletAngularMarginLoss](../../../ppcls/loss/tripletangularmarginloss.py)，在训练时以分类损失和基于角度的三元组损失来指导网络进行优化。详细的配置文件见[GeneralRecognitionV2_PPLCNetV2_base.yaml](../../../ppcls/configs/GeneralRecognitionV2/GeneralRecognitionV2_PPLCNetV2_base.yaml#L63-77)。
+Loss 部分选用 [Cross entropy loss](../../../ppcls/loss/celoss.py) 和 [TripletAngularMarginLoss](../../../ppcls/loss/tripletangularmarginloss.py)，在训练时以分类损失和基于角度的三元组损失来指导网络进行优化。详细的配置文件见 [GeneralRecognitionV2_PPLCNetV2_base.yaml](../../../ppcls/configs/GeneralRecognitionV2/GeneralRecognitionV2_PPLCNetV2_base.yaml#L63-77)。
 
 <a name="4"></a>
 
@@ -137,8 +137,8 @@ Loss 部分选用 [Cross entropy loss](../../../ppcls/loss/celoss.py) 和 [Tripl
   Train:
     dataset:
       name: ImageNetDataset
-      image_root: ./dataset/     # 此处表示train数据所在的目录
-      cls_label_path: ./dataset/train_reg_all_data.txt  # 此处表示train数据集label文件的地址
+      image_root: ./dataset/     # 此处表示train数据集所在的目录
+      cls_label_path: ./dataset/train_reg_all_data_v2.txt  # 此处表示train数据集对应标注文件的地址
       relabel: True
   ```
 - 修改评估数据集中query数据配置：
@@ -147,7 +147,7 @@ Loss 部分选用 [Cross entropy loss](../../../ppcls/loss/celoss.py) 和 [Tripl
     dataset:
       name: VeriWild
       image_root: ./dataset/Aliproduct/    # 此处表示query数据集所在的目录
-      cls_label_path: ./dataset/Aliproduct/val_list.txt    # 此处表示query数据集label文件的地址
+      cls_label_path: ./dataset/Aliproduct/val_list.txt    # 此处表示query数据集对应标注文件的地址
   ```
 - 修改评估数据集中gallery数据配置：
   ```yaml
@@ -155,7 +155,7 @@ Loss 部分选用 [Cross entropy loss](../../../ppcls/loss/celoss.py) 和 [Tripl
     dataset:
       name: VeriWild
       image_root: ./dataset/Aliproduct/    # 此处表示gallery数据集所在的目录
-      cls_label_path: ./dataset/Aliproduct/val_list.txt   # 此处表示gallery数据集label文件的地址
+      cls_label_path: ./dataset/Aliproduct/val_list.txt   # 此处表示gallery数据集对应标注文件的地址
   ```
 
 <a name="5.2"></a>
@@ -249,8 +249,16 @@ python3.7 python/predict_rec.py \
 -c configs/inference_rec.yaml \
 -o Global.rec_inference_model_dir="../inference"
 ```
-得到的特征输出格式如下图所示：
-![](../../images/feature_extraction_output.png)
+得到的特征输出格式如下所示：
+
+```log
+wangzai.jpg:    [-4.72979844e-02  3.40038240e-02 -4.06982675e-02  2.46225717e-03
+  9.67078656e-03  2.70162839e-02 -8.85589980e-03 -4.71983254e-02
+  6.18615076e-02  1.38509814e-02 -1.11342799e-02  6.73768669e-02
+ -1.03065455e-02 -4.88462113e-02  8.46387446e-03  1.57074817e-02
+ ...
+ -3.14170569e-02  7.35917836e-02 -3.09373233e-02 -2.31755469e-02]
+```
 
 在实际使用过程中，仅仅得到特征可能并不能满足业务需求。如果想进一步通过特征检索来进行图像识别，可以参照文档[向量检索](./vector_search.md)。
 
