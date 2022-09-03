@@ -79,7 +79,7 @@ python3.7 -m paddle.distributed.launch tools/train.py \
 
 ### 模型推理
 
-参考 [模型推理](../image_recognition_pipeline/feature_extraction.md#54-模型推理)
+参考 [Python模型推理](../quick_start/quick_start_recognition.md#22-图像识别体验) 和 [C++ 模型推理](../../../deploy/cpp_shitu/readme.md)
 
 ### 模型部署
 
