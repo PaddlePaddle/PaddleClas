@@ -38,7 +38,7 @@
 其中主界面的按钮如下图所示
 
 <div align="center">
-<img src="../../images/shitu_index_manager/menu.png"  width = "600" />
+<img src="https://user-images.githubusercontent.com/11568925/188273082-b1ada7ed-e56e-4b6a-9e79-2dda01a3db69.png"  width = "600" />
 <p>界面按钮展示</p>
 </div>
 
@@ -49,7 +49,7 @@
 下面将进行具体功能介绍，其操作入口，可以点击`主要功能按钮`下拉菜单查看，如下图所示：
 
 <div align="center">
-<img src="../../images/shitu_index_manager/all_menu.png"  width = "600" />
+<img src="https://user-images.githubusercontent.com/11568925/188273056-04b376f5-7275-47ac-898b-474a667bc6a7.png"  width = "600" />
 <p>主要功能展示</p>
 </div>
 
@@ -60,7 +60,7 @@
 点击新建库功能后，会选择一个**空的存储目录**或者**新建目录**，此时所有的图片及对应的索引库都会存放在此目录下。完成操作后，如下图所示
 
 <div align="center">
-<img src="../../images/shitu_index_manager/creat_images.png"  width = "600" />
+<img src="https://user-images.githubusercontent.com/11568925/188273108-8789b8cf-d2ab-49d5-bc82-f0bf7b41c686.png"  width = "600" />
 <p>新建库</p>
 </div>
 
@@ -73,7 +73,7 @@
 此功能是，用此工具存储好的库，进行打开编辑。注意，**打开库时，请选择打开的是新建库时文件夹路径**。打开库后，示例如下
 
 <div align="center">
-<img src="../../images/shitu_index_manager/main_page.png"  width = "600" />
+<img src="https://user-images.githubusercontent.com/11568925/188273143-00ff0558-ccc9-4b8d-9364-43eef5dce334.png"  width = "600" />
 <p>打开库</p>
 </div>
 
@@ -93,7 +93,7 @@
 选择图像后，鼠标右击可以进行如下操作，可以根据需求，选择具体的操作，**注意修改完成图像后，请点击保存按钮，进行保存**
 
 <div align="center">
-<img src="../../images/shitu_index_manager/image_operation.png"  width = "600" />
+<img src="https://user-images.githubusercontent.com/11568925/188273178-5eff2f2e-7a8b-4a2b-809e-78f99479162d.png"  width = "600" />
 <p>图像操作</p>
 </div>
 
@@ -163,7 +163,7 @@ index_root/            # 库存储目录
 
 ## 致谢
 
-此工具的前端主要由[国内qt论坛](http://www.qtcn.org/)总坛主[小熊宝宝](https://github.com/cnhemiya)完成，感谢**小熊宝宝**的大力支持~~
+此工具的前端主要由[国内qt论坛](http://www.qtcn.org/)总版主[小熊宝宝](https://github.com/cnhemiya)完成，感谢**小熊宝宝**的大力支持~~
 
 此工具前端原项目地址：https://github.com/cnhemiya/shitu-manager
 
