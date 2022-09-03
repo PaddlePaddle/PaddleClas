@@ -33,7 +33,7 @@
 
 PaddleClas发布了[PP-HGNet](docs/zh_CN/models/PP-HGNet.md)、[PP-LCNetv2](docs/zh_CN/models/PP-LCNetV2.md)、 [PP-LCNet](docs/zh_CN/models/PP-LCNet.md)和[SSLD半监督知识蒸馏方案](docs/zh_CN/advanced_tutorials/ssld.md)等算法，
 并支持多种图像分类、识别相关算法，在此基础上打造[PULC超轻量图像分类方案](docs/zh_CN/PULC/PULC_quickstart.md)和[PP-ShiTu图像识别系统](./docs/zh_CN/quick_start/quick_start_recognition.md)。
-![](https://user-images.githubusercontent.com/19523330/173273046-239a42da-c88d-4c2c-94b1-2134557afa49.png)
+![](https://user-images.githubusercontent.com/11568925/188055076-7b0e3492-55cb-420f-b61a-160d4dd0bb0d.png)
 
 
 ## 欢迎加入技术交流群
@@ -116,18 +116,18 @@ PP-ShiTu图像识别快速体验：[点击这里](./docs/zh_CN/quick_start/quick
 
 <a name="图像识别系统介绍"></a>
 
-## PP-ShiTu图像识别系统
+## PP-ShiTuV2图像识别系统
 
 <div align="center">
 <img src="./docs/images/structure.jpg"  width = "800" />
 </div>
 
 
-PP-ShiTu是一个实用的轻量级通用图像识别系统，主要由主体检测、特征学习和向量检索三个模块组成。该系统从骨干网络选择和调整、损失函数的选择、数据增强、学习率变换策略、正则化参数选择、预训练模型使用以及模型裁剪量化8个方面，采用多种策略，对各个模块的模型进行优化，最终得到在CPU上仅0.2s即可完成10w+库的图像识别的系统。更多细节请参考[PP-ShiTu技术方案](https://arxiv.org/pdf/2111.00775.pdf)。
+PP-ShiTuV2是一个实用的轻量级通用图像识别系统，主要由主体检测、特征学习和向量检索三个模块组成。该系统从骨干网络选择和调整、损失函数的选择、数据增强、学习率变换策略、正则化参数选择、预训练模型使用以及模型裁剪量化多个方面，采用多种策略，对各个模块的模型进行优化，PP-ShiTuV2相比V1而已，Recall1提升10+个点。更多细节请参考[PP-ShiTuV2详细介绍](./docs/zh_CN/PPShiTu/PPShiTuV2_introduction.md)。
 
 <a name="识别效果展示"></a>
 
-## PP-ShiTu图像识别系统效果展示
+## PP-ShiTuV2图像识别系统效果展示
 
 - 瓶装饮料识别
 

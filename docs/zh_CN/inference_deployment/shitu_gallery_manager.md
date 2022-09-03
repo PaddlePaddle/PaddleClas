@@ -46,7 +46,12 @@
 
 第二行包括：`搜索框`、`搜索确定键`、`新加图像按钮`、`删除图像按钮`。
 
-下面将进行具体功能介绍，其操作入口，可以点击`主要功能按钮`下拉菜单查看
+下面将进行具体功能介绍，其操作入口，可以点击`主要功能按钮`下拉菜单查看，如下图所示：
+
+<div align="center">
+<img src="../../images/shitu_index_manager/all_menu.png"  width = "600" />
+<p>主要功能展示</p>
+</div>
 
 <a name="1.1"></a>
 
@@ -118,7 +123,7 @@ pip install pyqt5
 
 ### 2.2 模型准备
 
-请按照[PP-ShiTu快速体验](../quick_start/quick_start_recognition.md#2.2.1)中下载及准备inference model model
+请按照[PP-ShiTu快速体验](../quick_start/quick_start_recognition.md#2.2.1)中下载及准备inference model，并修改好`${PaddleClas}/deploy/configs/inference_drink.yaml`的相关参数。
 
 <a name="2.3"></a>
 
@@ -127,8 +132,8 @@ pip install pyqt5
 运行方式如下
 
 ```shell
-cd ${PaddleClas}/deploy/
-python shitu_index_manager/start.py -c inference_drink.yaml
+cd ${PaddleClas}/deploy/shitu_index_manager
+python index_manager.py -c ../configs/inference_drink.yaml
 ```
 
 <a name="3"></a>
