@@ -95,6 +95,7 @@ PP-ShiTu图像识别快速体验：[点击这里](./docs/zh_CN/quick_start/quick
     - [基于C++预测引擎推理](deploy/cpp_shitu/readme.md)
     - [服务化部署](docs/zh_CN/inference_deployment/recognition_serving_deploy.md)
     - [端侧部署](deploy/lite_shitu/README.md)
+  - [场景库应用](/docs/zh_CN/introduction/ppshitu_application_scenarios.md)
 - PP系列骨干网络模型
   - [PP-HGNet](docs/zh_CN/models/PP-HGNet.md)
   - [PP-LCNetv2](docs/zh_CN/models/PP-LCNetV2.md)
