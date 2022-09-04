@@ -1,4 +1,4 @@
-简体中文|[English](../../en/image_recognition_pipeline/feature_extraction_en.md)
+简体中文 | [English](../../en/image_recognition_pipeline/feature_extraction_en.md)
 # 特征提取
 
 ## 目录
@@ -35,10 +35,10 @@
 ![](../../images/feature_extraction_framework.png)
 图中各个模块的功能为:
 
-- **Backbone**: 用于提取输入图像初步特征的骨干网络，一般由配置文件中的 [`B.//ppcls/configs/GeneralRecognitionV2/GeneralRecognitionV2_PPLCNetV2_base.yaml#L26-L29) 以及 [`B.//ppcls/configs/GeneralRecognitionV2/GeneralRecognitionV2_PPLCNetV2_base.yaml#L30-L31) 字段共同指定。
-- **Neck**: 用以特征增强及特征维度变换。可以是一个简单的 FC Layer，用来做特征维度变换；也可以是较复杂的 FPN 结构，用以做特征增强，一般由配置文件中的 [`N.//ppcls/configs/GeneralRecognitionV2/GeneralRecognitionV2_PPLCNetV2_base.yaml#L32-L35)字段指定。
-- **Head**: 用来将 `Neck` 的输出 feature 转化为 logits，让模型在训练阶段能以分类任务的形式进行训练。除了常用的 FC Layer 外，还可以替换为 [CosMargin](../../../ppcls/arch/gears/cosmargin.py), [ArcMargin](../../../ppcls/arch/gears/arcmargin.py), [CircleMargin](../../../ppcls/arch/gears/circlemargin.py) 等模块，一般由配置文件中的 [`H.//ppcls/configs/GeneralRecognitionV2/GeneralRecognitionV2_PPLCNetV2_base.yaml#L36-L41) 字段指定。
-- **Loss**: 指定所使用的 Loss 函数。我们将 Loss 设计为组合 loss 的形式，可以方便地将 Classification Loss 和 Metric learning Loss 组合在一起，一般由配置文件中的 [`L.//ppcls/configs/GeneralRecognitionV2/GeneralRecognitionV2_PPLCNetV2_base.yaml#L44-L50) 字段指定。
+- **Backbone**: 用于提取输入图像初步特征的骨干网络，一般由配置文件中的 [Backbone](../../../ppcls/configs/GeneralRecognitionV2/GeneralRecognitionV2_PPLCNetV2_base.yaml#L33-L37) 以及 [BackboneStopLayer](../../../ppcls/configs/GeneralRecognitionV2/GeneralRecognitionV2_PPLCNetV2_base.yaml#L38-L39) 字段共同指定。
+- **Neck**: 用以特征增强及特征维度变换。可以是一个简单的 FC Layer，用来做特征维度变换；也可以是较复杂的 FPN 结构，用以做特征增强，一般由配置文件中的 [Neck](../../../ppcls/configs/GeneralRecognitionV2/GeneralRecognitionV2_PPLCNetV2_base.yaml#L40-L51) 字段指定。
+- **Head**: 用来将 `Neck` 的输出 feature 转化为 logits，让模型在训练阶段能以分类任务的形式进行训练。除了常用的 FC Layer 外，还可以替换为 [CosMargin](../../../ppcls/arch/gears/cosmargin.py), [ArcMargin](../../../ppcls/arch/gears/arcmargin.py), [CircleMargin](../../../ppcls/arch/gears/circlemargin.py) 等模块，一般由配置文件中的 [Head](`../../../ppcls/configs/GeneralRecognitionV2/GeneralRecognitionV2_PPLCNetV2_base.yaml#L52-L60) 字段指定。
+- **Loss**: 指定所使用的 Loss 函数。我们将 Loss 设计为组合 loss 的形式，可以方便地将 Classification Loss 和 Metric learning Loss 组合在一起，一般由配置文件中的 [Loss](../../../ppcls/configs/GeneralRecognitionV2/GeneralRecognitionV2_PPLCNetV2_base.yaml#L63-L77) 字段指定。
 
 <a name="3"></a>
 
@@ -58,7 +58,7 @@ Head 部分选用 [FC Layer](../../../ppcls/arch/gears/fc.py)，使用分类头�
 
 #### 3.4 Loss
 
-Loss 部分选用 [Cross entropy loss](../../../ppcls/loss/celoss.py) 和 [TripletAngularMarginLoss](../../../ppcls/loss/tripletangularmarginloss.py)，在训练时以分类损失和基于角度的三元组损失来指导网络进行优化。详细的配置文件见[GeneralRecognitionV2_PPLCNetV2_base.yaml](../../../ppcls/configs/GeneralRecognitionV2/GeneralRecognitionV2_PPLCNetV2_base.yaml#L63-77)。
+Loss 部分选用 [Cross entropy loss](../../../ppcls/loss/celoss.py) 和 [TripletAngularMarginLoss](../../../ppcls/loss/tripletangularmarginloss.py)，在训练时以分类损失和基于角度的三元组损失来指导网络进行优化。详细的配置文件见 [GeneralRecognitionV2_PPLCNetV2_base.yaml](../../../ppcls/configs/GeneralRecognitionV2/GeneralRecognitionV2_PPLCNetV2_base.yaml#L63-77)。
 
 <a name="4"></a>
 
@@ -116,7 +116,7 @@ Loss 部分选用 [Cross entropy loss](../../../ppcls/loss/celoss.py) 和 [Tripl
 
 ### 5.1 数据准备
 
-首先需要基于任务定制自己的数据集。数据集格式与文件结构详见[数据集格式说明](../data_preparation/recognition_dataset.md)。
+首先需要基于任务定制自己的数据集。数据集格式与文件结构详见 [数据集格式说明](../data_preparation/recognition_dataset.md)。
 
 准备完毕之后还需要在配置文件中修改数据配置相关的内容, 主要包括数据集的地址以及类别数量。对应到配置文件中的位置如下所示：
 
@@ -137,8 +137,8 @@ Loss 部分选用 [Cross entropy loss](../../../ppcls/loss/celoss.py) 和 [Tripl
   Train:
     dataset:
       name: ImageNetDataset
-      image_root: ./dataset/     # 此处表示train数据所在的目录
-      cls_label_path: ./dataset/train_reg_all_data.txt  # 此处表示train数据集label文件的地址
+      image_root: ./dataset/     # 此处表示train数据集所在的目录
+      cls_label_path: ./dataset/train_reg_all_data_v2.txt  # 此处表示train数据集对应标注文件的地址
       relabel: True
   ```
 - 修改评估数据集中query数据配置：
@@ -147,7 +147,7 @@ Loss 部分选用 [Cross entropy loss](../../../ppcls/loss/celoss.py) 和 [Tripl
     dataset:
       name: VeriWild
       image_root: ./dataset/Aliproduct/    # 此处表示query数据集所在的目录
-      cls_label_path: ./dataset/Aliproduct/val_list.txt    # 此处表示query数据集label文件的地址
+      cls_label_path: ./dataset/Aliproduct/val_list.txt    # 此处表示query数据集对应标注文件的地址
   ```
 - 修改评估数据集中gallery数据配置：
   ```yaml
@@ -155,7 +155,7 @@ Loss 部分选用 [Cross entropy loss](../../../ppcls/loss/celoss.py) 和 [Tripl
     dataset:
       name: VeriWild
       image_root: ./dataset/Aliproduct/    # 此处表示gallery数据集所在的目录
-      cls_label_path: ./dataset/Aliproduct/val_list.txt   # 此处表示gallery数据集label文件的地址
+      cls_label_path: ./dataset/Aliproduct/val_list.txt   # 此处表示gallery数据集对应标注文件的地址
   ```
 
 <a name="5.2"></a>
@@ -173,8 +173,8 @@ Loss 部分选用 [Cross entropy loss](../../../ppcls/loss/celoss.py) 和 [Tripl
 - 单机多卡训练
   ```shell
   export CUDA_VISIBLE_DEVICES=0,1,2,3
-  python3.7 -m paddle.distributed.launch \
-  --gpus="0,1,2,3" tools/train.py \
+  python3.7 -m paddle.distributed.launch --gpus="0,1,2,3" \
+  tools/train.py \
   -c ./ppcls/configs/GeneralRecognitionV2/GeneralRecognitionV2_PPLCNetV2_base.yaml
   ```
 **注意：**
@@ -192,8 +192,8 @@ Loss 部分选用 [Cross entropy loss](../../../ppcls/loss/celoss.py) 和 [Tripl
 - 单机多卡断点恢复训练
   ```shell
   export CUDA_VISIBLE_DEVICES=0,1,2,3
-  python3.7 -m paddle.distributed.launch \
-  --gpus="0,1,2,3" tools/train.py \
+  python3.7 -m paddle.distributed.launch --gpus="0,1,2,3" \
+  tools/train.py \
   -c ./ppcls/configs/GeneralRecognitionV2/GeneralRecognitionV2_PPLCNetV2_base.yaml \
   -o Global.checkpoint="output/RecModel/latest"
   ```
@@ -215,8 +215,8 @@ Loss 部分选用 [Cross entropy loss](../../../ppcls/loss/celoss.py) 和 [Tripl
 - 多卡评估
   ```shell
   export CUDA_VISIBLE_DEVICES=0,1,2,3
-  python3.7 -m paddle.distributed.launch \
-  --gpus="0,1,2,3" tools/eval.py \
+  python3.7 -m paddle.distributed.launch --gpus="0,1,2,3" \
+  tools/eval.py \
   -c ./ppcls/configs/GeneralRecognitionV2/GeneralRecognitionV2_PPLCNetV2_base.yaml \
   -o  Global.pretrained_model="output/RecModel/best_model"
   ```
@@ -249,10 +249,18 @@ python3.7 python/predict_rec.py \
 -c configs/inference_rec.yaml \
 -o Global.rec_inference_model_dir="../inference"
 ```
-得到的特征输出格式如下图所示：
-![](../../images/feature_extraction_output.png)
+得到的特征输出格式如下所示：
 
-在实际使用过程中，仅仅得到特征可能并不能满足业务需求。如果想进一步通过特征检索来进行图像识别，可以参照文档[向量检索](./vector_search.md)。
+```log
+wangzai.jpg:    [-4.72979844e-02  3.40038240e-02 -4.06982675e-02  2.46225717e-03
+  9.67078656e-03  2.70162839e-02 -8.85589980e-03 -4.71983254e-02
+  6.18615076e-02  1.38509814e-02 -1.11342799e-02  6.73768669e-02
+ -1.03065455e-02 -4.88462113e-02  8.46387446e-03  1.57074817e-02
+ ...
+ -3.14170569e-02  7.35917836e-02 -3.09373233e-02 -2.31755469e-02]
+```
+
+在实际使用过程中，仅仅得到特征可能并不能满足业务需求。如果想进一步通过特征检索来进行图像识别，可以参照文档 [向量检索](./vector_search.md)。
 
 <a name="6"></a>
 

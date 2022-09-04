@@ -7,6 +7,7 @@
   - [模型训练](#模型训练)
   - [模型评估](#模型评估)
   - [模型推理](#模型推理)
+  - [模型部署](#模型部署)
 - [模块介绍](#模块介绍)
   - [主体检测模型](#主体检测模型)
   - [特征提取模型](#特征提取模型)
@@ -21,18 +22,18 @@
 PP-ShiTuV2 是基于 PP-ShiTuV1 改进的一个实用轻量级通用图像识别系统，相比 PP-ShiTuV1 具有更高的识别精度、更强的泛化能力以及相近的推理速度<sup>*</sup>。该系统主要针对**训练数据集**、特征提取两个部分进行优化，使用了更优的骨干网络、损失函数与训练策略。使得 PP-ShiTuV2 在多个实际应用场景上的检索性能有显著提升。
 
 <div align="center">
-<img src="../../images/structure.png" />
+<img src="../../images/structure.jpg" />
 </div>
 
 ### 数据集介绍
 
-我们将训练数据进行了合理扩充与优化，更多细节请参考 [PP-ShiTuV2 数据集](../image_recognition_pipeline/feature_extraction.md#42-pp-shituv2)。
+我们将训练数据进行了合理扩充与优化，更多细节请参考 [PP-ShiTuV2 数据集](../image_recognition_pipeline/feature_extraction.md#4-实验部分)。
 
-下面以 [PP-ShiTuV2](../image_recognition_pipeline/feature_extraction.md#42-pp-shituv2) 的数据集为例，介绍 PP-ShiTuV2 模型的训练、评估、推理流程。
+下面以 [PP-ShiTuV2](../image_recognition_pipeline/feature_extraction.md#4-实验部分) 的数据集为例，介绍 PP-ShiTuV2 模型的训练、评估、推理流程。
 
 ### 模型训练
 
-首先下载好 [PP-ShiTuV2 数据集](../image_recognition_pipeline/feature_extraction.md#42-pp-shituv2) 中的16个数据集并手动进行合并、生成标注文本文件 `train_reg_all_data_v2.txt`，最后放置到 `dataset` 目录下。
+首先下载好 [PP-ShiTuV2 数据集](../image_recognition_pipeline/feature_extraction.md#4-实验部分) 中的16个数据集并手动进行合并、生成标注文本文件 `train_reg_all_data_v2.txt`，最后放置到 `dataset` 目录下。
 
 合并后的文件夹结构如下所示：
 
@@ -78,7 +79,11 @@ python3.7 -m paddle.distributed.launch tools/train.py \
 
 ### 模型推理
 
-参考 [模型推理](../image_recognition_pipeline/feature_extraction.md#54-模型推理)
+参考 [Python模型推理](../quick_start/quick_start_recognition.md#22-图像识别体验) 和 [C++ 模型推理](../../../deploy/cpp_shitu/readme.md)
+
+### 模型部署
+
+参考 [模型部署](../inference_deployment/recognition_serving_deploy.md#3-图像识别服务部署)
 
 ## 模块介绍
 
@@ -106,7 +111,7 @@ python3.7 -m paddle.distributed.launch tools/train.py \
 
 2. `last stride=1`：只将最后一个 stage 的 stride 改为1，即不进行下采样，以此增加最后输出的特征图的语义信息，同时不对推理速度产生太大影响。
 
-3. `BN Neck`：在全局池化层后加入一个 `BatchNorm1D` 结构，对特征向量的每个维度进行标准化，让 `CELoss` 与 `TripletAngularMarginLoss` 在不同的分布下进行优化，使得模型更快地收敛。
+3. `BN Neck`：在全局池化层后加入一个 `BatchNorm1D` 结构，对特征向量的每个维度进行标准化，使得模型更快地收敛。
 
     | 模型                                                               | training data     | recall@1%(mAP%) |
     | :----------------------------------------------------------------- | :---------------- | :-------------- |

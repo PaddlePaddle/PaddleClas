@@ -9,15 +9,15 @@
 
 # 默认编译时的${PWD}=PaddleClas/deploy/paddleserving/
 
-python_name=${1:-'python'}
+export python_name=${1:-'python'}
 
 apt-get update
 apt install -y libcurl4-openssl-dev libbz2-dev
 wget -nc https://paddle-serving.bj.bcebos.com/others/centos_ssl.tar
 tar xf centos_ssl.tar
 rm -rf centos_ssl.tar
-mv libcrypto.so.1.0.2k /usr/lib/libcrypto.so.1.0.2k
-mv libssl.so.1.0.2k /usr/lib/libssl.so.1.0.2k
+\mv libcrypto.so.1.0.2k /usr/lib/libcrypto.so.1.0.2k
+\mv libssl.so.1.0.2k /usr/lib/libssl.so.1.0.2k
 ln -sf /usr/lib/libcrypto.so.1.0.2k /usr/lib/libcrypto.so.10
 ln -sf /usr/lib/libssl.so.1.0.2k /usr/lib/libssl.so.10
 ln -sf /usr/lib/libcrypto.so.10 /usr/lib/libcrypto.so
