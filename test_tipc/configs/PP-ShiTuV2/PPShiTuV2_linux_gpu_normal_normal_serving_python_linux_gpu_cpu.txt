@@ -1,5 +1,5 @@
 ===========================serving_params===========================
-model_name:PPShiTu
+model_name:PPShiTuV2
 python:python3.7
 cls_inference_model_url:https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/inference/PP-ShiTuV2/general_PPLCNetV2_base_pretrained_v1.0_infer.tar
 det_inference_model_url:https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/inference/picodet_PPLCNet_x2_5_mainbody_lite_v1.0_infer.tar
