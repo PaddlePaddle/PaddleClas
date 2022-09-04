@@ -20,7 +20,7 @@ distill_train:null
 null:null
 null:null
 ##
-===========================eval_params=========================== 
+===========================eval_params===========================
 eval:tools/eval.py -c ppcls/configs/GeneralRecognitionV2/GeneralRecognitionV2_PPLCNetV2_base.yaml
 null:null
 ##
@@ -33,7 +33,7 @@ fpgm_export:null
 distill_export:null
 kl_quant:deploy/slim/quant_post_static.py -c ppcls/configs/GeneralRecognitionV2/GeneralRecognitionV2_PPLCNetV2_base.yaml -o Global.save_inference_dir=./general_PPLCNetV2_base_pretrained_v1.0_infer
 export2:null
-pretrained_model_url:https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/inference/PP-ShiTuV2/general_PPLCNetV2_base_pretrained_v1.0_infer.tar 
+pretrained_model_url:https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/inference/PP-ShiTuV2/general_PPLCNetV2_base_pretrained_v1.0_infer.tar
 infer_model:./general_PPLCNetV2_base_pretrained_v1.0_infer
 infer_export:True
 infer_quant:Fasle

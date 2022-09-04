@@ -12,6 +12,7 @@ Linux GPU/CPU C++ 推理功能测试的主程序为`test_inference_cpp.sh`，可
 |   MobileNetV3   |          MobileNetV3_large_x1_0_KL           |    支持    |    支持    |
 |   MobileNetV3   |         MobileNetV3_large_x1_0_PACT          |    支持    |    支持    |
 |    PP-ShiTu     |  PPShiTu_general_rec、PPShiTu_mainbody_det   |    支持    |    支持    |
+|   PP-ShiTuV2    |  PPShiTuV2_general_rec、PPShiTu_mainbody_det |    支持    |    支持    |
 |    PP-ShiTu     |      GeneralRecognition_PPLCNet_x2_5_KL      |    支持    |    支持    |
 |    PP-ShiTu     |     GeneralRecognition_PPLCNet_x2_5_PACT     |    支持    |    支持    |
 |     PPHGNet     |                PPHGNet_small                 |    支持    |    支持    |

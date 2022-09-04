@@ -15,6 +15,7 @@ Linux GPU/CPU C++ 服务化部署测试的主程序为`test_serving_infer_cpp.sh
 |    PP-ShiTu     |  PPShiTu_general_rec、PPShiTu_mainbody_det   |    支持    |    支持    |
 |    PP-ShiTu     |      GeneralRecognition_PPLCNet_x2_5_KL      |    支持    |    支持    |
 |    PP-ShiTu     |     GeneralRecognition_PPLCNet_x2_5_PACT     |    支持    |    支持    |
+|   PP-ShiTuV2    |  PPShiTuV2_general_rec、PPShiTu_mainbody_det |    支持    |    支持    |
 |     PPHGNet     |                PPHGNet_small                 |    支持    |    支持    |
 |     PPHGNet     |               PPHGNet_small_KL               |    支持    |    支持    |
 |     PPHGNet     |              PPHGNet_small_PACT              |    支持    |    支持    |

@@ -143,6 +143,8 @@ if [[ ${MODE} = "cpp_infer" ]]; then
             cd dataset
             wget -nc https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/data/drink_dataset_v1.0.tar
             tar -xf drink_dataset_v1.0.tar
+            wget -nc https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/data/drink_dataset_v2.0.tar
+            tar -xf drink_dataset_v2.0.tar
         else
             echo "Wrong cpp type in config file in line 3. only support cls, shitu"
         fi
@@ -288,6 +290,8 @@ if [[ ${MODE} = "serving_infer" ]]; then
         cd ./deploy
         wget -nc https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/data/drink_dataset_v1.0.tar --no-check-certificate
         tar -xf drink_dataset_v1.0.tar
+        wget -nc https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/data/drink_dataset_v2.0.tar --no-check-certificate
+        tar -xf drink_dataset_v2.0.tar
         mkdir models
         cd models
         wget -nc ${cls_inference_model_url} && tar xf ${cls_tar_name}

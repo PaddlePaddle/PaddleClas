@@ -113,7 +113,6 @@ if __name__ == "__main__":
         batch=False)
 
     # add retrieval procedure
-    print(fetch_map.keys())
     det_boxes = fetch_map["boxes"]
     searcher, id_map = init_index(index_dir)
     results = postprocess(fetch_map, feature_normalize, det_boxes, searcher,

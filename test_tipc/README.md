@@ -110,7 +110,6 @@ bash test_tipc/test_train_inference_python.sh ./test_tipc/configs/MobileNetV3/Mo
 - [test_train_pact_inference_python 使用](docs/test_train_pact_inference_python.md)：测试基于Python的模型PACT在线量化等基本功能。
 - [test_train_ptq_inference_python 使用](docs/test_train_ptq_inference_python.md)：测试基于Python的模型KL离线量化等基本功能。
 - [test_inference_cpp 使用](docs/test_inference_cpp.md) ：测试基于C++的模型推理。
-- [test_serving 使用](docs/test_serving.md) ：测试基于Paddle Serving的服务化部署功能。
 - [test_lite_arm_cpu_cpp 使用](docs/test_lite_arm_cpu_cpp.md): 测试基于Paddle-Lite的ARM CPU端c++预测部署功能.
 - [test_paddle2onnx 使用](docs/test_paddle2onnx.md)：测试Paddle2ONNX的模型转化功能，并验证正确性。
 - [test_serving_infer_python 使用](docs/test_serving_infer_python.md)：测试python serving功能。
