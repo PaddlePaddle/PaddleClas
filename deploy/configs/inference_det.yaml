@@ -6,7 +6,7 @@ Global:
   threshold: 0.2
   max_det_results: 1
   label_list:
-  - foreground
+    - foreground
 
   # inference engine config
   use_gpu: True
@@ -30,5 +30,5 @@ DetPreProcess:
         mean: [0.485, 0.456, 0.406]
         std: [0.229, 0.224, 0.225]
     - DetPermute: {}
-    
+
 DetPostProcess: {}
