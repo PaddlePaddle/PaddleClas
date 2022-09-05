@@ -53,7 +53,7 @@ function func_paddle2onnx(){
     set_save_model=$(func_set_params "${save_file_key}" "${save_file_value}")
     set_opset_version=$(func_set_params "${opset_version_key}" "${opset_version_value}")
     set_enable_onnx_checker=$(func_set_params "${enable_onnx_checker_key}" "${enable_onnx_checker_value}")
-    trans_model_cmd="${padlle2onnx_cmd} ${set_dirname} ${set_model_filename} ${set_params_filename} ${set_save_model} ${set_opset_version} ${set_enable_onnx_checker}"
+    trans_model_cmd="${padlle2onnx_cmd} ${set_dirname} ${set_model_filename} ${set_params_filename} ${set_save_model} ${set_opset_version} ${set_enable_onnx_checker} --enable_dev_version=False"
     eval $trans_model_cmd
     last_status=${PIPESTATUS[0]}
     status_check $last_status "${trans_model_cmd}" "${status_log}" "${model_name}"
