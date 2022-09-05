@@ -201,7 +201,7 @@ def _vovnet(arch,
     return model
 
 
-def vovnet57(pretrained=False, progress=True, **kwargs):
+def VoVNet57(pretrained=False, progress=True, **kwargs):
     r"""Constructs a VoVNet-57 model as described in
     `"An Energy and GPU-Computation Efficient Backbone Networks"
     <https://arxiv.org/abs/1904.09730>`_.
@@ -213,7 +213,7 @@ def vovnet57(pretrained=False, progress=True, **kwargs):
                    [1, 1, 4, 3], 5, pretrained, progress, **kwargs)
 
 
-def vovnet39(pretrained=False, progress=True, **kwargs):
+def VoVNet39(pretrained=False, progress=True, **kwargs):
     r"""Constructs a VoVNet-39 model as described in
     `"An Energy and GPU-Computation Efficient Backbone Networks"
     <https://arxiv.org/abs/1904.09730>`_.
@@ -225,7 +225,7 @@ def vovnet39(pretrained=False, progress=True, **kwargs):
                    [1, 1, 2, 2], 5, pretrained, progress, **kwargs)
 
 
-def vovnet27_slim(pretrained=False, progress=True, **kwargs):
+def VoVNet27_slim(pretrained=False, progress=True, **kwargs):
     r"""Constructs a VoVNet-39 model as described in
     `"An Energy and GPU-Computation Efficient Backbone Networks"
     <https://arxiv.org/abs/1904.09730>`_.

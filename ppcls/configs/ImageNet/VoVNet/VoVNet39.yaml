@@ -18,7 +18,7 @@ Global:
 
 # model architecture
 Arch:
-  name: vovnet39
+  name: VoVNet39
   class_num: 1000
 
 # loss function config for traing/eval process
