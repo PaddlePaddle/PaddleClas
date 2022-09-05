@@ -198,8 +198,10 @@ cd $code_path
 git clone https://github.com/PaddlePaddle/PaddleDetection.git
 # 进入PaddleDetection根目录
 cd PaddleDetection
+# 切换到2.3分支
+git checkout release/2.3
 # 将预训练模型导出为inference模型
-python tools/export_model.py -c configs/picodet/legacy_model/application/mainbody_detection/picodet_lcnet_x2_5_640_mainbody.yml -o weights=https://paddledet.bj.bcebos.com/models/picodet_lcnet_x2_5_640_mainbody.pdparams export_post_process=False --output_dir=inference
+python tools/export_model.py -c configs/picodet/application/mainbody_detection/picodet_lcnet_x2_5_640_mainbody.yml -o weights=https://paddledet.bj.bcebos.com/models/picodet_lcnet_x2_5_640_mainbody.pdparams export_post_process=False --output_dir=inference
 # 将inference模型转化为Paddle-Lite优化模型
 paddle_lite_opt --model_file=inference/picodet_lcnet_x2_5_640_mainbody/model.pdmodel --param_file=inference/picodet_lcnet_x2_5_640_mainbody/model.pdiparams --optimize_out=inference/picodet_lcnet_x2_5_640_mainbody/mainbody_det
 # 将转好的模型复制到lite_shitu目录下
