@@ -64,7 +64,7 @@ Loss 部分选用 [Cross entropy loss](../../../ppcls/loss/celoss.py) 和 [Tripl
 
 ## 4. 实验部分
 
-我们对原有的训练数据进行了合理扩充与优化，最终使用如下 16 个公开数据集的汇总：
+我们对原有的训练数据进行了合理扩充与优化，最终使用如下 17 个公开数据集的汇总：
 
 | 数据集                 | 数据量  |  类别数  | 场景  |                                      数据集地址                                      |
 | :--------------------- | :-----: | :------: | :---: | :----------------------------------------------------------------------------------: |
@@ -89,15 +89,10 @@ Loss 部分选用 [Cross entropy loss](../../../ppcls/loss/celoss.py) 和 [Tripl
 
 最终的模型精度指标如下表所示:
 
-  | 模型       | Aliproduct      | VeRI-Wild       | LogoDet-3k      | iCartoonFace    | SOP             | Inshop          |
-  | :--------- | :-------------- | :-------------- | :-------------- | :-------------- | :-------------- | :-------------- |
-  | -          | recall@1%(mAP%) | recall@1%(mAP%) | recall@1%(mAP%) | recall@1%(mAP%) | recall@1%(mAP%) | recall@1%(mAP%) |
-  | PP-ShiTuV2 | 84.2(83.3)      | 87.8(68.8)      | 88.0(63.2)      | 53.6(27.5)      | 77.6(55.3)      | 90.8(74.3)      |
-
-  | 模型       | gldv2           | imdb_face       | iNat            | instre          | sketch          | sop<sup>*</sup> |
-  | :--------- | :-------------- | :-------------- | :-------------- | :-------------- | :-------------- | :-------------- |
-  | -          | recall@1%(mAP%) | recall@1%(mAP%) | recall@1%(mAP%) | recall@1%(mAP%) | recall@1%(mAP%) | recall@1%(mAP%) |
-  | PP-ShiTuV2 | 98.1(90.5)      | 35.9(11.2)      | 38.6(23.9)      | 87.7(71.4)      | 39.3(15.6)      | 98.3(90.9)      |
+| 模型                   | 延时(ms) | 存储(MB) | product<sup>*</sup> |      | Aliproduct |      | VeRI-Wild |      | LogoDet-3k |      | iCartoonFace |      | SOP      |      | Inshop   |      | gldv2    |      | imdb_face |      | iNat     |      | instre   |      | sketch   |      | sop      |      |
+| :--------------------- | :----------- | :------ | :------------------ | :--- | ---------- | ---- | --------- | ---- | ---------- | ---- | ------------ | ---- | -------- | ---- | -------- | ---- | -------- | ---- | --------- | ---- | -------- | ---- | -------- | ---- | -------- | ---- | -------- | ---- |
+|                        |              |         | recall@1            | mAP  | recall@1   | mAP  | recall@1  | mAP  | recall@1   | mAP  | recall@1     | mAP  | recall@1 | mAP  | recall@1 | mAP  | recall@1 | mAP  | recall@1  | mAP  | recall@1 | mAP  | recall@1 | mAP  | recall@1 | mAP  | recall@1 | mAP  |
+| PP-ShiTuV2_general_rec | 6.1          | 19       | 73.7                | 61.0 | 84.2       | 83.3 | 87.8      | 68.8 | 88.0       | 63.2 | 53.6         | 27.5 | 77.6     | 55.3 | 90.8     | 74.3 | 98.1     | 90.5 | 35.9      | 11.2 | 38.6     | 23.9 | 87.7     | 71.4 | 39.3     | 15.6 | 98.3     | 90.9 |
 
 * 预训练模型地址：[general_PPLCNetV2_base_pretrained_v1.0.pdparams](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/pretrain/PPShiTuV2/general_PPLCNetV2_base_pretrained_v1.0.pdparams)
 * 采用的评测指标为：`Recall@1` 与 `mAP`
