@@ -16,7 +16,11 @@
 # reference: https://arxiv.org/abs/2007.02269
 
 import math
+from functools import partial
+
+import paddle
 import paddle.nn as nn
+from paddle.regularizer import L2Decay
 
 from ppcls.utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
 
@@ -29,6 +33,14 @@ MODEL_URLS = {
 }
 
 __all__ = list(MODEL_URLS.keys())
+
+no_weight_decay_attr = paddle.ParamAttr(L2Decay(0))
+BatchNorm2D = partial(
+    nn.BatchNorm2D,
+    weight_attr=no_weight_decay_attr,
+    bias_attr=no_weight_decay_attr)
+Conv2D = partial(nn.Conv2D, bias_attr=no_weight_decay_attr)
+Linear = partial(nn.Linear, bias_attr=no_weight_decay_attr)
 
 
 def _make_divisible(v, divisor, min_value=None):
@@ -53,10 +65,10 @@ def _make_divisible(v, divisor, min_value=None):
 
 def conv_3x3_bn(inp, oup, stride):
     return nn.Sequential(
-        nn.Conv2D(
+        Conv2D(
             inp, oup, 3, stride, 1, bias_attr=False),
-        nn.BatchNorm2D(oup),
-        nn.ReLU6(), )
+        BatchNorm2D(oup),
+        nn.ReLU6())
 
 
 class SGBlock(nn.Layer):
@@ -76,72 +88,72 @@ class SGBlock(nn.Layer):
         if expand_ratio == 2:
             self.conv = nn.Sequential(
                 # dw
-                nn.Conv2D(
+                Conv2D(
                     inp, inp, 3, 1, 1, groups=inp, bias_attr=False),
-                nn.BatchNorm2D(inp),
+                BatchNorm2D(inp),
                 nn.ReLU6(),
                 # pw-linear
-                nn.Conv2D(
+                Conv2D(
                     inp, hidden_dim, 1, 1, 0, bias_attr=False),
-                nn.BatchNorm2D(hidden_dim),
+                BatchNorm2D(hidden_dim),
                 # pw-linear
-                nn.Conv2D(
+                Conv2D(
                     hidden_dim, oup, 1, 1, 0, bias_attr=False),
-                nn.BatchNorm2D(oup),
+                BatchNorm2D(oup),
                 nn.ReLU6(),
                 # dw
-                nn.Conv2D(
+                Conv2D(
                     oup, oup, 3, stride, 1, groups=oup, bias_attr=False),
-                nn.BatchNorm2D(oup), )
+                BatchNorm2D(oup))
         elif inp != oup and stride == 1 and keep_3x3 == False:
             self.conv = nn.Sequential(
                 # pw-linear
-                nn.Conv2D(
+                Conv2D(
                     inp, hidden_dim, 1, 1, 0, bias_attr=False),
-                nn.BatchNorm2D(hidden_dim),
+                BatchNorm2D(hidden_dim),
                 # pw-linear
-                nn.Conv2D(
+                Conv2D(
                     hidden_dim, oup, 1, 1, 0, bias_attr=False),
-                nn.BatchNorm2D(oup),
-                nn.ReLU6(), )
+                BatchNorm2D(oup),
+                nn.ReLU6())
         elif inp != oup and stride == 2 and keep_3x3 == False:
             self.conv = nn.Sequential(
                 # pw-linear
-                nn.Conv2D(
+                Conv2D(
                     inp, hidden_dim, 1, 1, 0, bias_attr=False),
-                nn.BatchNorm2D(hidden_dim),
+                BatchNorm2D(hidden_dim),
                 # pw-linear
-                nn.Conv2D(
+                Conv2D(
                     hidden_dim, oup, 1, 1, 0, bias_attr=False),
-                nn.BatchNorm2D(oup),
+                BatchNorm2D(oup),
                 nn.ReLU6(),
                 # dw
-                nn.Conv2D(
+                Conv2D(
                     oup, oup, 3, stride, 1, groups=oup, bias_attr=False),
-                nn.BatchNorm2D(oup), )
+                BatchNorm2D(oup))
         else:
             if keep_3x3 == False:
                 self.identity = True
             self.conv = nn.Sequential(
                 # dw
-                nn.Conv2D(
+                Conv2D(
                     inp, inp, 3, 1, 1, groups=inp, bias_attr=False),
-                nn.BatchNorm2D(inp),
+                BatchNorm2D(inp),
                 nn.ReLU6(),
                 # pw
-                nn.Conv2D(
+                Conv2D(
                     inp, hidden_dim, 1, 1, 0, bias_attr=False),
-                nn.BatchNorm2D(hidden_dim),
+                BatchNorm2D(hidden_dim),
                 #nn.ReLU6(),
                 # pw
-                nn.Conv2D(
+                Conv2D(
                     hidden_dim, oup, 1, 1, 0, bias_attr=False),
-                nn.BatchNorm2D(oup),
+                BatchNorm2D(oup),
                 nn.ReLU6(),
                 # dw
-                nn.Conv2D(
+                Conv2D(
                     oup, oup, 3, 1, 1, groups=oup, bias_attr=False),
-                nn.BatchNorm2D(oup), )
+                BatchNorm2D(oup))
 
     def forward(self, x):
         out = self.conv(x)
@@ -199,7 +211,8 @@ class MobileNeXt(nn.Layer):
         self.avgpool = nn.AdaptiveAvgPool2D((1, 1))
         self.classifier = nn.Sequential(
             nn.Dropout(0.2),
-            nn.Linear(output_channel, class_num), )
+            Linear(
+                output_channel, class_num, bias_attr=no_weight_decay_attr))
 
         self.apply(self._initialize_weights)
 

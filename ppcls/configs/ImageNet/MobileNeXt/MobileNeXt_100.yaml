@@ -35,8 +35,6 @@ Optimizer:
   name: Momentum
   momentum: 0.9
   use_nesterov: True
-  no_weight_decay_name: .bias
-  one_dim_param_no_weight_decay: True
   lr:
     name: Cosine
     learning_rate: 0.1  # for total batch size 512

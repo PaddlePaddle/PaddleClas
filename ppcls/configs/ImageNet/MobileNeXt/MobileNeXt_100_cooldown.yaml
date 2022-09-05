@@ -35,17 +35,9 @@ Optimizer:
   name: Momentum
   momentum: 0.9
   use_nesterov: True
-  no_weight_decay_name: .bias
-  one_dim_param_no_weight_decay: True
   lr:
     name: Constant                     # for cooldown
     learning_rate: 1e-5                # for cooldown
-    # name: Cosine
-    # learning_rate: 0.1  # for total batch size 512
-    # eta_min: 1e-5
-    # warmup_epoch: 3
-    # warmup_start_lr: 1e-4
-    # by_epoch: True
   regularizer:
     name: 'L2'
     coeff: 1e-4
