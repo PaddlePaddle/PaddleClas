@@ -133,18 +133,18 @@ python -m paddle.distributed.launch --gpus="0,1,2,3" \
 ```shell
 python tools/infer.py \
     -c ./ppcls/configs/ImageNet/VoVNet/VoVNet39.yaml \
-    -o Infer.infer_imgs=./deploy/images/ILSVRC2012_val_00020010.jpeg \
+    -o Infer.infer_imgs=./deploy/images/ImageNet/ILSVRC2012_val_00020010.jpeg \
     -o Global.pretrained_model=$TRAINED_MODEL
 ```
 <div align="center">
-    <img src="./deploy/images/ILSVRC2012_val_00020010.jpeg" width=300">
+    <img src="./deploy/images/ImageNet/ILSVRC2012_val_00020010.jpeg" width=300">
 </div>
 
 最终输出结果为
 ```
-[{'class_ids': [178, 211, 209, 210, 246], 'scores': [0.8353, 0.01287, 0.00731, 0.00315, 0.00206], 'file_name': './deploy/images/ILSVRC2012_val_00020010.jpeg', 'label_names': ['Weimaraner', 'vizsla, Hungarian pointer', 'Chesapeake Bay retriever', 'German short-haired pointer', 'Great Dane']}]
+[{'class_ids': [178, 211, 209, 210, 181], 'scores': [0.99925, 0.00017, 0.00012, 9e-05, 7e-05], 'file_name': './deploy/images/ImageNet/ILSVRC2012_val_00020010.jpeg', 'label_names': ['Weimaraner', 'vizsla, Hungarian pointer', 'Chesapeake Bay retriever', 'German short-haired pointer', 'Bedlington terrier']}]```
+表示预测的类别为`Weimaraner（魏玛猎狗）`，ID是`178`，置信度为`0.99925`。
 ```
-表示预测的类别为`Weimaraner（魏玛猎狗）`，ID是`178`，置信度为`0.8353`。
 
 ## 5. 模型推理部署
 
@@ -156,14 +156,16 @@ python tools/infer.py \
 
 ```shell
 python tools/export_model.py \
-    -c ./ppcls/configs/ImageNet/VAN/VAN_tiny.yaml \
-    -o Global.save_inference_dir=./deploy/models/class_VAN_tiny_ImageNet_infer \
+    -c ./ppcls/configs/ImageNet/VoVNet/VoVNet39.yaml \
+    -o Global.save_inference_dir=./deploy/models/class_VoVNet39_ImageNet_infer \
     -o Global.pretrained_model=$TRAINED_MODEL
 ```
 
-### 5.2 基于Serving的服务化部署
+静态图模型推理
+```shell
+python deploy/python/predict_cls.py
+```
 
-Serving部署教程可参考：[链接](./deploy/paddleserving/readme.md)。
 
 
 ## 6. 自动化测试脚本

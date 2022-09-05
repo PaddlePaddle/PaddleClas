@@ -1,5 +1,5 @@
 ===========================train_params===========================
-model_name:vovnet39
+model_name:VoVNet39
 python:python3.7
 gpu_list:0|0,1
 -o Global.device:gpu
