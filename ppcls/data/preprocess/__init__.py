@@ -41,6 +41,7 @@ from ppcls.data.preprocess.ops.operators import RandomCropImage
 from ppcls.data.preprocess.ops.operators import Padv2
 
 from ppcls.data.preprocess.batch_ops.batch_operators import MixupOperator, CutmixOperator, OpSampler, FmixOperator
+from ppcls.data.preprocess.batch_ops.batch_operators import HackedMixupOperator
 
 import numpy as np
 from PIL import Image
