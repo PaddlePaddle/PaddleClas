@@ -22,7 +22,6 @@
 
 这是一个PaddlePaddle实现的VoVNet（An Energy and GPU-Computation Efficient Backbone Network for Real-Time Object Detection）。
 
-Figure 1: **在ImageNet-1K验证集上与不同的vision backbones进行比较。**
 
 **论文:** [An Energy and GPU-Computation Efficient Backbone Network for Real-Time Object Detection](https://arxiv.org/abs/1904.09730)
 
@@ -166,8 +165,9 @@ python python/predict_cls.py -c configs/inference_cls.yaml \
  -o Global.inference_model_dir=models/class_VoVNet39_ImageNet_infer \
   -o Global.infer_imgs=images/ImageNet/ILSVRC2012_val_00020010.jpeg
 ```
+```
 ILSVRC2012_val_00020010.jpeg:   class id(s): [178, 211, 209, 210, 181], score(s): [1.00, 0.00, 0.00, 0.00, 0.00], label_name(s): ['Weimaraner', 'vizsla, Hungarian pointer', 'Chesapeake Bay retriever', 'German short-haired pointer', 'Bedlington terrier']
-
+```
 
 ## 6. 自动化测试脚本
 
