@@ -22,8 +22,6 @@
 
 这是一个PaddlePaddle实现的VoVNet（An Energy and GPU-Computation Efficient Backbone Network for Real-Time Object Detection）。
 
-![Comparsion](https://github.com/Visual-Attention-Network/VAN-Classification/blob/main/images/Comparsion.png)
-
 Figure 1: **在ImageNet-1K验证集上与不同的vision backbones进行比较。**
 
 **论文:** [An Energy and GPU-Computation Efficient Backbone Network for Real-Time Object Detection](https://arxiv.org/abs/1904.09730)
@@ -60,9 +58,9 @@ Figure 1: **在ImageNet-1K验证集上与不同的vision backbones进行比较�
 
 | 模型      | top1 acc (参考精度) | top1 acc (复现精度) | 权重 \| 训练日志 |
 |:---------:|:------:|:----------:|:----------:|
-| VoVNet-39| 0.7677   | 0.7680   | aistudio_bs1024_75.446/best_model.pdparams \| aistudio_bs1024_75.446/train.log |
+| VoVNet-39| 0.7677   | 0.7680   | best_model.pdparams \| train.log |
 
-权重及训练日志下载地址：[百度网盘](https://pan.baidu.com/s/1O3kFNwtW53aOZR31HN35Hw?pwd=4owk)
+权重及训练日志下载地址：[百度网盘](https://pan.baidu.com/s/1s7EAQiRnbPnWDRjA1VgPfw?pwd=w1xt)
 
 ## 3. 准备数据与环境
 
@@ -108,7 +106,7 @@ pip install -r requirements.txt
 ### 4.1 模型训练
 
 * 单机多卡训练
-使用torch初始化，转换的权重
+使用torch初始化转换的权重作为初始化权重
 ```shell
 export CUDA_VISIBLE_DEVICES=0,1,2,3
 python -m paddle.distributed.launch --gpus="0,1,2,3" \
@@ -163,9 +161,12 @@ python tools/export_model.py \
 
 静态图模型推理
 ```shell
-python deploy/python/predict_cls.py
+cd deploy
+python python/predict_cls.py -c configs/inference_cls.yaml \
+ -o Global.inference_model_dir=models/class_VoVNet39_ImageNet_infer \
+  -o Global.infer_imgs=images/ImageNet/ILSVRC2012_val_00020010.jpeg
 ```
-
+ILSVRC2012_val_00020010.jpeg:   class id(s): [178, 211, 209, 210, 181], score(s): [1.00, 0.00, 0.00, 0.00, 0.00], label_name(s): ['Weimaraner', 'vizsla, Hungarian pointer', 'Chesapeake Bay retriever', 'German short-haired pointer', 'Bedlington terrier']
 
 
 ## 6. 自动化测试脚本
@@ -175,19 +176,15 @@ python deploy/python/predict_cls.py
 TIPC: [TIPC: test_tipc/README.md](./test_tipc/README.md)
 
 首先安装auto_log，需要进行安装，安装方式如下：
-auto_log的详细介绍参考https://github.com/LDOUBLEV/AutoLog。
 ```shell
-git clone https://github.com/LDOUBLEV/AutoLog
-cd AutoLog/
-pip3 install -r requirements.txt
-python3 setup.py bdist_wheel
-pip3 install ./dist/auto_log-1.2.0-py3-none-any.whl
+pip install  https://paddleocr.bj.bcebos.com/libs/auto_log-1.2.0-py3-none-any.whl
 ```
 进行TIPC：
 ```bash
-bash test_tipc/prepare.sh test_tipc/config/VAN/VAN_tiny.txt 'lite_train_lite_infer'
-
-bash test_tipc/test_train_inference_python.sh test_tipc/config/VAN/VAN_tiny.txt 'lite_train_lite_infer'
+# 准备数据
+bash test_tipc/prepare.sh c_train_infer_python.txt 'lite_train_lite_infer'
+# 运行测试
+bash test_tipc/test_train_inference_python.sh c_train_infer_python.txt 'lite_train_lite_infer'
 ```
 TIPC结果：
 
@@ -206,5 +203,5 @@ Run successfully with command - python3.7 deploy/py_inference/infer.py --use-gpu
 本项目的发布受[Apache 2.0 license](./LICENSE)许可认证。
 
 ## 8. 参考链接与文献
-1. Visual Attention Network: https://arxiv.org/pdf/2202.09741.pdf
-2. VAN-Classification: https://github.com/Visual-Attention-Network/VAN-Classification
+1. [An Energy and GPU-Computation Efficient Backbone Network for Real-Time Object Detection](https://arxiv.org/abs/1904.09730)
+2. [VoVNet.pytorch](https://github.com/stigma0617/VoVNet.pytorch)
