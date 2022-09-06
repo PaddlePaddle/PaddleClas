@@ -18,7 +18,7 @@
 <a name='2'></a>
 ## 2. 算法介绍
 
-目前PaddleClas中，主要复现了三种DeepHash的方法，分别是：[DCH](http://ise.thss.tsinghua.edu.cn/~mlong/doc/deep-cauchy-hashing-cvpr18.pdf)，[DSHSD](https://ieeexplore.ieee.org/document/8648432/), [LCDSH](https://www.ijcai.org/Proceedings/2017/0499.pdf)。以下请分别介绍。
+目前PaddleClas中，主要复现了三种DeepHash的方法，分别是：[DCH](http://ise.thss.tsinghua.edu.cn/~mlong/doc/deep-cauchy-hashing-cvpr18.pdf)，[DSHSD](https://ieeexplore.ieee.org/document/8648432/), [LCDSH](https://www.ijcai.org/Proceedings/2017/0499.pdf)。以下做简要介绍。
 
 <a name='2.1'></a>
 ## 2.1 DCH
@@ -32,7 +32,7 @@
 <a name='2.2'></a>
 ## 2.2 DSHSD
 
-DSHSD主要创新点在于，在保证分布一致性的情况下消除差异。首先，作者利用平滑投影函数来放松离散约束，而不是使用任何量化正则化器，其中平滑量是可调整的。其次，在平滑投影和特征分布之间建立数学联系，以保持分布的一致性。进而提出了一种多语义信息融合方法，使hash码学习后能够保留更多的语义信息，从而加快训练收敛速度。其方法在在CIFAR-10、NUS-WIDE和ImageNet数据集上的大量实验表现良好。具体可查看[论文](https://ieeexplore.ieee.org/document/8648432/)。
+DSHSD主要创新点在于，在保证分布一致性的情况下消除差异。首先，作者利用平滑投影函数来放松离散约束，而不是使用任何量化正则化器，其中平滑量是可调整的。其次，在平滑投影和特征分布之间建立数学联系，以保持分布的一致性。进而提出了一种多语义信息融合方法，使hash码学习后能够保留更多的语义信息，从而加快训练收敛速度。其方法在在CIFAR-10、NUS-WIDE和ImageNet数据集上的大量实验表现良好。具体可查看[论文](https://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=8648432)。
 
 <div align="center">
 <img src="../../images/deep_hash/DSHSD.png"  width = "400" />
