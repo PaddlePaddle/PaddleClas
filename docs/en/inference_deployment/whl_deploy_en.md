@@ -25,17 +25,16 @@ PaddleClas supports Python wheel package for prediction. At present, PaddleClas 
 
 ## 1. Installation
 
-* installing from pypi
+* **[Recommended]** Installing from PyPI:
 
 ```bash
-pip3 install paddleclas==2.2.1
+pip3 install paddleclas
 ```
 
-* build own whl package and install
+* Please build and install locally if you need to use the develop branch of PaddleClas to experience the latest functions, or need to redevelop based on PaddleClas. The command is as follows:
 
 ```bash
-python3 setup.py bdist_wheel
-pip3 install dist/*
+python3 setup.py install
 ```
 
 <a name="2"></a>

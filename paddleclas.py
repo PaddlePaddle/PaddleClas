@@ -50,6 +50,11 @@ BASE_IMAGES_DIR = os.path.join(BASE_DIR, "images")
 IMN_MODEL_BASE_DOWNLOAD_URL = "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/{}_infer.tar"
 IMN_MODEL_SERIES = {
     "AlexNet": ["AlexNet"],
+    "CSWinTransformer": [
+        "CSWinTransformer_tiny_224", "CSWinTransformer_small_224",
+        "CSWinTransformer_base_224", "CSWinTransformer_base_384",
+        "CSWinTransformer_large_224", "CSWinTransformer_large_384"
+    ],
     "DarkNet": ["DarkNet53"],
     "DeiT": [
         "DeiT_base_distilled_patch16_224", "DeiT_base_distilled_patch16_384",
@@ -81,6 +86,8 @@ IMN_MODEL_SERIES = {
         "HRNet_W48_C_ssld"
     ],
     "Inception": ["GoogLeNet", "InceptionV3", "InceptionV4"],
+    "LeViT":
+    ["LeViT_128S", "LeViT_128", "LeViT_192", "LeViT_256", "LeViT_384"],
     "MixNet": ["MixNet_S", "MixNet_M", "MixNet_L"],
     "MobileNetV1": [
         "MobileNetV1_x0_25", "MobileNetV1_x0_5", "MobileNetV1_x0_75",
@@ -99,6 +106,7 @@ IMN_MODEL_SERIES = {
         "MobileNetV3_large_x1_0", "MobileNetV3_large_x1_25",
         "MobileNetV3_small_x1_0_ssld", "MobileNetV3_large_x1_0_ssld"
     ],
+    "MobileViT": ["MobileViT_XXS", "MobileViT_XS", "MobileViT_S"],
     "PPHGNet": [
         "PPHGNet_tiny",
         "PPHGNet_small",
@@ -110,6 +118,10 @@ IMN_MODEL_SERIES = {
         "PPLCNet_x1_0", "PPLCNet_x1_5", "PPLCNet_x2_0", "PPLCNet_x2_5"
     ],
     "PPLCNetV2": ["PPLCNetV2_base"],
+    "PVTV2": [
+        "PVT_V2_B0", "PVT_V2_B1", "PVT_V2_B2", "PVT_V2_B2_Linear", "PVT_V2_B3",
+        "PVT_V2_B4", "PVT_V2_B5"
+    ],
     "RedNet": ["RedNet26", "RedNet38", "RedNet50", "RedNet101", "RedNet152"],
     "RegNet": ["RegNetX_4GF"],
     "Res2Net": [
@@ -162,6 +174,7 @@ IMN_MODEL_SERIES = {
         "pcpvt_small", "pcpvt_base", "pcpvt_large", "alt_gvt_small",
         "alt_gvt_base", "alt_gvt_large"
     ],
+    "TNT": ["TNT_small"],
     "VGG": ["VGG11", "VGG13", "VGG16", "VGG19"],
     "VisionTransformer": [
         "ViT_base_patch16_224", "ViT_base_patch16_384", "ViT_base_patch32_384",

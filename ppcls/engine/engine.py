@@ -114,6 +114,7 @@ class Engine(object):
         #TODO(gaotingquan): support rec
         class_num = config["Arch"].get("class_num", None)
         self.config["DataLoader"].update({"class_num": class_num})
+
         # build dataloader
         if self.mode == 'train':
             self.train_dataloader = build_dataloader(

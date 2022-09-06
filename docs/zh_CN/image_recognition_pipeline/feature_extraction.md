@@ -1,4 +1,4 @@
-简体中文|[English](../../en/image_recognition_pipeline/feature_extraction_en.md)
+简体中文 | [English](../../en/image_recognition_pipeline/feature_extraction_en.md)
 # 特征提取
 
 ## 目录
@@ -6,10 +6,10 @@
 - [1. 摘要](#1-摘要)
 - [2. 介绍](#2-介绍)
 - [3. 方法](#3-方法)
-  - [3.1 Backbone](#31-backbone)
-  - [3.2 Neck](#32-neck)
-  - [3.3 Head](#33-head)
-  - [3.4 Loss](#34-loss)
+    - [3.1 Backbone](#31-backbone)
+    - [3.2 Neck](#32-neck)
+    - [3.3 Head](#33-head)
+    - [3.4 Loss](#34-loss)
 - [4. 实验部分](#4-实验部分)
 - [5. 自定义特征提取](#5-自定义特征提取)
   - [5.1 数据准备](#51-数据准备)
@@ -35,56 +35,72 @@
 ![](../../images/feature_extraction_framework.png)
 图中各个模块的功能为:
 
-- **Backbone**: 用于提取输入图像初步特征的骨干网络，一般由配置文件中的 [`Backbone`](../../../ppcls/configs/GeneralRecognition/GeneralRecognition_PPLCNet_x2_5.yaml#L26-L29) 以及 [`BackboneStopLayer`](../../../ppcls/configs/GeneralRecognition/GeneralRecognition_PPLCNet_x2_5.yaml#L30-L31) 字段共同指定。
-- **Neck**: 用以特征增强及特征维度变换。可以是一个简单的 FC Layer，用来做特征维度变换；也可以是较复杂的 FPN 结构，用以做特征增强，一般由配置文件中的 [`Neck`](../../../ppcls/configs/GeneralRecognition/GeneralRecognition_PPLCNet_x2_5.yaml#L32-L35)字段指定。
-- **Head**: 用来将 feature 转化为 logits，让模型在训练阶段能以分类任务的形式进行训练。除了常用的 FC Layer 外，还可以替换为 cosmargin, arcmargin, circlemargin 等模块，一般由配置文件中的 [`Head`](../../../ppcls/configs/GeneralRecognition/GeneralRecognition_PPLCNet_x2_5.yaml#L36-L41)字段指定。
-- **Loss**: 指定所使用的 Loss 函数。我们将 Loss 设计为组合 loss 的形式，可以方便地将 Classification Loss 和 Metric learning Loss 组合在一起，一般由配置文件中的 [`Loss`](../../../ppcls/configs/GeneralRecognition/GeneralRecognition_PPLCNet_x2_5.yaml#L44-L50)字段指定。
+- **Backbone**: 用于提取输入图像初步特征的骨干网络，一般由配置文件中的 [Backbone](../../../ppcls/configs/GeneralRecognitionV2/GeneralRecognitionV2_PPLCNetV2_base.yaml#L33-L37) 以及 [BackboneStopLayer](../../../ppcls/configs/GeneralRecognitionV2/GeneralRecognitionV2_PPLCNetV2_base.yaml#L38-L39) 字段共同指定。
+- **Neck**: 用以特征增强及特征维度变换。可以是一个简单的 FC Layer，用来做特征维度变换；也可以是较复杂的 FPN 结构，用以做特征增强，一般由配置文件中的 [Neck](../../../ppcls/configs/GeneralRecognitionV2/GeneralRecognitionV2_PPLCNetV2_base.yaml#L40-L51) 字段指定。
+- **Head**: 用来将 `Neck` 的输出 feature 转化为 logits，让模型在训练阶段能以分类任务的形式进行训练。除了常用的 FC Layer 外，还可以替换为 [CosMargin](../../../ppcls/arch/gears/cosmargin.py), [ArcMargin](../../../ppcls/arch/gears/arcmargin.py), [CircleMargin](../../../ppcls/arch/gears/circlemargin.py) 等模块，一般由配置文件中的 [Head](`../../../ppcls/configs/GeneralRecognitionV2/GeneralRecognitionV2_PPLCNetV2_base.yaml#L52-L60) 字段指定。
+- **Loss**: 指定所使用的 Loss 函数。我们将 Loss 设计为组合 loss 的形式，可以方便地将 Classification Loss 和 Metric learning Loss 组合在一起，一般由配置文件中的 [Loss](../../../ppcls/configs/GeneralRecognitionV2/GeneralRecognitionV2_PPLCNetV2_base.yaml#L63-L77) 字段指定。
 
 <a name="3"></a>
 
 ## 3. 方法
 
-### 3.1 Backbone
+#### 3.1 Backbone
 
-Backbone 部分采用了 [PP_LCNet_x2_5](../models/PP-LCNet.md)，其针对Intel CPU端的性能优化探索了多个有效的结构设计方案，最终实现了在不增加推理时间的情况下，进一步提升模型的性能，最终大幅度超越现有的 SOTA 模型。
+Backbone 部分采用了 [PP-LCNetV2_base](../models/PP-LCNetV2.md)，其针对Intel CPU端的性能优化探索了多个有效的结构设计方案，最终实现了在不增加推理时间的情况下，进一步提升模型的性能，最终大幅度超越现有的 SOTA 模型。
 
-### 3.2 Neck
+#### 3.2 Neck
 
-Neck 部分采用了 [FC Layer](../../../ppcls/arch/gears/fc.py)，对 Backbone 抽取得到的特征进行降维，减少了特征存储的成本与计算量。
+Neck 部分采用了 [BN Neck](../../../ppcls/arch/gears/bnneck.py)，对 Backbone 抽取得到的特征的每个维度进行标准化操作，减少了同时优化度量学习损失和分类损失的难度。
 
-### 3.3 Head
+#### 3.3 Head
 
-Head 部分选用 [ArcMargin](../../../ppcls/arch/gears/arcmargin.py)，在训练时通过指定margin，增大同类特征之间的角度差异再进行分类，进一步提升抽取特征的表征能力。
+Head 部分选用 [FC Layer](../../../ppcls/arch/gears/fc.py)，使用分类头将 feature 转换成 logits 供后续计算分类损失。
 
-### 3.4 Loss
+#### 3.4 Loss
 
-Loss 部分选用 [Cross entropy loss](../../../ppcls/loss/celoss.py)，在训练时以分类任务的损失函数来指导网络进行优化。详细的配置文件见[通用识别配置文件](../../../ppcls/configs/GeneralRecognition/GeneralRecognition_PPLCNet_x2_5.yaml)。
+Loss 部分选用 [Cross entropy loss](../../../ppcls/loss/celoss.py) 和 [TripletAngularMarginLoss](../../../ppcls/loss/tripletangularmarginloss.py)，在训练时以分类损失和基于角度的三元组损失来指导网络进行优化。详细的配置文件见 [GeneralRecognitionV2_PPLCNetV2_base.yaml](../../../ppcls/configs/GeneralRecognitionV2/GeneralRecognitionV2_PPLCNetV2_base.yaml#L63-77)。
 
 <a name="4"></a>
 
 ## 4. 实验部分
 
-训练数据为如下 7 个公开数据集的汇总：
+我们对原有的训练数据进行了合理扩充与优化，最终使用如下 16 个公开数据集的汇总：
 
-|    数据集    | 数据量  |  类别数  |   场景   |                                  数据集地址                                  |
-| :----------: | :-----: | :------: | :------: | :--------------------------------------------------------------------------: |
-|  Aliproduct  | 2498771 |  50030   |   商品   |  [地址](https://retailvisionworkshop.github.io/recognition_challenge_2020/)  |
-|    GLDv2     | 1580470 |  81313   |   地标   |           [地址](https://github.com/cvdfoundation/google-landmark)           |
-|  VeRI-Wild   | 277797  |  30671   |   车辆   |                [地址](https://github.com/PKU-IMRE/VERI-Wild)                 |
-|  LogoDet-3K  | 155427  |   3000   |   Logo   |          [地址](https://github.com/Wangjing1551/LogoDet-3K-Dataset)          |
-| iCartoonFace | 389678  |   5013   | 动漫人物 | [地址](http://challenge.ai.iqiyi.com/detail?raceId=5def69ace9fcf68aef76a75d) |
-|     SOP      |  59551  |  11318   |   商品   |          [地址](https://cvgl.stanford.edu/projects/lifted_struct/)           |
-|    Inshop    |  25882  |   3997   |   商品   |        [地址](http://mmlab.ie.cuhk.edu.hk/projects/DeepFashion.html)         |
-|  **Total**   | **5M**  | **185K** |   ----   |                                     ----                                     |
+| 数据集                 | 数据量  |  类别数  | 场景  |                                      数据集地址                                      |
+| :--------------------- | :-----: | :------: | :---: | :----------------------------------------------------------------------------------: |
+| Aliproduct             | 2498771 |  50030   | 商品  |      [地址](https://retailvisionworkshop.github.io/recognition_challenge_2020/)      |
+| GLDv2                  | 1580470 |  81313   | 地标  |               [地址](https://github.com/cvdfoundation/google-landmark)               |
+| VeRI-Wild              | 277797  |  30671   | 车辆  |                    [地址](https://github.com/PKU-IMRE/VERI-Wild)                     |
+| LogoDet-3K             | 155427  |   3000   | Logo  |              [地址](https://github.com/Wangjing1551/LogoDet-3K-Dataset)              |
+| SOP                    |  59551  |  11318   | 商品  |              [地址](https://cvgl.stanford.edu/projects/lifted_struct/)               |
+| Inshop                 |  25882  |   3997   | 商品  |            [地址](http://mmlab.ie.cuhk.edu.hk/projects/DeepFashion.html)             |
+| bird400                |  58388  |   400    | 鸟类  |          [地址](https://www.kaggle.com/datasets/gpiosenka/100-bird-species)          |
+| 104flows               |  12753  |   104    | 花类  |              [地址](https://www.robots.ox.ac.uk/~vgg/data/flowers/102/)              |
+| Cars                   |  58315  |   112    | 车辆  |            [地址](https://ai.stanford.edu/~jkrause/cars/car_dataset.html)            |
+| Fashion Product Images |  44441  |    47    | 商品  | [地址](https://www.kaggle.com/datasets/paramaggarwal/fashion-product-images-dataset) |
+| flowerrecognition      |  24123  |    59    | 花类  |         [地址](https://www.kaggle.com/datasets/aymenktari/flowerrecognition)         |
+| food-101               | 101000  |   101    | 食物  |         [地址](https://data.vision.ee.ethz.ch/cvl/datasets_extra/food-101/)          |
+| fruits-262             | 225639  |   262    | 水果  |            [地址](https://www.kaggle.com/datasets/aelchimminut/fruits262)            |
+| inaturalist            | 265213  |   1010   | 自然  |           [地址](https://github.com/visipedia/inat_comp/tree/master/2017)            |
+| indoor-scenes          |  15588  |    67    | 室内  |       [地址](https://www.kaggle.com/datasets/itsahmad/indoor-scenes-cvpr-2019)       |
+| Products-10k           | 141931  |   9691   | 商品  |                       [地址](https://products-10k.github.io/)                        |
+| CompCars               |  16016  |   431    | 车辆  |     [地址](http://​​​​​​http://ai.stanford.edu/~jkrause/cars/car_dataset.html​)      |
+| **Total**              | **6M**  | **192K** |   -   |                                          -                                           |
 
-最终的模型效果如下表所示:
+最终的模型精度指标如下表所示:
 
-|              模型               | Aliproduct | VeRI-Wild | LogoDet-3K | iCartoonFace |  SOP  | Inshop | Latency(ms) |
-| :-----------------------------: | :--------: | :-------: | :--------: | :----------: | :---: | :----: | :---------: |
-| GeneralRecognition_PPLCNet_x2_5 |   0.839    |   0.888   |   0.861    |    0.841     | 0.793 | 0.892  |     5.0     |
+  | 模型       | Aliproduct      | VeRI-Wild       | LogoDet-3k      | iCartoonFace    | SOP             | Inshop          |
+  | :--------- | :-------------- | :-------------- | :-------------- | :-------------- | :-------------- | :-------------- |
+  | -          | recall@1%(mAP%) | recall@1%(mAP%) | recall@1%(mAP%) | recall@1%(mAP%) | recall@1%(mAP%) | recall@1%(mAP%) |
+  | PP-ShiTuV2 | 84.2(83.3)      | 87.8(68.8)      | 88.0(63.2)      | 53.6(27.5)      | 77.6(55.3)      | 90.8(74.3)      |
 
-* 预训练模型地址：[通用识别预训练模型](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/pretrain/general_PPLCNet_x2_5_pretrained_v1.0.pdparams)
-* 采用的评测指标为：`Recall@1`
+  | 模型       | gldv2           | imdb_face       | iNat            | instre          | sketch          | sop<sup>*</sup> |
+  | :--------- | :-------------- | :-------------- | :-------------- | :-------------- | :-------------- | :-------------- |
+  | -          | recall@1%(mAP%) | recall@1%(mAP%) | recall@1%(mAP%) | recall@1%(mAP%) | recall@1%(mAP%) | recall@1%(mAP%) |
+  | PP-ShiTuV2 | 98.1(90.5)      | 35.9(11.2)      | 38.6(23.9)      | 87.7(71.4)      | 39.3(15.6)      | 98.3(90.9)      |
+
+* 预训练模型地址：[general_PPLCNetV2_base_pretrained_v1.0.pdparams](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/pretrain/PPShiTuV2/general_PPLCNetV2_base_pretrained_v1.0.pdparams)
+* 采用的评测指标为：`Recall@1` 与 `mAP`
 * 速度评测机器的 CPU 具体信息为：`Intel(R) Xeon(R) Gold 6148 CPU @ 2.40GHz`
 * 速度指标的评测条件为： 开启 MKLDNN, 线程数设置为 10
 
@@ -94,47 +110,52 @@ Loss 部分选用 [Cross entropy loss](../../../ppcls/loss/celoss.py)，在训�
 
 自定义特征提取，是指依据自己的任务，重新训练特征提取模型。
 
-下面基于`GeneralRecognition_PPLCNet_x2_5.yaml`配置文件，介绍主要的四个步骤：1）数据准备；2）模型训练；3）模型评估；4）模型推理
-
+下面基于 `GeneralRecognitionV2_PPLCNetV2_base.yaml` 配置文件，介绍主要的四个步骤：1）数据准备；2）模型训练；3）模型评估；4）模型推理
 
 <a name="5.1"></a>
 
 ### 5.1 数据准备
 
-首先需要基于任务定制自己的数据集。数据集格式与文件结构详见[数据集格式说明](../data_preparation/recognition_dataset.md)。
+首先需要基于任务定制自己的数据集。数据集格式与文件结构详见 [数据集格式说明](../data_preparation/recognition_dataset.md)。
 
 准备完毕之后还需要在配置文件中修改数据配置相关的内容, 主要包括数据集的地址以及类别数量。对应到配置文件中的位置如下所示：
 
 - 修改类别数：
   ```yaml
-    Head:
-      name: ArcMargin
-      embedding_size: 512
-      class_num: 185341    # 此处表示类别数
+  Head:
+    name: FC
+    embedding_size: *feat_dim
+    class_num: 192612  # 此处表示类别数
+    weight_attr:
+      initializer:
+        name: Normal
+        std: 0.001
+    bias_attr: False
   ```
 - 修改训练数据集配置：
   ```yaml
-    Train:
-      dataset:
-        name: ImageNetDataset
-        image_root: ./dataset/     # 此处表示train数据所在的目录
-        cls_label_path: ./dataset/train_reg_all_data.txt  # 此处表示train数据集label文件的地址
+  Train:
+    dataset:
+      name: ImageNetDataset
+      image_root: ./dataset/     # 此处表示train数据集所在的目录
+      cls_label_path: ./dataset/train_reg_all_data_v2.txt  # 此处表示train数据集对应标注文件的地址
+      relabel: True
   ```
 - 修改评估数据集中query数据配置：
   ```yaml
-      Query:
-        dataset:
-          name: VeriWild
-          image_root: ./dataset/Aliproduct/    # 此处表示query数据集所在的目录
-          cls_label_path: ./dataset/Aliproduct/val_list.txt    # 此处表示query数据集label文件的地址
+  Query:
+    dataset:
+      name: VeriWild
+      image_root: ./dataset/Aliproduct/    # 此处表示query数据集所在的目录
+      cls_label_path: ./dataset/Aliproduct/val_list.txt    # 此处表示query数据集对应标注文件的地址
   ```
 - 修改评估数据集中gallery数据配置：
   ```yaml
-      Gallery:
-        dataset:
-          name: VeriWild
-          image_root: ./dataset/Aliproduct/    # 此处表示gallery数据集所在的目录
-          cls_label_path: ./dataset/Aliproduct/val_list.txt   # 此处表示gallery数据集label文件的地址
+  Gallery:
+    dataset:
+      name: VeriWild
+      image_root: ./dataset/Aliproduct/    # 此处表示gallery数据集所在的目录
+      cls_label_path: ./dataset/Aliproduct/val_list.txt   # 此处表示gallery数据集对应标注文件的地址
   ```
 
 <a name="5.2"></a>
@@ -147,14 +168,14 @@ Loss 部分选用 [Cross entropy loss](../../../ppcls/loss/celoss.py)，在训�
   ```shell
   export CUDA_VISIBLE_DEVICES=0
   python3.7 tools/train.py \
-  -c ppcls/configs/GeneralRecognition/GeneralRecognition_PPLCNet_x2_5.yaml
+  -c ./ppcls/configs/GeneralRecognitionV2/GeneralRecognitionV2_PPLCNetV2_base.yaml
   ```
 - 单机多卡训练
   ```shell
   export CUDA_VISIBLE_DEVICES=0,1,2,3
-  python3.7 -m paddle.distributed.launch \
-  --gpus="0,1,2,3" tools/train.py \
-  -c ppcls/configs/GeneralRecognition/GeneralRecognition_PPLCNet_x2_5.yaml
+  python3.7 -m paddle.distributed.launch --gpus="0,1,2,3" \
+  tools/train.py \
+  -c ./ppcls/configs/GeneralRecognitionV2/GeneralRecognitionV2_PPLCNetV2_base.yaml
   ```
 **注意：**
 配置文件中默认采用`在线评估`的方式，如果你想加快训练速度，可以关闭`在线评估`功能，只需要在上述命令的后面，增加 `-o Global.eval_during_train=False`。
@@ -165,15 +186,15 @@ Loss 部分选用 [Cross entropy loss](../../../ppcls/loss/celoss.py)，在训�
   ```shell
   export CUDA_VISIBLE_DEVICES=0
   python3.7 tools/train.py \
-  -c ppcls/configs/GeneralRecognition/GeneralRecognition_PPLCNet_x2_5.yaml \
+  -c ./ppcls/configs/GeneralRecognitionV2/GeneralRecognitionV2_PPLCNetV2_base.yaml \
   -o Global.checkpoint="output/RecModel/latest"
   ```
 - 单机多卡断点恢复训练
   ```shell
   export CUDA_VISIBLE_DEVICES=0,1,2,3
-  python3.7 -m paddle.distributed.launch \
-  --gpus="0,1,2,3" tools/train.py \
-  -c ppcls/configs/GeneralRecognition/GeneralRecognition_PPLCNet_x2_5.yaml \
+  python3.7 -m paddle.distributed.launch --gpus="0,1,2,3" \
+  tools/train.py \
+  -c ./ppcls/configs/GeneralRecognitionV2/GeneralRecognitionV2_PPLCNetV2_base.yaml \
   -o Global.checkpoint="output/RecModel/latest"
   ```
 
@@ -187,16 +208,16 @@ Loss 部分选用 [Cross entropy loss](../../../ppcls/loss/celoss.py)，在训�
   ```shell
   export CUDA_VISIBLE_DEVICES=0
   python3.7 tools/eval.py \
-  -c ppcls/configs/GeneralRecognition/GeneralRecognition_PPLCNet_x2_5.yaml \
+  -c ./ppcls/configs/GeneralRecognitionV2/GeneralRecognitionV2_PPLCNetV2_base.yaml \
   -o Global.pretrained_model="output/RecModel/best_model"
   ```
 
 - 多卡评估
   ```shell
   export CUDA_VISIBLE_DEVICES=0,1,2,3
-  python3.7 -m paddle.distributed.launch \
-  --gpus="0,1,2,3" tools/eval.py \
-  -c  ppcls/configs/GeneralRecognition/GeneralRecognition_PPLCNet_x2_5.yaml \
+  python3.7 -m paddle.distributed.launch --gpus="0,1,2,3" \
+  tools/eval.py \
+  -c ./ppcls/configs/GeneralRecognitionV2/GeneralRecognitionV2_PPLCNetV2_base.yaml \
   -o  Global.pretrained_model="output/RecModel/best_model"
   ```
 **注：** 建议使用多卡评估。该方式可以利用多卡并行计算快速得到全部数据的特征，能够加速评估的过程。
@@ -212,7 +233,7 @@ Loss 部分选用 [Cross entropy loss](../../../ppcls/loss/celoss.py)，在训�
 首先需要将 `*.pdparams` 模型文件转换成 inference 格式，转换命令如下。
 ```shell
 python3.7 tools/export_model.py \
--c ppcls/configs/GeneralRecognition/GeneralRecognition_PPLCNet_x2_5.yaml \
+-c ./ppcls/configs/GeneralRecognitionV2/GeneralRecognitionV2_PPLCNetV2_base.yaml \
 -o Global.pretrained_model="output/RecModel/best_model"
 ```
 生成的推理模型默认位于 `PaddleClas/inference` 目录，里面包含三个文件，分别为 `inference.pdmodel`、`inference.pdiparams`、`inference.pdiparams.info`。
@@ -228,10 +249,18 @@ python3.7 python/predict_rec.py \
 -c configs/inference_rec.yaml \
 -o Global.rec_inference_model_dir="../inference"
 ```
-得到的特征输出格式如下图所示：
-![](../../images/feature_extraction_output.png)
+得到的特征输出格式如下所示：
 
-在实际使用过程中，仅仅得到特征可能并不能满足业务需求。如果想进一步通过特征检索来进行图像识别，可以参照文档[向量检索](./vector_search.md)。
+```log
+wangzai.jpg:    [-7.82453567e-02  2.55877394e-02 -3.66694555e-02  1.34572461e-02
+  4.39076796e-02 -2.34078392e-02 -9.49947070e-03  1.28221214e-02
+  5.53947650e-02  1.01355985e-02 -1.06436480e-02  4.97181974e-02
+ -2.21862812e-02 -1.75557341e-02  1.55848479e-02 -3.33278324e-03
+ ...
+ -3.40284109e-02  8.35561901e-02  2.10910216e-02 -3.27066667e-02]
+```
+
+在实际使用过程中，仅仅得到特征可能并不能满足业务需求。如果想进一步通过特征检索来进行图像识别，可以参照文档 [向量检索](./vector_search.md)。
 
 <a name="6"></a>
 
@@ -244,4 +273,4 @@ python3.7 python/predict_rec.py \
 ## 7. 参考文献
 
 1. [PP-LCNet: A Lightweight CPU Convolutional Neural Network](https://arxiv.org/pdf/2109.15099.pdf)
-2. [ArcFace: Additive Angular Margin Loss for Deep Face Recognition](https://arxiv.org/abs/1801.07698)
+2. [Bag of Tricks and A Strong Baseline for Deep Person Re-identification](https://openaccess.thecvf.com/content_CVPRW_2019/papers/TRMTMCT/Luo_Bag_of_Tricks_and_a_Strong_Baseline_for_Deep_Person_CVPRW_2019_paper.pdf)
