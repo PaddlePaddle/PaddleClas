@@ -39,7 +39,7 @@
 
 ## 1. PP-ShiTuV2模型和应用场景介绍
 
-PP-ShiTuV2 是基于 PP-ShiTuV1 改进的一个实用轻量级通用图像识别系统，相比 PP-ShiTuV1 具有更高的识别精度、更强的泛化能力以及相近的推理速度<sup>*</sup>。该系统主要针对**训练数据集**、特征提取两个部分进行优化，使用了更优的骨干网络、损失函数与训练策略。使得 PP-ShiTuV2 在多个实际应用场景上的检索性能有显著提升。
+PP-ShiTuV2 是基于 PP-ShiTuV1 改进的一个实用轻量级通用图像识别系统，相比 PP-ShiTuV1 具有更高的识别精度、更强的泛化能力以及相近的推理速度<sup>*</sup>。该系统主要针对训练数据集、特征提取两个部分进行优化，使用了更优的骨干网络、损失函数与训练策略。使得 PP-ShiTuV2 在多个实际应用场景上的检索性能有显著提升。
 
 **本文档提供了用户使用 PaddleClas 的 PP-ShiTuV2 图像识别方案进行快速构建轻量级、高精度、可落地的图像识别pipeline。该pipeline可以广泛应用于商场商品识别场景、安防人脸或行人识别场景、海量图像检索过滤等场景中。**
 
@@ -177,18 +177,16 @@ wget -nc https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/in
 执行以下命令下载并解压测试数据：
 
 ```shell
-cd deploy
+# 返回deploy
+cd ../
+
+# 下载测试数据drink_dataset_v2.0，并解压
 wget -nc https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/data/drink_dataset_v2.0.tar && tar -xf drink_dataset_v2.0.tar
 ```
 
 ### 4.3 基于 Python 预测引擎推理
 
 #### 4.3.1 预测单张图像
-
-首先返回至 `deploy` 目录
-```shell
-cd ../
-```
 
 然后执行以下命令对单张图像 `./drink_dataset_v2.0/test_images/100.jpeg` 进行识别。
 
