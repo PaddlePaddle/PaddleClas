@@ -36,6 +36,8 @@ web_service_py=$(func_parser_value "${lines[11]}")
 web_use_gpu_key=$(func_parser_key "${lines[12]}")
 web_use_gpu_list=$(func_parser_value "${lines[12]}")
 pipeline_py=$(func_parser_value "${lines[13]}")
+use_mkldnn="False"
+threads="1"
 
 
 function func_serving_cls(){
@@ -106,7 +108,6 @@ function func_serving_cls(){
             status_check $last_status "${web_service_cmd}" "${status_log}" "${model_name}" "${server_log_path}"
             sleep 5s
             for pipeline in ${pipeline_py[*]}; do
-                # TODO
                 _save_log_path="${LOG_PATH}/python_client_cpu_${pipeline%_client*}_usemkldnn_${use_mkldnn}_threads_${threads}_batchsize_1.log"
                 pipeline_cmd="${python_} ${pipeline} > ${_save_log_path} 2>&1 "
                 eval ${pipeline_cmd}
@@ -256,7 +257,6 @@ function func_serving_rec(){
             status_check $last_status "${web_service_cmd}" "${status_log}" "${model_name}" "${server_log_path}"
             sleep 5s
             for pipeline in ${pipeline_py[*]}; do
-                # TODO
                 _save_log_path="${LOG_PATH}/python_client_cpu_${pipeline%_client*}_usemkldnn_${use_mkldnn}_threads_${threads}_batchsize_1.log"
                 pipeline_cmd="${python} ${pipeline} > ${_save_log_path} 2>&1"
                 eval ${pipeline_cmd}

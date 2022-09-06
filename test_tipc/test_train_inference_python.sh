@@ -164,8 +164,7 @@ if [[ ${MODE} = "whole_infer" ]]; then
     # for kl_quant
     if [ ${kl_quant_cmd_value} != "null" ] && [ ${kl_quant_cmd_value} != "False" ]; then
         echo "kl_quant"
-        # TODO
-        log_path="${LOG_PATH}_.log"
+        log_path="${LOG_PATH}/export.log"
         command="${python} ${kl_quant_cmd_value} > ${log_path} 2>&1"
         echo ${command}
         eval $command
