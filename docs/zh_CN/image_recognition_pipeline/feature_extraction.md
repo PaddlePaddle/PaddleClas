@@ -46,11 +46,13 @@
 
 #### 3.1 Backbone
 
-Backbone 部分采用了 [PP-LCNetV2_base](../models/PP-LCNetV2.md)，其针对Intel CPU端的性能优化探索了多个有效的结构设计方案，最终实现了在不增加推理时间的情况下，进一步提升模型的性能，最终大幅度超越现有的 SOTA 模型。
+Backbone 部分采用了 [PP-LCNetV2_base](../models/PP-LCNetV2.md)，其在 `PPLCNet_V1` 的基础上，加入了包括Rep 策略、PW 卷积、Shortcut、激活函数改进、SE 模块改进等多个优化点，使得最终分类精度与 `PPLCNet_x2_5` 相近，且推理延时减少了40%<sup>*</sup>。
+
+**注：** <sup>*</sup>推理环境基于 Intel(R) Xeon(R) Gold 6271C CPU @ 2.60GHz 硬件平台，OpenVINO 推理平台。
 
 #### 3.2 Neck
 
-Neck 部分采用了 [BN Neck](../../../ppcls/arch/gears/bnneck.py)，对 Backbone 抽取得到的特征的每个维度进行标准化操作，减少了同时优化度量学习损失和分类损失的难度。
+Neck 部分采用了 [BN Neck](../../../ppcls/arch/gears/bnneck.py)，对 Backbone 抽取得到的特征的每个维度进行标准化操作，减少了同时优化度量学习损失函数和分类损失函数的难度，加快收敛速度。
 
 #### 3.3 Head
 
@@ -92,6 +94,7 @@ Loss 部分选用 [Cross entropy loss](../../../ppcls/loss/celoss.py) 和 [Tripl
 | 模型                   | 延时(ms) | 存储(MB) | product<sup>*</sup> |      | Aliproduct |      | VeRI-Wild |      | LogoDet-3k |      | iCartoonFace |      | SOP      |      | Inshop   |      | gldv2    |      | imdb_face |      | iNat     |      | instre   |      | sketch   |      | sop      |      |
 | :--------------------- | :----------- | :------ | :------------------ | :--- | ---------- | ---- | --------- | ---- | ---------- | ---- | ------------ | ---- | -------- | ---- | -------- | ---- | -------- | ---- | --------- | ---- | -------- | ---- | -------- | ---- | -------- | ---- | -------- | ---- |
 |                        |              |         | recall@1            | mAP  | recall@1   | mAP  | recall@1  | mAP  | recall@1   | mAP  | recall@1     | mAP  | recall@1 | mAP  | recall@1 | mAP  | recall@1 | mAP  | recall@1  | mAP  | recall@1 | mAP  | recall@1 | mAP  | recall@1 | mAP  | recall@1 | mAP  |
+| PP-ShiTuV1_general_rec | 5.0          | 34       | 63.0                | 51.5 | 83.9       | 83.2 | 88.7      | 60.1 | 86.1       | 73.6 | 84.1         | 72.3 | 79.7     | 58.6 | 89.1     | 69.4 | 98.2     | 91.6 | 28.8      | 8.42 | 12.6     | 6.1  | 72.0     | 50.4 | 27.9     | 9.5  | 97.6     | 90.3 |
 | PP-ShiTuV2_general_rec | 6.1          | 19       | 73.7                | 61.0 | 84.2       | 83.3 | 87.8      | 68.8 | 88.0       | 63.2 | 53.6         | 27.5 | 77.6     | 55.3 | 90.8     | 74.3 | 98.1     | 90.5 | 35.9      | 11.2 | 38.6     | 23.9 | 87.7     | 71.4 | 39.3     | 15.6 | 98.3     | 90.9 |
 
 * 预训练模型地址：[general_PPLCNetV2_base_pretrained_v1.0.pdparams](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/pretrain/PPShiTuV2/general_PPLCNetV2_base_pretrained_v1.0.pdparams)
