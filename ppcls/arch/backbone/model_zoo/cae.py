@@ -629,13 +629,33 @@ def _load_pretrained(pretrained, model, model_keys, model_ema_configs, abs_pos_e
 
 
 def cae_small_patch16_224(**kwargs):
+    config  = kwargs.copy()
+    enable_linear_eval = config.pop('enable_linear_eval')
+    model_keys = config.pop('model_key')
+    model_ema_configs = config.pop('model_ema')
+    abs_pos_emb = config.pop('abs_pos_emb')
+    rel_pos_bias = config.pop('rel_pos_bias')
+    pretrained = config.pop('pretrained')
+
     model = VisionTransformer(
         patch_size=16, embed_dim=384, depth=12, num_heads=12, mlp_ratio=4, qkv_bias=True,
         norm_layer=partial(nn.LayerNorm, epsilon=1e-6), **kwargs)
+    
+    if enable_linear_eval:
+        _enable_linear_eval(model)
+    
+    _load_pretrained(
+        pretrained,
+        model,
+        model_keys,
+        model_ema_configs,
+        abs_pos_emb,
+        rel_pos_bias,
+        use_ssld=False)
     return model
 
 
-def cae_base_patch16_224(use_ssld=False, **kwargs):
+def cae_base_patch16_224(**kwargs):
     config  = kwargs.copy()
     enable_linear_eval = config.pop('enable_linear_eval')
     model_keys = config.pop('model_key')
@@ -658,35 +678,118 @@ def cae_base_patch16_224(use_ssld=False, **kwargs):
         model_ema_configs,
         abs_pos_emb,
         rel_pos_bias,
-        use_ssld=use_ssld)
+        use_ssld=False)
 
     return model
 
 
 def cae_base_patch16_384(**kwargs):
+    config  = kwargs.copy()
+    enable_linear_eval = config.pop('enable_linear_eval')
+    model_keys = config.pop('model_key')
+    model_ema_configs = config.pop('model_ema')
+    abs_pos_emb = config.pop('abs_pos_emb')
+    rel_pos_bias = config.pop('rel_pos_bias')
+    pretrained = config.pop('pretrained')
+
     model = VisionTransformer(
         img_size=384, patch_size=16, embed_dim=768, depth=12, num_heads=12, mlp_ratio=4, qkv_bias=True,
         norm_layer=partial(nn.LayerNorm, epsilon=1e-6), **kwargs)
     
+    if enable_linear_eval:
+        _enable_linear_eval(model)
+
+    _load_pretrained(
+        pretrained,
+        model,
+        model_keys,
+        model_ema_configs,
+        abs_pos_emb,
+        rel_pos_bias,
+        use_ssld=False)
+
     return model
 
 
 def cae_large_patch16_224(**kwargs):
+    config  = kwargs.copy()
+    enable_linear_eval = config.pop('enable_linear_eval')
+    model_keys = config.pop('model_key')
+    model_ema_configs = config.pop('model_ema')
+    abs_pos_emb = config.pop('abs_pos_emb')
+    rel_pos_bias = config.pop('rel_pos_bias')
+    pretrained = config.pop('pretrained')
+
     model = VisionTransformer(
         patch_size=16, embed_dim=1024, depth=24, num_heads=16, mlp_ratio=4, qkv_bias=True,
         norm_layer=partial(nn.LayerNorm, epsilon=1e-6), **kwargs)
+    
+    if enable_linear_eval:
+        _enable_linear_eval(model)
+
+    _load_pretrained(
+        pretrained,
+        model,
+        model_keys,
+        model_ema_configs,
+        abs_pos_emb,
+        rel_pos_bias,
+        use_ssld=False)
+
     return model
 
 
 def cae_large_patch16_384(**kwargs):
+    config  = kwargs.copy()
+    enable_linear_eval = config.pop('enable_linear_eval')
+    model_keys = config.pop('model_key')
+    model_ema_configs = config.pop('model_ema')
+    abs_pos_emb = config.pop('abs_pos_emb')
+    rel_pos_bias = config.pop('rel_pos_bias')
+    pretrained = config.pop('pretrained')
+
     model = VisionTransformer(
         img_size=384, patch_size=16, embed_dim=1024, depth=24, num_heads=16, mlp_ratio=4, qkv_bias=True,
         norm_layer=partial(nn.LayerNorm, epsilon=1e-6), **kwargs)
+    
+    if enable_linear_eval:
+        _enable_linear_eval(model)
+
+    _load_pretrained(
+        pretrained,
+        model,
+        model_keys,
+        model_ema_configs,
+        abs_pos_emb,
+        rel_pos_bias,
+        use_ssld=False)
+
     return model
 
 
 def cae_large_patch16_512(**kwargs):
+    config  = kwargs.copy()
+    enable_linear_eval = config.pop('enable_linear_eval')
+    model_keys = config.pop('model_key')
+    model_ema_configs = config.pop('model_ema')
+    abs_pos_emb = config.pop('abs_pos_emb')
+    rel_pos_bias = config.pop('rel_pos_bias')
+    pretrained = config.pop('pretrained')
+
     model = VisionTransformer(
         img_size=512, patch_size=16, embed_dim=1024, depth=24, num_heads=16, mlp_ratio=4, qkv_bias=True,
         norm_layer=partial(nn.LayerNorm, epsilon=1e-6), **kwargs)
+    
+    if enable_linear_eval:
+        _enable_linear_eval(model)
+
+    _load_pretrained(
+        pretrained,
+        model,
+        model_keys,
+        model_ema_configs,
+        abs_pos_emb,
+        rel_pos_bias,
+        use_ssld=False)
+    
     return model
