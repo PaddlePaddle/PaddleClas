@@ -233,18 +233,6 @@ class OpSampler(object):
         return op(batch) if op else batch
 
 
-# class HackedMixupOperator(BatchOperator):  # add by CAE
-#     def __init__(self, class_num, mixup_alpha=0.8, cutmix_alpha=1.0, switch_prob=0.5):
-#         self.mixup_op = MixupOperator(class_num, mixup_alpha)
-#         self.cutmix_op = CutmixOperator(class_num, cutmix_alpha)
-#         self.switch_prob = switch_prob
-        
-#     def __call__(self, batch):
-#         if np.random.rand() < self.switch_prob:
-#             return self.mixup_op(batch)
-#         else:
-#             return self.cutmix_op(batch)
-
 class HackedMixupOperator(object):
     """ Mixup/Cutmix that applies different params to each element or whole batch
 
