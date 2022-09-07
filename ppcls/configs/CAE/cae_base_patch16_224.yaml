@@ -104,7 +104,7 @@ DataLoader:
       name: DistributedBatchSampler
       batch_size: 2
       drop_last: True
-      shuffle: False
+      shuffle: True
     loader:
       num_workers: 4
       use_shared_memory: True

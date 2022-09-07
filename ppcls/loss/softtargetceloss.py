@@ -8,7 +8,6 @@ class SoftTargetCrossEntropy(nn.Layer):
 
     def forward(self, x, target):
         loss = paddle.sum(-target * F.log_softmax(x, axis=-1), axis=-1)
-        loss = paddle.Tensor(loss, dtype='float32')
         loss = loss.mean()
         return {"SoftTargetCELoss": loss}
     
