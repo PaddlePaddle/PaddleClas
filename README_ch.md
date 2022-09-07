@@ -60,19 +60,18 @@ PP-ShiTu图像识别快速体验：[点击这里](./docs/zh_CN/quick_start/quick
 - [环境准备](docs/zh_CN/installation/install_paddleclas.md)
 - [PP-ShiTuV2图像识别系统介绍](./docs/zh_CN/PPShiTu/PPShiTuV2_introduction.md)
   - [图像识别快速体验](docs/zh_CN/quick_start/quick_start_recognition.md)
-  - 模块介绍
+  - [20+应用场景库](docs/zh_CN/introduction/ppshitu_application_scenarios.md)
+  - 子模块算法介绍及模型训练
     - [主体检测](./docs/zh_CN/image_recognition_pipeline/mainbody_detection.md)
     - [特征提取模型](./docs/zh_CN/image_recognition_pipeline/feature_extraction.md)
     - [向量检索](./docs/zh_CN/image_recognition_pipeline/vector_search.md)
-    - [哈希编码](docs/zh_CN/image_recognition_pipeline/)
-  - [模型训练](docs/zh_CN/models_training/recognition.md)
-  - 推理部署
+    - [哈希编码](docs/zh_CN/image_recognition_pipeline/deep_hashing.md)
+  - PipeLine 推理部署
     - [基于python预测引擎推理](docs/zh_CN/inference_deployment/python_deploy.md#2)
     - [基于C++预测引擎推理](deploy/cpp_shitu/readme.md)
     - [服务化部署](docs/zh_CN/inference_deployment/recognition_serving_deploy.md)
     - [端侧部署](docs/zh_CN/inference_deployment/lite_shitu.md)
     - [库管理工具](docs/zh_CN/inference_deployment/shitu_gallery_manager.md)
- - [20+应用场景库](docs/zh_CN/introduction/ppshitu_application_scenarios.md)
 - [PULC超轻量图像分类实用方案](docs/zh_CN/PULC/PULC_train.md)
   - [超轻量图像分类快速体验](docs/zh_CN/PULC/PULC_quickstart.md)
   - [超轻量图像分类模型库](docs/zh_CN/PULC/PULC_model_list.md)

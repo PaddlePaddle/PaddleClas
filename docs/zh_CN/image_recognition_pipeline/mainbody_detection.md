@@ -70,9 +70,9 @@ PicoDet 由 [PaddleDetection](https://github.com/PaddlePaddle/PaddleDetection) �
 - [ATSS](https://arxiv.org/abs/1912.02424)及[SimOTA](https://arxiv.org/abs/2107.08430) 标签分配策略
 
 
-更多关于 PicoDet 的优化细节与 benchmark 可以参考 [PicoDet 系列模型介绍](https://github.com/PaddlePaddle/PaddleDetection/tree/release/2.5/configs/picodet)。
+更多关于 PicoDet 的优化细节与 benchmark 可以参考 [PicoDet 系列模型介绍](https://github.com/PaddlePaddle/PaddleDetection/tree/release/2.3/configs/picodet)。
 
-在轻量级主体检测任务中，为了更好地兼顾检测速度与效果，我们使用 PPLCNet_x2_5 作为主体检测模型的骨干网络，同时将训练与预测的图像尺度修改为了 640x640，其余配置与 [picodet_lcnet_1_5x_416_coco.yml](https://github.com/PaddlePaddle/PaddleDetection/blob/release/2.5/configs/picodet/picodet_l_416_coco_lcnet.yml) 完全一致。将数据集更换为自定义的主体检测数据集，进行训练，最终得到检测模型。
+在轻量级主体检测任务中，为了更好地兼顾检测速度与效果，我们使用 PPLCNet_x2_5 作为主体检测模型的骨干网络，同时将训练与预测的图像尺度修改为了 640x640，其余配置与 [picodet_l_416_coco.yml](https://github.com/PaddlePaddle/PaddleDetection/blob/release/2.3/configs/picodet/picodet_l_416_coco.yml) 完全一致。将数据集更换为自定义的主体检测数据集，进行训练，最终得到检测模型。
 
 <a name="3"></a>
 
@@ -89,19 +89,20 @@ PicoDet 由 [PaddleDetection](https://github.com/PaddlePaddle/PaddleDetection) �
 ```shell
 cd <path/to/clone/PaddleDetection>
 git clone https://github.com/PaddlePaddle/PaddleDetection.git
-
 cd PaddleDetection
+# 切换到2.3分支
+git checkout release/2.3
 # 安装其他依赖
 pip install -r requirements.txt
 ```
 
-更多安装教程，请参考: [安装文档](https://github.com/PaddlePaddle/PaddleDetection/blob/release/2.5/docs/tutorials/INSTALL_cn.md)
+更多安装教程，请参考: [安装文档](https://github.com/PaddlePaddle/PaddleDetection/blob/release/2.3/docs/tutorials/INSTALL_cn.md)
 
 <a name="3.2"></a>
 
 ### 3.2 数据准备
 
-对于自定义数据集，首先需要将自己的数据集修改为 COCO 格式，可以参考[自定义检测数据集教程](https://github.com/PaddlePaddle/PaddleDetection/tree/release/2.5/docs/tutorials/data)制作 COCO 格式的数据集。
+对于自定义数据集，首先需要将自己的数据集修改为 COCO 格式，可以参考[自定义检测数据集教程](https://github.com/PaddlePaddle/PaddleDetection/blob/release/2.3/docs/tutorials/PrepareDataSet.md)制作 COCO 格式的数据集。
 
 主体检测任务中，所有的检测框均属于前景，在这里需要将标注文件中，检测框的 `category_id` 修改为 1，同时将整个标注文件中的 `categories` 映射表修改为下面的格式，即整个类别映射表中只包含`前景`类别。
 
@@ -113,7 +114,7 @@ pip install -r requirements.txt
 
 ### 3.3 配置文件改动和说明
 
-我们使用 [mainbody_detection/picodet_lcnet_x2_5_640_mainbody.yml](https://github.com/PaddlePaddle/PaddleDetection/blob/release/2.5/configs/picodet/legacy_model/application/mainbody_detection/picodet_lcnet_x2_5_640_mainbody.yml) 配置进行训练，配置文件摘要如下：
+我们使用 [mainbody_detection/picodet_lcnet_x2_5_640_mainbody.yml](https://github.com/PaddlePaddle/PaddleDetection/blob/release/2.3/configs/picodet/application/mainbody_detection/picodet_lcnet_x2_5_640_mainbody.yml) 配置进行训练，配置文件摘要如下：
 
 ![](../../images/det/PaddleDetection_config.png)
 
@@ -144,14 +145,14 @@ PaddleDetection 提供了单卡/多卡训练模式，满足用户多种训练需
 ```bash
 # windows 和 Mac 下不需要执行该命令
 export CUDA_VISIBLE_DEVICES=0
-python tools/train.py -c configs/picodet/legacy_model/application/mainbody_detection/picodet_lcnet_x2_5_640_mainbody.yml
+python tools/train.py -c configs/picodet/application/mainbody_detection/picodet_lcnet_x2_5_640_mainbody.yml
 ```
 
 * GPU 多卡训练
 
 ```bash
 export CUDA_VISIBLE_DEVICES=0,1,2,3
-python -m paddle.distributed.launch --gpus 0,1,2,3 tools/train.py -c configs/picodet/legacy_model/application/mainbody_detection/picodet_lcnet_x2_5_640_mainbody.yml --eval
+python -m paddle.distributed.launch --gpus 0,1,2,3 tools/train.py -c configs/picodet/legacy_model/mainbody_detection/picodet_lcnet_x2_5_640_mainbody.yml --eval
 ```
 
 --eval：表示边训练边验证。
@@ -163,7 +164,7 @@ python -m paddle.distributed.launch --gpus 0,1,2,3 tools/train.py -c configs/pic
 ```bash
 export CUDA_VISIBLE_DEVICES=0
 # 指定 pretrain_weights 参数，加载通用的主体检测预训练模型
-python tools/train.py -c configs/picodet/legacy_model/application/mainbody_detection/picodet_lcnet_x2_5_640_mainbody.yml -o pretrain_weights=https://paddledet.bj.bcebos.com/models/picodet_lcnet_x2_5_640_mainbody.pdparams
+python tools/train.py -c configs/picodet/application/mainbody_detection/picodet_lcnet_x2_5_640_mainbody.yml -o pretrain_weights=https://paddledet.bj.bcebos.com/models/picodet_lcnet_x2_5_640_mainbody.pdparams
 ```
 
 * 模型恢复训练
@@ -172,7 +173,7 @@ python tools/train.py -c configs/picodet/legacy_model/application/mainbody_detec
 
 ```bash
 export CUDA_VISIBLE_DEVICES=0,1,2,3
-python -m paddle.distributed.launch --gpus 0,1,2,3 tools/train.py -c configs/picodet/legacy_model/application/mainbody_detection/picodet_lcnet_x2_5_640_mainbody.yml --eval -r output/picodet_lcnet_x2_5_640_mainbody/20
+python -m paddle.distributed.launch --gpus 0,1,2,3 tools/train.py -c configs/picodet/application/mainbody_detection/picodet_lcnet_x2_5_640_mainbody.yml --eval -r output/picodet_lcnet_x2_5_640_mainbody/20
 ```
 
 注意：
@@ -189,7 +190,7 @@ python -m paddle.distributed.launch --gpus 0,1,2,3 tools/train.py -c configs/pic
 
 ```bash
 export CUDA_VISIBLE_DEVICES=0
-python tools/infer.py -c configs/picodet/legacy_model/application/mainbody_detection/picodet_lcnet_x2_5_640_mainbody.yml --infer_img=your_image_path.jpg --output_dir=infer_output/ --draw_threshold=0.5 -o weights=output/picodet_lcnet_x2_5_640_mainbody/model_final
+python tools/infer.py -c configs/picodet/application/mainbody_detection/picodet_lcnet_x2_5_640_mainbody.yml --infer_img=your_image_path.jpg --output_dir=infer_output/ --draw_threshold=0.5 -o weights=output/picodet_lcnet_x2_5_640_mainbody/model_final
 ```
 
 `--draw_threshold` 是个可选参数. 根据 [NMS](https://ieeexplore.ieee.org/document/1699659) 的计算，不同阈值会产生不同的结果 `keep_top_k` 表示设置输出目标的最大数量，默认值为 100，用户可以根据自己的实际情况进行设定。
@@ -204,7 +205,7 @@ python tools/infer.py -c configs/picodet/legacy_model/application/mainbody_detec
 执行导出模型脚本：
 
 ```bash
-python tools/export_model.py -c configs/picodet/legacy_model/application/mainbody_detection/picodet_lcnet_x2_5_640_mainbody.yml --output_dir=./inference -o weights=output/picodet_lcnet_x2_5_640_mainbody/model_final.pdparams
+python tools/export_model.py -c configs/picodet/application/mainbody_detection/picodet_lcnet_x2_5_640_mainbody.yml --output_dir=./inference -o weights=output/picodet_lcnet_x2_5_640_mainbody/model_final.pdparams
 ```
 
 预测模型会导出到 `inference/picodet_lcnet_x2_5_640_mainbody` 目录下，分别为 `infer_cfg.yml` (预测不需要), `model.pdiparams`, `model.pdiparams.info`, `model.pdmodel` 。
@@ -224,7 +225,7 @@ python tools/export_model.py -c configs/picodet/legacy_model/application/mainbod
 
 <a name="4.3"></a>
 ### 4.3 其他推理方式
-其他推理方法，如C++推理部署、PaddleServing部署等请参考[检测模型推理部署](https://github.com/PaddlePaddle/PaddleDetection/blob/release/2.5/deploy/README.md)。
+其他推理方法，如C++推理部署、PaddleServing部署等请参考[检测模型推理部署](https://github.com/PaddlePaddle/PaddleDetection/blob/release/2.3/deploy/README.md)。
 
 
 ### FAQ
