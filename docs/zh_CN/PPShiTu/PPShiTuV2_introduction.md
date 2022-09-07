@@ -37,11 +37,11 @@ PP-ShiTuV2 是基于 PP-ShiTuV1 改进的一个实用轻量级通用图像识别
 
 下表列出了 PP-ShiTuV2 中的识别模型用不同的模型结构与训练策略所得到的相关指标，
 
-| 模型                | 延时(ms) | 存储(MB)(检测+特征提取) | product<sup>*</sup> |
-| :------------------ | :------- | :---------------------- | :------------------ |
-|                     |          |                         | recall@1            |
-| PP-ShiTuV1_pipeline | 5.0      | 64(30+34)               | 63                  |
-| PP-ShiTuV2_pipeline | 6.1      | 49(30+19)               | 68                  |
+| 模型       | 延时  | 存储(主体检测+特征提取) | product<sup>*</sup> |
+| :--------- | :---- | :---------------------- | :------------------ |
+|            |       |                         | recall@1            |
+| PP-ShiTuV1 | 5.0ms | 64(30+34)MB             | 63%                 |
+| PP-ShiTuV2 | 6.1ms | 49(30+19)               | 68%                 |
 
 **注：**
 - product数据集是为了验证PP-ShiTu的泛化性能而制作的数据集，所有的数据都没有在训练和测试集中出现。该数据包含8个大类（人脸、化妆品、地标、红酒、手表、车、运动鞋、饮料），299个小类。测试时，使用299个小类的标签进行测试；sop数据集来自[GPR1200: A Benchmark for General-Purpose Content-Based Image Retrieval](https://arxiv.org/abs/2111.13122)，可视为“SOP”数据集的子集。
@@ -54,25 +54,28 @@ PP-ShiTuV2 是基于 PP-ShiTuV1 改进的一个实用轻量级通用图像识别
 
 可以通过扫描二维码或者 [点击链接](https://paddle-imagenet-models-name.bj.bcebos.com/demos/PP-ShiTu.apk) 下载并安装APP
 
-<div align=center><img src="../../images/quick_start/android_demo/PPShiTu_qrcode.png" height="400" width="400"/></div>
+<div align=center><img src="../../images/quick_start/android_demo/PPShiTu_qrcode.png" height="45%" width="45%"/></div>
 
 然后将以下体验图片保存到手机上：
 
-<div align=center><img src="../../images/recognition/drink_data_demo/test_images/nongfu_spring.jpeg" width=45% height=45% /></div>
+<div align=center><img src="../../images/recognition/drink_data_demo/test_images/nongfu_spring.jpeg" width=30% height=30% /></div>
 
 打开安装好的APP，点击下方“**本地识别**”按钮，选择上面这张保存的图片，再点击确定，就能得到如下识别结果：
 
-<div align=center><img src="../../images/quick_start/android_demo/android_nongfu_spring.JPG" width=45% height=45%/></div>
+<div align=center><img src="../../images/quick_start/android_demo/android_nongfu_spring.JPG" width=30% height=30%/></div>
 
 ### 2.2 命令行代码快速体验
 
-- 首先按照以下命令，安装paddlepaddle
+- 首先按照以下命令，安装paddlepaddle和faiss
   ```shell
-  # 您的机器安装的是 CUDA9 或 CUDA10，请运行以下命令安装
-    python3.7 -m pip install paddlepaddle-gpu -i https://mirror.baidu.com/pypi/simple
+  # 如果您的机器安装的是 CUDA9 或 CUDA10，请运行以下命令安装
+  python3.7 -m pip install paddlepaddle-gpu -i https://mirror.baidu.com/pypi/simple
 
-  # 您的机器是CPU，请运行以下命令安装
-    python3.7 -m pip install paddlepaddle -i https://mirror.baidu.com/pypi/simple
+  # 如果您的机器是CPU，请运行以下命令安装
+  python3.7 -m pip install paddlepaddle -i https://mirror.baidu.com/pypi/simple
+
+  # 安装 faiss 库
+  python3.7 -m pip install faiss-cpu==1.7.1post2
   ```
 
 - 然后按照以下命令，安装paddleclas whl包
@@ -83,11 +86,19 @@ PP-ShiTuV2 是基于 PP-ShiTuV1 改进的一个实用轻量级通用图像识别
   # 安装paddleclas
   python3.7 setup.py install
   ```
-- 然后执行以下命令对体验图像进行识别
+
+- 然后执行以下命令下载并解压好demo数据，最后执行一行命令体验图像识别
 
   ```shell
+  # 下载并解压demo数据
+  wget -nc https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/data/drink_dataset_v2.0.tar && tar -xf drink_dataset_v2.0.tar
 
-
+  # 执行识别命令
+  paddleclas \
+  --model_name=PP-ShiTuV2 \
+  --infer_imgs=./drink_dataset_v2.0/test_images/100.jpeg \
+  --index_dir=./drink_dataset_v2.0/index/ \
+  --data_file=./drink_dataset_v2.0/gallery/drink_label.txt
   ```
 
 ## 3 模块介绍与训练
@@ -110,17 +121,13 @@ PP-ShiTuV2 是基于 PP-ShiTuV1 改进的一个实用轻量级通用图像识别
 
 特征提取模型的数据集、训练、评估、推理等详细信息可以参考文档：[PPLCNetV2_base_ShiTu](../image_recognition_pipeline/feature_extraction.md)。
 
-<!-- #### 3.2.4 数据增强
-
-我们考虑到实际相机拍摄时目标主体可能出现一定的旋转而不一定能保持正立状态，因此我们在数据增强中加入了适当的 [随机旋转增强](../../../ppcls/configs/GeneralRecognitionV2/GeneralRecognitionV2_PPLCNetV2_base.yaml#L117)，以提升模型在真实场景中的检索能力。 -->
-
 ### 3.3 向量检索
 
 向量检索技术在图像识别、图像检索中应用比较广泛。其主要目标是对于给定的查询向量，在已经建立好的向量库中进行特征向量的相似度或距离计算，返回候选向量的相似度排序结果。
 
 在 PP-ShiTuV2 识别系统中，我们使用了 [Faiss](https://github.com/facebookresearch/faiss) 向量检索开源库对此部分进行支持，其具有适配性好、安装方便、算法丰富、同时支持CPU与GPU的优点。
 
-PP-ShiTuV2 系统中关于 Faiss 向量检索库的安装及使用可以参考文档：[vector search](../image_recognition_pipeline/feature_extraction.md)。
+PP-ShiTuV2 系统中关于 Faiss 向量检索库的安装及使用可以参考文档：[vector search](../image_recognition_pipeline/vector_search.md)。
 
 ## 4. 推理部署
 
@@ -136,7 +143,7 @@ Paddle Inference 是飞桨的原生推理库， 作用于服务器端和云端�
   ```shell
   python3.7 tools/export_model.py \
   -c ./ppcls/configs/GeneralRecognitionV2/GeneralRecognitionV2_PPLCNetV2_base.yaml \
-  -o Global.pretrained_model="./output/GeneralRecognitionV2_PPLCNetV2_base/RecModel/best_model" \
+  -o Global.pretrained_model="https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/pretrain/PPShiTuV2/general_PPLCNetV2_base_pretrained_v1.0.pdparams" \
   -o Global.save_inference_dir=deploy/models/GeneralRecognitionV2_PPLCNetV2_base`
   ```
   执行完该脚本后会在 `deploy/models/` 下生成 `GeneralRecognitionV2_PPLCNetV2_base` 文件夹，具有如下文件结构：

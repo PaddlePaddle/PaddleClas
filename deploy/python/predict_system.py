@@ -37,8 +37,9 @@ class SystemPredictor(object):
         self.return_k = self.config['IndexProcess']['return_k']
 
         index_dir = self.config["IndexProcess"]["index_dir"]
-        assert os.path.exists(os.path.join(
-            index_dir, "vector.index")), "vector.index not found ..."
+        assert os.path.exists(
+            os.path.join(index_dir, "vector.index")
+        ), f"{os.path.join(index_dir, 'vector.index')} not found ..."
         assert os.path.exists(os.path.join(
             index_dir, "id_map.pkl")), "id_map.pkl not found ... "
 
@@ -89,41 +90,49 @@ class SystemPredictor(object):
 
         return filtered_results
 
-    def predict(self, img):
-        output = []
-        # st1: get all detection results
-        results = self.det_predictor.predict(img)
+    def predict(self, images):
+        if not isinstance(images, (tuple, list)):
+            images = [images, ]
 
-        # st2: add the whole image for recognition to improve recall
-        results = self.append_self(results, img.shape)
+        batch_output = []
+        for img in images:
+            output = []
+            # st1: get all detection results
+            results = self.det_predictor.predict(img)
 
-        # st3: recognition process, use score_thres to ensure accuracy
-        for result in results:
-            preds = {}
-            xmin, ymin, xmax, ymax = result["bbox"].astype("int")
-            crop_img = img[ymin:ymax, xmin:xmax, :].copy()
-            rec_results = self.rec_predictor.predict(crop_img)
-            preds["bbox"] = [xmin, ymin, xmax, ymax]
-            scores, docs = self.Searcher.search(rec_results, self.return_k)
+            # st2: add the whole image for recognition to improve recall
+            results = self.append_self(results, img.shape)
 
-            # just top-1 result will be returned for the final
-            if self.config["IndexProcess"]["dist_type"] == "hamming":
-                if scores[0][0] <= self.config["IndexProcess"][
-                        "hamming_radius"]:
-                    preds["rec_docs"] = self.id_map[docs[0][0]].split()[1]
-                    preds["rec_scores"] = scores[0][0]
-                    output.append(preds)
-            else:
-                if scores[0][0] >= self.config["IndexProcess"]["score_thres"]:
-                    preds["rec_docs"] = self.id_map[docs[0][0]].split()[1]
-                    preds["rec_scores"] = scores[0][0]
-                    output.append(preds)
+            # st3: recognition process, use score_thres to ensure accuracy
+            for result in results:
+                preds = {}
+                xmin, ymin, xmax, ymax = result["bbox"].astype("int")
+                crop_img = img[ymin:ymax, xmin:xmax, :].copy()
+                rec_results = self.rec_predictor.predict(crop_img)
+                preds["bbox"] = [xmin, ymin, xmax, ymax]
+                scores, docs = self.Searcher.search(rec_results, self.return_k)
 
-        # st5: nms to the final results to avoid fetching duplicate results
-        output = self.nms_to_rec_results(
-            output, self.config["Global"]["rec_nms_thresold"])
+                # just top-1 result will be returned for the final
+                if self.config["IndexProcess"]["dist_type"] == "hamming":
+                    if scores[0][0] <= self.config["IndexProcess"][
+                            "hamming_radius"]:
+                        preds["rec_docs"] = self.id_map[docs[0][0]].split()[1]
+                        preds["rec_scores"] = scores[0][0]
+                        output.append(preds)
+                else:
+                    if scores[0][0] >= self.config["IndexProcess"][
+                            "score_thres"]:
+                        preds["rec_docs"] = self.id_map[docs[0][0]].split()[1]
+                        preds["rec_scores"] = scores[0][0]
+                        output.append(preds)
 
-        return output
+            # st5: nms to the final results to avoid fetching duplicate results
+            output = self.nms_to_rec_results(
+                output, self.config["Global"]["rec_nms_thresold"])
+
+            # return output
+            batch_output.append(output)
+        return batch_output
 
 
 def main(config):
@@ -133,9 +142,10 @@ def main(config):
     assert config["Global"]["batch_size"] == 1
     for idx, image_file in enumerate(image_list):
         img = cv2.imread(image_file)[:, :, ::-1]
-        output = system_predictor.predict(img)
-        draw_bbox_results(img, output, image_file)
-        print(output)
+        outputs = system_predictor.predict(img)
+        for output in outputs:
+            draw_bbox_results(img, output, image_file)
+            print(output)
     return
 
 

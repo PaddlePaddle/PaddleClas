@@ -10,6 +10,7 @@
     - [3.2 Neck](#32-neck)
     - [3.3 Head](#33-head)
     - [3.4 Loss](#34-loss)
+    - [3.5 Data Augmentation](#35-data-augmentation)
 - [4. 实验部分](#4-实验部分)
 - [5. 自定义特征提取](#5-自定义特征提取)
   - [5.1 数据准备](#51-数据准备)
@@ -46,7 +47,8 @@
 
 #### 3.1 Backbone
 
-Backbone 部分采用了 [PP-LCNetV2_base](../models/PP-LCNetV2.md)，其在 `PPLCNet_V1` 的基础上，加入了包括Rep 策略、PW 卷积、Shortcut、激活函数改进、SE 模块改进等多个优化点，使得最终分类精度与 `PPLCNet_x2_5` 相近，且推理延时减少了40%<sup>*</sup>。
+Backbone 部分采用了 [PP-LCNetV2_base](../models/PP-LCNetV2.md)，其在 `PPLCNet_V1` 的基础上，加入了包括Rep 策略、PW 卷积、Shortcut、激活函数改进、SE 模块改进等多个优化点，使得最终分类精度与 `PPLCNet_x2_5` 相近，且推理延时减少了40%<sup>*</sup>。在实验过程中我们对 `PPLCNetV2_base` 进行了适当的改进，在保持速度基本不变的情况下，让其在识别任务中得到更高的性能，包括：去掉 `PPLCNetV2_base` 末尾的 `ReLU` 和 `FC`、将最后一个 stage(RepDepthwiseSeparable) 的 stride 改为1。
+
 
 **注：** <sup>*</sup>推理环境基于 Intel(R) Xeon(R) Gold 6271C CPU @ 2.60GHz 硬件平台，OpenVINO 推理平台。
 
@@ -60,7 +62,11 @@ Head 部分选用 [FC Layer](../../../ppcls/arch/gears/fc.py)，使用分类头�
 
 #### 3.4 Loss
 
-Loss 部分选用 [Cross entropy loss](../../../ppcls/loss/celoss.py) 和 [TripletAngularMarginLoss](../../../ppcls/loss/tripletangularmarginloss.py)，在训练时以分类损失和基于角度的三元组损失来指导网络进行优化。详细的配置文件见 [GeneralRecognitionV2_PPLCNetV2_base.yaml](../../../ppcls/configs/GeneralRecognitionV2/GeneralRecognitionV2_PPLCNetV2_base.yaml#L63-77)。
+Loss 部分选用 [Cross entropy loss](../../../ppcls/loss/celoss.py) 和 [TripletAngularMarginLoss](../../../ppcls/loss/tripletangularmarginloss.py)，在训练时以分类损失和基于角度的三元组损失来指导网络进行优化。我们基于原始的 TripletLoss (困难三元组损失)进行了改进，将优化目标从 L2 欧几里得空间更换成余弦空间，并加入了 anchor 与 positive/negtive 之间的硬性距离约束，让训练与测试的目标更加接近，提升模型的泛化能力。详细的配置文件见 [GeneralRecognitionV2_PPLCNetV2_base.yaml](../../../ppcls/configs/GeneralRecognitionV2/GeneralRecognitionV2_PPLCNetV2_base.yaml#L63-77)。
+
+#### 3.5 Data Augmentation
+
+我们考虑到实际相机拍摄时目标主体可能出现一定的旋转而不一定能保持正立状态，因此我们在数据增强中加入了适当的 [随机旋转增强](../../../ppcls/configs/GeneralRecognitionV2/GeneralRecognitionV2_PPLCNetV2_base.yaml#L117)，以提升模型在真实场景中的检索能力。
 
 <a name="4"></a>
 
@@ -92,10 +98,10 @@ Loss 部分选用 [Cross entropy loss](../../../ppcls/loss/celoss.py) 和 [Tripl
 最终的模型精度指标如下表所示:
 
 | 模型                   | 延时(ms) | 存储(MB) | product<sup>*</sup> |      | Aliproduct |      | VeRI-Wild |      | LogoDet-3k |      | iCartoonFace |      | SOP      |      | Inshop   |      | gldv2    |      | imdb_face |      | iNat     |      | instre   |      | sketch   |      | sop      |      |
-| :--------------------- | :----------- | :------ | :------------------ | :--- | ---------- | ---- | --------- | ---- | ---------- | ---- | ------------ | ---- | -------- | ---- | -------- | ---- | -------- | ---- | --------- | ---- | -------- | ---- | -------- | ---- | -------- | ---- | -------- | ---- |
-|                        |              |         | recall@1            | mAP  | recall@1   | mAP  | recall@1  | mAP  | recall@1   | mAP  | recall@1     | mAP  | recall@1 | mAP  | recall@1 | mAP  | recall@1 | mAP  | recall@1  | mAP  | recall@1 | mAP  | recall@1 | mAP  | recall@1 | mAP  | recall@1 | mAP  |
-| PP-ShiTuV1_general_rec | 5.0          | 34       | 63.0                | 51.5 | 83.9       | 83.2 | 88.7      | 60.1 | 86.1       | 73.6 | 84.1         | 72.3 | 79.7     | 58.6 | 89.1     | 69.4 | 98.2     | 91.6 | 28.8      | 8.42 | 12.6     | 6.1  | 72.0     | 50.4 | 27.9     | 9.5  | 97.6     | 90.3 |
-| PP-ShiTuV2_general_rec | 6.1          | 19       | 73.7                | 61.0 | 84.2       | 83.3 | 87.8      | 68.8 | 88.0       | 63.2 | 53.6         | 27.5 | 77.6     | 55.3 | 90.8     | 74.3 | 98.1     | 90.5 | 35.9      | 11.2 | 38.6     | 23.9 | 87.7     | 71.4 | 39.3     | 15.6 | 98.3     | 90.9 |
+| :--------------------- | :------- | :------- | :------------------ | :--- | ---------- | ---- | --------- | ---- | ---------- | ---- | ------------ | ---- | -------- | ---- | -------- | ---- | -------- | ---- | --------- | ---- | -------- | ---- | -------- | ---- | -------- | ---- | -------- | ---- |
+|                        |          |          | recall@1            | mAP  | recall@1   | mAP  | recall@1  | mAP  | recall@1   | mAP  | recall@1     | mAP  | recall@1 | mAP  | recall@1 | mAP  | recall@1 | mAP  | recall@1  | mAP  | recall@1 | mAP  | recall@1 | mAP  | recall@1 | mAP  | recall@1 | mAP  |
+| PP-ShiTuV1_general_rec | 5.0      | 34       | 63.0                | 51.5 | 83.9       | 83.2 | 88.7      | 60.1 | 86.1       | 73.6 | 84.1         | 72.3 | 79.7     | 58.6 | 89.1     | 69.4 | 98.2     | 91.6 | 28.8      | 8.42 | 12.6     | 6.1  | 72.0     | 50.4 | 27.9     | 9.5  | 97.6     | 90.3 |
+| PP-ShiTuV2_general_rec | 6.1      | 19       | 73.7                | 61.0 | 84.2       | 83.3 | 87.8      | 68.8 | 88.0       | 63.2 | 53.6         | 27.5 | 77.6     | 55.3 | 90.8     | 74.3 | 98.1     | 90.5 | 35.9      | 11.2 | 38.6     | 23.9 | 87.7     | 71.4 | 39.3     | 15.6 | 98.3     | 90.9 |
 
 * 预训练模型地址：[general_PPLCNetV2_base_pretrained_v1.0.pdparams](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/pretrain/PPShiTuV2/general_PPLCNetV2_base_pretrained_v1.0.pdparams)
 * 采用的评测指标为：`Recall@1` 与 `mAP`
