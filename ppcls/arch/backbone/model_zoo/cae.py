@@ -618,16 +618,6 @@ def _load_pretrained(pretrained, model, model_keys, model_ema_configs, abs_pos_e
             checkpoint_model['pos_embed'] = new_pos_embed
     msg = model.set_state_dict(checkpoint_model)
     print(msg)
-
-    # model_ema = None
-    # if model_ema_configs['enable_model_ema']:
-    #     # Important to create EMA model after cuda(), DP wrapper, and AMP but before SyncBN and DDP wrapper
-    #     model_ema = ModelEma(
-    #         model,
-    #         decay=args.model_ema_decay,
-    #         device='cpu' if model_ema_configs['model_ema_force_cpu'] else '',
-    #         resume='')
-    #     print("Using EMA with decay = %.8f" % model_ema_configs['model_ema_decay'])
     
     model_without_ddp = model
     n_parameters = sum(p.numel() for p in model.parameters() if not p.stop_gradient).item()
@@ -645,14 +635,14 @@ def cae_small_patch16_224(**kwargs):
     return model
 
 
-pretrained_model = '/CAE/PaddleClas/pretrained/vit_base_cae_pretrained.pdparams'
-def cae_base_patch16_224(pretrained=pretrained_model, use_ssld=False, **kwargs):
+def cae_base_patch16_224(use_ssld=False, **kwargs):
     config  = kwargs.copy()
     enable_linear_eval = config.pop('enable_linear_eval')
     model_keys = config.pop('model_key')
     model_ema_configs = config.pop('model_ema')
     abs_pos_emb = config.pop('abs_pos_emb')
     rel_pos_bias = config.pop('rel_pos_bias')
+    pretrained = config.pop('pretrained')
 
     model = VisionTransformer(
         patch_size=16, embed_dim=768, depth=12, num_heads=12, mlp_ratio=4, qkv_bias=True,
