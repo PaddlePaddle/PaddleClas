@@ -11,17 +11,21 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 import os
+import sys
+
+__dir__ = os.path.dirname(os.path.abspath(__file__))
+sys.path.append(os.path.abspath(os.path.join(__dir__, '../')))
 
 import cv2
 import numpy as np
 
-from paddleclas.deploy.utils import logger, config
-from paddleclas.deploy.utils.predictor import Predictor
-from paddleclas.deploy.utils.get_image_list import get_image_list
-from paddleclas.deploy.python.preprocess import create_operators
-from paddleclas.deploy.python.postprocess import build_postprocess
+from utils import logger
+from utils import config
+from utils.predictor import Predictor
+from utils.get_image_list import get_image_list
+from python.preprocess import create_operators
+from python.postprocess import build_postprocess
 
 
 class ClsPredictor(Predictor):
@@ -136,7 +140,7 @@ def main(config):
             for number, result_dict in enumerate(batch_results):
                 if "PersonAttribute" in config[
                         "PostProcess"] or "VehicleAttribute" in config[
-                            "PostProcess"]:
+                            "PostProcess"]  or "TableAttribute" in config["PostProcess"]:
                     filename = batch_names[number]
                     print("{}:\t {}".format(filename, result_dict))
                 else:

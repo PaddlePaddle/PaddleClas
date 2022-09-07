@@ -18,7 +18,7 @@ from . import topk, threshoutput
 
 from .topk import Topk, MultiLabelTopk
 from .threshoutput import ThreshOutput
-from .attr_rec import VehicleAttribute, PersonAttribute
+from .attr_rec import VehicleAttribute, PersonAttribute, TableAttribute
 
 
 def build_postprocess(config):
