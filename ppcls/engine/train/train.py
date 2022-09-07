@@ -29,6 +29,7 @@ def train_epoch(engine, epoch_id, print_batch_step):
             for key in engine.time_info:
                 engine.time_info[key].reset()
         engine.time_info["reader_cost"].update(time.time() - tic)
+
         if engine.use_dali:
             batch = [
                 paddle.to_tensor(batch[0]['data']),

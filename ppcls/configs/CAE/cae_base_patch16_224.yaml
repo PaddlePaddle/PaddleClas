@@ -77,17 +77,17 @@ DataLoader:
             mixup_alpha: 0.8
             cutmix_alpha: 1.0
             switch_prob: 0.5
+            num_classes: 4
       transform_ops:
         - DecodeImage:
             to_rgb: True
             channel_first: False
         - RandCropImage:
             size: 224
-            interpolation: bilinear # add by CAE
+            interpolation: bilinear
         - RandFlipImage:
             flip_code: 1
-        - RandAugment: # add by CAE
-
+        - RandAugment:
         - NormalizeImage:
             scale: 1.0/255.0
             mean: [0.485, 0.456, 0.406]
@@ -104,7 +104,7 @@ DataLoader:
       name: DistributedBatchSampler
       batch_size: 2
       drop_last: True
-      shuffle: True
+      shuffle: False
     loader:
       num_workers: 4
       use_shared_memory: True
