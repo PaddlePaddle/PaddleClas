@@ -49,7 +49,7 @@ Linux GPU/CPU KL离线量化推理测试的主程序为`test_ptq_inference_pytho
 
 ## 2. 测试流程
 
-一下测试流程以 MobileNetV3_large_x1_0 模型为例。
+以下测试流程以 MobileNetV3_large_x1_0 模型为例。
 
 ### 2.1 准备环境
 
@@ -80,7 +80,7 @@ Linux GPU/CPU KL离线量化推理测试的主程序为`test_ptq_inference_pytho
 ### 2.2 准备数据和模型
 
 ```bash
-bash test_tipc/prepare.sh test_tipc/config/MobileNetV3/MobileNetV3_large_x1_0_train_ptq_infer_python.txt whole_infer
+bash test_tipc/prepare.sh test_tipc/configs/MobileNetV3/MobileNetV3_large_x1_0_train_ptq_infer_python.txt whole_infer
 ```
 
 离线量化的操作流程，可参考[文档](../../deploy/slim/README.md)。
@@ -90,7 +90,7 @@ bash test_tipc/prepare.sh test_tipc/config/MobileNetV3/MobileNetV3_large_x1_0_tr
 以`MobileNetV3_large_x1_0`的`Linux GPU/CPU KL离线量化训练推理测试`为例，命令如下所示。
 
 ```bash
-bash test_tipc/test_ptq_inference_python.sh test_tipc/config/MobileNetV3/MobileNetV3_large_x1_0_train_ptq_infer_python.txt whole_infer
+bash test_tipc/test_ptq_inference_python.sh test_tipc/configs/MobileNetV3/MobileNetV3_large_x1_0_train_ptq_infer_python.txt whole_infer
 ```
 
 输出结果如下，表示命令运行成功。

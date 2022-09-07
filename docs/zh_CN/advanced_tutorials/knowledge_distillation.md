@@ -14,6 +14,8 @@
         - [1.2.3 UDML](#1.2.3)
         - [1.2.4 AFD](#1.2.4)
         - [1.2.5 DKD](#1.2.5)
+        - [1.2.6 DIST](#1.2.6)
+        - [1.2.7 MGD](#1.2.7)
 - [2. 使用方法](#2)
     - [2.1 环境配置](#2.1)
     - [2.2 数据准备](#2.2)
@@ -22,8 +24,6 @@
     - [2.5 模型预测](#2.5)
     - [2.6 模型导出与推理](#2.6)
 - [3. 参考文献](#3)
-
-
 
 <a name="1"></a>
 
@@ -444,6 +444,145 @@ Loss:
     - CELoss:
         weight: 1.0
 ```
+
+<a name='1.2.6'></a>
+
+#### 1.2.6 DIST
+
+##### 1.2.6.1 DIST 算法介绍
+
+论文信息：
+
+
+> [Knowledge Distillation from A Stronger Teacher](https://arxiv.org/pdf/2205.10536v1.pdf)
+>
+> Tao Huang, Shan You, Fei Wang, Chen Qian, Chang Xu
+>
+> 2022, under review
+
+使用KD方法进行模型蒸馏时，教师模型精度提升时，蒸馏的效果往往难以同步提升。本文提出DIST方法，使用皮尔逊相关系数（Pearson correlation coefficient）去表征学生模型与教师模型之间的差异，替代蒸馏过程中默认的KL散度，从而保证模型可以学到更加准确的相关性信息。
+
+在ImageNet1k公开数据集上，效果如下所示。
+
+| 策略 | 骨干网络 | 配置文件 | Top-1 acc | 下载链接 |
+| --- | --- | --- | --- | --- |
+| baseline | ResNet18 | [ResNet18.yaml](../../../ppcls/configs/ImageNet/ResNet/ResNet18.yaml) | 70.8% | - |
+| DIST | ResNet18 | [resnet34_distill_resnet18_dist.yaml](../../../ppcls/configs/ImageNet/Distillation/resnet34_distill_resnet18_dist.yaml) | 71.99%(**+1.19%**) | - |
+
+
+##### 1.2.6.2 DIST 配置
+
+DIST 配置如下所示。在模型构建Arch字段中，需要同时定义学生模型与教师模型，教师模型固定参数，且需要加载预训练模型。在损失函数Loss字段中，需要定义`DistillationDISTLoss`（学生与教师之间的DIST loss）以及`DistillationGTCELoss`（学生与教师关于真值标签的CE loss），作为训练的损失函数。
+
+
+```yaml
+Arch:
+  name: "DistillationModel"
+  # if not null, its lengths should be same as models
+  pretrained_list:
+  # if not null, its lengths should be same as models
+  freeze_params_list:
+  - True
+  - False
+  models:
+    - Teacher:
+        name: ResNet34
+        pretrained: True
+
+    - Student:
+        name: ResNet18
+        pretrained: False
+
+  infer_model_name: "Student"
+
+
+# loss function config for traing/eval process
+Loss:
+  Train:
+    - DistillationGTCELoss:
+        weight: 1.0
+        model_names: ["Student"]
+    - DistillationDISTLoss:
+        weight: 2.0
+        model_name_pairs:
+        - ["Student", "Teacher"]
+  Eval:
+    - CELoss:
+        weight: 1.0
+```
+
+<a name='1.2.7'></a>
+
+#### 1.2.7 MGD
+
+##### 1.2.7.1 MGD 算法介绍
+
+论文信息：
+
+
+> [Masked Generative Distillation](https://arxiv.org/abs/2205.01529)
+>
+> Zhendong Yang, Zhe Li, Mingqi Shao, Dachuan Shi, Zehuan Yuan, Chun Yuan
+>
+> ECCV 2022
+
+该方法针对特征图展开蒸馏，在蒸馏的过程中，对特征进行随机mask，强制学生用部分特征去生成教师模型的所有特征，以提升学生模型的表征能力，最终在特征蒸馏任务上达到了SOTA，并在检测、分割等任务中广泛验证有效。
+
+在ImageNet1k公开数据集上，效果如下所示。
+
+| 策略 | 骨干网络 | 配置文件 | Top-1 acc | 下载链接 |
+| --- | --- | --- | --- | --- |
+| baseline | ResNet18 | [ResNet18.yaml](../../../ppcls/configs/ImageNet/ResNet/ResNet18.yaml) | 70.8% | - |
+| MGD | ResNet18 | [resnet34_distill_resnet18_dist.yaml](../../../ppcls/configs/ImageNet/Distillation/resnet34_distill_resnet18_mgd.yaml) | 71.86%(**+1.06%**) | - |
+
+
+##### 1.2.7.2 MGD 配置
+
+MGD 配置如下所示。在模型构建Arch字段中，需要同时定义学生模型与教师模型，教师模型固定参数，且需要加载预训练模型。在损失函数Loss字段中，需要定义`DistillationPairLoss`（学生与教师模型之间的MGDLoss）以及`DistillationGTCELoss`（学生与教师关于真值标签的CE loss），作为训练的损失函数。
+
+```yaml
+Arch:
+  name: "DistillationModel"
+  class_num: &class_num 1000
+  # if not null, its lengths should be same as models
+  pretrained_list:
+  # if not null, its lengths should be same as models
+  freeze_params_list:
+  - True
+  - False
+  infer_model_name: "Student"
+  models:
+    - Teacher:
+        name: ResNet34
+        class_num: *class_num
+        pretrained: True
+        return_patterns: &t_stages ["blocks[2]", "blocks[6]", "blocks[12]", "blocks[15]"]
+    - Student:
+        name: ResNet18
+        class_num: *class_num
+        pretrained: False
+        return_patterns: &s_stages ["blocks[1]", "blocks[3]", "blocks[5]", "blocks[7]"]
+
+# loss function config for traing/eval process
+Loss:
+  Train:
+    - DistillationGTCELoss:
+        weight: 1.0
+        model_names: ["Student"]
+    - DistillationPairLoss:
+        weight: 1.0
+        model_name_pairs: [["Student", "Teacher"]] # calculate mgdloss for Student and Teacher
+        name: "loss_mgd"
+        base_loss_name: MGDLoss # MGD loss，the following are parameters of 'MGD loss'
+        s_keys: ["blocks[7]"]   # feature map used to calculate MGD loss in student model
+        t_keys: ["blocks[15]"]  # feature map used to calculate MGD loss in teacher model
+        student_channels: 512   # channel num for stduent feature map
+        teacher_channels: 512   # channel num for teacher feature map
+  Eval:
+    - CELoss:
+        weight: 1.0
+```
+
 <a name="2"></a>
 
 ## 2. 模型训练、评估和预测
@@ -601,3 +740,5 @@ python3 tools/export_model.py \
 [11] Zhao B, Cui Q, Song R, et al. Decoupled Knowledge Distillation[J]. arXiv preprint arXiv:2203.08679, 2022.
 
 [12] Ji M, Heo B, Park S. Show, attend and distill: Knowledge distillation via attention-based feature matching[C]//Proceedings of the AAAI Conference on Artificial Intelligence. 2021, 35(9): 7945-7952.
+
+[13] Huang T, You S, Wang F, et al. Knowledge Distillation from A Stronger Teacher[J]. arXiv preprint arXiv:2205.10536, 2022.

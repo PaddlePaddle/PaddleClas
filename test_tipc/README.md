@@ -31,7 +31,7 @@
 ```
 ./test_tipc/
 ├── common_func.sh                      #test_*.sh会调用到的公共函数
-├── config     # 配置文件目录
+├── configs     # 配置文件目录
 │   ├── MobileNetV3         # MobileNetV3系列模型测试配置文件目录
 │   │   ├── MobileNetV3_large_x1_0_train_infer_python.txt                                    #基础训练预测配置文件
 │   │   ├── MobileNetV3_large_x1_0_train_linux_gpu_fleet_amp_infer_python_linux_gpu_cpu.txt  #多机多卡训练预测配置文件
@@ -108,6 +108,7 @@ bash test_tipc/test_train_inference_python.sh ./test_tipc/configs/MobileNetV3/Mo
 
 - [test_train_inference_python 使用](docs/test_train_inference_python.md)：测试基于Python的模型训练、评估、推理等基本功能，包括裁剪、量化、蒸馏。
 - [test_train_pact_inference_python 使用](docs/test_train_pact_inference_python.md)：测试基于Python的模型PACT在线量化等基本功能。
+- [test_train_ptq_inference_python 使用](docs/test_train_ptq_inference_python.md)：测试基于Python的模型KL离线量化等基本功能。
 - [test_inference_cpp 使用](docs/test_inference_cpp.md) ：测试基于C++的模型推理。
 - [test_serving 使用](docs/test_serving.md) ：测试基于Paddle Serving的服务化部署功能。
 - [test_lite_arm_cpu_cpp 使用](docs/test_lite_arm_cpu_cpp.md): 测试基于Paddle-Lite的ARM CPU端c++预测部署功能.

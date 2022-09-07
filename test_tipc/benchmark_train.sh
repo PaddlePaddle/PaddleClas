@@ -7,10 +7,10 @@ export str_tmp=$(echo `pip list|grep paddlepaddle-gpu|awk -F ' ' '{print $2}'`)
 export frame_version=${str_tmp%%.post*}
 export frame_commit=$(echo `${python} -c "import paddle;print(paddle.version.commit)"`)
 
-# run benchmark sh 
+# run benchmark sh
 # Usage:
 # bash run_benchmark_train.sh config.txt params
-# or 
+# or
 # bash run_benchmark_train.sh config.txt
 
 function func_parser_params(){
@@ -73,8 +73,8 @@ model_type=$4
 
 IFS=$'\n'
 # parser params from train_benchmark.txt
-sed -i 's/ -o DataLoader.Train.sampler.shuffle=False//g' $FILENAME
-sed -i 's/ -o DataLoader.Train.loader.num_workers=0/ -o Global.print_batch_step=1/g' $FILENAME
+sed -i 's/ -o DataLoader.Train.sampler.shuffle=False/ -o Global.print_batch_step=1/g' $FILENAME
+sed -i 's/ -o DataLoader.Train.loader.num_workers=0/ -o DataLoader.Train.loader.num_workers=12/g' $FILENAME
 sed -i 's/-o DataLoader.Train.loader.use_shared_memory=False/ -o Global.eval_during_train=False/g' $FILENAME
 dataline=`cat $FILENAME`
 # parser params
@@ -132,7 +132,7 @@ func_sed_params "$FILENAME" "${line_pact_train}" "null"
 func_sed_params "$FILENAME" "${line_fgpm_train}" "null"
 
 # if params
-if  [ ! -n "$PARAMS" ] ;then
+if [[ ! -n "$PARAMS" ]];then
     # PARAMS input is not a word.
     IFS="|"
     batch_size_list=(${batch_size})
@@ -151,7 +151,7 @@ else
     device_num=${params_list[4]}
     IFS=";"
 
-    if [ ${precision} = "null" ];then
+    if [[ ${precision} = "null" ]];then
         precision="fp32"
     fi
 
@@ -163,14 +163,14 @@ fi
 # for log name
 to_static=""
 # parse "to_static" options and modify trainer into "to_static_trainer"
-if [ $model_type = "dynamicTostatic" ] ;then
-   to_static="d2sT_"
-   sed -i 's/trainer:norm_train/trainer:to_static_train/g' $FILENAME
+if [[ ${model_type} = "dynamicTostatic" ]];then
+    to_static="d2sT_"
+    sed -i 's/trainer:norm_train/trainer:to_static_train/g' $FILENAME
 fi
 
 
 IFS="|"
-for batch_size in ${batch_size_list[*]}; do 
+for batch_size in ${batch_size_list[*]}; do
     for precision in ${fp_items_list[*]}; do
         for device_num in ${device_num_list[*]}; do
             # sed batchsize and precision
@@ -179,11 +179,39 @@ for batch_size in ${batch_size_list[*]}; do
             func_sed_params "$FILENAME" "${line_epoch}" "$epoch"
             gpu_id=$(set_gpu_id $device_num)
 
-            if [ ${#gpu_id} -le 1 ];then
+            # if bs is big, then copy train_list.txt to generate more train log
+            # At least 25 log number would be good to calculate ips for benchmark system.
+            # So the copy number for train_list is as follows:
+            total_batch_size=`echo $[$batch_size*${device_num:1:1}*${device_num:3:3}]`
+            if [[ $model_name == *GeneralRecognition* ]]; then
+                cd dataset/
+                train_list_length=`cat train_reg_all_data.txt | wc -l`
+                copy_num=`echo $[25*10*$total_batch_size/$train_list_length]`
+                if [[ $copy_num -gt 1 ]];then
+                    rm -rf train_reg_all_data.txt
+                    for ((i=1; i <=$copy_num; i++));do
+                        cat tipc_shitu_demo_data/demo_train.txt >> train_reg_all_data.txt
+                    done
+                fi
+                cd ..
+            else
+                cd dataset/ILSVRC2012
+                train_list_length=`cat train_list.txt | wc -l`
+                copy_num=`echo $[25*10*$total_batch_size/$train_list_length]`
+                if [[ $copy_num -gt 1 ]];then
+                    rm -rf train_list.txt
+                    for ((i=1; i <=$copy_num; i++));do
+                        cat val_list.txt >> train_list.txt
+                    done
+                fi
+                cd ../../
+            fi
+
+            if [[ ${#gpu_id} -le 1 ]];then
                 log_path="$SAVE_LOG/profiling_log"
                 mkdir -p $log_path
                 log_name="${repo_name}_${model_name}_bs${batch_size}_${precision}_${run_mode}_${device_num}_${to_static}profiling"
-                func_sed_params "$FILENAME" "${line_gpuid}" "0"  # sed used gpu_id 
+                func_sed_params "$FILENAME" "${line_gpuid}" "0"  # sed used gpu_id
                 # set profile_option params
                 tmp=`sed -i "${line_profile}s/.*/${profile_option}/" "${FILENAME}"`
 
@@ -235,7 +263,7 @@ for batch_size in ${batch_size_list[*]}; do
                 mkdir -p $speed_log_path
                 log_name="${repo_name}_${model_name}_bs${batch_size}_${precision}_${run_mode}_${device_num}_${to_static}log"
                 speed_log_name="${repo_name}_${model_name}_bs${batch_size}_${precision}_${run_mode}_${device_num}_${to_static}speed"
-                func_sed_params "$FILENAME" "${line_gpuid}" "$gpu_id"  # sed used gpu_id 
+                func_sed_params "$FILENAME" "${line_gpuid}" "$gpu_id"  # sed used gpu_id
                 func_sed_params "$FILENAME" "${line_profile}" "null"  # sed --profile_option as null
                 cmd="bash test_tipc/test_train_inference_python.sh ${FILENAME} benchmark_train > ${log_path}/${log_name} 2>&1 "
                 echo $cmd
@@ -246,7 +274,7 @@ for batch_size in ${batch_size_list[*]}; do
                 eval "cat ${log_path}/${log_name}"
                 # parser log
                 _model_name="${model_name}_bs${batch_size}_${precision}_${run_mode}"
-                
+
                 cmd="${python} ${BENCHMARK_ROOT}/scripts/analysis.py --filename ${log_path}/${log_name} \
                         --speed_log_file '${speed_log_path}/${speed_log_name}' \
                         --model_name ${_model_name} \

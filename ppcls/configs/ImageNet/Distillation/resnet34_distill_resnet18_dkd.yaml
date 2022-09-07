@@ -139,8 +139,7 @@ Infer:
           order: ''
       - ToCHWImage:
   PostProcess:
-    name: DistillationPostProcess
-    func: Topk
+    name: Topk
     topk: 5
     class_id_map_file: "ppcls/utils/imagenet1k_label_list.txt"
 

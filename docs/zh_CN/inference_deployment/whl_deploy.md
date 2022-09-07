@@ -23,17 +23,16 @@ PaddleClas 支持 Python Whl 包方式进行预测，目前 Whl 包方式仅支�
 <a name="1"></a>
 ## 1. 安装 paddleclas
 
-* pip 安装
+* **[推荐]** 直接 pip 安装：
 
 ```bash
-pip3 install paddleclas==2.2.1
+pip3 install paddleclas
 ```
 
-* 本地构建并安装
+* 如需使用 PaddleClas develop 分支体验最新功能，或是需要基于 PaddleClas 进行二次开发，请本地构建安装：
 
 ```bash
-python3 setup.py bdist_wheel
-pip3 install dist/*
+python3 setup.py install
 ```
 
 <a name="2"></a>
@@ -92,7 +91,6 @@ Predict complete!
 
 * 命令行中
 ```bash
-from paddleclas import PaddleClas, get_default_confg
 paddleclas --model_name=ViT_base_patch16_384 --infer_imgs='docs/images/inference_deployment/whl_demo.jpg' --resize_short=384 --crop_size=384
 ```
 

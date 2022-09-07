@@ -13,11 +13,6 @@
 # limitations under the License.
 
 import os
-import sys
-__dir__ = os.path.dirname(__file__)
-sys.path.append(os.path.join(__dir__, ""))
-sys.path.append(os.path.join(__dir__, "deploy"))
-
 from typing import Union, Generator
 import argparse
 import shutil
@@ -33,12 +28,16 @@ from tqdm import tqdm
 from prettytable import PrettyTable
 import paddle
 
-from deploy.python.predict_cls import ClsPredictor
-from deploy.utils.get_image_list import get_image_list
-from deploy.utils import config
+from .ppcls.arch import backbone
+from .ppcls.utils import logger
 
-import ppcls.arch.backbone as backbone
-from ppcls.utils import logger
+from .deploy.python.predict_cls import ClsPredictor
+from .deploy.utils.get_image_list import get_image_list
+from .deploy.utils import config
+
+# for the PaddleClas Project
+from . import deploy
+from . import ppcls
 
 # for building model with loading pretrained weights from backbone
 logger.init_logger()
@@ -51,6 +50,11 @@ BASE_IMAGES_DIR = os.path.join(BASE_DIR, "images")
 IMN_MODEL_BASE_DOWNLOAD_URL = "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/{}_infer.tar"
 IMN_MODEL_SERIES = {
     "AlexNet": ["AlexNet"],
+    "CSWinTransformer": [
+        "CSWinTransformer_tiny_224", "CSWinTransformer_small_224",
+        "CSWinTransformer_base_224", "CSWinTransformer_base_384",
+        "CSWinTransformer_large_224", "CSWinTransformer_large_384"
+    ],
     "DarkNet": ["DarkNet53"],
     "DeiT": [
         "DeiT_base_distilled_patch16_224", "DeiT_base_distilled_patch16_384",
@@ -82,6 +86,8 @@ IMN_MODEL_SERIES = {
         "HRNet_W48_C_ssld"
     ],
     "Inception": ["GoogLeNet", "InceptionV3", "InceptionV4"],
+    "LeViT":
+    ["LeViT_128S", "LeViT_128", "LeViT_192", "LeViT_256", "LeViT_384"],
     "MixNet": ["MixNet_S", "MixNet_M", "MixNet_L"],
     "MobileNetV1": [
         "MobileNetV1_x0_25", "MobileNetV1_x0_5", "MobileNetV1_x0_75",
@@ -100,6 +106,7 @@ IMN_MODEL_SERIES = {
         "MobileNetV3_large_x1_0", "MobileNetV3_large_x1_25",
         "MobileNetV3_small_x1_0_ssld", "MobileNetV3_large_x1_0_ssld"
     ],
+    "MobileViT": ["MobileViT_XXS", "MobileViT_XS", "MobileViT_S"],
     "PPHGNet": [
         "PPHGNet_tiny",
         "PPHGNet_small",
@@ -111,6 +118,10 @@ IMN_MODEL_SERIES = {
         "PPLCNet_x1_0", "PPLCNet_x1_5", "PPLCNet_x2_0", "PPLCNet_x2_5"
     ],
     "PPLCNetV2": ["PPLCNetV2_base"],
+    "PVTV2": [
+        "PVT_V2_B0", "PVT_V2_B1", "PVT_V2_B2", "PVT_V2_B2_Linear", "PVT_V2_B3",
+        "PVT_V2_B4", "PVT_V2_B5"
+    ],
     "RedNet": ["RedNet26", "RedNet38", "RedNet50", "RedNet101", "RedNet152"],
     "RegNet": ["RegNetX_4GF"],
     "Res2Net": [
@@ -163,6 +174,7 @@ IMN_MODEL_SERIES = {
         "pcpvt_small", "pcpvt_base", "pcpvt_large", "alt_gvt_small",
         "alt_gvt_base", "alt_gvt_large"
     ],
+    "TNT": ["TNT_small"],
     "VGG": ["VGG11", "VGG13", "VGG16", "VGG19"],
     "VisionTransformer": [
         "ViT_base_patch16_224", "ViT_base_patch16_384", "ViT_base_patch32_384",
@@ -202,6 +214,7 @@ class InputModelError(Exception):
 def init_config(model_type, model_name, inference_model_dir, **kwargs):
 
     cfg_path = f"deploy/configs/PULC/{model_name}/inference_{model_name}.yaml" if model_type == "pulc" else "deploy/configs/inference_cls.yaml"
+    __dir__ = os.path.dirname(__file__)
     cfg_path = os.path.join(__dir__, cfg_path)
     cfg = config.get_config(cfg_path, show=False)
 
@@ -453,10 +466,6 @@ class PaddleClas(object):
     """PaddleClas.
     """
 
-    if not os.environ.get('ppcls', False):
-        os.environ.setdefault('ppcls', 'True')
-        print_info()
-
     def __init__(self,
                  model_name: str=None,
                  inference_model_dir: str=None,
@@ -471,6 +480,7 @@ class PaddleClas(object):
             topk (int, optional): Return the top k prediction results with the highest score. Defaults to 5.
         """
         super().__init__()
+
         self.model_type, inference_model_dir = self._check_input_model(
             model_name, inference_model_dir)
         self._config = init_config(self.model_type, model_name,
@@ -595,6 +605,7 @@ class PaddleClas(object):
 def main():
     """Function API used for commad line.
     """
+    print_info()
     cfg = args_cfg()
     clas_engine = PaddleClas(**cfg)
     res = clas_engine.predict(cfg["infer_imgs"], print_pred=True)

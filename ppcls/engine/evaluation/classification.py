@@ -98,7 +98,14 @@ def classification_eval(engine, epoch_id=0):
                 preds = paddle.concat(pred_list, 0)
 
             if accum_samples > total_samples and not engine.use_dali:
-                preds = preds[:total_samples + current_samples - accum_samples]
+                if isinstance(preds, list):
+                    preds = [
+                        pred[:total_samples + current_samples - accum_samples]
+                        for pred in preds
+                    ]
+                else:
+                    preds = preds[:total_samples + current_samples -
+                                  accum_samples]
                 labels = labels[:total_samples + current_samples -
                                 accum_samples]
                 current_samples = total_samples + current_samples - accum_samples

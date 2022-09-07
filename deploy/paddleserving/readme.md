@@ -1,1 +1,1 @@
-../../docs/zh_CN/inference_deployment/paddle_serving_deploy.md
+../../docs/zh_CN/inference_deployment/classification_serving_deploy.md

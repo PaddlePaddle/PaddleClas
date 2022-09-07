@@ -23,10 +23,16 @@ git clone https://gitee.com/paddlepaddle/PaddleClas.git -b develop
 
 <a name='2'></a>
 
-## 2. Install requirements
+## 2. Install PaddleClas and requirements
 
-PaddleClas dependencies are listed in file `requirements.txt`, you can use the following command to install the dependencies.
+* **[Recommended]** Installing from PyPI:
 
+```shell
+pip install paddleclas
 ```
-pip install --upgrade -r requirements.txt -i https://mirror.baidu.com/pypi/simple
+
+* Please build and install locally if you need to use the develop branch of PaddleClas to experience the latest functions, or need to redevelop based on PaddleClas. The command is as follows:
+
+```shell
+python setup.py install
 ```

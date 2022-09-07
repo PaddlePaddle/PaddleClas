@@ -79,7 +79,7 @@ Linux GPU/CPU PACT量化训练推理测试的主程序为`test_train_inference_p
 ### 2.2 准备数据和模型
 
 ```bash
-bash test_tipc/prepare.sh test_tipc/config/PPLCNetV2/PPLCNetV2_base_train_pact_infer_python.txt lite_train_lite_infer
+bash test_tipc/prepare.sh test_tipc/configs/PPLCNetV2/PPLCNetV2_base_train_pact_infer_python.txt lite_train_lite_infer
 ```
 
 在线量化的操作流程，可参考[文档](../../deploy/slim/README.md)。
@@ -89,7 +89,7 @@ bash test_tipc/prepare.sh test_tipc/config/PPLCNetV2/PPLCNetV2_base_train_pact_i
 以`MobileNetV3_large_x1_0`的`Linux GPU/CPU PACT在线量化训练推理测试`为例，命令如下所示。
 
 ```bash
-bash test_tipc/test_train_inference_python.sh test_tipc/config/PPLCNetV2/PPLCNetV2_base_train_pact_infer_python.txt lite_train_lite_infer
+bash test_tipc/test_train_inference_python.sh test_tipc/configs/PPLCNetV2/PPLCNetV2_base_train_pact_infer_python.txt lite_train_lite_infer
 ```
 
 输出结果如下，表示命令运行成功。

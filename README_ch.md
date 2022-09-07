@@ -30,7 +30,7 @@
 
 - 2022.5.26 [飞桨产业实践范例直播课](http://aglc.cn/v-c4FAR)，解读**超轻量重点区域人员出入管理方案**。
 
-- 2022.5.23 新增[人员出入管理范例库](https://aistudio.baidu.com/aistudio/projectdetail/4094475)，具体内容可以在 AI Stuio 上体验。
+- 2022.5.23 新增[人员出入管理范例库](https://aistudio.baidu.com/aistudio/projectdetail/4094475)，具体内容可以在 AI Studio 上体验。
 
 - 2022.5.20 上线[PP-HGNet](./docs/zh_CN/models/PP-HGNet.md), [PP-LCNetv2](./docs/zh_CN/models/PP-LCNetV2.md)。
 
@@ -78,7 +78,7 @@ PP-ShiTu图像识别快速体验：[点击这里](./docs/zh_CN/quick_start/quick
   - 推理部署
     - [基于python预测引擎推理](docs/zh_CN/inference_deployment/python_deploy.md#1)
     - [基于C++预测引擎推理](docs/zh_CN/inference_deployment/cpp_deploy.md)
-    - [服务化部署](docs/zh_CN/inference_deployment/paddle_serving_deploy.md)
+    - [服务化部署](docs/zh_CN/inference_deployment/classification_serving_deploy.md)
     - [端侧部署](docs/zh_CN/inference_deployment/paddle_lite_deploy.md)
     - [Paddle2ONNX模型转化与预测](deploy/paddle2onnx/readme.md)
   - [模型压缩](deploy/slim/README.md)
@@ -93,7 +93,7 @@ PP-ShiTu图像识别快速体验：[点击这里](./docs/zh_CN/quick_start/quick
   - 推理部署
     - [基于python预测引擎推理](docs/zh_CN/inference_deployment/python_deploy.md#2)
     - [基于C++预测引擎推理](deploy/cpp_shitu/readme.md)
-    - [服务化部署](docs/zh_CN/inference_deployment/paddle_serving_deploy.md)
+    - [服务化部署](docs/zh_CN/inference_deployment/recognition_serving_deploy.md)
     - [端侧部署](deploy/lite_shitu/README.md)
 - PP系列骨干网络模型
   - [PP-HGNet](docs/zh_CN/models/PP-HGNet.md)
