@@ -46,7 +46,7 @@ python tools/export_model.py \
 <a name="3"></a>
 ## 3. 主体检测模型导出
 
-主体检测模型的导出，可以参考[主题检测介绍](../image_recognition_pipeline/mainbody_detection.md)。
+主体检测模型的导出，可以参考[主体检测介绍](../image_recognition_pipeline/mainbody_detection.md)。
 
 <a name="4"></a>
 ## 4. 识别模型导出
