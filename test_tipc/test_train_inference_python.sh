@@ -20,7 +20,7 @@ python=$(func_parser_value "${lines[2]}")
 gpu_list=$(func_parser_value "${lines[3]}")
 train_use_gpu_key=$(func_parser_key "${lines[4]}")
 train_use_gpu_value=$(func_parser_value "${lines[4]}")
-if [ ${DEVICE} != "gpu" ]; then
+if [ "${DEVICE}" != "gpu" ]; then
     train_use_gpu_value=$(echo $train_use_gpu_value | sed -e "s/gpu/${DEVICE}/g") # replace gpu to ${DEVICE}
 fi
 autocast_list=$(func_parser_value "${lines[5]}")
@@ -75,7 +75,7 @@ infer_is_quant=$(func_parser_value "${lines[38]}")
 # parser inference
 inference_py=$(func_parser_value "${lines[39]}")
 use_gpu_key=$(func_parser_key "${lines[40]}")
-if [ ${DEVICE} != "gpu" ]; then
+if [ "${DEVICE}" != "gpu" ]; then
     use_gpu_key=$(echo $use_gpu_key | sed -e "s/gpu/${DEVICE}/g") # replace gpu to ${DEVICE}
 fi
 use_gpu_list=$(func_parser_value "${lines[40]}")
@@ -181,7 +181,7 @@ if [[ ${MODE} = "whole_infer" ]]; then
         cd ../../deploy
         is_quant=True
         # replace use_gpu to use_${DEVICE} in inference config
-        if [ ${DEVICE} != "gpu" ]; then
+        if [ "${DEVICE}" != "gpu" ]; then
             inference_config=$(func_parser_config "${inference_py}")
             sed -i "s/use_gpu: True/use_${DEVICE}: True/g" $inference_config
         fi
@@ -271,7 +271,7 @@ else
 
                 # replace device: gpu to device: ${DEVICE} in trainer config file
                 # replace once as run_train/eval_py/run_export share same config file
-                if [ ${DEVICE} != "gpu" ]; then
+                if [ "${DEVICE}" != "gpu" ]; then
                     trainer_config=$(func_parser_config "${run_train}")
                     sed -i "s/device: gpu/device: ${DEVICE}/g" $trainer_config
                 fi
@@ -328,7 +328,7 @@ else
                     save_infer_path="${save_log}"
                     cd deploy
                     # replace use_gpu to use_npu in inference config
-                    if [ ${DEVICE} != "gpu" ]; then
+                    if [ "${DEVICE}" != "gpu" ]; then
                         inference_config=$(func_parser_config "${inference_py}")
                         sed -i "s/use_gpu: True/use_${DEVICE}: True/g" $inference_config
                     fi
