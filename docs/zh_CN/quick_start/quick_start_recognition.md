@@ -122,7 +122,9 @@
 
 注意：由于部分解压缩软件在解压上述 `tar` 格式文件时存在问题，建议非命令行用户下载 `zip` 格式文件并解压。`tar` 格式文件建议使用命令 `tar -xf xxx.tar` 解压。
 
-本章节 demo 数据下载地址如下: [drink_dataset_v2.0.tar(瓶装饮料数据)](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/data/drink_dataset_v2.0.tar)。
+本章节 demo 数据下载地址如下: [drink_dataset_v2.0.tar(瓶装饮料数据)](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/data/drink_dataset_v2.0.tar)，
+
+下面以 **drink_dataset_v2.0.tar** 为例介绍PC端的 PP-ShiTu 快速体验流程。用户也可以自行下载并解压其它场景的数据进行体验：[22种场景数据下载](../introduction/ppshitu_application_scenarios.md#1-应用场景介绍)。
 
 如果希望体验服务端主体检测和各垂类方向的识别模型，可以参考 [2.4 服务端识别模型列表](#24-服务端识别模型列表)
 
