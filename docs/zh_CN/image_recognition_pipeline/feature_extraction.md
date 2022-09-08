@@ -103,6 +103,7 @@ Loss 部分选用 [Cross entropy loss](../../../ppcls/loss/celoss.py) 和 [Tripl
 | PP-ShiTuV1_general_rec | 5.0      | 34       | 65.9                | 54.3 | 83.9       | 83.2 | 88.7      | 60.1 | 86.1       | 73.6 | 84.1         | 72.3 | 79.7     | 58.6 | 89.1     | 69.4 | 98.2     | 91.6 | 28.8      | 8.42 | 12.6     | 6.1  | 72.0     | 50.4 | 27.9     | 9.5  | 97.6     | 90.3 |
 | PP-ShiTuV2_general_rec | 6.1      | 19       | 73.7                | 61.0 | 84.2       | 83.3 | 87.8      | 68.8 | 88.0       | 63.2 | 53.6         | 27.5 | 77.6     | 55.3 | 90.8     | 74.3 | 98.1     | 90.5 | 35.9      | 11.2 | 38.6     | 23.9 | 87.7     | 71.4 | 39.3     | 15.6 | 98.3     | 90.9 |
 
+* product数据集是为了验证PP-ShiTu的泛化性能而制作的数据集，所有的数据都没有在训练和测试集中出现。该数据包含7个大类（化妆品、地标、红酒、手表、车、运动鞋、饮料），250个小类。测试时，使用250个小类的标签进行测试；sop数据集来自[GPR1200: A Benchmark for General-Purpose Content-Based Image Retrieval](https://arxiv.org/abs/2111.13122)，可视为“SOP”数据集的子集。
 * 预训练模型地址：[general_PPLCNetV2_base_pretrained_v1.0.pdparams](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/pretrain/PPShiTuV2/general_PPLCNetV2_base_pretrained_v1.0.pdparams)
 * 采用的评测指标为：`Recall@1` 与 `mAP`
 * 速度评测机器的 CPU 具体信息为：`Intel(R) Xeon(R) Gold 6148 CPU @ 2.40GHz`

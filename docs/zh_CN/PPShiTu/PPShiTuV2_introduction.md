@@ -36,14 +36,13 @@ PP-ShiTuV2 是基于 PP-ShiTuV1 改进的一个实用轻量级通用图像识别
 
 下表列出了 PP-ShiTuV2 用不同的模型结构与训练策略所得到的相关指标，
 
-| 模型       | 存储(主体检测+特征提取) | product<sup>*</sup> |
+| 模型       | 存储(主体检测+特征提取) | product |
 | :--------- | :---------------------- | :------------------ |
 |            |                         | recall@1            |
 | PP-ShiTuV1 | 64(30+34)MB             | 66.8%                 |
 | PP-ShiTuV2 | 49(30+19)               | 73.8%                 |
 
 **注：**
-- product数据集是为了验证PP-ShiTu的泛化性能而制作的数据集，所有的数据都没有在训练和测试集中出现。该数据包含7个大类（化妆品、地标、红酒、手表、车、运动鞋、饮料），299个小类。测试时，使用250个小类的标签进行测试；sop数据集来自[GPR1200: A Benchmark for General-Purpose Content-Based Image Retrieval](https://arxiv.org/abs/2111.13122)，可视为“SOP”数据集的子集。
 - recall及mAP指标的介绍可以参考 [常用指标](../algorithm_introduction/reid.md#22-常用指标)。
 - 延时是基于 Intel(R) Xeon(R) Gold 6148 CPU @ 2.40GHz 测试得到，开启 MKLDNN 加速策略，线程数为10。
 
