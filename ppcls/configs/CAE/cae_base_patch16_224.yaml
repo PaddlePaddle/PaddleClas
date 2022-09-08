@@ -103,7 +103,7 @@ DataLoader:
 
     sampler:
       name: DistributedBatchSampler
-      batch_size: 2
+      batch_size: 128
       drop_last: True
       shuffle: True
     loader:
@@ -132,7 +132,7 @@ DataLoader:
     
     sampler:
       name: DistributedBatchSampler
-      batch_size: 2
+      batch_size: 128
       drop_last: False
       shuffle: False
     loader:
