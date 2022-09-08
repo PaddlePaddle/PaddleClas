@@ -69,6 +69,7 @@ from .model_zoo.repvgg import RepVGG_A0, RepVGG_A1, RepVGG_A2, RepVGG_B0, RepVGG
 from .model_zoo.van import VAN_tiny
 from .model_zoo.peleenet import PeleeNet
 from .model_zoo.convnext import ConvNeXt_tiny
+from .model_zoo.cae import cae_base_patch16_224, cae_large_patch16_224
 
 from .variant_models.resnet_variant import ResNet50_last_stage_stride1
 from .variant_models.vgg_variant import VGG19Sigmoid
