@@ -41,10 +41,11 @@ threads="1"
 
 
 function func_serving_cls(){
-    LOG_PATH="test_tipc/output/${model_name}/${MODE}"
+    CLS_ROOT_PATH=$(pwd)
+    LOG_PATH="${CLS_ROOT_PATH}/test_tipc/output/${model_name}/${MODE}"
     mkdir -p ${LOG_PATH}
-    LOG_PATH="../../${LOG_PATH}"
     status_log="${LOG_PATH}/results_serving.log"
+
     IFS='|'
 
     # pdserving
@@ -159,10 +160,11 @@ function func_serving_cls(){
 
 
 function func_serving_rec(){
-    LOG_PATH="test_tipc/output/${model_name}/${MODE}"
+    CLS_ROOT_PATH=$(pwd)
+    LOG_PATH="${CLS_ROOT_PATH}/test_tipc/output/${model_name}/${MODE}"
     mkdir -p ${LOG_PATH}
-    LOG_PATH="../../../${LOG_PATH}"
     status_log="${LOG_PATH}/results_serving.log"
+
     trans_model_py=$(func_parser_value "${lines[5]}")
     cls_infer_model_dir_key=$(func_parser_key "${lines[6]}")
     cls_infer_model_dir_value=$(func_parser_value "${lines[6]}")

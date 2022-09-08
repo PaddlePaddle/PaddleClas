@@ -95,7 +95,8 @@ if [[ $MODE = 'benchmark_train' ]]; then
     epoch_num=1
 fi
 
-LOG_PATH="./test_tipc/output/${model_name}/${MODE}"
+CLS_ROOT_PATH=$(pwd)
+LOG_PATH="${CLS_ROOT_PATH}/test_tipc/output/${model_name}/${MODE}"
 mkdir -p ${LOG_PATH}
 status_log="${LOG_PATH}/results_python.log"
 
@@ -126,7 +127,7 @@ function func_inference() {
                             eval $command
                             last_status=${PIPESTATUS[0]}
                             eval "cat ${_save_log_path}"
-                            status_check $last_status "${command}" "../${status_log}" "${model_name}" "${_save_log_path}"
+                            status_check $last_status "${command}" "${status_log}" "${model_name}" "${_save_log_path}"
                         done
                     done
                 done
@@ -149,7 +150,7 @@ function func_inference() {
                         eval $command
                         last_status=${PIPESTATUS[0]}
                         eval "cat ${_save_log_path}"
-                        status_check $last_status "${command}" "../${status_log}" "${model_name}" "${_save_log_path}"
+                        status_check $last_status "${command}" "${status_log}" "${model_name}" "${_save_log_path}"
                     done
                 done
             done
@@ -171,12 +172,12 @@ if [[ ${MODE} = "whole_infer" ]]; then
         last_status=${PIPESTATUS[0]}
         status_check $last_status "${command}" "${status_log}" "${model_name}" "${log_path}"
         cd ${infer_model_dir_list}/quant_post_static_model
-        ln -s __model__ inference.pdmodel
-        ln -s __params__ inference.pdiparams
+        ln -s model.pdmodel inference.pdmodel
+        ln -s model.pdiparams inference.pdiparams
         cd ../../deploy
         is_quant=True
         gpu=0
-        func_inference "${python}" "${inference_py}" "../${infer_model_dir_list}/quant_post_static_model" "../${LOG_PATH}" "${infer_img_dir}" "${is_quant}" "${gpu}"
+        func_inference "${python}" "${inference_py}" "../${infer_model_dir_list}/quant_post_static_model" "${LOG_PATH}" "${infer_img_dir}" "${is_quant}" "${gpu}"
         cd ..
     fi
 else
@@ -262,7 +263,7 @@ else
 
                 set_save_model=$(func_set_params "${save_model_key}" "${save_log}")
                 if [ ${#gpu} -le 2 ]; then # train with cpu or single gpu
-                    cmd="${python} ${run_train} ${set_use_gpu}  ${set_save_model} ${set_epoch} ${set_pretrain} ${set_autocast} ${set_batchsize} ${set_train_params1} "
+                    cmd="${python} ${run_train} ${set_use_gpu} ${set_save_model} ${set_epoch} ${set_pretrain} ${set_autocast} ${set_batchsize} ${set_train_params1} "
                 elif [ ${#ips} -le 15 ]; then # train with multi-gpu
                     cmd="${python} -m paddle.distributed.launch --gpus=${gpu} ${run_train} ${set_use_gpu} ${set_save_model} ${set_epoch} ${set_pretrain} ${set_autocast} ${set_batchsize} ${set_train_params1}"
                 else # train with multi-machine
@@ -273,8 +274,8 @@ else
                 # export FLAGS_cudnn_deterministic=True
                 sleep 5
                 eval $cmd
-                eval "cat ${save_log}/train.log >> ${save_log}.log"
-                status_check $? "${cmd}" "${status_log}" "${model_name}" "${save_log}.log""
+                eval "cat ${save_log}/${model_name}/train.log >> ${save_log}.log"
+                status_check $? "${cmd}" "${status_log}" "${model_name}" "${save_log}.log"
                 sleep 5
 
                 if [[ $FILENAME == *GeneralRecognition* ]]; then
@@ -314,7 +315,7 @@ else
                     eval $env
                     save_infer_path="${save_log}"
                     cd deploy
-                    func_inference "${python}" "${inference_py}" "../${save_infer_path}" "../${LOG_PATH}" "${infer_img_dir}" "${flag_quant}" "${gpu}"
+                    func_inference "${python}" "${inference_py}" "${save_infer_path}" "${LOG_PATH}" "${infer_img_dir}" "${flag_quant}" "${gpu}"
                     cd ..
                 fi
                 eval "unset CUDA_VISIBLE_DEVICES"

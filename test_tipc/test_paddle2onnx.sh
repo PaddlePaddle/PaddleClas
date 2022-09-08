@@ -36,7 +36,8 @@ inference_hardware_value=$(func_parser_value "${lines[14]}")
 inference_config_key=$(func_parser_key "${lines[15]}")
 inference_config_value=$(func_parser_value "${lines[15]}")
 
-LOG_PATH="./test_tipc/output/${model_name}/${MODE}"
+CLS_ROOT_PATH=$(pwd)
+LOG_PATH="${CLS_ROOT_PATH}/test_tipc/output/${model_name}/${MODE}"
 mkdir -p ${LOG_PATH}
 status_log="${LOG_PATH}/results_paddle2onnx.log"
 

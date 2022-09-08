@@ -37,7 +37,8 @@ cpp_benchmark_value=$(func_parser_value "${lines[16]}")
 generate_yaml_cmd=$(func_parser_value "${lines[17]}")
 transform_index_cmd=$(func_parser_value "${lines[18]}")
 
-LOG_PATH="./test_tipc/output/${model_name}/${MODE}"
+CLS_ROOT_PATH=$(pwd)
+LOG_PATH="${CLS_ROOT_PATH}/test_tipc/output/${model_name}/${MODE}"
 mkdir -p ${LOG_PATH}
 status_log="${LOG_PATH}/results_cpp.log"
 # generate_yaml_cmd="python3 test_tipc/generate_cpp_yaml.py"

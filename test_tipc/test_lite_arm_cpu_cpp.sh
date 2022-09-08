@@ -1,6 +1,5 @@
 #!/bin/bash
 source test_tipc/common_func.sh
-current_path=$PWD
 
 IFS=$'\n'
 
@@ -33,7 +32,8 @@ num_threads_list=$(func_parser_value_lite "${tipc_lines[5]}" ":")
 batch_size_list=$(func_parser_value_lite "${tipc_lines[6]}" ":")
 precision_list=$(func_parser_value_lite "${tipc_lines[7]}" ":")
 
-LOG_PATH=${current_path}"/output"
+CLS_ROOT_PATH=$(pwd)
+LOG_PATH="${CLS_ROOT_PATH}/output"
 mkdir -p ${LOG_PATH}
 status_log="${LOG_PATH}/results.log"
 
@@ -65,9 +65,9 @@ function func_test_tipc(){
                 real_inference_cmd=$(echo ${inference_cmd} | awk -F " " '{print path $1" "path $2" "path $3}' path="$lite_arm_work_path")
                 command1="adb push ${_basic_config} ${lite_arm_work_path}"
                 eval ${command1}
-                command2="adb shell 'export LD_LIBRARY_PATH=${lite_arm_work_path}; ${real_inference_cmd}'  > ${_save_log_path} 2>&1"
+                command2="adb shell 'export LD_LIBRARY_PATH=${lite_arm_work_path}; ${real_inference_cmd}' > ${_save_log_path} 2>&1"
                 eval ${command2}
-                status_check $? "${command2}" "${status_log}" "${model_name}"
+                status_check $? "${command2}" "${status_log}" "${model_name}" "${_save_log_path}"
             done
         done
     done
