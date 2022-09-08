@@ -1,9 +1,14 @@
 #!/bin/bash
+set -ex
+
 FILENAME=$1
 source test_tipc/common_func.sh
 
 # MODE be one of ['lite_train_lite_infer' 'lite_train_whole_infer' 'whole_train_whole_infer', 'whole_infer', 'klquant_whole_infer']
 MODE=$2
+
+# DEVICE be one of ['gpu', 'npu', 'xpu'], default is gpu
+DEVICE=${3:gpu}
 
 dataline=$(cat ${FILENAME})
 
@@ -17,6 +22,9 @@ python=$(func_parser_value "${lines[2]}")
 gpu_list=$(func_parser_value "${lines[3]}")
 train_use_gpu_key=$(func_parser_key "${lines[4]}")
 train_use_gpu_value=$(func_parser_value "${lines[4]}")
+if [ ${DEVICE} != "gpu" ]; then
+    train_use_gpu_value=$(echo $train_use_gpu_value | sed -e "s/gpu/${DEVICE}/g") # replace gpu to ${DEVICE}
+fi
 autocast_list=$(func_parser_value "${lines[5]}")
 autocast_key=$(func_parser_key "${lines[5]}")
 epoch_key=$(func_parser_key "${lines[6]}")
@@ -69,6 +77,9 @@ infer_is_quant=$(func_parser_value "${lines[38]}")
 # parser inference
 inference_py=$(func_parser_value "${lines[39]}")
 use_gpu_key=$(func_parser_key "${lines[40]}")
+if [ ${DEVICE} != "gpu" ]; then
+    use_gpu_key=$(echo $use_gpu_key | sed -e "s/gpu/${DEVICE}/g") # replace gpu to ${DEVICE}
+fi
 use_gpu_list=$(func_parser_value "${lines[40]}")
 use_mkldnn_key=$(func_parser_key "${lines[41]}")
 use_mkldnn_list=$(func_parser_value "${lines[41]}")
@@ -151,7 +162,7 @@ function func_inference() {
                 done
             done
         else
-            echo "Does not support hardware other than CPU and GPU Currently!"
+            echo "Does not support hardware other than CPU, GPU, NPU and XPU Currently!"
         fi
     done
 }
@@ -171,6 +182,11 @@ if [[ ${MODE} = "whole_infer" ]]; then
         ln -s __params__ inference.pdiparams
         cd ../../deploy
         is_quant=True
+        # replace use_gpu to use_${DEVICE} in inference config
+        if [ ${DEVICE} != "gpu" ]; then
+            inference_config=$(func_parser_config "${inference_py}")
+            sed -i "s/use_gpu: True/use_${DEVICE}: True/g" $inference_config
+        fi
         func_inference "${python}" "${inference_py}" "../${infer_model_dir_list}/quant_post_static_model" "../${LOG_PATH}" "${infer_img_dir}" ${is_quant}
         cd ..
     fi
@@ -255,6 +271,13 @@ else
                 #    set_pretrain="${load_norm_train_model}"
                 # fi
 
+                # replace device: gpu to device: ${DEVICE} in trainer config file
+                # replace once as run_train/eval_py/run_export share same config file
+                if [ ${DEVICE} != "gpu" ]; then
+                    trainer_config=$(func_parser_config "${run_train}")
+                    sed -i "s/device: gpu/device: ${DEVICE}/g" $trainer_config
+                fi
+
                 set_save_model=$(func_set_params "${save_model_key}" "${save_log}")
                 if [ ${#gpu} -le 2 ]; then # train with cpu or single gpu
                     cmd="${python} ${run_train} ${set_use_gpu}  ${set_save_model} ${set_epoch} ${set_pretrain} ${set_autocast} ${set_batchsize} ${set_train_params1} "
@@ -306,6 +329,11 @@ else
                     eval $env
                     save_infer_path="${save_log}"
                     cd deploy
+                    # replace use_gpu to use_npu in inference config
+                    if [ ${DEVICE} != "gpu" ]; then
+                        inference_config=$(func_parser_config "${inference_py}")
+                        sed -i "s/use_gpu: True/use_${DEVICE}: True/g" $inference_config
+                    fi
                     func_inference "${python}" "${inference_py}" "../${save_infer_path}" "../${LOG_PATH}" "${infer_img_dir}" "${flag_quant}"
                     cd ..
                 fi

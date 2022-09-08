@@ -83,3 +83,11 @@ function status_check(){
         echo -e "\033[33m Run failed with command - ${model_name} - ${run_command}!  \033[0m" | tee -a ${run_log}
     fi
 }
+
+function func_parser_config() {
+    strs=$1
+    IFS=" "
+    array=(${strs})
+    tmp=${array[2]}
+    echo ${tmp}
+}
