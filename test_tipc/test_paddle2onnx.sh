@@ -2,7 +2,7 @@
 source test_tipc/common_func.sh
 
 FILENAME=$1
-MODE=$2
+MODE="paddle2onnx_infer"
 
 # parser params
 dataline=$(awk 'NR==1, NR==16{print}'  $FILENAME)
@@ -61,7 +61,7 @@ function func_paddle2onnx(){
 
     # python inference
     if [[ ${inference_py} != "null" ]]; then
-        _save_log_path=".${LOG_PATH}/paddle2onnx_infer_cpu.log"
+        _save_log_path="${LOG_PATH}/paddle2onnx_infer_cpu.log"
         set_model_dir=$(func_set_params "${inference_model_dir_key}" "${inference_model_dir_value}")
         set_use_onnx=$(func_set_params "${use_onnx_key}" "${use_onnx_value}")
         set_hardware=$(func_set_params "${inference_hardware_key}" "${inference_hardware_value}")

@@ -323,8 +323,8 @@ if [[ ${MODE} = "paddle2onnx_infer" ]]; then
     # prepare paddle2onnx env
     python_name=$(func_parser_value "${lines[2]}")
     inference_model_url=$(func_parser_value "${lines[10]}")
-    tar_name=${inference_model_url##*/}
-
+    tar_name=$(func_get_url_file_name "$inference_model_url")
+    
     ${python_name} -m pip install onnx
     ${python_name} -m pip install paddle2onnx
     ${python_name} -m pip install onnxruntime

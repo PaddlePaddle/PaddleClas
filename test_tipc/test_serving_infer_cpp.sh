@@ -39,7 +39,7 @@ pipeline_py=$(func_parser_value "${lines[13]}")
 
 function func_serving_cls(){
     CLS_ROOT_PATH=$(pwd)
-    LOG_PATH="${CLS_ROOT_PATH}/test_tipc/output/${model_name}/${MODE}/cpp"
+    LOG_PATH="${CLS_ROOT_PATH}/test_tipc/output/${model_name}/serving_infer"
     mkdir -p ${LOG_PATH}
     status_log="${LOG_PATH}/results_cpp_serving.log"
     IFS='|'
@@ -142,7 +142,7 @@ function func_serving_cls(){
 
 function func_serving_rec(){
     CLS_ROOT_PATH=$(pwd)
-    LOG_PATH="${CLS_ROOT_PATH}/test_tipc/output/${model_name}"
+    LOG_PATH="${CLS_ROOT_PATH}/test_tipc/output/${model_name}/serving_infer"
     mkdir -p ${LOG_PATH}
     status_log="${LOG_PATH}/results_cpp_serving.log"
 

@@ -58,7 +58,7 @@ function func_serving_cls(){
     for python_ in ${python[*]}; do
         if [[ ${python_} =~ "python" ]]; then
             trans_log="${LOG_PATH}/python_trans_model.log"
-            trans_model_cmd="${python_} ${trans_model_py} ${set_dirname} ${set_model_filename} ${set_params_filename} ${set_serving_server} ${set_serving_client} > ${trans_cls_log} 2>&1"
+            trans_model_cmd="${python_} ${trans_model_py} ${set_dirname} ${set_model_filename} ${set_params_filename} ${set_serving_server} ${set_serving_client} > ${trans_log} 2>&1"
             eval ${trans_model_cmd}
             last_status=${PIPESTATUS[0]}
             status_check $last_status "${trans_model_cmd}" "${status_log}" "${model_name}" "${trans_log}"
