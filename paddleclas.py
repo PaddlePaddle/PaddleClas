@@ -380,6 +380,7 @@ def print_info():
     """
     imn_table = PrettyTable(["IMN Model Series", "Model Name"])
     pulc_table = PrettyTable(["PULC Models"])
+    shitu_table = PrettyTable(["PP-ShiTu Models"])
     try:
         sz = os.get_terminal_size()
         total_width = sz.columns
@@ -398,11 +399,16 @@ def print_info():
         textwrap.fill(
             "  ".join(PULC_MODELS), width=total_width).center(table_width - 4)
     ])
+    shitu_table.add_row([
+        textwrap.fill(
+            "  ".join(SHITU_MODELS), width=total_width).center(table_width - 4)
+    ])
 
     print("{}".format("-" * table_width))
     print("Models supported by PaddleClas".center(table_width))
     print(imn_table)
     print(pulc_table)
+    print(shitu_table)
     print("Powered by PaddlePaddle!".rjust(table_width))
     print("{}".format("-" * table_width))
 
@@ -579,8 +585,9 @@ class PaddleClas(object):
             raise InputModelError(err)
         return None
 
-    def predict(self, input_data: Union[str, np.array],
-                print_pred: bool=False) -> Generator[list, None, None]:
+    def predict_cls(self,
+                    input_data: Union[str, np.array],
+                    print_pred: bool=False) -> Generator[list, None, None]:
         """Predict input_data.
 
         Args:
@@ -636,16 +643,10 @@ class PaddleClas(object):
 
                     if preds:
                         for idx_pred, pred in enumerate(preds):
-                            if isinstance(pred, dict):
-                                pred["filename"] = img_path_list[idx_pred]
-                            else:
-                                file_name = img_path_list[idx_pred]
+                            pred["filename"] = img_path_list[idx_pred]
                             if print_pred:
-                                if isinstance(pred, dict):
-                                    logger.info(", ".join(
-                                        [f"{k}: {pred[k]}" for k in pred]))
-                                else:
-                                    logger.info(f"{file_name}: {pred}")
+                                logger.info(", ".join(
+                                    [f"{k}: {pred[k]}" for k in pred]))
 
                     img_list = []
                     img_path_list = []
@@ -655,6 +656,77 @@ class PaddleClas(object):
             raise ImageTypeError(err)
         return
 
+    def predict_shitu(self,
+                      input_data: Union[str, np.array],
+                      print_pred: bool=False) -> Generator[list, None, None]:
+        """Predict input_data.
+        Args:
+            input_data (Union[str, np.array]):
+                When the type is str, it is the path of image, or the directory containing images, or the URL of image from Internet.
+                When the type is np.array, it is the image data whose channel order is RGB.
+            print_pred (bool, optional): Whether print the prediction result. Defaults to False.
+
+        Raises:
+            ImageTypeError: Illegal input_data.
+
+        Yields:
+            Generator[list, None, None]:
+                The prediction result(s) of input_data by batch_size. For every one image,
+                prediction result(s) is zipped as a dict, that includs topk "class_ids", "scores" and "label_names".
+                The format of batch prediction result(s) is as follow: [{"class_ids": [...], "scores": [...], "label_names": [...]}, ...]
+        """
+        if isinstance(input_data, np.ndarray):
+            yield self.predictor.predict(input_data)
+        elif isinstance(input_data, str):
+            if input_data.startswith("http") or input_data.startswith("https"):
+                image_storage_dir = partial(os.path.join, BASE_IMAGES_DIR)
+                if not os.path.exists(image_storage_dir()):
+                    os.makedirs(image_storage_dir())
+                image_save_path = image_storage_dir("tmp.jpg")
+                download_with_progressbar(input_data, image_save_path)
+                logger.info(
+                    f"Image to be predicted from Internet: {input_data}, has been saved to: {image_save_path}"
+                )
+                input_data = image_save_path
+            image_list = get_image_list(input_data)
+
+            cnt = 0
+            for idx_img, img_path in enumerate(image_list):
+                img = cv2.imread(img_path)
+                if img is None:
+                    logger.warning(
+                        f"Image file failed to read and has been skipped. The path: {img_path}"
+                    )
+                    continue
+                img = img[:, :, ::-1]
+                cnt += 1
+
+                preds = self.predictor.predict(
+                    img)  # [dict1, dict2, ..., dictn]
+                if preds:
+                    if print_pred:
+                        logger.info(f"{preds}, filename: {img_path}")
+
+                yield preds
+        else:
+            err = "Please input legal image! The type of image supported by PaddleClas are: NumPy.ndarray and string of local path or Ineternet URL"
+            raise ImageTypeError(err)
+        return
+
+    def predict(self,
+                input_data: Union[str, np.array],
+                print_pred: bool=False,
+                predict_type="cls"):
+        if predict_type == "cls":
+            return self.predict_cls(input_data, print_pred)
+        elif predict_type == "shitu":
+            assert not isinstance(input_data, (
+                list, tuple
+            )), "PP-ShiTu predictor only support single image as input now."
+            return self.predict_shitu(input_data, print_pred)
+        else:
+            raise ModuleNotFoundError
+
 
 # for CLI
 def main():
@@ -663,7 +735,10 @@ def main():
     print_info()
     cfg = args_cfg()
     clas_engine = PaddleClas(**cfg)
-    res = clas_engine.predict(cfg["infer_imgs"], print_pred=True)
+    res = clas_engine.predict(
+        cfg["infer_imgs"],
+        print_pred=True,
+        predict_type="cls" if "PP-ShiTu" not in cfg["model_name"] else "shitu")
     for _ in res:
         pass
     logger.info("Predict complete!")
