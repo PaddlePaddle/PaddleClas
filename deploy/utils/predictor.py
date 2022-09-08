@@ -60,8 +60,12 @@ class Predictor(object):
 
         config = Config(model_file, params_file)
 
-        if args.use_gpu:
+        if args.get("use_gpu", False):
             config.enable_use_gpu(args.gpu_mem, 0)
+        elif args.get("use_npu", False):
+            config.enable_npu()
+        elif args.get("use_xpu", False):
+            config.enable_xpu()
         else:
             config.disable_gpu()
             if args.enable_mkldnn:
