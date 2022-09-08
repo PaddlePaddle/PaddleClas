@@ -1,6 +1,4 @@
 #!/bin/bash
-set -ex
-
 FILENAME=$1
 source test_tipc/common_func.sh
 
