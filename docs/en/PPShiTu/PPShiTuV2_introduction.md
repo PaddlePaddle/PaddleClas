@@ -113,9 +113,9 @@ We adjust the `PPLCNetV2_base` structure, and added more general and effective o
 
 3. `BN Neck`: Add a `BatchNorm1D` layer after `BackBone` to normalize each dimension of the feature vector, bringing faster convergence.
 
-    | Model                                                              | training data      | recall@1%(mAP%) |
-    | :----------------------------------------------------------------- | :----------------- | :-------------- |
-    | GeneralRecognition_PPLCNet_x2_5                                                         | PP-ShiTuV1 dataset | 65.9(54.3)      |
+    | Model                                            | training data      | recall@1%(mAP%) |
+    | :----------------------------------------------- | :----------------- | :-------------- |
+    | GeneralRecognition_PPLCNet_x2_5                  | PP-ShiTuV1 dataset | 65.9(54.3)      |
     | GeneralRecognitionV2_PPLCNetV2_base(TripletLoss) | PP-ShiTuV1 dataset | 72.3(60.5)      |
 
 4. `TripletAngularMarginLoss`: We improved on the original `TripletLoss` (difficult triplet loss), changed the optimization objective from L2 Euclidean space to cosine space, and added an additional space between anchor and positive/negtive The hard distance constraint makes the training and testing goals closer and improves the generalization ability of the model.
@@ -127,26 +127,26 @@ We adjust the `PPLCNetV2_base` structure, and added more general and effective o
 
 #### Data Augmentation
 
-The target object may rotate to a certain extent and may not maintain an upright state when the actual camera is shot, so we add [random rotation augmentation](../../../ppcls/configs/GeneralRecognitionV2/GeneralRecognitionV2_PPLCNetV2_base.yaml#L117) in the data augmentation to make retrieval more robust in real scenes.
+The target object may rotate to a certain extent and may not maintain an upright state when the actual camera is shot, so we add [Random Rotation](../../../ppcls/configs/GeneralRecognitionV2/GeneralRecognitionV2_PPLCNetV2_base.yaml#L117) in the data augmentation to make retrieval more robust in real scenes.
 
 Combining the above strategies, the final experimental results on multiple data sets are as follows:
 
-  | Model      | product<sup>*</sup> |
-  | :--------- | :------------------ |
-  | -          | recall@1%(mAP%)     |
-  | GeneralRecognition_PPLCNet_x2_5 | 65.9(54.3)          |
+  | Model                               | product<sup>*</sup> |
+  | :---------------------------------- | :------------------ |
+  | -                                   | recall@1%(mAP%)     |
+  | GeneralRecognition_PPLCNet_x2_5     | 65.9(54.3)          |
   | GeneralRecognitionV2_PPLCNetV2_base | 73.7(61.0)          |
 
-  | Models     | Aliproduct      | VeRI-Wild       | LogoDet-3k      | iCartoonFace    | SOP             | Inshop           |
-  | :--------- | :-------------- | :-------------- | :-------------- | :-------------- | :-------------- | :--------------- |
-  | -          | recall@1%(mAP%) | recall@1%(mAP%) | recall@1%(mAP%) | recall@1%(mAP%) | recall@1%(mAP%) | recall@ 1%(mAP%) |
-  | GeneralRecognition_PPLCNet_x2_5 | 83.9(83.2)      | 88.7(60.1)      | 86.1(73.6)      | 84.1(72.3)      | 79.7(58.6)      | 89.1(69.4)       |
+  | Models                              | Aliproduct      | VeRI-Wild       | LogoDet-3k      | iCartoonFace    | SOP             | Inshop           |
+  | :---------------------------------- | :-------------- | :-------------- | :-------------- | :-------------- | :-------------- | :--------------- |
+  | -                                   | recall@1%(mAP%) | recall@1%(mAP%) | recall@1%(mAP%) | recall@1%(mAP%) | recall@1%(mAP%) | recall@ 1%(mAP%) |
+  | GeneralRecognition_PPLCNet_x2_5     | 83.9(83.2)      | 88.7(60.1)      | 86.1(73.6)      | 84.1(72.3)      | 79.7(58.6)      | 89.1(69.4)       |
   | GeneralRecognitionV2_PPLCNetV2_base | 84.2(83.3)      | 87.8(68.8)      | 88.0(63.2)      | 53.6(27.5)      | 77.6(55.3)      | 90.8(74.3)       |
 
-  | model      | gldv2           | imdb_face       | iNat            | instre          | sketch          | sop<sup>*</sup>  |
-  | :--------- | :-------------- | :-------------- | :-------------- | :-------------- | :-------------- | :--------------- |
-  | -          | recall@1%(mAP%) | recall@1%(mAP%) | recall@1%(mAP%) | recall@1%(mAP%) | recall@1%(mAP%) | recall@ 1%(mAP%) |
-  | GeneralRecognition_PPLCNet_x2_5 | 98.2(91.6)      | 28.8(8.42)      | 12.6(6.1)       | 72.0(50.4)      | 27.9(9.5)       | 97.6(90.3)       |
+  | model                               | gldv2           | imdb_face       | iNat            | instre          | sketch          | sop<sup>*</sup>  |
+  | :---------------------------------- | :-------------- | :-------------- | :-------------- | :-------------- | :-------------- | :--------------- |
+  | -                                   | recall@1%(mAP%) | recall@1%(mAP%) | recall@1%(mAP%) | recall@1%(mAP%) | recall@1%(mAP%) | recall@ 1%(mAP%) |
+  | GeneralRecognition_PPLCNet_x2_5     | 98.2(91.6)      | 28.8(8.42)      | 12.6(6.1)       | 72.0(50.4)      | 27.9(9.5)       | 97.6(90.3)       |
   | GeneralRecognitionV2_PPLCNetV2_base | 98.1(90.5)      | 35.9(11.2)      | 38.6(23.9)      | 87.7(71.4)      | 39.3(15.6)      | 98.3(90.9)       |
 
 **Note:** The product dataset is made to verify the generalization performance of PP-ShiTu, and all the data are not present in the training and testing sets. The data contains 7 categories ( cosmetics, landmarks, wine, watches, cars, sports shoes, beverages) and 250 sub-categories. When testing, use the labels of 250 small classes for testing; the sop dataset comes from [GPR1200: A Benchmark for General-Purpose Content-Based Image Retrieval](https://arxiv.org/abs/2111.13122), which can be regarded as " SOP" dataset.

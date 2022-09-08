@@ -22,7 +22,7 @@ PULC demo images
 
 
 **Recent updates**
-- 🔥️ Release [PP-ShiTuV2](./docs/en/PPShiTu/PPShiTuV2_introduction.md), recall1 is improved by nearly 8 points, covering 20+ recognition scenarios, with [index management tool](./deploy/shitu_index_manager/README.md) and [Android Demo](./docs/en/quick_start/quick_start_recognition_en.md) for better experience.
+- 🔥️ Release [PP-ShiTuV2](./docs/en/PPShiTu/PPShiTuV2_introduction.md), recall1 is improved by nearly 8 points, covering 20+ recognition scenarios, with [index management tool](./deploy/shitu_index_manager) and [Android Demo](./docs/en/quick_start/quick_start_recognition_en.md) for better experience.
 - 2022.6.15 Release [**P**ractical **U**ltra **L**ight-weight image **C**lassification solutions](./docs/en/PULC/PULC_quickstart_en.md). PULC models inference within 3ms on CPU devices, with accuracy on par with SwinTransformer. We also release 9 practical classification models covering pedestrian, vehicle and OCR scenario.
 - 2022.4.21 Added the related [code](https://github.com/PaddlePaddle/PaddleClas/pull/1820/files) of the CVPR2022 oral paper [MixFormer](https://arxiv.org/pdf/2204.02557.pdf).
 
