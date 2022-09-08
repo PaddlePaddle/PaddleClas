@@ -33,7 +33,7 @@ PP-ShiTuV2 是基于 PP-ShiTuV1 改进的一个实用轻量级通用图像识别
 
 ### 模型训练
 
-首先下载好 [PP-ShiTuV2 数据集](../image_recognition_pipeline/feature_extraction.md#4-实验部分) 中的16个数据集并手动进行合并、生成标注文本文件 `train_reg_all_data_v2.txt`，最后放置到 `dataset` 目录下。
+首先下载好 [PP-ShiTuV2 数据集](../image_recognition_pipeline/feature_extraction.md#4-实验部分) 中的17个数据集并手动进行合并、生成标注文本文件 `train_reg_all_data_v2.txt`，最后放置到 `dataset` 目录下。
 
 合并后的文件夹结构如下所示：
 

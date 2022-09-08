@@ -110,6 +110,7 @@ PP-ShiTu图像识别快速体验：[点击这里](./docs/zh_CN/quick_start/quick
   - [图像分类精选问题](docs/zh_CN/faq_series/faq_selected_30.md)
   - [图像分类FAQ第一季](docs/zh_CN/faq_series/faq_2020_s1.md)
   - [图像分类FAQ第二季](docs/zh_CN/faq_series/faq_2021_s1.md)
+  - [图像分类FAQ第三季](docs/zh_CN/faq_series/faq_2022_s1.md)
 - [社区贡献指南](./docs/zh_CN/advanced_tutorials/how_to_contribute.md)
 - [许可证书](#许可证书)
 - [贡献代码](#贡献代码)
@@ -123,7 +124,7 @@ PP-ShiTu图像识别快速体验：[点击这里](./docs/zh_CN/quick_start/quick
 </div>
 
 
-PP-ShiTuV2是一个实用的轻量级通用图像识别系统，主要由主体检测、特征学习和向量检索三个模块组成。该系统从骨干网络选择和调整、损失函数的选择、数据增强、学习率变换策略、正则化参数选择、预训练模型使用以及模型裁剪量化多个方面，采用多种策略，对各个模块的模型进行优化，PP-ShiTuV2相比V1而已，Recall1提升10+个点。更多细节请参考[PP-ShiTuV2详细介绍](./docs/zh_CN/PPShiTu/PPShiTuV2_introduction.md)。
+PP-ShiTuV2是一个实用的轻量级通用图像识别系统，主要由主体检测、特征学习和向量检索三个模块组成。该系统从骨干网络选择和调整、损失函数的选择、数据增强、学习率变换策略、正则化参数选择、预训练模型使用以及模型裁剪量化多个方面，采用多种策略，对各个模块的模型进行优化，PP-ShiTuV2相比V1，Recall1提升近8个点。更多细节请参考[PP-ShiTuV2详细介绍](./docs/zh_CN/PPShiTu/PPShiTuV2_introduction.md)。
 
 <a name="识别效果展示"></a>
 
