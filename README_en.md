@@ -54,6 +54,11 @@ Based on th algorithms above, PaddleClas release PP-ShiTu image recognition syst
 ## Quick Start
 Quick experience of PP-ShiTu image recognition system：[Link](./docs/en/quick_start/quick_start_recognition_en.md)
 
+<div align="center">
+<img src="./docs/images/quick_start/android_demo/PPShiTu_qrcode.png"  width = "40%" />
+<p>PP-ShiTuV2 Android Demo</p>
+</div>
+
 Quick experience of **P**ractical **U**ltra **L**ight-weight image **C**lassification models：[Link](docs/en/PULC/PULC_quickstart_en.md)
 
 ## Tutorials
@@ -61,6 +66,8 @@ Quick experience of **P**ractical **U**ltra **L**ight-weight image **C**lassific
 - [Install Paddle](./docs/en/installation/install_paddle_en.md)
 - [Install PaddleClas Environment](./docs/en/installation/install_paddleclas_en.md)
 - [PP-ShiTuV2 Image Recognition Systems Introduction](./docs/en/PPShiTu/PPShiTuV2_introduction.md)
+  - [Image Recognition Quick Start](docs/en/quick_start/quick_start_recognition_en.md)
+  - [20+ application scenarios](docs/zh_CN/introduction/ppshitu_application_scenarios.md)
   - Submodule Introduction and Model Training
     - [Mainbody Detection](./docs/zh_CN/image_recognition_pipeline/mainbody_detection.md)
     - [Feature Extraction](./docs/en/image_recognition_pipeline/feature_extraction_en.md)
