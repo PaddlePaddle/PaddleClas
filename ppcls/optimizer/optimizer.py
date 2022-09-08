@@ -238,7 +238,6 @@ class AdamW(object):
         # model_list is None in static graph
         parameters = sum([m.parameters() for m in model_list],
                          []) if model_list else None
-        import pdb; pdb.set_trace()
         # TODO(gaotingquan): model_list is None when in static graph, "no_weight_decay" not work.
         if model_list is None:
             if self.one_dim_param_no_weight_decay or len(
