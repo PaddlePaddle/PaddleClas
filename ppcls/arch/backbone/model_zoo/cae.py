@@ -25,6 +25,17 @@ import paddle
 import paddle.nn as nn
 import paddle.nn.functional as F
 
+from ....utils.download import get_weights_path_from_url
+
+MODEL_URLS = {
+    "cae_base_patch16_224":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/cae_base_patch16_224_pretrained.pdparams",
+    "cae_large_patch16_224":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/cae_large_patch16_224_pretrained.pdparams"
+}
+
+__all__ = list(MODEL_URLS.keys())
+
 
 def _ntuple(n):
     def parse(x):
@@ -615,13 +626,22 @@ def _enable_linear_eval(model):
 
 
 def _load_pretrained(pretrained,
+                     pretrained_url,
                      model,
                      model_keys,
                      model_ema_configs,
                      abs_pos_emb,
                      rel_pos_bias,
                      use_ssld=False):
-    checkpoint = paddle.load(pretrained)
+    if pretrained is False:
+        pass
+    elif pretrained is True:
+        local_weight_path = get_weights_path_from_url(pretrained_url).replace(
+            ".pdparams", "")
+        checkpoint = paddle.load(local_weight_path + ".pdparams")
+    elif isinstance(pretrained, str):
+        checkpoint = paddle.load(local_weight_path + ".pdparams")
+
     checkpoint_model = None
     for model_key in model_keys.split('|'):
         if model_key in checkpoint:
@@ -766,48 +786,15 @@ def _load_pretrained(pretrained,
     return
 
 
-def cae_small_patch16_224(**kwargs):
+def cae_base_patch16_224(pretrained=True, use_ssld=False, **kwargs):
     config = kwargs.copy()
     enable_linear_eval = config.pop('enable_linear_eval')
     model_keys = config.pop('model_key')
     model_ema_configs = config.pop('model_ema')
     abs_pos_emb = config.pop('abs_pos_emb')
     rel_pos_bias = config.pop('rel_pos_bias')
-    pretrained = config.pop('pretrained')
-
-    model = VisionTransformer(
-        patch_size=16,
-        embed_dim=384,
-        depth=12,
-        num_heads=12,
-        mlp_ratio=4,
-        qkv_bias=True,
-        norm_layer=partial(
-            nn.LayerNorm, epsilon=1e-6),
-        **kwargs)
-
-    if enable_linear_eval:
-        _enable_linear_eval(model)
-
-    _load_pretrained(
-        pretrained,
-        model,
-        model_keys,
-        model_ema_configs,
-        abs_pos_emb,
-        rel_pos_bias,
-        use_ssld=False)
-    return model
-
-
-def cae_base_patch16_224(**kwargs):
-    config = kwargs.copy()
-    enable_linear_eval = config.pop('enable_linear_eval')
-    model_keys = config.pop('model_key')
-    model_ema_configs = config.pop('model_ema')
-    abs_pos_emb = config.pop('abs_pos_emb')
-    rel_pos_bias = config.pop('rel_pos_bias')
-    pretrained = config.pop('pretrained')
+    if pretrained in config:
+        pretrained = config.pop('pretrained')
 
     model = VisionTransformer(
         patch_size=16,
@@ -825,6 +812,7 @@ def cae_base_patch16_224(**kwargs):
 
     _load_pretrained(
         pretrained,
+        MODEL_URLS["cae_base_patch16_224"],
         model,
         model_keys,
         model_ema_configs,
@@ -835,50 +823,15 @@ def cae_base_patch16_224(**kwargs):
     return model
 
 
-def cae_base_patch16_384(**kwargs):
+def cae_large_patch16_224(pretrained=True, use_ssld=False, **kwargs):
     config = kwargs.copy()
     enable_linear_eval = config.pop('enable_linear_eval')
     model_keys = config.pop('model_key')
     model_ema_configs = config.pop('model_ema')
     abs_pos_emb = config.pop('abs_pos_emb')
     rel_pos_bias = config.pop('rel_pos_bias')
-    pretrained = config.pop('pretrained')
-
-    model = VisionTransformer(
-        img_size=384,
-        patch_size=16,
-        embed_dim=768,
-        depth=12,
-        num_heads=12,
-        mlp_ratio=4,
-        qkv_bias=True,
-        norm_layer=partial(
-            nn.LayerNorm, epsilon=1e-6),
-        **kwargs)
-
-    if enable_linear_eval:
-        _enable_linear_eval(model)
-
-    _load_pretrained(
-        pretrained,
-        model,
-        model_keys,
-        model_ema_configs,
-        abs_pos_emb,
-        rel_pos_bias,
-        use_ssld=False)
-
-    return model
-
-
-def cae_large_patch16_224(**kwargs):
-    config = kwargs.copy()
-    enable_linear_eval = config.pop('enable_linear_eval')
-    model_keys = config.pop('model_key')
-    model_ema_configs = config.pop('model_ema')
-    abs_pos_emb = config.pop('abs_pos_emb')
-    rel_pos_bias = config.pop('rel_pos_bias')
-    pretrained = config.pop('pretrained')
+    if pretrained in config:
+        pretrained = config.pop('pretrained')
 
     model = VisionTransformer(
         patch_size=16,
@@ -896,78 +849,7 @@ def cae_large_patch16_224(**kwargs):
 
     _load_pretrained(
         pretrained,
-        model,
-        model_keys,
-        model_ema_configs,
-        abs_pos_emb,
-        rel_pos_bias,
-        use_ssld=False)
-
-    return model
-
-
-def cae_large_patch16_384(**kwargs):
-    config = kwargs.copy()
-    enable_linear_eval = config.pop('enable_linear_eval')
-    model_keys = config.pop('model_key')
-    model_ema_configs = config.pop('model_ema')
-    abs_pos_emb = config.pop('abs_pos_emb')
-    rel_pos_bias = config.pop('rel_pos_bias')
-    pretrained = config.pop('pretrained')
-
-    model = VisionTransformer(
-        img_size=384,
-        patch_size=16,
-        embed_dim=1024,
-        depth=24,
-        num_heads=16,
-        mlp_ratio=4,
-        qkv_bias=True,
-        norm_layer=partial(
-            nn.LayerNorm, epsilon=1e-6),
-        **kwargs)
-
-    if enable_linear_eval:
-        _enable_linear_eval(model)
-
-    _load_pretrained(
-        pretrained,
-        model,
-        model_keys,
-        model_ema_configs,
-        abs_pos_emb,
-        rel_pos_bias,
-        use_ssld=False)
-
-    return model
-
-
-def cae_large_patch16_512(**kwargs):
-    config = kwargs.copy()
-    enable_linear_eval = config.pop('enable_linear_eval')
-    model_keys = config.pop('model_key')
-    model_ema_configs = config.pop('model_ema')
-    abs_pos_emb = config.pop('abs_pos_emb')
-    rel_pos_bias = config.pop('rel_pos_bias')
-    pretrained = config.pop('pretrained')
-
-    model = VisionTransformer(
-        img_size=512,
-        patch_size=16,
-        embed_dim=1024,
-        depth=24,
-        num_heads=16,
-        mlp_ratio=4,
-        qkv_bias=True,
-        norm_layer=partial(
-            nn.LayerNorm, epsilon=1e-6),
-        **kwargs)
-
-    if enable_linear_eval:
-        _enable_linear_eval(model)
-
-    _load_pretrained(
-        pretrained,
+        MODEL_URLS["cae_large_patch16_224"],
         model,
         model_keys,
         model_ema_configs,
