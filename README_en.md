@@ -61,17 +61,17 @@ Quick experience of **P**ractical **U**ltra **L**ight-weight image **C**lassific
 - [Install Paddle](./docs/en/installation/install_paddle_en.md)
 - [Install PaddleClas Environment](./docs/en/installation/install_paddleclas_en.md)
 - [PP-ShiTuV2 Image Recognition Systems Introduction](./docs/en/PPShiTu/PPShiTuV2_introduction.md)
-  - [Submodule Introduction]
-    - [Mainbody Detection](./docs/en/image_recognition_pipeline/mainbody_detection.md)
-    - [Feature Extraction](./docs/en/image_recognition_pipeline/feature_extraction.md)
-    - [Vector Search](./docs/en/image_recognition_pipeline/vector_search.md)
-    - [Hash Encoding](docs/en/image_recognition_pipeline/deep_hashing.md)
-  - PipeLine 推理部署
-    - [Python Inference](docs/en/inference_deployment/python_deploy.md#2)
-    - [C++ Inference](deploy/cpp_shitu/readme.md)
-    - [Serving Deployment](docs/en/inference_deployment/recognition_serving_deploy.md)
-    - [Lite Deployment](docs/en/inference_deployment/lite_shitu.md)
-    - [Shitu Gallery Manager Tool](docs/en/inference_deployment/shitu_gallery_manager.md)
+  - Submodule Introduction and Model Training
+    - [Mainbody Detection](./docs/zh_CN/image_recognition_pipeline/mainbody_detection.md)
+    - [Feature Extraction](./docs/en/image_recognition_pipeline/feature_extraction_en.md)
+    - [Vector Search](./docs/en/image_recognition_pipeline/vector_search_en.md)
+    - [Hash Encoding](./docs/zh_CN/image_recognition_pipeline/deep_hashing.md)
+  - PipeLine Inference and Deployment
+    - [Python Inference](docs/en/inference_deployment/python_deploy_en.md)
+    - [C++ Inference](deploy/cpp_shitu/readme_en.md)
+    - [Serving Deployment](docs/en/inference_deployment/recognition_serving_deploy_en.md)
+    - [Lite Deployment](docs/en/inference_deployment/paddle_lite_deploy_en.md)
+    - [Shitu Gallery Manager Tool](docs/zh_CN/inference_deployment/shitu_gallery_manager.md)
 - [Practical Ultra Light-weight image Classification solutions](./docs/en/PULC/PULC_train_en.md)
   - [PULC Quick Start](docs/en/PULC/PULC_quickstart_en.md)
   - [PULC Model Zoo](docs/en/PULC/PULC_model_list_en.md)
