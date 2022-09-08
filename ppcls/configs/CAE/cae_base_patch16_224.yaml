@@ -47,7 +47,7 @@ Loss:
     - SoftTargetCrossEntropy:
         weight: 1.0
   Eval:
-    - SoftTargetCrossEntropy:
+    - CELoss:
         weight: 1.0
 
 
