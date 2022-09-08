@@ -75,7 +75,7 @@ from .variant_models.vgg_variant import VGG19Sigmoid
 from .variant_models.pp_lcnet_variant import PPLCNet_x2_5_Tanh
 from .model_zoo.adaface_ir_net import AdaFace_IR_18, AdaFace_IR_34, AdaFace_IR_50, AdaFace_IR_101, AdaFace_IR_152, AdaFace_IR_SE_50, AdaFace_IR_SE_101, AdaFace_IR_SE_152, AdaFace_IR_SE_200
 
-from ppcls.arch.backbone.model_zoo.cae import cae_base_patch16_224, cae_base_patch16_384, cae_large_patch16_224, cae_large_patch16_384, cae_large_patch16_512, cae_small_patch16_224
+from .model_zoo.cae import cae_base_patch16_224, cae_base_patch16_384, cae_large_patch16_224, cae_large_patch16_384, cae_large_patch16_512, cae_small_patch16_224
 
 # help whl get all the models' api (class type) and components' api (func type)
 def get_apis():
