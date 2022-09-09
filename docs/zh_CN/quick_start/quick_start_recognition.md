@@ -1,4 +1,4 @@
-# 图像识别快速体验
+## 图像识别快速体验
 
 本文档包含 2 个部分：PP-ShiTu android端 demo 快速体验与PP-ShiTu PC端 demo 快速体验。
 
