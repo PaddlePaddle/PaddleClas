@@ -131,7 +131,7 @@ class ClassifyUiContext(QtCore.QObject):
                                               "分类下存在图片，请先移除图片")
             else:
                 self.__imageListMgr.removeClassify(classify)
-                self.setClassifyList(self.__imageListMgr.classifyList())
+                self.setClassifyList(self.__imageListMgr.classifyList)
 
     def renemeClassify(self):
         """重命名分类"""
