@@ -64,9 +64,9 @@
 再次打开程序时，将会自动选择使用`latest`库。app仅存在一个自定义库，每次保存时会覆盖之前的库。
 
 #### (4) 检索库恢复出厂设置
-点击上方的“初始化 ”按钮<img src="../../images/quick_start/android_demo/reset_100.png" width="25" height="25"/>，删除所有自定义的标签和类别，恢复出厂特征库。
-
 **警告：本操作无法撤销，初始化后自定义的标签和类别都会被删除，请谨慎操作**
+
+点击上方的“初始化 ”按钮<img src="../../images/quick_start/android_demo/reset_100.png" width="25" height="25"/>，删除所有自定义的标签和类别，恢复出厂特征库。
 
 初始化库时会删掉`latest`库（如果存在），自动将检索库和标签库切换成 `original.index` 和 `original.txt`。不管是否有保存过，自定义的标签和类别都会被清空。
 
