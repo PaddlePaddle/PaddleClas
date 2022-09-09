@@ -7,9 +7,10 @@
 飞桨图像识别套件PaddleClas是飞桨为工业界和学术界所准备的一个图像识别和图像分类任务的工具集，助力使用者训练出更好的视觉模型和应用落地。&nbsp;
 
 <div align="center">
-<img src="./docs/images/recognition.gif"  width = "400" />
+<img src="./docs/images/shituv2.gif"  width = "450" />
 <p>PP-ShiTuV2图像识别系统效果展示</p>
 </div>
+
 
 
 
@@ -33,7 +34,7 @@
 
 PaddleClas发布了[PP-HGNet](docs/zh_CN/models/PP-HGNet.md)、[PP-LCNetv2](docs/zh_CN/models/PP-LCNetV2.md)、 [PP-LCNet](docs/zh_CN/models/PP-LCNet.md)和[SSLD半监督知识蒸馏方案](docs/zh_CN/advanced_tutorials/ssld.md)等算法，
 并支持多种图像分类、识别相关算法，在此基础上打造[PULC超轻量图像分类方案](docs/zh_CN/PULC/PULC_quickstart.md)和[PP-ShiTu图像识别系统](./docs/zh_CN/quick_start/quick_start_recognition.md)。
-![](https://user-images.githubusercontent.com/11568925/188055076-7b0e3492-55cb-420f-b61a-160d4dd0bb0d.png)
+![](https://user-images.githubusercontent.com/11568925/189267545-7a6eefa0-b4fc-4ed0-ae9d-7c6d53f59798.png)
 
 
 ## 欢迎加入技术交流群

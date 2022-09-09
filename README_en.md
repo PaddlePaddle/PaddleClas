@@ -7,9 +7,10 @@
 PaddleClas is an image classification and image recognition toolset for industry and academia, helping users train better computer vision models and apply them in real scenarios.
 
 <div align="center">
-<img src="./docs/images/recognition.gif"  width = "400" />
+<img src="./docs/images/shituv2.gif"  width = "450" />
 <p>PP-ShiTuV2 demo images</p>
 </div>
+
 
 
 
@@ -40,7 +41,7 @@ image classification and image recognition algorithms.
 Based on th algorithms above, PaddleClas release PP-ShiTu image recognition system and [**P**ractical **U**ltra **L**ight-weight image **C**lassification solutions](docs/en/PULC/PULC_quickstart_en.md).
 
 
-![](https://user-images.githubusercontent.com/19523330/173539361-68cf7ab1-7e3b-4e5e-b00f-1500719bd2a2.png)
+![](https://user-images.githubusercontent.com/11568925/189268878-43d9d35b-90cf-425a-859e-767f8d94c5f7.png)
 
 ## Welcome to Join the Technical Exchange Group
 
