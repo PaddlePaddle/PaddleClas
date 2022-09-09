@@ -7,9 +7,10 @@
 飞桨图像识别套件PaddleClas是飞桨为工业界和学术界所准备的一个图像识别和图像分类任务的工具集，助力使用者训练出更好的视觉模型和应用落地。&nbsp;
 
 <div align="center">
-<img src="./docs/images/recognition.gif"  width = "400" />
+<img src="./docs/images/shituv2.gif"  width = "450" />
 <p>PP-ShiTuV2图像识别系统效果展示</p>
 </div>
+
 
 
 
@@ -23,7 +24,7 @@
 ## 近期更新
 
 - 🔥️ 发布[PP-ShiTuV2](./docs/zh_CN/PPShiTu/PPShiTuV2_introduction.md)，recall1精度提升8个点，覆盖[20+识别场景](./docs/zh_CN/introduction/ppshitu_application_scenarios.md)，新增[库管理工具](./deploy/shitu_index_manager/)，[Android Demo](./docs/zh_CN/quick_start/quick_start_recognition.md)全新体验。
-- 2022.9.4 新增[生鲜产品自主结算范例库](https://aistudio.baidu.com/aistudio/projectdetail/4486158)，具体内容可以在AI Studio上体验。
+- 2022.9.4 新增[生鲜产品自主结算范例库](./docs/zh_CN/samples/Fresh_Food_Recogniiton/README.md)，具体内容可以在AI Studio上体验。
 - 2022.6.15 发布[PULC超轻量图像分类实用方案](docs/zh_CN/PULC/PULC_train.md)，CPU推理3ms，精度比肩SwinTransformer，覆盖人、车、OCR场景九大常见任务。
 - 2022.5.23 新增[人员出入管理范例库](https://aistudio.baidu.com/aistudio/projectdetail/4094475)，具体内容可以在 AI Studio 上体验。
 - 2022.5.20 上线[PP-HGNet](./docs/zh_CN/models/PP-HGNet.md), [PP-LCNetv2](./docs/zh_CN/models/PP-LCNetV2.md)。
@@ -33,7 +34,7 @@
 
 PaddleClas发布了[PP-HGNet](docs/zh_CN/models/PP-HGNet.md)、[PP-LCNetv2](docs/zh_CN/models/PP-LCNetV2.md)、 [PP-LCNet](docs/zh_CN/models/PP-LCNet.md)和[SSLD半监督知识蒸馏方案](docs/zh_CN/advanced_tutorials/ssld.md)等算法，
 并支持多种图像分类、识别相关算法，在此基础上打造[PULC超轻量图像分类方案](docs/zh_CN/PULC/PULC_quickstart.md)和[PP-ShiTu图像识别系统](./docs/zh_CN/quick_start/quick_start_recognition.md)。
-![](https://user-images.githubusercontent.com/11568925/188055076-7b0e3492-55cb-420f-b61a-160d4dd0bb0d.png)
+![](https://user-images.githubusercontent.com/11568925/189267545-7a6eefa0-b4fc-4ed0-ae9d-7c6d53f59798.png)
 
 
 ## 欢迎加入技术交流群
@@ -51,10 +52,20 @@ PULC超轻量图像分类方案快速体验：[点击这里](docs/zh_CN/PULC/PUL
 
 PP-ShiTu图像识别快速体验：[点击这里](./docs/zh_CN/quick_start/quick_start_recognition.md)
 
+PP-ShiTuV2 Android Demo APP，可扫描如下二维码，下载体验
+
 <div align="center">
-<img src="./docs/images/quick_start/android_demo/PPShiTu_qrcode.png"  width = "400" />
+<img src="./docs/images/quick_start/android_demo/PPShiTu_qrcode.png"  width = "240" height = "240" />
 <p>PP-ShiTuV2 Android Demo</p>
 </div>
+
+
+## 产业实践范例库
+
+- 基于PP-ShiTu v2的生鲜品自助结算： [点击这里](./docs/zh_CN/samples/Fresh_Food_Recogniiton/README.md)
+- 基于PULC人员出入视频管理： [点击这里](./docs/zh_CN/samples/Personnel_Access/README.md)
+- 基于 PP-ShiTu 的智慧商超商品识别：[点击这里](./docs/zh_CN/Goods_Recognition/README.md)
+- 基于PP-ShiTu电梯内电瓶车入室识别：[点击这里](./docs/zh_CN/samples//Electromobile_In_Elevator_Detection/README.md)
 
 ## 文档教程
 - [环境准备](docs/zh_CN/installation/install_paddleclas.md)
