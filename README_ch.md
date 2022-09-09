@@ -22,7 +22,7 @@
 
 ## 近期更新
 
-- 🔥️ 发布[PP-ShiTuV2](./docs/zh_CN/PPShiTu/PPShiTuV2_introduction.md)，recall1精度提升10个点，覆盖20+识别场景，新增库管理工具，Android Demo全新体验。
+- 🔥️ 发布[PP-ShiTuV2](./docs/zh_CN/PPShiTu/PPShiTuV2_introduction.md)，recall1精度提升8个点，覆盖[20+识别场景](./docs/zh_CN/introduction/ppshitu_application_scenarios.md)，新增[库管理工具](./deploy/shitu_index_manager/)，[Android Demo](./docs/zh_CN/quick_start/quick_start_recognition.md)全新体验。
 - 2022.9.4 新增[生鲜产品自主结算范例库](https://aistudio.baidu.com/aistudio/projectdetail/4486158)，具体内容可以在AI Studio上体验。
 - 2022.6.15 发布[PULC超轻量图像分类实用方案](docs/zh_CN/PULC/PULC_train.md)，CPU推理3ms，精度比肩SwinTransformer，覆盖人、车、OCR场景九大常见任务。
 - 2022.5.23 新增[人员出入管理范例库](https://aistudio.baidu.com/aistudio/projectdetail/4094475)，具体内容可以在 AI Studio 上体验。
@@ -100,6 +100,7 @@ PP-ShiTu图像识别快速体验：[点击这里](./docs/zh_CN/quick_start/quick
 - 前沿算法
   - [骨干网络和预训练模型库](docs/zh_CN/algorithm_introduction/ImageNet_models.md)
   - [度量学习](docs/zh_CN/algorithm_introduction/metric_learning.md)
+    - [ReID](./docs/zh_CN/algorithm_introduction/reid.md)
   - [模型压缩](docs/zh_CN/algorithm_introduction/model_prune_quantization.md)
   - [模型蒸馏](docs/zh_CN/algorithm_introduction/knowledge_distillation.md)
   - [数据增强](docs/zh_CN/advanced_tutorials/DataAugmentation.md)
@@ -110,6 +111,7 @@ PP-ShiTu图像识别快速体验：[点击这里](./docs/zh_CN/quick_start/quick
   - [图像分类精选问题](docs/zh_CN/faq_series/faq_selected_30.md)
   - [图像分类FAQ第一季](docs/zh_CN/faq_series/faq_2020_s1.md)
   - [图像分类FAQ第二季](docs/zh_CN/faq_series/faq_2021_s1.md)
+  - [图像分类FAQ第三季](docs/zh_CN/faq_series/faq_2022_s1.md)
 - [社区贡献指南](./docs/zh_CN/advanced_tutorials/how_to_contribute.md)
 - [许可证书](#许可证书)
 - [贡献代码](#贡献代码)
@@ -123,7 +125,7 @@ PP-ShiTu图像识别快速体验：[点击这里](./docs/zh_CN/quick_start/quick
 </div>
 
 
-PP-ShiTuV2是一个实用的轻量级通用图像识别系统，主要由主体检测、特征学习和向量检索三个模块组成。该系统从骨干网络选择和调整、损失函数的选择、数据增强、学习率变换策略、正则化参数选择、预训练模型使用以及模型裁剪量化多个方面，采用多种策略，对各个模块的模型进行优化，PP-ShiTuV2相比V1而已，Recall1提升10+个点。更多细节请参考[PP-ShiTuV2详细介绍](./docs/zh_CN/PPShiTu/PPShiTuV2_introduction.md)。
+PP-ShiTuV2是一个实用的轻量级通用图像识别系统，主要由主体检测、特征学习和向量检索三个模块组成。该系统从骨干网络选择和调整、损失函数的选择、数据增强、学习率变换策略、正则化参数选择、预训练模型使用以及模型裁剪量化多个方面，采用多种策略，对各个模块的模型进行优化，PP-ShiTuV2相比V1，Recall1提升近8个点。更多细节请参考[PP-ShiTuV2详细介绍](./docs/zh_CN/PPShiTu/PPShiTuV2_introduction.md)。
 
 <a name="识别效果展示"></a>
 

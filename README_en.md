@@ -7,20 +7,22 @@
 PaddleClas is an image classification and image recognition toolset for industry and academia, helping users train better computer vision models and apply them in real scenarios.
 
 <div align="center">
+<img src="./docs/images/recognition.gif"  width = "400" />
+<p>PP-ShiTuV2 demo images</p>
+</div>
+
+
+
+<div align="center">
 <img src="./docs/images/class_simple_en.gif"  width = "600" />
 
 PULC demo images
 </div>
-&nbsp;
 
 
-<div align="center">
-<img src="./docs/images/recognition.gif"  width = "400" />
-
-PP-ShiTu demo images
-</div>
 
 **Recent updates**
+- 🔥️ Release [PP-ShiTuV2](./docs/en/PPShiTu/PPShiTuV2_introduction.md), recall1 is improved by nearly 8 points, covering 20+ recognition scenarios, with [index management tool](./deploy/shitu_index_manager) and [Android Demo](./docs/en/quick_start/quick_start_recognition_en.md) for better experience.
 - 2022.6.15 Release [**P**ractical **U**ltra **L**ight-weight image **C**lassification solutions](./docs/en/PULC/PULC_quickstart_en.md). PULC models inference within 3ms on CPU devices, with accuracy on par with SwinTransformer. We also release 9 practical classification models covering pedestrian, vehicle and OCR scenario.
 - 2022.4.21 Added the related [code](https://github.com/PaddlePaddle/PaddleClas/pull/1820/files) of the CVPR2022 oral paper [MixFormer](https://arxiv.org/pdf/2204.02557.pdf).
 
@@ -52,12 +54,31 @@ Based on th algorithms above, PaddleClas release PP-ShiTu image recognition syst
 ## Quick Start
 Quick experience of PP-ShiTu image recognition system：[Link](./docs/en/quick_start/quick_start_recognition_en.md)
 
+<div align="center">
+<img src="./docs/images/quick_start/android_demo/PPShiTu_qrcode.png"  width = "40%" />
+<p>PP-ShiTuV2 Android Demo</p>
+</div>
+
 Quick experience of **P**ractical **U**ltra **L**ight-weight image **C**lassification models：[Link](docs/en/PULC/PULC_quickstart_en.md)
 
 ## Tutorials
 
 - [Install Paddle](./docs/en/installation/install_paddle_en.md)
 - [Install PaddleClas Environment](./docs/en/installation/install_paddleclas_en.md)
+- [PP-ShiTuV2 Image Recognition Systems Introduction](./docs/en/PPShiTu/PPShiTuV2_introduction.md)
+  - [Image Recognition Quick Start](docs/en/quick_start/quick_start_recognition_en.md)
+  - [20+ application scenarios](docs/zh_CN/introduction/ppshitu_application_scenarios.md)
+  - Submodule Introduction and Model Training
+    - [Mainbody Detection](./docs/zh_CN/image_recognition_pipeline/mainbody_detection.md)
+    - [Feature Extraction](./docs/en/image_recognition_pipeline/feature_extraction_en.md)
+    - [Vector Search](./docs/en/image_recognition_pipeline/vector_search_en.md)
+    - [Hash Encoding](./docs/zh_CN/image_recognition_pipeline/deep_hashing.md)
+  - PipeLine Inference and Deployment
+    - [Python Inference](docs/en/inference_deployment/python_deploy_en.md)
+    - [C++ Inference](deploy/cpp_shitu/readme_en.md)
+    - [Serving Deployment](docs/en/inference_deployment/recognition_serving_deploy_en.md)
+    - [Lite Deployment](docs/en/inference_deployment/paddle_lite_deploy_en.md)
+    - [Shitu Gallery Manager Tool](docs/zh_CN/inference_deployment/shitu_gallery_manager.md)
 - [Practical Ultra Light-weight image Classification solutions](./docs/en/PULC/PULC_train_en.md)
   - [PULC Quick Start](docs/en/PULC/PULC_quickstart_en.md)
   - [PULC Model Zoo](docs/en/PULC/PULC_model_list_en.md)
@@ -108,12 +129,47 @@ PULC models inference within 3ms on CPU devices, with accuracy comparable with S
 <img src="./docs/images/structure.jpg"  width = "800" />
 </div>
 
-Image recognition can be divided into three steps:
-- （1）Identify region proposal for target objects through a detection model；
-- （2）Extract features for each region proposal;
-- （3）Search features in the retrieval database and output results;
-
+PP-ShiTuV2 is a practical lightweight general image recognition system, which is mainly composed of three modules: mainbody detection model, feature extraction model and vector search tool. The system adopts a variety of strategies including backbone network, loss function, data augmentations, optimal hyperparameters, pre-training model, model pruning and quantization. Compared to V1, PP-ShiTuV2, Recall1 is improved by nearly 8 points. For more details, please refer to [PP-ShiTuV2 introduction](./docs/en/PPShiTu/PPShiTuV2_introduction.md).
 For a new unknown category, there is no need to retrain the model, just prepare images of new category, extract features and update retrieval database and the category can be recognised.
+
+<a name="Rec_Demo_images"></a>
+## PP-ShiTuV2 Demo images
+
+- Drinks recognition
+
+<div align="center">
+<img src="docs/images/drink_demo.gif">
+</div>
+
+
+- Product recognition
+
+<div align="center">
+<img src="https://user-images.githubusercontent.com/18028216/122769644-51604f80-d2d7-11eb-8290-c53b12a5c1f6.gif"  width = "400" />
+</div>
+
+
+- Cartoon character recognition
+
+<div align="center">
+<img src="https://user-images.githubusercontent.com/18028216/122769746-6b019700-d2d7-11eb-86df-f1d710999ba6.gif"  width = "400" />
+</div>
+
+
+- Logo recognition
+
+<div align="center">
+<img src="https://user-images.githubusercontent.com/18028216/122769837-7fde2a80-d2d7-11eb-9b69-04140e9d785f.gif"  width = "400" />
+</div>
+
+
+
+- Car recognition
+
+<div align="center">
+<img src="https://user-images.githubusercontent.com/18028216/122769916-8ec4dd00-d2d7-11eb-8c60-42d89e25030c.gif"  width = "400" />
+</div>
+
 
 <a name="Clas_Demo_images"></a>
 ## PULC demo images
@@ -121,27 +177,6 @@ For a new unknown category, there is no need to retrain the model, just prepare 
 <img src="docs/images/classification_en.gif">
 </div>
 
-<a name="Rec_Demo_images"></a>
-## Image Recognition Demo images [more](https://github.com/PaddlePaddle/PaddleClas/tree/release/2.2/docs/images/recognition/more_demo_images)
-- Product recognition
-<div align="center">
-<img src="https://user-images.githubusercontent.com/18028216/122769644-51604f80-d2d7-11eb-8290-c53b12a5c1f6.gif"  width = "400" />
-</div>
-
-- Cartoon character recognition
-<div align="center">
-<img src="https://user-images.githubusercontent.com/18028216/122769746-6b019700-d2d7-11eb-86df-f1d710999ba6.gif"  width = "400" />
-</div>
-
-- Logo recognition
-<div align="center">
-<img src="https://user-images.githubusercontent.com/18028216/122769837-7fde2a80-d2d7-11eb-9b69-04140e9d785f.gif"  width = "400" />
-</div>
-
-- Car recognition
-<div align="center">
-<img src="https://user-images.githubusercontent.com/18028216/122769916-8ec4dd00-d2d7-11eb-8c60-42d89e25030c.gif"  width = "400" />
-</div>
 
 <a name="License"></a>
 ## License
