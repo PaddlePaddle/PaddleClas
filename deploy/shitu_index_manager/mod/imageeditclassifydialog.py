@@ -9,7 +9,7 @@ class ImageEditClassifyDialog(QtWidgets.QDialog):
     """图像编辑分类对话框"""
     def __init__(self, parent, old_classify, classify_list):
         super(ImageEditClassifyDialog, self).__init__(parent)
-        self.ui = mod.ui_imageeditclassifydialog.Ui_Dialog()
+        self.ui = ui_imageeditclassifydialog.Ui_Dialog()
         self.ui.setupUi(self)  # 初始化主窗口界面
         self.__oldClassify = old_classify
         self.__classifyList = classify_list
