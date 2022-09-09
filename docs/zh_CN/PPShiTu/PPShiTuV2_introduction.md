@@ -1,8 +1,8 @@
-## PP-ShiTuV2图像识别系统
+## PP-ShiTu V2图像识别系统
 
 ## 目录
 
-- [1. PP-ShiTuV2模型和应用场景介绍](#1-pp-shituv2模型和应用场景介绍)
+- [1. PP-ShiTu V2模型和应用场景介绍](#1-pp-shituv2模型和应用场景介绍)
 - [2. 模型快速体验](#2-模型快速体验)
   - [2.1 PP-ShiTu android demo 快速体验](#21-pp-shitu-android-demo-快速体验)
   - [2.2 命令行代码快速体验](#22-命令行代码快速体验)
@@ -18,10 +18,10 @@
   - [4.3 基于 Python 预测引擎推理](#43-基于-python-预测引擎推理)
     - [4.3.1 预测单张图像](#431-预测单张图像)
     - [4.3.2 基于文件夹的批量预测](#432-基于文件夹的批量预测)
-  - [4.3 基于 C++ 预测引擎推理](#43-基于-c-预测引擎推理)
-  - [4.4 服务化部署](#44-服务化部署)
-  - [4.5 端侧部署](#45-端侧部署)
-  - [4.6 Paddle2ONNX 模型转换与预测](#46-paddle2onnx-模型转换与预测)
+  - [4.4 基于 C++ 预测引擎推理](#44-基于-c-预测引擎推理)
+  - [4.5 服务化部署](#45-服务化部署)
+  - [4.6 端侧部署](#46-端侧部署)
+  - [4.7 Paddle2ONNX 模型转换与预测](#47-paddle2onnx-模型转换与预测)
 - [参考文献](#参考文献)
 
 ## 1. PP-ShiTuV2模型和应用场景介绍
@@ -52,7 +52,7 @@ PP-ShiTuV2 是基于 PP-ShiTuV1 改进的一个实用轻量级通用图像识别
 
 可以通过扫描二维码或者 [点击链接](https://paddle-imagenet-models-name.bj.bcebos.com/demos/PP-ShiTu.apk) 下载并安装APP
 
-<div align=center><img src="../../images/quick_start/android_demo/PPShiTu_qrcode.png" height="45%" width="45%"/></div>
+<div align=center><img src="../../images/quick_start/android_demo/PPShiTu_qrcode.png" width="300"/></div>
 
 然后将以下体验图片保存到手机上：
 
@@ -62,16 +62,18 @@ PP-ShiTuV2 是基于 PP-ShiTuV1 改进的一个实用轻量级通用图像识别
 
 <div align=center><img src="../../images/quick_start/android_demo/android_nongfu_spring.JPG" width=30% height=30%/></div>
 
+更详细的说明参考[PP-ShiTu android demo功能说明](https://github.com/weisy11/PaddleClas/blob/develop/docs/zh_CN/quick_start/quick_start_recognition.md)
+
 ### 2.2 命令行代码快速体验
 
 - 首先按照以下命令，安装paddlepaddle和faiss
   ```shell
   # 如果您的机器安装的是 CUDA9 或 CUDA10，请运行以下命令安装
   python3.7 -m pip install paddlepaddle-gpu -i https://mirror.baidu.com/pypi/simple
-
+  
   # 如果您的机器是CPU，请运行以下命令安装
   python3.7 -m pip install paddlepaddle -i https://mirror.baidu.com/pypi/simple
-
+  
   # 安装 faiss 库
   python3.7 -m pip install faiss-cpu==1.7.1post2
   ```
@@ -80,7 +82,7 @@ PP-ShiTuV2 是基于 PP-ShiTuV1 改进的一个实用轻量级通用图像识别
   ```shell
   # 进入到PaddleClas根目录下
   cd PaddleClas
-
+  
   # 安装paddleclas
   python3.7 setup.py install
   ```
@@ -90,7 +92,7 @@ PP-ShiTuV2 是基于 PP-ShiTuV1 改进的一个实用轻量级通用图像识别
   ```shell
   # 下载并解压demo数据
   wget -nc https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/data/drink_dataset_v2.0.tar && tar -xf drink_dataset_v2.0.tar
-
+  
   # 执行识别命令
   paddleclas \
   --model_name=PP-ShiTuV2 \
@@ -231,18 +233,18 @@ Inference: 37.95266151428223 ms per batch image
 
 其中 `bbox` 表示检测出的主体所在位置，`rec_docs` 表示索引库中与检测框最为相似的类别，`rec_scores` 表示对应的相似度。
 
-### 4.3 基于 C++ 预测引擎推理
+### 4.4 基于 C++ 预测引擎推理
 PaddleClas 提供了基于 C++ 预测引擎推理的示例，您可以参考 [服务器端 C++ 预测](../../../deploy/cpp_shitu/readme.md) 来完成相应的推理部署。如果您使用的是 Windows 平台，可以参考 [基于 Visual Studio 2019 Community CMake 编译指南](../inference_deployment/cpp_deploy_on_windows.md) 完成相应的预测库编译和模型预测工作。
 
-### 4.4 服务化部署
+### 4.5 服务化部署
 Paddle Serving 提供高性能、灵活易用的工业级在线推理服务。Paddle Serving 支持 RESTful、gRPC、bRPC 等多种协议，提供多种异构硬件和多种操作系统环境下推理解决方案。更多关于Paddle Serving 的介绍，可以参考 [Paddle Serving 代码仓库](https://github.com/PaddlePaddle/Serving)。
 
 PaddleClas 提供了基于 Paddle Serving 来完成模型服务化部署的示例，您可以参考 [模型服务化部署](../inference_deployment/recognition_serving_deploy.md) 来完成相应的部署工作。
 
-### 4.5 端侧部署
+### 4.6 端侧部署
 Paddle Lite 是一个高性能、轻量级、灵活性强且易于扩展的深度学习推理框架，定位于支持包括移动端、嵌入式以及服务器端在内的多硬件平台。更多关于 Paddle Lite 的介绍，可以参考 [Paddle Lite 代码仓库](https://github.com/PaddlePaddle/Paddle-Lite)。
 
-### 4.6 Paddle2ONNX 模型转换与预测
+### 4.7 Paddle2ONNX 模型转换与预测
 Paddle2ONNX 支持将 PaddlePaddle 模型格式转化到 ONNX 模型格式。通过 ONNX 可以完成将 Paddle 模型到多种推理引擎的部署，包括TensorRT/OpenVINO/MNN/TNN/NCNN，以及其它对 ONNX 开源格式进行支持的推理引擎或硬件。更多关于 Paddle2ONNX 的介绍，可以参考 [Paddle2ONNX 代码仓库](https://github.com/PaddlePaddle/Paddle2ONNX)。
 
 PaddleClas 提供了基于 Paddle2ONNX 来完成 inference 模型转换 ONNX 模型并作推理预测的示例，您可以参考 [Paddle2ONNX 模型转换与预测](../../../deploy/paddle2onnx/readme.md) 来完成相应的部署工作。
