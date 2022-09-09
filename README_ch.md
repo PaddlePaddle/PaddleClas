@@ -48,8 +48,6 @@ PaddleClas发布了[PP-HGNet](docs/zh_CN/models/PP-HGNet.md)、[PP-LCNetv2](docs
 
 ## 快速体验
 
-生鲜品自主结算范例库： [点击这里](./docs/zh_CN/samples/Fresh_Food_Recogniiton/README.md)
-
 PULC超轻量图像分类方案快速体验：[点击这里](docs/zh_CN/PULC/PULC_quickstart.md)
 
 PP-ShiTu图像识别快速体验：[点击这里](./docs/zh_CN/quick_start/quick_start_recognition.md)
@@ -58,6 +56,13 @@ PP-ShiTu图像识别快速体验：[点击这里](./docs/zh_CN/quick_start/quick
 <img src="./docs/images/quick_start/android_demo/PPShiTu_qrcode.png"  width = "400" />
 <p>PP-ShiTuV2 Android Demo</p>
 </div>
+
+## 产业实践范例库
+
+基于PP-ShiTu v2的生鲜品自助结算： [点击这里](./docs/zh_CN/samples/Fresh_Food_Recogniiton/README.md)
+基于PULC人员出入视频管理： [点击这里](./docs/zh_CN/samples/Personnel_Access/README.md)
+基于 PP-ShiTu 的智慧商超商品识别：[点击这里](./docs/zh_CN/Goods_Recognition/README.md)
+基于PP-ShiTu电梯内电瓶车入室识别：[点击这里](./docs/zh_CN/samples//Electromobile_In_Elevator_Detection/README.md)
 
 ## 文档教程
 - [环境准备](docs/zh_CN/installation/install_paddleclas.md)
