@@ -24,7 +24,7 @@
 ## 近期更新
 
 - 🔥️ 发布[PP-ShiTuV2](./docs/zh_CN/PPShiTu/PPShiTuV2_introduction.md)，recall1精度提升8个点，覆盖[20+识别场景](./docs/zh_CN/introduction/ppshitu_application_scenarios.md)，新增[库管理工具](./deploy/shitu_index_manager/)，[Android Demo](./docs/zh_CN/quick_start/quick_start_recognition.md)全新体验。
-- 2022.9.4 新增[生鲜产品自主结算范例库](https://aistudio.baidu.com/aistudio/projectdetail/4486158)，具体内容可以在AI Studio上体验。
+- 2022.9.4 新增[生鲜产品自主结算范例库](./docs/zh_CN/samples/Fresh_Food_Recogniiton/README.md)，具体内容可以在AI Studio上体验。
 - 2022.6.15 发布[PULC超轻量图像分类实用方案](docs/zh_CN/PULC/PULC_train.md)，CPU推理3ms，精度比肩SwinTransformer，覆盖人、车、OCR场景九大常见任务。
 - 2022.5.23 新增[人员出入管理范例库](https://aistudio.baidu.com/aistudio/projectdetail/4094475)，具体内容可以在 AI Studio 上体验。
 - 2022.5.20 上线[PP-HGNet](./docs/zh_CN/models/PP-HGNet.md), [PP-LCNetv2](./docs/zh_CN/models/PP-LCNetV2.md)。
@@ -47,6 +47,8 @@ PaddleClas发布了[PP-HGNet](docs/zh_CN/models/PP-HGNet.md)、[PP-LCNetv2](docs
 
 
 ## 快速体验
+
+生鲜品自主结算范例库： [点击这里](./docs/zh_CN/samples/Fresh_Food_Recogniiton/README.md)
 
 PULC超轻量图像分类方案快速体验：[点击这里](docs/zh_CN/PULC/PULC_quickstart.md)
 
