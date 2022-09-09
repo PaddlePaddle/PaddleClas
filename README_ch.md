@@ -52,17 +52,20 @@ PULC超轻量图像分类方案快速体验：[点击这里](docs/zh_CN/PULC/PUL
 
 PP-ShiTu图像识别快速体验：[点击这里](./docs/zh_CN/quick_start/quick_start_recognition.md)
 
+PP-ShiTuV2 Android Demo APP，可扫描如下二维码，下载体验
+
 <div align="center">
-<img src="./docs/images/quick_start/android_demo/PPShiTu_qrcode.png"  width = "400" />
+<img src="./docs/images/quick_start/android_demo/PPShiTu_qrcode.png"  width = "240" height = "240" />
 <p>PP-ShiTuV2 Android Demo</p>
 </div>
 
+
 ## 产业实践范例库
 
-基于PP-ShiTu v2的生鲜品自助结算： [点击这里](./docs/zh_CN/samples/Fresh_Food_Recogniiton/README.md)
-基于PULC人员出入视频管理： [点击这里](./docs/zh_CN/samples/Personnel_Access/README.md)
-基于 PP-ShiTu 的智慧商超商品识别：[点击这里](./docs/zh_CN/Goods_Recognition/README.md)
-基于PP-ShiTu电梯内电瓶车入室识别：[点击这里](./docs/zh_CN/samples//Electromobile_In_Elevator_Detection/README.md)
+- 基于PP-ShiTu v2的生鲜品自助结算： [点击这里](./docs/zh_CN/samples/Fresh_Food_Recogniiton/README.md)
+- 基于PULC人员出入视频管理： [点击这里](./docs/zh_CN/samples/Personnel_Access/README.md)
+- 基于 PP-ShiTu 的智慧商超商品识别：[点击这里](./docs/zh_CN/Goods_Recognition/README.md)
+- 基于PP-ShiTu电梯内电瓶车入室识别：[点击这里](./docs/zh_CN/samples//Electromobile_In_Elevator_Detection/README.md)
 
 ## 文档教程
 - [环境准备](docs/zh_CN/installation/install_paddleclas.md)
