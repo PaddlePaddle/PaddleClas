@@ -42,7 +42,8 @@ infer_key1=$(func_parser_key "${lines[17]}")
 infer_value1=$(func_parser_value "${lines[17]}")
 
 
-LOG_PATH="./test_tipc/output"
+CLS_ROOT_PATH=$(pwd)
+LOG_PATH="${CLS_ROOT_PATH}/test_tipc/output"
 mkdir -p ${LOG_PATH}
 status_log="${LOG_PATH}/results_python.log"
 
@@ -71,7 +72,7 @@ if [ ${MODE} = "whole_infer" ]; then
             echo  $export_cmd
             eval $export_cmd
             status_export=$?
-            status_check $status_export "${export_cmd}" "${status_log}" "${model_name}"
+            status_check $status_export "${export_cmd}" "${status_log}" "${model_name}" ""
         else
             save_infer_dir=${infer_model}
         fi

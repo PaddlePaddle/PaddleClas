@@ -37,7 +37,8 @@ cpp_benchmark_value=$(func_parser_value "${lines[16]}")
 generate_yaml_cmd=$(func_parser_value "${lines[17]}")
 transform_index_cmd=$(func_parser_value "${lines[18]}")
 
-LOG_PATH="./test_tipc/output/${model_name}/${MODE}"
+CLS_ROOT_PATH=$(pwd)
+LOG_PATH="${CLS_ROOT_PATH}/test_tipc/output/${model_name}/${MODE}"
 mkdir -p ${LOG_PATH}
 status_log="${LOG_PATH}/results_cpp.log"
 # generate_yaml_cmd="python3 test_tipc/generate_cpp_yaml.py"
@@ -70,7 +71,7 @@ function func_shitu_cpp_inference(){
                         command="${_script} > ${_save_log_path} 2>&1"
                         eval $command
                         last_status=${PIPESTATUS[0]}
-                        status_check $last_status "${command}" "${status_log}" "${model_name}"
+                        status_check $last_status "${command}" "${status_log}" "${model_name}" "${_save_log_path}"
                     done
                 done
             done
@@ -94,7 +95,7 @@ function func_shitu_cpp_inference(){
                         command="${_script} > ${_save_log_path} 2>&1"
                         eval $command
                         last_status=${PIPESTATUS[0]}
-                        status_check $last_status "${command}" "${status_log}" "${model_name}"
+                        status_check $last_status "${command}" "${status_log}" "${model_name}" "${_save_log_path}"
                     done
                 done
             done
@@ -126,13 +127,12 @@ function func_cls_cpp_inference(){
                             precison="int8"
                         fi
                         _save_log_path="${_log_path}/cpp_infer_cpu_usemkldnn_${use_mkldnn}_threads_${threads}_precision_${precision}_batchsize_${batch_size}.log"
-
                         command="${generate_yaml_cmd} --type cls --batch_size ${batch_size} --mkldnn ${use_mkldnn} --gpu ${use_gpu} --cpu_thread ${threads} --tensorrt False --precision ${precision} --data_dir ${_img_dir} --benchmark True --cls_model_dir ${cpp_infer_model_dir} --gpu_id ${GPUID}"
                         eval $command
                         command1="${_script} > ${_save_log_path} 2>&1"
                         eval ${command1}
                         last_status=${PIPESTATUS[0]}
-                        status_check $last_status "${command1}" "${status_log}" "${model_name}"
+                        status_check $last_status "${command1}" "${status_log}" "${model_name}" "${_save_log_path}"
                     done
                 done
             done
@@ -155,7 +155,7 @@ function func_cls_cpp_inference(){
                         command="${_script} > ${_save_log_path} 2>&1"
                         eval $command
                         last_status=${PIPESTATUS[0]}
-                        status_check $last_status "${command}" "${status_log}" "${model_name}"
+                        status_check $last_status "${command}" "${status_log}" "${model_name}" "${_save_log_path}"
                     done
                 done
             done

@@ -38,10 +38,10 @@ pipeline_py=$(func_parser_value "${lines[13]}")
 
 
 function func_serving_cls(){
-    LOG_PATH="test_tipc/output/${model_name}"
+    CLS_ROOT_PATH=$(pwd)
+    LOG_PATH="${CLS_ROOT_PATH}/test_tipc/output/${model_name}/serving_infer"
     mkdir -p ${LOG_PATH}
-    LOG_PATH="../../${LOG_PATH}"
-    status_log="${LOG_PATH}/results_serving.log"
+    status_log="${LOG_PATH}/results_cpp_serving.log"
     IFS='|'
 
     # pdserving
@@ -53,8 +53,11 @@ function func_serving_cls(){
 
     for python_ in ${python[*]}; do
         if [[ ${python_} =~ "python" ]]; then
-            trans_model_cmd="${python_} ${trans_model_py} ${set_dirname} ${set_model_filename} ${set_params_filename} ${set_serving_server} ${set_serving_client}"
+            trans_log="${LOG_PATH}/cpp_trans_model.log"
+            trans_model_cmd="${python_} ${trans_model_py} ${set_dirname} ${set_model_filename} ${set_params_filename} ${set_serving_server} ${set_serving_client} > ${trans_log} 2>&1"
             eval ${trans_model_cmd}
+            last_status=${PIPESTATUS[0]}
+            status_check $last_status "${trans_model_cmd}" "${status_log}" "${model_name}" "${trans_log}"
             break
         fi
     done
@@ -102,32 +105,34 @@ function func_serving_cls(){
 
     for use_gpu in ${web_use_gpu_list[*]}; do
         if [[ ${use_gpu} = "null" ]]; then
-            web_service_cpp_cmd="${python_} -m paddle_serving_server.serve --model ${serving_server_dir_name} --op GeneralClasOp --port 9292 &"
+            server_log_path="${LOG_PATH}/cpp_server_cpu.log"
+            web_service_cpp_cmd="nohup ${python_} -m paddle_serving_server.serve --model ${serving_server_dir_name} --op GeneralClasOp --port 9292 > ${server_log_path} 2>&1 &"
             eval ${web_service_cpp_cmd}
             last_status=${PIPESTATUS[0]}
-            status_check $last_status "${web_service_cpp_cmd}" "${status_log}" "${model_name}"
+            status_check $last_status "${web_service_cpp_cmd}" "${status_log}" "${model_name}" "${server_log_path}"
             sleep 5s
-            _save_log_path="${LOG_PATH}/server_infer_cpp_cpu_pipeline_batchsize_1.log"
+            _save_log_path="${LOG_PATH}/cpp_client_cpu.log"
             pipeline_cmd="${python_} test_cpp_serving_client.py > ${_save_log_path} 2>&1 "
             eval ${pipeline_cmd}
             last_status=${PIPESTATUS[0]}
             eval "cat ${_save_log_path}"
-            status_check ${last_status} "${pipeline_cmd}" "${status_log}" "${model_name}"
+            status_check ${last_status} "${pipeline_cmd}" "${status_log}" "${model_name}" "${_save_log_path}"
             eval "${python_} -m paddle_serving_server.serve stop"
             sleep 5s
         else
-            web_service_cpp_cmd="${python_} -m paddle_serving_server.serve --model ${serving_server_dir_name} --op GeneralClasOp --port 9292 --gpu_id=${use_gpu} &"
+            server_log_path="${LOG_PATH}/cpp_server_gpu.log"
+            web_service_cpp_cmd="nohup ${python_} -m paddle_serving_server.serve --model ${serving_server_dir_name} --op GeneralClasOp --port 9292 --gpu_id=${use_gpu} > ${server_log_path} 2>&1 &"
             eval ${web_service_cpp_cmd}
             last_status=${PIPESTATUS[0]}
-            status_check $last_status "${web_service_cpp_cmd}" "${status_log}" "${model_name}"
+            status_check $last_status "${web_service_cpp_cmd}" "${status_log}" "${model_name}" "${server_log_path}"
             sleep 8s
 
-            _save_log_path="${LOG_PATH}/server_infer_cpp_gpu_pipeline_batchsize_1.log"
+            _save_log_path="${LOG_PATH}/cpp_client_gpu.log"
             pipeline_cmd="${python_} test_cpp_serving_client.py > ${_save_log_path} 2>&1 "
             eval ${pipeline_cmd}
             last_status=${PIPESTATUS[0]}
             eval "cat ${_save_log_path}"
-            status_check ${last_status} "${pipeline_cmd}" "${status_log}" "${model_name}"
+            status_check ${last_status} "${pipeline_cmd}" "${status_log}" "${model_name}" "${_save_log_path}"
             sleep 5s
             eval "${python_} -m paddle_serving_server.serve stop"
         fi
@@ -136,10 +141,11 @@ function func_serving_cls(){
 
 
 function func_serving_rec(){
-    LOG_PATH="test_tipc/output/${model_name}"
+    CLS_ROOT_PATH=$(pwd)
+    LOG_PATH="${CLS_ROOT_PATH}/test_tipc/output/${model_name}/serving_infer"
     mkdir -p ${LOG_PATH}
-    LOG_PATH="../../../${LOG_PATH}"
-    status_log="${LOG_PATH}/results_serving.log"
+    status_log="${LOG_PATH}/results_cpp_serving.log"
+
     trans_model_py=$(func_parser_value "${lines[5]}")
     cls_infer_model_dir_key=$(func_parser_key "${lines[6]}")
     cls_infer_model_dir_value=$(func_parser_value "${lines[6]}")
@@ -181,16 +187,22 @@ function func_serving_rec(){
     set_params_filename=$(func_set_params "${params_filename_key}" "${params_filename_value}")
     set_serving_server=$(func_set_params "${cls_serving_server_key}" "${cls_serving_server_value}")
     set_serving_client=$(func_set_params "${cls_serving_client_key}" "${cls_serving_client_value}")
-    cls_trans_model_cmd="${python_interp} ${trans_model_py} ${set_dirname} ${set_model_filename} ${set_params_filename} ${set_serving_server} ${set_serving_client}"
+    trans_cls_log="${LOG_PATH}/cpp_trans_model_cls.log"
+    cls_trans_model_cmd="${python_interp} ${trans_model_py} ${set_dirname} ${set_model_filename} ${set_params_filename} ${set_serving_server} ${set_serving_client} > ${trans_cls_log} 2>&1"
     eval ${cls_trans_model_cmd}
+    last_status=${PIPESTATUS[0]}
+    status_check $last_status "${cls_trans_model_cmd}" "${status_log}" "${model_name}" "${trans_cls_log}"
 
     set_dirname=$(func_set_params "${det_infer_model_dir_key}" "${det_infer_model_dir_value}")
     set_model_filename=$(func_set_params "${model_filename_key}" "${model_filename_value}")
     set_params_filename=$(func_set_params "${params_filename_key}" "${params_filename_value}")
     set_serving_server=$(func_set_params "${det_serving_server_key}" "${det_serving_server_value}")
     set_serving_client=$(func_set_params "${det_serving_client_key}" "${det_serving_client_value}")
-    det_trans_model_cmd="${python_interp} ${trans_model_py} ${set_dirname} ${set_model_filename} ${set_params_filename} ${set_serving_server} ${set_serving_client}"
+    trans_det_log="${LOG_PATH}/cpp_trans_model_det.log"
+    det_trans_model_cmd="${python_interp} ${trans_model_py} ${set_dirname} ${set_model_filename} ${set_params_filename} ${set_serving_server} ${set_serving_client} > ${trans_det_log} 2>&1"
     eval ${det_trans_model_cmd}
+    last_status=${PIPESTATUS[0]}
+    status_check $last_status "${det_trans_model_cmd}" "${status_log}" "${model_name}" "${trans_det_log}"
 
     OLD_IFS="${IFS}"
     IFS='/'
@@ -225,32 +237,34 @@ function func_serving_rec(){
     for use_gpu in ${web_use_gpu_list[*]}; do
         if [ ${use_gpu} = "null" ]; then
             det_serving_server_dir_name=$(func_get_url_file_name "$det_serving_server_value")
-            web_service_cpp_cmd="${python_interp} -m paddle_serving_server.serve --model ../../${det_serving_server_value} ../../${cls_serving_server_value} --op GeneralPicodetOp GeneralFeatureExtractOp --port 9400 &"
+            server_log_path="${LOG_PATH}/cpp_server_cpu.log"
+            web_service_cpp_cmd="nohup ${python_interp} -m paddle_serving_server.serve --model ../../${det_serving_server_value} ../../${cls_serving_server_value} --op GeneralPicodetOp GeneralFeatureExtractOp --port 9400 > ${server_log_path} 2>&1 &"
             eval ${web_service_cpp_cmd}
             last_status=${PIPESTATUS[0]}
-            status_check $last_status "${web_service_cpp_cmd}" "${status_log}" "${model_name}"
+            status_check $last_status "${web_service_cpp_cmd}" "${status_log}" "${model_name}" "${server_log_path}"
             sleep 5s
-            _save_log_path="${LOG_PATH}/server_infer_cpp_cpu_batchsize_1.log"
+            _save_log_path="${LOG_PATH}/cpp_client_cpu.log"
             pipeline_cmd="${python_interp} ${pipeline_py} > ${_save_log_path} 2>&1 "
             eval ${pipeline_cmd}
             last_status=${PIPESTATUS[0]}
             eval "cat ${_save_log_path}"
-            status_check ${last_status} "${pipeline_cmd}" "${status_log}" "${model_name}"
+            status_check ${last_status} "${pipeline_cmd}" "${status_log}" "${model_name}" "${_save_log_path}"
             eval "${python_} -m paddle_serving_server.serve stop"
             sleep 5s
         else
             det_serving_server_dir_name=$(func_get_url_file_name "$det_serving_server_value")
+            server_log_path="${LOG_PATH}/cpp_server_gpu.log"
             web_service_cpp_cmd="${python_interp} -m paddle_serving_server.serve --model ../../${det_serving_server_value} ../../${cls_serving_server_value} --op GeneralPicodetOp GeneralFeatureExtractOp --port 9400 --gpu_id=${use_gpu} &"
             eval ${web_service_cpp_cmd}
             last_status=${PIPESTATUS[0]}
-            status_check $last_status "${web_service_cpp_cmd}" "${status_log}" "${model_name}"
+            status_check $last_status "${web_service_cpp_cmd}" "${status_log}" "${model_name}" ${server_log_path}
             sleep 5s
-            _save_log_path="${LOG_PATH}/server_infer_cpp_gpu_batchsize_1.log"
+            _save_log_path="${LOG_PATH}/cpp_client_gpu.log"
             pipeline_cmd="${python_interp} ${pipeline_py} > ${_save_log_path} 2>&1 "
             eval ${pipeline_cmd}
             last_status=${PIPESTATUS[0]}
             eval "cat ${_save_log_path}"
-            status_check ${last_status} "${pipeline_cmd}" "${status_log}" "${model_name}"
+            status_check ${last_status} "${pipeline_cmd}" "${status_log}" "${model_name}" "${_save_log_path}"
             eval "${python_} -m paddle_serving_server.serve stop"
             sleep 5s
         fi

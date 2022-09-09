@@ -36,13 +36,16 @@ web_service_py=$(func_parser_value "${lines[11]}")
 web_use_gpu_key=$(func_parser_key "${lines[12]}")
 web_use_gpu_list=$(func_parser_value "${lines[12]}")
 pipeline_py=$(func_parser_value "${lines[13]}")
+use_mkldnn="False"
+threads="1"
 
 
 function func_serving_cls(){
-    LOG_PATH="test_tipc/output/${model_name}/${MODE}"
+    CLS_ROOT_PATH=$(pwd)
+    LOG_PATH="${CLS_ROOT_PATH}/test_tipc/output/${model_name}/${MODE}"
     mkdir -p ${LOG_PATH}
-    LOG_PATH="../../${LOG_PATH}"
     status_log="${LOG_PATH}/results_serving.log"
+
     IFS='|'
 
     # pdserving
@@ -54,8 +57,11 @@ function func_serving_cls(){
 
     for python_ in ${python[*]}; do
         if [[ ${python_} =~ "python" ]]; then
-            trans_model_cmd="${python_} ${trans_model_py} ${set_dirname} ${set_model_filename} ${set_params_filename} ${set_serving_server} ${set_serving_client}"
+            trans_log="${LOG_PATH}/python_trans_model.log"
+            trans_model_cmd="${python_} ${trans_model_py} ${set_dirname} ${set_model_filename} ${set_params_filename} ${set_serving_server} ${set_serving_client} > ${trans_log} 2>&1"
             eval ${trans_model_cmd}
+            last_status=${PIPESTATUS[0]}
+            status_check $last_status "${trans_model_cmd}" "${status_log}" "${model_name}" "${trans_log}"
             break
         fi
     done
@@ -96,19 +102,19 @@ function func_serving_cls(){
             devices_line=27
             set_devices_cmd="sed -i '${devices_line}s/devices: .*/devices: \"\"/' config.yml"
             eval ${set_devices_cmd}
-
-            web_service_cmd="${python_} ${web_service_py} &"
+            server_log_path="${LOG_PATH}/python_server_cpu.log"
+            web_service_cmd="nohup ${python_} ${web_service_py} > ${server_log_path} 2>&1 &"
             eval ${web_service_cmd}
             last_status=${PIPESTATUS[0]}
-            status_check $last_status "${web_service_cmd}" "${status_log}" "${model_name}"
+            status_check $last_status "${web_service_cmd}" "${status_log}" "${model_name}" "${server_log_path}"
             sleep 5s
             for pipeline in ${pipeline_py[*]}; do
-                _save_log_path="${LOG_PATH}/server_infer_cpu_${pipeline%_client*}_batchsize_1.log"
+                _save_log_path="${LOG_PATH}/python_client_cpu_${pipeline%_client*}_usemkldnn_${use_mkldnn}_threads_${threads}_batchsize_1.log"
                 pipeline_cmd="${python_} ${pipeline} > ${_save_log_path} 2>&1 "
                 eval ${pipeline_cmd}
                 last_status=${PIPESTATUS[0]}
                 eval "cat ${_save_log_path}"
-                status_check $last_status "${pipeline_cmd}" "${status_log}" "${model_name}"
+                status_check $last_status "${pipeline_cmd}" "${status_log}" "${model_name}" "${_save_log_path}"
                 sleep 5s
             done
             eval "${python_} -m paddle_serving_server.serve stop"
@@ -130,19 +136,19 @@ function func_serving_cls(){
             devices_line=27
             set_devices_cmd="sed -i '${devices_line}s/devices: .*/devices: \"${use_gpu}\"/' config.yml"
             eval ${set_devices_cmd}
-
-            web_service_cmd="${python_} ${web_service_py} & "
+            server_log_path="${LOG_PATH}/python_server_gpu_usetrt_${use_trt}_precision_${precision}.log"
+            web_service_cmd="nohup ${python_} ${web_service_py} > ${server_log_path} 2>&1 &"
             eval ${web_service_cmd}
             last_status=${PIPESTATUS[0]}
-            status_check $last_status "${web_service_cmd}" "${status_log}" "${model_name}"
+            status_check $last_status "${web_service_cmd}" "${status_log}" "${model_name}" "${server_log_path}"
             sleep 5s
             for pipeline in ${pipeline_py[*]}; do
-                _save_log_path="${LOG_PATH}/server_infer_gpu_${pipeline%_client*}_batchsize_1.log"
+                _save_log_path="${LOG_PATH}/python_client_gpu_${pipeline%_client*}_usetrt_${use_trt}_precision_${precision}_batchsize_1.log"
                 pipeline_cmd="${python_} ${pipeline} > ${_save_log_path} 2>&1"
                 eval ${pipeline_cmd}
                 last_status=${PIPESTATUS[0]}
                 eval "cat ${_save_log_path}"
-                status_check $last_status "${pipeline_cmd}" "${status_log}" "${model_name}"
+                status_check $last_status "${pipeline_cmd}" "${status_log}" "${model_name}" "${_save_log_path}"
                 sleep 5s
             done
             eval "${python_} -m paddle_serving_server.serve stop"
@@ -154,10 +160,11 @@ function func_serving_cls(){
 
 
 function func_serving_rec(){
-    LOG_PATH="test_tipc/output/${model_name}/${MODE}"
+    CLS_ROOT_PATH=$(pwd)
+    LOG_PATH="${CLS_ROOT_PATH}/test_tipc/output/${model_name}/${MODE}"
     mkdir -p ${LOG_PATH}
-    LOG_PATH="../../../${LOG_PATH}"
     status_log="${LOG_PATH}/results_serving.log"
+
     trans_model_py=$(func_parser_value "${lines[5]}")
     cls_infer_model_dir_key=$(func_parser_key "${lines[6]}")
     cls_infer_model_dir_value=$(func_parser_value "${lines[6]}")
@@ -199,16 +206,22 @@ function func_serving_rec(){
     set_params_filename=$(func_set_params "${params_filename_key}" "${params_filename_value}")
     set_serving_server=$(func_set_params "${cls_serving_server_key}" "${cls_serving_server_value}")
     set_serving_client=$(func_set_params "${cls_serving_client_key}" "${cls_serving_client_value}")
-    cls_trans_model_cmd="${python_interp} ${trans_model_py} ${set_dirname} ${set_model_filename} ${set_params_filename} ${set_serving_server} ${set_serving_client}"
+    trans_cls_log="${LOG_PATH}/python_trans_model_cls.log"
+    cls_trans_model_cmd="${python_interp} ${trans_model_py} ${set_dirname} ${set_model_filename} ${set_params_filename} ${set_serving_server} ${set_serving_client} > ${trans_cls_log} 2>&1"
     eval ${cls_trans_model_cmd}
+    last_status=${PIPESTATUS[0]}
+    status_check $last_status "${cls_trans_model_cmd}" "${status_log}" "${model_name}" "${trans_cls_log}"
 
     set_dirname=$(func_set_params "${det_infer_model_dir_key}" "${det_infer_model_dir_value}")
     set_model_filename=$(func_set_params "${model_filename_key}" "${model_filename_value}")
     set_params_filename=$(func_set_params "${params_filename_key}" "${params_filename_value}")
     set_serving_server=$(func_set_params "${det_serving_server_key}" "${det_serving_server_value}")
     set_serving_client=$(func_set_params "${det_serving_client_key}" "${det_serving_client_value}")
-    det_trans_model_cmd="${python_interp} ${trans_model_py} ${set_dirname} ${set_model_filename} ${set_params_filename} ${set_serving_server} ${set_serving_client}"
+    trans_det_log="${LOG_PATH}/python_trans_model_det.log"
+    det_trans_model_cmd="${python_interp} ${trans_model_py} ${set_dirname} ${set_model_filename} ${set_params_filename} ${set_serving_server} ${set_serving_client} > ${trans_det_log} 2>&1"
     eval ${det_trans_model_cmd}
+    last_status=${PIPESTATUS[0]}
+    status_check $last_status "${det_trans_model_cmd}" "${status_log}" "${model_name}" "${trans_det_log}"
 
     # modify the alias_name of fetch_var to "outputs"
     server_fetch_var_line_cmd="sed -i '/fetch_var/,/is_lod_tensor/s/alias_name: .*/alias_name: \"features\"/' $cls_serving_server_value/serving_server_conf.prototxt"
@@ -239,19 +252,19 @@ function func_serving_rec(){
             devices_line=27
             set_devices_cmd="sed -i '${devices_line}s/devices: .*/devices: \"\"/' config.yml"
             eval ${set_devices_cmd}
-
-            web_service_cmd="${python} ${web_service_py} &"
+            server_log_path="${LOG_PATH}/python_server_cpu.log"
+            web_service_cmd="nohup ${python} ${web_service_py} > ${server_log_path} 2>&1 &"
             eval ${web_service_cmd}
             last_status=${PIPESTATUS[0]}
-            status_check $last_status "${web_service_cmd}" "${status_log}" "${model_name}"
+            status_check $last_status "${web_service_cmd}" "${status_log}" "${model_name}" "${server_log_path}"
             sleep 5s
             for pipeline in ${pipeline_py[*]}; do
-                _save_log_path="${LOG_PATH}/server_infer_cpu_${pipeline%_client*}_batchsize_1.log"
-                pipeline_cmd="${python} ${pipeline} > ${_save_log_path} 2>&1 "
+                _save_log_path="${LOG_PATH}/python_client_cpu_${pipeline%_client*}_usemkldnn_${use_mkldnn}_threads_${threads}_batchsize_1.log"
+                pipeline_cmd="${python} ${pipeline} > ${_save_log_path} 2>&1"
                 eval ${pipeline_cmd}
                 last_status=${PIPESTATUS[0]}
                 eval "cat ${_save_log_path}"
-                status_check $last_status "${pipeline_cmd}" "${status_log}" "${model_name}"
+                status_check $last_status "${pipeline_cmd}" "${status_log}" "${model_name}" "${_save_log_path}"
                 sleep 5s
             done
             eval "${python_} -m paddle_serving_server.serve stop"
@@ -273,19 +286,19 @@ function func_serving_rec(){
             devices_line=27
             set_devices_cmd="sed -i '${devices_line}s/devices: .*/devices: \"${use_gpu}\"/' config.yml"
             eval ${set_devices_cmd}
-
-            web_service_cmd="${python} ${web_service_py} & "
+            server_log_path="${LOG_PATH}/python_server_gpu_usetrt_${use_trt}_precision_${precision}.log"
+            web_service_cmd="nohup ${python} ${web_service_py} > ${server_log_path} 2>&1 &"
             eval ${web_service_cmd}
             last_status=${PIPESTATUS[0]}
-            status_check $last_status "${web_service_cmd}" "${status_log}" "${model_name}"
+            status_check $last_status "${web_service_cmd}" "${status_log}" "${model_name}" "${server_log_path}"
             sleep 10s
             for pipeline in ${pipeline_py[*]}; do
-                _save_log_path="${LOG_PATH}/server_infer_gpu_${pipeline%_client*}_batchsize_1.log"
+                _save_log_path="${LOG_PATH}/python_client_gpu_${pipeline%_client*}_usetrt_${use_trt}_precision_${precision}_batchsize_1.log"
                 pipeline_cmd="${python} ${pipeline} > ${_save_log_path} 2>&1"
                 eval ${pipeline_cmd}
                 last_status=${PIPESTATUS[0]}
                 eval "cat ${_save_log_path}"
-                status_check $last_status "${pipeline_cmd}" "${status_log}" "${model_name}"
+                status_check $last_status "${pipeline_cmd}" "${status_log}" "${model_name}" "${_save_log_path}"
                 sleep 10s
             done
             eval "${python_} -m paddle_serving_server.serve stop"
