@@ -182,9 +182,9 @@ pip install  https://paddleocr.bj.bcebos.com/libs/auto_log-1.2.0-py3-none-any.wh
 进行TIPC：
 ```bash
 # 准备数据
-bash test_tipc/prepare.sh c_train_infer_python.txt 'lite_train_lite_infer'
+bash test_tipc/prepare.sh test_tipc/configs/VoVNet/VoVNet39_train_infer_python.txt 'lite_train_lite_infer'
 # 运行测试
-bash test_tipc/test_train_inference_python.sh c_train_infer_python.txt 'lite_train_lite_infer'
+bash test_tipc/test_train_inference_python.sh test_tipc/configs/VoVNet/VoVNet39_train_infer_python.txt 'lite_train_lite_infer'
 ```
 TIPC结果：
 
