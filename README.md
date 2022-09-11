@@ -160,6 +160,8 @@ python tools/export_model.py \
 
 静态图模型推理
 ```shell
+bash test_tipc/prepare.sh test_tipc/configs/VoVNet/VoVNet39_train_infer_python.txt 'lite_train_lite_infer' # 安装paddleclas
+
 cd deploy
 python python/predict_cls.py -c configs/inference_cls.yaml \
  -o Global.inference_model_dir=models/class_VoVNet39_ImageNet_infer \
