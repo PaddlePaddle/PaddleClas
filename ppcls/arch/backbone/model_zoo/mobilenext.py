@@ -34,7 +34,7 @@ MODEL_URLS = {
 
 __all__ = list(MODEL_URLS.keys())
 
-no_weight_decay_attr = paddle.ParamAttr(L2Decay(0))
+no_weight_decay_attr = paddle.ParamAttr(regularizer=L2Decay(0))
 BatchNorm2D = partial(
     nn.BatchNorm2D,
     weight_attr=no_weight_decay_attr,
