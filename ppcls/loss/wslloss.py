@@ -49,7 +49,7 @@ class WSLLoss(nn.Layer):
                                 axis=1)
 
         ratio = ce_loss_s / (ce_loss_t + 1e-7)
-        # ratio = paddle.maximum(ratio, paddle.zeros_like(ratio))
+        ratio = paddle.maximum(ratio, paddle.zeros_like(ratio))
 
         kd_loss = -paddle.sum(F.softmax(t_input_for_softmax) *
                               F.log_softmax(s_input_for_softmax),
