@@ -65,9 +65,7 @@ def eval_function(exe, compiled_test_program, test_feed_names,
                 label = np.array(label).reshape((-1, 1))
                 sort_array = pred.argsort(axis=1)
                 top_1_pred = sort_array[:, -1:][:, ::-1]
-                # print(label, top_1_pred)
                 top_1 = np.mean(label == top_1_pred)
-                # print(top_1)
                 top_5_pred = sort_array[:, -5:][:, ::-1]
                 acc_num = 0
                 for i in range(len(label)):
