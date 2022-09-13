@@ -22,6 +22,7 @@ from .distanceloss import DistanceLoss
 from .rkdloss import RKdAngle, RkdDistance
 from .kldivloss import KLDivLoss
 from .dkdloss import DKDLoss
+from .wslloss import WSLLoss
 from .dist_loss import DISTLoss
 from .multilabelloss import MultiLabelLoss
 from .mgd_loss import MGDLoss
@@ -247,6 +248,34 @@ class DistillationDKDLoss(DKDLoss):
             use_target_as_gt=use_target_as_gt)
         self.key = key
         self.model_name_pairs = model_name_pairs
+        self.name = name
+
+    def forward(self, predicts, batch):
+        loss_dict = dict()
+        for idx, pair in enumerate(self.model_name_pairs):
+            out1 = predicts[pair[0]]
+            out2 = predicts[pair[1]]
+            if self.key is not None:
+                out1 = out1[self.key]
+                out2 = out2[self.key]
+            loss = super().forward(out1, out2, batch)
+            loss_dict[f"{self.name}_{pair[0]}_{pair[1]}"] = loss
+        return loss_dict
+
+
+class DistillationWSLLoss(WSLLoss):
+    """
+    DistillationWSLLoss
+    """
+
+    def __init__(self,
+                 model_name_pairs=[],
+                 key=None,
+                 temperature=2.0,
+                 name="wsl_loss"):
+        super().__init__(temperature)
+        self.model_name_pairs = model_name_pairs
+        self.key = key
         self.name = name
 
     def forward(self, predicts, batch):
