@@ -842,7 +842,7 @@ def cae_large_patch16_224(pretrained=True, use_ssld=False, **kwargs):
         qkv_bias=True,
         norm_layer=partial(
             nn.LayerNorm, epsilon=1e-6),
-        **kwargs)
+        **config)
 
     if enable_linear_eval:
         _enable_linear_eval(model)
