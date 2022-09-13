@@ -274,7 +274,11 @@ else
                 # export FLAGS_cudnn_deterministic=True
                 sleep 5
                 eval $cmd
-                eval "cat ${save_log}/${model_name}/train.log >> ${save_log}.log"
+                if [[ $FILENAME == *GeneralRecognition* ]]; then
+                    eval "cat ${save_log}/RecModel/train.log >> ${save_log}.log"
+                else
+                    eval "cat ${save_log}/${model_name}/train.log >> ${save_log}.log"
+                fi
                 status_check $? "${cmd}" "${status_log}" "${model_name}" "${save_log}.log"
                 sleep 5
 
