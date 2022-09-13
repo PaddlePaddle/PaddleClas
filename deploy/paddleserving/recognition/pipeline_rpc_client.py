@@ -15,20 +15,33 @@ try:
     from paddle_serving_server_gpu.pipeline import PipelineClient
 except ImportError:
     from paddle_serving_server.pipeline import PipelineClient
+
 import base64
+import os
 
 client = PipelineClient()
 client.connect(['127.0.0.1:9994'])
-imgpath = "../../drink_dataset_v1.0/test_images/001.jpeg"
+image_path = "../../drink_dataset_v2.0/test_images/100.jpeg"
 
-def cv2_to_base64(image):
-    return base64.b64encode(image).decode('utf8')
+
+def bytes_to_base64(image_bytes: bytes) -> bytes:
+    """encode bytes using base64 algorithm
+
+    Args:
+        image_bytes (bytes): bytes to be encoded
+
+    Returns:
+        bytes: base64 bytes
+    """
+    return base64.b64encode(image_bytes).decode('utf8')
+
 
 if __name__ == "__main__":
-    with open(imgpath, 'rb') as file:
-        image_data = file.read()
-    image = cv2_to_base64(image_data)
+    with open(os.path.join(".", image_path), 'rb') as file:
+        image_bytes = file.read()
+    image_base64 = bytes_to_base64(image_bytes)
 
     for i in range(1):
-        ret = client.predict(feed_dict={"image": image}, fetch=["result"])
+        ret = client.predict(
+            feed_dict={"image": image_base64}, fetch=["result"])
         print(ret)

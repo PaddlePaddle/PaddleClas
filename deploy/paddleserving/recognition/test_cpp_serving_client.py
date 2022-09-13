@@ -12,20 +12,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import numpy as np
-
-from paddle_serving_client import Client
-from paddle_serving_app.reader import *
-import cv2
-import faiss
 import os
 import pickle
+
+import cv2
+import faiss
+import numpy as np
+from paddle_serving_client import Client
 
 rec_nms_thresold = 0.05
 rec_score_thres = 0.5
 feature_normalize = True
 return_k = 1
-index_dir = "../../drink_dataset_v1.0/index"
+index_dir = "../../drink_dataset_v2.0/index"
 
 
 def init_index(index_dir):
@@ -41,7 +40,7 @@ def init_index(index_dir):
     return searcher, id_map
 
 
-#get box
+# get box
 def nms_to_rec_results(results, thresh=0.1):
     filtered_results = []
 
@@ -91,21 +90,21 @@ def postprocess(fetch_dict, feature_normalize, det_boxes, searcher, id_map,
             pred["rec_scores"] = scores[i][0]
             results.append(pred)
 
-    #do nms
+    # do NMS
     results = nms_to_rec_results(results, rec_nms_thresold)
     return results
 
 
-#do client
+# do client
 if __name__ == "__main__":
     client = Client()
     client.load_client_config([
         "../../models/picodet_PPLCNet_x2_5_mainbody_lite_v1.0_client",
-        "../../models/general_PPLCNet_x2_5_lite_v1.0_client"
+        "../../models/general_PPLCNetV2_base_pretrained_v1.0_client"
     ])
     client.connect(['127.0.0.1:9400'])
 
-    im = cv2.imread("../../drink_dataset_v1.0/test_images/001.jpeg")
+    im = cv2.imread("../../drink_dataset_v2.0/test_images/100.jpeg")
     im_shape = np.array(im.shape[:2]).reshape(-1)
     fetch_map = client.predict(
         feed={"image": im,
@@ -113,7 +112,7 @@ if __name__ == "__main__":
         fetch=["features", "boxes"],
         batch=False)
 
-    #add retrieval procedure
+    # add retrieval procedure
     det_boxes = fetch_map["boxes"]
     searcher, id_map = init_index(index_dir)
     results = postprocess(fetch_map, feature_normalize, det_boxes, searcher,

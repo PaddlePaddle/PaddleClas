@@ -69,14 +69,14 @@ MobileNetV1
 │   .
 │   .
 │   └── blocks12 (DepthwiseSeparable).............("blocks[12]")
-│       ├── depthwise_conv (ConvBNLayer)..........("blocks[0].depthwise_conv")
-│       │   ├── conv (nn.Conv2D)..................("blocks[0].depthwise_conv.conv")
-│       │   ├── bn (nn.BatchNorm).................("blocks[0].depthwise_conv.bn")
-│       │   └── relu (nn.ReLU)....................("blocks[0].depthwise_conv.relu")
-│       └── pointwise_conv (ConvBNLayer)..........("blocks[0].pointwise_conv")
-│           ├── conv (nn.Conv2D)..................("blocks[0].pointwise_conv.conv")
-│           ├── bn (nn.BatchNorm).................("blocks[0].pointwise_conv.bn")
-│           └── relu (nn.ReLU)....................("blocks[0].pointwise_conv.relu")
+│       ├── depthwise_conv (ConvBNLayer)..........("blocks[12].depthwise_conv")
+│       │   ├── conv (nn.Conv2D)..................("blocks[12].depthwise_conv.conv")
+│       │   ├── bn (nn.BatchNorm).................("blocks[12].depthwise_conv.bn")
+│       │   └── relu (nn.ReLU)....................("blocks[12].depthwise_conv.relu")
+│       └── pointwise_conv (ConvBNLayer)..........("blocks[12].pointwise_conv")
+│           ├── conv (nn.Conv2D)..................("blocks[12].pointwise_conv.conv")
+│           ├── bn (nn.BatchNorm).................("blocks[12].pointwise_conv.bn")
+│           └── relu (nn.ReLU)....................("blocks[12].pointwise_conv.relu")
 │
 ├── avg_pool (nn.AdaptiveAvgPool2D)...............("avg_pool")
 │
@@ -184,8 +184,8 @@ print("The result returned by update_res(): ", res)
 
 output = net(pd_input)
 print("The output's keys of processed net: ", output.keys())
-# The output's keys of net:  dict_keys(['output', 'blocks[0]', 'blocks[2]', 'blocks[4]', 'blocks[10]'])
-# 网络前向输出 output 为 dict 类型对象，其中，output["output"] 为网络最终输出，output["blocks[0]"] 等为网络中间层输出结果
+# The output's keys of net:  dict_keys(['logits', 'blocks[0]', 'blocks[2]', 'blocks[4]', 'blocks[10]'])
+# 网络前向输出 output 为 dict 类型对象，其中，output["logits"] 为网络最终输出，output["blocks[0]"] 等为网络中间层输出结果
 ```
 
 除了通过调用方法 `update_res()` 的方式之外，也同样可以在实例化网络对象时，通过指定参数 `return_patterns` 实现相同效果：

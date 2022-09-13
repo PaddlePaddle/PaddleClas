@@ -4,7 +4,7 @@ fp_item=pure_fp16
 run_mode=DP
 device_num=N1C1
 max_epochs=1
-num_workers=8
+num_workers=4
 
 # get data
 bash test_tipc/static/${model_item}/benchmark_common/prepare.sh
