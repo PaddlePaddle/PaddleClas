@@ -40,6 +40,9 @@ grep -n 'tools/.*yaml' $FILENAME  | cut -d ":" -f 1 \
     sed -i 's/device: gpu/device: npu/g' "$REPO_ROOT_PATH/$trainer_config"
 done
 
+# change gpu to npu in execution script
+sed -i "s/\"gpu\"/\"npu\"/g" test_tipc/test_train_inference_python.sh
+
 # pass parameters to test_train_inference_python.sh
 cmd="bash test_tipc/test_train_inference_python.sh ${FILENAME} $2"
 echo $cmd
