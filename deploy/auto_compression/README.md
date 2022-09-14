@@ -1,17 +1,18 @@
 # 图像分类模型自动压缩示例
 
 目录：
-- [1. 简介](#1简介)
-- [2. Benchmark](#2Benchmark)
-- [3. 自动压缩流程](#自动压缩流程)
+- [1. 简介](#1-简介)
+- [2. Benchmark](#2-benchmark)
+- [3. 自动压缩流程](#3-自动压缩流程)
   - [3.1 准备环境](#31-准备准备)
   - [3.2 准备数据集](#32-准备数据集)
   - [3.3 准备预测模型](#33-准备预测模型)
   - [3.4 自动压缩并产出模型](#34-自动压缩并产出模型)
-- [4. 预测部署](#4预测部署)
-  - [4.1 Python预测推理](#41-Python预测推理)
-  - [4.2 PaddleLite端侧部署](#42-PaddleLite端侧部署)
-- [5. FAQ](5FAQ)
+- [4. 配置文件介绍](#4-配置文件介绍)
+- [5. 预测部署](#5-预测部署)
+  - [5.1 Python预测推理](#51-python预测推理)
+  - [5.2 PaddleLite端侧部署](#52-paddlelite端侧部署)
+- [6. FAQ](#6-faq)
 
 
 ## 1. 简介
@@ -24,21 +25,18 @@
 | 模型 | 策略 | Top-1 Acc | GPU 耗时(ms) | ARM CPU 耗时(ms) | 配置文件 | Inference模型 |
 |:------:|:------:|:------:|:------:|:------:|:------:|:------:|
 | MobileNetV3_large_x1_0 | Baseline | 75.32 | - | 16.62 | - | [Model](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/MobileNetV3_large_x1_0_infer.tar) |
-| MobileNetV3_large_x1_0 | 量化+蒸馏 | 74.04 | - | 9.85 | [Config](./mbv3_qat_dis.yaml) | [Model](https://paddle-slim-models.bj.bcebos.com/act/MobileNetV3_large_x1_0_QAT.tar) |
+| MobileNetV3_large_x1_0 | 量化+蒸馏 | 74.40 | - | 9.85 | [Config](./mbv3_qat_dis.yaml) | [Model](https://paddle-slim-models.bj.bcebos.com/act/MobileNetV3_large_x1_0_QAT.tar) |
 
 
 - ARM CPU 测试环境：`SDM865(4xA77+4xA55)`
-- Nvidia GPU 测试环境：
-  - 硬件：NVIDIA Tesla T4 单卡
-  - 软件：CUDA 11.2, cuDNN 8.0, TensorRT 8.4
-  - 测试配置：batch_size: 1, image size: 224
+
 
 ## 3. 自动压缩流程
 
 #### 3.1 准备环境
 
 - python >= 3.6
-- PaddlePaddle >= 2.3 （可从[Paddle官网](https://www.paddlepaddle.org.cn/install/quick?docurl=/documentation/docs/zh/install/pip/linux-pip.html)下载安装）
+- PaddlePaddle >= 2.3 （可从[PaddlePaddle官网](https://www.paddlepaddle.org.cn/install/quick?docurl=/documentation/docs/zh/install/pip/linux-pip.html)下载安装）
 - PaddleSlim >= 2.3
 
 安装paddlepaddle：
@@ -59,7 +57,7 @@ pip install paddleslim
 
 
 #### 3.3 准备预测模型
-预测模型的格式为：`model.pdmodel` 和 `model.pdiparams`两个，带`pdmodel`的是模型文件，带`pdiparams`后缀的是权重文件。
+预测模型的格式为：`model.pdmodel` 和 `model.pdiparams`，带`pdmodel`后缀的是模型文件，带`pdiparams`后缀的是权重文件。
 
 注：其他像`__model__`和`__params__`分别对应`model.pdmodel` 和 `model.pdiparams`文件。
 
@@ -90,21 +88,35 @@ python run.py --save_dir='./save_quant_mobilev3/' --config_path='./configs/mbv3_
 export CUDA_VISIBLE_DEVICES=0,1,2,3
 python -m paddle.distributed.launch run.py --save_dir='./save_quant_mobilev3/' --config_path='./configs/mbv3_qat_dis.yaml'
 ```
-多卡训练指的是将训练任务按照一定方法拆分到多个训练节点完成数据读取、前向计算、反向梯度计算等过程，并将计算出的梯度上传至服务节点。服务节点在收到所有训练节点传来的梯度后，会将梯度聚合并更新参数。最后将参数发送给训练节点，开始新一轮的训练。多卡训练一轮训练能训练```batch size * num gpus```的数据，比如单卡的```batch size```为32，单轮训练的数据量即32，而四卡训练的```batch size```为32，单轮训练的数据量为128。
+多卡训练指的是将训练任务按照一定方法拆分到多个训练节点完成数据读取、前向计算、反向梯度计算等过程，并将计算出的梯度上传至服务节点。服务节点在收到所有训练节点传来的梯度后，会将梯度聚合并更新参数。最后将参数发送给训练节点，开始新一轮的训练。多卡训练一轮训练能训练```batch size * num gpus```的数据，比如单卡的```batch size```为128，单轮训练的数据量即128，而四卡训练的```batch size```为128，单轮训练的数据量为512。
 
-注意 ```learning rate``` 与 ```batch size``` 呈线性关系，这里单卡 ```batch size``` 为32，对应的 ```learning rate``` 为0.015，那么如果 ```batch size``` 减小4倍改为8，```learning rate``` 也需除以4；多卡时 ```batch size``` 为32，```learning rate``` 需乘上卡数。所以改变 ```batch size``` 或改变训练卡数都需要对应修改 ```learning rate```。
+注意 ```learning rate``` 与 ```batch size``` 呈线性关系，这里单卡 ```batch size``` 为128，对应的 ```learning rate``` 为0.001，那么如果 ```batch size``` 减小4倍改为32，```learning rate``` 也需除以4；多卡时 ```batch size``` 为128，```learning rate``` 需乘上卡数。所以改变 ```batch size``` 或改变训练卡数都需要对应修改 ```learning rate```。
+
+加载训练好的模型进行量化训练时，一般`learning rate`可比原始训练的`learning rate`小10倍。
+
+
+## 4. 配置文件
+自动压缩相关配置主要有：
+- 压缩策略配置，如量化（Quantization），知识蒸馏（Distillation），结构化稀疏（ChannelPrune），ASP半结构化稀疏（ASPPrune ），非结构化稀疏（UnstructurePrune）。
+- 训练超参配置（TrainConfig）：主要设置学习率、训练次数（epochs）和优化器等。
+- 全局配置（Global）：需提供inference模型文件路径，输入名称等信息。
+
+详细介绍可参考[ACT超参详细教程](https://github.com/PaddlePaddle/PaddleSlim/blob/develop/example/auto_compression/hyperparameter_tutorial.md)
+
+注意```DataLoader```的使用与```PaddleClas```中的相同，保持与```PaddleClas```中相同配置即可。不同模型```DataLoader```的配置可参考[PaddleClas配置文件](https://github.com/PaddlePaddle/PaddleClas/tree/develop/ppcls/configs/ImageNet)。
 
 
 
-## 4.预测部署
-#### 4.1 Python预测推理
+
+## 5. 预测部署
+#### 5.1 Python预测推理
 Python预测推理可参考：
 - [Python部署](https://github.com/PaddlePaddle/PaddleClas/blob/develop/docs/zh_CN/inference_deployment/python_deploy.md)
 
 
 
-#### 4.2 PaddleLite端侧部署
+#### 5.2 PaddleLite端侧部署
 PaddleLite端侧部署可参考：
 - [Paddle Lite部署](https://github.com/PaddlePaddle/PaddleClas/blob/develop/docs/zh_CN/inference_deployment/paddle_lite_deploy.md)
 
-## 5.FAQ
+## 6. FAQ
