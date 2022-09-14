@@ -606,7 +606,7 @@ WSL (Weighted Soft Labels) 损失函数根据教师模型与学生模型关于�
 | 策略 | 骨干网络 | 配置文件 | Top-1 acc | 下载链接 |
 | --- | --- | --- | --- | --- |
 | baseline | ResNet18 | [ResNet18.yaml](../../../ppcls/configs/ImageNet/ResNet/ResNet18.yaml) | 70.8% | - |
-| WSL | ResNet18 | [resnet34_distill_resnet18_wsl.yaml](../../../ppcls/configs/ImageNet/Distillation/esnet34_distill_resnet18_wsl.yaml) | 72.23%(**+1.43%**) | - |
+| WSL | ResNet18 | [resnet34_distill_resnet18_wsl.yaml](../../../ppcls/configs/ImageNet/Distillation/resnet34_distill_resnet18_wsl.yaml) | 72.23%(**+1.43%**) | - |
 
 
 ##### 1.2.8.2 WSL 配置
