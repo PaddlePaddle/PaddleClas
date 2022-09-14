@@ -192,9 +192,19 @@ function func_serving_rec(){
     det_trans_model_cmd="${python_interp} ${trans_model_py} ${set_dirname} ${set_model_filename} ${set_params_filename} ${set_serving_server} ${set_serving_client}"
     eval ${det_trans_model_cmd}
 
-    cp_prototxt_cmd="cp ./paddleserving/recognition/preprocess/general_PPLCNet_x2_5_lite_v1.0_serving/*.prototxt ${cls_serving_server_value}"
+    OLD_IFS="${IFS}"
+    IFS='/'
+    tmp_arr=($cls_serving_server_value)
+    lastIndex=$((${#tmp_arr[@]}-1))
+    cls_serving_server_dirname="${tmp_arr[lastIndex]}"
+    tmp_arr=($cls_serving_client_value)
+    lastIndex=$((${#tmp_arr[@]}-1))
+    cls_serving_client_dirname="${tmp_arr[lastIndex]}"
+    IFS="${OLD_IFS}"
+
+    cp_prototxt_cmd="cp ./paddleserving/recognition/preprocess/${cls_serving_server_dirname}/*.prototxt ${cls_serving_server_value}"
     eval ${cp_prototxt_cmd}
-    cp_prototxt_cmd="cp ./paddleserving/recognition/preprocess/general_PPLCNet_x2_5_lite_v1.0_client/*.prototxt ${cls_serving_client_value}"
+    cp_prototxt_cmd="cp ./paddleserving/recognition/preprocess/${cls_serving_client_dirname}/*.prototxt ${cls_serving_client_value}"
     eval ${cp_prototxt_cmd}
     cp_prototxt_cmd="cp ./paddleserving/recognition/preprocess/picodet_PPLCNet_x2_5_mainbody_lite_v1.0_client/*.prototxt ${det_serving_client_value}"
     eval ${cp_prototxt_cmd}

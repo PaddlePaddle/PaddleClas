@@ -43,7 +43,8 @@ function func_get_url_file_name() {
 model_name=$(func_parser_value "${lines[1]}")
 
 # install paddleclas whl
-python setup.py install
+python_name=$(func_parser_value "${lines[2]}")
+${python_name} setup.py install
 
 if [[ ${MODE} = "cpp_infer" ]]; then
     if [ -d "./deploy/cpp/opencv-3.4.7/opencv3/" ] && [ $(md5sum ./deploy/cpp/opencv-3.4.7.tar.gz | awk -F ' ' '{print $1}') = "faa2b5950f8bee3f03118e600c74746a" ]; then
@@ -142,6 +143,8 @@ if [[ ${MODE} = "cpp_infer" ]]; then
             cd dataset
             wget -nc https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/data/drink_dataset_v1.0.tar
             tar -xf drink_dataset_v1.0.tar
+            wget -nc https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/data/drink_dataset_v2.0.tar
+            tar -xf drink_dataset_v2.0.tar
         else
             echo "Wrong cpp type in config file in line 3. only support cls, shitu"
         fi
@@ -170,8 +173,9 @@ if [[ $model_name == *ShiTu* ]]; then
     ln -s demo_test.txt val_list.txt
     cd ../../
     eval "wget -nc $model_url_value --no-check-certificate"
-    mv general_PPLCNet_x2_5_pretrained_v1.0.pdparams GeneralRecognition_PPLCNet_x2_5_pretrained.pdparams
-    exit 0
+    if [[ -d "./general_PPLCNet_x2_5_pretrained_v1.0.pdparams" ]]; then
+        mv general_PPLCNet_x2_5_pretrained_v1.0.pdparams GeneralRecognition_PPLCNet_x2_5_pretrained.pdparams
+    fi
 fi
 
 if [[ $FILENAME == *use_dali* ]]; then
@@ -243,12 +247,12 @@ elif [[ ${MODE} = "whole_infer" ]]; then
         cd ../../
     fi
     # download inference or pretrained model
-    eval "wget -nc $model_url_value"
+    eval "wget -nc ${model_url_value}"
     if [[ ${model_url_value} =~ ".tar" ]]; then
         tar_name=$(func_get_url_file_name "${model_url_value}")
-        echo $tar_name
-        rm -rf {tar_name}
-        tar xf ${tar_name}
+        echo ${tar_name}
+        eval "tar -xf ${tar_name}"
+        rm -f ${tar_name}
     fi
     if [[ $model_name == "SwinTransformer_large_patch4_window7_224" || $model_name == "SwinTransformer_large_patch4_window12_384" ]]; then
         cmd="mv ${model_name}_22kto1k_pretrained.pdparams ${model_name}_pretrained.pdparams"
@@ -278,7 +282,7 @@ fi
 if [[ ${MODE} = "serving_infer" ]]; then
     # prepare serving env
     python_name=$(func_parser_value "${lines[2]}")
-    if [[ ${model_name} = "PPShiTu" ]]; then
+    if [[ ${model_name} =~ "PPShiTu" ]]; then
         cls_inference_model_url=$(func_parser_value "${lines[3]}")
         cls_tar_name=$(func_get_url_file_name "${cls_inference_model_url}")
         det_inference_model_url=$(func_parser_value "${lines[4]}")
@@ -286,6 +290,8 @@ if [[ ${MODE} = "serving_infer" ]]; then
         cd ./deploy
         wget -nc https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/data/drink_dataset_v1.0.tar --no-check-certificate
         tar -xf drink_dataset_v1.0.tar
+        wget -nc https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/data/drink_dataset_v2.0.tar --no-check-certificate
+        tar -xf drink_dataset_v2.0.tar
         mkdir models
         cd models
         wget -nc ${cls_inference_model_url} && tar xf ${cls_tar_name}
@@ -319,6 +325,7 @@ if [[ ${MODE} = "paddle2onnx_infer" ]]; then
     inference_model_url=$(func_parser_value "${lines[10]}")
     tar_name=${inference_model_url##*/}
 
+    ${python_name} -m pip install onnx
     ${python_name} -m pip install paddle2onnx
     ${python_name} -m pip install onnxruntime
     if [[ ${model_name} =~ "GeneralRecognition" ]]; then
@@ -335,14 +342,12 @@ if [[ ${MODE} = "paddle2onnx_infer" ]]; then
         rm -rf val_list.txt
         ln -s demo_test.txt val_list.txt
         cd ../../
-        eval "wget -nc $model_url_value --no-check-certificate"
-        mv general_PPLCNet_x2_5_pretrained_v1.0.pdparams GeneralRecognition_PPLCNet_x2_5_pretrained.pdparams
     fi
     cd deploy
     mkdir models
     cd models
     wget -nc ${inference_model_url}
-    tar xf ${tar_name}
+    eval "tar -xf ${tar_name}"
     cd ../../
 fi
 

@@ -20,8 +20,8 @@ Arch:
   name: RecModel
   infer_output_key: features
   infer_add_softmax: False
-  
-  Backbone: 
+
+  Backbone:
     name: MobileNetV1
     pretrained: False
   BackboneStopLayer:
@@ -31,12 +31,12 @@ Arch:
     embedding_size: 1024
     class_num: 512
   Head:
-    name: ArcMargin  
+    name: ArcMargin
     embedding_size: 512
     class_num: 101
     margin: 0.15
     scale: 30
-   
+
 # loss function config for traing/eval process
 Loss:
   Train:
@@ -60,7 +60,7 @@ Optimizer:
     verbose: False
     last_epoch: -1
   regularizer:
-    name: 'L2'
+    name: "L2"
     coeff: 0.0005
 
 # data loader for train and eval
@@ -82,7 +82,7 @@ DataLoader:
             scale: 0.00392157
             mean: [0.485, 0.456, 0.406]
             std: [0.229, 0.224, 0.225]
-            order: ''
+            order: ""
         - RandomErasing:
             EPSILON: 0.5
             sl: 0.02
@@ -98,10 +98,10 @@ DataLoader:
     loader:
       num_workers: 4
       use_shared_memory: True
-      
+
   Eval:
     Query:
-      dataset: 
+      dataset:
         name: VeriWild
         image_root: ./dataset/CUB_200_2011/
         cls_label_path: ./dataset/CUB_200_2011/test_list.txt
@@ -115,7 +115,7 @@ DataLoader:
               scale: 0.00392157
               mean: [0.485, 0.456, 0.406]
               std: [0.229, 0.224, 0.225]
-              order: ''
+              order: ""
       sampler:
         name: DistributedBatchSampler
         batch_size: 64
@@ -126,7 +126,7 @@ DataLoader:
         use_shared_memory: True
 
     Gallery:
-      dataset: 
+      dataset:
         name: VeriWild
         image_root: ./dataset/CUB_200_2011/
         cls_label_path: ./dataset/CUB_200_2011/test_list.txt
@@ -140,7 +140,7 @@ DataLoader:
               scale: 1.0/255.0
               mean: [0.485, 0.456, 0.406]
               std: [0.229, 0.224, 0.225]
-              order: ''
+              order: ""
       sampler:
         name: DistributedBatchSampler
         batch_size: 64
@@ -155,4 +155,3 @@ Metric:
     - Recallk:
         topk: [1, 5]
     - mAP: {}
-

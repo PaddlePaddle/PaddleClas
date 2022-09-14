@@ -10,6 +10,7 @@ Linux GPU/CPU 混合精度训练推理测试的主程序为`test_train_inference
 | :-------------: | :-------------------------------------: | :----------: | :----------: |
 |   MobileNetV3   |         MobileNetV3_large_x1_0          | 混合精度训练 | 混合精度训练 |
 |    PP-ShiTu     |     GeneralRecognition_PPLCNet_x2_5     | 混合精度训练 | 混合精度训练 |
+|   PP-ShiTuV2    |   GeneralRecognitionV2_PPLCNetV2_base   | 混合精度训练 | 混合精度训练 |
 |     PPHGNet     |              PPHGNet_small              | 混合精度训练 | 混合精度训练 |
 |     PPHGNet     |              PPHGNet_tiny               | 混合精度训练 | 混合精度训练 |
 |     PPLCNet     |              PPLCNet_x0_25              | 混合精度训练 | 混合精度训练 |
@@ -31,6 +32,7 @@ Linux GPU/CPU 混合精度训练推理测试的主程序为`test_train_inference
 | :-------------: | :-------------------------------------: | :--------: | :--------: | :-------: |
 |   MobileNetV3   |         MobileNetV3_large_x1_0          |    支持    |    支持    |     1     |
 |    PP-ShiTu     |     GeneralRecognition_PPLCNet_x2_5     |    支持    |    支持    |     1     |
+|   PP-ShiTuV2    |   GeneralRecognitionV2_PPLCNetV2_base   |    支持    |    支持    |     1     |
 |     PPHGNet     |              PPHGNet_small              |    支持    |    支持    |     1     |
 |     PPHGNet     |              PPHGNet_tiny               |    支持    |    支持    |     1     |
 |     PPLCNet     |              PPLCNet_x0_25              |    支持    |    支持    |     1     |

@@ -533,7 +533,7 @@ Loss:
 | 策略 | 骨干网络 | 配置文件 | Top-1 acc | 下载链接 |
 | --- | --- | --- | --- | --- |
 | baseline | ResNet18 | [ResNet18.yaml](../../../ppcls/configs/ImageNet/ResNet/ResNet18.yaml) | 70.8% | - |
-| MGD | ResNet18 | [resnet34_distill_resnet18_dist.yaml](../../../ppcls/configs/ImageNet/Distillation/resnet34_distill_resnet18_mgd.yaml) | 71.86%(**+1.06%**) | - |
+| MGD | ResNet18 | [resnet34_distill_resnet18_mgd.yaml](../../../ppcls/configs/ImageNet/Distillation/resnet34_distill_resnet18_mgd.yaml) | 71.86%(**+1.06%**) | - |
 
 
 ##### 1.2.7.2 MGD 配置
