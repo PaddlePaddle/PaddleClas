@@ -11,7 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 import os
 
 import cv2
@@ -136,7 +135,8 @@ def main(config):
             for number, result_dict in enumerate(batch_results):
                 if "PersonAttribute" in config[
                         "PostProcess"] or "VehicleAttribute" in config[
-                            "PostProcess"]:
+                            "PostProcess"] or "TableAttribute" in config[
+                                "PostProcess"]:
                     filename = batch_names[number]
                     print("{}:\t {}".format(filename, result_dict))
                 else:
