@@ -13,36 +13,32 @@
 # limitations under the License.
 
 import os
-import argparse
-import base64
 import numpy as np
 
 import cv2
-def get_image_list_from_txt(dataset, img_file, img_path=None):
+from collections import defaultdict
+
+
+def get_image_list_from_txt(dataset, img_file, dir_path=None):
     imgs_lists = {}
     if img_file is None or not os.path.exists(img_file):
         print("infer_imgs file of {} not found".format(dataset))
         return None
 
-    img_end = ['jpg', 'png', 'jpeg', 'JPEG', 'JPG', 'bmp']
-    
-    f = open(img_file)
-    file_list = f.readlines()
+    imgs_lists = defaultdict(list)
+    img_end = ['jpg', 'png', 'jpeg', 'bmp']
+
+    file_list = open(img_file).readlines()
     for img in file_list:
-        label = img.split()[1]
-        if label not in imgs_lists:
-            imgs_lists[label] = []
-        img = img.split()[0]
-        if img.split('.')[-1] in img_end:
-            if img_path is not None:
-                img = os.path.join(img_path, img)
+        [img, label] = img.split()
+        if img.split('.')[-1].lower() in img_end:
+            if dir_path is not None:
+                img = os.path.join(dir_path, img)
             if img is None or not os.path.exists(img):
                 return None
             imgs_lists[label].append(img)
 
     if len(imgs_lists) == 0:
         return None
-    # imgs_lists = sorted(imgs_lists)
 
     return imgs_lists
-
