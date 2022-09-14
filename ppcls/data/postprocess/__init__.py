@@ -21,6 +21,7 @@ from .threshoutput import ThreshOutput, MultiLabelThreshOutput
 from .attr_rec import VehicleAttribute, PersonAttribute
 
 
+
 def build_postprocess(config):
     config = copy.deepcopy(config)
     model_name = config.pop("name")

@@ -69,10 +69,12 @@ from .model_zoo.repvgg import RepVGG_A0, RepVGG_A1, RepVGG_A2, RepVGG_B0, RepVGG
 from .model_zoo.van import VAN_tiny
 from .model_zoo.peleenet import PeleeNet
 from .model_zoo.convnext import ConvNeXt_tiny
+from .model_zoo.cae import cae_base_patch16_224, cae_large_patch16_224
 
 from .variant_models.resnet_variant import ResNet50_last_stage_stride1
 from .variant_models.vgg_variant import VGG19Sigmoid
 from .variant_models.pp_lcnet_variant import PPLCNet_x2_5_Tanh
+from .variant_models.pp_lcnetv2_variant import PPLCNetV2_base_ShiTu
 from .model_zoo.adaface_ir_net import AdaFace_IR_18, AdaFace_IR_34, AdaFace_IR_50, AdaFace_IR_101, AdaFace_IR_152, AdaFace_IR_SE_50, AdaFace_IR_SE_101, AdaFace_IR_SE_152, AdaFace_IR_SE_200
 
 

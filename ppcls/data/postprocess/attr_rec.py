@@ -71,7 +71,6 @@ class VehicleAttribute(object):
         return batch_res
 
 
-
 class PersonAttribute(object):
     def __init__(self,
                  threshold=0.5,
@@ -171,3 +170,58 @@ class PersonAttribute(object):
             batch_res.append({"attributes": label_res, "output": pred_res})
         return batch_res
 
+
+class TableAttribute(object):
+    def __init__(
+            self,
+            source_threshold=0.5,
+            number_threshold=0.5,
+            color_threshold=0.5,
+            clarity_threshold=0.5,
+            obstruction_threshold=0.5,
+            angle_threshold=0.5, ):
+        self.source_threshold = source_threshold
+        self.number_threshold = number_threshold
+        self.color_threshold = color_threshold
+        self.clarity_threshold = clarity_threshold
+        self.obstruction_threshold = obstruction_threshold
+        self.angle_threshold = angle_threshold
+
+    def __call__(self, x, file_names=None):
+        if isinstance(x, dict):
+            x = x['logits']
+        assert isinstance(x, paddle.Tensor)
+        if file_names is not None:
+            assert x.shape[0] == len(file_names)
+        x = F.sigmoid(x).numpy()
+
+        # postprocess output of predictor
+        batch_res = []
+        for idx, res in enumerate(x):
+            res = res.tolist()
+            label_res = []
+            source = 'Scanned' if res[0] > self.source_threshold else 'Photo'
+            number = 'Little' if res[1] > self.number_threshold else 'Numerous'
+            color = 'Black-and-White' if res[
+                2] > self.color_threshold else 'Multicolor'
+            clarity = 'Clear' if res[3] > self.clarity_threshold else 'Blurry'
+            obstruction = 'Without-Obstacles' if res[
+                4] > self.number_threshold else 'With-Obstacles'
+            angle = 'Horizontal' if res[
+                5] > self.number_threshold else 'Tilted'
+
+            label_res = [source, number, color, clarity, obstruction, angle]
+
+            threshold_list = [
+                self.source_threshold, self.number_threshold,
+                self.color_threshold, self.clarity_threshold,
+                self.obstruction_threshold, self.angle_threshold
+            ]
+            pred_res = (np.array(res) > np.array(threshold_list)
+                        ).astype(np.int8).tolist()
+            batch_res.append({
+                "attributes": label_res,
+                "output": pred_res,
+                "file_name": file_names[idx]
+            })
+        return batch_res

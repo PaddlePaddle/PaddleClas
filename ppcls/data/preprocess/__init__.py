@@ -38,9 +38,11 @@ from ppcls.data.preprocess.ops.operators import CropWithPadding
 from ppcls.data.preprocess.ops.operators import RandomInterpolationAugment
 from ppcls.data.preprocess.ops.operators import ColorJitter
 from ppcls.data.preprocess.ops.operators import RandomCropImage
+from ppcls.data.preprocess.ops.operators import RandomRotation
 from ppcls.data.preprocess.ops.operators import Padv2
 
 from ppcls.data.preprocess.batch_ops.batch_operators import MixupOperator, CutmixOperator, OpSampler, FmixOperator
+from ppcls.data.preprocess.batch_ops.batch_operators import MixupCutmixHybrid
 
 import numpy as np
 from PIL import Image

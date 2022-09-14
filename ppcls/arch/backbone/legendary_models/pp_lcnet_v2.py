@@ -126,6 +126,8 @@ class RepDepthwiseSeparable(TheseusLayer):
                  use_se=False,
                  use_shortcut=False):
         super().__init__()
+        self.in_channels = in_channels
+        self.out_channels = out_channels
         self.is_repped = False
 
         self.dw_size = dw_size
@@ -306,8 +308,8 @@ class PPLCNetV2(TheseusLayer):
             self.dropout = Dropout(p=dropout_prob, mode="downscale_in_infer")
 
         self.flatten = nn.Flatten(start_axis=1, stop_axis=-1)
-        in_features = self.class_expand if self.use_last_conv else NET_CONFIG[
-            "stage4"][0] * 2 * scale
+        in_features = self.class_expand if self.use_last_conv else make_divisible(
+            NET_CONFIG["stage4"][0] * 2 * scale)
         self.fc = Linear(in_features, class_num)
 
     def forward(self, x):

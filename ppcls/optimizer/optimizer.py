@@ -272,3 +272,145 @@ class AdamW(object):
 
     def _apply_decay_param_fun(self, name):
         return name not in self.no_weight_decay_param_name_list
+
+
+class AdamWDL(object):
+    """
+    The AdamWDL optimizer is implemented based on the AdamW Optimization with dynamic lr setting.
+    Generally it's used for transformer model.
+    """
+
+    def __init__(self,
+                 learning_rate=0.001,
+                 beta1=0.9,
+                 beta2=0.999,
+                 epsilon=1e-8,
+                 weight_decay=None,
+                 multi_precision=False,
+                 grad_clip=None,
+                 layerwise_decay=None,
+                 filter_bias_and_bn=True,
+                 **args):
+        self.learning_rate = learning_rate
+        self.beta1 = beta1
+        self.beta2 = beta2
+        self.epsilon = epsilon
+        self.grad_clip = grad_clip
+        self.weight_decay = weight_decay
+        self.multi_precision = multi_precision
+        self.layerwise_decay = layerwise_decay
+        self.filter_bias_and_bn = filter_bias_and_bn
+
+    class AdamWDLImpl(optim.AdamW):
+        def __init__(self,
+                     learning_rate=0.001,
+                     beta1=0.9,
+                     beta2=0.999,
+                     epsilon=1e-8,
+                     parameters=None,
+                     weight_decay=0.01,
+                     apply_decay_param_fun=None,
+                     grad_clip=None,
+                     lazy_mode=False,
+                     multi_precision=False,
+                     layerwise_decay=1.0,
+                     n_layers=12,
+                     name_dict=None,
+                     name=None):
+            if not isinstance(layerwise_decay, float) and \
+                    not isinstance(layerwise_decay, fluid.framework.Variable):
+                raise TypeError("coeff should be float or Tensor.")
+            self.layerwise_decay = layerwise_decay
+            self.name_dict = name_dict
+            self.n_layers = n_layers
+            self.set_param_lr_fun = self._layerwise_lr_decay
+            super().__init__(
+                learning_rate=learning_rate,
+                parameters=parameters,
+                beta1=beta1,
+                beta2=beta2,
+                epsilon=epsilon,
+                grad_clip=grad_clip,
+                name=name,
+                apply_decay_param_fun=apply_decay_param_fun,
+                weight_decay=weight_decay,
+                lazy_mode=lazy_mode,
+                multi_precision=multi_precision)
+
+        def _append_optimize_op(self, block, param_and_grad):
+            if self.set_param_lr_fun is None:
+                return super(AdamLW, self)._append_optimize_op(block,
+                                                               param_and_grad)
+
+            self._append_decoupled_weight_decay(block, param_and_grad)
+            prev_lr = param_and_grad[0].optimize_attr["learning_rate"]
+            self.set_param_lr_fun(self.layerwise_decay, self.name_dict,
+                                  self.n_layers, param_and_grad[0])
+            # excute Adam op
+            res = super(optim.AdamW, self)._append_optimize_op(block,
+                                                               param_and_grad)
+            param_and_grad[0].optimize_attr["learning_rate"] = prev_lr
+            return res
+
+        # Layerwise decay
+        def _layerwise_lr_decay(self, decay_rate, name_dict, n_layers, param):
+            """
+            Args:
+                decay_rate (float): 
+                    The layer-wise decay ratio.
+                name_dict (dict): 
+                    The keys of name_dict is dynamic name of model while the value
+                    of name_dict is static name.
+                    Use model.named_parameters() to get name_dict.
+                n_layers (int):
+                    Total number of layers in the transformer encoder.
+            """
+            ratio = 1.0
+            static_name = name_dict[param.name]
+            if "blocks" in static_name:
+                idx = static_name.find("blocks.")
+                layer = int(static_name[idx:].split(".")[1])
+                ratio = decay_rate**(n_layers - layer)
+            elif "embed" in static_name:
+                ratio = decay_rate**(n_layers + 1)
+            param.optimize_attr["learning_rate"] *= ratio
+
+    def __call__(self, model_list):
+        model = model_list[0]
+        if self.weight_decay and self.filter_bias_and_bn:
+            skip = {}
+            if hasattr(model, 'no_weight_decay'):
+                skip = model.no_weight_decay()
+            decay_dict = {
+                param.name: not (len(param.shape) == 1 or
+                                 name.endswith(".bias") or name in skip)
+                for name, param in model.named_parameters()
+                if not 'teacher' in name
+            }
+            parameters = [
+                param for param in model.parameters()
+                if 'teacher' not in param.name
+            ]
+            weight_decay = 0.
+        else:
+            parameters = model.parameters()
+
+        opt_args = dict(
+            learning_rate=self.learning_rate, weight_decay=self.weight_decay)
+        opt_args['parameters'] = parameters
+        if decay_dict is not None:
+            opt_args['apply_decay_param_fun'] = lambda n: decay_dict[n]
+        opt_args['epsilon'] = self.epsilon
+        opt_args['beta1'] = self.beta1
+        opt_args['beta2'] = self.beta2
+        if self.layerwise_decay and self.layerwise_decay < 1.0:
+            opt_args['layerwise_decay'] = self.layerwise_decay
+            name_dict = dict()
+            for n, p in model.named_parameters():
+                name_dict[p.name] = n
+            opt_args['name_dict'] = name_dict
+            opt_args['n_layers'] = model.get_num_layers()
+
+        optimizer = self.AdamWDLImpl(**opt_args)
+
+        return optimizer

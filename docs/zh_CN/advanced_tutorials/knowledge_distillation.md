@@ -16,6 +16,7 @@
         - [1.2.5 DKD](#1.2.5)
         - [1.2.6 DIST](#1.2.6)
         - [1.2.7 MGD](#1.2.7)
+        - [1.2.8 WSL](#1.2.8)
 - [2. 使用方法](#2)
     - [2.1 环境配置](#2.1)
     - [2.2 数据准备](#2.2)
@@ -399,7 +400,7 @@ DKD将蒸馏中常用的 KD Loss 进行了解耦成为Target Class Knowledge Dis
 | 策略 | 骨干网络 | 配置文件 | Top-1 acc | 下载链接 |
 | --- | --- | --- | --- | --- |
 | baseline | ResNet18 | [ResNet18.yaml](../../../ppcls/configs/ImageNet/ResNet/ResNet18.yaml) | 70.8% | - |
-| AFD | ResNet18 | [resnet34_distill_resnet18_dkd.yaml](../../../ppcls/configs/ImageNet/Distillation/resnet34_distill_resnet18_dkd.yaml) | 72.59%(**+1.79%**) | - |
+| DKD | ResNet18 | [resnet34_distill_resnet18_dkd.yaml](../../../ppcls/configs/ImageNet/Distillation/resnet34_distill_resnet18_dkd.yaml) | 72.59%(**+1.79%**) | - |
 
 
 ##### 1.2.5.2 DKD 配置
@@ -533,7 +534,7 @@ Loss:
 | 策略 | 骨干网络 | 配置文件 | Top-1 acc | 下载链接 |
 | --- | --- | --- | --- | --- |
 | baseline | ResNet18 | [ResNet18.yaml](../../../ppcls/configs/ImageNet/ResNet/ResNet18.yaml) | 70.8% | - |
-| MGD | ResNet18 | [resnet34_distill_resnet18_dist.yaml](../../../ppcls/configs/ImageNet/Distillation/resnet34_distill_resnet18_mgd.yaml) | 71.86%(**+1.06%**) | - |
+| MGD | ResNet18 | [resnet34_distill_resnet18_mgd.yaml](../../../ppcls/configs/ImageNet/Distillation/resnet34_distill_resnet18_mgd.yaml) | 71.86%(**+1.06%**) | - |
 
 
 ##### 1.2.7.2 MGD 配置
@@ -578,6 +579,73 @@ Loss:
         t_keys: ["blocks[15]"]  # feature map used to calculate MGD loss in teacher model
         student_channels: 512   # channel num for stduent feature map
         teacher_channels: 512   # channel num for teacher feature map
+  Eval:
+    - CELoss:
+        weight: 1.0
+```
+
+<a name='1.2.8'></a>
+
+#### 1.2.8 WSL
+
+##### 1.2.8.1 WSL 算法介绍
+
+论文信息：
+
+
+> [Rethinking Soft Labels For Knowledge Distillation: A Bias-variance Tradeoff Perspective](https://arxiv.org/abs/2102.0650)
+>
+> Helong Zhou, Liangchen Song, Jiajie Chen, Ye Zhou, Guoli Wang, Junsong Yuan, Qian Zhang
+>
+> ICLR, 2021
+
+WSL (Weighted Soft Labels) 损失函数根据教师模型与学生模型关于真值标签的 CE Loss 比值，对每个样本的 KD Loss 分别赋予权重。若学生模型相对教师模型在某个样本上预测结果更好，则对该样本赋予较小的权重。该方法简单、有效，使各个样本的权重可自适应调节，提升了蒸馏精度。
+
+在ImageNet1k公开数据集上，效果如下所示。
+
+| 策略 | 骨干网络 | 配置文件 | Top-1 acc | 下载链接 |
+| --- | --- | --- | --- | --- |
+| baseline | ResNet18 | [ResNet18.yaml](../../../ppcls/configs/ImageNet/ResNet/ResNet18.yaml) | 70.8% | - |
+| WSL | ResNet18 | [resnet34_distill_resnet18_wsl.yaml](../../../ppcls/configs/ImageNet/Distillation/resnet34_distill_resnet18_wsl.yaml) | 72.23%(**+1.43%**) | - |
+
+
+##### 1.2.8.2 WSL 配置
+
+WSL 配置如下所示。在模型构建Arch字段中，需要同时定义学生模型与教师模型，教师模型固定参数，且需要加载预训练模型。在损失函数Loss字段中，需要定义`DistillationGTCELoss`（学生与真值标签之间的CE loss）以及`DistillationWSLLoss`（学生与教师之间的WSL loss），作为训练的损失函数。
+
+
+```yaml
+# model architecture
+Arch:
+  name: "DistillationModel"
+  # if not null, its lengths should be same as models
+  pretrained_list:
+  # if not null, its lengths should be same as models
+  freeze_params_list:
+  - True
+  - False
+  models:
+    - Teacher:
+        name: ResNet34
+        pretrained: True
+
+    - Student:
+        name: ResNet18
+        pretrained: False
+
+  infer_model_name: "Student"
+
+
+# loss function config for traing/eval process
+Loss:
+  Train:
+    - DistillationGTCELoss:
+        weight: 1.0
+        model_names: ["Student"]
+    - DistillationWSLLoss:
+        weight: 2.5
+        model_name_pairs: [["Student", "Teacher"]]
+        temperature: 2
   Eval:
     - CELoss:
         weight: 1.0

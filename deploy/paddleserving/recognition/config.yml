@@ -16,9 +16,8 @@ op:
 
         #当op配置没有server_endpoints时，从local_service_conf读取本地服务配置
         local_service_conf:
-
             #uci模型路径
-            model_config: ../../models/general_PPLCNet_x2_5_lite_v1.0_serving
+            model_config: ../../models/general_PPLCNetV2_base_pretrained_v1.0_serving
 
             #计算硬件类型: 空缺时由devices决定(CPU/GPU)，0=cpu, 1=gpu, 2=tensorRT, 3=arm cpu, 4=kunlun xpu
             device_type: 1
@@ -37,7 +36,7 @@ op:
         local_service_conf:
             client_type: local_predictor
             device_type: 1
-            devices: '0'
+            devices: "0"
             fetch_list:
-            - save_infer_model/scale_0.tmp_1
+                - save_infer_model/scale_0.tmp_1
             model_config: ../../models/picodet_PPLCNet_x2_5_mainbody_lite_v1.0_serving/

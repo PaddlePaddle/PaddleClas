@@ -1,0 +1,16 @@
+===========================paddle2onnx_params===========================
+model_name:PP-ShiTu_mainbody_det
+python:python3.7
+2onnx: paddle2onnx
+--model_dir:./deploy/models/picodet_lcnet_x2_5_640_mainbody_infer/
+--model_filename:inference.pdmodel
+--params_filename:inference.pdiparams
+--save_file:./deploy/models/picodet_lcnet_x2_5_640_mainbody_infer/inference.onnx
+--opset_version:11
+--enable_onnx_checker:True
+inference_model_url:https://paddledet.bj.bcebos.com/models/picodet_lcnet_x2_5_640_mainbody_infer.tar
+inference:null
+Global.use_onnx:null
+Global.inference_model_dir:null
+Global.use_gpu:null
+-c:null

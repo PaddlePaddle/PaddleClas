@@ -11,17 +11,24 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from paddle_serving_server.web_service import WebService, Op
-import logging
-import numpy as np
-import sys
-import cv2
-from paddle_serving_app.reader import *
 import base64
-import os
-import faiss
-import pickle
 import json
+import logging
+import os
+import pickle
+import sys
+
+import cv2
+import faiss
+import numpy as np
+from paddle_serving_app.reader import BGR2RGB
+from paddle_serving_app.reader import Div
+from paddle_serving_app.reader import Normalize
+from paddle_serving_app.reader import RCNNPostprocess
+from paddle_serving_app.reader import Resize
+from paddle_serving_app.reader import Sequential
+from paddle_serving_app.reader import Transpose
+from paddle_serving_server.web_service import Op, WebService
 
 
 class DetOp(Op):
@@ -101,11 +108,11 @@ class RecOp(Op):
     def init_op(self):
         self.seq = Sequential([
             BGR2RGB(), Resize((224, 224)), Div(255),
-            Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225],
-                      False), Transpose((2, 0, 1))
+            Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225], False),
+            Transpose((2, 0, 1))
         ])
 
-        index_dir = "../../drink_dataset_v1.0/index"
+        index_dir = "../../drink_dataset_v2.0/index"
         assert os.path.exists(os.path.join(
             index_dir, "vector.index")), "vector.index not found ..."
         assert os.path.exists(os.path.join(
@@ -136,7 +143,7 @@ class RecOp(Op):
         })
         self.det_boxes = boxes
 
-        #construct batch images for rec
+        # construct batch images for rec
         imgs = []
         for box in boxes:
             box = [int(x) for x in box["bbox"]]
@@ -192,7 +199,7 @@ class RecOp(Op):
                 pred["rec_scores"] = scores[i][0]
                 results.append(pred)
 
-        #do nms
+        # do NMS
         results = self.nms_to_rec_results(results, self.rec_nms_thresold)
         return {"result": str(results)}, None, ""
 

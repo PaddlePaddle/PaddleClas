@@ -69,14 +69,14 @@ MobileNetV1
 │   .
 │   .
 │   └── blocks12 (DepthwiseSeparable).............("blocks[12]")
-│       ├── depthwise_conv (ConvBNLayer)..........("blocks[0].depthwise_conv")
-│       │   ├── conv (nn.Conv2D)..................("blocks[0].depthwise_conv.conv")
-│       │   ├── bn (nn.BatchNorm).................("blocks[0].depthwise_conv.bn")
-│       │   └── relu (nn.ReLU)....................("blocks[0].depthwise_conv.relu")
-│       └── pointwise_conv (ConvBNLayer)..........("blocks[0].pointwise_conv")
-│           ├── conv (nn.Conv2D)..................("blocks[0].pointwise_conv.conv")
-│           ├── bn (nn.BatchNorm).................("blocks[0].pointwise_conv.bn")
-│           └── relu (nn.ReLU)....................("blocks[0].pointwise_conv.relu")
+│       ├── depthwise_conv (ConvBNLayer)..........("blocks[12].depthwise_conv")
+│       │   ├── conv (nn.Conv2D)..................("blocks[12].depthwise_conv.conv")
+│       │   ├── bn (nn.BatchNorm).................("blocks[12].depthwise_conv.bn")
+│       │   └── relu (nn.ReLU)....................("blocks[12].depthwise_conv.relu")
+│       └── pointwise_conv (ConvBNLayer)..........("blocks[12].pointwise_conv")
+│           ├── conv (nn.Conv2D)..................("blocks[12].pointwise_conv.conv")
+│           ├── bn (nn.BatchNorm).................("blocks[12].pointwise_conv.bn")
+│           └── relu (nn.ReLU)....................("blocks[12].pointwise_conv.relu")
 │
 ├── avg_pool (nn.AdaptiveAvgPool2D)...............("avg_pool")
 │
@@ -94,7 +94,7 @@ MobileNetV1
 
 ## 3. 方法说明
 
-PaddleClas 提供的 backbone 网络均基于图像分类数据集训练得到，因此网络的尾部带有用于分类的全连接层，而在特定任务场景下，需要去掉分类的全连接层。在部分下游任务中，例如目标检测场景，需要获取到网络中间层的输出结果，也可能需要对网络的中间层进行修改，因此 `TheseusLayer` 提供了 3 个接口函数用于实现不同的修改功能。
+PaddleClas 提供的 backbone 网络均基于图像分类数据集训练得到，因此网络的尾部带有用于分类的全连接层，而在特定任务场景下，需要去掉分类的全连接层。在部分下游任务中，例如目标检测场景，需要获取到网络中间层的输出结果，也可能需要对网络的中间层进行修改，因此 `TheseusLayer` 提供了 3 个接口函数用于实现不同的修改功能。下面基于 PaddleClas whl 进行说明，首先需要安装 PaddleClas：`pip install paddleclas`。
 
 <a name="3.1"></a>
 
@@ -122,7 +122,6 @@ def stop_after(self, stop_layer_name: str) -> bool:
 以 `MobileNetV1` 网络为例，参数 `stop_layer_name` 为 `"blocks[0].depthwise_conv.conv"`，具体效果可以参考下方代码案例进行尝试。
 
 ```python
-# cd <root-path-to-PaddleClas> or pip install paddleclas to import paddleclas
 import paddleclas
 
 net = paddleclas.MobileNetV1()
@@ -168,7 +167,6 @@ def update_res(
 import numpy as np
 import paddle
 
-# cd <root-path-to-PaddleClas> or pip install paddleclas to import paddleclas
 import paddleclas
 
 np_input = np.zeros((1, 3, 224, 224))
@@ -186,8 +184,8 @@ print("The result returned by update_res(): ", res)
 
 output = net(pd_input)
 print("The output's keys of processed net: ", output.keys())
-# The output's keys of net:  dict_keys(['output', 'blocks[0]', 'blocks[2]', 'blocks[4]', 'blocks[10]'])
-# 网络前向输出 output 为 dict 类型对象，其中，output["output"] 为网络最终输出，output["blocks[0]"] 等为网络中间层输出结果
+# The output's keys of net:  dict_keys(['logits', 'blocks[0]', 'blocks[2]', 'blocks[4]', 'blocks[10]'])
+# 网络前向输出 output 为 dict 类型对象，其中，output["logits"] 为网络最终输出，output["blocks[0]"] 等为网络中间层输出结果
 ```
 
 除了通过调用方法 `update_res()` 的方式之外，也同样可以在实例化网络对象时，通过指定参数 `return_patterns` 实现相同效果：
@@ -241,7 +239,6 @@ def upgrade_sublayer(self,
 ```python
 from paddle import nn
 
-# cd <root-path-to-PaddleClas> or pip install paddleclas to import paddleclas
 import paddleclas
 
 # 该函数必须有两个形参

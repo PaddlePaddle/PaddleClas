@@ -13,14 +13,14 @@ train_infer_img_dir:./dataset/ILSVRC2012/val
 null:null
 ##
 trainer:norm_train
-norm_train:tools/train.py -c ppcls/configs/GeneralRecognition/GeneralRecognition_PPLCNet_x2_5.yaml -o DataLoader.Train.sampler.name="PKSampler" -o DataLoader.Train.sampler.sample_per_id=2 
+norm_train:tools/train.py -c ppcls/configs/GeneralRecognition/GeneralRecognition_PPLCNet_x2_5.yaml -o DataLoader.Train.sampler.name="PKSampler" -o DataLoader.Train.sampler.sample_per_id=2
 pact_train:null
 fpgm_train:null
 distill_train:null
 null:null
 null:null
 ##
-===========================eval_params=========================== 
+===========================eval_params===========================
 eval:null
 null:null
 ##

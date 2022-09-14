@@ -364,3 +364,49 @@ class VehicleAttribute(object):
                         ).astype(np.int8).tolist()
             batch_res.append({"attributes": label_res, "output": pred_res})
         return batch_res
+
+
+class TableAttribute(object):
+    def __init__(
+            self,
+            source_threshold=0.5,
+            number_threshold=0.5,
+            color_threshold=0.5,
+            clarity_threshold=0.5,
+            obstruction_threshold=0.5,
+            angle_threshold=0.5, ):
+        self.source_threshold = source_threshold
+        self.number_threshold = number_threshold
+        self.color_threshold = color_threshold
+        self.clarity_threshold = clarity_threshold
+        self.obstruction_threshold = obstruction_threshold
+        self.angle_threshold = angle_threshold
+
+    def __call__(self, batch_preds, file_names=None):
+        # postprocess output of predictor
+        batch_res = []
+
+        for res in batch_preds:
+            res = res.tolist()
+            label_res = []
+            source = 'Scanned' if res[0] > self.source_threshold else 'Photo'
+            number = 'Little' if res[1] > self.number_threshold else 'Numerous'
+            color = 'Black-and-White' if res[
+                2] > self.color_threshold else 'Multicolor'
+            clarity = 'Clear' if res[3] > self.clarity_threshold else 'Blurry'
+            obstruction = 'Without-Obstacles' if res[
+                4] > self.number_threshold else 'With-Obstacles'
+            angle = 'Horizontal' if res[
+                5] > self.number_threshold else 'Tilted'
+
+            label_res = [source, number, color, clarity, obstruction, angle]
+
+            threshold_list = [
+                self.source_threshold, self.number_threshold,
+                self.color_threshold, self.clarity_threshold,
+                self.obstruction_threshold, self.angle_threshold
+            ]
+            pred_res = (np.array(res) > np.array(threshold_list)
+                        ).astype(np.int8).tolist()
+            batch_res.append({"attributes": label_res, "output": pred_res})
+        return batch_res

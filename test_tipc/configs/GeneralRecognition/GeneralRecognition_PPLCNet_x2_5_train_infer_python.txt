@@ -20,7 +20,7 @@ distill_train:null
 null:null
 null:null
 ##
-===========================eval_params=========================== 
+===========================eval_params===========================
 eval:tools/eval.py -c ppcls/configs/GeneralRecognition/GeneralRecognition_PPLCNet_x2_5.yaml
 null:null
 ##
@@ -37,7 +37,7 @@ pretrained_model_url:https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/r
 infer_model:../inference/
 infer_export:True
 infer_quant:Fasle
-inference:python/predict_rec.py -c configs/inference_rec.yaml
+inference:python/predict_rec.py -c configs/inference_rec.yaml -o Global.rec_inference_model_dir="./models/general_PPLCNet_x2_5_lite_v1.0_infer"
 -o Global.use_gpu:True|False
 -o Global.enable_mkldnn:False
 -o Global.cpu_num_threads:1

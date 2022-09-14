@@ -15,7 +15,7 @@ feed_var {
   shape: 6
 }
 fetch_var {
-  name: "save_infer_model/scale_0.tmp_1"
+  name: "batch_norm_25.tmp_2"
   alias_name: "features"
   is_lod_tensor: false
   fetch_type: 1
