@@ -23,10 +23,10 @@ Global:
 
 
 Datasets:
-  Vechicle:
-    infer_path: "./Vechicles"
-    infer_imgs: "./Vechicles/gallery_list.txt"
-    output_dir: "./Vechicles/Index_test"
+  # DatasetName:
+  #   infer_path: "/path/to/Gallery/images"
+  #   infer_imgs: "/path/to/gallery_list.txt"
+  #   output_dir: "/path/to/save/index"
 
 
 Methods:
