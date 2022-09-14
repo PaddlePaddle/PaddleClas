@@ -192,7 +192,7 @@ Loss 部分选用 [Cross entropy loss](../../../ppcls/loss/celoss.py) 和 [Tripl
   export CUDA_VISIBLE_DEVICES=0
   python3.7 tools/train.py \
   -c ./ppcls/configs/GeneralRecognitionV2/GeneralRecognitionV2_PPLCNetV2_base.yaml \
-  -o Global.checkpoint="output/RecModel/latest"
+  -o Global.checkpoints="output/RecModel/latest"
   ```
 - 单机多卡断点恢复训练
   ```shell
@@ -200,7 +200,7 @@ Loss 部分选用 [Cross entropy loss](../../../ppcls/loss/celoss.py) 和 [Tripl
   python3.7 -m paddle.distributed.launch --gpus="0,1,2,3" \
   tools/train.py \
   -c ./ppcls/configs/GeneralRecognitionV2/GeneralRecognitionV2_PPLCNetV2_base.yaml \
-  -o Global.checkpoint="output/RecModel/latest"
+  -o Global.checkpoints="output/RecModel/latest"
   ```
 
 <a name="5.3"></a>
