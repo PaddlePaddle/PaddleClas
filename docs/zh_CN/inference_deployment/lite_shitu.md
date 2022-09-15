@@ -129,7 +129,9 @@ tar -xf ppshituv2_lite_models_v1.0.tar
 rm -f ppshituv2_lite_models_v1.0.tar
 ```
 
-此模型是PP-ShiTu V2的检测和特征模型的量化模型，存储大小约为14M，相对于非量化模型，模型加速一倍左右，精度降低不到一个点。如果想用非量化模型，可以参考[使用其他模型](#2.1.2)
+解压后的文件夹中包含PP-ShiTu V2的检测和特征模型的量化模型，即解压后的两个`.nb`模型。 存储大小约为14M，相对于非量化模型，模型加速一倍左右，精度降低不到一个点。如果想用非量化模型，可以参考[使用其他模型](#2.1.2)
+
+同时，文件中存在`general_PPLCNetV2_base_quant_v1.0_lite_inference_model`子文件夹，子文件夹中存储的是`general_PPLCNetV2_base_quant_v1.0_lite.nb`对应的`inference model`，在实际部署前，先需要用此`inference model`生成好对应的`index`库。实际推理时，只需要生成好的`index`库和两个量化模型来完成部署。
 
 <a name="2.1.2"></a>
 
@@ -189,6 +191,8 @@ Paddle-Lite 提供了多种策略来自动优化原始的模型，其中包括�
 ##### 2.1.2.2 转换示例
 
 下面介绍使用`paddle_lite_opt`完成主体检测模型和识别模型的预训练模型，转成inference模型，最终转换成Paddle-Lite的优化模型的过程。
+
+此示例是使用`fp32`的模型直接生成`.nb`模型，相对于量化模型，精度会更高，但是速度会降低。
 
 1. 转换主体检测模型
 
@@ -250,11 +254,6 @@ rm -rf drink_dataset_v2.0/index
 
 # 安装1.5.3版本的faiss
 pip install faiss-cpu==1.5.3
-
-# 下载通用识别模型，可替换成自己的inference model
-wget https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/inference/PP-ShiTuV2/general_PPLCNetV2_base_pretrained_v1.0_infer.tar
-tar -xf general_PPLCNetV2_base_pretrained_v1.0_infer.tar
-rm -rf general_PPLCNetV2_base_pretrained_v1.0_infer.tar
 ```
 
 <a name="2.2.2"></a>
@@ -264,7 +263,7 @@ rm -rf general_PPLCNetV2_base_pretrained_v1.0_infer.tar
 ```shell
 # 生成新的index库，注意指定好识别模型的路径，同时将index_mothod修改成Flat，HNSW32和IVF在此版本中可能存在bug，请慎重使用。
 # 如果使用自己的识别模型，对应的修改inference model的目录
-python python/build_gallery.py -c configs/inference_drink.yaml -o Global.rec_inference_model_dir=general_PPLCNetV2_base_pretrained_v1.0_infer -o IndexProcess.index_method=Flat
+python python/build_gallery.py -c configs/inference_drink.yaml -o Global.rec_inference_model_dir=lite_shitu/ppshituv2_lite_models_v1.0/general_PPLCNetV2_base_quant_v1.0_lite_inference_model -o IndexProcess.index_method=Flat
 
 # 进入到lite_shitu目录
 cd lite_shitu
@@ -276,6 +275,7 @@ mv ../drink_dataset_v2.0 .
 ### 2.3 将yaml文件转换成json文件
 
 ```shell
+# 如果是使用自己生成的.nb模型，请修改好对应的det_model_path和rec_model_path的路径
 # 如果测试单张图像，路径使用相对路径
 python generate_json_config.py --det_model_path ppshituv2_lite_models_v1.0/mainbody_PPLCNet_x2_5_640_quant_v1.0_lite.nb  --rec_model_path ppshituv2_lite_models_v1.0/general_PPLCNetV2_base_quant_v1.0_lite.nb --img_path images/demo.jpeg
 # or
@@ -367,8 +367,9 @@ cp ../../../cxx/lib/libpaddle_light_api_shared.so deploy/
 ```shell
 deploy/
 |-- ppshituv2_lite_models_v1.0/
-|   |--mainbody_PPLCNet_x2_5_640_quant_v1.0_lite.nb    优化后的主体检测模型文件
-|   |--general_PPLCNetV2_base_quant_v1.0_lite.nb       优化后的识别模型文件
+|   |--mainbody_PPLCNet_x2_5_640_quant_v1.0_lite.nb    主体检测lite模型文件
+|   |--general_PPLCNetV2_base_quant_v1.0_lite.nb       识别lite模型文件
+|   |--general_PPLCNetV2_base_quant_v1.0_lite_inference_model 识别对应的inference model文件夹
 |-- images/
 |   |--demo.jpg                                      图片文件
 |-- drink_dataset_v2.0/                              瓶装饮料demo数据
