@@ -3,7 +3,7 @@
 基于 PaddleClas PP-ShiTu 和 [Paddle-Lite-Demo](https://github.com/PaddlePaddle/Paddle-Lite-Demo) 的安卓轻量级图像识别APP
 
 本工程Android部分基于 [Paddle-Lite-Demo](https://github.com/PaddlePaddle/Paddle-Lite-Demo) 修改，识别过程中使用的检测与识别模型基于 PaddleDetection 和 PaddleClas，
-详细信息可以查看对应模型文档 [主题检测模型](../../../../docs/zh_CN/image_recognition_pipeline/mainbody_detection.md) 与 [特征提取模型](../../../../docs/zh_CN/image_recognition_pipeline/feature_extraction.md) 以及 [faiss检索库](https://github.com/facebookresearch/faiss)
+详细信息可以查看对应模型文档 [主体检测模型](../../../../../docs/zh_CN/training/PP-ShiTu/mainbody_detection.md) 与 [特征提取模型](../../../../../docs/zh_CN/training/PP-ShiTu/feature_extraction.md) 以及 [faiss检索库](../../../../../docs/zh_CN/deployment/PP-ShiTu/vector_search.md)
 
 
 ## APP安装体验
@@ -24,7 +24,7 @@
     ├── general_PPLCNet_x2_5_lite_v1.2_infer.nb
     └── mainbody_PPLCNet_x2_5_640_v1.2_lite.nb
     ```
-2. 以`drink_dataset_v1.0`检索库为例，下载好[`drink_dataset_v1.0`](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/data/drink_dataset_v1.0.tar)并解压，按照 [lite demo-生成新的index文件](../../../../../docs/zh_CN/inference_deployment/lite_shitu.md#222-生成新的index文件) 与 [lite demo-index字典转换](../../../../../docs/zh_CN/inference_deployment/lite_shitu.md#24-index字典转换) 两步，生成 `*.index` 文件与 `*.txt` 文件，并将其重命名为 `original.index` 与 `original.txt` ，放到 [pp_shitu/app/src/main/assets/index](../app/src/main/assets/index) 文件夹下
+2. 以 `drink_dataset_v1.0` 检索库为例，下载好 [drink_dataset_v1.0.tar](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/data/drink_dataset_v1.0.tar) 并解压出来，然后按照 [lite demo-生成新的index文件](../../../../../docs/zh_CN/deployment/PP-ShiTu/PaddleLite.md#22-生成新的检索库) 与 [lite demo-index字典转换](../../../../../docs/zh_CN/deployment/PP-ShiTu/PaddleLite.md#24-index字典转换) 两步，生成 `*.index` 文件与 `*.txt` 文件，并将其重命名为 `original.index` 与 `original.txt` ，放到 [pp_shitu/app/src/main/assets/index](../app/src/main/assets/index) 文件夹下
 
 ### 打开Demo
 1. 首先下载并安装AndroidStudio集成开发环境(IDE)
@@ -43,7 +43,7 @@
 5. 连接完毕后应该能在Android Studio界面右上角显示出手机型号，如下图所示
     ![step3](./images/step3.png)
 
-6. 然后点击手机型号右侧第一个绿色箭头，会自动进行交叉编译并安装APP到手机上，在手机上确认安装即可开始使用、调试APP。开发过程中想即时使用当前代码生成的APP，则仍旧点击手机型号右侧的第一个按钮（开发过程中绿色箭头的按钮图标可能会变成其它形状，但仍然可以点击它），在手机上确认安装最新APK文件，重复这一过程直至开发完成即可。开发完毕后，如需导出APK文件并分享给他人安装，请自行在上网查找对应教程。
+6. 然后点击手机型号右侧第一个绿色箭头，会自动进行交叉编译并安装APP到手机上，在手机上确认安装即可开始使用、调试APP。开发过程中想即时使用当前代码生成的APP，则仍旧点击手机型号右侧的第一个按钮（开发过程中绿色箭头的按钮图标可能会变成其它形状，但仍然可以点击它），在手机上确认安装最新APK文件，重复这一过程直至开发完成即可。开发完毕后，如需导出APK文件并分享给他人安装，请自行上网查找对应教程。
 
 ### 二次开发
 本项目的功能实现主要由几个文件完成，下面分别介绍这几个文件的作用
