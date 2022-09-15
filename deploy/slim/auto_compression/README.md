@@ -82,7 +82,7 @@ python run.py --save_dir='./save_quant_mobilev3/' --config_path='./configs/mbv3_
 
 **多卡启动**
 
-图像分类训练任务中往往包含大量训练数据，以ImageNet为例，ImageNet22k数据集中包含1400W张图像，如果使用单卡训练，会非常耗时，使用分布式训练可以达到几乎线性的加速比。
+图像分类训练任务中往往包含大量训练数据，以ImageNet-1k为例，如果使用单卡训练，会非常耗时，使用分布式训练可以达到几乎线性的加速比。
 
 ```shell
 export CUDA_VISIBLE_DEVICES=0,1,2,3
@@ -95,7 +95,7 @@ python -m paddle.distributed.launch run.py --save_dir='./save_quant_mobilev3/' -
 加载训练好的模型进行量化训练时，一般`learning rate`可比原始训练的`learning rate`小10倍。
 
 
-## 4. 配置文件
+## 4. 配置文件介绍
 自动压缩相关配置主要有：
 - 压缩策略配置，如量化（Quantization），知识蒸馏（Distillation），结构化稀疏（ChannelPrune），ASP半结构化稀疏（ASPPrune ），非结构化稀疏（UnstructurePrune）。
 - 训练超参配置（TrainConfig）：主要设置学习率、训练次数（epochs）和优化器等。

@@ -27,12 +27,12 @@ Quantization:
 
 TrainConfig:
   epochs: 2
-  eval_iter: 500
+  eval_iter: 5000
   learning_rate: 0.001
   optimizer_builder:
     optimizer:
       type: Momentum
-    weight_decay: 0.000005
+    weight_decay: 0.00005
   origin_metric: 0.7532
   
 
