@@ -103,7 +103,7 @@ python3.7 python/predict_rec.py -c configs/inference_rec.yaml
 
 上述预测命令可以得到一个 512 维的特征向量，直接输出在在命令行中。
 
-在配置文件 `configs/inference_det.yaml` 中有以下字段用于配置预测参数：
+在配置文件 `configs/inference_rec.yaml` 中有以下字段用于配置预测参数：
 * `Global.infer_imgs`：待预测的图片文件路径；
 * `Global.use_gpu`： 是否使用 GPU 预测，默认为 `True`。
 
