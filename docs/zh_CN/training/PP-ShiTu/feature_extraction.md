@@ -38,7 +38,7 @@
 
 - **Backbone**: 用于提取输入图像初步特征的骨干网络，一般由配置文件中的 [Backbone](../../../ppcls/configs/GeneralRecognitionV2/GeneralRecognitionV2_PPLCNetV2_base.yaml#L33-L37) 以及 [BackboneStopLayer](../../../ppcls/configs/GeneralRecognitionV2/GeneralRecognitionV2_PPLCNetV2_base.yaml#L38-L39) 字段共同指定。
 - **Neck**: 用以特征增强及特征维度变换。可以是一个简单的 FC Layer，用来做特征维度变换；也可以是较复杂的 FPN 结构，用以做特征增强，一般由配置文件中的 [Neck](../../../ppcls/configs/GeneralRecognitionV2/GeneralRecognitionV2_PPLCNetV2_base.yaml#L40-L51) 字段指定。
-- **Head**: 用来将 `Neck` 的输出 feature 转化为 logits，让模型在训练阶段能以分类任务的形式进行训练。除了常用的 FC Layer 外，还可以替换为 [CosMargin](../../../ppcls/arch/gears/cosmargin.py), [ArcMargin](../../../ppcls/arch/gears/arcmargin.py), [CircleMargin](../../../ppcls/arch/gears/circlemargin.py) 等模块，一般由配置文件中的 [Head](`../../../ppcls/configs/GeneralRecognitionV2/GeneralRecognitionV2_PPLCNetV2_base.yaml#L52-L60) 字段指定。
+- **Head**: 用来将 `Neck` 的输出 feature 转化为 logits，让模型在训练阶段能以分类任务的形式进行训练。除了常用的 FC Layer 外，还可以替换为 [CosMargin](../../../ppcls/arch/gears/cosmargin.py), [ArcMargin](../../../ppcls/arch/gears/arcmargin.py), [CircleMargin](../../../ppcls/arch/gears/circlemargin.py) 等模块，一般由配置文件中的 [Head](../../../ppcls/configs/GeneralRecognitionV2/GeneralRecognitionV2_PPLCNetV2_base.yaml#L52) 字段指定。
 - **Loss**: 指定所使用的 Loss 函数。我们将 Loss 设计为组合 loss 的形式，可以方便地将 Classification Loss 和 Metric learning Loss 组合在一起，一般由配置文件中的 [Loss](../../../ppcls/configs/GeneralRecognitionV2/GeneralRecognitionV2_PPLCNetV2_base.yaml#L63-L77) 字段指定。
 
 <a name="3"></a>
@@ -185,14 +185,14 @@ Loss 部分选用 [Cross entropy loss](../../../ppcls/loss/celoss.py) 和 [Tripl
 **注意：**
 配置文件中默认采用`在线评估`的方式，如果你想加快训练速度，可以关闭`在线评估`功能，只需要在上述命令的后面，增加 `-o Global.eval_during_train=False`。
 
-训练完毕后，在 output 目录下会生成最终模型文件 `latest.pdparams`，`best_model.pdarams` 和训练日志文件 `train.log`。其中，`best_model` 保存了当前评测指标下的最佳模型，`latest` 用来保存最新生成的模型, 方便在任务中断的情况下从断点位置恢复训练。通过在上述训练命令的末尾加上`-o Global.checkpoint="path_to_resume_checkpoint"`即可从断点恢复训练，示例如下。
+训练完毕后，在 output 目录下会生成最终模型文件 `latest.pdparams`，`best_model.pdarams` 和训练日志文件 `train.log`。其中，`best_model` 保存了当前评测指标下的最佳模型，`latest` 用来保存最新生成的模型, 方便在任务中断的情况下从断点位置恢复训练。通过在上述训练命令的末尾加上`-o Global.checkpoints="path_to_resume_checkpoint"`即可从断点恢复训练，示例如下。
 
 - 单机单卡断点恢复训练
   ```shell
   export CUDA_VISIBLE_DEVICES=0
   python3.7 tools/train.py \
   -c ./ppcls/configs/GeneralRecognitionV2/GeneralRecognitionV2_PPLCNetV2_base.yaml \
-  -o Global.checkpoint="output/RecModel/latest"
+  -o Global.checkpoints="output/RecModel/latest"
   ```
 - 单机多卡断点恢复训练
   ```shell
@@ -200,7 +200,7 @@ Loss 部分选用 [Cross entropy loss](../../../ppcls/loss/celoss.py) 和 [Tripl
   python3.7 -m paddle.distributed.launch --gpus="0,1,2,3" \
   tools/train.py \
   -c ./ppcls/configs/GeneralRecognitionV2/GeneralRecognitionV2_PPLCNetV2_base.yaml \
-  -o Global.checkpoint="output/RecModel/latest"
+  -o Global.checkpoints="output/RecModel/latest"
   ```
 
 <a name="5.3"></a>
