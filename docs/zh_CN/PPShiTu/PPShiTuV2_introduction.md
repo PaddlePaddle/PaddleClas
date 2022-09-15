@@ -40,7 +40,7 @@ PP-ShiTuV2 是基于 PP-ShiTuV1 改进的一个实用轻量级通用图像识别
 | :--------- | :---------------------- | :------------------ |
 |            |                         | recall@1            |
 | PP-ShiTuV1 | 64(30+34)MB             | 66.8%                 |
-| PP-ShiTuV2 | 49(30+19)               | 73.8%                 |
+| PP-ShiTuV2 | 49(30+19)MB               | 73.8%                 |
 
 **注：**
 - recall及mAP指标的介绍可以参考 [常用指标](../algorithm_introduction/reid.md#22-常用指标)。
@@ -70,10 +70,10 @@ PP-ShiTuV2 是基于 PP-ShiTuV1 改进的一个实用轻量级通用图像识别
   ```shell
   # 如果您的机器安装的是 CUDA9 或 CUDA10，请运行以下命令安装
   python3.7 -m pip install paddlepaddle-gpu -i https://mirror.baidu.com/pypi/simple
-  
+
   # 如果您的机器是CPU，请运行以下命令安装
   python3.7 -m pip install paddlepaddle -i https://mirror.baidu.com/pypi/simple
-  
+
   # 安装 faiss 库
   python3.7 -m pip install faiss-cpu==1.7.1post2
   ```
@@ -82,7 +82,7 @@ PP-ShiTuV2 是基于 PP-ShiTuV1 改进的一个实用轻量级通用图像识别
   ```shell
   # 进入到PaddleClas根目录下
   cd PaddleClas
-  
+
   # 安装paddleclas
   python3.7 setup.py install
   ```
@@ -92,7 +92,7 @@ PP-ShiTuV2 是基于 PP-ShiTuV1 改进的一个实用轻量级通用图像识别
   ```shell
   # 下载并解压demo数据
   wget -nc https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/data/drink_dataset_v2.0.tar && tar -xf drink_dataset_v2.0.tar
-  
+
   # 执行识别命令
   paddleclas \
   --model_name=PP-ShiTuV2 \

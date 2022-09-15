@@ -38,7 +38,7 @@ The following table lists the relevant metric obtained by PP-ShiTuV2 with compar
 | :--------- | :------------------------------------------------ | :------- |
 |            |                                                   | recall@1 |
 | PP-ShiTuV1 | 64(30+34)MB                                       | 66.8%    |
-| PP-ShiTuV2 | 49(30+19)                                         | 73.8%    |
+| PP-ShiTuV2 | 49(30+19)MB                                         | 73.8%    |
 
 **Note:**
 - For the introduction of recall and mAP metric, please refer to [Retrieval Metric](../algorithm_introduction/reid.md).
