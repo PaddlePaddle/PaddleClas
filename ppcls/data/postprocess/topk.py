@@ -46,19 +46,18 @@ class Topk(object):
             class_id_map = None
         return class_id_map
 
-    def __call__(self, x, file_names=None, multilabel=False):
+    def __call__(self, x, file_names=None):
         if isinstance(x, dict):
             x = x['logits']
         assert isinstance(x, paddle.Tensor)
         if file_names is not None:
             assert x.shape[0] == len(file_names)
-        x = F.softmax(x, axis=-1) if not multilabel else F.sigmoid(x)
+        x = F.softmax(x, axis=-1)
         x = x.numpy()
         y = []
         for idx, probs in enumerate(x):
             index = probs.argsort(axis=0)[-self.topk:][::-1].astype(
-                "int32") if not multilabel else np.where(
-                    probs >= 0.5)[0].astype("int32")
+                "int32")
             clas_id_list = []
             score_list = []
             label_name_list = []
@@ -79,10 +78,3 @@ class Topk(object):
             y.append(result)
         return y
 
-
-class MultiLabelTopk(Topk):
-    def __init__(self, topk=1, class_id_map_file=None):
-        super().__init__()
-
-    def __call__(self, x, file_names=None):
-        return super().__call__(x, file_names, multilabel=True)

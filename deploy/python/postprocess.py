@@ -82,10 +82,11 @@ class ThreshOutput(object):
 
 
 class Topk(object):
-    def __init__(self, topk=1, class_id_map_file=None):
+    def __init__(self, topk=1, class_id_map_file=None, delimiter=None):
         assert isinstance(topk, (int, ))
-        self.class_id_map = self.parse_class_id_map(class_id_map_file)
         self.topk = topk
+        self.class_id_map = self.parse_class_id_map(class_id_map_file)
+        self.delimiter = delimiter if delimiter is not None else " "
 
     def parse_class_id_map(self, class_id_map_file):
         if class_id_map_file is None:
@@ -102,21 +103,20 @@ class Topk(object):
             with open(class_id_map_file, "r") as fin:
                 lines = fin.readlines()
                 for line in lines:
-                    partition = line.split("\n")[0].partition(" ")
+                    partition = line.split("\n")[0].partition(self.delimiter)
                     class_id_map[int(partition[0])] = str(partition[-1])
         except Exception as ex:
             print(ex)
             class_id_map = None
         return class_id_map
 
-    def __call__(self, x, file_names=None, multilabel=False):
+    def __call__(self, x, file_names=None):
         if file_names is not None:
             assert x.shape[0] == len(file_names)
         y = []
         for idx, probs in enumerate(x):
             index = probs.argsort(axis=0)[-self.topk:][::-1].astype(
-                "int32") if not multilabel else np.where(
-                    probs >= 0.5)[0].astype("int32")
+                "int32")
             clas_id_list = []
             score_list = []
             label_name_list = []
@@ -138,12 +138,56 @@ class Topk(object):
         return y
 
 
-class MultiLabelTopk(Topk):
-    def __init__(self, topk=1, class_id_map_file=None):
-        super().__init__()
+class MultiLabelThreshOutput(object):
+    def __init__(self, threshold=0.5, class_id_map_file=None, delimiter=None):
+        self.threshold = threshold
+        self.delimiter = delimiter if delimiter is not None else " "
+        self.class_id_map = self.parse_class_id_map(class_id_map_file)
+
+    def parse_class_id_map(self, class_id_map_file):
+        if class_id_map_file is None:
+            return None
+
+        if not os.path.exists(class_id_map_file):
+            print(
+                "Warning: If want to use your own label_dict, please input legal path!\nOtherwise label_names will be empty!"
+            )
+            return None
+
+        try:
+            class_id_map = {}
+            with open(class_id_map_file, "r") as fin:
+                lines = fin.readlines()
+                for line in lines:
+                    partition = line.split("\n")[0].partition(self.delimiter)
+                    class_id_map[int(partition[0])] = str(partition[-1])
+        except Exception as ex:
+            print(ex)
+            class_id_map = None
+        return class_id_map
 
     def __call__(self, x, file_names=None):
-        return super().__call__(x, file_names, multilabel=True)
+        y = []
+        for idx, probs in enumerate(x):
+            index = np.where(probs >= self.threshold)[0].astype("int32")
+            clas_id_list = []
+            score_list = []
+            label_name_list = []
+            for i in index:
+                clas_id_list.append(i.item())
+                score_list.append(probs[i].item())
+                if self.class_id_map is not None:
+                    label_name_list.append(self.class_id_map[i.item()])
+            result = {
+                "class_ids": clas_id_list,
+                "scores": np.around(
+                    score_list, decimals=5).tolist(),
+                "label_names": label_name_list
+            }
+            if file_names is not None:
+                result["file_name"] = file_names[idx]
+            y.append(result)
+        return y
 
 
 class SavePreLabel(object):
@@ -316,6 +360,52 @@ class VehicleAttribute(object):
 
             threshold_list = [self.color_threshold
                               ] * 10 + [self.type_threshold] * 9
+            pred_res = (np.array(res) > np.array(threshold_list)
+                        ).astype(np.int8).tolist()
+            batch_res.append({"attributes": label_res, "output": pred_res})
+        return batch_res
+
+
+class TableAttribute(object):
+    def __init__(
+            self,
+            source_threshold=0.5,
+            number_threshold=0.5,
+            color_threshold=0.5,
+            clarity_threshold=0.5,
+            obstruction_threshold=0.5,
+            angle_threshold=0.5, ):
+        self.source_threshold = source_threshold
+        self.number_threshold = number_threshold
+        self.color_threshold = color_threshold
+        self.clarity_threshold = clarity_threshold
+        self.obstruction_threshold = obstruction_threshold
+        self.angle_threshold = angle_threshold
+
+    def __call__(self, batch_preds, file_names=None):
+        # postprocess output of predictor
+        batch_res = []
+
+        for res in batch_preds:
+            res = res.tolist()
+            label_res = []
+            source = 'Scanned' if res[0] > self.source_threshold else 'Photo'
+            number = 'Little' if res[1] > self.number_threshold else 'Numerous'
+            color = 'Black-and-White' if res[
+                2] > self.color_threshold else 'Multicolor'
+            clarity = 'Clear' if res[3] > self.clarity_threshold else 'Blurry'
+            obstruction = 'Without-Obstacles' if res[
+                4] > self.number_threshold else 'With-Obstacles'
+            angle = 'Horizontal' if res[
+                5] > self.number_threshold else 'Tilted'
+
+            label_res = [source, number, color, clarity, obstruction, angle]
+
+            threshold_list = [
+                self.source_threshold, self.number_threshold,
+                self.color_threshold, self.clarity_threshold,
+                self.obstruction_threshold, self.angle_threshold
+            ]
             pred_res = (np.array(res) > np.array(threshold_list)
                         ).astype(np.int8).tolist()
             batch_res.append({"attributes": label_res, "output": pred_res})
