@@ -51,6 +51,9 @@ python3 -m paddle.distributed.launch \
 
 After training 10 epochs, the best correctness of the validation set should be around 0.95.
 
+**Note:**
+1. Currently, the loss function for multi-label classification only supports `MultiLabelLoss` (BCE Loss).
+2. Currently, the evaluation metrics of multi-label classification support `Accuracy_Score` and `HammingDistance`. Please look forward to the support of other evaluation metrics.
 
 <a name="3"></a>
 ## 3. Model Evaluation
@@ -74,7 +77,7 @@ python3 tools/infer.py \
 Obtain an output silimar to the following:
 
 ```
-[{'class_ids': [6, 13, 17, 23, 26, 30], 'scores': [0.95683, 0.5567, 0.55211, 0.99088, 0.5943, 0.78767], 'file_name': './deploy/images/0517_2715693311.jpg', 'label_names': []}]
+[{'class_ids': [6, 13, 17, 23, 30], 'scores': [0.98217, 0.78129, 0.64377, 0.9942, 0.96109], 'label_names': ['clouds', 'lake', 'ocean', 'sky', 'water'], 'file_name': 'deploy/images/0517_2715693311.jpg'}]
 ```
 
 
@@ -107,11 +110,14 @@ Inference and prediction through predictive engines:
 
 ```
 python3 python/predict_cls.py \
-     -c configs/inference_multilabel_cls.yaml
+     -c configs/inference_cls_multilabel.yaml
 ```
+The predicted pictures are as follows:
 
-Obtain an output silimar to the following:
+![](../../images/quick_start/multi_label_demo.png)
+
+After executing the inference command, obtain an output silimar to the following:
 
 ```
-0517_2715693311.jpg:    class id(s): [6, 13, 17, 23, 26, 30], score(s): [0.96, 0.56, 0.55, 0.99, 0.59, 0.79], label_name(s): []
+0517_2715693311.jpg:    class id(s): [6, 13, 17, 23, 30], score(s): [0.98, 0.78, 0.64, 0.99, 0.96], label_name(s): ['clouds', 'lake', 'ocean', 'sky', 'water']
 ```
