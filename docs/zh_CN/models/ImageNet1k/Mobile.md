@@ -21,13 +21,13 @@ MobileNetV3 是 Google 于 2019 年提出的一种基于 NAS 的新的轻量级�
 
 GhostNet 是华为于 2020 年提出的一种全新的轻量化网络结构，通过引入 ghost module，大大减缓了传统深度网络中特征的冗余计算问题，使得网络的参数量和计算量大大降低。
 
-![](../../images/models/mobile_arm_top1.png)
+![](../../../images/models/mobile_arm_top1.png)
 
-![](../../images/models/mobile_arm_storage.png)
+![](../../../images/models/mobile_arm_storage.png)
 
-![](../../images/models/T4_benchmark/t4.fp32.bs4.mobile_trt.flops.png)
+![](../../../images/models/T4_benchmark/t4.fp32.bs4.mobile_trt.flops.png)
 
-![](../../images/models/T4_benchmark/t4.fp32.bs4.mobile_trt.params.png)
+![](../../../images/models/T4_benchmark/t4.fp32.bs4.mobile_trt.params.png)
 
 
 目前 PaddleClas 开源的的移动端系列的预训练模型一共有 35 个，其指标如图所示。从图片可以看出，越新的轻量级模型往往有更优的表现，MobileNetV3 代表了目前主流的轻量级神经网络结构。在 MobileNetV3 中，作者为了获得更高的精度，在 global-avg-pooling 后使用了 1x1 的卷积。该操作大幅提升了参数量但对计算量影响不大，所以如果从存储角度评价模型的优异程度，MobileNetV3 优势不是很大，但由于其更小的计算量，使得其有更快的推理速度。此外，我们模型库中的 ssld 蒸馏模型表现优异，从各个考量角度下，都刷新了当前轻量级模型的精度。由于 MobileNetV3 模型结构复杂，分支较多，对 GPU 并不友好，GPU 预测速度不如 MobileNetV1。GhostNet 于 2020 年提出，通过引入 ghost 的网络设计理念，大大降低了计算量和参数量，同时在精度上也超过前期最高的 MobileNetV3 网络结构。

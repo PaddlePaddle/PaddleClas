@@ -91,7 +91,7 @@ Park 等人提出了 RKD [10]，基于关系的知识蒸馏算法，RKD 中进�
 
 SSLD是百度于2021年提出的一种简单的半监督知识蒸馏方案，通过设计一种改进的JS散度作为损失函数，结合基于ImageNet22k数据集的数据挖掘策略，最终帮助15个骨干网络模型的精度平均提升超过3%。
 
-更多关于SSLD的原理、模型库与使用介绍，请参考：[SSLD知识蒸馏算法介绍](./ssld.md)。
+更多关于SSLD的原理、模型库与使用介绍，请参考：[SSLD知识蒸馏算法介绍](ssld.md)。
 
 
 ##### 1.2.1.2 SSLD 配置
@@ -152,8 +152,8 @@ DML论文中，在蒸馏的过程中，不依赖于教师模型，两个结构�
 
 | 策略 | 骨干网络 | 配置文件 | Top-1 acc | 下载链接 |
 | --- | --- | --- | --- | --- |
-| baseline | PPLCNet_x2_5 | [PPLCNet_x2_5.yaml](../../../ppcls/configs/ImageNet/PPLCNet/PPLCNet_x2_5.yaml) | 74.93% | - |
-| DML | PPLCNet_x2_5 | [PPLCNet_x2_5_dml.yaml](../../../ppcls/configs/ImageNet/Distillation/PPLCNet_x2_5_dml.yaml) | 76.68%(**+1.75%**) | - |
+| baseline | PPLCNet_x2_5 | [PPLCNet_x2_5.yaml](../../../../ppcls/configs/ImageNet/PPLCNet/PPLCNet_x2_5.yaml) | 74.93% | - |
+| DML | PPLCNet_x2_5 | [PPLCNet_x2_5_dml.yaml](../../../../ppcls/configs/ImageNet/Distillation/PPLCNet_x2_5_dml.yaml) | 76.68%(**+1.75%**) | - |
 
 
 * 注：完整的PPLCNet_x2_5模型训练了360epoch，这里为了方便对比，baseline和DML均训练了100epoch，因此指标比官网最终开源出来的模型精度（76.60%）低一些。
@@ -211,8 +211,8 @@ UDML 是百度飞桨视觉团队提出的无需依赖教师模型的知识蒸馏
 
 | 策略 | 骨干网络 | 配置文件 | Top-1 acc | 下载链接 |
 | --- | --- | --- | --- | --- |
-| baseline | PPLCNet_x2_5 | [PPLCNet_x2_5.yaml](../../../ppcls/configs/ImageNet/PPLCNet/PPLCNet_x2_5.yaml) | 74.93% | - |
-| UDML | PPLCNet_x2_5 | [PPLCNet_x2_5_dml.yaml](../../../ppcls/configs/ImageNet/Distillation/PPLCNet_x2_5_udml.yaml) | 76.74%(**+1.81%**) | - |
+| baseline | PPLCNet_x2_5 | [PPLCNet_x2_5.yaml](../../../../ppcls/configs/ImageNet/PPLCNet/PPLCNet_x2_5.yaml) | 74.93% | - |
+| UDML | PPLCNet_x2_5 | [PPLCNet_x2_5_dml.yaml](../../../../ppcls/configs/ImageNet/Distillation/PPLCNet_x2_5_udml.yaml) | 76.74%(**+1.81%**) | - |
 
 
 ##### 1.2.3.2 UDML 配置
@@ -263,7 +263,7 @@ Loss:
         weight: 1.0
 ```
 
-**注意(：** 上述在网络中指定`return_patterns`，返回中间层特征的功能是基于TheseusLayer，更多关于TheseusLayer的使用说明，请参考：[TheseusLayer 使用说明](./theseus_layer.md)。
+**注意(：** 上述在网络中指定`return_patterns`，返回中间层特征的功能是基于TheseusLayer，更多关于TheseusLayer的使用说明，请参考：[TheseusLayer 使用说明](theseus_layer.md)。
 
 
 <a name='1.2.4'></a>
@@ -287,8 +287,8 @@ AFD提出在蒸馏的过程中，利用基于注意力的元网络学习特征�
 
 | 策略 | 骨干网络 | 配置文件 | Top-1 acc | 下载链接 |
 | --- | --- | --- | --- | --- |
-| baseline | ResNet18 | [ResNet18.yaml](../../../ppcls/configs/ImageNet/ResNet/ResNet18.yaml) | 70.8% | - |
-| AFD | ResNet18 | [resnet34_distill_resnet18_afd.yaml](../../../ppcls/configs/ImageNet/Distillation/resnet34_distill_resnet18_afd.yaml) | 71.68%(**+0.88%**) | - |
+| baseline | ResNet18 | [ResNet18.yaml](../../../../ppcls/configs/ImageNet/ResNet/ResNet18.yaml) | 70.8% | - |
+| AFD | ResNet18 | [resnet34_distill_resnet18_afd.yaml](../../../../ppcls/configs/ImageNet/Distillation/resnet34_distill_resnet18_afd.yaml) | 71.68%(**+0.88%**) | - |
 
 注意：这里为了与论文的训练配置保持对齐，设置训练的迭代轮数为100epoch，因此baseline精度低于PaddleClas中开源出的模型精度（71.0%）
 
@@ -375,7 +375,7 @@ Loss:
         weight: 1.0
 ```
 
-**注意(：** 上述在网络中指定`return_patterns`，返回中间层特征的功能是基于TheseusLayer，更多关于TheseusLayer的使用说明，请参考：[TheseusLayer 使用说明](./theseus_layer.md)。
+**注意(：** 上述在网络中指定`return_patterns`，返回中间层特征的功能是基于TheseusLayer，更多关于TheseusLayer的使用说明，请参考：[TheseusLayer 使用说明](theseus_layer.md)。
 
 <a name='1.2.5'></a>
 
@@ -398,8 +398,8 @@ DKD将蒸馏中常用的 KD Loss 进行了解耦成为Target Class Knowledge Dis
 
 | 策略 | 骨干网络 | 配置文件 | Top-1 acc | 下载链接 |
 | --- | --- | --- | --- | --- |
-| baseline | ResNet18 | [ResNet18.yaml](../../../ppcls/configs/ImageNet/ResNet/ResNet18.yaml) | 70.8% | - |
-| AFD | ResNet18 | [resnet34_distill_resnet18_dkd.yaml](../../../ppcls/configs/ImageNet/Distillation/resnet34_distill_resnet18_dkd.yaml) | 72.59%(**+1.79%**) | - |
+| baseline | ResNet18 | [ResNet18.yaml](../../../../ppcls/configs/ImageNet/ResNet/ResNet18.yaml) | 70.8% | - |
+| DKD | ResNet18 | [resnet34_distill_resnet18_dkd.yaml](../../../../ppcls/configs/ImageNet/Distillation/resnet34_distill_resnet18_dkd.yaml) | 72.59%(**+1.79%**) | - |
 
 
 ##### 1.2.5.2 DKD 配置
@@ -466,8 +466,8 @@ Loss:
 
 | 策略 | 骨干网络 | 配置文件 | Top-1 acc | 下载链接 |
 | --- | --- | --- | --- | --- |
-| baseline | ResNet18 | [ResNet18.yaml](../../../ppcls/configs/ImageNet/ResNet/ResNet18.yaml) | 70.8% | - |
-| DIST | ResNet18 | [resnet34_distill_resnet18_dist.yaml](../../../ppcls/configs/ImageNet/Distillation/resnet34_distill_resnet18_dist.yaml) | 71.99%(**+1.19%**) | - |
+| baseline | ResNet18 | [ResNet18.yaml](../../../../ppcls/configs/ImageNet/ResNet/ResNet18.yaml) | 70.8% | - |
+| DIST | ResNet18 | [resnet34_distill_resnet18_dist.yaml](../../../../ppcls/configs/ImageNet/Distillation/resnet34_distill_resnet18_dist.yaml) | 71.99%(**+1.19%**) | - |
 
 
 ##### 1.2.6.2 DIST 配置
@@ -532,8 +532,8 @@ Loss:
 
 | 策略 | 骨干网络 | 配置文件 | Top-1 acc | 下载链接 |
 | --- | --- | --- | --- | --- |
-| baseline | ResNet18 | [ResNet18.yaml](../../../ppcls/configs/ImageNet/ResNet/ResNet18.yaml) | 70.8% | - |
-| MGD | ResNet18 | [resnet34_distill_resnet18_mgd.yaml](../../../ppcls/configs/ImageNet/Distillation/resnet34_distill_resnet18_mgd.yaml) | 71.86%(**+1.06%**) | - |
+| baseline | ResNet18 | [ResNet18.yaml](../../../../ppcls/configs/ImageNet/ResNet/ResNet18.yaml) | 70.8% | - |
+| MGD | ResNet18 | [resnet34_distill_resnet18_mgd.yaml](../../../../ppcls/configs/ImageNet/Distillation/resnet34_distill_resnet18_mgd.yaml) | 71.86%(**+1.06%**) | - |
 
 
 ##### 1.2.7.2 MGD 配置
@@ -583,6 +583,76 @@ Loss:
         weight: 1.0
 ```
 
+<<<<<<< HEAD
+=======
+<a name='1.2.8'></a>
+
+#### 1.2.8 WSL
+
+##### 1.2.8.1 WSL 算法介绍
+
+论文信息：
+
+
+> [Rethinking Soft Labels For Knowledge Distillation: A Bias-variance Tradeoff Perspective](https://arxiv.org/abs/2102.0650)
+>
+> Helong Zhou, Liangchen Song, Jiajie Chen, Ye Zhou, Guoli Wang, Junsong Yuan, Qian Zhang
+>
+> ICLR, 2021
+
+WSL (Weighted Soft Labels) 损失函数根据教师模型与学生模型关于真值标签的 CE Loss 比值，对每个样本的 KD Loss 分别赋予权重。若学生模型相对教师模型在某个样本上预测结果更好，则对该样本赋予较小的权重。该方法简单、有效，使各个样本的权重可自适应调节，提升了蒸馏精度。
+
+在ImageNet1k公开数据集上，效果如下所示。
+
+| 策略 | 骨干网络 | 配置文件 | Top-1 acc | 下载链接 |
+| --- | --- | --- | --- | --- |
+| baseline | ResNet18 | [ResNet18.yaml](../../../../ppcls/configs/ImageNet/ResNet/ResNet18.yaml) | 70.8% | - |
+| WSL | ResNet18 | [resnet34_distill_resnet18_wsl.yaml](../../../../ppcls/configs/ImageNet/Distillation/resnet34_distill_resnet18_wsl.yaml) | 72.23%(**+1.43%**) | - |
+
+
+##### 1.2.8.2 WSL 配置
+
+WSL 配置如下所示。在模型构建Arch字段中，需要同时定义学生模型与教师模型，教师模型固定参数，且需要加载预训练模型。在损失函数Loss字段中，需要定义`DistillationGTCELoss`（学生与真值标签之间的CE loss）以及`DistillationWSLLoss`（学生与教师之间的WSL loss），作为训练的损失函数。
+
+
+```yaml
+# model architecture
+Arch:
+  name: "DistillationModel"
+  # if not null, its lengths should be same as models
+  pretrained_list:
+  # if not null, its lengths should be same as models
+  freeze_params_list:
+  - True
+  - False
+  models:
+    - Teacher:
+        name: ResNet34
+        pretrained: True
+
+    - Student:
+        name: ResNet18
+        pretrained: False
+
+  infer_model_name: "Student"
+
+
+# loss function config for traing/eval process
+Loss:
+  Train:
+    - DistillationGTCELoss:
+        weight: 1.0
+        model_names: ["Student"]
+    - DistillationWSLLoss:
+        weight: 2.5
+        model_name_pairs: [["Student", "Teacher"]]
+        temperature: 2
+  Eval:
+    - CELoss:
+        weight: 1.0
+```
+
+>>>>>>> 1f6f4797 (docs: refactor & fix link & rename)
 <a name="2"></a>
 
 ## 2. 模型训练、评估和预测
@@ -591,7 +661,7 @@ Loss:
 
 ### 2.1 环境配置
 
-* 安装：请先参考 [Paddle 安装教程](../installation/install_paddle.md) 以及 [PaddleClas 安装教程](../installation/install_paddleclas.md) 配置 PaddleClas 运行环境。
+* 安装：请先参考 [Paddle 安装教程](../installation/install_paddle.md) 以及 [PaddleClas 安装教程](../../installation.md) 配置 PaddleClas 运行环境。
 
 <a name="2.2"></a>
 
@@ -633,7 +703,7 @@ cat train_list.txt train_list_unlabel.txt > train_list_all.txt
 
 **备注：**
 
-* 关于 `train_list.txt`、`val_list.txt`的格式说明，可以参考[PaddleClas分类数据集格式说明](../data_preparation/classification_dataset.md#1-数据集格式说明) 。
+* 关于 `train_list.txt`、`val_list.txt`的格式说明，可以参考[PaddleClas分类数据集格式说明](../single_label_classification/dataset.md#1-数据集格式说明) 。
 
 
 <a name="2.3"></a>
@@ -641,7 +711,7 @@ cat train_list.txt train_list_unlabel.txt > train_list_all.txt
 ### 2.3 模型训练
 
 
-以SSLD知识蒸馏算法为例，介绍知识蒸馏算法的模型训练、评估、预测等过程。配置文件为 [PPLCNet_x2_5_ssld.yaml](../../../ppcls/configs/ImageNet/Distillation/PPLCNet_x2_5_ssld.yaml) ，使用下面的命令可以完成模型训练。
+以SSLD知识蒸馏算法为例，介绍知识蒸馏算法的模型训练、评估、预测等过程。配置文件为 [PPLCNet_x2_5_ssld.yaml](../../../../ppcls/configs/ImageNet/Distillation/PPLCNet_x2_5_ssld.yaml) ，使用下面的命令可以完成模型训练。
 
 
 ```shell
@@ -710,7 +780,7 @@ python3 tools/export_model.py \
 
 最终在`inference`目录下会产生`inference.pdiparams`、`inference.pdiparams.info`、`inference.pdmodel` 3个文件。
 
-关于更多模型推理相关的教程，请参考：[Python 预测推理](../inference_deployment/python_deploy.md)。
+关于更多模型推理相关的教程，请参考：[Python 预测推理](../../deployment/image_classification/python.md)。
 
 
 <a name="3"></a>

@@ -116,7 +116,7 @@ pip install -r requirements.txt
 
 我们使用 [mainbody_detection/picodet_lcnet_x2_5_640_mainbody.yml](https://github.com/PaddlePaddle/PaddleDetection/blob/release/2.3/configs/picodet/application/mainbody_detection/picodet_lcnet_x2_5_640_mainbody.yml) 配置进行训练，配置文件摘要如下：
 
-![](../../images/det/PaddleDetection_config.png)
+![](../../../images/det/PaddleDetection_config.png)
 
 从上图看到 `mainbody_detection/picodet_lcnet_x2_5_640_mainbody.yml` 配置需要依赖其他的配置文件，这些配置文件的含义如下:
 
@@ -221,7 +221,7 @@ python tools/export_model.py -c configs/picodet/application/mainbody_detection/p
 
 导出模型之后，在主体检测与识别任务中，就可以将检测模型的路径更改为该 inference 模型路径，完成预测。
 
-以商品识别为例，其配置文件为 [inference_product.yaml](../../../deploy/configs/inference_product.yaml)，修改其中的 `Global.det_inference_model_dir` 字段为导出的主体检测 inference 模型目录，参考[图像识别快速开始教程](../quick_start/quick_start_recognition.md)，即可完成商品检测与识别过程。
+以商品识别为例，其配置文件为 [inference_product.yaml](../../../../deploy/configs/inference_product.yaml)，修改其中的 `Global.det_inference_model_dir` 字段为导出的主体检测 inference 模型目录，参考[图像识别快速开始教程](../../quick_start/quick_start_recognition.md)，即可完成商品检测与识别过程。
 
 <a name="4.3"></a>
 ### 4.3 其他推理方式

@@ -1,6 +1,6 @@
 # 多标签分类 quick start
 
-基于 [NUS-WIDE-SCENE](https://lms.comp.nus.edu.sg/wp-content/uploads/2019/research/nuswide/NUS-WIDE.html) 数据集，体验多标签分类的训练、评估、预测的过程，该数据集是 NUS-WIDE 数据集的一个子集。请首先安装 PaddlePaddle 和 PaddleClas，具体安装步骤可详看 [环境准备](../installation/install_paddleclas.md)。
+基于 [NUS-WIDE-SCENE](https://lms.comp.nus.edu.sg/wp-content/uploads/2019/research/nuswide/NUS-WIDE.html) 数据集，体验多标签分类的训练、评估、预测的过程，该数据集是 NUS-WIDE 数据集的一个子集。请首先安装 PaddlePaddle 和 PaddleClas，具体安装步骤可详看 [环境准备](../installation.md)。
 
 
 ## 目录
@@ -49,6 +49,10 @@ python3 -m paddle.distributed.launch \
 ```
 
 训练 10 epoch 之后，验证集最好的正确率应该在 0.95 左右。
+
+**注意:**
+1. 目前多标签分类的损失函数仅支持`MultiLabelLoss`(BCE Loss)。
+2. 目前多标签分类的评估指标支持`AccuracyScore`和`HammingDistance`,其他评估指标敬请期待。
 
 <a name="3"></a>
 

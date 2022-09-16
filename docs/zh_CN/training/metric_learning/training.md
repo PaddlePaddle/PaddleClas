@@ -14,11 +14,11 @@
 
 <img src="../../images/structure.png"/>
 
-在Android端或PC端体验整体图像识别系统，或查看特征库建立方法，可以参考 [图像识别快速开始文档](../quick_start/quick_start_recognition.md)。
+在Android端或PC端体验整体图像识别系统，或查看特征库建立方法，可以参考 [图像识别快速开始文档](../../quick_start/quick_start_recognition.md)。
 
 以下内容，主要对上述三个步骤的训练部分进行介绍。
 
-在训练开始之前，请参考 [安装指南](../installation/install_paddleclas.md) 配置运行环境。
+在训练开始之前，请参考 [安装指南](../../installation.md) 配置运行环境。
 
 ##  目录
 
@@ -45,7 +45,7 @@
 
 关于主体检测数据集构造与模型训练方法可以参考： [30分钟快速上手PaddleDetection](https://github.com/PaddlePaddle/PaddleDetection/blob/develop/docs/tutorials/GETTING_STARTED_cn.md#30%E5%88%86%E9%92%9F%E5%BF%AB%E9%80%9F%E4%B8%8A%E6%89%8Bpaddledetection)。
 
-更多关于 PaddleClas 中提供的主体检测的模型介绍与下载请参考：[主体检测教程](../image_recognition_pipeline/mainbody_detection.md)。
+更多关于 PaddleClas 中提供的主体检测的模型介绍与下载请参考：[主体检测教程](../PP-ShiTu/mainbody_detection.md)。
 
 <a name="2"></a>
 
@@ -163,7 +163,7 @@ python3.7 -m paddle.distributed.launch tools/train.py \
 
 **注**：其中，`-c` 用于指定配置文件的路径，`-o` 用于指定需要修改或者添加的参数，其中 `-o Arch.Backbone.pretrained=True` 表示 Backbone 在训练开始前会加载预训练模型；`-o Arch.Backbone.pretrained` 也可以指定为模型权重文件的路径，使用时换成自己的预训练模型权重文件的路径即可；`-o Global.device=gpu` 表示使用 GPU 进行训练。如果希望使用 CPU 进行训练，则设置 `-o Global.device=cpu`即可。
 
-更详细的训练配置，也可以直接修改模型对应的配置文件。具体配置参数参考[配置文档](config_description.md)。
+更详细的训练配置，也可以直接修改模型对应的配置文件。具体配置参数参考[配置文档](../config_discription/basic.md)。
 
 运行上述训练命令，可以看到输出日志，示例如下：
 
@@ -177,7 +177,7 @@ python3.7 -m paddle.distributed.launch tools/train.py \
 
 此处配置文件的 Backbone 是 MobileNetV1，如果想使用其他 Backbone，可以重写参数 `Arch.Backbone.name`，比如命令中增加 `-o Arch.Backbone.name={其他 Backbone 的名字}`。此外，由于不同模型 `Neck` 部分的输入维度不同，更换 Backbone 后可能需要改写 `Neck` 的输入大小，改写方式类似替换 Backbone 的名字。
 
-在训练 Loss 部分，此处使用了 [CELoss](../../../ppcls/loss/celoss.py) 和 [TripletLossV2](../../../ppcls/loss/triplet.py)，配置文件如下：
+在训练 Loss 部分，此处使用了 [CELoss](../../../../ppcls/loss/celoss.py) 和 [TripletLossV2](../../../../ppcls/loss/triplet.py)，配置文件如下：
 
 ```yaml
 Loss:
@@ -280,7 +280,7 @@ python3.7 tools/export_model.py \
 
 其中，`Global.pretrained_model` 用于指定模型文件路径，该路径仍无需包含模型文件后缀名（如[2.2.2 特征提取模型恢复训练](#2.2.2)）。当执行后，会在当前目录下生成 `./inference` 目录，目录下包含 `inference.pdiparams`、`inference.pdiparams.info`、`inference.pdmodel` 文件。`Global.save_inference_dir` 可以指定导出 inference 模型文件夹的路径。此处保存的 inference 模型在 embedding 特征层做了截断，即模型的推理输出为 n 维特征。
 
-有了上述命令将生成的模型结构文件(`inference.pdmodel`)和模型权重文件(`inference.pdiparams`)，接下来就可以使用预测引擎进行推理。使用 inference 模型推理的流程可以参考[基于 Python 预测引擎预测推理](../inference_deployment/python_deploy.md)。
+有了上述命令将生成的模型结构文件(`inference.pdmodel`)和模型权重文件(`inference.pdiparams`)，接下来就可以使用预测引擎进行推理。使用 inference 模型推理的流程可以参考[基于 Python 预测引擎预测推理](../deployment/image_classification/python_deploy.md)。
 
 <a name="3"></a>
 

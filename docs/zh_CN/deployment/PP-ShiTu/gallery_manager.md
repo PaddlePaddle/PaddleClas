@@ -129,7 +129,7 @@ pip install pyqt5
 
 ### 2.2 模型准备
 
-请按照[PP-ShiTu快速体验](../quick_start/quick_start_recognition.md#2.2.1)中下载及准备inference model，并修改好`${PaddleClas}/deploy/configs/inference_drink.yaml`的相关参数。
+请按照[PP-ShiTu快速体验](../../quick_start/quick_start_recognition.md#2.2.1)中下载及准备inference model，并修改好`${PaddleClas}/deploy/configs/inference_drink.yaml`的相关参数。
 
 <a name="2.3"></a>
 

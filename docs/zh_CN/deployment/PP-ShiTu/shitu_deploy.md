@@ -11,7 +11,7 @@
   - [2.2 识别模型调优](#2.2)
 - [3.模型加速](#3)
 
-在[PP-ShiTu快速开始](../quick_start/quick_start_recognition.md)中，主要展示了`PP-ShiTu`的快速开始demo。那么本文档主要介绍，如何将`PP-ShiTu`应用到自己的需求中，及如何继续调优，优化识别效果。具体可以分成以下三种情况
+在[PP-ShiTu快速开始](../../quick_start/quick_start_recognition.md)中，主要展示了`PP-ShiTu`的快速开始demo。那么本文档主要介绍，如何将`PP-ShiTu`应用到自己的需求中，及如何继续调优，优化识别效果。具体可以分成以下三种情况
 
 - 直接使用官方模型
 - 根据需求对模型进行调优
@@ -35,7 +35,7 @@
 
 ### 1.1 下载官方模型及数据准备
 
-模型下载及pipline 运行详见[图像识别快速开始](../quick_start/quick_start_recognition.md)
+模型下载及pipline 运行详见[图像识别快速开始](../../quick_start/quick_start_recognition.md)
 
 下载模型后，要准备相应的数据，即所迁移应用的具体数据，数据量根据实际情况，自行决定，但是不能太少，会影响精度。将准备的数据分成两部分：1）建库图像（gallery），2）测试图像。其中建库数据无需过多，但需保证每个类别包含此类别物体不同角度的图像，建议每个类别至少5张图，请根据实际情况，具体调节。
 
@@ -49,7 +49,7 @@
 
 对于加入检索的数据，每个类别尽量准备此类别的各角度的图像，丰富类别信息。准备的图像只能包含此类别，同时图像背景尽可能的少、简单。即将要加入检索根据标注的包围框信息，裁剪出bbox图像作为新的要加入的图像，以提高检索库的图像质量。
 
-收集好图像后，数据整理及建库流程详见[图像识别快速开始](../quick_start/quick_start_recognition.md)中`3.2 建立新的索引库`
+收集好图像后，数据整理及建库流程详见[图像识别快速开始](../../quick_start/quick_start_recognition.md)中`3.2 建立新的索引库`
 
 <a name="1.3"></a>
 
@@ -77,12 +77,12 @@
 
 在使用官方模型后，如果不满足精度需求，则可以参考此部分文档，进行模型调优
 
-因为要对模型进行训练，所以收集自己的数据集。数据准备及相应格式请参考：[特征提取文档](../image_recognition_pipeline/feature_extraction.md)中 `4.1数据准备`部分、[识别数据集说明](../data_preparation/recognition_dataset.md)。值得注意的是，此部分需要准备大量的数据，以保证识别模型效果。训练配置文件参考：[通用识别模型配置文件](../../../ppcls/configs/GeneralRecognition/GeneralRecognition_PPLCNet_x2_5.yaml)，训练方法参考：[识别模型训练](../models_training/recognition.md)
+因为要对模型进行训练，所以收集自己的数据集。数据准备及相应格式请参考：[特征提取文档](../../training/PP-ShiTu/feature_extraction.md)中 `4.1数据准备`部分、[识别数据集说明](../../training/metric_learning/dataset.md)。值得注意的是，此部分需要准备大量的数据，以保证识别模型效果。训练配置文件参考：[通用识别模型配置文件](../../../../ppcls/configs/GeneralRecognition/GeneralRecognition_PPLCNet_x2_5.yaml)，训练方法参考：[识别模型训练](../../models_training/recognition.md)
 
-- 数据增强：根据实际情况选择不同数据增强方法。如：实际应用中数据遮挡比较严重，建议添加`RandomErasing`增强方法。详见[数据增强文档](./DataAugmentation.md)
-- 换不同的`backbone`，一般来说，越大的模型，特征提取能力更强。不同`backbone`详见[模型介绍](../algorithm_introduction/ImageNet_models.md)
-- 选择不同的`Metric Learning`方法。不同的`Metric Learning`方法，对不同的数据集效果可能不太一样，建议尝试其他`Loss`,详见[Metric Learning](../algorithm_introduction/metric_learning.md)
-- 采用蒸馏方法，对小模型进行模型能力提升，详见[模型蒸馏](../algorithm_introduction/knowledge_distillation.md)
+- 数据增强：根据实际情况选择不同数据增强方法。如：实际应用中数据遮挡比较严重，建议添加`RandomErasing`增强方法。详见[数据增强文档](../../training/config_discription/data_augmentation.md)
+- 换不同的`backbone`，一般来说，越大的模型，特征提取能力更强。不同`backbone`详见[模型介绍](../../models/ImageNet1k/model_list.md)
+- 选择不同的`Metric Learning`方法。不同的`Metric Learning`方法，对不同的数据集效果可能不太一样，建议尝试其他`Loss`,详见[Metric Learning](../../algorithm_introduction/metric_learning.md)
+- 采用蒸馏方法，对小模型进行模型能力提升，详见[模型蒸馏](../../algorithm_introduction/knowledge_distillation.md)
 - 增补数据集。针对错误样本，添加badcase数据
 
 模型训练完成后，参照[1.2 检索库更新](#1.2)进行检索库更新。同时，对整个pipeline进行测试，如果精度不达预期，则重复此步骤。
@@ -94,4 +94,4 @@
 模型加速主要以下几种方法：
 
 - 替换小模型：一般来说，越小的模型预测速度相对越快
-- 模型裁剪、量化：请参考文档[模型压缩](./model_prune_quantization.md)，压缩配置文件修改请参考[slim相关配置文件](../../../ppcls/configs/slim/)。
+- 模型裁剪、量化：请参考文档[模型压缩](../../training/advanced/prune_quantization.md)，压缩配置文件修改请参考[slim相关配置文件](../../../ppcls/configs/slim/)。

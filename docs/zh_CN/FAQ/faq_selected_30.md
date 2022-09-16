@@ -32,7 +32,7 @@
 >>
 * Q: 怎样根据自己的任务选择合适的模型进行训练？
 * A: 如果希望在服务器部署，或者希望精度尽可能地高，对模型存储大小或者预测速度的要求不是很高，那么推荐使用 ResNet_vd、Res2Net_vd、DenseNet、Xception 等适合于服务器端的系列模型；如果希望在移动端侧部署，则推荐使用 MobileNetV3、GhostNet
-    等适合于移动端的系列模型。同时，我们推荐在选择模型的时候可以参考[模型库](../algorithm_introduction/ImageNet_models.md)中的速度-精度指标图。
+    等适合于移动端的系列模型。同时，我们推荐在选择模型的时候可以参考[模型库](../models/ImageNet1k/model_list.md)中的速度-精度指标图。
 
 >>
 * Q: 如何进行参数初始化，什么样的初始化可以加快模型收敛？
@@ -126,7 +126,7 @@
 
 >>
 * Q: 数据量不足的情况下，目前有哪些常见的数据增广方法来增加训练样本的丰富度呢？
-* A: PaddleClas 中将目前比较常见的数据增广方法分为了三大类，分别是图像变换类、图像裁剪类和图像混叠类，图像变换类主要包括 AutoAugment 和 RandAugment，图像裁剪类主要包括 CutOut、RandErasing、HideAndSeek 和 GridMask，图像混叠类主要包括 Mixup 和 Cutmix，更详细的关于数据增广的介绍可以参考：[数据增广章节](../algorithm_introduction/DataAugmentation.md)。
+* A: PaddleClas 中将目前比较常见的数据增广方法分为了三大类，分别是图像变换类、图像裁剪类和图像混叠类，图像变换类主要包括 AutoAugment 和 RandAugment，图像裁剪类主要包括 CutOut、RandErasing、HideAndSeek 和 GridMask，图像混叠类主要包括 Mixup 和 Cutmix，更详细的关于数据增广的介绍可以参考：[数据增广章节](../algorithm_introduction/data_augmentation.md)。
 >>
 * Q: 对于遮挡情况比较常见的图像分类场景，该使用什么数据增广方法去提升模型的精度呢？
 * A: 在训练的过程中可以尝试对训练集使用 CutOut、RandErasing、HideAndSeek 和 GridMask 等裁剪类数据增广方法，让模型也能够不止学习到显著区域，也能关注到非显著性区域，从而在遮挡的情况下，也能较好地完成识别任务。
@@ -214,7 +214,7 @@
 
 >>
 * Q: 怎么在 windows 上或者 cpu 上面模型训练呢？
-* A: 可以参考[开始使用教程](../models_training/classification.md)，详细介绍了在 Linux、Windows、CPU 等环境中进行模型训练、评估与预测的教程。
+* A: 可以参考[开始使用教程](../training/single_label_classification/training.md)，详细介绍了在 Linux、Windows、CPU 等环境中进行模型训练、评估与预测的教程。
 >>
 * Q: 怎样在模型训练的时候使用 label smoothing 呢？
 * A: 可以在配置文件中的 `Loss` 字段下进行设置，如下所示，`epsilon=0.1` 表示设置该值为 0.1，若不设置 `epsilon` 字段，则不使用 `label smoothing`。

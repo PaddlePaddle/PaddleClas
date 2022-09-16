@@ -1,4 +1,4 @@
-简体中文 | [English](../../en/inference_deployment/recognition_serving_deploy_en.md)
+简体中文 | [English](../../../en/inference_deployment/recognition_serving_deploy_en.md)
 
 # 识别模型服务化部署
 
@@ -188,7 +188,7 @@ python3.7 -m pip install paddle-serving-server-gpu==0.7.0.post112 # GPU with CUD
   pipeline_http_client.py     # http方式发送pipeline预测请求的脚本
   pipeline_rpc_client.py      # rpc方式发送pipeline预测请求的脚本
   recognition_web_service.py  # 启动pipeline服务端的脚本
-  readme.md                   # 识别模型服务化部署文档
+  paddle2onnx.md                   # 识别模型服务化部署文档
   run_cpp_serving.sh          # 启动C++ Pipeline Serving部署的脚本
   test_cpp_serving_client.py  # rpc方式发送C++ Pipeline serving预测请求的脚本
   ```

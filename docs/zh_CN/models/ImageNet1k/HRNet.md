@@ -14,13 +14,13 @@ HRNet 是 2019 年由微软亚洲研究院提出的一种全新的神经网络�
 
 该系列模型的 FLOPS、参数量以及 T4 GPU 上的预测耗时如下图所示。
 
-![](../../images/models/T4_benchmark/t4.fp32.bs4.HRNet.flops.png)
+![](../../../images/models/T4_benchmark/t4.fp32.bs4.HRNet.flops.png)
 
-![](../../images/models/T4_benchmark/t4.fp32.bs4.HRNet.params.png)
+![](../../../images/models/T4_benchmark/t4.fp32.bs4.HRNet.params.png)
 
-![](../../images/models/T4_benchmark/t4.fp32.bs4.HRNet.png)
+![](../../../images/models/T4_benchmark/t4.fp32.bs4.HRNet.png)
 
-![](../../images/models/T4_benchmark/t4.fp16.bs4.HRNet.png)
+![](../../../images/models/T4_benchmark/t4.fp16.bs4.HRNet.png)
 
 目前 PaddleClas 开源的这类模型的预训练模型一共有 7 个，其指标如图所示，其中 HRNet_W48_C 指标精度异常的原因可能是因为网络训练的正常波动。
 

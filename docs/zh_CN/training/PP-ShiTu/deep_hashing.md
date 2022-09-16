@@ -47,15 +47,15 @@ python3.7 -m paddle.distributed.launch tools/train.py \
 
 ### 1.2 其他特征模型二值训练
 
-其他二值特征训练模型的配置文件位于`ppcls/configs/DeepHash/`文件夹下，此文件夹下的相关配置文件主要是复现相关`deep hashing`相关算法。包括：`DCH, DSHSD, LCDSH`三种算法。这三种算法相关介绍，详见[Deep Hashing相关算法介绍](../algorithm_introduction/deep_hashing_introduction.md)。
+其他二值特征训练模型的配置文件位于`ppcls/configs/DeepHash/`文件夹下，此文件夹下的相关配置文件主要是复现相关`deep hashing`相关算法。包括：`DCH, DSHSD, LCDSH`三种算法。这三种算法相关介绍，详见[Deep Hashing相关算法介绍](../../algorithm_introduction/deep_hashing.md)。
 
-相关训练方法，请参考[分类模型训练文档](../models_training/classification.md)。
+相关训练方法，请参考[分类模型训练文档](../single_label_classification/training.md)。
 
 <a name="2"></a>
 
 ## 2. 检索算法配置
 
-在PP-ShiTu中使用二值特征，部署及离线推理配置请参考`deploy/configs/inference_general_binary.yaml`。配置文件中相关参数介绍请参考[向量检索文档](./vector_search.md).
+在PP-ShiTu中使用二值特征，部署及离线推理配置请参考`deploy/configs/inference_general_binary.yaml`。配置文件中相关参数介绍请参考[向量检索文档](../../deployment/PP-ShiTu/vector_search.md).
 
 其中需值得注意的是，二值检索相关配置应设置如下：
 

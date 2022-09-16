@@ -17,7 +17,7 @@ PaddlePaddle 支持导出 inference 模型用于部署推理场景，相比于�
 <a name="1"></a>
 ## 1. 环境准备
 
-首先请参考文档文档[环境准备](../installation/install_paddleclas.md)配置运行环境。
+首先请参考文档文档[环境准备](../installation.md)配置运行环境。
 
 <a name="2"></a>
 ## 2. 分类模型导出
@@ -46,7 +46,7 @@ python tools/export_model.py \
 <a name="3"></a>
 ## 3. 主体检测模型导出
 
-主体检测模型的导出，可以参考[主体检测介绍](../image_recognition_pipeline/mainbody_detection.md)。
+主体检测模型的导出，可以参考[主体检测介绍](../training/PP-ShiTu/mainbody_detection.md)。
 
 <a name="4"></a>
 ## 4. 识别模型导出
