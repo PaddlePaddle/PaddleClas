@@ -6,7 +6,7 @@
 
 图像分类是计算机视觉里很基础但又重要的一个领域，其研究成果一直影响着计算机视觉甚至深度学习的发展，图像分类有很多子领域，如多标签分类、细粒度分类等，此处只对单标签图像分类做一个简述。
 
-具体图像分类算法介绍详见[文档](../algorithm_introduction/image_classification.md)。
+具体图像分类算法介绍详见[文档](../../algorithm_introduction/image_classification.md)。
 
 ## 目录
 
@@ -54,20 +54,20 @@ CIFAR-10 数据集由 10 个类的 60000 个彩色图像组成，图像分辨率
 <a name="2.1"></a>
 ### 2.1 数据及其预处理
 
-数据的质量及数量往往可以决定一个模型的好坏。在图像分类领域，数据包括图像及标签。在大部分情形下，带有标签的数据比较匮乏，所以数量很难达到使模型饱和的程度，为了可以使模型学习更多的图像特征，图像数据在进入模型之前要经过很多图像变换或者数据增强，来保证输入图像数据的多样性，从而保证模型有更好的泛化能力。PaddleClas 提供了训练 ImageNet-1k 的标准图像变换，也提供了多种数据增强的方法，相关代码可以查看[数据处理](../../../ppcls/data/preprocess)，配置文件可以参考[数据增强配置文件](../../../ppcls/configs/ImageNet/DataAugment)，相关数据增强算法详见[增强介绍文档](../algorithm_introduction/DataAugmentation.md)。
+数据的质量及数量往往可以决定一个模型的好坏。在图像分类领域，数据包括图像及标签。在大部分情形下，带有标签的数据比较匮乏，所以数量很难达到使模型饱和的程度，为了可以使模型学习更多的图像特征，图像数据在进入模型之前要经过很多图像变换或者数据增强，来保证输入图像数据的多样性，从而保证模型有更好的泛化能力。PaddleClas 提供了训练 ImageNet-1k 的标准图像变换，也提供了多种数据增强的方法，相关代码可以查看[数据处理](../../../../ppcls/data/preprocess)，配置文件可以参考[数据增强配置文件](../../../../ppcls/configs/ImageNet/DataAugment)，相关数据增强算法详见[增强介绍文档](../../algorithm_introduction/data_augmentation.md)。
 
 <a name="2.2"></a>
 
 ### 2.2 模型准备
 
-在数据确定后，模型往往决定了最终算法精度的上限，在图像分类领域，经典的模型层出不穷，PaddleClas 提供了 35 个系列共 164 个 ImageNet 预训练模型。具体的精度、速度等指标请参考[骨干网络和预训练模型库](../algorithm_introduction/ImageNet_models.md)。
+在数据确定后，模型往往决定了最终算法精度的上限，在图像分类领域，经典的模型层出不穷，PaddleClas 提供了 35 个系列共 164 个 ImageNet 预训练模型。具体的精度、速度等指标请参考[骨干网络和预训练模型库](../../models/ImageNet1k/model_list.md)。
 
 <a name="2.3"></a>
 ### 2.3 模型训练
 
-在准备好数据、模型后，便可以开始迭代模型并更新模型的参数。经过多次迭代最终可以得到训练好的模型来做图像分类任务。图像分类的训练过程需要很多经验，涉及很多超参数的设置，PaddleClas 提供了一些列的[训练调优方法](./train_strategy.md)，可以快速助你获得高精度的模型。
+在准备好数据、模型后，便可以开始迭代模型并更新模型的参数。经过多次迭代最终可以得到训练好的模型来做图像分类任务。图像分类的训练过程需要很多经验，涉及很多超参数的设置，PaddleClas 提供了一些列的[训练调优方法](training_strategy.md)，可以快速助你获得高精度的模型。
 
-同时，PaddleClas 还支持使用VisualDL 可视化训练过程。VisualDL 是飞桨可视化分析工具，以丰富的图表呈现训练参数变化趋势、模型结构、数据样本、高维数据分布等。可帮助用户更清晰直观地理解深度学习模型训练过程及模型结构，进而实现高效的模型优化。更多细节请查看[VisualDL](../others/VisualDL.md)。
+同时，PaddleClas 还支持使用VisualDL 可视化训练过程。VisualDL 是飞桨可视化分析工具，以丰富的图表呈现训练参数变化趋势、模型结构、数据样本、高维数据分布等。可帮助用户更清晰直观地理解深度学习模型训练过程及模型结构，进而实现高效的模型优化。更多细节请查看[VisualDL](../config_discription/VisualDL.md)。
 
 <a name="2.4"></a>
 ### 2.4 模型评估
@@ -77,7 +77,7 @@ CIFAR-10 数据集由 10 个类的 60000 个彩色图像组成，图像分辨率
 <a name="3"></a>
 ## 3. 使用方法介绍
 
-请参考[安装指南](../installation/install_paddleclas.md)配置运行环境，并根据[快速开始](../quick_start/quick_start_classification_new_user.md)文档准备 flower102 数据集，本章节下面所有的实验均以 flower102 数据集为例。
+请参考[安装指南](../../installation.md)配置运行环境，并根据[快速开始](../../quick_start/quick_start_classification_new_user.md)文档准备 flower102 数据集，本章节下面所有的实验均以 flower102 数据集为例。
 
 PaddleClas 目前支持的训练/评估环境如下：
 ```shell
@@ -109,7 +109,7 @@ python3 tools/train.py \
 
 其中，`-c` 用于指定配置文件的路径，`-o` 用于指定需要修改或者添加的参数，其中 `-o Arch.pretrained=False` 表示不使用预训练模型，`-o Global.device=gpu` 表示使用 GPU 进行训练。如果希望使用 CPU 进行训练，则需要将 `Global.device` 设置为 `cpu`。
 
-更详细的训练配置，也可以直接修改模型对应的配置文件。具体配置参数参考[配置文档](config_description.md)。
+更详细的训练配置，也可以直接修改模型对应的配置文件。具体配置参数参考[配置文档](../config_discription/basic.md)。
 
 运行上述命令，可以看到输出日志，示例如下：
 
@@ -132,7 +132,7 @@ python3 tools/train.py \
     ...
     ```
 
-训练期间也可以通过 VisualDL 实时观察 loss 变化，详见 [VisualDL](../others/VisualDL.md)。
+训练期间也可以通过 VisualDL 实时观察 loss 变化，详见 [VisualDL](../config_discription/VisualDL.md)。
 
 <a name="3.1.2"></a>
 #### 3.1.2 模型微调
@@ -148,7 +148,7 @@ python3 tools/train.py \
 
 其中 `Arch.pretrained` 设置为 `True` 表示加载 ImageNet 的预训练模型，此外，`Arch.pretrained` 也可以指定具体的模型权重文件的地址，使用时需要换成自己的预训练模型权重文件的路径。
 
-我们也提供了大量基于 `ImageNet-1k` 数据集的预训练模型，模型列表及下载地址详见[模型库概览](../algorithm_introduction/ImageNet_models.md)。
+我们也提供了大量基于 `ImageNet-1k` 数据集的预训练模型，模型列表及下载地址详见[模型库概览](../../models/ImageNet1k/model_list.md)。
 
 
 <a name="3.1.3"></a>
@@ -243,7 +243,7 @@ python3 -m paddle.distributed.launch \
 
 其中 `Arch.pretrained` 为 `True` 或 `False`，当然也可以设置加载预训练权重文件的路径，使用时需要换成自己的预训练模型权重文件路径，也可以直接在配置文件中修改该路径。
 
-30 分钟玩转 PaddleClas [尝鲜版](../quick_start/quick_start_classification_new_user.md)与[进阶版](../quick_start/quick_start_classification_professional.md)中包含大量模型微调的示例，可以参考该章节在特定的数据集上进行模型微调。
+30 分钟玩转 PaddleClas [尝鲜版](../../quick_start/quick_start_classification_new_user.md)与[进阶版](../../quick_start/quick_start_classification_professional.md)中包含大量模型微调的示例，可以参考该章节在特定的数据集上进行模型微调。
 
 <a name="3.2.3"></a>
 

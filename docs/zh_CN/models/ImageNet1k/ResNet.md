@@ -181,7 +181,7 @@ Predict complete!
 ```python
 from paddleclas import PaddleClas
 clas = PaddleClas(model_name='ResNet50')
-infer_imgs = 'docs/images/inference_deployment/whl_demo.jpg'
+infer_imgs = 'docs/images/deployment/whl_demo.jpg'
 result = clas.predict(infer_imgs)
 print(next(result))
 ```
@@ -203,7 +203,7 @@ print(next(result))
 
 ### 3.1 环境配置
 
-* 安装：请先参考 [Paddle 安装教程](../installation/install_paddle.md) 以及 [PaddleClas 安装教程](../installation/install_paddleclas.md) 配置 PaddleClas 运行环境。
+* 安装：请先参考 [Paddle 安装教程](../installation/install_paddle.md) 以及 [PaddleClas 安装教程](../../installation.md) 配置 PaddleClas 运行环境。
 
 <a name="3.2"></a>
 
@@ -237,7 +237,7 @@ cd path_to_PaddleClas
 
 **备注：**
 
-* 关于 `train_list.txt`、`val_list.txt`的格式说明，可以参考[PaddleClas分类数据集格式说明](../data_preparation/classification_dataset.md#1-数据集格式说明) 。
+* 关于 `train_list.txt`、`val_list.txt`的格式说明，可以参考[PaddleClas分类数据集格式说明](../../training/single_label_classification/dataset.md#1-数据集格式说明) 。
 
 
 <a name="3.3"></a>
@@ -413,7 +413,7 @@ ILSVRC2012_val_00030010.jpeg:	class id(s): [80, 23, 83, 93, 136], score(s): [1.0
 
 ### 4.3 基于 C++ 预测引擎推理
 
-PaddleClas 提供了基于 C++ 预测引擎推理的示例，您可以参考[服务器端 C++ 预测](../inference_deployment/cpp_deploy.md)来完成相应的推理部署。如果您使用的是 Windows 平台，可以参考[基于 Visual Studio 2019 Community CMake 编译指南](../inference_deployment/cpp_deploy_on_windows.md)完成相应的预测库编译和模型预测工作。
+PaddleClas 提供了基于 C++ 预测引擎推理的示例，您可以参考[服务器端 C++ 预测](../../deployment/image_classification/cpp/linux.md)来完成相应的推理部署。如果您使用的是 Windows 平台，可以参考[基于 Visual Studio 2019 Community CMake 编译指南](../../deployment/image_classification/cpp/windows.md)完成相应的预测库编译和模型预测工作。
 
 <a name="4.4"></a>
 
@@ -421,7 +421,7 @@ PaddleClas 提供了基于 C++ 预测引擎推理的示例，您可以参考[服
 
 Paddle Serving 提供高性能、灵活易用的工业级在线推理服务。Paddle Serving 支持 RESTful、gRPC、bRPC 等多种协议，提供多种异构硬件和多种操作系统环境下推理解决方案。更多关于Paddle Serving 的介绍，可以参考[Paddle Serving 代码仓库](https://github.com/PaddlePaddle/Serving)。
 
-PaddleClas 提供了基于 Paddle Serving 来完成模型服务化部署的示例，您可以参考[模型服务化部署](../inference_deployment/paddle_serving_deploy.md)来完成相应的部署工作。
+PaddleClas 提供了基于 Paddle Serving 来完成模型服务化部署的示例，您可以参考[模型服务化部署](../deployment/paddle_serving_deploy.md)来完成相应的部署工作。
 
 <a name="4.5"></a>
 
@@ -429,7 +429,7 @@ PaddleClas 提供了基于 Paddle Serving 来完成模型服务化部署的示�
 
 Paddle Lite 是一个高性能、轻量级、灵活性强且易于扩展的深度学习推理框架，定位于支持包括移动端、嵌入式以及服务器端在内的多硬件平台。更多关于 Paddle Lite 的介绍，可以参考[Paddle Lite 代码仓库](https://github.com/PaddlePaddle/Paddle-Lite)。
 
-PaddleClas 提供了基于 Paddle Lite 来完成模型端侧部署的示例，您可以参考[端侧部署](../inference_deployment/paddle_lite_deploy.md)来完成相应的部署工作。
+PaddleClas 提供了基于 Paddle Lite 来完成模型端侧部署的示例，您可以参考[端侧部署](../../deployment/image_classification/paddle_lite.md)来完成相应的部署工作。
 
 <a name="4.6"></a>
 

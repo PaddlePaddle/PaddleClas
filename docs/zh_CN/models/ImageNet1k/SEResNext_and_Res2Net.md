@@ -20,13 +20,13 @@ Res2Net 是 2019 年提出的一种全新的对 ResNet 的改进方案，该方�
 该系列模型的 FLOPS、参数量以及 T4 GPU 上的预测耗时如下图所示。
 
 
-![](../../images/models/T4_benchmark/t4.fp32.bs4.SeResNeXt.flops.png)
+![](../../../images/models/T4_benchmark/t4.fp32.bs4.SeResNeXt.flops.png)
 
-![](../../images/models/T4_benchmark/t4.fp32.bs4.SeResNeXt.params.png)
+![](../../../images/models/T4_benchmark/t4.fp32.bs4.SeResNeXt.params.png)
 
-![](../../images/models/T4_benchmark/t4.fp32.bs4.SeResNeXt.png)
+![](../../../images/models/T4_benchmark/t4.fp32.bs4.SeResNeXt.png)
 
-![](../../images/models/T4_benchmark/t4.fp16.bs4.SeResNeXt.png)
+![](../../../images/models/T4_benchmark/t4.fp16.bs4.SeResNeXt.png)
 
 
 目前 PaddleClas 开源的这三类的预训练模型一共有 24 个，其指标如图所示，从图中可以看出，在同样 Flops 和 Params 下，改进版的模型往往有更高的精度，但是推理速度往往不如 ResNet 系列。另一方面，Res2Net 表现也较为优秀，相比 ResNeXt 中的 group 操作、SEResNet 中的 SE 结构操作，Res2Net 在相同 Flops、Params 和推理速度下往往精度更佳。

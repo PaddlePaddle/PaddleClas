@@ -16,13 +16,13 @@ ResNeXt 是 facebook 于 2016 年提出的一种对 ResNet 的改进版网络。
 
 该系列模型的 FLOPS、参数量以及 T4 GPU 上的预测耗时如下图所示。
 
-![](../../images/models/T4_benchmark/t4.fp32.bs4.EfficientNet.flops.png)
+![](../../../images/models/T4_benchmark/t4.fp32.bs4.EfficientNet.flops.png)
 
-![](../../images/models/T4_benchmark/t4.fp32.bs4.EfficientNet.params.png)
+![](../../../images/models/T4_benchmark/t4.fp32.bs4.EfficientNet.params.png)
 
-![](../../images/models/T4_benchmark/t4.fp32.bs1.EfficientNet.png)
+![](../../../images/models/T4_benchmark/t4.fp32.bs1.EfficientNet.png)
 
-![](../../images/models/T4_benchmark/t4.fp16.bs1.EfficientNet.png)
+![](../../../images/models/T4_benchmark/t4.fp16.bs1.EfficientNet.png)
 
 目前 PaddleClas 开源的这两类模型的预训练模型一共有 14 个。从上图中可以看出 EfficientNet 系列网络优势非常明显，ResNeXt101_wsl 系列模型由于用到了更多的数据，最终的精度也更高。EfficientNet_B0_Small 是去掉了 SE_block 的 EfficientNet_B0，其具有更快的推理速度。
 

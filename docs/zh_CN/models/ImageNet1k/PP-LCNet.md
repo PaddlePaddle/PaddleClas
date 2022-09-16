@@ -49,14 +49,14 @@
 在计算机视觉领域中，骨干网络的好坏直接影响到整个视觉任务的结果。在之前的一些工作中，相关的研究者普遍将 FLOPs 或者 Params 作为优化目的，但是在工业界真实落地的场景中，推理速度才是考量模型好坏的重要指标，然而，推理速度和准确性很难兼得。考虑到工业界有很多基于 Intel CPU 的应用，所以我们本次的工作旨在使骨干网络更好的适应 Intel CPU，从而得到一个速度更快、准确率更高的轻量级骨干网络，与此同时，目标检测、语义分割等下游视觉任务的性能也同样得到提升。
 
 近年来，有很多轻量级的骨干网络问世，尤其最近两年，各种 NAS 搜索出的网络层出不穷，这些网络要么主打 FLOPs 或者 Params 上的优势，要么主打 ARM 设备上的推理速度的优势，很少有网络专门针对 Intel CPU 做特定的优化，导致这些网络在 Intel CPU 端的推理速度并不是很完美。基于此，我们针对 Intel CPU 设备以及其加速库 MKLDNN 设计了特定的骨干网络 PP-LCNet，比起其他的轻量级的 SOTA 模型，该骨干网络可以在不增加推理时间的情况下，进一步提升模型的性能，最终大幅度超越现有的 SOTA 模型。与其他模型的对比图如下。
-![](../../images/PP-LCNet/PP-LCNet-Acc.png)
+![](../../../images/PP-LCNet/PP-LCNet-Acc.png)
 
 <a name="1.2"></a>
 
 ### 1.2 模型细节
 
 网络结构整体如下图所示。
-![](../../images/PP-LCNet/PP-LCNet.png)
+![](../../../images/PP-LCNet/PP-LCNet.png)
 我们经过大量的实验发现，在基于 Intel CPU 设备上，尤其当启用 MKLDNN 加速库后，很多看似不太耗时的操作反而会增加延时，比如 elementwise-add 操作、split-concat 结构等。所以最终我们选用了结构尽可能精简、速度尽可能快的 block 组成我们的 BaseNet（类似 MobileNetV1）。基于 BaseNet，我们通过实验，总结了四条几乎不增加延时但是可以提升模型精度的方法，融合这四条策略，我们组合成了 PP-LCNet。下面对这四条策略一一介绍：
 
 <a name="1.2.1"></a>
@@ -136,7 +136,7 @@ BaseNet 经过以上四个方面的改进，得到了 PP-LCNet。下表进一步
 | PPLCNet_x1_0_ssld | 3.0 | 161 | 74.39 | 92.09 | 2.46 | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/PPLCNet_x1_0_ssld_pretrained.pdparams) | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/PPLCNet_x1_0_ssld_infer.tar) |
 | PPLCNet_x2_5_ssld | 9.0 | 906 | 80.82 | 95.33 | 5.39 | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/PPLCNet_x2_5_ssld_pretrained.pdparams) | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/PPLCNet_x2_5_ssld_infer.tar) |
 
-其中 `_ssld` 表示使用 `SSLD 蒸馏`后的模型。关于 `SSLD蒸馏` 的内容，详情 [SSLD 蒸馏](../advanced_tutorials/knowledge_distillation.md)。
+其中 `_ssld` 表示使用 `SSLD 蒸馏`后的模型。关于 `SSLD蒸馏` 的内容，详情 [SSLD 蒸馏](../../training/advanced/knowledge_distillation.md)。
 
 与其他轻量级网络的性能对比：
 
@@ -291,7 +291,7 @@ Predict complete!
 ```python
 from paddleclas import PaddleClas
 clas = PaddleClas(model_name='PPLCNet_x1_0')
-infer_imgs='docs/images/inference_deployment/whl_demo.jpg'
+infer_imgs='docs/images/deployment/whl_demo.jpg'
 result=clas.predict(infer_imgs)
 print(next(result))
 ```
@@ -312,7 +312,7 @@ print(next(result))
 
 ### 3.1 环境配置
 
-* 安装：请先参考 [Paddle 安装教程](../installation/install_paddle.md) 以及 [PaddleClas 安装教程](../installation/install_paddleclas.md) 配置 PaddleClas 运行环境。
+* 安装：请先参考 [Paddle 安装教程](../installation/install_paddle.md) 以及 [PaddleClas 安装教程](../../installation.md) 配置 PaddleClas 运行环境。
 
 <a name="3.2"></a>
 
@@ -346,7 +346,7 @@ cd path_to_PaddleClas
 
 **备注：**
 
-* 关于 `train_list.txt`、`val_list.txt`的格式说明，可以参考[PaddleClas分类数据集格式说明](../data_preparation/classification_dataset.md#1-数据集格式说明) 。
+* 关于 `train_list.txt`、`val_list.txt`的格式说明，可以参考[PaddleClas分类数据集格式说明](../../training/single_label_classification/dataset.md#1-数据集格式说明) 。
 
 
 <a name="3.3"></a>
@@ -522,7 +522,7 @@ ILSVRC2012_val_00030010.jpeg:	class id(s): [80, 23, 93, 81, 99], score(s): [0.87
 
 ### 4.3 基于 C++ 预测引擎推理
 
-PaddleClas 提供了基于 C++ 预测引擎推理的示例，您可以参考[服务器端 C++ 预测](../inference_deployment/cpp_deploy.md)来完成相应的推理部署。如果您使用的是 Windows 平台，可以参考[基于 Visual Studio 2019 Community CMake 编译指南](../inference_deployment/cpp_deploy_on_windows.md)完成相应的预测库编译和模型预测工作。
+PaddleClas 提供了基于 C++ 预测引擎推理的示例，您可以参考[服务器端 C++ 预测](../../deployment/image_classification/cpp/linux.md)来完成相应的推理部署。如果您使用的是 Windows 平台，可以参考[基于 Visual Studio 2019 Community CMake 编译指南](../../deployment/image_classification/cpp/windows.md)完成相应的预测库编译和模型预测工作。
 
 <a name="4.4"></a>
 
@@ -530,7 +530,7 @@ PaddleClas 提供了基于 C++ 预测引擎推理的示例，您可以参考[服
 
 Paddle Serving 提供高性能、灵活易用的工业级在线推理服务。Paddle Serving 支持 RESTful、gRPC、bRPC 等多种协议，提供多种异构硬件和多种操作系统环境下推理解决方案。更多关于Paddle Serving 的介绍，可以参考[Paddle Serving 代码仓库](https://github.com/PaddlePaddle/Serving)。
 
-PaddleClas 提供了基于 Paddle Serving 来完成模型服务化部署的示例，您可以参考[模型服务化部署](../inference_deployment/paddle_serving_deploy.md)来完成相应的部署工作。
+PaddleClas 提供了基于 Paddle Serving 来完成模型服务化部署的示例，您可以参考[模型服务化部署](../deployment/paddle_serving_deploy.md)来完成相应的部署工作。
 
 <a name="4.5"></a>
 
@@ -538,7 +538,7 @@ PaddleClas 提供了基于 Paddle Serving 来完成模型服务化部署的示�
 
 Paddle Lite 是一个高性能、轻量级、灵活性强且易于扩展的深度学习推理框架，定位于支持包括移动端、嵌入式以及服务器端在内的多硬件平台。更多关于 Paddle Lite 的介绍，可以参考[Paddle Lite 代码仓库](https://github.com/PaddlePaddle/Paddle-Lite)。
 
-PaddleClas 提供了基于 Paddle Lite 来完成模型端侧部署的示例，您可以参考[端侧部署](../inference_deployment/paddle_lite_deploy.md)来完成相应的部署工作。
+PaddleClas 提供了基于 Paddle Lite 来完成模型端侧部署的示例，您可以参考[端侧部署](../../deployment/image_classification/paddle_lite.md)来完成相应的部署工作。
 
 <a name="4.6"></a>
 

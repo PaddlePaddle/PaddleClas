@@ -11,7 +11,7 @@
 本教程将介绍如何使用飞桨模型压缩库 PaddleSlim 做 PaddleClas 模型的压缩，即裁剪、量化功能。
 [PaddleSlim](https://github.com/PaddlePaddle/PaddleSlim)集成了模型剪枝、量化（包括量化训练和离线量化）、蒸馏和神经网络搜索等多种业界常用且领先的模型压缩功能，如果您感兴趣，可以关注并了解。
 
-在开始本教程之前，建议先了解 [PaddleClas 模型的训练方法](../models_training/classification.md)以及 [PaddleSlim](https://paddleslim.readthedocs.io/zh_CN/latest/index.html)，相关裁剪、量化方法可以参考[模型裁剪量化算法介绍文档](../algorithm_introduction/model_prune_quantization.md)。
+在开始本教程之前，建议先了解 [PaddleClas 模型的训练方法](../single_label_classification/training.md)以及 [PaddleSlim](https://paddleslim.readthedocs.io/zh_CN/latest/index.html)，相关裁剪、量化方法可以参考[模型裁剪量化算法介绍文档](../../algorithm_introduction/prune_quantization.md)。
 
 -----------
 
@@ -61,7 +61,7 @@ python3.7 setup.py install
 <a name="1.2"></a>
 ### 1.2 准备训练好的模型
 
-PaddleClas 提供了一系列训练好的[模型](../models/models_intro.md)，如果待量化的模型不在列表中，需要按照[常规训练](../models_training/classification.md)方法得到训练好的模型。
+PaddleClas 提供了一系列训练好的[模型](../models/models_intro.md)，如果待量化的模型不在列表中，需要按照[常规训练](../single_label_classification/training.md)方法得到训练好的模型。
 
 <a name="2"></a>
 ## 2. 快速开始
@@ -92,7 +92,7 @@ cd PaddleClas
 python3.7 tools/train.py -c ppcls/configs/slim/ResNet50_vd_quantization.yaml -o Global.device=cpu
 ```
 
-其中 `yaml` 文件解析详见[参考文档](../models_training/config_description.md)。为了保证精度，`yaml` 文件中已经使用 `pretrained model`.
+其中 `yaml` 文件解析详见[参考文档](../config_discription/basic.md)。为了保证精度，`yaml` 文件中已经使用 `pretrained model`.
 
 
 * 单机多卡/多机多卡启动
@@ -108,7 +108,7 @@ python3.7 -m paddle.distributed.launch \
 <a name="2.1.2"></a>
 #### 2.1.2 离线量化
 
-**注意**：目前离线量化，必须使用已经训练好的模型，导出的 `inference model` 进行量化。一般模型导出 `inference model` 可参考[教程](../inference_deployment/export_model.md).
+**注意**：目前离线量化，必须使用已经训练好的模型，导出的 `inference model` 进行量化。一般模型导出 `inference model` 可参考[教程](../../deployment/export_model.md).
 
 一般来说，离线量化损失模型精度较多。
 
@@ -160,10 +160,10 @@ python3.7 tools/export.py \
 <a name="4"></a>
 ## 4. 模型部署
 
-上述步骤导出的模型可以直接使用 inferecne 进行部署，参考 [inference 部署](../inference_deployment/)。
+上述步骤导出的模型可以直接使用 inferecne 进行部署，参考 [inference 部署](../deployment/)。
 
 也通过 PaddleLite 的 opt 模型转换工具，完成 inference 模型到移动端模型转换，用于移动端的模型部署。
-移动端模型部署的可参考 [移动端模型部署](../inference_deployment/paddle_lite_deploy.md)。
+移动端模型部署的可参考 [移动端模型部署](../../deployment/image_classification/paddle_lite.md)。
 
 <a name="5"></a>
 ## 5. 训练超参数建议

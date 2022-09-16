@@ -51,7 +51,7 @@
 
 在图像分类任务中，图像数据的增广是一种常用的正则化方法，常用于数据量不足或者模型参数较多的场景。在本章节中，我们将对除 ImageNet 分类任务标准数据增强外的 8 种数据增强方式进行简单的介绍和对比，用户也可以将这些增广方法应用到自己的任务中，以获得模型精度的提升。这 8 种数据增强方式在 ImageNet 上的精度指标如下所示。
 
-![](../../images/image_aug/main_image_aug.png)
+![](../../../images/image_aug/main_image_aug.png)
 
 更具体的指标如下表所示：
 
@@ -91,7 +91,7 @@
 
 增广后的可视化效果如下所示。
 
-![](../../images/image_aug/image_aug_samples_s.jpg)
+![](../../../images/image_aug/image_aug_samples_s.jpg)
 
 具体如下表所示：
 
@@ -609,7 +609,7 @@ Mixup 是最先提出的图像混叠增广方案，其原理简单、方便实�
 
 ### 2.1 环境配置
 
-* 安装：请先参考 [Paddle 安装教程](../installation/install_paddle.md) 以及 [PaddleClas 安装教程](../installation/install_paddleclas.md) 配置 PaddleClas 运行环境。
+* 安装：请先参考 [Paddle 安装教程](../installation/install_paddle.md) 以及 [PaddleClas 安装教程](../../installation.md) 配置 PaddleClas 运行环境。
 
 <a name="2.2"></a>
 
@@ -643,7 +643,7 @@ cd path_to_PaddleClas
 
 **备注：**
 
-* 关于 `train_list.txt`、`val_list.txt`的格式说明，可以参考[PaddleClas分类数据集格式说明](../data_preparation/classification_dataset.md#1-数据集格式说明) 。
+* 关于 `train_list.txt`、`val_list.txt`的格式说明，可以参考[PaddleClas分类数据集格式说明](../single_label_classification/dataset.md#1-数据集格式说明) 。
 
 
 <a name="2.3"></a>
@@ -670,7 +670,7 @@ python3 -m paddle.distributed.launch \
 * 4.由于图像混叠时需对 label 进行混叠，无法计算训练数据的准确率，所以在训练过程中没有打印训练准确率。
 * 5.在使用数据增强后，由于训练数据更难，所以训练损失函数可能较大，训练集的准确率相对较低，但其有拥更好的泛化能力，所以验证集的准确率相对较高。
 * 6.在使用数据增强后，模型可能会趋于欠拟合状态，建议可以适当的调小 `l2_decay` 的值来获得更高的验证集准确率。
-* 7.几乎每一类图像增强均含有超参数，我们只提供了基于 ImageNet-1k 的超参数，其他数据集需要用户自己调试超参数，具体超参数的含义用户可以阅读相关的论文，调试方法也可以参考[训练技巧](../models_training/train_strategy.md)。
+* 7.几乎每一类图像增强均含有超参数，我们只提供了基于 ImageNet-1k 的超参数，其他数据集需要用户自己调试超参数，具体超参数的含义用户可以阅读相关的论文，调试方法也可以参考[训练技巧](../single_label_classification/training_strategy.md)。
 
 <a name="2.4"></a>
 
@@ -737,14 +737,14 @@ python3 tools/infer.py \
 
 
 
-[test_baseline]: ../../images/image_aug/test_baseline.jpeg
-[test_autoaugment]: ../../images/image_aug/test_autoaugment.jpeg
-[test_cutout]: ../../images/image_aug/test_cutout.jpeg
-[test_gridmask]: ../../images/image_aug/test_gridmask.jpeg
-[gridmask-0]: ../../images/image_aug/gridmask-0.png
-[test_hideandseek]: ../../images/image_aug/test_hideandseek.jpeg
-[test_randaugment]: ../../images/image_aug/test_randaugment.jpeg
-[test_randomerassing]: ../../images/image_aug/test_randomerassing.jpeg
-[hide_and_seek_mask_expanation]: ../../images/image_aug/hide-and-seek-visual.png
-[test_mixup]: ../../images/image_aug/test_mixup.png
-[test_cutmix]: ../../images/image_aug/test_cutmix.png
+[test_baseline]: ../../../images/image_aug/test_baseline.jpeg
+[test_autoaugment]: ../../../images/image_aug/test_autoaugment.jpeg
+[test_cutout]: ../../../images/image_aug/test_cutout.jpeg
+[test_gridmask]: ../../../images/image_aug/test_gridmask.jpeg
+[gridmask-0]: ../../../images/image_aug/gridmask-0.png
+[test_hideandseek]: ../../../images/image_aug/test_hideandseek.jpeg
+[test_randaugment]: ../../../images/image_aug/test_randaugment.jpeg
+[test_randomerassing]: ../../../images/image_aug/test_randomerassing.jpeg
+[hide_and_seek_mask_expanation]: ../../../images/image_aug/hide-and-seek-visual.png
+[test_mixup]: ../../../images/image_aug/test_mixup.png
+[test_cutmix]: ../../../images/image_aug/test_cutmix.png

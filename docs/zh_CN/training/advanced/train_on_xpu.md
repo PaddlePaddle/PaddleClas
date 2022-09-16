@@ -17,7 +17,7 @@
 <a name='2'></a>
 
 ## 2. 昆仑训练
-* 数据来源和预训练模型参考[quick_start](../quick_start/quick_start_classification_new_user.md)。昆仑训练效果与 CPU/GPU 对齐。
+* 数据来源和预训练模型参考[quick_start](../../quick_start/quick_start_classification_new_user.md)。昆仑训练效果与 CPU/GPU 对齐。
 
 <a name='2.1'></a>
 

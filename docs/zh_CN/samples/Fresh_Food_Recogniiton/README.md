@@ -12,10 +12,9 @@
 
 深圳市银歌云技术有限公司基于飞桨的图像识别开发套件PaddleClas，提供了一套基于计算机视觉的完整生鲜品自主结算方案，其通过结算平台的摄像头拍摄的图像，自动的识别称上的商品，整个流程在1秒内完成，无需售卖人员的操作及称重。整个流程，实现了精度高、速度快，无需人工干预的自动结算效果。减少人工成本的同时，大大提高了效率和用户体验。
 
-本案例使用了飞桨图像分类开发套件中的通用图像识别系统[PP-ShiTuV2](../../PPShiTu/PPShiTuV2_introduction.md)。
+本案例使用了飞桨图像分类开发套件中的通用图像识别系统[PP-ShiTuV2](../../models/PP-ShiTu/README.md)。
 
 
 ![result](./imgs/yingeo.png)
 
 **注**: AI Studio在线运行代码请参考[生鲜品自主结算](https://aistudio.baidu.com/aistudio/projectdetail/4486158)
-

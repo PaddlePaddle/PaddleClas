@@ -35,7 +35,7 @@
 <a name="1"></a>
 ### 1.分类模型
 
-此处以 `ResNet50_vd` 在 `ImageNet-1k` 上的训练配置为例，详解各个参数的意义。[配置路径](../../../ppcls/configs/ImageNet/ResNet/ResNet50_vd.yaml)。
+此处以 `ResNet50_vd` 在 `ImageNet-1k` 上的训练配置为例，详解各个参数的意义。[配置路径](../../../../ppcls/configs/ImageNet/ResNet/ResNet50_vd.yaml)。
 
 <a name="1.1"></a>
 #### 1.1 全局配置(Global)
@@ -102,7 +102,7 @@
     values: [0.1, 0.01, 0.001, 0.0001]
 ```
 
-添加方法及参数请查看 [learning_rate.py](../../../ppcls/optimizer/learning_rate.py)。
+添加方法及参数请查看 [learning_rate.py](../../../../ppcls/optimizer/learning_rate.py)。
 
 <a name="1.5"></a>
 #### 1.5 数据读取模块(DataLoader)
@@ -181,7 +181,7 @@ batch_transform_ops 中参数的含义：
 <a name="2"></a>
 ### 2.蒸馏模型
 
-**注**：此处以 `MobileNetV3_large_x1_0` 在 `ImageNet-1k` 上蒸馏 `MobileNetV3_small_x1_0` 的训练配置为例，详解各个参数的意义。[配置路径](../../../ppcls/configs/ImageNet/Distillation/mv3_large_x1_0_distill_mv3_small_x1_0.yaml)。这里只介绍与分类模型有区别的参数。
+**注**：此处以 `MobileNetV3_large_x1_0` 在 `ImageNet-1k` 上蒸馏 `MobileNetV3_small_x1_0` 的训练配置为例，详解各个参数的意义。[配置路径](../../../../ppcls/configs/ImageNet/Distillation/mv3_large_x1_0_distill_mv3_small_x1_0.yaml)。这里只介绍与分类模型有区别的参数。
 
 <a name="2.1"></a>
 #### 2.1 结构（Arch）
@@ -234,7 +234,7 @@ batch_transform_ops 中参数的含义：
 <a name="3"></a>
 ### 3. 识别模型
 
-**注**：此处以 `ResNet50` 在 `LogoDet-3k` 上的训练配置为例，详解各个参数的意义。[配置路径](../../../ppcls/configs/Logo/ResNet50_ReID.yaml)。这里只介绍与分类模型有区别的参数。
+**注**：此处以 `ResNet50` 在 `LogoDet-3k` 上的训练配置为例，详解各个参数的意义。[配置路径](../../../../ppcls/configs/Logo/ResNet50_ReID.yaml)。这里只介绍与分类模型有区别的参数。
 
 <a name="3.1"></a>
 #### 3.1 结构(Arch)

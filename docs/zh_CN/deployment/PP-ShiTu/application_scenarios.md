@@ -56,7 +56,7 @@ PP-ShiTu对原数据集进行了`Gallery`库和`Query`库划分，并生成了�
 <a name="2.1 环境配置"></a>
 
 ### 2.1 环境配置
-- 安装：请先参考文档[环境准备](../installation/install_paddleclas.md)配置PaddleClas运行环境
+- 安装：请先参考文档[环境准备](../../installation.md)配置PaddleClas运行环境
 - 进入`deploy`运行目录，本部分所有内容与命令均需要在`deploy`目录下运行，可以通过下面命令进入`deploy`目录。
 ```shell
 cd deploy
@@ -174,7 +174,7 @@ python3.7 python/predict_system.py -c configs/inference_general.yaml -o Global.u
 其中`bbox`表示检测出的主体所在位置，`rec_docs`表示索引库中与检测框最为相似的类别，`rec_scores`表示对应的置信度。
 检测的可视化结果也保存在`output`文件夹下，对于本张图像，识别结果可视化如下所示。
 
-![](../../images/ppshitu_application_scenarios/systerm_result.jpg)
+![](../../../images/ppshitu_application_scenarios/systerm_result.jpg)
 
 <a name="2.4.2 基于文件夹的批量识别"></a>
 
