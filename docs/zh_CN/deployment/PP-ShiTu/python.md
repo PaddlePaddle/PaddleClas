@@ -1,6 +1,6 @@
 # Python 预测推理
 
-首先请参考文档[环境准备](../installation/install_paddleclas.md)配置运行环境。
+首先请参考文档[环境准备](../../installation.md)配置运行环境。
 
 ## 目录
 
@@ -79,4 +79,4 @@ python3.7 python/predict_rec.py -c configs/inference_rec.yaml
 
 ### 1.3 PP-ShiTu PipeLine推理
 
-主体检测、特征提取和向量检索的串联预测，可以参考[图像识别快速开始](../quick_start/quick_start_recognition.md)。
+主体检测、特征提取和向量检索的串联预测，可以参考[图像识别快速开始](../../quick_start/quick_start_recognition.md)。

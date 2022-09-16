@@ -189,7 +189,7 @@ Loss:
         margin: 0.5
 ```
 
-最终的总 Loss 是所有 Loss 的加权和，其中 weight 定义了特定 Loss 在最终总 Loss 的权重。如果想替换其他 Loss，也可以在配置文件中更改 Loss 字段，目前支持的 Loss 请参考 [Loss](../../../ppcls/loss/__init__.py)。
+最终的总 Loss 是所有 Loss 的加权和，其中 weight 定义了特定 Loss 在最终总 Loss 的权重。如果想替换其他 Loss，也可以在配置文件中更改 Loss 字段，目前支持的 Loss 请参考 [Loss](../../../../ppcls/loss/__init__.py)。
 
 <a name="2.2.2"></a>
 
@@ -257,7 +257,7 @@ python3.7 -m paddle.distributed.launch tools/eval.py \
 
 可配置的部分评估参数说明如下：
 * `Global.pretrained_model`：待评估的模型的预训练模型文件路径，不同于 `Global.Backbone.pretrained`，此处的预训练模型是整个模型的权重，而 `Global.Backbone.pretrained` 只是 Backbone 部分的权重。当需要做模型评估时，需要加载整个模型的权重。
-* `Metric.Eval`：待评估的指标，默认评估 `recall@1`、`recall@5`、`mAP`。当你不准备评测某一项指标时，可以将对应的试标从配置文件中删除；当你想增加某一项评测指标时，也可以参考 [Metric](../../../ppcls/metric/metrics.py) 部分在配置文件 `Metric.Eval` 中添加相关的指标。
+* `Metric.Eval`：待评估的指标，默认评估 `recall@1`、`recall@5`、`mAP`。当你不准备评测某一项指标时，可以将对应的试标从配置文件中删除；当你想增加某一项评测指标时，也可以参考 [Metric](../../../../ppcls/metric/metrics.py) 部分在配置文件 `Metric.Eval` 中添加相关的指标。
 
 **注意：**
 
@@ -280,7 +280,7 @@ python3.7 tools/export_model.py \
 
 其中，`Global.pretrained_model` 用于指定模型文件路径，该路径仍无需包含模型文件后缀名（如[2.2.2 特征提取模型恢复训练](#2.2.2)）。当执行后，会在当前目录下生成 `./inference` 目录，目录下包含 `inference.pdiparams`、`inference.pdiparams.info`、`inference.pdmodel` 文件。`Global.save_inference_dir` 可以指定导出 inference 模型文件夹的路径。此处保存的 inference 模型在 embedding 特征层做了截断，即模型的推理输出为 n 维特征。
 
-有了上述命令将生成的模型结构文件(`inference.pdmodel`)和模型权重文件(`inference.pdiparams`)，接下来就可以使用预测引擎进行推理。使用 inference 模型推理的流程可以参考[基于 Python 预测引擎预测推理](../deployment/image_classification/python_deploy.md)。
+有了上述命令将生成的模型结构文件(`inference.pdmodel`)和模型权重文件(`inference.pdiparams`)，接下来就可以使用预测引擎进行推理。使用 inference 模型推理的流程可以参考[基于 Python 预测引擎预测推理](../../deployment/image_classification/python.md)。
 
 <a name="3"></a>
 
@@ -325,7 +325,7 @@ python3.7 -m pip install faiss-cpu==1.7.1post2
 <a name="度量学习"></a>
 - 度量学习（Metric Learning）
 
-  度量学习研究如何在一个特定的任务上学习一个距离函数，使得该距离函数能够帮助基于近邻的算法（kNN、k-means 等）取得较好的性能。深度度量学习(Deep Metric Learning)是度量学习的一种方法，它的目标是学习一个从原始特征到低维稠密的向量空间（嵌入空间，embedding space）的映射，使得同类对象在嵌入空间上使用常用的距离函数（欧氏距离、cosine 距离等）计算的距离比较近，而不同类的对象之间的距离则比较远。深度度量学习在计算机视觉领域取得了非常多的成功的应用，比如人脸识别、商品识别、图像检索、行人重识别等。更详细的介绍请参考[此文档](../algorithm_introduction/metric_learning.md)。
+  度量学习研究如何在一个特定的任务上学习一个距离函数，使得该距离函数能够帮助基于近邻的算法（kNN、k-means 等）取得较好的性能。深度度量学习(Deep Metric Learning)是度量学习的一种方法，它的目标是学习一个从原始特征到低维稠密的向量空间（嵌入空间，embedding space）的映射，使得同类对象在嵌入空间上使用常用的距离函数（欧氏距离、cosine 距离等）计算的距离比较近，而不同类的对象之间的距离则比较远。深度度量学习在计算机视觉领域取得了非常多的成功的应用，比如人脸识别、商品识别、图像检索、行人重识别等。更详细的介绍请参考[此文档](../../algorithm_introduction/metric_learning.md)。
 
 <a name="图像检索数据集介绍"></a>
 
