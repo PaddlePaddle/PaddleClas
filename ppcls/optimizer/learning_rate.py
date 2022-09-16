@@ -58,7 +58,7 @@ class LRBase(object):
         self.warmup_epoch = warmup_epoch
         self.warmup_steps = round(
             self.warmup_epoch *
-            self.step_each_epoch) if self.by_epoch else self.warmup_epoch
+            self.step_each_epoch) if by_epoch else self.warmup_epoch
         self.warmup_start_lr = warmup_start_lr
         self.last_epoch = last_epoch
         self.by_epoch = by_epoch
