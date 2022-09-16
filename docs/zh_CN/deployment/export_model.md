@@ -91,9 +91,16 @@ python3 tools/export_model.py \
 
 导出的 inference 模型文件可用于预测引擎进行推理部署，根据不同的部署方式/平台，可参考：
 
-* [Python 预测](./inference/python_deploy.md)
-* [C++ 预测](./inference/cpp_deploy.md)（目前仅支持分类模型）
-* [Python Whl 预测](./inference/whl_deploy.md)（目前仅支持分类模型）
-* [PaddleHub Serving 部署](./deployment/paddle_hub_serving_deploy.md)（目前仅支持分类模型）
-* [PaddleServing 部署](./deployment/paddle_serving_deploy.md)
-* [PaddleLite 部署](./deployment/paddle_lite_deploy.md)（目前仅支持分类模型）
+图像分类模型部署：
+* [Python 预测](./image_classification/python.md)
+* [C++ 预测](./image_classification/cpp/linux.md)
+* [Python Whl 预测](./image_classification/whl.md)（目前仅支持分类模型）
+* [PaddleHub Serving 部署](./image_classification/paddle_hub.md)（目前仅支持分类模型）
+* [PaddleServing 部署](./image_classification/paddle_serving.md)
+* [PaddleLite 部署](./image_classification/paddle_lite.md)
+
+PP-ShiTu 部署：
+* [Python 预测](./PP-ShiTu/python.md)
+* [C++ 预测](./PP-ShiTu/cpp.md)
+* [PaddleServing 部署](./PP-ShiTu/paddle_serving.md)
+* [PaddleLite 部署](./PP-ShiTu/paddle_lite.md)

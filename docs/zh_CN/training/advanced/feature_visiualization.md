@@ -17,7 +17,7 @@
 
 ## 2. 准备工作
 
-首先需要选定研究的模型，本文设定 ResNet50 作为研究模型，将模型组网代码[resnet.py](../../../../ppcls/arch/backbone/legendary_models/resnet.py)拷贝到[目录](../../../ppcls/utils/feature_maps_visualization/)下，并下载[ResNet50 预训练模型](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ResNet50_pretrained.pdparams)，或使用以下命令下载。
+首先需要选定研究的模型，本文设定 ResNet50 作为研究模型，将模型组网代码[resnet.py](../../../../ppcls/arch/backbone/legendary_models/resnet.py)拷贝到[目录](../../../../ppcls/utils/feature_maps_visualization/)下，并下载[ResNet50 预训练模型](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ResNet50_pretrained.pdparams)，或使用以下命令下载。
 
 ```bash
 wget https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ResNet50_pretrained.pdparams
