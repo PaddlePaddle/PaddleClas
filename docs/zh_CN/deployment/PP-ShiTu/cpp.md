@@ -361,6 +361,6 @@ cd ..
 
 ## 4.  使用自己模型
 
-使用自己训练的模型，可以参考[模型导出](../../docs/zh_CN/inference_deployment/export_model.md)，导出`inference model`，用于模型预测。
+使用自己训练的模型，可以参考[模型导出](../export_model.md)，导出`inference model`，用于模型预测。
 
 同时注意修改`yaml`文件中具体参数。
