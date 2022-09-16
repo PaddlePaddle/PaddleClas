@@ -245,15 +245,15 @@ Slim:
     name: pact
 ```
 
-训练方法详见模型[裁剪量化使用介绍](../advanced_tutorials/model_prune_quantization.md)，
-算法介绍详见[裁剪量化算法介绍](../algorithm_introduction/model_prune_quantization.md)。
+训练方法详见模型[裁剪量化使用介绍](../training/advanced/prune_quantization.md)，
+算法介绍详见[裁剪量化算法介绍](../algorithm_introduction/prune_quantization.md)。
 
 <a name="3"></a>
 ## 3. 预测部署代码和方式
 
-* 如果希望将对分类模型进行离线量化，可以参考 [模型量化裁剪教程](../advanced_tutorials/model_prune_quantization.md) 中离线量化部分。
-* 如果希望在服务端使用 python 进行部署，可以参考 [python inference 预测教程](../inference_deployment/python_deploy.md)。
-* 如果希望在服务端使用 cpp 进行部署，可以参考 [cpp inference 预测教程](../inference_deployment/cpp_deploy.md)。
-* 如果希望将分类模型部署为服务，可以参考 [hub serving 预测部署教程](../inference_deployment/paddle_hub_serving_deploy.md)。
-* 如果希望在移动端使用分类模型进行预测，可以参考 [PaddleLite 预测部署教程](../inference_deployment/paddle_lite_deploy.md)。
-* 如果希望使用 whl 包对分类模型进行预测，可以参考 [whl 包预测](../inference_deployment/whl_deploy.md)。
+* 如果希望将对分类模型进行离线量化，可以参考 [模型量化裁剪教程](../training/advanced/prune_quantization.md) 中离线量化部分。
+* 如果希望在服务端使用 python 进行部署，可以参考 [python inference 预测教程](../deployment/image_classification/python.md)。
+* 如果希望在服务端使用 cpp 进行部署，可以参考 [cpp inference 预测教程](../deployment/image_classification/cpp/linux.md)。
+* 如果希望将分类模型部署为服务，可以参考 [hub serving 预测部署教程](../deployment/image_classification/paddle_hub.md)。
+* 如果希望在移动端使用分类模型进行预测，可以参考 [PaddleLite 预测部署教程](../deployment/image_classification/paddle_lite.md)。
+* 如果希望使用 whl 包对分类模型进行预测，可以参考 [whl 包预测](../deployment/image_classification/whl.md)。

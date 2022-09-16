@@ -1,4 +1,4 @@
-简体中文 | [English](../../en/inference_deployment/paddle_hub_serving_deploy_en.md)
+简体中文 | [English](../../../en/inference_deployment/paddle_hub_serving_deploy_en.md)
 
 # 基于 PaddleHub Serving 的服务部署
 
@@ -54,7 +54,7 @@ python3.7 -m pip install paddlehub==2.1.0 --upgrade -i https://pypi.tuna.tsinghu
   "inference_model_dir": "../inference/"
   ```
 * 模型文件（包括 `.pdmodel` 与 `.pdiparams`）的名称必须为 `inference`。
-* 我们提供了大量基于 ImageNet-1k 数据集的预训练模型，模型列表及下载地址详见[模型库概览](../algorithm_introduction/ImageNet_models.md)，也可以使用自己训练转换好的模型。
+* 我们提供了大量基于 ImageNet-1k 数据集的预训练模型，模型列表及下载地址详见[模型库概览](../../models/ImageNet1k/model_list.md)，也可以使用自己训练转换好的模型。
 
 
 <a name="4"></a>
@@ -236,4 +236,4 @@ list: 返回结果
     'class_id_map_file':
     ```
 
-为了避免不必要的延时以及能够以 batch_size 进行预测，数据预处理逻辑（包括 `resize`、`crop` 等操作）均在客户端完成，因此需要在 [PaddleClas/deploy/hubserving/test_hubserving.py#L41-L47](../../../deploy/hubserving/test_hubserving.py#L41-L47) 以及 [PaddleClas/deploy/hubserving/test_hubserving.py#L51-L76](../../../deploy/hubserving/test_hubserving.py#L51-L76) 中修改数据预处理逻辑相关代码。
+为了避免不必要的延时以及能够以 batch_size 进行预测，数据预处理逻辑（包括 `resize`、`crop` 等操作）均在客户端完成，因此需要在 [PaddleClas/deploy/hubserving/test_hubserving.py#L41-L47](../../../../deploy/hubserving/test_hubserving.py#L41-L47) 以及 [PaddleClas/deploy/hubserving/test_hubserving.py#L51-L76](../../../../deploy/hubserving/test_hubserving.py#L51-L76) 中修改数据预处理逻辑相关代码。

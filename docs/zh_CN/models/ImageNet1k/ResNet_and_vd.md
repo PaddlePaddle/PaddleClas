@@ -21,13 +21,13 @@ ResNet 系列模型是在 2015 年提出的，一举在 ILSVRC2015 比赛中取�
 
 该系列模型的 FLOPS、参数量以及 T4 GPU 上的预测耗时如下图所示。
 
-![](../../images/models/T4_benchmark/t4.fp32.bs4.ResNet.flops.png)
+![](../../../images/models/T4_benchmark/t4.fp32.bs4.ResNet.flops.png)
 
-![](../../images/models/T4_benchmark/t4.fp32.bs4.ResNet.params.png)
+![](../../../images/models/T4_benchmark/t4.fp32.bs4.ResNet.params.png)
 
-![](../../images/models/T4_benchmark/t4.fp32.bs4.ResNet.png)
+![](../../../images/models/T4_benchmark/t4.fp32.bs4.ResNet.png)
 
-![](../../images/models/T4_benchmark/t4.fp16.bs4.ResNet.png)
+![](../../../images/models/T4_benchmark/t4.fp16.bs4.ResNet.png)
 
 
 通过上述曲线可以看出，层数越多，准确率越高，但是相应的参数量、计算量和延时都会增加。ResNet50_vd_ssld 通过用更强的 teacher 和更多的数据，将其在 ImageNet-1k 上的验证集 top-1 精度进一步提高，达到了 82.39%，刷新了 ResNet50 系列模型的精度。

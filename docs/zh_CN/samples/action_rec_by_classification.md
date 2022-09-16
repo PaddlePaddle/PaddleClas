@@ -44,7 +44,7 @@
 <a name="2.1"></a>
 
 ### 2.1 PaddleClas 环境安装
-请根据[环境准备](../installation/install_paddleclas.md)完成PaddleClas的环境依赖准备。
+请根据[环境准备](../installation.md)完成PaddleClas的环境依赖准备。
 
 <a name="2.2"></a>
 
@@ -71,7 +71,7 @@
 <a name="2.2.3"></a>
 
 #### 2.2.3 标注文件准备
-根据[PaddleClas数据集格式说明](../data_preparation/classification_dataset.md)，标注文件样例如下，其中`0`,`1`分别是图片对应所属的类别：
+根据[PaddleClas数据集格式说明](../training/single_label_classification/dataset.md)，标注文件样例如下，其中`0`,`1`分别是图片对应所属的类别：
 ```
     # 每一行采用"空格"分隔图像路径与标注
     train/000001.jpg 0

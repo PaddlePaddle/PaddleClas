@@ -1,45 +1,47 @@
-简体中文 | [English](../../en/image_recognition_pipeline/feature_extraction_en.md)
+简体中文 | [English](../../../en/image_recognition_pipeline/feature_extraction_en.md)
 # 特征提取
 
 ## 目录
 
-- [1. 摘要](#1-摘要)
-- [2. 介绍](#2-介绍)
-- [3. 方法](#3-方法)
-    - [3.1 Backbone](#31-backbone)
-    - [3.2 Neck](#32-neck)
-    - [3.3 Head](#33-head)
-    - [3.4 Loss](#34-loss)
-    - [3.5 Data Augmentation](#35-data-augmentation)
-- [4. 实验部分](#4-实验部分)
-- [5. 自定义特征提取](#5-自定义特征提取)
-  - [5.1 数据准备](#51-数据准备)
-  - [5.2 模型训练](#52-模型训练)
-  - [5.3 模型评估](#53-模型评估)
-  - [5.4 模型推理](#54-模型推理)
-    - [5.4.1 导出推理模型](#541-导出推理模型)
-    - [5.4.2 获取特征向量](#542-获取特征向量)
-- [6. 总结](#6-总结)
-- [7. 参考文献](#7-参考文献)
+- [特征提取](#特征提取)
+  - [目录](#目录)
+  - [1. 摘要](#1-摘要)
+  - [2. 介绍](#2-介绍)
+  - [3. 方法](#3-方法)
+      - [3.1 Backbone](#31-backbone)
+      - [3.2 Neck](#32-neck)
+      - [3.3 Head](#33-head)
+      - [3.4 Loss](#34-loss)
+      - [3.5 Data Augmentation](#35-data-augmentation)
+  - [4. 实验部分](#4-实验部分)
+  - [5. 自定义特征提取](#5-自定义特征提取)
+    - [5.1 数据准备](#51-数据准备)
+    - [5.2 模型训练](#52-模型训练)
+    - [5.3 模型评估](#53-模型评估)
+    - [5.4 模型推理](#54-模型推理)
+      - [5.4.1 导出推理模型](#541-导出推理模型)
+      - [5.4.2 获取特征向量](#542-获取特征向量)
+  - [6. 总结](#6-总结)
+  - [7. 参考文献](#7-参考文献)
 
 <a name="1"></a>
 
 ## 1. 摘要
 
-特征提取是图像识别中的关键一环，它的作用是将输入的图片转化为固定维度的特征向量，用于后续的[向量检索](./vector_search.md)。一个好的特征需要具备“相似度保持性”，即相似度高的图片对，其特征的相似度也比较高（特征空间中的距离比较近），相似度低的图片对，其特征相似度要比较低（特征空间中的距离比较远）。为此[Deep Metric Learning](../algorithm_introduction/metric_learning.md)领域内提出了不少方法用以研究如何通过深度学习来获得具有强表征能力的特征。
+特征提取是图像识别中的关键一环，它的作用是将输入的图片转化为固定维度的特征向量，用于后续的[向量检索](../../deployment/PP-ShiTu/vector_search.md)。一个好的特征需要具备“相似度保持性”，即相似度高的图片对，其特征的相似度也比较高（特征空间中的距离比较近），相似度低的图片对，其特征相似度要比较低（特征空间中的距离比较远）。为此[Deep Metric Learning](../../algorithm_introduction/metric_learning.md)领域内提出了不少方法用以研究如何通过深度学习来获得具有强表征能力的特征。
 
 <a name="2"></a>
 
 ## 2. 介绍
 
 为了图像识别任务的灵活定制，我们将整个网络分为 Backbone、 Neck、 Head 以及 Loss 部分，整体结构如下图所示:
-![](../../images/feature_extraction_framework.png)
+![](../../../images/feature_extraction_framework.png)
 图中各个模块的功能为:
 
-- **Backbone**: 用于提取输入图像初步特征的骨干网络，一般由配置文件中的 [Backbone](../../../ppcls/configs/GeneralRecognitionV2/GeneralRecognitionV2_PPLCNetV2_base.yaml#L33-L37) 以及 [BackboneStopLayer](../../../ppcls/configs/GeneralRecognitionV2/GeneralRecognitionV2_PPLCNetV2_base.yaml#L38-L39) 字段共同指定。
-- **Neck**: 用以特征增强及特征维度变换。可以是一个简单的 FC Layer，用来做特征维度变换；也可以是较复杂的 FPN 结构，用以做特征增强，一般由配置文件中的 [Neck](../../../ppcls/configs/GeneralRecognitionV2/GeneralRecognitionV2_PPLCNetV2_base.yaml#L40-L51) 字段指定。
-- **Head**: 用来将 `Neck` 的输出 feature 转化为 logits，让模型在训练阶段能以分类任务的形式进行训练。除了常用的 FC Layer 外，还可以替换为 [CosMargin](../../../ppcls/arch/gears/cosmargin.py), [ArcMargin](../../../ppcls/arch/gears/arcmargin.py), [CircleMargin](../../../ppcls/arch/gears/circlemargin.py) 等模块，一般由配置文件中的 [Head](../../../ppcls/configs/GeneralRecognitionV2/GeneralRecognitionV2_PPLCNetV2_base.yaml#L52) 字段指定。
-- **Loss**: 指定所使用的 Loss 函数。我们将 Loss 设计为组合 loss 的形式，可以方便地将 Classification Loss 和 Metric learning Loss 组合在一起，一般由配置文件中的 [Loss](../../../ppcls/configs/GeneralRecognitionV2/GeneralRecognitionV2_PPLCNetV2_base.yaml#L63-L77) 字段指定。
+- **Backbone**: 用于提取输入图像初步特征的骨干网络，一般由配置文件中的 [Backbone](../../../../ppcls/configs/GeneralRecognitionV2/GeneralRecognitionV2_PPLCNetV2_base.yaml#L33-L37) 以及 [BackboneStopLayer](../../../../ppcls/configs/GeneralRecognitionV2/GeneralRecognitionV2_PPLCNetV2_base.yaml#L38-L39) 字段共同指定。
+- **Neck**: 用以特征增强及特征维度变换。可以是一个简单的 FC Layer，用来做特征维度变换；也可以是较复杂的 FPN 结构，用以做特征增强，一般由配置文件中的 [Neck](../../../../ppcls/configs/GeneralRecognitionV2/GeneralRecognitionV2_PPLCNetV2_base.yaml#L40-L51) 字段指定。
+- **Head**: 用来将 `Neck` 的输出 feature 转化为 logits，让模型在训练阶段能以分类任务的形式进行训练。除了常用的 FC Layer 外，还可以替换为 [CosMargin](../../../../ppcls/arch/gears/cosmargin.py), [ArcMargin](../../../../ppcls/arch/gears/arcmargin.py), [CircleMargin](../../../../ppcls/arch/gears/circlemargin.py) 等模块，一般由配置文件中的 [Head](`../../../ppcls/configs/GeneralRecognitionV2/GeneralRecognitionV2_PPLCNetV2_base.yaml#L52-L60) 字段指定。
+- **Loss**: 指定所使用的 Loss 函数。我们将 Loss 设计为组合 loss 的形式，可以方便地将 Classification Loss 和 Metric learning Loss 组合在一起，一般由配置文件中的 [Loss](../../../../ppcls/configs/GeneralRecognitionV2/GeneralRecognitionV2_PPLCNetV2_base.yaml#L63-L77) 字段指定。
 
 <a name="3"></a>
 
@@ -47,26 +49,26 @@
 
 #### 3.1 Backbone
 
-Backbone 部分采用了 [PP-LCNetV2_base](../models/PP-LCNetV2.md)，其在 `PPLCNet_V1` 的基础上，加入了包括Rep 策略、PW 卷积、Shortcut、激活函数改进、SE 模块改进等多个优化点，使得最终分类精度与 `PPLCNet_x2_5` 相近，且推理延时减少了40%<sup>*</sup>。在实验过程中我们对 `PPLCNetV2_base` 进行了适当的改进，在保持速度基本不变的情况下，让其在识别任务中得到更高的性能，包括：去掉 `PPLCNetV2_base` 末尾的 `ReLU` 和 `FC`、将最后一个 stage(RepDepthwiseSeparable) 的 stride 改为1。
+Backbone 部分采用了 [PP-LCNetV2_base](../../models/ImageNet1k/PP-LCNetV2.md)，其在 `PPLCNet_V1` 的基础上，加入了包括Rep 策略、PW 卷积、Shortcut、激活函数改进、SE 模块改进等多个优化点，使得最终分类精度与 `PPLCNet_x2_5` 相近，且推理延时减少了40%<sup>*</sup>。在实验过程中我们对 `PPLCNetV2_base` 进行了适当的改进，在保持速度基本不变的情况下，让其在识别任务中得到更高的性能，包括：去掉 `PPLCNetV2_base` 末尾的 `ReLU` 和 `FC`、将最后一个 stage(RepDepthwiseSeparable) 的 stride 改为1。
 
 
 **注：** <sup>*</sup>推理环境基于 Intel(R) Xeon(R) Gold 6271C CPU @ 2.60GHz 硬件平台，OpenVINO 推理平台。
 
 #### 3.2 Neck
 
-Neck 部分采用了 [BN Neck](../../../ppcls/arch/gears/bnneck.py)，对 Backbone 抽取得到的特征的每个维度进行标准化操作，减少了同时优化度量学习损失函数和分类损失函数的难度，加快收敛速度。
+Neck 部分采用了 [BN Neck](../../../../ppcls/arch/gears/bnneck.py)，对 Backbone 抽取得到的特征的每个维度进行标准化操作，减少了同时优化度量学习损失函数和分类损失函数的难度，加快收敛速度。
 
 #### 3.3 Head
 
-Head 部分选用 [FC Layer](../../../ppcls/arch/gears/fc.py)，使用分类头将 feature 转换成 logits 供后续计算分类损失。
+Head 部分选用 [FC Layer](../../../../ppcls/arch/gears/fc.py)，使用分类头将 feature 转换成 logits 供后续计算分类损失。
 
 #### 3.4 Loss
 
-Loss 部分选用 [Cross entropy loss](../../../ppcls/loss/celoss.py) 和 [TripletAngularMarginLoss](../../../ppcls/loss/tripletangularmarginloss.py)，在训练时以分类损失和基于角度的三元组损失来指导网络进行优化。我们基于原始的 TripletLoss (困难三元组损失)进行了改进，将优化目标从 L2 欧几里得空间更换成余弦空间，并加入了 anchor 与 positive/negtive 之间的硬性距离约束，让训练与测试的目标更加接近，提升模型的泛化能力。详细的配置文件见 [GeneralRecognitionV2_PPLCNetV2_base.yaml](../../../ppcls/configs/GeneralRecognitionV2/GeneralRecognitionV2_PPLCNetV2_base.yaml#L63-77)。
+Loss 部分选用 [Cross entropy loss](../../../../ppcls/loss/celoss.py) 和 [TripletAngularMarginLoss](../../../../ppcls/loss/tripletangularmarginloss.py)，在训练时以分类损失和基于角度的三元组损失来指导网络进行优化。我们基于原始的 TripletLoss (困难三元组损失)进行了改进，将优化目标从 L2 欧几里得空间更换成余弦空间，并加入了 anchor 与 positive/negtive 之间的硬性距离约束，让训练与测试的目标更加接近，提升模型的泛化能力。详细的配置文件见 [GeneralRecognitionV2_PPLCNetV2_base.yaml](../../../../ppcls/configs/GeneralRecognitionV2/GeneralRecognitionV2_PPLCNetV2_base.yaml#L63-77)。
 
 #### 3.5 Data Augmentation
 
-我们考虑到实际相机拍摄时目标主体可能出现一定的旋转而不一定能保持正立状态，因此我们在数据增强中加入了适当的 [随机旋转增强](../../../ppcls/configs/GeneralRecognitionV2/GeneralRecognitionV2_PPLCNetV2_base.yaml#L117)，以提升模型在真实场景中的检索能力。
+我们考虑到实际相机拍摄时目标主体可能出现一定的旋转而不一定能保持正立状态，因此我们在数据增强中加入了适当的 [随机旋转增强](../../../../ppcls/configs/GeneralRecognitionV2/GeneralRecognitionV2_PPLCNetV2_base.yaml#L117)，以提升模型在真实场景中的检索能力。
 
 <a name="4"></a>
 
@@ -121,7 +123,7 @@ Loss 部分选用 [Cross entropy loss](../../../ppcls/loss/celoss.py) 和 [Tripl
 
 ### 5.1 数据准备
 
-首先需要基于任务定制自己的数据集。数据集格式与文件结构详见 [数据集格式说明](../data_preparation/recognition_dataset.md)。
+首先需要基于任务定制自己的数据集。数据集格式与文件结构详见 [数据集格式说明](../metric_learning/dataset.md)。
 
 准备完毕之后还需要在配置文件中修改数据配置相关的内容, 主要包括数据集的地址以及类别数量。对应到配置文件中的位置如下所示：
 
@@ -265,7 +267,7 @@ wangzai.jpg:    [-7.82453567e-02  2.55877394e-02 -3.66694555e-02  1.34572461e-02
  -3.40284109e-02  8.35561901e-02  2.10910216e-02 -3.27066667e-02]
 ```
 
-在实际使用过程中，仅仅得到特征可能并不能满足业务需求。如果想进一步通过特征检索来进行图像识别，可以参照文档 [向量检索](./vector_search.md)。
+在实际使用过程中，仅仅得到特征可能并不能满足业务需求。如果想进一步通过特征检索来进行图像识别，可以参照文档 [向量检索](../../deployment/PP-ShiTu/vector_search.md)。
 
 <a name="6"></a>
 

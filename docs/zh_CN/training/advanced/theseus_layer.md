@@ -44,7 +44,7 @@ class net(TheseusLayer):
 * 以 `.` 作为网络层级的分隔符；
 * 对于 `nn.Sequential` 类型或是 `nn.LayerList` 类型的层，使用 `["index"]` 指定其子层。
 
-以 `MobileNetV1` 网络为例，其模型结构定义在 [MobileNetV1](../../../ppcls/arch/backbone/legendary_models/mobilenet_v1.py)，为方便说明，可参考下方网络结构及不同网络层所对应的网络层描述符。可以清晰看出，对于 `MobileNetV1` 网络的任一子层，均可按层级结构逐层指定，不同层级结构间使用 `.` 进行分隔即可。
+以 `MobileNetV1` 网络为例，其模型结构定义在 [MobileNetV1](../../../../ppcls/arch/backbone/legendary_models/mobilenet_v1.py)，为方便说明，可参考下方网络结构及不同网络层所对应的网络层描述符。可以清晰看出，对于 `MobileNetV1` 网络的任一子层，均可按层级结构逐层指定，不同层级结构间使用 `.` 进行分隔即可。
 
 ```shell
 # 网络层对象的变量名（该对象所属类）....................(该网络层对应的网络层描述符)
