@@ -160,7 +160,7 @@ python3.7 tools/export.py \
 <a name="4"></a>
 ## 4. 模型部署
 
-上述步骤导出的模型可以直接使用 inferecne 进行部署，参考 [inference 部署](../deployment/)。
+上述步骤导出的模型可以直接使用 inferecne 进行部署，参考 [inference 部署](../../deployment/)。
 
 也通过 PaddleLite 的 opt 模型转换工具，完成 inference 模型到移动端模型转换，用于移动端的模型部署。
 移动端模型部署的可参考 [移动端模型部署](../../deployment/image_classification/paddle_lite.md)。

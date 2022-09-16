@@ -1,6 +1,6 @@
 # Python 预测推理
 
-首先请参考文档[环境准备](../installation/install_paddleclas.md)配置运行环境。
+首先请参考文档[环境准备](../../installation.md)配置运行环境。
 
 ## 目录
 
@@ -10,7 +10,7 @@
 
 ## 1. 图像分类推理
 
-首先请参考文档[模型导出](./export_model.md)准备 inference 模型，然后进入 PaddleClas 的 `deploy` 目录下：
+首先请参考文档[模型导出](../export_model.md)准备 inference 模型，然后进入 PaddleClas 的 `deploy` 目录下：
 
 ```shell
 cd PaddleClas/deploy
