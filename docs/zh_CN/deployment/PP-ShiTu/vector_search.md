@@ -25,7 +25,7 @@
 
 值得注意的是，为了更好是适配性，目前版本，`PaddleClas` 中暂时**只使用 CPU 进行向量检索**。
 
-![](../../images/structure.jpg)
+![](../../../images/structure.jpg)
 
 如上图中所示，向量检索部分，在整个 `PP-ShiTu` 系统中有两部分内容
 
@@ -127,7 +127,7 @@ IndexProcess:
 ### 4.2 检索配置文件参数
 
 
-将检索的过程融合到 `PP-ShiTu` 的整体流程中，请参考 [README](../../../README_ch.md) 中 `PP-ShiTu 图像识别系统介绍` 部分。检索具体使用操作请参考[识别快速开始文档](../quick_start/quick_start_recognition.md)。
+将检索的过程融合到 `PP-ShiTu` 的整体流程中，请参考 [README](../../../../README_ch.md) 中 `PP-ShiTu 图像识别系统介绍` 部分。检索具体使用操作请参考[识别快速开始文档](../../quick_start/quick_start_recognition.md)。
 
 其中，检索部分配置如下，整体检索配置文件，请参考 `deploy/configs/inference_*.yaml` 文件。
 
@@ -145,4 +145,4 @@ IndexProcess:
 
 - `return_k`: 检索结果返回 `k` 个结果
 - `score_thres`: 检索匹配的阈值
-- `hamming_radius`: 汉明距离半径。此参数只有在使用二值特征模型，`dist_type`设置为`hamming`时才能生效。具体二值特征模型使用方法请参考[哈希编码](./deep_hashing.md)
+- `hamming_radius`: 汉明距离半径。此参数只有在使用二值特征模型，`dist_type`设置为`hamming`时才能生效。具体二值特征模型使用方法请参考[哈希编码](../../training/PP-ShiTu/deep_hashing.md)

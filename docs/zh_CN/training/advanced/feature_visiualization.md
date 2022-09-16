@@ -17,13 +17,13 @@
 
 ## 2. 准备工作
 
-首先需要选定研究的模型，本文设定 ResNet50 作为研究模型，将模型组网代码[resnet.py](../../../ppcls/arch/backbone/legendary_models/resnet.py)拷贝到[目录](../../../ppcls/utils/feature_maps_visualization/)下，并下载[ResNet50 预训练模型](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ResNet50_pretrained.pdparams)，或使用以下命令下载。
+首先需要选定研究的模型，本文设定 ResNet50 作为研究模型，将模型组网代码[resnet.py](../../../../ppcls/arch/backbone/legendary_models/resnet.py)拷贝到[目录](../../../ppcls/utils/feature_maps_visualization/)下，并下载[ResNet50 预训练模型](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ResNet50_pretrained.pdparams)，或使用以下命令下载。
 
 ```bash
 wget https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ResNet50_pretrained.pdparams
 ```
 
-其他模型网络结构代码及预训练模型请自行下载：[模型库](../../../ppcls/arch/backbone/)，[预训练模型](../algorithm_introduction/ImageNet_models.md)。
+其他模型网络结构代码及预训练模型请自行下载：[模型库](../../../ppcls/arch/backbone/)，[预训练模型](../../models/ImageNet1k/model_list.md)。
 
  <a name='3'></a>
 
@@ -49,7 +49,7 @@ wget https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ResNet50_pretrain
         return x, fm
 ```
 
-然后修改代码[fm_vis.py](../../../ppcls/utils/feature_maps_visualization/fm_vis.py)，引入 `ResNet50`，实例化 `net` 对象：
+然后修改代码[fm_vis.py](../../../../ppcls/utils/feature_maps_visualization/fm_vis.py)，引入 `ResNet50`，实例化 `net` 对象：
 
 ```python
 from resnet import ResNet50
@@ -82,7 +82,7 @@ python tools/feature_maps_visualization/fm_vis.py \
 
 * 输入图片：  
 
-![](../../images/feature_maps/feature_visualization_input.jpg)
+![](../../../images/feature_maps/feature_visualization_input.jpg)
 
 * 运行下面的特征图可视化脚本
 
@@ -99,4 +99,4 @@ python tools/feature_maps_visualization/fm_vis.py \
 
 * 输出特征图保存为 `output.png`，如下所示。
 
-![](../../images/feature_maps/feature_visualization_output.jpg)
+![](../../../images/feature_maps/feature_visualization_output.jpg)

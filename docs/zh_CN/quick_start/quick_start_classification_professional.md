@@ -1,6 +1,6 @@
 # 30 分钟玩转 PaddleClas（进阶版）
 
-此处提供了专业用户在 linux 操作系统上使用 PaddleClas 的快速上手教程，主要内容基于 CIFAR-100 数据集，快速体验不同模型的训练、加载不同预训练模型、SSLD 知识蒸馏方案和数据增广的效果。请事先参考[安装指南](../installation/install_paddleclas.md)配置运行环境和克隆 PaddleClas 代码。
+此处提供了专业用户在 linux 操作系统上使用 PaddleClas 的快速上手教程，主要内容基于 CIFAR-100 数据集，快速体验不同模型的训练、加载不同预训练模型、SSLD 知识蒸馏方案和数据增广的效果。请事先参考[安装指南](../installation.md)配置运行环境和克隆 PaddleClas 代码。
 
 ------
 
@@ -37,7 +37,7 @@
 cd path_to_PaddleClas
 ```
 
-<a name="1.1.1"></a> 
+<a name="1.1.1"></a>
 
 #### 1.1.1 准备 CIFAR100
 
@@ -54,11 +54,11 @@ cd ../
 
 ## 2. 模型训练
 
-<a name="2.1"></a> 
+<a name="2.1"></a>
 
 ### 2.1 单标签训练
 
-<a name="2.1.1"></a> 
+<a name="2.1.1"></a>
 
 #### 2.1.1 零基础训练：不加载预训练模型的训练
 
@@ -87,12 +87,12 @@ python3 -m paddle.distributed.launch \
         -o Optimizer.lr.learning_rate=0.01
 ```
 
-* **注意**: 
+* **注意**:
 
 * `--gpus`中指定的 GPU 可以是 `CUDA_VISIBLE_DEVICES` 指定的 GPU 的子集。
 * 由于初始学习率和 batch-size 需要保持线性关系，所以训练从 4 个 GPU 切换到 1 个 GPU 训练时，总 batch-size 缩减为原来的 1/4，学习率也需要缩减为原来的 1/4，所以改变了默认的学习率从 0.04 到 0.01。
 
-<a name="2.1.2"></a> 
+<a name="2.1.2"></a>
 
 
 #### 2.1.2 迁移学习
@@ -145,13 +145,13 @@ python3 -m paddle.distributed.launch \
 
 ## 3. 数据增广
 
-PaddleClas 包含了很多数据增广的方法，如 Mixup、Cutout、RandomErasing 等，具体的方法可以参考[数据增广的章节](../algorithm_introduction/DataAugmentation.md)。
+PaddleClas 包含了很多数据增广的方法，如 Mixup、Cutout、RandomErasing 等，具体的方法可以参考[数据增广的章节](../algorithm_introduction/data_augmentation.md)。
 
-<a name="3.1"></a> 
+<a name="3.1"></a>
 
 ### 3.1 数据增广的尝试-Mixup
 
-基于[数据增广的章节](../algorithm_introduction/DataAugmentation.md) `3.3 节` 中的训练方法，结合 Mixup 的数据增广方式进行训练，具体的训练脚本如下所示。
+基于[数据增广的章节](../algorithm_introduction/data_augmentation.md) `3.3 节` 中的训练方法，结合 Mixup 的数据增广方式进行训练，具体的训练脚本如下所示。
 
 ```shell
 export CUDA_VISIBLE_DEVICES=0,1,2,3
@@ -243,11 +243,11 @@ python3 -m paddle.distributed.launch \
 
 ## 5. 模型评估与推理
 
-<a name="5.1"></a> 
+<a name="5.1"></a>
 
 ### 5.1 单标签分类模型评估与推理
 
-<a name="5.1.1"></a> 
+<a name="5.1.1"></a>
 
 #### 5.1.1 单标签分类模型评估。
 
@@ -259,7 +259,7 @@ python3 tools/eval.py \
     -o Global.pretrained_model="output_CIFAR/ResNet50_vd/best_model"
 ```
 
-<a name="5.1.2"></a> 
+<a name="5.1.2"></a>
 
 #### 5.1.2 单标签分类模型预测
 
@@ -272,7 +272,7 @@ python3 tools/infer.py \
     -o Global.pretrained_model=output_CIFAR/ResNet50_vd/best_model
 ```
 
-<a name="5.1.3"></a> 
+<a name="5.1.3"></a>
 
 #### 5.1.3 单标签分类使用 inference 模型进行模型推理
 

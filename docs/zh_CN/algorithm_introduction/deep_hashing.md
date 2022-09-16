@@ -55,7 +55,7 @@ LCDSH是一种局部约束深度监督哈希算法。该方案通过学习图像
 `DSHSD`: ppcls/configs/DeepHash/DSHSD.yaml
 `LCDSH`: ppcls/configs/DeepHash/LCDSH.yaml
 
-具体训练方法，请参考[分类模型训练文档](../models_training/classification.md)
+具体训练方法，请参考[分类模型训练文档](../training/single_label_classification/training.md)
 
 <a name='4'></a>
 ## 4. 总结及建议

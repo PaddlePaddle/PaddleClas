@@ -15,13 +15,13 @@ DPN 的全称是 Dual Path Networks，即双通道网络。该网络是由 Dense
 
 该系列模型的 FLOPS、参数量以及 T4 GPU 上的预测耗时如下图所示。
 
-![](../../images/models/T4_benchmark/t4.fp32.bs4.DPN.flops.png)
+![](../../../images/models/T4_benchmark/t4.fp32.bs4.DPN.flops.png)
 
-![](../../images/models/T4_benchmark/t4.fp32.bs4.DPN.params.png)
+![](../../../images/models/T4_benchmark/t4.fp32.bs4.DPN.params.png)
 
-![](../../images/models/T4_benchmark/t4.fp32.bs4.DPN.png)
+![](../../../images/models/T4_benchmark/t4.fp32.bs4.DPN.png)
 
-![](../../images/models/T4_benchmark/t4.fp16.bs4.DPN.png)
+![](../../../images/models/T4_benchmark/t4.fp16.bs4.DPN.png)
 
 目前 PaddleClas 开源的这两类模型的预训练模型一共有 10 个，其指标如上图所示，可以看到，在相同的 FLOPS 和参数量下，相比 DenseNet，DPN 拥有更高的精度。但是由于 DPN 有更多的分支，所以其推理速度要慢于 DenseNet。由于 DenseNet264 的网络层数最深，所以该网络是 DenseNet 系列模型中参数量最大的网络，DenseNet161 的网络的宽度最大，导致其是该系列中网络中计算量最大、精度最高的网络。从推理速度来看，计算量大且精度高的的 DenseNet161 比 DenseNet264 具有更快的速度，所以其比 DenseNet264 具有更大的优势。
 

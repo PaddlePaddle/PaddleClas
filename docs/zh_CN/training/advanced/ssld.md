@@ -80,7 +80,7 @@ SSLD 蒸馏方案的一大特色就是无需使用图像的真值标签，因此
 
 此外，在无标注数据选择的过程中，我们发现使用更加通用的数据，即使不需要严格的数据筛选过程，也可以帮助知识蒸馏任务获得稳定的精度提升，因而提出了SKL-UGI (Symmetrical-KL Unlabeled General Images distillation)知识蒸馏方案。
 
-通用数据可以使用ImageNet数据或者与场景相似的数据集。更多关于SKL-UGI的应用，请参考：[超轻量图像分类方案PULC使用教程](../PULC/PULC_train.md)。
+通用数据可以使用ImageNet数据或者与场景相似的数据集。更多关于SKL-UGI的应用，请参考：[超轻量图像分类方案PULC使用教程](../PULC.md)。
 
 
 <a name="2"></a>
@@ -154,9 +154,9 @@ python3 -m paddle.distributed.launch --gpus="0,1,2,3" tools/train.py -c ppcls/co
 cat train_list.txt train_list_unlabel.txt > train_list_all.txt
 ```
 
-更多关于图像分类任务的数据标签说明，请参考：[PaddleClas图像分类数据集格式说明](../data_preparation/classification_dataset.md#1-数据集格式说明)
+更多关于图像分类任务的数据标签说明，请参考：[PaddleClas图像分类数据集格式说明](../single_label_classification/dataset.md#1-数据集格式说明)
 
-PaddleClas中集成了PULC超轻量图像分类实用方案，里面包含SSLD ImageNet预训练模型的使用以及更加通用的无标签数据的知识蒸馏方案，更多详细信息，请参考[PULC超轻量图像分类实用方案使用教程](../PULC/PULC_train.md)。
+PaddleClas中集成了PULC超轻量图像分类实用方案，里面包含SSLD ImageNet预训练模型的使用以及更加通用的无标签数据的知识蒸馏方案，更多详细信息，请参考[PULC超轻量图像分类实用方案使用教程](../PULC.md)。
 
 <a name="4"></a>
 
