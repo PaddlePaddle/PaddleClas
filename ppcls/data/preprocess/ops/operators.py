@@ -188,7 +188,7 @@ class DecodeImage(object):
         elif isinstance(img, bytes):
             if self.backend == "pil":
                 data = io.BytesIO(img)
-                img = Image.open(data)
+                img = Image.open(data).convert("RGB")
             else:
                 data = np.frombuffer(img, dtype="uint8")
                 img = cv2.imdecode(data, 1)
@@ -197,7 +197,7 @@ class DecodeImage(object):
 
         if self.to_np:
             if self.backend == "pil":
-                assert img.mode == "RGB", f"invalid shape of image[{img.shape}]"
+                assert img.mode == "RGB", f"invalid mode of image[{img.mode}]"
                 img = np.asarray(img)[:, :, ::-1]  # BRG
 
             if self.to_rgb:
