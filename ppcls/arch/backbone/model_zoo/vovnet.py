@@ -19,6 +19,10 @@ import paddle.nn.functional as F
 from paddle.nn.initializer import TruncatedNormal, Constant, Normal, KaimingNormal
 from ....utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
 
+MODEL_URLS = {"VoVNet39": "", "VoVNet57": "", "VoVNet27_slim": ""}
+
+__all__ = list(MODEL_URLS.keys())
+
 trunc_normal_ = TruncatedNormal(std=.02)
 normal_ = Normal
 zeros_ = Constant(value=0.)
@@ -26,39 +30,51 @@ ones_ = Constant(value=1.)
 kaiming_normal_ = KaimingNormal()
 
 
-def conv3x3(in_channels, out_channels, module_name, postfix,
-            stride=1, groups=1, kernel_size=3, padding=1):
+def conv3x3(in_channels,
+            out_channels,
+            module_name,
+            postfix,
+            stride=1,
+            groups=1,
+            kernel_size=3,
+            padding=1):
     """3x3 convolution with padding"""
     return [
-        ('{}_{}/conv'.format(module_name, postfix),
-         nn.Conv2D(in_channels, out_channels,
-                   kernel_size=kernel_size,
-                   stride=stride,
-                   padding=padding,
-                   groups=groups,
-                   bias_attr=False)),
+        ('{}_{}/conv'.format(module_name, postfix), nn.Conv2D(
+            in_channels,
+            out_channels,
+            kernel_size=kernel_size,
+            stride=stride,
+            padding=padding,
+            groups=groups,
+            bias_attr=False)),
         ('{}_{}/norm'.format(module_name, postfix),
          nn.BatchNorm2D(out_channels)),
-        ('{}_{}/relu'.format(module_name, postfix),
-         nn.ReLU()),
+        ('{}_{}/relu'.format(module_name, postfix), nn.ReLU()),
     ]
 
 
-def conv1x1(in_channels, out_channels, module_name, postfix,
-            stride=1, groups=1, kernel_size=1, padding=0):
+def conv1x1(in_channels,
+            out_channels,
+            module_name,
+            postfix,
+            stride=1,
+            groups=1,
+            kernel_size=1,
+            padding=0):
     """1x1 convolution"""
     return [
-        ('{}_{}/conv'.format(module_name, postfix),
-         nn.Conv2D(in_channels, out_channels,
-                   kernel_size=kernel_size,
-                   stride=stride,
-                   padding=padding,
-                   groups=groups,
-                   bias_attr=False)),
+        ('{}_{}/conv'.format(module_name, postfix), nn.Conv2D(
+            in_channels,
+            out_channels,
+            kernel_size=kernel_size,
+            stride=stride,
+            padding=padding,
+            groups=groups,
+            bias_attr=False)),
         ('{}_{}/norm'.format(module_name, postfix),
          nn.BatchNorm2D(out_channels)),
-        ('{}_{}/relu'.format(module_name, postfix),
-         nn.ReLU()),
+        ('{}_{}/relu'.format(module_name, postfix), nn.ReLU()),
     ]
 
 
@@ -76,8 +92,8 @@ class _OSA_module(nn.Layer):
         self.layers = nn.LayerList()
         in_channel = in_ch
         for i in range(layer_per_block):
-            self.layers.append(nn.Sequential(
-                *conv3x3(in_channel, stage_ch, module_name, i)))
+            self.layers.append(
+                nn.Sequential(*conv3x3(in_channel, stage_ch, module_name, i)))
             in_channel = stage_ch
 
         # feature aggregation
@@ -103,35 +119,31 @@ class _OSA_module(nn.Layer):
 
 
 class _OSA_stage(nn.Sequential):
-    def __init__(self,
-                 in_ch,
-                 stage_ch,
-                 concat_ch,
-                 block_per_stage,
-                 layer_per_block,
-                 stage_num):
+    def __init__(self, in_ch, stage_ch, concat_ch, block_per_stage,
+                 layer_per_block, stage_num):
         super(_OSA_stage, self).__init__()
 
         if not stage_num == 2:
-            self.add_sublayer('Pooling',
-                              nn.MaxPool2D(kernel_size=3, stride=2, ceil_mode=True))
+            self.add_sublayer(
+                'Pooling',
+                nn.MaxPool2D(
+                    kernel_size=3, stride=2, ceil_mode=True))
 
         module_name = f'OSA{stage_num}_1'
         self.add_sublayer(module_name,
-                          _OSA_module(in_ch,
-                                      stage_ch,
-                                      concat_ch,
-                                      layer_per_block,
-                                      module_name))
+                          _OSA_module(in_ch, stage_ch, concat_ch,
+                                      layer_per_block, module_name))
         for i in range(block_per_stage - 1):
             module_name = f'OSA{stage_num}_{i + 2}'
-            self.add_sublayer(module_name,
-                              _OSA_module(concat_ch,
-                                          stage_ch,
-                                          concat_ch,
-                                          layer_per_block,
-                                          module_name,
-                                          identity=True))
+            self.add_sublayer(
+                module_name,
+                _OSA_module(
+                    concat_ch,
+                    stage_ch,
+                    concat_ch,
+                    layer_per_block,
+                    module_name,
+                    identity=True))
 
 
 class VoVNet(nn.Layer):
@@ -155,13 +167,11 @@ class VoVNet(nn.Layer):
         for i in range(4):  # num_stages
             name = 'stage%d' % (i + 2)
             self.stage_names.append(name)
-            self.add_sublayer(name,
-                              _OSA_stage(in_ch_list[i],
-                                         config_stage_ch[i],
-                                         config_concat_ch[i],
-                                         block_per_stage[i],
-                                         layer_per_block,
-                                         i + 2))
+            self.add_sublayer(
+                name,
+                _OSA_stage(in_ch_list[i], config_stage_ch[i],
+                           config_concat_ch[i], block_per_stage[i],
+                           layer_per_block, i + 2))
 
         self.classifier = nn.Linear(config_concat_ch[-1], class_num)
 
@@ -183,25 +193,20 @@ class VoVNet(nn.Layer):
         return x
 
 
-def _vovnet(arch,
-            config_stage_ch,
-            config_concat_ch,
-            block_per_stage,
-            layer_per_block,
-            pretrained,
-            progress,
-            **kwargs):
-    model = VoVNet(config_stage_ch, config_concat_ch,
-                   block_per_stage, layer_per_block,
-                   **kwargs)
-    if pretrained:
-        state_dict = load_state_dict_from_url(model_urls[arch],
-                                              progress=progress)
-        model.load_state_dict(state_dict)
-    return model
+def _load_pretrained(pretrained, model, model_url, use_ssld=False):
+    if pretrained is False:
+        pass
+    elif pretrained is True:
+        load_dygraph_pretrain_from_url(model, model_url, use_ssld=use_ssld)
+    elif isinstance(pretrained, str):
+        load_dygraph_pretrain(model, pretrained)
+    else:
+        raise RuntimeError(
+            "pretrained type is not available. Please use `string` or `boolean` type."
+        )
 
 
-def VoVNet57(pretrained=False, progress=True, **kwargs):
+def VoVNet57(pretrained=False, use_ssld=False, **kwargs):
     r"""Constructs a VoVNet-57 model as described in
     `"An Energy and GPU-Computation Efficient Backbone Networks"
     <https://arxiv.org/abs/1904.09730>`_.
@@ -209,11 +214,14 @@ def VoVNet57(pretrained=False, progress=True, **kwargs):
         pretrained (bool): If True, returns a model pre-trained on ImageNet
         progress (bool): If True, displays a progress bar of the download to stderr
     """
-    return _vovnet('vovnet57', [128, 160, 192, 224], [256, 512, 768, 1024],
-                   [1, 1, 4, 3], 5, pretrained, progress, **kwargs)
+    model = VoVNet([128, 160, 192, 224], [256, 512, 768, 1024], [1, 1, 4, 3],
+                   5)
+    _load_pretrained(
+        pretrained, model, MODEL_URLS["VoVNet57"], use_ssld=use_ssld)
+    return model
 
 
-def VoVNet39(pretrained=False, progress=True, **kwargs):
+def VoVNet39(pretrained=False, use_ssld=False, **kwargs):
     r"""Constructs a VoVNet-39 model as described in
     `"An Energy and GPU-Computation Efficient Backbone Networks"
     <https://arxiv.org/abs/1904.09730>`_.
@@ -221,11 +229,14 @@ def VoVNet39(pretrained=False, progress=True, **kwargs):
         pretrained (bool): If True, returns a model pre-trained on ImageNet
         progress (bool): If True, displays a progress bar of the download to stderr
     """
-    return _vovnet('vovnet39', [128, 160, 192, 224], [256, 512, 768, 1024],
-                   [1, 1, 2, 2], 5, pretrained, progress, **kwargs)
+    model = VoVNet([128, 160, 192, 224], [256, 512, 768, 1024], [1, 1, 2, 2],
+                   5)
+    _load_pretrained(
+        pretrained, model, MODEL_URLS["VoVNet39"], use_ssld=use_ssld)
+    return model
 
 
-def VoVNet27_slim(pretrained=False, progress=True, **kwargs):
+def VoVNet27_slim(pretrained=False, use_ssld=False, **kwargs):
     r"""Constructs a VoVNet-39 model as described in
     `"An Energy and GPU-Computation Efficient Backbone Networks"
     <https://arxiv.org/abs/1904.09730>`_.
@@ -233,5 +244,7 @@ def VoVNet27_slim(pretrained=False, progress=True, **kwargs):
         pretrained (bool): If True, returns a model pre-trained on ImageNet
         progress (bool): If True, displays a progress bar of the download to stderr
     """
-    return _vovnet('vovnet27_slim', [64, 80, 96, 112], [128, 256, 384, 512],
-                   [1, 1, 1, 1], 5, pretrained, progress, **kwargs)
+    model = VoVNet([64, 80, 96, 112], [128, 256, 384, 512], [1, 1, 1, 1], 5)
+    _load_pretrained(
+        pretrained, model, MODEL_URLS["VoVNet27_slim"], use_ssld=use_ssld)
+    return model
