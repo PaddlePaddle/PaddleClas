@@ -201,13 +201,15 @@ for batch_size in ${batch_size_list[*]}; do
                 cd ..
             else
                 cd dataset/ILSVRC2012
-                train_list_length=`cat train_list.txt | wc -l`
-                copy_num=`echo $[25*10*$total_batch_size/$train_list_length]`
+                val_list_length=`cat val_list.txt | wc -l`
+                copy_num=`echo $[25*10*$total_batch_size/$val_list_length]`
+                rm -rf train_list.txt
                 if [[ $copy_num -gt 1 ]];then
-                    rm -rf train_list.txt
                     for ((i=1; i <=$copy_num; i++));do
                         cat val_list.txt >> train_list.txt
                     done
+		else
+		    ln -s val_list.txt train_list.txt
                 fi
                 cd ../../
             fi
@@ -251,7 +253,7 @@ for batch_size in ${batch_size_list[*]}; do
                         --run_mode ${run_mode} \
                         --fp_item ${precision} \
                         --keyword ips: \
-                        --skip_steps 2 \
+                        --skip_steps 100 \
                         --device_num ${device_num} \
                         --speed_unit samples/s \
                         --convergence_key loss: "
@@ -287,7 +289,7 @@ for batch_size in ${batch_size_list[*]}; do
                         --run_mode ${run_mode} \
                         --fp_item ${precision} \
                         --keyword ips: \
-                        --skip_steps 2 \
+                        --skip_steps 100 \
                         --device_num ${device_num} \
                         --speed_unit images/s \
                         --convergence_key loss: "
