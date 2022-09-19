@@ -2,7 +2,7 @@
 Global:
   checkpoints: null
   pretrained_model: null
-  output_dir: ./output/r34_r18_mgd
+  output_dir: ./output/r34_r18_reviewkd
   device: gpu
   save_interval: 1
   eval_during_train: True
@@ -31,12 +31,12 @@ Arch:
         name: ResNet34
         class_num: *class_num
         pretrained: True
-        return_patterns: &t_stages ["blocks[2]", "blocks[6]", "blocks[12]", "blocks[15]"]
+        return_patterns: &t_stages ["blocks[2]", "blocks[6]", "blocks[12]", "blocks[15]", "avg_pool"]
     - Student:
         name: ResNet18
         class_num: *class_num
         pretrained: False
-        return_patterns: &s_stages ["blocks[1]", "blocks[3]", "blocks[5]", "blocks[7]"]
+        return_patterns: &s_stages ["blocks[1]", "blocks[3]", "blocks[5]", "blocks[7]", "avg_pool"]
  
 # loss function config for traing/eval process
 Loss:
@@ -46,13 +46,15 @@ Loss:
         model_names: ["Student"]
     - DistillationPairLoss:
         weight: 1.0
-        base_loss_name: MGDLoss
+        base_loss_name: ReviewKDLoss
         model_name_pairs: [["Student", "Teacher"]]
-        s_key: "blocks[7]"
-        t_key: "blocks[15]"
-        name: "loss_mgd"
-        student_channels: 512
-        teacher_channels: 512
+        s_key: *s_stages
+        t_key: *t_stages
+        name: "loss_reviewkd"
+        student_channels: [64,128,256,512,512]
+        teacher_channels: [64,128,256,512,512]
+        mid_channel: 512
+        hcl_mode: "avg"
   Eval:
     - CELoss:
         weight: 1.0
