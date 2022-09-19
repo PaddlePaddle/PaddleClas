@@ -1,0 +1,296 @@
+[
+  {
+    "level": "INFO",
+    "message": "Start JSON generation. Platform version: 16 min SDK version: arm64-v8a",
+    "file": "D:\\python_proj\\PaddleClas\\deploy\\shitu_android_demo\\app\\src\\main\\cpp\\CMakeLists.txt",
+    "tag": "debug|arm64-v8a"
+  },
+  {
+    "level": "INFO",
+    "message": "Trying to locate CMake in local SDK repository.",
+    "file": "D:\\python_proj\\PaddleClas\\deploy\\shitu_android_demo\\app\\src\\main\\cpp\\CMakeLists.txt",
+    "tag": "debug|arm64-v8a"
+  },
+  {
+    "level": "INFO",
+    "message": "- CMake found in SDK at \u0027C:\\Users\\hesensen\\AppData\\Local\\Android\\Sdk\\cmake\\3.18.1\u0027 had version \u00273.18.1\u0027",
+    "file": "D:\\python_proj\\PaddleClas\\deploy\\shitu_android_demo\\app\\src\\main\\cpp\\CMakeLists.txt",
+    "tag": "debug|arm64-v8a"
+  },
+  {
+    "level": "INFO",
+    "message": "rebuilding JSON D:\\python_proj\\PaddleClas\\deploy\\shitu_android_demo\\app\\.cxx\\cmake\\debug\\arm64-v8a\\android_gradle_build.json due to:",
+    "file": "D:\\python_proj\\PaddleClas\\deploy\\shitu_android_demo\\app\\src\\main\\cpp\\CMakeLists.txt",
+    "tag": "debug|arm64-v8a"
+  },
+  {
+    "level": "INFO",
+    "message": "- expected json D:\\python_proj\\PaddleClas\\deploy\\shitu_android_demo\\app\\.cxx\\cmake\\debug\\arm64-v8a\\android_gradle_build.json file is not present, will remove stale json folder",
+    "file": "D:\\python_proj\\PaddleClas\\deploy\\shitu_android_demo\\app\\src\\main\\cpp\\CMakeLists.txt",
+    "tag": "debug|arm64-v8a"
+  },
+  {
+    "level": "INFO",
+    "message": "- missing previous command file D:\\python_proj\\PaddleClas\\deploy\\shitu_android_demo\\app\\.cxx\\cmake\\debug\\arm64-v8a\\build_command.txt, will remove stale json folder",
+    "file": "D:\\python_proj\\PaddleClas\\deploy\\shitu_android_demo\\app\\src\\main\\cpp\\CMakeLists.txt",
+    "tag": "debug|arm64-v8a"
+  },
+  {
+    "level": "INFO",
+    "message": "- command changed from previous, will remove stale json folder",
+    "file": "D:\\python_proj\\PaddleClas\\deploy\\shitu_android_demo\\app\\src\\main\\cpp\\CMakeLists.txt",
+    "tag": "debug|arm64-v8a"
+  },
+  {
+    "level": "INFO",
+    "message": "created folder \u0027D:\\python_proj\\PaddleClas\\deploy\\shitu_android_demo\\app\\.cxx\\cmake\\debug\\arm64-v8a\u0027",
+    "file": "D:\\python_proj\\PaddleClas\\deploy\\shitu_android_demo\\app\\src\\main\\cpp\\CMakeLists.txt",
+    "tag": "debug|arm64-v8a"
+  },
+  {
+    "level": "INFO",
+    "message": "executing cmake Executable : C:\\Users\\hesensen\\AppData\\Local\\Android\\Sdk\\cmake\\3.18.1\\bin\\cmake.exe\narguments : \n-HD:\\python_proj\\PaddleClas\\deploy\\shitu_android_demo\\app\\src\\main\\cpp\n-DCMAKE_CXX_FLAGS\u003d-std\u003dc++11\n-DCMAKE_FIND_ROOT_PATH\u003dD:\\python_proj\\PaddleClas\\deploy\\shitu_android_demo\\app\\.cxx\\cmake\\debug\\prefab\\arm64-v8a\\prefab\n-DCMAKE_BUILD_TYPE\u003dDebug\n-DCMAKE_TOOLCHAIN_FILE\u003dC:\\Users\\hesensen\\AppData\\Local\\Android\\Sdk\\ndk\\21.1.6352462\\build\\cmake\\android.toolchain.cmake\n-DANDROID_ABI\u003darm64-v8a\n-DANDROID_NDK\u003dC:\\Users\\hesensen\\AppData\\Local\\Android\\Sdk\\ndk\\21.1.6352462\n-DCMAKE_ANDROID_ARCH_ABI\u003darm64-v8a\n-DCMAKE_ANDROID_NDK\u003dC:\\Users\\hesensen\\AppData\\Local\\Android\\Sdk\\ndk\\21.1.6352462\n-DCMAKE_EXPORT_COMPILE_COMMANDS\u003dON\n-DCMAKE_LIBRARY_OUTPUT_DIRECTORY\u003dD:\\python_proj\\PaddleClas\\deploy\\shitu_android_demo\\app\\build\\intermediates\\cmake\\debug\\obj\\arm64-v8a\n-DCMAKE_MAKE_PROGRAM\u003dC:\\Users\\hesensen\\AppData\\Local\\Android\\Sdk\\cmake\\3.18.1\\bin\\ninja.exe\n-DCMAKE_SYSTEM_NAME\u003dAndroid\n-DCMAKE_SYSTEM_VERSION\u003d16\n-DANDROID_PLATFORM\u003dandroid-23\n-DANDROID_STL\u003dc++_shared\n-BD:\\python_proj\\PaddleClas\\deploy\\shitu_android_demo\\app\\.cxx\\cmake\\debug\\arm64-v8a\n-GNinja\njvmArgs : \n\n",
+    "file": "D:\\python_proj\\PaddleClas\\deploy\\shitu_android_demo\\app\\src\\main\\cpp\\CMakeLists.txt",
+    "tag": "debug|arm64-v8a"
+  },
+  {
+    "level": "INFO",
+    "message": "\n",
+    "file": "D:\\python_proj\\PaddleClas\\deploy\\shitu_android_demo\\app\\src\\main\\cpp\\CMakeLists.txt",
+    "tag": "debug|arm64-v8a"
+  },
+  {
+    "level": "INFO",
+    "message": "[\u003d\u003d \"CMake Server\" \u003d\u003d[\n",
+    "file": "D:\\python_proj\\PaddleClas\\deploy\\shitu_android_demo\\app\\src\\main\\cpp\\CMakeLists.txt",
+    "tag": "debug|arm64-v8a"
+  },
+  {
+    "level": "INFO",
+    "message": "{\"supportedProtocolVersions\":[{\"isExperimental\":true,\"major\":1,\"minor\":2}],\"type\":\"hello\"}\n",
+    "file": "D:\\python_proj\\PaddleClas\\deploy\\shitu_android_demo\\app\\src\\main\\cpp\\CMakeLists.txt",
+    "tag": "debug|arm64-v8a"
+  },
+  {
+    "level": "INFO",
+    "message": "]\u003d\u003d \"CMake Server\" \u003d\u003d]\n",
+    "file": "D:\\python_proj\\PaddleClas\\deploy\\shitu_android_demo\\app\\src\\main\\cpp\\CMakeLists.txt",
+    "tag": "debug|arm64-v8a"
+  },
+  {
+    "level": "INFO",
+    "message": "{\n  \"type\": \"handshake\",\n  \"cookie\": \"gradle-cmake-cookie\",\n  \"protocolVersion\": {\n    \"isExperimental\": true,\n    \"major\": 1,\n    \"minor\": 2\n  },\n  \"sourceDirectory\": \"D:/python_proj/PaddleClas/deploy/shitu_android_demo/app/src/main/cpp\",\n  \"buildDirectory\": \"D:/python_proj/PaddleClas/deploy/shitu_android_demo/app/.cxx/cmake/debug/arm64-v8a\",\n  \"generator\": \"Ninja\"\n}\n",
+    "file": "D:\\python_proj\\PaddleClas\\deploy\\shitu_android_demo\\app\\src\\main\\cpp\\CMakeLists.txt",
+    "tag": "debug|arm64-v8a"
+  },
+  {
+    "level": "INFO",
+    "message": "{\"cookie\":\"gradle-cmake-cookie\",\"inReplyTo\":\"handshake\",\"type\":\"reply\"}\n",
+    "file": "D:\\python_proj\\PaddleClas\\deploy\\shitu_android_demo\\app\\src\\main\\cpp\\CMakeLists.txt",
+    "tag": "debug|arm64-v8a"
+  },
+  {
+    "level": "INFO",
+    "message": "{\n  \"type\": \"configure\",\n  \"cacheArguments\": [\n    \"\",\n    \"-DCMAKE_CXX_FLAGS\\u003d-std\\u003dc++11\",\n    \"-DCMAKE_FIND_ROOT_PATH\\u003dD:\\\\python_proj\\\\PaddleClas\\\\deploy\\\\shitu_android_demo\\\\app\\\\.cxx\\\\cmake\\\\debug\\\\prefab\\\\arm64-v8a\\\\prefab\",\n    \"-DCMAKE_BUILD_TYPE\\u003dDebug\",\n    \"-DCMAKE_TOOLCHAIN_FILE\\u003dC:\\\\Users\\\\hesensen\\\\AppData\\\\Local\\\\Android\\\\Sdk\\\\ndk\\\\21.1.6352462\\\\build\\\\cmake\\\\android.toolchain.cmake\",\n    \"-DANDROID_ABI\\u003darm64-v8a\",\n    \"-DANDROID_NDK\\u003dC:\\\\Users\\\\hesensen\\\\AppData\\\\Local\\\\Android\\\\Sdk\\\\ndk\\\\21.1.6352462\",\n    \"-DCMAKE_ANDROID_ARCH_ABI\\u003darm64-v8a\",\n    \"-DCMAKE_ANDROID_NDK\\u003dC:\\\\Users\\\\hesensen\\\\AppData\\\\Local\\\\Android\\\\Sdk\\\\ndk\\\\21.1.6352462\",\n    \"-DCMAKE_EXPORT_COMPILE_COMMANDS\\u003dON\",\n    \"-DCMAKE_LIBRARY_OUTPUT_DIRECTORY\\u003dD:\\\\python_proj\\\\PaddleClas\\\\deploy\\\\shitu_android_demo\\\\app\\\\build\\\\intermediates\\\\cmake\\\\debug\\\\obj\\\\arm64-v8a\",\n    \"-DCMAKE_MAKE_PROGRAM\\u003dC:\\\\Users\\\\hesensen\\\\AppData\\\\Local\\\\Android\\\\Sdk\\\\cmake\\\\3.18.1\\\\bin\\\\ninja.exe\",\n    \"-DCMAKE_SYSTEM_NAME\\u003dAndroid\",\n    \"-DCMAKE_SYSTEM_VERSION\\u003d16\",\n    \"-DANDROID_PLATFORM\\u003dandroid-23\",\n    \"-DANDROID_STL\\u003dc++_shared\"\n  ]\n}\n",
+    "file": "D:\\python_proj\\PaddleClas\\deploy\\shitu_android_demo\\app\\src\\main\\cpp\\CMakeLists.txt",
+    "tag": "debug|arm64-v8a"
+  },
+  {
+    "level": "INFO",
+    "message": "{\"cookie\":\"\",\"inReplyTo\":\"configure\",\"message\":\"CMake Warning (dev) in CMakeLists.txt:\\n  No project() command is present.  The top-level CMakeLists.txt file must\\n  contain a literal, direct call to the project() command.  Add a line of\\n  code such as\\n\\n    project(ProjectName)\\n\\n  near the top of the file, but after cmake_minimum_required().\\n\\n  CMake is pretending there is a \\\"project(Project)\\\" command on the first\\n  line.\\nThis warning is for project developers.  Use -Wno-dev to suppress it.\\n\",\"title\":\"Warning\",\"type\":\"message\"}\n",
+    "file": "D:\\python_proj\\PaddleClas\\deploy\\shitu_android_demo\\app\\src\\main\\cpp\\CMakeLists.txt",
+    "tag": "debug|arm64-v8a"
+  },
+  {
+    "level": "WARN",
+    "message": "CMake Warning (dev) in CMakeLists.txt:\r\n  No project() command is present.  The top-level CMakeLists.txt file must\r\n  contain a literal, direct call to the project() command.  Add a line of\r\n  code such as\r\n\r\n    project(ProjectName)\r\n\r\n  near the top of the file, but after cmake_minimum_required().\r\n\r\n  CMake is pretending there is a \"project(Project)\" command on the first\r\n  line.\r\nThis warning is for project developers.  Use -Wno-dev to suppress it.",
+    "file": "D:\\python_proj\\PaddleClas\\deploy\\shitu_android_demo\\app\\src\\main\\cpp\\CMakeLists.txt",
+    "tag": "debug|arm64-v8a"
+  },
+  {
+    "level": "INFO",
+    "message": "{\"cookie\":\"\",\"inReplyTo\":\"configure\",\"message\":\"Detecting C compiler ABI info\",\"type\":\"message\"}\n",
+    "file": "D:\\python_proj\\PaddleClas\\deploy\\shitu_android_demo\\app\\src\\main\\cpp\\CMakeLists.txt",
+    "tag": "debug|arm64-v8a"
+  },
+  {
+    "level": "INFO",
+    "message": "Detecting C compiler ABI info",
+    "file": "D:\\python_proj\\PaddleClas\\deploy\\shitu_android_demo\\app\\src\\main\\cpp\\CMakeLists.txt",
+    "tag": "debug|arm64-v8a"
+  },
+  {
+    "level": "INFO",
+    "message": "{\"cookie\":\"\",\"inReplyTo\":\"configure\",\"progressCurrent\":33,\"progressMaximum\":1000,\"progressMessage\":\"Configuring\",\"progressMinimum\":0,\"type\":\"progress\"}\n",
+    "file": "D:\\python_proj\\PaddleClas\\deploy\\shitu_android_demo\\app\\src\\main\\cpp\\CMakeLists.txt",
+    "tag": "debug|arm64-v8a"
+  },
+  {
+    "level": "INFO",
+    "message": "{\"cookie\":\"\",\"inReplyTo\":\"configure\",\"message\":\"Detecting C compiler ABI info - done\",\"type\":\"message\"}\n",
+    "file": "D:\\python_proj\\PaddleClas\\deploy\\shitu_android_demo\\app\\src\\main\\cpp\\CMakeLists.txt",
+    "tag": "debug|arm64-v8a"
+  },
+  {
+    "level": "INFO",
+    "message": "Detecting C compiler ABI info - done",
+    "file": "D:\\python_proj\\PaddleClas\\deploy\\shitu_android_demo\\app\\src\\main\\cpp\\CMakeLists.txt",
+    "tag": "debug|arm64-v8a"
+  },
+  {
+    "level": "INFO",
+    "message": "{\"cookie\":\"\",\"inReplyTo\":\"configure\",\"message\":\"Check for working C compiler: C:/Users/hesensen/AppData/Local/Android/Sdk/ndk/21.1.6352462/toolchains/llvm/prebuilt/windows-x86_64/bin/clang.exe - skipped\",\"type\":\"message\"}\n",
+    "file": "D:\\python_proj\\PaddleClas\\deploy\\shitu_android_demo\\app\\src\\main\\cpp\\CMakeLists.txt",
+    "tag": "debug|arm64-v8a"
+  },
+  {
+    "level": "INFO",
+    "message": "Check for working C compiler: C:/Users/hesensen/AppData/Local/Android/Sdk/ndk/21.1.6352462/toolchains/llvm/prebuilt/windows-x86_64/bin/clang.exe - skipped",
+    "file": "D:\\python_proj\\PaddleClas\\deploy\\shitu_android_demo\\app\\src\\main\\cpp\\CMakeLists.txt",
+    "tag": "debug|arm64-v8a"
+  },
+  {
+    "level": "INFO",
+    "message": "{\"cookie\":\"\",\"inReplyTo\":\"configure\",\"message\":\"Detecting C compile features\",\"type\":\"message\"}\n",
+    "file": "D:\\python_proj\\PaddleClas\\deploy\\shitu_android_demo\\app\\src\\main\\cpp\\CMakeLists.txt",
+    "tag": "debug|arm64-v8a"
+  },
+  {
+    "level": "INFO",
+    "message": "Detecting C compile features",
+    "file": "D:\\python_proj\\PaddleClas\\deploy\\shitu_android_demo\\app\\src\\main\\cpp\\CMakeLists.txt",
+    "tag": "debug|arm64-v8a"
+  },
+  {
+    "level": "INFO",
+    "message": "{\"cookie\":\"\",\"inReplyTo\":\"configure\",\"message\":\"Detecting C compile features - done\",\"type\":\"message\"}\n",
+    "file": "D:\\python_proj\\PaddleClas\\deploy\\shitu_android_demo\\app\\src\\main\\cpp\\CMakeLists.txt",
+    "tag": "debug|arm64-v8a"
+  },
+  {
+    "level": "INFO",
+    "message": "Detecting C compile features - done",
+    "file": "D:\\python_proj\\PaddleClas\\deploy\\shitu_android_demo\\app\\src\\main\\cpp\\CMakeLists.txt",
+    "tag": "debug|arm64-v8a"
+  },
+  {
+    "level": "INFO",
+    "message": "{\"cookie\":\"\",\"inReplyTo\":\"configure\",\"message\":\"Detecting CXX compiler ABI info\",\"type\":\"message\"}\n",
+    "file": "D:\\python_proj\\PaddleClas\\deploy\\shitu_android_demo\\app\\src\\main\\cpp\\CMakeLists.txt",
+    "tag": "debug|arm64-v8a"
+  },
+  {
+    "level": "INFO",
+    "message": "Detecting CXX compiler ABI info",
+    "file": "D:\\python_proj\\PaddleClas\\deploy\\shitu_android_demo\\app\\src\\main\\cpp\\CMakeLists.txt",
+    "tag": "debug|arm64-v8a"
+  },
+  {
+    "level": "INFO",
+    "message": "{\"cookie\":\"\",\"inReplyTo\":\"configure\",\"progressCurrent\":65,\"progressMaximum\":1000,\"progressMessage\":\"Configuring\",\"progressMinimum\":0,\"type\":\"progress\"}\n",
+    "file": "D:\\python_proj\\PaddleClas\\deploy\\shitu_android_demo\\app\\src\\main\\cpp\\CMakeLists.txt",
+    "tag": "debug|arm64-v8a"
+  },
+  {
+    "level": "INFO",
+    "message": "{\"cookie\":\"\",\"inReplyTo\":\"configure\",\"message\":\"Detecting CXX compiler ABI info - done\",\"type\":\"message\"}\n",
+    "file": "D:\\python_proj\\PaddleClas\\deploy\\shitu_android_demo\\app\\src\\main\\cpp\\CMakeLists.txt",
+    "tag": "debug|arm64-v8a"
+  },
+  {
+    "level": "INFO",
+    "message": "Detecting CXX compiler ABI info - done",
+    "file": "D:\\python_proj\\PaddleClas\\deploy\\shitu_android_demo\\app\\src\\main\\cpp\\CMakeLists.txt",
+    "tag": "debug|arm64-v8a"
+  },
+  {
+    "level": "INFO",
+    "message": "{\"cookie\":\"\",\"inReplyTo\":\"configure\",\"message\":\"Check for working CXX compiler: C:/Users/hesensen/AppData/Local/Android/Sdk/ndk/21.1.6352462/toolchains/llvm/prebuilt/windows-x86_64/bin/clang++.exe - skipped\",\"type\":\"message\"}\n",
+    "file": "D:\\python_proj\\PaddleClas\\deploy\\shitu_android_demo\\app\\src\\main\\cpp\\CMakeLists.txt",
+    "tag": "debug|arm64-v8a"
+  },
+  {
+    "level": "INFO",
+    "message": "Check for working CXX compiler: C:/Users/hesensen/AppData/Local/Android/Sdk/ndk/21.1.6352462/toolchains/llvm/prebuilt/windows-x86_64/bin/clang++.exe - skipped",
+    "file": "D:\\python_proj\\PaddleClas\\deploy\\shitu_android_demo\\app\\src\\main\\cpp\\CMakeLists.txt",
+    "tag": "debug|arm64-v8a"
+  },
+  {
+    "level": "INFO",
+    "message": "{\"cookie\":\"\",\"inReplyTo\":\"configure\",\"message\":\"Detecting CXX compile features\",\"type\":\"message\"}\n",
+    "file": "D:\\python_proj\\PaddleClas\\deploy\\shitu_android_demo\\app\\src\\main\\cpp\\CMakeLists.txt",
+    "tag": "debug|arm64-v8a"
+  },
+  {
+    "level": "INFO",
+    "message": "Detecting CXX compile features",
+    "file": "D:\\python_proj\\PaddleClas\\deploy\\shitu_android_demo\\app\\src\\main\\cpp\\CMakeLists.txt",
+    "tag": "debug|arm64-v8a"
+  },
+  {
+    "level": "INFO",
+    "message": "{\"cookie\":\"\",\"inReplyTo\":\"configure\",\"message\":\"Detecting CXX compile features - done\",\"type\":\"message\"}\n",
+    "file": "D:\\python_proj\\PaddleClas\\deploy\\shitu_android_demo\\app\\src\\main\\cpp\\CMakeLists.txt",
+    "tag": "debug|arm64-v8a"
+  },
+  {
+    "level": "INFO",
+    "message": "Detecting CXX compile features - done",
+    "file": "D:\\python_proj\\PaddleClas\\deploy\\shitu_android_demo\\app\\src\\main\\cpp\\CMakeLists.txt",
+    "tag": "debug|arm64-v8a"
+  },
+  {
+    "level": "INFO",
+    "message": "{\"cookie\":\"\",\"inReplyTo\":\"configure\",\"message\":\"CMake Error at CMakeLists.txt:18 (find_package):\\n  By not providing \\\"FindOpenCV.cmake\\\" in CMAKE_MODULE_PATH this project has\\n  asked CMake to find a package configuration file provided by \\\"OpenCV\\\", but\\n  CMake did not find one.\\n\\n  Could not find a package configuration file provided by \\\"OpenCV\\\" with any\\n  of the following names:\\n\\n    OpenCVConfig.cmake\\n    opencv-config.cmake\\n\\n  Add the installation prefix of \\\"OpenCV\\\" to CMAKE_PREFIX_PATH or set\\n  \\\"OpenCV_DIR\\\" to a directory containing one of the above files.  If \\\"OpenCV\\\"\\n  provides a separate development package or SDK, be sure it has been\\n  installed.\\n\\n\",\"title\":\"Error\",\"type\":\"message\"}\n",
+    "file": "D:\\python_proj\\PaddleClas\\deploy\\shitu_android_demo\\app\\src\\main\\cpp\\CMakeLists.txt",
+    "tag": "debug|arm64-v8a"
+  },
+  {
+    "level": "ERROR",
+    "message": "CMake Error at D:\\python_proj\\PaddleClas\\deploy\\shitu_android_demo\\app\\src\\main\\cpp\\CMakeLists.txt:18 (find_package):\r\n  By not providing \"FindOpenCV.cmake\" in CMAKE_MODULE_PATH this project has\r\n  asked CMake to find a package configuration file provided by \"OpenCV\", but\r\n  CMake did not find one.\r\n\r\n  Could not find a package configuration file provided by \"OpenCV\" with any\r\n  of the following names:\r\n\r\n    OpenCVConfig.cmake\r\n    opencv-config.cmake\r\n\r\n  Add the installation prefix of \"OpenCV\" to CMAKE_PREFIX_PATH or set\r\n  \"OpenCV_DIR\" to a directory containing one of the above files.  If \"OpenCV\"\r\n  provides a separate development package or SDK, be sure it has been\r\n  installed.\r\n",
+    "file": "D:\\python_proj\\PaddleClas\\deploy\\shitu_android_demo\\app\\src\\main\\cpp\\CMakeLists.txt",
+    "tag": "debug|arm64-v8a"
+  },
+  {
+    "level": "INFO",
+    "message": "{\"cookie\":\"\",\"inReplyTo\":\"configure\",\"message\":\"Configuring incomplete, errors occurred!\\nSee also \\\"D:/python_proj/PaddleClas/deploy/shitu_android_demo/app/.cxx/cmake/debug/arm64-v8a/CMakeFiles/CMakeOutput.log\\\".\",\"type\":\"message\"}\n",
+    "file": "D:\\python_proj\\PaddleClas\\deploy\\shitu_android_demo\\app\\src\\main\\cpp\\CMakeLists.txt",
+    "tag": "debug|arm64-v8a"
+  },
+  {
+    "level": "INFO",
+    "message": "Configuring incomplete, errors occurred!\r\nSee also \"D:/python_proj/PaddleClas/deploy/shitu_android_demo/app/.cxx/cmake/debug/arm64-v8a/CMakeFiles/CMakeOutput.log\".",
+    "file": "D:\\python_proj\\PaddleClas\\deploy\\shitu_android_demo\\app\\src\\main\\cpp\\CMakeLists.txt",
+    "tag": "debug|arm64-v8a"
+  },
+  {
+    "level": "INFO",
+    "message": "{\"cookie\":\"\",\"inReplyTo\":\"configure\",\"message\":\"CMake Deprecation Warning:\\n  The \u0027cmake-server(7)\u0027 is deprecated.  Please port clients to use the\\n  \u0027cmake-file-api(7)\u0027 instead.\\n\\n\",\"title\":\"Warning\",\"type\":\"message\"}\n",
+    "file": "D:\\python_proj\\PaddleClas\\deploy\\shitu_android_demo\\app\\src\\main\\cpp\\CMakeLists.txt",
+    "tag": "debug|arm64-v8a"
+  },
+  {
+    "level": "WARN",
+    "message": "CMake Deprecation Warning:\r\n  The \u0027cmake-server(7)\u0027 is deprecated.  Please port clients to use the\r\n  \u0027cmake-file-api(7)\u0027 instead.\r\n",
+    "file": "D:\\python_proj\\PaddleClas\\deploy\\shitu_android_demo\\app\\src\\main\\cpp\\CMakeLists.txt",
+    "tag": "debug|arm64-v8a"
+  },
+  {
+    "level": "INFO",
+    "message": "{\"cookie\":\"\",\"errorMessage\":\"Configuration failed.\",\"inReplyTo\":\"configure\",\"type\":\"error\"}\n",
+    "file": "D:\\python_proj\\PaddleClas\\deploy\\shitu_android_demo\\app\\src\\main\\cpp\\CMakeLists.txt",
+    "tag": "debug|arm64-v8a"
+  },
+  {
+    "level": "ERROR",
+    "message": "Configuration failed.",
+    "file": "D:\\python_proj\\PaddleClas\\deploy\\shitu_android_demo\\app\\src\\main\\cpp\\CMakeLists.txt",
+    "tag": "debug|arm64-v8a"
+  },
+  {
+    "level": "INFO",
+    "message": "JSON generation completed with problem. Exception: com.android.ide.common.process.ProcessException: Error configuring CMake server (C:\\Users\\hesensen\\AppData\\Local\\Android\\Sdk\\cmake\\3.18.1\\bin).\r\nCMake Warning (dev) in CMakeLists.txt:\n  No project() command is present.  The top-level CMakeLists.txt file must\n  contain a literal, direct call to the project() command.  Add a line of\n  code such as\n\n    project(ProjectName)\n\n  near the top of the file, but after cmake_minimum_required().\n\n  CMake is pretending there is a \"project(Project)\" command on the first\n  line.\nThis warning is for project developers.  Use -Wno-dev to suppress it.\n\nDetecting C compiler ABI info\nDetecting C compiler ABI info - done\nCheck for working C compiler: C:/Users/hesensen/AppData/Local/Android/Sdk/ndk/21.1.6352462/toolchains/llvm/prebuilt/windows-x86_64/bin/clang.exe - skipped\nDetecting C compile features\nDetecting C compile features - done\nDetecting CXX compiler ABI info\nDetecting CXX compiler ABI info - done\nCheck for working CXX compiler: C:/Users/hesensen/AppData/Local/Android/Sdk/ndk/21.1.6352462/toolchains/llvm/prebuilt/windows-x86_64/bin/clang++.exe - skipped\nDetecting CXX compile features\nDetecting CXX compile features - done\nCMake Error at CMakeLists.txt:18 (find_package):\n  By not providing \"FindOpenCV.cmake\" in CMAKE_MODULE_PATH this project has\n  asked CMake to find a package configuration file provided by \"OpenCV\", but\n  CMake did not find one.\n\n  Could not find a package configuration file provided by \"OpenCV\" with any\n  of the following names:\n\n    OpenCVConfig.cmake\n    opencv-config.cmake\n\n  Add the installation prefix of \"OpenCV\" to CMAKE_PREFIX_PATH or set\n  \"OpenCV_DIR\" to a directory containing one of the above files.  If \"OpenCV\"\n  provides a separate development package or SDK, be sure it has been\n  installed.\n\n\nConfiguring incomplete, errors occurred!\nSee also \"D:/python_proj/PaddleClas/deploy/shitu_android_demo/app/.cxx/cmake/debug/arm64-v8a/CMakeFiles/CMakeOutput.log\".\nCMake Deprecation Warning:\n  The \u0027cmake-server(7)\u0027 is deprecated.  Please port clients to use the\n  \u0027cmake-file-api(7)\u0027 instead.\n\n\n",
+    "file": "D:\\python_proj\\PaddleClas\\deploy\\shitu_android_demo\\app\\src\\main\\cpp\\CMakeLists.txt",
+    "tag": "debug|arm64-v8a"
+  }
+]
