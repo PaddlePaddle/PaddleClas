@@ -132,6 +132,7 @@ print(next(result))
 [{'attributes': 'Color: (yellow, prob: 0.9893476963043213), Type: (hatchback, prob: 0.9734097719192505)', 'output': [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0], 'filename': 'pulc_demo_imgs/vehicle_attribute/0002_c002_00030670_0.jpg'}]
 ```
 
+**备注**：其中 `output` 的值索引为0-9表示颜色属性，对应的颜色分别是：yellow(黄色), orange(橙色), green(绿色), gray(灰色), red(灰色), blue(蓝色), white(白色), golden(金色), brown(棕色), black(黑色)；索引为10-18表示车型属性，对应的车型分别是sedan(轿车), suv(越野车), van(面包车), hatchback(掀背车), mpv(多用途汽车), pickup(皮卡车), bus(公共汽车), truck(卡车), estate(旅行车)。
 
 <a name="3"></a>
 
