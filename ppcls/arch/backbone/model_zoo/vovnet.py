@@ -211,7 +211,7 @@ def VoVNet57(pretrained=False, use_ssld=False, **kwargs):
 
 
 def VoVNet39(pretrained=False, use_ssld=False, **kwargs):
-    model = VoVNet([128, 160, 192, 224], [256, 512, 768, 1024], [1, 1, 4, 3],
+    model = VoVNet([128, 160, 192, 224], [256, 512, 768, 1024], [1, 1, 2, 2],
                    5)
 
     _load_pretrained(
@@ -220,8 +220,7 @@ def VoVNet39(pretrained=False, use_ssld=False, **kwargs):
 
 
 def VoVNet27_slim(pretrained=False, use_ssld=False, **kwargs):
-    model = VoVNet([128, 160, 192, 224], [256, 512, 768, 1024], [1, 1, 4, 3],
-                   5)
+    model = VoVNet([64, 80, 96, 112], [128, 256, 384, 512], [1, 1, 1, 1], 5)
 
     _load_pretrained(
         pretrained, model, MODEL_URLS["VoVNet27_slim"], use_ssld=use_ssld)
