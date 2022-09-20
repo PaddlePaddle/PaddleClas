@@ -132,6 +132,8 @@ print(next(result))
 [{'attributes': 'Color: (yellow, prob: 0.9893476963043213), Type: (hatchback, prob: 0.9734097719192505)', 'output': [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0], 'filename': 'pulc_demo_imgs/vehicle_attribute/0002_c002_00030670_0.jpg'}]
 ```
 
+**Note**: The value index of `output` is 0-9 to indicate the color attribute, and the corresponding colors are: yellow, orange, green, gray, red, blue, white,  golden, brown, black; the index is 10-18 to represent the model attributes, the corresponding models are sedan, suv, van, hatchback, mpv, pickup, bus, truck, estate.
+
 <a name="3"></a>
 
 ## 3. Training, Evaluation and Inference
