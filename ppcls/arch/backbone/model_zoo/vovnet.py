@@ -138,9 +138,8 @@ class VoVNet(nn.Layer):
           https://arxiv.org/abs/1904.09730
 
     Args:
-        in_channels (int): Number of input image channels. Default: 3
-        config_stage_ch (tuple(int)): Number of blocks at each stage. Default: [3, 3, 9, 3]
-        config_concat_ch (int): Feature dimension at each stage. Default: [96, 192, 384, 768]
+        config_stage_ch (tuple(int)): Output channels at each stage.
+        config_concat_ch (int): Output channels of concatenations.
         block_per_stage (float): Stochastic depth rate. Default: 0.
         layer_per_block (float): Num of layers for each block. Default: 5.
         class_num (int): Number of classes for classification head. Default: 1000
