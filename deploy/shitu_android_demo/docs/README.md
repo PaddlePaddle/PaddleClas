@@ -47,7 +47,7 @@
     cd ../
 
     # 构建检索库与标签库
-    python3.7 python/build_gallery.py -c configs/inference_drink.yaml -o Global.rec_inference_model_dir=./models/ppshituv2_lite_models_v1.0/general_PPLCNetV2_base_quant_v1.0_lite_inference_model -o IndexProcess.index_method=Flat
+    python3.7 python/build_gallery.py -c configs/inference_drink.yaml -o Global.rec_inference_model_dir=./models/ppshituv2_lite_models_v1.0/general_PPLCNetV2_base_quant_v1.0_lite_inference_model -o IndexProcess.index_method=Flat -o Global.android_demo=True
     ```
 4. 然后将 `configs/inference_drink.yaml` 文件中的 `IndexProcess.index_dir` 字段后的路径改为 `"../drink_dataset_v2.0/index"`，再执行以下命令，得到转换成txt格式的标签库
 
