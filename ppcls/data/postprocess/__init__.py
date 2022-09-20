@@ -18,7 +18,7 @@ from . import topk, threshoutput
 
 from .topk import Topk
 from .threshoutput import ThreshOutput, MultiLabelThreshOutput
-from .attr_rec import VehicleAttribute, PersonAttribute
+from .attr_rec import VehicleAttribute, PersonAttribute, TableAttribute
 
 
 

@@ -16,10 +16,11 @@
 | text_image_orientation |[PULC含文字图像方向分类模型](PULC_text_image_orientation.md)| 99.06 | 7.1M | 2.16ms |[推理模型](https://paddleclas.bj.bcebos.com/models/PULC/inference/text_image_orientation_infer.tar) / [预训练模型](https://paddleclas.bj.bcebos.com/models/PULC/pretrained/text_image_orientation_pretrained.pdparams)|
 | textline_orientation |[PULC文本行方向分类模型](PULC_textline_orientation.md)| 96.01 |7.0M|2.72ms|[推理模型](https://paddleclas.bj.bcebos.com/models/PULC/inference/textline_orientation_infer.tar) / [预训练模型](https://paddleclas.bj.bcebos.com/models/PULC/pretrained/textline_orientation_pretrained.pdparams)|
 | language_classification |[PULC语种分类模型](PULC_language_classification.md)| 99.26 |7.1M|2.58ms|[推理模型](https://paddleclas.bj.bcebos.com/models/PULC/inference/language_classification_infer.tar) / [预训练模型](https://paddleclas.bj.bcebos.com/models/PULC/pretrained/language_classification_pretrained.pdparams)|
+| table_attribute |[PULC表格属性识别模型](PULC_table_attribute.md)| 88.1 |7.1M|2.58ms|[推理模型](https://paddleclas.bj.bcebos.com/models/PULC/inference/table_attribute_infer.tar) / [预训练模型](https://paddleclas.bj.bcebos.com/models/PULC/pretrained/table_attribute_pretrained.pdparams)|
 
 
 **备注：**
 
 * 以上所有的模型的 backbone 均为 PPLCNet_x1_0，部分模型大小不同是由于分类的输出大小不同导致的，推理耗时是基于Intel(R) Xeon(R) Gold 6148 CPU @ 2.40GHz 测试得到，其中测试过程开启 MKLDNN 加速策略，线程数为10。速度测试过程会有轻微波动。
 
-* person_exists、safety_helmet、car_exists 的评测指标为 TprAtFpr，person_attribute、vehicle_attribute的评测指标为ma、traffic_sign、text_image_orientation、textline_orientation、language_classification的评测指标为Top-1 Acc。
+* person_exists、safety_helmet、car_exists 的评测指标为 TprAtFpr，person_attribute、vehicle_attribute、table_attribute 的评测指标为mA、traffic_sign、text_image_orientation、textline_orientation、language_classification的评测指标为Top-1 Acc。
