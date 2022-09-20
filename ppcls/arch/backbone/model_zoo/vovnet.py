@@ -133,14 +133,13 @@ class _OSA_stage(nn.Sequential):
 
 
 class VoVNet(nn.Layer):
-    r""" VoVNet
+    """ VoVNet
         A PaddlePaddle impl of : `An Energy and GPU-Computation Efficient Backbone Network for Real-Time Object Detection`
           https://arxiv.org/abs/1904.09730
-
     Args:
         config_stage_ch (tuple(int)): Output channels at each stage.
         config_concat_ch (int): Output channels of concatenations.
-        block_per_stage (float): Stochastic depth rate. Default: 0.
+        block_per_stage (float): Num of blocks for each stage.
         layer_per_block (float): Num of layers for each block. Default: 5.
         class_num (int): Number of classes for classification head. Default: 1000
     """
