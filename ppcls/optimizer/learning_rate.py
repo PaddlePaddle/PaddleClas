@@ -93,7 +93,7 @@ class LRBase(object):
         return warmup_lr
 
 
-class ConstantImpl(lr.LRScheduler):
+class Constant(lr.LRScheduler):
     """Constant learning rate Class implementation
 
     Args:
@@ -104,7 +104,7 @@ class ConstantImpl(lr.LRScheduler):
     def __init__(self, learning_rate, last_epoch=-1, **kwargs):
         self.learning_rate = learning_rate
         self.last_epoch = last_epoch
-        super(ConstantImpl, self).__init__()
+        super(Constant, self).__init__()
 
     def get_lr(self) -> float:
         """always return the same learning rate
@@ -112,7 +112,7 @@ class ConstantImpl(lr.LRScheduler):
         return self.learning_rate
 
 
-class Constant(LRBase):
+class ConstLR(LRBase):
     """Constant learning rate
 
     Args:
@@ -134,12 +134,12 @@ class Constant(LRBase):
                  last_epoch=-1,
                  by_epoch=False,
                  **kwargs):
-        super(Constant, self).__init__(epochs, step_each_epoch, learning_rate,
-                                       warmup_epoch, warmup_start_lr,
-                                       last_epoch, by_epoch)
+        super(ConstLR, self).__init__(epochs, step_each_epoch, learning_rate,
+                                      warmup_epoch, warmup_start_lr,
+                                      last_epoch, by_epoch)
 
     def __call__(self):
-        learning_rate = ConstantImpl(
+        learning_rate = Constant(
             learning_rate=self.learning_rate, last_epoch=self.last_epoch)
 
         if self.warmup_steps > 0:
