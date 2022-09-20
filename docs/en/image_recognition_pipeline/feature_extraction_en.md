@@ -176,14 +176,14 @@ Model training mainly includes the starting training and restoring training from
 **Notice:**
 The online evaluation method is used by default in the configuration file. If you want to speed up the training, you can turn off the online evaluation function, just add `-o Global.eval_during_train=False` after the above scripts.
 
-After training, the final model files `latest.pdparams`, `best_model.pdarams` and the training log file `train.log` will be generated in the output directory. Among them, `best_model` saves the best model under the current evaluation index, and `latest` is used to save the latest generated model, which is convenient to resume training from the checkpoint when training task is interrupted. Training can be resumed from a checkpoint by adding `-o Global.checkpoint="path_to_resume_checkpoint"` to the end of the above training scripts, as shown below.
+After training, the final model files `latest.pdparams`, `best_model.pdarams` and the training log file `train.log` will be generated in the output directory. Among them, `best_model` saves the best model under the current evaluation index, and `latest` is used to save the latest generated model, which is convenient to resume training from the checkpoint when training task is interrupted. Training can be resumed from a checkpoint by adding `-o Global.checkpoints="path_to_resume_checkpoint"` to the end of the above training scripts, as shown below.
 
 - Single machine and single card checkpoint recovery training
   ```shell
   export CUDA_VISIBLE_DEVICES=0
   python3.7 tools/train.py \
   -c ./ppcls/configs/GeneralRecognitionV2/GeneralRecognitionV2_PPLCNetV2_base.yaml \
-  -o Global.checkpoint="output/RecModel/latest"
+  -o Global.checkpoints="output/RecModel/latest"
   ```
 - Single-machine multi-card checkpoint recovery training
   ```shell
@@ -191,7 +191,7 @@ After training, the final model files `latest.pdparams`, `best_model.pdarams` an
   python3.7 -m paddle.distributed.launch --gpus="0,1,2,3" \
   tools/train.py \
   -c ./ppcls/configs/GeneralRecognitionV2/GeneralRecognitionV2_PPLCNetV2_base.yaml \
-  -o Global.checkpoint="output/RecModel/latest"
+  -o Global.checkpoints="output/RecModel/latest"
   ```
 
 <a name="5.3"></a>
