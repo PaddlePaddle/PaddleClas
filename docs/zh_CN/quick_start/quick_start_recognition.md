@@ -82,7 +82,7 @@
 
 ### 2.1 环境配置
 
-* 安装：请先参考文档 [环境准备](../installation/install_paddleclas.md) 配置 PaddleClas 运行环境。
+* 安装：请先参考文档 [环境准备](../installation.md) 配置 PaddleClas 运行环境。
 
 * 进入 `deploy` 运行目录。本部分所有内容与命令均需要在 `deploy` 目录下运行，可以通过下面的命令进入 `deploy` 目录。
 
@@ -107,7 +107,7 @@
 
 本章节 demo 数据下载地址如下: [drink_dataset_v2.0.tar(瓶装饮料数据)](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/data/drink_dataset_v2.0.tar)，
 
-下面以 **drink_dataset_v2.0.tar** 为例介绍PC端的 PP-ShiTu 快速体验流程。用户也可以自行下载并解压其它场景的数据进行体验：[22种场景数据下载](../introduction/ppshitu_application_scenarios.md#1-应用场景介绍)。
+下面以 **drink_dataset_v2.0.tar** 为例介绍PC端的 PP-ShiTu 快速体验流程。用户也可以自行下载并解压其它场景的数据进行体验：[22种场景数据下载](../deployment/PP-ShiTu/application_scenarios.md#1-应用场景介绍)。
 
 如果希望体验服务端主体检测和各垂类方向的识别模型，可以参考 [2.4 服务端识别模型列表](#24-服务端识别模型列表)
 
@@ -300,7 +300,7 @@ python3.7 python/predict_system.py -c configs/inference_general.yaml -o Global.i
 python3.7 python/build_gallery.py -c configs/inference_general.yaml -o IndexProcess.data_file="./drink_dataset_v2.0/gallery/drink_label_all.txt" -o IndexProcess.index_dir="./drink_dataset_v2.0/index_all"
 ```
 
-最终构建完毕的新的索引库保存在文件夹 `./drink_dataset_v2.0/index_all` 下。具体 `yaml` 请参考[向量检索文档](../image_recognition_pipeline/vector_search.md)。
+最终构建完毕的新的索引库保存在文件夹 `./drink_dataset_v2.0/index_all` 下。具体 `yaml` 请参考[向量检索文档](../deployment/PP-ShiTu/vector_search.md)。
 
 <a name="基于新的索引库的图像识别"></a>
 
@@ -377,4 +377,4 @@ wget https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/data/recognit
 
 按照上述步骤下载模型和测试数据后，您可以重新建立索引库，并进行相关方向识别模型的测试。
 
-* 更多关于主体检测的介绍可以参考：[主体检测教程文档](../image_recognition_pipeline/mainbody_detection.md)；关于特征提取的介绍可以参考：[特征提取教程文档](../image_recognition_pipeline/feature_extraction.md)；关于向量检索的介绍可以参考：[向量检索教程文档](../image_recognition_pipeline/vector_search.md)。
+* 更多关于主体检测的介绍可以参考：[主体检测教程文档](../training/PP-ShiTu/mainbody_detection.md)；关于特征提取的介绍可以参考：[特征提取教程文档](../training/PP-ShiTu/feature_extraction.md)；关于向量检索的介绍可以参考：[向量检索教程文档](../deployment/PP-ShiTu/vector_search.md)。

@@ -131,6 +131,27 @@ print(next(result))
 [{'attributes': ['Male', 'Age18-60', 'Back', 'Glasses: False', 'Hat: False', 'HoldObjectsInFront: False', 'Backpack', 'Upper: LongSleeve UpperPlaid', 'Lower:  Trousers', 'No boots'], 'output': [0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 1], 'filename': 'pulc_demo_imgs/person_attribute/090004.jpg'}]
 ```
 
+**Note**: The `output` value index 0 means whether to wear a hat, index value 1 means whether to wear glasses, index value 2-7 means top style, index value means bottom style, index value 14 means whether to wear boots, index value 15-17 means the type of bag on the back, index value 18 means whether the front is holding something, index value 19-21 means age, index value 22 means gender, and index value 23-25 means direction. For details, see [code](../../../ppcls/data/postprocess/attr_rec.py#L84). Specifically, person attribute include the following types:
+
+```
+- Gender: Male Female
+- Age: AgeLess18, Age18-60, AgeOver60
+- Direction: Front, Side, Back
+- Accessories: glasses, hat, none
+- Front holding: yes, no
+- Bags: Backpack, Shoulder, Handbag
+- Upper styles: UpperStride, UpperLogo, UpperPlaid, UpperSplice
+- Lower style: LowerStripe, LowerPattern
+- Short sleeved: yes, no
+- Long sleeved: yes, no
+- Long coat: yes, no
+- Trousers: yes, no
+- Shorts: yes, no
+- Skirts & Skirts: Yes, No
+- Wear boots: yes, no
+```
+
+
 <a name="3"></a>
 
 ## 3. Training, Evaluation and Inference
