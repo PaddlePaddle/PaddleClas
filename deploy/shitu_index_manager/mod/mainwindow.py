@@ -22,8 +22,6 @@ try:
     DEFAULT_HOST = socket.gethostbyname(socket.gethostname())
 except:
     DEFAULT_HOST = '127.0.0.1'
-
-#  DEFAULT_HOST = "localhost"
 DEFAULT_PORT = 8000
 PADDLECLAS_DOC_URL = "https://gitee.com/paddlepaddle/PaddleClas/docs/zh_CN/inference_deployment/shitu_gallery_manager.md"
 
@@ -35,12 +33,17 @@ class MainWindow(QtWidgets.QMainWindow):
     updateIndexMsg = QtCore.pyqtSignal(str)  # 更新索引库线程信号
     importImageCount = QtCore.pyqtSignal(int)  # 导入图像数量信号
 
-    def __init__(self, process=None):
+    def __init__(self, ip=None, port=None):
         super(MainWindow, self).__init__()
-        self.server_process = process
+        if ip is not None and port is not None:
+            self.server_ip = ip
+            self.server_port = port
+        else:
+            self.server_ip = DEFAULT_HOST
+            self.server_port = DEFAULT_PORT
+
         self.ui = ui_mainwindow.Ui_MainWindow()
         self.ui.setupUi(self)  # 初始化主窗口界面
-
         self.__imageListMgr = image_list_manager.ImageListManager()
 
         self.__appMenu = QtWidgets.QMenu()  # 应用菜单
@@ -115,8 +118,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.saveImageLibraryBtn.clicked.connect(self.saveImageLibrary)
 
         self.__setToolButton(self.ui.addClassifyBtn, "添加分类",
-                             "./resource/add_classify.png",
-                             TOOL_BTN_ICON_SIZE)
+                             "./resource/add_classify.png", TOOL_BTN_ICON_SIZE)
         self.ui.addClassifyBtn.clicked.connect(
             self.__classifyUiContext.addClassify)
 
@@ -145,7 +147,10 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.searchClassifyHistoryCmb.setToolTip("查找分类历史")
         self.ui.imageScaleSlider.setToolTip("图片缩放")
 
-    def __setToolButton(self, button, tool_tip: str, icon_path: str,
+    def __setToolButton(self,
+                        button,
+                        tool_tip: str,
+                        icon_path: str,
                         icon_size: int):
         """设置工具按钮"""
         button.setToolTip(tool_tip)
@@ -160,9 +165,9 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self.__libraryAppendMenu.setTitle("导入图像")
         utils.setMenu(self.__libraryAppendMenu, "导入 image_list 图像",
-                          self.importImageListImage)
+                      self.importImageListImage)
         utils.setMenu(self.__libraryAppendMenu, "导入多文件夹图像",
-                          self.importDirsImage)
+                      self.importDirsImage)
         self.__appMenu.addMenu(self.__libraryAppendMenu)
 
         self.__appMenu.addSeparator()
@@ -179,16 +184,16 @@ class MainWindow(QtWidgets.QMainWindow):
     def __initWaitDialog(self):
         """初始化等待对话框"""
         self.__waitDialogUi.setupUi(self.__waitDialog)
-        self.__waitDialog.setWindowFlags(QtCore.Qt.Dialog
-                                         | QtCore.Qt.FramelessWindowHint)
+        self.__waitDialog.setWindowFlags(QtCore.Qt.Dialog |
+                                         QtCore.Qt.FramelessWindowHint)
 
     def __startWait(self, msg: str):
         """开始显示等待对话框"""
         self.setEnabled(False)
         self.__waitDialogUi.msgLabel.setText(msg)
-        self.__waitDialog.setWindowFlags(QtCore.Qt.Dialog
-                                         | QtCore.Qt.FramelessWindowHint
-                                         | QtCore.Qt.WindowStaysOnTopHint)
+        self.__waitDialog.setWindowFlags(QtCore.Qt.Dialog |
+                                         QtCore.Qt.FramelessWindowHint |
+                                         QtCore.Qt.WindowStaysOnTopHint)
         self.__waitDialog.show()
         self.__waitDialog.repaint()
 
@@ -196,9 +201,9 @@ class MainWindow(QtWidgets.QMainWindow):
         """停止显示等待对话框"""
         self.setEnabled(True)
         self.__waitDialogUi.msgLabel.setText("执行完毕！")
-        self.__waitDialog.setWindowFlags(QtCore.Qt.Dialog
-                                         | QtCore.Qt.FramelessWindowHint
-                                         | QtCore.Qt.CustomizeWindowHint)
+        self.__waitDialog.setWindowFlags(QtCore.Qt.Dialog |
+                                         QtCore.Qt.FramelessWindowHint |
+                                         QtCore.Qt.CustomizeWindowHint)
         self.__waitDialog.close()
 
     def __connectSignal(self):
@@ -290,8 +295,8 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def __importImageListImageThread(self, from_path: str, to_path: str):
         """导入 image_list 图像 线程"""
-        count = utils.oneKeyImportFromFile(from_path=from_path,
-                                               to_path=to_path)
+        count = utils.oneKeyImportFromFile(
+            from_path=from_path, to_path=to_path)
         if count == None:
             count = -1
         self.importImageCount.emit(count)
@@ -308,9 +313,9 @@ class MainWindow(QtWidgets.QMainWindow):
             return
         from_mgr = image_list_manager.ImageListManager(from_path)
         self.__startWait("正在导入图像，请等待。。。")
-        thread = threading.Thread(target=self.__importImageListImageThread,
-                                  args=(from_mgr.filePath,
-                                        self.__imageListMgr.filePath))
+        thread = threading.Thread(
+            target=self.__importImageListImageThread,
+            args=(from_mgr.filePath, self.__imageListMgr.filePath))
         thread.start()
 
     def __importDirsImageThread(self, from_dir: str, to_image_list_path: str):
@@ -333,21 +338,25 @@ class MainWindow(QtWidgets.QMainWindow):
             QtWidgets.QMessageBox.information(self, "提示", "打开的目录不存在")
             return
         self.__startWait("正在导入图像，请等待。。。")
-        thread = threading.Thread(target=self.__importDirsImageThread,
-                                  args=(dir_path,
-                                        self.__imageListMgr.filePath))
+        thread = threading.Thread(
+            target=self.__importDirsImageThread,
+            args=(dir_path, self.__imageListMgr.filePath))
         thread.start()
 
-    def __newIndexThread(self, index_root_path: str, image_list_path: str,
-                         index_method: str, force: bool):
+    def __newIndexThread(self,
+                         index_root_path: str,
+                         image_list_path: str,
+                         index_method: str,
+                         force: bool):
         """新建重建索引库线程"""
         try:
-            client = index_http_client.IndexHttpClient(
-                DEFAULT_HOST, DEFAULT_PORT)
-            err_msg = client.new_index(image_list_path=image_list_path,
-                                       index_root_path=index_root_path,
-                                       index_method=index_method,
-                                       force=force)
+            client = index_http_client.IndexHttpClient(self.server_ip,
+                                                       self.server_port)
+            err_msg = client.new_index(
+                image_list_path=image_list_path,
+                index_root_path=index_root_path,
+                index_method=index_method,
+                force=force)
             if err_msg == None:
                 err_msg = ""
             self.newIndexMsg.emit(err_msg)
@@ -375,19 +384,20 @@ class MainWindow(QtWidgets.QMainWindow):
         force = ui.resetCheckBox.isChecked()
         if result == QtWidgets.QDialog.Accepted:
             self.__startWait("正在 新建/重建 索引库，请等待。。。")
-            thread = threading.Thread(target=self.__newIndexThread,
-                                      args=(self.__imageListMgr.dirName,
-                                            "image_list.txt", index_method,
-                                            force))
+            thread = threading.Thread(
+                target=self.__newIndexThread,
+                args=(self.__imageListMgr.dirName, "image_list.txt",
+                      index_method, force))
             thread.start()
 
     def __openIndexThread(self, index_root_path: str, image_list_path: str):
         """打开索引库线程"""
         try:
-            client = index_http_client.IndexHttpClient(
-                DEFAULT_HOST, DEFAULT_PORT)
-            err_msg = client.open_index(index_root_path=index_root_path,
-                                        image_list_path=image_list_path)
+            client = index_http_client.IndexHttpClient(self.server_ip,
+                                                       self.server_port)
+            err_msg = client.open_index(
+                index_root_path=index_root_path,
+                image_list_path=image_list_path)
             if err_msg == None:
                 err_msg = ""
             self.openIndexMsg.emit(err_msg)
@@ -408,18 +418,19 @@ class MainWindow(QtWidgets.QMainWindow):
             QtWidgets.QMessageBox.information(self, "提示", "请先打开正确的图像库")
             return
         self.__startWait("正在打开索引库，请等待。。。")
-        thread = threading.Thread(target=self.__openIndexThread,
-                                  args=(self.__imageListMgr.dirName,
-                                        "image_list.txt"))
+        thread = threading.Thread(
+            target=self.__openIndexThread,
+            args=(self.__imageListMgr.dirName, "image_list.txt"))
         thread.start()
 
     def __updateIndexThread(self, index_root_path: str, image_list_path: str):
         """更新索引库线程"""
         try:
-            client = index_http_client.IndexHttpClient(
-                DEFAULT_HOST, DEFAULT_PORT)
-            err_msg = client.update_index(image_list_path=image_list_path,
-                                          index_root_path=index_root_path)
+            client = index_http_client.IndexHttpClient(self.server_ip,
+                                                       self.server_port)
+            err_msg = client.update_index(
+                image_list_path=image_list_path,
+                index_root_path=index_root_path)
             if err_msg == None:
                 err_msg = ""
             self.updateIndexMsg.emit(err_msg)
@@ -440,9 +451,9 @@ class MainWindow(QtWidgets.QMainWindow):
             QtWidgets.QMessageBox.information(self, "提示", "请先打开正确的图像库")
             return
         self.__startWait("正在更新索引库，请等待。。。")
-        thread = threading.Thread(target=self.__updateIndexThread,
-                                  args=(self.__imageListMgr.dirName,
-                                        "image_list.txt"))
+        thread = threading.Thread(
+            target=self.__updateIndexThread,
+            args=(self.__imageListMgr.dirName, "image_list.txt"))
         thread.start()
 
     def searchClassify(self):
@@ -471,9 +482,6 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def exitApp(self):
         """退出应用"""
-        if isinstance(self.server_process, Process):
-            self.server_process.terminate()
-            #  os.kill(self.server_pid)
         sys.exit(0)
 
     def __setPathBar(self, msg: str):
