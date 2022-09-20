@@ -124,10 +124,14 @@ PaddleClas 提供了转换并优化后的推理模型，可以直接参考下方
 ```shell
 # 进入lite_ppshitu目录
 cd $PaddleClas/deploy/lite_shitu
-wget https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/lite/ppshitu_lite_models_v1.2.tar
-tar -xf ppshitu_lite_models_v1.2.tar
-rm -f ppshitu_lite_models_v1.2.tar
+wget https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/lite/ppshituv2_lite_models_v1.0.tar
+tar -xf ppshituv2_lite_models_v1.0.tar
+rm -f ppshituv2_lite_models_v1.0.tar
 ```
+
+解压后的文件夹中包含PP-ShiTu V2的检测和特征模型的量化模型，即解压后的两个`.nb`模型。 存储大小约为14M，相对于非量化模型，模型加速一倍左右，精度降低不到一个点。如果想用非量化模型，可以参考[使用其他模型](#2.1.2)
+
+同时，文件中存在`general_PPLCNetV2_base_quant_v1.0_lite_inference_model`子文件夹，子文件夹中存储的是`general_PPLCNetV2_base_quant_v1.0_lite.nb`对应的`inference model`，在实际部署前，先需要用此`inference model`生成好对应的`index`库。实际推理时，只需要生成好的`index`库和两个量化模型来完成部署。
 
 <a name="2.1.2"></a>
 
@@ -188,6 +192,8 @@ Paddle-Lite 提供了多种策略来自动优化原始的模型，其中包括�
 
 下面介绍使用`paddle_lite_opt`完成主体检测模型和识别模型的预训练模型，转成inference模型，最终转换成Paddle-Lite的优化模型的过程。
 
+此示例是使用`fp32`的模型直接生成`.nb`模型，相对于量化模型，精度会更高，但是速度会降低。
+
 1. 转换主体检测模型
 
 ```shell
@@ -214,13 +220,13 @@ cp $code_path/PaddleDetection/inference/picodet_lcnet_x2_5_640_mainbody/mainbody
 
 ```shell
 # 识别模型下载
-wget https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/inference/general_PPLCNet_x2_5_lite_v1.0_infer.tar
+wget https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/inference/PP-ShiTuV2/general_PPLCNetV2_base_pretrained_v1.0_infer.tar
 # 解压模型
-tar -xf general_PPLCNet_x2_5_lite_v1.0_infer.tar
+tar -xf general_PPLCNetV2_base_pretrained_v1.0_infer.tar
 # 转换为Paddle-Lite模型
-paddle_lite_opt --model_file=general_PPLCNet_x2_5_lite_v1.0_infer/inference.pdmodel --param_file=general_PPLCNet_x2_5_lite_v1.0_infer/inference.pdiparams --optimize_out=general_PPLCNet_x2_5_lite_v1.0_infer/rec
+paddle_lite_opt --model_file=general_PPLCNetV2_base_pretrained_v1.0_infer/inference.pdmodel --param_file=general_PPLCNetV2_base_pretrained_v1.0_infer/inference.pdiparams --optimize_out=general_PPLCNetV2_base_pretrained_v1.0_infer/rec
 # 将模型文件拷贝到lite_shitu下
-cp general_PPLCNet_x2_5_lite_v1.0_infer/rec.nb deploy/lite_shitu/models/
+cp general_PPLCNetV2_base_pretrained_v1.0_infer/rec.nb deploy/lite_shitu/models/
 ```
 
 **注意**：`--optimize_out` 参数为优化后模型的保存路径，无需加后缀`.nb`；`--model_file` 参数为模型结构信息文件的路径，`--param_file` 参数为模型权重信息文件的路径，请注意文件名。
@@ -242,17 +248,12 @@ cd $PaddleClas
 python setup.py install
 cd deploy
 # 下载瓶装饮料数据集
-wget https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/data/drink_dataset_v1.0.tar && tar -xf drink_dataset_v1.0.tar
-rm -rf drink_dataset_v1.0.tar
-rm -rf drink_dataset_v1.0/index
+wget https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/data/drink_dataset_v2.0.tar && tar -xf drink_dataset_v2.0.tar
+rm -rf drink_dataset_v2.0.tar
+rm -rf drink_dataset_v2.0/index
 
 # 安装1.5.3版本的faiss
 pip install faiss-cpu==1.5.3
-
-# 下载通用识别模型，可替换成自己的inference model
-wget https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/inference/general_PPLCNet_x2_5_lite_v1.0_infer.tar
-tar -xf general_PPLCNet_x2_5_lite_v1.0_infer.tar
-rm -rf general_PPLCNet_x2_5_lite_v1.0_infer.tar
 ```
 
 <a name="2.2.2"></a>
@@ -262,11 +263,11 @@ rm -rf general_PPLCNet_x2_5_lite_v1.0_infer.tar
 ```shell
 # 生成新的index库，注意指定好识别模型的路径，同时将index_mothod修改成Flat，HNSW32和IVF在此版本中可能存在bug，请慎重使用。
 # 如果使用自己的识别模型，对应的修改inference model的目录
-python python/build_gallery.py -c configs/inference_drink.yaml -o Global.rec_inference_model_dir=general_PPLCNet_x2_5_lite_v1.0_infer -o IndexProcess.index_method=Flat
+python python/build_gallery.py -c configs/inference_drink.yaml -o Global.rec_inference_model_dir=lite_shitu/ppshituv2_lite_models_v1.0/general_PPLCNetV2_base_quant_v1.0_lite_inference_model -o IndexProcess.index_method=Flat
 
 # 进入到lite_shitu目录
 cd lite_shitu
-mv ../drink_dataset_v1.0 .
+mv ../drink_dataset_v2.0 .
 ```
 
 <a name="2.3"></a>
@@ -274,13 +275,16 @@ mv ../drink_dataset_v1.0 .
 ### 2.3 将yaml文件转换成json文件
 
 ```shell
+# 如果是使用自己生成的.nb模型，请修改好对应的det_model_path和rec_model_path的路径
 # 如果测试单张图像，路径使用相对路径
-python generate_json_config.py --det_model_path ppshitu_lite_models_v1.2/mainbody_PPLCNet_x2_5_640_v1.2_lite.nb  --rec_model_path ppshitu_lite_models_v1.2/general_PPLCNet_x2_5_lite_v1.2_infer.nb --img_path images/demo.jpeg
+python generate_json_config.py --det_model_path ppshituv2_lite_models_v1.0/mainbody_PPLCNet_x2_5_640_quant_v1.0_lite.nb  --rec_model_path ppshituv2_lite_models_v1.0/general_PPLCNetV2_base_quant_v1.0_lite.nb --img_path images/demo.jpeg
 # or
 # 如果测试多张图像
-python generate_json_config.py --det_model_path ppshitu_lite_models_v1.2/mainbody_PPLCNet_x2_5_640_v1.2_lite.nb  --rec_model_path ppshitu_lite_models_v1.2/general_PPLCNet_x2_5_lite_v1.2_infer.nb --img_dir images
+python generate_json_config.py --det_model_path ppshituv2_lite_models_v1.0/mainbody_PPLCNet_x2_5_640_quant_v1.0_lite.nb  --rec_model_path ppshituv2_lite_models_v1.0/general_PPLCNetV2_base_quant_v1.0_lite.nb --img_dir images
 # 执行完成后，会在lit_shitu下生成shitu_config.json配置文件
 ```
+
+**注意**：生成json文件的时候，请注意修改好模型路径，特别是使用自己生成的`.nb`模型时
 
 <a name="2.4"></a>
 
@@ -289,7 +293,6 @@ python generate_json_config.py --det_model_path ppshitu_lite_models_v1.2/mainbod
 由于python的检索库字典，使用`pickle`进行的序列化存储，导致C++不方便读取，因此需要进行转换
 
 ```shell
-
 # 转化id_map.pkl为id_map.txt
 python transform_id_map.py -c ../configs/inference_drink.yaml
 ```
@@ -349,8 +352,8 @@ make ARM_ABI=arm8
 ```shell
 mkdir deploy
 # 移动的模型路径要和之前生成的json文件中模型路径一致
-mv ppshitu_lite_models_v1.2 deploy/
-mv drink_dataset_v1.0 deploy/
+mv ppshituv2_lite_models_v1.0 deploy/
+mv drink_dataset_v2.0 deploy/
 mv images deploy/
 mv shitu_config.json deploy/
 cp pp_shitu deploy/
@@ -363,12 +366,13 @@ cp ../../../cxx/lib/libpaddle_light_api_shared.so deploy/
 
 ```shell
 deploy/
-|-- ppshitu_lite_models_v1.1/
-|   |--mainbody_PPLCNet_x2_5_640_quant_v1.1_lite.nb    优化后的主体检测模型文件
-|   |--general_PPLCNet_x2_5_lite_v1.1_infer.nb         优化后的识别模型文件
+|-- ppshituv2_lite_models_v1.0/
+|   |--mainbody_PPLCNet_x2_5_640_quant_v1.0_lite.nb    主体检测lite模型文件
+|   |--general_PPLCNetV2_base_quant_v1.0_lite.nb       识别lite模型文件
+|   |--general_PPLCNetV2_base_quant_v1.0_lite_inference_model 识别对应的inference model文件夹
 |-- images/
 |   |--demo.jpg                                      图片文件
-|-- drink_dataset_v1.0/                              瓶装饮料demo数据
+|-- drink_dataset_v2.0/                              瓶装饮料demo数据
 |   |--index                                         检索index目录
 |-- pp_shitu                                         生成的移动端执行文件
 |-- shitu_config.json                                执行时参数配置文件
@@ -399,8 +403,7 @@ chmod 777 pp_shitu
 运行效果如下：
 ```
 images/demo.jpeg:
-       result0: bbox[344, 98, 527, 593], score: 0.811656, label: 红牛-强化型
-       result1: bbox[0, 0, 600, 600], score: 0.729664, label: 红牛-强化型
+       result1: bbox[0, 0, 600, 600], score: 0.696782, label: 红牛-强化型
 ```
 
 <a name="FAQ"></a>

@@ -22,7 +22,7 @@
 - [2. 使用说明](#2)
 
   - [2.1 环境安装](#2.1)
-  - [2.2 模型准备](#2.2)
+  - [2.2 模型及数据准备](#2.2)
   - [2.3运行使用](#2.3)
 
 - [3.生成文件介绍](#3)
@@ -123,13 +123,25 @@
 pip install fastapi
 pip install uvicorn
 pip install pyqt5
+pip install psutil
 ```
 
 <a name="2.2"></a>
 
-### 2.2 模型准备
+### 2.2 模型及数据准备
 
-请按照[PP-ShiTu快速体验](../../quick_start/quick_start_recognition.md#2.2.1)中下载及准备inference model，并修改好`${PaddleClas}/deploy/configs/inference_drink.yaml`的相关参数。
+请按照[PP-ShiTu快速体验](../quick_start/quick_start_recognition.md#2.2.1)中下载及准备inference model，并修改好`${PaddleClas}/deploy/configs/inference_drink.yaml`的相关参数，同时准备好数据集。在具体使用时，请替换好自己的数据集及模型文件。
+
+```shell
+cd ${PaddleClas}/deploy/shitu_index_manager
+mkdir models
+cd models
+# 下载及解压识别模型
+wget https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/inference/PP-ShiTuV2/general_PPLCNetV2_base_pretrained_v1.0_infer.tar && tar -xf general_PPLCNetV2_base_pretrained_v1.0_infer.tar
+cd ..
+# 下载及解压示例数据集
+wget https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/data/drink_dataset_v2.0.tar && tar -xf drink_dataset_v2.0.tar
+```
 
 <a name="2.3"></a>
 
@@ -139,8 +151,25 @@ pip install pyqt5
 
 ```shell
 cd ${PaddleClas}/deploy/shitu_index_manager
-python index_manager.py -c ../configs/inference_drink.yaml
+cp ../configs/inference_drink.yaml .
+# 注意如果没有按照2.2中准备数据集及代码，请手动修改inference_drink.yaml，做好适配
+python index_manager.py -c inference_drink.yaml
 ```
+
+运行成功后，会自动跳转到工具界面，可以按照如下步骤，生成新的index库。
+
+1. 点击菜单栏`新建图像库`，会提示打开一个文件夹，此时请创建一个**新的文件夹**，并打开。如在`${PaddleClas}/deploy/shitu_index_manager`下新建一个`drink_index`文件夹
+2. 导入图像，或者如上面功能介绍，自己手动新增类别和相应的图像，下面介绍两种导入图像方式，操作时，二选一即可。
+   - 点击`导入图像`->`导入image_list图像`，打开`${PaddleClas}/deploy/shitu_index_manager/drink_dataset_v2.0/gallery/drink_label.txt`，此时就可以将`drink_label.txt`中的图像全部导入进来，图像类别就是`drink_label.txt`中记录的类别。
+   - 点击`导入图像`->`导入多文件夹图像`，打开`${PaddleClas}/deploy/shitu_index_manager/drink_dataset_v2.0/gallery/`文件夹，此时就将`gallery`文件夹下，所有子文件夹都导入进来，图像类别就是子文件夹的名字。
+3. 点击菜单栏中`新建/重建 索引库`，此时就会开始生成索引库。如果图片较多或者使用cpu来进行特征提取，那么耗时会比较长，请耐心等待。
+4. 生成索引库成功后，会发现在`drink_index`文件夹下生成如[3](#3) 中介绍的文件，此时`index`子文件夹下生出的文件，就是`PP-ShiTu`所使用的索引文件。
+
+**注意**：
+
+- 利用此工具生成的index库，如`drink_index`文件夹，请妥善存储。之后，可以继续使用此工具中`打开图像库`功能，打开`drink_index`文件夹，继续对index库进行增删改查操作，具体功能可以查看[功能介绍](#1)。
+- 打开一个生成好的库，在其上面进行增删改查操作后，请及时保存。保存后并及时使用菜单中`更新索引库`功能，对索引库进行更新
+- 如果要使用自己的图像库文件，图像生成格式如示例数据格式，生成`image_list.txt`或者多文件夹存储，二选一。
 
 <a name="3"></a>
 
