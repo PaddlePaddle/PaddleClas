@@ -57,7 +57,7 @@
 
 在选择好要入库的图片之后，首先会通过检测模型进行主体检测，得到图像中的物体的区域，然后将这块区域裁剪出来输入到识别模型中，得到对应的特征向量，再与用户输入的图像标签一起加入到检索库中。
 
-**温馨提示：** 使用安卓demo管理类别主要用于功能体验，如果您有较为重要的数据要生成检索库，推荐使用[检索库管理工具](https://github.com/PaddlePaddle/PaddleClas/blob/release/2.5/docs/zh_CN/inference_deployment/shitu_gallery_manager.md)
+**温馨提示：** 使用安卓demo管理类别主要用于功能体验，如果您有较为重要的数据要生成检索库，推荐使用 [检索库管理工具](../deployment/PP-ShiTu/gallery_manager.md)
 
 #### (3) 保存检索库
 点击上方的“保存修改”按钮<img src="../../images/quick_start/android_demo/baocunxiugai_100.png" width="25" height="25"/>，即可将当前库以 `latest` 的库名保存下来。
