@@ -13,10 +13,8 @@
 # limitations under the License.
 import os
 import sys
-import subprocess
-import shlex
-import psutil
-import time
+from PyQt5 import QtCore, QtGui, QtWidgets
+import mod.mainwindow
 """
 完整的index库如下:
 root_path/            # 库存储目录
@@ -31,34 +29,17 @@ root_path/            # 库存储目录
 |   |-- id_map.pkl     # 索引文件
 """
 
+
+def FrontInterface(server_ip=None, server_port=None):
+    front = QtWidgets.QApplication([])
+    main_window = mod.mainwindow.MainWindow(ip=server_ip, port=server_port)
+    main_window.showMaximized()
+    sys.exit(front.exec_())
+
+
 if __name__ == '__main__':
-    if not (len(sys.argv) == 3 or len(sys.argv) == 5):
-        print("start example:")
-        print("   python index_manager.py -c xxx.yaml")
-        print("   python index_manager.py -c xxx.yaml -p port")
-    yaml_path = sys.argv[2]
-    if len(sys.argv) == 5:
-        port = sys.argv[4]
-    else:
-        port = 8000
-    assert int(port) > 1024 and int(
-        port) < 65536, "The port should be bigger than 1024 and \
-            smaller than 65536"
-
-    try:
-        ip = socket.gethostbyname(socket.gethostname())
-    except:
-        ip = '127.0.0.1'
-    server_cmd = "python server.py -c {} -o ip={} -o port={}".format(yaml_path,
-                                                                     ip, port)
-    server_proc = subprocess.Popen(shlex.split(server_cmd))
-    client_proc = subprocess.Popen(
-        ["python", "client.py", "{} {}".format(ip, port)])
-    try:
-        while psutil.Process(client_proc.pid).status() == "running":
-            time.sleep(0.5)
-    except:
-        pass
-
-    client_proc.terminate()
-    server_proc.terminate()
+    server_ip = None
+    server_port = None
+    if len(sys.argv) == 2 and len(sys.argv[1].split(' ')) == 2:
+        [server_ip, server_port] = sys.argv[1].split(' ')
+    FrontInterface(server_ip, server_port)
