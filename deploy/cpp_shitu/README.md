@@ -1,1 +1,0 @@
-../../docs/zh_CN/deployment/PP-ShiTu/cpp.md
