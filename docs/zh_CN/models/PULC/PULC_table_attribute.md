@@ -166,7 +166,7 @@ print(next(result))
 cd path_to_PaddleClas
 ```
 
-进入 `dataset/` 目录，下载并解压有人/无人场景的数据。
+进入 `dataset/` 目录，下载并解压表格属性的数据。
 
 ```shell
 cd dataset
