@@ -223,6 +223,20 @@ python3.7 python/predict_system.py -c configs/inference_general.yaml -o Global.u
 
 ![](../../images/recognition/drink_data_demo/output/100.jpeg)
 
+识别流程支持灵活配置，用户可以选择不使用主体检测模型，而直接将单幅整图输入到特征提取模型，计算特征向量供后续检索使用，从而减少整体识别流程的耗时。可以按照以下命令直接进行整图识别
+```shell
+# 使用下面的命令使用 GPU 进行整图预测
+python3.7 python/predict_system.py -c configs/inference_general.yaml -o Global.det_inference_model_dir=None
+
+# 使用下面的命令使用 CPU 进行整图预测
+python3.7 python/predict_system.py -c configs/inference_general.yaml -o Global.use_gpu=False -o Global.det_inference_model_dir=None
+```
+
+最终输出结果如下
+```log
+INFO: find 'Global.det_inference_model_dir' empty(), so det_predictor is disabled
+[{'bbox': [0, 0, 1200, 802], 'rec_docs': '元气森林', 'rec_scores': 0.5696486}]
+```
 
 <a name="基于文件夹的批量识别"></a>
 

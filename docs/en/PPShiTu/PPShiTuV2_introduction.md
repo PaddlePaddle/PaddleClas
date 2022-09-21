@@ -198,6 +198,21 @@ The final output is as follows.
 [{'bbox': [437, 71, 660, 728], 'rec_docs': '元气森林', 'rec_scores': 0.7740249}, {'bbox': [221, 72, 449, 701], 'rec_docs': '元气森林', 'rec_scores': 0.6950992}, {'bbox': [794, 104, 979, 652], 'rec_docs': '元气森林', 'rec_scores': 0.6305153}]
 ```
 
+The recognition process supports flexible configuration. Users can choose not to use the object detection model, but directly input a single whole image into the feature extraction model, and calculate the feature vector for subsequent retrieval, thereby reducing the time-consuming of the overall recognition process. It can be achieved by the script below
+```shell
+# Use the following command to use the GPU for whole-image prediction
+python3.7 python/predict_system.py -c configs/inference_general.yaml -o Global.det_inference_model_dir=None
+
+# Use the following command to use the CPU for whole-image prediction
+python3.7 python/predict_system.py -c configs/inference_general.yaml -o Global.use_gpu=False -o Global.det_inference_model_dir=None
+```
+
+The final output is as follows
+```log
+INFO: find 'Global.det_inference_model_dir' empty(), so det_predictor is disabled
+[{'bbox': [0, 0, 1200, 802], 'rec_docs': '元气森林', 'rec_scores': 0.5696486}]
+```
+
 #### 4.3.2 multi images prediction
 
 If you want to predict the images in the folder, you can directly modify the `Global.infer_imgs` field in the configuration file, or you can modify the corresponding configuration through the following -o parameter.
