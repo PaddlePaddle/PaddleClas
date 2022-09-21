@@ -61,9 +61,10 @@ PipeLine::PipeLine(std::string det_model_path, std::string rec_model_path,
 
   max_det_num_ = topk;
   cpu_pow_ = cpu_power;
-  det_model_path_ = det_model_path_ + "/mainbody_PPLCNet_x2_5_640_v1.2_lite.nb";
+  det_model_path_ =
+      det_model_path_ + "/mainbody_PPLCNet_x2_5_640_quant_v1.0_lite.nb";
   rec_model_path_ =
-      rec_model_path_ + "/general_PPLCNet_x2_5_lite_v1.2_infer.nb";
+      rec_model_path_ + "/general_PPLCNetV2_base_quant_v1.0_lite.nb";
 
   // create object detector
   det_ = std::make_shared<ObjectDetector>(det_model_path_, det_input_shape_,

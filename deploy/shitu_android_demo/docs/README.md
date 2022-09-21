@@ -21,7 +21,18 @@
 首先使用git工具，将本项目克隆到本地
 
 ### 文件准备
-1. 下载我们准备好的模型压缩包：[ppshituv2_lite_models_v1.0.tar](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/lite/ppshituv2_lite_models_v1.0.tar) 并解压出来，将其中2个 `*.nb` 格式的Lite模型文件放置到 [shitu_android_demo/app/src/main/assets/models](../app/src/main/assets/models) 目录下。以 PP-ShiTuV2 的主体检测和特征提取模型为例，模型最终的文件组织结构如下所示
+下述步骤均以 **ppshituv2_lite_models_v1.0.tar** 模型压缩包为例，如需使用非量化的模型包 ppshituv2_lite_models_fp32_v1.0.tar ，则按照类似步骤进行操作，过程中使用非量化的识别模型生成检索库，同时按照 [FAQ-Q2](#faq) 将文件名替换成非量化的模型文件名即可。
+
+1. 下载我们准备好的模型压缩包：
+
+    | model      | download_link | size |
+    | :--------- | :------------------------------------------------ | :-- |
+    | 量化模型 | [ppshituv2_lite_models_v1.0.tar](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/lite/ppshituv2_lite_models_v1.0.tar) | 13.8MB |
+    | fp32模型 | [ppshituv2_lite_models_fp32_v1.0.tar](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/lite/ppshituv2_lite_models_fp32_v1.0.tar) | 44.8MB |
+    **注：** 量化模型虽然减少了体积但也略微降低了精度,用户可以根据实际需要下载量化或非量化版本的模型文件；上述表格中的“size”指主体检测+特征提取`*.nb`文件的大小总和，不包括压缩包内额外提供的方便用户导出检索库的普通推理模型大小；
+
+
+    下载 [ppshituv2_lite_models_v1.0.tar](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/lite/ppshituv2_lite_models_v1.0.tar) 并解压出来，将其中2个 `*.nb` 格式的Lite模型文件放置到 [shitu_android_demo/app/src/main/assets/models](../app/src/main/assets/models) 目录下。以 PP-ShiTuV2 的主体检测和特征提取模型为例，模型最终的文件组织结构如下所示
     ```log
     models
     ├── general_PPLCNetV2_base_quant_v1.0_lite.nb
@@ -46,7 +57,7 @@
     tar -xf ppshituv2_lite_models_v1.0.tar
     cd ../
 
-    # 构建检索库与标签库
+    # 构建检索库与标签库(如使用非量化模型，则需将Global.rec_inference_model_dir后的路径改为非量化推理模型)
     python3.7 python/build_gallery.py -c configs/inference_drink.yaml -o Global.rec_inference_model_dir=./models/ppshituv2_lite_models_v1.0/general_PPLCNetV2_base_quant_v1.0_lite_inference_model -o IndexProcess.index_method=Flat -o Global.android_demo=True
     ```
 4. 然后将 `configs/inference_drink.yaml` 文件中的 `IndexProcess.index_dir` 字段后的路径改为 `"../drink_dataset_v2.0/index"`，再执行以下命令，得到转换成txt格式的标签库
@@ -95,3 +106,14 @@ main
 └── ...
 ```
 开发者可以针对以上涉及的具体代码文件进行修改与二次开发
+
+
+### FAQ
+Q1: 点击绿色箭头后，交叉编译过程中报“source-7不支持lambda匿名表达式“的错误
+A1: 将光标移动到报错的代码上，按 `Alt+Enter` 键，选择替换语言支持到source-8，等待IDE同步更新完毕，再重新点击绿色箭头即可。
+
+Q2: 想更换其他检测或识别模型
+A2: 首先将自己准备的模型放置到 [shitu_android_demo/app/src/main/assets/models](../app/src/main/assets/models) 目录下，然后对用替换 [Pipeline.cc](../app/src/main/cpp/Pipeline.cc#L64-L65) 文件中检测和识别模型的路径，重新点击绿色三角箭头交叉编译安装即可。
+
+Q3: 开发过程中APP进行某些操作会闪退
+A3: 一般闪退是由于APP代码存在一些BUG导致程序运行出现错误，可以重点关注Android Studio下方的"Run"窗口，闪退时报错信息会显示在里面，方便快速定位问题代码行。
