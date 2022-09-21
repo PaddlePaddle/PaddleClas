@@ -1,1 +1,1 @@
-../../docs/zh_CN/inference_deployment/shitu_gallery_manager.md
+../../docs/zh_CN/deployment/PP-ShiTu/gallery_manager.md

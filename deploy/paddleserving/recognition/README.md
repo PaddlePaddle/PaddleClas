@@ -1,0 +1,1 @@
+../../../docs/zh_CN/deployment/PP-ShiTu/paddle_serving.md

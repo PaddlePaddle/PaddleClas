@@ -1,1 +1,1 @@
-../../docs/zh_CN/inference_deployment/lite_shitu.md
+../../docs/zh_CN/deployment/PP-ShiTu/paddle_lite.md

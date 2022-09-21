@@ -26,7 +26,7 @@
 PaddleClas 融合已有的知识蒸馏方法 [2,3]，提供了一种简单的半监督标签知识蒸馏方案(SSLD，Simple Semi-supervised Label Distillation)，基于 ImageNet1k 分类数据集，在 ResNet_vd 以及 MobileNet 系列上的精度均有超过 3% 的绝对精度提升，具体指标如下图所示。
 
 <div align="center">
-<img src="../../images/distillation/distillation_perform_s.jpg"  width = "800" />
+<img src="../../../images/distillation/distillation_perform_s.jpg"  width = "800" />
 </div>
 
 <a name="1.2"></a>
@@ -36,7 +36,7 @@ PaddleClas 融合已有的知识蒸馏方法 [2,3]，提供了一种简单的半
 SSLD 的流程图如下图所示。
 
 <div align="center">
-<img src="../../images/distillation/ppcls_distillation.png"  width = "800" />
+<img src="../../../images/distillation/ppcls_distillation.png"  width = "800" />
 </div>
 
 首先，我们从 ImageNet22k 中挖掘出了近 400 万张图片，同时与 ImageNet-1k 训练集整合在一起，得到了一个新的包含 500 万张图片的数据集。然后，我们将学生模型与教师模型组合成一个新的网络，该网络分别输出学生模型和教师模型的预测分布，与此同时，固定教师模型整个网络的梯度，而学生模型可以做正常的反向传播。最后，我们将两个模型的 logits 经过 softmax 激活函数转换为 soft label，并将二者的 soft label 做 JS 散度作为损失函数，用于蒸馏模型训练。
@@ -64,7 +64,7 @@ SSLD 蒸馏方案的一大特色就是无需使用图像的真值标签，因此
 （1）训练集去重。我们首先基于 SIFT 特征相似度匹配的方式对 ImageNet22k 数据集与 ImageNet1k 验证集进行去重，防止添加的 ImageNet22k 训练集中包含 ImageNet1k 验证集图像，最终去除了 4511 张相似图片。部分过滤的相似图片如下所示。
 
 <div align="center">
-<img src="../../images/distillation/22k_1k_val_compare_w_sift.png"  width = "600" />
+<img src="../../../images/distillation/22k_1k_val_compare_w_sift.png"  width = "600" />
 </div>
 
 （2）大数据集 soft label 获取，对于去重后的 ImageNet22k 数据集，我们使用 `ResNeXt101_32x16d_wsl` 模型进行预测，得到每张图片的 soft label 。
