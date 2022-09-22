@@ -92,7 +92,7 @@ cd PaddleClas
 python3.7 tools/train.py -c ppcls/configs/slim/ResNet50_vd_quantization.yaml -o Global.device=cpu
 ```
 
-其中 `yaml` 文件解析详见[参考文档](../config_discription/basic.md)。为了保证精度，`yaml` 文件中已经使用 `pretrained model`.
+其中 `yaml` 文件解析详见[参考文档](../config_description/basic.md)。为了保证精度，`yaml` 文件中已经使用 `pretrained model`.
 
 
 * 单机多卡/多机多卡启动

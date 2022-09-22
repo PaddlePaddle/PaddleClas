@@ -12,7 +12,7 @@
 
 完整的图像识别系统，如下图所示
 
-<img src="../../images/structure.png"/>
+<img src="../../../images/structure.jpg"/>
 
 在Android端或PC端体验整体图像识别系统，或查看特征库建立方法，可以参考 [图像识别快速开始文档](../../quick_start/quick_start_recognition.md)。
 
@@ -163,7 +163,7 @@ python3.7 -m paddle.distributed.launch tools/train.py \
 
 **注**：其中，`-c` 用于指定配置文件的路径，`-o` 用于指定需要修改或者添加的参数，其中 `-o Arch.Backbone.pretrained=True` 表示 Backbone 在训练开始前会加载预训练模型；`-o Arch.Backbone.pretrained` 也可以指定为模型权重文件的路径，使用时换成自己的预训练模型权重文件的路径即可；`-o Global.device=gpu` 表示使用 GPU 进行训练。如果希望使用 CPU 进行训练，则设置 `-o Global.device=cpu`即可。
 
-更详细的训练配置，也可以直接修改模型对应的配置文件。具体配置参数参考[配置文档](../config_discription/basic.md)。
+更详细的训练配置，也可以直接修改模型对应的配置文件。具体配置参数参考[配置文档](../config_description/basic.md)。
 
 运行上述训练命令，可以看到输出日志，示例如下：
 

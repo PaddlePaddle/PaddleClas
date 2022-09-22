@@ -159,7 +159,7 @@ SSLD 是百度自研的半监督蒸馏算法，在 ImageNet 数据集上，模�
 
 #### 3.3 EDA数据增强策略
 
-数据增强是视觉算法中常用的优化策略，可以对模型精度有明显提升。除了传统的 RandomCrop，RandomFlip 等方法之外，我们还应用了 RandomAugment 和 RandomErasing。您可以在[数据增强介绍](config_discription/data_augmentation.md)找到详细介绍。
+数据增强是视觉算法中常用的优化策略，可以对模型精度有明显提升。除了传统的 RandomCrop，RandomFlip 等方法之外，我们还应用了 RandomAugment 和 RandomErasing。您可以在[数据增强介绍](config_description/data_augmentation.md)找到详细介绍。
 由于这两种数据增强对图片的修改较大，使分类任务变难，在一些小数据集上可能会导致模型欠拟合，我们将提前设置好这两种方法启用的概率。
 基于以上改进，我们训练得到模型精度为 93.43%，提升 1.3%。
 
