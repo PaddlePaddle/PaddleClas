@@ -31,7 +31,7 @@ PP-ShiTuV2 是基于 PP-ShiTuV1 改进的一个实用轻量级通用图像识别
 **本文档提供了用户使用 PaddleClas 的 PP-ShiTuV2 图像识别方案进行快速构建轻量级、高精度、可落地的图像识别pipeline。该pipeline可以广泛应用于商场商品识别场景、安防人脸或行人识别场景、海量图像检索过滤等场景中。**
 
 <div align="center">
-<img src="../../images/structure.jpg" />
+<img src="../../../images/structure.jpg" />
 </div>
 
 下表列出了 PP-ShiTuV2 用不同的模型结构与训练策略所得到的相关指标，
