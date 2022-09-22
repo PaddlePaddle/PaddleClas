@@ -94,10 +94,7 @@ class SystemPredictor(object):
         # st1: get all detection results
         results = self.det_predictor.predict(img)
 
-        # st2: add the whole image for recognition to improve recall
-        results = self.append_self(results, img.shape)
-
-        # st3: recognition process, use score_thres to ensure accuracy
+        # st2: recognition process, use score_thres to ensure accuracy
         for result in results:
             preds = {}
             xmin, ymin, xmax, ymax = result["bbox"].astype("int")
@@ -119,10 +116,33 @@ class SystemPredictor(object):
                     preds["rec_scores"] = scores[0][0]
                     output.append(preds)
 
-        # st5: nms to the final results to avoid fetching duplicate results
+        # st3: nms to the final results to avoid fetching duplicate results
         output = self.nms_to_rec_results(
             output, self.config["Global"]["rec_nms_thresold"])
+        
+        # st4: if the output is empty, add the whole image to promote recall
+        result = []
+        if len(output) == 0:
+            result = self.append_self(result, img.shape)[0]
+            preds = {}
+            xmin, ymin, xmax, ymax = result["bbox"].astype("int")
+            rec_results = self.rec_predictor.predict(img)
+            preds["bbox"] = [xmin, ymin, xmax, ymax]
+            scores, docs = self.Searcher.search(rec_results, self.return_k)
 
+            # just top-1 result will be returned for the final
+            if self.config["IndexProcess"]["dist_type"] == "hamming":
+                if scores[0][0] <= self.config["IndexProcess"][
+                        "hamming_radius"]:
+                    preds["rec_docs"] = self.id_map[docs[0][0]].split()[1]
+                    preds["rec_scores"] = scores[0][0]
+                    output.append(preds)
+            else:
+                if scores[0][0] >= self.config["IndexProcess"]["score_thres"]:
+                    preds["rec_docs"] = self.id_map[docs[0][0]].split()[1]
+                    preds["rec_scores"] = scores[0][0]
+                    output.append(preds)
+                    
         return output
 
 
