@@ -31,7 +31,14 @@ class SystemPredictor(object):
 
         self.config = config
         self.rec_predictor = RecPredictor(config)
-        self.det_predictor = DetPredictor(config)
+
+        if not config["Global"]["det_inference_model_dir"]:
+            logger.info(
+                f"Found 'Global.det_inference_model_dir' empty({config['Global']['det_inference_model_dir']}), so det_predictor is disabled"
+            )
+            self.det_predictor = None
+        else:
+            self.det_predictor = DetPredictor(config)
 
         assert 'IndexProcess' in config.keys(), "Index config not found ... "
         self.return_k = self.config['IndexProcess']['return_k']
@@ -92,7 +99,10 @@ class SystemPredictor(object):
     def predict(self, img):
         output = []
         # st1: get all detection results
-        results = self.det_predictor.predict(img)
+        if self.det_predictor:
+            results = self.det_predictor.predict(img)
+        else:
+            results = []
 
         # st2: add the whole image for recognition to improve recall
         results = self.append_self(results, img.shape)
