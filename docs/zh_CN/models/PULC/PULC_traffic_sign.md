@@ -180,7 +180,7 @@ def get_random_crop_box(xmin, ymin, xmax, ymax, img_height, img_width, ratio=1.0
 处理后的数据集部分数据可视化如下。
 
 <div align="center">
-<img src="../../images/PULC/docs/traffic_sign_data_demo.png"  width = "500" />
+<img src="../../../images/PULC/docs/traffic_sign_data_demo.png"  width = "500" />
 </div>
 
 

@@ -179,7 +179,7 @@ print(next(result))
 部分数据可视化如下所示。
 
 <div align="center">
-<img src="../../images/PULC/docs/person_attribute_data_demo.png"  width = "500" />
+<img src="../../../images/PULC/docs/person_attribute_data_demo.png"  width = "500" />
 </div>
 
 

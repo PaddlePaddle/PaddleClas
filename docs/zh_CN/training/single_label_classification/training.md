@@ -67,7 +67,7 @@ CIFAR-10 数据集由 10 个类的 60000 个彩色图像组成，图像分辨率
 
 在准备好数据、模型后，便可以开始迭代模型并更新模型的参数。经过多次迭代最终可以得到训练好的模型来做图像分类任务。图像分类的训练过程需要很多经验，涉及很多超参数的设置，PaddleClas 提供了一些列的[训练调优方法](training_strategy.md)，可以快速助你获得高精度的模型。
 
-同时，PaddleClas 还支持使用VisualDL 可视化训练过程。VisualDL 是飞桨可视化分析工具，以丰富的图表呈现训练参数变化趋势、模型结构、数据样本、高维数据分布等。可帮助用户更清晰直观地理解深度学习模型训练过程及模型结构，进而实现高效的模型优化。更多细节请查看[VisualDL](../config_discription/VisualDL.md)。
+同时，PaddleClas 还支持使用VisualDL 可视化训练过程。VisualDL 是飞桨可视化分析工具，以丰富的图表呈现训练参数变化趋势、模型结构、数据样本、高维数据分布等。可帮助用户更清晰直观地理解深度学习模型训练过程及模型结构，进而实现高效的模型优化。更多细节请查看[VisualDL](../config_description/VisualDL.md)。
 
 <a name="2.4"></a>
 ### 2.4 模型评估
@@ -109,7 +109,7 @@ python3 tools/train.py \
 
 其中，`-c` 用于指定配置文件的路径，`-o` 用于指定需要修改或者添加的参数，其中 `-o Arch.pretrained=False` 表示不使用预训练模型，`-o Global.device=gpu` 表示使用 GPU 进行训练。如果希望使用 CPU 进行训练，则需要将 `Global.device` 设置为 `cpu`。
 
-更详细的训练配置，也可以直接修改模型对应的配置文件。具体配置参数参考[配置文档](../config_discription/basic.md)。
+更详细的训练配置，也可以直接修改模型对应的配置文件。具体配置参数参考[配置文档](../config_description/basic.md)。
 
 运行上述命令，可以看到输出日志，示例如下：
 
@@ -132,7 +132,7 @@ python3 tools/train.py \
     ...
     ```
 
-训练期间也可以通过 VisualDL 实时观察 loss 变化，详见 [VisualDL](../config_discription/VisualDL.md)。
+训练期间也可以通过 VisualDL 实时观察 loss 变化，详见 [VisualDL](../config_description/VisualDL.md)。
 
 <a name="3.1.2"></a>
 #### 3.1.2 模型微调
