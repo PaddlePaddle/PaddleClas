@@ -174,6 +174,10 @@ int main(int argc, char **argv) {
            .as<std::string>()
            .empty()) {
     detector_ptr = new Detection::ObjectDetector(config.config_file);
+  } else {
+    std::cout << "Found 'Global.det_inference_model_dir' empty, so "
+                 "det_predictor is disabled"
+              << std::endl;
   }
 
   // initialize feature_extractor

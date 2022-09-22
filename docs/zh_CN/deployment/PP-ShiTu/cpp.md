@@ -348,11 +348,25 @@ cd ..
   ./build/pp_shitu -c inference_drink.yaml
   ```
 
-  以 `drink_dataset_v2.0/test_images/nongfu_spring.jpeg` 作为输入图像，则执行上述推理命令可以得到如下结果
+  默认以 `../drink_dataset_v2.0/test_images/100.jpeg` 作为输入图像，则执行上述推理命令可以得到如下结果
 
   ```log
-  ../../deploy/drink_dataset_v2.0/test_images/nongfu_spring.jpeg:
-        result0: bbox[0, 0, 729, 1094], score: 0.688691, label: 农夫山泉-饮用天然水
+  ../drink_dataset_v2.0/test_images/100.jpeg:
+        result0: bbox[437, 72, 660, 723], score: 0.769916, label: 元气森林
+        result1: bbox[220, 71, 449, 685], score: 0.695485, label: 元气森林
+        result2: bbox[795, 104, 979, 653], score: 0.626963, label: 元气森林
+  ```
+
+  识别流程支持灵活配置，用户可以选择不使用主体检测模型，而直接将单幅整图输入到特征提取模型，计算特征向量供后续检索使用，从而减少整体识别流程的耗时。只需将`Global.det_inference_model_dir`后的字段改为`null`或者`""`，再运行以下推理命令即可
+  ```shell
+  ./build/pp_shitu -c inference_drink.yaml
+  ```
+
+  最终输出结果如下
+  ```log
+  Found 'Global.det_inference_model_dir' empty, so det_predictor is disabled
+  ../drink_dataset_v2.0/test_images/100.jpeg:
+          result0: bbox[0, 0, 1199, 801], score: 0.568903, label: 元气森林
   ```
 
   由于python和C++的opencv实现存在部分不同，可能导致python推理和C++推理结果有微小差异。但基本不影响最终的检索结果。

@@ -34,7 +34,7 @@ class SystemPredictor(object):
 
         if not config["Global"]["det_inference_model_dir"]:
             logger.info(
-                f"find 'Global.det_inference_model_dir' empty({config['Global']['det_inference_model_dir']}), so det_predictor is disabled"
+                f"Found 'Global.det_inference_model_dir' empty({config['Global']['det_inference_model_dir']}), so det_predictor is disabled"
             )
             self.det_predictor = None
         else:

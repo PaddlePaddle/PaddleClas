@@ -234,7 +234,7 @@ python3.7 python/predict_system.py -c configs/inference_general.yaml -o Global.u
 
 最终输出结果如下
 ```log
-INFO: find 'Global.det_inference_model_dir' empty(), so det_predictor is disabled
+INFO: Found 'Global.det_inference_model_dir' empty(), so det_predictor is disabled
 [{'bbox': [0, 0, 1200, 802], 'rec_docs': '元气森林', 'rec_scores': 0.5696486}]
 ```
 
