@@ -124,7 +124,7 @@ function func_inference() {
                         eval $command
                         last_status=${PIPESTATUS[0]}
                         eval "cat ${_save_log_path}"
-                        status_check $last_status "${command}" "${status_log}" "${model_name}"
+                        status_check $last_status "${command}" "${status_log}" "${model_name}" "${_save_log_path}"
                     done
                 done
             done
@@ -146,7 +146,7 @@ function func_inference() {
                         eval $command
                         last_status=${PIPESTATUS[0]}
                         eval "cat ${_save_log_path}"
-                        status_check $last_status "${command}" "${status_log}" "${model_name}"
+                        status_check $last_status "${command}" "${status_log}" "${model_name}" "${_save_log_path}"
                     done
                 done
             done
@@ -158,12 +158,13 @@ function func_inference() {
 
 # for kl_quant
 if [ ${kl_quant_cmd_value} != "null" ] && [ ${kl_quant_cmd_value} != "False" ]; then
+    _kl_log="${LOG_PATH}/export.log"
     echo "kl_quant"
-    command="${python} ${kl_quant_cmd_value}"
+    command="${python} ${kl_quant_cmd_value} >${_kl_log} 2>&1"
     echo ${command}
     eval $command
     last_status=${PIPESTATUS[0]}
-    status_check $last_status "${command}" "${status_log}" "${model_name}"
+    status_check $last_status "${command}" "${status_log}" "${model_name}" "${_kl_log}"
     cd ${infer_model_dir_list}/quant_post_static_model
     ln -s __model__ inference.pdmodel
     ln -s __params__ inference.pdiparams
