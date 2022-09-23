@@ -212,6 +212,21 @@ python3.7 -m pip install paddle-serving-server-gpu==0.7.0.post112 # GPU with CUD
   {'err_no': 0, 'err_msg': '', 'key': ['result'], 'value': ["[{'bbox': [438, 71, 660, 712], 'rec_docs': '元气森林', 'rec_scores': 0.7581642}, {'bbox': [220, 72, 449, 689], 'rec_docs': '元气森林', 'rec_scores': 0.68961805}, {'bbox': [794, 104, 978, 652], 'rec_docs': '元气森林', 'rec_scores': 0.63075215}]"], 'tensors': []}
   ```
 
+  识别流程支持灵活配置，用户可以通过参数`--det`来选择不使用主体检测模型，而直接将单幅整图输入到特征提取模型，计算特征向量供后续检索使用，从而减少整体识别流程的耗时。可以按照以下命令在serving服务中不启用检测模型
+  ```shell
+  python3.7 recognition_web_service.py --det=False &>log.txt &
+  ```
+  启动后部署服务的机器上会打印出 `Found 'args.det' is False, so det_predictor is disabled` 信息，表示部署时不启用检测模型。
+
+  发送请求：
+  ```shell
+  python3.7 pipeline_http_client.py
+  ```
+  最终输出结果如下
+  ```log
+  {'err_no': 0, 'err_msg': '', 'key': ['result'], 'value': ["[{'bbox': [0, 0, 1200, 802], 'rec_docs': '元气森林', 'rec_scores': 0.56964844}]"], 'tensors': []}
+  ```
+
 <a name="3.2.2"></a>
 
 #### 3.2.2 C++ Serving
@@ -263,7 +278,40 @@ python3.7 -m pip install paddle-serving-server-gpu==0.7.0.post112 # GPU with CUD
   I0903 16:03:21.346057 35600 general_model.cpp:490] [client]logid=0,client_cost=1306.26ms,server_cost=1293.65ms.
   [{'bbox': [437, 71, 660, 727], 'rec_docs': '元气森林', 'rec_scores': 0.76902336}, {'bbox': [222, 72, 449, 700], 'rec_docs': '元气森林', 'rec_scores': 0.69347066}, {'bbox': [794, 104, 979, 652], 'rec_docs': '元气森林', 'rec_scores': 0.6305151}]
   ```
+  CPP识别流程暂时只支持通过修改CPP源文件来选择不使用主体检测模型，而直接将单幅整图输入到特征提取模型，计算特征向量供后续检索使用，从而减少整体识别流程的耗时。可以按照以下步骤在识别部署时跳过检测模型
+  1. 使用修改后的代码 `deploy/paddleserving/recognition/preprocess/general_picodet_op.cpp` 覆盖 `deploy/paddleserving/Serving/core/general-server/op/general_picodet_op.cpp`
+      ```shell
+      \cp deploy/paddleserving/recognition/preprocess/general_picodet_op.cpp deploy/paddleserving/Serving/core/general-server/op/general_picodet_op.cpp
+      ```
+  2. 重新编译并安装Serving server包
+      ```shell
+      # 进入工作目录
+      cd ./deploy/paddleserving
 
+      # 一键编译安装Serving server、设置 SERVING_BIN
+      source ./build_server.sh python3.7
+      ```
+  3. 重新启动Serving服务并进行测试，
+      ```shell
+      # 进入工作目录
+      cd ./paddleserving/recognition
+
+      # 端口号默认为9400；运行日志默认保存在 log_PPShiTu.txt 中
+      # CPU部署
+      bash run_cpp_serving.sh
+      # GPU部署，并指定第0号卡
+      bash run_cpp_serving.sh 0
+
+      # 等待服务启动完毕后，执行发送服务请求命令
+      python3.7 test_cpp_serving_client.py
+      ```
+      最终输出结果如下：
+      ```log
+      WARNING: Logging before InitGoogleLogging() is written to STDERR
+      I0923 11:23:34.473188 50771 naming_service_thread.cpp:202] brpc::policy::ListNamingService("127.0.0.1:9400"): added 1
+      I0923 11:23:34.604307 50771 general_model.cpp:490] [client]logid=0,client_cost=113.187ms,server_cost=102.835ms.
+      [{'bbox': [0, 0, 1199, 801], 'rec_docs': '元气森林', 'rec_scores': 0.5689028}]
+      ```
 - 关闭服务
 如果服务程序在前台运行，可以按下`Ctrl+C`来终止服务端程序；如果在后台运行，可以使用kill命令关闭相关进程，也可以在启动服务程序的路径下执行以下命令来终止服务端程序：
   ```bash

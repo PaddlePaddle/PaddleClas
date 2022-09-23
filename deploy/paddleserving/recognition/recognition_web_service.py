@@ -11,12 +11,11 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import argparse
 import base64
 import json
-import logging
 import os
 import pickle
-import sys
 
 import cv2
 import faiss
@@ -63,7 +62,7 @@ class DetOp(Op):
         imgs = []
         raw_imgs = []
         for key in input_dict.keys():
-            data = base64.b64decode(input_dict[key].encode('utf8'))
+            data = base64.b64decode(input_dict[key].encode("utf8"))
             raw_imgs.append(data)
             data = np.fromstring(data, np.uint8)
             raw_im = cv2.imdecode(data, cv2.IMREAD_COLOR)
@@ -131,10 +130,14 @@ class RecOp(Op):
 
     def preprocess(self, input_dicts, data_id, log_id):
         (_, input_dict), = input_dicts.items()
-        raw_img = input_dict["image"][0]
-        data = np.frombuffer(raw_img, np.uint8)
+        if args.det:
+            raw_img = input_dict["image"][0]
+            data = np.frombuffer(raw_img, np.uint8)
+        else:
+            raw_img = base64.b64decode(input_dict["image"].encode("utf8"))
+            data = np.fromstring(raw_img, np.uint8)
         origin_img = cv2.imdecode(data, cv2.IMREAD_COLOR)
-        dt_boxes = input_dict["bbox_result"]
+        dt_boxes = input_dict.get("bbox_result", "[]")
         boxes = json.loads(dt_boxes)
         boxes.append({
             "category_id": 0,
@@ -206,11 +209,54 @@ class RecOp(Op):
 
 class RecognitionService(WebService):
     def get_pipeline_response(self, read_op):
+        if args.det:
+            return self.get_pipeline_response_det_rec(read_op)
+        else:
+            print(
+                f"Found 'args.det' is {args.det}, so det_predictor is disabled")
+            return self.get_pipeline_response_rec(read_op)
+
+    def get_pipeline_response_det_rec(self, read_op):
         det_op = DetOp(name="det", input_ops=[read_op])
         rec_op = RecOp(name="rec", input_ops=[det_op])
         return rec_op
 
+    def get_pipeline_response_rec(self, read_op):
+        rec_op = RecOp(name="rec", input_ops=[read_op])
+        return rec_op
 
-product_recog_service = RecognitionService(name="recognition")
-product_recog_service.prepare_pipeline_config("config.yml")
-product_recog_service.run_service()
+
+def str2bool(v):
+    if isinstance(v, bool):
+        return v
+    if v.lower() in ("yes", "true", "t", "y", "1"):
+        return True
+    elif v.lower() in ("no", "false", "f", "n", "0"):
+        return False
+    else:
+        raise argparse.ArgumentTypeError("Boolean value expected.")
+
+
+def parse_args():
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "-c",
+        "--config",
+        type=str,
+        default="config.yml",
+        help="config file path for recognition pipeline")
+    parser.add_argument(
+        "--det",
+        type=str2bool,
+        default=True,
+        help="whether to enable detection model in recognition pipeline, default to True"
+    )
+    args = parser.parse_args()
+    return args
+
+
+if __name__ == "__main__":
+    args = parse_args()
+    product_recog_service = RecognitionService(name="recognition")
+    product_recog_service.prepare_pipeline_config(args.config)
+    product_recog_service.run_service()
