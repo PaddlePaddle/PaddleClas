@@ -40,6 +40,7 @@ Arch:
     model_ema_decay: 0.9999
     model_ema_force_cpu: False
   pretrained: True
+  parameters_from: 'pretrain' # 'pretrain' or 'finetune'
 
 # loss function config for traing/eval process
 Loss:

@@ -26,8 +26,11 @@ import paddle.nn as nn
 import paddle.nn.functional as F
 
 from ....utils.download import get_weights_path_from_url
+from ....utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
 
-MODEL_URLS = {
+MODEL_URLS = {"cae_base_patch16_224": "", "cae_large_patch16_224": ""}  # TO DO
+
+PRETRAINED_URLS = {
     "cae_base_patch16_224":
     "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/cae_base_patch16_224_pretrained.pdparams",
     "cae_large_patch16_224":
@@ -626,6 +629,8 @@ def _enable_linear_eval(model):
 
 
 def _load_pretrained(pretrained,
+                     parameters_from,
+                     model_url,
                      pretrained_url,
                      model,
                      model_keys,
@@ -635,11 +640,19 @@ def _load_pretrained(pretrained,
                      use_ssld=False):
     if pretrained is False:
         pass
-    elif pretrained is True:
+    elif pretrained is True and parameters_from == "finetune":
+        load_dygraph_pretrain_from_url(model, model_url, use_ssld=use_ssld)
+        return
+    elif isinstance(pretrained, str) and parameters_from == "finetune":
+        # load_dygraph_pretrain(model, pretrained)
+        checkpoint = paddle.load(pretrained + ".pdparams")['model']  # For the finetune model from vimer
+        model.set_state_dict(checkpoint)
+        return
+    elif pretrained is True and parameters_from == "pretrain":
         local_weight_path = get_weights_path_from_url(pretrained_url).replace(
             ".pdparams", "")
         checkpoint = paddle.load(local_weight_path + ".pdparams")
-    elif isinstance(pretrained, str):
+    elif isinstance(pretrained, str) and parameters_from == "pretrain":
         checkpoint = paddle.load(local_weight_path + ".pdparams")
 
     checkpoint_model = None
@@ -786,7 +799,7 @@ def _load_pretrained(pretrained,
     return
 
 
-def cae_base_patch16_224(pretrained=True, use_ssld=False, **kwargs):
+def cae_base_patch16_224(pretrained=True, parameters_from="pretrain", use_ssld=False, **kwargs):
     config = kwargs.copy()
     enable_linear_eval = config.pop('enable_linear_eval')
     model_keys = config.pop('model_key')
@@ -795,6 +808,8 @@ def cae_base_patch16_224(pretrained=True, use_ssld=False, **kwargs):
     rel_pos_bias = config.pop('rel_pos_bias')
     if pretrained in config:
         pretrained = config.pop('pretrained')
+        parameters_from = config.pop('parameters_from')
+    assert parameters_from in ["pretrain", "finetune"]
 
     model = VisionTransformer(
         patch_size=16,
@@ -812,7 +827,9 @@ def cae_base_patch16_224(pretrained=True, use_ssld=False, **kwargs):
 
     _load_pretrained(
         pretrained,
+        parameters_from,
         MODEL_URLS["cae_base_patch16_224"],
+        PRETRAINED_URLS["cae_base_patch16_224"],
         model,
         model_keys,
         model_ema_configs,
@@ -823,7 +840,7 @@ def cae_base_patch16_224(pretrained=True, use_ssld=False, **kwargs):
     return model
 
 
-def cae_large_patch16_224(pretrained=True, use_ssld=False, **kwargs):
+def cae_large_patch16_224(pretrained=True, parameters_from="pretrain", use_ssld=False, **kwargs):
     config = kwargs.copy()
     enable_linear_eval = config.pop('enable_linear_eval')
     model_keys = config.pop('model_key')
@@ -832,6 +849,8 @@ def cae_large_patch16_224(pretrained=True, use_ssld=False, **kwargs):
     rel_pos_bias = config.pop('rel_pos_bias')
     if pretrained in config:
         pretrained = config.pop('pretrained')
+        parameters_from = config.pop('parameters_from')
+    assert parameters_from in ["pretrain", "finetune"]
 
     model = VisionTransformer(
         patch_size=16,
@@ -849,7 +868,9 @@ def cae_large_patch16_224(pretrained=True, use_ssld=False, **kwargs):
 
     _load_pretrained(
         pretrained,
+        parameters_from,
         MODEL_URLS["cae_large_patch16_224"],
+        PRETRAINED_URLS["cae_large_patch16_224"],
         model,
         model_keys,
         model_ema_configs,
