@@ -37,6 +37,7 @@ cpp_benchmark_value=$(func_parser_value "${lines[16]}")
 generate_yaml_cmd=$(func_parser_value "${lines[17]}")
 transform_index_cmd=$(func_parser_value "${lines[18]}")
 
+# set LOG_PATH
 CLS_ROOT_PATH=$(pwd)
 LOG_PATH="${CLS_ROOT_PATH}/test_tipc/output/${model_name}/${MODE}"
 mkdir -p ${LOG_PATH}
