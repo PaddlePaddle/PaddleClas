@@ -94,7 +94,8 @@ if [[ $MODE = 'benchmark_train' ]]; then
     epoch_num=1
 fi
 
-LOG_PATH="./test_tipc/output/${model_name}/${MODE}"
+CLS_ROOT_PATH=$(pwd)
+LOG_PATH="${CLS_ROOT_PATH}/test_tipc/output/${model_name}/${MODE}"
 mkdir -p ${LOG_PATH}
 status_log="${LOG_PATH}/results_python.log"
 
@@ -123,7 +124,7 @@ function func_inference() {
                         eval $command
                         last_status=${PIPESTATUS[0]}
                         eval "cat ${_save_log_path}"
-                        status_check $last_status "${command}" "../${status_log}" "${model_name}"
+                        status_check $last_status "${command}" "${status_log}" "${model_name}"
                     done
                 done
             done
@@ -145,7 +146,7 @@ function func_inference() {
                         eval $command
                         last_status=${PIPESTATUS[0]}
                         eval "cat ${_save_log_path}"
-                        status_check $last_status "${command}" "../${status_log}" "${model_name}"
+                        status_check $last_status "${command}" "${status_log}" "${model_name}"
                     done
                 done
             done
@@ -168,6 +169,6 @@ if [ ${kl_quant_cmd_value} != "null" ] && [ ${kl_quant_cmd_value} != "False" ]; 
     ln -s __params__ inference.pdiparams
     cd ../../deploy
     is_quant=True
-    func_inference "${python}" "${inference_py}" "../${infer_model_dir_list}/quant_post_static_model" "../${LOG_PATH}" "${infer_img_dir}" ${is_quant}
+    func_inference "${python}" "${inference_py}" "../${infer_model_dir_list}/quant_post_static_model" "${LOG_PATH}" "${infer_img_dir}" ${is_quant}
     cd ..
 fi

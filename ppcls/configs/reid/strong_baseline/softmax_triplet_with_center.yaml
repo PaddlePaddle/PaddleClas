@@ -87,7 +87,7 @@ Optimizer:
   - SGD:
       scope: CenterLoss
       lr:
-        name: Constant
+        name: ConstLR
         learning_rate: 1000.0 # NOTE: set to ori_lr*(1/centerloss_weight) to avoid manually scaling centers' gradidents.
 
 # data loader for train and eval

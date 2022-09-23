@@ -26,6 +26,7 @@ import cv2
 import numpy as np
 from PIL import Image, ImageOps, __version__ as PILLOW_VERSION
 from paddle.vision.transforms import ColorJitter as RawColorJitter
+from paddle.vision.transforms import RandomRotation as RawRandomRotation
 from paddle.vision.transforms import ToTensor, Normalize, RandomHorizontalFlip, RandomResizedCrop
 from paddle.vision.transforms import functional as F
 from .autoaugment import ImageNetPolicy
@@ -181,7 +182,8 @@ class DecodeImage(object):
                 img = np.asarray(img)[:, :, ::-1]  # BRG
 
             if self.to_rgb:
-                assert img.shape[2] == 3, f"invalid shape of image[{img.shape}]"
+                assert img.shape[
+                    2] == 3, f"invalid shape of image[{img.shape}]"
                 img = img[:, :, ::-1]
 
             if self.channel_first:
@@ -495,7 +497,13 @@ class RandFlipImage(object):
             if isinstance(img, np.ndarray):
                 return cv2.flip(img, self.flip_code)
             else:
-                return img.transpose(Image.FLIP_LEFT_RIGHT)
+                if self.flip_code == 1:
+                    return img.transpose(Image.FLIP_LEFT_RIGHT)
+                elif self.flip_code == 0:
+                    return img.transpose(Image.FLIP_TOP_BOTTOM)
+                else:
+                    return img.transpose(Image.FLIP_LEFT_RIGHT).transpose(
+                        Image.FLIP_LEFT_RIGHT)
         else:
             return img
 
@@ -653,17 +661,38 @@ class ColorJitter(RawColorJitter):
         return img
 
 
+class RandomRotation(RawRandomRotation):
+    """RandomRotation.
+    """
+
+    def __init__(self, prob=0.5, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.prob = prob
+
+    def __call__(self, img):
+        if np.random.random() < self.prob:
+            img = super()._apply_image(img)
+        return img
+
+
 class Pad(object):
     """
     Pads the given PIL.Image on all sides with specified padding mode and fill value.
     adapted from: https://pytorch.org/vision/stable/_modules/torchvision/transforms/transforms.html#Pad
     """
 
-    def __init__(self, padding: int, fill: int=0,
-                 padding_mode: str="constant"):
+    def __init__(self,
+                 padding: int,
+                 fill: int=0,
+                 padding_mode: str="constant",
+                 backend: str="pil"):
         self.padding = padding
         self.fill = fill
         self.padding_mode = padding_mode
+        self.backend = backend
+        assert backend in [
+            "pil", "cv2"
+        ], f"backend must in ['pil', 'cv2'], but got {backend}"
 
     def _parse_fill(self, fill, img, min_pil_version, name="fillcolor"):
         # Process fill color for affine transforms
@@ -698,11 +727,21 @@ class Pad(object):
         return {name: fill}
 
     def __call__(self, img):
-        opts = self._parse_fill(self.fill, img, "2.3.0", name="fill")
-        if img.mode == "P":
-            palette = img.getpalette()
-            img = ImageOps.expand(img, border=self.padding, **opts)
-            img.putpalette(palette)
+        if self.backend == "pil":
+            opts = self._parse_fill(self.fill, img, "2.3.0", name="fill")
+            if img.mode == "P":
+                palette = img.getpalette()
+                img = ImageOps.expand(img, border=self.padding, **opts)
+                img.putpalette(palette)
+                return img
+            return ImageOps.expand(img, border=self.padding, **opts)
+        else:
+            img = cv2.copyMakeBorder(
+                img,
+                self.padding,
+                self.padding,
+                self.padding,
+                self.padding,
+                cv2.BORDER_CONSTANT,
+                value=(self.fill, self.fill, self.fill))
             return img
-
-        return ImageOps.expand(img, border=self.padding, **opts)

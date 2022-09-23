@@ -99,7 +99,7 @@ DataLoader:
       use_shared_memory: True
 
 Infer:
-  infer_imgs: ./deploy/images/0517_2715693311.jpg
+  infer_imgs: deploy/images/0517_2715693311.jpg
   batch_size: 10
   transforms:
     - DecodeImage:
@@ -116,9 +116,10 @@ Infer:
         order: ''
     - ToCHWImage:
   PostProcess:
-    name: MultiLabelTopk
-    topk: 5
-    class_id_map_file: None
+    name: MultiLabelThreshOutput
+    threshold: 0.5
+    class_id_map_file: "ppcls/utils/NUS-WIDE-SCENE_label_list.txt"
+    delimiter: " "
 
 Metric:
   Train:

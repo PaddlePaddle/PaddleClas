@@ -1,6 +1,6 @@
 # 多标签分类 quick start
 
-基于 [NUS-WIDE-SCENE](https://lms.comp.nus.edu.sg/wp-content/uploads/2019/research/nuswide/NUS-WIDE.html) 数据集，体验多标签分类的训练、评估、预测的过程，该数据集是 NUS-WIDE 数据集的一个子集。请首先安装 PaddlePaddle 和 PaddleClas，具体安装步骤可详看 [环境准备](../installation/install_paddleclas.md)。
+基于 [NUS-WIDE-SCENE](https://lms.comp.nus.edu.sg/wp-content/uploads/2019/research/nuswide/NUS-WIDE.html) 数据集，体验多标签分类的训练、评估、预测的过程，该数据集是 NUS-WIDE 数据集的一个子集。请首先安装 PaddlePaddle 和 PaddleClas，具体安装步骤可详看 [环境准备](../installation.md)。
 
 
 ## 目录
@@ -50,6 +50,10 @@ python3 -m paddle.distributed.launch \
 
 训练 10 epoch 之后，验证集最好的正确率应该在 0.95 左右。
 
+**注意:**
+1. 目前多标签分类的损失函数仅支持`MultiLabelLoss`(BCE Loss)。
+2. 目前多标签分类的评估指标支持`AccuracyScore`和`HammingDistance`,其他评估指标敬请期待。
+
 <a name="3"></a>
 
 ## 3. 模型评估
@@ -70,8 +74,8 @@ python3 tools/infer.py \
 ```
 
 得到类似下面的输出：
-```  
-[{'class_ids': [6, 13, 17, 23, 26, 30], 'scores': [0.95683, 0.5567, 0.55211, 0.99088, 0.5943, 0.78767], 'file_name': './deploy/images/0517_2715693311.jpg', 'label_names': []}]
+```
+[{'class_ids': [6, 13, 17, 23, 30], 'scores': [0.98217, 0.78129, 0.64377, 0.9942, 0.96109], 'label_names': ['clouds', 'lake', 'ocean', 'sky', 'water'], 'file_name': 'deploy/images/0517_2715693311.jpg'}]
 ```
 
 <a name="5"></a>
@@ -100,10 +104,13 @@ cd ./deploy
 
 ```
 python3 python/predict_cls.py \
-     -c configs/inference_multilabel_cls.yaml
+     -c configs/inference_cls_multilabel.yaml
 ```
+推理图片如下：
 
-得到类似下面的输出：
+![](../../images/quick_start/multi_label_demo.png)
+
+执行推理命令后，得到类似下面的输出：
 ```
-0517_2715693311.jpg:    class id(s): [6, 13, 17, 23, 26, 30], score(s): [0.96, 0.56, 0.55, 0.99, 0.59, 0.79], label_name(s): []
+0517_2715693311.jpg:    class id(s): [6, 13, 17, 23, 30], score(s): [0.98, 0.78, 0.64, 0.99, 0.96], label_name(s): ['clouds', 'lake', 'ocean', 'sky', 'water']
 ```

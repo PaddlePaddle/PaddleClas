@@ -12,10 +12,12 @@ from .msmloss import MSMLoss
 from .npairsloss import NpairsLoss
 from .trihardloss import TriHardLoss
 from .triplet import TripletLoss, TripletLossV2
+from .tripletangularmarginloss import TripletAngularMarginLoss
 from .supconloss import SupConLoss
 from .pairwisecosface import PairwiseCosface
 from .dmlloss import DMLLoss
 from .distanceloss import DistanceLoss
+from .softtargetceloss import SoftTargetCrossEntropy
 
 from .distillationloss import DistillationCELoss
 from .distillationloss import DistillationGTCELoss
@@ -24,6 +26,7 @@ from .distillationloss import DistillationDistanceLoss
 from .distillationloss import DistillationRKDLoss
 from .distillationloss import DistillationKLDivLoss
 from .distillationloss import DistillationDKDLoss
+from .distillationloss import DistillationWSLLoss
 from .distillationloss import DistillationMultiLabelLoss
 from .distillationloss import DistillationDISTLoss
 from .distillationloss import DistillationPairLoss

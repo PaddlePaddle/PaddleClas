@@ -81,8 +81,10 @@ def classification_eval(engine, epoch_id=0):
         # gather Tensor when distributed
         if paddle.distributed.get_world_size() > 1:
             label_list = []
-
-            paddle.distributed.all_gather(label_list, batch[1])
+            device_id = paddle.distributed.ParallelEnv().device_id
+            label = batch[1].cuda(device_id) if engine.config["Global"][
+                "device"] == "gpu" else batch[1]
+            paddle.distributed.all_gather(label_list, label)
             labels = paddle.concat(label_list, 0)
 
             if isinstance(out, list):

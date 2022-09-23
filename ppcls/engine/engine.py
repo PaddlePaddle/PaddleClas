@@ -114,6 +114,7 @@ class Engine(object):
         #TODO(gaotingquan): support rec
         class_num = config["Arch"].get("class_num", None)
         self.config["DataLoader"].update({"class_num": class_num})
+
         # build dataloader
         if self.mode == 'train':
             self.train_dataloader = build_dataloader(
@@ -501,7 +502,7 @@ class Engine(object):
         assert self.mode == "export"
         use_multilabel = self.config["Global"].get(
             "use_multilabel",
-            False) and "ATTRMetric" in self.config["Metric"]["Eval"][0]
+            False) or "ATTRMetric" in self.config["Metric"]["Eval"][0]
         model = ExportModel(self.config["Arch"], self.model, use_multilabel)
         if self.config["Global"]["pretrained_model"] is not None:
             load_dygraph_pretrain(model.base_model,

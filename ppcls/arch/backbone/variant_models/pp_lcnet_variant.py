@@ -1,7 +1,7 @@
 import paddle
 from paddle.nn import Sigmoid
 from paddle.nn import Tanh
-from ppcls.arch.backbone.legendary_models.pp_lcnet import PPLCNet_x2_5
+from ..legendary_models.pp_lcnet import PPLCNet_x2_5
 
 __all__ = ["PPLCNet_x2_5_Tanh"]
 

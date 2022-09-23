@@ -26,9 +26,9 @@ from paddle.nn.initializer import Uniform
 from paddle.regularizer import L2Decay
 import math
 
-from ppcls.utils import logger
-from ppcls.arch.backbone.base.theseus_layer import TheseusLayer
-from ppcls.utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
+from ....utils import logger
+from ..base.theseus_layer import TheseusLayer
+from ....utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
 
 MODEL_URLS = {
     "ResNet18":
@@ -328,7 +328,7 @@ class ResNet(TheseusLayer):
                    [32, 32, 3, 1], [32, 64, 3, 1]]
         }
 
-        self.stem = nn.Sequential(*[
+        self.stem = nn.Sequential(* [
             ConvBNLayer(
                 num_channels=in_c,
                 num_filters=out_c,

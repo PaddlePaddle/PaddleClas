@@ -21,8 +21,9 @@ from paddle import ParamAttr
 from paddle.nn import AdaptiveAvgPool2D, BatchNorm2D, Conv2D, Dropout, Linear
 from paddle.regularizer import L2Decay
 from paddle.nn.initializer import KaimingNormal
-from ppcls.arch.backbone.base.theseus_layer import TheseusLayer
-from ppcls.utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
+
+from ..base.theseus_layer import TheseusLayer
+from ....utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
 
 MODEL_URLS = {
     "PPLCNetV2_base":
@@ -125,6 +126,8 @@ class RepDepthwiseSeparable(TheseusLayer):
                  use_se=False,
                  use_shortcut=False):
         super().__init__()
+        self.in_channels = in_channels
+        self.out_channels = out_channels
         self.is_repped = False
 
         self.dw_size = dw_size
@@ -305,8 +308,8 @@ class PPLCNetV2(TheseusLayer):
             self.dropout = Dropout(p=dropout_prob, mode="downscale_in_infer")
 
         self.flatten = nn.Flatten(start_axis=1, stop_axis=-1)
-        in_features = self.class_expand if self.use_last_conv else NET_CONFIG[
-            "stage4"][0] * 2 * scale
+        in_features = self.class_expand if self.use_last_conv else make_divisible(
+            NET_CONFIG["stage4"][0] * 2 * scale)
         self.fc = Linear(in_features, class_num)
 
     def forward(self, x):

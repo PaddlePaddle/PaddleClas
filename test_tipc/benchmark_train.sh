@@ -179,6 +179,11 @@ for batch_size in ${batch_size_list[*]}; do
             func_sed_params "$FILENAME" "${line_epoch}" "$epoch"
             gpu_id=$(set_gpu_id $device_num)
 
+            # It is needed that using dali, NHWC and 4 channels when training ResNet50 with AMPO2
+            if [[ $model_name == "ResNet50" && $precision == "fp16" ]]; then
+                sed -i "s/ResNet50.yaml/ResNet50_amp_O2_ultra.yaml/g" $FILENAME
+            fi
+
             # if bs is big, then copy train_list.txt to generate more train log
             # At least 25 log number would be good to calculate ips for benchmark system.
             # So the copy number for train_list is as follows:
@@ -196,13 +201,15 @@ for batch_size in ${batch_size_list[*]}; do
                 cd ..
             else
                 cd dataset/ILSVRC2012
-                train_list_length=`cat train_list.txt | wc -l`
-                copy_num=`echo $[25*10*$total_batch_size/$train_list_length]`
+                val_list_length=`cat val_list.txt | wc -l`
+                copy_num=`echo $[25*10*$total_batch_size/$val_list_length]`
+                rm -rf train_list.txt
                 if [[ $copy_num -gt 1 ]];then
-                    rm -rf train_list.txt
                     for ((i=1; i <=$copy_num; i++));do
                         cat val_list.txt >> train_list.txt
                     done
+		else
+		    ln -s val_list.txt train_list.txt
                 fi
                 cd ../../
             fi
@@ -246,7 +253,7 @@ for batch_size in ${batch_size_list[*]}; do
                         --run_mode ${run_mode} \
                         --fp_item ${precision} \
                         --keyword ips: \
-                        --skip_steps 2 \
+                        --skip_steps 100 \
                         --device_num ${device_num} \
                         --speed_unit samples/s \
                         --convergence_key loss: "
@@ -282,7 +289,7 @@ for batch_size in ${batch_size_list[*]}; do
                         --run_mode ${run_mode} \
                         --fp_item ${precision} \
                         --keyword ips: \
-                        --skip_steps 2 \
+                        --skip_steps 100 \
                         --device_num ${device_num} \
                         --speed_unit images/s \
                         --convergence_key loss: "
