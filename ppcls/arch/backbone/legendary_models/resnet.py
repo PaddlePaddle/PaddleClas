@@ -21,7 +21,7 @@ import paddle
 from paddle import ParamAttr
 import paddle.nn as nn
 from paddle.nn import Conv2D, BatchNorm, Linear, BatchNorm2D
-from paddle.nn import AdaptiveAvgPool2D, MaxPool2D, AvgPool2D
+from paddle.nn import AdaptiveAvgPool2D, MaxPool2D, AvgPool2D, AdaptiveMaxPool2D
 from paddle.nn.initializer import Uniform
 from paddle.regularizer import L2Decay
 import math
@@ -387,6 +387,7 @@ class ResNet(TheseusLayer):
             x = self.max_pool(x)
             x = self.blocks(x)
             x = self.avg_pool(x)
+            # print(f"stem output: {x.mean().item():.10f}")
             x = self.flatten(x)
             x = self.fc(x)
         return x
