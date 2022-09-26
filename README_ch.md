@@ -113,8 +113,8 @@ PP-ShiTuV2 Android Demo APP，可扫描如下二维码，下载体验
   - [度量学习](docs/zh_CN/algorithm_introduction/metric_learning.md)
     - [ReID](./docs/zh_CN/algorithm_introduction/ReID.md)
   - [模型压缩](docs/zh_CN/algorithm_introduction/prune_quantization.md)
-  - [模型蒸馏](docs/zh_CN/algorithm_introduction/knowledge_distillation.md)
-  - [数据增强](docs/zh_CN/training/config_discription/data_augmentation.md)
+  - [模型蒸馏](./docs/zh_CN/training/advanced/knowledge_distillation.md)
+  - [数据增强](docs/zh_CN/training/config_description/data_augmentation.md)
 - [产业实用范例库](docs/zh_CN/samples)
 - [30分钟快速体验图像分类](docs/zh_CN/quick_start/quick_start_classification_new_user.md)
 - FAQ
