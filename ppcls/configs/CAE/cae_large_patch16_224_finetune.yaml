@@ -29,8 +29,10 @@ Arch:
   init_values: 0.1
   lin_probe: False
 
-  sin_pos_emb: True
+  pretrained: True
+  parameters_from: 'pretrain' # 'pretrain' or 'finetune'
 
+  sin_pos_emb: True
   abs_pos_emb: False
   enable_linear_eval: False
   model_key: model|module|state_dict
@@ -39,8 +41,7 @@ Arch:
     enable_model_ema: False 
     model_ema_decay: 0.9999
     model_ema_force_cpu: False
-  pretrained: True
-  parameters_from: 'pretrain' # 'pretrain' or 'finetune'
+
 
 # loss function config for traing/eval process
 Loss:
