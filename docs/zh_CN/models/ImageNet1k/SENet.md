@@ -1,4 +1,4 @@
-# RedNet 系列
+# ResNeXt 系列
 -----
 
 ## 目录
@@ -8,6 +8,7 @@
     - [1.2 模型指标](#1.2)
     - [1.3 Benchmark](#1.3)
       - [1.3.1 基于 V100 GPU 的预测速度](#1.3.1)
+      - [1.3.2 基于 T4 GPU 的预测速度](#1.3.2)
 - [2. 模型快速体验](#2)
 - [3. 模型训练、评估和预测](#3)
 - [4. 模型推理部署](#4)
@@ -26,21 +27,28 @@
 
 ### 1.1 模型简介
 
-在 ResNet 的 Backbone 和 Backbone 的所有 Bottleneck 位置上使用 Involution 替换掉了卷积，但保留了所有的卷积用于通道映射和融合。这些精心重新设计的实体联合起来，形成了一种新的高效 Backbone 网络，称为 RedNet。[论文地址](https://arxiv.org/abs/2103.06255)。
+SENet 是 2017 年 ImageNet 分类比赛的冠军方案，其提出了一个全新的 SE 结构，该结构可以迁移到任何其他网络中，其通过控制 scale 的大小，把每个通道间重要的特征增强，不重要的特征减弱，从而让提取的特征指向性更强。
+
+该系列模型的 FLOPs、参数量以及 T4 GPU 上的预测耗时如下图所示。
+
+![](../../images/models/T4_benchmark/t4.fp32.bs4.SeResNeXt.flops.png)
+
+![](../../images/models/T4_benchmark/t4.fp32.bs4.SeResNeXt.params.png)
+
+![](../../images/models/T4_benchmark/t4.fp32.bs4.SeResNeXt.png)
+
+![](../../images/models/T4_benchmark/t4.fp16.bs4.SeResNeXt.png)
+
 
 <a name='1.2'></a>
 
 ### 1.2 模型指标
 
-| Models           | Top1 | Top5 | Reference<br>top1 | Reference<br>top5 | FLOPs<br>(G) | Params<br>(M) |
+| Models                | Top1   | Top5   | Reference<br>top1 | Reference<br>top5 | FLOPs<br>(G) | Params<br>(M) |
 |:--:|:--:|:--:|:--:|:--:|:--:|:--:|
-| RedNet26        | 75.95     | 93.19     | - | - | 1.7 | 9.2 |  
-| RedNet38        | 77.47     | 93.56     | - | - | 2.2 | 12.4 |  
-| RedNet50        | 78.33     | 94.17     | - | - | 2.7 | 15.5 |  
-| RedNet101       | 78.94     | 94.36     | - | - | 4.7 | 25.7 |  
-| RedNet152       | 79.17     | 94.40     | - | - | 6.8 | 34.0 |  
-
-**备注：** PaddleClas 所提供的该系列模型的预训练模型权重，均是基于其官方提供的权重转得。
+| SE_ResNeXt50_32x4d    | 0.784  | 0.940  | 0.789             | 0.945             | 8.020        | 26.160            |
+| SE_ResNeXt50_vd_32x4d | 0.802  | 0.949  |                   |                   | 10.760       | 26.280            |
+| SE_ResNeXt101_32x4d   | 0.7939  | 0.9443  | 0.793             | 0.950             | 15.020       | 46.280            |
 
 ### 1.3 Benchmark
 
@@ -49,16 +57,26 @@
 #### 1.3.1 基于 V100 GPU 的预测速度
 
 | Models      | Size | Latency(ms)<br>bs=1 | Latency(ms)<br>bs=4 | Latency(ms)<br>bs=8 |
-| --------- | --------- | ---------------- | ---------------- | ----------------- |
-| RedNet26  | 224       | 4.45             | 15.16            | 29.03             |
-| RedNet38  | 224       | 6.24             | 21.39            | 41.26             |
-| RedNet50  | 224       | 8.04             | 27.71            | 53.73             |
-| RedNet101 | 224       | 13.07            | 44.12            | 83.28             |
-| RedNet152 | 224       | 18.66            | 63.27            | 119.48            |
+|-----------------------|-------------------|-----------------------|-----------------------|-----------------------|
+| SE_ResNeXt50_32x4d    | 224       | 6.39               | 11.01              | 14.94              |
+| SE_ResNeXt50_vd_32x4d | 224       | 7.04               | 11.57              | 16.01              |
+| SE_ResNeXt101_32x4d   | 224       | 13.31             | 21.85             | 28.77             |
 
 **备注：** 精度类型为 FP32，推理过程使用 TensorRT。
 
-<a name="2"></a>  
+<a name='1.3.2'></a>
+
+#### 1.3.2 基于 T4 GPU 的预测速度
+
+| Models            | Size | Latency(ms)<br>FP16<br>bs=1 | Latency(ms)<br>FP16<br>bs=4 | Latency(ms)<br>FP16<br>bs=8 | Latency(ms)<br>FP32<br>bs=1 | Latency(ms)<br>FP32<br>bs=4 | Latency(ms)<br>FP32<br>bs=8 |
+|:--:|:--:|:--:|:--:|:--:|:--:|:--:|:--:|
+| SE_ResNeXt50_32x4d    | 224  | 9.06957                      | 11.37898                     | 18.86282                     | 8.74121                      | 13.563                       | 23.01954                     |
+| SE_ResNeXt50_vd_32x4d | 224  | 9.25016                      | 11.85045                     | 25.57004                     | 9.17134                      | 14.76192                     | 19.914                       |
+| SE_ResNeXt101_32x4d   | 224  | 19.34455                     | 20.6104                      | 32.20432                     | 18.82604                     | 25.31814                     | 41.97758                     |
+
+**备注：** 推理过程使用 TensorRT。
+
+<a name="2"></a>
 
 ## 2. 模型快速体验
 
@@ -68,7 +86,7 @@
 
 ## 3. 模型训练、评估和预测
 
-此部分内容包括训练环境配置、ImageNet数据的准备、该模型在 ImageNet 上的训练、评估、预测等内容。在 `ppcls/configs/ImageNet/RedNet/` 中提供了该模型的训练配置，启动训练方法可以参考：[ResNet50 模型训练、评估和预测](./ResNet.md#3-模型训练评估和预测)。
+此部分内容包括训练环境配置、ImageNet数据的准备、该模型在 ImageNet 上的训练、评估、预测等内容。在 `ppcls/configs/ImageNet/SENet/` 中提供了该模型的训练配置，启动训练方法可以参考：[ResNet50 模型训练、评估和预测](./ResNet.md#3-模型训练评估和预测)。
 
 <a name="4"></a>
 
