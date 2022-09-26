@@ -30,7 +30,7 @@ Arch:
   lin_probe: False
 
   pretrained: True
-  parameters_from: 'pretrain' # 'pretrain' or 'finetune'
+  parameters_from: 'finetune' # 'pretrain' or 'finetune'
 
   sin_pos_emb: True
   abs_pos_emb: False
@@ -41,7 +41,7 @@ Arch:
     enable_model_ema: False 
     model_ema_decay: 0.9999
     model_ema_force_cpu: False
-
+  
 
 # loss function config for traing/eval process
 Loss:
@@ -73,8 +73,8 @@ DataLoader:
   Train:
     dataset:
       name: ImageNetDataset
-      image_root: ./dataset/flowers102/
-      cls_label_path: ./dataset/flowers102/train_list.txt
+      image_root: /CAE/CAE_fix_loadding_param/PaddleClas/dataset/flowers102/
+      cls_label_path: /CAE/CAE_fix_loadding_param/PaddleClas/dataset/flowers102/train_list.txt
       batch_transform_ops:
         - MixupCutmixHybrid:
             mixup_alpha: 0.8
@@ -114,8 +114,8 @@ DataLoader:
   Eval:
     dataset: 
       name: ImageNetDataset
-      image_root: ./dataset/flowers102/
-      cls_label_path: ./dataset/flowers102/val_list.txt
+      image_root: /CAE/CAE_fix_loadding_param/PaddleClas/dataset/flowers102/
+      cls_label_path: /CAE/CAE_fix_loadding_param/PaddleClas/dataset/flowers102/val_list.txt
       transform_ops:
         - DecodeImage:
             to_rgb: True

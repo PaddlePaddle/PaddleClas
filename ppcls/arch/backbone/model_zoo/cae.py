@@ -644,9 +644,9 @@ def _load_pretrained(pretrained,
         load_dygraph_pretrain_from_url(model, model_url, use_ssld=use_ssld)
         return
     elif isinstance(pretrained, str) and parameters_from == "finetune":
-        # load_dygraph_pretrain(model, pretrained)
-        checkpoint = paddle.load(pretrained + ".pdparams")['model']  # For the finetune model from vimer
-        model.set_state_dict(checkpoint)
+        load_dygraph_pretrain(model, pretrained)
+        # checkpoint = paddle.load(pretrained + ".pdparams")['model']  # For the finetune model from vimer
+        # model.set_state_dict(checkpoint)
         return
     elif pretrained is True and parameters_from == "pretrain":
         local_weight_path = get_weights_path_from_url(pretrained_url).replace(
@@ -806,9 +806,9 @@ def cae_base_patch16_224(pretrained=True, parameters_from="pretrain", use_ssld=F
     model_ema_configs = config.pop('model_ema')
     abs_pos_emb = config.pop('abs_pos_emb')
     rel_pos_bias = config.pop('rel_pos_bias')
-    if pretrained in config:
-        pretrained = config.pop('pretrained')
-        parameters_from = config.pop('parameters_from')
+    if "infer_add_softmax" in config:
+        infer_add_softmax = config.pop('infer_add_softmax')
+    
     assert parameters_from in ["pretrain", "finetune"]
 
     model = VisionTransformer(
@@ -847,9 +847,9 @@ def cae_large_patch16_224(pretrained=True, parameters_from="pretrain", use_ssld=
     model_ema_configs = config.pop('model_ema')
     abs_pos_emb = config.pop('abs_pos_emb')
     rel_pos_bias = config.pop('rel_pos_bias')
-    if pretrained in config:
-        pretrained = config.pop('pretrained')
-        parameters_from = config.pop('parameters_from')
+    if "infer_add_softmax" in config:
+        config.pop('infer_add_softmax')
+ 
     assert parameters_from in ["pretrain", "finetune"]
 
     model = VisionTransformer(
