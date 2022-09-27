@@ -51,8 +51,7 @@ class CommonDataset(Dataset):
                  label_ratio=False):
         self._img_root = image_root
         self._cls_path = cls_label_path
-        if transform_ops:
-            self._transform_ops = create_operators(transform_ops)
+        self._transform_ops = create_operators(transform_ops)
 
         self.images = []
         self.labels = []
@@ -84,4 +83,4 @@ class CommonDataset(Dataset):
 
     @property
     def class_num(self):
-        return len(set(self.labels))
+        return len(set(self.images))
