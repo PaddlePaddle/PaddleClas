@@ -20,7 +20,7 @@ MixFormer是一个高效、通用的骨干网路（Vision Transformer）。在Mi
 > Qiang Chen, Qiman Wu, Jian Wang, Qinghao Hu, Tao Hu, Errui Ding, Jian Cheng, Jingdong Wang<br>
 > CVPR2022, **Oral** presentation
 
-![image](../../images/MixFormer/MixingBlock.png)
+![image](../../../images/MixFormer/MixingBlock.png)
 
 
 <a name='2'></a>
@@ -38,9 +38,8 @@ MixFormer是一个高效、通用的骨干网路（Vision Transformer）。在Mi
 | MixFormer-B3 | 0.817 |  1.9  |
 | MixFormer-B4 | 0.830 |  3.6  |
 | MixFormer-B5 | 0.835 |  6.8  |
-| MixFormer-B6 | 0.838 |  12.7  |
+| MixFormer-B6 | 0.838 |  12.7 | 
 
-模型后续将提供下载。
 
 <a name='2.2'></a>
 ### 目标检测与实例分割

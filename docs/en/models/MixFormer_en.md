@@ -29,17 +29,15 @@ MixFormer is an efficient and general-purpose hybrid vision transformer. There a
 ### Results on ImageNet-1K
 We provide the accuracy with FLOPs of MixFormer on ImageNet-1K. Unlike other vision transformer variants, they only show promising results when the FLOPs are pretty large (e.g., 4.5G). MixFormer can achieve favorable results **with small model sizes (FLOPs < 1G)**, which are nontrivial results.
 
-| Models | Top1 | Top5 | Reference top1| FLOPs (G) |
-|:--:|:--:|:--:|:--:|:--:|
-| MixFormer-B0 | - | - | 0.765 |  0.4  |
-| MixFormer-B1 | - | - | 0.789 |  0.7  |
-| MixFormer-B2 | - | - | 0.800 |  0.9  |
-| MixFormer-B3 | - | - | 0.817 |  1.9  |
-| MixFormer-B4 | - | - | 0.830 |  3.6  |
-| MixFormer-B5 | - | - | 0.835 |  6.8  |
-| MixFormer-B6 | - | - | 0.838 |  12.7  |
-
-The models are coming soon.
+| Models | Top1 | FLOPs (G) |
+|:--:|:--:|:--:|
+| MixFormer-B0 | 0.765 |  0.4  |
+| MixFormer-B1 | 0.789 |  0.7  |
+| MixFormer-B2 | 0.800 |  0.9  |
+| MixFormer-B3 | 0.817 |  1.9  |
+| MixFormer-B4 | 0.830 |  3.6  |
+| MixFormer-B5 | 0.835 |  6.8  |
+| MixFormer-B6 | 0.838 |  12.7 | 
 
 <a name='2.2'></a>
 ### Results on MS COCO with Mask R-CNN
