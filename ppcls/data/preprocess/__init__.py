@@ -40,6 +40,7 @@ from ppcls.data.preprocess.ops.operators import ColorJitter
 from ppcls.data.preprocess.ops.operators import RandomCropImage
 from ppcls.data.preprocess.ops.operators import RandomRotation
 from ppcls.data.preprocess.ops.operators import Padv2
+from ppcls.data.preprocess.ops.operators import RandomRot90
 
 from ppcls.data.preprocess.batch_ops.batch_operators import MixupOperator, CutmixOperator, OpSampler, FmixOperator
 from ppcls.data.preprocess.batch_ops.batch_operators import MixupCutmixHybrid
@@ -101,7 +102,8 @@ class TimmAutoAugment(RawTimmAutoAugment):
         super().__init__(*args, **kwargs)
         self.prob = prob
 
-    def __call__(self, img):
+    def __call__(self, ori_data):
+        img = ori_data["img"] if isinstance(ori_data, dict) else ori_data
         if not isinstance(img, Image.Image):
             img = np.ascontiguousarray(img)
             img = Image.fromarray(img)
@@ -109,5 +111,9 @@ class TimmAutoAugment(RawTimmAutoAugment):
             img = super().__call__(img)
         if isinstance(img, Image.Image):
             img = np.asarray(img)
-
-        return img
+        processed_data = {
+            **
+            ori_data,
+            "img": img
+        } if isinstance(ori_data, dict) else img
+        return processed_data
