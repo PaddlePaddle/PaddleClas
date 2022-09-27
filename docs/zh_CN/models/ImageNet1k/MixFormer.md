@@ -30,15 +30,15 @@ MixFormer是一个高效、通用的骨干网路（Vision Transformer）。在Mi
 ### 图像分类
 我们提供了MixFormer在ImageNet-1K数据集上的精度。与其他vision transformer不同的是，MixFormer即使在小模型的场景下，也能有很好的性能表现，而其他的vision transformer往往只有在模型较大的情况下（例如，4.5G FLOPs）才比较有效。
 
-| Models | Top1 | Top5 | Reference top1| FLOPs (G) |
-|:--:|:--:|:--:|:--:|:--:|
-| MixFormer-B0 | - | - | 0.765 |  0.4  |
-| MixFormer-B1 | - | - | 0.789 |  0.7  |
-| MixFormer-B2 | - | - | 0.800 |  0.9  |
-| MixFormer-B3 | - | - | 0.817 |  1.9  |
-| MixFormer-B4 | - | - | 0.830 |  3.6  |
-| MixFormer-B5 | - | - | 0.835 |  6.8  |
-| MixFormer-B6 | - | - | 0.838 |  12.7  |
+| Models | Top1 | FLOPs (G) |
+|:--:|:--:|:--:|
+| MixFormer-B0 | 0.765 |  0.4  |
+| MixFormer-B1 | 0.789 |  0.7  |
+| MixFormer-B2 | 0.800 |  0.9  |
+| MixFormer-B3 | 0.817 |  1.9  |
+| MixFormer-B4 | 0.830 |  3.6  |
+| MixFormer-B5 | 0.835 |  6.8  |
+| MixFormer-B6 | 0.838 |  12.7  |
 
 模型后续将提供下载。
 
