@@ -302,7 +302,8 @@ class PPLCNet(TheseusLayer):
         self.flatten = nn.Flatten(start_axis=1, stop_axis=-1)
         self.fc = Linear(
             self.class_expand if self.use_last_conv else
-            make_divisible(self.net_config["blocks6"][-1][2]), class_num)
+            make_divisible(self.net_config["blocks6"][-1][2] * scale),
+            class_num)
 
         super().init_res(
             stages_pattern,
