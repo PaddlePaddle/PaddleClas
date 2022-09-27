@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# reference: https://arxiv.org/abs/1801.07698
+
 import paddle
 import paddle.nn as nn
 import math

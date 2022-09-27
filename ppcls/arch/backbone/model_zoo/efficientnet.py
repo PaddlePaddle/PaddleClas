@@ -13,6 +13,7 @@
 # limitations under the License.
 
 # Code was based on https://github.com/lukemelas/EfficientNet-PyTorch
+# reference: https://arxiv.org/abs/1905.11946
 
 import paddle
 from paddle import ParamAttr
@@ -25,7 +26,7 @@ import collections
 import re
 import copy
 
-from ppcls.utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
+from ....utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
 
 MODEL_URLS = {
     "EfficientNetB0_small":

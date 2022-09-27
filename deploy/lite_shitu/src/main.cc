@@ -27,6 +27,7 @@
 #include "include/feature_extractor.h"
 #include "include/object_detector.h"
 #include "include/preprocess_op.h"
+#include "include/utils.h"
 #include "include/vector_search.h"
 #include "json/json.h"
 
@@ -158,6 +159,11 @@ int main(int argc, char **argv) {
               << " [image_dir]>" << std::endl;
     return -1;
   }
+
+  float rec_nms_threshold = 0.05;
+  if (RT_Config["Global"]["rec_nms_thresold"].isDouble())
+    rec_nms_threshold = RT_Config["Global"]["rec_nms_thresold"].as<float>();
+
   // Load model and create a object detector
   PPShiTu::ObjectDetector det(
       RT_Config, RT_Config["Global"]["det_model_path"].as<std::string>(),
@@ -174,6 +180,7 @@ int main(int argc, char **argv) {
   // for vector search
   std::vector<float> feature;
   std::vector<float> features;
+  std::vector<int> indeices;
   double rec_time;
   if (!RT_Config["Global"]["infer_imgs"].as<std::string>().empty() ||
       !img_dir.empty()) {
@@ -208,9 +215,9 @@ int main(int argc, char **argv) {
           RT_Config["Global"]["max_det_results"].as<int>(), false, &det);
 
       // add the whole image for recognition to improve recall
-//      PPShiTu::ObjectResult result_whole_img = {
-//          {0, 0, srcimg.cols, srcimg.rows}, 0, 1.0};
-//      det_result.push_back(result_whole_img);
+      PPShiTu::ObjectResult result_whole_img = {
+          {0, 0, srcimg.cols, srcimg.rows}, 0, 1.0};
+      det_result.push_back(result_whole_img);
 
       // get rec result
       PPShiTu::SearchResult search_result;
@@ -225,10 +232,18 @@ int main(int argc, char **argv) {
 
       // do vectore search
       search_result = searcher.Search(features.data(), det_result.size());
+      for (int i = 0; i < det_result.size(); ++i) {
+        det_result[i].confidence = search_result.D[search_result.return_k * i];
+      }
+      NMSBoxes(det_result, searcher.GetThreshold(), rec_nms_threshold,
+               indeices);
       PrintResult(img_path, det_result, searcher, search_result);
 
       batch_imgs.clear();
       det_result.clear();
+      features.clear();
+      feature.clear();
+      indeices.clear();
     }
   }
   return 0;

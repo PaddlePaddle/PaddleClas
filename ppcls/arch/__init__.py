@@ -23,23 +23,28 @@ from . import backbone, gears
 from .backbone import *
 from .gears import build_gear
 from .utils import *
-from ppcls.arch.backbone.base.theseus_layer import TheseusLayer
-from ppcls.utils import logger
-from ppcls.utils.save_load import load_dygraph_pretrain
-from ppcls.arch.slim import prune_model, quantize_model
-from ppcls.arch.distill.afd_attention import LinearTransformStudent, LinearTransformTeacher
+from .backbone.base.theseus_layer import TheseusLayer
+from ..utils import logger
+from ..utils.save_load import load_dygraph_pretrain
+from .slim import prune_model, quantize_model
+from .distill.afd_attention import LinearTransformStudent, LinearTransformTeacher
 
 __all__ = ["build_model", "RecModel", "DistillationModel", "AttentionModel"]
 
 
-def build_model(config):
+def build_model(config, mode="train"):
     arch_config = copy.deepcopy(config["Arch"])
     model_type = arch_config.pop("name")
+    use_sync_bn = arch_config.pop("use_sync_bn", False)
     mod = importlib.import_module(__name__)
     arch = getattr(mod, model_type)(**arch_config)
+    if use_sync_bn:
+        arch = nn.SyncBatchNorm.convert_sync_batchnorm(arch)
+
     if isinstance(arch, TheseusLayer):
         prune_model(config, arch)
-        quantize_model(config, arch)
+        quantize_model(config, arch, mode)
+
     return arch
 
 
@@ -50,6 +55,7 @@ def apply_to_static(config, model):
         specs = None
         if 'image_shape' in config['Global']:
             specs = [InputSpec([None] + config['Global']['image_shape'])]
+            specs[0].stop_gradient = True
         model = to_static(model, input_spec=specs)
         logger.info("Successfully to apply @to_static with specs: {}".format(
             specs))

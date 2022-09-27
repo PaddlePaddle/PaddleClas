@@ -12,10 +12,12 @@ from .msmloss import MSMLoss
 from .npairsloss import NpairsLoss
 from .trihardloss import TriHardLoss
 from .triplet import TripletLoss, TripletLossV2
+from .tripletangularmarginloss import TripletAngularMarginLoss
 from .supconloss import SupConLoss
 from .pairwisecosface import PairwiseCosface
 from .dmlloss import DMLLoss
 from .distanceloss import DistanceLoss
+from .softtargetceloss import SoftTargetCrossEntropy
 
 from .distillationloss import DistillationCELoss
 from .distillationloss import DistillationGTCELoss
@@ -23,6 +25,12 @@ from .distillationloss import DistillationDMLLoss
 from .distillationloss import DistillationDistanceLoss
 from .distillationloss import DistillationRKDLoss
 from .distillationloss import DistillationKLDivLoss
+from .distillationloss import DistillationDKDLoss
+from .distillationloss import DistillationWSLLoss
+from .distillationloss import DistillationMultiLabelLoss
+from .distillationloss import DistillationDISTLoss
+from .distillationloss import DistillationPairLoss
+
 from .multilabelloss import MultiLabelLoss
 from .afdloss import AFDLoss
 
@@ -47,6 +55,7 @@ class CombinedLoss(nn.Layer):
                 param.keys())
             self.loss_weight.append(param.pop("weight"))
             self.loss_func.append(eval(name)(**param))
+            self.loss_func = nn.LayerList(self.loss_func)
 
     def __call__(self, input, batch):
         loss_dict = {}

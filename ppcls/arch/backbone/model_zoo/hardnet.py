@@ -13,11 +13,12 @@
 # limitations under the License.
 
 # Code was based on https://github.com/PingoLH/Pytorch-HarDNet
+# reference: https://arxiv.org/abs/1909.00948
 
 import paddle
 import paddle.nn as nn
 
-from ppcls.utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
+from ....utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
 
 MODEL_URLS = {
     'HarDNet39_ds':

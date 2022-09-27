@@ -23,6 +23,8 @@ from ppcls.utils import logger
 
 
 def classification_eval(engine, epoch_id=0):
+    if hasattr(engine.eval_metric_func, "reset"):
+        engine.eval_metric_func.reset()
     output_info = dict()
     time_info = {
         "batch_cost": AverageMeter(
@@ -32,7 +34,6 @@ def classification_eval(engine, epoch_id=0):
     }
     print_batch_step = engine.config["Global"]["print_batch_step"]
 
-    metric_key = None
     tic = time.time()
     accum_samples = 0
     total_samples = len(
@@ -53,90 +54,88 @@ def classification_eval(engine, epoch_id=0):
             ]
         time_info["reader_cost"].update(time.time() - tic)
         batch_size = batch[0].shape[0]
-        batch[0] = paddle.to_tensor(batch[0]).astype("float32")
+        batch[0] = paddle.to_tensor(batch[0])
         if not engine.config["Global"].get("use_multilabel", False):
             batch[1] = batch[1].reshape([-1, 1]).astype("int64")
 
         # image input
-        if engine.amp and engine.config["AMP"].get("use_fp16_test", False):
-            amp_level = engine.config['AMP'].get("level", "O1").upper()
+        if engine.amp and engine.amp_eval:
             with paddle.amp.auto_cast(
                     custom_black_list={
                         "flatten_contiguous_range", "greater_than"
                     },
-                    level=amp_level):
+                    level=engine.amp_level):
                 out = engine.model(batch[0])
-                # calc loss
-                if engine.eval_loss_func is not None:
-                    loss_dict = engine.eval_loss_func(out, batch[1])
-                    for key in loss_dict:
-                        if key not in output_info:
-                            output_info[key] = AverageMeter(key, '7.5f')
-                        output_info[key].update(loss_dict[key].numpy()[0],
-                                                batch_size)
         else:
             out = engine.model(batch[0])
-            # calc loss
-            if engine.eval_loss_func is not None:
-                loss_dict = engine.eval_loss_func(out, batch[1])
-                for key in loss_dict:
-                    if key not in output_info:
-                        output_info[key] = AverageMeter(key, '7.5f')
-                    output_info[key].update(loss_dict[key].numpy()[0],
-                                            batch_size)
 
         # just for DistributedBatchSampler issue: repeat sampling
         current_samples = batch_size * paddle.distributed.get_world_size()
         accum_samples += current_samples
 
-        # calc metric
-        if engine.eval_metric_func is not None:
-            if paddle.distributed.get_world_size() > 1:
-                label_list = []
-                paddle.distributed.all_gather(label_list, batch[1])
-                labels = paddle.concat(label_list, 0)
+        if isinstance(out, dict) and "Student" in out:
+            out = out["Student"]
+        if isinstance(out, dict) and "logits" in out:
+            out = out["logits"]
 
-                if isinstance(out, dict):
-                    if "Student" in out:
-                        out = out["Student"]
-                        if isinstance(out, dict):
-                            out = out["logits"]
-                    elif "logits" in out:
-                        out = out["logits"]
-                    else:
-                        msg = "Error: Wrong key in out!"
-                        raise Exception(msg)
-                if isinstance(out, list):
-                    pred = []
-                    for x in out:
-                        pred_list = []
-                        paddle.distributed.all_gather(pred_list, x)
-                        pred_x = paddle.concat(pred_list, 0)
-                        pred.append(pred_x)
-                else:
+        # gather Tensor when distributed
+        if paddle.distributed.get_world_size() > 1:
+            label_list = []
+            device_id = paddle.distributed.ParallelEnv().device_id
+            label = batch[1].cuda(device_id) if engine.config["Global"][
+                "device"] == "gpu" else batch[1]
+            paddle.distributed.all_gather(label_list, label)
+            labels = paddle.concat(label_list, 0)
+
+            if isinstance(out, list):
+                preds = []
+                for x in out:
                     pred_list = []
-                    paddle.distributed.all_gather(pred_list, out)
-                    pred = paddle.concat(pred_list, 0)
-
-                if accum_samples > total_samples and not engine.use_dali:
-                    pred = pred[:total_samples + current_samples -
-                                accum_samples]
-                    labels = labels[:total_samples + current_samples -
-                                    accum_samples]
-                    current_samples = total_samples + current_samples - accum_samples
-                metric_dict = engine.eval_metric_func(pred, labels)
+                    paddle.distributed.all_gather(pred_list, x)
+                    pred_x = paddle.concat(pred_list, 0)
+                    preds.append(pred_x)
             else:
-                metric_dict = engine.eval_metric_func(out, batch[1])
+                pred_list = []
+                paddle.distributed.all_gather(pred_list, out)
+                preds = paddle.concat(pred_list, 0)
 
-            for key in metric_dict:
-                if metric_key is None:
-                    metric_key = key
+            if accum_samples > total_samples and not engine.use_dali:
+                if isinstance(preds, list):
+                    preds = [
+                        pred[:total_samples + current_samples - accum_samples]
+                        for pred in preds
+                    ]
+                else:
+                    preds = preds[:total_samples + current_samples -
+                                  accum_samples]
+                labels = labels[:total_samples + current_samples -
+                                accum_samples]
+                current_samples = total_samples + current_samples - accum_samples
+        else:
+            labels = batch[1]
+            preds = out
+
+        # calc loss
+        if engine.eval_loss_func is not None:
+            if engine.amp and engine.amp_eval:
+                with paddle.amp.auto_cast(
+                        custom_black_list={
+                            "flatten_contiguous_range", "greater_than"
+                        },
+                        level=engine.amp_level):
+                    loss_dict = engine.eval_loss_func(preds, labels)
+            else:
+                loss_dict = engine.eval_loss_func(preds, labels)
+
+            for key in loss_dict:
                 if key not in output_info:
                     output_info[key] = AverageMeter(key, '7.5f')
-
-                output_info[key].update(metric_dict[key].numpy()[0],
+                output_info[key].update(loss_dict[key].numpy()[0],
                                         current_samples)
 
+        #  calc metric
+        if engine.eval_metric_func is not None:
+            engine.eval_metric_func(preds, labels)
         time_info["batch_cost"].update(time.time() - tic)
 
         if iter_id % print_batch_step == 0:
@@ -148,10 +147,14 @@ def classification_eval(engine, epoch_id=0):
             ips_msg = "ips: {:.5f} images/sec".format(
                 batch_size / time_info["batch_cost"].avg)
 
-            metric_msg = ", ".join([
-                "{}: {:.5f}".format(key, output_info[key].val)
-                for key in output_info
-            ])
+            if "ATTRMetric" in engine.config["Metric"]["Eval"][0]:
+                metric_msg = ""
+            else:
+                metric_msg = ", ".join([
+                    "{}: {:.5f}".format(key, output_info[key].val)
+                    for key in output_info
+                ])
+                metric_msg += ", {}".format(engine.eval_metric_func.avg_info)
             logger.info("[Eval][Epoch {}][Iter: {}/{}]{}, {}, {}".format(
                 epoch_id, iter_id,
                 len(engine.eval_dataloader), metric_msg, time_msg, ips_msg))
@@ -159,13 +162,29 @@ def classification_eval(engine, epoch_id=0):
         tic = time.time()
     if engine.use_dali:
         engine.eval_dataloader.reset()
-    metric_msg = ", ".join([
-        "{}: {:.5f}".format(key, output_info[key].avg) for key in output_info
-    ])
-    logger.info("[Eval][Epoch {}][Avg]{}".format(epoch_id, metric_msg))
 
-    # do not try to save best eval.model
-    if engine.eval_metric_func is None:
-        return -1
-    # return 1st metric in the dict
-    return output_info[metric_key].avg
+    if "ATTRMetric" in engine.config["Metric"]["Eval"][0]:
+        metric_msg = ", ".join([
+            "evalres: ma: {:.5f} label_f1: {:.5f} label_pos_recall: {:.5f} label_neg_recall: {:.5f} instance_f1: {:.5f} instance_acc: {:.5f} instance_prec: {:.5f} instance_recall: {:.5f}".
+            format(*engine.eval_metric_func.attr_res())
+        ])
+        logger.info("[Eval][Epoch {}][Avg]{}".format(epoch_id, metric_msg))
+
+        # do not try to save best eval.model
+        if engine.eval_metric_func is None:
+            return -1
+        # return 1st metric in the dict
+        return engine.eval_metric_func.attr_res()[0]
+    else:
+        metric_msg = ", ".join([
+            "{}: {:.5f}".format(key, output_info[key].avg)
+            for key in output_info
+        ])
+        metric_msg += ", {}".format(engine.eval_metric_func.avg_info)
+        logger.info("[Eval][Epoch {}][Avg]{}".format(epoch_id, metric_msg))
+
+        # do not try to save best eval.model
+        if engine.eval_metric_func is None:
+            return -1
+        # return 1st metric in the dict
+        return engine.eval_metric_func.avg

@@ -16,8 +16,9 @@ import os
 import copy
 import argparse
 import yaml
-from ppcls.utils import logger
-from ppcls.utils import check
+from . import logger
+from . import check
+
 __all__ = ['get_config']
 
 
@@ -137,9 +138,12 @@ def override(dl, ks, v):
         if len(ks) == 1:
             # assert ks[0] in dl, ('{} is not exist in {}'.format(ks[0], dl))
             if not ks[0] in dl:
-                print('A new filed ({}) detected!'.format(ks[0], dl))
+                print('A new field ({}) detected!'.format(ks[0], dl))
             dl[ks[0]] = str2num(v)
         else:
+            if ks[0] not in dl.keys():
+                dl[ks[0]] = {}
+                print("A new Series field ({}) detected!".format(ks[0], dl))
             override(dl[ks[0]], ks[1:], v)
 
 

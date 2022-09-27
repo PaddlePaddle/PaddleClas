@@ -13,13 +13,14 @@
 # limitations under the License.
 
 # Code was based on https://github.com/d-li14/involution
+# reference: https://arxiv.org/abs/2103.06255
 
 import paddle
 import paddle.nn as nn
 
 from paddle.vision.models import resnet
 
-from ppcls.utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
+from ....utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
 
 MODEL_URLS = {
     "RedNet26":

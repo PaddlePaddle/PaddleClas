@@ -12,6 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# This code is based on https://github.com/ecs-vlc/FMix
+# reference: https://arxiv.org/abs/2002.12047
+
 import math
 import random
 

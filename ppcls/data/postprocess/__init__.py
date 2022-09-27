@@ -14,9 +14,12 @@
 import copy
 import importlib
 
-from . import topk
+from . import topk, threshoutput
 
-from .topk import Topk, MultiLabelTopk
+from .topk import Topk
+from .threshoutput import ThreshOutput, MultiLabelThreshOutput
+from .attr_rec import VehicleAttribute, PersonAttribute, TableAttribute
+
 
 
 def build_postprocess(config):

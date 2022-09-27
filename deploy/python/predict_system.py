@@ -12,24 +12,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import os
-import sys
-
-__dir__ = os.path.dirname(os.path.abspath(__file__))
-sys.path.append(os.path.abspath(os.path.join(__dir__, '../')))
-
 import copy
-import cv2
+
 import numpy as np
+import cv2
 import faiss
 import pickle
 
-from python.predict_rec import RecPredictor
-from python.predict_det import DetPredictor
-
-from utils import logger
-from utils import config
-from utils.get_image_list import get_image_list
-from utils.draw_bbox import draw_bbox_results
+from paddleclas.deploy.utils import logger, config
+from paddleclas.deploy.utils.get_image_list import get_image_list
+from paddleclas.deploy.utils.draw_bbox import draw_bbox_results
+from paddleclas.deploy.python.predict_rec import RecPredictor
+from paddleclas.deploy.python.predict_det import DetPredictor
 
 
 class SystemPredictor(object):
@@ -37,7 +31,14 @@ class SystemPredictor(object):
 
         self.config = config
         self.rec_predictor = RecPredictor(config)
-        self.det_predictor = DetPredictor(config)
+
+        if not config["Global"]["det_inference_model_dir"]:
+            logger.info(
+                f"Found 'Global.det_inference_model_dir' empty({config['Global']['det_inference_model_dir']}), so det_predictor is disabled"
+            )
+            self.det_predictor = None
+        else:
+            self.det_predictor = DetPredictor(config)
 
         assert 'IndexProcess' in config.keys(), "Index config not found ... "
         self.return_k = self.config['IndexProcess']['return_k']
@@ -98,7 +99,10 @@ class SystemPredictor(object):
     def predict(self, img):
         output = []
         # st1: get all detection results
-        results = self.det_predictor.predict(img)
+        if self.det_predictor:
+            results = self.det_predictor.predict(img)
+        else:
+            results = []
 
         # st2: add the whole image for recognition to improve recall
         results = self.append_self(results, img.shape)

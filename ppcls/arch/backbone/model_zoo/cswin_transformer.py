@@ -13,6 +13,7 @@
 # limitations under the License.
 
 # Code was based on https://github.com/BR-IDL/PaddleViT/blob/develop/image_classification/CSwin/cswin.py
+# reference: https://arxiv.org/abs/2107.00652
 
 import copy
 import numpy as np
@@ -20,7 +21,7 @@ import paddle
 import paddle.nn as nn
 from .vision_transformer import trunc_normal_, zeros_, ones_, to_2tuple, DropPath, Identity
 
-from ppcls.utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
+from ....utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
 
 MODEL_URLS = {
     "CSWinTransformer_tiny_224":

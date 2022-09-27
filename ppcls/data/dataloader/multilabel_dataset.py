@@ -25,9 +25,10 @@ from .common_dataset import CommonDataset
 
 
 class MultiLabelDataset(CommonDataset):
-    def _load_anno(self):
+    def _load_anno(self, label_ratio=False):
         assert os.path.exists(self._cls_path)
         assert os.path.exists(self._img_root)
+        self.label_ratio = label_ratio
         self.images = []
         self.labels = []
         with open(self._cls_path) as fd:
@@ -41,6 +42,8 @@ class MultiLabelDataset(CommonDataset):
 
                 self.labels.append(labels)
                 assert os.path.exists(self.images[-1])
+        if self.label_ratio is not False:
+            return np.array(self.labels).mean(0).astype("float32")
 
     def __getitem__(self, idx):
         try:
@@ -50,7 +53,10 @@ class MultiLabelDataset(CommonDataset):
                 img = transform(img, self._transform_ops)
             img = img.transpose((2, 0, 1))
             label = np.array(self.labels[idx]).astype("float32")
-            return (img, label)
+            if self.label_ratio is not False:
+                return (img, np.array([label, self.label_ratio]))
+            else:
+                return (img, label)
 
         except Exception as ex:
             logger.error("Exception occured when parse line: {} with msg: {}".

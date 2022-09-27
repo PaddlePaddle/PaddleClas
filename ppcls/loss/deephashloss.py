@@ -20,6 +20,7 @@ class DSHSDLoss(nn.Layer):
     """
     # DSHSD(IEEE ACCESS 2019)
     # paper [Deep Supervised Hashing Based on Stable Distribution](https://ieeexplore.ieee.org/document/8648432/)
+    # code reference: https://github.com/swuxyj/DeepHash-pytorch/blob/master/DSHSD.py
     """
 
     def __init__(self, alpha, multi_label=False):
@@ -62,6 +63,7 @@ class DSHSDLoss(nn.Layer):
 class LCDSHLoss(nn.Layer):
     """
     # paper [Locality-Constrained Deep Supervised Hashing for Image Retrieval](https://www.ijcai.org/Proceedings/2017/0499.pdf)
+    # code reference: https://github.com/swuxyj/DeepHash-pytorch/blob/master/LCDSH.py
     """
 
     def __init__(self, n_class, _lambda):
@@ -100,6 +102,7 @@ class DCHLoss(paddle.nn.Layer):
     """
     # paper [Deep Cauchy Hashing for Hamming Space Retrieval]
     URL:(http://ise.thss.tsinghua.edu.cn/~mlong/doc/deep-cauchy-hashing-cvpr18.pdf)
+    # code reference: https://github.com/swuxyj/DeepHash-pytorch/blob/master/DCH.py
     """
 
     def __init__(self, gamma, _lambda, n_class):

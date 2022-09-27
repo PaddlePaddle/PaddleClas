@@ -13,12 +13,13 @@
 # limitations under the License.
 
 # Code was heavily based on https://github.com/facebookresearch/deit
+# reference: https://arxiv.org/abs/2012.12877
 
 import paddle
 import paddle.nn as nn
 from .vision_transformer import VisionTransformer, Identity, trunc_normal_, zeros_
 
-from ppcls.utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
+from ....utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
 
 MODEL_URLS = {
     "DeiT_tiny_patch16_224":

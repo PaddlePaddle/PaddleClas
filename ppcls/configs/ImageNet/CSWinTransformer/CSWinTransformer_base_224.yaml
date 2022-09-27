@@ -42,11 +42,12 @@ Optimizer:
   no_weight_decay_name: pos_embed cls_token .bias norm 
   one_dim_param_no_weight_decay: True
   lr:
+    # for 8 cards
     name: Cosine
-    learning_rate: 1.25e-4
-    eta_min: 1.25e-6
+    learning_rate: 2.5e-4
+    eta_min: 2.5e-6
     warmup_epoch: 20
-    warmup_start_lr: 1.25e-7
+    warmup_start_lr: 2.5e-7
 
 
 # data loader for train and eval

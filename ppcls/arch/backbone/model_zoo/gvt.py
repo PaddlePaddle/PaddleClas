@@ -13,6 +13,7 @@
 # limitations under the License.
 
 # Code was based on https://github.com/Meituan-AutoML/Twins
+# reference: https://arxiv.org/abs/2104.13840
 
 from functools import partial
 
@@ -24,7 +25,7 @@ from paddle.regularizer import L2Decay
 from .vision_transformer import trunc_normal_, normal_, zeros_, ones_, to_2tuple, DropPath, Identity, Mlp
 from .vision_transformer import Block as ViTBlock
 
-from ppcls.utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
+from ....utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
 
 MODEL_URLS = {
     "pcpvt_small":

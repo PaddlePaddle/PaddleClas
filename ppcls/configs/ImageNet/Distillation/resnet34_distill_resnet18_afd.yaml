@@ -88,10 +88,8 @@ Loss:
         s_shapes: *s_shapes
         t_shapes: *t_shapes
   Eval:
-    - DistillationGTCELoss:
+    - CELoss:
         weight: 1.0
-        model_names: ["Student"]
-        
 
 Optimizer:
   name: Momentum
@@ -186,8 +184,7 @@ Infer:
           order: ''
       - ToCHWImage:
   PostProcess:
-    name: DistillationPostProcess
-    func: Topk
+    name: Topk
     topk: 5
     class_id_map_file: "ppcls/utils/imagenet1k_label_list.txt"
 

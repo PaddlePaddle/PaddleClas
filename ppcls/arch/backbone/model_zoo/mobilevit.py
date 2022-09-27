@@ -14,6 +14,7 @@
 
 # Code was based on https://github.com/BR-IDL/PaddleViT/blob/develop/image_classification/MobileViT/mobilevit.py
 # and https://github.com/apple/ml-cvnets/blob/main/cvnets/models/classification/mobilevit.py
+# reference: https://arxiv.org/abs/2110.02178
 
 import paddle
 from paddle import ParamAttr
@@ -22,7 +23,7 @@ import paddle.nn.functional as F
 from paddle.nn.initializer import KaimingUniform, TruncatedNormal, Constant
 import math
 
-from ppcls.utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
+from ....utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
 
 MODEL_URLS = {
     "MobileViT_XXS":

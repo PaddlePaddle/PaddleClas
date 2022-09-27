@@ -1,5 +1,5 @@
 Global:
-  infer_imgs: "./images/ILSVRC2012_val_00000010.jpeg"
+  infer_imgs: "./images/ImageNet/ILSVRC2012_val_00000010.jpeg"
   inference_model_dir: "./models"
   batch_size: 1
   use_gpu: True
@@ -22,7 +22,7 @@ PreProcess:
         scale: 0.00392157
         mean: [0.485, 0.456, 0.406]
         std: [0.229, 0.224, 0.225]
-        order: ''
+        order: ""
         channel_num: 3
     - ToCHWImage:
 

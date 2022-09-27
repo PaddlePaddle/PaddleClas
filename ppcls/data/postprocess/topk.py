@@ -19,10 +19,11 @@ import paddle.nn.functional as F
 
 
 class Topk(object):
-    def __init__(self, topk=1, class_id_map_file=None):
+    def __init__(self, topk=1, class_id_map_file=None, delimiter=None):
         assert isinstance(topk, (int, ))
-        self.class_id_map = self.parse_class_id_map(class_id_map_file)
         self.topk = topk
+        self.delimiter = delimiter if delimiter is not None else " "
+        self.class_id_map = self.parse_class_id_map(class_id_map_file)
 
     def parse_class_id_map(self, class_id_map_file):
         if class_id_map_file is None:
@@ -38,26 +39,25 @@ class Topk(object):
             with open(class_id_map_file, "r") as fin:
                 lines = fin.readlines()
                 for line in lines:
-                    partition = line.split("\n")[0].partition(" ")
+                    partition = line.split("\n")[0].partition(self.delimiter)
                     class_id_map[int(partition[0])] = str(partition[-1])
         except Exception as ex:
             print(ex)
             class_id_map = None
         return class_id_map
 
-    def __call__(self, x, file_names=None, multilabel=False):
+    def __call__(self, x, file_names=None):
         if isinstance(x, dict):
             x = x['logits']
         assert isinstance(x, paddle.Tensor)
         if file_names is not None:
             assert x.shape[0] == len(file_names)
-        x = F.softmax(x, axis=-1) if not multilabel else F.sigmoid(x)
+        x = F.softmax(x, axis=-1)
         x = x.numpy()
         y = []
         for idx, probs in enumerate(x):
             index = probs.argsort(axis=0)[-self.topk:][::-1].astype(
-                "int32") if not multilabel else np.where(
-                    probs >= 0.5)[0].astype("int32")
+                "int32")
             clas_id_list = []
             score_list = []
             label_name_list = []
@@ -78,10 +78,3 @@ class Topk(object):
             y.append(result)
         return y
 
-
-class MultiLabelTopk(Topk):
-    def __init__(self, topk=1, class_id_map_file=None):
-        super().__init__()
-
-    def __call__(self, x, file_names=None):
-        return super().__call__(x, file_names, multilabel=True)

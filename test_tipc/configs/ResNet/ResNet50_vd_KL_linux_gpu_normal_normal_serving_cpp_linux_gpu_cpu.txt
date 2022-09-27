@@ -1,0 +1,14 @@
+===========================serving_params===========================
+model_name:ResNet50_vd_KL
+python:python3.7
+inference_model_url:https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/slim_model/ResNet50_vd_kl_quant_infer.tar
+trans_model:-m paddle_serving_client.convert
+--dirname:./deploy/paddleserving/ResNet50_vd_kl_quant_infer/
+--model_filename:inference.pdmodel
+--params_filename:inference.pdiparams
+--serving_server:./deploy/paddleserving/ResNet50_vd_kl_quant_serving/
+--serving_client:./deploy/paddleserving/ResNet50_vd_kl_quant_client/
+serving_dir:./deploy/paddleserving
+web_service:null
+--use_gpu:0|null
+pipline:test_cpp_serving_client.py

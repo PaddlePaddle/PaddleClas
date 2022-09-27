@@ -1,0 +1,14 @@
+===========================serving_params===========================
+model_name:PPLCNet_x1_0_PACT
+python:python3.7
+inference_model_url:https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/slim_model/PPLCNet_x1_0_pact_infer.tar
+trans_model:-m paddle_serving_client.convert
+--dirname:./deploy/paddleserving/PPLCNet_x1_0_pact_infer/
+--model_filename:inference.pdmodel
+--params_filename:inference.pdiparams
+--serving_server:./deploy/paddleserving/PPLCNet_x1_0_pact_serving/
+--serving_client:./deploy/paddleserving/PPLCNet_x1_0_pact_client/
+serving_dir:./deploy/paddleserving
+web_service:classification_web_service.py
+--use_gpu:0|null
+pipline:pipeline_http_client.py

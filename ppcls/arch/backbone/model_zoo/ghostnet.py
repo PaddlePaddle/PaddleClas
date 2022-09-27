@@ -13,6 +13,7 @@
 # limitations under the License.
 
 # Code was based on https://github.com/huawei-noah/CV-Backbones/tree/master/ghostnet_pytorch
+# reference: https://arxiv.org/abs/1911.11907
 
 import math
 import paddle
@@ -23,7 +24,7 @@ from paddle.nn import Conv2D, BatchNorm, AdaptiveAvgPool2D, Linear
 from paddle.regularizer import L2Decay
 from paddle.nn.initializer import Uniform, KaimingNormal
 
-from ppcls.utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
+from ....utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
 
 MODEL_URLS = {
     "GhostNet_x0_5":

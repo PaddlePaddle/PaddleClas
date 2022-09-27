@@ -12,20 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import os
-import sys
-
-__dir__ = os.path.dirname(os.path.abspath(__file__))
-sys.path.append(os.path.abspath(os.path.join(__dir__, '../')))
 
 import cv2
 import numpy as np
 
-from utils import logger
-from utils import config
-from utils.predictor import Predictor
-from utils.get_image_list import get_image_list
-from python.preprocess import create_operators
-from python.postprocess import build_postprocess
+from paddleclas.deploy.utils import logger, config
+from paddleclas.deploy.utils.predictor import Predictor
+from paddleclas.deploy.utils.get_image_list import get_image_list
+from paddleclas.deploy.python.preprocess import create_operators
+from paddleclas.deploy.python.postprocess import build_postprocess
 
 
 class ClsPredictor(Predictor):
@@ -49,10 +44,15 @@ class ClsPredictor(Predictor):
             pid = os.getpid()
             size = config["PreProcess"]["transform_ops"][1]["CropImage"][
                 "size"]
+            if config["Global"].get("use_int8", False):
+                precision = "int8"
+            elif config["Global"].get("use_fp16", False):
+                precision = "fp16"
+            else:
+                precision = "fp32"
             self.auto_logger = auto_log.AutoLogger(
                 model_name=config["Global"].get("model_name", "cls"),
-                model_precision='fp16'
-                if config["Global"]["use_fp16"] else 'fp32',
+                model_precision=precision,
                 batch_size=config["Global"].get("batch_size", 1),
                 data_shape=[3, size, size],
                 save_path=config["Global"].get("save_log_path",
@@ -133,13 +133,21 @@ def main(config):
                 continue
             batch_results = cls_predictor.predict(batch_imgs)
             for number, result_dict in enumerate(batch_results):
-                filename = batch_names[number]
-                clas_ids = result_dict["class_ids"]
-                scores_str = "[{}]".format(", ".join("{:.2f}".format(
-                    r) for r in result_dict["scores"]))
-                label_names = result_dict["label_names"]
-                print("{}:\tclass id(s): {}, score(s): {}, label_name(s): {}".
-                      format(filename, clas_ids, scores_str, label_names))
+                if "PersonAttribute" in config[
+                        "PostProcess"] or "VehicleAttribute" in config[
+                            "PostProcess"] or "TableAttribute" in config[
+                                "PostProcess"]:
+                    filename = batch_names[number]
+                    print("{}:\t {}".format(filename, result_dict))
+                else:
+                    filename = batch_names[number]
+                    clas_ids = result_dict["class_ids"]
+                    scores_str = "[{}]".format(", ".join("{:.2f}".format(
+                        r) for r in result_dict["scores"]))
+                    label_names = result_dict["label_names"]
+                    print(
+                        "{}:\tclass id(s): {}, score(s): {}, label_name(s): {}".
+                        format(filename, clas_ids, scores_str, label_names))
             batch_imgs = []
             batch_names = []
     if cls_predictor.benchmark:

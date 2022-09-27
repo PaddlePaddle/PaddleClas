@@ -13,13 +13,14 @@
 # limitations under the License.
 
 # Code was heavily based on https://github.com/rwightman/pytorch-image-models
+# reference: https://arxiv.org/abs/1911.11929
 
 import paddle
 import paddle.nn as nn
 import paddle.nn.functional as F
 from paddle import ParamAttr
 
-from ppcls.utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
+from ....utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
 
 MODEL_URLS = {
     "CSPDarkNet53":

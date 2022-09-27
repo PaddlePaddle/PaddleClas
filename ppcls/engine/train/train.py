@@ -21,7 +21,6 @@ from ppcls.utils import profiler
 
 def train_epoch(engine, epoch_id, print_batch_step):
     tic = time.time()
-    v_current = [int(i) for i in paddle.__version__.split(".")]
     for iter_id, batch in enumerate(engine.train_dataloader):
         if iter_id >= engine.max_iter:
             break
@@ -54,16 +53,33 @@ def train_epoch(engine, epoch_id, print_batch_step):
             out = forward(engine, batch)
             loss_dict = engine.train_loss_func(out, batch[1])
 
-        # step opt and lr
+        # loss
+        loss = loss_dict["loss"] / engine.update_freq
+
+        # backward & step opt
         if engine.amp:
-            scaled = engine.scaler.scale(loss_dict["loss"])
+            scaled = engine.scaler.scale(loss)
             scaled.backward()
-            engine.scaler.minimize(engine.optimizer, scaled)
+            if (iter_id + 1) % engine.update_freq == 0:
+                for i in range(len(engine.optimizer)):
+                    engine.scaler.minimize(engine.optimizer[i], scaled)
         else:
-            loss_dict["loss"].backward()
-            engine.optimizer.step()
-        engine.optimizer.clear_grad()
-        engine.lr_sch.step()
+            loss.backward()
+            if (iter_id + 1) % engine.update_freq == 0:
+                for i in range(len(engine.optimizer)):
+                    engine.optimizer[i].step()
+
+        if (iter_id + 1) % engine.update_freq == 0:
+            # clear grad
+            for i in range(len(engine.optimizer)):
+                engine.optimizer[i].clear_grad()
+            # step lr(by step)
+            for i in range(len(engine.lr_sch)):
+                if not getattr(engine.lr_sch[i], "by_epoch", False):
+                    engine.lr_sch[i].step()
+            # update ema
+            if engine.ema:
+                engine.model_ema.update(engine.model)
 
         # below code just for logging
         # update metric_for_logger
@@ -74,6 +90,11 @@ def train_epoch(engine, epoch_id, print_batch_step):
         if iter_id % print_batch_step == 0:
             log_info(engine, batch_size, epoch_id, iter_id)
         tic = time.time()
+
+    # step lr(by epoch)
+    for i in range(len(engine.lr_sch)):
+        if getattr(engine.lr_sch[i], "by_epoch", False):
+            engine.lr_sch[i].step()
 
 
 def forward(engine, batch):

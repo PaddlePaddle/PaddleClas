@@ -1,0 +1,20 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <group>
+        <item
+            android:id="@+id/reset"
+            android:icon="@drawable/reset"
+            android:title="初始化检索库"
+            app:showAsAction="always"/>
+        <item
+            android:id="@+id/help"
+            android:icon="@drawable/shuoming"
+            android:title="settings"
+            app:showAsAction="ifRoom"/>
+        <item
+            android:id="@+id/settings"
+            android:icon="@drawable/shezhi"
+            android:title="reset"
+            app:showAsAction="always"/>
+    </group>
+</menu>

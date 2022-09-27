@@ -7,5 +7,7 @@ wget -nc https://paddle-imagenet-models-name.bj.bcebos.com/data/ImageNet1k/ILSVR
 tar xf ILSVRC2012_val.tar
 ln -s ILSVRC2012_val ILSVRC2012
 cd ILSVRC2012
-ln -s val_list.txt  train_list.txt
+for ((i=1; i<=4; i++));do
+  cat val_list.txt >> train_list.txt
+done
 cd ../../

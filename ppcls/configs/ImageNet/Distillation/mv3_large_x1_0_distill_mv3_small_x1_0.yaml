@@ -49,9 +49,8 @@ Loss:
         model_name_pairs:
         - ["Student", "Teacher"]
   Eval:
-    - DistillationGTCELoss:
+    - CELoss:
         weight: 1.0
-        model_names: ["Student"]
         
 
 Optimizer:
@@ -141,8 +140,7 @@ Infer:
           order: ''
       - ToCHWImage:
   PostProcess:
-    name: DistillationPostProcess
-    func: Topk
+    name: Topk
     topk: 5
     class_id_map_file: "ppcls/utils/imagenet1k_label_list.txt"
 

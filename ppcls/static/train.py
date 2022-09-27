@@ -87,7 +87,7 @@ def main(args):
             'FLAGS_max_inplace_grad_add': 8,
         }
         os.environ['FLAGS_cudnn_batchnorm_spatial_persistent'] = '1'
-        paddle.fluid.set_flags(AMP_RELATED_FLAGS_SETTING)
+        paddle.set_flags(AMP_RELATED_FLAGS_SETTING)
 
     use_xpu = global_config.get("use_xpu", False)
     use_npu = global_config.get("use_npu", False)
@@ -162,12 +162,21 @@ def main(args):
     init_model(global_config, train_prog, exe)
 
     if 'AMP' in config:
+        if config["AMP"].get("level", "O1").upper() == "O2":
+            use_fp16_test = True
+            msg = "Only support FP16 evaluation when AMP O2 is enabled."
+            logger.warning(msg)
+        elif "use_fp16_test" in config["AMP"]:
+            use_fp16_test = config["AMP"].get["use_fp16_test"]
+        else:
+            use_fp16_test = False
+
         optimizer.amp_init(
             device,
             scope=paddle.static.global_scope(),
             test_program=eval_prog
             if global_config["eval_during_train"] else None,
-            use_fp16_test=config["AMP"].get("use_fp16_test", False))
+            use_fp16_test=use_fp16_test)
 
     if not global_config.get("is_distributed", True):
         compiled_train_prog = program.compile(

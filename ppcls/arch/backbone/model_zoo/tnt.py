@@ -13,6 +13,7 @@
 # limitations under the License.
 
 # Code was based on https://github.com/huawei-noah/CV-Backbones/tree/master/tnt_pytorch
+# reference: https://arxiv.org/abs/2103.00112
 
 import math
 import numpy as np
@@ -22,8 +23,8 @@ import paddle.nn as nn
 
 from paddle.nn.initializer import TruncatedNormal, Constant
 
-from ppcls.arch.backbone.base.theseus_layer import Identity
-from ppcls.utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
+from ..base.theseus_layer import Identity
+from ....utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
 
 MODEL_URLS = {
     "TNT_small":
