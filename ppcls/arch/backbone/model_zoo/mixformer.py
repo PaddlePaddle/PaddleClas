@@ -27,13 +27,11 @@ from ppcls.utils.save_load import (
 
 # TODO: update the urls of the pre-trained models
 MODEL_URLS = {
-    "mixformer-B0": "",
-    "mixformer-B1": "",
-    "mixformer-B2": "",
-    "mixformer-B3": "",
-    "mixformer-B4": "",
-    "mixformer-B5": "",
-    "mixformer-B6": "",
+    "mixformer-B1": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/MixFormer_B1_pretrained.pdparams",
+    "mixformer-B2": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/MixFormer_B2_pretrained.pdparams",
+    "mixformer-B3": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/MixFormer_B3_pretrained.pdparams",
+    "mixformer-B4": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/MixFormer_B4_pretrained.pdparams",
+    "mixformer-B6": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/MixFormer_B6_pretrained.pdparams",
 }
 
 __all__ = list(MODEL_URLS.keys())
