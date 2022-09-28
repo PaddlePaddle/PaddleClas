@@ -255,8 +255,9 @@ class PPLCNetV2(TheseusLayer):
                  class_num=1000,
                  dropout_prob=0,
                  use_last_conv=True,
-                 class_expand=1280):
-        super().__init__()
+                 class_expand=1280,
+                 **kwargs):
+        super().__init__(**kwargs)
         self.scale = scale
         self.use_last_conv = use_last_conv
         self.class_expand = class_expand
