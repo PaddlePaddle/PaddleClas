@@ -26,7 +26,7 @@ Arch:
   infer_add_softmax: False
   Backbone:
     name: ResNet50_adaptivemaxpool
-    pretrained: /root/.paddleclas/weights/resnet50-19c8e357_torch2paddle
+    pretrained: https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/others/resnet50-19c8e357_torch2paddle.pdparams
     stem_act: null
   BackboneStopLayer:
     name: flatten
@@ -98,8 +98,8 @@ DataLoader:
         - RandomResizedCrop:
             scale: [0.2, 1]
             size: 224
-        - RandFlipImage:
-            flip_code: 1
+        - RandomHorizontalFlip:
+            prob: 0.5
         - ToTensor:
         - Normalize:
             mean: [0.485, 0.456, 0.406]
@@ -110,7 +110,7 @@ DataLoader:
       num_instances: 4
       drop_last: False
       shuffle: True
-      max_iters: *max_iters
+      max_iters: 35001
     loader:
       num_workers: 8
       use_shared_memory: True
@@ -136,7 +136,7 @@ DataLoader:
         drop_last: False
         shuffle: False
       loader:
-        num_workers: 4
+        num_workers: 8
         use_shared_memory: True
 
 Metric:

@@ -228,17 +228,16 @@ def train_iter(engine, epoch_id, print_batch_step, save_interval, best_metric, e
                     writer=engine.vdl_writer)
 
             # save model
-            if iter_id > 0:
-                if iter_id % save_interval == 0:
-                    save_load.save_model(
-                        engine.model,
-                        engine.optimizer,
-                        {"metric": acc, "iter": iter_id},
-                        engine.output_dir,
-                        ema=ema_module,
-                        model_name=engine.config["Arch"]["name"],
-                        prefix="iter_{}".format(iter_id),
-                        loss=engine.train_loss_func)
+            if iter_id > 0 and iter_id % save_interval == 0:
+                save_load.save_model(
+                    engine.model,
+                    engine.optimizer,
+                    {"metric": acc, "iter": iter_id},
+                    engine.output_dir,
+                    ema=ema_module,
+                    model_name=engine.config["Arch"]["name"],
+                    prefix="iter_{}".format(iter_id),
+                    loss=engine.train_loss_func)
 
         if engine.vdl_writer is not None:
             engine.vdl_writer.close()

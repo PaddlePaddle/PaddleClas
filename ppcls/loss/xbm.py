@@ -32,7 +32,8 @@ class CrossBatchMemory(object):
 
     @property
     def is_full(self) -> bool:
-        return self.cur_size >= self.size
+        # return self.cur_size >= self.size
+        return self.targets[-1].item() != 0
 
     def get(self) -> Tuple[paddle.Tensor, paddle.Tensor]:
         """return features and targets in memory bank
