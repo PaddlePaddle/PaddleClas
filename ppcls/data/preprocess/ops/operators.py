@@ -767,6 +767,7 @@ class Pad(object):
             return img
 
 
+# TODO(gaotingquan): integrate into RandomRotation
 class RandomRot90(object):
     """RandomRot90
     """
