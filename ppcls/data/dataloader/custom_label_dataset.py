@@ -1,4 +1,4 @@
-#   Copyright (c) 2021 PaddlePaddle Authors. All Rights Reserved.
+#   Copyright (c) 2022 PaddlePaddle Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -44,7 +44,7 @@ class CustomLabelDataset(CommonDataset):
         super().__init__(image_root, sample_list_path, transform_ops)
         if self._transform_ops is None and label_key is not None:
             label_key = None
-            msg = ""
+            msg = "Unable to get label by label_key when transform_ops is None. The label_key has been set to None."
             logger.warning(msg)
         self.label_key = label_key
 
