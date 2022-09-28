@@ -22,6 +22,8 @@ import random
 
 import numpy as np
 
+from .operators import format_data
+
 
 class Pixels(object):
     def __init__(self, mode="const", mean=[0., 0., 0.]):
@@ -70,11 +72,10 @@ class RandomErasing(object):
         self.attempt = attempt
         self.get_pixels = Pixels(mode, mean)
 
-    def __call__(self, ori_data):
+    @format_data
+    def __call__(self, img):
         if random.random() > self.EPSILON:
-            return ori_data
-
-        img = ori_data["img"] if isinstance(ori_data, dict) else ori_data
+            return img
 
         for _ in range(self.attempt):
             if isinstance(img, np.ndarray):
@@ -107,16 +108,6 @@ class RandomErasing(object):
                         img[0, x1:x1 + h, y1:y1 + w] = pixels[0]
                     else:
                         img[x1:x1 + h, y1:y1 + w, 0] = pixels[:, :, 0]
-                processed_data = {
-                    **
-                    ori_data,
-                    "img": img
-                } if isinstance(ori_data, dict) else img
-                return processed_data
+                return img
 
-        processed_data = {
-            **
-            ori_data,
-            "img": img
-        } if isinstance(ori_data, dict) else img
-        return processed_data
+        return img
