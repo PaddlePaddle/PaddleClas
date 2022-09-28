@@ -34,6 +34,23 @@ from .functional import augmentations
 from ppcls.utils import logger
 
 
+def format_data(func):
+    def warpper(self, data):
+        if isinstance(data, dict):
+            img = data["img"]
+            result = func(self, img)
+            if not isinstance(result, dict):
+                result = {"img": result}
+            return { ** data, ** result}
+        else:
+            result = func(self, data)
+            if isinstance(result, dict):
+                result = result["img"]
+            return result
+
+    return warpper
+
+
 class UnifiedResize(object):
     def __init__(self, interpolation=None, backend="cv2", return_numpy=True):
         _cv2_interp_from_str = {
@@ -161,8 +178,8 @@ class DecodeImage(object):
                 f"\"to_rgb\" and \"channel_first\" are only enabled when to_np is True. \"to_np\" is now {to_np}."
             )
 
-    def __call__(self, ori_data):
-        img = ori_data["img"] if isinstance(ori_data, dict) else ori_data
+    @format_data
+    def __call__(self, img):
         if isinstance(img, Image.Image):
             assert self.backend == "pil", "invalid input 'img' in DecodeImage"
         elif isinstance(img, np.ndarray):
@@ -189,12 +206,7 @@ class DecodeImage(object):
 
             if self.channel_first:
                 img = img.transpose((2, 0, 1))
-        processed_data = {
-            **
-            ori_data,
-            "img": img
-        } if isinstance(ori_data, dict) else img
-        return processed_data
+        return img
 
 
 class ResizeImage(object):
@@ -421,8 +433,8 @@ class RandCropImage(object):
         self._resize_func = UnifiedResize(
             interpolation=interpolation, backend=backend)
 
-    def __call__(self, ori_data):
-        img = ori_data["img"] if isinstance(ori_data, dict) else ori_data
+    @format_data
+    def __call__(self, img):
         size = self.size
         scale = self.scale
         ratio = self.ratio
@@ -447,12 +459,7 @@ class RandCropImage(object):
         j = random.randint(0, img_h - h)
 
         img = self._resize_func(img[j:j + h, i:i + w, :], size)
-        processed_data = {
-            **
-            ori_data,
-            "img": img
-        } if isinstance(ori_data, dict) else img
-        return processed_data
+        return img
 
 
 class RandCropImageV2(object):
@@ -557,8 +564,8 @@ class NormalizeImage(object):
         self.mean = np.array(mean).reshape(shape).astype('float32')
         self.std = np.array(std).reshape(shape).astype('float32')
 
-    def __call__(self, ori_data):
-        img = ori_data["img"] if isinstance(ori_data, dict) else ori_data
+    @format_data
+    def __call__(self, img):
         from PIL import Image
         if isinstance(img, Image.Image):
             img = np.array(img)
@@ -580,12 +587,7 @@ class NormalizeImage(object):
                        (img, pad_zeros), axis=2))
 
         img = img.astype(self.output_dtype)
-        processed_data = {
-            **
-            ori_data,
-            "img": img
-        } if isinstance(ori_data, dict) else img
-        return processed_data
+        return img
 
 
 class ToCHWImage(object):
@@ -772,15 +774,9 @@ class RandomRot90(object):
     def __init__(self):
         pass
 
-    def __call__(self, ori_data):
-        img = ori_data["img"] if isinstance(ori_data, dict) else ori_data
+    @format_data
+    def __call__(self, img):
         orientation = random.choice([0, 1, 2, 3])
         if orientation:
             img = np.rot90(img, orientation)
-        processed_data = {
-            **
-            ori_data,
-            "img": img,
-            "random_rot90_orientation": orientation
-        } if isinstance(ori_data, dict) else img
-        return processed_data
+        return {"img": img, "random_rot90_orientation": orientation}
