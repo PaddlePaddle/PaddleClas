@@ -7,7 +7,7 @@ Global:
   save_interval: 10
   eval_during_train: True
   eval_interval: 10
-  epochs: 20
+  epochs: 60
   print_batch_step: 10
   use_visualdl: False
   # used for static mode and model export
@@ -20,6 +20,7 @@ Arch:
   pretrained: True
   use_ssld: True
   class_num: 4
+  use_last_conv: False
 
 # loss function config for traing/eval process
 Loss:
@@ -37,7 +38,7 @@ Optimizer:
   momentum: 0.9
   lr:
     name: Cosine
-    learning_rate: 0.56
+    learning_rate: 0.14
     warmup_epoch: 5
   regularizer:
     name: 'L2'
@@ -79,11 +80,11 @@ DataLoader:
         - RandomRot90:
     sampler:
       name: DistributedBatchSampler
-      batch_size: 512
+      batch_size: 256
       drop_last: False
       shuffle: True
     loader:
-      num_workers: 16
+      num_workers: 12
       use_shared_memory: True
 
   Eval:
