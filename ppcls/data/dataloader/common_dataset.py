@@ -83,4 +83,4 @@ class CommonDataset(Dataset):
 
     @property
     def class_num(self):
-        return len(set(self.images))
+        return len(set(self.labels))
