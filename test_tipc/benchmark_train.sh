@@ -208,8 +208,8 @@ for batch_size in ${batch_size_list[*]}; do
                     for ((i=1; i <=$copy_num; i++));do
                         cat val_list.txt >> train_list.txt
                     done
-		else
-		    ln -s val_list.txt train_list.txt
+                else
+                    ln -s val_list.txt train_list.txt
                 fi
                 cd ../../
             fi
