@@ -28,11 +28,13 @@ class Identity(nn.Layer):
 
 class TheseusLayer(nn.Layer):
     def __init__(self, *args, **kwargs):
-        super(TheseusLayer, self).__init__()
+        super().__init__()
         self.res_dict = {}
         self.res_name = self.full_name()
         self.pruner = None
         self.quanter = None
+
+        self.init_net(*args, **kwargs)
 
     def _return_dict_hook(self, layer, input, output):
         res_dict = {"logits": output}
@@ -43,36 +45,45 @@ class TheseusLayer(nn.Layer):
         return res_dict
 
     def init_net(self,
-                 stages_pattern,
+                 stages_pattern=None,
                  return_patterns=None,
                  return_stages=None,
-                 stop_grad_pattern=None):
-        if return_patterns and return_stages:
-            msg = f"The 'return_patterns' would be ignored when 'return_stages' is set."
-            logger.warning(msg)
-            return_stages = None
-
-        if return_stages is True:
-            return_patterns = stages_pattern
-        # return_stages is int or bool
-        if type(return_stages) is int:
-            return_stages = [return_stages]
-        if isinstance(return_stages, list):
-            if max(return_stages) > len(stages_pattern) or min(
-                    return_stages) < 0:
-                msg = f"The 'return_stages' set error. Illegal value(s) have been ignored. The stages' pattern list is {stages_pattern}."
+                 freeze_befor=None,
+                 stop_after=None):
+        # init the output of net
+        if return_patterns or return_stages:
+            if return_patterns and return_stages:
+                msg = f"The 'return_patterns' would be ignored when 'return_stages' is set."
                 logger.warning(msg)
-                return_stages = [
-                    val for val in return_stages
-                    if val >= 0 and val < len(stages_pattern)
-                ]
-            return_patterns = [stages_pattern[i] for i in return_stages]
+                return_stages = None
 
-        if return_patterns:
-            self.update_res(return_patterns)
+            if return_stages is True:
+                return_patterns = stages_pattern
 
-        if stop_grad_pattern is not None:
-            self.freeze_befor(stop_grad_pattern)
+            # return_stages is int or bool
+            if type(return_stages) is int:
+                return_stages = [return_stages]
+            if isinstance(return_stages, list):
+                if max(return_stages) > len(stages_pattern) or min(
+                        return_stages) < 0:
+                    msg = f"The 'return_stages' set error. Illegal value(s) have been ignored. The stages' pattern list is {stages_pattern}."
+                    logger.warning(msg)
+                    return_stages = [
+                        val for val in return_stages
+                        if val >= 0 and val < len(stages_pattern)
+                    ]
+                return_patterns = [stages_pattern[i] for i in return_stages]
+
+            if return_patterns:
+                self.update_res(return_patterns)
+
+        # freeze subnet
+        if freeze_befor is not None:
+            self.freeze_befor(freeze_befor)
+
+        # set subnet to Identity
+        if stop_after is not None:
+            self.stop_after(stop_after)
 
     def init_res(self,
                  stages_pattern,
