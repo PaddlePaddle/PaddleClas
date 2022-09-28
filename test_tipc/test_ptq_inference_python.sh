@@ -166,8 +166,8 @@ if [ ${kl_quant_cmd_value} != "null" ] && [ ${kl_quant_cmd_value} != "False" ]; 
     last_status=${PIPESTATUS[0]}
     status_check $last_status "${command}" "${status_log}" "${model_name}" "${_kl_log}"
     cd ${infer_model_dir_list}/quant_post_static_model
-    ln -s __model__ inference.pdmodel
-    ln -s __params__ inference.pdiparams
+    ln -s model.pdmodel inference.pdmodel
+    ln -s model.pdiparams inference.pdiparams
     cd ../../deploy
     is_quant=True
     func_inference "${python}" "${inference_py}" "../${infer_model_dir_list}/quant_post_static_model" "${LOG_PATH}" "${infer_img_dir}" ${is_quant}
