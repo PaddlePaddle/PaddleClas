@@ -14,20 +14,18 @@
 
 from __future__ import print_function
 
+import glob
+import os.path as osp
+import re
+
 import numpy as np
 import paddle
 from paddle.io import Dataset
-import os
-import cv2
-
-from ppcls.data import preprocess
+from PIL import Image
 from ppcls.data.preprocess import transform
 from ppcls.utils import logger
+
 from .common_dataset import create_operators
-import os.path as osp
-import glob
-import re
-from PIL import Image
 
 
 class Market1501(Dataset):
@@ -50,8 +48,8 @@ class Market1501(Dataset):
                  backend="cv2"):
         self._img_root = image_root
         self._cls_path = cls_label_path  # the sub folder in the dataset
-        # self._dataset_dir = osp.join(image_root,
-        #                              self._cls_path)
+        self._dataset_dir = osp.join(image_root, self._dataset_dir,
+                                     self._cls_path)
         self._check_before_run()
         if transform_ops:
             self._transform_ops = create_operators(transform_ops)
@@ -61,71 +59,38 @@ class Market1501(Dataset):
 
     def _check_before_run(self):
         """Check if the file is available before going deeper"""
-        # if not osp.exists(self._dataset_dir):
-        #     raise RuntimeError("'{}' is not available".format(
-        #         self._dataset_dir))
+        if not osp.exists(self._dataset_dir):
+            raise RuntimeError("'{}' is not available".format(
+                self._dataset_dir))
 
-    def _load_anno(self, seed=None, relabel=False):
-        assert os.path.exists(
-            self._cls_path), f"path {self._cls_path} does not exist."
-        assert os.path.exists(
-            self._img_root), f"path {self._img_root} does not exist."
+    def _load_anno(self, relabel=False):
+        img_paths = glob.glob(osp.join(self._dataset_dir, '*.jpg'))
+        pattern = re.compile(r'([-\d]+)_c(\d)')
+
         self.images = []
         self.labels = []
         self.cameras = []
-        with open(self._cls_path) as fd:
-            lines = fd.readlines()
-            if relabel:
-                label_set = set()
-                for line in lines:
-                    line = line.strip().split()
-                    label_set.add(np.int64(line[1]))
-                label_map = {
-                    oldlabel: newlabel
-                    for newlabel, oldlabel in enumerate(label_set)
-                }
+        pid_container = set()
 
-            if seed is not None:
-                np.random.RandomState(seed).shuffle(lines)
-            for line in lines:
-                line = line.strip().split()
-                self.images.append(os.path.join(self._img_root, line[0]))
-                if relabel:
-                    self.labels.append(label_map[np.int64(line[1])])
-                else:
-                    self.labels.append(np.int64(line[1]))
-                self.cameras.append(np.int64(line[2]))
-                assert os.path.exists(self.images[
-                    -1]), f"path {self.images[-1]} does not exist."
+        for img_path in sorted(img_paths):
+            pid, _ = map(int, pattern.search(img_path).groups())
+            if pid == -1: continue  # junk images are just ignored
+            pid_container.add(pid)
+        pid2label = {pid: label for label, pid in enumerate(pid_container)}
 
-    # def _load_anno(self, relabel=False):
-    #     img_paths = glob.glob(osp.join(self._dataset_dir, '*.jpg'))
-    #     pattern = re.compile(r'([-\d]+)_c(\d)')
+        for img_path in sorted(img_paths):
+            pid, camid = map(int, pattern.search(img_path).groups())
+            if pid == -1: continue  # junk images are just ignored
+            assert 0 <= pid <= 1501  # pid == 0 means background
+            assert 1 <= camid <= 6
+            camid -= 1  # index starts from 0
+            if relabel: pid = pid2label[pid]
+            self.images.append(img_path)
+            self.labels.append(pid)
+            self.cameras.append(camid)
 
-    #     self.images = []
-    #     self.labels = []
-    #     self.cameras = []
-    #     pid_container = set()
-
-    #     for img_path in sorted(img_paths):
-    #         pid, _ = map(int, pattern.search(img_path).groups())
-    #         if pid == -1: continue  # junk images are just ignored
-    #         pid_container.add(pid)
-    #     pid2label = {pid: label for label, pid in enumerate(pid_container)}
-
-    #     for img_path in sorted(img_paths):
-    #         pid, camid = map(int, pattern.search(img_path).groups())
-    #         if pid == -1: continue  # junk images are just ignored
-    #         assert 0 <= pid <= 1501  # pid == 0 means background
-    #         assert 1 <= camid <= 6
-    #         camid -= 1  # index starts from 0
-    #         if relabel: pid = pid2label[pid]
-    #         self.images.append(img_path)
-    #         self.labels.append(pid)
-    #         self.cameras.append(camid)
-
-    #     self.num_pids, self.num_imgs, self.num_cams = get_imagedata_info(
-    #         self.images, self.labels, self.cameras, subfolder=self._cls_path)
+        self.num_pids, self.num_imgs, self.num_cams = get_imagedata_info(
+            self.images, self.labels, self.cameras, subfolder=self._cls_path)
 
     def __getitem__(self, idx):
         try:

@@ -14,7 +14,7 @@ from .common_dataset import create_operators
 
 
 class GoodsDataset(Dataset):
-    """Dataset for Good, such as SOP, Inshop...
+    """Dataset for Goods, such as SOP, Inshop...
 
     Args:
         image_root (str): image root

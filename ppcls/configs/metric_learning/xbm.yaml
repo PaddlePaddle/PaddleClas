@@ -25,7 +25,7 @@ Arch:
   infer_output_key: features
   infer_add_softmax: False
   Backbone:
-    name: ResNet50_adaptivemaxpool
+    name: ResNet50_adaptive_max_pool2d
     pretrained: https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/others/resnet50-19c8e357_torch2paddle.pdparams
     stem_act: null
   BackboneStopLayer:

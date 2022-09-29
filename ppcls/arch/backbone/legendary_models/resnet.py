@@ -20,10 +20,9 @@ import numpy as np
 import paddle
 from paddle import ParamAttr
 import paddle.nn as nn
-from paddle.nn import Conv2D, BatchNorm, Linear, BatchNorm2D
-from paddle.nn import AdaptiveAvgPool2D, MaxPool2D, AvgPool2D, AdaptiveMaxPool2D
+from paddle.nn import Conv2D, BatchNorm, Linear
+from paddle.nn import AdaptiveAvgPool2D, MaxPool2D, AvgPool2D
 from paddle.nn.initializer import Uniform
-from paddle.regularizer import L2Decay
 import math
 
 from ....utils import logger
@@ -328,7 +327,7 @@ class ResNet(TheseusLayer):
                    [32, 32, 3, 1], [32, 64, 3, 1]]
         }
 
-        self.stem = nn.Sequential(* [
+        self.stem = nn.Sequential(*[
             ConvBNLayer(
                 num_channels=in_c,
                 num_filters=out_c,
@@ -387,7 +386,6 @@ class ResNet(TheseusLayer):
             x = self.max_pool(x)
             x = self.blocks(x)
             x = self.avg_pool(x)
-            # print(f"stem output: {x.mean().item():.10f}")
             x = self.flatten(x)
             x = self.fc(x)
         return x

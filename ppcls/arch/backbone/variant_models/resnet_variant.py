@@ -1,7 +1,7 @@
 from paddle import nn
 from ..legendary_models.resnet import ResNet50, MODEL_URLS, _load_pretrained
 
-__all__ = ["ResNet50_last_stage_stride1", "ResNet50_adaptivemaxpool"]
+__all__ = ["ResNet50_last_stage_stride1", "ResNet50_adaptive_max_pool2d"]
 
 
 def ResNet50_last_stage_stride1(pretrained=False, use_ssld=False, **kwargs):
@@ -23,7 +23,7 @@ def ResNet50_last_stage_stride1(pretrained=False, use_ssld=False, **kwargs):
     return model
 
 
-def ResNet50_adaptivemaxpool(pretrained=False, use_ssld=False, **kwargs):
+def ResNet50_adaptive_max_pool2d(pretrained=False, use_ssld=False, **kwargs):
     def replace_function(pool, pattern):
         new_pool = nn.AdaptiveMaxPool2D(output_size=1)
         return new_pool
