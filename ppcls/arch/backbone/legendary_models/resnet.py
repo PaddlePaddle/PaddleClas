@@ -20,9 +20,10 @@ import numpy as np
 import paddle
 from paddle import ParamAttr
 import paddle.nn as nn
-from paddle.nn import Conv2D, BatchNorm, Linear
+from paddle.nn import Conv2D, BatchNorm, Linear, BatchNorm2D
 from paddle.nn import AdaptiveAvgPool2D, MaxPool2D, AvgPool2D
 from paddle.nn.initializer import Uniform
+from paddle.regularizer import L2Decay
 import math
 
 from ....utils import logger
