@@ -53,9 +53,11 @@ DataLoader:
         - DecodeImage:
             to_rgb: True
             channel_first: False
+            backend: pil
         - RandCropImage:
             size: 224
             interpolation: bilinear
+            use_log_aspect: True
             backend: pil
         - RandFlipImage:
             flip_code: 1
@@ -83,6 +85,7 @@ DataLoader:
         - DecodeImage:
             to_rgb: True
             channel_first: False
+            backend: pil
         - ResizeImage:
             resize_short: 256
             interpolation: bilinear
@@ -110,6 +113,7 @@ Infer:
     - DecodeImage:
         to_rgb: True
         channel_first: False
+        backend: pil
     - ResizeImage:
         resize_short: 256
         interpolation: bilinear

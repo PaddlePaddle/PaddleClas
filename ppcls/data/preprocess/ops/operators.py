@@ -425,6 +425,7 @@ class RandCropImage(object):
                  scale=None,
                  ratio=None,
                  interpolation=None,
+                 use_log_aspect=False,
                  backend="cv2"):
         if type(size) is int:
             self.size = (size, size)  # (h, w)
@@ -433,6 +434,7 @@ class RandCropImage(object):
 
         self.scale = [0.08, 1.0] if scale is None else scale
         self.ratio = [3. / 4., 4. / 3.] if ratio is None else ratio
+        self.use_log_aspect = use_log_aspect
 
         self._resize_func = UnifiedResize(
             interpolation=interpolation, backend=backend)
@@ -443,21 +445,21 @@ class RandCropImage(object):
         scale = self.scale
         ratio = self.ratio
 
-        aspect_ratio = math.sqrt(random.uniform(*ratio))
-        w = 1. * aspect_ratio
-        h = 1. / aspect_ratio
+        if self.use_log_aspect:
+            log_ratio = list(map(math.log, ratio))
+            aspect_ratio = math.exp(random.uniform(*log_ratio))
+        else:
+            aspect_ratio = random.uniform(*ratio)
 
         img_h, img_w = img.shape[:2]
-
-        bound = min((float(img_w) / img_h) / (w**2),
-                    (float(img_h) / img_w) / (h**2))
+        bound = min((float(img_w) / img_h) / aspect_ratio,
+                    (float(img_h) / img_w) * aspect_ratio)
         scale_max = min(scale[1], bound)
         scale_min = min(scale[0], bound)
 
         target_area = img_w * img_h * random.uniform(scale_min, scale_max)
-        target_size = math.sqrt(target_area)
-        w = int(target_size * w)
-        h = int(target_size * h)
+        w = int(math.sqrt(target_area * aspect_ratio))
+        h = int(math.sqrt(target_area / aspect_ratio))
 
         i = random.randint(0, img_w - w)
         j = random.randint(0, img_h - h)
