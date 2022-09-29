@@ -192,8 +192,6 @@ def cal_feature(engine, name='gallery'):
                 paddle.sum(paddle.square(batch_feas), axis=1, keepdim=True))
             batch_feas = paddle.divide(batch_feas, feas_norm)
 
-        # print(f"{batch[0].mean().item():.10f} {batch_feas.shape} {batch_feas.mean().item():.10f}")
-        # exit(0)
         # do binarize
         if engine.config["Global"].get("feature_binarize") == "round":
             batch_feas = paddle.round(batch_feas).astype("float32") * 2.0 - 1.0
