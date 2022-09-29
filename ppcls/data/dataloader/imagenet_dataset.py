@@ -16,7 +16,7 @@ from __future__ import print_function
 
 import numpy as np
 import os
-
+from ppcls.utils import logger
 from .common_dataset import CommonDataset
 
 
@@ -72,3 +72,5 @@ class ImageNetDataset(CommonDataset):
                     self.labels.append(np.int64(line[1]))
                 assert os.path.exists(self.images[
                     -1]), f"path {self.images[-1]} does not exist."
+        if self.relabel:
+            logger.info(f"#images = {len(self.images)},  #labels = {len(label_set)}")

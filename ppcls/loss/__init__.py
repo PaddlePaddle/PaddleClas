@@ -14,7 +14,7 @@ from .msmloss import MSMLoss
 from .npairsloss import NpairsLoss
 from .trihardloss import TriHardLoss
 from .triplet import TripletLoss, TripletLossV2
-from .tripletangularmarginloss import TripletAngularMarginLoss
+from .tripletangularmarginloss import TripletAngularMarginLoss, TripletAngularMarginLoss_XBM
 from .supconloss import SupConLoss
 from .pairwisecosface import PairwiseCosface
 from .dmlloss import DMLLoss
