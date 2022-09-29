@@ -43,7 +43,7 @@ Arch:
   Head:
     name: "FC"
     embedding_size: *feat_dim
-    class_num: 751
+    class_num: &class_num 751
     weight_attr:
       initializer:
         name: Normal
@@ -61,23 +61,34 @@ Loss:
         margin: 0.3
         normalize_feature: False
         feature_from: "backbone"
+    - CenterLoss:
+        weight: 0.0005
+        num_classes: *class_num
+        feat_dim: *feat_dim
+        feature_from: "backbone"
   Eval:
     - CELoss:
         weight: 1.0
 
 Optimizer:
-  name: Adam
-  lr:
-    name: Piecewise
-    decay_epochs: [30, 60]
-    values: [0.00035, 0.000035, 0.0000035]
-    warmup_epoch: 10
-    warmup_start_lr: 0.0000035
-    by_epoch: True
-    last_epoch: 0
-  regularizer:
-    name: "L2"
-    coeff: 0.0005
+  - Adam:
+      scope: RecModel
+      lr:
+        name: Piecewise
+        decay_epochs: [30, 60]
+        values: [0.00035, 0.000035, 0.0000035]
+        warmup_epoch: 10
+        warmup_start_lr: 0.0000035
+        by_epoch: True
+        last_epoch: 0
+      regularizer:
+        name: "L2"
+        coeff: 0.0005
+  - SGD:
+      scope: CenterLoss
+      lr:
+        name: ConstLR
+        learning_rate: 1000.0 # NOTE: set to ori_lr*(1/centerloss_weight) to avoid manually scaling centers' gradidents.
 
 # data loader for train and eval
 DataLoader:

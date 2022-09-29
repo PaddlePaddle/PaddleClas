@@ -22,17 +22,28 @@ import paddle
 
 
 class CrossBatchMemory(object):
-    def __init__(self, size: int, feat_dim: int):
+    """
+    CrossBatchMemory Implementation. refer to "Cross-Batch Memory for Embedding Learning".
+
+    code heavily based on https://github.com/msight-tech/research-xbm/blob/master/ret_benchmark/modeling/xbm.py
+
+    Args:
+        size (int): Size of memory bank
+        embedding_size (int): number of embedding dimension for memory bank
+    """
+
+    def __init__(self, size: int, embedding_size: int):
         self.size = size
-        self.feat_dim = feat_dim
-        self.feats = paddle.zeros([self.size, self.feat_dim])
+        self.embedding_size = embedding_size
+        self.feats = paddle.zeros([self.size, self.embedding_size])
         self.targets = paddle.zeros([self.size, ], dtype="int64")
         self.ptr = 0
-        self.cur_size = 0
+        # self.accumulated_size = 0
 
     @property
-    def is_full(self) -> bool:
-        return self.cur_size >= self.size
+    def _is_full(self) -> bool:
+        # return self.accumulated_size >= self.size
+        return self.targets[-1].item() != 0  # author's usage
 
     def get(self) -> Tuple[paddle.Tensor, paddle.Tensor]:
         """return features and targets in memory bank
@@ -40,12 +51,13 @@ class CrossBatchMemory(object):
         Returns:
             Tuple[paddle.Tensor, paddle.Tensor]: [features, targets]
         """
-        if self.is_full:
+        if self._is_full:
             return self.feats, self.targets
         else:
             return self.feats[:self.ptr], self.targets[:self.ptr]
 
-    def enqueue_dequeue(self, feats: paddle.Tensor, targets: paddle.Tensor) -> None:
+    def enqueue_dequeue(self, feats: paddle.Tensor,
+                        targets: paddle.Tensor) -> None:
         """put newest feats and targets into memory bank and pop oldest feats and targets from momory bank
 
         Args:
@@ -58,7 +70,7 @@ class CrossBatchMemory(object):
             self.targets[-input_size:] = targets
             self.ptr = 0
         else:
-            self.feats[self.ptr: self.ptr + input_size] = feats
-            self.targets[self.ptr: self.ptr + input_size] = targets
+            self.feats[self.ptr:self.ptr + input_size] = feats
+            self.targets[self.ptr:self.ptr + input_size] = targets
             self.ptr += input_size
-        self.cur_size += input_size
+        # self.accumulated_size += input_size

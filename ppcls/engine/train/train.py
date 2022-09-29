@@ -101,20 +101,32 @@ def train_epoch(engine, epoch_id, print_batch_step):
             engine.lr_sch[i].step()
 
 
-def train_iter(engine, epoch_id, print_batch_step, save_interval, best_metric, ema_module, best_metric_ema=None):
+def train_iter(engine, epoch_id, print_batch_step, best_metric):
     """
     train by iteration, epoch_id is fixed to 1
     """
+    assert epoch_id == 1, f"epoch_id({epoch_id}) must equal to 1 in train_iter function"
     tic = time.time()
 
-    for iter_id, batch in enumerate(engine.train_dataloader):
+    save_interval = engine.config["Global"]["save_interval"]
+    ema_module = None
+    if engine.ema:
+        best_metric_ema = 0.0
+        ema_module = engine.model_ema.module
+
+    for iter_id, batch in range(
+            best_metric.get("iters", -1) + 1, engine.iters):
         if iter_id >= engine.max_iter:
             break
+
+        batch = next(engine.train_dataloader)  # fetch data from dataloader
+
         profiler.add_profiler_step(engine.config["profiler_options"])
         if iter_id == 5:
             for key in engine.time_info:
                 engine.time_info[key].reset()
         engine.time_info["reader_cost"].update(time.time() - tic)
+
         if engine.use_dali:
             batch = [
                 paddle.to_tensor(batch[0]["data"]),
@@ -171,8 +183,10 @@ def train_iter(engine, epoch_id, print_batch_step, save_interval, best_metric, e
                 engine.model_ema.update(engine.model)
 
         start_eval_iter = engine.config["Global"].get("start_eval_iter", 0) - 1
-        if engine.config["Global"]["eval_during_train"] and iter_id % engine.config["Global"]["eval_interval"] == 0 and iter_id > start_eval_iter:
-            acc = engine.eval(iter_id)
+        if engine.config["Global"][
+                "eval_during_train"] and iter_id % engine.config["Global"][
+                    "eval_interval"] == 0 and iter_id > start_eval_iter:
+            acc = engine.eval(epoch_id)
             if acc > best_metric["metric"]:
                 best_metric["metric"] = acc
                 best_metric["iter"] = iter_id
@@ -194,6 +208,7 @@ def train_iter(engine, epoch_id, print_batch_step, save_interval, best_metric, e
                 step=iter_id,
                 writer=engine.vdl_writer)
 
+            # step lr by metric, such as `ReduceOnPlateau`
             for i in range(len(engine.lr_sch)):
                 if not getattr(engine.lr_sch[i], "by_epoch", False):
                     argspec = inspect.getargspec(engine.lr_sch[i].step).args
@@ -204,7 +219,7 @@ def train_iter(engine, epoch_id, print_batch_step, save_interval, best_metric, e
 
             if engine.ema:
                 ori_model, engine.model = engine.model, ema_module
-                acc_ema = engine.eval(iter_id)
+                acc_ema = engine.eval(epoch_id)
                 engine.model = ori_model
                 ema_module.eval()
 
@@ -213,7 +228,8 @@ def train_iter(engine, epoch_id, print_batch_step, save_interval, best_metric, e
                     save_load.save_model(
                         engine.model,
                         engine.optimizer,
-                        {"metric": acc_ema, "iter": iter_id},
+                        {"metric": acc_ema,
+                         "iter": iter_id},
                         engine.output_dir,
                         ema=ema_module,
                         model_name=engine.config["Arch"]["name"],
@@ -228,21 +244,19 @@ def train_iter(engine, epoch_id, print_batch_step, save_interval, best_metric, e
                     writer=engine.vdl_writer)
 
             # save model
-            if iter_id > 0:
-                if iter_id % save_interval == 0:
-                    save_load.save_model(
-                        engine.model,
-                        engine.optimizer,
-                        {"metric": acc, "iter": iter_id},
-                        engine.output_dir,
-                        ema=ema_module,
-                        model_name=engine.config["Arch"]["name"],
-                        prefix="iter_{}".format(iter_id),
-                        loss=engine.train_loss_func)
+            if iter_id > 0 and iter_id % save_interval == 0:
+                save_load.save_model(
+                    engine.model,
+                    engine.optimizer, {"metric": acc,
+                                       "iter": iter_id},
+                    engine.output_dir,
+                    ema=ema_module,
+                    model_name=engine.config["Arch"]["name"],
+                    prefix="iter_{}".format(iter_id),
+                    loss=engine.train_loss_func)
 
         if engine.vdl_writer is not None:
             engine.vdl_writer.close()
-
 
         # below code just for logging
         # update metric_for_logger

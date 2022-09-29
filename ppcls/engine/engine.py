@@ -80,8 +80,8 @@ class Engine(object):
             "classification", "retrieval", "adaface"
         ], logger.error("Invalid eval mode: {}".format(self.eval_mode))
         self.train_epoch_func = train_epoch
-        if self.config['Global'].get('iters', None):
-            self.train_iter_func = train_iter
+        if self.config['Global'].get('iters', None) is not None:
+            self.train_epoch_func = train_iter
 
         self.eval_func = getattr(evaluation, self.eval_mode + "_eval")
 
@@ -352,100 +352,103 @@ class Engine(object):
         ) == "Windows" else len(self.train_dataloader)
         self.max_iter = self.max_iter // self.update_freq * self.update_freq
 
-        if hasattr(self, 'train_iter_func'):
-            self.train_iter_func(self, 1, print_batch_step, save_interval, best_metric, ema_module, best_metric_ema if self.ema else None)
-        else:
-            for epoch_id in range(best_metric["epoch"] + 1,
-                                self.config["Global"]["epochs"] + 1):
-                acc = 0.0
+        for epoch_id in range(best_metric["epoch"] + 1,
+                              self.config["Global"]["epochs"] + 1):
+            acc = 0.0
+
+            if self.config['Global'].get('iters', None) is not None:
+                # train by iteration
+                self.train_epoch_func(self, epoch_id, print_batch_step,
+                                      best_metric)
+            else:
                 # for one epoch train
                 self.train_epoch_func(self, epoch_id, print_batch_step)
 
-                if self.use_dali:
-                    self.train_dataloader.reset()
-                metric_msg = ", ".join(
-                    [self.output_info[key].avg_info for key in self.output_info])
-                logger.info("[Train][Epoch {}/{}][Avg]{}".format(
-                    epoch_id, self.config["Global"]["epochs"], metric_msg))
-                self.output_info.clear()
+            if self.use_dali:
+                self.train_dataloader.reset()
+            metric_msg = ", ".join(
+                [self.output_info[key].avg_info for key in self.output_info])
+            logger.info("[Train][Epoch {}/{}][Avg]{}".format(
+                epoch_id, self.config["Global"]["epochs"], metric_msg))
+            self.output_info.clear()
 
-                # eval model and save model if possible
-                start_eval_epoch = self.config["Global"].get("start_eval_epoch",
-                                                            0) - 1
-                if self.config["Global"][
-                        "eval_during_train"] and epoch_id % self.config["Global"][
-                            "eval_interval"] == 0 and epoch_id > start_eval_epoch:
-                    acc = self.eval(epoch_id)
-                    if acc > best_metric["metric"]:
-                        best_metric["metric"] = acc
-                        best_metric["epoch"] = epoch_id
-                        save_load.save_model(
-                            self.model,
-                            self.optimizer,
-                            best_metric,
-                            self.output_dir,
-                            ema=ema_module,
-                            model_name=self.config["Arch"]["name"],
-                            prefix="best_model",
-                            loss=self.train_loss_func,
-                            save_student_model=True)
-                    logger.info("[Eval][Epoch {}][best metric: {}]".format(
-                        epoch_id, best_metric["metric"]))
-                    logger.scaler(
-                        name="eval_acc",
-                        value=acc,
-                        step=epoch_id,
-                        writer=self.vdl_writer)
-
-                    self.model.train()
-
-                    if self.ema:
-                        ori_model, self.model = self.model, ema_module
-                        acc_ema = self.eval(epoch_id)
-                        self.model = ori_model
-                        ema_module.eval()
-
-                        if acc_ema > best_metric_ema:
-                            best_metric_ema = acc_ema
-                            save_load.save_model(
-                                self.model,
-                                self.optimizer,
-                                {"metric": acc_ema,
-                                "epoch": epoch_id},
-                                self.output_dir,
-                                ema=ema_module,
-                                model_name=self.config["Arch"]["name"],
-                                prefix="best_model_ema",
-                                loss=self.train_loss_func)
-                        logger.info("[Eval][Epoch {}][best metric ema: {}]".format(
-                            epoch_id, best_metric_ema))
-                        logger.scaler(
-                            name="eval_acc_ema",
-                            value=acc_ema,
-                            step=epoch_id,
-                            writer=self.vdl_writer)
-
-                # save model
-                if epoch_id % save_interval == 0:
+            # eval model and save model if possible
+            start_eval_epoch = self.config["Global"].get("start_eval_epoch",
+                                                         0) - 1
+            if self.config["Global"][
+                    "eval_during_train"] and epoch_id % self.config["Global"][
+                        "eval_interval"] == 0 and epoch_id > start_eval_epoch:
+                acc = self.eval(epoch_id)
+                if acc > best_metric["metric"]:
+                    best_metric["metric"] = acc
+                    best_metric["epoch"] = epoch_id
                     save_load.save_model(
                         self.model,
-                        self.optimizer, {"metric": acc,
-                                        "epoch": epoch_id},
+                        self.optimizer,
+                        best_metric,
                         self.output_dir,
                         ema=ema_module,
                         model_name=self.config["Arch"]["name"],
-                        prefix="epoch_{}".format(epoch_id),
-                        loss=self.train_loss_func)
-                # save the latest model
+                        prefix="best_model",
+                        loss=self.train_loss_func,
+                        save_student_model=True)
+                logger.info("[Eval][Epoch {}][best metric: {}]".format(
+                    epoch_id, best_metric["metric"]))
+                logger.scaler(
+                    name="eval_acc",
+                    value=acc,
+                    step=epoch_id,
+                    writer=self.vdl_writer)
+
+                self.model.train()
+
+                if self.ema:
+                    ori_model, self.model = self.model, ema_module
+                    acc_ema = self.eval(epoch_id)
+                    self.model = ori_model
+                    ema_module.eval()
+
+                    if acc_ema > best_metric_ema:
+                        best_metric_ema = acc_ema
+                        save_load.save_model(
+                            self.model,
+                            self.optimizer,
+                            {"metric": acc_ema,
+                             "epoch": epoch_id},
+                            self.output_dir,
+                            ema=ema_module,
+                            model_name=self.config["Arch"]["name"],
+                            prefix="best_model_ema",
+                            loss=self.train_loss_func)
+                    logger.info("[Eval][Epoch {}][best metric ema: {}]".format(
+                        epoch_id, best_metric_ema))
+                    logger.scaler(
+                        name="eval_acc_ema",
+                        value=acc_ema,
+                        step=epoch_id,
+                        writer=self.vdl_writer)
+
+            # save model
+            if epoch_id % save_interval == 0:
                 save_load.save_model(
                     self.model,
                     self.optimizer, {"metric": acc,
-                                    "epoch": epoch_id},
+                                     "epoch": epoch_id},
                     self.output_dir,
                     ema=ema_module,
                     model_name=self.config["Arch"]["name"],
-                    prefix="latest",
+                    prefix="epoch_{}".format(epoch_id),
                     loss=self.train_loss_func)
+            # save the latest model
+            save_load.save_model(
+                self.model,
+                self.optimizer, {"metric": acc,
+                                 "epoch": epoch_id},
+                self.output_dir,
+                ema=ema_module,
+                model_name=self.config["Arch"]["name"],
+                prefix="latest",
+                loss=self.train_loss_func)
 
         if self.vdl_writer is not None:
             self.vdl_writer.close()

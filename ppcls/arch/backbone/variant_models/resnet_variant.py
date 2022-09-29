@@ -22,11 +22,10 @@ def ResNet50_last_stage_stride1(pretrained=False, use_ssld=False, **kwargs):
     _load_pretrained(pretrained, model, MODEL_URLS["ResNet50"], use_ssld)
     return model
 
+
 def ResNet50_adaptivemaxpool(pretrained=False, use_ssld=False, **kwargs):
     def replace_function(pool, pattern):
         new_pool = nn.AdaptiveMaxPool2D(output_size=1)
-        print(pool)
-        print(new_pool)
         return new_pool
 
     pattern = ["avg_pool"]

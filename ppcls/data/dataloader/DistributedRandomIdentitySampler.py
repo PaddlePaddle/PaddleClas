@@ -20,7 +20,7 @@ import random
 from collections import defaultdict
 
 import numpy as np
-from paddle.io import DistributedBatchSampler, Sampler
+from paddle.io import DistributedBatchSampler
 
 
 class DistributedRandomIdentitySampler(DistributedBatchSampler):
@@ -31,20 +31,28 @@ class DistributedRandomIdentitySampler(DistributedBatchSampler):
         batch_size (int): batch size
         num_instances (int): number of instance(s) within an class
         drop_last (bool): whether to discard the data at the end
+        max_iter (int): max iteration. Default to None.
     """
-    def __init__(self, dataset, batch_size, num_instances, drop_last, **args):
+
+    def __init__(self,
+                 dataset,
+                 batch_size,
+                 num_instances,
+                 drop_last,
+                 max_iter=None,
+                 **args):
         assert batch_size % num_instances == 0, \
             f"batch_size({batch_size}) must be divisible by num_instances({num_instances}) when using DistributedRandomIdentitySampler"
         self.dataset = dataset
         self.batch_size = batch_size
         self.num_instances = num_instances
         self.drop_last = drop_last
+        self.max_iter = max_iter
         self.num_pids_per_batch = self.batch_size // self.num_instances
         self.index_dic = defaultdict(list)
         for index, pid in enumerate(self.dataset.labels):
             self.index_dic[pid].append(index)
         self.pids = list(self.index_dic.keys())
-        self.max_iters = args.get("max_iters", None)
         # estimate number of examples in an epoch
         self.length = 0
         for pid in self.pids:
@@ -54,84 +62,43 @@ class DistributedRandomIdentitySampler(DistributedBatchSampler):
                 num = self.num_instances
             self.length += num - num % self.num_instances
 
-    # def __iter__(self):
-    #     batch_idxs_dict = defaultdict(list)
-    #     for pid in self.pids:
-    #         idxs = copy.deepcopy(self.index_dic[pid])
-    #         if len(idxs) < self.num_instances:
-    #             idxs = np.random.choice(
-    #                 idxs, size=self.num_instances, replace=True)
-    #         random.shuffle(idxs)
-    #         batch_idxs = []
-    #         for idx in idxs:
-    #             batch_idxs.append(idx)
-    #             if len(batch_idxs) == self.num_instances:
-    #                 batch_idxs_dict[pid].append(batch_idxs)
-    #                 batch_idxs = []
-    #     avai_pids = copy.deepcopy(self.pids)
-    #     final_idxs = []
-    #     while len(avai_pids) >= self.num_pids_per_batch:
-    #         selected_pids = random.sample(avai_pids, self.num_pids_per_batch)
-    #         for pid in selected_pids:
-    #             batch_idxs = batch_idxs_dict[pid].pop(0)
-    #             final_idxs.extend(batch_idxs)
-    #             if len(batch_idxs_dict[pid]) == 0:
-    #                 avai_pids.remove(pid)
-    #     _sample_iter = iter(final_idxs)
-    #     batch_indices = []
-    #     for idx in _sample_iter:
-    #         batch_indices.append(idx)
-    #         if len(batch_indices) == self.batch_size:
-    #             yield batch_indices
-    #             batch_indices = []
-    #     if not self.drop_last and len(batch_indices) > 0:
-    #         yield batch_indices
-    def _prepare_batch(self):
-        batch_idxs_dict = defaultdict(list)
-        count = list()
-
-        for label in self.pids:
-            idxs = copy.deepcopy(self.index_dic[label])
-            if len(idxs) % self.num_instances != 0:
-                idxs.extend(
-                    np.random.choice(
-                        idxs, size=self.num_instances - len(idxs) % self.num_instances, replace=True
-                    )
-                )
-            random.shuffle(idxs)
-            batch_idxs_dict[label] = [
-                idxs[i * self.num_instances: (i + 1) * self.num_instances] for i in range(len(idxs) // self.num_instances)
-            ]
-            count.append(len(batch_idxs_dict[label]))
-        count = np.array(count)
-        avai_labels = copy.deepcopy(self.pids)
-        return batch_idxs_dict, avai_labels, count
-
     def __iter__(self):
-        batch_idxs_dict, avai_labels, count = self._prepare_batch()
-        for _ in range(self.max_iters):
-            batch = []
-            if len(avai_labels) < self.num_pids_per_batch:
-                batch_idxs_dict, avai_labels, count = self._prepare_batch()
-
-            selected_labels = np.random.choice(
-                avai_labels, self.num_pids_per_batch, False, count / count.sum()
-            )
-            for label in selected_labels:
-                batch_idxs = batch_idxs_dict[label].pop(0)
-                batch.extend(batch_idxs)
-                label_idx = avai_labels.index(label)
-                if len(batch_idxs_dict[label]) == 0:
-                    avai_labels.pop(label_idx)
-                    count = np.delete(count, label_idx)
-                else:
-                    count[label_idx] = len(batch_idxs_dict[label])
-            yield batch
+        batch_idxs_dict = defaultdict(list)
+        for pid in self.pids:
+            idxs = copy.deepcopy(self.index_dic[pid])
+            if len(idxs) < self.num_instances:
+                idxs = np.random.choice(
+                    idxs, size=self.num_instances, replace=True)
+            random.shuffle(idxs)
+            batch_idxs = []
+            for idx in idxs:
+                batch_idxs.append(idx)
+                if len(batch_idxs) == self.num_instances:
+                    batch_idxs_dict[pid].append(batch_idxs)
+                    batch_idxs = []
+        avai_pids = copy.deepcopy(self.pids)
+        final_idxs = []
+        while len(avai_pids) >= self.num_pids_per_batch:
+            selected_pids = random.sample(avai_pids, self.num_pids_per_batch)
+            for pid in selected_pids:
+                batch_idxs = batch_idxs_dict[pid].pop(0)
+                final_idxs.extend(batch_idxs)
+                if len(batch_idxs_dict[pid]) == 0:
+                    avai_pids.remove(pid)
+        _sample_iter = iter(final_idxs)
+        batch_indices = []
+        for idx in _sample_iter:
+            batch_indices.append(idx)
+            if len(batch_indices) == self.batch_size:
+                yield batch_indices
+                batch_indices = []
+        if not self.drop_last and len(batch_indices) > 0:
+            yield batch_indices
 
     def __len__(self):
-        if self.max_iters is not None:
-            return self.max_iters
-        if self.drop_last:
+        if self.max_iter is not None:
+            return self.max_iter
+        elif self.drop_last:
             return self.length // self.batch_size
         else:
             return (self.length + self.batch_size - 1) // self.batch_size

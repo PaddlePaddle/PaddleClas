@@ -16,7 +16,7 @@ Global:
   retrieval_feature_from: features # 'backbone' or 'features'
   re_ranking: False
   # used for static mode and model export
-  image_shape: [3, 256, 128]
+  image_shape: [3, 224, 224]
   save_inference_dir: ./inference
 
 # model architecture
@@ -26,7 +26,7 @@ Arch:
   infer_add_softmax: False
   Backbone:
     name: ResNet50_adaptivemaxpool
-    pretrained: /root/.paddleclas/weights/resnet50-19c8e357_torch2paddle
+    pretrained: https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/others/resnet50-19c8e357_torch2paddle.pdparams
     stem_act: null
   BackboneStopLayer:
     name: flatten
@@ -50,19 +50,19 @@ Loss:
   Train:
     - ContrastiveLoss_XBM:
         weight: 1.0
-        margin: 0.5
-        feat_dim: *feat_dim
-        normalize_feature: True
-        epsilon: 1.0e-5
-        feature_from: features
-        start_iter: 1000
         xbm_size: 55000
         xbm_weight: 1.0
+        start_iter: 1000
+        margin: 0.5
+        embedding_size: *feat_dim
+        epsilon: 1.0e-5
+        normalize_feature: True
+        feature_from: features
   Eval:
     - ContrastiveLoss:
         weight: 1.0
         margin: 0.5
-        feat_dim: *feat_dim
+        embedding_size: *feat_dim
         normalize_feature: True
         epsilon: 1.0e-5
         feature_from: features
@@ -88,9 +88,9 @@ Optimizer:
 DataLoader:
   Train:
     dataset:
-      name: Market1501
-      image_root: /workspace/hesensen/XBM_reprod/SOP
-      cls_label_path: /workspace/hesensen/XBM_reprod/SOP/train_list.txt
+      name: GoodsDataset
+      image_root: ./dataset/SOP
+      cls_label_path: ./dataset/SOP/train_list.txt
       backend: pil
       transform_ops:
         - Resize:
@@ -98,8 +98,8 @@ DataLoader:
         - RandomResizedCrop:
             scale: [0.2, 1]
             size: 224
-        - RandFlipImage:
-            flip_code: 1
+        - RandomHorizontalFlip:
+            prob: 0.5
         - ToTensor:
         - Normalize:
             mean: [0.485, 0.456, 0.406]
@@ -115,11 +115,11 @@ DataLoader:
       num_workers: 8
       use_shared_memory: True
   Eval:
-    Query:
+    Gallery:
       dataset:
-        name: Market1501
-        image_root: /workspace/hesensen/XBM_reprod/SOP
-        cls_label_path: /workspace/hesensen/XBM_reprod/SOP/test_list.txt
+        name: GoodsDataset
+        image_root: ./dataset/SOP
+        cls_label_path: ./dataset/SOP/test_list.txt
         backend: pil
         transform_ops:
           - Resize:
@@ -136,7 +136,31 @@ DataLoader:
         drop_last: False
         shuffle: False
       loader:
-        num_workers: 4
+        num_workers: 8
+        use_shared_memory: True
+
+    Query:
+      dataset:
+        name: GoodsDataset
+        image_root: ./dataset/SOP
+        cls_label_path: ./dataset/SOP/test_list.txt
+        backend: pil
+        transform_ops:
+          - Resize:
+              size: 256
+          - CenterCrop:
+              size: 224
+          - ToTensor:
+          - Normalize:
+              mean: [0.485, 0.456, 0.406]
+              std: [0.229, 0.224, 0.225]
+      sampler:
+        name: DistributedBatchSampler
+        batch_size: 256
+        drop_last: False
+        shuffle: False
+      loader:
+        num_workers: 8
         use_shared_memory: True
 
 Metric:

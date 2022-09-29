@@ -28,23 +28,27 @@ class ContrastiveLoss(nn.Layer):
 
     Args:
         margin (float): margin
-        feat_dim (int): feature dim
-        feature_from (str, optional): key which features fetched from output dict. Defaults to "features".
+        embedding_size (int): number of embedding's dimension
+        normalize_feature (bool, optional): whether to normalize embedding. Defaults to True.
+        epsilon (float, optional): epsilon. Defaults to 1e-5.
+        feature_from (str, optional): which key embedding from input dict. Defaults to "features".
     """
 
     def __init__(self,
                  margin: float,
-                 feat_dim: int,
+                 embedding_size: int,
                  normalize_feature=True,
-                 epsilon: float = 1e-5,
-                 feature_from: str = "features"):
+                 epsilon: float=1e-5,
+                 feature_from: str="features"):
         super(ContrastiveLoss, self).__init__()
         self.margin = margin
-        self.feat_dim = feat_dim
+        self.embedding_size = embedding_size
+        self.normalize_feature = normalize_feature
         self.epsilon = epsilon
         self.feature_from = feature_from
 
-    def __call__(self, input: Dict[str, paddle.Tensor], target: paddle.Tensor) -> Dict[str, paddle.Tensor]:
+    def forward(self, input: Dict[str, paddle.Tensor],
+                target: paddle.Tensor) -> Dict[str, paddle.Tensor]:
         feats = input[self.feature_from]
         labels = target
 
@@ -61,64 +65,69 @@ class ContrastiveLoss(nn.Layer):
         return {'ContrastiveLoss': loss}
 
     def _compute_loss(self,
-                      inputs_q: paddle.Tensor, targets_q: paddle.Tensor,
-                      inputs_k: paddle.Tensor, targets_k: paddle.Tensor) -> paddle.Tensor:
+                      inputs_q: paddle.Tensor,
+                      targets_q: paddle.Tensor,
+                      inputs_k: paddle.Tensor,
+                      targets_k: paddle.Tensor) -> paddle.Tensor:
         batch_size = inputs_q.shape[0]
         # Compute similarity matrix
         sim_mat = paddle.matmul(inputs_q, inputs_k.t())
+
         loss = []
-
-        # neg_count = []
         for i in range(batch_size):
-            pos_pair_ = paddle.masked_select(sim_mat[i], targets_q[i] == targets_k)
-            pos_pair_ = paddle.masked_select(pos_pair_, pos_pair_ < 1 - self.epsilon)
+            pos_pair_ = paddle.masked_select(sim_mat[i],
+                                             targets_q[i] == targets_k)
+            pos_pair_ = paddle.masked_select(pos_pair_,
+                                             pos_pair_ < 1 - self.epsilon)
 
-            neg_pair_ = paddle.masked_select(sim_mat[i], targets_q[i] != targets_k)
+            neg_pair_ = paddle.masked_select(sim_mat[i],
+                                             targets_q[i] != targets_k)
             neg_pair = paddle.masked_select(neg_pair_, neg_pair_ > self.margin)
 
             pos_loss = paddle.sum(-pos_pair_ + 1)
 
             if len(neg_pair) > 0:
                 neg_loss = paddle.sum(neg_pair)
-                # neg_count.append(len(neg_pair))
             else:
                 neg_loss = 0
             loss.append(pos_loss + neg_loss)
 
-        loss = sum(loss) / batch_size  # / all_targets.shape[1]
+        loss = sum(loss) / batch_size
         return loss
 
 
-class ContrastiveLoss_XBM(nn.Layer):
-    """ContrastiveLoss_XBM
+class ContrastiveLoss_XBM(ContrastiveLoss):
+    """ContrastiveLoss with CrossBatchMemory
 
     Args:
+        xbm_size (int): size of memory bank
+        xbm_weight (int): weight of CrossBatchMemory's loss
+        start_iter (int): store embeddings after start_iter
         margin (float): margin
-        feat_dim (int): feature dim
-        feature_from (str, optional): key which features fetched from output dict. Defaults to "features".
+        embedding_size (int): number of embedding's dimension
+        epsilon (float, optional): epsilon. Defaults to 1e-5.
+        normalize_feature (bool, optional): whether to normalize embedding. Defaults to True.
+        feature_from (str, optional): which key embedding from input dict. Defaults to "features".
     """
 
     def __init__(self,
-                 margin: float,
-                 feat_dim: int,
-                 start_iter: int,
                  xbm_size: int,
                  xbm_weight: int,
+                 start_iter: int,
+                 margin: float,
+                 embedding_size: int,
+                 epsilon: float=1e-5,
                  normalize_feature=True,
-                 epsilon: float = 1e-5,
-                 feature_from: str = "features"):
-        super(ContrastiveLoss_XBM, self).__init__()
-        self.margin = margin
-        self.feat_dim = feat_dim
-        self.start_iter = start_iter
-        self.epsilon = epsilon
-        self.feature_from = feature_from
-        self.normalize_feature = normalize_feature
-        self.iter = 0
-        self.xbm = CrossBatchMemory(xbm_size, feat_dim)
+                 feature_from: str="features"):
+        super(ContrastiveLoss_XBM, self).__init__(
+            margin, embedding_size, normalize_feature, epsilon, feature_from)
+        self.xbm = CrossBatchMemory(xbm_size, embedding_size)
         self.xbm_weight = xbm_weight
+        self.start_iter = start_iter
+        self.iter = 0
 
-    def __call__(self, input: Dict[str, paddle.Tensor], target: paddle.Tensor) -> Dict[str, paddle.Tensor]:
+    def __call__(self, input: Dict[str, paddle.Tensor],
+                 target: paddle.Tensor) -> Dict[str, paddle.Tensor]:
         feats = input[self.feature_from]
         labels = target
 
@@ -132,9 +141,7 @@ class ContrastiveLoss_XBM(nn.Layer):
 
         loss = self._compute_loss(feats, labels, feats, labels)
 
-        # for XBM loss
-        # if not hasattr(self, 'model'):
-        #     raise ValueError("model should assign to ContrastiveLoss_XBM")
+        # compute contrastive loss from memory bank
         self.iter += 1
         if self.iter > self.start_iter:
             self.xbm.enqueue_dequeue(feats.detach(), labels.detach())
@@ -143,31 +150,3 @@ class ContrastiveLoss_XBM(nn.Layer):
             loss = loss + self.xbm_weight * xbm_loss
 
         return {'ContrastiveLoss_XBM': loss}
-
-    def _compute_loss(self,
-                      inputs_q: paddle.Tensor, targets_q: paddle.Tensor,
-                      inputs_k: paddle.Tensor, targets_k: paddle.Tensor) -> paddle.Tensor:
-        batch_size = inputs_q.shape[0]
-        # Compute similarity matrix
-        sim_mat = paddle.matmul(inputs_q, inputs_k.t())
-        loss = []
-
-        # neg_count = []
-        for i in range(batch_size):
-            pos_pair_ = paddle.masked_select(sim_mat[i], targets_q[i] == targets_k)
-            pos_pair_ = paddle.masked_select(pos_pair_, pos_pair_ < 1 - self.epsilon)
-
-            neg_pair_ = paddle.masked_select(sim_mat[i], targets_q[i] != targets_k)
-            neg_pair = paddle.masked_select(neg_pair_, neg_pair_ > self.margin)
-
-            pos_loss = paddle.sum(-pos_pair_ + 1)
-
-            if len(neg_pair) > 0:
-                neg_loss = paddle.sum(neg_pair)
-                # neg_count.append(len(neg_pair))
-            else:
-                neg_loss = 0
-            loss.append(pos_loss + neg_loss)
-
-        loss = sum(loss) / batch_size  # / all_targets.shape[1]
-        return loss
