@@ -64,6 +64,7 @@ class DistributedRandomIdentitySampler(DistributedBatchSampler):
 
     def _prepare_batch(self):
         batch_idxs_dict = defaultdict(list)
+        count = []
         for pid in self.pids:
             idxs = copy.deepcopy(self.index_dic[pid])
             if len(idxs) < self.num_instances:
@@ -76,7 +77,7 @@ class DistributedRandomIdentitySampler(DistributedBatchSampler):
                 if len(batch_idxs) == self.num_instances:
                     batch_idxs_dict[pid].append(batch_idxs)
                     batch_idxs = []
-        count = [len(batch_idxs_dict[pid] for pid in self.pids)]
+        count = [len(batch_idxs_dict[pid]) for pid in self.pids]
         count = np.array(count)
         avai_pids = copy.deepcopy(self.pids)
         return batch_idxs_dict, avai_pids, count
