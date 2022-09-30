@@ -62,7 +62,7 @@ class DistributedRandomIdentitySampler(DistributedBatchSampler):
                 num = self.num_instances
             self.length += num - num % self.num_instances
 
-    def __iter__(self):
+    def _prepare_batch(self):
         batch_idxs_dict = defaultdict(list)
         for pid in self.pids:
             idxs = copy.deepcopy(self.index_dic[pid])
@@ -76,24 +76,74 @@ class DistributedRandomIdentitySampler(DistributedBatchSampler):
                 if len(batch_idxs) == self.num_instances:
                     batch_idxs_dict[pid].append(batch_idxs)
                     batch_idxs = []
+        count = [len(batch_idxs_dict[pid] for pid in self.pids)]
+        count = np.array(count)
         avai_pids = copy.deepcopy(self.pids)
-        final_idxs = []
-        while len(avai_pids) >= self.num_pids_per_batch:
-            selected_pids = random.sample(avai_pids, self.num_pids_per_batch)
+        return batch_idxs_dict, avai_pids, count
+
+    def __iter__(self):
+        batch_idxs_dict, avai_pids, count = self._prepare_batch()
+        for _ in range(self.max_iters):
+            final_idxs = []
+            if len(avai_pids) < self.num_pids_per_batch:
+                batch_idxs_dict, avai_pids, count = self._prepare_batch()
+
+            selected_pids = np.random.choice(
+                avai_pids, self.num_pids_per_batch, False, count / count.sum())
             for pid in selected_pids:
                 batch_idxs = batch_idxs_dict[pid].pop(0)
                 final_idxs.extend(batch_idxs)
+                pid_idx = avai_pids.index(pid)
                 if len(batch_idxs_dict[pid]) == 0:
-                    avai_pids.remove(pid)
-        _sample_iter = iter(final_idxs)
-        batch_indices = []
-        for idx in _sample_iter:
-            batch_indices.append(idx)
-            if len(batch_indices) == self.batch_size:
+                    avai_pids.pop(pid_idx)
+                    count = np.delete(count, pid_idx)
+                else:
+                    count[pid_idx] = len(batch_idxs_dict[pid])
+            yield final_idxs
+
+    def __iter__(self):
+        # prepare
+        batch_idxs_dict, avai_pids, count = self._prepare_batch()
+
+        # sample
+        if self.max_iters is not None:
+            for _ in range(self.max_iters):
+                final_idxs = []
+                if len(avai_pids) < self.num_pids_per_batch:
+                    batch_idxs_dict, avai_pids, count = self._prepare_batch()
+
+                selected_pids = np.random.choice(avai_pids,
+                                                 self.num_pids_per_batch,
+                                                 False, count / count.sum())
+                for pid in selected_pids:
+                    batch_idxs = batch_idxs_dict[pid].pop(0)
+                    final_idxs.extend(batch_idxs)
+                    pid_idx = avai_pids.index(pid)
+                    if len(batch_idxs_dict[pid]) == 0:
+                        avai_pids.pop(pid_idx)
+                        count = np.delete(count, pid_idx)
+                    else:
+                        count[pid_idx] = len(batch_idxs_dict[pid])
+                yield final_idxs
+        else:
+            final_idxs = []
+            while len(avai_pids) >= self.num_pids_per_batch:
+                selected_pids = random.sample(avai_pids,
+                                              self.num_pids_per_batch)
+                for pid in selected_pids:
+                    batch_idxs = batch_idxs_dict[pid].pop(0)
+                    final_idxs.extend(batch_idxs)
+                    if len(batch_idxs_dict[pid]) == 0:
+                        avai_pids.remove(pid)
+            _sample_iter = iter(final_idxs)
+            batch_indices = []
+            for idx in _sample_iter:
+                batch_indices.append(idx)
+                if len(batch_indices) == self.batch_size:
+                    yield batch_indices
+                    batch_indices = []
+            if not self.drop_last and len(batch_indices) > 0:
                 yield batch_indices
-                batch_indices = []
-        if not self.drop_last and len(batch_indices) > 0:
-            yield batch_indices
 
     def __len__(self):
         if self.max_iters is not None:
