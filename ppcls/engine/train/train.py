@@ -35,8 +35,8 @@ def train_epoch(engine, epoch_id, print_batch_step):
         engine.time_info["reader_cost"].update(time.time() - tic)
         if engine.use_dali:
             batch = [
-                paddle.to_tensor(batch[0]['data']),
-                paddle.to_tensor(batch[0]['label'])
+                paddle.to_tensor(batch[0]["data"]),
+                paddle.to_tensor(batch[0]["label"])
             ]
         batch_size = batch[0].shape[0]
         if not engine.config["Global"].get("use_multilabel", False):
@@ -45,7 +45,7 @@ def train_epoch(engine, epoch_id, print_batch_step):
 
         # image input
         if engine.amp:
-            amp_level = engine.config['AMP'].get("level", "O1").upper()
+            amp_level = engine.config["AMP"].get("level", "O1").upper()
             with paddle.amp.auto_cast(
                     custom_black_list={
                         "flatten_contiguous_range", "greater_than"
@@ -114,12 +114,10 @@ def train_iter(engine, epoch_id, print_batch_step, best_metric):
         best_metric_ema = 0.0
         ema_module = engine.model_ema.module
 
-    for iter_id, batch in range(
-            best_metric.get("iters", -1) + 1, engine.iters):
-        if iter_id >= engine.max_iter:
-            break
-
-        batch = next(engine.train_dataloader)  # fetch data from dataloader
+    dataloader_iterator = iter(engine.train_dataloader)
+    for iter_id in range(best_metric.get("iters", -1) + 1, engine.max_iter):
+        # fetch data from dataloader iterator
+        batch = dataloader_iterator.next()
 
         profiler.add_profiler_step(engine.config["profiler_options"])
         if iter_id == 5:

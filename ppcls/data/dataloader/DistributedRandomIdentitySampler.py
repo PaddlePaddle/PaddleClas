@@ -31,7 +31,7 @@ class DistributedRandomIdentitySampler(DistributedBatchSampler):
         batch_size (int): batch size
         num_instances (int): number of instance(s) within an class
         drop_last (bool): whether to discard the data at the end
-        max_iter (int): max iteration. Default to None.
+        max_iters (int): max iteration(s). Default to None.
     """
 
     def __init__(self,
@@ -39,7 +39,7 @@ class DistributedRandomIdentitySampler(DistributedBatchSampler):
                  batch_size,
                  num_instances,
                  drop_last,
-                 max_iter=None,
+                 max_iters=None,
                  **args):
         assert batch_size % num_instances == 0, \
             f"batch_size({batch_size}) must be divisible by num_instances({num_instances}) when using DistributedRandomIdentitySampler"
@@ -47,7 +47,7 @@ class DistributedRandomIdentitySampler(DistributedBatchSampler):
         self.batch_size = batch_size
         self.num_instances = num_instances
         self.drop_last = drop_last
-        self.max_iter = max_iter
+        self.max_iters = max_iters
         self.num_pids_per_batch = self.batch_size // self.num_instances
         self.index_dic = defaultdict(list)
         for index, pid in enumerate(self.dataset.labels):
@@ -96,8 +96,8 @@ class DistributedRandomIdentitySampler(DistributedBatchSampler):
             yield batch_indices
 
     def __len__(self):
-        if self.max_iter is not None:
-            return self.max_iter
+        if self.max_iters is not None:
+            return self.max_iters
         elif self.drop_last:
             return self.length // self.batch_size
         else:

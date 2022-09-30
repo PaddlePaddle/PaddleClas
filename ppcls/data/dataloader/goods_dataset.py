@@ -32,7 +32,6 @@ class GoodsDataset(Dataset):
                  relabel=False):
         self._img_root = image_root
         self._cls_path = cls_label_path
-        self._check_before_run()
         if transform_ops:
             self._transform_ops = create_operators(transform_ops)
         self.backend = backend
