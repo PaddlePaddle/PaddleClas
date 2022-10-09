@@ -84,8 +84,13 @@ def classification_eval(engine, epoch_id=0):
             device_id = paddle.distributed.ParallelEnv().device_id
             label = batch[1].cuda(device_id) if engine.config["Global"][
                 "device"] == "gpu" else batch[1]
+            #TODO(@chenxiao) remove this when cncl supports int64 all_gather
+            label = label.astype('int32') if engine.config["Global"][
+                "device"] == "mlu" else label
             paddle.distributed.all_gather(label_list, label)
             labels = paddle.concat(label_list, 0)
+            labels = labels.astype('int64') if engine.config["Global"][
+                "device"] == "mlu" else labels
 
             if isinstance(out, list):
                 preds = []
