@@ -181,9 +181,10 @@ def train_iter(engine, epoch_id, print_batch_step, best_metric):
                 engine.model_ema.update(engine.model)
 
         start_eval_iter = engine.config["Global"].get("start_eval_iter", 0) - 1
-        if engine.config["Global"][
-                "eval_during_train"] and iter_id % engine.config["Global"][
-                    "eval_interval"] == 0 and iter_id > start_eval_iter:
+        if engine.config["Global"]["eval_during_train"] and (
+                iter_id + 1
+        ) % engine.config["Global"]["eval_interval"] == 0 and (
+                iter_id + 1) > start_eval_iter:
             acc = engine.eval(epoch_id)
             if acc > best_metric["metric"]:
                 best_metric["metric"] = acc
@@ -242,7 +243,7 @@ def train_iter(engine, epoch_id, print_batch_step, best_metric):
                     writer=engine.vdl_writer)
 
             # save model
-            if iter_id > 0 and iter_id % save_interval == 0:
+            if (iter_id + 1) > 0 and (iter_id + 1) % save_interval == 0:
                 save_load.save_model(
                     engine.model,
                     engine.optimizer, {"metric": acc,
