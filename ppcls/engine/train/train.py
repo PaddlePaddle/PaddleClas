@@ -187,7 +187,7 @@ def train_iter(engine, epoch_id, print_batch_step, best_metric):
             acc = engine.eval(epoch_id)
             if acc > best_metric["metric"]:
                 best_metric["metric"] = acc
-                best_metric["iter"] = iter_id
+                best_metric["iters"] = iter_id
                 save_load.save_model(
                     engine.model,
                     engine.optimizer,
@@ -227,7 +227,7 @@ def train_iter(engine, epoch_id, print_batch_step, best_metric):
                         engine.model,
                         engine.optimizer,
                         {"metric": acc_ema,
-                         "iter": iter_id},
+                         "iters": iter_id},
                         engine.output_dir,
                         ema=ema_module,
                         model_name=engine.config["Arch"]["name"],
@@ -246,7 +246,7 @@ def train_iter(engine, epoch_id, print_batch_step, best_metric):
                 save_load.save_model(
                     engine.model,
                     engine.optimizer, {"metric": acc,
-                                       "iter": iter_id},
+                                       "iters": iter_id},
                     engine.output_dir,
                     ema=ema_module,
                     model_name=engine.config["Arch"]["name"],
