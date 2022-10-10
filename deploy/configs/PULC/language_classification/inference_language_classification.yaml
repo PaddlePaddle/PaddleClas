@@ -15,7 +15,7 @@ Global:
 PreProcess:
   transform_ops:
     - ResizeImage:
-        size: [160, 80]
+        size: [192, 48]
     - NormalizeImage:
         scale: 0.00392157
         mean: [0.485, 0.456, 0.406]
