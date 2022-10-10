@@ -1,0 +1,73 @@
+Global:
+  infer_imgs: "./drink_dataset_v2.0/test_images/100.jpeg"
+  det_inference_model_dir: "./models/picodet_PPLCNet_x2_5_mainbody_lite_v1.0_infer"
+  rec_inference_model_dir: "./models/general_PPLCNetV2_base_pretrained_v1.0_infer"
+  rec_nms_thresold: 0.05
+
+  batch_size: 1
+  image_shape: [3, 640, 640]
+  threshold: 0.2
+  max_det_results: 5
+  label_list:
+    - foreground
+
+  use_gpu: True
+  enable_mkldnn: True
+  cpu_num_threads: 10
+  enable_benchmark: True
+  use_fp16: False
+  ir_optim: True
+  use_tensorrt: False
+  gpu_mem: 8000
+  enable_profile: False
+
+DetPreProcess:
+  transform_ops:
+    - DetResize:
+        interp: 2
+        keep_ratio: false
+        target_size: [640, 640]
+    - DetNormalizeImage:
+        is_scale: true
+        mean: [0.485, 0.456, 0.406]
+        std: [0.229, 0.224, 0.225]
+    - DetPermute: {}
+
+DetPostProcess: {}
+
+RecPreProcess:
+  transform_ops:
+    - ResizeImage:
+        size: [224, 224]
+        return_numpy: False
+        interpolation: bilinear
+        backend: cv2
+    - NormalizeImage:
+        scale: 1.0/255.0
+        mean: [0.485, 0.456, 0.406]
+        std: [0.229, 0.224, 0.225]
+        order: hwc
+    - ToCHWImage:
+
+RecPostProcess: null
+
+# evaluation config 
+Eval:
+  name: Vechicles
+  image_root: ./Vechicles
+  cls_label_path: ./Vechicles/query_list.txt
+  output_dir: ./eval_output 
+
+# indexing engine config
+IndexProcess:
+  index_method: "HNSW32" # supported: HNSW32, IVF, Flat
+  image_root: "./Vechicles/"
+  index_dir: "./Vechicles/index"
+  data_file: "./Vechicles/gallery_list.txt"
+  index_operation: "new" # suported: "append", "remove", "new"
+  delimiter: " "
+  dist_type: "IP"
+  embedding_size: 512
+  batch_size: 32
+  return_k: 5
+  score_thres: 0.5

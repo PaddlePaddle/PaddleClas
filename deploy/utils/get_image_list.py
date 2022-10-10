@@ -47,3 +47,15 @@ def get_image_list_from_label_file(image_path, label_file_path):
             imgs_lists.append(os.path.join(image_path, image_name))
             gt_labels.append(int(label))
     return imgs_lists, gt_labels
+
+
+def get_image_and_label_list(image_path, label_file_path):
+    imgs_lists = []
+    gt_labels = []
+    with open(label_file_path, "r") as fin:
+        lines = fin.readlines()
+        for line in lines:
+            image_name, label = line.strip("\n").split()
+            imgs_lists.append(os.path.join(image_path, image_name))
+            gt_labels.append(label)
+    return imgs_lists, gt_labels

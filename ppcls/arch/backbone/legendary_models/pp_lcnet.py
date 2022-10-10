@@ -184,7 +184,6 @@ class SEModule(TheseusLayer):
 
 class PPLCNet(TheseusLayer):
     def __init__(self,
-                 stages_pattern,
                  scale=1.0,
                  class_num=1000,
                  dropout_prob=0.2,
@@ -192,10 +191,8 @@ class PPLCNet(TheseusLayer):
                  lr_mult_list=[1.0, 1.0, 1.0, 1.0, 1.0, 1.0],
                  stride_list=[2, 2, 2, 2, 2],
                  use_last_conv=True,
-                 return_patterns=None,
-                 return_stages=None,
                  **kwargs):
-        super().__init__()
+        super().__init__(**kwargs)
         self.scale = scale
         self.class_expand = class_expand
         self.lr_mult_list = lr_mult_list
@@ -302,12 +299,8 @@ class PPLCNet(TheseusLayer):
         self.flatten = nn.Flatten(start_axis=1, stop_axis=-1)
         self.fc = Linear(
             self.class_expand if self.use_last_conv else
-            make_divisible(self.net_config["blocks6"][-1][2]), class_num)
-
-        super().init_res(
-            stages_pattern,
-            return_patterns=return_patterns,
-            return_stages=return_stages)
+            make_divisible(self.net_config["blocks6"][-1][2] * scale),
+            class_num)
 
     def forward(self, x):
         x = self.conv1(x)

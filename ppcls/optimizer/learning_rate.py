@@ -194,8 +194,8 @@ class Linear(LRBase):
             end_lr=self.end_lr,
             power=self.power,
             cycle=self.cycle,
-            last_epoch=self.
-            last_epoch) if self.decay_steps > 0 else self.learning_rate
+            last_epoch=self.last_epoch) if self.decay_steps > 0 else Constant(
+                self.learning_rate)
 
         if self.warmup_steps > 0:
             learning_rate = self.linear_warmup(learning_rate)
@@ -243,8 +243,8 @@ class Cosine(LRBase):
             learning_rate=self.learning_rate,
             T_max=self.T_max,
             eta_min=self.eta_min,
-            last_epoch=self.
-            last_epoch) if self.T_max > 0 else self.learning_rate
+            last_epoch=self.last_epoch) if self.T_max > 0 else Constant(
+                self.learning_rate)
 
         if self.warmup_steps > 0:
             learning_rate = self.linear_warmup(learning_rate)

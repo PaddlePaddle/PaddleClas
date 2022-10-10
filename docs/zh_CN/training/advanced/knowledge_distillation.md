@@ -71,6 +71,9 @@ Park 等人提出了 RKD [10]，基于关系的知识蒸馏算法，RKD 中进�
 
 本论文提出的算法关系知识蒸馏（RKD）迁移教师模型得到的输出结果间的结构化关系给学生模型，不同于之前的只关注个体输出结果，RKD 算法使用两种损失函数：二阶的距离损失(distance-wise)和三阶的角度损失(angle-wise)。在最终计算蒸馏损失函数的时候，同时考虑 KD loss 和 RKD loss。最终精度优于单独使用 KD loss 蒸馏得到的模型精度。
 
+
+更多关于知识蒸馏的算法简介以及应用介绍，请参考：[知识蒸馏算法简介](../../algorithm_introduction/knowledge_distillation.md)。
+
 <a name='1.2'></a>
 
 ### 1.2 PaddleClas支持的知识蒸馏算法
