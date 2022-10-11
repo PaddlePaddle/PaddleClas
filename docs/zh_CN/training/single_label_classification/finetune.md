@@ -91,7 +91,7 @@ DataLoader:
     dataset: 
       name: ImageNetDataset
       image_root: your_image_root
-      cls_label_path: your_train_cls_label_path
+      cls_label_path: your_eval_cls_label_path
 ```
 
 <a name="2.2"></a>
@@ -110,7 +110,7 @@ python3 -m paddle.distributed.launch \
 <a name="faq"></a>
 ## FAQ
 
-Q1.如何更改分辨率？
+**Q1.如何更改分辨率？**
 
 以 224 修改为 320 为例，如果只做训练和评测，可以只修改以下字段：
 
@@ -129,15 +129,15 @@ Q1.如何更改分辨率？
 3.修改配置文件中`Infer.transforms.2.CropImage.size`, 如从 `224` 修改到 `320`。
 
 
-Q2.如何更改数据增强？
+**Q2.如何更改数据增强？**
 
 关于数据增强部分可以参考[数据增强文档](../config_description/data_augmentation.md)，里边有详细的介绍。
 
-Q3.如何更改评价指标？
+**Q3.如何更改评价指标？**
 
 PaddleClas中的分类指标目前只支持 `Top-k`，如果需要更改 `k` 值，可以修改配置文件中` Metric.TopkAcc.topk`,如从 `[1, 5]` 修改到` [1, 3]`，即评测指标从 `Top-1`、`Top-5` 改为 `Top-1`、`Top-3`。
 
-Q4.如何进一步提升模型的精度？
+**Q4.如何进一步提升模型的精度？**
 
 1.如果不考虑模型的推理速度，可以更换在 ImageNet 上精度更高的模型，或者使用更大的分辨率，如果考虑模型的推理速度，建议使用经过 PaddleClas 团队优化的 PP 系列模型，如[PP-LCNet](../../models/ImageNet1k/PP-LCNet.md)、[PP-HGNet](../../models/ImageNet1k/PP-HGNet.md)等；
 
