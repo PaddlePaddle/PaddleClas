@@ -57,14 +57,16 @@ DataLoader:
         - DecodeImage:
             to_rgb: True
             channel_first: False
-        - RandCropImage:
+        - BlurImage:
+        - ResizeImage:
             size: 224
+        - RandFlipImage:
+            flip_code: 1
         - NormalizeImage:
             scale: 1.0/255.0
             mean: [0.485, 0.456, 0.406]
             std: [0.229, 0.224, 0.225]
             order: ''
-        - BlurImage:
     sampler:
       name: DistributedBatchSampler
       batch_size: 256

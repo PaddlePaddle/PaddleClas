@@ -235,6 +235,7 @@ class ResizeImage(object):
             backend=backend,
             return_numpy=return_numpy)
 
+    @format_data
     def __call__(self, img):
         if isinstance(img, np.ndarray):
             img_h, img_w = img.shape[:2]
@@ -508,7 +509,8 @@ class RandFlipImage(object):
         assert flip_code in [-1, 0, 1
                              ], "flip_code should be a value in [-1, 0, 1]"
         self.flip_code = flip_code
-
+    
+    @format_data
     def __call__(self, img):
         if random.randint(0, 1) == 1:
             if isinstance(img, np.ndarray):
