@@ -235,6 +235,7 @@ class ResizeImage(object):
             backend=backend,
             return_numpy=return_numpy)
 
+    @format_data
     def __call__(self, img):
         if isinstance(img, np.ndarray):
             img_h, img_w = img.shape[:2]
@@ -508,7 +509,8 @@ class RandFlipImage(object):
         assert flip_code in [-1, 0, 1
                              ], "flip_code should be a value in [-1, 0, 1]"
         self.flip_code = flip_code
-
+    
+    @format_data
     def __call__(self, img):
         if random.randint(0, 1) == 1:
             if isinstance(img, np.ndarray):
@@ -718,8 +720,8 @@ class Pad(object):
         # Process fill color for affine transforms
         major_found, minor_found = (int(v)
                                     for v in PILLOW_VERSION.split('.')[:2])
-        major_required, minor_required = (int(v) for v in
-                                          min_pil_version.split('.')[:2])
+        major_required, minor_required = (
+            int(v) for v in min_pil_version.split('.')[:2])
         if major_found < major_required or (major_found == major_required and
                                             minor_found < minor_required):
             if fill is None:
@@ -781,3 +783,54 @@ class RandomRot90(object):
         if orientation:
             img = np.rot90(img, orientation)
         return {"img": img, "random_rot90_orientation": orientation}
+
+
+class BlurImage(object):
+    """BlurImage
+    """
+
+    def __init__(self,
+                 ratio=0.5,
+                 motion_max_ksize=12,
+                 motion_max_angle=45,
+                 gaussian_max_ksize=12):
+        self.ratio = ratio
+        self.motion_max_ksize = motion_max_ksize
+        self.motion_max_angle = motion_max_angle
+        self.gaussian_max_ksize = gaussian_max_ksize
+
+    def _gaussian_blur(self, img, max_ksize=12):
+        ksize = (np.random.choice(np.arange(5, max_ksize, 2)),
+                 np.random.choice(np.arange(5, max_ksize, 2)))
+        img = cv2.GaussianBlur(img, ksize, 0)
+        return img
+
+    def _motion_blur(self, img, max_ksize=12, max_angle=45):
+        degree = np.random.choice(np.arange(5, max_ksize, 2))
+        angle = np.random.choice(np.arange(-1 * max_angle, max_angle))
+
+        M = cv2.getRotationMatrix2D((degree / 2, degree / 2), angle, 1)
+        motion_blur_kernel = np.diag(np.ones(degree))
+        motion_blur_kernel = cv2.warpAffine(motion_blur_kernel, M,
+                                            (degree, degree))
+
+        motion_blur_kernel = motion_blur_kernel / degree
+        blurred = cv2.filter2D(img, -1, motion_blur_kernel)
+
+        cv2.normalize(blurred, blurred, 0, 255, cv2.NORM_MINMAX)
+        img = np.array(blurred, dtype=np.uint8)
+        return img
+
+    @format_data
+    def __call__(self, img):
+        if random.random() > self.ratio:
+            label = 0
+        else:
+            method = random.choice(["gaussian", "motion"])
+            if method == "gaussian":
+                img = self._gaussian_blur(img, self.gaussian_max_ksize)
+            else:
+                img = self._motion_blur(img, self.motion_max_ksize,
+                                        self.motion_max_angle)
+            label = 1
+        return {"img": img, "blur_image": label}
