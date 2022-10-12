@@ -7,6 +7,7 @@
 * [3. 算法](#3)
     * [3.1 Classification based](#3.1)
     * [3.2 Pairwise based](#3.2)
+    * [3.3 Cross-Batch Memory for Embedding Learning](#3.3)
 
 <a name='1'></a>
 ## 1. 简介
@@ -34,3 +35,8 @@
    这是一类基于样本对的学习范式。他以样本对作为输入，通过直接学习样本对之间的相似度来得到有效的特征表示，常见的算法包括：[Contrastive loss](http://yann.lecun.com/exdb/publis/pdf/hadsell-chopra-lecun-06.pdf), [Triplet loss](https://arxiv.org/abs/1503.03832), [Lifted-Structure loss](https://arxiv.org/abs/1511.06452), [N-pair loss](https://papers.nips.cc/paper/2016/file/6b180037abbebea991d8b1232f8a8ca9-Paper.pdf), [Multi-Similarity loss](https://arxiv.org/pdf/1904.06627.pdf)等
 
 2020 年发表的[CircleLoss](https://arxiv.org/abs/2002.10857)，从一个全新的视角统一了两种学习范式，让研究人员和从业者对 Metric Learning 问题有了更进一步的思考。
+
+<a name='3.3'></a>
+
+作者提出了利用历史模型产生的特征来近似当前模型的特征，在一定程度上解耦了候选正负样本的数量与 mini-batch 大小的关系，让informative样本的挖掘更加高效，解决了以往的 metric learning 方法只能利用 mini-batch 内部的样本的局限。
+具体信息可参考[xbm.md](../training/metric_learning/xbm.md)
