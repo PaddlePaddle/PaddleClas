@@ -42,7 +42,7 @@ from ppcls.utils import save_load
 from ppcls.data.utils.get_image_list import get_image_list
 from ppcls.data.postprocess import build_postprocess
 from ppcls.data import create_operators
-from ppcls.engine.train import train_epoch
+from ppcls.engine import train as train_method
 from ppcls.engine import evaluation
 from ppcls.arch.gears.identity_head import IdentityHead
 
@@ -54,6 +54,7 @@ class Engine(object):
         self.config = config
         self.eval_mode = self.config["Global"].get("eval_mode",
                                                    "classification")
+        self.train_mode = self.config["Global"].get("train_mode", None)
         if "Head" in self.config["Arch"] or self.config["Arch"].get("is_rec",
                                                                     False):
             self.is_rec = True
@@ -79,7 +80,11 @@ class Engine(object):
         assert self.eval_mode in [
             "classification", "retrieval", "adaface"
         ], logger.error("Invalid eval mode: {}".format(self.eval_mode))
-        self.train_epoch_func = train_epoch
+        if self.train_mode is None:
+            self.train_epoch_func = train_method.train_epoch
+        else:
+            self.train_epoch_func = getattr(train_method,
+                                            "train_epoch_" + self.train_mode)
         self.eval_func = getattr(evaluation, self.eval_mode + "_eval")
 
         self.use_dali = self.config['Global'].get("use_dali", False)
@@ -119,6 +124,9 @@ class Engine(object):
         if self.mode == 'train':
             self.train_dataloader = build_dataloader(
                 self.config["DataLoader"], "Train", self.device, self.use_dali)
+            self.unlabel_train_dataloader = build_dataloader(
+                self.config["DataLoader"], "UnLabelTrain", self.device,
+                self.use_dali)
         if self.mode == "eval" or (self.mode == "train" and
                                    self.config["Global"]["eval_during_train"]):
             if self.eval_mode in ["classification", "adaface"]:
@@ -140,10 +148,17 @@ class Engine(object):
                         self.config["DataLoader"]["Eval"], "Query",
                         self.device, self.use_dali)
 
+        # for iter training, such as semi-super wised learning, fixmatch
+        self.iter_per_epochs = self.config["Global"].get("iter_per_epochs",
+                                                         None)
+
         # build loss
         if self.mode == "train":
-            loss_info = self.config["Loss"]["Train"]
-            self.train_loss_func = build_loss(loss_info)
+            label_loss_info = self.config["Loss"]["Train"]
+            self.train_loss_func = build_loss(label_loss_info)
+            unlabel_loss_info = self.config.get("UnLabelLoss", {}).get("Train",
+                                                                       None)
+            self.unlabel_train_loss_func = build_loss(unlabel_loss_info)
         if self.mode == "eval" or (self.mode == "train" and
                                    self.config["Global"]["eval_during_train"]):
             loss_config = self.config.get("Loss", None)
@@ -208,8 +223,9 @@ class Engine(object):
         if self.mode == 'train':
             self.optimizer, self.lr_sch = build_optimizer(
                 self.config["Optimizer"], self.config["Global"]["epochs"],
-                len(self.train_dataloader) // self.update_freq,
-                [self.model, self.train_loss_func])
+                len(self.train_dataloader)
+                if self.iter_per_epochs is None else self.iter_per_epochs //
+                self.update_freq, [self.model, self.train_loss_func])
 
         # AMP training and evaluating
         self.amp = "AMP" in self.config and self.config["AMP"] is not None

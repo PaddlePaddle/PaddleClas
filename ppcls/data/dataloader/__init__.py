@@ -12,3 +12,4 @@ from ppcls.data.dataloader.pk_sampler import PKSampler
 from ppcls.data.dataloader.person_dataset import Market1501, MSMT17
 from ppcls.data.dataloader.face_dataset import AdaFaceDataset, FiveValidationDataset
 from ppcls.data.dataloader.custom_label_dataset import CustomLabelDataset
+from ppcls.data.dataloader.cifar import Cifar10, Cifar100
