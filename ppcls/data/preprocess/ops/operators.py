@@ -834,3 +834,78 @@ class BlurImage(object):
                                         self.motion_max_angle)
             label = 1
         return {"img": img, "blur_image": label}
+
+
+class MosaicImage(object):
+    """MosaicImage
+    """
+
+    def __init__(self,
+                 ratio=0.5,
+                 x_ratio=[0.1, 0.3],
+                 y_ratio=[0.1, 0.3]):
+        self.ratio = ratio
+        self.x_ratio = x_ratio
+        self.y_ratio = y_ratio
+
+    def _get_region(self, img, percent_x=None, percent_y=None, area_ratio=None, aspect_ratio=None):
+
+        height, width, channels = img.shape
+        if percent_x:
+            coordinate_x = int(width * percent_x)
+        else:
+            coordinate_x = int(width * random.random())
+        if percent_y:
+            coordinate_y = int(height * percent_y)
+        else:
+            coordinate_y = int(height * random.random())
+
+        max_w = 2 * min(width - coordinate_x, coordinate_x)
+        min_w = int(width * 0.1)
+        min_w = min_w if min_w < max_w else max_w
+        w = random.randint(min_w, max_w) // 2 * 2
+
+        if area_ratio:
+            area = int(height * width * area_ratio)
+            h = int(area / w)
+        elif aspect_ratio:
+            h = int(w / aspect_ratio)
+        else:
+            max_h = 2 * min(height - coordinate_y, coordinate_y)
+            min_h = int(height * 0.1)
+            min_h = min_h if min_h < max_h else max_h
+            h = random.randint(min_h, max_h) // 2 * 2
+
+        w = w if (coordinate_x - w / 2) >= 0 else coordinate_x * 2
+        h = h if (coordinate_y - h / 2) >= 0 else coordinate_y * 2
+        x = int(coordinate_x - w / 2)
+        y = int(coordinate_y - h / 2)
+        return (x, y, w, h)
+
+    def _mosaic(self, img, region):
+        img = img.copy()
+        max_neighbor = int(max(min(img.shape[0], img.shape[1]) / 20, 10))
+        min_neighbor = int(min(max(img.shape[0], img.shape[1]) / 20, 5))
+        neighbor = random.randint(min_neighbor, max_neighbor)
+        x, y, w, h = region
+        for i in range(0, h - neighbor, neighbor): 
+            for j in range(0, w - neighbor, neighbor):
+                rect = [j + x, i + y, neighbor, neighbor]
+                color = img[i + y][j + x].tolist()
+                left_up = (rect[0], rect[1])
+                right_down = (rect[0] + neighbor - 1, rect[1] + neighbor - 1)
+                cv2.rectangle(img, left_up, right_down, color, -1)
+        return img
+
+    @format_data
+    def __call__(self, img):
+        if random.random() > self.ratio:
+            label = 0
+        else:
+            percent_x = random.uniform(self.x_ratio[0], self.x_ratio[1])
+            percent_y = random.uniform(self.y_ratio[0], self.y_ratio[1])
+            region = self._get_region(img, percent_x, percent_y)
+            x, y, w, h = region
+            img[x:x+w, y:y+h, :] = self._mosaic(img, region)[x:x+w, y:y+h, :]
+            label = 1
+        return {"img": img, "mosaic_image": label}

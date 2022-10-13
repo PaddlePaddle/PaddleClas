@@ -42,6 +42,7 @@ from ppcls.data.preprocess.ops.operators import RandomRotation
 from ppcls.data.preprocess.ops.operators import Padv2
 from ppcls.data.preprocess.ops.operators import RandomRot90
 from ppcls.data.preprocess.ops.operators import BlurImage
+from ppcls.data.preprocess.ops.operators import MosaicImage
 from .ops.operators import format_data
 
 from ppcls.data.preprocess.batch_ops.batch_operators import MixupOperator, CutmixOperator, OpSampler, FmixOperator
