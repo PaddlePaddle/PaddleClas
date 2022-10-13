@@ -1,6 +1,21 @@
-from __future__ import division
+# Copyright (c) 2021 PaddlePaddle Authors. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import math
 
 import nvidia.dali.fn as fn
+import nvidia.dali.math as nvmath
 import nvidia.dali.ops as ops
 import nvidia.dali.types as types
 
@@ -52,6 +67,114 @@ class CropMirrorNormalize(ops.CropMirrorNormalize):
         do_mirror = self.rng()
         return super(CropMirrorNormalize, self).__call__(
             data, mirror=do_mirror, **kwargs)
+
+
+class Pixels(ops.random.Normal):
+    def __init__(self,
+                 *kargs,
+                 device="cpu",
+                 mode="const",
+                 mean=[0.0, 0.0, 0.0],
+                 channel_first=False,
+                 h=224,
+                 w=224,
+                 c=3,
+                 **kwargs):
+        super(Pixels, self).__init__(*kargs, device=device, **kwargs)
+        self._mode = mode
+        self._mean = mean
+        self.channel_first = channel_first
+        self.h = h
+        self.w = w
+        self.c = c
+
+    def __call__(self, **kwargs):
+        if self._mode == "rand":
+            return super(Pixels, self).__call__(shape=(
+                3)) if not self.channel_first else super(
+                    Pixels, self).__call__(shape=(3))
+        elif self._mode == "pixel":
+            return super(Pixels, self).__call__(shape=(
+                self.h, self.w, self.c)) if not self.channel_first else super(
+                    Pixels, self).__call__(shape=(self.c, self.h, self.w))
+        elif self._mode == "const":
+            return fn.constant(
+                fdata=self._mean,
+                shape=(self.c)) if not self.channel_first else fn.constant(
+                    fdata=self._mean, shape=(self.c))
+        else:
+            raise Exception(
+                "Invalid mode in RandomErasing, only support \"const\", \"rand\", \"pixel\""
+            )
+
+
+class RandomErasing(ops.Erase):
+    def __init__(self,
+                 *kargs,
+                 device="cpu",
+                 EPSILON=0.5,
+                 sl=0.02,
+                 sh=0.4,
+                 r1=0.3,
+                 mean=[0.0, 0.0, 0.0],
+                 attempt=100,
+                 use_log_aspect=False,
+                 mode='const',
+                 channel_first=False,
+                 img_h=224,
+                 img_w=224,
+                 **kwargs):
+        super(RandomErasing, self).__init__(*kargs, device=device, **kwargs)
+        self.EPSILON = eval(EPSILON) if isinstance(EPSILON, str) else EPSILON
+        self.sl = eval(sl) if isinstance(sl, str) else sl
+        self.sh = eval(sh) if isinstance(sh, str) else sh
+        r1 = eval(r1) if isinstance(r1, str) else r1
+        self.r1 = (math.log(r1), math.log(1 / r1)) if use_log_aspect else (
+            r1, 1 / r1)
+        self.use_log_aspect = use_log_aspect
+        self.attempt = attempt
+        self.mean = mean
+        self.get_pixels = Pixels(
+            device=device,
+            mode=mode,
+            mean=mean,
+            channel_first=False,
+            h=224,
+            w=224,
+            c=3)
+        self.channel_first = channel_first
+        self.img_h = img_h
+        self.img_w = img_w
+        self.area = img_h * img_w
+
+    def __call__(self, data, **kwargs):
+        do_aug = fn.random.coin_flip(probability=self.EPSILON)
+        keep = do_aug ^ True
+        target_area = fn.random.uniform(range=(self.sl, self.sh)) * self.area
+        aspect_ratio = fn.random.uniform(range=(self.r1[0], self.r1[1]))
+        if self.use_log_aspect:
+            aspect_ratio = nvmath.exp(aspect_ratio)
+        h = nvmath.floor(nvmath.sqrt(target_area * aspect_ratio))
+        w = nvmath.floor(nvmath.sqrt(target_area / aspect_ratio))
+        pixels = self.get_pixels()
+        range1 = fn.stack(
+            (self.img_h - h) / self.img_h - (self.img_h - h) / self.img_h,
+            (self.img_h - h) / self.img_h)
+        range2 = fn.stack(
+            (self.img_w - w) / self.img_w - (self.img_w - w) / self.img_w,
+            (self.img_w - w) / self.img_w)
+        # shapes
+        x1 = fn.random.uniform(range=range1)
+        y1 = fn.random.uniform(range=range2)
+        anchor = fn.stack(x1, y1)
+        shape = fn.stack(h, w)
+        aug_data = super(RandomErasing, self).__call__(
+            data,
+            anchor=anchor,
+            normalized_anchor=True,
+            shape=shape,
+            fill_value=pixels)
+        return aug_data * do_aug + data * keep
 
 
 class RandCropImage(ops.RandomResizedCrop):
@@ -117,12 +240,12 @@ class RandomRotation(ops.Rotate):
         self.rng_angle = ops.random.Uniform(range=(-angle, angle))
 
     def __call__(self, data, **kwargs):
-        do_flip = self.rng()
+        do_rotate = self.rng()
         angle = self.rng_angle()
         flip_data = super(RandomRotation, self).__call__(
             data,
             angle=fn.cast(
-                do_flip, dtype=types.FLOAT) * angle,
+                do_rotate, dtype=types.FLOAT) * angle,
             keep_size=True,
             fill_value=0,
             **kwargs)
@@ -131,7 +254,9 @@ class RandomRotation(ops.Rotate):
 
 class NormalizeImage(ops.Normalize):
     def __init__(self, *kargs, device="cpu", **kwargs):
+        print(kwargs)
         super(NormalizeImage, self).__init__(*kargs, device=device, **kwargs)
 
     def __call__(self, data, **kwargs):
-        return super(NormalizeImage, self).__call__(data, **kwargs)
+        return super(NormalizeImage, self).__call__(
+            data, axes=[0, 1], **kwargs)

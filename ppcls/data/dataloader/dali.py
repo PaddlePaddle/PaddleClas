@@ -12,20 +12,32 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from __future__ import division
-
+from ppcls.utils import logger
+import math
 import os
 from typing import Any, Callable, Dict, List
 
+import cv2
 import numpy as np
 import nvidia.dali.fn as fn
+import nvidia.dali.math as nvmath
 import nvidia.dali.ops as ops
 import nvidia.dali.pipeline as pipeline
 import nvidia.dali.types as types
 import paddle
 from nvidia.dali.plugin.paddle import DALIGenericIterator
 
-# from ppcls.utils import logger
+from ppcls.data.dataloader.dali_operators import DecodeImage
+from ppcls.data.dataloader.dali_operators import DecodeRandomResizedCrop
+from ppcls.data.dataloader.dali_operators import CropMirrorNormalize
+from ppcls.data.dataloader.dali_operators import RandomErasing
+from ppcls.data.dataloader.dali_operators import RandCropImage
+from ppcls.data.dataloader.dali_operators import ResizeImage
+from ppcls.data.dataloader.dali_operators import RandFlipImage
+from ppcls.data.dataloader.dali_operators import Pad
+from ppcls.data.dataloader.dali_operators import RandCropImageV2
+from ppcls.data.dataloader.dali_operators import RandomRotation
+from ppcls.data.dataloader.dali_operators import NormalizeImage
 
 
 class DecodeImage(ops.decoders.Image):
@@ -75,6 +87,112 @@ class CropMirrorNormalize(ops.CropMirrorNormalize):
         do_mirror = self.rng()
         return super(CropMirrorNormalize, self).__call__(
             data, mirror=do_mirror, **kwargs)
+
+
+class Pixels(ops.random.Normal):
+    def __init__(self,
+                 *kargs,
+                 device="cpu",
+                 mode="const",
+                 mean=[0.0, 0.0, 0.0],
+                 channel_first=False,
+                 h=224,
+                 w=224,
+                 c=3,
+                 **kwargs):
+        super(Pixels, self).__init__(*kargs, device=device, **kwargs)
+        self._mode = mode
+        self._mean = mean
+        self.channel_first = channel_first
+        self.h = h
+        self.w = w
+        self.c = c
+
+    def __call__(self, **kwargs):
+        if self._mode == "rand":
+            return super(Pixels, self).__call__(shape=(
+                3)) if not self.channel_first else super(
+                    Pixels, self).__call__(shape=(3))
+        elif self._mode == "pixel":
+            return super(Pixels, self).__call__(shape=(
+                self.h, self.w, self.c)) if not self.channel_first else super(
+                    Pixels, self).__call__(shape=(self.c, self.h, self.w))
+        elif self._mode == "const":
+            return fn.constant(
+                fdata=self._mean,
+                shape=(self.c)) if not self.channel_first else fn.constant(
+                    fdata=self._mean, shape=(self.c))
+        else:
+            raise Exception(
+                "Invalid mode in RandomErasing, only support \"const\", \"rand\", \"pixel\""
+            )
+
+
+class RandomErasing(ops.Erase):
+    def __init__(self,
+                 *kargs,
+                 device="cpu",
+                 EPSILON=0.5,
+                 sl=0.02,
+                 sh=0.4,
+                 r1=0.3,
+                 mean=[0.0, 0.0, 0.0],
+                 attempt=100,
+                 use_log_aspect=False,
+                 mode='const',
+                 channel_first=False,
+                 img_h=224,
+                 img_w=224,
+                 **kwargs):
+        super(RandomErasing, self).__init__(*kargs, device=device, **kwargs)
+        self.EPSILON = eval(EPSILON) if isinstance(EPSILON, str) else EPSILON
+        self.sl = eval(sl) if isinstance(sl, str) else sl
+        self.sh = eval(sh) if isinstance(sh, str) else sh
+        r1 = eval(r1) if isinstance(r1, str) else r1
+        self.r1 = (math.log(r1), math.log(1 / r1)) if use_log_aspect else (
+            r1, 1 / r1)
+        self.use_log_aspect = use_log_aspect
+        self.attempt = attempt
+        self.mean = mean
+        self.get_pixels = Pixels(
+            device=device,
+            mode=mode,
+            mean=mean,
+            channel_first=False,
+            h=224,
+            w=224,
+            c=3)
+        self.channel_first = channel_first
+        self.img_h = img_h
+        self.img_w = img_w
+        self.area = img_h * img_w
+
+    def __call__(self, data, **kwargs):
+        do_aug = fn.random.coin_flip(probability=self.EPSILON)
+        keep = do_aug ^ True
+        target_area = fn.random.uniform(range=(self.sl, self.sh)) * self.area
+        aspect_ratio = fn.random.uniform(range=(self.r1[0], self.r1[1]))
+        h = nvmath.floor(nvmath.sqrt(target_area * aspect_ratio))
+        w = nvmath.floor(nvmath.sqrt(target_area / aspect_ratio))
+        pixels = self.get_pixels()
+        range1 = fn.stack(
+            (self.img_h - h) / self.img_h - (self.img_h - h) / self.img_h,
+            (self.img_h - h) / self.img_h)
+        range2 = fn.stack(
+            (self.img_w - w) / self.img_w - (self.img_w - w) / self.img_w,
+            (self.img_w - w) / self.img_w)
+        # shapes
+        x1 = fn.random.uniform(range=range1)
+        y1 = fn.random.uniform(range=range2)
+        anchor = fn.stack(x1, y1)
+        shape = fn.stack(h, w)
+        aug_data = super(RandomErasing, self).__call__(
+            data,
+            anchor=anchor,
+            normalized_anchor=True,
+            shape=shape,
+            fill_value=pixels)
+        return aug_data * do_aug + data * keep
 
 
 class RandCropImage(ops.RandomResizedCrop):
@@ -140,12 +258,12 @@ class RandomRotation(ops.Rotate):
         self.rng_angle = ops.random.Uniform(range=(-angle, angle))
 
     def __call__(self, data, **kwargs):
-        do_flip = self.rng()
+        do_rotate = self.rng()
         angle = self.rng_angle()
         flip_data = super(RandomRotation, self).__call__(
             data,
             angle=fn.cast(
-                do_flip, dtype=types.FLOAT) * angle,
+                do_rotate, dtype=types.FLOAT) * angle,
             keep_size=True,
             fill_value=0,
             **kwargs)
@@ -157,7 +275,8 @@ class NormalizeImage(ops.Normalize):
         super(NormalizeImage, self).__init__(*kargs, device=device, **kwargs)
 
     def __call__(self, data, **kwargs):
-        return super(NormalizeImage, self).__call__(data, **kwargs)
+        return super(NormalizeImage, self).__call__(
+            data, axes=[0, 1], **kwargs)
 
 
 INTERP_MAP = {
@@ -174,51 +293,69 @@ def convert_cfg_to_dali(op_name: str, device: str,
     """convert original preprocess op params into DALI-based op params
 
     Args:
-        op_name (str): preprocess OP name
+        op_name (str): name of operator
+        device (str): device which operator excute on
 
     Returns:
-        Dict[str, Any]: converted params for DALI initialization
+        Dict[str, Any]: converted arguments for DALI initialization
     """
     assert device in ["cpu", "gpu"
                       ], f"device({device}) must in [\"cpu\", \"gpu\"]"
     ret_dict = {}
     if op_name == "DecodeImage":
-        device = "cpu" if device == "cpu" else "mixed"
-        output_type = ops_param.get("output_type", types.DALIImageType.RGB)
+        if device != "cpu":
+            device = "mixed"
+        to_rgb = ops_param.get("to_rgb", True)
         device_memory_padding = ops_param.get("device_memory_padding",
                                               211025920)
         host_memory_padding = ops_param.get("host_memory_padding", 140544512)
         if device is not None:
-            ret_dict.update({"device": device, })
-        if output_type is not None:
-            ret_dict.update({"output_type": output_type, })
+            ret_dict.update({"device": device})
+        if to_rgb is not None:
+            ret_dict.update({
+                "output_type": types.DALIImageType.RGB
+                if to_rgb else types.DALIImageType.BGR
+            })
         if device_memory_padding is not None:
-            ret_dict.update({"device_memory_padding": device_memory_padding, })
+            ret_dict.update({"device_memory_padding": device_memory_padding})
         if host_memory_padding is not None:
-            ret_dict.update({"host_memory_padding": host_memory_padding, })
+            ret_dict.update({"host_memory_padding": host_memory_padding})
     elif op_name == "DecodeRandomResizedCrop":
-        device = "cpu" if device == "cpu" else "mixed"
-        output_type = ops_param.get("output_type", types.DALIImageType.RGB)
+        if device != "cpu":
+            device = "mixed"
+        to_rgb = ops_param.get("to_rgb", True)
         device_memory_padding = ops_param.get("device_memory_padding",
                                               211025920)
         host_memory_padding = ops_param.get("host_memory_padding", 140544512)
         scale = ops_param.get("scale", [0.08, 1.0])
         ratio = ops_param.get("ratio", [3.0 / 4, 4.0 / 3])
         num_attempts = ops_param.get("num_attempts", 100)
+        size = ops_param.get("size", None)
+        interpolation = ops_param.get("interpolation", None)
+        resize_short = ops_param.get("resize_short", None)
         if device is not None:
-            ret_dict.update({"device": device, })
-        if output_type is not None:
-            ret_dict.update({"output_type": output_type, })
+            ret_dict.update({"device": device})
+        if to_rgb is not None:
+            ret_dict.update({
+                "output_type": types.DALIImageType.RGB
+                if to_rgb else types.DALIImageType.BGR
+            })
         if device_memory_padding is not None:
-            ret_dict.update({"device_memory_padding": device_memory_padding, })
+            ret_dict.update({"device_memory_padding": device_memory_padding})
         if host_memory_padding is not None:
-            ret_dict.update({"host_memory_padding": host_memory_padding, })
+            ret_dict.update({"host_memory_padding": host_memory_padding})
+        if size is not None:
+            ret_dict.update({"resize_x": size[1], "resize_y": size[0]})
+        if interpolation is not None:
+            ret_dict.update({"interp_type": INTERP_MAP[interpolation]})
+        if resize_short is not None:
+            ret_dict.update({"resize_short": resize_short})
         if scale is not None:
-            ret_dict.update({"random_area": scale, })
+            ret_dict.update({"random_area": scale})
         if ratio is not None:
-            ret_dict.update({"random_aspect_ratio": ratio, })
+            ret_dict.update({"random_aspect_ratio": ratio})
         if num_attempts is not None:
-            ret_dict.update({"num_attempts": num_attempts, })
+            ret_dict.update({"num_attempts": num_attempts})
     elif op_name == "CropMirrorNormalize":
         dtype = types.FLOAT16 if ops_param.get("output_fp16",
                                                False) else types.FLOAT
@@ -228,17 +365,17 @@ def convert_cfg_to_dali(op_name: str, device: str,
         std = ops_param.get("std", None)
         pad_output = ops_param.get("channel_num", 3) == 4
         if dtype is not None:
-            ret_dict.update({"dtype": dtype, })
+            ret_dict.update({"dtype": dtype})
         if output_layout is not None:
-            ret_dict.update({"output_layout": output_layout, })
+            ret_dict.update({"output_layout": output_layout})
         if crop is not None:
-            ret_dict.update({"crop": crop, })
+            ret_dict.update({"crop": crop})
         if mean is not None:
-            ret_dict.update({"mean": mean, })
+            ret_dict.update({"mean": mean})
         if std is not None:
-            ret_dict.update({"std": std, })
+            ret_dict.update({"std": std})
         if pad_output is not None:
-            ret_dict.update({"pad_output": pad_output, })
+            ret_dict.update({"pad_output": pad_output})
     elif op_name == "ResizeImage":
         size = ops_param.get("size", None)
         resize_short = ops_param.get("resize_short", None)
@@ -269,7 +406,7 @@ def convert_cfg_to_dali(op_name: str, device: str,
             ret_dict.update({"crop": size})
     elif op_name == "RandomRotation":
         prob = ops_param.get("prob", 0.5)
-        degrees = ops_param.get("degrees", 90)
+        degrees = ops_param.get("degrees", 0)
         interpolation = ops_param.get("interpolation", "bilinear")
         if prob is not None:
             ret_dict.update({"prob": prob})
@@ -289,32 +426,53 @@ def convert_cfg_to_dali(op_name: str, device: str,
             ret_dict.update({"scale": scale})
         if mean is not None:
             ret_dict.update({
-                "mean": np.reshape(
-                    np.array(
-                        [v / scale for v in mean], dtype="float32"),
-                    [1, 1, 3])
+                "mean": fn.constant(
+                    fdata=[v / scale for v in mean], shape=[1, 1, 3])
             })
         if std is not None:
             ret_dict.update({
-                "stddev": np.reshape(
-                    np.array(
-                        [v / scale for v in std], dtype="float32"), [1, 1, 3])
+                "stddev": fn.constant(
+                    fdata=std, shape=[1, 1, 3])
             })
         if output_fp16 is True:
             ret_dict.update({"dtype": types.FLOAT16})
+        # ret_dict.update({"axes ": 2})
+
     elif op_name == "RandCropImage":
         size = ops_param.get("size")
         scale = ops_param.get("scale", [0.08, 1.0])
         ratio = ops_param.get("ratio", [3.0 / 4, 4.0 / 3])
         interpolation = ops_param.get("interpolation", "bilinear")
-        if size is True:
+        if size is not None:
             ret_dict.update({"size": size})
-        if scale is True:
+        if scale is not None:
             ret_dict.update({"random_area": scale})
-        if ratio is True:
+        if ratio is not None:
             ret_dict.update({"random_aspect_ratio": ratio})
-        if interpolation is True:
+        if interpolation is not None:
             ret_dict.update({"interp_type": INTERP_MAP[interpolation]})
+    elif op_name == "RandomErasing":
+        EPSILON = ops_param.get("EPSILON", 0.5)
+        sl = ops_param.get("sl", 0.02)
+        sh = ops_param.get("sh", 0.4)
+        r1 = ops_param.get("r1", 0.3)
+        mean = ops_param.get("mean", [0.485 * 255, 0.456 * 255, 0.406 * 255])
+        mode = ops_param.get("mode", 'const')
+        channel_first = ops_param.get("channel_first", False),
+        if EPSILON is not None:
+            ret_dict.update({"EPSILON": EPSILON})
+        if sl is not None:
+            ret_dict.update({"sl": sl})
+        if sh is not None:
+            ret_dict.update({"sh": sh})
+        if r1 is not None:
+            ret_dict.update({"r1": r1})
+        if mean is not None:
+            ret_dict.update({"mean": mean})
+        if mode is not None:
+            ret_dict.update({"mode": mode})
+        if channel_first is True:
+            ret_dict.update({"channel_first": channel_first})
     else:
         raise ValueError(f"Operator '{op_name}' is not implemented now.")
     if "device" not in ret_dict:
@@ -324,7 +482,7 @@ def convert_cfg_to_dali(op_name: str, device: str,
 
 def build_dali_transforms(op_cfg_list: List[Dict[str, Any]],
                           device: str="cpu",
-                          fuse: bool=True) -> List[Callable]:
+                          enable_fuse: bool=True) -> List[Callable]:
     """create dali operators based on the config
     Args:
         op_cfg_list (List[Dict[str, Any]]): a dict list, used to create some operators, such as config below
@@ -340,8 +498,9 @@ def build_dali_transforms(op_cfg_list: List[Dict[str, Any]],
             std: [0.229, 0.224, 0.225]
             order: ""
         --------------------------------
+
         device (str): device which dali operator(s) applied in. Defaults to "cpu".
-        fuse (bool): whether to fuse transforms. Defaults to True.
+        enable_fuse (bool): whether to do operator fusion. Defaults to True.
     Returns:
         List[Callable]: Callable DALI operators in list.
     """
@@ -355,7 +514,7 @@ def build_dali_transforms(op_cfg_list: List[Dict[str, Any]],
         op_name = list(op_cfg)[0]
         op_param = {} if op_cfg[op_name] is None else op_cfg[op_name]
         flag = False
-        if fuse:
+        if enable_fuse:
             if idx + 1 < num_cfg_node and (
                     op_name == "DecodeImage" and
                     list(op_cfg_list[idx + 1])[0] == "RandCropImage"):
@@ -368,7 +527,7 @@ def build_dali_transforms(op_cfg_list: List[Dict[str, Any]],
                 idx += 2
                 dali_ops.append(fused_dali_op)
                 flag = True
-                print(
+                logger.info(
                     f"DALI Operator conversion: {fused_op_name} -> {dali_ops[-1].__class__.__name__}"
                 )
             elif 0 < idx and idx + 1 < num_cfg_node and (
@@ -385,17 +544,17 @@ def build_dali_transforms(op_cfg_list: List[Dict[str, Any]],
                 idx += 2
                 dali_ops.append(fused_dali_op)
                 flag = True
-                print(
+                logger.info(
                     f"DALI Operator conversion: {fused_op_name} -> {dali_ops[-1].__class__.__name__}"
                 )
-        if not fuse or not flag:
+        if not enable_fuse or not flag:
             assert isinstance(op_cfg,
                               dict) and len(op_cfg) == 1, "yaml format error"
             dali_param = convert_cfg_to_dali(op_name, device, **op_param)
             dali_op = eval(op_name)(**dali_param)
             dali_ops.append(dali_op)
             idx += 1
-            print(
+            logger.info(
                 f"DALI Operator conversion: {op_name} -> {dali_ops[-1].__class__.__name__}"
             )
     return dali_ops
@@ -414,13 +573,13 @@ class HybridPipeline(pipeline.Pipeline):
                  shard_id: int=0,
                  num_shards: int=1,
                  random_shuffle: bool=True):
-        super(HybridPipeline, self).__init__(
-            batch_size, num_threads, device_id, seed=seed)
+        super(HybridPipeline, self).__init__(batch_size, num_threads,
+                                             device_id)
         self.device = device
         self.reader = ops.readers.File(
             file_root=file_root,
             file_list=file_list,
-            hard_id=shard_id,
+            shard_id=shard_id,
             num_shards=num_shards,
             random_shuffle=random_shuffle)
         self.transforms = ops.Compose(transform_list)
@@ -588,21 +747,66 @@ if __name__ == "__main__":
             }]
         }
     }
+    reid_config = {
+        "dataset": {
+            "name": "ImageNetDataset",
+            "image_root": "./dataset/",
+            "cls_label_path": "./dataset/train_reg_all_data.txt",
+            "transform_ops": [
+                {
+                    "DecodeImage": {
+                        "to_rgb": True,
+                        "channel_first": False
+                    }
+                },
+                {
+                    "ResizeImage": {
+                        "size": [128, 256],
+                        "return_numpy": False,
+                        "interpolation": "bilinear",
+                        "backend": "pil"
+                    }
+                },
+                # {
+                #     "RandFlipImage": {
+                #         "flip_code": 1
+                #     }
+                # },
+                # {
+                #     "Pad": {
+                #         "padding": 10
+                #     }
+                # },
+                # {
+                #     "RandCropImageV2": {
+                #         "size": [
+                #             128,
+                #             256
+                #         ]
+                #     }
+                # },
+                {
+                    "RandomErasing": {
+                        "EPSILON": 1.0,
+                        "sl": 0.02,
+                        "sh": 0.4,
+                        "r1": 0.3,
+                        "mean": [0.485 * 255, 0.456 * 255, 0.406 * 255]
+                    }
+                }
+            ]
+        }
+    }
+
+    device = "gpu"
     dali_transforms = build_dali_transforms(
-        shituv1_config["dataset"]["transform_ops"], device)
-    batch_size = 3
+        shituv2_config["dataset"]["transform_ops"], device)
+    batch_size = 4
     num_threads = 4
     seed = 42
     file_root = "/workspace/hesensen/dali_learning/DALI/docs/examples/data/images"
-    pipe = HybridPipeline(
-        device,
-        batch_size,
-        num_threads,
-        device_id,
-        seed,
-        file_root,
-        None,
-        dali_transforms, )
+    pipe = HybridPipeline(device, batch_size, num_threads, 0, seed, file_root,
+                          None, dali_transforms)
     pipe.build()
     pipelines = [pipe]
     dali_loader = DALIImageNetIterator(
@@ -611,4 +815,17 @@ if __name__ == "__main__":
         images, labels = batch
         print(images.place, images.shape)
         print(labels.place, labels.shape)
-        break
+        img_list = []
+        for j in range(batch_size):
+            img = images.numpy()
+            # imgnorm = (img[j]/255.0 - np.array([0.229, 0.224, 0.225]).reshape([1, 1, 3]))/np.array([0.485, 0.456, 0.406]).reshape([1, 1, 3])
+            imgnorm = img[j]
+            img_list.append(imgnorm)
+            print(imgnorm.mean(), imgnorm.std())
+        img_list = np.concatenate(img_list, axis=0)
+        img_list = ((
+            img_list * np.reshape(np.array([0.229, 0.224, 0.225]), [1, 1, 3]) +
+            np.reshape(np.array([0.485, 0.456, 0.406]), [1, 1, 3])))
+        img_list = (img_list * 255.0).clip(0, 255.0).astype('uint8')
+        print(img_list.shape)
+        cv2.imwrite(f"./pipeline_output_{iter_id}.jpg", img_list[:, :, ::-1])
