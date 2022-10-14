@@ -174,7 +174,8 @@ class RandomErasing(ops.Erase):
             normalized_anchor=True,
             shape=shape,
             fill_value=pixels)
-        return aug_data * do_aug + data * keep
+        return fn.cast(
+            aug_data * do_aug + data * keep, dtype=types.DALIDataType.UINT8)
 
 
 class RandCropImage(ops.RandomResizedCrop):

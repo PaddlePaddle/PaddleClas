@@ -1,5 +1,23 @@
 # 基于PaddleClas的DALI开发实战
 
+- [1. 简介](#1-简介)
+- [2. 环境准备](#2-环境准备)
+  - [2.1 安装DALI](#21-安装dali)
+- [3. 基本概念介绍](#3-基本概念介绍)
+  - [3.1 Operator](#31-operator)
+  - [3.2 Device](#32-device)
+  - [3.3 DataNode](#33-datanode)
+  - [3.4 Pipeline](#34-pipeline)
+- [4. 开发实战](#4-开发实战)
+  - [4.1 RandomFlip](#41-randomflip)
+    - [4.1.1 继承DALI已有类](#411-继承dali已有类)
+    - [4.1.2 重写 \_\_init\_\_ 方法](#412-重写-__init__-方法)
+    - [4.1.3 重写 \_\_call\_\_ 方法](#413-重写-__call__-方法)
+  - [4.2 RandomRotation](#42-randomrotation)
+    - [4.1.1 继承DALI已有类](#411-继承dali已有类-1)
+    - [4.1.2 重写 \_\_init\_\_ 方法](#412-重写-__init__-方法-1)
+    - [4.1.3 重写 \_\_call\_\_ 方法](#413-重写-__call__-方法-1)
+
 ## 1. 简介
 NVIDIA **Da**ta Loading **Li**brary (DALI) 是由 NVIDIA 开发的一套高性能数据预处理开源代码库，其提供了许多优化后的预处理算子，能很大程度上减少数据预处理耗时，非常适合在深度学习任务中使用。具体地，DALI 通过将大部分的数据预处理转移到 GPU 来解决 CPU 瓶颈问题。此外，DALI 编写了配套的高效执行引擎，最大限度地提高输入管道的吞吐量。
 
@@ -111,18 +129,18 @@ class RandFlipImage(ops.Flip):
                 data, horizontal=do_flip, vertical=do_flip, **kwargs)
 ```
 
-### 4.2 RandomErasing
-以 PaddleClas 已有的 [RandomErasing](../../../../ppcls/data/preprocess/ops/random_erasing.py#L52) 算子为例，我们希望在开启DALI训练时，将其转换为对应的 DALI 算子，且同样具备 **按指定的参数概率进行随机擦除**
+### 4.2 RandomRotation
+以 PaddleClas 已有的 [RandomRotation](../../../../ppcls/data/preprocess/ops/operators.py#L684) 算子为例，我们希望在开启DALI训练时，将其转换为对应的 DALI 算子，且同样具备 **按指定的参数与角度进行随机旋转**
 
 #### 4.1.1 继承DALI已有类
-DALI 已经提供了简单的翻转算子 [`nvidia.dali.ops.Erase`](https://docs.nvidia.com/deeplearning/dali/user-guide/docs/supported_ops_legacy.html#nvidia.dali.ops.Flip)，其通过 `anchor`、`fill_value`、`shape`等参数控制擦除区域和擦除填充值。但是其缺少一定的随机性，无法直接按照一定分布选取擦除区域，且无法自定义填充值，因此我们需要继承这个擦除类，并重写其 `__init__` 方法和 `__call__` 方法。继承代码如下所示：
+DALI 已经提供了简单的翻转算子 [`nvidia.dali.ops.Rotate`](https://docs.nvidia.com/deeplearning/dali/user-guide/docs/supported_ops_legacy.html#nvidia.dali.ops.Rotate)，其通过 `angle`、`fill_value`、`interp_type` 等参数控制旋转的角度和填充值以及插值方式。但是其缺少一定的随机性，此我们需要继承这个旋转类，并重写其 `__init__` 方法和 `__call__` 方法。继承代码如下所示：
 
 ```python
 import nvidia.dali.ops as ops
 
-class RandomErasing(ops.Erase):
+class RandomRotation(ops.Rotate):
     def __init__(self, *kargs, device="cpu", **kwargs):
-        super(RandomErasing, self).__init__(*kargs, device=device, **kwargs)
+        super(RandomRotation, self).__init__(*kargs, device=device, **kwargs)
         ...
 
     def __call__(self, data, **kwargs):
@@ -130,153 +148,42 @@ class RandomErasing(ops.Erase):
 ```
 
 #### 4.1.2 重写 \_\_init\_\_ 方法
-我们需要在构造算子时加入随机参数来控制是否翻转，因此仿照普通 `RandomErasing`算子的逻辑，在继承类的初始化方法中加入参数 `prob`，同理再加入 `flip_code` 用于控制水平、垂直翻转。
+我们需要在构造算子时加入随机参数来控制是否翻转，因此仿照普通 `RandomRotation` 算子的逻辑，在继承类的初始化方法中加入参数 `prob`，同理再加入 `angle` 用于控制旋转角度。
 
-由于每一次执行我们都需要生成一个随机数（此处用0或1表示），代表是否进行随机擦除，因此我们实例化一个 `ops.random.CoinFlip` 来作为随机数生成器（实例化对象为上述代码中的 `self.rng`）。在此基础上我们需要根据 `operators.py` 中的代码，构建出如 `target_area`、`aspect_ratio`这样的一些随机变量来控制擦除时的区域。
-
-同时随机擦除时填充擦除区域的值也有多种选择，因此我们还需要另一个填充值生成类，该类的写法与 `random_erasing.py` 中的写法类似。
+由于每一次执行我们都需要生成一个随机数（此处用0或1表示），代表是否进行随机旋转，因此我们实例化一个 `ops.random.CoinFlip` 来作为随机数生成器（实例化对象为上述代码中的 `self.rng`）。除此之外我们还需要实例化一个随机数生成器来作为实际旋转时的角度（实例化对象为上述代码中的 `self.rng_angle`），由于角度是一个均匀分布而不是二项分布，因此需要使用 `random.Uniform` 这个类来完成。
 
 修改后代码如下所示：
 ```python
-class Pixels(ops.random.Normal):
-    def __init__(self, *kargs, device="cpu", mode="const", mean=[0.0, 0.0, 0.0], channel_first=False, h=224, w=224, c=3, **kwargs):
-        super(Pixels, self).__init__(*kargs, device=device, **kwargs)
-        self._mode = mode
-        self._mean = mean
-        self.channel_first = channel_first
-        self.h = h
-        self.w = w
-        self.c = c
-
-    def __call__(self, **kwargs):
-        if self._mode == "rand":
-            return super(Pixels, self).__call__(shape=(3)) if not self.channel_first else super(Pixels, self).__call__(shape=(3))
-        elif self._mode == "pixel":
-            return super(Pixels, self).__call__(shape=(self.h, self.w, self.c)) if not self.channel_first else super(Pixels, self).__call__(shape=(self.c, self.h, self.w))
-        elif self._mode == "const":
-            return fn.constant(fdata=self._mean, shape=(self.c)) if not self.channel_first else fn.constant(fdata=self._mean, shape=(self.c))
-        else:
-            raise Exception(
-                "Invalid mode in RandomErasing, only support \"const\", \"rand\", \"pixel\""
-            )
-
-
-class RandomErasing(ops.Erase):
-    def __init__(self,
-                 *kargs,
-                 device="cpu",
-                 EPSILON=0.5,
-                 sl=0.02,
-                 sh=0.4,
-                 r1=0.3,
-                 mean=[0.0, 0.0, 0.0],
-                 attempt=100,
-                 use_log_aspect=False,
-                 mode='const',
-                 channel_first=False,
-                 img_h=224,
-                 img_w=224,
-                 **kwargs):
-        super(RandomErasing, self).__init__(*kargs, device=device, **kwargs)
-        self.EPSILON = eval(EPSILON) if isinstance(EPSILON, str) else EPSILON
-        self.sl = eval(sl) if isinstance(sl, str) else sl
-        self.sh = eval(sh) if isinstance(sh, str) else sh
-        r1 = eval(r1) if isinstance(r1, str) else r1
-        self.r1 = (math.log(r1), math.log(1 / r1)) if use_log_aspect else (r1, 1 / r1)
-        self.use_log_aspect = use_log_aspect
-        self.attempt = attempt
-        self.mean = mean
-        self.get_pixels = Pixels(device=device, mode=mode, mean=mean, channel_first=False, h=224, w=224, c=3)
-        self.channel_first = channel_first
-        self.img_h = img_h
-        self.img_w = img_w
-        self.area = img_h * img_w
+class RandomRotation(ops.Rotate):
+    def __init__(self, *kargs, device="cpu", prob=0.5, angle=0, **kwargs):
+        super(RandomRotation, self).__init__(*kargs, device=device, **kwargs)
+        self.rng = ops.random.CoinFlip(probability=prob)
+        self.rng_angle = ops.random.Uniform(range=(-angle, angle))
 
     def __call__(self, data, **kwargs):
         ...
 ```
 
 #### 4.1.3 重写 \_\_call\_\_ 方法
-有了以上的一些变量，按照`operators.py`的逻辑进行代码编写，就能得到完整代码如下所示：
+有了以上的一些变量，仿照 `operators.py` 的逻辑和 [RandomFlip-重写__call__方法](#413-重写-__call__-方法) 的方式，进行代码编写，就能得到完整代码，如下所示：
 ```python
-class Pixels(ops.random.Normal):
-    def __init__(self, *kargs, device="cpu", mode="const", mean=[0.0, 0.0, 0.0], channel_first=False, h=224, w=224, c=3, **kwargs):
-        super(Pixels, self).__init__(*kargs, device=device, **kwargs)
-        self._mode = mode
-        self._mean = mean
-        self.channel_first = channel_first
-        self.h = h
-        self.w = w
-        self.c = c
-
-    def __call__(self, **kwargs):
-        if self._mode == "rand":
-            return super(Pixels, self).__call__(shape=(3)) if not self.channel_first else super(Pixels, self).__call__(shape=(3))
-        elif self._mode == "pixel":
-            return super(Pixels, self).__call__(shape=(self.h, self.w, self.c)) if not self.channel_first else super(Pixels, self).__call__(shape=(self.c, self.h, self.w))
-        elif self._mode == "const":
-            return fn.constant(fdata=self._mean, shape=(self.c)) if not self.channel_first else fn.constant(fdata=self._mean, shape=(self.c))
-        else:
-            raise Exception(
-                "Invalid mode in RandomErasing, only support \"const\", \"rand\", \"pixel\""
-            )
-
-
-class RandomErasing(ops.Erase):
-    def __init__(self,
-                 *kargs,
-                 device="cpu",
-                 EPSILON=0.5,
-                 sl=0.02,
-                 sh=0.4,
-                 r1=0.3,
-                 mean=[0.0, 0.0, 0.0],
-                 attempt=100,
-                 use_log_aspect=False,
-                 mode='const',
-                 channel_first=False,
-                 img_h=224,
-                 img_w=224,
-                 **kwargs):
-        super(RandomErasing, self).__init__(*kargs, device=device, **kwargs)
-        self.EPSILON = eval(EPSILON) if isinstance(EPSILON, str) else EPSILON
-        self.sl = eval(sl) if isinstance(sl, str) else sl
-        self.sh = eval(sh) if isinstance(sh, str) else sh
-        r1 = eval(r1) if isinstance(r1, str) else r1
-        self.r1 = (math.log(r1), math.log(1 / r1)) if use_log_aspect else (r1, 1 / r1)
-        self.use_log_aspect = use_log_aspect
-        self.attempt = attempt
-        self.mean = mean
-        self.get_pixels = Pixels(device=device, mode=mode, mean=mean, channel_first=False, h=224, w=224, c=3)
-        self.channel_first = channel_first
-        self.img_h = img_h
-        self.img_w = img_w
-        self.area = img_h * img_w
+class RandomRotation(ops.Rotate):
+    def __init__(self, *kargs, device="cpu", prob=0.5, angle=0, **kwargs):
+        super(RandomRotation, self).__init__(*kargs, device=device, **kwargs)
+        self.rng = ops.random.CoinFlip(probability=prob)
+        self.rng_angle = ops.random.Uniform(range=(-angle, angle))
 
     def __call__(self, data, **kwargs):
-        do_aug = fn.random.coin_flip(probability=self.EPSILON)
-        keep = do_aug ^ True
-        target_area = fn.random.uniform(range=(self.sl, self.sh)) * self.area
-        aspect_ratio = fn.random.uniform(range=(self.r1[0], self.r1[1]))
-        if self.use_log_aspect:
-            aspect_ratio = nvmath.exp(aspect_ratio)
-        h = nvmath.floor(nvmath.sqrt(target_area * aspect_ratio))
-        w = nvmath.floor(nvmath.sqrt(target_area / aspect_ratio))
-        pixels = self.get_pixels()
-        range1 = fn.stack((self.img_h-h)/self.img_h-(self.img_h-h)/self.img_h, (self.img_h-h)/self.img_h)
-        range2 = fn.stack((self.img_w-w)/self.img_w-(self.img_w-w)/self.img_w, (self.img_w-w)/self.img_w)
-        # shapes
-        x1 = fn.random.uniform(range=range1)
-        y1 = fn.random.uniform(range=range2)
-        anchor = fn.stack(x1, y1)
-        shape = fn.stack(h, w)
-        aug_data = super(RandomErasing, self).__call__(
+        do_rotate = self.rng()
+        angle = self.rng_angle()
+        flip_data = super(RandomRotation, self).__call__(
             data,
-            anchor=anchor,
-            normalized_anchor=True,
-            shape=shape,
-            fill_value=pixels)
-        return aug_data * do_aug + data * keep
+            angle=fn.cast(
+                do_rotate, dtype=types.FLOAT) * angle,
+            keep_size=True,
+            fill_value=0,
+            **kwargs)
+        return flip_data
 ```
 
 
