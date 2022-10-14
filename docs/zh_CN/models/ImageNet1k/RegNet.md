@@ -1,4 +1,4 @@
-# ESNet 系列
+# RegNet 系列
 -----
 
 ## 目录
@@ -6,6 +6,9 @@
 - [1. 模型介绍](#1)
     - [1.1 模型简介](#1.1)
     - [1.2 模型指标](#1.2)
+    - [1.3 Benchmark](#1.3)
+      - [1.3.1 基于 V100 GPU 的预测速度](#1.3.1)
+      - [1.3.2 基于 T4 GPU 的预测速度](#1.3.2)
 - [2. 模型快速体验](#2)
 - [3. 模型训练、评估和预测](#3)
 - [4. 模型推理部署](#4)
@@ -24,20 +27,37 @@
 
 ### 1.1 模型简介
 
-ESNet(Enhanced ShuffleNet)是百度自研的一个轻量级网络，该网络在 ShuffleNetV2 的基础上融合了 MobileNetV3、GhostNet、PPLCNet 的优点，组合成了一个在 ARM 设备上速度更快、精度更高的网络，由于其出色的表现，所以在 PaddleDetection 推出的 [PP-PicoDet](https://github.com/PaddlePaddle/PaddleDetection/tree/release/2.3/configs/picodet) 使用了该模型做 backbone，配合更强的目标检测算法，最终的指标一举刷新了目标检测模型在 ARM 设备上的 SOTA 指标。
+RegNet 是由 facebook 于 2020 年提出，旨在深化设计空间理念的概念，在 AnyNetX 的基础上逐步改进，通过加入共享瓶颈 ratio、共享组宽度、调整网络深度与宽度等策略，最终实现简化设计空间结构、提高设计空间的可解释性、改善设计空间的质量，并保持设计空间的模型多样性的目的。最终设计出的模型在类似的条件下，性能还要优于 EfficientNet，并且在 GPU 上的速度提高了 5 倍。
 
 <a name='1.2'></a>
 
 ### 1.2 模型指标
 
-| Models | Top1 | Top5 | FLOPs<br>(M) | Params<br/>(M) |
-|:--:|:--:|:--:|:--:|:--:|
-| ESNet_x0_25 | 62.48 | 83.46 | - | - | 30.9  | 2.83 |
-| ESNet_x0_5  | 68.82 | 88.04 | - | - | 67.3  | 3.25 |
-| ESNet_x0_75 | 72.24 | 90.45 | - | - | 123.7 | 3.87 |
-| ESNet_x1_0  | 73.92 | 91.40 | - | - | 197.3 | 4.64 |
+| Models           | Top1 | Top5 | Reference<br>top1 | Reference<br>top5 | FLOPs<br>(G) | Params<br>(M) |
+|:--:|:--:|:--:|:--:|:--:|:--:|:--:|
+| RegNetX_4GF        | 0.7850 | 0.9416|  0.7860 |            -| 8.0     | 22.1   |
 
-关于 Inference speed 等信息，敬请期待。
+### 1.3 Benchmark
+
+<a name='1.3.1'></a>
+
+#### 1.3.1 基于 V100 GPU 的预测速度
+
+| Models      | Size | Latency(ms)<br>bs=1 | Latency(ms)<br>bs=4 | Latency(ms)<br>bs=8 |
+| ---------------------- | --------------- | ---------------- | ----------------------- | --------------------- |
+| RegNetX_4GF            | 224 | 6.46              | 8.48         | 11.45                          |
+
+**备注：** 精度类型为 FP32，推理过程使用 TensorRT。
+
+<a name='1.3.2'></a>
+
+#### 1.3.2 基于 T4 GPU 的预测速度
+
+| Models            | Size | Latency(ms)<br>FP16<br>bs=1 | Latency(ms)<br>FP16<br>bs=4 | Latency(ms)<br>FP16<br>bs=8 | Latency(ms)<br>FP32<br>bs=1 | Latency(ms)<br>FP32<br>bs=4 | Latency(ms)<br>FP32<br>bs=8 |
+|:--:|:--:|:--:|:--:|:--:|:--:|:--:|:--:|
+| RegNetX_4GF | 224      | 6.69042    | 8.01664            | 11.60608       | 6.46478     |   11.19862    |    16.89089    |
+
+**备注：** 推理过程使用 TensorRT。
 
 <a name="2"></a>  
 
@@ -49,7 +69,7 @@ ESNet(Enhanced ShuffleNet)是百度自研的一个轻量级网络，该网络在
 
 ## 3. 模型训练、评估和预测
 
-此部分内容包括训练环境配置、ImageNet数据的准备、该模型在 ImageNet 上的训练、评估、预测等内容。在 `ppcls/configs/ImageNet/ESNet/` 中提供了该模型的训练配置，启动训练方法可以参考：[ResNet50 模型训练、评估和预测](./ResNet.md#3-模型训练评估和预测)。
+此部分内容包括训练环境配置、ImageNet数据的准备、该模型在 ImageNet 上的训练、评估、预测等内容。在 `ppcls/configs/ImageNet/RegNet/` 中提供了该模型的训练配置，启动训练方法可以参考：[ResNet50 模型训练、评估和预测](./ResNet.md#3-模型训练评估和预测)。
 
 <a name="4"></a>
 

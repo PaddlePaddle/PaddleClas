@@ -1,6 +1,6 @@
 # SwinTransformer
-
 -----
+
 ## 目录
 
 - [1. 模型介绍](#1)
@@ -23,11 +23,13 @@
 
 ## 1. 模型介绍
 
+<a name='1.1'></a>
+
 ### 1.1 模型简介
 
-Swin Transformer 是一种新的视觉 Transformer 网络，可以用作计算机视觉领域的通用骨干网路。SwinTransformer 由移动窗口（shifted windows）表示的层次 Transformer 结构组成。移动窗口将自注意计算限制在非重叠的局部窗口上，同时允许跨窗口连接，从而提高了网络性能。[论文地址](https://arxiv.org/abs/2103.14030)。
+SwinTransformer 是一种新的视觉 Transformer 网络，可以用作计算机视觉领域的通用骨干网路。SwinTransformer 由移动窗口（shifted windows）表示的层次 Transformer 结构组成。移动窗口将自注意计算限制在非重叠的局部窗口上，同时允许跨窗口连接，从而提高了网络性能。[论文地址](https://arxiv.org/abs/2103.14030)。
 
-<a name='2'></a>
+<a name='1.2'></a>
 
 ### 1.2 模型指标
 
@@ -44,13 +46,19 @@ Swin Transformer 是一种新的视觉 Transformer 网络，可以用作计算�
 
 [1]：基于 ImageNet22k 数据集预训练，然后在 ImageNet1k 数据集迁移学习得到。
 
-<a name='3'></a>
+**备注：**
+1. 与 Reference 的精度差异源于数据预处理不同。
+2. PaddleClas 所提供的该系列模型的预训练模型权重，均是基于其官方提供的权重转得。
+
+<a name='1.3'></a>
 
 ### 1.3 Benchmark
 
+<a name='1.3.1'></a>
+
 #### 1.3.1 基于 V100 GPU 的预测速度
 
-| Models  | Size |  Latency(ms)<br>bs=1 | Latency(ms)<br>bs=4 | Latency(ms)<br>bs=8 |
+| Models      | Size | Latency(ms)<br>bs=1 | Latency(ms)<br>bs=4 | Latency(ms)<br>bs=8 |
 |:--:|:--:|:--:|:--:|:--:|
 | SwinTransformer_tiny_patch4_window7_224                 | 224       | 6.59                           | 9.68                           | 16.32                          |
 | SwinTransformer_small_patch4_window7_224                | 224       | 12.54                          | 17.07                          | 28.08                          |
@@ -65,7 +73,6 @@ Swin Transformer 是一种新的视觉 Transformer 网络，可以用作计算�
 
 **备注：** 精度类型为 FP32，推理过程使用 TensorRT。
 
-
 <a name="2"></a>  
 
 ## 2. 模型快速体验
@@ -76,11 +83,9 @@ Swin Transformer 是一种新的视觉 Transformer 网络，可以用作计算�
 
 ## 3. 模型训练、评估和预测
 
-
 此部分内容包括训练环境配置、ImageNet数据的准备、SwinTransformer 在 ImageNet 上的训练、评估、预测等内容。在 `ppcls/configs/ImageNet/SwinTransformer/` 中提供了 SwinTransformer 的训练配置，可以通过如下脚本启动训练：此部分内容可以参考[ResNet50 模型训练、评估和预测](./ResNet.md#3)。
 
 **备注：** 由于 SwinTransformer 系列模型默认使用的 GPU 数量为 8 个，所以在训练时，需要指定8个GPU，如`python3 -m paddle.distributed.launch --gpus="0,1,2,3,4,5,6,7" tools/train.py -c xxx.yaml`, 如果使用 4 个 GPU 训练，默认学习率需要减小一半，精度可能有损。
-
 
 <a name="4"></a>
 
@@ -98,7 +103,7 @@ Inference 的获取可以参考 [ResNet50 推理模型准备](./ResNet.md#4.1) �
 
 ### 4.2 基于 Python 预测引擎推理
 
-PaddleClas 提供了基于 python 预测引擎推理的示例。您可以参考[ResNet50 基于 Python 预测引擎推理](./ResNet.md#4.2) 对 SwinTransformer 完成推理预测。
+PaddleClas 提供了基于 python 预测引擎推理的示例。您可以参考[ResNet50 基于 Python 预测引擎推理](./ResNet.md#42-基于-python-预测引擎推理) 。
 
 <a name="4.3"></a>
 
@@ -128,4 +133,4 @@ PaddleClas 提供了基于 Paddle Lite 来完成模型端侧部署的示例，�
 
 Paddle2ONNX 支持将 PaddlePaddle 模型格式转化到 ONNX 模型格式。通过 ONNX 可以完成将 Paddle 模型到多种推理引擎的部署，包括TensorRT/OpenVINO/MNN/TNN/NCNN，以及其它对 ONNX 开源格式进行支持的推理引擎或硬件。更多关于 Paddle2ONNX 的介绍，可以参考[Paddle2ONNX 代码仓库](https://github.com/PaddlePaddle/Paddle2ONNX)。
 
-PaddleClas 提供了基于 Paddle2ONNX 来完成 inference 模型转换 ONNX 模型并作推理预测的示例，您可以参考[Paddle2ONNX 模型转换与预测](@shuilong)来完成相应的部署工作。
+PaddleClas 提供了基于 Paddle2ONNX 来完成 inference 模型转换 ONNX 模型并作推理预测的示例，您可以参考[Paddle2ONNX 模型转换与预测](../../deployment/image_classification/paddle2onnx.md)来完成相应的部署工作。

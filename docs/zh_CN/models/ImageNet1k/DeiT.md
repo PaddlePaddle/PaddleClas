@@ -1,4 +1,4 @@
-# ESNet 系列
+# DeiT 系列
 -----
 
 ## 目录
@@ -6,6 +6,8 @@
 - [1. 模型介绍](#1)
     - [1.1 模型简介](#1.1)
     - [1.2 模型指标](#1.2)
+    - [1.3 Benchmark](#1.3)
+      - [1.3.1 基于 V100 GPU 的预测速度](#1.3.1)
 - [2. 模型快速体验](#2)
 - [3. 模型训练、评估和预测](#3)
 - [4. 模型推理部署](#4)
@@ -24,20 +26,43 @@
 
 ### 1.1 模型简介
 
-ESNet(Enhanced ShuffleNet)是百度自研的一个轻量级网络，该网络在 ShuffleNetV2 的基础上融合了 MobileNetV3、GhostNet、PPLCNet 的优点，组合成了一个在 ARM 设备上速度更快、精度更高的网络，由于其出色的表现，所以在 PaddleDetection 推出的 [PP-PicoDet](https://github.com/PaddlePaddle/PaddleDetection/tree/release/2.3/configs/picodet) 使用了该模型做 backbone，配合更强的目标检测算法，最终的指标一举刷新了目标检测模型在 ARM 设备上的 SOTA 指标。
+DeiT（Data-efficient Image Transformers）系列模型是由 FaceBook 在 2020 年底提出的，针对 ViT 模型需要大规模数据集训练的问题进行了改进，最终在 ImageNet 上取得了 83.1%的 Top1 精度。并且使用卷积模型作为教师模型，针对该模型进行知识蒸馏，在 ImageNet 数据集上可以达到 85.2% 的 Top1 精度。[论文地址](https://arxiv.org/abs/2012.12877)。
 
 <a name='1.2'></a>
 
 ### 1.2 模型指标
 
-| Models | Top1 | Top5 | FLOPs<br>(M) | Params<br/>(M) |
-|:--:|:--:|:--:|:--:|:--:|
-| ESNet_x0_25 | 62.48 | 83.46 | - | - | 30.9  | 2.83 |
-| ESNet_x0_5  | 68.82 | 88.04 | - | - | 67.3  | 3.25 |
-| ESNet_x0_75 | 72.24 | 90.45 | - | - | 123.7 | 3.87 |
-| ESNet_x1_0  | 73.92 | 91.40 | - | - | 197.3 | 4.64 |
+| Models           | Top1 | Top5 | Reference<br>top1 | Reference<br>top5 | FLOPs<br>(G) | Params<br>(M) |
+|:--:|:--:|:--:|:--:|:--:|:--:|:--:|
+| DeiT_tiny_patch16_224            | 0.718 | 0.910 | 0.722 | 0.911 | 1.07 | 5.68 |
+| DeiT_small_patch16_224           | 0.796 | 0.949 | 0.799 | 0.950 | 4.24 | 21.97 |
+| DeiT_base_patch16_224            | 0.817 | 0.957 | 0.818 | 0.956 | 16.85 | 86.42 |
+| DeiT_base_patch16_384            | 0.830 | 0.962 | 0.829 | 0.972 | 49.35 | 86.42 |
+| DeiT_tiny_distilled_patch16_224  | 0.741 | 0.918 | 0.745 | 0.919 | 1.08 | 5.87 |
+| DeiT_small_distilled_patch16_224 | 0.809 | 0.953 | 0.812 | 0.954 | 4.26 | 22.36 |
+| DeiT_base_distilled_patch16_224  | 0.831 | 0.964 | 0.834 | 0.965 | 16.93 | 87.18 |
+| DeiT_base_distilled_patch16_384  | 0.851 | 0.973 | 0.852 | 0.972 | 49.43 | 87.18 |
 
-关于 Inference speed 等信息，敬请期待。
+**备注：** PaddleClas 所提供的该系列模型的预训练模型权重，均是基于其官方提供的权重转得。
+
+### 1.3 Benchmark
+
+<a name='1.3.1'></a>
+
+#### 1.3.1 基于 V100 GPU 的预测速度
+
+| Models                               | Size | Latency(ms)<br>bs=1 | Latency(ms)<br>bs=4 | Latency(ms)<br>bs=8 |
+| ------------------------------------ | ----------------- | ------------------------------ | ------------------------------ | ------------------------------ |
+| DeiT_tiny_<br>patch16_224            | 224               | 3.61                           | 3.94                           | 6.10                           |
+| DeiT_small_<br>patch16_224           | 224               | 3.61                           | 6.24                           | 10.49                          |
+| DeiT_base_<br>patch16_224            | 224               | 6.13                           | 14.87                          | 28.50                          |
+| DeiT_base_<br>patch16_384            | 384               | 14.12                          | 48.80                          | 97.60                          |
+| DeiT_tiny_<br>distilled_patch16_224  | 224               | 3.51                           | 4.05                           | 6.03                           |
+| DeiT_small_<br>distilled_patch16_224 | 224               | 3.70                           | 6.20                           | 10.53                          |
+| DeiT_base_<br>distilled_patch16_224  | 224               | 6.17                           | 14.94                          | 28.58                          |
+| DeiT_base_<br>distilled_patch16_384  | 384               | 14.12                          | 48.76                          | 97.09                          |
+
+**备注：** 精度类型为 FP32，推理过程使用 TensorRT。
 
 <a name="2"></a>  
 
@@ -49,7 +74,9 @@ ESNet(Enhanced ShuffleNet)是百度自研的一个轻量级网络，该网络在
 
 ## 3. 模型训练、评估和预测
 
-此部分内容包括训练环境配置、ImageNet数据的准备、该模型在 ImageNet 上的训练、评估、预测等内容。在 `ppcls/configs/ImageNet/ESNet/` 中提供了该模型的训练配置，启动训练方法可以参考：[ResNet50 模型训练、评估和预测](./ResNet.md#3-模型训练评估和预测)。
+此部分内容包括训练环境配置、ImageNet数据的准备、该模型在 ImageNet 上的训练、评估、预测等内容。在 `ppcls/configs/ImageNet/DeiT/` 中提供了该模型的训练配置，启动训练方法可以参考：[ResNet50 模型训练、评估和预测](./ResNet.md#3-模型训练评估和预测)。
+
+**备注：** 由于 DeiT 系列模型默认使用的 GPU 数量为 8 个，所以在训练时，需要指定8个GPU，如`python3 -m paddle.distributed.launch --gpus="0,1,2,3,4,5,6,7" tools/train.py -c xxx.yaml`, 如果使用 4 个 GPU 训练，默认学习率需要减小一半，精度可能有损。
 
 <a name="4"></a>
 

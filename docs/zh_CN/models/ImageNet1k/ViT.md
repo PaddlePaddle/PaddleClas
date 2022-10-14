@@ -1,4 +1,4 @@
-# ESNet 系列
+# ViT 系列
 -----
 
 ## 目录
@@ -6,6 +6,8 @@
 - [1. 模型介绍](#1)
     - [1.1 模型简介](#1.1)
     - [1.2 模型指标](#1.2)
+    - [1.3 Benchmark](#1.3)
+      - [1.3.1 基于 V100 GPU 的预测速度](#1.3.1)
 - [2. 模型快速体验](#2)
 - [3. 模型训练、评估和预测](#3)
 - [4. 模型推理部署](#4)
@@ -24,20 +26,41 @@
 
 ### 1.1 模型简介
 
-ESNet(Enhanced ShuffleNet)是百度自研的一个轻量级网络，该网络在 ShuffleNetV2 的基础上融合了 MobileNetV3、GhostNet、PPLCNet 的优点，组合成了一个在 ARM 设备上速度更快、精度更高的网络，由于其出色的表现，所以在 PaddleDetection 推出的 [PP-PicoDet](https://github.com/PaddlePaddle/PaddleDetection/tree/release/2.3/configs/picodet) 使用了该模型做 backbone，配合更强的目标检测算法，最终的指标一举刷新了目标检测模型在 ARM 设备上的 SOTA 指标。
+ViT（Vision Transformer）系列模型是 Google 在 2020 年提出的，该模型仅使用标准的 Transformer 结构，完全抛弃了卷积结构，将图像拆分为多个 patch 后再输入到 Transformer 中，展示了 Transformer 在 CV 领域的潜力。[论文地址](https://arxiv.org/abs/2010.11929)。
 
 <a name='1.2'></a>
 
 ### 1.2 模型指标
 
-| Models | Top1 | Top5 | FLOPs<br>(M) | Params<br/>(M) |
-|:--:|:--:|:--:|:--:|:--:|
-| ESNet_x0_25 | 62.48 | 83.46 | - | - | 30.9  | 2.83 |
-| ESNet_x0_5  | 68.82 | 88.04 | - | - | 67.3  | 3.25 |
-| ESNet_x0_75 | 72.24 | 90.45 | - | - | 123.7 | 3.87 |
-| ESNet_x1_0  | 73.92 | 91.40 | - | - | 197.3 | 4.64 |
+| Models           | Top1 | Top5 | Reference<br>top1 | Reference<br>top5 | FLOPs<br>(G) | Params<br>(M) |
+|:--:|:--:|:--:|:--:|:--:|:--:|:--:|
+| ViT_small_patch16_224 | 0.7769 | 0.9342 | 0.7785 | 0.9342 | 9.41 | 48.60 |
+| ViT_base_patch16_224  | 0.8195 | 0.9617 | 0.8178 | 0.9613 | 16.85 | 86.42 |
+| ViT_base_patch16_384  | 0.8414 | 0.9717 | 0.8420 | 0.9722 | 49.35 | 86.42 |
+| ViT_base_patch32_384  | 0.8176 | 0.9613 | 0.8166 | 0.9613 | 12.66 | 88.19 |
+| ViT_large_patch16_224 | 0.8323 | 0.9650 | 0.8306 | 0.9644 | 59.65 | 304.12 |
+| ViT_large_patch16_384 | 0.8513 | 0.9736 | 0.8517 | 0.9736 | 174.70 | 304.12 |
+| ViT_large_patch32_384 | 0.8153 | 0.9608 | 0.815  | -      | 44.24 | 306.48 |
 
-关于 Inference speed 等信息，敬请期待。
+**备注：** PaddleClas 所提供的该系列模型的预训练模型权重，均是基于其官方提供的权重转得。
+
+### 1.3 Benchmark
+
+<a name='1.3.1'></a>
+
+#### 1.3.1 基于 V100 GPU 的预测速度
+
+| Models      | Size | Latency(ms)<br>bs=1 | Latency(ms)<br>bs=4 | Latency(ms)<br>bs=8 |
+| -------------------------- | --------- | ----------------- | ------------------------------ | ------------------------------ | ------------------------------ |
+| ViT_small_<br/>patch16_224 | 224               | 3.71                           | 9.05                           | 16.72                          |
+| ViT_base_<br/>patch16_224  | 224               | 6.12                           | 14.84                          | 28.51                          |
+| ViT_base_<br/>patch16_384  | 384               | 14.15                          | 48.38                          | 95.06                          |
+| ViT_base_<br/>patch32_384  | 384               | 4.94                           | 13.43                          | 24.08                          |
+| ViT_large_<br/>patch16_224 | 224               | 15.53                          | 49.50                          | 94.09                          |
+| ViT_large_<br/>patch16_384 | 384               | 39.51                          | 152.46                         | 304.06                         |
+| ViT_large_<br/>patch32_384 | 384               | 11.44                          | 36.09                          | 70.63                          |
+
+**备注：** 精度类型为 FP32，推理过程使用 TensorRT。
 
 <a name="2"></a>  
 
@@ -49,7 +72,9 @@ ESNet(Enhanced ShuffleNet)是百度自研的一个轻量级网络，该网络在
 
 ## 3. 模型训练、评估和预测
 
-此部分内容包括训练环境配置、ImageNet数据的准备、该模型在 ImageNet 上的训练、评估、预测等内容。在 `ppcls/configs/ImageNet/ESNet/` 中提供了该模型的训练配置，启动训练方法可以参考：[ResNet50 模型训练、评估和预测](./ResNet.md#3-模型训练评估和预测)。
+此部分内容包括训练环境配置、ImageNet数据的准备、该模型在 ImageNet 上的训练、评估、预测等内容。在 `ppcls/configs/ImageNet/VisionTransformer/` 中提供了该模型的训练配置，启动训练方法可以参考：[ResNet50 模型训练、评估和预测](./ResNet.md#3-模型训练评估和预测)。
+
+**备注：** 由于 ViT 系列模型默认使用的 GPU 数量为 8 个，所以在训练时，需要指定8个GPU，如`python3 -m paddle.distributed.launch --gpus="0,1,2,3,4,5,6,7" tools/train.py -c xxx.yaml`, 如果使用 4 个 GPU 训练，默认学习率需要减小一半，精度可能有损。
 
 <a name="4"></a>
 

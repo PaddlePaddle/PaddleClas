@@ -1,4 +1,4 @@
-# PVTV2
+# ResNeXt 系列
 -----
 
 ## 目录
@@ -6,6 +6,9 @@
 - [1. 模型介绍](#1)
     - [1.1 模型简介](#1.1)
     - [1.2 模型指标](#1.2)
+    - [1.3 Benchmark](#1.3)
+      - [1.3.1 基于 V100 GPU 的预测速度](#1.3.1)
+      - [1.3.2 基于 T4 GPU 的预测速度](#1.3.2)
 - [2. 模型快速体验](#2)
 - [3. 模型训练、评估和预测](#3)
 - [4. 模型推理部署](#4)
@@ -24,23 +27,56 @@
 
 ### 1.1 模型简介
 
-PVTV2 是 VisionTransformer 系列模型，该模型基于 PVT（Pyramid Vision Transformer）改进得到，PVT 模型使用 Transformer 结构构建了特征金字塔网络。PVTV2 的主要创新点有：1. 带 overlap 的 Patch embeding；2. 结合卷积神经网络；3. 注意力模块为线性复杂度。[论文地址](https://arxiv.org/pdf/2106.13797.pdf)。
+SENet 是 2017 年 ImageNet 分类比赛的冠军方案，其提出了一个全新的 SE 结构，该结构可以迁移到任何其他网络中，其通过控制 scale 的大小，把每个通道间重要的特征增强，不重要的特征减弱，从而让提取的特征指向性更强。
+
+该系列模型的 FLOPs、参数量以及 T4 GPU 上的预测耗时如下图所示。
+
+![](../../images/models/T4_benchmark/t4.fp32.bs4.SeResNeXt.flops.png)
+
+![](../../images/models/T4_benchmark/t4.fp32.bs4.SeResNeXt.params.png)
+
+![](../../images/models/T4_benchmark/t4.fp32.bs4.SeResNeXt.png)
+
+![](../../images/models/T4_benchmark/t4.fp16.bs4.SeResNeXt.png)
+
 
 <a name='1.2'></a>
 
 ### 1.2 模型指标
 
-| Models           | Top1 | Top5 | Reference<br>top1 | Reference<br>top5 | FLOPS<br>(G) | Params<br>(M) |
+| Models                | Top1   | Top5   | Reference<br>top1 | Reference<br>top5 | FLOPs<br>(G) | Params<br>(M) |
 |:--:|:--:|:--:|:--:|:--:|:--:|:--:|
-| PVT_V2_B0 | 0.705 | 0.902 | 0.705 | - | 0.53 | 3.7 |
-| PVT_V2_B1 | 0.787 | 0.945 | 0.787 | - | 2.0 | 14.0 |
-| PVT_V2_B2 | 0.821 | 0.960 | 0.820 | - | 3.9 | 25.4 |
-| PVT_V2_B3 | 0.831 | 0.965 | 0.831 | - | 6.7 | 45.2 |
-| PVT_V2_B4 | 0.836 | 0.967 | 0.836 | - | 9.8 | 62.6 |
-| PVT_V2_B5 | 0.837 | 0.966 | 0.838 | - | 11.4 | 82.0 |
-| PVT_V2_B2_Linear | 0.821 | 0.961 | 0.821 | - | 3.8 | 22.6 |
+| SE_ResNeXt50_32x4d    | 0.784  | 0.940  | 0.789             | 0.945             | 8.020        | 26.160            |
+| SE_ResNeXt50_vd_32x4d | 0.802  | 0.949  |                   |                   | 10.760       | 26.280            |
+| SE_ResNeXt101_32x4d   | 0.7939  | 0.9443  | 0.793             | 0.950             | 15.020       | 46.280            |
 
-<a name="2"></a>  
+### 1.3 Benchmark
+
+<a name='1.3.1'></a>
+
+#### 1.3.1 基于 V100 GPU 的预测速度
+
+| Models      | Size | Latency(ms)<br>bs=1 | Latency(ms)<br>bs=4 | Latency(ms)<br>bs=8 |
+|-----------------------|-------------------|-----------------------|-----------------------|-----------------------|
+| SE_ResNeXt50_32x4d    | 224       | 6.39               | 11.01              | 14.94              |
+| SE_ResNeXt50_vd_32x4d | 224       | 7.04               | 11.57              | 16.01              |
+| SE_ResNeXt101_32x4d   | 224       | 13.31             | 21.85             | 28.77             |
+
+**备注：** 精度类型为 FP32，推理过程使用 TensorRT。
+
+<a name='1.3.2'></a>
+
+#### 1.3.2 基于 T4 GPU 的预测速度
+
+| Models            | Size | Latency(ms)<br>FP16<br>bs=1 | Latency(ms)<br>FP16<br>bs=4 | Latency(ms)<br>FP16<br>bs=8 | Latency(ms)<br>FP32<br>bs=1 | Latency(ms)<br>FP32<br>bs=4 | Latency(ms)<br>FP32<br>bs=8 |
+|:--:|:--:|:--:|:--:|:--:|:--:|:--:|:--:|
+| SE_ResNeXt50_32x4d    | 224  | 9.06957                      | 11.37898                     | 18.86282                     | 8.74121                      | 13.563                       | 23.01954                     |
+| SE_ResNeXt50_vd_32x4d | 224  | 9.25016                      | 11.85045                     | 25.57004                     | 9.17134                      | 14.76192                     | 19.914                       |
+| SE_ResNeXt101_32x4d   | 224  | 19.34455                     | 20.6104                      | 32.20432                     | 18.82604                     | 25.31814                     | 41.97758                     |
+
+**备注：** 推理过程使用 TensorRT。
+
+<a name="2"></a>
 
 ## 2. 模型快速体验
 
@@ -50,9 +86,7 @@ PVTV2 是 VisionTransformer 系列模型，该模型基于 PVT（Pyramid Vision 
 
 ## 3. 模型训练、评估和预测
 
-此部分内容包括训练环境配置、ImageNet数据的准备、该模型在 ImageNet 上的训练、评估、预测等内容。在 `ppcls/configs/ImageNet/PVTV2/` 中提供了该模型的训练配置，启动训练方法可以参考：[ResNet50 模型训练、评估和预测](./ResNet.md#3-模型训练评估和预测)。
-
-**备注：** 由于 PVTV2 系列模型默认使用的 GPU 数量为 8 个，所以在训练时，需要指定8个GPU，如`python3 -m paddle.distributed.launch --gpus="0,1,2,3,4,5,6,7" tools/train.py -c xxx.yaml`, 如果使用 4 个 GPU 训练，默认学习率需要减小一半，精度可能有损。
+此部分内容包括训练环境配置、ImageNet数据的准备、该模型在 ImageNet 上的训练、评估、预测等内容。在 `ppcls/configs/ImageNet/SENet/` 中提供了该模型的训练配置，启动训练方法可以参考：[ResNet50 模型训练、评估和预测](./ResNet.md#3-模型训练评估和预测)。
 
 <a name="4"></a>
 
@@ -100,8 +134,4 @@ PaddleClas 提供了基于 Paddle Lite 来完成模型端侧部署的示例，�
 
 Paddle2ONNX 支持将 PaddlePaddle 模型格式转化到 ONNX 模型格式。通过 ONNX 可以完成将 Paddle 模型到多种推理引擎的部署，包括TensorRT/OpenVINO/MNN/TNN/NCNN，以及其它对 ONNX 开源格式进行支持的推理引擎或硬件。更多关于 Paddle2ONNX 的介绍，可以参考[Paddle2ONNX 代码仓库](https://github.com/PaddlePaddle/Paddle2ONNX)。
 
-<<<<<<< 60cba5adfae34265593069e36ff0d379b8aeba71:docs/zh_CN/models/ImageNet1k/PVTV2.md
 PaddleClas 提供了基于 Paddle2ONNX 来完成 inference 模型转换 ONNX 模型并作推理预测的示例，您可以参考[Paddle2ONNX 模型转换与预测](../../deployment/image_classification/paddle2onnx.md)来完成相应的部署工作。
-=======
-PaddleClas 提供了基于 Paddle2ONNX 来完成 inference 模型转换 ONNX 模型并作推理预测的示例，您可以参考[Paddle2ONNX 模型转换与预测](../../../deploy/paddle2onnx/readme.md)来完成相应的部署工作。
->>>>>>> docs: update:docs/zh_CN/models/PVTV2.md
