@@ -152,8 +152,6 @@ class RandomErasing(ops.Erase):
         keep = do_aug ^ True
         target_area = fn.random.uniform(range=(self.sl, self.sh)) * self.area
         aspect_ratio = fn.random.uniform(range=(self.r1[0], self.r1[1]))
-        if self.use_log_aspect:
-            aspect_ratio = nvmath.exp(aspect_ratio)
         h = nvmath.floor(nvmath.sqrt(target_area * aspect_ratio))
         w = nvmath.floor(nvmath.sqrt(target_area / aspect_ratio))
         pixels = self.get_pixels()
