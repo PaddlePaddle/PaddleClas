@@ -5,13 +5,13 @@
 
 ## 目录
 
-- [模型库概览图](#Overview)
-- [SSLD 知识蒸馏预训练模型](#SSLD)
-  - [服务器端知识蒸馏模型](#SSLD_server)
-  - [移动端知识蒸馏模型](#SSLD_mobile)
-  - [Intel CPU 端知识蒸馏模型](#SSLD_intel_cpu)
-- [CNN 系列模型](#CNN_based)
-  - [服务器端模型](#CNN_server)
+- [一、模型库概览图](#Overview)
+- [二、SSLD 知识蒸馏预训练模型](#SSLD)
+  - [2.1 服务器端知识蒸馏模型](#SSLD_server)
+  - [2.2 移动端知识蒸馏模型](#SSLD_mobile)
+  - [2.3 Intel CPU 端知识蒸馏模型](#SSLD_intel_cpu)
+- [三、CNN 系列模型](#CNN_based)
+  - [3.1 服务器端模型](#CNN_server)
     - [PP-HGNet 系列](#PPHGNet)
     - [ResNet 系列](#ResNet)
     - [SEResNeXt 与 Res2Net 系列](#SEResNeXt&Res2Net)
@@ -27,11 +27,11 @@
     - [DLA 系列](#DLA)
     - [RedNet 系列](#RedNet)
     - [其他模型](#Others)
-  - [轻量级模型](#CNN_lite)
+  - [3.2 轻量级模型](#CNN_lite)
     - [移动端系列](#Mobile)
     - [PP-LCNet & PP-LCNetV2 系列](#PPLCNet)
-- [Transformer 系列模型](#Transformer_based)
-  - [服务器端模型](#Transformer_server)
+- [四、Transformer 系列模型](#Transformer_based)
+  - [4.1 服务器端模型](#Transformer_server)
     - [ViT_and_DeiT 系列](#ViT&DeiT)
     - [SwinTransformer 系列](#SwinTransformer)
     - [Twins 系列](#Twins)
@@ -39,13 +39,13 @@
     - [PVTV2 系列](#PVTV2)
     - [LeViT 系列](#LeViT)
     - [TNT 系列](#TNT)
-  - [轻量级模型](#Transformer_lite)
+  - [4.2 轻量级模型](#Transformer_lite)
     - [MobileViT 系列](#MobileViT)
-- [参考文献](#reference)
+- [五、参考文献](#reference)
 
 <a name="Overview"></a>
 
-## 模型库概览图
+## 一、模型库概览图
 
 基于 ImageNet1k 分类数据集，PaddleClas 支持 37 个系列分类网络结构以及对应的 217 个图像分类预训练模型，训练技巧、每个系列网络结构的简单介绍和性能评估将在相应章节展现，下面所有的速度指标评估环境如下：
 * Arm CPU 的评估环境基于骁龙 855(SD855)。
@@ -67,12 +67,12 @@
 
 <a name="SSLD"></a>
 
-## SSLD 知识蒸馏预训练模型
+## 二、SSLD 知识蒸馏预训练模型
 基于 SSLD 知识蒸馏的预训练模型列表如下所示，更多关于 SSLD 知识蒸馏方案的介绍可以参考：[SSLD 知识蒸馏文档](../../algorithm_introduction/knowledge_distillation.md)。
 
 <a name="SSLD_server"></a>
 
-### 服务器端知识蒸馏模型
+### 2.1 服务器端知识蒸馏模型
 
 | 模型                  | Top-1 Acc | Reference<br>Top-1 Acc | Acc gain | time(ms)<br>bs=1 | time(ms)<br>bs=4 | time(ms)<br/>bs=8 | FLOPs(G) | Params(M) | 预训练模型下载地址 | inference模型下载地址 |
 |---------------------|-----------|-----------|---------------|----------------|-----------|----------|-----------|-----------------------------------|-----------------------------------|-----------------------------------|
@@ -90,7 +90,7 @@
 
 <a name="SSLD_mobile"></a>
 
-### 移动端知识蒸馏模型
+### 2.2 移动端知识蒸馏模型
 
 | 模型                  | Top-1 Acc | Reference<br>Top-1 Acc | Acc gain | SD855 time(ms)<br>bs=1, thread=1 | SD855 time(ms)<br/>bs=1, thread=2 | SD855 time(ms)<br/>bs=1, thread=4 | FLOPs(M) | Params(M) | <span style="white-space:nowrap;">模型大小(M)</span> | 预训练模型下载地址 | inference模型下载地址 |
 |---------------------|-----------|-----------|---------------|----------------|-----------|----------|-----------|-----------------------------------|-----------------------------------|-----------------------------------|-----------------------------------|
@@ -103,7 +103,7 @@
 
 <a name="SSLD_intel_cpu"></a>
 
-### Intel CPU 端知识蒸馏模型
+### 2.3 Intel CPU 端知识蒸馏模型
 
 | 模型                  | Top-1 Acc | Reference<br>Top-1 Acc | Acc gain |  Intel-Xeon-Gold-6148 time(ms)<br>bs=1 | FLOPs(M) | Params(M)  | 预训练模型下载地址 | inference模型下载地址 |
 |---------------------|-----------|-----------|---------------|----------------|----------|-----------|-----------------------------------|-----------------------------------|
@@ -115,11 +115,11 @@
 
 <a name="CNN_based"></a>
 
-## CNN 系列模型
+## 三、CNN 系列模型
 
 <a name="CNN_server"></a>
 
-### 服务器端模型
+### 3.1 服务器端模型
 
 <a name="PPHGNet"></a>
 
@@ -394,7 +394,7 @@ ResNeSt 与 RegNet 系列模型的精度、速度指标如下表所示，更多�
 
 <a name="CNN_lite"></a>
 
-### 轻量级模型
+### 3.2 轻量级模型
 
 <a name="Mobile"></a>
 
@@ -472,11 +472,11 @@ PP-LCNet 系列模型的精度、速度指标如下表所示，更多关于该�
 
 <a name="Transformer_based"></a>
 
-### Transformer 系列模型
+### 四、Transformer 系列模型
 
 <a name="Transformer_server"></a>
 
-### 服务器端模型
+### 4.1 服务器端模型
 
 <a name="ViT&DeiT"></a>
 
@@ -602,7 +602,7 @@ ViT(Vision Transformer) 与 DeiT（Data-efficient Image Transformers）系列模
 
 <a name="Transformer_lite"></a>
 
-### 轻量级模型
+### 4.2 轻量级模型
 
 <a name="MobileViT"></a>
 
@@ -618,7 +618,7 @@ ViT(Vision Transformer) 与 DeiT（Data-efficient Image Transformers）系列模
 
 <a name='reference'></a>
 
-## 参考文献
+## 五、参考文献
 
 <a name="ref1">[1]</a> He K, Zhang X, Ren S, et al. Deep residual learning for image recognition[C]//Proceedings of the IEEE conference on computer vision and pattern recognition. 2016: 770-778.
 
