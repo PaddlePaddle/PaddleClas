@@ -20,6 +20,8 @@
     - [3.1 环境配置](#3.1)
     - [3.2 数据准备](#3.2)
     - [3.3 模型训练](#3.3)
+      - [3.3.1 训练 ImageNet](#3.3.1)
+      - [3.3.2 基于 ImageNet 权重微调](#3.3.2)
     - [3.4 模型评估](#3.4)
     - [3.5 模型预测](#3.5)
 - [4. 模型推理部署](#4)
@@ -229,6 +231,10 @@ cd path_to_PaddleClas
 <a name="3.3"></a>
 
 ### 3.3 模型训练
+    
+<a name="3.3.1"></a>
+
+#### 3.3.1 训练 ImageNet
 
 在 `ppcls/configs/ImageNet/PPLCNetV2/PPLCNetV2_base.yaml` 中提供了 PPLCNetV2_base 训练配置，可以通过如下脚本启动训练：
 
@@ -243,6 +249,10 @@ python3 -m paddle.distributed.launch \
 **备注：**
 
 * 当前精度最佳的模型会保存在 `output/PPLCNetV2_base/best_model.pdparams`
+    
+#### 3.3.2 基于 ImageNet 权重微调
+
+如果训练的不是 ImageNet 任务，而是其他任务时，需要更改配置文件和训练方法，详情可以参考：[模型微调](../../training/single_label_classification/finetune.md)。
 
 <a name="3.4"></a>
 
@@ -283,6 +293,8 @@ python3 tools/infer.py \
 * 默认是对 `docs/images/inference_deployment/whl_demo.jpg` 进行预测，此处也可以通过增加字段 `-o Infer.infer_imgs=xxx` 对其他图片预测。
 
 * 默认输出的是 Top-5 的值，如果希望输出 Top-k 的值，可以指定`-o Infer.PostProcess.topk=k`，其中，`k` 为您指定的值。
+    
+* 默认的标签映射基于 ImageNet 数据集，如果改变数据集，需要重新指定`Infer.PostProcess.class_id_map_file`，该映射文件的制作方法可以参考`ppcls/utils/imagenet1k_label_list.txt`。
 
 <a name="4"></a>
 

@@ -1,4 +1,4 @@
-# 微调模型
+# 模型微调
 ---
 
 此处提供了用户在 linux 操作系统上使用 PaddleClas 的微调（finetune）模型的教程，此处默认您已经配置好本地环境且已经执行过[快速开始](../../quick_start/quick_start_classification_professional.md)相关的代码。
@@ -50,7 +50,7 @@ val/ILSVRC2012_val_00000001.JPEG 65
 <a name="2.1"></a>
 ### 2.1 更改配置文件
 
-在 finetune 自己的任务时，往往需要更改训练的配置文件，在`ppcls/configs/ImageNet/`中，定义了所有模型在 ImageNet 数据上的训练配置，可以直接修改该配置完成训练。下面以 ResNet50_vd 为例子，详述需要修改的配置。
+在 finetune 自己的任务时，往往需要更改训练的配置文件，在`ppcls/configs/ImageNet/`中，定义了所有模型在 ImageNet 数据上的训练配置，可以直接修改该配置完成训练。下面以 ResNet50_vd 为例子，详述需要修改的配置。其中，该配置文件存在于`ppcls/configs/ImageNet/ResNet/ResNet50_vd.yaml`。
 
 1.类别数：类别数量默认为1000（ImageNet-1k类别数），此处需要修改为实际任务中的类别数量。
 ```
