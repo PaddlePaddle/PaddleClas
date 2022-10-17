@@ -23,7 +23,6 @@ from paddle import nn
 import numpy as np
 import random
 
-from ppcls.utils.check import check_gpu
 from ppcls.utils.misc import AverageMeter
 from ppcls.utils import logger
 from ppcls.utils.logger import init_logger
@@ -347,6 +346,10 @@ class Engine(object):
 
         self.max_iter = len(self.train_dataloader) - 1 if platform.system(
         ) == "Windows" else len(self.train_dataloader)
+        if self.config["Global"].get("iter_per_epoch", None):
+            # set max iteration per epoch mannualy, when training by iteration(s), such as XBM, FixMatch.
+            self.max_iter = self.config["Global"].get("iter_per_epoch")
+
         self.max_iter = self.max_iter // self.update_freq * self.update_freq
 
         for epoch_id in range(best_metric["epoch"] + 1,
@@ -370,6 +373,13 @@ class Engine(object):
                     "eval_during_train"] and epoch_id % self.config["Global"][
                         "eval_interval"] == 0 and epoch_id > start_eval_epoch:
                 acc = self.eval(epoch_id)
+
+                # step lr (by epoch) according to given metric, such as acc
+                for i in range(len(self.lr_sch)):
+                    if getattr(self.lr_sch[i], "by_epoch", False) and \
+                            self.lr_sch[i].__class__.__name__ == "ReduceOnPlateau":
+                        self.lr_sch[i].step(acc)
+
                 if acc > best_metric["metric"]:
                     best_metric["metric"] = acc
                     best_metric["epoch"] = epoch_id
