@@ -1,4 +1,4 @@
-# ResNeXt 系列
+# SENet 系列
 -----
 
 ## 目录
@@ -31,13 +31,13 @@ SENet 是 2017 年 ImageNet 分类比赛的冠军方案，其提出了一个全�
 
 该系列模型的 FLOPs、参数量以及 T4 GPU 上的预测耗时如下图所示。
 
-![](../../images/models/T4_benchmark/t4.fp32.bs4.SeResNeXt.flops.png)
+![](../../../images/models/T4_benchmark/t4.fp32.bs4.SeResNeXt.flops.png)
 
-![](../../images/models/T4_benchmark/t4.fp32.bs4.SeResNeXt.params.png)
+![](../../../images/models/T4_benchmark/t4.fp32.bs4.SeResNeXt.params.png)
 
-![](../../images/models/T4_benchmark/t4.fp32.bs4.SeResNeXt.png)
+![](../../../images/models/T4_benchmark/t4.fp32.bs4.SeResNeXt.png)
 
-![](../../images/models/T4_benchmark/t4.fp16.bs4.SeResNeXt.png)
+![](../../../images/models/T4_benchmark/t4.fp16.bs4.SeResNeXt.png)
 
 
 <a name='1.2'></a>
