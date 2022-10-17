@@ -29,11 +29,7 @@ def train_epoch(engine, epoch_id, print_batch_step):
             for key in engine.time_info:
                 engine.time_info[key].reset()
         engine.time_info["reader_cost"].update(time.time() - tic)
-        if engine.use_dali:
-            batch = [
-                paddle.to_tensor(batch[0]['data']),
-                paddle.to_tensor(batch[0]['label'])
-            ]
+
         batch_size = batch[0].shape[0]
         if not engine.config["Global"].get("use_multilabel", False):
             batch[1] = batch[1].reshape([batch_size, -1])
