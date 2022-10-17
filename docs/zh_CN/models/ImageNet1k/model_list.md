@@ -10,8 +10,8 @@
   - [服务器端知识蒸馏模型](#SSLD_server)
   - [移动端知识蒸馏模型](#SSLD_mobile)
   - [Intel CPU 端知识蒸馏模型](#SSLD_intel_cpu)
-- CNN 系列模型
-  - 服务器端模型
+- [CNN 系列模型](#CNN_based)
+  - [服务器端模型](#CNN_server)
     - [PP-HGNet 系列](#PPHGNet)
     - [ResNet 系列](#ResNet)
     - [SEResNeXt 与 Res2Net 系列](#SEResNeXt&Res2Net)
@@ -27,11 +27,11 @@
     - [DLA 系列](#DLA)
     - [RedNet 系列](#RedNet)
     - [其他模型](#Others)
-  - 轻量级模型
+  - [轻量级模型](#CNN_lite)
     - [移动端系列](#Mobile)
     - [PP-LCNet & PP-LCNetV2 系列](#PPLCNet)
-- Transformer 系列模型
-  - 服务器端模型
+- [Transformer 系列模型](#Transformer_based)
+  - [服务器端模型](#Transformer_server)
     - [ViT_and_DeiT 系列](#ViT&DeiT)
     - [SwinTransformer 系列](#SwinTransformer)
     - [Twins 系列](#Twins)
@@ -39,7 +39,7 @@
     - [PVTV2 系列](#PVTV2)
     - [LeViT 系列](#LeViT)
     - [TNT 系列](#TNT)
-  - 轻量级模型
+  - [轻量级模型](#Transformer_lite)
     - [MobileViT 系列](#MobileViT)
 - [参考文献](#reference)
 
@@ -112,6 +112,14 @@
 | PPLCNet_x2_5_ssld   | 0.808    | 0.766    | 0.042 | 5.39     | 906.49     |   9.04  | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/PPLCNet_x2_5_ssld_pretrained.pdparams)                 | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/PPLCNet_x2_5_ssld_infer.tar) |
 
 * 注: `Reference Top-1 Acc` 表示 PaddleClas 基于 ImageNet1k 数据集训练得到的预训练模型精度。
+
+<a name="CNN_based"></a>
+
+## CNN 系列模型
+
+<a name="CNN_server"></a>
+
+### 服务器端模型
 
 <a name="PPHGNet"></a>
 
@@ -384,6 +392,9 @@ ResNeSt 与 RegNet 系列模型的精度、速度指标如下表所示，更多�
 | VGG19 | 0.726 | 0.909 | 2.93             | 8.28             | 15.21 | 19.63 | 143.66 | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/VGG19_pretrained.pdparams) | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/VGG19_infer.tar) |
 | DarkNet53 | 0.780 | 0.941 | 2.79 | 6.42 | 10.89 | 9.31 | 41.65 | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DarkNet53_pretrained.pdparams) | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/DarkNet53_infer.tar) |
 
+<a name="CNN_lite"></a>
+
+### 轻量级模型
 
 <a name="Mobile"></a>
 
@@ -458,6 +469,14 @@ PP-LCNet 系列模型的精度、速度指标如下表所示，更多关于该�
 *: 基于 Intel-Xeon-Gold-6148 硬件平台与 PaddlePaddle 推理平台。
 
 **: 基于 Intel-Xeon-Gold-6271C 硬件平台与 OpenVINO 2021.4.2 推理平台。
+
+<a name="Transformer_based"></a>
+
+### Transformer 系列模型
+
+<a name="Transformer_server"></a>
+
+### 服务器端模型
 
 <a name="ViT&DeiT"></a>
 
@@ -580,6 +599,10 @@ ViT(Vision Transformer) 与 DeiT（Data-efficient Image Transformers）系列模
 | TNT_small | 0.8121   |0.9563  |                  |                  | 4.83   |  23.68    | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/TNT_small_pretrained.pdparams) | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/TNT_small_infer.tar) |
 
 **注**：TNT 模型的数据预处理部分 `NormalizeImage` 中的 `mean` 与 `std` 均为 0.5。
+
+<a name="Transformer_lite"></a>
+
+### 轻量级模型
 
 <a name="MobileViT"></a>
 
