@@ -31,6 +31,10 @@
     - [HarDNet 系列](#HarDNet)
     - [DLA 系列](#DLA)
     - [RedNet 系列](#RedNet)
+    - [ConvNeXt](#ConvNeXt)
+    - [VAN](#VAN)
+    - [PeleeNet](#PeleeNet)
+    - [CSPNet](#CSPNet)
     - [其他模型](#Others)
   - [3.2 轻量级模型](#CNN_lite)
     - [移动端系列](#Mobile)
@@ -425,6 +429,46 @@ RegNet 系列模型的精度、速度指标如下表所示，更多关于该系�
 | RedNet50| 0.7833  | 0.9417   | 8.04 | 27.71 | 53.73 | 2.61   | 15.60    | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/RedNet50_pretrained.pdparams) | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/RedNet50_infer.tar) |
 | RedNet101 | 0.7894  | 0.9436   | 13.07 | 44.12 | 83.28 | 4.59  | 25.76 | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/RedNet101_pretrained.pdparams) | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/RedNet101_infer.tar) |
 | RedNet152 | 0.7917  | 0.9440   | 18.66 | 63.27 | 119.48 | 6.57  | 34.14  | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/RedNet152_pretrained.pdparams) | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/RedNet152_infer.tar) |
+
+<a name="ConvNeXt"></a>
+
+## ConvNeXt 系列 <sup>[[39](#ref39)]</sup>
+
+关于 ConvNeXt 系列模型的精度、速度指标如下表所示，更多介绍可以参考：[ConvNeXt 系列模型文档](ConvNeXt.md)。
+
+| 模型       | Top-1 Acc | Top-5 Acc | time(ms)<br>bs=1 | time(ms)<br>bs=4 | time(ms)<br/>bs=8 | FLOPs(G) | Params(M) | 预训练模型下载地址 | inference模型下载地址 |
+| ---------- | --------- | --------- | ---------------- | ---------------- | -------- | --------- | ------------------------------------------------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ |
+| ConvNeXt_tiny | 0.8203 | 0.9590 | - | - | - | 4.458 | 28.583 | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ConvNeXt_tiny_pretrained.pdparams) | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/ConvNeXt_tiny_infer.tar) |
+
+<a name="VAN"></a>
+
+## VAN 系列 <sup>[[39](#ref39)]</sup>
+
+关于 VAN 系列模型的精度、速度指标如下表所示，更多介绍可以参考：[VAN 系列模型文档](VAN.md)。
+
+| 模型       | Top-1 Acc | Top-5 Acc | time(ms)<br>bs=1 | time(ms)<br>bs=4 | time(ms)<br/>bs=8 | FLOPs(G) | Params(M) | 预训练模型下载地址 | inference模型下载地址 |
+| ---------- | --------- | --------- | ---------------- | ---------------- | -------- | --------- | ------------------------------------------------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ |
+| VAN_B0 | 0.7535 | 0.9299  | - | - | - | 0.880 | 4.110 | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/VAN_B0_pretrained.pdparams) | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/VAN_B0_infer.tar) |
+
+<a name="PeleeNet"></a>
+
+## PeleeNet 系列 <sup>[[39](#ref39)]</sup>
+
+关于 PeleeNet 系列模型的精度、速度指标如下表所示，更多介绍可以参考：[PeleeNet 系列模型文档](PeleeNet.md)。
+
+| 模型       | Top-1 Acc | Top-5 Acc | time(ms)<br>bs=1 | time(ms)<br>bs=4 | time(ms)<br/>bs=8 | FLOPs(G) | Params(M) | 预训练模型下载地址 | inference模型下载地址 |
+| ---------- | --------- | --------- | ---------------- | ---------------- | -------- | --------- | ------------------------------------------------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ |
+| PeleeNet | 0.726   | - | - | - | - | 0.514 |  2.812 | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/PeleeNet_pretrained.pdparams) | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/PeleeNet_infer.tar) |
+
+<a name="CSPNet"></a>
+
+## CSPNet 系列 <sup>[[39](#ref39)]</sup>
+
+关于 CSPNet 系列模型的精度、速度指标如下表所示，更多介绍可以参考：[CSPNet 系列模型文档](CSPNet.md)。
+
+| 模型       | Top-1 Acc | Top-5 Acc | time(ms)<br>bs=1 | time(ms)<br>bs=4 | time(ms)<br/>bs=8 | FLOPs(G) | Params(M) | 预训练模型下载地址 | inference模型下载地址 |
+| ---------- | --------- | --------- | ---------------- | ---------------- | -------- | --------- | ------------------------------------------------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ |
+| CSPNet | 0.7725 | 0.9355  | - | - | - | 5.041 | 27.678 | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/CSPDarkNet53_pretrained.pdparams) | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/CSPDarkNet53_infer.tar) |
 
 <a name="Others"></a>
 
