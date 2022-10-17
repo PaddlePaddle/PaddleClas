@@ -14,12 +14,17 @@
   - [3.1 服务器端模型](#CNN_server)
     - [PP-HGNet 系列](#PPHGNet)
     - [ResNet 系列](#ResNet)
-    - [SEResNeXt 与 Res2Net 系列](#SEResNeXt&Res2Net)
-    - [DPN 与 DenseNet 系列](#DPN&DenseNet)
+    - [ResNeXt 系列](#ResNeXt)
+    - [Res2Net 系列](#Res2Net)
+    - [SENet 系列](#SENet)
+    - [DPN 系列](#DPN)
+    - [DenseNet 系列](#DenseNet)
     - [HRNet 系列](#HRNet)
     - [Inception 系列](#Inception)
-    - [EfficientNet 与 ResNeXt101_wsl 系列](#EfficientNetRes&NeXt101_wsl)
-    - [ResNeSt 与 RegNet 系列](#ResNeSt&RegNet)
+    - [EfficientNet 系列](#EfficientNet)
+    - [ResNeXt101_wsl 系列](#ResNeXt101_wsl)
+    - [ResNeSt 系列](#ResNeSt)
+    - [RegNet 系列](#RegNet)
     - [RepVGG 系列](#RepVGG)
     - [MixNet 系列](#MixNet)
     - [ReXNet 系列](#ReXNet)
@@ -32,7 +37,8 @@
     - [PP-LCNet & PP-LCNetV2 系列](#PPLCNet)
 - [四、Transformer 系列模型](#Transformer_based)
   - [4.1 服务器端模型](#Transformer_server)
-    - [ViT_and_DeiT 系列](#ViT&DeiT)
+    - [ViT 系列](#ViT)
+    - [DeiT 系列](#DeiT)
     - [SwinTransformer 系列](#SwinTransformer)
     - [Twins 系列](#Twins)
     - [CSwinTransformer 系列](#CSwinTransformer)
@@ -139,7 +145,7 @@ PP-HGNet 系列模型的精度、速度指标如下表所示，更多关于该�
 
 ## ResNet 系列 <sup>[[1](#ref1)]</sup>
 
-ResNet 及其 Vd 系列模型的精度、速度指标如下表所示，更多关于该系列的模型介绍可以参考：[ResNet 及其 Vd 系列模型文档](ResNet_and_vd.md)。
+ResNet 及其 Vd 系列模型的精度、速度指标如下表所示，更多关于该系列的模型介绍可以参考：[ResNet 系列模型文档](ResNet.md)。
 
 | 模型                  | Top-1 Acc | Top-5 Acc | time(ms)<br>bs=1 | time(ms)<br>bs=4 | time(ms)<br/>bs=8 | FLOPs(G) | Params(M) | 预训练模型下载地址                              | inference模型下载地址                      |
 |---------------------|-----------|-----------|-----------------------|----------------------|----------|-----------|----------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------|
@@ -159,21 +165,15 @@ ResNet 及其 Vd 系列模型的精度、速度指标如下表所示，更多关
 | ResNet50_vd_<br>ssld | 0.8300    | 0.9640    | 2.60             | 4.86             | 7.63              | 4.35     | 25.63     | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/ResNet50_vd_ssld_pretrained.pdparams) | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/ResNet50_vd_ssld_infer.tar) |
 | ResNet101_vd_<br>ssld   | 0.8373    | 0.9669    | 4.43             | 8.25             | 12.60             | 8.08     | 44.67     | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/ResNet101_vd_ssld_pretrained.pdparams)   | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/ResNet101_vd_ssld_infer.tar) |
 
-<a name="SEResNeXt&Res2Net"></a>
+<a name="ResNeXt"></a>
 
-## SEResNeXt 与 Res2Net 系列 <sup>[[7](#ref7)][[8](#ref8)][[9](#ref9)]</sup>
+## ResNeXt 系列 <sup>[[7](#ref7)]</sup>
 
-SEResNeXt 与 Res2Net 系列模型的精度、速度指标如下表所示，更多关于该系列的模型介绍可以参考：[SEResNeXt 与 Res2Net 系列模型文档](SEResNext_and_Res2Net.md)。
+ResNeXt 系列模型的精度、速度指标如下表所示，更多关于该系列的模型介绍可以参考：[ResNeXt 系列模型文档](ResNeXt.md)。
 
 
 | 模型                  | Top-1 Acc | Top-5 Acc | time(ms)<br>bs=1 | time(ms)<br>bs=4 | time(ms)<br/>bs=8 | FLOPs(G) | Params(M) | 预训练模型下载地址                              | inference模型下载地址               |
 |---------------------------|-----------|-----------|-----------------------|----------------------|----------|-----------|----------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------|
-| Res2Net50_<br>26w_4s          | 0.7933    | 0.9457    | 3.52             | 6.23             | 9.30         | 4.28     | 25.76      | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/Res2Net50_26w_4s_pretrained.pdparams)          | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/Res2Net50_26w_4s_infer.tar) |
-| Res2Net50_vd_<br>26w_4s       | 0.7975    | 0.9491    | 3.59             | 6.35             | 9.50         | 4.52     | 25.78     | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/Res2Net50_vd_26w_4s_pretrained.pdparams)       | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/Res2Net50_vd_26w_4s_infer.tar) |
-| Res2Net50_<br>14w_8s          | 0.7946    | 0.9470    | 4.39             | 7.21             | 10.38       | 4.20     | 25.12     | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/Res2Net50_14w_8s_pretrained.pdparams)          | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/Res2Net50_14w_8s_infer.tar) |
-| Res2Net101_vd_<br>26w_4s      | 0.8064    | 0.9522    | 6.34             | 11.02            | 16.13       | 8.35    | 45.35     | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/Res2Net101_vd_26w_4s_pretrained.pdparams)      | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/Res2Net101_vd_26w_4s_infer.tar) |
-| Res2Net200_vd_<br>26w_4s      | 0.8121    | 0.9571    | 11.45            | 19.77            | 28.81       | 15.77    | 76.44     | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/Res2Net200_vd_26w_4s_pretrained.pdparams)      | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/Res2Net200_vd_26w_4s_infer.tar) |
-| Res2Net200_vd_<br>26w_4s_ssld | 0.8513    | 0.9742    | 11.45            | 19.77            | 28.81             | 15.77    | 76.44     | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/Res2Net200_vd_26w_4s_ssld_pretrained.pdparams) | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/Res2Net200_vd_26w_4s_ssld_infer.tar) |
 | ResNeXt50_<br>32x4d           | 0.7775    | 0.9382    | 5.07             | 8.49             | 12.02        | 4.26     | 25.10     | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ResNeXt50_32x4d_pretrained.pdparams)           | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/ResNeXt50_32x4d_infer.tar) |
 | ResNeXt50_vd_<br>32x4d        | 0.7956    | 0.9462    | 5.29             | 8.68             | 12.33       | 4.50     | 25.12     | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ResNeXt50_vd_32x4d_pretrained.pdparams)        | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/ResNeXt50_vd_32x4d_infer.tar) |
 | ResNeXt50_<br>64x4d           | 0.7843    | 0.9413    | 9.39             | 13.97            | 20.56        | 8.02    | 45.29     | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ResNeXt50_64x4d_pretrained.pdparams)           | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/ResNeXt50_64x4d_infer.tar) |
@@ -186,6 +186,30 @@ SEResNeXt 与 Res2Net 系列模型的精度、速度指标如下表所示，更�
 | ResNeXt152_vd_<br>32x4d       | 0.8072    | 0.9520    | 16.99            | 25.29            | 33.85       | 12.01    | 60.17      | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ResNeXt152_vd_32x4d_pretrained.pdparams)       | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/ResNeXt152_vd_32x4d_infer.tar) |
 | ResNeXt152_<br>64x4d          | 0.7951    | 0.9471    | 33.07            | 42.05            | 59.13       | 23.03    | 115.27    | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ResNeXt152_64x4d_pretrained.pdparams)          | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/ResNeXt152_64x4d_infer.tar) |
 | ResNeXt152_vd_<br>64x4d       | 0.8108    | 0.9534    | 33.30            | 42.41            | 59.42       | 23.27    | 115.29   | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ResNeXt152_vd_64x4d_pretrained.pdparams)       | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/ResNeXt152_vd_64x4d_infer.tar) |
+
+<a name="Res2Net"></a>
+
+## Res2Net 系列 <sup>[[9](#ref9)]</sup>
+
+Res2Net 系列模型的精度、速度指标如下表所示，更多关于该系列的模型介绍可以参考：[Res2Net 系列模型文档](Res2Net.md)。
+
+| 模型                  | Top-1 Acc | Top-5 Acc | time(ms)<br>bs=1 | time(ms)<br>bs=4 | time(ms)<br/>bs=8 | FLOPs(G) | Params(M) | 预训练模型下载地址                              | inference模型下载地址               |
+|---------------------------|-----------|-----------|-----------------------|----------------------|----------|-----------|----------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------|
+| Res2Net50_<br>26w_4s          | 0.7933    | 0.9457    | 3.52             | 6.23             | 9.30         | 4.28     | 25.76      | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/Res2Net50_26w_4s_pretrained.pdparams)          | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/Res2Net50_26w_4s_infer.tar) |
+| Res2Net50_vd_<br>26w_4s       | 0.7975    | 0.9491    | 3.59             | 6.35             | 9.50         | 4.52     | 25.78     | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/Res2Net50_vd_26w_4s_pretrained.pdparams)       | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/Res2Net50_vd_26w_4s_infer.tar) |
+| Res2Net50_<br>14w_8s          | 0.7946    | 0.9470    | 4.39             | 7.21             | 10.38       | 4.20     | 25.12     | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/Res2Net50_14w_8s_pretrained.pdparams)          | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/Res2Net50_14w_8s_infer.tar) |
+| Res2Net101_vd_<br>26w_4s      | 0.8064    | 0.9522    | 6.34             | 11.02            | 16.13       | 8.35    | 45.35     | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/Res2Net101_vd_26w_4s_pretrained.pdparams)      | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/Res2Net101_vd_26w_4s_infer.tar) |
+| Res2Net200_vd_<br>26w_4s      | 0.8121    | 0.9571    | 11.45            | 19.77            | 28.81       | 15.77    | 76.44     | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/Res2Net200_vd_26w_4s_pretrained.pdparams)      | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/Res2Net200_vd_26w_4s_infer.tar) |
+| Res2Net200_vd_<br>26w_4s_ssld | 0.8513    | 0.9742    | 11.45            | 19.77            | 28.81             | 15.77    | 76.44     | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/Res2Net200_vd_26w_4s_ssld_pretrained.pdparams) | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/Res2Net200_vd_26w_4s_ssld_infer.tar) |
+
+<a name="SENet"></a>
+
+## SENet 系列 <sup>[[8](#ref8)]</sup>
+
+SENet 系列模型的精度、速度指标如下表所示，更多关于该系列的模型介绍可以参考：[SENet 系列模型文档](SENet.md)。
+
+| 模型                  | Top-1 Acc | Top-5 Acc | time(ms)<br>bs=1 | time(ms)<br>bs=4 | time(ms)<br/>bs=8 | FLOPs(G) | Params(M) | 预训练模型下载地址                              | inference模型下载地址               |
+|---------------------------|-----------|-----------|-----------------------|----------------------|----------|-----------|----------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------|
 | SE_ResNet18_vd            | 0.7333    | 0.9138    | 1.48             | 2.70             | 4.32         | 2.07     | 11.81      | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/SE_ResNet18_vd_pretrained.pdparams)            | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/SE_ResNet18_vd_infer.tar) |
 | SE_ResNet34_vd            | 0.7651    | 0.9320    | 2.42             | 3.69             | 6.29         | 3.93     | 22.00     | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/SE_ResNet34_vd_pretrained.pdparams)            | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/SE_ResNet34_vd_infer.tar) |
 | SE_ResNet50_vd            | 0.7952    | 0.9475    | 3.11             | 5.99             | 9.34        | 4.36     | 28.16     | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/SE_ResNet50_vd_pretrained.pdparams)            | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/SE_ResNet50_vd_infer.tar) |
@@ -194,12 +218,25 @@ SEResNeXt 与 Res2Net 系列模型的精度、速度指标如下表所示，更�
 | SE_ResNeXt101_<br>32x4d       | 0.7939    | 0.9443    | 13.31            | 21.85            | 28.77       | 8.03    | 49.09     | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/SE_ResNeXt101_32x4d_pretrained.pdparams)       | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/SE_ResNeXt101_32x4d_infer.tar) |
 | SENet154_vd               | 0.8140    | 0.9548    | 34.83            | 51.22            | 69.74       | 24.45    | 122.03    | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/SENet154_vd_pretrained.pdparams)               | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/SENet154_vd_infer.tar) |
 
-<a name="DPN&DenseNet"></a>
+<a name="DPN"></a>
 
-## DPN 与 DenseNet 系列 <sup>[[14](#ref14)][[15](#ref15)]</sup>
+## DPN 系列 <sup>[[14](#ref14)]</sup>
 
-DPN 与 DenseNet 系列模型的精度、速度指标如下表所示，更多关于该系列的模型介绍可以参考：[DPN 与 DenseNet 系列模型文档](DPN_DenseNet.md)。
+DPN 系列模型的精度、速度指标如下表所示，更多关于该系列的模型介绍可以参考：[DPN 系列模型文档](DPN.md)。
 
+| 模型                  | Top-1 Acc | Top-5 Acc | time(ms)<br>bs=1 | time(ms)<br>bs=4 | time(ms)<br/>bs=8 | FLOPs(G) | Params(M) | 预训练模型下载地址                              | inference模型下载地址 |
+|-------------|-----------|-----------|-----------------------|----------------------|----------|-----------|--------------------------------------------------------------------------------------|-------------|-------------|
+| DPN68       | 0.7678    | 0.9343    | 8.18             | 11.40            | 14.82       | 2.35     | 12.68     | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DPN68_pretrained.pdparams)       | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/DPN68_infer.tar) |
+| DPN92       | 0.7985    | 0.9480    | 12.48            | 20.04            | 25.10       | 6.54    | 37.79     | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DPN92_pretrained.pdparams)       | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/DPN92_infer.tar) |
+| DPN98       | 0.8059    | 0.9510    | 14.70            | 25.55            | 35.12       | 11.728    | 61.74     | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DPN98_pretrained.pdparams)       | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/DPN98_infer.tar) |
+| DPN107      | 0.8089    | 0.9532    | 19.46            | 35.62            | 50.22       | 18.38    | 87.13     | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DPN107_pretrained.pdparams)      | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/DPN107_infer.tar) |
+| DPN131      | 0.8070    | 0.9514    | 19.64            | 34.60            | 47.42       | 16.09    | 79.48     | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DPN131_pretrained.pdparams)      | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/DPN131_infer.tar) |
+
+<a name="DenseNet"></a>
+
+## DenseNet 系列 <sup>[[15](#ref15)]</sup>
+
+DenseNet 系列模型的精度、速度指标如下表所示，更多关于该系列的模型介绍可以参考：[DenseNet 系列模型文档](DenseNet.md)。
 
 | 模型                  | Top-1 Acc | Top-5 Acc | time(ms)<br>bs=1 | time(ms)<br>bs=4 | time(ms)<br/>bs=8 | FLOPs(G) | Params(M) | 预训练模型下载地址                              | inference模型下载地址 |
 |-------------|-----------|-----------|-----------------------|----------------------|----------|-----------|--------------------------------------------------------------------------------------|-------------|-------------|
@@ -208,11 +245,6 @@ DPN 与 DenseNet 系列模型的精度、速度指标如下表所示，更多关
 | DenseNet169 | 0.7681    | 0.9331    | 5.00             | 10.29            | 12.84       | 3.40     | 14.31     | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DenseNet169_pretrained.pdparams) | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/DenseNet169_infer.tar) |
 | DenseNet201 | 0.7763    | 0.9366    | 6.38             | 13.72            | 17.17       | 4.34     | 20.24     | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DenseNet201_pretrained.pdparams) | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/DenseNet201_infer.tar) |
 | DenseNet264 | 0.7796    | 0.9385    | 9.34             | 20.95            | 25.41       | 5.82    | 33.74     | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DenseNet264_pretrained.pdparams) | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/DenseNet264_infer.tar) |
-| DPN68       | 0.7678    | 0.9343    | 8.18             | 11.40            | 14.82       | 2.35     | 12.68     | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DPN68_pretrained.pdparams)       | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/DPN68_infer.tar) |
-| DPN92       | 0.7985    | 0.9480    | 12.48            | 20.04            | 25.10       | 6.54    | 37.79     | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DPN92_pretrained.pdparams)       | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/DPN92_infer.tar) |
-| DPN98       | 0.8059    | 0.9510    | 14.70            | 25.55            | 35.12       | 11.728    | 61.74     | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DPN98_pretrained.pdparams)       | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/DPN98_infer.tar) |
-| DPN107      | 0.8089    | 0.9532    | 19.46            | 35.62            | 50.22       | 18.38    | 87.13     | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DPN107_pretrained.pdparams)      | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/DPN107_infer.tar) |
-| DPN131      | 0.8070    | 0.9514    | 19.64            | 34.60            | 47.42       | 16.09    | 79.48     | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DPN131_pretrained.pdparams)      | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/DPN131_infer.tar) |
 
 <a name="HRNet"></a>
 
@@ -250,19 +282,14 @@ Inception 系列模型的精度、速度指标如下表所示，更多关于该�
 | InceptionV3        | 0.7914    | 0.9459    | 4.78             | 8.53             | 12.28        | 5.73    | 23.87     | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/InceptionV3_pretrained.pdparams)        | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/InceptionV3_infer.tar) |
 | InceptionV4        | 0.8077    | 0.9526    | 8.93             | 15.17            | 21.56       | 12.29    | 42.74     | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/InceptionV4_pretrained.pdparams)        | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/InceptionV4_infer.tar) |
 
-<a name="EfficientNet&ResNeXt101_wsl"></a>
+<a name="EfficientNet"></a>
 
-## EfficientNet 与 ResNeXt101_wsl 系列 <sup>[[16](#ref16)][[17](#ref17)]</sup>
+## EfficientNet 系列 <sup>[[16](#ref16)]</sup>
 
-EfficientNet 与 ResNeXt101_wsl 系列模型的精度、速度指标如下表所示，更多关于该系列的模型介绍可以参考：[EfficientNet 与 ResNeXt101_wsl 系列模型文档](EfficientNet_and_ResNeXt101_wsl.md)。
+EfficientNet 系列模型的精度、速度指标如下表所示，更多关于该系列的模型介绍可以参考：[EfficientNet 系列模型文档](EfficientNet.md)。
 
 | 模型                        | Top-1 Acc | Top-5 Acc | time(ms)<br>bs=1 | time(ms)<br>bs=4 | time(ms)<br/>bs=8 | FLOPs(G) | Params(M) | 预训练模型下载地址                                    | inference模型下载地址                           |
 |---------------------------|-----------|-----------|------------------|------------------|----------|-----------|----------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------|
-| ResNeXt101_<br>32x8d_wsl      | 0.8255    | 0.9674    | 13.55            | 23.39            | 36.18   | 16.48    | 88.99     | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ResNeXt101_32x8d_wsl_pretrained.pdparams)      | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/ResNeXt101_32x8d_wsl_infer.tar) |
-| ResNeXt101_<br>32x16d_wsl     | 0.8424    | 0.9726    | 21.96            | 38.35            | 63.29   | 36.26    | 194.36    | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ResNeXt101_32x16d_wsl_pretrained.pdparams)     | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/ResNeXt101_32x16d_wsl_infer.tar) |
-| ResNeXt101_<br>32x32d_wsl     | 0.8497    | 0.9759    | 37.28            | 76.50            | 121.56 | 87.28   | 469.12    | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ResNeXt101_32x32d_wsl_pretrained.pdparams)     | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/ResNeXt101_32x32d_wsl_infer.tar) |
-| ResNeXt101_<br>32x48d_wsl     | 0.8537    | 0.9769    | 55.07            | 124.39           | 205.01 | 153.57   | 829.26     | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ResNeXt101_32x48d_wsl_pretrained.pdparams)     | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/ResNeXt101_32x48d_wsl_infer.tar) |
-| Fix_ResNeXt101_<br>32x48d_wsl | 0.8626    | 0.9797    | 55.01            | 122.63           | 204.66 | 313.41   | 829.26     | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/Fix_ResNeXt101_32x48d_wsl_pretrained.pdparams) | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/Fix_ResNeXt101_32x48d_wsl_infer.tar) |
 | EfficientNetB0            | 0.7738    | 0.9331    | 1.96             | 3.71             | 5.56     | 0.40     | 5.33       | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/EfficientNetB0_pretrained.pdparams)            | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/EfficientNetB0_infer.tar) |
 | EfficientNetB1            | 0.7915    | 0.9441    | 2.88             | 5.40             | 7.63     | 0.71     | 7.86      | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/EfficientNetB1_pretrained.pdparams)            | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/EfficientNetB1_infer.tar) |
 | EfficientNetB2            | 0.7985    | 0.9474    | 3.26             | 6.20             | 9.17    | 1.02     | 9.18      | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/EfficientNetB2_pretrained.pdparams)            | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/EfficientNetB2_infer.tar) |
@@ -273,16 +300,40 @@ EfficientNet 与 ResNeXt101_wsl 系列模型的精度、速度指标如下表所
 | EfficientNetB7            | 0.8430    | 0.9689    | 25.91            | 71.23            | 128.20         | 38.45    | 66.66     | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/EfficientNetB7_pretrained.pdparams)            | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/EfficientNetB7_infer.tar) |
 | EfficientNetB0_<br>small      | 0.7580    | 0.9258    | 1.24             | 2.59             | 3.92     | 0.40     | 4.69      | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/EfficientNetB0_small_pretrained.pdparams)      | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/EfficientNetB0_small_infer.tar) |
 
-<a name="ResNeSt&RegNet"></a>
 
-## ResNeSt 与 RegNet 系列 <sup>[[24](#ref24)][[25](#ref25)]</sup>
+<a name="ResNeXt101_wsl"></a>
 
-ResNeSt 与 RegNet 系列模型的精度、速度指标如下表所示，更多关于该系列的模型介绍可以参考：[ResNeSt 与 RegNet 系列模型文档](ResNeSt_RegNet.md)。
+## ResNeXt101_wsl 系列 <sup>[[17](#ref17)]</sup>
+
+ResNeXt101_wsl 系列模型的精度、速度指标如下表所示，更多关于该系列的模型介绍可以参考：[ResNeXt101_wsl 系列模型文档](ResNeXt101_wsl.md)。
+
+| 模型                        | Top-1 Acc | Top-5 Acc | time(ms)<br>bs=1 | time(ms)<br>bs=4 | time(ms)<br/>bs=8 | FLOPs(G) | Params(M) | 预训练模型下载地址                                    | inference模型下载地址                           |
+|---------------------------|-----------|-----------|------------------|------------------|----------|-----------|----------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------|
+| ResNeXt101_<br>32x8d_wsl      | 0.8255    | 0.9674    | 13.55            | 23.39            | 36.18   | 16.48    | 88.99     | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ResNeXt101_32x8d_wsl_pretrained.pdparams)      | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/ResNeXt101_32x8d_wsl_infer.tar) |
+| ResNeXt101_<br>32x16d_wsl     | 0.8424    | 0.9726    | 21.96            | 38.35            | 63.29   | 36.26    | 194.36    | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ResNeXt101_32x16d_wsl_pretrained.pdparams)     | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/ResNeXt101_32x16d_wsl_infer.tar) |
+| ResNeXt101_<br>32x32d_wsl     | 0.8497    | 0.9759    | 37.28            | 76.50            | 121.56 | 87.28   | 469.12    | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ResNeXt101_32x32d_wsl_pretrained.pdparams)     | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/ResNeXt101_32x32d_wsl_infer.tar) |
+| ResNeXt101_<br>32x48d_wsl     | 0.8537    | 0.9769    | 55.07            | 124.39           | 205.01 | 153.57   | 829.26     | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ResNeXt101_32x48d_wsl_pretrained.pdparams)     | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/ResNeXt101_32x48d_wsl_infer.tar) |
+| Fix_ResNeXt101_<br>32x48d_wsl | 0.8626    | 0.9797    | 55.01            | 122.63           | 204.66 | 313.41   | 829.26     | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/Fix_ResNeXt101_32x48d_wsl_pretrained.pdparams) | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/Fix_ResNeXt101_32x48d_wsl_infer.tar) |
+
+<a name="ResNeSt"></a>
+
+## ResNeSt 系列 <sup>[[24](#ref24)]</sup>
+
+ResNeSt 系列模型的精度、速度指标如下表所示，更多关于该系列的模型介绍可以参考：[ResNeSt 系列模型文档](ResNeSt.md)。
 
 | 模型                   | Top-1 Acc | Top-5 Acc | time(ms)<br>bs=1 | time(ms)<br>bs=4 | time(ms)<br/>bs=8 | FLOPs(G) | Params(M) | 预训练模型下载地址                                      | inference模型下载地址                          |
 |------------------------|-----------|-----------|------------------|------------------|----------|-----------|------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------|
 | ResNeSt50_<br>fast_1s1x64d | 0.8035    | 0.9528    | 2.73             | 5.33             | 8.24           | 4.36     | 26.27      | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ResNeSt50_fast_1s1x64d_pretrained.pdparams) | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/ResNeSt50_fast_1s1x64d_infer.tar) |
 | ResNeSt50              | 0.8083    | 0.9542    | 7.36             | 10.23            | 13.84          | 5.40    | 27.54      | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ResNeSt50_pretrained.pdparams)              | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/ResNeSt50_infer.tar) |
+
+<a name="RegNet"></a>
+
+## RegNet 系列 <sup>[[25](#ref25)]</sup>
+
+RegNet 系列模型的精度、速度指标如下表所示，更多关于该系列的模型介绍可以参考：[RegNet 系列模型文档](RegNet.md)。
+
+| 模型                   | Top-1 Acc | Top-5 Acc | time(ms)<br>bs=1 | time(ms)<br>bs=4 | time(ms)<br/>bs=8 | FLOPs(G) | Params(M) | 预训练模型下载地址                                      | inference模型下载地址                          |
+|------------------------|-----------|-----------|------------------|------------------|----------|-----------|------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------|
 | RegNetX_4GF            | 0.785     | 0.9416    | 6.46             | 8.48             |      11.45     | 4.00        | 22.23      | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/RegNetX_4GF_pretrained.pdparams)            | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/RegNetX_4GF_infer.tar) |
 
 <a name="RepVGG"></a>
@@ -379,7 +430,7 @@ ResNeSt 与 RegNet 系列模型的精度、速度指标如下表所示，更多�
 
 ## 其他模型
 
-关于 AlexNet <sup>[[18](#ref18)]</sup>、SqueezeNet 系列 <sup>[[19](#ref19)]</sup>、VGG 系列 <sup>[[20](#ref20)]</sup>、DarkNet53 <sup>[[21](#ref21)]</sup> 等模型的精度、速度指标如下表所示，更多介绍可以参考：[其他模型文档](../models/Others.md)。
+关于 AlexNet <sup>[[18](#ref18)]</sup>、SqueezeNet 系列 <sup>[[19](#ref19)]</sup>、VGG 系列 <sup>[[20](#ref20)]</sup>、DarkNet53 <sup>[[21](#ref21)]</sup> 等模型的精度、速度指标如下表所示，更多介绍可以参考：[其他模型文档](Others.md)。
 
 | 模型                     | Top-1 Acc | Top-5 Acc | time(ms)<br>bs=1 | time(ms)<br>bs=4 | time(ms)<br/>bs=8 | FLOPs(G) | Params(M) | 预训练模型下载地址 | inference模型下载地址 |
 |------------------------|-----------|-----------|------------------|------------------|----------|-----------|------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------|
@@ -400,7 +451,7 @@ ResNeSt 与 RegNet 系列模型的精度、速度指标如下表所示，更多�
 
 ## 移动端系列 <sup>[[3](#ref3)][[4](#ref4)][[5](#ref5)][[6](#ref6)][[23](#ref23)]</sup>
 
-移动端系列模型的精度、速度指标如下表所示，更多关于该系列的模型介绍可以参考：[移动端系列模型文档](../models/Mobile.md)。
+移动端系列模型的精度、速度指标如下表所示，更多关于该系列的模型介绍可以参考：[MobileNetV1 系列模型文档](MobileNetV1.md)、[MobileNetV2 系列模型文档](MobileNetV2.md)、[MobileNetV3 系列模型文档](MobileNetV3.md)、[ShuffleNetV2 系列模型文档](ShuffleNetV2.md)、[GhostNet 系列模型文档](GhostNet.md)、[ESNet 系列模型文档](ESNet.md)。
 
 | 模型          | Top-1 Acc | Top-5 Acc | SD855 time(ms)<br>bs=1, thread=1 | SD855 time(ms)<br/>bs=1, thread=2 | SD855 time(ms)<br/>bs=1, thread=4 | FLOPs(M) | Params(M) | <span style="white-space:nowrap;">模型大小(M)</span> | 预训练模型下载地址 | inference模型下载地址 |
 |----------------------------------|-----------|-----------|------------------------|----------|-----------|---------|-----------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------|
@@ -449,7 +500,7 @@ ResNeSt 与 RegNet 系列模型的精度、速度指标如下表所示，更多�
 
 ## PP-LCNet & PP-LCNetV2 系列 <sup>[[28](#ref28)]</sup>
 
-PP-LCNet 系列模型的精度、速度指标如下表所示，更多关于该系列的模型介绍可以参考：[PP-LCNet 系列模型文档](../models/PP-LCNet.md)，[PP-LCNetV2 系列模型文档](../models/PP-LCNetV2.md)。
+PP-LCNet 系列模型的精度、速度指标如下表所示，更多关于该系列的模型介绍可以参考：[PP-LCNet 系列模型文档](PP-LCNet.md)，[PP-LCNetV2 系列模型文档](PP-LCNetV2.md)。
 
 | 模型           | Top-1 Acc | Top-5 Acc | time(ms)<sup>*</sup><br>bs=1 | FLOPs(M) | Params(M) | 预训练模型下载地址 | inference模型下载地址 |
 |:--:|:--:|:--:|:--:|----|----|----|:--:|
@@ -478,11 +529,11 @@ PP-LCNet 系列模型的精度、速度指标如下表所示，更多关于该�
 
 ### 4.1 服务器端模型
 
-<a name="ViT&DeiT"></a>
+<a name="ViT"></a>
 
-## ViT_and_DeiT 系列 <sup>[[31](#ref31)][[32](#ref32)]</sup>
+## ViT 系列 <sup>[[31](#ref31)]</sup>
 
-ViT(Vision Transformer) 与 DeiT（Data-efficient Image Transformers）系列模型的精度、速度指标如下表所示. 更多关于该系列模型的介绍可以参考： [ViT_and_DeiT 系列模型文档](../models/ViT_and_DeiT.md)。
+ViT(Vision Transformer) 系列模型的精度、速度指标如下表所示. 更多关于该系列模型的介绍可以参考： [ViT 系列模型文档](ViT.md)。
 
 | 模型                  | Top-1 Acc | Top-5 Acc | time(ms)<br>bs=1 | time(ms)<br>bs=4 | time(ms)<br/>bs=8 | FLOPs(G) | Params(M) | 预训练模型下载地址 | inference模型下载地址 |
 |------------------------|-----------|-----------|------------------|------------------|----------|------------------------|------------------------|------------------------|------------------------|
@@ -493,6 +544,12 @@ ViT(Vision Transformer) 与 DeiT（Data-efficient Image Transformers）系列模
 | ViT_large_<br/>patch16_224 | 0.8323  | 0.9650   | 15.53            | 49.50            | 94.09             | 59.65 | 304.12 | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ViT_large_patch16_224_pretrained.pdparams) | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/ViT_large_patch16_224_infer.tar) |
 |ViT_large_<br/>patch16_384| 0.8513 | 0.9736    | 39.51            | 152.46           | 304.06            | 174.70   | 304.12    | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ViT_large_patch16_384_pretrained.pdparams) | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/ViT_large_patch16_384_infer.tar) |
 |ViT_large_<br/>patch32_384| 0.8153 | 0.9608    | 11.44            | 36.09            | 70.63             | 44.24    | 306.48    | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ViT_large_patch32_384_pretrained.pdparams) | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/ViT_large_patch32_384_infer.tar) |
+
+<a name="DeiT"></a>
+
+## DeiT 系列 <sup>[[32](#ref32)]</sup>
+
+DeiT（Data-efficient Image Transformers）系列模型的精度、速度指标如下表所示. 更多关于该系列模型的介绍可以参考： [DeiT 系列模型文档](DeiT.md)。
 
 | 模型                  | Top-1 Acc | Top-5 Acc | time(ms)<br>bs=1 | time(ms)<br>bs=4 | time(ms)<br/>bs=8 | FLOPs(G) | Params(M) | 预训练模型下载地址 | inference模型下载地址 |
 |------------------------|-----------|-----------|------------------|------------------|----------|------------------------|------------------------|------------------------|------------------------|
@@ -509,7 +566,7 @@ ViT(Vision Transformer) 与 DeiT（Data-efficient Image Transformers）系列模
 
 ## SwinTransformer 系列 <sup>[[27](#ref27)]</sup>
 
-关于 SwinTransformer 系列模型的精度、速度指标如下表所示，更多介绍可以参考：[SwinTransformer 系列模型文档](../models/SwinTransformer.md)。
+关于 SwinTransformer 系列模型的精度、速度指标如下表所示，更多介绍可以参考：[SwinTransformer 系列模型文档](SwinTransformer.md)。
 
 | 模型       | Top-1 Acc | Top-5 Acc | time(ms)<br>bs=1 | time(ms)<br>bs=4 | time(ms)<br/>bs=8 | FLOPs(G) | Params(M) | 预训练模型下载地址                                               | inference模型下载地址                                      |
 | ---------- | --------- | --------- | ---------------- | ---------------- | -------- | --------- | ------------------------------------------------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ |
@@ -528,7 +585,7 @@ ViT(Vision Transformer) 与 DeiT（Data-efficient Image Transformers）系列模
 
 ## Twins 系列 <sup>[[34](#ref34)]</sup>
 
-关于 Twins 系列模型的精度、速度指标如下表所示，更多介绍可以参考：[Twins 系列模型文档](../models/Twins.md)。
+关于 Twins 系列模型的精度、速度指标如下表所示，更多介绍可以参考：[Twins 系列模型文档](Twins.md)。
 
 | 模型       | Top-1 Acc | Top-5 Acc | time(ms)<br>bs=1 | time(ms)<br>bs=4 | time(ms)<br/>bs=8 | FLOPs(G) | Params(M) | 预训练模型下载地址                                               | inference模型下载地址                                      |
 | ---------- | --------- | --------- | ---------------- | ---------------- | -------- | --------- | ------------------------------------------------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ |
@@ -576,7 +633,7 @@ ViT(Vision Transformer) 与 DeiT（Data-efficient Image Transformers）系列模
 
 ## LeViT 系列 <sup>[[33](#ref33)]</sup>
 
-关于 LeViT 系列模型的精度、速度指标如下表所示，更多介绍可以参考：[LeViT 系列模型文档](../models/LeViT.md)。
+关于 LeViT 系列模型的精度、速度指标如下表所示，更多介绍可以参考：[LeViT 系列模型文档](LeViT.md)。
 
 | 模型       | Top-1 Acc | Top-5 Acc | time(ms)<br>bs=1 | time(ms)<br>bs=4 | time(ms)<br/>bs=8 | FLOPs(M) | Params(M) | 预训练模型下载地址                                               | inference模型下载地址                                      |
 | ---------- | --------- | --------- | ---------------- | ---------------- | -------- | --------- | ------------------------------------------------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ |
@@ -592,7 +649,7 @@ ViT(Vision Transformer) 与 DeiT（Data-efficient Image Transformers）系列模
 
 ## TNT 系列 <sup>[[35](#ref35)]</sup>
 
-关于 TNT 系列模型的精度、速度指标如下表所示，更多介绍可以参考：[TNT 系列模型文档](../models/TNT.md)。
+关于 TNT 系列模型的精度、速度指标如下表所示，更多介绍可以参考：[TNT 系列模型文档](TNT.md)。
 
 | 模型       | Top-1 Acc | Top-5 Acc | time(ms)<br>bs=1 | time(ms)<br>bs=4 | FLOPs(G) | Params(M) | 预训练模型下载地址                                               | inference模型下载地址                                      |
 | ---------- | --------- | --------- | ---------------- | ---------------- | -------- | --------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
