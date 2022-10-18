@@ -26,7 +26,7 @@
 
 ### 1.1 模型简介
 
-PeleeNet 系列模型是基于 DenseNet 网络所提出的稠密链接的思想，对 DenseNet 网络进行结构上的优化所得到，因此可以视为是 DenseNet 的轻量化版本。[论文地址](https://arxiv.org/pdf/1804.06882.pdf)。
+PeleeNet 系列模型是基于 DenseNet 网络所提出的稠密链接的思想，对 DenseNet 网络进行结构上的优化所得到，在模型性能和效率之间取得了较好的平衡，因此可以视为是 DenseNet 的轻量化版本。[论文地址](https://arxiv.org/pdf/1804.06882.pdf)。
 
 <a name='1.2'></a>
 
@@ -34,7 +34,7 @@ PeleeNet 系列模型是基于 DenseNet 网络所提出的稠密链接的思想�
 
 | Models           | Top1 | Top5 | Reference<br>top1 | Reference<br>top5 | FLOPs<br>(G) | Params<br>(M) |
 |:--:|:--:|:--:|:--:|:--:|:--:|:--:|
-| PeleeNet         | 0.726 | - | 0.726 | - | 0.514 | 2.812 |
+| PeleeNet         | 0.7153 | 0.9040 | 0.716 | - | 0.514 | 2.812 |
 
 
 ### 1.3 Benchmark
