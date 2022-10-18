@@ -18,7 +18,7 @@ Global:
 
 # model architecture
 Arch:
-  name: VAN_tiny
+  name: VAN_B0
   class_num: 1000
   drop_path_rate: 0.1
   drop_rate: 0.0
