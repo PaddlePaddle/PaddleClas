@@ -432,7 +432,7 @@ RegNet 系列模型的精度、速度指标如下表所示，更多关于该系�
 
 <a name="ConvNeXt"></a>
 
-## ConvNeXt 系列 <sup>[[39](#ref39)]</sup>
+## ConvNeXt 系列 <sup>[[43](#ref43)]</sup>
 
 关于 ConvNeXt 系列模型的精度、速度指标如下表所示，更多介绍可以参考：[ConvNeXt 系列模型文档](ConvNeXt.md)。
 
@@ -442,7 +442,7 @@ RegNet 系列模型的精度、速度指标如下表所示，更多关于该系�
 
 <a name="VAN"></a>
 
-## VAN 系列 <sup>[[39](#ref39)]</sup>
+## VAN 系列 <sup>[[44](#ref44)]</sup>
 
 关于 VAN 系列模型的精度、速度指标如下表所示，更多介绍可以参考：[VAN 系列模型文档](VAN.md)。
 
@@ -452,7 +452,7 @@ RegNet 系列模型的精度、速度指标如下表所示，更多关于该系�
 
 <a name="PeleeNet"></a>
 
-## PeleeNet 系列 <sup>[[39](#ref39)]</sup>
+## PeleeNet 系列 <sup>[[45](#ref45)]</sup>
 
 关于 PeleeNet 系列模型的精度、速度指标如下表所示，更多介绍可以参考：[PeleeNet 系列模型文档](PeleeNet.md)。
 
@@ -462,7 +462,7 @@ RegNet 系列模型的精度、速度指标如下表所示，更多关于该系�
 
 <a name="CSPNet"></a>
 
-## CSPNet 系列 <sup>[[39](#ref39)]</sup>
+## CSPNet 系列 <sup>[[46](#ref46)]</sup>
 
 关于 CSPNet 系列模型的精度、速度指标如下表所示，更多介绍可以参考：[CSPNet 系列模型文档](CSPNet.md)。
 
@@ -805,3 +805,11 @@ TRANSFORMERS FOR IMAGE RECOGNITION AT SCALE.
 <a name="ref41">[41]</a>Wenhai Wang, Enze Xie, Xiang Li, Deng-Ping Fan, Kaitao Song, Ding Liang, Tong Lu, Ping Luo, Ling Shao. PVTv2: Improved Baselines with Pyramid Vision Transformer.
 
 <a name="ref42">[42]</a>Sachin Mehta, Mohammad Rastegari. MobileViT: Light-weight, General-purpose, and Mobile-friendly Vision Transformer.
+
+<a name="ref43">[43]</a>Zhuang Liu, Hanzi Mao, Chao-Yuan Wu, Christoph Feichtenhofer, Trevor Darrell, Saining Xie. A ConvNet for the 2020s.
+
+<a name="ref44">[44]</a>Meng-Hao Guo, Cheng-Ze Lu, Zheng-Ning Liu, Ming-Ming Cheng, Shi-Min Hu. Visual Attention Network.
+
+<a name="ref45">[45]</a>Robert J. Wang, Xiang Li, Charles X. Ling. Pelee: A Real-Time Object Detection System on Mobile Devices
+
+<a name="ref46">[46]</a>Chien-Yao Wang, Hong-Yuan Mark Liao, I-Hau Yeh, Yueh-Hua Wu, Ping-Yang Chen, Jun-Wei Hsieh. CSPNet: A New Backbone that can Enhance Learning Capability of CNN
