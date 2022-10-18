@@ -17,7 +17,7 @@
 <a name="1. 项目整体介绍"></a>
 
 ## 1. 项目整体介绍
-PaddleClas是一个致力于为工业界和学术界提供运用PaddlePaddle快速实现图像分类和图像识别的套件库，能够帮助开发者训练和部署性能更强的视觉模型。同时，PaddleClas提供了数个特色方案：[PULC超轻量级图像分类方案](#31-PULC实用图像分类方案)、[PP-ShiTU图像识别系统](#32-PP-ShiTu图像识别系统)、[PP系列骨干网络模型](../models/ImageNet1k/model_list.md)和[SSLD半监督知识蒸馏算法](../training/advanced/ssld.md)。
+PaddleClas是一个致力于为工业界和学术界提供运用PaddlePaddle快速实现图像分类和图像识别的套件库，能够帮助开发者训练和部署性能更强的视觉模型。同时，PaddleClas提供了数个特色方案：[PULC超轻量级图像分类方案](#31-PULC超轻量级图像分类方案)、[PP-ShiTU图像识别系统](#32-PP-ShiTu图像识别系统)、[PP系列骨干网络模型](../models/ImageNet1k/model_list.md)和[SSLD半监督知识蒸馏算法](../training/advanced/ssld.md)。
 <div align="center">
 <img src="https://user-images.githubusercontent.com/11568925/189267545-7a6eefa0-b4fc-4ed0-ae9d-7c6d53f59798.png"/>
 <p>PaddleClas全景图</p>
@@ -50,7 +50,7 @@ PaddleClas是一个致力于为工业界和学术界提供运用PaddlePaddle快�
 - run_benchmark.sh:执行单独一个训练测试的脚本，具体调用方式，可查看脚本注释。
 - run_all.sh: 执行所有训练测试的入口脚本。
 
-具体介绍可以[参考文档](../../../../benchmark/README.md)。
+具体介绍可以[参考文档](../../../benchmark/README.md)。
 
 <a name="2.1.2"></a>
 
@@ -147,12 +147,12 @@ jpg/image_05137.jpg 1
 ### 2.1.5 deploy
 该目录包含了PaddleClas模型部署以及PP-ShiTu相关代码。以下文档为模型部署以及PP-ShiTu相关介绍教程，可配合文档对相应代码进行理解:
 
-- [服务器端C++预测](../../../deploy/cpp/readme.md)
-- [分类模型服务化部署](../../../deploy/paddleserving/README.md)
-- [基于PaddleHub Serving服务部署](../../../deploy/hubserving/readme.md)
-- [Slim功能介绍](../../../deploy/slim/README.md)
-- [端侧部署](../../../deploy/lite/readme.md)
-- [paddle2onnx模型转化与预测](../../../deploy/paddle2onnx/readme.md)
+- [服务器端C++预测](../../../deploy/cpp)
+- [分类模型服务化部署](../../../deploy/paddleserving)
+- [基于PaddleHub Serving服务部署](../../../deploy/hubserving)
+- [Slim功能介绍](../../../deploy/slim)
+- [端侧部署](../../../deploy/lite)
+- [paddle2onnx模型转化与预测](../../../deploy/paddle2onnx)
 - [PP-ShiTu相关](../models/PP-ShiTu/README.md)
 
 
@@ -219,6 +219,6 @@ PULC是PaddleClas为了解决企业应用难题，让分类模型的训练和调
 ### 3.2 PP-ShiTu图像识别系统
 PP-ShiTuV2是一个实用的轻量级通用图像识别系统，主要由主体检测、特征学习和向量检索三个模块组成。该系统从骨干网络选择和调整、损失函数的选择、数据增强、学习率变换策略、正则化参数选择、预训练模型使用以及模型裁剪量化多个方面，采用多种策略，对各个模块的模型进行优化，PP-ShiTuV2相比V1，Recall1提升近8个点。更多细节请参考：[PP-ShiTuV2图像识别系统](../models/PP-ShiTu/README.md)
 <div align="center">
-  <img src="../images/structure.jpg"/>
+  <img src="../../images/structure.jpg"/>
 <p>PULC超轻量级图像分类方案</p>
 </div>
