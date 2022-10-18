@@ -24,7 +24,8 @@ from paddle.nn.initializer import TruncatedNormal, Constant
 from ....utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
 
 MODEL_URLS = {
-    "VAN_B0": "",  # TODO
+    "VAN_B0":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/VAN_B0_pretrained.pdparams",
 }
 
 __all__ = list(MODEL_URLS.keys())
