@@ -51,6 +51,8 @@ BASE_IMAGES_DIR = os.path.join(BASE_DIR, "images")
 IMN_MODEL_BASE_DOWNLOAD_URL = "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/{}_infer.tar"
 IMN_MODEL_SERIES = {
     "AlexNet": ["AlexNet"],
+    "ConvNeXt": ["ConvNeXt_tiny"],
+    "CSPNet": ["CSPDarkNet53"],
     "CSWinTransformer": [
         "CSWinTransformer_tiny_224", "CSWinTransformer_small_224",
         "CSWinTransformer_base_224", "CSWinTransformer_base_384",
@@ -108,6 +110,7 @@ IMN_MODEL_SERIES = {
         "MobileNetV3_small_x1_0_ssld", "MobileNetV3_large_x1_0_ssld"
     ],
     "MobileViT": ["MobileViT_XXS", "MobileViT_XS", "MobileViT_S"],
+    "PeleeNet": ["PeleeNet"],
     "PPHGNet": [
         "PPHGNet_tiny",
         "PPHGNet_small",
@@ -176,6 +179,7 @@ IMN_MODEL_SERIES = {
         "alt_gvt_base", "alt_gvt_large"
     ],
     "TNT": ["TNT_small"],
+    "VAN": ["VAN_B0"],
     "VGG": ["VGG11", "VGG13", "VGG16", "VGG19"],
     "VisionTransformer": [
         "ViT_base_patch16_224", "ViT_base_patch16_384", "ViT_base_patch32_384",
