@@ -17,7 +17,7 @@
 <a name="1. 项目整体介绍"></a>
 
 ## 1. 项目整体介绍
-PaddleClas是一个致力于为工业界和学术界提供运用PaddlePaddle快速实现图像分类和图像识别的套件库，能够帮助开发者训练和部署性能更强的视觉模型。同时，PaddleClas提供了数个特色方案：[PULC超轻量级图像分类方案](#31-PULC实用图像分类方案)、[PP-ShiTU图像识别系统](#32-PP-ShiTu图像识别系统)、[PP系列骨干网络模型](models/ImageNet1k/model_list.md)和[SSLD半监督知识蒸馏算法](training/advanced/ssld.md)。
+PaddleClas是一个致力于为工业界和学术界提供运用PaddlePaddle快速实现图像分类和图像识别的套件库，能够帮助开发者训练和部署性能更强的视觉模型。同时，PaddleClas提供了数个特色方案：[PULC超轻量级图像分类方案](#31-PULC实用图像分类方案)、[PP-ShiTU图像识别系统](#32-PP-ShiTu图像识别系统)、[PP系列骨干网络模型](../models/ImageNet1k/model_list.md)和[SSLD半监督知识蒸馏算法](../training/advanced/ssld.md)。
 <div align="center">
 <img src="https://user-images.githubusercontent.com/11568925/189267545-7a6eefa0-b4fc-4ed0-ae9d-7c6d53f59798.png"/>
 <p>PaddleClas全景图</p>
@@ -50,7 +50,7 @@ PaddleClas是一个致力于为工业界和学术界提供运用PaddlePaddle快�
 - run_benchmark.sh:执行单独一个训练测试的脚本，具体调用方式，可查看脚本注释。
 - run_all.sh: 执行所有训练测试的入口脚本。
 
-具体介绍可以[参考文档](../../benchmark/README.md)。
+具体介绍可以[参考文档](../../../../benchmark/README.md)。
 
 <a name="2.1.2"></a>
 
@@ -64,7 +64,7 @@ jpg/image_05145.jpg 1
 jpg/image_05137.jpg 1
 ```
 
-更详细的数据集格式说明请参考：[图像分类任务数据集说明](./training/single_label_classification/dataset.md)和[图像识别任务数据集说明](training/metric_learning/dataset.md)。
+更详细的数据集格式说明请参考：[图像分类任务数据集说明](../training/single_label_classification/dataset.md)和[图像识别任务数据集说明](../training/metric_learning/dataset.md)。
 
 <a name="2.1.3"></a>
 
@@ -78,7 +78,7 @@ jpg/image_05137.jpg 1
 
 **configs**
 
-该文件夹包含PaddleClas提供的官方配置文件，包括了对应不同模型、方法的配置，可以直接调用训练或作为训练配置的参考，详细介绍可参考：[配置文件说明](training/config_description/basic.md)。以下简单介绍配置文件各字段功能：
+该文件夹包含PaddleClas提供的官方配置文件，包括了对应不同模型、方法的配置，可以直接调用训练或作为训练配置的参考，详细介绍可参考：[配置文件说明](../training/config_description/basic.md)。以下简单介绍配置文件各字段功能：
 |字段名|功能|
 |:---:|:---:|
 |Global|该字段描述整体的训练配置，包括预训练权重、预训练模型、输出地址、训练设备、训练epoch数、输入图像大小等|
@@ -94,10 +94,10 @@ jpg/image_05137.jpg 1
 
 |文件夹|功能|
 |:---:|:---:|
-|backbone|PaddleClas实现的骨干网络模型，，`__init__.py`中可以查看所有模型情况，具体骨干网络模型情况可参考：[骨干网络预训练库](models/ImageNet1k/model_list.md)|
+|backbone|PaddleClas实现的骨干网络模型，，`__init__.py`中可以查看所有模型情况，具体骨干网络模型情况可参考：[骨干网络预训练库](../models/ImageNet1k/model_list.md)|
 |gears|包含特征提取网络的 `Neck`和`Head`部分代码，在识别模型中用于对骨干网络提取的特征进行转换和处理。|-|
-|distill|包含知识蒸馏相关代码，详细内容可参考：[知识蒸馏介绍](algorithm_introduction/knowledge_distillation.md)和[知识蒸馏实战](training/advanced/knowledge_distillation.md)|
-|slim|包含模型量化相关代码，详细内容可参考[算法介绍](algorithm_introduction/prune_quantization.md)和[使用介绍](advanced/prune_quantization.md)|
+|distill|包含知识蒸馏相关代码，详细内容可参考：[知识蒸馏介绍](../algorithm_introduction/knowledge_distillation.md)和[知识蒸馏实战](../training/advanced/knowledge_distillation.md)|
+|slim|包含模型量化相关代码，详细内容可参考[算法介绍](../algorithm_introduction/prune_quantization.md)和[使用介绍](../training/advanced/prune_quantization.md)|
 
 **data**
 
@@ -106,7 +106,7 @@ jpg/image_05137.jpg 1
 |文件夹|功能|
 |:---:|:---:|
 |dataloader|该目录包含了不同的数据集采样方法(dataset)和不同的采样策略(sampler)|
-|preprocess|该目录包含对数据的预处理和数据增广方法，包括对数据样本的处理(ops)和批数据处理方法(batch_ops)，详细介绍可参考：[数据增强实战](training/config_description/data_augmentation.md)|
+|preprocess|该目录包含对数据的预处理和数据增广方法，包括对数据样本的处理(ops)和批数据处理方法(batch_ops)，详细介绍可参考：[数据增强实战](../training/config_description/data_augmentation.md)|
 |postprocess|对模型输出结果的后处理，输出对应的类别名、置信度、预测结果等|
 |utils|其他常用函数|
 
@@ -147,19 +147,19 @@ jpg/image_05137.jpg 1
 ### 2.1.5 deploy
 该目录包含了PaddleClas模型部署以及PP-ShiTu相关代码。以下文档为模型部署以及PP-ShiTu相关介绍教程，可配合文档对相应代码进行理解:
 
-- [服务器端C++预测](../../deploy/cpp/readme.md)
-- [分类模型服务化部署](../../deploy/paddleserving/readme.md)
-- [基于PaddleHub Serving服务部署](../../deploy/hubserving/readme.md)
-- [Slim功能介绍](../../deploy/slim/readme.md)
-- [端侧部署](../../deploy/lite/readme.md)
-- [paddle2onnx模型转化与预测](../../deploy/paddle2onnx/readme.md)
-- [PP-ShiTu相关](models/PP-ShiTu/README.md)
+- [服务器端C++预测](../../../deploy/cpp/readme.md)
+- [分类模型服务化部署](../../../deploy/paddleserving/README.md)
+- [基于PaddleHub Serving服务部署](../../../deploy/hubserving/readme.md)
+- [Slim功能介绍](../../../deploy/slim/README.md)
+- [端侧部署](../../../deploy/lite/readme.md)
+- [paddle2onnx模型转化与预测](../../../deploy/paddle2onnx/readme.md)
+- [PP-ShiTu相关](../models/PP-ShiTu/README.md)
 
 
 <a name="2.1.6"></a>
 
 ### 2.1.6 test_tipc
-该目录包含了PaddleClas项目质量监控相关的脚本，提供了一键化测试各模型的各项性能指标的功能，详细内容请参考：[飞桨训推一体全流程开发文档](../../test_tipc/README.md)
+该目录包含了PaddleClas项目质量监控相关的脚本，提供了一键化测试各模型的各项性能指标的功能，详细内容请参考：[飞桨训推一体全流程开发文档](../../../test_tipc/README.md)
 
 <a name="2.2"></a>
 
@@ -171,30 +171,30 @@ jpg/image_05137.jpg 1
 <p>代码运行逻辑</p>
 </div>
 
-注意：此处仅介绍整体运行逻辑，建议配合[启动训练的快速体验文档](quick_start/quick_start_classification_new_user.md)进行代码运行逻辑部分的理解。
+注意：此处仅介绍整体运行逻辑，建议配合[启动训练的快速体验文档](../quick_start/quick_start_classification_new_user.md)进行代码运行逻辑部分的理解。
 
 <a name="2.2.1"></a>
 
 ### 2.2.1 编写配置文件
 
-设置训练过程中的配置参数和各个模块的构建参数，[./ppcls/configs](../../ppcls/configs)中包含了PaddleClas官方提供的参考配置文件。
+设置训练过程中的配置参数和各个模块的构建参数，[./ppcls/configs](../../../ppcls/configs)中包含了PaddleClas官方提供的参考配置文件。
 
 <a name="2.2.2"></a>
 
 ### 2.2.2 启动训练
 
 
-运行训练脚本[./tools/train.py](../../tools/train.py)启动训练，该启动脚本首先对配置文件进行解析并调用[Engine类](../../ppcls/engine/engine.py)进行各模块构建。
+运行训练脚本[./tools/train.py](../../../tools/train.py)启动训练，该启动脚本首先对配置文件进行解析并调用[Engine类](../../../ppcls/engine/engine.py)进行各模块构建。
 <div align="center">
   <img src="https://user-images.githubusercontent.com/108920665/196380536-d9161e04-5d69-4e24-b57f-389918830cf5.png"/>
 </div>
 
-模块构建主要调用`./ppcls`文件夹下各模块的`build函数`(位于各模块的的`__init__.py`文件)以及配置文件中对应参数进行构建，如下图在Engine类中调用[build_dataloader()函数](../../ppcls/data/__init__.py)构建dataloader。
+模块构建主要调用`./ppcls`文件夹下各模块的`build函数`(位于各模块的的`__init__.py`文件)以及配置文件中对应参数进行构建，如下图在Engine类中调用[build_dataloader()函数](../../../ppcls/data/__init__.py)构建dataloader。
 <div align="center">
   <img src="https://user-images.githubusercontent.com/108920665/196381203-4eb961ba-c554-49a5-87ce-a9649f96bbf7.png"/>
 </div>
 
-训练脚本[./tools/train.py](../../tools/train.py)调用Engine类完成训练所需的各个模块构建后，会调用Engine类中的`train()`方法启动训练，该方法使用[./ppcls/engine/train/train.py](../../ppcls/engine/train/train.py)中的`train_epoch（）函数`进行模型训练。
+训练脚本[./tools/train.py](../../../tools/train.py)调用Engine类完成训练所需的各个模块构建后，会调用Engine类中的`train()`方法启动训练，该方法使用[./ppcls/engine/train/train.py](../../../ppcls/engine/train/train.py)中的`train_epoch（）函数`进行模型训练。
 <div align="center">
   <img src="https://user-images.githubusercontent.com/108920665/196381856-28079311-3401-46e6-aaf2-db88c326de4c.png"/>
 </div>
@@ -208,7 +208,7 @@ jpg/image_05137.jpg 1
 <a name="3.1"></a>
 
 ### 3.1 PULC超轻量级图像分类方案
-PULC是PaddleClas为了解决企业应用难题，让分类模型的训练和调参更加容易，总结出的实用轻量图像分类解决方案（PULC, Practical Ultra Lightweight Classification）。PULC融合了骨干网络、数据增广、蒸馏等多种前沿算法，可以自动训练得到轻量且高精度的图像分类模型。详情请参考：[PULC详细介绍](zh_CN/training/PULC.md)
+PULC是PaddleClas为了解决企业应用难题，让分类模型的训练和调参更加容易，总结出的实用轻量图像分类解决方案（PULC, Practical Ultra Lightweight Classification）。PULC融合了骨干网络、数据增广、蒸馏等多种前沿算法，可以自动训练得到轻量且高精度的图像分类模型。详情请参考：[PULC详细介绍](../training/PULC.md)
 <div align="center">
   <img src="https://user-images.githubusercontent.com/19523330/173011854-b10fcd7a-b799-4dfd-a1cf-9504952a3c44.png"/>
 <p>PULC超轻量级图像分类方案</p>
@@ -217,7 +217,7 @@ PULC是PaddleClas为了解决企业应用难题，让分类模型的训练和调
 <a name="3.2"></a>
 
 ### 3.2 PP-ShiTu图像识别系统
-PP-ShiTuV2是一个实用的轻量级通用图像识别系统，主要由主体检测、特征学习和向量检索三个模块组成。该系统从骨干网络选择和调整、损失函数的选择、数据增强、学习率变换策略、正则化参数选择、预训练模型使用以及模型裁剪量化多个方面，采用多种策略，对各个模块的模型进行优化，PP-ShiTuV2相比V1，Recall1提升近8个点。更多细节请参考：[PP-ShiTuV2图像识别系统](models/PP-ShiTu/README.md)
+PP-ShiTuV2是一个实用的轻量级通用图像识别系统，主要由主体检测、特征学习和向量检索三个模块组成。该系统从骨干网络选择和调整、损失函数的选择、数据增强、学习率变换策略、正则化参数选择、预训练模型使用以及模型裁剪量化多个方面，采用多种策略，对各个模块的模型进行优化，PP-ShiTuV2相比V1，Recall1提升近8个点。更多细节请参考：[PP-ShiTuV2图像识别系统](../models/PP-ShiTu/README.md)
 <div align="center">
   <img src="../images/structure.jpg"/>
 <p>PULC超轻量级图像分类方案</p>
