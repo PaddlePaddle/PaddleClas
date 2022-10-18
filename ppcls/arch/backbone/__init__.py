@@ -66,7 +66,7 @@ from .model_zoo.cspnet import CSPDarkNet53
 from .model_zoo.pvt_v2 import PVT_V2_B0, PVT_V2_B1, PVT_V2_B2_Linear, PVT_V2_B2, PVT_V2_B3, PVT_V2_B4, PVT_V2_B5
 from .model_zoo.mobilevit import MobileViT_XXS, MobileViT_XS, MobileViT_S
 from .model_zoo.repvgg import RepVGG_A0, RepVGG_A1, RepVGG_A2, RepVGG_B0, RepVGG_B1, RepVGG_B2, RepVGG_B1g2, RepVGG_B1g4, RepVGG_B2g4, RepVGG_B3g4
-from .model_zoo.van import VAN_tiny
+from .model_zoo.van import VAN_B0
 from .model_zoo.peleenet import PeleeNet
 from .model_zoo.convnext import ConvNeXt_tiny
 from .model_zoo.cae import cae_base_patch16_224, cae_large_patch16_224
