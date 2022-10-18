@@ -458,7 +458,7 @@ RegNet 系列模型的精度、速度指标如下表所示，更多关于该系�
 
 | 模型       | Top-1 Acc | Top-5 Acc | time(ms)<br>bs=1 | time(ms)<br>bs=4 | time(ms)<br/>bs=8 | FLOPs(G) | Params(M) | 预训练模型下载地址 | inference模型下载地址 |
 | ---------- | --------- | --------- | ---------------- | ---------------- | -------- | --------- | ------------------------------------------------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ |
-| PeleeNet | 0.726   | - | - | - | - | 0.514 |  2.812 | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/PeleeNet_pretrained.pdparams) | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/PeleeNet_infer.tar) |
+| PeleeNet | 0.7153   | 0.9040 | - | - | - | 0.514 |  2.812 | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/PeleeNet_pretrained.pdparams) | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/PeleeNet_infer.tar) |
 
 <a name="CSPNet"></a>
 
