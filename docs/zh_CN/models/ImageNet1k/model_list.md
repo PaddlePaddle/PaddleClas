@@ -468,7 +468,7 @@ RegNet 系列模型的精度、速度指标如下表所示，更多关于该系�
 
 | 模型       | Top-1 Acc | Top-5 Acc | time(ms)<br>bs=1 | time(ms)<br>bs=4 | time(ms)<br/>bs=8 | FLOPs(G) | Params(M) | 预训练模型下载地址 | inference模型下载地址 |
 | ---------- | --------- | --------- | ---------------- | ---------------- | -------- | --------- | ------------------------------------------------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ |
-| CSPNet | 0.7725 | 0.9355  | - | - | - | 5.041 | 27.678 | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/CSPDarkNet53_pretrained.pdparams) | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/CSPDarkNet53_infer.tar) |
+| CSPDarkNet53 | 0.7725 | 0.9355  | - | - | - | 5.041 | 27.678 | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/CSPDarkNet53_pretrained.pdparams) | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/CSPDarkNet53_infer.tar) |
 
 <a name="Others"></a>
 
