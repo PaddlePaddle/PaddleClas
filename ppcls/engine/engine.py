@@ -42,6 +42,7 @@ from ppcls.data.utils.get_image_list import get_image_list
 from ppcls.data.postprocess import build_postprocess
 from ppcls.data import create_operators
 from ppcls.engine.train import train_epoch
+from ppcls.engine.train.utils import type_name
 from ppcls.engine import evaluation
 from ppcls.arch.gears.identity_head import IdentityHead
 
@@ -377,7 +378,7 @@ class Engine(object):
                 # step lr (by epoch) according to given metric, such as acc
                 for i in range(len(self.lr_sch)):
                     if getattr(self.lr_sch[i], "by_epoch", False) and \
-                            self.lr_sch[i].__class__.__name__ == "ReduceOnPlateau":
+                            type_name(self.lr_sch[i]) == "ReduceOnPlateau":
                         self.lr_sch[i].step(acc)
 
                 if acc > best_metric["metric"]:

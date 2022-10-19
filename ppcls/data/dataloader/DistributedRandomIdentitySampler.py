@@ -83,26 +83,6 @@ class DistributedRandomIdentitySampler(DistributedBatchSampler):
         return batch_idxs_dict, avai_pids, count
 
     def __iter__(self):
-        batch_idxs_dict, avai_pids, count = self._prepare_batch()
-        for _ in range(self.max_iters):
-            final_idxs = []
-            if len(avai_pids) < self.num_pids_per_batch:
-                batch_idxs_dict, avai_pids, count = self._prepare_batch()
-
-            selected_pids = np.random.choice(
-                avai_pids, self.num_pids_per_batch, False, count / count.sum())
-            for pid in selected_pids:
-                batch_idxs = batch_idxs_dict[pid].pop(0)
-                final_idxs.extend(batch_idxs)
-                pid_idx = avai_pids.index(pid)
-                if len(batch_idxs_dict[pid]) == 0:
-                    avai_pids.pop(pid_idx)
-                    count = np.delete(count, pid_idx)
-                else:
-                    count[pid_idx] = len(batch_idxs_dict[pid])
-            yield final_idxs
-
-    def __iter__(self):
         # prepare
         batch_idxs_dict, avai_pids, count = self._prepare_batch()
 

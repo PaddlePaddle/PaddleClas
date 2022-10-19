@@ -88,7 +88,7 @@ Optimizer:
 DataLoader:
   Train:
     dataset:
-      name: GoodsDataset
+      name: VeriWild
       image_root: ./dataset/SOP
       cls_label_path: ./dataset/SOP/train_list.txt
       backend: pil
@@ -117,7 +117,7 @@ DataLoader:
   Eval:
     Gallery:
       dataset:
-        name: GoodsDataset
+        name: VeriWild
         image_root: ./dataset/SOP
         cls_label_path: ./dataset/SOP/test_list.txt
         backend: pil
@@ -141,7 +141,7 @@ DataLoader:
 
     Query:
       dataset:
-        name: GoodsDataset
+        name: VeriWild
         image_root: ./dataset/SOP
         cls_label_path: ./dataset/SOP/test_list.txt
         backend: pil

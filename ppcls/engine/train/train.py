@@ -15,7 +15,7 @@ from __future__ import absolute_import, division, print_function
 
 import time
 import paddle
-from ppcls.engine.train.utils import update_loss, update_metric, log_info
+from ppcls.engine.train.utils import update_loss, update_metric, log_info, type_name
 from ppcls.utils import profiler
 
 
@@ -98,7 +98,8 @@ def train_epoch(engine, epoch_id, print_batch_step):
 
     # step lr(by epoch)
     for i in range(len(engine.lr_sch)):
-        if getattr(engine.lr_sch[i], "by_epoch", False):
+        if getattr(engine.lr_sch[i], "by_epoch", False) and \
+                type_name(engine.lr_sch[i]) != "ReduceOnPlateau":
             engine.lr_sch[i].step()
 
 
