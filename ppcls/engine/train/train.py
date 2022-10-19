@@ -15,15 +15,24 @@ from __future__ import absolute_import, division, print_function
 
 import time
 import paddle
-from ppcls.engine.train.utils import update_loss, update_metric, log_info
+from ppcls.engine.train.utils import update_loss, update_metric, log_info, type_name
 from ppcls.utils import profiler
 
 
 def train_epoch(engine, epoch_id, print_batch_step):
     tic = time.time()
-    for iter_id, batch in enumerate(engine.train_dataloader):
-        if iter_id >= engine.max_iter:
-            break
+
+    if not hasattr(engine, "train_dataloader_iter"):
+        engine.train_dataloader_iter = iter(engine.train_dataloader)
+
+    for iter_id in range(engine.max_iter):
+        # fetch data batch from dataloader
+        try:
+            batch = engine.train_dataloader_iter.next()
+        except Exception:
+            engine.train_dataloader_iter = iter(engine.train_dataloader)
+            batch = engine.train_dataloader_iter.next()
+
         profiler.add_profiler_step(engine.config["profiler_options"])
         if iter_id == 5:
             for key in engine.time_info:
@@ -37,7 +46,7 @@ def train_epoch(engine, epoch_id, print_batch_step):
 
         # image input
         if engine.amp:
-            amp_level = engine.config['AMP'].get("level", "O1").upper()
+            amp_level = engine.config["AMP"].get("level", "O1").upper()
             with paddle.amp.auto_cast(
                     custom_black_list={
                         "flatten_contiguous_range", "greater_than"
@@ -89,7 +98,8 @@ def train_epoch(engine, epoch_id, print_batch_step):
 
     # step lr(by epoch)
     for i in range(len(engine.lr_sch)):
-        if getattr(engine.lr_sch[i], "by_epoch", False):
+        if getattr(engine.lr_sch[i], "by_epoch", False) and \
+                type_name(engine.lr_sch[i]) != "ReduceOnPlateau":
             engine.lr_sch[i].step()
 
 

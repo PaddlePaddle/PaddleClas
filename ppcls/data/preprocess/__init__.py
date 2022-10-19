@@ -24,6 +24,7 @@ from ppcls.data.preprocess.ops.grid import GridMask
 from ppcls.data.preprocess.ops.operators import DecodeImage
 from ppcls.data.preprocess.ops.operators import ResizeImage
 from ppcls.data.preprocess.ops.operators import CropImage
+from ppcls.data.preprocess.ops.operators import CenterCrop, Resize
 from ppcls.data.preprocess.ops.operators import RandCropImage
 from ppcls.data.preprocess.ops.operators import RandCropImageV2
 from ppcls.data.preprocess.ops.operators import RandFlipImage
@@ -34,6 +35,7 @@ from ppcls.data.preprocess.ops.operators import Pad
 from ppcls.data.preprocess.ops.operators import ToTensor
 from ppcls.data.preprocess.ops.operators import Normalize
 from ppcls.data.preprocess.ops.operators import RandomHorizontalFlip
+from ppcls.data.preprocess.ops.operators import RandomResizedCrop
 from ppcls.data.preprocess.ops.operators import CropWithPadding
 from ppcls.data.preprocess.ops.operators import RandomInterpolationAugment
 from ppcls.data.preprocess.ops.operators import ColorJitter
@@ -41,7 +43,6 @@ from ppcls.data.preprocess.ops.operators import RandomCropImage
 from ppcls.data.preprocess.ops.operators import RandomRotation
 from ppcls.data.preprocess.ops.operators import Padv2
 from ppcls.data.preprocess.ops.operators import RandomRot90
-from ppcls.data.preprocess.ops.operators import BlurImage
 from .ops.operators import format_data
 
 from ppcls.data.preprocess.batch_ops.batch_operators import MixupOperator, CutmixOperator, OpSampler, FmixOperator

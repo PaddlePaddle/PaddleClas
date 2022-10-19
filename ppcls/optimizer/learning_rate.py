@@ -14,7 +14,7 @@
 
 from __future__ import (absolute_import, division, print_function,
                         unicode_literals)
-
+import types
 from abc import abstractmethod
 from typing import Union
 
@@ -389,6 +389,89 @@ class MultiStepDecay(LRBase):
 
         if self.warmup_steps > 0:
             learning_rate = self.linear_warmup(learning_rate)
+
+        setattr(learning_rate, "by_epoch", self.by_epoch)
+        return learning_rate
+
+
+class ReduceOnPlateau(LRBase):
+    """ReduceOnPlateau learning rate decay
+    Args:
+        epochs (int): total epoch(s)
+        step_each_epoch (int): number of iterations within an epoch
+        learning_rate (float): learning rate
+        mode (str, optional): ``'min'`` or ``'max'`` can be selected. Normally, it is ``'min'`` , which means that the
+            learning rate will reduce when ``loss`` stops descending. Specially, if it's set to ``'max'``, the learning
+            rate will reduce when ``loss`` stops ascending. Defaults to ``'min'``.
+        factor (float, optional): The Ratio that the learning rate will be reduced. ``new_lr = origin_lr * factor`` .
+            It should be less than 1.0. Defaults to 0.1.
+        patience (int, optional): When ``loss`` doesn't improve for this number of epochs, learing rate will be reduced.
+            Defaults to 10.
+        threshold (float, optional): ``threshold`` and ``threshold_mode`` will determine the minimum change of ``loss`` .
+            This make tiny changes of ``loss`` will be ignored. Defaults to 1e-4.
+        threshold_mode (str, optional): ``'rel'`` or ``'abs'`` can be selected. In ``'rel'`` mode, the minimum change of ``loss``
+            is ``last_loss * threshold`` , where ``last_loss`` is ``loss`` in last epoch. In ``'abs'`` mode, the minimum
+            change of ``loss`` is ``threshold`` . Defaults to ``'rel'`` .
+        cooldown (int, optional): The number of epochs to wait before resuming normal operation. Defaults to 0.
+        min_lr (float, optional): The lower bound of the learning rate after reduction. Defaults to 0.
+        epsilon (float, optional): Minimal decay applied to lr. If the difference between new and old lr is smaller than epsilon,
+            the update is ignored. Defaults to 1e-8.
+        warmup_epoch (int, optional): The epoch numbers for LinearWarmup. Defaults to 0.
+        warmup_start_lr (float, optional): start learning rate within warmup. Defaults to 0.0.
+        last_epoch (int, optional): last epoch. Defaults to -1.
+        by_epoch (bool, optional): learning rate decays by epoch when by_epoch is True, else by iter. Defaults to False.
+    """
+
+    def __init__(self,
+                 epochs,
+                 step_each_epoch,
+                 learning_rate,
+                 mode='min',
+                 factor=0.1,
+                 patience=10,
+                 threshold=1e-4,
+                 threshold_mode='rel',
+                 cooldown=0,
+                 min_lr=0,
+                 epsilon=1e-8,
+                 warmup_epoch=0,
+                 warmup_start_lr=0.0,
+                 last_epoch=-1,
+                 by_epoch=False,
+                 **kwargs):
+        super(ReduceOnPlateau, self).__init__(
+            epochs, step_each_epoch, learning_rate, warmup_epoch,
+            warmup_start_lr, last_epoch, by_epoch)
+        self.mode = mode
+        self.factor = factor
+        self.patience = patience
+        self.threshold = threshold
+        self.threshold_mode = threshold_mode
+        self.cooldown = cooldown
+        self.min_lr = min_lr
+        self.epsilon = epsilon
+
+    def __call__(self):
+        learning_rate = lr.ReduceOnPlateau(
+            learning_rate=self.learning_rate,
+            mode=self.mode,
+            factor=self.factor,
+            patience=self.patience,
+            threshold=self.threshold,
+            threshold_mode=self.threshold_mode,
+            cooldown=self.cooldown,
+            min_lr=self.min_lr,
+            epsilon=self.epsilon)
+
+        if self.warmup_steps > 0:
+            learning_rate = self.linear_warmup(learning_rate)
+
+        # NOTE: Implement get_lr() method for class `ReduceOnPlateau`,
+        # which is called in `log_info` function
+        def get_lr(self):
+            return self.last_lr
+
+        learning_rate.get_lr = types.MethodType(get_lr, learning_rate)
 
         setattr(learning_rate, "by_epoch", self.by_epoch)
         return learning_rate

@@ -97,9 +97,9 @@ The following table summarizes the accuracy metrics of the 3 configurations of t
 
 | configuration file | recall@1(\%) | mAP(\%) | reference recall@1(\%) | reference mAP(\%) | pretrained model download address | inference model download address |
 | ------------------ | ------------ | ------- | ---------------------- | ----------------- | --------------------------------- | -------------------------------- |
-| baseline.yaml | 88.45 | 74.37 | 87.7 | 74.0 | [download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/reid/pretrain/baseline_pretrained.pdparams) | [ Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/reid/inference/baseline_infer.tar) |
-| softmax_triplet.yaml | 94.29 | 85.57 | 94.1 | 85.7 | [download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/reid/pretrain/softmax_triplet_pretrained.pdparams) | [ Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/reid/inference/softmax_triplet_infer.tar) |
-| softmax_triplet_with_center.yaml | 94.50 | 85.82 | 94.5 | 85.9 | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/reid/pretrain/softmax_triplet_with_center_pretrained.pdparams) | [ Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/reid/inference/softmax_triplet_with_center_infer.tar) |
+| baseline.yaml | 88.45 | 74.37 | 87.7 | 74.0 | [download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/metric_learning/reid/baseline_pretrained.pdparams) | [ Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/metric_learning/reid/baseline_infer.tar) |
+| softmax_triplet.yaml | 94.29 | 85.57 | 94.1 | 85.7 | [download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/metric_learning/reid/softmax_triplet_pretrained.pdparams) | [ Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/metric_learning/reid/softmax_triplet_infer.tar) |
+| softmax_triplet_with_center.yaml | 94.50 | 85.82 | 94.5 | 85.9 | [Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/metric_learning/reid/softmax_triplet_with_center_pretrained.pdparams) | [ Download link](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/metric_learning/reid/softmax_triplet_with_center_infer.tar) |
 
 Note: The above reference indicators are obtained by using the author's open source code to train on our equipment for many times. Due to different system environment, torch version, CUDA version and other reasons, there may be slight differences with the indicators provided by the author.
 
@@ -171,14 +171,14 @@ Prepare the `*.pdparams` model parameter file for evaluation. You can use the tr
   -o Global.pretrained_model="./output/RecModel/latest"
   ```
 
-- Take the trained model as an example, download [softmax_triplet_with_center_pretrained.pdparams](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/reid/pretrain/softmax_triplet_with_center_pretrained.pdparams) to `PaddleClas/ In the pretrained_models` folder, execute the following command to evaluate.
+- Take the trained model as an example, download [softmax_triplet_with_center_pretrained.pdparams](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/metric_learning/reid/softmax_triplet_with_center_pretrained.pdparams) to `PaddleClas/ In the pretrained_models` folder, execute the following command to evaluate.
 
   ```shell
   # download model
   cd PaddleClas
   mkdir pretrained_models
   cd pretrained_models
-  wget https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/reid/pretrain/softmax_triplet_with_center_pretrained.pdparams
+  wget https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/metric_learning/reid/softmax_triplet_with_center_pretrained.pdparams
   cd..
   # Evaluate
   python3.7 tools/eval.py \
@@ -260,7 +260,7 @@ You can convert the model file saved during training into an inference model and
   - Or download and unzip the inference model we provide
     ```shell
     cd PaddleClas/deploy
-    wget https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/reid/inference/softmax_triplet_with_center_infer.tar
+    wget https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/metric_learning/reid/softmax_triplet_with_center_infer.tar
     tar xf softmax_triplet_with_center_infer.tar
     cd ../
     ```

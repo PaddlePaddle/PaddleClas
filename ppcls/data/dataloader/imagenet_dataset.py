@@ -25,11 +25,12 @@ class ImageNetDataset(CommonDataset):
 
     Args:
         image_root (str): image root, path to `ILSVRC2012`
-        cls_label_path (str): path to annotation file `train_list.txt` or 'val_list.txt`
+        cls_label_path (str): path to annotation file `train_list.txt` or `val_list.txt`
         transform_ops (list, optional): list of transform op(s). Defaults to None.
         delimiter (str, optional): delimiter. Defaults to None.
         relabel (bool, optional): whether do relabel when original label do not starts from 0 or are discontinuous. Defaults to False.
     """
+
     def __init__(self,
                  image_root,
                  cls_label_path,
