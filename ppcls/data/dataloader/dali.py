@@ -142,13 +142,18 @@ class HybridValPipe(Pipeline):
 
 
 class DALIImageNetIterator(DALIGenericIterator):
+    def __init__(self, *kargs, **kwargs):
+        super(DALIImageNetIterator, self).__init__(*kargs, **kwargs)
+        self.in_dynamic_mode = paddle.in_dynamic_mode()
+
     def __next__(self) -> List[paddle.Tensor]:
         data_batch = super(DALIImageNetIterator,
                            self).__next__()  # List[Dict[str, Tensor], ...]
-
         # reformat to List[Tensor1, Tensor2, ...]
         data_batch = [
-            paddle.to_tensor(data_batch[0][key]) for key in self.output_map
+            paddle.to_tensor(data_batch[0][key])
+            if self.in_dynamic_mode else data_batch[0][key]
+            for key in self.output_map
         ]
         return data_batch
 
