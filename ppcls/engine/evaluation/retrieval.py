@@ -155,11 +155,7 @@ def cal_feature(engine, name='gallery'):
             logger.info(
                 f"{name} feature calculation process: [{idx}/{len(dataloader)}]"
             )
-        if engine.use_dali:
-            batch = [
-                paddle.to_tensor(batch[0]['data']),
-                paddle.to_tensor(batch[0]['label'])
-            ]
+
         batch = [paddle.to_tensor(x) for x in batch]
         batch[1] = batch[1].reshape([-1, 1]).astype("int64")
         if len(batch) == 3:

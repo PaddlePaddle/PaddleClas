@@ -7,6 +7,8 @@ from ppcls.utils import logger
 from .celoss import CELoss, MixCELoss
 from .googlenetloss import GoogLeNetLoss
 from .centerloss import CenterLoss
+from .contrasiveloss import ContrastiveLoss
+from .contrasiveloss import ContrastiveLoss_XBM
 from .emlloss import EmlLoss
 from .msmloss import MSMLoss
 from .npairsloss import NpairsLoss

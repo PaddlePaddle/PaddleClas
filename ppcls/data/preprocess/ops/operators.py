@@ -26,6 +26,7 @@ import cv2
 import numpy as np
 from PIL import Image, ImageOps, __version__ as PILLOW_VERSION
 from paddle.vision.transforms import ColorJitter as RawColorJitter
+from paddle.vision.transforms import CenterCrop, Resize
 from paddle.vision.transforms import RandomRotation as RawRandomRotation
 from paddle.vision.transforms import ToTensor, Normalize, RandomHorizontalFlip, RandomResizedCrop
 from paddle.vision.transforms import functional as F
@@ -509,7 +510,7 @@ class RandFlipImage(object):
         assert flip_code in [-1, 0, 1
                              ], "flip_code should be a value in [-1, 0, 1]"
         self.flip_code = flip_code
-    
+
     @format_data
     def __call__(self, img):
         if random.randint(0, 1) == 1:

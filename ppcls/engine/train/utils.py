@@ -53,14 +53,13 @@ def log_info(trainer, batch_size, epoch_id, iter_id):
 
     ips_msg = "ips: {:.5f} samples/s".format(
         batch_size / trainer.time_info["batch_cost"].avg)
-    eta_sec = ((trainer.config["Global"]["epochs"] - epoch_id + 1
-                ) * trainer.max_iter - iter_id
-               ) * trainer.time_info["batch_cost"].avg
+    eta_sec = (
+        (trainer.config["Global"]["epochs"] - epoch_id + 1
+         ) * trainer.max_iter - iter_id) * trainer.time_info["batch_cost"].avg
     eta_msg = "eta: {:s}".format(str(datetime.timedelta(seconds=int(eta_sec))))
     logger.info("[Train][Epoch {}/{}][Iter: {}/{}]{}, {}, {}, {}, {}".format(
         epoch_id, trainer.config["Global"]["epochs"], iter_id,
-        trainer.max_iter, lr_msg, metric_msg, time_msg, ips_msg,
-        eta_msg))
+        trainer.max_iter, lr_msg, metric_msg, time_msg, ips_msg, eta_msg))
 
     for i, lr in enumerate(trainer.lr_sch):
         logger.scaler(
@@ -74,3 +73,8 @@ def log_info(trainer, batch_size, epoch_id, iter_id):
             value=trainer.output_info[key].avg,
             step=trainer.global_step,
             writer=trainer.vdl_writer)
+
+
+def type_name(object: object) -> str:
+    """get class name of an object"""
+    return object.__class__.__name__

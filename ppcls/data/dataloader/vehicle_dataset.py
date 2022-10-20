@@ -19,8 +19,7 @@ import paddle
 from paddle.io import Dataset
 import os
 import cv2
-
-from ppcls.data import preprocess
+from PIL import Image
 from ppcls.data.preprocess import transform
 from ppcls.utils import logger
 from .common_dataset import create_operators
@@ -89,15 +88,30 @@ class CompCars(Dataset):
 
 
 class VeriWild(Dataset):
-    def __init__(self, image_root, cls_label_path, transform_ops=None):
+    """Dataset for Vehicle and other similar data structure, such as VeRI-Wild, SOP, Inshop...
+    Args:
+        image_root (str): image root
+        cls_label_path (str): path to annotation file
+        transform_ops (List[Callable], optional): list of transform op(s). Defaults to None.
+        backend (str, optional): pil or cv2. Defaults to "cv2".
+        relabel (bool, optional): whether do relabel when original label do not starts from 0 or are discontinuous. Defaults to False.
+    """
+
+    def __init__(self,
+                 image_root,
+                 cls_label_path,
+                 transform_ops=None,
+                 backend="cv2",
+                 relabel=False):
         self._img_root = image_root
         self._cls_path = cls_label_path
         if transform_ops:
             self._transform_ops = create_operators(transform_ops)
+        self.backend = backend
         self._dtype = paddle.get_default_dtype()
-        self._load_anno()
+        self._load_anno(relabel)
 
-    def _load_anno(self):
+    def _load_anno(self, relabel):
         assert os.path.exists(
             self._cls_path), f"path {self._cls_path} does not exist."
         assert os.path.exists(
@@ -107,22 +121,40 @@ class VeriWild(Dataset):
         self.cameras = []
         with open(self._cls_path) as fd:
             lines = fd.readlines()
+            if relabel:
+                label_set = set()
+                for line in lines:
+                    line = line.strip().split()
+                    label_set.add(np.int64(line[1]))
+                label_map = {
+                    oldlabel: newlabel
+                    for newlabel, oldlabel in enumerate(label_set)
+                }
             for line in lines:
                 line = line.strip().split()
                 self.images.append(os.path.join(self._img_root, line[0]))
-                self.labels.append(np.int64(line[1]))
+                if relabel:
+                    self.labels.append(label_map[np.int64(line[1])])
+                else:
+                    self.labels.append(np.int64(line[1]))
                 if len(line) >= 3:
                     self.cameras.append(np.int64(line[2]))
-                assert os.path.exists(self.images[-1])
+                assert os.path.exists(self.images[-1]), \
+                    f"path {self.images[-1]} does not exist."
+
         self.has_camera = len(self.cameras) > 0
 
     def __getitem__(self, idx):
         try:
-            with open(self.images[idx], 'rb') as f:
-                img = f.read()
+            if self.backend == "cv2":
+                with open(self.images[idx], 'rb') as f:
+                    img = f.read()
+            else:
+                img = Image.open(self.images[idx]).convert("RGB")
             if self._transform_ops:
                 img = transform(img, self._transform_ops)
-            img = img.transpose((2, 0, 1))
+            if self.backend == "cv2":
+                img = img.transpose((2, 0, 1))
             if self.has_camera:
                 return (img, self.labels[idx], self.cameras[idx])
             else:

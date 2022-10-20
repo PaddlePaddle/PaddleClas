@@ -14,14 +14,12 @@
 
 from __future__ import division
 
-import copy
 import os
 
-import numpy as np
 import nvidia.dali.ops as ops
 import nvidia.dali.types as types
 import paddle
-from nvidia.dali import fn
+from typing import List
 from nvidia.dali.pipeline import Pipeline
 from nvidia.dali.plugin.paddle import DALIGenericIterator
 
@@ -141,6 +139,18 @@ class HybridValPipe(Pipeline):
 
     def __len__(self):
         return self.epoch_size("Reader")
+
+
+class DALIImageNetIterator(DALIGenericIterator):
+    def __next__(self) -> List[paddle.Tensor]:
+        data_batch = super(DALIImageNetIterator,
+                           self).__next__()  # List[Dict[str, Tensor], ...]
+
+        # reformat to List[Tensor1, Tensor2, ...]
+        data_batch = [
+            paddle.to_tensor(data_batch[0][key]) for key in self.output_map
+        ]
+        return data_batch
 
 
 def dali_dataloader(config, mode, device, num_threads=4, seed=None):
@@ -278,7 +288,7 @@ def dali_dataloader(config, mode, device, num_threads=4, seed=None):
             pipe.build()
             pipelines = [pipe]
             #  sample_per_shard = len(pipelines[0])
-        return DALIGenericIterator(
+        return DALIImageNetIterator(
             pipelines, ['data', 'label'], reader_name='Reader')
     else:
         resize_shorter = transforms["ResizeImage"].get("resize_short", 256)
@@ -318,5 +328,5 @@ def dali_dataloader(config, mode, device, num_threads=4, seed=None):
                 pad_output=pad_output,
                 output_dtype=output_dtype)
         pipe.build()
-        return DALIGenericIterator(
+        return DALIImageNetIterator(
             [pipe], ['data', 'label'], reader_name="Reader")
