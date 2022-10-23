@@ -16,6 +16,8 @@
     - [3.1 环境配置](#3.1)
     - [3.2 数据准备](#3.2)
     - [3.3 模型训练](#3.3)
+      - [3.3.1 训练 ImageNet](#3.3.1)
+      - [3.3.2 基于 ImageNet 权重微调](#3.3.2)
     - [3.4 模型评估](#3.4)
     - [3.5 模型预测](#3.5)
 - [4. 模型推理部署](#4)
@@ -42,10 +44,9 @@ ResNet 系列模型是在 2015 年提出的，一举在 ILSVRC2015 比赛中取�
 
 斯坦福大学的 Joyce Xu 将 ResNet 称为「真正重新定义了我们看待神经网络的方式」的三大架构之一。由于 ResNet 卓越的性能，越来越多的来自学术界和工业界学者和工程师对其结构进行了改进，比较出名的有 Wide-ResNet, ResNet-vc, ResNet-vd, Res2Net 等，其中 ResNet-vc 与 ResNet-vd 的参数量和计算量与 ResNet 几乎一致，所以在此我们将其与 ResNet 统一归为 ResNet 系列。
 
-PaddleClas 提供的 ResNet 系列的模型包括 ResNet50，ResNet50_vd，ResNet50_vd_ssld，ResNet200_vd 等 16 个预训练模型。在训练层面上，ResNet 的模型采用了训练 ImageNet 的标准训练流程，而其余改进版模型采用了更多的训练策略，如 learning rate 的下降方式采用了 cosine decay，引入了 label smoothing 的标签正则方式，在数据预处理加入了 mixup 的操作，迭代总轮数从 120 个 epoch 增加到 200 个 epoch。
+PaddleClas 提供的 ResNet 系列的模型包括 ResNet50，ResNet50_vd，ResNet50_vd_ssld，ResNet200_vd 以及结合 SENet 的 SE_ResNet18_vd 等在内 19 个预训练模型。在训练层面上，ResNet 的模型采用了训练 ImageNet 的标准训练流程，而其余改进版模型采用了更多的训练策略，如 learning rate 的下降方式采用了 cosine decay，引入了 label smoothing 的标签正则方式，在数据预处理加入了 mixup 的操作，迭代总轮数从 120 个 epoch 增加到 200 个 epoch。
 
 其中，后缀使用`_ssld`的模型采用了 SSLD 知识蒸馏，保证模型结构不变的情况下，进一步提升了模型的精度。
-
 
 <a name='1.2'></a>
 
@@ -72,14 +73,13 @@ PaddleClas 提供的 ResNet 系列的模型包括 ResNet50，ResNet50_vd，ResNe
 
 **备注：** `Fix_ResNet50_vd_ssld` 是固定 `ResNet50_vd_ssld` 除 FC 层外所有的网络参数，在 320x320 的图像输入分辨率下，基于 ImageNet-1k 数据集微调得到。
 
-
 <a name='1.3'></a>
 
-## 1.3 Benchmark
+### 1.3 Benchmark
 
 <a name='1.3.1'></a>
 
-### 1.3.1 基于 V100 GPU 的预测速度
+#### 1.3.1 基于 V100 GPU 的预测速度
 
 | Models                 | Size | Latency(ms)<br>bs=1 | Latency(ms)<br>bs=4 | Latency(ms)<br>bs=8 |
 |:--:|:--:|:--:|:--:|:--:|
@@ -96,6 +96,9 @@ PaddleClas 提供的 ResNet 系列的模型包括 ResNet50，ResNet50_vd，ResNe
 | ResNet152        | 224       | 6.05               | 11.41              | 17.33              |
 | ResNet152_vd     | 224       |  6.11               | 11.51              | 17.59              |
 | ResNet200_vd     | 224       |  7.70               | 14.57              | 22.16              |
+| SE_ResNet18_vd   | 224       | 1.48               | 2.70               | 4.32               |
+| SE_ResNet34_vd   | 224       | 2.42               | 3.69               | 6.29               |
+| SE_ResNet50_vd   | 224       | 3.11               | 5.99               | 9.34               |
 | ResNet50_vd_ssld | 224       | 2.59           | 4.87               | 7.62               |
 | ResNet101_vd_ssld  | 224     | 4.43             | 8.25             | 12.58            |
 
@@ -103,7 +106,7 @@ PaddleClas 提供的 ResNet 系列的模型包括 ResNet50，ResNet50_vd，ResNe
 
 <a name='1.3.2'></a>
 
-### 1.3.2 基于 T4 GPU 的预测速度
+#### 1.3.2 基于 T4 GPU 的预测速度
 
 | Models            | Size | Latency(ms)<br>FP16<br>bs=1 | Latency(ms)<br>FP16<br>bs=4 | Latency(ms)<br>FP16<br>bs=8 | Latency(ms)<br>FP32<br>bs=1 | Latency(ms)<br>FP32<br>bs=4 | Latency(ms)<br>FP32<br>bs=8 |
 |:--:|:--:|:--:|:--:|:--:|:--:|:--:|:--:|
@@ -120,6 +123,9 @@ PaddleClas 提供的 ResNet 系列的模型包括 ResNet50，ResNet50_vd，ResNe
 | ResNet152         | 224       | 7.28665                      | 10.62001                     | 14.90317                     | 8.50198                      | 19.17073                     | 35.78384                     |
 | ResNet152_vd      | 224       | 7.29127                      | 10.86137                     | 15.32444                     | 8.54376                      | 19.52157                     | 36.64445                     |
 | ResNet200_vd      | 224       | 9.36026                      | 13.5474                      | 19.0725                      | 10.80619                     | 25.01731                     | 48.81399                     |
+| SE_ResNet18_vd    | 224       | 1.61823                      | 3.1391                       | 4.60282                      | 1.7691                       | 4.19877                      | 7.5331                       |
+| SE_ResNet34_vd    | 224       | 2.67518                      | 5.04694                      | 7.18946                      | 2.88559                      | 7.03291                      | 12.73502                     |
+| SE_ResNet50_vd    | 224       | 3.65394                      | 7.568                        | 12.52793                     | 4.28393                      | 10.38846                     | 18.33154  
 | ResNet50_vd_ssld  | 224       | 2.65164                      | 4.84109                      | 7.46225                      | 3.53131                      | 8.09057                      | 14.45965                     |
 | Fix_ResNet50_vd_ssld  | 320       | 3.42818                      | 7.51534                      | 13.19370                      | 5.07696                      | 14.64218                      | 27.01453                     |
 | ResNet101_vd_ssld | 224       | 5.05972                      | 7.83685                      | 11.34235                     | 6.11704                      | 13.76222                     | 25.11071                     |
@@ -176,7 +182,6 @@ Predict complete!
 
 **备注**： 更换 ResNet 的其他 scale 的模型时，只需替换 `model_name`，如将此时的模型改为 `ResNet18` 时，只需要将 `--model_name=ResNet50` 改为 `--model_name=ResNet18` 即可。  
 
-
 * 在 Python 代码中预测
 ```python
 from paddleclas import PaddleClas
@@ -194,7 +199,6 @@ print(next(result))
 [{'class_ids': [8, 7, 86, 82, 80], 'scores': [0.97968, 0.02028, 3e-05, 1e-05, 0.0], 'label_names': ['hen', 'cock', 'partridge', 'ruffed grouse, partridge, Bonasa umbellus', 'black grouse'], 'filename': 'docs/images/inference_deployment/whl_demo.jpg'}]
 ```
 
-
 <a name="3"></a>
 
 ## 3. 模型训练、评估和预测
@@ -210,7 +214,6 @@ print(next(result))
 ### 3.2 数据准备
 
 请在[ImageNet 官网](https://www.image-net.org/)准备 ImageNet-1k 相关的数据。
-
 
 进入 PaddleClas 目录。
 
@@ -244,6 +247,9 @@ cd path_to_PaddleClas
 
 ### 3.3 模型训练
 
+<a name="3.3.1"></a>
+
+#### 3.3.1 训练 ImageNet
 
 在 `ppcls/configs/ImageNet/ResNet/ResNet50.yaml` 中提供了 ResNet50 训练配置，可以通过如下脚本启动训练：
 
@@ -255,10 +261,15 @@ python3 -m paddle.distributed.launch \
         -c ppcls/configs/ImageNet/ResNet/ResNet50.yaml
 ```
 
-
 **备注：**
 
 * 当前精度最佳的模型会保存在 `output/ResNet50/best_model.pdparams`
+
+<a name="3.3.2"></a>
+
+#### 3.3.2 基于 ImageNet 权重微调
+
+如果训练的不是 ImageNet 任务，而是其他任务时，需要更改配置文件和训练方法，详情可以参考：[模型微调](../../training/single_label_classification/finetune.md)。
 
 <a name="3.4"></a>
 
@@ -300,7 +311,7 @@ python3 tools/infer.py \
 
 * 默认输出的是 Top-5 的值，如果希望输出 Top-k 的值，可以指定`-o Infer.PostProcess.topk=k`，其中，`k` 为您指定的值。
 
-
+* 默认的标签映射基于 ImageNet 数据集，如果改变数据集，需要重新指定`Infer.PostProcess.class_id_map_file`，该映射文件的制作方法可以参考`ppcls/utils/imagenet1k_label_list.txt`。
 
 <a name="4"></a>
 
@@ -313,7 +324,6 @@ python3 tools/infer.py \
 Paddle Inference 是飞桨的原生推理库， 作用于服务器端和云端，提供高性能的推理能力。相比于直接基于预训练模型进行预测，Paddle Inference可使用MKLDNN、CUDNN、TensorRT 进行预测加速，从而实现更优的推理性能。更多关于Paddle Inference推理引擎的介绍，可以参考[Paddle Inference官网教程](https://www.paddlepaddle.org.cn/documentation/docs/zh/guides/infer/inference/inference_cn.html)。
 
 当使用 Paddle Inference 推理时，加载的模型类型为 inference 模型。本案例提供了两种获得 inference 模型的方法，如果希望得到和文档相同的结果，请选择[直接下载 inference 模型](#6.1.2)的方式。
-
 
 <a name="4.1.1"></a>
 
@@ -335,7 +345,6 @@ python3 tools/export_model.py \
 │   ├── inference.pdiparams.info
 │   └── inference.pdmodel
 ```
-
 
 <a name="4.1.2"></a>
 
@@ -362,7 +371,6 @@ wget https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/ResNet5
 
 ### 4.2 基于 Python 预测引擎推理
 
-
 <a name="4.2.1"></a>  
 
 #### 4.2.1 预测单张图像
@@ -385,7 +393,7 @@ python3 python/predict_cls.py -c configs/inference_cls.yaml -o Global.inference_
 输出结果如下。
 
 ```
-ILSVRC2012_val_00000010.jpeg:	class id(s): [153, 332, 229, 204, 265], score(s): [0.41, 0.39, 0.05, 0.04, 0.04], label_name(s): ['Maltese dog, Maltese terrier, Maltese', 'Angora, Angora rabbit', 'Old English sheepdog, bobtail', 'Lhasa, Lhasa apso', 'toy poodle']
+ILSVRC2012_val_00000010.jpeg:    class id(s): [153, 332, 229, 204, 265], score(s): [0.41, 0.39, 0.05, 0.04, 0.04], label_name(s): ['Maltese dog, Maltese terrier, Maltese', 'Angora, Angora rabbit', 'Old English sheepdog, bobtail', 'Lhasa, Lhasa apso', 'toy poodle']
 ```
 
 <a name="4.2.2"></a>  
@@ -402,12 +410,11 @@ python3 python/predict_cls.py -c configs/inference_cls.yaml -o Global.inference_
 终端中会输出该文件夹内所有图像的分类结果，如下所示。
 
 ```
-ILSVRC2012_val_00000010.jpeg:	class id(s): [153, 332, 229, 204, 265], score(s): [0.41, 0.39, 0.05, 0.04, 0.04], label_name(s): ['Maltese dog, Maltese terrier, Maltese', 'Angora, Angora rabbit', 'Old English sheepdog, bobtail', 'Lhasa, Lhasa apso', 'toy poodle']
-ILSVRC2012_val_00010010.jpeg:	class id(s): [902, 626, 531, 487, 761], score(s): [0.47, 0.10, 0.05, 0.04, 0.03], label_name(s): ['whistle', 'lighter, light, igniter, ignitor', 'digital watch', 'cellular telephone, cellular phone, cellphone, cell, mobile phone', 'remote control, remote']
-ILSVRC2012_val_00020010.jpeg:	class id(s): [178, 211, 246, 236, 210], score(s): [1.00, 0.00, 0.00, 0.00, 0.00], label_name(s): ['Weimaraner', 'vizsla, Hungarian pointer', 'Great Dane', 'Doberman, Doberman pinscher', 'German short-haired pointer']
-ILSVRC2012_val_00030010.jpeg:	class id(s): [80, 23, 83, 93, 136], score(s): [1.00, 0.00, 0.00, 0.00, 0.00], label_name(s): ['black grouse', 'vulture', 'prairie chicken, prairie grouse, prairie fowl', 'hornbill', 'European gallinule, Porphyrio porphyrio']
+ILSVRC2012_val_00000010.jpeg:    class id(s): [153, 332, 229, 204, 265], score(s): [0.41, 0.39, 0.05, 0.04, 0.04], label_name(s): ['Maltese dog, Maltese terrier, Maltese', 'Angora, Angora rabbit', 'Old English sheepdog, bobtail', 'Lhasa, Lhasa apso', 'toy poodle']
+ILSVRC2012_val_00010010.jpeg:    class id(s): [902, 626, 531, 487, 761], score(s): [0.47, 0.10, 0.05, 0.04, 0.03], label_name(s): ['whistle', 'lighter, light, igniter, ignitor', 'digital watch', 'cellular telephone, cellular phone, cellphone, cell, mobile phone', 'remote control, remote']
+ILSVRC2012_val_00020010.jpeg:    class id(s): [178, 211, 246, 236, 210], score(s): [1.00, 0.00, 0.00, 0.00, 0.00], label_name(s): ['Weimaraner', 'vizsla, Hungarian pointer', 'Great Dane', 'Doberman, Doberman pinscher', 'German short-haired pointer']
+ILSVRC2012_val_00030010.jpeg:    class id(s): [80, 23, 83, 93, 136], score(s): [1.00, 0.00, 0.00, 0.00, 0.00], label_name(s): ['black grouse', 'vulture', 'prairie chicken, prairie grouse, prairie fowl', 'hornbill', 'European gallinule, Porphyrio porphyrio']
 ```
-
 
 <a name="4.3"></a>
 
@@ -437,4 +444,4 @@ PaddleClas 提供了基于 Paddle Lite 来完成模型端侧部署的示例，�
 
 Paddle2ONNX 支持将 PaddlePaddle 模型格式转化到 ONNX 模型格式。通过 ONNX 可以完成将 Paddle 模型到多种推理引擎的部署，包括TensorRT/OpenVINO/MNN/TNN/NCNN，以及其它对 ONNX 开源格式进行支持的推理引擎或硬件。更多关于 Paddle2ONNX 的介绍，可以参考[Paddle2ONNX 代码仓库](https://github.com/PaddlePaddle/Paddle2ONNX)。
 
-PaddleClas 提供了基于 Paddle2ONNX 来完成 inference 模型转换 ONNX 模型并作推理预测的示例，您可以参考[Paddle2ONNX 模型转换与预测](@shuilong)来完成相应的部署工作。
+PaddleClas 提供了基于 Paddle2ONNX 来完成 inference 模型转换 ONNX 模型并作推理预测的示例，您可以参考[Paddle2ONNX 模型转换与预测](../../../deploy/paddle2onnx/readme.md)来完成相应的部署工作。

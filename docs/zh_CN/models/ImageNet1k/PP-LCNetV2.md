@@ -1,5 +1,4 @@
 # PP-LCNetV2
-
 ---
 
 ## 目录
@@ -21,6 +20,8 @@
     - [3.1 环境配置](#3.1)
     - [3.2 数据准备](#3.2)
     - [3.3 模型训练](#3.3)
+      - [3.3.1 训练 ImageNet](#3.3.1)
+      - [3.3.2 基于 ImageNet 权重微调](#3.3.2)
     - [3.4 模型评估](#3.4)
     - [3.5 模型预测](#3.5)
 - [4. 模型推理部署](#4)
@@ -182,7 +183,6 @@ print(next(result))
 [{'class_ids': [8, 7, 86, 82, 83], 'scores': [0.8859, 0.07156, 0.00588, 0.00047, 0.00034], 'label_names': ['hen', 'cock', 'partridge', 'ruffed grouse, partridge, Bonasa umbellus', 'prairie chicken, prairie grouse, prairie fowl'], 'filename': 'docs/images/inference_deployment/whl_demo.jpg'}]
 ```
 
-
 <a name="3"></a>
 
 ## 3. 模型训练、评估和预测
@@ -198,7 +198,6 @@ print(next(result))
 ### 3.2 数据准备
 
 请在[ImageNet 官网](https://www.image-net.org/)准备 ImageNet-1k 相关的数据。
-
 
 进入 PaddleClas 目录。
 
@@ -227,11 +226,15 @@ cd path_to_PaddleClas
 
 * 关于 `train_list.txt`、`val_list.txt`的格式说明，可以参考[PaddleClas分类数据集格式说明](../../training/single_label_classification/dataset.md#1-数据集格式说明) 。
 
+**备注：**
 
 <a name="3.3"></a>
 
 ### 3.3 模型训练
+    
+<a name="3.3.1"></a>
 
+#### 3.3.1 训练 ImageNet
 
 在 `ppcls/configs/ImageNet/PPLCNetV2/PPLCNetV2_base.yaml` 中提供了 PPLCNetV2_base 训练配置，可以通过如下脚本启动训练：
 
@@ -243,10 +246,13 @@ python3 -m paddle.distributed.launch \
         -c ppcls/configs/ImageNet/PPLCNetV2/PPLCNetV2_base.yaml
 ```
 
-
 **备注：**
 
 * 当前精度最佳的模型会保存在 `output/PPLCNetV2_base/best_model.pdparams`
+    
+#### 3.3.2 基于 ImageNet 权重微调
+
+如果训练的不是 ImageNet 任务，而是其他任务时，需要更改配置文件和训练方法，详情可以参考：[模型微调](../../training/single_label_classification/finetune.md)。
 
 <a name="3.4"></a>
 
@@ -287,8 +293,8 @@ python3 tools/infer.py \
 * 默认是对 `docs/images/inference_deployment/whl_demo.jpg` 进行预测，此处也可以通过增加字段 `-o Infer.infer_imgs=xxx` 对其他图片预测。
 
 * 默认输出的是 Top-5 的值，如果希望输出 Top-k 的值，可以指定`-o Infer.PostProcess.topk=k`，其中，`k` 为您指定的值。
-
-
+    
+* 默认的标签映射基于 ImageNet 数据集，如果改变数据集，需要重新指定`Infer.PostProcess.class_id_map_file`，该映射文件的制作方法可以参考`ppcls/utils/imagenet1k_label_list.txt`。
 
 <a name="4"></a>
 
@@ -301,7 +307,6 @@ python3 tools/infer.py \
 Paddle Inference 是飞桨的原生推理库， 作用于服务器端和云端，提供高性能的推理能力。相比于直接基于预训练模型进行预测，Paddle Inference可使用MKLDNN、CUDNN、TensorRT 进行预测加速，从而实现更优的推理性能。更多关于Paddle Inference推理引擎的介绍，可以参考[Paddle Inference官网教程](https://www.paddlepaddle.org.cn/documentation/docs/zh/guides/infer/inference/inference_cn.html)。
 
 当使用 Paddle Inference 推理时，加载的模型类型为 inference 模型。本案例提供了两种获得 inference 模型的方法，如果希望得到和文档相同的结果，请选择[直接下载 inference 模型](#6.1.2)的方式。
-
 
 <a name="4.1.1"></a>
 
@@ -323,7 +328,6 @@ python3 tools/export_model.py \
 │   ├── inference.pdiparams.info
 │   └── inference.pdmodel
 ```
-
 
 <a name="4.1.2"></a>
 
@@ -373,7 +377,7 @@ python3 python/predict_cls.py -c configs/inference_cls.yaml -o Global.inference_
 输出结果如下。
 
 ```
-ILSVRC2012_val_00000010.jpeg:	class id(s): [332, 153, 229, 204, 265], score(s): [0.28, 0.25, 0.03, 0.02, 0.02], label_name(s): ['Angora, Angora rabbit', 'Maltese dog, Maltese terrier, Maltese', 'Old English sheepdog, bobtail', 'Lhasa, Lhasa apso', 'toy poodle']
+ILSVRC2012_val_00000010.jpeg:    class id(s): [332, 153, 229, 204, 265], score(s): [0.28, 0.25, 0.03, 0.02, 0.02], label_name(s): ['Angora, Angora rabbit', 'Maltese dog, Maltese terrier, Maltese', 'Old English sheepdog, bobtail', 'Lhasa, Lhasa apso', 'toy poodle']
 ```
 
 <a name="4.2.2"></a>  
@@ -390,12 +394,11 @@ python3 python/predict_cls.py -c configs/inference_cls.yaml -o Global.inference_
 终端中会输出该文件夹内所有图像的分类结果，如下所示。
 
 ```
-ILSVRC2012_val_00000010.jpeg:	class id(s): [332, 153, 229, 204, 265], score(s): [0.28, 0.25, 0.03, 0.02, 0.02], label_name(s): ['Angora, Angora rabbit', 'Maltese dog, Maltese terrier, Maltese', 'Old English sheepdog, bobtail', 'Lhasa, Lhasa apso', 'toy poodle']
-ILSVRC2012_val_00010010.jpeg:	class id(s): [626, 531, 761, 487, 673], score(s): [0.64, 0.06, 0.03, 0.02, 0.01], label_name(s): ['lighter, light, igniter, ignitor', 'digital watch', 'remote control, remote', 'cellular telephone, cellular phone, cellphone, cell, mobile phone', 'mouse, computer mouse']
-ILSVRC2012_val_00020010.jpeg:	class id(s): [178, 209, 246, 181, 211], score(s): [0.97, 0.00, 0.00, 0.00, 0.00], label_name(s): ['Weimaraner', 'Chesapeake Bay retriever', 'Great Dane', 'Bedlington terrier', 'vizsla, Hungarian pointer']
-ILSVRC2012_val_00030010.jpeg:	class id(s): [80, 143, 81, 137, 98], score(s): [0.91, 0.01, 0.00, 0.00, 0.00], label_name(s): ['black grouse', 'oystercatcher, oyster catcher', 'ptarmigan', 'American coot, marsh hen, mud hen, water hen, Fulica americana', 'red-breasted merganser, Mergus serrator'
+ILSVRC2012_val_00000010.jpeg:    class id(s): [332, 153, 229, 204, 265], score(s): [0.28, 0.25, 0.03, 0.02, 0.02], label_name(s): ['Angora, Angora rabbit', 'Maltese dog, Maltese terrier, Maltese', 'Old English sheepdog, bobtail', 'Lhasa, Lhasa apso', 'toy poodle']
+ILSVRC2012_val_00010010.jpeg:    class id(s): [626, 531, 761, 487, 673], score(s): [0.64, 0.06, 0.03, 0.02, 0.01], label_name(s): ['lighter, light, igniter, ignitor', 'digital watch', 'remote control, remote', 'cellular telephone, cellular phone, cellphone, cell, mobile phone', 'mouse, computer mouse']
+ILSVRC2012_val_00020010.jpeg:    class id(s): [178, 209, 246, 181, 211], score(s): [0.97, 0.00, 0.00, 0.00, 0.00], label_name(s): ['Weimaraner', 'Chesapeake Bay retriever', 'Great Dane', 'Bedlington terrier', 'vizsla, Hungarian pointer']
+ILSVRC2012_val_00030010.jpeg:    class id(s): [80, 143, 81, 137, 98], score(s): [0.91, 0.01, 0.00, 0.00, 0.00], label_name(s): ['black grouse', 'oystercatcher, oyster catcher', 'ptarmigan', 'American coot, marsh hen, mud hen, water hen, Fulica americana', 'red-breasted merganser, Mergus serrator'
 ```
-
 
 <a name="4.3"></a>
 

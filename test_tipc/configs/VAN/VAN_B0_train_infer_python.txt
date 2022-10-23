@@ -1,5 +1,5 @@
 ===========================train_params===========================
-model_name:VAN_tiny
+model_name:VAN_B0
 python:python3.7
 gpu_list:0|0,1
 -o Global.device:gpu
@@ -13,21 +13,21 @@ train_infer_img_dir:./dataset/ILSVRC2012/val
 null:null
 ##
 trainer:norm_train
-norm_train:tools/train.py -c ppcls/configs/ImageNet/VAN/VAN_tiny.yaml -o Global.seed=1234 -o DataLoader.Train.sampler.shuffle=False -o DataLoader.Train.loader.num_workers=0 -o DataLoader.Train.loader.use_shared_memory=False -o Global.eval_during_train=False -o Global.save_interval=2
+norm_train:tools/train.py -c ppcls/configs/ImageNet/VAN/VAN_B0.yaml -o Global.seed=1234 -o DataLoader.Train.sampler.shuffle=False -o DataLoader.Train.loader.num_workers=0 -o DataLoader.Train.loader.use_shared_memory=False -o Global.eval_during_train=False -o Global.save_interval=2
 pact_train:null
 fpgm_train:null
 distill_train:null
 null:null
 null:null
 ##
-===========================eval_params=========================== 
-eval:tools/eval.py -c ppcls/configs/ImageNet/VAN/VAN_tiny.yaml
+===========================eval_params===========================
+eval:tools/eval.py -c ppcls/configs/ImageNet/VAN/VAN_B0.yaml
 null:null
 ##
 ===========================infer_params==========================
 -o Global.save_inference_dir:./inference
 -o Global.pretrained_model:
-norm_export:tools/export_model.py -c ppcls/configs/ImageNet/VAN/VAN_tiny.yaml
+norm_export:tools/export_model.py -c ppcls/configs/ImageNet/VAN/VAN_B0.yaml
 quant_export:null
 fpgm_export:null
 distill_export:null
