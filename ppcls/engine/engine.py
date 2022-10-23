@@ -436,7 +436,7 @@ class Engine(object):
                         writer=self.vdl_writer)
 
             # save model
-            if epoch_id % save_interval == 0:
+            if save_interval > 0 and epoch_id % save_interval == 0:
                 save_load.save_model(
                     self.model,
                     self.optimizer, {"metric": acc,

@@ -29,10 +29,12 @@ class Cifar10(Cifar10_paddle):
                  download=True,
                  backend='cv2',
                  sample_per_label=None,
+                 expand_labels=1,
                  transform_ops=None,
                  transform_ops_weak=None,
                  transform_ops_strong=None):
         super().__init__(data_file, mode, None, download, backend)
+        assert isinstance(expand_labels, int)
         self._transform_ops = create_operators(transform_ops)
         self._transform_ops_weak = create_operators(transform_ops_weak)
         self._transform_ops_strong = create_operators(transform_ops_strong)
@@ -47,6 +49,7 @@ class Cifar10(Cifar10_paddle):
                 idx = np.where(labels == i)[0]
                 idx = np.random.choice(idx, sample_per_label, False)
                 index.extend(idx)
+            index = index * expand_labels
             data = [self.data[x] for x in index]
             self.data = data
 
@@ -72,10 +75,12 @@ class Cifar100(Cifar100_paddle):
                  download=True,
                  backend='pil',
                  sample_per_label=None,
+                 expand_labels=1,
                  transform_ops=None,
                  transform_ops_weak=None,
                  transform_ops_strong=None):
         super().__init__(data_file, mode, None, download, backend)
+        assert isinstance(expand_labels, int)
         self._transform_ops = create_operators(transform_ops)
         self._transform_ops_weak = create_operators(transform_ops_weak)
         self._transform_ops_strong = create_operators(transform_ops_strong)
@@ -91,6 +96,7 @@ class Cifar100(Cifar100_paddle):
                 idx = np.where(labels == i)[0]
                 idx = np.random.choice(idx, sample_per_label, False)
                 index.extend(idx)
+            index = index * expand_labels
             data = [self.data[x] for x in index]
             self.data = data
 
@@ -107,7 +113,3 @@ class Cifar100(Cifar100_paddle):
             image3 = image3.transpose((2, 0, 1))
 
             return (image2, image3, np.int64(label))
-
-
-if __name__ == "__main__":
-    dataset = Cifar100(sample_per_label=4)

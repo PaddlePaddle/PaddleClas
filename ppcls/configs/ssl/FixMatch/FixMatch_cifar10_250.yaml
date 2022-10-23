@@ -1,10 +1,10 @@
 # global configs
 Global:
   checkpoints: null
-  pretrained_model: './torch2paddle'
-  output_dir: ./output
+  pretrained_model: '../test/torch2paddle_cifar10'
+  output_dir: ./output_25
   device: gpu
-  save_interval: 100
+  save_interval: -1
   eval_during_train: True
   eval_interval: 1
   epochs: 1024
@@ -34,9 +34,9 @@ EMA:
 Arch:
   name: WideResNet
   depth: 28
-  widen_factor: 8
+  widen_factor: 2
   dropout: 0
-  num_classes: 100
+  num_classes: 10
 
 # loss function config for traing/eval process
 Loss:
@@ -58,24 +58,24 @@ Optimizer:
   momentum: 0.9
   use_nesterov: True
   no_weight_decay_name: bn bias
+  weight_decay: 0.0005
   lr:
-    name: Cosine
+    name: CosineFixmatch
     learning_rate: 0.03
-    warmup_epoch: 0
-  regularizer:
-    name: L2
-    coeff: 0.001
+    num_warmup_steps: 0
+    num_cycles: 0.4375
 
 # data loader for train and eval
 DataLoader:
   Train:
     dataset:
-      name: Cifar100
+      name: Cifar10
       data_file: None
       mode: 'train'
       download: True
       backend: 'pil'
-      sample_per_label: 4
+      sample_per_label: 25
+      expand_labels: 263
       transform_ops:
         - RandFlipImage:
             flip_code: 1
@@ -86,21 +86,21 @@ DataLoader:
             size: [32, 32]
         - NormalizeImage:
             scale: 1.0/255.0
-            mean: [0.5071, 0.4867, 0.4408]
-            std: [0.2675, 0.2565, 0.2761]
+            mean: [0.4914, 0.4822, 0.4465]
+            std: [0.2471, 0.2435, 0.2616]
             order: hwc
     sampler:
       name: DistributedBatchSampler
-      batch_size: 16
-      drop_last: False
+      batch_size: 64
+      drop_last: True
       shuffle: True
     loader:
-      num_workers: 4
+      num_workers: 8
       use_shared_memory: True
 
   UnLabelTrain:
     dataset:
-      name: Cifar100
+      name: Cifar10
       data_file: None
       mode: 'train'
       download: True
@@ -116,8 +116,8 @@ DataLoader:
             size: [32, 32]
         - NormalizeImage:
             scale: 1.0/255.0
-            mean: [0.5071, 0.4867, 0.4408]
-            std: [0.2675, 0.2565, 0.2761]
+            mean: [0.4914, 0.4822, 0.4465]
+            std: [0.2471, 0.2435, 0.2616]
             order: hwc
       transform_ops_strong:
         - RandFlipImage:
@@ -132,22 +132,22 @@ DataLoader:
             magnitude: 10
         - NormalizeImage:
             scale: 1.0/255.0
-            mean: [0.5071, 0.4867, 0.4408]
-            std: [0.2675, 0.2565, 0.2761]
+            mean: [0.4914, 0.4822, 0.4465]
+            std: [0.2471, 0.2435, 0.2616]
             order: hwc
     sampler:
       name: DistributedBatchSampler
-      batch_size: 112
-      drop_last: False
+      batch_size: 448
+      drop_last: True
       shuffle: True
     loader:
-      num_workers: 4
+      num_workers: 8
       use_shared_memory: True
 
 
   Eval:
     dataset:
-      name: Cifar100
+      name: Cifar10
       data_file: None
       mode: 'test'
       download: True
@@ -156,12 +156,12 @@ DataLoader:
       transform_ops:
         - NormalizeImage:
             scale: 1.0/255.0
-            mean: [0.5071, 0.4867, 0.4408]
-            std: [0.2675, 0.2565, 0.2761]
+            mean: [0.4914, 0.4822, 0.4465]
+            std: [0.2471, 0.2435, 0.2616]
             order: hwc
     sampler:
       name: DistributedBatchSampler
-      batch_size: 16
+      batch_size: 64
       drop_last: False
       shuffle: True
     loader:

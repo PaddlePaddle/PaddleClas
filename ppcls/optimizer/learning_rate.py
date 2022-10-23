@@ -14,10 +14,9 @@
 
 from __future__ import (absolute_import, division, print_function,
                         unicode_literals)
-
+import math
 from abc import abstractmethod
 from typing import Union
-
 from paddle.optimizer import lr
 from ppcls.utils import logger
 
@@ -392,3 +391,33 @@ class MultiStepDecay(LRBase):
 
         setattr(learning_rate, "by_epoch", self.by_epoch)
         return learning_rate
+
+
+class CosineFixmatch:
+    def __init__(self,
+                 epochs,
+                 step_each_epoch,
+                 learning_rate,
+                 num_warmup_steps,
+                 num_cycles=7 / 16,
+                 last_epoch=-1):
+        self.epochs = epochs
+        self.step_each_epoch = step_each_epoch
+        self.learning_rate = learning_rate
+        self.num_warmup_steps = num_warmup_steps
+        self.num_cycles = num_cycles
+        self.last_epoch = last_epoch
+
+    def __call__(self):
+        def _lr_lambda(current_step):
+            if current_step < self.num_warmup_steps:
+                return float(current_step) / float(
+                    max(1, self.num_warmup_steps))
+            no_progress = float(current_step - self.num_warmup_steps) / \
+                        float(max(1, self.epochs * self.step_each_epoch - self.num_warmup_steps))
+            return max(0., math.cos(math.pi * self.num_cycles * no_progress))
+
+        return lr.LambdaDecay(
+            learning_rate=self.learning_rate,
+            lr_lambda=_lr_lambda,
+            last_epoch=self.last_epoch)

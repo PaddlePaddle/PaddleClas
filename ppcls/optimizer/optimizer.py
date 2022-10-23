@@ -135,6 +135,7 @@ class Momentum(object):
             weight_decay=self.weight_decay,
             grad_clip=self.grad_clip,
             multi_precision=self.multi_precision,
+            use_nesterov=self.use_nesterov,
             parameters=parameters)
         if hasattr(opt, '_use_multi_tensor'):
             opt = optim.Momentum(

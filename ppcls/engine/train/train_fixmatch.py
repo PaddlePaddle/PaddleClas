@@ -18,6 +18,7 @@ import paddle
 from ppcls.engine.train.utils import update_loss, update_metric, log_info
 from ppcls.utils import profiler
 from paddle.nn import functional as F
+import numpy as np
 
 
 def train_epoch_fixmatch(engine, epoch_id, print_batch_step):
@@ -48,6 +49,7 @@ def train_epoch_fixmatch(engine, epoch_id, print_batch_step):
                 engine.unlabel_train_dataloader)
             unlabel_data_batch = engine.unlabel_train_dataloader_iter.next()
         assert len(unlabel_data_batch) == 3
+        assert unlabel_data_batch[0].shape == unlabel_data_batch[1].shape
         engine.time_info["reader_cost"].update(time.time() - tic)
         batch_size = label_data_batch[0].shape[0] + unlabel_data_batch[0].shape[0] \
             + unlabel_data_batch[1].shape[0]
@@ -67,12 +69,13 @@ def train_epoch_fixmatch(engine, epoch_id, print_batch_step):
                         "flatten_contiguous_range", "greater_than"
                     },
                     level=amp_level):
-                loss_dict, logits_label = forward(engine, inputs,
-                                                  batch_size_label, temperture,
-                                                  threshold, targets_x)
+                loss_dict, logits_label = get_loss(
+                    engine, inputs, batch_size_label, temperture, threshold,
+                    targets_x)
         else:
-            loss_dict, logits_label = forward(engine, inputs, batch_size_label,
-                                              temperture, threshold, targets_x)
+            loss_dict, logits_label = get_loss(engine, inputs,
+                                               batch_size_label, temperture,
+                                               threshold, targets_x)
 
         # loss
         loss = loss_dict["loss"]
@@ -89,13 +92,14 @@ def train_epoch_fixmatch(engine, epoch_id, print_batch_step):
             for i in range(len(engine.optimizer)):
                 engine.optimizer[i].step()
 
-        # clear grad
-        for i in range(len(engine.optimizer)):
-            engine.optimizer[i].clear_grad()
         # step lr(by step)
         for i in range(len(engine.lr_sch)):
             if not getattr(engine.lr_sch[i], "by_epoch", False):
                 engine.lr_sch[i].step()
+        # clear grad
+        for i in range(len(engine.optimizer)):
+            engine.optimizer[i].clear_grad()
+
         # update ema
         if engine.ema:
             engine.model_ema.update(engine.model)
@@ -116,9 +120,14 @@ def train_epoch_fixmatch(engine, epoch_id, print_batch_step):
             engine.lr_sch[i].step()
 
 
-def forward(engine, inputs, batch_size_label, temperture, threshold,
-            targets_x):
+def get_loss(engine, inputs, batch_size_label, temperture, threshold,
+             targets_x):
+    # For pytroch version, inputs need to use interleave and de_interleave
+    # to reshape and transpose inputs and logits, but it dosen't affect the
+    # result. So this paddle version dose not use the two transpose func.
+    # inputs = interleave(inputs, inputs.shape[0] // batch_size_label)
     logits = engine.model(inputs)
+    # logits = de_interleave(logits, inputs.shape[0] // batch_size_label)
     logits_x = logits[:batch_size_label]
     logits_u_w, logits_u_s = logits[batch_size_label:].chunk(2)
     loss_dict_label = engine.train_loss_func(logits_x, targets_x)
@@ -142,3 +151,15 @@ def get_psuedo_label_and_mask(probs_u_w, threshold):
 
     mask = paddle.greater_equal(max_probs, threshold).astype('float')
     return p_targets_u, mask
+
+
+def interleave(x, size):
+    s = list(x.shape)
+    return x.reshape([-1, size] + s[1:]).transpose(
+        [1, 0, 2, 3, 4]).reshape([-1] + s[1:])
+
+
+def de_interleave(x, size):
+    s = list(x.shape)
+    return x.reshape([size, -1] + s[1:]).transpose(
+        [1, 0, 2]).reshape([-1] + s[1:])

@@ -1,7 +1,6 @@
 import paddle
 import paddle.nn as nn
 import paddle.nn.functional as F
-from paddle.regularizer import L2Decay
 from paddle import ParamAttr
 """
 backbone option "WideResNet"
@@ -41,11 +40,7 @@ class BasicBlock(nn.Layer):
                  drop_rate=0.0,
                  activate_before_residual=False):
         super(BasicBlock, self).__init__()
-        self.bn1 = nn.BatchNorm2D(
-            in_planes,
-            momentum=0.999,
-            weight_attr=ParamAttr(regularizer=L2Decay(0.0)),
-            bias_attr=ParamAttr(regularizer=L2Decay(0.0)))
+        self.bn1 = nn.BatchNorm2D(in_planes, momentum=0.999)
         self.relu1 = nn.LeakyReLU(negative_slope=0.1)
         self.conv1 = nn.Conv2D(
             in_planes,
@@ -54,11 +49,7 @@ class BasicBlock(nn.Layer):
             stride=stride,
             padding=1,
             bias_attr=False)
-        self.bn2 = nn.BatchNorm2D(
-            out_planes,
-            momentum=0.999,
-            weight_attr=ParamAttr(regularizer=L2Decay(0.0)),
-            bias_attr=ParamAttr(regularizer=L2Decay(0.0)))
+        self.bn2 = nn.BatchNorm2D(out_planes, momentum=0.999)
         self.relu2 = nn.LeakyReLU(negative_slope=0.1)
         self.conv2 = nn.Conv2D(
             out_planes,
@@ -182,56 +173,25 @@ class Wide_ResNet(nn.Layer):
         self.block3 = NetworkBlock(n, channels[2], channels[3], block, 2,
                                    drop_rate)
         # global average pooling and classifier
-        self.bn1 = nn.BatchNorm2D(
-            channels[3],
-            momentum=0.999,
-            weight_attr=ParamAttr(regularizer=L2Decay(0.0)),
-            bias_attr=ParamAttr(regularizer=L2Decay(0.0)))
+        self.bn1 = nn.BatchNorm2D(channels[3], momentum=0.999)
         self.relu = nn.LeakyReLU(negative_slope=0.1)
 
         # if proj after means we classify after projection head
         # so we must change the in channel to low_dim of laster fc
         if self.proj_after:
-            self.fc = nn.Linear(
-                self.low_dim,
-                num_classes,
-                bias_attr=ParamAttr(regularizer=L2Decay(0.0)))
+            self.fc = nn.Linear(self.low_dim, num_classes)
         else:
-            self.fc = nn.Linear(
-                channels[3],
-                num_classes,
-                bias_attr=ParamAttr(regularizer=L2Decay(0.0)))
+            self.fc = nn.Linear(channels[3], num_classes)
         self.channels = channels[3]
 
         # projection head
         if self.proj:
             self.l2norm = Normalize(2)
 
-            self.fc1 = nn.Linear(
-                64 * self.widen_factor,
-                64 * self.widen_factor,
-                bias_attr=ParamAttr(regularizer=L2Decay(0.0)))
+            self.fc1 = nn.Linear(64 * self.widen_factor,
+                                 64 * self.widen_factor)
             self.relu_mlp = nn.LeakyReLU(negative_slope=0.1)
-            self.fc2 = nn.Linear(
-                64 * self.widen_factor,
-                self.low_dim,
-                bias_attr=ParamAttr(regularizer=L2Decay(0.0)))
-
-        #  self.init_wegihts()
-
-        # init_wegihts
-        #  def init_wegihts(self):
-        #  for m in self.modules():
-        #      if isinstance(m, nn.Conv2D):
-        #          nn.init.kaiming_normal_(m.weight,
-        #                                  mode='fan_out',
-        #                                  nonlinearity='leaky_relu')
-        #      elif isinstance(m, nn.BatchNorm2D):
-        #          nn.init.constant_(m.weight, 1.0)
-        #          nn.init.constant_(m.bias, 0.0)
-        #      elif isinstance(m, nn.Linear):
-        #          nn.init.xavier_normal_(m.weight)
-        #              nn.init.constant_(m.bias, 0.0)
+            self.fc2 = nn.Linear(64 * self.widen_factor, self.low_dim)
 
     def forward(self, x):
         feat = self.conv1(x)
@@ -276,13 +236,3 @@ def WideResNet(depth,
         proj=proj,
         low_dim=low_dim,
         **kwargs)
-
-
-if __name__ == "__main__":
-    model = build(
-        depth=28,
-        widen_factor=8,
-        dropout=0,
-        num_classes=100, )
-    data = paddle.randn([1, 3, 224, 224])
-    r = model(data)

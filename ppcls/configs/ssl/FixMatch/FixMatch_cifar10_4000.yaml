@@ -1,10 +1,10 @@
 # global configs
 Global:
   checkpoints: null
-  pretrained_model: null
+  pretrained_model: 'https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/others/torch2paddle_weight/torch2paddle_initialize_cifar10_WideResNet_depth28_widenfactor2_classnum10.pdparams'
   output_dir: ./output
   device: gpu
-  save_interval: 1
+  save_interval: -1
   eval_during_train: True
   eval_interval: 1
   epochs: 1024
@@ -58,13 +58,12 @@ Optimizer:
   momentum: 0.9
   use_nesterov: True
   no_weight_decay_name: bn bias
+  weight_decay: 0.0005
   lr:
-    name: Cosine
+    name: CosineFixmatch
     learning_rate: 0.03
-    warmup_epoch: 0
-  regularizer:
-    name: L2
-    coeff: 0.0005
+    num_warmup_steps: 0
+    num_cycles: 0.4375
 
 # data loader for train and eval
 DataLoader:
@@ -75,7 +74,8 @@ DataLoader:
       mode: 'train'
       download: True
       backend: 'pil'
-      sample_per_label: 4
+      sample_per_label: 400
+      expand_labels: 17
       transform_ops:
         - RandFlipImage:
             flip_code: 1
@@ -92,7 +92,7 @@ DataLoader:
     sampler:
       name: DistributedBatchSampler
       batch_size: 64
-      drop_last: False
+      drop_last: True
       shuffle: True
     loader:
       num_workers: 4
@@ -138,7 +138,7 @@ DataLoader:
     sampler:
       name: DistributedBatchSampler
       batch_size: 448
-      drop_last: False
+      drop_last: True
       shuffle: True
     loader:
       num_workers: 4
