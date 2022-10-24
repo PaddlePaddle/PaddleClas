@@ -112,7 +112,7 @@ Based on the `GeneralRecognitionV2_PPLCNetV2_base.yaml` configuration file, the 
 
 ### 5.1 Data Preparation
 
-First you need to customize your own dataset based on the task. Please refer to [Dataset Format Description](../data_preparation/recognition_dataset.md) for the dataset format and file structure.
+First you need to customize your own dataset based on the task. Please refer to [Dataset Format Description](../data_preparation/recognition_dataset_en.md) for the dataset format and file structure.
 
 After the preparation is complete, it is necessary to modify the content related to the data configuration in the configuration file, mainly including the path of the dataset and the number of categories. As is as shown below:
 
@@ -256,7 +256,7 @@ wangzai.jpg: [-7.82453567e-02 2.55877394e-02 -3.66694555e-02 1.34572461e-02
  -3.40284109e-02 8.35561901e-02 2.10910216e-02 -3.27066667e-02]
 ```
 
-In most cases, just getting the features may not meet the users' requirements. If you want to go further on the image recognition task, you can refer to the document [Vector Search](./vector_search.md).
+In most cases, just getting the features may not meet the users' requirements. If you want to go further on the image recognition task, you can refer to the document [Vector Search](./vector_search_en.md).
 
 <a name="6"></a>
 
