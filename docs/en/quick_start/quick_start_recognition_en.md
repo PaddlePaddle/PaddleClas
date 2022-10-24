@@ -71,7 +71,7 @@ Click the "save index" button above <img src="../../images/quick_start/android_d
 Click the "initialize index" button above <img src="../../images/quick_start/android_demo/reset_100.png" width="25" height="25"/> to initialize the current library to `original`.
 
 #### 1.2.5 Preview Index
-Click the "class preview" button <img src="../../images/quick_start/android_demo/leibichaxun_100.png" width="25" height="25"/> to view it in the pop-up window.
+Click the "class preview" button <img src="../../images/quick_start/android_demo/leibiechaxun_100.png" width="25" height="25"/> to view it in the pop-up window.
 
 <a name="Feature introduction"></a>
 
@@ -99,7 +99,7 @@ One can preview it according to the instructions in [Function Experience - Previ
 
 ### 2.1 Environment configuration
 
-* Installation: Please refer to the document [Environment Preparation](../installation/install_paddleclas.md) to configure the PaddleClas operating environment.
+* Installation: Please refer to the document [Environment Preparation](../installation/install_paddleclas_en.md) to configure the PaddleClas operating environment.
 
 * Go to the `deploy` run directory. All the content and scripts in this section need to be run in the `deploy` directory, you can enter the `deploy` directory with the following scripts.
 
@@ -315,7 +315,7 @@ Build a new index database `index_all` with the following scripts.
 python3.7 python/build_gallery.py -c configs/inference_general.yaml -o IndexProcess.data_file="./drink_dataset_v2.0/gallery/drink_label_all.txt" -o IndexProcess.index_dir="./drink_dataset_v2.0/index_all"
 ```
 
-The final constructed new index database is saved in the folder `./drink_dataset_v2.0/index_all`. For specific instructions on yaml `yaml`, please refer to [Vector Search Documentation](../image_recognition_pipeline/vector_search.md).
+The final constructed new index database is saved in the folder `./drink_dataset_v2.0/index_all`. For specific instructions on yaml `yaml`, please refer to [Vector Search Documentation](../image_recognition_pipeline/vector_search_en.md).
 
 <a name="Image recognition based on the new index database"></a>
 
@@ -392,4 +392,4 @@ After decompression, the `recognition_demo_data_v1.1` folder should have the fol
 
 After downloading the model and test data according to the above steps, you can re-build the index database and test the relevant recognition model.
 
-* For more introduction to object detection, please refer to: [Object Detection Tutorial Document](../image_recognition_pipeline/mainbody_detection.md); for the introduction of feature extraction, please refer to: [Feature Extraction Tutorial Document](../image_recognition_pipeline/feature_extraction.md); for the introduction to vector search, please refer to: [vector search tutorial document](../image_recognition_pipeline/vector_search.md).
+* For more introduction to object detection, please refer to: [Object Detection Tutorial Document](../image_recognition_pipeline/mainbody_detection.md); for the introduction of feature extraction, please refer to: [Feature Extraction Tutorial Document](../image_recognition_pipeline/feature_extraction.md); for the introduction to vector search, please refer to: [vector search tutorial document](../image_recognition_pipeline/vector_search_en.md).

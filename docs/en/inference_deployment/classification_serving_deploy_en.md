@@ -1,4 +1,4 @@
-English | [简体中文](../../zh_CN/inference_deployment/classification_serving_deploy.md)
+English | [简体中文](../../zh_CN/deployment/image_classification/paddle_serving.md)
 
 # Classification model service deployment
 

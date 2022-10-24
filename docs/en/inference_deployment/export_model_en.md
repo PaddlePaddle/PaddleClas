@@ -99,5 +99,5 @@ The inference model exported is used to deployment by using prediction engine. Y
 * [C++ inference](./cpp_deploy_en.md)(Only support classification)
 * [Python Whl inference](./whl_deploy_en.md)(Only support classification)
 * [PaddleHub Serving inference](./paddle_hub_serving_deploy_en.md)(Only support classification)
-* [PaddleServing inference](./paddle_serving_deploy_en.md)
+* [PaddleServing inference](./classification_serving_deploy_en.md)
 * [PaddleLite inference](./paddle_lite_deploy_en.md)(Only support classification)
