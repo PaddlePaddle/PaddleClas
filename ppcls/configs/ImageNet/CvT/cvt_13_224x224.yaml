@@ -38,7 +38,7 @@ Optimizer:
   beta2: 0.999
   epsilon: 1e-8
   weight_decay: 0.05
-  no_weight_decay_name: stage1.pos_embed stage2.pos_embed stage0.pos_embed stage0.cls_token stage2.cls_token stage1.cls_token .bias
+  no_weight_decay_name: pos_embed cls_token .bias
   one_dim_param_no_weight_decay: True
   lr:
     # for 8 cards
