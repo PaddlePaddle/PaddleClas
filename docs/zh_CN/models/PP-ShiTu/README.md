@@ -52,15 +52,15 @@ PP-ShiTuV2 是基于 PP-ShiTuV1 改进的一个实用轻量级通用图像识别
 
 可以通过扫描二维码或者 [点击链接](https://paddle-imagenet-models-name.bj.bcebos.com/demos/PP-ShiTu.apk) 下载并安装APP
 
-<div align=center><img src="../../images/quick_start/android_demo/PPShiTu_qrcode.png" width="300"/></div>
+<div align=center><img src="../../../images/quick_start/android_demo/PPShiTu_qrcode.png" width="300"/></div>
 
 然后将以下体验图片保存到手机上：
 
-<div align=center><img src="../../images/recognition/drink_data_demo/test_images/nongfu_spring.jpeg" width=30% height=30% /></div>
+<div align=center><img src="../../../images/recognition/drink_data_demo/test_images/nongfu_spring.jpeg" width=30% height=30% /></div>
 
 打开安装好的APP，点击下方“**本地识别**”按钮，选择上面这张保存的图片，再点击确定，就能得到如下识别结果：
 
-<div align=center><img src="../../images/quick_start/android_demo/android_nongfu_spring.JPG" width=30% height=30%/></div>
+<div align=center><img src="../../../images/quick_start/android_demo/android_nongfu_spring.JPG" width=30% height=30%/></div>
 
 更详细的说明参考[PP-ShiTu android demo功能说明](https://github.com/weisy11/PaddleClas/blob/develop/docs/zh_CN/quick_start/quick_start_recognition.md)
 

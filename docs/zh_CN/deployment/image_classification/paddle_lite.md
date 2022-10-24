@@ -253,7 +253,7 @@ adb shell 'export LD_LIBRARY_PATH=/data/local/tmp/arm_cpu/; /data/local/tmp/arm_
 运行效果如下：
 
 <div align="center">
-    <img src="./imgs/lite_demo_result.png" width="600">
+    <img src="../../../images/inference_deployment/lite_demo_result.png" width="600">
 </div>
 
 
