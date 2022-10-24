@@ -103,5 +103,5 @@ Paddle2ONNX 支持将 PaddlePaddle 模型格式转化到 ONNX 模型格式。通
 <<<<<<< 60cba5adfae34265593069e36ff0d379b8aeba71:docs/zh_CN/models/ImageNet1k/PVTV2.md
 PaddleClas 提供了基于 Paddle2ONNX 来完成 inference 模型转换 ONNX 模型并作推理预测的示例，您可以参考[Paddle2ONNX 模型转换与预测](../../deployment/image_classification/paddle2onnx.md)来完成相应的部署工作。
 =======
-PaddleClas 提供了基于 Paddle2ONNX 来完成 inference 模型转换 ONNX 模型并作推理预测的示例，您可以参考[Paddle2ONNX 模型转换与预测](../../../deploy/paddle2onnx/readme.md)来完成相应的部署工作。
+PaddleClas 提供了基于 Paddle2ONNX 来完成 inference 模型转换 ONNX 模型并作推理预测的示例，您可以参考[Paddle2ONNX 模型转换与预测](../../deployment/image_classification/paddle2onnx.md)来完成相应的部署工作。
 >>>>>>> docs: update:docs/zh_CN/models/PVTV2.md
