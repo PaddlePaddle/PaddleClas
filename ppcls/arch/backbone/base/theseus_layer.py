@@ -49,7 +49,9 @@ class TheseusLayer(nn.Layer):
                  return_patterns=None,
                  return_stages=None,
                  freeze_befor=None,
-                 stop_after=None):
+                 stop_after=None,
+                 *args,
+                 **kwargs):
         # init the output of net
         if return_patterns or return_stages:
             if return_patterns and return_stages:
