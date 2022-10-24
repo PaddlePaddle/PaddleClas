@@ -56,7 +56,7 @@ It can be seen that high accuracy can be getted when backbone is SwinTranformer_
 
 **Note**:
 * Backbone name without \* means the resolution is 224x224, and with \* means the resolution is 48x192 (h\*w). The stride of the network is changed to `[2, [2, 1], [2, 1], [2, 1]`. Please refer to [PaddleOCR]（ https://github.com/PaddlePaddle/PaddleOCR）for more details.
-* Backbone name with \*\* means that the resolution is 80x160 (h\*w), and the stride of the network is changed to `[2, [2, 1], [2, 1], [2, 1]]`. This resolution is searched by [Hyperparameter Searching](pulc_train_en.md#4).
+* Backbone name with \*\* means that the resolution is 80x160 (h\*w), and the stride of the network is changed to `[2, [2, 1], [2, 1], [2, 1]]`. This resolution is searched by [Hyperparameter Searching](PULC_train_en.md#4).
 * The Latency is tested on Intel(R) Xeon(R) Gold 6148 CPU @ 2.40GHz. The MKLDNN is enabled and the number of threads is 10.
 * About PP-LCNet, please refer to [PP-LCNet Introduction](../models/PP-LCNet_en.md) and [PP-LCNet Paper](https://arxiv.org/abs/2109.15099).
 
@@ -431,7 +431,7 @@ PaddleClas provides an example about how to deploy with C++. Please refer to [De
 
 Paddle Serving is a flexible, high-performance carrier for machine learning models, and supports different protocol, such as RESTful, gRPC, bRPC and so on, which provides different deployment solutions for a variety of heterogeneous hardware and operating system environments. Please refer [Paddle Serving](https://github.com/PaddlePaddle/Serving) for more information.
 
-PaddleClas provides an example about how to deploy as service by Paddle Serving. Please refer to [Paddle Serving Deployment](../inference_deployment/paddle_serving_deploy_en.md).
+PaddleClas provides an example about how to deploy as service by Paddle Serving. Please refer to [Paddle Serving Deployment](../inference_deployment/classification_serving_deploy_en.md).
 
 <a name="6.5"></a>
 
