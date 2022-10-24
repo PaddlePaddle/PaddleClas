@@ -25,7 +25,7 @@ def train_epoch(engine, epoch_id, print_batch_step):
     if not hasattr(engine, "train_dataloader_iter"):
         engine.train_dataloader_iter = iter(engine.train_dataloader)
 
-    for iter_id in range(engine.max_iter):
+    for iter_id in range(engine.iter_per_epoch):
         # fetch data batch from dataloader
         try:
             batch = engine.train_dataloader_iter.next()

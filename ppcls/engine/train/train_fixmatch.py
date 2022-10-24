@@ -29,10 +29,10 @@ def train_epoch_fixmatch(engine, epoch_id, print_batch_step):
             engine.unlabel_train_dataloader)
     temperture = engine.config["SSL"].get("temperture", 1)
     threshold = engine.config["SSL"].get("threshold", 0.95)
-    assert engine.iter_per_epochs is not None, "Global.iter_per_epochs need to be set."
+    assert engine.iter_per_epoch is not None, "Global.iter_per_epoch need to be set."
     threshold = paddle.to_tensor(threshold)
-    for iter_id in range(engine.iter_per_epochs):
-        if iter_id >= engine.iter_per_epochs:
+    for iter_id in range(engine.iter_per_epoch):
+        if iter_id >= engine.iter_per_epoch:
             break
         if iter_id == 5:
             for key in engine.time_info:

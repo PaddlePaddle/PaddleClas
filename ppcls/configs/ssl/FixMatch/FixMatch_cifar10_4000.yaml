@@ -8,7 +8,7 @@ Global:
   eval_during_train: True
   eval_interval: 1
   epochs: 1024
-  iter_per_epochs: 1024
+  iter_per_epoch: 1024
   print_batch_step: 20
   use_visualdl: False
   use_dali: False

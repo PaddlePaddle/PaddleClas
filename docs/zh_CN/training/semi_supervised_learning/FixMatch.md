@@ -23,8 +23,6 @@
 
 ## 1. 原理介绍
 
-**作者首先通过实验观察到 metric learning 方法学习到的特征在模型稳定后变化总是在一个可接受的范围内，因此提出了利用历史模型产生的特征来近似当前模型的特征，将这些历史特征按FIFO原则放入一个队列中，在一定程度上解耦了候选正负样本的数量与 mini-batch 大小的关系，且由于历史特征不记录梯度，开销相对较小，最终让informative样本的挖掘更加高效，解决了以往的 metric learning 方法只能利用 mini-batch 内部的样本的局限。**
-
 **作者提出一种简单而有效的半监督学习方法。主要是在有标签的数据训练的同时，对无标签的数据进行强弱两种不同的数据增强。如果无标签的数据弱数据增强的分类结果，大于阈值，则弱数据增强的输出标签作为软标签，对强数据增强的输出进行loss计算及模型训练。如示例图所示。**
 
 ![](https://raw.githubusercontent.com/google-research/fixmatch/master/media/FixMatch%20diagram.png)
@@ -51,13 +49,17 @@
 
 ## 3. 数据准备
 
-**    **在训练及测试的过程中，cifar10数据集会自动下载，请保持联网。如网络问题，则提前下载好[相关数据](https://dataset.bj.bcebos.com/cifar/cifar-10-python.tar.gz)，并在以下命令中，添加如下参数
+在训练及测试的过程中，cifar10数据集会自动下载，请保持联网。如网络问题，则提前下载好[相关数据](https://dataset.bj.bcebos.com/cifar/cifar-10-python.tar.gz)，并在以下命令中，添加如下参数
 
 ```
 ${cmd} -o DataLoader.Train.dataset.data_file=${data_file} -o DataLoader.UnLabelTrain.dataset.data_file=${data_file} -o DataLoader.Eval.dataset.data_file=${data_file}
 ```
 
-**其中：**`${cmd}`为以下的命令，%{data_file}`是下载数据的路径
+**其中：**`${cmd}`为以下的命令，`${data_file}`是下载数据的路径。如4.1中单卡命令就改为：
+
+```shell
+python tools/train.py -c ppcls/configs/ssl/FixMatch/FixMatch_cifar10_40.yaml -o DataLoader.Train.dataset.data_file=cifar-10-python.tar.gz -o DataLoader.UnLabelTrain.dataset.data_file=cifar-10-python.tar.gz -o DataLoader.Eval.dataset.data_file=cifar-10-python.tar.gz
+```
 
 ## 4. 模型训练
 
@@ -65,27 +67,27 @@ ${cmd} -o DataLoader.Train.dataset.data_file=${data_file} -o DataLoader.UnLabelT
    **单卡训练：**
 
    ```
-   python tools/train.py -c ppcls/configs/ssl/FixMatch_cifar10_40.yaml
+   python tools/train.py -c ppcls/configs/ssl/FixMatch/FixMatch_cifar10_40.yaml
    ```
 
    **注：单卡训练大约需要2-4个天。**
 2. **查看训练日志和保存的模型参数文件**
-   **训练过程中会在屏幕上实时打印loss等指标信息，同时会保存日志文件 **`train.log`、模型参数文件 `*.pdparams`、优化器参数文件 `*.pdopt`等内容到 `Global.output_dir`指定的文件夹下，默认在 `PaddleClas/output/RecModel/`文件夹下。
+   训练过程中会在屏幕上实时打印loss等指标信息，同时会保存日志文件`train.log`、模型参数文件 `*.pdparams`、优化器参数文件 `*.pdopt`等内容到 `Global.output_dir`指定的文件夹下，默认在 `PaddleClas/output/WideResNet/`文件夹下。
 
 ## 5. 模型评估与推理部署
 
 ### 5.1 模型评估
 
-**准备用于评估的 **`*.pdparams`模型参数文件，可以使用训练好的模型，也可以使用[4. 模型训练](#4-%E6%A8%A1%E5%9E%8B%E8%AE%AD%E7%BB%83)中保存的模型。
+准备用于评估的 `*.pdparams`模型参数文件，可以使用训练好的模型，也可以使用[4. 模型训练](#4-%E6%A8%A1%E5%9E%8B%E8%AE%AD%E7%BB%83)中保存的模型。
 
-* **以训练过程中保存的 **`latest.pdparams`为例，执行如下命令即可进行评估。
+* 以训练过程中保存的`best_model_ema.ema.pdparams`为例，执行如下命令即可进行评估。
 
   ```
   python3.7 tools/eval.py \
-  -c python tools/train.py -c ppcls/configs/ssl/FixMatch_cifar10_40.yaml \
+  -c ppcls/configs/ssl/FixMatch/FixMatch_cifar10_40.yaml \
   -o Global.pretrained_model="./output/WideResNet/best_model_ema.ema"
   ```
-* **以训练好的模型为例，下载提供的已经训练好的模型，到 **`PaddleClas/pretrained_models` 文件夹中，执行如下命令即可进行评估。
+* 以训练好的模型为例，下载提供的已经训练好的模型，到`PaddleClas/pretrained_models` 文件夹中，执行如下命令即可进行评估。
 
   ```
   # 下载模型
@@ -96,12 +98,12 @@ ${cmd} -o DataLoader.Train.dataset.data_file=${data_file} -o DataLoader.UnLabelT
   cd ..
   # 评估
   python3.7 tools/eval.py \
-  -c ppcls/configs/ssl/FixMatch_cifar10_40.yaml \
-  -o Global.pretrained_model="pretrained_models/FixMatch_WideResNet_cifar10_label40.pdparams"
+  -c ppcls/configs/ssl/FixMatch/FixMatch_cifar10_40.yaml \
+  -o Global.pretrained_model="pretrained_models/FixMatch_WideResNet_cifar10_label40"
   ```
 
   **注：**`pretrained_model` 后填入的地址不需要加 `.pdparams` 后缀，在程序运行时会自动补上。
-* **查看输出结果**
+* 查看输出结果
 
   ```
   ...
@@ -117,13 +119,13 @@ ${cmd} -o DataLoader.Train.dataset.data_file=${data_file} -o DataLoader.UnLabelT
   ppcls INFO: [Eval][Epoch 0][Avg]CELoss: 0.59721, loss: 0.59721, top1: 0.93140, top5: 0.99570
   ```
 
-  **默认评估日志保存在 **`PaddleClas/output/RecModel/eval.log`中，可以看到我们提供的模型在 cifar10 数据集上的评估指标为top1: 0.93140, top5: 0.99570
+  默认评估日志保存在`PaddleClas/output/WideResNet/eval.log`中，可以看到我们提供的模型在 cifar10 数据集上的评估指标为top1: 0.93140, top5: 0.99570
 
 ### 5.2 模型推理
 
 #### 5.2.1 推理模型准备
 
-**将训练过程中保存的模型文件转换成 inference 模型，同样以 **`latest.pdparams` 为例，执行以下命令进行转换
+将训练过程中保存的模型文件转换成 inference 模型，同样以`best_model_ema.ema.pdparams` 为例，执行以下命令进行转换
 
 ```
 python3.7 tools/export_model.py \
@@ -134,11 +136,11 @@ python3.7 tools/export_model.py \
 
 #### 5.2.2 基于 Python 预测引擎推理
 
-1. **修改 **`PaddleClas/deploy/configs/inference_cls.yaml`
+1. 修改`PaddleClas/deploy/configs/inference_cls.yaml`
 
-   * **将 **`infer_imgs:` 后的路径段改为 query 文件夹下的任意一张图片路径（下方配置使用的是 `demo.jpg`图片的路径）
-   * **将 **`rec_inference_model_dir:` 后的字段改为解压出来的 inference模型文件夹路径
-   * **将 **`transform_ops:` 字段下的预处理配置改为 `FixMatch_cifar10_40.yaml` 中 `Eval.dataset` 下的预处理配置
+   - 将`infer_imgs:` 后的路径段改为 query 文件夹下的任意一张图片路径（下方配置使用的是 `demo.jpg`图片的路径）
+   - 将`rec_inference_model_dir:` 后的字段改为解压出来的 inference模型文件夹路径
+   - 将`transform_ops:` 字段下的预处理配置改为 `FixMatch_cifar10_40.yaml` 中 `Eval.dataset` 下的预处理配置
 
    ```
    Global:
@@ -164,13 +166,13 @@ python3.7 tools/export_model.py \
            order: hwc
    PostProcess: null
    ```
-2. **执行推理命令**
+2. 执行推理命令
 
    ```
    cd ./deploy/
    python3.7 python/predict_rec.py -c ./configs/inference_rec.yaml
    ```
-3. **查看输出结果，实际结果为一个长度10的向量，表示图像分类的结果，如**
+3. 查看输出结果，实际结果为一个长度10的向量，表示图像分类的结果，如
 
    ```
    demo.JPG:        [ 0.02560742  0.05221584  ...  0.11635944 -0.18817757
@@ -179,25 +181,25 @@ python3.7 tools/export_model.py \
 
 #### 5.2.3 基于 C++ 预测引擎推理
 
-**PaddleClas 提供了基于 C++ 预测引擎推理的示例，您可以参考**[服务器端 C++ 预测](../../deployment/image_classification/cpp/linux.md)来完成相应的推理部署。如果您使用的是 Windows 平台，可以参考基于 Visual Studio 2019 Community CMake 编译指南完成相应的预测库编译和模型预测工作。
+PaddleClas 提供了基于 C++ 预测引擎推理的示例，您可以参考[服务器端 C++ 预测](../../deployment/image_classification/cpp/linux.md)来完成相应的推理部署。如果您使用的是 Windows 平台，可以参考基于 Visual Studio 2019 Community CMake 编译指南完成相应的预测库编译和模型预测工作。
 
 ### 5.4 服务化部署
 
-**Paddle Serving 提供高性能、灵活易用的工业级在线推理服务。Paddle Serving 支持 RESTful、gRPC、bRPC 等多种协议，提供多种异构硬件和多种操作系统环境下推理解决方案。更多关于Paddle Serving 的介绍，可以参考Paddle Serving 代码仓库。**
+Paddle Serving 提供高性能、灵活易用的工业级在线推理服务。Paddle Serving 支持 RESTful、gRPC、bRPC 等多种协议，提供多种异构硬件和多种操作系统环境下推理解决方案。更多关于Paddle Serving 的介绍，可以参考Paddle Serving 代码仓库。
 
-**PaddleClas 提供了基于 Paddle Serving 来完成模型服务化部署的示例，您可以参考**[模型服务化部署](../../deployment/PP-ShiTu/paddle_serving.md)来完成相应的部署工作。
+PaddleClas 提供了基于 Paddle Serving 来完成模型服务化部署的示例，您可以参考[模型服务化部署](../../deployment/PP-ShiTu/paddle_serving.md)来完成相应的部署工作。
 
 ### 5.5 端侧部署
 
-**Paddle Lite 是一个高性能、轻量级、灵活性强且易于扩展的深度学习推理框架，定位于支持包括移动端、嵌入式以及服务器端在内的多硬件平台。更多关于 Paddle Lite 的介绍，可以参考Paddle Lite 代码仓库。**
+Paddle Lite 是一个高性能、轻量级、灵活性强且易于扩展的深度学习推理框架，定位于支持包括移动端、嵌入式以及服务器端在内的多硬件平台。更多关于 Paddle Lite 的介绍，可以参考Paddle Lite 代码仓库。
 
-**PaddleClas 提供了基于 Paddle Lite 来完成模型端侧部署的示例，您可以参考**[端侧部署](../../deployment/image_classification/paddle_lite.md)来完成相应的部署工作。
+PaddleClas 提供了基于 Paddle Lite 来完成模型端侧部署的示例，您可以参考[端侧部署](../../deployment/image_classification/paddle_lite.md)来完成相应的部署工作。
 
 ### 5.6 Paddle2ONNX 模型转换与预测
 
-**Paddle2ONNX 支持将 PaddlePaddle 模型格式转化到 ONNX 模型格式。通过 ONNX 可以完成将 Paddle 模型到多种推理引擎的部署，包括TensorRT/OpenVINO/MNN/TNN/NCNN，以及其它对 ONNX 开源格式进行支持的推理引擎或硬件。更多关于 Paddle2ONNX 的介绍，可以参考Paddle2ONNX 代码仓库。**
+Paddle2ONNX 支持将 PaddlePaddle 模型格式转化到 ONNX 模型格式。通过 ONNX 可以完成将 Paddle 模型到多种推理引擎的部署，包括TensorRT/OpenVINO/MNN/TNN/NCNN，以及其它对 ONNX 开源格式进行支持的推理引擎或硬件。更多关于 Paddle2ONNX 的介绍，可以参考Paddle2ONNX 代码仓库。
 
-**PaddleClas 提供了基于 Paddle2ONNX 来完成 inference 模型转换 ONNX 模型并作推理预测的示例，您可以参考**[Paddle2ONNX 模型转换与预测](../../deployment/image_classification/paddle2onnx.md)来完成相应的部署工作。
+PaddleClas 提供了基于 Paddle2ONNX 来完成 inference 模型转换 ONNX 模型并作推理预测的示例，您可以参考**[Paddle2ONNX 模型转换与预测](../../deployment/image_classification/paddle2onnx.md)来完成相应的部署工作。
 
 ### 6. 参考资料
 

@@ -81,8 +81,7 @@ class Engine(object):
             "classification", "retrieval", "adaface"
         ], logger.error("Invalid eval mode: {}".format(self.eval_mode))
         if self.train_mode is None:
-            self.
-            _func = train_method.train_epoch
+            self.train_epoch_func = train_method.train_epoch
         else:
             self.train_epoch_func = getattr(train_method,
                                             "train_epoch_" + self.train_mode)
@@ -125,9 +124,20 @@ class Engine(object):
         if self.mode == 'train':
             self.train_dataloader = build_dataloader(
                 self.config["DataLoader"], "Train", self.device, self.use_dali)
-            self.unlabel_train_dataloader = build_dataloader(
-                self.config["DataLoader"], "UnLabelTrain", self.device,
-                self.use_dali)
+            if self.config["DataLoader"].get('UnLabelTrain', None) is not None:
+                self.unlabel_train_dataloader = build_dataloader(
+                        self.config["DataLoader"], "UnLabelTrain", self.device,
+                        self.use_dali)
+            else:
+                self.unlabel_train_dataloader = None
+
+            self.iter_per_epoch = len(self.train_dataloader) - 1 if platform.system(
+                ) == "Windows" else len(self.train_dataloader)
+            if self.config["Global"].get("iter_per_epoch", None):
+                # set max iteration per epoch mannualy, when training by iteration(s), such as XBM, FixMatch.
+                self.iter_per_epoch = self.config["Global"].get("iter_per_epoch")
+            self.iter_per_epoch = self.iter_per_epoch // self.update_freq * self.update_freq
+
         if self.mode == "eval" or (self.mode == "train" and
                                    self.config["Global"]["eval_during_train"]):
             if self.eval_mode in ["classification", "adaface"]:
@@ -148,10 +158,6 @@ class Engine(object):
                     self.query_dataloader = build_dataloader(
                         self.config["DataLoader"]["Eval"], "Query",
                         self.device, self.use_dali)
-
-        # for iter training, such as semi-super wised learning, fixmatch
-        self.iter_per_epochs = self.config["Global"].get("iter_per_epochs",
-                                                         None)
 
         # build loss
         if self.mode == "train":
@@ -224,9 +230,8 @@ class Engine(object):
         if self.mode == 'train':
             self.optimizer, self.lr_sch = build_optimizer(
                 self.config["Optimizer"], self.config["Global"]["epochs"],
-                len(self.train_dataloader)
-                if self.iter_per_epochs is None else self.iter_per_epochs //
-                self.update_freq, [self.model, self.train_loss_func])
+                self.iter_per_epoch // self.update_freq,
+                [self.model, self.train_loss_func])
 
         # AMP training and evaluating
         self.amp = "AMP" in self.config and self.config["AMP"] is not None
@@ -361,14 +366,6 @@ class Engine(object):
                                      ema_module)
             if metric_info is not None:
                 best_metric.update(metric_info)
-
-        self.max_iter = len(self.train_dataloader) - 1 if platform.system(
-        ) == "Windows" else len(self.train_dataloader)
-        if self.config["Global"].get("iter_per_epoch", None):
-            # set max iteration per epoch mannualy, when training by iteration(s), such as XBM, FixMatch.
-            self.max_iter = self.config["Global"].get("iter_per_epoch")
-
-        self.max_iter = self.max_iter // self.update_freq * self.update_freq
 
         for epoch_id in range(best_metric["epoch"] + 1,
                               self.config["Global"]["epochs"] + 1):
