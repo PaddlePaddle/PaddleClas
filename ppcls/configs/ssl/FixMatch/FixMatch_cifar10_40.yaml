@@ -1,0 +1,175 @@
+# global configs
+Global:
+  checkpoints: null
+  pretrained_model: 'https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/others/torch2paddle_weight/torch2paddle_initialize_cifar10_WideResNet_depth28_widenfactor2_classnum10.pdparams'
+  output_dir: ./output
+  device: gpu
+  save_interval: -1
+  eval_during_train: True
+  eval_interval: 1
+  epochs: 1024
+  iter_per_epoch: 1024
+  print_batch_step: 20
+  use_visualdl: False
+  use_dali: False
+  train_mode: fixmatch
+  # used for static mode and model export
+  image_shape: [3, 224, 224]
+  save_inference_dir: ./inference
+
+SSL:
+  tempture: 1
+  threshold: 0.95
+
+EMA:
+  decay: 0.999
+
+# AMP:
+#   scale_loss: 65536
+#   use_dynamic_loss_scaling: True
+#   # O1: mixed fp16
+#   level: O1
+
+# model architecture
+Arch:
+  name: WideResNet
+  depth: 28
+  widen_factor: 2
+  dropout: 0
+  num_classes: 10
+
+# loss function config for traing/eval process
+Loss:
+  Train:
+    - CELoss:
+        weight: 1.0
+        reduction: "mean"
+  Eval:
+    - CELoss:
+        weight: 1.0
+UnLabelLoss:
+  Train:
+    - CELoss:
+        weight: 1.0
+        reduction: "none"
+
+Optimizer:
+  name: Momentum
+  momentum: 0.9
+  use_nesterov: True
+  no_weight_decay_name: bn bias
+  weight_decay: 0.0005
+  lr:
+    name: CosineFixmatch
+    learning_rate: 0.03
+    num_warmup_steps: 0
+    num_cycles: 0.4375
+
+# data loader for train and eval
+DataLoader:
+  Train:
+    dataset:
+      name: Cifar10
+      data_file: None
+      mode: 'train'
+      download: True
+      backend: 'pil'
+      sample_per_label: 4
+      expand_labels: 1639
+      transform_ops:
+        - RandFlipImage:
+            flip_code: 1
+        - Pad_paddle_vision:
+            padding: 4
+            padding_mode: reflect
+        - RandCropImageV2:
+            size: [32, 32]
+        - NormalizeImage:
+            scale: 1.0/255.0
+            mean: [0.4914, 0.4822, 0.4465]
+            std: [0.2471, 0.2435, 0.2616]
+            order: hwc
+    sampler:
+      name: DistributedBatchSampler
+      batch_size: 64
+      drop_last: True
+      shuffle: True
+    loader:
+      num_workers: 8
+      use_shared_memory: True
+
+  UnLabelTrain:
+    dataset:
+      name: Cifar10
+      data_file: None
+      mode: 'train'
+      download: True
+      backend: 'pil'
+      sample_per_label: None
+      transform_ops_weak:
+        - RandFlipImage:
+            flip_code: 1
+        - Pad_paddle_vision:
+            padding: 4
+            padding_mode: reflect
+        - RandCropImageV2:
+            size: [32, 32]
+        - NormalizeImage:
+            scale: 1.0/255.0
+            mean: [0.4914, 0.4822, 0.4465]
+            std: [0.2471, 0.2435, 0.2616]
+            order: hwc
+      transform_ops_strong:
+        - RandFlipImage:
+            flip_code: 1
+        - Pad_paddle_vision:
+            padding: 4
+            padding_mode: reflect
+        - RandCropImageV2:
+            size: [32, 32]
+        - RandAugment:
+            num_layers: 2
+            magnitude: 10
+        - NormalizeImage:
+            scale: 1.0/255.0
+            mean: [0.4914, 0.4822, 0.4465]
+            std: [0.2471, 0.2435, 0.2616]
+            order: hwc
+    sampler:
+      name: DistributedBatchSampler
+      batch_size: 448
+      drop_last: True
+      shuffle: True
+    loader:
+      num_workers: 8
+      use_shared_memory: True
+
+
+  Eval:
+    dataset:
+      name: Cifar10
+      data_file: None
+      mode: 'test'
+      download: True
+      backend: 'pil'
+      sample_per_label: None
+      transform_ops:
+        - NormalizeImage:
+            scale: 1.0/255.0
+            mean: [0.4914, 0.4822, 0.4465]
+            std: [0.2471, 0.2435, 0.2616]
+            order: hwc
+    sampler:
+      name: DistributedBatchSampler
+      batch_size: 64
+      drop_last: False
+      shuffle: True
+    loader:
+      num_workers: 4
+      use_shared_memory: True
+
+
+Metric:
+  Eval:
+    - TopkAcc:
+        topk: [1, 5]

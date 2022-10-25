@@ -32,6 +32,7 @@ from ppcls.data.dataloader.multi_scale_dataset import MultiScaleDataset
 from ppcls.data.dataloader.person_dataset import Market1501, MSMT17
 from ppcls.data.dataloader.face_dataset import FiveValidationDataset, AdaFaceDataset
 from ppcls.data.dataloader.custom_label_dataset import CustomLabelDataset
+from ppcls.data.dataloader.cifar import Cifar10, Cifar100
 
 # sampler
 from ppcls.data.dataloader.DistributedRandomIdentitySampler import DistributedRandomIdentitySampler
@@ -67,8 +68,9 @@ def create_operators(params, class_num=None):
 
 def build_dataloader(config, mode, device, use_dali=False, seed=None):
     assert mode in [
-        'Train', 'Eval', 'Test', 'Gallery', 'Query'
-    ], "Dataset mode should be Train, Eval, Test, Gallery, Query"
+        'Train', 'Eval', 'Test', 'Gallery', 'Query', 'UnLabelTrain'
+    ], "Dataset mode should be Train, Eval, Test, Gallery, Query, UnLabelTrain"
+    assert mode in config.keys(), "{} config not in yaml".format(mode)
     # build dataset
     if use_dali:
         from ppcls.data.dataloader.dali import dali_dataloader
