@@ -26,11 +26,13 @@ class CELoss(nn.Layer):
     Cross entropy loss
     """
 
-    def __init__(self, epsilon=None):
+    def __init__(self, reduction="mean", epsilon=None):
         super().__init__()
         if epsilon is not None and (epsilon <= 0 or epsilon >= 1):
             epsilon = None
         self.epsilon = epsilon
+        assert reduction in ["mean", "sum", "none"]
+        self.reduction = reduction
 
     def _labelsmoothing(self, target, class_num):
         if len(target.shape) == 1 or target.shape[-1] != class_num:
@@ -55,8 +57,11 @@ class CELoss(nn.Layer):
                 soft_label = True
             else:
                 soft_label = False
-            loss = F.cross_entropy(x, label=label, soft_label=soft_label)
-        loss = loss.mean()
+            loss = F.cross_entropy(
+                x,
+                label=label,
+                soft_label=soft_label,
+                reduction=self.reduction)
         return {"CELoss": loss}
 
 

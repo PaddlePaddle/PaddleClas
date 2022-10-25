@@ -12,6 +12,8 @@
     - [3.1 环境配置](#3.1)
     - [3.2 数据准备](#3.2)
     - [3.3 模型训练](#3.3)
+      - [3.3.1 训练 ImageNet](#3.3.1)
+      - [3.3.2 基于 ImageNet 权重微调](#3.3.2)
     - [3.4 模型评估](#3.4)
     - [3.5 模型预测](#3.5)
 - [4. 模型推理部署](#4)
@@ -90,7 +92,6 @@ PP-HGNet 与其他模型的比较如下，其中测试机器为 NVIDIA® Tesla®
 | SwinTransformer_base     | 85.2       | 97.5        | 13.53       |  
 | <b>PPHGNet_base_ssld<b> | <b>85.00<b>| <b>97.35<b> | <b>5.97<b>   |
 
-
 <a name="2"></a>
 
 ## 2. 模型快速体验
@@ -160,7 +161,6 @@ print(next(result))
 [{'class_ids': [8, 7, 86, 82, 81], 'scores': [0.71479, 0.08682, 0.00806, 0.0023, 0.00121], 'label_names': ['hen', 'cock', 'partridge', 'ruffed grouse, partridge, Bonasa umbellus', 'ptarmigan'], 'filename': 'docs/images/inference_deployment/whl_demo.jpg'}]
 ```
 
-
 <a name="3"></a>
 
 ## 3. 模型训练、评估和预测
@@ -210,7 +210,10 @@ cd path_to_PaddleClas
 
 ### 3.3 模型训练
 
+<a name="3.3.1"></a>
 
+#### 3.3.1 训练 ImageNet
+    
 在 `ppcls/configs/ImageNet/PPHGNet/PPHGNet_small.yaml` 中提供了 PPHGNet_small 训练配置，可以通过如下脚本启动训练：
 
 ```shell
@@ -225,6 +228,13 @@ python3 -m paddle.distributed.launch \
 **备注：**
 
 * 当前精度最佳的模型会保存在 `output/PPHGNet_small/best_model.pdparams`
+    
+<a name="3.3.2"></a>
+
+#### 3.3.2 基于 ImageNet 权重微调
+
+如果训练的不是 ImageNet 任务，而是其他任务时，需要更改配置文件和训练方法，详情可以参考：[模型微调](../../training/single_label_classification/finetune.md)。
+    
 
 <a name="3.4"></a>
 
@@ -265,6 +275,8 @@ python3 tools/infer.py \
 * 默认是对 `docs/images/inference_deployment/whl_demo.jpg` 进行预测，此处也可以通过增加字段 `-o Infer.infer_imgs=xxx` 对其他图片预测。
 
 * 默认输出的是 Top-5 的值，如果希望输出 Top-k 的值，可以指定`-o Infer.PostProcess.topk=k`，其中，`k` 为您指定的值。
+   
+* 默认的标签映射基于 ImageNet 数据集，如果改变数据集，需要重新指定`Infer.PostProcess.class_id_map_file`，该映射文件的制作方法可以参考`ppcls/utils/imagenet1k_label_list.txt`。
 
 
 
@@ -351,7 +363,7 @@ python3 python/predict_cls.py -c configs/inference_cls.yaml -o Global.inference_
 输出结果如下。
 
 ```
-ILSVRC2012_val_00000010.jpeg:	class id(s): [332, 153, 283, 338, 204], score(s): [0.50, 0.05, 0.02, 0.01, 0.01], label_name(s): ['Angora, Angora rabbit', 'Maltese dog, Maltese terrier, Maltese', 'Persian cat', 'guinea pig, Cavia cobaya', 'Lhasa, Lhasa apso']
+ILSVRC2012_val_00000010.jpeg:    class id(s): [332, 153, 283, 338, 204], score(s): [0.50, 0.05, 0.02, 0.01, 0.01], label_name(s): ['Angora, Angora rabbit', 'Maltese dog, Maltese terrier, Maltese', 'Persian cat', 'guinea pig, Cavia cobaya', 'Lhasa, Lhasa apso']
 ```
 
 <a name="4.2.2"></a>  
@@ -368,12 +380,11 @@ python3 python/predict_cls.py -c configs/inference_cls.yaml -o Global.inference_
 终端中会输出该文件夹内所有图像的分类结果，如下所示。
 
 ```
-ILSVRC2012_val_00000010.jpeg:	class id(s): [332, 153, 283, 338, 204], score(s): [0.50, 0.05, 0.02, 0.01, 0.01], label_name(s): ['Angora, Angora rabbit', 'Maltese dog, Maltese terrier, Maltese', 'Persian cat', 'guinea pig, Cavia cobaya', 'Lhasa, Lhasa apso']
-ILSVRC2012_val_00010010.jpeg:	class id(s): [626, 622, 531, 487, 633], score(s): [0.68, 0.02, 0.02, 0.02, 0.02], label_name(s): ['lighter, light, igniter, ignitor', 'lens cap, lens cover', 'digital watch', 'cellular telephone, cellular phone, cellphone, cell, mobile phone', "loupe, jeweler's loupe"]
-ILSVRC2012_val_00020010.jpeg:	class id(s): [178, 211, 171, 246, 741], score(s): [0.82, 0.00, 0.00, 0.00, 0.00], label_name(s): ['Weimaraner', 'vizsla, Hungarian pointer', 'Italian greyhound', 'Great Dane', 'prayer rug, prayer mat']
-ILSVRC2012_val_00030010.jpeg:	class id(s): [80, 83, 136, 23, 93], score(s): [0.84, 0.00, 0.00, 0.00, 0.00], label_name(s): ['black grouse', 'prairie chicken, prairie grouse, prairie fowl', 'European gallinule, Porphyrio porphyrio', 'vulture', 'hornbill']
+ILSVRC2012_val_00000010.jpeg:    class id(s): [332, 153, 283, 338, 204], score(s): [0.50, 0.05, 0.02, 0.01, 0.01], label_name(s): ['Angora, Angora rabbit', 'Maltese dog, Maltese terrier, Maltese', 'Persian cat', 'guinea pig, Cavia cobaya', 'Lhasa, Lhasa apso']
+ILSVRC2012_val_00010010.jpeg:    class id(s): [626, 622, 531, 487, 633], score(s): [0.68, 0.02, 0.02, 0.02, 0.02], label_name(s): ['lighter, light, igniter, ignitor', 'lens cap, lens cover', 'digital watch', 'cellular telephone, cellular phone, cellphone, cell, mobile phone', "loupe, jeweler's loupe"]
+ILSVRC2012_val_00020010.jpeg:    class id(s): [178, 211, 171, 246, 741], score(s): [0.82, 0.00, 0.00, 0.00, 0.00], label_name(s): ['Weimaraner', 'vizsla, Hungarian pointer', 'Italian greyhound', 'Great Dane', 'prayer rug, prayer mat']
+ILSVRC2012_val_00030010.jpeg:    class id(s): [80, 83, 136, 23, 93], score(s): [0.84, 0.00, 0.00, 0.00, 0.00], label_name(s): ['black grouse', 'prairie chicken, prairie grouse, prairie fowl', 'European gallinule, Porphyrio porphyrio', 'vulture', 'hornbill']
 ```
-
 
 <a name="4.3"></a>
 

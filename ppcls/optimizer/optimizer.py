@@ -93,24 +93,49 @@ class Momentum(object):
                  momentum,
                  weight_decay=None,
                  grad_clip=None,
-                 multi_precision=True):
+                 use_nesterov=False,
+                 multi_precision=True,
+                 no_weight_decay_name=None):
         super().__init__()
         self.learning_rate = learning_rate
         self.momentum = momentum
         self.weight_decay = weight_decay
         self.grad_clip = grad_clip
         self.multi_precision = multi_precision
+        self.use_nesterov = use_nesterov
+        self.no_weight_decay_name_list = no_weight_decay_name.split(
+        ) if no_weight_decay_name else []
 
     def __call__(self, model_list):
         # model_list is None in static graph
-        parameters = sum([m.parameters() for m in model_list],
-                         []) if model_list else None
+        parameters = None
+        if len(self.no_weight_decay_name_list) > 0:
+            params_with_decay = []
+            params_without_decay = []
+            for m in model_list:
+                params = [p for n, p in m.named_parameters() \
+                          if not any(nd in n for nd in self.no_weight_decay_name_list)]
+                params_with_decay.extend(params)
+                params = [p for n, p in m.named_parameters() \
+                          if any(nd in n for nd in self.no_weight_decay_name_list)]
+                params_without_decay.extend(params)
+            parameters = [{
+                "params": params_with_decay,
+                "weight_decay": self.weight_decay
+            }, {
+                "params": params_without_decay,
+                "weight_decay": 0.0
+            }]
+        else:
+            parameters = sum([m.parameters() for m in model_list],
+                             []) if model_list else None
         opt = optim.Momentum(
             learning_rate=self.learning_rate,
             momentum=self.momentum,
             weight_decay=self.weight_decay,
             grad_clip=self.grad_clip,
             multi_precision=self.multi_precision,
+            use_nesterov=self.use_nesterov,
             parameters=parameters)
         if hasattr(opt, '_use_multi_tensor'):
             opt = optim.Momentum(
@@ -120,6 +145,7 @@ class Momentum(object):
                 grad_clip=self.grad_clip,
                 multi_precision=self.multi_precision,
                 parameters=parameters,
+                use_nesterov=self.use_nesterov,
                 use_multi_tensor=True)
         return opt
 

@@ -23,6 +23,8 @@
     - [3.1 环境配置](#3.1)
     - [3.2 数据准备](#3.2)
     - [3.3 模型训练](#3.3)
+      - [3.3.1 训练 ImageNet](#3.3.1)
+      - [3.3.2 基于 ImageNet 权重微调](#3.3.2)
     - [3.4 模型评估](#3.4)
     - [3.5 模型预测](#3.5)
 - [4. 模型推理部署](#4)
@@ -37,8 +39,6 @@
   - [4.5 端侧部署](#4.5)
   - [4.6 Paddle2ONNX 模型转换与预测](#4.6)
 - [5. 引用](#5)
-
-
 
 <a name="1"></a>
 
@@ -71,14 +71,12 @@
 
 SE 模块是 SENet 提出的一种通道注意力机制，可以有效提升模型的精度。但是在 Intel CPU 端，该模块同样会带来较大的延时，如何平衡精度和速度是我们要解决的一个问题。虽然在 MobileNetV3 等基于 NAS 搜索的网络中对 SE 模块的位置进行了搜索，但是并没有得出一般的结论，我们通过实验发现，SE 模块越靠近网络的尾部对模型精度的提升越大。下表也展示了我们的一些实验结果：
 
-
 | SE Location       | Top-1 Acc(\%) | Latency(ms) |
 |:--:|:--:|:--:|
 | 1100000000000     | 61.73           | 2.06         |
 | 0000001100000     | 62.17           | 2.03         |
 | <b>0000000000011<b>     | <b>63.14<b>           | <b>2.05<b>         |
 | 1111111111111     | 64.27           | 3.80         |
-
 
 最终，PP-LCNet 中的 SE 模块的位置选用了表格中第三行的方案。
 
@@ -93,7 +91,6 @@ SE 模块是 SENet 提出的一种通道注意力机制，可以有效提升模�
 | 1111111111111     | 63.22           | 2.08         |
 | 1111111000000     | 62.70           | 2.07        |
 | <b>0000001111111<b>     | <b>63.14<b>           | <b>2.05<b>         |
-
 
 实验表明，更大的卷积核放在网络的中后部即可达到放在所有位置的精度，与此同时，获得更快的推理速度。PP-LCNet 最终选用了表格中第三行的方案。
 
@@ -286,7 +283,6 @@ Predict complete!
 
 **备注**： 更换 PPLCNet 的其他 scale 的模型时，只需替换 `model_name`，如将此时的模型改为 `PPLCNet_x2_0` 时，只需要将 `--model_name=PPLCNet_x1_0` 改为 `--model_name=PPLCNet_x2_0` 即可。  
 
-
 * 在 Python 代码中预测
 ```python
 from paddleclas import PaddleClas
@@ -320,7 +316,6 @@ print(next(result))
 
 请在[ImageNet 官网](https://www.image-net.org/)准备 ImageNet-1k 相关的数据。
 
-
 进入 PaddleClas 目录。
 
 ```
@@ -343,16 +338,21 @@ cd path_to_PaddleClas
 ```
 
 其中 `train/` 和 `val/` 分别为训练集和验证集。`train_list.txt` 和 `val_list.txt` 分别为训练集和验证集的标签文件。
+<<<<<<< f18496291fdbc9ca57ece7790b00f456b68a1f68:docs/zh_CN/models/ImageNet1k/PP-LCNet.md
 
 **备注：**
 
 * 关于 `train_list.txt`、`val_list.txt`的格式说明，可以参考[PaddleClas分类数据集格式说明](../../training/single_label_classification/dataset.md#1-数据集格式说明) 。
 
+**备注：**
 
 <a name="3.3"></a>
 
 ### 3.3 模型训练
 
+<a name="3.3.1"></a>
+
+#### 3.3.1 训练 ImageNet
 
 在 `ppcls/configs/ImageNet/PPLCNet/PPLCNet_x1_0.yaml` 中提供了 PPLCNet_x1_0 训练配置，可以通过如下脚本启动训练：
 
@@ -364,11 +364,14 @@ python3 -m paddle.distributed.launch \
         -c ppcls/configs/ImageNet/PPLCNet/PPLCNet_x1_0.yaml
 ```
 
-
 **备注：**
 
 * 当前精度最佳的模型会保存在 `output/PPLCNet_x1_0/best_model.pdparams`
 
+#### 3.3.2 基于 ImageNet 权重微调
+
+如果训练的不是 ImageNet 任务，而是其他任务时，需要更改配置文件和训练方法，详情可以参考：[模型微调](../../training/single_label_classification/finetune.md)。
+    
 <a name="3.4"></a>
 
 ### 3.4 模型评估
@@ -408,8 +411,8 @@ python3 tools/infer.py \
 * 默认是对 `docs/images/inference_deployment/whl_demo.jpg` 进行预测，此处也可以通过增加字段 `-o Infer.infer_imgs=xxx` 对其他图片预测。
 
 * 默认输出的是 Top-5 的值，如果希望输出 Top-k 的值，可以指定`-o Infer.PostProcess.topk=k`，其中，`k` 为您指定的值。
-
-
+    
+* 默认的标签映射基于 ImageNet 数据集，如果改变数据集，需要重新指定`Infer.PostProcess.class_id_map_file`，该映射文件的制作方法可以参考`ppcls/utils/imagenet1k_label_list.txt`。
 
 <a name="4"></a>
 
@@ -422,7 +425,6 @@ python3 tools/infer.py \
 Paddle Inference 是飞桨的原生推理库， 作用于服务器端和云端，提供高性能的推理能力。相比于直接基于预训练模型进行预测，Paddle Inference可使用MKLDNN、CUDNN、TensorRT 进行预测加速，从而实现更优的推理性能。更多关于Paddle Inference推理引擎的介绍，可以参考[Paddle Inference官网教程](https://www.paddlepaddle.org.cn/documentation/docs/zh/guides/infer/inference/inference_cn.html)。
 
 当使用 Paddle Inference 推理时，加载的模型类型为 inference 模型。本案例提供了两种获得 inference 模型的方法，如果希望得到和文档相同的结果，请选择[直接下载 inference 模型](#6.1.2)的方式。
-
 
 <a name="4.1.1"></a>
 
@@ -444,7 +446,6 @@ python3 tools/export_model.py \
 │   ├── inference.pdiparams.info
 │   └── inference.pdmodel
 ```
-
 
 <a name="4.1.2"></a>
 
@@ -470,7 +471,6 @@ wget https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/PPLCNet
 <a name="4.2"></a>
 
 ### 4.2 基于 Python 预测引擎推理
-
 
 <a name="4.2.1"></a>  
 
@@ -517,7 +517,6 @@ ILSVRC2012_val_00020010.jpeg:	class id(s): [178, 211, 209, 210, 236], score(s): 
 ILSVRC2012_val_00030010.jpeg:	class id(s): [80, 23, 93, 81, 99], score(s): [0.87, 0.01, 0.01, 0.01, 0.00], label_name(s): ['black grouse', 'vulture', 'hornbill', 'ptarmigan', 'goose']
 ```
 
-
 <a name="4.3"></a>
 
 ### 4.3 基于 C++ 预测引擎推理
@@ -547,7 +546,6 @@ PaddleClas 提供了基于 Paddle Lite 来完成模型端侧部署的示例，�
 Paddle2ONNX 支持将 PaddlePaddle 模型格式转化到 ONNX 模型格式。通过 ONNX 可以完成将 Paddle 模型到多种推理引擎的部署，包括TensorRT/OpenVINO/MNN/TNN/NCNN，以及其它对 ONNX 开源格式进行支持的推理引擎或硬件。更多关于 Paddle2ONNX 的介绍，可以参考[Paddle2ONNX 代码仓库](https://github.com/PaddlePaddle/Paddle2ONNX)。
 
 PaddleClas 提供了基于 Paddle2ONNX 来完成 inference 模型转换 ONNX 模型并作推理预测的示例，您可以参考[Paddle2ONNX 模型转换与预测](@shuilong)来完成相应的部署工作。
-
 
 <a name="5"></a>
 

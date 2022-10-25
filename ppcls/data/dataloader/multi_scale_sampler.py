@@ -15,6 +15,7 @@ class MultiScaleSampler(Sampler):
                  first_bs,
                  divided_factor=32,
                  is_training=True,
+                 shuffle=True,
                  seed=None):
         """
             multi scale samper
@@ -23,7 +24,7 @@ class MultiScaleSampler(Sampler):
                 scales(list): several scales for image resolution
                 first_bs(int): batch size for the first scale in scales
                 divided_factor(int): ImageNet models down-sample images by a factor, ensure that width and height dimensions are multiples are multiple of devided_factor.
-                is_training(boolean): mode 
+                is_training(boolean): mode
         """
         # min. and max. spatial dimensions
         self.data_source = data_source
@@ -47,7 +48,7 @@ class MultiScaleSampler(Sampler):
             math.ceil(self.n_data_samples * 1.0 / num_replicas))
         img_indices = [idx for idx in range(self.n_data_samples)]
 
-        self.shuffle = False
+        self.shuffle = shuffle
         if is_training:
             # compute the spatial dimensions and corresponding batch size
             # ImageNet models down-sample images by a factor of 32.
@@ -66,7 +67,6 @@ class MultiScaleSampler(Sampler):
                 batch_size = int(max(1, (base_elements / (h * w))))
                 img_batch_pairs.append((w, h, batch_size))
             self.img_batch_pairs = img_batch_pairs
-            self.shuffle = True
         else:
             self.img_batch_pairs = [(base_im_w, base_im_h, base_batch_size)]
 

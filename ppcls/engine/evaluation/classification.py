@@ -47,11 +47,7 @@ def classification_eval(engine, epoch_id=0):
         if iter_id == 5:
             for key in time_info:
                 time_info[key].reset()
-        if engine.use_dali:
-            batch = [
-                paddle.to_tensor(batch[0]['data']),
-                paddle.to_tensor(batch[0]['label'])
-            ]
+
         time_info["reader_cost"].update(time.time() - tic)
         batch_size = batch[0].shape[0]
         batch[0] = paddle.to_tensor(batch[0])
