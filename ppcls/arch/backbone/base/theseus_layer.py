@@ -77,7 +77,11 @@ class TheseusLayer(nn.Layer):
                 return_patterns = [stages_pattern[i] for i in return_stages]
 
             if return_patterns:
-                self.update_res(return_patterns)
+                # call update_res function after the __init__ of the object has completed execution, that is, the contructing of layer or model has been completed.
+                def update_res_hook(layer, input):
+                    self.update_res(return_patterns)
+
+                self.register_forward_pre_hook(update_res_hook)
 
         # freeze subnet
         if freeze_befor is not None:
