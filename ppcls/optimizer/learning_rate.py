@@ -502,6 +502,7 @@ class CosineFixmatch(LRBase):
         self.num_warmup_steps = num_warmup_steps
         self.num_cycles = num_cycles
         self.last_epoch = last_epoch
+        self.by_epoch = by_epoch
 
     def __call__(self):
         def _lr_lambda(current_step):
