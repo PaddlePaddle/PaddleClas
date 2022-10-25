@@ -77,6 +77,8 @@ class CombinedLoss(nn.Layer):
 
 
 def build_loss(config):
+    if config is None:
+        return None
     module_class = CombinedLoss(copy.deepcopy(config))
     logger.debug("build loss {} success.".format(module_class))
     return module_class

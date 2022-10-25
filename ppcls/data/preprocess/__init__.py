@@ -44,6 +44,7 @@ from ppcls.data.preprocess.ops.operators import RandomRotation
 from ppcls.data.preprocess.ops.operators import Padv2
 from ppcls.data.preprocess.ops.operators import RandomRot90
 from .ops.operators import format_data
+from paddle.vision.transforms import Pad as Pad_paddle_vision
 
 from ppcls.data.preprocess.batch_ops.batch_operators import MixupOperator, CutmixOperator, OpSampler, FmixOperator
 from ppcls.data.preprocess.batch_ops.batch_operators import MixupCutmixHybrid
