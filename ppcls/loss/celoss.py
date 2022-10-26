@@ -51,6 +51,10 @@ class CELoss(nn.Layer):
             label = self._labelsmoothing(label, class_num)
             x = -F.log_softmax(x, axis=-1)
             loss = paddle.sum(x * label, axis=-1)
+            if self.reduction == 'mean':
+                loss = loss.mean()
+            elif self.reduction == 'sum':
+                loss = loss.sum()
         else:
             if label.shape[-1] == x.shape[-1]:
                 label = F.softmax(label, axis=-1)
