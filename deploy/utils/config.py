@@ -80,7 +80,7 @@ def print_dict(d, delimiter=0):
             logger.info("{}{} : {}".format(delimiter * " ",
                                            logger.coloring(k, "HEADER"),
                                            logger.coloring(v, "OKGREEN")))
-        if k.isupper():
+        if k[0].isupper() and delimiter == 0:
             logger.info(placeholder)
 
 
