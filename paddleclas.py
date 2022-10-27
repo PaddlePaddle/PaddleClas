@@ -554,6 +554,10 @@ class PaddleClas(object):
     """
 
     def __init__(self,
+                 build_gallery: bool=False,
+                 gallery_image_root: str=None,
+                 gallery_data_file: str=None,
+                 index_dir: str=None,
                  model_name: str=None,
                  inference_model_dir: str=None,
                  **kwargs):
@@ -568,13 +572,19 @@ class PaddleClas(object):
         """
         super().__init__()
 
-        if kwargs.get("build_gallery", False):
+        if build_gallery:
             self.model_type, inference_model_dir = self._check_input_model(
                 model_name
                 if model_name else "PP-ShiTuV2", inference_model_dir)
             self._config = init_config(self.model_type, model_name
                                        if model_name else "PP-ShiTuV2",
                                        inference_model_dir, **kwargs)
+            if gallery_image_root:
+                self._config.IndexProcess.image_root = gallery_image_root
+            if gallery_data_file:
+                self._config.IndexProcess.data_file = gallery_data_file
+            if index_dir:
+                self._config.IndexProcess.index_dir = index_dir
 
             logger.info("Building Gallery...")
             GalleryBuilder(self._config)
@@ -586,6 +596,8 @@ class PaddleClas(object):
                                        inference_model_dir, **kwargs)
 
             if self.model_type == "shitu":
+                if index_dir:
+                    self._config.IndexProcess.index_dir = index_dir
                 self.predictor = SystemPredictor(self._config)
             else:
                 self.predictor = ClsPredictor(self._config)
