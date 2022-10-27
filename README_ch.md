@@ -4,32 +4,28 @@
 
 ## 简介
 
-飞桨图像识别套件PaddleClas是飞桨为工业界和学术界所准备的一个图像识别和图像分类任务的工具集，助力使用者训练出更好的视觉模型和应用落地。&nbsp;
+飞桨图像识别套件PaddleClas是飞桨为工业界和学术界所准备的一个图像识别和图像分类任务的工具集，助力使用者训练出更好的视觉模型和应用落地。
+
+|             PP-ShiTuV2图像识别系统效果展示             |                PULC实用图像分类模型效果展示                 |
+| :----------------------------------------------------: | :---------------------------------------------------------: |
+| <img src="./docs/images/shituv2.gif"  width = "450" /> | <img src="./docs/images/class_simple.gif"  width = "600" /> |
+
+
+## 📣 近期更新
+
+- **💥 直播预告：11.1-11.3日每晚8点半**，PaddleClas研发团队详解PP-ShituV2优化策略与真实产业应用。微信扫描下方二维码，关注公众号并填写问卷后进入官方交流群，获取直播链接与20G重磅图像分类学习大礼包（内含20+数据集、4个垂类模型、前沿）
 
 <div align="center">
-<img src="./docs/images/shituv2.gif"  width = "450" />
-<p>PP-ShiTuV2图像识别系统效果展示</p>
+    <img src="https://user-images.githubusercontent.com/11568925/189877049-d17ddcea-22d2-44ab-91fe-36d12af3add8.png" width = "150" height = "150"/>
 </div>
 
 
+- 🔥️ 2022.9.14 发布**商超零售新革命-生鲜智能结算产业应用**范例
 
-
-<div align="center">
-<img src="./docs/images/class_simple.gif"  width = "600" />
-<p>PULC实用图像分类模型效果展示</p>
-</div>
-
-
-
-## 近期更新
-
-- 🔥️ 2022.9.14 晚上8:30  **商超零售新革命-生鲜智能结算产业应用**，扫码进群获取直播链接
-
-  <div align="center">
-    <img src="https://user-images.githubusercontent.com/11568925/189877049-d17ddcea-22d2-44ab-91fe-36d12af3add8.png" width = "200" height = "200"/>
-  </div>
-
-- 🔥️ 2022.9.13发布超轻量图像识别系统[PP-ShiTuV2](docs/zh_CN/models/PP-ShiTu/README.md)，recall1精度提升8个点，覆盖商品识别、垃圾分类、航拍场景等[20+识别场景](docs/zh_CN/deployment/PP-ShiTu/application_scenarios.md)，新增[库管理工具](./deploy/shitu_index_manager/)，[Android Demo](./docs/zh_CN/quick_start/quick_start_recognition.md)全新体验。
+- **🔥️ 2022.9.13 发布超轻量图像识别系统[PP-ShiTuV2](docs/zh_CN/models/PP-ShiTu/README.md)：**
+  - recall1精度提升8个点，覆盖商品识别、垃圾分类、航拍场景等[20+识别场景](docs/zh_CN/deployment/PP-ShiTu/application_scenarios.md)，
+  - 新增[库管理工具](./deploy/shitu_index_manager/)，[Android Demo](./docs/zh_CN/quick_start/quick_start_recognition.md)全新体验。
+  
 - 2022.9.4 新增[生鲜产品自主结算范例库](./docs/zh_CN/samples/Fresh_Food_Recogniiton/README.md)，具体内容可以在AI Studio上体验。
 - 2022.6.15 发布[PULC超轻量图像分类实用方案](docs/zh_CN/training/PULC.md)，CPU推理3ms，精度比肩SwinTransformer，覆盖人、车、OCR场景九大常见任务。
 - 2022.5.23 新增[人员出入管理范例库](https://aistudio.baidu.com/aistudio/projectdetail/4094475)，具体内容可以在 AI Studio 上体验。
@@ -37,44 +33,55 @@
 - [more](docs/zh_CN/version_history.md)
 
 
-## 特性
+## 🌟 特性
 
-PaddleClas发布了[PP-HGNet](docs/zh_CN/models/ImageNet1k/PP-HGNet.md)、[PP-LCNetv2](docs/zh_CN/models/ImageNet1k/PP-LCNetV2.md)、 [PP-LCNet](docs/zh_CN/models/ImageNet1k/PP-LCNet.md)和[SSLD半监督知识蒸馏方案](docs/zh_CN/training/advanced/ssld.md)等算法，
-并支持多种图像分类、识别相关算法，在此基础上打造[PULC超轻量图像分类方案](docs/zh_CN/quick_start/PULC.md)和[PP-ShiTu图像识别系统](./docs/zh_CN/quick_start/quick_start_recognition.md)。
-![](https://user-images.githubusercontent.com/11568925/189267545-7a6eefa0-b4fc-4ed0-ae9d-7c6d53f59798.png)
-
-
-## 欢迎加入技术交流群
-
-* 欢迎加入PaddleClas 微信用户群（扫码填写问卷即可入群）
+PaddleClas支持多种前沿图像分类、识别相关算法，发布产业级特色骨干网络[PP-HGNet](docs/zh_CN/models/ImageNet1k/PP-HGNet.md)、[PP-LCNetv2](docs/zh_CN/models/ImageNet1k/PP-LCNetV2.md)、 [PP-LCNet](docs/zh_CN/models/ImageNet1k/PP-LCNet.md)和[SSLD半监督知识蒸馏方案](docs/zh_CN/training/advanced/ssld.md)等模型，在此基础上打造[PULC超轻量图像分类方案](docs/zh_CN/quick_start/PULC.md)和[PP-ShiTu图像识别系统](./docs/zh_CN/quick_start/quick_start_recognition.md)。
 
 <div align="center">
-  <img src="https://user-images.githubusercontent.com/45199522/173483779-2332f990-4941-4f8d-baee-69b62035fc31.png" width = "200" height = "200"/>
+  <img src="https://user-images.githubusercontent.com/11568925/189267545-7a6eefa0-b4fc-4ed0-ae9d-7c6d53f59798.png"/>
 </div>
+> 上述内容的使用方法建议从文档教程中的快速开始体验
 
+## 👫 开源社区
 
-## 快速体验
+* **📑项目合作：** 如果您是企业开发者且有明确的图像分类应用需求，填写[问卷](https://paddle.wjx.cn/vm/hnGOjfn.aspx# )后可免费与官方团队展开不同层次的合作。
+* **👫加入社区：** 微信扫描二维码并填写问卷之后，加入交流群领取20G重磅图像分类学习大礼包，内含
+  * **20+场景数据库**，包括各类商品、动植物、航拍图像等数据集
+  * 场景应用**模型集合**：包括人员出入管理、生鲜品识别、商品识别等
+  * **50+前沿图像分类与识别论文**、历次发版课程视频、PPT与优质社区项目等
 
-PULC超轻量图像分类方案快速体验：[点击这里](docs/zh_CN/quick_start/PULC.md)
-
-PP-ShiTu图像识别快速体验：[点击这里](./docs/zh_CN/quick_start/quick_start_recognition.md)
-
-PP-ShiTuV2 Android Demo APP，可扫描如下二维码，下载体验
 
 <div align="center">
-<img src="./docs/images/quick_start/android_demo/PPShiTu_qrcode.png"  width = "240" height = "240" />
-<p>PP-ShiTuV2 Android Demo</p>
+  <img src="https://user-images.githubusercontent.com/45199522/173483779-2332f990-4941-4f8d-baee-69b62035fc31.png" width = "150" height = "150"/>
 </div>
 
+## ⚡ 快速开始
 
-## 产业实践范例库
+- PULC超轻量图像分类方案快速体验：[点击这里](docs/zh_CN/quick_start/PULC.md)
+- PP-ShiTu图像识别快速体验：[点击这里](./docs/zh_CN/quick_start/quick_start_recognition.md)
+- PP-ShiTuV2 Android Demo APP，可扫描如下二维码，下载体验
 
-- 基于PP-ShiTu v2的生鲜品自助结算： [点击这里](./docs/zh_CN/samples/Fresh_Food_Recogniiton/README.md)
+<div align="center">
+<img src="./docs/images/quick_start/android_demo/PPShiTu_qrcode.png"  width = "170" height = "170" />
+</div>
+
+## 🛠️ PP系列模型列表（更新中）
+
+| 模型简介                    | 应用场景         | 下载链接 |
+| --------------------------- | ---------------- | -------- |
+| PULC 超轻量图像分类方案     |                  |          |
+| PP-ShituV2 轻量图像识别系统 | 场景数据频繁变动 |          |
+| PP-LCNet 轻量骨干网络       | 移动端&服务端    |          |
+| PP-HGNet 高精度骨干网络     | 移动端&服务端    |          |
+
+### 产业范例
+
+- 基于PP-ShiTuV2的生鲜品自助结算： [点击这里](./docs/zh_CN/samples/Fresh_Food_Recogniiton/README.md)
 - 基于PULC人员出入视频管理： [点击这里](./docs/zh_CN/samples/Personnel_Access/README.md)
-- 基于 PP-ShiTu 的智慧商超商品识别：[点击这里](./docs/zh_CN/samples/Goods_Recognition/README.md)
+- 基于PP-ShiTu 的智慧商超商品识别：[点击这里](./docs/zh_CN/samples/Goods_Recognition/README.md)
 - 基于PP-ShiTu电梯内电瓶车入室识别：[点击这里](./docs/zh_CN/samples//Electromobile_In_Elevator_Detection/README.md)
 
-## 文档教程
+## 📖 文档教程
 - [环境准备](docs/zh_CN/installation.md)
 - [PP-ShiTuV2图像识别系统介绍](docs/zh_CN/models/PP-ShiTu/README.md)
   - [图像识别快速体验](docs/zh_CN/quick_start/quick_start_recognition.md)
