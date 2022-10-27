@@ -76,7 +76,8 @@ def print_dict(d, delimiter=0):
                 print_dict(value, delimiter + 4)
         else:
             logger.info("{}{} : {}".format(delimiter * " ", k, v))
-        if k.isupper():
+
+        if k[0].isupper() and delimiter == 0:
             logger.info(placeholder)
 
 
