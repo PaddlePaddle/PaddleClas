@@ -66,7 +66,7 @@ def print_dict(d, delimiter=0):
     indenting acrrording by the relationship of keys.
     """
     placeholder = "-" * 60
-    for k, v in sorted(d.items()):
+    for k, v in d.items():
         if isinstance(v, dict):
             logger.info("{}{} : ".format(delimiter * " ", k))
             print_dict(v, delimiter + 4)
