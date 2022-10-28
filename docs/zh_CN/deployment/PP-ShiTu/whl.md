@@ -23,13 +23,6 @@ pip3 install paddleclas
 python3 setup.py install
 ```
 
-* 进入 `deploy` 运行目录。本部分所有内容与命令均需要在 `deploy` 目录下运行，可以通过下面的命令进入 `deploy` 目录。
-
-```shell
-cd deploy
-```
-
-
 <a name="2"></a>
 
 ## 2. 快速开始
