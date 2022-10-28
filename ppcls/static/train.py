@@ -95,7 +95,7 @@ def main(args):
     use_ascend = global_config.get("use_ascend", False)
     assert (
         use_gpu + use_xpu + use_npu + use_mlu + use_ascend <= 1
-    ) is not True, "gpu, xpu, npu, mlu and ascend can not be true in the same time in static mode!"
+    ), "gpu, xpu, npu, mlu and ascend can not be true in the same time in static mode!"
 
     if use_gpu:
         device = paddle.set_device('gpu')
