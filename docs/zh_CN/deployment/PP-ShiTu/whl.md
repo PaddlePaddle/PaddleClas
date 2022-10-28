@@ -31,16 +31,8 @@ python3 setup.py install
 
 ### 2.1 构建索引库
 
-下载demo数据集以及轻量级主题检测、识别模型，命令如下：
+下载demo数据集，命令如下：
 ```shell
-mkdir models
-cd models
-# 下载通用检测 inference 模型并解压
-wget https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/inference/picodet_PPLCNet_x2_5_mainbody_lite_v1.0_infer.tar && tar -xf picodet_PPLCNet_x2_5_mainbody_lite_v1.0_infer.tar
-# 下载识别 inference 模型并解压
-wget https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/inference/PP-ShiTuV2/general_PPLCNetV2_base_pretrained_v1.0_infer.tar && tar -xf general_PPLCNetV2_base_pretrained_v1.0_infer.tar
-
-cd ../
 # 下载 demo 数据并解压
 wget https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/data/drink_dataset_v2.0.tar && tar -xf drink_dataset_v2.0.tar
 ```
@@ -58,18 +50,8 @@ wget https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/data/drink_da
 
 其中 `gallery` 文件夹中存放的是用于构建索引库的原始图像，`index` 表示基于原始图像构建得到的索引库信息，`test_images` 文件夹中存放的是用于测试识别效果的图像列表。
 
-`models` 文件夹下应有如下文件结构：
 
-```log
-├── general_PPLCNetV2_base_pretrained_v1.0_infer
-│   ├── inference.pdiparams
-│   ├── inference.pdiparams.info
-│   └── inference.pdmodel
-├── picodet_PPLCNet_x2_5_mainbody_lite_v1.0_infer
-│   ├── inference.pdiparams
-│   ├── inference.pdiparams.info
-│   └── inference.pdmodel
-```
+
 
 **在Python代码中构建索引库**
 ```python
