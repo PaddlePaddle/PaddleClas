@@ -89,7 +89,7 @@ paddleclas --build_gallery=True --model_name="PP-ShiTuV2" \
 
 ### 2.2 瓶装饮料识别
 
-体验瓶装饮料识别，对图像`./drink_dataset_v2.0/test_images/001.jpeg`进行识别与检索。
+体验瓶装饮料识别，对图像`./drink_dataset_v2.0/test_images/100.jpeg`进行识别与检索。
 
 待检索图像如下：
 ![](../../../images/recognition/drink_data_demo/test_images/100.jpeg)
@@ -99,7 +99,7 @@ paddleclas --build_gallery=True --model_name="PP-ShiTuV2" \
 from paddleclas import PaddleClas
 clas = PaddleClas(model_name='PP-ShiTuV2',
                   index_dir='./drink_dataset_v2.0/index')
-infer_imgs='./drink_dataset_v2.0/test_images/001.jpeg'
+infer_imgs='./drink_dataset_v2.0/test_images/100.jpeg'
 result=clas.predict(infer_imgs, predict_type='shitu')
 print(next(result))
 ```
@@ -115,7 +115,7 @@ print(next(result))
 **在命令行中进行识别和检索**
 ```shell
 paddleclas --model_name=PP-ShiTuV2 --predict_type=shitu \
--o Global.infer_imgs='./drink_dataset_v2.0/test_images/001.jpeg' \
+-o Global.infer_imgs='./drink_dataset_v2.0/test_images/100.jpeg' \
 -o IndexProcess.index_dir='./drink_dataset_v2.0/index'
 ```
 其中参数`model_name`为用于检索和识别的模型、`predict_type`设置为'shitu'模式。
