@@ -155,22 +155,6 @@ wget https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/data/drink_da
 
 如果使用服务端通用识别模型，Demo 数据需要重新提取特征、够建索引，方式如下：
 
-**在Python代码中构建索引库**
-```python
-from paddleclas import PaddleClas
-build = PaddleClas(
-    build_gallery=True,
-    gallery_image_root='./drink_dataset_v2.0/gallery/',
-    gallery_data_file='./drink_dataset_v2.0/gallery/drink_label.txt',
-    index_dir='./drink_dataset_v2.0/index')
-```
-参数说明：
-- build_gallery：是否使用索引库构建模式，默认为`False`。
-- gallery_image_root：构建索引库使用的`gallery`图像地址。
-- gallery_data_file：构建索引库图像的真值文件。
-- index_dir：索引库存放地址。
-
-
 **在命令行中构建索引库**
 ```shell
 paddleclas --build_gallery=True --model_name="PP-ShiTuV2" \
@@ -205,20 +189,6 @@ paddleclas --build_gallery=True --model_name="PP-ShiTuV2" \
 
 ![](../../images/recognition/drink_data_demo/test_images/100.jpeg)
 
-**在Python代码中进行识别和检索**
-```python
-from paddleclas import PaddleClas
-clas = PaddleClas(model_name='PP-ShiTuV2',
-                  index_dir='./drink_dataset_v2.0/index')
-infer_imgs='./drink_dataset_v2.0/test_images/100.jpeg'
-result=clas.predict(infer_imgs, predict_type='shitu')
-print(next(result))
-```
-参数说明：
-- model_name(str):用于检索和识别的模型。
-- index_dir(str):用于检索的索引库地址。
-
-
 **在命令行中进行识别和检索**
 ```shell
 paddleclas --model_name=PP-ShiTuV2 --predict_type=shitu \
@@ -244,19 +214,7 @@ paddleclas --model_name=PP-ShiTuV2 --predict_type=shitu \
 
 ##### 2.2.2.2 基于文件夹的批量识别
 
-如果希望预测文件夹内的图像，可以直接修改`infer_imgs`参数或命令行中的 `-o` 参数对应的`Global.infer_imgs` 字段配置。
-
-**在Python代码中进行识别和检索**
-```python
-import os
-from paddleclas import PaddleClas
-clas = PaddleClas(model_name='PP-ShiTuV2',
-                  index_dir='./drink_dataset_v2.0/index')
-infer_imgs='./drink_dataset_v2.0/test_images'
-result=clas.predict(infer_imgs, predict_type='shitu')
-for i in range(len(os.listdir('./drink_dataset_v2.0/test_images'))):
-    print(next(result))
-```
+如果希望预测文件夹内的图像，可以直接修改命令行中的 `-o` 参数对应的`Global.infer_imgs` 字段配置。
 
 **在命令行中进行识别和检索**
 ```shell
@@ -291,18 +249,6 @@ paddleclas --model_name=PP-ShiTuV2 --predict_type=shitu \
 
 执行如下识别命令
 
-**在Python代码中进行识别和检索**
-
-```python
-import os
-from paddleclas import PaddleClas
-clas = PaddleClas(model_name='PP-ShiTuV2',
-                  index_dir='./drink_dataset_v2.0/index')
-infer_imgs='./drink_dataset_v2.0/test_images/mosilian.jpeg'
-result=clas.predict(infer_imgs, predict_type='shitu')
-print(next(result))
-```
-
 **在命令行中进行识别和检索**
 ```shell
 paddleclas --model_name=PP-ShiTuV2 --predict_type=shitu \
@@ -332,16 +278,6 @@ paddleclas --model_name=PP-ShiTuV2 --predict_type=shitu \
 
 使用下面的命令构建新的索引库 `index_all`。
 
-**在Python代码中构建索引库**
-```python
-from paddleclas import PaddleClas
-build = PaddleClas(
-    build_gallery=True,
-    gallery_image_root='./drink_dataset_v2.0/gallery/',
-    gallery_data_file='./drink_dataset_v2.0/gallery/drink_label_all.txt',
-    index_dir='./drink_dataset_v2.0/index_all')
-```
-
 **在命令行中构建索引库**
 ```shell
 paddleclas --build_gallery=True --model_name="PP-ShiTuV2" \
@@ -358,18 +294,6 @@ paddleclas --build_gallery=True --model_name="PP-ShiTuV2" \
 #### 2.3.3 基于新的索引库的图像识别
 
 使用新的索引库，重新对 `mosilian.jpeg` 图像进行识别，运行命令如下。
-
-**在Python代码中进行识别和检索**
-
-```python
-import os
-from paddleclas import PaddleClas
-clas = PaddleClas(model_name='PP-ShiTuV2',
-                  index_dir='./drink_dataset_v2.0/index_all')
-infer_imgs='./drink_dataset_v2.0/test_images/mosilian.jpeg'
-result=clas.predict(infer_imgs, predict_type='shitu')
-print(next(result))
-```
 
 **在命令行中进行识别和检索**
 ```shell
