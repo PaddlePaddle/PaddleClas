@@ -16,7 +16,7 @@ ISE (Implicit Sample Extension)是一种简单、高效、有效的无监督行�
 > Xinyu Zhang, Dongdong Li, Zhigang Wang, Jian Wang, Errui Ding, Javen Qinfeng Shi, Zhaoxiang Zhang, Jingdong Wang<br>
 > CVPR2022
 
-![image](../../images/ISE_ReID/ISE_pipeline.png)
+![image](../../images/ISE_pipeline.png)
 
 
 <a name='2'></a>

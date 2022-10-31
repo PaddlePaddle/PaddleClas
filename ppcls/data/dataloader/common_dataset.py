@@ -30,6 +30,8 @@ def create_operators(params):
     Args:
         params(list): a dict list, used to create some operators
     """
+    if params is None:
+        return None
     assert isinstance(params, list), ('operator config should be a list')
     ops = []
     for operator in params:

@@ -14,7 +14,6 @@
 
 from __future__ import division
 
-import copy
 import os
 from typing import Any, Callable, Dict, List, Tuple, Union
 from collections import defaultdict
@@ -25,7 +24,6 @@ import nvidia.dali.ops as ops
 import nvidia.dali.pipeline as pipeline
 import nvidia.dali.types as types
 import paddle
-
 from nvidia.dali.plugin.paddle import DALIGenericIterator
 import nvidia.dali.fn as fn
 

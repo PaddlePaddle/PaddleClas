@@ -7,6 +7,8 @@ from ppcls.utils import logger
 from .celoss import CELoss, MixCELoss
 from .googlenetloss import GoogLeNetLoss
 from .centerloss import CenterLoss
+from .contrasiveloss import ContrastiveLoss
+from .contrasiveloss import ContrastiveLoss_XBM
 from .emlloss import EmlLoss
 from .msmloss import MSMLoss
 from .npairsloss import NpairsLoss
@@ -75,6 +77,8 @@ class CombinedLoss(nn.Layer):
 
 
 def build_loss(config):
+    if config is None:
+        return None
     module_class = CombinedLoss(copy.deepcopy(config))
     logger.debug("build loss {} success.".format(module_class))
     return module_class

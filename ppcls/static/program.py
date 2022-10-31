@@ -386,15 +386,11 @@ def run(dataloader,
 
         profiler.add_profiler_step(profiler_options)
 
-        if use_dali:
-            batch_size = batch[0]["data"].shape()[0]
-            feed_dict = batch[0]
-        else:
-            batch_size = batch[0].shape()[0]
-            feed_dict = {
-                key.name: batch[idx]
-                for idx, key in enumerate(feeds.values())
-            }
+        batch_size = batch[0].shape()[0]
+        feed_dict = {
+            key.name: batch[idx]
+            for idx, key in enumerate(feeds.values())
+        }
 
         metrics = exe.run(program=program,
                           feed=feed_dict,

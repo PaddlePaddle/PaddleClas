@@ -21,7 +21,8 @@ from paddle.nn.initializer import TruncatedNormal, Constant
 from ....utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
 
 MODEL_URLS = {
-    "ConvNeXt_tiny": "",  # TODO
+    "ConvNeXt_tiny":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ConvNeXt_tiny_pretrained.pdparams",
 }
 
 __all__ = list(MODEL_URLS.keys())
@@ -59,9 +60,9 @@ class DropPath(nn.Layer):
 
 
 class ChannelsFirstLayerNorm(nn.Layer):
-    r""" LayerNorm that supports two data formats: channels_last (default) or channels_first. 
-    The ordering of the dimensions in the inputs. channels_last corresponds to inputs with 
-    shape (batch_size, height, width, channels) while channels_first corresponds to inputs 
+    r""" LayerNorm that supports two data formats: channels_last (default) or channels_first.
+    The ordering of the dimensions in the inputs. channels_last corresponds to inputs with
+    shape (batch_size, height, width, channels) while channels_first corresponds to inputs
     with shape (batch_size, channels, height, width).
     """
 

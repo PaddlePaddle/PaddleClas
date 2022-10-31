@@ -25,7 +25,8 @@ from paddle.nn.initializer import Normal, Constant
 from ....utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
 
 MODEL_URLS = {
-    "PeleeNet": ""  # TODO
+    "PeleeNet":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/PeleeNet_pretrained.pdparams"
 }
 
 __all__ = MODEL_URLS.keys()

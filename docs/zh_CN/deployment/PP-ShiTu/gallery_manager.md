@@ -130,7 +130,7 @@ pip install psutil
 
 ### 2.2 模型及数据准备
 
-请按照[PP-ShiTu快速体验](../quick_start/quick_start_recognition.md#2.2.1)中下载及准备inference model，并修改好`${PaddleClas}/deploy/configs/inference_drink.yaml`的相关参数，同时准备好数据集。在具体使用时，请替换好自己的数据集及模型文件。
+请按照[PP-ShiTu快速体验](../../quick_start/quick_start_recognition.md#2.2.1)中下载及准备inference model，并修改好`${PaddleClas}/deploy/configs/inference_drink.yaml`的相关参数，同时准备好数据集。在具体使用时，请替换好自己的数据集及模型文件。
 
 ```shell
 cd ${PaddleClas}/deploy/shitu_index_manager
