@@ -19,6 +19,7 @@ import os
 from typing import Any, Callable, Dict, List, Tuple, Union
 from collections import defaultdict
 
+import cv2
 import numpy as np
 import nvidia.dali.ops as ops
 import nvidia.dali.pipeline as pipeline
@@ -94,10 +95,11 @@ def convert_cfg_to_dali(op_name: str, device: str, **op_cfg) -> Dict[str, Any]:
     """convert original preprocess op params into DALI-based op params
 
     Args:
-        op_name (str): preprocess OP name
+        op_name (str): name of operator
+        device (str): device which operator excute on
 
     Returns:
-        Dict[str, Any]: converted params for DALI initialization
+        Dict[str, Any]: converted arguments for DALI initialization
     """
     assert device in ["cpu", "gpu"
                       ], f"device({device}) must in [\"cpu\", \"gpu\"]"
@@ -284,7 +286,7 @@ def convert_cfg_to_dali(op_name: str, device: str, **op_cfg) -> Dict[str, Any]:
 
 def build_dali_transforms(op_cfg_list: List[Dict[str, Any]],
                           device: str="cpu",
-                          fuse: bool=True) -> List[Callable]:
+                          enable_fuse: bool=True) -> List[Callable]:
     """create dali operators based on the config
     Args:
         op_cfg_list (List[Dict[str, Any]]): a dict list, used to create some operators, such as config below
