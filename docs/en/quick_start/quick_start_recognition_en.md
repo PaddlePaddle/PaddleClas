@@ -124,7 +124,10 @@ Note: Since some decompression software has problems in decompressing the above 
 
 The demo data download path of this chapter is as follows: [drink_dataset_v2.0.tar (drink data)](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/data/drink_dataset_v2.0.tar),
 
-The following takes **drink_dataset_v2.0.tar** as an example to introduce the PP-ShiTu quick start process on the PC. Users can also download and decompress the data of other scenarios to experience: [22 scenarios data download](../../zh_CN/introduction/ppshitu_application_scenarios.md#22-下载解压场景库数据).
+The following takes **drink_dataset_v2.0.tar** as an example to introduce the PP-ShiTu quick start process on the PC.
+
+<!-- TODO -->
+<!-- Users can also download and decompress the data of other scenarios to experience: [22 scenarios data download](../../zh_CN/introduction/ppshitu_application_scenarios.md#22-下载解压场景库数据). -->
 
 If you want to experience the server object detection and the recognition model of each scene, you can refer to [2.4 Server recognition model list](#24-list-of-server-identification-models)
 
