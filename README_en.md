@@ -6,7 +6,7 @@
 
 PaddleClas is an image classification and image recognition toolset for industry and academia, helping users train better computer vision models and apply them in real scenarios.
 
-|                       PP-ShiTuV2                       |                 PULC实用图像分类模型效果展示                 |
+|                       PP-ShiTuV2                       | PULC: **P**ractical **U**ltra **L**ight-weight image **C**lassification solutions |
 | :----------------------------------------------------: | :----------------------------------------------------------: |
 | <img src="./docs/images/shituv2.gif"  width = "450" /> | <img src="./docs/images/class_simple_en.gif"  width = "600" /> |
 
