@@ -6,6 +6,7 @@
 
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 |模型名称|模型简介|模型精度 |模型大小|推理耗时|下载地址|
 | --- | --- | --- | --- | --- | --- |
 | person_exists |[PULC有人/无人分类模型](PULC_person_exists.md)| 96.23 |7.0M|2.58ms|[推理模型](https://paddleclas.bj.bcebos.com/models/PULC/inference/person_exists_infer.tar) / [预训练模型](https://paddleclas.bj.bcebos.com/models/PULC/pretrained/person_exists_pretrained.pdparams)|
@@ -20,6 +21,10 @@
 =======
 |模型名称|使用介绍|模型介绍|模型精度 |模型大小|推理耗时|下载地址|
 | --- | --- | --- | --- | --- | --- | --- |
+=======
+|模型名称|使用介绍|模型介绍|模型精度 |模型大小|推理耗时|下载地址|
+| --- | --- | --- | --- | --- | --- |
+>>>>>>> 49d195d... update model_list.md
 | person_exists |[PULC有人/无人分类](PULC_person_exists.md)|判断图片中是否有人| 96.23 |7.0M|2.58ms|[推理模型](https://paddleclas.bj.bcebos.com/models/PULC/inference/person_exists_infer.tar) / [预训练模型](https://paddleclas.bj.bcebos.com/models/PULC/pretrained/person_exists_pretrained.pdparams)|
 | person_attribute |[PULC人体属性识别](PULC_person_attribute.md)|人体属性识别，可以识别行人性别、年龄、朝向、配饰、包、服装风格等| 78.59 |7.2M|2.01ms|[推理模型](https://paddleclas.bj.bcebos.com/models/PULC/inference/person_attribute_infer.tar) / [预训练模型](https://paddleclas.bj.bcebos.com/models/PULC/pretrained/person_attribute_pretrained.pdparams)|
 | safety_helmet |[PULC佩戴安全帽分类](PULC_safety_helmet.md)|判断图片中的人脸是否佩戴安全帽| 99.38 |7.1M|2.03ms|[推理模型](https://paddleclas.bj.bcebos.com/models/PULC/inference/safety_helmet_infer.tar) / [预训练模型](https://paddleclas.bj.bcebos.com/models/PULC/pretrained/safety_helmet_pretrained.pdparams)|
@@ -30,7 +35,10 @@
 | textline_orientation |[PULC文本行方向分类](PULC_textline_orientation.md)|判断文本行的方向，可以区分0度、180度| 96.01 |7.0M|2.72ms|[推理模型](https://paddleclas.bj.bcebos.com/models/PULC/inference/textline_orientation_infer.tar) / [预训练模型](https://paddleclas.bj.bcebos.com/models/PULC/pretrained/textline_orientation_pretrained.pdparams)|
 | language_classification |[PULC语种分类](PULC_language_classification.md)|判断文本行的语种，可以区分10种常见的语种| 99.26 |7.1M|2.58ms|[推理模型](https://paddleclas.bj.bcebos.com/models/PULC/inference/language_classification_infer.tar) / [预训练模型](https://paddleclas.bj.bcebos.com/models/PULC/pretrained/language_classification_pretrained.pdparams)|
 | table_attribute |[PULC表格属性识别](PULC_table_attribute.md)|表格属性识别，可以识别表格是否为拍照、表格数量、表格颜色、表格清晰度、表格有无干扰、表格角度6个属性| 88.1 |7.1M|2.58ms|[推理模型](https://paddleclas.bj.bcebos.com/models/PULC/inference/table_attribute_infer.tar) / [预训练模型](https://paddleclas.bj.bcebos.com/models/PULC/pretrained/table_attribute_pretrained.pdparams)|
+<<<<<<< HEAD
 >>>>>>> 2e2ff31... update model_list.md
+=======
+>>>>>>> 49d195d... update model_list.md
 
 
 **备注：**
