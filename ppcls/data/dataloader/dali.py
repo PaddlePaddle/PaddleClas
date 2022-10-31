@@ -14,34 +14,37 @@
 
 from __future__ import division
 
+import copy
 import os
-from typing import Any, Callable, Dict, List, Tuple, Union
 from collections import defaultdict
+from typing import Any, Callable, Dict, List, Tuple, Union
 
 import cv2
 import numpy as np
+import nvidia.dali.fn as fn
 import nvidia.dali.ops as ops
 import nvidia.dali.pipeline as pipeline
 import nvidia.dali.types as types
 import paddle
 from nvidia.dali.plugin.paddle import DALIGenericIterator
-import nvidia.dali.fn as fn
+from ppcls.utils import logger
+from ppcls.engine.train.utils import type_name
 
-from dali_operators import DecodeImage
-from dali_operators import ResizeImage
-from dali_operators import CropImage
-from dali_operators import RandomCropImage
-from dali_operators import RandCropImage
-from dali_operators import RandCropImageV2
-from dali_operators import RandFlipImage
-from dali_operators import NormalizeImage
-from dali_operators import ToCHWImage
-from dali_operators import ColorJitter
-from dali_operators import RandomRotation
-from dali_operators import Pad
-from dali_operators import RandomRot90
-from dali_operators import DecodeRandomResizedCrop
-from dali_operators import CropMirrorNormalize
+from .dali_operators import DecodeImage
+from .dali_operators import ResizeImage
+from .dali_operators import CropImage
+from .dali_operators import RandomCropImage
+from .dali_operators import RandCropImage
+from .dali_operators import RandCropImageV2
+from .dali_operators import RandFlipImage
+from .dali_operators import NormalizeImage
+from .dali_operators import ToCHWImage
+from .dali_operators import ColorJitter
+from .dali_operators import RandomRotation
+from .dali_operators import Pad
+from .dali_operators import RandomRot90
+from .dali_operators import DecodeRandomResizedCrop
+from .dali_operators import CropMirrorNormalize
 
 INTERP_MAP = {
     "nearest": types.DALIInterpType.INTERP_NN,  # cv2.INTER_NEAREST
@@ -301,12 +304,15 @@ def build_dali_transforms(op_cfg_list: List[Dict[str, Any]],
                 order: ""
             --------------------------------
         device (str): device which dali operator(s) applied in. Defaults to "cpu".
-        fuse (bool): whether to use fused dali operators instead of single operators. Defaults to True.
+        enable_fuse (bool): whether to use fused dali operators instead of single operators. Defaults to True.
     Returns:
         List[Callable]: Callable DALI operators in list.
     """
     assert isinstance(op_cfg_list, list), "operator config should be a list"
     # build dali transforms list
+
+    if "ToCHWImage" not in [list(item.keys())[0] for item in op_cfg_list]:
+        op_cfg_list.append({"ToCHWImage": {"perm": [2, 0, 1]}})
     dali_op_list = []
     idx = 0
     num_cfg_node = len(op_cfg_list)
@@ -316,7 +322,7 @@ def build_dali_transforms(op_cfg_list: List[Dict[str, Any]],
         op_param = {} if op_cfg[op_name] is None else copy.deepcopy(op_cfg[
             op_name])
         fused_flag = False
-        if fuse:
+        if enable_fuse:
             # fuse operator if enabled
             if idx + 1 < num_cfg_node:
                 op_name_nxt = list(op_cfg_list[idx + 1])[0]
@@ -331,8 +337,8 @@ def build_dali_transforms(op_cfg_list: List[Dict[str, Any]],
                     idx += 2
                     dali_op_list.append(fused_dali_op)
                     fused_flag = True
-                    print(
-                        f"DALI Operator conversion: [DecodeImage, RandCropImage] -> {dali_op_list[-1].__class__.__name__}"
+                    logger.debug(
+                        f"DALI Operator conversion: [DecodeImage, RandCropImage] -> {type_name(dali_op_list[-1])}: {fused_op_param}"
                     )
             elif 0 < idx and idx + 1 < num_cfg_node:
                 op_name_pre = list(op_cfg_list[idx - 1])[0]
@@ -351,10 +357,10 @@ def build_dali_transforms(op_cfg_list: List[Dict[str, Any]],
                     idx += 2
                     dali_op_list.append(fused_dali_op)
                     fused_flag = True
-                    print(
-                        f"DALI Operator conversion: [RandCropImage, RandFlipImage, NormalizeImage] -> {dali_op_list[-1].__class__.__name__}"
+                    logger.debug(
+                        f"DALI Operator conversion: [RandCropImage, RandFlipImage, NormalizeImage] -> {type_name(dali_op_list[-1])}: {fused_op_param}"
                     )
-        if not fuse or not fused_flag:
+        if not enable_fuse or not fused_flag:
             assert isinstance(op_cfg,
                               dict) and len(op_cfg) == 1, "yaml format error"
             if op_name == "Pad":
@@ -365,8 +371,8 @@ def build_dali_transforms(op_cfg_list: List[Dict[str, Any]],
             dali_op = eval(op_name)(**dali_param)
             dali_op_list.append(dali_op)
             idx += 1
-            print(
-                f"DALI Operator conversion: {op_name} -> {dali_op_list[-1].__class__.__name__}"
+            logger.debug(
+                f"DALI Operator conversion: {op_name} -> {type_name(dali_op_list[-1])}: {dali_param}"
             )
     return dali_op_list
 
@@ -388,16 +394,14 @@ class HybridPipeline(pipeline.Pipeline):
         super(HybridPipeline, self).__init__(
             batch_size, num_threads, device_id, seed=seed)
         self.device = device
-        if ext_src:
-            self.ext_src = True
-            self.ext_src = ext_src
-        else:
-            self.reader = ops.readers.File(
-                file_root=file_root,
-                file_list=file_list,
-                shard_id=shard_id,
-                num_shards=num_shards,
-                random_shuffle=random_shuffle)
+        self.ext_src = ext_src
+        self.ext_src = ext_src
+        self.reader = ops.readers.File(
+            file_root=file_root,
+            file_list=file_list,
+            shard_id=shard_id,
+            num_shards=num_shards,
+            random_shuffle=random_shuffle)
         self.transforms = ops.Compose(transform_list)
         self.cast = ops.Cast(dtype=types.DALIDataType.INT64, device=device)
 
@@ -433,80 +437,6 @@ class DALIImageNetIterator(DALIGenericIterator):
             for key in self.output_map
         ]
         return data_batch
-
-
-def dali_dataloader(config, mode, device, num_threads=4, seed=None):
-    assert "gpu" in device, "gpu training is required for DALI"
-    device_id = int(device.split(":")[1])
-    device = "gpu"
-    config_dataloader = config[mode]
-    seed = 42 if seed is None else seed
-    env = os.environ
-    num_gpus = paddle.distributed.get_world_size()
-
-    batch_size = config_dataloader["sampler"]["batch_size"]
-    file_root = config_dataloader["dataset"]["image_root"]
-    file_list = config_dataloader["dataset"]["cls_label_path"]
-    sampler_name = config_dataloader["sampler"].get("name",
-                                                    "DistributedBatchSampler")
-    dali_transforms = build_dali_transforms(
-        config_dataloader["dataset"]["transform_ops"], device)
-
-    if mode.lower() == "train":
-        if sampler_name in ["PKSampler", "DistributedRandomIdentitySampler"]:
-            ext_src = ExternalRandomIdentityIterator(
-                batch_size,
-                config_dataloader["dataset"]["sample_per_id" if sampler_name ==
-                                             "PKSampler" else "num_instances"],
-                device_id,
-                num_gpus,
-                file_root,
-                file_list,
-                None,
-                relabel=config_dataloader["dataset"].get("relabel", False),
-                sample_method=config_dataloader["sampler"].get("sample_method",
-                                                               "id_avg_prob"),
-                drop_last=config_dataloader["sampler"].get("drop_last", True),
-                seed=seed, )
-        else:
-            ext_src = None
-        if "PADDLE_TRAINER_ID" in env and "PADDLE_TRAINERS_NUM" in env and "FLAGS_selected_gpus" in env:
-            shard_id = int(env["PADDLE_TRAINER_ID"])
-            num_shards = int(env["PADDLE_TRAINERS_NUM"])
-            device_id = int(env["FLAGS_selected_gpus"])
-            pipe = HybridPipeline(device, batch_size, num_threads, device_id,
-                                  seed + shard_id, file_root, file_list,
-                                  dali_transforms, shard_id, num_shards, True,
-                                  ext_src)
-            #  sample_per_shard = len(pipe) // num_shards
-        else:
-            pipe = HybridPipeline(device, batch_size, 1, device_id, seed,
-                                  file_root, file_list, dali_transforms, 0, 1,
-                                  False, ext_src)
-            #  sample_per_shard = len(pipelines[0])
-        pipe.build()
-        pipelines = [pipe]
-        return DALIImageNetIterator(
-            pipelines, ["data", "label"], reader_name="Reader")
-    else:
-        assert sampler_name in ["DistributedBatchSampler"], \
-            f"sampler_name({sampler_name}) must in [\"DistributedBatchSampler\"]"
-        if "PADDLE_TRAINER_ID" in env and "PADDLE_TRAINERS_NUM" in env and "FLAGS_selected_gpus" in env and sampler_name == "DistributedBatchSampler":
-            shard_id = int(env["PADDLE_TRAINER_ID"])
-            num_shards = int(env["PADDLE_TRAINERS_NUM"])
-            device_id = int(env["FLAGS_selected_gpus"])
-
-            pipe = HybridPipeline(device, batch_size, num_threads, device_id,
-                                  seed, file_root, file_list, dali_transforms,
-                                  shard_id, num_shards, False)
-        else:
-            pipe = HybridPipeline(device, batch_size, 1, device_id, seed,
-                                  file_root, file_list, dali_transforms, 0, 1,
-                                  False)
-        pipe.build()
-        pipelines = [pipe]
-        return DALIImageNetIterator(
-            pipelines, ["data", "label"], reader_name="Reader")
 
 
 class ExternalRandomIdentityIterator(object):
@@ -627,6 +557,84 @@ class ExternalRandomIdentityIterator(object):
 
     def __len__(self):
         return self.data_set_len
+
+
+def dali_dataloader(config, mode, device, num_threads=4, seed=None):
+    assert "gpu" in device, "gpu training is required for DALI"
+    device_id = int(device.split(":")[1])
+    device = "gpu"
+    config_dataloader = config[mode]
+    seed = 42 if seed is None else seed
+    env = os.environ
+    num_gpus = paddle.distributed.get_world_size()
+
+    batch_size = config_dataloader["sampler"]["batch_size"]
+    file_root = config_dataloader["dataset"]["image_root"]
+    file_list = config_dataloader["dataset"]["cls_label_path"]
+    sampler_name = config_dataloader["sampler"].get("name",
+                                                    "DistributedBatchSampler")
+    dali_transforms = build_dali_transforms(
+        config_dataloader["dataset"]["transform_ops"], device)
+
+    if mode.lower() == "train":
+        if sampler_name in ["PKSampler", "DistributedRandomIdentitySampler"]:
+            ext_src = ExternalRandomIdentityIterator(
+                batch_size,
+                config_dataloader["sampler"]["sample_per_id" if sampler_name ==
+                                             "PKSampler" else "num_instances"],
+                device_id,
+                num_gpus,
+                file_root,
+                file_list,
+                None,
+                relabel=config_dataloader["dataset"].get("relabel", False),
+                sample_method=config_dataloader["sampler"].get("sample_method",
+                                                               "id_avg_prob"),
+                drop_last=config_dataloader["sampler"].get("drop_last", True),
+                seed=seed)
+        else:
+            ext_src = None
+        if "PADDLE_TRAINER_ID" in env and "PADDLE_TRAINERS_NUM" in env and "FLAGS_selected_gpus" in env:
+            shard_id = int(env["PADDLE_TRAINER_ID"])
+            num_shards = int(env["PADDLE_TRAINERS_NUM"])
+            device_id = int(env["FLAGS_selected_gpus"])
+            pipe = HybridPipeline(device, batch_size, num_threads, device_id,
+                                  seed + shard_id, file_root, file_list,
+                                  dali_transforms, shard_id, num_shards, True,
+                                  ext_src)
+            #  sample_per_shard = len(pipe) // num_shards
+        else:
+            pipe = HybridPipeline(device, batch_size, 1, device_id, seed,
+                                  file_root, file_list, dali_transforms, 0, 1,
+                                  False, ext_src)
+            #  sample_per_shard = len(pipelines[0])
+        pipe.build()
+        pipelines = [pipe]
+        if ext_src is None:
+            return DALIImageNetIterator(
+                pipelines, ["data", "label"], reader_name="Reader")
+        else:
+            return DALIImageNetIterator(
+                pipelines, ["data", "label"], size=len(ext_src) // (num_gpus))
+    else:
+        assert sampler_name in ["DistributedBatchSampler"], \
+            f"sampler_name({sampler_name}) must in [\"DistributedBatchSampler\"]"
+        if "PADDLE_TRAINER_ID" in env and "PADDLE_TRAINERS_NUM" in env and "FLAGS_selected_gpus" in env and sampler_name == "DistributedBatchSampler":
+            shard_id = int(env["PADDLE_TRAINER_ID"])
+            num_shards = int(env["PADDLE_TRAINERS_NUM"])
+            device_id = int(env["FLAGS_selected_gpus"])
+
+            pipe = HybridPipeline(device, batch_size, num_threads, device_id,
+                                  seed, file_root, file_list, dali_transforms,
+                                  shard_id, num_shards, False)
+        else:
+            pipe = HybridPipeline(device, batch_size, 1, device_id, seed,
+                                  file_root, file_list, dali_transforms, 0, 1,
+                                  False)
+        pipe.build()
+        pipelines = [pipe]
+        return DALIImageNetIterator(
+            pipelines, ["data", "label"], reader_name="Reader")
 
 
 if __name__ == "__main__":
