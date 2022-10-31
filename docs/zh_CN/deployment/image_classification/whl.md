@@ -55,7 +55,7 @@ print(next(result))
 
 ```
 >>> result
-[{'class_ids': [8, 7, 136, 80, 84], 'scores': [0.79368, 0.16329, 0.01853, 0.00959, 0.00239], 'label_names': ['hen', 'cock', 'European gallinule, Porphyrio porphyrio', 'black grouse', 'peacock']}]
+[{'class_ids': [8, 7, 86, 82, 80], 'scores': [0.97968, 0.02028, 3e-05, 1e-05, 0.0], 'label_names': ['hen', 'cock', 'partridge', 'ruffed grouse, partridge, Bonasa umbellus', 'black grouse'], 'filename': 'docs/images/inference_deployment/whl_demo.jpg'}]
 ```
 
 * 在命令行中使用
@@ -65,7 +65,7 @@ paddleclas --model_name=ResNet50  --infer_imgs="docs/images/inference_deployment
 
 ```
 >>> result
-filename: docs/images/inference_deployment/whl_demo.jpg, top-5, class_ids: [8, 7, 136, 80, 84], scores: [0.79368, 0.16329, 0.01853, 0.00959, 0.00239], label_names: ['hen', 'cock', 'European gallinule, Porphyrio porphyrio', 'black grouse', 'peacock']
+class_ids: [8, 7, 86, 82, 80], scores: [0.97968, 0.02028, 3e-05, 1e-05, 0.0], label_names: ['hen', 'cock', 'partridge', 'ruffed grouse, partridge, Bonasa umbellus', 'black grouse'], filename: docs/images/inference_deployment/whl_demo.jpg
 Predict complete!
 ```
 
