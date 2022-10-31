@@ -85,8 +85,8 @@ class Topk(object):
     def __init__(self, topk=1, class_id_map_file=None, delimiter=None):
         assert isinstance(topk, (int, ))
         self.topk = topk
-        self.class_id_map = self.parse_class_id_map(class_id_map_file)
         self.delimiter = delimiter if delimiter is not None else " "
+        self.class_id_map = self.parse_class_id_map(class_id_map_file)
 
     def parse_class_id_map(self, class_id_map_file):
         if class_id_map_file is None:
@@ -115,8 +115,7 @@ class Topk(object):
             assert x.shape[0] == len(file_names)
         y = []
         for idx, probs in enumerate(x):
-            index = probs.argsort(axis=0)[-self.topk:][::-1].astype(
-                "int32")
+            index = probs.argsort(axis=0)[-self.topk:][::-1].astype("int32")
             clas_id_list = []
             score_list = []
             label_name_list = []
