@@ -6,7 +6,7 @@
 
 
 |模型名称|使用介绍|模型介绍|模型精度 |模型大小|推理耗时|下载地址|
-| --- | --- | --- | --- | --- | --- |
+| --- | --- | --- | --- | --- | --- | --- |
 | person_exists |[PULC有人/无人分类](PULC_person_exists.md)|判断图片中是否有人| 96.23 |7.0M|2.58ms|[推理模型](https://paddleclas.bj.bcebos.com/models/PULC/inference/person_exists_infer.tar) / [预训练模型](https://paddleclas.bj.bcebos.com/models/PULC/pretrained/person_exists_pretrained.pdparams)|
 | person_attribute |[PULC人体属性识别](PULC_person_attribute.md)|人体属性识别，可以识别行人性别、年龄、朝向、配饰、包、服装风格等| 78.59 |7.2M|2.01ms|[推理模型](https://paddleclas.bj.bcebos.com/models/PULC/inference/person_attribute_infer.tar) / [预训练模型](https://paddleclas.bj.bcebos.com/models/PULC/pretrained/person_attribute_pretrained.pdparams)|
 | safety_helmet |[PULC佩戴安全帽分类](PULC_safety_helmet.md)|判断图片中的人脸是否佩戴安全帽| 99.38 |7.1M|2.03ms|[推理模型](https://paddleclas.bj.bcebos.com/models/PULC/inference/safety_helmet_infer.tar) / [预训练模型](https://paddleclas.bj.bcebos.com/models/PULC/pretrained/safety_helmet_pretrained.pdparams)|
