@@ -39,7 +39,7 @@ Functions of the above modules :
 
 #### 3.1 Backbone
 
-The Backbone part adopts [PP-LCNetV2_base](../models/PP-LCNetV2.md), which is based on `PPLCNet_V1`, including Rep strategy, PW convolution, Shortcut, activation function improvement, SE module improvement After several optimization points, the final classification accuracy is similar to `PPLCNet_x2_5`, and the inference delay is reduced by 40%<sup>*</sup>. During the experiment, we made appropriate improvements to `PPLCNetV2_base`, so that it can achieve higher performance in recognition tasks while keeping the speed basically unchanged, including: removing `ReLU` and ` at the end of `PPLCNetV2_base` FC`, change the stride of the last stage (RepDepthwiseSeparable) to 1.
+The Backbone part adopts [PP-LCNetV2_base](../models/PP-LCNetV2_en.md), which is based on `PPLCNet_V1`, including Rep strategy, PW convolution, Shortcut, activation function improvement, SE module improvement After several optimization points, the final classification accuracy is similar to `PPLCNet_x2_5`, and the inference delay is reduced by 40%<sup>*</sup>. During the experiment, we made appropriate improvements to `PPLCNetV2_base`, so that it can achieve higher performance in recognition tasks while keeping the speed basically unchanged, including: removing `ReLU` and ` at the end of `PPLCNetV2_base` FC`, change the stride of the last stage (RepDepthwiseSeparable) to 1.
 
 **Note:** <sup>*</sup>The inference environment is based on Intel(R) Xeon(R) Gold 6271C CPU @ 2.60GHz hardware platform, OpenVINO inference platform.
 
