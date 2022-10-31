@@ -306,26 +306,6 @@ def init_config(model_type, model_name, inference_model_dir, **kwargs):
             if "type_threshold" in kwargs and kwargs["type_threshold"]:
                 cfg.PostProcess.VehicleAttribute.type_threshold = kwargs[
                     "type_threshold"]
-        if "TableAttribute" in cfg.PostProcess:
-            if "source_threshold" in kwargs and kwargs["source_threshold"]:
-                cfg.PostProcess.VehicleAttribute.color_threshold = kwargs[
-                    "source_threshold"]
-            if "number_threshold" in kwargs and kwargs["number_threshold"]:
-                cfg.PostProcess.VehicleAttribute.color_threshold = kwargs[
-                    "number_threshold"]
-            if "color_threshold" in kwargs and kwargs["color_threshold"]:
-                cfg.PostProcess.VehicleAttribute.color_threshold = kwargs[
-                    "color_threshold"]
-            if "clarity_threshold" in kwargs and kwargs["clarity_threshold"]:
-                cfg.PostProcess.VehicleAttribute.color_threshold = kwargs[
-                    "clarity_threshold"]
-            if "obstruction_threshold" in kwargs and kwargs[
-                    "obstruction_threshold"]:
-                cfg.PostProcess.VehicleAttribute.color_threshold = kwargs[
-                    "obstruction_threshold"]
-            if "angle_threshold" in kwargs and kwargs["angle_threshold"]:
-                cfg.PostProcess.VehicleAttribute.color_threshold = kwargs[
-                    "angle_threshold"]
     if "save_dir" in kwargs and kwargs["save_dir"]:
         cfg.PostProcess.SavePreLabel.save_dir = kwargs["save_dir"]
 
