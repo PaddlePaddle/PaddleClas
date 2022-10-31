@@ -197,8 +197,7 @@ PULC_MODEL_BASE_DOWNLOAD_URL = "https://paddleclas.bj.bcebos.com/models/PULC/inf
 PULC_MODELS = [
     "car_exists", "language_classification", "person_attribute",
     "person_exists", "safety_helmet", "text_image_orientation",
-    "textline_orientation", "traffic_sign", "vehicle_attribute",
-    "table_attribute"
+    "textline_orientation", "traffic_sign", "vehicle_attribute"
 ]
 
 SHITU_MODEL_BASE_DOWNLOAD_URL = "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/inference/{}_infer.tar"
