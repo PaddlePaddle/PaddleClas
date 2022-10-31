@@ -4,25 +4,25 @@
 ## Catalogue
 
 - [1. Introduction ](#2)
-- [2. Method](#3)
-    - [2.1 Rep 策略](#2.1)
-    - [2.2 PW 卷积](#2.2)
+- [2. Methods](#3)
+    - [2.1 Re-parameterization](#2.1)
+    - [2.2 PW Conv](#2.2)
     - [2.3 Shortcut](#2.3)
-    - [2.4 激活函数](#2.4)
-    - [2.5 SE 模块](#2.5)
+    - [2.4 Activation Function](#2.4)
+    - [2.5 SE](#2.5)
 - [3. Experiments](#3)
 
 <a name="1"></a>
 
 ### 1. Instroduction
 
-At present, although the lightweight models are so plentiful, there are few models specially optimized for Intel CPU platform. We have proposed [PPLCNetV1](PP-LCNet.md) , which pursues faster inference speed, so its performance is limited and the performance is insufficient when dealing with complex tasks. Therefore, we now propose PPLCNetV2 to fill the gap in the lack of a higher performance model on CPU platform. For the consideration of compatibility, OpenVINO is currently a widely used deployment framework in Intel CPU platform. Therefore, we focus on optimizing the model for the deployment scheme of Intel CPU with OpenVINO.
+At present, although the lightweight models are so plentiful, there are few models specially optimized for Intel CPU platform. We have proposed [PPLCNetV1](PP-LCNet_en.md) , which pursues faster inference speed, so its performance is limited and the performance is insufficient when dealing with complex tasks. Therefore, we now propose PPLCNetV2 to fill the gap in the lack of a higher performance model on CPU platform. For the consideration of compatibility, OpenVINO is currently a widely used deployment framework in Intel CPU platform. Therefore, we focus on optimizing the model for the deployment scheme of Intel CPU with OpenVINO.
 
 <a name="2"></a>
 
 ## 2. Methods
 
-![](../../../images/PP-LCNetV2/net.png)
+![](../../images/PP-LCNetV2/net.png)
 
 The overview of PPLCNetV2 is shown in the figure above. PPLCNetV2 is obtained on PPLCNet. The details of optimization tracks is shown in this section.
 
@@ -32,7 +32,7 @@ The overview of PPLCNetV2 is shown in the figure above. PPLCNetV2 is obtained on
 
 There are lots of depthwise convolution in PPLCNetV2, so we optimize some of the depthwise convolution by the re-parameterization. The size of the convolution kernel affects the size of the model's receptive field, which affects the model's ability to capture more global or local features. In order to help the model build different scales features, we use 5\*5, 3\*3 and 1\*1 size convolution kernel. The details is shown in the figure below.
 
-![](../../../images/PP-LCNetV2/rep.png)
+![](../../images/PP-LCNetV2/rep.png)
 
 <a name="2.2"></a>
 
@@ -40,7 +40,7 @@ There are lots of depthwise convolution in PPLCNetV2, so we optimize some of the
 
 We know that the network is more deeper, the model is more stronger. So we replaced some point convolution layer with two layers that squeeze and expand the channel dimensions of the feature, respectively. The details is shown in the figure below. Finally, we use this optimization method in the second last-to-last block.
 
-![](../../../images/PP-LCNetV2/split_pw.png)
+![](../../images/PP-LCNetV2/split_pw.png)
 
 <a name="2.3"></a>
 
@@ -48,7 +48,7 @@ We know that the network is more deeper, the model is more stronger. So we repla
 
 It is believed that the Shortcut can alleviate the vanishing gradient problem, so it is more important for the improvement of deep networks. However, Shortcut is generally used with caution in the lightweight models because it results in an elementwise addition operation and possibly memory access. We experimented on the influence of shortcut on the model at different stage. Finally, we only used Shortcut in the last block, as shown in the figure below.
 
-![](../../../images/PP-LCNetV2/shortcut.png)
+![](../../images/PP-LCNetV2/shortcut.png)
 
 <a name="2.4"></a>
 
