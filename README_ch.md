@@ -16,11 +16,10 @@
 - **💥 直播预告：11.1-11.3日每晚8点半**，PaddleClas研发团队详解PP-ShituV2优化策略与真实产业应用。微信扫描下方二维码，关注公众号并填写问卷后进入官方交流群，获取直播链接与20G重磅图像分类学习大礼包（内含20+数据集、4个垂类模型、70+前沿论文集合）
 
 <div align="center">
-    <img src="https://user-images.githubusercontent.com/11568925/189877049-d17ddcea-22d2-44ab-91fe-36d12af3add8.png" width = "150" height = "150"/>
+    <img src="https://user-images.githubusercontent.com/50011306/198980780-602c6eef-11da-4b4e-aa20-c2f6fd547ae5.jpg" width = "150" height = "150"/>
 </div>
 
-
-- 🔥️ 2022.9.14 发布**商超零售新革命-生鲜智能结算产业应用**范例
+- 2022.9.14 发布**商超零售新革命-生鲜智能结算产业应用**范例
 
 - **🔥️ 2022.9.13 发布超轻量图像识别系统[PP-ShiTuV2](docs/zh_CN/models/PP-ShiTu/README.md)：**
   - recall1精度提升8个点，覆盖商品识别、垃圾分类、航拍场景等[20+识别场景](docs/zh_CN/deployment/PP-ShiTu/application_scenarios.md)，
@@ -38,22 +37,11 @@
 PaddleClas支持多种前沿图像分类、识别相关算法，发布产业级特色骨干网络[PP-HGNet](docs/zh_CN/models/ImageNet1k/PP-HGNet.md)、[PP-LCNetv2](docs/zh_CN/models/ImageNet1k/PP-LCNetV2.md)、 [PP-LCNet](docs/zh_CN/models/ImageNet1k/PP-LCNet.md)和[SSLD半监督知识蒸馏方案](docs/zh_CN/training/advanced/ssld.md)等模型，在此基础上打造[PULC超轻量图像分类方案](docs/zh_CN/quick_start/PULC.md)和[PP-ShiTu图像识别系统](./docs/zh_CN/quick_start/quick_start_recognition.md)。
 
 <div align="center">
-  <img src="https://user-images.githubusercontent.com/11568925/189267545-7a6eefa0-b4fc-4ed0-ae9d-7c6d53f59798.png"/>
+  <img src="https://user-images.githubusercontent.com/50011306/198961573-06a1a78d-7669-4061-aba5-79e9a2fc84dc.png"/>
 </div>
+
 > 上述内容的使用方法建议从文档教程中的快速开始体验
 
-## 👫 开源社区
-
-* **📑项目合作：** 如果您是企业开发者且有明确的图像分类应用需求，填写[问卷](https://paddle.wjx.cn/vm/hnGOjfn.aspx# )后可免费与官方团队展开不同层次的合作。
-* **👫加入社区：** 微信扫描二维码并填写问卷之后，加入交流群领取20G重磅图像分类学习大礼包，内含
-  * **20+场景数据库**，包括各类商品、动植物、航拍图像等数据集
-  * 场景应用**模型集合**：包括人员出入管理、生鲜品识别、商品识别等
-  * **50+前沿图像分类与识别论文**、历次发版课程视频、PPT与优质社区项目等
-
-
-<div align="center">
-  <img src="https://user-images.githubusercontent.com/45199522/173483779-2332f990-4941-4f8d-baee-69b62035fc31.png" width = "150" height = "150"/>
-</div>
 
 ## ⚡ 快速开始
 
@@ -64,15 +52,30 @@ PaddleClas支持多种前沿图像分类、识别相关算法，发布产业级�
 <div align="center">
 <img src="./docs/images/quick_start/android_demo/PPShiTu_qrcode.png"  width = "170" height = "170" />
 </div>
+## 👫 开源社区
 
-## 🛠️ PP系列模型列表（更新中）
+* **📑项目合作：** 如果您是企业开发者且有明确的图像分类应用需求，填写[问卷](https://paddle.wjx.cn/vm/hnGOjfn.aspx# )后可免费与官方团队展开不同层次的合作。
+* **👫加入社区：** 微信扫描二维码并填写问卷之后，加入交流群领取**20G重磅图像分类学习大礼包**，内含
+  * **20+场景数据库**，包括各类商品、动植物、航拍图像等数据集
+  * 场景应用**模型集合**：包括人员出入管理、生鲜品识别、商品识别等
+  * **50+前沿图像分类与识别论文**、历次发版课程视频、PPT与优质社区项目等
 
-| 模型简介                    | 应用场景                         | 模型链接                                                     |
-| --------------------------- | -------------------------------- | ------------------------------------------------------------ |
-| PULC 超轻量图像分类方案     | 固定图像类别分类                 | 人体相关：属性分类（性别\|年龄\|朝向\|穿着\|随身物品）、有/无人分类<br />车辆相关：车辆分类（颜色\|类型）、有/无车分类、232种交通标志<br />文字相关：整图4向分类、文本行正反向分类、10种语种分类 |
-| PP-ShituV2 轻量图像识别系统 | 场景数据类别频繁变动、类别数据多 | 检测网络、识别网络、图像检索库                               |
-| PP-LCNet 轻量骨干网络       | 移动端&服务端                    | 不同版本xxx                                                  |
-| PP-HGNet 高精度骨干网络     | 移动端&服务端                    | 不同版本xxx                                                  |
+<div align="center">
+  <img src="https://user-images.githubusercontent.com/50011306/198980780-602c6eef-11da-4b4e-aa20-c2f6fd547ae5.jpg" width = "150" height = "150"/>
+</div>
+
+
+## 🛠️ PP系列模型列表
+
+| 模型简介                    | 应用场景                             | 模型下载链接                                                 |
+| --------------------------- | ------------------------------------ | ------------------------------------------------------------ |
+| PULC 超轻量图像分类方案     | 固定图像类别分类方案                 | 人体、车辆、文字相关9大模型：[模型库连接](./docs/zh_CN/models/PULC/model_list.md) |
+| PP-ShituV2 轻量图像识别系统 | 针对场景数据类别频繁变动、类别数据多 | 主体检测模型：[预训练模型](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/pretrain/picodet_PPLCNet_x2_5_mainbody_lite_v1.0_pretrained.pdparams)  / [推理模型](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/inference/picodet_PPLCNet_x2_5_mainbody_lite_v1.0_infer.tar)<br />识别模型：[预训练模型](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/pretrain/PPShiTuV2/general_PPLCNetV2_base_pretrained_v1.0.pdparams)  / [推理模型](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/inference/PP-ShiTuV2/general_PPLCNetV2_base_pretrained_v1.0_infer.tar) |
+| PP-LCNet 轻量骨干网络       | 针对Intel CPU设备及MKLDNN加速库定制  | PPLCNet_x1_0：[预训练模型](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/PPLCNet_x1_0_pretrained.pdparams)  / [推理模型](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/PPLCNet_x1_0_infer.tar) |
+| PP-LCNetV2 轻量骨干网络     | 针对Intel CPU设备，适配OpenVINO      | PPLCNetV2_base：[预训练模型](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/PPLCNetV2_base_pretrained.pdparams)  / [推理模型](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/PPLCNetV2_base_infer.tar) |
+| PP-HGNet 高精度骨干网络     | GPU设备上相同推理时间精度更高        | PPHGNet_small：[预训练模型](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/PPHGNet_small_pretrained.pdparams)  / [推理模型](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/PPHGNet_small_infer.tar) |
+
+> 全部模型下载链接可查看 文档教程 中的各模型介绍
 
 ### 产业范例
 
