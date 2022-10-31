@@ -76,8 +76,12 @@ def main(args):
 
     if global_config.get("is_distributed", True):
         fleet.init(is_collective=True)
+
     # assign the device
-    use_gpu = global_config.get("use_gpu", True)
+    assert global_config[
+        "device"] in ["cpu", "gpu", "xpu", "npu", "mlu", "ascend"]
+    device = paddle.set_device(global_config["device"])
+
     # amp related config
     if 'AMP' in config:
         AMP_RELATED_FLAGS_SETTING = {
@@ -88,24 +92,6 @@ def main(args):
         }
         os.environ['FLAGS_cudnn_batchnorm_spatial_persistent'] = '1'
         paddle.set_flags(AMP_RELATED_FLAGS_SETTING)
-
-    use_xpu = global_config.get("use_xpu", False)
-    use_npu = global_config.get("use_npu", False)
-    use_mlu = global_config.get("use_mlu", False)
-    assert (
-        use_gpu and use_xpu and use_npu and use_mlu
-    ) is not True, "gpu, xpu, npu and mlu can not be true in the same time in static mode!"
-
-    if use_gpu:
-        device = paddle.set_device('gpu')
-    elif use_xpu:
-        device = paddle.set_device('xpu')
-    elif use_npu:
-        device = paddle.set_device('npu')
-    elif use_mlu:
-        device = paddle.set_device('mlu')
-    else:
-        device = paddle.set_device('cpu')
 
     # visualDL
     vdl_writer = None
