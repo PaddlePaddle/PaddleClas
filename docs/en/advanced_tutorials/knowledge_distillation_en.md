@@ -91,7 +91,7 @@ Paper:
 
 SSLD is a simple semi-supervised distillation method proposed by Baidu in 2021. By designing an improved JS divergence as the loss function and combining the data mining strategy based on ImageNet22k dataset, the accuracy of the 18 backbone network models was improved by more than 3% on average.
 
-For more information about the principle, model zoo and usage of SSLD, please refer to: [Introduction to SSLD](ssld.md).
+<!-- For more information about the principle, model zoo and usage of SSLD, please refer to: [Introduction to SSLD](ssld_en.md). -->
 
 
 ##### 1.2.1.2 Configuration of SSLD
@@ -152,8 +152,8 @@ Performance on ImageNet1k is shown below.
 
 | Strategy | Backbone | Config | Top-1 acc | Download Link |
 | --- | --- | --- | --- | --- |
-| baseline | PPLCNet_x2_5 | [PPLCNet_x2_5.yaml](../../../../ppcls/configs/ImageNet/PPLCNet/PPLCNet_x2_5.yaml) | 74.93% | - |
-| DML | PPLCNet_x2_5 | [PPLCNet_x2_5_dml.yaml](../../../../ppcls/configs/ImageNet/Distillation/PPLCNet_x2_5_dml.yaml) | 76.68%(**+1.75%**) | - |
+| baseline | PPLCNet_x2_5 | [PPLCNet_x2_5.yaml](../../../ppcls/configs/ImageNet/PPLCNet/PPLCNet_x2_5.yaml) | 74.93% | - |
+| DML | PPLCNet_x2_5 | [PPLCNet_x2_5_dml.yaml](../../../ppcls/configs/ImageNet/Distillation/PPLCNet_x2_5_dml.yaml) | 76.68%(**+1.75%**) | - |
 
 
 * Note: Complete PPLCNet_x2_5 The model have been trained for 360 epochs. For comparison, both baseline and DML have been trained for 100 epochs. Therefore, the accuracy is lower than the model (76.60%) opened on the official website.
@@ -210,8 +210,8 @@ Performance on ImageNet1k is shown below.
 
 | Strategy | Backbone | Config | Top-1 acc | Download Link |
 | --- | --- | --- | --- | --- |
-| baseline | PPLCNet_x2_5 | [PPLCNet_x2_5.yaml](../../../../ppcls/configs/ImageNet/PPLCNet/PPLCNet_x2_5.yaml) | 74.93% | - |
-| UDML | PPLCNet_x2_5 | [PPLCNet_x2_5_dml.yaml](../../../../ppcls/configs/ImageNet/Distillation/PPLCNet_x2_5_udml.yaml) | 76.74%(**+1.81%**) | - |
+| baseline | PPLCNet_x2_5 | [PPLCNet_x2_5.yaml](../../../ppcls/configs/ImageNet/PPLCNet/PPLCNet_x2_5.yaml) | 74.93% | - |
+| UDML | PPLCNet_x2_5 | [PPLCNet_x2_5_dml.yaml](../../../ppcls/configs/ImageNet/Distillation/PPLCNet_x2_5_udml.yaml) | 76.74%(**+1.81%**) | - |
 
 
 ##### 1.2.3.2 Configuration of UDML
@@ -262,7 +262,10 @@ Loss:
         weight: 1.0
 ```
 
-**Note(:** `return_patterns` are specified in the network above. The function of returning middle layer features is based on TheseusLayer. For more information about usage of TheseusLayer, please refer to: [Usage of TheseusLayer](theseus_layer.md).
+**Note(:** `return_patterns` are specified in the network above. The function of returning middle layer features is based on TheseusLayer.
+
+<!-- TODO(gaotingquan) -->
+<!-- For more information about usage of TheseusLayer, please refer to: [Usage of TheseusLayer](theseus_layer.md). -->
 
 
 <a name='1.2.4'></a>
@@ -286,8 +289,8 @@ Performance on ImageNet1k is shown below.
 
 | Strategy | Backbone | Config | Top-1 acc | Download Link |
 | --- | --- | --- | --- | --- |
-| baseline | ResNet18 | [ResNet18.yaml](../../../../ppcls/configs/ImageNet/ResNet/ResNet18.yaml) | 70.8% | - |
-| AFD | ResNet18 | [resnet34_distill_resnet18_afd.yaml](../../../../ppcls/configs/ImageNet/Distillation/resnet34_distill_resnet18_afd.yaml) | 71.68%(**+0.88%**) | - |
+| baseline | ResNet18 | [ResNet18.yaml](../../../ppcls/configs/ImageNet/ResNet/ResNet18.yaml) | 70.8% | - |
+| AFD | ResNet18 | [resnet34_distill_resnet18_afd.yaml](../../../ppcls/configs/ImageNet/Distillation/resnet34_distill_resnet18_afd.yaml) | 71.68%(**+0.88%**) | - |
 
 Note: In order to keep alignment with the training configuration in the paper, the number of training iterations is set to be 100 epochs, so the baseline accuracy is lower than the open source model accuracy in PaddleClas (71.0%).
 
@@ -374,7 +377,10 @@ Loss:
         weight: 1.0
 ```
 
-**Note(:** `return_patterns` are specified in the network above. The function of returning middle layer features is based on TheseusLayer. For more information about usage of TheseusLayer, please refer to: [Usage of TheseusLayer](theseus_layer.md).
+**Note(:** `return_patterns` are specified in the network above. The function of returning middle layer features is based on TheseusLayer.
+
+<!-- TODO(gaotingquan) -->
+<!-- For more information about usage of TheseusLayer, please refer to: [Usage of TheseusLayer](theseus_layer.md). -->
 
 <a name='1.2.5'></a>
 
@@ -397,8 +403,8 @@ Performance on ImageNet1k is shown below.
 
 | Strategy | Backbone | Config | Top-1 acc | Download Link |
 | --- | --- | --- | --- | --- |
-| baseline | ResNet18 | [ResNet18.yaml](../../../../ppcls/configs/ImageNet/ResNet/ResNet18.yaml) | 70.8% | - |
-| DKD | ResNet18 | [resnet34_distill_resnet18_dkd.yaml](../../../../ppcls/configs/ImageNet/Distillation/resnet34_distill_resnet18_dkd.yaml) | 72.59%(**+1.79%**) | - |
+| baseline | ResNet18 | [ResNet18.yaml](../../../ppcls/configs/ImageNet/ResNet/ResNet18.yaml) | 70.8% | - |
+| DKD | ResNet18 | [resnet34_distill_resnet18_dkd.yaml](../../../ppcls/configs/ImageNet/Distillation/resnet34_distill_resnet18_dkd.yaml) | 72.59%(**+1.79%**) | - |
 
 
 ##### 1.2.5.2 Configuration of DKD
@@ -465,8 +471,8 @@ Performance on ImageNet1k is shown below.
 
 | Strategy | Backbone | Config | Top-1 acc | Download Link |
 | --- | --- | --- | --- | --- |
-| baseline | ResNet18 | [ResNet18.yaml](../../../../ppcls/configs/ImageNet/ResNet/ResNet18.yaml) | 70.8% | - |
-| DIST | ResNet18 | [resnet34_distill_resnet18_dist.yaml](../../../../ppcls/configs/ImageNet/Distillation/resnet34_distill_resnet18_dist.yaml) | 71.99%(**+1.19%**) | - |
+| baseline | ResNet18 | [ResNet18.yaml](../../../ppcls/configs/ImageNet/ResNet/ResNet18.yaml) | 70.8% | - |
+| DIST | ResNet18 | [resnet34_distill_resnet18_dist.yaml](../../../ppcls/configs/ImageNet/Distillation/resnet34_distill_resnet18_dist.yaml) | 71.99%(**+1.19%**) | - |
 
 
 ##### 1.2.6.2 Configuration of DIST
@@ -531,8 +537,8 @@ Performance on ImageNet1k is shown below.
 
 | Strategy | Backbone | Config | Top-1 acc | Download Link |
 | --- | --- | --- | --- | --- |
-| baseline | ResNet18 | [ResNet18.yaml](../../../../ppcls/configs/ImageNet/ResNet/ResNet18.yaml) | 70.8% | - |
-| MGD | ResNet18 | [resnet34_distill_resnet18_mgd.yaml](../../../../ppcls/configs/ImageNet/Distillation/resnet34_distill_resnet18_mgd.yaml) | 71.86%(**+1.06%**) | - |
+| baseline | ResNet18 | [ResNet18.yaml](../../../ppcls/configs/ImageNet/ResNet/ResNet18.yaml) | 70.8% | - |
+| MGD | ResNet18 | [resnet34_distill_resnet18_mgd.yaml](../../../ppcls/configs/ImageNet/Distillation/resnet34_distill_resnet18_mgd.yaml) | 71.86%(**+1.06%**) | - |
 
 
 ##### 1.2.7.2 Configuration of MGD
@@ -603,8 +609,8 @@ Performance on ImageNet1k is shown below.
 
 | Strategy | Backbone | Config | Top-1 acc | Download Link |
 | --- | --- | --- | --- | --- |
-| baseline | ResNet18 | [ResNet18.yaml](../../../../ppcls/configs/ImageNet/ResNet/ResNet18.yaml) | 70.8% | - |
-| WSL | ResNet18 | [resnet34_distill_resnet18_wsl.yaml](../../../../ppcls/configs/ImageNet/Distillation/resnet34_distill_resnet18_wsl.yaml) | 72.23%(**+1.43%**) | - |
+| baseline | ResNet18 | [ResNet18.yaml](../../../ppcls/configs/ImageNet/ResNet/ResNet18.yaml) | 70.8% | - |
+| WSL | ResNet18 | [resnet34_distill_resnet18_wsl.yaml](../../../ppcls/configs/ImageNet/Distillation/resnet34_distill_resnet18_wsl.yaml) | 72.23%(**+1.43%**) | - |
 
 
 ##### 1.2.8.2 Configuration of WSL
@@ -657,7 +663,7 @@ Loss:
 
 ### 2.1 Environment Configuration
 
-* Installation: Please refer to [Paddle Installation Tutorial](../installation/install_paddle.md) and [PaddleClas Installation Tutorial](../../installation.md) to configure the running environment.
+* Installation: Please refer to [Paddle Installation Tutorial](../installation/install_paddle_en.md) and [PaddleClas Installation Tutorial](../installation/install_paddleclas_en.md) to configure the running environment.
 
 <a name="2.2"></a>
 
@@ -699,7 +705,7 @@ cat train_list.txt train_list_unlabel.txt > train_list_all.txt
 
 **Note:**
 
-* For more information about the format of `train_list.txt` and `val_list.txt`, you may refer to [Format Description of PaddleClas Classification Dataset](../single_label_classification/dataset.md#1-数据集格式说明) .
+* For more information about the format of `train_list.txt` and `val_list.txt`, you may refer to [Format Description of PaddleClas Classification Dataset](../data_preparation/classification_dataset_en.md#1dataset-format) .
 
 
 <a name="2.3"></a>
@@ -707,7 +713,7 @@ cat train_list.txt train_list_unlabel.txt > train_list_all.txt
 ### 2.3 Model Training
 
 
-In this section, the process of model training, evaluation and prediction of knowledge distillation algorithm will be introduced using the SSLD knowledge distillation algorithm as an example. The configuration file is [PPLCNet_x2_5_ssld.yaml](../../../../ppcls/configs/ImageNet/Distillation/PPLCNet_x2_5_ssld.yaml). You can use the following command to complete the model training.
+In this section, the process of model training, evaluation and prediction of knowledge distillation algorithm will be introduced using the SSLD knowledge distillation algorithm as an example. The configuration file is [PPLCNet_x2_5_ssld.yaml](../../../ppcls/configs/ImageNet/Distillation/PPLCNet_x2_5_ssld.yaml). You can use the following command to complete the model training.
 
 
 ```shell
@@ -776,7 +782,7 @@ python3 tools/export_model.py \
 
 3 files will be generated in `inference` directory: `inference.pdiparams`, `inference.pdiparams.info` and `inference.pdmodel`.
 
-For more information about model inference, please refer to: [Python Inference](../../deployment/image_classification/python.md).
+For more information about model inference, please refer to: [Python Inference](../inference_deployment/python_deploy_en.md).
 
 
 <a name="3"></a>
