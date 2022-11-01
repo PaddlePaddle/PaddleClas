@@ -95,8 +95,8 @@ PaddleClas支持多种前沿图像分类、识别相关算法，发布产业级�
     - [向量检索](docs/zh_CN/deployment/PP-ShiTu/vector_search.md)
     - [哈希编码](docs/zh_CN/training/PP-ShiTu/deep_hashing.md)
   - PipeLine 推理部署
-    - [基于python预测引擎推理](docs/zh_CN/deployment/image_classification/python.md#2)
-    - [基于C++预测引擎推理](deploy/cpp_shitu/readme.md)
+    - [基于python预测引擎推理](docs/zh_CN/deployment/PP-ShiTu/python.md)
+    - [基于C++预测引擎推理](docs/zh_CN/deployment/PP-ShiTu/cpp.md)
     - [服务化部署](docs/zh_CN/deployment/PP-ShiTu/paddle_serving.md)
     - [端侧部署](docs/zh_CN/deployment/PP-ShiTu/paddle_lite.md)
     - [库管理工具](docs/zh_CN/deployment/PP-ShiTu/gallery_manager.md)
