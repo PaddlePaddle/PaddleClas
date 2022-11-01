@@ -20,6 +20,7 @@ import copy
 import paddle
 from typing import Dict, List
 
+from ppcls.engine.train.utils import type_name
 from ppcls.utils import logger
 
 from . import optimizer
@@ -111,11 +112,11 @@ def build_optimizer(config, epochs, step_each_epoch, model_list=None):
                 if optim_scope.endswith("Loss"):
                     # optimizer for loss
                     for m in model_list[i].sublayers(True):
-                        if m.__class__.__name__ == optim_scope:
+                        if type_name(m) == optim_scope:
                             optim_model.append(m)
                 else:
                     # opmizer for module in model, such as backbone, neck, head...
-                    if optim_scope == model_list[i].__class__.__name__:
+                    if optim_scope == type_name(model_list[i]):
                         optim_model.append(model_list[i])
                     elif hasattr(model_list[i], optim_scope):
                         optim_model.append(getattr(model_list[i], optim_scope))
