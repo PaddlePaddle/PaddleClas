@@ -113,7 +113,7 @@ class mAP(nn.Layer):
         precision_mask = paddle.multiply(equal_flag, precision)
         ap = paddle.sum(precision_mask, axis=1) / paddle.sum(equal_flag,
                                                              axis=1)
-        metric_dict["mAP"] = paddle.mean(ap).numpy()[0]
+        metric_dict["mAP"] = float(paddle.mean(ap))
         return metric_dict
 
 
@@ -157,7 +157,7 @@ class mINP(nn.Layer):
         hard_index = paddle.argmax(auxilary, axis=1).astype("float32")
         all_INP = paddle.divide(paddle.sum(equal_flag, axis=1), hard_index)
         mINP = paddle.mean(all_INP)
-        metric_dict["mINP"] = mINP.numpy()[0]
+        metric_dict["mINP"] = float(mINP)
         return metric_dict
 
 
@@ -360,7 +360,7 @@ class HammingDistance(MultiLabelMetric):
         metric_dict["HammingDistance"] = paddle.to_tensor(
             hamming_loss(target, preds))
         self.avg_meters["HammingDistance"].update(
-            metric_dict["HammingDistance"].numpy()[0], output.shape[0])
+            float(metric_dict["HammingDistance"]), output.shape[0])
         return metric_dict
 
 
@@ -400,7 +400,7 @@ class AccuracyScore(MultiLabelMetric):
                 sum(tps) + sum(tns) + sum(fns) + sum(fps))
         metric_dict["AccuracyScore"] = paddle.to_tensor(accuracy)
         self.avg_meters["AccuracyScore"].update(
-            metric_dict["AccuracyScore"].numpy()[0], output.shape[0])
+            float(metric_dict["AccuracyScore"]), output.shape[0])
         return metric_dict
 
 

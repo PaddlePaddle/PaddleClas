@@ -324,8 +324,7 @@ class PyramidVisionTransformer(nn.Layer):
             self.pos_drops.append(nn.Dropout(p=drop_rate))
 
         dpr = [
-            x.numpy()[0]
-            for x in paddle.linspace(0, drop_path_rate, sum(depths))
+            float(x) for x in paddle.linspace(0, drop_path_rate, sum(depths))
         ]  # stochastic depth decay rule
 
         cur = 0
@@ -551,8 +550,7 @@ class ALTGVT(PCPVT):
         self.wss = wss
         # transformer encoder
         dpr = [
-            x.numpy()[0]
-            for x in paddle.linspace(0, drop_path_rate, sum(depths))
+            float(x) for x in paddle.linspace(0, drop_path_rate, sum(depths))
         ]  # stochastic depth decay rule
         cur = 0
         self.blocks = nn.LayerList()
