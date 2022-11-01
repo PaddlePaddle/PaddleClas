@@ -20,8 +20,8 @@ import copy
 import paddle
 from typing import Dict, List
 
-from ppcls.engine.train.utils import type_name
-from ppcls.utils import logger
+from ..engine.train.utils import type_name
+from ..utils import logger
 
 from . import optimizer
 

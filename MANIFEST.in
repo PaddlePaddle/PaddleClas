@@ -1,8 +1,8 @@
 include LICENSE.txt
 include README.md
 include docs/en/whl_en.md
+recursive-include ppcls *.py
+recursive-include ppcls/utils *.py *.txt
 recursive-include deploy/python *.py
 recursive-include deploy/utils *.py
-recursive-include ppcls/arch *.py
-recursive-include ppcls/utils *.py *.txt
 recursive-include deploy/configs *.yaml

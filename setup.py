@@ -29,8 +29,12 @@ def readme():
 
 setup(
     name='paddleclas',
-    packages=['paddleclas'],
-    package_dir={'paddleclas': ''},
+    packages=['paddleclas', 'paddleclas.ppcls', 'paddleclas.deploy'],
+    package_dir={
+        'paddleclas': 'python_whl',
+        'paddleclas.ppcls': 'ppcls',
+        'paddleclas.deploy': 'deploy'
+    },
     include_package_data=True,
     entry_points={
         "console_scripts": ["paddleclas=paddleclas.paddleclas:main"]
