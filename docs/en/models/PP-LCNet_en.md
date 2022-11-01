@@ -198,9 +198,16 @@ Predict complete!
 ```python
 from paddleclas import PaddleClas
 clas = PaddleClas(model_name='PPLCNet_x1_0')
-infer_imgs = 'docs/images/deployment/whl_demo.jpg'
+infer_imgs = 'docs/images/inference_deployment/whl_demo.jpg'
 result = clas.predict(infer_imgs)
 print(next(result))
+```
+
+The result of demo above:
+
+```
+>>> result
+[{'class_ids': [8, 7, 86, 81, 85], 'scores': [0.91347, 0.03779, 0.0036, 0.00117, 0.00112], 'label_names': ['hen', 'cock', 'partridge', 'ptarmigan', 'quail'], 'filename': 'docs/images/inference_deployment/whl_demo.jpg'}]
 ```
 
 **Note**: The result returned by model.predict() is a `generator`, so you need to use the `next()` function to call it or `for loop` to loop it. And it will predict with batch_size size batch and return the prediction results when called. The default batch_size is 1, and you also specify the batch_size when instantiating, such as `model = paddleclas.PaddleClas(model_name="PPLCNet_x1_0", batch_size=2)`.
