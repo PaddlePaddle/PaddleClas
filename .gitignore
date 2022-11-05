@@ -13,5 +13,3 @@ log/
 nohup.out
 .DS_Store
 .idea
-dataset/
-deploy/auto_log.log
