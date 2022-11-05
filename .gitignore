@@ -14,5 +14,3 @@ nohup.out
 .DS_Store
 .idea
 inference/
-dataset/
-deploy/auto_log.log
