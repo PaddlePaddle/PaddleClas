@@ -20,8 +20,7 @@ import math
 import paddle
 import paddle.nn as nn
 
-from ppcls.arch.backbone.legendary_models.mobilenet_v3 import _make_divisible
-from ppcls.utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
+from ....utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
 
 MODEL_URLS = {
     "micronet_m0": "",  # TODO
@@ -147,6 +146,15 @@ ACTIVATION_CONFIG = {
         "init_b": [0.0, 0.5],
     },
 }
+
+
+def _make_divisible(v, divisor=8, min_value=None):
+    if min_value is None:
+        min_value = divisor
+    new_v = max(min_value, int(v + divisor / 2) // divisor * divisor)
+    if new_v < 0.9 * v:
+        new_v += divisor
+    return new_v
 
 
 class MaxGroupPooling(nn.Layer):
