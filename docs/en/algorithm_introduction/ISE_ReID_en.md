@@ -16,7 +16,7 @@ ISE (Implicit Sample Extension) is a simple, efficient, and effective learning a
 > Xinyu Zhang, Dongdong Li, Zhigang Wang, Jian Wang, Errui Ding, Javen Qinfeng Shi, Zhaoxiang Zhang, Jingdong Wang<br>
 > CVPR2022
 
-![image](../../images/ISE_ReID/ISE_pipeline.png)
+![image](../../images/ISE_pipeline.png)
 
 <a name='2'></a>
 ## 2. Performance on Market1501 and MSMT17

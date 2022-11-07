@@ -79,7 +79,10 @@ Quick experience of **P**ractical **U**ltra **L**ight-weight image **C**lassific
     - [PULC Classification Model of Text Image Orientation](docs/en/PULC/PULC_text_image_orientation_en.md)
     - [PULC Classification Model of Textline Orientation](docs/en/PULC/PULC_textline_orientation_en.md)
     - [PULC Classification Model of Language](docs/en/PULC/PULC_language_classification_en.md)
-- [Quick Start of Recognition](./docs/en/quick_start/quick_start_recognition_en.md)
+- PP Series Backbone
+    - [PP-HGNet](docs/en/models/PP-HGNet_en.md)
+    - [PP-LCNet](docs/en/models/PP-LCNet_en.md)
+    - [PP-LCNetv2](docs/en/models/PP-LCNetv2_en.md)
 - [Introduction to Image Recognition Systems](#Introduction_to_Image_Recognition_Systems)
 - [Image Recognition Demo images](#Rec_Demo_images)
 - [PULC demo images](#Clas_Demo_images)
@@ -90,7 +93,7 @@ Quick experience of **P**ractical **U**ltra **L**ight-weight image **C**lassific
     - [Vector Search](./deploy/vector_search/README.md)
 - Inference Model Prediction
     - [Python Inference](./docs/en/inference_deployment/python_deploy_en.md)
-    - [C++ Classfication Inference](./deploy/cpp/readme_en.md)， [C++ PP-ShiTu Inference](deploy/cpp_shitu/readme_en.md)
+    - [C++ Classfication Inference](./deploy/cpp/readme_en.md)
 - Model Deploy (only support classification for now, recognition coming soon)
     - [Hub Serving Deployment](./deploy/hubserving/readme_en.md)
     - [Mobile Deployment](./deploy/lite/readme_en.md)
