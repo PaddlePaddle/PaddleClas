@@ -19,6 +19,7 @@
 | table_attribute |[PULC表格属性识别](PULC_table_attribute.md)|表格属性识别，可以识别表格是否为拍照、表格数量、表格颜色、表格清晰度、表格有无干扰、表格角度6个属性| 88.1 |7.1M|2.58ms|[推理模型](https://paddleclas.bj.bcebos.com/models/PULC/inference/table_attribute_infer.tar) / [预训练模型](https://paddleclas.bj.bcebos.com/models/PULC/pretrained/table_attribute_pretrained.pdparams)|
 | code_exists |[PULC有无广告码](PULC_code_exists.md)|判断图片中有无广告码，其中，这里广告码包含二维码、条形码、小程序码| 94.9 |7.0M|2.13ms|[推理模型](https://paddleclas.bj.bcebos.com/models/PULC/inference/code_exists_infer.tar) / [预训练模型](https://paddleclas.bj.bcebos.com/models/PULC/pretrained/code_exists_pretrained.pdparams)|
 | clarity_assessment |[PULC清晰度评估](PULC_clarity_assessment.md)|判断图片的清晰度| 95.3 |7.0M|2.13ms|[推理模型](https://paddleclas.bj.bcebos.com/models/PULC/inference/clarity_assessment_infer.tar) / [预训练模型](https://paddleclas.bj.bcebos.com/models/PULC/pretrained/clarity_assessment_pretrained.pdparams)|
+| image_orientation |[PULC图像方向分类](PULC_image_orientation.md)|判断图片的清晰度| 89.99 |7.1M|2.16ms|[推理模型](https://paddleclas.bj.bcebos.com/models/PULC/inference/image_orientation_infer.tar) / [预训练模型](https://paddleclas.bj.bcebos.com/models/PULC/pretrained/image_orientation_pretrained.pdparams)|
 
 
 
@@ -26,4 +27,4 @@
 
 * 以上所有的模型的 backbone 均为 PPLCNet_x1_0，部分模型大小不同是由于分类的输出大小不同导致的，推理耗时是基于Intel(R) Xeon(R) Gold 6148 CPU @ 2.40GHz 测试得到，其中测试过程开启 MKLDNN 加速策略，线程数为10。速度测试过程会有轻微波动。
 
-* person_exists、safety_helmet、car_exists 的评测指标为 TprAtFpr，person_attribute、vehicle_attribute、table_attribute 的评测指标为mA、traffic_sign、text_image_orientation、textline_orientation、language_classification、code_exists、clarity_assessment 的评测指标为Top-1 Acc。
+* person_exists、safety_helmet、car_exists 的评测指标为 TprAtFpr；person_attribute、vehicle_attribute、table_attribute 的评测指标为mA；traffic_sign、text_image_orientation、textline_orientation、language_classification、code_exists、clarity_assessment、image_orientation 的评测指标为Top-1 Acc。
