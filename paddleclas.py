@@ -252,7 +252,7 @@ def init_config(model_type, model_name, inference_model_dir, **kwargs):
     if "batch_size" in kwargs and kwargs["batch_size"]:
         cfg.Global.batch_size = kwargs["batch_size"]
 
-    if "use_gpu" in kwargs and kwargs["use_gpu"]:
+    if "use_gpu" in kwargs and kwargs["use_gpu"] is not None:
         cfg.Global.use_gpu = kwargs["use_gpu"]
     if cfg.Global.use_gpu and not paddle.device.is_compiled_with_cuda():
         msg = "The current running environment does not support the use of GPU. CPU has been used instead."
@@ -265,13 +265,13 @@ def init_config(model_type, model_name, inference_model_dir, **kwargs):
         cfg.IndexProcess.index_dir = kwargs["index_dir"]
     if "data_file" in kwargs and kwargs["data_file"]:
         cfg.IndexProcess.data_file = kwargs["data_file"]
-    if "enable_mkldnn" in kwargs and kwargs["enable_mkldnn"]:
+    if "enable_mkldnn" in kwargs and kwargs["enable_mkldnn"] is not None:
         cfg.Global.enable_mkldnn = kwargs["enable_mkldnn"]
     if "cpu_num_threads" in kwargs and kwargs["cpu_num_threads"]:
         cfg.Global.cpu_num_threads = kwargs["cpu_num_threads"]
-    if "use_fp16" in kwargs and kwargs["use_fp16"]:
+    if "use_fp16" in kwargs and kwargs["use_fp16"] is not None:
         cfg.Global.use_fp16 = kwargs["use_fp16"]
-    if "use_tensorrt" in kwargs and kwargs["use_tensorrt"]:
+    if "use_tensorrt" in kwargs and kwargs["use_tensorrt"] is not None:
         cfg.Global.use_tensorrt = kwargs["use_tensorrt"]
     if "gpu_mem" in kwargs and kwargs["gpu_mem"]:
         cfg.Global.gpu_mem = kwargs["gpu_mem"]

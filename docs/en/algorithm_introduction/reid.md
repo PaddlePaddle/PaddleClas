@@ -1,4 +1,4 @@
-English | [简体中文](../../zh_CN/algorithm_introduction/reid.md)
+English | [简体中文](../../zh_CN/algorithm_introduction/ReID.md)
 
 # ReID pedestrian re-identification
 

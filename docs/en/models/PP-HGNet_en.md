@@ -148,18 +148,19 @@ Predict complete!
 ```python
 from paddleclas import PaddleClas
 clas = PaddleClas(model_name='PPHGNet_small')
-infer_imgs = 'docs/images/deployment/whl_demo.jpg'
+infer_imgs = 'docs/images/inference_deployment/whl_demo.jpg'
 result = clas.predict(infer_imgs)
 print(next(result))
 ```
 
-**Note**: The result returned by model.predict() is a `generator`, so you need to use the `next()` function to call it or `for loop` to loop it. And it will predict with batch_size size batch and return the prediction results when called. The default batch_size is 1, and you also specify the batch_size when instantiating, such as model = paddleclas.PaddleClas(model_name="PPHGNet_small", batch_size=2). The result of demo above:
-
+The result of demo above:
 
 ```
 >>> result
-[{'class_ids': [8, 7, 86, 82, 81], 'scores': [0.71479, 0.08682, 0.00806, 0.0023, 0.00121], 'label_names': ['hen', 'cock', 'partridge', 'ruffed grouse, partridge, Bonasa umbellus', 'ptarmigan'], 'filename': 'docs/images/inference_deployment/whl_demo.jpg'}]
+[{'class_ids': [8, 7, 86, 82, 81], 'scores': [0.77132, 0.05122, 0.00755, 0.00199, 0.00115], 'label_names': ['hen', 'cock', 'partridge', 'ruffed grouse, partridge, Bonasa umbellus', 'ptarmigan'], 'filename': 'docs/images/inference_deployment/whl_demo.jpg'}]
 ```
+
+**Note**: The result returned by model.predict() is a `generator`, so you need to use the `next()` function to call it or `for loop` to loop it. And it will predict with batch_size size batch and return the prediction results when called. The default batch_size is 1, and you also specify the batch_size when instantiating, such as `model = paddleclas.PaddleClas(model_name="PPHGNet_small", batch_size=2)`.
 
 <a name="3"></a>
 
@@ -212,7 +213,7 @@ where `train/` and `val/` are the training set and validation set, respectively.
 
 #### 3.3.1 Train ImageNet
 
-The PPHGNet_small training configuration is provided in `ppcls/configs/ImageNet/PPHGNet/PPHGNet_small.yaml`, which can be started with the following script:    
+The PPHGNet_small training configuration is provided in `ppcls/configs/ImageNet/PPHGNet/PPHGNet_small.yaml`, which can be started with the following script:  
 
 ```shell
 export CUDA_VISIBLE_DEVICES=0,1,2,3
@@ -226,12 +227,12 @@ python3 -m paddle.distributed.launch \
 **Note:**
 
 * The current model with the best accuracy will be saved in `output/PPHGNet_small/best_model.pdparams`
-    
+
 <a name="3.3.2"></a>
 
 #### 3.3.2 Fine-tuning based on ImageNet weights
 
-If you are not training an ImageNet task, you need to change the configuration file and training method, such as reducing the learning rate, reducing the number of epochs, etc. 
+If you are not training an ImageNet task, you need to change the configuration file and training method, such as reducing the learning rate, reducing the number of epochs, etc.
 
 <a name="3.4"></a>
 
@@ -265,13 +266,13 @@ The results:
 
 **Note**:
 
-* Among the above command, argument `-o Global.pretrained_model="output/PPLCNet_x1_0/best_model"` specify the path of the best model weight file. You can specify other path if needed.
+* Among the above command, argument `-o Global.pretrained_model="output/PPHGNet_small/best_model"` specify the path of the best model weight file. You can specify other path if needed.
 
 
 * The default test image is `docs/images/inference_deployment/whl_demo.jpg` ，And you can test other image, only need to specify the argument `-o Infer.infer_imgs=path_to_test_image`.
 
 * The default output is the value of Top-5. If you want to output the value of Top-k, you can specify `-o Infer.PostProcess.topk=k`, where `k` is the value you specify.
-   
+
 * The default label mapping is based on the ImageNet dataset. If you change the dataset, you need to re-specify `Infer.PostProcess.class_id_map_file`. For the method of making the mapping file, please refer to `ppcls/utils/imagenet1k_label_list.txt`
 
 
@@ -410,4 +411,3 @@ PaddleClas provides an example of how to deploy on mobile by Paddle-Lite. Please
 Paddle2ONNX support convert Paddle Inference model to ONNX model. And you can deploy with ONNX model on different inference engine, such as TensorRT, OpenVINO, MNN/TNN, NCNN and so on. About Paddle2ONNX details, please refer to [Paddle2ONNX](https://github.com/PaddlePaddle/Paddle2ONNX).
 
 PaddleClas provides an example of how to convert Paddle Inference model to ONNX model by paddle2onnx toolkit and predict by ONNX model. You can refer to [paddle2onnx](../../../deploy/paddle2onnx/readme_en.md) for deployment details.
-

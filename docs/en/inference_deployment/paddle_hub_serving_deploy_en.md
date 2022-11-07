@@ -1,4 +1,4 @@
-English | [简体中文](../../zh_CN/inference_deployment/paddle_hub_serving_deploy.md)
+English | [简体中文](../../zh_CN/deployment/image_classification/paddle_hub.md)
 
 # Service deployment based on PaddleHub Serving
 
@@ -53,7 +53,7 @@ Before installing the service module, you need to prepare the inference model an
   "inference_model_dir": "../inference/"
   ```
 * Model files (including `.pdmodel` and `.pdiparams`) must be named `inference`.
-* We provide a large number of pre-trained models based on the ImageNet-1k dataset. For the model list and download address, see [Model Library Overview](../algorithm_introduction/ImageNet_models.md), or you can use your own trained and converted models.
+* We provide a large number of pre-trained models based on the ImageNet-1k dataset. For the model list and download address, see [Model Library Overview](../algorithm_introduction/ImageNet_models_en.md), or you can use your own trained and converted models.
 
 
 <a name="4"></a>
