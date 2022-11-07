@@ -39,6 +39,29 @@ def build_postprocess(config):
     return PostProcesser(func_list, main_indicator)
 
 
+def parse_class_id_map(class_id_map_file, delimiter):
+    if class_id_map_file is None:
+        return None
+
+    if not os.path.exists(class_id_map_file):
+        print(
+            "Warning: If want to use your own label_dict, please input legal path!\nOtherwise label_names will be empty!"
+        )
+        return None
+
+    try:
+        class_id_map = {}
+        with open(class_id_map_file, "r") as fin:
+            lines = fin.readlines()
+            for line in lines:
+                partition = line.split("\n")[0].partition(delimiter)
+                class_id_map[int(partition[0])] = str(partition[-1])
+    except Exception as ex:
+        print(ex)
+        class_id_map = None
+    return class_id_map
+
+
 class PostProcesser(object):
     def __init__(self, func_list, main_indicator="Topk"):
         self.func_list = func_list
@@ -54,27 +77,45 @@ class PostProcesser(object):
 
 
 class ThreshOutput(object):
-    def __init__(self, threshold, label_0="0", label_1="1"):
+    def __init__(self,
+                 threshold=0,
+                 default_label_index=0,
+                 class_id_map_file=None,
+                 delimiter=None,
+                 label_0=None,
+                 label_1=None):
         self.threshold = threshold
-        self.label_0 = label_0
-        self.label_1 = label_1
+        self.default_label_index = default_label_index
+        delimiter = delimiter if delimiter is not None else " "
+        self.class_id_map = parse_class_id_map(class_id_map_file, delimiter)
+
+        if label_0 is not None or label_1 is not None:
+            print(
+                "[WARNING] The arguments \"label_0\" and \"label_1\" have been deprecated. Please use \"default_label_index\" instead."
+            )
 
     def __call__(self, x, file_names=None):
+        if file_names is not None:
+            assert x.shape[0] == len(file_names)
         y = []
         for idx, probs in enumerate(x):
-            score = probs[1]
-            if score < self.threshold:
-                result = {
-                    "class_ids": [0],
-                    "scores": [1 - score],
-                    "label_names": [self.label_0]
-                }
+            index = probs.argsort(axis=0)[::-1].astype("int32")
+            top1_id = index[0]
+            top1_score = probs[top1_id]
+
+            if top1_score > self.threshold:
+                rtn_id = top1_id
             else:
-                result = {
-                    "class_ids": [1],
-                    "scores": [score],
-                    "label_names": [self.label_1]
-                }
+                rtn_id = self.default_label_index
+
+            label_name = self.class_id_map[
+                rtn_id] if self.class_id_map is not None else ""
+
+            result = {
+                "class_ids": [rtn_id],
+                "scores": [probs[rtn_id]],
+                "label_names": [label_name]
+            }
             if file_names is not None:
                 result["file_name"] = file_names[idx]
             y.append(result)
@@ -85,30 +126,8 @@ class Topk(object):
     def __init__(self, topk=1, class_id_map_file=None, delimiter=None):
         assert isinstance(topk, (int, ))
         self.topk = topk
-        self.delimiter = delimiter if delimiter is not None else " "
-        self.class_id_map = self.parse_class_id_map(class_id_map_file)
-
-    def parse_class_id_map(self, class_id_map_file):
-        if class_id_map_file is None:
-            return None
-
-        if not os.path.exists(class_id_map_file):
-            print(
-                "Warning: If want to use your own label_dict, please input legal path!\nOtherwise label_names will be empty!"
-            )
-            return None
-
-        try:
-            class_id_map = {}
-            with open(class_id_map_file, "r") as fin:
-                lines = fin.readlines()
-                for line in lines:
-                    partition = line.split("\n")[0].partition(self.delimiter)
-                    class_id_map[int(partition[0])] = str(partition[-1])
-        except Exception as ex:
-            print(ex)
-            class_id_map = None
-        return class_id_map
+        delimiter = delimiter if delimiter is not None else " "
+        self.class_id_map = parse_class_id_map(class_id_map_file, delimiter)
 
     def __call__(self, x, file_names=None):
         if file_names is not None:
@@ -140,30 +159,8 @@ class Topk(object):
 class MultiLabelThreshOutput(object):
     def __init__(self, threshold=0.5, class_id_map_file=None, delimiter=None):
         self.threshold = threshold
-        self.delimiter = delimiter if delimiter is not None else " "
-        self.class_id_map = self.parse_class_id_map(class_id_map_file)
-
-    def parse_class_id_map(self, class_id_map_file):
-        if class_id_map_file is None:
-            return None
-
-        if not os.path.exists(class_id_map_file):
-            print(
-                "Warning: If want to use your own label_dict, please input legal path!\nOtherwise label_names will be empty!"
-            )
-            return None
-
-        try:
-            class_id_map = {}
-            with open(class_id_map_file, "r") as fin:
-                lines = fin.readlines()
-                for line in lines:
-                    partition = line.split("\n")[0].partition(self.delimiter)
-                    class_id_map[int(partition[0])] = str(partition[-1])
-        except Exception as ex:
-            print(ex)
-            class_id_map = None
-        return class_id_map
+        delimiter = delimiter if delimiter is not None else " "
+        self.class_id_map = parse_class_id_map(class_id_map_file, delimiter)
 
     def __call__(self, x, file_names=None):
         y = []

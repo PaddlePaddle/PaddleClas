@@ -197,8 +197,8 @@ PULC_MODEL_BASE_DOWNLOAD_URL = "https://paddleclas.bj.bcebos.com/models/PULC/inf
 PULC_MODELS = [
     "car_exists", "language_classification", "person_attribute",
     "person_exists", "safety_helmet", "text_image_orientation",
-    "textline_orientation", "traffic_sign", "vehicle_attribute",
-    "table_attribute"
+    "image_orientation", "textline_orientation", "traffic_sign",
+    "vehicle_attribute", "table_attribute"
 ]
 
 SHITU_MODEL_BASE_DOWNLOAD_URL = "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/inference/{}_infer.tar"
@@ -284,10 +284,6 @@ def init_config(model_type, model_name, inference_model_dir, **kwargs):
             "crop_size"]
 
     # TODO(gaotingquan): not robust
-    if "thresh" in kwargs and kwargs[
-            "thresh"] and "ThreshOutput" in cfg.PostProcess:
-        cfg.PostProcess.ThreshOutput.thresh = kwargs["thresh"]
-
     if cfg.get("PostProcess"):
         if "Topk" in cfg.PostProcess:
             if "topk" in kwargs and kwargs["topk"]:
@@ -299,6 +295,17 @@ def init_config(model_type, model_name, inference_model_dir, **kwargs):
                 class_id_map_file_path = os.path.relpath(
                     cfg.PostProcess.Topk.class_id_map_file, "../")
                 cfg.PostProcess.Topk.class_id_map_file = os.path.join(
+                    __dir__, class_id_map_file_path)
+        if "ThreshOutput" in cfg.PostProcess:
+            if "thresh" in kwargs and kwargs["thresh"]:
+                cfg.PostProcess.ThreshOutput.thresh = kwargs["thresh"]
+            if "class_id_map_file" in kwargs and kwargs["class_id_map_file"]:
+                cfg.PostProcess.ThreshOutput["class_id_map_file"] = kwargs[
+                    "class_id_map_file"]
+            elif "class_id_map_file" in cfg.PostProcess.ThreshOutput:
+                class_id_map_file_path = os.path.relpath(
+                    cfg.PostProcess.ThreshOutput.class_id_map_file, "../")
+                cfg.PostProcess.ThreshOutput.class_id_map_file = os.path.join(
                     __dir__, class_id_map_file_path)
         if "VehicleAttribute" in cfg.PostProcess:
             if "color_threshold" in kwargs and kwargs["color_threshold"]:
