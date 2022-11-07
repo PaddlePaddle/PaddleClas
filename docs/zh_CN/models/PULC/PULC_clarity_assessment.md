@@ -45,7 +45,7 @@
 下表列出了清晰度评估模型的相关指标，前两行展现了使用 SwinTranformer_tiny 和 MobileNetV3_small_x0_35 作为 backbone 训练得到的模型的相关指标，第三行至第六行依次展现了替换 backbone 为 PP-LCNet_x1_0、使用 SSLD 预训练模型、使用 SSLD 预训练模型 + EDA 策略、使用 SSLD 预训练模型 + EDA 策略 + SKL-UGI 知识蒸馏策略训练得到的模型的相关指标。
 
 
-| 模型 | Tpr（%） | 延时（ms） | 存储（M） | 策略 |
+| 模型 | Accuracy（%） | 延时（ms） | 存储（M） | 策略 |
 |-------|-----------|----------|---------------|---------------|
 | SwinTranformer_tiny  | - | -  | 111 | 使用 ImageNet 预训练模型 |
 | MobileNetV3_small_x0_35  | - | 2.85  | 2.6 | 使用 ImageNet 预训练模型 |
