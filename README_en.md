@@ -8,7 +8,7 @@ PaddleClas is an image classification and image recognition toolset for industry
 
 |                       PP-ShiTuV2                       | PULC: **P**ractical **U**ltra **L**ight-weight image **C**lassification solutions |
 | :----------------------------------------------------: | :----------------------------------------------------------: |
-| <img src="./docs/images/shituv2.gif"  width = "450" /> | <img src="./docs/images/class_simple_en.gif"  width = "600" /> |
+| <img src="./docs/images/shituv2.gif"  width = "400" /> | <img src="./docs/images/class_simple_en.gif"  width = "500" /> |
 
 ## 📣 Recent updates
 
