@@ -4,7 +4,6 @@ import re
 
 
 def parameter_parser():
-    import argparse
     parser = argparse.ArgumentParser(description="Support Args:")
     parser.add_argument(
         "-v",

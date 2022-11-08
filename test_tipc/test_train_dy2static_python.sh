@@ -1,25 +1,9 @@
 #!/bin/bash
 source test_tipc/common_func.sh
 
-function readlinkf() {
-    perl -MCwd -e 'print Cwd::abs_path shift' "$1";
-}
-
-function func_parser_config() {
-    strs=$1
-    IFS=" "
-    array=(${strs})
-    tmp=${array[2]}
-    echo ${tmp}
-}
-
 # always use the lite_train_lite_infer mode to speed. Modify the config file.
 MODE=lite_train_lite_infer
 BASEDIR=$(dirname "$0")
-REPO_ROOT_PATH=$(readlinkf ${BASEDIR}/../)
-
-echo $BASEDIR
-echo $REPO_ROOT_PATH
 
 FILENAME=$1
 sed -i 's/gpu_list.*$/gpu_list:0/g' $FILENAME
@@ -52,8 +36,8 @@ echo $cmd
 eval $cmd
 
 # analysis and compare the losses. 
-dyout=`cat $dy2static_output | python3 test_tipc/loss_filter.py -v 'Iter:' -e 'loss: {%f},'`
-stout=`cat $dygraph_output | python3 test_tipc/loss_filter.py -v 'Iter:' -e 'loss: {%f},'  `
+dyout=`cat $dy2static_output | python3 test_tipc/extract_loss.py -v 'Iter:' -e 'loss: {%f},'`
+stout=`cat $dygraph_output | python3 test_tipc/extract_loss.py -v 'Iter:' -e 'loss: {%f},'  `
 echo $dyout
 echo $stout
 if [ "$dyout" = "" ]; then
