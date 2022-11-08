@@ -29,6 +29,7 @@ from .distillationloss import DistillationRKDLoss
 from .distillationloss import DistillationKLDivLoss
 from .distillationloss import DistillationDKDLoss
 from .distillationloss import DistillationWSLLoss
+from .distillationloss import DistillationSKDLoss
 from .distillationloss import DistillationMultiLabelLoss
 from .distillationloss import DistillationDISTLoss
 from .distillationloss import DistillationPairLoss
