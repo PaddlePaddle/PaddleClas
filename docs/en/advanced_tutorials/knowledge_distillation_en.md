@@ -17,6 +17,7 @@
         - [1.2.6 DIST](#1.2.6)
         - [1.2.7 MGD](#1.2.7)
         - [1.2.8 WSL](#1.2.8)
+        - [1.2.9 SKD](#1.2.9)
 - [2. Usage](#2)
     - [2.1 Environment Configuration](#2.1)
     - [2.2 Data Preparation](#2.2)
@@ -650,6 +651,72 @@ Loss:
         weight: 2.5
         model_name_pairs: [["Student", "Teacher"]]
         temperature: 2
+  Eval:
+    - CELoss:
+        weight: 1.0
+```
+
+<a name='1.2.9'></a>
+
+#### 1.2.9 SKD
+
+##### 1.2.9.1 Introduction to SKD
+
+Paper:
+
+
+> [Reducing the Teacher-Student Gap via Spherical Knowledge Disitllation](https://arxiv.org/abs/2010.07485)
+>
+> Jia Guo, Minghao Chen, Yao Hu, Chen Zhu, Xiaofei He, Deng Cai
+>
+> 2022, under review
+
+Due to the limited capacity of the student, student performance would unexpectedly drop when distilling from an oversized teacher. Spherical Knowledge Distillation (SKD) explicitly eliminates the gap of confidence between teacher and student, so as to ease the capacity gap problem. SKD achieves a significant improvement over previous SOTA in distilling ResNet18 on ImageNet1k.
+
+Performance on ImageNet1k is shown below.
+
+| Strategy | Backbone | Config | Top-1 acc | Download Link |
+| --- | --- | --- | --- | --- |
+| baseline | ResNet18 | [ResNet18.yaml](../../../../ppcls/configs/ImageNet/ResNet/ResNet18.yaml) | 70.8% | - |
+| SKD | ResNet18 | [resnet34_distill_resnet18_skd.yaml](../../../../ppcls/configs/ImageNet/Distillation/resnet34_distill_resnet18_skd.yaml) | 72.84%(**+2.04%**) | - |
+
+
+##### 1.2.9.2 Configuration of SKD
+
+The SKD configuration is shown below. In the `Arch` field, you need to define both the student model and the teacher model. The teacher model has fixed parameters, and the pretrained parameters are loaded. In the `Loss` field, you need to define `DistillationSKDLoss` (SKD loss between student and teacher). It should be noted that SKD loss includes KL div loss with teacher and CE loss with ground truth labels. Therefore, `DistillationGTCELoss` does not need to be defined.
+
+
+```yaml
+# model architecture
+Arch:
+  name: "DistillationModel"
+  # if not null, its lengths should be same as models
+  pretrained_list:
+  # if not null, its lengths should be same as models
+  freeze_params_list:
+  - True
+  - False
+  models:
+    - Teacher:
+        name: ResNet34
+        pretrained: True
+
+    - Student:
+        name: ResNet18
+        pretrained: False
+
+  infer_model_name: "Student"
+
+
+# loss function config for traing/eval process
+Loss:
+  Train:
+    - DistillationSKDLoss:
+        weight: 1.0
+        model_name_pairs: [["Student", "Teacher"]]
+        temperature: 1.0
+        multiplier: 2.0
+        alpha: 0.9
   Eval:
     - CELoss:
         weight: 1.0
