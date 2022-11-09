@@ -49,7 +49,7 @@ ppcls/data/
 
 PaddleClas 内置了大量图像操作相关模块，对于没有内置的模块可通过如下步骤添加:
 
-1. 如果只涉及单个图像的操作，在 [ppcls/data/preprocess/ops](../../../ppcls/data/preprocess/ops) 文件夹下新建文件，如果设计整个batch的图像操作，需要在 [ppcls/data/preprocess/batch_ops](../../../ppcls/data/preprocess/batch_ops) 文件夹下新建文件，如my_module.py。
+1. 如果只涉及单个图像的操作，在 [ppcls/data/preprocess/ops](../../../ppcls/data/preprocess/ops) 文件夹下新建文件，如果涉及整个batch的图像操作，需要在 [ppcls/data/preprocess/batch_ops](../../../ppcls/data/preprocess/batch_ops) 文件夹下新建文件，如my_module.py。
 2. 在 my_module.py 文件内添加相关代码，示例代码如下:
 
 ```python
@@ -82,8 +82,7 @@ transforms:
 
 ### 1.2 网络
 
-网络部分完成了网络的组网操作，，这一部分在[ppcls/arch/](../../../ppcls/arch/)下。 进入网络的数据将按照顺序(transforms->backbones->
-necks->heads)依次通过这四个部分。其中，非特征模型的neck和head为空。
+网络部分完成了网络的组网操作，，这一部分在[ppcls/arch/](../../../ppcls/arch/)下。 数据将按照顺序(transforms->backbone->neck->head)依次通过这四个部分。其中，非特征模型的neck和head为空。
 
 ```bash
 ppcls/arch/
@@ -123,9 +122,10 @@ import paddle.nn.functional as F
 
 
 class MyBackbone(nn.Layer):
-    def __init__(self, *args, **kwargs):
-        super(MyBackbone, self).__init__()
+    def __init__(self, class_num=xx, *args, **kwargs):
+        super().__init__()
         # your init code
+        self.class_num = class_num
         self.conv = nn.xxxx
 
     def forward(self, inputs):
@@ -291,7 +291,7 @@ Metric:
 
 对于没有内置的模块可通过如下步骤添加，以`optimizer`为例:
 
-1. 在 [ppcls/optimizer//optimizer.py](../../../ppcls/optimizer//optimizer.py) 文件内创建自己的优化器，示例代码如下:
+1. 在 [ppcls/optimizer/optimizer.py](../../../ppcls/optimizer/optimizer.py) 文件内创建自己的优化器，示例代码如下:
 
 ```python
 from paddle import optimizer as optim
