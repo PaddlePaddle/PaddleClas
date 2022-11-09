@@ -28,10 +28,10 @@ def train_epoch(engine, epoch_id, print_batch_step):
     for iter_id in range(engine.iter_per_epoch):
         # fetch data batch from dataloader
         try:
-            batch = engine.train_dataloader_iter.next()
+            batch = next(engine.train_dataloader_iter)
         except Exception:
             engine.train_dataloader_iter = iter(engine.train_dataloader)
-            batch = engine.train_dataloader_iter.next()
+            batch = next(engine.train_dataloader_iter)
 
         profiler.add_profiler_step(engine.config["profiler_options"])
         if iter_id == 5:
