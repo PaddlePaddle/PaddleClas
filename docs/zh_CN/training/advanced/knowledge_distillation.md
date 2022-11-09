@@ -682,7 +682,7 @@ Loss:
 
 ##### 1.2.9.2 SKD 配置
 
-SKD 配置如下所示。在模型构建Arch字段中，需要同时定义学生模型与教师模型，教师模型固定参数，且需要加载预训练模型。在损失函数Loss字段中，需要定义`DistillationSKDLoss`（学生与教师之间的SKD loss），作为训练的损失函数。
+SKD 配置如下所示。在模型构建Arch字段中，需要同时定义学生模型与教师模型，教师模型固定参数，且需要加载预训练模型。在损失函数Loss字段中，需要定义`DistillationSKDLoss`（学生与教师之间的SKD loss），作为训练的损失函数。需要注意的是，SKD loss包含了学生与教师模型之间的KL div loss和学生模型与真值标签之间的CE loss，因此无需定义`DistillationGTCELoss`。
 
 
 ```yaml

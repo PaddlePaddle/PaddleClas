@@ -55,7 +55,7 @@ Optimizer:
   weight_decay: 1e-4
   lr:
     name: MultiStepDecay
-    learning_rate: 0.2
+    learning_rate: 0.1
     milestones: [30, 60, 90]
     step_each_epoch: 1
     gamma: 0.1
@@ -84,7 +84,7 @@ DataLoader:
 
     sampler:
         name: DistributedBatchSampler
-        batch_size: 128
+        batch_size: 64
         drop_last: False
         shuffle: True
     loader:
