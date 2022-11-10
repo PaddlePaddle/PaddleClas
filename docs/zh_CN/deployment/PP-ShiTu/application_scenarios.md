@@ -2,11 +2,12 @@
 
 该文档介绍了PP-ShiTu提供的各种应用场景库简介、下载链接以及使用简介。
 
-------
-
 ## 目录
 
 - [1. 应用场景介绍](#1-应用场景介绍)
+  - [1.1 场景库介绍](#1.1 场景库介绍)
+  - [1.2 场景库下载](#1.2 场景库下载)
+
 - [2. 使用说明](#2-使用说明)
   - [2.1 环境配置](#21-环境配置)
   - [2.2 下载、解压场景库数据](#22-下载解压场景库数据)
@@ -20,37 +21,47 @@
 
 ## 1. 应用场景介绍
 
+<a name="1.1 场景库介绍"></a>
+
+### 1.1 场景库介绍
+
 PP-ShiTu对原数据集进行了`Gallery`库和`Query`库划分，并生成了对应的`Index`索引库，具体应用场景介绍和下载地址如下表所示。
 
-| 场景 |示例图|场景简介|Recall@1|场景库下载地址|原数据集下载地址|
-|:---:|:---:|:---:|:---:|:---:|:---:|
-| 花 | <img src="../../../images/ppshitu_application_scenarios/104flowers.jpeg" height = "100"> |104种花细分类识别 | 0.9788 | [104flowers](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/data/PP-ShiTuV2_application_dataset/104flowers.tar) | [原数据下载地址](https://www.kaggle.com/datasets/msheriey/104-flowers-garden-of-eden) |
-| 交通工具 | <img src="../../../images/ppshitu_application_scenarios/Vechicles.jpg" height = "100"> |车、船等交通工具粗分类识别 | 0.9307 | [Vechicles](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/data/PP-ShiTuV2_application_dataset/Vechicles.tar) | [原数据下载地址](https://www.kaggle.com/datasets/rishabkoul1/vechicle-dataset) |
-| 动物 | <img src="../../../images/ppshitu_application_scenarios/AnimalImageDataset.jpg" height = "100"> |各种动物识别 | 0.9078 | [AnimalImageDataset](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/data/PP-ShiTuV2_application_dataset/AnimalImageDataset.tar) | [原数据下载地址](https://www.kaggle.com/datasets/iamsouravbanerjee/animal-image-dataset-90-different-animals) |
-| 时装 | <img src="../../../images/ppshitu_application_scenarios/FashionProductsImage.jpg" height = "100"> |首饰、挎包、化妆品等时尚商品识别 | 0.9555 | [FashionProductImageSmall](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/data/PP-ShiTuV2_application_dataset/FashionProductImageSmall.tar) | [原数据下载地址](https://www.kaggle.com/datasets/paramaggarwal/fashion-product-images-small) |
-| 球类 | <img src="../../../images/ppshitu_application_scenarios/Ball.jpg" height = "100"> |各种球类识别 | 0.9769 | [Balls](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/data/PP-ShiTuV2_application_dataset/Balls.tar) | [原数据下载地址](https://www.kaggle.com/datasets/gpiosenka/balls-image-classification) |
-| 狗识别 | <img src="../../../images/ppshitu_application_scenarios/DogBreeds.jpg" height = "100"> | 狗细分类识别，包括69种狗的图像 | 0.9606 | 添加技术交流群后即可获得 | [原数据下载地址](https://www.kaggle.com/datasets/gpiosenka/70-dog-breedsimage-data-set) |
-| 宝石 | <img src="../../../images/ppshitu_application_scenarios/Gemstones.jpg" height = "100"> | 宝石种类识别 | 0.9653 | 添加技术交流群后即可获得 | [原数据下载地址](https://www.kaggle.com/datasets/lsind18/gemstones-images) |
-| 鸟类 | <img src="../../../images/ppshitu_application_scenarios/Bird400.jpg" height = "100"> |鸟细分类识别，包括400种各种姿态的鸟类图像 | 0.9673 | 添加技术交流群后即可获得 | [原数据下载地址](https://www.kaggle.com/datasets/gpiosenka/100-bird-species) |
-| 运动种类 | <img src="../../../images/ppshitu_application_scenarios/100sports.jpg" height = "100"> |100种运动图像识别 | 0.9413 | 添加技术交流群后即可获得 | [原数据下载地址](https://www.kaggle.com/datasets/gpiosenka/sports-classification) |
-| 乐器 | <img src="../../../images/ppshitu_application_scenarios/MusicInstruments.jpg" height = "100"> |30种不同乐器种类识别 | 0.9467 | 添加技术交流群后即可获得 | [原数据下载地址](https://www.kaggle.com/datasets/gpiosenka/musical-instruments-image-classification) |
-| 宝可梦 | <img src="../../../images/ppshitu_application_scenarios/Pokemon.png" height = "100"> |宝可梦神奇宝贝识别 | 0.9236 | 添加技术交流群后即可获得 | [原数据下载地址](https://www.kaggle.com/datasets/lantian773030/pokemonclassification) |
-| 船 | <img src="../../../images/ppshitu_application_scenarios/Boat.jpg" height = "100"> |船种类识别 |0.9242 | 添加技术交流群后即可获得 | [原数据下载地址](https://www.kaggle.com/datasets/imsparsh/dockship-boat-type-classification) |
-| 鞋子 | <img src="../../../images/ppshitu_application_scenarios/Shoes.jpeg" height = "100"> |鞋子种类识别，包括靴子、拖鞋等 | 0.9000 | 添加技术交流群后即可获得 | [原数据下载地址](https://www.kaggle.com/datasets/noobyogi0100/shoe-dataset) |
-| 巴黎建筑 | <img src="../../../images/ppshitu_application_scenarios/Paris.jpg" height = "100"> |巴黎著名建筑景点识别，如：巴黎铁塔、圣母院等 | 1.000 | 添加技术交流群后即可获得 | [原数据下载地址](https://www.kaggle.com/datasets/skylord/oxbuildings) |
-| 蝴蝶 | <img src="../../../images/ppshitu_application_scenarios/Butterfly.jpg" height = "100"> |75种蝴蝶细分类识别 | 0.9360 | 添加技术交流群后即可获得 | [原数据下载地址](https://www.kaggle.com/datasets/gpiosenka/butterfly-images40-species) |
-| 野外植物 | <img src="../../../images/ppshitu_application_scenarios/WildEdiblePlants.jpg" height = "100"> |野外植物识别 | 0.9758 | 添加技术交流群后即可获得 | [原数据下载地址](https://www.kaggle.com/datasets/ryanpartridge01/wild-edible-plants) |
-| 天气 | <img src="../../../images/ppshitu_application_scenarios/WeatherImageRecognition.jpg" height = "100"> |各种天气场景识别，如：雨天、打雷、下雪等 | 0.9924 | 添加技术交流群后即可获得 | [原数据下载地址](https://www.kaggle.com/datasets/jehanbhathena/weather-dataset) |
-| 坚果 | <img src="../../../images/ppshitu_application_scenarios/TreeNuts.jpg" height = "100"> |各种坚果种类识别 | 0.9412 | 添加技术交流群后即可获得 | [原数据下载地址](https://www.kaggle.com/datasets/gpiosenka/tree-nuts-image-classification) |
-| 垃圾 | <img src="../../../images/ppshitu_application_scenarios/Garbage12.jpg" height = "100"> |12种垃圾分类识别 | 0.9845 | 添加技术交流群后即可获得 | [原数据下载地址](https://www.kaggle.com/datasets/mostafaabla/garbage-classification) |
-| 航拍场景 | <img src="../../../images/ppshitu_application_scenarios/AID.jpg" height = "100"> |各种航拍场景识别，如机场、火车站等 | 0.9797 | 添加技术交流群后即可获得 | [原数据下载地址](https://www.kaggle.com/datasets/jiayuanchengala/aid-scene-classification-datasets) |
-| 蔬菜 | <img src="../../../images/ppshitu_application_scenarios/Veg200.jpg" height = "100"> |各种蔬菜识别 | 0.8929 | 添加技术交流群后即可获得 | [原数据下载地址](https://www.kaggle.com/datasets/zhaoyj688/vegfru) |
+| 类别 | 场景 |示例图|场景简介|Recall@1|场景库下载地址|原数据集下载地址|
+|:---:|:---:|:---:|:---:|:---:|:---:|-----|
+| 动植物 | 花 | <img src="../../../images/ppshitu_application_scenarios/104flowers.jpeg" height = "100"> |104种花细分类识别 | 0.9788 | [104flowers](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/data/PP-ShiTuV2_application_dataset/104flowers.tar) | [原数据下载地址](https://www.kaggle.com/datasets/msheriey/104-flowers-garden-of-eden) |
+| 动植物 | 蝴蝶     | <img src="../../../images/ppshitu_application_scenarios/Butterfly.jpg" height = "100"> |              75种蝴蝶细分类识别              |  0.9360  |                 [下载地址](#1.2-场景库下载)                  | [原数据下载地址](https://www.kaggle.com/datasets/gpiosenka/butterfly-images40-species) |
+| 动植物 | 野外植物 | <img src="../../../images/ppshitu_application_scenarios/WildEdiblePlants.jpg" height = "100"> |                 32种野外植物识别，包括雏菊、蒲公英等                 |  0.9758  |                 [下载地址](#1.2-场景库下载)                  | [原数据下载地址](https://www.kaggle.com/datasets/ryanpartridge01/wild-edible-plants) |
+| 动植物 | 动物 | <img src="../../../images/ppshitu_application_scenarios/AnimalImageDataset.jpg" height = "100"> |90种动物识别，包括斑马、羚羊等 | 0.9078 | [AnimalImageDataset](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/data/PP-ShiTuV2_application_dataset/AnimalImageDataset.tar) | [原数据下载地址](https://www.kaggle.com/datasets/iamsouravbanerjee/animal-image-dataset-90-different-animals) |
+| 动植物 | 狗识别 | <img src="../../../images/ppshitu_application_scenarios/DogBreeds.jpg" height = "100"> |69种狗细分类识别，包括柴犬等 | 0.9606 | [下载地址](#1.2 场景库下载) | [原数据下载地址](https://www.kaggle.com/datasets/gpiosenka/70-dog-breedsimage-data-set) |
+| 动植物 | 鸟类 | <img src="../../../images/ppshitu_application_scenarios/Bird400.jpg" height = "100"> |400种各种姿态的鸟细分类识别 | 0.9673 | [下载地址](#1.2-场景库下载) | [原数据下载地址](https://www.kaggle.com/datasets/gpiosenka/100-bird-species) |
+| 商品 | 坚果     | <img src="../../../images/ppshitu_application_scenarios/TreeNuts.jpg" height = "100"> |               10种坚果种类识别，包括开心果、核桃、腰果等               |  0.9412  |                 [下载地址](#1.2-场景库下载)                  | [原数据下载地址](https://www.kaggle.com/datasets/gpiosenka/tree-nuts-image-classification) |
+| 商品 | 蔬菜     | <img src="../../../images/ppshitu_application_scenarios/Veg200.jpg" height = "100"> |                 116种蔬菜识别，包括菠菜、胡萝卜、玉米等               |  0.8929  |                 [下载地址](#1.2-场景库下载)                  | [原数据下载地址](https://www.kaggle.com/datasets/zhaoyj688/vegfru) |
+| 商品 | 时装     | <img src="../../../images/ppshitu_application_scenarios/FashionProductsImage.jpg" height = "100"> |       23种时尚商品识别，包括首饰、挎包、化妆品等       |  0.9555  | [FashionProductImageSmall](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/data/PP-ShiTuV2_application_dataset/FashionProductImageSmall.tar) | [原数据下载地址](https://www.kaggle.com/datasets/paramaggarwal/fashion-product-images-small) |
+| 商品 | 鞋子     | <img src="../../../images/ppshitu_application_scenarios/Shoes.jpeg" height = "100"> |        6种鞋子识别，包括靴子、足球鞋等        |  0.9000  |                 [下载地址](#1.2-场景库下载)                  | [原数据下载地址](https://www.kaggle.com/datasets/noobyogi0100/shoe-dataset) |
+| 商品 | 乐器     | <img src="../../../images/ppshitu_application_scenarios/MusicInstruments.jpg" height = "100"> |             30种不同乐器种类识别             |  0.9467  |                 [下载地址](#1.2-场景库下载)                  | [原数据下载地址](https://www.kaggle.com/datasets/gpiosenka/musical-instruments-image-classification) |
+| 商品 | 宝石 | <img src="../../../images/ppshitu_application_scenarios/Gemstones.jpg" height = "100"> | 27种宝石识别，包括萤石、翡翠等 | 0.9653 | [下载地址](#1.2-场景库下载) | [原数据下载地址](https://www.kaggle.com/datasets/lsind18/gemstones-images) |
+| 商品 | 球类     | <img src="../../../images/ppshitu_application_scenarios/Ball.jpg" height = "100"> |                 26种球型物体识别，包括弹珠、足球等                 |  0.9769  | [Balls](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/data/PP-ShiTuV2_application_dataset/Balls.tar) | [原数据下载地址](https://www.kaggle.com/datasets/gpiosenka/balls-image-classification) |
+| 交通 | 交通工具 | <img src="../../../images/ppshitu_application_scenarios/Vechicles.jpg" height = "100"> |          9种交通工具粗分类识别，包括车、船等          |  0.9307  | [Vechicles](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/data/PP-ShiTuV2_application_dataset/Vechicles.tar) | [原数据下载地址](https://www.kaggle.com/datasets/rishabkoul1/vechicle-dataset) |
+| 交通 | 船 | <img src="../../../images/ppshitu_application_scenarios/Boat.jpg" height = "100"> |6种船种类识别，包括游轮、帆船等 |0.9242 | [下载地址](#1.2-场景库下载) | [原数据下载地址](https://www.kaggle.com/datasets/imsparsh/dockship-boat-type-classification) |
+| 交通 | 航拍场景 | <img src="../../../images/ppshitu_application_scenarios/AID.jpg" height = "100"> |      30种航拍场景识别，如机场、火车站等      |  0.9797  |                 [下载地址](#1.2-场景库下载)                  | [原数据下载地址](https://www.kaggle.com/datasets/jiayuanchengala/aid-scene-classification-datasets) |
+| 其他 | 巴黎建筑 | <img src="../../../images/ppshitu_application_scenarios/Paris.jpg" height = "100"> |11个巴黎建筑识别，如：巴黎铁塔、圣母院等 | 1.000 | [下载地址](#1.2-场景库下载) | [原数据下载地址](https://www.kaggle.com/datasets/skylord/oxbuildings) |
+| 其他 | 天气 | <img src="../../../images/ppshitu_application_scenarios/WeatherImageRecognition.jpg" height = "100"> |10种天气场景识别，如：雨天、打雷、下雪等 | 0.9924 | [下载地址](#1.2-场景库下载) | [原数据下载地址](https://www.kaggle.com/datasets/jehanbhathena/weather-dataset) |
+| 其他 | 垃圾 | <img src="../../../images/ppshitu_application_scenarios/Garbage12.jpg" height = "100"> |12种垃圾分类识别 | 0.9845 | [下载地址](#1.2-场景库下载) | [原数据下载地址](https://www.kaggle.com/datasets/mostafaabla/garbage-classification) |
+| 其他 | 运动种类 | <img src="../../../images/ppshitu_application_scenarios/100sports.jpg" height = "100"> |100种运动图像识别 | 0.9413 | [下载地址](#1.2-场景库下载) | [原数据下载地址](https://www.kaggle.com/datasets/gpiosenka/sports-classification) |
+| 其他 | 宝可梦   | <img src="../../../images/ppshitu_application_scenarios/Pokemon.png" height = "100"> |              150种宝可梦神奇宝贝识别，包括皮卡丘、喷火龙等              |  0.9236  |                 [下载地址](#1.2-场景库下载)                  | [原数据下载地址](https://www.kaggle.com/datasets/lantian773030/pokemonclassification) |
+
+
+
+<a name="1.2 场景库下载"></a>
+
+### 1.2 场景库下载
+
+如需下载已经整理后的场景库数据集，可以扫描下方二维码，关注公众号填写问卷后，加入PaddleClas官方交流群获取**20G重磅图像分类学习大礼包**，**内含上述所有场景库数据集**、**垂类模型集合**（包括人员出入管理、生鲜品识别、商品识别等）、70+前沿图像分类与识别论文、历次发版课程视频与优质社区项目等
 
 <div align="center">
-  <img src="https://user-images.githubusercontent.com/11568925/189877049-d17ddcea-22d2-44ab-91fe-36d12af3add8.png" width = "200" height = "200"/>
-<p>添加二维码获取相关场景库及大礼包</p>
+  <img src="https://user-images.githubusercontent.com/11568925/189877049-d17ddcea-22d2-44ab-91fe-36d12af3add8.png" width = "150" height = "150"/>
 </div>
-
 <a name="2. 使用说明"></a>
 
 ## 2. 使用说明
