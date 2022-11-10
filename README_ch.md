@@ -8,7 +8,7 @@
 
 |             PP-ShiTuV2图像识别系统效果展示             |                PULC实用图像分类模型效果展示                 |
 | :----------------------------------------------------: | :---------------------------------------------------------: |
-| <img src="./docs/images/shituv2.gif"  width = "450" /> | <img src="./docs/images/class_simple.gif"  width = "600" /> |
+| <img src="./docs/images/shituv2.gif"  width = "400" /> | <img src="./docs/images/class_simple.gif"  width = "500" /> |
 
 
 ## 📣 近期更新
@@ -52,6 +52,7 @@ PaddleClas支持多种前沿图像分类、识别相关算法，发布产业级�
 <div align="center">
 <img src="./docs/images/quick_start/android_demo/PPShiTu_qrcode.png"  width = "170" height = "170" />
 </div>
+
 ## 👫 开源社区
 
 * **📑项目合作：** 如果您是企业开发者且有明确的图像分类应用需求，填写[问卷](https://paddle.wjx.cn/vm/hnGOjfn.aspx# )后可免费与官方团队展开不同层次的合作。
@@ -95,8 +96,8 @@ PaddleClas支持多种前沿图像分类、识别相关算法，发布产业级�
     - [向量检索](docs/zh_CN/deployment/PP-ShiTu/vector_search.md)
     - [哈希编码](docs/zh_CN/training/PP-ShiTu/deep_hashing.md)
   - PipeLine 推理部署
-    - [基于python预测引擎推理](docs/zh_CN/deployment/image_classification/python.md#2)
-    - [基于C++预测引擎推理](deploy/cpp_shitu/readme.md)
+    - [基于python预测引擎推理](docs/zh_CN/deployment/PP-ShiTu/python.md)
+    - [基于C++预测引擎推理](docs/zh_CN/deployment/PP-ShiTu/cpp.md)
     - [服务化部署](docs/zh_CN/deployment/PP-ShiTu/paddle_serving.md)
     - [端侧部署](docs/zh_CN/deployment/PP-ShiTu/paddle_lite.md)
     - [库管理工具](docs/zh_CN/deployment/PP-ShiTu/gallery_manager.md)
