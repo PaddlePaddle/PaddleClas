@@ -59,7 +59,7 @@ It can be seen that high accuracy can be getted when backbone is SwinTranformer_
 **Note：**
 
 * The Latency is tested on Intel(R) Xeon(R) Gold 6148 CPU @ 2.40GHz. The MKLDNN is enabled and the number of threads is 10.
-* About PP-LCNet, please refer to[PP-LCNet Introduction ](../ImageNet1k/PP-LCNet.md)and[PP-LCNet Paper](https://arxiv.org/abs/2109.15099).
+* About PP-LCNet, please refer to [PP-LCNet Introduction ](../ImageNet1k/PP-LCNet.md)and [PP-LCNet Paper](https://arxiv.org/abs/2109.15099).
 
 
 <a name="2"></a>
