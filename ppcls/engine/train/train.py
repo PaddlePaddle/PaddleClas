@@ -62,7 +62,7 @@ def train_epoch(engine, epoch_id, print_batch_step):
         loss = loss_dict["loss"] / engine.update_freq
 
         # backward & step opt
-        if engine.amp and engine.use_dynamic_loss_scaling::
+        if engine.amp and engine.use_dynamic_loss_scaling:
             scaled = engine.scaler.scale(loss)
             scaled.backward()
             if (iter_id + 1) % engine.update_freq == 0:
