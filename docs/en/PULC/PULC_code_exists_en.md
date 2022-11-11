@@ -98,7 +98,7 @@ pip3 install paddleclas
 
 ### 2.3 Prediction
 
-First, please click[here](https://paddleclas.bj.bcebos.com/data/PULC/pulc_demo_imgs.zip)to download and unzip to get the test demo images.
+First, please click [here](https://paddleclas.bj.bcebos.com/data/PULC/pulc_demo_imgs.zip) to download and unzip to get the test demo images.
 
 * Prediction with CLI
 
@@ -124,7 +124,7 @@ result = model.predict(input_data="pulc_demo_imgs/code_exists/contains_code_demo
 print(next(result))
 ```
 
-**Note**: The `result` returned by `model.predict()` is a generator, so you need to use the `next()` function to call it or `for` loop to loop it. And it will predict with `batch_size` size batch and return the prediction results when called. The default `batch_size` is 1, and you also specify the `batch_size` when instantiating, such as `model = paddleclas.PaddleClas(model_name="person_exists",  batch_size=2)`. The result of demo above:
+**Note**: The `result` returned by `model.predict()` is a generator, so you need to use the `next()` function to call it or `for` loop to loop it. And it will predict with `batch_size` size batch and return the prediction results when called. The default `batch_size` is 1, and you also specify the `batch_size` when instantiating, such as `model = paddleclas.PaddleClas(model_name="codeexists",  batch_size=2)`. The result of demo above:
 
 ```
 >>> result
@@ -202,6 +202,7 @@ The datas under `code_exists` directory:
 ```
 
 Where `train/` and `val/` are training set and validation set respectively. The `train_list.txt` and `val_list.txt` are label files of training data and validation data respectively.
+
 **Note：**
 
 * About the contents format of `train_list.txt` and `val_list.txt`, please refer to [Description about Classification Dataset in PaddleClas](../data_preparation/classification_dataset_en.md).
