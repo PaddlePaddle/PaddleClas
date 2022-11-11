@@ -63,6 +63,7 @@ def train_epoch(engine, epoch_id, print_batch_step):
 
         # backward & step opt
         if engine.amp and engine.use_dynamic_loss_scaling:
+            print("use grad scaler")
             scaled = engine.scaler.scale(loss)
             scaled.backward()
             if (iter_id + 1) % engine.update_freq == 0:
