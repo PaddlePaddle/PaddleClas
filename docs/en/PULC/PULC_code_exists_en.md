@@ -124,7 +124,7 @@ result = model.predict(input_data="pulc_demo_imgs/code_exists/contains_code_demo
 print(next(result))
 ```
 
-**Note**: The `result` returned by `model.predict()` is a generator, so you need to use the `next()` function to call it or `for` loop to loop it. And it will predict with `batch_size` size batch and return the prediction results when called. The default `batch_size` is 1, and you also specify the `batch_size` when instantiating, such as `model = paddleclas.PaddleClas(model_name="codeexists",  batch_size=2)`. The result of demo above:
+**Note**: The `result` returned by `model.predict()` is a generator, so you need to use the `next()` function to call it or `for` loop to loop it. And it will predict with `batch_size` size batch and return the prediction results when called. The default `batch_size` is 1, and you also specify the `batch_size` when instantiating, such as `model = paddleclas.PaddleClas(model_name = "code_exists",  batch_size=2)`. The result of demo above:
 
 ```
 >>> result
