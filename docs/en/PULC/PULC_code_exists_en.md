@@ -1,4 +1,4 @@
-# PULC classification model of whether or not there are AD codes
+# PULC Classification Model of Containing or Uncontaining AD Code
 
 ------
 
@@ -40,7 +40,7 @@
 
 ## 1. Introduction
 
-This case provides a way for users to quickly build a lightweight, high-precision and practical classification model of AD code(Here the definition of AD code includes: QR code, bar code, small program code) exists using PaddleClas PULC (Practical Ultra Lightweight image Classification). The model can be widely used in live broadcast scenarios, audit scenarios, massive data filtering scenarios, etc.
+This case provides a way for users to quickly build a lightweight, high-precision and practical classification model of AD code(Here the definition of AD code includes: QR code, bar code, mini apps code) exists using PaddleClas PULC (Practical Ultra Lightweight image Classification). The model can be widely used in live broadcast scenarios, audit scenarios, massive data filtering scenarios, etc.
 
 The following table lists the relevant indicators of the model. The first two lines means that using SwinTransformer_tiny and MobileNetV3_small_x0_35 as the backbone to training. The third to sixth lines means that the backbone is replaced by PPLCNet, additional use of EDA strategy and additional use of EDA strategy and SKL-UGI knowledge distillation strategy.
 
@@ -54,7 +54,7 @@ The following table lists the relevant indicators of the model. The first two li
 | PPLCNet_x1_0  | 94.62 | 2.13  | 7.0 | using SSLD pretrained model + EDA strategy |
 | <b>PPLCNet_x1_0<b>  | <b>94.94<b> | <b>2.13<b>  | <b>7.0<b> | using SSLD pretrained model + EDA strategy + SKL-UGI knowledge distillation strategy|
 
-It can be seen that high accuracy can be getted when backbone is SwinTranformer_tiny, but the speed is slow. Replacing backbone with the lightweight model MobileNetV3_small_x0_35, the speed can be greatly improved, but the accuracy will be greatly reduced. Replacing backbone with faster backbone PPLCNet_x1_0, the accuracy is higher more 7 percentage points than MobileNetv3_small_x0_35. At the same time, the speed can be more than 20% faster. After additional using the SSLD pretrained model, the accuracy can be improved by about 0.8 percentage points without affecting the inference speed. Further, additional using the EDA strategy, the accuracy can be increased by 0.2 percentage points. Finally, after additional using the SKL-UGI knowledge distillation, the accuracy can be further improved by 0.3 percentage points. At this point, the Tpr is close to that of SwinTranformer_tiny, but the speed is more than 40 times faster. The training method and deployment instructions of PULC will be introduced in detail below.
+It can be seen that high accuracy can be getted when backbone is SwinTranformer_tiny, but the speed is slow. Replacing backbone with the lightweight model MobileNetV3_small_x0_35, the speed can be greatly improved, but the accuracy will be greatly reduced. Replacing backbone with faster backbone PPLCNet_x1_0, the accuracy is higher more 7 percentage points than MobileNetv3_small_x0_35. At the same time, the speed can be more than 20% faster. After additional using the SSLD pretrained model, the accuracy can be improved by about 0.8 percentage points without affecting the inference speed. Further, additional using the EDA strategy, the accuracy can be increased by 0.2 percentage points. Finally, after additional using the SKL-UGI knowledge distillation, the accuracy can be further improved by 0.3 percentage points. At this point, the accuracy is close to that of SwinTranformer_tiny, but the speed is more than 40 times faster. The training method and deployment instructions of PULC will be introduced in detail below.
 
 **Note：**
 
@@ -82,7 +82,7 @@ python3 -m pip install paddlepaddle-gpu -i https://mirror.baidu.com/pypi/simple
 python3 -m pip install paddlepaddle -i https://mirror.baidu.com/pypi/simple
 ```
 
-Please refer to[PaddlePaddle Installation ](https://www.paddlepaddle.org.cn/install/quick)for more information about installation, for examples other versions.
+Please refer to [PaddlePaddle Installation ](https://www.paddlepaddle.org.cn/install/quick) for more information about installation, for examples other versions.
 
 <a name="2.2"></a>  
 
@@ -349,7 +349,7 @@ python3 tools/export_model.py \
     -o Global.pretrained_model=output/DistillationModel/best_model_student \
     -o Global.save_inference_dir=deploy/models/PPLCNet_x1_0_code_exists_infer
 ```
-After running above command, the inference model files would be saved in `deploy/models/PPLCNet_x1_0_person_exists_infer`, as shown below:
+After running above command, the inference model files would be saved in `deploy/models/PPLCNet_x1_0_code_exists_infer`, as shown below:
 
 ```
 ├── PPLCNet_x1_0_code_exists_infer
@@ -369,7 +369,7 @@ You can also download directly.
 ```
 cd deploy/models
 # download the inference model and decompression
-wget https://paddleclas.bj.bcebos.com/models/PULC/person_exists_infer.tar && tar -xf person_exists_infer.tar
+wget https://paddleclas.bj.bcebos.com/models/PULC/code_exists_infer.tar && tar -xf code_exists_infer.tar
 ```
 
 After decompression, the directory `models` should be shown below.
@@ -429,7 +429,7 @@ no_code_demo.jpg:    class id(s): [0], score(s): [1.00], label_name(s): ['no_cod
 contains_code_demo.jpg:    class id(s): [1], score(s): [1.00], label_name(s): ['contains_code']
 ```
 
-Among the prediction results above,`contains_code` means that there is a AD code in the image,`no-code` means that there is no human in the image.
+Among the prediction results above,`contains_code` means that there are AD codes in the image,`no-code` means that there is no AD code in the image.
 
 <a name="6.3"></a>
 
