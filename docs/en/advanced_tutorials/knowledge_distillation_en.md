@@ -677,8 +677,8 @@ Performance on ImageNet1k is shown below.
 
 | Strategy | Backbone | Config | Top-1 acc | Download Link |
 | --- | --- | --- | --- | --- |
-| baseline | ResNet18 | [ResNet18.yaml](../../../../ppcls/configs/ImageNet/ResNet/ResNet18.yaml) | 70.8% | - |
-| SKD | ResNet18 | [resnet34_distill_resnet18_skd.yaml](../../../../ppcls/configs/ImageNet/Distillation/resnet34_distill_resnet18_skd.yaml) | 72.84%(**+2.04%**) | - |
+| baseline | ResNet18 | [ResNet18.yaml](../../../ppcls/configs/ImageNet/ResNet/ResNet18.yaml) | 70.8% | - |
+| SKD | ResNet18 | [resnet34_distill_resnet18_skd.yaml](../../../ppcls/configs/ImageNet/Distillation/resnet34_distill_resnet18_skd.yaml) | 72.84%(**+2.04%**) | - |
 
 
 ##### 1.2.9.2 Configuration of SKD
