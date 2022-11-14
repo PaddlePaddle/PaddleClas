@@ -8,7 +8,7 @@ BASEDIR=$(dirname "$0")
 FILENAME=$1
 sed -i 's/gpu_list.*$/gpu_list:0/g' $FILENAME
 sed -i '23,$d' $FILENAME
-sed -i 's/-o Global.device:.*$/-o Global.device:cpu/g' $FILENAME
+#sed -i 's/-o Global.device:.*$/-o Global.device:cpu/g' $FILENAME
 sed -i '16s/$/ -o Global.print_batch_step=1/' ${FILENAME}
 
 
@@ -21,6 +21,9 @@ LOG_PATH="./test_tipc/output/${model_name}/${MODE}"
 rm -rf $LOG_PATH
 mkdir -p ${LOG_PATH}
 status_log="${LOG_PATH}/results_python.log"
+
+# make cudnn algorithm deterministic, such as conv.
+export FLAGS_cudnn_deterministic=True
 
 # start dygraph train
 dygraph_output=$LOG_PATH/python_train_infer_dygraph_output.txt
