@@ -132,7 +132,7 @@ def convert_cfg_to_dali(op_name: str, device: str, **op_cfg) -> Dict[str, Any]:
             dali_op_cfg.update({"resize_shorter": resize_short})
         if interpolation is not None:
             dali_op_cfg.update({"interp_type": INTERP_MAP[interpolation]})
-        dali_op_cfg.update({"antialias": False})
+        # dali_op_cfg.update({"antialias": False})
     elif op_name == "CropImage":
         size = op_cfg.get("size", 224)
         size = make_pair(size)
@@ -264,8 +264,8 @@ def convert_cfg_to_dali(op_name: str, device: str, **op_cfg) -> Dict[str, Any]:
         std = op_cfg.get("std", [0.229, 0.224, 0.225])
         std = [v / scale for v in std]
         pad_output = op_cfg.get("channel_num", 3) == 4
-        if dtype is not None:
-            dali_op_cfg.update({"dtype": dtype})
+        prob = op_cfg.get("prob", 0.5)
+        dali_op_cfg.update({"dtype": dtype})
         if output_layout is not None:
             dali_op_cfg.update({"output_layout": output_layout})
         if size is not None:
@@ -276,6 +276,8 @@ def convert_cfg_to_dali(op_name: str, device: str, **op_cfg) -> Dict[str, Any]:
             dali_op_cfg.update({"std": std})
         if pad_output is not None:
             dali_op_cfg.update({"pad_output": pad_output})
+        if prob is not None:
+            dali_op_cfg.update({"prob": prob})
     else:
         raise ValueError(
             f"DALI operator \"{op_name}\" is not implemented now.")
@@ -359,6 +361,26 @@ def build_dali_transforms(op_cfg_list: List[Dict[str, Any]],
                     fused_flag = True
                     logger.info(
                         f"DALI Operator conversion: [RandCropImage, RandFlipImage, NormalizeImage] -> {type_name(dali_op_list[-1])}: {fused_op_param}"
+                    )
+            if idx + 1 < num_cfg_node:
+                op_name_nxt = list(op_cfg_list[idx + 1])[0]
+                if (op_name == "CropImage" and
+                        op_name_nxt == "NormalizeImage"):
+                    fused_op_name = "CropMirrorNormalize"
+                    fused_op_param = convert_cfg_to_dali(
+                        fused_op_name, device, **{
+                            **
+                            op_param,
+                            **
+                            (op_cfg_list[idx + 1][op_name_nxt]),
+                            "prob": 0.0
+                        })
+                    fused_dali_op = eval(fused_op_name)(**fused_op_param)
+                    idx += 2
+                    dali_op_list.append(fused_dali_op)
+                    fused_flag = True
+                    logger.info(
+                        f"DALI Operator conversion: [CropImage, NormalizeImage] -> {type_name(dali_op_list[-1])}: {fused_op_param}"
                     )
         if not enable_fuse or not fused_flag:
             assert isinstance(op_cfg,
@@ -595,10 +617,10 @@ def dali_dataloader(config,
             shard_id = int(env["PADDLE_TRAINER_ID"])
             num_shards = int(env["PADDLE_TRAINERS_NUM"])
             device_id = int(env["FLAGS_selected_gpus"])
-            logger.info(f"num_shards: {num_shards}, num_gpus: {num_gpus}")
         else:
             shard_id = 0
             num_shards = 1
+        logger.info(f"num_shards: {num_shards}, num_gpus: {num_gpus}")
         random_shuffle = True
 
         if sampler_name in ["PKSampler", "DistributedRandomIdentitySampler"]:
@@ -640,6 +662,7 @@ def dali_dataloader(config,
         else:
             shard_id = 0
             num_shards = 1
+        logger.info(f"num_shards: {num_shards}, num_gpus: {num_gpus}")
         random_shuffle = False
 
         pipe = HybridPipeline(device, batch_size, py_num_workers, num_threads,
