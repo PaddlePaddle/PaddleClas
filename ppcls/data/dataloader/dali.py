@@ -26,24 +26,23 @@ import nvidia.dali.pipeline as pipeline
 import nvidia.dali.types as types
 import paddle
 from nvidia.dali.plugin.paddle import DALIGenericIterator
-from ppcls.utils import logger
-from ppcls.engine.train.utils import type_name
-
-from ppcls.data.preprocess.ops.dali_operators import ResizeImage
-from ppcls.data.preprocess.ops.dali_operators import DecodeImage
+from ppcls.data.preprocess.ops.dali_operators import ColorJitter
 from ppcls.data.preprocess.ops.dali_operators import CropImage
-from ppcls.data.preprocess.ops.dali_operators import RandomCropImage
+from ppcls.data.preprocess.ops.dali_operators import CropMirrorNormalize
+from ppcls.data.preprocess.ops.dali_operators import DecodeImage
+from ppcls.data.preprocess.ops.dali_operators import DecodeRandomResizedCrop
+from ppcls.data.preprocess.ops.dali_operators import NormalizeImage
+from ppcls.data.preprocess.ops.dali_operators import Pad
 from ppcls.data.preprocess.ops.dali_operators import RandCropImage
 from ppcls.data.preprocess.ops.dali_operators import RandCropImageV2
 from ppcls.data.preprocess.ops.dali_operators import RandFlipImage
-from ppcls.data.preprocess.ops.dali_operators import NormalizeImage
-from ppcls.data.preprocess.ops.dali_operators import ToCHWImage
-from ppcls.data.preprocess.ops.dali_operators import ColorJitter
-from ppcls.data.preprocess.ops.dali_operators import RandomRotation
-from ppcls.data.preprocess.ops.dali_operators import Pad
+from ppcls.data.preprocess.ops.dali_operators import RandomCropImage
 from ppcls.data.preprocess.ops.dali_operators import RandomRot90
-from ppcls.data.preprocess.ops.dali_operators import DecodeRandomResizedCrop
-from ppcls.data.preprocess.ops.dali_operators import CropMirrorNormalize
+from ppcls.data.preprocess.ops.dali_operators import RandomRotation
+from ppcls.data.preprocess.ops.dali_operators import ResizeImage
+from ppcls.data.preprocess.ops.dali_operators import ToCHWImage
+from ppcls.engine.train.utils import type_name
+from ppcls.utils import logger
 
 INTERP_MAP = {
     "nearest": types.DALIInterpType.INTERP_NN,  # cv2.INTER_NEAREST
