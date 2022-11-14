@@ -12,7 +12,7 @@
 - [2. PP-ShiTu PC端 demo 快速体验](#2-pp-shitu-pc端-demo-快速体验)
   - [2.1 环境配置](#21-环境配置)
   - [2.2 图像识别体验](#22-图像识别体验)
-    - [2.2.1 下载、解压 inference 模型与 demo 数据](#221-下载解压-inference-模型与-demo-数据)
+    - [2.2.1 下载、解压 demo 数据](#221-下载解压-demo-数据)
     - [2.2.2 瓶装饮料识别与检索](#222-瓶装饮料识别与检索)
       - [2.2.2.1 识别单张图像](#2221-识别单张图像)
       - [2.2.2.2 基于文件夹的批量识别](#2222-基于文件夹的批量识别)
@@ -82,13 +82,17 @@
 
 ### 2.1 环境配置
 
-* 安装：请先参考文档 [环境准备](../installation.md) 配置 PaddleClas 运行环境。
+* **[推荐]** 直接 pip 安装：
 
-* 进入 `deploy` 运行目录。本部分所有内容与命令均需要在 `deploy` 目录下运行，可以通过下面的命令进入 `deploy` 目录。
+```bash
+pip3 install paddleclas
+```
 
-  ```shell
-  cd deploy
-  ```
+* 如需使用 PaddleClas develop 分支体验最新功能，或是需要基于 PaddleClas 进行二次开发，请本地构建安装：
+
+```bash
+python3 setup.py install
+```
 
 <a name="图像识别体验"></a>
 
@@ -125,19 +129,11 @@
 
 <a name="2.2.1"></a>
 
-#### 2.2.1 下载、解压 inference 模型与 demo 数据
+#### 2.2.1 下载、解压 demo 数据
 
 下载 demo 数据集以及轻量级主体检测、识别模型，命令如下。
 
 ```shell
-mkdir models
-cd models
-# 下载通用检测 inference 模型并解压
-wget https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/inference/picodet_PPLCNet_x2_5_mainbody_lite_v1.0_infer.tar && tar -xf picodet_PPLCNet_x2_5_mainbody_lite_v1.0_infer.tar
-# 下载识别 inference 模型并解压
-wget https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/inference/PP-ShiTuV2/general_PPLCNetV2_base_pretrained_v1.0_infer.tar && tar -xf general_PPLCNetV2_base_pretrained_v1.0_infer.tar
-
-cd ../
 # 下载 demo 数据并解压
 wget https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/data/drink_dataset_v2.0.tar && tar -xf drink_dataset_v2.0.tar
 ```
@@ -155,42 +151,33 @@ wget https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/data/drink_da
 
 其中 `gallery` 文件夹中存放的是用于构建索引库的原始图像，`index` 表示基于原始图像构建得到的索引库信息，`test_images` 文件夹中存放的是用于测试识别效果的图像列表。
 
-`models` 文件夹下应有如下文件结构：
-
-```log
-├── general_PPLCNetV2_base_pretrained_v1.0_infer
-│   ├── inference.pdiparams
-│   ├── inference.pdiparams.info
-│   └── inference.pdmodel
-├── picodet_PPLCNet_x2_5_mainbody_lite_v1.0_infer
-│   ├── inference.pdiparams
-│   ├── inference.pdiparams.info
-│   └── inference.pdmodel
-```
-
 **注意**
 
 如果使用服务端通用识别模型，Demo 数据需要重新提取特征、够建索引，方式如下：
 
+**在命令行中构建索引库**
 ```shell
-python3.7 python/build_gallery.py \
--c configs/inference_general.yaml \
--o Global.rec_inference_model_dir=./models/general_PPLCNetV2_base_pretrained_v1.0_infer
+paddleclas --build_gallery=True --model_name="PP-ShiTuV2" \
+-o IndexProcess.image_root=./drink_dataset_v2.0/gallery/ \
+-o IndexProcess.index_dir=./drink_dataset_v2.0/index \
+-o IndexProcess.data_file=./drink_dataset_v2.0/gallery/drink_label.txt
 ```
+其中参数`build_gallery(bool)`控制是否使用索引库构建模式，默认为`False`。
+
+同时可以通过`-o`指令更改构建索引库使用的配置，字段说明如下：
+
+- IndexProcess.image_root(str): 构建索引库使用的`gallery`图像地址。
+- IndexProcess.index_dir(str): 索引库存放地址。
+- IndexProcess.data_file(str): 构建索引库图像的真值文件。
+
+
 
 <a name="瓶装饮料识别与检索"></a>
 
 #### 2.2.2 瓶装饮料识别与检索
 
-以瓶装饮料识别 demo 为例，展示识别与检索过程（如果希望尝试其他方向的识别与检索效果，在下载解压好对应的 demo 数据与模型之后，替换对应的配置文件即可完成预测）。
+以瓶装饮料识别 demo 为例，展示识别与检索过程（如果希望尝试其他方向的识别与检索效果，在下载解压好对应的 demo 数据之后，替换命令中对应的文件地址即可）。
 
-注意，此部分使用了 `faiss` 作为检索库，安装方法如下：
-
-```python
-python3.7 -m pip install faiss-cpu==1.7.1post2
-```
-
-若使用时，不能正常引用，则 `uninstall` 之后，重新 `install`，尤其是 windows 下。
 
 <a name="识别单张图像"></a>
 
@@ -202,74 +189,53 @@ python3.7 -m pip install faiss-cpu==1.7.1post2
 
 ![](../../images/recognition/drink_data_demo/test_images/100.jpeg)
 
+**在命令行中进行识别和检索**
 ```shell
-# 使用下面的命令使用 GPU 进行预测
-python3.7 python/predict_system.py -c configs/inference_general.yaml
+paddleclas --model_name=PP-ShiTuV2 --predict_type=shitu \
+-o Global.infer_imgs='./drink_dataset_v2.0/test_images/100.jpeg' \
+-o IndexProcess.index_dir='./drink_dataset_v2.0/index'
+```
+其中参数`model_name`为用于检索和识别的模型、`predict_type`设置为'shitu'模式。
 
-# 使用下面的命令使用 CPU 进行预测
-python3.7 python/predict_system.py -c configs/inference_general.yaml -o Global.use_gpu=False
+同时可以通过`-o`指令更改检索图像以及索引库，字段说明如下：
+- Global.infer_imgs(str)：待检索图像地址。
+- IndexProcess.index_dir(str): 索引库存放地址。
+
+最终输出结果如下：
+```
+[{'bbox': [437, 71, 660, 728], 'rec_docs': '元气森林', 'rec_scores': 0.7740249}, {'bbox': [221, 72, 449, 701], 'rec_docs': '元气森林', 'rec_scores': 0.6950992}, {'bbox': [794, 104, 979, 652], 'rec_docs': '元气森林', 'rec_scores': 0.6305153}], filename: ./drink_dataset_v2.0/test_images/100.jpeg
 ```
 
-
-最终输出结果如下。
-
-```log
-[{'bbox': [437, 71, 660, 728], 'rec_docs': '元气森林', 'rec_scores': 0.7740249}, {'bbox': [221, 72, 449, 701], 'rec_docs': '元气森林', 'rec_scores': 0.6950992}, {'bbox': [794, 104, 979, 652], 'rec_docs': '元气森林', 'rec_scores': 0.6305153}]
-```
 
 其中 `bbox` 表示检测出的主体所在位置，`rec_docs` 表示索引库中与检测框最为相似的类别，`rec_scores` 表示对应的置信度。
 
-检测的可视化结果默认保存在 `output` 文件夹下，对于本张图像，识别结果可视化如下所示。
-
-![](../../images/recognition/drink_data_demo/output/100.jpeg)
-
-识别流程支持灵活配置，用户可以选择不使用主体检测模型，而直接将单幅整图输入到特征提取模型，计算特征向量供后续检索使用，从而减少整体识别流程的耗时。可以按照以下命令直接进行整图识别
-```shell
-# 使用下面的命令使用 GPU 进行整图预测
-python3.7 python/predict_system.py -c configs/inference_general.yaml -o Global.det_inference_model_dir=None
-
-# 使用下面的命令使用 CPU 进行整图预测
-python3.7 python/predict_system.py -c configs/inference_general.yaml -o Global.use_gpu=False -o Global.det_inference_model_dir=None
-```
-
-最终输出结果如下
-```log
-INFO: Found 'Global.det_inference_model_dir' empty(), so det_predictor is disabled
-[{'bbox': [0, 0, 1200, 802], 'rec_docs': '元气森林', 'rec_scores': 0.5696486}]
-```
 
 <a name="基于文件夹的批量识别"></a>
 
 ##### 2.2.2.2 基于文件夹的批量识别
 
-如果希望预测文件夹内的图像，可以直接修改配置文件中的 `Global.infer_imgs` 字段，也可以通过下面的 `-o` 参数修改对应的配置。
+如果希望预测文件夹内的图像，可以直接修改命令行中的 `-o` 参数对应的`Global.infer_imgs` 字段配置。
 
+**在命令行中进行识别和检索**
 ```shell
-# 使用下面的命令使用 GPU 进行预测，如果希望使用 CPU 预测，可以在命令后面添加 -o Global.use_gpu=False
-python3.7 python/predict_system.py -c configs/inference_general.yaml -o Global.infer_imgs="./drink_dataset_v2.0/test_images/"
+paddleclas --model_name=PP-ShiTuV2 --predict_type=shitu \
+-o Global.infer_imgs='./drink_dataset_v2.0/test_images' \
+-o IndexProcess.index_dir='./drink_dataset_v2.0/index'
 ```
 
 终端中会输出该文件夹内所有图像的识别结果，如下所示。
 
 ```log
 ...
-[{'bbox': [0, 0, 600, 600], 'rec_docs': '红牛-强化型', 'rec_scores': 0.74081033}]
-Inference: 120.39852142333984 ms per batch image
-[{'bbox': [0, 0, 514, 436], 'rec_docs': '康师傅矿物质水', 'rec_scores': 0.6918598}]
-Inference: 32.045602798461914 ms per batch image
-[{'bbox': [138, 40, 573, 1198], 'rec_docs': '乐虎功能饮料', 'rec_scores': 0.68214047}]
-Inference: 113.41428756713867 ms per batch image
-[{'bbox': [328, 7, 467, 272], 'rec_docs': '脉动', 'rec_scores': 0.60406065}]
-Inference: 122.04337120056152 ms per batch image
-[{'bbox': [242, 82, 498, 726], 'rec_docs': '味全_每日C', 'rec_scores': 0.5428652}]
-Inference: 37.95266151428223 ms per batch image
-[{'bbox': [437, 71, 660, 728], 'rec_docs': '元气森林', 'rec_scores': 0.7740249}, {'bbox': [221, 72, 449, 701], 'rec_docs': '元气森林', 'rec_scores': 0.6950992}, {'bbox': [794, 104, 979, 652], 'rec_docs': '元气森林', 'rec_scores': 0.6305153}]
+[{'bbox': [0, 0, 600, 600], 'rec_docs': '红牛-强化型', 'rec_scores': 0.74081033}], filename: ./drink_dataset_v2.0/test_images/001.jpeg
+[{'bbox': [0, 0, 514, 436], 'rec_docs': '康师傅矿物质水', 'rec_scores': 0.6918598}], filename: ./drink_dataset_v2.0/test_images/002.jpeg
+[{'bbox': [138, 40, 573, 1198], 'rec_docs': '乐虎功能饮料', 'rec_scores': 0.68214047}], filename: ./drink_dataset_v2.0/test_images/003.jpeg
+[{'bbox': [328, 7, 467, 272], 'rec_docs': '脉动', 'rec_scores': 0.60406065}], filename: ./drink_dataset_v2.0/test_images/004.jpeg
+[{'bbox': [242, 82, 498, 726], 'rec_docs': '味全_每日C', 'rec_scores': 0.5428652}], filename: ./drink_dataset_v2.0/test_images/005.jpeg
+[{'bbox': [437, 71, 660, 728], 'rec_docs': '元气森林', 'rec_scores': 0.7740249}, {'bbox': [221, 72, 449, 701], 'rec_docs': '元气森林', 'rec_scores': 0.6950992}, {'bbox': [794, 104, 979, 652], 'rec_docs': '元气森林', 'rec_scores': 0.6305153}], filename: ./drink_dataset_v2.0/test_images/100.jpeg
 ...
 ```
 
-所有图像的识别结果可视化图像也保存在 `output` 文件夹内。
-
-更多地，可以通过修改 `Global.rec_inference_model_dir` 字段来更改识别 inference 模型的路径，通过修改 `IndexProcess.index_dir` 字段来更改索引库索引的路径。
 
 <a name="未知类别的图像识别体验"></a>
 
@@ -283,9 +249,11 @@ Inference: 37.95266151428223 ms per batch image
 
 执行如下识别命令
 
+**在命令行中进行识别和检索**
 ```shell
-# 使用下面的命令使用 GPU 进行预测，如果希望使用 CPU 预测，可以在命令后面添加 -o Global.use_gpu=False
-python3.7 python/predict_system.py -c configs/inference_general.yaml -o Global.infer_imgs="./drink_dataset_v2.0/test_images/mosilian.jpeg"
+paddleclas --model_name=PP-ShiTuV2 --predict_type=shitu \
+-o Global.infer_imgs='./drink_dataset_v2.0/test_images/mosilian.jpeg' \
+-o IndexProcess.index_dir='./drink_dataset_v2.0/index'
 ```
 
 可以发现输出结果为空
@@ -310,9 +278,14 @@ python3.7 python/predict_system.py -c configs/inference_general.yaml -o Global.i
 
 使用下面的命令构建新的索引库 `index_all`。
 
+**在命令行中构建索引库**
 ```shell
-python3.7 python/build_gallery.py -c configs/inference_general.yaml -o IndexProcess.data_file="./drink_dataset_v2.0/gallery/drink_label_all.txt" -o IndexProcess.index_dir="./drink_dataset_v2.0/index_all"
+paddleclas --build_gallery=True --model_name="PP-ShiTuV2" \
+-o IndexProcess.image_root=./drink_dataset_v2.0/gallery/ \
+-o IndexProcess.index_dir=./drink_dataset_v2.0/index_all \
+-o IndexProcess.data_file=./drink_dataset_v2.0/gallery/drink_label_all.txt
 ```
+其中参数`build_gallery(bool)`控制是否使用索引库构建模式，默认为`False`。
 
 最终构建完毕的新的索引库保存在文件夹 `./drink_dataset_v2.0/index_all` 下。具体 `yaml` 请参考[向量检索文档](../deployment/PP-ShiTu/vector_search.md)。
 
@@ -322,20 +295,17 @@ python3.7 python/build_gallery.py -c configs/inference_general.yaml -o IndexProc
 
 使用新的索引库，重新对 `mosilian.jpeg` 图像进行识别，运行命令如下。
 
+**在命令行中进行识别和检索**
 ```shell
-# 使用下面的命令使用 GPU 进行预测，如果希望使用 CPU 预测，可以在命令后面添加 -o Global.use_gpu=False
-python3.7 python/predict_system.py -c configs/inference_general.yaml -o Global.infer_imgs="./drink_dataset_v2.0/test_images/mosilian.jpeg" -o IndexProcess.index_dir="./drink_dataset_v2.0/index_all"
+paddleclas --model_name=PP-ShiTuV2 --predict_type=shitu \
+-o Global.infer_imgs='./drink_dataset_v2.0/test_images/mosilian.jpeg' \
+-o IndexProcess.index_dir='./drink_dataset_v2.0/index_all'
 ```
-
 输出结果如下。
 
 ```log
-[{'bbox': [290, 297, 564, 919], 'rec_docs': '光明_莫斯利安', 'rec_scores': 0.59137374}]
+[{'bbox': [290, 297, 564, 919], 'rec_docs': '光明_莫斯利安', 'rec_scores': 0.59137374}], filename: ./drink_dataset_v2.0/test_images/mosilian.jpeg
 ```
-
-最终识别结果为 `光明_莫斯利安` ，识别正确，识别结果可视化如下所示。
-
-![](../../images/recognition/drink_data_demo/output/mosilian.jpeg)
 
 
 <a name="5"></a>

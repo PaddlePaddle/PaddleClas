@@ -4,7 +4,7 @@ Global:
   pretrained_model: null
   output_dir: ./output/
   device: gpu
-  save_interval: 1
+  save_interval: 5
   eval_during_train: True
   eval_interval: 1
   start_eval_epoch: 1
@@ -21,7 +21,7 @@ Global:
 
 # model architecture
 Arch:
-  name: ResNet50_vd
+  name: PPLCNet_x1_0
   class_num: 2
   pretrained: True
   use_ssld: True
@@ -54,14 +54,14 @@ DataLoader:
   Train:
     dataset:
       name: ImageNetDataset
-      image_root: ./dataset/code_img/
-      cls_label_path: ./dataset/code_img/train_list.txt
+      image_root: ./dataset/code_exists/
+      cls_label_path: ./dataset/code_exists/train_list.txt
       transform_ops:
         - DecodeImage:
             to_rgb: True
             channel_first: False
         - RandCropImage:
-            size: 224
+            size: 192
         - RandFlipImage:
             flip_code: 1
         - NormalizeImage:
@@ -89,8 +89,8 @@ DataLoader:
   Eval:
     dataset: 
       name: ImageNetDataset
-      image_root: ./dataset/code_img/
-      cls_label_path: ./dataset/code_img/val_list.txt
+      image_root: ./dataset/code_exists/
+      cls_label_path: ./dataset/code_exists/val_list.txt
       transform_ops:
         - DecodeImage:
             to_rgb: True

@@ -6,23 +6,12 @@
 
 PaddleClas is an image classification and image recognition toolset for industry and academia, helping users train better computer vision models and apply them in real scenarios.
 
-<div align="center">
-<img src="./docs/images/shituv2.gif"  width = "450" />
-<p>PP-ShiTuV2 demo images</p>
-</div>
+|                       PP-ShiTuV2                       | PULC: **P**ractical **U**ltra **L**ight-weight image **C**lassification solutions |
+| :----------------------------------------------------: | :----------------------------------------------------------: |
+| <img src="./docs/images/shituv2.gif"  width = "450" /> | <img src="./docs/images/class_simple_en.gif"  width = "600" /> |
 
+## 📣 Recent updates
 
-
-
-<div align="center">
-<img src="./docs/images/class_simple_en.gif"  width = "600" />
-
-PULC demo images
-</div>
-
-
-
-**Recent updates**
 - 🔥️ Release [PP-ShiTuV2](./docs/en/PPShiTu/PPShiTuV2_introduction.md), recall1 is improved by nearly 8 points, covering 20+ recognition scenarios, with [index management tool](./deploy/shitu_index_manager) and [Android Demo](./docs/en/quick_start/quick_start_recognition_en.md) for better experience.
 - 2022.6.15 Release [**P**ractical **U**ltra **L**ight-weight image **C**lassification solutions](./docs/en/PULC/PULC_quickstart_en.md). PULC models inference within 3ms on CPU devices, with accuracy on par with SwinTransformer. We also release 9 practical classification models covering pedestrian, vehicle and OCR scenario.
 - 2022.4.21 Added the related [code](https://github.com/PaddlePaddle/PaddleClas/pull/1820/files) of the CVPR2022 oral paper [MixFormer](https://arxiv.org/pdf/2204.02557.pdf).
@@ -34,11 +23,9 @@ For the introduction of PP-LCNet, please refer to [paper](https://arxiv.org/pdf/
 - 2021.06.16 PaddleClas release/2.2. Add metric learning and vector search modules. Add product recognition, animation character recognition, vehicle recognition and logo recognition. Added 30 pretrained models of LeViT, Twins, TNT, DLA, HarDNet, and RedNet, and the accuracy is roughly the same as that of the paper.
 - [more](./docs/en/others/update_history_en.md)
 
-## Features
+## 🌟 Features
 
-PaddleClas release PP-HGNet、PP-LCNetv2、 PP-LCNet and **S**imple **S**emi-supervised **L**abel **D**istillation algorithms, and support plenty of
-image classification and image recognition algorithms.
-Based on th algorithms above, PaddleClas release PP-ShiTu image recognition system and [**P**ractical **U**ltra **L**ight-weight image **C**lassification solutions](docs/en/PULC/PULC_quickstart_en.md).
+PaddleClas release PP-HGNet、PP-LCNetv2、 PP-LCNet and **S**imple **S**emi-supervised **L**abel **D**istillation algorithms, and support plenty of image classification and image recognition algorithms.Based on th algorithms above, PaddleClas release PP-ShiTu image recognition system and [**P**ractical **U**ltra **L**ight-weight image **C**lassification solutions](docs/en/PULC/PULC_quickstart_en.md).
 
 
 ![](https://user-images.githubusercontent.com/11568925/189268878-43d9d35b-90cf-425a-859e-767f8d94c5f7.png)
@@ -92,7 +79,10 @@ Quick experience of **P**ractical **U**ltra **L**ight-weight image **C**lassific
     - [PULC Classification Model of Text Image Orientation](docs/en/PULC/PULC_text_image_orientation_en.md)
     - [PULC Classification Model of Textline Orientation](docs/en/PULC/PULC_textline_orientation_en.md)
     - [PULC Classification Model of Language](docs/en/PULC/PULC_language_classification_en.md)
-- [Quick Start of Recognition](./docs/en/quick_start/quick_start_recognition_en.md)
+- PP Series Backbone
+    - [PP-HGNet](docs/en/models/PP-HGNet_en.md)
+    - [PP-LCNet](docs/en/models/PP-LCNet_en.md)
+    - [PP-LCNetv2](docs/en/models/PP-LCNetv2_en.md)
 - [Introduction to Image Recognition Systems](#Introduction_to_Image_Recognition_Systems)
 - [Image Recognition Demo images](#Rec_Demo_images)
 - [PULC demo images](#Clas_Demo_images)
@@ -103,7 +93,7 @@ Quick experience of **P**ractical **U**ltra **L**ight-weight image **C**lassific
     - [Vector Search](./deploy/vector_search/README.md)
 - Inference Model Prediction
     - [Python Inference](./docs/en/inference_deployment/python_deploy_en.md)
-    - [C++ Classfication Inference](./deploy/cpp/readme_en.md)， [C++ PP-ShiTu Inference](deploy/cpp_shitu/readme_en.md)
+    - [C++ Classfication Inference](./deploy/cpp/readme_en.md)
 - Model Deploy (only support classification for now, recognition coming soon)
     - [Hub Serving Deployment](./deploy/hubserving/readme_en.md)
     - [Mobile Deployment](./deploy/lite/readme_en.md)

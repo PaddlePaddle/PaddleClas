@@ -47,7 +47,7 @@ class AverageMeter(object):
     @property
     def avg_info(self):
         if isinstance(self.avg, paddle.Tensor):
-            self.avg = self.avg.numpy()[0]
+            self.avg = float(self.avg)
         return "{}: {:.5f}".format(self.name, self.avg)
 
     @property

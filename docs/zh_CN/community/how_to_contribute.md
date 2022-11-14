@@ -17,8 +17,9 @@
         - [1.2.9 签署 CLA 协议和通过单元测试](#1.2.9)
         - [1.2.10 删除分支](#1.2.10)
         - [1.2.11 提交代码的一些约定](#1.2.11)
-- [2. 总结](#2)
-- [3. 参考文献](#3)
+- [2. 如何新增算法](#2)
+- [3. 总结](#3)
+- [4. 参考文献](#4)
 
 <a name="1"></a>
 ## 1. 如何贡献代码
@@ -28,12 +29,12 @@
 
 PaddleClas 未来将维护 2 种分支，分别为：
 
-* release/x.x 系列分支：为稳定的发行版本分支，会适时打 tag 发布版本，适配 Paddle 的 release 版本。当前最新的分支为 release/2.3 分支，是当前默认分支，适配 Paddle v2.1.0 。随着版本迭代， release/x.x 系列分支会越来越多，默认维护最新版本的 release 分支，前 1 个版本分支会修复 bug，其他的分支不再维护。
+* release/x.x 系列分支：为稳定的发行版本分支，会适时打 tag 发布版本，适配 PaddlePaddle 的 release 版本。当前最新的分支为 release/2.5 分支，是当前默认分支，适配 PaddlePaddle >= 2.2 。随着版本迭代， release/x.x 系列分支会越来越多，默认维护最新版本的 release 分支，前 1 个版本分支会修复 bug，其他的分支不再维护。
 * develop 分支：为开发分支，适配 Paddle 的 develop 版本，主要用于开发新功能。如果有同学需要进行二次开发，请选择 develop 分支。为了保证 develop 分支能在需要的时候拉出 release/x.x 分支， develop 分支的代码只能使用 Paddle 最新 release 分支中有效的 api 。也就是说，如果 Paddle develop 分支中开发了新的 api，但尚未出现在 release 分支代码中，那么请不要在 PaddleClas 中使用。除此之外，对于不涉及 api 的性能优化、参数调整、策略更新等，都可以正常进行开发。
 
 PaddleClas 的历史分支，未来将不再维护。考虑到一些同学可能仍在使用，这些分支还会继续保留：
 
-* release/static 分支：这个分支曾用于静态图的开发与测试，目前兼容 >=1.7 版本的 Paddle 。如果有特殊需求，要适配旧版本的 Paddle，那还可以使用这个分支，但除了修复 bug 外不再更新代码。
+* release/static 分支：这个分支曾用于静态图的开发与测试，目前兼容 >=1.7 版本的 PaddlePaddle 。如果有特殊需求，要适配旧版本的 PaddlePaddle，那还可以使用这个分支，但除了修复 bug 外不再更新代码。
 * dygraph-dev 分支：这个分支将不再维护，也不再接受新的代码，请使用的同学尽快迁移到 develop 分支。
 
 
@@ -242,11 +243,16 @@ git branch -D new_branch
 - 请采用 `start a review` 进行回复，而非直接回复的方式。原因是每个回复都会发送一封邮件，会造成邮件灾难。
 
 <a name="2"></a>
-## 2. 总结
+## 2. 如何新增算法
+
+PaddleClas的发展离不开广大开发者的贡献，为了快速帮助开发者开发新的算法，我们总结了在PaddleClas中新增算法的一些需要的操作，请参考[如何新增算法](add_new_algorithm.md)。
+
+<a name="3"></a>
+## 3. 总结
 
 * 开源社区依赖于众多开发者与用户的贡献和反馈，在这里感谢与期待大家向 PaddleClas 提出宝贵的意见与 Pull Request，希望我们可以一起打造一个领先实用全面的图像识别代码仓库！
 
-<a name="3"></a>
-## 3. 参考文献
+<a name="4"></a>
+## 4. 参考文献
 1. [PaddlePaddle 本地开发指南](https://www.paddlepaddle.org.cn/documentation/docs/zh/develop/guides/08_contribution/index_cn.html)
 2. [向开源框架提交 pr 的过程](https://blog.csdn.net/vim_wj/article/details/78300239)

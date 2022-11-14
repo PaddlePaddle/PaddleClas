@@ -39,7 +39,7 @@ Functions of the above modules :
 
 #### 3.1 Backbone
 
-The Backbone part adopts [PP-LCNetV2_base](../models/PP-LCNetV2.md), which is based on `PPLCNet_V1`, including Rep strategy, PW convolution, Shortcut, activation function improvement, SE module improvement After several optimization points, the final classification accuracy is similar to `PPLCNet_x2_5`, and the inference delay is reduced by 40%<sup>*</sup>. During the experiment, we made appropriate improvements to `PPLCNetV2_base`, so that it can achieve higher performance in recognition tasks while keeping the speed basically unchanged, including: removing `ReLU` and ` at the end of `PPLCNetV2_base` FC`, change the stride of the last stage (RepDepthwiseSeparable) to 1.
+The Backbone part adopts [PP-LCNetV2_base](../models/PP-LCNetV2_en.md), which is based on `PPLCNet_V1`, including Rep strategy, PW convolution, Shortcut, activation function improvement, SE module improvement After several optimization points, the final classification accuracy is similar to `PPLCNet_x2_5`, and the inference delay is reduced by 40%<sup>*</sup>. During the experiment, we made appropriate improvements to `PPLCNetV2_base`, so that it can achieve higher performance in recognition tasks while keeping the speed basically unchanged, including: removing `ReLU` and ` at the end of `PPLCNetV2_base` FC`, change the stride of the last stage (RepDepthwiseSeparable) to 1.
 
 **Note:** <sup>*</sup>The inference environment is based on Intel(R) Xeon(R) Gold 6271C CPU @ 2.60GHz hardware platform, OpenVINO inference platform.
 
@@ -112,7 +112,7 @@ Based on the `GeneralRecognitionV2_PPLCNetV2_base.yaml` configuration file, the 
 
 ### 5.1 Data Preparation
 
-First you need to customize your own dataset based on the task. Please refer to [Dataset Format Description](../data_preparation/recognition_dataset.md) for the dataset format and file structure.
+First you need to customize your own dataset based on the task. Please refer to [Dataset Format Description](../data_preparation/recognition_dataset_en.md) for the dataset format and file structure.
 
 After the preparation is complete, it is necessary to modify the content related to the data configuration in the configuration file, mainly including the path of the dataset and the number of categories. As is as shown below:
 
@@ -256,7 +256,7 @@ wangzai.jpg: [-7.82453567e-02 2.55877394e-02 -3.66694555e-02 1.34572461e-02
  -3.40284109e-02 8.35561901e-02 2.10910216e-02 -3.27066667e-02]
 ```
 
-In most cases, just getting the features may not meet the users' requirements. If you want to go further on the image recognition task, you can refer to the document [Vector Search](./vector_search.md).
+In most cases, just getting the features may not meet the users' requirements. If you want to go further on the image recognition task, you can refer to the document [Vector Search](./vector_search_en.md).
 
 <a name="6"></a>
 

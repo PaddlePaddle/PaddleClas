@@ -20,6 +20,7 @@ from typing import Optional
 
 import numpy as np
 import paddle
+from ppcls.engine.train.utils import type_name
 from ppcls.utils import logger
 
 
@@ -65,7 +66,7 @@ def retrieval_eval(engine, epoch_id=0):
                     engine.eval_metric_func.metric_func_list[
                         i].descending = False
                     logger.warning(
-                        f"re_ranking=True,{engine.eval_metric_func.metric_func_list[i].__class__.__name__}.descending has been set to False"
+                        f"re_ranking=True,{type_name(engine.eval_metric_func.metric_func_list[i])}.descending has been set to False"
                     )
 
             # compute distance matrix(The smaller the value, the more similar)
