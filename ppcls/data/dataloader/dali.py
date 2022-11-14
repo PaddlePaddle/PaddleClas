@@ -29,21 +29,21 @@ from nvidia.dali.plugin.paddle import DALIGenericIterator
 from ppcls.utils import logger
 from ppcls.engine.train.utils import type_name
 
-from .dali_operators import ResizeImage
-from .dali_operators import DecodeImage
-from .dali_operators import CropImage
-from .dali_operators import RandomCropImage
-from .dali_operators import RandCropImage
-from .dali_operators import RandCropImageV2
-from .dali_operators import RandFlipImage
-from .dali_operators import NormalizeImage
-from .dali_operators import ToCHWImage
-from .dali_operators import ColorJitter
-from .dali_operators import RandomRotation
-from .dali_operators import Pad
-from .dali_operators import RandomRot90
-from .dali_operators import DecodeRandomResizedCrop
-from .dali_operators import CropMirrorNormalize
+from ppcls.data.preprocess.ops.dali_operators import ResizeImage
+from ppcls.data.preprocess.ops.dali_operators import DecodeImage
+from ppcls.data.preprocess.ops.dali_operators import CropImage
+from ppcls.data.preprocess.ops.dali_operators import RandomCropImage
+from ppcls.data.preprocess.ops.dali_operators import RandCropImage
+from ppcls.data.preprocess.ops.dali_operators import RandCropImageV2
+from ppcls.data.preprocess.ops.dali_operators import RandFlipImage
+from ppcls.data.preprocess.ops.dali_operators import NormalizeImage
+from ppcls.data.preprocess.ops.dali_operators import ToCHWImage
+from ppcls.data.preprocess.ops.dali_operators import ColorJitter
+from ppcls.data.preprocess.ops.dali_operators import RandomRotation
+from ppcls.data.preprocess.ops.dali_operators import Pad
+from ppcls.data.preprocess.ops.dali_operators import RandomRot90
+from ppcls.data.preprocess.ops.dali_operators import DecodeRandomResizedCrop
+from ppcls.data.preprocess.ops.dali_operators import CropMirrorNormalize
 
 INTERP_MAP = {
     "nearest": types.DALIInterpType.INTERP_NN,  # cv2.INTER_NEAREST
@@ -96,7 +96,7 @@ def convert_cfg_to_dali(op_name: str, device: str, **op_cfg) -> Dict[str, Any]:
 
     Args:
         op_name (str): name of operator
-        device (str): device which operator excute on
+        device (str): device which operator applied on
 
     Returns:
         Dict[str, Any]: converted arguments for DALI initialization
@@ -110,8 +110,7 @@ def convert_cfg_to_dali(op_name: str, device: str, **op_cfg) -> Dict[str, Any]:
         channel_first = op_cfg.get("channel_first", False)
         assert channel_first is False, \
             f"`channel_first` must set to False when using DALI, but got {channel_first}"
-        if device is not None:
-            dali_op_cfg.update({"device": device})
+        dali_op_cfg.update({"device": device})
         dali_op_cfg.update({
             "output_type": types.DALIImageType.RGB
             if to_rgb else types.DALIImageType.BGR
@@ -134,6 +133,7 @@ def convert_cfg_to_dali(op_name: str, device: str, **op_cfg) -> Dict[str, Any]:
             dali_op_cfg.update({"resize_shorter": resize_short})
         if interpolation is not None:
             dali_op_cfg.update({"interp_type": INTERP_MAP[interpolation]})
+        dali_op_cfg.update({"antialias": False})
     elif op_name == "CropImage":
         size = op_cfg.get("size", 224)
         size = make_pair(size)
@@ -172,21 +172,23 @@ def convert_cfg_to_dali(op_name: str, device: str, **op_cfg) -> Dict[str, Any]:
         if isinstance(scale, str):
             scale = eval(scale)
         mean = op_cfg.get("mean", [0.485, 0.456, 0.406])
-        # each value of mean should be rescaled in [0, 1/scale] according to
-        # https://docs.nvidia.com/deeplearning/dali/user-guide/docs/supported_ops_legacy.html?highlight=cropmirrornormalize#nvidia.dali.ops.Normalize
-        mean = [v / scale for v in mean]
         std = op_cfg.get("std", [0.229, 0.224, 0.225])
+        mean = [v / scale for v in mean]
+        std = [v / scale for v in std]
+        order = op_cfg.get("order", "chw")
+        channel_num = op_cfg.get("channel_num", 3)
         output_fp16 = op_cfg.get("output_fp16", False)
-        dali_op_cfg.update({"scale": scale})
         dali_op_cfg.update({
             "mean": np.reshape(
                 np.array(
-                    mean, dtype="float32"), [1, 1, 3])
+                    mean, dtype="float32"), [channel_num, 1, 1]
+                if order == "chw" else [1, 1, channel_num])
         })
         dali_op_cfg.update({
             "stddev": np.reshape(
                 np.array(
-                    std, dtype="float32"), [1, 1, 3])
+                    std, dtype="float32"), [channel_num, 1, 1]
+                if order == "chw" else [1, 1, channel_num])
         })
         if output_fp16:
             dali_op_cfg.update({"dtype": types.FLOAT16})
@@ -213,7 +215,7 @@ def convert_cfg_to_dali(op_name: str, device: str, **op_cfg) -> Dict[str, Any]:
     elif op_name == "Pad":
         size = op_cfg.get("size", None)
         assert size is not None, f"`size` can't be None when using DALI, but got {size}"
-        make_pair(size)
+        size = make_pair(size)
         padding = op_cfg.get("padding", 0)
         fill = op_cfg.get("fill", 0)
         dali_op_cfg.update({
@@ -224,7 +226,6 @@ def convert_cfg_to_dali(op_name: str, device: str, **op_cfg) -> Dict[str, Any]:
         dali_op_cfg.update({"out_of_bounds_policy": "pad"})
     elif op_name == "RandomRot90":
         interpolation = op_cfg.get("interpolation", "nearest")
-        dali_op_cfg.update({"interp_type": INTERP_MAP[interpolation]})
     elif op_name == "DecodeRandomResizedCrop":
         device = "cpu" if device == "cpu" else "mixed"
         output_type = op_cfg.get("output_type", types.DALIImageType.RGB)
@@ -234,8 +235,7 @@ def convert_cfg_to_dali(op_name: str, device: str, **op_cfg) -> Dict[str, Any]:
         ratio = op_cfg.get("ratio", [3.0 / 4, 4.0 / 3])
         num_attempts = op_cfg.get("num_attempts", 100)
         size = op_cfg.get("size", 224)
-        if device is not None:
-            dali_op_cfg.update({"device": device})
+        dali_op_cfg.update({"device": device})
         if output_type is not None:
             dali_op_cfg.update({"output_type": output_type})
         if device_memory_padding is not None:
@@ -271,8 +271,6 @@ def convert_cfg_to_dali(op_name: str, device: str, **op_cfg) -> Dict[str, Any]:
             dali_op_cfg.update({"output_layout": output_layout})
         if size is not None:
             dali_op_cfg.update({"crop": (size, size)})
-        if scale is not None:
-            dali_op_cfg.update({"scale": scale})
         if mean is not None:
             dali_op_cfg.update({"mean": mean})
         if std is not None:
@@ -280,7 +278,8 @@ def convert_cfg_to_dali(op_name: str, device: str, **op_cfg) -> Dict[str, Any]:
         if pad_output is not None:
             dali_op_cfg.update({"pad_output": pad_output})
     else:
-        raise ValueError(f"Operator '{op_name}' is not implemented now.")
+        raise ValueError(
+            f"DALI operator \"{op_name}\" is not implemented now.")
     if "device" not in dali_op_cfg:
         dali_op_cfg.update({"device": device})
     return dali_op_cfg
@@ -313,7 +312,7 @@ def build_dali_transforms(op_cfg_list: List[Dict[str, Any]],
     # build dali transforms list
 
     if "ToCHWImage" not in [list(item.keys())[0]
-                            for item in op_cfg_list] and not enable_fuse:
+                            for item in op_cfg_list] and (not enable_fuse):
         op_cfg_list.append({"ToCHWImage": {"perm": [2, 0, 1]}})
     dali_op_list = []
     idx = 0
@@ -379,78 +378,7 @@ def build_dali_transforms(op_cfg_list: List[Dict[str, Any]],
     return dali_op_list
 
 
-class HybridPipeline(pipeline.Pipeline):
-    def __init__(self,
-                 device: str,
-                 batch_size: int,
-                 py_num_workers: int,
-                 num_threads: int,
-                 device_id: int,
-                 seed: int,
-                 file_root: str,
-                 file_list: str,
-                 transform_list: List[Callable],
-                 shard_id: int=0,
-                 num_shards: int=1,
-                 random_shuffle: bool=True,
-                 ext_src=None):
-        super(HybridPipeline, self).__init__(
-            batch_size=batch_size,
-            device_id=device_id,
-            seed=seed,
-            py_start_method='spawn',
-            py_num_workers=py_num_workers,
-            num_threads=num_threads)
-        self.device = device
-        self.ext_src = ext_src
-        self.reader = ops.readers.File(
-            file_root=file_root,
-            file_list=file_list,
-            shard_id=shard_id,
-            num_shards=num_shards,
-            random_shuffle=random_shuffle)
-        self.transforms = ops.Compose(transform_list)
-        self.cast = ops.Cast(dtype=types.DALIDataType.INT64, device=device)
-
-    def define_graph(self):
-        if self.ext_src:
-            raw_images, labels = fn.external_source(
-                source=self.ext_src,
-                num_outputs=2,
-                dtype=[types.DALIDataType.UINT8, types.DALIDataType.INT64],
-                batch=True,
-                parallel=True)
-        else:
-            raw_images, labels = self.reader(name="Reader")
-        images = self.transforms(raw_images)
-        return [
-            images, self.cast(labels.gpu() if self.device == "gpu" else labels)
-        ]
-
-    def __len__(self):
-        if self.ext_src is not None:
-            return len(self.ext_src)
-        return self.epoch_size(name="Reader")
-
-
-class DALIImageNetIterator(DALIGenericIterator):
-    def __init__(self, *kargs, **kwargs):
-        super(DALIImageNetIterator, self).__init__(*kargs, **kwargs)
-        self.in_dynamic_mode = paddle.in_dynamic_mode()
-
-    def __next__(self) -> List[paddle.Tensor]:
-        data_batch = super(DALIImageNetIterator,
-                           self).__next__()  # List[Dict[str, Tensor], ...]
-        # reformat to List[Tensor1, Tensor2, ...]
-        data_batch = [
-            paddle.to_tensor(data_batch[0][key])
-            if self.in_dynamic_mode else data_batch[0][key]
-            for key in self.output_map
-        ]
-        return data_batch
-
-
-class ExternalSource_RandomIdentityIterator(object):
+class ExternalSource_RandomIdentity(object):
     def __init__(self,
                  batch_size,
                  num_instances,
@@ -567,12 +495,84 @@ class ExternalSource_RandomIdentityIterator(object):
         return self.sharded_data_set_len
 
 
+class HybridPipeline(pipeline.Pipeline):
+    def __init__(self,
+                 device: str,
+                 batch_size: int,
+                 py_num_workers: int,
+                 num_threads: int,
+                 device_id: int,
+                 seed: int,
+                 file_root: str,
+                 file_list: str,
+                 transform_list: List[Callable],
+                 shard_id: int=0,
+                 num_shards: int=1,
+                 random_shuffle: bool=True,
+                 ext_src=None):
+        super(HybridPipeline, self).__init__(
+            batch_size=batch_size,
+            device_id=device_id,
+            seed=seed,
+            py_start_method="fork" if ext_src is None else "spawn",
+            py_num_workers=py_num_workers,
+            num_threads=num_threads)
+        self.device = device
+        self.ext_src = ext_src
+        self.reader = ops.readers.File(
+            file_root=file_root,
+            file_list=file_list,
+            shard_id=shard_id,
+            num_shards=num_shards,
+            random_shuffle=random_shuffle)
+        self.transforms = ops.Compose(transform_list)
+        self.cast = ops.Cast(dtype=types.DALIDataType.INT64, device=device)
+
+    def define_graph(self):
+        if self.ext_src:
+            raw_images, labels = fn.external_source(
+                source=self.ext_src,
+                num_outputs=2,
+                dtype=[types.DALIDataType.UINT8, types.DALIDataType.INT64],
+                batch=True,
+                parallel=True)
+        else:
+            raw_images, labels = self.reader(name="Reader")
+        images = self.transforms(raw_images)
+        return [
+            images, self.cast(labels.gpu() if self.device == "gpu" else labels)
+        ]
+
+    def __len__(self):
+        if self.ext_src is not None:
+            return len(self.ext_src)
+        return self.epoch_size(name="Reader")
+
+
+class DALIImageNetIterator(DALIGenericIterator):
+    def __init__(self, *kargs, **kwargs):
+        super(DALIImageNetIterator, self).__init__(*kargs, **kwargs)
+        self.in_dynamic_mode = paddle.in_dynamic_mode()
+
+    def __next__(self) -> List[paddle.Tensor]:
+        data_batch = super(DALIImageNetIterator,
+                           self).__next__()  # List[Dict[str, Tensor], ...]
+        # reformat to List[Tensor1, Tensor2, ...]
+        data_batch = [
+            paddle.to_tensor(data_batch[0][key])
+            if self.in_dynamic_mode else data_batch[0][key]
+            for key in self.output_map
+        ]
+        return data_batch
+
+
 def dali_dataloader(config,
                     mode,
                     device,
                     py_num_workers=1,
                     num_threads=4,
-                    seed=None):
+                    seed=None,
+                    enable_fuse=True):
     assert "gpu" in device, "gpu training is required for DALI"
     device_id = int(device.split(":")[1])
     device = "gpu"
@@ -587,7 +587,9 @@ def dali_dataloader(config,
     sampler_name = config_dataloader["sampler"].get("name",
                                                     "DistributedBatchSampler")
     dali_transforms = build_dali_transforms(
-        config_dataloader["dataset"]["transform_ops"], device)
+        config_dataloader["dataset"]["transform_ops"],
+        device,
+        enable_fuse=enable_fuse)
 
     if mode.lower() == "train":
         if "PADDLE_TRAINER_ID" in env and "PADDLE_TRAINERS_NUM" in env and "FLAGS_selected_gpus" in env:
@@ -601,7 +603,7 @@ def dali_dataloader(config,
         random_shuffle = True
 
         if sampler_name in ["PKSampler", "DistributedRandomIdentitySampler"]:
-            ext_src = ExternalSource_RandomIdentityIterator(
+            ext_src = ExternalSource_RandomIdentity(
                 batch_size,
                 config_dataloader["sampler"]["sample_per_id" if sampler_name ==
                                              "PKSampler" else "num_instances"],
@@ -609,11 +611,11 @@ def dali_dataloader(config,
                 num_gpus,
                 file_root,
                 file_list,
-                None,
+                delimiter=None,
                 relabel=config_dataloader["dataset"].get("relabel", False),
                 sample_method=config_dataloader["sampler"].get("sample_method",
                                                                "id_avg_prob"),
-                seed=seed)
+                seed=seed + shard_id)
         else:
             ext_src = None
 
@@ -621,7 +623,6 @@ def dali_dataloader(config,
                               device_id, seed + shard_id, file_root, file_list,
                               dali_transforms, shard_id, num_shards,
                               random_shuffle, ext_src)
-        #  sample_per_shard = len(pipelines[0])
         pipe.build()
         pipelines = [pipe]
         if ext_src is None:
