@@ -34,10 +34,11 @@ class CELoss(nn.Layer):
         self.epsilon = epsilon
         assert reduction in ["mean", "sum", "none"]
         self.reduction = reduction
-        self.weight_data = self._read_weight(
+        self.weight_dict = self._load_weight(
             weight_file) if weight_file else None
+        self.weight_tensor = None
 
-    def _read_weight(self, weight_file):
+    def _load_weight(self, weight_file):
         if not os.path.exists(weight_file):
             msg = f"The file of rescaling weight is not exists. And the setting has been ignored. Please check the file path: {weight_file}."
             logger.warning(msg)
@@ -45,16 +46,28 @@ class CELoss(nn.Layer):
         else:
             with open(weight_file, "r") as f:
                 lines = f.readlines()
-
             try:
-                weight_list = []
+                weight_dict = {}
                 for line in lines:
-                    weight_list.append(float(line.strip()))
+                    idx, weight = line.strip().split(" ")
+                    weight_dict[int(idx)] = float(weight)
             except Exception as e:
                 msg = f"The setting about scaling weight has been ignored because of an encountered error: {e}"
                 logger.warning(msg)
                 return None
-            return paddle.to_tensor(weight_list)
+            return weight_dict
+
+    def _load2tensor(self, class_num):
+        weight_tensor = paddle.ones([class_num])
+        for idx in self.weight_dict:
+            if idx > class_num - 1:
+                msg = f"The idx number must be less than class number - 1. But there is a idx number({idx}) and class number is {class_num}. Please check the rescaling weight file. The setting about scaling weight has been ignored."
+                logger.warning(msg)
+                self.weight_dict = None
+                return None
+
+            weight_tensor[idx] = self.weight_dict[idx]
+        return weight_tensor
 
     def _labelsmoothing(self, target, class_num):
         if len(target.shape) == 1 or target.shape[-1] != class_num:
@@ -78,18 +91,15 @@ class CELoss(nn.Layer):
             else:
                 soft_label = False
 
-        if self.weight_data is not None and self.weight_data.shape[
-                0] != class_num:
-            msg = f"The shape of rescaling weight must be [class num]. Please check the rescaling weight file. The setting about scaling weight has been ignored."
-            logger.warning(msg)
-            self.weight_data = None
+        if self.weight_dict is not None and self.weight_tensor is None:
+            self.weight_tensor = self._load2tensor(class_num)
 
         loss = F.cross_entropy(
             x,
             label=label,
             soft_label=soft_label,
             reduction=self.reduction,
-            weight=self.weight_data)
+            weight=self.weight_tensor)
         return {"CELoss": loss}
 
 
