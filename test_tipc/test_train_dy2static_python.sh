@@ -42,8 +42,8 @@ echo $cmd
 eval $cmd
 
 # analysis and compare the losses. 
-dyout=`cat $dy2static_output | python3 test_tipc/extract_loss.py -v 'Iter:' -e 'loss: {%f},'`
-stout=`cat $dygraph_output   | python3 test_tipc/extract_loss.py -v 'Iter:' -e 'loss: {%f},'  `
+dyout=`cat $dy2static_output | python test_tipc/extract_loss.py -v 'Iter:' -e 'loss: {%f},'`
+stout=`cat $dygraph_output   | python test_tipc/extract_loss.py -v 'Iter:' -e 'loss: {%f},'  `
 echo $dyout > $dygraph_loss
 echo $stout > $dy2static_loss
 diff_log=$LOG_PATH/diff_log.txt
