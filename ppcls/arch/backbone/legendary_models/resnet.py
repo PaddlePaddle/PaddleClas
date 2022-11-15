@@ -123,7 +123,11 @@ class ConvBNLayer(TheseusLayer):
         self.is_vd_mode = is_vd_mode
         self.act = act
         self.avg_pool = AvgPool2D(
-            kernel_size=2, stride=stride, padding="SAME", ceil_mode=True)
+            kernel_size=2,
+            stride=stride,
+            padding="SAME",
+            ceil_mode=True,
+            data_format=data_format)
         self.conv = Conv2D(
             in_channels=num_channels,
             out_channels=num_filters,
