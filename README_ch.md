@@ -6,14 +6,20 @@
 
 飞桨图像识别套件PaddleClas是飞桨为工业界和学术界所准备的一个图像识别和图像分类任务的工具集，助力使用者训练出更好的视觉模型和应用落地。
 
-|             PP-ShiTuV2图像识别系统效果展示             |                PULC实用图像分类模型效果展示                 |
-| :----------------------------------------------------: | :---------------------------------------------------------: |
-| <img src="./docs/images/shituv2.gif"  width = "400" /> | <img src="./docs/images/class_simple.gif"  width = "500" /> |
+<div align="center">
+<img src="https://user-images.githubusercontent.com/50011306/201870645-63319203-9730-44fc-8e2e-054aad164461.gif"  width = "600" />
+<p>PP-ShiTu图像识别系统应用范围</p>
+</div>
+
+<div align="center">
+<img src="./docs/images/class_simple.gif"  width = "600" />
+<p>PULC实用图像分类模型效果展示</p>
+</div>
 
 
 ## 📣 近期更新
 
-- **💥 直播预告：11.1-11.3日每晚8点半**，PaddleClas研发团队详解PP-ShituV2优化策略与真实产业应用。微信扫描下方二维码，关注公众号并填写问卷后进入官方交流群，获取直播链接与20G重磅图像分类学习大礼包（内含20+数据集、4个垂类模型、70+前沿论文集合）
+- **💥 直播回放：**PaddleClas研发团队详解PP-ShituV2优化策略与真实产业应用。微信扫描下方二维码，关注公众号并填写问卷后进入官方交流群，获取直播回访与20G重磅图像分类学习大礼包（内含20+数据集、4个垂类模型、70+前沿论文集合）
 
 <div align="center">
     <img src="https://user-images.githubusercontent.com/50011306/198980780-602c6eef-11da-4b4e-aa20-c2f6fd547ae5.jpg" width = "150" height = "150"/>
@@ -24,7 +30,7 @@
 - **🔥️ 2022.9.13 发布超轻量图像识别系统[PP-ShiTuV2](docs/zh_CN/models/PP-ShiTu/README.md)：**
   - recall1精度提升8个点，覆盖商品识别、垃圾分类、航拍场景等[20+识别场景](docs/zh_CN/deployment/PP-ShiTu/application_scenarios.md)，
   - 新增[库管理工具](./deploy/shitu_index_manager/)，[Android Demo](./docs/zh_CN/quick_start/quick_start_recognition.md)全新体验。
-  
+
 - 2022.9.4 新增[生鲜产品自主结算范例库](./docs/zh_CN/samples/Fresh_Food_Recogniiton/README.md)，具体内容可以在AI Studio上体验。
 - 2022.6.15 发布[PULC超轻量图像分类实用方案](docs/zh_CN/training/PULC.md)，CPU推理3ms，精度比肩SwinTransformer，覆盖人、车、OCR场景九大常见任务。
 - 2022.5.23 新增[人员出入管理范例库](https://aistudio.baidu.com/aistudio/projectdetail/4094475)，具体内容可以在 AI Studio 上体验。
