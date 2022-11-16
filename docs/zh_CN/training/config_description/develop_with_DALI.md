@@ -1,24 +1,24 @@
 # 基于PaddleClas的DALI开发实践
 
-- [基于PaddleClas的DALI开发实践](#基于paddleclas的dali开发实践)
-  - [1. 简介](#1-简介)
-  - [2. 环境准备](#2-环境准备)
-    - [2.1 安装DALI](#21-安装dali)
-  - [3. 基本概念介绍](#3-基本概念介绍)
-    - [3.1 Operator](#31-operator)
-    - [3.2 Device](#32-device)
-    - [3.3 DataNode](#33-datanode)
-    - [3.4 Pipeline](#34-pipeline)
-  - [4. 开发实践](#4-开发实践)
-    - [4.1 RandomFlip](#41-randomflip)
-      - [4.1.1 继承DALI已有类](#411-继承dali已有类)
-      - [4.1.2 重载 \_\_init\_\_ 方法](#412-重载-__init__-方法)
-      - [4.1.3 重载 \_\_call\_\_ 方法](#413-重载-__call__-方法)
-    - [4.2 RandomRotation](#42-randomrotation)
-      - [4.1.1 继承DALI已有类](#411-继承dali已有类-1)
-      - [4.1.2 重载 \_\_init\_\_ 方法](#412-重载-__init__-方法-1)
-      - [4.1.3 重载 \_\_call\_\_ 方法](#413-重载-__call__-方法-1)
-  - [5. FAQ](#5-faq)
+- [1. 简介](#1-简介)
+- [2. 环境准备](#2-环境准备)
+  - [2.1 安装DALI](#21-安装dali)
+- [3. 基本概念介绍](#3-基本概念介绍)
+  - [3.1 Operator](#31-operator)
+  - [3.2 Device](#32-device)
+  - [3.3 DataNode](#33-datanode)
+  - [3.4 Pipeline](#34-pipeline)
+- [4. 开发实践](#4-开发实践)
+  - [4.1 开发与接入流程](#41-开发与接入流程)
+  - [4.2 RandomFlip](#42-randomflip)
+    - [4.2.1 继承DALI已有类](#421-继承dali已有类)
+    - [4.2.2 重载 \_\_init\_\_ 方法](#422-重载-__init__-方法)
+    - [4.2.3 重载 \_\_call\_\_ 方法](#423-重载-__call__-方法)
+  - [4.3 RandomRotation](#43-randomrotation)
+    - [4.3.1 继承DALI已有类](#431-继承dali已有类)
+    - [4.3.2 重载 \_\_init\_\_ 方法](#432-重载-__init__-方法)
+    - [4.3.3 重载 \_\_call\_\_ 方法](#433-重载-__call__-方法)
+- [5. FAQ](#5-faq)
 
 ## 1. 简介
 NVIDIA **Da**ta Loading **Li**brary (DALI) 是由 NVIDIA 开发的一套高性能数据预处理开源代码库，其提供了许多优化后的预处理算子，能很大程度上减少数据预处理耗时，非常适合在深度学习任务中使用。具体地，DALI 通过将大部分的数据预处理转移到 GPU 来解决 CPU 瓶颈问题。此外，DALI 编写了配套的高效执行引擎，最大限度地提高输入管道的吞吐量。
@@ -74,10 +74,16 @@ DALI 可以选择将数据预处理放到GPU上进行，因此绝大部分算子
 ## 4. 开发实践
 本章节希望通过一个简单的例子和一个稍复杂的例子，介绍如何基于 DALI 提供的算子，在python侧进行二次开发，以满足用户实际需要。
 
-### 4.1 RandomFlip
+### 4.1 开发与接入流程
+1. 在 `ppcls/data/preprocess/ops/dali_operators.py` 中开发python侧DALI算子的代码。
+2. 在 `ppcls/data/preprocess/ops/dali.py` 开头处 import 导入开发好的算子类，并在 `convert_cfg_to_dali` 函数内参照其它算子配置转换逻辑，为添加的算子也加入对应的配置转换逻辑。
+3. （可选）如果开发的算子属于 fused operator，则还需在 `ppcls/data/preprocess/ops/dali.py` 的 `build_dali_transforms` 函数内，参照已有融合算子逻辑，添加新算子对应的融合逻辑。
+4. （可选）如果开发的是 External Source 类的 sampler 算子，可参照已有的 `ExternalSource_RandomIdentity` 代码进行开发，并在添加对应调用逻辑。
+
+### 4.2 RandomFlip
 以 PaddleClas 已有的 [RandFlipImage](../../../../ppcls/data/preprocess/ops/operators.py#L499) 算子为例，我们希望在使用DALI训练时，将其转换为对应的 DALI 算子，且同样具备 **按指定的 `prob` 概率进行 指定的水平 or 垂直翻转**
 
-#### 4.1.1 继承DALI已有类
+#### 4.2.1 继承DALI已有类
 DALI 已经提供了简单的翻转算子 [`nvidia.dali.ops.Flip`](https://docs.nvidia.com/deeplearning/dali/user-guide/docs/supported_ops_legacy.html#nvidia.dali.ops.Flip)，其通过 `horizontal` 与 `vertical` 参数来分别控制是否对图像进行水平、垂直翻转。但是其缺少随机性，无法直接按照一定概率进行翻转或不翻转，因此我们需要继承这个翻转类，并重载其 `__init__` 方法和 `__call__` 方法。继承代码如下所示：
 
 ```python
@@ -92,7 +98,7 @@ class RandFlipImage(ops.Flip):
         ...
 ```
 
-#### 4.1.2 重载 \_\_init\_\_ 方法
+#### 4.2.2 重载 \_\_init\_\_ 方法
 我们需要在构造算子时加入随机参数来控制是否翻转，因此仿照普通 `RandFlipImage`算子的逻辑，在继承类的初始化方法中加入参数 `prob`，同理再加入 `flip_code` 用于控制水平、垂直翻转。
 
 由于每一次执行我们都需要生成一个随机数（此处用0或1表示），代表是否在翻转轴上进行翻转，因此我们实例化一个 `ops.random.CoinFlip` 来作为随机数生成器（实例化对象为下方代码中的 `self.rng`），同理我们也需要记录翻转轴参数 `flip_code`，以供 `__call__` 方法中调用。
@@ -109,7 +115,7 @@ class RandFlipImage(ops.Flip):
         ...
 ```
 
-#### 4.1.3 重载 \_\_call\_\_ 方法
+#### 4.2.3 重载 \_\_call\_\_ 方法
 有了 `self.rng` 和 `self.flip_code`，我们就能在每次调用的 `__call__` 方法内部，加入随机性并控制方向。首先调用 `self.rng()` 的 `__call__` 方法，生成一个0或1的随机整数，0代表不进行翻转，1代表进行翻转；然后根据 `self.flip_code` ，将这个随机整数作为父类 `__call__` 方法的 `horizontal` 或 `vertical` 参数，调用父类的 `__call__` 方法完成翻转。这样就完成了一个简单的自定义DALI RandomFlip 算子的编写。完整代码如下所示：
 ```python
 class RandFlipImage(ops.Flip):
@@ -131,10 +137,10 @@ class RandFlipImage(ops.Flip):
                 data, horizontal=do_flip, vertical=do_flip, **kwargs)
 ```
 
-### 4.2 RandomRotation
+### 4.3 RandomRotation
 以 PaddleClas 已有的 [RandomRotation](../../../../ppcls/data/preprocess/ops/operators.py#L684) 算子为例，我们希望在使用DALI训练时，将其转换为对应的 DALI 算子，且同样具备 **按指定的参数与角度进行随机旋转**
 
-#### 4.1.1 继承DALI已有类
+#### 4.3.1 继承DALI已有类
 DALI 已经提供了简单的翻转算子 [`nvidia.dali.ops.Rotate`](https://docs.nvidia.com/deeplearning/dali/user-guide/docs/supported_ops_legacy.html#nvidia.dali.ops.Rotate)，其通过 `angle`、`fill_value`、`interp_type` 等参数控制旋转的角度、填充值以及插值方式。但是其缺少一定的随机性，此我们需要继承这个旋转类，并重载其 `__init__` 方法和 `__call__` 方法。继承代码如下所示：
 
 ```python
@@ -149,7 +155,7 @@ class RandomRotation(ops.Rotate):
         ...
 ```
 
-#### 4.1.2 重载 \_\_init\_\_ 方法
+#### 4.3.2 重载 \_\_init\_\_ 方法
 我们需要在构造算子时加入随机参数来控制是否翻转，因此仿照普通 `RandomRotation` 算子的逻辑，在继承类的初始化方法中加入参数 `prob`，同理再加入 `angle` 用于控制旋转角度。
 
 由于每一次执行我们都需要生成一个随机数（此处用0或1表示），代表是否进行随机旋转，因此我们实例化一个 `ops.random.CoinFlip` 来作为随机数生成器（实例化对象为下方代码中的 `self.rng`）。除此之外我们还需要实例化一个随机数生成器来作为实际旋转时的角度（实例化对象为下方代码中的 `self.rng_angle`），由于角度是一个均匀分布而不是伯努利分布，因此需要使用 `random.Uniform` 这个类。
@@ -166,7 +172,7 @@ class RandomRotation(ops.Rotate):
         ...
 ```
 
-#### 4.1.3 重载 \_\_call\_\_ 方法
+#### 4.3.3 重载 \_\_call\_\_ 方法
 有了以上的一些变量，根据 `operators.py` 里 `RandomRotation` 的逻辑，仿照 [RandomFlip-重载__call__方法](#413-重载-__call__-方法) 的写法进行代码编写，就能得到完整代码，如下所示：
 ```python
 class RandomRotation(ops.Rotate):
