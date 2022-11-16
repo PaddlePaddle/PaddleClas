@@ -54,7 +54,6 @@
 | image_shape | 图片大小 | [3, 224, 224] | list, shape: (3,) |
 | save_inference_dir | inference 模型的保存路径 | "./inference" | str |
 | eval_mode | eval 的模式 | "classification" | "retrieval" |
-| to_static | 是否改为静态图模式 | False | True |
 | ues_dali | 是否使用 dali 库进行图像预处理 | False | True |
 
 **注**：`pretrained_model` 也可以填写存放预训练模型的 http 地址。

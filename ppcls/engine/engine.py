@@ -126,16 +126,18 @@ class Engine(object):
                 self.config["DataLoader"], "Train", self.device, self.use_dali)
             if self.config["DataLoader"].get('UnLabelTrain', None) is not None:
                 self.unlabel_train_dataloader = build_dataloader(
-                        self.config["DataLoader"], "UnLabelTrain", self.device,
-                        self.use_dali)
+                    self.config["DataLoader"], "UnLabelTrain", self.device,
+                    self.use_dali)
             else:
                 self.unlabel_train_dataloader = None
 
-            self.iter_per_epoch = len(self.train_dataloader) - 1 if platform.system(
+            self.iter_per_epoch = len(
+                self.train_dataloader) - 1 if platform.system(
                 ) == "Windows" else len(self.train_dataloader)
             if self.config["Global"].get("iter_per_epoch", None):
                 # set max iteration per epoch mannualy, when training by iteration(s), such as XBM, FixMatch.
-                self.iter_per_epoch = self.config["Global"].get("iter_per_epoch")
+                self.iter_per_epoch = self.config["Global"].get(
+                    "iter_per_epoch")
             self.iter_per_epoch = self.iter_per_epoch // self.update_freq * self.update_freq
 
         if self.mode == "eval" or (self.mode == "train" and
@@ -213,7 +215,8 @@ class Engine(object):
         # build model
         self.model = build_model(self.config, self.mode)
         # set @to_static for benchmark, skip this by default.
-        apply_to_static(self.config, self.model)
+        if config['Global'].get('to_static', False):
+            apply_to_static(self.config, self.model)
 
         # load_pretrain
         if self.config["Global"]["pretrained_model"] is not None:

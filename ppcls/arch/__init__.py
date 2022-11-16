@@ -49,16 +49,13 @@ def build_model(config, mode="train"):
 
 
 def apply_to_static(config, model):
-    support_to_static = config['Global'].get('to_static', False)
-
-    if support_to_static:
-        specs = None
-        if 'image_shape' in config['Global']:
-            specs = [InputSpec([None] + config['Global']['image_shape'])]
-            specs[0].stop_gradient = True
-        model = to_static(model, input_spec=specs)
-        logger.info("Successfully to apply @to_static with specs: {}".format(
-            specs))
+    specs = None
+    if 'image_shape' in config['Global']:
+        specs = [InputSpec([None] + config['Global']['image_shape'])]
+        specs[0].stop_gradient = True
+    model = to_static(model, input_spec=specs)
+    logger.info("Successfully to apply @to_static with specs: {}".format(
+        specs))
     return model
 
 

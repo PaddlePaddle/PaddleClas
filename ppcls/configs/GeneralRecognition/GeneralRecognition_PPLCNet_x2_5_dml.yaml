@@ -15,7 +15,7 @@ Global:
   save_inference_dir: ./inference
   eval_mode: retrieval
   use_dali: False
-  to_static: False
+  
 
 # model architecture
 Arch:

@@ -13,7 +13,7 @@ Global:
   # used for static mode and model export
   image_shape: [3, 224, 224]
   save_inference_dir: ./inference
-  to_static: True
+  
 
 AMP:
   scale_loss: 128.0
