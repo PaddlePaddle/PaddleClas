@@ -20,6 +20,7 @@ from collections import defaultdict
 import numpy as np
 from paddle.io import DistributedBatchSampler
 from ppcls.utils import logger
+import paddle.distributed as dist
 
 
 class PKSampler(DistributedBatchSampler):
@@ -94,6 +95,12 @@ class PKSampler(DistributedBatchSampler):
                     format(diff))
 
     def __iter__(self):
+        # shuffing in distributed case
+        if self.nranks > 1:
+            self.rank = dist.get_rank()
+            logger.info(f"PKsampler - self.rank = {self.rank}")
+            np.random.RandomState(42 + self.rank).shuffle(self.label_list)
+
         label_per_batch = self.batch_size // self.sample_per_id
         for _ in range(len(self)):
             batch_index = []

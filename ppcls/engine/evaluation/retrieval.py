@@ -213,7 +213,7 @@ def cal_feature(engine, name='gallery'):
             if has_unique_id:
                 unique_id_list.append(batch[2])
 
-    if engine.use_dali:
+    if False:
         dataloader.reset()
 
     all_feas = paddle.concat(batch_feas_list)
@@ -222,8 +222,7 @@ def cal_feature(engine, name='gallery'):
         all_unique_id = paddle.concat(unique_id_list)
 
     # just for DistributedBatchSampler issue: repeat sampling
-    total_samples = len(
-        dataloader.dataset) if not engine.use_dali else dataloader.size
+    total_samples = len(dataloader.dataset) if not False else dataloader.size
     all_feas = all_feas[:total_samples]
     all_img_id = all_img_id[:total_samples]
     if has_unique_id:

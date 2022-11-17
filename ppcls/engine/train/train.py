@@ -15,8 +15,11 @@ from __future__ import absolute_import, division, print_function
 
 import time
 import paddle
-from ppcls.engine.train.utils import update_loss, update_metric, log_info, type_name
+from ppcls.engine.train.utils import update_loss, update_metric, log_info, type_name, logger
 from ppcls.utils import profiler
+import numpy as np
+
+# import cv2
 
 
 def train_epoch(engine, epoch_id, print_batch_step):
@@ -28,8 +31,10 @@ def train_epoch(engine, epoch_id, print_batch_step):
     for iter_id in range(engine.iter_per_epoch):
         # fetch data batch from dataloader
         try:
+            # logger.info(f"{iter_id} Normal")
             batch = next(engine.train_dataloader_iter)
         except Exception:
+            # logger.info(f"{iter_id} ********** Exception")
             engine.train_dataloader_iter = iter(engine.train_dataloader)
             batch = next(engine.train_dataloader_iter)
 
@@ -41,6 +46,38 @@ def train_epoch(engine, epoch_id, print_batch_step):
         batch_size = batch[0].shape[0]
         if not engine.config["Global"].get("use_multilabel", False):
             batch[1] = batch[1].reshape([batch_size, -1])
+
+        # image_list = []
+        # paddle.distributed.all_gather(image_list, batch[0])
+        # image_all = paddle.stack(image_list, axis=0)
+        # P = 256 // 4
+        # K = 4
+        # image_all_reshape = np.zeros([8 * K * 224 + 8 * 20, P * 224, 3], "uint8")
+        # image_all = image_all.numpy()  # [8,b,c,h,w]
+        # image_all = image_all.transpose((0, 1, 3, 4, 2))  # [8,b,h,w,c]
+        # mean = np.array([0.485, 0.456, 0.406]).reshape([1, 1, 1, 1, 3])
+        # std = np.array([0.229, 0.224, 0.225]).reshape([1, 1, 1, 1, 3])
+        # image_all = ((image_all * std + mean) * 255.0).clip(0.0, 255.0).astype("uint8")
+
+        # base = 0
+        # for g in range(8):
+        #     for i in range(P):
+        #         for j in range(K):
+        #             image_all_reshape[base + j*224:base + (j+1)*224, i*224:(i+1)*224, :] = image_all[g, i*K+j]
+        #     base += (K * 224 + 20)
+        # cv2.imwrite(f"./_iter_batches/image_all_{iter_id}.jpg", image_all_reshape)
+
+        # label_list = []
+        # paddle.distributed.all_gather(label_list, batch[1])
+        # label_all = paddle.stack(label_list, axis=0)
+
+        # np.save(f"./_iter_batches/label_all_{iter_id}.npy", label_all.numpy())
+        # if iter_id >= 10:
+        #     exit(0)
+        # else:
+        #     logger.info(f"{'*' * 10} finished {iter_id}")
+        #     continue
+        # # exit(0)
         engine.global_step += 1
 
         # image input
