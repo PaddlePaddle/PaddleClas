@@ -204,14 +204,15 @@ class TprAtFpr(nn.Layer):
                 gt_pos_score_list > threshold) / len(gt_pos_score_list)
             if len(gt_neg_score_list) == 0 and tpr > max_tpr:
                 max_tpr = tpr
-                result = "threshold: {}, fpr: {}, tpr: {:.5f}".format(
-                    threshold, fpr, tpr)
-            fpr = np.sum(
-                gt_neg_score_list > threshold) / len(gt_neg_score_list)
-            if fpr <= self.max_fpr and tpr > max_tpr:
-                max_tpr = tpr
-                result = "threshold: {}, fpr: {}, tpr: {:.5f}".format(
-                    threshold, fpr, tpr)
+                result = "threshold: {},  tpr: {:.5f}".format(
+                    threshold, tpr)
+            else:
+                fpr = np.sum(
+                    gt_neg_score_list > threshold) / len(gt_neg_score_list)
+                if fpr <= self.max_fpr and tpr > max_tpr:
+                    max_tpr = tpr
+                    result = "threshold: {}, fpr: {}, tpr: {:.5f}".format(
+                        threshold, fpr, tpr)
         self.max_tpr = max_tpr
         return result
 
