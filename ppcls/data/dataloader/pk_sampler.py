@@ -18,9 +18,7 @@ from __future__ import division
 from collections import defaultdict
 
 import numpy as np
-import paddle.distributed as dist
 from paddle.io import DistributedBatchSampler
-
 from ppcls.utils import logger
 
 
