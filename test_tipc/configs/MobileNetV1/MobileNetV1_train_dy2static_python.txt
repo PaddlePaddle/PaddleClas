@@ -21,7 +21,7 @@ to_static_train:-o Global.to_static=True
 null:null
 ##
 =========================== amp_train ===========================
-model_name:MobileNetV1
+model_name:MobileNetV2
 python:python3.7
 gpu_list:0
 -o Global.device:gpu
