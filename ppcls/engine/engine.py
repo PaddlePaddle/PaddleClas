@@ -144,7 +144,8 @@ class Engine(object):
                                    self.config["Global"]["eval_during_train"]):
             if self.eval_mode in ["classification", "adaface"]:
                 self.eval_dataloader = build_dataloader(
-                    self.config["DataLoader"], "Eval", self.device, False)
+                    self.config["DataLoader"], "Eval", self.device,
+                    self.use_dali)
             elif self.eval_mode == "retrieval":
                 self.gallery_query_dataloader = None
                 if len(self.config["DataLoader"]["Eval"].keys()) == 1:
