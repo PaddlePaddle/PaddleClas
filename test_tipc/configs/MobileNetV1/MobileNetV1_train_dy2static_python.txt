@@ -1,5 +1,5 @@
 =========================== base_train ===========================
-model_name:MobileNetV2
+model_name:MobileNetV1
 python:python3.7
 gpu_list:0
 -o Global.device:gpu
@@ -21,7 +21,7 @@ to_static_train:-o Global.to_static=True
 null:null
 ##
 =========================== amp_train ===========================
-model_name:MobileNetV2
+model_name:MobileNetV1
 python:python3.7
 gpu_list:0
 -o Global.device:gpu
