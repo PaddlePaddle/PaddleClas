@@ -96,11 +96,6 @@ class PKSampler(DistributedBatchSampler):
                     format(diff))
 
     def __iter__(self):
-        # shuffing label_list manually in distributed environment
-        if self.nranks > 1:
-            cur_rank = dist.get_rank()
-            np.random.RandomState(42 + cur_rank).shuffle(self.label_list)
-
         label_per_batch = self.batch_size // self.sample_per_id
         for _ in range(len(self)):
             batch_index = []
