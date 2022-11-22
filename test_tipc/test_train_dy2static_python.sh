@@ -32,14 +32,11 @@ do
     echo ${config_lines} > $FILENAME
     sed -i 's/gpu_list.*$/gpu_list:0/g' $FILENAME
     sed -i '16s/$/ -o Global.print_batch_step=1/' ${FILENAME}
-
     IFS=$'\n'
-
 
     # start dygraph train
     dygraph_output=$LOG_PATH/${config_name}_python_train_infer_dygraph_output.txt
     dygraph_loss=$LOG_PATH/${config_name}_dygraph_loss.txt
-    sed -i '15ctrainer:norm_train' ${FILENAME}
     cmd="bash test_tipc/test_train_inference_python.sh ${FILENAME} $MODE >$dygraph_output 2>&1"
     echo $cmd
     eval $cmd
@@ -63,10 +60,10 @@ do
     last_status=$?
     cat $diff_log
     if [ "$dyout" = "" ]; then
+        status_check 1 $diff_cmd $status_log $model_name $diff_log
+    elif [ "$stout" = "" ]; then
         status_check 2 $diff_cmd $status_log $model_name $diff_log
+    else
+        status_check $last_status $diff_cmd $status_log $model_name $diff_log
     fi
-    if [ "$stout" = "" ]; then
-        status_check 2 $diff_cmd $status_log $model_name $diff_log
-    fi
-    status_check $last_status $diff_cmd $status_log $model_name $diff_log
 done
