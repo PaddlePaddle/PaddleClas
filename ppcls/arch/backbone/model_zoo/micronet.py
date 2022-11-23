@@ -204,7 +204,6 @@ class GroupConv(nn.Layer):
         self.inp = inp
         self.oup = oup
         self.groups = groups
-        # print('inp: %d, oup:%d, g:%d' % (inp, oup, self.groups[0]))
         self.conv = nn.Sequential(
             nn.Conv2D(
                 inp, oup, 1, groups=self.groups[0], bias_attr=False),
@@ -320,8 +319,6 @@ class DYShiftMax(nn.Layer):
         squeeze = _make_divisible(inp // reduction, 4)
         if squeeze < 4:
             squeeze = 4
-        # print('reduction: {}, squeeze: {}/{}'.format(reduction, inp, squeeze))
-        # print('init-a: {}, init-b: {}'.format(init_a, init_b))
 
         self.fc = nn.Sequential(
             nn.Linear(inp, squeeze),
@@ -331,7 +328,6 @@ class DYShiftMax(nn.Layer):
         self.g = g[1]
         if self.g != 1 and expansion:
             self.g = inp // self.g
-        # print('group shuffle: {}, divide group: {}'.format(self.g, expansion))
         self.gc = inp // self.g
         index = paddle.to_tensor(list(range(inp))).reshape([1, inp, 1, 1])
         index = index.reshape([1, self.g, self.gc, 1, 1])
@@ -390,8 +386,6 @@ class DYMicroBlock(nn.Layer):
                  ratio=1.0,
                  activation_cfg=None):
         super().__init__()
-
-        # print(dy)
 
         self.identity = stride == 1 and inp == oup
 
