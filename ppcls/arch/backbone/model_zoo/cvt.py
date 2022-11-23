@@ -688,5 +688,5 @@ def CvT_W24_384(pretrained=False, use_ssld=False, **kwargs):
         spec=msvit_spec,
         **kwargs)
     _load_pretrained(
-        pretrained, model, MODEL_URLS["CvT_21_384"], use_ssld=use_ssld)
+        pretrained, model, MODEL_URLS["CvT_W24_384"], use_ssld=use_ssld)
     return model
