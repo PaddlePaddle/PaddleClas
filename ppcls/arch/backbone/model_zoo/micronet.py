@@ -251,7 +251,7 @@ class SpatialSepConvSF(nn.Layer):
                 groups=oup1,
                 bias_attr=False),
             nn.BatchNorm2D(oup1 * oup2),
-            ChannelShuffle(oup1), )
+            ChannelShuffle(oup1))
 
     def forward(self, x):
         out = self.conv(x)
@@ -426,7 +426,7 @@ class DYMicroBlock(nn.Layer):
                     expansion=False) if y3 > 0 else nn.Identity(),
                 ChannelShuffle(g2),
                 ChannelShuffle(oup // 2)
-                if oup % 2 == 0 and y3 != 0 else nn.Identity(), )
+                if oup % 2 == 0 and y3 != 0 else nn.Identity())
         elif g2 == 0:
             self.layers = nn.Sequential(
                 GroupConv(inp, hidden_dim2, gs1),
@@ -439,7 +439,7 @@ class DYMicroBlock(nn.Layer):
                     reduction=act_reduction,
                     init_b=[init_ab3[1], 0.0],
                     g=gs1,
-                    expansion=False) if y3 > 0 else nn.Identity(), )
+                    expansion=False) if y3 > 0 else nn.Identity())
         else:
             self.layers = nn.Sequential(
                 GroupConv(inp, hidden_dim2, gs1),
@@ -465,7 +465,7 @@ class DYMicroBlock(nn.Layer):
                     reduction=act_reduction,
                     init_b=init_b,
                     g=gs1,
-                    expansion=True, ) if y2 > 0 else nn.ReLU6(),
+                    expansion=True) if y2 > 0 else nn.ReLU6(),
                 ChannelShuffle(hidden_dim2 // 4)
                 if y1 != 0 and y2 != 0 else nn.Identity()
                 if y1 == 0 and y2 == 0 else ChannelShuffle(hidden_dim2 // 2),
@@ -482,7 +482,7 @@ class DYMicroBlock(nn.Layer):
                     g=(g1, g2),
                     expansion=False) if y3 > 0 else nn.Identity(),
                 ChannelShuffle(g2),
-                ChannelShuffle(oup // 2) if y3 != 0 else nn.Identity(), )
+                ChannelShuffle(oup // 2) if y3 != 0 else nn.Identity())
 
     def forward(self, x):
         out = self.layers(x)
@@ -521,20 +521,17 @@ class MicroNet(nn.Layer):
                         groups_1x1=(c3, g3, g4),
                         dy=[y1, y2, y3],
                         ratio=r,
-                        activation_cfg=activation_cfg, ))
+                        activation_cfg=activation_cfg))
                 input_channel = c
         self.features = nn.Sequential(*layers)
 
-        self.avgpool = nn.Sequential(
-            nn.ReLU6(),
-            nn.AdaptiveAvgPool2D(1),
-            nn.Hardswish(), )
+        self.avgpool = nn.Sequential(nn.ReLU6(),
+                                     nn.AdaptiveAvgPool2D(1), nn.Hardswish())
 
         # building last several layers
         self.classifier = nn.Sequential(
             SwishLinear(input_channel, out_ch),
-            nn.Dropout(dropout_rate),
-            SwishLinear(out_ch, class_num), )
+            nn.Dropout(dropout_rate), SwishLinear(out_ch, class_num))
 
         self.apply(self._initialize_weights)
 
