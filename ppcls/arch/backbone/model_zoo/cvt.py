@@ -26,6 +26,7 @@ MODEL_URLS = {
     "CvT_13_384": "",  # TODO
     "CvT_21_224": "",  # TODO
     "CvT_21_384": "",  # TODO
+    "CvT_W24_384": "",  # TODO
 }
 
 __all__ = list(MODEL_URLS.keys())
@@ -637,6 +638,40 @@ def CvT_21_384(pretrained=False, use_ssld=False, **kwargs):
         ATTN_DROP_RATE=[0.0, 0.0, 0.0],
         DROP_RATE=[0.0, 0.0, 0.0],
         DROP_PATH_RATE=[0.0, 0.0, 0.1],
+        QKV_BIAS=[True, True, True],
+        CLS_TOKEN=[False, False, True],
+        POS_EMBED=[False, False, False],
+        QKV_PROJ_METHOD=['dw_bn', 'dw_bn', 'dw_bn'],
+        KERNEL_QKV=[3, 3, 3],
+        PADDING_KV=[1, 1, 1],
+        STRIDE_KV=[2, 2, 2],
+        PADDING_Q=[1, 1, 1],
+        STRIDE_Q=[1, 1, 1])
+    model = ConvolutionalVisionTransformer(
+        in_chans=3,
+        act_layer=QuickGELU,
+        init=msvit_spec.get('INIT', 'trunc_norm'),
+        spec=msvit_spec,
+        **kwargs)
+    _load_pretrained(
+        pretrained, model, MODEL_URLS["CvT_21_384"], use_ssld=use_ssld)
+    return model
+
+
+def CvT_W24_384(pretrained=False, use_ssld=False, **kwargs):
+    msvit_spec = dict(
+        INIT='trunc_norm',
+        NUM_STAGES=3,
+        PATCH_SIZE=[7, 3, 3],
+        PATCH_STRIDE=[4, 2, 2],
+        PATCH_PADDING=[2, 1, 1],
+        DIM_EMBED=[192, 768, 1024],
+        NUM_HEADS=[3, 12, 16],
+        DEPTH=[2, 2, 20],
+        MLP_RATIO=[4.0, 4.0, 4.0],
+        ATTN_DROP_RATE=[0.0, 0.0, 0.0],
+        DROP_RATE=[0.0, 0.0, 0.0],
+        DROP_PATH_RATE=[0.0, 0.0, 0.3],
         QKV_BIAS=[True, True, True],
         CLS_TOKEN=[False, False, True],
         POS_EMBED=[False, False, False],
