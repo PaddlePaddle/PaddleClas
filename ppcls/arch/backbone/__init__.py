@@ -75,7 +75,7 @@ from .model_zoo.foundation_vit import CLIP_vit_base_patch32_224, CLIP_vit_base_p
 from .model_zoo.convnext import ConvNeXt_tiny, ConvNeXt_small, ConvNeXt_base_224, ConvNeXt_base_384, ConvNeXt_large_224, ConvNeXt_large_384
 from .model_zoo.nextvit import NextViT_small_224, NextViT_base_224, NextViT_large_224, NextViT_small_384, NextViT_base_384, NextViT_large_384
 from .model_zoo.cae import cae_base_patch16_224, cae_large_patch16_224
-from .model_zoo.cvt import CvT_13_224, CvT_13_384, CvT_21_224, CvT_21_384
+from .model_zoo.cvt import CvT_13_224, CvT_13_384, CvT_21_224, CvT_21_384, CvT_W24_384
 
 from .variant_models.resnet_variant import ResNet50_last_stage_stride1
 from .variant_models.resnet_variant import ResNet50_adaptive_max_pool2d
