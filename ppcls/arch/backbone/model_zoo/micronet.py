@@ -232,11 +232,6 @@ class ChannelShuffle(nn.Layer):
         return out
 
 
-class ChannelShuffle2(ChannelShuffle):
-
-    pass
-
-
 class SpatialSepConvSF(nn.Layer):
     def __init__(self, inp, oups, kernel_size, stride):
         super().__init__()
@@ -417,8 +412,7 @@ class DYMicroBlock(nn.Layer):
                     g=gs1,
                     expansion=False) if y2 > 0 else nn.ReLU6(),
                 ChannelShuffle(gs1[1]),
-                ChannelShuffle2(hidden_dim2 // 2)
-                if y2 != 0 else nn.Identity(),
+                ChannelShuffle(hidden_dim2 // 2) if y2 != 0 else nn.Identity(),
                 GroupConv(hidden_dim2, oup, (g1, g2)),
                 DYShiftMax(
                     oup,
@@ -431,7 +425,7 @@ class DYMicroBlock(nn.Layer):
                     g=(g1, g2),
                     expansion=False) if y3 > 0 else nn.Identity(),
                 ChannelShuffle(g2),
-                ChannelShuffle2(oup // 2)
+                ChannelShuffle(oup // 2)
                 if oup % 2 == 0 and y3 != 0 else nn.Identity(), )
         elif g2 == 0:
             self.layers = nn.Sequential(
@@ -472,9 +466,9 @@ class DYMicroBlock(nn.Layer):
                     init_b=init_b,
                     g=gs1,
                     expansion=True, ) if y2 > 0 else nn.ReLU6(),
-                ChannelShuffle2(hidden_dim2 // 4)
+                ChannelShuffle(hidden_dim2 // 4)
                 if y1 != 0 and y2 != 0 else nn.Identity()
-                if y1 == 0 and y2 == 0 else ChannelShuffle2(hidden_dim2 // 2),
+                if y1 == 0 and y2 == 0 else ChannelShuffle(hidden_dim2 // 2),
                 GroupConv(hidden_dim2, oup, (g1, g2)),
                 DYShiftMax(
                     oup,
@@ -488,7 +482,7 @@ class DYMicroBlock(nn.Layer):
                     g=(g1, g2),
                     expansion=False) if y3 > 0 else nn.Identity(),
                 ChannelShuffle(g2),
-                ChannelShuffle2(oup // 2) if y3 != 0 else nn.Identity(), )
+                ChannelShuffle(oup // 2) if y3 != 0 else nn.Identity(), )
 
     def forward(self, x):
         out = self.layers(x)
