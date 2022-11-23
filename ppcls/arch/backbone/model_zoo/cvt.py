@@ -22,10 +22,10 @@ from paddle.nn.initializer import XavierUniform, TruncatedNormal, Constant
 from ....utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
 
 MODEL_URLS = {
-    "cvt_13_224x224": "",  # TODO
-    "cvt_13_384x384": "",  # TODO
-    "cvt_21_224x224": "",  # TODO
-    "cvt_21_384x384": "",  # TODO
+    "CvT_13_224": "",  # TODO
+    "CvT_13_384": "",  # TODO
+    "CvT_21_224": "",  # TODO
+    "CvT_21_384": "",  # TODO
 }
 
 __all__ = list(MODEL_URLS.keys())
@@ -521,7 +521,7 @@ def _load_pretrained(pretrained, model, model_url, use_ssld=False):
         )
 
 
-def cvt_13_224x224(pretrained=False, use_ssld=False, **kwargs):
+def CvT_13_224(pretrained=False, use_ssld=False, **kwargs):
     msvit_spec = dict(
         INIT='trunc_norm',
         NUM_STAGES=3,
@@ -551,11 +551,11 @@ def cvt_13_224x224(pretrained=False, use_ssld=False, **kwargs):
         spec=msvit_spec,
         **kwargs)
     _load_pretrained(
-        pretrained, model, MODEL_URLS["cvt_13_224x224"], use_ssld=use_ssld)
+        pretrained, model, MODEL_URLS["CvT_13_224"], use_ssld=use_ssld)
     return model
 
 
-def cvt_13_384x384(pretrained=False, use_ssld=False, **kwargs):
+def CvT_13_384(pretrained=False, use_ssld=False, **kwargs):
     msvit_spec = dict(
         INIT='trunc_norm',
         NUM_STAGES=3,
@@ -585,11 +585,11 @@ def cvt_13_384x384(pretrained=False, use_ssld=False, **kwargs):
         spec=msvit_spec,
         **kwargs)
     _load_pretrained(
-        pretrained, model, MODEL_URLS["cvt_13_384x384"], use_ssld=use_ssld)
+        pretrained, model, MODEL_URLS["CvT_13_384"], use_ssld=use_ssld)
     return model
 
 
-def cvt_21_224x224(pretrained=False, use_ssld=False, **kwargs):
+def CvT_21_224(pretrained=False, use_ssld=False, **kwargs):
     msvit_spec = dict(
         INIT='trunc_norm',
         NUM_STAGES=3,
@@ -619,11 +619,11 @@ def cvt_21_224x224(pretrained=False, use_ssld=False, **kwargs):
         spec=msvit_spec,
         **kwargs)
     _load_pretrained(
-        pretrained, model, MODEL_URLS["cvt_21_224x224"], use_ssld=use_ssld)
+        pretrained, model, MODEL_URLS["CvT_21_224"], use_ssld=use_ssld)
     return model
 
 
-def cvt_21_384x384(pretrained=False, use_ssld=False, **kwargs):
+def CvT_21_384(pretrained=False, use_ssld=False, **kwargs):
     msvit_spec = dict(
         INIT='trunc_norm',
         NUM_STAGES=3,
@@ -653,5 +653,5 @@ def cvt_21_384x384(pretrained=False, use_ssld=False, **kwargs):
         spec=msvit_spec,
         **kwargs)
     _load_pretrained(
-        pretrained, model, MODEL_URLS["cvt_21_384x384"], use_ssld=use_ssld)
+        pretrained, model, MODEL_URLS["CvT_21_384"], use_ssld=use_ssld)
     return model

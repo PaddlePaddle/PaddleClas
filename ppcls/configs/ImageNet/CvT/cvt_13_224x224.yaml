@@ -19,7 +19,7 @@ Global:
 
 # model architecture
 Arch:
-  name: cvt_13_224x224
+  name: CvT_13_224
   class_num: 1000
 
 # loss function config for traing/eval process
