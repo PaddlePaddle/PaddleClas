@@ -119,6 +119,9 @@ class Engine(object):
         #TODO(gaotingquan): support rec
         class_num = config["Arch"].get("class_num", None)
         self.config["DataLoader"].update({"class_num": class_num})
+        self.config["DataLoader"].update({
+            "epochs": self.config["Global"]["epochs"]
+        })
 
         # build dataloader
         if self.mode == 'train':
