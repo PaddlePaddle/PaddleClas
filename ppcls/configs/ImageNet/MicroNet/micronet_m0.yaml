@@ -18,7 +18,7 @@ Global:
 
 # model architecture
 Arch:
-  name: micronet_m0
+  name: MicroNet_M0
   class_num: 1000
  
 # loss function config for traing/eval process

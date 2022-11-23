@@ -23,10 +23,10 @@ import paddle.nn as nn
 from ....utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
 
 MODEL_URLS = {
-    "micronet_m0": "",  # TODO
-    "micronet_m1": "",  # TODO
-    "micronet_m2": "",  # TODO
-    "micronet_m3": "",  # TODO
+    "MicroNet_M0": "",  # TODO
+    "MicroNet_M1": "",  # TODO
+    "MicroNet_M2": "",  # TODO
+    "MicroNet_M3": "",  # TODO
 }
 
 __all__ = MODEL_URLS.keys()
@@ -562,7 +562,7 @@ def _load_pretrained(pretrained, model, model_url, use_ssld):
         )
 
 
-def micronet_m0(pretrained=False, use_ssld=False, **kwargs):
+def MicroNet_M0(pretrained=False, use_ssld=False, **kwargs):
     model = MicroNet(
         NET_CONFIG["msnx_dy6_exp4_4M_221"],
         ACTIVATION_CONFIG["msnx_dy6_exp4_4M_221"],
@@ -571,11 +571,11 @@ def micronet_m0(pretrained=False, use_ssld=False, **kwargs):
         out_ch=640,
         dropout_rate=0.05,
         **kwargs)
-    _load_pretrained(pretrained, model, MODEL_URLS["micronet_m0"], use_ssld)
+    _load_pretrained(pretrained, model, MODEL_URLS["MicroNet_M0"], use_ssld)
     return model
 
 
-def micronet_m1(pretrained=False, use_ssld=False, **kwargs):
+def MicroNet_M1(pretrained=False, use_ssld=False, **kwargs):
     model = MicroNet(
         NET_CONFIG["msnx_dy6_exp6_6M_221"],
         ACTIVATION_CONFIG["msnx_dy6_exp6_6M_221"],
@@ -584,11 +584,11 @@ def micronet_m1(pretrained=False, use_ssld=False, **kwargs):
         out_ch=960,
         dropout_rate=0.05,
         **kwargs)
-    _load_pretrained(pretrained, model, MODEL_URLS["micronet_m1"], use_ssld)
+    _load_pretrained(pretrained, model, MODEL_URLS["MicroNet_M1"], use_ssld)
     return model
 
 
-def micronet_m2(pretrained=False, use_ssld=False, **kwargs):
+def MicroNet_M2(pretrained=False, use_ssld=False, **kwargs):
     model = MicroNet(
         NET_CONFIG["msnx_dy9_exp6_12M_221"],
         ACTIVATION_CONFIG["msnx_dy9_exp6_12M_221"],
@@ -597,11 +597,11 @@ def micronet_m2(pretrained=False, use_ssld=False, **kwargs):
         out_ch=1024,
         dropout_rate=0.1,
         **kwargs)
-    _load_pretrained(pretrained, model, MODEL_URLS["micronet_m2"], use_ssld)
+    _load_pretrained(pretrained, model, MODEL_URLS["MicroNet_M2"], use_ssld)
     return model
 
 
-def micronet_m3(pretrained=False, use_ssld=False, **kwargs):
+def MicroNet_M3(pretrained=False, use_ssld=False, **kwargs):
     model = MicroNet(
         NET_CONFIG["msnx_dy12_exp6_20M_020"],
         ACTIVATION_CONFIG["msnx_dy12_exp6_20M_020"],
@@ -610,5 +610,5 @@ def micronet_m3(pretrained=False, use_ssld=False, **kwargs):
         out_ch=1024,
         dropout_rate=0.1,
         **kwargs)
-    _load_pretrained(pretrained, model, MODEL_URLS["micronet_m3"], use_ssld)
+    _load_pretrained(pretrained, model, MODEL_URLS["MicroNet_M3"], use_ssld)
     return model
