@@ -10,9 +10,9 @@
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
-# limitations under the License.from __future__ import division
+# limitations under the License.
+from __future__ import division
 
-# from ppcls.utils import logger
 import nvidia.dali.fn as fn
 import nvidia.dali.ops as ops
 import nvidia.dali.types as types
@@ -199,7 +199,8 @@ class RandomRotation(ops.Rotate):
     def __init__(self, *kargs, device="cpu", prob=0.5, angle=0, **kwargs):
         super(RandomRotation, self).__init__(*kargs, device=device, **kwargs)
         self.rng = ops.random.CoinFlip(probability=prob)
-        self.rng_angle = ops.random.Uniform(range=(-angle, angle))
+        discrete_angle = list(range(-angle, angle + 1))
+        self.rng_angle = ops.random.Uniform(values=discrete_angle)
 
     def __call__(self, data, **kwargs):
         do_rotate = self.rng()
