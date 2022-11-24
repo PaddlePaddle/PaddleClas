@@ -18,6 +18,7 @@
         - [1.2.7 MGD](#1.2.7)
         - [1.2.8 WSL](#1.2.8)
         - [1.2.9 SKD](#1.2.9)
+        - [1.2.10 PEFD](#1.2.10)
 - [2. Usage](#2)
     - [2.1 Environment Configuration](#2.1)
     - [2.2 Data Preparation](#2.2)
@@ -580,8 +581,8 @@ Loss:
         model_name_pairs: [["Student", "Teacher"]] # calculate mgdloss for Student and Teacher
         name: "loss_mgd"
         base_loss_name: MGDLoss # MGD loss, the following are parameters of 'MGD loss'
-        s_keys: ["blocks[7]"]   # feature map used to calculate MGD loss in student model
-        t_keys: ["blocks[15]"]  # feature map used to calculate MGD loss in teacher model
+        s_key: "blocks[7]"   # feature map used to calculate MGD loss in student model
+        t_key: "blocks[15]"  # feature map used to calculate MGD loss in teacher model
         student_channels: 512   # channel num for stduent feature map
         teacher_channels: 512   # channel num for teacher feature map
   Eval:
@@ -717,6 +718,80 @@ Loss:
         temperature: 1.0
         multiplier: 2.0
         alpha: 0.9
+  Eval:
+    - CELoss:
+        weight: 1.0
+```
+
+<a name='1.2.10'></a>
+
+#### 1.2.10 PEFD
+
+##### 1.2.10.1 Introduction to PEFD
+
+Paper:
+
+
+> [Improved Feature Distillation via Projector Ensemble](https://arxiv.org/pdf/2210.15274.pdf)
+>
+> Yudong Chen, Sen Wang, Jiajun Liu, Xuwei Xu, Frank de Hoog, Zi Huang
+>
+> NeurIPS 2022
+
+PEFD uses an ensemble of multiple projectors to transform student's features before applying the feature distillation loss, so as to prevent the student from overfitting the teacher's features and further improve the performance of feature distillation.
+
+Performance on ImageNet1k is shown below.
+
+| Strategy | Backbone | Config | Top-1 acc | Download Link |
+| --- | --- | --- | --- | --- |
+| baseline | ResNet18 | [ResNet18.yaml](../../../ppcls/configs/ImageNet/ResNet/ResNet18.yaml) | 70.8% | - |
+| PEFD | ResNet18 | [resnet34_distill_resnet18_pefd.yaml](../../../ppcls/configs/ImageNet/Distillation/resnet34_distill_resnet18_pefd.yaml) | 72.23%(**+1.43%**) | - |
+
+
+##### 1.2.10.2 Configuration of PEFD
+
+The PEFD configuration is shown below. In the `Arch` field, you need to define both the student model and the teacher model. The teacher model has fixed parameters, and the pretrained parameters are loaded. In the `Loss` field, you need to define `DistillationPairLoss` (PEFD loss between student and teacher) and `DistillationGTCELoss` (CE loss with ground truth labels) as the training loss.
+
+
+```yaml
+# model architecture
+Arch:
+  name: "DistillationModel"
+  class_num: &class_num 1000
+  # if not null, its lengths should be same as models
+  pretrained_list:
+  # if not null, its lengths should be same as models
+  freeze_params_list:
+  - True
+  - False
+  infer_model_name: "Student"
+  models:
+    - Teacher:
+        name: ResNet34
+        class_num: *class_num
+        pretrained: True
+        return_patterns: &t_stages ["avg_pool"]
+    - Student:
+        name: ResNet18
+        class_num: *class_num
+        pretrained: False
+        return_patterns: &s_stages ["avg_pool"]
+
+# loss function config for traing/eval process
+Loss:
+  Train:
+    - DistillationGTCELoss:
+        weight: 1.0
+        model_names: ["Student"]
+    - DistillationPairLoss:
+        weight: 25.0
+        base_loss_name: PEFDLoss
+        model_name_pairs: [["Student", "Teacher"]]
+        s_key: "avg_pool"
+        t_key: "avg_pool"
+        name: "loss_pefd"
+        student_channel: 512
+        teacher_channel: 512
   Eval:
     - CELoss:
         weight: 1.0

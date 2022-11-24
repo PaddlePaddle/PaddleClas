@@ -119,6 +119,9 @@ class Engine(object):
         #TODO(gaotingquan): support rec
         class_num = config["Arch"].get("class_num", None)
         self.config["DataLoader"].update({"class_num": class_num})
+        self.config["DataLoader"].update({
+            "epochs": self.config["Global"]["epochs"]
+        })
 
         # build dataloader
         if self.mode == 'train':
@@ -330,13 +333,19 @@ class Engine(object):
             )) > 0:
                 self.train_loss_func = paddle.DataParallel(
                     self.train_loss_func)
-            # set seed for different GPU
+
+            # set different seed in different GPU manually in distributed environment
+            if seed is None:
+                logger.warning(
+                    "The random seed cannot be None in a distributed environment. Global.seed has been set to 42 by default"
+                )
+                self.config["Global"]["seed"] = seed = 42
             logger.info(
-                f"Engine - set different seed for different GPU, set seed {42 + dist.get_rank()} for rank {dist.get_rank()}"
+                f"Set random seed to ({int(seed)} + $PADDLE_TRAINER_ID) for different trainer"
             )
-            paddle.seed(42 + dist.get_rank())
-            np.random.seed(42 + dist.get_rank())
-            random.seed(42 + dist.get_rank())
+            paddle.seed(int(seed) + dist.get_rank())
+            np.random.seed(int(seed) + dist.get_rank())
+            random.seed(int(seed) + dist.get_rank())
 
         # build postprocess for infer
         if self.mode == 'infer':
