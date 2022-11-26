@@ -515,11 +515,14 @@ class ExternalSource_RandomIdentity(object):
 
         # whole dataset size
         self.data_set_len = len(self.image_paths)
+
         # get sharded size
         self.sharded_data_set_len = self.data_set_len // self.num_gpus
-        # iteration count
-        self.iter_count = 0
+
+        # iteration log
         self.shuffle = shuffle
+        self.total_iter = self.sharded_data_set_len // batch_size
+        self.iter_count = 0
 
     def __iter__(self):
         if self.shuffle:
@@ -529,11 +532,9 @@ class ExternalSource_RandomIdentity(object):
         return self
 
     def __next__(self):
-        if self.iter_count >= self.sharded_data_set_len:
-            seed = self.shard_id * 12345 + self.epoch
-            np.random.RandomState(seed).shuffle(self.label_list)
-            self.epoch += 1
-            raise StopIteration()
+        if self.iter_count >= self.total_iter:
+            self.__iter__()
+            self.iter_count = 0
 
         batch_indexes = []
         for _ in range(self.sharded_data_set_len):
