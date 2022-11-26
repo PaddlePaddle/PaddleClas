@@ -415,6 +415,7 @@ class ExternalSource_RandomIdentity(object):
         sample_method (str, optional): sample method when generating prob_list. Defaults to "sample_avg_prob".
         id_list (List[int], optional): list of (start_id, end_id, start_id, end_id) for set of ids to duplicated. Defaults to None.
         ratio (List[Union[int, float]], optional): list of (ratio1, ratio2..) the duplication number for ids in id_list. Defaults to None.
+        shuffle (bool): whether to shuffle label list. Defaults to True.
     """
 
     def __init__(self,
