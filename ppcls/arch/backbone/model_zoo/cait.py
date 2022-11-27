@@ -21,6 +21,19 @@ from .vision_transformer import VisionTransformer, Identity, DropPath, Mlp, Patc
 
 from ....utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
 
+MODEL_URLS = {
+    "CaiT_M48": "",
+    "CaiT_M36": "",
+    "CaiT_S36": "",
+    "CaiT_S24": "",
+    "CaiT_S24_224": "",
+    "CaiT_XS24": "",
+    "CaiT_XXS24": "",
+    "CaiT_XXS24_224": "",
+    "CaiT_XXS36": "",
+    "CaiT_XXS36_224": "",
+}
+
 
 class ClassAttention(nn.Layer):
     """
@@ -298,3 +311,206 @@ class Cait(VisionTransformer):
         x = self.forward_features(x)
         x = self.head(x)
         return x
+
+
+def _load_pretrained(pretrained, model, model_url, use_ssld=False):
+    if pretrained is False:
+        pass
+    elif pretrained is True:
+        load_dygraph_pretrain_from_url(model, model_url, use_ssld=use_ssld)
+    elif isinstance(pretrained, str):
+        load_dygraph_pretrain(model, pretrained)
+    else:
+        raise RuntimeError(
+            "pretrained type is not available. Please use `string` or `boolean` type."
+        )
+
+
+def CaiT_M48(pretrained=False, use_ssld=False, **kwargs):
+    model = Cait(image_size=448,
+                 patch_size=16,
+                 embed_dim=768,
+                 depth=48,
+                 num_heads=16,
+                 mlp_ratio=4,
+                 qkv_bias=True,
+                 norm_layer=nn.LayerNorm(epsilon=1e-6),
+                 init_scale=1e-6,
+                 depth_token_only=2,
+                 **kwargs)
+    _load_pretrained(pretrained=pretrained,
+                     model=model,
+                     model_url=MODEL_URLS['CaiT_M48'],
+                     use_ssld=use_ssld)
+    return model
+
+
+def CaiT_M36(pretrained=False, use_ssld=False, **kwargs):
+    model = Cait(image_size=384,
+                 patch_size=16,
+                 embed_dim=768,
+                 depth=36,
+                 num_heads=16,
+                 mlp_ratio=4,
+                 qkv_bias=True,
+                 norm_layer=nn.LayerNorm(epsilon=1e-6),
+                 init_scale=1e-6,
+                 depth_token_only=2,
+                 **kwargs)
+    _load_pretrained(pretrained=pretrained,
+                     model=model,
+                     model_url=MODEL_URLS['CaiT_M36'],
+                     use_ssld=use_ssld)
+    return model
+
+
+def CaiT_S36(pretrained=False, use_ssld=False, **kwargs):
+    model = Cait(image_size=384,
+                 patch_size=16,
+                 embed_dim=384,
+                 depth=36,
+                 num_heads=8,
+                 mlp_ratio=4,
+                 qkv_bias=True,
+                 norm_layer=nn.LayerNorm(epsilon=1e-6),
+                 init_scale=1e-6,
+                 depth_token_only=2,
+                 **kwargs)
+    _load_pretrained(pretrained=pretrained,
+                     model=model,
+                     model_url=MODEL_URLS['CaiT_S36'],
+                     use_ssld=use_ssld)
+    return model
+
+
+def CaiT_S24(pretrained=False, use_ssld=False, **kwargs):
+    model = Cait(image_size=384,
+                 patch_size=16,
+                 embed_dim=384,
+                 depth=24,
+                 num_heads=8,
+                 mlp_ratio=4,
+                 qkv_bias=True,
+                 norm_layer=nn.LayerNorm(epsilon=1e-6),
+                 init_scale=1e-5,
+                 depth_token_only=2,
+                 **kwargs)
+    _load_pretrained(pretrained=pretrained,
+                     model=model,
+                     model_url=MODEL_URLS['CaiT_S24'],
+                     use_ssld=use_ssld)
+    return model
+
+
+def CaiT_S24_224(pretrained=False, use_ssld=False, **kwargs):
+    model = Cait(image_size=224,
+                 patch_size=16,
+                 embed_dim=384,
+                 depth=24,
+                 num_heads=8,
+                 mlp_ratio=4,
+                 qkv_bias=True,
+                 norm_layer=nn.LayerNorm(epsilon=1e-6),
+                 init_scale=1e-5,
+                 depth_token_only=2,
+                 **kwargs)
+    _load_pretrained(pretrained=pretrained,
+                     model=model,
+                     model_url=MODEL_URLS['CaiT_S24_224'],
+                     use_ssld=use_ssld)
+    return model
+
+
+def CaiT_XS24(pretrained=False, use_ssld=False, **kwargs):
+    model = Cait(image_size=384,
+                 patch_size=16,
+                 embed_dim=288,
+                 depth=24,
+                 num_heads=6,
+                 mlp_ratio=4,
+                 qkv_bias=True,
+                 norm_layer=nn.LayerNorm(epsilon=1e-6),
+                 init_scale=1e-5,
+                 depth_token_only=2,
+                 **kwargs)
+    _load_pretrained(pretrained=pretrained,
+                     model=model,
+                     model_url=MODEL_URLS['CaiT_XS24'],
+                     use_ssld=use_ssld)
+    return model
+
+
+def CaiT_XXS36(pretrained=False, use_ssld=False, **kwargs):
+    model = Cait(image_size=384,
+                 patch_size=16,
+                 embed_dim=192,
+                 depth=36,
+                 num_heads=4,
+                 mlp_ratio=4,
+                 qkv_bias=True,
+                 norm_layer=nn.LayerNorm(epsilon=1e-6),
+                 init_scale=1e-5,
+                 depth_token_only=2,
+                 **kwargs)
+    _load_pretrained(pretrained=pretrained,
+                     model=model,
+                     model_url=MODEL_URLS['CaiT_XXS36'],
+                     use_ssld=use_ssld)
+    return model
+
+
+def CaiT_XXS36_224(pretrained=False, use_ssld=False, **kwargs):
+    model = Cait(image_size=224,
+                 patch_size=16,
+                 embed_dim=192,
+                 depth=36,
+                 num_heads=4,
+                 mlp_ratio=4,
+                 qkv_bias=True,
+                 norm_layer=nn.LayerNorm(epsilon=1e-6),
+                 init_scale=1e-5,
+                 depth_token_only=2,
+                 **kwargs)
+    _load_pretrained(pretrained=pretrained,
+                     model=model,
+                     model_url=MODEL_URLS['CaiT_XXS36_224'],
+                     use_ssld=use_ssld)
+    return model
+
+
+def CaiT_XXS24(pretrained=False, use_ssld=False, **kwargs):
+    model = Cait(image_size=384,
+                 patch_size=16,
+                 embed_dim=192,
+                 depth=24,
+                 num_heads=4,
+                 mlp_ratio=4,
+                 qkv_bias=True,
+                 norm_layer=nn.LayerNorm(epsilon=1e-6),
+                 init_scale=1e-5,
+                 depth_token_only=2,
+                 **kwargs)
+    _load_pretrained(pretrained=pretrained,
+                     model=model,
+                     model_url=MODEL_URLS['CaiT_XXS24'],
+                     use_ssld=use_ssld)
+    return model
+
+
+def CaiT_XXS24_224(pretrained=False, use_ssld=False, **kwargs):
+    model = Cait(image_size=224,
+                 patch_size=16,
+                 embed_dim=192,
+                 depth=24,
+                 num_heads=4,
+                 mlp_ratio=4,
+                 qkv_bias=True,
+                 norm_layer=nn.LayerNorm(epsilon=1e-6),
+                 init_scale=1e-5,
+                 depth_token_only=2,
+                 **kwargs)
+    _load_pretrained(pretrained=pretrained,
+                     model=model,
+                     model_url=MODEL_URLS['CaiT_XXS24_224'],
+                     use_ssld=use_ssld)
+    return model
