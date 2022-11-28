@@ -34,6 +34,8 @@ MODEL_URLS = {
     "CaiT_XXS36_224": "",
 }
 
+__all__ = list(MODEL_URLS.keys())
+
 
 class ClassAttention(nn.Layer):
     """
@@ -55,6 +57,8 @@ class ClassAttention(nn.Layer):
         self.proj = nn.Linear(dim, dim)
         self.proj_drop = nn.Dropout(proj_drop)
 
+        self.softmax = nn.Softmax(axis=-1)
+
     def forward(self, x):
         B, N, C = x.shape
 
@@ -71,8 +75,8 @@ class ClassAttention(nn.Layer):
         v = v.transpose([0, 2, 1, 3])
 
         q = q * self.scale
-        attn = paddle.matmul(q, k.transpose([-2, -1]))
-        attn = nn.Softmax(attn, axis=-1)
+        attn = paddle.matmul(q, k.transpose([0, 1, 3, 2]))
+        attn = self.softmax(attn)
         attn = self.attn_drop(attn)
 
         x_cls = paddle.matmul(attn, v)
@@ -151,6 +155,8 @@ class AttentionTalkingHead(nn.Layer):
 
         self.proj_drop = nn.Dropout(proj_drop)
 
+        self.softmax = nn.Softmax(axis=-1)
+
     def transpose_multihead(self, x):
         new_shape = tuple(x.shape[:-1]) + (self.num_heads, self.dim_head)
         x = x.reshape(new_shape)
@@ -163,14 +169,14 @@ class AttentionTalkingHead(nn.Layer):
         qkv = qkv.transpose([2, 0, 3, 1, 4])
         q, k, v = qkv[0] * self.scale , qkv[1], qkv[2] 
 
-        attn = paddle.matmul(q, k.transpose([-2, -1]))
+        attn = paddle.matmul(q, k.transpose([0, 1, 3, 2]))
 
         # projection across heads (before softmax)
         attn = attn.transpose([0, 2, 3, 1]) #[B, num_patches, num_patches, num_heads]
         attn = self.proj_l(attn)
         attn = attn.transpose([0, 3, 1, 2]) #[B, num_heads, num_patches, num_patches]
 
-        attn = nn.Softmax(attn, axis=-1)
+        attn = self.softmax(attn)
 
         # projection across heads (after softmax)
         attn = attn.transpose([0, 2, 3, 1]) #[B, num_patches, num_patches, num_heads]
@@ -183,7 +189,7 @@ class AttentionTalkingHead(nn.Layer):
         x = x.transpose([0, 2, 1, 3]) #[B, num_patches, num_heads, single_head_dim]
         x = x.reshape([B, N, C])
         x = self.proj(x)
-        x = self.proj_dropout(x)
+        x = self.proj_drop(x)
         return x
 
 
@@ -231,7 +237,7 @@ class Cait(VisionTransformer):
     """
     CaiT Model
     """
-    def __init__(self, image_size=224, patch_size=16, in_channels=3, num_classes=1000,
+    def __init__(self, image_size=224, patch_size=16, in_channels=3, class_num=1000,
                  embed_dim=768, depth=12, num_heads=12, mlp_ratio=4.,
                  qkv_bias=False, qk_scale=None, drop_rate=0., attn_drop_rate=0.,
                  drop_path_rate=0., norm_layer=nn.LayerNorm, global_pool=None,
@@ -247,12 +253,12 @@ class Cait(VisionTransformer):
                  depth_token_only=2,
                  mlp_ratio_clstk = 4.0):
         super().__init__()
-        self.num_classes = num_classes
+        self.class_num = class_num
         self.num_features = self.embed_dim = embed_dim
         # convert image to paches
-        self.patch_embed = Patch_layer(image_size=image_size,
+        self.patch_embed = Patch_layer(img_size=image_size,
                                        patch_size=patch_size,
-                                       in_channels=in_channels,
+                                       in_chans=in_channels,
                                        embed_dim=embed_dim)
         num_patches = self.patch_embed.num_patches
         # tokens add for classification
@@ -287,7 +293,7 @@ class Cait(VisionTransformer):
 
         self.norm = norm_layer(embed_dim, epsilon=1e-6)
         self.feature_info = [dict(num_chs=embed_dim, reduction=0, module='head')]
-        self.head = nn.Linear(embed_dim, num_classes) if num_classes > 0 else Identity()
+        self.head = nn.Linear(embed_dim, class_num) if class_num > 0 else Identity()
 
     def forward_features(self, x):
         # Patch Embedding
@@ -334,7 +340,7 @@ def CaiT_M48(pretrained=False, use_ssld=False, **kwargs):
                  num_heads=16,
                  mlp_ratio=4,
                  qkv_bias=True,
-                 norm_layer=nn.LayerNorm(epsilon=1e-6),
+                 norm_layer=nn.LayerNorm,
                  init_scale=1e-6,
                  depth_token_only=2,
                  **kwargs)
@@ -353,7 +359,7 @@ def CaiT_M36(pretrained=False, use_ssld=False, **kwargs):
                  num_heads=16,
                  mlp_ratio=4,
                  qkv_bias=True,
-                 norm_layer=nn.LayerNorm(epsilon=1e-6),
+                 norm_layer=nn.LayerNorm,
                  init_scale=1e-6,
                  depth_token_only=2,
                  **kwargs)
@@ -372,7 +378,7 @@ def CaiT_S36(pretrained=False, use_ssld=False, **kwargs):
                  num_heads=8,
                  mlp_ratio=4,
                  qkv_bias=True,
-                 norm_layer=nn.LayerNorm(epsilon=1e-6),
+                 norm_layer=nn.LayerNorm,
                  init_scale=1e-6,
                  depth_token_only=2,
                  **kwargs)
@@ -391,7 +397,7 @@ def CaiT_S24(pretrained=False, use_ssld=False, **kwargs):
                  num_heads=8,
                  mlp_ratio=4,
                  qkv_bias=True,
-                 norm_layer=nn.LayerNorm(epsilon=1e-6),
+                 norm_layer=nn.LayerNorm,
                  init_scale=1e-5,
                  depth_token_only=2,
                  **kwargs)
@@ -410,7 +416,7 @@ def CaiT_S24_224(pretrained=False, use_ssld=False, **kwargs):
                  num_heads=8,
                  mlp_ratio=4,
                  qkv_bias=True,
-                 norm_layer=nn.LayerNorm(epsilon=1e-6),
+                 norm_layer=nn.LayerNorm,
                  init_scale=1e-5,
                  depth_token_only=2,
                  **kwargs)
@@ -429,7 +435,7 @@ def CaiT_XS24(pretrained=False, use_ssld=False, **kwargs):
                  num_heads=6,
                  mlp_ratio=4,
                  qkv_bias=True,
-                 norm_layer=nn.LayerNorm(epsilon=1e-6),
+                 norm_layer=nn.LayerNorm,
                  init_scale=1e-5,
                  depth_token_only=2,
                  **kwargs)
@@ -448,7 +454,7 @@ def CaiT_XXS36(pretrained=False, use_ssld=False, **kwargs):
                  num_heads=4,
                  mlp_ratio=4,
                  qkv_bias=True,
-                 norm_layer=nn.LayerNorm(epsilon=1e-6),
+                 norm_layer=nn.LayerNorm,
                  init_scale=1e-5,
                  depth_token_only=2,
                  **kwargs)
@@ -467,7 +473,7 @@ def CaiT_XXS36_224(pretrained=False, use_ssld=False, **kwargs):
                  num_heads=4,
                  mlp_ratio=4,
                  qkv_bias=True,
-                 norm_layer=nn.LayerNorm(epsilon=1e-6),
+                 norm_layer=nn.LayerNorm,
                  init_scale=1e-5,
                  depth_token_only=2,
                  **kwargs)
@@ -486,7 +492,7 @@ def CaiT_XXS24(pretrained=False, use_ssld=False, **kwargs):
                  num_heads=4,
                  mlp_ratio=4,
                  qkv_bias=True,
-                 norm_layer=nn.LayerNorm(epsilon=1e-6),
+                 norm_layer=nn.LayerNorm,
                  init_scale=1e-5,
                  depth_token_only=2,
                  **kwargs)
@@ -505,7 +511,7 @@ def CaiT_XXS24_224(pretrained=False, use_ssld=False, **kwargs):
                  num_heads=4,
                  mlp_ratio=4,
                  qkv_bias=True,
-                 norm_layer=nn.LayerNorm(epsilon=1e-6),
+                 norm_layer=nn.LayerNorm,
                  init_scale=1e-5,
                  depth_token_only=2,
                  **kwargs)
