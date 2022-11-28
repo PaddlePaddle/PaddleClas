@@ -78,7 +78,7 @@ DALI 可以选择将数据预处理放到GPU上进行，因此绝大部分算子
 1. 在 `ppcls/data/preprocess/ops/dali_operators.py` 中开发python侧DALI算子的代码。
 2. 在 `ppcls/data/preprocess/ops/dali.py` 开头处 import 导入开发好的算子类，并在 `convert_cfg_to_dali` 函数内参照其它算子配置转换逻辑，为添加的算子也加入对应的配置转换逻辑。
 3. （可选）如果开发的算子属于 fused operator，则还需在 `ppcls/data/preprocess/ops/dali.py` 的 `build_dali_transforms` 函数内，参照已有融合算子逻辑，添加新算子对应的融合逻辑。
-4. （可选）如果开发的是 External Source 类的 sampler 算子，可参照已有的 `ExternalSource_RandomIdentity` 代码进行开发，并在添加对应调用逻辑。
+4. （可选）如果开发的是 External Source 类的 sampler 算子，可参照已有的 `ExternalSource_RandomIdentity` 代码进行开发，并在添加对应调用逻辑。实际上 External Source 类可视作对原有的Dataset和Sampler代码进行合并。
 
 ### 4.2 RandomFlip
 以 PaddleClas 已有的 [RandFlipImage](../../../../ppcls/data/preprocess/ops/operators.py#L499) 算子为例，我们希望在使用DALI训练时，将其转换为对应的 DALI 算子，且同样具备 **按指定的 `prob` 概率进行 指定的水平 or 垂直翻转**
@@ -179,7 +179,8 @@ class RandomRotation(ops.Rotate):
     def __init__(self, *kargs, device="cpu", prob=0.5, angle=0, **kwargs):
         super(RandomRotation, self).__init__(*kargs, device=device, **kwargs)
         self.rng = ops.random.CoinFlip(probability=prob)
-        self.rng_angle = ops.random.Uniform(range=(-angle, angle))
+        discrete_angle = list(range(-angle, angle + 1))
+        self.rng_angle = ops.random.Uniform(values=discrete_angle)
 
     def __call__(self, data, **kwargs):
         do_rotate = self.rng()
@@ -198,14 +199,11 @@ class RandomRotation(ops.Rotate):
 
 ## 5. FAQ
 
-- 是否所有算子都能以继承-重载的方式改写成DALI算子？
+- **Q**：是否所有算子都能以继承-重载的方式改写成DALI算子？
+  **A**：具体视算子本身的执行逻辑而定，如 `RandomErasing` 算子实际上比较难在python侧转换成DALI算子，尽管DALI有一个对应的 [random_erasing Demo](https://docs.nvidia.com/deeplearning/dali/user-guide/docs/examples/general/erase.html?highlight=erase)，但其实际执行中的随机逻辑与 `RandomErasing` 存在一定差异，无法保证等价转换。可以尝试使用 [python_function](https://docs.nvidia.com/deeplearning/dali/main-user-guide/docs/operations/nvidia.dali.fn.python_function.html?highlight=python_function#nvidia.dali.fn.python_function) 来接入python实现的数据增强
 
-  **A**：具体视算子本身的执行逻辑而定，如 `RandomErasing` 算子实际上比较难在python侧转换成DALI算子，尽管DALI有一个对应的 [random_erasing Demo](https://docs.nvidia.com/deeplearning/dali/user-guide/docs/examples/general/erase.html?highlight=erase)，但其实际执行中的随机逻辑与 `RandomErasing` 存在一定差异，无法保证等价转换
+- **Q**：使用DALI训练模型的最终精度与不使用DALI不同？
+  **A**：由于DALI底层实现是NVIDIA官方编写的代码，而operators.py中调用的是cv2、Pillow库，可能存在无法避免的细微差异，如同样的插值方法，实现存在不同。因此只能尽量从执行逻辑、参数、随机数分布上进行等价转换，而无法做到完全一致。如果出现较大diff，可以检查转换来的DALI算子代码执行逻辑、参数、随机数分布是否存在问题，也可以将读取结果可视化检查。另外需要注意的是如果使用DALI的数据预处理接口进行训练，那么为了获得最佳的精度，也应该用DALI的数据预处理接口进行测试，否则可能会造成精度下降。
 
-- 使用DALI训练模型的最终精度与不使用DALI不同？
-
-  **A**：由于DALI底层实现是NVIDIA官方编写的代码，而operators.py中调用的是cv2、Pillow库，可能存在无法避免的细微差异，因此只能尽量从执行逻辑、参数、随机数分布上进行等价转换，而无法做到完全一致。如果出现较大diff，可以检查转换来的DALI算子代码执行逻辑、参数、随机数分布是否存在问题，也可以将读取结果可视化检查。
-
-- 如果模型使用比较复杂的Sampler如PKsampler该如何改写呢？
-
+- **Q**：如果模型使用比较复杂的Sampler如PKsampler该如何改写呢？
   **A**：从开发成本考虑，目前比较推荐的方法([#issue 4407](https://github.com/NVIDIA/DALI/issues/4407#issuecomment-1298132180))是使用DALI官方提供的 [`External Source Operator`](https://docs.nvidia.com/deeplearning/dali/user-guide/docs/examples/general/data_loading/external_input.html) 完成自定义Sampler的编写，实际上 [dali.py](../../../../ppcls/data/dataloader/dali.py) 也提供了基于 `External Source Operator` 的 `PKSampler` 的实现 `ExternalSource_RandomIdentity`。
