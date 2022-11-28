@@ -193,7 +193,7 @@ Infer:
   PostProcess:
     args1: args1
     args2: args2
-  
+
 ```
 
 **备注：** 该模块只在infer时使用。
@@ -218,7 +218,7 @@ class MyLoss(nn.Layer):
         super().__init__()
         # you init code
         pass
-        
+
     def loss(self, **kwargs):
         your loss code
         pass
@@ -340,8 +340,8 @@ PaddleClas 中的算法都有相对应的文档说明，当给 PaddleClas 提供
 
 算法类型|需要修改的文档地址|备注|
 | --- | --- | --- |
-| 骨干网络 |[文档地址1](../models/ImageNet1k)；[文档地址2](../models/ImageNet1k/README.md)|在文档地址1中新增模型介绍，在文档地址2中新增模型的精度等信息| 
-| PULC |[文档地址1](../models/PULC)；[文档地址2](../models/PULC/model_list.md)|在文档地址1中新增模型介绍，在文档地址2中新增模型的精度等信息| 
+| 骨干网络 |[文档目录](../models/ImageNet1k)；[model_list文档](../models/ImageNet1k/README.md)|在[文档目录](../models/ImageNet1k)中新建md文件，文件以模型算法名称命名，内容为所添加模型的介绍，具体可参考该目录下其他模型介绍文档；修改[model_list文档](../models/ImageNet1k/README.md)，在其中新增关于模型的精度、参数量、计算量、引用论文等内容，格式可参考该文档内的其他模型。|
+| PULC |[文档地址1](../models/PULC)；[文档地址2](../models/PULC/model_list.md)|在文档地址1中新增模型介绍，在文档地址2中新增模型的精度等信息|
 | 知识蒸馏相关 |[文档地址](../training/advanced/knowledge_distillation.md)|-|
 | 数据增强相关 |[文档地址1](../training/config_description/data_augmentation.md)；[文档地址2](../algorithm_introduction/data_augmentation.md)|-|
 | 其他 |[文档地址1](../algorithm_introduction)；[文档地址2](../training)；[文档地址3](../models)|需要判断在文档地址1、文档地址2、文档地址3中添加相关的文档|
@@ -354,11 +354,16 @@ PaddleClas 中的算法都有相对应的文档说明，当给 PaddleClas 提供
 
 飞桨除了基本的模型训练和预测，还提供了支持多端多平台的高性能推理部署工具。PaddleClas中所有模型和算法需要通过飞桨训推一体认证 (Training and Inference Pipeline Certification(TIPC)) ，在您提供模型时，模型需要同时通过该认证。
 
-TIPC 当前包含很多细的方向的认证，当前只需要通过新增模型只需要通过训练和推理的基础认证即可，详情可以参考：[Linux端基础训练预测功能测试](../../../test_tipc/docs/test_train_inference_python.md)，开发流程简述如下：
+TIPC 当前包含很多细分方向的认证，当前只需要通过新增模型只需要通过训练和推理的基础认证即可，详情可以参考：[Linux端基础训练预测功能测试](../../../test_tipc/docs/test_train_inference_python.md)，开发流程简述如下：
 
-- 1.新增 TIPC config，此处可以参考[DeiT](../../../test_tipc/configs/DeiT)的config配置。
-- 2.走通[Linux 端基础训练预测功能测试模式一](../../../test_tipc/docs/test_train_inference_python.md#22-功能测试)，检查输出没有报错即可。
+1. 添加 TIPC config 配置文件：
 
-**备注：** 
+在[目录]()下新建目录`model_series`，在其中新建txt文件，文件命名为 model_name_train_infer_python.txt。其中model_series为新增算法模型的系列名称，如 DeiT，model_name为具体模型名称，如 DeiT_tiny_patch16_224；model_name_train_infer_python.txt 文件内容可以参考其他模型的config配置，如[DeiT](../../../test_tipc/configs/DeiT/DeiT_tiny_patch16_224_train_infer_python.txt)。
+
+2. 新增模型的TIPC基础链接功能运行通过：
+
+按照文档[Linux端基础训练预测功能测试](../../../test_tipc/docs/test_train_inference_python.md#22-功能测试)依次完成“安装依赖”和“功能测试”，其中“功能测试”只需运行其中的“模式1：lite_train_lite_infer”。运行通过标准为上述命令运行完成不报错即可。
+
+**备注：**
 - 当前只需要走通功能测试的模式一即可；
 - 如果在添加TIPC过程中遇到任何问题，欢迎给我们提 [issue](https://github.com/PaddlePaddle/PaddleClas/issues)。
