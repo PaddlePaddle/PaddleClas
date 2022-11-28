@@ -17,7 +17,7 @@
 
 import paddle
 import paddle.nn as nn
-from .vision_transformer import VisionTransformer, Identity, DropPath, Mlp, PatchEmbed
+from .vision_transformer import Identity, DropPath, Mlp, PatchEmbed, ones_, zeros_, trunc_normal_
 
 from ....utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
 
@@ -64,7 +64,7 @@ class ClassAttention(nn.Layer):
 
         q = self.q(x[:,0]).unsqueeze(1)
         q = q.reshape([B, 1, self.num_heads, C // self.num_heads])
-        q = q.transpose(0, 2, 1, 3)
+        q = q.transpose([0, 2, 1, 3])
 
         k = self.k(x)
         k = k.reshape([B, N, self.num_heads, C // self.num_heads])
@@ -233,7 +233,7 @@ class LayerScaleBlock(nn.Layer):
         return x
 
 
-class Cait(VisionTransformer):
+class Cait(nn.Layer):
     """
     CaiT Model
     """
@@ -265,12 +265,14 @@ class Cait(VisionTransformer):
         self.cls_token = paddle.create_parameter(
             shape=[1, 1, embed_dim],
             dtype='float32',
-            default_initializer=nn.initializer.Constant(0.0))
+            default_initializer=zeros_)
+        self.add_parameter("cls_token", self.cls_token)
         # positional embeddings for patch positions
         self.pos_embed = paddle.create_parameter(
             shape=[1, num_patches, embed_dim],
             dtype='float32',
-            default_initializer=nn.initializer.Constant(0.0))
+            default_initializer=zeros_)
+        self.add_parameter("pos_embed", self.pos_embed)
         self.pos_drop = nn.Dropout(drop_rate)
 
         dpr = [drop_path_rate for i in range(depth)]
@@ -294,6 +296,19 @@ class Cait(VisionTransformer):
         self.norm = norm_layer(embed_dim, epsilon=1e-6)
         self.feature_info = [dict(num_chs=embed_dim, reduction=0, module='head')]
         self.head = nn.Linear(embed_dim, class_num) if class_num > 0 else Identity()
+
+        trunc_normal_(self.pos_embed)
+        trunc_normal_(self.cls_token)
+        self.apply(self._init_weights)
+
+    def _init_weights(self, m):
+        if isinstance(m, nn.Linear):
+            trunc_normal_(m.weight)
+            if isinstance(m, nn.Linear) and m.bias is not None:
+                zeros_(m.bias)
+        elif isinstance(m, nn.LayerNorm):
+            zeros_(m.bias)
+            ones_(m.weight)
 
     def forward_features(self, x):
         # Patch Embedding
