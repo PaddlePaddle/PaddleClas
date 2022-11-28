@@ -22,7 +22,6 @@ import paddle.distributed as dist
 from paddle.io import DistributedBatchSampler
 
 from ppcls.utils import logger
-import paddle.distributed as dist
 
 
 class PKSampler(DistributedBatchSampler):
