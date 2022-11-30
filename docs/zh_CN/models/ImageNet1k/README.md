@@ -49,6 +49,7 @@
     - [PVTV2 系列](#PVTV2)
     - [LeViT 系列](#LeViT)
     - [TNT 系列](#TNT)
+    - [UniFormer 系列](#UniFormer)
   - [4.2 轻量级模型](#Transformer_lite)
     - [MobileViT 系列](#MobileViT)
 - [五、参考文献](#reference)
@@ -701,6 +702,21 @@ DeiT（Data-efficient Image Transformers）系列模型的精度、速度指标�
 
 **注**：TNT 模型的数据预处理部分 `NormalizeImage` 中的 `mean` 与 `std` 均为 0.5。
 
+<a name="UniFormer"></a>
+
+## UniFormer 系列 <sup>[[35](#ref47)]</sup>
+
+关于 UniFormer 系列模型的精度、速度指标如下表所示，更多介绍可以参考：[UniFomer 系列模型文档](UniFormer.md)。
+
+| 模型       | Top-1 Acc | Top-5 Acc | time(ms)<br>bs=1 | time(ms)<br>bs=4 | time(ms)<br/>bs=8 | FLOPs(G) | Params(M) | 预训练模型下载地址                                               | inference模型下载地址                                      |
+| ---------- | --------- | --------- | ---------------- | ---------------- | -------- | --------- | ------------------------------------------------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ |
+| UniFormer_small_in1k    | 0.8294 | 0.9631 | - | - | - | 3.4  | 22   | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/UniFormer_small_in1k_pretrained.pdparams) | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/UniFormer_small_in1k_infer.tar) |
+| UniFormer_small_plus_in1k    | 0.8329 | 0.9656 | - | - | - | 3.9 | 24  | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/UniFormer_small_plus_in1k _pretrained.pdparams) | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/UniFormer_small_plus_in1k _infer.tar) |
+| UniFormer_small_plus_dim64_in1k    | 0.8325 | 0.9649 | - | - | - | 4.0 | 24   | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/UniFormer_small_plus_dim64_in1k_pretrained.pdparams) | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/UniFormer_small_plus_dim64_in1k_infer.tar) |
+| UniFormer_base_in1k     | 0.8376 | 0.9672 | - | - |- | 7.8 | 49   | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/UniFormer_base_in1k_pretrained.pdparams) | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/UniFormer_base_in1k_infer.tar) |
+| UniFormer_base_ls_in1k    | 0.8398 | 0.9675 | - | - | - | 7.8 | 50 | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/UniFormer_base_ls_in1k_pretrained.pdparams) | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/UniFormer_base_ls_in1k_infer.tar) |
+
+
 <a name="Transformer_lite"></a>
 
 ### 4.2 轻量级模型
@@ -813,3 +829,5 @@ TRANSFORMERS FOR IMAGE RECOGNITION AT SCALE.
 <a name="ref45">[45]</a>Robert J. Wang, Xiang Li, Charles X. Ling. Pelee: A Real-Time Object Detection System on Mobile Devices
 
 <a name="ref46">[46]</a>Chien-Yao Wang, Hong-Yuan Mark Liao, I-Hau Yeh, Yueh-Hua Wu, Ping-Yang Chen, Jun-Wei Hsieh. CSPNet: A New Backbone that can Enhance Learning Capability of CNN
+
+<a name="ref47">[46]</a>Kunchang Li, Yali Wang, Junhao Zhang, Peng Gao, Guanglu Song, Yu Liu, Hongsheng Li, Yu Qiao. UniFormer: Unifying Convolution and Self-attention for Visual Recognition
