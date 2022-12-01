@@ -1,4 +1,4 @@
-# copyright (c) 2021 PaddlePaddle Authors. All Rights Reserve.
+# copyright (c) 2022 PaddlePaddle Authors. All Rights Reserve.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -17,11 +17,11 @@ import paddle.nn as nn
 from .vision_transformer import to_2tuple, zeros_, ones_, VisionTransformer, Identity, zeros_
 from functools import partial
 from ppcls.utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
-from paddle.nn.initializer import TruncatedNormal, Constant, Normal  ############modify
+from paddle.nn.initializer import TruncatedNormal, Constant, Normal
 
 __all__ = ["DSNet_tiny_patch16_224"]
 
-trunc_normal_ = TruncatedNormal(std=.02)  #############modify
+trunc_normal_ = TruncatedNormal(std=.02)
 
 
 class Mlp(nn.Layer):
@@ -95,7 +95,6 @@ class Attention(nn.Layer):
         super().__init__()
         self.num_heads = num_heads
         head_dim = dim // num_heads
-        # NOTE scale factor was wrong in my original version, can set manually to be compat with prev weights
         self.scale = qk_scale or head_dim**-0.5
 
         self.attn_drop = nn.Dropout(attn_drop)
@@ -109,16 +108,11 @@ class Attention(nn.Layer):
                 (2, 0, 3, 1, 4))
         q, k, v = qkv[0], qkv[1], qkv[2]
 
-        #attn = (q @ k.transpose((-2, -1))) * self.scale
-        attn = (q.matmul(k.transpose((0, 1, 3, 2)))
-                ) * self.scale  ###########modify
-        #attn = attn.softmax(dim=-1)
-        attn = nn.functional.softmax(attn, axis=-1)  ########modify
+        attn = (q.matmul(k.transpose((0, 1, 3, 2)))) * self.scale
+        attn = nn.functional.softmax(attn, axis=-1)
         attn = self.attn_drop(attn)
 
-        #x = (attn @ v).transpose(1, 2).reshape(B, N, C)
-        x = (attn.matmul(v)).transpose((0, 2, 1, 3)).reshape(
-            (B, N, C))  ##########modify
+        x = (attn.matmul(v)).transpose((0, 2, 1, 3)).reshape((B, N, C))
         x = self.proj_drop(x)
         return x
 
@@ -134,7 +128,6 @@ class Cross_Attention(nn.Layer):
         super().__init__()
         self.num_heads = num_heads
         head_dim = dim // num_heads
-        # NOTE scale factor was wrong in my original version, can set manually to be compat with prev weights
         self.scale = qk_scale or head_dim**-0.5
 
         self.attn_drop = nn.Dropout(attn_drop)
@@ -142,16 +135,12 @@ class Cross_Attention(nn.Layer):
 
     def forward(self, tokens_q, memory_k, memory_v, shape=None):
         assert shape is not None
-        #attn = (tokens_q @ memory_k.transpose(-2, -1)) * self.scale
-        attn = (tokens_q.matmul(memory_k.transpose((0, 1, 3, 2)))
-                ) * self.scale  ##########modify
-        #attn = attn.softmax(dim=-1)
-        attn = nn.functional.softmax(attn, axis=-1)  #########modify
+        attn = (tokens_q.matmul(memory_k.transpose((0, 1, 3, 2)))) * self.scale
+        attn = nn.functional.softmax(attn, axis=-1)
         attn = self.attn_drop(attn)
 
-        #x = (attn @ memory_v).transpose(1, 2).reshape(shape[0], shape[1], shape[2])
         x = (attn.matmul(memory_v)).transpose((0, 2, 1, 3)).reshape(
-            (shape[0], shape[1], shape[2]))  #########modify
+            (shape[0], shape[1], shape[2]))
         x = self.proj_drop(x)
         return x
 
@@ -176,16 +165,12 @@ class MixBlock(nn.Layer):
         self.norm1 = nn.BatchNorm2D(dim)
         self.conv1 = nn.Conv2D(dim, dim, 1)
         self.conv2 = nn.Conv2D(dim, dim, 1)
-        # self.conv = nn.Conv2D(dim // 2, dim // 2, 3, padding=1, groups=dim // 2)
         self.dim_conv = int(dim * 0.5)
         self.dim_sa = dim - self.dim_conv
         self.norm_conv1 = nn.BatchNorm2D(self.dim_conv)
         self.norm_sa1 = nn.LayerNorm(self.dim_sa)
         self.conv = nn.Conv2D(
             self.dim_conv, self.dim_conv, 3, padding=1, groups=self.dim_conv)
-        # self.attn_down = nn.Conv2D(dim // 2, dim // 2, (2 * downsample + 1),
-        # padding=downsample, groups=dim // 2, stride=downsample)
-        # self.channel_up = nn.Conv2D(dim // 2, 3 * dim // 2, 1)
         self.channel_up = nn.Linear(self.dim_sa, 3 * self.dim_sa)
         self.cross_channel_up_conv = nn.Conv2D(self.dim_conv,
                                                3 * self.dim_conv, 1)
@@ -209,7 +194,6 @@ class MixBlock(nn.Layer):
             proj_drop=drop)
         self.norm_conv2 = nn.BatchNorm2D(self.dim_conv)
         self.norm_sa2 = nn.LayerNorm(self.dim_sa)
-        # NOTE: drop path for stochastic depth, we shall see if this is better than dropout here
         self.drop_path = DropPath(drop_path) if drop_path > 0. else Identity()
         self.norm2 = nn.BatchNorm2D(dim)
         self.downsample = downsample
@@ -233,14 +217,11 @@ class MixBlock(nn.Layer):
         x = self.norm1(x)
         x = self.conv1(x)
 
-        # qkv = x[:, :(self.dim // 2), :]
-        # conv = x[:, (self.dim // 2):, :, :]
         qkv = x[:, :self.dim_sa, :]
         conv = x[:, self.dim_sa:, :, :]
         residual_conv = conv
         conv = residual_conv + self.conv(self.norm_conv1(conv))
 
-        # sa = self.attn_down(qkv)
         sa = nn.functional.interpolate(
             qkv,
             size=(H // self.downsample, W // self.downsample),
@@ -250,18 +231,15 @@ class MixBlock(nn.Layer):
         residual_sa = sa
         sa = self.norm_sa1(sa)
         sa = self.channel_up(sa)
-        #input()
         sa = residual_sa + self.attn(sa)
 
-        ### cross attention ###
+        # cross attention
         residual_conv_co = conv
         residual_sa_co = sa
         conv_qkv = self.cross_channel_up_conv(self.norm_conv2(conv))
         conv_qkv = conv_qkv.flatten(2).transpose([0, 2, 1])
-        #input()
 
         sa_qkv = self.cross_channel_up_sa(self.norm_sa2(sa))
-        #input()
 
         B_conv, N_conv, C_conv = conv_qkv.shape
         C_conv = int(C_conv // 3)
@@ -281,16 +259,13 @@ class MixBlock(nn.Layer):
         conv = self.cross_attn(
             conv_q, sa_k, sa_v, shape=(B_conv, N_conv, C_conv))
         conv = self.fuse_channel_conv(conv)
-        conv = conv.reshape((B, H, W, C_conv)).transpose(
-            (0, 3, 1, 2))  #.contiguous()
+        conv = conv.reshape((B, H, W, C_conv)).transpose((0, 3, 1, 2))
         conv = residual_conv_co + conv
 
         # conv -> sa
         sa = self.cross_attn(sa_q, conv_k, conv_v, shape=(B_sa, N_sa, C_sa))
         sa = residual_sa_co + self.fuse_channel_sa(sa)
-        sa = sa.reshape((B, H_down, W_down, C_sa)).transpose(
-            (0, 3, 1, 2))  #.contiguous()
-        #input()
+        sa = sa.reshape((B, H_down, W_down, C_sa)).transpose((0, 3, 1, 2))
         sa = nn.functional.interpolate(sa, size=(H, W), mode='bilinear')
         x = paddle.concat([conv, sa], axis=1)
         x = residual + self.drop_path(self.conv2(x))
@@ -319,7 +294,6 @@ class Block(nn.Layer):
             qk_scale=qk_scale,
             attn_drop=attn_drop,
             proj_drop=drop)
-        # NOTE: drop path for stochastic depth, we shall see if this is better than dropout here
         self.drop_path = DropPath(drop_path) if drop_path > 0. else Identity()
         self.norm2 = norm_layer(dim)
         mlp_hidden_dim = int(dim * mlp_ratio)
@@ -353,7 +327,6 @@ class PatchEmbed(nn.Layer):
 
     def forward(self, x):
         B, C, H, W = x.shape
-        # FIXME look at relaxing size constraints
         assert H == self.img_size[0] and W == self.img_size[1], \
             f"Input image size ({H}*{W}) doesn't match model ({self.img_size[0]}*{self.img_size[1]})."
         x = self.proj(x)
@@ -385,7 +358,6 @@ class OverlapPatchEmbed(nn.Layer):
             kernel_size=patch_size,
             stride=stride,
             padding=(patch_size[0] // 2, patch_size[1] // 2))
-        # self.norm = nn.LayerNorm(embed_dim)
 
     def forward(self, x):
         B, C, H, W = x.shape
@@ -396,9 +368,8 @@ class OverlapPatchEmbed(nn.Layer):
 
 
 class MixVisionTransformer(nn.Layer):
-    """ Vision Transformer
-    A PyTorch impl of : `An Image is Worth 16x16 Words: Transformers for Image Recognition at Scale`  -
-        https://arxiv.org/abs/2010.11929
+    """ Mixed Vision Transformer for DSNet
+    A PyTorch impl of : `Dual-stream Network for Visual Recognition` - https://arxiv.org/abs/2105.14734v4
     """
 
     def __init__(self,
@@ -435,12 +406,13 @@ class MixVisionTransformer(nn.Layer):
             drop_rate (float): dropout rate
             attn_drop_rate (float): attention dropout rate
             drop_path_rate (float): stochastic depth rate
-            hybrid_backbone (nn.Layer): CNN backbone to use in-place of PatchEmbed module
             norm_layer: (nn.Layer): normalization layer
+            overlap_embed (bool): enable overlapped patch embedding if True
+            conv_ffn (bool): enable depthwise convolution for mlp if True
         """
         super().__init__()
         self.class_num = class_num
-        self.num_features = self.embed_dim = embed_dim  # num_features for consistency with other models
+        self.num_features = self.embed_dim = embed_dim
         norm_layer = norm_layer or partial(nn.LayerNorm, eps=1e-6)
         downsamples = [8, 4, 2, 2]
         if overlap_embed:
@@ -494,7 +466,7 @@ class MixVisionTransformer(nn.Layer):
         self.mixture = False
         dpr = [
             x.item() for x in paddle.linspace(0, drop_path_rate, sum(depth))
-        ]  # stochastic depth decay rule
+        ]
         self.blocks1 = nn.LayerList([
             MixBlock(
                 dim=embed_dim[0],
@@ -569,6 +541,7 @@ class MixVisionTransformer(nn.Layer):
                     conv_ffn=conv_ffn) for i in range(depth[3])
             ])
             self.norm = nn.BatchNorm2D(embed_dim[-1])
+
         # Representation layer
         if representation_size:
             self.num_features = representation_size
@@ -582,11 +555,6 @@ class MixVisionTransformer(nn.Layer):
         self.head = nn.Linear(embed_dim[-1],
                               class_num) if class_num > 0 else Identity()
 
-        #        trunc_normal_(self.pos_embed1, std=.02)
-        #        trunc_normal_(self.pos_embed2, std=.02)
-        #        trunc_normal_(self.pos_embed3, std=.02)
-        #        trunc_normal_(self.pos_embed4, std=.02)
-
         self.apply(self._init_weights)
 
     def _init_weights(self, m):
@@ -597,9 +565,6 @@ class MixVisionTransformer(nn.Layer):
         elif isinstance(m, nn.LayerNorm):
             zeros_(m.bias)
             ones_(m.weight)
-
-    def no_weight_decay(self):
-        return {'pos_embed', 'cls_token'}
 
     def get_classifier(self):
         return self.head
@@ -640,25 +605,6 @@ class MixVisionTransformer(nn.Layer):
         return x
 
 
-def _cfg(url='', **kwargs):
-    return {
-        'url': url,
-        'class_num': 1000,
-        'input_size': (3, 224, 224),
-        'pool_size': None,
-        'crop_pct': .9,
-        'interpolation': 'bicubic',
-        'fixed_input_size': True,
-        #'mean': IMAGENET_INCEPTION_MEAN, 'std': IMAGENET_INCEPTION_STD,     ########modify
-        'mean': [0.485, 0.456, 0.406],
-        'std': [0.229, 0.224, 0.225],
-        'first_conv': 'patch_embed.proj',
-        'classifier': 'head',
-        **
-        kwargs
-    }
-
-
 def DSNet_tiny_patch16_224(pretrained=False, **kwargs):
     """ 12M parameters, compared with ResNet18 """
     model = MixVisionTransformer(
@@ -669,5 +615,17 @@ def DSNet_tiny_patch16_224(pretrained=False, **kwargs):
         norm_layer=partial(
             nn.LayerNorm, eps=1e-6),
         **kwargs)
-    model.default_cfg = _cfg()
+    model.default_cfg = {
+        'url': '',
+        'class_num': 1000,
+        'input_size': (3, 224, 224),
+        'pool_size': None,
+        'crop_pct': .9,
+        'interpolation': 'bicubic',
+        'fixed_input_size': True,
+        'mean': [0.485, 0.456, 0.406],
+        'std': [0.229, 0.224, 0.225],
+        'first_conv': 'patch_embed.proj',
+        'classifier': 'head',
+    }
     return model
