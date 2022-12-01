@@ -32,11 +32,11 @@ UniFormer 是一种新的视觉 Transformer 网络，可以用作计算机视觉
 
 | Models           | Top1 | Top5 | Reference<br>top1 | Reference<br>top5 | FLOPs<br>(G) | Params<br>(M) |
 |:--:|:--:|:--:|:--:|:--:|:--:|:--:|
-| UniFormer_small_in1k    | 0.8294 | 0.9631 | 0.829 | 0.962 | 3.4  | 22   |
-| UniFormer_small_plus_in1k   | 0.8329 | 0.9656 | 0.833 | 0.965 | 3.9  | 24   |
-| UniFormer_small_plus_dim64_in1k    | 0.8325 | 0.9649 | 0.832 | 4.0 |  | 24   |
-| UniFormer_base_in1k   | 0.8376 | 0.9672 | 0.839 | - | 7.8 | 49   |
-| UniFormer_base_ls_in1k   | 0.8398 | 0.9675 | 0.839 | 0.967 | 7.8 | 50   |
+| UniFormer_small    | 0.8294 | 0.9631 | 0.829 | 0.962 | 3.44  | 21.55   |
+| UniFormer_small_plus   | 0.8329 | 0.9656 | 0.833 | 0.965 | 3.99  | 24.04   |
+| UniFormer_small_plus_dim64    | 0.8325 | 0.9649 | 0.832 | 0.964 | 3.99 | 24.04   |
+| UniFormer_base   | 0.8376 | 0.9672 | 0.839 | - | 7.77 | 49.78   |
+| UniFormer_base_ls   | 0.8398 | 0.9675 | 0.839 | 0.967 | 7.77 | 49.78   |
 
 
 **备注：** PaddleClas 所提供的该系列模型的预训练模型权重，均是基于其官方提供的权重转得。

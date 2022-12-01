@@ -26,16 +26,16 @@ from .vision_transformer import trunc_normal_, zeros_, ones_, to_2tuple, DropPat
 from ....utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
 
 MODEL_URLS = {
-    "UniFormer_small_in1k":
-    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/UniFormer_small_in1k_pretrained.pdparams",
-    "UniFormer_small_plus_in1k":
-    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/UniFormer_small_plus_in1k_pretrained.pdparams",
-    "UniFormer_small_plus_dim64_in1k":
-    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/UniFormer_small_plus_dim64_in1k_pretrained.pdparams",
-    "UniFormer_base_in1k":
-    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/UniFormer_base_in1k_pretrained.pdparams",
-    "UniFormer_base_ls_in1k":
-    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/UniFormer_base_ls_in1k_pretrained.pdparams",
+    "UniFormer_small":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/UniFormer_small_pretrained.pdparams",
+    "UniFormer_small_plus":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/UniFormer_small_plus_pretrained.pdparams",
+    "UniFormer_small_plus_dim64":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/UniFormer_small_plus_dim64_pretrained.pdparams",
+    "UniFormer_base":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/UniFormer_base_pretrained.pdparams",
+    "UniFormer_base_ls":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/UniFormer_base_ls_pretrained.pdparams",
 }
 
 __all__ = list(MODEL_URLS.keys())
@@ -266,7 +266,7 @@ class PatchEmbed(nn.Layer):
         B, C, H, W = x.shape
         x = x.flatten(2).transpose(perm=[0, 2, 1])
         x = self.norm(x)
-        x = x.reshape(shape=[B, H, W, -1]).transpose(perm=[0, 3, 1, 2])
+        x = x.reshape(shape=[B, H, W, C]).transpose(perm=[0, 3, 1, 2])
         return x
 
 
@@ -462,7 +462,7 @@ def _load_pretrained(pretrained, model, model_url, use_ssld=False):
         )
 
 
-def UniFormer_small_in1k(pretrained=True, use_ssld=False, **kwargs):
+def UniFormer_small(pretrained=True, use_ssld=False, **kwargs):
     model = UniFormer(
         depth=[3, 4, 8, 3],
         embed_dim=[64, 128, 320, 512],
@@ -471,16 +471,14 @@ def UniFormer_small_in1k(pretrained=True, use_ssld=False, **kwargs):
         qkv_bias=True,
         norm_layer=partial(
             nn.LayerNorm, epsilon=1e-6),
+        drop_path_rate=0.1,
         **kwargs)
     _load_pretrained(
-        pretrained,
-        model,
-        MODEL_URLS["UniFormer_small_in1k"],
-        use_ssld=use_ssld)
+        pretrained, model, MODEL_URLS["UniFormer_small"], use_ssld=use_ssld)
     return model
 
 
-def UniFormer_small_plus_in1k(pretrained=True, use_ssld=False, **kwargs):
+def UniFormer_small_plus(pretrained=True, use_ssld=False, **kwargs):
     model = UniFormer(
         depth=[3, 5, 9, 3],
         conv_stem=True,
@@ -490,16 +488,17 @@ def UniFormer_small_plus_in1k(pretrained=True, use_ssld=False, **kwargs):
         qkv_bias=True,
         norm_layer=partial(
             nn.LayerNorm, epsilon=1e-6),
+        drop_path_rate=0.1,
         **kwargs)
     _load_pretrained(
         pretrained,
         model,
-        MODEL_URLS["UniFormer_small_plus_in1k"],
+        MODEL_URLS["UniFormer_small_plus"],
         use_ssld=use_ssld)
     return model
 
 
-def UniFormer_small_plus_dim64_in1k(pretrained=True, use_ssld=False, **kwargs):
+def UniFormer_small_plus_dim64(pretrained=True, use_ssld=False, **kwargs):
     model = UniFormer(
         depth=[3, 5, 9, 3],
         conv_stem=True,
@@ -509,6 +508,7 @@ def UniFormer_small_plus_dim64_in1k(pretrained=True, use_ssld=False, **kwargs):
         qkv_bias=True,
         norm_layer=partial(
             nn.LayerNorm, epsilon=1e-6),
+        drop_path_rate=0.1,
         **kwargs)
     _load_pretrained(
         pretrained,
@@ -518,7 +518,7 @@ def UniFormer_small_plus_dim64_in1k(pretrained=True, use_ssld=False, **kwargs):
     return model
 
 
-def UniFormer_base_in1k(pretrained=True, use_ssld=False, **kwargs):
+def UniFormer_base(pretrained=True, use_ssld=False, **kwargs):
     model = UniFormer(
         depth=[5, 8, 20, 7],
         embed_dim=[64, 128, 320, 512],
@@ -527,16 +527,14 @@ def UniFormer_base_in1k(pretrained=True, use_ssld=False, **kwargs):
         qkv_bias=True,
         norm_layer=partial(
             nn.LayerNorm, epsilon=1e-6),
+        drop_path_rate=0.3,
         **kwargs)
     _load_pretrained(
-        pretrained,
-        model,
-        MODEL_URLS["UniFormer_base_in1k"],
-        use_ssld=use_ssld)
+        pretrained, model, MODEL_URLS["UniFormer_base"], use_ssld=use_ssld)
     return model
 
 
-def UniFormer_base_ls_in1k(pretrained=True, use_ssld=False, **kwargs):
+def UniFormer_base_ls(pretrained=True, use_ssld=False, **kwargs):
     global layer_scale
     layer_scale = True
     model = UniFormer(
@@ -547,10 +545,8 @@ def UniFormer_base_ls_in1k(pretrained=True, use_ssld=False, **kwargs):
         qkv_bias=True,
         norm_layer=partial(
             nn.LayerNorm, epsilon=1e-6),
+        drop_path_rate=0.3,
         **kwargs)
     _load_pretrained(
-        pretrained,
-        model,
-        MODEL_URLS["UniFormer_base_ls_in1k"],
-        use_ssld=use_ssld)
+        pretrained, model, MODEL_URLS["UniFormer_base_ls"], use_ssld=use_ssld)
     return model
