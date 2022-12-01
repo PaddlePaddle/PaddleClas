@@ -20,7 +20,7 @@ Arch:
   image_size: 224
   patch_size: 16
   in_channels: 3
-  num_classes: 1000
+  class_num: 1000
   embed_dim: 192
   depth: 24
   num_heads: 4
