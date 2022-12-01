@@ -442,7 +442,7 @@ class CaiT(nn.Layer):
     def __init__(self,
                  image_size=224,
                  in_channels=3,
-                 num_classes=1000,
+                 class_num=1000,
                  patch_size=16,
                  embed_dim=768,
                  depth=12,
@@ -456,7 +456,7 @@ class CaiT(nn.Layer):
                  mlp_ratio_class_token=4.0,
                  depth_token_only=2):
         super().__init__()
-        self.num_classes = num_classes
+        self.num_classes = class_num
         self.patch_embed = PatchEmbedding(image_size=image_size,
                                           patch_size=patch_size,
                                           in_channels=in_channels,
@@ -504,7 +504,7 @@ class CaiT(nn.Layer):
         self.blocks_token_only = nn.LayerList(layer_list)
 
         self.norm = nn.LayerNorm(embed_dim, epsilon=1e-6)
-        self.head = nn.Linear(embed_dim, num_classes) if num_classes > 0. else Identity()
+        self.head = nn.Linear(embed_dim, class_num) if class_num > 0. else Identity()
 
     def forward_features(self, x):
         # Patch Embedding
