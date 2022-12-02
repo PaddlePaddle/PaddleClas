@@ -440,13 +440,17 @@ class PatchMerging(nn.Layer):
         assert H % 2 == 0 and W % 2 == 0, "x size ({}*{}) are not even.".format(
             H, W)
 
-        x = x.reshape([B, H, W, C])
+        # x = x.reshape([B, H, W, C])
 
-        x0 = x[:, 0::2, 0::2, :]  # B H/2 W/2 C
-        x1 = x[:, 1::2, 0::2, :]  # B H/2 W/2 C
-        x2 = x[:, 0::2, 1::2, :]  # B H/2 W/2 C
-        x3 = x[:, 1::2, 1::2, :]  # B H/2 W/2 C
-        x = paddle.concat([x0, x1, x2, x3], -1)  # B H/2 W/2 4*C
+        # x0 = x[:, 0::2, 0::2, :]  # B H/2 W/2 C
+        # x1 = x[:, 1::2, 0::2, :]  # B H/2 W/2 C
+        # x2 = x[:, 0::2, 1::2, :]  # B H/2 W/2 C
+        # x3 = x[:, 1::2, 1::2, :]  # B H/2 W/2 C
+        # x = paddle.concat([x0, x1, x2, x3], -1)  # B H/2 W/2 4*C
+
+        x = x.reshape([B, H//2, 2, W//2, 2, C])
+        x = x.transpose((0, 1, 3, 4, 2, 5))
+
         x = x.reshape([B, H * W // 4, 4 * C])  # B H/2*W/2 4*C
 
         x = self.norm(x)

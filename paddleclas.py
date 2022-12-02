@@ -751,7 +751,7 @@ class PaddleClas(object):
                 prediction result(s) is zipped as a dict, that includs topk "class_ids", "scores" and "label_names".
                 The format of batch prediction result(s) is as follow: [{"class_ids": [...], "scores": [...], "label_names": [...]}, ...]
         """
-        if input_data == None and self._config.Global.infer_imgs:
+        if input_data is None and self._config.Global.infer_imgs:
             input_data = self._config.Global.infer_imgs
 
         if isinstance(input_data, np.ndarray):

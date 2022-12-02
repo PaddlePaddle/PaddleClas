@@ -2,7 +2,7 @@
 Global:
   checkpoints: null
   pretrained_model: null
-  output_dir: ./output/r34_r18_mgd
+  output_dir: ./output/r34_r18_pefd
   device: gpu
   save_interval: 1
   eval_during_train: True
@@ -31,13 +31,13 @@ Arch:
         name: ResNet34
         class_num: *class_num
         pretrained: True
-        return_patterns: &t_stages ["blocks[2]", "blocks[6]", "blocks[12]", "blocks[15]"]
+        return_patterns: &t_stages ["avg_pool"]
     - Student:
         name: ResNet18
         class_num: *class_num
         pretrained: False
-        return_patterns: &s_stages ["blocks[1]", "blocks[3]", "blocks[5]", "blocks[7]"]
- 
+        return_patterns: &s_stages ["avg_pool"]
+
 # loss function config for traing/eval process
 Loss:
   Train:
@@ -45,14 +45,14 @@ Loss:
         weight: 1.0
         model_names: ["Student"]
     - DistillationPairLoss:
-        weight: 1.0
-        base_loss_name: MGDLoss
+        weight: 25.0
+        base_loss_name: PEFDLoss
         model_name_pairs: [["Student", "Teacher"]]
-        s_key: "blocks[7]"
-        t_key: "blocks[15]"
-        name: "loss_mgd"
-        student_channels: 512
-        teacher_channels: 512
+        s_key: "avg_pool"
+        t_key: "avg_pool"
+        name: "loss_pefd"
+        student_channel: 512
+        teacher_channel: 512
   Eval:
     - CELoss:
         weight: 1.0
@@ -99,7 +99,7 @@ DataLoader:
       use_shared_memory: True
 
   Eval:
-    dataset: 
+    dataset:
       name: ImageNetDataset
       image_root: ./dataset/ILSVRC2012/
       cls_label_path: ./dataset/ILSVRC2012/val_list.txt

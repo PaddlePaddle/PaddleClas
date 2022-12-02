@@ -45,6 +45,8 @@
 | **250**   | [配置文件](../../../../ppcls/configs/ssl/FixMatch/FixMatch_cifar10_250.yaml)  | [模型地址](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/semi_superwised_learning/FixMatch_WideResNet_cifar10_label250.pdparams)  |
 | **4000**  | [配置文件](../../../../ppcls/configs/ssl/FixMatch/FixMatch_cifar10_4000.yaml) | [模型地址](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/semi_superwised_learning/FixMatch_WideResNet_cifar10_label4000.pdparams) |
 
+上表中的配置是基于单GPU训练的，使用4GPU训练40 label可参考[配置文件](../../../../ppcls/configs/ssl/FixMatch/FixMatch_cifar10_40_4gpu.yaml)，使用这两个配置文件训练得到的模型精度接近。
+
 **接下来主要以** `FixMatch/FixMatch_cifar10_40.yaml`配置和训练好的模型文件为例，展示在cifar10数据集上进行训练、测试、推理的过程。
 
 ## 3. 数据准备

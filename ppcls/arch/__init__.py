@@ -39,7 +39,11 @@ def build_model(config, mode="train"):
     mod = importlib.import_module(__name__)
     arch = getattr(mod, model_type)(**arch_config)
     if use_sync_bn:
-        arch = nn.SyncBatchNorm.convert_sync_batchnorm(arch)
+        if config["Global"]["device"] == "gpu":
+            arch = nn.SyncBatchNorm.convert_sync_batchnorm(arch)
+        else:
+            msg = "SyncBatchNorm can only be used on GPU device. The releated setting has been ignored."
+            logger.warning(msg)
 
     if isinstance(arch, TheseusLayer):
         prune_model(config, arch)
