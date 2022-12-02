@@ -705,7 +705,7 @@ DeiT（Data-efficient Image Transformers）系列模型的精度、速度指标�
 
 
 <a name="NextViT"></a>
-## NextViT 系列 <sup>[[35](#ref47)]</sup>
+## NextViT 系列 <sup>[[47](#ref47)]</sup>
 
 关于 NextViT 系列模型的精度、速度指标如下表所示，更多介绍可以参考：[NextViT 系列模型文档](NextViT.md)。
 | 模型       | Top-1 Acc | Top-5 Acc | time(ms)<br>bs=1 | time(ms)<br>bs=4 | time(ms)<br/>bs=8 | FLOPs(G) | Params(M) | 预训练模型下载地址                                               | inference模型下载地址                                      |
@@ -725,7 +725,7 @@ DeiT（Data-efficient Image Transformers）系列模型的精度、速度指标�
 
 <a name="UniFormer"></a>
 
-## UniFormer 系列 <sup>[[35](#ref48)]</sup>
+## UniFormer 系列 <sup>[[48](#ref48)]</sup>
 
 关于 UniFormer 系列模型的精度、速度指标如下表所示，更多介绍可以参考：[UniFomer 系列模型文档](UniFormer.md)。
 
@@ -853,4 +853,4 @@ TRANSFORMERS FOR IMAGE RECOGNITION AT SCALE.
 
 <a name="ref47">[47]</a>Jiashi Li, Xin Xia, Wei Li, Huixia Li, Xing Wang, Xuefeng Xiao, Rui Wang, Min Zheng, Xin Pan. Next-ViT: Next Generation Vision Transformer for Efficient Deployment in Realistic Industrial Scenarios.
 
-<a name="ref47">[48]</a>Kunchang Li, Yali Wang, Junhao Zhang, Peng Gao, Guanglu Song, Yu Liu, Hongsheng Li, Yu Qiao. UniFormer: Unifying Convolution and Self-attention for Visual Recognition
+<a name="ref48">[48]</a>Kunchang Li, Yali Wang, Junhao Zhang, Peng Gao, Guanglu Song, Yu Liu, Hongsheng Li, Yu Qiao. UniFormer: Unifying Convolution and Self-attention for Visual Recognition
