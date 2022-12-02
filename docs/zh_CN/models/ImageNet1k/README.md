@@ -50,6 +50,7 @@
     - [LeViT 系列](#LeViT)
     - [TNT 系列](#TNT)
     - [NextViT 系列](#NextViT)
+    - [UniFormer 系列](#UniFormer)
   - [4.2 轻量级模型](#Transformer_lite)
     - [MobileViT 系列](#MobileViT)
 - [五、参考文献](#reference)
@@ -703,7 +704,8 @@ DeiT（Data-efficient Image Transformers）系列模型的精度、速度指标�
 **注**：TNT 模型的数据预处理部分 `NormalizeImage` 中的 `mean` 与 `std` 均为 0.5。
 
 <a name="NextViT"></a>
-## NextViT 系列 <sup>[[35](#ref47)]</sup>
+
+## NextViT 系列 <sup>[[47](#ref47)]</sup>
 
 关于 NextViT 系列模型的精度、速度指标如下表所示，更多介绍可以参考：[NextViT 系列模型文档](NextViT.md)。
 | 模型       | Top-1 Acc | Top-5 Acc | time(ms)<br>bs=1 | time(ms)<br>bs=4 | time(ms)<br/>bs=8 | FLOPs(G) | Params(M) | 预训练模型下载地址                                               | inference模型下载地址                                      |
@@ -720,6 +722,21 @@ DeiT（Data-efficient Image Transformers）系列模型的精度、速度指标�
 | NextViT_small_384_ssld   | 0.8597 | 0.9790 | - | - | - | 17.00 | 31.80   | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/NextViT_small_384_ssld_pretrained.pdparams) | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/NextViT_small_384_ssld_infer.tar) |
 | NextViT_base_384_ssld   | 0.8634 | 0.9806 | - | - | - | 24.27 | 44.88   | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/NextViT_base_384_ssld_pretrained.pdparams) | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/NextViT_base_384_ssld_infer.tar) |
 | NextViT_large_384_ssld   | 0.8654 | 0.9814 | - | - | - | 31.53 | 57.95   | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/NextViT_large_384_ssld_pretrained.pdparams) | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/NextViT_large_384_ssld_infer.tar) |
+
+<a name="UniFormer"></a>
+
+## UniFormer 系列 <sup>[[35](#ref47)]</sup>
+
+关于 UniFormer 系列模型的精度、速度指标如下表所示，更多介绍可以参考：[UniFomer 系列模型文档](UniFormer.md)。
+
+| 模型       | Top-1 Acc | Top-5 Acc | time(ms)<br>bs=1 | time(ms)<br>bs=4 | time(ms)<br/>bs=8 | FLOPs(G) | Params(M) | 预训练模型下载地址                                               | inference模型下载地址                                      |
+| ---------- | --------- | --------- | ---------------- | ---------------- | -------- | --------- | ------------------------------------------------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ |
+| UniFormer_small    | 0.8294 | 0.9631 | - | - | - | 3.44  | 21.55   | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/UniFormer_small_pretrained.pdparams) | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/UniFormer_small_infer.tar) |
+| UniFormer_small_plus    | 0.8329 | 0.9656 | - | - | - | 3.99 | 24.04  | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/UniFormer_small_plus_pretrained.pdparams) | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/UniFormer_small_plus_infer.tar) |
+| UniFormer_small_plus_dim64    | 0.8325 | 0.9649 | - | - | - | 3.99 | 24.04   | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/UniFormer_small_plus_dim64_pretrained.pdparams) | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/UniFormer_small_plus_dim64_infer.tar) |
+| UniFormer_base     | 0.8376 | 0.9672 | - | - |- | 7.77 | 49.78   | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/UniFormer_base_pretrained.pdparams) | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/UniFormer_base_infer.tar) |
+| UniFormer_base_ls    | 0.8398 | 0.9675 | - | - | - | 7.77 | 49.78 | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/UniFormer_base_ls_pretrained.pdparams) | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/UniFormer_base_ls_infer.tar) |
+
 
 <a name="Transformer_lite"></a>
 
@@ -834,4 +851,6 @@ TRANSFORMERS FOR IMAGE RECOGNITION AT SCALE.
 
 <a name="ref46">[46]</a>Chien-Yao Wang, Hong-Yuan Mark Liao, I-Hau Yeh, Yueh-Hua Wu, Ping-Yang Chen, Jun-Wei Hsieh. CSPNet: A New Backbone that can Enhance Learning Capability of CNN
 
-<a name="ref47">[46]</a>Jiashi Li, Xin Xia, Wei Li, Huixia Li, Xing Wang, Xuefeng Xiao, Rui Wang, Min Zheng, Xin Pan. Next-ViT: Next Generation Vision Transformer for Efficient Deployment in Realistic Industrial Scenarios.
+<a name="ref47">[47]</a>Jiashi Li, Xin Xia, Wei Li, Huixia Li, Xing Wang, Xuefeng Xiao, Rui Wang, Min Zheng, Xin Pan. Next-ViT: Next Generation Vision Transformer for Efficient Deployment in Realistic Industrial Scenarios.
+
+<a name="ref48">[48]</a>Kunchang Li, Yali Wang, Junhao Zhang, Peng Gao, Guanglu Song, Yu Liu, Hongsheng Li, Yu Qiao. UniFormer: Unifying Convolution and Self-attention for Visual Recognition
