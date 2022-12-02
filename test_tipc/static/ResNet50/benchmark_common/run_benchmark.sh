@@ -74,6 +74,7 @@ function _train(){
         rm ${log_file}
         cp mylog/workerlog.0 ${log_file}
     fi
+    echo ${train_cmd} >> ${log_file}
     cd ../
 }
 
