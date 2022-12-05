@@ -529,6 +529,7 @@ class ExternalSource_RandomIdentity(object):
         if self.shuffle:
             seed = self.shard_id * 12345 + self.epoch
             np.random.RandomState(seed).shuffle(self.label_list)
+            np.random.RandomState(seed).shuffle(self.prob_list)
             self.epoch += 1
         return self
 
