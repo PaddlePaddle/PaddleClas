@@ -90,7 +90,7 @@ class RollWrapperSingleton():
 
     def __call__(self, x, shifts, axis):
         if not self.enable:
-            return padlde.roll(x, shifts, axis)
+            return paddle.roll(x, shifts, axis)
 
         assert x.dim() == 4
         assert len(shifts) == 2
