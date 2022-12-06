@@ -85,7 +85,7 @@ class NpuRollWithIndexSelect():
         index_fp, index_bp = self.index_dict[key]
         return roll_with_index_select(x, index_fp, index_bp)
 
-roll = NpuRollWithIndexSelect()
+roll = NpuRollWithIndexSelect() if 'npu' in paddle.device.get_all_custom_device_type() else paddle.roll
 
 class Mlp(nn.Layer):
     def __init__(self,
