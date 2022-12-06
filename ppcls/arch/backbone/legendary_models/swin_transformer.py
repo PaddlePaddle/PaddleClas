@@ -86,8 +86,7 @@ class RollWrapperSingleton():
     def __init__(self):
         self.index_dict = {}
         self.roll_with_index_select = RollWithIndexSelect.apply
-        if 'npu' in paddle.device.get_all_custom_device_type():
-            self.enable = True
+        self.enable = True if 'npu' in paddle.device.get_all_custom_device_type() else False
 
     def __call__(self, x, shifts, axis):
         if not self.enable:
