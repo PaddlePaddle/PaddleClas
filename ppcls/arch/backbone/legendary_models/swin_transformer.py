@@ -64,10 +64,9 @@ class RollWithIndexSelect(paddle.autograd.PyLayer):
 
 
 def get_roll_index(H, W, shifts, place):
-    # following tensors will be created on cpu place with npu custom device
-    index = paddle.arange(0, H * W, dtype='int64').reshape([H, W]) # cpu
-    index_fp = paddle.roll(index, shifts=shifts, axis=(0, 1)).reshape([-1]) # cpu
-    index_bp = {i:idx for idx, i in enumerate(index_fp.numpy().tolist())}
+    index = np.arange(0, H * W, dtype=np.int64).reshape([H, W])
+    index_fp = np.roll(index, shift=shifts, axis=(0, 1)).reshape([-1])
+    index_bp = {i:idx for idx, i in enumerate(index_fp.tolist())}
     index_bp = [index_bp[i] for i in range(H * W)]
     index_fp = paddle.to_tensor(index_fp, place=place)
     index_bp = paddle.to_tensor(index_fp, dtype='int64', place=place)
