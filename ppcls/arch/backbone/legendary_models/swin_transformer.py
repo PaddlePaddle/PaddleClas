@@ -72,13 +72,14 @@ def get_roll_index(H, W, shifts, place):
     index_bp = paddle.to_tensor(index_fp, dtype='int64', place=place)
     return [index_fp, index_bp]
 
-def singleton(class_):
-    instances = {}
-    def getinstance(*args, **kwargs):
-        if class_ not in instances:
-            instances[class_] = class_(*args, **kwargs)
-        return instances[class_]
-    return getinstance
+
+def singleton(cls):
+    def wrapper_singleton(*args, **kwargs):
+        if not wrapper_singleton.instance:
+            wrapper_singleton.instance = cls(*args, **kwargs)
+        return wrapper_singleton.instance
+    wrapper_singleton.instance = None
+    return wrapper_singleton
 
 @singleton
 class RollWrapperSingleton():
