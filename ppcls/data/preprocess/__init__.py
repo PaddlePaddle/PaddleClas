@@ -39,6 +39,7 @@ from ppcls.data.preprocess.ops.operators import RandomResizedCrop
 from ppcls.data.preprocess.ops.operators import CropWithPadding
 from ppcls.data.preprocess.ops.operators import RandomInterpolationAugment
 from ppcls.data.preprocess.ops.operators import ColorJitter
+from ppcls.data.preprocess.ops.operators import RandomGrayscale
 from ppcls.data.preprocess.ops.operators import RandomCropImage
 from ppcls.data.preprocess.ops.operators import RandomRotation
 from ppcls.data.preprocess.ops.operators import Padv2
@@ -49,9 +50,13 @@ from paddle.vision.transforms import Pad as Pad_paddle_vision
 from ppcls.data.preprocess.batch_ops.batch_operators import MixupOperator, CutmixOperator, OpSampler, FmixOperator
 from ppcls.data.preprocess.batch_ops.batch_operators import MixupCutmixHybrid
 
+from .ops.randaugmentmc import RandAugmentMC, RandomApply
+
 import numpy as np
 from PIL import Image
 import random
+from paddle.vision.transforms import transforms as T
+from paddle.vision.transforms.transforms import RandomCrop, ToTensor, Normalize
 
 
 def transform(data, ops=[]):
@@ -117,3 +122,41 @@ class TimmAutoAugment(RawTimmAutoAugment):
             img = np.asarray(img)
 
         return img
+
+
+class BaseTransform:
+    def __init__(self, cfg) -> None:
+        """
+        Args:
+            cfg: list [dict, dict, dict]
+        """
+        ts = []
+        for op in cfg:
+            name = list(op.keys())[0]
+            if op[name] is None:
+                ts.append(eval(name)())
+            else:
+                ts.append(eval(name)(**(op[name])))
+
+        self.t = T.Compose(ts)
+
+    def __call__(self, img):
+        
+        return self.t(img)
+
+
+class ListTransform:
+    def __init__(self, ops) -> None:
+        """
+        Args:
+            ops: list[list[dict, dict], ...]
+        """
+        self.ts = []
+        for op in ops:
+            self.ts.append(BaseTransform(op))
+
+    def __call__(self, img):
+        results = []
+        for op in self.ts:
+            results.append(op(img))
+        return results
