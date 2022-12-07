@@ -31,7 +31,7 @@ Arch:
   proj: true
   proj_after: false
 
-  use_sync_bn: true
+  # use_sync_bn: true
 
 Loss:
   Train:
@@ -44,14 +44,19 @@ Loss:
   
 UnLabelLoss:
   Train:
-    - CCSSLLoss:
-        CELoss:
-          weight: 1.0
-          reduction: "none"
-        SoftSupConLoss:
-          weight: 1.0
-          temperature: 0.07
+    - CCSSLCeLoss:
         weight: 1.
+    - SoftSupConLoss:
+        weight: 1.0
+        temperature: 0.07
+    # - CCSSLLoss:
+    #     CELoss:
+    #       weight: 1.0
+    #       reduction: "none"
+    #     SoftSupConLoss:
+    #       weight: 1.0
+    #       temperature: 0.07
+    #     weight: 1.
 
 Optimizer:
   name: Momentum
@@ -76,22 +81,22 @@ DataLoader:
       sample_per_label: 400
       expand_labels: 1
       transform_ops:
-        - RandomHorizontalFlip:
-            prob: 0.5
-        - RandomCrop:
-            size: 32
-            padding: 4
-            padding_mode: "reflect"
+        # - RandomHorizontalFlip:
+        #     prob: 0.5
+        # - RandomCrop:
+        #     size: 32
+        #     padding: 4
+        #     padding_mode: "reflect"
         - ToTensor:
         - Normalize:
             mean: *sign_mean
             std: *sign_std
     
     sampler:
-      name: DistributedBatchSampler
+      name: BatchSampler    # DistributedBatchSampler
       batch_size: 64
       drop_last: true
-      shuffle: true
+      shuffle: false
     loader:
       num_workers: 4
       use_shared_memory: true
@@ -106,57 +111,57 @@ DataLoader:
       download: true
 
       transform_w:
-        - RandomHorizontalFlip:
-            prob: 0.5
-        - RandomCrop:
-            size: 32
-            padding: 4
-            padding_mode: 'reflect'
+        # - RandomHorizontalFlip:
+        #     prob: 0.5
+        # - RandomCrop:
+        #     size: 32
+        #     padding: 4
+        #     padding_mode: 'reflect'
         - ToTensor:
         - Normalize:
             mean: *sign_mean
             std: *sign_std
 
       transform_s1:
-        - RandomHorizontalFlip:
-                prob: 0.5
-        - RandomCrop:
-            size: 32
-            padding: 4
-            padding_mode: 'reflect'
-        - RandAugmentMC:
-            n: 2
-            m: 10
+        # - RandomHorizontalFlip:
+        #         prob: 0.5
+        # - RandomCrop:
+        #     size: 32
+        #     padding: 4
+        #     padding_mode: 'reflect'
+        # - RandAugmentMC:
+        #     n: 2
+        #     m: 10
         - ToTensor:
         - Normalize:
             mean: *sign_mean
             std: *sign_std
       
       transform_s2:
-        - RandomResizedCrop:
-            size: 32
-        - RandomHorizontalFlip:
-            prob: 0.5
-        - RandomApply:
-            transforms:
-              - ColorJitter:
-                  brightness: 0.4
-                  contrast: 0.4
-                  saturation: 0.4
-                  hue: 0.1
-            p: 0.8
-        - RandomGrayscale:
-            p: 0.2
+        # - RandomResizedCrop:
+        #     size: 32
+        # - RandomHorizontalFlip:
+        #     prob: 0.5
+        # - RandomApply:
+        #     transforms:
+        #       - ColorJitter:
+        #           brightness: 0.4
+        #           contrast: 0.4
+        #           saturation: 0.4
+        #           hue: 0.1
+        #     p: 0.8
+        # - RandomGrayscale:
+        #     p: 0.2
         - ToTensor:
         # - Normalize:
         #     mean: *sign_mean
         #     std: *sign_std
 
     sampler:
-      name: DistributedBatchSampler
+      name: BatchSampler   # DistributedBatchSampler
       batch_size: 448
       drop_last: true
-      shuffle: true
+      shuffle: false
     loader:
       num_workers: 4
       use_shared_memory: true

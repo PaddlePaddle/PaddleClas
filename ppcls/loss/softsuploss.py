@@ -4,19 +4,20 @@ author: zhhike
 """
 
 import paddle
+import paddle.nn as nn
 
-
-class SoftSupConLoss(object):
+class SoftSupConLoss(nn.Layer):
     """
     Supervised Contrastive Learning: https://arxiv.org/pdf/2004.11362.pdf.
     It also supports the unsupervised contrastive loss in SimCLR
     """
     def __init__(self, temperature=0.07, contrast_mode='all', base_temperature=0.07):
+        super(SoftSupConLoss, self).__init__()
         self.temperature = temperature
         self.contrast_mode = contrast_mode
         self.base_temperature = base_temperature
 
-    def __call__(self, feat, max_probs, labels=None, mask=None, reduction="mean", select_matrix=None):
+    def __call__(self, feat, batch, max_probs=None, labels=None, mask=None, reduction="mean", select_matrix=None):
         """Compute loss for model. If both `labels` and `mask` are None,
         it degenerates to SimCLR unsupervised loss:
         https://arxiv.org/pdf/2002.05709.pdf
@@ -29,8 +30,8 @@ class SoftSupConLoss(object):
         Returns:
             A loss scalar.
         """
-        # max_probs = batch['max_probs']
-        # labels = batch['labels']
+        max_probs = batch['max_probs']
+        labels = batch['p_targets_u_w']
         # reduction = batch['reduction']
         batch_size = feat.shape[0]
         if labels is not None:
@@ -66,7 +67,7 @@ class SoftSupConLoss(object):
         if reduction == 'mean':
             loss = loss.mean()
 
-        return loss
+        return {"SoftSupConLoss": loss}
     
 
 

@@ -180,9 +180,10 @@ class CIFAR10SSL(CIFAR10):
             self.data_type = 'labeled_train'
             for c in range(self.num_classes):
                 idx = np.where(self.y == c)[0]
-                idx = np.random.choice(idx, sample_per_label, False)
-                index.extend(idx)
+                # idx = np.random.choice(idx, sample_per_label, False)
+                index.extend(idx[:sample_per_label])
             index = index * expand_labels
+            # print(index)
             self.x = self.x[index]
             self.y = self.y[index]
         self.transforms = [transform_ops] if transform_ops is not None else [transform_w, transform_s1, transform_s2]

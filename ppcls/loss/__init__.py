@@ -16,6 +16,8 @@ from .trihardloss import TriHardLoss
 from .triplet import TripletLoss, TripletLossV2
 from .tripletangularmarginloss import TripletAngularMarginLoss
 from .supconloss import SupConLoss
+from .softsuploss import SoftSupConLoss
+from .ccssl_loss import CCSSLCeLoss
 from .pairwisecosface import PairwiseCosface
 from .dmlloss import DMLLoss
 from .distanceloss import DistanceLoss
