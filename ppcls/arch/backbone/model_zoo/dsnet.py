@@ -12,16 +12,28 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# reference: https://arxiv.org/abs/2105.14734v4
+
 import paddle
 import paddle.nn as nn
+import paddle.nn.functional as F
+
 from .vision_transformer import to_2tuple, zeros_, ones_, VisionTransformer, Identity, zeros_
 from functools import partial
-from ppcls.utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
 from paddle.nn.initializer import TruncatedNormal, Constant, Normal
 
-__all__ = ["DSNet_tiny_patch16_224"]
+from ....utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
 
-trunc_normal_ = TruncatedNormal(std=.02)
+MODEL_URLS = {
+    "DSNet_tiny_patch16_224":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DSNet_tiny_patch16_224_pretrained.pdparams",
+    "DSNet_small_patch16_224":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DSNet_small_patch16_224_pretrained.pdparams",
+    "DSNet_base_patch16_224":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DSNet_base_patch16_224_pretrained.pdparams",
+}
+
+__all__ = list(MODEL_URLS.keys())
 
 
 class Mlp(nn.Layer):
@@ -84,6 +96,32 @@ class DWConvMlp(nn.Layer):
         return x
 
 
+def drop_path(x, drop_prob=0., training=False):
+    """Drop paths (Stochastic Depth) per sample (when applied in main path of residual blocks).
+    See discussion: https://github.com/tensorflow/tpu/issues/494#issuecomment-532968956 ...
+    """
+    if drop_prob == 0. or not training:
+        return x
+    keep_prob = paddle.to_tensor(1 - drop_prob)
+    shape = (paddle.shape(x)[0], ) + (1, ) * (x.ndim - 1)
+    random_tensor = keep_prob + paddle.rand(shape, dtype=x.dtype)
+    random_tensor = paddle.floor(random_tensor)  # binarize
+    output = x.divide(keep_prob) * random_tensor
+    return output
+
+
+class DropPath(nn.Layer):
+    """Drop paths (Stochastic Depth) per sample  (when applied in main path of residual blocks).
+    """
+
+    def __init__(self, drop_prob=None):
+        super(DropPath, self).__init__()
+        self.drop_prob = drop_prob
+
+    def forward(self, x):
+        return drop_path(x, self.drop_prob, self.training)
+
+
 class Attention(nn.Layer):
     def __init__(self,
                  dim,
@@ -109,7 +147,7 @@ class Attention(nn.Layer):
         q, k, v = qkv[0], qkv[1], qkv[2]
 
         attn = (q.matmul(k.transpose((0, 1, 3, 2)))) * self.scale
-        attn = nn.functional.softmax(attn, axis=-1)
+        attn = F.softmax(attn, axis=-1)
         attn = self.attn_drop(attn)
 
         x = (attn.matmul(v)).transpose((0, 2, 1, 3)).reshape((B, N, C))
@@ -136,7 +174,7 @@ class Cross_Attention(nn.Layer):
     def forward(self, tokens_q, memory_k, memory_v, shape=None):
         assert shape is not None
         attn = (tokens_q.matmul(memory_k.transpose((0, 1, 3, 2)))) * self.scale
-        attn = nn.functional.softmax(attn, axis=-1)
+        attn = F.softmax(attn, axis=-1)
         attn = self.attn_drop(attn)
 
         x = (attn.matmul(memory_v)).transpose((0, 2, 1, 3)).reshape(
@@ -222,7 +260,7 @@ class MixBlock(nn.Layer):
         residual_conv = conv
         conv = residual_conv + self.conv(self.norm_conv1(conv))
 
-        sa = nn.functional.interpolate(
+        sa = F.interpolate(
             qkv,
             size=(H // self.downsample, W // self.downsample),
             mode='bilinear')
@@ -233,7 +271,7 @@ class MixBlock(nn.Layer):
         sa = self.channel_up(sa)
         sa = residual_sa + self.attn(sa)
 
-        # cross attention
+        # cross attention 
         residual_conv_co = conv
         residual_sa_co = sa
         conv_qkv = self.cross_channel_up_conv(self.norm_conv2(conv))
@@ -245,14 +283,14 @@ class MixBlock(nn.Layer):
         C_conv = int(C_conv // 3)
         conv_qkv = conv_qkv.reshape((B_conv, N_conv, 3, self.num_heads,
                                      C_conv // self.num_heads)).transpose(
-                                         (2, 0, 3, 1, 4))  #######modify
+                                         (2, 0, 3, 1, 4))
         conv_q, conv_k, conv_v = conv_qkv[0], conv_qkv[1], conv_qkv[2]
 
         B_sa, N_sa, C_sa = sa_qkv.shape
         C_sa = int(C_sa // 3)
         sa_qkv = sa_qkv.reshape(
             (B_sa, N_sa, 3, self.num_heads, C_sa // self.num_heads)).transpose(
-                (2, 0, 3, 1, 4))  #######modify 
+                (2, 0, 3, 1, 4))
         sa_q, sa_k, sa_v = sa_qkv[0], sa_qkv[1], sa_qkv[2]
 
         # sa -> conv
@@ -266,7 +304,7 @@ class MixBlock(nn.Layer):
         sa = self.cross_attn(sa_q, conv_k, conv_v, shape=(B_sa, N_sa, C_sa))
         sa = residual_sa_co + self.fuse_channel_sa(sa)
         sa = sa.reshape((B, H_down, W_down, C_sa)).transpose((0, 3, 1, 2))
-        sa = nn.functional.interpolate(sa, size=(H, W), mode='bilinear')
+        sa = F.interpolate(sa, size=(H, W), mode='bilinear')
         x = paddle.concat([conv, sa], axis=1)
         x = residual + self.drop_path(self.conv2(x))
         x = x + self.drop_path(self.mlp(self.norm2(x)))
@@ -369,7 +407,7 @@ class OverlapPatchEmbed(nn.Layer):
 
 class MixVisionTransformer(nn.Layer):
     """ Mixed Vision Transformer for DSNet
-    A PyTorch impl of : `Dual-stream Network for Visual Recognition` - https://arxiv.org/abs/2105.14734v4
+    A PaddlePaddle impl of : `Dual-stream Network for Visual Recognition` - https://arxiv.org/abs/2105.14734v4
     """
 
     def __init__(self,
@@ -386,7 +424,7 @@ class MixVisionTransformer(nn.Layer):
                  representation_size=None,
                  drop_rate=0.,
                  attn_drop_rate=0.,
-                 drop_path_rate=0.,
+                 drop_path_rate=0.1,
                  norm_layer=None,
                  overlap_embed=False,
                  conv_ffn=False):
@@ -481,6 +519,7 @@ class MixVisionTransformer(nn.Layer):
                 downsample=downsamples[0],
                 conv_ffn=conv_ffn) for i in range(depth[0])
         ])
+
         self.blocks2 = nn.LayerList([
             MixBlock(
                 dim=embed_dim[1],
@@ -495,6 +534,7 @@ class MixVisionTransformer(nn.Layer):
                 downsample=downsamples[1],
                 conv_ffn=conv_ffn) for i in range(depth[1])
         ])
+
         self.blocks3 = nn.LayerList([
             MixBlock(
                 dim=embed_dim[2],
@@ -509,6 +549,7 @@ class MixVisionTransformer(nn.Layer):
                 downsample=downsamples[2],
                 conv_ffn=conv_ffn) for i in range(depth[2])
         ])
+
         if self.mixture:
             self.blocks4 = nn.LayerList([
                 Block(
@@ -559,7 +600,7 @@ class MixVisionTransformer(nn.Layer):
 
     def _init_weights(self, m):
         if isinstance(m, nn.Linear):
-            trunc_normal_(m.weight)
+            TruncatedNormal(m.weight, std=.02)
             if isinstance(m, nn.Linear) and m.bias is not None:
                 zeros_(m.bias)
         elif isinstance(m, nn.LayerNorm):
@@ -605,8 +646,20 @@ class MixVisionTransformer(nn.Layer):
         return x
 
 
-def DSNet_tiny_patch16_224(pretrained=False, **kwargs):
-    """ 12M parameters, compared with ResNet18 """
+def _load_pretrained(pretrained, model, model_url, use_ssld=False):
+    if pretrained is False:
+        pass
+    elif pretrained is True:
+        load_dygraph_pretrain_from_url(model, model_url, use_ssld=use_ssld)
+    elif isinstance(pretrained, str):
+        load_dygraph_pretrain(model, pretrained)
+    else:
+        raise RuntimeError(
+            "pretrained type is not available. Please use `string` or `boolean` type."
+        )
+
+
+def DSNet_tiny_patch16_224(pretrained=False, use_ssld=False, **kwargs):
     model = MixVisionTransformer(
         patch_size=16,
         depth=[2, 2, 4, 1],
@@ -616,16 +669,60 @@ def DSNet_tiny_patch16_224(pretrained=False, **kwargs):
             nn.LayerNorm, eps=1e-6),
         **kwargs)
     model.default_cfg = {
-        'url': '',
-        'class_num': 1000,
-        'input_size': (3, 224, 224),
         'pool_size': None,
-        'crop_pct': .9,
-        'interpolation': 'bicubic',
         'fixed_input_size': True,
-        'mean': [0.485, 0.456, 0.406],
-        'std': [0.229, 0.224, 0.225],
         'first_conv': 'patch_embed.proj',
         'classifier': 'head',
     }
+    _load_pretrained(
+        pretrained,
+        model,
+        MODEL_URLS["DSNet_tiny_patch16_224"],
+        use_ssld=use_ssld)
+    return model
+
+
+def DSNet_small_patch16_224(pretrained=False, use_ssld=False, **kwargs):
+    model = MixVisionTransformer(
+        patch_size=16,
+        depth=[3, 4, 8, 3],
+        mlp_ratio=4,
+        qkv_bias=True,
+        norm_layer=partial(
+            nn.LayerNorm, eps=1e-6),
+        **kwargs)
+    model.default_cfg = {
+        'pool_size': None,
+        'fixed_input_size': True,
+        'first_conv': 'patch_embed.proj',
+        'classifier': 'head',
+    }
+    _load_pretrained(
+        pretrained,
+        model,
+        MODEL_URLS["DSNet_small_patch16_224"],
+        use_ssld=use_ssld)
+    return model
+
+
+def DSNet_base_patch16_224(pretrained=False, use_ssld=False, **kwargs):
+    model = MixVisionTransformer(
+        patch_size=16,
+        depth=[3, 4, 28, 3],
+        mlp_ratio=4,
+        qkv_bias=True,
+        norm_layer=partial(
+            nn.LayerNorm, eps=1e-6),
+        **kwargs)
+    model.default_cfg = {
+        'pool_size': None,
+        'fixed_input_size': True,
+        'first_conv': 'patch_embed.proj',
+        'classifier': 'head',
+    }
+    _load_pretrained(
+        pretrained,
+        model,
+        MODEL_URLS["DSNet_base_patch16_224"],
+        use_ssld=use_ssld)
     return model

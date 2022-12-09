@@ -18,7 +18,7 @@ Global:
 
 # model architecture
 Arch:
-  name: DSNet_tiny_patch16_224
+  name: DSNet_small_patch16_224
   class_num: 1000
 
 # loss function config for traing/eval process
@@ -44,6 +44,7 @@ Optimizer:
     eta_min: 1e-5
     warmup_epoch: 5
     warmup_start_lr: 1e-6
+
 
 # data loader for train and eval
 DataLoader:

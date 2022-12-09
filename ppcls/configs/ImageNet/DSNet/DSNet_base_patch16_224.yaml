@@ -18,7 +18,7 @@ Global:
 
 # model architecture
 Arch:
-  name: DSNet_tiny_patch16_224
+  name: DSNet_base_patch16_224
   class_num: 1000
 
 # loss function config for traing/eval process
