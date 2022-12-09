@@ -26,6 +26,12 @@ from ....utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_fro
 MODEL_URLS = {
     "VAN_B0":
     "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/VAN_B0_pretrained.pdparams",
+    "VAN_B1":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/VAN_B1_pretrained.pdparams",
+    "VAN_B2":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/VAN_B2_pretrained.pdparams",
+    "VAN_B3":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/VAN_B3_pretrained.pdparams"
 }
 
 __all__ = list(MODEL_URLS.keys())
@@ -266,9 +272,12 @@ class VAN(nn.Layer):
             patch_embed = getattr(self, f"patch_embed{i + 1}")
             block = getattr(self, f"block{i + 1}")
             norm = getattr(self, f"norm{i + 1}")
+            #print(x[0][:10])
             x, H, W = patch_embed(x)
+            #print(x[0][:10])
             for blk in block:
                 x = blk(x)
+
             x = x.flatten(2)
             x = swapdim(x, 1, 2)
             x = norm(x)
@@ -316,4 +325,40 @@ def VAN_B0(pretrained=False, use_ssld=False, **kwargs):
                 **kwargs)
     _load_pretrained(
         pretrained, model, MODEL_URLS["VAN_B0"], use_ssld=use_ssld)
+    return model
+
+
+def VAN_B1(pretrained=False, use_ssld=False, **kwargs):
+    model = VAN(embed_dims=[64, 128, 320, 512],
+                mlp_ratios=[8, 8, 4, 4],
+                norm_layer=partial(
+                    nn.LayerNorm, epsilon=1e-6),
+                depths=[2, 2, 4, 2],
+                **kwargs)
+    _load_pretrained(
+        pretrained, model, MODEL_URLS["VAN_B1"], use_ssld=use_ssld)
+    return model
+
+
+def VAN_B2(pretrained=False, use_ssld=False, **kwargs):
+    model = VAN(embed_dims=[64, 128, 320, 512],
+                mlp_ratios=[8, 8, 4, 4],
+                norm_layer=partial(
+                    nn.LayerNorm, epsilon=1e-6),
+                depths=[3, 3, 12, 3],
+                **kwargs)
+    _load_pretrained(
+        pretrained, model, MODEL_URLS["VAN_B2"], use_ssld=use_ssld)
+    return model
+
+
+def VAN_B3(pretrained=False, use_ssld=False, **kwargs):
+    model = VAN(embed_dims=[64, 128, 320, 512],
+                mlp_ratios=[8, 8, 4, 4],
+                norm_layer=partial(
+                    nn.LayerNorm, epsilon=1e-6),
+                depths=[3, 5, 27, 3],
+                **kwargs)
+    _load_pretrained(
+        pretrained, model, MODEL_URLS["VAN_B3"], use_ssld=use_ssld)
     return model
