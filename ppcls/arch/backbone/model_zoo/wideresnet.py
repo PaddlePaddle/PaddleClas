@@ -201,7 +201,9 @@ class Wide_ResNet(nn.Layer):
         feat = self.relu(self.bn1(feat))
         feat = F.adaptive_avg_pool2d(feat, 1)
         feat = paddle.reshape(feat, [-1, self.channels])
-
+        if not self.training:
+            return self.fc(feat)
+            
         if self.proj:
             pfeat = self.fc1(feat)
             pfeat = self.relu_mlp(pfeat)
