@@ -835,3 +835,37 @@ class BlurImage(object):
                                         self.motion_max_angle)
             label = 1
         return {"img": img, "blur_image": label}
+
+
+class RandomGrayscale(object):
+    """Randomly convert image to grayscale with a probability of p (default 0.1).
+
+    Args:
+        p (float): probability that image should be converted to grayscale.
+
+    Returns:
+        PIL Image: Grayscale version of the input image with probability p and unchanged
+        with probability (1-p).
+        - If input image is 1 channel: grayscale version is 1 channel
+        - If input image is 3 channel: grayscale version is 3 channel with r == g == b
+
+    """
+
+    def __init__(self, p=0.1):
+        self.p = p
+
+    def __call__(self, img):
+        """
+        Args:
+            img (PIL Image): Image to be converted to grayscale.
+
+        Returns:
+            PIL Image: Randomly grayscaled image.
+        """
+        num_output_channels = 1 if img.mode == 'L' else 3
+        if random.random() < self.p:
+            return F.to_grayscale(img, num_output_channels=num_output_channels)
+        return img
+
+    def __repr__(self):
+        return self.__class__.__name__ + '()'

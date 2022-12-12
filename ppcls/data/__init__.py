@@ -35,7 +35,7 @@ from ppcls.data.dataloader.multi_scale_dataset import MultiScaleDataset
 from ppcls.data.dataloader.person_dataset import Market1501, MSMT17
 from ppcls.data.dataloader.face_dataset import FiveValidationDataset, AdaFaceDataset
 from ppcls.data.dataloader.custom_label_dataset import CustomLabelDataset
-from ppcls.data.dataloader.cifar import Cifar10, Cifar100
+from ppcls.data.dataloader.cifar import Cifar10, Cifar100, CIFAR10SSL
 
 # sampler
 from ppcls.data.dataloader.DistributedRandomIdentitySampler import DistributedRandomIdentitySampler
@@ -112,7 +112,7 @@ def build_dataloader(config, mode, device, use_dali=False, seed=None):
 
     dataset = eval(dataset_name)(**config_dataset)
 
-    logger.debug("build dataset({}) success...".format(dataset))
+    # logger.debug("build dataset({}) success...".format(dataset))
 
     # build sampler
     config_sampler = config[mode]['sampler']
@@ -128,7 +128,7 @@ def build_dataloader(config, mode, device, use_dali=False, seed=None):
             config_sampler.update({"total_epochs": epochs})
         batch_sampler = eval(sampler_name)(dataset, **config_sampler)
 
-    logger.debug("build batch_sampler({}) success...".format(batch_sampler))
+    # logger.debug("build batch_sampler({}) success...".format(batch_sampler))
 
     # build batch operator
     def mix_collate_fn(batch):
@@ -183,5 +183,5 @@ def build_dataloader(config, mode, device, use_dali=False, seed=None):
             collate_fn=batch_collate_fn,
             worker_init_fn=init_fn)
 
-    logger.debug("build data_loader({}) success...".format(data_loader))
+    # logger.debug("build data_loader({}) success...".format(data_loader))
     return data_loader

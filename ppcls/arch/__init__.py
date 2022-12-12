@@ -28,7 +28,7 @@ from ..utils import logger
 from ..utils.save_load import load_dygraph_pretrain
 from .slim import prune_model, quantize_model
 from .distill.afd_attention import LinearTransformStudent, LinearTransformTeacher
-
+from test_ import load_paddle_from_torch    # for align
 __all__ = ["build_model", "RecModel", "DistillationModel", "AttentionModel"]
 
 
@@ -49,6 +49,8 @@ def build_model(config, mode="train"):
         prune_model(config, arch)
         quantize_model(config, arch, mode)
 
+    load_paddle_from_torch(arch)
+    paddle.save(arch.state_dict(), '../align/step1/data/paddle_model.pdparams')
     return arch
 
 
