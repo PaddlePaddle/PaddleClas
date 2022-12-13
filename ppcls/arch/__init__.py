@@ -85,10 +85,18 @@ class RecModel(TheseusLayer):
             self.head = build_gear(config["Head"])
         else:
             self.head = None
+        
+        if "Decoup" in config:
+            self.decoup = build_gear(config['Decoup'])
+        else:
+            self.decoup = None
 
     def forward(self, x, label=None):
+        
         out = dict()
         x = self.backbone(x)
+        if self.decoup is not None:
+            return self.decoup(x)
         out["backbone"] = x
         if self.neck is not None:
             x = self.neck(x)

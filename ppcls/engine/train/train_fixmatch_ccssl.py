@@ -10,6 +10,7 @@ from ppcls.engine.train.utils import update_loss, update_metric, log_info
 from ppcls.utils import profiler
 from paddle.nn import functional as F
 import numpy as np
+import paddle
 # from reprod_log import ReprodLogger
 
 
@@ -20,6 +21,9 @@ def train_epoch_fixmatch_ccssl(engine, epoch_id, print_batch_step):
     # epoch = 0
     ##############################################################
 
+    paddle.save(engine.model.state_dict(), '../recmodel.pdparams')
+
+    assert 1==0
     tic = time.time()
     if not hasattr(engine, 'train_dataloader_iter'):
         engine.train_dataloader_iter = iter(engine.train_dataloader)
@@ -81,7 +85,7 @@ def train_epoch_fixmatch_ccssl(engine, epoch_id, print_batch_step):
         inputs_w, inputs_s1, inputs_s2 = unlabel_data_batch
 
         batch_size_label = inputs_x.shape[0]
-        inputs = paddle.concat([inputs_x, inputs_w, inputs_s1, inputs_s2])
+        inputs = paddle.concat([inputs_x, inputs_w, inputs_s1, inputs_s2], axis=0)
 
         loss_dict, logits_label = get_loss(engine, inputs, batch_size_label, 
                                            temperture, threshold, targets_x,
@@ -134,8 +138,9 @@ def get_loss(engine,
              targets_x,
              **kwargs
              ):
-
-    logits, feats = engine.model(inputs)
+    out = engine.model(inputs)
+    logits, feats = out['logits'], out['features']
+    # logits, feats = engine.model(inputs)
     feat_w, feat_s1, feat_s2 = feats[batch_size_label:].chunk(3)
     feat_x = feats[:batch_size_label]
     logits_x = logits[:batch_size_label]

@@ -71,7 +71,7 @@ cifar10数据在训练过程中会自动下载到默认缓存路径 `~/.cache/pa
 
 单卡训练执行以下命令
 ```
-python tools/train.py -c ppcls/configs/ssl/FixMatch_CCSSL_cifar10_4000.yaml
+python tools/train.py -c ppcls/configs/ssl/FixMatchCCSSL/FixMatchCCSSL_cifar10_4000.yaml
 ```
 
 4卡训练执行以下操作
@@ -86,7 +86,7 @@ python -m paddle.distributed.launch --gpus='0,1,2,3' tools/train.py -c ppcls/con
 准备用于评估的 `*.pdparams` 模型参数文件，可以使用训练好的模型，也可以使用 *4. 模型训练* 中保存的模型。
 * 以训练过程中保存的 `best_model_ema.ema.pdparams`为例，执行如下命令即可进行评估。
 ```
-python3.7 tools/eval.py -c ppcls/configs/ssl/FixMatch_CCSSL_cifar10_4000.yaml -o Global.pretrained_model="./output/WideResNetCCSSL/best_model_ema.ema"
+python3.7 tools/eval.py -c ppcls/configs/ssl/FixMatchCCSSL/FixMatchCCSSL_cifar10_4000_4gpu.yaml -o Global.pretrained_model="./output/WideResNet/best_model_ema.ema"
 ```
 
 * 以训练好的模型为例，下载提供的已经训练好的模型，到 `PaddleClas/pretrained_models` 文件夹中，执行如下命令即可进行评估。
