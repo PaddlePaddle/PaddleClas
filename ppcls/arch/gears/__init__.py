@@ -20,6 +20,7 @@ from .vehicle_neck import VehicleNeck
 from paddle.nn import Tanh
 from .bnneck import BNNeck
 from .adamargin import AdaMargin
+from .decoup import Decoup
 
 __all__ = ['build_gear']
 
@@ -27,7 +28,7 @@ __all__ = ['build_gear']
 def build_gear(config):
     support_dict = [
         'ArcMargin', 'CosMargin', 'CircleMargin', 'FC', 'VehicleNeck', 'Tanh',
-        'BNNeck', 'AdaMargin'
+        'BNNeck', 'AdaMargin', 'FRFBNeck', 'Decoup'
     ]
     module_name = config.pop('name')
     assert module_name in support_dict, Exception(

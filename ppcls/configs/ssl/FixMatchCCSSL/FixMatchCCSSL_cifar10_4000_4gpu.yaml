@@ -23,14 +23,23 @@ EMA:
   decay: 0.999
 
 Arch:
-  name: WideResNet
-  widen_factor: 2
-  depth: 28
-  dropout: 0     # CCSSL为 drop_rate
-  num_classes: &sign_num_classes 10
-  low_dim: 64
-  proj: true
-  proj_after: false
+  name: RecModel
+  infer_output_key: logits
+  infer_add_softmax: false
+  Backbone:
+    name: WideResNet
+    widen_factor: 2
+    depth: 28
+    dropout: 0     # CCSSL为 drop_rate
+    num_classes: &sign_num_classes 10
+    low_dim: 64
+    proj: true
+    proj_after: false
+
+  Decoup:
+    name: Decoup
+    logits_index: 0
+    features_index: 1 
 
   use_sync_bn: true
 
