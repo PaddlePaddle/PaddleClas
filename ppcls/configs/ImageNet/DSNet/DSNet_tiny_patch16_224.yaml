@@ -24,10 +24,11 @@ Arch:
 # loss function config for traing/eval process
 Loss:
   Train:
-    - SoftTargetCrossEntropy:
+    - CELoss:
         weight: 1.0
+        epsilon: 0.1
   Eval:
-    - SoftTargetCrossEntropy:
+    - CELoss:
         weight: 1.0
 
 Optimizer:
@@ -94,7 +95,7 @@ DataLoader:
       drop_last: False
       shuffle: True
     loader:
-      num_workers: 4
+      num_workers: 8
       use_shared_memory: True
 
   Eval:
