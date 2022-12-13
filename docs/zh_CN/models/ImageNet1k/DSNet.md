@@ -50,7 +50,7 @@
 $$
 {f}_ {L} = \sum^{M, N}_ {m, n} W \left( m, n \right) \odot {f}_ {l} \left( i+m, j+n \right),
 $$
-其中$W \left( m, n \right), \left( m, n \right) \in \left\{ -1, 0, 1 \right\}$表示卷积核，$\odot$表示元素级相乘。而对于低分辨率的${f}_ {g}$，我们首先将其展平为长度为${l}_ {g}$的序列，从而将序列中每一个向量视为一个visual token，然后通过self-attention机制得到特征图为
+其中$W ( m, n ), ( m, n ) \in \{ -1, 0, 1 \}$表示卷积核，$\odot$表示元素级相乘。而对于低分辨率的${f}_ {g}$，我们首先将其展平为长度为${l}_ {g}$的序列，从而将序列中每一个向量视为一个visual token，然后通过self-attention机制得到特征图为
 $$
 {f}_ {G} = \text{softmax} \left( \frac{{f}_ {Q} {f}_ {K}^{T}}{\sqrt{d}} \right) {f}_ {V},
 $$
