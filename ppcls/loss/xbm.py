@@ -21,7 +21,7 @@ from typing import Tuple
 import paddle
 
 
-class CrossBatchMemory(nn.Layer):
+class CrossBatchMemory(paddle.nn.Layer):
     """
     CrossBatchMemory Implementation. refer to "Cross-Batch Memory for Embedding Learning".
 
