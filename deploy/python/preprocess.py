@@ -64,13 +64,13 @@ class UnifiedResize(object):
             'random': (cv2.INTER_LINEAR, cv2.INTER_CUBIC)
         }
         _pil_interp_from_str = {
-            'nearest': Image.NEAREST,
-            'bilinear': Image.BILINEAR,
-            'bicubic': Image.BICUBIC,
-            'box': Image.BOX,
-            'lanczos': Image.LANCZOS,
-            'hamming': Image.HAMMING,
-            'random': (Image.BILINEAR, Image.BICUBIC)
+            'nearest': Image.Resampling.NEAREST,
+            'bilinear': Image.Resampling.BILINEAR,
+            'bicubic': Image.Resampling.BICUBIC,
+            'box': Image.Resampling.BOX,
+            'lanczos': Image.Resampling.LANCZOS,
+            'hamming': Image.Resampling.HAMMING,
+            'random': (Image.Resampling.BILINEAR, Image.Resampling.BICUBIC)
         }
 
         def _cv2_resize(src, size, resample):
