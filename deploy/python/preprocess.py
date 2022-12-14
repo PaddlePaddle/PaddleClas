@@ -31,6 +31,10 @@ from paddle.vision.transforms import ToTensor, Normalize
 
 from paddleclas.deploy.python.det_preprocess import DetNormalizeImage, DetPadStride, DetPermute, DetResize
 
+# Pillow<9.0
+if not hasattr(Image, 'Resampling'):
+    Image.Resampling = Image
+
 
 def create_operators(params):
     """
