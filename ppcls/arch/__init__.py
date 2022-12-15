@@ -14,6 +14,7 @@
 
 import copy
 import importlib
+from pyexpat import features
 
 import paddle.nn as nn
 from paddle.jit import to_static
@@ -71,6 +72,9 @@ class RecModel(TheseusLayer):
         super().__init__()
         backbone_config = config["Backbone"]
         backbone_name = backbone_config.pop("name")
+        self.decoup = False
+        if backbone_config.get('decoup', False):
+            self.decoup = backbone_config.pop('decoup')
         self.backbone = eval(backbone_name)(**backbone_config)
         if "BackboneStopLayer" in config:
             backbone_stop_layer = config["BackboneStopLayer"]["name"]
@@ -85,25 +89,26 @@ class RecModel(TheseusLayer):
             self.head = build_gear(config["Head"])
         else:
             self.head = None
-        
-        if "Decoup" in config:
-            self.decoup = build_gear(config['Decoup'])
-        else:
-            self.decoup = None
 
     def forward(self, x, label=None):
         
         out = dict()
         x = self.backbone(x)
-        if self.decoup is not None:
-            return self.decoup(x)
+        
         out["backbone"] = x
+        if self.decoup:
+            logits_index, features_index = self.decoup['logits_index'], self.decoup['features_index']
+            logits, feat = x[logits_index], x[features_index]
+            out['logits'] = logits
+            out['features'] =feat
+            return out
+
         if self.neck is not None:
-            x = self.neck(x)
-            out["neck"] = x
-        out["features"] = x
+            feat = self.neck(x)
+            out["neck"] = feat
+        out["features"] = out['neck'] if self.neck else x
         if self.head is not None:
-            y = self.head(x, label)
+            y = self.head(out['features'], label)
             out["logits"] = y
         return out
 
