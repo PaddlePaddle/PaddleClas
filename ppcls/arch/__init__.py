@@ -14,8 +14,6 @@
 
 import copy
 import importlib
-from pyexpat import features
-
 import paddle.nn as nn
 from paddle.jit import to_static
 from paddle.static import InputSpec

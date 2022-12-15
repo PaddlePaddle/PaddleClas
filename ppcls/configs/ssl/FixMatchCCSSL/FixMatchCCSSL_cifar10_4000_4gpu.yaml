@@ -7,7 +7,7 @@ Global:
   eval_during_train: true
   eval_interval: 1
   epochs: 1024
-  iter_per_epoch: 40
+  iter_per_epoch: 1024
   print_batch_step: 20
   use_visualdl: false
   use_dali: false
@@ -195,8 +195,6 @@ DataLoader:
     loader:
       num_workers: 4
       use_shared_memory: true
-
-
 
 Metric:
   Eval:

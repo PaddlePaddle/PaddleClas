@@ -51,12 +51,9 @@ from paddle.vision.transforms import Pad as Pad_paddle_vision
 from ppcls.data.preprocess.batch_ops.batch_operators import MixupOperator, CutmixOperator, OpSampler, FmixOperator
 from ppcls.data.preprocess.batch_ops.batch_operators import MixupCutmixHybrid
 
-
-
 import numpy as np
 from PIL import Image
 import random
-
 
 def transform(data, ops=[]):
     """ transform """
@@ -121,4 +118,3 @@ class TimmAutoAugment(RawTimmAutoAugment):
             img = np.asarray(img)
 
         return img
-        
