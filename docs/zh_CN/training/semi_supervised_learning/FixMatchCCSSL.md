@@ -79,14 +79,14 @@ python tools/train.py -c ppcls/configs/ssl/FixMatchCCSSL/FixMatchCCSSL_cifar10_4
 python -m paddle.distributed.launch --gpus='0,1,2,3' tools/train.py -c ppcls/configs/ssl/FixMatchCCSSL/FixMatchCCSSL_cifar10_4000_4gpu.yaml
 ```
 
-2. **查看训练日志和保存的模型参数文件** 训练过程中屏幕会实时打印loss等指标信息，同时会保存日志文件 `train.log` ，模型参数文件 `*.pdparams`，优化器参数文件 `*.pdopt` 等内容到`Global.output_dir`指定的文件夹下，默认在 `PaddleClas/output/WideResNet/`文件夹下。
+2. **查看训练日志和保存的模型参数文件** 训练过程中屏幕会实时打印loss等指标信息，同时会保存日志文件 `train.log` ，模型参数文件 `*.pdparams`，优化器参数文件 `*.pdopt` 等内容到`Global.output_dir`指定的文件夹下，默认在 `PaddleClas/output/RecModel/`文件夹下。
 
 ## 5. 模型评估与推理部署
 ### 5.1 模型评估
 准备用于评估的 `*.pdparams` 模型参数文件，可以使用训练好的模型，也可以使用 *4. 模型训练* 中保存的模型。
 * 以训练过程中保存的 `best_model_ema.ema.pdparams`为例，执行如下命令即可进行评估。
 ```
-python3.7 tools/eval.py -c ppcls/configs/ssl/FixMatchCCSSL/FixMatchCCSSL_cifar10_4000_4gpu.yaml -o Global.pretrained_model="./output/WideResNet/best_model_ema.ema"
+python3.7 tools/eval.py -c ppcls/configs/ssl/FixMatchCCSSL/FixMatchCCSSL_cifar10_4000_4gpu.yaml -o Global.pretrained_model="./output/RecModel/best_model_ema.ema"
 ```
 
 * 以训练好的模型为例，下载提供的已经训练好的模型，到 `PaddleClas/pretrained_models` 文件夹中，执行如下命令即可进行评估。
@@ -98,7 +98,7 @@ cd pretrained_models
 wget 
 cd ..
 # 评估
-python3.7 tools/eval.py -c ppcls/configs/ssl/FixMatch_CCSSL_cifar10_4000.yaml -o Global.pretrained_model=""
+python3.7 tools/eval.py -c ppcls/configs/ssl/FixMatchCCSSL_cifar10_4000.yaml -o Global.pretrained_model="./output/RecModel/best_model_ema.ema"
 ```
 **注：** `pretrained_model` 后填入的地址不需要加 `.pdparams`后缀，在程序运行时会自动补上。
 
@@ -114,15 +114,15 @@ python3.7 tools/eval.py -c ppcls/configs/ssl/FixMatch_CCSSL_cifar10_4000.yaml -o
 [2022/12/08 09:36:16] ppcls INFO: [Eval][Epoch 0][Iter: 140/157]CELoss: 0.03242, loss: 0.03242, top1: 0.95601, top5: 0.99945, batch_cost: 0.02084s, reader_cost: 0.00075, ips: 3071.00311 images/sec
 [2022/12/08 09:36:16] ppcls INFO: [Eval][Epoch 0][Avg]CELoss: 0.16041, loss: 0.16041, top1: 0.95610, top5: 0.99950
 ```
-默认评估日志保存在 `PaddleClas/output/WideResNetCCSSL/eval.log`中，可以看到我们提供的模型在cifar10数据集上的评估指标为top1: 95.61, top5: 99.95
+默认评估日志保存在 `PaddleClas/output/RecModel/eval.log`中，可以看到我们提供的模型在cifar10数据集上的评估指标为top1: 95.57, top5: 99.95
 
 ### 5.2 模型推理
 #### 5.2.1 推理模型准备
 将训练过程中保存的模型文件转成inference模型，同样以 `best_model_ema.ema_pdparams`为例，执行以下命令进行转换
 ```
 python3.7 tools/export_model.py \
--c ppcls/configs/ssl/FixMatch_CCSSL/FixMatch_CCSSL_cifar10_4000.yaml \
--o Global.pretrained_model="output/WideResNetCCSSL/best_model_ema.ema" \
+-c ppcls/configs/ssl/FixMatchCCSSL/FixMatchCCSSL_cifar10_4000.yaml \
+-o Global.pretrained_model="output/RecModel/best_model_ema.ema" \
 -o Global.save_inference_fir="./deploy/inference"
 ```
 

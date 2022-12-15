@@ -41,7 +41,6 @@ class SoftSupConLoss(nn.Layer):
             
             score_mask = paddle.matmul(max_probs, max_probs.T)
             
-            
             mask = paddle.multiply(mask, score_mask)
             
         contrast_count = feat.shape[1]
@@ -55,7 +54,6 @@ class SoftSupConLoss(nn.Layer):
         mask = paddle.concat([mask, mask], axis=0)
         mask = paddle.concat([mask, mask], axis=1)
         
-        # mask = paddle.repeat_interleave(paddle.repeat_interleave(mask, 2, 0), 2, 1)
         logits_mask = 1 - paddle.eye(batch_size * contrast_count, dtype=paddle.float64)
         mask = mask * logits_mask
         exp_logits = paddle.exp(logits) * logits_mask
@@ -69,5 +67,3 @@ class SoftSupConLoss(nn.Layer):
 
         return {"SoftSupConLoss": loss}
     
-
-
