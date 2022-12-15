@@ -2,6 +2,7 @@ import paddle
 import paddle.nn as nn
 import paddle.nn.functional as F
 from paddle import ParamAttr
+from ..base.theseus_layer import TheseusLayer
 """
 backbone option "WideResNet"
 code in this file is adpated from
@@ -123,7 +124,7 @@ class Normalize(nn.Layer):
         return out
 
 
-class Wide_ResNet(nn.Layer):
+class Wide_ResNet(TheseusLayer):
     def __init__(self,
                  num_classes,
                  depth=28,

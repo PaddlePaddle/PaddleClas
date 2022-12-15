@@ -26,18 +26,26 @@ Arch:
   name: RecModel
   infer_output_key: logits
   infer_add_softmax: false
+  head_feature_from: backbone 
   Backbone:
     name: WideResNet
-    decoup:
-      logits_index: 0
-      features_index: 1
     widen_factor: 2
     depth: 28
     dropout: 0
     num_classes: 10
     low_dim: 64
-    proj: true
+    proj: false
     proj_after: false
+  BackboneStopLayer:
+    name: bn1
+  Neck:
+    name: FRFNNeck
+    num_features: 128
+    low_dim: 64
+  Head:
+    name: FC
+    embedding_size: 128
+    class_num: 10
 
   use_sync_bn: true
 
@@ -103,8 +111,6 @@ DataLoader:
       num_workers: 4
       use_shared_memory: true
   
-
-
   UnLabelTrain:
     dataset:
       name: Cifar10
