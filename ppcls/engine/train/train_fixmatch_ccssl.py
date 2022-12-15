@@ -11,8 +11,6 @@ import paddle
 
 
 def train_epoch_fixmatch_ccssl(engine, epoch_id, print_batch_step):
-    print(engine.model.state_dict().keys())
-    assert 1==0
     tic = time.time()
     if not hasattr(engine, 'train_dataloader_iter'):
         engine.train_dataloader_iter = iter(engine.train_dataloader)

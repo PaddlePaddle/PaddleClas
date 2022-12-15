@@ -70,10 +70,9 @@ class RecModel(TheseusLayer):
         super().__init__()
         backbone_config = config["Backbone"]
         backbone_name = backbone_config.pop("name")
-        self.decoup = False
-        if backbone_config.get('decoup', False):
-            self.decoup = backbone_config.pop('decoup')
         self.backbone = eval(backbone_name)(**backbone_config)
+        self.head_feature_from = config.get('head_feature_from', 'neck')
+
         if "BackboneStopLayer" in config:
             backbone_stop_layer = config["BackboneStopLayer"]["name"]
             self.backbone.stop_after(backbone_stop_layer)
@@ -94,19 +93,16 @@ class RecModel(TheseusLayer):
         x = self.backbone(x)
         
         out["backbone"] = x
-        if self.decoup:
-            logits_index, features_index = self.decoup['logits_index'], self.decoup['features_index']
-            logits, feat = x[logits_index], x[features_index]
-            out['logits'] = logits
-            out['features'] =feat
-            return out
 
         if self.neck is not None:
             feat = self.neck(x)
             out["neck"] = feat
         out["features"] = out['neck'] if self.neck else x
         if self.head is not None:
-            y = self.head(out['features'], label)
+            if self.head_feature_from == 'backbone':
+                y = self.head(out['backbone'], label)
+            elif self.head_feature_from == 'neck':
+                y = self.head(out['features'], label)
             out["logits"] = y
         return out
 

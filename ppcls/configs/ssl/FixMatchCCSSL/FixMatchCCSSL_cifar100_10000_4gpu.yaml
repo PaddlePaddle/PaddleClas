@@ -26,6 +26,7 @@ Arch:
   name: RecModel
   infer_output_key: logits
   infer_add_softmax: false
+  head_feature_from: backbone 
   Backbone:
     name: WideResNet
     widen_factor: 8
@@ -33,13 +34,18 @@ Arch:
     dropout: 0 
     num_classes: 100
     low_dim: 64
-    proj: true
+    proj: false
     proj_after: false
-
-  Decoup:
-    name: Decoup
-    logits_index: 0
-    features_index: 1 
+  BackboneStopLayer:
+    name: bn1
+  Neck:
+    name: FRFNNeck
+    num_features: 512
+    low_dim: 64
+  Head:
+    name: FC
+    embedding_size: 512
+    class_num: 100
 
   use_sync_bn: true
 
@@ -66,33 +72,36 @@ Optimizer:
   use_nesterov: true
   weight_decay: 0.001
   lr:
-    name: 'cosine_schedule_with_warmup'
+    name: 'CosineFixmatch'
     learning_rate: 0.03
     num_warmup_steps: 0
-    num_training_steps: 524800
 
 DataLoader:
   mean: [0.5071, 0.4867, 0.4408]
   std: [0.2675, 0.2565, 0.2761]
   Train:
     dataset:
-      name: CIFAR100SSL
+      name: Cifar100
       data_file: null
       mode: 'train'
       download: true
+      backend: 'pil'
       sample_per_label: 100
       expand_labels: 1
       transform_ops:
-        - RandomHorizontalFlip:
-            prob: 0.5
-        - RandomCrop:
-            size: 32
+        - RandFlipImage:
+            flip_code: 1
+        - Pad_paddle_vision:
             padding: 4
-            padding_mode: "reflect"
-        - ToTensor:
+            padding_mode: reflect
+        - RandCropImageV2:
+            size: [32, 32]
+        - NormalizeImage:
         - Normalize:
+            scale: 1.0/255.0
             mean: [0.5071, 0.4867, 0.4408]
             std: [0.2675, 0.2565, 0.2761]
+            order: hwc
     
     sampler:
       name: DistributedBatchSampler
@@ -105,46 +114,51 @@ DataLoader:
   
   UnLabelTrain:
     dataset:
-      name: CIFAR100SSL
+      name: Cifar100
       data_file: null
       mode: 'train'
+      backend: 'pil'
       download: true
 
-      transform_w:
-        - RandomHorizontalFlip:
-            prob: 0.5
-        - RandomCrop:
-            size: 32
+      transform_ops_weak:
+        - RandFlipImage:
+            flip_code: 1
+        - Pad_paddle_vision:
             padding: 4
-            padding_mode: 'reflect'
-        - ToTensor:
-        - Normalize:
+            padding_mode: reflect
+        - RandCropImageV2:
+            size: [32, 32]
+        - NormalizeImage:
+            scale: 1.0/255.0
             mean: [0.5071, 0.4867, 0.4408]
             std: [0.2675, 0.2565, 0.2761]
+            order: hwc
 
-      transform_s1:
-        - RandomHorizontalFlip:
-                prob: 0.5
-        - RandomCrop:
-            size: 32
+      transform_ops_strong:
+        - RandFlipImage:
+            flip_code: 1
+        - Pad_paddle_vision:
             padding: 4
-            padding_mode: 'reflect'
-        - RandAugmentMC:
-            n: 2
-            m: 10
-        - ToTensor:
-        - Normalize:
+            padding_mode: reflect
+        - RandCropImageV2:
+            size: [32, 32]
+        - RandAugment:
+            num_layers: 2
+            magnitude: 10
+        - NormalizeImage:
+            scale: 1.0/255.0
             mean: [0.5071, 0.4867, 0.4408]
             std: [0.2675, 0.2565, 0.2761]
+            order: hwc
       
-      transform_s2:
-        - RandomResizedCrop:
-            size: 32
-        - RandomHorizontalFlip:
-            prob: 0.5
+      transform_ops_strong2:
+        - RandCropImageV2:
+            size: [32, 32]
+        - RandFlipImage:
+            flip_code: 1
         - RandomApply:
             transforms:
-              - ColorJitter:
+              - RawColorJitter:
                   brightness: 0.4
                   contrast: 0.4
                   saturation: 0.4
@@ -152,7 +166,12 @@ DataLoader:
             p: 0.8
         - RandomGrayscale:
             p: 0.2
-        - ToTensor:
+        - NormalizeImage:
+            scale: 1.0/255.0
+            mean: [0.5071, 0.4867, 0.4408]
+            std: [0.2675, 0.2565, 0.2761]
+            order: hwc
+
 
     sampler:
       name: DistributedBatchSampler
@@ -165,15 +184,17 @@ DataLoader:
 
   Eval:
     dataset:
-      name: CIFAR100SSL
+      name: Cifar100
       mode: 'test'
+      backend: 'pil'
       download: true
       data_file: null
       transform_ops:
-        - ToTensor:
-        - Normalize:
+        - NormalizeImage:
+            scale: 1.0/255.0
             mean: [0.5071, 0.4867, 0.4408]
             std: [0.2675, 0.2565, 0.2761]
+            order: hwc
     sampler:
       name: DistributedBatchSampler
       batch_size: 16
