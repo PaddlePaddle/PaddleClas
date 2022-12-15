@@ -25,12 +25,12 @@ from paddle.nn.initializer import TruncatedNormal, Constant, Normal
 from ....utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
 
 MODEL_URLS = {
-    "DSNet_tiny_patch16_224":
-    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DSNet_tiny_patch16_224_pretrained.pdparams",
-    "DSNet_small_patch16_224":
-    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DSNet_small_patch16_224_pretrained.pdparams",
-    "DSNet_base_patch16_224":
-    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DSNet_base_patch16_224_pretrained.pdparams",
+    "DSNet_tiny":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DSNet_tiny_pretrained.pdparams",
+    "DSNet_small":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DSNet_small_pretrained.pdparams",
+    "DSNet_base":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DSNet_base_pretrained.pdparams",
 }
 
 __all__ = list(MODEL_URLS.keys())
@@ -659,7 +659,7 @@ def _load_pretrained(pretrained, model, model_url, use_ssld=False):
         )
 
 
-def DSNet_tiny_patch16_224(pretrained=False, use_ssld=False, **kwargs):
+def DSNet_tiny(pretrained=False, use_ssld=False, **kwargs):
     model = MixVisionTransformer(
         patch_size=16,
         depth=[2, 2, 4, 1],
@@ -669,14 +669,11 @@ def DSNet_tiny_patch16_224(pretrained=False, use_ssld=False, **kwargs):
             nn.LayerNorm, eps=1e-6),
         **kwargs)
     _load_pretrained(
-        pretrained,
-        model,
-        MODEL_URLS["DSNet_tiny_patch16_224"],
-        use_ssld=use_ssld)
+        pretrained, model, MODEL_URLS["DSNet_tiny"], use_ssld=use_ssld)
     return model
 
 
-def DSNet_small_patch16_224(pretrained=False, use_ssld=False, **kwargs):
+def DSNet_small(pretrained=False, use_ssld=False, **kwargs):
     model = MixVisionTransformer(
         patch_size=16,
         depth=[3, 4, 8, 3],
@@ -686,14 +683,11 @@ def DSNet_small_patch16_224(pretrained=False, use_ssld=False, **kwargs):
             nn.LayerNorm, eps=1e-6),
         **kwargs)
     _load_pretrained(
-        pretrained,
-        model,
-        MODEL_URLS["DSNet_small_patch16_224"],
-        use_ssld=use_ssld)
+        pretrained, model, MODEL_URLS["DSNet_small"], use_ssld=use_ssld)
     return model
 
 
-def DSNet_base_patch16_224(pretrained=False, use_ssld=False, **kwargs):
+def DSNet_base(pretrained=False, use_ssld=False, **kwargs):
     model = MixVisionTransformer(
         patch_size=16,
         depth=[3, 4, 28, 3],
@@ -703,8 +697,5 @@ def DSNet_base_patch16_224(pretrained=False, use_ssld=False, **kwargs):
             nn.LayerNorm, eps=1e-6),
         **kwargs)
     _load_pretrained(
-        pretrained,
-        model,
-        MODEL_URLS["DSNet_base_patch16_224"],
-        use_ssld=use_ssld)
+        pretrained, model, MODEL_URLS["DSNet_base"], use_ssld=use_ssld)
     return model
