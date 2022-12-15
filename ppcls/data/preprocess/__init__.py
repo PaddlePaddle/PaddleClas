@@ -14,6 +14,7 @@
 
 from ppcls.data.preprocess.ops.autoaugment import ImageNetPolicy as RawImageNetPolicy
 from ppcls.data.preprocess.ops.randaugment import RandAugment as RawRandAugment
+from ppcls.data.preprocess.ops.randaugment import RandomApply
 from ppcls.data.preprocess.ops.timm_autoaugment import RawTimmAutoAugment
 from ppcls.data.preprocess.ops.cutout import Cutout
 
@@ -50,7 +51,7 @@ from paddle.vision.transforms import Pad as Pad_paddle_vision
 from ppcls.data.preprocess.batch_ops.batch_operators import MixupOperator, CutmixOperator, OpSampler, FmixOperator
 from ppcls.data.preprocess.batch_ops.batch_operators import MixupCutmixHybrid
 
-from .ops.randaugmentmc import RandAugmentMC, RandomApply
+
 
 import numpy as np
 from PIL import Image
@@ -124,39 +125,39 @@ class TimmAutoAugment(RawTimmAutoAugment):
         return img
 
 
-class BaseTransform:
-    def __init__(self, cfg) -> None:
-        """
-        Args:
-            cfg: list [dict, dict, dict]
-        """
-        ts = []
-        for op in cfg:
-            name = list(op.keys())[0]
-            if op[name] is None:
-                ts.append(eval(name)())
-            else:
-                ts.append(eval(name)(**(op[name])))
+# class BaseTransform:
+#     def __init__(self, cfg) -> None:
+#         """
+#         Args:
+#             cfg: list [dict, dict, dict]
+#         """
+#         ts = []
+#         for op in cfg:
+#             name = list(op.keys())[0]
+#             if op[name] is None:
+#                 ts.append(eval(name)())
+#             else:
+#                 ts.append(eval(name)(**(op[name])))
 
-        self.t = T.Compose(ts)
+#         self.t = T.Compose(ts)
 
-    def __call__(self, img):
+#     def __call__(self, img):
         
-        return self.t(img)
+#         return self.t(img)
 
 
-class ListTransform:
-    def __init__(self, ops) -> None:
-        """
-        Args:
-            ops: list[list[dict, dict], ...]
-        """
-        self.ts = []
-        for op in ops:
-            self.ts.append(BaseTransform(op))
+# class ListTransform:
+#     def __init__(self, ops) -> None:
+#         """
+#         Args:
+#             ops: list[list[dict, dict], ...]
+#         """
+#         self.ts = []
+#         for op in ops:
+#             self.ts.append(BaseTransform(op))
 
-    def __call__(self, img):
-        results = []
-        for op in self.ts:
-            results.append(op(img))
-        return results
+#     def __call__(self, img):
+#         results = []
+#         for op in self.ts:
+#             results.append(op(img))
+#         return results

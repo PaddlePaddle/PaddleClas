@@ -7,7 +7,7 @@ Global:
   eval_during_train: true
   eval_interval: 1
   epochs: 1024
-  iter_per_epoch: 40
+  iter_per_epoch: 1024
   print_batch_step: 20
   use_visualdl: false
   use_dali: false
@@ -28,16 +28,18 @@ Arch:
   infer_add_softmax: false
   Backbone:
     name: WideResNet
-    decoup:
-      logits_index: 0
-      features_index: 1
-    widen_factor: 2
+    widen_factor: 8
     depth: 28
-    dropout: 0
-    num_classes: 10
+    dropout: 0     # CCSSL为 drop_rate
+    num_classes: &sign_num_classes 100
     low_dim: 64
     proj: true
     proj_after: false
+
+  Decoup:
+    name: Decoup
+    logits_index: 0
+    features_index: 1 
 
   use_sync_bn: true
 
@@ -57,6 +59,14 @@ UnLabelLoss:
     - SoftSupConLoss:
         weight: 1.0
         temperature: 0.07
+    # - CCSSLLoss:
+    #     CELoss:
+    #       weight: 1.0
+    #       reduction: "none"
+    #     SoftSupConLoss:
+    #       weight: 1.0
+    #       temperature: 0.07
+    #     weight: 1.
 
 Optimizer:
   name: Momentum
@@ -70,34 +80,31 @@ Optimizer:
     num_training_steps: 524800
 
 DataLoader:
-  mean: [0.4914, 0.4822, 0.4465]
-  std: [0.2471, 0.2435, 0.2616]
+  mean: &sign_mean [0.5071, 0.4867, 0.4408]
+  std: &sign_std [0.2675, 0.2565, 0.2761]
   Train:
     dataset:
-      name: Cifar10
+      name: CIFAR100SSL
       data_file: null
       mode: 'train'
       download: true
-      backend: 'pil'
-      sample_per_label: 400
+      sample_per_label: 100
       expand_labels: 1
       transform_ops:
-        - RandFlipImage:
-            flip_code: 1
-        - Pad_paddle_vision:
+        - RandomHorizontalFlip:
+            prob: 0.5
+        - RandomCrop:
+            size: 32
             padding: 4
-            padding_mode: reflect
-        - RandCropImageV2:
-            size: [32, 32]
-        - NormalizeImage:
-            scale: 1.0/255.0
-            mean: [0.4914, 0.4822, 0.4465]
-            std: [0.2471, 0.2435, 0.2616]
-            order: hwc
+            padding_mode: "reflect"
+        - ToTensor:
+        - Normalize:
+            mean: *sign_mean
+            std: *sign_std
     
     sampler:
       name: DistributedBatchSampler    # DistributedBatchSampler
-      batch_size: 64
+      batch_size: 16
       drop_last: true
       shuffle: true
     loader:
@@ -108,51 +115,46 @@ DataLoader:
 
   UnLabelTrain:
     dataset:
-      name: Cifar10
+      name: CIFAR100SSL
       data_file: null
       mode: 'train'
-      backend: 'pil'
       download: true
 
-      transform_ops_weak:
-        - RandFlipImage:
-            flip_code: 1
-        - Pad_paddle_vision:
+      transform_w:
+        - RandomHorizontalFlip:
+            prob: 0.5
+        - RandomCrop:
+            size: 32
             padding: 4
-            padding_mode: reflect
-        - RandCropImageV2:
-            size: [32, 32]
-        - NormalizeImage:
-            scale: 1.0/255.0
-            mean: [0.4914, 0.4822, 0.4465]
-            std: [0.2471, 0.2435, 0.2616]
-            order: hwc
+            padding_mode: 'reflect'
+        - ToTensor:
+        - Normalize:
+            mean: *sign_mean
+            std: *sign_std
 
-      transform_ops_strong:
-        - RandFlipImage:
-            flip_code: 1
-        - Pad_paddle_vision:
+      transform_s1:
+        - RandomHorizontalFlip:
+                prob: 0.5
+        - RandomCrop:
+            size: 32
             padding: 4
-            padding_mode: reflect
-        - RandCropImageV2:
-            size: [32, 32]
-        - RandAugment:
-            num_layers: 2
-            magnitude: 10
-        - NormalizeImage:
-            scale: 1.0/255.0
-            mean: [0.4914, 0.4822, 0.4465]
-            std: [0.2471, 0.2435, 0.2616]
-            order: hwc
+            padding_mode: 'reflect'
+        - RandAugmentMC:
+            n: 2
+            m: 10
+        - ToTensor:
+        - Normalize:
+            mean: *sign_mean
+            std: *sign_std
       
-      transform_ops_strong2:
-        - RandCropImageV2:
-            size: [32, 32]
-        - RandFlipImage:
-            flip_code: 1
+      transform_s2:
+        - RandomResizedCrop:
+            size: 32
+        - RandomHorizontalFlip:
+            prob: 0.5
         - RandomApply:
             transforms:
-              - RawColorJitter:
+              - ColorJitter:
                   brightness: 0.4
                   contrast: 0.4
                   saturation: 0.4
@@ -160,15 +162,14 @@ DataLoader:
             p: 0.8
         - RandomGrayscale:
             p: 0.2
-        - NormalizeImage:
-            scale: 1.0/255.0
-            mean: [0.4914, 0.4822, 0.4465]
-            std: [0.2471, 0.2435, 0.2616]
-            order: hwc
+        - ToTensor:
+        # - Normalize:
+        #     mean: *sign_mean
+        #     std: *sign_std
 
     sampler:
-      name: DistributedBatchSampler
-      batch_size: 448
+      name: DistributedBatchSampler   # DistributedBatchSampler
+      batch_size: 112
       drop_last: true
       shuffle: true
     loader:
@@ -177,20 +178,18 @@ DataLoader:
 
   Eval:
     dataset:
-      name: Cifar10
+      name: CIFAR100SSL
       mode: 'test'
-      backend: 'pil'
       download: true
       data_file: null
       transform_ops:
-        - NormalizeImage:
-            scale: 1.0/255.0
-            mean: [0.4914, 0.4822, 0.4465]
-            std: [0.2471, 0.2435, 0.2616]
-            order: hwc
+        - ToTensor:
+        - Normalize:
+            mean: *sign_mean
+            std: *sign_std
     sampler:
       name: DistributedBatchSampler
-      batch_size: 64
+      batch_size: 16
       drop_last: False
       shuffle: True
     loader:
