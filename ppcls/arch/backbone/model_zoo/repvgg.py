@@ -17,8 +17,8 @@
 
 import paddle.nn as nn
 import paddle
-import numpy as np
 import paddle.nn.functional as F
+import numpy as np
 
 from ....utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
 
@@ -239,13 +239,11 @@ class RepVGG(nn.Layer):
                  class_num=1000,
                  use_se=False):
         super(RepVGG, self).__init__()
-
         assert len(width_multiplier) == 4
         self.override_groups_map = override_groups_map or dict()
-
         assert 0 not in self.override_groups_map
-        self.use_se = use_se
         self.in_planes = min(64, int(64 * width_multiplier[0]))
+        self.use_se = use_se
 
         self.stage0 = RepVGGBlock(
             in_channels=3,

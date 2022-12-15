@@ -272,9 +272,7 @@ class VAN(nn.Layer):
             patch_embed = getattr(self, f"patch_embed{i + 1}")
             block = getattr(self, f"block{i + 1}")
             norm = getattr(self, f"norm{i + 1}")
-            #print(x[0][:10])
             x, H, W = patch_embed(x)
-            #print(x[0][:10])
             for blk in block:
                 x = blk(x)
 

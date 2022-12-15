@@ -20,7 +20,6 @@ import numpy as np
 
 import paddle
 import paddle.nn as nn
-
 from paddle.nn.initializer import TruncatedNormal, Constant
 
 from ..base.theseus_layer import Identity
@@ -208,14 +207,8 @@ class Block(nn.Layer):
             self.drop_path(self.mlp_in(self.norm_mlp_in(pixel_embed))))
         # outer
         B, N, C = patch_embed.shape
-
-        norm1_proj = pixel_embed.reshape((B, N - 1, -1))
+        norm1_proj = pixel_embed.reshape(shape=[B, N - 1, C])
         norm1_proj = self.norm1_proj(norm1_proj)
-        '''
-        norm1_proj = self.norm1_proj(pixel_embed)
-        norm1_proj = norm1_proj.reshape(
-            (B, N - 1, norm1_proj.shape[1] * norm1_proj.shape[2]))
-        '''
         patch_embed[:, 1:] = paddle.add(
             patch_embed[:, 1:], self.norm2_proj(self.proj(norm1_proj)))
         patch_embed = paddle.add(
@@ -234,6 +227,7 @@ class PixelEmbed(nn.Layer):
                  in_dim=48,
                  stride=4):
         super().__init__()
+        self.patch_size = patch_size
         num_patches = (img_size // patch_size)**2
         self.img_size = img_size
         self.num_patches = num_patches
@@ -247,15 +241,12 @@ class PixelEmbed(nn.Layer):
     def forward(self, x, pixel_pos):
         B, C, H, W = x.shape
         assert H == self.img_size and W == self.img_size, f"Input image size ({H}*{W}) doesn't match model ({self.img_size}*{self.img_size})."
-
-        x = self.proj(x)
-        x = nn.functional.unfold(x, self.new_patch_size, self.new_patch_size)
+        x = nn.functional.unfold(x, self.patch_size, self.patch_size)
         x = x.transpose((0, 2, 1)).reshape(
-            (-1, self.in_dim, self.new_patch_size, self.new_patch_size))
+            (-1, C, self.patch_size, self.patch_size))
+        x = self.proj(x)
+        x = x.reshape((-1, self.in_dim, self.patch_size)).transpose((0, 2, 1))
         x = x + pixel_pos
-
-        x = x.reshape((-1, self.in_dim, self.new_patch_size *
-                       self.new_patch_size)).transpose((0, 2, 1))
         return x
 
 
@@ -306,8 +297,7 @@ class TNT(nn.Layer):
         self.add_parameter("patch_pos", self.patch_pos)
 
         self.pixel_pos = self.create_parameter(
-            shape=(1, in_dim, new_patch_size, new_patch_size),
-            default_initializer=zeros_)
+            shape=(1, patch_size, in_dim), default_initializer=zeros_)
         self.add_parameter("pixel_pos", self.pixel_pos)
 
         self.pos_drop = nn.Dropout(p=drop_rate)
@@ -363,7 +353,6 @@ class TNT(nn.Layer):
             (self.cls_token.expand((B, -1, -1)), patch_embed), axis=1)
         patch_embed = patch_embed + self.patch_pos
         patch_embed = self.pos_drop(patch_embed)
-
         for blk in self.blocks:
             pixel_embed, patch_embed = blk(pixel_embed, patch_embed)
 

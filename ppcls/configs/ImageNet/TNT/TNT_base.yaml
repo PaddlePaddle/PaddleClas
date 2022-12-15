@@ -16,7 +16,7 @@ Global:
 
 # model architecture
 Arch:
-  name: TNT_small
+  name: TNT_base
   class_num: 1000
  
 # loss function config for traing/eval process

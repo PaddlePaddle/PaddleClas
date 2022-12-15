@@ -164,8 +164,7 @@ class SplatConv(nn.Layer):
             padding=0,
             groups=groups,
             weight_attr=ParamAttr(
-                name=name + "_weights", initializer=KaimingNormal()),
-            bias_attr=True)
+                name=name + "_weights", initializer=KaimingNormal()))
 
         self.rsoftmax = rSoftmax(radix=radix, cardinality=groups)
 
