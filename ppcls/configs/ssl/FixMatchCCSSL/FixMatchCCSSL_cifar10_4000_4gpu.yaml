@@ -64,10 +64,9 @@ Optimizer:
   use_nesterov: true
   weight_decay: 0.001
   lr:
-    name: 'cosine_schedule_with_warmup'
+    name: 'CosineFixmatch'
     learning_rate: 0.03
     num_warmup_steps: 0
-    num_training_steps: 524800
 
 DataLoader:
   mean: [0.4914, 0.4822, 0.4465]
