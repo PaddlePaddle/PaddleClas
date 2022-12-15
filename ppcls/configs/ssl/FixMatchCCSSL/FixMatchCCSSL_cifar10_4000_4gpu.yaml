@@ -103,7 +103,7 @@ DataLoader:
             order: hwc
     
     sampler:
-      name: DistributedBatchSampler    # DistributedBatchSampler
+      name: DistributedBatchSampler
       batch_size: 64
       drop_last: true
       shuffle: true
