@@ -1,7 +1,4 @@
-
-
 from __future__ import absolute_import, division, print_function
-
 import time
 from turtle import update
 import paddle
@@ -11,11 +8,11 @@ from ppcls.utils import profiler
 from paddle.nn import functional as F
 import numpy as np
 import paddle
-# from reprod_log import ReprodLogger
 
 
 def train_epoch_fixmatch_ccssl(engine, epoch_id, print_batch_step):
-
+    print(engine.model.state_dict().keys())
+    assert 1==0
     tic = time.time()
     if not hasattr(engine, 'train_dataloader_iter'):
         engine.train_dataloader_iter = iter(engine.train_dataloader)
@@ -136,4 +133,3 @@ def get_loss(engine,
     loss_dict['loss'] = loss_dict_label['loss'] + unlabel_loss['loss']
 
     return loss_dict, logits_x
-    

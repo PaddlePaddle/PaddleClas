@@ -33,13 +33,13 @@
         <td>pytorch版本</td>
         <td></td>
         <td></td>
-        <td></td>
+        <td>95.54</td>
     </tr>
     <tr>
         <td>paddle版本</td>
         <td></td>
         <td></td>
-        <td></td>
+        <td>95.61</td>
     </tr>
 </table>
 cifar10上，paddle版本的配置文件及训练好的模型如下表所示

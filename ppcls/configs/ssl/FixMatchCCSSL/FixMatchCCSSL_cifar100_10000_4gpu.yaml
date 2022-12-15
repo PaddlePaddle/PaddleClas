@@ -30,8 +30,8 @@ Arch:
     name: WideResNet
     widen_factor: 8
     depth: 28
-    dropout: 0     # CCSSL为 drop_rate
-    num_classes: &sign_num_classes 100
+    dropout: 0 
+    num_classes: 100
     low_dim: 64
     proj: true
     proj_after: false
@@ -59,14 +59,6 @@ UnLabelLoss:
     - SoftSupConLoss:
         weight: 1.0
         temperature: 0.07
-    # - CCSSLLoss:
-    #     CELoss:
-    #       weight: 1.0
-    #       reduction: "none"
-    #     SoftSupConLoss:
-    #       weight: 1.0
-    #       temperature: 0.07
-    #     weight: 1.
 
 Optimizer:
   name: Momentum
@@ -80,8 +72,8 @@ Optimizer:
     num_training_steps: 524800
 
 DataLoader:
-  mean: &sign_mean [0.5071, 0.4867, 0.4408]
-  std: &sign_std [0.2675, 0.2565, 0.2761]
+  mean: [0.5071, 0.4867, 0.4408]
+  std: [0.2675, 0.2565, 0.2761]
   Train:
     dataset:
       name: CIFAR100SSL
@@ -99,11 +91,11 @@ DataLoader:
             padding_mode: "reflect"
         - ToTensor:
         - Normalize:
-            mean: *sign_mean
-            std: *sign_std
+            mean: [0.5071, 0.4867, 0.4408]
+            std: [0.2675, 0.2565, 0.2761]
     
     sampler:
-      name: DistributedBatchSampler    # DistributedBatchSampler
+      name: DistributedBatchSampler
       batch_size: 16
       drop_last: true
       shuffle: true
@@ -111,8 +103,6 @@ DataLoader:
       num_workers: 4
       use_shared_memory: true
   
-
-
   UnLabelTrain:
     dataset:
       name: CIFAR100SSL
@@ -129,8 +119,8 @@ DataLoader:
             padding_mode: 'reflect'
         - ToTensor:
         - Normalize:
-            mean: *sign_mean
-            std: *sign_std
+            mean: [0.5071, 0.4867, 0.4408]
+            std: [0.2675, 0.2565, 0.2761]
 
       transform_s1:
         - RandomHorizontalFlip:
@@ -144,8 +134,8 @@ DataLoader:
             m: 10
         - ToTensor:
         - Normalize:
-            mean: *sign_mean
-            std: *sign_std
+            mean: [0.5071, 0.4867, 0.4408]
+            std: [0.2675, 0.2565, 0.2761]
       
       transform_s2:
         - RandomResizedCrop:
@@ -163,12 +153,9 @@ DataLoader:
         - RandomGrayscale:
             p: 0.2
         - ToTensor:
-        # - Normalize:
-        #     mean: *sign_mean
-        #     std: *sign_std
 
     sampler:
-      name: DistributedBatchSampler   # DistributedBatchSampler
+      name: DistributedBatchSampler
       batch_size: 112
       drop_last: true
       shuffle: true
@@ -185,8 +172,8 @@ DataLoader:
       transform_ops:
         - ToTensor:
         - Normalize:
-            mean: *sign_mean
-            std: *sign_std
+            mean: [0.5071, 0.4867, 0.4408]
+            std: [0.2675, 0.2565, 0.2761]
     sampler:
       name: DistributedBatchSampler
       batch_size: 16
@@ -195,8 +182,6 @@ DataLoader:
     loader:
       num_workers: 4
       use_shared_memory: true
-
-
 
 Metric:
   Eval:
