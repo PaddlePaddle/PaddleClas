@@ -86,8 +86,10 @@ DataLoader:
             channel_first: False
         - ResizeImage:
             resize_short: 256
+            interpolation: bicubic
+            backend: pil
         - CropImage:
-            size: 256
+            size: 224
         - NormalizeImage:
             scale: 1.0/255.0
             mean: [0.485, 0.456, 0.406]
@@ -111,6 +113,8 @@ Infer:
         channel_first: False
     - ResizeImage:
         resize_short: 256
+        interpolation: bicubic
+        backend: pil
     - CropImage:
         size: 224
     - NormalizeImage:

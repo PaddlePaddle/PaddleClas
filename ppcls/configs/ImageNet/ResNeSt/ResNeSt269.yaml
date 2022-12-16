@@ -11,7 +11,7 @@ Global:
   print_batch_step: 10
   use_visualdl: False
   # used for static mode and model export
-  image_shape: [3, 256, 256]
+  image_shape: [3, 416, 416]
   save_inference_dir: ./inference
 
 # model architecture
@@ -38,7 +38,7 @@ Optimizer:
     learning_rate: 0.1
   regularizer:
     name: 'L2'
-    coeff: 0.00007
+    coeff: 0.0001
 
 
 # data loader for train and eval
@@ -110,9 +110,9 @@ Infer:
         to_rgb: True
         channel_first: False
     - ResizeImage:
-        resize_short: 288
+        resize_short: 416
     - CropImage:
-        size: 256
+        size: 416
     - NormalizeImage:
         scale: 1.0/255.0
         mean: [0.485, 0.456, 0.406]
