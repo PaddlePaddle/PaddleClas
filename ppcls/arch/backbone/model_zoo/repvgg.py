@@ -20,7 +20,7 @@ import paddle
 import paddle.nn.functional as F
 import numpy as np
 
-from ....utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
+#from ....utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
 
 MODEL_URLS = {
     "RepVGG_A0":
@@ -243,7 +243,6 @@ class RepVGG(nn.Layer):
         self.override_groups_map = override_groups_map or dict()
         assert 0 not in self.override_groups_map
         self.in_planes = min(64, int(64 * width_multiplier[0]))
-        self.use_se = use_se
 
         self.stage0 = RepVGGBlock(
             in_channels=3,
@@ -251,20 +250,32 @@ class RepVGG(nn.Layer):
             kernel_size=3,
             stride=2,
             padding=1,
-            use_se=self.use_se)
+            use_se=use_se)
         self.cur_layer_idx = 1
         self.stage1 = self._make_stage(
-            int(64 * width_multiplier[0]), num_blocks[0], stride=2)
+            int(64 * width_multiplier[0]),
+            num_blocks[0],
+            stride=2,
+            use_se=use_se)
         self.stage2 = self._make_stage(
-            int(128 * width_multiplier[1]), num_blocks[1], stride=2)
+            int(128 * width_multiplier[1]),
+            num_blocks[1],
+            stride=2,
+            use_se=use_se)
         self.stage3 = self._make_stage(
-            int(256 * width_multiplier[2]), num_blocks[2], stride=2)
+            int(256 * width_multiplier[2]),
+            num_blocks[2],
+            stride=2,
+            use_se=use_se)
         self.stage4 = self._make_stage(
-            int(512 * width_multiplier[3]), num_blocks[3], stride=2)
+            int(512 * width_multiplier[3]),
+            num_blocks[3],
+            stride=2,
+            use_se=use_se)
         self.gap = nn.AdaptiveAvgPool2D(output_size=1)
         self.linear = nn.Linear(int(512 * width_multiplier[3]), class_num)
 
-    def _make_stage(self, planes, num_blocks, stride):
+    def _make_stage(self, planes, num_blocks, stride, use_se=False):
         strides = [stride] + [1] * (num_blocks - 1)
         blocks = []
         for stride in strides:
@@ -277,7 +288,7 @@ class RepVGG(nn.Layer):
                     stride=stride,
                     padding=1,
                     groups=cur_groups,
-                    use_se=self.use_se))
+                    use_se=use_se))
             self.in_planes = planes
             self.cur_layer_idx += 1
         return nn.Sequential(*blocks)

@@ -53,7 +53,7 @@ DataLoader:
             to_rgb: True
             channel_first: False
         - RandCropImage:
-            size: 256
+            size: 416
         - RandFlipImage:
             flip_code: 1
         - AutoAugment:
