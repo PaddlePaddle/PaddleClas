@@ -91,9 +91,7 @@ class RecModel(TheseusLayer):
         
         out = dict()
         x = self.backbone(x)
-        
         out["backbone"] = x
-
         if self.neck is not None:
             feat = self.neck(x)
             out["neck"] = feat

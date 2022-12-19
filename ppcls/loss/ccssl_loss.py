@@ -4,9 +4,9 @@ import copy
 import paddle.nn as nn
 
 
-class CCSSLCeLoss(nn.Layer):
+class CCSSLCELoss(nn.Layer):
     def __init__(self, **kwargs):
-        super(CCSSLCeLoss, self).__init__()
+        super(CCSSLCELoss, self).__init__()
         self.celoss = nn.CrossEntropyLoss(reduction='none')
 
     def forward(self, inputs, batch, **kwargs):
@@ -16,4 +16,4 @@ class CCSSLCeLoss(nn.Layer):
         loss_u = self.celoss(logits_s1, p_targets_u_w) * mask
         loss_u = loss_u.mean()
 
-        return {'CCSSLCeLoss': loss_u}
+        return {'CCSSLCELoss': loss_u}

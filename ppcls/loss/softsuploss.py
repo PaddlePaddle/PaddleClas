@@ -1,10 +1,10 @@
-#   Copyright (c) 2022 PaddlePaddle Authors. All Rights Reserved.
+# copyright (c) 2021 PaddlePaddle Authors. All Rights Reserve.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http://www.apache.org/licenses/LICENSE-2.0
+#    http://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -47,9 +47,7 @@ class SoftSupConLoss(nn.Layer):
             labels = labels.reshape((-1, 1))
             mask = paddle.equal(labels, labels.T).astype('float32')
             max_probs = max_probs.reshape((-1, 1))
-            
             score_mask = paddle.matmul(max_probs, max_probs.T)
-            
             mask = paddle.multiply(mask, score_mask)
             
         contrast_count = feat.shape[1]
