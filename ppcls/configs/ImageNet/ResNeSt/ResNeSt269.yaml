@@ -16,7 +16,7 @@ Global:
 
 # model architecture
 Arch:
-  name: ResNeSt101
+  name: ResNeSt269
   class_num: 1000
  
 # loss function config for traing/eval process

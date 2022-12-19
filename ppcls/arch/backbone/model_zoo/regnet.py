@@ -56,12 +56,6 @@ MODEL_URLS = {
     "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/RegNetX_16GF_pretrained.pdparams",
     "RegNetX_32GF":
     "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/RegNetX_32GF_pretrained.pdparams",
-    "RegNetY_200MF":
-    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/RegNetY_200MF_pretrained.pdparams",
-    "RegNetY_4GF":
-    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/RegNetY_4GF_pretrained.pdparams",
-    "RegNetY_32GF":
-    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/RegNetY_32GF_pretrained.pdparams"
 }
 
 __all__ = list(MODEL_URLS.keys())

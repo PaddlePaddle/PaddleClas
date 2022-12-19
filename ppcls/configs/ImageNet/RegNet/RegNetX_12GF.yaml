@@ -7,7 +7,7 @@ Global:
   save_interval: 1
   eval_during_train: True
   eval_interval: 1
-  epochs: 300
+  epochs: 120
   print_batch_step: 10
   use_visualdl: False
   # used for static mode and model export
@@ -16,15 +16,14 @@ Global:
 
 # model architecture
 Arch:
-  name: ResNeSt101
+  name: RegNetX_12GF
   class_num: 1000
- 
+
 # loss function config for traing/eval process
 Loss:
   Train:
     - CELoss:
         weight: 1.0
-        epsilon: 0.1
   Eval:
     - CELoss:
         weight: 1.0
@@ -34,8 +33,10 @@ Optimizer:
   name: Momentum
   momentum: 0.9
   lr:
-    name: Cosine
+    name: Piecewise
     learning_rate: 0.1
+    decay_epochs: [30, 60, 90]
+    values: [0.1, 0.01, 0.001, 0.0001]
   regularizer:
     name: 'L2'
     coeff: 0.0001
@@ -53,22 +54,18 @@ DataLoader:
             to_rgb: True
             channel_first: False
         - RandCropImage:
-            size: 256
+            size: 224
         - RandFlipImage:
             flip_code: 1
-        - AutoAugment:
         - NormalizeImage:
             scale: 1.0/255.0
             mean: [0.485, 0.456, 0.406]
             std: [0.229, 0.224, 0.225]
             order: ''
-      batch_transform_ops:
-        - MixupOperator:
-            alpha: 0.2
 
     sampler:
       name: DistributedBatchSampler
-      batch_size: 64
+      batch_size: 128
       drop_last: False
       shuffle: True
     loader:
@@ -85,7 +82,7 @@ DataLoader:
             to_rgb: True
             channel_first: False
         - ResizeImage:
-            resize_short: 288
+            resize_short: 256
         - CropImage:
             size: 256
         - NormalizeImage:
@@ -110,7 +107,7 @@ Infer:
         to_rgb: True
         channel_first: False
     - ResizeImage:
-        resize_short: 288
+        resize_short: 256
     - CropImage:
         size: 256
     - NormalizeImage:
@@ -126,6 +123,8 @@ Infer:
 
 Metric:
   Train:
+    - TopkAcc:
+        topk: [1, 5]
   Eval:
     - TopkAcc:
         topk: [1, 5]
