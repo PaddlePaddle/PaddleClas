@@ -7,18 +7,18 @@ Global:
   save_interval: 1
   eval_during_train: True
   eval_interval: 1
-  epochs: 300
+  epochs: 200
   print_batch_step: 10
   use_visualdl: False
   # used for static mode and model export
-  image_shape: [3, 256, 256]
+  image_shape: [3, 320, 320]
   save_inference_dir: ./inference
 
 # model architecture
 Arch:
-  name: ResNeSt101
+  name: RepVGG_D2se
   class_num: 1000
- 
+
 # loss function config for traing/eval process
 Loss:
   Train:
@@ -36,6 +36,7 @@ Optimizer:
   lr:
     name: Cosine
     learning_rate: 0.1
+    warmup_epoch: 5
   regularizer:
     name: 'L2'
     coeff: 0.0001
@@ -53,7 +54,7 @@ DataLoader:
             to_rgb: True
             channel_first: False
         - RandCropImage:
-            size: 256
+            size: 224
         - RandFlipImage:
             flip_code: 1
         - AutoAugment:
@@ -65,7 +66,6 @@ DataLoader:
       batch_transform_ops:
         - MixupOperator:
             alpha: 0.2
-
     sampler:
       name: DistributedBatchSampler
       batch_size: 64
@@ -85,9 +85,11 @@ DataLoader:
             to_rgb: True
             channel_first: False
         - ResizeImage:
-            resize_short: 288
+            resize_short: 320
+            interpolation: bicubic
+            backend: pil
         - CropImage:
-            size: 256
+            size: 320
         - NormalizeImage:
             scale: 1.0/255.0
             mean: [0.485, 0.456, 0.406]
@@ -110,9 +112,11 @@ Infer:
         to_rgb: True
         channel_first: False
     - ResizeImage:
-        resize_short: 288
+        resize_short: 320
+        interpolation: bicubic
+        backend: pil
     - CropImage:
-        size: 256
+        size: 320
     - NormalizeImage:
         scale: 1.0/255.0
         mean: [0.485, 0.456, 0.406]
@@ -126,6 +130,8 @@ Infer:
 
 Metric:
   Train:
+    - TopkAcc:
+        topk: [1, 5]
   Eval:
     - TopkAcc:
         topk: [1, 5]
