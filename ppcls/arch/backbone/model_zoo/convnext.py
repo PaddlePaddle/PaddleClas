@@ -23,6 +23,16 @@ from ....utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_fro
 MODEL_URLS = {
     "ConvNeXt_tiny":
     "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ConvNeXt_tiny_pretrained.pdparams",
+    "ConvNeXt_small":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ConvNeXt_small_pretrained.pdparams",
+    "ConvNeXt_base_224":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ConvNeXt_base_224_pretrained.pdparams",
+    "ConvNeXt_base_384":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ConvNeXt_base_384_pretrained.pdparams",
+    "ConvNeXt_large_224":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ConvNeXt_large_224_pretrained.pdparams",
+    "ConvNeXt_large_384":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ConvNeXt_large_384_pretrained.pdparams"
 }
 
 __all__ = list(MODEL_URLS.keys())
@@ -230,4 +240,43 @@ def ConvNeXt_tiny(pretrained=False, use_ssld=False, **kwargs):
     model = ConvNeXt(depths=[3, 3, 9, 3], dims=[96, 192, 384, 768], **kwargs)
     _load_pretrained(
         pretrained, model, MODEL_URLS["ConvNeXt_tiny"], use_ssld=use_ssld)
+    return model
+
+
+def ConvNeXt_small(pretrained=False, use_ssld=False, **kwargs):
+    model = ConvNeXt(depths=[3, 3, 27, 3], dims=[96, 192, 384, 768], **kwargs)
+    _load_pretrained(
+        pretrained, model, MODEL_URLS["ConvNeXt_small"], use_ssld=use_ssld)
+    return model
+
+
+def ConvNeXt_base_224(pretrained=False, use_ssld=False, **kwargs):
+    model = ConvNeXt(
+        depths=[3, 3, 27, 3], dims=[128, 256, 512, 1024], **kwargs)
+    _load_pretrained(
+        pretrained, model, MODEL_URLS["ConvNeXt_base_224"], use_ssld=use_ssld)
+    return model
+
+
+def ConvNeXt_base_384(pretrained=False, use_ssld=False, **kwargs):
+    model = ConvNeXt(
+        depths=[3, 3, 27, 3], dims=[128, 256, 512, 1024], **kwargs)
+    _load_pretrained(
+        pretrained, model, MODEL_URLS["ConvNeXt_base_384"], use_ssld=use_ssld)
+    return model
+
+
+def ConvNeXt_large_224(pretrained=False, use_ssld=False, **kwargs):
+    model = ConvNeXt(
+        depths=[3, 3, 27, 3], dims=[192, 384, 768, 1536], **kwargs)
+    _load_pretrained(
+        pretrained, model, MODEL_URLS["ConvNeXt_large_224"], use_ssld=use_ssld)
+    return model
+
+
+def ConvNeXt_large_384(pretrained=False, use_ssld=False, **kwargs):
+    model = ConvNeXt(
+        depths=[3, 3, 27, 3], dims=[192, 384, 768, 1536], **kwargs)
+    _load_pretrained(
+        pretrained, model, MODEL_URLS["ConvNeXt_large_384"], use_ssld=use_ssld)
     return model
