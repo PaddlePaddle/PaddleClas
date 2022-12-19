@@ -53,14 +53,12 @@ def train_epoch_fixmatch_ccssl(engine, epoch_id, print_batch_step):
 
         inputs_x, targets_x = label_data_batch
         inputs_w, inputs_s1, inputs_s2 = unlabel_data_batch[:3]
-
         batch_size_label = inputs_x.shape[0]
         inputs = paddle.concat([inputs_x, inputs_w, inputs_s1, inputs_s2], axis=0)
 
         loss_dict, logits_label = get_loss(engine, inputs, batch_size_label, 
                                            temperture, threshold, targets_x,
                                            )
-
         loss = loss_dict['loss']
         loss.backward()
         
@@ -76,13 +74,9 @@ def train_epoch_fixmatch_ccssl(engine, epoch_id, print_batch_step):
 
         if engine.ema:
             engine.model_ema.update(engine.model)
-        
         update_metric(engine, logits_label, label_data_batch, batch_size)
-
         update_loss(engine, loss_dict, batch_size)
-
         engine.time_info['batch_cost'].update(time.time() - tic)
-
         if iter_id % print_batch_step == 0:
             log_info(engine, batch_size, epoch_id, iter_id)
 
@@ -101,6 +95,7 @@ def get_loss(engine,
              **kwargs
              ):
     out = engine.model(inputs)
+
     logits, feats = out['logits'], out['features']
     feat_w, feat_s1, feat_s2 = feats[batch_size_label:].chunk(3)
     feat_x = feats[:batch_size_label]
@@ -118,9 +113,7 @@ def get_loss(engine,
              'mask': mask,
              'max_probs': max_probs,
              }
-
     unlabel_loss = engine.unlabel_train_loss_func(feats, batch)
-
     loss_dict = {}
     for k, v in loss_dict_label.items():
         if k != 'loss':

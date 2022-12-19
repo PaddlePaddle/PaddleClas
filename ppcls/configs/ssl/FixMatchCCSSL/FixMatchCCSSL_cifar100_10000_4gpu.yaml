@@ -60,7 +60,7 @@ Loss:
   
 UnLabelLoss:
   Train:
-    - CCSSLCeLoss:
+    - CCSSLCELoss:
         weight: 1.
     - SoftSupConLoss:
         weight: 1.0
