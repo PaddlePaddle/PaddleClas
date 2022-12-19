@@ -29,7 +29,7 @@ from .legendary_models.pp_hgnet import PPHGNet_tiny, PPHGNet_small, PPHGNet_base
 from .model_zoo.resnet_vc import ResNet50_vc
 from .model_zoo.resnext import ResNeXt50_32x4d, ResNeXt50_64x4d, ResNeXt101_32x4d, ResNeXt101_64x4d, ResNeXt152_32x4d, ResNeXt152_64x4d
 from .model_zoo.resnext_vd import ResNeXt50_vd_32x4d, ResNeXt50_vd_64x4d, ResNeXt101_vd_32x4d, ResNeXt101_vd_64x4d, ResNeXt152_vd_32x4d, ResNeXt152_vd_64x4d
-from .model_zoo.res2net import Res2Net50_26w_4s, Res2Net50_14w_8s, Res2Net50_26w_6s, Res2Net50_26w_8s, Res2Net50_48w_2s, Res2Net101_26w_4s
+from .model_zoo.res2net import Res2Net50_26w_4s, Res2Net50_14w_8s
 from .model_zoo.res2net_vd import Res2Net50_vd_26w_4s, Res2Net101_vd_26w_4s, Res2Net200_vd_26w_4s
 from .model_zoo.se_resnet_vd import SE_ResNet18_vd, SE_ResNet34_vd, SE_ResNet50_vd
 from .model_zoo.se_resnext_vd import SE_ResNeXt50_vd_32x4d, SE_ResNeXt50_vd_32x4d, SENet154_vd
