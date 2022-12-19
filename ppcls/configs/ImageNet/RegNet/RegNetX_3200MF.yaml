@@ -16,7 +16,7 @@ Global:
 
 # model architecture
 Arch:
-  name: RegNetY_3200MF
+  name: RegNetX_3200MF
   class_num: 1000
  
 # loss function config for traing/eval process
