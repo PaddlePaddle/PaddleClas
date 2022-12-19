@@ -1,7 +1,7 @@
 # global configs
 Global:
   checkpoints: null
-  pretrained_model: bull
+  pretrained_model: null
   output_dir: ./output/
   device: gpu
   save_interval: 1
