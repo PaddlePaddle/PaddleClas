@@ -26,14 +26,24 @@ import random
 import cv2
 import numpy as np
 import importlib
+import PIL
 from PIL import Image
+
 from paddle.vision.transforms import ToTensor, Normalize
 
 from paddleclas.deploy.python.det_preprocess import DetNormalizeImage, DetPadStride, DetPermute, DetResize
 
-# Pillow<9.0
-if not hasattr(Image, 'Resampling'):
-    Image.Resampling = Image
+
+class PILResampling(object):
+    def __init__(self):
+        self.version = PIL.__version__
+
+    def __call__(self, method):
+        from packaging.version import Version
+        return getattr(
+            Image,
+            method) if Version(self.version) < Version("9.0") else getattr(
+                Image.Resampling, method)
 
 
 def create_operators(params):
@@ -67,14 +77,15 @@ class UnifiedResize(object):
             'lanczos': cv2.INTER_LANCZOS4,
             'random': (cv2.INTER_LINEAR, cv2.INTER_CUBIC)
         }
+        resampling = PILResampling()
         _pil_interp_from_str = {
-            'nearest': Image.Resampling.NEAREST,
-            'bilinear': Image.Resampling.BILINEAR,
-            'bicubic': Image.Resampling.BICUBIC,
-            'box': Image.Resampling.BOX,
-            'lanczos': Image.Resampling.LANCZOS,
-            'hamming': Image.Resampling.HAMMING,
-            'random': (Image.Resampling.BILINEAR, Image.Resampling.BICUBIC)
+            'nearest': resampling("NEAREST"),
+            'bilinear': resampling("BILINEAR"),
+            'bicubic': resampling("BICUBIC"),
+            'box': resampling("BOX"),
+            'lanczos': resampling("LANCZOS"),
+            'hamming': resampling("HAMMING"),
+            'random': (resampling("BILINEAR"), resampling("BICUBIC"))
         }
 
         def _cv2_resize(src, size, resample):
