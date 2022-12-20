@@ -19,6 +19,7 @@ import paddle
 import paddle.nn as nn
 
 from .vision_transformer import Identity
+from .vision_transformer import PatchEmbed
 
 from ....utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
 
@@ -66,43 +67,6 @@ class DropPath(nn.Layer):
 
     def forward(self, inputs):
         return self.drop_path(inputs)
-
-
-class PatchEmbedding(nn.Layer):
-    """Patch Embedding
-    Apply patch embedding (which is implemented using Conv2D) on input data.
-
-    Attributes:
-        image_size: int, input image size, default: 224
-        patch_size: int, size of patch, default: 4
-        in_channels: int, input image channels, default: 3
-        embed_dim: int, embedding dimension, default: 96
-    """
-    def __init__(self,
-                 image_size=224,
-                 patch_size=4,
-                 in_channels=3,
-                 embed_dim=96):
-        super(PatchEmbedding, self).__init__()
-        image_size = (image_size, image_size)
-        patch_size = (patch_size, patch_size)
-        patches_resolution = (image_size[0]//patch_size[0], image_size[1]//patch_size[1])
-        self.image_size = image_size
-        self.patch_size = patch_size
-        self.patches_resolution = patches_resolution
-        self.num_patches = patches_resolution[0] * patches_resolution[1]
-        self.in_channels = in_channels
-        self.embed_dim = embed_dim
-
-        self.patch_embed = nn.Conv2D(in_channels=in_channels, out_channels=embed_dim,
-                                     kernel_size=patch_size, stride=patch_size)
-
-    def forward(self, x):
-        x = self.patch_embed(x)  # [batch, embed_dim, h, w] h,w = patch_resolution
-        B, C, H, W = x.shape
-        x = paddle.reshape(x, [B, C, -1])  # [batch, embed_dim, h*w] h*w = num_patches
-        x = paddle.transpose(x, [0, 2, 1])  # [batch, h*w, embed_dim]
-        return x
 
 
 class TalkingHeadAttention(nn.Layer):
@@ -457,10 +421,10 @@ class CaiT(nn.Layer):
                  depth_token_only=2):
         super().__init__()
         self.num_classes = class_num
-        self.patch_embed = PatchEmbedding(image_size=image_size,
-                                          patch_size=patch_size,
-                                          in_channels=in_channels,
-                                          embed_dim=embed_dim)
+        self.patch_embed = PatchEmbed(img_size=image_size,
+                                      patch_size=patch_size,
+                                      in_chans=in_channels,
+                                      embed_dim=embed_dim)
         num_patches = self.patch_embed.num_patches
         # tokens add for classification
         self.cls_token = paddle.create_parameter(
