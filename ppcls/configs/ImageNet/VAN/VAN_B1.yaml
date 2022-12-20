@@ -22,7 +22,7 @@ Arch:
   class_num: 1000
   drop_path_rate: 0.1
   drop_rate: 0.0
-
+ 
 # loss function config for traing/eval process
 Loss:
   Train:

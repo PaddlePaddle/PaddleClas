@@ -18,7 +18,7 @@ Global:
 Arch:
   name: RepVGG_D2se
   class_num: 1000
-
+ 
 # loss function config for traing/eval process
 Loss:
   Train:
