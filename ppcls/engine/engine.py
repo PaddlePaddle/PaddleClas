@@ -45,6 +45,7 @@ from ppcls.engine import train as train_method
 from ppcls.engine.train.utils import type_name
 from ppcls.engine import evaluation
 from ppcls.arch.gears.identity_head import IdentityHead
+from ..arch.backbone.base.dynamic_adjust_net import DynamicAdjustNet
 
 
 class Engine(object):
@@ -484,6 +485,15 @@ class Engine(object):
                 model_name=self.config["Arch"]["name"],
                 prefix="latest",
                 loss=self.train_loss_func)
+
+            # for dynamic adjust net structure
+            if isinstance(self.model, DynamicAdjustNet):
+                self.model.post_epoch(epoch_id, self)
+                # TODO(gaotingquan): it is needed to re-eval?
+                acc = self.eval(epoch_id)
+                logger.info("[Eval][Epoch {}][best metric: {}]".format(
+                    epoch_id, best_metric["metric"]))
+                self.model.train()
 
         if self.vdl_writer is not None:
             self.vdl_writer.close()

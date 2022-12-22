@@ -15,6 +15,7 @@ from __future__ import absolute_import, division, print_function
 
 import time
 import paddle
+from ...arch.backbone.base.dynamic_adjust_net import DynamicAdjustNet
 from ppcls.engine.train.utils import update_loss, update_metric, log_info, type_name
 from ppcls.utils import profiler
 
@@ -73,6 +74,10 @@ def train_epoch(engine, epoch_id, print_batch_step):
             if (iter_id + 1) % engine.update_freq == 0:
                 for i in range(len(engine.optimizer)):
                     engine.optimizer[i].step()
+
+        # for dynamic adjust net structure
+        if isinstance(engine.model, DynamicAdjustNet):
+            engine.model.post_iter()
 
         if (iter_id + 1) % engine.update_freq == 0:
             # clear grad

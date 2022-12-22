@@ -28,6 +28,7 @@ import math
 
 from ....utils import logger
 from ..base.theseus_layer import TheseusLayer
+from ..base.dynamic_adjust_net import DyRepNet
 from ....utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
 
 MODEL_URLS = {
@@ -274,7 +275,7 @@ class ResNet(TheseusLayer):
     ResNet
     Args:
         config: dict. config of ResNet.
-        version: str="vb". Different version of ResNet, version vd can perform better. 
+        version: str="vb". Different version of ResNet, version vd can perform better.
         class_num: int=1000. The number of classes.
         lr_mult_list: list. Control the learning rate of different stages.
     Returns:
@@ -618,4 +619,24 @@ def ResNet200_vd(pretrained=False, use_ssld=False, **kwargs):
         version="vd",
         **kwargs)
     _load_pretrained(pretrained, model, MODEL_URLS["ResNet200_vd"], use_ssld)
+    return model
+
+
+def DyRepResNet18(dyrep, pretrained=False, use_ssld=False, **kwargs):
+    """
+    ResNet18
+    Args:
+        pretrained: bool=False or str. If `True` load pretrained parameters, `False` otherwise.
+                    If str, means the path of the pretrained model.
+        use_ssld: bool=False. Whether using distillation pretrained model when pretrained=True.
+    Returns:
+        model: nn.Layer. Specific `ResNet18` model depends on args.
+    """
+    model = ResNet(
+        config=NET_CONFIG["18"],
+        stages_pattern=MODEL_STAGES_PATTERN["ResNet18"],
+        version="vb",
+        **kwargs)
+    model = DyRepNet(model, **dyrep)
+    _load_pretrained(pretrained, model, MODEL_URLS["ResNet18"], use_ssld)
     return model
