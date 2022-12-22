@@ -24,7 +24,7 @@
 - **🔥️ 2022.9.13 发布超轻量图像识别系统[PP-ShiTuV2](docs/zh_CN/models/PP-ShiTu/README.md)：**
   - recall1精度提升8个点，覆盖商品识别、垃圾分类、航拍场景等[20+识别场景](docs/zh_CN/deployment/PP-ShiTu/application_scenarios.md)，
   - 新增[库管理工具](./deploy/shitu_index_manager/)，[Android Demo](./docs/zh_CN/quick_start/quick_start_recognition.md)全新体验。
-  
+
 - 2022.9.4 新增[生鲜产品自主结算范例库](./docs/zh_CN/samples/Fresh_Food_Recogniiton/README.md)，具体内容可以在AI Studio上体验。
 - 2022.6.15 发布[PULC超轻量图像分类实用方案](docs/zh_CN/training/PULC.md)，CPU推理3ms，精度比肩SwinTransformer，覆盖人、车、OCR场景九大常见任务。
 - 2022.5.23 新增[人员出入管理范例库](https://aistudio.baidu.com/aistudio/projectdetail/4094475)，具体内容可以在 AI Studio 上体验。
@@ -52,6 +52,7 @@ PaddleClas支持多种前沿图像分类、识别相关算法，发布产业级�
 <div align="center">
 <img src="./docs/images/quick_start/android_demo/PPShiTu_qrcode.png"  width = "170" height = "170" />
 </div>
+
 ## 👫 开源社区
 
 * **📑项目合作：** 如果您是企业开发者且有明确的图像分类应用需求，填写[问卷](https://paddle.wjx.cn/vm/hnGOjfn.aspx# )后可免费与官方团队展开不同层次的合作。
