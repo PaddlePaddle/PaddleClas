@@ -319,6 +319,25 @@ class CropImage(object):
         return img[h_start:h_end, w_start:w_end, :]
 
 
+class CropImageAtRatio(object):
+    """ crop image with specified size and padding"""
+
+    def __init__(self, size: int, pad: int, interpolation="bilinear"):
+        self.size = size
+        self.ratio = size / (size + pad)
+        self.interpolation = interpolation
+
+    def __call__(self, img):
+        height, width = img.shape[:2]
+        crop_size = int(self.ratio * min(height, width))
+
+        y = (height - crop_size) // 2
+        x = (width - crop_size) // 2
+
+        crop_img = img[y:y + crop_size, x:x + crop_size, :]
+        return F.resize(crop_img, [self.size, self.size], self.interpolation)
+
+
 class Padv2(object):
     def __init__(self,
                  size=None,

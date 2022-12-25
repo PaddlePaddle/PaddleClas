@@ -33,7 +33,7 @@ class AttrDict(dict):
             self[key] = value
 
     def __deepcopy__(self, content):
-        return copy.deepcopy(dict(self))
+        return AttrDict(copy.deepcopy(dict(self)))
 
 
 def create_attr_dict(yaml_config):
