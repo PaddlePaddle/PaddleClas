@@ -26,7 +26,7 @@ from paddle import ParamAttr
 from paddle.nn.initializer import Constant, Normal, Uniform
 from paddle.regularizer import L2Decay
 
-from ppcls.utils.config import AttrDict
+from ....utils.config import AttrDict
 
 from ....utils.save_load import (load_dygraph_pretrain,
                                  load_dygraph_pretrain_from_url)
