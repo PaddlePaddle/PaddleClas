@@ -136,7 +136,8 @@ def main(config):
                 if "PersonAttribute" in config[
                         "PostProcess"] or "VehicleAttribute" in config[
                             "PostProcess"] or "TableAttribute" in config[
-                                "PostProcess"]:
+                                "PostProcess"] or "FaceAttribute" in config[
+                                    "PostProcess"]:
                     filename = batch_names[number]
                     print("{}:\t {}".format(filename, result_dict))
                 else:
