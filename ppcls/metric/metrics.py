@@ -219,12 +219,17 @@ class TprAtFpr(nn.Layer):
 
 
 class MultilabelMeanAccuracy(nn.Layer):
-    def __init__(self, class_num=40):
+    def __init__(self,
+                 start_threshold=0.4,
+                 num_iterations=10,
+                 end_threshold=0.9):
         super().__init__()
+        self.start_threshold = start_threshold
+        self.num_iterations = num_iterations
+        self.end_threshold = end_threshold
         self.gt_all_score_list = []
         self.gt_label_score_list = []
         self.max_acc = 0.
-        self.class_num = class_num
 
     def forward(self, x, label):
         if isinstance(x, dict):
@@ -251,8 +256,10 @@ class MultilabelMeanAccuracy(nn.Layer):
         result = ""
         gt_all_score_list = np.array(self.gt_all_score_list)
         gt_label_score_list = np.array(self.gt_label_score_list)
-        for i in range(10):
-            threshold = 0.4 + i * 0.05
+        for i in range(self.num_iterations):
+            threshold = self.start_threshold + i * (self.end_threshold -
+                                                    self.start_threshold
+                                                    ) / self.num_iterations
             pred_label = (gt_all_score_list > threshold).astype(int)
             TP = np.sum(
                 (gt_label_score_list == 1) * (pred_label == 1)).astype(float)
@@ -262,8 +269,8 @@ class MultilabelMeanAccuracy(nn.Layer):
             if max_acc <= acc:
                 max_acc = acc
                 result = "threshold: {}, mean_acc: {}".format(
-                    threshold, max_acc / self.class_num)
-        self.max_acc = max_acc / self.class_num
+                    threshold, max_acc / len(gt_label_score_list[0]))
+        self.max_acc = max_acc / len(gt_label_score_list[0])
         return result
 
 
