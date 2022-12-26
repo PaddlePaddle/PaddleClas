@@ -374,10 +374,7 @@ class FaceAttribute(object):
         gender_list = [["Male", "男性"], ["Female", "女性"]]
         age_list = [["Young", "年轻人"], ["Old", "老年人"]]
         batch_res = []
-        if self.convert_cn:
-            index = 1
-        else:
-            index = 0
+        index = 1 if self.convert_cn else 0
         for idx, res in enumerate(x):
             res = res.tolist()
             label_res = []
