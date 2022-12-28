@@ -56,6 +56,30 @@ MODEL_URLS = {
     "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/RegNetX_16GF_pretrained.pdparams",
     "RegNetX_32GF":
     "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/RegNetX_32GF_pretrained.pdparams",
+    "RegNetY_200MF":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/RegNetY_200MF_pretrained.pdparams",
+    "RegNetY_400MF":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/RegNetY_400MF_pretrained.pdparams",
+    "RegNetY_600MF":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/RegNetY_600MF_pretrained.pdparams",
+    "RegNetY_800MF":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/RegNetY_800MF_pretrained.pdparams",
+    "RegNetY_1600MF":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/RegNetY_1600MF_pretrained.pdparams",
+    "RegNetY_3200MF":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/RegNetY_3200MF_pretrained.pdparams",
+    "RegNetY_4GF":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/RegNetY_4GF_pretrained.pdparams",
+    "RegNetY_6400MF":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/RegNetY_6400MF_pretrained.pdparams",
+    "RegNetY_8GF":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/RegNetY_8GF_pretrained.pdparams",
+    "RegNetY_12GF":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/RegNetY_12GF_pretrained.pdparams",
+    "RegNetY_16GF":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/RegNetY_16GF_pretrained.pdparams",
+    "RegNetY_32GF":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/RegNetY_32GF_pretrained.pdparams"
 }
 
 __all__ = list(MODEL_URLS.keys())
@@ -147,11 +171,18 @@ class BottleneckBlock(nn.Layer):
                  name=None):
         super(BottleneckBlock, self).__init__()
 
-        # Compute the bottleneck width
         w_b = int(round(num_filters * bm))
+        w_se = int(round(num_channels * se_r))
         # Compute the number of groups
         num_gs = w_b // gw
         self.se_on = se_on
+        if not shortcut:
+            self.short = ConvBNLayer(
+                num_channels=num_channels,
+                num_filters=num_filters,
+                filter_size=1,
+                stride=stride,
+                name=name + "_branch1")
         self.conv0 = ConvBNLayer(
             num_channels=num_channels,
             num_filters=w_b,
@@ -171,24 +202,13 @@ class BottleneckBlock(nn.Layer):
         if se_on:
             w_se = int(round(num_channels * se_r))
             self.se_block = SELayer(
-                num_channels=w_b,
-                num_filters=w_b,
-                reduction_ratio=w_se,
-                name=name + "_branch2se")
+                num_channels=w_b, num_filters=w_se, name=name + "_branch2se")
         self.conv2 = ConvBNLayer(
             num_channels=w_b,
             num_filters=num_filters,
             filter_size=1,
             act=None,
             name=name + "_branch2c")
-
-        if not shortcut:
-            self.short = ConvBNLayer(
-                num_channels=num_channels,
-                num_filters=num_filters,
-                filter_size=1,
-                stride=stride,
-                name=name + "_branch1")
 
         self.shortcut = shortcut
 
@@ -210,39 +230,20 @@ class BottleneckBlock(nn.Layer):
 
 
 class SELayer(nn.Layer):
-    def __init__(self, num_channels, num_filters, reduction_ratio, name=None):
+    def __init__(self, num_channels, num_filters, name=None):
         super(SELayer, self).__init__()
 
         self.pool2d_gap = AdaptiveAvgPool2D(1)
-
         self._num_channels = num_channels
-
-        med_ch = int(num_channels / reduction_ratio)
-        stdv = 1.0 / math.sqrt(num_channels * 1.0)
-        self.squeeze = Linear(
-            num_channels,
-            med_ch,
-            weight_attr=ParamAttr(
-                initializer=Uniform(-stdv, stdv), name=name + "_sqz_weights"),
-            bias_attr=ParamAttr(name=name + "_sqz_offset"))
-
-        stdv = 1.0 / math.sqrt(med_ch * 1.0)
-        self.excitation = Linear(
-            med_ch,
-            num_filters,
-            weight_attr=ParamAttr(
-                initializer=Uniform(-stdv, stdv), name=name + "_exc_weights"),
-            bias_attr=ParamAttr(name=name + "_exc_offset"))
+        self.squeeze = Conv2D(num_channels, num_filters, 1, bias_attr=True)
+        self.excitation = Conv2D(num_filters, num_channels, 1, bias_attr=True)
 
     def forward(self, input):
         pool = self.pool2d_gap(input)
-        pool = paddle.reshape(pool, shape=[-1, self._num_channels])
         squeeze = self.squeeze(pool)
         squeeze = F.relu(squeeze)
         excitation = self.excitation(squeeze)
         excitation = F.sigmoid(excitation)
-        excitation = paddle.reshape(
-            excitation, shape=[-1, self._num_channels, 1, 1])
         out = input * excitation
         return out
 
@@ -528,4 +529,196 @@ def RegNetX_32GF(pretrained=False, use_ssld=False, **kwargs):
         **kwargs)
     _load_pretrained(
         pretrained, model, MODEL_URLS["RegNetX_32GF"], use_ssld=use_ssld)
+    return model
+
+
+def RegNetY_200MF(pretrained=False, use_ssld=False, **kwargs):
+    model = RegNet(
+        w_a=36.44,
+        w_0=24,
+        w_m=2.49,
+        d=13,
+        group_w=8,
+        bot_mul=1.0,
+        q=8,
+        se_on=True,
+        **kwargs)
+    _load_pretrained(
+        pretrained, model, MODEL_URLS["RegNetY_200MF"], use_ssld=use_ssld)
+    return model
+
+
+def RegNetY_400MF(pretrained=False, use_ssld=False, **kwargs):
+    model = RegNet(
+        w_a=27.89,
+        w_0=48,
+        w_m=2.09,
+        d=16,
+        group_w=8,
+        bot_mul=1.0,
+        q=8,
+        se_on=True,
+        **kwargs)
+    _load_pretrained(
+        pretrained, model, MODEL_URLS["RegNetY_400MF"], use_ssld=use_ssld)
+    return model
+
+
+def RegNetY_600MF(pretrained=False, use_ssld=False, **kwargs):
+    model = RegNet(
+        w_a=32.54,
+        w_0=48,
+        w_m=2.32,
+        d=15,
+        group_w=16,
+        bot_mul=1.0,
+        q=8,
+        se_on=True,
+        **kwargs)
+    _load_pretrained(
+        pretrained, model, MODEL_URLS["RegNetY_600MF"], use_ssld=use_ssld)
+    return model
+
+
+def RegNetY_800MF(pretrained=False, use_ssld=False, **kwargs):
+    model = RegNet(
+        w_a=38.84,
+        w_0=56,
+        w_m=2.4,
+        d=14,
+        group_w=16,
+        bot_mul=1.0,
+        q=8,
+        se_on=True,
+        **kwargs)
+    _load_pretrained(
+        pretrained, model, MODEL_URLS["RegNetY_800MF"], use_ssld=use_ssld)
+    return model
+
+
+def RegNetY_1600MF(pretrained=False, use_ssld=False, **kwargs):
+    model = RegNet(
+        w_a=20.71,
+        w_0=48,
+        w_m=2.65,
+        d=27,
+        group_w=24,
+        bot_mul=1.0,
+        q=8,
+        se_on=True,
+        **kwargs)
+    _load_pretrained(
+        pretrained, model, MODEL_URLS["RegNetY_1600MF"], use_ssld=use_ssld)
+    return model
+
+
+def RegNetY_3200MF(pretrained=False, use_ssld=False, **kwargs):
+    model = RegNet(
+        w_a=42.63,
+        w_0=80,
+        w_m=2.66,
+        d=21,
+        group_w=24,
+        bot_mul=1.0,
+        q=8,
+        se_on=True,
+        **kwargs)
+    _load_pretrained(
+        pretrained, model, MODEL_URLS["RegNetY_3200MF"], use_ssld=use_ssld)
+    return model
+
+
+def RegNetY_4GF(pretrained=False, use_ssld=False, **kwargs):
+    model = RegNet(
+        w_a=31.41,
+        w_0=96,
+        w_m=2.24,
+        d=22,
+        group_w=64,
+        bot_mul=1.0,
+        q=8,
+        se_on=True,
+        **kwargs)
+    _load_pretrained(
+        pretrained, model, MODEL_URLS["RegNetY_4GF"], use_ssld=use_ssld)
+    return model
+
+
+def RegNetY_6400MF(pretrained=False, use_ssld=False, **kwargs):
+    model = RegNet(
+        w_a=33.22,
+        w_0=112,
+        w_m=2.27,
+        d=25,
+        group_w=72,
+        bot_mul=1.0,
+        q=8,
+        se_on=True,
+        **kwargs)
+    _load_pretrained(
+        pretrained, model, MODEL_URLS["RegNetY_6400MF"], use_ssld=use_ssld)
+    return model
+
+
+def RegNetY_8GF(pretrained=False, use_ssld=False, **kwargs):
+    model = RegNet(
+        w_a=76.82,
+        w_0=192,
+        w_m=2.19,
+        d=17,
+        group_w=56,
+        bot_mul=1.0,
+        q=8,
+        se_on=True,
+        **kwargs)
+    _load_pretrained(
+        pretrained, model, MODEL_URLS["RegNetY_8GF"], use_ssld=use_ssld)
+    return model
+
+
+def RegNetY_12GF(pretrained=False, use_ssld=False, **kwargs):
+    model = RegNet(
+        w_a=73.36,
+        w_0=168,
+        w_m=2.37,
+        d=19,
+        group_w=112,
+        bot_mul=1.0,
+        q=8,
+        se_on=True,
+        **kwargs)
+    _load_pretrained(
+        pretrained, model, MODEL_URLS["RegNetY_12GF"], use_ssld=use_ssld)
+    return model
+
+
+def RegNetY_16GF(pretrained=False, use_ssld=False, **kwargs):
+    model = RegNet(
+        w_a=106.23,
+        w_0=200,
+        w_m=2.48,
+        d=18,
+        group_w=112,
+        bot_mul=1.0,
+        q=8,
+        se_on=True,
+        **kwargs)
+    _load_pretrained(
+        pretrained, model, MODEL_URLS["RegNetY_16GF"], use_ssld=use_ssld)
+    return model
+
+
+def RegNetY_32GF(pretrained=False, use_ssld=False, **kwargs):
+    model = RegNet(
+        w_a=115.89,
+        w_0=232,
+        w_m=2.53,
+        d=20,
+        group_w=232,
+        bot_mul=1.0,
+        q=8,
+        se_on=True,
+        **kwargs)
+    _load_pretrained(
+        pretrained, model, MODEL_URLS["RegNetY_32GF"], use_ssld=use_ssld)
     return model
