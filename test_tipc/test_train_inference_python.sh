@@ -270,7 +270,6 @@ else
                     cmd="${python} -m paddle.distributed.launch --ips=${ips} --devices=${gpu} ${run_train} ${set_use_gpu} ${set_save_model} ${set_pretrain} ${set_epoch} ${set_autocast} ${set_batchsize} ${set_train_params1}"
                 fi
                 # run train
-                eval "unset CUDA_VISIBLE_DEVICES"
                 # export FLAGS_cudnn_deterministic=True
                 sleep 5
                 eval $cmd
