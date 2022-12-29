@@ -1,7 +1,23 @@
+# copyright (c) 2023 PaddlePaddle Authors. All Rights Reserve.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#    http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+# reference: https://arxiv.org/abs/2103.13425, https://github.com/DingXiaoH/DiverseBranchBlock
+
 import importlib
-import paddle
+
 import paddle.nn as nn
-# from ..rep_blocks import RepBlock
+
 from .....utils import logger
 from ..theseus_layer import TheseusLayer
 from .branches import ConvKxK, Conv1x1, Conv1x1_KxK, Conv1x1_AVG
@@ -107,11 +123,9 @@ class DiverseBranchBlock(RepBlock):
     def single_init(self):
         for branch_name in self.branch_dict:
             if branch_name == "ConvKxK":
-                paddle.nn.init.constant_(
-                    self.branch_dict[branch_name].bn.weight, 1.0)
+                nn.init.constant_(self.branch_dict[branch_name].bn.weight, 1.0)
             else:
-                paddle.nn.init.constant_(
-                    self.branch_dict[branch_name].bn.weight, 0.0)
+                nn.init.constant_(self.branch_dict[branch_name].bn.weight, 0.0)
 
     def re_parameterize(self):
         if self.is_repped:
