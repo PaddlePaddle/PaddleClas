@@ -16,8 +16,6 @@
 
 from __future__ import absolute_import, division, print_function
 
-from functools import reduce
-
 import numpy as np
 import paddle
 from paddle import ParamAttr
@@ -30,7 +28,7 @@ import math
 
 from ....utils import logger
 from ..base.theseus_layer import TheseusLayer
-from ..base.rep_blocks import DiverseBranchBlock
+from ..base.rep_blocks import resnet2dbb
 from ....utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
 
 MODEL_URLS = {
@@ -394,9 +392,8 @@ class ResNet(TheseusLayer):
             return_patterns=return_patterns,
             return_stages=return_stages)
 
-        # if use_dbb:
         if micro_block == "DiverseBranchBlock":
-            self.convert2dbb()
+            resnet2dbb(self)
 
     def forward(self, x):
         with paddle.static.amp.fp16_guard():
@@ -410,43 +407,6 @@ class ResNet(TheseusLayer):
             x = self.flatten(x)
             x = self.fc(x)
         return x
-
-    # TODO(gaotingquan): support vd
-    def convert2dbb(self):
-        def handle_func(layer, pattern):
-            config = {
-                "in_channels": layer.conv._in_channels,
-                "out_channels": layer.conv._out_channels,
-                "kernel_size": layer.conv._kernel_size,
-                "stride": layer.conv._stride,
-                "padding": layer.conv._padding,
-                "dilation": layer.conv._dilation,
-                "groups": layer.conv._groups,
-                "internal_channels": layer.conv._in_channels,
-                "with_bn": True
-            }
-            dbb_layer = DiverseBranchBlock(
-                config=config,
-                act=nn.ReLU() if layer.act else None,
-                data_format=layer.data_format
-                # act=nn.ReLU() if "conv0" in pattern else None,
-            )
-            return dbb_layer
-
-        if self.block_type == "BasicBlock":
-            name_list = [[f"blocks[{i}].conv0", f"blocks[{i}].conv1"]
-                         for i in range(len(self.blocks))]
-        elif self.block_type == "BottleneckBlock":
-            name_list = [[
-                f"blocks[{i}].conv0", f"blocks[{i}].conv1",
-                f"blocks[{i}].conv2"
-            ] for i in range(len(self.blocks))]
-        else:
-            raise Exception()
-        layer_name_list = reduce(lambda x, y: x + y, name_list)
-
-        self.upgrade_sublayer(
-            layer_name_pattern=layer_name_list, handle_func=handle_func)
 
 
 def _load_pretrained(pretrained, model, model_url, use_ssld):

@@ -15,6 +15,7 @@
 # reference: https://arxiv.org/abs/2103.13425, https://github.com/DingXiaoH/DiverseBranchBlock
 
 import importlib
+from functools import reduce
 
 import paddle.nn as nn
 
@@ -148,3 +149,38 @@ class DiverseBranchBlock(RepBlock):
         # self.branch_list = []
         del self.branch_list
         self.is_repped = True
+
+
+# TODO(gaotingquan): support vd
+def resnet2dbb(model):
+    def handle_func(layer, pattern):
+        config = {
+            "in_channels": layer.conv._in_channels,
+            "out_channels": layer.conv._out_channels,
+            "kernel_size": layer.conv._kernel_size,
+            "stride": layer.conv._stride,
+            "padding": layer.conv._padding,
+            "dilation": layer.conv._dilation,
+            "groups": layer.conv._groups,
+            "internal_channels": layer.conv._in_channels,
+            "with_bn": True
+        }
+        dbb_layer = DiverseBranchBlock(
+            config=config,
+            act=nn.ReLU() if layer.act else None,
+            data_format=layer.data_format)
+        return dbb_layer
+
+    if model.block_type == "BasicBlock":
+        name_list = [[f"blocks[{i}].conv0", f"blocks[{i}].conv1"]
+                     for i in range(len(model.blocks))]
+    elif model.block_type == "BottleneckBlock":
+        name_list = [[
+            f"blocks[{i}].conv0", f"blocks[{i}].conv1", f"blocks[{i}].conv2"
+        ] for i in range(len(model.blocks))]
+    else:
+        raise Exception()
+    layer_name_list = reduce(lambda x, y: x + y, name_list)
+
+    model.upgrade_sublayer(
+        layer_name_pattern=layer_name_list, handle_func=handle_func)

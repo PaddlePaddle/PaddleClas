@@ -12,4 +12,4 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from .diverse_branch_block import DiverseBranchBlock
+from .diverse_branch_block import DiverseBranchBlock, resnet2dbb
