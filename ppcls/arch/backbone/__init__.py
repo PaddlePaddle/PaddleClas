@@ -35,7 +35,6 @@ from .model_zoo.se_resnet_vd import SE_ResNet18_vd, SE_ResNet34_vd, SE_ResNet50_
 from .model_zoo.se_resnext_vd import SE_ResNeXt50_vd_32x4d, SE_ResNeXt50_vd_32x4d, SENet154_vd
 from .model_zoo.se_resnext import SE_ResNeXt50_32x4d, SE_ResNeXt101_32x4d, SE_ResNeXt152_64x4d
 from .model_zoo.dpn import DPN68, DPN92, DPN98, DPN107, DPN131
-from .model_zoo.dsnet import DSNet_tiny, DSNet_small, DSNet_base
 from .model_zoo.densenet import DenseNet121, DenseNet161, DenseNet169, DenseNet201, DenseNet264
 from .model_zoo.efficientnet import EfficientNetB0, EfficientNetB1, EfficientNetB2, EfficientNetB3, EfficientNetB4, EfficientNetB5, EfficientNetB6, EfficientNetB7, EfficientNetB0_small
 from .model_zoo.resnest import ResNeSt50_fast_1s1x64d, ResNeSt50, ResNeSt101, ResNeSt200, ResNeSt269
@@ -50,10 +49,11 @@ from .model_zoo.xception_deeplab import Xception41_deeplab, Xception65_deeplab
 from .model_zoo.resnext101_wsl import ResNeXt101_32x8d_wsl, ResNeXt101_32x16d_wsl, ResNeXt101_32x32d_wsl, ResNeXt101_32x48d_wsl
 from .model_zoo.squeezenet import SqueezeNet1_0, SqueezeNet1_1
 from .model_zoo.darknet import DarkNet53
-from .model_zoo.regnet import RegNetX_200MF, RegNetX_400MF, RegNetX_600MF, RegNetX_800MF, RegNetX_1600MF, RegNetX_3200MF, RegNetX_4GF, RegNetX_6400MF, RegNetX_8GF, RegNetX_12GF, RegNetX_16GF, RegNetX_32GF
+from .model_zoo.regnet import RegNetX_200MF, RegNetX_4GF, RegNetX_32GF, RegNetY_200MF, RegNetY_4GF, RegNetY_32GF
 from .model_zoo.vision_transformer import ViT_small_patch16_224, ViT_base_patch16_224, ViT_base_patch16_384, ViT_base_patch32_384, ViT_large_patch16_224, ViT_large_patch16_384, ViT_large_patch32_384
 from .model_zoo.distilled_vision_transformer import DeiT_tiny_patch16_224, DeiT_small_patch16_224, DeiT_base_patch16_224, DeiT_tiny_distilled_patch16_224, DeiT_small_distilled_patch16_224, DeiT_base_distilled_patch16_224, DeiT_base_patch16_384, DeiT_base_distilled_patch16_384
 from .legendary_models.swin_transformer import SwinTransformer_tiny_patch4_window7_224, SwinTransformer_small_patch4_window7_224, SwinTransformer_base_patch4_window7_224, SwinTransformer_base_patch4_window12_384, SwinTransformer_large_patch4_window7_224, SwinTransformer_large_patch4_window12_384
+from .legendary_models.swin_transformerv2 import SwinTransformerV2_tiny_patch4_window8_256, SwinTransformerV2_small_patch4_window8_256, SwinTransformerV2_base_patch4_window8_256, SwinTransformerV2_tiny_patch4_window16_256, SwinTransformerV2_small_patch4_window16_256, SwinTransformerV2_base_patch4_window16_256, SwinTransformerV2_base_patch4_window12to16_256, SwinTransformerV2_base_patch4_window24_384, SwinTransformerV2_large_patch4_window16_256, SwinTransformerV2_large_patch4_window24_384
 from .model_zoo.cswin_transformer import CSWinTransformer_tiny_224, CSWinTransformer_small_224, CSWinTransformer_base_224, CSWinTransformer_large_224, CSWinTransformer_base_384, CSWinTransformer_large_384
 from .model_zoo.mixnet import MixNet_S, MixNet_M, MixNet_L
 from .model_zoo.rexnet import ReXNet_1_0, ReXNet_1_3, ReXNet_1_5, ReXNet_2_0, ReXNet_3_0
