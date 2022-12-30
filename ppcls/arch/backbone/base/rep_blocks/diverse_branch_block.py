@@ -71,7 +71,8 @@ class DiverseBranchBlock(RepBlock):
                 "out_channels": out_channels,
                 "stride": stride,
                 "groups": groups,
-                "with_bn": with_bn
+                "with_bn": with_bn,
+                "to_rep_kernel_size": kernel_size
             },
             "Conv1x1_AVG": {
                 "in_channels": in_channels,
@@ -131,7 +132,12 @@ class DiverseBranchBlock(RepBlock):
     def re_parameterize(self):
         if self.is_repped:
             return
-        w, b = self.get_actual_kernel()
+
+        weight_hat, bias_hat = 0, 0
+        for branch_name in self.branch_dict:
+            weight, bias = self.branch_dict[branch_name].get_rep_kernel()
+            weight_hat += weight
+            bias_hat += bias
 
         self.repped_conv = nn.Conv2D(
             in_channels=self.config["in_channels"],
@@ -143,11 +149,9 @@ class DiverseBranchBlock(RepBlock):
             groups=self.config["groups"],
             bias_attr=True)
 
-        self.repped_conv.weight.set_value(w)
-        self.repped_conv.bias.set_value(b)
-        # TODO(gaotingquan): is OK ?
-        # self.branch_list = []
-        del self.branch_list
+        self.repped_conv.weight.set_value(weight_hat)
+        self.repped_conv.bias.set_value(bias_hat)
+        del self.branch_dict
         self.is_repped = True
 
 
