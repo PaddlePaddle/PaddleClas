@@ -97,7 +97,6 @@ DataLoader:
         - RandCropImageV2:
             size: [32, 32]
         - NormalizeImage:
-        - Normalize:
             scale: 1.0/255.0
             mean: [0.5071, 0.4867, 0.4408]
             std: [0.2675, 0.2565, 0.2761]
@@ -152,7 +151,7 @@ DataLoader:
             order: hwc
       
       transform_ops_strong2:
-        - RandCropImageV2:
+        - RandomResizedCrop:
             size: [32, 32]
         - RandFlipImage:
             flip_code: 1
@@ -168,8 +167,8 @@ DataLoader:
             p: 0.2
         - NormalizeImage:
             scale: 1.0/255.0
-            mean: [0.5071, 0.4867, 0.4408]
-            std: [0.2675, 0.2565, 0.2761]
+            mean: [0., 0., 0.]
+            std: [1., 1., 1.]
             order: hwc
 
 
