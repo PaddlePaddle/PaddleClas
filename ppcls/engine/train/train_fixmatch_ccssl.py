@@ -41,7 +41,7 @@ def train_epoch_fixmatch_ccssl(engine, epoch_id, print_batch_step):
             engine.unlabel_train_dataloader_iter = iter(engine.unlabel_train_dataloader)
             unlabel_data_batch = engine.unlabel_train_dataloader_iter.next()
 
-        assert len(unlabel_data_batch) == 4
+        assert len(unlabel_data_batch) in [3, 4]
         assert unlabel_data_batch[0].shape == unlabel_data_batch[1].shape == unlabel_data_batch[2].shape
 
         engine.time_info['reader_cost'].update(time.time() - tic)
