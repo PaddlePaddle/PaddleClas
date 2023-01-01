@@ -287,10 +287,10 @@ class Recallk(nn.Layer):
                 keep_mask):
         metric_dict = dict()
 
-        #get cmc
+        # get cmc
         choosen_indices = paddle.argsort(
             similarities_matrix, axis=1, descending=self.descending)
-        gallery_labels_transpose = paddle.transpose(gallery_img_id, [1, 0])
+        gallery_labels_transpose = gallery_img_id.t()
         gallery_labels_transpose = paddle.broadcast_to(
             gallery_labels_transpose,
             shape=[
@@ -301,18 +301,14 @@ class Recallk(nn.Layer):
         equal_flag = paddle.equal(choosen_label, query_img_id)
         if keep_mask is not None:
             keep_mask = paddle.index_sample(
-                keep_mask.astype('float32'), choosen_indices)
-            equal_flag = paddle.logical_and(equal_flag,
-                                            keep_mask.astype('bool'))
-        equal_flag = paddle.cast(equal_flag, 'float32')
+                keep_mask.astype("float32"), choosen_indices)
+            equal_flag = equal_flag & keep_mask.astype("bool")
+        equal_flag = paddle.cast(equal_flag, "float32")
         real_query_num = paddle.sum(equal_flag, axis=1)
-        real_query_num = paddle.sum(
-            paddle.greater_than(real_query_num, paddle.to_tensor(0.)).astype(
-                "float32"))
+        real_query_num = paddle.sum((real_query_num > 0.0).astype("float32"))
 
         acc_sum = paddle.cumsum(equal_flag, axis=1)
-        mask = paddle.greater_than(acc_sum,
-                                   paddle.to_tensor(0.)).astype("float32")
+        mask = (acc_sum > 0.0).astype("float32")
         all_cmc = (paddle.sum(mask, axis=0) / real_query_num).numpy()
 
         for k in self.topk:
