@@ -43,8 +43,8 @@ cifar数据集上，paddle版本的配置文件及训练好的模型如下表所
 
 |数据集|配置文件地址|模型下载链接|
 |:----:|:----:|:----:|
-|cifar10| [配置文件](../../../../ppcls/configs/ssl/FixMatchCCSSL/FixMatchCCSSL_cifar10_4000_4gpu.yaml)|[模型地址](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/semi_superwised_learning/FixMatchCCSSL_WideResNet_cifar10_label4000.pdparams)|
-|cifar100|[配置文件](../../../../ppcls/configs/ssl/FixMatchCCSSL/FixMatchCCSSL_cifar100_10000_4gpu.yaml)|[模型地址](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/semi_superwised_learning/FixMatchCCSSL_WideResNet_cifar100_label10000.pdparams)|
+|cifar10| [配置文件](../../../../ppcls/configs/ssl/CCSSL/FixMatchCCSSL_cifar10_4000_4gpu.yaml)|[模型地址](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/semi_superwised_learning/FixMatchCCSSL_WideResNet_cifar10_label4000.pdparams)|
+|cifar100|[配置文件](../../../../ppcls/configs/ssl/CCSSL/FixMatchCCSSL_cifar100_10000_4gpu.yaml)|[模型地址](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/semi_superwised_learning/FixMatchCCSSL_WideResNet_cifar100_label10000.pdparams)|
 |||
 
 上表中的配置是基于4卡GPU训练的。
@@ -58,12 +58,12 @@ cifar10数据在训练过程中会自动下载到默认缓存路径 `~/.cache/pa
 
 单卡训练执行以下命令
 ```
-python tools/train.py -c ppcls/configs/ssl/FixMatchCCSSL/FixMatchCCSSL_cifar10_4000_4gpu.yaml
+python tools/train.py -c ppcls/configs/ssl/CCSSL/FixMatchCCSSL_cifar10_4000_4gpu.yaml
 ```
 
 4卡训练执行以下操作
 ```
-python -m paddle.distributed.launch --gpus='0,1,2,3' tools/train.py -c ppcls/configs/ssl/FixMatchCCSSL/FixMatchCCSSL_cifar10_4000_4gpu.yaml
+python -m paddle.distributed.launch --gpus='0,1,2,3' tools/train.py -c ppcls/configs/ssl/CCSSL/FixMatchCCSSL_cifar10_4000_4gpu.yaml
 ```
 
 2. **查看训练日志和保存的模型参数文件** 训练过程中屏幕会实时打印loss等指标信息，同时会保存日志文件 `train.log` ，模型参数文件 `*.pdparams`，优化器参数文件 `*.pdopt` 等内容到`Global.output_dir`指定的文件夹下，默认在 `PaddleClas/output/RecModel/`文件夹下。
@@ -73,7 +73,7 @@ python -m paddle.distributed.launch --gpus='0,1,2,3' tools/train.py -c ppcls/con
 准备用于评估的 `*.pdparams` 模型参数文件，可以使用训练好的模型，也可以使用 *4. 模型训练* 中保存的模型。
 * 以训练过程中保存的 `best_model_ema.ema.pdparams`为例，执行如下命令即可进行评估。
 ```
-python3.7 tools/eval.py -c ppcls/configs/ssl/FixMatchCCSSL/FixMatchCCSSL_cifar10_4000_4gpu.yaml -o Global.pretrained_model="./output/RecModel/best_model_ema.ema"
+python3.7 tools/eval.py -c ppcls/configs/ssl/CCSSL/FixMatchCCSSL_cifar10_4000_4gpu.yaml -o Global.pretrained_model="./output/RecModel/best_model_ema.ema"
 ```
 
 * 以训练好的模型为例，下载提供的已经训练好的模型，到 `PaddleClas/pretrained_models` 文件夹中，执行如下命令即可进行评估。
@@ -85,7 +85,7 @@ cd pretrained_models
 wget 
 cd ..
 # 评估
-python tools/eval.py -c ppcls/configs/ssl/FixMatchCCSSL/FixMatchCCSSL_cifar10_4000_4gpu.yaml -o Global.pretrained_model="./output/RecModel/best_model_ema.ema"
+python tools/eval.py -c ppcls/configs/ssl/CCSSL/FixMatchCCSSL_cifar10_4000_4gpu.yaml -o Global.pretrained_model="./output/RecModel/best_model_ema.ema"
 ```
 **注：** `pretrained_model` 后填入的地址不需要加 `.pdparams`后缀，在程序运行时会自动补上。
 
@@ -108,7 +108,7 @@ python tools/eval.py -c ppcls/configs/ssl/FixMatchCCSSL/FixMatchCCSSL_cifar10_40
 将训练过程中保存的模型文件转成inference模型，同样以 `best_model_ema.ema_pdparams`为例，执行以下命令进行转换
 ```
 python3.7 tools/export_model.py \
--c ppcls/configs/ssl/FixMatchCCSSL/FixMatchCCSSL_cifar10_4000_4gpu.yaml \
+-c ppcls/configs/ssl/CCSSL/FixMatchCCSSL_cifar10_4000_4gpu.yaml \
 -o Global.pretrained_model="output/RecModel/best_model_ema.ema" \
 -o Global.save_inference_fir="./deploy/inference"
 ```
