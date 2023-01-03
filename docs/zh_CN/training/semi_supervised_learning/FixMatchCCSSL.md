@@ -21,41 +21,38 @@
 作者提出了一种新颖的半监督学习方法。对有标签的数据进行数据训练的同时，对无标签数据进行一种弱增强和两种强增强。如果若增强的分类结果大于阈值，则弱数据增强的输出标签作为伪标签。通过伪标签，制作一个仅包含类级信息的监督对比矩阵。然后，通过对分布外数据的图像级对比形成类感知对比矩阵，以减少确认偏差。通过应用重新加权模块，将学习重点放在干净的数据上，并获得最终的目标矩阵。此外，特征亲和矩阵由两个强大的增强视图组成。通过最小化亲和矩阵和目标矩阵之间的交叉熵来制定用于未标记数据的类感知对比模块。模型的流程图如下
 
 ## 2. 精度指标
-以下表格总结了复现的CCSSL在Cifar10数据集上的精度指标。
+以下表格总结了复现的CCSSL在Cifar数据集上的精度指标。其中cifar10带标签的样本数为4000，cifar100带标签的样本数为10000
 <table>
     <tr>
         <td>Labels</td>
-        <td>40</td>
-        <td>250</td>
-        <td>4000</td>
+        <td>cifar10</td>
+        <td>cifar100</td>
     </tr>
     <tr>
         <td>pytorch版本</td>
-        <td></td>
-        <td></td>
         <td>95.54</td>
+        <td>80.68</td>
     </tr>
     <tr>
         <td>paddle版本</td>
-        <td></td>
-        <td></td>
-        <td>95.61</td>
+        <td>95.73</td>
+        <td>80.75</td>
     </tr>
 </table>
-cifar10上，paddle版本的配置文件及训练好的模型如下表所示
+cifar数据集上，paddle版本的配置文件及训练好的模型如下表所示
 <table>
     <tr>
-        <td>label</td>
+        <td>数据集</td>
         <td>配置文件地址</td>
         <td>模型下载链接</td>
     </tr>
     <tr>
-        <td>40</td>
+        <td>cifar10</td>
         <td></td>
         <td></td>
     </tr>
     <tr>
-        <td>paddle版本</td>
+        <td>cifar100</td>
         <td></td>
         <td></td>
     </tr>
@@ -71,7 +68,7 @@ cifar10数据在训练过程中会自动下载到默认缓存路径 `~/.cache/pa
 
 单卡训练执行以下命令
 ```
-python tools/train.py -c ppcls/configs/ssl/FixMatchCCSSL/FixMatchCCSSL_cifar10_4000.yaml
+python tools/train.py -c ppcls/configs/ssl/FixMatchCCSSL/FixMatchCCSSL_cifar10_4000_4gpu.yaml
 ```
 
 4卡训练执行以下操作
@@ -98,21 +95,21 @@ cd pretrained_models
 wget 
 cd ..
 # 评估
-python3.7 tools/eval.py -c ppcls/configs/ssl/FixMatchCCSSL_cifar10_4000.yaml -o Global.pretrained_model="./output/RecModel/best_model_ema.ema"
+python tools/eval.py -c ppcls/configs/ssl/FixMatchCCSSL/FixMatchCCSSL_cifar10_4000_4gpu.yaml -o Global.pretrained_model="./output/RecModel/best_model_ema.ema"
 ```
 **注：** `pretrained_model` 后填入的地址不需要加 `.pdparams`后缀，在程序运行时会自动补上。
 
 * 查看输出结果
 ```
-[2022/12/08 09:36:13] ppcls INFO: [Eval][Epoch 0][Iter: 0/157]CELoss: 0.00999, loss: 0.00999, top1: 1.00000, top5: 1.00000, batch_cost: 5.11046s, reader_cost: 1.22196, ips: 12.52334 images/sec
-[2022/12/08 09:36:13] ppcls INFO: [Eval][Epoch 0][Iter: 20/157]CELoss: 0.04825, loss: 0.04825, top1: 0.95164, top5: 1.00000, batch_cost: 0.02071s, reader_cost: 0.00207, ips: 3089.66447 images/sec
-[2022/12/08 09:36:14] ppcls INFO: [Eval][Epoch 0][Iter: 40/157]CELoss: 0.03500, loss: 0.03500, top1: 0.95084, top5: 1.00000, batch_cost: 0.02155s, reader_cost: 0.00108, ips: 2970.07129 images/sec
-[2022/12/08 09:36:14] ppcls INFO: [Eval][Epoch 0][Iter: 60/157]CELoss: 0.26421, loss: 0.26421, top1: 0.94928, top5: 0.99949, batch_cost: 0.02048s, reader_cost: 0.00151, ips: 3124.81965 images/sec
-[2022/12/08 09:36:14] ppcls INFO: [Eval][Epoch 0][Iter: 80/157]CELoss: 0.16254, loss: 0.16254, top1: 0.95332, top5: 0.99942, batch_cost: 0.02124s, reader_cost: 0.00117, ips: 3013.43961 images/sec
-[2022/12/08 09:36:15] ppcls INFO: [Eval][Epoch 0][Iter: 100/157]CELoss: 0.15471, loss: 0.15471, top1: 0.95374, top5: 0.99923, batch_cost: 0.02046s, reader_cost: 0.00098, ips: 3128.15428 images/sec
-[2022/12/08 09:36:15] ppcls INFO: [Eval][Epoch 0][Iter: 120/157]CELoss: 0.05237, loss: 0.05237, top1: 0.95493, top5: 0.99935, batch_cost: 0.02061s, reader_cost: 0.00084, ips: 3106.03867 images/sec
-[2022/12/08 09:36:16] ppcls INFO: [Eval][Epoch 0][Iter: 140/157]CELoss: 0.03242, loss: 0.03242, top1: 0.95601, top5: 0.99945, batch_cost: 0.02084s, reader_cost: 0.00075, ips: 3071.00311 images/sec
-[2022/12/08 09:36:16] ppcls INFO: [Eval][Epoch 0][Avg]CELoss: 0.16041, loss: 0.16041, top1: 0.95610, top5: 0.99950
+[2023/01/02 03:07:48] ppcls INFO: [Eval][Epoch 0][Iter: 0/157]CELoss: 0.01224, loss: 0.01224, top1: 1.00000, top5: 1.00000, batch_cost: 4.57323s, reader_cost: 0.76991, ips: 13.99447 images/sec
+[2023/01/02 03:07:48] ppcls INFO: [Eval][Epoch 0][Iter: 20/157]CELoss: 0.05035, loss: 0.05035, top1: 0.95759, top5: 0.99851, batch_cost: 0.02510s, reader_cost: 0.00009, ips: 2549.51698 images/sec
+[2023/01/02 03:07:49] ppcls INFO: [Eval][Epoch 0][Iter: 40/157]CELoss: 0.02832, loss: 0.02832, top1: 0.95541, top5: 0.99848, batch_cost: 0.02364s, reader_cost: 0.00008, ips: 2707.22687 images/sec
+[2023/01/02 03:07:49] ppcls INFO: [Eval][Epoch 0][Iter: 60/157]CELoss: 0.05375, loss: 0.05375, top1: 0.95569, top5: 0.99898, batch_cost: 0.02209s, reader_cost: 0.00009, ips: 2897.88691 images/sec
+[2023/01/02 03:07:50] ppcls INFO: [Eval][Epoch 0][Iter: 80/157]CELoss: 0.02459, loss: 0.02459, top1: 0.95872, top5: 0.99904, batch_cost: 0.02318s, reader_cost: 0.00009, ips: 2761.57735 images/sec
+[2023/01/02 03:07:50] ppcls INFO: [Eval][Epoch 0][Iter: 100/157]CELoss: 0.06381, loss: 0.06381, top1: 0.95777, top5: 0.99876, batch_cost: 0.02258s, reader_cost: 0.00009, ips: 2834.16342 images/sec
+[2023/01/02 03:07:51] ppcls INFO: [Eval][Epoch 0][Iter: 120/157]CELoss: 0.01684, loss: 0.01684, top1: 0.95713, top5: 0.99884, batch_cost: 0.02253s, reader_cost: 0.00009, ips: 2841.09327 images/sec
+[2023/01/02 03:07:51] ppcls INFO: [Eval][Epoch 0][Iter: 140/157]CELoss: 0.05013, loss: 0.05013, top1: 0.95667, top5: 0.99889, batch_cost: 0.02238s, reader_cost: 0.00009, ips: 2860.07617 images/sec
+[2023/01/02 03:07:51] ppcls INFO: [Eval][Epoch 0][Avg]CELoss: 0.15216, loss: 0.15216, top1: 0.95730, top5: 0.99890
 ```
 默认评估日志保存在 `PaddleClas/output/RecModel/eval.log`中，可以看到我们提供的模型在cifar10数据集上的评估指标为top1: 95.57, top5: 99.95
 
@@ -121,7 +118,7 @@ python3.7 tools/eval.py -c ppcls/configs/ssl/FixMatchCCSSL_cifar10_4000.yaml -o 
 将训练过程中保存的模型文件转成inference模型，同样以 `best_model_ema.ema_pdparams`为例，执行以下命令进行转换
 ```
 python3.7 tools/export_model.py \
--c ppcls/configs/ssl/FixMatchCCSSL/FixMatchCCSSL_cifar10_4000.yaml \
+-c ppcls/configs/ssl/FixMatchCCSSL/FixMatchCCSSL_cifar10_4000_4gpu.yaml \
 -o Global.pretrained_model="output/RecModel/best_model_ema.ema" \
 -o Global.save_inference_fir="./deploy/inference"
 ```
@@ -129,42 +126,50 @@ python3.7 tools/export_model.py \
 #### 5.2.2 基于 Python 预测引擎推理
 1. 修改 `PaddleClas/deploy/configs/inference_cls.yaml`
 * * 将`infer_imgs:` 后的路径段改为 query 文件夹下的任意一张图片路径（下方配置使用的是`demo.jpg`图片的路径）
-* * 将`rec_inference_model.dir:` 后的字段改为解压出来的 inference 模型文件夹路径
-* * 将`transform_ops:` 字段下的预处理配置改为 `FixMatch_CCSSL_cifar10_40000.yaml` 中 `Eval.dataset`下的预处理配置
+* * 将`inference_model_dir:` 后的字段改为解压出来的 inference 模型文件夹路径
+* * 将`transform_ops:` 字段下的预处理配置改为 `FixMatch_CCSSL_cifar10_40000_4gpu.yaml` 中 `Eval.dataset`下的预处理配置
 ```
 Global:
-  infer_imgs: "demo"
-  rec_inference_model_dir: "./inferece"
+  infer_imgs: "./images/ImageNet/ILSVRC2012_val_00000010.jpeg"
+  inference_model_dir: "../inference"
   batch_size: 1
-  use_gpu: False
+  use_gpu: True
   enable_mkldnn: True
   cpu_num_threads: 10
-  enable_benchmark: False
+  enable_benchmark: True
   use_fp16: False
   ir_optim: True
   use_tensorrt: False
   gpu_mem: 8000
   enable_profile: False
 
-RecPreProcess:
+PreProcess:
   transform_ops:
-   -  NormalizeImage:
-        scale: 1.0/255.0
-        mean: [0.4914, 0.4822, 0.4465]
-        std: [0.2471, 0.2435, 0.2616]
-        order: hwc
-PostProcess: null
+    - ResizeImage:
+        size: [32, 32]
+        backend: pil
+    - NormalizeImage:
+        scale: 1.0/255.0
+        mean: [0.4914, 0.4822, 0.4465]
+        std: [0.2471, 0.2435, 0.2616]
+        order: hwc
+    - ToCHWImage:
+
+PostProcess:
+  main_indicator: Topk
+  Topk:
+    topk: 5
 ```
 
 2. 执行推理命令
 ```
 cd ./deploy/
-python3.7 python/predict_rec.py -c ./configs/inference_rec.yaml
+python3.7 python/predict_cls.py -c ./configs/inference_cls.yaml
 ```
 
-3. 查看输出结果，实际结果为一个长度为10的向量，表示图像分类的结果，如
+3. 查看输出结果，实际结果为一个长度为5的向量，表示图像分类的结果，如
 ```
-
+ILSVRC2012_val_00000010.jpeg:   class id(s): [3, 5, 2, 6, 0], score(s): [6.16, 3.26, 0.02, -0.26, -0.76], label_name(s): []
 ```
 
 #### 5.2.3 基于C++预测引擎推理
