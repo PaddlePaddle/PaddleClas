@@ -51,9 +51,6 @@ MODEL_URLS = {
 
 __all__ = list(MODEL_URLS.keys())
 
-# The following re-implementation of roll is inspired by
-# https://gitee.com/ascend/pytorch/blob/master/torch_npu/contrib/function/roll.py
-
 
 class RollWithIndexSelect(paddle.autograd.PyLayer):
     @staticmethod
@@ -103,7 +100,6 @@ class NpuRollWithIndexSelect():
 
 
 class RollWrapper(object):
-
     _roll = None
 
     @staticmethod
@@ -333,7 +329,7 @@ class WindowAttention(nn.Layer):
         x = self.proj_drop(x)
         return x
 
-    def extra_repr(self) -> str:
+    def extra_repr(self):
         return f'dim={self.dim}, window_size={self.window_size}, ' \
                f'pretrained_window_size={self.pretrained_window_size}, num_heads={self.num_heads}'
 
@@ -374,7 +370,7 @@ class SwinTransformerBlock(nn.Layer):
                  dim,
                  input_resolution,
                  num_heads,
-                 window_size=7,
+                 window_size=8,
                  shift_size=0,
                  mlp_ratio=4.,
                  qkv_bias=True,
@@ -492,7 +488,7 @@ class SwinTransformerBlock(nn.Layer):
 
         return x
 
-    def extra_repr(self) -> str:
+    def extra_repr(self):
         return f"dim={self.dim}, input_resolution={self.input_resolution}, num_heads={self.num_heads}, " \
                f"window_size={self.window_size}, shift_size={self.shift_size}, mlp_ratio={self.mlp_ratio}"
 
@@ -543,7 +539,7 @@ class PatchMerging(nn.Layer):
         x = self.norm(x)
         return x
 
-    def extra_repr(self) -> str:
+    def extra_repr(self):
         return f"input_resolution={self.input_resolution}, dim={self.dim}"
 
     def flops(self):
@@ -625,7 +621,7 @@ class BasicLayer(nn.Layer):
             x = self.downsample(x)
         return x
 
-    def extra_repr(self) -> str:
+    def extra_repr(self):
         return f"dim={self.dim}, input_resolution={self.input_resolution}, depth={self.depth}"
 
     def flops(self):
@@ -641,7 +637,7 @@ class PatchEmbed(nn.Layer):
     r""" Image to Patch Embedding
 
     Args:
-        img_size (int): Image size.  Default: 224.
+        img_size (int): Image size.  Default: 256.
         patch_size (int): Patch token size. Default: 4.
         in_chans (int): Number of input image channels. Default: 3.
         embed_dim (int): Number of linear projection output channels. Default: 96.
@@ -649,7 +645,7 @@ class PatchEmbed(nn.Layer):
     """
 
     def __init__(self,
-                 img_size=224,
+                 img_size=256,
                  patch_size=4,
                  in_chans=3,
                  embed_dim=96,
@@ -695,15 +691,15 @@ class PatchEmbed(nn.Layer):
 
 
 class SwinTransformerV2(nn.Layer):
-    r""" Swin Transformer
-        A PyTorch impl of : `Swin Transformer: Hierarchical Vision Transformer using Shifted Windows`  -
-          https://arxiv.org/pdf/2103.14030
+    r""" Swin TransformerV2
+        A PaddlePaddle impl of : `Swin Transformer V2: Scaling Up Capacity and Resolution`  -
+          https://arxiv.org/abs/2111.09883
 
     Args:
-        img_size (int | tuple(int)): Input image size. Default 224
+        img_size (int | tuple(int)): Input image size. Default 256
         patch_size (int | tuple(int)): Patch size. Default: 4
         in_chans (int): Number of input image channels. Default: 3
-        num_classes (int): Number of classes for classification head. Default: 1000
+        class_num (int): Number of classes for classification head. Default: 1000
         embed_dim (int): Patch embedding dimension. Default: 96
         depths (tuple(int)): Depth of each Swin Transformer layer.
         num_heads (tuple(int)): Number of attention heads in different layers.
@@ -720,10 +716,10 @@ class SwinTransformerV2(nn.Layer):
     """
 
     def __init__(self,
-                 img_size=224,
+                 img_size=256,
                  patch_size=4,
                  in_chans=3,
-                 num_classes=1000,
+                 class_num=1000,
                  embed_dim=96,
                  depths=[2, 2, 6, 2],
                  num_heads=[3, 6, 12, 24],
@@ -740,7 +736,7 @@ class SwinTransformerV2(nn.Layer):
                  **kwargs):
         super().__init__()
 
-        self.num_classes = num_classes
+        self.class_num = class_num
         self.num_layers = len(depths)
         self.embed_dim = embed_dim
         self.ape = ape
@@ -761,9 +757,9 @@ class SwinTransformerV2(nn.Layer):
 
         # absolute position embedding
         if self.ape:
-            self.absolute_pos_embed = nn.Parameter(
-                paddle.zeros(1, num_patches, embed_dim))
-            trunc_normal_(self.absolute_pos_embed, std=.02)
+            self.absolute_pos_embed = self.create_parameter(
+                shape=(1, num_patches, embed_dim), default_initializer=zeros_)
+            trunc_normal_(self.absolute_pos_embed)
 
         self.pos_drop = nn.Dropout(p=drop_rate)
 
@@ -795,9 +791,8 @@ class SwinTransformerV2(nn.Layer):
 
         self.norm = norm_layer(self.num_features)
         self.avgpool = nn.AdaptiveAvgPool1D(1)
-        self.head = nn.Linear(
-            self.num_features,
-            num_classes) if num_classes > 0 else nn.Identity()
+        self.head = nn.Linear(self.num_features,
+                              class_num) if class_num > 0 else nn.Identity()
 
         self.apply(self._init_weights)
 
@@ -836,7 +831,7 @@ class SwinTransformerV2(nn.Layer):
             flops += layer.flops()
         flops += self.num_features * self.patches_resolution[
             0] * self.patches_resolution[1] // (2**self.num_layers)
-        flops += self.num_features * self.num_classes
+        flops += self.num_features * self.class_num
         return flops
 
 

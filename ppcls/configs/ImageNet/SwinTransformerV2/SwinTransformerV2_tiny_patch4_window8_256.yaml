@@ -61,7 +61,7 @@ DataLoader:
             to_rgb: True
             channel_first: False
         - RandCropImage:
-            size: 224
+            size: 256
             interpolation: bicubic
             backend: pil
         - RandFlipImage:
@@ -69,7 +69,7 @@ DataLoader:
         - TimmAutoAugment:
             config_str: rand-m9-mstd0.5-inc1
             interpolation: bicubic
-            img_size: 224
+            img_size: 256
         - NormalizeImage:
             scale: 1.0/255.0
             mean: [0.485, 0.456, 0.406]
