@@ -45,6 +45,7 @@ from ppcls.data.preprocess.ops.operators import RandomCropImage
 from ppcls.data.preprocess.ops.operators import RandomRotation
 from ppcls.data.preprocess.ops.operators import Padv2
 from ppcls.data.preprocess.ops.operators import RandomRot90
+from ppcls.data.preprocess.ops.operators import PCALighting
 from .ops.operators import format_data
 from paddle.vision.transforms import Pad as Pad_paddle_vision
 

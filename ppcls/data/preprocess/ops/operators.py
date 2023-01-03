@@ -721,8 +721,8 @@ class Pad(object):
         # Process fill color for affine transforms
         major_found, minor_found = (int(v)
                                     for v in PILLOW_VERSION.split('.')[:2])
-        major_required, minor_required = (
-            int(v) for v in min_pil_version.split('.')[:2])
+        major_required, minor_required = (int(v) for v in
+                                          min_pil_version.split('.')[:2])
         if major_found < major_required or (major_found == major_required and
                                             minor_found < minor_required):
             if fill is None:
@@ -869,3 +869,30 @@ class RandomGrayscale(object):
 
     def __repr__(self):
         return self.__class__.__name__ + '()'
+
+
+class PCALighting(object):
+    """Lighting noise(AlexNet - style PCA - based noise)"""
+
+    def __init__(self):
+        self.alphastd = 0.1
+        self.eigval = [0.2175, 0.0188, 0.0045]
+        self.eigvec = [
+            [-0.5675, 0.7192, 0.4009],
+            [-0.5808, -0.0045, -0.8140],
+            [-0.5836, -0.6948, 0.4203],
+        ]
+        self.eigval = np.array(self.eigval).astype(np.float32)
+        self.eigvec = np.array(self.eigvec).astype(np.float32)
+
+    def __call__(self, img):
+        if self.alphastd == 0:
+            return img
+
+        img = img.transpose((2, 0, 1))
+        alpha = np.random.normal(0, self.alphastd, size=(3)).astype(np.float32)
+        rgb = self.eigvec * np.broadcast_to(alpha.reshape(1, 3), (
+            3, 3)) * np.broadcast_to(self.eigval.reshape(1, 3), (3, 3))
+        rgb = rgb.sum(1).squeeze()
+        img = img + rgb.reshape(3, 1, 1)
+        return img.transpose((1, 2, 0))
