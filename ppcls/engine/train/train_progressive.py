@@ -13,28 +13,20 @@
 # limitations under the License.
 from __future__ import absolute_import, division, print_function
 
-import time
-
-import numpy as np
-
 from ppcls.data import build_dataloader
+from ppcls.engine.train.utils import type_name
 from ppcls.utils import logger
 
 from .train import train_epoch
 
 
-def train_epoch_efficientnetv2(engine, epoch_id, print_batch_step):
+def train_epoch_progressive(engine, epoch_id, print_batch_step):
     # 1. Build training hyper-parameters for different training stage
     num_stage = 4
     ratio_list = [(i + 1) / num_stage for i in range(num_stage)]
-    ram_list = np.linspace(5, 10, num_stage)
-    # dropout_rate_list = np.linspace(0.0, 0.2, num_stage)
     stones = [
         int(engine.config["Global"]["epochs"] * ratio_list[i])
         for i in range(num_stage)
-    ]
-    image_size_list = [
-        int(128 + (300 - 128) * ratio_list[i]) for i in range(num_stage)
     ]
     stage_id = 0
     for i in range(num_stage):
@@ -43,10 +35,24 @@ def train_epoch_efficientnetv2(engine, epoch_id, print_batch_step):
 
     # 2. Adjust training hyper-parameters for different training stage
     if not hasattr(engine, 'last_stage') or engine.last_stage < stage_id:
+        cur_dropout_rate = 0.0
+
+        def _change_dp_func(m):
+            global cur_dropout_rate
+            if type_name(m) == "Head" and hasattr(m, "_dropout"):
+                m._dropout.p = m.dropout_rate[stage_id]
+                cur_dropout_rate = m.dropout_rate[stage_id]
+
+        engine.model.apply(_change_dp_func)
+
+        cur_image_size = engine.config["DataLoader"]["Train"]["dataset"][
+            "transform_ops"][1]["RandCropImage"]["progress_size"][stage_id]
+        cur_magnitude = engine.config["DataLoader"]["Train"]["dataset"][
+            "transform_ops"][3]["RandAugment"]["progress_magnitude"][stage_id]
         engine.config["DataLoader"]["Train"]["dataset"]["transform_ops"][1][
-            "RandCropImage"]["size"] = image_size_list[stage_id]
+            "RandCropImage"]["size"] = cur_image_size
         engine.config["DataLoader"]["Train"]["dataset"]["transform_ops"][3][
-            "RandAugment"]["magnitude"] = ram_list[stage_id]
+            "RandAugment"]["magnitude"] = cur_magnitude
         engine.train_dataloader = build_dataloader(
             engine.config["DataLoader"],
             "Train",
@@ -55,9 +61,11 @@ def train_epoch_efficientnetv2(engine, epoch_id, print_batch_step):
             seed=epoch_id)
         engine.train_dataloader_iter = iter(engine.train_dataloader)
         engine.last_stage = stage_id
-    logger.info(
-        f"Training stage: [{stage_id+1}/{num_stage}](random_aug_magnitude={ram_list[stage_id]}, train_image_size={image_size_list[stage_id]})"
-    )
+    logger.info(f"Training stage: [{stage_id+1}/{num_stage}]("
+                f"random_aug_magnitude={cur_magnitude}, "
+                f"train_image_size={cur_image_size}, "
+                f"dropout_rate={cur_dropout_rate}"
+                f")")
 
     # 3. Train one epoch as usual at current stage
     train_epoch(engine, epoch_id, print_batch_step)

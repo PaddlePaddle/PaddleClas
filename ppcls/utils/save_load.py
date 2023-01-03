@@ -61,6 +61,7 @@ def load_dygraph_pretrain(model, path=None):
                 m.set_dict(param_state_dict)
     else:
         model.set_dict(param_state_dict)
+    logger.info("Finish load pretrained model from {}".format(path))
     return
 
 
