@@ -38,8 +38,23 @@ UniFormer 是一种新的视觉 Transformer 网络，可以用作计算机视觉
 | UniFormer_base   | 0.8376 | 0.9672 | 0.839 | - | 7.77 | 49.78   |
 | UniFormer_base_ls   | 0.8398 | 0.9675 | 0.839 | 0.967 | 7.77 | 49.78   |
 
-
 **备注：** PaddleClas 所提供的该系列模型的预训练模型权重，均是基于其官方提供的权重转得。
+
+### 1.3 Benchmark
+
+<a name='1.3.1'></a>
+
+#### 1.3.1 基于 V100 GPU 的预测速度
+
+| Models     | Size  | Latency(ms)<br>bs=1 | Latency(ms)<br>bs=4 | Latency(ms)<br>bs=8 |
+| -------- | --------- | ----------------- | ------------------------------ | ------------------------------ | ------------------------------ |
+| UniFormer_small   | 224       | 3.68                           | 5.93                           | 9.64                          |
+| UniFormer_small_plus | 224       | 4.12                          | 7.03                          | 11.59                          |
+| UniFormer_small_plus_dim64  | 224       | 3.91                          | 6.56                          | 10.69                          |
+| UniFormer_base   | 224       | 8.19                           | 12.98                          | 21.29                          |
+| UniFormer_base_ls    | 224       | 14.79                           | -                           | 22.20                           |
+
+**备注：** 精度类型为 FP32，推理过程使用 TensorRT。
 
 <a name="2"></a>  
 
