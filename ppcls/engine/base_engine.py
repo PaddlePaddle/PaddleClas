@@ -88,22 +88,23 @@ class BaseEngine(ABC):
         self.train_loss_func, self.eval_metric_func = None, None
         self.optimizer, self.lr_sch = None, None
 
-        # global iter counter
+        # global train iter counter
         self.global_step = 0
-
-    def _build_component(self,
-                         build_dataloader=True,
-                         build_model=True,
-                         build_loss=True,
-                         build_optimizer=True,
-                         build_metrics=True,
-                         build_process=True):
         # gradient accumulation
         self.update_freq = self.config["Global"].get("update_freq", 1)
+        # flag to use dataloader
+        self.use_dali = self.config['Global'].get("use_dali", False)
+
+    def _build_component(self,
+                         build_dataloader_flag=True,
+                         build_model_flag=True,
+                         build_loss_flag=True,
+                         build_optimizer_flag=True,
+                         build_metrics_flag=True,
+                         build_process_flag=True):
 
         # build dataloader
-        self.use_dali = self.config['Global'].get("use_dali", False)
-        if self.mode == 'train':
+        if self.mode == 'train' and build_dataloader_flag:
             self.train_dataloader = build_dataloader(
                 self.config["DataLoader"], "Train", self.device, self.use_dali)
 
@@ -116,18 +117,20 @@ class BaseEngine(ABC):
                     "iter_per_epoch")
             self.iter_per_epoch = self.iter_per_epoch // self.update_freq * self.update_freq
 
-        if self.mode == "eval" or (self.mode == "train" and
-                                   self.config["Global"]["eval_during_train"]):
+        if build_dataloader_flag and (self.mode == "eval" or (
+                self.mode == "train" and
+                self.config["Global"]["eval_during_train"])):
             self.eval_dataloader = build_dataloader(
                 self.config["DataLoader"], "Eval", self.device, self.use_dali)
 
         # build loss
-        if self.mode == "train":
+        if self.mode == "train" and build_loss_flag:
             label_loss_info = self.config["Loss"]["Train"]
             self.train_loss_func = build_loss(label_loss_info)
 
-        if self.mode == "eval" or (self.mode == "train" and
-                                   self.config["Global"]["eval_during_train"]):
+        if build_loss_flag and (self.mode == "eval" or
+                                (self.mode == "train" and
+                                 self.config["Global"]["eval_during_train"])):
             loss_config = self.config.get("Loss", None)
             if loss_config is not None and loss_config.get("Eval",
                                                            None) is not None:
@@ -135,45 +138,52 @@ class BaseEngine(ABC):
 
         # build metric
         if self.mode == 'train' and "Metric" in self.config and "Train" in self.config[
-                "Metric"] and self.config["Metric"]["Train"]:
-            metric_config = self.config["Metric"]["Train"]
-            self.train_metric_func = build_metrics(metric_config)
+                "Metric"] and self.config["Metric"][
+                    "Train"] and build_metrics_flag:
+            self.train_metric_func = build_metrics(self.config["Metric"][
+                "Train"])
 
         if self.mode == "eval" or (self.mode == "train" and
-                                   self.config["Global"]["eval_during_train"]):
-            self.eval_metric_func = build_metrics(metric_config)
+                                   self.config["Global"]["eval_during_train"]
+                                   ) and build_metrics_flag:
+            self.eval_metric_func = build_metrics(self.config["Metric"][
+                "Eval"])
 
         # build model
-        self.model = build_model(self.config, self.mode)
-        # set @to_static for benchmark, skip this by default.
-        apply_to_static(self.config, self.model)
+        if build_model_flag:
+            self.model = build_model(self.config, self.mode)
+            # set @to_static for benchmark, skip this by default.
+            apply_to_static(self.config, self.model)
 
-        # load_pretrain
-        if self.config["Global"]["pretrained_model"] is not None:
-            if self.config["Global"]["pretrained_model"].startswith("http"):
-                load_dygraph_pretrain_from_url(
-                    [self.model, getattr(self, 'train_loss_func', None)],
-                    self.config["Global"]["pretrained_model"])
-            else:
-                load_dygraph_pretrain(
-                    [self.model, getattr(self, 'train_loss_func', None)],
-                    self.config["Global"]["pretrained_model"])
+            # load_pretrain
+            if self.config["Global"]["pretrained_model"] is not None:
+                if self.config["Global"]["pretrained_model"].startswith(
+                        "http"):
+                    load_dygraph_pretrain_from_url(
+                        [self.model, getattr(self, 'train_loss_func', None)],
+                        self.config["Global"]["pretrained_model"])
+                else:
+                    load_dygraph_pretrain(
+                        [self.model, getattr(self, 'train_loss_func', None)],
+                        self.config["Global"]["pretrained_model"])
+            # build EMA model
+            self.ema = "EMA" in self.config and self.mode == "train"
+            if self.ema:
+                self.model_ema = ExponentialMovingAverage(
+                    self.model, self.config['EMA'].get("decay", 0.9999))
 
         # build optimizer
-        if self.mode == 'train':
+        assert hasattr(
+            self, "iter_per_epoch"
+        ), "Please set iter_per_epoch attribute when building optimizer!"
+        if self.mode == 'train' and build_optimizer_flag:
             self.optimizer, self.lr_sch = build_optimizer(
                 self.config["Optimizer"], self.config["Global"]["epochs"],
                 self.iter_per_epoch // self.update_freq,
                 [self.model, self.train_loss_func])
 
-        # build EMA model
-        self.ema = "EMA" in self.config and self.mode == "train"
-        if self.ema:
-            self.model_ema = ExponentialMovingAverage(
-                self.model, self.config['EMA'].get("decay", 0.9999))
-
         # build postprocess for infer
-        if self.mode == 'infer':
+        if build_process_flag and self.mode == 'infer':
             self.preprocess_func = create_operators(self.config["Infer"][
                 "transforms"])
             self.postprocess_func = build_postprocess(self.config["Infer"][
@@ -187,6 +197,17 @@ class BaseEngine(ABC):
             paddle.seed(self.seed)
             np.random.seed(self.seed)
             random.seed(self.seed)
+
+        # check the gpu num
+        world_size = dist.get_world_size()
+        self.config["Global"]["distributed"] = world_size != 1
+        if self.mode == "train":
+            std_gpu_num = 8 if isinstance(
+                self.config["Optimizer"],
+                dict) and self.config["Optimizer"]["name"] == "AdamW" else 4
+            if world_size != std_gpu_num:
+                msg = f"The training strategy provided by PaddleClas is based on {std_gpu_num} gpus. But the number of gpu is {world_size} in current training. Please modify the stategy (learning rate, batch size and so on) if use this config to train."
+                logger.warning(msg)
 
         # for distributed
         if self.config["Global"]["distributed"]:
@@ -267,17 +288,6 @@ class BaseEngine(ABC):
             else:
                 self.model = model
                 self.optimizer = optimizer
-
-        # check the gpu num
-        world_size = dist.get_world_size()
-        self.config["Global"]["distributed"] = world_size != 1
-        if self.mode == "train":
-            std_gpu_num = 8 if isinstance(
-                self.config["Optimizer"],
-                dict) and self.config["Optimizer"]["name"] == "AdamW" else 4
-            if world_size != std_gpu_num:
-                msg = f"The training strategy provided by PaddleClas is based on {std_gpu_num} gpus. But the number of gpu is {world_size} in current training. Please modify the stategy (learning rate, batch size and so on) if use this config to train."
-                logger.warning(msg)
 
     def train(self):
         assert self.mode == "train"

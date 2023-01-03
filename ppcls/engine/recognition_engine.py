@@ -25,7 +25,7 @@ import numpy as np
 import random
 from typing import Optional
 from ppcls.engine.train.utils import type_name
-from ppcls.engine.base_engine import BaseEngine
+from ppcls.engine.base_engine import BaseEngine, ExportModel
 from ppcls.utils.misc import AverageMeter
 from ppcls.utils import logger
 from ppcls.utils.logger import init_logger
@@ -44,11 +44,11 @@ from ppcls.utils import save_load
 from ppcls.data.utils.get_image_list import get_image_list
 from ppcls.data.postprocess import build_postprocess
 from ppcls.data import create_operators
-from ppcls.self import train as train_method
-from ppcls.self.train.utils import type_name
-from ppcls.self import evaluation
+from ppcls.engine import train as train_method
+from ppcls.engine.train.utils import type_name
+from ppcls.engine import evaluation
 from ppcls.arch.gears.identity_head import IdentityHead
-from ppcls.self.train.utils import update_loss, update_metric, log_info, type_name
+from ppcls.engine.train.utils import update_loss, update_metric, log_info, type_name
 from ppcls.utils import profiler
 
 
@@ -59,7 +59,55 @@ class RecognitionEngine(BaseEngine):
                                                    "recognition").lower()
         self.train_mode = self.config["Global"].get("train_mode",
                                                     "recognition").lower()
-        self._build_component()
+        class_num = config["Arch"].get("class_num", None)
+        self.config["DataLoader"].update({"class_num": class_num})
+        self.config["DataLoader"].update({
+            "epochs": self.config["Global"]["epochs"]
+        })
+        # build dataloader
+        if self.mode == 'train':
+            self.train_dataloader = build_dataloader(
+                self.config["DataLoader"], "Train", self.device, self.use_dali)
+
+            self.iter_per_epoch = len(
+                self.train_dataloader) - 1 if platform.system(
+                ) == "Windows" else len(self.train_dataloader)
+            if self.config["Global"].get("iter_per_epoch", None):
+                self.iter_per_epoch = self.config["Global"].get(
+                    "iter_per_epoch")
+            self.iter_per_epoch = self.iter_per_epoch // self.update_freq * self.update_freq
+
+        if self.mode == "eval" or (self.mode == "train" and
+                                   self.config["Global"]["eval_during_train"]):
+            if len(self.config["DataLoader"]["Eval"].keys()) == 1:
+                key = list(self.config["DataLoader"]["Eval"].keys())[0]
+                self.gallery_query_dataloader = build_dataloader(
+                    self.config["DataLoader"]["Eval"], key, self.device,
+                    self.use_dali)
+            else:
+                self.gallery_dataloader = build_dataloader(
+                    self.config["DataLoader"]["Eval"], "Gallery", self.device,
+                    self.use_dali)
+                self.query_dataloader = build_dataloader(
+                    self.config["DataLoader"]["Eval"], "Query", self.device,
+                    self.use_dali)
+
+        # build metric
+        self.train_metric_func, self.eval_metric_func = None, None
+        if self.mode == 'train' and "Metric" in self.config and "Train" in self.config[
+                "Metric"] and self.config["Metric"]["Train"]:
+            metric_config = self.config["Metric"]["Train"]
+            self.train_metric_func = build_metrics(metric_config)
+
+        if self.mode == "eval" or (self.mode == "train" and
+                                   self.config["Global"]["eval_during_train"]):
+            if "Metric" in self.config and "Eval" in self.config["Metric"]:
+                metric_config = self.config["Metric"]["Eval"]
+            else:
+                metric_config = [{"name": "Recallk", "topk": (1, 5)}]
+            self.eval_metric_func = build_metrics(metric_config)
+        self._build_component(
+            build_dataloader_flag=False, build_metrics_flag=False)
         self._set_train_attribute()
 
     def train_epoch(self, epoch_id, print_batch_step):

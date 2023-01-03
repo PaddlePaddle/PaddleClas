@@ -13,3 +13,4 @@ log/
 nohup.out
 .DS_Store
 .idea
+.vscode

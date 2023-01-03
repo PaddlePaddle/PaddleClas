@@ -23,7 +23,7 @@ from visualdl import LogWriter
 from paddle import nn
 import numpy as np
 import random
-from ppcls.engine.base_engine import BaseEngine
+from ppcls.engine.base_engine import BaseEngine, ExportModel
 from ppcls.utils.misc import AverageMeter
 from ppcls.utils import logger
 from ppcls.utils.logger import init_logger
@@ -42,18 +42,40 @@ from ppcls.utils import save_load
 from ppcls.data.utils.get_image_list import get_image_list
 from ppcls.data.postprocess import build_postprocess
 from ppcls.data import create_operators
-from ppcls.self import train as train_method
-from ppcls.self.train.utils import type_name
+from ppcls.engine import train as train_method
+from ppcls.engine.train.utils import type_name
 from ppcls.arch.gears.identity_head import IdentityHead
-from ppcls.self.train.utils import update_loss, update_metric, log_info, type_name
+from ppcls.engine.train.utils import update_loss, update_metric, log_info, type_name
 from ppcls.utils import profiler
 
 
 class ClassEngine(BaseEngine):
     def __init__(self, config, mode="train"):
         super().__init__(config, mode=mode)
-        self._build_component()
+        self._build_component(build_metrics_flag=False)
         self._set_train_attribute()
+
+        # build metric
+        if self.mode == 'train' and "Metric" in self.config and "Train" in self.config[
+                "Metric"] and self.config["Metric"]["Train"]:
+            metric_config = self.config["Metric"]["Train"]
+            if hasattr(self.train_dataloader, "collate_fn"
+                       ) and self.train_dataloader.collate_fn is not None:
+                for m_idx, m in enumerate(metric_config):
+                    if "TopkAcc" in m:
+                        msg = f"Unable to calculate accuracy when using \"batch_transform_ops\". The metric \"{m}\" has been removed."
+                        logger.warning(msg)
+                        metric_config.pop(m_idx)
+            self.train_metric_func = build_metrics(metric_config)
+        else:
+            self.train_metric_func = None
+
+        self.eval_metric_func = None
+        if self.mode == "eval" or (self.mode == "train" and
+                                   self.config["Global"]["eval_during_train"]):
+            if "Metric" in self.config and "Eval" in self.config["Metric"]:
+                self.eval_metric_func = build_metrics(self.config["Metric"][
+                    "Eval"])
 
     def train_epoch(self, epoch_id, print_batch_step):
         tic = time.time()
