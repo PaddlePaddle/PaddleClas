@@ -40,23 +40,13 @@
     </tr>
 </table>
 cifar数据集上，paddle版本的配置文件及训练好的模型如下表所示
-<table>
-    <tr>
-        <td>数据集</td>
-        <td>配置文件地址</td>
-        <td>模型下载链接</td>
-    </tr>
-    <tr>
-        <td>cifar10</td>
-        <td></td>
-        <td></td>
-    </tr>
-    <tr>
-        <td>cifar100</td>
-        <td></td>
-        <td></td>
-    </tr>
-</table>
+
+|数据集|配置文件地址|模型下载链接|
+|:----:|:----:|:----:|
+|cifar10| [配置文件](../../../../ppcls/configs/ssl/FixMatchCCSSL/FixMatchCCSSL_cifar10_4000_4gpu.yaml)|[模型地址](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/semi_superwised_learning/FixMatchCCSSL_WideResNet_cifar10_label4000.pdparams)|
+|cifar100|[配置文件](../../../../ppcls/configs/ssl/FixMatchCCSSL/FixMatchCCSSL_cifar100_10000_4gpu.yaml)|[模型地址](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/semi_superwised_learning/FixMatchCCSSL_WideResNet_cifar100_label10000.pdparams)|
+|||
+
 上表中的配置是基于4卡GPU训练的。
 **接下来** 以 `FixMatch_CCSSL_cifar10_40000_4gpu.yaml` 配置和训练好的模型文件为例，展示在cifar10数据集上进行训练，测试，推理的过程。
 
