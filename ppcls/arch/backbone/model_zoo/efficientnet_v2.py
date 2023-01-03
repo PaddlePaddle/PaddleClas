@@ -268,7 +268,7 @@ v2_xl_block = [  # only for 21k pretraining.
 ]
 efficientnetv2_params = {
     # params:            (block, width, depth, dropout)
-    "efficientnetv2-s": (v2_s_block, 1.0, 1.0, 0.2),
+    "efficientnetv2-s": (v2_s_block, 1.0, 1.0, np.linspace(0.1, 0.3, 4)),
     "efficientnetv2-m": (v2_m_block, 1.0, 1.0, 0.3),
     "efficientnetv2-l": (v2_l_block, 1.0, 1.0, 0.4),
     "efficientnetv2-xl": (v2_xl_block, 1.0, 1.0, 0.4),
@@ -293,7 +293,7 @@ def efficientnetv2_config(model_name: str):
         act_fn="silu",
         survival_prob=0.8,
         local_pooling=False,
-        conv_dropout=None,
+        conv_dropout=0,
         num_classes=1000))
     return cfg
 
@@ -756,8 +756,10 @@ class Head(nn.Layer):
 
         self._avg_pooling = nn.AdaptiveAvgPool2D(output_size=1)
 
-        if self.dropout_rate > 0:
-            self._dropout = nn.Dropout(self.dropout_rate)
+        if isinstance(self.dropout_rate,
+                      (list, tuple)) or self.dropout_rate > 0:
+            self._dropout = nn.Dropout(self.dropout_rate[0] if isinstance(
+                self.dropout_rate, (list, tuple)) else self.dropout_rate)
         else:
             self._dropout = None
 

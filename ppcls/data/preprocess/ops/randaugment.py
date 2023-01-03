@@ -176,9 +176,14 @@ class RandomApply(object):
 class RandAugmentV2(RandAugment):
     """Customed RandAugment for EfficientNetV2"""
 
-    def __init__(self, num_layers=2, magnitude=5, fillcolor=(128, 128, 128)):
+    def __init__(self,
+                 num_layers=2,
+                 magnitude=5,
+                 progress_magnitude=None,
+                 fillcolor=(128, 128, 128)):
         super().__init__(num_layers, magnitude, fillcolor)
-        abso_level = self.magnitude / self.max_level  # [5.0~10.0/10.0]=[0.5, 1.0]
+        self.progress_magnitude = progress_magnitude
+        abso_level = self.magnitude / self.max_level
         self.level_map = {
             "shearX": 0.3 * abso_level,
             "shearY": 0.3 * abso_level,

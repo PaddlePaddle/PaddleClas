@@ -439,6 +439,7 @@ class RandCropImage(object):
 
     def __init__(self,
                  size,
+                 progress_size=None,
                  scale=None,
                  ratio=None,
                  interpolation=None,
@@ -448,6 +449,7 @@ class RandCropImage(object):
         else:
             self.size = size
 
+        self.progress_size = progress_size
         self.scale = [0.08, 1.0] if scale is None else scale
         self.ratio = [3. / 4., 4. / 3.] if ratio is None else ratio
 
