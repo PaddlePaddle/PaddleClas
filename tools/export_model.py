@@ -24,7 +24,7 @@ import paddle
 import paddle.nn as nn
 
 from ppcls.utils import config
-from ppcls.engine.engine import Engine
+from ppcls.engine import choose_engine
 
 if __name__ == "__main__":
     args = config.parse_args()
@@ -32,5 +32,5 @@ if __name__ == "__main__":
         args.config, overrides=args.override, show=False)
     if config["Arch"].get("use_sync_bn", False):
         config["Arch"]["use_sync_bn"] = False
-    engine = Engine(config, mode="export")
+    engine = choose_engine(config, mode="export")
     engine.export()

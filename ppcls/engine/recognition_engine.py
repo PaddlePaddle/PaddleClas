@@ -55,11 +55,13 @@ from ppcls.utils import profiler
 class RecognitionEngine(BaseEngine):
     def __init__(self, config, mode="train"):
         super().__init__(config, mode=mode)
-        self.eval_mode = self.config["Global"].get("eval_mode", "recognition").lower()
-        self.train_mode = self.config["Global"].get("train_mode", "recognition").lower()
-        self.build_component()
-        self.set_train_attribute()
-    
+        self.eval_mode = self.config["Global"].get("eval_mode",
+                                                   "recognition").lower()
+        self.train_mode = self.config["Global"].get("train_mode",
+                                                    "recognition").lower()
+        self._build_component()
+        self._set_train_attribute()
+
     def train_epoch(self, epoch_id, print_batch_step):
         tic = time.time()
         if not hasattr(self, "train_dataloader_iter"):
@@ -141,16 +143,19 @@ class RecognitionEngine(BaseEngine):
             if getattr(self.lr_sch[i], "by_epoch", False) and \
                     type_name(self.lr_sch[i]) != "ReduceOnPlateau":
                 self.lr_sch[i].step()
-    
+
     def eval_epoch(self, epoch_id=0):
         self.model.eval()
         # step1. build query & gallery
         if self.gallery_query_dataloader is not None:
-            gallery_feas, gallery_img_id, gallery_unique_id = self._cal_feature(name='gallery_query')
+            gallery_feas, gallery_img_id, gallery_unique_id = self._cal_feature(
+                name='gallery_query')
             query_feas, query_img_id, query_unique_id = gallery_feas, gallery_img_id, gallery_unique_id
         else:
-            gallery_feas, gallery_img_id, gallery_unique_id = self._cal_feature(name='gallery')
-            query_feas, query_img_id, query_unique_id = self._cal_feature(name='query')
+            gallery_feas, gallery_img_id, gallery_unique_id = self._cal_feature(
+                name='gallery')
+            query_feas, query_img_id, query_unique_id = self._cal_feature(
+                name='query')
 
         # step2. split data into blocks so as to save memory
         sim_block_size = self.config["Global"].get("sim_block_size", 64)
@@ -162,7 +167,8 @@ class RecognitionEngine(BaseEngine):
         if query_unique_id is not None:
             query_unique_id_blocks = paddle.split(
                 query_unique_id, num_or_sections=sections)
-        query_img_id_blocks = paddle.split(query_img_id, num_or_sections=sections)
+        query_img_id_blocks = paddle.split(
+            query_img_id, num_or_sections=sections)
         metric_key = None
 
         # step3. do evaluation
@@ -195,12 +201,13 @@ class RecognitionEngine(BaseEngine):
 
                 # set inf(1e9) distance to those exist in gallery
                 distmat = distmat * keep_mask.astype("float32")
-                inf_mat = (paddle.logical_not(keep_mask).astype("float32")) * 1e20
+                inf_mat = (
+                    paddle.logical_not(keep_mask).astype("float32")) * 1e20
                 distmat = distmat + inf_mat
 
                 # compute metric
                 metric_tmp = self.eval_metric_func(distmat, query_img_id,
-                                                    gallery_img_id, keep_mask)
+                                                   gallery_img_id, keep_mask)
                 for key in metric_tmp:
                     metric_dict[key] = metric_tmp[key]
             else:
@@ -209,15 +216,17 @@ class RecognitionEngine(BaseEngine):
                     similarity_matrix = paddle.matmul(
                         block_fea, gallery_feas, transpose_y=True)  # [n,m]
                     if query_unique_id is not None:
-                        query_unique_id_block = query_unique_id_blocks[block_idx]
+                        query_unique_id_block = query_unique_id_blocks[
+                            block_idx]
                         unique_id_mask = (
                             query_unique_id_block != gallery_unique_id.t())
 
                         query_img_id_block = query_img_id_blocks[block_idx]
-                        image_id_mask = (query_img_id_block != gallery_img_id.t())
+                        image_id_mask = (
+                            query_img_id_block != gallery_img_id.t())
 
                         keep_mask = paddle.logical_or(image_id_mask,
-                                                    unique_id_mask)
+                                                      unique_id_mask)
                         similarity_matrix = similarity_matrix * keep_mask.astype(
                             "float32")
                     else:
@@ -229,11 +238,11 @@ class RecognitionEngine(BaseEngine):
 
                     for key in metric_tmp:
                         if key not in metric_dict:
-                            metric_dict[key] = metric_tmp[key] * block_fea.shape[
-                                0] / len(query_feas)
+                            metric_dict[key] = metric_tmp[
+                                key] * block_fea.shape[0] / len(query_feas)
                         else:
-                            metric_dict[key] += metric_tmp[key] * block_fea.shape[
-                                0] / len(query_feas)
+                            metric_dict[key] += metric_tmp[
+                                key] * block_fea.shape[0] / len(query_feas)
 
         metric_info_list = []
         for key in metric_dict:
@@ -244,7 +253,6 @@ class RecognitionEngine(BaseEngine):
         logger.info("[Eval][Epoch {}][Avg]{}".format(epoch_id, metric_msg))
 
         return metric_dict[metric_key]
-
 
     def _cal_feature(self, name='gallery'):
         has_unique_id = False
@@ -262,8 +270,8 @@ class RecognitionEngine(BaseEngine):
         batch_feas_list = []
         img_id_list = []
         unique_id_list = []
-        max_iter = len(dataloader) - 1 if platform.system() == "Windows" else len(
-            dataloader)
+        max_iter = len(dataloader) - 1 if platform.system(
+        ) == "Windows" else len(dataloader)
         for idx, batch in enumerate(dataloader):  # load is very time-consuming
             if idx >= max_iter:
                 break
@@ -291,7 +299,7 @@ class RecognitionEngine(BaseEngine):
 
             # get features
             if self.config["Global"].get("retrieval_feature_from",
-                                        "features") == "features":
+                                         "features") == "features":
                 # use neck's output as features
                 batch_feas = out["features"]
             else:
@@ -301,12 +309,14 @@ class RecognitionEngine(BaseEngine):
             # do norm
             if self.config["Global"].get("feature_normalize", True):
                 feas_norm = paddle.sqrt(
-                    paddle.sum(paddle.square(batch_feas), axis=1, keepdim=True))
+                    paddle.sum(paddle.square(batch_feas), axis=1,
+                               keepdim=True))
                 batch_feas = paddle.divide(batch_feas, feas_norm)
 
             # do binarize
             if self.config["Global"].get("feature_binarize") == "round":
-                batch_feas = paddle.round(batch_feas).astype("float32") * 2.0 - 1.0
+                batch_feas = paddle.round(batch_feas).astype(
+                    "float32") * 2.0 - 1.0
 
             if self.config["Global"].get("feature_binarize") == "sign":
                 batch_feas = paddle.sign(batch_feas).astype("float32")
@@ -344,18 +354,18 @@ class RecognitionEngine(BaseEngine):
         if has_unique_id:
             all_unique_id = all_unique_id[:total_samples]
 
-        logger.info("Build {} done, all feat shape: {}, begin to eval..".format(
-            name, all_feas.shape))
+        logger.info("Build {} done, all feat shape: {}, begin to eval..".
+                    format(name, all_feas.shape))
         return all_feas, all_img_id, all_unique_id
 
-
-    def _re_ranking(self, query_feas: paddle.Tensor,
-                gallery_feas: paddle.Tensor,
-                k1: int=20,
-                k2: int=6,
-                lambda_value: int=0.5,
-                local_distmat: Optional[np.ndarray]=None,
-                only_local: bool=False) -> paddle.Tensor:
+    def _re_ranking(self,
+                    query_feas: paddle.Tensor,
+                    gallery_feas: paddle.Tensor,
+                    k1: int=20,
+                    k2: int=6,
+                    lambda_value: int=0.5,
+                    local_distmat: Optional[np.ndarray]=None,
+                    only_local: bool=False) -> paddle.Tensor:
         """re-ranking, most computed with numpy
 
         code heavily based on
@@ -392,14 +402,16 @@ class RecognitionEngine(BaseEngine):
                 original_dist = original_dist + local_distmat
 
         gallery_num = original_dist.shape[0]
-        original_dist = np.transpose(original_dist / np.max(original_dist, axis=0))
+        original_dist = np.transpose(original_dist / np.max(original_dist,
+                                                            axis=0))
         V = np.zeros_like(original_dist).astype(np.float16)
         initial_rank = np.argsort(original_dist).astype(np.int32)
         logger.info('starting re_ranking')
         for i in range(all_num):
             # k-reciprocal neighbors
             forward_k_neigh_index = initial_rank[i, :k1 + 1]
-            backward_k_neigh_index = initial_rank[forward_k_neigh_index, :k1 + 1]
+            backward_k_neigh_index = initial_rank[forward_k_neigh_index, :k1 +
+                                                  1]
             fi = np.where(backward_k_neigh_index == i)[0]
             k_reciprocal_index = forward_k_neigh_index[fi]
             k_reciprocal_expansion_index = k_reciprocal_index
@@ -408,19 +420,22 @@ class RecognitionEngine(BaseEngine):
                 candidate_forward_k_neigh_index = initial_rank[candidate, :int(
                     np.around(k1 / 2)) + 1]
                 candidate_backward_k_neigh_index = initial_rank[
-                    candidate_forward_k_neigh_index, :int(np.around(k1 / 2)) + 1]
+                    candidate_forward_k_neigh_index, :int(np.around(k1 /
+                                                                    2)) + 1]
                 fi_candidate = np.where(
                     candidate_backward_k_neigh_index == candidate)[0]
                 candidate_k_reciprocal_index = candidate_forward_k_neigh_index[
                     fi_candidate]
                 if len(
                         np.intersect1d(candidate_k_reciprocal_index,
-                                    k_reciprocal_index)) > 2 / 3 * len(
-                                        candidate_k_reciprocal_index):
+                                       k_reciprocal_index)) > 2 / 3 * len(
+                                           candidate_k_reciprocal_index):
                     k_reciprocal_expansion_index = np.append(
-                        k_reciprocal_expansion_index, candidate_k_reciprocal_index)
+                        k_reciprocal_expansion_index,
+                        candidate_k_reciprocal_index)
 
-            k_reciprocal_expansion_index = np.unique(k_reciprocal_expansion_index)
+            k_reciprocal_expansion_index = np.unique(
+                k_reciprocal_expansion_index)
             weight = np.exp(-original_dist[i, k_reciprocal_expansion_index])
             V[i, k_reciprocal_expansion_index] = weight / np.sum(weight)
         original_dist = original_dist[:query_num, ]
@@ -441,12 +456,13 @@ class RecognitionEngine(BaseEngine):
             indNonZero = np.where(V[i, :] != 0)[0]
             indImages = [invIndex[ind] for ind in indNonZero]
             for j in range(len(indNonZero)):
-                temp_min[0, indImages[j]] = temp_min[0, indImages[j]] + np.minimum(
-                    V[i, indNonZero[j]], V[indImages[j], indNonZero[j]])
+                temp_min[0, indImages[j]] = temp_min[0, indImages[
+                    j]] + np.minimum(V[i, indNonZero[j]],
+                                     V[indImages[j], indNonZero[j]])
             jaccard_dist[i] = 1 - temp_min / (2 - temp_min)
 
         final_dist = jaccard_dist * (1 - lambda_value
-                                    ) + original_dist * lambda_value
+                                     ) + original_dist * lambda_value
         del original_dist
         del V
         del jaccard_dist

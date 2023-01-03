@@ -53,8 +53,10 @@ class BaseEngine(ABC):
         assert mode in ["train", "eval", "infer", "export"]
         self.mode = mode
         self.config = config
-        self.eval_mode = self.config["Global"].get("eval_mode", "classification").lower()
-        self.train_mode = self.config["Global"].get("train_mode", "classification").lower()
+        self.eval_mode = self.config["Global"].get("eval_mode",
+                                                   "classification").lower()
+        self.train_mode = self.config["Global"].get("train_mode",
+                                                    "classification").lower()
 
         # init logger
         self.output_dir = self.config['Global']['output_dir']
@@ -89,7 +91,13 @@ class BaseEngine(ABC):
         # global iter counter
         self.global_step = 0
 
-    def build_component(self, build_dataloader=True, build_model=True, build_loss=True, build_optimizer=True, build_metrics=True, build_process=True):
+    def _build_component(self,
+                         build_dataloader=True,
+                         build_model=True,
+                         build_loss=True,
+                         build_optimizer=True,
+                         build_metrics=True,
+                         build_process=True):
         # gradient accumulation
         self.update_freq = self.config["Global"].get("update_freq", 1)
 
@@ -111,9 +119,8 @@ class BaseEngine(ABC):
         if self.mode == "eval" or (self.mode == "train" and
                                    self.config["Global"]["eval_during_train"]):
             self.eval_dataloader = build_dataloader(
-                self.config["DataLoader"], "Eval", self.device,
-                self.use_dali)
-           
+                self.config["DataLoader"], "Eval", self.device, self.use_dali)
+
         # build loss
         if self.mode == "train":
             label_loss_info = self.config["Loss"]["Train"]
@@ -122,7 +129,8 @@ class BaseEngine(ABC):
         if self.mode == "eval" or (self.mode == "train" and
                                    self.config["Global"]["eval_during_train"]):
             loss_config = self.config.get("Loss", None)
-            if loss_config is not None and loss_config.get("Eval", None) is not None:
+            if loss_config is not None and loss_config.get("Eval",
+                                                           None) is not None:
                 self.eval_loss_func = build_loss(loss_config.get("Eval"))
 
         # build metric
@@ -171,7 +179,7 @@ class BaseEngine(ABC):
             self.postprocess_func = build_postprocess(self.config["Infer"][
                 "PostProcess"])
 
-    def set_train_attribute(self):
+    def _set_train_attribute(self):
         # set seed
         self.seed = self.config["Global"].get("seed", None)
         if self.seed or self.seed == 0:
@@ -186,7 +194,8 @@ class BaseEngine(ABC):
             assert self.model, "Please build model before using paddle.DataParallel."
             assert self.train_loss_func, "Please build train_loss before using paddle.DataParallel"
             self.model = paddle.DataParallel(self.model)
-            if self.mode == 'train' and len(self.train_loss_func.parameters()) > 0:
+            if self.mode == 'train' and len(self.train_loss_func.parameters(
+            )) > 0:
                 self.train_loss_func = paddle.DataParallel(
                     self.train_loss_func)
 
@@ -202,7 +211,7 @@ class BaseEngine(ABC):
             paddle.seed(int(self.seed) + dist.get_rank())
             np.random.seed(int(self.seed) + dist.get_rank())
             random.seed(int(self.seed) + dist.get_rank())
-        
+
         # AMP training and evaluating
         self.amp = "AMP" in self.config and self.config["AMP"] is not None
         self.amp_eval = False
@@ -245,12 +254,13 @@ class BaseEngine(ABC):
             # paddle version < 2.3.0 and not develop
 
             model, optimizer = paddle.amp.decorate(
-                        models=self.model,
-                        optimizers=self.optimizer,
-                        level=self.amp_level,
-                        save_dtype='float32')
+                models=self.model,
+                optimizers=self.optimizer,
+                level=self.amp_level,
+                save_dtype='float32')
 
-            if (float(paddle_version) >=2.3 or float(paddle_version) == 0.0) and self.amp_level == "O2" and self.amp_eval:
+            if (float(paddle_version) >= 2.3 or float(paddle_version) == 0.0
+                ) and self.amp_level == "O2" and self.amp_eval:
                 msg = "The PaddlePaddle that installed not support FP16 evaluation in AMP O2. Please use PaddlePaddle version >= 2.3.0. Use FP32 evaluation instead and please notice the Eval Dataset output_fp16 should be 'False'."
                 logger.warning(msg)
                 self.amp_eval = False
@@ -454,7 +464,7 @@ class BaseEngine(ABC):
         logger.info(
             f"Export succeeded! The inference model exported has been saved in \"{self.config['Global']['save_inference_dir']}\"."
         )
-    
+
     @abstractmethod
     def train_epoch(self, epoch_id, print_batch_step):
         pass

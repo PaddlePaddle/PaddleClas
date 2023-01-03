@@ -44,7 +44,6 @@ from ppcls.data.postprocess import build_postprocess
 from ppcls.data import create_operators
 from ppcls.self import train as train_method
 from ppcls.self.train.utils import type_name
-from ppcls.self import evaluation
 from ppcls.arch.gears.identity_head import IdentityHead
 from ppcls.self.train.utils import update_loss, update_metric, log_info, type_name
 from ppcls.utils import profiler
@@ -53,9 +52,9 @@ from ppcls.utils import profiler
 class ClassEngine(BaseEngine):
     def __init__(self, config, mode="train"):
         super().__init__(config, mode=mode)
-        self.build_component()
-        self.set_train_attribute()
-    
+        self._build_component()
+        self._set_train_attribute()
+
     def train_epoch(self, epoch_id, print_batch_step):
         tic = time.time()
         if not hasattr(self, "train_dataloader_iter"):
@@ -137,7 +136,7 @@ class ClassEngine(BaseEngine):
             if getattr(self.lr_sch[i], "by_epoch", False) and \
                     type_name(self.lr_sch[i]) != "ReduceOnPlateau":
                 self.lr_sch[i].step()
-    
+
     def eval_epoch(self, epoch_id):
         if hasattr(self.eval_metric_func, "reset"):
             self.eval_metric_func.reset()
@@ -214,12 +213,12 @@ class ClassEngine(BaseEngine):
                 if accum_samples > total_samples and not self.use_dali:
                     if isinstance(preds, list):
                         preds = [
-                            pred[:total_samples + current_samples - accum_samples]
-                            for pred in preds
+                            pred[:total_samples + current_samples -
+                                 accum_samples] for pred in preds
                         ]
                     else:
                         preds = preds[:total_samples + current_samples -
-                                    accum_samples]
+                                      accum_samples]
                     labels = labels[:total_samples + current_samples -
                                     accum_samples]
                     current_samples = total_samples + current_samples - accum_samples
@@ -242,7 +241,8 @@ class ClassEngine(BaseEngine):
                 for key in loss_dict:
                     if key not in output_info:
                         output_info[key] = AverageMeter(key, '7.5f')
-                    output_info[key].update(float(loss_dict[key]), current_samples)
+                    output_info[key].update(
+                        float(loss_dict[key]), current_samples)
 
             #  calc metric
             if self.eval_metric_func is not None:
