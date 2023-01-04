@@ -44,9 +44,9 @@ Optimizer:
     # for 8 cards
     name: Cosine
     learning_rate: 1e-3
-    eta_min: 2e-5
+    eta_min: 1e-5
     warmup_epoch: 20
-    warmup_start_lr: 2e-6
+    warmup_start_lr: 1e-6
 
 
 # data loader for train and eval
@@ -123,7 +123,7 @@ DataLoader:
             order: ''
     sampler:
       name: DistributedBatchSampler
-      batch_size: 128
+      batch_size: 32
       drop_last: False
       shuffle: False
     loader:
@@ -138,7 +138,7 @@ Infer:
         to_rgb: True
         channel_first: False
     - ResizeImage:
-        resize_short: 438
+        resize_short: 384
         interpolation: bicubic
         backend: pil
     - CropImage:
