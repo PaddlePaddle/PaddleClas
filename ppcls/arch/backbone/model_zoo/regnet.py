@@ -34,16 +34,28 @@ from ....utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_fro
 MODEL_URLS = {
     "RegNetX_200MF":
     "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/RegNetX_200MF_pretrained.pdparams",
+    "RegNetX_400MF":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/RegNetX_400MF_pretrained.pdparams",
+    "RegNetX_600MF":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/RegNetX_600MF_pretrained.pdparams",
+    "RegNetX_800MF":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/RegNetX_800MF_pretrained.pdparams",
+    "RegNetX_1600MF":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/RegNetX_1600MF_pretrained.pdparams",
+    "RegNetX_3200MF":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/RegNetX_3200MF_pretrained.pdparams",
     "RegNetX_4GF":
     "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/RegNetX_4GF_pretrained.pdparams",
+    "RegNetX_6400MF":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/RegNetX_6400MF_pretrained.pdparams",
+    "RegNetX_8GF":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/RegNetX_8GF_pretrained.pdparams",
+    "RegNetX_12GF":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/RegNetX_12GF_pretrained.pdparams",
+    "RegNetX_16GF":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/RegNetX_16GF_pretrained.pdparams",
     "RegNetX_32GF":
     "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/RegNetX_32GF_pretrained.pdparams",
-    "RegNetY_200MF":
-    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/RegNetY_200MF_pretrained.pdparams",
-    "RegNetY_4GF":
-    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/RegNetY_4GF_pretrained.pdparams",
-    "RegNetY_32GF":
-    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/RegNetY_32GF_pretrained.pdparams",
 }
 
 __all__ = list(MODEL_URLS.keys())
@@ -106,7 +118,7 @@ class ConvBNLayer(nn.Layer):
             padding=padding,
             groups=groups,
             weight_attr=ParamAttr(name=name + ".conv2d.output.1.w_0"),
-            bias_attr=ParamAttr(name=name + ".conv2d.output.1.b_0"))
+            bias_attr=False)
         bn_name = name + "_bn"
         self._batch_norm = BatchNorm(
             num_filters,
@@ -354,6 +366,81 @@ def RegNetX_200MF(pretrained=False, use_ssld=False, **kwargs):
     return model
 
 
+def RegNetX_400MF(pretrained=False, use_ssld=False, **kwargs):
+    model = RegNet(
+        w_a=24.48,
+        w_0=24,
+        w_m=2.54,
+        d=22,
+        group_w=16,
+        bot_mul=1.0,
+        q=8,
+        **kwargs)
+    _load_pretrained(
+        pretrained, model, MODEL_URLS["RegNetX_400MF"], use_ssld=use_ssld)
+    return model
+
+
+def RegNetX_600MF(pretrained=False, use_ssld=False, **kwargs):
+    model = RegNet(
+        w_a=36.97,
+        w_0=48,
+        w_m=2.24,
+        d=16,
+        group_w=24,
+        bot_mul=1.0,
+        q=8,
+        **kwargs)
+    _load_pretrained(
+        pretrained, model, MODEL_URLS["RegNetX_600MF"], use_ssld=use_ssld)
+    return model
+
+
+def RegNetX_800MF(pretrained=False, use_ssld=False, **kwargs):
+    model = RegNet(
+        w_a=35.73,
+        w_0=56,
+        w_m=2.28,
+        d=16,
+        group_w=16,
+        bot_mul=1.0,
+        q=8,
+        **kwargs)
+    _load_pretrained(
+        pretrained, model, MODEL_URLS["RegNetX_800MF"], use_ssld=use_ssld)
+    return model
+
+
+def RegNetX_1600MF(pretrained=False, use_ssld=False, **kwargs):
+    model = RegNet(
+        w_a=34.01,
+        w_0=80,
+        w_m=2.25,
+        d=18,
+        group_w=24,
+        bot_mul=1.0,
+        q=8,
+        **kwargs)
+    _load_pretrained(
+        pretrained, model, MODEL_URLS["RegNetX_1600MF"], use_ssld=use_ssld)
+    return model
+
+
+def RegNetX_3200MF(pretrained=False, use_ssld=False, **kwargs):
+    model = RegNet(
+        w_a=26.31,
+        w_0=88,
+        w_m=2.25,
+        d=25,
+        group_w=48,
+        bot_mul=1.0,
+        q=8,
+        **kwargs)
+    _load_pretrained(
+        pretrained, model, MODEL_URLS["RegNetX_3200MF"], use_ssld=use_ssld)
+    return model
+
+
 def RegNetX_4GF(pretrained=False, use_ssld=False, **kwargs):
     model = RegNet(
         w_a=38.65,
@@ -369,6 +456,66 @@ def RegNetX_4GF(pretrained=False, use_ssld=False, **kwargs):
     return model
 
 
+def RegNetX_6400MF(pretrained=False, use_ssld=False, **kwargs):
+    model = RegNet(
+        w_a=60.83,
+        w_0=184,
+        w_m=2.07,
+        d=17,
+        group_w=56,
+        bot_mul=1.0,
+        q=8,
+        **kwargs)
+    _load_pretrained(
+        pretrained, model, MODEL_URLS["RegNetX_6400MF"], use_ssld=use_ssld)
+    return model
+
+
+def RegNetX_8GF(pretrained=False, use_ssld=False, **kwargs):
+    model = RegNet(
+        w_a=49.56,
+        w_0=80,
+        w_m=2.88,
+        d=23,
+        group_w=120,
+        bot_mul=1.0,
+        q=8,
+        **kwargs)
+    _load_pretrained(
+        pretrained, model, MODEL_URLS["RegNetX_8GF"], use_ssld=use_ssld)
+    return model
+
+
+def RegNetX_12GF(pretrained=False, use_ssld=False, **kwargs):
+    model = RegNet(
+        w_a=73.36,
+        w_0=168,
+        w_m=2.37,
+        d=19,
+        group_w=112,
+        bot_mul=1.0,
+        q=8,
+        **kwargs)
+    _load_pretrained(
+        pretrained, model, MODEL_URLS["RegNetX_12GF"], use_ssld=use_ssld)
+    return model
+
+
+def RegNetX_16GF(pretrained=False, use_ssld=False, **kwargs):
+    model = RegNet(
+        w_a=55.59,
+        w_0=216,
+        w_m=2.1,
+        d=22,
+        group_w=128,
+        bot_mul=1.0,
+        q=8,
+        **kwargs)
+    _load_pretrained(
+        pretrained, model, MODEL_URLS["RegNetX_16GF"], use_ssld=use_ssld)
+    return model
+
+
 def RegNetX_32GF(pretrained=False, use_ssld=False, **kwargs):
     model = RegNet(
         w_a=69.86,
@@ -378,54 +525,6 @@ def RegNetX_32GF(pretrained=False, use_ssld=False, **kwargs):
         group_w=168,
         bot_mul=1.0,
         q=8,
-        **kwargs)
-    _load_pretrained(
-        pretrained, model, MODEL_URLS["RegNetX_32GF"], use_ssld=use_ssld)
-    return model
-
-
-def RegNetY_200MF(pretrained=False, use_ssld=False, **kwargs):
-    model = RegNet(
-        w_a=36.44,
-        w_0=24,
-        w_m=2.49,
-        d=13,
-        group_w=8,
-        bot_mul=1.0,
-        q=8,
-        se_on=True,
-        **kwargs)
-    _load_pretrained(
-        pretrained, model, MODEL_URLS["RegNetX_32GF"], use_ssld=use_ssld)
-    return model
-
-
-def RegNetY_4GF(pretrained=False, use_ssld=False, **kwargs):
-    model = RegNet(
-        w_a=31.41,
-        w_0=96,
-        w_m=2.24,
-        d=22,
-        group_w=64,
-        bot_mul=1.0,
-        q=8,
-        se_on=True,
-        **kwargs)
-    _load_pretrained(
-        pretrained, model, MODEL_URLS["RegNetX_32GF"], use_ssld=use_ssld)
-    return model
-
-
-def RegNetY_32GF(pretrained=False, use_ssld=False, **kwargs):
-    model = RegNet(
-        w_a=115.89,
-        w_0=232,
-        w_m=2.53,
-        d=20,
-        group_w=232,
-        bot_mul=1.0,
-        q=8,
-        se_on=True,
         **kwargs)
     _load_pretrained(
         pretrained, model, MODEL_URLS["RegNetX_32GF"], use_ssld=use_ssld)

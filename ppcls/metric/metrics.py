@@ -218,6 +218,62 @@ class TprAtFpr(nn.Layer):
         return result
 
 
+class MultilabelMeanAccuracy(nn.Layer):
+    def __init__(self,
+                 start_threshold=0.4,
+                 num_iterations=10,
+                 end_threshold=0.9):
+        super().__init__()
+        self.start_threshold = start_threshold
+        self.num_iterations = num_iterations
+        self.end_threshold = end_threshold
+        self.gt_all_score_list = []
+        self.gt_label_score_list = []
+        self.max_acc = 0.
+
+    def forward(self, x, label):
+        if isinstance(x, dict):
+            x = x["logits"]
+        x = F.sigmoid(x)
+        label = label[:, 0, :]
+        for i in range(len(x)):
+            self.gt_all_score_list.append(x[i].numpy())
+            self.gt_label_score_list.append(label[i].numpy())
+        return {}
+
+    def reset(self):
+        self.gt_all_score_list = []
+        self.gt_label_score_list = []
+        self.max_acc = 0.
+
+    @property
+    def avg(self):
+        return self.max_acc
+
+    @property
+    def avg_info(self):
+        max_acc = 0.
+        result = ""
+        gt_all_score_list = np.array(self.gt_all_score_list)
+        gt_label_score_list = np.array(self.gt_label_score_list)
+        for i in range(self.num_iterations):
+            threshold = self.start_threshold + i * (self.end_threshold -
+                                                    self.start_threshold
+                                                    ) / self.num_iterations
+            pred_label = (gt_all_score_list > threshold).astype(int)
+            TP = np.sum(
+                (gt_label_score_list == 1) * (pred_label == 1)).astype(float)
+            TN = np.sum(
+                (gt_label_score_list == 0) * (pred_label == 0)).astype(float)
+            acc = (TP + TN) / len(gt_all_score_list)
+            if max_acc <= acc:
+                max_acc = acc
+                result = "threshold: {}, mean_acc: {}".format(
+                    threshold, max_acc / len(gt_label_score_list[0]))
+        self.max_acc = max_acc / len(gt_label_score_list[0])
+        return result
+
+
 class Recallk(nn.Layer):
     def __init__(self, topk=(1, 5), descending=True):
         super().__init__()

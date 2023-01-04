@@ -86,6 +86,8 @@ DataLoader:
             channel_first: False
         - ResizeImage:
             resize_short: 256
+            interpolation: bicubic
+            backend: pil
         - CropImage:
             size: 224
         - NormalizeImage:
@@ -95,7 +97,7 @@ DataLoader:
             order: ''
     sampler:
       name: DistributedBatchSampler
-      batch_size: 64
+      batch_size: 128
       drop_last: False
       shuffle: False
     loader:
@@ -111,6 +113,8 @@ Infer:
         channel_first: False
     - ResizeImage:
         resize_short: 256
+        interpolation: bicubic
+        backend: pil
     - CropImage:
         size: 224
     - NormalizeImage:

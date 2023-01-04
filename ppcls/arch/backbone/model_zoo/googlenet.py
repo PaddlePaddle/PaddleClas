@@ -49,7 +49,8 @@ class ConvLayer(nn.Layer):
                  stride=1,
                  groups=1,
                  act=None,
-                 name=None):
+                 name=None,
+                 data_format="NCHW"):
         super(ConvLayer, self).__init__()
 
         self._conv = Conv2D(
@@ -60,7 +61,8 @@ class ConvLayer(nn.Layer):
             padding=(filter_size - 1) // 2,
             groups=groups,
             weight_attr=ParamAttr(name=name + "_weights"),
-            bias_attr=False)
+            bias_attr=False,
+            data_format=data_format)
 
     def forward(self, inputs):
         y = self._conv(inputs)
@@ -77,29 +79,50 @@ class Inception(nn.Layer):
                  filter5R,
                  filter5,
                  proj,
-                 name=None):
+                 name=None,
+                 data_format="NCHW"):
         super(Inception, self).__init__()
+        self.data_format = data_format
 
         self._conv1 = ConvLayer(
-            input_channels, filter1, 1, name="inception_" + name + "_1x1")
+            input_channels,
+            filter1,
+            1,
+            name="inception_" + name + "_1x1",
+            data_format=data_format)
         self._conv3r = ConvLayer(
             input_channels,
             filter3R,
             1,
-            name="inception_" + name + "_3x3_reduce")
+            name="inception_" + name + "_3x3_reduce",
+            data_format=data_format)
         self._conv3 = ConvLayer(
-            filter3R, filter3, 3, name="inception_" + name + "_3x3")
+            filter3R,
+            filter3,
+            3,
+            name="inception_" + name + "_3x3",
+            data_format=data_format)
         self._conv5r = ConvLayer(
             input_channels,
             filter5R,
             1,
-            name="inception_" + name + "_5x5_reduce")
+            name="inception_" + name + "_5x5_reduce",
+            data_format=data_format)
         self._conv5 = ConvLayer(
-            filter5R, filter5, 5, name="inception_" + name + "_5x5")
-        self._pool = MaxPool2D(kernel_size=3, stride=1, padding=1)
+            filter5R,
+            filter5,
+            5,
+            name="inception_" + name + "_5x5",
+            data_format=data_format)
+        self._pool = MaxPool2D(
+            kernel_size=3, stride=1, padding=1, data_format=data_format)
 
         self._convprj = ConvLayer(
-            input_channels, proj, 1, name="inception_" + name + "_3x3_proj")
+            input_channels,
+            proj,
+            1,
+            name="inception_" + name + "_3x3_proj",
+            data_format=data_format)
 
     def forward(self, inputs):
         conv1 = self._conv1(inputs)
@@ -113,50 +136,142 @@ class Inception(nn.Layer):
         pool = self._pool(inputs)
         convprj = self._convprj(pool)
 
-        cat = paddle.concat([conv1, conv3, conv5, convprj], axis=1)
+        if self.data_format == "NHWC":
+            cat = paddle.concat([conv1, conv3, conv5, convprj], axis=3)
+        else:
+            cat = paddle.concat([conv1, conv3, conv5, convprj], axis=1)
         cat = F.relu(cat)
         return cat
 
 
 class GoogLeNetDY(nn.Layer):
-    def __init__(self, class_num=1000):
+    def __init__(self, class_num=1000, data_format="NCHW"):
         super(GoogLeNetDY, self).__init__()
-        self._conv = ConvLayer(3, 64, 7, 2, name="conv1")
-        self._pool = MaxPool2D(kernel_size=3, stride=2)
-        self._conv_1 = ConvLayer(64, 64, 1, name="conv2_1x1")
-        self._conv_2 = ConvLayer(64, 192, 3, name="conv2_3x3")
+        self.data_format = data_format
+        self._conv = ConvLayer(
+            3, 64, 7, 2, name="conv1", data_format=data_format)
+        self._pool = MaxPool2D(
+            kernel_size=3, stride=2, data_format=data_format)
+        self._conv_1 = ConvLayer(
+            64, 64, 1, name="conv2_1x1", data_format=data_format)
+        self._conv_2 = ConvLayer(
+            64, 192, 3, name="conv2_3x3", data_format=data_format)
 
         self._ince3a = Inception(
-            192, 192, 64, 96, 128, 16, 32, 32, name="ince3a")
+            192,
+            192,
+            64,
+            96,
+            128,
+            16,
+            32,
+            32,
+            name="ince3a",
+            data_format=data_format)
         self._ince3b = Inception(
-            256, 256, 128, 128, 192, 32, 96, 64, name="ince3b")
+            256,
+            256,
+            128,
+            128,
+            192,
+            32,
+            96,
+            64,
+            name="ince3b",
+            data_format=data_format)
 
         self._ince4a = Inception(
-            480, 480, 192, 96, 208, 16, 48, 64, name="ince4a")
+            480,
+            480,
+            192,
+            96,
+            208,
+            16,
+            48,
+            64,
+            name="ince4a",
+            data_format=data_format)
         self._ince4b = Inception(
-            512, 512, 160, 112, 224, 24, 64, 64, name="ince4b")
+            512,
+            512,
+            160,
+            112,
+            224,
+            24,
+            64,
+            64,
+            name="ince4b",
+            data_format=data_format)
         self._ince4c = Inception(
-            512, 512, 128, 128, 256, 24, 64, 64, name="ince4c")
+            512,
+            512,
+            128,
+            128,
+            256,
+            24,
+            64,
+            64,
+            name="ince4c",
+            data_format=data_format)
         self._ince4d = Inception(
-            512, 512, 112, 144, 288, 32, 64, 64, name="ince4d")
+            512,
+            512,
+            112,
+            144,
+            288,
+            32,
+            64,
+            64,
+            name="ince4d",
+            data_format=data_format)
         self._ince4e = Inception(
-            528, 528, 256, 160, 320, 32, 128, 128, name="ince4e")
+            528,
+            528,
+            256,
+            160,
+            320,
+            32,
+            128,
+            128,
+            name="ince4e",
+            data_format=data_format)
 
         self._ince5a = Inception(
-            832, 832, 256, 160, 320, 32, 128, 128, name="ince5a")
+            832,
+            832,
+            256,
+            160,
+            320,
+            32,
+            128,
+            128,
+            name="ince5a",
+            data_format=data_format)
         self._ince5b = Inception(
-            832, 832, 384, 192, 384, 48, 128, 128, name="ince5b")
+            832,
+            832,
+            384,
+            192,
+            384,
+            48,
+            128,
+            128,
+            name="ince5b",
+            data_format=data_format)
 
-        self._pool_5 = AdaptiveAvgPool2D(1)
+        self._pool_5 = AdaptiveAvgPool2D(1, data_format=data_format)
 
         self._drop = Dropout(p=0.4, mode="downscale_in_infer")
+        self.flatten = nn.Flatten()
         self._fc_out = Linear(
             1024,
             class_num,
             weight_attr=xavier(1024, 1, "out"),
             bias_attr=ParamAttr(name="out_offset"))
-        self._pool_o1 = AvgPool2D(kernel_size=5, stride=3)
-        self._conv_o1 = ConvLayer(512, 128, 1, name="conv_o1")
+        self._pool_o1 = AvgPool2D(
+            kernel_size=5, stride=3, data_format=data_format)
+        self._conv_o1 = ConvLayer(
+            512, 128, 1, name="conv_o1", data_format=data_format)
         self._fc_o1 = Linear(
             1152,
             1024,
@@ -168,8 +283,10 @@ class GoogLeNetDY(nn.Layer):
             class_num,
             weight_attr=xavier(1024, 1, "out1"),
             bias_attr=ParamAttr(name="out1_offset"))
-        self._pool_o2 = AvgPool2D(kernel_size=5, stride=3)
-        self._conv_o2 = ConvLayer(528, 128, 1, name="conv_o2")
+        self._pool_o2 = AvgPool2D(
+            kernel_size=5, stride=3, data_format=data_format)
+        self._conv_o2 = ConvLayer(
+            528, 128, 1, name="conv_o2", data_format=data_format)
         self._fc_o2 = Linear(
             1152,
             1024,
@@ -183,6 +300,9 @@ class GoogLeNetDY(nn.Layer):
             bias_attr=ParamAttr(name="out2_offset"))
 
     def forward(self, inputs):
+        if self.data_format == "NHWC":
+            inputs = paddle.transpose(inputs, [0, 2, 3, 1])
+            inputs.stop_gradient = True
         x = self._conv(inputs)
         x = self._pool(x)
         x = self._conv_1(x)
@@ -205,12 +325,12 @@ class GoogLeNetDY(nn.Layer):
 
         x = self._pool_5(ince5b)
         x = self._drop(x)
-        x = paddle.squeeze(x, axis=[2, 3])
+        x = self.flatten(x)
         out = self._fc_out(x)
 
         x = self._pool_o1(ince4a)
         x = self._conv_o1(x)
-        x = paddle.flatten(x, start_axis=1, stop_axis=-1)
+        x = self.flatten(x)
         x = self._fc_o1(x)
         x = F.relu(x)
         x = self._drop_o1(x)
@@ -218,7 +338,7 @@ class GoogLeNetDY(nn.Layer):
 
         x = self._pool_o2(ince4d)
         x = self._conv_o2(x)
-        x = paddle.flatten(x, start_axis=1, stop_axis=-1)
+        x = self.flatten(x)
         x = self._fc_o2(x)
         x = self._drop_o2(x)
         out2 = self._out2(x)
