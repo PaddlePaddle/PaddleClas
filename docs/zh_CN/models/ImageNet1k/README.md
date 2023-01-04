@@ -43,7 +43,7 @@
   - [4.1 服务器端模型](#Transformer_server)
     - [ViT 系列](#ViT)
     - [DeiT 系列](#DeiT)
-    - [SwinTransformer 系列](#SwinTransformer)
+    - [SwinTransformer & SwinTransformerV2系列](#SwinTransformer)
     - [Twins 系列](#Twins)
     - [CSwinTransformer 系列](#CSwinTransformer)
     - [PVTV2 系列](#PVTV2)
@@ -636,7 +636,7 @@ DeiT（Data-efficient Image Transformers）系列模型的精度、速度指标�
 
 <a name="SwinTransformer"></a>
 
-## SwinTransformer 系列 <sup>[[27](#ref27)]</sup>
+## SwinTransformer  & SwinTransformerV2 系列 <sup>[[27](#ref27)]</sup><sup>[[50](#ref50)]</sup>
 
 关于 SwinTransformer 系列模型的精度、速度指标如下表所示，更多介绍可以参考：[SwinTransformer 系列模型文档](SwinTransformer.md)。
 
@@ -650,6 +650,19 @@ DeiT（Data-efficient Image Transformers）系列模型的精度、速度指标�
 | SwinTransformer_base_patch4_window12_384<sup>[1]</sup>    | 0.8642 | 0.9807 | 19.65 | 64.72 | 123.42 | 44.45 | 87.70   | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/SwinTransformer_base_patch4_window12_384_22kto1k_pretrained.pdparams) | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/SwinTransformer_base_patch4_window12_384_infer.tar) |
 | SwinTransformer_large_patch4_window7_224<sup>[1]</sup>    | 0.8596 | 0.9783 | 15.74 | 38.57 | 71.49 | 34.02 | 196.43  | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/SwinTransformer_large_patch4_window7_224_22kto1k_pretrained.pdparams) | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/SwinTransformer_large_patch4_window7_224_22kto1k_infer.tar) |
 | SwinTransformer_large_patch4_window12_384<sup>[1]</sup>   | 0.8719 | 0.9823 | 32.61 | 116.59 | 223.23 | 99.97 | 196.43 | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/SwinTransformer_large_patch4_window12_384_22kto1k_pretrained.pdparams) | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/SwinTransformer_large_patch4_window12_384_22kto1k_infer.tar) |
+
+| 模型       | Top-1 Acc | Top-5 Acc | time(ms)<br>bs=1 | time(ms)<br>bs=4 | time(ms)<br/>bs=8 | FLOPs(G) | Params(M) | 预训练模型下载地址                                               | inference模型下载地址                                      |
+| ---------- | --------- | --------- | ---------------- | ---------------- | -------- | --------- | ------------------------------------------------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ |
+| SwinTransformerV2_tiny_patch4_window8_256    | 0.8177 | 0.9588 | - | - | - | 4.34  | 21.87   | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/SwinTransformerV2_tiny_patch4_window8_256_pretrained.pdparams) | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/SwinTransformerV2_tiny_patch4_window8_256_infer.tar) |
+| SwinTransformerV2_tiny_patch4_window16_256   | 0.8283 | 0.9623 | - | - | - | 4.38  | 21.87   | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/SwinTransformerV2_tiny_patch4_window16_256_pretrained.pdparams) | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/SwinTransformerV2_tiny_patch4_window16_256_infer.tar) |
+| SwinTransformerV2_small_patch4_window8_256    | 0.8373 | 0.9662 | - | - | - | 8.44 | 37.93   | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/SwinTransformerV2_small_patch4_window8_256_pretrained.pdparams) | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/SwinTransformerV2_small_patch4_window8_256_infer.tar) |
+| SwinTransformerV2_small_patch4_window16_256   | 0.8414 | 0.9681 | - | - | - | 8.54 | 37.93   | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/SwinTransformerV2_small_patch4_window16_256_pretrained.pdparams) | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/SwinTransformerV2_small_patch4_window16_256_infer.tar) |
+| SwinTransformerV2_base_patch4_window8_256    | 0.8419 | 0.9687 | - | - | - | 14.97 | 66.96   | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/SwinTransformerV2_base_patch4_window8_256_pretrained.pdparams) | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/SwinTransformerV2_base_patch4_window8_256_infer.tar) |
+| SwinTransformerV2_base_patch4_window16_256   | 0.8458 | 0.9706 | - | - | - | 15.11 | 66.96   | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/SwinTransformerV2_base_patch4_window16_256_pretrained.pdparams) | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/SwinTransformerV2_base_patch4_window16_256_infer.tar) |
+| SwinTransformerV2_base_patch4_window12to16_256<sup>[1]</sup>     | 0.8616 | 0.9789 | - | - | - | 15.11 | 66.96   | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/SwinTransformerV2_base_patch4_window12to16_256_22kto1k_pretrained.pdparams) | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/SwinTransformerV2_base_patch4_window12to16_256_22kto1k_infer.tar) |
+| SwinTransformerV2_base_patch4_window24_384<sup>[1]</sup>    | 0.8714 | 0.9824 | - | - | - | 34.00 | 66.96   | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/SwinTransformerV2_base_patch4_window24_384_22kto1k_pretrained.pdparams) | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/SwinTransformerV2_base_patch4_window24_384_22kto1k_infer.tar) |
+| SwinTransformerV2_large_patch4_window16_256<sup>[1]</sup>    | 0.8689 | 0.9804 | - | - | - | 33.82 | 149.59  | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/SwinTransformerV2_large_patch4_window16_256_22kto1k_pretrained.pdparams) | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/SwinTransformerV2_large_patch4_window16_256_22kto1k_infer.tar) |
+| SwinTransformerV2_large_patch4_window24_384<sup>[1]</sup>   | 0.8747 | 0.9827 | - | - | - | 76.12 | 149.59 | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/SwinTransformerV2_large_patch4_window24_384_22kto1k_pretrained.pdparams) | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/SwinTransformerV2_large_patch4_window24_384_22kto1k_infer.tar) |
 
 [1]：基于 ImageNet22k 数据集预训练，然后在 ImageNet1k 数据集迁移学习得到。
 
@@ -893,3 +906,5 @@ TRANSFORMERS FOR IMAGE RECOGNITION AT SCALE.
 <a name="ref48">[48]</a>Kunchang Li, Yali Wang, Junhao Zhang, Peng Gao, Guanglu Song, Yu Liu, Hongsheng Li, Yu Qiao. UniFormer: Unifying Convolution and Self-attention for Visual Recognition
 
 <a name="ref49">[49]</a>Mingyuan Mao, Renrui Zhang, Honghui Zheng, Peng Gao, Teli Ma, Yan Peng, Errui Ding, Baochang Zhang, Shumin Han. Dual-stream Network for Visual Recognition.
+
+<a name="ref50">[50]</a>Ze Liu, Han Hu, Yutong Lin, Zhuliang Yao, Zhenda Xie, Yixuan Wei, Jia Ning, Yue Cao, Zheng Zhang, Li Dong, Furu Wei, Baining Guo. Swin Transformer V2: Scaling Up Capacity and Resolution
