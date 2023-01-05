@@ -125,12 +125,8 @@ def compute_feature(engine, name="gallery"):
     all_feat = []
     all_label = []
     all_camera = []
-    max_iter = len(dataloader) - 1 if platform.system() == "Windows" else len(
-        dataloader)
     has_camera = False
     for idx, batch in enumerate(dataloader):  # load is very time-consuming
-        if idx >= max_iter:
-            break
         if idx % engine.config["Global"]["print_batch_step"] == 0:
             logger.info(
                 f"{name} feature calculation process: [{idx}/{len(dataloader)}]"
