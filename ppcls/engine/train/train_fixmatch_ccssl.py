@@ -1,6 +1,5 @@
 from __future__ import absolute_import, division, print_function
 import time
-from turtle import update
 import paddle
 from ppcls.engine.train.train_fixmatch import get_loss
 from ppcls.engine.train.utils import update_loss, update_metric, log_info
