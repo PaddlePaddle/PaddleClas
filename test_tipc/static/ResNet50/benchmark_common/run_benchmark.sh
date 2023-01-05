@@ -30,6 +30,7 @@ function _set_params(){
 }
 function _train(){
     batch_size=${base_batch_size}  # 如果模型跑多卡单进程时,请在_train函数中计算出多卡需要的bs
+    export CUDA_VISIBLE_DEVICES=3,4,5,6
     echo "current CUDA_VISIBLE_DEVICES=${CUDA_VISIBLE_DEVICES}, model_name=${model_name}, device_num=${device_num}, is profiling=${profiling}"
 
     if [ ${fp_item} = "fp32" ]; then
@@ -55,7 +56,7 @@ function _train(){
 	        train_cmd="python ppcls/static/train.py ${train_cmd}"
         else
             rm -rf ./mylog
-            train_cmd="python -m paddle.distributed.launch --gpus 0,1,2,3,4,5,6,7 ppcls/static/train.py ${train_cmd}"
+            train_cmd="python -m paddle.distributed.launch --gpus 3,4,5,6 ppcls/static/train.py ${train_cmd}"
         fi
         ;;
     DP1-MP1-PP1)  echo "run run_mode: DP1-MP1-PP1" ;;
@@ -63,7 +64,7 @@ function _train(){
     esac
 
     echo "train_cmd: ${train_cmd}  log_file: ${log_file}"
-    timeout 10m ${train_cmd} > ${log_file} 2>&1
+    ${train_cmd} > ${log_file} 2>&1
     if [ $? -ne 0 ];then
         echo -e "${model_name}, FAIL"
     else
@@ -81,9 +82,10 @@ function _set_env(){
     export FLAGS_fraction_of_gpu_memory_to_use=0.80
     export FLAGS_cudnn_batchnorm_spatial_persistent=1
     export FLAGS_max_inplace_grad_add=8
-    export FLAGS_cudnn_exhaustive_search=1
+    # export FLAGS_cudnn_exhaustive_search=1
     export FLAGS_eager_delete_tensor_gb=0.0
     export FLAGS_conv_workspace_size_limit=4000
+    export FLAGS_cudnn_deterministic=True
 }
 
 

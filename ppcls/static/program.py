@@ -301,11 +301,12 @@ def compile(config, program, loss_name=None, share_prog=None):
     build_strategy, exec_strategy = create_strategy(config)
 
     compiled_program = paddle.static.CompiledProgram(
-        program).with_data_parallel(
-            share_vars_from=share_prog,
-            loss_name=loss_name,
-            build_strategy=build_strategy,
-            exec_strategy=exec_strategy)
+        program,
+        build_strategy=build_strategy)
+            # share_vars_from=share_prog,
+            # loss_name=loss_name,
+            # build_strategy=build_strategy,
+            # exec_strategy=exec_strategy)
 
     return compiled_program
 
@@ -430,7 +431,7 @@ def run(dataloader,
             epoch_str = "epoch:{:<3d}".format(epoch)
             step_str = "{:s} step:{:<4d}".format(mode, idx)
 
-            if idx % config.get('print_interval', 10) == 0:
+            if idx % config['Global'].get('print_interval', 10) == 0:
                 logger.info("{:s} {:s} {:s}".format(epoch_str, step_str,
                                                     fetchs_str))
 

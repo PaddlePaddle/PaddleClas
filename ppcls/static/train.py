@@ -204,5 +204,10 @@ def main(args):
 
 if __name__ == '__main__':
     paddle.enable_static()
+    paddle.seed(1234)
+    import numpy as np
+    np.random.seed(0)
+    import random
+    random.seed(0)
     args = parse_args()
     main(args)

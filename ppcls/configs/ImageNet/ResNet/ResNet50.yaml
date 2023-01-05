@@ -8,7 +8,7 @@ Global:
   eval_during_train: True
   eval_interval: 1
   epochs: 120
-  print_batch_step: 10
+  print_interval: 1
   use_visualdl: False
   # used for static mode and model export
   image_shape: [3, 224, 224]
@@ -69,7 +69,7 @@ DataLoader:
       name: DistributedBatchSampler
       batch_size: 64
       drop_last: False
-      shuffle: True
+      shuffle: False
     loader:
       num_workers: 4
       use_shared_memory: True
