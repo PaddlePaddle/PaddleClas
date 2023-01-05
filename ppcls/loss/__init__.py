@@ -16,11 +16,12 @@ from .trihardloss import TriHardLoss
 from .triplet import TripletLoss, TripletLossV2
 from .tripletangularmarginloss import TripletAngularMarginLoss, TripletAngularMarginLoss_XBM
 from .supconloss import SupConLoss
+from .softsuploss import SoftSupConLoss
+from .ccssl_loss import CCSSLCELoss
 from .pairwisecosface import PairwiseCosface
 from .dmlloss import DMLLoss
 from .distanceloss import DistanceLoss
 from .softtargetceloss import SoftTargetCrossEntropy
-
 from .distillationloss import DistillationCELoss
 from .distillationloss import DistillationGTCELoss
 from .distillationloss import DistillationDMLLoss

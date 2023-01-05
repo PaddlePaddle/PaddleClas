@@ -18,6 +18,8 @@
 from PIL import Image, ImageEnhance, ImageOps
 import numpy as np
 import random
+from .operators import RawColorJitter
+from paddle.vision.transforms import transforms as T
 
 
 class RandAugment(object):
@@ -105,3 +107,18 @@ class RandAugment(object):
             op_name = np.random.choice(avaiable_op_names)
             img = self.func[op_name](img, self.level_map[op_name])
         return img
+
+
+class RandomApply(object):
+    def __init__(self, p, transforms):
+        self.p = p
+        ts = []
+        for t in transforms:
+            for key in t.keys():
+                ts.append(eval(key)(**t[key]))
+
+        self.trans = T.Compose(ts)
+
+    def __call__(self, img):
+        timg = self.trans(img)
+        return timg

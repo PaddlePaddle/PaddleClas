@@ -1,0 +1,208 @@
+Global:
+  checkpoints: null
+  pretrained_model: null
+  output_dir: ./output
+  device: gpu
+  save_interval: -1
+  eval_during_train: true
+  eval_interval: 1
+  epochs: 1024
+  iter_per_epoch: 1024
+  print_batch_step: 20
+  use_visualdl: false
+  use_dali: false
+  train_mode: fixmatch_ccssl
+  image_shape: [3, 32, 32]
+  save_inference_dir: ./inference
+
+SSL:
+  T: 1
+  threshold: 0.95
+
+EMA:
+  decay: 0.999
+
+Arch:
+  name: RecModel
+  infer_output_key: logits
+  infer_add_softmax: false
+  head_feature_from: backbone 
+  Backbone:
+    name: WideResNet
+    widen_factor: 2
+    depth: 28
+    dropout: 0
+    num_classes: 10
+    low_dim: 64
+    proj: false
+    proj_after: false
+  BackboneStopLayer:
+    name: bn1
+  Neck:
+    name: FRFNNeck
+    num_features: 128
+    low_dim: 64
+  Head:
+    name: FC
+    embedding_size: 128
+    class_num: 10
+
+  use_sync_bn: true
+
+Loss:
+  Train:
+    - CELoss:
+        weight: 1.0
+        reduction: "mean"
+  Eval:
+    - CELoss:
+        weight: 1.0
+  
+UnLabelLoss:
+  Train:
+    - CCSSLCELoss:
+        weight: 1.
+    - SoftSupConLoss:
+        weight: 1.0
+        temperature: 0.07
+
+Optimizer:
+  name: Momentum
+  momentum: 0.9
+  use_nesterov: true
+  weight_decay: 0.001
+  lr:
+    name: 'CosineFixmatch'
+    learning_rate: 0.03
+    num_warmup_steps: 0
+
+DataLoader:
+  mean: [0.4914, 0.4822, 0.4465]
+  std: [0.2471, 0.2435, 0.2616]
+  Train:
+    dataset:
+      name: Cifar10
+      data_file: null
+      mode: 'train'
+      download: true
+      backend: 'pil'
+      sample_per_label: 400
+      expand_labels: 1
+      transform_ops:
+        - RandFlipImage:
+            flip_code: 1
+        - Pad_paddle_vision:
+            padding: 4
+            padding_mode: reflect
+        - RandCropImageV2:
+            size: [32, 32]
+        - NormalizeImage:
+            scale: 1.0/255.0
+            mean: [0.4914, 0.4822, 0.4465]
+            std: [0.2471, 0.2435, 0.2616]
+            order: hwc
+    
+    sampler:
+      name: DistributedBatchSampler
+      batch_size: 64
+      drop_last: true
+      shuffle: true
+    loader:
+      num_workers: 4
+      use_shared_memory: true
+  
+  UnLabelTrain:
+    dataset:
+      name: Cifar10
+      data_file: null
+      mode: 'train'
+      backend: 'pil'
+      download: true
+
+      transform_ops_weak:
+        - RandFlipImage:
+            flip_code: 1
+        - Pad_paddle_vision:
+            padding: 4
+            padding_mode: reflect
+        - RandCropImageV2:
+            size: [32, 32]
+        - NormalizeImage:
+            scale: 1.0/255.0
+            mean: [0.4914, 0.4822, 0.4465]
+            std: [0.2471, 0.2435, 0.2616]
+            order: hwc
+
+      transform_ops_strong:
+        - RandFlipImage:
+            flip_code: 1
+        - Pad_paddle_vision:
+            padding: 4
+            padding_mode: reflect
+        - RandCropImageV2:
+            size: [32, 32]
+        - RandAugment:
+            num_layers: 2
+            magnitude: 10
+        - NormalizeImage:
+            scale: 1.0/255.0
+            mean: [0.4914, 0.4822, 0.4465]
+            std: [0.2471, 0.2435, 0.2616]
+            order: hwc
+      
+      transform_ops_strong2:
+        - RandCropImageV2:
+            size: [32, 32]
+        - RandFlipImage:
+            flip_code: 1
+        - RandomApply:
+            transforms:
+              - RawColorJitter:
+                  brightness: 0.4
+                  contrast: 0.4
+                  saturation: 0.4
+                  hue: 0.1
+            p: 0.8
+        - RandomGrayscale:
+            p: 0.2
+        - NormalizeImage:
+            scale: 1.0/255.0
+            mean: [0.4914, 0.4822, 0.4465]
+            std: [0.2471, 0.2435, 0.2616]
+            order: hwc
+
+    sampler:
+      name: DistributedBatchSampler
+      batch_size: 448
+      drop_last: true
+      shuffle: true
+    loader:
+      num_workers: 4
+      use_shared_memory: true
+
+  Eval:
+    dataset:
+      name: Cifar10
+      mode: 'test'
+      backend: 'pil'
+      download: true
+      data_file: null
+      transform_ops:
+        - NormalizeImage:
+            scale: 1.0/255.0
+            mean: [0.4914, 0.4822, 0.4465]
+            std: [0.2471, 0.2435, 0.2616]
+            order: hwc
+    sampler:
+      name: DistributedBatchSampler
+      batch_size: 64
+      drop_last: False
+      shuffle: True
+    loader:
+      num_workers: 4
+      use_shared_memory: true
+
+Metric:
+  Eval:
+    - TopkAcc:
+        topk: [1, 5]

@@ -14,7 +14,6 @@
 
 import copy
 import importlib
-
 import paddle.nn as nn
 from paddle.jit import to_static
 from paddle.static import InputSpec
@@ -72,6 +71,8 @@ class RecModel(TheseusLayer):
         backbone_config = config["Backbone"]
         backbone_name = backbone_config.pop("name")
         self.backbone = eval(backbone_name)(**backbone_config)
+        self.head_feature_from = config.get('head_feature_from', 'neck')
+
         if "BackboneStopLayer" in config:
             backbone_stop_layer = config["BackboneStopLayer"]["name"]
             self.backbone.stop_after(backbone_stop_layer)
@@ -87,15 +88,19 @@ class RecModel(TheseusLayer):
             self.head = None
 
     def forward(self, x, label=None):
+        
         out = dict()
         x = self.backbone(x)
         out["backbone"] = x
         if self.neck is not None:
-            x = self.neck(x)
-            out["neck"] = x
-        out["features"] = x
+            feat = self.neck(x)
+            out["neck"] = feat
+        out["features"] = out['neck'] if self.neck else x
         if self.head is not None:
-            y = self.head(x, label)
+            if self.head_feature_from == 'backbone':
+                y = self.head(out['backbone'], label)
+            elif self.head_feature_from == 'neck':
+                y = self.head(out['features'], label)
             out["logits"] = y
         return out
 
