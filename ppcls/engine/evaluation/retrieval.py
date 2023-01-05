@@ -190,6 +190,7 @@ def compute_feature(engine, name="gallery"):
         all_camera = paddle.concat(all_camera)
     else:
         all_camera = None
+
     # discard redundant padding sample(s) at the end
     total_samples = dataloader.size if engine.use_dali else len(
         dataloader.dataset)
@@ -273,11 +274,15 @@ def compute_re_ranking_dist(query_feat: paddle.Tensor,
         for _, q in enumerate(p_k_reciprocal_ind):
             q_k_reciprocal_ind = k_reciprocal_neighbor(initial_rank, q,
                                                        int(np.around(k1 / 2)))
-            if len(np.intersect1d(p_k_reciprocal_ind, q_k_reciprocal_ind)
-                   ) > 2 / 3 * len(q_k_reciprocal_ind):
+            if len(
+                    np.intersect1d(
+                        p_k_reciprocal_ind,
+                        q_k_reciprocal_ind,
+                        assume_unique=True)) > 2 / 3 * len(q_k_reciprocal_ind):
                 p_k_reciprocal_exp_ind = np.append(p_k_reciprocal_exp_ind,
                                                    q_k_reciprocal_ind)
         p_k_reciprocal_exp_ind = np.unique(p_k_reciprocal_exp_ind)
+
         # reweight distance using gaussian kernel
         weight = np.exp(-original_dist[p, p_k_reciprocal_exp_ind])
         V[p, p_k_reciprocal_exp_ind] = weight / np.sum(weight)
