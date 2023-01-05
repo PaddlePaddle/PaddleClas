@@ -21,7 +21,7 @@ from .metrics import DistillationTopkAcc
 from .metrics import GoogLeNetTopkAcc
 from .metrics import HammingDistance, AccuracyScore
 from .metrics import ATTRMetric
-from .metrics import TprAtFpr
+from .metrics import TprAtFpr, MultilabelMeanAccuracy
 
 
 class CombinedMetrics(AvgMetrics):
