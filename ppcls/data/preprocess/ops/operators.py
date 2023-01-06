@@ -892,10 +892,8 @@ class PCALighting(object):
         if self.alphastd == 0:
             return img
 
-        img = img.transpose((2, 0, 1))
         alpha = np.random.normal(0, self.alphastd, size=(3)).astype(np.float32)
         rgb = self.eigvec * np.broadcast_to(alpha.reshape(1, 3), (
             3, 3)) * np.broadcast_to(self.eigval.reshape(1, 3), (3, 3))
         rgb = rgb.sum(1).squeeze()
-        img = img + rgb.reshape(3, 1, 1)
-        return img.transpose((1, 2, 0))
+        return img + rgb.reshape(1, 1, 3)
