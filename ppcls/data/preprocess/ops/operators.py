@@ -872,7 +872,10 @@ class RandomGrayscale(object):
 
 
 class PCALighting(object):
-    """Lighting noise(AlexNet - style PCA - based noise)"""
+    """
+    Lighting noise(AlexNet - style PCA - based noise)
+    reference: https://github.com/DingXiaoH/DiverseBranchBlock
+    """
 
     def __init__(self):
         self.alphastd = 0.1
