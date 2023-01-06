@@ -172,7 +172,7 @@ class RepVGGBlock(nn.Layer):
         return self.nonlinearity(
             self.se(self.rbr_dense(inputs) + self.rbr_1x1(inputs) + id_out))
 
-    def rep(self):
+    def re_parameterize(self):
         if not hasattr(self, 'rbr_reparam'):
             self.rbr_reparam = nn.Conv2D(
                 in_channels=self.in_channels,
