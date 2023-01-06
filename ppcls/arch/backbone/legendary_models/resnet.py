@@ -34,6 +34,8 @@ from ....utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_fro
 MODEL_URLS = {
     "ResNet18":
     "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/ResNet18_pretrained.pdparams",
+    "ResNet18_dbb":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/ResNet18_dbb_pretrained.pdparams",
     "ResNet18_vd":
     "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/ResNet18_vd_pretrained.pdparams",
     "ResNet34":
@@ -429,7 +431,10 @@ def _load_pretrained(pretrained, model, model_url, use_ssld):
         )
 
 
-def ResNet18(pretrained=False, use_ssld=False, **kwargs):
+def ResNet18(pretrained=False,
+             use_ssld=False,
+             layer_type="ConvBNLayer",
+             **kwargs):
     """
     ResNet18
     Args:
@@ -443,8 +448,13 @@ def ResNet18(pretrained=False, use_ssld=False, **kwargs):
         config=NET_CONFIG["18"],
         stages_pattern=MODEL_STAGES_PATTERN["ResNet18"],
         version="vb",
+        layer_type=layer_type,
         **kwargs)
-    _load_pretrained(pretrained, model, MODEL_URLS["ResNet18"], use_ssld)
+    if layer_type == "DiverseBranchBlock":
+        _load_pretrained(pretrained, model, MODEL_URLS["ResNet18_dbb"],
+                         use_ssld)
+    else:
+        _load_pretrained(pretrained, model, MODEL_URLS["ResNet18"], use_ssld)
     return model
 
 
