@@ -883,8 +883,7 @@ def SwinTransformerV2_base_patch4_window8_256(pretrained=False,
         pretrained,
         model,
         MODEL_URLS["SwinTransformerV2_base_patch4_window8_256"],
-        use_ssld=use_ssld,
-        use_imagenet22k_pretrained=use_imagenet22k_pretrained)
+        use_ssld=use_ssld)
     return model
 
 
