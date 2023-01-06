@@ -39,18 +39,24 @@ class DistillationCELoss(CELoss):
                  model_name_pairs=[],
                  epsilon=None,
                  key=None,
-                 name="loss_ce"):
+                 name="loss_ce",
+                 use_hard_label=False):
         super().__init__(epsilon=epsilon)
         assert isinstance(model_name_pairs, list)
         self.key = key
         self.model_name_pairs = model_name_pairs
         self.name = name
+        self.use_hard_label = use_hard_label
 
     def forward(self, predicts, batch):
         loss_dict = dict()
         for idx, pair in enumerate(self.model_name_pairs):
             out1 = predicts[pair[0]]
+            if isinstance(out1, tuple):
+                out1 = out1[1]
             out2 = predicts[pair[1]]
+            if self.use_hard_label:
+                out2 = paddle.argmax(out2, axis=1)
             if self.key is not None:
                 out1 = out1[self.key]
                 out2 = out2[self.key]
@@ -80,6 +86,8 @@ class DistillationGTCELoss(CELoss):
         loss_dict = dict()
         for name in self.model_names:
             out = predicts[name]
+            if isinstance(out, tuple):
+                out = out[0]
             if self.key is not None:
                 out = out[self.key]
             loss = super().forward(out, batch)
