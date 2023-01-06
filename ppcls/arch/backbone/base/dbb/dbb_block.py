@@ -18,6 +18,7 @@ import paddle
 import paddle.nn as nn
 import paddle.nn.functional as F
 import numpy as np
+from .dbb_transforms import *
 
 
 def conv_bn(in_channels,
@@ -62,7 +63,6 @@ class IdentityBasedConv1x1(nn.Conv2D):
         for i in range(channels):
             id_value[i, i % input_dim, 0, 0] = 1
         self.id_tensor = paddle.to_tensor(id_value)
-        # nn.init.zeros_(self.weight)
         self.weight.set_value(paddle.zeros_like(self.weight))
 
     def forward(self, input):
@@ -143,20 +143,21 @@ class DiverseBranchBlock(nn.Layer):
                  stride=1,
                  groups=1,
                  act=None,
+                 is_repped=False,
+                 single_init=False,
                  **kwargs):
         super().__init__()
 
         padding = (filter_size - 1) // 2
         dilation = 1
-        deploy = False
-        single_init = False
+
         in_channels = num_channels
         out_channels = num_filters
         kernel_size = filter_size
         internal_channels_1x1_3x3 = None
         nonlinear = act
 
-        self.deploy = deploy
+        self.is_repped = is_repped
 
         if nonlinear is None:
             self.nonlinear = nn.Identity()
@@ -168,7 +169,7 @@ class DiverseBranchBlock(nn.Layer):
         self.groups = groups
         assert padding == kernel_size // 2
 
-        if deploy:
+        if is_repped:
             self.dbb_reparam = nn.Conv2D(
                 in_channels=in_channels,
                 out_channels=out_channels,
@@ -268,8 +269,7 @@ class DiverseBranchBlock(nn.Layer):
             self.single_init()
 
     def forward(self, inputs):
-
-        if hasattr(self, 'dbb_reparam'):
+        if self.is_repped:
             return self.nonlinear(self.dbb_reparam(inputs))
 
         out = self.dbb_origin(inputs)
@@ -293,3 +293,73 @@ class DiverseBranchBlock(nn.Layer):
         self.init_gamma(0.0)
         if hasattr(self, "dbb_origin"):
             paddle.nn.init.constant_(self.dbb_origin.bn.weight, 1.0)
+
+    def get_equivalent_kernel_bias(self):
+        k_origin, b_origin = transI_fusebn(self.dbb_origin.conv.weight,
+                                           self.dbb_origin.bn)
+
+        if hasattr(self, 'dbb_1x1'):
+            k_1x1, b_1x1 = transI_fusebn(self.dbb_1x1.conv.weight,
+                                         self.dbb_1x1.bn)
+            k_1x1 = transVI_multiscale(k_1x1, self.kernel_size)
+        else:
+            k_1x1, b_1x1 = 0, 0
+
+        if hasattr(self.dbb_1x1_kxk, 'idconv1'):
+            k_1x1_kxk_first = self.dbb_1x1_kxk.idconv1.get_actual_kernel()
+        else:
+            k_1x1_kxk_first = self.dbb_1x1_kxk.conv1.weight
+        k_1x1_kxk_first, b_1x1_kxk_first = transI_fusebn(k_1x1_kxk_first,
+                                                         self.dbb_1x1_kxk.bn1)
+        k_1x1_kxk_second, b_1x1_kxk_second = transI_fusebn(
+            self.dbb_1x1_kxk.conv2.weight, self.dbb_1x1_kxk.bn2)
+        k_1x1_kxk_merged, b_1x1_kxk_merged = transIII_1x1_kxk(
+            k_1x1_kxk_first,
+            b_1x1_kxk_first,
+            k_1x1_kxk_second,
+            b_1x1_kxk_second,
+            groups=self.groups)
+
+        k_avg = transV_avg(self.out_channels, self.kernel_size, self.groups)
+        k_1x1_avg_second, b_1x1_avg_second = transI_fusebn(k_avg,
+                                                           self.dbb_avg.avgbn)
+        if hasattr(self.dbb_avg, 'conv'):
+            k_1x1_avg_first, b_1x1_avg_first = transI_fusebn(
+                self.dbb_avg.conv.weight, self.dbb_avg.bn)
+            k_1x1_avg_merged, b_1x1_avg_merged = transIII_1x1_kxk(
+                k_1x1_avg_first,
+                b_1x1_avg_first,
+                k_1x1_avg_second,
+                b_1x1_avg_second,
+                groups=self.groups)
+        else:
+            k_1x1_avg_merged, b_1x1_avg_merged = k_1x1_avg_second, b_1x1_avg_second
+
+        return transII_addbranch(
+            (k_origin, k_1x1, k_1x1_kxk_merged, k_1x1_avg_merged),
+            (b_origin, b_1x1, b_1x1_kxk_merged, b_1x1_avg_merged))
+
+    def re_parameterize(self):
+        if self.is_repped:
+            return
+
+        kernel, bias = self.get_equivalent_kernel_bias()
+        self.dbb_reparam = nn.Conv2D(
+            in_channels=self.dbb_origin.conv._in_channels,
+            out_channels=self.dbb_origin.conv._out_channels,
+            kernel_size=self.dbb_origin.conv._kernel_size,
+            stride=self.dbb_origin.conv._stride,
+            padding=self.dbb_origin.conv._padding,
+            dilation=self.dbb_origin.conv._dilation,
+            groups=self.dbb_origin.conv._groups,
+            bias_attr=True)
+
+        self.dbb_reparam.weight.set_value(kernel)
+        self.dbb_reparam.bias.set_value(bias)
+
+        self.__delattr__('dbb_origin')
+        self.__delattr__('dbb_avg')
+        if hasattr(self, 'dbb_1x1'):
+            self.__delattr__('dbb_1x1')
+        self.__delattr__('dbb_1x1_kxk')
+        self.is_repped = True
