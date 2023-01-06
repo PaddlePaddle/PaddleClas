@@ -28,7 +28,7 @@ import math
 
 from ....utils import logger
 from ..base.theseus_layer import TheseusLayer
-from ..base.dbb_block import DiverseBranchBlock
+from ..base.dbb.dbb_block import DiverseBranchBlock
 from ....utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
 
 MODEL_URLS = {
