@@ -893,7 +893,7 @@ def SwinTransformerV2_base_patch4_window16_256(
         use_imagenet22k_pretrained=False,
         use_imagenet22kto1k_pretrained=False,
         **kwargs):
-    model = SwinTransformerV2(
+     model = SwinTransformerV2(
         img_size=256,
         embed_dim=128,
         depths=[2, 2, 18, 2],
