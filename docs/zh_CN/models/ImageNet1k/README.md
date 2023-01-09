@@ -52,6 +52,7 @@
     - [NextViT 系列](#NextViT)
     - [UniFormer 系列](#UniFormer)
     - [DSNet 系列](#DSNet)
+    - [EfficientFormer 系列](#EfficientFormer)
   - [4.2 轻量级模型](#Transformer_lite)
     - [MobileViT 系列](#MobileViT)
 - [五、参考文献](#reference)
@@ -775,6 +776,18 @@ DeiT（Data-efficient Image Transformers）系列模型的精度、速度指标�
 | DSNet_small | 0.8196    | 0.9596    | -                | -                | -                 | 3.5      | 23.0      | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DSNet_small_pretrained.pdparams) | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/DSNet_small_infer.tar) |
 | DSNet_base  | 0.8175    | 0.9522    | -                | -                | -                 | 8.4      | 49.3      | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DSNet_base_pretrained.pdparams) | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/DSNet_base_infer.tar) |
 
+<a name="DSNet"></a>
+
+## EfficientFormer 系列 <sup>[[50](#ref50)]</sup>
+
+关于 EfficientFormer 系列模型的精度、速度指标如下表所示，更多介绍可以参考：[EfficientFormer 系列模型文档](EfficientFormer.md)。
+
+| 模型        | Top-1 Acc | Top-5 Acc | time(ms)<br>bs=1 | time(ms)<br>bs=4 | time(ms)<br/>bs=8 | FLOPs(G) | Params(M) | 预训练模型下载地址                                           | inference模型下载地址                                        |
+| ----------- | --------- | --------- | ---------------- | ---------------- | ----------------- | -------- | --------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
+|  EfficientFormer_L1  | 0.7927(0.8041)   | 0.9446    | -                | -                | -                 | 1.3      | 12.3      | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/EfficientFormer_L1_pretrained.pdparams) | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/EfficientFormer_L1_infer.tar) |
+|  EfficientFormer_L3 | 0.8243    | 0.9616    | -                | -                | -                 | 3.9      | 31.4      | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/EfficientFormer_L3_pretrained.pdparams) | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/EfficientFormer_L3_infer.tar) |
+|  EfficientFormer_L7  | 0.8336   | 0.9658    | -                | -                | -                 | 10.2      | 82.3      | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/EfficientFormer_L7_pretrained.pdparams) | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/EfficientFormer_L7_infer.tar) |
+
 <a name="Transformer_lite"></a>
 
 ### 4.2 轻量级模型
@@ -893,3 +906,5 @@ TRANSFORMERS FOR IMAGE RECOGNITION AT SCALE.
 <a name="ref48">[48]</a>Kunchang Li, Yali Wang, Junhao Zhang, Peng Gao, Guanglu Song, Yu Liu, Hongsheng Li, Yu Qiao. UniFormer: Unifying Convolution and Self-attention for Visual Recognition
 
 <a name="ref49">[49]</a>Mingyuan Mao, Renrui Zhang, Honghui Zheng, Peng Gao, Teli Ma, Yan Peng, Errui Ding, Baochang Zhang, Shumin Han. Dual-stream Network for Visual Recognition.
+
+<a name="ref50">[50]</a>Yanyu Li, Geng Yuan, Yang Wen, Ju Hu, Georgios Evangelidis, Sergey Tulyakov, Yanzhi Wang, Jian Ren. EfficientFormer: Vision Transformers at MobileNet Speed
