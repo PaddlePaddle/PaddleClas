@@ -85,7 +85,7 @@ flowers102数据集的图像文件存放在 `dataset/flowers102/jpg` 目录中�
 ```shell
 # linux or mac
 cd ../../
-# windoes直接打开PaddleClas根目录即可
+# windows直接打开PaddleClas根目录即可
 ```
 <a name='4'></a>
 
