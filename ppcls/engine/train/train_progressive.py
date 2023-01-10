@@ -48,11 +48,12 @@ def train_epoch_progressive(engine, epoch_id, print_batch_step):
         cur_image_size = engine.config["DataLoader"]["Train"]["dataset"][
             "transform_ops"][1]["RandCropImage"]["progress_size"][stage_id]
         cur_magnitude = engine.config["DataLoader"]["Train"]["dataset"][
-            "transform_ops"][3]["RandAugment"]["progress_magnitude"][stage_id]
+            "transform_ops"][3]["RandAugmentV2"]["progress_magnitude"][
+                stage_id]
         engine.config["DataLoader"]["Train"]["dataset"]["transform_ops"][1][
             "RandCropImage"]["size"] = cur_image_size
         engine.config["DataLoader"]["Train"]["dataset"]["transform_ops"][3][
-            "RandAugment"]["magnitude"] = cur_magnitude
+            "RandAugmentV2"]["magnitude"] = cur_magnitude
         engine.train_dataloader = build_dataloader(
             engine.config["DataLoader"],
             "Train",

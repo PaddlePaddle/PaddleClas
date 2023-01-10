@@ -268,7 +268,8 @@ v2_xl_block = [  # only for 21k pretraining.
 ]
 efficientnetv2_params = {
     # params:            (block, width, depth, dropout)
-    "efficientnetv2-s": (v2_s_block, 1.0, 1.0, np.linspace(0.1, 0.3, 4)),
+    "efficientnetv2-s":
+    (v2_s_block, 1.0, 1.0, np.linspace(0.1, 0.3, 4).tolist()),
     "efficientnetv2-m": (v2_m_block, 1.0, 1.0, 0.3),
     "efficientnetv2-l": (v2_l_block, 1.0, 1.0, 0.4),
     "efficientnetv2-xl": (v2_xl_block, 1.0, 1.0, 0.4),
