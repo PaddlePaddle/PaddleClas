@@ -60,7 +60,7 @@ ViT（Vision Transformer）系列模型是 Google 在 2020 年提出的，该模
 | ViT_large_<br/>patch16_384 | 384               | 38.67                          | 142.57                         | 282.87                         |
 | ViT_large_<br/>patch32_384 | 384               | 12.07                          | 34.53                          | 65.81                          |
 
-**备注：** 精度类型为 FP32，推理过程使用 TensorRT。
+**备注：** 精度类型为 FP32，推理过程使用 TensorRT-8.0.3.4。
 
 <a name="2"></a>  
 

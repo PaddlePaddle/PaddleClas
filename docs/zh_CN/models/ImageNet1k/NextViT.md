@@ -65,7 +65,7 @@ NextViT 是一种新的视觉 Transformer 网络，可以用作计算机视觉�
 | NextViT_base_224_ssld | 224       | 12.02                          | 16.21                          | 20.63                          |
 | NextViT_large_224_ssld  | 224       | 16.51                          | 21.91                          | 27.25                          |
 
-**备注：** 精度类型为 FP32，推理过程使用 TensorRT。
+**备注：** 精度类型为 FP32，推理过程使用 TensorRT-8.0.3.4。
 
 <a name="2"></a>  
 

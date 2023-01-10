@@ -77,7 +77,7 @@ EfficientNet 是 Google 于 2019 年发布的一个基于 NAS 的轻量级网络
 | EfficientNetB7                | 600       | 21.91 | 62.29 | 116.07 |
 | EfficientNetB0_<br>small      | 224       | 1.24 | 2.59 | 3.92 |
 
-**备注：** 精度类型为 FP32，推理过程使用 TensorRT。
+**备注：** 精度类型为 FP32，推理过程使用 TensorRT-8.0.3.4。
 
 <a name='1.3.2'></a>
 
@@ -95,7 +95,7 @@ EfficientNet 是 Google 于 2019 年发布的一个基于 NAS 的轻量级网络
 | EfficientNetB7            | 600      | 47.86087                     | -                            | -                            | 53.93823                     | -                            | -                            |
 | EfficientNetB0_small      | 224      | 2.39166                      | 4.36748                      | 6.96002                      | 2.3076                       | 4.71886                      | 7.21888                      |
 
-**备注：** 推理过程使用 TensorRT。
+**备注：** 推理过程使用 TensorRT-8.0.3.4。
 
 <a name="2"></a>
 

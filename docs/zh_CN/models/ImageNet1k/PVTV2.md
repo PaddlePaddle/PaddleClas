@@ -57,7 +57,7 @@ PVTV2 是 VisionTransformer 系列模型，该模型基于 PVT（Pyramid Vision 
 | PVT_V2_B4    | 224       | 14.06                           | -                           | -                           |
 | PVT_V2_B5  | 224       | -                           | -                           | -                           |
 
-**备注：** 精度类型为 FP32，推理过程使用 TensorRT。
+**备注：** 精度类型为 FP32，推理过程使用 TensorRT-8.0.3.4。
 
 <a name="2"></a>  
 
