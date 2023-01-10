@@ -203,6 +203,8 @@ class RandAugmentV2(RandAugment):
             "cutout": int(40 * abso_level)
         }
 
+        # from https://stackoverflow.com/questions/5252170/
+        # specify-image-filling-color-when-rotating-in-python-with-pil-and-setting-expand
         def rotate_with_fill(img, magnitude):
             rot = img.convert("RGBA").rotate(magnitude)
             return Image.composite(rot,
