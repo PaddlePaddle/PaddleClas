@@ -56,7 +56,7 @@ Twins 网络包括 Twins-PCPVT 和 Twins-SVT，其重点对空间注意力机制
 | alt_gvt_base  | 224      | 7.48                           | 12.60                          | 19.93                          |
 | alt_gvt_large | 224      | 9.28                          | 18.72                          | 31.18                          |
 
-**备注：** 精度类型为 FP32，推理过程使用 TensorRT。
+**备注：** 精度类型为 FP32，推理过程使用 TensorRT-8.0.3.4。
 
 <a name="2"></a>  
 

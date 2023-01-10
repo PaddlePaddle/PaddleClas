@@ -102,7 +102,7 @@ PaddleClas 提供的 ResNet 系列的模型包括 ResNet50，ResNet50_vd，ResNe
 | ResNet50_vd_ssld | 224       | 2.23           | 3.92               | 6.46               |
 | ResNet101_vd_ssld  | 224     | 4.04             | 6.84             | 11.44            |
 
-**备注：** 精度类型为 FP32，推理过程使用 TensorRT。
+**备注：** 精度类型为 FP32，推理过程使用 TensorRT-8.0.3.4。
 
 <a name='1.3.2'></a>
 
@@ -130,7 +130,7 @@ PaddleClas 提供的 ResNet 系列的模型包括 ResNet50，ResNet50_vd，ResNe
 | Fix_ResNet50_vd_ssld  | 320       | 3.42818                      | 7.51534                      | 13.19370                      | 5.07696                      | 14.64218                      | 27.01453                     |
 | ResNet101_vd_ssld | 224       | 5.05972                      | 7.83685                      | 11.34235                     | 6.11704                      | 13.76222                     | 25.11071                     |
 
-**备注：** 推理过程使用 TensorRT。
+**备注：** 推理过程使用 TensorRT-8.0.3.4。
 
 <a name="2"></a>  
 

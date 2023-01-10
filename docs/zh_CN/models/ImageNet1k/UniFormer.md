@@ -54,7 +54,7 @@ UniFormer 是一种新的视觉 Transformer 网络，可以用作计算机视觉
 | UniFormer_base   | 224       | 8.19                           | 12.98                          | 21.29                          |
 | UniFormer_base_ls    | 224       | 14.79                           | -                           | 22.20                           |
 
-**备注：** 精度类型为 FP32，推理过程使用 TensorRT。
+**备注：** 精度类型为 FP32，推理过程使用 TensorRT-8.0.3.4。
 
 <a name="2"></a>  
 

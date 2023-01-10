@@ -62,7 +62,7 @@ DeiT（Data-efficient Image Transformers）系列模型是由 FaceBook 在 2020 
 | DeiT_base_<br>distilled_patch16_224  | 224               | 6.00                           | 15.43                          | 27.10                          |
 | DeiT_base_<br>distilled_patch16_384  | 384               | 13.76                          | 45.61                          | 89.15                          |
 
-**备注：** 精度类型为 FP32，推理过程使用 TensorRT。
+**备注：** 精度类型为 FP32，推理过程使用 TensorRT-8.0.3.4。
 
 <a name="2"></a>  
 
