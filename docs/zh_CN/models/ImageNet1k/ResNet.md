@@ -87,7 +87,7 @@ PaddleClas 提供的 ResNet 系列的模型包括 ResNet50，ResNet50_vd，ResNe
 | ResNet18_vd      | 224       | 1.11               | 1.52               | 2.60               |
 | ResNet34         | 224       | 1.83               | 2.41               | 4.23               |
 | ResNet34_vd      | 224       | 1.87               | 2.49               | 4.41               |
-| ResNet34_vd_ssld      | 224  | 2.00               | 3.26               | 5.85               |
+| ResNet34_vd_ssld      | 224  | 1.87               | 2.49               | 4.41               |
 | ResNet50         | 224       |  2.19               | 3.77               | 6.22               |
 | ResNet50_vc      | 224       | 2.57               | 4.83               | 7.52               |
 | ResNet50_vd      | 224       |  2.23               | 3.92               | 6.46               |
@@ -99,8 +99,8 @@ PaddleClas 提供的 ResNet 系列的模型包括 ResNet50，ResNet50_vd，ResNe
 | SE_ResNet18_vd   | 224       | 1.31               | 1.77               | 2.92               |
 | SE_ResNet34_vd   | 224       | 2.20               | 2.99               | 5.09               |
 | SE_ResNet50_vd   | 224       | 2.72               | 5.07               | 8.12               |
-| ResNet50_vd_ssld | 224       | 2.59           | 4.87               | 7.62               |
-| ResNet101_vd_ssld  | 224     | 4.43             | 8.25             | 12.58            |
+| ResNet50_vd_ssld | 224       | 2.23           | 3.92               | 6.46               |
+| ResNet101_vd_ssld  | 224     | 4.04             | 6.84             | 11.44            |
 
 **备注：** 精度类型为 FP32，推理过程使用 TensorRT。
 

@@ -75,20 +75,20 @@ PP-HGNet 与其他模型的比较如下，其中测试机器为 NVIDIA® Tesla®
 
 | Model | Top-1 Acc(\%) | Top-5 Acc(\%) | Latency(ms) |
 |:--: |:--: |:--: |:--: |
-| ResNet34                 | 74.57      | 92.14       | 1.97        |
-| ResNet34_vd              | 75.98      | 92.98       | 2.00        |
-| EfficientNetB0           | 77.38      | 93.31       | 1.96        |
-| <b>PPHGNet_tiny<b>       | <b>79.83<b> | <b>95.04<b> | <b>1.77<b> |
-| <b>PPHGNet_tiny_ssld<b>  | <b>81.95<b> | <b>96.12<b> | <b>1.77<b> |
-| ResNet50                 | 76.50      | 93.00       | 2.54        |
-| ResNet50_vd              | 79.12      | 94.44       | 2.60        |
+| ResNet34                 | 74.57      | 92.14       | 1.83        |
+| ResNet34_vd              | 75.98      | 92.98       | 1.87        |
+| EfficientNetB0           | 77.38      | 93.31       | 1.58        |
+| <b>PPHGNet_tiny<b>       | <b>79.83<b> | <b>95.04<b> | <b>1.72<b> |
+| <b>PPHGNet_tiny_ssld<b>  | <b>81.95<b> | <b>96.12<b> | <b>1.72<b> |
+| ResNet50                 | 76.50      | 93.00       | 2.19        |
+| ResNet50_vd              | 79.12      | 94.44       | 2.23        |
 | ResNet50_rsb             | 80.40      |         |     2.54        |
-| EfficientNetB1           | 79.15      | 94.41       | 2.88        |
+| EfficientNetB1           | 79.15      | 94.41       | 2.29        |
 | SwinTransformer_tiny     | 81.2      | 95.5       | 6.59        |
-| <b>PPHGNet_small<b>      | <b>81.51<b>| <b>95.82<b> | <b>2.52<b>  |
-| <b>PPHGNet_small_ssld<b> | <b>83.82<b>| <b>96.81<b> | <b>2.52<b>  |
-| Res2Net200_vd_26w_4s_ssld| 85.13      | 97.42       | 11.45       |
-| ResNeXt101_32x48d_wsl    | 85.37      | 97.69       | 55.07       |
+| <b>PPHGNet_small<b>      | <b>81.51<b>| <b>95.82<b> | <b>2.46<b>  |
+| <b>PPHGNet_small_ssld<b> | <b>83.82<b>| <b>96.81<b> | <b>2.46<b>  |
+| Res2Net200_vd_26w_4s_ssld| 85.13      | 97.42       | 10.80       |
+| ResNeXt101_32x48d_wsl    | 85.37      | 97.69       | 69.81       |
 | SwinTransformer_base     | 85.2       | 97.5        | 13.53       |  
 | <b>PPHGNet_base_ssld<b> | <b>85.00<b>| <b>97.35<b> | <b>5.97<b>   |
 
