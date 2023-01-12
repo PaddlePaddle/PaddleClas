@@ -41,7 +41,6 @@ SwinTransformerV2 在 SwinTransformer 的基础上进行改进，可处理大尺
 | SwinTransformerV2_small_patch4_window16_256   | 0.8414 | 0.9681 | 0.841 | 0.968 | 8.5 | 37.9   |
 | SwinTransformerV2_base_patch4_window8_256    | 0.8419 | 0.9687 | 0.842 | 0.969 | 15.0 | 67.0   |
 | SwinTransformerV2_base_patch4_window16_256   | 0.8458 | 0.9706 | 0.846 | 0.970 | 15.1 | 67.0   |
-| SwinTransformerV2_base_patch4_window12to16_256<sup>[1]</sup>    | 0.8616 | 0.9789 | 0.862 | 0.979 | 15.1 | 67.0   |
 | SwinTransformerV2_base_patch4_window24_384<sup>[1]</sup>   | 0.8714 | 0.9824 | 0.871 | 0.982 | 34.0 | 67.0   |
 | SwinTransformerV2_large_patch4_window16_256<sup>[1]</sup>   | 0.8689 | 0.9804 | 0.869 | 0.980 | 33.8 | 149.6 |
 | SwinTransformerV2_large_patch4_window24_384<sup>[1]</sup>  | 0.8747 | 0.9827 | 0.876 | 0.983 | 76.1 | 149.6 |
