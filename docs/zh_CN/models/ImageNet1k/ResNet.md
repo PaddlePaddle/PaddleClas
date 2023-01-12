@@ -48,7 +48,7 @@ PaddleClas 提供的 ResNet 系列的模型包括 ResNet50，ResNet50_vd，ResNe
 
 其中：
 * 后缀使用`_ssld`的模型采用了 SSLD 知识蒸馏，保证模型结构不变的情况下，进一步提升了模型的精度；
-* ResNet18_dbb 模型在官方 ResNet18_vb 模型的基础上，使用了 DiverseBranchBlock 进行训练，详细内容请参考[论文](https://arxiv.org/abs/2103.13425)。
+* ResNet18_dbb 模型在官方 ResNet18 模型的基础上，使用了 DiverseBranchBlock 进行训练，详细内容请参考[论文](https://arxiv.org/abs/2103.13425)。
 
 <a name='1.2'></a>
 
