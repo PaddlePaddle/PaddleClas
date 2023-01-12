@@ -28,23 +28,23 @@ from ....utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_fro
 
 MODEL_URLS = {
     "SwinTransformerV2_tiny_patch4_window8_256":
-    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/SwinTransformerV2_tiny_patch4_window8_256_pretrained.pdparams",
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/SwinTransformerV2_tiny_patch4_window8_256_pretrained.pdparams",
     "SwinTransformerV2_tiny_patch4_window16_256":
-    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/SwinTransformerV2_tiny_patch4_window16_256_pretrained.pdparams",
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/SwinTransformerV2_tiny_patch4_window16_256_pretrained.pdparams",
     "SwinTransformerV2_small_patch4_window8_256":
-    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/SwinTransformerV2_small_patch4_window8_256_pretrained.pdparams",
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/SwinTransformerV2_small_patch4_window8_256_pretrained.pdparams",
     "SwinTransformerV2_small_patch4_window16_256":
-    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/SwinTransformerV2_small_patch4_window16_256_pretrained.pdparams",
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/SwinTransformerV2_small_patch4_window16_256_pretrained.pdparams",
     "SwinTransformerV2_base_patch4_window8_256":
-    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/SwinTransformerV2_base_patch4_window8_256_pretrained.pdparams",
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/SwinTransformerV2_base_patch4_window8_256_pretrained.pdparams",
     "SwinTransformerV2_base_patch4_window16_256":
-    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/SwinTransformerV2_base_patch4_window16_256_pretrained.pdparams",
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/SwinTransformerV2_base_patch4_window16_256_pretrained.pdparams",
     "SwinTransformerV2_base_patch4_window24_384":
-    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/SwinTransformerV2_base_patch4_window24_384_pretrained.pdparams",
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/SwinTransformerV2_base_patch4_window24_384_pretrained.pdparams",
     "SwinTransformerV2_large_patch4_window16_256":
-    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/SwinTransformerV2_large_patch4_window16_256_pretrained.pdparams",
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/SwinTransformerV2_large_patch4_window16_256_pretrained.pdparams",
     "SwinTransformerV2_large_patch4_window24_384":
-    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/SwinTransformerV2_large_patch4_window24_384_pretrained.pdparams"
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/SwinTransformerV2_large_patch4_window24_384_pretrained.pdparams"
 }
 
 __all__ = list(MODEL_URLS.keys())
@@ -380,7 +380,7 @@ class SwinTransformerBlock(nn.Layer):
         assert L == H * W, "input feature has wrong size"
 
         shortcut = x
-        x = x.reshape(shape=[B, H, W, C])
+        x = x.reshape([B, H, W, C])
 
         # cyclic shift
         if self.shift_size > 0:
@@ -782,8 +782,8 @@ def _load_pretrained(pretrained,
             model,
             model_url,
             use_ssld=use_ssld,
-            use_imagenet22k_pretrained=False,
-            use_imagenet22kto1k_pretrained=False)
+            use_imagenet22k_pretrained=use_imagenet22k_pretrained,
+            use_imagenet22kto1k_pretrained=use_imagenet22kto1k_pretrained)
     elif isinstance(pretrained, str):
         load_dygraph_pretrain(model, pretrained, **kwargs)
     else:
@@ -916,7 +916,7 @@ def SwinTransformerV2_base_patch4_window24_384(
         pretrained=False,
         use_ssld=False,
         use_imagenet22k_pretrained=False,
-        use_imagenet22kto1k_pretrained=False,
+        use_imagenet22kto1k_pretrained=True,
         **kwargs):
     model = SwinTransformerV2(
         img_size=384,
@@ -941,7 +941,7 @@ def SwinTransformerV2_large_patch4_window16_256(
         pretrained=False,
         use_ssld=False,
         use_imagenet22k_pretrained=False,
-        use_imagenet22kto1k_pretrained=False,
+        use_imagenet22kto1k_pretrained=True,
         **kwargs):
     model = SwinTransformerV2(
         img_size=256,
@@ -966,7 +966,7 @@ def SwinTransformerV2_large_patch4_window24_384(
         pretrained=False,
         use_ssld=False,
         use_imagenet22k_pretrained=False,
-        use_imagenet22kto1k_pretrained=False,
+        use_imagenet22kto1k_pretrained=True,
         **kwargs):
     model = SwinTransformerV2(
         img_size=384,
