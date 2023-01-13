@@ -1,4 +1,4 @@
-<!-- 简体中文 | [English](../../en/algorithm_introduction/model_list.md) -->
+简体中文 | [English](../../en/algorithm_introduction/model_list.md) 
 
 
 # ImageNet 预训练模型库

@@ -1,3 +1,5 @@
+[简体中文](../../zh_CN/models/ImageNet1k/model_list.md) | English
+
 # ImageNet Model zoo overview
 
 ## Catalogue
