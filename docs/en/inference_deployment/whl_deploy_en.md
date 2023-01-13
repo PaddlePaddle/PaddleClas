@@ -45,7 +45,7 @@ python3 setup.py install
 
 ### 2.1 ImageNet1k models
 
-Using the `ResNet50` model provided by PaddleClas, the following image(`'docs/images/inference_deployment/whl_demo.jpg'`) as an example.
+Using the `ResNet50` model provided by PaddleClas, the following image(`'docs/images/inference_deployment/whl_demo.jpg'`) as an example. Please refer to [this document](../algorithm_introduction/ImageNet_models_en.md) for the full list of ImageNet1k models.
 
 ![](../../images/inference_deployment/whl_demo.jpg)
 

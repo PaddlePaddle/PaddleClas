@@ -37,7 +37,7 @@ python3 setup.py install
 
 <a name="2"></a>
 ## 2. 快速开始
-* 使用 `ResNet50` 模型，以下图（`PaddleClas/docs/images/inference_deployment/whl_demo.jpg`）为例进行说明。
+* 使用 `ResNet50` 模型，以下图（`PaddleClas/docs/images/inference_deployment/whl_demo.jpg`）为例进行说明。所有支持的模型列表在[此文档](../../models/ImageNet1k/model_list.md)中展示
 
 ![](../../../images/inference_deployment/whl_demo.jpg)
 
