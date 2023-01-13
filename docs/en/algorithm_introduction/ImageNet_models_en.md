@@ -2,7 +2,7 @@
 
 ## Catalogue
 
-- [1. Model library overview diagram](#1)
+- [1. Model library overview and quick start](#1)
 - [2. SSLD pretrained models](#2)
   - [2.1 Server-side knowledge distillation model](#2.1)
   - [2.2 Mobile-side knowledge distillation model](#2.2)
@@ -35,7 +35,9 @@
 
 <a name="1"></a>
 
-## 1. Model library overview diagram
+## 1. Model library overview and quick start
+
+### 1.1 Model library overview
 
 Based on the ImageNet-1k classification dataset, the 37 classification network structures supported by PaddleClas and the corresponding 217 image classification pretrained models are shown below. Training trick, a brief introduction to each series of network structures, and performance evaluation will be shown in the corresponding chapters. The  evaluation environment is as follows.
 
@@ -55,6 +57,63 @@ Curves of accuracy to the inference time of common mobile-side models are shown 
 Curves of accuracy to the inference time of some VisionTransformer models are shown as follows.
 
 ![](../../images/models/V100_benchmark/v100.fp32.bs1.visiontransformer.png)
+
+### 1.2 Quick start
+
+#### 1.2.1 Install PaddlePaddle and PaddleClas whl package
+
+- If you have CUDA 9 or CUDA 10 installed on your machine, please run the following command to install PaddlePaddle
+
+  ```
+  python -m pip install paddlepaddle-gpu -i https://pypi.tuna.tsinghua.edu.cn/simple
+  ```
+
+- If you have no available GPU on your machine, please run the following command to install the CPU version of PaddlePaddle
+
+  ```
+  python -m pip install paddlepaddle -i https://pypi.tuna.tsinghua.edu.cn/simple
+  ```
+
+​		For more software version requirements, please refer to the instructions in [Installation Document](https://www.paddlepaddle.org.cn/install/quick) for operation.
+
+- Install PaddleClas whl package
+
+  ```
+  pip install paddleclas
+  ```
+
+#### 1.2.2 PaddleClas Usage
+
+Take `ResNet50` for example, modify `--infer_imgs` to the path of your image, and the return result is shown below. To replace the model, change `--model_name` to the model name below
+
+* CLI
+
+```bash
+paddleclas --model_name=ResNet50  --infer_imgs="the/path/of/your/test_image.jpg"
+```
+
+```
+>>> result
+class_ids: [8, 7, 86, 82, 80], scores: [0.97968, 0.02028, 3e-05, 1e-05, 0.0], label_names: ['hen', 'cock', 'partridge', 'ruffed grouse, partridge, Bonasa umbellus', 'black grouse'], filename: docs/images/inference_deployment/whl_demo.jpg
+Predict complete!
+```
+
+* Python
+
+```python
+from paddleclas import PaddleClas
+clas = PaddleClas(model_name='ResNet50')
+infer_imgs="the/path/of/your/test_image.jpg"
+result=clas.predict(infer_imgs)
+print(next(result))
+```
+
+**Note**: `PaddleClas.predict()` is a `generator`. Therefore you need to use `next()` or `for` call it iteratively. It will perform a prediction by `batch_size` and return the prediction result(s) when called. Examples of returned results are as follows:
+
+```
+>>> result
+[{'class_ids': [8, 7, 86, 82, 80], 'scores': [0.97968, 0.02028, 3e-05, 1e-05, 0.0], 'label_names': ['hen', 'cock', 'partridge', 'ruffed grouse, partridge, Bonasa umbellus', 'black grouse'], 'filename': 'docs/images/inference_deployment/whl_demo.jpg'}]
+```
 
 <a name="2"></a>
 

@@ -5,7 +5,7 @@
 
 ## 目录
 
-- [一、模型库概览图](#Overview)
+- [一、模型库概览图与快速使用](#Overview)
 - [二、SSLD 知识蒸馏预训练模型](#SSLD)
   - [2.1 服务器端知识蒸馏模型](#SSLD_server)
   - [2.2 移动端知识蒸馏模型](#SSLD_mobile)
@@ -55,9 +55,12 @@
 
 <a name="Overview"></a>
 
-## 一、模型库概览图
+## 一、模型库概览图与快速使用
+
+### 1.1 模型库概览图
 
 基于 ImageNet1k 分类数据集，PaddleClas 支持 37 个系列分类网络结构以及对应的 217 个图像分类预训练模型，训练技巧、每个系列网络结构的简单介绍和性能评估将在相应章节展现，下面所有的速度指标评估环境如下：
+
 * Arm CPU 的评估环境基于骁龙 855(SD855)。
 * Intel CPU 的评估环境基于 Intel(R) Xeon(R) Gold 6148。
 * GPU 评估环境基于 V100 机器，在 FP32+TensorRT 配置下运行 2100 次测得（去除前 100 次的 warmup 时间）。
@@ -74,6 +77,63 @@
 部分VisionTransformer模型的精度指标与其预测耗时的变化曲线如下图所示.
 
 ![](../../../images/models/V100_benchmark/v100.fp32.bs1.visiontransformer.png)
+
+### 1.2 快速使用
+
+#### 1.2.1 安装PaddlePaddle与PaddleClas whl包
+
+- 您的机器安装的是CUDA9或CUDA10，请运行以下命令安装PaddlePaddle
+
+  ```
+  python3 -m pip install paddlepaddle-gpu -i https://mirror.baidu.com/pypi/simple
+  ```
+
+- 您的机器是CPU，请运行以下命令安装PaddlePaddle
+
+  ```
+  python3 -m pip install paddlepaddle -i https://mirror.baidu.com/pypi/simple
+  ```
+
+  - 更多的版本需求，请参照[飞桨官网安装文档](https://www.paddlepaddle.org.cn/install/quick)中的说明进行操作。
+
+- 安装PaddleClas whl包
+
+  ```
+  pip install paddleclas
+  ```
+
+#### 1.2.2 使用
+
+以 `ResNet50` 模型为例，修改`--infer_imgs` 为自己的待测图片的路径，返回结果示例如下。如需替换模型请修改 `--model_name` 为下方模型名称
+
+* 在命令行中使用
+
+```bash
+paddleclas --model_name=ResNet50  --infer_imgs="the/path/of/your/test_image.jpg"
+```
+
+```
+>>> result
+class_ids: [8, 7, 86, 82, 80], scores: [0.97968, 0.02028, 3e-05, 1e-05, 0.0], label_names: ['hen', 'cock', 'partridge', 'ruffed grouse, partridge, Bonasa umbellus', 'black grouse'], filename: docs/images/inference_deployment/whl_demo.jpg
+Predict complete!
+```
+
+* 在 Python 代码中使用
+
+```python
+from paddleclas import PaddleClas
+clas = PaddleClas(model_name='ResNet50')
+infer_imgs="the/path/of/your/test_image.jpg"
+result=clas.predict(infer_imgs)
+print(next(result))
+```
+
+**注意**：`PaddleClas.predict()` 为可迭代对象（`generator`），因此需要使用 `next()` 函数或 `for` 循环对其迭代调用。每次调用将以 `batch_size` 为单位进行一次预测，并返回预测结果。返回结果示例如下：
+
+```
+>>> result
+[{'class_ids': [8, 7, 86, 82, 80], 'scores': [0.97968, 0.02028, 3e-05, 1e-05, 0.0], 'label_names': ['hen', 'cock', 'partridge', 'ruffed grouse, partridge, Bonasa umbellus', 'black grouse'], 'filename': 'docs/images/inference_deployment/whl_demo.jpg'}]
+```
 
 <a name="SSLD"></a>
 
