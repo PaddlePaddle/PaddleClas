@@ -1,7 +1,5 @@
 import paddle
 import paddle.nn as nn
-from paddle.nn import Sigmoid
-from paddle.nn import Tanh
 from ..model_zoo.efficientnet import EfficientNetB3, _load_pretrained
 
 MODEL_URLS = {
