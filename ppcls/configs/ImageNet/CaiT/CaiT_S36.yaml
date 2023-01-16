@@ -7,7 +7,7 @@ Global:
   save_interval: 1
   eval_during_train: True
   eval_interval: 1
-  epochs: 300
+  epochs: 400
   print_batch_step: 10
   use_visualdl: False
   # used for static mode and model export
@@ -54,8 +54,8 @@ Optimizer:
   lr:
     # for 8 cards
     name: Cosine
-    learning_rate: 5e-4
-    eta_min: 0.0
+    learning_rate: 0.001
+    eta_min: 1e-5
     warmup_epoch: 5
     warmup_start_lr: 1e-6
 
