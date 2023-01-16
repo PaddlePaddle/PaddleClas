@@ -23,7 +23,7 @@ import sys
 import paddle
 from paddle import ParamAttr
 import paddle.nn as nn
-from paddle.nn import Conv2D, BatchNorm, Linear
+from paddle.nn import Conv2D, BatchNorm2D, Linear
 from paddle.nn import AdaptiveAvgPool2D, MaxPool2D, AvgPool2D
 from paddle.nn.initializer import Uniform
 
@@ -59,6 +59,7 @@ class ConvBNLayer(nn.Layer):
                  name=None):
         super(ConvBNLayer, self).__init__()
 
+        self.use_act = act
         self._conv = Conv2D(
             in_channels=num_channels,
             out_channels=num_filters,
@@ -68,17 +69,18 @@ class ConvBNLayer(nn.Layer):
             groups=groups,
             weight_attr=ParamAttr(name=name + "_weights"),
             bias_attr=False)
-        self._batch_norm = BatchNorm(
+        self._batch_norm = BatchNorm2D(
             num_filters,
-            act=act,
-            param_attr=ParamAttr(name=name + '_bn_scale'),
-            bias_attr=ParamAttr(name + '_bn_offset'),
-            moving_mean_name=name + '_bn_mean',
-            moving_variance_name=name + '_bn_variance')
+            weight_attr=ParamAttr(name=name + '_bn_scale'),
+            bias_attr=ParamAttr(name + '_bn_offset'))
+        if self.use_act:
+            self.act = nn.ReLU()
 
     def forward(self, input):
         y = self._conv(input)
         y = self._batch_norm(y)
+        if self.use_act:
+            y = self.act(y)
         return y
 
 
@@ -95,13 +97,13 @@ class BNACConvLayer(nn.Layer):
         super(BNACConvLayer, self).__init__()
         self.num_channels = num_channels
 
-        self._batch_norm = BatchNorm(
+        self.use_act = act
+        self._batch_norm = BatchNorm2D(
             num_channels,
-            act=act,
-            param_attr=ParamAttr(name=name + '_bn_scale'),
-            bias_attr=ParamAttr(name + '_bn_offset'),
-            moving_mean_name=name + '_bn_mean',
-            moving_variance_name=name + '_bn_variance')
+            weight_attr=ParamAttr(name=name + '_bn_scale'),
+            bias_attr=ParamAttr(name + '_bn_offset'))
+        if self.use_act:
+            self.act = nn.ReLU()
 
         self._conv = Conv2D(
             in_channels=num_channels,
@@ -115,6 +117,8 @@ class BNACConvLayer(nn.Layer):
 
     def forward(self, input):
         y = self._batch_norm(input)
+        if self.use_act:
+            y = self.act(y)
         y = self._conv(y)
         return y
 
@@ -303,13 +307,11 @@ class DPN(nn.Layer):
 
         out_channel = sum(num_channel_dpn)
 
-        self.conv5_x_x_bn = BatchNorm(
-            num_channels=sum(num_channel_dpn),
-            act="relu",
-            param_attr=ParamAttr(name='final_concat_bn_scale'),
-            bias_attr=ParamAttr('final_concat_bn_offset'),
-            moving_mean_name='final_concat_bn_mean',
-            moving_variance_name='final_concat_bn_variance')
+        self.conv5_x_x_bn = BatchNorm2D(
+            num_features=sum(num_channel_dpn),
+            weight_attr=ParamAttr(name='final_concat_bn_scale'),
+            bias_attr=ParamAttr('final_concat_bn_offset'))
+        self.act = nn.ReLU()
 
         self.pool2d_avg = AdaptiveAvgPool2D(1)
 
@@ -336,6 +338,7 @@ class DPN(nn.Layer):
 
         conv5_x_x = paddle.concat(convX_x_x, axis=1)
         conv5_x_x = self.conv5_x_x_bn(conv5_x_x)
+        conv5_x_x = self.act(conv5_x_x)
 
         y = self.pool2d_avg(conv5_x_x)
         y = paddle.flatten(y, start_axis=1, stop_axis=-1)

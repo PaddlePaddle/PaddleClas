@@ -26,7 +26,7 @@ import paddle.nn as nn
 import paddle.nn.functional as F
 from paddle import ParamAttr
 from paddle.nn.initializer import KaimingNormal
-from paddle.nn import Conv2D, BatchNorm, Linear, Dropout
+from paddle.nn import Conv2D, BatchNorm2D, Linear, Dropout
 from paddle.nn import AdaptiveAvgPool2D, MaxPool2D, AvgPool2D
 from paddle.regularizer import L2Decay
 
@@ -62,6 +62,7 @@ class ConvBNLayer(nn.Layer):
 
         bn_decay = 0.0
 
+        self.use_act = act
         self._conv = Conv2D(
             in_channels=num_channels,
             out_channels=num_filters,
@@ -72,19 +73,20 @@ class ConvBNLayer(nn.Layer):
             groups=groups,
             weight_attr=ParamAttr(name=name + "_weight"),
             bias_attr=False)
-        self._batch_norm = BatchNorm(
+        self._batch_norm = BatchNorm2D(
             num_filters,
-            act=act,
-            param_attr=ParamAttr(
+            weight_attr=ParamAttr(
                 name=name + "_scale", regularizer=L2Decay(bn_decay)),
             bias_attr=ParamAttr(
-                name + "_offset", regularizer=L2Decay(bn_decay)),
-            moving_mean_name=name + "_mean",
-            moving_variance_name=name + "_variance")
+                name + "_offset", regularizer=L2Decay(bn_decay)))
+        if self.use_act:
+            self.act = nn.ReLU()
 
     def forward(self, x):
         x = self._conv(x)
         x = self._batch_norm(x)
+        if self.use_act:
+            x = self.act(x)
         return x
 
 
@@ -310,16 +312,13 @@ class BottleneckBlock(nn.Layer):
                     bias_attr=False)
 
             bn_decay = 0.0
-            self._batch_norm = BatchNorm(
+            self._batch_norm = BatchNorm2D(
                 planes * 4,
-                act=None,
-                param_attr=ParamAttr(
+                weight_attr=ParamAttr(
                     name=name + "_shortcut_scale",
                     regularizer=L2Decay(bn_decay)),
                 bias_attr=ParamAttr(
-                    name + "_shortcut_offset", regularizer=L2Decay(bn_decay)),
-                moving_mean_name=name + "_shortcut_mean",
-                moving_variance_name=name + "_shortcut_variance")
+                    name + "_shortcut_offset", regularizer=L2Decay(bn_decay)))
 
     def forward(self, x):
         short = x

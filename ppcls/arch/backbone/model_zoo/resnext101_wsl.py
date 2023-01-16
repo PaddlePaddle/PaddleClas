@@ -18,7 +18,7 @@ import paddle
 from paddle import ParamAttr
 import paddle.nn as nn
 import paddle.nn.functional as F
-from paddle.nn import Conv2D, BatchNorm, Linear, Dropout
+from paddle.nn import Conv2D, BatchNorm2D, Linear, Dropout
 from paddle.nn import AdaptiveAvgPool2D, MaxPool2D, AvgPool2D
 from paddle.nn.initializer import Uniform
 
@@ -52,6 +52,7 @@ class ConvBNLayer(nn.Layer):
             conv_name = name + ".0"
         else:
             conv_name = name
+        self.use_act = act
         self._conv = Conv2D(
             in_channels=input_channels,
             out_channels=output_channels,
@@ -69,17 +70,18 @@ class ConvBNLayer(nn.Layer):
             else:
                 bn_name = (name[:10] if name[7:9].isdigit() else name[:9]
                            ) + "bn" + name[-1]
-        self._bn = BatchNorm(
-            num_channels=output_channels,
-            act=act,
-            param_attr=ParamAttr(name=bn_name + ".weight"),
-            bias_attr=ParamAttr(name=bn_name + ".bias"),
-            moving_mean_name=bn_name + ".running_mean",
-            moving_variance_name=bn_name + ".running_var")
+        self._bn = BatchNorm2D(
+            num_features=output_channels,
+            weight_attr=ParamAttr(name=bn_name + ".weight"),
+            bias_attr=ParamAttr(name=bn_name + ".bias"))
+        if self.use_act:
+            self.act = nn.ReLU()
 
     def forward(self, inputs):
         x = self._conv(inputs)
         x = self._bn(x)
+        if self.use_act:
+            x = self.act(x)
         return x
 
 
