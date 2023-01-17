@@ -76,7 +76,7 @@ Curves of accuracy to the inference time of some VisionTransformer models are sh
   python -m pip install paddlepaddle -i https://pypi.tuna.tsinghua.edu.cn/simple
   ```
 
-​		For more software version requirements, please refer to the instructions in [Installation Document](https://www.paddlepaddle.org.cn/install/quick) for operation.
+  For more software version requirements, please refer to the instructions in [Installation Document](https://www.paddlepaddle.org.cn/en/install/quick) for operation.
 
 - Install PaddleClas whl package
 
