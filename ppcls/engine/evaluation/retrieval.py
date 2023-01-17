@@ -15,7 +15,6 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-import platform
 from typing import Optional
 
 import numpy as np
@@ -146,11 +145,7 @@ def cal_feature(engine, name='gallery'):
     batch_feas_list = []
     img_id_list = []
     unique_id_list = []
-    max_iter = len(dataloader) - 1 if platform.system() == "Windows" else len(
-        dataloader)
     for idx, batch in enumerate(dataloader):  # load is very time-consuming
-        if idx >= max_iter:
-            break
         if idx % engine.config["Global"]["print_batch_step"] == 0:
             logger.info(
                 f"{name} feature calculation process: [{idx}/{len(dataloader)}]"
