@@ -708,7 +708,7 @@ class SwinTransformer(TheseusLayer):
                  img_size=224,
                  patch_size=4,
                  in_chans=3,
-                 class_num=5,
+                 class_num=1000,
                  embed_dim=96,
                  depths=[2, 2, 6, 2],
                  num_heads=[3, 6, 12, 24],
