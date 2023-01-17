@@ -4,7 +4,7 @@ from ..model_zoo.efficientnet import EfficientNetB3, _load_pretrained
 
 MODEL_URLS = {
     "EfficientNetB3_watermark":
-    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/EfficientNetB3_watermark_pretrained.pdparams"
+    "https://paddleclas.bj.bcebos.com/models/practical/pretrained/EfficientNetB3_watermark_pretrained.pdparams"
 }
 
 __all__ = list(MODEL_URLS.keys())
@@ -21,7 +21,7 @@ def EfficientNetB3_watermark(padding_type='DYNAMIC',
             # 1536 is the orginal in_features
             nn.Linear(
                 in_features=1536, out_features=625),
-            nn.ReLU(),  # ReLu to be the activation function
+            nn.ReLU(),
             nn.Dropout(p=0.3),
             nn.Linear(
                 in_features=625, out_features=256),
