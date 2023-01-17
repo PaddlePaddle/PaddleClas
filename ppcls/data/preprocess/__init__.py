@@ -14,6 +14,7 @@
 
 from ppcls.data.preprocess.ops.autoaugment import ImageNetPolicy as RawImageNetPolicy
 from ppcls.data.preprocess.ops.randaugment import RandAugment as RawRandAugment
+from ppcls.data.preprocess.ops.randaugment import RandomApply
 from ppcls.data.preprocess.ops.timm_autoaugment import RawTimmAutoAugment
 from ppcls.data.preprocess.ops.cutout import Cutout
 
@@ -39,10 +40,12 @@ from ppcls.data.preprocess.ops.operators import RandomResizedCrop
 from ppcls.data.preprocess.ops.operators import CropWithPadding
 from ppcls.data.preprocess.ops.operators import RandomInterpolationAugment
 from ppcls.data.preprocess.ops.operators import ColorJitter
+from ppcls.data.preprocess.ops.operators import RandomGrayscale
 from ppcls.data.preprocess.ops.operators import RandomCropImage
 from ppcls.data.preprocess.ops.operators import RandomRotation
 from ppcls.data.preprocess.ops.operators import Padv2
 from ppcls.data.preprocess.ops.operators import RandomRot90
+from ppcls.data.preprocess.ops.operators import PCALighting
 from .ops.operators import format_data
 from paddle.vision.transforms import Pad as Pad_paddle_vision
 
@@ -52,7 +55,6 @@ from ppcls.data.preprocess.batch_ops.batch_operators import MixupCutmixHybrid
 import numpy as np
 from PIL import Image
 import random
-
 
 def transform(data, ops=[]):
     """ transform """

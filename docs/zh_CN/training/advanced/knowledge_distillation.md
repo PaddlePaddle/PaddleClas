@@ -17,6 +17,8 @@
         - [1.2.6 DIST](#1.2.6)
         - [1.2.7 MGD](#1.2.7)
         - [1.2.8 WSL](#1.2.8)
+        - [1.2.9 SKD](#1.2.9)
+        - [1.2.10 PEFD](#1.2.10)
 - [2. 使用方法](#2)
     - [2.1 环境配置](#2.1)
     - [2.2 数据准备](#2.2)
@@ -578,8 +580,8 @@ Loss:
         model_name_pairs: [["Student", "Teacher"]] # calculate mgdloss for Student and Teacher
         name: "loss_mgd"
         base_loss_name: MGDLoss # MGD loss，the following are parameters of 'MGD loss'
-        s_keys: ["blocks[7]"]   # feature map used to calculate MGD loss in student model
-        t_keys: ["blocks[15]"]  # feature map used to calculate MGD loss in teacher model
+        s_key: "blocks[7]"   # feature map used to calculate MGD loss in student model
+        t_key: "blocks[15]"  # feature map used to calculate MGD loss in teacher model
         student_channels: 512   # channel num for stduent feature map
         teacher_channels: 512   # channel num for teacher feature map
   Eval:
@@ -649,6 +651,146 @@ Loss:
         weight: 2.5
         model_name_pairs: [["Student", "Teacher"]]
         temperature: 2
+  Eval:
+    - CELoss:
+        weight: 1.0
+```
+
+<a name='1.2.9'></a>
+
+#### 1.2.9 SKD
+
+##### 1.2.9.1 SKD 算法介绍
+
+论文信息：
+
+
+> [Reducing the Teacher-Student Gap via Spherical Knowledge Disitllation](https://arxiv.org/abs/2010.07485)
+>
+> Jia Guo, Minghao Chen, Yao Hu, Chen Zhu, Xiaofei He, Deng Cai
+>
+> 2022, under review
+
+使用更大、精度更高的教师模型蒸馏学生模型，学生模型的精度往往反而降低。SKD (Spherical Knowledge Disitllation) 方法显式地消除了教师与学生之间的置信度差距，缓解了教师与学生之间的容量差距问题。SKD在ImageNet1k上蒸馏ResNet18的任务上显著超越了SOTA。
+
+在ImageNet1k公开数据集上，效果如下所示。
+
+| 策略 | 骨干网络 | 配置文件 | Top-1 acc | 下载链接 |
+| --- | --- | --- | --- | --- |
+| baseline | ResNet18 | [ResNet18.yaml](../../../../ppcls/configs/ImageNet/ResNet/ResNet18.yaml) | 70.8% | - |
+| SKD | ResNet18 | [resnet34_distill_resnet18_skd.yaml](../../../../ppcls/configs/ImageNet/Distillation/resnet34_distill_resnet18_skd.yaml) | 72.84%(**+2.04%**) | - |
+
+
+##### 1.2.9.2 SKD 配置
+
+SKD 配置如下所示。在模型构建Arch字段中，需要同时定义学生模型与教师模型，教师模型固定参数，且需要加载预训练模型。在损失函数Loss字段中，需要定义`DistillationSKDLoss`（学生与教师之间的SKD loss），作为训练的损失函数。需要注意的是，SKD loss包含了学生与教师模型之间的KL div loss和学生模型与真值标签之间的CE loss，因此无需定义`DistillationGTCELoss`。
+
+
+```yaml
+# model architecture
+Arch:
+  name: "DistillationModel"
+  # if not null, its lengths should be same as models
+  pretrained_list:
+  # if not null, its lengths should be same as models
+  freeze_params_list:
+  - True
+  - False
+  models:
+    - Teacher:
+        name: ResNet34
+        pretrained: True
+
+    - Student:
+        name: ResNet18
+        pretrained: False
+
+  infer_model_name: "Student"
+
+
+# loss function config for traing/eval process
+Loss:
+  Train:
+    - DistillationSKDLoss:
+        weight: 1.0
+        model_name_pairs: [["Student", "Teacher"]]
+        temperature: 1.0
+        multiplier: 2.0
+        alpha: 0.9
+  Eval:
+    - CELoss:
+        weight: 1.0
+```
+
+<a name='1.2.10'></a>
+
+#### 1.2.10 PEFD
+
+##### 1.2.10.1 PEFD 算法介绍
+
+论文信息：
+
+
+> [Improved Feature Distillation via Projector Ensemble](https://arxiv.org/pdf/2210.15274.pdf)
+>
+> Yudong Chen, Sen Wang, Jiajun Liu, Xuwei Xu, Frank de Hoog, Zi Huang
+>
+> NeurIPS 2022
+
+PEFD使用多个projector对学生特征图进行投影并ensemble，来拟合教师的特征图。与不使用projector或使用单个projector相比，该方法可以避免学生模型对教师特征的过拟合，进一步提高特征蒸馏的性能。
+
+在ImageNet1k公开数据集上，效果如下所示。
+
+| 策略 | 骨干网络 | 配置文件 | Top-1 acc | 下载链接 |
+| --- | --- | --- | --- | --- |
+| baseline | ResNet18 | [ResNet18.yaml](../../../../ppcls/configs/ImageNet/ResNet/ResNet18.yaml) | 70.8% | - |
+| PEFD | ResNet18 | [resnet34_distill_resnet18_pefd.yaml](../../../../ppcls/configs/ImageNet/Distillation/resnet34_distill_resnet18_pefd.yaml) | 72.23%(**+1.43%**) | - |
+
+
+##### 1.2.10.2 PEFD 配置
+
+PEFD 配置如下所示。在模型构建Arch字段中，需要同时定义学生模型与教师模型，教师模型固定参数，且需要加载预训练模型。在损失函数Loss字段中，需要定义`DistillationPairLoss`（学生与教师模型之间的PEFDLoss）以及`DistillationGTCELoss`（学生与教师关于真值标签的CE loss），作为训练的损失函数。
+
+
+```yaml
+# model architecture
+Arch:
+  name: "DistillationModel"
+  class_num: &class_num 1000
+  # if not null, its lengths should be same as models
+  pretrained_list:
+  # if not null, its lengths should be same as models
+  freeze_params_list:
+  - True
+  - False
+  infer_model_name: "Student"
+  models:
+    - Teacher:
+        name: ResNet34
+        class_num: *class_num
+        pretrained: True
+        return_patterns: &t_stages ["avg_pool"]
+    - Student:
+        name: ResNet18
+        class_num: *class_num
+        pretrained: False
+        return_patterns: &s_stages ["avg_pool"]
+
+# loss function config for traing/eval process
+Loss:
+  Train:
+    - DistillationGTCELoss:
+        weight: 1.0
+        model_names: ["Student"]
+    - DistillationPairLoss:
+        weight: 25.0
+        base_loss_name: PEFDLoss
+        model_name_pairs: [["Student", "Teacher"]]
+        s_key: "avg_pool"
+        t_key: "avg_pool"
+        name: "loss_pefd"
+        student_channel: 512
+        teacher_channel: 512
   Eval:
     - CELoss:
         weight: 1.0

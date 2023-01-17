@@ -26,8 +26,12 @@ from ..base.theseus_layer import TheseusLayer
 from ....utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
 
 MODEL_URLS = {
+    "PPLCNetV2_small":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/PPLCNetV2_small_pretrained.pdparams",
     "PPLCNetV2_base":
     "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/PPLCNetV2_base_pretrained.pdparams",
+    "PPLCNetV2_large":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/PPLCNetV2_large_pretrained.pdparams",
 }
 
 __all__ = list(MODEL_URLS.keys())
@@ -212,7 +216,7 @@ class RepDepthwiseSeparable(TheseusLayer):
             x = x + input_x
         return x
 
-    def rep(self):
+    def re_parameterize(self):
         if self.use_rep:
             self.is_repped = True
             kernel, bias = self._get_equivalent_kernel_bias()
@@ -340,6 +344,23 @@ def _load_pretrained(pretrained, model, model_url, use_ssld):
         )
 
 
+def PPLCNetV2_small(pretrained=False, use_ssld=False, **kwargs):
+    """
+    PPLCNetV2_small
+    Args:
+        pretrained: bool=False or str. If `True` load pretrained parameters, `False` otherwise.
+                    If str, means the path of the pretrained model.
+        use_ssld: bool=False. Whether using distillation pretrained model when pretrained=True.
+    Returns:
+        model: nn.Layer. Specific `PPLCNetV2_base` model depends on args.
+    """
+    model = PPLCNetV2(
+        scale=0.75, depths=[2, 2, 4, 2], dropout_prob=0.2, **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["PPLCNetV2_small"],
+                     use_ssld)
+    return model
+
+
 def PPLCNetV2_base(pretrained=False, use_ssld=False, **kwargs):
     """
     PPLCNetV2_base
@@ -353,4 +374,21 @@ def PPLCNetV2_base(pretrained=False, use_ssld=False, **kwargs):
     model = PPLCNetV2(
         scale=1.0, depths=[2, 2, 6, 2], dropout_prob=0.2, **kwargs)
     _load_pretrained(pretrained, model, MODEL_URLS["PPLCNetV2_base"], use_ssld)
+    return model
+
+
+def PPLCNetV2_large(pretrained=False, use_ssld=False, **kwargs):
+    """
+    PPLCNetV2_large
+    Args:
+        pretrained: bool=False or str. If `True` load pretrained parameters, `False` otherwise.
+                    If str, means the path of the pretrained model.
+        use_ssld: bool=False. Whether using distillation pretrained model when pretrained=True.
+    Returns:
+        model: nn.Layer. Specific `PPLCNetV2_base` model depends on args.
+    """
+    model = PPLCNetV2(
+        scale=1.25, depths=[2, 2, 8, 2], dropout_prob=0.2, **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["PPLCNetV2_large"],
+                     use_ssld)
     return model

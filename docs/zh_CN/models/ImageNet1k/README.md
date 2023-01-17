@@ -49,6 +49,9 @@
     - [PVTV2 系列](#PVTV2)
     - [LeViT 系列](#LeViT)
     - [TNT 系列](#TNT)
+    - [NextViT 系列](#NextViT)
+    - [UniFormer 系列](#UniFormer)
+    - [DSNet 系列](#DSNet)
   - [4.2 轻量级模型](#Transformer_lite)
     - [MobileViT 系列](#MobileViT)
 - [五、参考文献](#reference)
@@ -327,8 +330,11 @@ ResNeSt 系列模型的精度、速度指标如下表所示，更多关于该系
 
 | 模型                   | Top-1 Acc | Top-5 Acc | time(ms)<br>bs=1 | time(ms)<br>bs=4 | time(ms)<br/>bs=8 | FLOPs(G) | Params(M) | 预训练模型下载地址                                      | inference模型下载地址                          |
 |------------------------|-----------|-----------|------------------|------------------|----------|-----------|------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------|
-| ResNeSt50_<br>fast_1s1x64d | 0.8035    | 0.9528    | 2.73             | 5.33             | 8.24           | 4.36     | 26.27      | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ResNeSt50_fast_1s1x64d_pretrained.pdparams) | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/ResNeSt50_fast_1s1x64d_infer.tar) |
-| ResNeSt50              | 0.8083    | 0.9542    | 7.36             | 10.23            | 13.84          | 5.40    | 27.54      | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ResNeSt50_pretrained.pdparams)              | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/ResNeSt50_infer.tar) |
+| ResNeSt50_<br>fast_1s1x64d | 0.8061    | 0.9527    | 2.73             | 5.33             | 8.24           | 4.36     | 26.27      | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ResNeSt50_fast_1s1x64d_pretrained.pdparams) | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/ResNeSt50_fast_1s1x64d_infer.tar) |
+| ResNeSt50              | 0.8102    | 0.9546    | 7.36             | 10.23            | 13.84          | 5.40    | 27.54      | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ResNeSt50_pretrained.pdparams)              | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/ResNeSt50_infer.tar) |
+| ResNeSt101              | 0.8279    | 0.9642    |              |             |           | 10.25    | 48.40      | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ResNeSt101_pretrained.pdparams)              | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/ResNeSt101_infer.tar) |
+| ResNeSt200              | 0.8418    | 0.9698    |              |             |           | 17.50    | 70.41      | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ResNeSt200_pretrained.pdparams)              | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/ResNeSt200_infer.tar) |
+| ResNeSt269              | 0.8444    |0.9698    |              |             |           | 22.54    | 111.23      | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ResNeSt269_pretrained.pdparams)              | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/ResNeSt269_infer.tar) |
 
 <a name="RegNet"></a>
 
@@ -338,7 +344,19 @@ RegNet 系列模型的精度、速度指标如下表所示，更多关于该系�
 
 | 模型                   | Top-1 Acc | Top-5 Acc | time(ms)<br>bs=1 | time(ms)<br>bs=4 | time(ms)<br/>bs=8 | FLOPs(G) | Params(M) | 预训练模型下载地址                                      | inference模型下载地址                          |
 |------------------------|-----------|-----------|------------------|------------------|----------|-----------|------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------|
-| RegNetX_4GF            | 0.785     | 0.9416    | 6.46             | 8.48             |      11.45     | 4.00        | 22.23      | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/RegNetX_4GF_pretrained.pdparams)            | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/RegNetX_4GF_infer.tar) |
+| RegNetX_200MF            | 0.680     | 0.8842    |              |              |           | 0.20        | 2.74      | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/RegNetX_200MF_pretrained.pdparams)            | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/RegNetX_200MF_infer.tar) |
+| RegNetX_400MF            | 0.723     | 0.9078    |              |              |           | 0.40        | 5.19      | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/RegNetX_400MF_pretrained.pdparams)            | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/RegNetX_400MF_infer.tar) |
+| RegNetX_600MF            | 0.737     | 0.9198    |              |              |           | 0.61        | 6.23      | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/RegNetX_600MF_pretrained.pdparams)            | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/RegNetX_600MF_infer.tar) |
+| RegNetX_800MF            | 0.751     | 0.9250    |              |              |           | 0.81        | 7.30      | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/RegNetX_800MF_pretrained.pdparams)            | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/RegNetX_800MF_infer.tar) |
+| RegNetX_1600MF            | 0.767     | 0.9329    |              |              |           | 1.62        | 9.23      | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/RegNetX_1600MF_pretrained.pdparams)            | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/RegNetX_1600MF_infer.tar) |
+| RegNetX_3200MF            | 0.781     | 0.9413    |              |              |           | 3.20        | 15.36      | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/RegNetX_3200MF_pretrained.pdparams)            | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/RegNetX_3200MF_infer.tar) |
+| RegNetX_4GF            | 0.785     | 0.9416    | 6.46             | 8.48             |      11.45     | 3.99        | 22.16      | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/RegNetX_4GF_pretrained.pdparams)            | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/RegNetX_4GF_infer.tar) |
+| RegNetX_6400MF            | 0.790     | 0.9461    |              |              |           | 6.49        | 26.28      | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/RegNetX_6400MF_pretrained.pdparams)            | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/RegNetX_6400MF_infer.tar) |
+| RegNetX_8GF            | 0.793     | 0.9464    |              |              |           | 8.02        | 39.66      | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/RegNetX_8GF_pretrained.pdparams)            | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/RegNetX_8GF_infer.tar) |
+| RegNetX_12GF            | 0.797     | 0.9501    |              |              |           | 12.13        | 46.20      | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/RegNetX_12GF_pretrained.pdparams)            | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/RegNetX_12GF_infer.tar) |
+| RegNetX_16GF            | 0.801     | 0.9505    |              |              |           | 15.99        | 54.39      | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/RegNetX_16GF_pretrained.pdparams)            | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/RegNetX_16GF_infer.tar) |
+| RegNetX_32GF            | 0.803     | 0.9526    |              |              |           | 32.33        | 130.67      | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/RegNetX_32GF_pretrained.pdparams)            | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/RegNetX_32GF_infer.tar) |
+
 
 <a name="RepVGG"></a>
 
@@ -357,7 +375,9 @@ RegNet 系列模型的精度、速度指标如下表所示，更多关于该系�
 | RepVGG_B1g2 | 0.7732    | 0.9359    |  |  |  | 8.82 | 41.36 | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/RepVGG_B1g2_pretrained.pdparams) | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/RepVGG_B1g2_infer.tar) |
 | RepVGG_B1g4 | 0.7675    | 0.9335    |  |  |  | 7.31 | 36.13 | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/RepVGG_B1g4_pretrained.pdparams) | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/RepVGG_B1g4_infer.tar) |
 | RepVGG_B2g4 | 0.7881    | 0.9448    |  |  |  | 11.34 | 55.78 | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/RepVGG_B2g4_pretrained.pdparams) | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/RepVGG_B2g4_infer.tar) |
-| RepVGG_B3g4 | 0.7965    | 0.9485    |  |  |  | 16.07 | 75.63 | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/RepVGG_B3g4_pretrained.pdparams) | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/RepVGG_B3g4_infer.tar) |
+| RepVGG_B3 | 0.8031    | 0.9517    |  |  |  | 29.16 | 123.19 | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/RepVGG_B3_pretrained.pdparams) | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/RepVGG_B3_infer.tar) |
+| RepVGG_B3g4 | 0.8005    | 0.9502    |  |  |  | 17.89 | 83.93 | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/RepVGG_B3g4_pretrained.pdparams) | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/RepVGG_B3g4_infer.tar) |
+| RepVGG_D2se | 0.8339    | 0.9665    |  |  |  | 36.54 | 133.47 | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/RepVGG_D2se_pretrained.pdparams) | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/RepVGG_D2se_infer.tar) |
 
 <a name="MixNet"></a>
 
@@ -439,6 +459,11 @@ RegNet 系列模型的精度、速度指标如下表所示，更多关于该系�
 | 模型       | Top-1 Acc | Top-5 Acc | time(ms)<br>bs=1 | time(ms)<br>bs=4 | time(ms)<br/>bs=8 | FLOPs(G) | Params(M) | 预训练模型下载地址 | inference模型下载地址 |
 | ---------- | --------- | --------- | ---------------- | ---------------- | -------- | --------- | ------------------------------------------------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ |
 | ConvNeXt_tiny | 0.8203 | 0.9590 | - | - | - | 4.458 | 28.583 | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ConvNeXt_tiny_pretrained.pdparams) | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/ConvNeXt_tiny_infer.tar) |
+| ConvNeXt_small | 0.8313 | 0.9643 | - | - | - | 8.688 | 50.210 | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ConvNeXt_small_pretrained.pdparams) | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/ConvNeXt_small_infer.tar) |
+| ConvNeXt_base_224 | 0.8384 | 0.9676 | - | - | - | 15.360 | 88.573 | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ConvNeXt_base_224_pretrained.pdparams) | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/ConvNeXt_base_224_infer.tar) |
+| ConvNeXt_base_384 | 0.8490 | 0.9727 | - | - | - | 45.138 | 88.573 | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ConvNeXt_base_384_pretrained.pdparams) | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/ConvNeXt_base_384_infer.tar) |
+| ConvNeXt_large_224 | 0.8426 | 0.9690 | - | - | - | 34.340 | 197.740 | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ConvNeXt_large_224_pretrained.pdparams) | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/ConvNeXt_large_224_infer.tar) |
+| ConvNeXt_large_384 | 0.8527 | 0.9749 | - | - | - | 101.001 | 197.740 | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ConvNeXt_large_384_pretrained.pdparams) | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/ConvNeXt_large_384_infer.tar) |
 
 <a name="VAN"></a>
 
@@ -449,6 +474,9 @@ RegNet 系列模型的精度、速度指标如下表所示，更多关于该系�
 | 模型       | Top-1 Acc | Top-5 Acc | time(ms)<br>bs=1 | time(ms)<br>bs=4 | time(ms)<br/>bs=8 | FLOPs(G) | Params(M) | 预训练模型下载地址 | inference模型下载地址 |
 | ---------- | --------- | --------- | ---------------- | ---------------- | -------- | --------- | ------------------------------------------------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ |
 | VAN_B0 | 0.7535 | 0.9299  | - | - | - | 0.880 | 4.110 | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/VAN_B0_pretrained.pdparams) | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/VAN_B0_infer.tar) |
+| VAN_B1 | 0.8102 | 0.9562  | - | - | - | 2.518 | 13.869 | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/VAN_B1_pretrained.pdparams) | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/VAN_B1_infer.tar) |
+| VAN_B2 | 0.8280 | 0.9620  | - | - | - | 5.032 | 26.592 | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/VAN_B2_pretrained.pdparams) | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/VAN_B2_infer.tar) |
+| VAN_B3 | 0.8389 | 0.9668  | - | - | - | 8.987 | 44.790 | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/VAN_B3_pretrained.pdparams) | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/VAN_B3_infer.tar) |
 
 <a name="PeleeNet"></a>
 
@@ -697,9 +725,55 @@ DeiT（Data-efficient Image Transformers）系列模型的精度、速度指标�
 
 | 模型       | Top-1 Acc | Top-5 Acc | time(ms)<br>bs=1 | time(ms)<br>bs=4 | FLOPs(G) | Params(M) | 预训练模型下载地址                                               | inference模型下载地址                                      |
 | ---------- | --------- | --------- | ---------------- | ---------------- | -------- | --------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
-| TNT_small | 0.8121   |0.9563  |                  |                  | 4.83   |  23.68    | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/TNT_small_pretrained.pdparams) | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/TNT_small_infer.tar) |
+| TNT_small | 0.8148   |0.9580  |                  |                  | 4.83   |  23.69    | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/TNT_small_pretrained.pdparams) | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/TNT_small_infer.tar) |
+| TNT_base | 0.8276   |0.9617  |                  |                  | 13.40   |  65.30    | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/TNT_base_pretrained.pdparams) | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/TNT_base_infer.tar) |
 
 **注**：TNT 模型的数据预处理部分 `NormalizeImage` 中的 `mean` 与 `std` 均为 0.5。
+
+<a name="NextViT"></a>
+## NextViT 系列 <sup>[[47](#ref47)]</sup>
+
+关于 NextViT 系列模型的精度、速度指标如下表所示，更多介绍可以参考：[NextViT 系列模型文档](NextViT.md)。
+| 模型       | Top-1 Acc | Top-5 Acc | time(ms)<br>bs=1 | time(ms)<br>bs=4 | time(ms)<br/>bs=8 | FLOPs(G) | Params(M) | 预训练模型下载地址                                               | inference模型下载地址                                      |
+| ---------- | --------- | --------- | ---------------- | ---------------- | -------- | --------- | ------------------------------------------------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ |
+| NextViT_small_224    | 0.8248 | 0.9616 | - | - | - | 5.79  | 31.80   | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/NextViT_small_224_pretrained.pdparams) | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/NextViT_small_224_infer.tar) |
+| NextViT_base_224   | 0.8324 | 0.9658 | - | - | - | 8.26  | 44.88   | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/NextViT_base_224_pretrained.pdparams) | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/NextViT_base_224_infer.tar) |
+| NextViT_large_224    | 0.8363 | 0.9661 | - | - | - | 10.73 | 57.95   | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/NextViT_large_224_pretrained.pdparams) | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/NextViT_large_224_infer.tar) |
+| NextViT_small_384   | 0.8401 | 0.9698 | - | - | - | 17.00 | 31.80   | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/NextViT_small_384_pretrained.pdparams) | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/NextViT_small_384_infer.tar) |
+| NextViT_base_384   | 0.8465 | 0.9723 | - | - | - | 24.27 | 44.88   | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/NextViT_base_384_pretrained.pdparams) | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/NextViT_base_384_infer.tar) |
+| NextViT_large_384   | 0.8492 | 0.9728 | - | - | - | 31.53 | 57.95   | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/NextViT_large_384_pretrained.pdparams) | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/NextViT_large_384_infer.tar) |
+| NextViT_small_224_ssld    | 0.8472 | 0.9734 | - | - | - | 5.79  | 31.80   | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/NextViT_small_224_ssld_pretrained.pdparams) | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/NextViT_small_224_ssld_infer.tar) |
+| NextViT_base_224_ssld   | 0.8500 | 0.9753 | - | - | - | 8.26  | 44.88   | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/NextViT_base_224_ssld_pretrained.pdparams) | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/NextViT_base_224_ssld_infer.tar) |
+| NextViT_large_224_ssld    | 0.8536 | 0.9762 | - | - | - | 10.73 | 57.95   | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/NextViT_large_224_ssld_pretrained.pdparams) | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/NextViT_large_224_ssld_infer.tar) |
+| NextViT_small_384_ssld   | 0.8597 | 0.9790 | - | - | - | 17.00 | 31.80   | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/NextViT_small_384_ssld_pretrained.pdparams) | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/NextViT_small_384_ssld_infer.tar) |
+| NextViT_base_384_ssld   | 0.8634 | 0.9806 | - | - | - | 24.27 | 44.88   | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/NextViT_base_384_ssld_pretrained.pdparams) | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/NextViT_base_384_ssld_infer.tar) |
+| NextViT_large_384_ssld   | 0.8654 | 0.9814 | - | - | - | 31.53 | 57.95   | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/NextViT_large_384_ssld_pretrained.pdparams) | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/NextViT_large_384_ssld_infer.tar) |
+
+<a name="UniFormer"></a>
+
+## UniFormer 系列 <sup>[[48](#ref48)]</sup>
+
+关于 UniFormer 系列模型的精度、速度指标如下表所示，更多介绍可以参考：[UniFomer 系列模型文档](UniFormer.md)。
+
+| 模型       | Top-1 Acc | Top-5 Acc | time(ms)<br>bs=1 | time(ms)<br>bs=4 | time(ms)<br/>bs=8 | FLOPs(G) | Params(M) | 预训练模型下载地址                                               | inference模型下载地址                                      |
+| ---------- | --------- | --------- | ---------------- | ---------------- | -------- | --------- | ------------------------------------------------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ |
+| UniFormer_small    | 0.8294 | 0.9631 | - | - | - | 3.44  | 21.55   | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/UniFormer_small_pretrained.pdparams) | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/UniFormer_small_infer.tar) |
+| UniFormer_small_plus    | 0.8329 | 0.9656 | - | - | - | 3.99 | 24.04  | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/UniFormer_small_plus_pretrained.pdparams) | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/UniFormer_small_plus_infer.tar) |
+| UniFormer_small_plus_dim64    | 0.8325 | 0.9649 | - | - | - | 3.99 | 24.04   | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/UniFormer_small_plus_dim64_pretrained.pdparams) | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/UniFormer_small_plus_dim64_infer.tar) |
+| UniFormer_base     | 0.8376 | 0.9672 | - | - |- | 7.77 | 49.78   | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/UniFormer_base_pretrained.pdparams) | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/UniFormer_base_infer.tar) |
+| UniFormer_base_ls    | 0.8398 | 0.9675 | - | - | - | 7.77 | 49.78 | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/UniFormer_base_ls_pretrained.pdparams) | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/UniFormer_base_ls_infer.tar) |
+
+<a name="DSNet"></a>
+
+## DSNet 系列 <sup>[[49](#ref49)]</sup>
+
+关于 DSNet 系列模型的精度、速度指标如下表所示，更多介绍可以参考：[DSNet 系列模型文档](DSNet.md)。
+
+| 模型        | Top-1 Acc | Top-5 Acc | time(ms)<br>bs=1 | time(ms)<br>bs=4 | time(ms)<br/>bs=8 | FLOPs(G) | Params(M) | 预训练模型下载地址                                           | inference模型下载地址                                        |
+| ----------- | --------- | --------- | ---------------- | ---------------- | ----------------- | -------- | --------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
+| DSNet_tiny  | 0.7919    | 0.9476    | -                | -                | -                 | 1.8      | 10.5      | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DSNet_tiny_pretrained.pdparams) | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/DSNet_tiny_infer.tar) |
+| DSNet_small | 0.8196    | 0.9596    | -                | -                | -                 | 3.5      | 23.0      | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DSNet_small_pretrained.pdparams) | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/DSNet_small_infer.tar) |
+| DSNet_base  | 0.8175    | 0.9522    | -                | -                | -                 | 8.4      | 49.3      | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DSNet_base_pretrained.pdparams) | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/DSNet_base_infer.tar) |
 
 <a name="Transformer_lite"></a>
 
@@ -813,3 +887,9 @@ TRANSFORMERS FOR IMAGE RECOGNITION AT SCALE.
 <a name="ref45">[45]</a>Robert J. Wang, Xiang Li, Charles X. Ling. Pelee: A Real-Time Object Detection System on Mobile Devices
 
 <a name="ref46">[46]</a>Chien-Yao Wang, Hong-Yuan Mark Liao, I-Hau Yeh, Yueh-Hua Wu, Ping-Yang Chen, Jun-Wei Hsieh. CSPNet: A New Backbone that can Enhance Learning Capability of CNN
+
+<a name="ref47">[47]</a>Jiashi Li, Xin Xia, Wei Li, Huixia Li, Xing Wang, Xuefeng Xiao, Rui Wang, Min Zheng, Xin Pan. Next-ViT: Next Generation Vision Transformer for Efficient Deployment in Realistic Industrial Scenarios.
+
+<a name="ref48">[48]</a>Kunchang Li, Yali Wang, Junhao Zhang, Peng Gao, Guanglu Song, Yu Liu, Hongsheng Li, Yu Qiao. UniFormer: Unifying Convolution and Self-attention for Visual Recognition
+
+<a name="ref49">[49]</a>Mingyuan Mao, Renrui Zhang, Honghui Zheng, Peng Gao, Teli Ma, Yan Peng, Errui Ding, Baochang Zhang, Shumin Han. Dual-stream Network for Visual Recognition.

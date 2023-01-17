@@ -18,7 +18,9 @@ from __future__ import division
 from collections import defaultdict
 
 import numpy as np
+import paddle.distributed as dist
 from paddle.io import DistributedBatchSampler
+
 from ppcls.utils import logger
 
 
@@ -36,6 +38,7 @@ class PKSampler(DistributedBatchSampler):
         ratio(list): list of (ratio1, ratio2..) the duplication number for ids in id_list.
         drop_last (bool, optional): whether to discard the data at the end. Defaults to True.
         sample_method (str, optional): sample method when generating prob_list. Defaults to "sample_avg_prob".
+        total_epochs (int, optional): total epochs. Defaults to 0.
     """
 
     def __init__(self,
@@ -46,7 +49,8 @@ class PKSampler(DistributedBatchSampler):
                  drop_last=True,
                  id_list=None,
                  ratio=None,
-                 sample_method="sample_avg_prob"):
+                 sample_method="sample_avg_prob",
+                 total_epochs=0):
         super().__init__(
             dataset, batch_size, shuffle=shuffle, drop_last=drop_last)
         assert batch_size % sample_per_id == 0, \
@@ -56,6 +60,7 @@ class PKSampler(DistributedBatchSampler):
         self.sample_per_id = sample_per_id
         self.label_dict = defaultdict(list)
         self.sample_method = sample_method
+        self.total_epochs = total_epochs
         for idx, label in enumerate(self.dataset.labels):
             self.label_dict[label].append(idx)
         self.label_list = list(self.label_dict)
@@ -94,6 +99,15 @@ class PKSampler(DistributedBatchSampler):
                     format(diff))
 
     def __iter__(self):
+        # shuffle manually, same as DistributedBatchSampler.__iter__
+        if self.shuffle:
+            rank = dist.get_rank()
+            np.random.RandomState(rank * self.total_epochs +
+                                  self.epoch).shuffle(self.label_list)
+            np.random.RandomState(rank * self.total_epochs +
+                                  self.epoch).shuffle(self.prob_list)
+            self.epoch += 1
+
         label_per_batch = self.batch_size // self.sample_per_id
         for _ in range(len(self)):
             batch_index = []

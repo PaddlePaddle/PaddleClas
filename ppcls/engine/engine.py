@@ -119,6 +119,9 @@ class Engine(object):
         #TODO(gaotingquan): support rec
         class_num = config["Arch"].get("class_num", None)
         self.config["DataLoader"].update({"class_num": class_num})
+        self.config["DataLoader"].update({
+            "epochs": self.config["Global"]["epochs"]
+        })
 
         # build dataloader
         if self.mode == 'train':
@@ -126,16 +129,18 @@ class Engine(object):
                 self.config["DataLoader"], "Train", self.device, self.use_dali)
             if self.config["DataLoader"].get('UnLabelTrain', None) is not None:
                 self.unlabel_train_dataloader = build_dataloader(
-                        self.config["DataLoader"], "UnLabelTrain", self.device,
-                        self.use_dali)
+                    self.config["DataLoader"], "UnLabelTrain", self.device,
+                    self.use_dali)
             else:
                 self.unlabel_train_dataloader = None
 
-            self.iter_per_epoch = len(self.train_dataloader) - 1 if platform.system(
+            self.iter_per_epoch = len(
+                self.train_dataloader) - 1 if platform.system(
                 ) == "Windows" else len(self.train_dataloader)
             if self.config["Global"].get("iter_per_epoch", None):
                 # set max iteration per epoch mannualy, when training by iteration(s), such as XBM, FixMatch.
-                self.iter_per_epoch = self.config["Global"].get("iter_per_epoch")
+                self.iter_per_epoch = self.config["Global"].get(
+                    "iter_per_epoch")
             self.iter_per_epoch = self.iter_per_epoch // self.update_freq * self.update_freq
 
         if self.mode == "eval" or (self.mode == "train" and
@@ -329,6 +334,20 @@ class Engine(object):
             )) > 0:
                 self.train_loss_func = paddle.DataParallel(
                     self.train_loss_func)
+
+            # set different seed in different GPU manually in distributed environment
+            if seed is None:
+                logger.warning(
+                    "The random seed cannot be None in a distributed environment. Global.seed has been set to 42 by default"
+                )
+                self.config["Global"]["seed"] = seed = 42
+            logger.info(
+                f"Set random seed to ({int(seed)} + $PADDLE_TRAINER_ID) for different trainer"
+            )
+            paddle.seed(int(seed) + dist.get_rank())
+            np.random.seed(int(seed) + dist.get_rank())
+            random.seed(int(seed) + dist.get_rank())
+
         # build postprocess for infer
         if self.mode == 'infer':
             self.preprocess_func = create_operators(self.config["Infer"][
@@ -530,15 +549,22 @@ class Engine(object):
             False) or "ATTRMetric" in self.config["Metric"]["Eval"][0]
         model = ExportModel(self.config["Arch"], self.model, use_multilabel)
         if self.config["Global"]["pretrained_model"] is not None:
-            load_dygraph_pretrain(model.base_model,
-                                  self.config["Global"]["pretrained_model"])
+            if self.config["Global"]["pretrained_model"].startswith("http"):
+                load_dygraph_pretrain_from_url(
+                    model.base_model,
+                    self.config["Global"]["pretrained_model"])
+            else:
+                load_dygraph_pretrain(
+                    model.base_model,
+                    self.config["Global"]["pretrained_model"])
 
         model.eval()
 
-        # for rep nets
+        # for re-parameterization nets
         for layer in self.model.sublayers():
-            if hasattr(layer, "rep") and not getattr(layer, "is_repped"):
-                layer.rep()
+            if hasattr(layer, "re_parameterize") and not getattr(layer,
+                                                                 "is_repped"):
+                layer.re_parameterize()
 
         save_path = os.path.join(self.config["Global"]["save_inference_dir"],
                                  "inference")

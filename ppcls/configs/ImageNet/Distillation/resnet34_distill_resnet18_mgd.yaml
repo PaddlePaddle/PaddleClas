@@ -48,8 +48,8 @@ Loss:
         weight: 1.0
         base_loss_name: MGDLoss
         model_name_pairs: [["Student", "Teacher"]]
-        s_keys: ["blocks[7]"]
-        t_keys: ["blocks[15]"]
+        s_key: "blocks[7]"
+        t_key: "blocks[15]"
         name: "loss_mgd"
         student_channels: 512
         teacher_channels: 512

@@ -10,18 +10,19 @@
   - [3.1 主体检测](#31-主体检测)
   - [3.2 特征提取](#32-特征提取)
   - [3.3 向量检索](#33-向量检索)
-- [4. 推理部署](#4-推理部署)
-  - [4.1 推理模型准备](#41-推理模型准备)
-    - [4.1.1 基于训练得到的权重导出 inference 模型](#411-基于训练得到的权重导出-inference-模型)
-    - [4.1.2 直接下载 inference 模型](#412-直接下载-inference-模型)
-  - [4.2 测试数据准备](#42-测试数据准备)
-  - [4.3 基于 Python 预测引擎推理](#43-基于-python-预测引擎推理)
-    - [4.3.1 预测单张图像](#431-预测单张图像)
-    - [4.3.2 基于文件夹的批量预测](#432-基于文件夹的批量预测)
-  - [4.4 基于 C++ 预测引擎推理](#44-基于-c-预测引擎推理)
-  - [4.5 服务化部署](#45-服务化部署)
-  - [4.6 端侧部署](#46-端侧部署)
-  - [4.7 Paddle2ONNX 模型转换与预测](#47-paddle2onnx-模型转换与预测)
+- [4. PP-ShiTu Pipeline评测](##4-PP-ShiTu-Pipeline评测)
+- [5. 推理部署](#5-推理部署)
+  - [5.1 推理模型准备](#51-推理模型准备)
+    - [5.1.1 基于训练得到的权重导出 inference 模型](#511-基于训练得到的权重导出-inference-模型)
+    - [5.1.2 直接下载 inference 模型](#512-直接下载-inference-模型)
+  - [5.2 测试数据准备](#52-测试数据准备)
+  - [5.3 基于 Python 预测引擎推理](#53-基于-python-预测引擎推理)
+    - [5.3.1 预测单张图像](#531-预测单张图像)
+    - [5.3.2 基于文件夹的批量预测](#532-基于文件夹的批量预测)
+  - [5.4 基于 C++ 预测引擎推理](#54-基于-c-预测引擎推理)
+  - [5.5 服务化部署](#55-服务化部署)
+  - [5.6 端侧部署](#56-端侧部署)
+  - [5.7 Paddle2ONNX 模型转换与预测](#57-paddle2onnx-模型转换与预测)
 - [参考文献](#参考文献)
 
 ## 1. PP-ShiTuV2模型和应用场景介绍
@@ -87,18 +88,22 @@ PP-ShiTuV2 是基于 PP-ShiTuV1 改进的一个实用轻量级通用图像识别
   python3.7 setup.py install
   ```
 
-- 然后执行以下命令下载并解压好demo数据，最后执行一行命令体验图像识别
+- 然后执行以下命令下载并解压好demo数据，最后执行命令体验索引库构建和图像识别
 
   ```shell
   # 下载并解压demo数据
   wget -nc https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/data/drink_dataset_v2.0.tar && tar -xf drink_dataset_v2.0.tar
 
-  # 执行识别命令
-  paddleclas \
-  --model_name=PP-ShiTuV2 \
-  --infer_imgs=./drink_dataset_v2.0/test_images/100.jpeg \
-  --index_dir=./drink_dataset_v2.0/index/ \
-  --data_file=./drink_dataset_v2.0/gallery/drink_label.txt
+  # 在命令行中构建索引库
+  paddleclas --build_gallery=True --model_name="PP-ShiTuV2" \
+  -o IndexProcess.image_root=./drink_dataset_v2.0/gallery/ \
+  -o IndexProcess.index_dir=./drink_dataset_v2.0/index \
+  -o IndexProcess.data_file=./drink_dataset_v2.0/gallery/drink_label.txt
+
+  # 执行图像识别命令
+  paddleclas --model_name=PP-ShiTuV2 --predict_type=shitu \
+  -o Global.infer_imgs='./drink_dataset_v2.0/test_images/100.jpeg' \
+  -o IndexProcess.index_dir='./drink_dataset_v2.0/index'
   ```
 
 ## 3 模块介绍与训练
@@ -129,14 +134,17 @@ PP-ShiTuV2 是基于 PP-ShiTuV1 改进的一个实用轻量级通用图像识别
 
 PP-ShiTuV2 系统中关于 Faiss 向量检索库的安装及使用可以参考文档：[vector search](../../deployment/PP-ShiTu/vector_search.md)。
 
-## 4. 推理部署
+## 4. PP-ShiTu Pipeline评测
+PP-ShiTu Pipeline评测请参考文档[Pipeline评测说明](../../deployment/PP-ShiTu/shitu_pipeline_eval.md)
 
-### 4.1 推理模型准备
+## 5. 推理部署
+
+### 5.1 推理模型准备
 Paddle Inference 是飞桨的原生推理库， 作用于服务器端和云端，提供高性能的推理能力。相比于直接基于预训练模型进行预测，Paddle Inference可使用 MKLDNN、CUDNN、TensorRT 进行预测加速，从而实现更优的推理性能。更多关于 Paddle Inference 推理引擎的介绍，可以参考 [Paddle Inference官网教程](https://www.paddlepaddle.org.cn/documentation/docs/zh/guides/infer/inference/inference_cn.html)。
 
 当使用 Paddle Inference 推理时，加载的模型类型为 inference 模型。本案例提供了两种获得 inference 模型的方法，如果希望得到和文档相同的结果，请选择 [直接下载 inference 模型](#412-直接下载-inference-模型) 的方式。
 
-#### 4.1.1 基于训练得到的权重导出 inference 模型
+#### 5.1.1 基于训练得到的权重导出 inference 模型
 - 主体检测模型权重导出请参考文档 [主体检测推理模型准备](../../training/PP-ShiTu/mainbody_detection.md#41-推理模型准备)，或者参照 [4.1.2](#412-直接下载-inference-模型) 直接下载解压即可。
 
 - 特征提取模型权重导出可以参考以下命令：
@@ -156,9 +164,9 @@ Paddle Inference 是飞桨的原生推理库， 作用于服务器端和云端�
   │   └── inference.pdmodel
   ```
 
-#### 4.1.2 直接下载 inference 模型
+#### 5.1.2 直接下载 inference 模型
 
-[4.1.1 小节](#411-基于训练得到的权重导出-inference-模型) 提供了导出 inference 模型的方法，此处提供我们导出好的 inference 模型，可以按以下命令，下载模型到指定位置解压进行体验。
+[5.1.1 小节](#411-基于训练得到的权重导出-inference-模型) 提供了导出 inference 模型的方法，此处提供我们导出好的 inference 模型，可以按以下命令，下载模型到指定位置解压进行体验。
 
 ```shell
 cd deploy/models
@@ -167,10 +175,10 @@ cd deploy/models
 wget -nc https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/inference/picodet_PPLCNet_x2_5_mainbody_lite_v1.0_infer.tar && tar -xf picodet_PPLCNet_x2_5_mainbody_lite_v1.0_infer.tar
 
 # 下载特征提取inference模型并解压
-wget -nc https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/inference/PP-ShiTuV2/general_PPLCNetV2_base_pretrained_v1.0_infer.tar && tar -xf general_PPLCNetV2_base_pretrained_v1.tar
+wget -nc https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/inference/PP-ShiTuV2/general_PPLCNetV2_base_pretrained_v1.0_infer.tar && tar -xf general_PPLCNetV2_base_pretrained_v1.0_infer.tar
 ```
 
-### 4.2 测试数据准备
+### 5.2 测试数据准备
 
 准备好主体检测、特征提取模型之后，还需要准备作为输入的测试数据，可以执行以下命令下载并解压测试数据。
 
@@ -182,9 +190,9 @@ cd ../
 wget -nc https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/data/drink_dataset_v2.0.tar && tar -xf drink_dataset_v2.0.tar
 ```
 
-### 4.3 基于 Python 预测引擎推理
+### 5.3 基于 Python 预测引擎推理
 
-#### 4.3.1 预测单张图像
+#### 5.3.1 预测单张图像
 
 然后执行以下命令对单张图像 `./drink_dataset_v2.0/test_images/100.jpeg` 进行识别。
 
@@ -233,18 +241,18 @@ Inference: 37.95266151428223 ms per batch image
 
 其中 `bbox` 表示检测出的主体所在位置，`rec_docs` 表示索引库中与检测框最为相似的类别，`rec_scores` 表示对应的相似度。
 
-### 4.4 基于 C++ 预测引擎推理
+### 5.4 基于 C++ 预测引擎推理
 PaddleClas 提供了基于 C++ 预测引擎推理的示例，您可以参考 [服务器端 C++ 预测](../../../../deploy/cpp_shitu/readme.md) 来完成相应的推理部署。如果您使用的是 Windows 平台，可以参考 [基于 Visual Studio 2019 Community CMake 编译指南](../../deployment/image_classification/cpp/windows.md) 完成相应的预测库编译和模型预测工作。
 
-### 4.5 服务化部署
+### 5.5 服务化部署
 Paddle Serving 提供高性能、灵活易用的工业级在线推理服务。Paddle Serving 支持 RESTful、gRPC、bRPC 等多种协议，提供多种异构硬件和多种操作系统环境下推理解决方案。更多关于Paddle Serving 的介绍，可以参考 [Paddle Serving 代码仓库](https://github.com/PaddlePaddle/Serving)。
 
 PaddleClas 提供了基于 Paddle Serving 来完成模型服务化部署的示例，您可以参考 [模型服务化部署](../../deployment/PP-ShiTu/paddle_serving.md) 来完成相应的部署工作。
 
-### 4.6 端侧部署
+### 5.6 端侧部署
 Paddle Lite 是一个高性能、轻量级、灵活性强且易于扩展的深度学习推理框架，定位于支持包括移动端、嵌入式以及服务器端在内的多硬件平台。更多关于 Paddle Lite 的介绍，可以参考 [Paddle Lite 代码仓库](https://github.com/PaddlePaddle/Paddle-Lite)。
 
-### 4.7 Paddle2ONNX 模型转换与预测
+### 5.7 Paddle2ONNX 模型转换与预测
 Paddle2ONNX 支持将 PaddlePaddle 模型格式转化到 ONNX 模型格式。通过 ONNX 可以完成将 Paddle 模型到多种推理引擎的部署，包括TensorRT/OpenVINO/MNN/TNN/NCNN，以及其它对 ONNX 开源格式进行支持的推理引擎或硬件。更多关于 Paddle2ONNX 的介绍，可以参考 [Paddle2ONNX 代码仓库](https://github.com/PaddlePaddle/Paddle2ONNX)。
 
 PaddleClas 提供了基于 Paddle2ONNX 来完成 inference 模型转换 ONNX 模型并作推理预测的示例，您可以参考 [Paddle2ONNX 模型转换与预测](../../deployment/image_classification/paddle2onnx.md) 来完成相应的部署工作。

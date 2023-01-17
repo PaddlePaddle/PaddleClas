@@ -20,7 +20,6 @@ import numpy as np
 
 import paddle
 import paddle.nn as nn
-
 from paddle.nn.initializer import TruncatedNormal, Constant
 
 from ..base.theseus_layer import Identity
@@ -28,7 +27,9 @@ from ....utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_fro
 
 MODEL_URLS = {
     "TNT_small":
-    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/TNT_small_pretrained.pdparams"
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/TNT_small_pretrained.pdparams",
+    "TNT_base":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/TNT_base_pretrained.pdparams"
 }
 
 __all__ = MODEL_URLS.keys()
@@ -36,6 +37,14 @@ __all__ = MODEL_URLS.keys()
 trunc_normal_ = TruncatedNormal(std=.02)
 zeros_ = Constant(value=0.)
 ones_ = Constant(value=1.)
+
+
+class Identity(nn.Layer):
+    def __init__(self):
+        super(Identity, self).__init__()
+
+    def forward(self, inputs):
+        return inputs
 
 
 def drop_path(x, drop_prob=0., training=False):
@@ -165,8 +174,10 @@ class Block(nn.Layer):
                           act_layer=act_layer,
                           drop=drop)
 
-        self.norm1_proj = norm_layer(in_dim)
-        self.proj = nn.Linear(in_dim * num_pixel, dim)
+        self.norm1_proj = norm_layer(in_dim * num_pixel)
+        self.proj = nn.Linear(in_dim * num_pixel, dim, bias_attr=False)
+        self.norm2_proj = norm_layer(in_dim * num_pixel)
+
         # Outer transformer
         self.norm_out = norm_layer(dim)
         self.attn_out = Attention(
@@ -196,11 +207,10 @@ class Block(nn.Layer):
             self.drop_path(self.mlp_in(self.norm_mlp_in(pixel_embed))))
         # outer
         B, N, C = patch_embed.shape
-        norm1_proj = self.norm1_proj(pixel_embed)
-        norm1_proj = norm1_proj.reshape(
-            (B, N - 1, norm1_proj.shape[1] * norm1_proj.shape[2]))
-        patch_embed[:, 1:] = paddle.add(patch_embed[:, 1:],
-                                        self.proj(norm1_proj))
+        norm1_proj = pixel_embed.reshape(shape=[B, N - 1, C])
+        norm1_proj = self.norm1_proj(norm1_proj)
+        patch_embed[:, 1:] = paddle.add(
+            patch_embed[:, 1:], self.norm2_proj(self.proj(norm1_proj)))
         patch_embed = paddle.add(
             patch_embed,
             self.drop_path(self.attn_out(self.norm_out(patch_embed))))
@@ -217,6 +227,7 @@ class PixelEmbed(nn.Layer):
                  in_dim=48,
                  stride=4):
         super().__init__()
+        self.patch_size = patch_size
         num_patches = (img_size // patch_size)**2
         self.img_size = img_size
         self.num_patches = num_patches
@@ -230,14 +241,12 @@ class PixelEmbed(nn.Layer):
     def forward(self, x, pixel_pos):
         B, C, H, W = x.shape
         assert H == self.img_size and W == self.img_size, f"Input image size ({H}*{W}) doesn't match model ({self.img_size}*{self.img_size})."
-
-        x = self.proj(x)
-        x = nn.functional.unfold(x, self.new_patch_size, self.new_patch_size)
+        x = nn.functional.unfold(x, self.patch_size, self.patch_size)
         x = x.transpose((0, 2, 1)).reshape(
-            (-1, self.in_dim, self.new_patch_size, self.new_patch_size))
+            (-1, C, self.patch_size, self.patch_size))
+        x = self.proj(x)
+        x = x.reshape((-1, self.in_dim, self.patch_size)).transpose((0, 2, 1))
         x = x + pixel_pos
-        x = x.reshape((-1, self.in_dim, self.new_patch_size *
-                       self.new_patch_size)).transpose((0, 2, 1))
         return x
 
 
@@ -288,8 +297,7 @@ class TNT(nn.Layer):
         self.add_parameter("patch_pos", self.patch_pos)
 
         self.pixel_pos = self.create_parameter(
-            shape=(1, in_dim, new_patch_size, new_patch_size),
-            default_initializer=zeros_)
+            shape=(1, patch_size, in_dim), default_initializer=zeros_)
         self.add_parameter("pixel_pos", self.pixel_pos)
 
         self.pos_drop = nn.Dropout(p=drop_rate)
@@ -345,7 +353,6 @@ class TNT(nn.Layer):
             (self.cls_token.expand((B, -1, -1)), patch_embed), axis=1)
         patch_embed = patch_embed + self.patch_pos
         patch_embed = self.pos_drop(patch_embed)
-
         for blk in self.blocks:
             pixel_embed, patch_embed = blk(pixel_embed, patch_embed)
 
@@ -384,4 +391,18 @@ def TNT_small(pretrained=False, use_ssld=False, **kwargs):
                 **kwargs)
     _load_pretrained(
         pretrained, model, MODEL_URLS["TNT_small"], use_ssld=use_ssld)
+    return model
+
+
+def TNT_base(pretrained=False, use_ssld=False, **kwargs):
+    model = TNT(patch_size=16,
+                embed_dim=640,
+                in_dim=40,
+                depth=12,
+                num_heads=10,
+                in_num_head=4,
+                qkv_bias=False,
+                **kwargs)
+    _load_pretrained(
+        pretrained, model, MODEL_URLS["TNT_base"], use_ssld=use_ssld)
     return model

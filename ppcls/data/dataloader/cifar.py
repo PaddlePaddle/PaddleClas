@@ -32,12 +32,14 @@ class Cifar10(Cifar10_paddle):
                  expand_labels=1,
                  transform_ops=None,
                  transform_ops_weak=None,
-                 transform_ops_strong=None):
+                 transform_ops_strong=None,
+                 transform_ops_strong2=None):
         super().__init__(data_file, mode, None, download, backend)
         assert isinstance(expand_labels, int)
         self._transform_ops = create_operators(transform_ops)
         self._transform_ops_weak = create_operators(transform_ops_weak)
         self._transform_ops_strong = create_operators(transform_ops_strong)
+        self._transform_ops_strong2 = create_operators(transform_ops_strong2)
         self.class_num = 10
         labels = []
         for x in self.data:
@@ -59,6 +61,15 @@ class Cifar10(Cifar10_paddle):
             image1 = transform(image, self._transform_ops)
             image1 = image1.transpose((2, 0, 1))
             return (image1, np.int64(label))
+        elif self._transform_ops_weak and self._transform_ops_strong and self._transform_ops_strong2:
+            image2 = transform(image, self._transform_ops_weak)
+            image2 = image2.transpose((2, 0, 1))
+            image3 = transform(image, self._transform_ops_strong)
+            image3 = image3.transpose((2, 0, 1))
+            image4 = transform(image, self._transform_ops_strong2)
+            image4 = image4.transpose((2, 0, 1))
+            return (image2, image3, image4, np.int64(label))
+
         elif self._transform_ops_weak and self._transform_ops_strong:
             image2 = transform(image, self._transform_ops_weak)
             image2 = image2.transpose((2, 0, 1))
@@ -78,12 +89,14 @@ class Cifar100(Cifar100_paddle):
                  expand_labels=1,
                  transform_ops=None,
                  transform_ops_weak=None,
-                 transform_ops_strong=None):
+                 transform_ops_strong=None,
+                 transform_ops_strong2=None):
         super().__init__(data_file, mode, None, download, backend)
         assert isinstance(expand_labels, int)
         self._transform_ops = create_operators(transform_ops)
         self._transform_ops_weak = create_operators(transform_ops_weak)
         self._transform_ops_strong = create_operators(transform_ops_strong)
+        self._transform_ops_strong2 = create_operators(transform_ops_strong2)
         self.class_num = 100
 
         labels = []
@@ -106,6 +119,14 @@ class Cifar100(Cifar100_paddle):
             image1 = transform(image, self._transform_ops)
             image1 = image1.transpose((2, 0, 1))
             return (image1, np.int64(label))
+        elif self._transform_ops_weak and self._transform_ops_strong and self._transform_ops_strong2:
+            image2 = transform(image, self._transform_ops_weak)
+            image2 = image2.transpose((2, 0, 1))
+            image3 = transform(image, self._transform_ops_strong)
+            image3 = image3.transpose((2, 0, 1))
+            image4 = transform(image, self._transform_ops_strong2)
+            image4 = image4.transpose((2, 0, 1))
+            return (image2, image3, image4, np.int64(label))
         elif self._transform_ops_weak and self._transform_ops_strong:
             image2 = transform(image, self._transform_ops_weak)
             image2 = image2.transpose((2, 0, 1))

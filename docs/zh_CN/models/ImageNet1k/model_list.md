@@ -60,18 +60,18 @@
 基于 ImageNet1k 分类数据集，PaddleClas 支持 37 个系列分类网络结构以及对应的 217 个图像分类预训练模型，训练技巧、每个系列网络结构的简单介绍和性能评估将在相应章节展现，下面所有的速度指标评估环境如下：
 * Arm CPU 的评估环境基于骁龙 855(SD855)。
 * Intel CPU 的评估环境基于 Intel(R) Xeon(R) Gold 6148。
-* GPU 评估环境基于 V100 机器，在 FP32+TensorRT 配置下运行 2100 次测得（去除前 100 次的 warmup 时间）。
+* GPU 评估环境基于 V100 机器，在 FP32+TensorRT-8.0.3.4 配置下运行 2100 次测得（去除前 100 次的 warmup 时间）。
 * FLOPs 与 Params 通过 `paddle.flops()` 计算得到（PaddlePaddle 版本为 2.2）
 
-常见服务器端模型的精度指标与其预测耗时的变化曲线如下图所示。
+常见服务器端 CNN 模型的精度指标与其预测耗时的变化曲线如下图所示，其中模型精度为 ImageNet1k 数据集上的 Top1 Acc，预测耗时基于 GPU 环境测得，Batch Size 为 1，FP32 精度。
 
 ![](../../../images/models/V100_benchmark/v100.fp32.bs1.main_fps_top1_s.png)
 
-常见移动端模型的精度指标与其预测耗时的变化曲线如下图所示。
+常见移动端 CNN 模型的精度指标与其预测耗时的变化曲线如下图所示，其中模型精度为 ImageNet1k 数据集上的 Top1 Acc，预测耗时基于 Arm 环境测得，Batch Size 为 1，FP32 精度。
 
 ![](../../../images/models/mobile_arm_top1.png)
 
-部分VisionTransformer模型的精度指标与其预测耗时的变化曲线如下图所示.
+部分 VisionTransformer 模型的精度指标与其预测耗时的变化曲线如下图所示，其中模型精度为 ImageNet1k 数据集上的 Top1 Acc，预测耗时基于 GPU 环境测得，Batch Size 为 1，FP32 精度。
 
 ![](../../../images/models/V100_benchmark/v100.fp32.bs1.visiontransformer.png)
 

@@ -14,8 +14,11 @@
 
 import inspect
 import copy
+import random
 import paddle
 import numpy as np
+import paddle.distributed as dist
+from functools import partial
 from paddle.io import DistributedBatchSampler, BatchSampler, DataLoader
 from ppcls.utils import logger
 
@@ -66,6 +69,22 @@ def create_operators(params, class_num=None):
     return ops
 
 
+def worker_init_fn(worker_id: int, num_workers: int, rank: int, seed: int):
+    """callback function on each worker subprocess after seeding and before data loading.
+
+    Args:
+        worker_id (int): Worker id in [0, num_workers - 1]
+        num_workers (int): Number of subprocesses to use for data loading.
+        rank (int): Rank of process in distributed environment. If in non-distributed environment, it is a constant number `0`.
+        seed (int): Random seed
+    """
+    # The seed of each worker equals to
+    # num_worker * rank + worker_id + user_seed
+    worker_seed = num_workers * rank + worker_id + seed
+    np.random.seed(worker_seed)
+    random.seed(worker_seed)
+
+
 def build_dataloader(config, mode, device, use_dali=False, seed=None):
     assert mode in [
         'Train', 'Eval', 'Test', 'Gallery', 'Query', 'UnLabelTrain'
@@ -79,9 +98,11 @@ def build_dataloader(config, mode, device, use_dali=False, seed=None):
             mode,
             paddle.device.get_device(),
             num_threads=config[mode]['loader']["num_workers"],
-            seed=seed)
+            seed=seed,
+            enable_fuse=True)
 
     class_num = config.get("class_num", None)
+    epochs = config.get("epochs", None)
     config_dataset = config[mode]['dataset']
     config_dataset = copy.deepcopy(config_dataset)
     dataset_name = config_dataset.pop('name')
@@ -103,6 +124,9 @@ def build_dataloader(config, mode, device, use_dali=False, seed=None):
         shuffle = config_sampler["shuffle"]
     else:
         sampler_name = config_sampler.pop("name")
+        sampler_argspec = inspect.getargspec(eval(sampler_name).__init__).args
+        if "total_epochs" in sampler_argspec:
+            config_sampler.update({"total_epochs": epochs})
         batch_sampler = eval(sampler_name)(dataset, **config_sampler)
 
     logger.debug("build batch_sampler({}) success...".format(batch_sampler))
@@ -131,6 +155,12 @@ def build_dataloader(config, mode, device, use_dali=False, seed=None):
     num_workers = config_loader["num_workers"]
     use_shared_memory = config_loader["use_shared_memory"]
 
+    init_fn = partial(
+        worker_init_fn,
+        num_workers=num_workers,
+        rank=dist.get_rank(),
+        seed=seed) if seed is not None else None
+
     if batch_sampler is None:
         data_loader = DataLoader(
             dataset=dataset,
@@ -141,7 +171,8 @@ def build_dataloader(config, mode, device, use_dali=False, seed=None):
             batch_size=batch_size,
             shuffle=shuffle,
             drop_last=drop_last,
-            collate_fn=batch_collate_fn)
+            collate_fn=batch_collate_fn,
+            worker_init_fn=init_fn)
     else:
         data_loader = DataLoader(
             dataset=dataset,
@@ -150,7 +181,8 @@ def build_dataloader(config, mode, device, use_dali=False, seed=None):
             return_list=True,
             use_shared_memory=use_shared_memory,
             batch_sampler=batch_sampler,
-            collate_fn=batch_collate_fn)
+            collate_fn=batch_collate_fn,
+            worker_init_fn=init_fn)
 
     logger.debug("build data_loader({}) success...".format(data_loader))
     return data_loader
