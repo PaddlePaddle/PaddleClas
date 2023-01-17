@@ -20,7 +20,7 @@
 
 ## 1. 模型和应用场景介绍
 
-该案例提供了用户使用 PaddleClas 的基于 EfficientNetB3 网络构建有水印/无水印（这里的水印包括数字照片上留下的一些logo、信息、网址等）的分类模型。该模型可以广泛应用于审核场景、海量数据过滤场景等。具体有无水印的图片对比如下：
+该案例提供了用户使用 PaddleClas 的基于 EfficientNetB3 网络构建有水印/无水印（这里的水印包括数字照片上留下的一些logo、信息、网址等）的分类模型。该模型可以广泛应用于审核场景、海量数据过滤场景等。本案例引用自[水印识别](https://github.com/LAION-AI/LAION-5B-WatermarkDetection),权重由官方权重转换而来。具体有无水印的图片对比如下：
 <center><img src='https://user-images.githubusercontent.com/94225063/212879681-f115d6f8-85c8-4cda-a07e-5f5b00d8236a.jpeg' width=800></center>
 可以看到，左图中有水印，右图中无水印。
 
