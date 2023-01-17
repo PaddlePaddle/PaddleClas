@@ -21,6 +21,9 @@ FILENAME=$1
 # change gpu to npu in tipc txt configs
 sed -i "s/Global.device:gpu/Global.device:npu/g" $FILENAME
 sed -i "s/Global.use_gpu/Global.use_npu/g" $FILENAME
+sed -i "s/Global.use_tensorrt:True|False/Global.use_tensorrt:False/g" $FILENAME
+sed -i "s/Global.use_tensorrt:True/Global.use_tensorrt:False/g" $FILENAME
+sed -i "s/Global.benchmark:True|False/Global.benchmark:False/g" $FILENAME
 dataline=`cat $FILENAME`
 
 # parser params
@@ -38,6 +41,7 @@ grep -n 'tools/.*yaml' $FILENAME  | cut -d ":" -f 1 \
     train_cmd=$(func_parser_value "${lines[line_num-1]}")
     trainer_config=$(func_parser_config ${train_cmd})
     sed -i 's/device: gpu/device: npu/g' "$REPO_ROOT_PATH/$trainer_config"
+    sed -i 's/device: "gpu"/device: npu/g' "$REPO_ROOT_PATH/$trainer_config"
 done
 
 # change gpu to npu in execution script
