@@ -75,8 +75,6 @@ Infer:
     label_1: no_watermark
 
 Metric:
-  Eval:
-    - TprAtFpr:
-        max_fpr: 0.01
+  Train:
     - TopkAcc:
         topk: [1, 2]
