@@ -6,6 +6,21 @@
 
 飞桨图像识别套件PaddleClas是飞桨为工业界和学术界所准备的一个图像识别和图像分类任务的工具集，助力使用者训练出更好的视觉模型和应用落地。
 
+| CV基础模型库                                  | PP-ShiTu图像识别系统                                         | PULC实用图像分类系统                                         |
+| --------------------------------------------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
+| 骨干网络预训练模型库                          | 动植物识别                                                   | 人                                                           |
+| - ResNet<br />- ResNeXt<br />- PP-LCNet<br /> | <img src="docs/images/ppshitu_application_scenarios/104flowers.jpeg" height = "100"><img src="docs/images/ppshitu_application_scenarios/Bird400.jpg" height = "100"><img src="docs/images/ppshitu_application_scenarios/DogBreeds.jpg" height = "100"> | <img src="docs//images/PULC/docs/safety_helmet_data_demo.jpg" height = "100"> |
+| Transformer预训练模型库                       | 商品识别                                                     | 车                                                           |
+| - ResNet<br />- ResNeXt<br />- PP-LCNet<br /> | <img src="docs/images/ppshitu_application_scenarios/MusicInstruments.jpg" height = "100"> |                                                              |
+| 其他                                          | 交通相关                                                     | 文字                                                         |
+| - ResNet<br />- ResNeXt<br />- PP-LCNet<br /> | <img src="docs/images/ppshitu_application_scenarios/AID.jpg" height = "100"> |                                                              |
+
+<details>
+<summary><b> 测试说明(点击展开)</b></summary>
+- 图中模型均可在[📱模型库](#模型库)中获取
+
+</details>
+
 <div align="center">
 <img src="https://user-images.githubusercontent.com/50011306/201870645-63319203-9730-44fc-8e2e-054aad164461.gif"  width = "600" />
 <p>PP-ShiTu图像识别系统应用范围</p>
@@ -90,6 +105,7 @@ PaddleClas支持多种前沿图像分类、识别相关算法，发布产业级�
 - 基于PULC人员出入视频管理： [点击这里](./docs/zh_CN/samples/Personnel_Access/README.md)
 - 基于PP-ShiTu 的智慧商超商品识别：[点击这里](./docs/zh_CN/samples/Goods_Recognition/README.md)
 - 基于PP-ShiTu电梯内电瓶车入室识别：[点击这里](./docs/zh_CN/samples//Electromobile_In_Elevator_Detection/README.md)
+- 
 
 ## 📖 文档教程
 - [环境准备](docs/zh_CN/installation.md)
