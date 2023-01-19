@@ -125,7 +125,7 @@ python3.7 -m paddle.distributed.launch \
 在得到在线量化训练、模型剪枝保存的模型后，可以将其导出为inference model，用于预测部署，以模型剪枝为例：
 
 ```bash
-python3.7 tools/export.py \
+python3.7 tools/export_model.py \
     -c ppcls/configs/slim/ResNet50_vd_prune.yaml \
     -o Global.pretrained_model=./output/ResNet50_vd/best_model \
     -o Global.save_inference_dir=./inference
