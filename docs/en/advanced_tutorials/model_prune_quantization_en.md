@@ -157,7 +157,7 @@ python3.7 -m paddle.distributed.launch \
 Having obtained the saved model after online quantization training and pruning, it can be exported as an inference model for inference deployment. Here we take model pruning as an example:
 
 ```
-python3.7 tools/export.py \
+python3.7 tools/export_model.py \
     -c ppcls/configs/slim/ResNet50_vd_prune.yaml \
     -o Global.pretrained_model=./output/ResNet50_vd/best_model \
     -o Global.save_inference_dir=./inference

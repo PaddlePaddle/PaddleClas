@@ -127,7 +127,7 @@ python3.7 -m paddle.distributed.launch \
 After getting the compressed model, we can export it as inference model for predictive deployment. Using pruned model as example:
 
 ```bash
-python3.7 tools/export.py \
+python3.7 tools/export_model.py \
     -c ppcls/configs/slim/ResNet50_vd_prune.yaml \
     -o Global.pretrained_model=./output/ResNet50_vd/best_model
     -o Global.save_inference_dir=./inference
