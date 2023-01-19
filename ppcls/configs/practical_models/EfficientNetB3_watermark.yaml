@@ -76,7 +76,5 @@ Infer:
 
 Metric:
   Eval:
-    - TprAtFpr:
-        max_fpr: 0.01
     - TopkAcc:
         topk: [1, 2]
