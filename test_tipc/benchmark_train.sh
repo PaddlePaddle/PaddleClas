@@ -199,11 +199,6 @@ for batch_size in ${batch_size_list[*]}; do
 
                 gpu_id=$(set_gpu_id $device_num)
 
-                # It is needed that using dali, NHWC and 4 channels when training ResNet50 with AMPO2
-                if [[ $model_name == "ResNet50" && $precision == "fp16" ]]; then
-                    sed -i "s/ResNet50.yaml/ResNet50_amp_O2_ultra.yaml/g" $FILENAME
-                fi
-
                 # if bs is big, then copy train_list.txt to generate more train log
                 # At least 25 log number would be good to calculate ips for benchmark system.
                 # So the copy number for train_list is as follows:
