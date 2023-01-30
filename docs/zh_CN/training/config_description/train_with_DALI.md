@@ -5,6 +5,7 @@
 * [2. 安装 DALI](#2)
 * [3. 使用 DALI](#3)
 * [4. 使用 FP16 训练](#4)
+* [5. 新增 DALI 算子](#5)
 
  <a name='1'></a>
 
@@ -70,3 +71,6 @@ python -m paddle.distributed.launch \
     ppcls/train.py \
     -c ./ppcls/configs/ImageNet/ResNet/ResNet50_fp16_dygraph.yaml
 ```
+
+## 5. 新增 DALI 算子
+PaddleClas提供了基于DALI已有API的自定义python算子教程，可以参考 [develop_with_DALI.md](../advanced/develop_with_DALI.md)

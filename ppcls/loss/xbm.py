@@ -21,7 +21,7 @@ from typing import Tuple
 import paddle
 
 
-class CrossBatchMemory(object):
+class CrossBatchMemory(paddle.nn.Layer):
     """
     CrossBatchMemory Implementation. refer to "Cross-Batch Memory for Embedding Learning".
 
@@ -33,10 +33,18 @@ class CrossBatchMemory(object):
     """
 
     def __init__(self, size: int, embedding_size: int):
+        super().__init__()
         self.size = size
         self.embedding_size = embedding_size
-        self.feats = paddle.zeros([self.size, self.embedding_size])
-        self.targets = paddle.zeros([self.size, ], dtype="int64")
+
+        # initialize and register feature queue for resume training
+        feats = paddle.zeros([self.size, self.embedding_size])
+        self.register_buffer("feats", feats)
+
+        # initialize and register label queue for resume training
+        targets = paddle.zeros([self.size, ], dtype="int64")
+        self.register_buffer("targets", targets)
+
         self.ptr = 0
         # self.accumulated_size = 0
 
@@ -74,3 +82,8 @@ class CrossBatchMemory(object):
             self.targets[self.ptr:self.ptr + input_size] = targets
             self.ptr += input_size
         # self.accumulated_size += input_size
+
+    def forward(self, *kargs, **kwargs):
+        raise NotImplementedError(
+            "CrossBatchMemory module is for memory-bank, forward method is not needed"
+        )

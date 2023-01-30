@@ -2,6 +2,7 @@ import paddle
 import paddle.nn as nn
 import paddle.nn.functional as F
 from paddle import ParamAttr
+from ..base.theseus_layer import TheseusLayer
 """
 backbone option "WideResNet"
 code in this file is adpated from
@@ -123,7 +124,7 @@ class Normalize(nn.Layer):
         return out
 
 
-class Wide_ResNet(nn.Layer):
+class Wide_ResNet(TheseusLayer):
     def __init__(self,
                  num_classes,
                  depth=28,
@@ -142,7 +143,6 @@ class Wide_ResNet(nn.Layer):
         # if use the output of projection head for classification
         self.proj_after = proj_after
         self.low_dim = low_dim
-
         channels = [
             16, 16 * widen_factor, 32 * widen_factor, 64 * widen_factor
         ]
@@ -183,7 +183,6 @@ class Wide_ResNet(nn.Layer):
         else:
             self.fc = nn.Linear(channels[3], num_classes)
         self.channels = channels[3]
-
         # projection head
         if self.proj:
             self.l2norm = Normalize(2)
@@ -201,7 +200,6 @@ class Wide_ResNet(nn.Layer):
         feat = self.relu(self.bn1(feat))
         feat = F.adaptive_avg_pool2d(feat, 1)
         feat = paddle.reshape(feat, [-1, self.channels])
-
         if self.proj:
             pfeat = self.fc1(feat)
             pfeat = self.relu_mlp(pfeat)

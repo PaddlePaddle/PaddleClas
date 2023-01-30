@@ -17,6 +17,7 @@
 
 import paddle.nn as nn
 import paddle
+import paddle.nn.functional as F
 import numpy as np
 
 from ....utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
@@ -40,8 +41,12 @@ MODEL_URLS = {
     "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/RepVGG_B1g4_pretrained.pdparams",
     "RepVGG_B2g4":
     "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/RepVGG_B2g4_pretrained.pdparams",
+    "RepVGG_B3":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/RepVGG_B3_pretrained.pdparams",
     "RepVGG_B3g4":
     "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/RepVGG_B3g4_pretrained.pdparams",
+    "RepVGG_D2se":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/RepVGG_D2se_pretrained.pdparams"
 }
 
 __all__ = list(MODEL_URLS.keys())
@@ -76,6 +81,33 @@ class ConvBN(nn.Layer):
         return y
 
 
+class SEBlock(nn.Layer):
+    def __init__(self, input_channels, internal_neurons):
+        super(SEBlock, self).__init__()
+        self.down = nn.Conv2D(
+            in_channels=input_channels,
+            out_channels=internal_neurons,
+            kernel_size=1,
+            stride=1,
+            bias_attr=True)
+        self.up = nn.Conv2D(
+            in_channels=internal_neurons,
+            out_channels=input_channels,
+            kernel_size=1,
+            stride=1,
+            bias_attr=True)
+        self.input_channels = input_channels
+
+    def forward(self, inputs):
+        x = F.avg_pool2d(inputs, kernel_size=inputs.shape[3])
+        x = self.down(x)
+        x = F.relu(x)
+        x = self.up(x)
+        x = F.sigmoid(x)
+        x = x.reshape([-1, self.input_channels, 1, 1])
+        return inputs * x
+
+
 class RepVGGBlock(nn.Layer):
     def __init__(self,
                  in_channels,
@@ -85,7 +117,8 @@ class RepVGGBlock(nn.Layer):
                  padding=0,
                  dilation=1,
                  groups=1,
-                 padding_mode='zeros'):
+                 padding_mode='zeros',
+                 use_se=False):
         super(RepVGGBlock, self).__init__()
         self.is_repped = False
 
@@ -105,6 +138,11 @@ class RepVGGBlock(nn.Layer):
 
         self.nonlinearity = nn.ReLU()
 
+        if use_se:
+            self.se = SEBlock(
+                out_channels, internal_neurons=out_channels // 16)
+        else:
+            self.se = nn.Identity()
         self.rbr_identity = nn.BatchNorm2D(
             num_features=in_channels
         ) if out_channels == in_channels and stride == 1 else None
@@ -132,9 +170,9 @@ class RepVGGBlock(nn.Layer):
         else:
             id_out = self.rbr_identity(inputs)
         return self.nonlinearity(
-            self.rbr_dense(inputs) + self.rbr_1x1(inputs) + id_out)
+            self.se(self.rbr_dense(inputs) + self.rbr_1x1(inputs) + id_out))
 
-    def rep(self):
+    def re_parameterize(self):
         if not hasattr(self, 'rbr_reparam'):
             self.rbr_reparam = nn.Conv2D(
                 in_channels=self.in_channels,
@@ -198,14 +236,12 @@ class RepVGG(nn.Layer):
                  num_blocks,
                  width_multiplier=None,
                  override_groups_map=None,
-                 class_num=1000):
+                 class_num=1000,
+                 use_se=False):
         super(RepVGG, self).__init__()
-
         assert len(width_multiplier) == 4
         self.override_groups_map = override_groups_map or dict()
-
         assert 0 not in self.override_groups_map
-
         self.in_planes = min(64, int(64 * width_multiplier[0]))
 
         self.stage0 = RepVGGBlock(
@@ -213,20 +249,33 @@ class RepVGG(nn.Layer):
             out_channels=self.in_planes,
             kernel_size=3,
             stride=2,
-            padding=1)
+            padding=1,
+            use_se=use_se)
         self.cur_layer_idx = 1
         self.stage1 = self._make_stage(
-            int(64 * width_multiplier[0]), num_blocks[0], stride=2)
+            int(64 * width_multiplier[0]),
+            num_blocks[0],
+            stride=2,
+            use_se=use_se)
         self.stage2 = self._make_stage(
-            int(128 * width_multiplier[1]), num_blocks[1], stride=2)
+            int(128 * width_multiplier[1]),
+            num_blocks[1],
+            stride=2,
+            use_se=use_se)
         self.stage3 = self._make_stage(
-            int(256 * width_multiplier[2]), num_blocks[2], stride=2)
+            int(256 * width_multiplier[2]),
+            num_blocks[2],
+            stride=2,
+            use_se=use_se)
         self.stage4 = self._make_stage(
-            int(512 * width_multiplier[3]), num_blocks[3], stride=2)
+            int(512 * width_multiplier[3]),
+            num_blocks[3],
+            stride=2,
+            use_se=use_se)
         self.gap = nn.AdaptiveAvgPool2D(output_size=1)
         self.linear = nn.Linear(int(512 * width_multiplier[3]), class_num)
 
-    def _make_stage(self, planes, num_blocks, stride):
+    def _make_stage(self, planes, num_blocks, stride, use_se=False):
         strides = [stride] + [1] * (num_blocks - 1)
         blocks = []
         for stride in strides:
@@ -238,7 +287,8 @@ class RepVGG(nn.Layer):
                     kernel_size=3,
                     stride=stride,
                     padding=1,
-                    groups=cur_groups))
+                    groups=cur_groups,
+                    use_se=use_se))
             self.in_planes = planes
             self.cur_layer_idx += 1
         return nn.Sequential(*blocks)
@@ -367,6 +417,17 @@ def RepVGG_B2g4(pretrained=False, use_ssld=False, **kwargs):
     return model
 
 
+def RepVGG_B3(pretrained=False, use_ssld=False, **kwargs):
+    model = RepVGG(
+        num_blocks=[4, 6, 16, 1],
+        width_multiplier=[3, 3, 3, 5],
+        override_groups_map=None,
+        **kwargs)
+    _load_pretrained(
+        pretrained, model, MODEL_URLS["RepVGG_B3"], use_ssld=use_ssld)
+    return model
+
+
 def RepVGG_B3g4(pretrained=False, use_ssld=False, **kwargs):
     model = RepVGG(
         num_blocks=[4, 6, 16, 1],
@@ -375,4 +436,16 @@ def RepVGG_B3g4(pretrained=False, use_ssld=False, **kwargs):
         **kwargs)
     _load_pretrained(
         pretrained, model, MODEL_URLS["RepVGG_B3g4"], use_ssld=use_ssld)
+    return model
+
+
+def RepVGG_D2se(pretrained=False, use_ssld=False, **kwargs):
+    model = RepVGG(
+        num_blocks=[8, 14, 24, 1],
+        width_multiplier=[2.5, 2.5, 2.5, 5],
+        override_groups_map=None,
+        use_se=True,
+        **kwargs)
+    _load_pretrained(
+        pretrained, model, MODEL_URLS["RepVGG_D2se"], use_ssld=use_ssld)
     return model

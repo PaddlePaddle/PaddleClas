@@ -53,16 +53,16 @@ DeiT（Data-efficient Image Transformers）系列模型是由 FaceBook 在 2020 
 
 | Models                               | Size | Latency(ms)<br>bs=1 | Latency(ms)<br>bs=4 | Latency(ms)<br>bs=8 |
 | ------------------------------------ | ----------------- | ------------------------------ | ------------------------------ | ------------------------------ |
-| DeiT_tiny_<br>patch16_224            | 224               | 3.61                           | 3.94                           | 6.10                           |
-| DeiT_small_<br>patch16_224           | 224               | 3.61                           | 6.24                           | 10.49                          |
-| DeiT_base_<br>patch16_224            | 224               | 6.13                           | 14.87                          | 28.50                          |
-| DeiT_base_<br>patch16_384            | 384               | 14.12                          | 48.80                          | 97.60                          |
-| DeiT_tiny_<br>distilled_patch16_224  | 224               | 3.51                           | 4.05                           | 6.03                           |
-| DeiT_small_<br>distilled_patch16_224 | 224               | 3.70                           | 6.20                           | 10.53                          |
-| DeiT_base_<br>distilled_patch16_224  | 224               | 6.17                           | 14.94                          | 28.58                          |
-| DeiT_base_<br>distilled_patch16_384  | 384               | 14.12                          | 48.76                          | 97.09                          |
+| DeiT_tiny_<br>patch16_224            | 224               | 3.87                           | 3.58                           | 4.64                           |
+| DeiT_small_<br>patch16_224           | 224               | 3.52                           | 5.90                           | 9.44                          |
+| DeiT_base_<br>patch16_224            | 224               | 5.97                           | 15.52                          | 27.37                          |
+| DeiT_base_<br>patch16_384            | 384               | 13.78                          | 45.94                          | 89.38                          |
+| DeiT_tiny_<br>distilled_patch16_224  | 224               | 3.31                           | 3.61                           | 4.57                           |
+| DeiT_small_<br>distilled_patch16_224 | 224               | 3.57                           | 5.91                           | 9.51                          |
+| DeiT_base_<br>distilled_patch16_224  | 224               | 6.00                           | 15.43                          | 27.10                          |
+| DeiT_base_<br>distilled_patch16_384  | 384               | 13.76                          | 45.61                          | 89.15                          |
 
-**备注：** 精度类型为 FP32，推理过程使用 TensorRT。
+**备注：** 精度类型为 FP32，推理过程使用 TensorRT-8.0.3.4。
 
 <a name="2"></a>  
 

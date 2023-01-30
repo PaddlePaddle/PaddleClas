@@ -549,15 +549,22 @@ class Engine(object):
             False) or "ATTRMetric" in self.config["Metric"]["Eval"][0]
         model = ExportModel(self.config["Arch"], self.model, use_multilabel)
         if self.config["Global"]["pretrained_model"] is not None:
-            load_dygraph_pretrain(model.base_model,
-                                  self.config["Global"]["pretrained_model"])
+            if self.config["Global"]["pretrained_model"].startswith("http"):
+                load_dygraph_pretrain_from_url(
+                    model.base_model,
+                    self.config["Global"]["pretrained_model"])
+            else:
+                load_dygraph_pretrain(
+                    model.base_model,
+                    self.config["Global"]["pretrained_model"])
 
         model.eval()
 
-        # for rep nets
+        # for re-parameterization nets
         for layer in self.model.sublayers():
-            if hasattr(layer, "rep") and not getattr(layer, "is_repped"):
-                layer.rep()
+            if hasattr(layer, "re_parameterize") and not getattr(layer,
+                                                                 "is_repped"):
+                layer.re_parameterize()
 
         save_path = os.path.join(self.config["Global"]["save_inference_dir"],
                                  "inference")
