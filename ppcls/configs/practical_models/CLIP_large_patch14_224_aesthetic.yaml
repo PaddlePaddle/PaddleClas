@@ -69,7 +69,7 @@ Infer:
     - ToCHWImage:
   PostProcess:
     name: ScoreOutput
-    decimal_places: 4
+    decimal_places: 2
 
 Metric:
   Eval:

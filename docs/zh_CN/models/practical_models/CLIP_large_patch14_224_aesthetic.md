@@ -24,6 +24,10 @@
 <center><img src='https://user-images.githubusercontent.com/94225063/215502324-e22b72dc-bb6a-42fa-8f9d-d1069b74c6b7.jpg' width=800></center>
 可以看到，相比于右图，左图更加符合人类审美。
 
+**备注：**
+
+* 图片引用自[链接](http://captions.christoph-schuhmann.de/aesthetic_viz_laion_sac+logos+ava1-l14-linearMSE-en-2.37B.html)，得分范围为1.00-8.00
+
 <a name="2"></a>
 
 ## 2. 模型快速体验
@@ -93,7 +97,7 @@ python3 tools/infer.py \
 
 * 这里`-o Arch.pretrained=True"` 指定了使用训练好的预训练权重，如果指定其他权重，只需替换对应的路径即可。
 
-* 默认是对 `deploy/images/practical/aesthetic_score_predictor/Highscore.png` 进行预测，此处也可以通过增加字段 `-o Infer.infer_imgs=xxx` 对其他图片预测。
+* 默认是对 `deploy/images/practical/aesthetic_score_predictor/Highscore.png` 进行打分，此处也可以通过增加字段 `-o Infer.infer_imgs=xxx` 对其他图片打分。
 
 <a name="3.2.2"></a>
 
@@ -101,29 +105,12 @@ python3 tools/infer.py \
 
 Paddle Inference 是飞桨的原生推理库， 作用于服务器端和云端，提供高性能的推理能力。相比于直接基于预训练模型进行预测，Paddle Inference可使用 MKLDNN、CUDNN、TensorRT 进行预测加速，从而实现更优的推理性能。更多关于 Paddle Inference 推理引擎的介绍，可以参考 [Paddle Inference官网教程](https://www.paddlepaddle.org.cn/documentation/docs/zh/guides/infer/inference/inference_cn.html)。
 
-首先，我们提供了将权重和模型转换的脚本，执行该脚本可以得到对应的 inference 模型：
-
-```bash
-python3 tools/export_model.py \
-    -c ./ppcls/configs/practical_models/CLIP_large_patch14_224_aesthetic.yaml \
-    -o Arch.pretrained=True \
-    -o Global.save_inference_dir=deploy/models/CLIP_large_patch14_224_aesthetic_infer
-```
-执行完该脚本后会在 `deploy/models/` 下生成 `CLIP_large_patch14_224_aesthetic_infer` 文件夹，`models` 文件夹下应有如下文件结构：
-
-```
-├── CLIP_large_patch14_224_aesthetic_infer
-│   ├── inference.pdiparams
-│   ├── inference.pdiparams.info
-│   └── inference.pdmodel
-```
-
-当然，也可以选择直接下载的方式：
+选择直接下载的方式得到对应的 inference 模型：
 
 ```
 cd deploy/models
 # 下载 inference 模型并解压
-wget https://paddleclas.bj.bcebos.com/models/practical/inference/EfficientNetB3_watermark_infer.tar && tar -xf EfficientNetB3_watermark_infer.tar
+wget https://paddleclas.bj.bcebos.com/models/practical/inference/CLIP_large_patch14_224_aesthetic_infer.tar && tar -xf CLIP_large_patch14_224_aesthetic_infer.tar
 ```
 解压完毕后，`models` 文件夹下应有如下文件结构：
 
@@ -141,7 +128,7 @@ wget https://paddleclas.bj.bcebos.com/models/practical/inference/EfficientNetB3_
 cd ../
 ```
 
-运行下面的命令，对图像 `./images/practical/aesthetic_score_predictor/Highscore.png` 进行有水印/无水印分类。
+运行下面的命令，对图像 `./images/practical/aesthetic_score_predictor/Highscore.png` 进行美观度打分。
 
 ```shell
 # 使用下面的命令使用 GPU 进行预测

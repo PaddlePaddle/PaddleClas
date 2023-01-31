@@ -29,4 +29,4 @@ PreProcess:
 PostProcess:
   main_indicator: ScoreOutput
   ScoreOutput:
-    decimal_places: 4
+    decimal_places: 2
