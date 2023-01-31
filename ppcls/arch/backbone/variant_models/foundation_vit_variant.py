@@ -5,7 +5,7 @@ from ..model_zoo.foundation_vit import CLIP_large_patch14_224, _load_pretrained
 
 MODEL_URLS = {
     "CLIP_large_patch14_224_aesthetic":
-    "https://paddleclas.bj.bcebos.com/models/practical/inference/CLIP_large_patch14_224_aesthetic_pretrained.pdparams"
+    "https://paddleclas.bj.bcebos.com/models/practical/pretrained/CLIP_large_patch14_224_aesthetic_pretrained.pdparams"
 }
 
 __all__ = list(MODEL_URLS.keys())
