@@ -1,4 +1,5 @@
 import numpy
+import numpy as np
 import paddle
 
 
@@ -7,10 +8,9 @@ class ScoreOutput(object):
         self.decimal_places = decimal_places
 
     def __call__(self, x, file_names=None):
-        paddle.set_printoptions(precision=self.decimal_places)
         y = []
         for idx, probs in enumerate(x):
-            score = x[0]
+            score = np.around(x[0].numpy(), self.decimal_places)
             result = {"scores": score}
             if file_names is not None:
                 result["file_name"] = file_names[idx]
