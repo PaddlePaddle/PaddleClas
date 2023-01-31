@@ -10,7 +10,7 @@ class ScoreOutput(object):
     def __call__(self, x, file_names=None):
         y = []
         for idx, probs in enumerate(x):
-            score = np.around(x[0].numpy(), self.decimal_places)
+            score = np.around(x[idx].numpy(), self.decimal_places)
             result = {"scores": score}
             if file_names is not None:
                 result["file_name"] = file_names[idx]
