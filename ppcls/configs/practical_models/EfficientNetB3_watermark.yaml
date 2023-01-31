@@ -20,6 +20,7 @@ Global:
 # model architecture
 Arch:
   name: EfficientNetB3_watermark
+  pretrained: True
   class_num: 2
 
 # data loader for train and eval
