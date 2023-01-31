@@ -144,7 +144,7 @@ def main(config):
                     filename = batch_names[number]
                     scores_str = "[{}]".format(", ".join("{:.2f}".format(
                         r) for r in result_dict["scores"]))
-                    if "class_ids" and "label_names" in result_dict:
+                    if "class_ids" in result_dict and "label_names" in result_dict:
                         clas_ids = result_dict["class_ids"]
                         label_names = result_dict["label_names"]
                         print(

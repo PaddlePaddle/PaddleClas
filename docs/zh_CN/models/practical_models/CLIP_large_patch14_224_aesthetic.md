@@ -56,13 +56,9 @@ python3 -m pip install paddlepaddle -i https://mirror.baidu.com/pypi/simple
 请确保已clone本项目，本地构建安装：
 
 ```  
-python3 setup.py install
-```
-
-进入到PaddleClas目录下：
-
-```
 cd path/to/PaddleClas
+#使用下面的命令构建
+python3 setup.py install
 ```
 
 <a name="3"></a>
