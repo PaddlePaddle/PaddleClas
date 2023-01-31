@@ -1,0 +1,81 @@
+# global configs
+Global:
+  checkpoints: null
+  pretrained_model: null
+  output_dir: ./output/
+  device: gpu
+  save_interval: 1
+  eval_during_train: True
+  eval_interval: 1
+  epochs: 50
+  print_batch_step: 10
+  use_visualdl: False
+  # used for static mode and model export
+  image_shape: [3, 224, 224]
+  save_inference_dir: ./inference
+  # training model under @to_static
+  to_static: False
+  use_dali: False
+
+# model architecture
+Arch:
+  name: EfficientNetB3_watermark
+  pretrained: True
+  class_num: 2
+
+# data loader for train and eval
+DataLoader:
+  Train:
+    dataset:
+      name: ImageNetDataset
+      image_root: ./dataset/
+      cls_label_path: ./dataset/train_list.txt
+      transform_ops:
+        - DecodeImage:
+            to_rgb: True
+            channel_first: False
+        - ResizeImage:
+            size: 224
+        - RandFlipImage:
+            flip_code: 1
+        - NormalizeImage:
+            scale: 1.0/255.0
+            mean: [0.485, 0.456, 0.406]
+            std: [0.229, 0.224, 0.225]
+            order: ''
+    sampler:
+      name: DistributedBatchSampler
+      batch_size: 128
+      drop_last: False
+      shuffle: True
+    loader:
+      num_workers: 4
+      use_shared_memory: False
+
+Infer:
+  infer_imgs: deploy/images/practical/watermark_exists/watermark_example.png
+  batch_size: 1
+  transforms:
+    - DecodeImage:
+        to_rgb: True
+        channel_first: False
+    - ResizeImage:
+        resize_short: 256
+    - CropImage:
+        size: 224
+    - NormalizeImage:
+        scale: 1.0/255.0
+        mean: [0.485, 0.456, 0.406]
+        std: [0.229, 0.224, 0.225]
+        order: ''
+    - ToCHWImage:
+  PostProcess:
+    name: ThreshOutput
+    threshold: 0.5
+    label_0: contains_watermark
+    label_1: no_watermark
+
+Metric:
+  Eval:
+    - TopkAcc:
+        topk: [1, 2]
