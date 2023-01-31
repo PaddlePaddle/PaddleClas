@@ -17,7 +17,6 @@ import copy
 import shutil
 from functools import partial
 import importlib
-import numpy
 import numpy as np
 import paddle
 import paddle.nn.functional as F

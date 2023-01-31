@@ -90,7 +90,7 @@ python3 tools/infer.py \
 
 ```
 [{'scores': Tensor(shape=[1], dtype=float32, place=Place(gpu:0), stop_gradient=True,
-       [7.8476]), 'file_name': 'deploy/images/practical/aesthetic_score_predictor/Highscore.png'}]
+       [7.85]), 'file_name': 'deploy/images/practical/aesthetic_score_predictor/Highscore.png'}]
 ```
 
 **备注：**
