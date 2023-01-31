@@ -10,10 +10,9 @@
     - [2.1 安装 paddlepaddle](#2.1)
     - [2.2 安装 paddleclas](#2.2)
 - [3. 模型预测](#3)
-    - [3.1 环境配置](#3.1)
-    - [3.2 模型预测](#3.2)
-      - [3.2.1 基于训练引擎预测](#3.2.1)
-      - [3.2.2 基于推理引擎预测](#3.2.2)
+    - [3.1 模型预测](#3.1)
+      - [3.1.1 基于训练引擎预测](#3.1.1)
+      - [3.1.2 基于推理引擎预测](#3.1.2)
 
 
 <a name="1"></a>
@@ -54,29 +53,23 @@ python3 -m pip install paddlepaddle -i https://mirror.baidu.com/pypi/simple
 
 ### 2.2 安装 paddleclas
 
-使用如下命令快速安装 paddleclas：
+请本地构建安装：
 
 ```  
-pip3 install paddleclas
+python3 setup.py install
 ```
 
 <a name="3"></a>
 
 ## 3. 模型预测
 
-<a name="3.1"></a>  
+<a name="3.1"></a>
 
-### 3.1 环境配置
+### 3.1模型预测
 
-* 安装：请先参考文档[环境准备](../../installation.md) 配置 PaddleClas 运行环境。
+<a name="3.1.1"></a>
 
-<a name="3.2"></a>
-
-### 3.2 模型预测
-
-<a name="3.2.1"></a>
-
-### 3.2.1 基于训练引擎预测
+### 3.1.1 基于训练引擎预测
 
 模型训练完成之后，可以加载训练得到的预训练模型，进行模型预测。在模型库的 `tools/infer.py` 中提供了完整的示例，只需执行下述命令即可完成模型预测：
 
@@ -99,9 +92,9 @@ python3 tools/infer.py \
 
 * 默认是对 `deploy/images/practical/aesthetic_score_predictor/Highscore.png` 进行打分，此处也可以通过增加字段 `-o Infer.infer_imgs=xxx` 对其他图片打分。
 
-<a name="3.2.2"></a>
+<a name="3.1.2"></a>
 
-### 3.2.2 基于推理引擎预测
+### 3.1.2 基于推理引擎预测
 
 Paddle Inference 是飞桨的原生推理库， 作用于服务器端和云端，提供高性能的推理能力。相比于直接基于预训练模型进行预测，Paddle Inference可使用 MKLDNN、CUDNN、TensorRT 进行预测加速，从而实现更优的推理性能。更多关于 Paddle Inference 推理引擎的介绍，可以参考 [Paddle Inference官网教程](https://www.paddlepaddle.org.cn/documentation/docs/zh/guides/infer/inference/inference_cn.html)。
 
