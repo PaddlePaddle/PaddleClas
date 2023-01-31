@@ -49,7 +49,7 @@ python3 -m pip install paddlepaddle -i https://mirror.baidu.com/pypi/simple
 
 ### 2.2 安装 paddleclas
 
-使用如下命令快速安装 paddleclas：
+请本地构建安装：
 
 ```  
 python3 setup.py install
