@@ -49,10 +49,16 @@ python3 -m pip install paddlepaddle -i https://mirror.baidu.com/pypi/simple
 
 ### 2.2 安装 paddleclas
 
-请本地构建安装：
+请确保已clone本项目，本地构建安装：
 
 ```  
 python3 setup.py install
+```
+
+进入到PaddleClas目录下：
+
+```
+cd path/to/PaddleClas
 ```
 
 <a name="3"></a>
@@ -67,12 +73,11 @@ python3 setup.py install
 
 ### 3.1.1 基于训练引擎预测
 
-模型训练完成之后，可以加载训练得到的预训练模型，进行模型预测。在模型库的 `tools/infer.py` 中提供了完整的示例，只需执行下述命令即可完成模型预测：
+加载预训练模型，进行模型预测。在模型库的 `tools/infer.py` 中提供了完整的示例，只需执行下述命令即可完成模型预测：
 
 ```python
 python3 tools/infer.py \
-    -c ./ppcls/configs/practical_models/EfficientNetB3_watermark.yaml \
-    -o Arch.pretrained=True
+    -c ./ppcls/configs/practical_models/EfficientNetB3_watermark.yaml
 ```
 
 输出结果如下：
@@ -82,8 +87,6 @@ python3 tools/infer.py \
 ```
 
 **备注：**
-
-* 这里`-o Arch.pretrained=True"` 指定了使用训练好的预训练权重，如果指定其他权重，只需替换对应的路径即可。
 
 * 默认是对 `deploy/images/practical/watermark_exists/watermark_example.png` 进行预测，此处也可以通过增加字段 `-o Infer.infer_imgs=xxx` 对其他图片预测。
 
@@ -100,7 +103,6 @@ Paddle Inference 是飞桨的原生推理库， 作用于服务器端和云端�
 ```bash
 python3 tools/export_model.py \
     -c ./ppcls/configs/practical_models/EfficientNetB3_watermark.yaml \
-    -o Arch.pretrained=True \
     -o Global.save_inference_dir=deploy/models/EfficientNetB3_watermark_infer
 ```
 执行完该脚本后会在 `deploy/models/` 下生成 `EfficientNetB3_watermark_infer` 文件夹，`models` 文件夹下应有如下文件结构：
