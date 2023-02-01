@@ -229,6 +229,7 @@ class Cosine(LRBase):
                  warmup_start_lr=0.0,
                  last_epoch=-1,
                  by_epoch=False,
+                 lr_scale=1.0,
                  **kwargs):
         super(Cosine, self).__init__(epochs, step_each_epoch, learning_rate,
                                      warmup_epoch, warmup_start_lr, last_epoch,
@@ -237,6 +238,7 @@ class Cosine(LRBase):
         self.eta_min = eta_min
         if self.by_epoch:
             self.T_max = self.epochs - self.warmup_epoch
+        self.lr_scale = lr_scale
 
     def __call__(self):
         learning_rate = lr.CosineAnnealingDecay(
@@ -248,6 +250,9 @@ class Cosine(LRBase):
 
         if self.warmup_steps > 0:
             learning_rate = self.linear_warmup(learning_rate)
+
+        if self.lr_scale != 1.0:
+            learning_rate = ScaledLR(learning_rate, self.lr_scale)
 
         setattr(learning_rate, "by_epoch", self.by_epoch)
         return learning_rate
@@ -421,6 +426,7 @@ class ReduceOnPlateau(LRBase):
         last_epoch (int, optional): last epoch. Defaults to -1.
         by_epoch (bool, optional): learning rate decays by epoch when by_epoch is True, else by iter. Defaults to False.
     """
+
     def __init__(self,
                  epochs,
                  step_each_epoch,
@@ -488,6 +494,7 @@ class CosineFixmatch(LRBase):
         last_epoch (int, optional): last epoch. Defaults to -1.
         by_epoch (bool, optional): learning rate decays by epoch when by_epoch is True, else by iter. Defaults to False.
     """
+
     def __init__(self,
                  epochs,
                  step_each_epoch,
@@ -519,3 +526,28 @@ class CosineFixmatch(LRBase):
             last_epoch=self.last_epoch)
         setattr(learning_rate, "by_epoch", self.by_epoch)
         return learning_rate
+
+
+class ScaledLR(lr.LRScheduler):
+    def __init__(self, learning_rate, lr_scale=1.0):
+        type_check = isinstance(learning_rate, lr.LRScheduler)
+        if not type_check:
+            raise TypeError(
+                "the type of learning_rate should be LRScheduler, the current type is {}".
+                format(learning_rate))
+        self.learning_rate = learning_rate
+        self.lr_scale = lr_scale
+        super(ScaledLR, self).__init__()
+
+    def state_dict(self):
+        state_dict = super(ScaledLR, self).state_dict()
+        state_dict["Scaled_LR"] = self.learning_rate.state_dict()
+        return state_dict
+
+    def set_state_dict(self, state_dict):
+        super(ScaledLR, self).set_state_dict(state_dict)
+        self.learning_rate.set_state_dict(state_dict["Scaled_LR"])
+
+    def get_lr(self):
+        self.learning_rate.step(self.last_epoch)
+        return self.lr_scale * self.learning_rate()
