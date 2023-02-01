@@ -86,7 +86,7 @@ python3 tools/infer.py \
 
 * 默认是对 `deploy/images/practical/watermark_exists/watermark_example.png` 进行预测，此处也可以通过增加字段 `-o Infer.infer_imgs=xxx` 对其他图片预测。
 
-* 二分类默认的阈值为0.5， 如果需要指定阈值，可以使用 `-o Infer.PostProcess.threshold=0.99` 命令修改。
+* 二分类默认的阈值为0.5， 如果需要指定阈值，可以重改 `Infer.PostProcess.threshold` 。
 
 <a name="3.1.2"></a>
 
@@ -148,4 +148,4 @@ python3 python/predict_cls.py -c ./configs/practical_models/watermark_exists/inf
 watermark_example.png:	class id(s): [0], score(s): [0.97], label_name(s): ['contains_watermark']
 ```
 
-**备注：** 二分类默认的阈值为0.5， 如果需要指定阈值，可以使用 `-o PostProcess.ThreshOutput.threshold=0.99` 命令修改。
+**备注：** 二分类默认的阈值为0.5， 如果需要指定阈值，可以重改 `PostProcess.ThreshOutput.threshold` 。
