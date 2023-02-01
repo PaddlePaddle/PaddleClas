@@ -55,9 +55,16 @@ python3 -m pip install paddlepaddle -i https://mirror.baidu.com/pypi/simple
 
 请确保已clone本项目，本地构建安装：
 
-```  
+```
+若之前安装有paddleclas，先使用以下命令卸载，然后重新安装
+python3 -m pip uninstall paddleclas
+python3 -m pip install paddleclas
+```
+
+使用下面的命令构建:
+
+```
 cd path/to/PaddleClas
-#使用下面的命令构建
 python3 setup.py install
 ```
 
@@ -123,9 +130,9 @@ cd ../
 
 ```shell
 # 使用下面的命令使用 GPU 进行预测
-python3.7 python/predict_cls.py -c ./configs/practical_models/aesthetic_score_predictor/inference_aesthetic_score_predictor.yaml
+python3 python/predict_cls.py -c ./configs/practical_models/aesthetic_score_predictor/inference_aesthetic_score_predictor.yaml
 # 使用下面的命令使用 CPU 进行预测
-python3.7 python/predict_cls.py -c ./configs/practical_models/aesthetic_score_predictor/inference_aesthetic_score_predictor.yaml -o Global.use_gpu=False
+python3 python/predict_cls.py -c ./configs/practical_models/aesthetic_score_predictor/inference_aesthetic_score_predictor.yaml -o Global.use_gpu=False
 ```
 
 输出结果如下。
