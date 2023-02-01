@@ -23,6 +23,8 @@ import paddle.nn as nn
 import sys
 from paddle.nn.initializer import TruncatedNormal, Constant, Normal
 
+from ....utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
+
 MODEL_URLS = {
     "CLIP_small_patch16_224": None,
     "CLIP_base_patch32_224": None,
