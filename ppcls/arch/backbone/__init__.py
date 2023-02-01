@@ -38,7 +38,6 @@ from .model_zoo.dpn import DPN68, DPN92, DPN98, DPN107, DPN131
 from .model_zoo.dsnet import DSNet_tiny, DSNet_small, DSNet_base
 from .model_zoo.densenet import DenseNet121, DenseNet161, DenseNet169, DenseNet201, DenseNet264
 from .model_zoo.efficientnet import EfficientNetB0, EfficientNetB1, EfficientNetB2, EfficientNetB3, EfficientNetB4, EfficientNetB5, EfficientNetB6, EfficientNetB7, EfficientNetB0_small
-from .model_zoo.efficientnet_v2 import EfficientNetV2_S
 from .model_zoo.resnest import ResNeSt50_fast_1s1x64d, ResNeSt50, ResNeSt101, ResNeSt200, ResNeSt269
 from .model_zoo.googlenet import GoogLeNet
 from .model_zoo.mobilenet_v2 import MobileNetV2_x0_25, MobileNetV2_x0_5, MobileNetV2_x0_75, MobileNetV2, MobileNetV2_x1_5, MobileNetV2_x2_0
@@ -81,6 +80,7 @@ from .variant_models.vgg_variant import VGG19Sigmoid
 from .variant_models.pp_lcnet_variant import PPLCNet_x2_5_Tanh
 from .variant_models.pp_lcnetv2_variant import PPLCNetV2_base_ShiTu
 from .variant_models.efficientnet_variant import EfficientNetB3_watermark
+from .variant_models.foundation_vit_variant import CLIP_large_patch14_224_aesthetic
 from .model_zoo.adaface_ir_net import AdaFace_IR_18, AdaFace_IR_34, AdaFace_IR_50, AdaFace_IR_101, AdaFace_IR_152, AdaFace_IR_SE_50, AdaFace_IR_SE_101, AdaFace_IR_SE_152, AdaFace_IR_SE_200
 from .model_zoo.wideresnet import WideResNet
 from .model_zoo.uniformer import UniFormer_small, UniFormer_small_plus, UniFormer_small_plus_dim64, UniFormer_base, UniFormer_base_ls
