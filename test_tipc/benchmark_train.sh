@@ -214,19 +214,6 @@ for batch_size in ${batch_size_list[*]}; do
                         done
                     fi
                     cd ..
-                else
-                    cd dataset/ILSVRC2012
-                    val_list_length=`cat val_list.txt | wc -l`
-                    copy_num=`echo $[25*10*$total_batch_size/$val_list_length]`
-                    rm -rf train_list.txt
-                    if [[ $copy_num -gt 1 ]];then
-                        for ((i=1; i <=$copy_num; i++));do
-                            cat val_list.txt >> train_list.txt
-                        done
-                    else
-                        ln -s val_list.txt train_list.txt
-                    fi
-                    cd ../../
                 fi
 
                 if [[ ${#gpu_id} -le 1 ]];then
@@ -238,9 +225,9 @@ for batch_size in ${batch_size_list[*]}; do
                     tmp=`sed -i "${line_profile}s/.*/${profile_option}/" "${FILENAME}"`
 
                     # run test_train_inference_python.sh
-                    cmd="bash test_tipc/test_train_inference_python.sh ${FILENAME} benchmark_train > ${log_path}/${log_name} 2>&1 "
+                    cmd="timeout 5m bash test_tipc/test_train_inference_python.sh ${FILENAME} benchmark_train > ${log_path}/${log_name} 2>&1 "
                     echo $cmd
-                    eval $cmd
+                    eval ${cmd}
                     eval "cat ${log_path}/${log_name}"
 
                     # without profile
@@ -251,10 +238,10 @@ for batch_size in ${batch_size_list[*]}; do
                     log_name="${repo_name}_${model_name}_bs${batch_size}_${precision}_${run_mode}_${device_num}_${to_static}log"
                     speed_log_name="${repo_name}_${model_name}_bs${batch_size}_${precision}_${run_mode}_${device_num}_${to_static}speed"
                     func_sed_params "$FILENAME" "${line_profile}" "null"  # sed profile_id as null
-                    cmd="bash test_tipc/test_train_inference_python.sh ${FILENAME} benchmark_train > ${log_path}/${log_name} 2>&1 "
+                    cmd="timeout 5m bash test_tipc/test_train_inference_python.sh ${FILENAME} benchmark_train > ${log_path}/${log_name} 2>&1 "
                     echo $cmd
                     job_bt=`date '+%Y%m%d%H%M%S'`
-                    eval $cmd
+                    eval ${cmd}
                     job_et=`date '+%Y%m%d%H%M%S'`
                     export model_run_time=$((${job_et}-${job_bt}))
                     eval "cat ${log_path}/${log_name}"
@@ -287,10 +274,10 @@ for batch_size in ${batch_size_list[*]}; do
                     speed_log_name="${repo_name}_${model_name}_bs${batch_size}_${precision}_${run_mode}_${device_num}_${to_static}speed"
                     func_sed_params "$FILENAME" "${line_gpuid}" "$gpu_id"  # sed used gpu_id
                     func_sed_params "$FILENAME" "${line_profile}" "null"  # sed --profile_option as null
-                    cmd="bash test_tipc/test_train_inference_python.sh ${FILENAME} benchmark_train > ${log_path}/${log_name} 2>&1 "
+                    cmd="timeout 5m bash test_tipc/test_train_inference_python.sh ${FILENAME} benchmark_train > ${log_path}/${log_name} 2>&1 "
                     echo $cmd
                     job_bt=`date '+%Y%m%d%H%M%S'`
-                    eval $cmd
+                    eval ${cmd}
                     job_et=`date '+%Y%m%d%H%M%S'`
                     export model_run_time=$((${job_et}-${job_bt}))
                     eval "cat ${log_path}/${log_name}"
