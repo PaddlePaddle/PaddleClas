@@ -56,9 +56,8 @@ python3 -m pip install paddlepaddle -i https://mirror.baidu.com/pypi/simple
 请确保已clone本项目，本地构建安装：
 
 ```
-若之前安装有paddleclas，先使用以下命令卸载，然后重新安装
+若之前安装有paddleclas，先使用以下命令卸载
 python3 -m pip uninstall paddleclas
-python3 -m pip install paddleclas
 ```
 
 使用下面的命令构建:
