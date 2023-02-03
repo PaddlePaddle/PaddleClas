@@ -142,13 +142,17 @@ def main(config):
                     print("{}:\t {}".format(filename, result_dict))
                 else:
                     filename = batch_names[number]
-                    clas_ids = result_dict["class_ids"]
                     scores_str = "[{}]".format(", ".join("{:.2f}".format(
                         r) for r in result_dict["scores"]))
-                    label_names = result_dict["label_names"]
-                    print(
-                        "{}:\tclass id(s): {}, score(s): {}, label_name(s): {}".
-                        format(filename, clas_ids, scores_str, label_names))
+                    if "class_ids" in result_dict and "label_names" in result_dict:
+                        clas_ids = result_dict["class_ids"]
+                        label_names = result_dict["label_names"]
+                        print(
+                            "{}:\tclass id(s): {}, score(s): {}, label_name(s): {}".
+                            format(filename, clas_ids, scores_str,
+                                   label_names))
+                    else:
+                        print("{}:\tscore(s): {}".format(filename, scores_str))
             batch_imgs = []
             batch_names = []
     if cls_predictor.benchmark:

@@ -560,10 +560,11 @@ class Engine(object):
 
         model.eval()
 
-        # for rep nets
+        # for re-parameterization nets
         for layer in self.model.sublayers():
-            if hasattr(layer, "rep") and not getattr(layer, "is_repped"):
-                layer.rep()
+            if hasattr(layer, "re_parameterize") and not getattr(layer,
+                                                                 "is_repped"):
+                layer.re_parameterize()
 
         save_path = os.path.join(self.config["Global"]["save_inference_dir"],
                                  "inference")

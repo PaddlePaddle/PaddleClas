@@ -216,7 +216,7 @@ class RepDepthwiseSeparable(TheseusLayer):
             x = x + input_x
         return x
 
-    def rep(self):
+    def re_parameterize(self):
         if self.use_rep:
             self.is_repped = True
             kernel, bias = self._get_equivalent_kernel_bias()

@@ -19,7 +19,7 @@ from . import topk, threshoutput
 from .topk import Topk
 from .threshoutput import ThreshOutput, MultiLabelThreshOutput
 from .attr_rec import VehicleAttribute, PersonAttribute, TableAttribute
-
+from .scoreoutput import ScoreOutput
 
 
 def build_postprocess(config):
