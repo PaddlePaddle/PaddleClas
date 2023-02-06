@@ -14,6 +14,8 @@
 
 from ppcls.data.preprocess.ops.autoaugment import ImageNetPolicy as RawImageNetPolicy
 from ppcls.data.preprocess.ops.randaugment import RandAugment as RawRandAugment
+from ppcls.data.preprocess.ops.randaugment import RandomApply
+from ppcls.data.preprocess.ops.randaugment import RandAugmentV2 as RawRandAugmentV2
 from ppcls.data.preprocess.ops.timm_autoaugment import RawTimmAutoAugment
 from ppcls.data.preprocess.ops.cutout import Cutout
 
@@ -24,6 +26,7 @@ from ppcls.data.preprocess.ops.grid import GridMask
 from ppcls.data.preprocess.ops.operators import DecodeImage
 from ppcls.data.preprocess.ops.operators import ResizeImage
 from ppcls.data.preprocess.ops.operators import CropImage
+from ppcls.data.preprocess.ops.operators import CropImageAtRatio
 from ppcls.data.preprocess.ops.operators import CenterCrop, Resize
 from ppcls.data.preprocess.ops.operators import RandCropImage
 from ppcls.data.preprocess.ops.operators import RandCropImageV2
@@ -39,10 +42,12 @@ from ppcls.data.preprocess.ops.operators import RandomResizedCrop
 from ppcls.data.preprocess.ops.operators import CropWithPadding
 from ppcls.data.preprocess.ops.operators import RandomInterpolationAugment
 from ppcls.data.preprocess.ops.operators import ColorJitter
+from ppcls.data.preprocess.ops.operators import RandomGrayscale
 from ppcls.data.preprocess.ops.operators import RandomCropImage
 from ppcls.data.preprocess.ops.operators import RandomRotation
 from ppcls.data.preprocess.ops.operators import Padv2
 from ppcls.data.preprocess.ops.operators import RandomRot90
+from ppcls.data.preprocess.ops.operators import PCALighting
 from .ops.operators import format_data
 from paddle.vision.transforms import Pad as Pad_paddle_vision
 
@@ -52,7 +57,6 @@ from ppcls.data.preprocess.batch_ops.batch_operators import MixupCutmixHybrid
 import numpy as np
 from PIL import Image
 import random
-
 
 def transform(data, ops=[]):
     """ transform """
@@ -82,6 +86,25 @@ class AutoAugment(RawImageNetPolicy):
 
 class RandAugment(RawRandAugment):
     """ RandAugment wrapper to auto fit different img types """
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+    def __call__(self, img):
+        if not isinstance(img, Image.Image):
+            img = np.ascontiguousarray(img)
+            img = Image.fromarray(img)
+
+        img = super().__call__(img)
+
+        if isinstance(img, Image.Image):
+            img = np.asarray(img)
+
+        return img
+
+
+class RandAugmentV2(RawRandAugmentV2):
+    """ RandAugmentV2 wrapper to auto fit different img types """
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

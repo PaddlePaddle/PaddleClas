@@ -13,3 +13,5 @@
 # limitations under the License.
 from ppcls.engine.train.train import train_epoch
 from ppcls.engine.train.train_fixmatch import train_epoch_fixmatch
+from ppcls.engine.train.train_fixmatch_ccssl import train_epoch_fixmatch_ccssl
+from ppcls.engine.train.train_progressive import train_epoch_progressive

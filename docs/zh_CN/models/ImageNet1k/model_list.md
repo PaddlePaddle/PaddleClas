@@ -35,6 +35,7 @@
     - [VAN](#VAN)
     - [PeleeNet](#PeleeNet)
     - [CSPNet](#CSPNet)
+    - [VGG](#VGG)
     - [其他模型](#Others)
   - [3.2 轻量级模型](#CNN_lite)
     - [移动端系列](#Mobile)
@@ -60,18 +61,18 @@
 基于 ImageNet1k 分类数据集，PaddleClas 支持 37 个系列分类网络结构以及对应的 217 个图像分类预训练模型，训练技巧、每个系列网络结构的简单介绍和性能评估将在相应章节展现，下面所有的速度指标评估环境如下：
 * Arm CPU 的评估环境基于骁龙 855(SD855)。
 * Intel CPU 的评估环境基于 Intel(R) Xeon(R) Gold 6148。
-* GPU 评估环境基于 V100 机器，在 FP32+TensorRT 配置下运行 2100 次测得（去除前 100 次的 warmup 时间）。
+* GPU 评估环境基于 V100 机器，在 FP32+TensorRT-8.0.3.4 配置下运行 2100 次测得（去除前 100 次的 warmup 时间）。
 * FLOPs 与 Params 通过 `paddle.flops()` 计算得到（PaddlePaddle 版本为 2.2）
 
-常见服务器端模型的精度指标与其预测耗时的变化曲线如下图所示。
+常见服务器端 CNN 模型的精度指标与其预测耗时的变化曲线如下图所示，其中模型精度为 ImageNet1k 数据集上的 Top1 Acc，预测耗时基于 GPU 环境测得，Batch Size 为 1，FP32 精度。
 
 ![](../../../images/models/V100_benchmark/v100.fp32.bs1.main_fps_top1_s.png)
 
-常见移动端模型的精度指标与其预测耗时的变化曲线如下图所示。
+常见移动端 CNN 模型的精度指标与其预测耗时的变化曲线如下图所示，其中模型精度为 ImageNet1k 数据集上的 Top1 Acc，预测耗时基于 Arm 环境测得，Batch Size 为 1，FP32 精度。
 
 ![](../../../images/models/mobile_arm_top1.png)
 
-部分VisionTransformer模型的精度指标与其预测耗时的变化曲线如下图所示.
+部分 VisionTransformer 模型的精度指标与其预测耗时的变化曲线如下图所示，其中模型精度为 ImageNet1k 数据集上的 Top1 Acc，预测耗时基于 GPU 环境测得，Batch Size 为 1，FP32 精度。
 
 ![](../../../images/models/V100_benchmark/v100.fp32.bs1.visiontransformer.png)
 
@@ -470,21 +471,31 @@ RegNet 系列模型的精度、速度指标如下表所示，更多关于该系�
 | ---------- | --------- | --------- | ---------------- | ---------------- | -------- | --------- | ------------------------------------------------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ |
 | CSPDarkNet53 | 0.7725 | 0.9355  | - | - | - | 5.041 | 27.678 | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/CSPDarkNet53_pretrained.pdparams) | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/CSPDarkNet53_infer.tar) |
 
+
+<a name="VGG"></a>
+
+## VGG 系列 <sup>[[20](#ref20)]</sup>
+
+关于 VGG 系列模型的精度、速度指标如下表所示，更多介绍可以参考：[VGG 系列模型文档](VGG.md)。
+
+| 模型                     | Top-1 Acc | Top-5 Acc | time(ms)<br>bs=1 | time(ms)<br>bs=4 | time(ms)<br/>bs=8 | FLOPs(G) | Params(M) | 预训练模型下载地址 | inference模型下载地址 |
+|------------------------|-----------|-----------|------------------|------------------|----------|-----------|------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------|
+| VGG11 | 0.693 | 0.891 | 1.72             | 4.15             | 7.24 | 7.61 | 132.86 | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/VGG11_pretrained.pdparams) | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/VGG11_infer.tar) |
+| VGG13 | 0.700 | 0.894 | 2.02             | 5.28             | 9.54 | 11.31 | 133.05 | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/VGG13_pretrained.pdparams) | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/VGG13_infer.tar) |
+| VGG16 | 0.720 | 0.907 | 2.48             | 6.79             | 12.33 | 15.470 | 138.35 | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/VGG16_pretrained.pdparams) | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/VGG16_infer.tar) |
+| VGG19 | 0.726 | 0.909 | 2.93             | 8.28             | 15.21 | 19.63 | 143.66 | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/VGG19_pretrained.pdparams) | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/VGG19_infer.tar) |
+
 <a name="Others"></a>
 
 ## 其他模型
 
-关于 AlexNet <sup>[[18](#ref18)]</sup>、SqueezeNet 系列 <sup>[[19](#ref19)]</sup>、VGG 系列 <sup>[[20](#ref20)]</sup>、DarkNet53 <sup>[[21](#ref21)]</sup> 等模型的精度、速度指标如下表所示，更多介绍可以参考：[其他模型文档](Others.md)。
+关于 AlexNet <sup>[[18](#ref18)]</sup>、SqueezeNet 系列 <sup>[[19](#ref19)]</sup>、DarkNet53 <sup>[[21](#ref21)]</sup> 等模型的精度、速度指标如下表所示，更多介绍可以参考：[其他模型文档](Others.md)。
 
 | 模型                     | Top-1 Acc | Top-5 Acc | time(ms)<br>bs=1 | time(ms)<br>bs=4 | time(ms)<br/>bs=8 | FLOPs(G) | Params(M) | 预训练模型下载地址 | inference模型下载地址 |
 |------------------------|-----------|-----------|------------------|------------------|----------|-----------|------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------|
 | AlexNet       | 0.567 | 0.792 | 0.81 | 1.50             | 2.33 | 0.71 | 61.10 | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/AlexNet_pretrained.pdparams) | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/AlexNet_infer.tar) |
 | SqueezeNet1_0 | 0.596 | 0.817 | 0.68             | 1.64             | 2.62    | 0.78 | 1.25 | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/SqueezeNet1_0_pretrained.pdparams) | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/SqueezeNet1_0_infer.tar) |
 | SqueezeNet1_1 | 0.601 | 0.819 | 0.62             | 1.30             | 2.09 | 0.35   | 1.24 | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/SqueezeNet1_1_pretrained.pdparams) | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/SqueezeNet1_1_infer.tar) |
-| VGG11 | 0.693 | 0.891 | 1.72             | 4.15             | 7.24 | 7.61 | 132.86 | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/VGG11_pretrained.pdparams) | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/VGG11_infer.tar) |
-| VGG13 | 0.700 | 0.894 | 2.02             | 5.28             | 9.54 | 11.31 | 133.05 | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/VGG13_pretrained.pdparams) | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/VGG13_infer.tar) |
-| VGG16 | 0.720 | 0.907 | 2.48             | 6.79             | 12.33 | 15.470 | 138.35 | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/VGG16_pretrained.pdparams) | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/VGG16_infer.tar) |
-| VGG19 | 0.726 | 0.909 | 2.93             | 8.28             | 15.21 | 19.63 | 143.66 | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/VGG19_pretrained.pdparams) | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/VGG19_infer.tar) |
 | DarkNet53 | 0.780 | 0.941 | 2.79 | 6.42 | 10.89 | 9.31 | 41.65 | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DarkNet53_pretrained.pdparams) | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/DarkNet53_infer.tar) |
 
 <a name="CNN_lite"></a>

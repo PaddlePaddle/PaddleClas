@@ -50,6 +50,22 @@ NextViT 是一种新的视觉 Transformer 网络，可以用作计算机视觉�
 - PaddleClas 所提供的该系列模型的预训练模型权重，均是基于其官方提供的权重转得。PaddleClas 验证了 NextViT_small_224 的精度可以与论文精度对齐。
 - 此处 `_ssld` 并非使用 PaddleClas 中的蒸馏的`SSLD 蒸馏`方法得到，而是使用类似`SSLD 蒸馏`挖掘的数据集训练得到。
 
+### 1.3 Benchmark
+
+<a name='1.3.1'></a>
+
+#### 1.3.1 基于 V100 GPU 的预测速度
+
+| Models     | Size  | Latency(ms)<br>bs=1 | Latency(ms)<br>bs=4 | Latency(ms)<br>bs=8 |
+| -------- | --------- | ----------------- | ------------------------------ | ------------------------------ |
+| NextViT_small_224  | 224       | 7.76                           | 10.86                           | 14.20                        |
+| NextViT_base_224 | 224       | 12.02                          | 16.21                          | 20.63                          |
+| NextViT_large_224  | 224       | 16.51                          | 21.91                          | 27.25                          |
+| NextViT_small_224_ssld  | 224       | 7.76                           | 10.86                           | 14.20                        |
+| NextViT_base_224_ssld | 224       | 12.02                          | 16.21                          | 20.63                          |
+| NextViT_large_224_ssld  | 224       | 16.51                          | 21.91                          | 27.25                          |
+
+**备注：** 精度类型为 FP32，推理过程使用 TensorRT-8.0.3.4。
 
 <a name="2"></a>  
 

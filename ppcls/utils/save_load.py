@@ -61,13 +61,24 @@ def load_dygraph_pretrain(model, path=None):
                 m.set_dict(param_state_dict)
     else:
         model.set_dict(param_state_dict)
+    logger.info("Finish load pretrained model from {}".format(path))
     return
 
 
-def load_dygraph_pretrain_from_url(model, pretrained_url, use_ssld=False):
+def load_dygraph_pretrain_from_url(model,
+                                   pretrained_url,
+                                   use_ssld=False,
+                                   use_imagenet22k_pretrained=False,
+                                   use_imagenet22kto1k_pretrained=False):
     if use_ssld:
         pretrained_url = pretrained_url.replace("_pretrained",
                                                 "_ssld_pretrained")
+    if use_imagenet22k_pretrained:
+        pretrained_url = pretrained_url.replace("_pretrained",
+                                                "_22k_pretrained")
+    if use_imagenet22kto1k_pretrained:
+        pretrained_url = pretrained_url.replace("_pretrained",
+                                                "_22kto1k_pretrained")
     local_weight_path = get_weights_path_from_url(pretrained_url).replace(
         ".pdparams", "")
     load_dygraph_pretrain(model, path=local_weight_path)

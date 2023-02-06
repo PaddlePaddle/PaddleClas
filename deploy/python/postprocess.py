@@ -17,6 +17,7 @@ import copy
 import shutil
 from functools import partial
 import importlib
+import numpy
 import numpy as np
 import paddle
 import paddle.nn.functional as F
@@ -145,6 +146,21 @@ class ThreshOutput(object):
             return binary_classification(x)
         else:
             return multi_classification(x)
+
+
+class ScoreOutput(object):
+    def __init__(self, decimal_places):
+        self.decimal_places = decimal_places
+
+    def __call__(self, x, file_names=None):
+        y = []
+        for idx, probs in enumerate(x):
+            score = np.around(x[idx], self.decimal_places)
+            result = {"scores": score}
+            if file_names is not None:
+                result["file_name"] = file_names[idx]
+            y.append(result)
+        return y
 
 
 class Topk(object):
@@ -342,6 +358,55 @@ class PersonAttribute(object):
             threshold_list[18] = self.hold_threshold
             pred_res = (np.array(res) > np.array(threshold_list)
                         ).astype(np.int8).tolist()
+            batch_res.append({"attributes": label_res, "output": pred_res})
+        return batch_res
+
+
+class FaceAttribute(object):
+    def __init__(self, threshold=0.65, convert_cn=False):
+        self.threshold = threshold
+        self.convert_cn = convert_cn
+
+    def __call__(self, x, file_names=None):
+        attribute_list = [
+            ["CheekWhiskers", "刚长出的双颊胡须"], ["ArchedEyebrows", "柳叶眉"],
+            ["Attractive", "吸引人的"], ["BagsUnderEyes", "眼袋"], ["Bald", "秃头"],
+            ["Bangs", "刘海"], ["BigLips", "大嘴唇"], ["BigNose", "大鼻子"],
+            ["BlackHair", "黑发"], ["BlondHair", "金发"], ["Blurry", "模糊的"],
+            ["BrownHair", "棕发"], ["BushyEyebrows", "浓眉"], ["Chubby", "圆胖的"],
+            ["DoubleChin", "双下巴"], ["Eyeglasses", "带眼镜"], ["Goatee", "山羊胡子"],
+            ["GrayHair", "灰发或白发"], ["HeavyMakeup", "浓妆"],
+            ["HighCheekbones", "高颧骨"], ["Male", "男性"],
+            ["MouthSlightlyOpen", "微微张开嘴巴"], ["Mustache", "胡子"],
+            ["NarrowEyes", "细长的眼睛"], ["NoBeard", "无胡子"],
+            ["OvalFace", "椭圆形的脸"], ["PaleSkin", "苍白的皮肤"],
+            ["PointyNose", "尖鼻子"], ["RecedingHairline", "发际线后移"],
+            ["RosyCheeks", "红润的双颊"], ["Sideburns", "连鬓胡子"], ["Smiling", "微笑"],
+            ["StraightHair", "直发"], ["WavyHair", "卷发"],
+            ["WearingEarrings", "戴着耳环"], ["WearingHat", "戴着帽子"],
+            ["WearingLipstick", "涂了唇膏"], ["WearingNecklace", "戴着项链"],
+            ["WearingNecktie", "戴着领带"], ["Young", "年轻人"]
+        ]
+        gender_list = [["Male", "男性"], ["Female", "女性"]]
+        age_list = [["Young", "年轻人"], ["Old", "老年人"]]
+        batch_res = []
+        index = 1 if self.convert_cn else 0
+        for idx, res in enumerate(x):
+            res = res.tolist()
+            label_res = []
+            threshold_list = [self.threshold] * len(res)
+            pred_res = (np.array(res) > np.array(threshold_list)
+                        ).astype(np.int8).tolist()
+            for i, value in enumerate(pred_res):
+                if i == 20:
+                    label_res.append(gender_list[0][index]
+                                     if value == 1 else gender_list[1][index])
+                elif i == 39:
+                    label_res.append(age_list[0][index]
+                                     if value == 1 else age_list[1][index])
+                else:
+                    if value == 1:
+                        label_res.append(attribute_list[i][index])
             batch_res.append({"attributes": label_res, "output": pred_res})
         return batch_res
 

@@ -67,17 +67,17 @@ EfficientNet 是 Google 于 2019 年发布的一个基于 NAS 的轻量级网络
 
 | Models                               | Size | Latency(ms)<br>bs=1 | Latency(ms)<br>bs=4 | Latency(ms)<br>bs=8 |
 |-------------------------------|-------------------|-------------------------------|-------------------------------|-------------------------------|
-| EfficientNetB0                | 224       | 1.96 | 3.71 | 5.56 |
-| EfficientNetB1                | 240       | 2.88 | 5.40 | 7.63 |
-| EfficientNetB2                | 260       | 3.26 | 6.20 | 9.17 |
-| EfficientNetB3                | 300       | 4.52 | 8.85 | 13.54 |
-| EfficientNetB4                | 380       | 6.78 | 15.47 | 24.95 |
-| EfficientNetB5                | 456       | 10.97 | 27.24 | 45.93 |
-| EfficientNetB6                | 528       | 17.09 | 43.32 | 76.90 |
-| EfficientNetB7                | 600       | 25.91 | 71.23 | 128.20 |
+| EfficientNetB0                | 224       | 1.58 | 2.55 | 3.69 |
+| EfficientNetB1                | 240       | 2.29 | 3.92 | 5.50 |
+| EfficientNetB2                | 260       | 2.52 | 4.47 | 6.78 |
+| EfficientNetB3                | 300       | 3.44 | 6.53 | 10.44 |
+| EfficientNetB4                | 380       | 5.35 | 11.69 | 19.97 |
+| EfficientNetB5                | 456       | 8.52 | 21.94 | 38.37 |
+| EfficientNetB6                | 528       | 13.49 | 36.99 | 67.17 |
+| EfficientNetB7                | 600       | 21.91 | 62.29 | 116.07 |
 | EfficientNetB0_<br>small      | 224       | 1.24 | 2.59 | 3.92 |
 
-**备注：** 精度类型为 FP32，推理过程使用 TensorRT。
+**备注：** 精度类型为 FP32，推理过程使用 TensorRT-8.0.3.4。
 
 <a name='1.3.2'></a>
 
@@ -95,7 +95,7 @@ EfficientNet 是 Google 于 2019 年发布的一个基于 NAS 的轻量级网络
 | EfficientNetB7            | 600      | 47.86087                     | -                            | -                            | 53.93823                     | -                            | -                            |
 | EfficientNetB0_small      | 224      | 2.39166                      | 4.36748                      | 6.96002                      | 2.3076                       | 4.71886                      | 7.21888                      |
 
-**备注：** 推理过程使用 TensorRT。
+**备注：** 推理过程使用 TensorRT-8.0.3.4。
 
 <a name="2"></a>
 

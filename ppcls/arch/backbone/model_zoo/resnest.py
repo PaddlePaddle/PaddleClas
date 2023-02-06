@@ -39,6 +39,10 @@ MODEL_URLS = {
     "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ResNeSt50_pretrained.pdparams",
     "ResNeSt101":
     "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ResNeSt101_pretrained.pdparams",
+    "ResNeSt200":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ResNeSt200_pretrained.pdparams",
+    "ResNeSt269":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ResNeSt269_pretrained.pdparams"
 }
 
 __all__ = list(MODEL_URLS.keys())
@@ -160,8 +164,7 @@ class SplatConv(nn.Layer):
             padding=0,
             groups=groups,
             weight_attr=ParamAttr(
-                name=name + "_weights", initializer=KaimingNormal()),
-            bias_attr=False)
+                name=name + "_weights", initializer=KaimingNormal()))
 
         self.rsoftmax = rSoftmax(radix=radix, cardinality=groups)
 
@@ -738,4 +741,40 @@ def ResNeSt101(pretrained=False, use_ssld=False, **kwargs):
         **kwargs)
     _load_pretrained(
         pretrained, model, MODEL_URLS["ResNeSt101"], use_ssld=use_ssld)
+    return model
+
+
+def ResNeSt200(pretrained=False, use_ssld=False, **kwargs):
+    model = ResNeSt(
+        layers=[3, 24, 36, 3],
+        radix=2,
+        groups=1,
+        bottleneck_width=64,
+        deep_stem=True,
+        stem_width=64,
+        avg_down=True,
+        avd=True,
+        avd_first=False,
+        final_drop=0.0,
+        **kwargs)
+    _load_pretrained(
+        pretrained, model, MODEL_URLS["ResNeSt200"], use_ssld=use_ssld)
+    return model
+
+
+def ResNeSt269(pretrained=False, use_ssld=False, **kwargs):
+    model = ResNeSt(
+        layers=[3, 30, 48, 8],
+        radix=2,
+        groups=1,
+        bottleneck_width=64,
+        deep_stem=True,
+        stem_width=64,
+        avg_down=True,
+        avd=True,
+        avd_first=False,
+        final_drop=0.0,
+        **kwargs)
+    _load_pretrained(
+        pretrained, model, MODEL_URLS["ResNeSt269"], use_ssld=use_ssld)
     return model

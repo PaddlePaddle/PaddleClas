@@ -49,10 +49,10 @@ def quantize_model(config, model, mode="train"):
         if mode in ["infer", "export"]:
             QUANT_CONFIG['activation_preprocess_type'] = None
 
-        # for rep nets, convert to reparameterized model first
+        # for re-parameterization nets, convert to reparameterized model first
         for layer in model.sublayers():
-            if hasattr(layer, "rep"):
-                layer.rep()
+            if hasattr(layer, "re_parameterize"):
+                layer.re_parameterize()
 
         model.quanter = QAT(config=QUANT_CONFIG)
         model.quanter.quantize(model)

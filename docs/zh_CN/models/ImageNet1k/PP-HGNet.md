@@ -60,9 +60,9 @@ PP-HGNet 目前提供的模型的精度、速度指标及预训练权重链接�
 
 | Model | Top-1 Acc(\%) | Top-5 Acc(\%) | Latency(ms) | 预训练模型下载地址 | inference模型下载地址 |
 |:--: |:--: |:--: |:--: | :--: |:--: |
-| PPHGNet_tiny      | 79.83 | 95.04 | 1.77 | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/PPHGNet_tiny_pretrained.pdparams) | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/PPHGNet_tiny_infer.tar) |
+| PPHGNet_tiny      | 79.83 | 95.04 | 1.72 | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/PPHGNet_tiny_pretrained.pdparams) | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/PPHGNet_tiny_infer.tar) |
 | PPHGNet_tiny_ssld  | 81.95 | 96.12 | 1.77 | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/PPHGNet_tiny_ssld_pretrained.pdparams) | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/PPHGNet_tiny_ssld_infer.tar) |
-| PPHGNet_small     | 81.51| 95.82 | 2.52  | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/PPHGNet_small_pretrained.pdparams) | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/PPHGNet_small_infer.tar) |
+| PPHGNet_small     | 81.51| 95.82 | 2.46  | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/PPHGNet_small_pretrained.pdparams) | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/PPHGNet_small_infer.tar) |
 | PPHGNet_small_ssld | 83.82| 96.81 | 2.52  | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/PPHGNet_small_ssld_pretrained.pdparams) | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/PPHGNet_small_ssld_infer.tar) |
 | PPHGNet_base_ssld | 85.00| 97.35 | 5.97   | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/PPHGNet_base_ssld_pretrained.pdparams) | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/PPHGNet_base_ssld_infer.tar) |
 
@@ -75,20 +75,20 @@ PP-HGNet 与其他模型的比较如下，其中测试机器为 NVIDIA® Tesla®
 
 | Model | Top-1 Acc(\%) | Top-5 Acc(\%) | Latency(ms) |
 |:--: |:--: |:--: |:--: |
-| ResNet34                 | 74.57      | 92.14       | 1.97        |
-| ResNet34_vd              | 75.98      | 92.98       | 2.00        |
-| EfficientNetB0           | 77.38      | 93.31       | 1.96        |
-| <b>PPHGNet_tiny<b>       | <b>79.83<b> | <b>95.04<b> | <b>1.77<b> |
-| <b>PPHGNet_tiny_ssld<b>  | <b>81.95<b> | <b>96.12<b> | <b>1.77<b> |
-| ResNet50                 | 76.50      | 93.00       | 2.54        |
-| ResNet50_vd              | 79.12      | 94.44       | 2.60        |
+| ResNet34                 | 74.57      | 92.14       | 1.83        |
+| ResNet34_vd              | 75.98      | 92.98       | 1.87        |
+| EfficientNetB0           | 77.38      | 93.31       | 1.58        |
+| <b>PPHGNet_tiny<b>       | <b>79.83<b> | <b>95.04<b> | <b>1.72<b> |
+| <b>PPHGNet_tiny_ssld<b>  | <b>81.95<b> | <b>96.12<b> | <b>1.72<b> |
+| ResNet50                 | 76.50      | 93.00       | 2.19        |
+| ResNet50_vd              | 79.12      | 94.44       | 2.23        |
 | ResNet50_rsb             | 80.40      |         |     2.54        |
-| EfficientNetB1           | 79.15      | 94.41       | 2.88        |
+| EfficientNetB1           | 79.15      | 94.41       | 2.29        |
 | SwinTransformer_tiny     | 81.2      | 95.5       | 6.59        |
-| <b>PPHGNet_small<b>      | <b>81.51<b>| <b>95.82<b> | <b>2.52<b>  |
-| <b>PPHGNet_small_ssld<b> | <b>83.82<b>| <b>96.81<b> | <b>2.52<b>  |
-| Res2Net200_vd_26w_4s_ssld| 85.13      | 97.42       | 11.45       |
-| ResNeXt101_32x48d_wsl    | 85.37      | 97.69       | 55.07       |
+| <b>PPHGNet_small<b>      | <b>81.51<b>| <b>95.82<b> | <b>2.46<b>  |
+| <b>PPHGNet_small_ssld<b> | <b>83.82<b>| <b>96.81<b> | <b>2.46<b>  |
+| Res2Net200_vd_26w_4s_ssld| 85.13      | 97.42       | 10.80       |
+| ResNeXt101_32x48d_wsl    | 85.37      | 97.69       | 69.81       |
 | SwinTransformer_base     | 85.2       | 97.5        | 13.53       |  
 | <b>PPHGNet_base_ssld<b> | <b>85.00<b>| <b>97.35<b> | <b>5.97<b>   |
 
@@ -213,7 +213,7 @@ cd path_to_PaddleClas
 <a name="3.3.1"></a>
 
 #### 3.3.1 训练 ImageNet
-    
+
 在 `ppcls/configs/ImageNet/PPHGNet/PPHGNet_small.yaml` 中提供了 PPHGNet_small 训练配置，可以通过如下脚本启动训练：
 
 ```shell
@@ -228,13 +228,13 @@ python3 -m paddle.distributed.launch \
 **备注：**
 
 * 当前精度最佳的模型会保存在 `output/PPHGNet_small/best_model.pdparams`
-    
+
 <a name="3.3.2"></a>
 
 #### 3.3.2 基于 ImageNet 权重微调
 
 如果训练的不是 ImageNet 任务，而是其他任务时，需要更改配置文件和训练方法，详情可以参考：[模型微调](../../training/single_label_classification/finetune.md)。
-    
+
 
 <a name="3.4"></a>
 
@@ -275,7 +275,7 @@ python3 tools/infer.py \
 * 默认是对 `docs/images/inference_deployment/whl_demo.jpg` 进行预测，此处也可以通过增加字段 `-o Infer.infer_imgs=xxx` 对其他图片预测。
 
 * 默认输出的是 Top-5 的值，如果希望输出 Top-k 的值，可以指定`-o Infer.PostProcess.topk=k`，其中，`k` 为您指定的值。
-   
+
 * 默认的标签映射基于 ImageNet 数据集，如果改变数据集，需要重新指定`Infer.PostProcess.class_id_map_file`，该映射文件的制作方法可以参考`ppcls/utils/imagenet1k_label_list.txt`。
 
 

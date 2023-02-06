@@ -319,6 +319,25 @@ class CropImage(object):
         return img[h_start:h_end, w_start:w_end, :]
 
 
+class CropImageAtRatio(object):
+    """ crop image with specified size and padding"""
+
+    def __init__(self, size: int, pad: int, interpolation="bilinear"):
+        self.size = size
+        self.ratio = size / (size + pad)
+        self.interpolation = interpolation
+
+    def __call__(self, img):
+        height, width = img.shape[:2]
+        crop_size = int(self.ratio * min(height, width))
+
+        y = (height - crop_size) // 2
+        x = (width - crop_size) // 2
+
+        crop_img = img[y:y + crop_size, x:x + crop_size, :]
+        return F.resize(crop_img, [self.size, self.size], self.interpolation)
+
+
 class Padv2(object):
     def __init__(self,
                  size=None,
@@ -420,6 +439,7 @@ class RandCropImage(object):
 
     def __init__(self,
                  size,
+                 progress_size=None,
                  scale=None,
                  ratio=None,
                  interpolation=None,
@@ -429,6 +449,7 @@ class RandCropImage(object):
         else:
             self.size = size
 
+        self.progress_size = progress_size
         self.scale = [0.08, 1.0] if scale is None else scale
         self.ratio = [3. / 4., 4. / 3.] if ratio is None else ratio
 
@@ -721,8 +742,8 @@ class Pad(object):
         # Process fill color for affine transforms
         major_found, minor_found = (int(v)
                                     for v in PILLOW_VERSION.split('.')[:2])
-        major_required, minor_required = (
-            int(v) for v in min_pil_version.split('.')[:2])
+        major_required, minor_required = (int(v) for v in
+                                          min_pil_version.split('.')[:2])
         if major_found < major_required or (major_found == major_required and
                                             minor_found < minor_required):
             if fill is None:
@@ -835,3 +856,67 @@ class BlurImage(object):
                                         self.motion_max_angle)
             label = 1
         return {"img": img, "blur_image": label}
+
+
+class RandomGrayscale(object):
+    """Randomly convert image to grayscale with a probability of p (default 0.1).
+
+    Args:
+        p (float): probability that image should be converted to grayscale.
+
+    Returns:
+        PIL Image: Grayscale version of the input image with probability p and unchanged
+        with probability (1-p).
+        - If input image is 1 channel: grayscale version is 1 channel
+        - If input image is 3 channel: grayscale version is 3 channel with r == g == b
+
+    """
+
+    def __init__(self, p=0.1):
+        self.p = p
+
+    def __call__(self, img):
+        """
+        Args:
+            img (PIL Image): Image to be converted to grayscale.
+
+        Returns:
+            PIL Image: Randomly grayscaled image.
+        """
+        num_output_channels = 1 if img.mode == 'L' else 3
+        if random.random() < self.p:
+            return F.to_grayscale(img, num_output_channels=num_output_channels)
+        return img
+
+    def __repr__(self):
+        return self.__class__.__name__ + '()'
+
+
+class PCALighting(object):
+    """
+    Lighting noise(AlexNet - style PCA - based noise)
+    reference: https://github.com/DingXiaoH/DiverseBranchBlock
+    """
+
+    def __init__(self):
+        self.alphastd = 0.1
+        self.eigval = [0.2175, 0.0188, 0.0045]
+        self.eigvec = [
+            [-0.5675, 0.7192, 0.4009],
+            [-0.5808, -0.0045, -0.8140],
+            [-0.5836, -0.6948, 0.4203],
+        ]
+        self.eigval = np.array(self.eigval).astype(np.float32)
+        self.eigvec = np.array(self.eigvec).astype(np.float32)
+
+    def __call__(self, img):
+        if self.alphastd == 0:
+            return img
+
+        img = img.transpose((2, 0, 1))
+        alpha = np.random.normal(0, self.alphastd, size=(3)).astype(np.float32)
+        rgb = self.eigvec * np.broadcast_to(alpha.reshape(1, 3), (
+            3, 3)) * np.broadcast_to(self.eigval.reshape(1, 3), (3, 3))
+        rgb = rgb.sum(1).squeeze()
+        img = img + rgb.reshape(3, 1, 1)
+        return img.transpose((1, 2, 0))

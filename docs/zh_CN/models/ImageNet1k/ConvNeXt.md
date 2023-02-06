@@ -35,6 +35,11 @@ ConvNeXt（Cross Stage Partial Network）系列模型是 Meta 在 2022 年提出
 | Models           | Top1 | Top5 | Reference<br>top1 | Reference<br>top5 | FLOPs<br>(G) | Params<br>(M) |
 |:--:|:--:|:--:|:--:|:--:|:--:|:--:|
 | ConvNeXt_tiny    | 0.8203 | 0.9590 | 0.821 | - | 4.458 | 28.583 |
+| ConvNeXt_small    | 0.8313 | 0.9643 | 0.831 | - | 8.688 | 50.210 |
+| ConvNeXt_base_224    | 0.8384 | 0.9676 | 0.838 | - | 15.360 | 88.573 |
+| ConvNeXt_base_384    | 0.8490 | 0.9727 | 0.851 | - | 45.138 | 88.573 |
+| ConvNeXt_large_224    | 0.8426 | 0.9690 | 0.843 | - | 34.340 | 197.740 |
+| ConvNeXt_large_384    | 0.8527 | 0.9749 | 0.855 | - | 101.001 | 197.740 |
 
 ### 1.3 Benchmark
 

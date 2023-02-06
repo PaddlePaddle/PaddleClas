@@ -98,7 +98,8 @@ def build_dataloader(config, mode, device, use_dali=False, seed=None):
             mode,
             paddle.device.get_device(),
             num_threads=config[mode]['loader']["num_workers"],
-            seed=seed)
+            seed=seed,
+            enable_fuse=True)
 
     class_num = config.get("class_num", None)
     epochs = config.get("epochs", None)

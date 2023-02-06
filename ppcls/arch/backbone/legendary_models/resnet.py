@@ -28,11 +28,14 @@ import math
 
 from ....utils import logger
 from ..base.theseus_layer import TheseusLayer
+from ..base.dbb.dbb_block import DiverseBranchBlock
 from ....utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
 
 MODEL_URLS = {
     "ResNet18":
     "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/ResNet18_pretrained.pdparams",
+    "ResNet18_dbb":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/ResNet18_dbb_pretrained.pdparams",
     "ResNet18_vd":
     "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/ResNet18_vd_pretrained.pdparams",
     "ResNet34":
@@ -163,17 +166,18 @@ class BottleneckBlock(TheseusLayer):
                  stride,
                  shortcut=True,
                  if_first=False,
+                 layer=ConvBNLayer,
                  lr_mult=1.0,
                  data_format="NCHW"):
         super().__init__()
-        self.conv0 = ConvBNLayer(
+        self.conv0 = layer(
             num_channels=num_channels,
             num_filters=num_filters,
             filter_size=1,
             act="relu",
             lr_mult=lr_mult,
             data_format=data_format)
-        self.conv1 = ConvBNLayer(
+        self.conv1 = layer(
             num_channels=num_filters,
             num_filters=num_filters,
             filter_size=3,
@@ -181,7 +185,7 @@ class BottleneckBlock(TheseusLayer):
             act="relu",
             lr_mult=lr_mult,
             data_format=data_format)
-        self.conv2 = ConvBNLayer(
+        self.conv2 = layer(
             num_channels=num_filters,
             num_filters=num_filters * 4,
             filter_size=1,
@@ -224,12 +228,13 @@ class BasicBlock(TheseusLayer):
                  stride,
                  shortcut=True,
                  if_first=False,
+                 layer=ConvBNLayer,
                  lr_mult=1.0,
                  data_format="NCHW"):
         super().__init__()
 
         self.stride = stride
-        self.conv0 = ConvBNLayer(
+        self.conv0 = layer(
             num_channels=num_channels,
             num_filters=num_filters,
             filter_size=3,
@@ -237,7 +242,7 @@ class BasicBlock(TheseusLayer):
             act="relu",
             lr_mult=lr_mult,
             data_format=data_format)
-        self.conv1 = ConvBNLayer(
+        self.conv1 = layer(
             num_channels=num_filters,
             num_filters=num_filters,
             filter_size=3,
@@ -274,7 +279,7 @@ class ResNet(TheseusLayer):
     ResNet
     Args:
         config: dict. config of ResNet.
-        version: str="vb". Different version of ResNet, version vd can perform better. 
+        version: str="vb". Different version of ResNet, version vd can perform better.
         class_num: int=1000. The number of classes.
         lr_mult_list: list. Control the learning rate of different stages.
     Returns:
@@ -293,6 +298,8 @@ class ResNet(TheseusLayer):
                  input_image_channel=3,
                  return_patterns=None,
                  return_stages=None,
+                 layer_type="ConvBNLayer",
+                 use_first_short_conv=True,
                  **kargs):
         super().__init__()
 
@@ -306,6 +313,13 @@ class ResNet(TheseusLayer):
         self.block_type = self.cfg["block_type"]
         self.num_channels = self.cfg["num_channels"]
         self.channels_mult = 1 if self.num_channels[-1] == 256 else 4
+
+        if layer_type == "ConvBNLayer":
+            layer = ConvBNLayer
+        elif layer_type == "DiverseBranchBlock":
+            layer = DiverseBranchBlock
+        else:
+            raise Exception()
 
         assert isinstance(self.lr_mult_list, (
             list, tuple
@@ -351,7 +365,11 @@ class ResNet(TheseusLayer):
             data_format=data_format)
         block_list = []
         for block_idx in range(len(self.block_depth)):
+            # paddleclas' special improvement version
             shortcut = False
+            # official resnet_vb version
+            if not use_first_short_conv and block_idx == 0:
+                shortcut = True
             for i in range(self.block_depth[block_idx]):
                 block_list.append(globals()[self.block_type](
                     num_channels=self.num_channels[block_idx] if i == 0 else
@@ -361,6 +379,7 @@ class ResNet(TheseusLayer):
                     if i == 0 and block_idx != 0 else 1,
                     shortcut=shortcut,
                     if_first=block_idx == i == 0 if version == "vd" else True,
+                    layer=layer,
                     lr_mult=self.lr_mult_list[block_idx + 1],
                     data_format=data_format))
                 shortcut = True
@@ -412,7 +431,10 @@ def _load_pretrained(pretrained, model, model_url, use_ssld):
         )
 
 
-def ResNet18(pretrained=False, use_ssld=False, **kwargs):
+def ResNet18(pretrained=False,
+             use_ssld=False,
+             layer_type="ConvBNLayer",
+             **kwargs):
     """
     ResNet18
     Args:
@@ -426,8 +448,13 @@ def ResNet18(pretrained=False, use_ssld=False, **kwargs):
         config=NET_CONFIG["18"],
         stages_pattern=MODEL_STAGES_PATTERN["ResNet18"],
         version="vb",
+        layer_type=layer_type,
         **kwargs)
-    _load_pretrained(pretrained, model, MODEL_URLS["ResNet18"], use_ssld)
+    if layer_type == "DiverseBranchBlock":
+        _load_pretrained(pretrained, model, MODEL_URLS["ResNet18_dbb"],
+                         use_ssld)
+    else:
+        _load_pretrained(pretrained, model, MODEL_URLS["ResNet18"], use_ssld)
     return model
 
 
