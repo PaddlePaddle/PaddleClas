@@ -26,7 +26,7 @@ from paddle.nn.initializer import TruncatedNormal, Constant, Normal
 from ....utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
 
 MODEL_URLS = {
-    "CLIP_small_patch16_224": None,
+    # "CLIP_small_patch16_224": None,
     "CLIP_base_patch32_224": None,
     "CLIP_base_patch16_224": None,
     "CLIP_large_patch14_336": None,
@@ -34,7 +34,8 @@ MODEL_URLS = {
     "BEiTv2_base_patch16_224": None,
     "BEiTv2_large_patch16_224": None,
     "CAE_base_patch16_224": None,
-    "EVA_small_patch16_224": None,
+    # "EVA_small_patch16_224": None,
+    'EVA_huge_patch14':None,
     "MOCOV3_small": None,
     "MOCOV3_base": None,
     "MAE_huge_patch14": None,
