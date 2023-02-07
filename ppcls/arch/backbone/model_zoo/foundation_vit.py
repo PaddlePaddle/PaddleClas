@@ -26,19 +26,19 @@ from paddle.nn.initializer import TruncatedNormal, Constant, Normal
 from ....utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
 
 MODEL_URLS = {
-    "CLIP_base_patch32_224": None,
-    "CLIP_base_patch16_224": None,
-    "CLIP_large_patch14_336": None,
-    "CLIP_large_patch14_224": None,
-    "BEiTv2_base_patch16_224": None,
-    "BEiTv2_large_patch16_224": None,
-    "CAE_base_patch16_224": None,
-    'EVA_huge_patch14':None,
-    "MOCOV3_small": None,
-    "MOCOV3_base": None,
-    "MAE_huge_patch14": None,
-    "MAE_large_patch16": None,
-    "MAE_base_patch16": None
+    "CLIP_vit_base_patch32_224": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/foundation_models/CLIP_vit_base_patch32_224.pdparams",
+    "CLIP_vit_base_patch16_224": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/foundation_models/CLIP_vit_base_patch16_224.pdparams",
+    "CLIP_vit_large_patch14_336": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/foundation_models/CLIP_vit_large_patch14_336.pdparams",
+    "CLIP_vit_large_patch14_224": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/foundation_models/CLIP_vit_large_patch14_224.pdparams",
+    "BEiTv2_vit_base_patch16_224": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/foundation_models/BEiTv2_vit_base_patch16_224.pdparams",
+    "BEiTv2_vit_large_patch16_224": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/foundation_models/BEiTv2_vit_large_patch16_224.pdparams",
+    "CAE_vit_base_patch16_224": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/foundation_models/CAE_vit_base_patch16_224.pdparams",
+    'EVA_vit_huge_patch14':"https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/foundation_models/EVA_vit_huge_patch14.pdparams",
+    "MOCOV3_vit_small": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/foundation_models/MOCOV3_vit_small.pdparams",
+    "MOCOV3_vit_base": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/foundation_models/MOCOV3_vit_base.pdparams",
+    "MAE_vit_huge_patch14": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/foundation_models/MAE_vit_huge_patch14.pdparams",
+    "MAE_vit_large_patch16": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/foundation_models/MAE_vit_large_patch16.pdparams",
+    "MAE_vit_base_patch16": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/foundation_models/MAE_vit_base_patch16.pdparams",
 }
 
 __all__ = list(MODEL_URLS.keys())
@@ -48,8 +48,8 @@ _model_diff = None
 
 _CLIP_diff = {
     'add_layer_norm_before_encoder': [
-        'base_patch32_224', 'base_patch16_224', 'large_patch14_336',
-        'large_patch14_224'
+        'base_vit_patch32_224', 'base_vit_patch16_224', 'large_vit_patch14_336',
+        'large_vit_patch14_224'
     ],
     'add_relative_position_bias_in_msa': [],
     'add_shared_rel_pos_bias': [],
@@ -57,8 +57,8 @@ _CLIP_diff = {
     'remove_cls_token': [],
     'remove_abs_pos_emb': [],
     'replace_mlp_GELU': [
-        'base_patch32_224', 'base_patch16_224', 'large_patch14_336',
-        'large_patch14_224'
+        'base_vit_patch32_224', 'base_vit_patch16_224', 'large_vit_patch14_336',
+        'large_vit_patch14_224'
     ],
     'head': {
         'fc_norm': [],
@@ -87,7 +87,7 @@ _CoCa_diff = {
     'add_relative_position_bias_in_msa': [],
     'add_shared_rel_pos_bias': [],
     'add_mul_gamma_to_msa_mlp': [],
-    'remove_cls_token': ['small_patch16_224'],
+    'remove_cls_token': ['small_vit_patch16_224'],
     'remove_abs_pos_emb': [],
     'replace_mlp_GELU': [],
     'head': {
@@ -100,11 +100,11 @@ _CoCa_diff = {
 _BEiTv2_diff = {
     'add_layer_norm_before_encoder': [],
     'add_relative_position_bias_in_msa':
-    ['base_patch16_224', 'large_patch16_224'],
+    ['base_vit_patch16_224', 'large_vit_patch16_224'],
     'add_shared_rel_pos_bias': [],
-    'add_mul_gamma_to_msa_mlp': ['base_patch16_224', 'large_patch16_224'],
+    'add_mul_gamma_to_msa_mlp': ['base_vit_patch16_224', 'large_vit_patch16_224'],
     'remove_cls_token': [],
-    'remove_abs_pos_emb': ['base_patch16_224', 'large_patch16_224'],
+    'remove_abs_pos_emb': ['base_vit_patch16_224', 'large_vit_patch16_224'],
     'replace_mlp_GELU': [],
     'head': {
         'fc_norm': [],
@@ -115,9 +115,9 @@ _BEiTv2_diff = {
 
 _CAE_diff = {
     'add_layer_norm_before_encoder': [],
-    'add_relative_position_bias_in_msa': ['base_patch16_224'],
+    'add_relative_position_bias_in_msa': ['base_vit_patch16_224'],
     'add_shared_rel_pos_bias': [],
-    'add_mul_gamma_to_msa_mlp': ['base_patch16_224'],
+    'add_mul_gamma_to_msa_mlp': ['base_vit_patch16_224'],
     'remove_cls_token': [],
     'remove_abs_pos_emb': [],
     'replace_mlp_GELU': [],
@@ -137,7 +137,7 @@ _EVA_diff = {
     'remove_abs_pos_emb': [],
     'replace_mlp_GELU': [],
     'head': {
-        'fc_norm': ['huge_patch14'],
+        'fc_norm': ['huge_vit_patch14'],
         'return_all_tokens': [],
         'return_patch_tokens': [],
     }
@@ -152,7 +152,7 @@ _MAE_diff = {
     'remove_abs_pos_emb': [],
     'replace_mlp_GELU': [],
     'head': {
-        'fc_norm': ['huge_patch14'],
+        'fc_norm': ['huge_vit_patch14'],
         'return_all_tokens': [],
         'return_patch_tokens': [],
     }
@@ -659,7 +659,7 @@ def _load_pretrained(pretrained, model, model_url, use_ssld=False):
         )
 
 
-def CLIP_base_patch32_224(pretrained=False, use_ssld=False, **kwargs):
+def CLIP_vit_base_patch32_224(pretrained=False, use_ssld=False, **kwargs):
     model_name = sys._getframe().f_code.co_name
     model = VisionTransformer(
         model_name=model_name,
@@ -677,7 +677,7 @@ def CLIP_base_patch32_224(pretrained=False, use_ssld=False, **kwargs):
     return model
 
 
-def CLIP_base_patch16_224(pretrained=False, use_ssld=False, **kwargs):
+def CLIP_vit_base_patch16_224(pretrained=False, use_ssld=False, **kwargs):
     model_name = sys._getframe().f_code.co_name
     model = VisionTransformer(
         model_name=model_name,
@@ -695,7 +695,7 @@ def CLIP_base_patch16_224(pretrained=False, use_ssld=False, **kwargs):
     return model
 
 
-def CLIP_large_patch14_336(pretrained=False, use_ssld=False, **kwargs):
+def CLIP_vit_large_patch14_336(pretrained=False, use_ssld=False, **kwargs):
     model_name = sys._getframe().f_code.co_name
     model = VisionTransformer(
         model_name=model_name,
@@ -713,7 +713,7 @@ def CLIP_large_patch14_336(pretrained=False, use_ssld=False, **kwargs):
     return model
 
 
-def CLIP_large_patch14_224(pretrained=False, use_ssld=False, **kwargs):
+def CLIP_vit_large_patch14_224(pretrained=False, use_ssld=False, **kwargs):
     model_name = sys._getframe().f_code.co_name
     model = VisionTransformer(
         model_name=model_name,
@@ -731,7 +731,7 @@ def CLIP_large_patch14_224(pretrained=False, use_ssld=False, **kwargs):
     return model
 
 
-def BEiTv2_base_patch16_224(pretrained=False, use_ssld=False, **kwargs):
+def BEiTv2_vit_base_patch16_224(pretrained=False, use_ssld=False, **kwargs):
     model_name = sys._getframe().f_code.co_name
     model = VisionTransformer(
         model_name=model_name,
@@ -749,7 +749,7 @@ def BEiTv2_base_patch16_224(pretrained=False, use_ssld=False, **kwargs):
     return model
 
 
-def BEiTv2_large_patch16_224(pretrained=False, use_ssld=False, **kwargs):
+def BEiTv2_vit_large_patch16_224(pretrained=False, use_ssld=False, **kwargs):
     model_name = sys._getframe().f_code.co_name
     model = VisionTransformer(
         model_name=model_name,
@@ -767,7 +767,7 @@ def BEiTv2_large_patch16_224(pretrained=False, use_ssld=False, **kwargs):
     return model
 
 
-def MOCOV3_small(pretrained=False, use_ssld=False, **kwargs):
+def MOCOV3_vit_small(pretrained=False, use_ssld=False, **kwargs):
     """
     vit small in mocov3
     """
@@ -786,7 +786,7 @@ def MOCOV3_small(pretrained=False, use_ssld=False, **kwargs):
     return model
 
 
-def MOCOV3_base(pretrained=False, use_ssld=False, **kwargs):
+def MOCOV3_vit_base(pretrained=False, use_ssld=False, **kwargs):
     """
     vit base in mocov3
     """
@@ -805,7 +805,7 @@ def MOCOV3_base(pretrained=False, use_ssld=False, **kwargs):
     return model
 
 
-def MAE_base_patch16(pretrained=False, use_ssld=False, **kwargs):
+def MAE_vit_base_patch16(pretrained=False, use_ssld=False, **kwargs):
     model_name = sys._getframe().f_code.co_name
     model = VisionTransformer(
         model_name=model_name,
@@ -821,7 +821,7 @@ def MAE_base_patch16(pretrained=False, use_ssld=False, **kwargs):
     return model
 
 
-def MAE_large_patch16(pretrained=False, use_ssld=False, **kwargs):
+def MAE_vit_large_patch16(pretrained=False, use_ssld=False, **kwargs):
     model_name = sys._getframe().f_code.co_name
     model = VisionTransformer(
         model_name=model_name,
@@ -837,7 +837,7 @@ def MAE_large_patch16(pretrained=False, use_ssld=False, **kwargs):
     return model
 
 
-def MAE_huge_patch14(pretrained=False, use_ssld=False, **kwargs):
+def MAE_vit_huge_patch14(pretrained=False, use_ssld=False, **kwargs):
     model_name = sys._getframe().f_code.co_name
     model = VisionTransformer(
         model_name=model_name,
@@ -853,7 +853,7 @@ def MAE_huge_patch14(pretrained=False, use_ssld=False, **kwargs):
     return model
 
 
-def EVA_huge_patch14(pretrained=False, use_ssld=False, **kwargs):
+def EVA_vit_huge_patch14(pretrained=False, use_ssld=False, **kwargs):
     model_name = sys._getframe().f_code.co_name
     model = VisionTransformer(
         model_name=model_name,
@@ -871,7 +871,7 @@ def EVA_huge_patch14(pretrained=False, use_ssld=False, **kwargs):
     return model
 
 
-def CAE_base_patch16_224(pretrained=False, use_ssld=False, **kwargs):
+def CAE_vit_base_patch16_224(pretrained=False, use_ssld=False, **kwargs):
     model_name = sys._getframe().f_code.co_name
     model = VisionTransformer(
         model_name=model_name,
