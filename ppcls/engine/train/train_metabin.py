@@ -24,7 +24,6 @@ from collections import defaultdict
 from ppcls.engine.train.utils import update_loss, update_metric, log_info, type_name
 from ppcls.utils import profiler
 from ppcls.data import build_dataloader
-from ppcls.arch.backbone.variant_models.resnet_variant import MetaBIN, BINGate
 from ppcls.loss import build_loss
 
 
@@ -74,7 +73,7 @@ def train_epoch_metabin(engine, epoch_id, print_batch_step):
 
         engine.global_step += 1
 
-        if engine.global_step == 1:  # update model (without gate) to warmup
+        if engine.global_step == 1:  # update model (execpt gate) to warmup
             for i in range(engine.config["Global"]["warmup_iter"] - 1):
                 out, basic_loss_dict = basic_update(engine, train_batch)
                 loss_dict = basic_loss_dict
@@ -143,14 +142,14 @@ def setup_opt(engine, stage):
         opt["bn_mode"] = "hold"
         opt["enable_inside_update"] = True
         opt["lr_gate"] = norm_lr * cyclic_lr
-    for layer in engine.model.sublayers():
-        if isinstance(layer, MetaBIN):
+    for name, layer in engine.model.backbone.named_sublayers():
+        if "bn" == name.split('.')[-1]:
             layer.setup_opt(opt)
 
 
 def reset_opt(model):
-    for layer in model.sublayers():
-        if isinstance(layer, MetaBIN):
+    for name, layer in model.backbone.named_sublayers():
+        if "bn" == name.split('.')[-1]:
             layer.reset_opt()
 
 
@@ -176,7 +175,6 @@ def get_meta_data(meta_dataloader_iter, num_domain):
         mtrain_batch = None
         raise RuntimeError
     else:
-        mtrain_batch = dict()
         mtrain_batch = [batch[i][is_mtrain_domain] for i in range(len(batch))]
 
     # mtest_batch
@@ -185,7 +183,6 @@ def get_meta_data(meta_dataloader_iter, num_domain):
         mtest_batch = None
         raise RuntimeError
     else:
-        mtest_batch = dict()
         mtest_batch = [batch[i][is_mtest_domains] for i in range(len(batch))]
     return mtrain_batch, mtest_batch
 
@@ -206,8 +203,8 @@ def backward(engine, loss, optimizer):
     scaled = engine.scaler.scale(loss)
     scaled.backward()
     engine.scaler.minimize(optimizer, scaled)
-    for layer in engine.model.sublayers():
-        if isinstance(layer, BINGate):
+    for name, layer in engine.model.backbone.named_sublayers():
+        if "gate" == name.split('.')[-1]:
             layer.clip_gate()
 
 

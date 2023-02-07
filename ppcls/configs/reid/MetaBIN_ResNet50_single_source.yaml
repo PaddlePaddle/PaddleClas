@@ -20,6 +20,10 @@ Global:
   save_inference_dir: "./inference"
   train_mode: 'metabin'
 
+AMP:
+  scale_loss: 65536
+  use_dynamic_loss_scaling: True
+
 # model architecture
 Arch:
   name: "RecModel"
@@ -33,10 +37,6 @@ Arch:
   Neck:
     name: BNNeck
     num_features: &feat_dim 2048
-    weight_attr:
-      initializer:
-        name: Constant
-        value: 1.0
   Head:
     name: "FC"
     embedding_size: *feat_dim
@@ -270,10 +270,6 @@ Optimizer:
         step_size_down: 1095
         by_epoch: False
         last_epoch: 0
-
-AMP:
-  scale_loss: 65536
-  use_dynamic_loss_scaling: True
 
 Metric:
   Eval:

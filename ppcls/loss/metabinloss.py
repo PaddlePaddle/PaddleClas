@@ -22,7 +22,6 @@ from paddle.nn import functional as F
 
 from .dist_loss import cosine_similarity
 from .celoss import CELoss
-from .triplet import TripletLoss
 
 
 def euclidean_dist(x, y):
@@ -41,19 +40,29 @@ def hard_example_mining(dist_mat, is_pos, is_neg):
       is_pos: positive index with shape [N, M]
       is_neg: negative index with shape [N, M]
     Returns:
-      dist_ap: distance(anchor, positive); shape [N]
-      dist_an: distance(anchor, negative); shape [N]
+      dist_ap: distance(anchor, positive); shape [N, 1]
+      dist_an: distance(anchor, negative); shape [N, 1]
     """
-    assert len(dist_mat.shape) == 2
-    dist_ap = list()
-    for i in range(dist_mat.shape[0]):
-        dist_ap.append(paddle.max(dist_mat[i][is_pos[i]]))
-    dist_ap = paddle.stack(dist_ap)
 
-    dist_an = list()
-    for i in range(dist_mat.shape[0]):
-        dist_an.append(paddle.min(dist_mat[i][is_neg[i]]))
-    dist_an = paddle.stack(dist_an)
+    inf = float("inf")
+
+    def _masked_max(tensor, mask, axis):
+        masked = paddle.multiply(tensor, mask.astype(tensor.dtype))
+        neg_inf = paddle.zeros_like(tensor)
+        neg_inf.stop_gradient = True
+        neg_inf[paddle.logical_not(mask)] = -inf
+        return paddle.max(masked + neg_inf, axis=axis, keepdim=True)
+
+    def _masked_min(tensor, mask, axis):
+        masked = paddle.multiply(tensor, mask.astype(tensor.dtype))
+        pos_inf = paddle.zeros_like(tensor)
+        pos_inf.stop_gradient = True
+        pos_inf[paddle.logical_not(mask)] = inf
+        return paddle.min(masked + pos_inf, axis=axis, keepdim=True)
+
+    assert len(dist_mat.shape) == 2
+    dist_ap = _masked_max(dist_mat, is_pos, axis=1)
+    dist_an = _masked_min(dist_mat, is_neg, axis=1)
     return dist_ap, dist_an
 
 

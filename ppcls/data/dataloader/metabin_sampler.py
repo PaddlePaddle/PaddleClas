@@ -27,9 +27,9 @@ class DomainShuffleSampler(Sampler):
     """
 
     def __init__(self,
-                 dataset: str,
-                 batch_size: int,
-                 num_instances: int,
+                 dataset,
+                 batch_size,
+                 num_instances,
                  camera_to_domain=True):
         self.dataset = dataset
         self.batch_size = batch_size
@@ -40,8 +40,12 @@ class DomainShuffleSampler(Sampler):
         self.pid_domain = defaultdict(list)
         self.pid_index = defaultdict(list)
         # data_source: [(img_path, pid, camera, domain), ...]  (camera_to_domain = True)
-        data_source = zip(dataset.images, dataset.labels, dataset.cameras,
-                          dataset.cameras)
+        if camera_to_domain:
+            data_source = zip(dataset.images, dataset.labels, dataset.cameras,
+                              dataset.cameras)
+        else:
+            data_source = zip(dataset.images, dataset.labels, dataset.cameras,
+                              dataset.domains)
         for index, info in enumerate(data_source):
             domainid = info[3]
             if camera_to_domain:
