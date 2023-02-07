@@ -13,14 +13,14 @@
 
 ## 2. 使用说明
 
-以模型`CLIP_base_patch16_224`为例，使用该模型以及对应的预训练权重进行特征提取的代码如下：
+以模型`CLIP_vit_base_patch16_224`为例，使用该模型以及对应的预训练权重进行特征提取的代码如下：
 
 ```python
 from ppcls.utils import config
 from ppcls.arch import build_model
 import paddle
-pretrained = './paddle_weights/CAE_base_patch16_224.pdparams' # path to pretrained weight
-cfg = {"Arch": {"name": "CLIP_base_patch16_224"}}
+pretrained = './paddle_weights/CLIP_vit_base_patch16_224.pdparams' # path to pretrained weight
+cfg = {"Arch": {"name": "CLIP_vit_base_patch16_224"}}
 model = build_model(cfg, mode="train")
 model.set_state_dict(paddle.load(pretrained))
 inputs = paddle.randn((1,3,224,224))  # create input
@@ -33,19 +33,19 @@ output = model(inputs)  # the output of model embeding
 
 |  系列  |           模型           | 模型大小 | embedding_size |                   预训练数据集                   |
 | :----: | :----------------------: | :------: | :------------: | :----------------------------------------------: |
-|  CLIP  |  CLIP_base_patch16_224   |   85M    |      768       |                       WIT                        |
-|  CLIP  |  CLIP_base_patch32_224   |   87M    |      768       |                       WIT                        |
-|  CLIP  |  CLIP_large_patch14_224  |   302M   |      1024      |                       WIT                        |
-|  CLIP  |  CLIP_large_patch14_336  |   302M   |      1024      |                       WIT                        |
-| BEiTv2 | BEiTv2_base_patch16_224  |   85M    |      768       |                   ImageNet-1k                    |
-| BEiTv2 | BEiTv2_large_patch16_224 |   303M   |      1024      |                   ImageNet-1k                    |
-| MoCoV3 |       MoCoV3_small       |   21M    |      384       |                   ImageNet-1k                    |
-| MoCoV3 |       MoCoV3_base        |   85M    |      768       |                   ImageNet-1k                    |
-|  MAE   |     MAE_base_patch16     |   85M    |      768       |                   ImageNet-1k                    |
-|  MAE   |    MAE_large_patch16     |   303M   |      1024      |                   ImageNet-1k                    |
-|  MAE   |     MAE_huge_patch14     |   630M   |      1280      |                   ImageNet-1k                    |
-|  EVA   |     EVA_huge_patch14     |  1010M   |      1408      | ImageNet-21k, CC12M,   CC2M, Object365,COCO, ADE |
-|  CAE   |   CAE_base_patch16_224   |   85M    |      768       |                   ImageNet-1k                    |
+|  CLIP  |  CLIP_vit_base_patch16_224   |   85M    |      768       |                       WIT                        |
+|  CLIP  |  CLIP_vit_base_patch32_224   |   87M    |      768       |                       WIT                        |
+|  CLIP  |  CLIP_vit_large_patch14_224  |   302M   |      1024      |                       WIT                        |
+|  CLIP  |  CLIP_vit_large_patch14_336  |   302M   |      1024      |                       WIT                        |
+| BEiTv2 | BEiTv2_vit_base_patch16_224  |   85M    |      768       |                   ImageNet-1k                    |
+| BEiTv2 | BEiTv2_vit_large_patch16_224 |   303M   |      1024      |                   ImageNet-1k                    |
+| MoCoV3 |       MoCoV3_vit_small       |   21M    |      384       |                   ImageNet-1k                    |
+| MoCoV3 |       MoCoV3_vit_base        |   85M    |      768       |                   ImageNet-1k                    |
+|  MAE   |     MAE_vit_base_patch16     |   85M    |      768       |                   ImageNet-1k                    |
+|  MAE   |    MAE_vit_large_patch16     |   303M   |      1024      |                   ImageNet-1k                    |
+|  MAE   |     MAE_vit_huge_patch14     |   630M   |      1280      |                   ImageNet-1k                    |
+|  EVA   |     EVA_vit_huge_patch14     |  1010M   |      1408      | ImageNet-21k, CC12M,   CC2M, Object365,COCO, ADE |
+|  CAE   |   CAE_vit_base_patch16_224   |   85M    |      768       |                   ImageNet-1k                    |
 
 ## 4. 参考文献
 
