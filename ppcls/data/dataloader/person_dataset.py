@@ -204,7 +204,7 @@ class MSMT17(Dataset):
         return len(set(self.labels))
 
 
-class DukeMTMC(Dataset):
+class DukeMTMC(Market1501):
     """
     DukeMTMC-reID.
 
@@ -220,28 +220,6 @@ class DukeMTMC(Dataset):
     # cameras: 8
     """
     _dataset_dir = 'dukemtmc/DukeMTMC-reID'
-
-    def __init__(self,
-                 image_root,
-                 cls_label_path,
-                 transform_ops=None,
-                 backend="cv2"):
-        self._img_root = image_root
-        self._cls_path = cls_label_path  # the sub folder in the dataset
-        self._dataset_dir = osp.join(image_root, self._dataset_dir,
-                                     self._cls_path)
-        self._check_before_run()
-        if transform_ops:
-            self._transform_ops = create_operators(transform_ops)
-        self.backend = backend
-        self._dtype = paddle.get_default_dtype()
-        self._load_anno(relabel=True if 'train' in self._cls_path else False)
-
-    def _check_before_run(self):
-        """Check if the file is available before going deeper"""
-        if not osp.exists(self._dataset_dir):
-            raise RuntimeError("'{}' is not available".format(
-                self._dataset_dir))
 
     def _load_anno(self, relabel=False):
         img_paths = glob.glob(osp.join(self._dataset_dir, '*.jpg'))
@@ -269,29 +247,6 @@ class DukeMTMC(Dataset):
 
         self.num_pids, self.num_imgs, self.num_cams = get_imagedata_info(
             self.images, self.labels, self.cameras, subfolder=self._cls_path)
-
-    def __getitem__(self, idx):
-        try:
-            img = Image.open(self.images[idx]).convert('RGB')
-            if self.backend == "cv2":
-                img = np.array(img, dtype="float32").astype(np.uint8)
-            if self._transform_ops:
-                img = transform(img, self._transform_ops)
-            if self.backend == "cv2":
-                img = img.transpose((2, 0, 1))
-            return (img, self.labels[idx], self.cameras[idx])
-        except Exception as ex:
-            logger.error("Exception occured when parse line: {} with msg: {}".
-                         format(self.images[idx], ex))
-            rnd_idx = np.random.randint(self.__len__())
-            return self.__getitem__(rnd_idx)
-
-    def __len__(self):
-        return len(self.images)
-
-    @property
-    def class_num(self):
-        return len(set(self.labels))
 
 
 def get_imagedata_info(data, labels, cameras, subfolder='train'):

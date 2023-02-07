@@ -257,7 +257,6 @@ class Cyclic(LRBase):
     """Cyclic learning rate decay
     
     Args:
-        Args:
         epochs (int): total epoch(s)
         step_each_epoch (int): number of iterations within an epoch
         base_learning_rate (float): Initial learning rate, which is the lower boundary in the cycle. The paper recommends
