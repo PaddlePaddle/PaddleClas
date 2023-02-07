@@ -31,21 +31,23 @@ output = model(inputs)  # the output of model embeding
 
 目前支持的视觉大模型以及预训练权重如下：
 
-|  系列  |           模型           | 模型大小 | embedding_size |                   预训练数据集                   |
-| :----: | :----------------------: | :------: | :------------: | :----------------------------------------------: |
-|  CLIP  |  CLIP_vit_base_patch16_224   |   85M    |      768       |                       WIT                        |
-|  CLIP  |  CLIP_vit_base_patch32_224   |   87M    |      768       |                       WIT                        |
-|  CLIP  |  CLIP_vit_large_patch14_224  |   302M   |      1024      |                       WIT                        |
-|  CLIP  |  CLIP_vit_large_patch14_336  |   302M   |      1024      |                       WIT                        |
-| BEiTv2 | BEiTv2_vit_base_patch16_224  |   85M    |      768       |                   ImageNet-1k                    |
-| BEiTv2 | BEiTv2_vit_large_patch16_224 |   303M   |      1024      |                   ImageNet-1k                    |
-| MoCoV3 |       MoCoV3_vit_small       |   21M    |      384       |                   ImageNet-1k                    |
-| MoCoV3 |       MoCoV3_vit_base        |   85M    |      768       |                   ImageNet-1k                    |
-|  MAE   |     MAE_vit_base_patch16     |   85M    |      768       |                   ImageNet-1k                    |
-|  MAE   |    MAE_vit_large_patch16     |   303M   |      1024      |                   ImageNet-1k                    |
-|  MAE   |     MAE_vit_huge_patch14     |   630M   |      1280      |                   ImageNet-1k                    |
-|  EVA   |     EVA_vit_huge_patch14     |  1010M   |      1408      | ImageNet-21k, CC12M,   CC2M, Object365,COCO, ADE |
-|  CAE   |   CAE_vit_base_patch16_224   |   85M    |      768       |                   ImageNet-1k                    |
+|  系列  |                模型                | 模型大小 | embedding_size |                   预训练数据集                   | 权重下载                                                     |
+| :----: | :--------------------------------: | :------: | :------------: | :----------------------------------------------: | ------------------------------------------------------------ |
+|  CLIP  |     CLIP_vit_base_patch16_224      |   85M    |      768       |                       WIT                        | [下载地址](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/foundation_models/CLIP_vit_base_patch16_224.pdparams) |
+|  CLIP  |     CLIP_vit_base_patch32_224      |   87M    |      768       |                       WIT                        | [下载地址](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/foundation_models/CLIP_vit_base_patch32_224.pdparams) |
+|  CLIP  |     CLIP_vit_large_patch14_224     |   302M   |      1024      |                       WIT                        | [下载地址](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/foundation_models/CLIP_vit_large_patch14_224.pdparams) |
+|  CLIP  |     CLIP_vit_large_patch14_336     |   302M   |      1024      |                       WIT                        | [下载地址](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/foundation_models/CLIP_vit_large_patch14_336.pdparams) |
+| BEiTv2 |    BEiTv2_vit_base_patch16_224     |   85M    |      768       |                   ImageNet-1k                    | [下载地址](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/foundation_models/BEiTv2_vit_base_patch16_224.pdparams) |
+| BEiTv2 | BEiTv2_vit_base_patch16_224_ft21k  |   85M    |      768       |            ImageNet-1k、ImageNet-21k             | [下载地址](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/foundation_models/BEiTv2_vit_base_patch16_224_ft21k.pdparams) |
+| BEiTv2 |    BEiTv2_vit_large_patch16_224    |   303M   |      1024      |                   ImageNet-1k                    | [下载地址](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/foundation_models/BEiTv2_vit_large_patch16_224.pdparams) |
+| BEiTv2 | BEiTv2_vit_large_patch16_224_ft21k |   303M   |      1024      |            ImageNet-1k、ImageNet-21k             | [下载地址](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/foundation_models/BEiTv2_vit_large_patch16_224_ft21k.pdparams) |
+| MoCoV3 |          MoCoV3_vit_small          |   21M    |      384       |                   ImageNet-1k                    | [下载地址](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/foundation_models/MoCoV3_vit_small.pdparams) |
+| MoCoV3 |          MoCoV3_vit_base           |   85M    |      768       |                   ImageNet-1k                    | [下载地址](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/foundation_models/MoCoV3_vit_base.pdparams) |
+|  MAE   |        MAE_vit_base_patch16        |   85M    |      768       |                   ImageNet-1k                    | [下载地址](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/foundation_models/MAE_vit_base_patch16.pdparams) |
+|  MAE   |       MAE_vit_large_patch16        |   303M   |      1024      |                   ImageNet-1k                    | [下载地址](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/foundation_models/MAE_vit_large_patch16.pdparams) |
+|  MAE   |        MAE_vit_huge_patch14        |   630M   |      1280      |                   ImageNet-1k                    | [下载地址](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/foundation_models/MAE_vit_huge_patch14.pdparams) |
+|  EVA   |        EVA_vit_huge_patch14        |  1010M   |      1408      | ImageNet-21k, CC12M,   CC2M, Object365,COCO, ADE | [下载地址](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/foundation_models/EVA_vit_huge_patch14.pdparams) |
+|  CAE   |      CAE_vit_base_patch16_224      |   85M    |      768       |                   ImageNet-1k                    | [下载地址](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/foundation_models/CAE_vit_base_patch16_224.pdparams) |
 
 ## 4. 参考文献
 
