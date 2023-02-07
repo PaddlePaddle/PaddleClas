@@ -1,4 +1,4 @@
-# Foudation ViT介绍文档
+# Foundation ViT介绍文档
 
 ## 目录
 
