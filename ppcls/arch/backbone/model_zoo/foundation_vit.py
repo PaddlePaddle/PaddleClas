@@ -26,19 +26,32 @@ from paddle.nn.initializer import TruncatedNormal, Constant, Normal
 from ....utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
 
 MODEL_URLS = {
-    "CLIP_vit_base_patch32_224": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/foundation_models/CLIP_vit_base_patch32_224.pdparams",
-    "CLIP_vit_base_patch16_224": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/foundation_models/CLIP_vit_base_patch16_224.pdparams",
-    "CLIP_vit_large_patch14_336": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/foundation_models/CLIP_vit_large_patch14_336.pdparams",
-    "CLIP_vit_large_patch14_224": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/foundation_models/CLIP_vit_large_patch14_224.pdparams",
-    "BEiTv2_vit_base_patch16_224": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/foundation_models/BEiTv2_vit_base_patch16_224.pdparams",
-    "BEiTv2_vit_large_patch16_224": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/foundation_models/BEiTv2_vit_large_patch16_224.pdparams",
-    "CAE_vit_base_patch16_224": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/foundation_models/CAE_vit_base_patch16_224.pdparams",
-    'EVA_vit_huge_patch14':"https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/foundation_models/EVA_vit_huge_patch14.pdparams",
-    "MOCOV3_vit_small": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/foundation_models/MOCOV3_vit_small.pdparams",
-    "MOCOV3_vit_base": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/foundation_models/MOCOV3_vit_base.pdparams",
-    "MAE_vit_huge_patch14": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/foundation_models/MAE_vit_huge_patch14.pdparams",
-    "MAE_vit_large_patch16": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/foundation_models/MAE_vit_large_patch16.pdparams",
-    "MAE_vit_base_patch16": "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/foundation_models/MAE_vit_base_patch16.pdparams",
+    "CLIP_vit_base_patch32_224":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/foundation_models/CLIP_vit_base_patch32_224.pdparams",
+    "CLIP_vit_base_patch16_224":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/foundation_models/CLIP_vit_base_patch16_224.pdparams",
+    "CLIP_vit_large_patch14_336":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/foundation_models/CLIP_vit_large_patch14_336.pdparams",
+    "CLIP_vit_large_patch14_224":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/foundation_models/CLIP_vit_large_patch14_224.pdparams",
+    "BEiTv2_vit_base_patch16_224":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/foundation_models/BEiTv2_vit_base_patch16_224.pdparams",
+    "BEiTv2_vit_large_patch16_224":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/foundation_models/BEiTv2_vit_large_patch16_224.pdparams",
+    "CAE_vit_base_patch16_224":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/foundation_models/CAE_vit_base_patch16_224.pdparams",
+    'EVA_vit_huge_patch14':
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/foundation_models/EVA_vit_huge_patch14.pdparams",
+    "MOCOV3_vit_small":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/foundation_models/MOCOV3_vit_small.pdparams",
+    "MOCOV3_vit_base":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/foundation_models/MOCOV3_vit_base.pdparams",
+    "MAE_vit_huge_patch14":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/foundation_models/MAE_vit_huge_patch14.pdparams",
+    "MAE_vit_large_patch16":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/foundation_models/MAE_vit_large_patch16.pdparams",
+    "MAE_vit_base_patch16":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/foundation_models/MAE_vit_base_patch16.pdparams",
 }
 
 __all__ = list(MODEL_URLS.keys())
@@ -48,8 +61,8 @@ _model_diff = None
 
 _CLIP_diff = {
     'add_layer_norm_before_encoder': [
-        'base_vit_patch32_224', 'base_vit_patch16_224', 'large_vit_patch14_336',
-        'large_vit_patch14_224'
+        'base_vit_patch32_224', 'base_vit_patch16_224',
+        'large_vit_patch14_336', 'large_vit_patch14_224'
     ],
     'add_relative_position_bias_in_msa': [],
     'add_shared_rel_pos_bias': [],
@@ -57,8 +70,8 @@ _CLIP_diff = {
     'remove_cls_token': [],
     'remove_abs_pos_emb': [],
     'replace_mlp_GELU': [
-        'base_vit_patch32_224', 'base_vit_patch16_224', 'large_vit_patch14_336',
-        'large_vit_patch14_224'
+        'base_vit_patch32_224', 'base_vit_patch16_224',
+        'large_vit_patch14_336', 'large_vit_patch14_224'
     ],
     'head': {
         'fc_norm': [],
@@ -102,7 +115,8 @@ _BEiTv2_diff = {
     'add_relative_position_bias_in_msa':
     ['base_vit_patch16_224', 'large_vit_patch16_224'],
     'add_shared_rel_pos_bias': [],
-    'add_mul_gamma_to_msa_mlp': ['base_vit_patch16_224', 'large_vit_patch16_224'],
+    'add_mul_gamma_to_msa_mlp':
+    ['base_vit_patch16_224', 'large_vit_patch16_224'],
     'remove_cls_token': [],
     'remove_abs_pos_emb': ['base_vit_patch16_224', 'large_vit_patch16_224'],
     'replace_mlp_GELU': [],
@@ -175,7 +189,7 @@ def drop_path(x, drop_prob=0., training=False):
     """
     if drop_prob == 0. or not training:
         return x
-    keep_prob = paddle.to_tensor(1 - drop_prob)
+    keep_prob = paddle.to_tensor(1 - drop_prob, dtype=x.dtype)
     shape = (paddle.shape(x)[0], ) + (1, ) * (x.ndim - 1)
     random_tensor = keep_prob + paddle.rand(shape).astype(x.dtype)
     random_tensor = paddle.floor(random_tensor)  # binarize
