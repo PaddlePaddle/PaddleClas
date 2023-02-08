@@ -45,7 +45,6 @@ def ResNet50_adaptive_max_pool2d(pretrained=False, use_ssld=False, **kwargs):
 def ResNet50_metabin(pretrained=False,
                      use_ssld=False,
                      bias_lr_factor=1.0,
-                     gate_lr_factor=1.0,
                      **kwargs):
     """
     ResNet50 which replaces all `bn` layers with MetaBIN
@@ -164,14 +163,12 @@ def ResNet50_metabin(pretrained=False,
         metabin = MetaBIN(bn.weight.shape[0])
         return metabin
 
-    def setup_optimize_attr(model, bias_lr_factor, gate_lr_factor):
+    def setup_optimize_attr(model, bias_lr_factor):
         for name, params in model.named_parameters():
             if params.stop_gradient:
                 continue
             if "bias" in name:
                 params.optimize_attr['learning_rate'] = bias_lr_factor
-            elif "gate" in name:
-                params.optimize_attr['learning_rate'] = gate_lr_factor
 
     stride_list = [2, 2, 2, 2, 1]
 
@@ -185,10 +182,7 @@ def ResNet50_metabin(pretrained=False,
         pretrained=False, use_ssld=use_ssld, stride_list=stride_list, **kwargs)
 
     model.upgrade_sublayer(pattern, bn2metabin)
-    setup_optimize_attr(
-        model=model,
-        bias_lr_factor=bias_lr_factor,
-        gate_lr_factor=gate_lr_factor)
+    setup_optimize_attr(model=model, bias_lr_factor=bias_lr_factor)
 
     _load_pretrained(pretrained, model, MODEL_URLS["ResNet50"], use_ssld)
     return model
