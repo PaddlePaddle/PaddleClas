@@ -31,7 +31,6 @@ Arch:
     name: "ResNet50_metabin"
     pretrained: False # "metabin_resnet50_backbone_pretrained"
     bias_lr_factor: 2.0
-    gate_lr_factor: 20.0
   BackboneStopLayer:
     name: "flatten"
   Neck:
@@ -249,13 +248,12 @@ Optimizer:
       regularizer:
         name: "L2"
         coeff: 0.0005
-  - Momentum:
+  - SGD:
       scope: "backbone.*gate"
       lr:
         name: Constant
-        learning_rate: 0.01
-        last_epoch: 0
-      momentum: 0.9
+        learning_rate: 0.2
+        last_epoch: -1
   - SGD:
       scope: "RecModel"
       lr:
