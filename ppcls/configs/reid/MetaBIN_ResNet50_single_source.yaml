@@ -36,6 +36,7 @@ Arch:
   Neck:
     name: BNNeck
     num_features: &feat_dim 2048
+    use_global_stats: True
   Head:
     name: "FC"
     embedding_size: *feat_dim
