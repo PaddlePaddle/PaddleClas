@@ -34,7 +34,7 @@ Arch:
   BackboneStopLayer:
     name: "flatten"
   Neck:
-    name: BNNeck
+    name: MetaBNNeck
     num_features: &feat_dim 2048
     use_global_stats: True
   Head:
