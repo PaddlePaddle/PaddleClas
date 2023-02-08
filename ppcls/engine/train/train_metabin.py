@@ -99,7 +99,7 @@ def train_epoch_metabin(engine, epoch_id, print_batch_step):
         }
         # step lr (by iter)
         # the last lr_sch is cyclic_lr
-        for i in range(len(engine.lr_sch) - 1):
+        for i in range(len(engine.lr_sch)):
             if not getattr(engine.lr_sch[i], "by_epoch", False):
                 engine.lr_sch[i].step()
         # update ema
@@ -118,7 +118,7 @@ def train_epoch_metabin(engine, epoch_id, print_batch_step):
 
     # step lr(by epoch)
     # the last lr_sch is cyclic_lr
-    for i in range(len(engine.lr_sch) - 1):
+    for i in range(len(engine.lr_sch)):
         if getattr(engine.lr_sch[i], "by_epoch", False) and \
                 type_name(engine.lr_sch[i]) != "ReduceOnPlateau":
             engine.lr_sch[i].step()
@@ -138,19 +138,20 @@ def setup_opt(engine, stage):
     elif stage == "mtest":
         norm_lr = engine.lr_sch[1].last_lr
         cyclic_lr = engine.lr_sch[2].get_lr()
-        engine.lr_sch[2].step()  # update cyclic learning rate
         opt["bn_mode"] = "hold"
         opt["enable_inside_update"] = True
         opt["lr_gate"] = norm_lr * cyclic_lr
     for name, layer in engine.model.backbone.named_sublayers():
         if "bn" == name.split('.')[-1]:
             layer.setup_opt(opt)
+    engine.model.neck.setup_opt(opt)
 
 
 def reset_opt(model):
     for name, layer in model.backbone.named_sublayers():
         if "bn" == name.split('.')[-1]:
             layer.reset_opt()
+    model.neck.reset_opt()
 
 
 def get_meta_data(meta_dataloader_iter, num_domain):
@@ -200,6 +201,7 @@ def forward(engine, batch, loss_func):
 
 
 def backward(engine, loss, optimizer):
+    optimizer.clear_grad()
     scaled = engine.scaler.scale(loss)
     scaled.backward()
     engine.scaler.minimize(optimizer, scaled)
