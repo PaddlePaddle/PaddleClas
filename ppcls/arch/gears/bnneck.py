@@ -36,12 +36,17 @@ class BNNeck(nn.Layer):
         if 'bias_attr' in kwargs:
             bias_attr = get_param_attr_dict(kwargs['bias_attr'])
 
+        use_global_stats = None
+        if 'use_global_stats' in kwargs:
+            use_global_stats = get_param_attr_dict(kwargs['use_global_stats'])
+
         self.feat_bn = nn.BatchNorm1D(
             num_features,
             momentum=0.9,
             epsilon=1e-05,
             weight_attr=weight_attr,
-            bias_attr=bias_attr)
+            bias_attr=bias_attr,
+            use_global_stats=use_global_stats)
 
         self.flatten = nn.Flatten()
 
