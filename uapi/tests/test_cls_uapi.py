@@ -62,12 +62,11 @@ if __name__ == '__main__':
     model.train(
         dataset='tests/data/tipc_shitu_demo_data',
         batch_size=8,
-        epochs_iters=2,
+        epochs_iters=1,
         device='gpu:0',
         dy2st=False,
         amp='O1',
-        save_dir='tests/shitu_res',
-        resume_path='tests/shitu_res/RecModel/latest.pdparams')
+        save_dir='tests/shitu_res')
 
     # model.predict(
     #     weight_path='tests/shitu_res/RecModel/latest.pdparams',

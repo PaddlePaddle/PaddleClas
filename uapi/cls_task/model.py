@@ -50,7 +50,7 @@ class ClsModel(BaseModel):
             save_dir = abspath(save_dir)
 
         # Update YAML config file
-        config_file_path = self.arch_info['config_path']
+        config_file_path = self.model_info['config_path']
         config = self.config_cls.build_from_file(config_file_path)
         config._update_dataset_config(dataset)
         config._update_amp_config(amp)
@@ -63,7 +63,8 @@ class ClsModel(BaseModel):
         if epochs_iters is not None:
             config.update([f'Global.epochs={epochs_iters}'])
         if resume_path is not None:
-            config.update([f'Global.checkpoints={resume_path.replace(".pdparams","")}'])
+            config.update(
+                [f'Global.checkpoints={resume_path.replace(".pdparams","")}'])
         if dy2st:
             config.update([f'Global.to_static={True}'])
         if save_dir is not None:
@@ -85,10 +86,12 @@ class ClsModel(BaseModel):
             save_dir = abspath(save_dir)
 
         # Update YAML config file
-        config_file_path = self.arch_info['config_path']
+        config_file_path = self.model_info['config_path']
         config = self.config_cls.build_from_file(config_file_path)
         if weight_path is not None:
-            config.update([f'Global.pretrained_model={weight_path.replace(".pdparams","")}'])
+            config.update([
+                f'Global.pretrained_model={weight_path.replace(".pdparams","")}'
+            ])
         if input_path is not None:
             config.update([f'Infer.infer_imgs={input_path}'])
         if save_dir is not None:
@@ -105,10 +108,12 @@ class ClsModel(BaseModel):
             save_dir = abspath(save_dir)
 
         # Update YAML config file
-        config_file_path = self.arch_info['config_path']
+        config_file_path = self.model_info['config_path']
         config = self.config_cls.build_from_file(config_file_path)
         if weight_path is not None:
-            config.update([f'Global.pretrained_model={weight_path.replace(".pdparams","")}'])
+            config.update([
+                f'Global.pretrained_model={weight_path.replace(".pdparams","")}'
+            ])
         if save_dir is not None:
             config.update([f'Global.save_inference_dir={save_dir}'])
         config_file_path = self.config_file_path
@@ -122,7 +127,7 @@ class ClsModel(BaseModel):
             input_path = abspath(input_path)
         if save_dir is not None:
             save_dir = abspath(save_dir)
-        
+
         config_file_path = '../deploy/configs/inference_cls.yaml'
         config = self.config_cls.build_from_file(config_file_path)
         config.update([f'Global.inference_model_dir={model_dir}'])
@@ -130,7 +135,7 @@ class ClsModel(BaseModel):
             config.update([f'Global.infer_imgs={input_path}'])
         if device is not None:
             config.update([f'Global.use_gpu={device.split(":")[0]=="gpu"}'])
-        
+
         config_file_path = self.config_file_path
         config.dump(config_file_path)
         self.runner.infer(config_file_path, device)
@@ -150,7 +155,7 @@ class ClsModel(BaseModel):
             save_dir = abspath(save_dir)
 
         # Update YAML config file
-        config_file_path = self.arch_info['auto_compression_config_path']
+        config_file_path = self.model_info['auto_compression_config_path']
         config = self.config_cls.build_from_file(config_file_path)
         config._update_dataset_config(dataset)
         config._update_device_config(device)
@@ -162,7 +167,9 @@ class ClsModel(BaseModel):
         if epochs_iters is not None:
             config.update([f'Global.epochs={epochs_iters}'])
         if weight_path is not None:
-            config.update([f'Global.pretrained_model={weight_path.replace(".pdparams","")}'])
+            config.update([
+                f'Global.pretrained_model={weight_path.replace(".pdparams","")}'
+            ])
         if save_dir is not None:
             config.update([f'Global.output_dir={save_dir}'])
         config_file_path = self.config_file_path

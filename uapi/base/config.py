@@ -59,8 +59,8 @@ class Config(object):
     def copy(self):
         return type(self)(self)
 
-    # def __repr__(self):
-    #     return format_cfg(self, indent=0)
+    def __repr__(self):
+        return format_cfg(self, indent=0)
 
     def reset_from_dict(self, dict_like_obj):
         self._dict.clear()
