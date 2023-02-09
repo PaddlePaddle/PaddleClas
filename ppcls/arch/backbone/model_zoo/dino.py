@@ -16,7 +16,6 @@ from .vision_transformer import ViT_base_patch16_224, ViT_small_patch16_224
 from paddle import nn
 import paddle
 from paddle.nn.initializer import Constant, Normal, TruncatedNormal
-from ppcls.utils import logger
 import os
 
 normal_ = Normal(mean=0, std=0.01)
@@ -103,8 +102,6 @@ class DINO(nn.Layer):
             for p in self.teacher.parameters():
                 p.stop_gradient = True
 
-            logger.info(f"Student and Teacher are built: they are both {arch_config['arch']} network.")
-
         else:
             self.model = model_name(patch_size=arch_config['patch_size'], num_classes=0)
             embed_dim = self.model.embed_dim * (arch_config['n_last_blocks'] + int(arch_config['avgpool_patchtokens']))
@@ -118,7 +115,6 @@ class DINO(nn.Layer):
                 state_dict = paddle.load(arch_config['pretrained_weights'])[arch_config['checkpoint_key']]
                 new_state_dict = {k.replace("backbone.", ""): v for k, v in state_dict.items()}
                 self.model.load_dict(new_state_dict)
-                logger.info(f"Pretrained weights found at {arch_config['pretrained_weights']} and loaded!")
 
             self.linear_clf = paddle.DataParallel(LinearClassifier(embed_dim, arch_config['num_labels']))
 
