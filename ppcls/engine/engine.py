@@ -42,7 +42,7 @@ from ppcls.data.utils.get_image_list import get_image_list
 from ppcls.data.postprocess import build_postprocess
 from ppcls.data import create_operators
 from ppcls.engine import train as train_method
-from ppcls.engine.train.utils import type_name
+from ppcls.engine.train.utils import type_name, cosine_scheduler
 from ppcls.engine import evaluation
 from ppcls.arch.gears.identity_head import IdentityHead
 
@@ -386,11 +386,36 @@ class Engine(object):
             if metric_info is not None:
                 best_metric.update(metric_info)
 
+        if self.train_mode == 'dino':
+            lr_schedule = cosine_scheduler(
+                self.config['Global']['lr'] * self.config['Global']['batch_size'] * dist.get_world_size() / 256,
+                self.config['Global']['min_lr'],
+                self.config['Global']['epochs'], len(self.train_dataloader),
+                warmup_epochs=self.config['Global']['warmup_epochs'],
+            )
+            wd_schedule = cosine_scheduler(
+                self.config['Global']['weight_decay'],
+                self.config['Global']['weight_decay_end'],
+                self.config['Global']['epochs'], len(self.train_dataloader),
+            )
+            # momentum parameter is increased to 1. during training with a cosine schedule
+            momentum_schedule = cosine_scheduler(
+                self.config['Global']['momentum_teacher'], 1,
+                self.config['Global']['epochs'], len(self.train_dataloader)
+            )
+
         for epoch_id in range(best_metric["epoch"] + 1,
                               self.config["Global"]["epochs"] + 1):
             acc = 0.0
-            # for one epoch train
-            self.train_epoch_func(self, epoch_id, print_batch_step)
+            if self.train_mode == 'dino':
+                self.train_epoch_func(
+                    self, epoch_id, print_batch_step,
+                    lr_schedule, wd_schedule, momentum_schedule,
+                    self.config['Global']['freeze_last_layer']
+                )
+            else:
+                # for one epoch train
+                self.train_epoch_func(self, epoch_id, print_batch_step)
 
             if self.use_dali:
                 self.train_dataloader.reset()

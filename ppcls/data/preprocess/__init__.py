@@ -14,7 +14,7 @@
 
 from ppcls.data.preprocess.ops.autoaugment import ImageNetPolicy as RawImageNetPolicy
 from ppcls.data.preprocess.ops.randaugment import RandAugment as RawRandAugment
-from ppcls.data.preprocess.ops.randaugment import RandomApply
+# from ppcls.data.preprocess.ops.randaugment import RandomApply
 from ppcls.data.preprocess.ops.randaugment import RandAugmentV2 as RawRandAugmentV2
 from ppcls.data.preprocess.ops.timm_autoaugment import RawTimmAutoAugment
 from ppcls.data.preprocess.ops.cutout import Cutout
@@ -48,6 +48,11 @@ from ppcls.data.preprocess.ops.operators import RandomRotation
 from ppcls.data.preprocess.ops.operators import Padv2
 from ppcls.data.preprocess.ops.operators import RandomRot90
 from ppcls.data.preprocess.ops.operators import PCALighting
+from ppcls.data.preprocess.ops.operators import GaussianBlur
+from ppcls.data.preprocess.ops.operators import Solarization
+from ppcls.data.preprocess.ops.operators import RandomApply
+from ppcls.data.preprocess.ops.operators import RandomGrayscale
+
 from .ops.operators import format_data
 from paddle.vision.transforms import Pad as Pad_paddle_vision
 
@@ -140,3 +145,51 @@ class TimmAutoAugment(RawTimmAutoAugment):
             img = np.asarray(img)
 
         return img
+
+
+class DataAugmentationDINO(object):
+    def __init__(self, global_crops_scale, local_crops_scale, local_crops_number):
+        flip_and_color_jitter = [
+            RandomHorizontalFlip(prob=0.5),
+            RandomApply(
+                p=0.8,
+                transforms=[ColorJitter(brightness=0.4, contrast=0.4, saturation=0.2, hue=0.1)]
+            ),
+            RandomGrayscale(p=0.2),
+        ]
+        normalize = [
+            ToTensor(),
+            Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225)),
+        ]
+
+        # first global crop
+        self.global_transfo1 = [
+            RandomResizedCrop(224, scale=global_crops_scale, interpolation="bicubic"),
+            flip_and_color_jitter,
+            GaussianBlur(1.0),
+            normalize,
+        ]
+        # second global crop
+        self.global_transfo2 = [
+            RandomResizedCrop(224, scale=global_crops_scale, interpolation="bicubic"),
+            flip_and_color_jitter,
+            GaussianBlur(0.1),
+            Solarization(0.2),
+            normalize,
+        ]
+        # transformation for the local small crops
+        self.local_crops_number = local_crops_number
+        self.local_transfo = [
+            RandomResizedCrop(96, scale=local_crops_scale, interpolation="bicubic"),
+            flip_and_color_jitter,
+            GaussianBlur(p=0.5),
+            normalize,
+        ]
+
+    def __call__(self, image):
+        crops = []
+        crops.append(transform(image, self.global_transfo1))
+        crops.append(transform(image, self.global_transfo2))
+        for _ in range(self.local_crops_number):
+            crops.append(transform(image, self.local_transfo))
+        return crops

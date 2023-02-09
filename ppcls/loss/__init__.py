@@ -37,6 +37,7 @@ from .distillationloss import DistillationPairLoss
 
 from .multilabelloss import MultiLabelLoss
 from .afdloss import AFDLoss
+from dino_loss import DINOLoss
 
 from .deephashloss import DSHSDLoss
 from .deephashloss import LCDSHLoss

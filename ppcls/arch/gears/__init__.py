@@ -28,7 +28,7 @@ __all__ = ['build_gear']
 def build_gear(config):
     support_dict = [
         'ArcMargin', 'CosMargin', 'CircleMargin', 'FC', 'VehicleNeck', 'Tanh',
-        'BNNeck', 'AdaMargin', 'FRFNNeck'
+        'BNNeck', 'AdaMargin', 'FRFNNeck', "DINOHead"
     ]
     module_name = config.pop('name')
     assert module_name in support_dict, Exception(
