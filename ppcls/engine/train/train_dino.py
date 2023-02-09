@@ -2,12 +2,19 @@ import paddle
 import math
 import sys
 from ppcls.engine.train.utils import cancel_gradients_last_layer, update_loss, log_info
+import time
 
 
 def train_epoch_dino(engine, epoch_id, print_batch_step, lr_schedule, wd_schedule, momentum_schedule, freeze_last_layer):
-    for iter_id, images in enumerate(engine.train_dataloader):
+    tic = time.time()
+    for iter_id, (images, y) in enumerate(engine.train_dataloader):
         cur_iter_num = len(engine.train_dataloader) * epoch_id + iter_id
         engine.optimizer.set_lr(lr_schedule[cur_iter_num])
+
+        if iter_id == 5:
+            for key in engine.time_info:
+                engine.time_info[key].reset()
+        engine.time_info["reader_cost"].update(time.time() - tic)
 
         for i, param_group in enumerate(engine.optimizer._param_groups):
             if i == 0:
@@ -17,10 +24,10 @@ def train_epoch_dino(engine, epoch_id, print_batch_step, lr_schedule, wd_schedul
         if engine.amp:
             amp_level = engine.config['AMP'].get("level", "O1").upper()
             with paddle.amp.auto_cast(level=amp_level):
-                student_out, teacher_out = engine.model.forward(images[0])
+                student_out, teacher_out = engine.model.forward(images)
                 loss = engine.train_loss_func(student_out, teacher_out, epoch_id)
         else:
-            student_out, teacher_out = engine.model.forward(images[0])
+            student_out, teacher_out = engine.model.forward(images)
             loss = engine.train_loss_func(student_out, teacher_out, epoch_id)
 
         if not math.isfinite(loss.item()):
@@ -44,6 +51,7 @@ def train_epoch_dino(engine, epoch_id, print_batch_step, lr_schedule, wd_schedul
 
         batch_size = engine.train_dataloader.batch_size
         update_loss(engine, loss, batch_size)
+        engine.time_info["batch_cost"].update(time.time() - tic)
         if iter_id % print_batch_step == 0:
             log_info(engine, batch_size, epoch_id, iter_id)
 
@@ -53,6 +61,8 @@ def train_epoch_dino(engine, epoch_id, print_batch_step, lr_schedule, wd_schedul
             for param_stu, params_tea in zip(engine.model.student.parameters(), engine.model.teacher_without_ddp.parameters()):
                 new_val = m * params_tea.numpy() + (1 - m) * param_stu.detach().numpy()
                 params_tea.set_value(new_val)
+
+        tic = time.time()
 
         engine.output_info['train_loss'] = loss.item()
         engine.output_info['train_lr'] = engine.optimizer.get_lr()

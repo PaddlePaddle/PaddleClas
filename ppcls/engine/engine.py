@@ -388,7 +388,7 @@ class Engine(object):
 
         if self.train_mode == 'dino':
             lr_schedule = cosine_scheduler(
-                self.config['Global']['lr'] * self.config['Global']['batch_size'] * dist.get_world_size() / 256,
+                self.config['Global']['lr'] * self.config['DataLoader']['Train']['sampler']['batch_size'] * dist.get_world_size() / 256,
                 self.config['Global']['min_lr'],
                 self.config['Global']['epochs'], len(self.train_dataloader),
                 warmup_epochs=self.config['Global']['warmup_epochs'],

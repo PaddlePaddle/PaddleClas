@@ -75,10 +75,12 @@ class DINO(nn.Layer):
         if arch_config['mode'] == 'pretrain':
             self.student = model_name(drop_path_rate=arch_config["drop_path_rate"])
             self.teacher = model_name()
+            embed_dim = self.student.embed_dim
+
             # multi-crop wrapper handles forward with inputs of different resolutions
             self.student = MultiCropWrapper(
                 self.student, DINOHead(
-                    self.student.embed_dim,
+                    embed_dim,
                     arch_config["out_dim"],
                     use_bn=arch_config['use_bn_in_head'],
                     norm_last_layer=arch_config['norm_last_layer']
@@ -86,7 +88,7 @@ class DINO(nn.Layer):
             )
             self.teacher = MultiCropWrapper(
                 self.teacher,
-                DINOHead(self.student.embed_dim, arch_config["out_dim"], arch_config['use_bn_in_head'])
+                DINOHead(embed_dim, arch_config["out_dim"], arch_config['use_bn_in_head'])
             )
 
             # vit_s8 and vit_s16 are batch norm free models. here, we don't check bn
@@ -105,9 +107,12 @@ class DINO(nn.Layer):
 
         else:
             self.model = model_name(patch_size=arch_config['patch_size'], num_classes=0)
-            embed_dim = self.embed_dim * (arch_config['n_last_blocks'] + int(arch_config['avgpool_patchtokens']))
+            embed_dim = self.model.embed_dim * (arch_config['n_last_blocks'] + int(arch_config['avgpool_patchtokens']))
             logger.info(f"vit_s{arch_config['patch_size']} has build!")
             self.model.eval()
+
+            for p in self.model.parameters():
+                p.stop_gradient = True
 
             if os.path.isfile(arch_config['pretrained_weights']):
                 state_dict = paddle.load(arch_config['pretrained_weights'])[arch_config['checkpoint_key']]

@@ -1,15 +1,13 @@
 # default 8 card
 
 Global:
-
-
   epochs: 100
   lr: 0.003
   batch_size: 32
   val_freq: 1
   output_dir: ./output
   class_num: 1000
-
+  use_visualdl: True
   image_shape: [3, 224, 224]
   save_inference_dir: ./inference
 

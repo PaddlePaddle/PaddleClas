@@ -1,13 +1,15 @@
 # global configs
 Global:
+  checkpoints: null
+  pretrained_model: null
+
   train_mode: dino
   warmup_teacher_temp: 0.04
   teacher_temp: 0.07
   warmup_teacher_temp_epochs: 30
-  use_fp16: False
+  use_fp16: False # ???
   weight_decay: 0.04
   weight_decay_end: 0.4
-  clip_grad: 0
   epochs: 800
   freeze_last_layer: 1
   lr: 0.0005
@@ -17,13 +19,18 @@ Global:
   local_crops_scale: [0.05, 0.25]
   local_crops_number: 10
   seed: 0
-  world_size: 16
   ngpus: 8
   nodes: 2
   device: gpu
   optimizer: adamw
   momentum_teacher: 0.996
   output_dir: ./output/
+
+  eval_during_train: False
+  eval_interval: 1
+  print_batch_step: 20
+  use_visualdl: True
+  save_interval: 1
 
 # model architecture
 Arch:
@@ -39,8 +46,13 @@ Arch:
 
 Optimizer:
   name: AdamW
+  weight_decay: 0.04
   no_weight_decay_name: norm bias
-  one_dim_param_no_weight_decay: True
+  clip_norm: 0
+  lr:
+    # for 8 cards
+    name: Constant
+    learning_rate: 5e-4
 
 # data loader
 DataLoader:
@@ -51,8 +63,10 @@ DataLoader:
       cls_label_path: ./dataset/ILSVRC2012/train_list.txt
       transform_ops:
         - DecodeImage:
+            to_np: False
             to_rgb: True
             channel_first: False
+            backend: pil
         - DataAugmentationDINO:
             global_crops_scale: [ 0.25, 1.0 ]
             local_crops_scale: [ 0.05, 0.25 ]
@@ -64,11 +78,13 @@ DataLoader:
       shuffle: True
     loader:
       num_workers: 10
+      use_shared_memory: True
 
 
 Loss:
   Train:
     - DINOLoss:
+        weight: 1.0
         out_dim: 65536
         ncrops: 12   # 10 + 2
         warmup_teacher_temp: 0.04

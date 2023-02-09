@@ -962,7 +962,7 @@ class RandomApply(object):
         self.p = p
         self.transforms = transforms
 
-    def _apply_image(self, img):
+    def __call__(self, img):
         if self.p < random.random():
             return img
         for t in self.transforms:
