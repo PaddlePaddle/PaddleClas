@@ -17,20 +17,7 @@ from ..cls_task import ClsRunner
 
 
 class ShiTuRunner(ClsRunner):
-    def predict(self, config_file_path, device):
-        self.distributed(device)
-        cmd = f"{self.python} tools/infer.py -c {config_file_path}"
-        self.run_cmd(cmd, switch_wdir=True, echo=True, silent=False)
-
-    def export(self, config_file_path, device):
-        # `device` unused
-        cmd = f"{self.python} tools/export_model.py -c {config_file_path}"
-        self.run_cmd(cmd, switch_wdir=True, echo=True, silent=False)
-
     def infer(self, config_file_path, device):
         self.distributed(device)
-        cmd = f"{self.python} python/predict_cls.py -c {config_file_path}"
+        cmd = f"{self.python} python/predict_rec.py -c {config_file_path}"
         self.run_cmd(cmd, switch_wdir='deploy', echo=True, silent=False)
-
-    def compression(self, config_file_path, device):
-        self.train(config_file_path, device)

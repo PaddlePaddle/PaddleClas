@@ -15,24 +15,26 @@
 import os.path as osp
 
 from ..base.register import register_arch_info, register_model_info
-from .model import ClsModel
-from .runner import ClsRunner
+from .model import ShiTuModel
+from .runner import ShiTuRunner
 
 # XXX: Hard-code relative path of repo root dir
 REPO_ROOT_PATH = osp.abspath(osp.join(osp.dirname(__file__), '..', '..'))
 register_model_info({
-    'model_name': 'ClsModel',
-    'model_cls': ClsModel,
-    'runner_cls': ClsRunner,
+    'model_name': 'ShiTuModel',
+    'model_cls': ShiTuModel,
+    'runner_cls': ShiTuRunner,
     'repo_root_path': REPO_ROOT_PATH
 })
 
 PPLCNetV2_base_ShiTu_CFG_PATH = osp.join(
-    REPO_ROOT_PATH, 'ppcls/configs/GeneralRecognitionV2/GeneralRecognitionV2_PPLCNetV2_base.yaml')
+    REPO_ROOT_PATH,
+    'ppcls/configs/GeneralRecognitionV2/GeneralRecognitionV2_PPLCNetV2_base.yaml'
+)
 
 register_arch_info({
     'arch_name': 'PPLCNetV2_base_ShiTu',
-    'model': 'ClsModel',
+    'model': 'ShiTuModel',
     'config_path': PPLCNetV2_base_ShiTu_CFG_PATH,
     'auto_compression_config_path': PPLCNetV2_base_ShiTu_CFG_PATH,
 })
