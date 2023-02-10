@@ -4,12 +4,12 @@ Global:
   pretrained_model: null #"metabin_resnet50_final"
   output_dir: "./output/"
   device: "gpu"
-  iter_per_epoch: 145
+  iter_per_epoch: &iter_per_epoch 50
   warmup_iter: 10
   save_interval: 40
   eval_during_train: True
-  eval_interval: 10
-  epochs: &epochs 120
+  eval_interval: 8
+  epochs: &epochs 348    # 348*50 = 120*145 = 17400 iters
   print_batch_step: 20
   use_visualdl: False
   eval_mode: "retrieval"
@@ -238,10 +238,10 @@ Optimizer:
         name: MultiStepDecay
         epochs: *epochs
         learning_rate: 0.01
-        step_each_epoch: 145
-        milestones: [50, 90]
+        step_each_epoch: *iter_per_epoch
+        milestones: [145, 261]
         gamma: 0.1
-        warmup_epoch: 10
+        warmup_epoch: 29
         warmup_start_lr: 0.0001
         by_epoch: False
         last_epoch: -1
@@ -260,7 +260,7 @@ Optimizer:
       lr:
         name: Cyclic
         epochs: *epochs
-        step_each_epoch: 145
+        step_each_epoch: *iter_per_epoch
         base_learning_rate: 0.001
         max_learning_rate: 0.1
         warmup_epoch: 0
