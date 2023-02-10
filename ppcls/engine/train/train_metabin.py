@@ -141,15 +141,15 @@ def setup_opt(engine, stage):
         opt["bn_mode"] = "hold"
         opt["enable_inside_update"] = True
         opt["lr_gate"] = norm_lr * cyclic_lr
-    for name, layer in engine.model.backbone.named_sublayers():
-        if "bn" == name.split('.')[-1]:
+    for layer in engine.model.backbone.sublayers():
+        if type_name(layer) == "MetaBIN":
             layer.setup_opt(opt)
     engine.model.neck.setup_opt(opt)
 
 
 def reset_opt(model):
-    for name, layer in model.backbone.named_sublayers():
-        if "bn" == name.split('.')[-1]:
+    for layer in model.backbone.sublayers():
+        if type_name(layer) == "MetaBIN":
             layer.reset_opt()
     model.neck.reset_opt()
 
