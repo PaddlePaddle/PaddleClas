@@ -106,7 +106,7 @@ class TalkingHeadAttention(nn.Layer):
         self.proj_w = nn.Linear(num_heads, num_heads)
 
     def transpose_multihead(self, x):
-        new_shape = x.shape[:-1] + [self.num_heads, self.dim_head]
+        new_shape = list(x.shape[:-1]) + [self.num_heads, self.dim_head]
         x = paddle.reshape(x, new_shape)
         x = paddle.transpose(x, [0, 2, 1, 3])
         return x
