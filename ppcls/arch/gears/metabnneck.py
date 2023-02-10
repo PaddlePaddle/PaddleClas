@@ -22,7 +22,7 @@ import paddle.nn.functional as F
 from ..utils import get_param_attr_dict
 
 
-class MetaBN1D(nn.BatchNorm2D):
+class MetaBN1D(nn.BatchNorm1D):
     def forward(self, inputs, opt={}):
         mode = opt.get("bn_mode", "general") if self.training else "eval"
         if mode == "general":  # update, but not apply running_mean/var
