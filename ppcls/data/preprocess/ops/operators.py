@@ -33,7 +33,6 @@ from paddle.vision.transforms import functional as F
 from .autoaugment import ImageNetPolicy
 from .functional import augmentations
 from ppcls.utils import logger
-from PIL import ImageFilter
 
 
 def format_data(func):
@@ -859,39 +858,6 @@ class BlurImage(object):
         return {"img": img, "blur_image": label}
 
 
-class GaussianBlur(object):
-    """Apply Gaussian Blur with probability to the PIL image.
-    """
-    def __init__(self, p=0.5, radius_min=0.1, radius_max=2.):
-        self.prob = p
-        self.radius_min = radius_min
-        self.radius_max = radius_max
-
-    def __call__(self, img):
-        do_it = random.random() <= self.prob
-        if not do_it:
-            return img
-
-        return img.filter(
-            ImageFilter.GaussianBlur(
-                radius=random.uniform(self.radius_min, self.radius_max)
-            )
-        )
-
-
-class Solarization(object):
-    """Apply Solarization with probability to the PIL image.
-    """
-    def __init__(self, p):
-        self.p = p
-
-    def __call__(self, img):
-        if random.random() < self.p:
-            return ImageOps.solarize(img)
-        else:
-            return img
-
-
 class RandomGrayscale(object):
     """Randomly convert image to grayscale with a probability of p (default 0.1).
 
@@ -954,17 +920,3 @@ class PCALighting(object):
         rgb = rgb.sum(1).squeeze()
         img = img + rgb.reshape(3, 1, 1)
         return img.transpose((1, 2, 0))
-
-
-class RandomApply(object):
-    def __init__(self, transforms: list, p=0.8):
-        super(RandomApply, self).__init__()
-        self.p = p
-        self.transforms = transforms
-
-    def __call__(self, img):
-        if self.p < random.random():
-            return img
-        for t in self.transforms:
-            img = t(img)
-        return img
