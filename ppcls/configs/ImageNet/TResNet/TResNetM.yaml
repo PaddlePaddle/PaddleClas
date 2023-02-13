@@ -26,6 +26,7 @@ AMP:
 # model architecture
 Arch:
   name: TResNetM
+  drop_rate: 0.0
   class_num: 1000
 
 # loss function config for traing/eval process
@@ -45,6 +46,7 @@ Optimizer:
   lr:
     name: Cosine
     learning_rate: 0.6
+    warmup_start_lr: 1e-5
     warmup_epoch: 5
   regularizer:
     name: 'L2'
@@ -64,6 +66,8 @@ DataLoader:
             channel_first: False
         - RandCropImage:
             size: 224
+            backend: pil
+            interpolation: bicubic
         - RandFlipImage:
             flip_code: 1
         - TimmAutoAugment:
@@ -83,12 +87,10 @@ DataLoader:
             attempt: 10
             use_log_aspect: True
             mode: pixel
-        - Cutout:
-            n_holes: 1
-            length: 112
       batch_transform_ops:
         - MixupOperator:
             alpha: 0.2
+            prob: 1.0
 
     sampler:
       name: DistributedBatchSampler
@@ -110,6 +112,8 @@ DataLoader:
             channel_first: False
         - ResizeImage:
             resize_short: 256
+            interpolation: bicubic
+            backend: pil
         - CropImage:
             size: 224
         - NormalizeImage:
@@ -119,7 +123,7 @@ DataLoader:
             order: ''
     sampler:
       name: DistributedBatchSampler
-      batch_size: 128
+      batch_size: 380
       drop_last: False
       shuffle: False
     loader:
@@ -135,6 +139,8 @@ Infer:
         channel_first: False
     - ResizeImage:
         resize_short: 256
+        interpolation: bicubic
+        backend: pil
     - CropImage:
         size: 224
     - NormalizeImage:
