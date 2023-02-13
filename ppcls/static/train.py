@@ -171,7 +171,10 @@ def main(args):
         compiled_train_prog = train_prog
 
     if eval_dataloader is not None:
-        compiled_eval_prog = program.compile(config, eval_prog)
+        if not global_config.get("is_distributed", True):
+            compiled_eval_prog = program.compile(config, eval_prog)
+        else:
+            compiled_eval_prog = eval_prog
 
     for epoch_id in range(global_config["epochs"]):
         # 1. train with train dataset
