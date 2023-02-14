@@ -61,17 +61,15 @@ class ClsModel(BaseModel):
                 [f'Global.checkpoints={resume_path.replace(".pdparams","")}'])
         if dy2st:
             config.update([f'Global.to_static={True}'])
+        if use_vdl:
+            config.update([f'Global.use_visualdl={use_vdl}'])
         if save_dir is not None:
             config.update([f'Global.output_dir={save_dir}'])
         config_path = self._config_path
         config.dump(config_path)
         self.runner.train(config_path, [], device)
 
-    def predict(self,
-                weight_path=None,
-                device=None,
-                input_path=None,
-                save_dir=None):
+    def predict(self, weight_path, input_path, device='gpu', save_dir=None):
         weight_path = abspath(weight_path)
         input_path = abspath(input_path)
         if save_dir is not None:
@@ -95,7 +93,7 @@ class ClsModel(BaseModel):
 
         self.runner.predict(config_path, [], device)
 
-    def export(self, weight_path=None, save_dir=None, input_shape=None):
+    def export(self, weight_path, save_dir=None, input_shape=None):
         weight_path = abspath(weight_path)
         if save_dir is not None:
             save_dir = abspath(save_dir)
@@ -116,7 +114,7 @@ class ClsModel(BaseModel):
 
         self.runner.export(config_path, [], None)
 
-    def infer(self, model_dir, device=None, input_path=None, save_dir=None):
+    def infer(self, model_dir, input_path, device='gpu', save_dir=None):
         model_dir = abspath(model_dir)
         input_path = abspath(input_path)
         if save_dir is not None:
@@ -139,13 +137,15 @@ class ClsModel(BaseModel):
         self.runner.infer(config_path, [], device)
 
     def compression(self,
-                    dataset,
+                    weight_path,
+                    dataset=None,
                     batch_size=None,
                     learning_rate=None,
                     epochs_iters=None,
-                    device=None,
-                    weight_path=None,
-                    save_dir=None):
+                    device='gpu',
+                    use_vdl=True,
+                    save_dir=None,
+                    input_shape=None):
         weight_path = abspath(weight_path)
         if dataset is not None:
             dataset = abspath(dataset)
@@ -170,6 +170,8 @@ class ClsModel(BaseModel):
             config.update([
                 f'Global.pretrained_model={weight_path.replace(".pdparams","")}'
             ])
+        if use_vdl:
+            config.update([f'Global.use_visualdl={use_vdl}'])
         if save_dir is not None:
             config.update([f'Global.output_dir={save_dir}'])
         config_path = self._config_path

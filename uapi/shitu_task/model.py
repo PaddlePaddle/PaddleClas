@@ -67,13 +67,15 @@ class ShiTuModel(ClsModel):
             raise Exception(
                 f'dygraph to static training is not support in {self.__class__.__name__}'
             )
+        if use_vdl:
+            config.update([f'Global.use_visualdl={use_vdl}'])
         if save_dir is not None:
             config.update([f'Global.output_dir={save_dir}'])
         config_path = self._config_path
         config.dump(config_path)
         self.runner.train(config_path, [], device)
 
-    def infer(self, model_dir, device=None, input_path=None, save_dir=None):
+    def infer(self, model_dir, input_path, device='gpu', save_dir=None):
         model_dir = abspath(model_dir)
         if input_path is not None:
             input_path = abspath(input_path)
