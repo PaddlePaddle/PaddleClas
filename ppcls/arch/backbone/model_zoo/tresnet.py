@@ -4,6 +4,7 @@ import paddle.nn.functional as F
 
 from functools import partial
 import os
+import numpy as np
 
 
 # Calculate symmetric padding for a convolution
@@ -40,7 +41,7 @@ class BlurPool2d(nn.Layer):
 
 
 class AntiAliasDownsampleLayer(nn.Layer):
-    def __init__(self, remove_aa_jit: bool = False, filt_size: int = 3, stride: int = 2,
+    def __init__(self, filt_size: int = 3, stride: int = 2,
                  channels: int = 0):
         super(AntiAliasDownsampleLayer, self).__init__()
         self.op = Downsample(filt_size, stride, channels)
@@ -82,7 +83,7 @@ class SpaceToDepth(nn.Layer):
 
 
 class SpaceToDepthModule(nn.Layer):
-    def __init__(self, remove_model_jit=False):
+    def __init__(self):
         super(SpaceToDepthModule, self).__init__()
         self.op = SpaceToDepth()
 
@@ -215,13 +216,13 @@ class Bottleneck(nn.Layer):
         return out
 
 class TResNet(nn.Layer):
-    def __init__(self, layers, in_chans=3, class_num=1000, width_factor=1.0, remove_model_jit=False, **kwargs):
+    def __init__(self, layers, in_chans=3, class_num=1000, width_factor=1.0, **kwargs):
         super(TResNet, self).__init__()
         self.inplanes = int(int(64 * width_factor + 4) / 8) * 8
         self.planes = int(int(64 * width_factor + 4) / 8) * 8
-        SpaceToDepth = SpaceToDepthModule(remove_model_jit=remove_model_jit)
+        SpaceToDepth = SpaceToDepthModule()
         conv1 = Conv2d_ABN(in_chans * 16, self.planes, stride=1, kernel_size=3)
-        anti_alias_layer = partial(AntiAliasDownsampleLayer, remove_aa_jit=remove_model_jit)
+        anti_alias_layer = partial(AntiAliasDownsampleLayer)
         global_pool_layer = FastGlobalAvgPool2d(flatten=True)
         layer1 = self._make_layer(BasicBlock, self.planes, layers[0], stride=1, use_se=True,
                                   anti_alias_layer=anti_alias_layer)   # 56x56
@@ -338,7 +339,7 @@ def _load_pretrained(pretrained, model, use_ssld=False):
         )
 
 def TResNetM(pretrained=False, use_ssld=False, **kwargs):
-    model = TResNet(layers=[3, 4, 11, 3], in_chans=3, width_factor=1.0, remove_model_jit=False, **kwargs)
+    model = TResNet(layers=[3, 4, 11, 3], in_chans=3, width_factor=1.0, **kwargs)
     _load_pretrained(pretrained, model, use_ssld=use_ssld)
     return model
 
