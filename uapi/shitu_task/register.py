@@ -17,13 +17,16 @@ import os.path as osp
 from ..base.register import register_suite_info, register_model_info
 from .model import ShiTuModel
 from .runner import ShiTuRunner
+from .config import ShiTuConfig
 
 # XXX: Hard-code relative path of repo root dir
 REPO_ROOT_PATH = osp.abspath(osp.join(osp.dirname(__file__), '..', '..'))
+
 register_suite_info({
-    'suite_name': 'ShiTuModel',
+    'suite_name': 'ShiTu',
     'model': ShiTuModel,
     'runner': ShiTuRunner,
+    'config': ShiTuConfig,
     'runner_root_path': REPO_ROOT_PATH
 })
 
@@ -34,7 +37,8 @@ PPLCNetV2_base_ShiTu_CFG_PATH = osp.join(
 
 register_model_info({
     'model_name': 'PPLCNetV2_base_ShiTu',
-    'suite': 'ShiTuModel',
+    'suite': 'ShiTu',
     'config_path': PPLCNetV2_base_ShiTu_CFG_PATH,
     'auto_compression_config_path': PPLCNetV2_base_ShiTu_CFG_PATH,
+    'supported_apis': ['train', 'export', 'infer', 'compression']
 })

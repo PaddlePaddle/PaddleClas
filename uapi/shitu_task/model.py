@@ -26,36 +26,38 @@ class ShiTuModel(ClsModel):
         self.config_cls = ShiTuConfig
 
     def train(self,
-              dataset,
+              dataset=None,
               batch_size=None,
               learning_rate=None,
               epochs_iters=None,
-              device=None,
+              device='gpu',
               resume_path=None,
-              dy2st=None,
+              dy2st=False,
               amp=None,
+              use_vdl=True,
               save_dir=None):
         # NOTE: We must use an absolute path here, 
         # so we can run the scripts either inside or outside the repo dir.
-        dataset = abspath(dataset)
-        if dy2st is None:
-            dy2st = False
+        if dataset is not None:
+            dataset = abspath(dataset)
         if resume_path is not None:
             resume_path = abspath(resume_path)
         if save_dir is not None:
             save_dir = abspath(save_dir)
+        else:
+            # `save_dir` is None
+            save_dir = abspath(os.path.join('output', 'train'))
 
         # Update YAML config file
-        config_file_path = self.model_info['config_path']
-        config = self.config_cls.build_from_file(config_file_path)
-        config._update_dataset_config(dataset)
-        config._update_amp_config(amp)
-        config._update_device_config(device)
+        config = self.config.copy()
+        config.update_dataset(dataset)
+        config.update_amp(amp)
+        config.update_device(device)
 
         if batch_size is not None:
-            config._update_batch_size_config(batch_size)
+            config.update_batch_size(batch_size)
         if learning_rate is not None:
-            config._update_lr_config(learning_rate)
+            config.update_lr_scheduler(learning_rate)
         if epochs_iters is not None:
             config.update([f'Global.epochs={epochs_iters}'])
         if resume_path is not None:
@@ -67,16 +69,9 @@ class ShiTuModel(ClsModel):
             )
         if save_dir is not None:
             config.update([f'Global.output_dir={save_dir}'])
-        config_file_path = self.config_file_path
-        config.dump(config_file_path)
-        self.runner.train(config_file_path, device)
-
-    def predict(self,
-                weight_path=None,
-                device=None,
-                input_path=None,
-                save_dir=None):
-        raise Exception(f'predict is not support in {self.__class__.__name__}')
+        config_path = self._config_path
+        config.dump(config_path)
+        self.runner.train(config_path, [], device)
 
     def infer(self, model_dir, device=None, input_path=None, save_dir=None):
         model_dir = abspath(model_dir)
@@ -85,14 +80,15 @@ class ShiTuModel(ClsModel):
         if save_dir is not None:
             save_dir = abspath(save_dir)
 
-        config_file_path = '../deploy/configs/inference_rec.yaml'
-        config = self.config_cls.build_from_file(config_file_path)
+        config_path = '../deploy/configs/inference_rec.yaml'
+        config = self.config.copy()
+        config.load(config_path)
         config.update([f'Global.rec_inference_model_dir={model_dir}'])
         if input_path is not None:
             config.update([f'Global.infer_imgs={input_path}'])
         if device is not None:
             config.update([f'Global.use_gpu={device.split(":")[0]=="gpu"}'])
 
-        config_file_path = self.config_file_path
-        config.dump(config_file_path)
-        self.runner.infer(config_file_path, device)
+        config_path = self._config_path
+        config.dump(config_path)
+        self.runner.infer(config_path, [], device)

@@ -17,13 +17,16 @@ import os.path as osp
 from ..base.register import register_suite_info, register_model_info
 from .model import ClsModel
 from .runner import ClsRunner
+from .config import ClsConfig
 
 # XXX: Hard-code relative path of repo root dir
 REPO_ROOT_PATH = osp.abspath(osp.join(osp.dirname(__file__), '..', '..'))
+
 register_suite_info({
     'suite_name': 'Cls',
     'model': ClsModel,
     'runner': ClsRunner,
+    'config': ClsConfig,
     'runner_root_path': REPO_ROOT_PATH
 })
 
@@ -36,4 +39,5 @@ register_model_info({
     'config_path': PPLCNet_x1_0_CFG_PATH,
     'auto_compression_config_path': osp.join(
         REPO_ROOT_PATH, 'ppcls/configs/slim/PPLCNet_x1_0_quantization.yaml'),
+    'supported_apis': ['train', 'predict', 'export', 'infer', 'compression']
 })

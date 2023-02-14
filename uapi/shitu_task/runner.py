@@ -17,7 +17,8 @@ from ..cls_task import ClsRunner
 
 
 class ShiTuRunner(ClsRunner):
-    def infer(self, config_file_path, device):
+    def infer(self, config_file_path, cli_args, device):
         self.distributed(device)
-        cmd = f"{self.python} python/predict_rec.py -c {config_file_path}"
+        cli_args = " ".join(cli_args)
+        cmd = f"{self.python} python/predict_rec.py -c {config_file_path} {cli_args}"
         self.run_cmd(cmd, switch_wdir='deploy', echo=True, silent=False)

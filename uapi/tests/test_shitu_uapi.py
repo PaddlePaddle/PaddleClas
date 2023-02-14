@@ -21,38 +21,32 @@ sys.path.insert(0, os.path.abspath(os.path.join(__dir__, '..', '..')))
 from uapi import PaddleModel
 
 if __name__ == '__main__':
-    model = PaddleModel(model_name='PPLCNet_x1_0')
+    model = PaddleModel(model_name='PPLCNetV2_base_ShiTu')
 
     model.train(
-        dataset='tests/data/ILSVRC2012',
-        batch_size=2,
+        dataset='tests/data/tipc_shitu_demo_data',
+        batch_size=8,
         epochs_iters=1,
         device='gpu:0',
-        dy2st=True,
+        dy2st=False,
         amp='O1',
-        save_dir='tests/cls_res')
-
-    model.predict(
-        weight_path='tests/cls_res/PPLCNet_x1_0/latest.pdparams',
-        device='gpu',
-        input_path='tests/data/ILSVRC2012/train/ILSVRC2012_val_00000032.JPEG',
-        save_dir='tests/cls_res/pred_res')
+        save_dir='tests/shitu_res')
 
     model.export(
-        weight_path='tests/cls_res/PPLCNet_x1_0/latest.pdparams',
-        save_dir='tests/cls_res/infer')
+        weight_path='tests/shitu_res/RecModel/latest.pdparams',
+        save_dir='tests/shitu_res/infer')
 
     model.infer(
-        model_dir='tests/cls_res/infer',
+        model_dir='tests/shitu_res/infer',
         device='gpu',
-        input_path='tests/data/ILSVRC2012/train/ILSVRC2012_val_00000032.JPEG',
-        save_dir='tests/cls_res/infer_res')
+        input_path='tests/data/tipc_shitu_demo_data/train/111085122871_0.JPG',
+        save_dir='tests/shitu_res/infer_res')
 
     model.compression(
-        dataset='tests/data/ILSVRC2012',
-        batch_size=2,
+        dataset='tests/data/tipc_shitu_demo_data',
+        batch_size=8,
         learning_rate=0.1,
         epochs_iters=1,
         device='gpu',
-        weight_path='tests/cls_res/PPLCNet_x1_0/latest.pdparams',
-        save_dir='tests/cls_res/compress')
+        weight_path='tests/shitu_res/RecModel/latest.pdparams',
+        save_dir='tests/shitu_res/compress')

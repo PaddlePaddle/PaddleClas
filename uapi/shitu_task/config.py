@@ -24,21 +24,21 @@ from ..cls_task import ClsConfig
 
 class ShiTuConfig(ClsConfig):
 
-    def _update_dataset_config(self, dataset_root_path):
+    def update_dataset(self,  dataset_path, dataset_type=None):
         _cfg = [
             'DataLoader.Train.dataset.name=ImageNetDataset',
-            f'DataLoader.Train.dataset.image_root={dataset_root_path}',
-            f'DataLoader.Train.dataset.cls_label_path={dataset_root_path}/train.txt',
+            f'DataLoader.Train.dataset.image_root={dataset_path}',
+            f'DataLoader.Train.dataset.cls_label_path={dataset_path}/train.txt',
             'DataLoader.Eval.Query.dataset.name=VeriWild',
-            f'DataLoader.Eval.Query.dataset.image_root={dataset_root_path}',
-            f'DataLoader.Eval.Query.dataset.cls_label_path={dataset_root_path}/val.txt',
+            f'DataLoader.Eval.Query.dataset.image_root={dataset_path}',
+            f'DataLoader.Eval.Query.dataset.cls_label_path={dataset_path}/val.txt',
             'DataLoader.Eval.Gallery.dataset.name=VeriWild',
-            f'DataLoader.Eval.Gallery.dataset.image_root={dataset_root_path}',
-            f'DataLoader.Eval.Gallery.dataset.cls_label_path={dataset_root_path}/val.txt',
+            f'DataLoader.Eval.Gallery.dataset.image_root={dataset_path}',
+            f'DataLoader.Eval.Gallery.dataset.cls_label_path={dataset_path}/val.txt',
         ]
         self.update(_cfg)
 
-    def _update_batch_size_config(self, batch_size):
+    def update_batch_size(self, batch_size):
         _cfg = [
             f'DataLoader.Train.sampler.batch_size={batch_size}',
             f'DataLoader.Eval.Query.sampler.batch_size={batch_size}',

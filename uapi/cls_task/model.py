@@ -18,48 +18,42 @@ from ..base import BaseModel
 from ..base.utils.path import get_cache_dir
 from ..base.utils.arg import CLIArgument
 from ..base.utils.misc import abspath
-from .config import ClsConfig
 
 
 class ClsModel(BaseModel):
-    def __init__(self, model_name):
-        super().__init__(model_name)
-        self.update_config_cls()
-
-    def update_config_cls(self):
-        self.config_cls = ClsConfig
-
     def train(self,
-              dataset,
+              dataset=None,
               batch_size=None,
               learning_rate=None,
               epochs_iters=None,
-              device=None,
+              device='gpu',
               resume_path=None,
-              dy2st=None,
+              dy2st=False,
               amp=None,
+              use_vdl=True,
               save_dir=None):
         # NOTE: We must use an absolute path here, 
         # so we can run the scripts either inside or outside the repo dir.
-        dataset = abspath(dataset)
-        if dy2st is None:
-            dy2st = False
+        if dataset is not None:
+            dataset = abspath(dataset)
         if resume_path is not None:
             resume_path = abspath(resume_path)
         if save_dir is not None:
             save_dir = abspath(save_dir)
+        else:
+            # `save_dir` is None
+            save_dir = abspath(os.path.join('output', 'train'))
 
         # Update YAML config file
-        config_file_path = self.model_info['config_path']
-        config = self.config_cls.build_from_file(config_file_path)
-        config._update_dataset_config(dataset)
-        config._update_amp_config(amp)
-        config._update_device_config(device)
+        config = self.config.copy()
+        config.update_dataset(dataset)
+        config.update_amp(amp)
+        config.update_device(device)
 
         if batch_size is not None:
-            config._update_batch_size_config(batch_size)
+            config.update_batch_size(batch_size)
         if learning_rate is not None:
-            config._update_lr_config(learning_rate)
+            config.update_lr_scheduler(learning_rate)
         if epochs_iters is not None:
             config.update([f'Global.epochs={epochs_iters}'])
         if resume_path is not None:
@@ -69,25 +63,26 @@ class ClsModel(BaseModel):
             config.update([f'Global.to_static={True}'])
         if save_dir is not None:
             config.update([f'Global.output_dir={save_dir}'])
-        config_file_path = self.config_file_path
-        config.dump(config_file_path)
-        self.runner.train(config_file_path, device)
+        config_path = self._config_path
+        config.dump(config_path)
+        self.runner.train(config_path, [], device)
 
     def predict(self,
                 weight_path=None,
                 device=None,
                 input_path=None,
                 save_dir=None):
-        if weight_path is not None:
-            weight_path = abspath(weight_path)
-        if input_path is not None:
-            input_path = abspath(input_path)
+        weight_path = abspath(weight_path)
+        input_path = abspath(input_path)
         if save_dir is not None:
             save_dir = abspath(save_dir)
+        else:
+            # `save_dir` is None
+            save_dir = abspath(os.path.join('output', 'predict'))
+
 
         # Update YAML config file
-        config_file_path = self.model_info['config_path']
-        config = self.config_cls.build_from_file(config_file_path)
+        config = self.config.copy()
         if weight_path is not None:
             config.update([
                 f'Global.pretrained_model={weight_path.replace(".pdparams","")}'
@@ -96,49 +91,53 @@ class ClsModel(BaseModel):
             config.update([f'Infer.infer_imgs={input_path}'])
         if save_dir is not None:
             pass
-        config_file_path = self.config_file_path
-        config.dump(config_file_path)
+        config_path = self._config_path
+        config.dump(config_path)
 
-        self.runner.predict(config_file_path, device)
+        self.runner.predict(config_path, [], device)
 
     def export(self, weight_path=None, save_dir=None, input_shape=None):
-        if weight_path is not None:
-            weight_path = abspath(weight_path)
+        weight_path = abspath(weight_path)
         if save_dir is not None:
             save_dir = abspath(save_dir)
+        else:
+            # `save_dir` is None
+            save_dir = abspath(os.path.join('output', 'export'))
 
         # Update YAML config file
-        config_file_path = self.model_info['config_path']
-        config = self.config_cls.build_from_file(config_file_path)
+        config = self.config.copy()
         if weight_path is not None:
             config.update([
                 f'Global.pretrained_model={weight_path.replace(".pdparams","")}'
             ])
         if save_dir is not None:
             config.update([f'Global.save_inference_dir={save_dir}'])
-        config_file_path = self.config_file_path
-        config.dump(config_file_path)
+        config_path = self._config_path
+        config.dump(config_path)
 
-        self.runner.export(config_file_path, None)
+        self.runner.export(config_path, [], None)
 
     def infer(self, model_dir, device=None, input_path=None, save_dir=None):
         model_dir = abspath(model_dir)
-        if input_path is not None:
-            input_path = abspath(input_path)
+        input_path = abspath(input_path)
         if save_dir is not None:
             save_dir = abspath(save_dir)
+        else:
+            # `save_dir` is None
+            save_dir = abspath(os.path.join('output', 'infer'))
 
-        config_file_path = '../deploy/configs/inference_cls.yaml'
-        config = self.config_cls.build_from_file(config_file_path)
+        config_path = '../deploy/configs/inference_cls.yaml'
+        config = self.config.copy()
+        config.load(config_path)
         config.update([f'Global.inference_model_dir={model_dir}'])
         if input_path is not None:
             config.update([f'Global.infer_imgs={input_path}'])
         if device is not None:
             config.update([f'Global.use_gpu={device.split(":")[0]=="gpu"}'])
 
-        config_file_path = self.config_file_path
-        config.dump(config_file_path)
-        self.runner.infer(config_file_path, device)
+        config_path = self._config_path
+        config.dump(config_path)
+        self.runner.infer(config_path, [], device)
 
     def compression(self,
                     dataset,
@@ -148,22 +147,24 @@ class ClsModel(BaseModel):
                     device=None,
                     weight_path=None,
                     save_dir=None):
-        dataset = abspath(dataset)
-        if weight_path is not None:
-            weight_path = abspath(weight_path)
+        weight_path = abspath(weight_path)
+        if dataset is not None:
+            dataset = abspath(dataset)
         if save_dir is not None:
             save_dir = abspath(save_dir)
+        else:
+            # `save_dir` is None
+            save_dir = abspath(os.path.join('output', 'compress'))
 
         # Update YAML config file
-        config_file_path = self.model_info['auto_compression_config_path']
-        config = self.config_cls.build_from_file(config_file_path)
-        config._update_dataset_config(dataset)
-        config._update_device_config(device)
+        config = self.config.copy()
+        config.update_dataset(dataset)
+        config.update_device(device)
 
         if batch_size is not None:
-            config._update_batch_size_config(batch_size)
+            config.update_batch_size(batch_size)
         if learning_rate is not None:
-            config._update_lr_config(learning_rate)
+            config.update_lr_scheduler(learning_rate)
         if epochs_iters is not None:
             config.update([f'Global.epochs={epochs_iters}'])
         if weight_path is not None:
@@ -172,7 +173,11 @@ class ClsModel(BaseModel):
             ])
         if save_dir is not None:
             config.update([f'Global.output_dir={save_dir}'])
-        config_file_path = self.config_file_path
-        config.dump(config_file_path)
+        config_path = self._config_path
+        config.dump(config_path)
 
-        self.runner.compression(config_file_path, device)
+        model_name = self.name
+        if self.name == 'PPLCNetV2_base_ShiTu':
+            model_name = 'RecModel'
+
+        self.runner.compression(config_path, [], device, save_dir, model_name)

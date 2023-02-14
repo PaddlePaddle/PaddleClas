@@ -37,25 +37,30 @@ class ClsConfig(BaseConfig):
         with open(config_file_path, 'w') as f:
             yaml.dump(self.dict, f, default_flow_style=False, sort_keys=False)
 
-    def _update_dataset_config(self, dataset_root_path):
-        _cfg = [
-            'DataLoader.Train.dataset.name=ImageNetDataset',
-            f'DataLoader.Train.dataset.image_root={dataset_root_path}',
-            f'DataLoader.Train.dataset.cls_label_path={dataset_root_path}/train.txt',
-            'DataLoader.Eval.dataset.name=ImageNetDataset',
-            f'DataLoader.Eval.dataset.image_root={dataset_root_path}',
-            f'DataLoader.Eval.dataset.cls_label_path={dataset_root_path}/val.txt',
-        ]
-        self.update(_cfg)
+    def update_dataset(self, dataset_path, dataset_type=None):
+        if dataset_type is None:
+            dataset_type = 'ImageNetDataset'
+        if dataset_type == 'ImageNetDataset':
+            ds_cfg = [
+                f'DataLoader.Train.dataset.name={dataset_type}',
+                f'DataLoader.Train.dataset.image_root={dataset_path}',
+                f'DataLoader.Train.dataset.cls_label_path={dataset_path}/train.txt',
+                f'DataLoader.Eval.dataset.name={dataset_type}',
+                f'DataLoader.Eval.dataset.image_root={dataset_path}',
+                f'DataLoader.Eval.dataset.cls_label_path={dataset_path}/val.txt',
+            ]
+        else:
+            raise ValueError(f"{dataset_type} is not supported.")
+        self.update(ds_cfg)
 
-    def _update_batch_size_config(self, batch_size):
+    def update_batch_size(self, batch_size, mode='train'):
         _cfg = [
             f'DataLoader.Train.sampler.batch_size={batch_size}',
             f'DataLoader.Eval.sampler.batch_size={batch_size}',
         ]
         self.update(_cfg)
 
-    def _update_amp_config(self, amp):
+    def update_amp(self, amp):
         if amp is None:
             if 'AMP' in self.dict:
                 self._dict.pop('AMP')
@@ -67,17 +72,29 @@ class ClsConfig(BaseConfig):
             ]
             self.update(_cfg)
 
-    def _update_lr_config(self, lr):
-        _cfg = [
-            f'Optimizer.lr.learning_rate={lr}',
-            # 'Optimizer.lr.warmup_epoch': 0,
-            # 'Optimizer.lr.name': 'Const',
-        ]
-        self.update(_cfg)
-
-    def _update_device_config(self, device):
+    def update_device(self, device):
         device = device.split(':')[0]
         _cfg = [
             f'Global.device={device}'
         ]
         self.update(_cfg)
+    
+    def update_optimizer(self, optimizer_type):
+        # Not yet implemented
+        raise NotImplementedError
+
+    def update_backbone(self, backbone_type):
+        # Not yet implemented
+        raise NotImplementedError
+
+    def update_lr_scheduler(self, lr_scheduler_type):
+        _cfg = [
+            f'Optimizer.lr.learning_rate={lr_scheduler_type}',
+            # 'Optimizer.lr.warmup_epoch': 0,
+            # 'Optimizer.lr.name': 'Const',
+        ]
+        self.update(_cfg)
+
+    def update_weight_decay(self, weight_decay):
+        # Not yet implemented
+        raise NotImplementedError
