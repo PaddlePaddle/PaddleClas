@@ -80,7 +80,6 @@ class ClsModel(BaseModel):
             # `save_dir` is None
             save_dir = abspath(os.path.join('output', 'predict'))
 
-
         # Update YAML config file
         config = self.config.copy()
         if weight_path is not None:

@@ -26,9 +26,9 @@ class ClsConfig(BaseConfig):
     def update(self, list_like_obj):
         dict_ = override_config(self.dict, list_like_obj)
         self.reset_from_dict(dict_)
-    
+
     def load(self, config_file_path):
-        dict_ =  yaml.load(open(config_file_path, 'rb'), Loader=yaml.Loader)
+        dict_ = yaml.load(open(config_file_path, 'rb'), Loader=yaml.Loader)
         if not isinstance(dict_, dict):
             raise TypeError
         self.reset_from_dict(dict_)
@@ -66,19 +66,16 @@ class ClsConfig(BaseConfig):
                 self._dict.pop('AMP')
         else:
             _cfg = [
-                'AMP.scale_loss=128',
-                'AMP.use_dynamic_loss_scaling=True',
+                'AMP.scale_loss=128', 'AMP.use_dynamic_loss_scaling=True',
                 f'AMP.level={amp}'
             ]
             self.update(_cfg)
 
     def update_device(self, device):
         device = device.split(':')[0]
-        _cfg = [
-            f'Global.device={device}'
-        ]
+        _cfg = [f'Global.device={device}']
         self.update(_cfg)
-    
+
     def update_optimizer(self, optimizer_type):
         # Not yet implemented
         raise NotImplementedError

@@ -35,7 +35,8 @@ class PaddleModel(object):
         elif model_name is None and config is not None:
             model_name = config.model_name
         model_info = get_registered_model_info(model_name)
-        return build_model_from_model_info(model_info=model_info, config=config)
+        return build_model_from_model_info(
+            model_info=model_info, config=config)
 
 
 class BaseModel(metaclass=abc.ABCMeta):

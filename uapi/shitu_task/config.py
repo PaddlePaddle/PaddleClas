@@ -23,8 +23,7 @@ from ..cls_task import ClsConfig
 
 
 class ShiTuConfig(ClsConfig):
-
-    def update_dataset(self,  dataset_path, dataset_type=None):
+    def update_dataset(self, dataset_path, dataset_type=None):
         _cfg = [
             'DataLoader.Train.dataset.name=ImageNetDataset',
             f'DataLoader.Train.dataset.image_root={dataset_path}',

@@ -41,7 +41,8 @@ class ClsRunner(BaseRunner):
         cmd = f"{self.python} python/predict_cls.py -c {config_file_path} {cli_args}"
         self.run_cmd(cmd, switch_wdir='deploy', echo=True, silent=False)
 
-    def compression(self, config_file_path, cli_args, device, save_dir, model_name):
+    def compression(self, config_file_path, cli_args, device, save_dir,
+                    model_name):
         # Step 1: Train model
         self.train(config_file_path, cli_args, device)
 
