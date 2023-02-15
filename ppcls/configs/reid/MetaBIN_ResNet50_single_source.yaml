@@ -1,7 +1,7 @@
 # global configs
 Global:
   checkpoints: null
-  pretrained_model: null #"metabin_resnet50_final"
+  pretrained_model: null
   output_dir: "./output/"
   device: "gpu"
   iter_per_epoch: &iter_per_epoch 50
@@ -29,7 +29,7 @@ Arch:
   name: "RecModel"
   Backbone:
     name: "ResNet50_metabin"
-    pretrained: False # "metabin_resnet50_backbone_pretrained"
+    pretrained: False
     bias_lr_factor: 2.0
   BackboneStopLayer:
     name: "flatten"

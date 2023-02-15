@@ -22,6 +22,12 @@ from paddle.io import Sampler, BatchSampler
 class DomainShuffleSampler(Sampler):
     """
     Domain shuffle sampler
+    Args:
+        dataset(Dataset): Dataset for sampling
+        batch_size (int): Number of examples in a batch.
+        num_instances (int): Number of instances per identity in a batch.
+        camera_to_domain (bool): If True, consider each camera as an individual domain
+    
     Code was heavily based on https://github.com/bismex/MetaBIN
     reference: https://arxiv.org/abs/2011.14670v2
     """
@@ -177,9 +183,9 @@ class NaiveIdentitySampler(Sampler):
     Randomly sample N identities, then for each identity,
     randomly sample K instances, therefore batch size is N*K.
     Args:
-    - data_source (list): list of (img_path, pid, camid).
-    - num_instances (int): number of instances per identity in a batch.
-    - batch_size (int): number of examples in a batch.
+        dataset(Dataset): Dataset for sampling
+        batch_size (int): Number of examples in a batch.
+        num_instances (int): Number of instances per identity in a batch.
 
     Code was heavily based on https://github.com/bismex/MetaBIN
     reference: https://arxiv.org/abs/2011.14670v2

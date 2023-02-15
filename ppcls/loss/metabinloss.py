@@ -36,12 +36,12 @@ def euclidean_dist(x, y):
 def hard_example_mining(dist_mat, is_pos, is_neg):
     """For each anchor, find the hardest positive and negative sample.
     Args:
-      dist_mat: pairwise distance between samples, shape [N, M]
-      is_pos: positive index with shape [N, M]
-      is_neg: negative index with shape [N, M]
+        dist_mat: pairwise distance between samples, shape [N, M]
+        is_pos: positive index with shape [N, M]
+        is_neg: negative index with shape [N, M]
     Returns:
-      dist_ap: distance(anchor, positive); shape [N, 1]
-      dist_an: distance(anchor, negative); shape [N, 1]
+        dist_ap: distance(anchor, positive); shape [N, 1]
+        dist_an: distance(anchor, negative); shape [N, 1]
     """
 
     inf = float("inf")
