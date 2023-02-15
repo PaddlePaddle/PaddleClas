@@ -257,21 +257,21 @@ class Cyclic(LRBase):
     """Cyclic learning rate decay
     
     Args:
-        epochs (int): total epoch(s)
-        step_each_epoch (int): number of iterations within an epoch
+        epochs (int): Total epoch(s)
+        step_each_epoch (int): Number of iterations within an epoch
         base_learning_rate (float): Initial learning rate, which is the lower boundary in the cycle. The paper recommends
             that set the base_learning_rate to 1/3 or 1/4 of max_learning_rate.
         max_learning_rate (float): Maximum learning rate in the cycle. It defines the cycle amplitude as above.
             Since there is some scaling operation during process of learning rate adjustment,
             max_learning_rate may not actually be reached.
-        warmup_epoch (int): number of warmup epoch(s)
-        warmup_start_lr (float): start learning rate within warmup
+        warmup_epoch (int): Number of warmup epoch(s)
+        warmup_start_lr (float): Start learning rate within warmup
         step_size_up (int): Number of training steps, which is used to increase learning rate in a cycle.
             The step size of one cycle will be defined by step_size_up + step_size_down. According to the paper, step
             size should be set as at least 3 or 4 times steps in one epoch.
         step_size_down (int, optional): Number of training steps, which is used to decrease learning rate in a cycle.
             If not specified, it's value will initialize to `` step_size_up `` . Default: None
-        mode (str, optional): one of 'triangular', 'triangular2' or 'exp_range'.
+        mode (str, optional): One of 'triangular', 'triangular2' or 'exp_range'.
             If scale_fn is specified, this argument will be ignored. Default: 'triangular'
         exp_gamma (float): Constant in 'exp_range' scaling function: exp_gamma**iterations. Used only when mode = 'exp_range'. Default: 1.0
         scale_fn (function, optional): A custom scaling function, which is used to replace three build-in methods.
@@ -279,8 +279,8 @@ class Cyclic(LRBase):
             If specified, then 'mode' will be ignored. Default: None
         scale_mode (str, optional): One of 'cycle' or 'iterations'. Defines whether scale_fn is evaluated on cycle
             number or cycle iterations (total iterations since start of training). Default: 'cycle'
-        last_epoch (int, optional): The index of last epoch. Can be set to restart training.Default: -1, means initial learning rate.
-        by_epoch (bool): learning rate decays by epoch when by_epoch is True, else by iter
+        last_epoch (int, optional): The index of last epoch. Can be set to restart training. Default: -1, means initial learning rate.
+        by_epoch (bool): Learning rate decays by epoch when by_epoch is True, else by iter
         verbose: (bool, optional): If True, prints a message to stdout for each update. Defaults to False
     """
 
@@ -300,7 +300,6 @@ class Cyclic(LRBase):
                  by_epoch=False,
                  last_epoch=-1,
                  verbose=False):
-
         super(Cyclic, self).__init__(
             epochs, step_each_epoch, base_learning_rate, warmup_epoch,
             warmup_start_lr, last_epoch, by_epoch, verbose)
