@@ -168,6 +168,8 @@ class RandomApply(object):
         self.trans = T.Compose(ts)
 
     def __call__(self, img):
+        if self.p < np.random.rand(1):
+            return img
         timg = self.trans(img)
         return timg
 
