@@ -71,6 +71,7 @@ from .model_zoo.mobilevit import MobileViT_XXS, MobileViT_XS, MobileViT_S
 from .model_zoo.repvgg import RepVGG_A0, RepVGG_A1, RepVGG_A2, RepVGG_B0, RepVGG_B1, RepVGG_B2, RepVGG_B1g2, RepVGG_B1g4, RepVGG_B2g4, RepVGG_B3, RepVGG_B3g4, RepVGG_D2se
 from .model_zoo.van import VAN_B0, VAN_B1, VAN_B2, VAN_B3
 from .model_zoo.peleenet import PeleeNet
+from .model_zoo.foundation_vit import CLIP_vit_base_patch32_224, CLIP_vit_base_patch16_224, CLIP_vit_large_patch14_336, CLIP_vit_large_patch14_224, BEiTv2_vit_base_patch16_224, BEiTv2_vit_large_patch16_224, CAE_vit_base_patch16_224, EVA_vit_huge_patch14, MOCOV3_vit_small, MOCOV3_vit_base, MAE_vit_huge_patch14, MAE_vit_large_patch16, MAE_vit_base_patch16
 from .model_zoo.convnext import ConvNeXt_tiny, ConvNeXt_small, ConvNeXt_base_224, ConvNeXt_base_384, ConvNeXt_large_224, ConvNeXt_large_384
 from .model_zoo.nextvit import NextViT_small_224, NextViT_base_224, NextViT_large_224, NextViT_small_384, NextViT_base_384, NextViT_large_384
 from .model_zoo.cae import cae_base_patch16_224, cae_large_patch16_224

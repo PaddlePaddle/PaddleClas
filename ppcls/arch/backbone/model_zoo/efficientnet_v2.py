@@ -365,7 +365,7 @@ def drop_path(x, training=False, survival_prob=1.0):
     if not training:
         return x
     shape = (paddle.shape(x)[0], ) + (1, ) * (x.ndim - 1)
-    keep_prob = paddle.to_tensor(survival_prob)
+    keep_prob = paddle.to_tensor(survival_prob, dtype=x.dtype)
     random_tensor = keep_prob + paddle.rand(shape).astype(x.dtype)
     random_tensor = paddle.floor(random_tensor)  # binarize
     output = x.divide(keep_prob) * random_tensor

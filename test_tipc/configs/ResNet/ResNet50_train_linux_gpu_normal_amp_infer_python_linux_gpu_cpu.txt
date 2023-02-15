@@ -54,3 +54,4 @@ null:null
 batch_size:128|256
 fp_items:purefp16
 epoch:1
+model_type:norm_train

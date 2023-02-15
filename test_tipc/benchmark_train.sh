@@ -90,6 +90,8 @@ line_num=`expr $line_num + 1`
 fp_items=$(func_parser_value "${lines[line_num]}")
 line_num=`expr $line_num + 1`
 epoch=$(func_parser_value "${lines[line_num]}")
+line_num=`expr $line_num + 1`
+model_type=$(func_parser_value "${lines[line_num]}")
 
 line_num=`expr $line_num + 1`
 profile_option_key=$(func_parser_key "${lines[line_num]}")
@@ -118,6 +120,7 @@ line_gpuid=4
 line_precision=6
 line_epoch=7
 line_batchsize=9
+line_model_type=15
 line_profile=13
 line_eval_py=24
 line_export_py=30
@@ -138,6 +141,7 @@ if [[ ! -n "$PARAMS" ]];then
     batch_size_list=(${batch_size})
     fp_items_list=(${fp_items})
     device_num_list=(N1C4)
+    model_type_list=(${model_type})
     run_mode="DP"
 elif [[ ${PARAMS} = "dynamicTostatic" ]];then
     IFS="|"
@@ -165,14 +169,13 @@ else
     fp_items_list=($precision)
     batch_size_list=($batch_size)
     device_num_list=($device_num)
-fi
 
-# for log name
-to_static=""
-# parse "to_static" options and modify trainer into "to_static_trainer"
-if [[ ${model_type} = "dynamicTostatic" ]];then
-    to_static="d2sT_"
-    sed -i 's/trainer:norm_train/trainer:to_static_train/g' $FILENAME
+    # parse "to_static" options and modify trainer into "to_static_trainer"
+    if [[ ${model_type} = "dynamicTostatic" ]];then
+        model_type_list="to_static_train"
+    else
+        model_type_list="norm_train"
+    fi
 fi
 
 
@@ -180,131 +183,124 @@ IFS="|"
 for batch_size in ${batch_size_list[*]}; do
     for precision in ${fp_items_list[*]}; do
         for device_num in ${device_num_list[*]}; do
-            # sed batchsize and precision
-            func_sed_params "$FILENAME" "${line_precision}" "$precision"
-            func_sed_params "$FILENAME" "${line_batchsize}" "$batch_size"
-            func_sed_params "$FILENAME" "${line_epoch}" "$epoch"
-            gpu_id=$(set_gpu_id $device_num)
+            for model_type in ${model_type_list[*]}; do
+                # sed batchsize and precision
+                func_sed_params "$FILENAME" "${line_precision}" "$precision"
+                func_sed_params "$FILENAME" "${line_batchsize}" "$batch_size"
+                func_sed_params "$FILENAME" "${line_epoch}" "$epoch"
+                func_sed_params "$FILENAME" "${line_model_type}" "$model_type"
 
-            # It is needed that using dali, NHWC and 4 channels when training ResNet50 with AMPO2
-            if [[ $model_name == "ResNet50" && $precision == "fp16" ]]; then
-                sed -i "s/ResNet50.yaml/ResNet50_amp_O2_ultra.yaml/g" $FILENAME
-            fi
-
-            # if bs is big, then copy train_list.txt to generate more train log
-            # At least 25 log number would be good to calculate ips for benchmark system.
-            # So the copy number for train_list is as follows:
-            total_batch_size=`echo $[$batch_size*${device_num:1:1}*${device_num:3:3}]`
-            if [[ $model_name == *GeneralRecognition* ]]; then
-                cd dataset/
-                train_list_length=`cat train_reg_all_data.txt | wc -l`
-                copy_num=`echo $[25*10*$total_batch_size/$train_list_length]`
-                if [[ $copy_num -gt 1 ]];then
-                    rm -rf train_reg_all_data.txt
-                    for ((i=1; i <=$copy_num; i++));do
-                        cat tipc_shitu_demo_data/demo_train.txt >> train_reg_all_data.txt
-                    done
-                fi
-                cd ..
-            else
-                cd dataset/ILSVRC2012
-                val_list_length=`cat val_list.txt | wc -l`
-                copy_num=`echo $[25*10*$total_batch_size/$val_list_length]`
-                rm -rf train_list.txt
-                if [[ $copy_num -gt 1 ]];then
-                    for ((i=1; i <=$copy_num; i++));do
-                        cat val_list.txt >> train_list.txt
-                    done
+                # for log name
+                if [[ ${model_type} = "to_static_train" ]];then
+                    to_static="d2sT_"
                 else
-                    ln -s val_list.txt train_list.txt
+                    to_static=""
                 fi
-                cd ../../
-            fi
 
-            if [[ ${#gpu_id} -le 1 ]];then
-                log_path="$SAVE_LOG/profiling_log"
-                mkdir -p $log_path
-                log_name="${repo_name}_${model_name}_bs${batch_size}_${precision}_${run_mode}_${device_num}_${to_static}profiling"
-                func_sed_params "$FILENAME" "${line_gpuid}" "0"  # sed used gpu_id
-                # set profile_option params
-                tmp=`sed -i "${line_profile}s/.*/${profile_option}/" "${FILENAME}"`
+                gpu_id=$(set_gpu_id $device_num)
 
-                # run test_train_inference_python.sh
-                cmd="bash test_tipc/test_train_inference_python.sh ${FILENAME} benchmark_train > ${log_path}/${log_name} 2>&1 "
-                echo $cmd
-                eval $cmd
-                eval "cat ${log_path}/${log_name}"
+                # if bs is big, then copy train_list.txt to generate more train log
+                # At least 25 log number would be good to calculate ips for benchmark system.
+                # So the copy number for train_list is as follows:
+                total_batch_size=`echo $[$batch_size*${device_num:1:1}*${device_num:3:3}]`
+                if [[ $model_name == *GeneralRecognition* ]]; then
+                    cd dataset/
+                    train_list_length=`cat train_reg_all_data.txt | wc -l`
+                    copy_num=`echo $[25*10*$total_batch_size/$train_list_length]`
+                    if [[ $copy_num -gt 1 ]];then
+                        rm -rf train_reg_all_data.txt
+                        for ((i=1; i <=$copy_num; i++));do
+                            cat tipc_shitu_demo_data/demo_train.txt >> train_reg_all_data.txt
+                        done
+                    fi
+                    cd ..
+                fi
 
-                # without profile
-                log_path="$SAVE_LOG/train_log"
-                speed_log_path="$SAVE_LOG/index"
-                mkdir -p $log_path
-                mkdir -p $speed_log_path
-                log_name="${repo_name}_${model_name}_bs${batch_size}_${precision}_${run_mode}_${device_num}_${to_static}log"
-                speed_log_name="${repo_name}_${model_name}_bs${batch_size}_${precision}_${run_mode}_${device_num}_${to_static}speed"
-                func_sed_params "$FILENAME" "${line_profile}" "null"  # sed profile_id as null
-                cmd="bash test_tipc/test_train_inference_python.sh ${FILENAME} benchmark_train > ${log_path}/${log_name} 2>&1 "
-                echo $cmd
-                job_bt=`date '+%Y%m%d%H%M%S'`
-                eval $cmd
-                job_et=`date '+%Y%m%d%H%M%S'`
-                export model_run_time=$((${job_et}-${job_bt}))
-                eval "cat ${log_path}/${log_name}"
+                if [[ ${#gpu_id} -le 1 ]];then
+                    log_path="$SAVE_LOG/profiling_log"
+                    mkdir -p $log_path
+                    log_name="${repo_name}_${model_name}_bs${batch_size}_${precision}_${run_mode}_${device_num}_${to_static}profiling"
+                    func_sed_params "$FILENAME" "${line_gpuid}" "0"  # sed used gpu_id
+                    # set profile_option params
+                    tmp=`sed -i "${line_profile}s/.*/${profile_option}/" "${FILENAME}"`
 
-                # parser log
-                _model_name="${model_name}_bs${batch_size}_${precision}_${run_mode}"
-                cmd="${python} ${BENCHMARK_ROOT}/scripts/analysis.py --filename ${log_path}/${log_name} \
-                        --speed_log_file '${speed_log_path}/${speed_log_name}' \
-                        --model_name ${_model_name} \
-                        --base_batch_size ${batch_size} \
-                        --run_mode ${run_mode} \
-                        --fp_item ${precision} \
-                        --keyword ips: \
-                        --skip_steps 100 \
-                        --device_num ${device_num} \
-                        --speed_unit samples/s \
-                        --convergence_key loss: "
-                echo $cmd
-                eval $cmd
-                last_status=${PIPESTATUS[0]}
-                status_check $last_status "${cmd}" "${status_log}" "${model_name}"
-            else
-                IFS=";"
-                unset_env=`unset CUDA_VISIBLE_DEVICES`
-                log_path="$SAVE_LOG/train_log"
-                speed_log_path="$SAVE_LOG/index"
-                mkdir -p $log_path
-                mkdir -p $speed_log_path
-                log_name="${repo_name}_${model_name}_bs${batch_size}_${precision}_${run_mode}_${device_num}_${to_static}log"
-                speed_log_name="${repo_name}_${model_name}_bs${batch_size}_${precision}_${run_mode}_${device_num}_${to_static}speed"
-                func_sed_params "$FILENAME" "${line_gpuid}" "$gpu_id"  # sed used gpu_id
-                func_sed_params "$FILENAME" "${line_profile}" "null"  # sed --profile_option as null
-                cmd="bash test_tipc/test_train_inference_python.sh ${FILENAME} benchmark_train > ${log_path}/${log_name} 2>&1 "
-                echo $cmd
-                job_bt=`date '+%Y%m%d%H%M%S'`
-                eval $cmd
-                job_et=`date '+%Y%m%d%H%M%S'`
-                export model_run_time=$((${job_et}-${job_bt}))
-                eval "cat ${log_path}/${log_name}"
-                # parser log
-                _model_name="${model_name}_bs${batch_size}_${precision}_${run_mode}"
+                    # run test_train_inference_python.sh
+                    cmd="timeout 5m bash test_tipc/test_train_inference_python.sh ${FILENAME} benchmark_train > ${log_path}/${log_name} 2>&1 "
+                    echo $cmd
+                    eval ${cmd}
+                    eval "cat ${log_path}/${log_name}"
 
-                cmd="${python} ${BENCHMARK_ROOT}/scripts/analysis.py --filename ${log_path}/${log_name} \
-                        --speed_log_file '${speed_log_path}/${speed_log_name}' \
-                        --model_name ${_model_name} \
-                        --base_batch_size ${batch_size} \
-                        --run_mode ${run_mode} \
-                        --fp_item ${precision} \
-                        --keyword ips: \
-                        --skip_steps 100 \
-                        --device_num ${device_num} \
-                        --speed_unit images/s \
-                        --convergence_key loss: "
-                echo $cmd
-                eval $cmd
-                last_status=${PIPESTATUS[0]}
-                status_check $last_status "${cmd}" "${status_log}" "${model_name}"
-            fi
+                    # without profile
+                    log_path="$SAVE_LOG/train_log"
+                    speed_log_path="$SAVE_LOG/index"
+                    mkdir -p $log_path
+                    mkdir -p $speed_log_path
+                    log_name="${repo_name}_${model_name}_bs${batch_size}_${precision}_${run_mode}_${device_num}_${to_static}log"
+                    speed_log_name="${repo_name}_${model_name}_bs${batch_size}_${precision}_${run_mode}_${device_num}_${to_static}speed"
+                    func_sed_params "$FILENAME" "${line_profile}" "null"  # sed profile_id as null
+                    cmd="timeout 5m bash test_tipc/test_train_inference_python.sh ${FILENAME} benchmark_train > ${log_path}/${log_name} 2>&1 "
+                    echo $cmd
+                    job_bt=`date '+%Y%m%d%H%M%S'`
+                    eval ${cmd}
+                    job_et=`date '+%Y%m%d%H%M%S'`
+                    export model_run_time=$((${job_et}-${job_bt}))
+                    eval "cat ${log_path}/${log_name}"
+
+                    # parser log
+                    _model_name="${model_name}_bs${batch_size}_${precision}_${run_mode}"
+                    cmd="${python} ${BENCHMARK_ROOT}/scripts/analysis.py --filename ${log_path}/${log_name} \
+                            --speed_log_file '${speed_log_path}/${speed_log_name}' \
+                            --model_name ${_model_name} \
+                            --base_batch_size ${batch_size} \
+                            --run_mode ${run_mode} \
+                            --fp_item ${precision} \
+                            --keyword ips: \
+                            --skip_steps 100 \
+                            --device_num ${device_num} \
+                            --speed_unit samples/s \
+                            --convergence_key loss: "
+                    echo $cmd
+                    eval $cmd
+                    last_status=${PIPESTATUS[0]}
+                    status_check $last_status "${cmd}" "${status_log}" "${model_name}"
+                else
+                    IFS=";"
+                    unset_env=`unset CUDA_VISIBLE_DEVICES`
+                    log_path="$SAVE_LOG/train_log"
+                    speed_log_path="$SAVE_LOG/index"
+                    mkdir -p $log_path
+                    mkdir -p $speed_log_path
+                    log_name="${repo_name}_${model_name}_bs${batch_size}_${precision}_${run_mode}_${device_num}_${to_static}log"
+                    speed_log_name="${repo_name}_${model_name}_bs${batch_size}_${precision}_${run_mode}_${device_num}_${to_static}speed"
+                    func_sed_params "$FILENAME" "${line_gpuid}" "$gpu_id"  # sed used gpu_id
+                    func_sed_params "$FILENAME" "${line_profile}" "null"  # sed --profile_option as null
+                    cmd="timeout 5m bash test_tipc/test_train_inference_python.sh ${FILENAME} benchmark_train > ${log_path}/${log_name} 2>&1 "
+                    echo $cmd
+                    job_bt=`date '+%Y%m%d%H%M%S'`
+                    eval ${cmd}
+                    job_et=`date '+%Y%m%d%H%M%S'`
+                    export model_run_time=$((${job_et}-${job_bt}))
+                    eval "cat ${log_path}/${log_name}"
+                    # parser log
+                    _model_name="${model_name}_bs${batch_size}_${precision}_${run_mode}"
+
+                    cmd="${python} ${BENCHMARK_ROOT}/scripts/analysis.py --filename ${log_path}/${log_name} \
+                            --speed_log_file '${speed_log_path}/${speed_log_name}' \
+                            --model_name ${_model_name} \
+                            --base_batch_size ${batch_size} \
+                            --run_mode ${run_mode} \
+                            --fp_item ${precision} \
+                            --keyword ips: \
+                            --skip_steps 100 \
+                            --device_num ${device_num} \
+                            --speed_unit images/s \
+                            --convergence_key loss: "
+                    echo $cmd
+                    eval $cmd
+                    last_status=${PIPESTATUS[0]}
+                    status_check $last_status "${cmd}" "${status_log}" "${model_name}"
+                fi
+            done
         done
     done
 done
