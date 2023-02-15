@@ -15,7 +15,6 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-import platform
 from collections import defaultdict
 
 import numpy as np
@@ -257,7 +256,7 @@ def compute_re_ranking_dist(query_feat: paddle.Tensor,
 
     original_dist = np.transpose(original_dist / np.max(original_dist, axis=0))
     V = np.zeros_like(original_dist).astype(np.float16)
-    initial_rank = np.argpartition(original_dist, range(1, k1 + 1))  # 22.2s
+    initial_rank = np.argpartition(original_dist, range(1, k1 + 1))
     logger.info("Start re-ranking...")
 
     for p in range(num_all):
