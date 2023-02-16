@@ -99,9 +99,9 @@ class MetaBNNeck(nn.Layer):
 
     def setup_opt(self, opt):
         """
-        enable_inside_update: enable inside updating for `gate` in MetaBIN
-        lr_gate: learning rate of `gate` during meta-train phase
-        bn_mode: control the running stats & updating of BN
+        Arg:
+            opt (dict): Optional setting to change the behavior of MetaBIN during training. 
+                It includes three settings which are `enable_inside_update`, `lr_gate` and `bn_mode`.
         """
         self.check_opt(opt)
         self.opt = copy.deepcopy(opt)
