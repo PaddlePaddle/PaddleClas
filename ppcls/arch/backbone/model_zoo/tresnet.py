@@ -39,23 +39,13 @@ class BlurPool2d(nn.Layer):
         x = F.pad(x, self.padding, 'reflect')
         return F.conv2d(x, self.filt, stride=self.stride, groups=self.channels)
 
-
 class AntiAliasDownsampleLayer(nn.Layer):
     def __init__(self, filt_size: int = 3, stride: int = 2,
                  channels: int = 0):
         super(AntiAliasDownsampleLayer, self).__init__()
-        self.op = Downsample(filt_size, stride, channels)
-
-    def forward(self, x):
-        return self.op(x)
-
-class Downsample(nn.Layer):
-    def __init__(self, filt_size=3, stride=2, channels=None):
-        super(Downsample, self).__init__()
         self.filt_size = filt_size
         self.stride = stride
         self.channels = channels
-
         assert self.filt_size == 3
         a = paddle.to_tensor([1., 2., 1.])
         filt = (a[:, None] * a[None, :])
@@ -63,14 +53,13 @@ class Downsample(nn.Layer):
         self.filt = paddle.tile(filt[None, None, :, :], repeat_times=[self.channels, 1, 1, 1])
         self.register_buffer('filt', self.filt)
 
-    def forward(self, input):
-        input_pad = F.pad(input, (1, 1, 1, 1), 'reflect')
-        return F.conv2d(input_pad, self.filt, stride=self.stride, padding=0, groups=input.shape[1])
+    def forward(self, x):
+        input_pad = F.pad(x, (1, 1, 1, 1), 'reflect')
+        return F.conv2d(input_pad, self.filt, stride=self.stride, padding=0, groups=x.shape[1])
 
-
-class SpaceToDepth(nn.Layer):
+class SpaceToDepthModule(nn.Layer):
     def __init__(self, block_size=4):
-        super(SpaceToDepth, self).__init__()
+        super(SpaceToDepthModule, self).__init__()
         assert block_size == 4
         self.bs = block_size
 
@@ -79,16 +68,6 @@ class SpaceToDepth(nn.Layer):
         x = paddle.reshape(x, [N, C, H // self.bs, self.bs, W // self.bs, self.bs])   # (N, C, H // bs, bs, W // bs, bs)
         x = paddle.transpose(x, [0, 3, 5, 1, 2, 4])   # (N, bs, bs, C, H // bs, W // bs)
         x = paddle.reshape(x, [N, self.bs * self.bs * C, H // self.bs, W // self.bs])
-        return x
-
-
-class SpaceToDepthModule(nn.Layer):
-    def __init__(self):
-        super(SpaceToDepthModule, self).__init__()
-        self.op = SpaceToDepth()
-
-    def forward(self, x):
-        x = self.op(x)
         return x
 
 class FastGlobalAvgPool2d(nn.Layer):
@@ -340,6 +319,16 @@ def _load_pretrained(pretrained, model, use_ssld=False):
 
 def TResNetM(pretrained=False, use_ssld=False, **kwargs):
     model = TResNet(layers=[3, 4, 11, 3], in_chans=3, width_factor=1.0, **kwargs)
+    _load_pretrained(pretrained, model, use_ssld=use_ssld)
+    return model
+
+def TResNetL(pretrained=False, use_ssld=False, **kwargs):
+    model = TResNet(layers=[4, 5, 18, 3], in_chans=3, width_factor=1.2, **kwargs)
+    _load_pretrained(pretrained, model, use_ssld=use_ssld)
+    return model
+
+def TResNetXL(pretrained=False, use_ssld=False, **kwargs):
+    model = TResNet(layers=[4, 5, 24, 3], in_chans=3, width_factor=1.3, **kwargs)
     _load_pretrained(pretrained, model, use_ssld=use_ssld)
     return model
 

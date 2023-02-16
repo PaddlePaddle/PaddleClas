@@ -155,9 +155,6 @@ Infer:
     class_id_map_file: ppcls/utils/imagenet1k_label_list.txt
 
 Metric:
-  Train:
-    - TopkAcc:
-        topk: [1, 5]
   Eval:
     - TopkAcc:
         topk: [1, 5]

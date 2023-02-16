@@ -33,7 +33,7 @@ fpgm_export:null
 distill_export:null
 kl_quant:null
 export2:null
-pretrained_model_url:https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/ResNet18_pretrained.pdparams
+pretrained_model_url:https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/TResNetM_pretrained.pdparams
 infer_model:../inference/
 infer_export:True
 infer_quant:Fasle
