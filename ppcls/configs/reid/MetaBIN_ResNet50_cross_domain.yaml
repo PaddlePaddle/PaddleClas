@@ -6,7 +6,7 @@ Global:
   device: "gpu"
   iter_per_epoch: &iter_per_epoch 50
   warmup_iter: 10
-  save_interval: 116
+  save_interval: 8
   eval_during_train: True
   eval_interval: 8
   epochs: &epochs 348    # 348*50 = 120*145 = 17400 iters
