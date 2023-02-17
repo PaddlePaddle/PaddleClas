@@ -197,8 +197,8 @@ class Bottleneck(nn.Layer):
 class TResNet(nn.Layer):
     def __init__(self, layers, in_chans=3, class_num=1000, width_factor=1.0, **kwargs):
         super(TResNet, self).__init__()
-        self.inplanes = int(int(64 * width_factor + 4) / 8) * 8
-        self.planes = int(int(64 * width_factor + 4) / 8) * 8
+        self.inplanes = int(64 * width_factor)
+        self.planes = int(64 * width_factor)
         SpaceToDepth = SpaceToDepthModule()
         conv1 = Conv2d_ABN(in_chans * 16, self.planes, stride=1, kernel_size=3)
         anti_alias_layer = partial(AntiAliasDownsampleLayer)
