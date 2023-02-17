@@ -47,10 +47,10 @@
   ```shell
   PaddleClas/dataset/
   ├── dukemtmc/
-  |   └── DukeMTMC-reID/
-  |       ├── bounding_box_test/     # 测试集gallery文件夹
-  |       ├── bounding_box_train/    # 训练集gallery文件夹
-  |       └── query/                 # query图片文件夹
+  │   └── DukeMTMC-reID/
+  │       ├── bounding_box_test/     # 测试集gallery文件夹
+  │       ├── bounding_box_train/    # 训练集gallery文件夹
+  │       └── query/                 # query图片文件夹
   └── market1501/
       └── Market-1501-v15.09.15/
           ├── bounding_box_test/     # 测试集gallery文件夹
@@ -108,7 +108,6 @@
   ```log
   ...
   ...
-  ppcls INFO: Finish load pretrained model from epoch_232
   ppcls INFO: gallery feature calculation process: [0/138]
   ppcls INFO: gallery feature calculation process: [25/138]
   ppcls INFO: gallery feature calculation process: [50/138]
