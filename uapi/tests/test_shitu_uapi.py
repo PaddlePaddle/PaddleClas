@@ -24,29 +24,29 @@ if __name__ == '__main__':
     model = PaddleModel(model_name='PPLCNetV2_base_ShiTu')
 
     model.train(
-        dataset='tests/data/tipc_shitu_demo_data',
+        dataset='uapi/tests/data/tipc_shitu_demo_data',
         batch_size=8,
         epochs_iters=1,
         device='gpu:0',
         dy2st=False,
         amp='O1',
-        save_dir='tests/shitu_res')
+        save_dir='uapi/tests/shitu_res')
 
     model.export(
-        weight_path='tests/shitu_res/RecModel/latest.pdparams',
-        save_dir='tests/shitu_res/infer')
+        weight_path='uapi/tests/shitu_res/RecModel/latest.pdparams',
+        save_dir='uapi/tests/shitu_res/infer')
 
     model.infer(
-        model_dir='tests/shitu_res/infer',
+        model_dir='uapi/tests/shitu_res/infer',
         device='gpu',
-        input_path='tests/data/tipc_shitu_demo_data/train/111085122871_0.JPG',
-        save_dir='tests/shitu_res/infer_res')
+        input_path='uapi/tests/data/tipc_shitu_demo_data/train/111085122871_0.JPG',
+        save_dir='uapi/tests/shitu_res/infer_res')
 
     model.compression(
-        dataset='tests/data/tipc_shitu_demo_data',
+        dataset='uapi/tests/data/tipc_shitu_demo_data',
         batch_size=8,
         learning_rate=0.1,
         epochs_iters=1,
         device='gpu',
-        weight_path='tests/shitu_res/RecModel/latest.pdparams',
-        save_dir='tests/shitu_res/compress')
+        weight_path='uapi/tests/shitu_res/RecModel/latest.pdparams',
+        save_dir='uapi/tests/shitu_res/compress')

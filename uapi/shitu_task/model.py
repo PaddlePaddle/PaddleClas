@@ -82,7 +82,8 @@ class ShiTuModel(ClsModel):
         if save_dir is not None:
             save_dir = abspath(save_dir)
 
-        config_path = '../deploy/configs/inference_rec.yaml'
+        config_path = os.path.join(self.runner.runner_root_path,
+                                   'deploy/configs/inference_rec.yaml')
         config = self.config.copy()
         config.load(config_path)
         config.update([f'Global.rec_inference_model_dir={model_dir}'])

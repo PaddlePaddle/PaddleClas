@@ -122,8 +122,8 @@ class ClsModel(BaseModel):
         else:
             # `save_dir` is None
             save_dir = abspath(os.path.join('output', 'infer'))
-
-        config_path = '../deploy/configs/inference_cls.yaml'
+        config_path = os.path.join(self.runner.runner_root_path,
+                                   'deploy/configs/inference_cls.yaml')
         config = self.config.copy()
         config.load(config_path)
         config.update([f'Global.inference_model_dir={model_dir}'])
