@@ -175,6 +175,10 @@ def ResNet50_metabin(pretrained=False,
 
     def bn2metabin(bn, pattern):
         metabin = MetaBIN(bn.weight.shape[0])
+        metabin.batch_norm.weight.set_value(bn.weight)
+        metabin.batch_norm.bias.set_value(bn.bias)
+        metabin.batch_norm._variance.set_value(bn._variance)
+        metabin.batch_norm._mean.set_value(bn._mean)
         return metabin
 
     def setup_optimize_attr(model, bias_lr_factor):
@@ -184,19 +188,16 @@ def ResNet50_metabin(pretrained=False,
             if "bias" in name:
                 params.optimize_attr['learning_rate'] = bias_lr_factor
 
-    stride_list = [2, 2, 2, 2, 1]
-
     pattern = []
     pattern.extend(["blocks[{}].conv{}.bn".format(i, j) \
                     for i in range(16) for j in range(3)])
     pattern.extend(["blocks[{}].short.bn".format(i) for i in [0, 3, 7, 13]])
     pattern.append("stem[0].bn")
 
-    model = ResNet50(
-        pretrained=False, use_ssld=use_ssld, stride_list=stride_list, **kwargs)
+    model = ResNet50_last_stage_stride1(
+        pretrained=pretrained, use_ssld=use_ssld, **kwargs)
 
     model.upgrade_sublayer(pattern, bn2metabin)
     setup_optimize_attr(model=model, bias_lr_factor=bias_lr_factor)
 
-    _load_pretrained(pretrained, model, MODEL_URLS["ResNet50"], use_ssld)
     return model
