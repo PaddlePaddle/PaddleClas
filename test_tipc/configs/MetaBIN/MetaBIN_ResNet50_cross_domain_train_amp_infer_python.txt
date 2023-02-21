@@ -1,6 +1,6 @@
 ===========================train_params===========================
 model_name:RecModel
-python:python3.8
+python:python3.7
 gpu_list:0
 -o Global.device:gpu
 -o Global.auto_cast:null
@@ -9,7 +9,7 @@ gpu_list:0
 -o DataLoader.Train.sampler.batch_size:16
 -o Global.pretrained_model:null
 train_model_name:latest
-train_infer_img_dir:./dataset/market1501/Market-1501-v15.09.15/bounding_box_train
+train_infer_img_dir:./dataset/ILSVRC2012/val
 null:null
 ##
 trainer:amp_train
@@ -33,19 +33,19 @@ fpgm_export:null
 distill_export:null
 kl_quant:null
 export2:null
-pretrained_model_url:null
+pretrained_model_url:https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/reid/metabin/metabin_resnet50_pretrained.pdparams
 infer_model:../inference/
 infer_export:True
 infer_quant:Fasle
 inference:python/predict_rec.py -c ./configs/inference_rec.yaml
 -o Global.use_gpu:True|False
--o Global.enable_mkldnn:True
+-o Global.enable_mkldnn:False
 -o Global.cpu_num_threads:1
 -o Global.batch_size:1
 -o Global.use_tensorrt:False
 -o Global.use_fp16:False
 -o Global.rec_inference_model_dir:../inference
--o Global.infer_imgs:../dataset/dukemtmc/DukeMTMC-reID/query/0005_c2_f0046985.jpg
+-o Global.infer_imgs:../dataset/ILSVRC2012/val/ILSVRC2012_val_00000001.JPEG
 -o Global.save_log_path:null
 -o Global.benchmark:False
 null:null
