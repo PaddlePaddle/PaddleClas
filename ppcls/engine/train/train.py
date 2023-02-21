@@ -30,6 +30,9 @@ def train_epoch(engine, epoch_id, print_batch_step):
         try:
             batch = next(engine.train_dataloader_iter)
         except Exception:
+            # NOTE: reset DALI dataloader manually
+            if engine.use_dali:
+                engine.train_dataloader.reset()
             engine.train_dataloader_iter = iter(engine.train_dataloader)
             batch = next(engine.train_dataloader_iter)
 
