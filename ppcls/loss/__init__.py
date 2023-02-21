@@ -51,7 +51,7 @@ from .metabinloss import IntraDomainScatterLoss
 class CombinedLoss(nn.Layer):
     def __init__(self, config_list):
         super().__init__()
-        self.loss_func = []
+        loss_func = []
         self.loss_weight = []
         assert isinstance(config_list, list), (
             'operator config should be a list')
@@ -63,8 +63,9 @@ class CombinedLoss(nn.Layer):
             assert "weight" in param, "weight must be in param, but param just contains {}".format(
                 param.keys())
             self.loss_weight.append(param.pop("weight"))
-            self.loss_func.append(eval(name)(**param))
-            self.loss_func = nn.LayerList(self.loss_func)
+            loss_func.append(eval(name)(**param))
+        self.loss_func = nn.LayerList(loss_func)
+        logger.debug("build loss {} success.".format(loss_func))
 
     def __call__(self, input, batch):
         loss_dict = {}
@@ -83,9 +84,22 @@ class CombinedLoss(nn.Layer):
         return loss_dict
 
 
-def build_loss(config):
-    if config is None:
-        return None
-    module_class = CombinedLoss(copy.deepcopy(config))
-    logger.debug("build loss {} success.".format(module_class))
-    return module_class
+def build_loss(config, mode="train"):
+    train_loss_func, unlabel_train_loss_func, eval_loss_func = None, None, None
+    if mode == "train":
+        label_loss_info = config["Loss"]["Train"]
+        if label_loss_info:
+            train_loss_func = CombinedLoss(copy.deepcopy(label_loss_info))
+        unlabel_loss_info = config.get("UnLabelLoss", {}).get("Train", None)
+        if unlabel_loss_info:
+            unlabel_train_loss_func = CombinedLoss(
+                copy.deepcopy(unlabel_loss_info))
+    if mode == "eval" or (mode == "train" and
+                          config["Global"]["eval_during_train"]):
+        loss_config = config.get("Loss", None)
+        if loss_config is not None:
+            loss_config = loss_config.get("Eval")
+            if loss_config is not None:
+                eval_loss_func = CombinedLoss(copy.deepcopy(loss_config))
+
+    return train_loss_func, unlabel_train_loss_func, eval_loss_func
