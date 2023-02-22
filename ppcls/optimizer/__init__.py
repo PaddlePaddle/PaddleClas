@@ -48,12 +48,12 @@ def build_lr_scheduler(lr_config, epochs, step_each_epoch):
 def build_optimizer(engine):
     if engine.mode != "train":
         return None, None
-    config, iter_per_epoch, model_list = engine.config, engine.dataloader_dict[
-        "Train"].iter_per_epoch, [engine.mode, engine.train_loss_func]
+    config, max_iter, model_list = engine.config, engine.dataloader_dict[
+        "Train"].max_iter, [engine.model, engine.train_loss_func]
     optim_config = copy.deepcopy(config["Optimizer"])
     epochs = config["Global"]["epochs"]
-    update_freq = config["Global"].get("update_freq", 1)
-    step_each_epoch = iter_per_epoch // update_freq
+    update_freq = engine.update_freq
+    step_each_epoch = max_iter // update_freq
     if isinstance(optim_config, dict):
         # convert {'name': xxx, **optim_cfg} to [{name: {scope: xxx, **optim_cfg}}]
         optim_name = optim_config.pop("name")

@@ -92,8 +92,7 @@ def classification_eval(engine, epoch_id=0):
                 paddle.distributed.all_gather(pred_list, out)
                 preds = paddle.concat(pred_list, 0)
 
-            if accum_samples > total_samples and not engine.config[
-                    "Global"].get("use_dali", False):
+            if accum_samples > total_samples and not engine.use_dali:
                 if isinstance(preds, list):
                     preds = [
                         pred[:total_samples + current_samples - accum_samples]
@@ -152,7 +151,7 @@ def classification_eval(engine, epoch_id=0):
                 epoch_id, iter_id, max_iter, metric_msg, time_msg, ips_msg))
 
         tic = time.time()
-    if engine.config["Global"].get("use_dali", False):
+    if engine.use_dali:
         engine.dataloader_dict["Eval"].reset()
 
     if "ATTRMetric" in engine.config["Metric"]["Eval"][0]:
