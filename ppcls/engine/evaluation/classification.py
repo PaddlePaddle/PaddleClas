@@ -35,13 +35,10 @@ def classification_eval(engine, epoch_id=0):
     print_batch_step = engine.config["Global"]["print_batch_step"]
 
     tic = time.time()
+    total_samples = engine.dataloader_dict["Eval"].total_samples
     accum_samples = 0
-    total_samples = len(
-        engine.eval_dataloader.
-        dataset) if not engine.use_dali else engine.eval_dataloader.size
-    max_iter = len(engine.eval_dataloader) - 1 if platform.system(
-    ) == "Windows" else len(engine.eval_dataloader)
-    for iter_id, batch in enumerate(engine.eval_dataloader):
+    max_iter = engine.dataloader_dict["Eval"].max_iter
+    for iter_id, batch in enumerate(engine.dataloader_dict["Eval"]):
         if iter_id >= max_iter:
             break
         if iter_id == 5:
@@ -61,9 +58,9 @@ def classification_eval(engine, epoch_id=0):
                         "flatten_contiguous_range", "greater_than"
                     },
                     level=engine.amp_level):
-                out = engine.model(batch[0])
+                out = engine.model(batch)
         else:
-            out = engine.model(batch[0])
+            out = engine.model(batch)
 
         # just for DistributedBatchSampler issue: repeat sampling
         current_samples = batch_size * paddle.distributed.get_world_size()
@@ -95,7 +92,8 @@ def classification_eval(engine, epoch_id=0):
                 paddle.distributed.all_gather(pred_list, out)
                 preds = paddle.concat(pred_list, 0)
 
-            if accum_samples > total_samples and not engine.use_dali:
+            if accum_samples > total_samples and not engine.config[
+                    "Global"].get("use_dali", False):
                 if isinstance(preds, list):
                     preds = [
                         pred[:total_samples + current_samples - accum_samples]
@@ -151,12 +149,11 @@ def classification_eval(engine, epoch_id=0):
                 ])
                 metric_msg += ", {}".format(engine.eval_metric_func.avg_info)
             logger.info("[Eval][Epoch {}][Iter: {}/{}]{}, {}, {}".format(
-                epoch_id, iter_id,
-                len(engine.eval_dataloader), metric_msg, time_msg, ips_msg))
+                epoch_id, iter_id, max_iter, metric_msg, time_msg, ips_msg))
 
         tic = time.time()
-    if engine.use_dali:
-        engine.eval_dataloader.reset()
+    if engine.config["Global"].get("use_dali", False):
+        engine.dataloader_dict["Eval"].reset()
 
     if "ATTRMetric" in engine.config["Metric"]["Eval"][0]:
         metric_msg = ", ".join([
