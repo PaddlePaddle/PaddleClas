@@ -12,14 +12,14 @@
 #See the License for the specific language governing permissions and
 #limitations under the License.
 
+import sys
 import copy
-import importlib
+
 import paddle.nn as nn
 from paddle.jit import to_static
 from paddle.static import InputSpec
 
-from . import backbone, gears
-from .backbone import *
+from . import backbone as backbone_zoo
 from .gears import build_gear
 from .utils import *
 from .backbone.base.theseus_layer import TheseusLayer
@@ -35,20 +35,28 @@ def build_model(config, mode="train"):
     arch_config = copy.deepcopy(config["Arch"])
     model_type = arch_config.pop("name")
     use_sync_bn = arch_config.pop("use_sync_bn", False)
-    mod = importlib.import_module(__name__)
-    arch = getattr(mod, model_type)(**arch_config)
+
+    if hasattr(backbone_zoo, model_type):
+        model = ClassModel(model_type, **arch_config)
+    else:
+        model = getattr(sys.modules[__name__], model_type)("ClassModel",
+                                                           **arch_config)
+
     if use_sync_bn:
         if config["Global"]["device"] == "gpu":
-            arch = nn.SyncBatchNorm.convert_sync_batchnorm(arch)
+            model = nn.SyncBatchNorm.convert_sync_batchnorm(model)
         else:
             msg = "SyncBatchNorm can only be used on GPU device. The releated setting has been ignored."
             logger.warning(msg)
 
-    if isinstance(arch, TheseusLayer):
-        prune_model(config, arch)
-        quantize_model(config, arch, mode)
+    if isinstance(model, TheseusLayer):
+        prune_model(config, model)
+        quantize_model(config, model, mode)
 
-    return arch
+    # set @to_static for benchmark, skip this by default.
+    model = apply_to_static(config, model)
+
+    return model
 
 
 def apply_to_static(config, model):
@@ -65,12 +73,29 @@ def apply_to_static(config, model):
     return model
 
 
+# TODO(gaotingquan): export model
+class ClassModel(TheseusLayer):
+    def __init__(self, model_type, **config):
+        super().__init__()
+        if model_type == "ClassModel":
+            backbone_config = config["Backbone"]
+            backbone_name = backbone_config.pop("name")
+        else:
+            backbone_name = model_type
+            backbone_config = config
+        self.backbone = getattr(backbone_zoo, backbone_name)(**backbone_config)
+
+    def forward(self, batch):
+        x, label = batch[0], batch[1]
+        return self.backbone(x)
+
+
 class RecModel(TheseusLayer):
     def __init__(self, **config):
         super().__init__()
         backbone_config = config["Backbone"]
         backbone_name = backbone_config.pop("name")
-        self.backbone = eval(backbone_name)(**backbone_config)
+        self.backbone = getattr(backbone_zoo, backbone_name)(**backbone_config)
         self.head_feature_from = config.get('head_feature_from', 'neck')
 
         if "BackboneStopLayer" in config:
@@ -87,8 +112,8 @@ class RecModel(TheseusLayer):
         else:
             self.head = None
 
-    def forward(self, x, label=None):
-        
+    def forward(self, batch):
+        x, label = batch[0], batch[1]
         out = dict()
         x = self.backbone(x)
         out["backbone"] = x
@@ -140,7 +165,8 @@ class DistillationModel(nn.Layer):
                     load_dygraph_pretrain(
                         self.model_name_list[idx], path=pretrained)
 
-    def forward(self, x, label=None):
+    def forward(self, batch):
+        x, label = batch[0], batch[1]
         result_dict = dict()
         for idx, model_name in enumerate(self.model_name_list):
             if label is None:
@@ -158,7 +184,8 @@ class AttentionModel(DistillationModel):
                  **kargs):
         super().__init__(models, pretrained_list, freeze_params_list, **kargs)
 
-    def forward(self, x, label=None):
+    def forward(self, batch):
+        x, label = batch[0], batch[1]
         result_dict = dict()
         out = x
         for idx, model_name in enumerate(self.model_name_list):
