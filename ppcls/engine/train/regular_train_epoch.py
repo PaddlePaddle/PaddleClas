@@ -22,19 +22,8 @@ from ppcls.utils import profiler
 def regular_train_epoch(engine, epoch_id, print_batch_step):
     tic = time.time()
 
-    if not hasattr(engine, "train_dataloader_iter"):
-        engine.train_dataloader_iter = iter(engine.train_dataloader)
-
-    for iter_id in range(engine.iter_per_epoch):
-        # fetch data batch from dataloader
-        try:
-            batch = next(engine.train_dataloader_iter)
-        except Exception:
-            # NOTE: reset DALI dataloader manually
-            if engine.use_dali:
-                engine.train_dataloader.reset()
-            engine.train_dataloader_iter = iter(engine.train_dataloader)
-            batch = next(engine.train_dataloader_iter)
+    for iter_id in range(engine.dataloader_dict["Train"].iter_per_epoch):
+        batch = engine.dataloader_dict["TrainIter"].get_batch()
 
         profiler.add_profiler_step(engine.config["profiler_options"])
         if iter_id == 5:
