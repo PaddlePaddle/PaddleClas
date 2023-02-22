@@ -12,6 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from ppcls.engine.evaluation.classification import classification_eval
-from ppcls.engine.evaluation.retrieval import retrieval_eval
-from ppcls.engine.evaluation.adaface import adaface_eval
+from .classification import classification_eval
+from .retrieval import retrieval_eval
+from .adaface import adaface_eval
+
+
+def build_eval_func(config):
+    eval_mode = config["Global"].get("eval_mode", None)
+    if eval_mode is None:
+        config["Global"]["eval_mode"] = "classification"
+        return classification_eval
+    else:
+        return getattr(sys.modules[__name__], eval_mode + "_eval")
