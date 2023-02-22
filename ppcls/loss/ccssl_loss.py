@@ -1,4 +1,3 @@
-from ppcls.engine.train.train import forward
 from .softsuploss import SoftSupConLoss
 import copy
 import paddle.nn as nn
