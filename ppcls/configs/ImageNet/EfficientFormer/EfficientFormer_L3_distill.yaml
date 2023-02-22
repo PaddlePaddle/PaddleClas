@@ -14,6 +14,10 @@ Global:
   image_shape: [3, 224, 224]
   save_inference_dir: "./inference"
 
+# model ema
+EMA:
+  decay: 0.99996
+
 # model architecture
 Arch:
   name: "DistillationModel"
@@ -39,10 +43,10 @@ Arch:
 Loss:
   Train:
     - DistillationGTCELoss:
-        weight: 1.0
+        weight: 0.5
         model_names: ["Student"]
     - DistillationCELoss:
-        weight: 1.0
+        weight: 0.5
         model_name_pairs: [["Student", "Teacher"]]
         use_hard_label: True
   Eval:
@@ -62,7 +66,7 @@ Optimizer:
     learning_rate: 1e-3
     eta_min: 1e-5
     warmup_epoch: 5
-    warmup_start_lr: 1e-6
+    warmup_start_lr: 1e-5
 
 
 # data loader for train and eval
@@ -104,7 +108,7 @@ DataLoader:
               class_num: 1000
               MixupOperator:
                alpha: 0.8
-               prob: 0.5
+               prob: 1.0
               CutmixOperator:
                alpha: 1.0
                prob: 0.5
