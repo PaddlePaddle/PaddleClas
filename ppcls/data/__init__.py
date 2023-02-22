@@ -88,7 +88,7 @@ def worker_init_fn(worker_id: int, num_workers: int, rank: int, seed: int):
     random.seed(worker_seed)
 
 
-def build(config, mode, device, use_dali=False, seed=None):
+def build(config, mode, use_dali=False, seed=None):
     assert mode in [
         'Train', 'Eval', 'Test', 'Gallery', 'Query', 'UnLabelTrain'
     ], "Dataset mode should be Train, Eval, Test, Gallery, Query, UnLabelTrain"
@@ -167,7 +167,7 @@ def build(config, mode, device, use_dali=False, seed=None):
     if batch_sampler is None:
         data_loader = DataLoader(
             dataset=dataset,
-            places=device,
+            places=paddle.device.get_device(),
             num_workers=num_workers,
             return_list=True,
             use_shared_memory=use_shared_memory,
@@ -179,7 +179,7 @@ def build(config, mode, device, use_dali=False, seed=None):
     else:
         data_loader = DataLoader(
             dataset=dataset,
-            places=device,
+            places=paddle.device.get_device(),
             num_workers=num_workers,
             return_list=True,
             use_shared_memory=use_shared_memory,
@@ -218,11 +218,7 @@ def build_dataloader(engine):
     }
     if engine.mode == 'train':
         train_dataloader = build(
-            engine.config["DataLoader"],
-            "Train",
-            engine.device,
-            use_dali,
-            seed=None)
+            engine.config["DataLoader"], "Train", use_dali, seed=None)
         iter_per_epoch = len(train_dataloader) - 1 if platform.system(
         ) == "Windows" else len(train_dataloader)
         if engine.config["Global"].get("iter_per_epoch", None):
@@ -235,33 +231,23 @@ def build_dataloader(engine):
 
     if engine.config["DataLoader"].get('UnLabelTrain', None) is not None:
         dataloader_dict["UnLabelTrain"] = build(
-            engine.config["DataLoader"],
-            "UnLabelTrain",
-            engine.device,
-            use_dali,
-            seed=None)
+            engine.config["DataLoader"], "UnLabelTrain", use_dali, seed=None)
 
     if engine.mode == "eval" or (engine.mode == "train" and
                                  engine.config["Global"]["eval_during_train"]):
-        if engine.eval_mode in ["classification", "adaface"]:
+        if engine.config["Global"][
+                "eval_mode"] in ["classification", "adaface"]:
             dataloader_dict["Eval"] = build(
-                engine.config["DataLoader"],
-                "Eval",
-                engine.device,
-                use_dali,
-                seed=None)
-        elif engine.eval_mode == "retrieval":
+                engine.config["DataLoader"], "Eval", use_dali, seed=None)
+        elif engine.config["Global"]["eval_mode"] == "retrieval":
             if len(engine.config["DataLoader"]["Eval"].keys()) == 1:
                 key = list(engine.config["DataLoader"]["Eval"].keys())[0]
-                dataloader_dict["GalleryQuery"] = build_dataloader(
-                    engine.config["DataLoader"]["Eval"], key, engine.device,
-                    use_dali)
+                dataloader_dict["GalleryQuery"] = build(
+                    engine.config["DataLoader"]["Eval"], key, use_dali)
             else:
-                dataloader_dict["Gallery"] = build_dataloader(
-                    engine.config["DataLoader"]["Eval"], "Gallery",
-                    engine.device, use_dali)
-                dataloader_dict["Query"] = build_dataloader(
-                    engine.config["DataLoader"]["Eval"], "Query",
-                    engine.device, use_dali)
+                dataloader_dict["Gallery"] = build(
+                    engine.config["DataLoader"]["Eval"], "Gallery", use_dali)
+                dataloader_dict["Query"] = build(
+                    engine.config["DataLoader"]["Eval"], "Query", use_dali)
 
     return dataloader_dict

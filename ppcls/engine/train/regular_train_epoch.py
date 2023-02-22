@@ -19,7 +19,7 @@ from ppcls.engine.train.utils import update_loss, update_metric, log_info, type_
 from ppcls.utils import profiler
 
 
-def train_epoch(engine, epoch_id, print_batch_step):
+def regular_train_epoch(engine, epoch_id, print_batch_step):
     tic = time.time()
 
     if not hasattr(engine, "train_dataloader_iter"):
