@@ -75,7 +75,7 @@ def regular_train_epoch(engine, epoch_id, print_batch_step):
                 if not getattr(engine.lr_sch[i], "by_epoch", False):
                     engine.lr_sch[i].step()
             # update ema
-            if engine.ema:
+            if engine.model_ema:
                 engine.model_ema.update(engine.model)
 
         # below code just for logging
