@@ -447,6 +447,8 @@ class Engine(object):
                     level=self.amp_level,
                     save_dtype='float32')
 
+            self.amp_level = engine.config["AMP"].get("level", "O1").upper()
+
     def _init_dist(self):
         # check the gpu num
         world_size = dist.get_world_size()
