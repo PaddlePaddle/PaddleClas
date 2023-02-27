@@ -1,15 +1,23 @@
 import paddle
 import math
 import sys
-from ppcls.engine.train.utils import cancel_gradients_last_layer, update_loss, log_info
+from ppcls.engine.train.utils import update_loss, log_info
 import time
 
 
-def train_epoch_dino(engine, epoch_id, print_batch_step, lr_schedule, wd_schedule, momentum_schedule, freeze_last_layer):
+def cancel_gradients_last_layer(epoch, model, freeze_last_layer):
+    if epoch >= freeze_last_layer:
+        return
+    for n, p in model.named_parameters():
+        if "last_layer" in n:
+            # can not use `stop_gradient`
+            p.clear_grad()
+
+
+def train_epoch_dino(engine, epoch_id, print_batch_step, wd_schedule, momentum_schedule, freeze_last_layer):
     tic = time.time()
     for iter_id, (images, y) in enumerate(engine.train_dataloader):
         cur_iter_num = len(engine.train_dataloader) * epoch_id + iter_id
-        engine.optimizer.set_lr(lr_schedule[cur_iter_num])
 
         if iter_id == 5:
             for key in engine.time_info:
@@ -34,7 +42,9 @@ def train_epoch_dino(engine, epoch_id, print_batch_step, lr_schedule, wd_schedul
             print("Loss is {}, stopping training".format(loss.item()), force=True)
             sys.exit(1)
 
-        engine.optimizer.clear_grad()
+        # clear grad
+        for i in range(len(engine.optimizer)):
+            engine.optimizer[i].clear_grad()
 
         # student update
         if engine.amp:
@@ -42,12 +52,19 @@ def train_epoch_dino(engine, epoch_id, print_batch_step, lr_schedule, wd_schedul
             if engine.optimizer._grad_clip is not None:
                 engine.scaler.unscale_(engine.optimizer)
             cancel_gradients_last_layer(epoch_id, engine.model.student, freeze_last_layer)
-            engine.scaler.step(engine.optimizer)
+            for i in range(len(engine.optimizer)):
+                engine.scaler.step(engine.optimizer[i])
             engine.scaler.update()
         else:
             loss.backward()
             cancel_gradients_last_layer(epoch_id, engine.model.student, freeze_last_layer)
-            engine.optimizer.step()
+            for i in range(len(engine.optimizer)):
+                engine.optimizer[i].step()
+
+        # step lr(by step)
+        for i in range(len(engine.lr_sch)):
+            if not getattr(engine.lr_sch[i], "by_epoch", False):
+                engine.lr_sch[i].step()
 
         batch_size = engine.train_dataloader.batch_size
         update_loss(engine, loss, batch_size)
