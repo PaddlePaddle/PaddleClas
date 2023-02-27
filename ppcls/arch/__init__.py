@@ -19,7 +19,7 @@ import paddle.nn as nn
 from paddle.jit import to_static
 from paddle.static import InputSpec
 
-from . import backbone as backbone_zoo
+from . import backbone
 from .gears import build_gear
 from .utils import *
 from .backbone.base.theseus_layer import TheseusLayer
@@ -36,7 +36,7 @@ def build_model(config, mode="train"):
     model_type = arch_config.pop("name")
     use_sync_bn = arch_config.pop("use_sync_bn", False)
 
-    if hasattr(backbone_zoo, model_type):
+    if hasattr(backbone, model_type):
         model = ClassModel(model_type, **arch_config)
     else:
         model = getattr(sys.modules[__name__], model_type)("ClassModel",
@@ -83,7 +83,7 @@ class ClassModel(TheseusLayer):
         else:
             backbone_name = model_type
             backbone_config = config
-        self.backbone = getattr(backbone_zoo, backbone_name)(**backbone_config)
+        self.backbone = getattr(backbone, backbone_name)(**backbone_config)
 
     def forward(self, batch):
         x, label = batch[0], batch[1]
@@ -95,7 +95,7 @@ class RecModel(TheseusLayer):
         super().__init__()
         backbone_config = config["Backbone"]
         backbone_name = backbone_config.pop("name")
-        self.backbone = getattr(backbone_zoo, backbone_name)(**backbone_config)
+        self.backbone = getattr(backbone, backbone_name)(**backbone_config)
         self.head_feature_from = config.get('head_feature_from', 'neck')
 
         if "BackboneStopLayer" in config:
