@@ -76,7 +76,7 @@ class Engine(object):
 
         # build dataloader
         self.use_dali = self.config["Global"].get("use_dali", False)
-        self.dataloader_dict = build_dataloader(self)
+        self.dataloader_dict = build_dataloader(self.config, mode)
 
         # build loss
         self.train_loss_func, self.unlabel_train_loss_func, self.eval_loss_func = build_loss(
