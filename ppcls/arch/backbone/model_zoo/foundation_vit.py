@@ -151,7 +151,7 @@ _EVA_diff = {
     'remove_abs_pos_emb': [],
     'replace_mlp_GELU': [],
     'head': {
-        'fc_norm': ['huge_vit_patch14'],
+        'fc_norm': ['vit_huge_patch14'],
         'return_all_tokens': [],
         'return_patch_tokens': [],
     }
