@@ -16,7 +16,6 @@ from __future__ import absolute_import, division, print_function
 import datetime
 from ppcls.utils import logger
 from ppcls.utils.misc import AverageMeter
-import numpy as np
 
 
 def update_metric(trainer, out, batch, batch_size):
@@ -80,26 +79,3 @@ def log_info(trainer, batch_size, epoch_id, iter_id):
 def type_name(object: object) -> str:
     """get class name of an object"""
     return object.__class__.__name__
-
-
-def cosine_scheduler(base_value, final_value, epochs, niter_per_ep, warmup_epochs=0, start_warmup_value=0):
-    warmup_schedule = np.array([])
-    warmup_iters = warmup_epochs * niter_per_ep
-    if warmup_epochs > 0:
-        warmup_schedule = np.linspace(start_warmup_value, base_value, warmup_iters)
-
-    iters = np.arange(epochs * niter_per_ep - warmup_iters)
-    schedule = final_value + 0.5 * (base_value - final_value) * (1 + np.cos(np.pi * iters / len(iters)))
-
-    schedule = np.concatenate((warmup_schedule, schedule))
-    assert len(schedule) == epochs * niter_per_ep
-    return schedule
-
-
-def cancel_gradients_last_layer(epoch, model, freeze_last_layer):
-    if epoch >= freeze_last_layer:
-        return
-    for n, p in model.named_parameters():
-        if "last_layer" in n:
-            # can not use `stop_gradient`
-            p.clear_grad()
