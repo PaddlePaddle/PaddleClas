@@ -1,0 +1,106 @@
+# default 8 card
+
+Global:
+  epochs: 100
+  lr: 0.003
+  batch_size: 32
+  val_freq: 1
+  output_dir: ./output
+  class_num: 1000
+  use_visualdl: True
+  image_shape: [3, 224, 224]
+  save_inference_dir: ./inference
+
+# model architecture
+Arch:
+  name: DINO
+  mode: finetune
+  arch: ViT_small
+  patch_size: 16
+  n_last_blocks: 4
+  avgpool_patchtokens: False
+  pretrained_weights: ./ckp.pdparams
+  checkpoint_key: teacher
+  class_num: 1000
+
+# loss function config for traing/eval process
+Loss:
+  Train:
+    - CELoss:
+        weight: 1.0
+        epsilon: 0.1
+  Eval:
+    - CELoss:
+        weight: 1.0
+
+Optimizer:
+  name: Momentum
+  momentum: 0.9
+  weight_decay: 0.0
+  lr:
+    # for 8 cards
+    name: Cosine
+    learning_rate: 0.003  # lr * (bs * world_size) / 256
+    T_max: 100
+    eta_min: 0
+
+# data loader for train and eval
+DataLoader:
+  Train:
+    dataset:
+      name: ImageNetDataset
+      image_root: ./dataset/ILSVRC2012/
+      cls_label_path: ./dataset/ILSVRC2012/train_list.txt
+      transform_ops:
+        - DecodeImage:
+            to_rgb: True
+            channel_first: False
+        - RandomResizedCrop:
+            size: 224
+        - RandomHorizontalFlip:
+        - ToTensor:
+        - Normalize:
+            mean: [0.485, 0.456, 0.406]
+            std: [0.229, 0.224, 0.225]
+    sampler:
+      name: DistributedBatchSampler
+      batch_size: 32
+      drop_last: True
+      shuffle: True
+    loader:
+      num_workers: 10
+      use_shared_memory: True
+
+  Eval:
+    dataset:
+      name: ImageNetDataset
+      image_root: ./dataset/ILSVRC2012/
+      cls_label_path: ./dataset/ILSVRC2012/val_list.txt
+      transform_ops:
+        - DecodeImage:
+            to_rgb: True
+            channel_first: False
+        - Resize:
+            size: 256
+            interpolation: bicubic
+        - CenterCrop:
+            size: 224
+        - ToTensor:
+        - Normalize:
+            mean: [0.485, 0.456, 0.406]
+            std: [0.229, 0.224, 0.225]
+
+    sampler:
+      name: DistributedBatchSampler
+      batch_size: 32
+      drop_last: False
+      shuffle: False
+    loader:
+      num_workers: 10
+      use_shared_memory: True
+
+
+Metric:
+  Eval:
+    - TopkAcc:
+        topk: [1, 5]

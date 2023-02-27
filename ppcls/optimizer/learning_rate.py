@@ -20,6 +20,7 @@ from abc import abstractmethod
 from typing import Union
 from paddle.optimizer import lr
 from ppcls.utils import logger
+import numpy as np
 
 
 class LRBase(object):
@@ -519,3 +520,38 @@ class CosineFixmatch(LRBase):
             last_epoch=self.last_epoch)
         setattr(learning_rate, "by_epoch", self.by_epoch)
         return learning_rate
+
+
+class CosineDino(LRBase):
+    def __init__(self,
+                 base_value,
+                 final_value,
+                 epochs,
+                 step_each_epoch,
+                 warmup_epochs=0,
+                 start_warmup_value=0):
+        self.base_value = base_value
+
+        warmup_schedule = np.array([])
+        warmup_iters = warmup_epochs * step_each_epoch
+        if warmup_epochs > 0:
+            warmup_schedule = np.linspace(start_warmup_value, base_value, warmup_iters)
+
+        iters = np.arange(epochs * step_each_epoch - warmup_iters)
+        schedule = final_value + 0.5 * (base_value - final_value) * (1 + np.cos(np.pi * iters / len(iters)))
+
+        self.schedule = np.concatenate((warmup_schedule, schedule))
+        assert len(self.schedule) == epochs * step_each_epoch
+
+    def __call__(self):
+        def _lr_lambda(current_step):
+            return self.schedule[current_step]
+
+        learning_rate = lr.LambdaDecay(
+            learning_rate=self.base_value,
+            lr_lambda=_lr_lambda,
+            last_epoch=-1
+        )
+        setattr(learning_rate, "by_epoch", False)
+        return learning_rate
+
