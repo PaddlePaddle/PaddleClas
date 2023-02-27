@@ -221,15 +221,6 @@ class DataIterator(object):
 
 
 def build_dataloader(config, mode):
-    if "class_num" in config["Global"]:
-        global_class_num = config["Global"]["class_num"]
-        if "class_num" not in config["Arch"]:
-            config["Arch"]["class_num"] = global_class_num
-            msg = f"The Global.class_num will be deprecated. Please use Arch.class_num instead. Arch.class_num has been set to {global_class_num}."
-        else:
-            msg = "The Global.class_num will be deprecated. Please use Arch.class_num instead. The Global.class_num has been ignored."
-        logger.warning(msg)
-
     class_num = config["Arch"].get("class_num", None)
     config["DataLoader"].update({"class_num": class_num})
     config["DataLoader"].update({"epochs": config["Global"]["epochs"]})
