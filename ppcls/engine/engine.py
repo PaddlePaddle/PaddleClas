@@ -33,8 +33,7 @@ from ppcls.metric import build_metrics
 from ppcls.optimizer import build_optimizer
 from ppcls.utils.ema import ExponentialMovingAverage
 from ppcls.utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
-from ppcls.utils.save_load import init_model
-from ppcls.utils.model_saver import ModelSaver
+from ppcls.utils.save_load import init_model, ModelSaver
 
 from ppcls.data.utils.get_image_list import get_image_list
 from ppcls.data.postprocess import build_postprocess
@@ -100,6 +99,14 @@ class Engine(object):
         # for distributed
         self._init_dist()
 
+        # build model saver
+        self.model_saver = ModelSaver(
+            self,
+            net_name="model",
+            loss_name="train_loss_func",
+            opt_name="optimizer",
+            model_ema_name="model_ema")
+
         print_config(config)
 
     def train(self):
@@ -128,14 +135,6 @@ class Engine(object):
         self.model_ema = self._build_ema_model()
         # TODO: mv best_metric_ema to best_metric dict
         best_metric_ema = 0
-
-        # build model saver
-        model_saver = ModelSaver(
-            self,
-            net_name="model",
-            loss_name="train_loss_func",
-            opt_name="optimizer",
-            model_ema_name="model_ema")
 
         self._init_checkpoints(best_metric)
 
@@ -166,7 +165,7 @@ class Engine(object):
                 if acc > best_metric["metric"]:
                     best_metric["metric"] = acc
                     best_metric["epoch"] = epoch_id
-                    model_saver.save(
+                    self.model_saver.save(
                         best_metric,
                         prefix="best_model",
                         save_student_model=True)
@@ -189,7 +188,7 @@ class Engine(object):
 
                     if acc_ema > best_metric_ema:
                         best_metric_ema = acc_ema
-                        model_saver.save(
+                        self.model_saver.save(
                             {
                                 "metric": acc_ema,
                                 "epoch": epoch_id
@@ -205,7 +204,7 @@ class Engine(object):
 
             # save model
             if save_interval > 0 and epoch_id % save_interval == 0:
-                model_saver.save(
+                self.model_saver.save(
                     {
                         "metric": acc,
                         "epoch": epoch_id
@@ -213,7 +212,7 @@ class Engine(object):
                     prefix=f"epoch_{epoch_id}")
 
             # save the latest model
-            model_saver.save(
+            self.model_saver.save(
                 {
                     "metric": acc,
                     "epoch": epoch_id
