@@ -13,15 +13,15 @@
 - [5. 模型评估与推理部署](#5-模型评估与推理部署)
 - [5.1 模型评估](#51-模型评估)
 - [5.2 模型推理](#52-模型推理)
-    - [5.2.1 推理模型准备](#521-推理模型准备)
-    - [5.2.2 基于 Python 预测引擎推理](#522-基于-python-预测引擎推理)
-    - [5.2.3 基于 C++ 预测引擎推理](#523-基于-c-预测引擎推理)
+  - [5.2.1 推理模型准备](#521-推理模型准备)
+  - [5.2.2 基于 Python 预测引擎推理](#522-基于-python-预测引擎推理)
+  - [5.2.3 基于 C++ 预测引擎推理](#523-基于-c-预测引擎推理)
 - [5.4 服务化部署](#54-服务化部署)
 - [5.5 端侧部署](#55-端侧部署)
 - [5.6 Paddle2ONNX 模型转换与预测](#56-paddle2onnx-模型转换与预测)
 - [6. 总结](#6-总结)
-    - [6.1 方法总结与对比](#61-方法总结与对比)
-    - [6.2 使用建议/FAQ](#62-使用建议faq)
+  - [6.1 方法总结与对比](#61-方法总结与对比)
+  - [6.2 使用建议/FAQ](#62-使用建议faq)
 - [7. 参考资料](#7-参考资料)
 
 ## 1. 原理介绍
@@ -65,9 +65,11 @@
 1. 执行以下命令开始训练
 
     单卡训练：
+
     ```shell
     python3.7 tools/train.py -c ./ppcls/configs/reid/MetaBIN_ResNet50_cross_domain.yaml
     ```
+
     注：单卡训练大约需要4个小时。
 
 2. 查看训练日志和保存的模型参数文件
@@ -102,9 +104,11 @@
   -c ./ppcls/configs/reid/MetaBIN_ResNet50_cross_domain.yaml \
   -o Global.pretrained_model="pretrained_models/metabin_resnet50_pretrained"
   ```
+
   注：`pretrained_model` 后填入的地址不需要加 `.pdparams` 后缀，在程序运行时会自动补上。
 
 - 查看输出结果
+
   ```log
   ...
   ...
@@ -120,6 +124,7 @@
   ppcls INFO: re_ranking=False
   ppcls INFO: [Eval][Epoch 0][Avg]recall1: 0.55251, recall5: 0.68268, recall10: 0.72756, mAP: 0.32977
   ```
+
   默认评估日志保存在`PaddleClas/output/RecModel/eval.log`中，可以看到我们提供的 `metabin_resnet50_pretrained.pdparams` 模型在 Market-1501 数据集上的评估指标为recall@1=0.55251，recall@5=0.68268，recall@10=0.72756，mAP=0.32977
 
 - 使用re-ranking功能提升评估精度
@@ -133,7 +138,9 @@
 #### 5.2.1 推理模型准备
 
 可以将训练过程中保存的模型文件转换成 inference 模型并推理，或者使用我们提供的转换好的 inference 模型直接进行推理
-  - 将训练过程中保存的模型文件转换成 inference 模型，同样以 `latest.pdparams` 为例，执行以下命令进行转换
+
+- 将训练过程中保存的模型文件转换成 inference 模型，同样以 `latest.pdparams` 为例，执行以下命令进行转换
+
     ```shell
     python3.7 tools/export_model.py \
     -c ./ppcls/configs/reid/MetaBIN_ResNet50_cross_domain.yaml \
@@ -141,7 +148,8 @@
     -o Global.save_inference_dir="./deploy/metabin_resnet50_infer"
     ```
 
-  - 或者下载并解压我们提供的 inference 模型
+- 或者下载并解压我们提供的 inference 模型
+
     ```shell
     cd ./deploy
     wget https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/metric_learning/metabin/metabin_resnet50_infer.tar
@@ -198,6 +206,7 @@
        ```log
        0005_c2_f0046985.jpg:    [ 0.02503409  0.02032688 ...  0.0145475  0.02760422 ]
        ```
+
         推理时的输出向量储存在[predict_rec.py](../../../../deploy/python/predict_rec.py#L131)的 `result_dict` 变量中。
 
   4. 批量预测，将配置文件中`infer_imgs:`后的路径改为为文件夹即可，如`../dataset/dukemtmc/DukeMTMC/query/`，会预测并逐个输出query下所有图片的特征向量。
