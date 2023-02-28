@@ -197,6 +197,11 @@ if [[ ${MODE} = "lite_train_lite_infer" ]] || [[ ${MODE} = "lite_train_whole_inf
         cd tipc_shitu_demo_data
         ln -s demo_test.txt val_list.txt
         cd ../../
+    elif [[ ${model_name} =~ "MetaBIN_ResNet50" ]]; then
+        cd dataset
+        wget -nc https://paddleclas.bj.bcebos.com/data/TIPC/duke_market.zip --no-check-certificate
+        unzip duke_market.zip
+        cd ../
     else
         # pretrain lite train data
         cd dataset
@@ -324,7 +329,7 @@ if [[ ${MODE} = "paddle2onnx_infer" ]]; then
     python_name=$(func_parser_value "${lines[2]}")
     inference_model_url=$(func_parser_value "${lines[10]}")
     tar_name=$(func_get_url_file_name "$inference_model_url")
-    
+
     ${python_name} -m pip install onnx
     ${python_name} -m pip install paddle2onnx
     ${python_name} -m pip install onnxruntime

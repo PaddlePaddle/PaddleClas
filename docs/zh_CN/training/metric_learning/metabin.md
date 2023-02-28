@@ -36,7 +36,7 @@
 
 | 模型 | recall@1(\%) | mAP(\%) | 参考recall@1(\%) | 参考mAP(\%) | 预训练模型下载地址 | inference模型下载地址 |
 | -------- | ------------ | ------- |------------ | ------- | ------------------ | --------------------- |
-| ResNet50_MetaBIN | 55.07 | 32.62 | 55.16 | 33.09 | [metabin_resnet50_pretrained.pdparams](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/reid/metabin/metabin_resnet50_pretrained.pdparams)                  | [metabin_resnet50_infer.tar](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/reid/metabin/metabin_resnet50_infer.tar)                     |
+| ResNet50_MetaBIN | 55.25 | 32.97 | 55.16 | 33.09 | [metabin_resnet50_pretrained.pdparams](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/metric_learning/metabin/metabin_resnet50_pretrained.pdparams)                  | [metabin_resnet50_infer.tar](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/metric_learning/metabin/metabin_resnet50_infer.tar)                     |
 
 接下来主要以`MetaBIN_ResNet50_cross_domain.yaml`配置和训练好的模型文件为例，展示在 Market1501 数据集上进行训练, 在 DukeMTMC-reID 数据集上测试、推理的过程。
 
@@ -88,14 +88,14 @@
   -o Global.pretrained_model="./output/RecModel/latest"
   ```
 
-- 以训练好的模型为例，下载 [metabin_resnet50_pretrained.pdparams](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/reid/metabin/metabin_resnet50_pretrained.pdparams) 到 `PaddleClas/pretrained_models` 文件夹中，执行如下命令即可进行评估。
+- 以训练好的模型为例，下载 [metabin_resnet50_pretrained.pdparams](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/metric_learning/metabin/metabin_resnet50_pretrained.pdparams) 到 `PaddleClas/pretrained_models` 文件夹中，执行如下命令即可进行评估。
 
   ```shell
   # 下载模型
   cd PaddleClas
   mkdir pretrained_models
   cd pretrained_models
-  wget https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/reid/metabin/metabin_resnet50_pretrained.pdparams
+  wget https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/metric_learning/metabin/metabin_resnet50_pretrained.pdparams
   cd ..
   # 评估
   python3.7 tools/eval.py \
@@ -118,10 +118,9 @@
   ppcls INFO: query feature calculation process: [0/18]
   ppcls INFO: Build query done, all feat shape: [2228, 2048]
   ppcls INFO: re_ranking=False
-  ppcls INFO: [Eval][Epoch 0][Avg]recall1: 0.55072, recall5: 0.68492, recall10: 0.73698, mAP: 0.32624
-
+  ppcls INFO: [Eval][Epoch 0][Avg]recall1: 0.55251, recall5: 0.68268, recall10: 0.72756, mAP: 0.32977
   ```
-  默认评估日志保存在`PaddleClas/output/RecModel/eval.log`中，可以看到我们提供的 `metabin_resnet50_pretrained.pdparams` 模型在 SOP 数据集上的评估指标为recall@1=0.55072，recall@5=0.68492，recall@10=0.73698，mAP=0.32624
+  默认评估日志保存在`PaddleClas/output/RecModel/eval.log`中，可以看到我们提供的 `metabin_resnet50_pretrained.pdparams` 模型在 Market-1501 数据集上的评估指标为recall@1=0.55251，recall@5=0.68268，recall@10=0.72756，mAP=0.32977
 
 - 使用re-ranking功能提升评估精度
 
@@ -145,7 +144,7 @@
   - 或者下载并解压我们提供的 inference 模型
     ```shell
     cd ./deploy
-    wget https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/reid/metabin/metabin_resnet50_infer.tar
+    wget https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/metric_learning/metabin/metabin_resnet50_infer.tar
     tar -xf metabin_resnet50_infer.tar
     cd ../
     ```
