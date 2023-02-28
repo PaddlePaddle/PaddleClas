@@ -26,6 +26,8 @@
 
 ## 1. PP-ShiTu android demo 快速体验
 
+如需基于android demo项目进行二次开发，请点击：[shitu_android_demo](../../../deploy/shitu_android_demo/docs/README.md)
+
 <a name="安装"></a>
 
 ### 1.1 安装 PP-ShiTu android demo
