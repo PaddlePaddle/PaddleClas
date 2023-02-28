@@ -9,7 +9,7 @@ Global:
   save_interval: 8
   eval_during_train: True
   eval_interval: 8
-  epochs: &epochs 348    # 348*50 = 120*145 = 17400 iters
+  epochs: &epochs 348 # 348*50 = 120*145 = 17400 iters
   print_batch_step: 25
   use_visualdl: False
   eval_mode: "retrieval"
@@ -18,7 +18,7 @@ Global:
   # used for static mode and model export
   image_shape: [3, 256, 128]
   save_inference_dir: "./inference"
-  train_mode: 'metabin'
+  train_mode: "metabin"
 
 AMP:
   scale_loss: 65536
@@ -40,11 +40,11 @@ Arch:
   Head:
     name: "FC"
     embedding_size: *feat_dim
-    class_num: &class_num 751
+    class_num: 751
     weight_attr:
       initializer:
         name: KaimingUniform
-        negative_slope: 2.23606   # math.sqrt(5)
+        negative_slope: 2.23606 # math.sqrt(5)
         nonlinearity: "leaky_relu"
     bias_attr: False
 
@@ -85,7 +85,7 @@ DataLoader:
     loader:
       num_workers: 4
       use_shared_memory: True
-      
+
   Metalearning:
     Train:
       dataset:
