@@ -1,5 +1,5 @@
 ===========================train_params===========================
-model_name:RecModel
+model_name:MetaBIN_ResNet50
 python:python3.7
 gpu_list:0
 -o Global.device:gpu
@@ -13,14 +13,14 @@ train_infer_img_dir:./dataset/ILSVRC2012/val
 null:null
 ##
 trainer:norm_train
-norm_train:tools/train.py -c ppcls/configs/reid/MetaBIN_ResNet50_cross_domain.yaml -o Global.seed=1234 -o DataLoader.Train.loader.num_workers=0 -o DataLoader.Train.loader.use_shared_memory=False -o Global.eval_during_train=False -o Global.save_interval=2 -o DataLoader.Train.sampler.num_instances=2 -o DataLoader.Metalearning.Train.sampler.batch_size=16 -o DataLoader.Metalearning.Train.sampler.num_instances=2 -o AMP=None
+norm_train:tools/train.py -c ppcls/configs/reid/MetaBIN_ResNet50_cross_domain.yaml -o Global.seed=1234 -o DataLoader.Train.loader.num_workers=1 -o DataLoader.Train.loader.use_shared_memory=False -o Global.eval_during_train=False -o Global.save_interval=2 -o DataLoader.Train.sampler.num_instances=2 -o DataLoader.Metalearning.Train.sampler.batch_size=16 -o DataLoader.Metalearning.Train.sampler.num_instances=2 -o AMP=None
 pact_train:null
 fpgm_train:null
 distill_train:null
 null:null
 null:null
 ##
-===========================eval_params=========================== 
+===========================eval_params===========================
 eval:tools/eval.py -c ppcls/configs/reid/MetaBIN_ResNet50_cross_domain.yaml
 null:null
 ##
@@ -33,7 +33,7 @@ fpgm_export:null
 distill_export:null
 kl_quant:null
 export2:null
-pretrained_model_url:https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/reid/metabin/metabin_resnet50_pretrained.pdparams
+pretrained_model_url:https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/metric_learning/metabin/metabin_resnet50_pretrained.pdparams
 infer_model:../inference/
 infer_export:True
 infer_quant:Fasle
