@@ -746,8 +746,8 @@ class Pad(object):
         # Process fill color for affine transforms
         major_found, minor_found = (int(v)
                                     for v in PILLOW_VERSION.split('.')[:2])
-        major_required, minor_required = (int(v) for v in
-                                          min_pil_version.split('.')[:2])
+        major_required, minor_required = (
+            int(v) for v in min_pil_version.split('.')[:2])
         if major_found < major_required or (major_found == major_required and
                                             minor_found < minor_required):
             if fill is None:
