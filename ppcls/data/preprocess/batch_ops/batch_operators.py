@@ -88,7 +88,7 @@ class MixupOperator(BatchOperator):
 
     def __call__(self, batch):
         imgs, labels, bs = self._unpack(batch)
-        idx = np.random.permutation(bs)
+        idx = np.arange(bs)[::-1]
         lam = np.random.beta(self._alpha, self._alpha)
         imgs = lam * imgs + (1 - lam) * imgs[idx]
         targets = self._mix_target(labels, labels[idx], lam)
@@ -143,7 +143,7 @@ class CutmixOperator(BatchOperator):
 
     def __call__(self, batch):
         imgs, labels, bs = self._unpack(batch)
-        idx = np.random.permutation(bs)
+        idx = np.arange(bs)[::-1]
         lam = np.random.beta(self._alpha, self._alpha)
 
         bbx1, bby1, bbx2, bby2 = self._rand_bbox(imgs.shape, lam)
@@ -179,7 +179,7 @@ class FmixOperator(BatchOperator):
 
     def __call__(self, batch):
         imgs, labels, bs = self._unpack(batch)
-        idx = np.random.permutation(bs)
+        idx = np.arange(bs)[::-1]
         size = (imgs.shape[2], imgs.shape[3])
         lam, mask = sample_mask(self._alpha, self._decay_power, \
                 size, self._max_soft, self._reformulate)
