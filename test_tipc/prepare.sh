@@ -373,9 +373,9 @@ if [[ ${MODE} = "benchmark_train" ]]; then
         ln -s demo_test.txt val_list.txt
     else
         rm -rf ILSVRC2012
-        wget -nc https://paddle-wheel.bj.bcebos.com/benchmark/ILSVRC2012_w.tar
-        tar xf ILSVRC2012_w.tar
-        ln -s ILSVRC2012_w ILSVRC2012
+        wget -nc https://paddleclas.bj.bcebos.com/data/TIPC/ILSVRC2012_benchmark.tar
+        tar xf ILSVRC2012_benchmark.tar
+        mv ILSVRC2012_benchmark ILSVRC2012
     fi
     cd ../
 
