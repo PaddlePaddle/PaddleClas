@@ -99,7 +99,7 @@ DataLoader:
       cls_label_path: ./dataset/ILSVRC2012/val_list.txt
       transform_ops:
         - DecodeImage:
-            to_rgb: False
+            to_rgb: True
             channel_first: False
         - ResizeImage:
             resize_short: 288
