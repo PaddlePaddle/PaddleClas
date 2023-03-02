@@ -44,7 +44,7 @@ wget https://gitee.com/paddlepaddle/PaddleClas/raw/release/2.4/deploy/images/Ima
 
 ## 5. PaddleClas C API接口简介
 下面提供了PaddleClas的C API简介
-- 如果用户想要更换部署后端或进行其他定制化操作, 请查看[C Runtime API](https://github.com/PaddlePaddle/FastDeploy/blob/develop/c_api/fastdeploy_capi/runtime/runtime_option.h).
+- 如果用户想要更换部署后端或进行其他定制化操作, 请查看[C Runtime API](https://baidu-paddle.github.io/fastdeploy-api/c/html/runtime__option_8h.html).
 - 更多 PaddleClas C API 请查看 [C PaddleClas API](https://github.com/PaddlePaddle/FastDeploy/blob/develop/c_api/fastdeploy_capi/vision/classification/ppcls/model.h)
 
 ### 配置
