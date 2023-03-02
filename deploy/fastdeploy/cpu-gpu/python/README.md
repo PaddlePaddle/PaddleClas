@@ -1,5 +1,5 @@
 # PaddleClas CPU-GPU Python部署示例
-本目录下提供`infer.py`快速完成PaddleClas在CPU/GPU，以及GPU上通过Paddle-TensorRT加速部署的示例.
+本目录下提供`infer.py`快速完成PaddleClas在CPU/GPU上部署的示例.
 
 ## 1. 说明  
 PaddleClas支持利用FastDeploy在NVIDIA GPU、X86 CPU、飞腾CPU、ARM CPU、Intel GPU(独立显卡/集成显卡)硬件上快速部署图像分类模型
