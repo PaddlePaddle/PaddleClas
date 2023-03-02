@@ -1,0 +1,277 @@
+# global configs
+Global:
+  checkpoints: null
+  pretrained_model: null
+  output_dir: "./output/"
+  device: "gpu"
+  iter_per_epoch: &iter_per_epoch 50
+  warmup_iter: 10
+  save_interval: 8
+  eval_during_train: True
+  eval_interval: 8
+  epochs: &epochs 348 # 348*50 = 120*145 = 17400 iters
+  print_batch_step: 25
+  use_visualdl: False
+  eval_mode: "retrieval"
+  retrieval_feature_from: "features" # 'backbone' or 'features'
+  re_ranking: False
+  # used for static mode and model export
+  image_shape: [3, 256, 128]
+  save_inference_dir: "./inference"
+  train_mode: "metabin"
+
+AMP:
+  scale_loss: 65536
+  use_dynamic_loss_scaling: True
+
+# model architecture
+Arch:
+  name: "RecModel"
+  Backbone:
+    name: "ResNet50_metabin"
+    pretrained: https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/others/resnet50-19c8e357_torch2paddle.pdparams
+    bias_lr_factor: 2.0
+  BackboneStopLayer:
+    name: "flatten"
+  Neck:
+    name: MetaBNNeck
+    num_features: &feat_dim 2048
+    use_global_stats: True
+  Head:
+    name: "FC"
+    embedding_size: *feat_dim
+    class_num: 751
+    weight_attr:
+      initializer:
+        name: KaimingUniform
+        negative_slope: 2.23606 # math.sqrt(5)
+        nonlinearity: "leaky_relu"
+    bias_attr: False
+
+# data loader for train and eval
+DataLoader:
+  Train:
+    dataset:
+      name: "Market1501"
+      image_root: "./dataset/"
+      cls_label_path: "bounding_box_train"
+      backend: "pil"
+      transform_ops:
+        - ResizeImage:
+            size: [128, 256]
+            return_numpy: False
+            interpolation: "bicubic"
+            backend: "pil"
+        - RandFlipImage:
+            flip_code: 1
+        - Pad:
+            padding: 10
+        - RandCropImageV2:
+            size: [128, 256]
+        - ColorJitter:
+            brightness: 0.15
+            contrast: 0.15
+            saturation: 0.1
+            hue: 0.1
+        - ToTensor:
+        - Normalize:
+            mean: [0.485, 0.456, 0.406]
+            std: [0.229, 0.224, 0.225]
+    sampler:
+      name: NaiveIdentityBatchSampler
+      batch_size: 96
+      num_instances: 4
+      drop_last: True
+    loader:
+      num_workers: 4
+      use_shared_memory: True
+
+  Metalearning:
+    Train:
+      dataset:
+        name: "Market1501"
+        image_root: "./dataset/"
+        cls_label_path: "bounding_box_train"
+        backend: "pil"
+        transform_ops:
+          - ResizeImage:
+              size: [128, 256]
+              return_numpy: False
+              interpolation: "bicubic"
+              backend: "pil"
+          - RandFlipImage:
+              flip_code: 1
+          - Pad:
+              padding: 10
+          - RandCropImageV2:
+              size: [128, 256]
+          - ColorJitter:
+              brightness: 0.15
+              contrast: 0.15
+              saturation: 0.1
+              hue: 0.1
+          - ToTensor:
+          - Normalize:
+              mean: [0.485, 0.456, 0.406]
+              std: [0.229, 0.224, 0.225]
+      sampler:
+        name: DomainShuffleBatchSampler
+        batch_size: 96
+        num_instances: 4
+        drop_last: True
+        camera_to_domain: True
+      loader:
+        num_workers: 4
+        use_shared_memory: True
+
+  Eval:
+    Query:
+      dataset:
+        name: "DukeMTMC"
+        image_root: "./dataset/"
+        cls_label_path: "query"
+        backend: "pil"
+        transform_ops:
+          - ResizeImage:
+              size: [128, 256]
+              return_numpy: False
+              interpolation: "bicubic"
+              backend: "pil"
+          - ToTensor:
+          - Normalize:
+              mean: [0.485, 0.456, 0.406]
+              std: [0.229, 0.224, 0.225]
+      sampler:
+        name: DistributedBatchSampler
+        batch_size: 128
+        drop_last: False
+        shuffle: False
+      loader:
+        num_workers: 4
+        use_shared_memory: True
+
+    Gallery:
+      dataset:
+        name: "DukeMTMC"
+        image_root: "./dataset/"
+        cls_label_path: "bounding_box_test"
+        backend: "pil"
+        transform_ops:
+          - ResizeImage:
+              size: [128, 256]
+              return_numpy: False
+              interpolation: "bicubic"
+              backend: "pil"
+          - ToTensor:
+          - Normalize:
+              mean: [0.485, 0.456, 0.406]
+              std: [0.229, 0.224, 0.225]
+      sampler:
+        name: DistributedBatchSampler
+        batch_size: 128
+        drop_last: False
+        shuffle: False
+      loader:
+        num_workers: 4
+        use_shared_memory: True
+
+# loss function config for traing/eval process
+Loss:
+  Train:
+    - CELossForMetaBIN:
+        weight: 1.0
+        epsilon: 0.1
+    - TripletLossForMetaBIN:
+        weight: 1.0
+        margin: 0.3
+        feature_from: "backbone"
+    - IntraDomainScatterLoss:
+        weight: 1.0
+        normalize_feature: True
+        feature_from: "backbone"
+    - InterDomainShuffleLoss:
+        weight: 1.0
+        normalize_feature: False
+        feature_from: "backbone"
+  Basic:
+    - CELossForMetaBIN:
+        weight: 1.0
+        epsilon: 0.1
+    - TripletLossForMetaBIN:
+        weight: 1.0
+        margin: 0.3
+        feature_from: "backbone"
+  MetaTrain:
+    - CELossForMetaBIN:
+        weight: 1.0
+        epsilon: 0.1
+    - TripletLossForMetaBIN:
+        weight: 1.0
+        margin: 0.3
+        feature_from: "backbone"
+    - IntraDomainScatterLoss:
+        weight: 1.0
+        normalize_feature: True
+        feature_from: "backbone"
+    - InterDomainShuffleLoss:
+        weight: 1.0
+        normalize_feature: False
+        feature_from: "backbone"
+  MetaTest:
+    - CELossForMetaBIN:
+        weight: 1.0
+        epsilon: 0.1
+    - TripletLossForMetaBIN:
+        weight: 1.0
+        margin: 0.3
+        feature_from: "backbone"
+  Eval:
+    - TripletLossForMetaBIN:
+        weight: 1.0
+        margin: 0.3
+        feature_from: "backbone"
+
+Optimizer:
+  - Momentum:
+      scope: ".*(conv|batch_norm|instance_norm|feat_bn|fc)"
+      lr:
+        name: MultiStepDecay
+        epochs: *epochs
+        learning_rate: 0.01
+        step_each_epoch: *iter_per_epoch
+        milestones: [145, 261]
+        gamma: 0.1
+        warmup_epoch: 29
+        warmup_start_lr: 0.0001
+        by_epoch: False
+        last_epoch: -1
+      momentum: 0.9
+      regularizer:
+        name: "L2"
+        coeff: 0.0005
+  - SGD:
+      scope: "backbone.*gate"
+      lr:
+        name: Constant
+        learning_rate: 0.2
+        last_epoch: -1
+  - SGD:
+      scope: "RecModel"
+      lr:
+        name: Cyclic
+        epochs: *epochs
+        step_each_epoch: *iter_per_epoch
+        base_learning_rate: 0.001
+        max_learning_rate: 0.1
+        warmup_epoch: 0
+        warmup_start_lr: 1
+        step_size_up: 1095
+        step_size_down: 1095
+        by_epoch: False
+        last_epoch: 0
+
+Metric:
+  Eval:
+    - Recallk:
+        topk: [1, 5, 10]
+    - mAP: {}

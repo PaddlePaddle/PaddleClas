@@ -78,6 +78,7 @@ from .model_zoo.cae import cae_base_patch16_224, cae_large_patch16_224
 
 from .variant_models.resnet_variant import ResNet50_last_stage_stride1
 from .variant_models.resnet_variant import ResNet50_adaptive_max_pool2d
+from .variant_models.resnet_variant import ResNet50_metabin
 from .variant_models.vgg_variant import VGG19Sigmoid
 from .variant_models.pp_lcnet_variant import PPLCNet_x2_5_Tanh
 from .variant_models.pp_lcnetv2_variant import PPLCNetV2_base_ShiTu

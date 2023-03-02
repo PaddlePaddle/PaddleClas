@@ -61,8 +61,8 @@ _model_diff = None
 
 _CLIP_diff = {
     'add_layer_norm_before_encoder': [
-        'base_vit_patch32_224', 'base_vit_patch16_224',
-        'large_vit_patch14_336', 'large_vit_patch14_224'
+        'vit_base_patch32_224', 'vit_base_patch16_224',
+        'vit_large_patch14_336', 'vit_large_patch14_224'
     ],
     'add_relative_position_bias_in_msa': [],
     'add_shared_rel_pos_bias': [],
@@ -70,8 +70,8 @@ _CLIP_diff = {
     'remove_cls_token': [],
     'remove_abs_pos_emb': [],
     'replace_mlp_GELU': [
-        'base_vit_patch32_224', 'base_vit_patch16_224',
-        'large_vit_patch14_336', 'large_vit_patch14_224'
+        'vit_base_patch32_224', 'vit_base_patch16_224',
+        'vit_large_patch14_336', 'vit_large_patch14_224'
     ],
     'head': {
         'fc_norm': [],
@@ -100,7 +100,7 @@ _CoCa_diff = {
     'add_relative_position_bias_in_msa': [],
     'add_shared_rel_pos_bias': [],
     'add_mul_gamma_to_msa_mlp': [],
-    'remove_cls_token': ['small_vit_patch16_224'],
+    'remove_cls_token': [],
     'remove_abs_pos_emb': [],
     'replace_mlp_GELU': [],
     'head': {
@@ -113,12 +113,12 @@ _CoCa_diff = {
 _BEiTv2_diff = {
     'add_layer_norm_before_encoder': [],
     'add_relative_position_bias_in_msa':
-    ['base_vit_patch16_224', 'large_vit_patch16_224'],
+    ['vit_base_patch16_224', 'vit_large_patch16_224'],
     'add_shared_rel_pos_bias': [],
     'add_mul_gamma_to_msa_mlp':
-    ['base_vit_patch16_224', 'large_vit_patch16_224'],
+    ['vit_base_patch16_224', 'vit_large_patch16_224'],
     'remove_cls_token': [],
-    'remove_abs_pos_emb': ['base_vit_patch16_224', 'large_vit_patch16_224'],
+    'remove_abs_pos_emb': ['vit_base_patch16_224', 'vit_large_patch16_224'],
     'replace_mlp_GELU': [],
     'head': {
         'fc_norm': [],
@@ -129,9 +129,9 @@ _BEiTv2_diff = {
 
 _CAE_diff = {
     'add_layer_norm_before_encoder': [],
-    'add_relative_position_bias_in_msa': ['base_vit_patch16_224'],
+    'add_relative_position_bias_in_msa': ['vit_base_patch16_224'],
     'add_shared_rel_pos_bias': [],
-    'add_mul_gamma_to_msa_mlp': ['base_vit_patch16_224'],
+    'add_mul_gamma_to_msa_mlp': ['vit_base_patch16_224'],
     'remove_cls_token': [],
     'remove_abs_pos_emb': [],
     'replace_mlp_GELU': [],
@@ -151,7 +151,7 @@ _EVA_diff = {
     'remove_abs_pos_emb': [],
     'replace_mlp_GELU': [],
     'head': {
-        'fc_norm': ['huge_vit_patch14'],
+        'fc_norm': ['vit_huge_patch14'],
         'return_all_tokens': [],
         'return_patch_tokens': [],
     }
@@ -166,7 +166,7 @@ _MAE_diff = {
     'remove_abs_pos_emb': [],
     'replace_mlp_GELU': [],
     'head': {
-        'fc_norm': ['huge_vit_patch14'],
+        'fc_norm': ['vit_huge_patch14'],
         'return_all_tokens': [],
         'return_patch_tokens': [],
     }

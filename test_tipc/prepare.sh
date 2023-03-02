@@ -197,6 +197,11 @@ if [[ ${MODE} = "lite_train_lite_infer" ]] || [[ ${MODE} = "lite_train_whole_inf
         cd tipc_shitu_demo_data
         ln -s demo_test.txt val_list.txt
         cd ../../
+    elif [[ ${model_name} =~ "MetaBIN_ResNet50" ]]; then
+        cd dataset
+        wget -nc https://paddleclas.bj.bcebos.com/data/TIPC/duke_market.zip --no-check-certificate
+        unzip duke_market.zip
+        cd ../
     else
         # pretrain lite train data
         cd dataset
@@ -368,9 +373,9 @@ if [[ ${MODE} = "benchmark_train" ]]; then
         ln -s demo_test.txt val_list.txt
     else
         rm -rf ILSVRC2012
-        wget -nc https://paddle-wheel.bj.bcebos.com/benchmark/ILSVRC2012_w.tar
-        tar xf ILSVRC2012_w.tar
-        ln -s ILSVRC2012_w ILSVRC2012
+        wget -nc https://paddleclas.bj.bcebos.com/data/TIPC/ILSVRC2012_benchmark.tar
+        tar xf ILSVRC2012_benchmark.tar
+        mv ILSVRC2012_benchmark ILSVRC2012
     fi
     cd ../
 
