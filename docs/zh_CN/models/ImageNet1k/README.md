@@ -796,15 +796,24 @@ DeiT（Data-efficient Image Transformers）系列模型的精度、速度指标�
 
 <a name="MobileViT"></a>
 
-## MobileViT 系列 <sup>[[42](#ref42)]</sup>
+## MobileViT 系列 <sup>[[42](#ref42)][[51](#ref51)]</sup>
 
-关于 MobileViT 系列模型的精度、速度指标如下表所示，更多介绍可以参考：[MobileViT 系列模型文档](MobileViT.md)。
+关于 MobileViT 系列模型的精度、速度指标如下表所示，更多介绍可以参考：[MobileViT 系列模型文档](MobileViT.md), [MobileViTv3 系列模型文档](MobileViTv3.md)。
 
 | 模型       | Top-1 Acc | Top-5 Acc | time(ms)<br>bs=1 | time(ms)<br>bs=4 | time(ms)<br/>bs=8 | FLOPs(M) | Params(M) | 预训练模型下载地址                                               | inference模型下载地址                                      |
 | ---------- | --------- | --------- | ---------------- | ---------------- | -------- | --------- | ------------------------------------------------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ |
-|  MobileViT_XXS    | 0.6867 | 0.8878 | - | - | - | 337.24  |  1.28   | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/MobileViT_XXS_pretrained.pdparams) | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/MobileViT_XXS_infer.tar) |
-|  MobileViT_XS    | 0.7454 | 0.9227 | - | - | - | 930.75  |  2.33   | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/MobileViT_XS_pretrained.pdparams) | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/MobileViT_XS_infer.tar) |
-|  MobileViT_S    | 0.7814 | 0.9413 | - | - | - | 1849.35  |   5.59   | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/MobileViT_S_pretrained.pdparams) | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/MobileViT_S_infer.tar) |
+|  MobileViT_XXS     | 0.6867 | 0.8878 | - | - | - |  337.24 | 1.28 | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/MobileViT_XXS_pretrained.pdparams) | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/MobileViT_XXS_infer.tar) |
+|  MobileViT_XS      | 0.7454 | 0.9227 | - | - | - |  930.75 | 2.33 | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/MobileViT_XS_pretrained.pdparams) | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/MobileViT_XS_infer.tar) |
+|  MobileViT_S       | 0.7814 | 0.9413 | - | - | - | 1849.35 | 5.59 | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/MobileViT_S_pretrained.pdparams) | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/MobileViT_S_infer.tar) |
+| MobileViTv3_XXS    | 0.7087 | 0.8976 | - | - | - |  289.02 | 1.25 | [下载链接]() | [下载链接]() |
+| MobileViTv3_XS     | 0.7663 | 0.9332 | - | - | - |  926.98 | 2.49 | [下载链接]() | [下载链接]() |
+| MobileViTv3_S      | 0.7928 | 0.9454 | - | - | - | 1841.39 | 5.76 | [下载链接]() | [下载链接]() |
+| MobileViTv3_XXS_L2 | 0.7028 | 0.8942 | - | - | - |  256.97 | 1.15 | [下载链接]() | [下载链接]() |
+| MobileViTv3_XS_L2  | 0.7607 | 0.9300 | - | - | - |  852.82 | 2.26 | [下载链接]() | [下载链接]() |
+| MobileViTv3_S_L2   | 0.7907 | 0.9440 | - | - | - | 1651.96 | 5.17 | [下载链接]() | [下载链接]() |
+| MobileViTv3_x0_5   | 0.7200 | 0.9083 | - | - | - |  481.33 | 1.43 | [下载链接]() | [下载链接]() |
+| MobileViTv3_x0_75  | 0.7626 | 0.9308 | - | - | - | 1064.48 | 3.00 | [下载链接]() | [下载链接]() |
+| MobileViTv3_x1_0   | 0.7838 | 0.9421 | - | - | - | 1875.96 | 5.14 | [下载链接]() | [下载链接]() |
 
 <a name='reference'></a>
 
@@ -910,3 +919,5 @@ TRANSFORMERS FOR IMAGE RECOGNITION AT SCALE.
 <a name="ref49">[49]</a>Mingyuan Mao, Renrui Zhang, Honghui Zheng, Peng Gao, Teli Ma, Yan Peng, Errui Ding, Baochang Zhang, Shumin Han. Dual-stream Network for Visual Recognition.
 
 <a name="ref50">[50]</a>Ze Liu, Han Hu, Yutong Lin, Zhuliang Yao, Zhenda Xie, Yixuan Wei, Jia Ning, Yue Cao, Zheng Zhang, Li Dong, Furu Wei, Baining Guo. Swin Transformer V2: Scaling Up Capacity and Resolution
+
+<a name="ref50">[51]</a>Wadekar, Shakti N. and Chaurasia, Abhishek. MobileViTv3: Mobile-Friendly Vision Transformer with Simple and Effective Fusion of Local, Global and Input Features

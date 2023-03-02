@@ -28,9 +28,9 @@ EMA:
 
 # model architecture
 Arch:
-  name: MobileViTv3_XXS
+  name: MobileViTv3_S_L2
   class_num: 1000
-  dropout: 0.05
+  dropout: 0.1
 
 # loss function config for traing/eval process
 Loss:
