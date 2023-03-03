@@ -108,7 +108,7 @@ DataLoader:
               class_num: 1000
               MixupOperator:
                alpha: 0.8
-               prob: 1.0
+               prob: 0.5
               CutmixOperator:
                alpha: 1.0
                prob: 0.5
