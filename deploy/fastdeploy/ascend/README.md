@@ -1,9 +1,9 @@
 [English](README.md) | 简体中文
 
-# PaddleClas 模型在华为昇腾上的部署方案-FastDeploy
+# PaddleClas 模型在昇腾上的部署方案-FastDeploy
 
 ## 1. 说明  
-PaddleClas支持通过FastDeploy在华为昇腾上部署图像分类模型.
+PaddleClas支持通过FastDeploy在昇腾上部署图像分类模型.
 
 ## 2. 模型版本说明
 

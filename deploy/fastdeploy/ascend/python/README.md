@@ -1,8 +1,8 @@
-# PaddleClas Ascend Python部署示例
-本目录下提供`infer.py`快速完成PaddleClas在华为昇腾AI处理器上部署的示例.
+# PaddleClas 昇腾 Python部署示例
+本目录下提供`infer.py`快速完成PaddleClas在昇腾AI处理器上部署的示例.
 
 ## 1. 部署环境准备
-在部署前，需自行编译基于华为昇腾AI处理器的FastDeploy python wheel包并安装，参考文档，参考文档[华为昇腾AI处理器部署环境编译](https://github.com/PaddlePaddle/FastDeploy/blob/develop/docs/cn/build_and_install#自行编译安装)
+在部署前，需自行编译基于昇腾AI处理器的FastDeploy python wheel包并安装，参考文档，参考文档[昇腾AI处理器部署环境编译](https://github.com/PaddlePaddle/FastDeploy/blob/develop/docs/cn/build_and_install#自行编译安装)
 
 ## 2. 部署模型准备
 在部署前, 请准备好您所需要运行的推理模型, 您可以在[FastDeploy支持的PaddleClas模型列表](../README.md)中下载所需模型.
