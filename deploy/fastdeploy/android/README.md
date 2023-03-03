@@ -1,82 +1,80 @@
-English | [简体中文](README_CN.md)
-## PaddleClas Android Demo Tutorial
+# PaddleClas Android Demo 使用文档
 
-Real-time image classification on Android. This demo is easy to use for everyone. For example, you can run your own trained model in the Demo.
+在 Android 上实现实时的PaddleClas图像分类功能，此 Demo 有很好的的易用性和开放性，如在 Demo 中跑自己训练好的模型等。
 
-## Prepare the Environment
+## 环境准备
 
-1. Install Android Studio in your local environment. Refer to [Android Studio Official Website](https://developer.android.com/studio)  for detailed tutorial.
-2. Prepare an Android phone and turn on the USB debug mode: `Settings -> Find developer options -> Open developer options and USB debug mode`
+1. 在本地环境安装好 Android Studio 工具，详细安装方法请见[Android Stuido 官网](https://developer.android.com/studio)。
+2. 准备一部 Android 手机，并开启 USB 调试模式。开启方法: `手机设置 -> 查找开发者选项 -> 打开开发者选项和 USB 调试模式`
 
-## Deployment steps
+## 部署步骤
 
-1. The target detection PaddleClas Demo  is located in the `fastdeploy/examples/vision/classification/paddleclas/android`
-2. Open paddleclas/android project with Android Studio
-3. Connect the phone to the computer, turn on USB debug mode and file transfer mode, and connect your phone to Android Studio (allow the phone to install software from USB)
+1. 用 Android Studio 打开 paddleclas/android 工程
+2. 手机连接电脑，打开 USB 调试和文件传输模式，并在 Android Studio 上连接自己的手机设备（手机需要开启允许从 USB 安装软件权限）
 
 <p align="center">
 <img width="1280" alt="image" src="https://user-images.githubusercontent.com/31974251/197338597-2c9e1cf0-569b-49b9-a7fb-cdec71921af8.png">
 </p>
 
-> **Attention：**
->> If you encounter an NDK configuration error during import, compilation or running, open ` File > Project Structure > SDK Location` and change the path of SDK configured by the `Andriod SDK location`.
+> **注意：**
+>> 如果您在导入项目、编译或者运行过程中遇到 NDK 配置错误的提示，请打开 ` File > Project Structure > SDK Location`，修改 `Andriod SDK location` 为您本机配置的 SDK 所在路径。
 
-4. Click the Run button to automatically compile the APP and install it to the phone. (The process will automatically download the pre-compiled FastDeploy Android library and model files. Internet is required).
-The final effect is as follows. Figure 1: Install the APP on the phone; Figure 2: The effect when opening the APP. It will automatically recognize and mark the objects in the image; Figure 3: APP setting option. Click setting in the upper right corner and modify your options.
+4. 点击 Run 按钮，自动编译 APP 并安装到手机。(该过程会自动下载预编译的 FastDeploy Android 库，需要联网)
+成功后效果如下，图一：APP 安装到手机；图二： APP 打开后的效果，会自动识别图片中的物体并标记；图三：APP设置选项，点击右上角的设置图片，可以设置不同选项进行体验。
 
-  | APP Icon | APP Effect | APP Settings
+  | APP 图标 | APP 效果 | APP设置项
   | ---     | --- | --- |
   | ![app_pic ](https://user-images.githubusercontent.com/14995488/203484427-83de2316-fd60-4baf-93b6-3755f9b5559d.jpg)   | ![app_res](https://user-images.githubusercontent.com/14995488/203494666-16528cb3-0ce2-48fc-9f9e-37da17b2c2f6.jpg) |  ![app_setup](https://user-images.githubusercontent.com/14995488/203484436-57fdd041-7dcc-4e0e-b6cb-43e5ac1e729b.jpg) |
 
-## PaddleClasModel Java API Description  
-- Model initialized API: The initialized API contains two ways: Firstly, initialize directly through the constructor. Secondly, initialize at the appropriate program node by calling the init function. PaddleClasModel initialization parameters are as follows.
-  - modelFile: String. Model file path in paddle format, such as model.pdmodel
-  - paramFile: String. Parameter file path in paddle format, such as model.pdiparams  
-  - configFile: String. Preprocessing file for model inference, such as infer_cfg.yml  
-  - labelFile: String. This optional parameter indicates the path of the label file and is used for visualization, such as imagenet1k_label_list.txt, each line containing one label
-  - option: RuntimeOption. Optional parameter for model initialization. Default runtime options if not passing the parameter.  
+## PaddleClasModel Java API 说明  
+- 模型初始化 API: 模型初始化API包含两种方式，方式一是通过构造函数直接初始化；方式二是，通过调用init函数，在合适的程序节点进行初始化。PaddleClasModel初始化参数说明如下：  
+  - modelFile: String, paddle格式的模型文件路径，如 model.pdmodel
+  - paramFile: String, paddle格式的参数文件路径，如 model.pdiparams  
+  - configFile: String, 模型推理的预处理配置文件，如 infer_cfg.yml  
+  - labelFile: String, 可选参数，表示label标签文件所在路径，用于可视化，如 imagenet1k_label_list.txt，每一行包含一个label  
+  - option: RuntimeOption，可选参数，模型初始化option。如果不传入该参数则会使用默认的运行时选项。  
 
 ```java
-// Constructor: constructor w/o label file
-public PaddleClasModel(); // An empty constructor, which can be initialized by calling init
+// 构造函数: constructor w/o label file
+public PaddleClasModel(); // 空构造函数，之后可以调用init初始化
 public PaddleClasModel(String modelFile, String paramsFile, String configFile);
 public PaddleClasModel(String modelFile, String paramsFile, String configFile, String labelFile);
 public PaddleClasModel(String modelFile, String paramsFile, String configFile, RuntimeOption option);
 public PaddleClasModel(String modelFile, String paramsFile, String configFile, String labelFile, RuntimeOption option);
-// Call init manually for initialization: call init manually w/o label file
+// 手动调用init初始化: call init manually w/o label file
 public boolean init(String modelFile, String paramsFile, String configFile, RuntimeOption option);
 public boolean init(String modelFile, String paramsFile, String configFile, String labelFile, RuntimeOption option);
 ```  
-- Model Prediction API: The Model Prediction API contains an API for direct prediction and an API for visualization. In direct prediction, we do not save the image and render the result on Bitmap. Instead, we merely predict the inference result. For prediction and visualization, the results are both predicted and visualized, the visualized images are saved to the specified path, and the visualized results are rendered in Bitmap (Now Bitmap in ARGB8888 format is supported). Afterward, the Bitmap can be displayed on the camera.
+- 模型预测 API：模型预测API包含直接预测的API以及带可视化功能的API。直接预测是指，不保存图片以及不渲染结果到Bitmap上，仅预测推理结果。预测并且可视化是指，预测结果以及可视化，并将可视化后的图片保存到指定的途径，以及将可视化结果渲染在Bitmap(目前支持ARGB8888格式的Bitmap), 后续可将该Bitmap在camera中进行显示。
 ```java
-// Direct prediction: No image saving and no result rendering to Bitmap
+// 直接预测：不保存图片以及不渲染结果到Bitmap上
 public ClassifyResult predict(Bitmap ARGB8888Bitmap)；
-// Prediction and visualization: Predict and visualize the results, save the visualized image to the specified path, and render the visualized results on Bitmap
+// 预测并且可视化：预测结果以及可视化，并将可视化后的图片保存到指定的途径，以及将可视化结果渲染在Bitmap上
 public ClassifyResult predict(Bitmap ARGB8888Bitmap, String savedImagePath, float scoreThreshold)
 ```
-- Model resource release API: Call release() API to release model resources. Return true for successful release and false for failure; call initialized() to determine whether the model was initialized successfully, with true indicating successful initialization and false indicating failure.
+- 模型资源释放 API：调用 release() API 可以释放模型资源，返回true表示释放成功，false表示失败；调用 initialized() 可以判断模型是否初始化成功，true表示初始化成功，false表示失败。
 ```java
-public boolean release(); // Realise native resources
-public boolean initialized(); // Check if initialization is successful
+public boolean release(); // 释放native资源  
+public boolean initialized(); // 检查是否初始化成功
 ```
-- RuntimeOption settings  
+- RuntimeOption设置说明  
 ```java  
-public void enableLiteFp16(); // Enable fp16 accuracy inference
-public void disableLiteFP16(); // Disable fp16 accuracy inference
-public void setCpuThreadNum(int threadNum); // Set thread numbers
-public void setLitePowerMode(LitePowerMode mode);  // Set power mode
-public void setLitePowerMode(String modeStr);  // Set power mode through character string
-public void enableRecordTimeOfRuntime();  // Whether the print model is time-consuming
+public void enableLiteFp16(); // 开启fp16精度推理
+public void disableLiteFP16(); // 关闭fp16精度推理
+public void setCpuThreadNum(int threadNum); // 设置线程数
+public void setLitePowerMode(LitePowerMode mode);  // 设置能耗模式
+public void setLitePowerMode(String modeStr);  // 通过字符串形式设置能耗模式
+public void enableRecordTimeOfRuntime();  // 是否打印模型运行耗时
 ```
 
-- Model ClassifyResult
+- 模型结果ClassifyResult说明  
 ```java
-public float[] mScores;  // [n]   Score
-public int[] mLabelIds;  // [n]   Classification ID
-public boolean initialized(); //  Whether the result is valid or not
+public float[] mScores;  // [n]   得分
+public int[] mLabelIds;  // [n]   分类ID
+public boolean initialized(); // 检测结果是否有效
 ```  
 
-- Model Calling Example 1: Using Constructor or Default RuntimeOption
+- 模型调用示例1：使用构造函数以及默认的RuntimeOption
 ```java  
 import java.nio.ByteBuffer;
 import android.graphics.Bitmap;
@@ -85,67 +83,67 @@ import android.opengl.GLES20;
 import com.baidu.paddle.fastdeploy.vision.ClassifyResult;
 import com.baidu.paddle.fastdeploy.vision.classification.PaddleClasModel;
 
-// Initialize the model
+// 初始化模型
 PaddleClasModel model = new PaddleClasModel("MobileNetV1_x0_25_infer/inference.pdmodel",
                                             "MobileNetV1_x0_25_infer/inference.pdiparams",
                                             "MobileNetV1_x0_25_infer/inference_cls.yml");
 
-// Read the image: The following is merely the pseudo code to read the Bitmap
+// 读取图片: 以下仅为读取Bitmap的伪代码
 ByteBuffer pixelBuffer = ByteBuffer.allocate(width * height * 4);
 GLES20.glReadPixels(0, 0, width, height, GLES20.GL_RGBA, GLES20.GL_UNSIGNED_BYTE, pixelBuffer);
 Bitmap ARGB8888ImageBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
 ARGB8888ImageBitmap.copyPixelsFromBuffer(pixelBuffer);
 
-// Model inference
+// 模型推理
 ClassifyResult result = model.predict(ARGB8888ImageBitmap);  
 
-// Release model resources  
+// 释放模型资源  
 model.release();
 ```  
 
-- Model calling example 2: Manually call init at the appropriate program node and self-define RuntimeOption
+- 模型调用示例2: 在合适的程序节点，手动调用init，并自定义RuntimeOption
 ```java  
-// import is as the above...
+// import 同上 ...
 import com.baidu.paddle.fastdeploy.RuntimeOption;
 import com.baidu.paddle.fastdeploy.LitePowerMode;
 import com.baidu.paddle.fastdeploy.vision.ClassifyResult;
 import com.baidu.paddle.fastdeploy.vision.classification.PaddleClasModel;
-// Create an empty model
+// 新建空模型
 PaddleClasModel model = new PaddleClasModel();  
-// Model path
+// 模型路径
 String modelFile = "MobileNetV1_x0_25_infer/inference.pdmodel";
 String paramFile = "MobileNetV1_x0_25_infer/inference.pdiparams";
 String configFile = "MobileNetV1_x0_25_infer/inference_cls.yml";
-// Specify RuntimeOption
+// 指定RuntimeOption
 RuntimeOption option = new RuntimeOption();
 option.setCpuThreadNum(2);
 option.setLitePowerMode(LitePowerMode.LITE_POWER_HIGH);
 option.enableRecordTimeOfRuntime();
 option.enableLiteFp16();
-// Use init function for initialization  
+// 使用init函数初始化  
 model.init(modelFile, paramFile, configFile, option);
-// Bitmap reading, model prediction, and resource release are as above ...
+// Bitmap读取、模型预测、资源释放 同上 ...
 ```
-Refer to [MainActivity](./app/src/main/java/com/baidu/paddle/fastdeploy/app/examples/classification/ClassificationMainActivity.java) for more information
+更详细的用法请参考 [MainActivity](./app/src/main/java/com/baidu/paddle/fastdeploy/app/examples/classification/ClassificationMainActivity.java) 中的用法
 
-## Replace FastDeploy Prediction Library and Models
-It’s simple to replace the FastDeploy prediction library and models. The prediction library is located at `app/libs/fastdeploy-android-xxx-shared`, where `xxx` represents the version of your prediction library. The models are located at `app/src/main/assets/models/MobileNetV1_x0_25_infer`.  
-- Steps to replace FastDeploy prediction library:
-  - Download or compile the latest FastDeploy Android SDK, unzip and place it in the `app/libs`;  
-  - Modify the default value of the model path in `app/src/main/cpp/CMakeLists.txt` and to the prediction library path you download or compile. For example,  
+## 替换 FastDeploy 预测库和模型  
+替换FastDeploy预测库和模型的步骤非常简单。预测库所在的位置为 `app/libs/fastdeploy-android-xxx-shared`，其中 `xxx` 表示当前您使用的预测库版本号。模型所在的位置为，`app/src/main/assets/models/MobileNetV1_x0_25_infer`。  
+- 替换FastDeploy预测库的步骤:
+  - 下载或编译最新的FastDeploy Android预测库，解压缩后放在 `app/libs` 目录下;  
+  - 修改 `app/src/main/cpp/CMakeLists.txt` 中的预测库路径，指向您下载或编译的预测库路径。如：  
 ```cmake  
 set(FastDeploy_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../../../libs/fastdeploy-android-xxx-shared")
 ```
-- Steps to replace PaddleClas models:
-  - Put your PaddleClas model in `app/src/main/assets/models`;
-  - Modify the default value of the model path in `app/src/main/res/values/strings.xml`. For example,
+- 替换PaddleClas模型的步骤：
+  - 将您的PaddleClas分类模型放在 `app/src/main/assets/models` 目录下；  
+  - 修改 `app/src/main/res/values/strings.xml` 中模型路径的默认值，如：  
 ```xml
-<!-- Change this path to your model, such as models/MobileNetV2_x0_25_infer -->
+<!-- 将这个路径指修改成您的模型，如 models/MobileNetV2_x0_25_infer -->
 <string name="CLASSIFICATION_MODEL_DIR_DEFAULT">models/MobileNetV1_x0_25_infer</string>  
 <string name="CLASSIFICATION_LABEL_PATH_DEFAULT">labels/imagenet1k_label_list.txt</string>
 ```  
 
-## More Reference Documents
-For more FastDeploy Java API documentes and how to access FastDeploy C++ API via JNI, refer to:
-- [Use FastDeploy Java SDK in Android](../../../../../java/android/)
-- [Use FastDeploy C++ SDK in Android](../../../../../docs/en/faq/use_cpp_sdk_on_android.md)  
+## 更多参考文档
+如果您想知道更多的FastDeploy Java API文档以及如何通过JNI来接入FastDeploy C++ API感兴趣，可以参考以下内容:
+- [在 Android 中使用 FastDeploy Java SDK](https://github.com/PaddlePaddle/FastDeploy/tree/develop/java/android)
+- [在 Android 中使用 FastDeploy C++ SDK](https://github.com/PaddlePaddle/FastDeploy/blob/develop/docs/cn/faq/use_cpp_sdk_on_android.md)  
