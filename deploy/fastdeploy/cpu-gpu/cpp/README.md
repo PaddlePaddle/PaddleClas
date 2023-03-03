@@ -79,6 +79,7 @@ scores: 0.686229,
 - 关于如何通过FastDeploy使用更多不同的推理后端，以及如何使用不同的硬件，请参考文档：[如何切换模型推理后端引擎](https://github.com/PaddlePaddle/FastDeploy/blob/develop/docs/cn/faq/how_to_change_backend.md)
 
 ## 6. 更多指南
+- [PaddleClas系列 C++ API查阅](https://www.paddlepaddle.org.cn/fastdeploy-api-doc/cpp/html/namespacefastdeploy_1_1vision_1_1classification.html)
 - [PaddleClas Python部署](../python)
 - [PaddleClas C 部署](../c)
 - [PaddleClas C# 部署](../csharp)
