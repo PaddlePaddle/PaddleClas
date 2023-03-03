@@ -1,11 +1,11 @@
-# PaddleClas CPU-GPU C++部署示例
+# PaddleClas 昇腾 C++部署示例
 
-本目录下提供`infer.cc`, 供用户完成PaddleClas模型在华为昇腾AI处理器上的部署.
+本目录下提供`infer.cc`, 供用户完成PaddleClas模型在昇腾AI处理器上的部署.
 
 ## 1. 部署环境准备
 在部署前，需确认以下两个步骤
-- 1. 在部署前，需自行编译基于华为昇腾AI处理器的预测库，参考文档[华为昇腾AI处理器部署环境编译](https://github.com/PaddlePaddle/FastDeploy/blob/develop/docs/cn/build_and_install#自行编译安装)
-- 2. 部署时需要环境初始化, 请参考[如何使用C++在华为昇腾AI处理器部署](https://github.com/PaddlePaddle/FastDeploy/blob/develop/docs/cn/faq/use_sdk_on_ascend.md)
+- 1. 在部署前，需自行编译基于昇腾AI处理器的预测库，参考文档[昇腾AI处理器部署环境编译](https://github.com/PaddlePaddle/FastDeploy/blob/develop/docs/cn/build_and_install#自行编译安装)
+- 2. 部署时需要环境初始化, 请参考[如何使用C++在昇腾AI处理器部署](https://github.com/PaddlePaddle/FastDeploy/blob/develop/docs/cn/faq/use_sdk_on_ascend.md)
 
 ## 2. 部署模型准备
 在部署前, 请准备好您所需要运行的推理模型, 您可以在[FastDeploy支持的PaddleClas模型列表](../README.md)中下载所需模型.
@@ -29,7 +29,7 @@ wget https://bj.bcebos.com/paddlehub/fastdeploy/ResNet50_vd_infer.tgz
 tar -xvf ResNet50_vd_infer.tgz
 wget https://gitee.com/paddlepaddle/PaddleClas/raw/release/2.4/deploy/images/ImageNet/ILSVRC2012_val_00000010.jpeg
 
-# 使用华为昇腾部署
+# 使用昇腾部署
 ./infer_demo ResNet50_vd_infer ILSVRC2012_val_00000010.jpeg
 
 ```
