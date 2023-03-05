@@ -42,7 +42,7 @@ from ppcls.data.preprocess.ops.dali_operators import RandomRot90
 from ppcls.data.preprocess.ops.dali_operators import RandomRotation
 from ppcls.data.preprocess.ops.dali_operators import ResizeImage
 from ppcls.data.preprocess.ops.dali_operators import ToCHWImage
-from ppcls.engine.train.utils import type_name
+from ppcls.utils import type_name
 from ppcls.utils import logger
 
 INTERP_MAP = {
