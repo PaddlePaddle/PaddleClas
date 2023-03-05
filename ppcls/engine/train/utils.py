@@ -14,7 +14,7 @@
 from __future__ import absolute_import, division, print_function
 
 import datetime
-from ppcls.utils import logger
+from ppcls.utils import logger, type_name
 from ppcls.utils.misc import AverageMeter
 
 
@@ -75,8 +75,3 @@ def log_info(trainer, batch_size, epoch_id, iter_id):
             value=trainer.output_info[key].avg,
             step=trainer.global_step,
             writer=trainer.vdl_writer)
-
-
-def type_name(object: object) -> str:
-    """get class name of an object"""
-    return object.__class__.__name__
