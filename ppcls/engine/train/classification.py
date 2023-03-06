@@ -189,31 +189,9 @@ class ClassTrainer(object):
                 batch[1] = batch[1].reshape([batch_size, -1])
             self.global_step += 1
 
-            # forward & backward & step opt
-            # if engine.amp:
-            #     with paddle.amp.auto_cast(
-            #             custom_black_list={
-            #                 "flatten_contiguous_range", "greater_than"
-            #             },
-            #             level=engine.amp_level):
-            #         out = engine.model(batch)
-            #         loss_dict = engine.train_loss_func(out, batch[1])
-            #     loss = loss_dict["loss"] / engine.update_freq
-            #     scaled = engine.scaler.scale(loss)
-            #     scaled.backward()
-            #     if (iter_id + 1) % engine.update_freq == 0:
-            #         for i in range(len(engine.optimizer)):
-            #             engine.scaler.minimize(engine.optimizer[i], scaled)
-            # else:
-            #     out = engine.model(batch)
-            #     loss_dict = engine.train_loss_func(out, batch[1])
-            #     loss = loss_dict["loss"] / engine.update_freq
-            #     loss.backward()
-            #     if (iter_id + 1) % engine.update_freq == 0:
-            #         for i in range(len(engine.optimizer)):
-            #             engine.optimizer[i].step()
             out = self.model(batch)
             loss_dict = self.train_loss_func(out, batch[1])
+            # TODO(gaotingquan): mv update_freq to loss and optimizer
             loss = loss_dict["loss"] / self.update_freq
             loss.backward()
 
