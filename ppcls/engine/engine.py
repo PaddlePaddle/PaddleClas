@@ -369,6 +369,9 @@ class Engine(object):
                                      ema_module)
             if metric_info is not None:
                 best_metric.update(metric_info)
+            if hasattr(self.train_dataloader.batch_sampler, "set_epoch"):
+                self.train_dataloader.batch_sampler.set_epoch(best_metric[
+                    "epoch"])
 
         for epoch_id in range(best_metric["epoch"] + 1,
                               self.config["Global"]["epochs"] + 1):
