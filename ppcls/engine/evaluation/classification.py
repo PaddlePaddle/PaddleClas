@@ -67,16 +67,6 @@ class ClassEval(object):
             if not self.config["Global"].get("use_multilabel", False):
                 batch[1] = batch[1].reshape([-1, 1]).astype("int64")
 
-            # image input
-            # if engine.amp and engine.amp_eval:
-            #     with paddle.amp.auto_cast(
-            #             custom_black_list={
-            #                 "flatten_contiguous_range", "greater_than"
-            #             },
-            #             level=engine.amp_level):
-            #         out = engine.model(batch)
-            # else:
-            #     out = self.model(batch)
             out = self.model(batch)
 
             # just for DistributedBatchSampler issue: repeat sampling
@@ -127,14 +117,6 @@ class ClassEval(object):
 
             # calc loss
             if self.eval_loss_func is not None:
-                # if self.amp and self.amp_eval:
-                #     with paddle.amp.auto_cast(
-                #             custom_black_list={
-                #                 "flatten_contiguous_range", "greater_than"
-                #             },
-                #             level=engine.amp_level):
-                #         loss_dict = engine.eval_loss_func(preds, labels)
-                # else:
                 loss_dict = self.eval_loss_func(preds, labels)
 
                 for key in loss_dict:
