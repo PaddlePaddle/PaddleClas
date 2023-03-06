@@ -79,10 +79,9 @@ DataLoader:
             use_log_aspect: True
         - RandFlipImage:
             flip_code: 1
-        - TimmAutoAugment:
-            config_str: rand-m9-mstd0.5-inc1
+        - RandAugmentV3:
+            num_layers: 2
             interpolation: bicubic
-            img_size: 256
         - NormalizeImage:
             scale: 1.0/255.0
             mean: [0.0, 0.0, 0.0]
