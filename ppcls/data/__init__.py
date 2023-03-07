@@ -88,25 +88,32 @@ def worker_init_fn(worker_id: int, num_workers: int, rank: int, seed: int):
     random.seed(worker_seed)
 
 
-def build(config, mode, use_dali=False, seed=None):
+def build_dataloader(config, mode, seed=None):
     assert mode in [
         'Train', 'Eval', 'Test', 'Gallery', 'Query', 'UnLabelTrain'
     ], "Dataset mode should be Train, Eval, Test, Gallery, Query, UnLabelTrain"
-    assert mode in config.keys(), "{} config not in yaml".format(mode)
+    assert mode in config["DataLoader"].keys(), "{} config not in yaml".format(
+        mode)
+
+    dataloader_config = config["DataLoader"][mode]
+    class_num = config["Arch"].get("class_num", None)
+    epochs = config["Global"]["epochs"]
+    use_dali = config["Global"].get("use_dali", False)
+    num_workers = dataloader_config['loader']["num_workers"]
+    use_shared_memory = dataloader_config['loader']["use_shared_memory"]
+
     # build dataset
     if use_dali:
         from ppcls.data.dataloader.dali import dali_dataloader
         return dali_dataloader(
-            config,
+            config["DataLoader"],
             mode,
             paddle.device.get_device(),
-            num_threads=config[mode]['loader']["num_workers"],
+            num_threads=num_workers,
             seed=seed,
             enable_fuse=True)
 
-    class_num = config.get("class_num", None)
-    epochs = config.get("epochs", None)
-    config_dataset = config[mode]['dataset']
+    config_dataset = dataloader_config['dataset']
     config_dataset = copy.deepcopy(config_dataset)
     dataset_name = config_dataset.pop('name')
     if 'batch_transform_ops' in config_dataset:
@@ -119,7 +126,7 @@ def build(config, mode, use_dali=False, seed=None):
     logger.debug("build dataset({}) success...".format(dataset))
 
     # build sampler
-    config_sampler = config[mode]['sampler']
+    config_sampler = dataloader_config['sampler']
     if config_sampler and "name" not in config_sampler:
         batch_sampler = None
         batch_size = config_sampler["batch_size"]
@@ -152,11 +159,6 @@ def build(config, mode, use_dali=False, seed=None):
         batch_collate_fn = mix_collate_fn
     else:
         batch_collate_fn = None
-
-    # build dataloader
-    config_loader = config[mode]['loader']
-    num_workers = config_loader["num_workers"]
-    use_shared_memory = config_loader["use_shared_memory"]
 
     init_fn = partial(
         worker_init_fn,
@@ -194,78 +196,36 @@ def build(config, mode, use_dali=False, seed=None):
     data_loader.max_iter = max_iter
     data_loader.total_samples = total_samples
 
+    # TODO(gaotingquan): mv to build_sampler
+    if mode == "train":
+        if dataloader_config["Train"].get("max_iter", None):
+            # set max iteration per epoch mannualy, when training by iteration(s), such as XBM, FixMatch.
+            max_iter = config["Train"].get("max_iter")
+        update_freq = config["Global"].get("update_freq", 1)
+        max_iter = data_loader.max_iter // update_freq * update_freq
+        data_loader.max_iter = max_iter
+
     logger.debug("build data_loader({}) success...".format(data_loader))
     return data_loader
 
 
-# TODO(gaotingquan): perf
-class DataIterator(object):
-    def __init__(self, dataloader, use_dali=False):
-        self.dataloader = dataloader
-        self.use_dali = use_dali
-        self.iterator = iter(dataloader)
-        self.max_iter = dataloader.max_iter
-        self.total_samples = dataloader.total_samples
+# # TODO(gaotingquan): the length of dataloader should be determined by sampler
+# class DataIterator(object):
+#     def __init__(self, dataloader, use_dali=False):
+#         self.dataloader = dataloader
+#         self.use_dali = use_dali
+#         self.iterator = iter(dataloader)
+#         self.max_iter = dataloader.max_iter
+#         self.total_samples = dataloader.total_samples
 
-    def get_batch(self):
-        # fetch data batch from dataloader
-        try:
-            batch = next(self.iterator)
-        except Exception:
-            # NOTE: reset DALI dataloader manually
-            if self.use_dali:
-                self.dataloader.reset()
-            self.iterator = iter(self.dataloader)
-            batch = next(self.iterator)
-        return batch
-
-
-def build_dataloader(config, mode):
-    class_num = config["Arch"].get("class_num", None)
-    config["DataLoader"].update({"class_num": class_num})
-    config["DataLoader"].update({"epochs": config["Global"]["epochs"]})
-
-    use_dali = config["Global"].get("use_dali", False)
-    dataloader_dict = {
-        "Train": None,
-        "UnLabelTrain": None,
-        "Eval": None,
-        "Query": None,
-        "Gallery": None,
-        "GalleryQuery": None
-    }
-    if mode == 'train':
-        train_dataloader = build(
-            config["DataLoader"], "Train", use_dali, seed=None)
-
-        if config["DataLoader"]["Train"].get("max_iter", None):
-            # set max iteration per epoch mannualy, when training by iteration(s), such as XBM, FixMatch.
-            max_iter = config["Train"].get("max_iter")
-        update_freq = config["Global"].get("update_freq", 1)
-        max_iter = train_dataloader.max_iter // update_freq * update_freq
-        train_dataloader.max_iter = max_iter
-        if config["DataLoader"]["Train"].get("convert_iterator", True):
-            train_dataloader = DataIterator(train_dataloader, use_dali)
-        dataloader_dict["Train"] = train_dataloader
-
-    if config["DataLoader"].get('UnLabelTrain', None) is not None:
-        dataloader_dict["UnLabelTrain"] = build(
-            config["DataLoader"], "UnLabelTrain", use_dali, seed=None)
-
-    if mode == "eval" or (mode == "train" and
-                          config["Global"]["eval_during_train"]):
-        task = config["Global"].get("task", "classification")
-        if task in ["classification", "adaface"]:
-            dataloader_dict["Eval"] = build(
-                config["DataLoader"], "Eval", use_dali, seed=None)
-        elif task == "retrieval":
-            if len(config["DataLoader"]["Eval"].keys()) == 1:
-                key = list(config["DataLoader"]["Eval"].keys())[0]
-                dataloader_dict["GalleryQuery"] = build(
-                    config["DataLoader"]["Eval"], key, use_dali)
-            else:
-                dataloader_dict["Gallery"] = build(
-                    config["DataLoader"]["Eval"], "Gallery", use_dali)
-                dataloader_dict["Query"] = build(config["DataLoader"]["Eval"],
-                                                 "Query", use_dali)
-    return dataloader_dict
+#     def get_batch(self):
+#         # fetch data batch from dataloader
+#         try:
+#             batch = next(self.iterator)
+#         except Exception:
+#             # NOTE: reset DALI dataloader manually
+#             if self.use_dali:
+#                 self.dataloader.reset()
+#             self.iterator = iter(self.dataloader)
+#             batch = next(self.iterator)
+#         return batch
