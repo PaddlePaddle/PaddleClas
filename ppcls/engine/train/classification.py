@@ -28,7 +28,7 @@ from ...utils.save_load import init_model, ModelSaver
 
 
 class ClassTrainer(object):
-    def __init__(self, config, mode, model, eval_func):
+    def __init__(self, config, model, eval_func):
         self.config = config
         self.model = model
         self.eval = eval_func
@@ -41,32 +41,32 @@ class ClassTrainer(object):
         # gradient accumulation
         self.update_freq = self.config["Global"].get("update_freq", 1)
 
-        # AMP training and evaluating
-        # self._init_amp()
+        # TODO(gaotingquan): mv to build_model
+        # build EMA model
+        self.model_ema = self._build_ema_model()
 
         # build dataloader
         self.use_dali = self.config["Global"].get("use_dali", False)
-        self.dataloader_dict = build_dataloader(self.config, mode)
+        self.dataloader = build_dataloader(self.config, "Train")
 
         # build loss
-        self.train_loss_func, self.unlabel_train_loss_func = build_loss(
-            self.config, mode)
+        self.loss_func = build_loss(config, "Train")
 
         # build metric
         self.train_metric_func = build_metrics(config, "train")
 
         # build optimizer
         self.optimizer, self.lr_sch = build_optimizer(
-            self.config, self.dataloader_dict["Train"].max_iter,
-            [self.model, self.train_loss_func], self.update_freq)
+            self.config, self.dataloader.max_iter,
+            [self.model, self.loss_func], self.update_freq)
 
         # build model saver
         self.model_saver = ModelSaver(
-            self,
-            net_name="model",
-            loss_name="train_loss_func",
-            opt_name="optimizer",
-            model_ema_name="model_ema")
+            config=self.config,
+            net=self.model,
+            loss=self.loss_func,
+            opt=self.optimizer,
+            model_ema=self.model_ema if self.model_ema else None)
 
         # build best metric
         self.best_metric = {
@@ -84,8 +84,6 @@ class ClassTrainer(object):
                 "reader_cost", ".5f", postfix=" s,"),
         }
 
-        # build EMA model
-        self.model_ema = self._build_ema_model()
         self._init_checkpoints()
 
         # for visualdl
@@ -173,11 +171,10 @@ class ClassTrainer(object):
                 }, prefix="latest")
 
     def train_epoch(self, epoch_id):
+        self.model.train()
         tic = time.time()
 
-        for iter_id in range(self.dataloader_dict["Train"].max_iter):
-            batch = self.dataloader_dict["Train"].get_batch()
-
+        for iter_id, batch in enumerate(self.dataloader):
             profiler.add_profiler_step(self.config["profiler_options"])
             if iter_id == 5:
                 for key in self.time_info:
@@ -190,7 +187,7 @@ class ClassTrainer(object):
             self.global_step += 1
 
             out = self.model(batch)
-            loss_dict = self.train_loss_func(out, batch[1])
+            loss_dict = self.loss_func(out, batch[1])
             # TODO(gaotingquan): mv update_freq to loss and optimizer
             loss = loss_dict["loss"] / self.update_freq
             loss.backward()

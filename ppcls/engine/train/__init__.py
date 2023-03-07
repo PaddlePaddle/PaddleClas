@@ -25,7 +25,7 @@ def build_train_func(config, mode, model, eval_func):
     train_mode = config["Global"].get("task", None)
     if train_mode is None:
         config["Global"]["task"] = "classification"
-        return ClassTrainer(config, mode, model, eval_func)
+        return ClassTrainer(config, model, eval_func)
     else:
         return getattr(sys.modules[__name__], "train_epoch_" + train_mode)(
             config, mode, model, eval_func)

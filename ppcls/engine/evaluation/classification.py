@@ -29,10 +29,11 @@ class ClassEval(object):
     def __init__(self, config, mode, model):
         self.config = config
         self.model = model
+        self.print_batch_step = self.config["Global"]["print_batch_step"]
         self.use_dali = self.config["Global"].get("use_dali", False)
-        self.eval_metric_func = build_metrics(config, "eval")
-        self.eval_dataloader = build_dataloader(config, "eval")
-        self.eval_loss_func = build_loss(config, "eval")
+        self.eval_metric_func = build_metrics(self.config, "eval")
+        self.eval_dataloader = build_dataloader(self.config, "Eval")
+        self.eval_loss_func = build_loss(self.config, "Eval")
         self.output_info = dict()
 
     @paddle.no_grad()
@@ -48,13 +49,12 @@ class ClassEval(object):
             "reader_cost": AverageMeter(
                 "reader_cost", ".5f", postfix=" s,"),
         }
-        print_batch_step = self.config["Global"]["print_batch_step"]
 
         tic = time.time()
-        total_samples = self.eval_dataloader["Eval"].total_samples
+        total_samples = self.eval_dataloader.total_samples
         accum_samples = 0
-        max_iter = self.eval_dataloader["Eval"].max_iter
-        for iter_id, batch in enumerate(self.eval_dataloader["Eval"]):
+        max_iter = self.eval_dataloader.max_iter
+        for iter_id, batch in enumerate(self.eval_dataloader):
             if iter_id >= max_iter:
                 break
             if iter_id == 5:
@@ -130,7 +130,7 @@ class ClassEval(object):
                 self.eval_metric_func(preds, labels)
             time_info["batch_cost"].update(time.time() - tic)
 
-            if iter_id % print_batch_step == 0:
+            if iter_id % self.print_batch_step == 0:
                 time_msg = "s, ".join([
                     "{}: {:.5f}".format(key, time_info[key].avg)
                     for key in time_info
@@ -153,7 +153,7 @@ class ClassEval(object):
 
             tic = time.time()
         if self.use_dali:
-            self.eval_dataloader["Eval"].reset()
+            self.eval_dataloader.reset()
 
         if "ATTRMetric" in self.config["Metric"]["Eval"][0]:
             metric_msg = ", ".join([
