@@ -48,12 +48,13 @@ class ClassTrainer(object):
         # build dataloader
         self.use_dali = self.config["Global"].get("use_dali", False)
         self.dataloader = build_dataloader(self.config, "Train")
+        self.dataloader_iter = iter(self.dataloader)
 
         # build loss
         self.loss_func = build_loss(config, "Train")
 
         # build metric
-        self.train_metric_func = build_metrics(config, "train")
+        self.train_metric_func = build_metrics(config, "Train")
 
         # build optimizer
         self.optimizer, self.lr_sch = build_optimizer(
@@ -174,7 +175,17 @@ class ClassTrainer(object):
         self.model.train()
         tic = time.time()
 
-        for iter_id, batch in enumerate(self.dataloader):
+        for iter_id in range(self.dataloader.max_iter):
+            # fetch data batch from dataloader
+            try:
+                batch = next(self.dataloader_iter)
+            except Exception:
+                # NOTE: reset DALI dataloader manually
+                if self.use_dali:
+                    self.dataloader.reset()
+                self.dataloader_iter = iter(self.dataloader)
+                batch = next(self.dataloader_iter)
+
             profiler.add_profiler_step(self.config["profiler_options"])
             if iter_id == 5:
                 for key in self.time_info:

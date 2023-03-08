@@ -207,25 +207,3 @@ def build_dataloader(config, mode, seed=None):
 
     logger.debug("build data_loader({}) success...".format(data_loader))
     return data_loader
-
-
-# # TODO(gaotingquan): the length of dataloader should be determined by sampler
-# class DataIterator(object):
-#     def __init__(self, dataloader, use_dali=False):
-#         self.dataloader = dataloader
-#         self.use_dali = use_dali
-#         self.iterator = iter(dataloader)
-#         self.max_iter = dataloader.max_iter
-#         self.total_samples = dataloader.total_samples
-
-#     def get_batch(self):
-#         # fetch data batch from dataloader
-#         try:
-#             batch = next(self.iterator)
-#         except Exception:
-#             # NOTE: reset DALI dataloader manually
-#             if self.use_dali:
-#                 self.dataloader.reset()
-#             self.iterator = iter(self.dataloader)
-#             batch = next(self.iterator)
-#         return batch
