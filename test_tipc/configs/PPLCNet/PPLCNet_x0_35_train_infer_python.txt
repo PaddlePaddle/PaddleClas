@@ -17,10 +17,10 @@ norm_train:tools/train.py -c ppcls/configs/ImageNet/PPLCNet/PPLCNet_x0_35.yaml -
 pact_train:null
 fpgm_train:null
 distill_train:null
-null:null
+to_static_train:-o Global.to_static=True
 null:null
 ##
-===========================eval_params=========================== 
+===========================eval_params===========================
 eval:tools/eval.py -c ppcls/configs/ImageNet/PPLCNet/PPLCNet_x0_35.yaml
 null:null
 ##
