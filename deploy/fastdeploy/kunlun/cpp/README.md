@@ -1,1 +1,0 @@
-/xieyunyao/project/PaddleClas/docs/zh_CN/fastdeploy/kunlun/cpp/README.md

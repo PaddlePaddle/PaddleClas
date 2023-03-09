@@ -1,1 +1,0 @@
-/xieyunyao/project/PaddleClas/docs/zh_CN/fastdeploy/rockchip/rv1126/cpp/README.md

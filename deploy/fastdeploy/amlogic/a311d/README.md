@@ -1,1 +1,0 @@
-/xieyunyao/project/PaddleClas/docs/zh_CN/fastdeploy/amlogic/a311d/README.md
