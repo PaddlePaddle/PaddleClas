@@ -22,6 +22,7 @@ from paddle import nn
 import numpy as np
 import random
 
+from ..utils.amp import AMPForwardDecorator
 from ppcls.utils import logger
 from ppcls.utils.logger import init_logger
 from ppcls.utils.config import print_config
