@@ -165,7 +165,6 @@ class MobileNet(TheseusLayer):
             return_stages=return_stages)
 
     @AMP_forward_decorator
-    @clas_forward_decorator
     def forward(self, x):
         x = self.conv(x)
         x = self.blocks(x)
