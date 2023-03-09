@@ -41,6 +41,12 @@ class ClassTrainer(object):
         # gradient accumulation
         self.update_freq = self.config["Global"].get("update_freq", 1)
 
+        if "Head" in self.config["Arch"] or self.config["Arch"].get("is_rec",
+                                                                    False):
+            self.is_rec = True
+        else:
+            self.is_rec = False
+
         # TODO(gaotingquan): mv to build_model
         # build EMA model
         self.model_ema = self._build_ema_model()
@@ -197,7 +203,11 @@ class ClassTrainer(object):
                 batch[1] = batch[1].reshape([batch_size, -1])
             self.global_step += 1
 
-            out = self.model(batch)
+            if self.is_rec:
+                out = self.model(batch)
+            else:
+                out = self.model(batch[0])
+
             loss_dict = self.loss_func(out, batch[1])
             # TODO(gaotingquan): mv update_freq to loss and optimizer
             loss = loss_dict["loss"] / self.update_freq
