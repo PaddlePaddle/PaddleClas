@@ -94,7 +94,7 @@ class CombinedLoss(nn.Layer):
             loss_dict["loss"] = paddle.add_n(list(loss_dict.values()))
 
         if self.scaler:
-            self.scaler(loss_dict["loss"])
+            self.scaler.scale(loss_dict["loss"])
         return loss_dict
 
 
