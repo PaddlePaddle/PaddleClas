@@ -105,11 +105,9 @@ def main(args):
 
     class_num = config["Arch"].get("class_num", None)
     config["DataLoader"].update({"class_num": class_num})
-    train_dataloader = build_dataloader(
-        config["DataLoader"], "Train", device=device, use_dali=use_dali)
+    train_dataloader = build_dataloader(config, "Train")
     if global_config["eval_during_train"]:
-        eval_dataloader = build_dataloader(
-            config["DataLoader"], "Eval", device=device, use_dali=use_dali)
+        eval_dataloader = build_dataloader(config, "Eval")
 
     step_each_epoch = len(train_dataloader)
 

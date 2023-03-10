@@ -44,7 +44,7 @@ def build_lr_scheduler(lr_config, epochs, step_each_epoch):
 
 
 # model_list is None in static graph
-def build_optimizer(config, max_iter, model_list, update_freq):
+def build_optimizer(config, max_iter, model_list=None):
     optim_config = copy.deepcopy(config["Optimizer"])
     epochs = config["Global"]["epochs"]
     update_freq = config["Global"].get("update_freq", 1)

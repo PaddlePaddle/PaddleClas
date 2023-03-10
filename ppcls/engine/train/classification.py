@@ -65,7 +65,7 @@ class ClassTrainer(object):
         # build optimizer
         self.optimizer, self.lr_sch = build_optimizer(
             self.config, self.dataloader.max_iter,
-            [self.model, self.loss_func], self.update_freq)
+            [self.model, self.loss_func])
 
         # build model saver
         self.model_saver = ModelSaver(
