@@ -19,7 +19,8 @@ const char sep = '\\';
 const char sep = '/';
 #endif
 
-void InitAndInfer(const std::string& model_dir, const std::string& image_file, const fastdeploy::RuntimeOption &option)) {
+void InitAndInfer(const std::string &model_dir, const std::string &image_file,
+                  const fastdeploy::RuntimeOption &option) {
   auto model_file = model_dir + sep + "inference.pdmodel";
   auto params_file = model_dir + sep + "inference.pdiparams";
   auto config_file = model_dir + sep + "inference_cls.yaml";
