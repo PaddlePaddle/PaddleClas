@@ -23,6 +23,7 @@ import paddle.nn as nn
 import sys
 from paddle.nn.initializer import TruncatedNormal, Constant, Normal
 
+from ..base.theseus_layer import TheseusLayer
 from ....utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
 
 MODEL_URLS = {
@@ -197,7 +198,7 @@ def drop_path(x, drop_prob=0., training=False):
     return output
 
 
-class DropPath(nn.Layer):
+class DropPath(TheseusLayer):
     """Drop paths (Stochastic Depth) per sample  (when applied in main path of residual blocks).
     """
 
@@ -209,7 +210,7 @@ class DropPath(nn.Layer):
         return drop_path(x, self.drop_prob, self.training)
 
 
-class Identity(nn.Layer):
+class Identity(TheseusLayer):
     def __init__(self):
         super(Identity, self).__init__()
 
@@ -217,12 +218,12 @@ class Identity(nn.Layer):
         return input
 
 
-class QuickGELU(nn.Layer):
+class QuickGELU(TheseusLayer):
     def forward(self, x):
         return x * nn.functional.sigmoid(1.702 * x)
 
 
-class Mlp(nn.Layer):
+class Mlp(TheseusLayer):
     def __init__(self,
                  in_features,
                  hidden_features=None,
@@ -247,7 +248,7 @@ class Mlp(nn.Layer):
         return x
 
 
-class Attention(nn.Layer):
+class Attention(TheseusLayer):
     def __init__(self,
                  dim,
                  num_heads=8,
@@ -341,7 +342,7 @@ class Attention(nn.Layer):
         return x
 
 
-class Block(nn.Layer):
+class Block(TheseusLayer):
     def __init__(self,
                  dim,
                  num_heads,
@@ -417,7 +418,7 @@ class Block(nn.Layer):
         return x
 
 
-class RelativePositionBias(nn.Layer):
+class RelativePositionBias(TheseusLayer):
     def __init__(self, window_size, num_heads):
         super().__init__()
         self.window_size = window_size
@@ -463,7 +464,7 @@ class RelativePositionBias(nn.Layer):
         return relative_position_bias.transpose([2, 0, 1])  # nH, Wh*Ww, Wh*Ww
 
 
-class PatchEmbed(nn.Layer):
+class PatchEmbed(TheseusLayer):
     """ Image to Patch Embedding
     """
 
@@ -489,7 +490,7 @@ class PatchEmbed(nn.Layer):
         return x
 
 
-class Head(nn.Layer):
+class Head(TheseusLayer):
     def __init__(self, embed_dim, class_num, norm_layer, model_size, setting):
         super().__init__()
         self.model_size = model_size
@@ -524,7 +525,7 @@ class Head(nn.Layer):
         return self.fc_head(x)
 
 
-class VisionTransformer(nn.Layer):
+class VisionTransformer(TheseusLayer):
     """ Vision Transformer with support for patch input
     """
 
@@ -656,7 +657,8 @@ class VisionTransformer(nn.Layer):
 
     def forward(self, x):
         x = self.forward_features(x)
-        x = self.head(x)
+        # x = self.head(x)
+        x = x[:, 0]
         return x
 
 
