@@ -258,7 +258,7 @@ class ClassTrainer(object):
         return None
 
     def _build_ema_model(self):
-        if "EMA" in self.config and self.mode == "train":
+        if "EMA" in self.config:
             model_ema = ExponentialMovingAverage(
                 self.model, self.config['EMA'].get("decay", 0.9999))
             self.best_metric["metric_ema"] = 0
