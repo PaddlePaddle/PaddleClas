@@ -48,7 +48,8 @@ def build_option(args):
     elif args.backend.lower() == "pptrt":
         assert args.device.lower(
         ) == "gpu", "Paddle-TensorRT backend require inference on device GPU."
-        option.use_trt_backend()
+        option.use_paddle_infer_backend()
+        option.paddle_infer_option.enable_trt = True
 
     elif args.backend.lower() == "ort":
         option.use_ort_backend()
