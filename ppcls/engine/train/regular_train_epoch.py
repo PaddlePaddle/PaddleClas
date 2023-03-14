@@ -36,25 +36,31 @@ def regular_train_epoch(engine, epoch_id, print_batch_step):
             batch[1] = batch[1].reshape([batch_size, -1])
         engine.global_step += 1
 
-        # forward & backward & step opt
+        # image input
         if engine.amp:
+            amp_level = engine.config["AMP"].get("level", "O1").upper()
             with paddle.amp.auto_cast(
                     custom_black_list={
                         "flatten_contiguous_range", "greater_than"
                     },
-                    level=engine.amp_level):
+                    level=amp_level):
                 out = engine.model(batch)
                 loss_dict = engine.train_loss_func(out, batch[1])
-            loss = loss_dict["loss"] / engine.update_freq
+        else:
+            out = engine.model(batch)
+            loss_dict = engine.train_loss_func(out, batch[1])
+
+        # loss
+        loss = loss_dict["loss"] / engine.update_freq
+
+        # backward & step opt
+        if engine.amp:
             scaled = engine.scaler.scale(loss)
             scaled.backward()
             if (iter_id + 1) % engine.update_freq == 0:
                 for i in range(len(engine.optimizer)):
                     engine.scaler.minimize(engine.optimizer[i], scaled)
         else:
-            out = engine.model(batch)
-            loss_dict = engine.train_loss_func(out, batch[1])
-            loss = loss_dict["loss"] / engine.update_freq
             loss.backward()
             if (iter_id + 1) % engine.update_freq == 0:
                 for i in range(len(engine.optimizer)):
