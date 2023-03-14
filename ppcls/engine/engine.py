@@ -44,13 +44,13 @@ class Engine(object):
         self.mode = mode
         self.config = config
 
+        # set seed
+        self._init_seed()
+
         # init logger
         log_file = os.path.join(self.config['Global']['output_dir'],
                                 self.config["Arch"]["name"], f"{mode}.log")
         init_logger(log_file=log_file)
-
-        # set seed
-        self._init_seed()
 
         # set device
         self._init_device()
