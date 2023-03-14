@@ -99,7 +99,16 @@ class Engine(object):
             image_file_list.append(image_file)
             if len(batch_data) >= batch_size or idx == len(image_list) - 1:
                 batch_tensor = paddle.to_tensor(batch_data)
-                out = self.model(batch_tensor)
+
+                if self.amp and self.amp_eval:
+                    with paddle.amp.auto_cast(
+                            custom_black_list={
+                                "flatten_contiguous_range", "greater_than"
+                            },
+                            level=self.amp_level):
+                        out = self.model(batch_tensor)
+                else:
+                    out = self.model(batch_tensor)
 
                 if isinstance(out, list):
                     out = out[0]
@@ -200,14 +209,10 @@ class Engine(object):
                     self.config["Global"]["pretrained_model"])
 
     def _init_amp(self):
-        if "AMP" in self.config and self.config["AMP"] is not None:
-            paddle_version = paddle.__version__[:3]
-            # paddle version < 2.3.0 and not develop
-            if paddle_version not in ["2.3", "2.4", "0.0"]:
-                msg = "When using AMP, PaddleClas release/2.6 and later version only support PaddlePaddle version >= 2.3.0."
-                logger.error(msg)
-                raise Exception(msg)
-
+        self.amp = "AMP" in self.config and self.config["AMP"] is not None
+        self.amp_eval = False
+        # for amp
+        if self.amp:
             AMP_RELATED_FLAGS_SETTING = {'FLAGS_max_inplace_grad_add': 8, }
             if paddle.is_compiled_with_cuda():
                 AMP_RELATED_FLAGS_SETTING.update({
@@ -215,26 +220,51 @@ class Engine(object):
                 })
             paddle.set_flags(AMP_RELATED_FLAGS_SETTING)
 
-            amp_level = self.config['AMP'].get("level", "O1").upper()
-            if amp_level not in ["O1", "O2"]:
+            self.scale_loss = self.config["AMP"].get("scale_loss", 1.0)
+            self.use_dynamic_loss_scaling = self.config["AMP"].get(
+                "use_dynamic_loss_scaling", False)
+            self.scaler = paddle.amp.GradScaler(
+                init_loss_scaling=self.scale_loss,
+                use_dynamic_loss_scaling=self.use_dynamic_loss_scaling)
+
+            self.amp_level = self.config['AMP'].get("level", "O1")
+            if self.amp_level not in ["O1", "O2"]:
                 msg = "[Parameter Error]: The optimize level of AMP only support 'O1' and 'O2'. The level has been set 'O1'."
                 logger.warning(msg)
                 self.config['AMP']["level"] = "O1"
-                amp_level = "O1"
+                self.amp_level = "O1"
 
-            amp_eval = self.config["AMP"].get("use_fp16_test", False)
+            self.amp_eval = self.config["AMP"].get("use_fp16_test", False)
             # TODO(gaotingquan): Paddle not yet support FP32 evaluation when training with AMPO2
             if self.mode == "train" and self.config["Global"].get(
                     "eval_during_train",
-                    True) and amp_level == "O2" and amp_eval == False:
+                    True) and self.amp_level == "O2" and self.amp_eval == False:
                 msg = "PaddlePaddle only support FP16 evaluation when training with AMP O2 now. "
                 logger.warning(msg)
                 self.config["AMP"]["use_fp16_test"] = True
-                amp_eval = True
+                self.amp_eval = True
 
-            if self.mode == "train" or amp_eval:
-                AMPForwardDecorator.amp_level = amp_level
-                AMPForwardDecorator.amp_eval = amp_eval
+            paddle_version = paddle.__version__[:3]
+            # paddle version < 2.3.0 and not develop
+            if paddle_version not in ["2.3", "2.4", "0.0"]:
+                msg = "When using AMP, PaddleClas release/2.6 and later version only support PaddlePaddle version >= 2.3.0."
+                logger.error(msg)
+                raise Exception(msg)
+
+            if self.mode == "train" or self.amp_eval:
+                self.model = paddle.amp.decorate(
+                    models=self.model,
+                    level=self.amp_level,
+                    save_dtype='float32')
+
+            if self.mode == "train" and len(self.train_loss_func.parameters(
+            )) > 0:
+                self.train_loss_func = paddle.amp.decorate(
+                    models=self.train_loss_func,
+                    level=self.amp_level,
+                    save_dtype='float32')
+
+            self.amp_level = engine.config["AMP"].get("level", "O1").upper()
 
     def _init_dist(self):
         # check the gpu num
