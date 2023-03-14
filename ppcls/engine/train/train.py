@@ -55,10 +55,10 @@ def train_epoch(engine, epoch_id, print_batch_step):
                         "flatten_contiguous_range", "greater_than"
                     },
                     level=amp_level):
-                out = engine.model(batch)
+                out = forward(engine, batch)
                 loss_dict = engine.train_loss_func(out, batch[1])
         else:
-            out = engine.model(batch)
+            out = forward(engine, batch)
             loss_dict = engine.train_loss_func(out, batch[1])
 
         # loss
@@ -104,3 +104,10 @@ def train_epoch(engine, epoch_id, print_batch_step):
         if getattr(engine.lr_sch[i], "by_epoch", False) and \
                 type_name(engine.lr_sch[i]) != "ReduceOnPlateau":
             engine.lr_sch[i].step()
+
+
+def forward(engine, batch):
+    if not engine.is_rec:
+        return engine.model(batch[0])
+    else:
+        return engine.model(batch[0], batch[1])

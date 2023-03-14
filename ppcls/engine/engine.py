@@ -28,6 +28,7 @@ from ppcls.utils.logger import init_logger
 from ppcls.utils.config import print_config
 from ppcls.data import build_dataloader
 from ppcls.arch import build_model, RecModel, DistillationModel, TheseusLayer
+from ppcls.arch import apply_to_static
 from ppcls.loss import build_loss
 from ppcls.metric import build_metrics
 from ppcls.optimizer import build_optimizer
@@ -56,9 +57,17 @@ class Engine(object):
 
         # init logger
         init_logger(self.config, mode=mode)
+        print_config(config)
 
         # for visualdl
         self.vdl_writer = self._init_vdl()
+
+        # is_rec
+        if "Head" in self.config["Arch"] or self.config["Arch"].get("is_rec",
+                                                                    False):
+            self.is_rec = True
+        else:
+            self.is_rec = False
 
         # init train_func and eval_func
         self.train_mode = self.config["Global"].get("train_mode", None)
@@ -99,6 +108,8 @@ class Engine(object):
 
         # build model
         self.model = build_model(self.config, self.mode)
+        # set @to_static for benchmark, skip this by default.
+        apply_to_static(self.config, self.model)
 
         # load_pretrain
         self._init_pretrained()
@@ -113,8 +124,6 @@ class Engine(object):
 
         # for distributed
         self._init_dist()
-
-        print_config(config)
 
     def train(self):
         assert self.mode == "train"
