@@ -107,8 +107,8 @@ def build_dataloader(config, *mode, seed=None):
     if use_dali:
         from ppcls.data.dataloader.dali import dali_dataloader
         return dali_dataloader(
-            dataloader_config,
-            mode[-1],
+            config["DataLoader"],
+            mode,
             paddle.device.get_device(),
             num_threads=num_workers,
             seed=seed,
