@@ -204,7 +204,7 @@ class ClassTrainer(object):
             self.global_step += 1
 
             if self.is_rec:
-                out = self.model(batch[0], batch[1])
+                out = self.model(batch)
             else:
                 out = self.model(batch[0])
 

@@ -101,7 +101,8 @@ class RecModel(TheseusLayer):
         else:
             self.head = None
 
-    def forward(self, x, label=None):
+    def forward(self, batch):
+        x, label = batch[0], batch[1]
         out = dict()
         x = self.backbone(x)
         out["backbone"] = x
@@ -153,7 +154,8 @@ class DistillationModel(nn.Layer):
                     load_dygraph_pretrain(
                         self.model_name_list[idx], path=pretrained)
 
-    def forward(self, x, label=None):
+    def forward(self, batch):
+        x, label = batch[0], batch[1]
         result_dict = dict()
         for idx, model_name in enumerate(self.model_name_list):
             if label is None:
@@ -171,7 +173,8 @@ class AttentionModel(DistillationModel):
                  **kargs):
         super().__init__(models, pretrained_list, freeze_params_list, **kargs)
 
-    def forward(self, x, label=None):
+    def forward(self, batch):
+        x, label = batch[0], batch[1]
         result_dict = dict()
         out = x
         for idx, model_name in enumerate(self.model_name_list):
