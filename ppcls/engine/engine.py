@@ -60,16 +60,16 @@ class Engine(object):
         # build model
         self.model = build_model(self.config, self.mode)
 
+        # load_pretrain
+        self._init_pretrained()
+
+        self._init_amp()
+
         # init train_func and eval_func
         self.eval = build_eval_func(
             self.config, mode=self.mode, model=self.model)
         self.train = build_train_func(
             self.config, mode=self.mode, model=self.model, eval_func=self.eval)
-
-        # load_pretrain
-        self._init_pretrained()
-
-        self._init_amp()
 
         # for distributed
         self._init_dist()
@@ -197,11 +197,11 @@ class Engine(object):
         if self.config["Global"]["pretrained_model"] is not None:
             if self.config["Global"]["pretrained_model"].startswith("http"):
                 load_dygraph_pretrain_from_url(
-                    [self.model, getattr(self.train, "loss_func", None)],
+                    [self.model, getattr(self, 'train_loss_func', None)],
                     self.config["Global"]["pretrained_model"])
             else:
                 load_dygraph_pretrain(
-                    [self.model, getattr(self.train, "loss_func", None)],
+                    [self.model, getattr(self, 'train_loss_func', None)],
                     self.config["Global"]["pretrained_model"])
 
     def _init_amp(self):
@@ -257,10 +257,10 @@ class Engine(object):
         if self.config["Global"]["distributed"]:
             dist.init_parallel_env()
             self.model = paddle.DataParallel(self.model)
-            if self.mode == 'train' and len(self.train.loss_func.parameters(
+            if self.mode == 'train' and len(self.train_loss_func.parameters(
             )) > 0:
-                self.train.loss_func = paddle.DataParallel(
-                    self.train.loss_func)
+                self.train_loss_func = paddle.DataParallel(
+                    self.train_loss_func)
 
 
 class ExportModel(TheseusLayer):
