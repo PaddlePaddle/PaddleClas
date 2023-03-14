@@ -25,4 +25,4 @@ from .metrics import mean_average_precision
 from .metrics import multi_hot_encode
 from .metrics import precision_recall_fscore
 from .misc import AverageMeter
-from .save_load import init_model
+from .save_load import init_model, save_model

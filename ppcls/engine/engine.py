@@ -34,7 +34,7 @@ from ppcls.optimizer import build_optimizer
 from ppcls.utils.ema import ExponentialMovingAverage
 from ppcls.utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
 from ppcls.utils.save_load import init_model
-from ppcls.utils.model_saver import ModelSaver
+from ppcls.utils import save_load
 
 from ppcls.data.utils.get_image_list import get_image_list
 from ppcls.data.postprocess import build_postprocess
@@ -56,10 +56,7 @@ class Engine(object):
         self._init_seed()
 
         # init logger
-        self.output_dir = self.config['Global']['output_dir']
-        log_file = os.path.join(self.output_dir, self.config["Arch"]["name"],
-                                f"{mode}.log")
-        init_logger(log_file=log_file)
+        init_logger(self.config, mode=mode)
 
         # for visualdl
         self.vdl_writer = self._init_vdl()
@@ -106,13 +103,20 @@ class Engine(object):
         assert self.mode == "train"
         print_batch_step = self.config['Global']['print_batch_step']
         save_interval = self.config["Global"]["save_interval"]
-        start_eval_epoch = self.config["Global"].get("start_eval_epoch", 0) - 1
-        epochs = self.config["Global"]["epochs"]
-
         best_metric = {
             "metric": -1.0,
             "epoch": 0,
         }
+
+        # build EMA model
+        self.ema = "EMA" in self.config and self.mode == "train"
+        if self.ema:
+            self.model_ema = ExponentialMovingAverage(
+                self.model, self.config['EMA'].get("decay", 0.9999))
+            best_metric_ema = 0.0
+            ema_module = self.model_ema.module
+        else:
+            ema_module = None
 
         # key:
         # val: metrics list word
@@ -123,35 +127,31 @@ class Engine(object):
             "reader_cost": AverageMeter(
                 "reader_cost", ".5f", postfix=" s,"),
         }
-
-        # build EMA model
-        self.model_ema = self._build_ema_model()
-        # TODO: mv best_metric_ema to best_metric dict
-        best_metric_ema = 0
-
-        # build model saver
-        model_saver = ModelSaver(
-            self,
-            net_name="model",
-            loss_name="train_loss_func",
-            opt_name="optimizer",
-            model_ema_name="model_ema")
-
-        self._init_checkpoints(best_metric)
-
         # global iter counter
         self.global_step = 0
-        for epoch_id in range(best_metric["epoch"] + 1, epochs + 1):
+
+        if self.config.Global.checkpoints is not None:
+            metric_info = init_model(self.config.Global, self.model,
+                                     self.optimizer, self.train_loss_func,
+                                     ema_module)
+            if metric_info is not None:
+                best_metric.update(metric_info)
+
+        for epoch_id in range(best_metric["epoch"] + 1,
+                              self.config["Global"]["epochs"] + 1):
+            acc = 0.0
             # for one epoch train
             self.train_epoch_func(self, epoch_id, print_batch_step)
 
             metric_msg = ", ".join(
                 [self.output_info[key].avg_info for key in self.output_info])
-            logger.info("[Train][Epoch {}/{}][Avg]{}".format(epoch_id, epochs,
-                                                             metric_msg))
+            logger.info("[Train][Epoch {}/{}][Avg]{}".format(
+                epoch_id, self.config["Global"]["epochs"], metric_msg))
             self.output_info.clear()
 
-            acc = 0.0
+            # eval model and save model if possible
+            start_eval_epoch = self.config["Global"].get("start_eval_epoch",
+                                                         0) - 1
             if self.config["Global"][
                     "eval_during_train"] and epoch_id % self.config["Global"][
                         "eval_interval"] == 0 and epoch_id > start_eval_epoch:
@@ -166,11 +166,16 @@ class Engine(object):
                 if acc > best_metric["metric"]:
                     best_metric["metric"] = acc
                     best_metric["epoch"] = epoch_id
-                    model_saver.save(
+                    save_load.save_model(
+                        self.model,
+                        self.optimizer,
                         best_metric,
+                        self.output_dir,
+                        ema=ema_module,
+                        model_name=self.config["Arch"]["name"],
                         prefix="best_model",
+                        loss=self.train_loss_func,
                         save_student_model=True)
-
                 logger.info("[Eval][Epoch {}][best metric: {}]".format(
                     epoch_id, best_metric["metric"]))
                 logger.scaler(
@@ -181,20 +186,24 @@ class Engine(object):
 
                 self.model.train()
 
-                if self.model_ema:
-                    ori_model, self.model = self.model, self.model_ema.module
+                if self.ema:
+                    ori_model, self.model = self.model, ema_module
                     acc_ema = self.eval(epoch_id)
                     self.model = ori_model
-                    self.model_ema.module.eval()
+                    ema_module.eval()
 
                     if acc_ema > best_metric_ema:
                         best_metric_ema = acc_ema
-                        model_saver.save(
-                            {
-                                "metric": acc_ema,
-                                "epoch": epoch_id
-                            },
-                            prefix="best_model_ema")
+                        save_load.save_model(
+                            self.model,
+                            self.optimizer,
+                            {"metric": acc_ema,
+                             "epoch": epoch_id},
+                            self.output_dir,
+                            ema=ema_module,
+                            model_name=self.config["Arch"]["name"],
+                            prefix="best_model_ema",
+                            loss=self.train_loss_func)
                     logger.info("[Eval][Epoch {}][best metric ema: {}]".format(
                         epoch_id, best_metric_ema))
                     logger.scaler(
@@ -205,19 +214,25 @@ class Engine(object):
 
             # save model
             if save_interval > 0 and epoch_id % save_interval == 0:
-                model_saver.save(
-                    {
-                        "metric": acc,
-                        "epoch": epoch_id
-                    },
-                    prefix=f"epoch_{epoch_id}")
-
+                save_load.save_model(
+                    self.model,
+                    self.optimizer, {"metric": acc,
+                                     "epoch": epoch_id},
+                    self.output_dir,
+                    ema=ema_module,
+                    model_name=self.config["Arch"]["name"],
+                    prefix="epoch_{}".format(epoch_id),
+                    loss=self.train_loss_func)
             # save the latest model
-            model_saver.save(
-                {
-                    "metric": acc,
-                    "epoch": epoch_id
-                }, prefix="latest")
+            save_load.save_model(
+                self.model,
+                self.optimizer, {"metric": acc,
+                                 "epoch": epoch_id},
+                self.output_dir,
+                ema=ema_module,
+                model_name=self.config["Arch"]["name"],
+                prefix="latest",
+                loss=self.train_loss_func)
 
         if self.vdl_writer is not None:
             self.vdl_writer.close()
@@ -467,23 +482,6 @@ class Engine(object):
             )) > 0:
                 self.train_loss_func = paddle.DataParallel(
                     self.train_loss_func)
-
-    def _build_ema_model(self):
-        if "EMA" in self.config and self.mode == "train":
-            model_ema = ExponentialMovingAverage(
-                self.model, self.config['EMA'].get("decay", 0.9999))
-            return model_ema
-        else:
-            return None
-
-    def _init_checkpoints(self, best_metric):
-        if self.config["Global"].get("checkpoints", None) is not None:
-            metric_info = init_model(self.config.Global, self.model,
-                                     self.optimizer, self.train_loss_func,
-                                     self.model_ema)
-            if metric_info is not None:
-                best_metric.update(metric_info)
-        return best_metric
 
 
 class ExportModel(TheseusLayer):
