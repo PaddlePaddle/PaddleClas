@@ -42,7 +42,7 @@ from ppcls.data.preprocess.ops.dali_operators import RandomRot90
 from ppcls.data.preprocess.ops.dali_operators import RandomRotation
 from ppcls.data.preprocess.ops.dali_operators import ResizeImage
 from ppcls.data.preprocess.ops.dali_operators import ToCHWImage
-from ppcls.engine.train.utils import type_name
+from ppcls.utils import type_name
 from ppcls.utils import logger
 
 INTERP_MAP = {
@@ -668,7 +668,7 @@ class DALIImageNetIterator(DALIGenericIterator):
         return data_batch
 
 
-def dali_dataloader(config: Dict[str, Any],
+def dali_dataloader(config_dataloader: Dict[str, Any],
                     mode: str,
                     device: str,
                     py_num_workers: int=1,
@@ -690,7 +690,6 @@ def dali_dataloader(config: Dict[str, Any],
         DALIImageNetIterator: Iterable DALI dataloader
     """
     assert "gpu" in device, f"device must be \"gpu\" when running with DALI, but got {device}"
-    config_dataloader = config[mode]
     device_id = int(device.split(":")[1])
     device = "gpu"
     seed = 42 if seed is None else seed

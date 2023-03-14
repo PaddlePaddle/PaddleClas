@@ -22,6 +22,8 @@ from paddle.nn import Conv2D, BatchNorm, Linear, ReLU, Flatten
 from paddle.nn import AdaptiveAvgPool2D
 from paddle.nn.initializer import KaimingNormal
 
+from ..base import clas_forward_decorator
+from ....utils.amp import AMP_forward_decorator
 from ..base.theseus_layer import TheseusLayer
 from ....utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
 
@@ -162,6 +164,7 @@ class MobileNet(TheseusLayer):
             return_patterns=return_patterns,
             return_stages=return_stages)
 
+    @AMP_forward_decorator
     def forward(self, x):
         x = self.conv(x)
         x = self.blocks(x)

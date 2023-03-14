@@ -11,8 +11,20 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from ppcls.engine.train.train import train_epoch
-from ppcls.engine.train.train_fixmatch import train_epoch_fixmatch
-from ppcls.engine.train.train_fixmatch_ccssl import train_epoch_fixmatch_ccssl
-from ppcls.engine.train.train_progressive import train_epoch_progressive
-from ppcls.engine.train.train_metabin import train_epoch_metabin
+
+from .train_metabin import train_epoch_metabin
+from .classification import ClassTrainer
+from .train_fixmatch import train_epoch_fixmatch
+from .train_fixmatch_ccssl import train_epoch_fixmatch_ccssl
+from .train_progressive import train_epoch_progressive
+
+
+def build_train_func(config, mode, model, eval_func):
+    if mode != "train":
+        return None
+    task = config["Global"].get("task", "classification")
+    if task == "classification" or task == "retrieval":
+        return ClassTrainer(config, model, eval_func)
+    else:
+        return getattr(sys.modules[__name__], "train_epoch_" + train_mode)(
+            config, mode, model, eval_func)

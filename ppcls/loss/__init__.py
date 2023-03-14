@@ -2,9 +2,10 @@ import copy
 
 import paddle
 import paddle.nn as nn
-from ppcls.utils import logger
+from ..utils import logger
+from ..utils.amp import AMPForwardDecorator, AMP_forward_decorator
 
-from .celoss import CELoss, MixCELoss
+from .celoss import CELoss
 from .googlenetloss import GoogLeNetLoss
 from .centerloss import CenterLoss
 from .contrasiveloss import ContrastiveLoss
@@ -49,9 +50,10 @@ from .metabinloss import IntraDomainScatterLoss
 
 
 class CombinedLoss(nn.Layer):
-    def __init__(self, config_list):
+    def __init__(self, config_list, mode, amp_config=None):
         super().__init__()
-        self.loss_func = []
+        self.mode = mode
+        loss_func = []
         self.loss_weight = []
         assert isinstance(config_list, list), (
             'operator config should be a list')
@@ -63,9 +65,19 @@ class CombinedLoss(nn.Layer):
             assert "weight" in param, "weight must be in param, but param just contains {}".format(
                 param.keys())
             self.loss_weight.append(param.pop("weight"))
-            self.loss_func.append(eval(name)(**param))
-            self.loss_func = nn.LayerList(self.loss_func)
+            loss_func.append(eval(name)(**param))
+        self.loss_func = nn.LayerList(loss_func)
+        logger.debug("build loss {} success.".format(loss_func))
 
+        self.scaler = None
+        if amp_config and paddle.in_dynamic_mode():
+            if self.mode == "Train" or AMPForwardDecorator.amp_eval:
+                self.scaler = paddle.amp.GradScaler(
+                    init_loss_scaling=amp_config.get("scale_loss", 1.0),
+                    use_dynamic_loss_scaling=amp_config.get(
+                        "use_dynamic_loss_scaling", False))
+
+    @AMP_forward_decorator
     def __call__(self, input, batch):
         loss_dict = {}
         # just for accelerate classification traing speed
@@ -80,12 +92,26 @@ class CombinedLoss(nn.Layer):
                 loss = {key: loss[key] * weight for key in loss}
                 loss_dict.update(loss)
             loss_dict["loss"] = paddle.add_n(list(loss_dict.values()))
+
+        if self.scaler:
+            self.scaler.scale(loss_dict["loss"])
         return loss_dict
 
 
-def build_loss(config):
-    if config is None:
+def build_loss(config, mode):
+    if config["Loss"][mode] is None:
         return None
-    module_class = CombinedLoss(copy.deepcopy(config))
+    module_class = CombinedLoss(
+        copy.deepcopy(config["Loss"][mode]),
+        mode,
+        amp_config=config.get("AMP", None))
+
+    if AMPForwardDecorator.amp_level is not None:
+        if mode == "Train" or AMPForwardDecorator.amp_eval:
+            module_class = paddle.amp.decorate(
+                models=module_class,
+                level=AMPForwardDecorator.amp_level,
+                save_dtype='float32')
+
     logger.debug("build loss {} success.".format(module_class))
     return module_class

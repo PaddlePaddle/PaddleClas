@@ -12,13 +12,15 @@
 #See the License for the specific language governing permissions and
 #limitations under the License.
 
+import sys
 import copy
 import importlib
+
 import paddle.nn as nn
 from paddle.jit import to_static
 from paddle.static import InputSpec
 
-from . import backbone, gears
+from . import backbone
 from .backbone import *
 from .gears import build_gear
 from .utils import *
@@ -27,6 +29,7 @@ from ..utils import logger
 from ..utils.save_load import load_dygraph_pretrain
 from .slim import prune_model, quantize_model
 from .distill.afd_attention import LinearTransformStudent, LinearTransformTeacher
+from ..utils.amp import AMPForwardDecorator
 
 __all__ = ["build_model", "RecModel", "DistillationModel", "AttentionModel"]
 
@@ -35,20 +38,31 @@ def build_model(config, mode="train"):
     arch_config = copy.deepcopy(config["Arch"])
     model_type = arch_config.pop("name")
     use_sync_bn = arch_config.pop("use_sync_bn", False)
+
     mod = importlib.import_module(__name__)
-    arch = getattr(mod, model_type)(**arch_config)
+    model = getattr(mod, model_type)(**arch_config)
+
     if use_sync_bn:
         if config["Global"]["device"] == "gpu":
-            arch = nn.SyncBatchNorm.convert_sync_batchnorm(arch)
+            model = nn.SyncBatchNorm.convert_sync_batchnorm(model)
         else:
             msg = "SyncBatchNorm can only be used on GPU device. The releated setting has been ignored."
             logger.warning(msg)
 
-    if isinstance(arch, TheseusLayer):
-        prune_model(config, arch)
-        quantize_model(config, arch, mode)
+    if isinstance(model, TheseusLayer):
+        prune_model(config, model)
+        quantize_model(config, model, mode)
 
-    return arch
+    # set @to_static for benchmark, skip this by default.
+    model = apply_to_static(config, model)
+
+    if AMPForwardDecorator.amp_level:
+        model = paddle.amp.decorate(
+            models=model,
+            level=AMPForwardDecorator.amp_level,
+            save_dtype='float32')
+
+    return model
 
 
 def apply_to_static(config, model):
@@ -70,7 +84,7 @@ class RecModel(TheseusLayer):
         super().__init__()
         backbone_config = config["Backbone"]
         backbone_name = backbone_config.pop("name")
-        self.backbone = eval(backbone_name)(**backbone_config)
+        self.backbone = getattr(backbone, backbone_name)(**backbone_config)
         self.head_feature_from = config.get('head_feature_from', 'neck')
 
         if "BackboneStopLayer" in config:
@@ -88,7 +102,6 @@ class RecModel(TheseusLayer):
             self.head = None
 
     def forward(self, x, label=None):
-        
         out = dict()
         x = self.backbone(x)
         out["backbone"] = x
