@@ -22,8 +22,8 @@ from ppcls.utils import profiler
 def regular_train_epoch(engine, epoch_id, print_batch_step):
     tic = time.time()
 
-    for iter_id in range(engine.dataloader_dict["Train"].max_iter):
-        batch = engine.dataloader_dict["Train"].get_batch()
+    for iter_id in range(engine.dataloader_dict["Train"].iter_per_epoch):
+        batch = engine.dataloader_dict["TrainIter"].get_batch()
 
         profiler.add_profiler_step(engine.config["profiler_options"])
         if iter_id == 5:
