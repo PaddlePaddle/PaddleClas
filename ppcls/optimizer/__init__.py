@@ -45,11 +45,8 @@ def build_lr_scheduler(lr_config, epochs, step_each_epoch):
 
 
 # model_list is None in static graph
-def build_optimizer(config, dataloader, model_list=None):
-    optim_config = copy.deepcopy(config["Optimizer"])
-    epochs = config["Global"]["epochs"]
-    update_freq = config["Global"].get("update_freq", 1)
-    step_each_epoch = dataloader.iter_per_epoch // update_freq
+def build_optimizer(config, epochs, step_each_epoch, model_list=None):
+    optim_config = copy.deepcopy(config)
     if isinstance(optim_config, dict):
         # convert {'name': xxx, **optim_cfg} to [{name: {scope: xxx, **optim_cfg}}]
         optim_name = optim_config.pop("name")
