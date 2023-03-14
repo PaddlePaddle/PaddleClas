@@ -17,7 +17,7 @@ Global:
 # model architecture
 Arch:
   name: cae_large_patch16_224
-  class_num: 102
+  class_num: 1000
   drop_rate: 0.0
   drop_path_rate: 0.2
   attn_drop_rate: 0.0
@@ -69,8 +69,8 @@ DataLoader:
   Train:
     dataset:
       name: ImageNetDataset
-      image_root: ./dataset/flowers102/
-      cls_label_path: ./dataset/flowers102/train_list.txt
+      image_root: ./dataset/ILSVRC2012/
+      cls_label_path: ./dataset/ILSVRC2012/train_list.txt
       batch_transform_ops:
         - MixupCutmixHybrid:
             mixup_alpha: 0.8
@@ -114,8 +114,8 @@ DataLoader:
   Eval:
     dataset:
       name: ImageNetDataset
-      image_root: ./dataset/flowers102/
-      cls_label_path: ./dataset/flowers102/val_list.txt
+      image_root: ./dataset/ILSVRC2012/
+      cls_label_path: ./dataset/ILSVRC2012/val_list.txt
       transform_ops:
         - DecodeImage:
             to_rgb: True

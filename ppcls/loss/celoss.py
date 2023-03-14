@@ -66,3 +66,10 @@ class CELoss(nn.Layer):
                 soft_label=soft_label,
                 reduction=self.reduction)
         return {"CELoss": loss}
+
+
+class MixCELoss(object):
+    def __init__(self, *args, **kwargs):
+        msg = "\"MixCELos\" is deprecated, please use \"CELoss\" instead."
+        logger.error(DeprecationWarning(msg))
+        raise DeprecationWarning(msg)

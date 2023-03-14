@@ -12,18 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from .classification import ClassEval
-from .retrieval import RetrievalEval
-from .adaface import adaface_eval
-
-
-def build_eval_func(config, mode, model):
-    if mode not in ["eval", "train"]:
-        return None
-    task = config["Global"].get("eval_mode", "classification")
-    if task == "classification":
-        return ClassEval(config, mode, model)
-    elif task == "retrieval":
-        return RetrievalEval(config, mode, model)
-    else:
-        raise Exception()
+from ppcls.engine.evaluation.classification import classification_eval
+from ppcls.engine.evaluation.retrieval import retrieval_eval
+from ppcls.engine.evaluation.adaface import adaface_eval

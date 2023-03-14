@@ -109,7 +109,7 @@ def create_fetchs(out,
     else:
         target = paddle.reshape(feeds['label'], [-1, 1])
 
-    loss_func = build_loss(config, mode)
+    loss_func = build_loss(config["Loss"][mode])
     loss_dict = loss_func(out, target)
 
     loss_out = loss_dict["loss"]
@@ -117,7 +117,7 @@ def create_fetchs(out,
 
     # build metric
     if not use_mix:
-        metric_func = build_metrics(config, mode)
+        metric_func = build_metrics(config["Metric"][mode])
 
         metric_dict = metric_func(out, target)
 
@@ -268,9 +268,9 @@ def build(config,
             lr_scheduler = None
             optimizer = None
             if is_train:
-                optimizer, lr_scheduler = build_optimizer(config,
-                                                          step_each_epoch)
-
+                optimizer, lr_scheduler = build_optimizer(
+                    config["Optimizer"], config["Global"]["epochs"],
+                    step_each_epoch)
                 optimizer = mixed_precision_optimizer(config, optimizer)
                 if is_distributed:
                     optimizer = dist_optimizer(config, optimizer)

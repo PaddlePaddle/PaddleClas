@@ -17,7 +17,7 @@ norm_train:tools/train.py -c ppcls/configs/ImageNet/PPHGNet/PPHGNet_tiny.yaml -o
 pact_train:null
 fpgm_train:null
 distill_train:null
-null:null
+to_static_train:-o Global.to_static=True
 null:null
 ##
 ===========================eval_params===========================

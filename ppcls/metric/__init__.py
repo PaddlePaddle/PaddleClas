@@ -15,7 +15,6 @@
 import copy
 from collections import OrderedDict
 
-from ..utils import logger
 from .avg_metrics import AvgMetrics
 from .metrics import TopkAcc, mAP, mINP, Recallk, Precisionk
 from .metrics import DistillationTopkAcc
@@ -66,28 +65,6 @@ class CombinedMetrics(AvgMetrics):
                 metric.reset()
 
 
-def build_metrics(config, mode):
-    if mode == 'Train' and "Metric" in config and "Train" in config[
-            "Metric"] and config["Metric"]["Train"]:
-        metric_config = config["Metric"]["Train"]
-        if config["DataLoader"]["Train"]["dataset"].get("batch_transform_ops",
-                                                        None):
-            for m_idx, m in enumerate(metric_config):
-                if "TopkAcc" in m:
-                    msg = f"Unable to calculate accuracy when using \"batch_transform_ops\". The metric \"{m}\" has been removed."
-                    logger.warning(msg)
-                    metric_config.pop(m_idx)
-        return CombinedMetrics(copy.deepcopy(metric_config))
-
-    if mode == "Eval":
-        task = config["Global"].get("task", "classification")
-        assert task in ["classification", "retrieval"]
-        if task == "classification":
-            if "Metric" in config and "Eval" in config["Metric"]:
-                return CombinedMetrics(copy.deepcopy(config["Metric"]["Eval"]))
-        elif task == "retrieval":
-            if "Metric" in config and "Eval" in config["Metric"]:
-                metric_config = config["Metric"]["Eval"]
-            else:
-                metric_config = [{"name": "Recallk", "topk": (1, 5)}]
-            return CombinedMetrics(copy.deepcopy(metric_config))
+def build_metrics(config):
+    metrics_list = CombinedMetrics(copy.deepcopy(config))
+    return metrics_list

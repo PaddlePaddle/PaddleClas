@@ -14,8 +14,10 @@
 from __future__ import absolute_import, division, print_function
 
 from ppcls.data import build_dataloader
-from ppcls.utils import logger, type_name
-from .classification import ClassTrainer
+from ppcls.engine.train.utils import type_name
+from ppcls.utils import logger
+
+from .train import train_epoch
 
 
 def train_epoch_progressive(engine, epoch_id, print_batch_step):
@@ -67,4 +69,4 @@ def train_epoch_progressive(engine, epoch_id, print_batch_step):
                 f")")
 
     # 3. Train one epoch as usual at current stage
-    regular_train_epoch(engine, epoch_id, print_batch_step)
+    train_epoch(engine, epoch_id, print_batch_step)
