@@ -20,7 +20,7 @@ from .adaface import adaface_eval
 def build_eval_func(config, mode, model):
     if mode not in ["eval", "train"]:
         return None
-    task = config["Global"].get("eval_mode", "classification")
+    task = config["Global"].get("task", "classification")
     if task == "classification":
         return ClassEval(config, mode, model)
     elif task == "retrieval":
