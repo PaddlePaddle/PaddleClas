@@ -14,7 +14,8 @@
 from __future__ import absolute_import, division, print_function
 
 from ppcls.data import build_dataloader
-from ppcls.utils import logger, type_name
+from ppcls.engine.train.utils import type_name
+from ppcls.utils import logger
 from .regular_train_epoch import regular_train_epoch
 
 

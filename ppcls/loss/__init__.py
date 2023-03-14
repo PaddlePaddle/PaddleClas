@@ -94,7 +94,6 @@ def build_loss(config, mode="train"):
         if unlabel_loss_info:
             unlabel_train_loss_func = CombinedLoss(
                 copy.deepcopy(unlabel_loss_info))
-        return train_loss_func, unlabel_train_loss_func
     if mode == "eval" or (mode == "train" and
                           config["Global"]["eval_during_train"]):
         loss_config = config.get("Loss", None)
@@ -102,4 +101,5 @@ def build_loss(config, mode="train"):
             loss_config = loss_config.get("Eval")
             if loss_config is not None:
                 eval_loss_func = CombinedLoss(copy.deepcopy(loss_config))
-        return eval_loss_func
+
+    return train_loss_func, unlabel_train_loss_func, eval_loss_func
