@@ -67,7 +67,7 @@ class ClassEval(object):
             if not self.config["Global"].get("use_multilabel", False):
                 batch[1] = batch[1].reshape([-1, 1]).astype("int64")
 
-            out = self.model(batch[0])
+            out = self.model(batch)
 
             # just for DistributedBatchSampler issue: repeat sampling
             current_samples = batch_size * paddle.distributed.get_world_size()
