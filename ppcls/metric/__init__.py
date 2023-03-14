@@ -65,38 +65,6 @@ class CombinedMetrics(AvgMetrics):
                 metric.reset()
 
 
-def build_metrics(engine):
-    config, mode = engine.config, engine.mode
-    if mode == 'train' and "Metric" in config and "Train" in config[
-            "Metric"] and config["Metric"]["Train"]:
-        metric_config = config["Metric"]["Train"]
-        if hasattr(engine.train_dataloader, "collate_fn"
-                   ) and engine.train_dataloader.collate_fn is not None:
-            for m_idx, m in enumerate(metric_config):
-                if "TopkAcc" in m:
-                    msg = f"Unable to calculate accuracy when using \"batch_transform_ops\". The metric \"{m}\" has been removed."
-                    logger.warning(msg)
-                    metric_config.pop(m_idx)
-        train_metric_func = CombinedMetrics(copy.deepcopy(metric_config))
-    else:
-        train_metric_func = None
-
-    if mode == "eval" or (mode == "train" and
-                          config["Global"]["eval_during_train"]):
-        eval_mode = config["Global"].get("eval_mode", "classification")
-        if eval_mode == "classification":
-            if "Metric" in config and "Eval" in config["Metric"]:
-                eval_metric_func = CombinedMetrics(
-                    copy.deepcopy(config["Metric"]["Eval"]))
-            else:
-                eval_metric_func = None
-        elif eval_mode == "retrieval":
-            if "Metric" in config and "Eval" in config["Metric"]:
-                metric_config = config["Metric"]["Eval"]
-            else:
-                metric_config = [{"name": "Recallk", "topk": (1, 5)}]
-            eval_metric_func = CombinedMetrics(copy.deepcopy(metric_config))
-    else:
-        eval_metric_func = None
-
-    return train_metric_func, eval_metric_func
+def build_metrics(config):
+    metrics_list = CombinedMetrics(copy.deepcopy(config))
+    return metrics_list

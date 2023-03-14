@@ -15,8 +15,6 @@
 import inspect
 import copy
 import random
-import platform
-
 import paddle
 import numpy as np
 import paddle.distributed as dist
@@ -88,7 +86,7 @@ def worker_init_fn(worker_id: int, num_workers: int, rank: int, seed: int):
     random.seed(worker_seed)
 
 
-def build(config, mode, device, use_dali=False, seed=None):
+def build_dataloader(config, mode, device, use_dali=False, seed=None):
     assert mode in [
         'Train', 'Eval', 'Test', 'Gallery', 'Query', 'UnLabelTrain'
     ], "Dataset mode should be Train, Eval, Test, Gallery, Query, UnLabelTrain"
@@ -189,79 +187,3 @@ def build(config, mode, device, use_dali=False, seed=None):
 
     logger.debug("build data_loader({}) success...".format(data_loader))
     return data_loader
-
-
-def build_dataloader(engine):
-    if "class_num" in engine.config["Global"]:
-        global_class_num = engine.config["Global"]["class_num"]
-        if "class_num" not in config["Arch"]:
-            engine.config["Arch"]["class_num"] = global_class_num
-            msg = f"The Global.class_num will be deprecated. Please use Arch.class_num instead. Arch.class_num has been set to {global_class_num}."
-        else:
-            msg = "The Global.class_num will be deprecated. Please use Arch.class_num instead. The Global.class_num has been ignored."
-        logger.warning(msg)
-
-    class_num = engine.config["Arch"].get("class_num", None)
-    engine.config["DataLoader"].update({"class_num": class_num})
-    engine.config["DataLoader"].update({
-        "epochs": engine.config["Global"]["epochs"]
-    })
-
-    use_dali = engine.config['Global'].get("use_dali", False)
-    dataloader_dict = {
-        "Train": None,
-        "UnLabelTrain": None,
-        "Eval": None,
-        "Query": None,
-        "Gallery": None,
-        "GalleryQuery": None
-    }
-    if engine.mode == 'train':
-        train_dataloader = build(
-            engine.config["DataLoader"],
-            "Train",
-            engine.device,
-            use_dali,
-            seed=None)
-        iter_per_epoch = len(train_dataloader) - 1 if platform.system(
-        ) == "Windows" else len(train_dataloader)
-        if engine.config["Global"].get("iter_per_epoch", None):
-            # set max iteration per epoch mannualy, when training by iteration(s), such as XBM, FixMatch.
-            iter_per_epoch = engine.config["Global"].get("iter_per_epoch")
-        iter_per_epoch = iter_per_epoch // engine.update_freq * engine.update_freq
-        engine.iter_per_epoch = iter_per_epoch
-        train_dataloader.iter_per_epoch = iter_per_epoch
-        dataloader_dict["Train"] = train_dataloader
-
-    if engine.config["DataLoader"].get('UnLabelTrain', None) is not None:
-        dataloader_dict["UnLabelTrain"] = build(
-            engine.config["DataLoader"],
-            "UnLabelTrain",
-            engine.device,
-            use_dali,
-            seed=None)
-
-    if engine.mode == "eval" or (engine.mode == "train" and
-                                 engine.config["Global"]["eval_during_train"]):
-        if engine.eval_mode in ["classification", "adaface"]:
-            dataloader_dict["Eval"] = build(
-                engine.config["DataLoader"],
-                "Eval",
-                engine.device,
-                use_dali,
-                seed=None)
-        elif engine.eval_mode == "retrieval":
-            if len(engine.config["DataLoader"]["Eval"].keys()) == 1:
-                key = list(engine.config["DataLoader"]["Eval"].keys())[0]
-                dataloader_dict["GalleryQuery"] = build_dataloader(
-                    engine.config["DataLoader"]["Eval"], key, engine.device,
-                    use_dali)
-            else:
-                dataloader_dict["Gallery"] = build_dataloader(
-                    engine.config["DataLoader"]["Eval"], "Gallery",
-                    engine.device, use_dali)
-                dataloader_dict["Query"] = build_dataloader(
-                    engine.config["DataLoader"]["Eval"], "Query",
-                    engine.device, use_dali)
-
-    return dataloader_dict
