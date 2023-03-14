@@ -88,15 +88,14 @@ def worker_init_fn(worker_id: int, num_workers: int, rank: int, seed: int):
     random.seed(worker_seed)
 
 
-def build_dataloader(config, *mode, seed=None):
-    dataloader_config = config["DataLoader"]
-    for m in mode:
-        assert m in [
-            'Train', 'Eval', 'Test', 'Gallery', 'Query', 'UnLabelTrain'
-        ], "Dataset mode should be Train, Eval, Test, Gallery, Query, UnLabelTrain"
-        assert m in dataloader_config.keys(), "{} config not in yaml".format(m)
-        dataloader_config = dataloader_config[m]
+def build_dataloader(config, mode, seed=None):
+    assert mode in [
+        'Train', 'Eval', 'Test', 'Gallery', 'Query', 'UnLabelTrain'
+    ], "Dataset mode should be Train, Eval, Test, Gallery, Query, UnLabelTrain"
+    assert mode in config["DataLoader"].keys(), "{} config not in yaml".format(
+        mode)
 
+    dataloader_config = config["DataLoader"][mode]
     class_num = config["Arch"].get("class_num", None)
     epochs = config["Global"]["epochs"]
     use_dali = config["Global"].get("use_dali", False)
