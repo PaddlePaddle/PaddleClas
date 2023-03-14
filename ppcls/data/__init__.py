@@ -110,7 +110,7 @@ def build(config, mode, use_dali=False, seed=None):
     config_dataset = copy.deepcopy(config_dataset)
     dataset_name = config_dataset.pop('name')
     if 'batch_transform_ops' in config_dataset:
-        batch_transform = config_dataset['batch_transform_ops']
+        batch_transform = config_dataset.pop('batch_transform_ops')
     else:
         batch_transform = None
 
@@ -254,11 +254,10 @@ def build_dataloader(config, mode):
 
     if mode == "eval" or (mode == "train" and
                           config["Global"]["eval_during_train"]):
-        task = config["Global"].get("task", "classification")
-        if task in ["classification", "adaface"]:
+        if config["Global"]["eval_mode"] in ["classification", "adaface"]:
             dataloader_dict["Eval"] = build(
                 config["DataLoader"], "Eval", use_dali, seed=None)
-        elif task == "retrieval":
+        elif config["Global"]["eval_mode"] == "retrieval":
             if len(config["DataLoader"]["Eval"].keys()) == 1:
                 key = list(config["DataLoader"]["Eval"].keys())[0]
                 dataloader_dict["GalleryQuery"] = build(
