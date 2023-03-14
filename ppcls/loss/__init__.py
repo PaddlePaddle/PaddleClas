@@ -4,7 +4,7 @@ import paddle
 import paddle.nn as nn
 from ppcls.utils import logger
 
-from .celoss import CELoss
+from .celoss import CELoss, MixCELoss
 from .googlenetloss import GoogLeNetLoss
 from .centerloss import CenterLoss
 from .contrasiveloss import ContrastiveLoss
