@@ -2,8 +2,7 @@ import copy
 
 import paddle
 import paddle.nn as nn
-from ..utils import logger
-from ..utils.amp import AMPForwardDecorator, AMP_forward_decorator
+from ppcls.utils import logger
 
 from .celoss import CELoss
 from .googlenetloss import GoogLeNetLoss
@@ -50,7 +49,7 @@ from .metabinloss import IntraDomainScatterLoss
 
 
 class CombinedLoss(nn.Layer):
-    def __init__(self, config_list, amp_config=None):
+    def __init__(self, config_list):
         super().__init__()
         loss_func = []
         self.loss_weight = []
@@ -68,13 +67,6 @@ class CombinedLoss(nn.Layer):
         self.loss_func = nn.LayerList(loss_func)
         logger.debug("build loss {} success.".format(loss_func))
 
-        if amp_config:
-            self.scaler = paddle.amp.GradScaler(
-                init_loss_scaling=config["AMP"].get("scale_loss", 1.0),
-                use_dynamic_loss_scaling=config["AMP"].get(
-                    "use_dynamic_loss_scaling", False))
-
-    @AMP_forward_decorator
     def __call__(self, input, batch):
         loss_dict = {}
         # just for accelerate classification traing speed
@@ -89,49 +81,25 @@ class CombinedLoss(nn.Layer):
                 loss = {key: loss[key] * weight for key in loss}
                 loss_dict.update(loss)
             loss_dict["loss"] = paddle.add_n(list(loss_dict.values()))
-        # TODO(gaotingquan): if amp_eval & eval_loss ?
-        if AMPForwardDecorator.amp_level:
-            self.scaler(loss_dict["loss"])
         return loss_dict
 
 
 def build_loss(config, mode="train"):
+    train_loss_func, unlabel_train_loss_func, eval_loss_func = None, None, None
     if mode == "train":
         label_loss_info = config["Loss"]["Train"]
         if label_loss_info:
-            train_loss_func = CombinedLoss(
-                copy.deepcopy(label_loss_info), config.get("AMP", None))
+            train_loss_func = CombinedLoss(copy.deepcopy(label_loss_info))
         unlabel_loss_info = config.get("UnLabelLoss", {}).get("Train", None)
         if unlabel_loss_info:
             unlabel_train_loss_func = CombinedLoss(
-                copy.deepcopy(unlabel_loss_info), config.get("AMP", None))
-        else:
-            unlabel_train_loss_func = None
-
-        if AMPForwardDecorator.amp_level is not None:
-            train_loss_func = paddle.amp.decorate(
-                models=train_loss_func,
-                level=AMPForwardDecorator.amp_level,
-                save_dtype='float32')
-            # TODO(gaotingquan): unlabel_loss_info may be None
-            unlabel_train_loss_func = paddle.amp.decorate(
-                models=unlabel_train_loss_func,
-                level=AMPForwardDecorator.amp_level,
-                save_dtype='float32')
+                copy.deepcopy(unlabel_loss_info))
         return train_loss_func, unlabel_train_loss_func
-
     if mode == "eval" or (mode == "train" and
                           config["Global"]["eval_during_train"]):
         loss_config = config.get("Loss", None)
         if loss_config is not None:
             loss_config = loss_config.get("Eval")
             if loss_config is not None:
-                eval_loss_func = CombinedLoss(
-                    copy.deepcopy(loss_config), config.get("AMP", None))
-
-        if AMPForwardDecorator.amp_level is not None and AMPForwardDecorator.amp_eval:
-            eval_loss_func = paddle.amp.decorate(
-                models=eval_loss_func,
-                level=AMPForwardDecorator.amp_level,
-                save_dtype='float32')
+                eval_loss_func = CombinedLoss(copy.deepcopy(loss_config))
         return eval_loss_func

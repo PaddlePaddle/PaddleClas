@@ -29,7 +29,6 @@ from ..utils import logger
 from ..utils.save_load import load_dygraph_pretrain
 from .slim import prune_model, quantize_model
 from .distill.afd_attention import LinearTransformStudent, LinearTransformTeacher
-from ..utils.amp import AMPForwardDecorator
 
 __all__ = ["build_model", "RecModel", "DistillationModel", "AttentionModel"]
 
@@ -55,12 +54,6 @@ def build_model(config, mode="train"):
 
     # set @to_static for benchmark, skip this by default.
     model = apply_to_static(config, model)
-
-    if AMPForwardDecorator.amp_level:
-        model = paddle.amp.decorate(
-            models=model,
-            level=AMPForwardDecorator.amp_level,
-            save_dtype='float32')
 
     return model
 
