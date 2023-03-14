@@ -72,7 +72,6 @@ class Engine(object):
         self.update_freq = self.config["Global"].get("update_freq", 1)
 
         # build dataloader
-        self.use_dali = self.config["Global"].get("use_dali", False)
         self.dataloader_dict = build_dataloader(self)
 
         # build loss

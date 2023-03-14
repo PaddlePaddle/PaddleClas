@@ -204,8 +204,6 @@ class DataIterator(object):
         self.dataloader = dataloader
         self.use_dali = use_dali
         self.iterator = iter(dataloader)
-        self.max_iter = dataloader.max_iter
-        self.total_samples = dataloader.total_samples
 
     def get_batch(self):
         # fetch data batch from dataloader
@@ -236,7 +234,7 @@ def build_dataloader(engine):
         "epochs": engine.config["Global"]["epochs"]
     })
 
-    use_dali = engine.use_dali
+    use_dali = engine.config['Global'].get("use_dali", False)
     dataloader_dict = {
         "Train": None,
         "UnLabelTrain": None,
@@ -248,15 +246,18 @@ def build_dataloader(engine):
     if engine.mode == 'train':
         train_dataloader = build(
             engine.config["DataLoader"], "Train", use_dali, seed=None)
-
-        if engine.config["DataLoader"]["Train"].get("max_iter", None):
+        iter_per_epoch = len(train_dataloader) - 1 if platform.system(
+        ) == "Windows" else len(train_dataloader)
+        if engine.config["Global"].get("iter_per_epoch", None):
+            # TODO(gaotingquan): iter_per_epoch should be set in Dataloader.Train, not Global
             # set max iteration per epoch mannualy, when training by iteration(s), such as XBM, FixMatch.
-            max_iter = engine.config["Train"].get("max_iter")
-        max_iter = train_dataloader.max_iter // engine.update_freq * engine.update_freq
-        train_dataloader.max_iter = max_iter
-        if engine.config["DataLoader"]["Train"].get("convert_iterator", True):
-            train_dataloader = DataIterator(train_dataloader, use_dali)
+            iter_per_epoch = engine.config["Global"].get("iter_per_epoch")
+        iter_per_epoch = iter_per_epoch // engine.update_freq * engine.update_freq
+        # engine.iter_per_epoch = iter_per_epoch
+        train_dataloader.iter_per_epoch = iter_per_epoch
         dataloader_dict["Train"] = train_dataloader
+        # TODO(gaotingquan): set the iterator field in config, such as Dataloader.Train.convert_iterator=True
+        dataloader_dict["TrainIter"] = DataIterator(train_dataloader, use_dali)
 
     if engine.config["DataLoader"].get('UnLabelTrain', None) is not None:
         dataloader_dict["UnLabelTrain"] = build(
