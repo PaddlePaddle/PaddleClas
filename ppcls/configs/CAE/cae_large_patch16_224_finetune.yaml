@@ -17,7 +17,7 @@ Global:
 # model architecture
 Arch:
   name: cae_large_patch16_224
-  class_num: 102
+  class_num: 1000
   drop_rate: 0.0
   drop_path_rate: 0.2
   attn_drop_rate: 0.0
