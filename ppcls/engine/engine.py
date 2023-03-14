@@ -43,8 +43,6 @@ class Engine(object):
         assert mode in ["train", "eval", "infer", "export"]
         self.mode = mode
         self.config = config
-        self.eval_mode = self.config["Global"].get("eval_mode",
-                                                   "classification")
 
         # init logger
         log_file = os.path.join(self.config['Global']['output_dir'],
