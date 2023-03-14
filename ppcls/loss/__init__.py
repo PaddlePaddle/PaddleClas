@@ -70,7 +70,7 @@ class CombinedLoss(nn.Layer):
         logger.debug("build loss {} success.".format(loss_func))
 
         self.scaler = None
-        if amp_config and paddle.in_dynamic_mode():
+        if amp_config:
             if self.mode == "Train" or AMPForwardDecorator.amp_eval:
                 self.scaler = paddle.amp.GradScaler(
                     init_loss_scaling=amp_config.get("scale_loss", 1.0),
