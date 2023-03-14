@@ -114,7 +114,7 @@ DataLoader:
   Eval:
     dataset:
       name: ImageNetDataset
-      image_root: /dataset/ILSVRC2012/
+      image_root: ./dataset/ILSVRC2012/
       cls_label_path: ./dataset/ILSVRC2012/val_list.txt
       transform_ops:
         - DecodeImage:
