@@ -118,7 +118,7 @@ def build_dataloader(config, *mode, seed=None):
         config_dataset = copy.deepcopy(config_dataset)
         dataset_name = config_dataset.pop('name')
         if 'batch_transform_ops' in config_dataset:
-            batch_transform = config_dataset.pop('batch_transform_ops')
+            batch_transform = config_dataset['batch_transform_ops']
         else:
             batch_transform = None
 
