@@ -14,14 +14,12 @@
 
 import sys
 import copy
-import importlib
 
 import paddle.nn as nn
 from paddle.jit import to_static
 from paddle.static import InputSpec
 
 from . import backbone
-from .backbone import *
 from .gears import build_gear
 from .utils import *
 from .backbone.base.theseus_layer import TheseusLayer
@@ -38,8 +36,11 @@ def build_model(config, mode="train"):
     model_type = arch_config.pop("name")
     use_sync_bn = arch_config.pop("use_sync_bn", False)
 
-    mod = importlib.import_module(__name__)
-    model = getattr(mod, model_type)(**arch_config)
+    if hasattr(backbone, model_type):
+        model = ClassModel(model_type, **arch_config)
+    else:
+        model = getattr(sys.modules[__name__], model_type)("ClassModel",
+                                                           **arch_config)
 
     if use_sync_bn:
         if config["Global"]["device"] == "gpu":
@@ -70,6 +71,23 @@ def apply_to_static(config, model):
         logger.info("Successfully to apply @to_static with specs: {}".format(
             specs))
     return model
+
+
+# TODO(gaotingquan): export model
+class ClassModel(TheseusLayer):
+    def __init__(self, model_type, **config):
+        super().__init__()
+        if model_type == "ClassModel":
+            backbone_config = config["Backbone"]
+            backbone_name = backbone_config.pop("name")
+        else:
+            backbone_name = model_type
+            backbone_config = config
+        self.backbone = getattr(backbone, backbone_name)(**backbone_config)
+
+    def forward(self, batch):
+        x, label = batch[0], batch[1]
+        return self.backbone(x)
 
 
 class RecModel(TheseusLayer):
