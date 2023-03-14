@@ -66,7 +66,7 @@ class CombinedMetrics(AvgMetrics):
 
 
 def build_metrics(config, mode):
-    if mode == 'Train' and "Metric" in config and "Train" in config[
+    if mode == 'train' and "Metric" in config and "Train" in config[
             "Metric"] and config["Metric"]["Train"]:
         metric_config = config["Metric"]["Train"]
         if config["DataLoader"]["Train"]["dataset"].get("batch_transform_ops",
@@ -76,17 +76,22 @@ def build_metrics(config, mode):
                     msg = f"Unable to calculate accuracy when using \"batch_transform_ops\". The metric \"{m}\" has been removed."
                     logger.warning(msg)
                     metric_config.pop(m_idx)
-        return CombinedMetrics(copy.deepcopy(metric_config))
+        train_metric_func = CombinedMetrics(copy.deepcopy(metric_config))
+        return train_metric_func
 
-    if mode == "Eval":
-        task = config["Global"].get("task", "classification")
-        assert task in ["classification", "retrieval"]
-        if task == "classification":
+    if mode == "eval" or (mode == "train" and
+                          config["Global"]["eval_during_train"]):
+        eval_mode = config["Global"].get("eval_mode", "classification")
+        if eval_mode == "classification":
             if "Metric" in config and "Eval" in config["Metric"]:
-                return CombinedMetrics(copy.deepcopy(config["Metric"]["Eval"]))
-        elif task == "retrieval":
+                eval_metric_func = CombinedMetrics(
+                    copy.deepcopy(config["Metric"]["Eval"]))
+            else:
+                eval_metric_func = None
+        elif eval_mode == "retrieval":
             if "Metric" in config and "Eval" in config["Metric"]:
                 metric_config = config["Metric"]["Eval"]
             else:
                 metric_config = [{"name": "Recallk", "topk": (1, 5)}]
-            return CombinedMetrics(copy.deepcopy(metric_config))
+            eval_metric_func = CombinedMetrics(copy.deepcopy(metric_config))
+        return eval_metric_func

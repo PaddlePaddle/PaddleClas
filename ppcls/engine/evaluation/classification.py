@@ -31,7 +31,7 @@ class ClassEval(object):
         self.model = model
         self.print_batch_step = self.config["Global"]["print_batch_step"]
         self.use_dali = self.config["Global"].get("use_dali", False)
-        self.eval_metric_func = build_metrics(self.config, "Eval")
+        self.eval_metric_func = build_metrics(self.config, "eval")
         self.eval_dataloader = build_dataloader(self.config, "Eval")
         self.eval_loss_func = build_loss(self.config, "Eval")
         self.output_info = dict()
