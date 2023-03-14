@@ -39,8 +39,7 @@ from ppcls.utils import save_load
 from ppcls.data.utils.get_image_list import get_image_list
 from ppcls.data.postprocess import build_postprocess
 from ppcls.data import create_operators
-from .train import build_train_epoch_func
-from .evaluation import build_eval_func
+from ppcls.engine import train as train_method
 from ppcls.engine.train.utils import type_name
 from ppcls.engine import evaluation
 from ppcls.arch.gears.identity_head import IdentityHead
@@ -62,11 +61,22 @@ class Engine(object):
         self.vdl_writer = self._init_vdl()
 
         # init train_func and eval_func
-        self.train_epoch_func = build_train_epoch_func(self.config)
-        self.eval_epoch_func = build_eval_func(self.config)
+        self.train_mode = self.config["Global"].get("train_mode", None)
+        if self.train_mode is None:
+            self.train_epoch_func = train_method.train_epoch
+        else:
+            self.train_epoch_func = getattr(train_method,
+                                            "train_epoch_" + self.train_mode)
+
+        self.eval_mode = self.config["Global"].get("eval_mode",
+                                                   "classification")
+        assert self.eval_mode in [
+            "classification", "retrieval", "adaface"
+        ], logger.error("Invalid eval mode: {}".format(self.eval_mode))
+        self.eval_func = getattr(evaluation, self.eval_mode + "_eval")
 
         # set device
-        self._init_device()
+        self.device = self._init_device()
 
         # gradient accumulation
         self.update_freq = self.config["Global"].get("update_freq", 1)
@@ -385,7 +395,7 @@ class Engine(object):
         assert device in ["cpu", "gpu", "xpu", "npu", "mlu", "ascend"]
         logger.info('train with paddle {} and device {}'.format(
             paddle.__version__, device))
-        paddle.set_device(device)
+        return paddle.set_device(device)
 
     def _init_pretrained(self):
         if self.config["Global"]["pretrained_model"] is not None:
