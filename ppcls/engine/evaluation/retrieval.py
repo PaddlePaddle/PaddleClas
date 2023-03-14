@@ -162,7 +162,7 @@ class RetrievalEval(object):
                 has_camera = True
                 batch[2] = batch[2].reshape([-1, 1]).astype("int64")
 
-            out = self.model(batch[0])
+            out = self.model(batch)
 
             if "Student" in out:
                 out = out["Student"]
