@@ -151,20 +151,20 @@ def _extract_student_weights(all_params, student_prefix="Student."):
 
 class ModelSaver(object):
     def __init__(self,
-                 trainer,
+                 engine,
                  net_name="model",
                  loss_name="train_loss_func",
                  opt_name="optimizer",
                  model_ema_name="model_ema"):
         # net, loss, opt, model_ema, output_dir, 
-        self.trainer = trainer
+        self.engine = engine
         self.net_name = net_name
         self.loss_name = loss_name
         self.opt_name = opt_name
         self.model_ema_name = model_ema_name
 
-        arch_name = trainer.config["Arch"]["name"]
-        self.output_dir = os.path.join(trainer.output_dir, arch_name)
+        arch_name = engine.config["Arch"]["name"]
+        self.output_dir = os.path.join(engine.output_dir, arch_name)
         _mkdir_if_not_exist(self.output_dir)
 
     def save(self, metric_info, prefix='ppcls', save_student_model=False):
@@ -174,8 +174,8 @@ class ModelSaver(object):
 
         save_dir = os.path.join(self.output_dir, prefix)
 
-        params_state_dict = getattr(self.trainer, self.net_name).state_dict()
-        loss = getattr(self.trainer, self.loss_name)
+        params_state_dict = getattr(self.engine, self.net_name).state_dict()
+        loss = getattr(self.engine, self.loss_name)
         if loss is not None:
             loss_state_dict = loss.state_dict()
             keys_inter = set(params_state_dict.keys()) & set(
@@ -190,11 +190,11 @@ class ModelSaver(object):
                 paddle.save(s_params, save_dir + "_student.pdparams")
 
         paddle.save(params_state_dict, save_dir + ".pdparams")
-        model_ema = getattr(self.trainer, self.model_ema_name)
+        model_ema = getattr(self.engine, self.model_ema_name)
         if model_ema is not None:
             paddle.save(model_ema.module.state_dict(),
                         save_dir + ".ema.pdparams")
-        optimizer = getattr(self.trainer, self.opt_name)
+        optimizer = getattr(self.engine, self.opt_name)
         paddle.save([opt.state_dict() for opt in optimizer],
                     save_dir + ".pdopt")
         paddle.save(metric_info, save_dir + ".pdstates")

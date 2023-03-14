@@ -13,19 +13,16 @@
 # limitations under the License.
 
 from .train_metabin import train_epoch_metabin
-from .classification import ClassTrainer
+from .regular_train_epoch import regular_train_epoch
 from .train_fixmatch import train_epoch_fixmatch
 from .train_fixmatch_ccssl import train_epoch_fixmatch_ccssl
 from .train_progressive import train_epoch_progressive
 
 
-def build_train_func(config, mode, model, eval_func):
-    if mode != "train":
-        return None
-    train_mode = config["Global"].get("task", None)
+def build_train_epoch_func(config):
+    train_mode = config["Global"].get("train_mode", None)
     if train_mode is None:
-        config["Global"]["task"] = "classification"
-        return ClassTrainer(config, mode, model, eval_func)
+        config["Global"]["train_mode"] = "regular_train"
+        return regular_train_epoch
     else:
-        return getattr(sys.modules[__name__], "train_epoch_" + train_mode)(
-            config, mode, model, eval_func)
+        return getattr(sys.modules[__name__], "train_epoch_" + train_mode)

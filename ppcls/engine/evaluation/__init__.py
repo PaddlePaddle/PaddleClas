@@ -12,18 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from .classification import ClassEval
+from .classification import classification_eval
 from .retrieval import retrieval_eval
 from .adaface import adaface_eval
 
 
-def build_eval_func(config, mode, model):
-    if mode not in ["eval", "train"]:
-        return None
+def build_eval_func(config):
     eval_mode = config["Global"].get("eval_mode", None)
     if eval_mode is None:
         config["Global"]["eval_mode"] = "classification"
-        return ClassEval(config, mode, model)
+        return classification_eval
     else:
-        return getattr(sys.modules[__name__], eval_mode + "_eval")(config,
-                                                                   mode, model)
+        return getattr(sys.modules[__name__], eval_mode + "_eval")

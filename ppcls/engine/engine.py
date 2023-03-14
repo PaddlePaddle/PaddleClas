@@ -22,17 +22,25 @@ from paddle import nn
 import numpy as np
 import random
 
+from ppcls.utils.misc import AverageMeter
 from ppcls.utils import logger
 from ppcls.utils.logger import init_logger
 from ppcls.utils.config import print_config
+from ppcls.data import build_dataloader
 from ppcls.arch import build_model, RecModel, DistillationModel, TheseusLayer
+from ppcls.loss import build_loss
+from ppcls.metric import build_metrics
+from ppcls.optimizer import build_optimizer
+from ppcls.utils.ema import ExponentialMovingAverage
 from ppcls.utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
+from ppcls.utils.save_load import init_model, ModelSaver
 
 from ppcls.data.utils.get_image_list import get_image_list
 from ppcls.data.postprocess import build_postprocess
 from ppcls.data import create_operators
-from .train import build_train_func
+from .train import build_train_epoch_func
 from .evaluation import build_eval_func
+from ppcls.engine.train.utils import type_name
 from ppcls.engine import evaluation
 from ppcls.arch.gears.identity_head import IdentityHead
 
@@ -42,17 +50,42 @@ class Engine(object):
         assert mode in ["train", "eval", "infer", "export"]
         self.mode = mode
         self.config = config
+        self.start_eval_epoch = self.config["Global"].get("start_eval_epoch",
+                                                          0) - 1
+        self.epochs = self.config["Global"].get("epochs", 1)
 
         # set seed
         self._init_seed()
 
         # init logger
-        log_file = os.path.join(self.config['Global']['output_dir'],
-                                self.config["Arch"]["name"], f"{mode}.log")
+        self.output_dir = self.config['Global']['output_dir']
+        log_file = os.path.join(self.output_dir, self.config["Arch"]["name"],
+                                f"{mode}.log")
         init_logger(log_file=log_file)
+
+        # for visualdl
+        self.vdl_writer = self._init_vdl()
+
+        # init train_func and eval_func
+        self.train_epoch_func = build_train_epoch_func(self.config)
+        self.eval_func = build_eval_func(self.config)
 
         # set device
         self._init_device()
+
+        # gradient accumulation
+        self.update_freq = self.config["Global"].get("update_freq", 1)
+
+        # build dataloader
+        self.use_dali = self.config["Global"].get("use_dali", False)
+        self.dataloader_dict = build_dataloader(self.config, mode)
+
+        # build loss
+        self.train_loss_func, self.unlabel_train_loss_func, self.eval_loss_func = build_loss(
+            self.config, self.mode)
+
+        # build metric
+        self.train_metric_func, self.eval_metric_func = build_metrics(self)
 
         # build model
         self.model = build_model(self.config, self.mode)
@@ -60,16 +93,142 @@ class Engine(object):
         # load_pretrain
         self._init_pretrained()
 
-        # init train_func and eval_func
-        self.eval = build_eval_func(
-            self.config, mode=self.mode, model=self.model)
-        self.train = build_train_func(
-            self.config, mode=self.mode, model=self.model, eval_func=self.eval)
+        # build optimizer
+        self.optimizer, self.lr_sch = build_optimizer(self)
+
+        # AMP training and evaluating
+        self._init_amp()
 
         # for distributed
         self._init_dist()
 
+        # build model saver
+        self.model_saver = ModelSaver(
+            self,
+            net_name="model",
+            loss_name="train_loss_func",
+            opt_name="optimizer",
+            model_ema_name="model_ema")
+
         print_config(config)
+
+    def train(self):
+        assert self.mode == "train"
+        print_batch_step = self.config['Global']['print_batch_step']
+        save_interval = self.config["Global"]["save_interval"]
+
+        best_metric = {
+            "metric": -1.0,
+            "epoch": 0,
+        }
+
+        # key:
+        # val: metrics list word
+        self.output_info = dict()
+        self.time_info = {
+            "batch_cost": AverageMeter(
+                "batch_cost", '.5f', postfix=" s,"),
+            "reader_cost": AverageMeter(
+                "reader_cost", ".5f", postfix=" s,"),
+        }
+
+        # build EMA model
+        self.model_ema = self._build_ema_model()
+        # TODO: mv best_metric_ema to best_metric dict
+        best_metric_ema = 0
+
+        self._init_checkpoints(best_metric)
+
+        # global iter counter
+        self.global_step = 0
+        for epoch_id in range(best_metric["epoch"] + 1, self.epochs + 1):
+            # for one epoch train
+            self.train_epoch_func(self, epoch_id, print_batch_step)
+
+            metric_msg = ", ".join(
+                [self.output_info[key].avg_info for key in self.output_info])
+            logger.info("[Train][Epoch {}/{}][Avg]{}".format(
+                epoch_id, self.epochs, metric_msg))
+            self.output_info.clear()
+
+            acc = 0.0
+            if self.config["Global"][
+                    "eval_during_train"] and epoch_id % self.config["Global"][
+                        "eval_interval"] == 0 and epoch_id > self.start_eval_epoch:
+                acc = self.eval(epoch_id)
+
+                # step lr (by epoch) according to given metric, such as acc
+                for i in range(len(self.lr_sch)):
+                    if getattr(self.lr_sch[i], "by_epoch", False) and \
+                            type_name(self.lr_sch[i]) == "ReduceOnPlateau":
+                        self.lr_sch[i].step(acc)
+
+                if acc > best_metric["metric"]:
+                    best_metric["metric"] = acc
+                    best_metric["epoch"] = epoch_id
+                    self.model_saver.save(
+                        best_metric,
+                        prefix="best_model",
+                        save_student_model=True)
+
+                logger.info("[Eval][Epoch {}][best metric: {}]".format(
+                    epoch_id, best_metric["metric"]))
+                logger.scaler(
+                    name="eval_acc",
+                    value=acc,
+                    step=epoch_id,
+                    writer=self.vdl_writer)
+
+                self.model.train()
+
+                if self.model_ema:
+                    ori_model, self.model = self.model, self.model_ema.module
+                    acc_ema = self.eval(epoch_id)
+                    self.model = ori_model
+                    self.model_ema.module.eval()
+
+                    if acc_ema > best_metric_ema:
+                        best_metric_ema = acc_ema
+                        self.model_saver.save(
+                            {
+                                "metric": acc_ema,
+                                "epoch": epoch_id
+                            },
+                            prefix="best_model_ema")
+                    logger.info("[Eval][Epoch {}][best metric ema: {}]".format(
+                        epoch_id, best_metric_ema))
+                    logger.scaler(
+                        name="eval_acc_ema",
+                        value=acc_ema,
+                        step=epoch_id,
+                        writer=self.vdl_writer)
+
+            # save model
+            if save_interval > 0 and epoch_id % save_interval == 0:
+                self.model_saver.save(
+                    {
+                        "metric": acc,
+                        "epoch": epoch_id
+                    },
+                    prefix=f"epoch_{epoch_id}")
+
+            # save the latest model
+            self.model_saver.save(
+                {
+                    "metric": acc,
+                    "epoch": epoch_id
+                }, prefix="latest")
+
+        if self.vdl_writer is not None:
+            self.vdl_writer.close()
+
+    @paddle.no_grad()
+    def eval(self, epoch_id=0):
+        assert self.mode in ["train", "eval"]
+        self.model.eval()
+        eval_result = self.eval_func(self, epoch_id)
+        self.model.train()
+        return eval_result
 
     @paddle.no_grad()
     def infer(self):
@@ -166,6 +325,15 @@ class Engine(object):
         logger.info(
             f"Export succeeded! The inference model exported has been saved in \"{self.config['Global']['save_inference_dir']}\"."
         )
+
+    def _init_vdl(self):
+        if self.config['Global'][
+                'use_visualdl'] and mode == "train" and dist.get_rank() == 0:
+            vdl_writer_path = os.path.join(self.output_dir, "vdl")
+            if not os.path.exists(vdl_writer_path):
+                os.makedirs(vdl_writer_path)
+            return LogWriter(logdir=vdl_writer_path)
+        return None
 
     def _init_seed(self):
         seed = self.config["Global"].get("seed", False)
@@ -286,6 +454,22 @@ class Engine(object):
             )) > 0:
                 self.train_loss_func = paddle.DataParallel(
                     self.train_loss_func)
+
+    def _build_ema_model(self):
+        if "EMA" in self.config and self.mode == "train":
+            model_ema = ExponentialMovingAverage(
+                self.model, self.config['EMA'].get("decay", 0.9999))
+            return model_ema
+        else:
+            return None
+
+    def _init_checkpoints(self, best_metric):
+        if self.config["Global"].get("checkpoints", None) is not None:
+            metric_info = init_model(self.config.Global, self.model,
+                                     self.optimizer, self.train_loss_func,
+                                     self.model_ema)
+            if metric_info is not None:
+                best_metric.update(metric_info)
 
 
 class ExportModel(TheseusLayer):
