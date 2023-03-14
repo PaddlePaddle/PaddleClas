@@ -60,8 +60,6 @@ class Engine(object):
         # load_pretrain
         self._init_pretrained()
 
-        self._init_amp()
-
         # init train_func and eval_func
         self.eval = build_eval_func(
             self.config, mode=self.mode, model=self.model)
@@ -71,7 +69,7 @@ class Engine(object):
         # for distributed
         self._init_dist()
 
-        print_config(self.config)
+        print_config(config)
 
     @paddle.no_grad()
     def infer(self):
