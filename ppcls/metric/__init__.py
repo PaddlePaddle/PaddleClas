@@ -70,9 +70,8 @@ def build_metrics(engine):
     if mode == 'train' and "Metric" in config and "Train" in config[
             "Metric"] and config["Metric"]["Train"]:
         metric_config = config["Metric"]["Train"]
-        if hasattr(engine.dataloader_dict["Train"],
-                   "collate_fn") and engine.dataloader_dict[
-                       "Train"].collate_fn is not None:
+        if hasattr(engine.train_dataloader, "collate_fn"
+                   ) and engine.train_dataloader.collate_fn is not None:
             for m_idx, m in enumerate(metric_config):
                 if "TopkAcc" in m:
                     msg = f"Unable to calculate accuracy when using \"batch_transform_ops\". The metric \"{m}\" has been removed."
