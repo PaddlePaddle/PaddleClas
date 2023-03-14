@@ -15,7 +15,6 @@
 import copy
 from collections import OrderedDict
 
-from ..utils import logger
 from .avg_metrics import AvgMetrics
 from .metrics import TopkAcc, mAP, mINP, Recallk, Precisionk
 from .metrics import DistillationTopkAcc
