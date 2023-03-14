@@ -54,14 +54,13 @@ def log_info(trainer, batch_size, epoch_id, iter_id):
     ips_msg = "ips: {:.5f} samples/s".format(
         batch_size / trainer.time_info["batch_cost"].avg)
 
-    eta_sec = ((trainer.config["Global"]["epochs"] - epoch_id + 1
-                ) * trainer.dataloader_dict["Train"].iter_per_epoch - iter_id
-               ) * trainer.time_info["batch_cost"].avg
+    eta_sec = (
+        (trainer.config["Global"]["epochs"] - epoch_id + 1) *
+        trainer.iter_per_epoch - iter_id) * trainer.time_info["batch_cost"].avg
     eta_msg = "eta: {:s}".format(str(datetime.timedelta(seconds=int(eta_sec))))
     logger.info("[Train][Epoch {}/{}][Iter: {}/{}]{}, {}, {}, {}, {}".format(
-        epoch_id, trainer.config["Global"][
-            "epochs"], iter_id, trainer.dataloader_dict["Train"]
-        .iter_per_epoch, lr_msg, metric_msg, time_msg, ips_msg, eta_msg))
+        epoch_id, trainer.config["Global"]["epochs"], iter_id, trainer.
+        iter_per_epoch, lr_msg, metric_msg, time_msg, ips_msg, eta_msg))
 
     for i, lr in enumerate(trainer.lr_sch):
         logger.scaler(

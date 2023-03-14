@@ -63,7 +63,7 @@ class Engine(object):
 
         # init train_func and eval_func
         self.train_epoch_func = build_train_epoch_func(self.config)
-        self.eval_func = build_eval_func(self.config)
+        self.eval_epoch_func = build_eval_func(self.config)
 
         # set device
         self._init_device()
@@ -73,6 +73,12 @@ class Engine(object):
 
         # build dataloader
         self.dataloader_dict = build_dataloader(self)
+        self.train_dataloader, self.unlabel_train_dataloader, self.eval_dataloader = self.dataloader_dict[
+            "Train"], self.dataloader_dict[
+                "UnLabelTrain"], self.dataloader_dict["Eval"]
+        self.gallery_query_dataloader, self.gallery_dataloader, self.query_dataloader = self.dataloader_dict[
+            "GalleryQuery"], self.dataloader_dict[
+                "Gallery"], self.dataloader_dict["Query"]
 
         # build loss
         self.train_loss_func, self.unlabel_train_loss_func, self.eval_loss_func = build_loss(
@@ -88,7 +94,9 @@ class Engine(object):
         self._init_pretrained()
 
         # build optimizer
-        self.optimizer, self.lr_sch = build_optimizer(self)
+        self.optimizer, self.lr_sch = build_optimizer(
+            self.config, self.train_dataloader,
+            [self.model, self.train_loss_func])
 
         # AMP training and evaluating
         self._init_amp()
