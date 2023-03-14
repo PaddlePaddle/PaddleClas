@@ -22,8 +22,9 @@ from .train_progressive import train_epoch_progressive
 def build_train_func(config, mode, model, eval_func):
     if mode != "train":
         return None
-    task = config["Global"].get("task", "classification")
-    if task == "classification" or task == "retrieval":
+    train_mode = config["Global"].get("task", None)
+    if train_mode is None:
+        config["Global"]["task"] = "classification"
         return ClassTrainer(config, model, eval_func)
     else:
         return getattr(sys.modules[__name__], "train_epoch_" + train_mode)(
