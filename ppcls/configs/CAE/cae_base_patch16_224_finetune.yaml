@@ -76,7 +76,7 @@ DataLoader:
             mixup_alpha: 0.8
             cutmix_alpha: 1.0
             switch_prob: 0.5
-            num_classes: 102
+            num_classes: 1000
       transform_ops:
         - DecodeImage:
             to_rgb: True
