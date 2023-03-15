@@ -1,0 +1,15 @@
+model_path: ./ResNet50_vd_infer/ResNet50_vd_infer.onnx
+output_folder: ./ResNet50_vd_infer
+mean:
+  -
+    - 123.675
+    - 116.28
+    - 103.53
+std:
+  -
+    - 58.395
+    - 57.12
+    - 57.375
+outputs_nodes:
+do_quantization: False
+dataset: "./ResNet50_vd_infer/dataset.txt"

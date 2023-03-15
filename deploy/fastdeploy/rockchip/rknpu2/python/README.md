@@ -1,0 +1,1 @@
+../../../../../docs/zh_CN/fastdeploy/rockchip/rknpu2/python/README.md

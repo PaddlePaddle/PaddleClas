@@ -1,0 +1,60 @@
+# optional, If name is specified it must match the name of the model repository directory containing the model.
+name: "runtime"
+backend: "fastdeploy"
+max_batch_size: 16
+
+# Input configuration of the model
+input [
+  {
+    # input name
+    name: "inputs"
+    # input type such as TYPE_FP32、TYPE_UINT8、TYPE_INT8、TYPE_INT16、TYPE_INT32、TYPE_INT64、TYPE_FP16、TYPE_STRING
+    data_type: TYPE_FP32
+    # input shape， The batch dimension is omitted and the actual shape is [batch, c, h, w]
+    dims: [ 3, 224, 224 ]
+  }
+]
+
+# The output of the model is configured in the same format as the input
+output [
+  {
+    name: "save_infer_model/scale_0.tmp_1"
+    data_type: TYPE_FP32
+    dims: [ 1000 ]
+  }
+]
+
+# Number of instances of the model
+instance_group [
+  {
+    # The number of instances is 1
+    count: 1
+    # Use GPU, CPU inference option is:KIND_CPU
+    kind: KIND_GPU
+    # The instance is deployed on the 0th GPU card
+    gpus: [0]
+  }
+]
+
+optimization {
+  execution_accelerators {
+  gpu_execution_accelerator : [ {
+    # use TRT engine
+    name: "tensorrt",
+    # use fp16 on TRT engine
+    parameters { key: "precision" value: "trt_fp16" }
+  },
+  {
+    name: "min_shape"
+    parameters { key: "inputs" value: "1 3 224 224" }
+  },
+  {
+    name: "opt_shape"
+    parameters { key: "inputs" value: "1 3 224 224" }
+  },
+  {
+    name: "max_shape"
+    parameters { key: "inputs" value: "16 3 224 224" }
+  }
+  ]
+}}
