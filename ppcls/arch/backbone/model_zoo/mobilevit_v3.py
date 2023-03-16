@@ -687,15 +687,25 @@ class MobileViTv3(nn.Layer):
 
     def _init_weights(self, m):
         if isinstance(m, nn.Conv2D):
+            fan_in = m.weight.shape[1] * m.weight.shape[2] * m.weight.shape[3]
             fan_out = m.weight.shape[0] * m.weight.shape[2] * m.weight.shape[3]
-            nn.initializer.KaimingNormal(fan_in=fan_out)(m.weight)
-            if m.bias is not None:
-                nn.initializer.Constant(0)(m.bias)
+            if self.mobilevit_v2_based:
+                bound = 1.0 / fan_in**0.5
+                nn.initializer.Uniform(-bound, bound)(m.weight)
+                if m.bias is not None:
+                    nn.initializer.Uniform(-bound, bound)(m.bias)
+            else:
+                nn.initializer.KaimingNormal(fan_in=fan_out)(m.weight)
+                if m.bias is not None:
+                    nn.initializer.Constant(0)(m.bias)
         elif isinstance(m, nn.BatchNorm2D):
             nn.initializer.Constant(1)(m.weight)
             nn.initializer.Constant(0)(m.bias)
         elif isinstance(m, nn.Linear):
-            nn.initializer.TruncatedNormal(std=.02)(m.weight)
+            if self.mobilevit_v2_based:
+                nn.initializer.XavierUniform()(m.weight)
+            else:
+                nn.initializer.TruncatedNormal(std=.02)(m.weight)
             if m.bias is not None:
                 nn.initializer.Constant(0)(m.bias)
 
