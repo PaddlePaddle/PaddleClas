@@ -19,6 +19,8 @@
 
 ## 📣 近期更新
 
+- **🔥2023.3.16 PaddleClas集成了高性能、全场景模型部署方案FastDeploy，欢迎参考[指南](https://github.com/PaddlePaddle/PaddleClas/tree/develop/deploy/fastdeploy)试用（注意使用develop分支）。**
+
 - **💥 直播回放**：PaddleClas研发团队详解PP-ShituV2优化策略与真实产业应用。微信扫描下方二维码，关注公众号并填写问卷后进入官方交流群，获取直播回放与20G重磅图像分类学习大礼包（内含20+数据集、4个垂类模型、70+前沿论文集合）
 
 <div align="center">
