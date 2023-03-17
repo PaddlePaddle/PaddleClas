@@ -499,6 +499,7 @@ class Engine(object):
     @paddle.no_grad()
     def infer(self):
         assert self.mode == "infer" and self.eval_mode == "classification"
+        results = []
         total_trainer = dist.get_world_size()
         local_rank = dist.get_rank()
         image_list = get_image_list(self.config["Infer"]["infer_imgs"])
