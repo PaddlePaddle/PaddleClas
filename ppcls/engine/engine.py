@@ -520,10 +520,11 @@ class Engine(object):
                     out = out["logits"]
                 if isinstance(out, dict) and "output" in out:
                     out = out["output"]
-                result = self.postprocess_func(out, image_file_list)
-                print(result)
+
+                results.extend(self.postprocess_func(out, image_file_list))
                 batch_data.clear()
                 image_file_list.clear()
+        return results
 
     def export(self):
         assert self.mode == "export"
