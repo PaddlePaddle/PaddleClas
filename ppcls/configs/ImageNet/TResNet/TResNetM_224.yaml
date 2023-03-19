@@ -16,6 +16,10 @@ Global:
   # training model under @to_static
   to_static: False
 
+# model ema
+EMA:
+  decay: 0.9999
+
 # mixed precision training
 AMP:
   scale_loss: 128.0
@@ -90,7 +94,6 @@ DataLoader:
       batch_transform_ops:
         - MixupOperator:
             alpha: 0.2
-            prob: 1.0
 
     sampler:
       name: DistributedBatchSampler

@@ -23,6 +23,10 @@ AMP:
   # O1: mixed fp16
   level: O1
 
+# model ema
+EMA:
+  decay: 0.9999
+
 # model architecture
 Arch:
   name: TResNetM
@@ -65,7 +69,7 @@ DataLoader:
             to_rgb: True
             channel_first: False
         - RandCropImage:
-            size: 224
+            size: 448
             backend: pil
             interpolation: bicubic
         - RandFlipImage:
@@ -73,7 +77,7 @@ DataLoader:
         - TimmAutoAugment:
             config_str: rand-m9-mstd0.5-inc1
             interpolation: bicubic
-            img_size: 224
+            img_size: 448
         - NormalizeImage:
             scale: 1.0/255.0
             mean: [0.485, 0.456, 0.406]
@@ -90,7 +94,6 @@ DataLoader:
       batch_transform_ops:
         - MixupOperator:
             alpha: 0.2
-            prob: 1.0
 
     sampler:
       name: DistributedBatchSampler
@@ -115,7 +118,7 @@ DataLoader:
             interpolation: bicubic
             backend: pil
         - CropImage:
-            size: 224
+            size: 448
         - NormalizeImage:
             scale: 1.0/255.0
             mean: [0.485, 0.456, 0.406]
@@ -142,7 +145,7 @@ Infer:
         interpolation: bicubic
         backend: pil
     - CropImage:
-        size: 224
+        size: 448
     - NormalizeImage:
         scale: 1.0/255.0
         mean: [0.485, 0.456, 0.406]

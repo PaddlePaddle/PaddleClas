@@ -23,6 +23,10 @@ AMP:
   # O1: mixed fp16
   level: O1
 
+# model ema
+EMA:
+  decay: 0.9999
+
 # model architecture
 Arch:
   name: TResNetL
@@ -90,7 +94,6 @@ DataLoader:
       batch_transform_ops:
         - MixupOperator:
             alpha: 0.2
-            prob: 1.0
 
     sampler:
       name: DistributedBatchSampler
