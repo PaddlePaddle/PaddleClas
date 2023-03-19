@@ -134,6 +134,12 @@ class GaussianBlur(object):
 - 两个项目基础模型ResNet50的每层参数名称不同，需要将PASSL项目的训练权重转化为PaddleClas项目使用
 - PSSL项目采用Register类方式将模型的architecture、backbone、neck、head、数据集、优化器、钩子函数链接在一起，使得整个模型的训练过程都可以通过命令行提供一份yaml文件搞定，这一点与PaddleClas项目类似
 
+### 详细设计方案
+
+1. model_zone添加模型
+编写yaml文件，编写MoCo的backbone、neck、head参数配置，同时编写MoCo.yaml文件
+
+
 ## 三、功能模块测试方法
 |功能模块|测试方法|
 |---|---|
