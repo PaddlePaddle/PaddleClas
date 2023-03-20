@@ -13,13 +13,19 @@
 
 ```bash
 # 下载部署示例代码
+git clone https://github.com/PaddlePaddle/FastDeploy.git
+cd  FastDeploy/examples/vision/classification/paddleclas/kunlunxin/cpp
+
+# 如果您希望从PaddleClas下载示例代码，请运行
 git clone https://github.com/PaddlePaddle/PaddleClas.git
-cd PaddleClas/deploy/fastdeploy/kunlun/cpp
+# 注意：如果当前分支找不到下面的fastdeploy测试代码，请切换到develop分支
+git checkout develop
+cd PaddleClas/deploy/fastdeploy/kunlunxin/cpp
 
 mkdir build
 cd build
 # 使用编译完成的FastDeploy库编译infer_demo
-cmake .. -DFASTDEPLOY_INSTALL_DIR=${PWD}/fastdeploy-kunlun
+cmake .. -DFASTDEPLOY_INSTALL_DIR=${PWD}/fastdeploy-kunlunxin
 make -j
 
 # 下载ResNet50_vd模型文件和测试图片

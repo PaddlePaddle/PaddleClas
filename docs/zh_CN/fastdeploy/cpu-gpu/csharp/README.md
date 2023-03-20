@@ -31,7 +31,13 @@ PaddleClas支持利用FastDeploy在NVIDIA GPU、X86 CPU、飞腾CPU、ARM CPU、
 https://bj.bcebos.com/fastdeploy/release/cpp/fastdeploy-linux-x64-x.x.x.tgz
 
 # 下载部署示例代码
+git clone https://github.com/PaddlePaddle/FastDeploy.git
+cd  FastDeploy\examples\vision\classification\paddleclas\cpu-gpu\csharp
+
+# 如果您希望从PaddleClas下载示例代码，请运行
 git clone https://github.com/PaddlePaddle/PaddleClas.git
+# 注意：如果当前分支找不到下面的fastdeploy测试代码，请切换到develop分支
+git checkout develop
 cd D:\PaddleClas\deploy\fastdeploy\cpu-gpu\csharp
 
 mkdir build && cd build

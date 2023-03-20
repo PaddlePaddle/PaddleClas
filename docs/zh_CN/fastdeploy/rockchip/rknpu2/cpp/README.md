@@ -51,6 +51,17 @@ wget https://gitee.com/paddlepaddle/PaddleClas/raw/release/2.4/deploy/images/Ima
 #### 3.2.4 编译example
 
 ```bash
+# 下载部署示例代码
+git clone https://github.com/PaddlePaddle/FastDeploy.git
+cd  FastDeploy/examples/vision/classification/paddleclas/rockchip/rknpu2/cpp
+
+# 如果您希望从PaddleClas下载示例代码，请运行
+git clone https://github.com/PaddlePaddle/PaddleClas.git
+# 注意：如果当前分支找不到下面的fastdeploy测试代码，请切换到develop分支
+git checkout develop
+cd PaddleClas/deploy/fastdeploy/rockchip/rknpu2/cpp
+
+
 cd build
 cmake ..
 make -j8
