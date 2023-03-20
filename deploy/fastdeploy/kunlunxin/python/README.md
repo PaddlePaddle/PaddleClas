@@ -1,1 +1,1 @@
-../../../../docs/zh_CN/fastdeploy/kunlun/python/README.md
+../../../../docs/zh_CN/fastdeploy/kunlunxin/python/README.md
