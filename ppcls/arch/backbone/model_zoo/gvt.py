@@ -376,7 +376,7 @@ class PyramidVisionTransformer(nn.Layer):
         for i in range(len(self.depths)):
             x, (H, W) = self.patch_embeds[i](x)
             if i == len(self.depths) - 1:
-                cls_tokens = self.cls_token.expand([B, -1, -1])
+                cls_tokens = self.cls_token.expand([B, -1, -1]).astype(x.dtype)
                 x = paddle.concat([cls_tokens, x], dim=1)
             x = x + self.pos_embeds[i]
             x = self.pos_drops[i](x)
