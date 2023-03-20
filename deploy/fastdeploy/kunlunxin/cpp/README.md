@@ -1,1 +1,1 @@
-../../../../docs/zh_CN/fastdeploy/kunlun/cpp/README.md
+../../../../docs/zh_CN/fastdeploy/kunlunxin/cpp/README.md
