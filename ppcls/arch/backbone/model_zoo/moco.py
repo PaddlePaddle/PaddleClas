@@ -18,23 +18,94 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-import importlib
 import paddle
 import paddle.nn as nn
 from paddle.vision.models import ResNet
 from paddle.vision.models.resnet import BottleneckBlock
 # do not using paddleclas model resnet50
 # from backbone.legendary_models import *
-from gears.moconeck import LinearNeck
-from gears.contrastivehead import ContrastiveHead
 from ppcls.arch.init_weight import kaiming_init, constant_init, normal_init
-
-from ....utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
 
 # TODO NO UPLOAD
 MODEL_URLS = {"MoCoV1": "UNKNOWN", "MoCoV2": "UNKNOWN"}
 
 __all__ = list(MODEL_URLS.keys())
+
+
+class LinearNeck(nn.Layer):
+    """Linear neck: fc only.
+    """
+
+    def __init__(self, in_channels, out_channels, with_avg_pool=False):
+        super(LinearNeck, self).__init__()
+        self.with_avg_pool = with_avg_pool
+        if with_avg_pool:
+            self.avgpool = nn.AdaptiveAvgPool2D((1, 1))
+        self.fc = nn.Linear(in_channels, out_channels)
+
+    def forward(self, x):
+
+        if self.with_avg_pool:
+            x = self.avgpool(x)
+        return self.fc(x.reshape([x.shape[0], -1]))
+
+
+class NonLinearNeck(nn.Layer):
+    """The non-linear neck in MoCo v2: fc-relu-fc.
+    """
+
+    def __init__(self,
+                 in_channels,
+                 hid_channels,
+                 out_channels,
+                 with_avg_pool=False):
+        super(NonLinearNeck, self).__init__()
+        self.with_avg_pool = with_avg_pool
+        if with_avg_pool:
+            self.avgpool = nn.AdaptiveAvgPool2D((1, 1))
+
+        self.mlp = nn.Sequential(
+            nn.Linear(in_channels, hid_channels),
+            nn.ReLU(), nn.Linear(hid_channels, out_channels))
+
+    def forward(self, x):
+
+        if self.with_avg_pool:
+            x = self.avgpool(x)
+        return self.mlp(x.reshape([x.shape[0], -1]))
+
+
+class ContrastiveHead(nn.Layer):
+    """Head for contrastive learning.
+
+    Args:
+        temperature (float): The temperature hyper-parameter that
+            controls the concentration level of the distribution.
+            Default: 0.1.
+    """
+
+    def __init__(self, temperature=0.1, **kwargs):
+        super(ContrastiveHead, self).__init__()
+        self.criterion = nn.CrossEntropyLoss()
+        self.temperature = temperature
+
+    def forward(self, pos, neg):
+        """Forward head.
+
+        Args:
+            pos (Tensor): Nx1 positive similarity.
+            neg (Tensor): Nxk negative similarity.
+
+        Returns:
+            dict[str, Tensor]: A dictionary of loss components.
+        """
+        N = pos.shape[0]
+        logits = paddle.concat((pos, neg), axis=1)
+        logits /= self.temperature
+        labels = paddle.zeros((N, ), dtype='int64')
+        outputs = dict()
+        outputs['loss'] = self.criterion(logits, labels)
+        return outputs
 
 
 class MoCo(nn.Layer):
@@ -43,13 +114,7 @@ class MoCo(nn.Layer):
     https://arxiv.org/abs/1911.05722
     """
 
-    def __init__(
-            self,
-            arch_config,
-            dim=128,
-            K=65536,
-            m=0.999,
-            T=0.07, ):
+    def __init__(self, arch_config, dim=128, K=65536, m=0.999, T=0.07):
         """
         initialize `MoCoV1` or `MoCoV2` model depends on args
         Args:
@@ -71,16 +136,12 @@ class MoCo(nn.Layer):
         head_config = arch_config['head']
 
         # build neck
-        mod = importlib.import_module(__name__)
-        backbone_type = backbone_config.pop('name')
-        backbone = getattr(mod, backbone_type)
-
+        backbone_name = backbone_config.pop('name')
         # neck
-        neck_type = neck_config.pop('name')
-        neck = getattr(mod, neck_type)
-        head_type = head_config.pop('name')
+        neck_name = neck_config.pop('name')
+        head_name = head_config.pop('name')
         # instantlize head net
-        self.head = getattr(mod, head_type)(**head_config)
+        self.head = eval(head_name)(**head_config)
         """ 
         # create the encoders 
         # return layers defore reset50 avg_pool, include avg_pool layer
@@ -99,24 +160,22 @@ class MoCo(nn.Layer):
         """
 
         self.encoder_q = nn.Sequential(
-            backbone(
-                BottleneckBlock,
-                num_classes=0,
-                with_pool=False,
-                **backbone_config),
+            eval(backbone_name)(BottleneckBlock,
+                                num_classes=0,
+                                with_pool=False,
+                                **backbone_config),
             nn.AdaptiveAvgPool2D((1, 1)),
             nn.Flatten(),
-            neck(**neck_config))
+            eval(neck_name)(**neck_config))
 
         self.encoder_k = nn.Sequential(
-            backbone(
-                BottleneckBlock,
-                num_classes=0,
-                with_pool=False,
-                **backbone_config),
+            eval(backbone_name)(BottleneckBlock,
+                                num_classes=0,
+                                with_pool=False,
+                                **backbone_config),
             nn.AdaptiveAvgPool2D((1, 1)),
             nn.Flatten(),
-            neck(**neck_config))
+            eval(neck_name)(**neck_config))
 
         self.backbone = self.encoder_q[0]
 
