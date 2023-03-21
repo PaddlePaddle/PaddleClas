@@ -274,7 +274,12 @@ for batch_size in ${batch_size_list[*]}; do
                     speed_log_name="${repo_name}_${model_name}_bs${batch_size}_${precision}_${run_mode}_${device_num}_${to_static}speed"
                     func_sed_params "$FILENAME" "${line_gpuid}" "$gpu_id"  # sed used gpu_id
                     func_sed_params "$FILENAME" "${line_profile}" "null"  # sed --profile_option as null
-                    cmd="timeout 5m bash test_tipc/test_train_inference_python.sh ${FILENAME} benchmark_train > ${log_path}/${log_name} 2>&1 "
+                    if [[ ${device_num} = "N4C32" ]];then
+                        duration=10m
+                    else
+                        duration=5m
+                    fi
+                    cmd="timeout ${duration} bash test_tipc/test_train_inference_python.sh ${FILENAME} benchmark_train > ${log_path}/${log_name} 2>&1 "
                     echo $cmd
                     job_bt=`date '+%Y%m%d%H%M%S'`
                     eval ${cmd}
