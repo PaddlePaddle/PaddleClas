@@ -215,7 +215,9 @@ class RMSProp(object):
                  epsilon=1e-6,
                  weight_decay=None,
                  grad_clip=None,
-                 multi_precision=False):
+                 multi_precision=False,
+                 no_weight_decay_name=None,
+                 one_dim_param_no_weight_decay=False):
         super().__init__()
         self.learning_rate = learning_rate
         self.momentum = momentum
@@ -223,11 +225,33 @@ class RMSProp(object):
         self.epsilon = epsilon
         self.weight_decay = weight_decay
         self.grad_clip = grad_clip
+        self.no_weight_decay_name_list = no_weight_decay_name.split(
+        ) if no_weight_decay_name else []
+        self.one_dim_param_no_weight_decay = one_dim_param_no_weight_decay
 
     def __call__(self, model_list):
         # model_list is None in static graph
-        parameters = sum([m.parameters() for m in model_list],
-                         []) if model_list else None
+        parameters = None
+        if len(self.no_weight_decay_name_list) > 0:
+            params_with_decay = []
+            params_without_decay = []
+            for m in model_list:
+                params = [p for n, p in m.named_parameters() \
+                          if not any(nd in n for nd in self.no_weight_decay_name_list)]
+                params_with_decay.extend(params)
+                params = [p for n, p in m.named_parameters() \
+                          if any(nd in n for nd in self.no_weight_decay_name_list) or (self.one_dim_param_no_weight_decay and len(p.shape) == 1)]
+                params_without_decay.extend(params)
+            parameters = [{
+                "params": params_with_decay,
+                "weight_decay": self.weight_decay
+            }, {
+                "params": params_without_decay,
+                "weight_decay": 0.0
+            }]
+        else:
+            parameters = sum([m.parameters() for m in model_list],
+                             []) if model_list else None
         opt = optim.RMSProp(
             learning_rate=self.learning_rate,
             momentum=self.momentum,

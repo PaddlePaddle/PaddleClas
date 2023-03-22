@@ -339,7 +339,7 @@ class Step(LRBase):
         epochs (int): total epoch(s)
         step_each_epoch (int): number of iterations within an epoch
         learning_rate (float): learning rate
-        step_size (int): the interval to update.
+        step_size (int|float): the interval to update.
         gamma (float, optional): The Ratio that the learning rate will be reduced. ``new_lr = origin_lr * gamma``. It should be less than 1.0. Default: 0.1.
         warmup_epoch (int, optional): The epoch numbers for LinearWarmup. Defaults to 0.
         warmup_start_lr (float, optional): start learning rate within warmup. Defaults to 0.0.
@@ -361,7 +361,7 @@ class Step(LRBase):
         super(Step, self).__init__(epochs, step_each_epoch, learning_rate,
                                    warmup_epoch, warmup_start_lr, last_epoch,
                                    by_epoch)
-        self.step_size = step_size * step_each_epoch
+        self.step_size = int(step_size * step_each_epoch)
         self.gamma = gamma
         if self.by_epoch:
             self.step_size = step_size
