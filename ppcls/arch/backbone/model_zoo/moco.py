@@ -119,7 +119,6 @@ class MoCo(nn.Layer):
         initialize `MoCoV1` or `MoCoV2` model depends on args
         Args:
             arch_config (dict): config of backbone(ResNet50), neck and head.
-            scale (list|tuple): Range of size of the origin size cropped. Default: (0.08, 1.0)
             dim (int): feature dimension. Default: 128.
             K (int): queue size; number of negative keys. Default: 65536.
             m (float): moco momentum of updating key encoder. Default: 0.999.
@@ -140,8 +139,6 @@ class MoCo(nn.Layer):
         # neck
         neck_name = neck_config.pop('name')
         head_name = head_config.pop('name')
-        # instantlize head net
-        self.head = eval(head_name)(**head_config)
         """ 
         # create the encoders 
         # return layers defore reset50 avg_pool, include avg_pool layer
@@ -164,8 +161,8 @@ class MoCo(nn.Layer):
                                 num_classes=0,
                                 with_pool=False,
                                 **backbone_config),
-            nn.AdaptiveAvgPool2D((1, 1)),
-            nn.Flatten(),
+            # nn.AdaptiveAvgPool2D((1, 1)),
+            # nn.Flatten(),
             eval(neck_name)(**neck_config))
 
         self.encoder_k = nn.Sequential(
@@ -173,11 +170,14 @@ class MoCo(nn.Layer):
                                 num_classes=0,
                                 with_pool=False,
                                 **backbone_config),
-            nn.AdaptiveAvgPool2D((1, 1)),
-            nn.Flatten(),
+            # nn.AdaptiveAvgPool2D((1, 1)),
+            # nn.Flatten(),
             eval(neck_name)(**neck_config))
 
         self.backbone = self.encoder_q[0]
+
+        # instantlize head net
+        self.head = eval(head_name)(**head_config)
 
         # initialize every layer with kaiming
         self.init_parameters()
@@ -313,7 +313,7 @@ class MoCo(nn.Layer):
         else:
             raise Exception("No such mode: {}".format(mode))
 
-        # initialize function
+    # initialize function
     def init_parameters(self, init_linear='kaiming', std=0.01, bias=0.):
         assert init_linear in ['normal', 'kaiming'], \
             "Undefined init_linear: {}".format(init_linear)
@@ -348,3 +348,19 @@ def freeze_batchnorm_statictis(layer):
     def freeze_bn(layer):
         if isinstance(layer, (nn.layer.norm._BatchNormBase)):
             layer._use_global_stats = True
+
+
+def moco_v2(arch_config):
+    """
+    moco_v2 neck: fc-relu-fc, T=0.2
+    """
+    model = MoCo(arch_config, dim=128, K=65536, m=0.999, T=0.2)
+    return model
+
+
+def moco_v1(arch_config):
+    """
+    moco_v2 neck: fc-relu, T=0.07
+    """
+    model = MoCo(arch_config, dim=128, K=65536, m=0.999, T=0.07)
+    return model
