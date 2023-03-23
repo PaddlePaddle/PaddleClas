@@ -36,7 +36,7 @@ FastDeploy 部署量化模型与部署FP32模型完全一致, 用户只需要将
 |ARM CPU|✅|[链接](cpu-gpu)|✅|✅|
 |Intel GPU(集成显卡)|✅|[链接](cpu-gpu)|✅|✅|  
 |Intel GPU(独立显卡)|✅|[链接](cpu-gpu)|✅|✅|  
-|昆仑|✅|[链接](kunlun)|✅|✅|
+|昆仑|✅|[链接](kunlunxin)|✅|✅|
 |昇腾|✅|[链接](ascend)|✅|✅|
 |瑞芯微|✅|[链接](rockchip)|✅|✅|  
 |晶晨|✅|[链接](amlogic)|--|✅|  
