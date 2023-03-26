@@ -346,7 +346,7 @@ class ResNet(TheseusLayer):
                    [32, 32, 3, 1], [32, 64, 3, 1]]
         }
 
-        self.stem = nn.Sequential(* [
+        self.stem = nn.Sequential(*[
             ConvBNLayer(
                 num_channels=in_c,
                 num_filters=out_c,
@@ -395,8 +395,8 @@ class ResNet(TheseusLayer):
             weight_attr=ParamAttr(initializer=Uniform(-stdv, stdv)))
 
         self.data_format = data_format
-
-        super().init_res(
+        # super().init_res init_net
+        super().init_net(
             stages_pattern,
             return_patterns=return_patterns,
             return_stages=return_stages)
