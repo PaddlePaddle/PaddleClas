@@ -20,14 +20,12 @@ from __future__ import print_function
 
 import paddle
 import paddle.nn as nn
-from paddle.vision.models import ResNet
-from paddle.vision.models.resnet import BottleneckBlock
-# do not using paddleclas model resnet50
-# from backbone.legendary_models import *
-from ppcls.arch.init_weight import kaiming_init, constant_init, normal_init
+
+from ..legendary_models import *
+from ....utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
 
 # TODO NO UPLOAD
-MODEL_URLS = {"MoCoV1": "UNKNOWN", "MoCoV2": "UNKNOWN"}
+MODEL_URLS = {"moco_v1": "UNKNOWN", "moco_v2": "UNKNOWN"}
 
 __all__ = list(MODEL_URLS.keys())
 
@@ -84,7 +82,7 @@ class ContrastiveHead(nn.Layer):
             Default: 0.1.
     """
 
-    def __init__(self, temperature=0.1, **kwargs):
+    def __init__(self, temperature=0.1, return_accuracy=True):
         super(ContrastiveHead, self).__init__()
         self.criterion = nn.CrossEntropyLoss()
         self.temperature = temperature
@@ -105,7 +103,45 @@ class ContrastiveHead(nn.Layer):
         labels = paddle.zeros((N, ), dtype='int64')
         outputs = dict()
         outputs['loss'] = self.criterion(logits, labels)
-        return outputs
+
+        if not self.return_accuracy:
+            return outputs
+        else:
+            acc1, acc5 = accuracy(logits, labels, topk=(1, 5))
+            outputs['acc1'] = acc1
+            outputs['acc5'] = acc5
+            return outputs
+
+
+def accuracy(output, target, topk=(1, )):
+    """Computes the accuracy over the k top predictions for the specified values of k"""
+    with paddle.no_grad():
+        maxk = max(topk)
+        batch_size = target.shape[0]
+
+        _, pred = output.topk(maxk, 1, True, True)
+        pred = pred.t()
+        correct = paddle.cast(pred == target.reshape([1, -1]).expand_as(pred),
+                              'float32')
+
+        res = []
+        for k in topk:
+            correct_k = correct[:k].reshape([-1]).sum(0, keepdim=True)
+            res.append(correct_k * 100.0 / batch_size)
+        return res
+
+
+def _load_pretrained(pretrained, model, model_url, use_ssld=False):
+    if pretrained is False:
+        pass
+    elif pretrained is True:
+        load_dygraph_pretrain_from_url(model, model_url, use_ssld=use_ssld)
+    elif isinstance(pretrained, str):
+        load_dygraph_pretrain(model, pretrained)
+    else:
+        raise RuntimeError(
+            "pretrained type is not available. Please use `string` or `boolean` type."
+        )
 
 
 class MoCo(nn.Layer):
@@ -118,7 +154,7 @@ class MoCo(nn.Layer):
         """
         initialize `MoCoV1` or `MoCoV2` model depends on args
         Args:
-            arch_config (dict): config of backbone(ResNet50), neck and head.
+            arch_config (dict): config of backbone(eg: ResNet50), neck and head.
             dim (int): feature dimension. Default: 128.
             K (int): queue size; number of negative keys. Default: 65536.
             m (float): moco momentum of updating key encoder. Default: 0.999.
@@ -129,58 +165,30 @@ class MoCo(nn.Layer):
         self.m = m
         self.T = T
 
-        # build backbone
+        # build net
         backbone_config = arch_config['backbone']
+        backbone_type = backbone_config.pop('name')
+        backbone = eval(backbone_type)
+
         neck_config = arch_config['neck']
+        neck_type = neck_config.pop('name')
+        neck = eval(neck_type)
+
         head_config = arch_config['head']
+        head_type = head_config.pop('name')
+        head = eval(head_type)
 
-        # build neck
-        backbone_name = backbone_config.pop('name')
-        # neck
-        neck_name = neck_config.pop('name')
-        head_name = head_config.pop('name')
-        """ 
-        # create the encoders 
-        # return layers defore reset50 avg_pool, include avg_pool layer
-        self.encoder_q = nn.Sequential(
-        backbone(**backbone_config).stop_after(stop_layer_name='avg_pool'),
-        nn.Flatten(), 
-        neck(**neck_config)
-        ) 
+        backbone_1 = backbone()
+        backbone_1.stop_after(stop_layer_name='avg_pool')
+        backbone_2 = backbone()
+        backbone_2.stop_after(stop_layer_name='avg_pool')
 
-        self.encoder_k = nn.Sequential(
-        backbone(**backbone_config).stop_after(stop_layer_name='avg_pool'),
-        nn.Flatten(),  
-        neck(**neck_config)
-        )
-        r_50 = ResNet(BottleneckBlock, 50, num_classes=0, with_pool=False)
-        """
-
-        self.encoder_q = nn.Sequential(
-            eval(backbone_name)(BottleneckBlock,
-                                num_classes=0,
-                                with_pool=False,
-                                **backbone_config),
-            # nn.AdaptiveAvgPool2D((1, 1)),
-            # nn.Flatten(),
-            eval(neck_name)(**neck_config))
-
-        self.encoder_k = nn.Sequential(
-            eval(backbone_name)(BottleneckBlock,
-                                num_classes=0,
-                                with_pool=False,
-                                **backbone_config),
-            # nn.AdaptiveAvgPool2D((1, 1)),
-            # nn.Flatten(),
-            eval(neck_name)(**neck_config))
+        self.encoder_q = nn.Sequential(backbone_1, neck(**neck_config))
+        self.encoder_k = nn.Sequential(backbone_2, neck(**neck_config))
 
         self.backbone = self.encoder_q[0]
 
-        # instantlize head net
-        self.head = eval(head_name)(**head_config)
-
-        # initialize every layer with kaiming
-        self.init_parameters()
+        self.head = head(**head_config)
 
         for param_q, param_k in zip(self.encoder_q.parameters(),
                                     self.encoder_k.parameters()):
@@ -313,21 +321,6 @@ class MoCo(nn.Layer):
         else:
             raise Exception("No such mode: {}".format(mode))
 
-    # initialize function
-    def init_parameters(self, init_linear='kaiming', std=0.01, bias=0.):
-        assert init_linear in ['normal', 'kaiming'], \
-            "Undefined init_linear: {}".format(init_linear)
-        for m in self.sublayers():
-            if isinstance(m, nn.Conv2D):
-                kaiming_init(m, mode='fan_out', nonlinearity='relu')
-            elif isinstance(m, (nn.layer.norm._BatchNormBase, nn.GroupNorm)):
-                constant_init(m, 1)
-            elif isinstance(m, nn.Linear):
-                if init_linear == 'normal':
-                    normal_init(m, std=std, bias=bias)
-                else:
-                    kaiming_init(m, mode='fan_in', nonlinearity='relu')
-
 
 @paddle.no_grad()
 def concat_all_gather(tensor):
@@ -350,17 +343,15 @@ def freeze_batchnorm_statictis(layer):
             layer._use_global_stats = True
 
 
-def moco_v2(arch_config):
-    """
-    moco_v2 neck: fc-relu-fc, T=0.2
-    """
-    model = MoCo(arch_config, dim=128, K=65536, m=0.999, T=0.2)
+def moco_v1(arch_config, pretrained=False, use_ssld=False):
+    model = MoCo(arch_config=arch_config, T=0.07)
+    _load_pretrained(
+        pretrained, model, MODEL_URLS["moco_v1"], use_ssld=use_ssld)
     return model
 
 
-def moco_v1(arch_config):
-    """
-    moco_v2 neck: fc-relu, T=0.07
-    """
-    model = MoCo(arch_config, dim=128, K=65536, m=0.999, T=0.07)
+def moco_v2(arch_config, pretrained=False, use_ssld=False):
+    return MoCo(arch_config=arch_config, T=0.2)
+    _load_pretrained(
+        pretrained, model, MODEL_URLS["moco_v2"], use_ssld=use_ssld)
     return model
