@@ -136,8 +136,11 @@ class GaussianBlur(object):
 
 ### 详细设计方案
 
-1. model_zone添加模型
-编写yaml文件，编写MoCo的backbone、neck、head参数配置，同时编写MoCo.yaml文件
+1. model_zone添加模型MoCo的backbone、neck、head参数配置，backbone采用theseuslayer定义的Resnet50网络；
+2. MoCo.yaml格式参考paddleclas项目；
+3. 在ppcls.data.preprocess.ops.operators.py 文件下新增GaussianBlur类
+4. 重构ImageNetDataset类中的__init__ 和__getitem__方法, 原来的ImageNetDataset只能返回(img, label) 现增加返回(sample_1, sample_2, label)可选功能，其中，sample_1和sample_2均是img分别经过view_trans1，view_trans2得到的；
+5. 在train.py
 
 
 ## 三、功能模块测试方法
@@ -165,6 +168,7 @@ class GaussianBlur(object):
 - **PaddleClas中所有模型和算法需要通过飞桨训推一体认证,当前只需要通过新增模型只需要通过训练和推理的基础认证即可**。但是这个与MoCo模型的训练推理原则相违背，是否可以对MoCo-v2模型的认证给出明确的指定
 - 合入代码题目是MoCo-v2,代码合入的时候是否需要同时考虑MoCo-v1代码模块（原PSSL项目有该项实现）
 - 原PSSL有MoCo-Clas分类模型，代码合入的时候是否需要同时加入此模块（原PSSL项目有该项实现）
+- 可能涉及到修改train.py部分代码
 
 影响面：
 数据的Dataloader、数据增强和model均为新增脚本，不对其它模块构成影响
