@@ -191,11 +191,7 @@ def forward(engine, batch, loss_func):
     batch_info = {"label": batch[1], "domain": batch[2]}
     if engine.amp:
         amp_level = engine.config["AMP"].get("level", "O1").upper()
-        with paddle.amp.auto_cast(
-                custom_black_list={
-                    "flatten_contiguous_range", "greater_than"
-                },
-                level=amp_level):
+        with paddle.amp.auto_cast(level=amp_level):
             out = engine.model(batch[0], batch[1])
             loss_dict = loss_func(out, batch_info)
     else:
