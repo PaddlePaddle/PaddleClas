@@ -20,11 +20,11 @@ from __future__ import print_function
 
 import paddle
 import paddle.nn as nn
-
+from ppcls.arch.init_weight import kaiming_init, constant_init, normal_init
 from ..legendary_models import *
 from ....utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
 
-# TODO NO UPLOAD
+# TODO NO UPLOAD,后期把损失函数单独取出来
 MODEL_URLS = {"moco_v1": "UNKNOWN", "moco_v2": "UNKNOWN"}
 
 __all__ = list(MODEL_URLS.keys())
@@ -190,6 +190,9 @@ class MoCo(nn.Layer):
 
         self.head = head(**head_config)
 
+        # initialize function by kaiming
+        self.init_parameters()
+
         for param_q, param_k in zip(self.encoder_q.parameters(),
                                     self.encoder_k.parameters()):
             param_k.set_value(param_q)  # moco initialize
@@ -203,6 +206,20 @@ class MoCo(nn.Layer):
         self.queue = nn.functional.normalize(self.queue, axis=0)
 
         self.register_buffer("queue_ptr", paddle.zeros([1], 'int64'))
+
+    def init_parameters(self, init_linear='kaiming', std=0.01, bias=0.):
+        assert init_linear in ['normal', 'kaiming'], \
+            "Undefined init_linear: {}".format(init_linear)
+        for m in self.sublayers():
+            if isinstance(m, nn.Conv2D):
+                kaiming_init(m, mode='fan_out', nonlinearity='relu')
+            elif isinstance(m, (nn.layer.norm._BatchNormBase, nn.GroupNorm)):
+                constant_init(m, 1)
+            elif isinstance(m, nn.Linear):
+                if init_linear == 'normal':
+                    normal_init(m, std=std, bias=bias)
+                else:
+                    kaiming_init(m, mode='fan_in', nonlinearity='relu')
 
     @paddle.no_grad()
     def _momentum_update_key_encoder(self):
