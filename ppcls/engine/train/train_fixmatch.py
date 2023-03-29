@@ -64,11 +64,7 @@ def train_epoch_fixmatch(engine, epoch_id, print_batch_step):
         # image input
         if engine.amp:
             amp_level = engine.config['AMP'].get("level", "O1").upper()
-            with paddle.amp.auto_cast(
-                    custom_black_list={
-                        "flatten_contiguous_range", "greater_than"
-                    },
-                    level=amp_level):
+            with paddle.amp.auto_cast(level=amp_level):
                 loss_dict, logits_label = get_loss(
                     engine, inputs, batch_size_label, temperture, threshold,
                     targets_x)

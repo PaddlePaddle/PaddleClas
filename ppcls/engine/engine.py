@@ -504,11 +504,7 @@ class Engine(object):
                 batch_tensor = paddle.to_tensor(batch_data)
 
                 if self.amp and self.amp_eval:
-                    with paddle.amp.auto_cast(
-                            custom_black_list={
-                                "flatten_contiguous_range", "greater_than"
-                            },
-                            level=self.amp_level):
+                    with paddle.amp.auto_cast(level=self.amp_level):
                         out = self.model(batch_tensor)
                 else:
                     out = self.model(batch_tensor)

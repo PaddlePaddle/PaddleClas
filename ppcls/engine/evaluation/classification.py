@@ -56,11 +56,7 @@ def classification_eval(engine, epoch_id=0):
 
         # image input
         if engine.amp and engine.amp_eval:
-            with paddle.amp.auto_cast(
-                    custom_black_list={
-                        "flatten_contiguous_range", "greater_than"
-                    },
-                    level=engine.amp_level):
+            with paddle.amp.auto_cast(level=engine.amp_level):
                 out = engine.model(batch[0])
         else:
             out = engine.model(batch[0])
@@ -114,11 +110,7 @@ def classification_eval(engine, epoch_id=0):
         # calc loss
         if engine.eval_loss_func is not None:
             if engine.amp and engine.amp_eval:
-                with paddle.amp.auto_cast(
-                        custom_black_list={
-                            "flatten_contiguous_range", "greater_than"
-                        },
-                        level=engine.amp_level):
+                with paddle.amp.auto_cast(level=engine.amp_level):
                     loss_dict = engine.eval_loss_func(preds, labels)
             else:
                 loss_dict = engine.eval_loss_func(preds, labels)
