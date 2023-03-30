@@ -14,6 +14,7 @@ Global:
   image_shape: [3, 256, 256]
   save_inference_dir: ./inference
   use_dali: False
+  update_freq: 3  # for 4 gpus
 
 # mixed precision training
 AMP:
@@ -49,9 +50,8 @@ Optimizer:
   epsilon: 1e-8
   weight_decay: 0.01
   lr:
-    # for 8 cards
     name: Cosine
-    learning_rate: 0.002
+    learning_rate: 0.002  # for total batch size 384
     eta_min: 0.0002
     warmup_epoch: 1  # 3000 iterations
     warmup_start_lr: 0.0002
@@ -86,7 +86,7 @@ DataLoader:
       scales: [256, 160, 192, 224, 288, 320]
       # first_bs: batch size for the first image resolution in the scales list
       # divide_factor: to ensure the width and height dimensions can be devided by downsampling multiple
-      first_bs: 48
+      first_bs: 32
       divided_factor: 32
       is_training: True
     loader:
