@@ -52,6 +52,11 @@ BASE_IMAGES_DIR = os.path.join(BASE_DIR, "images")
 IMN_MODEL_BASE_DOWNLOAD_URL = "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/{}_infer.tar"
 IMN_MODEL_SERIES = {
     "AlexNet": ["AlexNet"],
+    "CaiT": [
+        "CaiT_M48", "CaiT_M36", "CaiT_S36", "CaiT_S24",
+        "CaiT_S24_224", "CaiT_XS24", "CaiT_XXS24",
+        "CaiT_XXS24_224", "CaiT_XXS36", "CaiT_XXS36_224",
+    ],
     "ConvNeXt": ["ConvNeXt_tiny"],
     "CSPNet": ["CSPDarkNet53"],
     "CSWinTransformer": [
