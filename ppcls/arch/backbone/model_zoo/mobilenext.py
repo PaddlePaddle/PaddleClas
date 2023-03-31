@@ -21,11 +21,11 @@ import paddle.nn as nn
 from ....utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
 
 MODEL_URLS = {
-    "MobileNeXt_0.35": "",  # TODO
-    "MobileNeXt_0.50": "",  # TODO
-    "MobileNeXt_0.75": "",  # TODO
-    "MobileNeXt_1.00": "",  # TODO
-    "MobileNeXt_1.40": "",  # TODO
+    "MobileNeXt_x0_35": "",  # TODO
+    "MobileNeXt_x0_5": "",  # TODO
+    "MobileNeXt_x0_75": "",  # TODO
+    "MobileNeXt_x1_0": "",  # TODO
+    "MobileNeXt_x1_4": "",  # TODO
 }
 
 __all__ = list(MODEL_URLS.keys())
@@ -226,36 +226,36 @@ def _load_pretrained(pretrained, model, model_url, use_ssld=False):
         )
 
 
-def MobileNeXt_35(pretrained=False, use_ssld=False, **kwargs):
+def MobileNeXt_x0_35(pretrained=False, use_ssld=False, **kwargs):
     model = MobileNeXt(width_mult=0.35, **kwargs)
     _load_pretrained(
-        pretrained, model, MODEL_URLS["MobileNeXt_0.35"], use_ssld=use_ssld)
+        pretrained, model, MODEL_URLS["MobileNeXt_x0_35"], use_ssld=use_ssld)
     return model
 
 
-def MobileNeXt_50(pretrained=False, use_ssld=False, **kwargs):
+def MobileNeXt_x0_5(pretrained=False, use_ssld=False, **kwargs):
     model = MobileNeXt(width_mult=0.50, **kwargs)
     _load_pretrained(
-        pretrained, model, MODEL_URLS["MobileNeXt_0.50"], use_ssld=use_ssld)
+        pretrained, model, MODEL_URLS["MobileNeXt_x0_5"], use_ssld=use_ssld)
     return model
 
 
-def MobileNeXt_75(pretrained=False, use_ssld=False, **kwargs):
+def MobileNeXt_x0_75(pretrained=False, use_ssld=False, **kwargs):
     model = MobileNeXt(width_mult=0.75, **kwargs)
     _load_pretrained(
-        pretrained, model, MODEL_URLS["MobileNeXt_0.75"], use_ssld=use_ssld)
+        pretrained, model, MODEL_URLS["MobileNeXt_x0_75"], use_ssld=use_ssld)
     return model
 
 
-def MobileNeXt_100(pretrained=False, use_ssld=False, **kwargs):
+def MobileNeXt_x1_0(pretrained=False, use_ssld=False, **kwargs):
     model = MobileNeXt(width_mult=1.00, **kwargs)
     _load_pretrained(
-        pretrained, model, MODEL_URLS["MobileNeXt_1.00"], use_ssld=use_ssld)
+        pretrained, model, MODEL_URLS["MobileNeXt_x1_0"], use_ssld=use_ssld)
     return model
 
 
-def MobileNeXt_140(pretrained=False, use_ssld=False, **kwargs):
+def MobileNeXt_x1_4(pretrained=False, use_ssld=False, **kwargs):
     model = MobileNeXt(width_mult=1.40, **kwargs)
     _load_pretrained(
-        pretrained, model, MODEL_URLS["MobileNeXt_1.40"], use_ssld=use_ssld)
+        pretrained, model, MODEL_URLS["MobileNeXt_x1_4"], use_ssld=use_ssld)
     return model

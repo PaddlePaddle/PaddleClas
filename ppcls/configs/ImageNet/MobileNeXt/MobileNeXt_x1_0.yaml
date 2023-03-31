@@ -18,7 +18,7 @@ Global:
 
 # model architecture
 Arch:
-  name: MobileNeXt_100
+  name: MobileNeXt_x1_0
   class_num: 1000
 
 # loss function config for traing/eval process

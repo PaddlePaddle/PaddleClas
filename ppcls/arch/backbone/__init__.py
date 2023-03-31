@@ -70,7 +70,7 @@ from .model_zoo.van import VAN_tiny
 from .model_zoo.peleenet import PeleeNet
 from .model_zoo.convnext import ConvNeXt_tiny
 from .model_zoo.cae import cae_base_patch16_224, cae_large_patch16_224
-from .model_zoo.mobilenext import MobileNeXt_35, MobileNeXt_50, MobileNeXt_75, MobileNeXt_100, MobileNeXt_140
+from .model_zoo.mobilenext import MobileNeXt_x0_35, MobileNeXt_x0_5, MobileNeXt_x0_75, MobileNeXt_x1_0, MobileNeXt_x1_4
 
 from .variant_models.resnet_variant import ResNet50_last_stage_stride1
 from .variant_models.vgg_variant import VGG19Sigmoid
