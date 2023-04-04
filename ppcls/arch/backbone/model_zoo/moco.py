@@ -24,7 +24,6 @@ from ppcls.arch.init_weight import kaiming_init, constant_init, normal_init
 from ..legendary_models import *
 from ....utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
 
-# TODO NO UPLOAD,后期把损失函数单独取出来
 MODEL_URLS = {"moco_v1": "UNKNOWN", "moco_v2": "UNKNOWN"}
 
 __all__ = list(MODEL_URLS.keys())
@@ -82,7 +81,7 @@ class ContrastiveHead(nn.Layer):
             Default: 0.1.
     """
 
-    def __init__(self, temperature=0.1, return_accuracy=True):
+    def __init__(self, temperature=0.1):
         super(ContrastiveHead, self).__init__()
         self.criterion = nn.CrossEntropyLoss()
         self.temperature = temperature
@@ -100,35 +99,9 @@ class ContrastiveHead(nn.Layer):
         N = pos.shape[0]
         logits = paddle.concat((pos, neg), axis=1)
         logits /= self.temperature
-        labels = paddle.zeros((N, ), dtype='int64')
-        outputs = dict()
-        outputs['loss'] = self.criterion(logits, labels)
+        labels = paddle.zeros((N, 1), dtype='int64')
 
-        if not self.return_accuracy:
-            return outputs
-        else:
-            acc1, acc5 = accuracy(logits, labels, topk=(1, 5))
-            outputs['acc1'] = acc1
-            outputs['acc5'] = acc5
-            return outputs
-
-
-def accuracy(output, target, topk=(1, )):
-    """Computes the accuracy over the k top predictions for the specified values of k"""
-    with paddle.no_grad():
-        maxk = max(topk)
-        batch_size = target.shape[0]
-
-        _, pred = output.topk(maxk, 1, True, True)
-        pred = pred.t()
-        correct = paddle.cast(pred == target.reshape([1, -1]).expand_as(pred),
-                              'float32')
-
-        res = []
-        for k in topk:
-            correct_k = correct[:k].reshape([-1]).sum(0, keepdim=True)
-            res.append(correct_k * 100.0 / batch_size)
-        return res
+        return logits, labels
 
 
 def _load_pretrained(pretrained, model, model_url, use_ssld=False):
@@ -150,11 +123,20 @@ class MoCo(nn.Layer):
     https://arxiv.org/abs/1911.05722
     """
 
-    def __init__(self, arch_config, dim=128, K=65536, m=0.999, T=0.07):
+    def __init__(self,
+                 backbone_config,
+                 neck_config,
+                 head_config,
+                 dim=128,
+                 K=65536,
+                 m=0.999,
+                 T=0.07):
         """
         initialize `MoCoV1` or `MoCoV2` model depends on args
         Args:
-            arch_config (dict): config of backbone(eg: ResNet50), neck and head.
+            backbone_config (dict): config of backbone(eg: ResNet50).
+            neck_config (dict): config of neck(eg: MLP or FC)
+            head_config (dict): config of head
             dim (int): feature dimension. Default: 128.
             K (int): queue size; number of negative keys. Default: 65536.
             m (float): moco momentum of updating key encoder. Default: 0.999.
@@ -165,16 +147,12 @@ class MoCo(nn.Layer):
         self.m = m
         self.T = T
 
-        # build net
-        backbone_config = arch_config['backbone']
         backbone_type = backbone_config.pop('name')
         backbone = eval(backbone_type)
 
-        neck_config = arch_config['neck']
         neck_type = neck_config.pop('name')
         neck = eval(neck_type)
 
-        head_config = arch_config['head']
         head_type = head_config.pop('name')
         head = eval(head_type)
 
@@ -294,7 +272,7 @@ class MoCo(nn.Layer):
 
         return paddle.index_select(x_gather, idx_this)
 
-    def train_iter(self, *inputs, **kwargs):
+    def train_iter(self, inputs, **kwargs):
         img_q, img_k = inputs
 
         # compute query features
@@ -328,13 +306,13 @@ class MoCo(nn.Layer):
 
         return outputs
 
-    def forward(self, *inputs, mode='train', **kwargs):
+    def forward(self, inputs, mode='train', **kwargs):
         if mode == 'train':
-            return self.train_iter(*inputs, **kwargs)
+            return self.train_iter(inputs, **kwargs)
         elif mode == 'test':
-            return self.test_iter(*inputs, **kwargs)
+            return self.test_iter(inputs, **kwargs)
         elif mode == 'extract':
-            return self.backbone(*inputs)
+            return self.backbone(inputs)
         else:
             raise Exception("No such mode: {}".format(mode))
 
@@ -360,15 +338,17 @@ def freeze_batchnorm_statictis(layer):
             layer._use_global_stats = True
 
 
-def moco_v1(arch_config, pretrained=False, use_ssld=False):
-    model = MoCo(arch_config=arch_config, T=0.07)
+def moco_v1(backbone, neck, head, pretrained=False, use_ssld=False):
+    model = MoCo(
+        backbone_config=backbone, neck_config=neck, head_config=head, T=0.07)
     _load_pretrained(
         pretrained, model, MODEL_URLS["moco_v1"], use_ssld=use_ssld)
     return model
 
 
-def moco_v2(arch_config, pretrained=False, use_ssld=False):
-    return MoCo(arch_config=arch_config, T=0.2)
+def moco_v2(backbone, neck, head, pretrained=False, use_ssld=False):
+    model = MoCo(
+        backbone_config=backbone, neck_config=neck, head_config=head, T=0.2)
     _load_pretrained(
         pretrained, model, MODEL_URLS["moco_v2"], use_ssld=use_ssld)
     return model
