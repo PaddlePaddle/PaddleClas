@@ -13,11 +13,11 @@
 # limitations under the License.
 
 from __future__ import print_function
-
 import numpy as np
 import os
-
-from .common_dataset import CommonDataset
+from ppcls.utils import logger
+from .common_dataset import CommonDataset, create_operators
+from ppcls.data.preprocess import transform
 
 
 class ImageNetDataset(CommonDataset):
@@ -31,16 +31,56 @@ class ImageNetDataset(CommonDataset):
         relabel (bool, optional): whether do relabel when original label do not starts from 0 or are discontinuous. Defaults to False.
     """
 
-    def __init__(self,
-                 image_root,
-                 cls_label_path,
-                 transform_ops=None,
-                 delimiter=None,
-                 relabel=False):
+    def __init__(
+            self,
+            image_root,
+            cls_label_path,
+            return_label=True,
+            return_two_sample=False,
+            transform_ops=None,
+            delimiter=None,
+            relabel=False,
+            view_trans1=None,
+            view_trans2=None, ):
         self.delimiter = delimiter if delimiter is not None else " "
         self.relabel = relabel
         super(ImageNetDataset, self).__init__(image_root, cls_label_path,
                                               transform_ops)
+
+        self.return_label = return_label
+        self.return_two_sample = return_two_sample
+
+        if self.return_two_sample:
+            self.view_transform1 = create_operators(view_trans1)
+            self.view_transform2 = create_operators(view_trans2)
+
+    def __getitem__(self, idx):
+        try:
+            with open(self.images[idx], 'rb') as f:
+                img = f.read()
+
+            if self.return_two_sample:
+                sample1 = transform(img, self._transform_ops)
+                sample2 = transform(img, self._transform_ops)
+                sample1 = transform(sample1, self.view_transform1)
+                sample2 = transform(sample2, self.view_transform2)
+
+                if self.return_label:
+                    return (sample1, sample2, self.labels[idx])
+                else:
+                    return (sample1, sample2)
+
+            if self._transform_ops:
+                img = transform(img, self._transform_ops)
+                img = img.transpose((2, 0, 1))
+
+            return (img, self.labels[idx])
+
+        except Exception as ex:
+            logger.error("Exception occured when parse line: {} with msg: {}".
+                         format(self.images[idx], ex))
+            rnd_idx = np.random.randint(self.__len__())
+            return self.__getitem__(rnd_idx)
 
     def _load_anno(self, seed=None):
         assert os.path.exists(
