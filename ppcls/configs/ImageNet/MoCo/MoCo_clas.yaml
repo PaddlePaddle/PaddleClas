@@ -1,0 +1,112 @@
+# global configs
+Global:
+  checkpoints: null
+  pretrained_model: ./pretrain/ppclas_moco_v2_r50_clas
+  output_dir: /home/aistudio/work/PaddleClas/output/ 
+  seed: 0
+  device: gpu
+  save_interval: 1
+  eval_during_train: True
+  eval_interval: 1
+  epochs: 100
+  print_batch_step: 10
+  use_visualdl: False
+  # used for static mode and model export
+  image_shape: [3, 224, 224]
+  save_inference_dir: ./inference
+  # training model under @to_static
+  to_static: False
+  # distributed train seed
+  seed: 0
+  # gpu nums for distributed train
+  distributed: 4
+
+Arch:
+  name: ResNet50
+  class_num: 1000
+  freeze_befor: 
+
+
+# loss function config for traing/eval process
+Loss:
+  Train:
+    - CELoss:
+        weight: 1.0
+  Eval:
+    - CELoss:
+        weight: 1.0
+
+
+Optimizer:
+  name: Momentum
+  momentum: 0.9
+  lr:
+    name: MultiStepDecay
+    learning_rate: 15.0
+    milestones: [60, 80]
+    # learning_rate: 30.0
+
+DataLoader:
+  Train:
+    dataset:
+      name: ImageNetDataset
+      image_root: ./dataset/ILSVRC2012/
+      cls_label_path: ./dataset/ILSVRC2012/train_list.txt
+      return_label: True
+      return_two_sample: False
+      transform_ops:
+        - DecodeImage:
+            to_rgb: True
+            channel_first: False
+        - RandomResizedCrop:
+            size: 224
+        - RandomHorizontalFlip:
+        - NormalizeImage:
+            scale: 1.0/255.0
+            mean: [0.485, 0.456, 0.406]
+            std: [0.229, 0.224, 0.225]
+            order: ''
+    sampler:
+      batch_size: 64
+      shuffle: True
+      drop_last: False
+    loader:
+      num_workers: 4
+      use_shared_memory: True
+
+  Eval:
+    dataset:
+      name: ImageNetDataset
+      image_root: ./dataset/ILSVRC2012/
+      cls_label_path: ./dataset/ILSVRC2012/val_list.txt
+      return_label: True
+      return_two_sample: False
+      transform_ops:
+        - DecodeImage:
+            to_rgb: True
+            channel_first: False
+        - Resize:
+            size: 256
+        - CenterCrop:
+            size: 224
+        - NormalizeImage:
+            scale: 1.0/255.0
+            mean: [0.485, 0.456, 0.406]
+            std: [0.229, 0.224, 0.225]
+            order: ''
+    sampler:
+      name: DistributedBatchSampler
+      batch_size: 32
+      shuffle: False
+      drop_last: False
+    loader:
+      num_workers: 4
+      use_shared_memory: True
+
+Metric:
+  Train:
+    - TopkAcc:
+        topk: [1, 5]
+  Eval:
+    - TopkAcc:
+        topk: [1, 5]
