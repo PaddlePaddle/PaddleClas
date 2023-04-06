@@ -162,7 +162,7 @@ DataLoader:
                   contrast: 0.4
                   saturation: 0.4
                   hue: 0.1
-            p: 0.8
+            p: 1.0  # refer to official settings
         - RandomGrayscale:
             p: 0.2
         - NormalizeImage:

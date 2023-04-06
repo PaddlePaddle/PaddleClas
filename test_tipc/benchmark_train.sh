@@ -74,7 +74,6 @@ model_type=$4
 IFS=$'\n'
 # parser params from train_benchmark.txt
 sed -i 's/ -o DataLoader.Train.sampler.shuffle=False/ -o Global.print_batch_step=1/g' $FILENAME
-sed -i 's/ -o DataLoader.Train.loader.num_workers=0/ -o DataLoader.Train.loader.num_workers=12/g' $FILENAME
 sed -i 's/-o DataLoader.Train.loader.use_shared_memory=False/ -o Global.eval_during_train=False/g' $FILENAME
 dataline=`cat $FILENAME`
 # parser params
@@ -92,6 +91,9 @@ line_num=`expr $line_num + 1`
 epoch=$(func_parser_value "${lines[line_num]}")
 line_num=`expr $line_num + 1`
 model_type=$(func_parser_value "${lines[line_num]}")
+line_num=`expr $line_num + 1`
+num_workers=$(func_parser_value "${lines[line_num]}")
+
 
 line_num=`expr $line_num + 1`
 profile_option_key=$(func_parser_key "${lines[line_num]}")
@@ -133,6 +135,8 @@ func_sed_params "$FILENAME" "${line_export_py}" "null"
 func_sed_params "$FILENAME" "${line_python}"  "$python"
 func_sed_params "$FILENAME" "${line_pact_train}" "null"
 func_sed_params "$FILENAME" "${line_fgpm_train}" "null"
+# set num_workers
+sed -i "s/ -o DataLoader.Train.loader.num_workers=0/ -o DataLoader.Train.loader.num_workers=${num_workers}/g" $FILENAME
 
 # if params
 if [[ ! -n "$PARAMS" ]];then
@@ -274,7 +278,12 @@ for batch_size in ${batch_size_list[*]}; do
                     speed_log_name="${repo_name}_${model_name}_bs${batch_size}_${precision}_${run_mode}_${device_num}_${to_static}speed"
                     func_sed_params "$FILENAME" "${line_gpuid}" "$gpu_id"  # sed used gpu_id
                     func_sed_params "$FILENAME" "${line_profile}" "null"  # sed --profile_option as null
-                    cmd="timeout 5m bash test_tipc/test_train_inference_python.sh ${FILENAME} benchmark_train > ${log_path}/${log_name} 2>&1 "
+                    if [[ ${device_num} = "N4C32" ]];then
+                        duration=10m
+                    else
+                        duration=5m
+                    fi
+                    cmd="timeout ${duration} bash test_tipc/test_train_inference_python.sh ${FILENAME} benchmark_train > ${log_path}/${log_name} 2>&1 "
                     echo $cmd
                     job_bt=`date '+%Y%m%d%H%M%S'`
                     eval ${cmd}

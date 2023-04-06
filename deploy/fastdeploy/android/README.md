@@ -1,0 +1,1 @@
+../../../docs/zh_CN/fastdeploy/android/README.md

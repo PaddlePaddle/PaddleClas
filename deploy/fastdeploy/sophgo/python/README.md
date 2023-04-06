@@ -1,0 +1,1 @@
+../../../../docs/zh_CN/fastdeploy/sophgo/python/README.md

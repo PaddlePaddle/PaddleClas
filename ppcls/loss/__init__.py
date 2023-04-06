@@ -42,6 +42,11 @@ from .deephashloss import DSHSDLoss
 from .deephashloss import LCDSHLoss
 from .deephashloss import DCHLoss
 
+from .metabinloss import CELossForMetaBIN
+from .metabinloss import TripletLossForMetaBIN
+from .metabinloss import InterDomainShuffleLoss
+from .metabinloss import IntraDomainScatterLoss
+
 
 class CombinedLoss(nn.Layer):
     def __init__(self, config_list):

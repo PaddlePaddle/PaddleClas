@@ -17,7 +17,7 @@ Global:
 # model architecture
 Arch:
   name: cae_large_patch16_224
-  class_num: 102
+  class_num: 1000
   drop_rate: 0.0
   drop_path_rate: 0.2
   attn_drop_rate: 0.0
@@ -31,10 +31,8 @@ Arch:
 
   sin_pos_emb: True
 
-  abs_pos_emb: False
   enable_linear_eval: False
   model_key: model|module|state_dict
-  rel_pos_bias: True
   model_ema:
     enable_model_ema: False 
     model_ema_decay: 0.9999
@@ -71,35 +69,39 @@ DataLoader:
   Train:
     dataset:
       name: ImageNetDataset
-      image_root: ./dataset/flowers102/
-      cls_label_path: ./dataset/flowers102/train_list.txt
+      image_root: ./dataset/ILSVRC2012/
+      cls_label_path: ./dataset/ILSVRC2012/train_list.txt
       batch_transform_ops:
         - MixupCutmixHybrid:
             mixup_alpha: 0.8
             cutmix_alpha: 1.0
             switch_prob: 0.5
-            num_classes: 102
+            num_classes: 1000
       transform_ops:
         - DecodeImage:
             to_rgb: True
             channel_first: False
-        - RandCropImage:
+        - RandomResizedCrop:
             size: 224
-            interpolation: bilinear
-        - RandFlipImage:
-            flip_code: 1
-        - RandAugment:
+        - RandomHorizontalFlip:
+            prob: 0.5
+        - TimmAutoAugment:
+            config_str: rand-m9-mstd0.5-inc1
+            interpolation: bicubic
+            img_size: 224
         - NormalizeImage:
             scale: 1.0/255.0
-            mean: [0.485, 0.456, 0.406]
-            std: [0.229, 0.224, 0.225]
+            mean: [ 0.5, 0.5, 0.5 ]
+            std: [ 0.5, 0.5, 0.5 ]
             order: ''
         - RandomErasing:
-            EPSILON: 0.5
+            EPSILON: 0.25
             sl: 0.02
-            sh: 0.3
+            sh: 1.0/3.0
             r1: 0.3
-
+            attempt: 10
+            use_log_aspect: True
+            mode: pixel
     sampler:
       name: DistributedBatchSampler
       batch_size: 16
@@ -110,10 +112,10 @@ DataLoader:
       use_shared_memory: True
 
   Eval:
-    dataset: 
+    dataset:
       name: ImageNetDataset
-      image_root: ./dataset/flowers102/
-      cls_label_path: ./dataset/flowers102/val_list.txt
+      image_root: ./dataset/ILSVRC2012/
+      cls_label_path: ./dataset/ILSVRC2012/val_list.txt
       transform_ops:
         - DecodeImage:
             to_rgb: True
@@ -124,8 +126,8 @@ DataLoader:
             size: 224
         - NormalizeImage:
             scale: 1.0/255.0
-            mean: [0.485, 0.456, 0.406]
-            std: [0.229, 0.224, 0.225]
+            mean: [ 0.5, 0.5, 0.5 ]
+            std: [ 0.5, 0.5, 0.5 ]
             order: ''
     sampler:
       name: DistributedBatchSampler

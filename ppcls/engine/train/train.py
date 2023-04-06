@@ -30,6 +30,9 @@ def train_epoch(engine, epoch_id, print_batch_step):
         try:
             batch = next(engine.train_dataloader_iter)
         except Exception:
+            # NOTE: reset DALI dataloader manually
+            if engine.use_dali:
+                engine.train_dataloader.reset()
             engine.train_dataloader_iter = iter(engine.train_dataloader)
             batch = next(engine.train_dataloader_iter)
 
@@ -47,11 +50,7 @@ def train_epoch(engine, epoch_id, print_batch_step):
         # image input
         if engine.amp:
             amp_level = engine.config["AMP"].get("level", "O1").upper()
-            with paddle.amp.auto_cast(
-                    custom_black_list={
-                        "flatten_contiguous_range", "greater_than"
-                    },
-                    level=amp_level):
+            with paddle.amp.auto_cast(level=amp_level):
                 out = forward(engine, batch)
                 loss_dict = engine.train_loss_func(out, batch[1])
         else:
