@@ -55,7 +55,6 @@ Optimizer:
     eta_min: 0.0002
     warmup_epoch: 1  # 3000 iterations
     warmup_start_lr: 0.0002
-    # by_epoch: True
 
 # data loader for train and eval
 DataLoader:
