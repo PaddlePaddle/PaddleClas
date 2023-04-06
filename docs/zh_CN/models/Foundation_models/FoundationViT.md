@@ -46,7 +46,7 @@ output = model(inputs)  # the output of model embeding
 |  MAE   |        MAE_vit_base_patch16        |   85M    |      768       |                   ImageNet-1k                    | [下载地址](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/foundation_models/MAE_vit_base_patch16.pdparams) |
 |  MAE   |       MAE_vit_large_patch16        |   303M   |      1024      |                   ImageNet-1k                    | [下载地址](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/foundation_models/MAE_vit_large_patch16.pdparams) |
 |  MAE   |        MAE_vit_huge_patch14        |   630M   |      1280      |                   ImageNet-1k                    | [下载地址](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/foundation_models/MAE_vit_huge_patch14.pdparams) |
-|  EVA   |        EVA_vit_huge_patch14        |  1010M   |      1408      | ImageNet-21k, CC12M,   CC2M, Object365,COCO, ADE | [下载地址](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/foundation_models/EVA_vit_huge_patch14.pdparams) |
+|  EVA   |        EVA_vit_giant_patch14        |  1010M   |      1408      | ImageNet-21k, CC12M,   CC2M, Object365,COCO, ADE | [下载地址](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/foundation_models/EVA_vit_giant_patch14.pdparams) |
 |  CAE   |      CAE_vit_base_patch16_224      |   85M    |      768       |                   ImageNet-1k                    | [下载地址](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/foundation_models/CAE_vit_base_patch16_224.pdparams) |
 
 ## 4. 参考文献
