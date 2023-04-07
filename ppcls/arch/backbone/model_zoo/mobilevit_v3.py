@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Code was based on https://github.com/micronDLA/MobileViTV3/blob/main/MobileViTv3-v1/cvnets/models/classification/mobilevit.py
+# Code was based on https://github.com/micronDLA/MobileViTv3/blob/main/MobileViTv3-v1/cvnets/models/classification/mobilevit.py
 # reference: https://arxiv.org/abs/2209.15159
 
 import math
