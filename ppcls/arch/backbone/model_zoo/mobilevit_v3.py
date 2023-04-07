@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Code was based on https://github.com/micronDLA/MobileViTv3/blob/main/MobileViTv3-v1/cvnets/models/classification/mobilevit.py
+# Code was based on https://github.com/micronDLA/MobileViTV3/blob/main/MobileViTv3-v1/cvnets/models/classification/mobilevit.py
 # reference: https://arxiv.org/abs/2209.15159
 
 import math
@@ -26,15 +26,24 @@ import paddle.nn.functional as F
 from ....utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
 
 MODEL_URLS = {
-    "MobileViTv3_XXS": "",
-    "MobileViTv3_XS": "",
-    "MobileViTv3_S": "",
-    "MobileViTv3_XXS_L2": "",
-    "MobileViTv3_XS_L2": "",
-    "MobileViTv3_S_L2": "",
-    "MobileViTv3_x0_5": "",
-    "MobileViTv3_x0_75": "",
-    "MobileViTv3_x1_0": "",
+    "MobileViTV3_XXS":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/MobileViTV3_XXS_pretrained.pdparams",
+    "MobileViTV3_XS":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/MobileViTV3_XS_pretrained.pdparams",
+    "MobileViTV3_S":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/MobileViTV3_S_pretrained.pdparams",
+    "MobileViTV3_XXS_L2":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/MobileViTV3_XXS_L2_pretrained.pdparams",
+    "MobileViTV3_XS_L2":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/MobileViTV3_XS_L2_pretrained.pdparams",
+    "MobileViTV3_S_L2":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/MobileViTV3_S_L2_pretrained.pdparams",
+    "MobileViTV3_x0_5":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/MobileViTV3_x0_5_pretrained.pdparams",
+    "MobileViTV3_x0_75":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/MobileViTV3_x0_75_pretrained.pdparams",
+    "MobileViTV3_x1_0":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/MobileViTV3_x1_0_pretrained.pdparams",
 }
 
 layer_norm_2d = partial(nn.GroupNorm, num_groups=1)
@@ -185,9 +194,9 @@ class TransformerEncoder(nn.Layer):
         return x
 
 
-class MobileViTv3Block(nn.Layer):
+class MobileViTV3Block(nn.Layer):
     """
-        MobileViTv3 block
+        MobileViTV3 block
     """
 
     def __init__(self,
@@ -207,7 +216,7 @@ class MobileViTv3Block(nn.Layer):
                  var_ffn: Optional[bool]=False,
                  no_fusion: Optional[bool]=False):
 
-        # For MobileViTv3: Normal 3x3 convolution --> Depthwise 3x3 convolution
+        # For MobileViTV3: Normal 3x3 convolution --> Depthwise 3x3 convolution
         padding = (conv_ksize - 1) // 2 * dilation
         conv_3x3_in = nn.Sequential(
             ('conv', nn.Conv2D(
@@ -228,7 +237,7 @@ class MobileViTv3Block(nn.Layer):
             ('norm', nn.BatchNorm2D(in_channels)), ('act', nn.Silu()))
         conv_3x3_out = None
 
-        # For MobileViTv3: input+global --> local+global
+        # For MobileViTV3: input+global --> local+global
         if not no_fusion:
             #input_ch = tr_dim + in_ch
             conv_3x3_out = nn.Sequential(
@@ -375,7 +384,7 @@ class MobileViTv3Block(nn.Layer):
     def forward(self, x):
         res = x
 
-        # For MobileViTv3: Normal 3x3 convolution --> Depthwise 3x3 convolution
+        # For MobileViTV3: Normal 3x3 convolution --> Depthwise 3x3 convolution
         fm_conv = self.local_rep(x)
 
         # convert feature map to patches
@@ -390,10 +399,10 @@ class MobileViTv3Block(nn.Layer):
         fm = self.conv_proj(fm)
 
         if self.fusion is not None:
-            # For MobileViTv3: input+global --> local+global
+            # For MobileViTV3: input+global --> local+global
             fm = self.fusion(paddle.concat((fm_conv, fm), axis=1))
 
-        # For MobileViTv3: Skip connection
+        # For MobileViTV3: Skip connection
         fm = fm + res
 
         return fm
@@ -470,9 +479,9 @@ class LinearAttnFFN(nn.Layer):
         return x
 
 
-class MobileViTv3Block_v2(nn.Layer):
+class MobileViTV3Block_v2(nn.Layer):
     """
-    This class defines the `MobileViTv3 block`
+    This class defines the `MobileViTV3 block`
     """
 
     def __init__(self,
@@ -516,7 +525,7 @@ class MobileViTv3Block_v2(nn.Layer):
             ffn_dropout=ffn_dropout,
             attn_norm_layer=attn_norm_layer)
 
-        # MobileViTv3: input changed from just global to local+global
+        # MobileViTV3: input changed from just global to local+global
         self.conv_proj = nn.Sequential(
             ('conv', nn.Conv2D(
                 2 * cnn_out_dim, in_channels, 1, bias_attr=False)),
@@ -590,18 +599,18 @@ class MobileViTv3Block_v2(nn.Layer):
         # [B x Patch x Patches x C] --> [B x C x Patches x Patch]
         fm = self.folding(patches=patches, output_size=output_size)
 
-        # MobileViTv3: local+global instead of only global
+        # MobileViTV3: local+global instead of only global
         fm = self.conv_proj(paddle.concat((fm, fm_conv), axis=1))
 
-        # MobileViTv3: skip connection
+        # MobileViTV3: skip connection
         fm = fm + x
 
         return fm
 
 
-class MobileViTv3(nn.Layer):
+class MobileViTV3(nn.Layer):
     """
-        MobileViTv3:
+        MobileViTV3:
     """
 
     def __init__(self,
@@ -740,7 +749,7 @@ class MobileViTv3(nn.Layer):
 
         if self.mobilevit_v2_based:
             block.append(
-                MobileViTv3Block_v2(
+                MobileViTV3Block_v2(
                     in_channels=input_channel,
                     attn_unit_dim=cfg["attn_unit_dim"],
                     ffn_multiplier=cfg.get("ffn_multiplier"),
@@ -765,7 +774,7 @@ class MobileViTv3(nn.Layer):
                 "Got {} and {}.".format(transformer_dim, head_dim))
 
             block.append(
-                MobileViTv3Block(
+                MobileViTV3Block(
                     in_channels=input_channel,
                     transformer_dim=transformer_dim,
                     ffn_dim=ffn_dim,
@@ -827,7 +836,7 @@ def _load_pretrained(pretrained, model, model_url, use_ssld=False):
         )
 
 
-def MobileViTv3_S(pretrained=False, use_ssld=False, **kwargs):
+def MobileViTV3_S(pretrained=False, use_ssld=False, **kwargs):
     mv2_exp_mult = 4
     mobilevit_config = {
         "layer0": {
@@ -890,14 +899,14 @@ def MobileViTv3_S(pretrained=False, use_ssld=False, **kwargs):
         "last_layer_exp_factor": 4
     }
 
-    model = MobileViTv3(mobilevit_config, **kwargs)
+    model = MobileViTV3(mobilevit_config, **kwargs)
 
     _load_pretrained(
-        pretrained, model, MODEL_URLS["MobileViTv3_S"], use_ssld=use_ssld)
+        pretrained, model, MODEL_URLS["MobileViTV3_S"], use_ssld=use_ssld)
     return model
 
 
-def MobileViTv3_XS(pretrained=False, use_ssld=False, **kwargs):
+def MobileViTV3_XS(pretrained=False, use_ssld=False, **kwargs):
     mv2_exp_mult = 4
     mobilevit_config = {
         "layer0": {
@@ -960,14 +969,14 @@ def MobileViTv3_XS(pretrained=False, use_ssld=False, **kwargs):
         "last_layer_exp_factor": 4
     }
 
-    model = MobileViTv3(mobilevit_config, **kwargs)
+    model = MobileViTV3(mobilevit_config, **kwargs)
 
     _load_pretrained(
-        pretrained, model, MODEL_URLS["MobileViTv3_XS"], use_ssld=use_ssld)
+        pretrained, model, MODEL_URLS["MobileViTV3_XS"], use_ssld=use_ssld)
     return model
 
 
-def MobileViTv3_XXS(pretrained=False, use_ssld=False, **kwargs):
+def MobileViTV3_XXS(pretrained=False, use_ssld=False, **kwargs):
     mv2_exp_mult = 2
     mobilevit_config = {
         "layer0": {
@@ -1030,14 +1039,14 @@ def MobileViTv3_XXS(pretrained=False, use_ssld=False, **kwargs):
         "last_layer_exp_factor": 4
     }
 
-    model = MobileViTv3(mobilevit_config, **kwargs)
+    model = MobileViTV3(mobilevit_config, **kwargs)
 
     _load_pretrained(
-        pretrained, model, MODEL_URLS["MobileViTv3_XXS"], use_ssld=use_ssld)
+        pretrained, model, MODEL_URLS["MobileViTV3_XXS"], use_ssld=use_ssld)
     return model
 
 
-def MobileViTv3_S_L2(pretrained=False, use_ssld=False, **kwargs):
+def MobileViTV3_S_L2(pretrained=False, use_ssld=False, **kwargs):
     mv2_exp_mult = 4
     mobilevit_config = {
         "layer0": {
@@ -1100,14 +1109,14 @@ def MobileViTv3_S_L2(pretrained=False, use_ssld=False, **kwargs):
         "last_layer_exp_factor": 4
     }
 
-    model = MobileViTv3(mobilevit_config, **kwargs)
+    model = MobileViTV3(mobilevit_config, **kwargs)
 
     _load_pretrained(
-        pretrained, model, MODEL_URLS["MobileViTv3_S_L2"], use_ssld=use_ssld)
+        pretrained, model, MODEL_URLS["MobileViTV3_S_L2"], use_ssld=use_ssld)
     return model
 
 
-def MobileViTv3_XS_L2(pretrained=False, use_ssld=False, **kwargs):
+def MobileViTV3_XS_L2(pretrained=False, use_ssld=False, **kwargs):
     mv2_exp_mult = 4
     mobilevit_config = {
         "layer0": {
@@ -1170,14 +1179,14 @@ def MobileViTv3_XS_L2(pretrained=False, use_ssld=False, **kwargs):
         "last_layer_exp_factor": 4
     }
 
-    model = MobileViTv3(mobilevit_config, **kwargs)
+    model = MobileViTV3(mobilevit_config, **kwargs)
 
     _load_pretrained(
-        pretrained, model, MODEL_URLS["MobileViTv3_XS_L2"], use_ssld=use_ssld)
+        pretrained, model, MODEL_URLS["MobileViTV3_XS_L2"], use_ssld=use_ssld)
     return model
 
 
-def MobileViTv3_XXS_L2(pretrained=False, use_ssld=False, **kwargs):
+def MobileViTV3_XXS_L2(pretrained=False, use_ssld=False, **kwargs):
     mv2_exp_mult = 2
     mobilevit_config = {
         "layer0": {
@@ -1240,14 +1249,14 @@ def MobileViTv3_XXS_L2(pretrained=False, use_ssld=False, **kwargs):
         "last_layer_exp_factor": 4
     }
 
-    model = MobileViTv3(mobilevit_config, **kwargs)
+    model = MobileViTV3(mobilevit_config, **kwargs)
 
     _load_pretrained(
-        pretrained, model, MODEL_URLS["MobileViTv3_XXS_L2"], use_ssld=use_ssld)
+        pretrained, model, MODEL_URLS["MobileViTV3_XXS_L2"], use_ssld=use_ssld)
     return model
 
 
-def MobileViTv3_x1_0(pretrained=False, use_ssld=False, **kwargs):
+def MobileViTV3_x1_0(pretrained=False, use_ssld=False, **kwargs):
     mobilevit_config = {
         "layer0": {
             "img_channels": 3,
@@ -1303,14 +1312,14 @@ def MobileViTv3_x1_0(pretrained=False, use_ssld=False, **kwargs):
         "last_layer_exp_factor": 4,
     }
 
-    model = MobileViTv3(mobilevit_config, mobilevit_v2_based=True, **kwargs)
+    model = MobileViTV3(mobilevit_config, mobilevit_v2_based=True, **kwargs)
 
     _load_pretrained(
-        pretrained, model, MODEL_URLS["MobileViTv3_x1_0"], use_ssld=use_ssld)
+        pretrained, model, MODEL_URLS["MobileViTV3_x1_0"], use_ssld=use_ssld)
     return model
 
 
-def MobileViTv3_x0_75(pretrained=False, use_ssld=False, **kwargs):
+def MobileViTV3_x0_75(pretrained=False, use_ssld=False, **kwargs):
     mobilevit_config = {
         "layer0": {
             "img_channels": 3,
@@ -1366,14 +1375,14 @@ def MobileViTv3_x0_75(pretrained=False, use_ssld=False, **kwargs):
         "last_layer_exp_factor": 4,
     }
 
-    model = MobileViTv3(mobilevit_config, mobilevit_v2_based=True, **kwargs)
+    model = MobileViTV3(mobilevit_config, mobilevit_v2_based=True, **kwargs)
 
     _load_pretrained(
-        pretrained, model, MODEL_URLS["MobileViTv3_x0_75"], use_ssld=use_ssld)
+        pretrained, model, MODEL_URLS["MobileViTV3_x0_75"], use_ssld=use_ssld)
     return model
 
 
-def MobileViTv3_x0_5(pretrained=False, use_ssld=False, **kwargs):
+def MobileViTV3_x0_5(pretrained=False, use_ssld=False, **kwargs):
     mobilevit_config = {
         "layer0": {
             "img_channels": 3,
@@ -1429,8 +1438,8 @@ def MobileViTv3_x0_5(pretrained=False, use_ssld=False, **kwargs):
         "last_layer_exp_factor": 4,
     }
 
-    model = MobileViTv3(mobilevit_config, mobilevit_v2_based=True, **kwargs)
+    model = MobileViTV3(mobilevit_config, mobilevit_v2_based=True, **kwargs)
 
     _load_pretrained(
-        pretrained, model, MODEL_URLS["MobileViTv3_x0_5"], use_ssld=use_ssld)
+        pretrained, model, MODEL_URLS["MobileViTV3_x0_5"], use_ssld=use_ssld)
     return model

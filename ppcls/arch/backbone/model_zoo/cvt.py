@@ -22,11 +22,16 @@ from paddle.nn.initializer import XavierUniform, TruncatedNormal, Constant
 from ....utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
 
 MODEL_URLS = {
-    "CvT_13_224": "",  # TODO
-    "CvT_13_384": "",  # TODO
-    "CvT_21_224": "",  # TODO
-    "CvT_21_384": "",  # TODO
-    "CvT_W24_384": "",  # TODO
+    "CvT_13_224":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/CvT_13_224_pretrained.pdparams",
+    "CvT_13_384":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/CvT_13_384_pretrained.pdparams",
+    "CvT_21_224":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/CvT_21_224_pretrained.pdparams",
+    "CvT_21_384":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/CvT_21_384_pretrained.pdparams",
+    "CvT_W24_384":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/CvT_W24_384_22kto1k_pretrained.pdparams",
 }
 
 __all__ = list(MODEL_URLS.keys())
@@ -509,11 +514,19 @@ class ConvolutionalVisionTransformer(nn.Layer):
         return x
 
 
-def _load_pretrained(pretrained, model, model_url, use_ssld=False):
+def _load_pretrained(pretrained,
+                     model,
+                     model_url,
+                     use_ssld=False,
+                     use_imagenet22kto1k_pretrained=False):
     if pretrained is False:
         pass
     elif pretrained is True:
-        load_dygraph_pretrain_from_url(model, model_url, use_ssld=use_ssld)
+        load_dygraph_pretrain_from_url(
+            model,
+            model_url,
+            use_ssld=use_ssld,
+            use_imagenet22kto1k_pretrained=use_imagenet22kto1k_pretrained)
     elif isinstance(pretrained, str):
         load_dygraph_pretrain(model, pretrained)
     else:
@@ -556,7 +569,10 @@ def CvT_13_224(pretrained=False, use_ssld=False, **kwargs):
     return model
 
 
-def CvT_13_384(pretrained=False, use_ssld=False, **kwargs):
+def CvT_13_384(pretrained=False,
+               use_ssld=False,
+               use_imagenet22kto1k_pretrained=False,
+               **kwargs):
     msvit_spec = dict(
         INIT='trunc_norm',
         NUM_STAGES=3,
@@ -586,7 +602,11 @@ def CvT_13_384(pretrained=False, use_ssld=False, **kwargs):
         spec=msvit_spec,
         **kwargs)
     _load_pretrained(
-        pretrained, model, MODEL_URLS["CvT_13_384"], use_ssld=use_ssld)
+        pretrained,
+        model,
+        MODEL_URLS["CvT_13_384"],
+        use_ssld=use_ssld,
+        use_imagenet22kto1k_pretrained=use_imagenet22kto1k_pretrained)
     return model
 
 
@@ -624,7 +644,10 @@ def CvT_21_224(pretrained=False, use_ssld=False, **kwargs):
     return model
 
 
-def CvT_21_384(pretrained=False, use_ssld=False, **kwargs):
+def CvT_21_384(pretrained=False,
+               use_ssld=False,
+               use_imagenet22kto1k_pretrained=False,
+               **kwargs):
     msvit_spec = dict(
         INIT='trunc_norm',
         NUM_STAGES=3,
@@ -654,7 +677,11 @@ def CvT_21_384(pretrained=False, use_ssld=False, **kwargs):
         spec=msvit_spec,
         **kwargs)
     _load_pretrained(
-        pretrained, model, MODEL_URLS["CvT_21_384"], use_ssld=use_ssld)
+        pretrained,
+        model,
+        MODEL_URLS["CvT_21_384"],
+        use_ssld=use_ssld,
+        use_imagenet22kto1k_pretrained=use_imagenet22kto1k_pretrained)
     return model
 
 
@@ -688,5 +715,9 @@ def CvT_W24_384(pretrained=False, use_ssld=False, **kwargs):
         spec=msvit_spec,
         **kwargs)
     _load_pretrained(
-        pretrained, model, MODEL_URLS["CvT_W24_384"], use_ssld=use_ssld)
+        pretrained,
+        model,
+        MODEL_URLS["CvT_W24_384"],
+        use_ssld=use_ssld,
+        use_imagenet22kto1k_pretrained=True)
     return model

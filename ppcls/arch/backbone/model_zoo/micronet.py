@@ -23,10 +23,14 @@ import paddle.nn as nn
 from ....utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
 
 MODEL_URLS = {
-    "MicroNet_M0": "",  # TODO
-    "MicroNet_M1": "",  # TODO
-    "MicroNet_M2": "",  # TODO
-    "MicroNet_M3": "",  # TODO
+    "MicroNet_M0":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/MicroNet_M0_pretrained.pdparams",
+    "MicroNet_M1":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/MicroNet_M1_pretrained.pdparams",
+    "MicroNet_M2":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/MicroNet_M2_pretrained.pdparams",
+    "MicroNet_M3":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/MicroNet_M3_pretrained.pdparams",
 }
 
 __all__ = MODEL_URLS.keys()

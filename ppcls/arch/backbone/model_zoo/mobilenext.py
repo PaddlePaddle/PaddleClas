@@ -24,7 +24,8 @@ MODEL_URLS = {
     "MobileNeXt_x0_35": "",  # TODO
     "MobileNeXt_x0_5": "",  # TODO
     "MobileNeXt_x0_75": "",  # TODO
-    "MobileNeXt_x1_0": "",  # TODO
+    "MobileNeXt_x1_0":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/MobileNeXt_x1_0_pretrained.pdparams",
     "MobileNeXt_x1_4": "",  # TODO
 }
 
