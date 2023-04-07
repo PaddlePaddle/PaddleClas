@@ -63,7 +63,7 @@ class Engine(object):
 
         # set seed
         seed = self.config["Global"].get("seed", False)
-        if seed or not isinstance(seed, bool):
+        if seed or seed == 0:
             assert isinstance(seed, int), "The 'seed' must be a integer!"
             paddle.seed(seed)
             np.random.seed(seed)
@@ -123,83 +123,6 @@ class Engine(object):
             "epochs": self.config["Global"]["epochs"]
         })
 
-        # build model
-        self.model = build_model(self.config, self.mode)
-        # set @to_static for benchmark, skip this by default.
-        apply_to_static(self.config, self.model)
-        
-        # build loss
-        if self.mode == "train":
-            label_loss_info = self.config["Loss"]["Train"]
-            self.train_loss_func = build_loss(label_loss_info)
-            unlabel_loss_info = self.config.get("UnLabelLoss", {}).get("Train",
-                                                                       None)
-            self.unlabel_train_loss_func = build_loss(unlabel_loss_info)
-        if self.mode == "eval" or (self.mode == "train" and
-                                   self.config["Global"]["eval_during_train"]):
-            loss_config = self.config.get("Loss", None)
-            if loss_config is not None:
-                loss_config = loss_config.get("Eval")
-                if loss_config is not None:
-                    self.eval_loss_func = build_loss(loss_config)
-                else:
-                    self.eval_loss_func = None
-            else:
-                self.eval_loss_func = None
-        
-        # check the gpu num
-        world_size = dist.get_world_size()
-        self.config["Global"]["distributed"] = world_size != 1
-        if self.mode == "train":
-            std_gpu_num = 8 if isinstance(
-                self.config["Optimizer"],
-                dict) and self.config["Optimizer"]["name"] == "AdamW" else 4
-            if world_size != std_gpu_num:
-                msg = f"The training strategy provided by PaddleClas is based on {std_gpu_num} gpus. But the number of gpu is {world_size} in current training. Please modify the stategy (learning rate, batch size and so on) if use this config to train."
-                logger.warning(msg)
-        
-        # for distributed
-        if self.config["Global"]["distributed"]:
-            dist.init_parallel_env()
-            self.model = paddle.DataParallel(self.model)
-            if self.mode == 'train' and len(self.train_loss_func.parameters(
-            )) > 0:
-                self.train_loss_func = paddle.DataParallel(
-                    self.train_loss_func)
-
-            # set different seed in different GPU manually in distributed environment
-            if seed is None:
-                logger.warning(
-                    "The random seed cannot be None in a distributed environment. Global.seed has been set to 42 by default"
-                )
-                self.config["Global"]["seed"] = seed = 42
-            logger.info(
-                f"Set random seed to ({int(seed)} + $PADDLE_TRAINER_ID) for different trainer"
-            )
-            paddle.seed(int(seed) + dist.get_rank())
-            np.random.seed(int(seed) + dist.get_rank())
-            random.seed(int(seed) + dist.get_rank())
-            
-        # build dataloader
-        if self.mode == 'train':
-            self.train_dataloader = build_dataloader(
-                self.config["DataLoader"], "Train", self.device, self.use_dali)
-            if self.config["DataLoader"].get('UnLabelTrain', None) is not None:
-                self.unlabel_train_dataloader = build_dataloader(
-                    self.config["DataLoader"], "UnLabelTrain", self.device,
-                    self.use_dali)
-            else:
-                self.unlabel_train_dataloader = None
-
-            self.iter_per_epoch = len(
-                self.train_dataloader) - 1 if platform.system(
-                ) == "Windows" else len(self.train_dataloader)
-            if self.config["Global"].get("iter_per_epoch", None):
-                # set max iteration per epoch mannualy, when training by iteration(s), such as XBM, FixMatch.
-                self.iter_per_epoch = self.config["Global"].get(
-                    "iter_per_epoch")
-            self.iter_per_epoch = self.iter_per_epoch // self.update_freq * self.update_freq
-
         if self.mode == "eval" or (self.mode == "train" and
                                    self.config["Global"]["eval_during_train"]):
             if self.eval_mode in ["classification", "adaface"]:
@@ -221,20 +144,24 @@ class Engine(object):
                         self.config["DataLoader"]["Eval"], "Query",
                         self.device, self.use_dali)
 
-        # build metric
-        if self.mode == 'train' and "Metric" in self.config and "Train" in self.config[
-                "Metric"] and self.config["Metric"]["Train"]:
-            metric_config = self.config["Metric"]["Train"]
-            if hasattr(self.train_dataloader, "collate_fn"
-                       ) and self.train_dataloader.collate_fn is not None:
-                for m_idx, m in enumerate(metric_config):
-                    if "TopkAcc" in m:
-                        msg = f"Unable to calculate accuracy when using \"batch_transform_ops\". The metric \"{m}\" has been removed."
-                        logger.warning(msg)
-                        metric_config.pop(m_idx)
-            self.train_metric_func = build_metrics(metric_config)
-        else:
-            self.train_metric_func = None
+        # build loss
+        if self.mode == "train":
+            label_loss_info = self.config["Loss"]["Train"]
+            self.train_loss_func = build_loss(label_loss_info)
+            unlabel_loss_info = self.config.get("UnLabelLoss", {}).get("Train",
+                                                                       None)
+            self.unlabel_train_loss_func = build_loss(unlabel_loss_info)
+        if self.mode == "eval" or (self.mode == "train" and
+                                   self.config["Global"]["eval_during_train"]):
+            loss_config = self.config.get("Loss", None)
+            if loss_config is not None:
+                loss_config = loss_config.get("Eval")
+                if loss_config is not None:
+                    self.eval_loss_func = build_loss(loss_config)
+                else:
+                    self.eval_loss_func = None
+            else:
+                self.eval_loss_func = None
 
         if self.mode == "eval" or (self.mode == "train" and
                                    self.config["Global"]["eval_during_train"]):
@@ -253,6 +180,11 @@ class Engine(object):
         else:
             self.eval_metric_func = None
 
+        # build model
+        self.model = build_model(self.config, self.mode)
+        # set @to_static for benchmark, skip this by default.
+        apply_to_static(self.config, self.model)
+
         # load_pretrain
         if self.config["Global"]["pretrained_model"] is not None:
             if self.config["Global"]["pretrained_model"].startswith("http"):
@@ -263,13 +195,6 @@ class Engine(object):
                 load_dygraph_pretrain(
                     [self.model, getattr(self, 'train_loss_func', None)],
                     self.config["Global"]["pretrained_model"])
-
-        # build optimizer
-        if self.mode == 'train':
-            self.optimizer, self.lr_sch = build_optimizer(
-                self.config["Optimizer"], self.config["Global"]["epochs"],
-                self.iter_per_epoch // self.update_freq,
-                [self.model, self.train_loss_func])
 
         # AMP training and evaluating
         self.amp = "AMP" in self.config and self.config["AMP"] is not None
@@ -331,6 +256,81 @@ class Engine(object):
         if self.ema:
             self.model_ema = ExponentialMovingAverage(
                 self.model, self.config['EMA'].get("decay", 0.9999))
+
+        # check the gpu num
+        world_size = dist.get_world_size()
+        self.config["Global"]["distributed"] = world_size != 1
+        if self.mode == "train":
+            std_gpu_num = 8 if isinstance(
+                self.config["Optimizer"],
+                dict) and self.config["Optimizer"]["name"] == "AdamW" else 4
+            if world_size != std_gpu_num:
+                msg = f"The training strategy provided by PaddleClas is based on {std_gpu_num} gpus. But the number of gpu is {world_size} in current training. Please modify the stategy (learning rate, batch size and so on) if use this config to train."
+                logger.warning(msg)
+
+        # for distributed
+        if self.config["Global"]["distributed"]:
+            dist.init_parallel_env()
+            self.model = paddle.DataParallel(self.model)
+            if self.mode == 'train' and len(self.train_loss_func.parameters(
+            )) > 0:
+                self.train_loss_func = paddle.DataParallel(
+                    self.train_loss_func)
+
+            # set different seed in different GPU manually in distributed environment
+            if seed is None:
+                logger.warning(
+                    "The random seed cannot be None in a distributed environment. Global.seed has been set to 42 by default"
+                )
+                self.config["Global"]["seed"] = seed = 42
+            logger.info(
+                f"Set random seed to ({int(seed)} + $PADDLE_TRAINER_ID) for different trainer"
+            )
+            paddle.seed(int(seed) + dist.get_rank())
+            np.random.seed(int(seed) + dist.get_rank())
+            random.seed(int(seed) + dist.get_rank())
+        
+        # build dataloader
+        if self.mode == 'train':
+            self.train_dataloader = build_dataloader(
+                self.config["DataLoader"], "Train", self.device, self.use_dali)
+            if self.config["DataLoader"].get('UnLabelTrain', None) is not None:
+                self.unlabel_train_dataloader = build_dataloader(
+                    self.config["DataLoader"], "UnLabelTrain", self.device,
+                    self.use_dali)
+            else:
+                self.unlabel_train_dataloader = None
+
+            self.iter_per_epoch = len(
+                self.train_dataloader) - 1 if platform.system(
+                ) == "Windows" else len(self.train_dataloader)
+            if self.config["Global"].get("iter_per_epoch", None):
+                # set max iteration per epoch mannualy, when training by iteration(s), such as XBM, FixMatch.
+                self.iter_per_epoch = self.config["Global"].get(
+                    "iter_per_epoch")
+            self.iter_per_epoch = self.iter_per_epoch // self.update_freq * self.update_freq
+            
+        # build optimizer
+        if self.mode == 'train':
+            self.optimizer, self.lr_sch = build_optimizer(
+                self.config["Optimizer"], self.config["Global"]["epochs"],
+                self.iter_per_epoch // self.update_freq,
+                [self.model, self.train_loss_func])
+        
+        # build metric
+        if self.mode == 'train' and "Metric" in self.config and "Train" in self.config[
+                "Metric"] and self.config["Metric"]["Train"]:
+            metric_config = self.config["Metric"]["Train"]
+            if hasattr(self.train_dataloader, "collate_fn"
+                       ) and self.train_dataloader.collate_fn is not None:
+                for m_idx, m in enumerate(metric_config):
+                    if "TopkAcc" in m:
+                        msg = f"Unable to calculate accuracy when using \"batch_transform_ops\". The metric \"{m}\" has been removed."
+                        logger.warning(msg)
+                        metric_config.pop(m_idx)
+            self.train_metric_func = build_metrics(metric_config)
+        else:
+            self.train_metric_func = None
 
         # build postprocess for infer
         if self.mode == 'infer':
