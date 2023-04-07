@@ -80,7 +80,8 @@ def train_epoch(engine, epoch_id, print_batch_step):
             # step lr(by step)
             for i in range(len(engine.lr_sch)):
                 if not getattr(engine.lr_sch[i], "by_epoch", False):
-                    engine.lr_sch[i].step()
+                    crt_step = engine.iter_per_epoch * (epoch_id - 1) + iter_id
+                    engine.lr_sch[i].step(crt_step)
             # update ema
             if engine.ema:
                 engine.model_ema.update(engine.model)
@@ -99,7 +100,7 @@ def train_epoch(engine, epoch_id, print_batch_step):
     for i in range(len(engine.lr_sch)):
         if getattr(engine.lr_sch[i], "by_epoch", False) and \
                 type_name(engine.lr_sch[i]) != "ReduceOnPlateau":
-            engine.lr_sch[i].step()
+            engine.lr_sch[i].step(epoch_id)
 
 
 def forward(engine, batch):
