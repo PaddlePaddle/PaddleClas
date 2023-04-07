@@ -28,7 +28,7 @@ EMA:
 
 # model architecture
 Arch:
-  name: MobileViTv3_x1_0
+  name: MobileViTV3_x1_0
   class_num: 1000
   classifier_dropout: 0.
 

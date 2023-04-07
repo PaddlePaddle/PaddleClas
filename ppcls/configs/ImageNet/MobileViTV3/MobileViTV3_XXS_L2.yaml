@@ -28,7 +28,7 @@ EMA:
 
 # model architecture
 Arch:
-  name: MobileViTv3_XXS_L2
+  name: MobileViTV3_XXS_L2
   class_num: 1000
   dropout: 0.1
 
