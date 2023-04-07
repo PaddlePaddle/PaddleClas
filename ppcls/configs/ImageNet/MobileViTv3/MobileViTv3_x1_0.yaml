@@ -14,7 +14,6 @@ Global:
   image_shape: [3, 256, 256]
   save_inference_dir: ./inference
   use_dali: False
-  update_freq: 3  # for 4 gpus
 
 # mixed precision training
 AMP:
@@ -52,7 +51,7 @@ Optimizer:
   one_dim_param_no_weight_decay: True
   lr:
     name: Cosine
-    learning_rate: 0.002  # for total batch size 1020
+    learning_rate: 0.002  # for total batch size 1020 by referring to official
     eta_min: 0.0002
     warmup_epoch: 16  # 20000 iterations
     warmup_start_lr: 1e-6
@@ -103,7 +102,7 @@ DataLoader:
               prob: 0.25
     sampler:
       name: DistributedBatchSampler
-      batch_size: 85
+      batch_size: 128
       drop_last: False
       shuffle: True
     loader:
