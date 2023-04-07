@@ -28,9 +28,9 @@ EMA:
 
 # model architecture
 Arch:
-  name: MobileViTv3_x0_5
+  name: MobileViTV3_XXS
   class_num: 1000
-  classifier_dropout: 0.
+  dropout: 0.05
 
 # loss function config for traing/eval process
 Loss:
@@ -47,81 +47,61 @@ Optimizer:
   beta1: 0.9
   beta2: 0.999
   epsilon: 1e-8
-  weight_decay: 0.05
-  one_dim_param_no_weight_decay: True
+  weight_decay: 0.01
   lr:
     name: Cosine
-    learning_rate: 0.002  # for total batch size 1020 by referring to official
+    learning_rate: 0.002  # for total batch size 384
     eta_min: 0.0002
-    warmup_epoch: 16  # 20000 iterations
-    warmup_start_lr: 1e-6
-  clip_norm: 10
+    warmup_epoch: 1  # 3000 iterations
+    warmup_start_lr: 0.0002
 
 # data loader for train and eval
 DataLoader:
   Train:
     dataset:
-      name: ImageNetDataset
+      name: MultiScaleDataset
       image_root: ./dataset/ILSVRC2012/
       cls_label_path: ./dataset/ILSVRC2012/train_list.txt
       transform_ops:
         - DecodeImage:
             to_rgb: True
             channel_first: False
-            backend: pil
         - RandCropImage:
             size: 256
-            interpolation: bicubic
-            backend: pil
+            interpolation: bilinear
             use_log_aspect: True
         - RandFlipImage:
             flip_code: 1
-        - RandAugmentV3:
-            num_layers: 2
-            interpolation: bicubic
         - NormalizeImage:
             scale: 1.0/255.0
             mean: [0.0, 0.0, 0.0]
             std: [1.0, 1.0, 1.0]
             order: ''
-        - RandomErasing:
-            EPSILON: 0.25
-            sl: 0.02
-            sh: 1.0/3.0
-            r1: 0.3
-            attempt: 10
-            use_log_aspect: True
-            mode: const
-      batch_transform_ops:
-        - OpSampler:
-            MixupOperator:
-              alpha: 0.2
-              prob: 0.25
-            CutmixOperator:
-              alpha: 1.0
-              prob: 0.25
+    # support to specify width and height respectively:
+    # scales: [(256,256) (160,160), (192,192), (224,224) (288,288) (320,320)]
     sampler:
-      name: DistributedBatchSampler
-      batch_size: 128
-      drop_last: False
-      shuffle: True
+      name: MultiScaleSampler
+      scales: [256, 160, 192, 224, 288, 320]
+      # first_bs: batch size for the first image resolution in the scales list
+      # divide_factor: to ensure the width and height dimensions can be devided by downsampling multiple
+      first_bs: 48
+      divided_factor: 32
+      is_training: True
     loader:
       num_workers: 4
       use_shared_memory: True
   Eval:
-    dataset:
+    dataset: 
       name: ImageNetDataset
       image_root: ./dataset/ILSVRC2012/
       cls_label_path: ./dataset/ILSVRC2012/val_list.txt
       transform_ops:
         - DecodeImage:
-            to_np: False
+            to_rgb: True
             channel_first: False
-            backend: pil
         - ResizeImage:
             resize_short: 288
-            interpolation: bicubic
-            backend: pil
+            interpolation: bilinear
         - CropImage:
             size: 256
         - NormalizeImage:
@@ -131,7 +111,7 @@ DataLoader:
             order: ''
     sampler:
       name: DistributedBatchSampler
-      batch_size: 128
+      batch_size: 48
       drop_last: False
       shuffle: False
     loader:
@@ -143,13 +123,11 @@ Infer:
   batch_size: 10
   transforms:
     - DecodeImage:
-        to_np: False
+        to_rgb: True
         channel_first: False
-        backend: pil
     - ResizeImage:
         resize_short: 288
-        interpolation: bicubic
-        backend: pil
+        interpolation: bilinear
     - CropImage:
         size: 256
     - NormalizeImage:
