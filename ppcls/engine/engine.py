@@ -63,7 +63,7 @@ class Engine(object):
 
         # set seed
         seed = self.config["Global"].get("seed", False)
-        if seed or str(seed) == "0":
+        if seed or not isinstance(seed, bool):
             assert isinstance(seed, int), "The 'seed' must be a integer!"
             paddle.seed(seed)
             np.random.seed(seed)
@@ -123,6 +123,63 @@ class Engine(object):
             "epochs": self.config["Global"]["epochs"]
         })
 
+        # build model
+        self.model = build_model(self.config, self.mode)
+        # set @to_static for benchmark, skip this by default.
+        apply_to_static(self.config, self.model)
+        
+        # build loss
+        if self.mode == "train":
+            label_loss_info = self.config["Loss"]["Train"]
+            self.train_loss_func = build_loss(label_loss_info)
+            unlabel_loss_info = self.config.get("UnLabelLoss", {}).get("Train",
+                                                                       None)
+            self.unlabel_train_loss_func = build_loss(unlabel_loss_info)
+        if self.mode == "eval" or (self.mode == "train" and
+                                   self.config["Global"]["eval_during_train"]):
+            loss_config = self.config.get("Loss", None)
+            if loss_config is not None:
+                loss_config = loss_config.get("Eval")
+                if loss_config is not None:
+                    self.eval_loss_func = build_loss(loss_config)
+                else:
+                    self.eval_loss_func = None
+            else:
+                self.eval_loss_func = None
+        
+        # check the gpu num
+        world_size = dist.get_world_size()
+        self.config["Global"]["distributed"] = world_size != 1
+        if self.mode == "train":
+            std_gpu_num = 8 if isinstance(
+                self.config["Optimizer"],
+                dict) and self.config["Optimizer"]["name"] == "AdamW" else 4
+            if world_size != std_gpu_num:
+                msg = f"The training strategy provided by PaddleClas is based on {std_gpu_num} gpus. But the number of gpu is {world_size} in current training. Please modify the stategy (learning rate, batch size and so on) if use this config to train."
+                logger.warning(msg)
+        
+        # for distributed
+        if self.config["Global"]["distributed"]:
+            dist.init_parallel_env()
+            self.model = paddle.DataParallel(self.model)
+            if self.mode == 'train' and len(self.train_loss_func.parameters(
+            )) > 0:
+                self.train_loss_func = paddle.DataParallel(
+                    self.train_loss_func)
+
+            # set different seed in different GPU manually in distributed environment
+            if seed is None:
+                logger.warning(
+                    "The random seed cannot be None in a distributed environment. Global.seed has been set to 42 by default"
+                )
+                self.config["Global"]["seed"] = seed = 42
+            logger.info(
+                f"Set random seed to ({int(seed)} + $PADDLE_TRAINER_ID) for different trainer"
+            )
+            paddle.seed(int(seed) + dist.get_rank())
+            np.random.seed(int(seed) + dist.get_rank())
+            random.seed(int(seed) + dist.get_rank())
+            
         # build dataloader
         if self.mode == 'train':
             self.train_dataloader = build_dataloader(
@@ -164,25 +221,6 @@ class Engine(object):
                         self.config["DataLoader"]["Eval"], "Query",
                         self.device, self.use_dali)
 
-        # build loss
-        if self.mode == "train":
-            label_loss_info = self.config["Loss"]["Train"]
-            self.train_loss_func = build_loss(label_loss_info)
-            unlabel_loss_info = self.config.get("UnLabelLoss", {}).get("Train",
-                                                                       None)
-            self.unlabel_train_loss_func = build_loss(unlabel_loss_info)
-        if self.mode == "eval" or (self.mode == "train" and
-                                   self.config["Global"]["eval_during_train"]):
-            loss_config = self.config.get("Loss", None)
-            if loss_config is not None:
-                loss_config = loss_config.get("Eval")
-                if loss_config is not None:
-                    self.eval_loss_func = build_loss(loss_config)
-                else:
-                    self.eval_loss_func = None
-            else:
-                self.eval_loss_func = None
-
         # build metric
         if self.mode == 'train' and "Metric" in self.config and "Train" in self.config[
                 "Metric"] and self.config["Metric"]["Train"]:
@@ -214,11 +252,6 @@ class Engine(object):
                 self.eval_metric_func = build_metrics(metric_config)
         else:
             self.eval_metric_func = None
-
-        # build model
-        self.model = build_model(self.config, self.mode)
-        # set @to_static for benchmark, skip this by default.
-        apply_to_static(self.config, self.model)
 
         # load_pretrain
         if self.config["Global"]["pretrained_model"] is not None:
@@ -298,39 +331,6 @@ class Engine(object):
         if self.ema:
             self.model_ema = ExponentialMovingAverage(
                 self.model, self.config['EMA'].get("decay", 0.9999))
-
-        # check the gpu num
-        world_size = dist.get_world_size()
-        self.config["Global"]["distributed"] = world_size != 1
-        if self.mode == "train":
-            std_gpu_num = 8 if isinstance(
-                self.config["Optimizer"],
-                dict) and self.config["Optimizer"]["name"] == "AdamW" else 4
-            if world_size != std_gpu_num:
-                msg = f"The training strategy provided by PaddleClas is based on {std_gpu_num} gpus. But the number of gpu is {world_size} in current training. Please modify the stategy (learning rate, batch size and so on) if use this config to train."
-                logger.warning(msg)
-
-        # for distributed
-        if self.config["Global"]["distributed"]:
-            dist.init_parallel_env()
-            self.model = paddle.DataParallel(self.model)
-            if self.mode == 'train' and len(self.train_loss_func.parameters(
-            )) > 0:
-                self.train_loss_func = paddle.DataParallel(
-                    self.train_loss_func)
-
-            # set different seed in different GPU manually in distributed environment
-            if seed is None:
-                logger.warning(
-                    "The random seed cannot be None in a distributed environment. Global.seed has been set to 42 by default"
-                )
-                self.config["Global"]["seed"] = seed = 42
-            logger.info(
-                f"Set random seed to ({int(seed)} + $PADDLE_TRAINER_ID) for different trainer"
-            )
-            paddle.seed(int(seed) + dist.get_rank())
-            np.random.seed(int(seed) + dist.get_rank())
-            random.seed(int(seed) + dist.get_rank())
 
         # build postprocess for infer
         if self.mode == 'infer':
