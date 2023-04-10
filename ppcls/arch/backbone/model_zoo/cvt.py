@@ -31,7 +31,7 @@ MODEL_URLS = {
     "CvT_21_384":
     "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/CvT_21_384_pretrained.pdparams",
     "CvT_W24_384":
-    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/CvT_W24_384_22kto1k_pretrained.pdparams",
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/CvT_W24_384_pretrained.pdparams",
 }
 
 __all__ = list(MODEL_URLS.keys())
