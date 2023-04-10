@@ -479,7 +479,7 @@ class LinearAttnFFN(nn.Layer):
         return x
 
 
-class MobileViTV3Block_v2(nn.Layer):
+class MobileViTV3BlockV2(nn.Layer):
     """
     This class defines the `MobileViTV3 block`
     """
@@ -749,7 +749,7 @@ class MobileViTV3(nn.Layer):
 
         if self.mobilevit_v2_based:
             block.append(
-                MobileViTV3Block_v2(
+                MobileViTV3BlockV2(
                     in_channels=input_channel,
                     attn_unit_dim=cfg["attn_unit_dim"],
                     ffn_multiplier=cfg.get("ffn_multiplier"),
