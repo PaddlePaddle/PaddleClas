@@ -50,7 +50,7 @@ inference:python/predict_cls.py -c configs/inference_cls.yaml -o PreProcess.tran
 -o Global.benchmark:False
 null:null
 null:null
-===========================train_benchmark_params==========================
+===========================disable_train_benchmark==========================
 batch_size:128
 fp_items:fp32
 epoch:1
