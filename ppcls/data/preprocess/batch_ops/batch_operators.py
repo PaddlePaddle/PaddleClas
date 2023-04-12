@@ -60,7 +60,7 @@ class BatchOperator(object):
 
 
 class MixupOperator(BatchOperator):
-    """ Mixup operator 
+    """ Mixup operator
     reference: https://arxiv.org/abs/1710.09412
 
     """
@@ -88,7 +88,7 @@ class MixupOperator(BatchOperator):
 
     def __call__(self, batch):
         imgs, labels, bs = self._unpack(batch)
-        idx = np.arange(bs)[::-1]
+        idx = np.random.permutation(bs)
         lam = np.random.beta(self._alpha, self._alpha)
         imgs = lam * imgs + (1 - lam) * imgs[idx]
         targets = self._mix_target(labels, labels[idx], lam)
@@ -143,7 +143,7 @@ class CutmixOperator(BatchOperator):
 
     def __call__(self, batch):
         imgs, labels, bs = self._unpack(batch)
-        idx = np.arange(bs)[::-1]
+        idx = np.random.permutation(bs)
         lam = np.random.beta(self._alpha, self._alpha)
 
         bbx1, bby1, bbx2, bby2 = self._rand_bbox(imgs.shape, lam)
@@ -155,9 +155,9 @@ class CutmixOperator(BatchOperator):
 
 
 class FmixOperator(BatchOperator):
-    """ Fmix operator 
+    """ Fmix operator
     reference: https://arxiv.org/abs/2002.12047
-    
+
     """
 
     def __init__(self,
@@ -179,7 +179,7 @@ class FmixOperator(BatchOperator):
 
     def __call__(self, batch):
         imgs, labels, bs = self._unpack(batch)
-        idx = np.arange(bs)[::-1]
+        idx = np.random.permutation(bs)
         size = (imgs.shape[2], imgs.shape[3])
         lam, mask = sample_mask(self._alpha, self._decay_power, \
                 size, self._max_soft, self._reformulate)
