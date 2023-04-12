@@ -2,7 +2,7 @@
 Global:
   checkpoints: null
   pretrained_model: null
-  output_dir: /home/aistudio/work/PaddleClas/output/ 
+  output_dir: output/ 
   device: gpu
   save_interval: 10
   # train_epoch_iter_two_samples
@@ -28,7 +28,7 @@ Arch:
   name: moco_v2
   backbone:
     name: ResNet50
-    stop_layer_name: AvgPool2D
+    stop_layer_name: avg_pool
   neck:
     name: NonLinearNeck
     in_channels: 2048

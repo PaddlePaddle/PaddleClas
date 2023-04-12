@@ -1,14 +1,14 @@
 # global configs
 Global:
   checkpoints: null
-  pretrained_model: ./pretrain/ppclas_moco_v2_r50_clas
-  output_dir: /home/aistudio/work/PaddleClas/output/ 
+  pretrained_model: ./pretrain/ppclas_moco_v2_r50_e200_ckpt
+  output_dir: ./output/ 
   seed: 0
   device: gpu
   save_interval: 1
   eval_during_train: True
   eval_interval: 1
-  epochs: 100
+  epochs: 10
   print_batch_step: 10
   use_visualdl: False
   # used for static mode and model export
@@ -21,10 +21,19 @@ Global:
   # gpu nums for distributed train
   distributed: 4
 
+#Arch:
+#  name: ResNet50
+#  class_num: 1000
+#  freeze_befor: avg_pool
 Arch:
-  name: ResNet50
-  class_num: 1000
-  freeze_befor: 
+  name: moco_clas
+  backbone:
+    name: ResNet50
+    stop_layer_name: avg_pool
+    freeze_befor: avg_pool
+  head:
+    name: ClasHead
+    class_num: 1000
 
 
 # loss function config for traing/eval process
@@ -67,7 +76,7 @@ DataLoader:
             std: [0.229, 0.224, 0.225]
             order: ''
     sampler:
-      batch_size: 64
+      batch_size: 32
       shuffle: True
       drop_last: False
     loader:
@@ -78,7 +87,7 @@ DataLoader:
     dataset:
       name: ImageNetDataset
       image_root: ./dataset/ILSVRC2012/
-      cls_label_path: ./dataset/ILSVRC2012/val_list.txt
+      cls_label_path: ./dataset/ILSVRC2012/train_list.txt
       return_label: True
       return_two_sample: False
       transform_ops:
