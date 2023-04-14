@@ -83,11 +83,39 @@ class Classification(nn.Layer):
         return x
 
 
+def freeze_batchnorm_statictis(layer):
+    def freeze_bn(layer):
+        if isinstance(layer, nn.BatchNorm):
+            layer._use_global_stats = True
+
+
+def freeze_params(model):
+    from ppcls.arch.backbone.legendary_models.resnet import ConvBNLayer, BottleneckBlock
+    for item in ['stem', 'max_pool', 'blocks', 'avg_pool']:
+        m = getattr(model, item)
+        if isinstance(m, nn.Sequential):
+            for item in m:
+                if isinstance(item, ConvBNLayer):
+                    print(item.bn)
+                    freeze_batchnorm_statictis(item.bn)
+
+                if isinstance(item, BottleneckBlock):
+                    freeze_batchnorm_statictis(item.conv0.bn)
+                    freeze_batchnorm_statictis(item.conv1.bn)
+                    freeze_batchnorm_statictis(item.conv2.bn)
+                    if hasattr(item, 'short'):
+                        freeze_batchnorm_statictis(item.short.bn)
+
+        for param in m.parameters():
+            param.trainable = False
+
+
 def moco_clas(backbone, head, pretrained=False, use_ssld=False):
     backbone_config = backbone
     head_config = head
     backbone_name = backbone_config.pop('name')
     backbone = eval(backbone_name)(**backbone_config)
+
     # stop layer for backbone
     stop_layer_name = backbone_config.pop('stop_layer_name', None)
     if stop_layer_name:
@@ -97,12 +125,15 @@ def moco_clas(backbone, head, pretrained=False, use_ssld=False):
     if freeze_layer_name:
         ret = backbone.freeze_befor(freeze_layer_name)
         if ret:
-            logger.info("moco_clas backbone successfully freeze param update befor the layer: " \
-                        .format(freeze_layer_name))
+            logger.info(
+                "moco_clas backbone successfully freeze param update befor the layer: {}".
+                format(freeze_layer_name))
         else:
-            logger.error("moco_clas backbone failurely freeze param update befor the layer: " \
-                        .format(freeze_layer_name))
+            logger.error(
+                "moco_clas backbone failurely freeze param update befor the layer: {}".
+                format(freeze_layer_name))
 
+    freeze_params(backbone)
     head_name = head_config.pop('name')
     head = eval(head_name)(**head_config)
     model = Classification(backbone=backbone, head=head)
