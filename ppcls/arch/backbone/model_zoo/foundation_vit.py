@@ -40,8 +40,8 @@ MODEL_URLS = {
     "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/foundation_models/BEiTv2_vit_large_patch16_224.pdparams",
     "CAE_vit_base_patch16_224":
     "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/foundation_models/CAE_vit_base_patch16_224.pdparams",
-    'EVA_vit_huge_patch14':
-    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/foundation_models/EVA_vit_huge_patch14.pdparams",
+    'EVA_vit_giant_patch14':
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/foundation_models/EVA_vit_giant_patch14.pdparams",
     "MOCOV3_vit_small":
     "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/foundation_models/MOCOV3_vit_small.pdparams",
     "MOCOV3_vit_base":
@@ -867,7 +867,7 @@ def MAE_vit_huge_patch14(pretrained=False, use_ssld=False, **kwargs):
     return model
 
 
-def EVA_vit_huge_patch14(pretrained=False, use_ssld=False, **kwargs):
+def EVA_vit_giant_patch14(pretrained=False, use_ssld=False, **kwargs):
     model_name = sys._getframe().f_code.co_name
     model = VisionTransformer(
         model_name=model_name,
