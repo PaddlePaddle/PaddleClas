@@ -84,6 +84,7 @@ function _set_env(){
     export FLAGS_cudnn_exhaustive_search=1
     export FLAGS_eager_delete_tensor_gb=0.0
     export FLAGS_conv_workspace_size_limit=4000
+    export FLAGS_apply_pass_to_program=true
 }
 
 
