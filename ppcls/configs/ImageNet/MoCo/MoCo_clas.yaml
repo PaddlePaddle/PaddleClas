@@ -8,7 +8,7 @@ Global:
   save_interval: 1
   eval_during_train: True
   eval_interval: 1
-  epochs: 10
+  epochs: 100
   print_batch_step: 10
   use_visualdl: False
   # used for static mode and model export
@@ -51,7 +51,7 @@ Optimizer:
   momentum: 0.9
   lr:
     name: MultiStepDecay
-    learning_rate: 15.0
+    learning_rate: 30.0
     milestones: [60, 80]
     # learning_rate: 30.0
 
@@ -76,9 +76,9 @@ DataLoader:
             std: [0.229, 0.224, 0.225]
             order: ''
     sampler:
-      batch_size: 32
+      batch_size: 64
       shuffle: True
-      drop_last: False
+      drop_last: True
     loader:
       num_workers: 4
       use_shared_memory: True
@@ -87,7 +87,7 @@ DataLoader:
     dataset:
       name: ImageNetDataset
       image_root: ./dataset/ILSVRC2012/
-      cls_label_path: ./dataset/ILSVRC2012/train_list.txt
+      cls_label_path: ./dataset/ILSVRC2012/val_list.txt
       return_label: True
       return_two_sample: False
       transform_ops:
@@ -105,7 +105,7 @@ DataLoader:
             order: ''
     sampler:
       name: DistributedBatchSampler
-      batch_size: 32
+      batch_size: 64
       shuffle: False
       drop_last: False
     loader:

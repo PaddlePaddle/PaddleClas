@@ -54,7 +54,7 @@ Optimizer:
     learning_rate: 0.015
     T_max: 200
 # learning_rate: 0.03
-# self.T_max = (self.epochs - self.warmup_epoch) * self.step_each_epoch
+
 
 # data loader for train 
 DataLoader:
