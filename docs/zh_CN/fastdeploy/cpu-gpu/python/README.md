@@ -17,7 +17,14 @@ pip install fastdeploy-gpu-python -f https://www.paddlepaddle.org.cn/whl/fastdep
 conda config --add channels conda-forge && conda install cudatoolkit=11.2 cudnn=8.2
 
 # 下载部署示例代码
+# 下载部署示例代码
+git clone https://github.com/PaddlePaddle/FastDeploy.git
+cd  FastDeploy/examples/vision/classification/paddleclas/cpu-gpu/python
+
+# 如果您希望从PaddleClas下载示例代码，请运行
 git clone https://github.com/PaddlePaddle/PaddleClas.git
+# 注意：如果当前分支找不到下面的fastdeploy测试代码，请切换到develop分支
+git checkout develop
 cd PaddleClas/deploy/fastdeploy/cpu-gpu/python
 
 # 下载ResNet50_vd模型文件和测试图片

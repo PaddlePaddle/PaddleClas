@@ -12,8 +12,14 @@
 # 安装FastDpeloy 预测库 python包（详细文档请参考`部署环境准备`）
 
 # 下载部署示例代码
+git clone https://github.com/PaddlePaddle/FastDeploy.git
+cd  FastDeploy/examples/vision/classification/paddleclas/kunlunxin/python
+
+# 如果您希望从PaddleClas下载示例代码，请运行
 git clone https://github.com/PaddlePaddle/PaddleClas.git
-cd PaddleClas/deploy/fastdeploy/kunlun/python
+# 注意：如果当前分支找不到下面的fastdeploy测试代码，请切换到develop分支
+git checkout develop
+cd PaddleClas/deploy/fastdeploy/kunlunxin/python
 
 # 下载ResNet50_vd模型文件和测试图片
 wget https://bj.bcebos.com/paddlehub/fastdeploy/ResNet50_vd_infer.tgz

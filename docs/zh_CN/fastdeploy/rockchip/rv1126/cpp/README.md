@@ -20,7 +20,16 @@ cp -r FastDeploy/build/fastdeploy-timvx/ PaddleClas/deploy/fastdeploy/rockchip/r
 
 3. 在当前路径下载部署所需的模型和示例图片：
 ```bash
+# 下载部署示例代码
+git clone https://github.com/PaddlePaddle/FastDeploy.git
+cd  FastDeploy/examples/vision/classification/paddleclas/rockchip/rv1126/cpp/
+
+# 如果您希望从PaddleClas下载示例代码，请运行
+git clone https://github.com/PaddlePaddle/PaddleClas.git
+# 注意：如果当前分支找不到下面的fastdeploy测试代码，请切换到develop分支
+git checkout develop
 cd PaddleClas/deploy/fastdeploy/rockchip/rv1126/cpp/
+
 mkdir models && mkdir images
 wget https://bj.bcebos.com/paddlehub/fastdeploy/resnet50_vd_ptq.tar
 tar -xvf resnet50_vd_ptq.tar

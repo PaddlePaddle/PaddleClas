@@ -1,1 +1,0 @@
-../../../docs/zh_CN/fastdeploy/kunlun/README.md
