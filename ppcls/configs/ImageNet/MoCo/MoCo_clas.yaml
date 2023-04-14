@@ -1,11 +1,11 @@
 # global configs
 Global:
   checkpoints: null
-  pretrained_model: ./pretrain/ppclas_moco_v2_r50_e200_ckpt
+  pretrained_model: /root/paddlejob/workspace/code/epoch_200
   output_dir: ./output/ 
   seed: 0
   device: gpu
-  save_interval: 1
+  save_interval: 20
   eval_during_train: True
   eval_interval: 1
   epochs: 100
@@ -76,9 +76,10 @@ DataLoader:
             std: [0.229, 0.224, 0.225]
             order: ''
     sampler:
+      name: DistributedBatchSampler
       batch_size: 64
       shuffle: True
-      drop_last: True
+      drop_last: False
     loader:
       num_workers: 4
       use_shared_memory: True
