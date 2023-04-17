@@ -264,7 +264,7 @@ class RandAugmentV2(RandAugment):
 
 
 class RandAugmentV3(RandAugment):
-    """Customed RandAugment for MobileViTv2"""
+    """Customed RandAugment for MobileViTV2"""
 
     def __init__(self,
                  num_layers=2,
