@@ -522,7 +522,9 @@ class Engine(object):
                 if isinstance(out, dict) and "output" in out:
                     out = out["output"]
 
-                results.extend(self.postprocess_func(out, image_file_list))
+                result = self.postprocess_func(out, image_file_list)
+                logger.info(result)
+                results.extend(result)
                 batch_data.clear()
                 image_file_list.clear()
         return results
