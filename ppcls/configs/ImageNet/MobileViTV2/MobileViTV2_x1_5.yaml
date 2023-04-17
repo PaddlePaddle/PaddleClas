@@ -14,7 +14,6 @@ Global:
   image_shape: [3, 256, 256]
   save_inference_dir: ./inference
   use_dali: False
-  update_freq: 2  # for 4 gpus
 
 # mixed precision training
 AMP:
@@ -50,13 +49,11 @@ Optimizer:
   weight_decay: 0.029
   one_dim_param_no_weight_decay: True
   lr:
-    # for 8 cards
     name: Cosine
     learning_rate: 0.0035  # for total batch size 1024
     eta_min: 0.00035
     warmup_epoch: 16  # 20000 iterations
     warmup_start_lr: 1e-6
-    # by_epoch: True
   clip_norm: 10
 
 # data loader for train and eval
