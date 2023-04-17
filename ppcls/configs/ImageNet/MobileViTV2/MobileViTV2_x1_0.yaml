@@ -28,7 +28,7 @@ EMA:
 
 # model architecture
 Arch:
-  name: MobileViTv2_x2_0
+  name: MobileViTV2_x1_0
   class_num: 1000
 
 # loss function config for traing/eval process
@@ -46,13 +46,13 @@ Optimizer:
   beta1: 0.9
   beta2: 0.999
   epsilon: 1e-8
-  weight_decay: 0.05
+  weight_decay: 0.013
   one_dim_param_no_weight_decay: True
   lr:
     # for 8 cards
     name: Cosine
-    learning_rate: 0.002
-    eta_min: 0.0002
+    learning_rate: 0.0075
+    eta_min: 0.00075
     warmup_epoch: 16  # 20000 iterations
     warmup_start_lr: 1e-6
     # by_epoch: True

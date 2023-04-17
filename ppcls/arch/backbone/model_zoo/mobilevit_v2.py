@@ -25,13 +25,13 @@ import paddle.nn.functional as F
 from ....utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
 
 MODEL_URLS = {
-    "MobileViTv2_x0_5": "",
-    "MobileViTv2_x0_75": "",
-    "MobileViTv2_x1_0": "",
-    "MobileViTv2_x1_25": "",
-    "MobileViTv2_x1_5": "",
-    "MobileViTv2_x1_75": "",
-    "MobileViTv2_x2_0": "",
+    "MobileViTV2_x0_5": "",
+    "MobileViTV2_x0_75": "",
+    "MobileViTV2_x1_0": "",
+    "MobileViTV2_x1_25": "",
+    "MobileViTV2_x1_5": "",
+    "MobileViTV2_x1_75": "",
+    "MobileViTV2_x2_0": "",
 }
 
 layer_norm_2d = partial(nn.GroupNorm, num_groups=1)
@@ -179,9 +179,9 @@ class LinearAttnFFN(nn.Layer):
         return x
 
 
-class MobileViTv2Block(nn.Layer):
+class MobileViTV2Block(nn.Layer):
     """
-    This class defines the `MobileViTv2 block`
+    This class defines the `MobileViTV2 block`
     """
 
     def __init__(self,
@@ -302,9 +302,9 @@ class MobileViTv2Block(nn.Layer):
         return fm
 
 
-class MobileViTv2(nn.Layer):
+class MobileViTV2(nn.Layer):
     """
-        MobileViTv2
+        MobileViTV2
     """
 
     def __init__(self,
@@ -415,7 +415,7 @@ class MobileViTv2(nn.Layer):
             input_channel = cfg.get("out_channels")
 
         block.append(
-            MobileViTv2Block(
+            MobileViTV2Block(
                 in_channels=input_channel,
                 attn_unit_dim=cfg["attn_unit_dim"],
                 ffn_multiplier=cfg.get("ffn_multiplier"),
@@ -540,64 +540,64 @@ def get_configuration(width_multiplier) -> Dict:
     return config
 
 
-def MobileViTv2_x2_0(pretrained=False, use_ssld=False, **kwargs):
+def MobileViTV2_x2_0(pretrained=False, use_ssld=False, **kwargs):
     width_multiplier = 2.0
-    model = MobileViTv2(get_configuration(width_multiplier), **kwargs)
+    model = MobileViTV2(get_configuration(width_multiplier), **kwargs)
 
     _load_pretrained(
-        pretrained, model, MODEL_URLS["MobileViTv2_x2_0"], use_ssld=use_ssld)
+        pretrained, model, MODEL_URLS["MobileViTV2_x2_0"], use_ssld=use_ssld)
     return model
 
 
-def MobileViTv2_x1_75(pretrained=False, use_ssld=False, **kwargs):
+def MobileViTV2_x1_75(pretrained=False, use_ssld=False, **kwargs):
     width_multiplier = 1.75
-    model = MobileViTv2(get_configuration(width_multiplier), **kwargs)
+    model = MobileViTV2(get_configuration(width_multiplier), **kwargs)
 
     _load_pretrained(
-        pretrained, model, MODEL_URLS["MobileViTv2_x1_75"], use_ssld=use_ssld)
+        pretrained, model, MODEL_URLS["MobileViTV2_x1_75"], use_ssld=use_ssld)
     return model
 
 
-def MobileViTv2_x1_5(pretrained=False, use_ssld=False, **kwargs):
+def MobileViTV2_x1_5(pretrained=False, use_ssld=False, **kwargs):
     width_multiplier = 1.5
-    model = MobileViTv2(get_configuration(width_multiplier), **kwargs)
+    model = MobileViTV2(get_configuration(width_multiplier), **kwargs)
 
     _load_pretrained(
-        pretrained, model, MODEL_URLS["MobileViTv2_x1_5"], use_ssld=use_ssld)
+        pretrained, model, MODEL_URLS["MobileViTV2_x1_5"], use_ssld=use_ssld)
     return model
 
 
-def MobileViTv2_x1_25(pretrained=False, use_ssld=False, **kwargs):
+def MobileViTV2_x1_25(pretrained=False, use_ssld=False, **kwargs):
     width_multiplier = 1.25
-    model = MobileViTv2(get_configuration(width_multiplier), **kwargs)
+    model = MobileViTV2(get_configuration(width_multiplier), **kwargs)
 
     _load_pretrained(
-        pretrained, model, MODEL_URLS["MobileViTv2_x1_25"], use_ssld=use_ssld)
+        pretrained, model, MODEL_URLS["MobileViTV2_x1_25"], use_ssld=use_ssld)
     return model
 
 
-def MobileViTv2_x1_0(pretrained=False, use_ssld=False, **kwargs):
+def MobileViTV2_x1_0(pretrained=False, use_ssld=False, **kwargs):
     width_multiplier = 1.0
-    model = MobileViTv2(get_configuration(width_multiplier), **kwargs)
+    model = MobileViTV2(get_configuration(width_multiplier), **kwargs)
 
     _load_pretrained(
-        pretrained, model, MODEL_URLS["MobileViTv2_x1_0"], use_ssld=use_ssld)
+        pretrained, model, MODEL_URLS["MobileViTV2_x1_0"], use_ssld=use_ssld)
     return model
 
 
-def MobileViTv2_x0_75(pretrained=False, use_ssld=False, **kwargs):
+def MobileViTV2_x0_75(pretrained=False, use_ssld=False, **kwargs):
     width_multiplier = 0.75
-    model = MobileViTv2(get_configuration(width_multiplier), **kwargs)
+    model = MobileViTV2(get_configuration(width_multiplier), **kwargs)
 
     _load_pretrained(
-        pretrained, model, MODEL_URLS["MobileViTv2_x0_75"], use_ssld=use_ssld)
+        pretrained, model, MODEL_URLS["MobileViTV2_x0_75"], use_ssld=use_ssld)
     return model
 
 
-def MobileViTv2_x0_5(pretrained=False, use_ssld=False, **kwargs):
+def MobileViTV2_x0_5(pretrained=False, use_ssld=False, **kwargs):
     width_multiplier = 0.5
-    model = MobileViTv2(get_configuration(width_multiplier), **kwargs)
+    model = MobileViTV2(get_configuration(width_multiplier), **kwargs)
 
     _load_pretrained(
-        pretrained, model, MODEL_URLS["MobileViTv2_x0_5"], use_ssld=use_ssld)
+        pretrained, model, MODEL_URLS["MobileViTV2_x0_5"], use_ssld=use_ssld)
     return model
