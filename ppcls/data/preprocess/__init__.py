@@ -16,6 +16,7 @@ from ppcls.data.preprocess.ops.autoaugment import ImageNetPolicy as RawImageNetP
 from ppcls.data.preprocess.ops.randaugment import RandAugment as RawRandAugment
 from ppcls.data.preprocess.ops.randaugment import RandomApply
 from ppcls.data.preprocess.ops.randaugment import RandAugmentV2 as RawRandAugmentV2
+from ppcls.data.preprocess.ops.randaugment import RandAugmentV3 as RawRandAugmentV3
 from ppcls.data.preprocess.ops.timm_autoaugment import RawTimmAutoAugment
 from ppcls.data.preprocess.ops.cutout import Cutout
 
@@ -57,6 +58,7 @@ from ppcls.data.preprocess.batch_ops.batch_operators import MixupCutmixHybrid
 import numpy as np
 from PIL import Image
 import random
+
 
 def transform(data, ops=[]):
     """ transform """
@@ -105,6 +107,25 @@ class RandAugment(RawRandAugment):
 
 class RandAugmentV2(RawRandAugmentV2):
     """ RandAugmentV2 wrapper to auto fit different img types """
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+    def __call__(self, img):
+        if not isinstance(img, Image.Image):
+            img = np.ascontiguousarray(img)
+            img = Image.fromarray(img)
+
+        img = super().__call__(img)
+
+        if isinstance(img, Image.Image):
+            img = np.asarray(img)
+
+        return img
+
+
+class RandAugmentV3(RawRandAugmentV3):
+    """ RandAugmentV3 wrapper to auto fit different img types """
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
