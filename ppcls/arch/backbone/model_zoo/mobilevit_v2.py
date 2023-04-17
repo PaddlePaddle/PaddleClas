@@ -58,8 +58,8 @@ class InvertedResidual(nn.Layer):
                  expand_ratio: Union[int, float],
                  dilation: int=1,
                  skip_connection: Optional[bool]=True) -> None:
+        super().__init__()
         assert stride in [1, 2]
-        super(InvertedResidual, self).__init__()
         self.stride = stride
 
         hidden_dim = make_divisible(int(round(in_channels * expand_ratio)), 8)
@@ -101,7 +101,7 @@ class InvertedResidual(nn.Layer):
         self.exp = expand_ratio
         self.dilation = dilation
 
-    def forward(self, x, *args, **kwargs):
+    def forward(self, x):
         if self.use_res_connect:
             return x + self.block(x)
         else:
@@ -197,8 +197,8 @@ class MobileViTV2Block(nn.Layer):
                  conv_ksize: Optional[int]=3,
                  dilation: Optional[int]=1,
                  attn_norm_layer: Optional[str]=layer_norm_2d):
+        super().__init__()
         cnn_out_dim = attn_unit_dim
-
         padding = (conv_ksize - 1) // 2 * dilation
         conv_3x3_in = nn.Sequential(
             ('conv', nn.Conv2D(
@@ -213,7 +213,6 @@ class MobileViTV2Block(nn.Layer):
         conv_1x1_in = nn.Sequential(('conv', nn.Conv2D(
             in_channels, cnn_out_dim, 1, bias_attr=False)))
 
-        super().__init__()
         self.local_rep = nn.Sequential(conv_3x3_in, conv_1x1_in)
 
         self.global_rep, attn_unit_dim = self._build_attn_layer(
