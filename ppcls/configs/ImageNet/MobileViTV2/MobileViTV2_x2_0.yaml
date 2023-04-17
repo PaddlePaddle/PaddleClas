@@ -49,13 +49,11 @@ Optimizer:
   weight_decay: 0.05
   one_dim_param_no_weight_decay: True
   lr:
-    # for 8 cards
     name: Cosine
-    learning_rate: 0.002
+    learning_rate: 0.002  # for total batch size 1024
     eta_min: 0.0002
     warmup_epoch: 16  # 20000 iterations
     warmup_start_lr: 1e-6
-    # by_epoch: True
   clip_norm: 10
 
 # data loader for train and eval
