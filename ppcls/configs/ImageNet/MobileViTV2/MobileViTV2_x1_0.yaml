@@ -105,7 +105,7 @@ DataLoader:
       drop_last: False
       shuffle: True
     loader:
-      num_workers: 4
+      num_workers: 8
       use_shared_memory: True
   Eval:
     dataset:
@@ -134,7 +134,7 @@ DataLoader:
       drop_last: False
       shuffle: False
     loader:
-      num_workers: 4
+      num_workers: 8
       use_shared_memory: True
 
 Infer:
