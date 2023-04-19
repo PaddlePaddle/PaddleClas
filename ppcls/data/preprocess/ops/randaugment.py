@@ -16,12 +16,22 @@
 # reference: https://arxiv.org/abs/1909.13719
 
 import random
-from .operators import RawColorJitter
-from .timm_autoaugment import _pil_interp
 from paddle.vision.transforms import transforms as T
 
 import numpy as np
 from PIL import Image, ImageEnhance, ImageOps
+
+
+def _pil_interp(method):
+    if method == 'bicubic':
+        return Image.BICUBIC
+    elif method == 'lanczos':
+        return Image.LANCZOS
+    elif method == 'hamming':
+        return Image.HAMMING
+    elif method == 'nearest':
+        return Image.NEAREST
+    raise NotImplementedError
 
 
 def solarize_add(img, add, thresh=128, **__):
@@ -71,93 +81,6 @@ def cutout(image, pad_size, replace=0):
     return Image.fromarray(image_np)
 
 
-class RandAugment(object):
-    def __init__(self, num_layers=2, magnitude=5, fillcolor=(128, 128, 128)):
-        self.num_layers = num_layers
-        self.magnitude = magnitude
-        self.max_level = 10
-
-        abso_level = self.magnitude / self.max_level
-        self.level_map = {
-            "shearX": 0.3 * abso_level,
-            "shearY": 0.3 * abso_level,
-            "translateX": 150.0 / 331 * abso_level,
-            "translateY": 150.0 / 331 * abso_level,
-            "rotate": 30 * abso_level,
-            "color": 0.9 * abso_level,
-            "posterize": int(4.0 * abso_level),
-            "solarize": 256.0 * abso_level,
-            "contrast": 0.9 * abso_level,
-            "sharpness": 0.9 * abso_level,
-            "brightness": 0.9 * abso_level,
-            "autocontrast": 0,
-            "equalize": 0,
-            "invert": 0
-        }
-
-        # from https://stackoverflow.com/questions/5252170/
-        # specify-image-filling-color-when-rotating-in-python-with-pil-and-setting-expand
-        def rotate_with_fill(img, magnitude):
-            rot = img.convert("RGBA").rotate(magnitude)
-            return Image.composite(rot,
-                                   Image.new("RGBA", rot.size, (128, ) * 4),
-                                   rot).convert(img.mode)
-
-        rnd_ch_op = random.choice
-
-        self.func = {
-            "shearX": lambda img, magnitude: img.transform(
-                img.size,
-                Image.AFFINE,
-                (1, magnitude * rnd_ch_op([-1, 1]), 0, 0, 1, 0),
-                Image.BICUBIC,
-                fillcolor=fillcolor),
-            "shearY": lambda img, magnitude: img.transform(
-                img.size,
-                Image.AFFINE,
-                (1, 0, 0, magnitude * rnd_ch_op([-1, 1]), 1, 0),
-                Image.BICUBIC,
-                fillcolor=fillcolor),
-            "translateX": lambda img, magnitude: img.transform(
-                img.size,
-                Image.AFFINE,
-                (1, 0, magnitude * img.size[0] * rnd_ch_op([-1, 1]), 0, 1, 0),
-                fillcolor=fillcolor),
-            "translateY": lambda img, magnitude: img.transform(
-                img.size,
-                Image.AFFINE,
-                (1, 0, 0, 0, 1, magnitude * img.size[1] * rnd_ch_op([-1, 1])),
-                fillcolor=fillcolor),
-            "rotate": lambda img, magnitude: rotate_with_fill(img, magnitude),
-            "color": lambda img, magnitude: ImageEnhance.Color(img).enhance(
-                1 + magnitude * rnd_ch_op([-1, 1])),
-            "posterize": lambda img, magnitude:
-                ImageOps.posterize(img, magnitude),
-            "solarize": lambda img, magnitude:
-                ImageOps.solarize(img, magnitude),
-            "contrast": lambda img, magnitude:
-                ImageEnhance.Contrast(img).enhance(
-                    1 + magnitude * rnd_ch_op([-1, 1])),
-            "sharpness": lambda img, magnitude:
-                ImageEnhance.Sharpness(img).enhance(
-                    1 + magnitude * rnd_ch_op([-1, 1])),
-            "brightness": lambda img, magnitude:
-                ImageEnhance.Brightness(img).enhance(
-                    1 + magnitude * rnd_ch_op([-1, 1])),
-            "autocontrast": lambda img, _:
-                ImageOps.autocontrast(img),
-            "equalize": lambda img, _: ImageOps.equalize(img),
-            "invert": lambda img, _: ImageOps.invert(img)
-        }
-
-    def __call__(self, img):
-        avaiable_op_names = list(self.level_map.keys())
-        for layer_num in range(self.num_layers):
-            op_name = np.random.choice(avaiable_op_names)
-            img = self.func[op_name](img, self.level_map[op_name])
-        return img
-
-
 class RandomApply(object):
     def __init__(self, p, transforms):
         self.p = p
@@ -175,173 +98,138 @@ class RandomApply(object):
         return timg
 
 
-## RandAugment_EfficientNetV2 code below ##
-class RandAugmentV2(RandAugment):
-    """Customed RandAugment for EfficientNetV2"""
-
+class RandAugment(object):
     def __init__(self,
                  num_layers=2,
                  magnitude=5,
-                 progress_magnitude=None,
-                 fillcolor=(128, 128, 128)):
-        super().__init__(num_layers, magnitude, fillcolor)
-        self.progress_magnitude = progress_magnitude
-        abso_level = self.magnitude / self.max_level
-        self.level_map = {
-            "shearX": 0.3 * abso_level,
-            "shearY": 0.3 * abso_level,
-            "translateX": 100.0 * abso_level,
-            "translateY": 100.0 * abso_level,
-            "rotate": 30 * abso_level,
-            "color": 1.8 * abso_level + 0.1,
-            "posterize": int(4.0 * abso_level),
-            "solarize": int(256.0 * abso_level),
-            "solarize_add": int(110.0 * abso_level),
-            "contrast": 1.8 * abso_level + 0.1,
-            "sharpness": 1.8 * abso_level + 0.1,
-            "brightness": 1.8 * abso_level + 0.1,
-            "autocontrast": 0,
-            "equalize": 0,
-            "invert": 0,
-            "cutout": int(40 * abso_level)
-        }
-
-        # from https://stackoverflow.com/questions/5252170/
-        # specify-image-filling-color-when-rotating-in-python-with-pil-and-setting-expand
-        def rotate_with_fill(img, magnitude):
-            rot = img.convert("RGBA").rotate(magnitude)
-            return Image.composite(rot,
-                                   Image.new("RGBA", rot.size, (128, ) * 4),
-                                   rot).convert(img.mode)
-
-        rnd_ch_op = random.choice
-
-        self.func = {
-            "shearX": lambda img, magnitude: img.transform(
-                img.size,
-                Image.AFFINE,
-                (1, magnitude * rnd_ch_op([-1, 1]), 0, 0, 1, 0),
-                Image.NEAREST,
-                fillcolor=fillcolor),
-            "shearY": lambda img, magnitude: img.transform(
-                img.size,
-                Image.AFFINE,
-                (1, 0, 0, magnitude * rnd_ch_op([-1, 1]), 1, 0),
-                Image.NEAREST,
-                fillcolor=fillcolor),
-            "translateX": lambda img, magnitude: img.transform(
-                img.size,
-                Image.AFFINE,
-                (1, 0, magnitude * rnd_ch_op([-1, 1]), 0, 1, 0),
-                Image.NEAREST,
-                fillcolor=fillcolor),
-            "translateY": lambda img, magnitude: img.transform(
-                img.size,
-                Image.AFFINE,
-                (1, 0, 0, 0, 1, magnitude * rnd_ch_op([-1, 1])),
-                Image.NEAREST,
-                fillcolor=fillcolor),
-            "rotate": lambda img, magnitude: rotate_with_fill(img, magnitude * rnd_ch_op([-1, 1])),
-            "color": lambda img, magnitude: ImageEnhance.Color(img).enhance(magnitude),
-            "posterize": lambda img, magnitude:
-                ImageOps.posterize(img, magnitude),
-            "solarize": lambda img, magnitude:
-                ImageOps.solarize(img, magnitude),
-            "solarize_add": lambda img, magnitude:
-                solarize_add(img, magnitude),
-            "contrast": lambda img, magnitude:
-                ImageEnhance.Contrast(img).enhance(magnitude),
-            "sharpness": lambda img, magnitude:
-                ImageEnhance.Sharpness(img).enhance(magnitude),
-            "brightness": lambda img, magnitude:
-                ImageEnhance.Brightness(img).enhance(magnitude),
-            "autocontrast": lambda img, _:
-                ImageOps.autocontrast(img),
-            "equalize": lambda img, _: ImageOps.equalize(img),
-            "invert": lambda img, _: ImageOps.invert(img),
-            "cutout": lambda img, magnitude: cutout(img, magnitude, replace=fillcolor[0])
-        }
-
-
-class RandAugmentV3(RandAugment):
-    """Customed RandAugment for MobileViTV2"""
-
-    def __init__(self,
-                 num_layers=2,
-                 magnitude=3,
-                 fillcolor=(0, 0, 0),
+                 fillcolor=(128, 128, 128),
                  interpolation="bicubic"):
         self.num_layers = num_layers
         self.magnitude = magnitude
-        self.max_level = 10
-        interpolation = _pil_interp(interpolation)
+        self.fillcolor = tuple(fillcolor)
+        self.interpolation = _pil_interp(interpolation)
 
-        abso_level = self.magnitude / self.max_level
-        self.level_map = {
-            "shearX": 0.3 * abso_level,
-            "shearY": 0.3 * abso_level,
-            "translateX": 150.0 / 331.0 * abso_level,
-            "translateY": 150.0 / 331.0 * abso_level,
-            "rotate": 30 * abso_level,
-            "color": 0.9 * abso_level,
-            "posterize": 8 - int(4.0 * abso_level),
-            "solarize": 255.0 * (1 - abso_level),
-            "contrast": 0.9 * abso_level,
-            "sharpness": 0.9 * abso_level,
-            "brightness": 0.9 * abso_level,
-            "autocontrast": 0,
-            "equalize": 0,
-            "invert": 0
-        }
+        self.set_augmentation()
+        self.set_func()
 
-        rnd_ch_op = random.choice
+    def set_func(self):
+        sig = lambda signed: random.choice([-1, 1]) if signed else 1
 
         self.func = {
-            "shearX": lambda img, magnitude: img.transform(
+            "shearX": lambda img, magnitude, signed: img.transform(
                 img.size,
                 Image.AFFINE,
-                (1, magnitude * rnd_ch_op([-1, 1]), 0, 0, 1, 0),
-                interpolation,
-                fillcolor=fillcolor),
-            "shearY": lambda img, magnitude: img.transform(
+                (1, magnitude * sig(signed), 0, 0, 1, 0),
+                self.interpolation,
+                fillcolor=self.fillcolor),
+            "shearY": lambda img, magnitude, signed: img.transform(
                 img.size,
                 Image.AFFINE,
-                (1, 0, 0, magnitude * rnd_ch_op([-1, 1]), 1, 0),
-                interpolation,
-                fillcolor=fillcolor),
-            "translateX": lambda img, magnitude: img.transform(
+                (1, 0, 0, magnitude * sig(signed), 1, 0),
+                self.interpolation,
+                fillcolor=self.fillcolor),
+            "translateX": lambda img, magnitude, signed: img.transform(
                 img.size,
                 Image.AFFINE,
-                (1, 0, magnitude * img.size[0] * rnd_ch_op([-1, 1]), 0, 1, 0),
-                interpolation,
-                fillcolor=fillcolor),
-            "translateY": lambda img, magnitude: img.transform(
+                (1, 0, magnitude * img.size[0] * sig(signed), 0, 1, 0),
+                self.interpolation,
+                fillcolor=self.fillcolor),
+            "translateY": lambda img, magnitude, signed: img.transform(
                 img.size,
                 Image.AFFINE,
-                (1, 0, 0, 0, 1, magnitude * img.size[1] * rnd_ch_op([-1, 1])),
-                interpolation,
-                fillcolor=fillcolor),
-            "rotate": lambda img, magnitude: img.rotate(
-                magnitude * rnd_ch_op([-1, 1]),
-                interpolation,
-                fillcolor=fillcolor),
-            "color": lambda img, magnitude: ImageEnhance.Color(img).enhance(
-                1 + magnitude * rnd_ch_op([-1, 1])),
-            "posterize": lambda img, magnitude:
-                ImageOps.posterize(img, magnitude),
-            "solarize": lambda img, magnitude:
-                ImageOps.solarize(img, magnitude),
-            "contrast": lambda img, magnitude:
+                (1, 0, 0, 0, 1, magnitude * img.size[1] * sig(signed)),
+                self.interpolation,
+                fillcolor=self.fillcolor),
+            "rotate": lambda img, magnitude, signed: img.rotate(
+                magnitude * sig(signed),
+                self.interpolation,
+                fillcolor=self.fillcolor),
+            "color": lambda img, magnitude, signed: ImageEnhance.Color(img).enhance(
+                1 + magnitude * sig(signed)),
+            "posterize": lambda img, magnitude, signed:
+                ImageOps.posterize(img, magnitude * sig(signed)),
+            "solarize": lambda img, magnitude, signed:
+                ImageOps.solarize(img, magnitude * sig(signed)),
+            "contrast": lambda img, magnitude, signed:
                 ImageEnhance.Contrast(img).enhance(
-                    1 + magnitude * rnd_ch_op([-1, 1])),
-            "sharpness": lambda img, magnitude:
+                    1 + magnitude * sig(signed)),
+            "sharpness": lambda img, magnitude, signed:
                 ImageEnhance.Sharpness(img).enhance(
-                    1 + magnitude * rnd_ch_op([-1, 1])),
-            "brightness": lambda img, magnitude:
+                    1 + magnitude * sig(signed)),
+            "brightness": lambda img, magnitude, signed:
                 ImageEnhance.Brightness(img).enhance(
-                    1 + magnitude * rnd_ch_op([-1, 1])),
-            "autocontrast": lambda img, _:
+                    1 + magnitude * sig(signed)),
+            "autocontrast": lambda img, *_:
                 ImageOps.autocontrast(img),
-            "equalize": lambda img, _: ImageOps.equalize(img),
-            "invert": lambda img, _: ImageOps.invert(img)
+            "equalize": lambda img, *_: ImageOps.equalize(img),
+            "invert": lambda img, *_: ImageOps.invert(img),
         }
+
+    def set_augmentation(self):
+        abso_level = self.magnitude / 10
+        self.level_map = {
+            "shearX": (0.3 * abso_level, True),
+            "shearY": (0.3 * abso_level, True),
+            "translateX": (150.0 / 331.0 * abso_level, True),
+            "translateY": (150.0 / 331.0 * abso_level, True),
+            "rotate": (30 * abso_level, False),
+            "color": (0.9 * abso_level, True),
+            "posterize": (int(4.0 * abso_level), False),
+            "solarize": (256.0 * abso_level, False),
+            "contrast": (0.9 * abso_level, True),
+            "sharpness": (0.9 * abso_level, True),
+            "brightness": (0.9 * abso_level, True),
+            "autocontrast": (0, False),
+            "equalize": (0, False),
+            "invert": (0, False),
+        }
+
+    def __call__(self, img):
+        avaiable_op_names = list(self.level_map.keys())
+        for _ in range(self.num_layers):
+            op_name = np.random.choice(avaiable_op_names)
+            img = self.func[op_name](img, *self.level_map[op_name])
+        return img
+
+
+class RandAugmentV2(RandAugment):
+    """Customed RandAugment for EfficientNetV2"""
+
+    def set_func(self):
+        super().set_func()
+        sig = lambda signed: random.choice([-1, 1]) if signed else 1
+        self.func.update({
+            "solarize_add": lambda img, magnitude, signed: solarize_add(
+                img, magnitude * sig(signed)),
+            "cutout": lambda img, magnitude, signed: cutout(
+                img, magnitude * sig(signed), replace=self.fillcolor[0]),
+        })
+
+    def set_augmentation(self):
+        super().set_augmentation()
+        abso_level = self.magnitude / 10
+        self.level_map.update({
+            "translateX": (100.0 * abso_level, True),
+            "translateY": (100.0 * abso_level, True),
+            "rotate": (30 * abso_level, True),
+            "color": (1.8 * abso_level - 0.9, False),
+            "solarize": (int(256.0 * abso_level), False),
+            "solarize_add": (int(110.0 * abso_level), False),  # add
+            "contrast": (1.8 * abso_level - 0.9, False),
+            "sharpness": (1.8 * abso_level - 0.9, False),
+            "brightness": (1.8 * abso_level - 0.9, False),
+            "cutout": (int(40 * abso_level), False),  # add
+        })
+
+
+class RandAugmentV3(RandAugment):
+    """Customed RandAugment for MobileViTv2"""
+
+    def set_augmentation(self):
+        super().set_augmentation()
+        abso_level = self.magnitude / 10
+        self.level_map.update({
+            "rotate": (30 * abso_level, True),
+            "posterize": (8 - int(4.0 * abso_level), False),
+            "solarize": (255.0 * (1 - abso_level), False),
+        })

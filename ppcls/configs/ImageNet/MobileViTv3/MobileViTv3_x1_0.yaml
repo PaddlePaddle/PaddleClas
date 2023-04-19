@@ -79,7 +79,8 @@ DataLoader:
             flip_code: 1
         - RandAugmentV3:
             num_layers: 2
-            interpolation: bicubic
+            magnitude: 3
+            fillcolor: [0, 0, 0]
         - NormalizeImage:
             scale: 1.0/255.0
             mean: [0.0, 0.0, 0.0]
