@@ -23,6 +23,9 @@ __dir__ = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(__dir__)
 sys.path.append(os.path.abspath(os.path.join(__dir__, '../../')))
 
+import numpy as np
+import random
+
 import paddle
 from paddle.distributed import fleet
 from visualdl import LogWriter
@@ -65,6 +68,15 @@ def main(args):
     all the config of training paradigm should be in config["Global"]
     """
     config = get_config(args.config, overrides=args.override, show=False)
+
+    # set seed
+    seed = config["Global"].get("seed", False)
+    if seed or seed == 0:
+        assert isinstance(seed, int), "The 'seed' must be a integer!"
+        paddle.seed(seed)
+        np.random.seed(seed)
+        random.seed(seed)
+
     global_config = config["Global"]
 
     mode = "train"
@@ -207,6 +219,5 @@ def main(args):
 
 if __name__ == '__main__':
     paddle.enable_static()
-    paddle.seed(0)
     args = parse_args()
     main(args)
