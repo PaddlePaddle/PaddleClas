@@ -77,6 +77,9 @@ DataLoader:
             mean: [128.0, 128.0, 128.0]
             std: [128.0, 128.0, 128.0]
             order: ""
+      batch_transform_ops:
+        - MixupOperator:
+            alpha: 0.2
 
     sampler:
       name: DistributedBatchSampler
