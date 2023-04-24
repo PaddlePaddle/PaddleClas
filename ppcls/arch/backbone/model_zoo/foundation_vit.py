@@ -16,11 +16,12 @@
 # reference: https://arxiv.org/abs/2010.11929
 
 from collections.abc import Callable, Iterable
+import sys
 
 import numpy as np
 import paddle
 import paddle.nn as nn
-import sys
+from paddle import ParamAttr
 from paddle.nn.initializer import TruncatedNormal, Constant, Normal
 
 from ....utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
@@ -228,14 +229,23 @@ class Mlp(nn.Layer):
                  hidden_features=None,
                  out_features=None,
                  act_layer=nn.GELU,
-                 drop=0.):
+                 drop=0.,
+                 lr_mult=1.0):
         super().__init__()
         out_features = out_features or in_features
         hidden_features = hidden_features or in_features
-        self.fc1 = nn.Linear(in_features, hidden_features)
+        self.fc1 = nn.Linear(
+            in_features,
+            hidden_features,
+            bias_attr=ParamAttr(learning_rate=lr_mult),
+            weight_attr=ParamAttr(learning_rate=lr_mult))
         self.act = act_layer() if _model_size not in _model_diff[
             'replace_mlp_GELU'] else QuickGELU()
-        self.fc2 = nn.Linear(hidden_features, out_features)
+        self.fc2 = nn.Linear(
+            hidden_features,
+            out_features,
+            bias_attr=ParamAttr(learning_rate=lr_mult),
+            weight_attr=ParamAttr(learning_rate=lr_mult))
         self.drop = nn.Dropout(drop)
 
     def forward(self, x):
@@ -256,7 +266,8 @@ class Attention(nn.Layer):
                  attn_drop=0.,
                  proj_drop=0.,
                  model_name=None,
-                 window_size=None):
+                 window_size=None,
+                 lr_mult=1.0):
         super().__init__()
         self._model_name = model_name
 
@@ -273,9 +284,14 @@ class Attention(nn.Layer):
         head_dim = dim // num_heads
         self.scale = qk_scale or head_dim**-0.5
 
-        self.qkv = nn.Linear(dim, dim * 3, bias_attr=qkv_bias)
+        self.qkv = nn.Linear(
+            dim,
+            dim * 3,
+            bias_attr=ParamAttr(learning_rate=lr_mult) if qkv_bias else False,
+            weight_attr=ParamAttr(learning_rate=lr_mult))
         self.attn_drop = nn.Dropout(attn_drop)
-        self.proj = nn.Linear(dim, dim)
+        self.proj = nn.Linear(
+            dim, dim, weight_attr=ParamAttr(learning_rate=lr_mult))
         self.proj_drop = nn.Dropout(proj_drop)
 
     def _register_relative_position_index(
@@ -356,15 +372,23 @@ class Block(nn.Layer):
                  act_layer=nn.GELU,
                  norm_layer='nn.LayerNorm',
                  epsilon=1e-5,
-                 window_size=None):
+                 window_size=None,
+                 lr_mult=1.0):
         super().__init__()
         global _model_size
         global _model_diff
         self._model_name = model_name
         if isinstance(norm_layer, str):
-            self.norm1 = eval(norm_layer)(dim, epsilon=epsilon)
+            self.norm1 = eval(norm_layer)(
+                dim,
+                epsilon=epsilon,
+                weight_attr=ParamAttr(learning_rate=lr_mult),
+                bias_attr=ParamAttr(learning_rate=lr_mult))
         elif isinstance(norm_layer, Callable):
-            self.norm1 = norm_layer(dim)
+            self.norm1 = norm_layer(
+                dim,
+                weight_attr=ParamAttr(learning_rate=lr_mult),
+                bias_attr=ParamAttr(learning_rate=lr_mult))
         else:
             raise TypeError(
                 "The norm_layer must be str or paddle.nn.layer.Layer class")
@@ -376,25 +400,35 @@ class Block(nn.Layer):
             attn_drop=attn_drop,
             proj_drop=drop,
             model_name=self._model_name,
-            window_size=window_size)
+            window_size=window_size,
+            lr_mult=lr_mult)
         # NOTE: drop path for stochastic depth, we shall see if this is better than dropout here
         self.drop_path = DropPath(drop_path) if drop_path > 0. else Identity()
 
         if _model_size in _model_diff['add_mul_gamma_to_msa_mlp']:
             self.gamma_1 = self.create_parameter(
                 [dim],
-                default_initializer=nn.initializer.Constant(value=init_values))
+                default_initializer=nn.initializer.Constant(value=init_values),
+                attr=ParamAttr(learning_rate=lr_mult))
             self.gamma_2 = self.create_parameter(
                 [dim],
-                default_initializer=nn.initializer.Constant(value=init_values))
+                default_initializer=nn.initializer.Constant(value=init_values),
+                attr=ParamAttr(learning_rate=lr_mult))
         else:
             self.gamma_1 = None
             self.gamma_2 = None
 
         if isinstance(norm_layer, str):
-            self.norm2 = eval(norm_layer)(dim, epsilon=epsilon)
+            self.norm2 = eval(norm_layer)(
+                dim,
+                epsilon=epsilon,
+                weight_attr=ParamAttr(learning_rate=lr_mult),
+                bias_attr=ParamAttr(learning_rate=lr_mult))
         elif isinstance(norm_layer, Callable):
-            self.norm2 = norm_layer(dim)
+            self.norm2 = norm_layer(
+                dim,
+                weight_attr=ParamAttr(learning_rate=lr_mult),
+                bias_attr=ParamAttr(learning_rate=lr_mult))
         else:
             raise TypeError(
                 "The norm_layer must be str or paddle.nn.layer.Layer class")
@@ -402,7 +436,8 @@ class Block(nn.Layer):
         self.mlp = Mlp(in_features=dim,
                        hidden_features=mlp_hidden_dim,
                        act_layer=act_layer,
-                       drop=drop)
+                       drop=drop,
+                       lr_mult=lr_mult)
 
     def forward(self, x, rel_pos_bias=None):
         if self.gamma_1 is not None:
@@ -418,14 +453,15 @@ class Block(nn.Layer):
 
 
 class RelativePositionBias(nn.Layer):
-    def __init__(self, window_size, num_heads):
+    def __init__(self, window_size, num_heads, lr_mult=1.0):
         super().__init__()
         self.window_size = window_size
         self.num_relative_distance = (2 * window_size[0] - 1) * (
             2 * window_size[1] - 1) + 3
         self.relative_position_bias_table = self.create_parameter(
             [self.num_relative_distance, num_heads],
-            default_initializer=zeros_)  # 2*Wh-1 * 2*Ww-1, nH
+            default_initializer=zeros_,
+            attr=ParamAttr(learning_rate=lr_mult))  # 2*Wh-1 * 2*Ww-1, nH
         # cls to token & token 2 cls & cls to cls
 
         # get pair-wise relative position index for each token inside the window
@@ -467,7 +503,12 @@ class PatchEmbed(nn.Layer):
     """ Image to Patch Embedding
     """
 
-    def __init__(self, img_size=224, patch_size=16, in_chans=3, embed_dim=768):
+    def __init__(self,
+                 img_size=224,
+                 patch_size=16,
+                 in_chans=3,
+                 embed_dim=768,
+                 lr_mult=1.0):
         super().__init__()
         img_size = to_2tuple(img_size)
         patch_size = to_2tuple(patch_size)
@@ -478,7 +519,12 @@ class PatchEmbed(nn.Layer):
         self.num_patches = num_patches
 
         self.proj = nn.Conv2D(
-            in_chans, embed_dim, kernel_size=patch_size, stride=patch_size)
+            in_chans,
+            embed_dim,
+            kernel_size=patch_size,
+            stride=patch_size,
+            weight_attr=ParamAttr(learning_rate=lr_mult),
+            bias_attr=ParamAttr(learning_rate=lr_mult))
 
     def forward(self, x):
         B, C, H, W = x.shape
@@ -545,6 +591,7 @@ class VisionTransformer(nn.Layer):
                  drop_path_rate=0.,
                  norm_layer='nn.LayerNorm',
                  epsilon=1e-5,
+                 lr_mult=None,
                  **kwargs):
         super().__init__()
         global _model_diff
@@ -554,6 +601,11 @@ class VisionTransformer(nn.Layer):
         self.model_size = '_'.join(_model_split[1:])
         _model_size = self.model_size
         _model_diff = eval(f'_{self.model_name}_diff')
+
+        if lr_mult:
+            assert len(lr_mult) == depth + 2
+        else:
+            lr_mult = [1.0] * (depth + 2)
 
         self.class_num = class_num
         self.return_embed = kwargs.get('return_embed', True)
@@ -566,26 +618,34 @@ class VisionTransformer(nn.Layer):
             img_size=img_size,
             patch_size=patch_size,
             in_chans=in_chans,
-            embed_dim=embed_dim)
+            embed_dim=embed_dim,
+            lr_mult=lr_mult[0])
         num_patches = self.patch_embed.num_patches
 
         if _model_size in _model_diff['add_shared_rel_pos_bias']:
             self.rel_pos_bias = RelativePositionBias(
-                window_size=self.window_size, num_heads=num_heads)
+                window_size=self.window_size,
+                num_heads=num_heads,
+                lr_mult=lr_mult[-1])
 
         self.ln_pre = nn.LayerNorm(embed_dim) if _model_size in _model_diff[
             'add_layer_norm_before_encoder'] else nn.Identity()
 
         if _model_size in _model_diff['remove_cls_token']:
             self.pos_embed = self.create_parameter(
-                shape=(1, num_patches, embed_dim), default_initializer=zeros_)
+                shape=(1, num_patches, embed_dim),
+                default_initializer=zeros_,
+                attr=ParamAttr(learning_rate=lr_mult[0]))
             self.cls_token = None
         else:
             self.pos_embed = self.create_parameter(
                 shape=(1, num_patches + 1, embed_dim),
-                default_initializer=zeros_)
+                default_initializer=zeros_,
+                attr=ParamAttr(learning_rate=lr_mult[0]))
             self.cls_token = self.create_parameter(
-                shape=(1, 1, embed_dim), default_initializer=zeros_)
+                shape=(1, 1, embed_dim),
+                default_initializer=zeros_,
+                attr=ParamAttr(learning_rate=lr_mult[0]))
             self.add_parameter("cls_token", self.cls_token)
 
         if _model_size in _model_diff['remove_abs_pos_emb']:
@@ -610,6 +670,7 @@ class VisionTransformer(nn.Layer):
                 drop_path=dpr[i],
                 norm_layer=norm_layer,
                 epsilon=epsilon,
+                lr_mult=lr_mult[i + 1],
                 window_size=self.window_size) for i in range(depth)
         ])
 
