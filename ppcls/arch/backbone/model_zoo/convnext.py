@@ -223,11 +223,18 @@ class ConvNeXt(nn.Layer):
         return x
 
 
-def _load_pretrained(pretrained, model, model_url, use_ssld=False):
+def _load_pretrained(pretrained, 
+                     model, 
+                     model_url, 
+                     use_ssld=False, 
+                     use_imagenet22k_pretrained=False):
     if pretrained is False:
         pass
     elif pretrained is True:
-        load_dygraph_pretrain_from_url(model, model_url, use_ssld=use_ssld)
+        load_dygraph_pretrain_from_url(model, 
+                                       model_url, 
+                                       use_ssld=use_ssld,
+                                       use_imagenet22k_pretrained=use_imagenet22k_pretrained)
     elif isinstance(pretrained, str):
         load_dygraph_pretrain(model, pretrained)
     else:
@@ -236,25 +243,46 @@ def _load_pretrained(pretrained, model, model_url, use_ssld=False):
         )
 
 
-def ConvNeXt_tiny(pretrained=False, use_ssld=False, **kwargs):
+def ConvNeXt_tiny(pretrained=False, 
+                  use_ssld=False, 
+                  use_imagenet22k_pretrained=False,
+                  **kwargs):
     model = ConvNeXt(depths=[3, 3, 9, 3], dims=[96, 192, 384, 768], **kwargs)
     _load_pretrained(
-        pretrained, model, MODEL_URLS["ConvNeXt_tiny"], use_ssld=use_ssld)
+        pretrained, 
+        model, 
+        MODEL_URLS["ConvNeXt_tiny"], 
+        use_ssld=use_ssld,
+        use_imagenet22k_pretrained=use_imagenet22k_pretrained)
     return model
 
 
-def ConvNeXt_small(pretrained=False, use_ssld=False, **kwargs):
+def ConvNeXt_small(pretrained=False, 
+                   use_ssld=False, 
+                   use_imagenet22k_pretrained=False,
+                   **kwargs):
     model = ConvNeXt(depths=[3, 3, 27, 3], dims=[96, 192, 384, 768], **kwargs)
     _load_pretrained(
-        pretrained, model, MODEL_URLS["ConvNeXt_small"], use_ssld=use_ssld)
+        pretrained, 
+        model, 
+        MODEL_URLS["ConvNeXt_small"], 
+        use_ssld=use_ssld,
+        use_imagenet22k_pretrained=use_imagenet22k_pretrained)
     return model
 
 
-def ConvNeXt_base_224(pretrained=False, use_ssld=False, **kwargs):
+def ConvNeXt_base_224(pretrained=False, 
+                      use_ssld=False, 
+                      use_imagenet22k_pretrained=False,
+                      **kwargs):
     model = ConvNeXt(
         depths=[3, 3, 27, 3], dims=[128, 256, 512, 1024], **kwargs)
     _load_pretrained(
-        pretrained, model, MODEL_URLS["ConvNeXt_base_224"], use_ssld=use_ssld)
+        pretrained, 
+        model, 
+        MODEL_URLS["ConvNeXt_base_224"], 
+        use_ssld=use_ssld,
+        use_imagenet22k_pretrained=use_imagenet22k_pretrained)
     return model
 
 
@@ -266,11 +294,18 @@ def ConvNeXt_base_384(pretrained=False, use_ssld=False, **kwargs):
     return model
 
 
-def ConvNeXt_large_224(pretrained=False, use_ssld=False, **kwargs):
+def ConvNeXt_large_224(pretrained=False, 
+                       use_ssld=False, 
+                       use_imagenet22k_pretrained=False,
+                       **kwargs):
     model = ConvNeXt(
         depths=[3, 3, 27, 3], dims=[192, 384, 768, 1536], **kwargs)
     _load_pretrained(
-        pretrained, model, MODEL_URLS["ConvNeXt_large_224"], use_ssld=use_ssld)
+        pretrained, 
+        model, 
+        MODEL_URLS["ConvNeXt_large_224"], 
+        use_ssld=use_ssld,
+        use_imagenet22k_pretrained=use_imagenet22k_pretrained)
     return model
 
 
@@ -280,3 +315,4 @@ def ConvNeXt_large_384(pretrained=False, use_ssld=False, **kwargs):
     _load_pretrained(
         pretrained, model, MODEL_URLS["ConvNeXt_large_384"], use_ssld=use_ssld)
     return model
+
