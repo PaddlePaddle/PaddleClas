@@ -1,7 +1,7 @@
 # global configs
 Global:
   checkpoints: null
-  pretrained_model: /root/paddlejob/workspace/code/epoch_200
+  pretrained_model: /root/paddlejob/workspace/code/moco_v2_bs_256_epoch_200
   output_dir: ./output/ 
   seed: 0
   device: gpu
@@ -21,10 +21,7 @@ Global:
   # gpu nums for distributed train
   distributed: 4
 
-#Arch:
-#  name: ResNet50
-#  class_num: 1000
-#  freeze_befor: avg_pool
+
 Arch:
   name: moco_clas
   backbone:
@@ -53,7 +50,7 @@ Optimizer:
     name: MultiStepDecay
     learning_rate: 30.0
     milestones: [60, 80]
-    # learning_rate: 30.0
+
 
 DataLoader:
   Train:
@@ -107,8 +104,8 @@ DataLoader:
     sampler:
       name: DistributedBatchSampler
       batch_size: 64
-      shuffle: False
-      drop_last: False
+      shuffle: True
+      drop_last: True
     loader:
       num_workers: 4
       use_shared_memory: True

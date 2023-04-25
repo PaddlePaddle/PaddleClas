@@ -2,9 +2,9 @@
 Global:
   checkpoints: null
   pretrained_model: null
-  output_dir: output/ 
+  output_dir: /home/aistudio/work/PaddleClas/output/ 
   device: gpu
-  save_interval: 10
+  save_interval: 50
   # train_epoch_iter_two_samples
   train_mode: iter_two_samples
   eval_during_train: False
@@ -28,7 +28,7 @@ Arch:
   name: moco_v2
   backbone:
     name: ResNet50
-    stop_layer_name: avg_pool
+    stop_layer_name: AvgPool2D
   neck:
     name: NonLinearNeck
     in_channels: 2048
@@ -51,10 +51,10 @@ Optimizer:
   weight_decay: 0.0001
   lr:
     name: Cosine
-    learning_rate: 0.015
+    learning_rate: 0.03
     T_max: 200
-# learning_rate: 0.03
 
+    
 
 # data loader for train 
 DataLoader:
@@ -120,9 +120,9 @@ DataLoader:
         - ToCHWImage:
     sampler:
       name: DistributedBatchSampler
-      batch_size: 32
+      batch_size: 64
       drop_last: True
-      shuffle: False
+      shuffle: True
     loader:
       num_workers: 4
       use_shared_memory: True
