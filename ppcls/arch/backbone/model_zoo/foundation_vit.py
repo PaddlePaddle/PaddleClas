@@ -291,7 +291,10 @@ class Attention(nn.Layer):
             weight_attr=ParamAttr(learning_rate=lr_mult))
         self.attn_drop = nn.Dropout(attn_drop)
         self.proj = nn.Linear(
-            dim, dim, weight_attr=ParamAttr(learning_rate=lr_mult))
+            dim,
+            dim,
+            weight_attr=ParamAttr(learning_rate=lr_mult),
+            bias_attr=ParamAttr(learning_rate=lr_mult))
         self.proj_drop = nn.Dropout(proj_drop)
 
     def _register_relative_position_index(
@@ -536,7 +539,13 @@ class PatchEmbed(nn.Layer):
 
 
 class Head(nn.Layer):
-    def __init__(self, embed_dim, class_num, norm_layer, model_size, setting):
+    def __init__(self,
+                 embed_dim,
+                 class_num,
+                 norm_layer,
+                 model_size,
+                 setting,
+                 lr_mult=1.0):
         super().__init__()
         self.model_size = model_size
         self.setting = setting
@@ -547,8 +556,12 @@ class Head(nn.Layer):
         self.return_all_tokens = model_size in setting['return_all_tokens']
         self.return_patch_tokens = model_size in setting['return_patch_tokens']
 
-        self.fc_head = nn.Linear(embed_dim,
-                                 class_num) if class_num > 0 else Identity()
+        self.fc_head = nn.Linear(
+            embed_dim,
+            class_num,
+            bias_attr=ParamAttr(learning_rate=lr_mult),
+            weight_attr=ParamAttr(
+                learning_rate=lr_mult)) if class_num > 0 else Identity()
 
     def forward(self, x):
         if self.fc_norm is not None:
@@ -607,8 +620,6 @@ class VisionTransformer(nn.Layer):
             assert len(lr_mult) == depth + 2
         else:
             lr_mult = [1.0] * (depth + 2)
-        if freeze_patch_embed:
-            lr_mult[0] = 0.0
 
         self.class_num = class_num
         self.return_embed = kwargs.get('return_embed', True)
@@ -622,7 +633,7 @@ class VisionTransformer(nn.Layer):
             patch_size=patch_size,
             in_chans=in_chans,
             embed_dim=embed_dim,
-            lr_mult=lr_mult[0])
+            lr_mult=0. if freeze_patch_embed else lr_mult[0])
 
         num_patches = self.patch_embed.num_patches
 
@@ -632,8 +643,12 @@ class VisionTransformer(nn.Layer):
                 num_heads=num_heads,
                 lr_mult=lr_mult[-1])
 
-        self.ln_pre = nn.LayerNorm(embed_dim) if _model_size in _model_diff[
-            'add_layer_norm_before_encoder'] else nn.Identity()
+        self.ln_pre = nn.LayerNorm(
+            embed_dim,
+            weight_attr=ParamAttr(learning_rate=lr_mult[0]),
+            bias_attr=ParamAttr(
+                learning_rate=lr_mult[0])) if _model_size in _model_diff[
+                    'add_layer_norm_before_encoder'] else nn.Identity()
 
         if _model_size in _model_diff['remove_cls_token']:
             self.pos_embed = self.create_parameter(
@@ -678,11 +693,15 @@ class VisionTransformer(nn.Layer):
                 window_size=self.window_size) for i in range(depth)
         ])
 
-        self.norm = eval(norm_layer)(embed_dim, epsilon=epsilon)
+        self.norm = eval(norm_layer)(
+            embed_dim,
+            epsilon=epsilon,
+            weight_attr=ParamAttr(learning_rate=lr_mult[-1]),
+            bias_attr=ParamAttr(learning_rate=lr_mult[-1]))
 
         self.head = Identity() if self.return_embed else Head(
             embed_dim, class_num, norm_layer, self.model_size,
-            _model_diff['head'])
+            _model_diff['head'], lr_mult[-1])
 
         if self.pos_embed is not None:
             trunc_normal_(self.pos_embed)
