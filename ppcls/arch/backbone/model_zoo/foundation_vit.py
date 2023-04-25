@@ -592,6 +592,7 @@ class VisionTransformer(nn.Layer):
                  norm_layer='nn.LayerNorm',
                  epsilon=1e-5,
                  lr_mult=None,
+                 freeze_patch_embed=False,
                  **kwargs):
         super().__init__()
         global _model_diff
@@ -606,6 +607,8 @@ class VisionTransformer(nn.Layer):
             assert len(lr_mult) == depth + 2
         else:
             lr_mult = [1.0] * (depth + 2)
+        if freeze_patch_embed:
+            lr_mult[0] = 0.0
 
         self.class_num = class_num
         self.return_embed = kwargs.get('return_embed', True)
@@ -620,6 +623,7 @@ class VisionTransformer(nn.Layer):
             in_chans=in_chans,
             embed_dim=embed_dim,
             lr_mult=lr_mult[0])
+
         num_patches = self.patch_embed.num_patches
 
         if _model_size in _model_diff['add_shared_rel_pos_bias']:

@@ -30,6 +30,7 @@ Arch:
   name: CLIP_vit_base_patch16_224
   return_embed: False
   pretrained: True
+  freeze_patch_embed: True
   lr_mult: [0.00131, 0.00218, 0.00363, 0.00605, 0.01008, 0.01680, 0.02799, 0.04666, 0.07776, 0.12960, 0.21600, 0.36000, 0.6, 1.0]
 
 # loss function config for traing/eval process
