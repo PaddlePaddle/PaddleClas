@@ -78,6 +78,7 @@ _CLIP_diff = {
         'fc_norm': [],
         'return_all_tokens': [],
         'return_patch_tokens': [],
+        'return_tokens_mean': ["vit_base_patch16_224"],
     }
 }
 
@@ -545,7 +546,8 @@ class Head(nn.Layer):
                  norm_layer,
                  model_size,
                  setting,
-                 lr_mult=1.0):
+                 lr_mult=1.0,
+                 init_scale=1.0):
         super().__init__()
         self.model_size = model_size
         self.setting = setting
@@ -555,13 +557,21 @@ class Head(nn.Layer):
             epsilon=1e-5) if model_size in setting['fc_norm'] else None
         self.return_all_tokens = model_size in setting['return_all_tokens']
         self.return_patch_tokens = model_size in setting['return_patch_tokens']
+        self.return_tokens_mean = model_size in setting['return_tokens_mean']
 
-        self.fc_head = nn.Linear(
-            embed_dim,
-            class_num,
-            bias_attr=ParamAttr(learning_rate=lr_mult),
-            weight_attr=ParamAttr(
-                learning_rate=lr_mult)) if class_num > 0 else Identity()
+        if class_num > 0:
+            self.fc_head = nn.Linear(
+                embed_dim,
+                class_num,
+                bias_attr=ParamAttr(learning_rate=lr_mult),
+                weight_attr=ParamAttr(learning_rate=lr_mult))
+            trunc_normal_(self.fc_head.weight)
+            self.fc_head.weight.set_value(self.fc_head.weight *
+                                          paddle.to_tensor(init_scale))
+            self.fc_head.bias.set_value(self.fc_head.bias *
+                                        paddle.to_tensor(init_scale))
+        else:
+            self.fc_head = Identity()
 
     def forward(self, x):
         if self.fc_norm is not None:
@@ -578,6 +588,8 @@ class Head(nn.Layer):
                 x = x
             elif self.return_patch_tokens:
                 x = x[:, 1:]
+            elif self.return_tokens_mean:
+                x = x.mean(1)
             else:
                 x = x[:, 0]
         return self.fc_head(x)
@@ -606,6 +618,7 @@ class VisionTransformer(nn.Layer):
                  epsilon=1e-5,
                  lr_mult=None,
                  freeze_patch_embed=False,
+                 head_init_scale=1,
                  **kwargs):
         super().__init__()
         global _model_diff
@@ -698,10 +711,12 @@ class VisionTransformer(nn.Layer):
             epsilon=epsilon,
             weight_attr=ParamAttr(learning_rate=lr_mult[-1]),
             bias_attr=ParamAttr(learning_rate=lr_mult[-1]))
+        ones_(self.norm.weight)
+        zeros_(self.norm.bias)
 
         self.head = Identity() if self.return_embed else Head(
             embed_dim, class_num, norm_layer, self.model_size,
-            _model_diff['head'], lr_mult[-1])
+            _model_diff['head'], lr_mult[-1], head_init_scale)
 
         if self.pos_embed is not None:
             trunc_normal_(self.pos_embed)
@@ -735,7 +750,8 @@ class VisionTransformer(nn.Layer):
                                                       'rel_pos_bias') else None
         for blk in self.blocks:
             x = blk(x, rel_pos_bias=rel_pos_bias)
-        x = self.norm(x)
+        # TODO(gaotingquan):
+        x = self.norm(x[:, 1:, :])
         return x
 
     def forward(self, x):
