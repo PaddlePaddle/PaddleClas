@@ -52,7 +52,7 @@ null:null
 null:null
 ===========================train_benchmark_params==========================
 batch_size:256
-fp_items:fp32|fp16
+fp_items:fp16
 epoch:1
 model_type:norm_train|to_static_train
 num_workers:16
