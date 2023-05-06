@@ -44,9 +44,9 @@ Optimizer:
   momentum: 0.9
   lr:
     name: Piecewise
-    learning_rate: 0.1
+    learning_rate: 0.8
     decay_epochs: [30, 60, 90]
-    values: [0.1, 0.01, 0.001, 0.0001]
+    values: [0.8, 0.08, 0.008, 0.0008]
   regularizer:
     name: 'L2'
     coeff: 0.0001
@@ -75,11 +75,11 @@ DataLoader:
 
     sampler:
       name: DistributedBatchSampler
-      batch_size: 64
+      batch_size: 256
       drop_last: False
       shuffle: True
     loader:
-      num_workers: 4
+      num_workers: 16
       use_shared_memory: True
 
   Eval:
