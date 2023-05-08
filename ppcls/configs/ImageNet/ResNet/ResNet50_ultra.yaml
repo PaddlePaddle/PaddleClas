@@ -47,6 +47,7 @@ Optimizer:
     learning_rate: 0.8
     decay_epochs: [30, 60, 90]
     values: [0.8, 0.08, 0.008, 0.0008]
+    warmup_epoch : 5
   regularizer:
     name: 'L2'
     coeff: 0.0001
