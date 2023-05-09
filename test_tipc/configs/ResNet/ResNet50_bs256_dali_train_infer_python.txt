@@ -1,6 +1,6 @@
 ===========================train_params===========================
 model_name:ResNet50_dali
-python:python3.7
+python:python3.10
 gpu_list:0|0,1
 -o Global.device:gpu
 -o Global.auto_cast:null
