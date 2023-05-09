@@ -1,0 +1,167 @@
+# global configs
+Global:
+  checkpoints: null
+  pretrained_model: null
+  output_dir: ./output/
+  device: gpu
+  save_interval: 10                  #修改
+  eval_during_train: True
+  eval_interval: 1
+  epochs: 300                      #修改
+  print_batch_step: 10
+  use_visualdl: False
+  # used for static mode and model export
+  image_shape: [3, 224, 224]
+  save_inference_dir: ./inference
+  update_freq: 4   #修改
+#  distributed: True  #修改
+
+# model architecture
+Arch:
+  name: replknet    #修改
+  class_num: 1000
+  use_sync_bn: True  #修改
+
+
+
+ 
+# loss function config for traing/eval process
+Loss:
+  Train:
+    - SoftTargetCrossEntropy:   #修改
+        weight: 1.0
+  Eval:
+    - CELoss:
+        weight: 1.0
+
+
+Optimizer:
+  name: AdamW               #修改
+  beta1: 0.9               #修改
+  beta2: 0.999             #修改
+  epsilon: 1e-8            #修改
+  weight_decay: 0.05      #修改
+  clip: None  #修改
+  lr:
+    # for 8 cards
+    name: Cosine
+    learning_rate: 0.004  #修改
+    eta_min: 1e-06       #修改
+    warmup_epoch: 10     #修改
+    warmup_start_lr: 1e-06  #修改
+    by_epoch: True    #修改
+    last_epoch: 0
+
+AMP:   #修改
+  scale_loss: 32768.0   #修改
+  use_dynamic_loss_scaling: True
+  # O1: mixed fp16
+  level: O1     #修改
+
+
+
+# data loader for train and eval
+DataLoader:
+  Train:
+    dataset:
+      name: ImageNetDataset
+      image_root:  ./dataset/ILSVRC2012/
+      cls_label_path:  ./dataset/ILSVRC2012/train_list.txt
+      transform_ops:
+        - DecodeImage: #添加
+            to_rgb: True
+            channel_first: False
+        - RandomResizedCrop: #修改
+            size: [224, 224]
+            scale: [0.08, 1.0]
+            interpolation: bicubic
+        - RandomHorizontalFlip:  #修改
+            prob: 0.5
+        - RandAugment:        #修改
+            num_layers: 2
+            magnitude: 9  # 修改    这个应就是9
+#        - ToTensor:          #修改
+        - NormalizeImage:
+            scale: 1.0/255.0
+            mean: [0.485, 0.456, 0.406]
+            std: [0.229, 0.224, 0.225]
+            order: ''
+        - RandomErasing:
+            EPSILON: 0.25      #prob
+            sl: 0.02        #min_area
+            sh: 1.0/3.0     #max_area
+            r1: 0.3         #min_aspect
+            attempt: 10     #10
+            use_log_aspect: True   #True
+            mode: pixel     #mode
+
+      batch_transform_ops:  #修改
+        - OpSampler:
+            MixupOperator:
+              alpha: 0.8
+              prob: 0.5
+            CutmixOperator:
+              alpha: 1.0
+              prob: 0.5
+    sampler:
+      name: DistributedBatchSampler
+      batch_size: 4       #修改
+      drop_last: True      #修改
+      shuffle: True
+    loader:
+      num_workers: 4   #修改
+      use_shared_memory: True
+
+  Eval:
+    dataset: 
+      name: ImageNetDataset
+      image_root: ./dataset/ILSVRC2012/
+      cls_label_path: ./dataset/ILSVRC2012/val_list.txt
+      transform_ops:
+        - Resize:   #修改
+            size: 256
+            interpolation: bicubic
+        - CenterCrop:  #修改
+            size: 224
+        - ToTensor:    #修改
+        - Normalize:  #还是 Noemalizeimage ？？？？
+            mean: [0.485, 0.456, 0.406]
+            std: [0.229, 0.224, 0.225]
+    sampler:
+      name: DistributedBatchSampler
+      batch_size: 128
+      drop_last: False
+      shuffle: False
+    loader:
+      num_workers: 4   #修改
+      use_shared_memory: True
+
+Infer:   #预测样例
+  infer_imgs: docs/images/inference_deployment/whl_demo.jpg
+    batch_size: 10
+    transforms:
+      - DecodeImage:
+          to_rgb: True
+          channel_first: False
+      - ResizeImage:
+          resize_short: 256
+      - CropImage:
+          size: 224
+      - NormalizeImage:
+          scale: 1.0/255.0
+          mean: [ 0.485, 0.456, 0.406 ]
+          std: [ 0.229, 0.224, 0.225 ]
+          order: ''
+      - ToCHWImage:
+  PostProcess:
+    name: Topk
+    topk: 5
+    class_id_map_file: ppcls/utils/imagenet1k_label_list.txt
+
+Metric:
+  Train:
+    - TopkAcc:
+        topk: [1, 5]
+  Eval:
+    - TopkAcc:
+        topk: [1, 5]
