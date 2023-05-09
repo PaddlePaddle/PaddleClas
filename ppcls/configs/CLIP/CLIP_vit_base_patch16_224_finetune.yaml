@@ -51,7 +51,7 @@ Optimizer:
   epsilon: 1e-8
   weight_decay: 0.05
   one_dim_param_no_weight_decay: True
-  no_weight_decay_name: pos_embed cls_tokens bias relative_position_bias
+  no_weight_decay_name: pos_embed cls_token bias relative_position_bias
   # TODO: layerwise lr (layerwise_decay: 0.9) & no_weight_decay  & weight_decay_end
   lr:
     name: Cosine
