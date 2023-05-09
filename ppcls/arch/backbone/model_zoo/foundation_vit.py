@@ -528,7 +528,7 @@ class PatchEmbed(nn.Layer):
             kernel_size=patch_size,
             stride=patch_size,
             weight_attr=ParamAttr(learning_rate=lr_mult),
-            bias_attr=ParamAttr(learning_rate=lr_mult))
+            bias_attr=False)
 
     def forward(self, x):
         B, C, H, W = x.shape
