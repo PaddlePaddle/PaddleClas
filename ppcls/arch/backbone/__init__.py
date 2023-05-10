@@ -94,6 +94,7 @@ from .model_zoo.adaface_ir_net import AdaFace_IR_18, AdaFace_IR_34, AdaFace_IR_5
 from .model_zoo.wideresnet import WideResNet
 from .model_zoo.uniformer import UniFormer_small, UniFormer_small_plus, UniFormer_small_plus_dim64, UniFormer_base, UniFormer_base_ls
 
+from .model_zoo.fct import FCT, MLP_BN_SIDE_PROJECTION
 
 # help whl get all the models' api (class type) and components' api (func type)
 def get_apis():
