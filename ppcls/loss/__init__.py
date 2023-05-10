@@ -47,6 +47,8 @@ from .metabinloss import TripletLossForMetaBIN
 from .metabinloss import InterDomainShuffleLoss
 from .metabinloss import IntraDomainScatterLoss
 
+from .ibotloss import IBOTLoss
+
 
 class CombinedLoss(nn.Layer):
     def __init__(self, config_list):
