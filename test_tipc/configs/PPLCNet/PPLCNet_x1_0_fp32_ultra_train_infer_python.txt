@@ -1,5 +1,5 @@
 ===========================train_params===========================
-model_name:PPLCNet_x1_0_ultra
+model_name:PPLCNet_x1_0_fp32_ultra
 python:python3.10
 gpu_list:0|0,1
 -o Global.device:gpu

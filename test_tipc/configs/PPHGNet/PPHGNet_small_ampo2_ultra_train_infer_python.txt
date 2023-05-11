@@ -1,5 +1,5 @@
 ===========================train_params===========================
-model_name:PPHGNet_small
+model_name:PPHGNet_small_ampo2_ultra
 python:python3.10
 gpu_list:0|0,1
 -o Global.device:gpu
