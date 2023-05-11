@@ -13,7 +13,7 @@ train_infer_img_dir:./dataset/ILSVRC2012/val
 null:null
 ##
 trainer:norm_train
-norm_train:tools/train.py -c ppcls/configs/ImageNet/MobileNetV3/MobileNetV3_small_x1_0_ultra.yaml -o Global.seed=1234 -o DataLoader.Train.sampler.shuffle=False -o DataLoader.Train.loader.num_workers=0 -o DataLoader.Train.loader.use_shared_memory=False -o Global.eval_during_train=False -o Global.save_interval=2
+norm_train:tools/train.py -c ppcls/configs/ImageNet/MobileNetV3/MobileNetV3_small_x1_0_ampo2_ultra.yaml -o Global.seed=1234 -o DataLoader.Train.sampler.shuffle=False -o DataLoader.Train.loader.num_workers=0 -o DataLoader.Train.loader.use_shared_memory=False -o Global.eval_during_train=False -o Global.save_interval=2
 pact_train:null
 fpgm_train:null
 distill_train:null
@@ -21,13 +21,13 @@ to_static_train:-o Global.to_static=True
 null:null
 ##
 ===========================eval_params===========================
-eval:tools/eval.py -c ppcls/configs/ImageNet/MobileNetV3/MobileNetV3_small_x1_0_ultra.yaml
+eval:tools/eval.py -c ppcls/configs/ImageNet/MobileNetV3/MobileNetV3_small_x1_0_ampo2_ultra.yaml
 null:null
 ##
 ===========================infer_params==========================
 -o Global.save_inference_dir:./inference
 -o Global.pretrained_model:
-norm_export:tools/export_model.py -c ppcls/configs/ImageNet/MobileNetV3/MobileNetV3_small_x1_0_ultra.yaml
+norm_export:tools/export_model.py -c ppcls/configs/ImageNet/MobileNetV3/MobileNetV3_small_x1_0_ampo2_ultra.yaml
 quant_export:null
 fpgm_export:null
 distill_export:null
