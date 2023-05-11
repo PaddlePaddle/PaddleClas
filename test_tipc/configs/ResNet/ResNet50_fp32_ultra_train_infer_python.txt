@@ -1,5 +1,5 @@
 ===========================train_params===========================
-model_name:ResNet50_ultra
+model_name:ResNet50_fp32_ultra
 python:python3.10
 gpu_list:0|0,1
 -o Global.device:gpu

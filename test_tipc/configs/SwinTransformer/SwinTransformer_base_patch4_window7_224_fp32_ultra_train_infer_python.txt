@@ -1,5 +1,5 @@
 ===========================train_params===========================
-model_name:SwinTransformer_base_patch4_window7_224
+model_name:SwinTransformer_base_patch4_window7_224_fp32_ultra
 python:python3.10
 gpu_list:0|0,1
 -o Global.device:gpu
