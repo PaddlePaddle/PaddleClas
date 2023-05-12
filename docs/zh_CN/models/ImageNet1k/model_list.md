@@ -636,6 +636,22 @@ DeiT（Data-efficient Image Transformers）系列模型的精度、速度指标�
 
 [1]：基于 ImageNet22k 数据集预训练，然后在 ImageNet1k 数据集迁移学习得到。
 
+关于 SwinTransformerV2 系列模型的精度、速度指标如下表所示，更多介绍可以参考：[SwinTransformerV2 系列模型文档](SwinTransformerV2.md)。
+
+| 模型       | Top-1 Acc | Top-5 Acc | time(ms)<br>bs=1 | time(ms)<br>bs=4 | time(ms)<br/>bs=8 | FLOPs(G) | Params(M) | 预训练模型下载地址                                               | inference模型下载地址                                      |
+| ---------- | --------- | --------- | ---------------- | ---------------- | -------- | --------- | ------------------------------------------------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ |
+| SwinTransformerV2_tiny_patch4_window8_256    | 0.8177 | 0.9588 | - | - | - | 4.3  | 21.9   | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/SwinTransformerV2_tiny_patch4_window8_256_pretrained.pdparams) | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/SwinTransformerV2_tiny_patch4_window8_256_infer.tar) |
+| SwinTransformerV2_tiny_patch4_window16_256   | 0.8283 | 0.9623 | - | - | - | 4.4  | 21.9   | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/SwinTransformerV2_tiny_patch4_window16_256_pretrained.pdparams) | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/SwinTransformerV2_tiny_patch4_window16_256_infer.tar) |
+| SwinTransformerV2_small_patch4_window8_256    | 0.8373 | 0.9662 | - | - | - | 8.4 | 37.9   | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/SwinTransformerV2_small_patch4_window8_256_pretrained.pdparams) | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/SwinTransformerV2_small_patch4_window8_256_infer.tar) |
+| SwinTransformerV2_small_patch4_window16_256   | 0.8414 | 0.9681 | - | - | - | 8.5 | 37.9   | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/SwinTransformerV2_small_patch4_window16_256_pretrained.pdparams) | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/SwinTransformerV2_small_patch4_window16_256_infer.tar) |
+| SwinTransformerV2_base_patch4_window8_256   | 0.8419 | 0.9687 | - | - | - | 15.0 | 67.0   | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/SwinTransformerV2_base_patch4_window8_256_pretrained.pdparams) | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/SwinTransformerV2_base_patch4_window8_256_infer.tar) |
+| SwinTransformerV2_base_patch4_window16_256   | 0.8458 | 0.9706 | - | - | - | 15.1 | 67.0   | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/SwinTransformerV2_base_patch4_window16_256_pretrained.pdparams) | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/SwinTransformerV2_base_patch4_window16_256_infer.tar) |
+| SwinTransformerV2_base_patch4_window24_384<sup>[1]</sup>     | 0.8714 | 0.9824 | - | - | - | 34.0 | 67.0   | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/SwinTransformerV2_base_patch4_window24_384_22kto1k_pretrained.pdparams) | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/SwinTransformerV2_base_patch4_window24_384_22kto1k_infer.tar) |
+| SwinTransformerV2_large_patch4_window16_256<sup>[1]</sup>    | 0.8689 | 0.9804 | - | - | - | 33.8 | 149.6   | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/SwinTransformerV2_large_patch4_window16_256_22kto1k_pretrained.pdparams) | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/SwinTransformerV2_large_patch4_window16_256_22kto1k_infer.tar) |
+| SwinTransformerV2_large_patch4_window24_384<sup>[1]</sup>    | 0.8747 | 0.9827 | - | - | - | 76.1 | 149.6  | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/SwinTransformerV2_large_patch4_window24_384_22kto1k_pretrained.pdparams) | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/SwinTransformerV2_large_patch4_window24_384_22kto1k_infer.tar) |
+
+[1]：基于 ImageNet22k 数据集预训练，然后在 ImageNet1k 数据集迁移学习得到。
+
 <a name="Twins"></a>
 
 ## Twins 系列 <sup>[[34](#ref34)]</sup>
