@@ -1,7 +1,7 @@
 prettytable
 ujson
 opencv-python<=4.6.0.66
-pillow
+pillow>=9.0.0
 tqdm
 PyYAML>=5.1
 visualdl>=2.2.0
