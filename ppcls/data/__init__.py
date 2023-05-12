@@ -126,7 +126,8 @@ def build_dataloader(config, mode, device, use_dali=False, seed=None):
         shuffle = config_sampler["shuffle"]
     else:
         sampler_name = config_sampler.pop("name")
-        sampler_argspec = inspect.getargspec(eval(sampler_name).__init__).args
+        sampler_argspec = inspect.getfullargspec(eval(sampler_name)
+                                                 .__init__).args
         if "total_epochs" in sampler_argspec:
             config_sampler.update({"total_epochs": epochs})
         batch_sampler = eval(sampler_name)(dataset, **config_sampler)
