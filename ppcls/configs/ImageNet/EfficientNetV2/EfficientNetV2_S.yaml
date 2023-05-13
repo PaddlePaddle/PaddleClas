@@ -70,8 +70,9 @@ DataLoader:
             flip_code: 1
         - RandAugmentV2:
             num_layers: 2
-            magnitude: 5.0
-            progress_magnitude: [5.0, 8.3333333333, 11.66666666667, 15.0]
+            magnitude: 5
+            interpolation: nearest
+            # progress_magnitude: [5.0, 8.3333333333, 11.66666666667, 15.0]
         - NormalizeImage:
             scale: 1.0
             mean: [128.0, 128.0, 128.0]
