@@ -22,7 +22,7 @@ import paddle
 import paddle.nn as nn
 from paddle.nn.initializer import TruncatedNormal, Constant, Normal
 from .vision_transformer import VisionTransformer, Identity, trunc_normal_
-from .swin_transformer_v2 import SwinTransformerV2
+import os
 from ..legendary_models.swin_transformer import SwinTransformer
 from ....utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
 
@@ -39,6 +39,35 @@ normal_ = Normal
 zeros_ = Constant(value=0.0)
 ones_ = Constant(value=1.0)
 
+def to_2tuple(x):
+    return tuple([x] * 2)
+
+class IBOT_PatchEmbed(nn.Layer):
+    """ Image to Patch Embedding
+    """
+
+    def __init__(self, img_size=224, patch_size=16, in_chans=3, embed_dim=768):
+        super().__init__()
+        img_size = to_2tuple(img_size)
+        patch_size = to_2tuple(patch_size)
+        num_patches = (img_size[1] // patch_size[1]) * \
+            (img_size[0] // patch_size[0])
+        self.img_size = img_size
+        self.patch_size = patch_size
+        self.num_patches = num_patches
+
+        self.proj = nn.Conv2D(
+            in_chans, embed_dim, kernel_size=patch_size, stride=patch_size)
+
+        pass
+    def forward(self, x):
+        B, C, H, W = x.shape
+        # assert H == self.img_size[0] and W == self.img_size[1], \
+        #     f"Input image size ({H}*{W}) doesn't match model ({self.img_size[0]}*{self.img_size[1]})."
+
+        # x = self.proj(x).flatten(2).transpose((0, 2, 1))
+        x = self.proj(x)
+        return x
 
 class MultiCropWrapper(nn.Layer):
     """
@@ -146,7 +175,7 @@ class DINOHead(nn.Layer):
 
         if bottleneck_dim > 0:
             self.last_layer = nn.utils.weight_norm(
-                nn.Linear(bottleneck_dim, out_dim, bias_attr=False),dim=1
+                nn.Linear(bottleneck_dim, out_dim, bias_attr=False), dim=1
             )
             ones_(self.last_layer.weight_g)
             if norm_last_layer:
@@ -201,7 +230,7 @@ class IBOTHead(DINOHead):
         if not shared_head:
             if bottleneck_dim > 0:
                 self.last_layer2 = nn.utils.weight_norm(
-                    nn.Linear(bottleneck_dim, patch_out_dim, bias_attr=False),dim=1
+                    nn.Linear(bottleneck_dim, patch_out_dim, bias_attr=False), dim=1
                 )
                 ones_(self.last_layer2.weight_g)
                 if norm_last_layer:
@@ -259,7 +288,7 @@ class IBOTVisionTransformer(VisionTransformer):
         attn_drop_rate=0.0,
         drop_path_rate=0.0,
         norm_layer="nn.LayerNorm",
-        epsilon=1e-5,
+        epsilon=1e-6,
         return_all_tokens=False,
         masked_im_modeling=False,
         **kwargs
@@ -286,7 +315,11 @@ class IBOTVisionTransformer(VisionTransformer):
         self.masked_im_modeling = masked_im_modeling
         self.img_size = img_size
         self.patch_size = patch_size
-        # self.head = IBOTHead(in_dim=embed_dim,out_dim=out_dim,norm=norm,)
+        self.patch_embed = IBOT_PatchEmbed(
+            img_size=img_size,
+            patch_size=patch_size,
+            in_chans=in_chans,
+            embed_dim=embed_dim)
 
         if self.masked_im_modeling:
             self.masked_embed = self.create_parameter(
@@ -301,28 +334,28 @@ class IBOTVisionTransformer(VisionTransformer):
         class_pos_embed = self.pos_embed[:, 0]
         patch_pos_embed = self.pos_embed[:, 1:]
         dim = x.shape[-1]
-        w0 = w // self.patch_embed.patch_size
-        h0 = h // self.patch_embed.patch_size
+        w0 = w // self.patch_embed.patch_size[0]
+        h0 = h // self.patch_embed.patch_size[1]
         # we add a small number to avoid floating point error in the interpolation
         # see discussion at https://github.com/facebookresearch/dino/issues/8
         w0, h0 = w0 + 0.1, h0 + 0.1
         patch_pos_embed = nn.functional.interpolate(
-            patch_pos_embed.reshape(1, int(math.sqrt(N)), int(math.sqrt(N)), dim).permute(0, 3, 1, 2),
+            patch_pos_embed.reshape((1, int(math.sqrt(N)), int(math.sqrt(N)), dim)).transpose((0, 3, 1, 2)),
             scale_factor=(w0 / math.sqrt(N), h0 / math.sqrt(N)),
             mode='bicubic',
         )
         assert int(w0) == patch_pos_embed.shape[-2] and int(h0) == patch_pos_embed.shape[-1]
-        patch_pos_embed = patch_pos_embed.permute(0, 2, 3, 1).view(1, -1, dim)
+        patch_pos_embed = patch_pos_embed.transpose((0, 2, 3, 1)).reshape((1, -1, dim))
         return paddle.concat((class_pos_embed.unsqueeze(0), patch_pos_embed), axis=1)
 
+
     def forward_features(self, x, mask=None, return_all_tokens=None):
-        # B = x.shape[0]
         B, nc, w, h = x.shape
-        x = self.patch_embed(x)
-        x = paddle.transpose(x, perm=[0, 2, 1])
-        C,N,HW = x.shape
-        H, W = int(self.img_size / self.patch_size), int(self.img_size / self.patch_size)
-        x = x.reshape([C, N, H, W])
+        x= self.patch_embed(x)
+        # x = paddle.transpose(x, perm=[0, 2, 1])
+        # C,N,HW = x.shape
+        # H,W = int(self.img_size/self.patch_size),int(self.img_size/self.patch_size)
+        # x = x.reshape([C,N,H,W])
         # mask image modeling
         if self.masked_im_modeling:
             assert mask is not None
@@ -333,10 +366,12 @@ class IBOTVisionTransformer(VisionTransformer):
         cls_tokens = self.cls_token.expand((B, -1, -1)).astype(x.dtype)
         x = paddle.concat((cls_tokens, x), axis=1)
         x = x + self.interpolate_pos_encoding(x, w, h)
+
         x = self.pos_drop(x)
 
         for blk in self.blocks:
             x = blk(x)
+
         x = self.norm(x)
 
         # if self.fc_norm is not None:
@@ -363,232 +398,197 @@ class IBOTVisionTransformer(VisionTransformer):
         x = paddle.transpose(x, perm=[0, 3, 1, 2])
         return x
 
+    def get_intermediate_layers(self, x, n=1,mask=None):
 
-class IBOTSwinTransformer(SwinTransformer):
-    def __init__(
-        self,
-        img_size=256,
-        patch_size=4,
-        in_chans=3,
-        class_num=1000,
-        embed_dim=96,
-        depths=[2, 2, 6, 2],
-        num_heads=[3, 6, 12, 24],
-        window_size=7,
-        mlp_ratio=4.0,
-        qkv_bias=True,
-        drop_rate=0.0,
-        attn_drop_rate=0.0,
-        drop_path_rate=0.1,
-        norm_layer=nn.LayerNorm,
-        ape=False,
-        patch_norm=True,
-        pretrained_window_sizes=[0, 0, 0, 0],
-        return_all_tokens=False,
-        masked_im_modeling=False,
-        **kwargs
-    ):
-        super(IBOTSwinTransformer, self).__init__(
-            img_size,
-            patch_size,
-            in_chans,
-            class_num,
-            embed_dim,
-            depths,
-            num_heads,
-            window_size,
-            mlp_ratio,
-            qkv_bias,
-            drop_rate,
-            attn_drop_rate,
-            drop_path_rate,
-            norm_layer,
-            ape,
-            patch_norm,
-            pretrained_window_sizes,
-            **kwargs
-        )
-        self.return_all_token = return_all_tokens
-        self.masked_im_modeling = masked_im_modeling
-
-        if self.masked_im_modeling:
-            self.masked_embed = self.create_parameter(
-                shape=[1, embed_dim], default_initializer=zeros_
-            )
-
-        # self.head = IBOTHead()
-
-    def forward_features(self, x, mask=None, return_all_tokens=None):
+        B, nc, w, h = x.shape
         x = self.patch_embed(x)
-
         # mask image modeling
-        if mask is not None:
+        if self.masked_im_modeling:
+            assert mask is not None
             x = self.mask_model(x, mask)
         x = x.flatten(2).transpose(perm=[0, 2, 1])
 
-        if self.ape:
-            x = x + self.absolute_pos_embed
+        # add the [CLS] token to the embed patch tokens
+        cls_tokens = self.cls_token.expand((B, -1, -1)).astype(x.dtype)
+        x = paddle.concat((cls_tokens, x), axis=1)
+        x = x + self.interpolate_pos_encoding(x, w, h)
         x = self.pos_drop(x)
 
-        for layer in self.layers:
-            x = layer(x)
-
-        x_region = self.norm(x)  # B L C
-        x = self.avgpool(x_region.transpose([0, 2, 1]))  # B C 1
-        x = paddle.flatten(x, 1)
-
-        return_all_tokens = (
-            self.return_all_tokens if return_all_tokens is None else return_all_tokens
-        )
-        if return_all_tokens:
-            return paddle.concat([x.unsqueeze(1), x_region], axis=1)
-
-        return x
-
-    def forward(self, x, mask=None):
-        x = self.forward_features(x, mask, self.return_all_tokens)
-        # x = self.head(x)
-        return x
-
-    def mask_model(self, x, mask):
-        # extend mask for hierarchical features
-        if x.shape[-2:] != mask.shape[-2:]:
-            htimes, wtimes = np.array(x.shape[-2:]) // np.array(mask.shape[-2:])
-            mask = mask.repeat_interleave(htimes, -2).repeat_interleave(wtimes, -1)
-
-        # mask embed
-        x.permute(0, 2, 3, 1)[mask, :] = self.masked_embed.to(x.dtype)
-
-        return x
+        # we return the output tokens from the `n` last blocks
+        output = []
+        for i, blk in enumerate(self.blocks):
+            x = blk(x)
+            if len(self.blocks) - i <= n:
+                output.append(self.norm(x))
+        return output
 
 
-def _load_pretrained(
-    pretrained,
-    model,
-    model_url,
-    use_ssld=False,
-    use_imagenet22k_pretrained=False,
-    use_imagenet22kto1k_pretrained=False,
-):
-    if pretrained is False:
-        pass
-    elif pretrained is True:
-        load_dygraph_pretrain_from_url(
-            model,
-            model_url,
-            use_ssld=use_ssld,
-            use_imagenet22k_pretrained=use_imagenet22k_pretrained,
-            use_imagenet22kto1k_pretrained=use_imagenet22kto1k_pretrained,
-        )
-    elif isinstance(pretrained, str):
-        load_dygraph_pretrain(model, pretrained)
-    else:
-        raise RuntimeError(
-            "pretrained type is not available. Please use `string` or `boolean` type."
-        )
-
-
-def IBOT_ViT_small_patch16_224(pretrained=False, use_ssld=False,in_dim=384,out_dim=8192,patch_out_dim=8192,norm=None,act_layer=nn.GELU,norm_last_layer=False,shared_head=True,masked_im_modeling=False, **kwargs):
-    backbone = IBOTVisionTransformer(
-        patch_size=16,
+def IBOT_ViT_small_patch16_224(patch_size=16, **kwargs):
+    model = IBOTVisionTransformer(
+        patch_size=patch_size,
         embed_dim=384,
         depth=12,
         num_heads=6,
         mlp_ratio=4,
-        qk_scale=(384 // 6) ** -0.5,
-        return_all_tokens=True,
-        masked_im_modeling=masked_im_modeling,
+        qkv_bias=True,
         **kwargs
-    )
-    _load_pretrained(
-        pretrained, backbone, MODEL_URLS["IBOT_ViT_small_patch16_224"], use_ssld=use_ssld
-    )
-    model = MultiCropWrapper(
-        backbone,
-        IBOTHead(in_dim=in_dim,out_dim=out_dim,patch_out_dim=patch_out_dim,norm=norm,act_layer=act_layer,norm_last_layer=norm_last_layer,shared_head=shared_head)
     )
     return model
 
 
-def IBOT_ViT_base_patch16_224(pretrained=False, use_ssld=False, **kwargs):
-    backbone = IBOTVisionTransformer(
-        patch_size=16,
+def IBOT_ViT_base_patch16_224(patch_size=16, **kwargs):
+    model = IBOTVisionTransformer(
+        patch_size=patch_size,
         embed_dim=768,
         depth=12,
         num_heads=12,
         mlp_ratio=4,
-        qk_scale=(768 // 12) ** -0.5,
+        qkv_bias=True,
         **kwargs
-    )
-    _load_pretrained(
-        pretrained, backbone, MODEL_URLS["IBOT_ViT_base_patch16_224"], use_ssld=use_ssld
-    )
-    model = MultiCropWrapper(
-        backbone,
-        IBOTHead(in_dim=768, out_dim=8192, patch_out_dim=8192, norm=None, act_layer=nn.GELU, norm_last_layer=False,
-                 shared_head=True)
     )
     return model
 
 
-def IBOT_ViT_large_patch16_224(pretrained=False, use_ssld=False, **kwargs):
-    backbone = IBOTVisionTransformer(
-        patch_size=16,
+def IBOT_ViT_large_patch16_224(patch_size=16, **kwargs):
+    model = IBOTVisionTransformer(
+        patch_size=patch_size,
         embed_dim=1024,
         depth=24,
         num_heads=16,
         mlp_ratio=4,
-        qk_scale=(1024 // 12) ** -0.5,
+        qkv_bias=True,
         **kwargs
     )
-    _load_pretrained(
-        pretrained, backbone, MODEL_URLS["IBOT_ViT_large_patch16_224"], use_ssld=use_ssld
-    )
-    model = MultiCropWrapper(
-        backbone,
-        IBOTHead(in_dim=1024, out_dim=8192, patch_out_dim=8192, norm=None, act_layer=nn.GELU, norm_last_layer=False,
-                 shared_head=True)
-    )
+
     return model
 
 
-def IBOT_Swin_tiny_windows7_224(pretrained=False, use_ssld=False, **kwargs):
-    backbone = IBOTSwinTransformer(
-        img_size=224,
-        embed_dim=96,
-        depths=[2, 2, 6, 2],
-        num_heads=[3, 6, 12, 24],
-        window_size=7,
-        mlp_ratio=4,
-        **kwargs
-    )
-    _load_pretrained(
-        pretrained, backbone, MODEL_URLS["IBOT_Swin_tiny_windows7_224"], use_ssld=use_ssld
-    )
-    model = MultiCropWrapper(
-        backbone,
-        IBOTHead(in_dim=96, out_dim=8192, patch_out_dim=8192, norm=None, act_layer=nn.GELU, norm_last_layer=False,
-                 shared_head=True)
-    )
-    return model
+class LinearClassifier(nn.Layer):
+    """Linear layer to train on top of frozen features"""
+    def __init__(self, dim, num_labels=1000):
+        super(LinearClassifier, self).__init__()
+        self.num_labels = num_labels
+        self.linear = nn.Linear(dim, num_labels)
+        normal_(self.linear.weight)
+        zeros_(self.linear.bias)
+
+    def forward(self, x):
+        # flatten
+        x = x.reshape((x.shape[0], -1))
+
+        # linear layer
+        return self.linear(x)
 
 
-def IBOT_Swin_tiny_windows14_224(pretrained=False, use_ssld=False, **kwargs):
-    backbone = IBOTSwinTransformer(
-        img_size=224,
-        embed_dim=96,
-        depths=[2, 2, 6, 2],
-        num_heads=[3, 6, 12, 24],
-        window_size=14,
-        mlp_ratio=4,
-        **kwargs
-    )
-    _load_pretrained(
-        pretrained, backbone, MODEL_URLS["IBOT_Swin_tiny_windows14_224"], use_ssld=use_ssld
-    )
-    model = MultiCropWrapper(
-        backbone,
-        IBOTHead(in_dim=96, out_dim=8192, patch_out_dim=8192, norm=None, act_layer=nn.GELU, norm_last_layer=False,
-                 shared_head=True)
-    )
-    return model
+class IBOT(nn.Layer):
+    def __init__(self, **arch_config):
+        super(IBOT, self).__init__()
+        assert arch_config['arch'] in ['ViT_small', 'ViT_base','ViT_large'], f"arch can be only ['ViT_small', 'ViT_base','ViT_large']"
+        model_name = "IBOT_" + arch_config['arch'] + "_patch" + str(arch_config['patch_size']) + "_224"
+        model_name = eval(model_name)
+        self.train_stage = arch_config['mode']
+        self.arch_config = arch_config
+        if arch_config['mode'] == 'pretrain':
+            student = model_name(
+                    patch_size=arch_config["patch_size"],
+                    drop_path_rate=arch_config["drop_path"],
+                    return_all_tokens=True,
+                    masked_im_modeling=arch_config["use_masked_im_modeling"]
+                ),
+            teacher = model_name(
+                patch_size=arch_config["patch_size"],
+                return_all_tokens=True,
+            ),
+            embed_dim = student.embed_dim
+            # multi-crop wrapper handles forward with inputs of different resolutions
+            self.student = MultiCropWrapper(
+                student,
+                IBOTHead(
+                    embed_dim,
+                    arch_config["out_dim"],
+                    patch_out_dim=arch_config["patch_out_dim"],
+                    norm=arch_config["norm_in_head"],
+                    act=arch_config["act_in_head"],
+                    norm_last_layer=arch_config["norm_last_layer"],
+                    shared_head=arch_config["shared_head"],
+                )
+            )
+            self.teacher = MultiCropWrapper(
+                teacher,
+                IBOTHead(
+                    embed_dim,
+                    arch_config["out_dim"],
+                    patch_out_dim=arch_config["patch_out_dim"],
+                    norm=arch_config["norm_in_head"],
+                    act=arch_config["act_in_head"],
+                    shared_head=arch_config["shared_head_teacher"],
+                )
+            )
+
+            # vit_s8 and vit_s16 are batch norm free models. here, we don't check bn
+            self.teacher = paddle.DataParallel(self.teacher)
+            self.teacher_without_ddp = self.teacher._layers
+            self.student = paddle.DataParallel(self.student)
+
+            # teacher and student start with the same weights
+            self.teacher_without_ddp.load_dict(self.student.state_dict())
+
+            # there is no backpropagation through the teacher, so no need for gradients
+            for p in self.teacher.parameters():
+                p.stop_gradient = True
+
+        else:
+            self.model = model_name(patch_size=arch_config['patch_size'], num_classes=0,use_mean_pooling=arch_config["avgpool_patchtokens"]== 1)
+            feat_dim = self.model.embed_dim * (arch_config['n_last_blocks'] * int(arch_config["avgpool_patchtokens"] != 1) + int(arch_config["avgpool_patchtokens"] > 0) )
+            self.model.eval()
+            for p in self.model.parameters():
+                p.stop_gradient = True
+
+            self.linear_clf = paddle.DataParallel(LinearClassifier(feat_dim, arch_config['num_labels']))
+
+            if os.path.isfile(arch_config['pretrained_weights']):
+                state_dict = paddle.load(arch_config['pretrained_weights'])[arch_config['checkpoint_key']]
+                state_dict = {k.replace("module.", ""): v for k, v in state_dict.items()}
+                new_state_dict = {k.replace("backbone.", ""): v for k, v in state_dict.items()}
+                self.model.set_state_dict(new_state_dict)
+
+            self.n_last_blocks = arch_config['n_last_blocks']
+            self.avgpool = arch_config['avgpool_patchtokens']
+
+    def forward(self, images,masks):
+        if self.train_stage == 'pretrain':
+            teacher_output = self.teacher(
+                images[:self.arch_config["global_crops_number"]])  # only the 2 global views pass through the teacher
+            student_output = self.student(images[:self.arch_config["global_crops_number"]],
+                                     mask=masks[:self.arch_config["global_crops_number"]])  # all views pass through the student
+
+            self.student.sublayers()[0].backbone.masked_im_modeling = False
+            student_local_cls = self.student(images[self.arch_config["global_crops_number"]:])[0] if len(
+                images) > self.arch_config["global_crops_number"] else None
+            self.student.sublayers()[0].backbone.masked_im_modeling = self.arch_config["use_masked_im_modeling"]
+
+            return teacher_output, student_output, student_local_cls
+
+        else:    # finetune
+            self.linear_clf.train()
+
+            # forward
+            with paddle.no_grad():
+                intermediate_output = self.model.get_intermediate_layers(images, self.n_last_blocks)
+                if self.avgpool == 0:
+                    # norm(x[:, 0])
+                    output = [x[:, 0] for x in intermediate_output]
+                elif self.avgpool == 1:
+                    # x[:, 1:].mean(1)
+                    output = [paddle.mean(intermediate_output[-1][:, 1:], axis=1)]
+                elif self.avgpool == 2:
+                    # norm(x[:, 0]) + x[:, 1:].mean(1)
+                    output = [x[:, 0] for x in intermediate_output] + [
+                        paddle.mean(intermediate_output[-1][:, 1:], axis=1)
+                    ]
+                else:
+                    assert False, "Unkown avgpool type {}".format(self.avgpool)
+
+                output = paddle.concat(output, axis=-1)
+
+            return self.linear_clf.forward(output)
