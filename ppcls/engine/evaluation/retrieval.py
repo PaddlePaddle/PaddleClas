@@ -137,7 +137,8 @@ def compute_feature(engine, name="gallery"):
             has_camera = True
             batch[2] = batch[2].reshape([-1, 1]).astype("int64")
         if engine.amp and engine.amp_eval:
-            with paddle.amp.auto_cast(level=engine.amp_level):
+            with paddle.amp.auto_cast(
+                    level=engine.amp_level, use_promote=engine.use_promote):
                 out = engine.model(batch[0])
         else:
             out = engine.model(batch[0])

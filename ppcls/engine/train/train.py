@@ -50,7 +50,9 @@ def train_epoch(engine, epoch_id, print_batch_step):
         # image input
         if engine.amp:
             amp_level = engine.config["AMP"].get("level", "O1").upper()
-            with paddle.amp.auto_cast(level=amp_level):
+            use_promote = engine.config["AMP"].get("use_promote", False)
+            with paddle.amp.auto_cast(
+                    level=amp_level, use_promote=use_promote):
                 out = forward(engine, batch)
                 loss_dict = engine.train_loss_func(out, batch[1])
         else:

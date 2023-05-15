@@ -258,6 +258,7 @@ class Engine(object):
                 use_dynamic_loss_scaling=self.use_dynamic_loss_scaling)
 
             self.amp_level = self.config['AMP'].get("level", "O1")
+            self.use_promote = self.config['AMP'].get("use_promote", False)
             if self.amp_level not in ["O1", "O2"]:
                 msg = "[Parameter Error]: The optimize level of AMP only support 'O1' and 'O2'. The level has been set 'O1'."
                 logger.warning(msg)
@@ -508,7 +509,9 @@ class Engine(object):
                 batch_tensor = paddle.to_tensor(batch_data)
 
                 if self.amp and self.amp_eval:
-                    with paddle.amp.auto_cast(level=self.amp_level):
+                    with paddle.amp.auto_cast(
+                            level=self.amp_level,
+                            use_promote=self.use_promote):
                         out = self.model(batch_tensor)
                 else:
                     out = self.model(batch_tensor)
