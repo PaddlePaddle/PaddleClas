@@ -15,9 +15,8 @@ Global:
   lr: 0.001
   warmup_epochs: 10
   min_lr: 1e-06
-
+  batch_size: 32
 #  num_workers: 10
-
   global_crops_scale: [ 0.25, 1.0 ]
   local_crops_number: 10
   local_crops_scale: [ 0.05, 0.25 ]
@@ -28,7 +27,7 @@ Global:
   ngpus: 8
   nodes: 2
   device: gpu
-  optimizer: adamw
+#  optimizer: adamw
   momentum_teacher: 0.996
   output_dir: ./output_ibot_vit_small_p16/
 
@@ -48,12 +47,24 @@ AMP:
 Arch:
   name: IBOT
   mode: pretrain
-  arch: vit_small
+  arch: ViT_small
   patch_size: 16
   out_dim: 8192
+  patch_out_dim: 8192
   norm_last_layer: False
   shared_head: True
   class_num: 1000
+  drop_path: 0.1
+  use_masked_im_modeling: True
+  norm_in_head: None
+  act_in_head: gelu
+  shared_head_teacher: True
+  global_crops_number: 2
+  global_crops_scale: [ 0.25, 1.0 ]
+  local_crops_number: 10
+  local_crops_scale: [ 0.05, 0.25 ]
+  pred_ratio: [ 0, 0.3 ]
+  pred_ratio_var: [ 0 0.2 ]
 
 # loss function config for traing/eval process
 Loss:
@@ -61,25 +72,42 @@ Loss:
     - IBOTLoss:
         weight: 1.0
         out_dim: 8192
-        ncrops: 12   # 10 + 2
+        patch_out_dim: 8192
+        # global_crops_number
+        ngcrops: 2
+        # local_crops_number
+        nlcrops: 10
         warmup_teacher_temp: 0.04
         teacher_temp: 0.07
+        # warmup_teacher_patch_temp
+        warmup_teacher_temp2: 0.04
+        # teacher_patch_temp
+        teacher_temp2: 0.07
         warmup_teacher_temp_epochs: 30
         nepochs: 800
+        lambda1: 1.0
+        lambda2: 1.0
+        mim_start_epoch: 0
   Eval:
     - CELoss:
         weight: 1.0
 
 
 Optimizer:
-  name: AdamW
+  name: AdamWIBOT
   weight_decay: 0.04
   no_weight_decay_name: norm bias
   clip_norm: 0
   lr:
     # for 8 cards
-    name: Constant
-    learning_rate: 5e-4
+    name: CosineIBOT
+    # 运算之后，注意修改
+    base_value: 0.00125
+    final_value: 1e-06
+    epochs: 800
+    step_each_epoch: 1
+    warmup_epochs: 10
+    start_warmup_value: 0
 
 
 # data loader for train and eval
@@ -87,20 +115,19 @@ DataLoader:
   Train:
     dataset:
       name: IBOTDataset
-      image_root: ../dataset/ILSVRC2012/
-      cls_label_path: ../dataset/ILSVRC2012/train_list.txt
+      image_root: /data3/linkaihao/dataset/mini-imagenet-1k
+      cls_label_path: /data3/linkaihao/dataset/mini-imagenet-1k/train_list.txt
       transform_ops:
-        - IBOTAugmentation:
-            transform_ops_global:
-              - DecodeImage:
-                  to_np: False
-                  to_rgb: True
-                  channel_first: False
-                  backend: pil
-              - DataAugmentationIBOT:
-                  global_crops_scale: [ 0.25, 1.0 ]
-                  local_crops_scale: [ 0.05, 0.25 ]
-                  local_crops_number: 10
+          - DecodeImage:
+              to_np: False
+              to_rgb: True
+              channel_first: False
+              backend: pil
+          - IBOTAugmentation:
+              global_crops_scale: [ 0.25, 1.0 ]
+              local_crops_scale: [ 0.05, 0.25 ]
+              global_crops_number: 2
+              local_crops_number: 10
     sampler:
       name: DistributedBatchSampler
       batch_size: 32
@@ -108,32 +135,6 @@ DataLoader:
       shuffle: True
     loader:
       num_workers: 10
-      use_shared_memory: True
-
-  Eval:
-    dataset: 
-      name: IBOTDataset
-      image_root: ../dataset/ILSVRC2012/
-      cls_label_path: ../dataset/ILSVRC2012/val_list.txt
-      transform_ops:
-        - IBOTAugmentation:
-            transform_ops_global:
-              - DecodeImage:
-                  to_np: False
-                  to_rgb: True
-                  channel_first: False
-                  backend: pil
-              - DataAugmentationIBOT:
-                  global_crops_scale: [ 0.25, 1.0 ]
-                  local_crops_scale: [ 0.05, 0.25 ]
-                  local_crops_number: 10
-    sampler:
-      name: DistributedBatchSampler
-      batch_size: 32
-      drop_last: True
-      shuffle: False
-    loader:
-      num_workers: 8
       use_shared_memory: True
 
 #Infer:

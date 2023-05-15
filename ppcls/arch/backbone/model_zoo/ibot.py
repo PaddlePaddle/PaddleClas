@@ -446,6 +446,7 @@ def IBOT_ViT_base_patch16_224(patch_size=16, **kwargs):
         qkv_bias=True,
         **kwargs
     )
+
     return model
 
 
@@ -495,10 +496,12 @@ class IBOT(nn.Layer):
                     return_all_tokens=True,
                     masked_im_modeling=arch_config["use_masked_im_modeling"]
                 ),
+            student = student[0]
             teacher = model_name(
-                patch_size=arch_config["patch_size"],
-                return_all_tokens=True,
-            ),
+                        patch_size=arch_config["patch_size"],
+                        return_all_tokens=True,
+                    ),
+            teacher = teacher[0]
             embed_dim = student.embed_dim
             # multi-crop wrapper handles forward with inputs of different resolutions
             self.student = MultiCropWrapper(
