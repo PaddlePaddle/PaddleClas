@@ -141,6 +141,11 @@ class Engine(object):
                 # set max iteration per epoch mannualy, when training by iteration(s), such as XBM, FixMatch.
                 self.iter_per_epoch = self.config["Global"].get(
                     "iter_per_epoch")
+            if self.iter_per_epoch < self.update_freq:
+                logger.warning(
+                    "The arg Global.update_freq greater than iter_per_epoch and has been set to 1. This may be caused by too few of batches."
+                )
+                self.update_freq = 1
             self.iter_per_epoch = self.iter_per_epoch // self.update_freq * self.update_freq
 
         if self.mode == "eval" or (self.mode == "train" and
