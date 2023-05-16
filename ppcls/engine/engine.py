@@ -63,19 +63,17 @@ class Engine(object):
         else:
             self.is_rec = False
 
-        # set seed
-        seed = self.config["Global"].get("seed", False)
-        if seed or seed == 0:
-            assert isinstance(seed, int), "The 'seed' must be a integer!"
-            paddle.seed(seed)
-            np.random.seed(seed)
-            random.seed(seed)
-
         # init logger
         self.output_dir = self.config['Global']['output_dir']
         log_file = os.path.join(self.output_dir, f"{mode}.log")
         init_logger(log_file=log_file)
         print_config(config)
+
+        # set seed
+        self._init_seed()
+
+        # set device
+        self._init_device()
 
         # init train_func and eval_func
         assert self.eval_mode in [
@@ -98,13 +96,6 @@ class Engine(object):
             if not os.path.exists(vdl_writer_path):
                 os.makedirs(vdl_writer_path)
             self.vdl_writer = LogWriter(logdir=vdl_writer_path)
-
-        # set device
-        assert self.config["Global"][
-            "device"] in ["cpu", "gpu", "xpu", "npu", "mlu", "ascend", "intel_gpu", "mps"]
-        self.device = paddle.set_device(self.config["Global"]["device"])
-        logger.info('train with paddle {} and device {}'.format(
-            paddle.__version__, self.device))
 
         # gradient accumulation
         self.update_freq = self.config["Global"].get("update_freq", 1)
@@ -227,15 +218,7 @@ class Engine(object):
         apply_to_static(self.config, self.model)
 
         # load_pretrain
-        if self.config["Global"]["pretrained_model"] is not None:
-            if self.config["Global"]["pretrained_model"].startswith("http"):
-                load_dygraph_pretrain_from_url(
-                    [self.model, getattr(self, 'train_loss_func', None)],
-                    self.config["Global"]["pretrained_model"])
-            else:
-                load_dygraph_pretrain(
-                    [self.model, getattr(self, 'train_loss_func', None)],
-                    self.config["Global"]["pretrained_model"])
+        self._init_pretrained()
 
         # build optimizer
         if self.mode == 'train':
@@ -252,38 +235,8 @@ class Engine(object):
             self.model_ema = ExponentialMovingAverage(
                 self.model, self.config['EMA'].get("decay", 0.9999))
 
-        # check the gpu num
-        world_size = dist.get_world_size()
-        self.config["Global"]["distributed"] = world_size != 1
-        if self.mode == "train":
-            std_gpu_num = 8 if isinstance(
-                self.config["Optimizer"],
-                dict) and self.config["Optimizer"]["name"] == "AdamW" else 4
-            if world_size != std_gpu_num:
-                msg = f"The training strategy provided by PaddleClas is based on {std_gpu_num} gpus. But the number of gpu is {world_size} in current training. Please modify the stategy (learning rate, batch size and so on) if use this config to train."
-                logger.warning(msg)
-
         # for distributed
-        if self.config["Global"]["distributed"]:
-            dist.init_parallel_env()
-            self.model = paddle.DataParallel(self.model)
-            if self.mode == 'train' and len(self.train_loss_func.parameters(
-            )) > 0:
-                self.train_loss_func = paddle.DataParallel(
-                    self.train_loss_func)
-
-            # set different seed in different GPU manually in distributed environment
-            if seed is None:
-                logger.warning(
-                    "The random seed cannot be None in a distributed environment. Global.seed has been set to 42 by default"
-                )
-                self.config["Global"]["seed"] = seed = 42
-            logger.info(
-                f"Set random seed to ({int(seed)} + $PADDLE_TRAINER_ID) for different trainer"
-            )
-            paddle.seed(int(seed) + dist.get_rank())
-            np.random.seed(int(seed) + dist.get_rank())
-            random.seed(int(seed) + dist.get_rank())
+        self._init_dist()
 
         # build postprocess for infer
         if self.mode == 'infer':
@@ -521,11 +474,56 @@ class Engine(object):
             paddle.jit.save(model, save_path)
         if self.config["Global"].get("export_for_fd", False):
             src_path = self.config["Global"]["infer_config_path"]
-            dst_path = os.path.join(self.config["Global"]["save_inference_dir"], 'inference.yml')
+            dst_path = os.path.join(
+                self.config["Global"]["save_inference_dir"], 'inference.yml')
             shutil.copy(src_path, dst_path)
         logger.info(
             f"Export succeeded! The inference model exported has been saved in \"{self.config['Global']['save_inference_dir']}\"."
         )
+
+    def _init_seed(self):
+        # set seed
+        seed = self.config["Global"].get("seed", False)
+        if dist.get_world_size() != 1:
+            # set different seed in different GPU manually in distributed environment
+            if not seed:
+                logger.warning(
+                    "The random seed cannot be None in a distributed environment. Global.seed has been set to 42 by default"
+                )
+                self.config["Global"]["seed"] = seed = 42
+            logger.info(
+                f"Set random seed to ({int(seed)} + $PADDLE_TRAINER_ID) for different trainer"
+            )
+            dist_seed = int(seed) + dist.get_rank()
+            paddle.seed(dist_seed)
+            np.random.seed(dist_seed)
+            random.seed(dist_seed)
+        elif seed or seed == 0:
+            assert isinstance(seed, int), "The 'seed' must be a integer!"
+            paddle.seed(seed)
+            np.random.seed(seed)
+            random.seed(seed)
+
+    def _init_device(self):
+        device = self.config["Global"]["device"]
+        assert device in [
+            "cpu", "gpu", "xpu", "npu", "mlu", "ascend", "intel_gpu", "mps"
+        ]
+        logger.info('train with paddle {} and device {}'.format(
+            paddle.__version__, device))
+        self.device = device
+        paddle.set_device(device)
+
+    def _init_pretrained(self):
+        if self.config["Global"]["pretrained_model"] is not None:
+            if self.config["Global"]["pretrained_model"].startswith("http"):
+                load_dygraph_pretrain_from_url(
+                    [self.model, getattr(self, 'train_loss_func', None)],
+                    self.config["Global"]["pretrained_model"])
+            else:
+                load_dygraph_pretrain(
+                    [self.model, getattr(self, 'train_loss_func', None)],
+                    self.config["Global"]["pretrained_model"])
 
     def _init_amp(self):
         if self.mode == "export":
@@ -593,6 +591,26 @@ class Engine(object):
                     models=self.train_loss_func,
                     level=self.amp_level,
                     save_dtype='float32')
+
+    def _init_dist(self):
+        # check the gpu num
+        world_size = dist.get_world_size()
+        self.config["Global"]["distributed"] = world_size != 1
+        # TODO(gaotingquan): specify the total batch size and gpu num in config
+        if self.mode == "train":
+            std_gpu_num = 8 if isinstance(
+                self.config["Optimizer"],
+                dict) and self.config["Optimizer"]["name"] == "AdamW" else 4
+            if world_size != std_gpu_num:
+                msg = f"The training strategy provided by PaddleClas is based on {std_gpu_num} gpus. But the number of gpu is {world_size} in current training. Please modify the stategy (learning rate, batch size and so on) if use this config to train."
+                logger.warning(msg)
+        if self.config["Global"]["distributed"]:
+            dist.init_parallel_env()
+            self.model = paddle.DataParallel(self.model)
+            if self.mode == 'train' and len(self.train_loss_func.parameters(
+            )) > 0:
+                self.train_loss_func = paddle.DataParallel(
+                    self.train_loss_func)
 
 
 class ExportModel(TheseusLayer):
