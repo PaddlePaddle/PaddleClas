@@ -28,7 +28,7 @@ from ppcls.utils import logger
 from ppcls.utils.logger import init_logger
 from ppcls.utils.config import print_config
 from ppcls.data import build_dataloader
-from ppcls.arch import build_model, RecModel, DistillationModel, TheseusLayer
+from ppcls.arch import build_model, RecModel, DistillationModel, TheseusLayer, Beitv2Model
 from ppcls.arch import apply_to_static
 from ppcls.loss import build_loss
 from ppcls.metric import build_metrics
@@ -60,6 +60,10 @@ class Engine(object):
             self.is_rec = True
         else:
             self.is_rec = False
+        if self.config["Arch"].get("is_beitv2", False):
+            self.is_beitv2 = True
+        else:
+            self.is_beitv2 = False
 
         # set seed
         seed = self.config["Global"].get("seed", False)

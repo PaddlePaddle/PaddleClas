@@ -424,3 +424,33 @@ class DistillationPairLoss(nn.Layer):
             else:
                 loss_dict[f"{self.name}_{idx}_{pair[0]}_{pair[1]}"] = loss
         return loss_dict
+
+class DistillationBeitV2CELoss(CELoss):
+    """
+    DistillationBeitV2CELoss
+    """
+
+    def __init__(self,
+                 model_name_pairs=[],
+                 epsilon=None,
+                 name="loss_beitv2"):
+        super().__init__(epsilon=epsilon)
+        assert isinstance(model_name_pairs, list)
+        self.model_name_pairs = model_name_pairs
+        self.name = name
+
+    def forward(self, predicts, batch):
+        loss_dict = dict()
+        loss = dict()
+        for idx, pair in enumerate(self.model_name_pairs):
+            out1 = predicts[pair[0]]
+            out2 = predicts[pair[1]]
+            if isinstance(out2, list):
+                loss_1 = super().forward(out2[0], out1)
+                loss_2 = super().forward(out2[1], out1)
+                loss["CELoss"] = loss_1["CELoss"] + loss_2["CELoss"]
+            else:
+                loss = super().forward(out2, out1)
+            for key in loss:
+                loss_dict["{}_{}_{}".format(self.name, pair[0], pair[1])] = loss[key]
+        return loss_dict

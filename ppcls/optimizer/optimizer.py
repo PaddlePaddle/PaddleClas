@@ -247,6 +247,7 @@ class AdamW(object):
                  grad_clip=None,
                  no_weight_decay_name=None,
                  one_dim_param_no_weight_decay=False,
+                 layer_decay=1.0,
                  **args):
         super().__init__()
         self.learning_rate = learning_rate
@@ -259,11 +260,47 @@ class AdamW(object):
         self.no_weight_decay_name_list = no_weight_decay_name.split(
         ) if no_weight_decay_name else []
         self.one_dim_param_no_weight_decay = one_dim_param_no_weight_decay
+        self.layer_decay = layer_decay
 
     def __call__(self, model_list):
         # model_list is None in static graph
-        parameters = sum([m.parameters() for m in model_list],
-                         []) if model_list else None
+        def get_num_layer_for_vit(var_name, num_max_layer):
+            if var_name in ("cls_token", "mask_token", "pos_embed"):
+                return 0
+            elif var_name.startswith("patch_embed"):
+                return 0
+            elif var_name.startswith("rel_pos_bias"):
+                return num_max_layer - 1
+            elif var_name.startswith("blocks"):
+                layer_id = int(var_name.split('.')[1])
+                return layer_id + 1
+            else:
+                return num_max_layer - 1
+
+        class LayerDecayValueAssigner(object):
+            def __init__(self, values):
+                self.values = values
+
+            def get_scale(self, layer_id):
+                return self.values[layer_id]
+
+            def get_layer_id(self, var_name):
+                return get_num_layer_for_vit(var_name, len(self.values))
+
+        if self.layer_decay < 1.0:
+            parameters_list = []
+            for m in model_list:
+                num_layers = m.get_num_layers()
+                assigner = LayerDecayValueAssigner(list(self.layer_decay ** (num_layers + 1 - i) for i in range(num_layers + 2)))
+                skip_weight_decay_list = m.no_weight_decay()
+                parameters_list.append(self._get_parameter_groups(m, self.weight_decay, skip_weight_decay_list,
+                                                        get_num_layer=assigner.get_layer_id,
+                                                        get_layer_scale=assigner.get_scale))
+            parameters = sum(parameters_list, [])
+            self.weight_decay = 0.
+        else:
+            parameters = sum([m.parameters() for m in model_list],
+                            []) if model_list else None
 
         # TODO(gaotingquan): model_list is None when in static graph, "no_weight_decay" not work.
         if model_list is None:
@@ -299,6 +336,48 @@ class AdamW(object):
 
     def _apply_decay_param_fun(self, name):
         return name not in self.no_weight_decay_param_name_list
+
+    def _get_parameter_groups(self, model, weight_decay=0.05, skip_list=(), get_num_layer=None, get_layer_scale=None):
+        parameter_group_names = {}
+        parameter_group_vars = {}
+        for name, param in model.named_parameters():
+            print(param.stop_gradient)
+            if param.stop_gradient:
+                continue
+            
+            if param.ndim <= 1 or name.endswith(".bias") or name in skip_list: # param.ndim <= 1 len(param.shape) == 1
+                group_name = "no_decay"
+                this_weight_decay = 0.
+            else:
+                group_name = "decay"
+                this_weight_decay = weight_decay
+            
+            if get_num_layer is not None:
+                layer_id = get_num_layer(name)
+                group_name = "layer_%d_%s" % (layer_id, group_name)
+            else:
+                layer_id = None
+
+            if group_name not in parameter_group_names:
+                if get_layer_scale is not None:
+                    scale = get_layer_scale(layer_id)
+                else:
+                    scale = 1.
+
+                parameter_group_names[group_name] = {
+                    "weight_decay": this_weight_decay,
+                    "params": [],
+                    "learning_rate": scale
+                }
+                parameter_group_vars[group_name] = {
+                    "weight_decay": this_weight_decay,
+                    "params": [],
+                    "learning_rate": scale
+                }
+
+            parameter_group_vars[group_name]["params"].append(param)
+            parameter_group_names[group_name]["params"].append(name)
+        return list(parameter_group_vars.values())
 
 
 class AdamWDL(object):

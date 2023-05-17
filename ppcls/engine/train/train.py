@@ -107,7 +107,9 @@ def train_epoch(engine, epoch_id, print_batch_step):
 
 
 def forward(engine, batch):
-    if not engine.is_rec:
+    if not engine.is_rec and not engine.is_beitv2:
         return engine.model(batch[0])
-    else:
+    elif engine.is_rec:
         return engine.model(batch[0], batch[1])
+    else:
+        return engine.model(batch[0], batch[1], batch[2])
