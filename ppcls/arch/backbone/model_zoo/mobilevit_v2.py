@@ -27,16 +27,10 @@ from ....utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_fro
 MODEL_URLS = {
     "MobileViTV2_x0_5":
     "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/MobileViTV2_x0_5_pretrained.pdparams",
-    "MobileViTV2_x0_75":
-    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/MobileViTV2_x0_75_pretrained.pdparams",
     "MobileViTV2_x1_0":
     "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/MobileViTV2_x1_0_pretrained.pdparams",
-    "MobileViTV2_x1_25":
-    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/MobileViTV2_x1_25_pretrained.pdparams",
     "MobileViTV2_x1_5":
     "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/MobileViTV2_x1_5_pretrained.pdparams",
-    "MobileViTV2_x1_75":
-    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/MobileViTV2_x1_75_pretrained.pdparams",
     "MobileViTV2_x2_0":
     "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/MobileViTV2_x2_0_pretrained.pdparams",
 }
